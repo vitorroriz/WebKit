@@ -138,7 +138,6 @@ public:
     float widthForSimpleText(StringView text, TextDirection = TextDirection::LTR) const;
 
     std::unique_ptr<TextLayout, TextLayoutDeleter> createLayout(RenderText&, float xPos, bool collapseWhiteSpace) const;
-    static float width(TextLayout&, unsigned from, unsigned len, HashSet<const Font*>* fallbackFonts = 0);
     float widthOfSpaceString() const
     {
         return width(TextRun { String { &space, 1 } });
