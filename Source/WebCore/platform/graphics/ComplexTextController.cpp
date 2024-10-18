@@ -316,6 +316,7 @@ void ComplexTextController::collectComplexTextRuns()
     bool dontSynthesizeSmallCaps = !m_font.fontDescription().hasAutoFontSynthesisSmallCaps();
     bool engageAllSmallCapsProcessing = fontVariantCaps == FontVariantCaps::AllSmall || fontVariantCaps == FontVariantCaps::AllPetite;
     bool engageSmallCapsProcessing = engageAllSmallCapsProcessing || fontVariantCaps == FontVariantCaps::Small || fontVariantCaps == FontVariantCaps::Petite;
+    auto shouldProcessTextSpacingTrim = !m_font.textSpacingTrim().isSpaceAll();
 
     if (engageAllSmallCapsProcessing || engageSmallCapsProcessing)
         m_smallCapsBuffer.resize(m_end);
@@ -327,6 +328,7 @@ void ComplexTextController::collectComplexTextRuns()
     RefPtr<const Font> nextFont;
     RefPtr<const Font> synthesizedFont;
     RefPtr<const Font> smallSynthesizedFont;
+    RefPtr<const Font> protectedHalfWidthFont;
 
     CachedTextBreakIterator graphemeClusterIterator(m_run.text(), { }, TextBreakIterator::CharacterMode { }, m_font.fontDescription().computedLocale());
 
@@ -337,6 +339,17 @@ void ComplexTextController::collectComplexTextRuns()
     // We may want to change this code to do so in the future; if we do, then the logic in initiateFontLoadingByAccessingGlyphDataIfApplicable()
     // would need to be updated accordingly too.
     nextFont = m_font.fontForCombiningCharacterSequence(baseOfString.first(currentIndex));
+
+    auto getHalfWidthFontIfNeeded = [&] (RefPtr<const Font>& protectedHalfWidthFont, TextSpacing::CharactersData& charactersData) {
+        if (m_font.textSpacingTrim().shouldTrimSpacing(charactersData))
+            protectedHalfWidthFont = nextFont->halfWidthFont();
+        return protectedHalfWidthFont ? protectedHalfWidthFont : nextFont;
+    };
+
+    if (shouldProcessTextSpacingTrim && nextFont && !nextFont->isSystemFontFallbackPlaceholder()) {
+        TextSpacing::CharactersData charactersData = { .currentCharacter = baseCharacter, .currentCharacterClass = TextSpacing::characterClass(baseCharacter) };
+        nextFont = getHalfWidthFontIfNeeded(protectedHalfWidthFont, charactersData);
+    }
 
     bool isSmallCaps = false;
     bool nextIsSmallCaps = false;
@@ -357,6 +370,7 @@ void ComplexTextController::collectComplexTextRuns()
         font = nextFont.get();
         isSmallCaps = nextIsSmallCaps;
         auto previousIndex = currentIndex;
+        protectedHalfWidthFont = nullptr;
 
         advanceByCombiningCharacterSequence(graphemeClusterIterator, currentIndex, baseCharacter);
 
@@ -377,6 +391,11 @@ void ComplexTextController::collectComplexTextRuns()
         }
 
         nextFont = m_font.fontForCombiningCharacterSequence(baseOfString.subspan(previousIndex, currentIndex - previousIndex));
+
+        if (shouldProcessTextSpacingTrim && nextFont && !nextFont->isSystemFontFallbackPlaceholder()) {
+            TextSpacing::CharactersData charactersData = { .currentCharacter = baseCharacter, .currentCharacterClass = TextSpacing::characterClass(baseCharacter) };
+            nextFont = getHalfWidthFontIfNeeded(protectedHalfWidthFont, charactersData);
+        }
 
         capitalizedBase = capitalized(baseCharacter);
         if (!synthesizedFont && shouldSynthesizeSmallCaps(dontSynthesizeSmallCaps, nextFont.get(), baseCharacter, capitalizedBase, fontVariantCaps, engageAllSmallCapsProcessing)) {
