@@ -50,10 +50,7 @@ public:
     {
         return m_textRun == other.m_textRun
             && m_fontCascadeGeneration == other.m_fontCascadeGeneration
-            && m_codePath == other.m_codePath
-            && m_forTextEmphasisOrNot == other.m_forTextEmphasisOrNot
-            && from == other.from
-            && to == other.to;
+            && m_forTextEmphasisOrNot == other.m_forTextEmphasisOrNot;
     }
 
     GlyphBufferCacheKey(WTF::HashTableEmptyValueType)
@@ -64,13 +61,11 @@ public:
         : m_textRun(WTF::HashTableDeletedValue)
     { }
 
-    GlyphBufferCacheKey(const TextRun& textRun, const FontCascade& font, FontCascade::CodePath& codePath, FontCascade::ForTextEmphasisOrNot forTextEmphasisOrNot, unsigned from, unsigned to)
+    GlyphBufferCacheKey(FontCascade::CodePath codePath, const TextRun& textRun, const FontCascade& font, FontCascade::ForTextEmphasisOrNot forTextEmphasisOrNot)
         : m_textRun(textRun)
         , m_fontCascadeGeneration(font.generation())
         , m_codePath(codePath)
         , m_forTextEmphasisOrNot(forTextEmphasisOrNot)
-        , from(from)
-        , to(to)
     {
     }
 
@@ -79,13 +74,11 @@ private:
     unsigned m_fontCascadeGeneration;
     FontCascade::CodePath m_codePath;
     FontCascade::ForTextEmphasisOrNot m_forTextEmphasisOrNot;
-    unsigned from;
-    unsigned to;
 };
 
 inline void add(Hasher& hasher, const GlyphBufferCacheKey& key)
 {
-    add(hasher, key.m_textRun, key.m_fontCascadeGeneration, key.m_codePath, key.m_forTextEmphasisOrNot, key.from, key.to);
+    add(hasher, key.m_textRun, key.m_fontCascadeGeneration, key.m_codePath, key.m_forTextEmphasisOrNot);
 }
 
 struct GlyphBufferCacheEntryHash {

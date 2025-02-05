@@ -57,13 +57,13 @@ GlyphBuffer GlyphBufferCache::glyphBuffer(const FontCascade& font, FontCascade::
         return font.layoutText(codePath, textRun, from, to, forTextEmphasisOrNot);
     }
 
-    // if (from || to != textRun.length())
-    //     return font.layoutText(codePath, textRun, from, to);
+    if (from || to != textRun.length())
+        return font.layoutText(codePath, textRun, from, to);
 
     if (font.isLoadingCustomFonts() || !font.fonts())
         return font.layoutText(codePath, textRun, from, to, forTextEmphasisOrNot);
 
-    GlyphBufferCacheKey key { textRun, font, codePath, forTextEmphasisOrNot, from, to };
+    GlyphBufferCacheKey key { codePath, textRun, font, forTextEmphasisOrNot };
     if (auto entry = m_entries.find(key); entry != m_entries.end())
         return *entry->value;
 
