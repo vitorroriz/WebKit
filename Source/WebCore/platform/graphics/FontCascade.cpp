@@ -34,6 +34,7 @@
 #include "LayoutRect.h"
 #include "TextRun.h"
 #include "WidthIterator.h"
+#include "rendering/GlyphBufferCache.h"
 #include <wtf/MainThread.h>
 #include <wtf/MathExtras.h>
 #include <wtf/NeverDestroyed.h>
@@ -163,6 +164,11 @@ GlyphBuffer FontCascade::layoutText(CodePath codePathToUse, const TextRun& run, 
     return layoutComplexText(run, from, to, forTextEmphasis);
 }
 
+GlyphBuffer FontCascade::layoutTextFromCache(CodePath codePathToUse, const TextRun& run, unsigned from, unsigned to, ForTextEmphasisOrNot forTextEmphasis) const
+{
+    return GlyphBufferCache::singleton().glyphBuffer(*this, codePathToUse, forTextEmphasis, run, from, to);
+}
+
 float FontCascade::letterSpacing() const
 {
     switch (m_spacing.letter.type()) {
@@ -196,7 +202,7 @@ float FontCascade::wordSpacing() const
 FloatSize FontCascade::drawText(GraphicsContext& context, const TextRun& run, const FloatPoint& point, unsigned from, std::optional<unsigned> to, CustomFontNotReadyAction customFontNotReadyAction) const
 {
     unsigned destination = to.value_or(run.length());
-    auto glyphBuffer = layoutText(codePath(run, from, to), run, from, destination);
+    auto glyphBuffer = layoutTextFromCache(codePath(run, from, to), run, from, destination);
     glyphBuffer.flatten();
 
     if (glyphBuffer.isEmpty())
@@ -214,7 +220,7 @@ void FontCascade::drawEmphasisMarks(GraphicsContext& context, const TextRun& run
 
     unsigned destination = to.value_or(run.length());
 
-    auto glyphBuffer = layoutText(codePath(run, from, to), run, from, destination, ForTextEmphasisOrNot::ForTextEmphasis);
+    auto glyphBuffer = layoutTextFromCache(codePath(run, from, to), run, from, destination, ForTextEmphasisOrNot::ForTextEmphasis);
     glyphBuffer.flatten();
 
     if (glyphBuffer.isEmpty())
@@ -234,7 +240,7 @@ std::unique_ptr<DisplayList::DisplayList> FontCascade::displayListForTextRun(Gra
     if (codePathToUse != CodePath::Complex && (enableKerning() || requiresShaping()) && (from || destination != run.length()))
         codePathToUse = CodePath::Complex;
 
-    auto glyphBuffer = layoutText(codePathToUse, run, from, destination);
+    auto glyphBuffer = layoutTextFromCache(codePathToUse, run, from, destination);
     glyphBuffer.flatten();
 
     if (glyphBuffer.isEmpty())
@@ -1590,6 +1596,14 @@ void FontCascade::drawEmphasisMarks(GraphicsContext& context, const GlyphBuffer&
 
 float FontCascade::widthForSimpleText(const TextRun& run, SingleThreadWeakHashSet<const Font>* fallbackFonts, GlyphOverflow* glyphOverflow) const
 {
+    // WTF_ALWAYS_LOG("--- widthForSimpleText fallbackfonts: " << !!fallbackFonts << " glyphoverflow: " << !!glyphOverflow );
+    // if (!fallbackFonts && !glyphOverflow) {
+    if (!glyphOverflow) {
+        auto glyphBuffer = GlyphBufferCache::singleton().glyphBuffer(*this, CodePath::Simple, ForTextEmphasisOrNot::NotForTextEmphasis, run, 0, run.length());
+        return glyphBuffer.totalAdvance();
+        // WTF_ALWAYS_LOG("totalAdvance: " << glyphBuffer.totalAdvance());
+    }
+
     WidthIterator it(*this, run, fallbackFonts, glyphOverflow);
     GlyphBuffer glyphBuffer;
     it.advance(run.length(), glyphBuffer);
@@ -1603,10 +1617,19 @@ float FontCascade::widthForSimpleText(const TextRun& run, SingleThreadWeakHashSe
     }
 
     return it.runWidthSoFar();
+    // auto w = it.runWidthSoFar();
+    // WTF_ALWAYS_LOG("widthSoFar: " << w);
+    // return w;
 }
 
 float FontCascade::widthForComplexText(const TextRun& run, SingleThreadWeakHashSet<const Font>* fallbackFonts, GlyphOverflow* glyphOverflow) const
 {
+    // WTF_ALWAYS_LOG("--- widthForComplexText");
+    if (!glyphOverflow) {
+        auto glyphBuffer = GlyphBufferCache::singleton().glyphBuffer(*this, CodePath::Complex, ForTextEmphasisOrNot::NotForTextEmphasis, run, 0, run.length());
+        return glyphBuffer.totalAdvance();
+        // WTF_ALWAYS_LOG("totalAdvance: " << glyphBuffer.totalAdvance());
+    }
     ComplexTextController controller(*this, run, true, fallbackFonts);
     if (glyphOverflow) {
         glyphOverflow->top = std::max<double>(glyphOverflow->top, -controller.minGlyphBoundingBoxY() - (glyphOverflow->computeBounds ? 0 : metricsOfPrimaryFont().ascent()));
@@ -1864,7 +1887,8 @@ Vector<FloatSegment> FontCascade::lineSegmentsForIntersectionsWithRect(const Tex
     if (isLoadingCustomFonts())
         return result;
 
-    auto glyphBuffer = layoutText(codePath(run), run, 0, run.length());
+    auto glyphBuffer = layoutTextFromCache(codePath(run), run, 0, run.length());
+
     if (!glyphBuffer.size())
         return result;
 
