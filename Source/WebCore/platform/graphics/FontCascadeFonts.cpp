@@ -169,13 +169,13 @@ static FontRanges realizeNextFallback(const FontCascadeDescription& description,
         auto visitor = WTF::makeVisitor([&, fontSelector = RefPtr { fontSelector }](const AtomString& family) -> FontRanges {
             if (family.isNull())
                 return FontRanges();
+            if (auto font = fontCache.fontForFamily(description, family))
+                return FontRanges(WTFMove(font));
             if (fontSelector) {
                 auto ranges = fontSelector->fontRangesForFamily(description, family);
                 if (!ranges.isNull())
                     return ranges;
             }
-            if (auto font = fontCache.fontForFamily(description, family))
-                return FontRanges(WTFMove(font));
             return FontRanges();
         }, [&](const FontFamilyPlatformSpecification& fontFamilySpecification) -> FontRanges {
             return { fontFamilySpecification.fontRanges(description), IsGenericFontFamily::Yes };
