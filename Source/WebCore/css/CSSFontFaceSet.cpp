@@ -576,4 +576,9 @@ void CSSFontFaceSet::fontPropertyChanged(CSSFontFace& face, CSSValueList* oldFam
     });
 }
 
+bool CSSFontFaceSet::hasFontFaceForFamily(const AtomString& fontFamily)
+{
+    return m_facesLookupTable.find(fontFamily) != m_facesLookupTable.end();
+}
+
 }

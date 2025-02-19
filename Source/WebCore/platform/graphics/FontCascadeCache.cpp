@@ -32,6 +32,8 @@
 
 #include "FontCache.h"
 #include "FontCascadeDescription.h"
+#include "FontCascadeFonts.h"
+#include "WidthCache.h"
 #include <wtf/TZoneMallocInlines.h>
 
 namespace WebCore {
@@ -40,6 +42,11 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(FontDescriptionKeyRareData);
 WTF_MAKE_TZONE_ALLOCATED_IMPL(FontCascadeCache);
 
 FontFamilyName::FontFamilyName() = default;
+
+Ref<FontDescriptionKeyRareData> FontDescriptionKeyRareData::create(FontFeatureSettings&& featureSettings, FontVariationSettings&& variationSettings, FontVariantAlternates&& variantAlternates, FontPalette&& fontPalette, FontSizeAdjust&& fontSizeAdjust)
+{
+    return adoptRef(*new FontDescriptionKeyRareData(WTFMove(featureSettings), WTFMove(variationSettings), WTFMove(variantAlternates), WTFMove(fontPalette), WTFMove(fontSizeAdjust)));
+}
 
 FontFamilyName::FontFamilyName(const AtomString& name)
     : m_name { name }
@@ -76,7 +83,8 @@ void FontCascadeCache::invalidate()
 void FontCascadeCache::clearWidthCaches()
 {
     for (auto& value : m_entries.values())
-        value->fonts.get().widthCache().clear();
+        value->fonts.get().clearLocalWidthCache();
+    WidthCache::globalWidthCache().clear();
 }
 
 void FontCascadeCache::pruneUnreferencedEntries()
@@ -114,15 +122,15 @@ Ref<FontCascadeFonts> FontCascadeCache::retrieveOrAddCachedFonts(const FontCasca
     newEntry = makeUnique<FontCascadeCacheEntry>(FontCascadeCacheEntry { WTFMove(key), FontCascadeFonts::create(WTFMove(fontSelector)) });
     Ref<FontCascadeFonts> fonts = newEntry->fonts.get();
 
-    static constexpr unsigned unreferencedPruneInterval = 50;
-    static constexpr int maximumEntries = 400;
-    static unsigned pruneCounter;
+    // static constexpr unsigned unreferencedPruneInterval = 50;
+    // static constexpr int maximumEntries = 400;
+    // static unsigned pruneCounter;
     // Referenced FontCascadeFonts would exist anyway so pruning them saves little memory.
-    if (!(++pruneCounter % unreferencedPruneInterval))
-        pruneUnreferencedEntries();
+    // if (!(++pruneCounter % unreferencedPruneInterval))
+    //     pruneUnreferencedEntries();
     // Prevent pathological growth.
-    if (m_entries.size() > maximumEntries)
-        m_entries.remove(m_entries.random());
+    // if (m_entries.size() > maximumEntries)
+    //     m_entries.remove(m_entries.random());
     return fonts;
 }
 

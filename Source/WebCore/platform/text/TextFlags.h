@@ -231,7 +231,7 @@ public:
         return { };
     }
 
-    friend void add(Hasher&, const FontVariantAlternates&);
+    WEBCORE_EXPORT friend void add(Hasher&, const FontVariantAlternates&);
 
 private:
     Markable<Values> m_values;

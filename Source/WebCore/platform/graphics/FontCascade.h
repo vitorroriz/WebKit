@@ -139,6 +139,8 @@ public:
     void updateFonts(Ref<FontCascadeFonts>&&) const;
     WEBCORE_EXPORT void update(RefPtr<FontSelector>&& = nullptr) const;
 
+    bool canUseGlobalWidthCache() const;
+
     enum class CustomFontNotReadyAction : bool { DoNotPaintIfFontNotReady, UseFallbackIfFontNotReady };
     WEBCORE_EXPORT FloatSize drawText(GraphicsContext&, const TextRun&, const FloatPoint&, unsigned from = 0, std::optional<unsigned> to = std::nullopt, CustomFontNotReadyAction = CustomFontNotReadyAction::DoNotPaintIfFontNotReady) const;
     static void drawGlyphs(GraphicsContext&, const Font&, std::span<const GlyphBufferGlyph>, std::span<const GlyphBufferAdvance>, const FloatPoint&, FontSmoothingMode);
@@ -333,6 +335,7 @@ public:
     FontCascadeFonts* fonts() const { return m_fonts.get(); }
     WEBCORE_EXPORT RefPtr<FontCascadeFonts> protectedFonts() const;
     bool isLoadingCustomFonts() const;
+    WEBCORE_EXPORT WidthCache& widthCache() const;
 
     static ResolvedEmojiPolicy resolveEmojiPolicy(FontVariantEmoji, char32_t);
 
@@ -379,6 +382,7 @@ private:
     bool m_enableKerning { false }; // Computed from m_fontDescription.
     bool m_requiresShaping { false }; // Computed from m_fontDescription.
     mutable WTF::BitSet<256 * bitsPerCharacterInCanUseSimplifiedTextMeasuringForAutoVariantCache> m_canUseSimplifiedTextMeasuringForAutoVariantCache;
+    std::optional<bool> m_canUseGlobalWidthCache { std::nullopt };
 };
 
 inline Ref<const Font> FontCascade::primaryFont() const
@@ -435,7 +439,7 @@ inline float FontCascade::widthForTextUsingSimplifiedMeasuring(StringView text, 
     if (text.isEmpty())
         return 0;
     ASSERT(codePath(TextRun(text)) != CodePath::Complex);
-    float* cacheEntry = protectedFonts()->widthCache().add(text, std::numeric_limits<float>::quiet_NaN());
+    float* cacheEntry = widthCache().add(fontDescription(), text, std::numeric_limits<float>::quiet_NaN());
     if (cacheEntry && !std::isnan(*cacheEntry))
         return *cacheEntry;
 

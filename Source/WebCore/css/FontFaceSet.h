@@ -67,6 +67,9 @@ public:
 
     CSSFontFaceSet& backing() { return m_backing; }
 
+    // FIXME: is this necessary? I think faces here are added to its m_backing counterpart
+    // bool hasFontFaceForFamily(const AtomString& family) const;
+
     class Iterator {
     public:
         explicit Iterator(FontFaceSet&);

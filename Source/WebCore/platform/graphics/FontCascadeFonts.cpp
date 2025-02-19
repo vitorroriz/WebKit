@@ -32,7 +32,9 @@
 
 #include "FontCache.h"
 #include "FontCascade.h"
+#include "FontSelector.h"
 #include "GlyphPage.h"
+#include "WidthCache.h"
 #include <wtf/TZoneMallocInlines.h>
 
 namespace WebCore {
@@ -571,6 +573,28 @@ void FontCascadeFonts::pruneSystemFallbacks()
     }
     m_systemFallbackFontSet.clear();
 }
+
+bool FontCascadeFonts::canUseGlobalWidthCache(const FontCascadeDescription& description) const
+{
+    auto selector = fontSelector();
+    if (!selector)
+        return true;
+    return selector->canUseGlobalWidthCache(description);
+}
+
+// WidthCache& FontCascadeFonts::widthCache(const FontCascadeDescription& description)
+// {
+//     if (canUseGlobalWidthCache(description))
+//         return WidthCache::globalWidthCache();
+//     return m_widthCache;
+// }
+
+// const WidthCache& FontCascadeFonts::widthCache(const FontCascadeDescription& description) const
+// {
+//     if (canUseGlobalWidthCache(description))
+//         return WidthCache::globalWidthCache();
+//     return m_widthCache;
+// }
 
 TextStream& operator<<(TextStream& ts, const FontCascadeFonts& fontCascadeFonts)
 {

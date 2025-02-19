@@ -26,6 +26,8 @@
 #ifndef WidthCache_h
 #define WidthCache_h
 
+#include "FontCascadeCache.h"
+#include "FontCascadeDescription.h"
 #include "TextRun.h"
 #include "TextSpacing.h"
 #include <wtf/Forward.h>
@@ -43,7 +45,17 @@ namespace WebCore {
 struct GlyphOverflow;
 
 class WidthCache {
-private:
+public:
+enum class IsGlobal : bool {
+    No = 0,
+    Yes
+};
+
+static WidthCache& globalWidthCache()
+{
+    static NeverDestroyed<WidthCache> cache(IsGlobal::Yes);
+    return cache;
+}
     // Used to optimize small strings as hash table keys. Avoids malloc'ing an out-of-line StringImpl.
     class SmallStringKey {
     public:
@@ -76,6 +88,7 @@ private:
 
         friend bool operator==(const SmallStringKey&, const SmallStringKey&) = default;
         friend bool operator!=(const SmallStringKey&, const SmallStringKey&) = default;
+        friend void add(Hasher&, const SmallStringKey&);
 
     private:
         static constexpr unsigned s_capacity = 16;
@@ -109,14 +122,88 @@ private:
         static constexpr int minimumTableSize = 16;
     };
 
-public:
-    WidthCache()
+    struct WidthCacheKey {
+        // IsGlobal isGlobal { IsGlobal::No };
+        SmallStringKey smallStringKey;
+        FontDescriptionKey fontDescriptionKey;
+        Vector<FontFamilyName, 3> families;
+
+        bool operator==(const WidthCacheKey&) const = default;
+        bool isHashTableDeletedValue() const { return smallStringKey.isHashTableDeletedValue(); }
+        bool isHashTableEmptyValue() const { return smallStringKey.isHashTableEmptyValue(); }
+
+        friend void add(Hasher& , const WidthCacheKey&);
+
+        static WidthCacheKey makeKey(const FontCascadeDescription& description, StringView smallString)
+        {
+            auto familyCount = description.familyCount();
+            return {
+                // isGlobal,
+                SmallStringKey(smallString),
+                FontDescriptionKey(description),
+                Vector<FontFamilyName, 3>(familyCount, [&](size_t i) -> AtomString { return description.familyAt(i); })
+            };
+        }
+    };
+
+    struct WidthCacheKeyHash {
+        static unsigned hash(const WidthCacheKey& key) { return computeHash(key); }
+        static bool equal(const WidthCacheKey& a, const WidthCacheKey& b) { return a == b; }
+        static constexpr bool safeToCompareToEmptyOrDeleted = true;
+    };
+
+    struct WidthCacheKeyHashTraits : HashTraits<WidthCacheKey> {
+        static WidthCacheKey emptyValue() { return { }; }
+        static void constructDeletedValue(WidthCacheKey& slot) { new (NotNull, &slot.smallStringKey) SmallStringKey(WTF::HashTableDeletedValue); }
+        static bool isDeletedValue(const WidthCacheKey& key) { return key.isHashTableDeletedValue(); }
+
+    };
+
+    WidthCache(IsGlobal isGlobal = IsGlobal::No)
         : m_interval(s_maxInterval)
         , m_countdown(m_interval)
+        , m_isGlobal(isGlobal)
     {
     }
 
-    float* add(StringView text, float entry)
+    struct SingleCharacterWidthCacheKey {
+        // IsGlobal isGlobal { IsGlobal::No };
+        char32_t character;
+        FontDescriptionKey fontDescriptionKey;
+        Vector<FontFamilyName, 3> families;
+
+        bool operator==(const SingleCharacterWidthCacheKey&) const = default;
+        bool isHashTableDeletedValue() const { return fontDescriptionKey.isHashTableDeletedValue(); }
+        bool isHashTableEmptyValue() const { return families.isEmpty(); }
+
+        friend void add(Hasher& , const SingleCharacterWidthCacheKey&);
+
+        static SingleCharacterWidthCacheKey makeKey(const FontCascadeDescription& description, char32_t character)
+        {
+            auto familyCount = description.familyCount();
+            return {
+                // isGlobal,
+                character,
+                FontDescriptionKey(description),
+                Vector<FontFamilyName, 3>(familyCount, [&](size_t i) -> AtomString { return description.familyAt(i); })
+            };
+        }
+    };
+
+    struct SingleCharacterWidthCacheKeyHash {
+        static unsigned hash(const SingleCharacterWidthCacheKey& key) { return computeHash(key); }
+        static bool equal(const SingleCharacterWidthCacheKey& a, const SingleCharacterWidthCacheKey& b) { return a == b; }
+        static constexpr bool safeToCompareToEmptyOrDeleted = true;
+    };
+
+    struct SingleCharacterWidthCacheKeyHashTraits : HashTraits<SingleCharacterWidthCacheKey> {
+        static SingleCharacterWidthCacheKey emptyValue() { return { }; }
+        static void constructDeletedValue(SingleCharacterWidthCacheKey& slot) { new (NotNull, &slot.fontDescriptionKey) FontDescriptionKey(WTF::HashTableDeletedValue); }
+        static bool isDeletedValue(const SingleCharacterWidthCacheKey& key) { return key.isHashTableDeletedValue(); }
+
+    };
+
+    float* add(const FontCascadeDescription& description, StringView text, float entry)
     {
         unsigned length = text.length();
 
@@ -127,15 +214,15 @@ public:
         if (length > SmallStringKey::capacity())
             return nullptr;
 
-        if (m_countdown > 0) {
-            --m_countdown;
-            return nullptr;
-        }
+//        if (m_countdown > 0) {
+//            --m_countdown;
+//            return nullptr;
+//        }
 
-        return addSlowCase(text, entry);
+        return addSlowCase(description, text, entry);
     }
 
-    float* add(const TextRun& run, float entry, bool hasKerningOrLigatures, bool hasWordSpacingOrLetterSpacing, bool hasTextSpacing, GlyphOverflow* glyphOverflow)
+    float* add(const FontCascadeDescription& description, const TextRun& run, float entry, bool hasKerningOrLigatures, bool hasWordSpacingOrLetterSpacing, bool hasTextSpacing, GlyphOverflow* glyphOverflow)
     {
         // The width cache is not really profitable unless we're doing expensive glyph transformations.
         if (!hasKerningOrLigatures)
@@ -153,18 +240,20 @@ public:
         if (hasTextSpacing && invalidateCacheForTextSpacing(run))
             return nullptr;
 
-        return add(run.text(), entry);
+        return add(description, run.text(), entry);
     }
 
     void clear()
     {
         m_singleCharMap.clear();
+        m_globalSingleCharMap.clear();
         m_map.clear();
+        m_smallStringMap.clear();
     }
 
 private:
 
-    float* addSlowCase(StringView text, float entry)
+    float* addSlowCase(const FontCascadeDescription& description, StringView text, float entry)
     {
         if (MemoryPressureHandler::singleton().isUnderMemoryPressure())
             return nullptr;
@@ -175,14 +264,29 @@ private:
         if (length == 1) {
             // The map use 0 for empty key, thus we do +1 here to avoid conflicting against empty key.
             // This is fine since the key is uint32_t while character is UChar. So +1 never causes overflow.
-            uint32_t character = text[0];
-            auto addResult = m_singleCharMap.fastAdd(character + 1, entry);
-            isNewEntry = addResult.isNewEntry;
-            value = &addResult.iterator->value;
+            if (isGlobal()) {
+                uint32_t character = text[0];
+                auto key = SingleCharacterWidthCacheKey::makeKey(description, character + 1);
+                auto addResult = m_globalSingleCharMap.fastAdd(key, entry);
+                isNewEntry = addResult.isNewEntry;
+                value = &addResult.iterator->value;
+            } else {
+                uint32_t character = text[0];
+                auto addResult = m_singleCharMap.fastAdd(character + 1, entry);
+                isNewEntry = addResult.isNewEntry;
+                value = &addResult.iterator->value;
+            }
         } else {
-            auto addResult = m_map.fastAdd(text, entry);
-            isNewEntry = addResult.isNewEntry;
-            value = &addResult.iterator->value;
+            if (isGlobal()) {
+                auto key = WidthCacheKey::makeKey(description, text);
+                auto addResult = m_map.fastAdd(key, entry);
+                isNewEntry = addResult.isNewEntry;
+                value = &addResult.iterator->value;
+            } else {
+                auto addResult = m_smallStringMap.fastAdd(text, entry);
+                isNewEntry = addResult.isNewEntry;
+                value = &addResult.iterator->value;
+            }
         }
 
         // Cache hit: ramp up by sampling the next few words.
@@ -200,8 +304,7 @@ private:
             return value;
 
         // No need to be fancy: we're just trying to avoid pathological growth.
-        m_singleCharMap.clear();
-        m_map.clear();
+        clear();
         return nullptr;
     }
 
@@ -222,19 +325,46 @@ private:
         return false;
     }
 
-    using Map = UncheckedKeyHashMap<SmallStringKey, float, SmallStringKeyHash, SmallStringKeyHashTraits, WTF::FloatWithZeroEmptyKeyHashTraits<float>>;
+    bool isGlobal() const { return m_isGlobal == IsGlobal::Yes; }
+
+    using SmallStringMap = UncheckedKeyHashMap<SmallStringKey, float, SmallStringKeyHash, SmallStringKeyHashTraits, WTF::FloatWithZeroEmptyKeyHashTraits<float>>;
     using SingleCharMap = UncheckedKeyHashMap<uint32_t, float, DefaultHash<uint32_t>, HashTraits<uint32_t>, WTF::FloatWithZeroEmptyKeyHashTraits<float>>;
 
+    using Map = UncheckedKeyHashMap<WidthCacheKey, float, WidthCacheKeyHash, WidthCacheKeyHashTraits, WTF::FloatWithZeroEmptyKeyHashTraits<float>>;
+    using GlobalSingleCharMap = UncheckedKeyHashMap<SingleCharacterWidthCacheKey, float, SingleCharacterWidthCacheKeyHash, SingleCharacterWidthCacheKeyHashTraits, WTF::FloatWithZeroEmptyKeyHashTraits<float>>;
+
     static constexpr int s_minInterval = -3; // A cache hit pays for about 3 cache misses.
-    static constexpr int s_maxInterval = 20; // Sampling at this interval has almost no overhead.
-    static constexpr unsigned s_maxSize = 500000; // Just enough to guard against pathological growth.
+    static constexpr int s_maxInterval = 10; // Sampling at this interval has almost no overhead.
+    static constexpr unsigned s_maxSize = 500'000'000; // Just enough to guard against pathological growth.
 
     int m_interval;
     int m_countdown;
     SingleCharMap m_singleCharMap;
+    GlobalSingleCharMap m_globalSingleCharMap;
     Map m_map;
+    SmallStringMap m_smallStringMap;
     bool m_hasSeenIdeograph;
+    IsGlobal m_isGlobal { IsGlobal::No };
 };
+
+inline void add(Hasher& hasher, const WidthCache::SmallStringKey& key)
+{
+    add(hasher, key.hash());
+}
+
+inline void add(Hasher& hasher, const WidthCache::WidthCacheKey& key)
+{
+    // add(hasher, key.smallStringKey);
+    // if (key.isGlobal == WidthCache::IsGlobal::Yes)
+    add(hasher, key.fontDescriptionKey, key.families, key.smallStringKey);
+}
+
+inline void add(Hasher& hasher, const WidthCache::SingleCharacterWidthCacheKey& key)
+{
+    // add(hasher, key.character);
+    // if (key.isGlobal == WidthCache::IsGlobal::Yes)
+    add(hasher, key.fontDescriptionKey, key.families, key.character);
+}
 
 } // namespace WebCore
 

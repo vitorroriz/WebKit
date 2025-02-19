@@ -28,6 +28,8 @@
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/ComplexTextController.h>
 #include <WebCore/FontCascade.h>
+#include <WebCore/FontCascadeCache.h>
+#include <WebCore/WidthCache.h>
 #include <WebCore/WidthIterator.h>
 #include <wtf/MainThread.h>
 #include <wtf/RunLoop.h>
@@ -65,9 +67,11 @@ TEST(MonospaceFontsTest, EnsureMonospaceFontInvariants)
                     auto glyphData = fontCascade.glyphDataForCharacter(character, false);
                     if (!glyphData.isValid() || glyphData.font != fontCascade.primaryFont().ptr())
                         continue;
-                    fontCascade.fonts()->widthCache().clear();
+                    fontCascade.fonts()->clearLocalWidthCache();
+                    WidthCache::globalWidthCache().clear();
                     float width = fontCascade.widthForSimpleTextWithFixedPitch(content, whitespaceIsCollapsed);
-                    fontCascade.fonts()->widthCache().clear();
+                    fontCascade.fonts()->clearLocalWidthCache();
+                    WidthCache::globalWidthCache().clear();
                     float originalWidth = fontCascade.widthForTextUsingSimplifiedMeasuring(content);
                     EXPECT_EQ(originalWidth , width);
                 }
@@ -77,9 +81,11 @@ TEST(MonospaceFontsTest, EnsureMonospaceFontInvariants)
                     };
                     StringView content(characters);
                     constexpr bool whitespaceIsCollapsed = false;
-                    fontCascade.fonts()->widthCache().clear();
+                    fontCascade.fonts()->clearLocalWidthCache();
+                    WidthCache::globalWidthCache().clear();
                     float width = fontCascade.widthForSimpleTextWithFixedPitch(content, whitespaceIsCollapsed);
-                    fontCascade.fonts()->widthCache().clear();
+                    fontCascade.fonts()->clearLocalWidthCache();
+                    WidthCache::globalWidthCache().clear();
                     float originalWidth = fontCascade.widthForTextUsingSimplifiedMeasuring(content);
                     EXPECT_EQ(originalWidth , width);
                 }

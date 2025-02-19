@@ -86,6 +86,8 @@ public:
     void registerForInvalidationCallbacks(FontSelectorClient&) final;
     void unregisterForInvalidationCallbacks(FontSelectorClient&) final;
 
+    bool canUseGlobalWidthCache(const FontCascadeDescription&) const final;
+
     ScriptExecutionContext* scriptExecutionContext() const { return m_context.get(); }
 
     FontFaceSet* fontFaceSetIfExists();
@@ -108,8 +110,8 @@ private:
 
     std::optional<AtomString> resolveGenericFamily(const FontDescription&, const AtomString& family);
 
-    const FontPaletteValues& lookupFontPaletteValues(const AtomString& familyName, const FontDescription&);
-    RefPtr<FontFeatureValues> lookupFontFeatureValues(const AtomString& familyName);
+    const FontPaletteValues& lookupFontPaletteValues(const AtomString& familyName, const FontDescription&) const;
+    RefPtr<FontFeatureValues> lookupFontFeatureValues(const AtomString& familyName) const;
 
     // CSSFontFaceClient
     void fontLoaded(CSSFontFace&) final;

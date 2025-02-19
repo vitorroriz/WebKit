@@ -76,6 +76,9 @@ public:
     unsigned fontSelectorVersion() const { return m_fontSelectorVersion; }
     unsigned generation() const { return m_generation; }
 
+    bool canUseGlobalWidthCache(const FontCascadeDescription&) const;
+    void clearLocalWidthCache() { m_widthCache.clear(); }
+
     WidthCache& widthCache() { return m_widthCache; }
     const WidthCache& widthCache() const { return m_widthCache; }
 

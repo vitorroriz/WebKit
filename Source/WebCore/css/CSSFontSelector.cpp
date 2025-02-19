@@ -347,7 +347,7 @@ std::optional<AtomString> CSSFontSelector::resolveGenericFamily(const FontDescri
     return std::nullopt;
 }
 
-const FontPaletteValues& CSSFontSelector::lookupFontPaletteValues(const AtomString& familyName, const FontDescription& fontDescription)
+const FontPaletteValues& CSSFontSelector::lookupFontPaletteValues(const AtomString& familyName, const FontDescription& fontDescription) const
 {
     static NeverDestroyed<FontPaletteValues> emptyFontPaletteValues;
     if (fontDescription.fontPalette().type != FontPalette::Type::Custom)
@@ -362,7 +362,7 @@ const FontPaletteValues& CSSFontSelector::lookupFontPaletteValues(const AtomStri
     return iterator->value;
 }
 
-RefPtr<FontFeatureValues> CSSFontSelector::lookupFontFeatureValues(const AtomString& familyName)
+RefPtr<FontFeatureValues> CSSFontSelector::lookupFontFeatureValues(const AtomString& familyName) const
 {
     // https://www.w3.org/TR/css-fonts-3/#font-family-casing
     auto lowercased = familyName.string().convertToLowercaseWithoutLocale();
@@ -443,6 +443,30 @@ RefPtr<Font> CSSFontSelector::fallbackFontAt(const FontDescription& fontDescript
         ResourceLoadObserver::shared().logFontLoad(*document, pictographFontFamily, !!font);
 
     return font;
+}
+
+bool CSSFontSelector::canUseGlobalWidthCache(const FontCascadeDescription& description) const
+{
+    // font face rules still pending
+    if (m_stagingArea.size())
+        return false;
+
+    if (!m_cssFontFaceSet->faceCount()
+        && !(m_fontFaceSet && m_fontFaceSet->size())
+        && m_featureValues.isEmpty()
+        && m_paletteMap.isEmpty())
+        return true;
+
+    for (const auto& family : description.families()) {
+        if (m_cssFontFaceSet->hasFontFaceForFamily(family))
+            return false;
+        if (lookupFontPaletteValues(family, description))
+            return false;
+        if (lookupFontFeatureValues(family))
+            return false;
+    }
+
+    return true;
 }
 
 }

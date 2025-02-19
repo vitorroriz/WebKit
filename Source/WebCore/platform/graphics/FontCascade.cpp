@@ -33,6 +33,7 @@
 #include "GraphicsContext.h"
 #include "LayoutRect.h"
 #include "TextRun.h"
+#include "WidthCache.h"
 #include "WidthIterator.h"
 #include <wtf/MainThread.h>
 #include <wtf/MathExtras.h>
@@ -313,10 +314,11 @@ float FontCascade::width(const TextRun& run, SingleThreadWeakHashSet<const Font>
     }
 
     bool hasWordSpacingOrLetterSpacing = wordSpacing() || letterSpacing();
-    float* cacheEntry = protectedFonts()->widthCache().add(run, std::numeric_limits<float>::quiet_NaN(), enableKerning() || requiresShaping(), hasWordSpacingOrLetterSpacing, !textAutospace().isNoAutospace(), glyphOverflow);
+    float* cacheEntry = widthCache().add(fontDescription(), run, std::numeric_limits<float>::quiet_NaN(), enableKerning() || requiresShaping(), hasWordSpacingOrLetterSpacing, !textAutospace().isNoAutospace(), glyphOverflow);
     if (cacheEntry && !std::isnan(*cacheEntry))
         return *cacheEntry;
 
+    // WTF_ALWAYS_LOG("@@@ cache miss!");
     SingleThreadWeakHashSet<const Font> localFallbackFonts;
     if (!fallbackFonts)
         fallbackFonts = &localFallbackFonts;
@@ -369,7 +371,7 @@ float FontCascade::widthForSimpleTextWithFixedPitch(StringView text, bool whites
     if (whitespaceIsCollapsed)
         return text.length() * monospaceCharacterWidth;
 
-    float* cacheEntry = protectedFonts()->widthCache().add(text, std::numeric_limits<float>::quiet_NaN());
+    float* cacheEntry = widthCache().add(fontDescription(), text, std::numeric_limits<float>::quiet_NaN());
     if (cacheEntry && !std::isnan(*cacheEntry))
         return *cacheEntry;
 
@@ -1922,6 +1924,20 @@ std::optional<char32_t> capitalized(char32_t baseCharacter)
     if (uppercaseCharacter != baseCharacter)
         return uppercaseCharacter;
     return std::nullopt;
+}
+
+bool FontCascade::canUseGlobalWidthCache() const
+{
+    if (m_canUseGlobalWidthCache.has_value())
+        return m_canUseGlobalWidthCache.value();
+
+    const_cast<FontCascade*>(this)->m_canUseGlobalWidthCache = protectedFonts()->canUseGlobalWidthCache(fontDescription());
+    return m_canUseGlobalWidthCache.value();
+}
+
+WidthCache& FontCascade::widthCache() const
+{
+    return canUseGlobalWidthCache() ? WidthCache::globalWidthCache() : protectedFonts()->widthCache();
 }
 
 TextStream& operator<<(TextStream& ts, const FontCascade& fontCascade)

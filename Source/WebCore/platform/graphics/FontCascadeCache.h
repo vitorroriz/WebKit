@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include "FontCascadeFonts.h"
+// #include "FontCascadeFonts.h"
 #include "FontDescription.h"
 #include "FontTaggedSettings.h"
 #include <array>
@@ -41,13 +41,14 @@
 
 namespace WebCore {
 
+class FontCascadeFonts;
+class FontCascadeDescription;
+class FontSelector;
+
 struct FontDescriptionKeyRareData : public RefCounted<FontDescriptionKeyRareData> {
     WTF_MAKE_TZONE_ALLOCATED(FontDescriptionKeyRareData);
 public:
-    static Ref<FontDescriptionKeyRareData> create(FontFeatureSettings&& featureSettings, FontVariationSettings&& variationSettings, FontVariantAlternates&& variantAlternates, FontPalette&& fontPalette, FontSizeAdjust&& fontSizeAdjust)
-    {
-        return adoptRef(*new FontDescriptionKeyRareData(WTFMove(featureSettings), WTFMove(variationSettings), WTFMove(variantAlternates), WTFMove(fontPalette), WTFMove(fontSizeAdjust)));
-    }
+    WEBCORE_EXPORT static Ref<FontDescriptionKeyRareData> create(FontFeatureSettings&&, FontVariationSettings&&, FontVariantAlternates&&, FontPalette&&, FontSizeAdjust&&);
 
     const FontFeatureSettings& featureSettings() const
     {
@@ -84,7 +85,7 @@ public:
     }
 
 private:
-    FontDescriptionKeyRareData(FontFeatureSettings&& featureSettings, FontVariationSettings&& variationSettings, FontVariantAlternates&& variantAlternates, FontPalette&& fontPalette, FontSizeAdjust&& fontSizeAdjust)
+    WEBCORE_EXPORT FontDescriptionKeyRareData(FontFeatureSettings&& featureSettings, FontVariationSettings&& variationSettings, FontVariantAlternates&& variantAlternates, FontPalette&& fontPalette, FontSizeAdjust&& fontSizeAdjust)
         : m_featureSettings(WTFMove(featureSettings))
         , m_variationSettings(WTFMove(variationSettings))
         , m_variantAlternates(WTFMove(variantAlternates))
@@ -214,15 +215,15 @@ namespace WebCore {
 class FontFamilyName {
 public:
     FontFamilyName();
-    FontFamilyName(const AtomString&);
+    WEBCORE_EXPORT FontFamilyName(const AtomString&);
     const AtomString& string() const;
-    friend void add(Hasher&, const FontFamilyName&);
+    WEBCORE_EXPORT friend void add(Hasher&, const FontFamilyName&);
 
 private:
     AtomString m_name;
 };
 
-bool operator==(const FontFamilyName&, const FontFamilyName&);
+WEBCORE_EXPORT bool operator==(const FontFamilyName&, const FontFamilyName&);
 
 struct FontCascadeCacheKey {
     FontDescriptionKey fontDescriptionKey; // Shared with the lower level FontCache (caching Font objects)
