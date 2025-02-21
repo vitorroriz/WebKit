@@ -132,7 +132,6 @@ void CSSFontSelector::buildStarted()
 {
     m_buildIsUnderway = true;
     m_cssFontFaceSet->purge();
-    ++m_version;
 
     ASSERT(m_cssConnectionsPossiblyToRemove.isEmpty());
     ASSERT(m_cssConnectionsEncounteredDuringBuild.isEmpty());
