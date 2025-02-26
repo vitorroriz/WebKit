@@ -463,18 +463,20 @@ bool CSSFontSelector::isSimpleFontSelectorForDescription(const FontCascadeDescri
         && m_paletteMap.isEmpty())
         return true;
 
-    for (const auto& family : description.families()) {
-        auto resolvedGenericFamilyName = resolveGenericFamily(description, family);
-        auto familyName = resolvedGenericFamilyName ? resolvedGenericFamilyName.value() : family;
-        if (m_cssFontFaceSet->hasFontFaceForFamily(familyName))
-            return false;
-        if (lookupFontPaletteValues(familyName, description))
-            return false;
-        if (lookupFontFeatureValues(familyName))
-            return false;
-    }
+    return false;
 
-    return true;
+    // for (const auto& family : description.families()) {
+    //     auto resolvedGenericFamilyName = resolveGenericFamily(description, family);
+    //     auto familyName = resolvedGenericFamilyName ? resolvedGenericFamilyName.value() : family;
+    //     if (m_cssFontFaceSet->hasFontFaceForFamily(familyName))
+    //         return false;
+    //     if (lookupFontPaletteValues(familyName, description))
+    //         return false;
+    //     if (lookupFontFeatureValues(familyName))
+    //         return false;
+    // }
+
+    // return true;
 }
 
 }
