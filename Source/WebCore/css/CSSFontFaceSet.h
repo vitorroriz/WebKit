@@ -103,6 +103,8 @@ public:
     // FIXME: Should this be implemented?
     void updateStyleIfNeeded(CSSFontFace&) final { }
 
+    bool hasFontFaceForFamily(const AtomString& family);
+
 private:
     CSSFontFaceSet(CSSFontSelector*);
 

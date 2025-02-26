@@ -27,7 +27,7 @@
 #include "config.h"
 #include "CSSFontSelector.h"
 
-#include "CachedFont.h"
+#include "CSSCounterStyleRegistry.h"
 #include "CSSFontFace.h"
 #include "CSSFontFaceSource.h"
 #include "CSSFontFeatureValuesRule.h"
@@ -36,6 +36,7 @@
 #include "CSSSegmentedFontFace.h"
 #include "CSSValueKeywords.h"
 #include "CSSValueList.h"
+#include "CachedFont.h"
 #include "CachedResourceLoader.h"
 #include "Document.h"
 #include "DocumentInlines.h"
@@ -326,7 +327,7 @@ void CSSFontSelector::fontCacheInvalidated()
     dispatchInvalidationCallbacks();
 }
 
-std::optional<AtomString> CSSFontSelector::resolveGenericFamily(const FontDescription& fontDescription, const AtomString& familyName)
+std::optional<AtomString> CSSFontSelector::resolveGenericFamily(const FontDescription& fontDescription, const AtomString& familyName) const
 {
     auto platformResult = FontDescription::platformResolveGenericFamily(fontDescription.script(), fontDescription.computedLocale(), familyName);
     if (!platformResult.isNull())
@@ -347,7 +348,7 @@ std::optional<AtomString> CSSFontSelector::resolveGenericFamily(const FontDescri
     return std::nullopt;
 }
 
-const FontPaletteValues& CSSFontSelector::lookupFontPaletteValues(const AtomString& familyName, const FontDescription& fontDescription)
+const FontPaletteValues& CSSFontSelector::lookupFontPaletteValues(const AtomString& familyName, const FontDescription& fontDescription) const
 {
     static NeverDestroyed<FontPaletteValues> emptyFontPaletteValues;
     if (fontDescription.fontPalette().type != FontPalette::Type::Custom)
@@ -362,7 +363,7 @@ const FontPaletteValues& CSSFontSelector::lookupFontPaletteValues(const AtomStri
     return iterator->value;
 }
 
-RefPtr<FontFeatureValues> CSSFontSelector::lookupFontFeatureValues(const AtomString& familyName)
+RefPtr<FontFeatureValues> CSSFontSelector::lookupFontFeatureValues(const AtomString& familyName) const
 {
     // https://www.w3.org/TR/css-fonts-3/#font-family-casing
     auto lowercased = familyName.string().convertToLowercaseWithoutLocale();
@@ -443,6 +444,37 @@ RefPtr<Font> CSSFontSelector::fallbackFontAt(const FontDescription& fontDescript
         ResourceLoadObserver::shared().logFontLoad(*document, pictographFontFamily, !!font);
 
     return font;
+}
+
+bool CSSFontSelector::isSimpleFontSelectorForDescription(const FontCascadeDescription& description) const
+{
+    // font face rules still pending
+    if (m_stagingArea.size())
+        return false;
+
+    // FIXME: remove this when we fix counter style rules mutation.
+    if (auto* document = dynamicDowncast<Document>(m_context.get())) {
+        if (document->counterStyleRegistry().hasAuthorCounterStyles())
+            return false;
+    }
+
+    if (!m_cssFontFaceSet->faceCount()
+        && m_featureValues.isEmpty()
+        && m_paletteMap.isEmpty())
+        return true;
+
+    for (const auto& family : description.families()) {
+        auto resolvedGenericFamilyName = resolveGenericFamily(description, family);
+        auto familyName = resolvedGenericFamilyName ? resolvedGenericFamilyName.value() : family;
+        if (m_cssFontFaceSet->hasFontFaceForFamily(familyName))
+            return false;
+        if (lookupFontPaletteValues(familyName, description))
+            return false;
+        if (lookupFontFeatureValues(familyName))
+            return false;
+    }
+
+    return true;
 }
 
 }

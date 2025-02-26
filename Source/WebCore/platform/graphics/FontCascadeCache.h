@@ -229,6 +229,8 @@ struct FontCascadeCacheKey {
     Vector<FontFamilyName, 3> families;
     unsigned fontSelectorId;
     unsigned fontSelectorVersion;
+    bool isComplex { true };
+
 
     friend bool operator==(const FontCascadeCacheKey&, const FontCascadeCacheKey&) = default;
 };

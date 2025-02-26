@@ -72,6 +72,8 @@ public:
     FontSelector* fontSelector() { return m_fontSelector.get(); }
     const FontSelector* fontSelector() const { return m_fontSelector.get(); }
 
+    void updateFontSelector(RefPtr<FontSelector>&& fontSelector) { m_fontSelector = WTFMove(fontSelector); }
+
     // FIXME: It should be possible to combine fontSelectorVersion and generation.
     unsigned fontSelectorVersion() const { return m_fontSelectorVersion; }
     unsigned generation() const { return m_generation; }
@@ -121,7 +123,7 @@ private:
     UncheckedKeyHashSet<RefPtr<Font>> m_systemFallbackFontSet;
 
     SingleThreadWeakPtr<const Font> m_cachedPrimaryFont;
-    const RefPtr<FontSelector> m_fontSelector;
+    RefPtr<FontSelector> m_fontSelector;
 
     WidthCache m_widthCache;
 

@@ -95,11 +95,13 @@ void FontCascadeCache::pruneSystemFallbackFonts()
 static FontCascadeCacheKey makeFontCascadeCacheKey(const FontCascadeDescription& description, FontSelector* fontSelector)
 {
     unsigned familyCount = description.familyCount();
+    auto isComplexCase = fontSelector && !fontSelector->isSimpleFontSelectorForDescription(description);
     return FontCascadeCacheKey {
         FontDescriptionKey(description),
         Vector<FontFamilyName, 3>(familyCount, [&](size_t i) { return description.familyAt(i); }),
-        fontSelector ? fontSelector->uniqueId() : 0,
-        fontSelector ? fontSelector->version() : 0
+        isComplexCase ? fontSelector->uniqueId() : 0,
+        isComplexCase ? fontSelector->version() : 0,
+        isComplexCase
     };
 }
 
@@ -107,8 +109,12 @@ Ref<FontCascadeFonts> FontCascadeCache::retrieveOrAddCachedFonts(const FontCasca
 {
     auto key = makeFontCascadeCacheKey(fontDescription, fontSelector.get());
     auto addResult = m_entries.add(key, nullptr);
-    if (!addResult.isNewEntry)
-        return addResult.iterator->value->fonts.get();
+    if (!addResult.isNewEntry) {
+        auto fonts = addResult.iterator->value->fonts;
+        if (!key.isComplex)
+            fonts->updateFontSelector(WTFMove(fontSelector));
+        return fonts.get();
+    }
 
     auto& newEntry = addResult.iterator->value;
     newEntry = makeUnique<FontCascadeCacheEntry>(FontCascadeCacheEntry { WTFMove(key), FontCascadeFonts::create(WTFMove(fontSelector)) });
