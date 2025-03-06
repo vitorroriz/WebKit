@@ -79,6 +79,7 @@ FontCascade::FontCascade(FontCascadeDescription&& description, const FontCascade
     , m_useBackslashAsYenSymbol(FontCache::forCurrentThread().useBackslashAsYenSignForFamily(m_fontDescription.firstFamily()))
     , m_enableKerning(computeEnableKerning())
     , m_requiresShaping(computeRequiresShaping())
+    // , m_fontSelector(other.m_fontSelector)
 {
 }
 
@@ -88,6 +89,7 @@ FontCascade::FontCascade(const FontCascade& other)
     , m_fontDescription(other.m_fontDescription)
     , m_spacing(other.m_spacing)
     , m_fonts(other.m_fonts)
+    , m_fontSelector(other.m_fontSelector)
     , m_generation(other.m_generation)
     , m_useBackslashAsYenSymbol(other.m_useBackslashAsYenSymbol)
     , m_enableKerning(computeEnableKerning())
@@ -104,6 +106,7 @@ FontCascade& FontCascade::operator=(const FontCascade& other)
     m_useBackslashAsYenSymbol = other.m_useBackslashAsYenSymbol;
     m_enableKerning = other.m_enableKerning;
     m_requiresShaping = other.m_requiresShaping;
+    m_fontSelector = other.m_fontSelector;
     return *this;
 }
 
@@ -112,17 +115,18 @@ bool FontCascade::operator==(const FontCascade& other) const
     if (m_fontDescription != other.m_fontDescription || m_spacing != other.m_spacing)
         return false;
 
-    if (m_fonts == other.m_fonts)
-        return true;
+    // if (m_fonts == other.m_fonts && fontSelector() == other.fontSelector())
+    if (m_fonts != other.m_fonts)
+        return false;
 
     if (!m_fonts || !other.m_fonts)
         return false;
 
-    if (m_fonts->fontSelector() != other.m_fonts->fontSelector())
+    if (fontSelector() != other.fontSelector())
         return false;
 
     // Can these cases actually somehow occur? All fonts should get wiped out by full style recalc.
-    if (m_fonts->fontSelectorVersion() != other.m_fonts->fontSelectorVersion())
+    if (fontSelectorVersion() != other.fontSelectorVersion())
         return false;
 
     if (m_fonts->generation() != other.m_fonts->generation())
@@ -137,10 +141,15 @@ bool FontCascade::isCurrent(const FontSelector& fontSelector) const
         return false;
     if (m_fonts->generation() != FontCache::forCurrentThread().generation())
         return false;
-    if (m_fonts->fontSelectorVersion() != fontSelector.version())
+    if (fontSelectorVersion() != fontSelector.version())
         return false;
 
     return true;
+}
+
+unsigned FontCascade::fontSelectorVersion() const
+{
+    return m_fontSelector ? m_fontSelector->version() : 0;
 }
 
 void FontCascade::updateFonts(Ref<FontCascadeFonts>&& fonts) const
@@ -152,7 +161,8 @@ void FontCascade::updateFonts(Ref<FontCascadeFonts>&& fonts) const
 
 void FontCascade::update(RefPtr<FontSelector>&& fontSelector) const
 {
-    FontCache::forCurrentThread().updateFontCascade(*this, WTFMove(fontSelector));
+    m_fontSelector = WTFMove(fontSelector);
+    FontCache::forCurrentThread().updateFontCascade(*this);
 }
 
 GlyphBuffer FontCascade::layoutText(CodePath codePathToUse, const TextRun& run, unsigned from, unsigned to, ForTextEmphasisOrNot forTextEmphasis) const
@@ -424,7 +434,7 @@ GlyphData FontCascade::glyphDataForCharacter(char32_t c, bool mirror, FontVarian
 
     auto emojiPolicy = resolveEmojiPolicy(m_fontDescription.variantEmoji(), c);
 
-    return protectedFonts()->glyphDataForCharacter(c, m_fontDescription, variant, emojiPolicy);
+    return protectedFonts()->glyphDataForCharacter(c, m_fontDescription, fontSelector(), variant, emojiPolicy);
 }
 
 
@@ -1929,8 +1939,8 @@ TextStream& operator<<(TextStream& ts, const FontCascade& fontCascade)
     ts << fontCascade.fontDescription();
 
     if (fontCascade.fonts()) {
-        ts << ", font selector " << fontCascade.fonts()->fontSelector();
-        ts << ", font selector version " << fontCascade.fonts()->fontSelectorVersion();
+        ts << ", font selector " << fontCascade.fontSelector();
+        ts << ", font selector version " << fontCascade.fontSelectorVersion();
         ts << ", generation " << fontCascade.fonts()->generation();
     }
 
