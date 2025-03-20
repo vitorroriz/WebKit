@@ -118,7 +118,7 @@ RefPtr<FontCustomPlatformData> FontCustomPlatformData::createMemorySafe(SharedBu
         return nullptr;
     }
 
-    RetainPtr fontDescriptor = adoptCF(PAL::softLinkCoreTextCTFontManagerCreateMemorySafeFontDescriptorFromData(extractedData.get()));
+    RetainPtr fontDescriptor = PAL::softLinkCoreTextCTFontManagerCreateMemorySafeFontDescriptorFromData(extractedData.get());
 
     // Safe Font parser could not handle this font. This is already logged by CachedFontLoadRequest::ensureCustomFontData
     if (!fontDescriptor)
