@@ -127,7 +127,6 @@ platform/graphics/ComplexTextController.h
 platform/graphics/FontSelectionAlgorithm.h
 platform/graphics/ImageBufferContextSwitcher.h
 platform/graphics/StringTruncator.cpp
-platform/graphics/WidthIterator.h
 platform/graphics/angle/ANGLEUtilities.cpp
 platform/graphics/angle/GraphicsContextGLANGLE.cpp
 platform/graphics/ca/GraphicsLayerCA.cpp
