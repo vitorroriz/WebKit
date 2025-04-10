@@ -108,7 +108,7 @@ bool CSSFontFaceSet::hasFace(const CSSFontFace& face) const
 void CSSFontFaceSet::updateStyleIfNeeded()
 {
     if (m_owningFontSelector)
-        m_owningFontSelector->updateStyleIfNeeded();
+        Ref { *m_owningFontSelector }->updateStyleIfNeeded();
 }
 
 void CSSFontFaceSet::ensureLocalFontFacesForFamilyRegistered(const AtomString& familyName)
@@ -117,19 +117,21 @@ void CSSFontFaceSet::ensureLocalFontFacesForFamilyRegistered(const AtomString& f
     if (m_locallyInstalledFacesLookupTable.contains(familyName))
         return;
 
-    if (!m_owningFontSelector->scriptExecutionContext())
+    Ref protectedOwningFontSelector { *m_owningFontSelector };
+    if (!protectedOwningFontSelector->scriptExecutionContext())
         return;
-    auto allowUserInstalledFonts = m_owningFontSelector->scriptExecutionContext()->settingsValues().shouldAllowUserInstalledFonts ? AllowUserInstalledFonts::Yes : AllowUserInstalledFonts::No;
+    Ref scriptExecutionContext { *protectedOwningFontSelector->scriptExecutionContext() };
+    auto allowUserInstalledFonts = scriptExecutionContext->settingsValues().shouldAllowUserInstalledFonts ? AllowUserInstalledFonts::Yes : AllowUserInstalledFonts::No;
     auto capabilities = FontCache::forCurrentThread().getFontSelectionCapabilitiesInFamily(familyName, allowUserInstalledFonts);
     if (capabilities.isEmpty())
         return;
 
     Vector<Ref<CSSFontFace>> faces;
     for (auto item : capabilities) {
-        auto face = CSSFontFace::create(*m_owningFontSelector, nullptr, nullptr, true);
+        auto face = CSSFontFace::create(protectedOwningFontSelector, nullptr, nullptr, true);
         
         // FIXME: Don't use a list here. https://bugs.webkit.org/show_bug.cgi?id=196381
-        auto& pool = m_owningFontSelector->scriptExecutionContext()->cssValuePool();
+        auto& pool = scriptExecutionContext->cssValuePool();
         face->setFamilies(CSSValueList::createCommaSeparated(pool.createFontFamilyValue(familyName)).get());
         face->setFontSelectionCapabilities(item);
         face->adoptSource(makeUnique<CSSFontFaceSource>(face.get(), familyName));
@@ -271,7 +273,7 @@ void CSSFontFaceSet::remove(const CSSFontFace& face)
         if (m_faces[i].ptr() == &face) {
             if (i < m_facesPartitionIndex)
                 --m_facesPartitionIndex;
-            m_faces[i]->removeClient(*this);
+            Ref { m_faces[i] }->removeClient(*this);
             m_faces.remove(i);
             if (face.status() == CSSFontFace::Status::Loading || face.status() == CSSFontFace::Status::TimedOut)
                 decrementActiveCount();
@@ -418,7 +420,8 @@ ExceptionOr<Vector<std::reference_wrapper<CSSFontFace>>> CSSFontFaceSet::matchin
                 familyAtom = familyNamesData->at(CSSPropertyParserHelpers::genericFontFamilyIndex(familyKeyword));
             else {
                 ASSERT(m_owningFontSelector && m_owningFontSelector->scriptExecutionContext());
-                familyAtom = AtomString { m_owningFontSelector->scriptExecutionContext()->settingsValues().fontGenericFamilies.standardFontFamily() };
+                Ref protectedOwningFontSelector { *m_owningFontSelector };
+                familyAtom = AtomString { Ref { *protectedOwningFontSelector->scriptExecutionContext() }->settingsValues().fontGenericFamilies.standardFontFamily() };
             }
         }, [&] (const AtomString& familyString) {
             familyAtom = familyString;
