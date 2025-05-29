@@ -61,7 +61,7 @@ public:
     TextLayout(RenderText& text, const FontCascade& fontCascade, float xPos)
         : m_fontCascade(fontCascade)
         , m_run(constructTextRun(text, xPos))
-        , m_controller(makeUnique<ComplexTextController>(m_fontCascade, m_run, true))
+        , m_controller(makeUnique<ComplexTextController>(CheckedRef { m_fontCascade }, CheckedRef { m_run }, true))
     {
     }
 
