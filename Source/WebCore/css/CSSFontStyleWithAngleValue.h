@@ -30,6 +30,10 @@
 
 namespace WebCore {
 
+// https://www.w3.org/TR/css-fonts-4/#font-style-prop
+// The lack of an <angle> represents 14deg. This also means that 14 deg should be serialized as 'oblique' only.
+static constexpr unsigned cssFontStyleImplicitObliqueValue = 14;
+
 // This class is currently only used for oblique. If we use it for more styles in the future we'll need to store the keyword.
 class CSSFontStyleWithAngleValue final : public CSSValue {
 public:

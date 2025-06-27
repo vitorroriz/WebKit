@@ -169,7 +169,7 @@ static RefPtr<CSSValue> extractPropertyValue(Style::Extractor& computedStyle, CS
     return computedStyle.propertyValue(propertyID);
 }
 
-// This synthesizes CSSValueBold and CSSValueItalic when appropriate, and never returns CSSValueOblique.
+// This synthesizes CSSValueBold and CSSValueItalic when appropriate.
 template<typename T> CSSValueID identifierForStyleProperty(T& style, CSSPropertyID propertyID)
 {
     auto value = extractPropertyValue(style, propertyID);
@@ -178,6 +178,8 @@ template<typename T> CSSValueID identifierForStyleProperty(T& style, CSSProperty
         auto resolvedAngle = Style::fontStyleAngleFromCSSFontStyleWithAngleValueDeprecated(*fontStyleValue);
         if (!resolvedAngle)
             return CSSValueNormal;
+        else if (resolvedAngle == cssFontStyleImplicitObliqueValue)
+            return CSSValueOblique;
         return *resolvedAngle >= italicThreshold() ? CSSValueItalic : CSSValueNormal;
     }
     if (RefPtr primitiveValue = dynamicDowncast<CSSPrimitiveValue>(value.get())) {

@@ -28,6 +28,7 @@
 
 #include "CSSPrimitiveNumericTypes+CSSValueVisitation.h"
 #include "CSSPrimitiveNumericTypes+Serialization.h"
+#include "StyleResolveForFont.h"
 #include <wtf/text/MakeString.h>
 
 namespace WebCore {
@@ -47,6 +48,8 @@ String CSSFontStyleWithAngleValue::customCSSText(const CSS::SerializationContext
 {
     if (m_obliqueAngle.isKnownZero())
         return nameLiteralForSerialization(CSSValueNormal);
+    if (auto angleValue = Style::fontStyleAngleFromCSSFontStyleWithAngleValueDeprecated(*this); angleValue == cssFontStyleImplicitObliqueValue)
+        return nameLiteralForSerialization(CSSValueOblique);
     return makeString(nameLiteralForSerialization(CSSValueOblique), ' ', CSS::serializationForCSS(context, m_obliqueAngle));
 }
 

@@ -49,7 +49,7 @@ PASS document.getElementById('test17').style.font is "100 48px / 49px \"Helvetic
 PASS document.getElementById('test18').style.font is "italic 48px / 49px \"Helvetica Neue\""
 PASS document.getElementById('test19').style.font is "italic small-caps 100 extra-expanded 48px / 49px \"Helvetica Neue\""
 PASS document.getElementById('test20').style.font is ""
-PASS document.getElementById('test21').style.font is "oblique 14deg small-caps 123 extra-expanded 48px / 49px \"Helvetica Neue\""
+PASS document.getElementById('test21').style.font is "oblique small-caps 123 extra-expanded 48px / 49px \"Helvetica Neue\""
 PASS successfullyParsed is true
 
 TEST COMPLETE
