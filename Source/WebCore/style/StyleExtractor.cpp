@@ -27,6 +27,7 @@
 #include "StyleExtractor.h"
 
 #include "CSSProperty.h"
+#include "CSSPropertyNames.h"
 #include "CSSRegisteredCustomProperty.h"
 #include "CSSSerializationContext.h"
 #include "CSSValuePool.h"

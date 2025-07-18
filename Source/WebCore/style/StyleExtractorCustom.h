@@ -133,6 +133,7 @@ public:
     static RefPtr<CSSValue> extractScrollTimelineShorthand(ExtractorState&);
     static RefPtr<CSSValue> extractTextBoxShorthand(ExtractorState&);
     static RefPtr<CSSValue> extractTextDecorationSkipShorthand(ExtractorState&);
+    static RefPtr<CSSValue> extractTextDecorationShorthand(ExtractorState&);
     static RefPtr<CSSValue> extractTextWrapShorthand(ExtractorState&);
     static RefPtr<CSSValue> extractTransformOriginShorthand(ExtractorState&);
     static RefPtr<CSSValue> extractTransitionShorthand(ExtractorState&);
@@ -232,6 +233,7 @@ public:
     static void extractScrollTimelineShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractTextBoxShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractTextDecorationSkipShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
+    static void extractTextDecorationShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractTextWrapShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractTransformOriginShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractTransitionShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
@@ -3018,6 +3020,71 @@ inline void ExtractorCustom::extractTextBoxShorthandSerialization(ExtractorState
     ExtractorSerializer::serialize(state, builder, context, textBoxTrim);
     builder.append(' ');
     ExtractorSerializer::serializeTextBoxEdge(state, builder, context, textBoxEdge);
+}
+
+static bool isDefaultOrIgnorableTextDecorationLine(const OptionSet<TextDecorationLine>& textDecorationLine)
+{
+    // Blink is deprecated and although it is parsed it should be ignored from the computed value
+    return textDecorationLine.isEmpty() || textDecorationLine.containsOnly(TextDecorationLine::Blink);
+}
+
+inline RefPtr<CSSValue> ExtractorCustom::extractTextDecorationShorthand(ExtractorState& state)
+{
+    auto textDecorationLine = state.style.textDecorationLine();
+    auto textDecorationThickness = state.style.textDecorationThickness();
+    auto textDecorationStyle = state.style.textDecorationStyle();
+    auto textDecorationColor = state.style.textDecorationColor();
+    bool hasDefaultOrIgnorableTextDecorationLine = isDefaultOrIgnorableTextDecorationLine(textDecorationLine);
+    bool hasDefaultTextDecorationThickness = textDecorationThickness == RenderStyle::initialTextDecorationThickness();
+    bool hasDefaultTextDecorationStyle = textDecorationStyle == RenderStyle::initialTextDecorationStyle();
+    bool hasDefaultTextDecorationColor = textDecorationColor.isCurrentColor();
+
+    if (hasDefaultOrIgnorableTextDecorationLine && hasDefaultTextDecorationStyle && hasDefaultTextDecorationColor)
+        return CSSPrimitiveValue::create(CSSValueNone);
+
+    CSSValueListBuilder list;
+    if (!hasDefaultOrIgnorableTextDecorationLine)
+        list.append(ExtractorConverter::convertTextDecorationLine(state, textDecorationLine));
+    if (!hasDefaultTextDecorationThickness)
+        list.append(ExtractorConverter::convertTextDecorationThickness(state, textDecorationThickness));
+    if (!hasDefaultTextDecorationStyle)
+        list.append(ExtractorConverter::convert(state, textDecorationStyle));
+    if (!hasDefaultTextDecorationColor)
+        list.append(ExtractorConverter::convertStyleType<Color>(state, textDecorationColor));
+
+    return CSSValueList::createCommaSeparated(WTFMove(list));
+}
+
+inline void ExtractorCustom::extractTextDecorationShorthandSerialization(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context)
+{
+    auto textDecorationLine = state.style.textDecorationLine();
+    auto textDecorationThickness = state.style.textDecorationThickness();
+    auto textDecorationStyle = state.style.textDecorationStyle();
+    auto textDecorationColor = state.style.textDecorationColor();
+    bool hasDefaultOrIgnorableTextDecorationLine = isDefaultOrIgnorableTextDecorationLine(textDecorationLine);
+    bool hasDefaultTextDecorationThickness = textDecorationThickness == RenderStyle::initialTextDecorationThickness();
+    bool hasDefaultTextDecorationStyle = textDecorationStyle == RenderStyle::initialTextDecorationStyle();
+    bool hasDefaultTextDecorationColor = textDecorationColor.isCurrentColor();
+
+    if (hasDefaultOrIgnorableTextDecorationLine && hasDefaultTextDecorationStyle && hasDefaultTextDecorationColor) {
+        CSS::serializationForCSS(builder, context, CSS::Keyword::None { });
+        return;
+    }
+
+    if (!hasDefaultOrIgnorableTextDecorationLine)
+        ExtractorSerializer::serializeTextDecorationLine(state, builder, context, textDecorationLine);
+    if (!hasDefaultTextDecorationThickness)
+        ExtractorSerializer::serializeTextDecorationThickness(state, builder, context, textDecorationThickness);
+    if (!hasDefaultTextDecorationStyle) {
+        if (!builder.isEmpty())
+            builder.append(" "_s);
+        ExtractorSerializer::serialize(state, builder, context, textDecorationStyle);
+    }
+    if (!hasDefaultTextDecorationColor) {
+        if (!builder.isEmpty())
+            builder.append(" "_s);
+        ExtractorSerializer::serialize(state, builder, context, textDecorationColor);
+    }
 }
 
 inline RefPtr<CSSValue> ExtractorCustom::extractTextDecorationSkipShorthand(ExtractorState& state)

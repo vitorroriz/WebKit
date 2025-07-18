@@ -226,8 +226,9 @@ static constexpr bool canUseShorthandForLonghand(CSSPropertyID shorthandID, CSSP
     case CSSPropertyWebkitColumnBreakInside:
     case CSSPropertyWebkitMaskPosition:
     case CSSPropertyWebkitPerspective:
-    case CSSPropertyWebkitTextDecoration:
-    case CSSPropertyWebkitTextOrientation:
+    // case CSSPropertyTextDecoration:
+    // FIXME: consider removing this after fixing https://bugs.webkit.org/show_bug.cgi?id=230083
+    // case CSSPropertyWebkitTextOrientation:
         return false;
 
     // No other browser currently supports text-decoration-skip, so it's currently more web
