@@ -365,7 +365,6 @@ void MediaPlayerPrivateWebM::cancelLoad()
         resourceClient->stop();
         m_resourceClient = nullptr;
     }
-    setNetworkState(MediaPlayer::NetworkState::Idle);
 }
 
 PlatformLayer* MediaPlayerPrivateWebM::platformLayer() const
