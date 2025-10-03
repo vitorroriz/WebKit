@@ -130,8 +130,6 @@ size_t UnplacedGridItem::columnSpanSize() const
 
 std::pair<int, int> UnplacedGridItem::definiteRowStartEnd() const
 {
-    ASSERT(hasDefiniteRowPosition());
-
     auto startPosition = m_rowPosition.first;
     auto endPosition = m_rowPosition.second;
 
