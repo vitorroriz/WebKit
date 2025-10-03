@@ -1313,8 +1313,10 @@ void AudioVideoRendererAVFObjC::configureHasAvailableVideoFrameCallbackIfNeeded(
     if (videoRenderer)
         videoRenderer->setPreferences(m_preferences);
 
-    // Activating AvailableVideoFrame callback may force the use of decompression session.
-    updateDisplayLayerIfNeeded();
+    if (m_previousRendererConfiguration.hasVideoTrack) {
+        // Activating AvailableVideoFrame callback may force the use of decompression session.
+        updateDisplayLayerIfNeeded();
+    }
 
     if (willUseDecompressionSessionIfNeeded())
         return;
@@ -1417,7 +1419,8 @@ Ref<GenericPromise> AudioVideoRendererAVFObjC::stageVideoRenderer(WebSampleBuffe
     RefPtr videoRenderer = m_videoRenderer;
     RendererConfiguration newConfiguration {
         .canUseDecompressionSession = willUseDecompressionSessionIfNeeded(),
-        .isProtected = m_hasProtectedVideoContent
+        .isProtected = m_hasProtectedVideoContent,
+        .hasVideoTrack = m_enabledVideoTrackId.has_value()
     };
     if (renderer == videoRenderer->renderer()) {
         if (std::exchange(m_previousRendererConfiguration, newConfiguration) != newConfiguration && renderer)
@@ -1442,9 +1445,10 @@ Ref<GenericPromise> AudioVideoRendererAVFObjC::stageVideoRenderer(WebSampleBuffe
         destroyVideoRenderer();
     }
 
-    bool flushRequired = std::exchange(m_previousRendererConfiguration, newConfiguration) != newConfiguration;
+    bool videoTrackChangeOnly = !m_previousRendererConfiguration.hasVideoTrack && newConfiguration.hasVideoTrack;
+    bool flushRequired = std::exchange(m_previousRendererConfiguration, newConfiguration) != newConfiguration && !videoTrackChangeOnly;
     m_readyToRequestVideoData = !flushRequired;
-    ALWAYS_LOG(LOGIDENTIFIER, "renderer: ", !!renderer, " flushRequired: ", flushRequired);
+    ALWAYS_LOG(LOGIDENTIFIER, "renderer: ", !!renderer, " videoTrackChangeOnly: ", videoTrackChangeOnly, " flushRequired: ", flushRequired);
 
     return videoRenderer->changeRenderer(renderer)->whenSettled(RunLoop::mainSingleton(), [weakThis = WeakPtr { *this }, renderersToExpire = WTFMove(renderersToExpire), flushRequired]() mutable {
         RefPtr protectedThis = weakThis.get();

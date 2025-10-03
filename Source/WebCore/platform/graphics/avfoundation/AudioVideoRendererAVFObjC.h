@@ -308,8 +308,9 @@ private:
     VideoRendererPreferences m_preferences;
     bool m_hasProtectedVideoContent { false };
     struct RendererConfiguration {
-        bool canUseDecompressionSession = { false };
-        bool isProtected = { false };
+        bool canUseDecompressionSession { false };
+        bool isProtected { false };
+        bool hasVideoTrack { false };
         bool operator==(const RendererConfiguration&) const = default;
     };
     RendererConfiguration m_previousRendererConfiguration;

@@ -8268,7 +8268,3 @@ webkit.org/b/299811 fast/images/background-image-size-changes-fractional-positio
 webkit.org/b/299501 http/tests/site-isolation/focus-tab-navigation-activeElement.html [ Pass Failure ]
 
 webkit.org/b/299501 http/tests/site-isolation/focus-click-navigation-activeElement.html [ Pass Failure ]
-
-# webkit.org/b/299996 REGRESSION(299875@main?) [iOS macOS] ASSERTION FAILED: it != m_trackIdentifiers.end() in media/media-video-videorange.html
-media/media-video-videorange.html [ Pass Crash ]
-media/media-video-fullrange.html [ Pass Crash ]
