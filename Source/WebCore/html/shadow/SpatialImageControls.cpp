@@ -37,6 +37,7 @@
 #include "HTMLNames.h"
 #include "HTMLSpanElement.h"
 #include "HTMLStyleElement.h"
+#include "LocalizedStrings.h"
 #include "MouseEvent.h"
 #include "RenderImage.h"
 #include "ShadowRoot.h"
@@ -130,6 +131,9 @@ void ensureSpatialControls(HTMLImageElement& imageElement)
         if (!isSpatialImage && !isPanoramicImage)
             return;
 
+        RefPtr page = element->document().page();
+        bool isRTL = page && page->userInterfaceLayoutDirection() == UserInterfaceLayoutDirection::RTL;
+
         Ref shadowRoot = element->ensureUserAgentShadowRoot();
         Ref document = element->document();
 
@@ -143,6 +147,7 @@ void ensureSpatialControls(HTMLImageElement& imageElement)
         Ref controlLayer = HTMLDivElement::create(document.get());
         controlLayer->setIdAttribute(spatialImageControlsElementIdentifier());
         controlLayer->setAttributeWithoutSynchronization(HTMLNames::contenteditableAttr, falseAtom());
+        controlLayer->setAttributeWithoutSynchronization(HTMLNames::dirAttr, isRTL ? "rtl"_s : "ltr"_s);
         controlLayer->setInlineStyleProperty(CSSPropertyDisplay, "flex"_s);
         controlLayer->setInlineStyleProperty(CSSPropertyFlexDirection, "column"_s);
         controlLayer->setInlineStyleProperty(CSSPropertyJustifyContent, "space-between"_s);
@@ -179,7 +184,7 @@ void ensureSpatialControls(HTMLImageElement& imageElement)
 
         Ref bottomLabelText = HTMLDivElement::create(document.get());
         bottomLabelText->setIdAttribute("label"_s);
-        bottomLabelText->setTextContent(isSpatialImage ? "SPATIAL"_s : "PANORAMA"_s);
+        bottomLabelText->setTextContent(isSpatialImage ? imageControlsLabelSpatial() : imageControlsLabelPanorama());
         controlLayer->appendChild(bottomLabelText);
 
         Ref glyphSpan = HTMLSpanElement::create(document.get());

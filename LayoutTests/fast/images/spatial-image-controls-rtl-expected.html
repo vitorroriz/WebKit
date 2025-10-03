@@ -11,9 +11,6 @@
         height: 200px;
         position: relative;
     }
-    div.rounded {
-        border-radius: 20px;
-    }
     div.spatial-image-controls {
         height: 100%;
         display: flex;
@@ -119,7 +116,7 @@
 <body>
     <div class="image-container">
         <img src="resources/spatial.heic">
-        <div class="spatial-image-controls" contenteditable="false">
+        <div class="spatial-image-controls" contenteditable="false" dir="rtl">
             <button class="spatial-image-controls-button"></button>
             <div class="background-tint">
                 <div class="blur"></div>
@@ -132,7 +129,7 @@
     </div>
     <div class="image-container">
         <img src="resources/spatial.heic">
-            <div class="spatial-image-controls" contenteditable="false">
+            <div class="spatial-image-controls" contenteditable="false" dir="rtl">
                 <button class="spatial-image-controls-button"></button>
                 <div class="background-tint">
                     <div class="blur"></div>
@@ -143,31 +140,4 @@
                     <span class="spatial-glyph"></span>SPATIAL</div>
             </div>
     </div>
-    <div class="image-container rounded">
-        <img src="resources/spatial.heic">
-        <div class="spatial-image-controls" contenteditable="false">
-            <button class="spatial-image-controls-button"></button>
-            <div class="background-tint">
-                <div class="blur"></div>
-                <div class="tint"></div>
-            </div>
-            <div class="bottom-gradient"></div>
-            <div class="label">
-                <span class="spatial-glyph"></span>SPATIAL</div>
-        </div>
-    </div>
-    <div class="image-container">
-        <img src="resources/green-2000x800.heic">
-        <div class="spatial-image-controls" contenteditable="false">
-            <button class="spatial-image-controls-button"></button>
-            <div class="background-tint">
-                <div class="blur"></div>
-                <div class="tint"></div>
-            </div>
-            <div class="bottom-gradient"></div>
-            <div class="label">
-                <span class="pano-glyph"></span>PANORAMA</div>
-        </div>
-    </div>
-    <img src="resources/green.jpg">
 </body>

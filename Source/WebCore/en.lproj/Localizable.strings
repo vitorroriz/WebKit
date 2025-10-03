@@ -1156,6 +1156,9 @@
 /* Undo action name */
 "Outline (Undo action name)" = "Outline";
 
+/* Label for panorama photos with image controls next to pano glyph */
+"PANORAMA" = "PANORAMA";
+
 /* Paragraph direction context sub-menu item */
 "Paragraph Direction" = "Paragraph Direction";
 
@@ -1395,6 +1398,9 @@
 
 /* Smart Lists context menu item */
 "Smart Lists" = "Smart Lists";
+
+/* Label for Spatial Photos with image controls next to spatial glyph */
+"SPATIAL" = "SPATIAL";
 
 /* Speech context sub-menu item */
 "Speech" = "Speech";
