@@ -9,13 +9,26 @@ textual-headers = ['spi/mac/MetadataSPI.h']
 requirements = ['cplusplus20']
 
 # The following WTF headers can be used in C contexts as well as C++
-# so we put them in a separate submodule. We'll call it Platform
-# since the majority of the files are Platform-related.
-# (Some are interdependent so we couldn't split them into
-# totally standalone submodules even if we wanted to.)
+# so we put them in separate submodules.
+[module.Assertions]
+headers = ['Assertions.h']
+
+[module.Compiler]
+headers = ['Compiler.h']
+
+[module.ExportMacros]
+headers = ['ExportMacros.h']
+
+[module.IOSurfaceSPI]
+headers = ['spi/cocoa/IOSurfaceSPI.h']
+
+[module.SwiftBridging]
+headers = ['SwiftBridging.h']
+
+# Users of these headers do not reliably Include What They Use,
+# so for now make them into one big module
 [module.Platform]
-headers = ['Assertions.h',
-    'Compiler.h', 'ExportMacros.h', 'spi/cocoa/IOSurfaceSPI.h', 'SwiftBridging.h',
+headers = [
     'Platform.h', 'PlatformCallingConventions.h', 'PlatformCPU.h',
     'PlatformEnable.h', 'PlatformEnableCocoa.h', 'PlatformHave.h',
     'PlatformLegacy.h', 'PlatformOS.h', 'PlatformUse.h']
