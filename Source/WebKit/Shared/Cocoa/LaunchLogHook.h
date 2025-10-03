@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2020 Apple Inc. All rights reserved.
+ /*
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,15 +25,28 @@
 
 #pragma once
 
-#include <wtf/ThreadSafeRefCounted.h>
+#if ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
+
+#import <wtf/NeverDestroyed.h>
+#import <wtf/OSObjectPtr.h>
+#import <wtf/spi/darwin/XPCSPI.h>
 
 namespace WebKit {
 
-class XPCEventHandler : public ThreadSafeRefCounted<XPCEventHandler> {
+class LaunchLogHook {
+    friend class LazyNeverDestroyed<LaunchLogHook>;
 public:
-    virtual ~XPCEventHandler() { }
+    static LaunchLogHook& singleton();
 
-    virtual bool handleXPCEvent(xpc_object_t) = 0;
+    void initialize(xpc_connection_t);
+    void disable();
+
+private:
+    LaunchLogHook() = default;
+
+    OSObjectPtr<xpc_connection_t> m_connection;
 };
 
-}
+} // namespace WebKit
+
+#endif // ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)

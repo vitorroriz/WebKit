@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,15 +25,19 @@
 
 #pragma once
 
-#include <wtf/ThreadSafeRefCounted.h>
+#if ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
+
+#include <wtf/text/ASCIILiteral.h>
 
 namespace WebKit {
 
-class XPCEventHandler : public ThreadSafeRefCounted<XPCEventHandler> {
-public:
-    virtual ~XPCEventHandler() { }
-
-    virtual bool handleXPCEvent(xpc_object_t) = 0;
-};
+constexpr auto logMessageName = "log-message"_s;
+constexpr auto subsystemKey = "subsystem"_s;
+constexpr auto categoryKey = "category"_s;
+constexpr auto messageStringKey = "message-string"_s;
+constexpr auto logTypeKey = "log-type"_s;
+constexpr auto disableLogMessageName = "disable-log-message"_s;
 
 }
+
+#endif // ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)

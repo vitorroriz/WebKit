@@ -574,6 +574,10 @@ public:
     void addSandboxExtensionForFile(const String& fileName, SandboxExtension::Handle);
     void clearSandboxExtensions();
 
+#if ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
+    bool receivedLogsDuringLaunchForTesting() const { return m_didReceiveLogsDuringLaunchForTesting; }
+#endif
+
 private:
     Type type() const final { return Type::WebContent; }
 
@@ -600,6 +604,9 @@ private:
     bool shouldEnableLockdownMode() const final { return m_lockdownMode == LockdownMode::Enabled; }
     bool shouldEnableEnhancedSecurity() const final { return m_enhancedSecurity == EnhancedSecurity::Enabled; }
     bool shouldDisableJITCage() const final;
+#if ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
+    RefPtr<XPCEventHandler> xpcEventHandler() const final;
+#endif
 
     void validateFreezerStatus();
 
@@ -885,6 +892,22 @@ private:
 #endif
 
     HashMap<String, SandboxExtension::Handle> m_fileSandboxExtensions;
+
+#if ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
+    class WebProcessXPCEventHandler final : public XPCEventHandler {
+    public:
+        explicit WebProcessXPCEventHandler(const WebProcessProxy&);
+
+        bool handleXPCEvent(xpc_object_t) final;
+
+    private:
+        WeakPtr<WebProcessProxy> m_webProcess;
+
+        bool m_logEndpointEnabled { true };
+    };
+
+    bool m_didReceiveLogsDuringLaunchForTesting { false };
+#endif // ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
 };
 
 WTF::TextStream& operator<<(WTF::TextStream&, const WebProcessProxy&);
