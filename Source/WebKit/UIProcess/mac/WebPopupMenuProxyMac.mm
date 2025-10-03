@@ -161,7 +161,7 @@ void WebPopupMenuProxyMac::showPopupMenu(const IntRect& rect, TextDirection text
     }
     RetainPtr<NSView> dummyView = adoptNS([[NSView alloc] initWithFrame:rect]);
     [dummyView.get() setUserInterfaceLayoutDirection:textDirection == TextDirection::LTR ? NSUserInterfaceLayoutDirectionLeftToRight : NSUserInterfaceLayoutDirectionRightToLeft];
-    [m_webView addSubview:dummyView.get()];
+    [m_webView.get() addSubview:dummyView.get()];
     location = [dummyView convertPoint:location fromView:m_webView.get().get()];
 
     NSControlSize controlSize;
@@ -214,7 +214,7 @@ void WebPopupMenuProxyMac::showPopupMenu(const IntRect& rect, TextDirection text
 
     [NSApp postEvent:fakeEvent.get() atStart:YES];
     fakeEvent = [NSEvent mouseEventWithType:NSEventTypeMouseMoved
-                                   location:[[m_webView window] convertPointFromScreen:[NSEvent mouseLocation]]
+                                   location:[[m_webView.get() window] convertPointFromScreen:[NSEvent mouseLocation]]
                               modifierFlags:[initiatingNSEvent modifierFlags]
                                   timestamp:[initiatingNSEvent timestamp]
                                windowNumber:[initiatingNSEvent windowNumber]
