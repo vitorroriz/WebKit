@@ -291,6 +291,7 @@ webaudio/audiocontext-restriction-audiobuffersourcenode-start.html [ Skip ]
 webaudio/audiocontext-restriction.html [ Skip ]
 webaudio/suspend-context-while-interrupted.html [ Skip ]
 webaudio/codec-tests/vorbis [ Skip ]
+# vorbis decoder not available on simulator.
 webaudio/decode-audio-data-webm-vorbis.html [ Failure ]
 media/track/audio-track-configuration-webm.html
 

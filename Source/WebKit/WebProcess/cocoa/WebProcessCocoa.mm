@@ -1007,6 +1007,12 @@ RetainPtr<CFDataRef> WebProcess::sourceApplicationAuditData() const
 void WebProcess::initializeSandbox(const AuxiliaryProcessInitializationParameters& parameters, SandboxInitializationParameters& sandboxParameters)
 {
 #if PLATFORM(MAC) || PLATFORM(MACCATALYST)
+
+#if ENABLE(AUDIO_DECODER_REGISTRATION)
+    registerOpusDecoderIfNeeded();
+    registerVorbisDecoderIfNeeded();
+#endif
+
     auto webKitBundle = [NSBundle bundleForClass:NSClassFromString(@"WKWebView")];
 
     sandboxParameters.setOverrideSandboxProfilePath(makeString(String([webKitBundle resourcePath]), "/com.apple.WebProcess.sb"_s));

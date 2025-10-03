@@ -1401,7 +1401,6 @@ webkit.org/b/245010 imported/w3c/web-platform-tests/html/browsers/browsing-the-w
 #webkit.org/b/248537 Batch mark expectations for Ventura test failures
 webrtc/canvas-to-peer-connection-2d.html [ Pass Failure ]
 webrtc/canvas-to-peer-connection.html [ Pass Failure ]
-webaudio/decode-audio-data-webm-vorbis.html [ Failure ]
 [ x86_64 ] scrollbars/scrolling-by-page-accounting-oversized-fixed-elements-on-keyboard-spacebar.html [ Pass Failure ]
 imported/w3c/web-platform-tests/html/semantics/embedded-content/media-elements/autoplay-allowed-by-feature-policy-attribute.https.sub.html [ Pass Failure ]
 [ x86_64 ] imported/mozilla/svg/blend-color.svg [ ImageOnlyFailure ]
