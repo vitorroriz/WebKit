@@ -840,25 +840,25 @@ Expected<SQLiteStatement, int> SQLiteDatabase::prepareStatement(ASCIILiteral que
     return SQLiteStatement { *this, sqlStatement.value() };
 }
 
-Expected<UniqueRef<SQLiteStatement>, int> SQLiteDatabase::prepareHeapStatementSlow(StringView queryString)
+std::unique_ptr<SQLiteStatement> SQLiteDatabase::prepareHeapStatementSlow(StringView queryString)
 {
     auto query = queryString.trim(isUnicodeCompatibleASCIIWhitespace<char16_t>).utf8();
     auto sqlStatement = constructAndPrepareStatement(*this, query.spanIncludingNullTerminator());
     if (!sqlStatement) {
         RELEASE_LOG_ERROR(SQLDatabase, "SQLiteDatabase::prepareHeapStatement: Failed to prepare statement %" PUBLIC_LOG_STRING, query.data());
-        return makeUnexpected(sqlStatement.error());
+        return nullptr;
     }
-    return UniqueRef<SQLiteStatement>(*new SQLiteStatement(*this, sqlStatement.value()));
+    return std::unique_ptr<SQLiteStatement>(new SQLiteStatement(*this, sqlStatement.value()));
 }
 
-Expected<UniqueRef<SQLiteStatement>, int> SQLiteDatabase::prepareHeapStatement(ASCIILiteral query)
+std::unique_ptr<SQLiteStatement> SQLiteDatabase::prepareHeapStatement(ASCIILiteral query)
 {
     auto sqlStatement = constructAndPrepareStatement(*this, query.spanIncludingNullTerminator());
     if (!sqlStatement) {
         RELEASE_LOG_ERROR(SQLDatabase, "SQLiteDatabase::prepareHeapStatement: Failed to prepare statement %" PUBLIC_LOG_STRING, query.characters());
-        return makeUnexpected(sqlStatement.error());
+        return nullptr;
     }
-    return UniqueRef<SQLiteStatement>(*new SQLiteStatement(*this, sqlStatement.value()));
+    return std::unique_ptr<SQLiteStatement>(new SQLiteStatement(*this, sqlStatement.value()));
 }
 
 } // namespace WebCore
