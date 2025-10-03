@@ -27,6 +27,7 @@
 #include "WebBackForwardList.h"
 
 #include "APIArray.h"
+#include "BrowsingContextGroup.h"
 #include "LoadedWebArchive.h"
 #include "Logging.h"
 #include "SessionState.h"
@@ -680,7 +681,7 @@ void WebBackForwardList::backForwardAddItemShared(IPC::Connection& connection, R
         ASSERT(!isRemoteFrameNavigation || webPageProxy->preferences().siteIsolationEnabled());
 
         auto navigatedFrameID = navigatedFrameState->frameID;
-        Ref item = WebBackForwardListItem::create(completeFrameStateForNavigation(WTFMove(navigatedFrameState)), webPageProxy->identifier(), navigatedFrameID);
+        Ref item = WebBackForwardListItem::create(completeFrameStateForNavigation(WTFMove(navigatedFrameState)), webPageProxy->identifier(), navigatedFrameID, webPageProxy->protectedBrowsingContextGroup().ptr());
         item->setResourceDirectoryURL(webPageProxy->currentResourceDirectoryURL());
         item->setIsRemoteFrameNavigation(isRemoteFrameNavigation);
         if (loadedWebArchive == LoadedWebArchive::Yes)

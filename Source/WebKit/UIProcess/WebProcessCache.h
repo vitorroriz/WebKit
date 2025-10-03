@@ -49,11 +49,12 @@ public:
 
     bool addProcessIfPossible(Ref<WebProcessProxy>&&);
     RefPtr<WebProcessProxy> takeProcess(const WebCore::Site&, WebsiteDataStore&, WebProcessProxy::LockdownMode, WebProcessProxy::EnhancedSecurity, const API::PageConfiguration&);
+    RefPtr<WebProcessProxy> takeSharedProcess(const WebCore::Site& mainFrameSite, WebsiteDataStore&, WebProcessProxy::LockdownMode, WebProcessProxy::EnhancedSecurity, const API::PageConfiguration&);
 
     void updateCapacity(WebProcessPool&);
     unsigned capacity() const { return m_capacity; }
 
-    unsigned size() const { return m_processesPerSite.size(); }
+    unsigned size() const { return m_processesPerSite.size() + m_sharedProcessesPerSite.size(); }
 
     void clear();
     void setApplicationIsActive(bool);
@@ -105,12 +106,14 @@ private:
     bool canCacheProcess(WebProcessProxy&) const;
     void platformInitialize();
     bool addProcess(Ref<CachedProcess>&&);
+    void evictAtRandomIfNeeded();
 
     unsigned m_capacity { 0 };
 
     WeakRef<WebProcessPool> m_processPool;
     HashMap<uint64_t, Ref<CachedProcess>> m_pendingAddRequests;
     HashMap<WebCore::Site, Ref<CachedProcess>> m_processesPerSite;
+    HashMap<WebCore::Site, Ref<CachedProcess>> m_sharedProcessesPerSite;
     RunLoop::Timer m_evictionTimer;
 };
 
