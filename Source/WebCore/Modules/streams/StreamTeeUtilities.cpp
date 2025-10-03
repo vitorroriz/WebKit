@@ -248,8 +248,8 @@ ExceptionOr<Vector<Ref<ReadableStream>>> byteStreamTee(JSDOMGlobalObject& global
     };
 
     Vector<Ref<ReadableStream>> branches;
-    branches.append(ReadableStream::createReadableByteStream(globalObject, WTFMove(pull1Algorithm), WTFMove(cancel1Algorithm)));
-    branches.append(ReadableStream::createReadableByteStream(globalObject, WTFMove(pull2Algorithm), WTFMove(cancel2Algorithm)));
+    branches.append(ReadableStream::createReadableByteStream(globalObject, WTFMove(pull1Algorithm), WTFMove(cancel1Algorithm), &stream));
+    branches.append(ReadableStream::createReadableByteStream(globalObject, WTFMove(pull2Algorithm), WTFMove(cancel2Algorithm), &stream));
 
     state->setBranch1(branches[0]);
     state->setBranch2(branches[1]);

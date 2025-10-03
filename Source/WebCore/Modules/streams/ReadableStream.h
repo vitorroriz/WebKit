@@ -116,7 +116,7 @@ public:
 
     void visitAdditionalChildren(JSC::AbstractSlotVisitor&);
 
-    static Ref<ReadableStream> createReadableByteStream(JSDOMGlobalObject&, ReadableByteStreamController::PullAlgorithm&&, ReadableByteStreamController::CancelAlgorithm&&);
+    static Ref<ReadableStream> createReadableByteStream(JSDOMGlobalObject&, ReadableByteStreamController::PullAlgorithm&&, ReadableByteStreamController::CancelAlgorithm&&, RefPtr<ReadableStream>&& = { });
 
     enum class Type : bool {
         Default,
@@ -127,7 +127,7 @@ public:
 protected:
     static ExceptionOr<Ref<ReadableStream>> createFromJSValues(JSC::JSGlobalObject&, JSC::JSValue, JSC::JSValue);
     static ExceptionOr<Ref<InternalReadableStream>> createInternalReadableStream(JSDOMGlobalObject&, Ref<ReadableStreamSource>&&);
-    explicit ReadableStream(RefPtr<InternalReadableStream>&& = { });
+    explicit ReadableStream(RefPtr<InternalReadableStream>&& = { }, RefPtr<ReadableStream>&& = { });
 
 private:
     ExceptionOr<void> setupReadableByteStreamControllerFromUnderlyingSource(JSDOMGlobalObject&, JSC::JSValue, UnderlyingSource&&, double);
@@ -140,6 +140,8 @@ private:
 
     const std::unique_ptr<ReadableByteStreamController> m_controller;
     const RefPtr<InternalReadableStream> m_internalReadableStream;
+
+    const RefPtr<ReadableStream> m_relatedStreamForGC;
 };
 
 } // namespace WebCore
