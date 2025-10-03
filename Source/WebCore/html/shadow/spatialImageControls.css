@@ -104,6 +104,7 @@ span#spatial-glyph {
     margin-bottom: -8px;
     margin-inline-end: -8px;
 }
+#if defined(ENABLE_PANORAMA_IMAGE_CONTROLS) && ENABLE_PANORAMA_IMAGE_CONTROLS
 span#pano-glyph {
     width: 30px;
     height: 30px;
@@ -115,5 +116,6 @@ span#pano-glyph {
     margin-inline-end: 5px;
     margin-inline-start: 10px;
 }
+#endif // defined(ENABLE_PANORAMA_IMAGE_CONTROLS) && ENABLE_PANORAMA_IMAGE_CONTROLS
 
 #endif

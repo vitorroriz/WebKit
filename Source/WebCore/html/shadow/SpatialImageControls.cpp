@@ -100,7 +100,11 @@ bool shouldHaveSpatialControls(HTMLImageElement& element)
     if (!image)
         return false;
 
-    return hasSpatialcontrolsAttribute && (image->isSpatial() || image->isMaybePanoramic());
+    return hasSpatialcontrolsAttribute && (image->isSpatial()
+#if ENABLE(PANORAMA_IMAGE_CONTROLS)
+        || image->isMaybePanoramic()
+#endif
+    );
 }
 
 void ensureSpatialControls(HTMLImageElement& imageElement)
@@ -116,6 +120,7 @@ void ensureSpatialControls(HTMLImageElement& imageElement)
         if (hasSpatialImageControls(*element))
             return;
 
+#if ENABLE(PANORAMA_IMAGE_CONTROLS)
         // Determine if this is a spatial or panoramic image
         auto* cachedImage = element->cachedImage();
         if (!cachedImage)
@@ -130,6 +135,7 @@ void ensureSpatialControls(HTMLImageElement& imageElement)
 
         if (!isSpatialImage && !isPanoramicImage)
             return;
+#endif // ENABLE(PANORAMA_IMAGE_CONTROLS)
 
         RefPtr page = element->document().page();
         bool isRTL = page && page->userInterfaceLayoutDirection() == UserInterfaceLayoutDirection::RTL;
@@ -184,11 +190,19 @@ void ensureSpatialControls(HTMLImageElement& imageElement)
 
         Ref bottomLabelText = HTMLDivElement::create(document.get());
         bottomLabelText->setIdAttribute("label"_s);
+#if ENABLE(PANORAMA_IMAGE_CONTROLS)
         bottomLabelText->setTextContent(isSpatialImage ? imageControlsLabelSpatial() : imageControlsLabelPanorama());
+#else
+        bottomLabelText->setTextContent(imageControlsLabelSpatial());
+#endif
         controlLayer->appendChild(bottomLabelText);
 
         Ref glyphSpan = HTMLSpanElement::create(document.get());
+#if ENABLE(PANORAMA_IMAGE_CONTROLS)
         glyphSpan->setIdAttribute(isSpatialImage ? "spatial-glyph"_s : "pano-glyph"_s);
+#else
+        glyphSpan->setIdAttribute("spatial-glyph"_s);
+#endif
         bottomLabelText->insertBefore(glyphSpan, bottomLabelText->protectedFirstChild());
 
         if (CheckedPtr renderImage = dynamicDowncast<RenderImage>(element->renderer()))
