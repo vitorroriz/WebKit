@@ -1080,15 +1080,6 @@ static void dumpCALayer(TextStream& ts, CALayer *layer, bool traverse)
 #endif
 }
 
-- (bool)_receivedLogsDuringLaunchForTesting
-{
-#if ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
-    if (RefPtr mainFrame = _page->mainFrame())
-        return mainFrame->process().receivedLogsDuringLaunchForTesting();
-#endif
-    return 0;
-}
-
 - (void)_modelProcessModelPlayerCountForTesting:(void(^)(NSUInteger))completionHandler
 {
 #if ENABLE(MODEL_PROCESS)

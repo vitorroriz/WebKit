@@ -2335,9 +2335,6 @@
 		E3816B3D27E2463A005EAFC0 /* WebMockContentFilterManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E3816B3B27E24639005EAFC0 /* WebMockContentFilterManager.cpp */; };
 		E3816B3E27E2463A005EAFC0 /* WebMockContentFilterManager.h in Headers */ = {isa = PBXBuildFile; fileRef = E3816B3C27E24639005EAFC0 /* WebMockContentFilterManager.h */; };
 		E382D57F2C21D500005F7653 /* DownloadProxyCocoa.mm in Sources */ = {isa = PBXBuildFile; fileRef = E382D57E2C21D500005F7653 /* DownloadProxyCocoa.mm */; };
-		E385F3672E86D6C900461B0C /* LaunchLogHook.mm in Sources */ = {isa = PBXBuildFile; fileRef = E385F3662E86D6C900461B0C /* LaunchLogHook.mm */; };
-		E385F3692E86D75800461B0C /* LaunchLogHook.h in Headers */ = {isa = PBXBuildFile; fileRef = E385F3682E86D6DB00461B0C /* LaunchLogHook.h */; };
-		E385F37C2E87076100461B0C /* LaunchLogMessages.h in Headers */ = {isa = PBXBuildFile; fileRef = E385F37B2E87076100461B0C /* LaunchLogMessages.h */; };
 		E3866AE52397400400F88FE9 /* WebDeviceOrientationUpdateProviderProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = E3866AE42397400400F88FE9 /* WebDeviceOrientationUpdateProviderProxy.mm */; };
 		E3866AE72397405300F88FE9 /* WebDeviceOrientationUpdateProviderProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = E3866AE62397405300F88FE9 /* WebDeviceOrientationUpdateProviderProxy.h */; };
 		E3866B082399A2D100F88FE9 /* WebDeviceOrientationUpdateProviderProxyMessages.h in Headers */ = {isa = PBXBuildFile; fileRef = E3866B052399979C00F88FE9 /* WebDeviceOrientationUpdateProviderProxyMessages.h */; };
@@ -8365,9 +8362,6 @@
 		E385982C2E68CAA80012AD39 /* gpu-defines.sb */ = {isa = PBXFileReference; lastKnownFileType = text; path = "gpu-defines.sb"; sourceTree = "<group>"; };
 		E385982D2E68CAA80012AD39 /* networking-defines.sb */ = {isa = PBXFileReference; lastKnownFileType = text; path = "networking-defines.sb"; sourceTree = "<group>"; };
 		E385982E2E68CAA80012AD39 /* webcontent-defines.sb */ = {isa = PBXFileReference; lastKnownFileType = text; path = "webcontent-defines.sb"; sourceTree = "<group>"; };
-		E385F3662E86D6C900461B0C /* LaunchLogHook.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LaunchLogHook.mm; sourceTree = "<group>"; };
-		E385F3682E86D6DB00461B0C /* LaunchLogHook.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LaunchLogHook.h; sourceTree = "<group>"; };
-		E385F37B2E87076100461B0C /* LaunchLogMessages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LaunchLogMessages.h; sourceTree = "<group>"; };
 		E3866AE42397400400F88FE9 /* WebDeviceOrientationUpdateProviderProxy.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WebDeviceOrientationUpdateProviderProxy.mm; path = ios/WebDeviceOrientationUpdateProviderProxy.mm; sourceTree = "<group>"; };
 		E3866AE62397405300F88FE9 /* WebDeviceOrientationUpdateProviderProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDeviceOrientationUpdateProviderProxy.h; path = ios/WebDeviceOrientationUpdateProviderProxy.h; sourceTree = "<group>"; };
 		E3866AED2398471A00F88FE9 /* WebDeviceOrientationUpdateProviderProxy.messages.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = WebDeviceOrientationUpdateProviderProxy.messages.in; path = ios/WebDeviceOrientationUpdateProviderProxy.messages.in; sourceTree = "<group>"; };
@@ -12885,9 +12879,6 @@
 				49DAA38B24CBA1A800793D75 /* DefaultWebBrowserChecks.mm */,
 				CE550E12228373C800D28791 /* InsertTextOptions.h */,
 				86E0787C2ACE0AE400B8FADC /* InsertTextOptions.serialization.in */,
-				E385F3682E86D6DB00461B0C /* LaunchLogHook.h */,
-				E385F3662E86D6C900461B0C /* LaunchLogHook.mm */,
-				E385F37B2E87076100461B0C /* LaunchLogMessages.h */,
 				C1663E5A24AEA74200C6A3B2 /* LaunchServicesDatabaseXPCConstants.h */,
 				2D1087621D2C641B00B85F82 /* LoadParametersCocoa.mm */,
 				2D440B8325EF235E00A98D87 /* PDFKitSoftLink.h */,
@@ -17744,8 +17735,6 @@
 				1C5DC46F290B27260061EC62 /* JSWebExtensionWrappable.h in Headers */,
 				1C5DC46E290B27260061EC62 /* JSWebExtensionWrapper.h in Headers */,
 				074A6FC72D5F1FAF0027F958 /* KeyEventInterpretationContext.h in Headers */,
-				E385F3692E86D75800461B0C /* LaunchLogHook.h in Headers */,
-				E385F37C2E87076100461B0C /* LaunchLogMessages.h in Headers */,
 				C1663E5B24AEAA2F00C6A3B2 /* LaunchServicesDatabaseXPCConstants.h in Headers */,
 				51E9049A27BCB9D400929E7E /* LaunchServicesSPI.h in Headers */,
 				BCE0937814FB128C001138D9 /* LayerHostingContext.h in Headers */,
@@ -21225,8 +21214,6 @@
 				2749F6442146561B008380BF /* InjectedBundleNodeHandle.cpp in Sources */,
 				2749F6452146561E008380BF /* InjectedBundleRangeHandle.cpp in Sources */,
 				1C0F05BE2CFA5D2E007D1F62 /* JSWebExtensionAPIUnified.mm in Sources */,
-				1C5DC45F2909B05A0061EC62 /* JSWebExtensionWrapperCocoa.mm in Sources */,
-				E385F3672E86D6C900461B0C /* LaunchLogHook.mm in Sources */,
 				C14D37FE24ACE086007FF014 /* LaunchServicesDatabaseManager.mm in Sources */,
 				C1710CF724AA643200D7C112 /* LaunchServicesDatabaseObserver.mm in Sources */,
 				41A0EB142641714900794471 /* LibWebRTCCodecsProxy.mm in Sources */,
