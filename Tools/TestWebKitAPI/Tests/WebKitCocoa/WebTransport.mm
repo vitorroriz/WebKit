@@ -41,6 +41,7 @@
 #import <WebKit/WKWebsiteDataStorePrivate.h>
 #import <WebKit/_WKInternalDebugFeature.h>
 #import <wtf/SoftLinking.h>
+#import <wtf/spi/cocoa/SecuritySPI.h>
 #import <wtf/text/MakeString.h>
 #import <wtf/text/StringBuilder.h>
 
