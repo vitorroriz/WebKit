@@ -656,10 +656,11 @@ static void* keyValueObservingContext = &keyValueObservingContext;
     self = [super init];
     if (!self)
         return nil;
-    _lastResponderInChain = chain;
-    while (RetainPtr next = [_lastResponderInChain nextResponder])
-        _lastResponderInChain = next.get();
-    [_lastResponderInChain setNextResponder:self];
+    RetainPtr current = chain;
+    while (RetainPtr next = [current nextResponder])
+        current = next.get();
+    [current setNextResponder:self];
+    _lastResponderInChain = current.get();
     return self;
 }
 

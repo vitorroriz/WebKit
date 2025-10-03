@@ -302,8 +302,9 @@ void WebContextMenuProxyMac::setupServicesMenu()
     [[WKSharingServicePickerDelegate sharedSharingServicePickerDelegate] setHandlesEditingReplacement:includeEditorServices];
     
     NSRect imageRect = m_context.controlledImageBounds();
-    imageRect = [m_webView convertRect:imageRect toView:nil];
-    imageRect = [[m_webView window] convertRectToScreen:imageRect];
+    auto webView = m_webView.get();
+    imageRect = [webView convertRect:imageRect toView:nil];
+    imageRect = [[webView window] convertRectToScreen:imageRect];
     [[WKSharingServicePickerDelegate sharedSharingServicePickerDelegate] setSourceFrame:imageRect];
     [[WKSharingServicePickerDelegate sharedSharingServicePickerDelegate] setAttachmentID:m_context.controlledImageAttachmentID()];
 
