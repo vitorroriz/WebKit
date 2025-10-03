@@ -1,4 +1,5 @@
 module-name = 'wtf'
+attributes = ['system']
 default-module = 'Cpp'
 # This header depends on surrounding preprocessor context.
 textual-headers = ['spi/mac/MetadataSPI.h']
