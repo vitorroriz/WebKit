@@ -1922,6 +1922,8 @@ RefPtr<WebSocketTask> NetworkSessionCocoa::createWebSocketTask(WebPageProxyIdent
 {
     ASSERT(!request.hasHTTPHeaderField(WebCore::HTTPHeaderName::SecWebSocketProtocol));
     RetainPtr nsRequest = request.nsURLRequest(WebCore::HTTPBodyUpdatePolicy::DoNotUpdateHTTPBody);
+    if (!nsRequest)
+        return nullptr;
     RetainPtr<NSMutableURLRequest> mutableRequest;
 
     auto ensureMutableRequest = [&] {
