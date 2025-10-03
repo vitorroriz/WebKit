@@ -1937,7 +1937,7 @@ if (window.eventSender) {
 constexpr auto testRunnerJS = R"testRunnerJS(
 if (window.testRunner) {
     let post = window.webkit.messageHandlers.webkitTestRunner.postMessage.bind(window.webkit.messageHandlers.webkitTestRunner);
-    let createHandle = (object) => object ? window.webkit.jsHandle(object) : undefined;
+    let createHandle = (object) => object ? window.webkit.createJSHandle(object) : undefined;
 
     testRunner.installTooltipDidChangeCallback = callback => post(['InstallTooltipCallback', createHandle(callback)]);
     testRunner.installDidBeginSwipeCallback = callback => post(['InstallBeginSwipeCallback', createHandle(callback)]);
