@@ -671,6 +671,7 @@ protected:
 #if ENABLE(FULLSCREEN_API)
         IsFullscreen = 1 << 19,
 #endif
+        IsShadowRootAttachedEventPending = 1 << 20,
         // 12 bits free.
     };
 

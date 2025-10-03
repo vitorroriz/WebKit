@@ -451,6 +451,9 @@ public:
     RefPtr<Element> resolveReferenceTarget() const;
     RefPtr<Element> retargetReferenceTargetForBindings(RefPtr<Element>) const;
 
+    void didDispatchShadowRootAttachedEvent() { clearStateFlag(StateFlag::IsShadowRootAttachedEventPending); }
+    void dispatchShadowRootAttachedEvent();
+
     enum class CustomElementRegistryKind : bool { Window, Null };
 
     WEBCORE_EXPORT ExceptionOr<ShadowRoot&> attachShadow(const ShadowRootInit&, std::optional<CustomElementRegistryKind> = std::nullopt);
@@ -995,6 +998,8 @@ private:
     SerializedNode serializeNode(CloningOperation) const override;
     void cloneShadowTreeIfPossible(Element& newHost) const;
     virtual Ref<Element> cloneElementWithoutAttributesAndChildren(Document&, CustomElementRegistry*) const;
+
+    void enqueueShadowRootAttachedEvent();
 
     inline void removeShadowRoot(); // Defined in ElementRareData.h.
     void removeShadowRootSlow(ShadowRoot&);

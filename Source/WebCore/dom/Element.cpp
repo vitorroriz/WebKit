@@ -3318,6 +3318,24 @@ void Element::addShadowRoot(Ref<ShadowRoot>&& newShadowRoot)
 
     if (shadowRoot->mode() == ShadowRootMode::UserAgent)
         didAddUserAgentShadowRoot(shadowRoot);
+    else
+        enqueueShadowRootAttachedEvent();
+}
+
+void Element::enqueueShadowRootAttachedEvent()
+{
+    if (hasStateFlag(StateFlag::IsShadowRootAttachedEventPending))
+        return;
+    setStateFlag(StateFlag::IsShadowRootAttachedEventPending);
+    MutationObserver::enqueueShadowRootAttachedEvent(*this);
+}
+
+void Element::dispatchShadowRootAttachedEvent()
+{
+    Ref<Event> event = Event::create(eventNames().webkitshadowrootattachedEvent, Event::CanBubble::Yes, Event::IsCancelable::No, Event::IsComposed::Yes);
+    event->setIsShadowRootAttachedEvent();
+    event->setTarget(Ref { *this });
+    dispatchEvent(event);
 }
 
 void Element::removeShadowRootSlow(ShadowRoot& oldRoot)
