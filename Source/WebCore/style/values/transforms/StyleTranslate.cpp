@@ -29,7 +29,9 @@
 #include "StyleBuilderChecking.h"
 #include "StyleBuilderConverter.h"
 #include "StyleLengthWrapper+Blending.h"
+#include "StyleLengthWrapper+CSSValueConversion.h"
 #include "StylePrimitiveNumericTypes+Blending.h"
+#include "StylePrimitiveNumericTypes+CSSValueConversion.h"
 #include "StylePrimitiveNumericTypes+CSSValueCreation.h"
 
 namespace WebCore {

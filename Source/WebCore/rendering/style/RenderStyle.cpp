@@ -2625,10 +2625,10 @@ void RenderStyle::setFontSize(float size)
     setFontDescription(WTFMove(description));
 }
 
-void RenderStyle::setFontSizeAdjust(FontSizeAdjust sizeAdjust)
+void RenderStyle::setFontSizeAdjust(Style::FontSizeAdjust sizeAdjust)
 {
     auto description = fontDescription();
-    description.setFontSizeAdjust(sizeAdjust);
+    description.setFontSizeAdjust(sizeAdjust.platform());
     setFontDescription(WTFMove(description));
 }
 

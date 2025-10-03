@@ -133,7 +133,6 @@ public:
     static GridAutoFlow convertGridAutoFlow(BuilderState&, const CSSValue&);
     static OptionSet<TouchAction> convertTouchAction(BuilderState&, const CSSValue&);
 
-    static FontSizeAdjust convertFontSizeAdjust(BuilderState&, const CSSValue&);
     static FontFeatureSettings convertFontFeatureSettings(BuilderState&, const CSSValue&);
     static FontVariationSettings convertFontVariationSettings(BuilderState&, const CSSValue&);
     static PaintOrder convertPaintOrder(BuilderState&, const CSSValue&);
@@ -500,11 +499,6 @@ inline FontFeatureSettings BuilderConverter::convertFontFeatureSettings(BuilderS
 inline FontVariationSettings BuilderConverter::convertFontVariationSettings(BuilderState& builderState, const CSSValue& value)
 {
     return fontVariationSettingsFromCSSValue(builderState, value);
-}
-
-inline FontSizeAdjust BuilderConverter::convertFontSizeAdjust(BuilderState& builderState, const CSSValue& value)
-{
-    return fontSizeAdjustFromCSSValue(builderState, value);
 }
 
 inline OptionSet<TouchAction> BuilderConverter::convertTouchAction(BuilderState&, const CSSValue& value)

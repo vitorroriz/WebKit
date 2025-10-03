@@ -50,8 +50,6 @@ class StyleResolver;
 class TextAutospace;
 class TextSpacingTrim;
 
-struct FontSizeAdjust;
-
 namespace CSSCalc {
 struct RandomCachingKey;
 }
@@ -61,6 +59,7 @@ namespace Style {
 class BuilderState;
 struct Color;
 struct FontPalette;
+struct FontSizeAdjust;
 struct FontStyle;
 struct FontWeight;
 struct FontWidth;
@@ -159,7 +158,7 @@ public:
     void setFontDescriptionFamilies(Vector<AtomString>&);
     void setFontDescriptionIsSpecifiedFont(bool);
     void setFontDescriptionFeatureSettings(FontFeatureSettings&&);
-    void setFontDescriptionFontPalette(Style::FontPalette&&);
+    void setFontDescriptionFontPalette(FontPalette&&);
     void setFontDescriptionFontSizeAdjust(FontSizeAdjust);
     void setFontDescriptionFontSmoothing(FontSmoothingMode);
     void setFontDescriptionFontStyle(FontStyle);

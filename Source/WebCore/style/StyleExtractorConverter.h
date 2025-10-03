@@ -179,7 +179,6 @@ public:
     // MARK: Font conversions
 
     static Ref<CSSValue> convertFontFamily(ExtractorState&, const AtomString&);
-    static Ref<CSSValue> convertFontSizeAdjust(ExtractorState&, const FontSizeAdjust&);
     static Ref<CSSValue> convertFontFeatureSettings(ExtractorState&, const FontFeatureSettings&);
     static Ref<CSSValue> convertFontVariationSettings(ExtractorState&, const FontVariationSettings&);
 
@@ -1009,22 +1008,6 @@ inline Ref<CSSValue> ExtractorConverter::convertFontFamily(ExtractorState& state
     if (auto familyIdentifier = identifierForFamily(family))
         return CSSPrimitiveValue::create(familyIdentifier);
     return state.pool.createFontFamilyValue(family);
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertFontSizeAdjust(ExtractorState& state, const FontSizeAdjust& fontSizeAdjust)
-{
-    if (fontSizeAdjust.isNone())
-        return CSSPrimitiveValue::create(CSSValueNone);
-
-    auto metric = fontSizeAdjust.metric;
-    auto value = fontSizeAdjust.shouldResolveFromFont() ? fontSizeAdjust.resolve(state.style.computedFontSize(), state.style.metricsOfPrimaryFont()) : fontSizeAdjust.value.asOptional();
-    if (!value)
-        return CSSPrimitiveValue::create(CSSValueNone);
-
-    if (metric == FontSizeAdjust::Metric::ExHeight)
-        return CSSPrimitiveValue::create(*value);
-
-    return CSSValuePair::create(convert(state, metric), CSSPrimitiveValue::create(*value));
 }
 
 inline Ref<CSSValue> ExtractorConverter::convertFontFeatureSettings(ExtractorState& state, const FontFeatureSettings& fontFeatureSettings)

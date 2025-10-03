@@ -117,7 +117,7 @@ inline void BuilderState::setFontDescriptionFeatureSettings(FontFeatureSettings&
     fontCascade.updateRequiresShaping();
 }
 
-inline void BuilderState::setFontDescriptionFontPalette(Style::FontPalette&& fontPalette)
+inline void BuilderState::setFontDescriptionFontPalette(FontPalette&& fontPalette)
 {
     if (m_style.fontDescription().fontPalette() == fontPalette.platform())
         return;
@@ -128,11 +128,11 @@ inline void BuilderState::setFontDescriptionFontPalette(Style::FontPalette&& fon
 
 inline void BuilderState::setFontDescriptionFontSizeAdjust(FontSizeAdjust fontSizeAdjust)
 {
-    if (m_style.fontDescription().fontSizeAdjust() == fontSizeAdjust)
+    if (m_style.fontDescription().fontSizeAdjust() == fontSizeAdjust.platform())
         return;
 
     m_fontDirty = true;
-    m_style.mutableFontDescriptionWithoutUpdate().setFontSizeAdjust(WTFMove(fontSizeAdjust));
+    m_style.mutableFontDescriptionWithoutUpdate().setFontSizeAdjust(fontSizeAdjust.platform());
 }
 
 inline void BuilderState::setFontDescriptionFontSmoothing(FontSmoothingMode fontSmoothing)

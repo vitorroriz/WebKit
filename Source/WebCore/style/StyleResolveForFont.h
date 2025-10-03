@@ -41,8 +41,6 @@ class FontCascadeDescription;
 class FontSelectionValue;
 class ScriptExecutionContext;
 
-struct FontSizeAdjust;
-
 template<typename> class FontTaggedSettings;
 using FontFeatureSettings = FontTaggedSettings<int>;
 using FontVariationSettings = FontTaggedSettings<float>;
@@ -65,7 +63,6 @@ std::optional<FontSelectionValue> fontStyleFromCSSValueDeprecated(const CSSValue
 
 FontFeatureSettings fontFeatureSettingsFromCSSValue(BuilderState&, const CSSValue&);
 FontVariationSettings fontVariationSettingsFromCSSValue(BuilderState&, const CSSValue&);
-FontSizeAdjust fontSizeAdjustFromCSSValue(BuilderState&, const CSSValue&);
 
 std::optional<FontCascade> resolveForUnresolvedFont(const CSSPropertyParserHelpers::UnresolvedFont&, FontCascadeDescription&&, ScriptExecutionContext&);
 

@@ -536,39 +536,6 @@ public:
 
 #endif
 
-class FontSizeAdjustWrapper final : public WrapperWithGetter<FontSizeAdjust> {
-    WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(FontSizeAdjustWrapper, Animation);
-public:
-    FontSizeAdjustWrapper()
-        : WrapperWithGetter(CSSPropertyFontSizeAdjust, &RenderStyle::fontSizeAdjust)
-    {
-    }
-
-    bool canInterpolate(const RenderStyle& from, const RenderStyle& to, CompositeOperation) const final
-    {
-        auto fromFontSizeAdjust = from.fontSizeAdjust();
-        auto toFontSizeAdjust = to.fontSizeAdjust();
-        return fromFontSizeAdjust.metric == toFontSizeAdjust.metric
-            && fromFontSizeAdjust.value && toFontSizeAdjust.value;
-    }
-
-    void interpolate(RenderStyle& destination, const RenderStyle& from, const RenderStyle& to, const Context& context) const final
-    {
-        auto blendedFontSizeAdjust = [&]() -> FontSizeAdjust {
-            if (context.isDiscrete)
-                return (!context.progress ? from : to).fontSizeAdjust();
-
-            ASSERT(from.fontSizeAdjust().value && to.fontSizeAdjust().value);
-            auto blendedAdjust = blendFunc(*from.fontSizeAdjust().value, *to.fontSizeAdjust().value, context);
-
-            ASSERT(from.fontSizeAdjust().metric == to.fontSizeAdjust().metric);
-            return { to.fontSizeAdjust().metric, FontSizeAdjust::ValueType::Number, std::max(blendedAdjust, 0.0f) };
-        };
-
-        destination.setFontSizeAdjust(blendedFontSizeAdjust());
-    }
-};
-
 class LineHeightWrapper final : public LengthWrapper {
     WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(LineHeightWrapper, Animation);
 public:

@@ -1394,11 +1394,6 @@ inline void BuilderCustom::applyValueFontSize(BuilderState& builderState, CSSVal
     builderState.setFontDescriptionFontSize(std::min(maximumAllowedFontSize, size));
 }
 
-inline void BuilderCustom::applyValueFontSizeAdjust(BuilderState& builderState, CSSValue& value)
-{
-    builderState.setFontDescriptionFontSizeAdjust(BuilderConverter::convertFontSizeAdjust(builderState, value));
-}
-
 inline void BuilderCustom::applyValueStrokeWidth(BuilderState& builderState, CSSValue& value)
 {
     builderState.style().setStrokeWidth(toStyleFromCSSValue<StrokeWidth>(builderState, value));

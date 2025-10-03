@@ -382,39 +382,6 @@ FontVariationSettings fontVariationSettingsFromCSSValue(BuilderState& builderSta
     return settings;
 }
 
-// MARK: 'font-size-adjust'
-
-FontSizeAdjust fontSizeAdjustFromCSSValue(BuilderState& builderState, const CSSValue& value)
-{
-    if (auto* primitiveValue = dynamicDowncast<CSSPrimitiveValue>(value)) {
-        if (primitiveValue->valueID() == CSSValueNone
-            || CSSPropertyParserHelpers::isSystemFontShorthand(primitiveValue->valueID()))
-            return FontCascadeDescription::initialFontSizeAdjust();
-
-        auto defaultMetric = FontSizeAdjust::Metric::ExHeight;
-        if (primitiveValue->isNumber())
-            return { defaultMetric, FontSizeAdjust::ValueType::Number, primitiveValue->resolveAsNumber(builderState.cssToLengthConversionData()) };
-
-        ASSERT(primitiveValue->valueID() == CSSValueFromFont);
-        // We cannot determine the primary font here, so we defer resolving the
-        // aspect value for from-font to when the primary font is created.
-        // See FontCascadeFonts::primaryFont().
-        return { defaultMetric, FontSizeAdjust::ValueType::FromFont, std::nullopt };
-    }
-
-    auto pair = requiredPairDowncast<CSSPrimitiveValue>(builderState, value);
-    if (!pair)
-        return { };
-
-    auto metric = fromCSSValueID<FontSizeAdjust::Metric>(pair->first->valueID());
-    if (pair->second->isNumber())
-        return { metric, FontSizeAdjust::ValueType::Number, pair->second->resolveAsNumber(builderState.cssToLengthConversionData()) };
-
-    ASSERT(pair->second->valueID() == CSSValueFromFont);
-    return { metric, FontSizeAdjust::ValueType::FromFont, std::nullopt };
-}
-
-
 // MARK: - Unresolved Font Shorthand Resolution
 
 std::optional<FontCascade> resolveForUnresolvedFont(const CSSPropertyParserHelpers::UnresolvedFont& unresolvedFont, FontCascadeDescription&& fontDescription, ScriptExecutionContext& context)

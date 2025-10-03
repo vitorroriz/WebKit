@@ -660,10 +660,10 @@
                 "from-font"
             ],
             "codegen-properties": {
-                "animation-wrapper": "FontSizeAdjustWrapper",
-                "animation-wrapper-requires-override-parameters": [],
-                "style-converter": "FontSizeAdjust",
-                "style-builder-custom": "Value",
+                "animation-wrapper": "StyleTypeWrapper",
+                "animation-wrapper-requires-render-style": true,
+                "style-converter": "StyleType<FontSizeAdjust>",
+                "font-property-uses-render-style-for-access": true,
                 "font-property": true,
                 "high-priority": true,
                 "separator": " ",

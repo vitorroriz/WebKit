@@ -45,6 +45,7 @@
 #include <WebCore/StyleFlexibleBoxData.h>
 #include <WebCore/StyleFontData.h>
 #include <WebCore/StyleFontPalette.h>
+#include <WebCore/StyleFontSizeAdjust.h>
 #include <WebCore/StyleFontStyle.h>
 #include <WebCore/StyleFontWeight.h>
 #include <WebCore/StyleFontWidth.h>
@@ -224,7 +225,7 @@ inline Style::FlexGrow RenderStyle::flexGrow() const { return m_nonInheritedData
 inline Style::FlexShrink RenderStyle::flexShrink() const { return m_nonInheritedData->miscData->flexibleBox->flexShrink; }
 inline FlexWrap RenderStyle::flexWrap() const { return static_cast<FlexWrap>(m_nonInheritedData->miscData->flexibleBox->flexWrap); }
 inline Style::FontPalette RenderStyle::fontPalette() const { return fontDescription().fontPalette(); }
-inline FontSizeAdjust RenderStyle::fontSizeAdjust() const { return fontDescription().fontSizeAdjust(); }
+inline Style::FontSizeAdjust RenderStyle::fontSizeAdjust() const { return fontDescription().fontSizeAdjust(); }
 inline Style::FontStyle RenderStyle::fontStyle() const { return { fontDescription().fontStyleSlope(), fontDescription().fontStyleAxis() }; }
 inline FontOpticalSizing RenderStyle::fontOpticalSizing() const { return fontDescription().opticalSizing(); }
 inline FontVariationSettings RenderStyle::fontVariationSettings() const { return fontDescription().variationSettings(); }
@@ -398,6 +399,7 @@ constexpr Style::FlexShrink RenderStyle::initialFlexShrink() { return 1_css_numb
 constexpr FlexWrap RenderStyle::initialFlexWrap() { return FlexWrap::NoWrap; }
 constexpr Float RenderStyle::initialFloating() { return Float::None; }
 inline Style::FontPalette RenderStyle::initialFontPalette() { return CSS::Keyword::Normal { }; }
+inline Style::FontSizeAdjust RenderStyle::initialFontSizeAdjust() { return CSS::Keyword::None { }; }
 inline Style::FontStyle RenderStyle::initialFontStyle() { return CSS::Keyword::Normal { }; }
 inline Style::FontWeight RenderStyle::initialFontWeight() { return CSS::Keyword::Normal { }; }
 inline Style::FontWidth RenderStyle::initialFontWidth() { return CSS::Keyword::Normal { }; }
