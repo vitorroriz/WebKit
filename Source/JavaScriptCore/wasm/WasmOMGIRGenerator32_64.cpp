@@ -391,17 +391,22 @@ public:
         return m_currentBlock->appendNew<Value>(m_proc, Trunc, origin(), v);
     }
 
-    Value* wasmRefOfCell(Value *cell)
+    Value* wasmRefOfCell(Value* cell)
     {
         return m_currentBlock->appendNew<Value>(m_proc, Stitch, origin(), cell, constant(Int32, JSValue::CellTag));
     }
 
-    Value* pointerOfWasmRef(Value *ref)
+    Value* pointerOfWasmRef(Value* ref)
     {
         return m_currentBlock->appendNew<Value>(m_proc, Trunc, origin(), ref);
     }
 
-    Value* pointerOfInt32(Value *value)
+    Value* pointerOfInt32(Value* value)
+    {
+        return value;
+    }
+
+    Value* int32OfPointer(Value* value)
     {
         return value;
     }
@@ -880,7 +885,6 @@ private:
     template <typename Generator>
     void emitCheckOrBranchForCast(CastKind, Value*, const Generator&, BasicBlock*);
     Value* emitLoadRTTFromObject(Value*);
-    Value* emitNotRTTKind(Value*, RTTKind);
 
     void unify(Value* phi, const ExpressionType source);
     void unifyValuesWithBlock(const Stack& resultStack, const ControlData& block);
@@ -904,6 +908,7 @@ private:
     Value* emitCatchImpl(CatchKind, ControlType&, unsigned exceptionIndex = 0);
     void emitCatchTableImpl(ControlData& entryData, const ControlData::TryTableTarget&);
     RefPtr<PatchpointExceptionHandle> preparePatchpointForExceptions(BasicBlock*, PatchpointValue*);
+    void connectValuesForCatchEntrypoint(ControlData& catchData, Value* pointer);
 
     Origin origin();
 
@@ -1114,7 +1119,7 @@ void OMGIRGenerator::computeStackCheckSize(bool& needsOverflowCheck, int32_t& ch
         // This allows us to elide stack checks in the Wasm -> JS call IC stub. Since these will
         // spill all arguments to the stack, we ensure that a stack check here covers the
         // stack that such a stub would use.
-        Checked<uint32_t>(m_maxNumJSCallArguments) * sizeof(uint64_t) + JSCallingConvention::headerSizeInBytes
+        Checked<uint32_t>(m_maxNumJSCallArguments) * sizeof(Register) + JSCallingConvention::headerSizeInBytes
     ));
 
     checkSize = wasmFrameSize.value();
@@ -1993,7 +1998,9 @@ auto OMGIRGenerator::addCurrentMemory(ExpressionType& result) -> PartialResult
 
     constexpr uint32_t shiftValue = 16;
     static_assert(PageCount::pageSize == 1ull << shiftValue, "This must hold for the code below to be correct.");
-    result = push(m_currentBlock->appendNew<Value>(m_proc, ZShr, origin(), size, constant(Int32, shiftValue)));
+    Value* numPages = m_currentBlock->appendNew<Value>(m_proc, ZShr, origin(), size, constant(Int32, shiftValue));
+
+    result = push(int32OfPointer(numPages));
 
     return { };
 }
@@ -3312,7 +3319,7 @@ auto OMGIRGenerator::addI31GetU(TypedExpression reference, ExpressionType& resul
     if (reference.type().isNullable())
         emitNullCheck(value, ExceptionType::NullI31Get);
 
-    Value* masked = m_currentBlock->appendNew<Value>(m_proc, B3::BitAnd, origin(), truncate(value), constant(Int32, 0x7fffffff));
+    Value* masked = m_currentBlock->appendNew<Value>(m_proc, B3::BitAnd, origin(), int32OfPointer(pointerOfWasmRef(value)), constant(Int32, 0x7fffffff));
     result = push(masked);
     return { };
 }
@@ -3542,9 +3549,10 @@ auto OMGIRGenerator::addArrayGet(ExtGCOpType arrayGetKind, uint32_t typeIndex, T
     }
 
     Value* payloadBase = emitGetArrayPayloadBase(elementType, arrayValue);
-    indexValue = is32Bit() ? indexValue : m_currentBlock->appendNew<Value>(m_proc, ZExt32, origin(), indexValue);
     Value* indexedAddress = m_currentBlock->appendNew<Value>(m_proc, Add, pointerType(), origin(), payloadBase,
-        m_currentBlock->appendNew<Value>(m_proc, Mul, pointerType(), origin(), indexValue, constant(pointerType(), elementType.elementSize())));
+        m_currentBlock->appendNew<Value>(m_proc, Mul, pointerType(), origin(),
+            pointerOfInt32(indexValue),
+            constant(pointerType(), elementType.elementSize())));
 
     auto decorateWithIndex = [&](MemoryValue* load, NumberedAbstractHeap& heap, Value* indexValue) {
         // FIXME: we should do this decoration after we found that indexValue is a constant.
@@ -3667,9 +3675,8 @@ bool OMGIRGenerator::emitArraySetUncheckedWithoutWriteBarrier(uint32_t typeIndex
     getArrayElementType(typeIndex, elementType);
 
     auto payloadBase = emitGetArrayPayloadBase(elementType, arrayref);
-    indexValue = is32Bit() ? indexValue : m_currentBlock->appendNew<Value>(m_proc, ZExt32, origin(), indexValue);
     auto indexedAddress = m_currentBlock->appendNew<Value>(m_proc, Add, pointerType(), origin(), payloadBase,
-        m_currentBlock->appendNew<Value>(m_proc, Mul, pointerType(), origin(), indexValue, constant(pointerType(), elementType.elementSize())));
+        m_currentBlock->appendNew<Value>(m_proc, Mul, pointerType(), origin(), pointerOfInt32(indexValue), constant(pointerType(), elementType.elementSize())));
 
     auto decorateWithIndex = [&](MemoryValue* store, NumberedAbstractHeap& heap, Value* indexValue) {
         // FIXME: we should do this decoration after we found that indexValue is a constant.
@@ -4536,6 +4543,7 @@ Value* OMGIRGenerator::emitLoadRTTFromObject(Value* reference)
     auto* rtt = m_currentBlock->appendNew<MemoryValue>(m_proc, B3::Load, pointerType(), origin(), structure, safeCast<int32_t>(WebAssemblyGCStructure::offsetOfRTT()));
     m_heaps.decorateMemory(&m_heaps.WebAssemblyGCStructure_rtt, rtt);
     rtt->setControlDependent(false);
+
     return rtt;
 }
 
@@ -5088,8 +5096,11 @@ RefPtr<PatchpointExceptionHandle> OMGIRGenerator::preparePatchpointForExceptions
             if (ControlType::isAnyCatch(data))
                 addLiveValue(get(block, data.exception()));
         }
+        // inlineParent frames only
+        if (currentFrame != this) {
         for (Variable* value : currentFrame->m_parser->expressionStack())
             addLiveValue(get(block, value));
+        }
     }
 
     patch->effects.exitsSideways = true;

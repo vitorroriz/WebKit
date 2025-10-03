@@ -389,19 +389,24 @@ public:
 
     void computeStackCheckSize(bool& needsOverflowCheck, int32_t& checkSize);
 
-    Value* wasmRefOfCell(Value *cell)
+    Value* wasmRefOfCell(Value* cell)
     {
         return cell;
     }
 
-    Value* pointerOfWasmRef(Value *ref)
+    Value* pointerOfWasmRef(Value* ref)
     {
         return ref;
     }
 
-    Value* pointerOfInt32(Value *value)
+    Value* pointerOfInt32(Value* value)
     {
         return m_currentBlock->appendNew<Value>(m_proc, ZExt32, origin(), value);
+    }
+
+    Value* int32OfPointer(Value* value)
+    {
+        return m_currentBlock->appendNew<Value>(m_proc, Trunc, origin(), value);
     }
 
     // SIMD
@@ -1619,7 +1624,7 @@ auto OMGIRGenerator::addTableSet(unsigned tableIndex, ExpressionType index, Expr
 auto OMGIRGenerator::addRefFunc(FunctionSpaceIndex index, ExpressionType& result) -> PartialResult
 {
     // FIXME: Emit this inline <https://bugs.webkit.org/show_bug.cgi?id=198506>.
-    result = push(callWasmOperation(m_currentBlock, B3::Int64, operationWasmRefFunc,
+    result = push(callWasmOperation(m_currentBlock, wasmRefType(), operationWasmRefFunc,
         instanceValue(), constant(toB3Type(Types::I32), index)));
     TRACE_VALUE(Wasm::Types::Funcref, get(result), "ref_func ", index);
     return { };
@@ -1899,7 +1904,7 @@ auto OMGIRGenerator::addCurrentMemory(ExpressionType& result) -> PartialResult
     static_assert(PageCount::pageSize == 1ull << shiftValue, "This must hold for the code below to be correct.");
     Value* numPages = m_currentBlock->appendNew<Value>(m_proc, ZShr, origin(), size, constant(Int32, shiftValue));
 
-    result = push(m_currentBlock->appendNew<Value>(m_proc, Trunc, origin(), numPages));
+    result = push(int32OfPointer(numPages));
 
     return { };
 }
@@ -3239,8 +3244,8 @@ auto OMGIRGenerator::addI31GetU(TypedExpression reference, ExpressionType& resul
     if (reference.type().isNullable())
         emitNullCheck(value, ExceptionType::NullI31Get);
 
-    Value* masked = m_currentBlock->appendNew<Value>(m_proc, B3::BitAnd, origin(), value, constant(Int64, 0x7fffffff));
-    result = push(m_currentBlock->appendNew<Value>(m_proc, B3::Trunc, origin(), masked));
+    Value* masked = m_currentBlock->appendNew<Value>(m_proc, B3::BitAnd, origin(), int32OfPointer(pointerOfWasmRef(value)), constant(Int32, 0x7fffffff));
+    result = push(masked);
     return { };
 }
 
@@ -3465,7 +3470,7 @@ auto OMGIRGenerator::addArrayGet(ExtGCOpType arrayGetKind, uint32_t typeIndex, T
     Value* payloadBase = emitGetArrayPayloadBase(elementType, arrayValue);
     Value* indexedAddress = m_currentBlock->appendNew<Value>(m_proc, Add, pointerType(), origin(), payloadBase,
         m_currentBlock->appendNew<Value>(m_proc, Mul, pointerType(), origin(),
-            m_currentBlock->appendNew<Value>(m_proc, ZExt32, origin(), indexValue),
+            pointerOfInt32(indexValue),
             constant(pointerType(), elementType.elementSize())));
 
     auto decorateWithIndex = [&](MemoryValue* load, NumberedAbstractHeap& heap, Value* indexValue) {
@@ -3590,7 +3595,7 @@ bool OMGIRGenerator::emitArraySetUncheckedWithoutWriteBarrier(uint32_t typeIndex
 
     auto payloadBase = emitGetArrayPayloadBase(elementType, arrayref);
     auto indexedAddress = m_currentBlock->appendNew<Value>(m_proc, Add, pointerType(), origin(), payloadBase,
-        m_currentBlock->appendNew<Value>(m_proc, Mul, pointerType(), origin(), m_currentBlock->appendNew<Value>(m_proc, ZExt32, origin(), indexValue), constant(pointerType(), elementType.elementSize())));
+        m_currentBlock->appendNew<Value>(m_proc, Mul, pointerType(), origin(), pointerOfInt32(indexValue), constant(pointerType(), elementType.elementSize())));
 
     auto decorateWithIndex = [&](MemoryValue* store, NumberedAbstractHeap& heap, Value* indexValue) {
         // FIXME: we should do this decoration after we found that indexValue is a constant.
@@ -4115,7 +4120,7 @@ void OMGIRGenerator::emitRefTestOrCast(CastKind castKind, TypedExpression refere
 
                 emitCheckOrBranchForCast(castKind, m_currentBlock->appendNew<Value>(m_proc, NotEqual, origin(), jsType, constant(Int32, JSType::WebAssemblyGCObjectType)), castFailure, falseBlock);
             }
-            Value* rtt = emitLoadRTTFromObject(value);
+            Value* rtt = emitLoadRTTFromObject(pointerOfWasmRef(value));
             auto* kind = m_currentBlock->appendNew<MemoryValue>(m_proc, Load8Z, origin(), rtt, safeCast<int32_t>(RTT::offsetOfKind()));
             m_heaps.decorateMemory(&m_heaps.WasmRTT_kind, kind);
             kind->setControlDependent(false);
