@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,58 +23,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "NativeImage.h"
+#pragma once
 
-#include "FloatRect.h"
-#include "GraphicsContext.h"
-#include "ImageBuffer.h"
-#include "RenderingMode.h"
-#include <wtf/TZoneMallocInlines.h>
+#if ENABLE(GPU_PROCESS)
 
-namespace WebCore {
+#include <WebCore/IntSize.h>
+#include <WebCore/NativeImage.h>
+#include <WebCore/PlatformColorSpace.h>
 
-WTF_MAKE_TZONE_ALLOCATED_IMPL(NativeImage);
+namespace WebKit {
 
-#if !USE(CG)
-RefPtr<NativeImage> NativeImage::create(PlatformImagePtr&& platformImage)
-{
-    if (!platformImage)
-        return nullptr;
-    return adoptRef(*new NativeImage(WTFMove(platformImage)));
+class RemoteResourceCacheProxy;
+
+class RemoteNativeImageProxy final : public WebCore::NativeImage {
+    WTF_MAKE_TZONE_ALLOCATED(RemoteNativeImageProxy);
+public:
+    static Ref<RemoteNativeImageProxy> create(const WebCore::IntSize&, WebCore::PlatformColorSpace&&, bool hasAlpha, WeakRef<RemoteResourceCacheProxy>&&);
+    ~RemoteNativeImageProxy() override;
+    const WebCore::PlatformImagePtr& platformImage() const override;
+    WebCore::IntSize size() const override;
+    bool hasAlpha() const override;
+    WebCore::DestinationColorSpace colorSpace() const override;
+
+private:
+    RemoteNativeImageProxy(const WebCore::IntSize&, WebCore::PlatformColorSpace&&, bool hasAlpha, WeakRef<RemoteResourceCacheProxy>&&);
+
+    WeakPtr<RemoteResourceCacheProxy> m_resourceCache;
+    const WebCore::IntSize m_size;
+    const WebCore::PlatformColorSpace m_colorSpace;
+    const bool m_hasAlpha;
+};
+
 }
 
-RefPtr<NativeImage> NativeImage::createTransient(PlatformImagePtr&& image)
-{
-    return create(WTFMove(image));
-}
 #endif
-
-NativeImage::NativeImage(PlatformImagePtr&& platformImage)
-    : m_platformImage(WTFMove(platformImage))
-{
-}
-
-NativeImage::~NativeImage()
-{
-    for (CheckedRef observer : m_observers)
-        observer->willDestroyNativeImage(*this);
-}
-
-const PlatformImagePtr& NativeImage::platformImage() const
-{
-    return m_platformImage;
-}
-
-bool NativeImage::hasHDRContent() const
-{
-    return colorSpace().usesITUR_2100TF();
-}
-
-void NativeImage::replacePlatformImage(PlatformImagePtr&& platformImage)
-{
-    ASSERT(platformImage);
-    m_platformImage = WTFMove(platformImage);
-}
-
-} // namespace WebCore
