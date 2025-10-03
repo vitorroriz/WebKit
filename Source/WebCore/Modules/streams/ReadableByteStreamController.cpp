@@ -624,7 +624,7 @@ void ReadableByteStreamController::clearAlgorithms()
 }
 
 // https://streams.spec.whatwg.org/#readable-byte-stream-controller-pull-into
-void ReadableByteStreamController::pullInto(JSDOMGlobalObject& globalObject, JSC::ArrayBufferView& view, size_t min, Ref<DeferredPromise>&& readIntoRequest)
+void ReadableByteStreamController::pullInto(JSDOMGlobalObject& globalObject, JSC::ArrayBufferView& view, size_t min, Ref<ReadableStreamReadIntoRequest>&& readIntoRequest)
 {
     Ref stream = m_stream.get();
     size_t elementSize = 1;
@@ -639,14 +639,14 @@ void ReadableByteStreamController::pullInto(JSDOMGlobalObject& globalObject, JSC
     auto byteOffset = view.byteOffset();
     auto byteLength = view.byteLength();
     if (view.isDetached()) {
-        readIntoRequest->reject(Exception { ExceptionCode::TypeError, "view is detached"_s });
+        readIntoRequest->runErrorSteps(Exception { ExceptionCode::TypeError, "view is detached"_s });
         return;
     }
 
     Ref vm = globalObject.vm();
     auto bufferResultOrException = transferArrayBuffer(vm.get(), *view.possiblySharedBuffer());
     if (bufferResultOrException.hasException()) {
-        readIntoRequest->reject(bufferResultOrException.releaseException());
+        readIntoRequest->runErrorSteps(bufferResultOrException.releaseException());
         return;
     }
 
@@ -663,7 +663,7 @@ void ReadableByteStreamController::pullInto(JSDOMGlobalObject& globalObject, JSC
     if (stream->state() == ReadableStream::State::Closed) {
         Ref emptyView = createTypedBuffer(pullIntoDescriptor.viewConstructor, WTFMove(pullIntoDescriptor.buffer), pullIntoDescriptor.byteOffset, 0);
         auto chunk = toJS<IDLArrayBufferView>(globalObject, globalObject, WTFMove(emptyView));
-        readIntoRequest->resolve<IDLDictionary<ReadableStreamReadResult>>({ WTFMove(chunk), true });
+        readIntoRequest->runCloseSteps(chunk);
         return;
     }
 
@@ -673,13 +673,13 @@ void ReadableByteStreamController::pullInto(JSDOMGlobalObject& globalObject, JSC
             handleQueueDrain(globalObject);
 
             auto chunk = toJS<IDLNullable<IDLArrayBufferView>>(globalObject, globalObject, WTFMove(filledView));
-            readIntoRequest->resolve<IDLDictionary<ReadableStreamReadResult>>({ WTFMove(chunk), false });
+            readIntoRequest->runChunkSteps(chunk);
             return;
         }
         if (m_closeRequested) {
             JSC::JSValue e = JSC::createTypeError(&globalObject, "close is requested"_s);
             error(globalObject, e);
-            readIntoRequest->reject<IDLAny>(e);
+            readIntoRequest->runErrorSteps(e);
             return;
         }
 
@@ -705,7 +705,7 @@ void ReadableByteStreamController::runCancelSteps(JSDOMGlobalObject& globalObjec
 }
 
 // https://streams.spec.whatwg.org/#rbs-controller-private-pull
-void ReadableByteStreamController::runPullSteps(JSDOMGlobalObject& globalObject, Ref<DeferredPromise>&& readRequest)
+void ReadableByteStreamController::runPullSteps(JSDOMGlobalObject& globalObject, Ref<ReadableStreamReadRequest>&& readRequest)
 {
     Ref stream = m_stream.get();
     ASSERT(stream->defaultReader());
@@ -735,7 +735,7 @@ void ReadableByteStreamController::runReleaseSteps()
 }
 
 // https://streams.spec.whatwg.org/#abstract-opdef-readablebytestreamcontrollerfillreadrequestfromqueue
-void ReadableByteStreamController::fillReadRequestFromQueue(JSDOMGlobalObject& globalObject, Ref<DeferredPromise>&& readRequest)
+void ReadableByteStreamController::fillReadRequestFromQueue(JSDOMGlobalObject& globalObject, Ref<ReadableStreamReadRequest>&& readRequest)
 {
     ASSERT(m_queueTotalSize);
     auto entry = m_queue.takeFirst();
@@ -745,7 +745,7 @@ void ReadableByteStreamController::fillReadRequestFromQueue(JSDOMGlobalObject& g
 
     Ref view = Uint8Array::create(WTFMove(entry.buffer), entry.byteOffset, entry.byteLength);
     auto chunk = toJS<IDLArrayBufferView>(globalObject, globalObject, WTFMove(view));
-    readRequest->resolve<IDLDictionary<ReadableStreamReadResult>>(ReadableStreamReadResult { chunk, false });
+    readRequest->runChunkSteps(chunk);
 }
 
 void ReadableByteStreamController::storeError(JSDOMGlobalObject& globalObject, JSC::JSValue error)

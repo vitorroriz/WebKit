@@ -1,6 +1,4 @@
 
-Harness Error (FAIL), message = Unhandled rejection: Type error
-
 PASS ReadableStream teeing with byte source: rs.tee() returns an array of two ReadableStreams
 PASS ReadableStream teeing with byte source: should be able to read one branch to the end without affecting the other
 PASS ReadableStream teeing with byte source: chunks should be cloned for each branch

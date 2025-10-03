@@ -26,6 +26,7 @@
 #pragma once
 
 #include "InternalReadableStreamDefaultReader.h"
+#include "ReadableStreamReadRequest.h"
 #include "ScriptWrappable.h"
 #include "WebCoreOpaqueRoot.h"
 #include <JavaScriptCore/Strong.h>
@@ -40,6 +41,7 @@ class DeferredPromise;
 class InternalReadableStreamDefaultReader;
 class JSDOMGlobalObject;
 class ReadableStream;
+class ReadableStreamReadRequest;
 
 class ReadableStreamDefaultReader : public ScriptWrappable, public RefCountedAndCanMakeWeakPtr<ReadableStreamDefaultReader> {
     WTF_MAKE_TZONE_OR_ISO_ALLOCATED(ReadableStreamDefaultReader);
@@ -51,13 +53,15 @@ public:
     ~ReadableStreamDefaultReader();
 
     DOMPromise& closedPromise() const;
-    void read(JSDOMGlobalObject&, Ref<DeferredPromise>&&);
+    void readForBindings(JSDOMGlobalObject&, Ref<DeferredPromise>&&);
+    void read(JSDOMGlobalObject&, Ref<ReadableStreamReadRequest>&&);
+
     ExceptionOr<void> releaseLock(JSDOMGlobalObject&);
 
     InternalReadableStreamDefaultReader* internalDefaultReader() { return m_internalDefaultReader.get(); }
     size_t getNumReadRequests() const { return m_readRequests.size(); }
-    void addReadRequest(Ref<DeferredPromise>&&);
-    Ref<DeferredPromise> takeFirstReadRequest();
+    void addReadRequest(Ref<ReadableStreamReadRequest>&&);
+    Ref<ReadableStreamReadRequest> takeFirstReadRequest();
 
     void genericCancel(JSDOMGlobalObject&, JSC::JSValue, Ref<DeferredPromise>&&);
 
@@ -82,7 +86,7 @@ private:
     Ref<DOMPromise> m_closedPromise;
     Ref<DeferredPromise> m_closedDeferred;
     RefPtr<ReadableStream> m_stream;
-    Deque<Ref<DeferredPromise>> m_readRequests;
+    Deque<Ref<ReadableStreamReadRequest>> m_readRequests;
 
     const RefPtr<InternalReadableStreamDefaultReader> m_internalDefaultReader;
     ClosedRejectionCallback m_closedRejectionCallback;

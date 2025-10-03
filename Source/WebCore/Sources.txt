@@ -381,6 +381,7 @@ Modules/streams/ReadableStream.cpp
 Modules/streams/ReadableStreamBYOBReader.cpp
 Modules/streams/ReadableStreamBYOBRequest.cpp
 Modules/streams/ReadableStreamDefaultReader.cpp
+Modules/streams/ReadableStreamReadRequest.cpp
 Modules/streams/ReadableStreamSink.cpp
 Modules/streams/ReadableStreamSource.cpp
 Modules/streams/StreamTeeUtilities.cpp

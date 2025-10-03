@@ -32,7 +32,7 @@
 #include "JSReadableStreamReadResult.h"
 #include "ReadableByteStreamController.h"
 #include "ReadableStream.h"
-#include "ReadableStreamReadResult.h"
+#include "ReadableStreamReadRequest.h"
 #include "WebCoreOpaqueRootInlines.h"
 #include <wtf/TZoneMallocInlines.h>
 
@@ -96,11 +96,16 @@ DOMPromise& ReadableStreamDefaultReader::closedPromise() const
 }
 
 // https://streams.spec.whatwg.org/#default-reader-read
-void ReadableStreamDefaultReader::read(JSDOMGlobalObject& globalObject, Ref<DeferredPromise>&& readRequest)
+void ReadableStreamDefaultReader::readForBindings(JSDOMGlobalObject& globalObject, Ref<DeferredPromise>&& promise)
+{
+    read(globalObject, ReadableStreamReadRequest::create(WTFMove(promise)));
+}
+
+void ReadableStreamDefaultReader::read(JSDOMGlobalObject& globalObject, Ref<ReadableStreamReadRequest>&& readRequest)
 {
     RefPtr stream = m_stream;
     if (!stream) {
-        readRequest->reject(Exception { ExceptionCode::TypeError, "stream is undefined"_s });
+        readRequest->runErrorSteps(Exception { ExceptionCode::TypeError, "stream is undefined"_s });
         return;
     }
 
@@ -111,10 +116,10 @@ void ReadableStreamDefaultReader::read(JSDOMGlobalObject& globalObject, Ref<Defe
     stream->markAsDisturbed();
     switch (stream->state()) {
     case ReadableStream::State::Closed:
-        readRequest->resolve<IDLDictionary<ReadableStreamReadResult>>({ JSC::jsUndefined(), true });
+        readRequest->runCloseSteps();
         break;
     case ReadableStream::State::Errored:
-        readRequest->reject<IDLAny>(stream->storedError(globalObject));
+        readRequest->runErrorSteps(stream->storedError(globalObject));
         break;
     case ReadableStream::State::Readable:
         RefPtr { stream->controller() }->runPullSteps(globalObject, WTFMove(readRequest));
@@ -186,7 +191,7 @@ void ReadableStreamDefaultReader::errorReadRequests(JSDOMGlobalObject& globalObj
     UNUSED_PARAM(globalObject);
     auto readRequests = std::exchange(m_readRequests, { });
     for (auto& readRequest : readRequests)
-        readRequest->reject(exception);
+        readRequest->runErrorSteps(Exception { exception });
 }
 
 // https://streams.spec.whatwg.org/#readable-stream-reader-generic-cancel
@@ -205,15 +210,15 @@ void ReadableStreamDefaultReader::errorReadRequests(JSC::JSValue reason)
 {
     auto readRequests = std::exchange(m_readRequests, { });
     for (auto& request : readRequests)
-        request->reject<IDLAny>(reason);
+        request->runErrorSteps(reason);
 }
 
-void ReadableStreamDefaultReader::addReadRequest(Ref<DeferredPromise>&& promise)
+void ReadableStreamDefaultReader::addReadRequest(Ref<ReadableStreamReadRequest>&& promise)
 {
     m_readRequests.append(WTFMove(promise));
 }
 
-Ref<DeferredPromise> ReadableStreamDefaultReader::takeFirstReadRequest()
+Ref<ReadableStreamReadRequest> ReadableStreamDefaultReader::takeFirstReadRequest()
 {
     return m_readRequests.takeFirst();
 }
@@ -293,7 +298,7 @@ JSC::JSValue JSReadableStreamDefaultReader::read(JSC::JSGlobalObject& globalObje
     RefPtr internalDefaultReader = wrapped().internalDefaultReader();
     if (!internalDefaultReader) {
         return callPromiseFunction(globalObject, callFrame, [this](auto& globalObject, auto&, auto&& promise) {
-            protectedWrapped()->read(globalObject, WTFMove(promise));
+            protectedWrapped()->readForBindings(globalObject, WTFMove(promise));
         });
     }
 

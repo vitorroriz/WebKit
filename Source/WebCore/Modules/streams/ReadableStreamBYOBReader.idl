@@ -37,7 +37,7 @@ dictionary ReadableStreamBYOBReaderReadOptions {
 ] interface ReadableStreamBYOBReader {
     [CallWith=CurrentGlobalObject] constructor(ReadableStream stream);
 
-    [CallWith=CurrentGlobalObject] Promise<ReadableStreamReadResult> read(ArrayBufferView view, optional ReadableStreamBYOBReaderReadOptions options = {});
+    [CallWith=CurrentGlobalObject, ImplementedAs=readForBindings] Promise<ReadableStreamReadResult> read(ArrayBufferView view, optional ReadableStreamBYOBReaderReadOptions options = {});
     [CallWith=CurrentGlobalObject] undefined releaseLock();
 
     // ReadableStreamGenericReader

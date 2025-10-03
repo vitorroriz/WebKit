@@ -43,6 +43,7 @@ class InternalReadableStream;
 class JSDOMGlobalObject;
 class ReadableStreamBYOBReader;
 class ReadableStreamDefaultReader;
+class ReadableStreamReadRequest;
 class ReadableStreamSource;
 class WritableStream;
 
@@ -105,10 +106,10 @@ public:
     JSC::JSValue storedError(JSDOMGlobalObject&) const;
 
     size_t getNumReadRequests() const;
-    void addReadRequest(Ref<DeferredPromise>&&);
+    void addReadRequest(Ref<ReadableStreamReadRequest>&&);
 
     size_t getNumReadIntoRequests() const;
-    void addReadIntoRequest(Ref<DeferredPromise>&&);
+    void addReadIntoRequest(Ref<ReadableStreamReadIntoRequest>&&);
 
     void error(JSDOMGlobalObject&, JSC::JSValue);
     void pipeTo(JSDOMGlobalObject&, WritableStream&, StreamPipeOptions&&, Ref<DeferredPromise>&&);

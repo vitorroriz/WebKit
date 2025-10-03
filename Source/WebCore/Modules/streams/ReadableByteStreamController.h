@@ -27,6 +27,7 @@
 
 #include "ExceptionOr.h"
 #include "JSValueInWrappedObject.h"
+#include "ReadableStreamReadRequest.h"
 #include <wtf/RefCounted.h>
 #include <wtf/Deque.h>
 #include <wtf/WeakPtr.h>
@@ -45,6 +46,7 @@ class DeferredPromise;
 class JSDOMGlobalObject;
 class ReadableStream;
 class ReadableStreamBYOBRequest;
+class ReadableStreamReadRequest;
 class UnderlyingSourceCancelCallback;
 class UnderlyingSourcePullCallback;
 class UnderlyingSourceStartCallback;
@@ -65,10 +67,10 @@ public:
     ReadableStream& stream();
     Ref<ReadableStream> protectedStream();
 
-    void pullInto(JSDOMGlobalObject&, JSC::ArrayBufferView&, size_t, Ref<DeferredPromise>&&);
+    void pullInto(JSDOMGlobalObject&, JSC::ArrayBufferView&, size_t, Ref<ReadableStreamReadIntoRequest>&&);
 
     void runCancelSteps(JSDOMGlobalObject&, JSC::JSValue, Function<void(std::optional<JSC::JSValue>&&)>&&);
-    void runPullSteps(JSDOMGlobalObject&, Ref<DeferredPromise>&&);
+    void runPullSteps(JSDOMGlobalObject&, Ref<ReadableStreamReadRequest>&&);
     void runReleaseSteps();
 
     void storeError(JSDOMGlobalObject&, JSC::JSValue);
@@ -148,7 +150,7 @@ private:
     void respondInReadableState(JSDOMGlobalObject&, size_t, PullIntoDescriptor&);
 
     void processReadRequestsUsingQueue(JSDOMGlobalObject&);
-    void fillReadRequestFromQueue(JSDOMGlobalObject&, Ref<DeferredPromise>&&);
+    void fillReadRequestFromQueue(JSDOMGlobalObject&, Ref<ReadableStreamReadRequest>&&);
     void handleQueueDrain(JSDOMGlobalObject&);
 
     static void handleSourcePromise(DOMPromise&, Callback&&);

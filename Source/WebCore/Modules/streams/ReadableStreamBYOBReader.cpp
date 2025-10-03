@@ -31,6 +31,7 @@
 #include "JSReadableStreamBYOBReader.h"
 #include "ReadableByteStreamController.h"
 #include "ReadableStream.h"
+#include "ReadableStreamReadRequest.h"
 #include "WebCoreOpaqueRootInlines.h"
 #include <wtf/TZoneMallocInlines.h>
 #include <JavaScriptCore/ArrayBuffer.h>
@@ -64,7 +65,7 @@ DOMPromise& ReadableStreamBYOBReader::closedPromise()
 }
 
 // https://streams.spec.whatwg.org/#byob-reader-read
-void ReadableStreamBYOBReader::read(JSDOMGlobalObject& globalObject, JSC::ArrayBufferView& view, ReadOptions options, Ref<DeferredPromise>&& promise)
+void ReadableStreamBYOBReader::readForBindings(JSDOMGlobalObject& globalObject, JSC::ArrayBufferView& view, ReadOptions options, Ref<DeferredPromise>&& promise)
 {
     if (!view.byteLength())
         return promise->reject(Exception { ExceptionCode::TypeError, "view byteLength is 0"_s });
@@ -91,7 +92,7 @@ void ReadableStreamBYOBReader::read(JSDOMGlobalObject& globalObject, JSC::ArrayB
     if (!m_stream)
         return promise->reject(Exception { ExceptionCode::TypeError, "reader has no stream"_s });
 
-    read(globalObject, view, options.min, WTFMove(promise));
+    read(globalObject, view, options.min, ReadableStreamReadIntoRequest::create(WTFMove(promise)));
 }
 
 // https://streams.spec.whatwg.org/#byob-reader-release-lock
@@ -147,19 +148,19 @@ void ReadableStreamBYOBReader::initialize(JSDOMGlobalObject& globalObject, Reada
 }
 
 // https://streams.spec.whatwg.org/#readable-stream-byob-reader-read
-void ReadableStreamBYOBReader::read(JSDOMGlobalObject& globalObject, JSC::ArrayBufferView& view, size_t optionMin, Ref<DeferredPromise>&& promise)
+void ReadableStreamBYOBReader::read(JSDOMGlobalObject& globalObject, JSC::ArrayBufferView& view, size_t optionMin, Ref<ReadableStreamReadIntoRequest>&& readRequest)
 {
     ASSERT(m_stream);
     Ref stream = *m_stream;
 
     stream->markAsDisturbed();
     if (stream->state() == ReadableStream::State::Errored) {
-        promise->reject<IDLAny>(stream->storedError(globalObject));
+        readRequest->runErrorSteps(stream->storedError(globalObject));
         return;
     }
 
     RefPtr controller = stream->controller();
-    controller->pullInto(globalObject, view, optionMin, WTFMove(promise));
+    controller->pullInto(globalObject, view, optionMin, WTFMove(readRequest));
 }
 
 // https://streams.spec.whatwg.org/#readable-stream-reader-generic-release
@@ -191,14 +192,14 @@ void ReadableStreamBYOBReader::errorReadIntoRequests(Exception&& exception)
 {
     auto requests = std::exchange(m_readIntoRequests, { });
     for (auto& request : requests)
-        request->reject(exception);
+        request->runErrorSteps(Exception { exception });
 }
 
 void ReadableStreamBYOBReader::errorReadIntoRequests(JSC::JSValue reason)
 {
     auto requests = std::exchange(m_readIntoRequests, { });
     for (auto& request : requests)
-        request->rejectWithCallback([&] (auto&) { return reason; });
+        request->runErrorSteps(reason);
 }
 
 void ReadableStreamBYOBReader::resolveClosedPromise()
@@ -219,14 +220,14 @@ void ReadableStreamBYOBReader::genericCancel(JSDOMGlobalObject& globalObject, JS
     stream->cancel(globalObject, value, WTFMove(promise));
 }
 
-Ref<DeferredPromise> ReadableStreamBYOBReader::takeFirstReadIntoRequest()
+Ref<ReadableStreamReadIntoRequest> ReadableStreamBYOBReader::takeFirstReadIntoRequest()
 {
     return m_readIntoRequests.takeFirst();
 }
 
-void ReadableStreamBYOBReader::addReadIntoRequest(Ref<DeferredPromise>&& promise)
+void ReadableStreamBYOBReader::addReadIntoRequest(Ref<ReadableStreamReadIntoRequest>&& readIntoRequest)
 {
-    m_readIntoRequests.append(WTFMove(promise));
+    m_readIntoRequests.append(WTFMove(readIntoRequest));
 }
 
 void ReadableStreamBYOBReader::onClosedPromiseRejection(ClosedCallback&& callback)
