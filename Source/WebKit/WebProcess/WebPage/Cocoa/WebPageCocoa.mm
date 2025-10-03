@@ -61,6 +61,7 @@
 #import <WebCore/EventNames.h>
 #import <WebCore/FixedContainerEdges.h>
 #import <WebCore/FocusController.h>
+#import <WebCore/FrameDestructionObserverInlines.h>
 #import <WebCore/FrameLoader.h>
 #import <WebCore/FrameView.h>
 #import <WebCore/GraphicsContextCG.h>

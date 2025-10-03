@@ -74,6 +74,8 @@
 #include <WebCore/FocusController.h>
 #include <WebCore/FocusControllerTypes.h>
 #include <WebCore/FocusEventData.h>
+#include <WebCore/FrameDestructionObserverInlines.h>
+#include <WebCore/FrameInlines.h>
 #include <WebCore/FrameLoader.h>
 #include <WebCore/FrameSnapshotting.h>
 #include <WebCore/HTMLFormElement.h>

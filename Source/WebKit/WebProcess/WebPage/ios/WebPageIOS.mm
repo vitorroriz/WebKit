@@ -100,6 +100,7 @@
 #import <WebCore/EventHandler.h>
 #import <WebCore/File.h>
 #import <WebCore/FloatQuad.h>
+#import <WebCore/FrameDestructionObserverInlines.h>
 #import <WebCore/FocusController.h>
 #import <WebCore/FocusControllerTypes.h>
 #import <WebCore/FontCache.h>
