@@ -866,7 +866,7 @@ inline void BuilderCustom::applyInitialFontFamily(BuilderState& builderState)
 
 inline void BuilderCustom::applyInheritFontFamily(BuilderState& builderState)
 {
-    auto parentFontDescription = builderState.parentStyle().fontDescription();
+    auto& parentFontDescription = builderState.parentStyle().fontDescription();
 
     builderState.setFontDescriptionFamilies(parentFontDescription.families());
     builderState.setFontDescriptionIsSpecifiedFont(parentFontDescription.isSpecifiedFont());
@@ -1330,40 +1330,6 @@ inline float BuilderCustom::determineRubyTextSizeMultiplier(BuilderState& builde
         }
     }
     return 0.25f;
-}
-
-static inline void applyFontStyle(BuilderState& state, std::optional<FontSelectionValue> slope, FontStyleAxis axis)
-{
-    auto& description = state.fontDescription();
-    if (description.italic() == slope && description.fontStyleAxis() == axis)
-        return;
-
-    auto copy = description;
-    copy.setItalic(slope);
-    copy.setFontStyleAxis(axis);
-    state.setFontDescription(WTFMove(copy));
-}
-
-inline void BuilderCustom::applyInitialFontStyle(BuilderState& state)
-{
-    applyFontStyle(state, FontCascadeDescription::initialItalic(), FontCascadeDescription::initialFontStyleAxis());
-}
-
-inline void BuilderCustom::applyInheritFontStyle(BuilderState& state)
-{
-    applyFontStyle(state, state.parentFontDescription().italic(), state.parentFontDescription().fontStyleAxis());
-}
-
-inline void BuilderCustom::applyValueFontStyle(BuilderState& state, CSSValue& value)
-{
-    auto* primitiveValue = dynamicDowncast<CSSPrimitiveValue>(value);
-    auto keyword = primitiveValue ? primitiveValue->valueID() : CSSValueOblique;
-
-    std::optional<FontSelectionValue> slope;
-    if (!CSSPropertyParserHelpers::isSystemFontShorthand(keyword))
-        slope = BuilderConverter::convertFontStyleFromValue(state, value);
-
-    applyFontStyle(state, slope, keyword == CSSValueItalic ? FontStyleAxis::ital : FontStyleAxis::slnt);
 }
 
 inline void BuilderCustom::applyValueFontSize(BuilderState& builderState, CSSValue& value)
