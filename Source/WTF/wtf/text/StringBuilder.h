@@ -110,7 +110,7 @@ private:
 
     template<typename CharacterType> std::span<CharacterType> extendBufferForAppending(unsigned requiredLength);
     template<typename CharacterType> std::span<CharacterType> extendBufferForAppendingSlowCase(unsigned requiredLength);
-    WTF_EXPORT_PRIVATE std::span<Latin1Character> extendBufferForAppendingLChar(unsigned requiredLength);
+    WTF_EXPORT_PRIVATE std::span<Latin1Character> extendBufferForAppendingLatin1Character(unsigned requiredLength);
     WTF_EXPORT_PRIVATE std::span<char16_t> extendBufferForAppendingWithUpconvert(unsigned requiredLength);
 
     WTF_EXPORT_PRIVATE void reifyString() const;
@@ -327,7 +327,7 @@ template<typename... StringTypeAdapters> void StringBuilder::appendFromAdapters(
     } else {
         auto requiredLength = saturatedSum<uint32_t>(m_length, adapters.length()...);
         if (is8Bit() && are8Bit(adapters...)) {
-            auto destination = extendBufferForAppendingLChar(requiredLength);
+            auto destination = extendBufferForAppendingLatin1Character(requiredLength);
             if (!destination.data())
                 return;
             stringTypeAdapterAccumulator(destination, adapters...);

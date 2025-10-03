@@ -660,7 +660,7 @@ JSC_DEFINE_HOST_FUNCTION(globalFuncUnescape, (JSGlobalObject* globalObject, Call
 
         if (view.is8Bit()) {
             auto characters = view.span8();
-            Latin1Character convertedLChar;
+            Latin1Character converted;
             while (k < length) {
                 auto c = characters.subspan(k);
                 if (c[0] == '%' && k <= length - 6 && c[1] == 'u') {
@@ -670,8 +670,8 @@ JSC_DEFINE_HOST_FUNCTION(globalFuncUnescape, (JSGlobalObject* globalObject, Call
                         continue;
                     }
                 } else if (c[0] == '%' && k <= length - 3 && isASCIIHexDigit(c[1]) && isASCIIHexDigit(c[2])) {
-                    convertedLChar = Latin1Character(Lexer<Latin1Character>::convertHex(c[1], c[2]));
-                    c = span(convertedLChar);
+                    converted = Latin1Character(Lexer<Latin1Character>::convertHex(c[1], c[2]));
+                    c = span(converted);
                     k += 2;
                 }
                 builder.append(c.front());
@@ -682,16 +682,16 @@ JSC_DEFINE_HOST_FUNCTION(globalFuncUnescape, (JSGlobalObject* globalObject, Call
 
             while (k < length) {
                 auto c = characters.subspan(k);
-                char16_t convertedUChar;
+                char16_t converted;
                 if (c[0] == '%' && k <= length - 6 && c[1] == 'u') {
                     if (isASCIIHexDigit(c[2]) && isASCIIHexDigit(c[3]) && isASCIIHexDigit(c[4]) && isASCIIHexDigit(c[5])) {
-                        convertedUChar = Lexer<char16_t>::convertUnicode(c[2], c[3], c[4], c[5]);
-                        c = span(convertedUChar);
+                        converted = Lexer<char16_t>::convertUnicode(c[2], c[3], c[4], c[5]);
+                        c = span(converted);
                         k += 5;
                     }
                 } else if (c[0] == '%' && k <= length - 3 && isASCIIHexDigit(c[1]) && isASCIIHexDigit(c[2])) {
-                    convertedUChar = char16_t(Lexer<char16_t>::convertHex(c[1], c[2]));
-                    c = span(convertedUChar);
+                    converted = char16_t(Lexer<char16_t>::convertHex(c[1], c[2]));
+                    c = span(converted);
                     k += 2;
                 }
                 ++k;
