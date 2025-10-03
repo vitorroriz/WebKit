@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Apple Inc. All rights reserved.
+# Copyright (C) 2025 Apple Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -22,13 +22,21 @@
 
 #if ENABLE(GPU_PROCESS)
 
-struct WebKit::GPUProcessConnectionInfo {
-
-#if HAVE(AUDIT_TOKEN)
-    std::optional<WebKit::CoreIPCAuditToken> auditToken;
+struct WebKit::GPUProcessMediaCodecCapabilities {
+#if ENABLE(VP9)
+    bool hasVP9HardwareDecoder;
 #endif
-
-    WebKit::GPUProcessMediaCodecCapabilities mediaCodecCapabilities;
-}
+#if ENABLE(AV1)
+    bool hasAV1HardwareDecoder;
+#endif
+#if PLATFORM(COCOA)
+#if ENABLE(OPUS)
+    bool hasOpusDecoder;
+#endif
+#if ENABLE(VORBIS)
+    bool hasVorbisDecoder;
+#endif
+#endif
+};
 
 #endif

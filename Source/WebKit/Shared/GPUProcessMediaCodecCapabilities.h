@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,34 +27,27 @@
 
 #if ENABLE(GPU_PROCESS)
 
-#include "GPUProcessMediaCodecCapabilities.h"
-#include "SharedPreferencesForWebProcess.h"
-#include <WebCore/ProcessIdentity.h>
-#include <wtf/MachSendRight.h>
-
-#if HAVE(AUDIT_TOKEN)
-#include "CoreIPCAuditToken.h"
-#include <WebCore/PageIdentifier.h>
-#endif
+#include <optional>
 
 namespace WebKit {
 
-struct GPUProcessConnectionParameters {
-    WebCore::ProcessIdentity webProcessIdentity;
-    SharedPreferencesForWebProcess sharedPreferencesForWebProcess;
-    bool isLockdownModeEnabled { false };
-#if ENABLE(IPC_TESTING_API)
-    bool ignoreInvalidMessageForTesting { false };
+struct GPUProcessMediaCodecCapabilities {
+#if ENABLE(VP9)
+    bool hasVP9HardwareDecoder { false };
 #endif
-#if HAVE(AUDIT_TOKEN)
-    HashMap<WebCore::PageIdentifier, CoreIPCAuditToken> presentingApplicationAuditTokens;
+#if ENABLE(AV1)
+    bool hasAV1HardwareDecoder { false };
 #endif
 #if PLATFORM(COCOA)
-    String applicationBundleIdentifier;
+#if ENABLE(OPUS)
+    bool hasOpusDecoder { false };
 #endif
-    std::optional<GPUProcessMediaCodecCapabilities> mediaCodecCapabilities;
+#if ENABLE(VORBIS)
+    bool hasVorbisDecoder { false };
+#endif
+#endif
 };
 
-}; // namespace WebKit
+} // namespace WebKit
 
 #endif // ENABLE(GPU_PROCESS)

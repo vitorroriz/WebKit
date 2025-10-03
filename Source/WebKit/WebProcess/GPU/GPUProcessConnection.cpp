@@ -96,6 +96,10 @@
 #include <WebCore/VP9UtilitiesCocoa.h>
 #endif
 
+#if (ENABLE(OPUS) || ENABLE(VORBIS)) && PLATFORM(COCOA)
+#include <WebCore/WebMAudioUtilitiesCocoa.h>
+#endif
+
 #if ENABLE(ROUTING_ARBITRATION)
 #include "AudioSessionRoutingArbitrator.h"
 #endif
@@ -326,16 +330,24 @@ void GPUProcessConnection::didInitialize(std::optional<GPUProcessConnectionInfo>
     m_hasInitialized = true;
     RELEASE_LOG(Process, "%p - GPUProcessConnection::didInitialize", this);
 
-#if USE(LIBWEBRTC) && PLATFORM(COCOA)
+#if PLATFORM(COCOA)
+#if USE(LIBWEBRTC)
 #if ENABLE(VP9)
-    WebProcess::singleton().libWebRTCCodecs().setVP9VTBSupport(info->hasVP9HardwareDecoder);
+    WebProcess::singleton().libWebRTCCodecs().setVP9VTBSupport(info->mediaCodecCapabilities.hasVP9HardwareDecoder);
 #endif
 #if ENABLE(AV1)
-    WebProcess::singleton().protectedLibWebRTCCodecs()->setHasAV1HardwareDecoder(info->hasAV1HardwareDecoder);
+    WebProcess::singleton().protectedLibWebRTCCodecs()->setHasAV1HardwareDecoder(info->mediaCodecCapabilities.hasAV1HardwareDecoder);
 #endif
 #endif
-#if PLATFORM(COCOA) && ENABLE(VP9)
-    VP9TestingOverrides::singleton().setVP9HardwareDecoderEnabledOverride(info->hasVP9HardwareDecoder);
+#if ENABLE(VP9)
+    VP9TestingOverrides::singleton().setVP9HardwareDecoderEnabledOverride(info->mediaCodecCapabilities.hasVP9HardwareDecoder);
+#endif
+#if ENABLE(OPUS)
+    WebCore::setHasOpusDecoder(info->mediaCodecCapabilities.hasOpusDecoder);
+#endif
+#if ENABLE(VORBIS)
+    WebCore::setHasVorbisDecoder(info->mediaCodecCapabilities.hasVorbisDecoder);
+#endif
 #endif
 }
 
