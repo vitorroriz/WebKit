@@ -2280,7 +2280,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/LegacySchemeRegistry.h
     platform/Length.h
     platform/LengthFunctions.h
-    platform/LengthPoint.h
     platform/LinkIcon.h
     platform/LocalizedStrings.h
     platform/LogClient.h
@@ -2427,6 +2426,13 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/animation/AcceleratedEffectValues.h
     platform/animation/AnimationUtilities.h
     platform/animation/TimingFunction.h
+    platform/animation/values/AcceleratedEffectOffsetAnchor.h
+    platform/animation/values/AcceleratedEffectOffsetDistance.h
+    platform/animation/values/AcceleratedEffectOffsetPosition.h
+    platform/animation/values/AcceleratedEffectOffsetRotate.h
+    platform/animation/values/AcceleratedEffectOpacity.h
+    platform/animation/values/AcceleratedEffectTransformBox.h
+    platform/animation/values/AcceleratedEffectTransformOrigin.h
     platform/audio/AudioArray.h
     platform/audio/AudioBus.h
     platform/audio/AudioChannel.h

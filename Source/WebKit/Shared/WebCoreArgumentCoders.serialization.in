@@ -3139,11 +3139,6 @@ enum class WebCore::GraphicsContextGLSimulatedEventForTesting : uint8_t {
     WebCore::IdentityTransformOperation
 }
 
-struct WebCore::LengthPoint {
-    WebCore::Length x;
-    WebCore::Length y;
-}
-
 class WebCore::SVGPathByteStream {
     Vector<unsigned char> bytes();
 }
@@ -6764,25 +6759,6 @@ enum class WebCore::StorageType : uint8_t {
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
 
-header: <WebCore/RenderStyleConstants.h>
-[CustomHeader] enum class WebCore::TransformBox : uint8_t {
-    StrokeBox,
-    ContentBox,
-    BorderBox,
-    FillBox,
-    ViewBox
-};
-
-header: <WebCore/StyleOffsetRotate.h>
-using WebCore::CSS::Keyword::Auto = WebCore::Constant<WebCore::CSSValueAuto>;
-[CustomHeader, Nested] struct WebCore::Constant<WebCore::CSSValueAuto> {
-};
-
-[CustomHeader] struct WebCore::Style::OffsetRotate {
-    std::optional<WebCore::CSS::Keyword::Auto> autoKeyword();
-    WebCore::Style::AngleAllFloat angle();
-}
-
 [OptionSet] enum class WebCore::AcceleratedEffectProperty : uint16_t {
     Opacity,
     Transform,
@@ -6826,23 +6802,62 @@ enum class WebCore::CompositeOperation : uint8_t {
     Accumulate
 };
 
+struct WebCore::AcceleratedEffectOffsetAnchor {
+    std::optional<WebCore::FloatPoint> value;
+};
+
+struct WebCore::AcceleratedEffectOffsetDistance {
+    float value;
+};
+
+struct WebCore::AcceleratedEffectOffsetPosition {
+    Variant<WebCore::AcceleratedEffectOffsetPosition::Normal, WebCore::AcceleratedEffectOffsetPosition::Auto, WebCore::FloatPoint> value;
+}
+
+[Nested] struct WebCore::AcceleratedEffectOffsetPosition::Normal {
+};
+
+[Nested] struct WebCore::AcceleratedEffectOffsetPosition::Auto {
+};
+
+struct WebCore::AcceleratedEffectOffsetRotate {
+    bool hasAuto;
+    float angle;
+};
+
+struct WebCore::AcceleratedEffectOpacity {
+    float value;
+};
+
+enum class WebCore::AcceleratedEffectTransformBox : uint8_t {
+    StrokeBox,
+    ContentBox,
+    BorderBox,
+    FillBox,
+    ViewBox
+};
+
+struct WebCore::AcceleratedEffectTransformOrigin {
+    WebCore::FloatPoint value;
+};
+
 struct WebCore::AcceleratedEffectValues {
-    float opacity;
+    WebCore::AcceleratedEffectOpacity opacity;
     std::optional<WebCore::TransformOperationData> transformOperationData;
-    WebCore::LengthPoint transformOrigin;
-    WebCore::TransformBox transformBox;
+    WebCore::AcceleratedEffectTransformOrigin transformOrigin;
+    WebCore::AcceleratedEffectTransformBox transformBox;
     WebCore::TransformOperations transform;
     RefPtr<WebCore::TransformOperation> translate;
     RefPtr<WebCore::TransformOperation> scale;
     RefPtr<WebCore::TransformOperation> rotate;
     RefPtr<WebCore::PathOperation> offsetPath;
-    WebCore::Length offsetDistance;
-    WebCore::LengthPoint offsetPosition;
-    WebCore::LengthPoint offsetAnchor;
-    WebCore::Style::OffsetRotate offsetRotate;
+    WebCore::AcceleratedEffectOffsetDistance offsetDistance;
+    WebCore::AcceleratedEffectOffsetPosition offsetPosition;
+    WebCore::AcceleratedEffectOffsetAnchor offsetAnchor;
+    WebCore::AcceleratedEffectOffsetRotate offsetRotate;
     WebCore::FilterOperations filter;
     WebCore::FilterOperations backdropFilter;
-}
+};
 
 class WebCore::WebAnimationTime {
     std::optional<Seconds> time();
@@ -6887,6 +6902,7 @@ header: <WebCore/AcceleratedEffect.h>
     std::optional<WebCore::WebAnimationTime> startTime();
     std::optional<WebCore::WebAnimationTime> holdTime();
 };
+
 #endif // ENABLE(THREADED_ANIMATION_RESOLUTION)
 
 #if PLATFORM(MAC)

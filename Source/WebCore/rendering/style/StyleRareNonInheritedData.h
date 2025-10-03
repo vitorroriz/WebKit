@@ -27,7 +27,6 @@
 
 #include <WebCore/CSSPropertyNames.h>
 #include <WebCore/CounterDirectives.h>
-#include <WebCore/LengthPoint.h>
 #include <WebCore/NameScope.h>
 #include <WebCore/PositionArea.h>
 #include <WebCore/PositionTryFallback.h>

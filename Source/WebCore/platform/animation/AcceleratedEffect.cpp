@@ -303,7 +303,7 @@ static void blend(AcceleratedEffectProperty property, AcceleratedEffectValues& o
 {
     switch (property) {
     case AcceleratedEffectProperty::Opacity:
-        output.opacity = blend(from.opacity, to.opacity, blendingContext);
+        output.opacity = WebCore::blend(from.opacity, to.opacity, blendingContext);
         break;
     case AcceleratedEffectProperty::Transform:
         output.transform = blend(from.transform, to.transform, blendingContext);
@@ -321,7 +321,7 @@ static void blend(AcceleratedEffectProperty property, AcceleratedEffectValues& o
             output.scale = toScale->blend(from.scale.get(), blendingContext);
         break;
     case AcceleratedEffectProperty::OffsetAnchor:
-        output.offsetDistance = blend(from.offsetDistance, to.offsetDistance, blendingContext);
+        output.offsetAnchor = blend(from.offsetAnchor, to.offsetAnchor, blendingContext);
         break;
     case AcceleratedEffectProperty::OffsetDistance:
         output.offsetDistance = blend(from.offsetDistance, to.offsetDistance, blendingContext);
@@ -334,11 +334,11 @@ static void blend(AcceleratedEffectProperty property, AcceleratedEffectValues& o
         output.offsetPosition = blend(from.offsetPosition, to.offsetPosition, blendingContext);
         break;
     case AcceleratedEffectProperty::OffsetRotate:
-        if (!Style::canBlend(from.offsetRotate, to.offsetRotate)) {
+        if (!canBlend(from.offsetRotate, to.offsetRotate)) {
             blendingContext.isDiscrete = true;
             blendingContext.normalizeProgress();
         }
-        output.offsetRotate = Style::blend(from.offsetRotate, to.offsetRotate, blendingContext);
+        output.offsetRotate = blend(from.offsetRotate, to.offsetRotate, blendingContext);
         break;
     case AcceleratedEffectProperty::Filter:
         output.filter = to.filter.blend(from.filter, blendingContext);
@@ -361,7 +361,7 @@ void AcceleratedEffect::apply(WebAnimationTime currentTime, AcceleratedEffectVal
         return (currentTime - *m_startTime) * m_playbackRate;
     }();
 
-    // FIXME: when we add threaded animaiton support support for scroll-driven animations,
+    // FIXME: when we add threaded animation support support for scroll-driven animations,
     // pass in the associated timeline's current time and duration.
     auto resolvedTiming = m_timing.resolve({
         std::nullopt,

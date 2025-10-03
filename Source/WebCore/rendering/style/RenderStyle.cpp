@@ -2363,7 +2363,7 @@ void RenderStyle::applyCSSTransform(TransformationMatrix& transform, const Trans
 
     // 6. Translate and rotate by the transform specified by offset.
     if (options.contains(RenderStyle::TransformOperationOption::Offset))
-        MotionPath::applyMotionPathTransform(*this, operationData, transform);
+        MotionPath::applyMotionPathTransform(transform, operationData, *this);
 
     // 7. Multiply by each of the transform functions in transform from left to right.
     this->transform().apply(transform, boundingBox.size());

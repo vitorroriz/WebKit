@@ -164,6 +164,7 @@ set(WebCore_PRIVATE_INCLUDE_DIRECTORIES
     "${WEBCORE_DIR}/page/text-extraction"
     "${WEBCORE_DIR}/platform"
     "${WEBCORE_DIR}/platform/animation"
+    "${WEBCORE_DIR}/platform/animation/values"
     "${WEBCORE_DIR}/platform/audio"
     "${WEBCORE_DIR}/platform/calc"
     "${WEBCORE_DIR}/platform/encryptedmedia"

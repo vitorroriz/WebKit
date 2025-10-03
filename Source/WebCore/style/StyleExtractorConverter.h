@@ -150,7 +150,6 @@ public:
     static Ref<CSSValue> convertWillChange(ExtractorState&, const WillChangeData*);
     static Ref<CSSValue> convertLineBoxContain(ExtractorState&, OptionSet<Style::LineBoxContain>);
     static Ref<CSSValue> convertWebkitRubyPosition(ExtractorState&, RubyPosition);
-    static Ref<CSSValue> convertPosition(ExtractorState&, const LengthPoint&);
     static Ref<CSSValue> convertTouchAction(ExtractorState&, OptionSet<TouchAction>);
     static Ref<CSSValue> convertTextTransform(ExtractorState&, OptionSet<TextTransform>);
     static Ref<CSSValue> convertTextUnderlinePosition(ExtractorState&, OptionSet<TextUnderlinePosition>);
@@ -518,14 +517,6 @@ inline Ref<CSSValue> ExtractorConverter::convertWebkitRubyPosition(ExtractorStat
         }
         return CSSValueBefore;
     }());
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertPosition(ExtractorState& state, const LengthPoint& position)
-{
-    return CSSValueList::createSpaceSeparated(
-        convertLength(state, position.x),
-        convertLength(state, position.y)
-    );
 }
 
 inline Ref<CSSValue> ExtractorConverter::convertTouchAction(ExtractorState&, OptionSet<TouchAction> touchActions)
