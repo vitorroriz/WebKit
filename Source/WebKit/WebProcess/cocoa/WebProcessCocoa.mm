@@ -183,6 +183,7 @@
 #endif
 
 #if ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
+#import "LaunchLogHook.h"
 #import "LogStream.h"
 #import "LogStreamMessages.h"
 #endif
@@ -849,11 +850,13 @@ static void registerLogClient(bool isDebugLoggingEnabled, std::unique_ptr<LogCli
     RELEASE_ASSERT(!logClient());
     logClient() = WTFMove(newLogClient);
 
-    static os_log_hook_t prevHook = nullptr;
-
     // OS_LOG_TYPE_DEFAULT implies default, fault, and error.
     // OS_LOG_TYPE_DEBUG implies debug, info, default, fault, and error.
     const auto minimumType = isDebugLoggingEnabled ? OS_LOG_TYPE_DEBUG : OS_LOG_TYPE_DEFAULT;
+
+    LaunchLogHook::singleton().disable();
+
+    static os_log_hook_t prevHook = nullptr;
 
     prevHook = os_log_set_hook(minimumType, makeBlockPtr([isDebugLoggingEnabled](os_log_type_t type, os_log_message_t msg) {
         if (prevHook)
