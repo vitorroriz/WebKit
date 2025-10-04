@@ -3438,11 +3438,10 @@ end)
 
 ipintOp(_array_get, macro()
     loadi IPInt::ArrayGetSetMetadata::type[MC], a1  # type
-    popInt32(a3, a0)  # index
-    popQuad(a2)  # array
-    subp StackValueSize, sp  # allocate space for result
-    move sp, a4  # result location
-    operationCallMayThrow(macro() cCall4(_ipint_extern_array_get) end)
+    move sp, a2 # all args on stack, result will be returned on stack
+    operationCallMayThrow(macro() cCall3(_ipint_extern_array_get) end)
+
+    addp StackValueSize, sp # 2 args - 1 result
 
     loadb IPInt::ArrayGetSetMetadata::length[MC], t0
     advancePCByReg(t0)
@@ -3452,11 +3451,10 @@ end)
 
 ipintOp(_array_get_s, macro()
     loadi IPInt::ArrayGetSetMetadata::type[MC], a1  # type
-    popInt32(a3, a0)  # index
-    popQuad(a2)  # array
-    subp StackValueSize, sp  # allocate space for result
-    move sp, a4  # result location
-    operationCallMayThrow(macro() cCall4(_ipint_extern_array_get_s) end)
+    move sp, a2 # all args on stack, result will be returned on stack
+    operationCallMayThrow(macro() cCall3(_ipint_extern_array_get_s) end)
+
+    addp StackValueSize, sp # 2 args - 1 result
 
     loadb IPInt::ArrayGetSetMetadata::length[MC], t0
     advancePCByReg(t0)
@@ -3466,12 +3464,10 @@ end)
 
 ipintOp(_array_get_u, macro()
     loadi IPInt::ArrayGetSetMetadata::type[MC], a1  # type
-    popInt32(a3, a0)  # index
-    popQuad(a2)  # array
-    subp StackValueSize, sp  # allocate space for result
-    move sp, a4  # result location
+    move sp, a2 # all args on stack, result will be returned on stack
+    operationCallMayThrow(macro() cCall3(_ipint_extern_array_get) end)
 
-    operationCallMayThrow(macro() cCall4(_ipint_extern_array_get) end)
+    addp StackValueSize, sp # 2 args - 1 result
 
     loadb IPInt::ArrayGetSetMetadata::length[MC], t0
     advancePCByReg(t0)
