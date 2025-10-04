@@ -64,14 +64,8 @@ UIProcess/API/mac/WKWebViewMac.mm
 UIProcess/API/mac/WKWebViewTestingMac.mm
 UIProcess/Authentication/cocoa/AuthenticationChallengeProxyCocoa.mm
 UIProcess/Automation/mac/WebAutomationSessionMac.mm
-UIProcess/Cocoa/DiagnosticLoggingClient.mm
-UIProcess/Cocoa/GlobalFindInPageState.mm
 UIProcess/Cocoa/NavigationState.mm
-UIProcess/Cocoa/ResourceLoadDelegate.mm
-UIProcess/Cocoa/SOAuthorization/SOAuthorizationSession.mm
 UIProcess/Cocoa/UIDelegate.mm
-UIProcess/Cocoa/WKContactPicker.mm
-UIProcess/Cocoa/WKShareSheet.mm
 UIProcess/Cocoa/WKStorageAccessAlert.mm
 UIProcess/Cocoa/_WKWarningView.mm
 UIProcess/Inspector/Cocoa/InspectorExtensionDelegate.mm
