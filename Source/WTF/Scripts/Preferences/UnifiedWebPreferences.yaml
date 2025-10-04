@@ -2722,17 +2722,17 @@ EventHandlerDrivenSmoothKeyboardScrollingEnabled:
 
 EventTimingEnabled:
   type: bool
-  status: preview
+  status: stable
   category: dom
   humanReadableName: "Event Timing API"
   humanReadableDescription: "Enable the Event Timing API and supporting instrumentation"
   defaultValue:
     WebKitLegacy:
-      default: false
+      default: true
     WebKit:
-      default: false
+      default: true
     WebCore:
-      default: false
+      default: true
 
 ExperimentalSandboxEnabled:
   type: bool
