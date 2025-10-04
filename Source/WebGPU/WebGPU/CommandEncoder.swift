@@ -1867,14 +1867,38 @@ extension WebGPU.CommandEncoder {
         guard !(querySet.isDestroyed() || destination.isDestroyed() || queryCount == 0) else {
             return
         }
-        guard let blitCommandEncoder = ensureBlitCommandEncoder() else {
-            return
-        }
+
         if querySet.type().rawValue == WGPUQueryType_Occlusion.rawValue {
+            guard let blitCommandEncoder = ensureBlitCommandEncoder() else {
+                return
+            }
             guard let sourceOffset = Int(exactly: 8 * firstQuery), let destinationOffsetChecked = Int(exactly: destinationOffset), let size = Int(exactly: 8 * queryCount) else {
                 return
             }
             blitCommandEncoder.copy(from: querySet.visibilityBuffer(), sourceOffset: sourceOffset, to: destination.buffer(), destinationOffset: destinationOffsetChecked, size: size)
+        }
+        if querySet.type().rawValue == WGPUQueryType_Timestamp.rawValue {
+            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=283385 - https://bugs.webkit.org/show_bug.cgi?id=283088 should be reverted when the blocking issue is resolved
+            self.finalizeBlitCommandEncoder()
+            let workaround: MTLSharedEvent = m_device.ptr().resolveTimestampsSharedEvent()
+            // The signal value does not matter, the event alone prevents reordering
+            m_commandBuffer.encodeSignalEvent(workaround, value: 1)
+            m_commandBuffer.encodeWaitForEvent(workaround, value: 1)
+            guard let blitCommandEncoder = ensureBlitCommandEncoder() else {
+                return
+            }
+            var counterSampleBuffer: MTLCounterSampleBuffer? = nil
+            counterSampleBuffer = unsafe querySet.counterSampleBufferWithOffset().first
+            let counterSampleBufferOffset = unsafe querySet.counterSampleBufferWithOffset().second
+            guard let counterSampleBuffer else {
+                return
+            }
+            unsafe m_blitCommandEncoder.resolveCounters(
+                counterSampleBuffer,
+                range: Range(uncheckedBounds: (Int(firstQuery + counterSampleBufferOffset), Int(queryCount))),
+                destinationBuffer: destination.buffer(),
+                destinationOffset: Int(destinationOffset)
+            )
         }
     }
     public func validateResolveQuerySet(querySet: WebGPU.QuerySet, firstQuery: UInt32, queryCount: UInt32, destination: WebGPU.Buffer, destinationOffset: UInt64) -> Bool
