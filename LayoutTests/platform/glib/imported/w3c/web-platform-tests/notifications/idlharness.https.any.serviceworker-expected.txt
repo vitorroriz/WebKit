@@ -23,7 +23,7 @@ PASS Notification interface: attribute title
 PASS Notification interface: attribute dir
 PASS Notification interface: attribute lang
 PASS Notification interface: attribute body
-PASS Notification interface: attribute navigate
+FAIL Notification interface: attribute navigate assert_true: The prototype object must have a property "navigate" expected true got false
 PASS Notification interface: attribute tag
 FAIL Notification interface: attribute image assert_true: The prototype object must have a property "image" expected true got false
 PASS Notification interface: attribute icon
@@ -36,33 +36,18 @@ FAIL Notification interface: attribute requireInteraction assert_true: The proto
 PASS Notification interface: attribute data
 FAIL Notification interface: attribute actions assert_true: The prototype object must have a property "actions" expected true got false
 PASS Notification interface: operation close()
-PASS Notification must be primary interface of notification
-PASS Stringification of notification
-PASS Notification interface: notification must inherit property "permission" with the proper type
-PASS Notification interface: notification must not have property "requestPermission"
-PASS Notification interface: notification must inherit property "maxActions" with the proper type
-PASS Notification interface: notification must inherit property "onclick" with the proper type
-PASS Notification interface: notification must inherit property "onshow" with the proper type
-PASS Notification interface: notification must inherit property "onerror" with the proper type
-PASS Notification interface: notification must inherit property "onclose" with the proper type
-PASS Notification interface: notification must inherit property "title" with the proper type
-PASS Notification interface: notification must inherit property "dir" with the proper type
-PASS Notification interface: notification must inherit property "lang" with the proper type
-PASS Notification interface: notification must inherit property "body" with the proper type
-PASS Notification interface: notification must inherit property "navigate" with the proper type
-PASS Notification interface: notification must inherit property "tag" with the proper type
-FAIL Notification interface: notification must inherit property "image" with the proper type assert_inherits: property "image" not found in prototype chain
-PASS Notification interface: notification must inherit property "icon" with the proper type
-FAIL Notification interface: notification must inherit property "badge" with the proper type assert_inherits: property "badge" not found in prototype chain
-FAIL Notification interface: notification must inherit property "vibrate" with the proper type assert_inherits: property "vibrate" not found in prototype chain
-FAIL Notification interface: notification must inherit property "timestamp" with the proper type assert_inherits: property "timestamp" not found in prototype chain
-FAIL Notification interface: notification must inherit property "renotify" with the proper type assert_inherits: property "renotify" not found in prototype chain
-PASS Notification interface: notification must inherit property "silent" with the proper type
-FAIL Notification interface: notification must inherit property "requireInteraction" with the proper type assert_inherits: property "requireInteraction" not found in prototype chain
-PASS Notification interface: notification must inherit property "data" with the proper type
-FAIL Notification interface: notification must inherit property "actions" with the proper type assert_inherits: property "actions" not found in prototype chain
-PASS Notification interface: notification must inherit property "close()" with the proper type
 PASS NotificationEvent interface: existence and properties of interface object
+PASS NotificationEvent interface object length
+PASS NotificationEvent interface object name
+PASS NotificationEvent interface: existence and properties of interface prototype object
+PASS NotificationEvent interface: existence and properties of interface prototype object's "constructor" property
+PASS NotificationEvent interface: existence and properties of interface prototype object's @@unscopables property
+PASS NotificationEvent interface: attribute notification
+PASS NotificationEvent interface: attribute action
 PASS ServiceWorkerRegistration interface: operation showNotification(DOMString, optional NotificationOptions)
 PASS ServiceWorkerRegistration interface: operation getNotifications(optional GetNotificationOptions)
+PASS ServiceWorkerGlobalScope interface: attribute onnotificationclick
+PASS ServiceWorkerGlobalScope interface: attribute onnotificationclose
+PASS ServiceWorkerGlobalScope interface: self must inherit property "onnotificationclick" with the proper type
+PASS ServiceWorkerGlobalScope interface: self must inherit property "onnotificationclose" with the proper type
 

@@ -13,7 +13,7 @@ PASS Notification interface: existence and properties of interface prototype obj
 PASS Notification interface: existence and properties of interface prototype object's "constructor" property
 PASS Notification interface: existence and properties of interface prototype object's @@unscopables property
 PASS Notification interface: attribute permission
-PASS Notification interface: member requestPermission
+PASS Notification interface: operation requestPermission(optional NotificationPermissionCallback)
 FAIL Notification interface: attribute maxActions assert_own_property: The interface object must have a property "maxActions" expected property "maxActions" missing
 PASS Notification interface: attribute onclick
 PASS Notification interface: attribute onshow
@@ -23,7 +23,7 @@ PASS Notification interface: attribute title
 PASS Notification interface: attribute dir
 PASS Notification interface: attribute lang
 PASS Notification interface: attribute body
-PASS Notification interface: attribute navigate
+FAIL Notification interface: attribute navigate assert_true: The prototype object must have a property "navigate" expected true got false
 PASS Notification interface: attribute tag
 FAIL Notification interface: attribute image assert_true: The prototype object must have a property "image" expected true got false
 PASS Notification interface: attribute icon
@@ -39,7 +39,8 @@ PASS Notification interface: operation close()
 PASS Notification must be primary interface of notification
 PASS Stringification of notification
 PASS Notification interface: notification must inherit property "permission" with the proper type
-PASS Notification interface: notification must not have property "requestPermission"
+PASS Notification interface: notification must inherit property "requestPermission(optional NotificationPermissionCallback)" with the proper type
+PASS Notification interface: calling requestPermission(optional NotificationPermissionCallback) on notification with too few arguments must throw TypeError
 PASS Notification interface: notification must inherit property "maxActions" with the proper type
 PASS Notification interface: notification must inherit property "onclick" with the proper type
 PASS Notification interface: notification must inherit property "onshow" with the proper type
@@ -49,7 +50,7 @@ PASS Notification interface: notification must inherit property "title" with the
 PASS Notification interface: notification must inherit property "dir" with the proper type
 PASS Notification interface: notification must inherit property "lang" with the proper type
 PASS Notification interface: notification must inherit property "body" with the proper type
-PASS Notification interface: notification must inherit property "navigate" with the proper type
+FAIL Notification interface: notification must inherit property "navigate" with the proper type assert_inherits: property "navigate" not found in prototype chain
 PASS Notification interface: notification must inherit property "tag" with the proper type
 FAIL Notification interface: notification must inherit property "image" with the proper type assert_inherits: property "image" not found in prototype chain
 PASS Notification interface: notification must inherit property "icon" with the proper type
