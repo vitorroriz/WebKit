@@ -81,9 +81,9 @@ public:
     RefPtr<DOMWindow> protectedWindow() const;
     FrameTree& tree() const { return m_treeNode; }
     FrameIdentifier frameID() const { return m_frameID; }
-    inline Page* page() const; // Defined in FrameInlines.h.
-    inline RefPtr<Page> protectedPage() const; // Defined in FrameInlines.h.
-    inline std::optional<PageIdentifier> pageID() const; // Defined in FrameInlines.h.
+    inline Page* page() const; // Defined in DocumentPage.h.
+    inline RefPtr<Page> protectedPage() const; // Defined in DocumentPage.h.
+    inline std::optional<PageIdentifier> pageID() const; // Defined in DocumentPage.h.
     Settings& settings() const { return m_settings.get(); }
     Frame& mainFrame() { return *m_mainFrame; }
     const Frame& mainFrame() const { return *m_mainFrame; }

@@ -41,9 +41,9 @@
 #include "CrossOriginAccessControl.h"
 #include "DefaultResourceLoadPriority.h"
 #include "DocumentLoader.h"
-#include "DocumentInlines.h"
-#include "DocumentLoader.h"
+#include "DocumentPage.h"
 #include "FetchRequestDestination.h"
+#include "FrameDestructionObserverInlines.h"
 #include "FrameLoader.h"
 #include "HTMLSrcsetParser.h"
 #include <JavaScriptCore/ConsoleTypes.h>

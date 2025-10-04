@@ -155,8 +155,8 @@ public:
 
     inline Document* document() const; // Defined in LocalFrameInlines.h
     inline RefPtr<Document> protectedDocument() const; // Defined in LocalFrameInlines.h
-    inline LocalFrameView* view() const; // Defined in LocalFrameInlines.h
-    inline RefPtr<LocalFrameView> protectedView() const; // Defined in LocalFrameView.h.
+    inline LocalFrameView* view() const; // Defined in DocumentView.h
+    inline RefPtr<LocalFrameView> protectedView() const; // Defined in DocumentView.h.
     WEBCORE_EXPORT RefPtr<const LocalFrame> localMainFrame() const;
     WEBCORE_EXPORT RefPtr<LocalFrame> localMainFrame();
 

@@ -33,7 +33,6 @@
 #include "ContainerNodeInlines.h"
 #include "CSSFontSelector.h"
 #include "Document.h"
-#include "DocumentInlines.h"
 #include "EditingInlines.h"
 #include "EventHandler.h"
 #include "FloatQuad.h"

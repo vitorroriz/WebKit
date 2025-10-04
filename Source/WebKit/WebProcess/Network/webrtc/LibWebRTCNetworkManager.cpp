@@ -34,10 +34,8 @@
 #include "NetworkRTCProviderMessages.h"
 #include "WebPage.h"
 #include "WebProcess.h"
-#include <WebCore/Document.h>
-#include <WebCore/DocumentInlines.h>
+#include <WebCore/DocumentPage.h>
 #include <WebCore/LibWebRTCUtils.h>
-#include <WebCore/Page.h>
 #include <WebCore/Settings.h>
 #include <algorithm>
 #include <wtf/EnumTraits.h>

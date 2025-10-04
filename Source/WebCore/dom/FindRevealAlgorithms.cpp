@@ -28,6 +28,7 @@
 
 #include "Document.h"
 #include "ElementInlines.h"
+#include "Event.h"
 #include "EventNames.h"
 #include "HTMLDetailsElement.h"
 #include "HTMLSlotElement.h"

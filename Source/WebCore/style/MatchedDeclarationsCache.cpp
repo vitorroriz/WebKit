@@ -31,7 +31,6 @@
 #include "MatchedDeclarationsCache.h"
 
 #include "CSSFontSelector.h"
-#include "Document.h"
 #include "DocumentInlines.h"
 #include "FontCascade.h"
 #include "NodeDocument.h"

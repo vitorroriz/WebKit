@@ -27,6 +27,7 @@
 #include "LayoutIntegrationGridCoverage.h"
 
 #include "RenderGrid.h"
+#include "Settings.h"
 
 namespace WebCore {
 namespace LayoutIntegration {

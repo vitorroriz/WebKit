@@ -28,7 +28,7 @@
 
 #include "CachedImage.h"
 #include "ContainerNodeInlines.h"
-#include "DocumentInlines.h"
+#include "DocumentView.h"
 #include "ElementInlines.h"
 #include "FloatQuad.h"
 #include "LargestContentfulPaint.h"

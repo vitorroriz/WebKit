@@ -87,7 +87,9 @@
 #include <WebCore/DatabaseTracker.h>
 #include <WebCore/DocumentFullscreen.h>
 #include <WebCore/DocumentLoader.h>
+#include <WebCore/DocumentPage.h>
 #include <WebCore/DocumentStorageAccess.h>
+#include <WebCore/DocumentView.h>
 #include <WebCore/ElementInlines.h>
 #include <WebCore/FaceDetectorInterface.h>
 #include <WebCore/FileChooser.h>
@@ -96,6 +98,7 @@
 #include <WebCore/FocusControllerTypes.h>
 #include <WebCore/FocusOptions.h>
 #include <WebCore/Frame.h>
+#include <WebCore/FrameDestructionObserverInlines.h>
 #include <WebCore/FrameLoader.h>
 #include <WebCore/HTMLInputElement.h>
 #include <WebCore/HTMLNames.h>
@@ -103,7 +106,7 @@
 #include <WebCore/HTMLPlugInElement.h>
 #include <WebCore/Icon.h>
 #include <WebCore/ImageBuffer.h>
-#include <WebCore/LocalFrame.h>
+#include <WebCore/LocalFrameInlines.h>
 #include <WebCore/LocalFrameView.h>
 #include <WebCore/NotImplemented.h>
 #include <WebCore/PointerLockController.h>

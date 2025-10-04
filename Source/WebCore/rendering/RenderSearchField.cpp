@@ -29,6 +29,7 @@
 #include "CSSValueKeywords.h"
 #include "Chrome.h"
 #include "DocumentInlines.h"
+#include "DocumentView.h"
 #include "ElementInlines.h"
 #include "Font.h"
 #include "FrameSelection.h"

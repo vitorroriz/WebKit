@@ -30,7 +30,7 @@
 #include "AXCoreObject.h"
 
 #include "AXUtilities.h"
-#include "DocumentInlines.h"
+#include "DocumentView.h"
 #include "HTMLAreaElement.h"
 #include "LocalFrameView.h"
 #include "RenderObjectStyle.h"

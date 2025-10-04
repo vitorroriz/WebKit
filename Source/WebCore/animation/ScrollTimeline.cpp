@@ -28,7 +28,6 @@
 
 #include "AnimationTimelinesController.h"
 #include "ContainerNodeInlines.h"
-#include "DocumentInlines.h"
 #include "Element.h"
 #include "KeyframeEffect.h"
 #include "RenderElementInlines.h"

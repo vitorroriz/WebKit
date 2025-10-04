@@ -32,7 +32,6 @@
 #include "CSSStyleSheet.h"
 #include "DeprecatedCSSOMValue.h"
 #include "Document.h"
-#include "DocumentInlines.h"
 #include "HTMLNames.h"
 #include "InspectorInstrumentation.h"
 #include "JSDOMGlobalObject.h"

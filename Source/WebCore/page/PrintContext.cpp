@@ -25,6 +25,7 @@
 #include "AXObjectCacheInlines.h"
 #include "CommonAtomStrings.h"
 #include "ContainerNodeInlines.h"
+#include "DocumentView.h"
 #include "ElementTraversal.h"
 #include "FrameDestructionObserverInlines.h"
 #include "GraphicsContext.h"

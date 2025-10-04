@@ -27,7 +27,6 @@
 
 #include "BackgroundPainter.h"
 #include "BorderShape.h"
-#include "DocumentInlines.h"
 #include "DocumentMarkerController.h"
 #include "ElementRuleCollector.h"
 #include "FloatRoundedRect.h"

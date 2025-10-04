@@ -47,6 +47,7 @@
 #endif
 
 #import <WebCore/DataTransfer.h>
+#import <WebCore/DocumentPage.h>
 #import <WebCore/DragData.h>
 #import <WebCore/Editor.h>
 #import <WebCore/EditorClient.h>

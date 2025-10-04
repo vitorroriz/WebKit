@@ -22,7 +22,7 @@
 #include "RenderView.h"
 
 #include "ContainerNodeInlines.h"
-#include "Document.h"
+#include "DocumentPage.h"
 #include "Element.h"
 #include "FloatQuad.h"
 #include "GraphicsContext.h"

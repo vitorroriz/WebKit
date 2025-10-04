@@ -30,7 +30,6 @@
 
 #import "AddEventListenerOptionsInlines.h"
 #import "DocumentFullscreen.h"
-#import "DocumentInlines.h"
 #import "Event.h"
 #import "EventListener.h"
 #import "EventNames.h"

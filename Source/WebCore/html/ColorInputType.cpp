@@ -39,6 +39,7 @@
 #include "ColorSerialization.h"
 #include "ColorTypes.h"
 #include "ContainerNodeInlines.h"
+#include "DocumentView.h"
 #include "ElementRareData.h"
 #include "Event.h"
 #include "HTMLDataListElement.h"

@@ -27,7 +27,6 @@
 #include "AXObjectCache.h"
 #include "BorderShape.h"
 #include "ContainerNodeInlines.h"
-#include "DocumentInlines.h"
 #include "Editor.h"
 #include "Element.h"
 #include "ElementInlines.h"

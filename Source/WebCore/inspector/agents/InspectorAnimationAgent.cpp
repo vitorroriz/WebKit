@@ -36,7 +36,7 @@
 #include "CSSValue.h"
 #include "CSSValuePool.h"
 #include "ContextDestructionObserverInlines.h"
-#include "DocumentInlines.h"
+#include "DocumentPage.h"
 #include "Element.h"
 #include "Event.h"
 #include "FillMode.h"

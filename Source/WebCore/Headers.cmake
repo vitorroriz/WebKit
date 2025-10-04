@@ -1332,6 +1332,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     dom/Document.h
     dom/DocumentClasses.h
     dom/DocumentEnums.h
+    dom/DocumentEventLoop.h
     dom/DocumentEventTiming.h
     dom/DocumentFontLoader.h
     dom/DocumentFragment.h
@@ -1339,9 +1340,17 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     dom/DocumentInlines.h
     dom/DocumentMarker.h
     dom/DocumentMarkerController.h
+    dom/DocumentMarkers.h
+    dom/DocumentPage.h
     dom/DocumentParser.h
+    dom/DocumentQuirks.h
+    dom/DocumentResourceLoader.h
+    dom/DocumentSecurityOrigin.h
+    dom/DocumentSettingsValues.h
     dom/DocumentStorageAccess.h
     dom/DocumentType.h
+    dom/DocumentView.h
+    dom/DocumentWindow.h
     dom/DragEvent.h
     dom/Element.h
     dom/ElementAncestorIterator.h

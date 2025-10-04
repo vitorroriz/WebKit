@@ -28,6 +28,7 @@
 
 #include "ColorHash.h"
 #include "Cursor.h"
+#include "DocumentView.h"
 #include "ElementIterator.h"
 #include "FloatRoundedRect.h"
 #include "Gradient.h"

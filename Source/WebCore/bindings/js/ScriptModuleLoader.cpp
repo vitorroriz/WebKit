@@ -29,7 +29,6 @@
 #include "CachedModuleScriptLoader.h"
 #include "CachedScript.h"
 #include "CachedScriptFetcher.h"
-#include "DocumentInlines.h"
 #include "EventLoop.h"
 #include "JSDOMBinding.h"
 #include "JSDOMPromiseDeferred.h"

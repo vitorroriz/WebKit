@@ -30,11 +30,12 @@
 #include "config.h"
 #include "MixedContentChecker.h"
 
-#include "DocumentInlines.h"
 #include "Document.h"
+#include "FrameDestructionObserverInlines.h"
 #include "LegacySchemeRegistry.h"
-#include "LocalFrame.h"
+#include "LocalFrameInlines.h"
 #include "SecurityOrigin.h"
+#include "Settings.h"
 #include <JavaScriptCore/ConsoleTypes.h>
 #include <wtf/text/MakeString.h>
 

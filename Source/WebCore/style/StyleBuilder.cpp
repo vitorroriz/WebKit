@@ -41,7 +41,6 @@
 #include "CSSWideKeyword.h"
 #include "ComputedStyleDependencies.h"
 #include "Document.h"
-#include "DocumentInlines.h"
 #include "HTMLElement.h"
 #include "PaintWorkletGlobalScope.h"
 #include "RenderStyleSetters.h"

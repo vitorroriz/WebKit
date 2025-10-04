@@ -30,14 +30,13 @@
 #include "StyleFontSizeFunctions.h"
 
 #include "CSSValueKeywords.h"
-#include "Document.h"
-#include "DocumentInlines.h"
+#include "DocumentSettingsValues.h"
+#include "DocumentView.h"
 #include "FontMetrics.h"
 #include "FontSizeAdjust.h"
 #include "FrameDestructionObserverInlines.h"
 #include "LocalFrame.h"
 #include "RenderStyleInlines.h"
-#include "Settings.h"
 
 namespace WebCore {
 

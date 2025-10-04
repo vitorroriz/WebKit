@@ -29,7 +29,6 @@
 
 #include "AXObjectCache.h"
 #include "BitmapImage.h"
-#include "DocumentInlines.h"
 #include "GeometryUtilities.h"
 #include "GraphicsContext.h"
 #include "HitTestResult.h"

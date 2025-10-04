@@ -30,7 +30,6 @@
 #include "CanvasRenderingContext.h"
 #include "Chrome.h"
 #include "Document.h"
-#include "DocumentInlines.h"
 #include "Element.h"
 #include "GraphicsClient.h"
 #include "GraphicsContext.h"

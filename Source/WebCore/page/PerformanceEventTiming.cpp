@@ -27,7 +27,6 @@
 #include "PerformanceEventTiming.h"
 
 #include "Document.h"
-#include "DocumentInlines.h"
 #include "EventNames.h"
 #include "EventTargetInlines.h"
 #include "NodeDocument.h"

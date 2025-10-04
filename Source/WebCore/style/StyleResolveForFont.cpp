@@ -42,7 +42,6 @@
 #include "CSSValueList.h"
 #include "CSSValuePair.h"
 #include "Document.h"
-#include "DocumentInlines.h"
 #include "FontCascade.h"
 #include "FontCascadeDescription.h"
 #include "FontSelectionValueInlines.h"
