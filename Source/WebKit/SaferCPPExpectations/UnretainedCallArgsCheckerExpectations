@@ -74,7 +74,6 @@ UIProcess/mac/DisplayCaptureSessionManager.mm
 UIProcess/mac/PageClientImplMac.mm
 UIProcess/mac/SecItemShimProxy.cpp
 UIProcess/mac/WKFullScreenWindowController.mm
-UIProcess/mac/WKImmediateActionController.mm
 UIProcess/mac/WKTextAnimationManagerMac.mm
 UIProcess/mac/WebDataListSuggestionsDropdownMac.mm
 UIProcess/mac/WebPopupMenuProxyMac.mm
