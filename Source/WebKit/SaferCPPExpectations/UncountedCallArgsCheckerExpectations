@@ -74,14 +74,11 @@ WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInHitTestResult.mm
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInNodeHandle.mm
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInRangeHandle.mm
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInScriptWorld.mm
-WebProcess/InjectedBundle/API/c/WKBundleDOMWindowExtension.cpp
 WebProcess/InjectedBundle/API/c/WKBundleFrame.cpp
 WebProcess/InjectedBundle/API/c/WKBundleHitTestResult.cpp
 WebProcess/InjectedBundle/API/c/WKBundleNodeHandle.cpp
 WebProcess/InjectedBundle/API/c/WKBundlePage.cpp
 WebProcess/InjectedBundle/API/c/WKBundlePageOverlay.cpp
-WebProcess/InjectedBundle/API/c/WKBundleRangeHandle.cpp
-WebProcess/InjectedBundle/API/c/WKBundleScriptWorld.cpp
 WebProcess/InjectedBundle/API/c/mac/WKBundleMac.mm
 WebProcess/InjectedBundle/API/c/mac/WKBundlePageBannerMac.mm
 WebProcess/InjectedBundle/API/mac/WKDOMDocument.mm
