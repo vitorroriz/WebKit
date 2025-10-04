@@ -3428,7 +3428,7 @@ ExceptionOr<ShadowRoot&> Element::attachShadow(const ShadowRootInit& init, std::
         ASSERT(registryKind == CustomElementRegistryKind::Window);
         scopedRegistry = ShadowRootScopedCustomElementRegistry::Yes;
     } else
-        registry = CustomElementRegistry::registryForElement(*this);
+        registry = document().customElementRegistry();
     Ref shadow = ShadowRoot::create(document(), init.mode, init.slotAssignment,
         init.delegatesFocus ? ShadowRootDelegatesFocus::Yes : ShadowRootDelegatesFocus::No,
         init.clonable ? ShadowRoot::Clonable::Yes : ShadowRoot::Clonable::No,
