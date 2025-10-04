@@ -247,6 +247,7 @@ Shared/SessionState.cpp
 Shared/SharedStringHashStore.cpp
 Shared/SharedStringHashTableReadOnly.cpp
 Shared/SharedStringHashTable.cpp
+Shared/TextExtractionToStringConversion.cpp
 Shared/UserData.cpp
 Shared/WebBackForwardListFrameItem.cpp
 Shared/WebBackForwardListItem.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,30 +25,28 @@
 
 #pragma once
 
-#if USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
-
-#import <wtf/Function.h>
-#import <wtf/RetainPtr.h>
-
-OBJC_CLASS NSString;
-OBJC_CLASS WKTextExtractionItem;
-OBJC_CLASS WKWebView;
+#include <wtf/CompletionHandler.h>
+#include <wtf/NativePromise.h>
+#include <wtf/RefCounted.h>
+#include <wtf/text/WTFString.h>
 
 namespace WebCore {
-class FloatRect;
 
 namespace TextExtraction {
+
 struct Item;
-}
-}
+
+} // namespace TextExtraction
+
+struct NodeIdentifierType;
+using NodeIdentifier = ObjectIdentifier<NodeIdentifierType>;
+
+} // namespace WebCore
 
 namespace WebKit {
 
-using RootViewToWebViewConverter = Function<WebCore::FloatRect(const WebCore::FloatRect&)>;
-RetainPtr<WKTextExtractionItem> createItem(const WebCore::TextExtraction::Item&, RootViewToWebViewConverter&&);
-
-std::optional<double> computeSimilarity(NSString *a, NSString *b, unsigned minimumLength = 1);
+using TextExtractionFilterPromise = NativePromise<String, void>;
+using TextExtractionFilterCallback = Function<Ref<TextExtractionFilterPromise>(const String&, std::optional<WebCore::NodeIdentifier>&&)>;
+void convertToText(WebCore::TextExtraction::Item&&, CompletionHandler<void(String&&)>&&, TextExtractionFilterCallback&& = { }, Vector<String>&& nativeMenuItems = { });
 
 } // namespace WebKit
-
-#endif // USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))

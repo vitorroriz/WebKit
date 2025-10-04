@@ -126,6 +126,9 @@ struct DigitalCredentialsResponseData;
 struct MobileDocumentRequest;
 struct OpenID4VPRequest;
 #endif
+
+struct NodeIdentifierType;
+using NodeIdentifier = ObjectIdentifier<NodeIdentifierType>;
 } // namespace WebCore
 
 namespace WebKit {
@@ -642,7 +645,6 @@ WebCore::CocoaColor *sampledFixedPositionContentColor(const WebCore::FixedContai
 #if ENABLE(TEXT_EXTRACTION_FILTER)
 
 @interface WKWebView (TextExtractionFilter)
-- (void)_validateText:(NSString *)text inNode:(NSString *)nodeIdentifier completionHandler:(void(^)(NSString *))completionHandler;
 - (void)_clearTextExtractionFilterCache;
 @end
 
