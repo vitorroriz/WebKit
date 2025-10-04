@@ -195,7 +195,7 @@ void Database::insertPrivateClickMeasurement(WebCore::PrivateClickMeasurement&& 
         // We should never be inserting an attributed private click measurement value into the database without valid report times.
         ASSERT(sourceEarliestTimeToSend != -1 || destinationEarliestTimeToSend != -1);
 
-        auto statement = m_database.prepareStatement(insertAttributedPrivateClickMeasurementQuery);
+        auto statement = m_database.prepareHeapStatement(insertAttributedPrivateClickMeasurementQuery);
         if (!statement
             || statement->bindInt(1, *sourceID) != SQLITE_OK
             || statement->bindInt(2, *attributionDestinationID) != SQLITE_OK
@@ -221,7 +221,7 @@ void Database::insertPrivateClickMeasurement(WebCore::PrivateClickMeasurement&& 
 
     ASSERT(attributionType == PrivateClickMeasurementAttributionType::Unattributed);
 
-    auto statement = m_database.prepareStatement(insertUnattributedPrivateClickMeasurementQuery);
+    auto statement = m_database.prepareHeapStatement(insertUnattributedPrivateClickMeasurementQuery);
     if (!statement
         || statement->bindInt(1, *sourceID) != SQLITE_OK
         || statement->bindInt(2, *attributionDestinationID) != SQLITE_OK
@@ -391,7 +391,7 @@ Vector<WebCore::PrivateClickMeasurement> Database::allAttributedPrivateClickMeas
 String Database::privateClickMeasurementToStringForTesting() const
 {
     ASSERT(!RunLoop::isMain());
-    auto privateClickMeasurementDataExists = m_database.prepareStatement("SELECT (SELECT COUNT(*) FROM UnattributedPrivateClickMeasurement) as cnt1, (SELECT COUNT(*) FROM AttributedPrivateClickMeasurement) as cnt2"_s);
+    auto privateClickMeasurementDataExists = m_database.prepareHeapStatement("SELECT (SELECT COUNT(*) FROM UnattributedPrivateClickMeasurement) as cnt1, (SELECT COUNT(*) FROM AttributedPrivateClickMeasurement) as cnt2"_s);
     if (!privateClickMeasurementDataExists || privateClickMeasurementDataExists->step() != SQLITE_ROW) {
         RELEASE_LOG_ERROR(PrivateClickMeasurement, "%p - Database::privateClickMeasurementToStringForTesting failed, error message: %" PRIVATE_LOG_STRING, this, m_database.lastErrorMsg());
         ASSERT_NOT_REACHED();
@@ -477,8 +477,8 @@ void Database::markAttributedPrivateClickMeasurementsAsExpiredForTesting()
 
     auto transactionScope = beginTransactionIfNecessary();
 
-    auto earliestTimeToSendToSourceStatement = m_database.prepareStatement("UPDATE AttributedPrivateClickMeasurement SET earliestTimeToSendToSource = ?"_s);
-    auto earliestTimeToSendToDestinationStatement = m_database.prepareStatement("UPDATE AttributedPrivateClickMeasurement SET earliestTimeToSendToDestination = null"_s);
+    auto earliestTimeToSendToSourceStatement = m_database.prepareHeapStatement("UPDATE AttributedPrivateClickMeasurement SET earliestTimeToSendToSource = ?"_s);
+    auto earliestTimeToSendToDestinationStatement = m_database.prepareHeapStatement("UPDATE AttributedPrivateClickMeasurement SET earliestTimeToSendToDestination = null"_s);
 
     if (!earliestTimeToSendToSourceStatement
         || earliestTimeToSendToSourceStatement->bindInt(1, expiredTimeToSend.secondsSinceEpoch().value()) != SQLITE_OK
@@ -570,7 +570,7 @@ void Database::clearSentAttribution(WebCore::PrivateClickMeasurement&& attributi
     if (destinationEarliestTimeToSend || sourceEarliestTimeToSend)
         return;
 
-    auto clearAttributedStatement = m_database.prepareStatement("DELETE FROM AttributedPrivateClickMeasurement WHERE sourceSiteDomainID = ? AND destinationSiteDomainID = ? AND sourceApplicationBundleID = ?"_s);
+    auto clearAttributedStatement = m_database.prepareHeapStatement("DELETE FROM AttributedPrivateClickMeasurement WHERE sourceSiteDomainID = ? AND destinationSiteDomainID = ? AND sourceApplicationBundleID = ?"_s);
     if (!clearAttributedStatement
         || clearAttributedStatement->bindInt(1, *sourceSiteDomainID) != SQLITE_OK
         || clearAttributedStatement->bindInt(2, *destinationSiteDomainID) != SQLITE_OK
@@ -676,7 +676,7 @@ String Database::getDomainStringFromDomainID(DomainID domainID) const
     }
     
     if (scopedStatement->step() == SQLITE_ROW)
-        result = m_domainStringFromDomainIDStatement->columnText(0);
+        result = scopedStatement->columnText(0);
     
     return result;
 }
