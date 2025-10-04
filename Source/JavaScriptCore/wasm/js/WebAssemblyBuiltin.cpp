@@ -85,7 +85,7 @@
 
 namespace JSC {
 
-JSObject* WebAssemblyBuiltin::jsWrapper(JSGlobalObject* globalObject) const
+JSFunction* WebAssemblyBuiltin::jsWrapper(JSGlobalObject* globalObject) const
 {
     return JSFunction::create(globalObject->vm(), globalObject, 0, m_name, m_jsHostFunction, ImplementationVisibility::Public, JSC::NoIntrinsic);
 }
