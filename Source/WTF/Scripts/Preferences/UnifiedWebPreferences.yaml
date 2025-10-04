@@ -3324,6 +3324,20 @@ GridFormattingContextIntegrationEnabled:
     WebCore:
       default: false
 
+HTMLEnhancedSelectParsingEnabled:
+   type: bool
+   status: testable
+   category: dom
+   humanReadableName: "Enhanced HTML select element parsing"
+   humanReadableDescription: "Enable enhanced HTML select element parsing"
+   defaultValue:
+     WebKitLegacy:
+       default: false
+     WebKit:
+       default: false
+     WebCore:
+       default: false
+
 HTMLLegacyAttributeValueSerializationEnabled:
    type: bool
    status: internal
