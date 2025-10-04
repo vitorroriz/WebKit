@@ -75,6 +75,7 @@
 #include "RenderModel.h"
 #include "RenderReplaced.h"
 #include "ScriptController.h"
+#include "Settings.h"
 #include <JavaScriptCore/ConsoleTypes.h>
 #include <wtf/Seconds.h>
 #include <wtf/TZoneMallocInlines.h>
