@@ -522,7 +522,17 @@ PAS_IGNORE_WARNINGS_END
 
 #define PAS_MTE_TAG_REGION_FROM_OTHER_ALLOCATION(ptr, size, mode, is_allocator_homogeneous, is_known_medium) do { \
         if (!PAS_MTE_FEATURE_ENABLED(PAS_MTE_FEATURE_RETAG_ON_FREE)) { \
-            PAS_MTE_TAG_REGION(ptr, size, mode, is_allocator_homogeneous, is_known_medium); \
+            uintptr_t tag = ptr; \
+            PAS_MTE_GET_TAG(tag); \
+            /* libpas ensures that all allocations which reside in pages with \
+             * backing tag memory are tagged with a non-zero tag at all points \
+             * in time after they've been allocated, so we can use this to see \
+             * whether the allocation should be retagged or not. \
+             * In the future it would be better to pipe the information through \
+             * so that we can save the LDG, but that will require moving the \
+             * source-of-truth out of the local allocator. */ \
+            if (tag) \
+                PAS_MTE_TAG_REGION(ptr, size, mode, is_allocator_homogeneous, is_known_medium); \
             break; \
         } \
         uint8_t* pas_mte_begin = (uint8_t*)(ptr); \
