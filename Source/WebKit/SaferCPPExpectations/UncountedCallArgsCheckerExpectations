@@ -47,8 +47,6 @@ UIProcess/API/Cocoa/_WKWebAuthenticationPanel.mm
 UIProcess/API/Cocoa/_WKWebsiteDataStoreConfiguration.mm
 WebDriverBidiFrontendDispatchers.cpp
 WebDriverBidiProtocolObjects.h
-WebProcess/Automation/WebAutomationDOMWindowObserver.cpp
-WebProcess/Cache/WebCacheStorageConnection.cpp
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIAlarmsCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIDeclarativeNetRequestCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIDevToolsInspectedWindowCocoa.mm
