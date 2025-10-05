@@ -50,6 +50,9 @@ static constexpr int64_t nsPerSecond = 1000LL * 1000 * 1000;
 static constexpr int64_t nsPerMillisecond = 1000LL * 1000;
 static constexpr int64_t nsPerMicrosecond = 1000LL;
 
+static constexpr int32_t maxYear = 275760;
+static constexpr int32_t minYear = -271821;
+
 std::optional<TimeZoneID> parseTimeZoneName(StringView string)
 {
     const auto& timeZones = intlAvailableTimeZones();
@@ -1090,7 +1093,7 @@ static std::optional<PlainDate> parseDate(StringParsingBuffer<CharacterType>& bu
     } else
         return std::nullopt;
 
-    return PlainDate::plainDate(year, month, day);
+    return PlainDate(year, month, day);
 }
 
 template<typename CharacterType>
@@ -1351,7 +1354,7 @@ uint8_t weekOfYear(PlainDate plainDate)
         // > The long years, with 53 weeks in them, can be described by any of the following equivalent definitions:
         // >  - any year ending on Thursday (D, ED) and any leap year ending on Friday (DC)
 
-        int32_t dayOfWeekForJanuaryFirst = ISO8601::dayOfWeek(ISO8601::PlainDate::plainDate(plainDate.year(), 1, 1));
+        int32_t dayOfWeekForJanuaryFirst = ISO8601::dayOfWeek(PlainDate { plainDate.year(), 1, 1 });
 
         // Any year ending on Thursday (D, ED) -> this year's 1/1 is Friday.
         if (dayOfWeekForJanuaryFirst == 5)
@@ -1841,7 +1844,7 @@ bool isValidISODate(double year, double month, double day)
 PlainDate createISODateRecord(double year, double month, double day)
 {
     ASSERT(isValidISODate(year, month, day));
-    return PlainDate::plainDate(year, month, day);
+    return PlainDate(year, month, day);
 }
 
 } // namespace ISO8601

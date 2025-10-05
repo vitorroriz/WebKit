@@ -87,9 +87,6 @@ private:
     static std::optional<ISO8601::PlainDate> parse(StringParsingBuffer<CharacterType>&);
     static ISO8601::PlainDate fromObject(JSGlobalObject*, JSObject*);
 
-    ISO8601::Duration differenceTemporalPlainDate(JSGlobalObject*, DifferenceOperation,
-        TemporalPlainDate*, TemporalUnit, TemporalUnit, RoundingMode, double);
-
     ISO8601::PlainDate m_plainDate;
     LazyProperty<TemporalPlainDate, TemporalCalendar> m_calendar;
 };
