@@ -9504,7 +9504,14 @@ void WebPageProxy::setMuted(WebCore::MediaProducerMutedStateFlags state, FromApp
     if (!isAllowedToChangeMuteState())
         state.add(WebCore::MediaProducer::MediaStreamCaptureIsMuted);
 
-    internals().mutedState = state;
+#if ENABLE(MEDIA_STREAM)
+    auto newState = applyWebAppDesiredMutedKinds(state, m_mutedCaptureKindsDesiredByWebApp);
+#else
+    auto newState = state;
+#endif
+    WEBPAGEPROXY_RELEASE_LOG(Media, "setMuted, app state = %d, final state = %d", state.toRaw(), newState.toRaw());
+
+    internals().mutedState = newState;
 
     if (!hasRunningProcess())
         return completionHandler();
@@ -9516,15 +9523,8 @@ void WebPageProxy::setMuted(WebCore::MediaProducerMutedStateFlags state, FromApp
 #endif // ENABLE(MEDIA_STREAM)
 
     forEachWebContentProcess([&] (auto& process, auto pageID) {
-        process.pageMutedStateChanged(pageID, state);
+        process.pageMutedStateChanged(pageID, newState);
     });
-
-#if ENABLE(MEDIA_STREAM)
-    auto newState = applyWebAppDesiredMutedKinds(state, m_mutedCaptureKindsDesiredByWebApp);
-#else
-    auto newState = state;
-#endif
-    WEBPAGEPROXY_RELEASE_LOG(Media, "setMuted, app state = %d, final state = %d", state.toRaw(), newState.toRaw());
 
     auto aggregator = CallbackAggregator::create(WTFMove(completionHandler));
     forEachWebContentProcess([&](auto& webProcess, auto pageID) {
