@@ -243,6 +243,8 @@ private:
 };
 static_assert(sizeof(PlainTime) <= sizeof(uint64_t));
 
+bool isYearWithinLimits(double year);
+
 // Note that PlainDate does not include week unit.
 // year can be negative. And month and day starts with 1.
 class PlainDate {
@@ -255,11 +257,11 @@ public:
     {
     }
 
-    constexpr PlainDate(int32_t year, unsigned month, unsigned day)
-        : m_year(year)
-        , m_month(month)
-        , m_day(day)
+    static inline constexpr PlainDate plainDate(int32_t year, unsigned month, unsigned day)
     {
+        // Check for overflow (because m_year is represented by a 21-bit int)
+        ASSERT(isYearWithinLimits(static_cast<double>(year)));
+        return PlainDate(year, month, day);
     }
 
     friend bool operator==(const PlainDate&, const PlainDate&) = default;
@@ -272,6 +274,13 @@ private:
     int32_t m_year : 21; // ECMAScript max / min date's year can be represented <= 20 bits.
     int32_t m_month : 5; // Starts with 1.
     int32_t m_day : 6; // Starts with 1.
+
+    constexpr PlainDate(int32_t year, unsigned month, unsigned day)
+        : m_year(year)
+        , m_month(month)
+        , m_day(day)
+    {
+    }
 };
 static_assert(sizeof(PlainDate) == sizeof(int32_t));
 
@@ -335,9 +344,11 @@ PlainDate createISODateRecord(double, double, double);
 std::optional<ExactTime> parseInstant(StringView);
 
 bool isDateTimeWithinLimits(int32_t year, uint8_t month, uint8_t day, unsigned hour, unsigned minute, unsigned second, unsigned millisecond, unsigned microsecond, unsigned nanosecond);
-bool isYearWithinLimits(double year);
 
 Int128 roundTimeDuration(JSGlobalObject*, Int128, unsigned, TemporalUnit, RoundingMode);
+
+static constexpr int32_t maxYear = 275760;
+static constexpr int32_t minYear = -271821;
 
 } // namespace ISO8601
 
