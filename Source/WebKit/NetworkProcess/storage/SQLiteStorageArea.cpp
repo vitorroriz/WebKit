@@ -235,7 +235,7 @@ WebCore::SQLiteStatementAutoResetScope SQLiteStorageArea::cachedStatement(Statem
 
     auto index = static_cast<uint8_t>(type);
     if (!m_cachedStatements[index]) {
-        if (auto result = checkedDatabase()->prepareHeapStatement(statementString(type)))
+        if (auto result = checkedDatabase()->prepareStatement(statementString(type)))
             m_cachedStatements[index] = WTFMove(result);
     }
 

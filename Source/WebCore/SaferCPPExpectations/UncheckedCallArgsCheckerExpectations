@@ -22,9 +22,7 @@ Modules/webdatabase/ChangeVersionWrapper.cpp
 Modules/webdatabase/Database.cpp
 Modules/webdatabase/DatabaseContext.cpp
 Modules/webdatabase/DatabaseManager.cpp
-Modules/webdatabase/DatabaseTracker.cpp
 Modules/webdatabase/LocalDOMWindowWebDatabase.cpp
-Modules/webdatabase/SQLStatement.cpp
 Modules/webdatabase/SQLTransaction.cpp
 Modules/websockets/WebSocketChannelInspector.cpp
 Modules/websockets/WorkerThreadableWebSocketChannel.cpp

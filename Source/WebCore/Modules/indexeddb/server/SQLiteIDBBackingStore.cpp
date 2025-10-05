@@ -2624,7 +2624,7 @@ void SQLiteIDBBackingStore::deleteBackingStore()
     if (CheckedPtr sqliteDB = m_sqliteDB.get()) {
         Vector<String> blobFiles;
         {
-            auto statement = sqliteDB->prepareHeapStatement("SELECT fileName FROM BlobFiles;"_s);
+            auto statement = sqliteDB->prepareStatement("SELECT fileName FROM BlobFiles;"_s);
             if (!statement)
                 LOG_ERROR("Error preparing statement to get blob filenames (%i) - %s", sqliteDB->lastError(), sqliteDB->lastErrorMsg());
             else {
@@ -2670,7 +2670,7 @@ SQLiteStatementAutoResetScope SQLiteIDBBackingStore::cachedStatement(SQLiteIDBBa
         return SQLiteStatementAutoResetScope { m_cachedStatements[static_cast<size_t>(sql)].get() };
 
     if (CheckedPtr sqliteDB = m_sqliteDB.get()) {
-        if (auto statement = sqliteDB->prepareHeapStatement(query))
+        if (auto statement = sqliteDB->prepareStatement(query))
             m_cachedStatements[static_cast<size_t>(sql)] = WTFMove(statement);
     }
 
