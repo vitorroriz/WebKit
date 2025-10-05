@@ -26,6 +26,7 @@
 #include "config.h"
 #include "ReadableStream.h"
 
+#include "InternalWritableStreamWriter.h"
 #include "JSDOMPromise.h"
 #include "JSDOMPromiseDeferred.h"
 #include "JSReadableStream.h"
@@ -33,13 +34,16 @@
 #include "JSReadableStreamDefaultReader.h"
 #include "JSReadableStreamReadResult.h"
 #include "JSReadableStreamSource.h"
+#include "JSStreamPipeOptions.h"
 #include "JSUnderlyingSource.h"
+#include "JSWritableStream.h"
 #include "QueuingStrategy.h"
 #include "ReadableByteStreamController.h"
 #include "ReadableStreamBYOBReader.h"
 #include "ReadableStreamBYOBRequest.h"
 #include "ScriptExecutionContext.h"
 #include "Settings.h"
+#include "StreamPipeToUtilities.h"
 #include "StreamTeeUtilities.h"
 #include "WritableStream.h"
 #include <wtf/Compiler.h>
@@ -453,7 +457,24 @@ void ReadableStream::addReadRequest(Ref<ReadableStreamReadRequest>&& readRequest
     return defaultReader->addReadRequest(WTFMove(readRequest));
 }
 
-void ReadableStream::pipeTo(JSDOMGlobalObject&, WritableStream& destination, StreamPipeOptions&&, Ref<DeferredPromise>&& promise)
+// https://streams.spec.whatwg.org/#readable-stream-pipe-to
+static void pipeToInternal(JSDOMGlobalObject& globalObject, ReadableStream& source, WritableStream& destination, StreamPipeOptions&& options, RefPtr<DeferredPromise>&& promise)
+{
+    auto readerOrException = ReadableStreamDefaultReader::create(globalObject, source);
+    if (readerOrException.hasException())
+        return;
+
+    auto writerOrException = acquireWritableStreamDefaultWriter(globalObject, destination);
+    if (writerOrException.hasException())
+        return;
+
+    source.markAsDisturbed();
+
+    readableStreamPipeTo(globalObject, source, destination, readerOrException.releaseReturnValue(), writerOrException.releaseReturnValue(), WTFMove(options), WTFMove(promise));
+}
+
+// https://streams.spec.whatwg.org/#rs-pipe-to
+void ReadableStream::pipeTo(JSDOMGlobalObject& globalObject, WritableStream& destination, StreamPipeOptions&& options, Ref<DeferredPromise>&& promise)
 {
     if (isLocked()) {
         promise->reject(Exception { ExceptionCode::TypeError, "stream is locked"_s }, RejectAsHandled::Yes);
@@ -465,10 +486,11 @@ void ReadableStream::pipeTo(JSDOMGlobalObject&, WritableStream& destination, Str
         return;
     }
 
-    promise->reject(Exception { ExceptionCode::NotSupportedError, "not implemented"_s }, RejectAsHandled::Yes);
+    pipeToInternal(globalObject, *this, destination, WTFMove(options), WTFMove(promise));
 }
 
-ExceptionOr<Ref<ReadableStream>> ReadableStream::pipeThrough(JSDOMGlobalObject&, WritablePair&& transform, StreamPipeOptions&&)
+// https://streams.spec.whatwg.org/#rs-pipe-through
+ExceptionOr<Ref<ReadableStream>> ReadableStream::pipeThrough(JSDOMGlobalObject& globalObject, WritablePair&& transform, StreamPipeOptions&& options)
 {
     if (isLocked())
         return Exception { ExceptionCode::TypeError, "stream is locked"_s };
@@ -476,7 +498,9 @@ ExceptionOr<Ref<ReadableStream>> ReadableStream::pipeThrough(JSDOMGlobalObject&,
     SUPPRESS_UNCOUNTED_ARG if (transform.writable->locked())
         return Exception { ExceptionCode::TypeError, "transform writable is locked"_s };
 
-    return Exception { ExceptionCode::NotSupportedError, "not implemented"_s };
+    pipeToInternal(globalObject, *this, transform.writable.releaseNonNull(), WTFMove(options), nullptr);
+
+    return transform.readable.releaseNonNull();
 }
 
 JSC::JSValue ReadableStream::storedError(JSDOMGlobalObject& globalObject) const
@@ -509,8 +533,36 @@ JSC::JSValue JSReadableStream::pipeTo(JSC::JSGlobalObject& globalObject, JSC::Ca
 {
     RefPtr internalReadableStream = wrapped().internalReadableStream();
     if (!internalReadableStream) {
-        return callPromiseFunction(globalObject, callFrame, [](auto&, auto&, auto&& promise) {
-            promise->reject(Exception { ExceptionCode::NotSupportedError, "piping to a byte stream is not yet supported"_s });
+        return callPromiseFunction(globalObject, callFrame, [this](auto& globalObject, auto& callFrame, auto&& promise) {
+            if (callFrame.argumentCount() < 1) {
+                promise->rejectWithCallback([](auto& globalObject) {
+                    return createNotEnoughArgumentsError(&globalObject);
+                });
+                return;
+            }
+
+            Ref vm = globalObject.vm();
+            auto throwScope = DECLARE_THROW_SCOPE(vm);
+
+            JSC::EnsureStillAliveScope argument0 = callFrame.uncheckedArgument(0);
+            auto destinationConversionResult = convert<IDLInterface<WritableStream>>(globalObject, argument0.value(), [](JSC::JSGlobalObject& lexicalGlobalObject, JSC::ThrowScope& scope) {
+                throwArgumentTypeError(lexicalGlobalObject, scope, 0, "destination"_s, "ReadableStream"_s, "pipeTo"_s, "WritableStream"_s);
+            });
+
+            if (destinationConversionResult.hasException(throwScope)) [[unlikely]] {
+                promise->reject(Exception { ExceptionCode::ExistingExceptionError });
+                return;
+            }
+
+            JSC::EnsureStillAliveScope argument1 = callFrame.argument(1);
+            auto optionsConversionResult = convert<IDLDictionary<StreamPipeOptions>>(globalObject, argument1.value());
+
+            if (optionsConversionResult.hasException(throwScope)) [[unlikely]] {
+                promise->reject(Exception { ExceptionCode::ExistingExceptionError });
+                return;
+            }
+
+            protectedWrapped()->pipeTo(globalObject, *destinationConversionResult.releaseReturnValue(), optionsConversionResult.releaseReturnValue(), WTFMove(promise));
         });
     }
 
@@ -521,10 +573,31 @@ JSC::JSValue JSReadableStream::pipeThrough(JSC::JSGlobalObject& globalObject, JS
 {
     RefPtr internalReadableStream = wrapped().internalReadableStream();
     if (!internalReadableStream) {
+        auto& jsDOMGlobalObject = *JSC::jsCast<JSDOMGlobalObject*>(&globalObject);
+
         Ref vm = globalObject.vm();
-        auto scope = DECLARE_THROW_SCOPE(vm);
-        throwNotSupportedError(globalObject, scope, "piping through a byte stream is not yet supported"_s);
-        return { };
+        auto throwScope = DECLARE_THROW_SCOPE(vm);
+        if (callFrame.argumentCount() < 1)
+            return throwException(&globalObject, throwScope, createNotEnoughArgumentsError(&globalObject));
+
+        JSC::EnsureStillAliveScope argument0 = callFrame.uncheckedArgument(0);
+        auto transformConversionResult = convert<IDLDictionary<ReadableStream::WritablePair>>(globalObject, argument0.value());
+        if (transformConversionResult.hasException(throwScope)) [[unlikely]]
+            return { };
+
+        JSC::EnsureStillAliveScope argument1 = callFrame.argument(1);
+        auto optionsConversionResult = convert<IDLDictionary<StreamPipeOptions>>(globalObject, argument1.value());
+        if (optionsConversionResult.hasException(throwScope)) [[unlikely]]
+            return { };
+
+        auto readableStreamOrException = protectedWrapped()->pipeThrough(jsDOMGlobalObject, transformConversionResult.releaseReturnValue(), optionsConversionResult.releaseReturnValue());
+
+        if (readableStreamOrException.hasException()) {
+            throwException(&globalObject, throwScope, createDOMException(globalObject, readableStreamOrException.releaseException()));
+            return { };
+        }
+
+        return toJS(&globalObject, &jsDOMGlobalObject, readableStreamOrException.releaseReturnValue());
     }
 
     return internalReadableStream->pipeThrough(globalObject, callFrame.argument(0), callFrame.argument(1));

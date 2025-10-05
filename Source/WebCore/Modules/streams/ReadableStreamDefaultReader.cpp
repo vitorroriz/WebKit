@@ -103,6 +103,46 @@ void ReadableStreamDefaultReader::readForBindings(JSDOMGlobalObject& globalObjec
 
 void ReadableStreamDefaultReader::read(JSDOMGlobalObject& globalObject, Ref<ReadableStreamReadRequest>&& readRequest)
 {
+    if (RefPtr internalReader = this->internalDefaultReader()) {
+        auto value = internalReader->readForBindings(globalObject);
+        auto* promise = jsCast<JSC::JSPromise*>(value);
+        if (!promise)
+            return;
+
+        Ref domPromise = DOMPromise::create(globalObject, *promise);
+        domPromise->whenSettled([domPromise, readRequest = WTFMove(readRequest)] {
+            switch (domPromise->status()) {
+            case DOMPromise::Status::Fulfilled: {
+                auto* globalObject = domPromise->globalObject();
+                if (!globalObject)
+                    return;
+
+                Ref vm = globalObject->vm();
+                auto scope = DECLARE_CATCH_SCOPE(vm);
+                auto resultOrException = convertDictionary<ReadableStreamReadResult>(*globalObject, domPromise->result());
+                ASSERT(!resultOrException.hasException(scope));
+                if (resultOrException.hasException(scope)) {
+                    scope.clearException();
+                    return;
+                }
+                auto result = resultOrException.releaseReturnValue();
+                if (result.done) {
+                    readRequest->runCloseSteps();
+                    return;
+                }
+                readRequest->runChunkSteps(result.value);
+            }
+                break;
+            case DOMPromise::Status::Rejected:
+                readRequest->runErrorSteps(domPromise->result());
+                break;
+            case DOMPromise::Status::Pending:
+                ASSERT_NOT_REACHED();
+            }
+        });
+        return;
+    }
+
     RefPtr stream = m_stream;
     if (!stream) {
         readRequest->runErrorSteps(Exception { ExceptionCode::TypeError, "stream is undefined"_s });

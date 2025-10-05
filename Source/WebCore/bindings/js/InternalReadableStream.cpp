@@ -145,7 +145,8 @@ InternalReadableStream::State InternalReadableStream::state() const
         return State::Closed;
     if (state == 4)
         return State::Readable;
-    ASSERT(state == 2);
+
+    ASSERT(state == 3);
     return State::Errored;
 }
 
