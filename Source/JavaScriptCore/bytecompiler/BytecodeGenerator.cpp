@@ -533,14 +533,32 @@ BytecodeGenerator::BytecodeGenerator(VM& vm, FunctionNode* functionNode, Unlinke
         break;
     case ConstructorKind::Naked:
         if (!isConstructor()) {
-            emitThrowTypeError("Cannot call a constructor without |new|"_s);
+            String constructorName = functionNode->ident().string();
+            if (!constructorName || constructorName.isEmpty())
+                emitThrowTypeError("Cannot call a constructor without |new|"_s);
+            else {
+                auto errorMessageStr = tryMakeString("Cannot call a constructor "_s, constructorName, " without |new|"_s);
+                if (!errorMessageStr)
+                    emitThrowTypeError("Cannot call a constructor without |new|"_s);
+                else
+                    emitThrowTypeError(Identifier::fromString(m_vm, errorMessageStr));
+            }
             return;
         }
         break;
     case ConstructorKind::Base:
     case ConstructorKind::Extends:
         if (!isConstructor()) {
-            emitThrowTypeError("Cannot call a class constructor without |new|"_s);
+            String constructorName = functionNode->ident().string();
+            if (!constructorName || constructorName.isEmpty())
+                emitThrowTypeError("Cannot call a class constructor without |new|"_s);
+            else {
+                auto errorMessageStr = tryMakeString("Cannot call a class constructor "_s, constructorName, " without |new|"_s);
+                if (!errorMessageStr)
+                    emitThrowTypeError("Cannot call a class constructor without |new|"_s);
+                else
+                    emitThrowTypeError(Identifier::fromString(m_vm, errorMessageStr));
+            }
             return;
         }
         break;
