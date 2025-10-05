@@ -260,6 +260,7 @@
 #include <WebCore/RenderEmbeddedObject.h>
 #include <WebCore/ResourceLoadStatistics.h>
 #include <WebCore/RunJavaScriptParameters.h>
+#include <WebCore/SecurityOrigin.h>
 #include <WebCore/SerializedCryptoKeyWrap.h>
 #include <WebCore/SerializedScriptValue.h>
 #include <WebCore/ShareData.h>
@@ -16656,7 +16657,7 @@ void WebPageProxy::describeTextExtractionInteraction(TextExtraction::Interaction
 
 void WebPageProxy::addConsoleMessage(FrameIdentifier frameID, MessageSource messageSource, MessageLevel messageLevel, const String& message, std::optional<ResourceLoaderIdentifier> coreIdentifier)
 {
-    send(Messages::WebPage::AddConsoleMessage { frameID, messageSource, messageLevel, message, coreIdentifier });
+    sendToProcessContainingFrame(frameID, Messages::WebPage::AddConsoleMessage { frameID, messageSource, messageLevel, message, coreIdentifier });
 }
 
 #if ENABLE(ASYNC_SCROLLING) && PLATFORM(COCOA)
@@ -16693,6 +16694,25 @@ void WebPageProxy::documentURLForConsoleLog(WebCore::FrameIdentifier frameID, Co
     if (RefPtr frame = WebFrameProxy::webFrame(frameID))
         return completionHandler(frame->url());
     completionHandler({ });
+}
+
+void WebPageProxy::reportMixedContentViolation(FrameIdentifier frameID, bool blocked, const URL& target)
+{
+    RefPtr frame = WebFrameProxy::webFrame(frameID);
+    if (!frame)
+        return;
+
+    auto isUpgradingLocalhostDisabled = !protectedPreferences()->iPAddressAndLocalhostMixedContentUpgradeTestingEnabled() && shouldTreatAsPotentiallyTrustworthy(target);
+    ASCIILiteral errorString = [&] {
+        if (blocked)
+            return "blocked and must"_s;
+        if (isUpgradingLocalhostDisabled)
+            return "not upgraded to HTTPS and must be served from the local host."_s;
+        return "automatically upgraded and should"_s;
+    }();
+
+    auto message = makeString((!blocked ? ""_s : "[blocked] "_s), "The page at "_s, frame->url().stringCenterEllipsizedToLength(), " requested insecure content from "_s, target.stringCenterEllipsizedToLength(), ". This content was "_s, errorString, !isUpgradingLocalhostDisabled ? " be served over HTTPS.\n"_s : "\n"_s);
+    addConsoleMessage(frameID, MessageSource::Security, MessageLevel::Warning, message);
 }
 
 void WebPageProxy::drawFrameToSnapshot(FrameIdentifier frameID, const IntRect& rect, RemoteSnapshotIdentifier snapshotIdentifier, CompletionHandler<void(bool)>&& completionHandler)

@@ -342,6 +342,7 @@ public:
 
     ScrollbarMode scrollingMode() const { return m_scrollingMode; }
     WEBCORE_EXPORT void updateScrollingMode() final;
+    WEBCORE_EXPORT void reportMixedContentViolation(bool blocked, const URL& target) const final;
     WEBCORE_EXPORT void setScrollingMode(ScrollbarMode);
     WEBCORE_EXPORT void showMemoryMonitorError();
 
@@ -373,6 +374,7 @@ private:
     void loadFrameRequest(FrameLoadRequest&&, Event*) final;
     void didFinishLoadInAnotherProcess() final;
     RefPtr<SecurityOrigin> frameDocumentSecurityOrigin() const final;
+    String frameURLProtocol() const final;
 
     FrameView* virtualView() const final;
     void disconnectView() final;

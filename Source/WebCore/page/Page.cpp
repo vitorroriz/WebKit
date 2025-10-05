@@ -990,6 +990,7 @@ void Page::updateProcessSyncData(const ProcessSyncData& data)
         break;
     case ProcessSyncDataType::FrameCanCreatePaymentSession:
     case ProcessSyncDataType::FrameDocumentSecurityOrigin:
+    case ProcessSyncDataType::FrameURLProtocol:
         ASSERT_NOT_REACHED();
     }
 }

@@ -107,6 +107,7 @@
 #include "ScriptController.h"
 #include "ScriptSourceCode.h"
 #include "ScrollingCoordinator.h"
+#include "SecurityOrigin.h"
 #include "ServiceWorkerGlobalScope.h"
 #include "Settings.h"
 #include "StyleProperties.h"
@@ -1468,6 +1469,26 @@ void LocalFrame::setScrollingMode(ScrollbarMode scrollingMode)
         view->setCanHaveScrollbars(m_scrollingMode != ScrollbarMode::AlwaysOff);
 }
 
+void LocalFrame::reportMixedContentViolation(bool blocked, const URL& target) const
+{
+    RefPtr document = this->document();
+    if (!document)
+        return;
+
+    auto isUpgradingLocalhostDisabled = !document->settings().iPAddressAndLocalhostMixedContentUpgradeTestingEnabled() && shouldTreatAsPotentiallyTrustworthy(target);
+    ASCIILiteral errorString = [&] {
+        if (blocked)
+            return "blocked and must"_s;
+        if (isUpgradingLocalhostDisabled)
+            return "not upgraded to HTTPS and must be served from the local host."_s;
+        return "automatically upgraded and should"_s;
+    }();
+
+    auto message = makeString((!blocked ? ""_s : "[blocked] "_s), "The page at "_s, document->url().stringCenterEllipsizedToLength(), " requested insecure content from "_s, target.stringCenterEllipsizedToLength(), ". This content was "_s, errorString, !isUpgradingLocalhostDisabled ? " be served over HTTPS.\n"_s : "\n"_s);
+
+    document->addConsoleMessage(MessageSource::Security, MessageLevel::Warning, message);
+}
+
 #if ENABLE(CONTENT_EXTENSIONS)
 
 static String generateResourceMonitorErrorHTML(OptionSet<ColorScheme> colorScheme)
@@ -1648,6 +1669,14 @@ RefPtr<SecurityOrigin> LocalFrame::frameDocumentSecurityOrigin() const
 Ref<FrameInspectorController> LocalFrame::protectedInspectorController()
 {
     return m_inspectorController.get();
+}
+
+String LocalFrame::frameURLProtocol() const
+{
+    if (RefPtr document = this->document())
+        return document->url().protocol().toString();
+
+    return ""_s;
 }
 
 } // namespace WebCore

@@ -763,6 +763,7 @@ void Document::populateDocumentSyncDataForNewlyConstructedDocument(ProcessSyncDa
     case ProcessSyncDataType::UserDidInteractWithPage:
     case ProcessSyncDataType::FrameCanCreatePaymentSession:
     case ProcessSyncDataType::FrameDocumentSecurityOrigin:
+    case ProcessSyncDataType::FrameURLProtocol:
         break;
     }
 }

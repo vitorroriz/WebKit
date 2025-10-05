@@ -703,7 +703,7 @@ void DocumentLoader::willSendRequest(ResourceRequest&& newRequest, const Resourc
 
     ASSERT(frame);
 
-    RefPtr topFrame = dynamicDowncast<LocalFrame>(frame->tree().top());
+    RefPtr topFrame = frame->tree().top();
 
     RefPtr document = frame->document();
     ASSERT(document);
@@ -730,7 +730,10 @@ void DocumentLoader::willSendRequest(ResourceRequest&& newRequest, const Resourc
 
     if (topFrame && topFrame != frame.get()) {
         // We shouldn't check for mixed content against the current frame when navigating; we only need to be concerned with the ancestor frames.
-        RefPtr parentFrame = dynamicDowncast<LocalFrame>(frame->tree().parent());
+        RefPtr parentFrame = frame->tree().parent();
+        if (!parentFrame)
+            parentFrame = frameLoader()->client().provisionalParentFrame();
+
         if (!parentFrame)
             return completionHandler(WTFMove(newRequest));
 

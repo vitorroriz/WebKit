@@ -141,6 +141,8 @@ public:
 
     virtual void updateScrollingMode() = 0;
 
+    virtual void reportMixedContentViolation(bool blocked, const URL& target) const = 0;
+
     void stopForBackForwardCache();
 
     WEBCORE_EXPORT void updateFrameTreeSyncData(Ref<FrameTreeSyncData>&&);
@@ -148,6 +150,7 @@ public:
     virtual bool frameCanCreatePaymentSession() const;
     FrameTreeSyncData& frameTreeSyncData() const { return m_frameTreeSyncData.get(); }
     WEBCORE_EXPORT virtual RefPtr<SecurityOrigin> frameDocumentSecurityOrigin() const = 0;
+    WEBCORE_EXPORT virtual String frameURLProtocol() const = 0;
 
     WEBCORE_EXPORT virtual void setPrinting(bool printing, FloatSize pageSize, FloatSize originalPageSize, float maximumShrinkRatio, AdjustViewSize, NotifyUIProcess = NotifyUIProcess::Yes);
     WEBCORE_EXPORT bool isPrinting() const;

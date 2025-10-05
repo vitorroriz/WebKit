@@ -66,3 +66,4 @@ DocumentClasses : OptionSet<WebCore::DocumentClass> [DocumentSyncData Header=<We
 HasInjectedUserScript : bool [DocumentSyncData]
 FrameCanCreatePaymentSession : bool [FrameTreeSyncData]
 FrameDocumentSecurityOrigin : RefPtr<WebCore::SecurityOrigin> [FrameTreeSyncData Header=<WebCore/SecurityOrigin.h>]
+FrameURLProtocol : String [FrameTreeSyncData Header=<wtf/text/WTFString.h>]

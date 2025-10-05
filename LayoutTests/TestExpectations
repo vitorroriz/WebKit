@@ -7916,3 +7916,7 @@ imported/w3c/web-platform-tests/html/rendering/replaced-elements/the-select-elem
 imported/w3c/web-platform-tests/html/rendering/replaced-elements/the-select-element/customizable-select/min-width-in-flex.html [ ImageOnlyFailure ]
 
 imported/w3c/web-platform-tests/html/rendering/sections/headingoffset-and-headingreset.html [ ImageOnlyFailure ]
+
+# Hits assert in debug, tracked by rdar://161930313
+[ Debug ] http/tests/site-isolation/mixedContent/data-url-iframe-in-main-frame.html [ Skip ]
+[ Debug ] http/tests/site-isolation/mixedContent/insecure-audio-video-in-main-frame.html [ Skip ]

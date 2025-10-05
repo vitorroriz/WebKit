@@ -5637,6 +5637,7 @@ fast/visual-viewport/ios/bottom-bar-with-keyboard.html [ Skip ]
 fast/visual-viewport/ios/fixed-element-on-bottom-with-keyboard.html [ Skip ]
 fast/visual-viewport/ios/zoomed-focus-in-fixed.html [ Skip ]
 http/tests/navigation/ping-attribute [ Skip ]
+http/tests/site-isolation/mixedContent/anchor-cross-origin-from-https-UpgradeMixedContent.html [ Skip ]
 
 webkit.org/b/153380 webarchive/loading/object.html [ Pass Crash ]
 webkit.org/b/153380 webarchive/loading/missing-data.html [ Pass Crash ]

@@ -2052,6 +2052,13 @@ RefPtr<WebCore::HistoryItem> WebLocalFrameLoaderClient::createHistoryItemTree(bo
     return frame->loader().history().createItemTree(frame, clipAtTarget, itemID);
 }
 
+RefPtr<WebCore::Frame> WebLocalFrameLoaderClient::provisionalParentFrame() const
+{
+    if (RefPtr parentWebFrame = webFrame().parentFrame())
+        return parentWebFrame->coreFrame();
+    return nullptr;
+}
+
 #if ENABLE(CONTENT_EXTENSIONS)
 
 void WebLocalFrameLoaderClient::didExceedNetworkUsageThreshold()
