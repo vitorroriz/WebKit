@@ -25,23 +25,16 @@
 
 #if ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
 
+#include "Connection.h"
 #include "LogStreamIdentifier.h"
+#include "LogStreamMessages.h"
+#include "StreamClientConnection.h"
+#include "WebKitLogDefinitions.h"
 #include <WebCore/LogClient.h>
+#include <WebCore/WebCoreLogDefinitions.h>
 #include <wtf/Identified.h>
 #include <wtf/Lock.h>
-
-#if __has_include("WebKitLogClientDeclarations.h")
-#include "WebKitLogClientDeclarations.h"
-#endif
-
-#if __has_include("WebCoreLogClientDeclarations.h")
-#include "WebCoreLogClientDeclarations.h"
-#endif
-
-namespace IPC {
-class Connection;
-class StreamClientConnection;
-}
+#include <wtf/Locker.h>
 
 namespace WebKit {
 
@@ -61,13 +54,13 @@ public:
 
     void log(std::span<const uint8_t> logChannel, std::span<const uint8_t> logCategory, std::span<const uint8_t> logString, os_log_type_t) final;
 
-#undef DECLARE_LOG_MESSAGE
-#define DECLARE_LOG_MESSAGE(messageName, argumentDeclarations, arguments) \
-    void messageName argumentDeclarations;
+#if __has_include("WebKitLogClientDeclarations.h")
+#include "WebKitLogClientDeclarations.h"
+#endif
 
-    WEBCORE_LOG_CLIENT_MESSAGES(DECLARE_LOG_MESSAGE)
-    WEBKIT2_LOG_CLIENT_MESSAGES(DECLARE_LOG_MESSAGE)
-#undef DECLARE_LOG_MESSAGE
+#if __has_include("WebCoreLogClientDeclarations.h")
+#include "WebCoreLogClientDeclarations.h"
+#endif
 
 private:
     bool isWebKitLogClient() const final { return true; }
@@ -85,6 +78,15 @@ private:
     const Ref<IPC::Connection> m_connection;
 #endif
 };
+
+template<typename T>
+void LogClient::send(T&& message)
+{
+#if ENABLE(STREAMING_IPC_IN_LOG_FORWARDING)
+    Locker locker { m_lock };
+#endif
+    m_connection->send(WTFMove(message), identifier());
+}
 
 }
 
