@@ -23,6 +23,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
+#include "pas_config.h"
+
+#if LIBPAS_ENABLED
 #include "pas_mte_config.h"
 
 #include "stdlib.h"
@@ -198,3 +201,4 @@ void pas_mte_ensure_initialized(void)
 #endif
 void pas_mte_ensure_initialized(void) { }
 #endif // PAS_OS(DARWIN)
+#endif /* LIBPAS_ENABLED */
