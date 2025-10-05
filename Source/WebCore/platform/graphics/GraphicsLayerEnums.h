@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,22 +25,45 @@
 
 #pragma once
 
-#include <wtf/Forward.h>
-#include <wtf/TZoneMallocInlines.h>
-
 namespace WebCore {
 
-class GraphicsLayer;
-class GraphicsLayerClient;
-
-enum class GraphicsLayerType : uint8_t;
-
-class GraphicsLayerFactory {
-    WTF_MAKE_TZONE_ALLOCATED_INLINE(GraphicsLayerFactory);
-public:
-    virtual ~GraphicsLayerFactory() = default;
-
-    virtual Ref<GraphicsLayer> createGraphicsLayer(GraphicsLayerType, GraphicsLayerClient&) = 0;
+enum class GraphicsLayerType : uint8_t {
+    Normal,
+    Structural, // Supports position and transform only, and doesn't flatten (i.e. behaves like preserves3D is true). Uses CATransformLayer on Cocoa platforms.
+    PageTiledBacking,
+    TiledBacking,
+    ScrollContainer,
+    ScrolledContents,
+    Shape
 };
 
-} // namespace WebCore
+enum class GraphicsLayerMode : uint8_t {
+    PlatformLayer,
+    LayerHostingContextId
+};
+
+enum class GraphicsLayerContentsLayerPurpose : uint8_t {
+    None = 0,
+    Image,
+    Media,
+    Canvas,
+    BackgroundColor,
+    Plugin,
+    Model,
+    HostedModel,
+    Host,
+};
+
+
+enum class GraphicsLayerShouldSetNeedsDisplay : bool { DoNotSet, Set };
+enum class GraphicsLayerShouldClipToLayer : bool { DoNotClip, Clip };
+
+#if ENABLE(MODEL_ELEMENT)
+enum class GraphicsLayerModelInteraction : bool { Disabled, Enabled };
+#endif
+
+enum class GraphicsLayerCompositingCoordinatesOrientation : uint8_t { TopDown, BottomUp };
+enum class GraphicsLayerScalingFilter : uint8_t { Linear, Nearest, Trilinear };
+enum class GraphicsLayerCustomAppearance : bool { None, ScrollingShadow };
+
+}

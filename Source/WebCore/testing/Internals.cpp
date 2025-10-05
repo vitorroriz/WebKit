@@ -103,6 +103,7 @@
 #include "FrameMemoryMonitor.h"
 #include "FrameSnapshotting.h"
 #include "GCObservation.h"
+#include "GraphicsLayer.h"
 #include "HEVCUtilities.h"
 #include "HTMLAnchorElement.h"
 #include "HTMLAttachmentElement.h"

@@ -33,6 +33,7 @@
 #include "FloatRoundedRect.h"
 #include "Gradient.h"
 #include "GraphicsContext.h"
+#include "GraphicsLayer.h"
 #include "HitTestResult.h"
 #include "InteractionRegion.h"
 #include "LocalFrameView.h"

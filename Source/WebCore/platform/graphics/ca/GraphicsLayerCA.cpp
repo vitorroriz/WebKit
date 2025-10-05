@@ -1000,7 +1000,7 @@ void GraphicsLayerCA::setNeedsDisplayInRect(const FloatRect& r, ShouldClipToLaye
         return;
 
     FloatRect rect(r);
-    if (shouldClip == ClipToLayer) {
+    if (shouldClip == ShouldClipToLayer::Clip) {
         FloatRect layerBounds(FloatPoint(), m_size);
         rect.intersect(layerBounds);
     }

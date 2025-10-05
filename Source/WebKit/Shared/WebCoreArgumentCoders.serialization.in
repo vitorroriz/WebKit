@@ -8704,6 +8704,7 @@ enum class WebCore::TransformOperationType : uint8_t {
 
 enum class WebCore::GraphicsContextGLSurfaceBuffer : bool;
 
+header: <WebCore/GraphicsLayer.h>
 [Nested] enum class WebCore::GraphicsLayer::CustomAppearance : bool;
 
 [OptionSet] enum class GCGLErrorCode : uint8_t {

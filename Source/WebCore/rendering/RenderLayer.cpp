@@ -75,6 +75,7 @@
 #include "FrameTree.h"
 #include "Gradient.h"
 #include "GraphicsContext.h"
+#include "GraphicsLayer.h"
 #include "HTMLCanvasElement.h"
 #include "HTMLFormControlElement.h"
 #include "HTMLFrameElement.h"
@@ -5926,7 +5927,7 @@ void RenderLayer::setBackingNeedsRepaint(GraphicsLayer::ShouldClipToLayer should
         backing()->setContentsNeedDisplay(shouldClip);
 }
 
-void RenderLayer::setBackingNeedsRepaintInRect(const LayoutRect& r, GraphicsLayer::ShouldClipToLayer shouldClip)
+void RenderLayer::setBackingNeedsRepaintInRect(const LayoutRect& r, GraphicsLayerShouldClipToLayer shouldClip)
 {
     // https://bugs.webkit.org/show_bug.cgi?id=61159 describes an unreproducible crash here,
     // so assert but check that the layer is composited.

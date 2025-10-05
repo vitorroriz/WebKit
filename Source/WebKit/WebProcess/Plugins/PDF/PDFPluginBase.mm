@@ -66,6 +66,7 @@
 #import <WebCore/FrameDestructionObserverInlines.h>
 #import <WebCore/FrameLoader.h>
 #import <WebCore/GraphicsContext.h>
+#import <WebCore/GraphicsLayer.h>
 #import <WebCore/HTMLPlugInElement.h>
 #import <WebCore/LegacyNSPasteboardTypes.h>
 #import <WebCore/LoaderNSURLExtras.h>

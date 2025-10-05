@@ -95,6 +95,7 @@
 #include "FrameSelection.h"
 #include "FrameTree.h"
 #include "GeolocationController.h"
+#include "GraphicsLayer.h"
 #include "HTMLElement.h"
 #include "HTMLImageElement.h"
 #include "HTMLMediaElement.h"

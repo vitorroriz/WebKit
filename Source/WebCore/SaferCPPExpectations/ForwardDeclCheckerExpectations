@@ -83,6 +83,7 @@ page/PageOverlayController.cpp
 page/WheelEventTestMonitor.h
 page/mac/ImageOverlayControllerMac.mm
 page/mac/ServicesOverlayController.mm
+page/scrolling/ScrollingCoordinator.h
 page/scrolling/ScrollingStateNode.h
 page/scrolling/ScrollingStateScrollingNode.cpp
 platform/PODRedBlackTree.h

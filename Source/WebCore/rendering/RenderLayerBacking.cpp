@@ -1698,8 +1698,8 @@ void RenderLayerBacking::updateGeometry(const RenderLayer* compositedAncestor)
             m_scrolledContentsLayer->setNeedsDisplay();
 
         m_scrolledContentsLayer->setSize(scrollSize);
-        m_scrolledContentsLayer->setScrollOffset(scrollOffset, GraphicsLayer::DontSetNeedsDisplay);
-        m_scrolledContentsLayer->setOffsetFromRenderer(toLayoutSize(scrollContainerBox.location()), GraphicsLayer::DontSetNeedsDisplay);
+        m_scrolledContentsLayer->setScrollOffset(scrollOffset, GraphicsLayer::ShouldSetNeedsDisplay::DoNotSet);
+        m_scrolledContentsLayer->setOffsetFromRenderer(toLayoutSize(scrollContainerBox.location()), GraphicsLayer::ShouldSetNeedsDisplay::DoNotSet);
         
         adjustTiledBackingCoverage();
     }
@@ -1717,11 +1717,11 @@ void RenderLayerBacking::updateGeometry(const RenderLayer* compositedAncestor)
     if (m_foregroundLayer) {
         FloatSize foregroundSize;
         FloatSize foregroundOffset;
-        GraphicsLayer::ShouldSetNeedsDisplay needsDisplayOnOffsetChange = GraphicsLayer::SetNeedsDisplay;
+        auto needsDisplayOnOffsetChange = GraphicsLayer::ShouldSetNeedsDisplay::Set;
         if (m_scrolledContentsLayer) {
             foregroundSize = m_scrolledContentsLayer->size();
             foregroundOffset = m_scrolledContentsLayer->offsetFromRenderer() - toLayoutSize(m_scrolledContentsLayer->scrollOffset());
-            needsDisplayOnOffsetChange = GraphicsLayer::DontSetNeedsDisplay;
+            needsDisplayOnOffsetChange = GraphicsLayer::ShouldSetNeedsDisplay::DoNotSet;
         } else if (hasClippingLayer()) {
             // If we have a clipping layer (which clips descendants), then the foreground layer is a child of it,
             // so that it gets correctly sorted with children. In that case, position relative to the clipping layer.

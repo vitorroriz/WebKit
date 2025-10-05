@@ -2600,6 +2600,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/graphics/GraphicsLayerAnimation.h
     platform/graphics/GraphicsLayerClient.h
     platform/graphics/GraphicsLayerContentsDisplayDelegate.h
+    platform/graphics/GraphicsLayerEnums.h
     platform/graphics/GraphicsLayerFactory.h
     platform/graphics/GraphicsLayerTransform.h
     platform/graphics/GraphicsStyle.h

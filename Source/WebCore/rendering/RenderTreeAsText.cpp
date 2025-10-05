@@ -32,6 +32,7 @@
 #include "Document.h"
 #include "ElementInlines.h"
 #include "FrameSelection.h"
+#include "GraphicsLayer.h"
 #include "HTMLElement.h"
 #include "HTMLNames.h"
 #include "HTMLSpanElement.h"

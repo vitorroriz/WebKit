@@ -142,7 +142,7 @@ public:
     WEBCORE_EXPORT void setBlendMode(BlendMode) override;
 
     WEBCORE_EXPORT void setNeedsDisplay() override;
-    WEBCORE_EXPORT void setNeedsDisplayInRect(const FloatRect&, ShouldClipToLayer = ClipToLayer) override;
+    WEBCORE_EXPORT void setNeedsDisplayInRect(const FloatRect&, ShouldClipToLayer = ShouldClipToLayer::Clip) override;
     WEBCORE_EXPORT void setContentsNeedsDisplay() override;
     
     WEBCORE_EXPORT void setContentsRect(const FloatRect&) override;

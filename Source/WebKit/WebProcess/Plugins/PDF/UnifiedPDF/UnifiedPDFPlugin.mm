@@ -4850,6 +4850,16 @@ RefPtr<PDFPresentationController> UnifiedPDFPlugin::protectedPresentationControl
     return m_presentationController;
 }
 
+RefPtr<WebCore::GraphicsLayer> UnifiedPDFPlugin::protectedScrollContainerLayer() const
+{
+    return m_scrollContainerLayer;
+}
+
+RefPtr<WebCore::GraphicsLayer> UnifiedPDFPlugin::protectedOverflowControlsContainer() const
+{
+    return m_overflowControlsContainer;
+}
+
 ViewportConfiguration::Parameters UnifiedPDFPlugin::viewportParameters()
 {
     ViewportConfiguration::Parameters parameters;

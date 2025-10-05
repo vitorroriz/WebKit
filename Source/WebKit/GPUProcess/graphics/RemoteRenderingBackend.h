@@ -53,6 +53,7 @@
 #include "StreamMessageReceiver.h"
 #include "StreamServerConnection.h"
 #include <WebCore/Font.h>
+#include <WebCore/FrameIdentifier.h>
 #include <WebCore/PixelFormat.h>
 #include <WebCore/ProcessIdentity.h>
 #include <WebCore/RenderingResourceIdentifier.h>
