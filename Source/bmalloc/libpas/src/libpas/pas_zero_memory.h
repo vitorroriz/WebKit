@@ -26,7 +26,6 @@
 #ifndef PAS_ZERO_MEMORY_H
 #define PAS_ZERO_MEMORY_H
 
-#include "pas_mte.h"
 #include "pas_utils.h"
 #include <stdint.h>
 
@@ -36,7 +35,6 @@ static PAS_ALWAYS_INLINE void pas_zero_memory(void* memory, size_t size)
 {
     PAS_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
     PAS_PROFILE(ZERO_MEMORY, memory, size);
-    PAS_MTE_HANDLE(ZERO_MEMORY, memory, size);
     memset(memory, 0, size);
     PAS_ALLOW_UNSAFE_BUFFER_USAGE_END
 }

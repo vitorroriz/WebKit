@@ -151,8 +151,6 @@ set(bmalloc_C_SOURCES
     libpas/src/libpas/pas_medium_megapage_cache.c
     libpas/src/libpas/pas_megapage_cache.c
     libpas/src/libpas/pas_monotonic_time.c
-    libpas/src/libpas/pas_mte.c
-    libpas/src/libpas/pas_mte_config.c
     libpas/src/libpas/pas_page_base.c
     libpas/src/libpas/pas_page_base_config.c
     libpas/src/libpas/pas_page_header_table.c
@@ -553,8 +551,6 @@ set(bmalloc_PUBLIC_HEADERS
     libpas/src/libpas/pas_min_heap.h
     libpas/src/libpas/pas_mmap_capability.h
     libpas/src/libpas/pas_monotonic_time.h
-    libpas/src/libpas/pas_mte.h
-    libpas/src/libpas/pas_mte_config.h
     libpas/src/libpas/pas_mutation_count.h
     libpas/src/libpas/pas_object_kind.h
     libpas/src/libpas/pas_page_base_and_kind.h

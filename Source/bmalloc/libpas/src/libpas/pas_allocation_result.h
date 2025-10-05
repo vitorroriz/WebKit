@@ -28,7 +28,6 @@
 
 #include <errno.h>
 #include "pas_internal_config.h"
-#include "pas_mte.h"
 #include "pas_utils.h"
 #include "pas_zero_memory.h"
 #include "pas_zero_mode.h"
@@ -97,7 +96,6 @@ pas_allocation_result_zero(pas_allocation_result result,
 
     PAS_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
     PAS_PROFILE(ZERO_ALLOCATION_RESULT, result.begin);
-    PAS_MTE_HANDLE(ZERO_ALLOCATION_RESULT, result.begin);
     PAS_ALLOW_UNSAFE_BUFFER_USAGE_END
 
     void* memory = (void*)result.begin;

@@ -58,10 +58,6 @@ PAS_IGNORE_CLANG_WARNINGS_BEGIN("qualifier-requires-header")
 #define PAS_END_EXTERN_C __PAS_END_EXTERN_C
 
 #if defined(PAS_BMALLOC) && PAS_BMALLOC
-#include "pas_mte_config.h"
-#endif // defined(PAS_BMALLOC) && PAS_BMALLOC
-
-#if defined(PAS_BMALLOC) && PAS_BMALLOC
 #if defined(__has_include)
 #if __has_include(<WebKitAdditions/pas_utils_additions.h>) && !PAS_ENABLE_TESTING
 #include <WebKitAdditions/pas_utils_additions.h>
