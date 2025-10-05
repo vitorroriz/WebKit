@@ -212,6 +212,25 @@ void VM::computeCanUseJIT()
 #endif
 }
 
+// This function is not meant to be called by anyone. It just provides a convenient scope
+// that can is permitted to access private members of VM in order to do some needed
+// static_asserts.
+inline void VM::checkStaticAsserts()
+{
+    // VM registration is done in the instantiation of its VMThreadContext.
+    //
+    // VM registration with the VMManager can only be done after m_apiLock is initialized
+    // because VMManager may trigger traps to stop the VM, and VMTraps the which uses
+    // m_apiLock for the VMTraps::SignalSender uses m_apiLock.
+    //
+    // VM registration needs to be done before the heap is initialized because we may Global GC
+    // may want to block the VM from doing any heap activity. In a Global GC world, we would be
+    // binding this VM to the global heap instead of instantiating the heap field. We want to
+    // be able to block before that point.
+    static_assert(OBJECT_OFFSETOF(VM, m_apiLock) < OBJECT_OFFSETOF(VM, m_threadContext));
+    static_assert(OBJECT_OFFSETOF(VM, m_threadContext) < OBJECT_OFFSETOF(VM, heap));
+}
+
 static bool vmCreationShouldCrash = false;
 
 VM::VM(VMType vmType, HeapType heapType, WTF::RunLoop* runLoop, bool* success)
@@ -241,8 +260,6 @@ VM::VM(VMType vmType, HeapType heapType, WTF::RunLoop* runLoop, bool* success)
 {
     if (vmCreationShouldCrash || g_jscConfig.vmCreationDisallowed) [[unlikely]]
         CRASH_WITH_EXTRA_SECURITY_IMPLICATION_AND_INFO(VMCreationDisallowed, "VM creation disallowed"_s, 0x4242424220202020, 0xbadbeef0badbeef, 0x1234123412341234, 0x1337133713371337);
-
-    VMManager::add(this);
 
     // Set up lazy initializers.
     {
@@ -469,7 +486,7 @@ VM::~VM()
 #endif
     if (RefPtr watchdog = this->watchdog(); watchdog) [[unlikely]]
         watchdog->willDestroyVM(this);
-    m_traps.willDestroyVM();
+    traps().willDestroyVM();
     m_isInService = false;
     WTF::storeStoreFence();
 
@@ -505,8 +522,6 @@ VM::~VM()
         m_microtaskQueues.begin()->remove();
 
     JSRunLoopTimer::Manager::singleton().unregisterVM(*this);
-
-    VMManager::remove(this);
 
     delete emptyList;
 
@@ -922,7 +937,7 @@ void VM::clearSourceProviderCaches()
 bool VM::hasExceptionsAfterHandlingTraps()
 {
     if (traps().needHandling(VMTraps::NonDebuggerAsyncEvents)) [[unlikely]]
-        m_traps.handleTraps(VMTraps::NonDebuggerAsyncEvents);
+        traps().handleTraps(VMTraps::NonDebuggerAsyncEvents);
     return exception();
 }
 
@@ -938,7 +953,7 @@ void VM::setException(Exception* exception)
 void VM::throwTerminationException()
 {
     ASSERT(hasTerminationRequest());
-    ASSERT(!m_traps.isDeferringTermination());
+    ASSERT(!traps().isDeferringTermination());
     setException(terminationException());
     if (m_executionForbiddenOnTermination)
         setExecutionForbidden();
@@ -1040,7 +1055,7 @@ static void preCommitStackMemory(void* stackLimit)
 
 void VM::updateStackLimits()
 {
-    void* lastSoftStackLimit = m_traps.softStackLimit();
+    void* lastSoftStackLimit = traps().softStackLimit();
 
     const StackBounds& stack = Thread::currentSingleton().stack();
     size_t reservedZoneSize = Options::reservedZoneSize();
@@ -1061,7 +1076,7 @@ void VM::updateStackLimits()
     }
 
     if (lastSoftStackLimit != newSoftStackLimit) {
-        m_traps.setStackSoftLimit(newSoftStackLimit);
+        traps().setStackSoftLimit(newSoftStackLimit);
 #if OS(WINDOWS)
         // We only need to precommit stack memory dictated by the VM::softStackLimit() limit.
         // This is because VM::softStackLimit() applies to stack usage by LLINT asm or JIT
@@ -1529,10 +1544,16 @@ void VM::executeEntryScopeServicesOnEntry()
 
     if (Options::useTracePoints()) [[unlikely]]
         tracePoint(VMEntryScopeStart);
+
+    if (hasEntryScopeServiceRequest(ConcurrentEntryScopeService::NeedStopTheWorld)) [[unlikely]]
+        VMManager::singleton().notifyVMActivation(*this);
 }
 
 void VM::executeEntryScopeServicesOnExit()
 {
+    if (hasEntryScopeServiceRequest(ConcurrentEntryScopeService::NeedStopTheWorld)) [[unlikely]]
+        VMManager::singleton().notifyVMDeactivation(*this);
+
     if (Options::useTracePoints()) [[unlikely]]
         tracePoint(VMEntryScopeEnd);
 

@@ -1336,6 +1336,7 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     runtime/StackFrame.h
     runtime/StackManager.h
     runtime/StackManagerInlines.h
+    runtime/StopTheWorldCallback.h
     runtime/StringIteratorPrototype.h
     runtime/StringObject.h
     runtime/StringPrototype.h
@@ -1385,6 +1386,7 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     runtime/VMEntryScopeInlines.h
     runtime/VMInlines.h
     runtime/VMManager.h
+    runtime/VMThreadContext.h
     runtime/VMTraps.h
     runtime/VMTrapsInlines.h
     runtime/WaiterListManager.h
