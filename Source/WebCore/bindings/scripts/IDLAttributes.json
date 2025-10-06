@@ -271,6 +271,9 @@
             },
             "unsupported": true
         },
+        "IgnoreSubclassesWhenGeneratingToJSObject": {
+            "contextsAllowed": ["interface"]
+        },
         "ImplementedAs": {
             "contextsAllowed": ["interface", "dictionary", "dictionary-member", "enum", "attribute", "operation", "constant"],
             "values": ["*"]

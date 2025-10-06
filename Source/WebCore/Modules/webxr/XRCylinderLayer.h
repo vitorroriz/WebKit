@@ -47,9 +47,16 @@ public:
     [[noreturn]] void setCentralAngle(float) { RELEASE_ASSERT_NOT_REACHED(); }
     float aspectRatio() const { RELEASE_ASSERT_NOT_REACHED(); }
     [[noreturn]] void setAspectRatio(float) { RELEASE_ASSERT_NOT_REACHED(); }
+
+private:
+    bool isXRCylinderLayer() const final { return true; }
 };
 
 } // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::XRCylinderLayer)
+    static bool isType(const WebCore::WebXRLayer& layer) { return layer.isXRCylinderLayer(); }
+SPECIALIZE_TYPE_TRAITS_END()
 
 #endif // ENABLE(WEBXR_LAYERS)
 

@@ -42,7 +42,13 @@ public:
 private:
     CSSOMColor(CSSKeywordish, Vector<CSSColorPercent>, CSSNumberish);
 
+    bool isCSSOMColor() const final { return true; }
+
     CSSNumberish m_alpha;
 };
 
 } // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::CSSOMColor)
+    static bool isType(const WebCore::CSSOMColorValue& value) { return value.isCSSOMColor(); }
+SPECIALIZE_TYPE_TRAITS_END()

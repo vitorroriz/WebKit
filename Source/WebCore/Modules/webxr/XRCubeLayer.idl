@@ -29,6 +29,7 @@
     EnabledBySetting=WebXRLayersAPIEnabled,
     ExportMacro=WEBCORE_EXPORT,
     Exposed=Window,
+    SuppressToJSObject
 ] interface XRCubeLayer : XRCompositionLayer {
     attribute WebXRSpace space;
     attribute DOMPointReadOnly orientation;

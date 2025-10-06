@@ -364,7 +364,7 @@ extern "C" { extern void (*const __identifier("??_7TestNamedDeleterNoIdentifier@
 extern "C" { extern void* _ZTVN7WebCore28TestNamedDeleterNoIdentifierE[]; }
 #endif
 template<std::same_as<TestNamedDeleterNoIdentifier> T>
-static inline void verifyVTable(TestNamedDeleterNoIdentifier* ptr) 
+static inline void verifyVTable(TestNamedDeleterNoIdentifier* ptr)
 {
     if constexpr (std::is_polymorphic_v<T>) {
         const void* actualVTablePointer = getVTablePointer<T>(ptr);
@@ -384,8 +384,9 @@ static inline void verifyVTable(TestNamedDeleterNoIdentifier* ptr)
 #endif
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 
-JSC::JSValue toJSNewlyCreated(JSC::JSGlobalObject*, JSDOMGlobalObject* globalObject, Ref<TestNamedDeleterNoIdentifier>&& impl)
+JSC::JSValue toJSNewlyCreated(JSC::JSGlobalObject* lexicalGlobalObject, JSDOMGlobalObject* globalObject, Ref<TestNamedDeleterNoIdentifier>&& impl)
 {
+    UNUSED_PARAM(lexicalGlobalObject);
 #if ENABLE(BINDING_INTEGRITY)
     verifyVTable<TestNamedDeleterNoIdentifier>(impl.ptr());
 #endif

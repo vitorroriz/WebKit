@@ -46,9 +46,16 @@ public:
     [[noreturn]] void setWidth(float) { RELEASE_ASSERT_NOT_REACHED(); }
     float height() const { RELEASE_ASSERT_NOT_REACHED(); }
     [[noreturn]] void setHeight(float) { RELEASE_ASSERT_NOT_REACHED(); }
+
+private:
+    bool isXRQuadLayer() const final { return true; }
 };
 
 } // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::XRQuadLayer)
+    static bool isType(const WebCore::WebXRLayer& layer) { return layer.isXRQuadLayer(); }
+SPECIALIZE_TYPE_TRAITS_END()
 
 #endif // ENABLE(WEBXR_LAYERS)
 

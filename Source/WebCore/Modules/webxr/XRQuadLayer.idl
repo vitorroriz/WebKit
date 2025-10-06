@@ -29,6 +29,7 @@
     EnabledBySetting=WebXRLayersAPIEnabled,
     ExportMacro=WEBCORE_EXPORT,
     Exposed=Window,
+    SuppressToJSObject
 ] interface XRQuadLayer : XRCompositionLayer {
     attribute WebXRSpace space;
     attribute WebXRRigidTransform transform;

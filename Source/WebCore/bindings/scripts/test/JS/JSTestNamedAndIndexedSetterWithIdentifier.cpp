@@ -496,7 +496,7 @@ extern "C" { extern void (*const __identifier("??_7TestNamedAndIndexedSetterWith
 extern "C" { extern void* _ZTVN7WebCore39TestNamedAndIndexedSetterWithIdentifierE[]; }
 #endif
 template<std::same_as<TestNamedAndIndexedSetterWithIdentifier> T>
-static inline void verifyVTable(TestNamedAndIndexedSetterWithIdentifier* ptr) 
+static inline void verifyVTable(TestNamedAndIndexedSetterWithIdentifier* ptr)
 {
     if constexpr (std::is_polymorphic_v<T>) {
         const void* actualVTablePointer = getVTablePointer<T>(ptr);
@@ -516,8 +516,9 @@ static inline void verifyVTable(TestNamedAndIndexedSetterWithIdentifier* ptr)
 #endif
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 
-JSC::JSValue toJSNewlyCreated(JSC::JSGlobalObject*, JSDOMGlobalObject* globalObject, Ref<TestNamedAndIndexedSetterWithIdentifier>&& impl)
+JSC::JSValue toJSNewlyCreated(JSC::JSGlobalObject* lexicalGlobalObject, JSDOMGlobalObject* globalObject, Ref<TestNamedAndIndexedSetterWithIdentifier>&& impl)
 {
+    UNUSED_PARAM(lexicalGlobalObject);
 #if ENABLE(BINDING_INTEGRITY)
     verifyVTable<TestNamedAndIndexedSetterWithIdentifier>(impl.ptr());
 #endif

@@ -51,8 +51,15 @@ public:
     std::optional<uint32_t> depthStencilTextureHeight() const { RELEASE_ASSERT_NOT_REACHED(); }
     std::optional<uint32_t> motionVectorTextureWidth() const { RELEASE_ASSERT_NOT_REACHED(); }
     std::optional<uint32_t> motionVectorTextureHeight() const { RELEASE_ASSERT_NOT_REACHED(); }
+
+private:
+    bool isXRWebGLSubImage() const final { return true; }
 };
 
 } // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::XRWebGLSubImage)
+    static bool isType(const WebCore::XRSubImage& image) { return image.isXRWebGLSubImage(); }
+SPECIALIZE_TYPE_TRAITS_END()
 
 #endif // ENABLE(WEBXR_LAYERS)

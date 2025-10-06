@@ -1810,10 +1810,7 @@ sub ShouldGenerateToJSDeclaration
     return 0 if ($interface->extendedAttributes->{SuppressToJSObject});
     return 0 if not NeedsImplementationClass($interface);
     return 0 if IsDOMGlobalObject($interface);
-    return 1 if (!$hasParent or $interface->extendedAttributes->{JSGenerateToJSObject} or $interface->extendedAttributes->{CustomToJSObject});
-    return 1 if $interface->parentType && $interface->parentType->name eq "EventTarget";
-    return 1 if @{$interface->constructors} > 0 && !HasCustomConstructor($interface);
-    return 0;
+    return 1;
 }
 
 sub ShouldGenerateToJSImplementation
@@ -4187,8 +4184,6 @@ sub GetGnuVTableOffsetForType
         || $typename eq "SVGPolyElement"
         || $typename eq "SVGPolygonElement"
         || $typename eq "SVGPolylineElement"
-        || $typename eq "SVGRectElement"
-        || $typename eq "SVGSVGElement"
         || $typename eq "SVGGeometryElement"
         || $typename eq "SVGGraphicsElement"
         || $typename eq "SVGSwitchElement"
@@ -5536,7 +5531,7 @@ extern "C" { extern void (*const ${vtableRefWin}[])(); }
 extern "C" { extern void* ${vtableNameGnu}[]; }
 #endif
 template<std::same_as<${implType}> T>
-static inline void verifyVTable(${implType}* ptr) 
+static inline void verifyVTable(${implType}* ptr)
 {
     if constexpr (std::is_polymorphic_v<T>) {
         const void* actualVTablePointer = getVTablePointer<T>(ptr);
@@ -5558,9 +5553,37 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 
 END
 
-        push(@implContent, "JSC::JSValue toJSNewlyCreated(JSC::JSGlobalObject*, JSDOMGlobalObject* globalObject, Ref<$implType>&& impl)\n");
+        push(@implContent, "JSC::JSValue toJSNewlyCreated(JSC::JSGlobalObject* lexicalGlobalObject, JSDOMGlobalObject* globalObject, Ref<$implType>&& impl)\n");
         push(@implContent, "{\n");
-        push(@implContent, <<END) if $vtableNameGnu;
+        push (@implContent, "    UNUSED_PARAM(lexicalGlobalObject);\n");
+        my $hasChildInterfaces = 0;
+        unless ($interface->extendedAttributes->{IgnoreSubclassesWhenGeneratingToJSObject}) {
+            $codeGenerator->ForEachChildInterface($interface, sub {
+                my $childInterface = shift;
+                $hasChildInterfaces = 1;
+                my $childImplType = GetImplClassName($childInterface);
+                my $conditional = $childInterface->extendedAttributes->{Conditional};
+                if ($conditional) {
+                    my $conditionalString = $codeGenerator->GenerateConditionalStringFromAttributeValue($conditional);
+                    push(@implContent, "#if ${conditionalString}\n");
+                }
+                AddToImplIncludesForIDLType($childInterface->type);
+                AddToImplIncludes("JS" . $childInterface->type->name . ".h");
+                if ($childInterface->type->name =~ m/\QElement\E$/) {
+                    if ($childInterface->type->name =~ /^\QHTML/) {
+                        AddToImplIncludes("HTMLElementTypeHelpers.h");
+                    } elsif ($childInterface->type->name =~ /^\QSVG/) {
+                        AddToImplIncludes("SVGElementTypeHelpers.h");
+                    } elsif ($childInterface->type->name =~ /^\QMathML/) {
+                        AddToImplIncludes("MathMLElementTypeHelpers.h");
+                    }
+                }
+                push(@implContent, "    if (is<${childImplType}>(impl))\n");
+                push(@implContent, "        return toJSNewlyCreated(lexicalGlobalObject, globalObject, downcast<${childImplType}>(WTFMove(impl)));\n");
+                push(@implContent, "#endif\n") if $conditional;
+            });
+        }
+        push(@implContent, <<END) if $vtableNameGnu and not $hasChildInterfaces;
 #if ENABLE(BINDING_INTEGRITY)
     verifyVTable<$implType>(impl.ptr());
 #endif

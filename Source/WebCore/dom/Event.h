@@ -114,18 +114,23 @@ public:
     virtual bool isClipboardEvent() const { return false; }
     virtual bool isCommandEvent() const { return false; }
     virtual bool isCompositionEvent() const { return false; }
+    virtual bool isDragEvent() const { return false; }
     virtual bool isErrorEvent() const { return false; }
     virtual bool isFocusEvent() const { return false; }
+    virtual bool isGestureEvent() const { return false; }
     virtual bool isInputEvent() const { return false; }
     virtual bool isKeyboardEvent() const { return false; }
     virtual bool isMouseEvent() const { return false; }
+    virtual bool isPaymentMethodChangeEvent() const { return false; }
     virtual bool isPointerEvent() const { return false; }
+    virtual bool isSpeechSynthesisErrorEvent() const { return false; }
     virtual bool isTextEvent() const { return false; }
     virtual bool isToggleEvent() const { return false; }
     virtual bool isTouchEvent() const { return false; }
     virtual bool isUIEvent() const { return false; }
     virtual bool isVersionChangeEvent() const { return false; }
     virtual bool isWheelEvent() const { return false; }
+    virtual bool isXMLHttpRequestProgressEvent() const { return false; }
 
     bool propagationStopped() const { return m_propagationStopped || m_immediatePropagationStopped; }
     bool immediatePropagationStopped() const { return m_immediatePropagationStopped; }

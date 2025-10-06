@@ -55,6 +55,15 @@ public:
     static CSSColorAngle toCSSColorAngle(const RectifiedCSSColorAngle&);
     static CSSColorNumber toCSSColorNumber(const RectifiedCSSColorNumber&);
 
+    virtual bool isCSSHSL() const { return false; }
+    virtual bool isCSSHWB() const { return false; }
+    virtual bool isCSSOKLCH() const { return false; }
+    virtual bool isCSSLCH() const { return false; }
+    virtual bool isCSSLab() const { return false; }
+    virtual bool isCSSOKLab() const { return false; }
+    virtual bool isCSSOMColor() const { return false; }
+    virtual bool isCSSRGB() const { return false; }
+
     RefPtr<CSSValue> toCSSValue() const final;
 };
 

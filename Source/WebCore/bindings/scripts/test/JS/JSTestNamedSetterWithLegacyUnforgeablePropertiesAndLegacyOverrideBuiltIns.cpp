@@ -429,7 +429,7 @@ extern "C" { extern void (*const __identifier("??_7TestNamedSetterWithLegacyUnfo
 extern "C" { extern void* _ZTVN7WebCore71TestNamedSetterWithLegacyUnforgeablePropertiesAndLegacyOverrideBuiltInsE[]; }
 #endif
 template<std::same_as<TestNamedSetterWithLegacyUnforgeablePropertiesAndLegacyOverrideBuiltIns> T>
-static inline void verifyVTable(TestNamedSetterWithLegacyUnforgeablePropertiesAndLegacyOverrideBuiltIns* ptr) 
+static inline void verifyVTable(TestNamedSetterWithLegacyUnforgeablePropertiesAndLegacyOverrideBuiltIns* ptr)
 {
     if constexpr (std::is_polymorphic_v<T>) {
         const void* actualVTablePointer = getVTablePointer<T>(ptr);
@@ -449,8 +449,9 @@ static inline void verifyVTable(TestNamedSetterWithLegacyUnforgeablePropertiesAn
 #endif
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 
-JSC::JSValue toJSNewlyCreated(JSC::JSGlobalObject*, JSDOMGlobalObject* globalObject, Ref<TestNamedSetterWithLegacyUnforgeablePropertiesAndLegacyOverrideBuiltIns>&& impl)
+JSC::JSValue toJSNewlyCreated(JSC::JSGlobalObject* lexicalGlobalObject, JSDOMGlobalObject* globalObject, Ref<TestNamedSetterWithLegacyUnforgeablePropertiesAndLegacyOverrideBuiltIns>&& impl)
 {
+    UNUSED_PARAM(lexicalGlobalObject);
 #if ENABLE(BINDING_INTEGRITY)
     verifyVTable<TestNamedSetterWithLegacyUnforgeablePropertiesAndLegacyOverrideBuiltIns>(impl.ptr());
 #endif

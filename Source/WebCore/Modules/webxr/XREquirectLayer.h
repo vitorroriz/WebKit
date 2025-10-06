@@ -50,8 +50,15 @@ public:
     [[noreturn]] void setUpperVerticalAngle(float) { RELEASE_ASSERT_NOT_REACHED(); }
     float lowerVerticalAngle() const { RELEASE_ASSERT_NOT_REACHED(); }
     [[noreturn]] void setLowerVerticalAngle(float) { RELEASE_ASSERT_NOT_REACHED(); }
+
+private:
+    bool isXREquirectLayer() const final { return true; }
 };
 
 } // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::XREquirectLayer)
+    static bool isType(const WebCore::WebXRLayer& layer) { return layer.isXREquirectLayer(); }
+SPECIALIZE_TYPE_TRAITS_END()
 
 #endif // ENABLE(WEBXR_LAYERS)

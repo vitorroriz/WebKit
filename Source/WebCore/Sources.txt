@@ -660,7 +660,6 @@ bindings/js/JSAudioBufferSourceNodeCustom.cpp
 bindings/js/JSAudioNodeCustom.cpp
 bindings/js/JSAudioWorkletGlobalScopeCustom.cpp
 bindings/js/JSAudioWorkletProcessorCustom.cpp
-bindings/js/JSAuthenticatorResponseCustom.cpp
 bindings/js/JSBaseAudioContextCustom.cpp
 bindings/js/JSBasicCredentialCustom.cpp
 bindings/js/JSBlobCustom.cpp

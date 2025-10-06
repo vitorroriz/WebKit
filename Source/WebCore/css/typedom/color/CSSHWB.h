@@ -43,6 +43,8 @@ public:
     CSSNumberish alpha() const;
     ExceptionOr<void> setAlpha(CSSNumberish&&);
 
+    bool isCSSHWB() const final { return true; }
+
 private:
     CSSHWB(Ref<CSSNumericValue>&& hue, Ref<CSSNumericValue>&& whiteness, Ref<CSSNumericValue>&& m_blackness, Ref<CSSNumericValue>&& alpha);
 
@@ -53,3 +55,7 @@ private:
 };
     
 } // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::CSSHWB)
+    static bool isType(const WebCore::CSSOMColorValue& value) { return value.isCSSHWB(); }
+SPECIALIZE_TYPE_TRAITS_END()

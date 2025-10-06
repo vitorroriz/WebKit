@@ -369,7 +369,7 @@ extern "C" { extern void (*const __identifier("??_7TestNamedSetterWithLegacyOver
 extern "C" { extern void* _ZTVN7WebCore41TestNamedSetterWithLegacyOverrideBuiltInsE[]; }
 #endif
 template<std::same_as<TestNamedSetterWithLegacyOverrideBuiltIns> T>
-static inline void verifyVTable(TestNamedSetterWithLegacyOverrideBuiltIns* ptr) 
+static inline void verifyVTable(TestNamedSetterWithLegacyOverrideBuiltIns* ptr)
 {
     if constexpr (std::is_polymorphic_v<T>) {
         const void* actualVTablePointer = getVTablePointer<T>(ptr);
@@ -389,8 +389,9 @@ static inline void verifyVTable(TestNamedSetterWithLegacyOverrideBuiltIns* ptr)
 #endif
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 
-JSC::JSValue toJSNewlyCreated(JSC::JSGlobalObject*, JSDOMGlobalObject* globalObject, Ref<TestNamedSetterWithLegacyOverrideBuiltIns>&& impl)
+JSC::JSValue toJSNewlyCreated(JSC::JSGlobalObject* lexicalGlobalObject, JSDOMGlobalObject* globalObject, Ref<TestNamedSetterWithLegacyOverrideBuiltIns>&& impl)
 {
+    UNUSED_PARAM(lexicalGlobalObject);
 #if ENABLE(BINDING_INTEGRITY)
     verifyVTable<TestNamedSetterWithLegacyOverrideBuiltIns>(impl.ptr());
 #endif

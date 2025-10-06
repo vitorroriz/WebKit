@@ -42,8 +42,15 @@ public:
     [[noreturn]] void setSpace(WebXRSpace&) { RELEASE_ASSERT_NOT_REACHED(); }
     const DOMPointReadOnly& orientation() const { RELEASE_ASSERT_NOT_REACHED(); }
     [[noreturn]] void setOrientation(DOMPointReadOnly&) { RELEASE_ASSERT_NOT_REACHED(); }
+
+private:
+    bool isXRCubeLayer() const final { return true; }
 };
 
 } // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::XRCubeLayer)
+    static bool isType(const WebCore::WebXRLayer& layer) { return layer.isXRCubeLayer(); }
+SPECIALIZE_TYPE_TRAITS_END()
 
 #endif // ENABLE(WEBXR_LAYERS)

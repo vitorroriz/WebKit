@@ -46,6 +46,8 @@ public:
 private:
     CSSOKLab(RectifiedCSSColorPercent&&, RectifiedCSSColorNumber&&, RectifiedCSSColorNumber&&, RectifiedCSSColorPercent&& alpha);
 
+    bool isCSSOKLab() const final { return true; }
+
     RectifiedCSSColorPercent m_lightness;
     RectifiedCSSColorNumber m_a;
     RectifiedCSSColorNumber m_b;
@@ -53,3 +55,7 @@ private:
 };
     
 } // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::CSSOKLab)
+    static bool isType(const WebCore::CSSOMColorValue& value) { return value.isCSSOKLab(); }
+SPECIALIZE_TYPE_TRAITS_END()

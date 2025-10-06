@@ -46,6 +46,8 @@ public:
 private:
     CSSHSL(RectifiedCSSColorAngle&&, RectifiedCSSColorPercent&&, RectifiedCSSColorPercent&&, RectifiedCSSColorPercent&&);
 
+    bool isCSSHSL() const final { return true; }
+
     RectifiedCSSColorAngle m_hue;
     RectifiedCSSColorPercent m_saturation;
     RectifiedCSSColorPercent m_lightness;
@@ -53,3 +55,7 @@ private:
 };
     
 } // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::CSSHSL)
+    static bool isType(const WebCore::CSSOMColorValue& value) { return value.isCSSHSL(); }
+SPECIALIZE_TYPE_TRAITS_END()
