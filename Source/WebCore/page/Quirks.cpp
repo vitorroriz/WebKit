@@ -939,9 +939,12 @@ static Vector<Ref<Element>> copyElements(const NodeList& nodeList)
     return elements;
 }
 
-Ref<NodeList> Quirks::applyFacebookFlagQuirk(Document& document, const NodeList& nodeList)
+Ref<NodeList> Quirks::applyFacebookFlagQuirk(Document& document, NodeList& nodeList)
 {
     m_quirksData.shouldEnableFacebookFlagQuirk = false;
+
+    if (!document.settings().facebookLiveRecordingQuirkEnabled())
+        return nodeList;
 
     auto elements = copyElements(nodeList);
     // Live Streaming flag activation
@@ -983,7 +986,7 @@ bool Quirks::shouldEnableEnumerateDeviceQuirk() const
 #if ENABLE(WEB_RTC)
 bool Quirks::shouldEnableRTCEncodedStreamsQuirk() const
 {
-    return needsQuirks() && m_quirksData.shouldEnableRTCEncodedStreamsQuirk;
+    return needsQuirks() && m_quirksData.shouldEnableRTCEncodedStreamsQuirk && protectedDocument() && protectedDocument()->settings().rtcEncodedStreamsQuirkEnabled();
 }
 #endif
 

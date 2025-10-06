@@ -2868,6 +2868,20 @@ FTPEnabled:
     WebKitLegacy:
       default: false
 
+FacebookLiveRecordingQuirkEnabled:
+  type: bool
+  status: internal
+  humanReadableName: "Facebook Live Recording Quirk"
+  humanReadableDescription: "Enable Facebook Live Recording Quirk"
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      PLATFORM(MAC): true
+      default: false
+    WebCore:
+      default: false
+
 FantasyFontFamily:
   type: String
   status: embedder
@@ -6215,6 +6229,20 @@ PushAPIEnabled:
   disableInLockdownMode: true
   sharedPreferenceForWebProcess: true
   richJavaScript: true
+
+RTCEncodedStreamsQuirkEnabled:
+  type: bool
+  status: internal
+  humanReadableName: "RTC Encoded Streams Quirk"
+  humanReadableDescription: "Enable RTC Encoded Streams Quirk"
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      PLATFORM(MAC): true
+      default: false
+    WebCore:
+      default: false
 
 ReadableByteStreamAPIEnabled:
   type: bool
