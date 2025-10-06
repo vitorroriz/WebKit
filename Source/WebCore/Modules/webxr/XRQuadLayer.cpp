@@ -1,6 +1,5 @@
-
 /*
- * Copyright (C) 2024 Apple, Inc. All rights reserved.
+ * Copyright (C) 2025 Apple, Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,39 +23,15 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "config.h"
 
 #if ENABLE(WEBXR_LAYERS)
-
-#include "XRCompositionLayer.h"
+#include "XRQuadLayer.h"
 
 namespace WebCore {
 
-class DOMPointReadOnly;
-class WebXRSpace;
+XRQuadLayer::~XRQuadLayer() = default;
 
-// https://immersive-web.github.io/layers/#xcubelayertype
-class XRCubeLayer : public XRCompositionLayer {
-public:
-    virtual ~XRCubeLayer();
+}
 
-    const WebXRSpace& space() const { RELEASE_ASSERT_NOT_REACHED(); }
-    [[noreturn]] void setSpace(WebXRSpace&) { RELEASE_ASSERT_NOT_REACHED(); }
-    const DOMPointReadOnly& orientation() const { RELEASE_ASSERT_NOT_REACHED(); }
-    [[noreturn]] void setOrientation(DOMPointReadOnly&) { RELEASE_ASSERT_NOT_REACHED(); }
-
-private:
-    bool isXRCubeLayer() const final { return true; }
-
-    // WebXRLayer.
-    [[noreturn]] void startFrame(PlatformXR::FrameData&) final { RELEASE_ASSERT_NOT_REACHED(); }
-    [[noreturn]] PlatformXR::Device::Layer endFrame() final { RELEASE_ASSERT_NOT_REACHED(); }
-};
-
-} // namespace WebCore
-
-SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::XRCubeLayer)
-    static bool isType(const WebCore::WebXRLayer& layer) { return layer.isXRCubeLayer(); }
-SPECIALIZE_TYPE_TRAITS_END()
-
-#endif // ENABLE(WEBXR_LAYERS)
+#endif

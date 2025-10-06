@@ -557,10 +557,14 @@ Modules/webxr/WebXRWebGLLayer.cpp
 Modules/webxr/XRCompositionLayer.cpp
 Modules/webxr/XRGPUBinding.cpp
 Modules/webxr/XRGPUSubImage.cpp
+Modules/webxr/XRCubeLayer.cpp
+Modules/webxr/XRCylinderLayer.cpp
+Modules/webxr/XREquirectLayer.cpp
 Modules/webxr/XRInputSourceEvent.cpp
 Modules/webxr/XRInputSourcesChangeEvent.cpp
 Modules/webxr/XRLayerEvent.cpp
 Modules/webxr/XRProjectionLayer.cpp
+Modules/webxr/XRQuadLayer.cpp
 Modules/webxr/XRReferenceSpaceEvent.cpp
 Modules/webxr/XRSessionEvent.cpp
 Modules/webxr/XRSubImage.cpp

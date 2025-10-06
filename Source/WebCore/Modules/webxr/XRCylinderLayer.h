@@ -36,6 +36,8 @@ namespace WebCore {
 // https://immersive-web.github.io/layers/#xrcylinderayertype
 class XRCylinderLayer : public XRCompositionLayer {
 public:
+    virtual ~XRCylinderLayer();
+
     const WebXRSpace& space() const { RELEASE_ASSERT_NOT_REACHED(); }
     [[noreturn]] void setSpace(WebXRSpace&) { RELEASE_ASSERT_NOT_REACHED(); }
     const WebXRRigidTransform& transform() const { RELEASE_ASSERT_NOT_REACHED(); }
@@ -50,6 +52,10 @@ public:
 
 private:
     bool isXRCylinderLayer() const final { return true; }
+
+    // WebXRLayer.
+    [[noreturn]] void startFrame(PlatformXR::FrameData&) final { RELEASE_ASSERT_NOT_REACHED(); }
+    [[noreturn]] PlatformXR::Device::Layer endFrame() final { RELEASE_ASSERT_NOT_REACHED(); }
 };
 
 } // namespace WebCore

@@ -30,8 +30,7 @@
     ExportMacro=WEBCORE_EXPORT,
     Exposed=Window,
     JSGenerateToJSObject,
-    JSGenerateToNativeObject,
-    IgnoreSubclassesWhenGeneratingToJSObject
+    JSGenerateToNativeObject
 ] interface XRCompositionLayer : WebXRLayer {
     readonly attribute XRLayerLayout layout;
 
