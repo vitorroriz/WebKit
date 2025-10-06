@@ -358,6 +358,11 @@ IntRect ColorInputType::elementRectRelativeToRootView() const
     return element->protectedDocument()->protectedView()->contentsToRootView(renderer->absoluteBoundingBoxRect());
 }
 
+std::optional<FrameIdentifier> ColorInputType::rootFrameID() const
+{
+    return element()->protectedDocument()->protectedView()->rootFrameID();
+}
+
 bool ColorInputType::supportsAlpha() const
 {
     ASSERT(element());
