@@ -673,7 +673,7 @@ protected:
     BleedAvoidance determineBleedAvoidance(GraphicsContext&) const;
     bool backgroundHasOpaqueTopLayer() const;
 
-    void computePositionedLogicalWidth(LogicalExtentComputedValues&) const;
+    void computeOutOfFlowPositionedLogicalWidth(LogicalExtentComputedValues&) const;
 
     std::optional<LayoutUnit> computeIntrinsicLogicalContentHeightUsing(const Style::PreferredSize& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;
     std::optional<LayoutUnit> computeIntrinsicLogicalContentHeightUsing(const Style::MinimumSize& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;
@@ -732,16 +732,16 @@ private:
     // Returns true if we did a full repaint.
     template<typename Layers> bool repaintLayerRectsForImage(WrappedImagePtr, const Layers&, bool drawingBackground);
 
-    void computePositionedLogicalHeight(LogicalExtentComputedValues&) const;
+    void computeOutOfFlowPositionedLogicalHeight(LogicalExtentComputedValues&) const;
 
-    template<typename SizeType> LayoutUnit computePositionedLogicalWidthUsing(const SizeType&, const PositionedLayoutConstraints&) const;
+    template<typename SizeType> LayoutUnit computeOutOfFlowPositionedLogicalWidthUsing(const SizeType&, const PositionedLayoutConstraints&) const;
 
-    LayoutUnit computePositionedLogicalHeightUsing(const Style::PreferredSize& logicalHeight, LayoutUnit computedHeight, const PositionedLayoutConstraints& blockConstraints) const;
-    LayoutUnit computePositionedLogicalHeightUsing(const Style::MinimumSize& logicalHeight, LayoutUnit computedHeight, const PositionedLayoutConstraints& blockConstraints) const;
-    LayoutUnit computePositionedLogicalHeightUsing(const Style::MaximumSize& logicalHeight, LayoutUnit computedHeight, const PositionedLayoutConstraints& blockConstraints) const;
+    LayoutUnit computeOutOfFlowPositionedLogicalHeightUsing(const Style::PreferredSize& logicalHeight, LayoutUnit computedHeight, const PositionedLayoutConstraints& blockConstraints) const;
+    LayoutUnit computeOutOfFlowPositionedLogicalHeightUsing(const Style::MinimumSize& logicalHeight, LayoutUnit computedHeight, const PositionedLayoutConstraints& blockConstraints) const;
+    LayoutUnit computeOutOfFlowPositionedLogicalHeightUsing(const Style::MaximumSize& logicalHeight, LayoutUnit computedHeight, const PositionedLayoutConstraints& blockConstraints) const;
 
-    void computePositionedLogicalHeightReplaced(LogicalExtentComputedValues&) const;
-    void computePositionedLogicalWidthReplaced(LogicalExtentComputedValues&) const;
+    void computeReplacedOutOfFlowPositionedLogicalHeight(LogicalExtentComputedValues&) const;
+    void computeReplacedOutOfFlowPositionedLogicalWidth(LogicalExtentComputedValues&) const;
 
     LayoutUnit fillAvailableMeasure(LayoutUnit availableLogicalWidth) const;
     LayoutUnit fillAvailableMeasure(LayoutUnit availableLogicalWidth, LayoutUnit& marginStart, LayoutUnit& marginEnd) const;

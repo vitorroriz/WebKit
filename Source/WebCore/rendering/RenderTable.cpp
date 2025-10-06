@@ -288,7 +288,7 @@ void RenderTable::updateLogicalWidth()
 
     if (isOutOfFlowPositioned()) {
         LogicalExtentComputedValues computedValues;
-        computePositionedLogicalWidth(computedValues);
+        computeOutOfFlowPositionedLogicalWidth(computedValues);
         setLogicalWidth(computedValues.m_extent);
         setLogicalLeft(computedValues.m_position);
         setMarginStart(computedValues.m_margins.m_start);
