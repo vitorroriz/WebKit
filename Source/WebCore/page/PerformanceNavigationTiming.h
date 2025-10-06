@@ -85,6 +85,4 @@ private:
 
 } // namespace WebCore
 
-SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::PerformanceNavigationTiming)
-    static bool isType(const WebCore::PerformanceEntry& entry) { return entry.performanceEntryType() == WebCore::PerformanceEntry::Type::Navigation; }
-SPECIALIZE_TYPE_TRAITS_END()
+SPECIALIZE_TYPE_TRAITS_PERFORMANCE_ENTRY(PerformanceNavigationTiming, Navigation);

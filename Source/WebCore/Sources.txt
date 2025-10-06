@@ -661,7 +661,6 @@ bindings/js/JSAudioBufferCustom.cpp
 bindings/js/JSAudioBufferSourceNodeCustom.cpp
 bindings/js/JSAudioWorkletGlobalScopeCustom.cpp
 bindings/js/JSAudioWorkletProcessorCustom.cpp
-bindings/js/JSBlobCustom.cpp
 bindings/js/JSCSSRuleCustom.cpp
 bindings/js/JSCSSRuleListCustom.cpp
 bindings/js/JSCSSStyleDeclarationCustom.cpp
@@ -745,7 +744,6 @@ bindings/js/JSPaintRenderingContext2DCustom.cpp
 bindings/js/JSPaintWorkletGlobalScopeCustom.cpp
 bindings/js/JSPaymentMethodChangeEventCustom.cpp
 bindings/js/JSPaymentResponseCustom.cpp
-bindings/js/JSPerformanceEntryCustom.cpp
 bindings/js/JSPerformanceObserverCustom.cpp
 bindings/js/JSPluginElementFunctions.cpp
 bindings/js/JSPopStateEventCustom.cpp
