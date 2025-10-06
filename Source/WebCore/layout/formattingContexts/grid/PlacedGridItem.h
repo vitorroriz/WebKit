@@ -65,6 +65,8 @@ public:
     const StyleSelfAlignmentData& inlineAxisAlignment() const { return m_inlineAxisAlignment; }
     const StyleSelfAlignmentData& blockAxisAlignment() const { return m_blockAxisAlignment; }
 
+    const GridAreaLines& gridAreaLines() const { return m_gridAreaLines; }
+
 private:
     const CheckedRef<const ElementBox> m_layoutBox;
 

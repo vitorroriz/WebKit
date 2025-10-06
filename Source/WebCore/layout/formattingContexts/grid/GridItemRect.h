@@ -25,27 +25,18 @@
 
 #pragma once
 
-namespace WebCore {
+#include "GridAreaLines.h"
 
-class LayoutUnit;
+namespace WebCore {
 
 namespace Layout {
 
-class PlacedGridItem;
-class UnplacedGridItem;
+struct GridItemRect {
+    LayoutRect borderBoxRect;
+    RectEdges<LayoutUnit> margins;
+    const GridAreaLines lineNumbersForGridArea;
+    const CheckedRef<const ElementBox> layoutBox;
+};
 
-struct GridAreaLines;
-struct GridItemRect;
-struct TrackSizingFunctions;
-struct UnsizedTrack;
-
-using GridAreas = HashMap<UnplacedGridItem, GridAreaLines>;
-using GridCell = Vector<UnplacedGridItem, 1>;
-using GridItemRects = Vector<GridItemRect>;
-using GridMatrix = Vector<Vector<GridCell>>;
-using PlacedGridItems = Vector<PlacedGridItem>;
-using TrackSizes = Vector<LayoutUnit>;
-using TrackSizingFunctionsList = Vector<TrackSizingFunctions>;
-using UnsizedTracks = Vector<UnsizedTrack>;
 } // namespace Layout
-} // namespace WebCore
+} // namespace  WebCore
