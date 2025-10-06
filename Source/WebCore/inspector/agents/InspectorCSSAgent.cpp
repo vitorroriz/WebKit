@@ -1276,7 +1276,7 @@ InspectorStyleSheet* InspectorCSSAgent::bindStyleSheet(CSSStyleSheet* styleSheet
             inspectorStyleSheetsForDocument.append(inspectorStyleSheet);
         }
     }
-    return inspectorStyleSheet.get();
+    return inspectorStyleSheet.unsafeGet();
 }
 
 InspectorStyleSheet* InspectorCSSAgent::assertStyleSheetForId(Inspector::Protocol::ErrorString& errorString, const String& styleSheetId)

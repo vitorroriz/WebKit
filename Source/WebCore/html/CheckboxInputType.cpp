@@ -153,7 +153,7 @@ static Touch* findTouchWithIdentifier(TouchList& list, unsigned identifier)
     for (unsigned i = 0; i < length; ++i) {
         RefPtr touch = list.item(i);
         if (touch->identifier() == identifier)
-            return touch.get();
+            return touch.unsafeGet();
     }
     return nullptr;
 }

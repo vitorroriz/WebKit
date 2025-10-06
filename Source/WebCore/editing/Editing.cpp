@@ -203,7 +203,7 @@ Element* unsplittableElementForPosition(const Position& position)
     // Since enclosingNodeOfType won't search beyond the highest root editable node,
     // this code works even if the closest table cell was outside of the root editable node.
     if (auto enclosingCell = downcast<Element>(enclosingNodeOfType(position, &isTableCell)))
-        return enclosingCell.get();
+        return enclosingCell.unsafeGet();
     return editableRootForPosition(position);
 }
 

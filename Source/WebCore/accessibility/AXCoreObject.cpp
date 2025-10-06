@@ -346,13 +346,13 @@ AXCoreObject* AXCoreObject::firstUnignoredChild()
     const auto& children = childrenIncludingIgnored(/* updateChildrenIfNeeded */ true);
     RefPtr descendant = children.size() ? children[0].ptr() : nullptr;
     if (onlyAddsUnignoredChildren())
-        return descendant.get();
+        return descendant.unsafeGet();
 
     bool isExposedTable = isExposableTable();
     while (descendant && descendant != this) {
         bool childIsValid = !isExposedTable || isValidChildForTable(*descendant);
         if (childIsValid && !descendant->isIgnored())
-            return descendant.get();
+            return descendant.unsafeGet();
         descendant = descendant->nextInPreOrder(/* updateChildrenIfNeeded */ true, /* stayWithin */ this);
     }
     return nullptr;
@@ -390,7 +390,7 @@ AXCoreObject* AXCoreObject::crossFrameParentObjectUnignored() const
     }
 #endif
 
-    return result.get();
+    return result.unsafeGet();
 }
 
 AXCoreObject::AccessibilityChildrenVector AXCoreObject::crossFrameChildrenIncludingIgnored(bool updateChildrenIfNeeded)
@@ -431,7 +431,7 @@ AXCoreObject* AXCoreObject::parentObjectIncludingCrossFrame() const
     }
 #endif
 
-    return result.get();
+    return result.unsafeGet();
 }
 
 
@@ -480,7 +480,7 @@ AXCoreObject* AXCoreObject::nextInPreOrder(bool updateChildrenIfNeeded , AXCoreO
         if (!current || stayWithin == current)
             return nullptr;
     }
-    return next.get();
+    return next.unsafeGet();
 }
 
 AXCoreObject* AXCoreObject::previousInPreOrder(bool updateChildrenIfNeeded, AXCoreObject* stayWithin)
@@ -492,7 +492,7 @@ AXCoreObject* AXCoreObject::previousInPreOrder(bool updateChildrenIfNeeded, AXCo
         const auto& children = sibling->childrenIncludingIgnored(updateChildrenIfNeeded);
         if (children.size())
             return sibling->deepestLastChildIncludingIgnored(updateChildrenIfNeeded);
-        return sibling.get();
+        return sibling.unsafeGet();
     }
     return parentObject();
 }
@@ -583,8 +583,8 @@ AXCoreObject* AXCoreObject::nextSiblingIncludingIgnoredOrParent() const
 {
     RefPtr parent = parentObject();
     if (RefPtr nextSibling = nextSiblingIncludingIgnored(/* updateChildrenIfNeeded */ true))
-        return nextSibling.get();
-    return parent.get();
+        return nextSibling.unsafeGet();
+    return parent.unsafeGet();
 }
 
 String AXCoreObject::autoCompleteValue() const
@@ -1795,7 +1795,7 @@ AXCoreObject* AXCoreObject::parentObjectUnignored() const
 {
     if (role() == AccessibilityRole::Row) {
         if (RefPtr table = exposedTableAncestor())
-            return table.get();
+            return table.unsafeGet();
     }
 
     return Accessibility::findAncestor<AXCoreObject>(*this, false, [&] (const AXCoreObject& object) {

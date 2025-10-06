@@ -200,7 +200,7 @@ static inline bool querySelectorMatchesOneElement(const Element& element, const 
 {
     Ref container = [&]() -> ContainerNode& {
         if (RefPtr shadowRoot = element.containingShadowRoot())
-            return *shadowRoot;
+            return *shadowRoot.unsafeGet();
         return element.document();
     }();
 
@@ -771,7 +771,7 @@ static const HTMLElement* findOnlyMainElement(const HTMLBodyElement& bodyElement
 
         onlyMainElement = descendant;
     }
-    return onlyMainElement.get();
+    return onlyMainElement.unsafeGet();
 }
 
 static bool isNavigationalElement(const Element& element)
@@ -1052,7 +1052,7 @@ static Element* searchForElementContainingText(ContainerNode& container, const S
     auto documentElements = collectDocumentElementsFromChildFrames(container);
     for (auto& documentElement : documentElements) {
         if (RefPtr target = searchForElementContainingText(documentElement, searchText))
-            return target.get();
+            return target.unsafeGet();
     }
 
     return nullptr;
@@ -1411,7 +1411,7 @@ static inline Element& elementToAdjust(Element& element)
 {
     if (RefPtr pseudoElement = dynamicDowncast<PseudoElement>(element)) {
         if (RefPtr host = pseudoElement->hostElement())
-            return *host;
+            return *host.unsafeGet();
     }
     return element;
 }

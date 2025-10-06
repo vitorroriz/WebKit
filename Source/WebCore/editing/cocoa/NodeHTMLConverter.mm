@@ -795,7 +795,7 @@ Element* HTMLConverter::_blockLevelElementForNode(Node* node)
         element = node->parentElement();
     if (element && !_caches->isBlockElement(*element))
         element = _blockLevelElementForNode(element->parentInComposedTree());
-    return element.get();
+    return element.unsafeGet();
 }
 
 static Color normalizedColor(Color color, bool ignoreDefaultColor, Element& element)

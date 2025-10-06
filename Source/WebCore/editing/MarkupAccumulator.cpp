@@ -389,7 +389,7 @@ const ShadowRoot* MarkupAccumulator::suitableShadowRoot(const Node& node)
     RefPtr shadowRoot = dynamicDowncast<ShadowRoot>(node);
     if (!shadowRoot || !includeShadowRoot(*shadowRoot))
         return nullptr;
-    return shadowRoot.get();
+    return shadowRoot.unsafeGet();
 }
 
 void MarkupAccumulator::startAppendingNode(const Node& node, Namespaces* namespaces)

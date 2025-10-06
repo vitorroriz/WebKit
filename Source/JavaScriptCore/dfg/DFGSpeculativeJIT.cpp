@@ -121,7 +121,7 @@ SpeculativeJIT::SpeculativeJIT(Graph& dfg)
     , m_compileOkay(true)
     , m_state(m_graph)
     , m_interpreter(m_graph, m_state)
-    , m_minifiedGraph(&jitCode()->minifiedDFG)
+    , m_minifiedGraph(&jitCode().unsafeGet()->minifiedDFG)
 {
 }
 
@@ -2383,7 +2383,8 @@ void SpeculativeJIT::linkOSREntries(LinkBuffer& linkBuffer)
         WTF::dataFile().atomically([&](auto& out) {
             DumpContext dumpContext;
             dataLogLn("OSR Entries:");
-            for (OSREntryData& entryData : jitCode()->m_osrEntry)
+            RefPtr jitCode = this->jitCode();
+            for (OSREntryData& entryData : jitCode->m_osrEntry)
                 dataLogLn("    ", inContext(entryData, &dumpContext));
             if (!dumpContext.isEmpty())
                 dumpContext.dump(out);

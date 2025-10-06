@@ -476,7 +476,7 @@ Node* InspectorDOMAgent::assertNode(Inspector::Protocol::ErrorString& errorStrin
         errorString = "Missing node for given nodeId"_s;
         return nullptr;
     }
-    return node.get();
+    return node.unsafeGet();
 }
 
 Document* InspectorDOMAgent::assertDocument(Inspector::Protocol::ErrorString& errorString, Inspector::Protocol::DOM::NodeId nodeId)
@@ -487,7 +487,7 @@ Document* InspectorDOMAgent::assertDocument(Inspector::Protocol::ErrorString& er
     RefPtr document = dynamicDowncast<Document>(*node);
     if (!document)
         errorString = "Node for given nodeId is not a document"_s;
-    return document.get();
+    return document.unsafeGet();
 }
 
 Element* InspectorDOMAgent::assertElement(Inspector::Protocol::ErrorString& errorString, Inspector::Protocol::DOM::NodeId nodeId)
@@ -498,7 +498,7 @@ Element* InspectorDOMAgent::assertElement(Inspector::Protocol::ErrorString& erro
     RefPtr element = dynamicDowncast<Element>(*node);
     if (!element)
         errorString = "Node for given nodeId is not an element"_s;
-    return element.get();
+    return element.unsafeGet();
 }
 
 Node* InspectorDOMAgent::assertEditableNode(Inspector::Protocol::ErrorString& errorString, Inspector::Protocol::DOM::NodeId nodeId)
@@ -514,7 +514,7 @@ Node* InspectorDOMAgent::assertEditableNode(Inspector::Protocol::ErrorString& er
         errorString = "Node for given nodeId is a pseudo-element"_s;
         return nullptr;
     }
-    return node.get();
+    return node.unsafeGet();
 }
 
 Element* InspectorDOMAgent::assertEditableElement(Inspector::Protocol::ErrorString& errorString, Inspector::Protocol::DOM::NodeId nodeId)
@@ -525,7 +525,7 @@ Element* InspectorDOMAgent::assertEditableElement(Inspector::Protocol::ErrorStri
     RefPtr element = dynamicDowncast<Element>(node);
     if (!element)
         errorString = "Node for given nodeId is not an element"_s;
-    return element.get();
+    return element.unsafeGet();
 }
 
 Inspector::Protocol::ErrorStringOr<Ref<Inspector::Protocol::DOM::Node>> InspectorDOMAgent::getDocument()

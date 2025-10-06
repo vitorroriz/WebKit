@@ -1679,7 +1679,7 @@ void Internals::setCanShowPlaceholder(Element& element, bool canShowPlaceholder)
 Element* Internals::insertTextPlaceholder(int width, int height)
 {
     RefPtr localFrame = frame();
-    return localFrame ? localFrame->editor().insertTextPlaceholder(IntSize { width, height }).get() : nullptr;
+    return localFrame ? localFrame->editor().insertTextPlaceholder(IntSize { width, height }).unsafeGet() : nullptr;
 }
 
 void Internals::removeTextPlaceholder(Element& element)

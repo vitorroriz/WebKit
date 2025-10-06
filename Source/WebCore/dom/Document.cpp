@@ -2415,7 +2415,7 @@ Element* Document::scrollingElement()
         // 1. If the HTML body element exists, and it is not potentially scrollable, return the
         // HTML body element and abort these steps.
         if (RefPtr firstBody = body(); firstBody && !isBodyPotentiallyScrollable(*firstBody))
-            return firstBody.get();
+            return firstBody.unsafeGet();
 
         // 2. Return null and abort these steps.
         return nullptr;
@@ -8977,7 +8977,7 @@ MediaCanStartListener* Document::takeAnyMediaCanStartListener()
     RefPtr listener = m_mediaCanStartListeners.begin().get();
     m_mediaCanStartListeners.remove(*listener);
 
-    return listener.get();
+    return listener.unsafeGet();
 }
 
 void Document::addDisplayChangedObserver(const DisplayChangedObserver& observer)
@@ -10878,7 +10878,7 @@ HTMLDialogElement* Document::activeModalDialog() const
 {
     for (auto& element : makeReversedRange(m_topLayerElements)) {
         if (RefPtr dialog = dynamicDowncast<HTMLDialogElement>(element.get()); dialog && dialog->isModal())
-            return dialog.get();
+            return dialog.unsafeGet();
     }
 
     return nullptr;

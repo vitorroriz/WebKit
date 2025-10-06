@@ -3522,7 +3522,7 @@ RefPtr<ShadowRoot> Element::protectedUserAgentShadowRoot() const
 ShadowRoot& Element::ensureUserAgentShadowRoot()
 {
     if (RefPtr shadow = userAgentShadowRoot())
-        return *shadow;
+        return *shadow.unsafeGet();
     return createUserAgentShadowRoot();
 }
 
@@ -6406,7 +6406,7 @@ HTMLElement* Element::topmostPopoverAncestor(TopLayerElementType topLayerType)
     if (topLayerType == TopLayerElementType::Popover)
         checkAncestor(popoverData()->invoker());
 
-    return topmostAncestor.get();
+    return topmostAncestor.unsafeGet();
 }
 
 double Element::lookupCSSRandomBaseValue(const std::optional<Style::PseudoElementIdentifier>& pseudoElementIdentifier, const CSSCalc::RandomCachingKey& key) const

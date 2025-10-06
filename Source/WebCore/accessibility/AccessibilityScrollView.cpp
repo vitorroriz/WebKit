@@ -446,7 +446,7 @@ Document* AccessibilityScrollView::document() const
 LocalFrameView* AccessibilityScrollView::documentFrameView() const
 {
     if (RefPtr localFrameView = dynamicDowncast<LocalFrameView>(m_scrollView.get()))
-        return localFrameView.get();
+        return localFrameView.unsafeGet();
 
     if (m_frameOwnerElement && m_frameOwnerElement->contentDocument())
         return m_frameOwnerElement->contentDocument()->view();
@@ -480,7 +480,7 @@ AccessibilityObject* AccessibilityScrollView::parentObject() const
             break;
         ancestorElement = ancestorElement->parentElementInComposedTree();
     }
-    return ancestorAccessibilityObject.get();
+    return ancestorAccessibilityObject.unsafeGet();
 }
 
 #if ENABLE_ACCESSIBILITY_LOCAL_FRAME

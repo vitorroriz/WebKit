@@ -747,7 +747,7 @@ const UserContentProvider* LocalFrame::userContentProvider() const
     RefPtr document = this->document();
     RefPtr documentLoader = document ? document->loader() : nullptr;
     if (RefPtr userContentProvider = documentLoader ? documentLoader->preferences().userContentProvider : nullptr)
-        return userContentProvider.get();
+        return userContentProvider.unsafeGet();
     if (RefPtr page = this->page())
         return page->protectedUserContentProviderForFrame().ptr();
     return nullptr;
@@ -758,7 +758,7 @@ UserContentProvider* LocalFrame::userContentProvider()
     RefPtr document = this->document();
     RefPtr documentLoader = document ? document->loader() : nullptr;
     if (RefPtr userContentProvider = documentLoader ? documentLoader->preferences().userContentProvider : nullptr)
-        return userContentProvider.get();
+        return userContentProvider.unsafeGet();
     if (RefPtr page = this->page())
         return page->protectedUserContentProviderForFrame().ptr();
     return nullptr;

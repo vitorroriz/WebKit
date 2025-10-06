@@ -6105,6 +6105,24 @@ class WebKitStyleTest(CppStyleTestBase):
             "  [runtime/wtf_move] [4]",
             'foo.mm')
 
+    def test_unsafe_get(self):
+        self.assert_lint(
+            'auto ptr = obj.get();',
+            '',
+            'foo.cpp')
+
+        self.assert_lint(
+            'auto ptr = obj.unsafeGet();',
+            "Avoid using 'unsafeGet()' by extending the lifetime of the RefPtr."
+            "  [runtime/unsafe_get] [5]",
+            'foo.cpp')
+
+        self.assert_lint(
+            'auto ptr = obj.unsafeGet();',
+            "Avoid using 'unsafeGet()' by extending the lifetime of the RefPtr."
+            "  [runtime/unsafe_get] [5]",
+            'foo.mm')
+
     def test_wtf_never_destroyed(self):
         self.assert_lint(
              'static NeverDestroyed<Foo> foo;',
