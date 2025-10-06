@@ -329,7 +329,7 @@ ArrayBuffer* JSArrayBufferView::slowDownAndWasteMemory()
     }
     heap->addReference(this, buffer.get());
 
-    return buffer.unsafeGet();
+    return buffer.get();
 }
 
 // Allocates the full-on native buffer and moves data into the C heap if

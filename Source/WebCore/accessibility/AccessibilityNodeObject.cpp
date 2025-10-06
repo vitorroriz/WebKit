@@ -182,7 +182,7 @@ AccessibilityObject* AccessibilityNodeObject::firstChild() const
         currentChild = currentChild->nextSibling();
         axCurrentChild = cache->getOrCreate(currentChild.get());
     }
-    return axCurrentChild.unsafeGet();
+    return axCurrentChild.get();
 }
 
 AccessibilityObject* AccessibilityNodeObject::lastChild() const
@@ -247,7 +247,7 @@ AccessibilityObject* AccessibilityNodeObject::parentObject() const
     }
 
     if (RefPtr ownerParent = ownerParentObject()) [[unlikely]]
-        return ownerParent.unsafeGet();
+        return ownerParent.get();
 
 #if USE(ATSPI)
     // FIXME: Consider removing this ATSPI-only branch with https://bugs.webkit.org/show_bug.cgi?id=282117.
@@ -1428,7 +1428,7 @@ Element* AccessibilityNodeObject::anchorElement() const
         return nullptr;
 
     if (RefPtr areaElement = dynamicDowncast<HTMLAreaElement>(*node))
-        return areaElement.unsafeGet();
+        return areaElement.get();
 
     AXObjectCache* cache = axObjectCache();
     if (!cache)
@@ -1438,7 +1438,7 @@ Element* AccessibilityNodeObject::anchorElement() const
     // NOTE: this assumes that any non-image with an anchor is an HTMLAnchorElement
     for ( ; node; node = node->parentNode()) {
         if (is<HTMLAnchorElement>(*node) || (node->renderer() && cache->getOrCreate(*node)->isLink()))
-            return downcast<Element>(node).unsafeGet();
+            return downcast<Element>(node).get();
     }
 
     return nullptr;
@@ -1538,10 +1538,10 @@ static Element* nativeActionElement(Node* start)
 
     for (RefPtr child = start->firstChild(); child; child = child->nextSibling()) {
         if (RefPtr element = nodeActionElement(*child))
-            return element.unsafeGet();
+            return element.get();
 
         if (RefPtr subChild = nativeActionElement(child.get()))
-            return subChild.unsafeGet();
+            return subChild.get();
     }
     return nullptr;
 }
@@ -1553,10 +1553,10 @@ Element* AccessibilityNodeObject::actionElement() const
         return nullptr;
 
     if (RefPtr element = nodeActionElement(*node))
-        return element.unsafeGet();
+        return element.get();
 
     if (AccessibilityObject::isARIAInput(ariaRoleAttribute()))
-        return downcast<Element>(node).unsafeGet();
+        return downcast<Element>(node).get();
 
     switch (role()) {
     case AccessibilityRole::Button:
@@ -1569,14 +1569,14 @@ Element* AccessibilityNodeObject::actionElement() const
     case AccessibilityRole::ListItem:
         // Check if the author is hiding the real control element inside the ARIA element.
         if (RefPtr nativeElement = nativeActionElement(node.get()))
-            return nativeElement.unsafeGet();
-        return downcast<Element>(node).unsafeGet();
+            return nativeElement.get();
+        return downcast<Element>(node).get();
     default:
         break;
     }
 
     if (RefPtr element = anchorElement())
-        return element.unsafeGet();
+        return element.get();
 
     if (RefPtr clickableObject = this->clickableSelfOrAncestor())
         return clickableObject->element();
@@ -2624,7 +2624,7 @@ AccessibilityObject* AccessibilityNodeObject::parentTable() const
                 // we don't want to choose another ancestor table as this cell's table.
                 if (ancestor->isTable()) {
                     if (ancestor->isExposableTable())
-                        return ancestor.unsafeGet();
+                        return ancestor.get();
                     if (ancestor->node())
                         break;
                 }
@@ -2632,7 +2632,7 @@ AccessibilityObject* AccessibilityNodeObject::parentTable() const
             return nullptr;
         }
 
-        return tableFromRenderTree.unsafeGet();
+        return tableFromRenderTree.get();
     }
 
     if (isTableRow()) {
@@ -2642,7 +2642,7 @@ AccessibilityObject* AccessibilityNodeObject::parentTable() const
             if (ancestor->isTable()) {
                 bool isNonGridRowOrValidAriaTable = !isARIAGridRow() || ancestor->isAriaTable() || elementName() == ElementName::HTML_tr;
                 if (ancestor->isExposableTable() && isNonGridRowOrValidAriaTable)
-                    return ancestor.unsafeGet();
+                    return ancestor.get();
 
                 // If this is a non-anonymous table object, but not an accessibility table, we should stop because we don't want to
                 // choose another ancestor table as this row's table.
@@ -2805,7 +2805,7 @@ AXCoreObject* AccessibilityNodeObject::parentTableIfExposedTableRow() const
         return nullptr;
 
     RefPtr table = parentTable();
-    return table && table->isExposableTable() ? table.unsafeGet() : nullptr;
+    return table && table->isExposableTable() ? table.get() : nullptr;
 }
 
 bool AccessibilityNodeObject::isTableCell() const

@@ -487,7 +487,7 @@ WebGLRenderingContextBase* HTMLCanvasElement::getContextWebGL(WebGLVersion type,
     if ((type == WebGLVersion::WebGL1) != glContext->isWebGL1())
         return nullptr;
 
-    return glContext.unsafeGet();
+    return glContext.get();
 }
 
 #endif // ENABLE(WEBGL)

@@ -67,7 +67,7 @@ const ResourceError& PreviewConverter::previewError() const
 
 const FragmentedSharedBuffer& PreviewConverter::previewData() const
 {
-    return *m_previewData.get().unsafeGet();
+    return *m_previewData.get();
 }
 
 void PreviewConverter::updateMainResource()

@@ -174,7 +174,7 @@ const Element* ContainerQueryEvaluator::selectContainer(OptionSet<CQ::Axis> requ
         // For selectors with pseudo elements, query containers can be established by the shadow-including inclusive ancestors of the ultimate originating element.
         for (RefPtr ancestor = originatingElement; ancestor; ancestor = ancestor->parentOrShadowHostElement()) {
             if (isContainerForQuery(*ancestor.get(), originatingElement.get()))
-                return ancestor.unsafeGet();
+                return ancestor.get();
         }
         return nullptr;
     }
@@ -194,7 +194,7 @@ const Element* ContainerQueryEvaluator::selectContainer(OptionSet<CQ::Axis> requ
 
     for (RefPtr ancestor = element.parentOrShadowHostElement(); ancestor; ancestor = ancestor->parentOrShadowHostElement()) {
         if (isContainerForQuery(*ancestor.get()))
-            return ancestor.unsafeGet();
+            return ancestor.get();
     }
     return { };
 }

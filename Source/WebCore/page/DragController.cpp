@@ -410,7 +410,7 @@ static Element* elementUnderMouse(Document& documentUnderMouse, const IntPoint& 
     if (!element)
         element = node->parentElement();
     auto* host = element->shadowHost();
-    return host ? host : element.unsafeGet();
+    return host ? host : element.get();
 }
 
 #if !PLATFORM(IOS_FAMILY)

@@ -1342,7 +1342,7 @@ inline DocumentLoader* WebFrame::policySourceDocumentLoader() const
     if (!policySourceDocumentLoader->request().url().hasSpecialScheme() && document->url().protocolIsInHTTPFamily())
         policySourceDocumentLoader = document->loader();
 
-    return policySourceDocumentLoader.unsafeGet();
+    return policySourceDocumentLoader.get();
 }
 
 OptionSet<WebCore::AdvancedPrivacyProtections> WebFrame::advancedPrivacyProtections() const

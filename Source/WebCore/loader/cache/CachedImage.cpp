@@ -290,9 +290,9 @@ Image* CachedImage::imageForRenderer(const RenderObject* renderer)
     if (m_image->drawsSVGImage()) {
         RefPtr image = m_svgImageCache->imageForRenderer(renderer);
         if (image != &Image::nullImage())
-            return image.unsafeGet();
+            return image.get();
     }
-    return m_image.unsafeGet();
+    return m_image.get();
 }
 
 void CachedImage::setContainerContextForClient(const CachedImageClient& client, const LayoutSize& containerSize, float containerZoom, const URL& imageURL)

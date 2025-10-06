@@ -278,7 +278,7 @@ GPUProcessConnection& RemoteMediaPlayerManager::gpuProcessConnection()
         gpuProcessConnection->addClient(*this);
     }
 
-    return *gpuProcessConnection.unsafeGet();
+    return *gpuProcessConnection;
 }
 
 Ref<GPUProcessConnection> RemoteMediaPlayerManager::protectedGPUProcessConnection()

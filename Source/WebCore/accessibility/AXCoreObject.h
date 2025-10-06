@@ -1439,7 +1439,7 @@ T* crossFrameFindAncestor(const T& object, bool includeSelf, const MatchFunction
             return nullptr;
 
         if (matches(*current))
-            return current.unsafeGet();
+            return current.get();
     }
     return nullptr;
 }
@@ -1458,7 +1458,7 @@ T* findAncestor(const T& object, bool includeSelf, const MatchFunctionT& matches
             return nullptr;
 
         if (matches(*current))
-            return current.unsafeGet();
+            return current.get();
     }
     return nullptr;
 }
@@ -1512,7 +1512,7 @@ T* clickableSelfOrAncestor(const T& startObject, const F& shouldStop)
     // Presentational objects should not be allowed to be clicked.
     if (ancestor && ancestor->role() == AccessibilityRole::Presentational)
         return nullptr;
-    return ancestor.unsafeGet();
+    return ancestor.get();
 }
 
 template<typename T>
@@ -1539,7 +1539,7 @@ T* highestEditableAncestor(T& startObject)
         previousEditableAncestor = editableAncestor;
         editableAncestor = editableAncestor->editableAncestor();
     }
-    return previousEditableAncestor.unsafeGet();
+    return previousEditableAncestor.get();
 }
 
 template<typename T>
@@ -1551,7 +1551,7 @@ T* findRelatedObjectInAncestry(const T& object, AXRelation relation, const T& de
             return relatedObject.get() == &ancestor;
         });
         if (ancestor)
-            return ancestor.unsafeGet();
+            return ancestor.get();
     }
     return nullptr;
 }
@@ -1580,7 +1580,7 @@ AXCoreObject* findUnignoredDescendant(T& object, bool includeSelf, const F& matc
 
     for (Ref child : object.childrenIncludingIgnored()) {
         if (RefPtr descendant = findUnignoredDescendant(child.get(), /* includeSelf */ true, matches))
-            return descendant.unsafeGet();
+            return descendant.get();
     }
     return nullptr;
 }

@@ -749,7 +749,7 @@ ImageDrawResult RenderImage::paintIntoRect(PaintInfo& paintInfo, const FloatRect
         return ImageDrawResult::DidNothing;
 
     // FIXME: Document when image != img.get().
-    auto* image = imageResource().image().unsafeGet();
+    auto* image = imageResource().image().get();
 
     ImagePaintingOptions options = {
         CompositeOperator::SourceOver,

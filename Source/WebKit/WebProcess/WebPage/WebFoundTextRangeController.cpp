@@ -516,7 +516,7 @@ WebCore::LocalFrame* WebFoundTextRangeController::frameForFoundTextRange(const W
         return nullptr;
 
     if (range.frameIdentifier.isEmpty())
-        return mainFrame.unsafeGet();
+        return mainFrame.get();
 
     return dynamicDowncast<WebCore::LocalFrame>(mainFrame->tree().findByUniqueName(AtomString { range.frameIdentifier }, *mainFrame));
 }

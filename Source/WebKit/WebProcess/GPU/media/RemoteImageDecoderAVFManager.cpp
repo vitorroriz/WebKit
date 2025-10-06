@@ -96,7 +96,7 @@ GPUProcessConnection& RemoteImageDecoderAVFManager::ensureGPUProcessConnection()
         gpuProcessConnection->addClient(*this);
         gpuProcessConnection->messageReceiverMap().addMessageReceiver(Messages::RemoteImageDecoderAVFManager::messageReceiverName(), *this);
     }
-    return *gpuProcessConnection.unsafeGet();
+    return *gpuProcessConnection;
 }
 
 void RemoteImageDecoderAVFManager::setUseGPUProcess(bool useGPUProcess)

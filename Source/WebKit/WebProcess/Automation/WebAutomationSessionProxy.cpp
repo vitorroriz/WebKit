@@ -371,7 +371,7 @@ WebCore::AccessibilityObject* WebAutomationSessionProxy::getAccessibilityObjectF
         axObjectCache->performDeferredCacheUpdate(ForceLayout::Yes);
 
         if (RefPtr<WebCore::AccessibilityObject> axObject = axObjectCache->exportedGetOrCreate(*coreElement))
-            return axObject.unsafeGet();
+            return axObject.get();
     }
 
     errorType = Inspector::Protocol::AutomationHelpers::getEnumConstantValue(Inspector::Protocol::Automation::ErrorMessage::InternalError);
@@ -667,16 +667,16 @@ static WebCore::Element* containerElementForElement(WebCore::Element& element)
     // https://w3c.github.io/webdriver/webdriver-spec.html#dfn-container.
     if (is<WebCore::HTMLOptionElement>(element)) {
         if (RefPtr parentElement = WebCore::ancestorsOfType<WebCore::HTMLDataListElement>(element).first())
-            return parentElement.unsafeGet();
+            return parentElement.get();
         if (RefPtr parentElement = downcast<WebCore::HTMLOptionElement>(element).ownerSelectElement())
-            return parentElement.unsafeGet();
+            return parentElement.get();
 
         return nullptr;
     }
 
     if (RefPtr optgroup = dynamicDowncast<WebCore::HTMLOptGroupElement>(element)) {
         if (RefPtr parentElement = optgroup->ownerSelectElement())
-            return parentElement.unsafeGet();
+            return parentElement.get();
 
         return nullptr;
     }

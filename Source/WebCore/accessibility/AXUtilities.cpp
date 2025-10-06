@@ -53,7 +53,7 @@ ContainerNode* composedParentIgnoringDocumentFragments(const Node& node)
     RefPtr ancestor = node.parentInComposedTree();
     while (is<DocumentFragment>(ancestor.get()))
         ancestor = ancestor->parentInComposedTree();
-    return ancestor.unsafeGet();
+    return ancestor.get();
 }
 
 ContainerNode* composedParentIgnoringDocumentFragments(const Node* node)

@@ -606,7 +606,7 @@ std::optional<SimpleRange> makeDOMRange(Document* document, NSRange range)
         return nullptr;
     RefPtr<AXCoreObject> backingObject = self.axBackingObject;
 #endif
-    return backingObject.unsafeGet();
+    return backingObject.get();
 }
 
 - (NSArray<NSDictionary *> *)lineRectsAndText
@@ -958,7 +958,7 @@ AccessibilitySearchCriteria accessibilitySearchCriteriaForSearchPredicate(AXCore
             criteria.startRange = *nsRange;
 
         if (!criteria.startObject)
-            criteria.startObject = markerRange.start().object().unsafeGet();
+            criteria.startObject = markerRange.start().object().get();
     }
 #endif
 

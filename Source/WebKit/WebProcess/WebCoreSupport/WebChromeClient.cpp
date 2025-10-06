@@ -1845,14 +1845,14 @@ RefPtr<API::Object> userDataFromJSONData(JSON::Value& value)
         return API::String::create(value.asString());
     case JSON::Value::Type::Object: {
         auto result = API::Dictionary::create();
-        for (auto [key, value] : *value.asObject().unsafeGet())
+        for (auto [key, value] : *value.asObject())
             result->add(key, userDataFromJSONData(value));
         return result;
     }
     case JSON::Value::Type::Array: {
         auto array = value.asArray();
         Vector<RefPtr<API::Object>> result;
-        for (auto& item : *value.asArray().unsafeGet())
+        for (auto& item : *value.asArray())
             result.append(userDataFromJSONData(item));
         return API::Array::create(WTFMove(result));
     }

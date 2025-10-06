@@ -197,7 +197,7 @@ const SecurityOrigin& RemoteFrame::frameDocumentSecurityOriginOrOpaque() const
 {
     RefPtr securityOrigin = frameDocumentSecurityOrigin();
     if (securityOrigin)
-        return *securityOrigin.unsafeGet();
+        return *securityOrigin;
     return SecurityOrigin::opaqueOrigin();
 }
 

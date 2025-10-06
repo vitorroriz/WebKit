@@ -123,7 +123,7 @@ Element* AccessibilitySVGObject::childElementWithMatchingLanguage(ChildrenType& 
     if (index < childLanguageCodes.size())
         return elements[index];
 
-    return fallback.unsafeGet();
+    return fallback.get();
 }
 
 void AccessibilitySVGObject::accessibilityText(Vector<AccessibilityText>& textOrder) const

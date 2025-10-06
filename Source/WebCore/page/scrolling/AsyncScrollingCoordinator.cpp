@@ -618,7 +618,7 @@ LocalFrameView* AsyncScrollingCoordinator::frameViewForScrollingNode(std::option
         return nullptr;
     for (const auto& rootFrame : page()->rootFrames()) {
         if (RefPtr frameView = frameViewForScrollingNode(rootFrame.get(), scrollingNodeID))
-            return frameView.unsafeGet();
+            return frameView.get();
     }
     return nullptr;
 }

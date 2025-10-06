@@ -76,7 +76,7 @@ WebBackForwardListItem* WebBackForwardList::itemForID(BackForwardItemIdentifier 
         return nullptr;
 
     ASSERT(item->pageID() == m_page->identifier());
-    return item.unsafeGet();
+    return item.get();
 }
 
 void WebBackForwardList::pageClosed()

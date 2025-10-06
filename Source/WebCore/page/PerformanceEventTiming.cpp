@@ -65,7 +65,7 @@ Node* PerformanceEventTiming::target() const
     if (!node->isConnected() || !document->isFullyActive())
         return nullptr;
 
-    return node.unsafeGet();
+    return node.get();
 }
 
 PerformanceEntry::Type PerformanceEventTiming::performanceEntryType() const

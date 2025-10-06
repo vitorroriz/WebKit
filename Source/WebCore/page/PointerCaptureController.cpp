@@ -63,7 +63,7 @@ Element* PointerCaptureController::pointerCaptureElement(Document* document, Poi
     if (auto capturingData = m_activePointerIdsToCapturingData.get(pointerId)) {
         auto pointerCaptureElement = capturingData->targetOverride;
         if (pointerCaptureElement && &pointerCaptureElement->document() == document)
-            return pointerCaptureElement.unsafeGet();
+            return pointerCaptureElement.get();
     }
     return nullptr;
 }

@@ -339,11 +339,11 @@ private:
     AXIsolatedObject* accessibilityHitTest(const IntPoint&) const final;
     AXIsolatedObject* focusedUIElement() const final
     {
-        return tree()->focusedNode().unsafeGet();
+        return tree()->focusedNode().get();
     }
     AXIsolatedObject* focusedUIElementInAnyLocalFrame() const final
     {
-        return tree()->focusedNode().unsafeGet();
+        return tree()->focusedNode().get();
     }
     AXIsolatedObject* internalLinkElement() const final { return objectAttributeValue(AXProperty::InternalLinkElement); }
     AccessibilityChildrenVector radioButtonGroup() const final { return tree()->objectsForIDs(vectorAttributeValue<AXID>(AXProperty::RadioButtonGroupMembers)); }

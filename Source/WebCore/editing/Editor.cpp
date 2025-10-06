@@ -2258,7 +2258,7 @@ Node* Editor::nodeBeforeWritingSuggestions() const
         return nullptr;
 
     if (RefPtr text = dynamicDowncast<Text>(container))
-        return text.unsafeGet();
+        return text.get();
 
     return position.computeNodeBeforePosition();
 }

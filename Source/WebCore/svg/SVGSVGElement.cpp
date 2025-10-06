@@ -860,7 +860,7 @@ Element* SVGSVGElement::getElementById(const AtomString& id)
 
     RefPtr element = treeScope().getElementById(id);
     if (element && element->isDescendantOf(*this))
-        return element.unsafeGet();
+        return element.get();
     if (treeScope().containsMultipleElementsWithId(id)) {
         for (auto& element : *treeScope().getAllElementsById(id)) {
             if (element->isDescendantOf(*this))

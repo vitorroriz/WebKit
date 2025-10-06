@@ -639,8 +639,8 @@ void StackVisitor::Frame::dump(PrintStream& out, Indenter indent, WTF::Function<
 
                     JITType jitType = codeBlock->jitType();
                     if (jitType != JITType::FTLJIT) {
-                        RefPtr jitCode = codeBlock->jitCode();
-                        out.print(indent, "jitCode: ", RawPointer(jitCode.get()),
+                        JITCode* jitCode = codeBlock->jitCode().get();
+                        out.print(indent, "jitCode: ", RawPointer(jitCode),
                             " start ", RawPointer(jitCode->start()),
                             " end ", RawPointer(jitCode->end()), "\n");
                     }

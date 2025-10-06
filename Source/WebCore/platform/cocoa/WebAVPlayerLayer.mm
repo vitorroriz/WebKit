@@ -122,7 +122,7 @@ private:
 
 - (VideoPresentationModel*)presentationModel
 {
-    return _presentationModel.get().unsafeGet();
+    return _presentationModel.get().get();
 }
 
 - (void)setPresentationModel:(VideoPresentationModel*)presentationModel

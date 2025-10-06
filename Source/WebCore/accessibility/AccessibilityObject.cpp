@@ -591,7 +591,7 @@ AccessibilityObject* firstAccessibleObjectFromNode(const Node* node, NOESCAPE co
         accessibleObject = cache->getOrCreate(const_cast<Node&>(*axNode));
     }
 
-    return accessibleObject.unsafeGet();
+    return accessibleObject.get();
 }
 
 // FIXME: Usages of this function should be replaced by a new flag in AccessibilityObject::m_ancestorFlags.
@@ -3045,7 +3045,7 @@ AccessibilityObject* AccessibilityObject::elementAccessibilityHitTest(const IntP
                 if (RefPtr remoteHostWidget = cache->getOrCreate(*widget)) {
                     remoteHostWidget->updateChildrenIfNecessary();
                     RefPtr scrollView = dynamicDowncast<AccessibilityScrollView>(*remoteHostWidget);
-                    return scrollView ? scrollView->remoteFrame().unsafeGet() : nullptr;
+                    return scrollView ? scrollView->remoteFrame().get() : nullptr;
                 }
             }
         }

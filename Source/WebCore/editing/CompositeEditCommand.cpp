@@ -455,7 +455,7 @@ EditCommandComposition* CompositeEditCommand::composition() const
     for (RefPtr command = this; command; command = command->parent()) {
         if (auto composition = command->m_composition) {
             ASSERT(!command->parent());
-            return composition.unsafeGet();
+            return composition.get();
         }
     }
     return nullptr;
@@ -468,7 +468,7 @@ EditCommandComposition& CompositeEditCommand::ensureComposition()
         command = WTFMove(parent);
     if (!command->m_composition)
         command->m_composition = EditCommandComposition::create(document(), startingSelection(), endingSelection(), editingAction());
-    return *command->m_composition.unsafeGet();
+    return *command->m_composition;
 }
 
 bool CompositeEditCommand::preservesTypingStyle() const

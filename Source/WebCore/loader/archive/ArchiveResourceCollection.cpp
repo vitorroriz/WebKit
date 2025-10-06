@@ -60,7 +60,7 @@ void ArchiveResourceCollection::addResource(Ref<ArchiveResource>&& resource)
 ArchiveResource* ArchiveResourceCollection::archiveResourceForURL(const URL& url)
 {
     if (RefPtr resource = m_subresources.get(url.string()))
-        return resource.unsafeGet();
+        return resource.get();
     if (!url.protocolIs("https"_s))
         return nullptr;
     URL httpURL = url;

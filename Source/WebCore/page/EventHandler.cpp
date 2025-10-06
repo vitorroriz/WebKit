@@ -562,7 +562,7 @@ static Node* nodeToSelectOnMouseDownForNode(Node& targetNode)
         return nullptr;
 
     if (RefPtr rootUserSelectAll = Position::rootUserSelectAllForNode(&targetNode))
-        return rootUserSelectAll.unsafeGet();
+        return rootUserSelectAll.get();
 
     if (targetNode.shouldSelectOnMouseDown())
         return &targetNode;

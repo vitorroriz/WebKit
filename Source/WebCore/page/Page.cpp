@@ -4432,7 +4432,7 @@ Document* Page::outermostFullscreenDocument() const
 
         currentDocument = fullscreenFrame->contentDocument();
     }
-    return outermostFullscreenDocument.unsafeGet();
+    return outermostFullscreenDocument.get();
 #else
     return nullptr;
 #endif

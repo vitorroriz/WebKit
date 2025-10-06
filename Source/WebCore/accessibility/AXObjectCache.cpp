@@ -405,7 +405,7 @@ void AXObjectCache::updateCurrentModalNode()
         // Pick the document active modal <dialog> element if it exists.
         if (RefPtr activeModalDialog = document->activeModalDialog()) {
             ASSERT(m_modalElements.contains(activeModalDialog.get()));
-            return activeModalDialog.unsafeGet();
+            return activeModalDialog.get();
         }
 
         SetForScope retrievingCurrentModalNode(m_isRetrievingCurrentModalNode, true);
@@ -446,7 +446,7 @@ void AXObjectCache::updateCurrentModalNode()
         RefPtr object = getOrCreate(modalElementToReturn.get());
         if (!object || object->isAXHidden())
             return nullptr;
-        return modalElementToReturn.unsafeGet();
+        return modalElementToReturn.get();
     };
 
     RefPtr previousModal = m_currentModalElement.get();
@@ -587,7 +587,7 @@ AccessibilityObject* AXObjectCache::focusedObjectForNode(Node* focusedNode)
 
     if (focus->isIgnored())
         return focus->parentObjectUnignored();
-    return focus.unsafeGet();
+    return focus.get();
 }
 
 #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
@@ -699,7 +699,7 @@ AccessibilityObject* AXObjectCache::exportedGetOrCreate(Node& node)
 AccessibilityObject* AXObjectCache::getOrCreate(Widget& widget)
 {
     if (RefPtr object = get(widget))
-        return object.unsafeGet();
+        return object.get();
 
     RefPtr<AccessibilityObject> newObject;
     if (auto* scrollView = dynamicDowncast<ScrollView>(widget))
@@ -716,7 +716,7 @@ AccessibilityObject* AXObjectCache::getOrCreate(Widget& widget)
         return nullptr;
 
     cacheAndInitializeWrapper(*newObject, &widget);
-    return newObject.unsafeGet();
+    return newObject.get();
 }
 
 AccessibilityObject* AXObjectCache::getOrCreateSlow(Node& node, IsPartOfRelation isPartOfRelation)
@@ -759,7 +759,7 @@ AccessibilityObject* AXObjectCache::getOrCreateSlow(Node& node, IsPartOfRelation
         } else
             object = AccessibilityListBoxOption::create(AXID::generate(), downcast<HTMLElement>(node), *this);
         cacheAndInitializeWrapper(*object, &node);
-        return object.unsafeGet();
+        return object.get();
     }
 
     bool inCanvasSubtree = lineageOfType<HTMLCanvasElement>(*composedParent).first();
@@ -788,7 +788,7 @@ AccessibilityObject* AXObjectCache::getOrCreateSlow(Node& node, IsPartOfRelation
 
     // The object may have already been created during relations update.
     if (RefPtr object = get(node))
-        return object.unsafeGet();
+        return object.get();
 
     // Fallback content is only focusable as long as the canvas is displayed and visible.
     // Update the style before Element::isFocusable() gets called.
@@ -806,7 +806,7 @@ AccessibilityObject* AXObjectCache::getOrCreateSlow(Node& node, IsPartOfRelation
     // it will disappear when this function is finished, leading to a use-after-free.
     if (newObject->isDetached())
         return nullptr;
-    return newObject.unsafeGet();
+    return newObject.get();
 }
 
 AccessibilityObject* AXObjectCache::getOrCreate(RenderObject& renderer)
@@ -815,7 +815,7 @@ AccessibilityObject* AXObjectCache::getOrCreate(RenderObject& renderer)
         return getOrCreate(renderer.node());
 
     if (RefPtr object = get(renderer))
-        return object.unsafeGet();
+        return object.get();
 
     // Don't create an object for this renderer if it's being destroyed.
     if (renderer.beingDestroyed())
@@ -958,7 +958,7 @@ AccessibilityObject* AXObjectCache::create(AccessibilityRole role)
         return nullptr;
 
     cacheAndInitializeWrapper(*object);
-    return object.unsafeGet();
+    return object.get();
 }
 
 void AXObjectCache::remove(AXID axID)
@@ -1461,7 +1461,7 @@ AccessibilityObject* AXObjectCache::getIncludingAncestors(RenderObject& renderer
 {
     for (CheckedPtr current = &renderer; current; current = current->parent()) {
         if (RefPtr object = get(*current))
-            return object.unsafeGet();
+            return object.get();
     }
     return nullptr;
 }
@@ -4098,7 +4098,7 @@ static Node* parentEditingBoundary(Node* node)
     while (boundary != documentElement && boundary->nonShadowBoundaryParentNode() && node->hasEditableStyle() == boundary->parentNode()->hasEditableStyle())
         boundary = boundary->nonShadowBoundaryParentNode();
 
-    return boundary.unsafeGet();
+    return boundary.get();
 }
 
 CharacterOffset AXObjectCache::nextBoundary(const CharacterOffset& characterOffset, BoundarySearchFunction searchFunction)

@@ -4007,12 +4007,12 @@ const TimingFunction& GraphicsLayerCA::timingFunctionForAnimationValue(const Ani
         // its mode set to SingleProperty. In this case, we chose not to set set the
         // animation-wide timing function, so we set it on the single keyframe interval
         // to work around a Core Animation limitation.
-        return *anim.timingFunction().unsafeGet();
+        return *anim.timingFunction();
     }
     if (animValue.timingFunction())
         return *animValue.timingFunction();
     if (anim.defaultTimingFunctionForKeyframes())
-        return *anim.defaultTimingFunctionForKeyframes().unsafeGet();
+        return *anim.defaultTimingFunctionForKeyframes();
     return LinearTimingFunction::identity();
 }
 
