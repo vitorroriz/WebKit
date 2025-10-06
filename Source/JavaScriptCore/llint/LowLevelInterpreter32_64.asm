@@ -205,6 +205,8 @@ macro doVMEntry(makeCall)
     end
 
     storep vm, VMEntryRecord::m_vm[sp]
+    loadp ProtoCallFrame::context[protoCallFrame], t4
+    storep t4, VMEntryRecord::m_context[sp]
     loadp VM::topCallFrame[vm], t4
     storep t4, VMEntryRecord::m_prevTopCallFrame[sp]
     loadp VM::topEntryFrame[vm], t4

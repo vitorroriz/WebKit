@@ -725,6 +725,7 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     debugger/DebuggerCallFrame.h
     debugger/DebuggerParseData.h
     debugger/DebuggerPrimitives.h
+    debugger/ScriptProfilingScope.h
 
     dfg/DFGCPSRethreadingPhase.h
     dfg/DFGCodeOriginPool.h

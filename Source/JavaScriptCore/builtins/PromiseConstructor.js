@@ -391,13 +391,6 @@ function try(callback /*, ...args */)
     return promiseCapability.promise;
 }
 
-function withResolvers()
-{
-    "use strict";
-
-    return @newPromiseCapability(this);
-}
-
 @nakedConstructor
 function Promise(executor)
 {

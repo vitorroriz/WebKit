@@ -31,6 +31,8 @@
 #include <wtf/Deque.h>
 #include <wtf/SentinelLinkedList.h>
 
+WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
+
 namespace JSC {
 
 class JSGlobalObject;
@@ -44,7 +46,7 @@ class QueuedTask {
     friend class MicrotaskQueue;
     friend class MarkedMicrotaskDeque;
 public:
-    static constexpr unsigned maxArguments = 4;
+    static constexpr unsigned maxArguments = maxMicrotaskArguments;
 
     enum class Result : uint8_t {
         Executed,
@@ -79,7 +81,7 @@ public:
     MicrotaskIdentifier identifier() const { return m_identifier; }
     JSGlobalObject* globalObject() const { return m_globalObject; }
     JSValue job() const { return m_job; }
-    std::span<const JSValue> arguments() const { return std::span { m_arguments }; }
+    std::span<const JSValue, maxArguments> arguments() const { return std::span<const JSValue, maxArguments> { m_arguments, maxArguments }; }
 
 private:
     RefPtr<MicrotaskDispatcher> m_dispatcher;
@@ -207,3 +209,5 @@ private:
 };
 
 } // namespace JSC
+
+WTF_ALLOW_UNSAFE_BUFFER_USAGE_END

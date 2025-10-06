@@ -29,7 +29,6 @@ Modules/webdatabase/DatabaseThread.h
 accessibility/AXTextMarker.cpp
 accessibility/AccessibilityObject.cpp
 bindings/js/GarbageCollectionController.cpp
-bindings/js/JSDOMAsyncIterator.h
 bindings/js/JSDOMConvertBase.h
 bindings/js/JSDOMWindowBase.h
 bindings/js/JSLocationCustom.cpp

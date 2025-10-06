@@ -32,6 +32,7 @@
 #include "WorkerGlobalScope.h"
 #include <JavaScriptCore/CatchScope.h>
 #include <JavaScriptCore/MicrotaskQueueInlines.h>
+#include <JavaScriptCore/ScriptProfilingScope.h>
 #include <JavaScriptCore/VMEntryScopeInlines.h>
 #include <wtf/MainThread.h>
 #include <wtf/NeverDestroyed.h>
@@ -72,18 +73,34 @@ void MicrotaskQueue::runJSMicrotask(JSC::JSGlobalObject* globalObject, JSC::VM& 
 {
     auto scope = DECLARE_CATCH_SCOPE(vm);
 
-    if (!task.job().isObject()) [[unlikely]]
+    JSC::JSValue job = task.job();
+    if (job.isInt32()) {
+        if (auto* debugger = globalObject->debugger()) [[unlikely]] {
+            JSC::DeferTerminationForAWhile deferTerminationForAWhile(vm);
+            debugger->willRunMicrotask(globalObject, task.identifier());
+            if (!scope.clearExceptionExceptTermination()) [[unlikely]]
+                return;
+        }
+
+        JSC::runInternalMirotask(globalObject, static_cast<JSC::InternalMicrotask>(job.asInt32()), task.arguments());
+        if (!scope.clearExceptionExceptTermination()) [[unlikely]]
+            return;
+
+        if (auto* debugger = globalObject->debugger()) [[unlikely]] {
+            JSC::DeferTerminationForAWhile deferTerminationForAWhile(vm);
+            debugger->didRunMicrotask(globalObject, task.identifier());
+            if (!scope.clearExceptionExceptTermination()) [[unlikely]]
+                return;
+        }
+        return;
+    }
+
+    if (!job.isObject()) [[unlikely]]
         return;
 
-    auto* job = JSC::asObject(task.job());
-
-    if (!scope.clearExceptionExceptTermination()) [[unlikely]]
-        return;
-
-    auto* lexicalGlobalObject = job->globalObject();
-    auto callData = JSC::getCallData(job);
-    if (!scope.clearExceptionExceptTermination()) [[unlikely]]
-        return;
+    auto* jobObject = JSC::asObject(task.job());
+    auto* lexicalGlobalObject = jobObject->globalObject();
+    auto callData = JSC::getCallData(jobObject);
     ASSERT(callData.type != JSC::CallData::Type::None);
 
     unsigned count = 0;
@@ -93,24 +110,25 @@ void MicrotaskQueue::runJSMicrotask(JSC::JSGlobalObject* globalObject, JSC::VM& 
         ++count;
     }
 
-    if (globalObject->hasDebugger()) [[unlikely]] {
+    if (auto* debugger = globalObject->debugger()) [[unlikely]] {
         JSC::DeferTerminationForAWhile deferTerminationForAWhile(vm);
-        globalObject->debugger()->willRunMicrotask(globalObject, task.identifier());
-        scope.clearException();
+        debugger->willRunMicrotask(globalObject, task.identifier());
+        if (!scope.clearExceptionExceptTermination()) [[unlikely]]
+            return;
     }
 
     NakedPtr<JSC::Exception> returnedException = nullptr;
-    if (!vm.hasPendingTerminationException()) [[likely]] {
-        JSC::profiledCall(lexicalGlobalObject, JSC::ProfilingReason::Microtask, job, callData, JSC::jsUndefined(), JSC::ArgList { std::bit_cast<JSC::EncodedJSValue*>(task.arguments().data()), count }, returnedException);
-        if (returnedException) [[unlikely]]
-            reportException(lexicalGlobalObject, returnedException);
-        scope.clearExceptionExceptTermination();
-    }
+    JSC::profiledCall(lexicalGlobalObject, JSC::ProfilingReason::Microtask, jobObject, callData, JSC::jsUndefined(), JSC::ArgList { std::bit_cast<JSC::EncodedJSValue*>(task.arguments().data()), count }, returnedException);
+    if (returnedException) [[unlikely]]
+        reportException(lexicalGlobalObject, returnedException);
+    if (!scope.clearExceptionExceptTermination()) [[unlikely]]
+        return;
 
-    if (globalObject->hasDebugger()) [[unlikely]] {
+    if (auto* debugger = globalObject->debugger()) [[unlikely]] {
         JSC::DeferTerminationForAWhile deferTerminationForAWhile(vm);
-        globalObject->debugger()->didRunMicrotask(globalObject, task.identifier());
-        scope.clearException();
+        debugger->didRunMicrotask(globalObject, task.identifier());
+        if (!scope.clearExceptionExceptTermination()) [[unlikely]]
+            return;
     }
 }
 
@@ -127,6 +145,8 @@ void MicrotaskQueue::performMicrotaskCheckpoint()
         SUPPRESS_UNCOUNTED_ARG auto& data = threadGlobalDataSingleton();
         auto* previousState = data.currentState();
         std::optional<JSC::VMEntryScope> entryScope;
+        std::optional<JSC::ScriptProfilingScope> profilingScope;
+        JSC::JSGlobalObject* currentGlobalObject = nullptr;
         m_microtaskQueue.performMicrotaskCheckpoint(vm,
             [&](JSC::QueuedTask& task) ALWAYS_INLINE_LAMBDA {
                 RefPtr dispatcher = downcast<WebCoreMicrotaskDispatcher>(task.dispatcher());
@@ -139,10 +159,14 @@ void MicrotaskQueue::performMicrotaskCheckpoint()
                     case WebCoreMicrotaskDispatcher::Type::JavaScript: {
                         auto* globalObject = task.globalObject();
                         data.setCurrentState(globalObject);
-                        if (!entryScope)
-                            entryScope.emplace(vm, globalObject);
-                        else
-                            entryScope->setGlobalObject(globalObject);
+                        if (currentGlobalObject != globalObject) {
+                            if (!entryScope)
+                                entryScope.emplace(vm, globalObject);
+                            else
+                                entryScope->setGlobalObject(globalObject);
+                            profilingScope.emplace(globalObject, JSC::ProfilingReason::Microtask);
+                            currentGlobalObject = globalObject;
+                        }
                         runJSMicrotask(globalObject, vm, task);
                         break;
                     }
@@ -150,6 +174,8 @@ void MicrotaskQueue::performMicrotaskCheckpoint()
                     case WebCoreMicrotaskDispatcher::Type::UserGestureIndicator:
                     case WebCoreMicrotaskDispatcher::Type::Function:
                         entryScope = std::nullopt;
+                        profilingScope = std::nullopt;
+                        currentGlobalObject = nullptr;
                         data.setCurrentState(previousState);
                         dispatcher->run(task);
                         break;

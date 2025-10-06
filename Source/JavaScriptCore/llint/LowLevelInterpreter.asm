@@ -1861,7 +1861,8 @@ if (ARM64E or ARM64) and ADDRESS64
         functionPrologue()
         pushCalleeSaves()
         vmEntryRecord(cfr, sp)
-        storep a1, VMEntryRecord::m_vm[sp]
+        move 0, t9
+        storepairq a1, t9, VMEntryRecord::m_vm[sp]
         loadpairq VM::topCallFrame[a1], t8, t9 # topCallFrame and topEntryFrame
         storepairq t8, t9, VMEntryRecord::m_prevTopCallFrame[sp]
     end

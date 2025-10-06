@@ -545,6 +545,13 @@ public:
     WriteBarrier<Structure> bigIntStructure;
 
     WriteBarrier<JSPropertyNameEnumerator> m_emptyPropertyNameEnumerator;
+    WriteBarrier<NativeExecutable> m_promiseResolvingFunctionResolveExecutable;
+    WriteBarrier<NativeExecutable> m_promiseResolvingFunctionRejectExecutable;
+    WriteBarrier<NativeExecutable> m_promiseFirstResolvingFunctionResolveExecutable;
+    WriteBarrier<NativeExecutable> m_promiseFirstResolvingFunctionRejectExecutable;
+    WriteBarrier<NativeExecutable> m_promiseResolvingFunctionResolveWithoutPromiseExecutable;
+    WriteBarrier<NativeExecutable> m_promiseResolvingFunctionRejectWithoutPromiseExecutable;
+    WriteBarrier<NativeExecutable> m_promiseCapabilityExecutorExecutable;
 
     WriteBarrier<JSCell> m_orderedHashTableDeletedValue;
     WriteBarrier<JSCell> m_orderedHashTableSentinel;
@@ -606,6 +613,55 @@ public:
         if (m_emptyPropertyNameEnumerator) [[likely]]
             return m_emptyPropertyNameEnumerator.get();
         return emptyPropertyNameEnumeratorSlow();
+    }
+
+    NativeExecutable* promiseResolvingFunctionResolveExecutable()
+    {
+        if (m_promiseResolvingFunctionResolveExecutable) [[likely]]
+            return m_promiseResolvingFunctionResolveExecutable.get();
+        return promiseResolvingFunctionResolveExecutableSlow();
+    }
+
+    NativeExecutable* promiseResolvingFunctionRejectExecutable()
+    {
+        if (m_promiseResolvingFunctionRejectExecutable) [[likely]]
+            return m_promiseResolvingFunctionRejectExecutable.get();
+        return promiseResolvingFunctionRejectExecutableSlow();
+    }
+
+    NativeExecutable* promiseFirstResolvingFunctionResolveExecutable()
+    {
+        if (m_promiseFirstResolvingFunctionResolveExecutable) [[likely]]
+            return m_promiseFirstResolvingFunctionResolveExecutable.get();
+        return promiseFirstResolvingFunctionResolveExecutableSlow();
+    }
+
+    NativeExecutable* promiseFirstResolvingFunctionRejectExecutable()
+    {
+        if (m_promiseFirstResolvingFunctionRejectExecutable) [[likely]]
+            return m_promiseFirstResolvingFunctionRejectExecutable.get();
+        return promiseFirstResolvingFunctionRejectExecutableSlow();
+    }
+
+    NativeExecutable* promiseResolvingFunctionResolveWithoutPromiseExecutable()
+    {
+        if (m_promiseResolvingFunctionResolveWithoutPromiseExecutable) [[likely]]
+            return m_promiseResolvingFunctionResolveWithoutPromiseExecutable.get();
+        return promiseResolvingFunctionResolveWithoutPromiseExecutableSlow();
+    }
+
+    NativeExecutable* promiseResolvingFunctionRejectWithoutPromiseExecutable()
+    {
+        if (m_promiseResolvingFunctionRejectWithoutPromiseExecutable) [[likely]]
+            return m_promiseResolvingFunctionRejectWithoutPromiseExecutable.get();
+        return promiseResolvingFunctionRejectWithoutPromiseExecutableSlow();
+    }
+
+    NativeExecutable* promiseCapabilityExecutorExecutable()
+    {
+        if (m_promiseCapabilityExecutorExecutable) [[likely]]
+            return m_promiseCapabilityExecutorExecutable.get();
+        return promiseCapabilityExecutorExecutableSlow();
     }
 
     WeakGCMap<SymbolImpl*, Symbol, PtrHash<SymbolImpl*>> symbolImplToSymbolMap;
@@ -1062,6 +1118,13 @@ private:
     JS_EXPORT_PRIVATE JSCell* orderedHashTableDeletedValueSlow();
     JS_EXPORT_PRIVATE JSCell* orderedHashTableSentinelSlow();
     JSPropertyNameEnumerator* emptyPropertyNameEnumeratorSlow();
+    NativeExecutable* promiseResolvingFunctionResolveExecutableSlow();
+    NativeExecutable* promiseResolvingFunctionRejectExecutableSlow();
+    NativeExecutable* promiseFirstResolvingFunctionResolveExecutableSlow();
+    NativeExecutable* promiseFirstResolvingFunctionRejectExecutableSlow();
+    NativeExecutable* promiseResolvingFunctionResolveWithoutPromiseExecutableSlow();
+    NativeExecutable* promiseResolvingFunctionRejectWithoutPromiseExecutableSlow();
+    NativeExecutable* promiseCapabilityExecutorExecutableSlow();
 
     void updateStackLimits();
 

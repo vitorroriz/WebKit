@@ -186,11 +186,15 @@ macro doVMEntry(makeCall)
 
     checkStackPointerAlignment(t4, 0xbad0dc01)
 
-    storep vm, VMEntryRecord::m_vm[sp]
     if (ARM64 or ARM64E) and ADDRESS64
+        loadp ProtoCallFrame::context[protoCallFrame], t3
+        storepairq vm, t3, VMEntryRecord::m_vm[sp]
         loadpairq VM::topCallFrame[vm], t4, t3
         storepairq t4, t3, VMEntryRecord::m_prevTopCallFrame[sp]
     else
+        loadp ProtoCallFrame::context[protoCallFrame], t4
+        storep vm, VMEntryRecord::m_vm[sp]
+        storep t4, VMEntryRecord::m_context[sp]
         loadp VM::topCallFrame[vm], t4
         storep t4, VMEntryRecord::m_prevTopCallFrame[sp]
         loadp VM::topEntryFrame[vm], t4

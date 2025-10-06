@@ -181,6 +181,11 @@ UserGestureIndicator::~UserGestureIndicator()
     currentToken() = m_previousToken;
 }
 
+RefPtr<UserGestureToken> UserGestureIndicator::currentUserGestureForMainThread()
+{
+    return currentToken();
+}
+
 RefPtr<UserGestureToken> UserGestureIndicator::currentUserGesture()
 {
     if (!isMainThread())

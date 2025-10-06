@@ -1328,7 +1328,7 @@ void VM::callPromiseRejectionCallback(Strong<JSPromise>& promise)
 
     MarkedArgumentBuffer args;
     args.append(promise.get());
-    args.append(promise->result(*this));
+    args.append(promise->result());
     ASSERT(!args.hasOverflowed());
     call(promise->globalObject(), callback, callData, jsNull(), args);
     scope.clearException();
@@ -1339,7 +1339,7 @@ void VM::didExhaustMicrotaskQueue()
     do {
         auto unhandledRejections = WTFMove(m_aboutToBeNotifiedRejectedPromises);
         for (auto& promise : unhandledRejections) {
-            if (promise->isHandled(*this))
+            if (promise->isHandled())
                 continue;
 
             callPromiseRejectionCallback(promise);
@@ -1521,6 +1521,62 @@ JSPropertyNameEnumerator* VM::emptyPropertyNameEnumeratorSlow()
     return enumerator;
 }
 
+NativeExecutable* VM::promiseResolvingFunctionResolveExecutableSlow()
+{
+    ASSERT(!m_promiseResolvingFunctionResolveExecutable);
+    auto* executable = getHostFunction(promiseResolvingFunctionResolve, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseResolvingFunctionResolveExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
+NativeExecutable* VM::promiseResolvingFunctionRejectExecutableSlow()
+{
+    ASSERT(!m_promiseResolvingFunctionRejectExecutable);
+    auto* executable = getHostFunction(promiseResolvingFunctionReject, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseResolvingFunctionRejectExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
+NativeExecutable* VM::promiseFirstResolvingFunctionResolveExecutableSlow()
+{
+    ASSERT(!m_promiseFirstResolvingFunctionResolveExecutable);
+    auto* executable = getHostFunction(promiseFirstResolvingFunctionResolve, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseFirstResolvingFunctionResolveExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
+NativeExecutable* VM::promiseFirstResolvingFunctionRejectExecutableSlow()
+{
+    ASSERT(!m_promiseFirstResolvingFunctionRejectExecutable);
+    auto* executable = getHostFunction(promiseFirstResolvingFunctionReject, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseFirstResolvingFunctionRejectExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
+NativeExecutable* VM::promiseResolvingFunctionResolveWithoutPromiseExecutableSlow()
+{
+    ASSERT(!m_promiseResolvingFunctionResolveWithoutPromiseExecutable);
+    auto* executable = getHostFunction(promiseResolvingFunctionResolveWithoutPromise, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseResolvingFunctionResolveWithoutPromiseExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
+NativeExecutable* VM::promiseResolvingFunctionRejectWithoutPromiseExecutableSlow()
+{
+    ASSERT(!m_promiseResolvingFunctionRejectWithoutPromiseExecutable);
+    auto* executable = getHostFunction(promiseResolvingFunctionRejectWithoutPromise, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseResolvingFunctionRejectWithoutPromiseExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
+NativeExecutable* VM::promiseCapabilityExecutorExecutableSlow()
+{
+    ASSERT(!m_promiseCapabilityExecutorExecutable);
+    auto* executable = getHostFunction(promiseCapabilityExecutor, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseCapabilityExecutorExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
 void VM::executeEntryScopeServicesOnEntry()
 {
     if (hasEntryScopeServiceRequest(EntryScopeService::FirePrimitiveGigacageEnabled)) [[unlikely]] {
@@ -1699,6 +1755,14 @@ void VM::visitAggregateImpl(Visitor& visitor)
     visitor.append(m_slowCanConstructBoundExecutable);
     visitor.append(lastCachedString);
     visitor.append(heapBigIntConstantOne);
+
+    visitor.append(m_promiseResolvingFunctionResolveExecutable);
+    visitor.append(m_promiseResolvingFunctionRejectExecutable);
+    visitor.append(m_promiseFirstResolvingFunctionResolveExecutable);
+    visitor.append(m_promiseFirstResolvingFunctionRejectExecutable);
+    visitor.append(m_promiseResolvingFunctionResolveWithoutPromiseExecutable);
+    visitor.append(m_promiseResolvingFunctionRejectWithoutPromiseExecutable);
+    visitor.append(m_promiseCapabilityExecutorExecutable);
 }
 DEFINE_VISIT_AGGREGATE(VM);
 
