@@ -1,21 +1,22 @@
 <!doctype html>
 <meta charset="utf-8">
-<link rel="help" href="https://github.com/w3c/csswg-drafts/pull/10586">
+<title>:has(...):host internal descendent</title>
+<link rel="help" href="https://drafts.csswg.org/css-scoping/#host-selector">
 <link rel="match" href="/css/reference/ref-filled-green-100px-square-only.html">
 <p>Test passes if there is a filled green square.</p>
 <div id="host">
     <template shadowrootmode="open">
       <style>
-        slot {
-          display: block;
+        div {
           width: 100px;
           height: 100px;
           background-color: red;
         }
-        :has-slotted {
+        :has(section):host div {
           background-color: green;
         }
       </style>
-      <slot></slot>
+      <span><div></div></span>
+      <section></section>
     </template>
 </div>
