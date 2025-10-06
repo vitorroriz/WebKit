@@ -1529,6 +1529,8 @@ JSValue LiteralParser<CharType, reviverMode>::parseRecursively(VM& vm, uint8_t* 
     return object;
 }
 
+constexpr unsigned maximumRangesStackRecursion = 4500;
+
 template <typename CharType, JSONReviverMode reviverMode>
 JSValue LiteralParser<CharType, reviverMode>::parse(VM& vm, ParserState initialState, JSONRanges* sourceRanges)
 {
@@ -1546,6 +1548,9 @@ JSValue LiteralParser<CharType, reviverMode>::parse(VM& vm, ParserState initialS
             m_objectStack.appendWithCrashOnOverflow(array);
             if constexpr (reviverMode == JSONReviverMode::Enabled) {
                 if (sourceRanges) {
+                    if (m_rangesStack.size() >= maximumRangesStackRecursion) [[unlikely]]
+                        return throwStackOverflowError(m_globalObject, scope);
+
                     unsigned startOffset = static_cast<unsigned>(m_lexer.currentTokenStart() - m_lexer.start());
                     m_rangesStack.append({
                         sourceRanges->record(array),
@@ -1612,6 +1617,9 @@ JSValue LiteralParser<CharType, reviverMode>::parse(VM& vm, ParserState initialS
             JSObject* object = constructEmptyObject(m_globalObject);
             if constexpr (reviverMode == JSONReviverMode::Enabled) {
                 if (sourceRanges) {
+                    if (m_rangesStack.size() >= maximumRangesStackRecursion) [[unlikely]]
+                        return throwStackOverflowError(m_globalObject, scope);
+
                     unsigned startOffset = static_cast<unsigned>(m_lexer.currentTokenStart() - m_lexer.start());
                     m_rangesStack.append({
                         sourceRanges->record(object),
