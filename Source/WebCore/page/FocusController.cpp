@@ -71,6 +71,7 @@
 #include <limits>
 #include <wtf/Ref.h>
 #include <wtf/TZoneMallocInlines.h>
+#include <wtf/text/TextStream.h>
 
 namespace WebCore {
 
@@ -1380,6 +1381,15 @@ void FocusController::focusRepaintTimerFired()
 Seconds FocusController::timeSinceFocusWasSet() const
 {
     return MonotonicTime::now() - m_focusSetTime;
+}
+
+TextStream& operator<<(TextStream& ts, const FocusableElementSearchResult& result)
+{
+    TextStream::GroupScope group(ts);
+    ts.dumpProperty("element"_s, result.element);
+    ts.dumpProperty("continuedSearchInRemoteFrame"_s, result.continuedSearchInRemoteFrame == ContinuedSearchInRemoteFrame::Yes);
+    ts.dumpProperty("relinquishedFocusToChrome"_s, result.relinquishedFocusToChrome == RelinquishedFocusToChrome::Yes);
+    return ts;
 }
 
 } // namespace WebCore
