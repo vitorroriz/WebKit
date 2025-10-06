@@ -269,11 +269,15 @@ public:
     uint8_t day() const { return m_day; }
 
 private:
-    int32_t m_year : 21; // ECMAScript max / min date's year can be represented <= 20 bits.
+    // ECMAScript max / min date's year can be represented <= 20 bits.
+    // However, PlainDate must be able to represent out-of-range years,
+    // since the validity checking is separate from date parsing.
+    // For example, see the test262 test
+    // Temporal/PlainDate/prototype/until/throws-if-rounded-date-outside-valid-iso-range.js
+    double m_year;
     int32_t m_month : 5; // Starts with 1.
     int32_t m_day : 6; // Starts with 1.
 };
-static_assert(sizeof(PlainDate) == sizeof(int32_t));
 
 using TimeZone = Variant<TimeZoneID, int64_t>;
 
