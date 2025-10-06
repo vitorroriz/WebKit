@@ -759,7 +759,6 @@ bindings/js/JSResizeObserverCustom.cpp
 bindings/js/JSResizeObserverEntryCustom.cpp
 bindings/js/JSSVGPathSegCustom.cpp
 bindings/js/JSSVGViewSpecCustom.cpp
-bindings/js/JSServiceWorkerClientCustom.cpp
 bindings/js/JSServiceWorkerGlobalScopeCustom.cpp
 bindings/js/JSShadowRealmGlobalScopeBase.cpp
 bindings/js/JSShadowRootCustom.cpp
