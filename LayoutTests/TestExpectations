@@ -2190,11 +2190,11 @@ imported/w3c/web-platform-tests/svg/styling/nested-svg-sizing-rems.tentative.svg
 imported/w3c/web-platform-tests/svg/styling/nested-svg-sizing-stretch.tentative.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/styling/nested-svg-sizing-viewport-units-with-ICB.tentative.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/styling/nested-svg-sizing-viewport-units.tentative.svg [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/styling/use-element-attr-selector-transition.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/svg/styling/use-element-attr-selector-transition.tentative.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/styling/use-element-attr-selector.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/styling/use-element-class-selector-transition.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/styling/use-element-id-selector-transition.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/styling/use-element-transitions-dom-mutation.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/svg/styling/use-element-class-selector-transition.tentative.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/svg/styling/use-element-id-selector-transition.tentative.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/svg/styling/use-element-transitions-dom-mutation.tentative.html [ ImageOnlyFailure ]
 
 webkit.org/b/201110 imported/w3c/web-platform-tests/svg/extensibility/foreignObject/stacking-context.html [ Skip ]
 webkit.org/b/201110 imported/w3c/web-platform-tests/svg/extensibility/foreignObject/position-svg-root-in-foreign-object.html [ Skip ]
@@ -7706,7 +7706,7 @@ webkit.org/b/289926 imported/w3c/web-platform-tests/css/css-position/sticky/posi
 webkit.org/b/289926 imported/w3c/web-platform-tests/css/css-position/sticky/position-sticky-table-pixel-rounding.html [ ImageOnlyFailure ]
 
 imported/w3c/web-platform-tests/svg/styling/use-element-animations.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/styling/use-element-transitions.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/svg/styling/use-element-transitions.tentative.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/styling/use-element-web-animations.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/styling/nested-svg-sizing.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/styling/nested-svg-sizing-with-use.svg [ ImageOnlyFailure ]
@@ -7916,6 +7916,11 @@ imported/w3c/web-platform-tests/html/rendering/replaced-elements/the-select-elem
 imported/w3c/web-platform-tests/html/rendering/replaced-elements/the-select-element/customizable-select/min-width-in-flex.html [ ImageOnlyFailure ]
 
 imported/w3c/web-platform-tests/html/rendering/sections/headingoffset-and-headingreset.html [ ImageOnlyFailure ]
+
+# Need to add tolerance for local in separate since failure is 0.01% and these tests pass on WPT itself.
+imported/w3c/web-platform-tests/svg/painting/reftests/text-shadow-01.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/svg/painting/reftests/text-shadow-02.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/svg/painting/reftests/text-shadow-03.html [ ImageOnlyFailure ]
 
 # Hits assert in debug, tracked by rdar://161930313
 [ Debug ] http/tests/site-isolation/mixedContent/data-url-iframe-in-main-frame.html [ Skip ]

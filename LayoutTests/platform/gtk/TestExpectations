@@ -1629,6 +1629,7 @@ http/tests/css/css-masking/mask-inline-svg-mask.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/geometry/reftests/circle-003.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/painting/reftests/marker-path-001.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/painting/reftests/marker-path-011.svg [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/svg/fonts/font-size-adjust-scale-text.svg [ ImageOnlyFailure ]
 
 media/adopt-node-after-showing-picker-crash.html [ Skip ]
 
