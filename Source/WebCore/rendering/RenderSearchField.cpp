@@ -296,7 +296,6 @@ PopupMenuStyle RenderSearchField::menuStyle() const
         style().usedVisibility() == Visibility::Visible,
         style().display() == DisplayType::None,
         true,
-        Style::toPlatform(style().textIndent().length),
         writingMode().bidiDirection(),
         isOverride(style().unicodeBidi()),
         PopupMenuStyle::CustomBackgroundColor
