@@ -5953,6 +5953,51 @@ sub GenerateAttributeSetterBodyDefinition
         push(@$outputArray, "    UNUSED_PARAM(thisObject);\n");
         push(@$outputArray, "    UNUSED_PARAM(value);\n");
         push(@$outputArray, "    return true;\n");
+    } elsif ($attribute->type->isUnion && !$attribute->type->isNullable && $attribute->extendedAttributes->{OptimizedUnionSetterUsingOverloads}) {
+        push(@$outputArray, "    SUPPRESS_UNCOUNTED_LOCAL auto& impl = thisObject.wrapped();\n") if !$attribute->isStatic;
+
+        my $globalObjectReference = $attribute->isStatic ? "*jsCast<JSDOMGlobalObject*>(lexicalGlobalObject)" : "*thisObject.globalObject()";
+        my $exceptionThrower = GetAttributeExceptionThrower($interface, $attribute);
+
+        push(@$outputArray, "    auto valueFunctor = [&]<typename T>(T&& nativeValueConversionResult) -> bool {\n");
+        push(@$outputArray, "        if constexpr (std::same_as<T, ConversionResultException>) {\n");
+        push(@$outputArray, "            return false;\n");
+        push(@$outputArray, "        } else {\n");
+        push(@$outputArray, "            if (nativeValueConversionResult.hasException(throwScope)) [[unlikely]]\n");
+        push(@$outputArray, "                return false;\n");
+
+        my $readValue = "nativeValueConversionResult.returnValue()";
+        my $releaseValue = PassArgumentExpression("nativeValueConversionResult.releaseReturnValue()", $attribute);
+
+        my $nativeValue = $releaseValue;
+        my ($baseFunctionName, @arguments) = $codeGenerator->SetterExpression(\%implIncludes, $interface->type->name, $attribute);
+        push(@arguments, $nativeValue);
+
+        my $functionName = GetFullyQualifiedImplementationCallName($interface, $attribute, $baseFunctionName, "impl", $conditional);
+        AddAdditionalArgumentsForImplementationCall(\@arguments, $interface, $attribute, "impl", "lexicalGlobalObject", "", "thisObject");
+
+        unshift(@arguments, GenerateCallWithUsingReferences($attribute->extendedAttributes->{SetterCallWith}, $outputArray, "false", "thisObject"));
+        unshift(@arguments, GenerateCallWithUsingReferences($attribute->extendedAttributes->{CallWith}, $outputArray, "false", "thisObject"));
+
+        my $functionString = "${functionName}(" . join(", ", @arguments) . ")";
+
+        my $callTracer = $attribute->extendedAttributes->{CallTracer} || $interface->extendedAttributes->{CallTracer};
+        if ($callTracer) {
+            my $indent = "            ";
+            my @callTracerArguments = ( ["typename T::IDL", "${readValue}"] );
+            GenerateCallTracer($outputArray, $callTracer, $attribute->name, \@callTracerArguments, $indent);
+        }
+
+        push(@$outputArray, "            invokeFunctorPropagatingExceptionIfNecessary(lexicalGlobalObject, throwScope, [&] {\n");
+        push(@$outputArray, "                return $functionString;\n");
+        push(@$outputArray, "            });\n");
+        push(@$outputArray, "            return true;\n");
+        push(@$outputArray, "        }\n");
+        push(@$outputArray, "    };\n");
+
+        my $toNativeExpression = JSValueToNative($interface, $attribute, "value", $attribute->extendedAttributes->{Conditional}, "&lexicalGlobalObject", "lexicalGlobalObject", "thisObject", $globalObjectReference, $exceptionThrower, undef, undef, undef, "valueFunctor");
+
+        push(@$outputArray, "    return $toNativeExpression;\n");
     } else {
         push(@$outputArray, "    SUPPRESS_UNCOUNTED_LOCAL auto& impl = thisObject.wrapped();\n") if !$attribute->isStatic;
 
@@ -7676,7 +7721,7 @@ sub IsValidContextForJSValueToNative
 
 sub JSValueToNative
 {
-    my ($interface, $context, $value, $conditional, $lexicalGlobalObjectPointer, $lexicalGlobalObjectReference, $thisObjectReference, $globalObjectReference, $exceptionThrowerFunctor, $functionName, $optional, $defaultValueFunctor) = @_;
+    my ($interface, $context, $value, $conditional, $lexicalGlobalObjectPointer, $lexicalGlobalObjectReference, $thisObjectReference, $globalObjectReference, $exceptionThrowerFunctor, $functionName, $optional, $defaultValueFunctor, $resultValueFunctor) = @_;
 
     assert("Invalid context type") if !IsValidContextForJSValueToNative($context);
 
@@ -7701,6 +7746,7 @@ sub JSValueToNative
     push(@conversionArguments, $globalObjectReference) if JSValueToNativeDOMConvertNeedsGlobalObject($type);
     push(@conversionArguments, $defaultValueFunctor) if $defaultValueFunctor;
     push(@conversionArguments, $exceptionThrowerFunctor) if $exceptionThrowerFunctor;
+    push(@conversionArguments, $resultValueFunctor) if $resultValueFunctor;
     if ($type->name eq "ScheduledAction") {
         my $interfaceName = $codeGenerator->GetVisibleInterfaceName($interface);
         if ($functionName) {
