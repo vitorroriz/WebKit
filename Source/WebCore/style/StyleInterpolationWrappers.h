@@ -536,33 +536,6 @@ public:
 
 #endif
 
-class LineHeightWrapper final : public LengthWrapper {
-    WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(LineHeightWrapper, Animation);
-public:
-    LineHeightWrapper()
-        : LengthWrapper(CSSPropertyLineHeight, &RenderStyle::specifiedLineHeight, &RenderStyle::setLineHeight)
-    {
-    }
-
-    bool canInterpolate(const RenderStyle& from, const RenderStyle& to, CompositeOperation compositeOperation) const final
-    {
-        // We must account for how BuilderConverter::convertLineHeight() deals with line-height values:
-        // - "normal" is converted to LengthType::Percent with a -100 value
-        // - <number> values are converted to LengthType::Percent
-        // - <length-percentage> values are converted to LengthType::Fixed
-        // This means that animating between "normal" and a "<number>" would work with LengthWrapper::canInterpolate()
-        // since it would see two LengthType::Percent values. So if either value is "normal" we cannot interpolate since those
-        // values are either equal or of incompatible types.
-        auto normalLineHeight = RenderStyle::initialLineHeight();
-        if (value(from) == normalLineHeight || value(to) == normalLineHeight)
-            return false;
-
-        // The default logic will now apply since <number> and <length-percentage> values
-        // are converted to different LengthType values.
-        return LengthWrapper::canInterpolate(from, to, compositeOperation);
-    }
-};
-
 // MARK: - Color Property Wrappers
 
 class ColorWrapper final : public WrapperWithGetter<const WebCore::Color&> {

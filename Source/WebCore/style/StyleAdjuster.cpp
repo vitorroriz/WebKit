@@ -1188,7 +1188,7 @@ auto Adjuster::adjustmentForTextAutosizing(const RenderStyle& style, const Eleme
 
         constexpr static float boostFactor = 1.25;
         auto minimumLineHeight = boostFactor * computedFontSize;
-        if (!lineHeight.isFixed() || lineHeight.value() >= minimumLineHeight)
+        if (auto fixedLineHeight = lineHeight.tryFixed(); !fixedLineHeight || fixedLineHeight->resolveZoom(ZoomNeeded { }) >= minimumLineHeight)
             return;
 
         if (AutosizeStatus::probablyContainsASmallFixedNumberOfLines(style))
@@ -1231,7 +1231,7 @@ bool Adjuster::adjustForTextAutosizing(RenderStyle& style, AdjustmentForTextAuto
         style.setFontDescription(WTFMove(fontDescription));
     }
     if (auto newLineHeight = adjustment.newLineHeight)
-        style.setLineHeight({ *newLineHeight, LengthType::Fixed });
+        style.setLineHeight(LineHeight::Fixed { *newLineHeight });
     if (auto newStatus = adjustment.newStatus)
         style.setAutosizeStatus(*newStatus);
     return adjustment.newFontSize || adjustment.newLineHeight;

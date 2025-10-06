@@ -2276,7 +2276,7 @@ static void adjustSelectListButtonStyleForVectorBasedControls(RenderStyle& style
     applyCommonButtonPaddingToStyleForVectorBasedControls(style, element);
 
     // Enforce "line-height: normal".
-    style.setLineHeight(Length(LengthType::Normal));
+    style.setLineHeight(CSS::Keyword::Normal { });
 }
 
 // FIXME: This is a copy of RenderThemeMeasureTextClient from RenderThemeIOS. Refactor to remove duplicate code.

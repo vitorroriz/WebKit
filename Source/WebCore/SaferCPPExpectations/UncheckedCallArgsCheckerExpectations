@@ -697,7 +697,6 @@ style/PseudoClassChangeInvalidation.cpp
 style/RuleSetBuilder.cpp
 style/StyleAdjuster.cpp
 style/StyleBuilder.cpp
-style/StyleBuilderConverter.h
 style/StyleBuilderCustom.h
 style/StyleBuilderState.cpp
 style/StyleBuilderStateInlines.h
@@ -722,6 +721,7 @@ style/values/color/StyleKeywordColor.cpp
 style/values/content/StyleContent.cpp
 style/values/fonts/StyleFontWeight.cpp
 style/values/grid/StyleGridPositionsResolver.cpp
+style/values/inline/StyleLineHeight.cpp
 style/values/primitives/StyleLengthResolution.cpp
 svg/SVGAElement.cpp
 svg/SVGClipPathElement.cpp

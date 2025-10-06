@@ -160,6 +160,7 @@ private:
     template<typename, typename> friend struct Evaluation;
     template<typename, typename> friend struct MinimumEvaluation;
     template<typename> friend struct Blending;
+    template<typename> friend struct LengthWrapperBlendingSupport;
 
     static LengthWrapperData toData(const Specified& specified)
     {

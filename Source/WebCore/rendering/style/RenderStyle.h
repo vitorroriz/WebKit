@@ -287,6 +287,7 @@ struct HyphenateLimitLines;
 struct ImageOrNone;
 struct InsetEdge;
 struct LetterSpacing;
+struct LineHeight;
 struct LineWidth;
 struct LineFitEdge;
 struct ListStyleType;
@@ -770,10 +771,10 @@ public:
 
     inline TextZoom textZoom() const;
 
-    const Length& specifiedLineHeight() const;
-    WEBCORE_EXPORT const Length& lineHeight() const;
+    const Style::LineHeight& specifiedLineHeight() const;
+    WEBCORE_EXPORT const Style::LineHeight& lineHeight() const;
     WEBCORE_EXPORT float computedLineHeight() const;
-    float computeLineHeight(const Length&) const;
+    float computeLineHeight(const Style::LineHeight&) const;
 
     inline bool autoWrap() const;
     static constexpr bool preserveNewline(WhiteSpaceCollapse);
@@ -1387,7 +1388,6 @@ public:
     inline void setTextUnderlinePosition(OptionSet<TextUnderlinePosition>);
     inline void setTextUnderlineOffset(Style::TextUnderlineOffset&&);
     inline void setTextTransform(OptionSet<TextTransform>);
-    void setLineHeight(Length&&);
     bool setZoom(float);
     inline bool setUsedZoom(float);
     inline void setTextZoom(TextZoom);
@@ -1400,8 +1400,9 @@ public:
 
     inline void setMarginTrim(OptionSet<MarginTrimType>);
 
+    void setLineHeight(Style::LineHeight&&);
 #if ENABLE(TEXT_AUTOSIZING)
-    void setSpecifiedLineHeight(Length&&);
+    void setSpecifiedLineHeight(Style::LineHeight&&);
 #endif
 
     inline void setImageOrientation(ImageOrientation);
@@ -2033,8 +2034,7 @@ public:
     static constexpr Style::LineFitEdge initialLineFitEdge();
     static constexpr Style::Widows initialWidows();
     static constexpr Style::Orphans initialOrphans();
-    // Returning -100% percent here means the line-height is not set.
-    static inline Length initialLineHeight();
+    static inline Style::LineHeight initialLineHeight();
     static constexpr TextAlignMode initialTextAlign();
     static constexpr TextAlignLast initialTextAlignLast();
     static constexpr TextGroupAlign initialTextGroupAlign();
@@ -2167,7 +2167,7 @@ public:
 #endif
 
 #if ENABLE(TEXT_AUTOSIZING)
-    static inline Length initialSpecifiedLineHeight();
+    static inline Style::LineHeight initialSpecifiedLineHeight();
     static constexpr Style::TextSizeAdjust initialTextSizeAdjust();
 #endif
 

@@ -3328,6 +3328,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     style/values/inline/StyleLineBoxContain.h
     style/values/inline/StyleLineFitEdge.h
+    style/values/inline/StyleLineHeight.h
     style/values/inline/StyleTextBoxEdge.h
     style/values/inline/StyleTextEdge.h
     style/values/inline/StyleVerticalAlign.h

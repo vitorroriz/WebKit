@@ -41,6 +41,7 @@
 #include "StyleExtractorSerializer.h"
 #include "StyleInterpolation.h"
 #include "StyleOrderedNamedLinesCollector.h"
+#include "StylePrimitiveNumericTypes+Evaluation.h"
 #include "StylePropertyShorthand.h"
 #include "StylePropertyShorthandFunctions.h"
 
@@ -264,6 +265,36 @@ template<> struct PropertyExtractorAdaptor<CSSPropertyWordSpacing> {
     template<typename F> decltype(auto) computedValue(ExtractorState& state, F&& functor) const
     {
         return functor(state.style.computedWordSpacing());
+    }
+};
+
+template<> struct PropertyExtractorAdaptor<CSSPropertyLineHeight> {
+    template<typename F> decltype(auto) computedValue(ExtractorState& state, F&& functor) const
+    {
+        return WTF::switchOn(state.style.lineHeight(),
+            [&](const CSS::Keyword::Normal& keyword) {
+                return functor(keyword);
+            },
+            [&](const LineHeight::Fixed& fixed) {
+                return functor(fixed);
+            },
+            [&](const LineHeight::Percentage& percentage) {
+                // CSSValueConversion<LineHeight> will convert a percentage value to a fixed value,
+                // and a number value to a percentage value. To be able to roundtrip a number value, we thus
+                // look for a percent value and convert it back to a number.
+                if (state.valueType == ExtractorState::PropertyValueType::Computed)
+                    return functor(Number<CSS::Nonnegative> { percentage.value / 100 });
+
+                // This is imperfect, because it doesn't include the zoom factor and the real computation
+                // for how high to be in pixels does include things like minimum font size and the zoom factor.
+                // On the other hand, since font-size doesn't include the zoom factor, we really can't do
+                // that here either.
+                return functor(Length<CSS::Nonnegative> { percentage.value * state.style.fontDescription().computedSize() / 100 });
+            },
+            [&](const LineHeight::Calc& calc) {
+                return functor(Length<CSS::Nonnegative> { evaluate<float>(calc, 0.0f) });
+            }
+        );
     }
 };
 
@@ -1316,50 +1347,12 @@ inline void ExtractorCustom::extractWordSpacingSerialization(ExtractorState& sta
 
 inline Ref<CSSValue> ExtractorCustom::extractLineHeight(ExtractorState& state)
 {
-    auto& length = state.style.lineHeight();
-    if (length.isNormal())
-        return CSSPrimitiveValue::create(CSSValueNormal);
-    if (length.isPercent()) {
-        // BuilderConverter::convertLineHeight() will convert a percentage value to a fixed value,
-        // and a number value to a percentage value. To be able to roundtrip a number value, we thus
-        // look for a percent value and convert it back to a number.
-        if (state.valueType == ExtractorState::PropertyValueType::Computed)
-            return CSSPrimitiveValue::create(length.value() / 100);
-
-        // This is imperfect, because it doesn't include the zoom factor and the real computation
-        // for how high to be in pixels does include things like minimum font size and the zoom factor.
-        // On the other hand, since font-size doesn't include the zoom factor, we really can't do
-        // that here either.
-        return ExtractorConverter::convertNumberAsPixels(state, static_cast<double>(length.percent() * state.style.fontDescription().computedSize()) / 100);
-    }
-    return ExtractorConverter::convertNumberAsPixels(state, floatValueForLength(length, 0, 1.0f /* FIXME FIND ZOOM */));
+    return extractCSSValue<CSSPropertyLineHeight>(state);
 }
 
 inline void ExtractorCustom::extractLineHeightSerialization(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context)
 {
-    auto& length = state.style.lineHeight();
-    if (length.isNormal()) {
-        CSS::serializationForCSS(builder, context, CSS::Keyword::Normal { });
-        return;
-    }
-    if (length.isPercent()) {
-        // BuilderConverter::convertLineHeight() will convert a percentage value to a fixed value,
-        // and a number value to a percentage value. To be able to roundtrip a number value, we thus
-        // look for a percent value and convert it back to a number.
-        if (state.valueType == ExtractorState::PropertyValueType::Computed) {
-            ExtractorSerializer::serializeNumber(state, builder, context, length.value() / 100);
-            return;
-        }
-
-        // This is imperfect, because it doesn't include the zoom factor and the real computation
-        // for how high to be in pixels does include things like minimum font size and the zoom factor.
-        // On the other hand, since font-size doesn't include the zoom factor, we really can't do
-        // that here either.
-        ExtractorSerializer::serializeNumberAsPixels(state, builder, context, static_cast<double>(length.percent() * state.style.fontDescription().computedSize()) / 100);
-        return;
-    }
-
-    ExtractorSerializer::serializeNumberAsPixels(state, builder, context, floatValueForLength(length, 0, 1.0f /* FIXME FIND ZOOM */));
+    extractSerialization<CSSPropertyLineHeight>(state, builder, context);
 }
 
 inline Ref<CSSValue> ExtractorCustom::extractFontFamily(ExtractorState& state)

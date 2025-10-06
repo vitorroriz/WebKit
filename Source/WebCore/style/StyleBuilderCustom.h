@@ -119,6 +119,7 @@ inline GridTemplateList forwardInheritedValue(const GridTemplateList& value) { a
 inline GridTrackSizes forwardInheritedValue(const GridTrackSizes& value) { auto copy = value; return copy; }
 inline HyphenateCharacter forwardInheritedValue(const HyphenateCharacter& value) { auto copy = value; return copy; }
 inline LetterSpacing forwardInheritedValue(const LetterSpacing& value) { auto copy = value; return copy; }
+inline LineHeight forwardInheritedValue(const LineHeight& value) { auto copy = value; return copy; }
 inline ListStyleType forwardInheritedValue(const ListStyleType& value) { auto copy = value; return copy; }
 inline OffsetAnchor forwardInheritedValue(const OffsetAnchor& value) { auto copy = value; return copy; }
 inline OffsetDistance forwardInheritedValue(const OffsetDistance& value) { auto copy = value; return copy; }
@@ -159,7 +160,6 @@ inline TextIndent forwardInheritedValue(const TextIndent& value) { auto copy = v
 inline TextShadows forwardInheritedValue(const TextShadows& value) { auto copy = value; return copy; }
 inline TextUnderlineOffset forwardInheritedValue(const TextUnderlineOffset& value) { auto copy = value; return copy; }
 inline URL forwardInheritedValue(const URL& value) { auto copy = value; return copy; }
-inline FixedVector<WebCore::Length> forwardInheritedValue(const FixedVector<WebCore::Length>& value) { auto copy = value; return copy; }
 inline FixedVector<PositionTryFallback> forwardInheritedValue(const FixedVector<PositionTryFallback>& value) { auto copy = value; return copy; }
 inline ProgressTimelineAxes forwardInheritedValue(const ProgressTimelineAxes& value) { auto copy = value; return copy; }
 inline ProgressTimelineNames forwardInheritedValue(const ProgressTimelineNames& value) { auto copy = value; return copy; }
@@ -735,21 +735,22 @@ inline void BuilderCustom::applyValueLineHeight(BuilderState& builderState, CSSV
         return;
     }
 
-    auto lineHeight = BuilderConverter::convertLineHeight(builderState, value, 1);
+    RefPtr primitiveValue = requiredDowncast<CSSPrimitiveValue>(builderState, value);
+    if (!primitiveValue)
+        return;
 
-    WebCore::Length computedLineHeight;
-    if (lineHeight.isNormal())
-        computedLineHeight = lineHeight;
-    else {
-        auto primitiveValue = requiredDowncast<CSSPrimitiveValue>(builderState, value);
-        if (!primitiveValue)
-            return;
+    auto lineHeight = toStyleFromCSSValue<LineHeight>(builderState, *primitiveValue, 1.0f);
+
+    auto computedLineHeight = [&] -> LineHeight {
+        if (lineHeight.isNormal())
+            return lineHeight;
+
         auto multiplier = computeLineHeightMultiplierDueToFontSize(builderState.document(), builderState.style(), *primitiveValue);
         if (multiplier == 1)
-            computedLineHeight = lineHeight;
-        else
-            computedLineHeight = BuilderConverter::convertLineHeight(builderState, value, multiplier);
-    }
+            return lineHeight;
+
+        return toStyleFromCSSValue<LineHeight>(builderState, *primitiveValue, multiplier);
+    }();
 
     builderState.style().setLineHeight(WTFMove(computedLineHeight));
     builderState.style().setSpecifiedLineHeight(WTFMove(lineHeight));

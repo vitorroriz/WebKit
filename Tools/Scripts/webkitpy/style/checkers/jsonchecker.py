@@ -386,7 +386,7 @@ class JSONCSSPropertiesChecker(JSONChecker):
             'animation-wrapper-acceleration': self.validate_string,
             'animation-wrapper-comment': self.validate_comment,
             'animation-wrapper-requires-additional-parameters': self.validate_array,
-            'animation-wrapper-requires-computed-getter': self.validate_boolean,
+            'animation-wrapper-requires-getter': self.validate_string,
             'animation-wrapper-requires-non-additive-or-cumulative-interpolation': self.validate_boolean,
             'animation-wrapper-requires-non-normalized-discrete-interpolation': self.validate_boolean,
             'animation-wrapper-requires-override-parameters': self.validate_array,

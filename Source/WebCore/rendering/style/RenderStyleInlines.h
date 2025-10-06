@@ -434,6 +434,7 @@ constexpr OptionSet<Style::LineBoxContain> RenderStyle::initialLineBoxContain() 
 constexpr LineBreak RenderStyle::initialLineBreak() { return LineBreak::Auto; }
 constexpr Style::WebkitLineClamp RenderStyle::initialLineClamp() { return CSS::Keyword::None { }; }
 inline Style::WebkitLineGrid RenderStyle::initialLineGrid() { return CSS::Keyword::None { }; }
+inline Style::LineHeight RenderStyle::initialLineHeight() { return CSS::Keyword::Normal { }; }
 constexpr LineSnap RenderStyle::initialLineSnap() { return LineSnap::None; }
 inline Style::ImageOrNone RenderStyle::initialListStyleImage() { return CSS::Keyword::None { }; }
 constexpr ListStylePosition RenderStyle::initialListStylePosition() { return ListStylePosition::Outside; }
@@ -902,7 +903,7 @@ constexpr Style::WebkitTouchCallout RenderStyle::initialTouchCallout() { return 
 #endif
 
 #if ENABLE(TEXT_AUTOSIZING)
-inline Length RenderStyle::initialSpecifiedLineHeight() { return LengthType::Normal; }
+inline Style::LineHeight RenderStyle::initialSpecifiedLineHeight() { return CSS::Keyword::Normal { }; }
 constexpr Style::TextSizeAdjust RenderStyle::initialTextSizeAdjust() { return CSS::Keyword::Auto { }; }
 inline Style::TextSizeAdjust RenderStyle::textSizeAdjust() const { return m_rareInheritedData->textSizeAdjust; }
 #endif
@@ -1034,11 +1035,6 @@ inline bool RenderStyle::hasInlineColumnAxis() const
 {
     auto axis = columnAxis();
     return axis == ColumnAxis::Auto || writingMode().isHorizontal() == (axis == ColumnAxis::Horizontal);
-}
-
-inline Length RenderStyle::initialLineHeight()
-{
-    return LengthType::Normal;
 }
 
 inline bool RenderStyle::isCollapsibleWhiteSpace(char16_t character) const

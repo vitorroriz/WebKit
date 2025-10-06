@@ -566,11 +566,11 @@ unsigned RenderStyle::hashForTextAutosizing() const
 {
     // FIXME: Not a very smart hash. Could be improved upon. See <https://bugs.webkit.org/show_bug.cgi?id=121131>.
     unsigned hash = m_nonInheritedData->miscData->usedAppearance;
-    hash ^= m_nonInheritedData->rareData->lineClamp.valueForTextAutosizingHash();
+    hash ^= m_nonInheritedData->rareData->lineClamp.valueForHash();
     hash ^= m_rareInheritedData->overflowWrap;
     hash ^= m_rareInheritedData->nbspMode;
     hash ^= m_rareInheritedData->lineBreak;
-    hash ^= WTF::FloatHash<float>::hash(m_inheritedData->specifiedLineHeight.value());
+    hash ^= m_inheritedData->specifiedLineHeight.valueForHash();
     hash ^= computeFontHash(m_inheritedData->fontData->fontCascade);
     hash ^= WTF::FloatHash<float>::hash(m_inheritedData->borderHorizontalSpacing.unresolvedValue());
     hash ^= WTF::FloatHash<float>::hash(m_inheritedData->borderVerticalSpacing.unresolvedValue());
@@ -625,18 +625,21 @@ bool RenderStyle::isIdempotentTextAutosizingCandidate(AutosizeStatus status) con
                 if (width().isFixed())
                     return false;
                 if (auto fixedHeight = height().tryFixed(); fixedHeight && specifiedLineHeight().isFixed()) {
-                    float specifiedSize = specifiedFontSize();
-                    if (fixedHeight->resolveZoom(Style::ZoomNeeded { }) == specifiedSize && specifiedLineHeight().value() == specifiedSize)
-                        return false;
+                    if (auto fixedSpecifiedLineHeight = specifiedLineHeight().tryFixed()) {
+                        float specifiedSize = specifiedFontSize();
+                        if (fixedHeight->resolveZoom(Style::ZoomNeeded { }) == specifiedSize && fixedSpecifiedLineHeight->resolveZoom(Style::ZoomNeeded { }) == specifiedSize)
+                            return false;
+                    }
                 }
                 return true;
             }
             if (fields.contains(AutosizeStatus::Fields::Floating)) {
                 if (auto fixedHeight = height().tryFixed(); specifiedLineHeight().isFixed() && fixedHeight) {
-                    float specifiedSize = specifiedFontSize();
-                    if (specifiedLineHeight().value() - specifiedSize > smallMinimumDifferenceThresholdBetweenLineHeightAndSpecifiedFontSizeForBoostingText
-                        && fixedHeight->resolveZoom(Style::ZoomNeeded { }) - specifiedSize > smallMinimumDifferenceThresholdBetweenLineHeightAndSpecifiedFontSizeForBoostingText) {
-                        return true;
+                    if (auto fixedSpecifiedLineHeight = specifiedLineHeight().tryFixed()) {
+                        float specifiedSize = specifiedFontSize();
+                        if (fixedSpecifiedLineHeight->resolveZoom(Style::ZoomNeeded { }) - specifiedSize > smallMinimumDifferenceThresholdBetweenLineHeightAndSpecifiedFontSizeForBoostingText
+                                && fixedHeight->resolveZoom(Style::ZoomNeeded { }) - specifiedSize > smallMinimumDifferenceThresholdBetweenLineHeightAndSpecifiedFontSizeForBoostingText)
+                            return true;
                     }
                 }
                 return false;
@@ -664,7 +667,7 @@ bool RenderStyle::isIdempotentTextAutosizingCandidate(AutosizeStatus status) con
             return true;
         if (fields.contains(AutosizeStatus::Fields::FixedWidth))
             return true;
-        if (specifiedLineHeight().isFixed() && specifiedLineHeight().value() - specifiedFontSize() > largeMinimumDifferenceThresholdBetweenLineHeightAndSpecifiedFontSizeForBoostingText)
+        if (auto fixedSpecifiedLineHeight = specifiedLineHeight().tryFixed(); fixedSpecifiedLineHeight && fixedSpecifiedLineHeight->resolveZoom(Style::ZoomNeeded { }) - specifiedFontSize() > largeMinimumDifferenceThresholdBetweenLineHeightAndSpecifiedFontSizeForBoostingText)
             return true;
         return false;
     }
@@ -2550,7 +2553,7 @@ bool RenderStyle::setFontDescriptionWithoutUpdate(FontCascadeDescription&& descr
     return true;
 }
 
-const Length& RenderStyle::specifiedLineHeight() const
+const Style::LineHeight& RenderStyle::specifiedLineHeight() const
 {
 #if ENABLE(TEXT_AUTOSIZING)
     return m_inheritedData->specifiedLineHeight;
@@ -2561,21 +2564,21 @@ const Length& RenderStyle::specifiedLineHeight() const
 
 #if ENABLE(TEXT_AUTOSIZING)
 
-void RenderStyle::setSpecifiedLineHeight(Length&& height)
+void RenderStyle::setSpecifiedLineHeight(Style::LineHeight&& lineHeight)
 {
-    SET_VAR(m_inheritedData, specifiedLineHeight, WTFMove(height));
+    SET_VAR(m_inheritedData, specifiedLineHeight, WTFMove(lineHeight));
 }
 
 #endif
 
-const Length& RenderStyle::lineHeight() const
+const Style::LineHeight& RenderStyle::lineHeight() const
 {
     return m_inheritedData->lineHeight;
 }
 
-void RenderStyle::setLineHeight(Length&& height)
+void RenderStyle::setLineHeight(Style::LineHeight&& lineHeight)
 {
-    SET_VAR(m_inheritedData, lineHeight, WTFMove(height));
+    SET_VAR(m_inheritedData, lineHeight, WTFMove(lineHeight));
 }
 
 float RenderStyle::computedLineHeight() const
@@ -2583,15 +2586,22 @@ float RenderStyle::computedLineHeight() const
     return computeLineHeight(lineHeight());
 }
 
-float RenderStyle::computeLineHeight(const Length& lineHeightLength) const
+float RenderStyle::computeLineHeight(const Style::LineHeight& lineHeight) const
 {
-    if (lineHeightLength.isNormal())
-        return metricsOfPrimaryFont().lineSpacing();
-
-    if (lineHeightLength.isPercentOrCalculated())
-        return minimumValueForLength(lineHeightLength, computedFontSize(), 1.0f /* FIXME FIND ZOOM */).toFloat();
-
-    return lineHeightLength.value();
+    return WTF::switchOn(lineHeight,
+        [&](const CSS::Keyword::Normal&) -> float {
+            return metricsOfPrimaryFont().lineSpacing();
+        },
+        [&](const Style::LineHeight::Fixed& fixed) -> float {
+            return Style::evaluate<LayoutUnit>(fixed, Style::ZoomNeeded { }).toFloat();
+        },
+        [&](const Style::LineHeight::Percentage& percentage) -> float {
+            return Style::evaluate<LayoutUnit>(percentage, LayoutUnit { computedFontSize() }).toFloat();
+        },
+        [&](const Style::LineHeight::Calc& calc) -> float {
+            return Style::evaluate<LayoutUnit>(calc, LayoutUnit { computedFontSize() }).toFloat();
+        }
+    );
 }
 
 void RenderStyle::setTextSpacingTrim(TextSpacingTrim value)

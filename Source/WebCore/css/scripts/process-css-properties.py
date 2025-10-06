@@ -463,10 +463,11 @@ class StylePropertyCodeGenProperties:
         Schema.Entry("animation-wrapper", allowed_types=[str]),
         Schema.Entry("animation-wrapper-acceleration", allowed_types=[str]),
         Schema.Entry("animation-wrapper-requires-additional-parameters", allowed_types=[list], default_value=[]),
-        Schema.Entry("animation-wrapper-requires-computed-getter", allowed_types=[bool], default_value=False),
+        Schema.Entry("animation-wrapper-requires-getter", allowed_types=[str]),
         Schema.Entry("animation-wrapper-requires-non-additive-or-cumulative-interpolation", allowed_types=[bool], default_value=False),
         Schema.Entry("animation-wrapper-requires-non-normalized-discrete-interpolation", allowed_types=[bool], default_value=False),
         Schema.Entry("animation-wrapper-requires-override-parameters", allowed_types=[list]),
+        Schema.Entry("animation-wrapper-requires-setter", allowed_types=[str]),
         Schema.Entry("animation-wrapper-requires-render-style", allowed_types=[bool], default_value=False),
         Schema.Entry("cascade-alias", allowed_types=[str]),
         Schema.Entry("color-property", allowed_types=[bool], default_value=False),
@@ -5269,13 +5270,16 @@ class GenerateStyleInterpolationWrapperMap:
                 property_wrapper_type = "FillLayersWrapper"
             else:
                 # Add getter
-                if property.codegen_properties.animation_wrapper_requires_computed_getter:
-                    property_wrapper_parameters += [f"&{style_type}::computed{name_for_methods}"]
+                if property.codegen_properties.animation_wrapper_requires_getter is not None:
+                    property_wrapper_parameters += [f"&{style_type}::{property.codegen_properties.animation_wrapper_requires_getter}"]
                 else:
                     property_wrapper_parameters += [f"&{style_type}::{getter}"]
 
                 # Add setter
-                property_wrapper_parameters += [f"&{style_type}::{setter}"]
+                if property.codegen_properties.animation_wrapper_requires_setter is not None:
+                    property_wrapper_parameters += [f"&{style_type}::{property.codegen_properties.animation_wrapper_requires_setter}"]
+                else:
+                    property_wrapper_parameters += [f"&{style_type}::{setter}"]
 
                 # Add property type specific parameters
                 if property.codegen_properties.visited_link_color_support:

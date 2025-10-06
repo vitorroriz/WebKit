@@ -4902,7 +4902,7 @@
             "codegen-properties": {
                 "accepts-quirky-length": true,
                 "animation-wrapper": "StyleTypeWrapper",
-                "animation-wrapper-requires-computed-getter": true,
+                "animation-wrapper-requires-getter": "computedLetterSpacing",
                 "animation-wrapper-requires-render-style": true,
                 "style-builder-custom": "All",
                 "style-builder-converter": "StyleType<LetterSpacing>",
@@ -4965,8 +4965,8 @@
             ],
             "codegen-properties": [
                 {
-                    "animation-wrapper": "LineHeightWrapper",
-                    "animation-wrapper-requires-override-parameters": [],
+                    "animation-wrapper": "StyleTypeWrapper",
+                    "animation-wrapper-requires-getter": "specifiedLineHeight",
                     "style-builder-custom": "All",
                     "style-extractor-custom": true,
                     "enable-if": "ENABLE_TEXT_AUTOSIZING",
@@ -4974,10 +4974,9 @@
                     "parser-exported": true
                 },
                 {
-                    "animation-wrapper": "LineHeightWrapper",
-                    "animation-wrapper-requires-override-parameters": [],
+                    "animation-wrapper": "StyleTypeWrapper",
                     "render-style-getter": "specifiedLineHeight",
-                    "style-builder-converter": "LineHeight",
+                    "style-builder-converter": "StyleType<LineHeight>",
                     "style-extractor-custom": true,
                     "enable-if": "!ENABLE_TEXT_AUTOSIZING",
                     "parser-grammar": "normal | <number [0,inf]> | <length-percentage [0,inf]>",
@@ -8409,7 +8408,7 @@
             "codegen-properties": {
                 "accepts-quirky-length": true,
                 "animation-wrapper": "StyleTypeWrapper",
-                "animation-wrapper-requires-computed-getter": true,
+                "animation-wrapper-requires-getter": "computedWordSpacing",
                 "animation-wrapper-requires-render-style": true,
                 "style-builder-custom": "All",
                 "style-builder-converter": "StyleType<WordSpacing>",
