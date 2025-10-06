@@ -73,6 +73,8 @@
 namespace WebCore {
 namespace Style {
 
+WTF_MAKE_TZONE_ALLOCATED_IMPL(BuilderState);
+
 BuilderState::BuilderState(RenderStyle& style)
     : m_style(style)
 {

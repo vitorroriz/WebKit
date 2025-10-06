@@ -1223,7 +1223,8 @@ inline NameScope BuilderConverter::convertNameScope(BuilderState& builderState, 
 
 inline FixedVector<PositionTryFallback> BuilderConverter::convertPositionTryFallbacks(BuilderState& builderState, const CSSValue& value)
 {
-    auto convertFallback = [&](const CSSValue& fallbackValue) -> std::optional<PositionTryFallback> {
+    // FIXME: SaferCPP analysis reports that 'builderState' is an unsafe capture, even though this lambda does not escape.
+    SUPPRESS_UNCOUNTED_LAMBDA_CAPTURE auto convertFallback = [&](const CSSValue& fallbackValue) -> std::optional<PositionTryFallback> {
         auto* valueList = dynamicDowncast<CSSValueList>(fallbackValue);
         if (!valueList) {
             // Turn the inlined position-area fallback into properties object that can be applied similarly to @position-try declarations.

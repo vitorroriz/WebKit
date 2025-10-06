@@ -586,6 +586,11 @@ CSSStyleSheet* StyleRuleCSSStyleProperties::parentStyleSheet() const
     return m_parentRule ? m_parentRule->parentStyleSheet() : nullptr;
 }
 
+CSSRule* StyleRuleCSSStyleProperties::parentRule() const
+{
+    return m_parentRule.get();
+}
+
 OptionalOrReference<CSSParserContext> StyleRuleCSSStyleProperties::cssParserContext() const
 {
     auto* styleSheet = contextStyleSheet();

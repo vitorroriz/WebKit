@@ -1533,6 +1533,7 @@ struct WebCore::PushSubscriptionData {
     std::optional<unsigned> columnNumber()
 };
 
+header: <WebCore/Report.h>
 [RefCounted] class WebCore::Report {
     String type()
     String url()
@@ -2965,6 +2966,7 @@ header: <WebCore/KeyboardScroll.h>
     WebCore::ScrollDirection direction;
 };
 
+header: <WebCore/NotificationResources.h>
 [RefCounted] class WebCore::NotificationResources {
     RefPtr<WebCore::Image> icon();
 };

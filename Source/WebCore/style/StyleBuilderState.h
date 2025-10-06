@@ -82,10 +82,22 @@ struct BuilderContext {
     std::optional<BuilderPositionTryFallback> positionTryFallback { };
 };
 
-class BuilderState {
+class BuilderState : public CanMakeCheckedPtr<BuilderState> {
+    WTF_MAKE_TZONE_ALLOCATED(BuilderState);
+    WTF_MAKE_NONCOPYABLE(BuilderState);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(BuilderState);
 public:
-    BuilderState(RenderStyle&);
-    BuilderState(RenderStyle&, BuilderContext&&);
+    template<typename T, class... Args> friend WTF::UniqueRef<T> WTF::makeUniqueRefWithoutFastMallocCheck(Args&&...);
+
+    static UniqueRef<BuilderState> create(RenderStyle& renderStyle)
+    {
+        return makeUniqueRefWithoutRefCountedCheck<BuilderState>(renderStyle);
+    }
+
+    static UniqueRef<BuilderState> create(RenderStyle& renderStyle, BuilderContext&& builderContext)
+    {
+        return makeUniqueRefWithoutRefCountedCheck<BuilderState>(renderStyle, WTFMove(builderContext));
+    }
 
     RenderStyle& style() { return m_style; }
     const RenderStyle& style() const { return m_style; }
@@ -198,6 +210,9 @@ private:
     // See the comment in maybeUpdateFontForLetterSpacingOrWordSpacing() about why this needs to be a friend.
     friend void maybeUpdateFontForLetterSpacingOrWordSpacing(BuilderState&, CSSValue&);
     friend class Builder;
+
+    BuilderState(RenderStyle&);
+    BuilderState(RenderStyle&, BuilderContext&&);
 
     void adjustStyleForInterCharacterRuby();
 

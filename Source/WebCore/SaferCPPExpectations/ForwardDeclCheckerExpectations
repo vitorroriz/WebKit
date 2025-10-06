@@ -75,7 +75,6 @@ layout/formattingContexts/inline/InlineLine.h
 layout/formattingContexts/inline/text/TextUtil.cpp
 layout/integration/inline/LayoutIntegrationLineLayout.h
 layout/layouttree/LayoutElementBox.h
-loader/cache/CachedImageClient.h
 page/DOMWindow.cpp
 page/EventHandler.h
 page/Page.h
@@ -94,7 +93,6 @@ platform/graphics/StringTruncator.cpp
 platform/graphics/ca/PlatformCALayer.h
 platform/graphics/ca/TileController.cpp
 platform/mediastream/libwebrtc/LibWebRTCDav1dDecoder.cpp
-rendering/AccessibilityRegionContext.h
 rendering/BreakablePositions.h
 rendering/RenderLayerBacking.cpp
 rendering/RenderLayerCompositor.cpp

@@ -98,27 +98,27 @@ public:
 
     operator unsigned short() const
     {
-        return protectedNumericValue()->resolveAsNumber<unsigned short>(m_builderState.cssToLengthConversionData());
+        return protectedNumericValue()->resolveAsNumber<unsigned short>(m_builderState->cssToLengthConversionData());
     }
 
     operator int() const
     {
-        return protectedNumericValue()->resolveAsNumber<int>(m_builderState.cssToLengthConversionData());
+        return protectedNumericValue()->resolveAsNumber<int>(m_builderState->cssToLengthConversionData());
     }
 
     operator unsigned() const
     {
-        return protectedNumericValue()->resolveAsNumber<unsigned>(m_builderState.cssToLengthConversionData());
+        return protectedNumericValue()->resolveAsNumber<unsigned>(m_builderState->cssToLengthConversionData());
     }
 
     operator float() const
     {
-        return protectedNumericValue()->resolveAsNumber<float>(m_builderState.cssToLengthConversionData());
+        return protectedNumericValue()->resolveAsNumber<float>(m_builderState->cssToLengthConversionData());
     }
 
     operator double() const
     {
-        return protectedNumericValue()->resolveAsNumber<double>(m_builderState.cssToLengthConversionData());
+        return protectedNumericValue()->resolveAsNumber<double>(m_builderState->cssToLengthConversionData());
     }
 
 private:
@@ -129,7 +129,7 @@ private:
         return value;
     }
 
-    const Style::BuilderState& m_builderState;
+    const CheckedRef<const Style::BuilderState> m_builderState;
     Ref<const CSSValue> m_value;
 };
 
