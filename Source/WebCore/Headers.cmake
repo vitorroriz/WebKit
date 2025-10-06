@@ -1403,6 +1403,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     dom/LiveNodeListInlines.h
     dom/LoadableClassicScript.h
     dom/LoadableModuleScript.h
+    dom/LoadableSpeculationRules.h
     dom/LoadableScript.h
     dom/LoadableScriptClient.h
     dom/LoadableScriptError.h

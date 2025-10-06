@@ -248,6 +248,7 @@ class Settings;
 class SleepDisabler;
 class SpaceSplitString;
 class SpeculationRules;
+class LoadableSpeculationRules;
 class SpeechRecognition;
 class StorageConnection;
 class StringCallback;
@@ -2029,6 +2030,8 @@ public:
 
     WEBCORE_EXPORT void prefetch(const URL&, const Vector<String>&, const String&, bool lowPriority = false);
 
+    void processSpeculationRulesHeader(const String& headerValue, const URL& baseURL);
+
 protected:
     enum class ConstructionFlag : uint8_t {
         Synthesized = 1 << 0,
@@ -2776,6 +2779,8 @@ private:
     mutable RefPtr<CSSCalc::RandomCachingKeyMap> m_randomCachingKeyMap;
 
     const Ref<DocumentSyncData> m_syncData;
+
+    Vector<Ref<LoadableSpeculationRules>> m_loadableSpeculationRules;
 }; // class Document
 
 inline AXObjectCache* Document::existingAXObjectCache() const

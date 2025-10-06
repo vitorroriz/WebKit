@@ -179,6 +179,7 @@
 #include "LayoutDisallowedScope.h"
 #include "LazyLoadImageObserver.h"
 #include "LegacySchemeRegistry.h"
+#include "LoadableSpeculationRules.h"
 #include "LoaderStrategy.h"
 #include "LocalDOMWindow.h"
 #include "LocalFrame.h"
@@ -234,6 +235,8 @@
 #include "ProcessingInstruction.h"
 #include "PseudoClassChangeInvalidation.h"
 #include "PublicSuffixStore.h"
+#include "Quirks.h"
+#include "RFC8941.h"
 #include "RTCController.h"
 #include "RTCNetworkManager.h"
 #include "Range.h"
@@ -359,6 +362,7 @@
 #include <algorithm>
 #include <ctime>
 #include <ranges>
+#include <wtf/ASCIICType.h>
 #include <wtf/Assertions.h>
 #include <wtf/CryptographicallyRandomNumber.h>
 #include <wtf/HexNumber.h>
@@ -11964,6 +11968,44 @@ void Document::prefetch(const URL& url, const Vector<String>& tags, const String
         return;
 
     frame->loader().prefetch(url, tags, referrerPolicy, lowPriority);
+}
+
+// https://html.spec.whatwg.org/C#process-the-speculation-rules-header
+void Document::processSpeculationRulesHeader(const String& headerValue, const URL& baseURL)
+{
+    if (!settings().speculationRulesPrefetchEnabled())
+        return;
+
+    // 1. Let parsedList be the result of getting a structured field value given `Speculation-Rules` and "list" from response's header list.
+    auto parsedList = RFC8941::parseListStructuredFieldValue(headerValue);
+    // 2. If parsedList is null, then return.
+    if (!parsedList)
+        return;
+
+    // 3. For each item of parsedList:
+    for (const auto& [itemOrInnerList, parameters] : *parsedList) {
+        // 3.1. If item is not a string, then continue.
+        const auto* bareItem = std::get_if<RFC8941::BareItem>(&itemOrInnerList);
+        if (!bareItem)
+            continue;
+
+        const auto* urlString = std::get_if<String>(bareItem);
+        if (!urlString || urlString->isEmpty())
+            continue;
+
+        // 3.2. Let url be the result of URL parsing item with document's document base URL.
+        URL speculationRulesURL(baseURL, *urlString);
+        // 3.3. If url is failure, then continue.
+        if (!speculationRulesURL.isValid())
+            continue;
+
+        // 3.4.2. Queue a global task on the speculation rules task source given document's relevant global object to perform the following steps
+        eventLoop().queueTask(TaskSource::SpeculationRules, [protectedThis = Ref { *this }, speculationRulesURL] {
+            auto loadableSpeculationRules = LoadableSpeculationRules::create(protectedThis.get(), speculationRulesURL);
+            if (loadableSpeculationRules->load(protectedThis.get(), speculationRulesURL))
+                protectedThis->m_loadableSpeculationRules.append(WTFMove(loadableSpeculationRules));
+        });
+    }
 }
 
 } // namespace WebCore

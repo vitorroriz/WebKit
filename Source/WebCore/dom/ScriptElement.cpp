@@ -667,8 +667,8 @@ void ScriptElement::registerSpeculationRules(const ScriptSourceCode& sourceCode)
     if (!frame)
         return;
 
-    frame->checkedScript()->registerSpeculationRules(sourceCode, document->baseURL());
-    document->considerSpeculationRules();
+    if (frame->checkedScript()->registerSpeculationRules(sourceCode, document->baseURL()))
+        document->considerSpeculationRules();
 }
 
 // TODO: Also implement unregister/update speculation rules

@@ -977,13 +977,13 @@ void ScriptController::registerImportMap(const ScriptSourceCode& sourceCode, con
         globalObject->importMap().mergeExistingAndNewImportMaps(WTFMove(newImportMap.value()), reporter);
 }
 
-void ScriptController::registerSpeculationRules(const ScriptSourceCode& sourceCode, const URL& baseURL)
+bool ScriptController::registerSpeculationRules(const ScriptSourceCode& sourceCode, const URL& baseURL)
 {
     RefPtr document = m_frame->document();
     if (!document || !document->settings().speculationRulesPrefetchEnabled())
-        return;
+        return false;
 
-    document->speculationRules()->parseSpeculationRules(sourceCode.source(), baseURL, document->url());
+    return document->speculationRules()->parseSpeculationRules(sourceCode.source(), baseURL, document->url());
 }
 
 } // namespace WebCore

@@ -1300,6 +1300,7 @@ dom/KeyboardEvent.cpp
 dom/LiveNodeList.cpp
 dom/LoadableClassicScript.cpp
 dom/LoadableModuleScript.cpp
+dom/LoadableSpeculationRules.cpp
 dom/LoadableScript.cpp
 dom/MessageChannel.cpp
 dom/MessageEvent.cpp

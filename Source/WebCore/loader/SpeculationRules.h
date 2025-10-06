@@ -98,7 +98,7 @@ public:
     static Ref<SpeculationRules> create();
 
     // https://wicg.github.io/nav-speculation/speculation-rules.html#parse-speculation-rules
-    WEBCORE_EXPORT void parseSpeculationRules(const StringView&, const URL& rulesetBaseURL, const URL& documentBaseURL);
+    WEBCORE_EXPORT bool parseSpeculationRules(const StringView&, const URL& rulesetBaseURL, const URL& documentBaseURL);
 
     const Vector<Rule>& prefetchRules() const;
 

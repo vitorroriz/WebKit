@@ -794,6 +794,12 @@ void FrameLoader::receivedFirstData()
     LinkLoader::loadLinksFromHeader(documentLoader->response().httpHeaderField(HTTPHeaderName::Link), document->url(), document, LinkLoader::MediaAttributeCheck::MediaAttributeEmpty);
 
     scheduleRefreshIfNeeded(document, documentLoader->response().httpHeaderField(HTTPHeaderName::Refresh), IsMetaRefresh::No);
+
+    if (document->settings().speculationRulesPrefetchEnabled()) {
+        String speculationRulesHeader = documentLoader->response().httpHeaderField(HTTPHeaderName::SpeculationRules);
+        if (!speculationRulesHeader.isEmpty())
+            document->processSpeculationRulesHeader(speculationRulesHeader, documentLoader->response().url());
+    }
 }
 
 void FrameLoader::setOutgoingReferrer(const URL& url)

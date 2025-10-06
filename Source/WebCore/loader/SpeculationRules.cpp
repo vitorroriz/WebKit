@@ -327,29 +327,30 @@ static std::optional<Vector<SpeculationRules::Rule>> parseRules(const JSON::Obje
 }
 
 // https://wicg.github.io/nav-speculation/speculation-rules.html#parse-speculation-rules
-void SpeculationRules::parseSpeculationRules(const StringView& text, const URL& rulesetBaseURL, const URL& documentBaseURL)
+bool SpeculationRules::parseSpeculationRules(const StringView& text, const URL& rulesetBaseURL, const URL& documentBaseURL)
 {
     auto jsonValue = JSON::Value::parseJSON(text);
     if (!jsonValue)
-        return;
+        return false;
 
     auto jsonObject = jsonValue->asObject();
     if (!jsonObject)
-        return;
+        return false;
 
     String rulesetLevelTag;
     auto tagValue = jsonObject->getValue("tag"_s);
     if (tagValue && tagValue->type() == JSON::Value::Type::String) {
         String candidateTag = tagValue->asString();
         if (!candidateTag.containsOnlyASCII() || !candidateTag.containsOnly<isASCIIPrintable>())
-            return;
+            return false;
         rulesetLevelTag = candidateTag;
     }
 
     auto prefetch = parseRules(*jsonObject, "prefetch"_s, rulesetLevelTag, rulesetBaseURL, documentBaseURL);
     if (!prefetch)
-        return;
+        return false;
     m_prefetchRules.appendVector(WTFMove(*prefetch));
+    return true;
 }
 
 } // namespace WebCore

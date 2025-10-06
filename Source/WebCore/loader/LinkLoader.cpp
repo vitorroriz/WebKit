@@ -187,6 +187,8 @@ std::optional<CachedResource::Type> LinkLoader::resourceTypeFromAsAttribute(cons
         return CachedResource::Type::Script;
     case FetchRequestDestination::Sharedworker:
         return CachedResource::Type::Script;
+    case FetchRequestDestination::Speculationrules:
+        return CachedResource::Type::Script;
     case FetchRequestDestination::Style:
         return CachedResource::Type::CSSStyleSheet;
     case FetchRequestDestination::Track:
