@@ -315,7 +315,7 @@
             "contextsAllowed": ["interface"]
         },
         "JSGenerateToJSObject": {
-            "contextsAllowed": ["interface", "dictionary", "callback-function"]
+            "contextsAllowed": ["dictionary"]
         },
         "JSGenerateToNativeObject": {
             "contextsAllowed": ["interface", "dictionary"]
