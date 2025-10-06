@@ -10687,11 +10687,12 @@ mintAlign(_result_stack)
 
 # CallResultBytecode::ResultStackVector (0x11)
 mintAlign(_result_stack_vector)
-    # safe to use wfa0 since frN bytecodes always come before vector stack result
-    loadv [mintRetSrc], wfa0
-    addp 2 * SlotSize, mintRetSrc
     subp StackValueSize, mintRetDst
-    storev wfa0, [mintRetDst]
+    loadq [mintRetSrc], sc0
+    storeq sc0, [mintRetDst]
+    loadq 8[mintRetSrc], sc0
+    storeq sc0, 8[mintRetDst]
+    addp 2 * SlotSize, mintRetSrc
     mintRetDispatch()
 
 mintAlign(_end)
@@ -11105,9 +11106,11 @@ argumINTAlign(_stack)
     argumINTDispatch()
 
 argumINTAlign(_stack_vector)
-    loadv [argumINTSrc], ft0
+    loadq [argumINTSrc], csr0
+    storeq csr0, [argumINTDst]
+    loadq 8[argumINTSrc], csr0
+    storeq csr0, 8[argumINTDst]
     addp 2 * SlotSize, argumINTSrc
-    storev ft0, [argumINTDst]
     addp LocalSize, argumINTDst
     argumINTDispatch()
 
