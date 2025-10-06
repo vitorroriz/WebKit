@@ -36,6 +36,9 @@ public:
     LayoutUnit computeReplacedLogicalWidth(ShouldComputePreferred = ShouldComputePreferred::ComputeActual) const override;
     LayoutUnit computeReplacedLogicalHeight(std::optional<LayoutUnit> estimatedUsedWidth = std::nullopt) const override;
 
+    void computeReplacedOutOfFlowPositionedLogicalHeight(LogicalExtentComputedValues&) const;
+    void computeReplacedOutOfFlowPositionedLogicalWidth(LogicalExtentComputedValues&) const;
+
     LayoutRect replacedContentRect(const LayoutSize& intrinsicSize) const;
     LayoutRect replacedContentRect() const { return replacedContentRect(intrinsicSize()); }
 
@@ -48,7 +51,6 @@ public:
     bool shouldInvalidatePreferredWidths() const override;
 
     double computeIntrinsicAspectRatio() const;
-
 
     virtual bool paintsContent() const { return true; }
 
