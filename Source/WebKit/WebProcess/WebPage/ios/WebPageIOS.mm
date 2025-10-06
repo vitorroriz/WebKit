@@ -1649,6 +1649,13 @@ void WebPage::setFocusedElementSelectedIndex(const WebCore::ElementContext& cont
         select->optionSelectedByUser(index, true, allowMultipleSelection);
 }
 
+void WebPage::setIsShowingInputViewForFocusedElement(bool showingInputView)
+{
+    m_isShowingInputViewForFocusedElement = showingInputView;
+    if (!showingInputView)
+        m_page->clearIsShowingInputView();
+}
+
 void WebPage::showInspectorHighlight(const WebCore::InspectorOverlay::Highlight& highlight)
 {
     send(Messages::WebPageProxy::ShowInspectorHighlight(highlight));

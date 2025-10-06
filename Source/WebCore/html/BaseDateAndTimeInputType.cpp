@@ -342,12 +342,19 @@ void BaseDateAndTimeInputType::showPicker()
     if (!element()->renderer())
         return;
 
-    if (!element()->document().page())
+    Ref document = element()->document();
+    if (!document->page())
         return;
 
     DateTimeChooserParameters parameters;
     if (!setupDateTimeChooserParameters(parameters))
         return;
+
+
+#if PLATFORM(IOS_FAMILY)
+    if (CheckedPtr cache = document->existingAXObjectCache())
+        cache->setWillPresentDatePopover(true);
+#endif
 
     if (auto* chrome = this->chrome()) {
         m_dateTimeChooser = chrome->createDateTimeChooser(*this);

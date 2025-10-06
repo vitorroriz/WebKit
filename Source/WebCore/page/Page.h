@@ -1384,6 +1384,9 @@ public:
     void setHardwareKeyboardAttached(bool attached) { m_hardwareKeyboardAttached = attached; }
     bool hardwareKeyboardAttached() const { return m_hardwareKeyboardAttached; }
 
+#if PLATFORM(IOS_FAMILY)
+    WEBCORE_EXPORT void clearIsShowingInputView();
+#endif
 private:
     explicit Page(PageConfiguration&&);
 

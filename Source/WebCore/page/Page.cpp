@@ -5979,6 +5979,14 @@ RefPtr<MediaSessionManagerInterface> Page::mediaSessionManagerForPageIdentifier(
     return nullptr;
 }
 
+#if PLATFORM(IOS_FAMILY)
+void Page::clearIsShowingInputView()
+{
+    if (CheckedPtr cache = existingAXObjectCache())
+        cache->setWillPresentDatePopover(false);
+}
+#endif
+
 #if HAVE(SUPPORT_HDR_DISPLAY)
 bool Page::drawsHDRContent() const
 {

@@ -1754,6 +1754,16 @@ static bool shouldDeferFocusChange(Element* element)
     if (renderer && rendererNeedsDeferredUpdate(*renderer))
         return true;
 
+#if PLATFORM(IOS_FAMILY)
+    // Date/DateTimeLocal input fields present popovers in the UI process synchronously.
+    // The web process can infer that this will happen via a DOMActivateEvent, but this may be dispatched after the focused change event.
+    // Defer the focus until after BaseDateAndTimeInputType::showPicker is called and has set the appropriate state (willPresentDatePopover) on AXObjectCache.
+    if (RefPtr input = dynamicDowncast<HTMLInputElement>(element)) {
+        if (input->isDateField() || input->isDateTimeLocalField())
+            return true;
+    }
+#endif // PLATFORM(IOS_FAMILY)
+
     // We also want to defer handling focus changes for nodes that haven't yet attached their renderer.
     if (const auto* style = element->existingComputedStyle())
         return !renderer && element->rendererIsNeeded(*style);
@@ -1840,6 +1850,16 @@ void AXObjectCache::deferModalChange(Element& element)
 
 void AXObjectCache::handleFocusedUIElementChanged(Element* oldElement, Element* newElement, UpdateModal updateModal)
 {
+#if PLATFORM(IOS_FAMILY)
+    if (willPresentDatePopover()) {
+        setWillPresentDatePopover(false);
+        if (RefPtr inputElement = dynamicDowncast<HTMLInputElement>(newElement)) {
+            if (inputElement->isDateField() || inputElement->isDateTimeLocalField())
+                return;
+        }
+    }
+#endif
+
     if (updateModal == UpdateModal::Yes)
         updateCurrentModalNode();
     handleMenuItemSelected(newElement);
