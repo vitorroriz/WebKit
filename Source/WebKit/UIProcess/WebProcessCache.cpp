@@ -377,7 +377,7 @@ void WebProcessCache::setApplicationIsActive(bool isActive)
 
 void WebProcessCache::removeProcess(WebProcessProxy& process, ShouldShutDownProcess shouldShutDownProcess)
 {
-    RELEASE_ASSERT(process.site());
+    RELEASE_ASSERT(process.site() || process.isSharedProcess());
     WEBPROCESSCACHE_RELEASE_LOG("removeProcess: Evicting process from WebProcess cache because it expired", process.processID());
 
     RefPtr<CachedProcess> cachedProcess;

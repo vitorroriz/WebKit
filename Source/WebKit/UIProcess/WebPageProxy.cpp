@@ -5033,6 +5033,7 @@ void WebPageProxy::receivedNavigationActionPolicyDecision(WebProcessProxy& proce
         loadedWebArchive,
         replacedDataStoreForWebArchiveLoad
     ] (Ref<WebProcessProxy>&& processNavigatingTo, SuspendedPageProxy* destinationSuspendedPage, ASCIILiteral reason) mutable {
+        ASSERT(!processNavigatingTo->isInProcessCache());
         // If the navigation has been destroyed or the frame has been replaced by PSON, then no need to proceed.
         auto currentMainFrameID = m_mainFrame ? std::optional<WebCore::FrameIdentifier> { m_mainFrame->frameID() } : std::nullopt;
         if (isClosed()
@@ -5146,6 +5147,8 @@ void WebPageProxy::receivedNavigationActionPolicyDecision(WebProcessProxy& proce
         continueWithProcessForNavigation = WTFMove(continueWithProcessForNavigation)
     ](FrameProcess* sharedProcess) mutable {
         if (sharedProcess) {
+            navigation->setPendingSharedProcess(*sharedProcess);
+            ASSERT(!sharedProcess->process().isInProcessCache());
             if (frame->isMainFrame()) {
                 protectedWebsiteDataStore()->protectedNetworkProcess()->addAllowedFirstPartyForCookies(sharedProcess->process(), site.domain(), LoadedWebArchive::No, [process = Ref { sharedProcess->process() }, continueWithProcessForNavigation = WTFMove(continueWithProcessForNavigation)] mutable {
                     continueWithProcessForNavigation(WTFMove(process), nullptr, "Uses shared Web process"_s);

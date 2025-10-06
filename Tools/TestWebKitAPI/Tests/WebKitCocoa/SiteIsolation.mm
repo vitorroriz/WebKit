@@ -5560,6 +5560,57 @@ TEST(SiteIsolation, SharedProcessBasicWebProcessCache)
     EXPECT_EQ(childFrameProcess2C, childFrameProcess2);
 }
 
+TEST(SiteIsolation, SharedProcessBasicWebProcessCacheCrash)
+{
+    HTTPServer server({
+        { "/empty"_s, { ""_s } },
+        { "/first"_s, { "<!DOCTYPE html><iframe src='https://webkit.org/webkit'></iframe><iframe src='https://w3.org/w3c'></iframe>"_s } },
+        { "/second"_s, { "<!DOCTYPE html><iframe src='https://webkit.org/webkit'></iframe><iframe src='https://w3.org/w3c'></iframe>"_s } },
+        { "/webkit"_s, { "webkit"_s } },
+        { "/w3c"_s, { "w3c"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+    auto [webView, navigationDelegate] = siteIsolatedViewWithSharedProcess(server, EnableProcessCache::Yes);
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/first"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    checkFrameTreesInProcesses(webView.get(), {
+        {
+            "https://example.com"_s,
+            { { RemoteFrame }, { RemoteFrame } }
+        },
+        {
+            RemoteFrame,
+            { { "https://webkit.org"_s }, { "https://w3.org"_s } }
+        },
+    });
+    auto mainFrameProcess = [webView mainFrame].info._processIdentifier;
+    auto childFrameProcess1 = [webView mainFrame].childFrames[0].info._processIdentifier;
+    auto childFrameProcess2 = [webView mainFrame].childFrames[1].info._processIdentifier;
+    EXPECT_NE(childFrameProcess1, mainFrameProcess);
+    EXPECT_EQ(childFrameProcess1, childFrameProcess2);
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/second"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    checkFrameTreesInProcesses(webView.get(), {
+        {
+            "https://example.com"_s,
+            { { RemoteFrame }, { RemoteFrame } }
+        },
+        {
+            RemoteFrame,
+            { { "https://webkit.org"_s }, { "https://w3.org"_s } }
+        },
+    });
+
+    auto mainFrameProcessB = [webView mainFrame].info._processIdentifier;
+    auto childFrameProcess1B = [webView mainFrame].childFrames[0].info._processIdentifier;
+    auto childFrameProcess2B = [webView mainFrame].childFrames[1].info._processIdentifier;
+    EXPECT_EQ(mainFrameProcessB, mainFrameProcess);
+    EXPECT_EQ(childFrameProcess1B, childFrameProcess1);
+    EXPECT_EQ(childFrameProcess2B, childFrameProcess2);
+}
+
 TEST(SiteIsolation, SharedProcessWithResourceLoadStatistics)
 {
     HTTPServer server({

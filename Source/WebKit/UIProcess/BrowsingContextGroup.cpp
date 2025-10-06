@@ -74,10 +74,14 @@ void BrowsingContextGroup::sharedProcessForSite(WebsiteDataStore& websiteDataSto
             return completionHandler(nullptr);
 
         protectedThis->m_sharedProcessSites.add(site);
-        if (RefPtr frameProcess = protectedThis->m_sharedProcess.get())
+        if (RefPtr frameProcess = protectedThis->m_sharedProcess.get()) {
+            ASSERT(frameProcess->isSharedProcess());
+            ASSERT(!frameProcess->process().isInProcessCache());
             return completionHandler(frameProcess.get());
+        }
 
         Ref process = pageConfiguration->protectedProcessPool()->processForSite(websiteDataStore.get(), WebProcessPool::IsSharedProcess::Yes, site, mainFrameSite, domainsWithUserInteraction, lockdownMode, enhancedSecurity, pageConfiguration.get(), ProcessSwapDisposition::Other);
+        ASSERT(!process->isInProcessCache());
         Ref frameProcess = FrameProcess::create(process, protectedThis, std::nullopt, mainFrameSite, preferences, InjectBrowsingContextIntoProcess::Yes);
         ASSERT(frameProcess->isSharedProcess());
         ASSERT(frameProcess->process().isSharedProcess());
