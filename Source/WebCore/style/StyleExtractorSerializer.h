@@ -71,8 +71,6 @@ public:
 
     // MARK: Shared serializations
 
-    static void serializeGlyphOrientation(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, GlyphOrientation);
-    static void serializeGlyphOrientationOrAuto(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, GlyphOrientation);
     static void serializeMarginTrim(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<MarginTrimType>);
     static void serializeWebkitTextCombine(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, TextCombine);
     static void serializeImageOrientation(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, ImageOrientation);
@@ -275,53 +273,6 @@ inline void ExtractorSerializer::serializeTransformationMatrix(const RenderStyle
 }
 
 // MARK: - Shared serializations
-
-inline void ExtractorSerializer::serializeGlyphOrientation(ExtractorState&, StringBuilder& builder, const CSS::SerializationContext& context, GlyphOrientation orientation)
-{
-    switch (orientation) {
-    case GlyphOrientation::Degrees0:
-        CSS::serializationForCSS(builder, context, CSS::AngleRaw<> { 0_css_deg });
-        return;
-    case GlyphOrientation::Degrees90:
-        CSS::serializationForCSS(builder, context, CSS::AngleRaw<> { 90_css_deg });
-        return;
-    case GlyphOrientation::Degrees180:
-        CSS::serializationForCSS(builder, context, CSS::AngleRaw<> { 180_css_deg });
-        return;
-    case GlyphOrientation::Degrees270:
-        CSS::serializationForCSS(builder, context, CSS::AngleRaw<> { 270_css_deg });
-        return;
-    case GlyphOrientation::Auto:
-        ASSERT_NOT_REACHED();
-        CSS::serializationForCSS(builder, context, CSS::AngleRaw<> { 0_css_deg });
-        return;
-    }
-
-    RELEASE_ASSERT_NOT_REACHED();
-}
-
-inline void ExtractorSerializer::serializeGlyphOrientationOrAuto(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, GlyphOrientation orientation)
-{
-    switch (orientation) {
-    case GlyphOrientation::Degrees0:
-        CSS::serializationForCSS(builder, context, CSS::AngleRaw<> { 0_css_deg });
-        return;
-    case GlyphOrientation::Degrees90:
-        CSS::serializationForCSS(builder, context, CSS::AngleRaw<> { 90_css_deg });
-        return;
-    case GlyphOrientation::Degrees180:
-        CSS::serializationForCSS(builder, context, CSS::AngleRaw<> { 180_css_deg });
-        return;
-    case GlyphOrientation::Degrees270:
-        CSS::serializationForCSS(builder, context, CSS::AngleRaw<> { 270_css_deg });
-        return;
-    case GlyphOrientation::Auto:
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Auto { });
-        return;
-    }
-
-    RELEASE_ASSERT_NOT_REACHED();
-}
 
 inline void ExtractorSerializer::serializeMarginTrim(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<MarginTrimType> marginTrim)
 {

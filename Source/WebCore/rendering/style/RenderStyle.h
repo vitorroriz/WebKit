@@ -379,6 +379,8 @@ enum class Change : uint8_t;
 enum class GridTrackSizingDirection : bool;
 enum class LineBoxContain : uint8_t;
 enum class PositionTryOrder : uint8_t;
+enum class SVGGlyphOrientationHorizontal : uint8_t;
+enum class SVGGlyphOrientationVertical : uint8_t;
 enum class ScrollBehavior : bool;
 enum class WebkitOverflowScrolling : bool;
 enum class WebkitTouchCallout : bool;
@@ -2417,13 +2419,13 @@ public:
     inline void setTextAnchor(TextAnchor);
     static constexpr TextAnchor initialTextAnchor();
 
-    inline GlyphOrientation glyphOrientationHorizontal() const;
-    inline void setGlyphOrientationHorizontal(GlyphOrientation);
-    static constexpr GlyphOrientation initialGlyphOrientationHorizontal();
+    inline Style::SVGGlyphOrientationHorizontal glyphOrientationHorizontal() const;
+    inline void setGlyphOrientationHorizontal(Style::SVGGlyphOrientationHorizontal);
+    static constexpr Style::SVGGlyphOrientationHorizontal initialGlyphOrientationHorizontal();
 
-    inline GlyphOrientation glyphOrientationVertical() const;
-    inline void setGlyphOrientationVertical(GlyphOrientation);
-    static constexpr GlyphOrientation initialGlyphOrientationVertical();
+    inline Style::SVGGlyphOrientationVertical glyphOrientationVertical() const;
+    inline void setGlyphOrientationVertical(Style::SVGGlyphOrientationVertical);
+    static constexpr Style::SVGGlyphOrientationVertical initialGlyphOrientationVertical();
 
     inline MaskType maskType() const;
     inline void setMaskType(MaskType);

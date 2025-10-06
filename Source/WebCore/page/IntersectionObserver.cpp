@@ -52,6 +52,7 @@
 #include "RenderLineBreak.h"
 #include "RenderObjectInlines.h"
 #include "RenderView.h"
+#include "StylePrimitiveKeyword+Logging.h"
 #include "StylePrimitiveNumericTypes+Evaluation.h"
 #include "StylePrimitiveNumericTypes+Logging.h"
 #include "VisibleRectContext.h"

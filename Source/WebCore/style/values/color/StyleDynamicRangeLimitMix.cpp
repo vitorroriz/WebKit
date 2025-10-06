@@ -28,6 +28,7 @@
 
 #include "CSSDynamicRangeLimitMix.h"
 #include "StyleDynamicRangeLimit.h"
+#include "StylePrimitiveKeyword+Logging.h"
 #include "StylePrimitiveNumericTypes+Conversions.h"
 #include "StylePrimitiveNumericTypes+Logging.h"
 

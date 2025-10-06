@@ -3385,6 +3385,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/primitives/StylePosition.h
     style/values/primitives/StylePrimitiveKeyword+CSSValueCreation.h
     style/values/primitives/StylePrimitiveKeyword+Serialization.h
+    style/values/primitives/StylePrimitiveKeyword+ValueRepresentationNeeded.h
     style/values/primitives/StylePrimitiveNumeric+Forward.h
     style/values/primitives/StylePrimitiveNumeric.h
     style/values/primitives/StylePrimitiveNumericAdaptors.h
@@ -3444,6 +3445,8 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/svg/StyleSVGBaselineShift.h
     style/values/svg/StyleSVGCenterCoordinateComponent.h
     style/values/svg/StyleSVGCoordinateComponent.h
+    style/values/svg/StyleSVGGlyphOrientationHorizontal.h
+    style/values/svg/StyleSVGGlyphOrientationVertical.h
     style/values/svg/StyleSVGMarkerResource.h
     style/values/svg/StyleSVGPaint.h
     style/values/svg/StyleSVGPathData.h

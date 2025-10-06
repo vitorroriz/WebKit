@@ -139,8 +139,6 @@ public:
     static PaintOrder convertPaintOrder(BuilderState&, const CSSValue&);
     static StyleSelfAlignmentData convertSelfOrDefaultAlignmentData(BuilderState&, const CSSValue&);
     static StyleContentAlignmentData convertContentAlignmentData(BuilderState&, const CSSValue&);
-    static GlyphOrientation convertGlyphOrientation(BuilderState&, const CSSValue&);
-    static GlyphOrientation convertGlyphOrientationOrAuto(BuilderState&, const CSSValue&);
 
     static OptionSet<HangingPunctuation> convertHangingPunctuation(BuilderState&, const CSSValue&);
 
@@ -660,29 +658,6 @@ inline StyleContentAlignmentData BuilderConverter::convertContentAlignmentData(B
     if (contentValue->overflow() != CSSValueInvalid)
         alignmentData.setOverflow(fromCSSValueID<OverflowAlignment>(contentValue->overflow()));
     return alignmentData;
-}
-
-inline GlyphOrientation BuilderConverter::convertGlyphOrientation(BuilderState& builderState, const CSSValue& value)
-{
-    auto* primitiveValue = requiredDowncast<CSSPrimitiveValue>(builderState, value);
-    if (!primitiveValue)
-        return { };
-
-    float angle = std::abs(fmodf(primitiveValue->resolveAsAngle(builderState.cssToLengthConversionData()), 360.0f));
-    if (angle <= 45.0f || angle > 315.0f)
-        return GlyphOrientation::Degrees0;
-    if (angle > 45.0f && angle <= 135.0f)
-        return GlyphOrientation::Degrees90;
-    if (angle > 135.0f && angle <= 225.0f)
-        return GlyphOrientation::Degrees180;
-    return GlyphOrientation::Degrees270;
-}
-
-inline GlyphOrientation BuilderConverter::convertGlyphOrientationOrAuto(BuilderState& builderState, const CSSValue& value)
-{
-    if (value.valueID() == CSSValueAuto)
-        return GlyphOrientation::Auto;
-    return convertGlyphOrientation(builderState, value);
 }
 
 inline OptionSet<SpeakAs> BuilderConverter::convertSpeakAs(BuilderState&, const CSSValue& value)

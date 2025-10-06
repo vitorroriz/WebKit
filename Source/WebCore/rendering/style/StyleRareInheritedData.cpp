@@ -28,6 +28,7 @@
 #include "RenderStyleDifference.h"
 #include "StyleAppleColorFilterData.h"
 #include "StyleImage.h"
+#include "StylePrimitiveKeyword+Logging.h"
 #include "StylePrimitiveNumericTypes+Logging.h"
 #include <wtf/PointerComparison.h>
 

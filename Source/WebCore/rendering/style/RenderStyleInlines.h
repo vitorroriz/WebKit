@@ -931,8 +931,8 @@ inline ColorInterpolation RenderStyle::colorInterpolationFilters() const { retur
 inline WindRule RenderStyle::fillRule() const { return static_cast<WindRule>(m_svgStyle->inheritedFlags.fillRule); }
 inline ShapeRendering RenderStyle::shapeRendering() const { return static_cast<ShapeRendering>(m_svgStyle->inheritedFlags.shapeRendering); }
 inline TextAnchor RenderStyle::textAnchor() const { return static_cast<TextAnchor>(m_svgStyle->inheritedFlags.textAnchor); }
-inline GlyphOrientation RenderStyle::glyphOrientationHorizontal() const { return static_cast<GlyphOrientation>(m_svgStyle->inheritedFlags.glyphOrientationHorizontal); }
-inline GlyphOrientation RenderStyle::glyphOrientationVertical() const { return static_cast<GlyphOrientation>(m_svgStyle->inheritedFlags.glyphOrientationVertical); }
+inline Style::SVGGlyphOrientationHorizontal RenderStyle::glyphOrientationHorizontal() const { return static_cast<Style::SVGGlyphOrientationHorizontal>(m_svgStyle->inheritedFlags.glyphOrientationHorizontal); }
+inline Style::SVGGlyphOrientationVertical RenderStyle::glyphOrientationVertical() const { return static_cast<Style::SVGGlyphOrientationVertical>(m_svgStyle->inheritedFlags.glyphOrientationVertical); }
 inline const Style::SVGPaint& RenderStyle::fill() const { return m_svgStyle->fillData->paint; }
 inline Style::Opacity RenderStyle::fillOpacity() const { return m_svgStyle->fillData->opacity; }
 inline const Style::SVGPaint& RenderStyle::stroke() const { return m_svgStyle->strokeData->paint; }
@@ -991,8 +991,8 @@ constexpr ColorInterpolation RenderStyle::initialColorInterpolationFilters() { r
 constexpr WindRule RenderStyle::initialFillRule() { return WindRule::NonZero; }
 constexpr ShapeRendering RenderStyle::initialShapeRendering() { return ShapeRendering::Auto; }
 constexpr TextAnchor RenderStyle::initialTextAnchor() { return TextAnchor::Start; }
-constexpr GlyphOrientation RenderStyle::initialGlyphOrientationHorizontal() { return GlyphOrientation::Degrees0; }
-constexpr GlyphOrientation RenderStyle::initialGlyphOrientationVertical() { return GlyphOrientation::Auto; }
+constexpr Style::SVGGlyphOrientationHorizontal RenderStyle::initialGlyphOrientationHorizontal() { return Style::SVGGlyphOrientationHorizontal::Degrees0; }
+constexpr Style::SVGGlyphOrientationVertical RenderStyle::initialGlyphOrientationVertical() { return Style::SVGGlyphOrientationVertical::Auto; }
 inline Style::SVGPaint RenderStyle::initialFill() { return Style::Color { Color::black }; }
 inline Style::SVGPaint RenderStyle::initialStroke() { return CSS::Keyword::None { }; }
 inline Style::Color RenderStyle::initialStopColor() { return Color::black; }

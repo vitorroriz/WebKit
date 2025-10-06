@@ -4526,7 +4526,7 @@
             "initial": "0deg",
             "codegen-properties": {
                 "accepts-quirky-angle": true,
-                "style-converter": "GlyphOrientation",
+                "style-converter": "StyleType<SVGGlyphOrientationHorizontal>",
                 "parser-grammar": "<angle unitless-zero=allowed>"
             },
             "specification": {
@@ -4543,7 +4543,7 @@
             ],
             "codegen-properties": {
                 "accepts-quirky-angle": true,
-                "style-converter": "GlyphOrientationOrAuto",
+                "style-converter": "StyleType<SVGGlyphOrientationVertical>",
                 "parser-grammar": "auto | <angle unitless-zero=allowed>"
             },
             "specification": {

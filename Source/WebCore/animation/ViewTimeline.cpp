@@ -42,6 +42,7 @@
 #include "ScrollingConstraints.h"
 #include "StylableInlines.h"
 #include "StyleLengthWrapper+DeprecatedCSSValueConversion.h"
+#include "StylePrimitiveKeyword+Logging.h"
 #include "StylePrimitiveNumericTypes+Evaluation.h"
 #include "StylePrimitiveNumericTypes+Logging.h"
 #include "StyleScrollPadding.h"

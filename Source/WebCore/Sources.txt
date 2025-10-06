@@ -3294,6 +3294,8 @@ style/values/sizing/StyleAspectRatio.cpp
 style/values/sizing/StyleContainIntrinsicSize.cpp
 style/values/sizing/StylePreferredSize.cpp
 style/values/svg/StyleSVGBaselineShift.cpp
+style/values/svg/StyleSVGGlyphOrientationHorizontal.cpp
+style/values/svg/StyleSVGGlyphOrientationVertical.cpp
 style/values/svg/StyleSVGPaint.cpp
 style/values/svg/StyleSVGPathData.cpp
 style/values/svg/StyleSVGStrokeDasharray.cpp

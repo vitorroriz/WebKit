@@ -413,9 +413,8 @@ inline void RenderStyle::setColorInterpolationFilters(ColorInterpolation val) { 
 inline void RenderStyle::setFillRule(WindRule val) { SET_NESTED_STRUCT(m_svgStyle, inheritedFlags, fillRule, static_cast<unsigned>(val)); }
 inline void RenderStyle::setShapeRendering(ShapeRendering val) { SET_NESTED_STRUCT(m_svgStyle, inheritedFlags, shapeRendering, static_cast<unsigned>(val)); }
 inline void RenderStyle::setTextAnchor(TextAnchor val) { SET_NESTED_STRUCT(m_svgStyle, inheritedFlags, textAnchor, static_cast<unsigned>(val)); }
-inline void RenderStyle::setGlyphOrientationHorizontal(GlyphOrientation val) { SET_NESTED_STRUCT(m_svgStyle, inheritedFlags, glyphOrientationHorizontal, static_cast<unsigned>(val)); }
-inline void RenderStyle::setGlyphOrientationVertical(GlyphOrientation val) { SET_NESTED_STRUCT(m_svgStyle, inheritedFlags, glyphOrientationVertical, static_cast<unsigned>(val)); }
-
+inline void RenderStyle::setGlyphOrientationHorizontal(Style::SVGGlyphOrientationHorizontal value) { SET_NESTED_STRUCT(m_svgStyle, inheritedFlags, glyphOrientationHorizontal, static_cast<unsigned>(value)); }
+inline void RenderStyle::setGlyphOrientationVertical(Style::SVGGlyphOrientationVertical value) { SET_NESTED_STRUCT(m_svgStyle, inheritedFlags, glyphOrientationVertical, static_cast<unsigned>(value)); }
 inline void RenderStyle::setBaselineShift(Style::SVGBaselineShift&& baselineShift) { SET_NESTED(m_svgStyle, miscData, baselineShift, WTFMove(baselineShift)); }
 inline void RenderStyle::setCx(Style::SVGCenterCoordinateComponent&& cx) { SET_NESTED(m_svgStyle, layoutData, cx, WTFMove(cx)); }
 inline void RenderStyle::setCy(Style::SVGCenterCoordinateComponent&& cy) { SET_NESTED(m_svgStyle, layoutData, cy, WTFMove(cy)); }

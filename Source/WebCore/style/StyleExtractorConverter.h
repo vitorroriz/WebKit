@@ -138,8 +138,6 @@ public:
 
     // MARK: Shared conversions
 
-    static Ref<CSSValue> convertGlyphOrientation(ExtractorState&, GlyphOrientation);
-    static Ref<CSSValue> convertGlyphOrientationOrAuto(ExtractorState&, GlyphOrientation);
     static Ref<CSSValue> convertMarginTrim(ExtractorState&, OptionSet<MarginTrimType>);
     static Ref<CSSValue> convertWebkitTextCombine(ExtractorState&, TextCombine);
     static Ref<CSSValue> convertImageOrientation(ExtractorState&, ImageOrientation);
@@ -294,43 +292,6 @@ inline Ref<CSSValue> ExtractorConverter::convertTransformationMatrix(const Rende
 }
 
 // MARK: - Shared conversions
-
-inline Ref<CSSValue> ExtractorConverter::convertGlyphOrientation(ExtractorState&, GlyphOrientation orientation)
-{
-    switch (orientation) {
-    case GlyphOrientation::Degrees0:
-        return CSSPrimitiveValue::create(0.0f, CSSUnitType::CSS_DEG);
-    case GlyphOrientation::Degrees90:
-        return CSSPrimitiveValue::create(90.0f, CSSUnitType::CSS_DEG);
-    case GlyphOrientation::Degrees180:
-        return CSSPrimitiveValue::create(180.0f, CSSUnitType::CSS_DEG);
-    case GlyphOrientation::Degrees270:
-        return CSSPrimitiveValue::create(270.0f, CSSUnitType::CSS_DEG);
-    case GlyphOrientation::Auto:
-        ASSERT_NOT_REACHED();
-        return CSSPrimitiveValue::create(0.0f, CSSUnitType::CSS_DEG);
-    }
-
-    RELEASE_ASSERT_NOT_REACHED();
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertGlyphOrientationOrAuto(ExtractorState&, GlyphOrientation orientation)
-{
-    switch (orientation) {
-    case GlyphOrientation::Degrees0:
-        return CSSPrimitiveValue::create(0.0f, CSSUnitType::CSS_DEG);
-    case GlyphOrientation::Degrees90:
-        return CSSPrimitiveValue::create(90.0f, CSSUnitType::CSS_DEG);
-    case GlyphOrientation::Degrees180:
-        return CSSPrimitiveValue::create(180.0f, CSSUnitType::CSS_DEG);
-    case GlyphOrientation::Degrees270:
-        return CSSPrimitiveValue::create(270.0f, CSSUnitType::CSS_DEG);
-    case GlyphOrientation::Auto:
-        return CSSPrimitiveValue::create(CSSValueAuto);
-    }
-
-    RELEASE_ASSERT_NOT_REACHED();
-}
 
 inline Ref<CSSValue> ExtractorConverter::convertMarginTrim(ExtractorState&, OptionSet<MarginTrimType> marginTrim)
 {
