@@ -4845,6 +4845,7 @@ void WebPage::updatePreferences(const WebPreferencesStore& store)
     WebProcess::singleton().protectedRemoteMediaPlayerManager()->setUseGPUProcess(m_shouldPlayMediaInGPUProcess);
 #if PLATFORM(COCOA)
     platformStrategies()->mediaStrategy()->enableRemoteRenderer(MediaPlayerMediaEngineIdentifier::CocoaWebM, settings.webMUseRemoteAudioVideoRenderer());
+    platformStrategies()->mediaStrategy()->enableRemoteRenderer(MediaPlayerMediaEngineIdentifier::AVFoundationMSE, settings.mediaSourceUseRemoteAudioVideoRenderer());
 #endif
 #endif
 #if HAVE(AVASSETREADER)

@@ -28,6 +28,8 @@
 #if ENABLE(MEDIA_SOURCE) && USE(AVFOUNDATION)
 
 #include "AudioVideoRenderer.h"
+#include "HTMLMediaElementIdentifier.h"
+#include "MediaPlayerIdentifier.h"
 #include "MediaPlayerPrivate.h"
 #include "SourceBufferPrivateClient.h"
 #include "VideoFrameMetadata.h"
@@ -320,6 +322,13 @@ private:
     void flushVideoIfNeeded();
     void reenqueueMediaForTime(const MediaTime&);
 
+    // Remote layer support
+    WebCore::HostingContext hostingContext() const final;
+    void setVideoLayerSizeFenced(const WebCore::FloatSize&, WTF::MachSendRightAnnotated&&) final;
+    std::optional<MediaPlayerIdentifier> identifier() const final { return m_playerIdentifier; }
+
+    static Ref<AudioVideoRenderer> createRenderer(LoggerHelper&, HTMLMediaElementIdentifier, MediaPlayerIdentifier);
+
     ThreadSafeWeakPtr<MediaPlayer> m_player;
     RefPtr<MediaSourcePrivateAVFObjC> m_mediaSourcePrivate;
 
@@ -372,6 +381,7 @@ private:
     bool m_applicationIsActive { true };
 #endif
 
+    const MediaPlayerIdentifier m_playerIdentifier;
     const Ref<AudioVideoRenderer> m_renderer;
 };
 

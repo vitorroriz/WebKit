@@ -310,7 +310,8 @@ static void buildMediaEnginesVector() WTF_REQUIRES_LOCK(mediaEngineVectorLock)
             MediaPlayerPrivateAVFoundationObjC::registerMediaEngine(addMediaEngine);
 
 #if ENABLE(MEDIA_SOURCE)
-        if (registerRemoteEngine)
+        bool useMSERemoteRenderer = hasPlatformStrategies() && platformStrategies()->mediaStrategy()->hasRemoteRendererFor(MediaPlayerMediaEngineIdentifier::AVFoundationMSE);
+        if (registerRemoteEngine && !useMSERemoteRenderer)
             registerRemoteEngine(addMediaEngine, MediaPlayerEnums::MediaEngineIdentifier::AVFoundationMSE);
         else
             MediaPlayerPrivateMediaSourceAVFObjC::registerMediaEngine(addMediaEngine);

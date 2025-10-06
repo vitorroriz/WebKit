@@ -43,11 +43,13 @@
 #import "MediaSourcePrivate.h"
 #import "MediaSourcePrivateAVFObjC.h"
 #import "MediaSourcePrivateClient.h"
+#import "MediaStrategy.h"
 #import "MessageClientForTesting.h"
 #import "MessageForTesting.h"
 #import "PixelBufferConformerCV.h"
 #import "PlatformDynamicRangeLimitCocoa.h"
 #import "PlatformScreen.h"
+#import "PlatformStrategies.h"
 #import "SourceBufferPrivateAVFObjC.h"
 #import "SpatialAudioExperienceHelper.h"
 #import "TextTrackRepresentation.h"
@@ -89,6 +91,15 @@ namespace WebCore {
 #pragma mark -
 #pragma mark MediaPlayerPrivateMediaSourceAVFObjC
 
+Ref<AudioVideoRenderer> MediaPlayerPrivateMediaSourceAVFObjC::createRenderer(LoggerHelper& loggerHelper, HTMLMediaElementIdentifier mediaElementIdentifier, MediaPlayerIdentifier playerIdentifier)
+{
+    if (hasPlatformStrategies()) {
+        if (RefPtr renderer = platformStrategies()->mediaStrategy()->createAudioVideoRenderer(&loggerHelper, mediaElementIdentifier, playerIdentifier))
+            return renderer.releaseNonNull();
+    }
+    return AudioVideoRendererAVFObjC::create(Ref { loggerHelper.logger() }, loggerHelper.logIdentifier());
+}
+
 MediaPlayerPrivateMediaSourceAVFObjC::MediaPlayerPrivateMediaSourceAVFObjC(MediaPlayer* player)
     : m_player(player)
     , m_seekTimer(*this, &MediaPlayerPrivateMediaSourceAVFObjC::seekInternal)
@@ -96,7 +107,8 @@ MediaPlayerPrivateMediaSourceAVFObjC::MediaPlayerPrivateMediaSourceAVFObjC(Media
     , m_readyState(MediaPlayer::ReadyState::HaveNothing)
     , m_logger(player->mediaPlayerLogger())
     , m_logIdentifier(player->mediaPlayerLogIdentifier())
-    , m_renderer(AudioVideoRendererAVFObjC::create(m_logger, m_logIdentifier))
+    , m_playerIdentifier(MediaPlayerIdentifier::generate())
+    , m_renderer(createRenderer(*this, player->clientIdentifier(), m_playerIdentifier))
 {
     auto logSiteIdentifier = LOGIDENTIFIER;
     ALWAYS_LOG(logSiteIdentifier);
@@ -1282,6 +1294,16 @@ void MediaPlayerPrivateMediaSourceAVFObjC::applicationDidBecomeActive()
 void MediaPlayerPrivateMediaSourceAVFObjC::isInFullscreenOrPictureInPictureChanged(bool isInFullscreenOrPictureInPicture)
 {
     m_renderer->isInFullscreenOrPictureInPictureChanged(isInFullscreenOrPictureInPicture);
+}
+
+WebCore::HostingContext MediaPlayerPrivateMediaSourceAVFObjC::hostingContext() const
+{
+    return m_renderer->hostingContext();
+}
+
+void MediaPlayerPrivateMediaSourceAVFObjC::setVideoLayerSizeFenced(const WebCore::FloatSize& size, WTF::MachSendRightAnnotated&& sendRightAnnotated)
+{
+    m_renderer->setVideoLayerSizeFenced(size, WTFMove(sendRightAnnotated));
 }
 
 } // namespace WebCore

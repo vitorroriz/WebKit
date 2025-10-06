@@ -5179,6 +5179,22 @@ MediaSourcePrefersDecompressionSession:
       default: true
   sharedPreferenceForWebProcess: true
 
+MediaSourceUseRemoteAudioVideoRenderer:
+  type: bool
+  status: unstable
+  category: media
+  humanReadableName: "MSE player uses GPU renderer"
+  humanReadableDescription: "MSE player uses GPU renderer"
+  condition: PLATFORM(COCOA) && ENABLE(VIDEO)
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+  sharedPreferenceForWebProcess: true
+
 MediaStreamTrackProcessingEnabled:
   type: bool
   status: mature
