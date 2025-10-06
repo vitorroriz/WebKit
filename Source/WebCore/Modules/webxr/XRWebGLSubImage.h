@@ -39,6 +39,8 @@ class WebGLTexture;
 class XRWebGLSubImage : public XRSubImage {
     WTF_MAKE_TZONE_OR_ISO_ALLOCATED(XRWebGLSubImage);
 public:
+    virtual ~XRWebGLSubImage();
+
     const WebXRViewport& viewport() const final { RELEASE_ASSERT_NOT_REACHED(); }
     Ref<WebGLTexture> colorTexture() const { RELEASE_ASSERT_NOT_REACHED(); }
     RefPtr<WebGLTexture> depthStencilTexture() const { RELEASE_ASSERT_NOT_REACHED(); }
