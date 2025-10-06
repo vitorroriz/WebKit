@@ -661,11 +661,8 @@ bindings/js/JSAnimationTimelineCustom.cpp
 bindings/js/JSAttrCustom.cpp
 bindings/js/JSAudioBufferCustom.cpp
 bindings/js/JSAudioBufferSourceNodeCustom.cpp
-bindings/js/JSAudioNodeCustom.cpp
 bindings/js/JSAudioWorkletGlobalScopeCustom.cpp
 bindings/js/JSAudioWorkletProcessorCustom.cpp
-bindings/js/JSBaseAudioContextCustom.cpp
-bindings/js/JSBasicCredentialCustom.cpp
 bindings/js/JSBlobCustom.cpp
 bindings/js/JSCSSRuleCustom.cpp
 bindings/js/JSCSSRuleListCustom.cpp
@@ -713,8 +710,6 @@ bindings/js/JSEventTargetCustom.cpp
 bindings/js/JSExecState.cpp
 bindings/js/JSExtendableMessageEventCustom.cpp
 bindings/js/JSFetchEventCustom.cpp
-bindings/js/JSFileSystemEntryCustom.cpp
-bindings/js/JSFileSystemHandleCustom.cpp
 bindings/js/JSHTMLAllCollectionCustom.cpp
 bindings/js/JSHTMLCanvasElementCustom.cpp
 bindings/js/JSHTMLCollectionCustom.cpp
@@ -736,8 +731,6 @@ bindings/js/JSLazyEventListener.cpp
 bindings/js/JSLocationCustom.cpp
 bindings/js/JSMediaControlsHostCustom.cpp
 bindings/js/JSMediaSessionCustom.cpp
-bindings/js/JSMediaSourceCustom.cpp
-bindings/js/JSMediaStreamTrackCustom.cpp
 bindings/js/JSMessageChannelCustom.cpp
 bindings/js/JSMessageEventCustom.cpp
 bindings/js/JSMessagePortCustom.cpp
@@ -761,7 +754,6 @@ bindings/js/JSPopStateEventCustom.cpp
 bindings/js/JSPromiseRejectionEventCustom.cpp
 bindings/js/JSRTCRtpSFrameTransformCustom.cpp
 bindings/js/JSRangeCustom.cpp
-bindings/js/JSReadableStreamCustom.cpp
 bindings/js/JSReadableStreamSourceCustom.cpp
 bindings/js/JSReportBodyCustom.cpp
 bindings/js/JSReportingObserverCustom.cpp
@@ -773,7 +765,6 @@ bindings/js/JSServiceWorkerClientCustom.cpp
 bindings/js/JSServiceWorkerGlobalScopeCustom.cpp
 bindings/js/JSShadowRealmGlobalScopeBase.cpp
 bindings/js/JSShadowRootCustom.cpp
-bindings/js/JSSourceBufferCustom.cpp
 bindings/js/JSStaticRangeCustom.cpp
 bindings/js/JSStylePropertyMapReadOnlyCustom.cpp
 bindings/js/JSStyleSheetCustom.cpp
@@ -792,17 +783,14 @@ bindings/js/JSWebCodecsVideoDecoderCustom.cpp
 bindings/js/JSWebCodecsVideoEncoderCustom.cpp
 bindings/js/JSWebGL2RenderingContextCustom.cpp
 bindings/js/JSWebGLRenderingContextCustom.cpp
-bindings/js/JSWebXRReferenceSpaceCustom.cpp
 bindings/js/JSWebXRRigidTransformCustom.cpp
 bindings/js/JSWebXRSessionCustom.cpp
-bindings/js/JSWebXRSpaceCustom.cpp
 bindings/js/JSWebXRViewCustom.cpp
 bindings/js/JSWindowProxy.cpp
 bindings/js/JSWorkerGlobalScopeBase.cpp
 bindings/js/JSWorkerGlobalScopeCustom.cpp
 bindings/js/JSWorkerNavigatorCustom.cpp
 bindings/js/JSWorkletGlobalScopeBase.cpp
-bindings/js/JSWritableStreamCustom.cpp
 bindings/js/JSXMLDocumentCustom.cpp
 bindings/js/JSXMLHttpRequestCustom.cpp
 bindings/js/JSXPathResultCustom.cpp

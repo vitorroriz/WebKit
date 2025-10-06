@@ -104,6 +104,4 @@ template<> struct LogArgument<WebCore::OscillatorType> {
 
 } // namespace WTF
 
-SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::OscillatorNode)
-    static bool isType(const WebCore::AudioNode& node) { return node.nodeType() == WebCore::AudioNode::NodeTypeOscillator; }
-SPECIALIZE_TYPE_TRAITS_END()
+SPECIALIZE_TYPE_TRAITS_AUDIONODE(OscillatorNode, NodeTypeOscillator);
