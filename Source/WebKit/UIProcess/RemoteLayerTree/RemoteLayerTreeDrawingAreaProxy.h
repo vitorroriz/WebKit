@@ -154,6 +154,7 @@ private:
     void waitForDidUpdateActivityState(ActivityStateChangeID) final;
     void hideContentUntilPendingUpdate() final;
     void hideContentUntilAnyUpdate() final;
+    void hideContentUntilDidUpdateActivityState(ActivityStateChangeID) final;
     bool hasVisibleContent() const final;
 
     WebCore::FloatPoint indicatorLocation() const;
@@ -207,6 +208,8 @@ private:
     Deque<Seconds> m_frameDurations;
 
     Markable<IPC::AsyncReplyID> m_replyForUnhidingContent;
+    std::optional<ActivityStateChangeID> m_activityStateChangeForUnhidingContent;
+    bool m_hasDetachedRootLayer { false };
 
 #if ASSERT_ENABLED
     TransactionID m_lastVisibleTransactionID;
