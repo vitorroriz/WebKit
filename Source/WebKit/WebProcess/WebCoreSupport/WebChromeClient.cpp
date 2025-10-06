@@ -181,7 +181,6 @@
 #endif
 
 #if ENABLE(DAMAGE_TRACKING)
-#include "LayerTreeHost.h"
 #include <WebCore/Damage.h>
 #endif
 

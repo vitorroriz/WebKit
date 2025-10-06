@@ -24,12 +24,12 @@
  */
 
 #include "config.h"
-#include "ThreadedDisplayRefreshMonitor.h"
+#include "ThreadedDisplayRefreshMonitorPlayStation.h"
 
 #if USE(COORDINATED_GRAPHICS)
 
 #include "CompositingRunLoop.h"
-#include "ThreadedCompositor.h"
+#include "ThreadedCompositorPlayStation.h"
 
 #if USE(GLIB_EVENT_LOOP)
 #include <wtf/glib/RunLoopSourcePriority.h>

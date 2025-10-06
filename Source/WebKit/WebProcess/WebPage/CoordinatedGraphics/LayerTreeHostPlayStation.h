@@ -29,7 +29,7 @@
 #if USE(COORDINATED_GRAPHICS)
 #include "CallbackID.h"
 #include "LayerTreeContext.h"
-#include "ThreadedCompositor.h"
+#include "ThreadedCompositorPlayStation.h"
 #include <WebCore/CoordinatedImageBackingStore.h>
 #include <WebCore/CoordinatedPlatformLayer.h>
 #include <WebCore/FloatPoint.h>
@@ -42,6 +42,10 @@
 #include <wtf/OptionSet.h>
 #include <wtf/RunLoop.h>
 #include <wtf/TZoneMalloc.h>
+
+#if !HAVE(DISPLAY_LINK)
+#include "ThreadedDisplayRefreshMonitorPlayStation.h"
+#endif
 
 #if ENABLE(DAMAGE_TRACKING)
 #include <WebCore/Region.h>
@@ -71,11 +75,18 @@ class CoordinatedSceneState;
 class WebPage;
 
 class LayerTreeHost final : public CanMakeCheckedPtr<LayerTreeHost>, public WebCore::GraphicsLayerFactory, public WebCore::CoordinatedPlatformLayer::Client
+#if !HAVE(DISPLAY_LINK)
+    , public ThreadedDisplayRefreshMonitor::Client
+#endif
 {
     WTF_MAKE_TZONE_ALLOCATED(LayerTreeHost);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(LayerTreeHost);
 public:
+#if HAVE(DISPLAY_LINK)
     explicit LayerTreeHost(WebPage&);
+#else
+    LayerTreeHost(WebPage&, WebCore::PlatformDisplayID);
+#endif
     ~LayerTreeHost();
 
     WebPage& webPage() const { return m_webPage; }
@@ -102,14 +113,14 @@ public:
 
     void willRenderFrame();
     void didRenderFrame();
+#if HAVE(DISPLAY_LINK)
     void didComposite(uint32_t);
-
-#if PLATFORM(GTK)
-    void adjustTransientZoom(double, WebCore::FloatPoint);
-    void commitTransientZoom(double, WebCore::FloatPoint);
 #endif
 
-    void ensureDrawing();
+#if !HAVE(DISPLAY_LINK)
+    RefPtr<WebCore::DisplayRefreshMonitor> createDisplayRefreshMonitor(WebCore::PlatformDisplayID);
+    WebCore::PlatformDisplayID displayID() const { return m_displayID; }
+#endif
 
 #if ENABLE(DAMAGE_TRACKING)
     void notifyFrameDamageForTesting(WebCore::Region&&);
@@ -117,15 +128,15 @@ public:
     void foreachRegionInDamageHistoryForTesting(Function<void(const WebCore::Region&)>&&);
 #endif
 
-#if PLATFORM(WPE) && USE(GBM) && ENABLE(WPE_PLATFORM)
-    void preferredBufferFormatsDidChange();
-#endif
 private:
     void updateRootLayer();
     WebCore::FloatRect visibleContentsRect() const;
     void layerFlushTimerFired();
     void flushLayers();
     void commitSceneState();
+#if !HAVE(DISPLAY_LINK)
+    void renderNextFrame(bool);
+#endif
 
     // CoordinatedPlatformLayer::Client
 #if USE(CAIRO)
@@ -145,10 +156,10 @@ private:
     // GraphicsLayerFactory
     Ref<WebCore::GraphicsLayer> createGraphicsLayer(WebCore::GraphicsLayer::Type, WebCore::GraphicsLayerClient&) override;
 
-#if PLATFORM(GTK)
-    WebCore::FloatPoint constrainTransientZoomOrigin(double, WebCore::FloatPoint) const;
-    WebCore::CoordinatedPlatformLayer* layerForTransientZoom() const;
-    void applyTransientZoomToLayers(double, WebCore::FloatPoint);
+#if !HAVE(DISPLAY_LINK)
+    // ThreadedDisplayRefreshMonitor::Client
+    void requestDisplayRefreshMonitorUpdate() override;
+    void handleDisplayRefreshMonitorUpdate(bool hasBeenRescheduled) override;
 #endif
 
     WebPage& m_webPage;
@@ -159,7 +170,9 @@ private:
     HashSet<Ref<WebCore::CoordinatedPlatformLayer>> m_layers;
     bool m_layerTreeStateIsFrozen { false };
     bool m_pendingResize { false };
+#if HAVE(DISPLAY_LINK)
     bool m_pendingForceRepaint { false };
+#endif
     bool m_isFlushingLayers { false };
     bool m_waitUntilPaintingComplete { false };
     bool m_isSuspended { false };
@@ -173,21 +186,22 @@ private:
     RefPtr<ThreadedCompositor> m_compositor;
     struct {
         CompletionHandler<void()> callback;
+#if HAVE(DISPLAY_LINK)
         std::optional<uint32_t> compositionRequestID;
+#else
+        bool needsFreshFlush { false };
+#endif
     } m_forceRepaintAsync;
     RunLoop::Timer m_layerFlushTimer;
+#if !HAVE(DISPLAY_LINK)
+    WebCore::PlatformDisplayID m_displayID;
+#endif
 #if USE(CAIRO)
     std::unique_ptr<WebCore::Cairo::PaintingEngine> m_paintingEngine;
 #elif USE(SKIA)
     std::unique_ptr<WebCore::SkiaPaintingEngine> m_skiaPaintingEngine;
 #endif
     HashMap<uint64_t, Ref<WebCore::CoordinatedImageBackingStore>> m_imageBackingStores;
-
-#if PLATFORM(GTK)
-    bool m_transientZoom { false };
-    double m_transientZoomScale { 1 };
-    WebCore::FloatPoint m_transientZoomOrigin;
-#endif
 
     uint32_t m_compositionRequestID { 0 };
 
