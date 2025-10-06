@@ -4994,9 +4994,13 @@ void BytecodeGenerator::emitRequireObjectCoercibleForDestructuring(RegisterID* v
     Ref<Label> target = newLabel();
     OpJnundefinedOrNull::emit(this, value, target->bind(this));
 
-    if (propertyName && !propertyName->isNull())
-        emitThrowTypeError(Identifier::fromString(m_vm, makeString("Cannot destructure property '"_s, propertyName->string(), "' from null or undefined value"_s)));
-    else
+    if (propertyName && !propertyName->isNull()) {
+        auto errorMessageStr = tryMakeString("Cannot destructure property '"_s, propertyName->string(), "' from null or undefined value"_s);
+        if (!errorMessageStr) [[unlikely]]
+            emitThrowTypeError("Cannot destructure null or undefined value"_s);
+        else
+            emitThrowTypeError(Identifier::fromString(m_vm, errorMessageStr));
+    } else
         emitThrowTypeError("Cannot destructure null or undefined value"_s);
 
     emitLabel(target.get());
