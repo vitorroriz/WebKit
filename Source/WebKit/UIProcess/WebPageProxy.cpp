@@ -11310,19 +11310,11 @@ void WebPageProxy::focusedElementChanged(IPC::Connection& connection, const std:
     });
 }
 
-void WebPageProxy::focusedFrameChanged(IPC::Connection& connection, const std::optional<FrameIdentifier>& frameID)
+void WebPageProxy::focusedFrameChanged(IPC::Connection& connection, std::optional<FrameIdentifier>&& frameID)
 {
-    if (!frameID) {
-        m_focusedFrame = nullptr;
-        return;
-    }
-
-    RefPtr frame = WebFrameProxy::webFrame(*frameID);
-    if (!frame)
-        return;
-
+    RefPtr frame = frameID ? WebFrameProxy::webFrame(*frameID) : nullptr;
     m_focusedFrame = WTFMove(frame);
-    broadcastFocusedFrameToOtherProcesses(connection, *frameID);
+    broadcastFocusedFrameToOtherProcesses(connection, WTFMove(frameID));
 }
 
 void WebPageProxy::processDidBecomeUnresponsive()
@@ -16356,16 +16348,12 @@ void WebPageProxy::dispatchLoadEventToFrameOwnerElement(WebCore::FrameIdentifier
     sendToProcessContainingFrame(parentFrame->frameID(), Messages::WebPage::DispatchLoadEventToFrameOwnerElement(frameID));
 }
 
-void WebPageProxy::broadcastFocusedFrameToOtherProcesses(IPC::Connection& connection, const WebCore::FrameIdentifier& frameID)
+void WebPageProxy::broadcastFocusedFrameToOtherProcesses(IPC::Connection& connection, std::optional<WebCore::FrameIdentifier>&& frameID)
 {
-    RefPtr frame = WebFrameProxy::webFrame(frameID);
-    if (!frame)
-        return;
-
     forEachWebContentProcess([&](auto& webProcess, auto pageID) {
         if (!webProcess.hasConnection() || &webProcess.connection() == &connection)
             return;
-        webProcess.send(Messages::WebPage::FrameWasFocusedInAnotherProcess(frameID), pageID);
+        webProcess.send(Messages::WebPage::FrameWasFocusedInAnotherProcess(WTFMove(frameID)), pageID);
     });
 }
 
@@ -16527,7 +16515,7 @@ void WebPageProxy::focusRemoteFrame(IPC::Connection& connection, WebCore::FrameI
 
     ASSERT(destinationFrame->page() == this);
 
-    broadcastFocusedFrameToOtherProcesses(connection, frameID);
+    broadcastFocusedFrameToOtherProcesses(connection, std::make_optional(frameID));
     setFocus(true);
 }
 

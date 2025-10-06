@@ -10129,12 +10129,11 @@ void WebPage::elementWasFocusedInAnotherProcess(WebCore::FrameIdentifier frameID
     protectedCorePage()->focusController().setFocusedElement(nullptr, frame->protectedCoreFrame().get(), options, WebCore::BroadcastFocusedElement::No);
 }
 
-void WebPage::frameWasFocusedInAnotherProcess(WebCore::FrameIdentifier frameID)
+void WebPage::frameWasFocusedInAnotherProcess(std::optional<WebCore::FrameIdentifier>&& frameID)
 {
-    RefPtr frame = WebProcess::singleton().webFrame(frameID);
-    if (!frame)
-        return;
-    protectedCorePage()->focusController().setFocusedFrame(frame->protectedCoreFrame().get(), WebCore::BroadcastFocusedFrame::No);
+    RefPtr frame = frameID ? WebProcess::singleton().webFrame(*frameID) : nullptr;
+    RefPtr coreFrame = frame ? frame->coreFrame() : nullptr;
+    protectedCorePage()->focusController().setFocusedFrame(coreFrame.get(), WebCore::BroadcastFocusedFrame::No);
 }
 
 void WebPage::remotePostMessage(WebCore::FrameIdentifier source, const String& sourceOrigin, WebCore::FrameIdentifier target, std::optional<WebCore::SecurityOriginData>&& targetOrigin, const WebCore::MessageWithMessagePorts& message)
