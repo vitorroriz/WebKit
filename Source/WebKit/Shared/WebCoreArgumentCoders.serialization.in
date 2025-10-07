@@ -429,19 +429,6 @@ header: <WebCore/ScrollbarTrackCornerSystemImageMac.h>
 }
 #endif // USE(APPKIT)
 
-header: <WebCore/StyleListStyleType.h>
-[CustomHeader, Nested] struct WebCore::Style::ListStyleType {
-    Variant<WebCore::Style::ListStyleType::NoneData, WebCore::Style::ListStyleType::StringData, WebCore::Style::ListStyleType::CounterStyleData> ipcData()
-};
-[CustomHeader, Nested] struct WebCore::Style::ListStyleType::NoneData {
-};
-[CustomHeader, Nested] struct WebCore::Style::ListStyleType::StringData {
-    AtomString identifier;
-};
-[CustomHeader, Nested] struct WebCore::Style::ListStyleType::CounterStyleData {
-    AtomString identifier;
-};
-
 header: <WebCore/ScrollTypes.h>
 enum class WebCore::ScrollIsAnimated : bool;
 
@@ -4328,12 +4315,6 @@ header: <WebCore/ExceptionDetails.h>
 header: <WebCore/SecurityPolicyViolationEventDisposition.h>
 enum class WebCore::SecurityPolicyViolationEventDisposition : bool
 
-header: <WebCore/FontAttributeChanges.h>
-enum class WebCore::VerticalAlignChange : uint8_t {
-    Superscript,
-    Baseline,
-    Subscript
-};
 
 header: <WebCore/TextGranularity.h>
 enum class WebCore::TextGranularity : uint8_t {
@@ -4367,40 +4348,6 @@ struct WebKit::RunJavaScriptParameters {
     WebCore::ForceUserGesture forceUserGesture;
     WebCore::RemoveTransientActivation removeTransientActivation;
 }
-
-header: <WebCore/FontAttributes.h>
-[CustomHeader] struct WebCore::TextList {
-    WebCore::Style::ListStyleType styleType;
-    int startingItemNumber
-    bool ordered
-};
-
-[Nested] enum class WebCore::FontAttributes::SubscriptOrSuperscript : uint8_t {
-    None,
-    Subscript,
-    Superscript
-};
-
-[Nested] enum class WebCore::FontAttributes::HorizontalAlignment : uint8_t {
-    Left,
-    Center,
-    Right,
-    Justify,
-    Natural
-};
-
-[CustomHeader] struct WebCore::FontAttributes {
-    RefPtr<WebCore::Font> font
-    WebCore::Color backgroundColor
-    WebCore::Color foregroundColor
-    WebCore::FontShadow fontShadow
-    WebCore::FontAttributes::SubscriptOrSuperscript subscriptOrSuperscript
-    WebCore::FontAttributes::HorizontalAlignment horizontalAlignment
-    Vector<WebCore::TextList> textLists
-    bool hasUnderline
-    bool hasStrikeThrough
-    bool hasMultipleFonts
-};
 
 header: <WebCore/WritingDirection.h>
 enum class WebCore::WritingDirection : uint8_t {
@@ -4638,37 +4585,11 @@ class WebCore::BufferSource {
     std::span<const uint8_t> span();
 }
 
-struct WebCore::FontShadow {
-    WebCore::Color color;
-    WebCore::FloatSize offset;
-    double blurRadius;
-};
-
 struct WebCore::CompositionHighlight {
     unsigned startOffset;
     unsigned endOffset;
     std::optional<WebCore::Color> backgroundColor;
     std::optional<WebCore::Color> foregroundColor;
-};
-
-header: <WebCore/FontAttributeChanges.h>
-[CustomHeader] class WebCore::FontChanges {
-    String m_fontName;
-    String m_fontFamily;
-    std::optional<double> m_fontSize;
-    [Validator='!*m_fontSize || !*m_fontSizeDelta'] std::optional<double> m_fontSizeDelta;
-    std::optional<bool> m_bold;
-    std::optional<bool> m_italic;
-};
-
-class WebCore::FontAttributeChanges {
-    std::optional<WebCore::VerticalAlignChange> m_verticalAlign;
-    std::optional<WebCore::Color> m_backgroundColor;
-    std::optional<WebCore::Color> m_foregroundColor;
-    std::optional<WebCore::FontShadow> m_shadow;
-    std::optional<bool> m_strikeThrough;
-    std::optional<bool> m_underline;
-    WebCore::FontChanges m_fontChanges;
 };
 
 header: <WebCore/TextManipulationController.h>
@@ -7607,23 +7528,6 @@ struct WebCore::PrewarmInformation {
     WebCore::FontCachePrewarmInformation fontCache;
 };
 
-header: <WebCore/FontSelectionAlgorithm.h>
-using WebCore::FontSelectionValue::BackingType = int16_t;
-[CustomHeader] class WebCore::FontSelectionValue {
-    WebCore::FontSelectionValue::BackingType rawValue();
-};
-
-[CustomHeader] struct WebCore::FontSelectionRange {
-    WebCore::FontSelectionValue minimum;
-    WebCore::FontSelectionValue maximum;
-};
-
-[CustomHeader] struct WebCore::FontSelectionSpecifiedCapabilities {
-    std::optional<WebCore::FontSelectionRange> weight;
-    std::optional<WebCore::FontSelectionRange> width;
-    std::optional<WebCore::FontSelectionRange> slope;
-};
-
 struct WebCore::RemoteUserInputEventData {
     WebCore::FrameIdentifier targetFrameID;
     WebCore::IntPoint transformedPoint;
@@ -7841,30 +7745,6 @@ struct WebCore::VideoConfiguration {
     std::optional<WebCore::HdrMetadataType> hdrMetadataType;
     std::optional<WebCore::TransferFunction> transferFunction;
 }
-
-using WebCore::FontTag = std::array<char, 4>;
-
-header: <WebCore/FontTaggedSettings.h>
-[Alias=class FontTaggedSetting<float>, CustomHeader] class WebCore::FloatFontTaggedSetting {
-    WebCore::FontTag m_tag;
-    float m_value;
-};
-
-header: <WebCore/FontTaggedSettings.h>
-[Alias=class FontTaggedSetting<int>, CustomHeader] class WebCore::IntFontTaggedSetting {
-    WebCore::FontTag m_tag;
-    int m_value;
-};
-
-header: <WebCore/FontTaggedSettings.h>
-[Alias=class FontTaggedSettings<float>, CustomHeader, LegacyPopulateFromEmptyConstructor] class WebCore::FontVariationSettings {
-    Vector<WebCore::FloatFontTaggedSetting> m_list;
-};
-
-header: <WebCore/FontTaggedSettings.h>
-[Alias=class FontTaggedSettings<int>, CustomHeader, LegacyPopulateFromEmptyConstructor] class WebCore::FontFeatureSettings {
-    Vector<WebCore::IntFontTaggedSetting> m_list;
-};
 
 enum class WebCore::UserScriptInjectionTime : bool;
 
@@ -8190,12 +8070,6 @@ struct WebCore::MarkupExclusionRule {
     Vector<std::pair<AtomString, AtomString>> attributes;
 };
 
-header: <WebCore/Font.h>
-[Nested] enum class WebCore::FontOrigin : bool;
-[Nested] enum class WebCore::FontIsInterstitial : bool;
-[Nested] enum class WebCore::FontVisibility : bool;
-[Nested] enum class WebCore::FontIsOrientationFallback : bool;
-
 #if ENABLE(VIDEO)
 header: <WebCore/CaptionUserPreferences.h>
 enum class WebCore::CaptionUserPreferencesDisplayMode : uint8_t {
@@ -8422,15 +8296,6 @@ struct WebCore::MediaSourceConfiguration {
 };
 
 #endif
-
-header: <WebCore/Font.h>
-[CustomHeader] struct WebCore::FontInternalAttributes {
-    std::optional<WebCore::RenderingResourceIdentifier> renderingResourceIdentifier;
-    [BitField] WebCore::FontOrigin origin;
-    [BitField] WebCore::FontIsInterstitial isInterstitial;
-    [BitField] WebCore::FontVisibility visibility;
-    [BitField] WebCore::FontIsOrientationFallback isTextOrientationFallback;
-};
 
 [CustomHeader, Nested] struct WebCore::Cursor::CustomCursorIPCData {
     Ref<WebCore::Image> image;
