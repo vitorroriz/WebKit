@@ -222,7 +222,7 @@ Vector<VM*>* testVMsPtr = nullptr;
 
 bool isCreatingInactiveVM = false;
 
-unsigned totalNumberOfVMs = 0;
+Atomic<unsigned> totalNumberOfVMs = 0;
 unsigned totalNumberOfActiveVMs = 0;
 Atomic<unsigned> numberOfThreadsStarted = 0;
 
@@ -419,7 +419,7 @@ static JSValueRef checkpointCallback(JSContextRef ctx, JSObjectRef functionObjec
 
     JSValueRef result = nullptr;
     switch (checkpointID) {
-    case 0: {
+    case 0: { // Checkpoint 0
         if (step >= 1820) {
             // Later tests should rendezvous at later checkpoints.
             result = JSValueMakeBoolean(ctx, false);
@@ -442,7 +442,7 @@ static JSValueRef checkpointCallback(JSContextRef ctx, JSObjectRef functionObjec
         result = JSValueMakeUndefined(ctx);
         break;
     }
-    case 1: {
+    case 1: { // Checkpoint 1
         if (step == 1000) {
             Locker locker { lock };
 
@@ -475,7 +475,7 @@ static JSValueRef checkpointCallback(JSContextRef ctx, JSObjectRef functionObjec
         abortTest(); // Should not reach here.
         break;
     }
-    case 2: {
+    case 2: { // Checkpoint 2
         if (step == 1510) {
             EXPECT_EQ(Test5::targetVM, &vm, "Checkpoint2 reached from the wrong VM thread");
             if (failuresFound) {
@@ -512,7 +512,7 @@ static JSValueRef checkpointCallback(JSContextRef ctx, JSObjectRef functionObjec
         result = JSValueMakeBoolean(ctx, true);
         break;
     }
-    case 3: {
+    case 3: { // Checkpoint 3
         if (step == 1810) {
             ASSERT(Test8::targetVM == &vm);
             // This VM is imminently exiting and its thread is terminating. Hence, we need to
@@ -531,7 +531,7 @@ static JSValueRef checkpointCallback(JSContextRef ctx, JSObjectRef functionObjec
         abortTest(); // Should not reach here.
         break;
     }
-    case 4: {
+    case 4: { // Checkpoint 4
         // Fall through to Checkpoint 5's code intentionally so that Checkpoint 4
         // will do the equivalent work of Checkpoint 5 because:
         // 1. the regular worker VMs will execute the regular script that goes through
@@ -542,7 +542,7 @@ static JSValueRef checkpointCallback(JSContextRef ctx, JSObjectRef functionObjec
         // Test 8 and Test 9 will rely on this same checkpoint behavior.
         [[fallthrough]];
     }
-    case 5: {
+    case 5: { // Checkpoint 5
         // This part is only for Checkpoint 5. When Checkpoint 4 code falls through to here,
         // step will be at least 1820, and will skip this part.
         if (step >= 1300 && step <= 1390) {
@@ -596,7 +596,7 @@ static JSValueRef checkpointCallback(JSContextRef ctx, JSObjectRef functionObjec
         result = JSValueMakeBoolean(ctx, !TestEnd::doneTesting);
         break;
     }
-    case 6: {
+    case 6: { // Checkpoint 6
         result = JSValueMakeBoolean(ctx, TestEnd::doneTesting);
         break;
     }
@@ -786,6 +786,12 @@ static void waitForVMDestruction() WTF_REQUIRES_LOCK(lock)
 
 static int test()
 {
+    // Flush any output from previous tests before starting this one. This will make
+    // test output read a lot more sensibly since this test uses dataLog which prints
+    // to stderr while other tests tend to use stdout.
+    fflush(stdout);
+    fflush(stderr);
+
     JSC::Config::configureForTesting();
     WTF::initializeMainThread();
     JSC::initialize();
@@ -811,9 +817,9 @@ static int test()
         VMManager::setMemoryDebuggerCallback(originalMemoryDebugger);
     });
 
-#define ABORT_IF_FAILED() do { \
+#define ABORT_IF_FAILED(__locker) do { \
         if (failuresFound) { \
-            abortTest(locker); \
+            abortTest(__locker); \
             return true; \
         } \
     } while (false)
@@ -872,7 +878,7 @@ static int test()
             LOG_STEP(0002.1, worker, "START thread");
         }
 
-        totalNumberOfVMs++; // JSGlobalContextCreateInGroup will create a VM.
+        totalNumberOfVMs.exchangeAdd(1); // JSGlobalContextCreateInGroup will create a VM.
         JSGlobalContextRef context = JSGlobalContextCreateInGroup(nullptr, nullptr);
         JSObjectRef globalObject = JSContextGetGlobalObject(context);
         RELEASE_ASSERT(JSValueIsObject(context, globalObject));
@@ -935,7 +941,7 @@ static int test()
         }
 
         JSGlobalContextRelease(context);
-        totalNumberOfVMs--; // JSGlobalContextRelease will destroy the VM.
+        totalNumberOfVMs.exchangeSub(1); // JSGlobalContextRelease will destroy the VM.
 
         if (needToNotifyVMDestruction)
             notifyVMDestruction();
@@ -976,7 +982,7 @@ static int test()
     // We expect that no other tests are running concurrently while this test is executing.
     // Hence, the only VMs added/removed should be from this test, and we can track them
     // with some tricks.
-    totalNumberOfVMs = preexistingVMs.size();
+    totalNumberOfVMs.exchange(preexistingVMs.size());
 
     // Start our worker threads.
     SET_STEP(0001, main, "Start and count inactive workers");
@@ -1016,7 +1022,7 @@ static int test()
     RELEASE_ASSERT(step == 0004);
 
     // Check that we can see the new number of VM threads created.
-    EXPECT_EQ(VMManager::numberOfVMs() - preexistingVMs.size() - numberOfInactiveVMs, numberOfTestVMs, "unexpected number of VMs");
+    EXPECT_EQ(VMManager::numberOfVMs(), numberOfTestVMs + numberOfInactiveVMs + preexistingVMs.size(), "unexpected number of VMs");
     EXPECT_EQ(numberOfThreadsStarted.loadRelaxed(), numberOfTestVMs, "unexpected number of VMs");
 
     SET_STEP(0005, main, "Record worker VMs");
@@ -1027,20 +1033,24 @@ static int test()
         }
         return IterationStatus::Continue;
     });
-    EXPECT_EQ(error, VMManager::Error::None, "Failed to collect test VMs");
-    EXPECT_EQ(testVMs.size(), numberOfTestVMs, "unexpected number of VMs");
+    {
+        Locker locker { lock };
+        EXPECT_EQ(error, VMManager::Error::None, "Failed to collect test VMs");
+        EXPECT_EQ(testVMs.size(), numberOfTestVMs, "unexpected number of VMs");
+        ABORT_IF_FAILED(locker);
+    }
 
     totalNumberOfActiveVMs = testVMs.size();
-    LOG_STEP(0005.2, main, "totalNumberOfVMs ", totalNumberOfVMs, " | pre-existing ", preexistingVMs.size(), " inactiveVMs ", numberOfInactiveVMs, " testVMs ", testVMs.size());
+    LOG_STEP(0005.2, main, "totalNumberOfVMs ", totalNumberOfVMs.loadRelaxed(), " | pre-existing ", preexistingVMs.size(), " inactiveVMs ", numberOfInactiveVMs, " testVMs ", testVMs.size());
 
     {
         Locker locker { lock };
         auto info = VMManager::info();
-        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs, "unexpected number of VMs");
+        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs.loadRelaxed(), "unexpected number of VMs");
         // info.numberOfActiveVMs is invalid until we have a StopTheWorld request.
         EXPECT_EQ(info.numberOfStoppedVMs, 0, "unexpected number of stopped VMs");
         EXPECT_EQ(info.worldMode, VMManager::Mode::RunAll, "unexpected VMManager mode");
-        ABORT_IF_FAILED();
+        ABORT_IF_FAILED(locker);
     }
 
     // === Ready to run the real tests now ===================================================
@@ -1095,11 +1105,11 @@ static int test()
 
         LOG_STEP(1200.1, main, "All workers have stopped in WasmDebugger");
         info = VMManager::info();
-        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs, "Unexpected number of VMs");
+        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs.loadRelaxed(), "Unexpected number of VMs");
         EXPECT_EQ(info.numberOfActiveVMs, totalNumberOfActiveVMs, "unexpected number of active VMs");
         EXPECT_EQ(info.numberOfStoppedVMs, totalNumberOfActiveVMs, "Unexpected number of stopped VMs");
         EXPECT_EQ(info.worldMode, VMManager::Mode::Stopped, "Unexpected VMManager mode");
-        ABORT_IF_FAILED();
+        ABORT_IF_FAILED(locker);
 
         Test2::reachedCheckpoint0 = false;
         Test2::numberOfStoppedVMsAtStart = VMManager::info().numberOfStoppedVMs;
@@ -1123,12 +1133,12 @@ static int test()
         totalNumberOfActiveVMs++;
 
         info = VMManager::info();
-        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs, "unexpected number of VMs");
+        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs.loadRelaxed(), "unexpected number of VMs");
         EXPECT_EQ(info.numberOfActiveVMs, totalNumberOfActiveVMs, "unexpected number of active VMs");
         EXPECT_EQ(info.numberOfStoppedVMs, totalNumberOfActiveVMs, "unexpected number of stopped VMs");
         EXPECT_EQ(info.worldMode, VMManager::Mode::Stopped, "unexpected VMManager mode");
         EXPECT_EQ(Test2::reachedCheckpoint0, false, "new VM did not stop on construction");
-        ABORT_IF_FAILED();
+        ABORT_IF_FAILED(locker);
 
         // === Test 3 ==============================================================
         Test3::reachedCheckpoint5 = false;
@@ -1157,16 +1167,16 @@ static int test()
         info = VMManager::info();
         LOG_STEP(1390.1, main, "Test3::reachedCheckpoint5 ", Test3::reachedCheckpoint5);
         LOG_STEP(1390.1, main, "Test3::numberOfStoppedVMsAtStart ", Test3::numberOfStoppedVMsAtStart);
-        LOG_STEP(1390.1, main, "info.numberOfVMs ", info.numberOfVMs, " totalNumberOfVMs ", totalNumberOfVMs);
+        LOG_STEP(1390.1, main, "info.numberOfVMs ", info.numberOfVMs, " totalNumberOfVMs ", totalNumberOfVMs.loadRelaxed());
         LOG_STEP(1390.1, main, "info.numberOfActiveVMs ", info.numberOfActiveVMs, " totalNumberOfActiveVMs ", totalNumberOfActiveVMs);
         LOG_STEP(1390.1, main, "info.numberOfStoppedVMs ", info.numberOfStoppedVMs, " totalNumberOfActiveVMs ", totalNumberOfActiveVMs);
 
-        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs, "unexpected number of VMs");
+        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs.loadRelaxed(), "unexpected number of VMs");
         EXPECT_EQ(info.numberOfActiveVMs, totalNumberOfActiveVMs, "unexpected number of active VMs");
         EXPECT_EQ(info.numberOfStoppedVMs, totalNumberOfActiveVMs, "unexpected number of stopped VMs");
         EXPECT_EQ(info.worldMode, VMManager::Mode::Stopped, "unexpected VMManager mode");
         EXPECT_EQ(Test3::reachedCheckpoint5, false, "Activated VM did not stop on entry");
-        ABORT_IF_FAILED();
+        ABORT_IF_FAILED(locker);
 
         // === Test 4 ==============================================================
         Test4::numberOfContextSwitches = 0;
@@ -1183,15 +1193,15 @@ static int test()
         EXPECT_EQ(step, 1490, "unexpected step");
 
         info = VMManager::info();
-        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs, "unexpected number of VMs");
+        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs.loadRelaxed(), "unexpected number of VMs");
         EXPECT_EQ(info.numberOfActiveVMs, totalNumberOfActiveVMs, "unexpected number of active VMs");
         EXPECT_EQ(info.numberOfStoppedVMs, totalNumberOfActiveVMs, "unexpected number of stopped VMs");
         EXPECT_EQ(info.worldMode, VMManager::Mode::Stopped, "unexpected VMManager mode");
-        ABORT_IF_FAILED();
+        ABORT_IF_FAILED(locker);
 
         // === Test 5 ==============================================================
         EXPECT_NE(Test4::targetVM, testVMs.at(0), "WasmDebugger should have context switched away from the 0th test VM");
-        ABORT_IF_FAILED();
+        ABORT_IF_FAILED(locker);
 
         Test5::targetVM = testVMs.at(0); // Let's do RunOne mode with a context switch.
         WTF::storeStoreFence();
@@ -1206,11 +1216,11 @@ static int test()
         EXPECT_EQ(step, 1590, "unexpected step");
 
         info = VMManager::info();
-        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs, "unexpected number of VMs");
+        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs.loadRelaxed(), "unexpected number of VMs");
         EXPECT_EQ(info.numberOfActiveVMs, totalNumberOfActiveVMs, "unexpected number of active VMs");
         EXPECT_EQ(info.numberOfStoppedVMs, totalNumberOfActiveVMs - 1, "unexpected number of stopped VMs");
         EXPECT_EQ(info.worldMode, VMManager::Mode::RunOne, "unexpected VMManager mode");
-        ABORT_IF_FAILED();
+        ABORT_IF_FAILED(locker);
 
         // === Test 6 ==============================================================
         SET_STEP(1600, main, "Start Test 6");
@@ -1225,11 +1235,11 @@ static int test()
         EXPECT_EQ(step, 1690, "unexpected step");
 
         info = VMManager::info();
-        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs, "unexpected number of VMs");
+        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs.loadRelaxed(), "unexpected number of VMs");
         EXPECT_EQ(info.numberOfActiveVMs, totalNumberOfActiveVMs, "unexpected number of active VMs");
         EXPECT_EQ(info.numberOfStoppedVMs, totalNumberOfActiveVMs, "unexpected number of stopped VMs");
         EXPECT_EQ(info.worldMode, VMManager::Mode::Stopped, "unexpected VMManager mode");
-        ABORT_IF_FAILED();
+        ABORT_IF_FAILED(locker);
 
         // === Test 7 ==============================================================
         SET_STEP(1700, main, "Start Test 7");
@@ -1243,11 +1253,11 @@ static int test()
         EXPECT_EQ(step, 1720, "unexpected step");
 
         info = VMManager::info();
-        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs, "unexpected number of VMs");
+        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs.loadRelaxed(), "unexpected number of VMs");
         EXPECT_EQ(info.numberOfActiveVMs, totalNumberOfActiveVMs, "unexpected number of active VMs");
         EXPECT_EQ(info.numberOfStoppedVMs, totalNumberOfActiveVMs - 1, "unexpected number of stopped VMs");
         EXPECT_EQ(info.worldMode, VMManager::Mode::RunOne, "unexpected VMManager mode");
-        ABORT_IF_FAILED();
+        ABORT_IF_FAILED(locker);
 
         SET_STEP(1790, main, "Success: MemoryDebugger resumed RunOne mode");
 
@@ -1281,12 +1291,12 @@ static int test()
         Test5::targetVM = nullptr;
 
         info = VMManager::info();
-        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs, "unexpected number of VMs");
+        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs.loadRelaxed(), "unexpected number of VMs");
         // We have ResumeAll at this point i.e. we're no longer in StopTheWorld. Hence,
         // info.numberOfActiveVMs is invalid.
         EXPECT_EQ(info.numberOfStoppedVMs, 0, "unexpected number of stopped VMs");
         EXPECT_EQ(info.worldMode, VMManager::Mode::RunAll, "unexpected VMManager mode");
-        ABORT_IF_FAILED();
+        ABORT_IF_FAILED(locker);
 
         // === Test 9 ==============================================================
         Test9::targetVM = inactiveVM;
@@ -1308,11 +1318,11 @@ static int test()
         EXPECT_EQ(step, 1920, "unexpected step");
 
         info = VMManager::info();
-        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs, "unexpected number of VMs");
+        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs.loadRelaxed(), "unexpected number of VMs");
         EXPECT_EQ(info.numberOfActiveVMs, totalNumberOfActiveVMs, "unexpected number of stopped VMs");
         EXPECT_EQ(info.numberOfStoppedVMs, totalNumberOfActiveVMs, "unexpected number of stopped VMs");
         EXPECT_EQ(info.worldMode, VMManager::Mode::Stopped, "unexpected VMManager mode");
-        ABORT_IF_FAILED();
+        ABORT_IF_FAILED(locker);
 
         Test9::numberOfWaitingThreads.exchange(0);
         WTF::storeLoadFence();
@@ -1332,12 +1342,12 @@ static int test()
         EXPECT_EQ(step, 1990, "unexpected step");
 
         info = VMManager::info();
-        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs, "unexpected number of VMs");
+        EXPECT_EQ(info.numberOfVMs, totalNumberOfVMs.loadRelaxed(), "unexpected number of VMs");
         // We have ResumeAll at this point i.e. we're no longer in StopTheWorld. Hence,
         // info.numberOfActiveVMs is invalid.
         EXPECT_EQ(info.numberOfStoppedVMs, 0, "unexpected number of stopped VMs");
         EXPECT_EQ(info.worldMode, VMManager::Mode::RunAll, "unexpected VMManager mode");
-        ABORT_IF_FAILED();
+        ABORT_IF_FAILED(locker);
 
         // Test Loop End: Prepare to run another iteration or exit.
         dataLogLn("=== iteration ", iteration, " END ================================");
