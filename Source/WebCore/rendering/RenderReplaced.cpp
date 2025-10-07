@@ -1044,7 +1044,7 @@ LayoutUnit RenderReplaced::computeReplacedLogicalWidthRespectingMinMaxWidth(Layo
 }
 
 template<typename SizeType>
-LayoutUnit RenderReplaced::computeReplacedLogicalWidthUsingGeneric(const SizeType& logicalWidth) const
+LayoutUnit RenderReplaced::computeReplacedLogicalWidthUsing(const SizeType& logicalWidth) const
 {
     auto calculateContainerWidth = [&] {
         if (isOutOfFlowPositioned()) {
@@ -1112,30 +1112,6 @@ LayoutUnit RenderReplaced::computeReplacedLogicalWidthUsingGeneric(const SizeTyp
     );
 }
 
-LayoutUnit RenderReplaced::computeReplacedLogicalWidthUsing(const Style::PreferredSize& logicalWidth) const
-{
-    return computeReplacedLogicalWidthUsingGeneric(logicalWidth);
-}
-
-LayoutUnit RenderReplaced::computeReplacedLogicalWidthUsing(const Style::MinimumSize& logicalWidth) const
-{
-    return computeReplacedLogicalWidthUsingGeneric(logicalWidth);
-}
-
-LayoutUnit RenderReplaced::computeReplacedLogicalWidthUsing(const Style::MaximumSize& logicalWidth) const
-{
-    return computeReplacedLogicalWidthUsingGeneric(logicalWidth);
-}
-
-static bool allowMinMaxPercentagesInAutoHeightBlocksQuirk()
-{
-#if PLATFORM(COCOA)
-    return WTF::CocoaApplication::isAppleBooks();
-#else
-    return false;
-#endif
-}
-
 bool RenderReplaced::replacedMinMaxLogicalHeightComputesAsNone(const auto& logicalHeight, const auto& initialLogicalHeight) const
 {
     if (logicalHeight == initialLogicalHeight)
@@ -1150,9 +1126,13 @@ bool RenderReplaced::replacedMinMaxLogicalHeightComputesAsNone(const auto& logic
     // Note that the "height" case for replaced elements was handled by hasReplacedLogicalHeight, which is why
     // min and max-height are the only ones handled here.
     // FIXME: For now we put in a quirk for Apple Books until we can move them to viewport units.
-    if (auto* cb = containingBlockForAutoHeightDetection(logicalHeight))
-        return allowMinMaxPercentagesInAutoHeightBlocksQuirk() ? false : cb->hasAutoHeightOrContainingBlockWithAutoHeight();
-
+#if PLATFORM(COCOA)
+    // Allow min-max percentages in auto height blocks quirk.
+    if (WTF::CocoaApplication::isAppleBooks())
+        return false;
+#endif
+    if (CheckedPtr containingBlock = containingBlockForAutoHeightDetection(logicalHeight))
+        return containingBlock->hasAutoHeightOrContainingBlockWithAutoHeight();
     return false;
 }
 
