@@ -41,6 +41,8 @@ OTHER_MODULE_VERIFIER_FLAGS_ = -iframework $(WK_PRIVATE_SDK_DIR)$(WK_OVERRIDE_FR
 // The ObjCxx module requires wtf and bmalloc to be modularized, and those are not under certain configurations.
 
 WK_HAS_VALID_OBJCXX_MODULE[sdk=macosx*] = YES;
+WK_HAS_VALID_OBJCXX_MODULE[sdk=macosx14*] = ;
+WK_HAS_VALID_OBJCXX_MODULE[sdk=macosx15*] = ;
 WK_HAS_VALID_OBJCXX_MODULE[sdk=macosx26.0*] = $(WK_NOT_$(DEPLOYMENT_LOCATION));
 WK_HAS_VALID_OBJCXX_MODULE[sdk=macosx26.1*] = $(WK_NOT_$(DEPLOYMENT_LOCATION));
 WK_HAS_VALID_OBJCXX_MODULE[sdk=macosx26.2*] = $(WK_NOT_$(DEPLOYMENT_LOCATION));
