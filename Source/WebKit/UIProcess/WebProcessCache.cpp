@@ -57,6 +57,11 @@ void WebProcessCache::setCachedProcessSuspensionDelayForTesting(Seconds delay)
     cachedProcessSuspensionDelay = delay;
 }
 
+void WebProcessCache::setCachedProcessLifetimeForTesting(Seconds lifetime)
+{
+    m_cachedProcessLifetime = lifetime;
+}
+
 static uint64_t generateAddRequestIdentifier()
 {
     static uint64_t identifier = 0;
@@ -66,6 +71,7 @@ static uint64_t generateAddRequestIdentifier()
 WebProcessCache::WebProcessCache(WebProcessPool& processPool)
     : m_processPool(processPool)
     , m_evictionTimer(RunLoop::mainSingleton(), "WebProcessCache::EvictionTimer"_s, this, &WebProcessCache::clear)
+    , m_cachedProcessLifetime(cachedProcessLifetime)
 {
     updateCapacity(processPool);
     platformInitialize();
@@ -126,7 +132,7 @@ bool WebProcessCache::addProcessIfPossible(Ref<WebProcessProxy>&& process)
 
     // CachedProcess can destroy the process pool (which owns the WebProcessCache), by making its reference weak in WebProcessProxy::setIsInProcessCache.
     uint64_t requestIdentifier = generateAddRequestIdentifier();
-    m_pendingAddRequests.add(requestIdentifier, CachedProcess::create(process.copyRef()));
+    m_pendingAddRequests.add(requestIdentifier, CachedProcess::create(process.copyRef(), m_cachedProcessLifetime));
 
     WEBPROCESSCACHE_RELEASE_LOG("addProcessIfPossible: Checking if process is responsive before caching it", process->processID());
     process->isResponsive([this, protectedThis = Ref { *this }, process, requestIdentifier](bool isResponsive) {
@@ -335,12 +341,13 @@ void WebProcessCache::updateCapacity(WebProcessPool& processPool)
 
 void WebProcessCache::clear()
 {
-    if (m_pendingAddRequests.isEmpty() && m_processesPerSite.isEmpty())
+    if (m_pendingAddRequests.isEmpty() && m_processesPerSite.isEmpty() && m_sharedProcessesPerSite.isEmpty())
         return;
 
     WEBPROCESSCACHE_RELEASE_LOG("clear: Evicting %u processes", 0, m_pendingAddRequests.size() + m_processesPerSite.size());
     m_pendingAddRequests.clear();
     m_processesPerSite.clear();
+    m_sharedProcessesPerSite.clear();
 }
 
 void WebProcessCache::clearAllProcessesForSession(PAL::SessionID sessionID)
@@ -355,6 +362,17 @@ void WebProcessCache::clearAllProcessesForSession(PAL::SessionID sessionID)
     }
     for (auto& key : keysToRemove)
         m_processesPerSite.remove(key);
+
+    HashMap<WebCore::Site, Ref<CachedProcess>> sharedProcessesPerSite;
+    for (auto& pair : m_sharedProcessesPerSite) {
+        RefPtr dataStore = pair.value->process().websiteDataStore();
+        if (!dataStore || dataStore->sessionID() == sessionID) {
+            WEBPROCESSCACHE_RELEASE_LOG("clearAllProcessesForSession: Evicting shared process because its session was destroyed", pair.value->process().processID());
+            continue;
+        }
+        sharedProcessesPerSite.add(pair.key, pair.value);
+    }
+    m_sharedProcessesPerSite = std::exchange(sharedProcessesPerSite, { });
 
     Vector<uint64_t> pendingRequestsToRemove;
     for (auto& pair : m_pendingAddRequests) {
@@ -373,7 +391,7 @@ void WebProcessCache::setApplicationIsActive(bool isActive)
     WEBPROCESSCACHE_RELEASE_LOG("setApplicationIsActive: (isActive=%d)", 0, isActive);
     if (isActive)
         m_evictionTimer.stop();
-    else if (!m_processesPerSite.isEmpty())
+    else if (size())
         m_evictionTimer.startOneShot(clearingDelayAfterApplicationResignsActive);
 }
 
@@ -383,11 +401,24 @@ void WebProcessCache::removeProcess(WebProcessProxy& process, ShouldShutDownProc
     WEBPROCESSCACHE_RELEASE_LOG("removeProcess: Evicting process from WebProcess cache because it expired", process.processID());
 
     RefPtr<CachedProcess> cachedProcess;
-    auto it = m_processesPerSite.find(*process.site());
-    if (it != m_processesPerSite.end() && &it->value->process() == &process) {
-        cachedProcess = WTFMove(it->value);
-        m_processesPerSite.remove(it);
-    } else {
+
+    if (auto expectedSite = process.site()) {
+        auto it = m_processesPerSite.find(expectedSite.value());
+        if (it != m_processesPerSite.end() && &it->value->process() == &process) {
+            cachedProcess = WTFMove(it->value);
+            m_processesPerSite.remove(it);
+        }
+    } else if (process.isSharedProcess()) {
+        for (auto it = m_sharedProcessesPerSite.begin(); it != m_sharedProcessesPerSite.end(); ++it) {
+            if (&it->value->process() == &process) {
+                cachedProcess = WTFMove(it->value);
+                m_sharedProcessesPerSite.remove(it);
+                break;
+            }
+        }
+    }
+
+    if (!cachedProcess) {
         for (auto& pair : m_pendingAddRequests) {
             if (&pair.value->process() == &process) {
                 cachedProcess = WTFMove(pair.value);
@@ -396,6 +427,7 @@ void WebProcessCache::removeProcess(WebProcessProxy& process, ShouldShutDownProc
             }
         }
     }
+
     ASSERT(cachedProcess);
     if (!cachedProcess)
         return;
@@ -405,12 +437,12 @@ void WebProcessCache::removeProcess(WebProcessProxy& process, ShouldShutDownProc
         cachedProcess->takeProcess();
 }
 
-Ref<WebProcessCache::CachedProcess> WebProcessCache::CachedProcess::create(Ref<WebProcessProxy>&& process)
+Ref<WebProcessCache::CachedProcess> WebProcessCache::CachedProcess::create(Ref<WebProcessProxy>&& process, Seconds cachedProcessEvictionDelay)
 {
-    return adoptRef(*new WebProcessCache::CachedProcess(WTFMove(process)));
+    return adoptRef(*new WebProcessCache::CachedProcess(WTFMove(process), cachedProcessEvictionDelay));
 }
 
-WebProcessCache::CachedProcess::CachedProcess(Ref<WebProcessProxy>&& process)
+WebProcessCache::CachedProcess::CachedProcess(Ref<WebProcessProxy>&& process, Seconds cachedProcessEvictionDelay)
     : m_process(WTFMove(process))
     , m_evictionTimer(RunLoop::mainSingleton(), "WebProcessCache::CachedProcess::EvictionTimer"_s, this, &CachedProcess::evictionTimerFired)
 #if PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
@@ -421,7 +453,7 @@ WebProcessCache::CachedProcess::CachedProcess(Ref<WebProcessProxy>&& process)
     RefPtr dataStore = m_process->websiteDataStore();
     RELEASE_ASSERT_WITH_MESSAGE(dataStore && !dataStore->processes().contains(*m_process), "Only processes with pages should be registered with the data store");
     protectedProcess()->setIsInProcessCache(true);
-    m_evictionTimer.startOneShot(cachedProcessLifetime);
+    m_evictionTimer.startOneShot(cachedProcessEvictionDelay);
 }
 
 WebProcessCache::CachedProcess::~CachedProcess()

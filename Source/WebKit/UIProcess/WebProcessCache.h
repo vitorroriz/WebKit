@@ -64,6 +64,7 @@ public:
     enum class ShouldShutDownProcess : bool { No, Yes };
     void removeProcess(WebProcessProxy&, ShouldShutDownProcess);
     static void setCachedProcessSuspensionDelayForTesting(Seconds);
+    void setCachedProcessLifetimeForTesting(Seconds);
 
     void ref() const final;
     void deref() const final;
@@ -75,7 +76,7 @@ private:
     class CachedProcess : public RefCounted<CachedProcess> {
         WTF_MAKE_TZONE_ALLOCATED(CachedProcess);
     public:
-        static Ref<CachedProcess> create(Ref<WebProcessProxy>&&);
+        static Ref<CachedProcess> create(Ref<WebProcessProxy>&&, Seconds);
         ~CachedProcess();
 
         Ref<WebProcessProxy> takeProcess();
@@ -88,7 +89,7 @@ private:
 #endif
 
     private:
-        explicit CachedProcess(Ref<WebProcessProxy>&&);
+        explicit CachedProcess(Ref<WebProcessProxy>&&, Seconds);
 
         void evictionTimerFired();
 #if PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
@@ -115,6 +116,7 @@ private:
     HashMap<WebCore::Site, Ref<CachedProcess>> m_processesPerSite;
     HashMap<WebCore::Site, Ref<CachedProcess>> m_sharedProcessesPerSite;
     RunLoop::Timer m_evictionTimer;
+    Seconds m_cachedProcessLifetime;
 };
 
 } // namespace WebKit
