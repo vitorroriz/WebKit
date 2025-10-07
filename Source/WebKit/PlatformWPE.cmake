@@ -766,8 +766,8 @@ else ()
 endif ()
 
 set(WPE_LIBRARIES_FOR_INTROSPECTION
+    Soup-3.0:libsoup-3.0
     WPEJavaScriptCore
-    Soup-${SOUP_API_VERSION}:libsoup-${SOUP_API_VERSION}
 )
 
 set(WPE_INCLUDE_DIRS_FOR_INTROSPECTION
@@ -824,7 +824,7 @@ GI_INTROSPECT(${WPE_WEB_PROCESS_EXTENSION_API_NAME} ${WPE_API_VERSION} wpe/${WPE
     SYMBOL_PREFIX webkit
     DEPENDENCIES
         WPEJavaScriptCore
-        Soup-${SOUP_API_VERSION}:libsoup-${SOUP_API_VERSION}
+        Soup-3.0:libsoup-3.0
     OPTIONS
         -I${JavaScriptCoreGLib_FRAMEWORK_HEADERS_DIR}
         -I${JavaScriptCoreGLib_DERIVED_SOURCES_DIR}
