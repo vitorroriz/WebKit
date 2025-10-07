@@ -99,7 +99,7 @@ public:
 
 private:
     friend class MessageReceiver;
-    AudioVideoRendererRemote(LoggerHelper*, GPUProcessConnection&, RemoteAudioVideoRendererIdentifier);
+    AudioVideoRendererRemote(LoggerHelper*, GPUProcessConnection&, WebCore::HTMLMediaElementIdentifier, WebCore::MediaPlayerIdentifier, RemoteAudioVideoRendererIdentifier);
 
     void gpuProcessConnectionDidClose(GPUProcessConnection&) final;
 

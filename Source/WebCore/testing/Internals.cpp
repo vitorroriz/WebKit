@@ -6051,6 +6051,12 @@ double Internals::elementEffectivePlaybackRate(const HTMLMediaElement& media)
 {
     return media.effectivePlaybackRate();
 }
+
+double Internals::privatePlayerCurrentTime(HTMLMediaElement& media)
+{
+    return media.mediaPlayerCurrentTime();
+}
+
 #endif
 
 ExceptionOr<void> Internals::setIsPlayingToBluetoothOverride(std::optional<bool> isPlaying)

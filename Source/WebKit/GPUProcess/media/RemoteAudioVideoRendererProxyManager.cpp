@@ -166,6 +166,8 @@ void RemoteAudioVideoRendererProxyManager::create(RemoteAudioVideoRendererIdenti
 #endif
 
     m_renderers.set(identifier, WTFMove(context));
+
+    m_gpuConnectionToWebProcess.get()->connection().send(Messages::AudioVideoRendererRemoteMessageReceiver::StateUpdate(stateFor(identifier)), identifier);
 }
 
 void RemoteAudioVideoRendererProxyManager::shutdown(RemoteAudioVideoRendererIdentifier identifier)

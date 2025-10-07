@@ -4312,6 +4312,13 @@ void HTMLMediaElement::setPreservesPitch(bool preservesPitch)
     RefPtr { m_player }->setPreservesPitch(preservesPitch);
 }
 
+double HTMLMediaElement::mediaPlayerCurrentTime() const
+{
+    if (RefPtr player = m_player)
+        return player->currentTime().toDouble();
+    return 0;
+}
+
 bool HTMLMediaElement::ended() const
 {
 #if ENABLE(MEDIA_STREAM)
