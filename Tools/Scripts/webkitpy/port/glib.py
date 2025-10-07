@@ -201,7 +201,7 @@ class GLibPort(Port):
             command = self._jhbuild_wrapper + command
         return self._executive.run_command(command + args, cwd=self.webkit_base(), stdout=None, return_stderr=False, decode_output=False, env=env)
 
-    API_TEST_BINARY_NAMES = ['TestWTF', 'TestWebCore', 'TestWebKit']
+    API_TEST_BINARY_NAMES = ['TestWTF', 'TestJavaScriptCore', 'TestWebCore', 'TestWebKit']
 
     def path_to_api_test(self, program_name):
         return self._built_executables_path('TestWebKitAPI', program_name)
