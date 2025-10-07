@@ -1,4 +1,4 @@
-framework module WebKit [system] {
+framework module WebKit [system] [extern_c] {
   umbrella header "WebKit.h"
   module * { export * }
   export *
