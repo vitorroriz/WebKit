@@ -171,7 +171,7 @@ void InternalReadableStream::cancel(Exception&& exception)
 
     auto scope = DECLARE_CATCH_SCOPE(globalObject->vm());
     JSC::JSLockHolder lock(globalObject->vm());
-    cancel(*globalObject, toJSNewlyCreated(globalObject, JSC::jsCast<JSDOMGlobalObject*>(globalObject), DOMException::create(WTFMove(exception))), Use::Private);
+    cancel(*globalObject, toJSNewlyCreated(globalObject, JSC::jsCast<JSDOMGlobalObject*>(globalObject), DOMException::create(WTFMove(exception))));
     if (scope.exception()) [[unlikely]]
         scope.clearException();
 }
@@ -240,11 +240,10 @@ ExceptionOr<std::pair<Ref<InternalReadableStream>, Ref<InternalReadableStream>>>
     return std::make_pair(InternalReadableStream::fromObject(jsDOMGlobalObject, *results[0].get()), InternalReadableStream::fromObject(jsDOMGlobalObject, *results[1].get()));
 }
 
-JSC::JSValue InternalReadableStream::cancel(JSC::JSGlobalObject& globalObject, JSC::JSValue reason, Use use)
+JSC::JSValue InternalReadableStream::cancel(JSC::JSGlobalObject& globalObject, JSC::JSValue reason)
 {
     auto* clientData = downcast<JSVMClientData>(globalObject.vm().clientData);
-    auto& names = clientData->builtinFunctions().readableStreamInternalsBuiltins();
-    auto& privateName = use == Use::Bindings ? names.readableStreamCancelForBindingsPrivateName() : names.readableStreamCancelPrivateName();
+    auto& privateName = clientData->builtinFunctions().readableStreamInternalsBuiltins().readableStreamCancelPrivateName();
 
     JSC::MarkedArgumentBuffer arguments;
     arguments.append(guardedObject());

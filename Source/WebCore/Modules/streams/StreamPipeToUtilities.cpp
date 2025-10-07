@@ -173,13 +173,10 @@ void readableStreamPipeTo(JSDOMGlobalObject& globalObject, Ref<ReadableStream>&&
 static RefPtr<DOMPromise> cancelReadableStream(JSDOMGlobalObject& globalObject, ReadableStream& stream, JSC::JSValue reason)
 {
     RefPtr internalReadableStream = stream.internalReadableStream();
-    if (!internalReadableStream) {
-        auto [promise, deferred] = createPromiseAndWrapper(globalObject);
-        stream.cancel(globalObject, reason, WTFMove(deferred));
-        return RefPtr { WTFMove(promise) };
-    }
+    if (!internalReadableStream)
+        return stream.cancel(globalObject, reason);
 
-    auto value = internalReadableStream->cancel(globalObject, reason, InternalReadableStream::Use::Private);
+    auto value = internalReadableStream->cancel(globalObject, reason);
     auto* promise = jsCast<JSC::JSPromise*>(value);
     if (!promise)
         return nullptr;
@@ -448,9 +445,7 @@ void StreamPipeToState::closingMustBePropagatedForward()
         return;
     }
 
-    m_reader->onClosedPromiseResolution([propagateClosedSteps = WTFMove(propagateClosedSteps)]() mutable {
-        propagateClosedSteps();
-    });
+    m_reader->onClosedPromiseResolution(WTFMove(propagateClosedSteps));
 }
 
 void StreamPipeToState::closingMustBePropagatedBackward()
@@ -477,7 +472,7 @@ void StreamPipeToState::closingMustBePropagatedBackward()
             Ref vm = globalObject->vm();
             // FIXME: Check whether ok to take a strong.
             JSC::Strong<JSC::Unknown> error { vm, getError(*globalObject) };
-            auto value = internalReadableStream->cancel(*globalObject, error.get(), InternalReadableStream::Use::Private);
+            auto value = internalReadableStream->cancel(*globalObject, error.get());
 
             auto getError2 = [error = WTFMove(error)](auto&) {
                 return error.get();

@@ -34,6 +34,7 @@
 #import "DataTransfer.h"
 #import "DictionaryLookup.h"
 #import "DocumentPage.h"
+#import "DocumentQuirks.h"
 #import "DocumentView.h"
 #import "DragController.h"
 #import "Editor.h"

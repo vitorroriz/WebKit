@@ -233,8 +233,7 @@ ExceptionOr<Vector<Ref<ReadableStream>>> byteStreamTee(JSDOMGlobalObject& global
             list.append(state->takeReason2().get());
             JSC::JSValue reason = JSC::constructArray(&globalObject, static_cast<JSC::ArrayAllocationProfile*>(nullptr), list);
 
-            auto [promise, deferred] = createPromiseAndWrapper(globalObject);
-            state->stream().cancel(globalObject, reason, WTFMove(deferred));
+            Ref promise = state->stream().cancel(globalObject, reason);
             promise->whenSettled([state, promise] {
                 if (promise->status() == DOMPromise::Status::Rejected) {
                     state->rejectCancelPromise(promise->result());
@@ -258,8 +257,7 @@ ExceptionOr<Vector<Ref<ReadableStream>>> byteStreamTee(JSDOMGlobalObject& global
             list.append(state->takeReason2().get());
             JSC::JSValue reason = JSC::constructArray(&globalObject, static_cast<JSC::ArrayAllocationProfile*>(nullptr), list);
 
-            auto [promise, deferred] = createPromiseAndWrapper(globalObject);
-            state->stream().cancel(globalObject, reason, WTFMove(deferred));
+            Ref promise = state->stream().cancel(globalObject, reason);
             promise->whenSettled([state, promise] {
                 if (promise->status() == DOMPromise::Status::Rejected) {
                     state->rejectCancelPromise(promise->result());
