@@ -681,14 +681,16 @@ bool JSPromise::isThenFastAndNonObservable()
 {
     JSGlobalObject* globalObject = this->globalObject();
     Structure* structure = this->structure();
-    // We do not allow overriding `then` in InternalPromise.
-    if (inherits<JSInternalPromise>())
-        return true;
-
-    if (!globalObject->promiseThenWatchpointSet().isStillValid()) [[unlikely]]
+    if (!globalObject->promiseThenWatchpointSet().isStillValid()) [[unlikely]] {
+        if (inherits<JSInternalPromise>())
+            return true;
         return false;
+    }
 
     if (structure == globalObject->promiseStructure())
+        return true;
+
+    if (inherits<JSInternalPromise>())
         return true;
 
     if (getPrototypeDirect() != globalObject->promisePrototype())
