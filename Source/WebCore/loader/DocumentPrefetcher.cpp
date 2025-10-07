@@ -88,6 +88,7 @@ static ResourceRequest makePrefetchRequest(URL&& url, const Vector<String>& tags
     ResourceRequest request { WTFMove(url) };
     request.setPriority(ResourceLoadPriority::VeryLow);
 
+    // https://html.spec.whatwg.org/multipage/speculative-loading.html#the-sec-speculation-tags-header
     if (!tags.isEmpty()) {
         StringBuilder builder;
         for (size_t i = 0; i < tags.size(); ++i) {

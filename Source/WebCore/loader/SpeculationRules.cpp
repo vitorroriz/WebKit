@@ -31,6 +31,7 @@
 #include <wtf/URL.h>
 #include <wtf/URLHash.h>
 #include <wtf/Vector.h>
+#include <wtf/text/StringBuilder.h>
 #include <wtf/text/WTFString.h>
 
 namespace WebCore {
@@ -168,7 +169,7 @@ static std::optional<SpeculationRules::DocumentPredicate> parseDocumentPredicate
     return std::nullopt;
 }
 
-// https://wicg.github.io/nav-speculation/speculation-rules.html#parse-a-speculation-rule
+// https://html.spec.whatwg.org/multipage/speculative-loading.html#parse-a-speculation-rule
 static std::optional<SpeculationRules::Rule> parseSingleRule(const JSON::Object& input, const String& rulesetLevelTag, const URL& rulesetBaseURL, const URL& documentBaseURL)
 {
     const HashSet<String> allowedKeys = {
@@ -290,16 +291,22 @@ static std::optional<SpeculationRules::Rule> parseSingleRule(const JSON::Object&
     if (!rulesetLevelTag.isNull())
         rule.tags.append(rulesetLevelTag);
 
+    // 18. If input["tag"] exists:
     auto tagValue = input.getValue("tag"_s);
     if (tagValue && tagValue->type() == JSON::Value::Type::String) {
         String ruleTag = tagValue->asString();
+        // 18.1. If input["tag"] is not a speculation rule tag... return null.
         if (!ruleTag.containsOnlyASCII() || !ruleTag.containsOnly<isASCIIPrintable>())
             return std::nullopt;
-        rule.tags.append(ruleTag);
+        StringBuilder ruleTagBuilder;
+        ruleTagBuilder.appendQuotedJSONString(ruleTag);
+        // 18.2 Append input["tag"] to tags.
+        rule.tags.append(ruleTagBuilder.toString());
     }
 
+    // 19. If tags is empty, then append null to tags.
     if (rule.tags.isEmpty())
-        rule.tags.append(String()); // Append null string
+        rule.tags.append("null"_s);
 
     return rule;
 }
@@ -326,7 +333,7 @@ static std::optional<Vector<SpeculationRules::Rule>> parseRules(const JSON::Obje
     return rules;
 }
 
-// https://wicg.github.io/nav-speculation/speculation-rules.html#parse-speculation-rules
+// https://html.spec.whatwg.org/multipage/speculative-loading.html#parse-a-speculation-rule-set-string
 bool SpeculationRules::parseSpeculationRules(const StringView& text, const URL& rulesetBaseURL, const URL& documentBaseURL)
 {
     auto jsonValue = JSON::Value::parseJSON(text);
@@ -343,7 +350,9 @@ bool SpeculationRules::parseSpeculationRules(const StringView& text, const URL& 
         String candidateTag = tagValue->asString();
         if (!candidateTag.containsOnlyASCII() || !candidateTag.containsOnly<isASCIIPrintable>())
             return false;
-        rulesetLevelTag = candidateTag;
+        StringBuilder ruleTagBuilder;
+        ruleTagBuilder.appendQuotedJSONString(candidateTag);
+        rulesetLevelTag = ruleTagBuilder.toString();
     }
 
     auto prefetch = parseRules(*jsonObject, "prefetch"_s, rulesetLevelTag, rulesetBaseURL, documentBaseURL);
