@@ -81,6 +81,7 @@ namespace WebCore {
 #pragma mark -
 #pragma mark SourceBufferPrivateAVFObjC
 
+#if ASSERT_ENABLED
 static inline bool supportsAttachContentKey()
 {
     static bool supportsAttachContentKey;
@@ -90,11 +91,7 @@ static inline bool supportsAttachContentKey()
     });
     return supportsAttachContentKey;
 }
-
-static inline bool shouldAddContentKeyRecipients()
-{
-    return !supportsAttachContentKey();
-}
+#endif
 
 Ref<SourceBufferPrivateAVFObjC> SourceBufferPrivateAVFObjC::create(MediaSourcePrivateAVFObjC& parent, Ref<SourceBufferParser>&& parser, Ref<AudioVideoRenderer>&& renderer)
 {
@@ -649,13 +646,8 @@ void SourceBufferPrivateAVFObjC::setCDMSession(LegacyCDMSession* session)
 
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    if (oldSession) {
+    if (oldSession)
         oldSession->removeSourceBuffer(this);
-
-        auto parser = this->streamDataParser();
-        if (parser && shouldAddContentKeyRecipients())
-            [oldSession->contentKeySession() removeContentKeyRecipient:parser];
-    }
 
     // FIXME: This is a false positive. Remove the suppression once rdar://145631564 is fixed.
     SUPPRESS_UNCOUNTED_ARG m_session = toCDMSessionAVContentKeySession(session);
@@ -666,10 +658,6 @@ void SourceBufferPrivateAVFObjC::setCDMSession(LegacyCDMSession* session)
             m_hasSessionSemaphore->signal();
             m_hasSessionSemaphore = nullptr;
         }
-
-        auto parser = this->streamDataParser();
-        if (parser && shouldAddContentKeyRecipients())
-            [session->contentKeySession() addContentKeyRecipient:parser];
     }
 #else
     UNUSED_PARAM(session);
@@ -901,8 +889,7 @@ void SourceBufferPrivateAVFObjC::enqueueSample(Ref<MediaSampleAVFObjC>&& sample,
 
 void SourceBufferPrivateAVFObjC::attachContentKeyToSampleIfNeeded(const MediaSampleAVFObjC& sample)
 {
-    if (!supportsAttachContentKey())
-        return;
+    ASSERT((!m_cdmInstance && !m_session.get()) || supportsAttachContentKey());
 
     if (RefPtr cdmInstance = m_cdmInstance)
         cdmInstance->attachContentKeyToSample(sample);
