@@ -33,9 +33,6 @@ public:
 
     virtual bool shouldRespectZeroIntrinsicWidth() const;
 
-    LayoutUnit computeReplacedLogicalWidth(ShouldComputePreferred = ShouldComputePreferred::ComputeActual) const override;
-    LayoutUnit computeReplacedLogicalHeight(std::optional<LayoutUnit> estimatedUsedWidth = std::nullopt) const override;
-
     void computeReplacedOutOfFlowPositionedLogicalHeight(LogicalExtentComputedValues&) const;
     void computeReplacedOutOfFlowPositionedLogicalWidth(LogicalExtentComputedValues&) const;
 
@@ -53,6 +50,31 @@ public:
     double computeIntrinsicAspectRatio() const;
 
     virtual bool paintsContent() const { return true; }
+
+    LayoutUnit computeReplacedLogicalWidthUsing(const Style::PreferredSize& logicalWidth) const;
+    LayoutUnit computeReplacedLogicalWidthUsing(const Style::MinimumSize& logicalWidth) const;
+    LayoutUnit computeReplacedLogicalWidthUsing(const Style::MaximumSize& logicalWidth) const;
+
+    LayoutUnit computeReplacedLogicalWidthRespectingMinMaxWidth(LayoutUnit logicalWidth, ShouldComputePreferred = ShouldComputePreferred::ComputeActual) const;
+
+    LayoutUnit computeReplacedLogicalHeightUsing(const Style::PreferredSize& logicalHeight) const;
+    LayoutUnit computeReplacedLogicalHeightUsing(const Style::MinimumSize& logicalHeight) const;
+    LayoutUnit computeReplacedLogicalHeightUsing(const Style::MaximumSize& logicalHeight) const;
+
+    LayoutUnit computeReplacedLogicalHeightRespectingMinMaxHeight(LayoutUnit logicalHeight) const;
+
+    template<typename T> LayoutUnit computeReplacedLogicalWidthRespectingMinMaxWidth(T logicalWidth, ShouldComputePreferred shouldComputePreferred = ShouldComputePreferred::ComputeActual) const { return computeReplacedLogicalWidthRespectingMinMaxWidth(LayoutUnit(logicalWidth), shouldComputePreferred); }
+    template<typename T> LayoutUnit computeReplacedLogicalHeightRespectingMinMaxHeight(T logicalHeight) const { return computeReplacedLogicalHeightRespectingMinMaxHeight(LayoutUnit(logicalHeight)); }
+
+    virtual LayoutUnit computeReplacedLogicalWidth(ShouldComputePreferred  = ShouldComputePreferred::ComputeActual) const;
+    virtual LayoutUnit computeReplacedLogicalHeight(std::optional<LayoutUnit> estimatedUsedWidth = std::nullopt) const;
+
+    template<typename SizeType> LayoutUnit computeReplacedLogicalWidthUsingGeneric(const SizeType& logicalWidth) const;
+    template<typename SizeType> LayoutUnit computeReplacedLogicalHeightUsingGeneric(const SizeType& logicalHeight) const;
+
+    bool replacedMinMaxLogicalHeightComputesAsNone(const auto& logicalHeight, const auto& initialLogicalHeight) const;
+    bool replacedMinLogicalHeightComputesAsNone() const;
+    bool replacedMaxLogicalHeightComputesAsNone() const;
 
 protected:
     RenderReplaced(Type, Element&, RenderStyle&&, OptionSet<ReplacedFlag> = { });
