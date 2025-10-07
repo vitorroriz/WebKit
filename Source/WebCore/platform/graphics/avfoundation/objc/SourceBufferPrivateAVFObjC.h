@@ -175,7 +175,6 @@ private:
     void attachContentKeyToSampleIfNeeded(const MediaSampleAVFObjC&);
     void didBecomeReadyForMoreSamples(TrackID);
     void appendCompleted(bool);
-    void destroyStreamDataParser();
     void destroyRendererTracks();
     void clearTracks();
 
@@ -242,7 +241,7 @@ private:
     RefPtr<CDMInstanceFairPlayStreamingAVFObjC> m_cdmInstance;
     UniqueRef<Observer<void()>> m_keyStatusesChangedObserver;
     KeyIDs m_keyIDs;
-    RetainPtr<AVStreamDataParser> m_streamDataParser;
+    const RetainPtr<AVStreamDataParser> m_streamDataParser;
 #endif
 
 #if !RELEASE_LOG_DISABLED

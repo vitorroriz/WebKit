@@ -130,7 +130,6 @@ SourceBufferPrivateAVFObjC::~SourceBufferPrivateAVFObjC()
 {
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    destroyStreamDataParser();
     destroyRendererTracks();
     clearTracks();
 
@@ -521,19 +520,6 @@ void SourceBufferPrivateAVFObjC::resetParserStateInternal()
     });
 }
 
-void SourceBufferPrivateAVFObjC::destroyStreamDataParser()
-{
-    auto parser = this->streamDataParser();
-    if (!parser)
-        return;
-#if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
-    if (RefPtr cdmInstance = m_cdmInstance) {
-        if (RefPtr instanceSession = cdmInstance->sessionForKeyIDs(m_keyIDs))
-            [instanceSession->contentKeySession() removeContentKeyRecipient:parser];
-    }
-#endif
-}
-
 void SourceBufferPrivateAVFObjC::destroyRendererTracks()
 {
     ALWAYS_LOG(LOGIDENTIFIER);
@@ -574,7 +560,6 @@ void SourceBufferPrivateAVFObjC::removedFromMediaSource()
 {
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    destroyStreamDataParser();
     destroyRendererTracks();
 
     SourceBufferPrivate::removedFromMediaSource();
