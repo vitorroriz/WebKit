@@ -697,6 +697,10 @@ imported/w3c/web-platform-tests/html/webappapis/microtask-queuing/queue-microtas
 imported/w3c/web-platform-tests/html/webappapis/scripting/processing-model-2/integration-with-the-javascript-agent-formalism/requires-success.any.sharedworker.html [ Skip ]
 imported/w3c/web-platform-tests/html/webappapis/scripting/processing-model-2/unhandled-promise-rejections/promise-rejection-events.sharedworker.html [ Skip ]
 imported/w3c/web-platform-tests/notifications/idlharness.https.any.sharedworker.html [ Skip ]
+imported/w3c/web-platform-tests/secure-contexts/basic-shared-worker.html [ Skip ]
+imported/w3c/web-platform-tests/secure-contexts/basic-shared-worker.https.html [ Skip ]
+imported/w3c/web-platform-tests/secure-contexts/shared-worker-insecure-first.https.html [ Skip ]
+imported/w3c/web-platform-tests/secure-contexts/shared-worker-secure-first.https.html [ Skip ]
 imported/w3c/web-platform-tests/service-workers/service-worker/claim-shared-worker-fetch.https.html [ Skip ]
 imported/w3c/web-platform-tests/streams/idlharness.any.sharedworker.html [ Skip ]
 imported/w3c/web-platform-tests/streams/piping/abort.any.sharedworker.html [ Skip ]
@@ -791,8 +795,6 @@ imported/w3c/web-platform-tests/streams/writable-streams/start.any.serviceworker
 imported/w3c/web-platform-tests/streams/writable-streams/start.any.sharedworker.html [ Skip ]
 imported/w3c/web-platform-tests/streams/writable-streams/write.any.serviceworker.html [ Skip ]
 imported/w3c/web-platform-tests/streams/writable-streams/write.any.sharedworker.html [ Skip ]
-
-
 imported/w3c/web-platform-tests/urlpattern/urlpattern-compare.tentative.any.serviceworker.html [ Skip ]
 imported/w3c/web-platform-tests/urlpattern/urlpattern-compare.tentative.any.sharedworker.html [ Skip ]
 imported/w3c/web-platform-tests/urlpattern/urlpattern-compare.tentative.https.any.serviceworker.html [ Skip ]
