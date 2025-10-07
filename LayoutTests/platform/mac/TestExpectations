@@ -2523,3 +2523,5 @@ webkit.org/b/299131 [ Release ] inspector/unit-tests/target-manager.html [ Pass 
 webkit.org/b/299322 imported/w3c/web-platform-tests/uievents/mouse/mouse_boundary_events_after_reappending_last_over_target.tentative.html [ Pass Failure ]
 
 [ x86_64 ] imported/w3c/web-platform-tests/svg/fonts/font-size-adjust-scale-text.svg [ Failure Pass ]
+
+webkit.org/b/300331 imported/w3c/web-platform-tests/navigation-api/navigation-history-entry/entries-after-bfcache-in-iframe.html [ Failure ]

@@ -8267,3 +8267,5 @@ webkit.org/b/299567 editing/text-iterator/hidden-textarea-selection-quirk.html [
 webkit.org/b/299501 http/tests/site-isolation/focus-tab-navigation-activeElement.html [ Pass Failure ]
 
 webkit.org/b/299501 http/tests/site-isolation/focus-click-navigation-activeElement.html [ Pass Failure ]
+
+webkit.org/b/300331 imported/w3c/web-platform-tests/navigation-api/navigation-history-entry/entries-after-bfcache-in-iframe.html [ Failure ]
