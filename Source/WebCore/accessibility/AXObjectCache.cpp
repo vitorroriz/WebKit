@@ -728,10 +728,11 @@ AccessibilityObject* AXObjectCache::getOrCreateSlow(Node& node, IsPartOfRelation
     ASSERT(&node.document() == document());
 #endif
 
-    CheckedPtr renderer = node.renderer();
-    if (renderer) {
+    bool isYouTubeReplacement = false;
+    if (CheckedPtr renderer = node.renderer()) {
         if (!renderer->isYouTubeReplacement()) [[likely]]
             return getOrCreate(*renderer);
+        isYouTubeReplacement = true;
     }
 
     if (CheckedPtr document = dynamicDowncast<Document>(node)) [[unlikely]]
@@ -781,7 +782,7 @@ AccessibilityObject* AXObjectCache::getOrCreateSlow(Node& node, IsPartOfRelation
         bool isAreaElement = is<HTMLAreaElement>(element);
         // YouTube embeds specifically create a render hierarchy with two elements that share a renderer.
         // In this instance, we want the <embed> element to associate its node with an AX element, so we need to create one here.
-        bool replacementWillCreateRenderer = renderer && renderer->isYouTubeReplacement();
+        bool replacementWillCreateRenderer = isYouTubeReplacement;
         if (!inCanvasSubtree && !insideMeterElement && !hasDisplayContents && !isPopover && !isNodeFocused(node) && !isAreaElement && !replacementWillCreateRenderer)
             return nullptr;
     }
