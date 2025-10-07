@@ -2525,3 +2525,5 @@ webkit.org/b/299322 imported/w3c/web-platform-tests/uievents/mouse/mouse_boundar
 [ x86_64 ] imported/w3c/web-platform-tests/svg/fonts/font-size-adjust-scale-text.svg [ Failure Pass ]
 
 webkit.org/b/300331 imported/w3c/web-platform-tests/navigation-api/navigation-history-entry/entries-after-bfcache-in-iframe.html [ Failure ]
+
+webkit.org/b/300137 imported/w3c/web-platform-tests/html/semantics/scripting-1/the-script-element/json-module/repeated-imports.any.sharedworker.html [ Pass Failure ]
