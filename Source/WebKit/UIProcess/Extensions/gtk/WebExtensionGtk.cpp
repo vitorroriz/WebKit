@@ -45,15 +45,12 @@ WebExtension::WebExtension(GFile* resourcesFile, RefPtr<API::Error>& outError)
 
     outError = nullptr;
 
-    GUniquePtr<char> baseURL(g_file_get_path(resourcesFile));
-    if (!g_str_has_prefix(baseURL.get(), "file"))
-        baseURL.reset(g_strconcat("file:", baseURL.get(), nullptr));
+    GUniquePtr<char> baseURL(g_file_get_uri(resourcesFile));
 
     // While there is a check below to make sure that the directory has a path suffix, it can sometimes remove the full path
     // and leave only the protocol.
-    if (!g_str_has_suffix(baseURL.get(), "/"))
-        baseURL.reset(g_strconcat(baseURL.get(), "/", nullptr));
-    m_resourceBaseURL = URL { String::fromUTF8(baseURL.get()) };
+    if (!m_resourceBaseURL.hasPath())
+        m_resourceBaseURL.setPath("/"_s);
 
     if (m_resourceBaseURL.isValid()) {
         auto isDirectory = g_file_query_file_type(resourcesFile, G_FILE_QUERY_INFO_NONE, nullptr) == G_FILE_TYPE_DIRECTORY;
@@ -63,9 +60,6 @@ WebExtension::WebExtension(GFile* resourcesFile, RefPtr<API::Error>& outError)
             return;
         }
     }
-
-    RELEASE_ASSERT(m_resourceBaseURL.protocolIsFile());
-    RELEASE_ASSERT(m_resourceBaseURL.hasPath());
 
     if (m_resourceBaseURL.path().right(1) != "/"_s)
         m_resourceBaseURL = URL::fileURLWithFileSystemPath(FileSystem::pathByAppendingComponent(m_resourceBaseURL.path(), "/"_s));
