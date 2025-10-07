@@ -70,7 +70,7 @@ const HandlerInfo* HandlerInfo::handlerForIndex(JSWebAssemblyInstance& instance,
         // Handlers are ordered innermost first, so the first handler we encounter
         // that contains the source address is the correct handler to use.
         // This index used is either the BytecodeOffset or a CallSiteIndex.
-        if (handler.m_start <= index && handler.m_end >= index) {
+        if (handler.m_start <= index && handler.m_end > index) {
             if (delegating) {
                 if (handler.m_tryDepth != delegateTarget)
                     continue;
