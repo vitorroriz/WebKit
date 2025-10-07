@@ -46,7 +46,7 @@ public:
 private:
     CSSLab(RectifiedCSSColorPercent&&, RectifiedCSSColorNumber&&, RectifiedCSSColorNumber&&, RectifiedCSSColorPercent&&);
 
-    bool isCSSLab() const final { return true; }
+    CSSStyleValueType styleValueType() const final { return CSSStyleValueType::CSSColorLab; }
 
     RectifiedCSSColorPercent m_lightness;
     RectifiedCSSColorNumber m_a;
@@ -57,5 +57,5 @@ private:
 } // namespace WebCore
 
 SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::CSSLab)
-    static bool isType(const WebCore::CSSOMColorValue& value) { return value.isCSSLab(); }
+    static bool isType(const WebCore::CSSStyleValue& value) { return value.styleValueType() == WebCore::CSSStyleValueType::CSSColorLab; }
 SPECIALIZE_TYPE_TRAITS_END()

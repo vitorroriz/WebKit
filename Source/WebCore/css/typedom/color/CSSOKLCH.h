@@ -46,7 +46,7 @@ public:
 private:
     CSSOKLCH(RectifiedCSSColorPercent&& lightness, RectifiedCSSColorPercent&& chroma, RectifiedCSSColorAngle&& hue, RectifiedCSSColorPercent&& alpha);
 
-    bool isCSSOKLCH() const final { return true; }
+    CSSStyleValueType styleValueType() const final { return CSSStyleValueType::CSSColorOKLCH; }
 
     RectifiedCSSColorPercent m_lightness;
     RectifiedCSSColorPercent m_chroma;
@@ -57,5 +57,5 @@ private:
 } // namespace WebCore
 
 SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::CSSOKLCH)
-    static bool isType(const WebCore::CSSOMColorValue& value) { return value.isCSSOKLCH(); }
+    static bool isType(const WebCore::CSSStyleValue& value) { return value.styleValueType() == WebCore::CSSStyleValueType::CSSColorOKLCH; }
 SPECIALIZE_TYPE_TRAITS_END()

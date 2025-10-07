@@ -46,7 +46,7 @@ public:
 private:
     CSSLCH(RectifiedCSSColorPercent&& lightness, RectifiedCSSColorPercent&& chroma, RectifiedCSSColorAngle&& hue, RectifiedCSSColorPercent&& alpha);
 
-    bool isCSSLCH() const final { return true; }
+    CSSStyleValueType styleValueType() const final { return CSSStyleValueType::CSSColorLCH; }
 
     RectifiedCSSColorPercent m_lightness;
     RectifiedCSSColorPercent m_chroma;
@@ -57,5 +57,5 @@ private:
 } // namespace WebCore
 
 SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::CSSLCH)
-    static bool isType(const WebCore::CSSOMColorValue& value) { return value.isCSSLCH(); }
+    static bool isType(const WebCore::CSSStyleValue& value) { return value.styleValueType() == WebCore::CSSStyleValueType::CSSColorLCH; }
 SPECIALIZE_TYPE_TRAITS_END()
