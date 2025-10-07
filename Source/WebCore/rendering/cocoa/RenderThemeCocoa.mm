@@ -347,7 +347,7 @@ static const String& glassMaterialMediaControlsStyleSheet()
         "        --primary-glyph-color: white;"
         "        --secondary-glyph-color: white;"
         "    }"
-        "    .media-controls.inline.mac:not(.audio) {"
+        "    .media-controls.inline.mac:not(.audio, .narrowviewer) {"
         "        background-color: rgba(0, 0, 0, 0.4);"
         "    }"
         "    .media-controls.inline.mac:not(.audio):is(:empty, .faded) {"
