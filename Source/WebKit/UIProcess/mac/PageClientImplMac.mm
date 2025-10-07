@@ -812,30 +812,32 @@ bool PageClientImpl::isFullScreen()
     if (!impl->hasFullScreenWindowController())
         return false;
 
-    return impl->fullScreenWindowController().isFullScreen;
+    return impl->protectedFullScreenWindowController().get().isFullScreen;
 }
 
 void PageClientImpl::enterFullScreen(FloatSize, CompletionHandler<void(bool)>&& completionHandler)
 {
     CheckedRef impl = *m_impl;
-    if (!impl->fullScreenWindowController())
+    if (RetainPtr fullScreenWindowController = impl->fullScreenWindowController())
+        [fullScreenWindowController enterFullScreen:WTFMove(completionHandler)];
+    else
         return completionHandler(false);
-    [impl->fullScreenWindowController() enterFullScreen:WTFMove(completionHandler)];
 }
 
 void PageClientImpl::exitFullScreen(CompletionHandler<void()>&& completionHandler)
 {
     CheckedRef impl = *m_impl;
-    if (!impl->fullScreenWindowController())
+    if (RetainPtr fullScreenWindowController = impl->fullScreenWindowController())
+        [fullScreenWindowController exitFullScreen:WTFMove(completionHandler)];
+    else
         return completionHandler();
-    [impl->fullScreenWindowController() exitFullScreen:WTFMove(completionHandler)];
 }
 
 void PageClientImpl::beganEnterFullScreen(const IntRect& initialFrame, const IntRect& finalFrame, CompletionHandler<void(bool)>&& completionHandler)
 {
     CheckedRef impl = *m_impl;
-    if (impl->fullScreenWindowController())
-        [impl->fullScreenWindowController() beganEnterFullScreenWithInitialFrame:initialFrame finalFrame:finalFrame completionHandler:WTFMove(completionHandler)];
+    if (RetainPtr fullScreenWindowController = impl->fullScreenWindowController())
+        [fullScreenWindowController beganEnterFullScreenWithInitialFrame:initialFrame finalFrame:finalFrame completionHandler:WTFMove(completionHandler)];
     else
         completionHandler(false);
 
@@ -845,10 +847,11 @@ void PageClientImpl::beganEnterFullScreen(const IntRect& initialFrame, const Int
 void PageClientImpl::beganExitFullScreen(const IntRect& initialFrame, const IntRect& finalFrame, CompletionHandler<void()>&& completionHandler)
 {
     CheckedRef impl = *m_impl;
-    if (!impl->fullScreenWindowController())
+    if (RetainPtr fullScreenWindowController = impl->fullScreenWindowController()) {
+        [fullScreenWindowController beganExitFullScreenWithInitialFrame:initialFrame finalFrame:finalFrame completionHandler:WTFMove(completionHandler)];
+        impl->updateSupportsArbitraryLayoutModes();
+    } else
         return completionHandler();
-    [impl->fullScreenWindowController() beganExitFullScreenWithInitialFrame:initialFrame finalFrame:finalFrame completionHandler:WTFMove(completionHandler)];
-    impl->updateSupportsArbitraryLayoutModes();
 }
 
 #endif // ENABLE(FULLSCREEN_API)
