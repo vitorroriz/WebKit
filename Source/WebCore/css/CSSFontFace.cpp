@@ -301,7 +301,8 @@ void CSSFontFace::setFeatureSettings(CSSValue& featureSettings)
     if (auto* list = dynamicDowncast<CSSValueList>(featureSettings)) {
         for (auto& rangeValue : *list) {
             auto& feature = downcast<CSSFontFeatureValue>(rangeValue);
-            settings.insert({ feature.tag(), feature.value().resolveAsIntegerDeprecated() });
+            if (RefPtr primitiveValue = dynamicDowncast<CSSPrimitiveValue>(feature.value()))
+                settings.insert({ feature.tag(), primitiveValue->resolveAsIntegerDeprecated() });
         }
     }
 

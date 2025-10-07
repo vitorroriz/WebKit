@@ -869,10 +869,12 @@
                 "normal"
             ],
             "codegen-properties": {
-                "animation-wrapper": "FontFeatureSettingsWrapper",
-                "animation-wrapper-requires-override-parameters": [],
-                "style-converter": "FontFeatureSettings",
+                "animation-wrapper": "DiscreteWrapper",
+                "animation-wrapper-comment": "By default, font properties use DiscreteFontDescriptionTypedWrapper, so an explicit wrapper is needed here to override that.",
+                "animation-wrapper-requires-render-style": true,
+                "style-converter": "StyleType<FontFeatureSettings>",
                 "font-description-name-for-methods": "FeatureSettings",
+                "font-property-uses-render-style-for-access": true,
                 "font-property": true,
                 "high-priority": true,
                 "parser-grammar": "normal | <feature-tag-value>#@(no-single-item-opt)",
@@ -891,10 +893,11 @@
                 "normal"
             ],
             "codegen-properties": {
-                "animation-wrapper": "FontVariationSettingsWrapper",
-                "animation-wrapper-requires-override-parameters": [],
-                "style-converter": "FontVariationSettings",
+                "animation-wrapper": "StyleTypeWrapper",
+                "animation-wrapper-requires-render-style": true,
+                "style-converter": "StyleType<FontVariationSettings>",
                 "font-description-name-for-methods": "VariationSettings",
+                "font-property-uses-render-style-for-access": true,
                 "font-property": true,
                 "high-priority": true,
                 "enable-if": "ENABLE_VARIATION_FONTS",

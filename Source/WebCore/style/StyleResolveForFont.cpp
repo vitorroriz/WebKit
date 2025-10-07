@@ -343,44 +343,6 @@ static ResolvedFontFamily fontFamilyFromUnresolvedFontFamily(const CSSPropertyPa
     };
 }
 
-// MARK: 'font-feature-settings'
-
-FontFeatureSettings fontFeatureSettingsFromCSSValue(BuilderState& builderState, const CSSValue& value)
-{
-    if (is<CSSPrimitiveValue>(value)) {
-        ASSERT(value.valueID() == CSSValueNormal || CSSPropertyParserHelpers::isSystemFontShorthand(value.valueID()));
-        return { };
-    }
-
-    auto list = requiredListDowncast<CSSValueList, CSSFontFeatureValue>(builderState, value);
-    if (!list)
-        return { };
-
-    FontFeatureSettings settings;
-    for (Ref feature : *list)
-        settings.insert(FontFeature(feature->tag(), feature->value().resolveAsNumber<int>(builderState.cssToLengthConversionData())));
-    return settings;
-}
-
-// MARK: 'font-variation-settings'
-
-FontVariationSettings fontVariationSettingsFromCSSValue(BuilderState& builderState, const CSSValue& value)
-{
-    if (is<CSSPrimitiveValue>(value)) {
-        ASSERT(value.valueID() == CSSValueNormal || CSSPropertyParserHelpers::isSystemFontShorthand(value.valueID()));
-        return { };
-    }
-
-    auto list = requiredListDowncast<CSSValueList, CSSFontVariationValue>(builderState, value);
-    if (!list)
-        return { };
-
-    FontVariationSettings settings;
-    for (Ref feature : *list)
-        settings.insert({ feature->tag(), feature->value().resolveAsNumber<float>(builderState.cssToLengthConversionData()) });
-    return settings;
-}
-
 // MARK: - Unresolved Font Shorthand Resolution
 
 std::optional<FontCascade> resolveForUnresolvedFont(const CSSPropertyParserHelpers::UnresolvedFont& unresolvedFont, FontCascadeDescription&& fontDescription, ScriptExecutionContext& context)

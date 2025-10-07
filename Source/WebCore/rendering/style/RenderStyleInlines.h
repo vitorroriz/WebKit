@@ -44,9 +44,11 @@
 #include <WebCore/StyleFilterData.h>
 #include <WebCore/StyleFlexibleBoxData.h>
 #include <WebCore/StyleFontData.h>
+#include <WebCore/StyleFontFeatureSettings.h>
 #include <WebCore/StyleFontPalette.h>
 #include <WebCore/StyleFontSizeAdjust.h>
 #include <WebCore/StyleFontStyle.h>
+#include <WebCore/StyleFontVariationSettings.h>
 #include <WebCore/StyleFontWeight.h>
 #include <WebCore/StyleFontWidth.h>
 #include <WebCore/StyleGridData.h>
@@ -228,7 +230,8 @@ inline Style::FontPalette RenderStyle::fontPalette() const { return fontDescript
 inline Style::FontSizeAdjust RenderStyle::fontSizeAdjust() const { return fontDescription().fontSizeAdjust(); }
 inline Style::FontStyle RenderStyle::fontStyle() const { return { fontDescription().fontStyleSlope(), fontDescription().fontStyleAxis() }; }
 inline FontOpticalSizing RenderStyle::fontOpticalSizing() const { return fontDescription().opticalSizing(); }
-inline FontVariationSettings RenderStyle::fontVariationSettings() const { return fontDescription().variationSettings(); }
+inline Style::FontFeatureSettings RenderStyle::fontFeatureSettings() const { return fontDescription().featureSettings(); }
+inline Style::FontVariationSettings RenderStyle::fontVariationSettings() const { return fontDescription().variationSettings(); }
 inline Style::FontWeight RenderStyle::fontWeight() const { return fontDescription().weight(); }
 inline Style::FontWidth RenderStyle::fontWidth() const { return fontDescription().width(); }
 inline const Style::GapGutter& RenderStyle::gap(Style::GridTrackSizingDirection direction) const { return direction == Style::GridTrackSizingDirection::Columns ? columnGap() : rowGap(); }
@@ -398,6 +401,8 @@ constexpr Style::FlexGrow RenderStyle::initialFlexGrow() { return 0_css_number; 
 constexpr Style::FlexShrink RenderStyle::initialFlexShrink() { return 1_css_number; }
 constexpr FlexWrap RenderStyle::initialFlexWrap() { return FlexWrap::NoWrap; }
 constexpr Float RenderStyle::initialFloating() { return Float::None; }
+inline Style::FontFeatureSettings RenderStyle::initialFontFeatureSettings() { return CSS::Keyword::Normal { }; }
+inline Style::FontVariationSettings RenderStyle::initialFontVariationSettings() { return CSS::Keyword::Normal { }; }
 inline Style::FontPalette RenderStyle::initialFontPalette() { return CSS::Keyword::Normal { }; }
 inline Style::FontSizeAdjust RenderStyle::initialFontSizeAdjust() { return CSS::Keyword::None { }; }
 inline Style::FontStyle RenderStyle::initialFontStyle() { return CSS::Keyword::Normal { }; }

@@ -177,8 +177,6 @@ public:
     // MARK: Font conversions
 
     static Ref<CSSValue> convertFontFamily(ExtractorState&, const AtomString&);
-    static Ref<CSSValue> convertFontFeatureSettings(ExtractorState&, const FontFeatureSettings&);
-    static Ref<CSSValue> convertFontVariationSettings(ExtractorState&, const FontVariationSettings&);
 
     // MARK: Grid conversions
 
@@ -969,26 +967,6 @@ inline Ref<CSSValue> ExtractorConverter::convertFontFamily(ExtractorState& state
     if (auto familyIdentifier = identifierForFamily(family))
         return CSSPrimitiveValue::create(familyIdentifier);
     return state.pool.createFontFamilyValue(family);
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertFontFeatureSettings(ExtractorState& state, const FontFeatureSettings& fontFeatureSettings)
-{
-    if (!fontFeatureSettings.size())
-        return CSSPrimitiveValue::create(CSSValueNormal);
-    CSSValueListBuilder list;
-    for (auto& feature : fontFeatureSettings)
-        list.append(CSSFontFeatureValue::create(FontTag(feature.tag()), convert(state, feature.value())));
-    return CSSValueList::createCommaSeparated(WTFMove(list));
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertFontVariationSettings(ExtractorState& state, const FontVariationSettings& fontVariationSettings)
-{
-    if (fontVariationSettings.isEmpty())
-        return CSSPrimitiveValue::create(CSSValueNormal);
-    CSSValueListBuilder list;
-    for (auto& feature : fontVariationSettings)
-        list.append(CSSFontVariationValue::create(feature.tag(), convert(state, feature.value())));
-    return CSSValueList::createCommaSeparated(WTFMove(list));
 }
 
 // MARK: - Grid conversions

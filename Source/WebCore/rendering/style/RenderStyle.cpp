@@ -2649,10 +2649,17 @@ void RenderStyle::setFontOpticalSizing(FontOpticalSizing opticalSizing)
     setFontDescription(WTFMove(description));
 }
 
-void RenderStyle::setFontVariationSettings(FontVariationSettings settings)
+void RenderStyle::setFontFeatureSettings(Style::FontFeatureSettings&& settings)
 {
     auto description = fontDescription();
-    description.setVariationSettings(WTFMove(settings));
+    description.setFeatureSettings(settings.takePlatform());
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setFontVariationSettings(Style::FontVariationSettings&& settings)
+{
+    auto description = fontDescription();
+    description.setVariationSettings(settings.takePlatform());
     setFontDescription(WTFMove(description));
 }
 

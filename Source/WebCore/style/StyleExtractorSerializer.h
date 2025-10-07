@@ -111,8 +111,6 @@ public:
     // MARK: Font serializations
 
     static void serializeFontFamily(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const AtomString&);
-    static void serializeFontFeatureSettings(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FontFeatureSettings&);
-    static void serializeFontVariationSettings(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FontVariationSettings&);
 
     // MARK: Grid serializations
 
@@ -935,36 +933,6 @@ inline void ExtractorSerializer::serializeFontFamily(ExtractorState&, StringBuil
         builder.append(nameLiteralForSerialization(familyIdentifier));
     else
         builder.append(WebCore::serializeFontFamily(family));
-}
-
-inline void ExtractorSerializer::serializeFontFeatureSettings(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const FontFeatureSettings& fontFeatureSettings)
-{
-    if (!fontFeatureSettings.size()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Normal { });
-        return;
-    }
-
-    // FIXME: Do this more efficiently without creating and destroying a CSSValue object.
-
-    CSSValueListBuilder list;
-    for (auto& feature : fontFeatureSettings)
-        list.append(CSSFontFeatureValue::create(FontTag(feature.tag()), ExtractorConverter::convert(state, feature.value())));
-    builder.append(CSSValueList::createCommaSeparated(WTFMove(list))->cssText(context));
-}
-
-inline void ExtractorSerializer::serializeFontVariationSettings(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const FontVariationSettings& fontVariationSettings)
-{
-    if (fontVariationSettings.isEmpty()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Normal { });
-        return;
-    }
-
-    // FIXME: Do this more efficiently without creating and destroying a CSSValue object.
-
-    CSSValueListBuilder list;
-    for (auto& feature : fontVariationSettings)
-        list.append(CSSFontVariationValue::create(feature.tag(), ExtractorConverter::convert(state, feature.value())));
-    builder.append(CSSValueList::createCommaSeparated(WTFMove(list))->cssText(context));
 }
 
 // MARK: - Grid serializations

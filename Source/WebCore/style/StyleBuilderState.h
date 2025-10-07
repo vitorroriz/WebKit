@@ -58,9 +58,11 @@ namespace Style {
 
 class BuilderState;
 struct Color;
+struct FontFeatureSettings;
 struct FontPalette;
 struct FontSizeAdjust;
 struct FontStyle;
+struct FontVariationSettings;
 struct FontWeight;
 struct FontWidth;
 

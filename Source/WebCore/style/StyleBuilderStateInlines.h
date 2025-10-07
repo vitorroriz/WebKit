@@ -108,12 +108,12 @@ inline void BuilderState::setFontDescriptionIsSpecifiedFont(bool isSpecifiedFont
 
 inline void BuilderState::setFontDescriptionFeatureSettings(FontFeatureSettings&& featureSettings)
 {
-    if (m_style.fontDescription().featureSettings() == featureSettings)
+    if (m_style.fontDescription().featureSettings() == featureSettings.platform())
         return;
 
     m_fontDirty = true;
     auto& fontCascade = m_style.mutableFontCascadeWithoutUpdate();
-    fontCascade.mutableFontDescription().setFeatureSettings(WTFMove(featureSettings));
+    fontCascade.mutableFontDescription().setFeatureSettings(featureSettings.takePlatform());
     fontCascade.updateRequiresShaping();
 }
 
@@ -277,11 +277,11 @@ inline void BuilderState::setFontDescriptionVariantPosition(FontVariantPosition 
 
 inline void BuilderState::setFontDescriptionVariationSettings(FontVariationSettings&& variationSettings)
 {
-    if (m_style.fontDescription().variationSettings() == variationSettings)
+    if (m_style.fontDescription().variationSettings() == variationSettings.platform())
         return;
 
     m_fontDirty = true;
-    m_style.mutableFontDescriptionWithoutUpdate().setVariationSettings(WTFMove(variationSettings));
+    m_style.mutableFontDescriptionWithoutUpdate().setVariationSettings(variationSettings.takePlatform());
 }
 
 inline void BuilderState::setFontDescriptionWeight(FontWeight weight)

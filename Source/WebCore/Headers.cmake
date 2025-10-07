@@ -3303,9 +3303,11 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/flexbox/StyleWebKitBoxFlexGroup.h
     style/values/flexbox/StyleWebKitBoxOrdinalGroup.h
 
+    style/values/fonts/StyleFontFeatureSettings.h
     style/values/fonts/StyleFontPalette.h
     style/values/fonts/StyleFontSizeAdjust.h
     style/values/fonts/StyleFontStyle.h
+    style/values/fonts/StyleFontVariationSettings.h
     style/values/fonts/StyleFontWeight.h
     style/values/fonts/StyleFontWidth.h
 

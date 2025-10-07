@@ -226,13 +226,11 @@ struct Length;
 struct NameScope;
 struct TransformOperationData;
 
-template<typename> class FontTaggedSettings;
 template<typename> class RectEdges;
 template<typename> class RectCorners;
 template<typename> struct MinimallySerializingSpaceSeparatedRectEdges;
 template<typename> struct MinimallySerializingSpaceSeparatedSize;
 
-using FontVariationSettings = FontTaggedSettings<float>;
 using IntOutsets = RectEdges<int>;
 
 namespace Style {
@@ -271,9 +269,11 @@ struct Cursor;
 struct DynamicRangeLimit;
 struct Filter;
 struct FlexBasis;
+struct FontFeatureSettings;
 struct FontPalette;
 struct FontSizeAdjust;
 struct FontStyle;
+struct FontVariationSettings;
 struct FontWeight;
 struct FontWidth;
 struct GapGutter;
@@ -731,7 +731,8 @@ public:
     std::pair<FontOrientation, NonCJKGlyphOrientation> fontAndGlyphOrientation();
 
     inline FontOpticalSizing fontOpticalSizing() const;
-    inline FontVariationSettings fontVariationSettings() const;
+    inline Style::FontFeatureSettings fontFeatureSettings() const;
+    inline Style::FontVariationSettings fontVariationSettings() const;
     inline Style::FontPalette fontPalette() const;
     inline Style::FontSizeAdjust fontSizeAdjust() const;
     inline Style::FontStyle fontStyle() const;
@@ -1368,7 +1369,8 @@ public:
     // Only used for blending font sizes when animating, for MathML anonymous blocks, and for text autosizing.
     void setFontSize(float);
     void setFontOpticalSizing(FontOpticalSizing);
-    void setFontVariationSettings(FontVariationSettings);
+    void setFontFeatureSettings(Style::FontFeatureSettings&&);
+    void setFontVariationSettings(Style::FontVariationSettings&&);
     void setFontPalette(Style::FontPalette&&);
     void setFontSizeAdjust(Style::FontSizeAdjust);
     void setFontStyle(Style::FontStyle);
@@ -1969,6 +1971,8 @@ public:
     static constexpr PositionType initialPosition();
     static inline Style::VerticalAlign initialVerticalAlign();
     static constexpr Float initialFloating();
+    static inline Style::FontFeatureSettings initialFontFeatureSettings();
+    static inline Style::FontVariationSettings initialFontVariationSettings();
     static inline Style::FontPalette initialFontPalette();
     static inline Style::FontSizeAdjust initialFontSizeAdjust();
     static inline Style::FontStyle initialFontStyle();

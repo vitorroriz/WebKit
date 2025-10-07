@@ -134,8 +134,6 @@ public:
     static GridAutoFlow convertGridAutoFlow(BuilderState&, const CSSValue&);
     static OptionSet<TouchAction> convertTouchAction(BuilderState&, const CSSValue&);
 
-    static FontFeatureSettings convertFontFeatureSettings(BuilderState&, const CSSValue&);
-    static FontVariationSettings convertFontVariationSettings(BuilderState&, const CSSValue&);
     static PaintOrder convertPaintOrder(BuilderState&, const CSSValue&);
     static StyleSelfAlignmentData convertSelfOrDefaultAlignmentData(BuilderState&, const CSSValue&);
     static StyleContentAlignmentData convertContentAlignmentData(BuilderState&, const CSSValue&);
@@ -487,16 +485,6 @@ inline float zoomWithTextZoomFactor(BuilderState& builderState)
         return builderState.style().usedZoom() * textZoomFactor;
     }
     return builderState.cssToLengthConversionData().zoom();
-}
-
-inline FontFeatureSettings BuilderConverter::convertFontFeatureSettings(BuilderState& builderState, const CSSValue& value)
-{
-    return fontFeatureSettingsFromCSSValue(builderState, value);
-}
-
-inline FontVariationSettings BuilderConverter::convertFontVariationSettings(BuilderState& builderState, const CSSValue& value)
-{
-    return fontVariationSettingsFromCSSValue(builderState, value);
 }
 
 inline OptionSet<TouchAction> BuilderConverter::convertTouchAction(BuilderState&, const CSSValue& value)

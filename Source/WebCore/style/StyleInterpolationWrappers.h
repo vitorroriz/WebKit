@@ -381,26 +381,6 @@ private:
     void (FontCascadeDescription::*m_setter)(T);
 };
 
-class FontFeatureSettingsWrapper final : public DiscreteFontDescriptionWrapper {
-    WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(FontFeatureSettingsWrapper, Animation);
-public:
-    FontFeatureSettingsWrapper()
-        : DiscreteFontDescriptionWrapper(CSSPropertyFontFeatureSettings)
-    {
-    }
-
-private:
-    bool propertiesInFontDescriptionAreEqual(const FontCascadeDescription& a, const FontCascadeDescription& b) const override
-    {
-        return a.featureSettings() == b.featureSettings();
-    }
-
-    void setPropertiesInFontDescription(const FontCascadeDescription& source, FontCascadeDescription& destination) const override
-    {
-        destination.setFeatureSettings(FontFeatureSettings(source.featureSettings()));
-    }
-};
-
 class FontVariantEastAsianWrapper final : public DiscreteFontDescriptionWrapper {
     WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(FontVariantEastAsianWrapper, Animation);
 public:
@@ -498,44 +478,6 @@ private:
         destination.setVariantNumericSlashedZero(source.variantNumericSlashedZero());
     }
 };
-
-#if ENABLE(VARIATION_FONTS)
-
-class FontVariationSettingsWrapper final : public Wrapper<FontVariationSettings> {
-    WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(FontVariationSettingsWrapper, Animation);
-public:
-    FontVariationSettingsWrapper()
-        : Wrapper(CSSPropertyFontVariationSettings, &RenderStyle::fontVariationSettings, &RenderStyle::setFontVariationSettings)
-    {
-    }
-
-    bool equals(const RenderStyle& a, const RenderStyle& b) const final
-    {
-        // If the style pointers are the same, don't bother doing the test.
-        if (&a == &b)
-            return true;
-        return value(a) == value(b);
-    }
-
-    bool canInterpolate(const RenderStyle& from, const RenderStyle& to, CompositeOperation) const final
-    {
-        auto fromVariationSettings = value(from);
-        auto toVariationSettings = value(to);
-
-        if (fromVariationSettings.size() != toVariationSettings.size())
-            return false;
-
-        auto size = fromVariationSettings.size();
-        for (unsigned i = 0; i < size; ++i) {
-            if (fromVariationSettings.at(i).tag() != toVariationSettings.at(i).tag())
-                return false;
-        }
-
-        return true;
-    }
-};
-
-#endif
 
 // MARK: - Color Property Wrappers
 
