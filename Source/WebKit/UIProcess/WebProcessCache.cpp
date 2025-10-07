@@ -192,15 +192,15 @@ void WebProcessCache::evictAtRandomIfNeeded()
     while (size() >= capacity() && (!m_sharedProcessesPerSite.isEmpty() || !m_processesPerSite.isEmpty())) {
         if (!m_sharedProcessesPerSite.isEmpty()) {
             auto it = m_sharedProcessesPerSite.random();
-            m_sharedProcessesPerSite.remove(it);
             WEBPROCESSCACHE_RELEASE_LOG("addProcess: Evicting shared process from WebProcess cache because capacity was reached", it->value->process().processID());
+            m_sharedProcessesPerSite.remove(it);
             if (size() < capacity())
                 break;
         }
         if (!m_processesPerSite.isEmpty()) {
             auto it = m_processesPerSite.random();
             if (RefPtr sharedProcess = m_sharedProcessesPerSite.take(it->key)) {
-                WEBPROCESSCACHE_RELEASE_LOG("addProcess: Evicting shared process from WebProcess cache because capacity was reached", it->value->process().processID());
+                WEBPROCESSCACHE_RELEASE_LOG("addProcess: Evicting shared process from WebProcess cache because capacity was reached", sharedProcess->process().processID());
                 if (size() < capacity())
                     break;
             }
