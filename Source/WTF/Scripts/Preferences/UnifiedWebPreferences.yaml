@@ -9436,6 +9436,21 @@ WebRTCSocketsProxyingEnabled:
     WebCore:
       default: false
 
+WebRTCSocketsServiceClassEnabled:
+  type: bool
+  status: internal
+  category: media
+  humanReadableName: "WebRTC Sockets Service Class"
+  humanReadableDescription: "Enable setting WebRTC Sockets Service Class"
+  condition: ENABLE(WEB_RTC)
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+
 WebRTCUDPPortRange:
   type: String
   status: embedder
