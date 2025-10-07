@@ -10967,15 +10967,10 @@ uintAlign(_stack)
 
 uintAlign(_stack_vector)
     subp 2 * SlotSize, sc0
-    if ARM64 or ARM64E
-        loadpairq [sp], sc1, sc2
-        storepairq sc1, sc2, [sc0]
-    else
-        loadq [sp], sc1
-        loadq 8[sp], sc2
-        storeq sc1, [sc0]
-        storeq sc2, 8[sc0]
-    end
+    loadq [sp], sc1
+    storeq sc1, [sc0]
+    loadq 8[sp], sc1
+    storeq sc1, 8[sc0]
     addq StackValueSize, sp
     uintDispatch()
 
