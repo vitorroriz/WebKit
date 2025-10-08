@@ -5579,7 +5579,7 @@ END
                     }
                 }
                 push(@implContent, "    if (is<${childImplType}>(impl))\n");
-                push(@implContent, "        return toJSNewlyCreated(lexicalGlobalObject, globalObject, downcast<${childImplType}>(WTFMove(impl)));\n");
+                push(@implContent, "        return toJSNewlyCreated(lexicalGlobalObject, globalObject, uncheckedDowncast<${childImplType}>(WTFMove(impl)));\n");
                 push(@implContent, "#endif\n") if $conditional;
             });
         }
