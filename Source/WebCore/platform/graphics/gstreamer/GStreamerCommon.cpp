@@ -2053,6 +2053,14 @@ void gst_pad_probe_info_set_buffer(GstPadProbeInfo* info, GstBuffer* buffer)
     gst_clear_mini_object(&info->data);
     info->data = buffer;
 }
+
+void gst_pad_probe_info_set_event(GstPadProbeInfo* info, GstEvent* event)
+{
+    g_return_if_fail(info->type & (GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM | GST_PAD_PROBE_TYPE_EVENT_UPSTREAM));
+
+    gst_clear_mini_object(&info->data);
+    info->data = event;
+}
 #endif
 
 #endif // USE(GSTREAMER)
