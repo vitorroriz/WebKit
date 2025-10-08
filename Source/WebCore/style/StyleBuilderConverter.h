@@ -855,22 +855,22 @@ static std::optional<PositionAreaAxis> positionAreaKeywordToAxis(CSSValueID keyw
 
     case CSSValueXStart:
     case CSSValueSpanXStart:
-    case CSSValueXSelfStart:
-    case CSSValueSpanXSelfStart:
+    case CSSValueSelfXStart:
+    case CSSValueSpanSelfXStart:
     case CSSValueXEnd:
     case CSSValueSpanXEnd:
-    case CSSValueXSelfEnd:
-    case CSSValueSpanXSelfEnd:
+    case CSSValueSelfXEnd:
+    case CSSValueSpanSelfXEnd:
         return PositionAreaAxis::X;
 
     case CSSValueYStart:
     case CSSValueSpanYStart:
-    case CSSValueYSelfStart:
-    case CSSValueSpanYSelfStart:
+    case CSSValueSelfYStart:
+    case CSSValueSpanSelfYStart:
     case CSSValueYEnd:
     case CSSValueSpanYEnd:
-    case CSSValueYSelfEnd:
-    case CSSValueSpanYSelfEnd:
+    case CSSValueSelfYEnd:
+    case CSSValueSpanSelfYEnd:
         return PositionAreaAxis::Y;
 
     case CSSValueBlockStart:
@@ -917,9 +917,9 @@ static PositionAreaTrack positionAreaKeywordToTrack(CSSValueID keyword)
     case CSSValueLeft:
     case CSSValueTop:
     case CSSValueXStart:
-    case CSSValueXSelfStart:
+    case CSSValueSelfXStart:
     case CSSValueYStart:
-    case CSSValueYSelfStart:
+    case CSSValueSelfYStart:
     case CSSValueBlockStart:
     case CSSValueSelfBlockStart:
     case CSSValueInlineStart:
@@ -931,9 +931,9 @@ static PositionAreaTrack positionAreaKeywordToTrack(CSSValueID keyword)
     case CSSValueSpanLeft:
     case CSSValueSpanTop:
     case CSSValueSpanXStart:
-    case CSSValueSpanXSelfStart:
+    case CSSValueSpanSelfXStart:
     case CSSValueSpanYStart:
-    case CSSValueSpanYSelfStart:
+    case CSSValueSpanSelfYStart:
     case CSSValueSpanBlockStart:
     case CSSValueSpanSelfBlockStart:
     case CSSValueSpanInlineStart:
@@ -945,9 +945,9 @@ static PositionAreaTrack positionAreaKeywordToTrack(CSSValueID keyword)
     case CSSValueRight:
     case CSSValueBottom:
     case CSSValueXEnd:
-    case CSSValueXSelfEnd:
+    case CSSValueSelfXEnd:
     case CSSValueYEnd:
-    case CSSValueYSelfEnd:
+    case CSSValueSelfYEnd:
     case CSSValueBlockEnd:
     case CSSValueSelfBlockEnd:
     case CSSValueInlineEnd:
@@ -959,9 +959,9 @@ static PositionAreaTrack positionAreaKeywordToTrack(CSSValueID keyword)
     case CSSValueSpanRight:
     case CSSValueSpanBottom:
     case CSSValueSpanXEnd:
-    case CSSValueSpanXSelfEnd:
+    case CSSValueSpanSelfXEnd:
     case CSSValueSpanYEnd:
-    case CSSValueSpanYSelfEnd:
+    case CSSValueSpanSelfYEnd:
     case CSSValueSpanBlockEnd:
     case CSSValueSpanSelfBlockEnd:
     case CSSValueSpanInlineEnd:
@@ -1016,14 +1016,14 @@ static PositionAreaSelf positionAreaKeywordToSelf(CSSValueID keyword)
     case CSSValueSpanAll:
         return PositionAreaSelf::No;
 
-    case CSSValueXSelfStart:
-    case CSSValueSpanXSelfStart:
-    case CSSValueXSelfEnd:
-    case CSSValueSpanXSelfEnd:
-    case CSSValueYSelfStart:
-    case CSSValueSpanYSelfStart:
-    case CSSValueYSelfEnd:
-    case CSSValueSpanYSelfEnd:
+    case CSSValueSelfXStart:
+    case CSSValueSpanSelfXStart:
+    case CSSValueSelfXEnd:
+    case CSSValueSpanSelfXEnd:
+    case CSSValueSelfYStart:
+    case CSSValueSpanSelfYStart:
+    case CSSValueSelfYEnd:
+    case CSSValueSpanSelfYEnd:
     case CSSValueSelfBlockStart:
     case CSSValueSpanSelfBlockStart:
     case CSSValueSelfBlockEnd:

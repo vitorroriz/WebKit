@@ -766,13 +766,13 @@ inline Ref<CSSValue> ExtractorConverter::convertPositionArea(ExtractorState&, co
         case PositionAreaAxis::X:
             switch (track) {
             case PositionAreaTrack::Start:
-                return self == PositionAreaSelf::No ? CSSValueXStart : CSSValueXSelfStart;
+                return self == PositionAreaSelf::No ? CSSValueXStart : CSSValueSelfXStart;
             case PositionAreaTrack::SpanStart:
-                return self == PositionAreaSelf::No ? CSSValueSpanXStart : CSSValueSpanXSelfStart;
+                return self == PositionAreaSelf::No ? CSSValueSpanXStart : CSSValueSpanSelfXStart;
             case PositionAreaTrack::End:
-                return self == PositionAreaSelf::No ? CSSValueXEnd : CSSValueXSelfEnd;
+                return self == PositionAreaSelf::No ? CSSValueXEnd : CSSValueSelfXEnd;
             case PositionAreaTrack::SpanEnd:
-                return self == PositionAreaSelf::No ? CSSValueSpanXEnd : CSSValueSpanXSelfEnd;
+                return self == PositionAreaSelf::No ? CSSValueSpanXEnd : CSSValueSpanSelfXEnd;
             case PositionAreaTrack::Center:
                 return CSSValueCenter;
             case PositionAreaTrack::SpanAll:
@@ -785,13 +785,13 @@ inline Ref<CSSValue> ExtractorConverter::convertPositionArea(ExtractorState&, co
         case PositionAreaAxis::Y:
             switch (track) {
             case PositionAreaTrack::Start:
-                return self == PositionAreaSelf::No ? CSSValueYStart : CSSValueYSelfStart;
+                return self == PositionAreaSelf::No ? CSSValueYStart : CSSValueSelfYStart;
             case PositionAreaTrack::SpanStart:
-                return self == PositionAreaSelf::No ? CSSValueSpanYStart : CSSValueSpanYSelfStart;
+                return self == PositionAreaSelf::No ? CSSValueSpanYStart : CSSValueSpanSelfYStart;
             case PositionAreaTrack::End:
-                return self == PositionAreaSelf::No ? CSSValueYEnd : CSSValueYSelfEnd;
+                return self == PositionAreaSelf::No ? CSSValueYEnd : CSSValueSelfYEnd;
             case PositionAreaTrack::SpanEnd:
-                return self == PositionAreaSelf::No ? CSSValueSpanYEnd : CSSValueSpanYSelfEnd;
+                return self == PositionAreaSelf::No ? CSSValueSpanYEnd : CSSValueSpanSelfYEnd;
             case PositionAreaTrack::Center:
                 return CSSValueCenter;
             case PositionAreaTrack::SpanAll:
