@@ -445,7 +445,6 @@ set(WebKit_SERIALIZATION_IN_FILES
 
     NetworkProcess/Classifier/ITPThirdPartyData.serialization.in
     NetworkProcess/Classifier/ITPThirdPartyDataForSpecificFirstParty.serialization.in
-    NetworkProcess/Classifier/StorageAccessStatus.serialization.in
 
     NetworkProcess/PrivateClickMeasurement/PrivateClickMeasurementManagerInterface.serialization.in
 
@@ -501,7 +500,6 @@ set(WebKit_SERIALIZATION_IN_FILES
     Shared/NetworkProcessConnectionParameters.serialization.in
     Shared/NodeHitTestResult.serialization.in
     Shared/Pasteboard.serialization.in
-    Shared/PlatformFontInfo.serialization.in
     Shared/PlatformPopupMenuData.serialization.in
     Shared/PolicyDecision.serialization.in
     Shared/PrintInfo.serialization.in

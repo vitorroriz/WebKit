@@ -456,7 +456,6 @@ NSPresentationIntent wrapped by CoreIPCPresentationIntent
 NSSet wrapped by CoreIPCStringSet
 
 #if PLATFORM(MAC)
-using CGDirectDisplayID = uint32_t
 using WebCore::CocoaColor = NSColor;
 NSColor wrapped by CoreIPCColor
 #else

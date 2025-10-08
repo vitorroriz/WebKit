@@ -609,7 +609,6 @@ SERIALIZATION_DESCRIPTION_FILES = \
 	NetworkProcess/NetworkSessionCreationParameters.serialization.in \
 	NetworkProcess/Classifier/ITPThirdPartyData.serialization.in \
 	NetworkProcess/Classifier/ITPThirdPartyDataForSpecificFirstParty.serialization.in \
-	NetworkProcess/Classifier/StorageAccessStatus.serialization.in \
 	NetworkProcess/PrivateClickMeasurement/PrivateClickMeasurementManagerInterface.serialization.in \
 	NetworkProcess/storage/FileSystemStorageError.serialization.in \
 	NetworkProcess/webtransport/WebTransport.serialization.in \
@@ -729,7 +728,6 @@ SERIALIZATION_DESCRIPTION_FILES = \
 	Shared/GoToBackForwardItemParameters.serialization.in \
 	Shared/ImageOptions.serialization.in \
 	Shared/InspectorExtensionTypes.serialization.in \
-	Shared/PlatformFontInfo.serialization.in \
 	Shared/ios/CursorContext.serialization.in \
 	Shared/ios/DynamicViewportSizeUpdate.serialization.in \
 	Shared/ios/GestureTypes.serialization.in \
