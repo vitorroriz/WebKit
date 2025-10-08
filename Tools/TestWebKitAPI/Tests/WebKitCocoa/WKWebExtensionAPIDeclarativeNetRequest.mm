@@ -583,6 +583,37 @@ TEST(WKWebExtensionAPIDeclarativeNetRequest, GetSessionRules)
     Util::loadAndRunExtension(declarativeNetRequestManifest, @{ @"background.js": backgroundScript  });
 }
 
+TEST(WKWebExtensionAPIDeclarativeNetRequest, RemoveSessionRules)
+{
+    auto *backgroundScript = Util::constructScript(@[
+        @"let sessionRules = await browser.declarativeNetRequest.getSessionRules()",
+        @"browser.test.assertEq(sessionRules.length, 0)",
+
+        @"await browser.declarativeNetRequest.updateSessionRules({ addRules: [{ id: 1, priority: 1, action: {type: 'block'}, condition: { urlFilter: 'foo' } }] })",
+        @"await browser.declarativeNetRequest.updateSessionRules({ addRules: [{ id: 2, priority: 1, action: {type: 'block'}, condition: { urlFilter: 'bar' } }] })",
+        @"await browser.declarativeNetRequest.updateSessionRules({ addRules: [{ id: 3, priority: 1, action: {type: 'block'}, condition: { urlFilter: 'baz' } }] })",
+
+        @"sessionRules = await browser.declarativeNetRequest.getSessionRules({ })",
+        @"browser.test.assertEq(sessionRules.length, 3)",
+
+        // FIXME: rdar://162148560 (Unable to remove all dynamic or session rules)
+        @"await browser.declarativeNetRequest.updateSessionRules({ removeRuleIds: [1, 2] })",
+
+        @"sessionRules = await browser.declarativeNetRequest.getSessionRules({ })",
+        @"browser.test.assertEq(sessionRules.length, 1)",
+
+        @"browser.test.notifyPass()"
+    ]);
+
+    auto *declarativeNetRequestManifest = @{
+        @"manifest_version": @3,
+        @"permissions": @[ @"declarativeNetRequest" ],
+        @"background": @{ @"scripts": @[ @"background.js" ], @"type": @"module", @"persistent": @NO },
+    };
+
+    Util::loadAndRunExtension(declarativeNetRequestManifest, @{ @"background.js": backgroundScript  });
+}
+
 TEST(WKWebExtensionAPIDeclarativeNetRequest, DynamicRules)
 {
     TestWebKitAPI::HTTPServer server({
@@ -699,6 +730,37 @@ TEST(WKWebExtensionAPIDeclarativeNetRequest, GetDynamicRules)
         @"browser.test.assertEq(dynamicRules[0].id, 1)",
         @"browser.test.assertEq(dynamicRules[1].id, 2)",
         @"browser.test.assertEq(dynamicRules[2].id, 3)",
+
+        @"browser.test.notifyPass()"
+    ]);
+
+    auto *declarativeNetRequestManifest = @{
+        @"manifest_version": @3,
+        @"permissions": @[ @"declarativeNetRequest" ],
+        @"background": @{ @"scripts": @[ @"background.js" ], @"type": @"module", @"persistent": @NO },
+    };
+
+    Util::loadAndRunExtension(declarativeNetRequestManifest, @{ @"background.js": backgroundScript  });
+}
+
+TEST(WKWebExtensionAPIDeclarativeNetRequest, RemoveDynamicRules)
+{
+    auto *backgroundScript = Util::constructScript(@[
+        @"let dynamicRules = await browser.declarativeNetRequest.getDynamicRules()",
+        @"browser.test.assertEq(dynamicRules.length, 0)",
+
+        @"await browser.declarativeNetRequest.updateDynamicRules({ addRules: [{ id: 1, priority: 1, action: {type: 'block'}, condition: { urlFilter: 'foo' } }] })",
+        @"await browser.declarativeNetRequest.updateDynamicRules({ addRules: [{ id: 2, priority: 1, action: {type: 'block'}, condition: { urlFilter: 'bar' } }] })",
+        @"await browser.declarativeNetRequest.updateDynamicRules({ addRules: [{ id: 3, priority: 1, action: {type: 'block'}, condition: { urlFilter: 'baz' } }] })",
+
+        @"dynamicRules = await browser.declarativeNetRequest.getDynamicRules({ })",
+        @"browser.test.assertEq(dynamicRules.length, 3)",
+
+        // FIXME: rdar://162148560 (Unable to remove all dynamic or session rules)
+        @"await browser.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [1, 2] })",
+
+        @"dynamicRules = await browser.declarativeNetRequest.getDynamicRules({ })",
+        @"browser.test.assertEq(dynamicRules.length, 1)",
 
         @"browser.test.notifyPass()"
     ]);
