@@ -74,6 +74,11 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #endif
 
+@interface WKWebView ()
+- (void)copy:(id)sender;
+- (void)paste:(id)sender;
+@end
+
 @interface SiteIsolationTextManipulationDelegate : NSObject <_WKTextManipulationDelegate>
 - (void)_webView:(WKWebView *)webView didFindTextManipulationItems:(NSArray<_WKTextManipulationItem *> *)items;
 @property (nonatomic, readonly, copy) NSArray<_WKTextManipulationItem *> *items;
@@ -5199,6 +5204,180 @@ TEST(SiteIsolation, CreateWebArchiveForFrames)
     done = false;
 }
 
+static void validateWebArchiveMainResource(NSDictionary *actualResource, NSDictionary *expectedResource)
+{
+    if (!actualResource)
+        return;
+
+    for (id key in expectedResource) {
+        NSString *actualValue = [actualResource objectForKey:key];
+        if (!actualValue)
+            actualValue = @"NULL";
+        EXPECT_WK_STREQ([actualValue UTF8String], [[expectedResource objectForKey:key] UTF8String]);
+    }
+}
+
+TEST(SiteIsolation, CreateWebArchiveForCopy)
+{
+    static constexpr auto mainframeBytes = R"TESTRESOURCE(
+    <!DOCTYPE html>
+    mainframecontent
+    <iframe id='subframe' src='https://example2.com/subframe'></iframe>
+    <script>
+        function alertSubframe() { document.getElementById('subframe').contentWindow.postMessage('alert', '*'); }
+    </script>
+    )TESTRESOURCE"_s;
+
+    static constexpr auto subframeBytes = R"TESTRESOURCE(
+    <!DOCTYPE html>
+    subframecontent
+    <script>
+        window.addEventListener('message', function(event) { 
+            alert('hi');
+        });
+    </script>
+    )TESTRESOURCE"_s;
+
+    HTTPServer server({
+        { "/mainframe"_s, { mainframeBytes } },
+        { "/subframe"_s, { subframeBytes } }
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto webViewAndDelegates = makeWebViewAndDelegates(server);
+    RetainPtr webView = webViewAndDelegates.webView;
+    RetainPtr navigationDelegate = webViewAndDelegates.navigationDelegate;
+    RetainPtr uiDelegate = webViewAndDelegates.uiDelegate;
+    static bool alerted = false;
+    uiDelegate.get().runJavaScriptAlertPanelWithMessage = ^(WKWebView *, NSString *message, WKFrameInfo *, void (^completionHandler)(void)) {
+        alerted = true;
+        completionHandler();
+    };
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/mainframe"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    [webView stringByEvaluatingJavaScript:@"getSelection().selectAllChildren(document.body)"];
+    [webView waitForNextPresentationUpdate];
+
+    [webView copy:nil];
+
+    // Ensure there is enough time to collect webarchive from subframe process.
+    [webView evaluateJavaScript:@"alertSubframe()" completionHandler:nil];
+    Util::run(&alerted);
+
+#if PLATFORM(IOS_FAMILY)
+    RetainPtr archiveData = [UIPasteboard.generalPasteboard dataForPasteboardType:UTTypeWebArchive.identifier];
+#else
+    RetainPtr archiveData = [NSPasteboard.generalPasteboard dataForType:UTTypeWebArchive.identifier];
+#endif
+    NSDictionary* expectedMainFrameResource = @{
+        @"WebResourceFrameName" : @"",
+        @"WebResourceMIMEType" : @"text/html",
+        @"WebResourceTextEncodingName" : @"UTF-8",
+        @"WebResourceURL" : @"https://example.com/mainframe"
+    };
+    NSDictionary* expectedSubframeResource = @{
+        @"WebResourceFrameName" : @"<!--frame1-->",
+        @"WebResourceMIMEType" : @"text/html",
+        @"WebResourceTextEncodingName" : @"UTF-8",
+        @"WebResourceURL" : @"https://example2.com/subframe"
+    };
+    NSDictionary* actualMainframeArchive = [NSPropertyListSerialization propertyListWithData:archiveData.get() options:0 format:nil error:nil];
+    EXPECT_NOT_NULL(actualMainframeArchive);
+    validateWebArchiveMainResource([actualMainframeArchive objectForKey:@"WebMainResource"], expectedMainFrameResource);
+    NSArray *subframeArchives = [actualMainframeArchive objectForKey:@"WebSubframeArchives"];
+    EXPECT_NOT_NULL(subframeArchives);
+    EXPECT_EQ(subframeArchives.count, 1u);
+    validateWebArchiveMainResource([subframeArchives.firstObject objectForKey:@"WebMainResource"], expectedSubframeResource);
+}
+
+TEST(SiteIsolation, CreateWebArchiveNestedFrameForCopy)
+{
+    static constexpr auto mainframeBytes = R"TESTRESOURCE(
+    <!DOCTYPE html>
+    mainframecontent
+    <iframe id='subframe' src='https://example2.com/subframe'></iframe>
+    <script>
+        function alertSubframe() { document.getElementById('subframe').contentWindow.postMessage('alert', '*'); }
+    </script>
+    )TESTRESOURCE"_s;
+
+    static constexpr auto subframeBytes = R"TESTRESOURCE(
+    <!DOCTYPE html>
+    subframecontent
+    <iframe src='https://example.com/nestedframe'></iframe>
+    <script>
+        window.addEventListener('message', function(event) { 
+            alert('hi');
+        });
+    </script>
+    )TESTRESOURCE"_s;
+
+    HTTPServer server({
+        { "/mainframe"_s, { mainframeBytes } },
+        { "/subframe"_s, { subframeBytes } },
+        { "/nestedframe"_s, { "nestedframecontent"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto webViewAndDelegates = makeWebViewAndDelegates(server);
+    RetainPtr webView = webViewAndDelegates.webView;
+    RetainPtr navigationDelegate = webViewAndDelegates.navigationDelegate;
+    RetainPtr uiDelegate = webViewAndDelegates.uiDelegate;
+    static bool alerted = false;
+    uiDelegate.get().runJavaScriptAlertPanelWithMessage = ^(WKWebView *, NSString *message, WKFrameInfo *, void (^completionHandler)(void)) {
+        alerted = true;
+        completionHandler();
+    };
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/mainframe"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    [webView stringByEvaluatingJavaScript:@"getSelection().selectAllChildren(document.body)"];
+    [webView waitForNextPresentationUpdate];
+
+    [webView copy:nil];
+
+    // Ensure there is enough time to collect webarchive from subframe process.
+    [webView evaluateJavaScript:@"alertSubframe()" completionHandler:nil];
+    Util::run(&alerted);
+
+#if PLATFORM(IOS_FAMILY)
+    RetainPtr archiveData = [UIPasteboard.generalPasteboard dataForPasteboardType:UTTypeWebArchive.identifier];
+#else
+    RetainPtr archiveData = [NSPasteboard.generalPasteboard dataForType:UTTypeWebArchive.identifier];
+#endif
+    NSDictionary* expectedMainFrameResource = @{
+        @"WebResourceFrameName" : @"",
+        @"WebResourceMIMEType" : @"text/html",
+        @"WebResourceTextEncodingName" : @"UTF-8",
+        @"WebResourceURL" : @"https://example.com/mainframe"
+    };
+    NSDictionary* expectedSubframeResource = @{
+        @"WebResourceFrameName" : @"<!--frame1-->",
+        @"WebResourceMIMEType" : @"text/html",
+        @"WebResourceTextEncodingName" : @"UTF-8",
+        @"WebResourceURL" : @"https://example2.com/subframe"
+    };
+    NSDictionary* expectedNestedFrameResource = @{
+        @"WebResourceFrameName" : @"<!--frame2-->",
+        @"WebResourceMIMEType" : @"text/plain",
+        @"WebResourceTextEncodingName" : @"UTF-8",
+        @"WebResourceURL" : @"https://example.com/nestedframe"
+    };
+    NSDictionary* actualMainframeArchive = [NSPropertyListSerialization propertyListWithData:archiveData.get() options:0 format:nil error:nil];
+    EXPECT_NOT_NULL(actualMainframeArchive);
+    validateWebArchiveMainResource([actualMainframeArchive objectForKey:@"WebMainResource"], expectedMainFrameResource);
+    NSArray *actualSubframeArchives = [actualMainframeArchive objectForKey:@"WebSubframeArchives"];
+    EXPECT_NOT_NULL(actualSubframeArchives);
+    EXPECT_EQ(actualSubframeArchives.count, 1u);
+    NSDictionary* actualSubframeArchive = actualSubframeArchives.firstObject;
+    validateWebArchiveMainResource([actualSubframeArchive objectForKey:@"WebMainResource"], expectedSubframeResource);
+    NSArray *actualNestedFrameArchives = [actualSubframeArchive objectForKey:@"WebSubframeArchives"];
+    EXPECT_NOT_NULL(actualNestedFrameArchives);
+    EXPECT_EQ(actualNestedFrameArchives.count, 1u);
+    validateWebArchiveMainResource([actualNestedFrameArchives.firstObject objectForKey:@"WebMainResource"], expectedNestedFrameResource);
+}
+
 // FIXME: Re-enable this once the extra resize events are gone.
 // https://bugs.webkit.org/show_bug.cgi?id=292311 might do it.
 TEST(SiteIsolation, DISABLED_Events)
@@ -5339,7 +5518,7 @@ TEST(SiteIsolation, FramesDuringProvisionalNavigation)
 TEST(SiteIsolation, DoAfterNextPresentationUpdate)
 {
     HTTPServer server({
-        { "/main"_s, { "<iframe src='https://webkit2.org/text'></iframe></iframe><iframe src='https://webkit3.org/text'></iframe>"_s } },
+        { "/main"_s, { "<iframe src='https://webkit2.org/text'></iframe><iframe src='https://webkit3.org/text'></iframe>"_s } },
         { "/navigatefrom"_s, { "<script>window.location='https://webkit2.org/navigateto'</script>"_s } },
         { "/navigateto"_s, { "<iframe src='https://webkit1.org/alert'></iframe>"_s } },
         { "/alert"_s, { "<script>alert('loaded')</script>"_s } },

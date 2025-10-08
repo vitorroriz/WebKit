@@ -307,8 +307,9 @@ RefPtr<ArchiveResource> LegacyWebArchive::createResource(CFDictionaryRef diction
     return ArchiveResource::create(SharedBuffer::create(resourceData), URL { url }, mimeType, textEncoding, frameName, response, filePath);
 }
 
-LegacyWebArchive::LegacyWebArchive(Vector<FrameIdentifier>&& subframeIdentifiers)
-    : m_subframeIdentifiers(WTFMove(subframeIdentifiers))
+LegacyWebArchive::LegacyWebArchive(std::optional<FrameIdentifier> frameIdentifier, Vector<FrameIdentifier>&& subframeIdentifiers)
+    : m_frameIdentifier(frameIdentifier)
+    , m_subframeIdentifiers(WTFMove(subframeIdentifiers))
 {
 }
 
@@ -317,9 +318,9 @@ Ref<LegacyWebArchive> LegacyWebArchive::create()
     return adoptRef(*new LegacyWebArchive);
 }
 
-Ref<LegacyWebArchive> LegacyWebArchive::create(Ref<ArchiveResource>&& mainResource, Vector<Ref<ArchiveResource>>&& subresources, Vector<FrameIdentifier>&& subframeIdentifiers)
+Ref<LegacyWebArchive> LegacyWebArchive::create(Ref<ArchiveResource>&& mainResource, Vector<Ref<ArchiveResource>>&& subresources, Vector<FrameIdentifier>&& subframeIdentifiers, std::optional<FrameIdentifier> mainFrameIdentifier)
 {
-    auto archive = adoptRef(*new LegacyWebArchive(WTFMove(subframeIdentifiers)));
+    auto archive = adoptRef(*new LegacyWebArchive(mainFrameIdentifier, WTFMove(subframeIdentifiers)));
     archive->setMainResource(WTFMove(mainResource));
 
     for (auto& subresource : subresources)
@@ -328,9 +329,9 @@ Ref<LegacyWebArchive> LegacyWebArchive::create(Ref<ArchiveResource>&& mainResour
     return archive;
 }
 
-Ref<LegacyWebArchive> LegacyWebArchive::create(Ref<ArchiveResource>&& mainResource, Vector<Ref<ArchiveResource>>&& subresources, Vector<Ref<LegacyWebArchive>>&& subframeArchives)
+Ref<LegacyWebArchive> LegacyWebArchive::create(Ref<ArchiveResource>&& mainResource, Vector<Ref<ArchiveResource>>&& subresources, Vector<Ref<LegacyWebArchive>>&& subframeArchives, std::optional<FrameIdentifier> mainFrameIdentifier)
 {
-    auto archive = create();
+    auto archive = adoptRef(*new LegacyWebArchive(mainFrameIdentifier, { }));
     archive->setMainResource(WTFMove(mainResource));
 
     for (auto& subresource : subresources)
@@ -561,10 +562,10 @@ RefPtr<LegacyWebArchive> LegacyWebArchive::create(LocalFrame& frame, ArchiveOpti
 
     if (!subframeIdentifiers.isEmpty()) {
         ASSERT(subframeArchives.isEmpty());
-        return create(mainResource.releaseNonNull(), documentLoader->subresources(), WTFMove(subframeIdentifiers));
+        return create(mainResource.releaseNonNull(), documentLoader->subresources(), WTFMove(subframeIdentifiers), frame.frameID());
     }
 
-    return create(mainResource.releaseNonNull(), documentLoader->subresources(), WTFMove(subframeArchives));
+    return create(mainResource.releaseNonNull(), documentLoader->subresources(), WTFMove(subframeArchives), frame.frameID());
 }
 
 RefPtr<LegacyWebArchive> LegacyWebArchive::create(const SimpleRange& range)
@@ -852,10 +853,10 @@ RefPtr<LegacyWebArchive> LegacyWebArchive::createInternal(const String& markupSt
 
     if (!subframeIdentifiers.isEmpty()) {
         ASSERT(subframeArchives.isEmpty());
-        return create(mainResource.releaseNonNull(), WTFMove(subresources), WTFMove(subframeIdentifiers));
+        return create(mainResource.releaseNonNull(), WTFMove(subresources), WTFMove(subframeIdentifiers), frame.frameID());
     }
 
-    return create(mainResource.releaseNonNull(), WTFMove(subresources), WTFMove(subframeArchives));
+    return create(mainResource.releaseNonNull(), WTFMove(subresources), WTFMove(subframeArchives), frame.frameID());
 }
 
 RefPtr<LegacyWebArchive> LegacyWebArchive::createFromSelection(LocalFrame* frame)
@@ -890,7 +891,7 @@ RefPtr<LegacyWebArchive> LegacyWebArchive::createFromSelection(LocalFrame* frame
     auto iframeMarkup = makeString("<iframe frameborder=\"no\" marginwidth=\"0\" marginheight=\"0\" width=\"98%%\" height=\"98%%\" src=\""_s, frame->loader().documentLoader()->response().url().string(), "\"></iframe>"_s);
     auto iframeResource = ArchiveResource::create(utf8Buffer(iframeMarkup), aboutBlankURL(), textHTMLContentTypeAtom(), "UTF-8"_s, String());
 
-    return create(iframeResource.releaseNonNull(), { }, { archive.releaseNonNull() });
+    return create(iframeResource.releaseNonNull(), { }, { archive.releaseNonNull() }, frame->frameID());
 }
 
 }
