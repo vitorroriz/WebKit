@@ -707,7 +707,7 @@ void Internals::resetToConsistentState(Page& page)
 #endif
 
 #if ENABLE(MEDIA_SESSION) && USE(GLIB)
-    MediaSessionManagerGLib* glibSessionManager = reinterpret_cast<MediaSessionManagerGLib*>(&sessionManager);
+    MediaSessionManagerGLib* glibSessionManager = static_cast<MediaSessionManagerGLib*>(sessionManager.get());
     glibSessionManager->setDBusNotificationsEnabled(false);
 #endif
 
