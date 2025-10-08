@@ -223,6 +223,7 @@ if (ENABLE_2022_GLIB_API)
         ${WEBKIT_DIR}/UIProcess/API/glib/WebKitWebExtension.h.in
     )
     list(APPEND WebKit_SOURCES
+        ${WEBKIT_DIR}/UIProcess/API/glib/WebKitWebExtensionMatchPattern.cpp
         ${WEBKIT_DIR}/UIProcess/API/glib/WebKitWebExtension.cpp
     )
 endif ()
