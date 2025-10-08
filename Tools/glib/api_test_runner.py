@@ -191,8 +191,6 @@ class TestRunner(object):
         wpe_legacy_api = self._use_wpe_legacy_api()
         if self.is_webxr_test(test_program):
             env = self._monado_env | self._test_env
-            # WebXR tests use a null compositor
-            env.pop('LIBGL_ALWAYS_SOFTWARE', None)
         else:
             env = self._weston_env if self.is_wpe_platform_wayland_test(test_program) else self._test_env
             if self.is_wpe_platform_test(test_program):
