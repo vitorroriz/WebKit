@@ -7495,6 +7495,8 @@ window.onload = function() {
 
 static const char* openedPage = "Hello World";
 
+// Disabled for macOS Debug builds due to regression in 300964@main - duplicate frame ID assertion failure. webkit.org/b/300391
+#if defined(NDEBUG)
 TEST(ProcessSwap, SameSiteWindowWithOpenerNavigateToFile)
 {
     auto processPoolConfiguration = psonProcessPoolConfiguration();
@@ -7574,6 +7576,7 @@ TEST(ProcessSwap, SameSiteWindowWithOpenerNavigateToFile)
     auto pid5 = [createdWebView _webProcessIdentifier];
     EXPECT_NE(pid4, pid5);
 }
+#endif // defined(NDEBUG)
 
 #endif // PLATFORM(MAC)
 
