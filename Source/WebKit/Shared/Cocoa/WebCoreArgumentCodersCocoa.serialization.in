@@ -422,6 +422,11 @@ NSURLRequest wrapped by CoreIPCNSURLRequest
 #if USE(AVFOUNDATION)
 AVOutputContext wrapped by CoreIPCAVOutputContext
 #endif
+
+#if USE(PASSKIT) && !HAVE(WK_SECURE_CODING_PKDATECOMPONENTSRANGE)
+PKDateComponentsRange wrapped by CoreIPCPKDateComponentsRange
+#endif
+
 #if USE(PASSKIT)
 PKPaymentMethod wrapped by CoreIPCPKPaymentMethod
 PKPaymentMerchantSession wrapped by CoreIPCPKPaymentMerchantSession
@@ -431,7 +436,6 @@ PKSecureElementPass wrapped by CoreIPCPKSecureElementPass
 PKPayment wrapped by CoreIPCPKPayment
 PKPaymentToken wrapped by CoreIPCPKPaymentToken
 PKShippingMethod wrapped by CoreIPCPKShippingMethod
-PKDateComponentsRange wrapped by CoreIPCPKDateComponentsRange
 CNContact wrapped by CoreIPCCNContact
 CNPhoneNumber wrapped by CoreIPCCNPhoneNumber
 CNPostalAddress wrapped by CoreIPCCNPostalAddress

@@ -672,6 +672,7 @@ SERIALIZATION_DESCRIPTION_FILES = \
 	Shared/Cocoa/CoreIPCNull.serialization.in \
 	Shared/Cocoa/CoreIPCPassKit.serialization.in \
 	Shared/Cocoa/CoreIPCPersonNameComponents.serialization.in \
+	Shared/Cocoa/CoreIPCPKDateComponentsRange.serialization.in \
 	Shared/Cocoa/CoreIPCPlist.serialization.in \
 	Shared/Cocoa/CoreIPCPresentationIntent.serialization.in \
 	Shared/Cocoa/CoreIPCSecureCoding.serialization.in \
