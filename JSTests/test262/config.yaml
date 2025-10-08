@@ -239,6 +239,8 @@ skip:
 
     # Depends on Calendar support
     - test/built-ins/Temporal/PlainDate/basic.js
+    - test/built-ins/Temporal/PlainDate/calendar-case-insensitive.js
+    - test/built-ins/Temporal/PlainDate/calendar-invalid-iso-string.js
     - test/built-ins/Temporal/PlainDate/calendar-number.js
     - test/built-ins/Temporal/PlainDate/calendar-wrong-type.js
     - test/built-ins/Temporal/PlainDate/compare/argument-propertybag-calendar-leap-second.js
@@ -296,6 +298,8 @@ skip:
     - test/built-ins/Temporal/PlainDate/prototype/until/argument-string-invalid.js
     - test/built-ins/Temporal/PlainDate/prototype/until/calendar-temporal-object.js
     - test/built-ins/Temporal/PlainDate/prototype/until/order-of-operations.js
+    - test/built-ins/Temporal/PlainDateTime/calendar-case-insensitive.js
+    - test/built-ins/Temporal/PlainDateTime/calendar-invalid-iso-string.js
     - test/built-ins/Temporal/PlainDateTime/calendar-number.js
     - test/built-ins/Temporal/PlainDateTime/calendar-wrong-type.js
     - test/built-ins/Temporal/PlainDateTime/compare/argument-propertybag-calendar-leap-second.js
