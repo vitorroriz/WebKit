@@ -3590,10 +3590,12 @@ xml/parser/XMLDocumentParserScope.cpp
 CSSPropertyParsing.cpp
 CSSValueKeywords.cpp
 ColorData.cpp
+DocumentSyncClient.cpp
 DocumentSyncData.cpp
 EventFactory.cpp
 EventNames.cpp
 EventTargetFactory.cpp
+FrameTreeSyncClient.cpp
 FrameTreeSyncData.cpp
 HTMLElementFactory.cpp
 HTMLEntityTable.cpp
@@ -3601,7 +3603,6 @@ JSHTMLElementWrapperFactory.cpp
 JSMathMLElementWrapperFactory.cpp
 JSSVGElementWrapperFactory.cpp
 MathMLElementFactory.cpp
-ProcessSyncClient.cpp
 SVGElementFactory.cpp
 StyleBuilderGenerated.cpp
 StyleExtractorGenerated.cpp

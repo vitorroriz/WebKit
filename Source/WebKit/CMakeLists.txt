@@ -724,7 +724,9 @@ set(WebCore_GENERATED_SERIALIZATION_IN_FILES
 set(WebCore_SERIALIZATION_IN_FILES
     ActivityState.serialization.in
     DDModel.serialization.in
+    DocumentSyncData.serialization.in
     DragActions.serialization.in
+    FrameTreeSyncData.serialization.in
     InbandTextTrackPrivate.serialization.in
     IndexedDB.serialization.in
     LayoutMilestones.serialization.in
@@ -734,7 +736,6 @@ set(WebCore_SERIALIZATION_IN_FILES
     PlatformMediaSession.serialization.in
     PlatformScreen.serialization.in
     PlatformWheelEvent.serialization.in
-    ProcessSyncData.serialization.in
     ProtectionSpaceBase.serialization.in
     ScrollTypes.serialization.in
     WebGPU.serialization.in
