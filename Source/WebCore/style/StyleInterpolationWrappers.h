@@ -350,87 +350,6 @@ protected:
     virtual void setPropertiesInFontDescription(const FontCascadeDescription&, FontCascadeDescription&) const { }
 };
 
-template<typename T>
-class DiscreteFontDescriptionTypedWrapper final : public DiscreteFontDescriptionWrapper {
-    WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(DiscreteFontDescriptionTypedWrapper, Animation);
-public:
-    DiscreteFontDescriptionTypedWrapper(CSSPropertyID property, T (FontCascadeDescription::*getter)() const, void (FontCascadeDescription::*setter)(T))
-        : DiscreteFontDescriptionWrapper(property)
-        , m_getter(getter)
-        , m_setter(setter)
-    {
-    }
-
-private:
-    bool propertiesInFontDescriptionAreEqual(const FontCascadeDescription& a, const FontCascadeDescription& b) const override
-    {
-        return this->value(a) == this->value(b);
-    }
-
-    void setPropertiesInFontDescription(const FontCascadeDescription& source, FontCascadeDescription& destination) const override
-    {
-        (destination.*this->m_setter)(this->value(source));
-    }
-
-    T value(const FontCascadeDescription& description) const
-    {
-        return (description.*this->m_getter)();
-    }
-
-    T (FontCascadeDescription::*m_getter)() const;
-    void (FontCascadeDescription::*m_setter)(T);
-};
-
-class FontVariantEastAsianWrapper final : public DiscreteFontDescriptionWrapper {
-    WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(FontVariantEastAsianWrapper, Animation);
-public:
-    FontVariantEastAsianWrapper()
-        : DiscreteFontDescriptionWrapper(CSSPropertyFontVariantEastAsian)
-    {
-    }
-
-private:
-    bool propertiesInFontDescriptionAreEqual(const FontCascadeDescription& a, const FontCascadeDescription& b) const override
-    {
-        return a.variantEastAsianVariant() == b.variantEastAsianVariant()
-            && a.variantEastAsianWidth() == b.variantEastAsianWidth()
-            && a.variantEastAsianRuby() == b.variantEastAsianRuby();
-    }
-
-    void setPropertiesInFontDescription(const FontCascadeDescription& source, FontCascadeDescription& destination) const override
-    {
-        destination.setVariantEastAsianVariant(source.variantEastAsianVariant());
-        destination.setVariantEastAsianWidth(source.variantEastAsianWidth());
-        destination.setVariantEastAsianRuby(source.variantEastAsianRuby());
-    }
-};
-
-class FontVariantLigaturesWrapper final : public DiscreteFontDescriptionWrapper {
-    WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(FontVariantLigaturesWrapper, Animation);
-public:
-    FontVariantLigaturesWrapper()
-        : DiscreteFontDescriptionWrapper(CSSPropertyFontVariantLigatures)
-    {
-    }
-
-private:
-    bool propertiesInFontDescriptionAreEqual(const FontCascadeDescription& a, const FontCascadeDescription& b) const override
-    {
-        return a.variantCommonLigatures() == b.variantCommonLigatures()
-            && a.variantDiscretionaryLigatures() == b.variantDiscretionaryLigatures()
-            && a.variantHistoricalLigatures() == b.variantHistoricalLigatures()
-            && a.variantContextualAlternates() == b.variantContextualAlternates();
-    }
-
-    void setPropertiesInFontDescription(const FontCascadeDescription& source, FontCascadeDescription& destination) const override
-    {
-        destination.setVariantCommonLigatures(source.variantCommonLigatures());
-        destination.setVariantDiscretionaryLigatures(source.variantDiscretionaryLigatures());
-        destination.setVariantHistoricalLigatures(source.variantHistoricalLigatures());
-        destination.setVariantContextualAlternates(source.variantContextualAlternates());
-    }
-};
-
 class FontFamilyWrapper final : public DiscreteFontDescriptionWrapper {
     WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(FontFamilyWrapper, Animation);
 public:
@@ -448,34 +367,6 @@ private:
     void setPropertiesInFontDescription(const FontCascadeDescription& source, FontCascadeDescription& destination) const override
     {
         destination.setFamilies(source.families());
-    }
-};
-
-class FontVariantNumericWrapper final : public DiscreteFontDescriptionWrapper {
-    WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(FontVariantNumericWrapper, Animation);
-public:
-    FontVariantNumericWrapper()
-        : DiscreteFontDescriptionWrapper(CSSPropertyFontVariantNumeric)
-    {
-    }
-
-private:
-    bool propertiesInFontDescriptionAreEqual(const FontCascadeDescription& a, const FontCascadeDescription& b) const override
-    {
-        return a.variantNumericFigure() == b.variantNumericFigure()
-            && a.variantNumericSpacing() == b.variantNumericSpacing()
-            && a.variantNumericFraction() == b.variantNumericFraction()
-            && a.variantNumericOrdinal() == b.variantNumericOrdinal()
-            && a.variantNumericSlashedZero() == b.variantNumericSlashedZero();
-    }
-
-    void setPropertiesInFontDescription(const FontCascadeDescription& source, FontCascadeDescription& destination) const override
-    {
-        destination.setVariantNumericFigure(source.variantNumericFigure());
-        destination.setVariantNumericSpacing(source.variantNumericSpacing());
-        destination.setVariantNumericFraction(source.variantNumericFraction());
-        destination.setVariantNumericOrdinal(source.variantNumericOrdinal());
-        destination.setVariantNumericSlashedZero(source.variantNumericSlashedZero());
     }
 };
 

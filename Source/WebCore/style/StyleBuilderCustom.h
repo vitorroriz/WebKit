@@ -43,7 +43,6 @@
 #include "CSSTextShadowPropertyValue.h"
 #include "CSSURLValue.h"
 #include "ElementAncestorIteratorInlines.h"
-#include "FontVariantBuilder.h"
 #include "HTMLElement.h"
 #include "LocalFrame.h"
 #include "SVGElement.h"
@@ -198,11 +197,6 @@ public:
     DECLARE_PROPERTY_CUSTOM_HANDLERS(Fill);
     DECLARE_PROPERTY_CUSTOM_HANDLERS(FontFamily);
     DECLARE_PROPERTY_CUSTOM_HANDLERS(FontSize);
-    DECLARE_PROPERTY_CUSTOM_HANDLERS(FontStyle);
-    DECLARE_PROPERTY_CUSTOM_HANDLERS(FontVariantAlternates);
-    DECLARE_PROPERTY_CUSTOM_HANDLERS(FontVariantLigatures);
-    DECLARE_PROPERTY_CUSTOM_HANDLERS(FontVariantNumeric);
-    DECLARE_PROPERTY_CUSTOM_HANDLERS(FontVariantEastAsian);
     DECLARE_PROPERTY_CUSTOM_HANDLERS(LetterSpacing);
 #if ENABLE(TEXT_AUTOSIZING)
     DECLARE_PROPERTY_CUSTOM_HANDLERS(LineHeight);
@@ -1157,114 +1151,6 @@ inline void BuilderCustom::applyValueStroke(BuilderState& builderState, CSSValue
         style.setStroke(toStyleFromCSSValue<SVGPaint>(builderState, value, ForVisitedLink::No));
     if (builderState.applyPropertyToVisitedLinkStyle())
         style.setVisitedLinkStroke(toStyleFromCSSValue<SVGPaint>(builderState, value, ForVisitedLink::Yes));
-}
-
-inline void BuilderCustom::applyInheritFontVariantLigatures(BuilderState& builderState)
-{
-    builderState.setFontDescriptionVariantCommonLigatures(builderState.parentFontDescription().variantCommonLigatures());
-    builderState.setFontDescriptionVariantDiscretionaryLigatures(builderState.parentFontDescription().variantDiscretionaryLigatures());
-    builderState.setFontDescriptionVariantHistoricalLigatures(builderState.parentFontDescription().variantHistoricalLigatures());
-    builderState.setFontDescriptionVariantContextualAlternates(builderState.parentFontDescription().variantContextualAlternates());
-}
-
-inline void BuilderCustom::applyInitialFontVariantLigatures(BuilderState& builderState)
-{
-    builderState.setFontDescriptionVariantCommonLigatures(FontVariantLigatures::Normal);
-    builderState.setFontDescriptionVariantDiscretionaryLigatures(FontVariantLigatures::Normal);
-    builderState.setFontDescriptionVariantHistoricalLigatures(FontVariantLigatures::Normal);
-    builderState.setFontDescriptionVariantContextualAlternates(FontVariantLigatures::Normal);
-}
-
-inline void BuilderCustom::applyValueFontVariantLigatures(BuilderState& builderState, CSSValue& value)
-{
-    if (CSSPropertyParserHelpers::isSystemFontShorthand(value.valueID())) {
-        applyInitialFontVariantLigatures(builderState);
-        return;
-    }
-    auto variantLigatures = extractFontVariantLigatures(value);
-    builderState.setFontDescriptionVariantCommonLigatures(variantLigatures.commonLigatures);
-    builderState.setFontDescriptionVariantDiscretionaryLigatures(variantLigatures.discretionaryLigatures);
-    builderState.setFontDescriptionVariantHistoricalLigatures(variantLigatures.historicalLigatures);
-    builderState.setFontDescriptionVariantContextualAlternates(variantLigatures.contextualAlternates);
-}
-
-inline void BuilderCustom::applyInheritFontVariantNumeric(BuilderState& builderState)
-{
-    builderState.setFontDescriptionVariantNumericFigure(builderState.parentFontDescription().variantNumericFigure());
-    builderState.setFontDescriptionVariantNumericSpacing(builderState.parentFontDescription().variantNumericSpacing());
-    builderState.setFontDescriptionVariantNumericFraction(builderState.parentFontDescription().variantNumericFraction());
-    builderState.setFontDescriptionVariantNumericOrdinal(builderState.parentFontDescription().variantNumericOrdinal());
-    builderState.setFontDescriptionVariantNumericSlashedZero(builderState.parentFontDescription().variantNumericSlashedZero());
-}
-
-inline void BuilderCustom::applyInitialFontVariantNumeric(BuilderState& builderState)
-{
-    builderState.setFontDescriptionVariantNumericFigure(FontVariantNumericFigure::Normal);
-    builderState.setFontDescriptionVariantNumericSpacing(FontVariantNumericSpacing::Normal);
-    builderState.setFontDescriptionVariantNumericFraction(FontVariantNumericFraction::Normal);
-    builderState.setFontDescriptionVariantNumericOrdinal(FontVariantNumericOrdinal::Normal);
-    builderState.setFontDescriptionVariantNumericSlashedZero(FontVariantNumericSlashedZero::Normal);
-}
-
-inline void BuilderCustom::applyValueFontVariantNumeric(BuilderState& builderState, CSSValue& value)
-{
-    if (CSSPropertyParserHelpers::isSystemFontShorthand(value.valueID())) {
-        applyInitialFontVariantNumeric(builderState);
-        return;
-    }
-    auto variantNumeric = extractFontVariantNumeric(value);
-    builderState.setFontDescriptionVariantNumericFigure(variantNumeric.figure);
-    builderState.setFontDescriptionVariantNumericSpacing(variantNumeric.spacing);
-    builderState.setFontDescriptionVariantNumericFraction(variantNumeric.fraction);
-    builderState.setFontDescriptionVariantNumericOrdinal(variantNumeric.ordinal);
-    builderState.setFontDescriptionVariantNumericSlashedZero(variantNumeric.slashedZero);
-}
-
-inline void BuilderCustom::applyInheritFontVariantEastAsian(BuilderState& builderState)
-{
-    builderState.setFontDescriptionVariantEastAsianVariant(builderState.parentFontDescription().variantEastAsianVariant());
-    builderState.setFontDescriptionVariantEastAsianWidth(builderState.parentFontDescription().variantEastAsianWidth());
-    builderState.setFontDescriptionVariantEastAsianRuby(builderState.parentFontDescription().variantEastAsianRuby());
-}
-
-inline void BuilderCustom::applyInitialFontVariantEastAsian(BuilderState& builderState)
-{
-    builderState.setFontDescriptionVariantEastAsianVariant(FontVariantEastAsianVariant::Normal);
-    builderState.setFontDescriptionVariantEastAsianWidth(FontVariantEastAsianWidth::Normal);
-    builderState.setFontDescriptionVariantEastAsianRuby(FontVariantEastAsianRuby::Normal);
-}
-
-inline void BuilderCustom::applyValueFontVariantEastAsian(BuilderState& builderState, CSSValue& value)
-{
-    if (CSSPropertyParserHelpers::isSystemFontShorthand(value.valueID())) {
-        applyInitialFontVariantEastAsian(builderState);
-        return;
-    }
-    auto variantEastAsian = extractFontVariantEastAsian(value);
-    builderState.setFontDescriptionVariantEastAsianVariant(variantEastAsian.variant);
-    builderState.setFontDescriptionVariantEastAsianWidth(variantEastAsian.width);
-    builderState.setFontDescriptionVariantEastAsianRuby(variantEastAsian.ruby);
-}
-
-inline void BuilderCustom::applyInheritFontVariantAlternates(BuilderState& builderState)
-{
-    builderState.setFontDescriptionVariantAlternates(builderState.parentFontDescription().variantAlternates());
-}
-
-inline void BuilderCustom::applyInitialFontVariantAlternates(BuilderState& builderState)
-{
-    builderState.setFontDescriptionVariantAlternates(FontVariantAlternates::Normal());
-}
-
-inline void BuilderCustom::applyValueFontVariantAlternates(BuilderState& builderState, CSSValue& value)
-{
-    if (CSSPropertyParserHelpers::isSystemFontShorthand(value.valueID())) {
-        applyInitialFontVariantAlternates(builderState);
-        return;
-    }
-    auto fontDescription = builderState.fontDescription();
-    fontDescription.setVariantAlternates(extractFontVariantAlternates(value, builderState));
-    builderState.setFontDescription(WTFMove(fontDescription));
 }
 
 inline void BuilderCustom::applyInitialFontSize(BuilderState& builderState)

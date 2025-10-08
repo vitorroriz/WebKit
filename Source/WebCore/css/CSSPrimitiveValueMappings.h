@@ -1720,32 +1720,6 @@ template<> constexpr FontSmoothingMode fromCSSValueID(CSSValueID valueID)
     return FontSmoothingMode::AutoSmoothing;
 }
 
-constexpr CSSValueID toCSSValueID(FontSmallCaps smallCaps)
-{
-    switch (smallCaps) {
-    case FontSmallCaps::Off:
-        return CSSValueNormal;
-    case FontSmallCaps::On:
-        return CSSValueSmallCaps;
-    }
-    ASSERT_NOT_REACHED_UNDER_CONSTEXPR_CONTEXT();
-    return CSSValueInvalid;
-}
-
-template<> constexpr FontSmallCaps fromCSSValueID(CSSValueID valueID)
-{
-    switch (valueID) {
-    case CSSValueSmallCaps:
-        return FontSmallCaps::On;
-    case CSSValueNormal:
-        return FontSmallCaps::Off;
-    default:
-        break;
-    }
-    ASSERT_NOT_REACHED_UNDER_CONSTEXPR_CONTEXT();
-    return FontSmallCaps::Off;
-}
-
 constexpr CSSValueID toCSSValueID(TextRenderingMode e)
 {
     switch (e) {

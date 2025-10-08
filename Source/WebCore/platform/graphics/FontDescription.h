@@ -86,27 +86,10 @@ public:
     FontVariantEastAsianWidth variantEastAsianWidth() const { return static_cast<FontVariantEastAsianWidth>(m_variantEastAsianWidth); }
     FontVariantEastAsianRuby variantEastAsianRuby() const { return static_cast<FontVariantEastAsianRuby>(m_variantEastAsianRuby); }
     FontVariantEmoji variantEmoji() const { return static_cast<FontVariantEmoji>(m_variantEmoji); }
-    FontVariantSettings variantSettings() const
-    {
-        return {
-            variantCommonLigatures(),
-            variantDiscretionaryLigatures(),
-            variantHistoricalLigatures(),
-            variantContextualAlternates(),
-            variantPosition(),
-            variantCaps(),
-            variantNumericFigure(),
-            variantNumericSpacing(),
-            variantNumericFraction(),
-            variantNumericOrdinal(),
-            variantNumericSlashedZero(),
-            variantAlternates(),
-            variantEastAsianVariant(),
-            variantEastAsianWidth(),
-            variantEastAsianRuby(),
-            variantEmoji()
-        };
-    }
+    FontVariantEastAsianValues variantEastAsian() const;
+    FontVariantNumericValues variantNumeric() const;
+    FontVariantLigaturesValues variantLigatures() const;
+    FontVariantSettings variantSettings() const;
     FontOpticalSizing opticalSizing() const { return static_cast<FontOpticalSizing>(m_opticalSizing); }
     FontStyleAxis fontStyleAxis() const { return static_cast<FontStyleAxis>(m_fontStyleAxis); }
     AllowUserInstalledFonts shouldAllowUserInstalledFonts() const { return static_cast<AllowUserInstalledFonts>(m_shouldAllowUserInstalledFonts); }
@@ -149,6 +132,9 @@ public:
     void setVariantEastAsianWidth(FontVariantEastAsianWidth variant) { m_variantEastAsianWidth = enumToUnderlyingType(variant); }
     void setVariantEastAsianRuby(FontVariantEastAsianRuby variant) { m_variantEastAsianRuby = enumToUnderlyingType(variant); }
     void setVariantEmoji(FontVariantEmoji variant) { m_variantEmoji = enumToUnderlyingType(variant); }
+    void setVariantEastAsian(FontVariantEastAsianValues);
+    void setVariantNumeric(FontVariantNumericValues);
+    void setVariantLigatures(FontVariantLigaturesValues);
     void setOpticalSizing(FontOpticalSizing sizing) { m_opticalSizing = enumToUnderlyingType(sizing); }
     void setShouldAllowUserInstalledFonts(AllowUserInstalledFonts shouldAllowUserInstalledFonts) { m_shouldAllowUserInstalledFonts = enumToUnderlyingType(shouldAllowUserInstalledFonts); }
     void setShouldDisableLigaturesForSpacing(bool shouldDisableLigaturesForSpacing) { m_shouldDisableLigaturesForSpacing = shouldDisableLigaturesForSpacing; }

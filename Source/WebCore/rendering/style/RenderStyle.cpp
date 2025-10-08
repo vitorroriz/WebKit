@@ -2692,6 +2692,104 @@ void RenderStyle::setFontPalette(Style::FontPalette&& value)
     setFontDescription(WTFMove(description));
 }
 
+void RenderStyle::setFontKerning(Kerning value)
+{
+    auto description = fontDescription();
+    description.setKerning(value);
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setFontSmoothing(FontSmoothingMode value)
+{
+    auto description = fontDescription();
+    description.setFontSmoothing(value);
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setFontSynthesisSmallCaps(FontSynthesisLonghandValue value)
+{
+    auto description = fontDescription();
+    description.setFontSynthesisSmallCaps(value);
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setFontSynthesisStyle(FontSynthesisLonghandValue value)
+{
+    auto description = fontDescription();
+    description.setFontSynthesisStyle(value);
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setFontSynthesisWeight(FontSynthesisLonghandValue value)
+{
+    auto description = fontDescription();
+    description.setFontSynthesisWeight(value);
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setFontVariantAlternates(Style::FontVariantAlternates&& value)
+{
+    auto description = fontDescription();
+    description.setVariantAlternates(value.takePlatform());
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setFontVariantCaps(FontVariantCaps value)
+{
+    auto description = fontDescription();
+    description.setVariantCaps(value);
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setFontVariantEastAsian(Style::FontVariantEastAsian value)
+{
+    auto description = fontDescription();
+    description.setVariantEastAsian(value.platform());
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setFontVariantEmoji(FontVariantEmoji value)
+{
+    auto description = fontDescription();
+    description.setVariantEmoji(value);
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setFontVariantLigatures(Style::FontVariantLigatures value)
+{
+    auto description = fontDescription();
+    description.setVariantLigatures(value.platform());
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setFontVariantNumeric(Style::FontVariantNumeric value)
+{
+    auto description = fontDescription();
+    description.setVariantNumeric(value.platform());
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setFontVariantPosition(FontVariantPosition value)
+{
+    auto description = fontDescription();
+    description.setVariantPosition(value);
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setLocale(AtomString&& value)
+{
+    auto description = fontDescription();
+    description.setSpecifiedLocale(WTFMove(value));
+    setFontDescription(WTFMove(description));
+}
+
+void RenderStyle::setTextRendering(TextRenderingMode value)
+{
+    auto description = fontDescription();
+    description.setTextRenderingMode(value);
+    setFontDescription(WTFMove(description));
+}
+
 const Style::Color& RenderStyle::unresolvedColorForProperty(CSSPropertyID colorProperty, bool visitedLink) const
 {
     switch (colorProperty) {

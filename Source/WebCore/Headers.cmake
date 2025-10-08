@@ -3307,6 +3307,10 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/fonts/StyleFontPalette.h
     style/values/fonts/StyleFontSizeAdjust.h
     style/values/fonts/StyleFontStyle.h
+    style/values/fonts/StyleFontVariantAlternates.h
+    style/values/fonts/StyleFontVariantEastAsian.h
+    style/values/fonts/StyleFontVariantLigatures.h
+    style/values/fonts/StyleFontVariantNumeric.h
     style/values/fonts/StyleFontVariationSettings.h
     style/values/fonts/StyleFontWeight.h
     style/values/fonts/StyleFontWidth.h

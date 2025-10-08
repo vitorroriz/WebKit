@@ -661,9 +661,7 @@
             ],
             "codegen-properties": {
                 "animation-wrapper": "StyleTypeWrapper",
-                "animation-wrapper-requires-render-style": true,
                 "style-converter": "StyleType<FontSizeAdjust>",
-                "font-property-uses-render-style-for-access": true,
                 "font-property": true,
                 "high-priority": true,
                 "separator": " ",
@@ -689,9 +687,7 @@
             ],
             "codegen-properties": {
                 "animation-wrapper": "StyleTypeWrapper",
-                "animation-wrapper-requires-render-style": true,
                 "style-converter": "StyleType<FontStyle>",
-                "font-property-uses-render-style-for-access": true,
                 "font-property": true,
                 "high-priority": true,
                 "parser-function": "consumeFontStyle",
@@ -715,9 +711,7 @@
             ],
             "codegen-properties": {
                 "animation-wrapper": "StyleTypeWrapper",
-                "animation-wrapper-requires-render-style": true,
                 "font-description-name-for-methods": "Weight",
-                "font-property-uses-render-style-for-access": true,
                 "font-property": true,
                 "high-priority": true,
                 "style-converter": "StyleType<FontWeight>",
@@ -749,9 +743,7 @@
                     "enable-if": "ENABLE_VARIATION_FONTS",
                     "aliases": ["font-stretch"],
                     "animation-wrapper": "StyleTypeWrapper",
-                    "animation-wrapper-requires-render-style": true,
                     "font-description-name-for-methods": "Width",
-                    "font-property-uses-render-style-for-access": true,
                     "font-property": true,
                     "high-priority": true,
                     "style-converter": "StyleType<FontWidth>",
@@ -761,9 +753,7 @@
                     "enable-if": "!ENABLE_VARIATION_FONTS",
                     "aliases": ["font-stretch"],
                     "animation-wrapper": "StyleTypeWrapper",
-                    "animation-wrapper-requires-render-style": true,
                     "font-description-name-for-methods": "Width",
-                    "font-property-uses-render-style-for-access": true,
                     "font-property": true,
                     "high-priority": true,
                     "style-converter": "StyleType<FontWidth>",
@@ -850,7 +840,6 @@
                 "geometricPrecision"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteFontDescriptionTypedWrapper<TextRenderingMode>",
                 "font-description-name-for-methods": "TextRenderingMode",
                 "font-property": true,
                 "high-priority": true,
@@ -869,12 +858,8 @@
                 "normal"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteWrapper",
-                "animation-wrapper-comment": "By default, font properties use DiscreteFontDescriptionTypedWrapper, so an explicit wrapper is needed here to override that.",
-                "animation-wrapper-requires-render-style": true,
                 "style-converter": "StyleType<FontFeatureSettings>",
                 "font-description-name-for-methods": "FeatureSettings",
-                "font-property-uses-render-style-for-access": true,
                 "font-property": true,
                 "high-priority": true,
                 "parser-grammar": "normal | <feature-tag-value>#@(no-single-item-opt)",
@@ -894,10 +879,8 @@
             ],
             "codegen-properties": {
                 "animation-wrapper": "StyleTypeWrapper",
-                "animation-wrapper-requires-render-style": true,
                 "style-converter": "StyleType<FontVariationSettings>",
                 "font-description-name-for-methods": "VariationSettings",
-                "font-property-uses-render-style-for-access": true,
                 "font-property": true,
                 "high-priority": true,
                 "enable-if": "ENABLE_VARIATION_FONTS",
@@ -921,7 +904,6 @@
                 "aliases": [
                     "-webkit-font-kerning"
                 ],
-                "animation-wrapper": "DiscreteFontDescriptionTypedWrapper<Kerning>",
                 "font-description-name-for-methods": "Kerning",
                 "font-property": true,
                 "high-priority": true,
@@ -938,11 +920,7 @@
             "inherited": true,
             "initial": "normal",
             "codegen-properties": {
-                "animation-wrapper": "DiscreteWrapper",
-                "animation-wrapper-comment": "By default, font properties use DiscreteFontDescriptionTypedWrapper, so an explicit wrapper is needed here to override that.",
-                "animation-wrapper-requires-render-style": true,
                 "style-converter": "StyleType<FontPalette>",
-                "font-property-uses-render-style-for-access": true,
                 "font-property": true,
                 "high-priority": true,
                 "parser-grammar": "normal | light | dark | <palette-identifier>"
@@ -986,10 +964,7 @@
                 "no-contextual"
             ],
             "codegen-properties": {
-                "animation-wrapper": "FontVariantLigaturesWrapper",
-                "animation-wrapper-requires-override-parameters": [],
-                "style-builder-custom": "All",
-                "style-extractor-custom": true,
+                "style-converter": "StyleType<FontVariantLigatures>",
                 "font-description-name-for-methods": "VariantLigatures",
                 "font-property": true,
                 "high-priority": true,
@@ -1010,7 +985,6 @@
                 "super"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteFontDescriptionTypedWrapper<FontVariantPosition>",
                 "font-description-name-for-methods": "VariantPosition",
                 "font-property": true,
                 "high-priority": true,
@@ -1036,7 +1010,6 @@
                 "titling-caps"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteFontDescriptionTypedWrapper<FontVariantCaps>",
                 "font-description-name-for-methods": "VariantCaps",
                 "font-property": true,
                 "high-priority": true,
@@ -1064,10 +1037,7 @@
                 "slashed-zero"
             ],
             "codegen-properties": {
-                "animation-wrapper": "FontVariantNumericWrapper",
-                "animation-wrapper-requires-override-parameters": [],
-                "style-builder-custom": "All",
-                "style-extractor-custom": true,
+                "style-converter": "StyleType<FontVariantNumeric>",
                 "font-description-name-for-methods": "VariantNumeric",
                 "font-property": true,
                 "high-priority": true,
@@ -1083,9 +1053,7 @@
             "inherited": true,
             "initial": "normal",
             "codegen-properties": {
-                "animation-wrapper": "DiscreteFontDescriptionTypedWrapper<const FontVariantAlternates&>",
-                "style-builder-custom": "All",
-                "style-extractor-custom": true,
+                "style-converter": "StyleType<FontVariantAlternates>",
                 "font-description-name-for-methods": "VariantAlternates",
                 "font-property": true,
                 "high-priority": true,
@@ -1114,10 +1082,7 @@
                 "ruby"
             ],
             "codegen-properties": {
-                "animation-wrapper": "FontVariantEastAsianWrapper",
-                "animation-wrapper-requires-override-parameters": [],
-                "style-builder-custom": "All",
-                "style-extractor-custom": true,
+                "style-converter": "StyleType<FontVariantEastAsian>",
                 "font-description-name-for-methods": "VariantEastAsian",
                 "font-property": true,
                 "high-priority": true,
@@ -1140,7 +1105,6 @@
                 "unicode"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteFontDescriptionTypedWrapper<FontVariantEmoji>",
                 "settings-flag": "cssFontVariantEmojiEnabled",
                 "parser-grammar": "<<values>>",
                 "font-description-name-for-methods": "VariantEmoji",
@@ -1179,7 +1143,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteFontDescriptionTypedWrapper<FontSynthesisLonghandValue>",
                 "font-property": true,
                 "high-priority": true,
                 "parser-grammar": "<<values>>"
@@ -1198,7 +1161,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteFontDescriptionTypedWrapper<FontSynthesisLonghandValue>",
                 "font-property": true,
                 "high-priority": true,
                 "parser-grammar": "<<values>>"
@@ -1217,7 +1179,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteFontDescriptionTypedWrapper<FontSynthesisLonghandValue>",
                 "font-property": true,
                 "high-priority": true,
                 "parser-grammar": "<<values>>"
@@ -1236,9 +1197,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteWrapper",
-                "animation-wrapper-comment": "By default, font properties use DiscreteFontDescriptionTypedWrapper, so an explicit wrapper is needed here to override that.",
-                "animation-wrapper-requires-render-style": true,
                 "font-description-name-for-methods": "OpticalSizing",
                 "font-property": true,
                 "high-priority": true,
@@ -1428,9 +1386,6 @@
             ],
             "codegen-properties": {
                 "settings-flag": "cssTextSpacingTrimEnabled",
-                "animation-wrapper": "DiscreteWrapper",
-                "animation-wrapper-comment": "By default, font properties use DiscreteFontDescriptionTypedWrapper, so an explicit wrapper is needed here to override that.",
-                "animation-wrapper-requires-render-style": true,
                 "font-property": true,
                 "high-priority": true,
                 "sink-priority": true,
@@ -1458,9 +1413,6 @@
             ],
             "codegen-properties": {
                 "settings-flag": "cssTextAutospaceEnabled",
-                "animation-wrapper": "DiscreteWrapper",
-                "animation-wrapper-comment": "By default, font properties use DiscreteFontDescriptionTypedWrapper, so an explicit wrapper is needed here to override that.",
-                "animation-wrapper-requires-render-style": true,
                 "font-property": true,
                 "high-priority": true,
                 "sink-priority": true,
@@ -4906,7 +4858,6 @@
                 "accepts-quirky-length": true,
                 "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-requires-getter": "computedLetterSpacing",
-                "animation-wrapper-requires-render-style": true,
                 "style-builder-custom": "All",
                 "style-builder-converter": "StyleType<LetterSpacing>",
                 "style-extractor-custom": true,
@@ -8412,7 +8363,6 @@
                 "accepts-quirky-length": true,
                 "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-requires-getter": "computedWordSpacing",
-                "animation-wrapper-requires-render-style": true,
                 "style-builder-custom": "All",
                 "style-builder-converter": "StyleType<WordSpacing>",
                 "style-extractor-custom": true,

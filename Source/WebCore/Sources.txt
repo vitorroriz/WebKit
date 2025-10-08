@@ -985,7 +985,6 @@ css/DeprecatedCSSOMValue.cpp
 css/DeprecatedCSSOMValueList.cpp
 css/FontFace.cpp
 css/FontFaceSet.cpp
-css/FontVariantBuilder.cpp
 css/ImmutableStyleProperties.cpp
 css/MediaList.cpp
 css/MediaQueryList.cpp
@@ -3215,6 +3214,10 @@ style/values/fonts/StyleFontFeatureSettings.cpp
 style/values/fonts/StyleFontPalette.cpp
 style/values/fonts/StyleFontSizeAdjust.cpp
 style/values/fonts/StyleFontStyle.cpp
+style/values/fonts/StyleFontVariantAlternates.cpp
+style/values/fonts/StyleFontVariantEastAsian.cpp
+style/values/fonts/StyleFontVariantLigatures.cpp
+style/values/fonts/StyleFontVariantNumeric.cpp
 style/values/fonts/StyleFontVariationSettings.cpp
 style/values/fonts/StyleFontWeight.cpp
 style/values/fonts/StyleFontWidth.cpp

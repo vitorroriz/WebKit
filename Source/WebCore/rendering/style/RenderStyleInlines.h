@@ -48,6 +48,10 @@
 #include <WebCore/StyleFontPalette.h>
 #include <WebCore/StyleFontSizeAdjust.h>
 #include <WebCore/StyleFontStyle.h>
+#include <WebCore/StyleFontVariantAlternates.h>
+#include <WebCore/StyleFontVariantEastAsian.h>
+#include <WebCore/StyleFontVariantLigatures.h>
+#include <WebCore/StyleFontVariantNumeric.h>
 #include <WebCore/StyleFontVariationSettings.h>
 #include <WebCore/StyleFontWeight.h>
 #include <WebCore/StyleFontWidth.h>
@@ -234,6 +238,20 @@ inline Style::FontFeatureSettings RenderStyle::fontFeatureSettings() const { ret
 inline Style::FontVariationSettings RenderStyle::fontVariationSettings() const { return fontDescription().variationSettings(); }
 inline Style::FontWeight RenderStyle::fontWeight() const { return fontDescription().weight(); }
 inline Style::FontWidth RenderStyle::fontWidth() const { return fontDescription().width(); }
+inline Kerning RenderStyle::fontKerning() const { return fontDescription().kerning(); }
+inline FontSmoothingMode RenderStyle::fontSmoothing() const { return fontDescription().fontSmoothing(); }
+inline FontSynthesisLonghandValue RenderStyle::fontSynthesisSmallCaps() const { return fontDescription().fontSynthesisSmallCaps(); }
+inline FontSynthesisLonghandValue RenderStyle::fontSynthesisStyle() const { return fontDescription().fontSynthesisStyle(); }
+inline FontSynthesisLonghandValue RenderStyle::fontSynthesisWeight() const { return fontDescription().fontSynthesisWeight(); }
+inline Style::FontVariantAlternates RenderStyle::fontVariantAlternates() const { return fontDescription().variantAlternates(); }
+inline FontVariantCaps RenderStyle::fontVariantCaps() const { return fontDescription().variantCaps(); }
+inline Style::FontVariantEastAsian RenderStyle::fontVariantEastAsian() const { return fontDescription().variantEastAsian(); }
+inline FontVariantEmoji RenderStyle::fontVariantEmoji() const { return fontDescription().variantEmoji(); }
+inline Style::FontVariantLigatures RenderStyle::fontVariantLigatures() const { return fontDescription().variantLigatures(); }
+inline Style::FontVariantNumeric RenderStyle::fontVariantNumeric() const { return fontDescription().variantNumeric(); }
+inline FontVariantPosition RenderStyle::fontVariantPosition() const { return fontDescription().variantPosition(); }
+inline const AtomString& RenderStyle::locale() const { return fontDescription().specifiedLocale(); }
+inline TextRenderingMode RenderStyle::textRendering() const { return fontDescription().textRenderingMode(); }
 inline const Style::GapGutter& RenderStyle::gap(Style::GridTrackSizingDirection direction) const { return direction == Style::GridTrackSizingDirection::Columns ? columnGap() : rowGap(); }
 inline const Style::GridTrackSizes& RenderStyle::gridAutoColumns() const { return m_nonInheritedData->rareData->grid->m_gridAutoColumns; }
 inline GridAutoFlow RenderStyle::gridAutoFlow() const { return static_cast<GridAutoFlow>(m_nonInheritedData->rareData->grid->m_gridAutoFlow); }
@@ -401,6 +419,7 @@ constexpr Style::FlexGrow RenderStyle::initialFlexGrow() { return 0_css_number; 
 constexpr Style::FlexShrink RenderStyle::initialFlexShrink() { return 1_css_number; }
 constexpr FlexWrap RenderStyle::initialFlexWrap() { return FlexWrap::NoWrap; }
 constexpr Float RenderStyle::initialFloating() { return Float::None; }
+constexpr FontOpticalSizing RenderStyle::initialFontOpticalSizing() { return FontOpticalSizing::Enabled; }
 inline Style::FontFeatureSettings RenderStyle::initialFontFeatureSettings() { return CSS::Keyword::Normal { }; }
 inline Style::FontVariationSettings RenderStyle::initialFontVariationSettings() { return CSS::Keyword::Normal { }; }
 inline Style::FontPalette RenderStyle::initialFontPalette() { return CSS::Keyword::Normal { }; }
@@ -408,6 +427,22 @@ inline Style::FontSizeAdjust RenderStyle::initialFontSizeAdjust() { return CSS::
 inline Style::FontStyle RenderStyle::initialFontStyle() { return CSS::Keyword::Normal { }; }
 inline Style::FontWeight RenderStyle::initialFontWeight() { return CSS::Keyword::Normal { }; }
 inline Style::FontWidth RenderStyle::initialFontWidth() { return CSS::Keyword::Normal { }; }
+constexpr Kerning RenderStyle::initialFontKerning() { return Kerning::Auto; }
+constexpr FontSmoothingMode RenderStyle::initialFontSmoothing() { return FontSmoothingMode::AutoSmoothing; }
+constexpr FontSynthesisLonghandValue RenderStyle::initialFontSynthesisSmallCaps() { return FontSynthesisLonghandValue::Auto; }
+constexpr FontSynthesisLonghandValue RenderStyle::initialFontSynthesisStyle() { return FontSynthesisLonghandValue::Auto; }
+constexpr FontSynthesisLonghandValue RenderStyle::initialFontSynthesisWeight() { return FontSynthesisLonghandValue::Auto; }
+inline Style::FontVariantAlternates RenderStyle::initialFontVariantAlternates() { return CSS::Keyword::Normal { }; }
+constexpr FontVariantCaps RenderStyle::initialFontVariantCaps() { return FontVariantCaps::Normal; }
+constexpr Style::FontVariantEastAsian RenderStyle::initialFontVariantEastAsian() { return CSS::Keyword::Normal { }; }
+constexpr FontVariantEmoji RenderStyle::initialFontVariantEmoji() { return FontVariantEmoji::Normal; }
+constexpr Style::FontVariantLigatures RenderStyle::initialFontVariantLigatures() { return CSS::Keyword::Normal { }; }
+constexpr Style::FontVariantNumeric RenderStyle::initialFontVariantNumeric() { return CSS::Keyword::Normal { }; }
+constexpr FontVariantPosition RenderStyle::initialFontVariantPosition() { return FontVariantPosition::Normal; }
+inline AtomString RenderStyle::initialLocale() { return nullAtom(); }
+constexpr TextAutospace RenderStyle::initialTextAutospace() { return { }; }
+constexpr TextRenderingMode RenderStyle::initialTextRendering() { return TextRenderingMode::AutoTextRendering; }
+constexpr TextSpacingTrim RenderStyle::initialTextSpacingTrim() { return { }; }
 inline Style::GridTrackSizes RenderStyle::initialGridAutoColumns() { return CSS::Keyword::Auto { }; }
 constexpr GridAutoFlow RenderStyle::initialGridAutoFlow() { return AutoFlowRow; }
 inline Style::GridTrackSizes RenderStyle::initialGridAutoRows() { return CSS::Keyword::Auto { }; }
@@ -758,7 +793,6 @@ inline const Style::ShapeOutside& RenderStyle::shapeOutside() const { return m_n
 inline ContentVisibility RenderStyle::usedContentVisibility() const { return static_cast<ContentVisibility>(m_rareInheritedData->usedContentVisibility); }
 inline bool RenderStyle::isSkippedRootOrSkippedContent() const { return usedContentVisibility() != ContentVisibility::Visible; }
 inline OptionSet<SpeakAs> RenderStyle::speakAs() const { return OptionSet<SpeakAs>::fromRaw(m_rareInheritedData->speakAs); }
-inline const AtomString& RenderStyle::specifiedLocale() const { return fontDescription().specifiedLocale(); }
 inline Style::ZIndex RenderStyle::specifiedZIndex() const { return m_nonInheritedData->boxData->specifiedZIndex(); }
 inline bool RenderStyle::specifiesColumns() const { return !columnCount().isAuto() || !columnWidth().isAuto() || !hasInlineColumnAxis(); }
 constexpr OptionSet<Containment> RenderStyle::strictContainment() { return { Containment::Size, Containment::Layout, Containment::Paint, Containment::Style }; }
