@@ -158,8 +158,8 @@ void RenderTable::styleDidChange(StyleDifference diff, const RenderStyle* oldSty
     bool oldFixedTableLayout = oldStyle ? oldStyle->isFixedTableLayout() : false;
 
     // In the collapsed border model, there is no cell spacing.
-    m_hSpacing = collapseBorders() ? 0 : style().borderHorizontalSpacing().resolveZoom(Style::ZoomNeeded { });
-    m_vSpacing = collapseBorders() ? 0 : style().borderVerticalSpacing().resolveZoom(Style::ZoomNeeded { });
+    m_hSpacing = collapseBorders() ? 0 : style().borderHorizontalSpacing().resolveZoom(style().usedZoomForLength());
+    m_vSpacing = collapseBorders() ? 0 : style().borderVerticalSpacing().resolveZoom(style().usedZoomForLength());
     ASSERT(m_hSpacing >= 0);
     ASSERT(m_vSpacing >= 0);
 
