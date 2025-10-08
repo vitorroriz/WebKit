@@ -168,13 +168,14 @@ if (ENABLE_WEBXR AND USE_OPENXR)
     ADD_WK2_TEST(TestWebKitWebXR ${TOOLS_DIR}/TestWebKitAPI/Tests/WebKitGLib/TestWebKitWebXR.cpp)
 endif ()
 
+if (ENABLE_2022_GLIB_API)
+    ADD_WK2_TEST(TestWebKitNetworkSession ${TOOLS_DIR}/TestWebKitAPI/Tests/WebKitGLib/TestWebKitNetworkSession.cpp)
+
 if (ENABLE_WK_WEB_EXTENSIONS)
     ADD_WK2_TEST(TestWebKitWebExtension ${TOOLS_DIR}/TestWebKitAPI/Tests/WebKitGLib/TestWebKitWebExtension.cpp)
     ADD_WK2_TEST(TestWebKitWebExtensionMatchPattern ${TOOLS_DIR}/TestWebKitAPI/Tests/WebKitGLib/TestWebKitWebExtensionMatchPattern.cpp)
 endif ()
 
-if (ENABLE_2022_GLIB_API)
-    ADD_WK2_TEST(TestWebKitNetworkSession ${TOOLS_DIR}/TestWebKitAPI/Tests/WebKitGLib/TestWebKitNetworkSession.cpp)
 endif ()
 
 macro(ADD_WPE_QT_TEST test_name)
