@@ -3293,12 +3293,12 @@ LayoutUnit RenderBlockFlow::adjustEnclosingTopForPrecedingBlock(LayoutUnit top) 
         const RenderElement* object = this;
         const RenderObject* sibling = nullptr;
         do {
-            sibling = object->previousSibling();
+            sibling = object->previousInFlowSibling();
             while (sibling) {
                 auto* siblingBlock = dynamicDowncast<RenderBlock>(*sibling);
                 if (siblingBlock && !siblingBlock->isSelectionRoot())
                     break;
-                sibling = sibling->previousSibling();
+                sibling = sibling->previousInFlowSibling();
             }
 
             auto& objectBlock = downcast<RenderBlock>(*object);
