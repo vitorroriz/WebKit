@@ -393,7 +393,7 @@ TEST_P(AnyContextAttributeTest, WebXRBlitTest)
         PlatformGLObject color = gl->createRenderbuffer();
         ASSERT_NE(color, 0u);
         gl->bindRenderbuffer(GL::RENDERBUFFER, color);
-        gl->renderbufferStorageMultisampleANGLE(GL::RENDERBUFFER, 0, GL::BGRA_EXT, 2, 2);
+        gl->renderbufferStorageMultisampleANGLE(GL::RENDERBUFFER, 0, GL::RGBA8, 2, 2);
         gl->framebufferRenderbuffer(GL::DRAW_FRAMEBUFFER, GL::COLOR_ATTACHMENT0, GL::RENDERBUFFER, color);
     }
     {
