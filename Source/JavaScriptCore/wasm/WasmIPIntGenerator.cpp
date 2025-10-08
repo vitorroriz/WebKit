@@ -667,9 +667,6 @@ private:
     inline uint32_t nextPC() { return m_parser->offset() - m_metadata->m_bytecodeOffset; }
     inline uint32_t curMC() { return m_metadata->m_metadata.size(); }
 
-    // FIXME: If rethrow is not used in practice we should consider just reparsing the function to update the SP offsets.
-    Vector<uint32_t> m_catchSPMetadataOffsets;
-
     CallInformation m_cachedCallInformation { };
     const FunctionSignature* m_cachedSignature { nullptr };
     Vector<uint8_t, 16> m_cachedCallBytecode;
@@ -3166,11 +3163,8 @@ PartialResult WARN_UNUSED_RETURN IPIntGenerator::addCrash()
 
 std::unique_ptr<FunctionIPIntMetadataGenerator> IPIntGenerator::finalize()
 {
-    if (m_usesRethrow) {
+    if (m_usesRethrow)
         m_metadata->m_numAlignedRethrowSlots = roundUpToMultipleOf<2>(m_maxTryDepth);
-        for (uint32_t catchSPOffset : m_catchSPMetadataOffsets)
-            *reinterpret_cast_ptr<uint32_t*>(m_metadata->m_metadata.mutableSpan().data() + catchSPOffset) += m_metadata->m_numAlignedRethrowSlots;
-    }
 
     // Pad the metadata to an even number since we will allocate the rounded up size
     if (m_metadata->m_numLocals % 2)
