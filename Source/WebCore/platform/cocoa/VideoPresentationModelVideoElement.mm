@@ -474,6 +474,12 @@ void VideoPresentationModelVideoElement::audioSessionCategoryChanged(AudioSessio
         client->audioSessionCategoryChanged(category, mode, policy);
 }
 
+void VideoPresentationModelVideoElement::routingContextUIDChanged(const String& routingContextUID)
+{
+    for (auto& client : copyToVector(m_clients))
+        client->routingContextUIDChanged(routingContextUID);
+}
+
 #if !RELEASE_LOG_DISABLED
 const Logger* VideoPresentationModelVideoElement::loggerPtr() const
 {

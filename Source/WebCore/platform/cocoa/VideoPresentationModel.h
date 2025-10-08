@@ -137,6 +137,7 @@ public:
     virtual void documentVisibilityChanged(bool) { }
     virtual void isChildOfElementFullscreenChanged(bool) { }
     virtual void audioSessionCategoryChanged(AudioSessionCategory, AudioSessionMode, RouteSharingPolicy) { }
+    virtual void routingContextUIDChanged(const String&) { }
     virtual void hasBeenInteractedWith() { }
 };
 

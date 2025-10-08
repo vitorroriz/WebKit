@@ -136,6 +136,12 @@ void VideoPresentationInterfaceContext::audioSessionCategoryChanged(WebCore::Aud
         manager->audioSessionCategoryChanged(m_contextId, category, mode, policy);
 }
 
+void VideoPresentationInterfaceContext::routingContextUIDChanged(const String& routingContextUID)
+{
+    if (RefPtr manager = m_manager.get())
+        manager->routingContextUIDChanged(m_contextId, routingContextUID);
+}
+
 void VideoPresentationInterfaceContext::hasBeenInteractedWith()
 {
     if (RefPtr manager = m_manager.get())
@@ -598,6 +604,12 @@ void VideoPresentationManager::audioSessionCategoryChanged(WebCore::MediaPlayerC
 {
     if (RefPtr page = m_page.get())
         page->send(Messages::VideoPresentationManagerProxy::AudioSessionCategoryChanged(processQualify(contextId), category, mode, policy));
+}
+
+void VideoPresentationManager::routingContextUIDChanged(WebCore::MediaPlayerClientIdentifier contextId, const String& routingContextUID)
+{
+    if (RefPtr page = m_page.get())
+        page->send(Messages::VideoPresentationManagerProxy::RoutingContextUIDChanged(processQualify(contextId), routingContextUID));
 }
 
 void VideoPresentationManager::hasBeenInteractedWith(WebCore::MediaPlayerClientIdentifier contextId)

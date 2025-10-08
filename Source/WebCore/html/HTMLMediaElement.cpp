@@ -739,7 +739,7 @@ void HTMLMediaElement::initializeMediaSession()
 
     registerWithDocument(document);
 
-#if USE(AUDIO_SESSION) && PLATFORM(MAC)
+#if USE(AUDIO_SESSION)
     AudioSession::singleton().addConfigurationChangeObserver(*this);
 #endif
 
@@ -780,7 +780,7 @@ HTMLMediaElement::~HTMLMediaElement()
 
     setShouldDelayLoadEvent(false);
 
-#if USE(AUDIO_SESSION) && PLATFORM(MAC)
+#if USE(AUDIO_SESSION)
     AudioSession::singleton().removeConfigurationChangeObserver(*this);
 #endif
 
@@ -4804,7 +4804,9 @@ void HTMLMediaElement::updateStalledState()
     }
 }
 
-#if USE(AUDIO_SESSION) && PLATFORM(MAC)
+#if USE(AUDIO_SESSION)
+
+#if PLATFORM(MAC)
 void HTMLMediaElement::hardwareMutedStateDidChange(const AudioSession& session)
 {
     if (!session.isMuted())
@@ -4820,6 +4822,15 @@ void HTMLMediaElement::hardwareMutedStateDidChange(const AudioSession& session)
     userDidInterfereWithAutoplay();
 }
 #endif
+
+void HTMLMediaElement::routingContextUIDDidChange(const AudioSession& session)
+{
+    m_clients.forEach([routingContextUID = session.routingContextUID()] (auto& client) {
+        client.routingContextUIDChanged(routingContextUID);
+    });
+}
+
+#endif // USE(AUDIO_SESSION)
 
 void HTMLMediaElement::togglePlayState()
 {

@@ -167,6 +167,7 @@ public:
     virtual ~HTMLMediaElementClient() = default;
 
     virtual void audioSessionCategoryChanged(AudioSessionCategory, AudioSessionMode, RouteSharingPolicy) { }
+    virtual void routingContextUIDChanged(const String&) { }
 };
 
 class HTMLMediaElement
@@ -183,7 +184,7 @@ class HTMLMediaElement
     , private AudioTrackClient
     , private TextTrackClient
     , private VideoTrackClient
-#if USE(AUDIO_SESSION) && PLATFORM(MAC)
+#if USE(AUDIO_SESSION)
     , private AudioSessionConfigurationChangeObserver
 #endif
 #if ENABLE(ENCRYPTED_MEDIA)
@@ -1074,8 +1075,11 @@ private:
     void sceneIdentifierDidChange() final;
 #endif
 
-#if USE(AUDIO_SESSION) && PLATFORM(MAC)
+#if USE(AUDIO_SESSION)
+#if PLATFORM(MAC)
     void hardwareMutedStateDidChange(const AudioSession&) final;
+#endif
+    void routingContextUIDDidChange(const AudioSession&) final;
 #endif
 
     bool hasMediaSource() const;
