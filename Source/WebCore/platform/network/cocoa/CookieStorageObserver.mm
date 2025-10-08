@@ -27,7 +27,6 @@
 #import "CookieStorageObserver.h"
 
 #import <pal/spi/cocoa/NSURLConnectionSPI.h>
-#import <wtf/CheckedPtr.h>
 #import <wtf/MainThread.h>
 #import <wtf/ProcessPrivilege.h>
 #import <wtf/TZoneMallocInlines.h>
@@ -46,7 +45,7 @@
 @end
 
 @interface WebCookieObserverAdapter : NSObject {
-    WeakPtr<WebCore::CookieStorageObserver> observer;
+    WebCore::CookieStorageObserver* observer;
 }
 - (instancetype)initWithObserver:(WebCore::CookieStorageObserver&)theObserver;
 - (void)cookiesChangedNotificationHandler:(NSNotification *)notification;
@@ -61,7 +60,7 @@
     if (!self)
         return nil;
 
-    observer = theObserver;
+    observer = &theObserver;
 
     return self;
 }
@@ -69,10 +68,7 @@
 - (void)cookiesChangedNotificationHandler:(NSNotification *)notification
 {
     UNUSED_PARAM(notification);
-    ensureOnMainThread([weakObserver = observer] {
-        if (CheckedPtr observer = weakObserver.get())
-            observer->cookiesDidChange();
-    });
+    observer->cookiesDidChange();
 }
 
 @end
@@ -136,9 +132,10 @@ void CookieStorageObserver::stopObserving()
 
 void CookieStorageObserver::cookiesDidChange()
 {
-    ASSERT(isMainThread());
-    if (m_cookieChangeCallback)
-        m_cookieChangeCallback();
+    callOnMainThread([weakThis = WeakPtr { *this }] {
+        if (weakThis && weakThis->m_cookieChangeCallback)
+            weakThis->m_cookieChangeCallback();
+    });
 }
 
 } // namespace WebCore
