@@ -1117,7 +1117,7 @@ void VideoMediaSampleRenderer::invalidateDecompressionSession()
     if (decompressionSession)
         decompressionSession->invalidate();
 
-    ensureOnMainThread([weakThis = WeakRef { *this }] {
+    ensureOnMainThread([weakThis = ThreadSafeWeakPtr { *this }] {
         if (RefPtr protectedThis = weakThis.get())
             protectedThis->notifyVideoRendererRequiresFlushToResumeDecoding();
     });
