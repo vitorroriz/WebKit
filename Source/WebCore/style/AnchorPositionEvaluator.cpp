@@ -271,7 +271,8 @@ void AnchorPositionEvaluator::captureScrollSnapshots(RenderBox& anchored, bool i
     if (adjuster.isEmpty())
         return clearAnchorScrollSnapshots(anchored);
 
-    if (!anchored.style().positionTryFallbacks().isEmpty())
+    if (!anchored.style().positionTryFallbacks().isEmpty()
+        || anchored.style().positionVisibility().contains(PositionVisibility::NoOverflow))
         adjuster.setFallbackLimits(anchored);
 
     auto captureDiff = anchored.layoutContext().registerAnchorScrollAdjuster(WTFMove(adjuster));
@@ -300,19 +301,21 @@ void AnchorPositionEvaluator::updateScrollAdjustments(RenderView& renderView)
         if (!anchored->layer()->setAnchorScrollAdjustment(scrollOffset))
             continue;
 
+        bool shouldBeHidden = false;
         bool needsInvalidation = false;
-        if (adjuster.hasFallbackLimits() && adjuster.exceedsFallbackLimits(scrollOffset)) {
-            anchored->setNeedsLayout();
-            needsInvalidation = true;
+        if (adjuster.hasFallbackLimits()) {
+            if (adjuster.exceedsFallbackLimits(scrollOffset)) {
+                if (!anchored->style().positionTryFallbacks().isEmpty()) {
+                    anchored->setNeedsLayout();
+                    needsInvalidation = true;
+                } else
+                    shouldBeHidden = anchored->style().positionVisibility().contains(PositionVisibility::NoOverflow);
+            }
         }
+        if (!shouldBeHidden && anchored->style().positionVisibility().contains(PositionVisibility::AnchorsVisible))
+            shouldBeHidden = AnchorPositionEvaluator::isDefaultAnchorInvisibleOrClippedByInterveningBoxes(*anchored);
 
-        if (anchored->style().positionVisibility().contains(PositionVisibility::AnchorsVisible)) {
-            bool shouldBeHidden = AnchorPositionEvaluator::isDefaultAnchorInvisibleOrClippedByInterveningBoxes(*anchored); // FIXME: Optimize this.
-            if (adjuster.isHidden() != shouldBeHidden)
-                needsInvalidation = true;
-        }
-
-        if (needsInvalidation) {
+        if (needsInvalidation || shouldBeHidden != adjuster.isHidden()) {
             ASSERT(anchored->element());
             if (CheckedPtr element = anchored->element())
                 element->invalidateForAnchorRectChange(); // FIXME: Optimize this.
