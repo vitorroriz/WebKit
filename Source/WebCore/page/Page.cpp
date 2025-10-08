@@ -865,6 +865,9 @@ void Page::setMainFrame(Ref<Frame>&& frame)
         document = localFrame->document();
 
     m_topDocumentSyncData = document ? document->syncData() : DocumentSyncData::create();
+
+    // Notify the web page that the frame changed, so that we can re-intitialize the remote token.
+    chrome().client().mainFrameDidChange();
 }
 
 void Page::setMainFrameURLAndOrigin(const URL& url, RefPtr<SecurityOrigin>&& origin)

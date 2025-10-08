@@ -159,7 +159,7 @@ void WebPage::createMockAccessibilityElement(pid_t pid)
     m_mockAccessibilityElement = WTFMove(mockAccessibilityElement);
 }
 
-void WebPage::platformReinitialize()
+void WebPage::platformReinitializeAccessibilityToken()
 {
     RefPtr frame = m_page->focusController().focusedOrMainFrame();
     if (!frame)

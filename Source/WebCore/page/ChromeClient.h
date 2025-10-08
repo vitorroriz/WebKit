@@ -292,6 +292,8 @@ public:
     virtual void relayAccessibilityNotification(String&&, RetainPtr<NSData>&&) const = 0;
 #endif
 
+    virtual void mainFrameDidChange() { };
+
     virtual void didFinishLoadingImageForElement(HTMLImageElement&) = 0;
     virtual void didFinishLoadingImageForSVGImage(SVGImageElement&) { }
 

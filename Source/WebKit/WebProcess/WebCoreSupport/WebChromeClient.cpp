@@ -808,6 +808,12 @@ IntRect WebChromeClient::rootViewToAccessibilityScreen(const IntRect& rect) cons
     return page ? page->rootViewToAccessibilityScreen(rect) : IntRect();
 }
 
+void WebChromeClient::mainFrameDidChange()
+{
+    if (RefPtr page = m_page.get())
+        page->platformReinitializeAccessibilityToken();
+}
+
 void WebChromeClient::didFinishLoadingImageForElement(HTMLImageElement& element)
 {
     if (RefPtr page = m_page.get())

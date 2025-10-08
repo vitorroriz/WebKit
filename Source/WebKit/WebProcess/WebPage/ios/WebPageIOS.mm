@@ -281,7 +281,7 @@ void WebPage::platformInitializeAccessibility(ShouldInitializeNSAccessibility)
         accessibilityTransferRemoteToken(accessibilityRemoteTokenData());
 }
 
-void WebPage::platformReinitialize()
+void WebPage::platformReinitializeAccessibilityToken()
 {
     RefPtr frame = m_page->focusController().focusedOrMainFrame();
     if (!frame)

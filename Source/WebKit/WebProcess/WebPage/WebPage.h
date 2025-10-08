@@ -577,6 +577,7 @@ public:
     void deref() const final;
 
     void reinitializeWebPage(WebPageCreationParameters&&);
+    void platformReinitializeAccessibilityToken();
 
     void close();
 
@@ -2102,7 +2103,6 @@ private:
     uint64_t messageSenderDestinationID() const override;
 
     void platformInitialize(const WebPageCreationParameters&);
-    void platformReinitialize();
     void platformDetach();
     void getPlatformEditorState(WebCore::LocalFrame&, EditorState&) const;
     bool requiresPostLayoutDataForEditorState(const WebCore::LocalFrame&) const;

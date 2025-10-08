@@ -1415,7 +1415,7 @@ void WebPage::reinitializeWebPage(WebPageCreationParameters&& parameters)
         createProvisionalFrame(WTFMove(*provisionalFrameCreationParameters));
     }
 
-    platformReinitialize();
+    platformReinitializeAccessibilityToken();
 }
 
 void WebPage::updateThrottleState()

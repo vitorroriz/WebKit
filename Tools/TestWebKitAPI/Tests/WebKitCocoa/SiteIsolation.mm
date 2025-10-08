@@ -6655,4 +6655,21 @@ TEST(SiteIsolation, IframeImageTranslationIfIframeIsAddedAfterTranslationCall)
 
 #endif // ENABLE(IMAGE_ANALYSIS)
 
+#if PLATFORM(MAC)
+TEST(SiteIsolation, AccessibilityTokenAfterPageNavigation)
+{
+    HTTPServer server({
+        { "/example"_s, { "<script>w = window.open('https://webkit.org/webkit')</script>"_s } },
+        { "/webkit"_s, { ""_s } }
+    }, HTTPServer::Protocol::HttpsProxy);
+    auto [opener, opened] = openerAndOpenedViews(server);
+    [opened.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://apple.com/webkit"]]];
+    [opened.navigationDelegate waitForDidFinishNavigation];
+
+    EXPECT_TRUE(TestWebKitAPI::Util::waitFor([&] {
+        return [opened.webView hasRemoteAccessibilityChild];
+    }));
+}
+#endif // PLATFORM(MAC)
+
 }
