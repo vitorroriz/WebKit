@@ -47,6 +47,7 @@ class IDBStorageRegistry;
 
 class IDBStorageManager final : public WebCore::IDBServer::UniqueIDBDatabaseManager {
     WTF_MAKE_TZONE_ALLOCATED(IDBStorageManager);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(IDBStorageManager);
 public:
     static void createVersionDirectoryIfNeeded(const String& rootDirectory);
     static String idbStorageOriginDirectory(const String& rootDirectory, const WebCore::ClientOrigin&);
