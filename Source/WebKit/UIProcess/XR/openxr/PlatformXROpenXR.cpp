@@ -234,7 +234,6 @@ void OpenXRCoordinator::startSession(WebPageProxy& page, WeakPtr<PlatformXRCoord
                 .renderState = renderState,
                 .renderQueue = renderQueue.get()
             };
-            page.uiClient().didStartXRSession(page);
             renderQueue->dispatch([this, renderState] {
                 createSessionIfNeeded();
                 if (m_session == XR_NULL_HANDLE) {
@@ -290,8 +289,8 @@ void OpenXRCoordinator::endSessionIfExists(WebPageProxy& page)
                 sessionEventClient->sessionDidEnd(m_deviceIdentifier);
             }
 
-            page.uiClient().didEndXRSession(page);
-
+            if (active.didStart)
+                page.uiClient().didEndXRSession(page);
             m_state = Idle { };
         });
 }
@@ -645,6 +644,16 @@ void OpenXRCoordinator::handleSessionStateChange()
         sessionBeginInfo.primaryViewConfigurationType = m_currentViewConfiguration;
         CHECK_XRCMD(xrBeginSession(m_session, &sessionBeginInfo));
         m_isSessionRunning = true;
+        callOnMainRunLoop([this] {
+            WTF::switchOn(m_state,
+                [&](Idle&) { },
+                [&](Active& active) {
+                    if (RefPtr page = WebProcessProxy::webPage(active.pageIdentifier)) {
+                        active.didStart = true;
+                        page->uiClient().didStartXRSession(*page);
+                    }
+                });
+        });
         break;
     }
     case XR_SESSION_STATE_STOPPING:
