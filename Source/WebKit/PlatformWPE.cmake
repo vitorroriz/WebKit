@@ -449,14 +449,10 @@ list(APPEND WebKit_PRIVATE_INCLUDE_DIRECTORIES
     "${JavaScriptCoreGLib_DERIVED_SOURCES_DIR}/jsc"
 )
 
-list(APPEND WebKit_SYSTEM_INCLUDE_DIRECTORIES
-    ${LIBSOUP_INCLUDE_DIRS}
-)
-
 list(APPEND WebKit_LIBRARIES
     GLib::Module
+    Soup3::Soup3
     WPE::libwpe
-    ${LIBSOUP_LIBRARIES}
 )
 
 if (ANDROID)
@@ -626,7 +622,6 @@ if (ENABLE_WPE_QT_API)
             $<TARGET_PROPERTY:WebKit,INCLUDE_DIRECTORIES>
             ${JavaScriptCoreGLib_FRAMEWORK_HEADERS_DIR}
             ${CMAKE_BINARY_DIR}
-            ${LIBSOUP_INCLUDE_DIRS}
             ${WPE_INCLUDE_DIRS}
             ${WEBKIT_DIR}/UIProcess/API/wpe/qt6
         )
@@ -671,7 +666,6 @@ if (ENABLE_WPE_QT_API)
             ${CMAKE_BINARY_DIR}
             ${Qt5_INCLUDE_DIRS}
             ${Qt5Gui_PRIVATE_INCLUDE_DIRS}
-            ${LIBSOUP_INCLUDE_DIRS}
             ${WPE_INCLUDE_DIRS}
         )
 
