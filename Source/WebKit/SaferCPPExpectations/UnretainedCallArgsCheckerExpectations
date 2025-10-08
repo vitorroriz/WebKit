@@ -62,7 +62,6 @@ UIProcess/API/Cocoa/_WKWebAuthenticationPanel.mm
 UIProcess/API/Cocoa/_WKWebPushAction.mm
 UIProcess/API/mac/WKWebViewMac.mm
 UIProcess/API/mac/WKWebViewTestingMac.mm
-UIProcess/Authentication/cocoa/AuthenticationChallengeProxyCocoa.mm
 UIProcess/Automation/mac/WebAutomationSessionMac.mm
 UIProcess/Cocoa/UIDelegate.mm
 UIProcess/Cocoa/WKStorageAccessAlert.mm
