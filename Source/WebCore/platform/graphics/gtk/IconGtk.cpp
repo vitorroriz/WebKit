@@ -36,7 +36,7 @@
 namespace WebCore {
 
 Icon::Icon(GRefPtr<GIcon>&& icon)
-    : m_icon(icon)
+    : m_icon(WTFMove(icon))
 {
 }
 

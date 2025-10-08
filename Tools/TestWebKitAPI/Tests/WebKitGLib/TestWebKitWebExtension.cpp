@@ -45,8 +45,7 @@ static void testExtensionCreationFromDirectory(Test*, gconstpointer)
     g_assert_true(g_file_set_contents(filePath.get(), extensionManifest, strlen(extensionManifest), &error.outPtr()));
     g_assert_no_error(error.get());
 
-    GRefPtr<GFile> file = adoptGRef(g_file_new_for_path(Test::dataDirectory()));
-    GRefPtr<WebKitWebExtension> extension = adoptGRef(webkit_web_extension_new(file.get(), &error.outPtr()));
+    GRefPtr<WebKitWebExtension> extension = adoptGRef(webkit_web_extension_new(Test::dataDirectory(), &error.outPtr()));
     g_assert_no_error(error.get());
 
     g_assert_cmpstr(webkit_web_extension_get_display_name(extension.get()), ==, "Test");

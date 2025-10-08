@@ -86,6 +86,7 @@ public:
     static Ref<Data> createWithoutCopying(GRefPtr<GBytes>&& bytes)
     {
         auto span = WTF::span(bytes);
+        // The destroy function receives ownership of the GRefPtr, therefore destroying it
         return createWithoutCopying(span, [bytes = WTFMove(bytes)] () { });
     }
 #endif
