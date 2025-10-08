@@ -136,7 +136,7 @@ static void promiseResolveThenableJob(JSGlobalObject* globalObject, JSValue prom
     EXCEPTION_ASSERT(scope.exception() || true);
 }
 
-void runInternalMirotask(JSGlobalObject* globalObject, InternalMicrotask task, std::span<const JSValue, maxMicrotaskArguments> arguments)
+void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, std::span<const JSValue, maxMicrotaskArguments> arguments)
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
@@ -163,12 +163,12 @@ void runInternalMirotask(JSGlobalObject* globalObject, InternalMicrotask task, s
                 }
             }
             scope.release();
-            globalObject->queueMicrotask(jsNumber(static_cast<int32_t>(InternalMicrotask::PromiseResolveWithoutHandlerJob)), promiseToResolve, promise->reactionsOrResult(), jsNumber(static_cast<int32_t>(JSPromise::Status::Rejected)), jsUndefined());
+            globalObject->queueMicrotask(InternalMicrotask::PromiseResolveWithoutHandlerJob, promiseToResolve, promise->reactionsOrResult(), jsNumber(static_cast<int32_t>(JSPromise::Status::Rejected)), jsUndefined());
             break;
         }
         case JSPromise::Status::Fulfilled: {
             scope.release();
-            globalObject->queueMicrotask(jsNumber(static_cast<int32_t>(InternalMicrotask::PromiseResolveWithoutHandlerJob)), promiseToResolve, promise->reactionsOrResult(), jsNumber(static_cast<int32_t>(JSPromise::Status::Fulfilled)), jsUndefined());
+            globalObject->queueMicrotask(InternalMicrotask::PromiseResolveWithoutHandlerJob, promiseToResolve, promise->reactionsOrResult(), jsNumber(static_cast<int32_t>(JSPromise::Status::Fulfilled)), jsUndefined());
             break;
         }
         }
@@ -200,12 +200,12 @@ void runInternalMirotask(JSGlobalObject* globalObject, InternalMicrotask task, s
             }
 
             scope.release();
-            globalObject->queueMicrotask(jsNumber(static_cast<int32_t>(InternalMicrotask::PromiseReactionJobWithoutPromise)), onRejected, promise->reactionsOrResult(), context, jsUndefined());
+            globalObject->queueMicrotask(InternalMicrotask::PromiseReactionJobWithoutPromise, onRejected, promise->reactionsOrResult(), context, jsUndefined());
             break;
         }
         case JSPromise::Status::Fulfilled: {
             scope.release();
-            globalObject->queueMicrotask(jsNumber(static_cast<int32_t>(InternalMicrotask::PromiseReactionJobWithoutPromise)), onFulfilled, promise->reactionsOrResult(), context, jsUndefined());
+            globalObject->queueMicrotask(InternalMicrotask::PromiseReactionJobWithoutPromise, onFulfilled, promise->reactionsOrResult(), context, jsUndefined());
             break;
         }
         }
@@ -309,64 +309,18 @@ void runInternalMirotask(JSGlobalObject* globalObject, InternalMicrotask task, s
         }
         return;
     }
-    }
-}
 
-void runJSMicrotask(JSGlobalObject* globalObject, MicrotaskIdentifier identifier, JSValue job, std::span<const JSValue, maxMicrotaskArguments> arguments)
-{
-    VM& vm = globalObject->vm();
-    auto scope = DECLARE_CATCH_SCOPE(vm);
-
-    if (job.isInt32()) {
-        if (auto* debugger = globalObject->debugger()) [[unlikely]] {
-            DeferTerminationForAWhile deferTerminationForAWhile(vm);
-            debugger->willRunMicrotask(globalObject, identifier);
-            if (!scope.clearExceptionExceptTermination()) [[unlikely]]
-                return;
-        }
-
-        runInternalMirotask(globalObject, static_cast<InternalMicrotask>(job.asInt32()), arguments);
-        if (!scope.clearExceptionExceptTermination()) [[unlikely]]
-            return;
-
-        if (auto* debugger = globalObject->debugger()) [[unlikely]] {
-            DeferTerminationForAWhile deferTerminationForAWhile(vm);
-            debugger->didRunMicrotask(globalObject, identifier);
-            if (!scope.clearExceptionExceptTermination()) [[unlikely]]
-                return;
-        }
+    case InternalMicrotask::InvokeFunctionJob: {
+        JSValue handler = arguments[0];
+        scope.release();
+        callMicrotask(globalObject, handler, jsUndefined(), nullptr, ArgList { }, "handler is not a function"_s);
         return;
     }
 
-    if (!job.isObject()) [[unlikely]]
+    case InternalMicrotask::Opaque: {
+        RELEASE_ASSERT_NOT_REACHED();
         return;
-
-    auto handlerCallData = JSC::getCallData(job);
-    ASSERT(handlerCallData.type != CallData::Type::None);
-
-    unsigned count = 0;
-    for (auto argument : arguments) {
-        if (!argument)
-            break;
-        ++count;
     }
-
-    if (auto* debugger = globalObject->debugger()) [[unlikely]] {
-        DeferTerminationForAWhile deferTerminationForAWhile(vm);
-        debugger->willRunMicrotask(globalObject, identifier);
-        if (!scope.clearExceptionExceptTermination()) [[unlikely]]
-            return;
-    }
-
-    profiledCall(globalObject, ProfilingReason::Microtask, job, handlerCallData, jsUndefined(), ArgList { std::bit_cast<EncodedJSValue*>(arguments.data()), count });
-    if (!scope.clearExceptionExceptTermination()) [[unlikely]]
-        return;
-
-    if (auto* debugger = globalObject->debugger()) [[unlikely]] {
-        DeferTerminationForAWhile deferTerminationForAWhile(vm);
-        debugger->didRunMicrotask(globalObject, identifier);
-        if (!scope.clearExceptionExceptTermination()) [[unlikely]]
-            return;
     }
 }
 

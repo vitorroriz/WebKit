@@ -73,43 +73,6 @@ void MicrotaskQueue::runJSMicrotask(JSC::JSGlobalObject* globalObject, JSC::VM& 
 {
     auto scope = DECLARE_CATCH_SCOPE(vm);
 
-    JSC::JSValue job = task.job();
-    if (job.isInt32()) {
-        if (auto* debugger = globalObject->debugger()) [[unlikely]] {
-            JSC::DeferTerminationForAWhile deferTerminationForAWhile(vm);
-            debugger->willRunMicrotask(globalObject, task.identifier());
-            if (!scope.clearExceptionExceptTermination()) [[unlikely]]
-                return;
-        }
-
-        JSC::runInternalMirotask(globalObject, static_cast<JSC::InternalMicrotask>(job.asInt32()), task.arguments());
-        if (!scope.clearExceptionExceptTermination()) [[unlikely]]
-            return;
-
-        if (auto* debugger = globalObject->debugger()) [[unlikely]] {
-            JSC::DeferTerminationForAWhile deferTerminationForAWhile(vm);
-            debugger->didRunMicrotask(globalObject, task.identifier());
-            if (!scope.clearExceptionExceptTermination()) [[unlikely]]
-                return;
-        }
-        return;
-    }
-
-    if (!job.isObject()) [[unlikely]]
-        return;
-
-    auto* jobObject = JSC::asObject(task.job());
-    auto* lexicalGlobalObject = jobObject->globalObject();
-    auto callData = JSC::getCallData(jobObject);
-    ASSERT(callData.type != JSC::CallData::Type::None);
-
-    unsigned count = 0;
-    for (auto argument : task.arguments()) {
-        if (!argument)
-            break;
-        ++count;
-    }
-
     if (auto* debugger = globalObject->debugger()) [[unlikely]] {
         JSC::DeferTerminationForAWhile deferTerminationForAWhile(vm);
         debugger->willRunMicrotask(globalObject, task.identifier());
@@ -117,12 +80,15 @@ void MicrotaskQueue::runJSMicrotask(JSC::JSGlobalObject* globalObject, JSC::VM& 
             return;
     }
 
-    NakedPtr<JSC::Exception> returnedException = nullptr;
-    JSC::profiledCall(lexicalGlobalObject, JSC::ProfilingReason::Microtask, jobObject, callData, JSC::jsUndefined(), JSC::ArgList { std::bit_cast<JSC::EncodedJSValue*>(task.arguments().data()), count }, returnedException);
-    if (returnedException) [[unlikely]]
-        reportException(lexicalGlobalObject, returnedException);
-    if (!scope.clearExceptionExceptTermination()) [[unlikely]]
-        return;
+    JSC::runInternalMicrotask(globalObject, task.job(), task.arguments());
+    if (scope.exception()) [[unlikely]] {
+        auto* exception = scope.exception();
+        if (!scope.clearExceptionExceptTermination()) [[unlikely]]
+            return;
+        reportException(globalObject, exception);
+        if (!scope.clearExceptionExceptTermination()) [[unlikely]]
+            return;
+    }
 
     if (auto* debugger = globalObject->debugger()) [[unlikely]] {
         JSC::DeferTerminationForAWhile deferTerminationForAWhile(vm);

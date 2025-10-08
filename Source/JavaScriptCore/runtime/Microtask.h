@@ -39,6 +39,8 @@ enum class InternalMicrotask : int32_t {
     PromiseResolveWithoutHandlerJob,
     PromiseReactionJob,
     PromiseReactionJobWithoutPromise,
+    InvokeFunctionJob,
+    Opaque, // Dispatch must handle everything.
 };
 
 constexpr unsigned maxMicrotaskArguments = 4;

@@ -1368,11 +1368,32 @@ void VM::drainMicrotasks()
         do {
             m_defaultMicrotaskQueue.performMicrotaskCheckpoint(*this,
                 [&](QueuedTask& task) ALWAYS_INLINE_LAMBDA {
-                    entryScope->setGlobalObject(task.globalObject());
+                    auto* globalObject = task.globalObject();
+                    entryScope->setGlobalObject(globalObject);
                     if (RefPtr dispatcher = task.dispatcher())
                         return dispatcher->run(task);
 
-                    runJSMicrotask(task.globalObject(), task.identifier(), task.job(), task.arguments());
+                    auto identifier = task.identifier();
+                    {
+                        auto catchScope = DECLARE_CATCH_SCOPE(*this);
+                        if (auto* debugger = globalObject->debugger()) [[unlikely]] {
+                            DeferTerminationForAWhile deferTerminationForAWhile(*this);
+                            debugger->willRunMicrotask(globalObject, identifier);
+                            if (!catchScope.clearExceptionExceptTermination()) [[unlikely]]
+                                return QueuedTask::Result::Executed;
+                        }
+
+                        runInternalMicrotask(globalObject, task.job(), task.arguments());
+                        if (!catchScope.clearExceptionExceptTermination()) [[unlikely]]
+                            return QueuedTask::Result::Executed;
+
+                        if (auto* debugger = globalObject->debugger()) [[unlikely]] {
+                            DeferTerminationForAWhile deferTerminationForAWhile(*this);
+                            debugger->didRunMicrotask(globalObject, identifier);
+                            if (!catchScope.clearExceptionExceptTermination()) [[unlikely]]
+                                return QueuedTask::Result::Executed;
+                        }
+                    }
                     return QueuedTask::Result::Executed;
                 });
             if (hasPendingTerminationException()) [[unlikely]]
