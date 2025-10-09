@@ -39,7 +39,8 @@ auto CSSValueConversion<WordSpacing>::operator()(BuilderState& state, const CSSV
         auto zoomWithTextZoomFactor = [](BuilderState& state) -> float {
             if (RefPtr frame = state.document().frame()) {
                 float textZoomFactor = state.style().textZoom() != TextZoom::Reset ? frame->textZoomFactor() : 1.0f;
-                return state.style().usedZoom() * textZoomFactor;
+                auto usedZoom = shouldUseEvaluationTimeZoom(state) ? 1.0f : state.style().usedZoom();
+                return usedZoom * textZoomFactor;
             }
             return state.cssToLengthConversionData().zoom();
         };
