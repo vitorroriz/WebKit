@@ -73,7 +73,6 @@ heap/MarkingConstraintSolver.cpp
 heap/ParallelSourceAdapter.h
 heap/SubspaceInlines.h
 inspector/ConsoleMessage.cpp
-inspector/InspectorProtocolObjects.h
 inspector/JSGlobalObjectInspectorController.cpp
 inspector/JSInjectedScriptHost.cpp
 inspector/JSJavaScriptCallFrame.cpp
