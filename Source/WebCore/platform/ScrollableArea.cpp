@@ -48,27 +48,29 @@
 #include <wtf/text/TextStream.h>
 
 namespace WebCore {
-struct SameSizeAsScrollableArea;
-}
-
-namespace WTF {
-template<typename T> struct IsDeprecatedWeakRefSmartPointerException;
-template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::SameSizeAsScrollableArea> : std::true_type { };
-}
-
-namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(ScrollableArea);
 
-struct SameSizeAsScrollableArea final : public CanMakeWeakPtr<SameSizeAsScrollableArea> {
+struct SameSizeAsScrollableArea : public CanMakeWeakPtr<SameSizeAsScrollableArea> {
     WTF_DEPRECATED_MAKE_STRUCT_FAST_ALLOCATED(SameSizeAsScrollableArea);
 
-    ~SameSizeAsScrollableArea() { }
+    // CheckedPtr interface
+    virtual uint32_t checkedPtrCount() const { return 0; }
+    virtual uint32_t checkedPtrCountWithoutThreadCheck() const { return 0; }
+    virtual void incrementCheckedPtrCount() const { }
+    virtual void decrementCheckedPtrCount() const { }
+
+    virtual ~SameSizeAsScrollableArea() { }
     SameSizeAsScrollableArea() { }
-    void* pointer[3];
-    IntPoint origin;
-    Markable<ScrollingNodeID> testID;
-    bool bytes[9];
+    void* pointer[2];
+    IntPoint scrollOrigin;
+    bool scrollClamping;
+    uint8_t scrollElasticity[2];
+    uint8_t scrollbarOverlayStyle;
+    bool currentScrollType;
+    uint8_t scrollAnimationStatus;
+    bool bytes[4];
+    Markable<ScrollingNodeID> scrollingNodeIDForTesting;
 };
 
 #if CPU(ADDRESS64)
