@@ -404,7 +404,6 @@ TestWebKitAPI.ScrollbarWidthCrash
 TestWebKitAPI.ScrollingCoordinatorTests
 TestWebKitAPI.SecurityOriginTest
 TestWebKitAPI.SelectionTests
-TestWebKitAPI.SessionStorage
 TestWebKitAPI.ShareSheetTests
 TestWebKitAPI.ShouldOpenAppLinks
 TestWebKitAPI.SimulateClickOverText
