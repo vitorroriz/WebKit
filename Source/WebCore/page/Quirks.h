@@ -164,8 +164,6 @@ public:
 
     bool needsCanPlayAfterSeekedQuirk() const;
 
-    bool shouldAvoidPastingImagesAsWebContent() const;
-
     bool shouldNotAutoUpgradeToHTTPSNavigation(const URL&);
 
     enum StorageAccessResult : bool { ShouldNotCancelEvent, ShouldCancelEvent };

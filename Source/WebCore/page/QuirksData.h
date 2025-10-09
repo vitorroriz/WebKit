@@ -106,7 +106,6 @@ struct WEBCORE_EXPORT QuirksData {
     bool needsScriptToEvaluateBeforeRunningScriptFromURLQuirk : 1 { false };
     bool needsYouTubeMouseOutQuirk : 1 { false };
     bool needsYouTubeOverflowScrollQuirk : 1 { false };
-    bool shouldAvoidPastingImagesAsWebContent : 1 { false };
     bool shouldDisablePointerEventsQuirk : 1 { false };
     bool shouldIgnoreAriaForFastPathContentObservationCheckQuirk : 1 { false };
     bool shouldNavigatorPluginsBeEmpty : 1 { false };

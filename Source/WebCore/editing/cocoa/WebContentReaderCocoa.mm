@@ -778,9 +778,6 @@ bool WebContentReader::readImage(Ref<FragmentedSharedBuffer>&& buffer, const Str
     ASSERT(frame().document());
     Ref frame = this->frame();
     Ref document = *frame->document();
-    if (document->quirks().shouldAvoidPastingImagesAsWebContent())
-        return false;
-
     if (shouldReplaceRichContentWithAttachments())
         addFragment(createFragmentForImageAttachment(frame, document, WTFMove(buffer), type, preferredPresentationSize));
     else

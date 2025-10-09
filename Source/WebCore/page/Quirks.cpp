@@ -1009,16 +1009,6 @@ bool Quirks::shouldLayOutAtMinimumWindowWidthWhenIgnoringScalingConstraints() co
     return needsQuirks() && m_quirksData.shouldLayOutAtMinimumWindowWidthWhenIgnoringScalingConstraintsQuirk;
 }
 
-// mail.yahoo.com rdar://63511613
-bool Quirks::shouldAvoidPastingImagesAsWebContent() const
-{
-#if PLATFORM(IOS_FAMILY)
-    return needsQuirks() && m_quirksData.shouldAvoidPastingImagesAsWebContent;
-#else
-    return false;
-#endif
-}
-
 bool Quirks::shouldNotAutoUpgradeToHTTPSNavigation(const URL& url)
 {
     return needsQuirks() && shouldNotAutoUpgradeToHTTPSNavigationInternal(url);
@@ -2219,18 +2209,6 @@ static void handleWalmartQuirks(QuirksData& quirksData, const URL& quirksURL, co
     quirksData.isWalmart = true;
 }
 
-static void handleYahooQuirks(QuirksData& quirksData, const URL& quirksURL, const String& quirksDomainString, const URL& documentURL)
-{
-    UNUSED_PARAM(documentURL);
-    UNUSED_PARAM(quirksDomainString);
-
-    auto topDocumentHost = quirksURL.host();
-    if (topDocumentHost.startsWith("mail."_s)) {
-        // mail.yahoo.com rdar://63511613
-        quirksData.shouldAvoidPastingImagesAsWebContent = true;
-    }
-}
-
 static void handleScriptToEvaluateBeforeRunningScriptFromURLQuirk(QuirksData& quirksData, const URL& quirksURL, const String& topDomain, const URL& documentURL)
 {
     UNUSED_PARAM(quirksURL);
@@ -3199,9 +3177,6 @@ void Quirks::determineRelevantQuirks()
 #endif
         { "weebly"_s, &handleWeeblyQuirks },
         { "x"_s, &handleTwitterXQuirks },
-#if PLATFORM(IOS_FAMILY)
-        { "yahoo"_s, &handleYahooQuirks },
-#endif
 #if ENABLE(TEXT_AUTOSIZING)
         { "ycombinator"_s, &handleYCombinatorQuirks },
 #endif
