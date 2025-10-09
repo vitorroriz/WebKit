@@ -252,7 +252,6 @@ TestWebKitAPI.Coding
 TestWebKitAPI.Color
 TestWebKitAPI.ColorInputTests
 TestWebKitAPI.ComplexTextControllerTest
-TestWebKitAPI.ContentExtensionTest
 TestWebKitAPI.ContentSecurityPolicy
 TestWebKitAPI.ContentWorld
 TestWebKitAPI.ContextMenuElementInfoWithQRCodeDetectionCrash
