@@ -4370,7 +4370,16 @@ ipintOp(_simd_i8x16_swizzle, macro()
     if ARM64 or ARM64E
         emit "tbl v16.16b, {v16.16b}, v17.16b"
     elsif X86_64
-        emit "vpshufb %xmm1, %xmm0, %xmm0"
+        # vpshufb only checks bit 7 for out-of-bounds (returns 0 if bit 7 is set)
+        # WebAssembly requires returning 0 for any index >= 16
+        # Add 0x70 with unsigned saturation, so any index > 15 sets bit 7
+        # (15 + 0x70 = 0x7F, anything > 15 saturates to 0xFF)
+        # See BBQJIT::fixupOutOfBoundsIndicesForSwizzle
+        emit "movabsq $0x7070707070707070, %rax"
+        emit "vmovq %rax, %xmm2"
+        emit "vpunpcklqdq %xmm2, %xmm2, %xmm2"   # xmm2 = [0x70, 0x70, ..., 0x70] (16 bytes)
+        emit "vpaddusb %xmm2, %xmm1, %xmm1"      # Saturating add to set bit 7 for indices > 15
+        emit "vpshufb %xmm1, %xmm0, %xmm0"       # Now vpshufb will return 0 for out-of-bounds
     else
         break # Not implemented
     end
@@ -8089,11 +8098,20 @@ ipintOp(_simd_f32x4_min, macro()
     if ARM64 or ARM64E
         emit "fmin v16.4s, v16.4s, v17.4s"
     elsif X86_64
-        # IEEE 754-2008 semantics: if either operand is NaN, result is NaN
-        # vminps doesn't handle NaN propagation correctly, so we need to check for NaN
-        emit "vcmpunordps %xmm1, %xmm0, %xmm2"  # Check for NaN in either operand
-        emit "vminps %xmm1, %xmm0, %xmm0"       # Compute min (may not handle NaN correctly)
-        emit "vorps %xmm2, %xmm0, %xmm0"        # OR with NaN mask to propagate NaN
+        # Wasm differs from X86_64 in terms of signed zero values and propagating NaNs
+        # so some special handling of those cases are needed.
+        # Compute result in both directions to handle NaN asymmetry
+        emit "vminps %xmm1, %xmm0, %xmm2"       # xmm2 = min(xmm0, xmm1)
+        emit "vminps %xmm0, %xmm1, %xmm0"       # xmm0 = min(xmm1, xmm0)
+
+        # OR results to propagate sign bits and NaN bits
+        emit "vorps %xmm0, %xmm2, %xmm2"        # xmm2 = xmm0 | xmm2
+
+        # Canonicalize NaNs by checking for unordered values and clearing mantissa
+        emit "vcmpunordps %xmm2, %xmm0, %xmm0" # xmm0 = NaN mask (all 1's where NaN)
+        emit "vorps %xmm0, %xmm2, %xmm2"        # xmm2 |= NaN mask
+        emit "vpsrld $10, %xmm0, %xmm0"         # Shift mask to clear mantissa bits (f32 uses 10)
+        emit "vpandn %xmm2, %xmm0, %xmm0"       # Clear mantissa to canonicalize NaN
     else
         break # Not implemented
     end
@@ -8109,11 +8127,25 @@ ipintOp(_simd_f32x4_max, macro()
     if ARM64 or ARM64E
         emit "fmax v16.4s, v16.4s, v17.4s"
     elsif X86_64
-        # IEEE 754-2008 semantics: if either operand is NaN, result is NaN
-        # vmaxps doesn't handle NaN propagation correctly, so we need to check for NaN
-        emit "vcmpunordps %xmm1, %xmm0, %xmm2"  # Check for NaN in either operand
-        emit "vmaxps %xmm1, %xmm0, %xmm0"       # Compute max (may not handle NaN correctly)
-        emit "vorps %xmm2, %xmm0, %xmm0"        # OR with NaN mask to propagate NaN
+        # Wasm differs from X86_64 in terms of signed zero values and propagating NaNs
+        # so some special handling of those cases are needed.
+        # Compute result in both directions to handle NaN asymmetry
+        emit "vmaxps %xmm1, %xmm0, %xmm2"       # xmm2 = max(xmm0, xmm1)
+        emit "vmaxps %xmm0, %xmm1, %xmm0"       # xmm0 = max(xmm1, xmm0)
+
+        # Check for discrepancies by XORing the results
+        emit "vxorps %xmm0, %xmm2, %xmm0"       # xmm0 = xmm0 ^ xmm2
+
+        # OR results to propagate sign bits and NaN bits
+        emit "vorps %xmm0, %xmm2, %xmm2"        # xmm2 = xmm0 | xmm2
+
+        # Propagate discrepancies in sign bit
+        emit "vsubps %xmm0, %xmm2, %xmm2"       # xmm2 = xmm2 - xmm0
+
+        # Canonicalize NaNs by checking for unordered values and clearing mantissa
+        emit "vcmpunordps %xmm2, %xmm0, %xmm0" # xmm0 = NaN mask (all 1's where NaN)
+        emit "vpsrld $10, %xmm0, %xmm0"         # Shift mask to clear mantissa bits (f32 uses 10)
+        emit "vpandn %xmm2, %xmm0, %xmm0"       # Clear mantissa to canonicalize NaN
     else
         break # Not implemented
     end
@@ -8290,11 +8322,20 @@ ipintOp(_simd_f64x2_min, macro()
     if ARM64 or ARM64E
         emit "fmin v16.2d, v16.2d, v17.2d"
     elsif X86_64
-        # IEEE 754-2008 semantics: if either operand is NaN, result is NaN
-        # vminpd doesn't handle NaN propagation correctly, so we need to check for NaN
-        emit "vcmpunordpd %xmm1, %xmm0, %xmm2"  # Check for NaN in either operand
-        emit "vminpd %xmm1, %xmm0, %xmm0"       # Compute min (may not handle NaN correctly)
-        emit "vorpd %xmm2, %xmm0, %xmm0"        # OR with NaN mask to propagate NaN
+        # Wasm differs from X86_64 in terms of signed zero values and propagating NaNs
+        # so some special handling of those cases are needed.
+        # Compute result in both directions to handle NaN asymmetry
+        emit "vminpd %xmm1, %xmm0, %xmm2"       # xmm2 = min(xmm0, xmm1)
+        emit "vminpd %xmm0, %xmm1, %xmm0"       # xmm0 = min(xmm1, xmm0)
+
+        # OR results to propagate sign bits and NaN bits
+        emit "vorpd %xmm0, %xmm2, %xmm2"        # xmm2 = xmm0 | xmm2
+
+        # Canonicalize NaNs by checking for unordered values and clearing mantissa
+        emit "vcmpunordpd %xmm2, %xmm0, %xmm0" # xmm0 = NaN mask (all 1's where NaN)
+        emit "vorpd %xmm0, %xmm2, %xmm2"        # xmm2 |= NaN mask
+        emit "vpsrlq $13, %xmm0, %xmm0"         # Shift mask to clear mantissa bits
+        emit "vpandn %xmm2, %xmm0, %xmm0"       # Clear mantissa to canonicalize NaN
     else
         break # Not implemented
     end
@@ -8310,11 +8351,25 @@ ipintOp(_simd_f64x2_max, macro()
     if ARM64 or ARM64E
         emit "fmax v16.2d, v16.2d, v17.2d"
     elsif X86_64
-        # IEEE 754-2008 semantics: if either operand is NaN, result is NaN
-        # vmaxpd doesn't handle NaN propagation correctly, so we need to check for NaN
-        emit "vcmpunordpd %xmm1, %xmm0, %xmm2"  # Check for NaN in either operand
-        emit "vmaxpd %xmm1, %xmm0, %xmm0"       # Compute max (may not handle NaN correctly)
-        emit "vorpd %xmm2, %xmm0, %xmm0"        # OR with NaN mask to propagate NaN
+        # Wasm differs from X86_64 in terms of signed zero values and propagating NaNs
+        # so some special handling of those cases are needed.
+        # Compute result in both directions to handle NaN asymmetry
+        emit "vmaxpd %xmm1, %xmm0, %xmm2"       # xmm2 = max(xmm0, xmm1)
+        emit "vmaxpd %xmm0, %xmm1, %xmm0"       # xmm0 = max(xmm1, xmm0)
+
+        # Check for discrepancies by XORing the results
+        emit "vxorpd %xmm0, %xmm2, %xmm0"       # xmm0 = xmm0 ^ xmm2
+
+        # OR results to propagate sign bits and NaN bits
+        emit "vorpd %xmm0, %xmm2, %xmm2"        # xmm2 = xmm0 | xmm2
+
+        # Propagate discrepancies in sign bit
+        emit "vsubpd %xmm0, %xmm2, %xmm2"       # xmm2 = xmm2 - xmm0
+
+        # Canonicalize NaNs by checking for unordered values and clearing mantissa
+        emit "vcmpunordpd %xmm2, %xmm0, %xmm0" # xmm0 = NaN mask (all 1's where NaN)
+        emit "vpsrlq $13, %xmm0, %xmm0"         # Shift mask to clear mantissa bits
+        emit "vpandn %xmm2, %xmm0, %xmm0"       # Clear mantissa to canonicalize NaN
     else
         break # Not implemented
     end
