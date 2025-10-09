@@ -227,24 +227,27 @@ void WebAutomationSession::platformSimulateMouseInteraction(WebPageProxy& page, 
         ASSERT(dragEventType);
         RetainPtr event = [NSEvent mouseEventWithType:dragEventType location:locationInWindow modifierFlags:modifiers timestamp:timestamp windowNumber:windowNumber context:nil eventNumber:eventNumber clickCount:0 pressure:0.0f];
         RetainPtr<CGEventRef> cgEvent = event.get().CGEvent;
-        if (!m_lastPosition)
-            updateLastPosition(locationInWindow);
-        CGEventSetIntegerValueField(cgEvent.get(), kCGMouseEventDeltaX, locationInWindow.x() - m_lastPosition->x());
-        CGEventSetIntegerValueField(cgEvent.get(), kCGMouseEventDeltaY, -1 * (locationInWindow.y() - m_lastPosition->y()));
+        CGEventSetIntegerValueField(cgEvent.get(), kCGMouseEventDeltaX, locationInWindow.x() - m_lastClickPosition.x());
+        CGEventSetIntegerValueField(cgEvent.get(), kCGMouseEventDeltaY, -1 * (locationInWindow.y() - m_lastClickPosition.y()));
         event = [NSEvent eventWithCGEvent:cgEvent.get()];
         [eventsToBeSent addObject:event.get()];
         break;
     }
     case MouseInteraction::Down:
         ASSERT(downEventType);
-        updateClickCount(button, locationInWindow);
         m_mouseButtonsCurrentlyDown.set(button, true);
-        [eventsToBeSent addObject:[NSEvent mouseEventWithType:downEventType location:locationInWindow modifierFlags:modifiers timestamp:timestamp windowNumber:windowNumber context:nil eventNumber:eventNumber clickCount:m_clickCount pressure:WebCore::ForceAtClick]];
+
+        // Hard-code the click count to one, since clients don't expect successive simulated
+        // down/up events to be potentially counted as a double click event.
+        [eventsToBeSent addObject:[NSEvent mouseEventWithType:downEventType location:locationInWindow modifierFlags:modifiers timestamp:timestamp windowNumber:windowNumber context:nil eventNumber:eventNumber clickCount:1 pressure:WebCore::ForceAtClick]];
         break;
     case MouseInteraction::Up:
         ASSERT(upEventType);
         m_mouseButtonsCurrentlyDown.set(button, false);
-        [eventsToBeSent addObject:[NSEvent mouseEventWithType:upEventType location:locationInWindow modifierFlags:modifiers timestamp:timestamp windowNumber:windowNumber context:nil eventNumber:eventNumber clickCount:m_clickCount pressure:0.0f]];
+
+        // Hard-code the click count to one, since clients don't expect successive simulated
+        // down/up events to be potentially counted as a double click event.
+        [eventsToBeSent addObject:[NSEvent mouseEventWithType:upEventType location:locationInWindow modifierFlags:modifiers timestamp:timestamp windowNumber:windowNumber context:nil eventNumber:eventNumber clickCount:1 pressure:0.0f]];
         break;
     case MouseInteraction::SingleClick:
         ASSERT(upEventType);
@@ -265,7 +268,7 @@ void WebAutomationSession::platformSimulateMouseInteraction(WebPageProxy& page, 
         [eventsToBeSent addObject:[NSEvent mouseEventWithType:downEventType location:locationInWindow modifierFlags:modifiers timestamp:timestamp windowNumber:windowNumber context:nil eventNumber:eventNumber clickCount:2 pressure:WebCore::ForceAtClick]];
         [eventsToBeSent addObject:[NSEvent mouseEventWithType:upEventType location:locationInWindow modifierFlags:modifiers timestamp:timestamp windowNumber:windowNumber context:nil eventNumber:eventNumber clickCount:2 pressure:0.0f]];
     }
-    updateLastPosition(locationInWindow);
+    updateClickCount(button, locationInWindow);
 
     sendSynthesizedEventsToPage(page, eventsToBeSent.get());
 }

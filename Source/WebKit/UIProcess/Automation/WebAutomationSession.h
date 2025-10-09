@@ -328,8 +328,7 @@ private:
     // Platform-dependent implementations.
 #if ENABLE(WEBDRIVER_MOUSE_INTERACTIONS)
     void updateClickCount(MouseButton, const WebCore::IntPoint&, Seconds maxTime = 1_s, int maxDistance = 0);
-    void updateLastPosition(const WebCore::IntPoint&, int maxDistance = 0);
-    void resetMouseState();
+    void resetClickCount();
     void platformSimulateMouseInteraction(WebPageProxy&, MouseInteraction, MouseButton, const WebCore::IntPoint& locationInViewport, OptionSet<WebEventModifier>, const String& pointerType);
     static OptionSet<WebEventModifier> platformWebModifiersFromRaw(WebPageProxy&, unsigned modifiers);
 #endif
@@ -427,9 +426,9 @@ private:
 #endif
 #if ENABLE(WEBDRIVER_MOUSE_INTERACTIONS)
     MonotonicTime m_lastClickTime;
+    MouseButton m_lastClickButton { MouseButton::None };
     HashMap<MouseButton, bool, WTF::IntHash<MouseButton>, WTF::StrongEnumHashTraits<MouseButton>> m_mouseButtonsCurrentlyDown;
-    std::optional<WebCore::IntPoint> m_lastPosition;
-    std::optional<WebCore::IntPoint> m_lastClickPosition;
+    WebCore::IntPoint m_lastClickPosition;
     unsigned m_clickCount { 1 };
 #endif
 

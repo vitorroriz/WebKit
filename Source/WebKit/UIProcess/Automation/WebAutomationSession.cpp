@@ -924,7 +924,7 @@ void WebAutomationSession::documentLoadedForFrame(const WebFrameProxy& frame, st
         }
 
 #if ENABLE(WEBDRIVER_MOUSE_INTERACTIONS)
-        resetMouseState();
+        resetClickCount();
 #endif
     } else {
         if (auto callback = m_pendingEagerNavigationInBrowsingContextCallbacksPerFrame.take(frame.frameID())) {
@@ -1942,38 +1942,24 @@ void WebAutomationSession::viewportInViewCenterPointOfElement(WebPageProxy& page
 #if ENABLE(WEBDRIVER_MOUSE_INTERACTIONS)
 void WebAutomationSession::updateClickCount(MouseButton button, const WebCore::IntPoint& position, Seconds maxTime, int maxDistance)
 {
-    if (button != MouseButton::Left) {
-        m_lastClickPosition.reset();
-        m_clickCount = 1;
-        return;
-    }
-
     auto now = MonotonicTime::now();
-    if (!m_lastClickPosition || m_lastClickPosition->distanceSquaredToPoint(position) > maxDistance || now - m_lastClickTime > maxTime) {
-        m_lastClickPosition = position;
+    if (now - m_lastClickTime < maxTime && button == m_lastClickButton && m_lastClickPosition.distanceSquaredToPoint(position) < maxDistance) {
+        m_clickCount++;
         m_lastClickTime = now;
-        m_clickCount = 1;
         return;
     }
 
+    m_clickCount = 1;
     m_lastClickTime = now;
-    ++m_clickCount;
+    m_lastClickButton = button;
+    m_lastClickPosition = position;
 }
 
-void WebAutomationSession::updateLastPosition(const WebCore::IntPoint& position, int maxDistance)
-{
-    // Cancel multiple clicks if mouse strays too far:
-    if (m_lastClickPosition && m_lastClickPosition->distanceSquaredToPoint(position) > maxDistance)
-        m_lastClickPosition.reset();
-
-    m_lastPosition = position;
-}
-
-void WebAutomationSession::resetMouseState()
+void WebAutomationSession::resetClickCount()
 {
     m_clickCount = 1;
-    m_lastPosition.reset();
-    m_lastClickPosition.reset();
+    m_lastClickButton = MouseButton::None;
+    m_lastClickPosition = { };
 }
 
 void WebAutomationSession::simulateMouseInteraction(WebPageProxy& page, MouseInteraction interaction, MouseButton mouseButton, const WebCore::IntPoint& locationInViewport, const String& pointerType, CompletionHandler<void(std::optional<AutomationCommandError>)>&& completionHandler)
