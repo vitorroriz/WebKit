@@ -324,7 +324,8 @@ class ServicesFactory(Factory):
         # TODO: update unit-tests for Buildbot 4, see https://bugs.webkit.org/show_bug.cgi?id=299036
         # self.addStep(RunBuildWebKitOrgUnitTests())
         self.addStep(RunBuildbotCheckConfigForBuildWebKit())
-        self.addStep(RunEWSUnitTests())
+        # TODO: update EWS unit-tests for Buildbot 4, see https://bugs.webkit.org/show_bug.cgi?id=300401
+        # self.addStep(RunEWSUnitTests())
         self.addStep(RunBuildbotCheckConfigForEWS())
         self.addStep(RunResultsdbpyTests())
 

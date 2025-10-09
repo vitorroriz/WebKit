@@ -788,7 +788,6 @@ class TestExpectedBuildSteps(unittest.TestCase):
             'checkout-pull-request',
             'validate-change',
             'buildbot-check-config-for-build-webkit',
-            'ews-unit-tests',
             'buildbot-check-config-for-ews',
             'resultsdbpy-unit-tests'
         ],
