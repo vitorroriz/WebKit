@@ -2443,8 +2443,6 @@ webkit.org/b/261667 css3/masking/mask-reference-png-fragment.html [ ImageOnlyFai
 
 webkit.org/b/142175 js/promises-tests/promises-tests-2-1-2.html [ Pass Timeout ]
 
-webkit.org/b/139840 fast/xmlhttprequest/xmlhttprequest-recursive-sync-event.html [ Pass Failure ]
-
 webkit.org/b/140043 js/dom/Promise.html [ Pass Failure ]
 
 webkit.org/b/134550 http/tests/cache/iframe-304-crash.html [ Failure Pass ]
