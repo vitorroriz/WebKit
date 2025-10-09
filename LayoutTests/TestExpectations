@@ -6947,11 +6947,6 @@ imported/w3c/web-platform-tests/navigation-api/ordering-and-transition/reload-no
 imported/w3c/web-platform-tests/navigation-api/ordering-and-transition/transition-to.tentative.html [ Skip ]
 imported/w3c/web-platform-tests/navigation-api/precommit-handler/ [ Skip ]
 
-# rdar://160391355
-imported/w3c/web-platform-tests/navigation-api/navigate-event/navigate-form-reload.html [ Failure ]
-imported/w3c/web-platform-tests/navigation-api/navigate-event/navigate-form-traverse.html [ Failure ]
-imported/w3c/web-platform-tests/navigation-api/navigate-event/navigate-form-with-target.html [ Failure ]
-
 # -- View Transitions -- #
 
 imported/w3c/web-platform-tests/css/css-view-transitions/pseudo-element-overflow-clip-with-border-radius.html [ ImageOnlyFailure ]
