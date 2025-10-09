@@ -354,15 +354,13 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 
 - (WebCore::IntDegrees)_deviceOrientationIgnoringOverrides
 {
-    auto orientation = UIInterfaceOrientationUnknown;
-    auto application = UIApplication.sharedApplication;
+    return deviceOrientationForUIInterfaceOrientation([&] {
+        if (auto windowScene = self.window.windowScene)
+            return windowScene.effectiveGeometry.interfaceOrientation;
 ALLOW_DEPRECATED_DECLARATIONS_BEGIN
-    if (!application._appAdoptsUISceneLifecycle)
-        orientation = application.statusBarOrientation;
+        return UIApplication.sharedApplication.statusBarOrientation;
 ALLOW_DEPRECATED_DECLARATIONS_END
-    else if (auto windowScene = self.window.windowScene)
-        orientation = windowScene.effectiveGeometry.interfaceOrientation;
-    return deviceOrientationForUIInterfaceOrientation(orientation);
+    }());
 }
 
 - (void)_dynamicUserInterfaceTraitDidChange
