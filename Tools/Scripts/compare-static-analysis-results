@@ -87,7 +87,7 @@ def parser():
     )
     config_options = parser.add_argument_group('Configuration options')
     config_options.add_argument('--architecture')
-    config_options.add_argument('--platform')
+    config_options.add_argument('--platform', default='mac')
     config_options.add_argument('--version')
     config_options.add_argument('--version-name')
     config_options.add_argument('--style')
