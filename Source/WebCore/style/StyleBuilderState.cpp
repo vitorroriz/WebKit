@@ -246,7 +246,7 @@ void BuilderState::updateFontForSizeChange()
     auto fontSize = fontCascade.size();
 
     auto newWordSpacing = evaluate<float>(m_style.computedWordSpacing(), fontSize, ZoomNeeded { });
-    auto newLetterSpacing = evaluate<float>(m_style.computedLetterSpacing(), fontSize, ZoomNeeded { });
+    auto newLetterSpacing = evaluate<float>(m_style.computedLetterSpacing(), fontSize, m_style.usedZoomForLength());
 
     if (newWordSpacing != fontCascade.wordSpacing())
         fontCascade.setWordSpacing(newWordSpacing);
