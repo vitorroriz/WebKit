@@ -1796,6 +1796,56 @@ TEST(SiteIsolation, MultipleReloads)
 }
 
 #if PLATFORM(MAC)
+TEST(SiteIsolation, GeneratesPageLoadTimingAfterOnUnloadFetch)
+{
+    // FIXME: this is a bit more convoluted than it needs to be due to didGeneratePageLoadTiming not working unless the page has at least one subresource load.
+    HTTPServer server({
+        { "/1"_s, { "<iframe src='https://example.com/iframe'></iframe><script src='/script'></script> 1"_s } },
+        { "/2"_s, { "<iframe src='https://example.com/iframe'></iframe><script src='/script'></script> 2"_s } },
+        { "/iframe"_s, { "<script>window.addEventListener('unload', () => fetch('/foobar', { keepalive: true }))</script> <script src='/script'></script>"_s } },
+        { "/foobar"_s, { "foobar"_s } },
+        { "/script"_s, { "console.log('hello from script')"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    __block bool didGeneratePageLoadTiming = false;
+
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server, CGRectMake(0, 0, 400, 400));
+    navigationDelegate.get().didGeneratePageLoadTiming = ^(_WKPageLoadTiming *timing) {
+        if (timing)
+            didGeneratePageLoadTiming = true;
+    };
+
+    RetainPtr window = adoptNS([[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 400, 400) styleMask:0 backing:NSBackingStoreBuffered defer:NO]);
+    [window.get().contentView addSubview:webView.get()];
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://webkit.org/1"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    checkFrameTreesInProcesses(webView.get(), {
+        { "https://webkit.org"_s, { { RemoteFrame } } },
+        { RemoteFrame, { { "https://example.com"_s } } }
+    });
+
+    for (int i = 0; i < 20 && !didGeneratePageLoadTiming; i++)
+        TestWebKitAPI::Util::runFor(0.1_s);
+
+    EXPECT_TRUE(didGeneratePageLoadTiming);
+    didGeneratePageLoadTiming = false;
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://webkit.org/2"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    checkFrameTreesInProcesses(webView.get(), {
+        { "https://webkit.org"_s, { { RemoteFrame } } },
+        { RemoteFrame, { { "https://example.com"_s } } }
+    });
+
+    for (int i = 0; i < 20 && !didGeneratePageLoadTiming; i++)
+        TestWebKitAPI::Util::runFor(0.1_s);
+
+    EXPECT_TRUE(didGeneratePageLoadTiming);
+}
+
 TEST(SiteIsolation, PropagateMouseEventsToSubframe)
 {
     auto mainframeHTML = "<script>"

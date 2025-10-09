@@ -470,6 +470,13 @@ void WebFrameProxy::disconnect()
         parentFrame->m_childFrames.remove(*this);
 }
 
+bool WebFrameProxy::isConnected() const
+{
+    if (RefPtr parentFrame = m_parentFrame.get())
+        return parentFrame->m_childFrames.contains(*this);
+    return false;
+}
+
 void WebFrameProxy::didCreateSubframe(WebCore::FrameIdentifier frameID, String&& frameName, SandboxFlags effectiveSandboxFlags, ReferrerPolicy effectiveReferrerPolicy, WebCore::ScrollbarMode scrollingMode)
 {
     // The DecidePolicyForNavigationActionSync IPC is synchronous and may therefore get processed before the DidCreateSubframe one.
