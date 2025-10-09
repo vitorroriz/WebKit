@@ -56,6 +56,7 @@
 #include "DocumentPage.h"
 #include "DocumentSecurityOrigin.h"
 #include "DynamicsCompressorNode.h"
+#include "Event.h"
 #include "EventNames.h"
 #include "EventTargetInterfaces.h"
 #include "FFTFrame.h"
