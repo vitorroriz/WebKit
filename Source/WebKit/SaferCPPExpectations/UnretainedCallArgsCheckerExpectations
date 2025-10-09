@@ -22,7 +22,6 @@ UIProcess/API/C/mac/WKProtectionSpaceNS.mm
 UIProcess/API/Cocoa/NSAttributedString.mm
 UIProcess/API/Cocoa/WKDownload.mm
 UIProcess/API/Cocoa/WKFrameInfo.mm
-UIProcess/API/Cocoa/WKNSURLAuthenticationChallenge.mm
 UIProcess/API/Cocoa/WKNavigationAction.mm
 UIProcess/API/Cocoa/WKNavigationResponse.mm
 UIProcess/API/Cocoa/WKProcessPool.mm
