@@ -17,9 +17,9 @@ accessibility/AccessibilityRenderObject.cpp
 accessibility/AccessibilityScrollView.cpp
 accessibility/AccessibilitySlider.cpp
 accessibility/cocoa/AccessibilityObjectCocoa.mm
-accessibility/isolatedtree/AXIsolatedObject.cpp
-accessibility/isolatedtree/AXIsolatedTree.cpp
-accessibility/mac/AccessibilityObjectMac.mm
+[ Mac ] accessibility/isolatedtree/AXIsolatedObject.cpp
+[ Mac ] accessibility/isolatedtree/AXIsolatedTree.cpp
+[ Mac ] accessibility/mac/AccessibilityObjectMac.mm
 animation/AcceleratedEffectStackUpdater.cpp
 animation/BlendingKeyframes.cpp
 animation/DocumentTimeline.cpp
@@ -101,7 +101,7 @@ dom/TreeScope.cpp
 dom/TypedElementDescendantIteratorInlines.h
 dom/ViewTransition.cpp
 dom/mac/ImageControlsMac.cpp
-editing/AlternativeTextController.cpp
+[ Mac ] editing/AlternativeTextController.cpp
 editing/ApplyBlockElementCommand.cpp
 editing/ApplyStyleCommand.cpp
 editing/BreakBlockquoteCommand.cpp
@@ -130,8 +130,8 @@ editing/cocoa/DictionaryLookup.mm
 editing/cocoa/EditingHTMLConverter.mm
 editing/cocoa/NodeHTMLConverter.mm
 editing/cocoa/WebContentReaderCocoa.mm
-editing/mac/EditorMac.mm
-editing/mac/FrameSelectionMac.mm
+[ Mac ] editing/mac/EditorMac.mm
+[ Mac ] editing/mac/FrameSelectionMac.mm
 editing/markup.cpp
 history/CachedFrame.cpp
 html/Autofill.cpp
@@ -258,7 +258,7 @@ loader/cache/CachedImage.cpp
 loader/cache/MemoryCache.cpp
 mathml/MathMLSelectElement.cpp
 page/AutoscrollController.cpp
-page/ContextMenuController.cpp
+[ Mac ] page/ContextMenuController.cpp
 page/DeviceController.cpp
 page/DragController.cpp
 page/ElementTargetingController.cpp
@@ -290,9 +290,9 @@ page/ScrollBehavior.cpp
 page/SpatialNavigation.cpp
 page/TextIndicator.cpp
 page/WorkerNavigator.cpp
-page/mac/EventHandlerMac.mm
-page/mac/ImageOverlayControllerMac.mm
-page/mac/ServicesOverlayController.mm
+[ Mac ] page/mac/EventHandlerMac.mm
+[ Mac ] page/mac/ImageOverlayControllerMac.mm
+[ Mac ] page/mac/ServicesOverlayController.mm
 page/scrolling/AsyncScrollingCoordinator.cpp
 page/scrolling/ScrollAnchoringController.cpp
 page/scrolling/ScrollSnapOffsetsInfo.cpp
@@ -546,9 +546,26 @@ svg/graphics/SVGImage.cpp
 svg/properties/SVGAnimatedString.cpp
 svg/properties/SVGAnimationAdditiveValueFunctionImpl.cpp
 testing/Internals.cpp
-testing/Internals.mm
+[ Mac ]  testing/Internals.mm
 testing/ServiceWorkerInternals.cpp
 testing/js/WebCoreTestSupport.cpp
 workers/WorkerGlobalScope.cpp
 workers/WorkerOrWorkletThread.cpp
 workers/WorkerRunLoop.cpp
+[ iOS ] accessibility/cocoa/AXTextMarkerCocoa.mm
+[ iOS ] accessibility/ios/AccessibilityObjectIOS.mm
+[ iOS ] accessibility/ios/WebAccessibilityObjectWrapperIOS.mm
+[ iOS ] editing/cocoa/EditorCocoa.mm
+[ iOS ] editing/ios/DictationCommandIOS.cpp
+[ iOS ] html/HTMLAnchorElement.cpp
+[ iOS ] html/HTMLImageLoader.cpp
+[ iOS ] page/Chrome.cpp
+[ iOS ] page/DOMTimer.cpp
+[ iOS ] page/ios/ContentChangeObserver.cpp
+[ iOS ] page/ios/EventHandlerIOS.mm
+[ iOS ] page/ios/FrameIOS.mm
+[ iOS ] platform/ios/DragImageIOS.mm
+[ iOS ] platform/ios/PasteboardIOS.mm
+[ iOS ] platform/ios/WebVideoFullscreenControllerAVKit.mm
+[ iOS ] rendering/RenderLineBreak.cpp
+[ iOS ] rendering/ios/RenderThemeIOS.mm
