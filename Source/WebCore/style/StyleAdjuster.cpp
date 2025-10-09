@@ -1012,6 +1012,16 @@ void Adjuster::adjustForSiteSpecificQuirks(RenderStyle& style) const
             style.setUserSelect(UserSelect::None);
     }
 
+    if (auto tikTokOverflowingContentQuery = m_document->quirks().needsTikTokOverflowingContentQuirk(*m_element, m_parentStyle)) {
+        if (*tikTokOverflowingContentQuery == Quirks::TikTokOverflowingContentQuirkType::CommentsSectionQuirk)  {
+            style.setFlexShrink({ 1 });
+            style.setMinWidth(0_css_px);
+        } else {
+            ASSERT(tikTokOverflowingContentQuery == Quirks::TikTokOverflowingContentQuirkType::VideoSectionQuirk);
+            style.setFlexShrink({ 2 });
+        }
+    }
+
 #if PLATFORM(MAC)
     if (m_document->quirks().needsZomatoEmailLoginLabelQuirk()) {
         static MainThreadNeverDestroyed<const AtomString> class1("eNjKGZ"_s);

@@ -1990,6 +1990,65 @@ bool Quirks::needsNowPlayingFullscreenSwapQuirk() const
     return needsQuirks() && m_quirksData.needsNowPlayingFullscreenSwapQuirk;
 }
 
+// tiktok.com rdar://149712691
+std::optional<Quirks::TikTokOverflowingContentQuirkType> Quirks::needsTikTokOverflowingContentQuirk(const Element& element, const RenderStyle& parentStyle) const
+{
+    if (!needsQuirks())
+        return { };
+
+    if (parentStyle.display() != DisplayType::Flex)
+        return { };
+
+    if (parentStyle.position() != PositionType::Fixed)
+        return { };
+
+    if (!element.elementData())
+        return { };
+
+    static LazyNeverDestroyed<AtomString> contentContainerSubstring;
+    static std::once_flag contentContainerSubstringOnceKey;
+    std::call_once(contentContainerSubstringOnceKey, [&] {
+        contentContainerSubstring.construct("DivContentContainer"_s);
+    });
+
+    static LazyNeverDestroyed<AtomString> videoContainerSubstring;
+    static std::once_flag videoContainerSubstringOnceKey;
+    std::call_once(videoContainerSubstringOnceKey, [&] {
+        videoContainerSubstring.construct("DivVideoContainer"_s);
+    });
+
+    static LazyNeverDestroyed<AtomString> browserModeContainerSubstring;
+    static std::once_flag browserModeContainerSubstringOnceKey;
+    std::call_once(browserModeContainerSubstringOnceKey, [&] {
+        browserModeContainerSubstring.construct("DivBrowserModeContainer"_s);
+    });
+
+    auto parentElementClassNamesContainsBrowserModeContainerSubstring = [&] {
+        RefPtr parentElement = element.parentElement();
+        if (!parentElement || !parentElement->elementData())
+            return false;
+
+        for (auto& className : parentElement->classNames()) {
+            if (className.contains(browserModeContainerSubstring.get()))
+                return true;
+        }
+        return false;
+    };
+
+    if (!parentElementClassNamesContainsBrowserModeContainerSubstring())
+        return { };
+
+    for (auto& className : element.classNames()) {
+        if (className.contains(contentContainerSubstring.get()))
+            return TikTokOverflowingContentQuirkType::CommentsSectionQuirk;
+
+        if (className.contains(videoContainerSubstring.get()))
+            return TikTokOverflowingContentQuirkType::VideoSectionQuirk;
+    }
+
+    return { };
+}
+
 bool Quirks::needsWebKitMediaTextTrackDisplayQuirk() const
 {
     return needsQuirks() && m_quirksData.needsWebKitMediaTextTrackDisplayQuirk;
@@ -2292,6 +2351,16 @@ static void handleWeatherQuirks(QuirksData& quirksData, const URL& quirksURL, co
     quirksData.needsFormControlToBeMouseFocusableQuirk = true;
 }
 #endif
+
+static void handleTikTokQuirks(QuirksData& quirksData, const URL& quirksURL, const String& quirksDomainString, const URL& documentURL)
+{
+    UNUSED_VARIABLE(quirksURL);
+    UNUSED_VARIABLE(documentURL);
+    if (quirksDomainString != "tiktok.com"_s)
+        return;
+
+    quirksData.needsTikTokOverflowingContentQuirk = true;
+}
 
 #if PLATFORM(IOS_FAMILY)
 static void handleDisneyPlusQuirks(QuirksData& quirksData, const URL& quirksURL, const String& quirksDomainString, const URL& documentURL)
@@ -3156,6 +3225,7 @@ void Quirks::determineRelevantQuirks()
         { "theguardian"_s, &handleGuardianQuirks },
         { "thesaurus"_s, &handleScriptToEvaluateBeforeRunningScriptFromURLQuirk },
 #endif
+        { "tiktok"_s, &handleTikTokQuirks },
 #if PLATFORM(MAC)
         { "trix-editor"_s, &handleTrixEditorQuirks },
 #endif
