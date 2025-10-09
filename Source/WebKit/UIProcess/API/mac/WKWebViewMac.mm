@@ -2068,7 +2068,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     if (!snapshot)
         return nil;
 
-    return [[NSImage alloc] initWithCGImage:snapshot.get() size:NSZeroSize];
+    SUPPRESS_RETAINPTR_CTOR_ADOPT return [[NSImage alloc] initWithCGImage:snapshot.get() size:NSZeroSize];
 }
 @end
 

@@ -116,7 +116,7 @@
 
 id <_WKObservablePageState> WKPageCreateObservableState(WKPageRef pageRef)
 {
-    return [[WKObservablePageState alloc] initWithPage:WebKit::toImpl(pageRef)];
+    SUPPRESS_RETAINPTR_CTOR_ADOPT return [[WKObservablePageState alloc] initWithPage:WebKit::toImpl(pageRef)];
 }
 
 _WKRemoteObjectRegistry *WKPageGetObjectRegistry(WKPageRef pageRef)
