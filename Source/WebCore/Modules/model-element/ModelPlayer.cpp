@@ -110,7 +110,7 @@ String ModelPlayer::inlinePreviewUUIDForTesting() const
     return emptyString();
 }
 
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
 void ModelPlayer::setAutoplay(bool)
 {
 }
@@ -157,9 +157,11 @@ void ModelPlayer::setHasPortal(bool)
 {
 }
 
+#if ENABLE(MODEL_PROCESS)
 void ModelPlayer::setStageMode(StageModeOperation)
 {
 }
+#endif
 
 void ModelPlayer::beginStageModeTransform(const TransformationMatrix&)
 {

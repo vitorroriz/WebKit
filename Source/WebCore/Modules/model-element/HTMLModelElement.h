@@ -67,7 +67,7 @@ template<typename IDLType> class DOMPromiseDeferred;
 template<typename IDLType> class DOMPromiseProxyWithResolveCallback;
 template<typename> class ExceptionOr;
 
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
 template<typename IDLType> class DOMPromiseProxy;
 class ModelContext;
 #endif
@@ -105,8 +105,11 @@ public:
     std::optional<LayerHostingContextIdentifier> layerHostingContextIdentifier() const;
 
     std::optional<PlatformLayerIdentifier> layerID() const;
+    WEBCORE_EXPORT const MachSendRight* displayBuffer() const;
+    GraphicsLayerContentsDisplayDelegate* contentsDisplayDelegate();
+    RefPtr<GraphicsLayer> graphicsLayer() const;
 
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
     RefPtr<ModelContext> modelContext() const;
 
     const DOMMatrixReadOnly& entityTransform() const;
@@ -114,7 +117,8 @@ public:
 
     const DOMPointReadOnly& boundingBoxCenter() const;
     const DOMPointReadOnly& boundingBoxExtents() const;
-
+#endif
+#if ENABLE(MODEL_PROCESS)
     using EnvironmentMapPromise = DOMPromiseProxy<IDLUndefined>;
     EnvironmentMapPromise& environmentMapReady() { return m_environmentMapReadyPromise.get(); }
 #endif
@@ -151,7 +155,7 @@ public:
 
     bool isInteractive() const;
 
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
     double playbackRate() const { return m_playbackRate; }
     void setPlaybackRate(double);
     double duration() const;
@@ -204,8 +208,6 @@ private:
     void startLoadModelTimer();
     void loadModelTimerFired();
 
-    RefPtr<GraphicsLayer> graphicsLayer() const;
-
     HTMLModelElement& readyPromiseResolve();
 
     CachedResourceRequest createResourceRequest(const URL&, FetchOptions::Destination);
@@ -238,7 +240,7 @@ private:
     void didUpdateLayerHostingContextIdentifier(ModelPlayer&, LayerHostingContextIdentifier) final;
     void didFinishLoading(ModelPlayer&) final;
     void didFailLoading(ModelPlayer&, const ResourceError&) final;
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
     void didUpdateEntityTransform(ModelPlayer&, const TransformationMatrix&) final;
     void didUpdateBoundingBox(ModelPlayer&, const FloatPoint3D&, const FloatPoint3D&) final;
     void didFinishEnvironmentMapLoading(bool succeeded) final;
@@ -264,7 +266,7 @@ private:
 
     void reportExtraMemoryCost();
 
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
     bool autoplay() const;
     void updateAutoplay();
     bool loop() const;
@@ -276,6 +278,8 @@ private:
     void environmentMapResourceFinished();
     bool hasPortal() const;
     void updateHasPortal();
+#endif
+#if ENABLE(MODEL_PROCESS)
     WebCore::StageModeOperation stageMode() const;
     void updateStageMode();
 #endif
@@ -287,6 +291,9 @@ private:
     bool isModelLoaded() const;
     bool isModelUnloading() const;
     bool isModelUnloaded() const;
+#if ENABLE(GPUP_MODEL)
+    void didUpdateDisplayDelegate() const final;
+#endif
 
     URL m_sourceURL;
     CachedResourceHandle<CachedRawResource> m_resource;
@@ -303,7 +310,7 @@ private:
 
     RefPtr<ModelPlayer> m_modelPlayer;
     EventLoopTimerHandle m_loadModelTimer;
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
     Ref<DOMMatrixReadOnly> m_entityTransform;
     Ref<DOMPointReadOnly> m_boundingBoxCenter;
     Ref<DOMPointReadOnly> m_boundingBoxExtents;
@@ -311,6 +318,8 @@ private:
     URL m_environmentMapURL;
     SharedBufferBuilder m_environmentMapData;
     mutable std::atomic<size_t> m_environmentMapDataMemoryCost { 0 };
+#endif
+#if ENABLE(MODEL_PROCESS)
     CachedResourceHandle<CachedRawResource> m_environmentMapResource;
     UniqueRef<EnvironmentMapPromise> m_environmentMapReadyPromise;
 #endif

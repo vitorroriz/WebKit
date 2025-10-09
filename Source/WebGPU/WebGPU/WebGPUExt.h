@@ -115,6 +115,12 @@ typedef struct WGPUDDMeshDescriptor {
     Vector<WGPUDDVertexLayout> vertexLayouts;
 } WGPUDDMeshDescriptor;
 
+typedef struct WGPUDDCreateMeshDescriptor {
+    unsigned width;
+    unsigned height;
+    Vector<RetainPtr<IOSurfaceRef>> ioSurfaces;
+} WGPUDDCreateMeshDescriptor;
+
 const int WGPUTextureSampleType_ExternalTexture = WGPUTextureSampleType_Force32 - 1;
 
 typedef struct WGPUExternalTextureBindingLayout {
@@ -139,8 +145,10 @@ typedef WGPUTexture (*WGPUProcSwapChainGetCurrentTexture)(WGPUSwapChain swapChai
 
 #if !defined(WGPU_SKIP_DECLARATIONS)
 
-WGPU_EXPORT WGPUDDMesh wgpuDDMeshCreate(WGPUInstance instance, const WGPUDDMeshDescriptor* descriptor);
+WGPU_EXPORT WGPUDDMesh wgpuDDMeshCreate(WGPUInstance instance, const WGPUDDCreateMeshDescriptor* descriptor);
+WGPU_EXPORT void wgpuDDMeshAdd(WGPUDDMesh mesh, WGPUDDMeshDescriptor*);
 WGPU_EXPORT void wgpuDDMeshUpdate(WGPUDDMesh mesh, WGPUDDUpdateMeshDescriptor*);
+WGPU_EXPORT void wgpuDDMeshRender(WGPUDDMesh mesh);
 
 WGPU_EXPORT void wgpuRenderBundleSetLabel(WGPURenderBundle renderBundle, char const * label);
 

@@ -28,6 +28,7 @@
 #include <WebCore/DDMesh.h>
 #include <WebCore/DDMeshDescriptor.h>
 #include <WebCore/DDUpdateMeshDescriptor.h>
+#include <WebCore/ModelDDTypes.h>
 
 namespace WebCore {
 static DDModel::DDVertexAttributeFormat toCpp(WebDDVertexAttributeFormat *format)

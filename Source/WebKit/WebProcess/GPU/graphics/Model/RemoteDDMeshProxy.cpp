@@ -48,24 +48,56 @@ RemoteDDMeshProxy::RemoteDDMeshProxy(Ref<RemoteGPUProxy>&& root, ConvertToBackin
 
 RemoteDDMeshProxy::~RemoteDDMeshProxy()
 {
+#if ENABLE(GPUP_MODEL)
     auto sendResult = send(Messages::RemoteDDMesh::Destruct());
     UNUSED_VARIABLE(sendResult);
+#endif
+}
+
+void RemoteDDMeshProxy::addMesh(const WebCore::DDModel::DDMeshDescriptor& descriptor)
+{
+#if ENABLE(GPUP_MODEL)
+    auto convertedDescriptor = m_convertToBackingContext->convertToBacking(descriptor);
+    if (!convertedDescriptor)
+        return;
+
+    auto sendResult = send(Messages::RemoteDDMesh::AddMesh(*convertedDescriptor));
+    UNUSED_PARAM(sendResult);
+#else
+    UNUSED_PARAM(descriptor);
+#endif
 }
 
 void RemoteDDMeshProxy::update(const WebCore::DDModel::DDUpdateMeshDescriptor& descriptor)
 {
+#if ENABLE(GPUP_MODEL)
     auto convertedDescriptor = m_convertToBackingContext->convertToBacking(descriptor);
     if (!convertedDescriptor)
         return;
 
     auto sendResult = send(Messages::RemoteDDMesh::Update(*convertedDescriptor));
     UNUSED_PARAM(sendResult);
+#else
+    UNUSED_PARAM(descriptor);
+#endif
+}
+
+void RemoteDDMeshProxy::render()
+{
+#if ENABLE(GPUP_MODEL)
+    auto sendResult = send(Messages::RemoteDDMesh::Render());
+    UNUSED_PARAM(sendResult);
+#endif
 }
 
 void RemoteDDMeshProxy::setLabelInternal(const String& label)
 {
+#if ENABLE(GPUP_MODEL)
     auto sendResult = send(Messages::RemoteDDMesh::SetLabel(label));
     UNUSED_VARIABLE(sendResult);
+#else
+    UNUSED_PARAM(label);
+#endif
 }
 
 }

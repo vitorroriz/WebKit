@@ -256,9 +256,13 @@ extension MTLCaptureDescriptor {
 
         captureObject = device
         destination = .gpuTraceDocument
-        let url = URL.temporaryDirectory.appending(path: "capture.gputrace").standardizedFileURL
-        outputURL = url
-        Logger.modelGPU.info("Captured gpu trace at \(url)")
+        let now = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = .current
+        dateFormatter.dateFormat = "yyyy-MM-dd-HH-mm-ss-SSSS"
+        let dateString = dateFormatter.string(from: now)
+
+        outputURL = URL.temporaryDirectory.appending(path: "capture_\(dateString).gputrace").standardizedFileURL
     }
 }
 

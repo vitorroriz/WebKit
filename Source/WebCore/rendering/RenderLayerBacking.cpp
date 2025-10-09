@@ -1327,8 +1327,13 @@ bool RenderLayerBacking::updateConfiguration(const RenderLayer* compositingAnces
             m_graphicsLayer->setContentsToModelContext(*modelContext, GraphicsLayer::ContentsLayerPurpose::HostedModel);
         }
 #endif
-        else if (auto model = element->model())
+        else if (auto model = element->model()) {
+#if ENABLE(GPUP_MODEL)
+            m_graphicsLayer->setContentsDisplayDelegate(element->contentsDisplayDelegate(), GraphicsLayer::ContentsLayerPurpose::Canvas);
+#else
             m_graphicsLayer->setContentsToModel(WTFMove(model), element->isInteractive() ? GraphicsLayer::ModelInteraction::Enabled : GraphicsLayer::ModelInteraction::Disabled);
+#endif
+        }
 
         element->sizeMayHaveChanged();
 
@@ -3466,6 +3471,10 @@ void RenderLayerBacking::contentChanged(ContentChangeType changeType, const std:
 
 #if ENABLE(MODEL_ELEMENT)
     if (changeType == ContentChangeType::Model) {
+#if ENABLE(GPUP_MODEL)
+        if (m_graphicsLayer && m_graphicsLayer->drawsContent())
+            m_graphicsLayer->setNeedsDisplay();
+#endif
         compositor().scheduleCompositingLayerUpdate();
         return;
     }

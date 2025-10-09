@@ -266,18 +266,20 @@ void RemoteGPU::paintNativeImageToImageBuffer(WebCore::NativeImage& nativeImage,
     semaphore.wait();
 }
 
-void RemoteGPU::addMeshRequest(const DDModel::DDMeshDescriptor& descriptor, DDModelIdentifier identifier)
+void RemoteGPU::createModelBacking(unsigned width, unsigned height, DDModelIdentifier identifier, CompletionHandler<void(Vector<MachSendRight>&&)>&& callback)
 {
     assertIsCurrent(workQueue());
 
     Ref objectHeap = m_modelObjectHeap.get();
-    auto convertedDescriptor = objectHeap->convertFromBacking(descriptor);
-    MESSAGE_CHECK(convertedDescriptor);
 
     RefPtr gpu = m_backing.get();
-    auto mesh = gpu->addMeshRequest(*convertedDescriptor);
+    auto mesh = gpu->createModelBacking(width, height, WTFMove(callback));
+#if ENABLE(GPUP_MODEL)
     auto remoteMesh = RemoteDDMesh::create(*m_gpuConnectionToWebProcess.get(), *this, *mesh, objectHeap, Ref { *m_streamConnection }, identifier);
     objectHeap->addObject(identifier, remoteMesh);
+#else
+    UNUSED_PARAM(mesh);
+#endif
 }
 
 void RemoteGPU::isValid(WebGPUIdentifier identifier, CompletionHandler<void(bool, bool)>&& completionHandler)

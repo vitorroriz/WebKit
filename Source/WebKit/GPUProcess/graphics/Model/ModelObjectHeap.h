@@ -75,7 +75,11 @@ private:
 
     using Object = Variant<
         std::monostate,
+#if ENABLE(GPUP_MODEL)
         IPC::ScopedActiveMessageReceiveQueue<RemoteDDMesh>
+#else
+        uint32_t
+#endif
     >;
 
     HashMap<DDModelIdentifier, Object> m_objects;

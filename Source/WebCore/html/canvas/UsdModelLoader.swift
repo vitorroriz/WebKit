@@ -615,10 +615,12 @@ final class Converter {
         if request.instanceTransforms.count > 0 {
             let countMinusOne = request.instanceTransforms.count - 1
             webRequestInstanceTransforms = WebChainedFloat4x4(transform: request.instanceTransforms[0])
-            var instanceTransforms = webRequest.instanceTransforms
-            for i in 1...countMinusOne {
-                instanceTransforms?.next = WebChainedFloat4x4(transform: request.instanceTransforms[i])
-                instanceTransforms = instanceTransforms?.next
+            var instanceTransforms = webRequestInstanceTransforms
+            if countMinusOne > 0 {
+                for i in 1...countMinusOne {
+                    instanceTransforms?.next = WebChainedFloat4x4(transform: request.instanceTransforms[i])
+                    instanceTransforms = instanceTransforms?.next
+                }
             }
         }
 
@@ -665,6 +667,7 @@ extension WebUSDModelLoader {
 
         self.renderer = USDModelLoader(objcInstance: self)
     }
+
     @objc(setCallbacksWithModelAddedCallback:modelUpdatedCallback:)
     func setCallbacksWithModelAddedCallback(
         _ modelAddedCallback: @escaping ((WebAddMeshRequest) -> (Void)),

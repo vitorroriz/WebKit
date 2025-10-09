@@ -67,7 +67,9 @@ private:
         return root().protectedStreamClientConnection()->send(WTFMove(message), backing());
     }
 
+    void addMesh(const WebCore::DDModel::DDMeshDescriptor&) final;
     void update(const WebCore::DDModel::DDUpdateMeshDescriptor&) final;
+    void render() final;
     void setLabelInternal(const String&) final;
 
     DDModelIdentifier m_backing;

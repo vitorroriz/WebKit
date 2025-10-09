@@ -43,6 +43,7 @@ template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::ModelPlayerC
 
 namespace WebCore {
 
+class HTMLModelElement;
 class ModelPlayer;
 class ResourceError;
 
@@ -53,7 +54,7 @@ public:
     virtual void didUpdateLayerHostingContextIdentifier(ModelPlayer&, LayerHostingContextIdentifier) = 0;
     virtual void didFinishLoading(ModelPlayer&) = 0;
     virtual void didFailLoading(ModelPlayer&, const ResourceError&) = 0;
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
     virtual void didUpdateEntityTransform(ModelPlayer&, const TransformationMatrix&) = 0;
     virtual void didUpdateBoundingBox(ModelPlayer&, const FloatPoint3D&, const FloatPoint3D&) = 0;
     virtual void didFinishEnvironmentMapLoading(bool succeeded) = 0;
@@ -63,6 +64,9 @@ public:
     virtual bool isVisible() const = 0;
     virtual bool isIntersectingViewport() const = 0;
     virtual void logWarning(ModelPlayer&, const String& warningMessage) = 0;
+#if ENABLE(GPUP_MODEL)
+    virtual void didUpdateDisplayDelegate() const = 0;
+#endif
 };
 
 }

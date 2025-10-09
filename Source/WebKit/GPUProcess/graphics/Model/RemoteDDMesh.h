@@ -25,7 +25,7 @@
 
 #pragma once
 
-#if ENABLE(GPU_PROCESS)
+#if ENABLE(GPUP_MODEL)
 
 #include "DDModelIdentifier.h"
 #include "RemoteGPU.h"
@@ -88,7 +88,9 @@ private:
     void destruct();
 
     void setLabel(String&&);
+    void addMesh(const DDModel::DDMeshDescriptor&);
     void update(const DDModel::DDUpdateMeshDescriptor&);
+    void render();
 
     Ref<WebCore::DDModel::DDMesh> m_backing;
     WeakRef<DDModel::ObjectHeap> m_objectHeap;
@@ -100,4 +102,4 @@ private:
 
 } // namespace WebKit
 
-#endif // ENABLE(GPU_PROCESS)
+#endif

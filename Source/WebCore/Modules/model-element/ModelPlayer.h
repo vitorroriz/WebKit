@@ -37,15 +37,22 @@
 #include <wtf/Seconds.h>
 #include <wtf/TZoneMalloc.h>
 
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
 #include <WebCore/ModelPlayerIdentifier.h>
+#endif
+#if ENABLE(MODEL_PROCESS)
 #include <WebCore/StageModeOperations.h>
 #endif
+
+namespace WTF {
+class MachSendRight;
+}
 
 namespace WebCore {
 
 class Color;
 class FloatPoint3D;
+class GraphicsLayerContentsDisplayDelegate;
 class Model;
 class ModelPlayerAnimationState;
 class ModelPlayerTransformState;
@@ -57,7 +64,7 @@ class WEBCORE_EXPORT ModelPlayer : public RefCounted<ModelPlayer> {
 public:
     virtual ~ModelPlayer();
 
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
     virtual ModelPlayerIdentifier identifier() const = 0;
 #endif
 
@@ -100,7 +107,7 @@ public:
 #if PLATFORM(COCOA)
     virtual Vector<RetainPtr<id>> accessibilityChildren() = 0;
 #endif
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
     virtual void setAutoplay(bool);
     virtual void setLoop(bool);
     virtual void setPlaybackRate(double, CompletionHandler<void(double effectivePlaybackRate)>&&);
@@ -111,12 +118,18 @@ public:
     virtual void setCurrentTime(Seconds, CompletionHandler<void()>&&);
     virtual void setEnvironmentMap(Ref<SharedBuffer>&& data);
     virtual void setHasPortal(bool);
-    virtual void setStageMode(StageModeOperation);
     virtual void beginStageModeTransform(const TransformationMatrix&);
     virtual void updateStageModeTransform(const TransformationMatrix&);
     virtual void endStageModeInteraction();
     virtual void animateModelToFitPortal(CompletionHandler<void(bool)>&&);
     virtual void resetModelTransformAfterDrag();
+#endif
+#if ENABLE(MODEL_PROCESS)
+    virtual void setStageMode(StageModeOperation);
+#endif
+#if ENABLE(GPUP_MODEL)
+    virtual const MachSendRight* displayBuffer() const = 0;
+    virtual GraphicsLayerContentsDisplayDelegate* contentsDisplayDelegate() = 0;
 #endif
 };
 

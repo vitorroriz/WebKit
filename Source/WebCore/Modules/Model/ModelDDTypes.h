@@ -60,8 +60,8 @@ NS_HEADER_AUDIT_BEGIN(nullability, sendability)
 @property (nonatomic, readonly) int32_t indexType;
 @property (nonatomic, readonly) int32_t vertexBufferCount;
 @property (nonatomic, readonly) int32_t vertexCapacity;
-@property (nonatomic, readonly) NSArray<WebDDVertexAttributeFormat*> *vertexAttributes;
-@property (nonatomic, readonly) NSArray<WebDDVertexLayout*> *vertexLayouts;
+@property (nonatomic, readonly, strong) NSArray<WebDDVertexAttributeFormat*> *vertexAttributes;
+@property (nonatomic, readonly, strong) NSArray<WebDDVertexLayout*> *vertexLayouts;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithIndexCapacity:(int32_t)indexCapacity indexType:(int32_t)indexType vertexBufferCount:(int32_t)vertexBufferCount vertexCapacity:(int32_t)vertexCapacity vertexAttributes:(NSArray<WebDDVertexAttributeFormat*> *)vertexAttributes vertexLayouts:(NSArray<WebDDVertexLayout*> *)vertexLayouts NS_DESIGNATED_INITIALIZER;
@@ -86,7 +86,7 @@ NS_HEADER_AUDIT_BEGIN(nullability, sendability)
 @interface WebSetPart : NSObject
 
 @property (nonatomic, readonly) long partIndex;
-@property (nonatomic, readonly) WebDDMeshPart *part;
+@property (nonatomic, strong, readonly) WebDDMeshPart *part;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -109,7 +109,7 @@ NS_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @property (nonatomic, readonly) long bufferIndex;
 
-@property (nonatomic, readonly) NSData* buffer;
+@property (nonatomic, strong, readonly) NSData* buffer;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -120,7 +120,7 @@ NS_HEADER_AUDIT_BEGIN(nullability, sendability)
 @interface WebChainedFloat4x4 : NSObject
 
 @property (nonatomic, readonly) simd_float4x4 transform;
-@property (nonatomic, nullable) WebChainedFloat4x4 *next;
+@property (nonatomic, nullable, strong) WebChainedFloat4x4 *next;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithTransform:(simd_float4x4)transform NS_DESIGNATED_INITIALIZER;
@@ -130,13 +130,13 @@ NS_HEADER_AUDIT_BEGIN(nullability, sendability)
 @interface WebUpdateMeshRequest : NSObject
 
 @property (nonatomic, readonly) long partCount;
-@property (nonatomic, nullable, readonly) NSArray<WebSetPart *> *parts;
-@property (nonatomic, nullable, readonly) NSArray<WebSetRenderFlags *> *renderFlags;
-@property (nonatomic, nullable, readonly) NSArray<WebReplaceVertices *> *vertices;
-@property (nonatomic, nullable, readonly) NSData *indices;
+@property (nonatomic, nullable, strong, readonly) NSArray<WebSetPart *> *parts;
+@property (nonatomic, nullable, strong, readonly) NSArray<WebSetRenderFlags *> *renderFlags;
+@property (nonatomic, nullable, strong, readonly) NSArray<WebReplaceVertices *> *vertices;
+@property (nonatomic, nullable, strong, readonly) NSData *indices;
 @property (nonatomic, readonly) simd_float4x4 transform;
-@property (nonatomic, nullable) WebChainedFloat4x4 *instanceTransforms;
-@property (nonatomic, nullable, readonly) NSArray<NSUUID *> *materialIds;
+@property (nonatomic, nullable, strong) WebChainedFloat4x4 *instanceTransforms;
+@property (nonatomic, nullable, strong, readonly) NSArray<NSUUID *> *materialIds;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithPartCount:(long)partCount

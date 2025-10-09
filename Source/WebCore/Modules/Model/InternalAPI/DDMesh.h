@@ -33,6 +33,7 @@
 
 namespace WebCore::DDModel {
 
+struct DDMeshDescriptor;
 struct DDUpdateMeshDescriptor;
 
 class DDMesh : public RefCountedAndCanMakeWeakPtr<DDMesh> {
@@ -47,7 +48,12 @@ public:
         setLabelInternal(m_label);
     }
 
+    virtual void addMesh(const DDMeshDescriptor&) = 0;
     virtual void update(const DDUpdateMeshDescriptor&) = 0;
+    virtual void render() = 0;
+#if PLATFORM(COCOA)
+    virtual Vector<MachSendRight> ioSurfaceHandles() { return { }; }
+#endif
 
 protected:
     DDMesh() = default;

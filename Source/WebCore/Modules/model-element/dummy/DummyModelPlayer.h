@@ -27,6 +27,7 @@
 
 #include <WebCore/ModelPlayer.h>
 #include <WebCore/ModelPlayerClient.h>
+#include <WebCore/ModelPlayerIdentifier.h>
 #include <wtf/Forward.h>
 #include <wtf/Platform.h>
 #include <wtf/WeakPtr.h>
@@ -42,7 +43,7 @@ private:
     DummyModelPlayer(ModelPlayerClient&);
 
     // ModelPlayer overrides.
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
     ModelPlayerIdentifier identifier() const final { return m_id; }
 #endif
     void load(Model&, LayoutSize) override;
@@ -68,9 +69,13 @@ private:
 #if PLATFORM(COCOA)
     Vector<RetainPtr<id>> accessibilityChildren() override;
 #endif
+#if ENABLE(GPUP_MODEL)
+    const MachSendRight* displayBuffer() const override;
+    GraphicsLayerContentsDisplayDelegate* contentsDisplayDelegate() override;
+#endif
 
     WeakPtr<ModelPlayerClient> m_client;
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
     ModelPlayerIdentifier m_id;
 #endif
 };

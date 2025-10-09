@@ -26,7 +26,7 @@
 #include "config.h"
 #include "RemoteDDMesh.h"
 
-#if ENABLE(GPU_PROCESS)
+#if ENABLE(GPUP_MODEL)
 
 #include "DDMeshDescriptor.h"
 #include "GPUConnectionToWebProcess.h"
@@ -86,6 +86,16 @@ Ref<WebCore::DDModel::DDMesh> RemoteDDMesh::protectedBacking()
     return m_backing;
 }
 
+void RemoteDDMesh::addMesh(const DDModel::DDMeshDescriptor& descriptor)
+{
+#if PLATFORM(COCOA)
+    auto convertedDescriptor = m_objectHeap->convertFromBacking(descriptor);
+    protectedBacking()->addMesh(*convertedDescriptor);
+#else
+    UNUSED_PARAM(descriptor);
+#endif
+}
+
 void RemoteDDMesh::update(const DDModel::DDUpdateMeshDescriptor& descriptor)
 {
 #if PLATFORM(COCOA)
@@ -96,8 +106,13 @@ void RemoteDDMesh::update(const DDModel::DDUpdateMeshDescriptor& descriptor)
 #endif
 }
 
+void RemoteDDMesh::render()
+{
+    protectedBacking()->render();
+}
+
 } // namespace WebKit
 
 #undef MESSAGE_CHECK
 
-#endif // ENABLE(GPU_PROCESS)
+#endif

@@ -33,14 +33,16 @@
 #include "ModelConvertToBackingContext.h"
 #include <WebGPU/WebGPUExt.h>
 #include <wtf/TZoneMallocInlines.h>
+#include <WebCore/IOSurface.h>
 
 namespace WebCore::DDModel {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(DDMeshImpl);
 
-DDMeshImpl::DDMeshImpl(WebGPU::WebGPUPtr<WGPUDDMesh>&& ddMesh, ConvertToBackingContext& convertToBackingContext)
+DDMeshImpl::DDMeshImpl(WebGPU::WebGPUPtr<WGPUDDMesh>&& ddMesh, Vector<UniqueRef<WebCore::IOSurface>>&& renderBuffers, ConvertToBackingContext& convertToBackingContext)
     : m_convertToBackingContext(convertToBackingContext)
     , m_backing(WTFMove(ddMesh))
+    , m_renderBuffers(WTFMove(renderBuffers))
 {
 }
 
@@ -89,6 +91,47 @@ static Vector<simd_float4x4> toVector(const Vector<DDFloat4x4>& input)
     return result;
 }
 
+static Vector<WGPUDDVertexAttributeFormat> convertToBacking(const Vector<DDModel::DDVertexAttributeFormat>& descriptor)
+{
+    Vector<WGPUDDVertexAttributeFormat> result;
+    for (auto& d : descriptor) {
+        result.append(WGPUDDVertexAttributeFormat {
+            .semantic = d.semantic,
+            .format = d.format,
+            .layoutIndex = d.layoutIndex,
+            .offset = d.offset
+        });
+    }
+    return result;
+}
+
+static Vector<WGPUDDVertexLayout> convertToBacking(const Vector<DDModel::DDVertexLayout>& descriptor)
+{
+    Vector<WGPUDDVertexLayout> result;
+    for (auto& d : descriptor) {
+        result.append(WGPUDDVertexLayout {
+            .bufferIndex = d.bufferIndex,
+            .bufferOffset = d.bufferOffset,
+            .bufferStride = d.bufferStride,
+        });
+    }
+    return result;
+}
+
+void DDMeshImpl::addMesh(const DDModel::DDMeshDescriptor& descriptor)
+{
+    WGPUDDMeshDescriptor backingDescriptor {
+        .indexCapacity = descriptor.indexCapacity,
+        .indexType = descriptor.indexType,
+        .vertexBufferCount = descriptor.vertexBufferCount,
+        .vertexCapacity = descriptor.vertexCapacity,
+        .vertexAttributes = convertToBacking(descriptor.vertexAttributes),
+        .vertexLayouts = convertToBacking(descriptor.vertexLayouts)
+    };
+
+    wgpuDDMeshAdd(m_backing.get(), &backingDescriptor);
+}
+
 void DDMeshImpl::update(const DDUpdateMeshDescriptor& descriptor)
 {
     WGPUDDUpdateMeshDescriptor backingDescriptor {
@@ -104,8 +147,19 @@ void DDMeshImpl::update(const DDUpdateMeshDescriptor& descriptor)
 
     wgpuDDMeshUpdate(m_backing.get(), &backingDescriptor);
 }
+
+void DDMeshImpl::render()
+{
+    wgpuDDMeshRender(m_backing.get());
+}
 #endif
 
+Vector<MachSendRight> DDMeshImpl::ioSurfaceHandles()
+{
+    return m_renderBuffers.map([](const auto& renderBuffer) {
+        return renderBuffer->createSendRight();
+    });
+}
 
 }
 

@@ -959,7 +959,7 @@
 #endif
 
 #if PLATFORM(MAC)
-#define HAVE_SCENEKIT 1
+#define HAVE_SCENEKIT !ENABLE_GPUP_MODEL
 #endif
 
 #if PLATFORM(COCOA)

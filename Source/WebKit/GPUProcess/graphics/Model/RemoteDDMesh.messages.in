@@ -21,17 +21,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if ENABLE(GPU_PROCESS)
+#if ENABLE(GPUP_MODEL)
 
 [
     DispatchedFrom=WebContent,
     DispatchedTo=GPU,
-    EnabledBy=WebGPUEnabled
+    EnabledBy=ModelElementEnabled
 ]
 messages -> RemoteDDMesh Stream {
     void SetLabel(String label)
     void Destruct()
+    void AddMesh(WebKit::DDModel::DDMeshDescriptor descriptor)
     void Update(WebKit::DDModel::DDUpdateMeshDescriptor descriptor)
+    void Render()
 }
-
 #endif
