@@ -419,9 +419,16 @@ bool RenderBlock::isSelfCollapsingBlock() const
             [](const CSS::Keyword::Auto&) {
                 return true;
             },
+// FIXME(GCC): Can be removed on Aug 9th, 2026 or later.
+#if COMPILER(GCC) && (__GNUC__ < 13)
+            [](auto const&) {
+                return false;
+            }
+#else
             [](CSS::PrimitiveKeyword auto const&) {
                 return false;
             }
+#endif
         );
     };
 
