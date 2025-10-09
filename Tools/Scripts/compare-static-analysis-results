@@ -119,7 +119,7 @@ def find_diff(args, expectation_file_path, results_file_path):
                 print(f'Unexpected line: {line}')
                 continue
             platform = match.group('platform')
-            if platform and arg.platform.lower() != platform.lower():
+            if platform and args.platform.lower() != platform.lower():
                 continue
             baseline_list.append(match.group('path'))
         new_file_list = new_file.read().splitlines()
