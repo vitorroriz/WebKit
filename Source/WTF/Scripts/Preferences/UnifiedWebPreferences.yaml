@@ -2694,7 +2694,7 @@ EnumeratingVisibleNetworkInterfacesEnabled:
 EvaluationTimeZoomEnabled:
   category: css
   type: bool
-  status: unstable
+  status: testable
   humanReadableName: "Evaluation time zoom enabled"
   humanReadableDescription: "Enables used zoom value to be applied during layout and avoid applying at style-build time"
   defaultValue:
