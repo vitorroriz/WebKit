@@ -274,6 +274,8 @@ private:
     // since the validity checking is separate from date parsing.
     // For example, see the test262 test
     // Temporal/PlainDate/prototype/until/throws-if-rounded-date-outside-valid-iso-range.js
+    // FIXME: Change to int32_t and represent out-of-range years using
+    // special Int32, per https://github.com/WebKit/WebKit/pull/52010#discussion_r2414715114
     double m_year;
     int32_t m_month : 5; // Starts with 1.
     int32_t m_day : 6; // Starts with 1.
@@ -287,6 +289,34 @@ public:
     double month;
     PlainYearMonth(double y, double m)
         : year(y), month(m) { }
+};
+
+class PlainMonthDay {
+    WTF_MAKE_TZONE_ALLOCATED(PlainMonthDay);
+public:
+    constexpr PlainMonthDay()
+        : m_isoPlainDate(0, 1, 1)
+    {
+    }
+
+    constexpr PlainMonthDay(unsigned month, int32_t day)
+        : m_isoPlainDate(2, month, day)
+    {
+    }
+
+    constexpr PlainMonthDay(PlainDate&& d)
+        : m_isoPlainDate(d)
+    {
+    }
+
+    friend bool operator==(const PlainMonthDay&, const PlainMonthDay&) = default;
+
+    uint8_t month() const { return m_isoPlainDate.month(); }
+    uint32_t day() const { return m_isoPlainDate.day(); }
+
+    const PlainDate& isoPlainDate() const { return m_isoPlainDate; }
+private:
+    PlainDate m_isoPlainDate;
 };
 
 // https://tc39.es/proposal-temporal/#sec-temporal-parsetemporaltimezonestring
