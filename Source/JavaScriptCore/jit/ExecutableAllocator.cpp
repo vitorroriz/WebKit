@@ -172,6 +172,10 @@ void ExecutableAllocator::disableJIT()
     bool shouldDisableJITMemory = processHasEntitlement("com.apple.security.cs.allow-jit"_s) && !isKernOpenSource();
 #endif
     if (shouldDisableJITMemory) {
+#if PLATFORM(MAC)
+        RELEASE_ASSERT(processHasEntitlement("com.apple.private.verified-jit"));
+        RELEASE_ASSERT(processHasEntitlement("com.apple.security.cs.single-jit"));
+#endif
         // Because of an OS quirk, even after the JIT region has been unmapped,
         // the OS thinks that region is reserved, and as such, can cause Gigacage
         // allocation to fail. We work around this by initializing the Gigacage
