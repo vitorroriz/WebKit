@@ -596,11 +596,10 @@ TEST(WKWebExtensionAPIDeclarativeNetRequest, RemoveSessionRules)
         @"sessionRules = await browser.declarativeNetRequest.getSessionRules({ })",
         @"browser.test.assertEq(sessionRules.length, 3)",
 
-        // FIXME: rdar://162148560 (Unable to remove all dynamic or session rules)
-        @"await browser.declarativeNetRequest.updateSessionRules({ removeRuleIds: [1, 2] })",
+        @"await browser.declarativeNetRequest.updateSessionRules({ removeRuleIds: [1, 2, 3] })",
 
         @"sessionRules = await browser.declarativeNetRequest.getSessionRules({ })",
-        @"browser.test.assertEq(sessionRules.length, 1)",
+        @"browser.test.assertEq(sessionRules.length, 0)",
 
         @"browser.test.notifyPass()"
     ]);
@@ -756,11 +755,10 @@ TEST(WKWebExtensionAPIDeclarativeNetRequest, RemoveDynamicRules)
         @"dynamicRules = await browser.declarativeNetRequest.getDynamicRules({ })",
         @"browser.test.assertEq(dynamicRules.length, 3)",
 
-        // FIXME: rdar://162148560 (Unable to remove all dynamic or session rules)
-        @"await browser.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [1, 2] })",
+        @"await browser.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [1, 2, 3] })",
 
         @"dynamicRules = await browser.declarativeNetRequest.getDynamicRules({ })",
-        @"browser.test.assertEq(dynamicRules.length, 1)",
+        @"browser.test.assertEq(dynamicRules.length, 0)",
 
         @"browser.test.notifyPass()"
     ]);
