@@ -150,6 +150,9 @@ public:
 
     virtual void setInspectorPageDeveloperExtrasEnabled(bool) = 0;
 
+    virtual void setPageAndTextZoomFactors(double /* pageZoomFactor */, double /* textZoomFactor */) { }
+    virtual double pageZoomFactor() const { return 1.0; }
+
 #if ENABLE(INSPECTOR_TELEMETRY)
     virtual bool supportsDiagnosticLogging() { return false; }
     virtual bool diagnosticLoggingAvailable() { return false; }

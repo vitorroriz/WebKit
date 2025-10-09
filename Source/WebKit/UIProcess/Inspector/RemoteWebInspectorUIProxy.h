@@ -158,6 +158,7 @@ private:
     void revealFileExternally(const String& path);
     void showCertificate(const WebCore::CertificateInfo&);
     void setInspectorPageDeveloperExtrasEnabled(bool);
+    void setPageAndTextZoomFactors(double pageZoomFactor, double textZoomFactor);
     void sendMessageToBackend(const String& message);
 
     void createFrontendPageAndWindow();

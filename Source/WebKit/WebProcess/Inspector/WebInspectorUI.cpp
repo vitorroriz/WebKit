@@ -323,6 +323,17 @@ void WebInspectorUI::setInspectorPageDeveloperExtrasEnabled(bool enabled)
     sendToParentProcess(Messages::WebInspectorUIProxy::SetInspectorPageDeveloperExtrasEnabled(enabled));
 }
 
+void WebInspectorUI::setPageAndTextZoomFactors(double pageZoomFactor, double textZoomFactor)
+{
+    m_pageZoomFactor = pageZoomFactor;
+    sendToParentProcess(Messages::WebInspectorUIProxy::SetPageAndTextZoomFactors(pageZoomFactor, textZoomFactor));
+}
+
+double WebInspectorUI::pageZoomFactor() const
+{
+    return m_pageZoomFactor;
+}
+
 #if ENABLE(INSPECTOR_TELEMETRY)
 bool WebInspectorUI::supportsDiagnosticLogging()
 {

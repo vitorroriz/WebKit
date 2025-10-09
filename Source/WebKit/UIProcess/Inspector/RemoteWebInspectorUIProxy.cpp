@@ -220,6 +220,15 @@ void RemoteWebInspectorUIProxy::setInspectorPageDeveloperExtrasEnabled(bool enab
     inspectorPage->protectedPreferences()->setDeveloperExtrasEnabled(enabled);
 }
 
+void RemoteWebInspectorUIProxy::setPageAndTextZoomFactors(double pageZoomFactor, double textZoomFactor)
+{
+    RefPtr inspectorPage = m_inspectorPage.get();
+    if (!inspectorPage)
+        return;
+
+    inspectorPage->setPageAndTextZoomFactors(pageZoomFactor, textZoomFactor);
+}
+
 void RemoteWebInspectorUIProxy::sendMessageToBackend(const String& message)
 {
     if (CheckedPtr client = m_client.get())
