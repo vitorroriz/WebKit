@@ -70,7 +70,9 @@ private:
     WGPUDDCreateMeshDescriptor m_descriptor;
     NSMutableArray<id<MTLTexture>>* m_textures { nil };
 
+#if ENABLE(WEBGPU_SWIFT)
     DDBridgeReceiver* m_ddReceiver;
+#endif
     NSUUID* m_ddMeshIdentifier;
     mutable uint32_t m_currentTexture { 0 };
 };
