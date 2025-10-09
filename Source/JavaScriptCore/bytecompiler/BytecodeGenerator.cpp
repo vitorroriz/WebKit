@@ -3923,7 +3923,19 @@ RegisterID* BytecodeGenerator::emitReturn(RegisterID* src)
             if (isDerived) {
                 Ref<Label> isUndefinedLabel = newLabel();
                 emitJumpIfTrue(emitIsUndefined(newTemporary(), src), isUndefinedLabel.get());
-                emitThrowTypeError("Cannot return a non-object type in the constructor of a derived class."_s);
+
+                ASSERT(m_scopeNode->isFunctionNode());
+                String className = static_cast<FunctionNode*>(m_scopeNode)->ident().string();
+                if (!className || className.isEmpty())
+                    emitThrowTypeError("Cannot return a non-object type in the constructor of a derived class."_s);
+                else {
+                    auto errorMessageStr = tryMakeString("Cannot return a non-object type in the constructor of a derived class "_s, className, "."_s);
+                    if (!errorMessageStr) [[unlikely]]
+                        emitThrowTypeError("Cannot return a non-object type in the constructor of a derived class."_s);
+                    else
+                        emitThrowTypeError(Identifier::fromString(m_vm, errorMessageStr));
+                }
+
                 emitLabel(isUndefinedLabel.get());
             }
 
