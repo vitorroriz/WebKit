@@ -1,6 +1,5 @@
 Modules/WebGPU/GPUQueue.cpp
 Modules/model-element/scenekit/SceneKitModelPlayer.mm
-Modules/notifications/NotificationDataCocoa.mm
 accessibility/cocoa/AXCoreObjectCocoa.mm
 accessibility/cocoa/AXTextMarkerCocoa.mm
 accessibility/cocoa/AccessibilityObjectCocoa.mm
@@ -26,7 +25,6 @@ editing/mac/EditorMac.mm
 editing/mac/TextAlternativeWithRange.mm
 editing/mac/TextUndoInsertionMarkupMac.mm
 inspector/agents/page/PageTimelineAgent.cpp
-inspector/mac/PageDebuggerMac.mm
 page/cocoa/PageCocoa.mm
 page/cocoa/WebTextIndicatorLayer.mm
 page/mac/EventHandlerMac.mm
@@ -96,7 +94,6 @@ platform/graphics/mac/ColorMac.mm
 platform/graphics/mac/PDFDocumentImageMac.mm
 platform/graphics/mac/ScrollbarTrackCornerSystemImageMac.mm
 platform/graphics/mac/controls/InnerSpinButtonMac.mm
-platform/graphics/mac/controls/MeterMac.mm
 platform/graphics/mac/controls/ToggleButtonMac.mm
 platform/graphics/mac/controls/WebControlView.mm
 platform/ios/WebAVPlayerController.mm

@@ -2,7 +2,6 @@ GeneratedWebKitSecureCoding.mm
 NetworkProcess/mac/NetworkProcessMac.mm
 Shared/API/Cocoa/WKBrowsingContextHandle.mm
 Shared/API/Cocoa/WKRemoteObjectCoder.mm
-Shared/API/Cocoa/_WKFrameHandle.mm
 Shared/API/Cocoa/_WKRemoteObjectInterface.mm
 Shared/API/c/mac/WKURLRequestNS.mm
 Shared/API/c/mac/WKURLResponseNS.mm
@@ -53,7 +52,6 @@ UIProcess/API/Cocoa/_WKPublicKeyCredentialRelyingPartyEntity.mm
 UIProcess/API/Cocoa/_WKPublicKeyCredentialRequestOptions.mm
 UIProcess/API/Cocoa/_WKPublicKeyCredentialUserEntity.mm
 UIProcess/API/Cocoa/_WKRemoteWebInspectorViewController.mm
-UIProcess/API/Cocoa/_WKResourceLoadInfo.mm
 UIProcess/API/Cocoa/_WKTextManipulationConfiguration.mm
 UIProcess/API/Cocoa/_WKTextManipulationToken.mm
 UIProcess/API/Cocoa/_WKThumbnailView.mm
