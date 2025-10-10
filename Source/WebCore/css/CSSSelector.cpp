@@ -384,6 +384,13 @@ const CSSSelector* CSSSelector::lastInCompound() const
 }
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 
+const CSSSelector* CSSSelector::precedingInCompound() const
+{
+    if (relation() != Relation::Subselector)
+        return nullptr;
+    return precedingInComplexSelector();
+}
+
 static void appendPseudoClassFunctionTail(StringBuilder& builder, const CSSSelector* selector)
 {
     switch (selector->pseudoClass()) {
@@ -930,6 +937,31 @@ bool complexSelectorCanMatchPseudoElement(const CSSSelector& complexSelector)
         selector = selector->precedingInComplexSelector();
     } while (selector);
     return false;
+}
+
+bool complexSelectorMatchesElementBackedPseudoElement(const CSSSelector& complexSelector)
+{
+    auto isElementBacked = [](CSSSelector::PseudoElement pseudoElement) {
+        switch (pseudoElement) {
+        case CSSSelector::PseudoElement::Slotted:
+        case CSSSelector::PseudoElement::Part:
+        case CSSSelector::PseudoElement::UserAgentPart:
+        case CSSSelector::PseudoElement::UserAgentPartLegacyAlias:
+            return true;
+        default:
+            return false;
+        }
+    };
+
+    auto result = false;
+    for (auto* simpleSelector = &complexSelector; simpleSelector; simpleSelector = simpleSelector->precedingInCompound()) {
+        if (simpleSelector->matchesPseudoElement()) {
+            if (!isElementBacked(simpleSelector->pseudoElement()))
+                return false;
+            result = true;
+        }
+    }
+    return result;
 }
 
 } // namespace WebCore

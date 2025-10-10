@@ -141,6 +141,7 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 
     const CSSSelector* firstInCompound() const;
     const CSSSelector* lastInCompound() const;
+    const CSSSelector* precedingInCompound() const;
 
     const QualifiedName& tagQName() const;
     const AtomString& tagLowercaseLocalName() const;
@@ -274,6 +275,7 @@ private:
 };
 
 bool complexSelectorCanMatchPseudoElement(const CSSSelector&);
+bool complexSelectorMatchesElementBackedPseudoElement(const CSSSelector&);
 
 inline bool operator==(const PossiblyQuotedIdentifier& a, const AtomString& b) { return a.identifier == b; }
 
