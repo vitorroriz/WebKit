@@ -12865,6 +12865,8 @@
         "web-platform-tests/webvtt/rendering/cues-with-video/processing-model/selectors/cue_function/italic_object/italic_white-space_pre_wrapped-ref.html",
         "web-platform-tests/webvtt/rendering/cues-with-video/processing-model/selectors/cue_function/italic_object/italic_with_class-ref.html",
         "web-platform-tests/webvtt/rendering/cues-with-video/processing-model/selectors/cue_function/italic_object/italic_with_class_object_specific_selector-ref.html",
+        "web-platform-tests/webvtt/rendering/cues-with-video/processing-model/selectors/cue_function/lang_object/lang_attribute-ref.html",
+        "web-platform-tests/webvtt/rendering/cues-with-video/processing-model/selectors/cue_function/lang_object/lang_color-ref.html",
         "web-platform-tests/webvtt/rendering/cues-with-video/processing-model/selectors/cue_function/not_allowed_properties-ref.html",
         "web-platform-tests/webvtt/rendering/cues-with-video/processing-model/selectors/cue_function/not_root_selector-ref.html",
         "web-platform-tests/webvtt/rendering/cues-with-video/processing-model/selectors/cue_function/outline_properties-ref.html",
