@@ -155,7 +155,7 @@ const WebAssemblyBuiltinSet* WebAssemblyBuiltinRegistry::findByQualifiedName(con
     return index != notFound ? &m_builtinSets[index] : nullptr;
 }
 
-bool WebAssemblyArrayMutI16TypeExpectation::check(const Wasm::Type& type) const
+bool WebAssemblyArrayMutI16TypeExpectation::isValid(const Wasm::Type& type) const
 {
     if (!type.isRefNull())
         return false;
@@ -168,18 +168,18 @@ bool WebAssemblyArrayMutI16TypeExpectation::check(const Wasm::Type& type) const
         && elementType.type.as<Wasm::PackedType>() == Wasm::PackedType::I16;
 }
 
-bool WebAssemblyBuiltinSignature::check(const Wasm::FunctionSignature& sig) const
+bool WebAssemblyBuiltinSignature::isValid(const Wasm::FunctionSignature& sig) const
 {
     if (sig.returnCount() != m_results.size() || sig.argumentCount() != m_params.size())
         return false;
     for (unsigned i = 0; i < sig.returnCount(); ++i) {
         auto type = sig.returnType(i);
-        if (!m_results[i]->check(type))
+        if (!m_results[i]->isValid(type))
             return false;
     }
     for (unsigned i = 0; i < sig.argumentCount(); ++i) {
         auto type = sig.argumentType(i);
-        if (!m_params[i]->check(type))
+        if (!m_params[i]->isValid(type))
             return false;
     }
     return true;
