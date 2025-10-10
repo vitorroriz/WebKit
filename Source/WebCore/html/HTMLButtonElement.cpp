@@ -56,7 +56,7 @@ using namespace HTMLNames;
 
 inline HTMLButtonElement::HTMLButtonElement(const QualifiedName& tagName, Document& document, HTMLFormElement* form)
     : HTMLFormControlElement(tagName, document, form)
-    , m_type(SUBMIT)
+    , m_type(Type::Submit)
     , m_isActivatedSubmit(false)
 {
     ASSERT(hasTagName(buttonTag));
@@ -89,11 +89,11 @@ int HTMLButtonElement::defaultTabIndex() const
 const AtomString& HTMLButtonElement::formControlType() const
 {
     switch (m_type) {
-    case SUBMIT:
+    case Type::Submit:
         return submitAtom();
-    case BUTTON:
+    case Type::Button:
         return HTMLNames::buttonTag->localName();
-    case RESET:
+    case Type::Reset:
         return resetAtom();
     }
 
@@ -274,19 +274,19 @@ void HTMLButtonElement::defaultEventHandler(Event& event)
             protectedDocument()->updateLayoutIgnorePendingStylesheets();
 
             if (RefPtr currentForm = form()) {
-                if (m_type == SUBMIT)
+                if (m_type == Type::Submit)
                     currentForm->submitIfPossible(&event, this);
 
-                if (m_type == RESET)
+                if (m_type == Type::Reset)
                     currentForm->reset();
             }
 
-            if (m_type == SUBMIT || m_type == RESET) {
+            if (m_type == Type::Submit || m_type == Type::Reset) {
                 event.setDefaultHandled();
                 return;
             }
 
-            if (m_type == BUTTON && !equalLettersIgnoringASCIICase(attributeWithoutSynchronization(HTMLNames::typeAttr), "button"_s))
+            if (m_type == Type::Button && !equalLettersIgnoringASCIICase(attributeWithoutSynchronization(HTMLNames::typeAttr), "button"_s))
                 return;
         }
 
@@ -336,7 +336,7 @@ bool HTMLButtonElement::isSuccessfulSubmitButton() const
 {
     // HTML spec says that buttons must have names to be considered successful.
     // However, other browsers do not impose this constraint.
-    return m_type == SUBMIT;
+    return m_type == Type::Submit;
 }
 
 bool HTMLButtonElement::matchesDefaultPseudoClass() const
@@ -356,7 +356,7 @@ void HTMLButtonElement::setActivatedSubmit(bool flag)
 
 bool HTMLButtonElement::appendFormData(DOMFormData& formData)
 {
-    if (m_type != SUBMIT || name().isEmpty() || !m_isActivatedSubmit)
+    if (m_type != Type::Submit || name().isEmpty() || !m_isActivatedSubmit)
         return false;
     formData.append(name(), value());
     return true;
@@ -374,12 +374,12 @@ const AtomString& HTMLButtonElement::value() const
 
 bool HTMLButtonElement::computeWillValidate() const
 {
-    return m_type == SUBMIT && HTMLFormControlElement::computeWillValidate();
+    return m_type == Type::Submit && HTMLFormControlElement::computeWillValidate();
 }
 
 bool HTMLButtonElement::isSubmitButton() const
 {
-    return m_type == SUBMIT;
+    return m_type == Type::Submit;
 }
 
 bool HTMLButtonElement::isExplicitlySetSubmitButton() const
@@ -391,21 +391,21 @@ void HTMLButtonElement::computeType(const AtomString& typeAttrValue)
 {
     auto oldType = m_type;
     if (equalLettersIgnoringASCIICase(typeAttrValue, "reset"_s))
-        m_type = RESET;
+        m_type = Type::Reset;
     else if (equalLettersIgnoringASCIICase(typeAttrValue, "button"_s))
-        m_type = BUTTON;
+        m_type = Type::Button;
     else if (equalLettersIgnoringASCIICase(typeAttrValue, "submit"_s))
-        m_type = SUBMIT;
+        m_type = Type::Submit;
     else if (document().settings().commandAttributesEnabled()) {
         if (hasAttributeWithoutSynchronization(HTMLNames::commandAttr) || hasAttributeWithoutSynchronization(HTMLNames::commandforAttr))
-            m_type = BUTTON;
+            m_type = Type::Button;
         else
-            m_type = SUBMIT;
+            m_type = Type::Submit;
     } else
-        m_type = SUBMIT;
+        m_type = Type::Submit;
     if (oldType != m_type) {
         updateWillValidateAndValidity();
-        if (RefPtr currentForm = form(); currentForm && (oldType == SUBMIT || m_type == SUBMIT))
+        if (RefPtr currentForm = form(); currentForm && (oldType == Type::Submit || m_type == Type::Submit))
             currentForm->resetDefaultButton();
     }
 }
