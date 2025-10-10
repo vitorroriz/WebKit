@@ -91,12 +91,12 @@ UNEXPORT_SWIFT_CXX_LDFLAGS = -Wl,-unexported_symbol,_$s*3Cxx* -Wl,-unexported_sy
 OTHER_LDFLAGS = $(inherited) $(UNEXPORT_SWIFT_CXX_LDFLAGS) $(SOURCE_VERSION_LDFLAGS) $(WK_NO_STATIC_INITIALIZERS) -Wl,-unexported_symbol,*s_heapSpec;
 
 ENABLE_WEBGPU_SWIFT = ;
-ENABLE_WEBGPU_SWIFT[sdk=macosx*26*] = ENABLE_WEBGPU_SWIFT;
+ENABLE_WEBGPU_SWIFT[sdk=macosx*26*][arch=arm64*] = ENABLE_WEBGPU_SWIFT;
 ENABLE_WEBGPU_SWIFT[sdk=iphoneos26*] = ENABLE_WEBGPU_SWIFT;
 // FIXME: Support WebGPU swift in iOS simulator builds once the underlying
 // modules issue is fixed (https://bugs.webkit.org/show_bug.cgi?id=300146).
 ENABLE_WEBGPU_SWIFT[sdk=iphonesimulator26*] = ;
-ENABLE_WEBGPU_SWIFT[sdk=iphonesimulator26*.internal] = ENABLE_WEBGPU_SWIFT;
+ENABLE_WEBGPU_SWIFT[sdk=macosx*26*][arch=x86*] = ;
 ENABLE_WEBGPU_SWIFT[sdk=xros*26*] = ENABLE_WEBGPU_SWIFT;
 
 SWIFT_OBJC_INTERFACE_HEADER_NAME = WebGPUSwift-Generated.h;
@@ -134,6 +134,4 @@ EXCLUDED_SOURCE_FILE_NAMES_ENABLE_WEBGPU_SWIFT =;
 EXCLUDED_SOURCE_FILE_NAMES_ = *.swift;
 
 BUILD_LIBRARY_FOR_DISTRIBUTION = YES; // This is required for all frameworks in the OS.
-SWIFT_EMIT_PRIVATE_MODULE_INTERFACE = YES;
-SWIFT_LIBRARY_LEVEL = spi;
 RUN_SWIFT_ABI_CHECKER_TOOL = NO

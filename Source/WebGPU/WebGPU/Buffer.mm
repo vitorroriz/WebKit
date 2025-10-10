@@ -853,9 +853,14 @@ WGPUBufferUsageFlags wgpuBufferGetUsage(WGPUBuffer buffer)
     return WebGPU::protectedFromAPI(buffer)->usage();
 }
 
-#if ENABLE(WEBGPU_SWIFT)
 void wgpuBufferCopy(WGPUBuffer buffer, std::span<const uint8_t> data, size_t offset)
 {
+#if ENABLE(WEBGPU_SWIFT)
     WebGPU::protectedFromAPI(buffer)->copyFrom(data, offset);
-}
+#else
+    UNUSED_PARAM(buffer);
+    UNUSED_PARAM(data);
+    UNUSED_PARAM(offset);
+
 #endif
+}
