@@ -35,7 +35,6 @@ mac/WebView/WebArchive.h
 mac/WebView/WebDeviceOrientation.h
 mac/WebView/WebDeviceOrientationProviderMock.h
 mac/WebView/WebDocumentLoaderMac.h
-mac/WebView/WebFeature.h
 mac/WebView/WebFrame.h
 mac/WebView/WebFrameView.h
 mac/WebView/WebFrameView.mm
