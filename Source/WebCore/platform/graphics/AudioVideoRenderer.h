@@ -25,13 +25,13 @@
 
 #pragma once
 
-#include "HostingContext.h"
-#include "MediaPlayerEnums.h"
-#include "MediaPromiseTypes.h"
-#include "PlatformLayer.h"
-#include "TrackInfo.h"
-#include "VideoPlaybackQualityMetrics.h"
-#include "VideoTarget.h"
+#include <WebCore/HostingContext.h>
+#include <WebCore/MediaPlayerEnums.h>
+#include <WebCore/MediaPromiseTypes.h>
+#include <WebCore/PlatformLayer.h>
+#include <WebCore/TrackInfo.h>
+#include <WebCore/VideoPlaybackQualityMetrics.h>
+#include <WebCore/VideoTarget.h>
 #include <optional>
 #include <wtf/AbstractThreadSafeRefCountedAndCanMakeWeakPtr.h>
 #include <wtf/CompletionHandler.h>

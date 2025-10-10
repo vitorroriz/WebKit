@@ -25,8 +25,8 @@
 
 #pragma once
 
-#include "JSDOMPromiseDeferredForward.h"
-#include "WebGPU.h"
+#include <WebCore/JSDOMPromiseDeferredForward.h>
+#include <WebCore/WebGPU.h>
 #include <optional>
 #include <wtf/Deque.h>
 #include <wtf/Ref.h>

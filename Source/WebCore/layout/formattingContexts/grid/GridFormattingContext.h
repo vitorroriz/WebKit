@@ -25,10 +25,10 @@
 
 #pragma once
 
-#include "GridTypeAliases.h"
-#include "LayoutIntegrationUtils.h"
-#include "LayoutState.h"
-#include "LayoutUnit.h"
+#include <WebCore/GridTypeAliases.h>
+#include <WebCore/LayoutIntegrationUtils.h>
+#include <WebCore/LayoutState.h>
+#include <WebCore/LayoutUnit.h>
 #include <wtf/CheckedRef.h>
 
 namespace WebCore {

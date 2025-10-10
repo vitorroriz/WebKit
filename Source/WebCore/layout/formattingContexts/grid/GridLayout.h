@@ -25,9 +25,9 @@
 
 #pragma once
 
-#include "GridFormattingContext.h"
-#include "GridTypeAliases.h"
-#include "StyleGridTrackBreadth.h"
+#include <WebCore/GridFormattingContext.h>
+#include <WebCore/GridTypeAliases.h>
+#include <WebCore/StyleGridTrackBreadth.h>
 
 namespace WebCore {
 class RenderStyle;

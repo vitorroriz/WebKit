@@ -25,9 +25,9 @@
 
 #pragma once
 
-#include "DDFloat4x4.h"
-#include "DDMeshPart.h"
-#include "DDReplaceVertices.h"
+#include <WebCore/DDFloat4x4.h>
+#include <WebCore/DDMeshPart.h>
+#include <WebCore/DDReplaceVertices.h>
 #include <WebCore/ModelObjectDescriptorBase.h>
 
 namespace WebCore::DDModel {

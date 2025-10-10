@@ -25,9 +25,9 @@
 
 #pragma once
 
-#include "ScriptExecutionContextIdentifier.h"
-#include "WebTransportSession.h"
-#include "WebTransportSessionClient.h"
+#include <WebCore/ScriptExecutionContextIdentifier.h>
+#include <WebCore/WebTransportSession.h>
+#include <WebCore/WebTransportSessionClient.h>
 
 namespace WebCore {
 

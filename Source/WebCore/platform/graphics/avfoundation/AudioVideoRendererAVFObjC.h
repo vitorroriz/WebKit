@@ -25,11 +25,11 @@
 
 #pragma once
 
-#include "AudioVideoRenderer.h"
-#include "PlatformDynamicRangeLimit.h"
-#include "ProcessIdentity.h"
-#include "TrackInfo.h"
-#include "WebAVSampleBufferListener.h"
+#include <WebCore/AudioVideoRenderer.h>
+#include <WebCore/PlatformDynamicRangeLimit.h>
+#include <WebCore/ProcessIdentity.h>
+#include <WebCore/TrackInfo.h>
+#include <WebCore/WebAVSampleBufferListener.h>
 #include <wtf/Forward.h>
 #include <wtf/Function.h>
 #include <wtf/HashMap.h>

@@ -25,9 +25,9 @@
 
 #pragma once
 
-#include "DDVertexAttributeFormat.h"
-#include "DDVertexLayout.h"
 #include <WebCore/DDFloat3.h>
+#include <WebCore/DDVertexAttributeFormat.h>
+#include <WebCore/DDVertexLayout.h>
 #include <WebCore/ModelObjectDescriptorBase.h>
 
 namespace WebCore::DDModel {
