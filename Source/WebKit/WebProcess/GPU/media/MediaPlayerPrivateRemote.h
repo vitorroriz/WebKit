@@ -220,6 +220,8 @@ public:
     MediaTime currentTime() const final;
     MediaTime currentOrPendingSeekTime() const final;
 
+    void gpuProcessConnectionDidClose();
+
 private:
     class TimeProgressEstimator final {
     public:

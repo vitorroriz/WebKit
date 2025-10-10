@@ -219,7 +219,7 @@ MediaPlayerPrivateRemote::~MediaPlayerPrivateRemote()
 
     // Shutdown any stale MediaResources.
     // This condition can happen if the MediaPlayer gets reloaded half-way.
-    ensureOnMainThread([resources = WTFMove(m_mediaResources)] {
+    ensureOnMainThread([resources = std::exchange(m_mediaResources, { })] {
         for (auto&& resource : resources)
             resource.value->shutdown();
     });
@@ -1910,6 +1910,13 @@ void MediaPlayerPrivateRemote::sendInternalMessage(const WebCore::MessageForTest
     connection().send(Messages::RemoteMediaPlayerProxy::SetHasMessageClientForTesting(false), m_id);
 }
 
+void MediaPlayerPrivateRemote::gpuProcessConnectionDidClose()
+{
+    assertIsMainRunLoop();
+
+    for (auto&& resource : std::exchange(m_mediaResources, { }))
+        resource.value->shutdown();
+}
 
 } // namespace WebKit
 
