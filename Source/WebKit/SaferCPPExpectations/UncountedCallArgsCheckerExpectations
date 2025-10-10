@@ -1,4 +1,3 @@
-GeneratedSerializers.mm
 Platform/IPC/ArgumentCoders.h
 UIProcess/API/C/mac/WKPagePrivateMac.mm
 UIProcess/API/Cocoa/WKContentWorld.mm

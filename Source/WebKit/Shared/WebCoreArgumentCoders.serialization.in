@@ -8054,7 +8054,7 @@ struct WebCore::MediaSourceConfiguration {
 
 [CustomHeader, Nested] struct WebCore::Cursor::CustomCursorIPCData {
     Ref<WebCore::Image> image;
-    [Validator='(*image)->rect().contains(*hotSpot)'] WebCore::IntPoint hotSpot;
+    [Validator='Ref { *image }->rect().contains(*hotSpot)'] WebCore::IntPoint hotSpot;
 #if ENABLE(MOUSE_CURSOR_SCALE)
     float scaleFactor;
 #endif
