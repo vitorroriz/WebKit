@@ -321,7 +321,7 @@ RenderPtr<RenderElement> HTMLPlugInElement::createElementRenderer(RenderStyle&& 
     return createPluginRenderer(WTFMove(style), insertionPosition);
 }
 
-bool HTMLPlugInElement::isReplaced(const RenderStyle&) const
+bool HTMLPlugInElement::isReplaced(const RenderStyle*) const
 {
     return !m_pluginReplacement || !m_pluginReplacement->willCreateRenderer();
 }
