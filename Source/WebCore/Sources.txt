@@ -705,7 +705,6 @@ bindings/js/JSFetchEventCustom.cpp
 bindings/js/JSHTMLAllCollectionCustom.cpp
 bindings/js/JSHTMLCanvasElementCustom.cpp
 bindings/js/JSHTMLCollectionCustom.cpp
-bindings/js/JSHTMLDocumentCustom.cpp
 bindings/js/JSHTMLElementCustom.cpp
 bindings/js/JSHTMLTemplateElementCustom.cpp
 bindings/js/JSHistoryCustom.cpp
@@ -779,7 +778,6 @@ bindings/js/JSWorkerGlobalScopeBase.cpp
 bindings/js/JSWorkerGlobalScopeCustom.cpp
 bindings/js/JSWorkerNavigatorCustom.cpp
 bindings/js/JSWorkletGlobalScopeBase.cpp
-bindings/js/JSXMLDocumentCustom.cpp
 bindings/js/JSXMLHttpRequestCustom.cpp
 bindings/js/JSXPathResultCustom.cpp
 bindings/js/ReadableStreamDefaultController.cpp

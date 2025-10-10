@@ -5555,7 +5555,12 @@ END
 
         push(@implContent, "JSC::JSValue toJSNewlyCreated(JSC::JSGlobalObject* lexicalGlobalObject, JSDOMGlobalObject* globalObject, Ref<$implType>&& impl)\n");
         push(@implContent, "{\n");
-        push (@implContent, "    UNUSED_PARAM(lexicalGlobalObject);\n");
+        if ($implType =~ /Document$/) {
+            AddToImplIncludes("JSDocumentCustom.h");
+            push(@implContent, "    reportMemoryForDocumentIfFrameless(*lexicalGlobalObject, impl.get());\n");
+        } else {
+            push(@implContent, "    UNUSED_PARAM(lexicalGlobalObject);\n");
+        }
         my $hasChildInterfaces = 0;
         unless ($interface->extendedAttributes->{IgnoreSubclassesWhenGeneratingToJSObject}) {
             $codeGenerator->ForEachChildInterface($interface, sub {
@@ -5593,6 +5598,11 @@ END
 
         push(@implContent, "JSC::JSValue toJS(JSC::JSGlobalObject* lexicalGlobalObject, JSDOMGlobalObject* globalObject, ${implType}& impl)\n");
         push(@implContent, "{\n");
+        if ($implType =~ /Document$/) {
+            AddToImplIncludes("JSDocumentCustom.h");
+            push(@implContent, "    if (auto* wrapper = cachedDocumentWrapper(*lexicalGlobalObject, *globalObject, impl))\n");
+            push(@implContent, "        return wrapper;\n");
+        }
         push(@implContent, "    return wrap(lexicalGlobalObject, globalObject, impl);\n");
         push(@implContent, "}\n\n");
     }
