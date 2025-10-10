@@ -253,7 +253,14 @@ ISO8601::PlainDate TemporalCalendar::balanceISODate(JSGlobalObject* globalObject
 {
     auto epochDays = makeDay(year, month - 1, day);
     double ms = makeDate(epochDays, 0);
-    auto [ y, m, d ] = globalObject->vm().dateCache.yearMonthDayFromDaysWithCache(msToDays(ms));
+    double daysToUse = msToDays(ms);
+    // Need the check here because yearMonthFromDays() takes an int32_t
+    if (!isInBounds<int32_t>(daysToUse)) [[unlikely]] {
+        // It doesn't matter what month and day we return, as this
+        // date will be flagged as an error later on anyway.
+        return ISO8601::PlainDate { ISO8601::outOfRangeYear, 1, 1 };
+    }
+    auto [ y, m, d ] = globalObject->vm().dateCache.yearMonthDayFromDaysWithCache(static_cast<int32_t>(daysToUse));
     return ISO8601::PlainDate { y, (unsigned) m + 1, (unsigned) d };
 }
 
@@ -294,7 +301,6 @@ ISO8601::PlainDate TemporalCalendar::isoDateAdd(JSGlobalObject* globalObject, co
 }
 
 // https://tc39.es/proposal-temporal/#sec-temporal-balanceisoyearmonth
-// Returns an option for the same reason as balanceISODate
 ISO8601::PlainYearMonth TemporalCalendar::balanceISOYearMonth(double year, double month)
 {
     year += std::floor((month - 1) / 12);
@@ -302,7 +308,9 @@ ISO8601::PlainYearMonth TemporalCalendar::balanceISOYearMonth(double year, doubl
     month = std::fmod(month - 1, 12) + 1;
     if (month < 1)
         month += 12;
-    return ISO8601::PlainYearMonth(year, month);
+    if (!ISO8601::isYearWithinLimits(year)) [[unlikely]]
+        year = ISO8601::outOfRangeYear;
+    return ISO8601::PlainYearMonth(year, static_cast<int32_t>(month));
 }
 
 // https://tc39.es/proposal-temporal/#sec-temporal-compareisodate

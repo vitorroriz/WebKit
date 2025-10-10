@@ -50,9 +50,6 @@ static constexpr int64_t nsPerSecond = 1000LL * 1000 * 1000;
 static constexpr int64_t nsPerMillisecond = 1000LL * 1000;
 static constexpr int64_t nsPerMicrosecond = 1000LL;
 
-static constexpr int32_t maxYear = 275760;
-static constexpr int32_t minYear = -271821;
-
 std::optional<TimeZoneID> parseTimeZoneName(StringView string)
 {
     const auto& timeZones = intlAvailableTimeZones();
@@ -1092,6 +1089,10 @@ static std::optional<PlainDate> parseDate(StringParsingBuffer<CharacterType>& bu
         buffer.advance();
     } else
         return std::nullopt;
+
+    // PlainDate represents out-of-range years using outOfRangeYear
+    if (!isYearWithinLimits(year)) [[unlikely]]
+        year = outOfRangeYear;
 
     return PlainDate(year, month, day);
 }

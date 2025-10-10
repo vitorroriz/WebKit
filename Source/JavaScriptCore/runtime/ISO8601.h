@@ -34,6 +34,10 @@
 namespace JSC {
 namespace ISO8601 {
 
+static constexpr int32_t maxYear = 275760;
+static constexpr int32_t minYear = -271821;
+static constexpr int32_t outOfRangeYear = minYear - 1;
+
 class Duration {
     WTF_MAKE_TZONE_ALLOCATED(Duration);
 public:
@@ -243,6 +247,8 @@ private:
 };
 static_assert(sizeof(PlainTime) <= sizeof(uint64_t));
 
+bool isYearWithinLimits(double year);
+
 // Note that PlainDate does not include week unit.
 // year can be negative. And month and day starts with 1.
 class PlainDate {
@@ -260,6 +266,7 @@ public:
         , m_month(month)
         , m_day(day)
     {
+        ASSERT(isYearWithinLimits(year) || year == outOfRangeYear);
     }
 
     friend bool operator==(const PlainDate&, const PlainDate&) = default;
@@ -274,22 +281,29 @@ private:
     // since the validity checking is separate from date parsing.
     // For example, see the test262 test
     // Temporal/PlainDate/prototype/until/throws-if-rounded-date-outside-valid-iso-range.js
-    // FIXME: Change to int32_t and represent out-of-range years using
-    // special Int32, per https://github.com/WebKit/WebKit/pull/52010#discussion_r2414715114
-    double m_year;
+    // The solution to this is to use a sentinel value (outOfRangeYear) to represent
+    // all out-of-range years. The PlainDate constructor checks the invariant
+    // that either the year is within limits, or it's equal to this sentinel value.
+    int32_t m_year : 21;
     int32_t m_month : 5; // Starts with 1.
     int32_t m_day : 6; // Starts with 1.
 };
+static_assert(sizeof(PlainDate) == sizeof(int32_t));
 
 using TimeZone = Variant<TimeZoneID, int64_t>;
 
 class PlainYearMonth final {
 public:
-    double year;
-    double month;
-    PlainYearMonth(double y, double m)
-        : year(y), month(m) { }
+    // Out-of-range years represented by outOfRangeYear, as with PlainDate
+    int32_t year : 21;
+    int32_t month : 5;
+    PlainYearMonth(int32_t y, int32_t m)
+        : year(y), month(m)
+    {
+        ASSERT(isYearWithinLimits(year) || year == outOfRangeYear);
+    }
 };
+static_assert(sizeof(PlainYearMonth) <= sizeof(int32_t));
 
 class PlainMonthDay {
     WTF_MAKE_TZONE_ALLOCATED(PlainMonthDay);
@@ -369,7 +383,6 @@ PlainDate createISODateRecord(double, double, double);
 std::optional<ExactTime> parseInstant(StringView);
 
 bool isDateTimeWithinLimits(int32_t year, uint8_t month, uint8_t day, unsigned hour, unsigned minute, unsigned second, unsigned millisecond, unsigned microsecond, unsigned nanosecond);
-bool isYearWithinLimits(double year);
 
 Int128 roundTimeDuration(JSGlobalObject*, Int128, unsigned, TemporalUnit, RoundingMode);
 
