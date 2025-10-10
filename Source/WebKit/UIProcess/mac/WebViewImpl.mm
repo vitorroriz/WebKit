@@ -4503,50 +4503,62 @@ void WebViewImpl::startDrag(const WebCore::DragItem& item, ShareableBitmap::Hand
 
     // The call below could release the view.
     auto protector = m_view.get();
-    auto clientDragLocation = item.dragLocationInWindowCoordinates;
-    RetainPtr pasteboard = [NSPasteboard pasteboardWithName:NSPasteboardNameDrag];
 
-    if (auto& info = item.promisedAttachmentInfo) {
-        auto attachment = m_page->attachmentForIdentifier(info.attachmentIdentifier);
-        if (!attachment) {
-            m_page->dragCancelled();
-            return;
-        }
+    if (RefPtr frame = WebFrameProxy::webFrame(item.rootFrameID)) {
+        m_page->convertPointToMainFrameCoordinates(item.dragLocationInWindowCoordinates, item.rootFrameID, [weakThis = WeakPtr { *this }, promisedAttachmentInfo = item.promisedAttachmentInfo, dragNSImage = WTFMove(dragNSImage), size, lastMouseDownEvent = m_lastMouseDownEvent] (std::optional<FloatPoint> dragLocationInMainFrameCoordinates) mutable {
+            CheckedPtr protectedThis = weakThis.get();
+            if (!protectedThis || !dragLocationInMainFrameCoordinates)
+                return;
+            RefPtr page = protectedThis->page();
+            RetainPtr view = protectedThis->view();
 
-        RetainPtr utiType = attachment->utiType().createNSString();
-        if (!utiType.get().length) {
-            m_page->dragCancelled();
-            return;
-        }
+            auto clientDragLocation = IntPoint(dragLocationInMainFrameCoordinates.value());
 
-        RetainPtr fileName = attachment->fileName().createNSString();
-        RetainPtr provider = adoptNS([[NSFilePromiseProvider alloc] initWithFileType:utiType.get() delegate:(id<NSFilePromiseProviderDelegate>)m_view.getAutoreleased()]);
-        RetainPtr context = adoptNS([[WKPromisedAttachmentContext alloc] initWithIdentifier:info.attachmentIdentifier.createNSString().get() fileName:fileName.get()]);
-        [provider setUserInfo:context.get()];
-        auto draggingItem = adoptNS([[NSDraggingItem alloc] initWithPasteboardWriter:provider.get()]);
-        [draggingItem setDraggingFrame:NSMakeRect(clientDragLocation.x(), clientDragLocation.y() - size.height(), size.width(), size.height()) contents:dragNSImage.get()];
+            RetainPtr pasteboard = [NSPasteboard pasteboardWithName:NSPasteboardNameDrag];
 
-        if (!m_lastMouseDownEvent) {
-            m_page->dragCancelled();
-            return;
-        }
+            if (promisedAttachmentInfo) {
+                RefPtr attachment = page->attachmentForIdentifier(promisedAttachmentInfo.attachmentIdentifier);
+                if (!attachment) {
+                    page->dragCancelled();
+                    return;
+                }
 
-        [m_view.get() beginDraggingSessionWithItems:@[draggingItem.get()] event:m_lastMouseDownEvent.get() source:(id<NSDraggingSource>)m_view.getAutoreleased()];
+                RetainPtr utiType = attachment->utiType().createNSString();
+                if (![utiType length]) {
+                    page->dragCancelled();
+                    return;
+                }
 
-        for (size_t index = 0; index < info.additionalTypesAndData.size(); ++index) {
-            auto nsData = Ref { *info.additionalTypesAndData[index].second }->createNSData();
-            [pasteboard setData:nsData.get() forType:info.additionalTypesAndData[index].first.createNSString().get()];
-        }
-        m_page->didStartDrag();
-        return;
+                RetainPtr fileName = attachment->fileName().createNSString();
+                RetainPtr provider = adoptNS([[NSFilePromiseProvider alloc] initWithFileType:utiType.get() delegate:(id<NSFilePromiseProviderDelegate>)view.get()]);
+                RetainPtr context = adoptNS([[WKPromisedAttachmentContext alloc] initWithIdentifier:promisedAttachmentInfo.attachmentIdentifier.createNSString().get() fileName:fileName.get()]);
+                [provider setUserInfo:context.get()];
+
+                RetainPtr draggingItem = adoptNS([[NSDraggingItem alloc] initWithPasteboardWriter:provider.get()]);
+                [draggingItem setDraggingFrame:NSMakeRect(clientDragLocation.x(), clientDragLocation.y() - size.height(), size.width(), size.height()) contents:dragNSImage.get()];
+
+                if (!lastMouseDownEvent) {
+                    page->dragCancelled();
+                    return;
+                }
+
+                [view beginDraggingSessionWithItems:@[draggingItem.get()] event:lastMouseDownEvent.get() source:(id<NSDraggingSource>)view.get()];
+
+                for (size_t index = 0; index < promisedAttachmentInfo.additionalTypesAndData.size(); ++index) {
+                    RetainPtr nsData = Ref { *promisedAttachmentInfo.additionalTypesAndData[index].second }->createNSData();
+                    [pasteboard setData:nsData.get() forType:promisedAttachmentInfo.additionalTypesAndData[index].first.createNSString().get()];
+                }
+                page->didStartDrag();
+                return;
+            }
+            page->didStartDrag();
+
+            [pasteboard setString:@"" forType:PasteboardTypes::WebDummyPboardType];
+        ALLOW_DEPRECATED_DECLARATIONS_BEGIN
+            [view dragImage:dragNSImage.get() at:NSPointFromCGPoint(clientDragLocation) offset:NSZeroSize event:lastMouseDownEvent.get() pasteboard:pasteboard.get() source:view.get() slideBack:YES];
+        ALLOW_DEPRECATED_DECLARATIONS_END
+        });
     }
-
-    m_page->didStartDrag();
-
-    [pasteboard setString:@"" forType:PasteboardTypes::WebDummyPboardType];
-ALLOW_DEPRECATED_DECLARATIONS_BEGIN
-    [m_view.get() dragImage:dragNSImage.get() at:NSPointFromCGPoint(clientDragLocation) offset:NSZeroSize event:m_lastMouseDownEvent.get() pasteboard:pasteboard.get() source:m_view.getAutoreleased() slideBack:YES];
-ALLOW_DEPRECATED_DECLARATIONS_END
 }
 
 static bool matchesExtensionOrEquivalent(const String& filename, const String& extension)
