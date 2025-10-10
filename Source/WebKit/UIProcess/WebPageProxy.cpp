@@ -6711,7 +6711,8 @@ void WebPageProxy::setNetworkRequestsInProgress(bool networkRequestsInProgress)
 
 void WebPageProxy::startNetworkRequestsForPageLoadTiming(WebCore::FrameIdentifier frameID)
 {
-    if (RefPtr frame = WebFrameProxy::webFrame(frameID); !frame || !frame->isConnected())
+    RefPtr frame = WebFrameProxy::webFrame(frameID);
+    if (!frame || (!frame->isMainFrame() && !frame->parentFrame()))
         return;
 
     m_generatePageLoadTimingTimer.stop();

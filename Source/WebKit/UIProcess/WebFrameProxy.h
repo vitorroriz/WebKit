@@ -195,7 +195,6 @@ public:
     void transferNavigationCallbackToFrame(WebFrameProxy&);
     void setNavigationCallback(CompletionHandler<void(std::optional<WebCore::PageIdentifier>, std::optional<WebCore::FrameIdentifier>)>&&);
 
-    bool isConnected() const;
     void disconnect();
     void didCreateSubframe(WebCore::FrameIdentifier, String&& frameName, WebCore::SandboxFlags, WebCore::ReferrerPolicy, WebCore::ScrollbarMode);
     ProcessID processID() const;
