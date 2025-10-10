@@ -11775,17 +11775,21 @@ static RetainPtr<UITargetedPreview> createFallbackTargetedPreview(UIView *rootVi
 
 - (UITargetedPreview *)_createTargetedContextMenuHintPreviewIfPossible
 {
+    RetainPtr<UIView> containerForContextMenuHintPreviews = self.containerForContextMenuHintPreviews;
+    if (![containerForContextMenuHintPreviews window])
+        return nil;
+
     RetainPtr<UITargetedPreview> targetedPreview;
 
     if (_positionInformation.isLink && _positionInformation.textIndicator && _positionInformation.textIndicator->contentImage()) {
         RefPtr textIndicator = _positionInformation.textIndicator;
         _positionInformationLinkIndicator = textIndicator;
 
-        targetedPreview = [self _createTargetedPreviewFromTextIndicator:WTFMove(textIndicator) previewContainer:self.containerForContextMenuHintPreviews];
+        targetedPreview = [self _createTargetedPreviewFromTextIndicator:WTFMove(textIndicator) previewContainer:containerForContextMenuHintPreviews.get()];
     } else if ((_positionInformation.isAttachment || _positionInformation.isImage) && _positionInformation.image) {
         RetainPtr cgImage = _positionInformation.image->createPlatformImage();
         auto image = adoptNS([[UIImage alloc] initWithCGImage:cgImage.get()]);
-        targetedPreview = createTargetedPreview(image.get(), self, self.containerForContextMenuHintPreviews, _positionInformation.bounds, { }, nil);
+        targetedPreview = createTargetedPreview(image.get(), self, containerForContextMenuHintPreviews.get(), _positionInformation.bounds, { }, nil);
     }
 
     if (!targetedPreview) {
@@ -11797,7 +11801,7 @@ static RetainPtr<UITargetedPreview> createFallbackTargetedPreview(UIView *rootVi
             return _positionInformation.bounds;
         }();
 
-        targetedPreview = createFallbackTargetedPreview(self, self.containerForContextMenuHintPreviews, boundsForFallbackPreview, nil);
+        targetedPreview = createFallbackTargetedPreview(self, containerForContextMenuHintPreviews.get(), boundsForFallbackPreview, nil);
     }
 
     [self _updateTargetedPreviewScrollViewUsingContainerScrollingNodeID:_positionInformation.containerScrollingNodeID];
