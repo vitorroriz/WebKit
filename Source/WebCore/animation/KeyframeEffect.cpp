@@ -1914,7 +1914,7 @@ const TimingFunction* KeyframeEffect::timingFunctionForBlendingKeyframe(const Bl
         }
 
         // Failing that, or for a CSS Transition, the timing function is inherited from the backing Animation object.
-        return styleOriginatedAnimation->backingAnimationTimingFunction().unsafeGet();
+        return styleOriginatedAnimation->backingAnimationTimingFunction();
     }
 
     return keyframe.timingFunction();
