@@ -1,8 +1,41 @@
 Shared/API/Cocoa/_WKRemoteObjectInterface.h
-UIProcess/API/Cocoa/WKView.h
+[ Mac ] UIProcess/API/Cocoa/WKView.h
 UIProcess/API/Cocoa/_WKAuthenticatorAssertionResponse.h
-UIProcess/API/Cocoa/_WKInspectorWindowInternal.h
+[ Mac ] UIProcess/API/Cocoa/_WKInspectorWindowInternal.h
 UIProcess/API/Cocoa/_WKNotificationData.mm
 UIProcess/API/Cocoa/_WKSpatialBackdropSource.h
 UIProcess/API/Cocoa/_WKWebPushMessage.h
-UIProcess/mac/WebViewImpl.mm
+[ Mac ] UIProcess/mac/WebViewImpl.mm
+[ iOS ] Platform/ios/PaymentAuthorizationController.mm
+[ iOS ] UIProcess/API/Cocoa/WKPreviewActionItem.h
+[ iOS ] UIProcess/API/Cocoa/WKWebView.h
+[ iOS ] UIProcess/API/Cocoa/_WKTouchEventGeneratorInternal.h
+[ iOS ] UIProcess/Cocoa/SystemPreviewControllerCocoa.mm
+[ iOS ] UIProcess/RemoteLayerTree/ios/RemoteLayerTreeDrawingAreaProxyIOS.mm
+[ iOS ] UIProcess/ViewGestureController.h
+[ iOS ] UIProcess/ios/CompactContextMenuPresenter.h
+[ iOS ] UIProcess/ios/SmartMagnificationController.h
+[ iOS ] UIProcess/ios/WKContentView.mm
+[ iOS ] UIProcess/ios/WKContentViewInteraction.mm
+[ iOS ] UIProcess/ios/WKImageAnalysisGestureRecognizer.h
+[ iOS ] UIProcess/ios/WKImageAnalysisGestureRecognizer.mm
+[ iOS ] UIProcess/ios/WKKeyboardScrollingAnimator.mm
+[ iOS ] UIProcess/ios/WKMouseInteraction.mm
+[ iOS ] UIProcess/ios/WKScrollView.h
+[ iOS ] UIProcess/ios/WKScrollView.mm
+[ iOS ] UIProcess/ios/WKScrollViewTrackingTapGestureRecognizer.h
+[ iOS ] UIProcess/ios/WKSyntheticTapGestureRecognizer.h
+[ iOS ] UIProcess/ios/WKTextInteractionWrapper.mm
+[ iOS ] UIProcess/ios/WKTouchEventsGestureRecognizer.h
+[ iOS ] UIProcess/ios/WKUSDPreviewView.mm
+[ iOS ] UIProcess/ios/WebDataListSuggestionsDropdownIOS.h
+[ iOS ] UIProcess/ios/WebDataListSuggestionsDropdownIOS.mm
+[ iOS ] UIProcess/ios/forms/WKDatePickerPopoverController.mm
+[ iOS ] UIProcess/ios/forms/WKDateTimeInputControl.mm
+[ iOS ] UIProcess/ios/forms/WKFormColorControl.mm
+[ iOS ] UIProcess/ios/forms/WKFormPeripheralBase.h
+[ iOS ] UIProcess/ios/forms/WKFormSelectPicker.mm
+[ iOS ] UIProcess/ios/forms/WKFormSelectPopover.mm
+[ iOS ] UIProcess/ios/fullscreen/WKFullScreenViewController.mm
+[ iOS ] UIProcess/ios/fullscreen/WKFullScreenWindowControllerIOS.mm
+[ iOS ] WebProcess/WebPage/WKAccessibilityWebPageObjectIOS.h
