@@ -2378,7 +2378,7 @@ WebGLAny WebGLRenderingContextBase::getTexParameter(GCGLenum target, GCGLenum pn
     }
 }
 
-WebGLAny WebGLRenderingContextBase::getUniform(WebGLProgram& program, const WebGLUniformLocation& uniformLocation)
+WebGLAny WebGLRenderingContextBase::getUniform(WebGLProgram& program, WebGLUniformLocation& uniformLocation)
 {
     if (isContextLost())
         return nullptr;
@@ -2390,9 +2390,40 @@ WebGLAny WebGLRenderingContextBase::getUniform(WebGLProgram& program, const WebG
     }
     GCGLint location = uniformLocation.location();
 
+    auto type = uniformLocation.type();
+    RefPtr context = m_context;
+
+    if (!type) {
+        GCGLint activeUniforms = context->getProgrami(program.object(), GraphicsContextGL::ACTIVE_UNIFORMS);
+        for (GCGLint i = 0; i < activeUniforms; i++) {
+            GraphicsContextGLActiveInfo info;
+            if (!context->getActiveUniform(program.object(), i, info))
+                break;
+            auto baseName = info.name;
+            // Strip "[0]" from the name if it's an array. FIXME: Is this still needed with ANGLE?
+            if (baseName.endsWith("[0]"_s))
+                baseName = baseName.left(baseName.length() - 3);
+            // If it's an array, we need to iterate through each element, appending "[index]" to the name.
+            for (GCGLint index = 0; index < info.size; ++index) {
+                auto currentName = !index ? baseName : makeString(baseName, '[', index, ']');
+                auto currentLocation = context->getUniformLocation(program.object(), currentName);
+                if (location == currentLocation) {
+                    type = info.type;
+                    break;
+                }
+            }
+            if (type)
+                break;
+        }
+        if (!type) {
+            synthesizeGLError(GraphicsContextGL::INVALID_VALUE, "getUniform"_s, "unknown error"_s);
+            return nullptr;
+        }
+        uniformLocation.setType(*type);
+    }
     GCGLenum baseType;
     unsigned length;
-    switch (uniformLocation.type()) {
+    switch (*type) {
     case GraphicsContextGL::BOOL:
         baseType = GraphicsContextGL::BOOL;
         length = 1;
@@ -2464,7 +2495,7 @@ WebGLAny WebGLRenderingContextBase::getUniform(WebGLProgram& program, const WebG
             synthesizeGLError(GraphicsContextGL::INVALID_VALUE, "getUniform"_s, "unhandled type"_s);
             return nullptr;
         }
-        switch (uniformLocation.type()) {
+        switch (*type) {
         case GraphicsContextGL::UNSIGNED_INT:
             baseType = GraphicsContextGL::UNSIGNED_INT;
             length = 1;
@@ -2591,23 +2622,7 @@ RefPtr<WebGLUniformLocation> WebGLRenderingContextBase::getUniformLocation(WebGL
     if (uniformLocation == -1)
         return nullptr;
 
-    GCGLint activeUniforms = context->getProgrami(program.object(), GraphicsContextGL::ACTIVE_UNIFORMS);
-    for (GCGLint i = 0; i < activeUniforms; i++) {
-        GraphicsContextGLActiveInfo info;
-        if (!context->getActiveUniform(program.object(), i, info))
-            return nullptr;
-        // Strip "[0]" from the name if it's an array.
-        if (info.name.endsWith("[0]"_s))
-            info.name = info.name.left(info.name.length() - 3);
-        // If it's an array, we need to iterate through each element, appending "[index]" to the name.
-        for (GCGLint index = 0; index < info.size; ++index) {
-            auto uniformName = makeString(info.name, '[', index, ']');
-
-            if (name == uniformName || name == info.name)
-                return WebGLUniformLocation::create(&program, uniformLocation, info.type);
-        }
-    }
-    return nullptr;
+    return WebGLUniformLocation::create(program, uniformLocation);
 }
 
 WebGLAny WebGLRenderingContextBase::getVertexAttrib(GCGLuint index, GCGLenum pname)
