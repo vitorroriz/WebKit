@@ -9414,9 +9414,6 @@ IGNORE_CLANG_WARNINGS_END
         case JSPromiseAllContextType:
             compileNewInternalFieldObjectImpl<JSPromiseAllContext>(operationNewPromiseAllContext);
             break;
-        case JSPromiseReactionType:
-            compileNewInternalFieldObjectImpl<JSPromiseReaction>(operationNewPromiseReaction);
-            break;
         case JSRegExpStringIteratorType:
             compileNewInternalFieldObjectImpl<JSRegExpStringIterator>(operationNewRegExpStringIterator);
             break;
@@ -17763,9 +17760,6 @@ IGNORE_CLANG_WARNINGS_END
             break;
         case JSPromiseAllContextType:
             compileMaterializeNewInternalFieldObjectImpl<JSPromiseAllContext>(operationNewPromiseAllContext);
-            break;
-        case JSPromiseReactionType:
-            compileMaterializeNewInternalFieldObjectImpl<JSPromiseReaction>(operationNewPromiseReaction);
             break;
         case JSPromiseType:
             if (m_node->structure()->classInfoForCells() == JSInternalPromise::info())

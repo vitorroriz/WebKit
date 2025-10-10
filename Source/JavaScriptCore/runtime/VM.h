@@ -517,6 +517,7 @@ public:
     WriteBarrier<Structure> webAssemblyCalleeGroupStructure;
 #endif
     WriteBarrier<Structure> moduleProgramExecutableStructure;
+    WriteBarrier<Structure> promiseReactionStructure;
     WriteBarrier<Structure> regExpStructure;
     WriteBarrier<Structure> symbolStructure;
     WriteBarrier<Structure> symbolTableStructure;

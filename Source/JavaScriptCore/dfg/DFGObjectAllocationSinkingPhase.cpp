@@ -1119,9 +1119,6 @@ private:
             case JSPromiseAllContextType:
                 target = handleInternalFieldClass<JSPromiseAllContext>(node, writes);
                 break;
-            case JSPromiseReactionType:
-                target = handleInternalFieldClass<JSPromiseReaction>(node, writes);
-                break;
             case JSRegExpStringIteratorType:
                 target = handleInternalFieldClass<JSRegExpStringIterator>(node, writes);
                 break;

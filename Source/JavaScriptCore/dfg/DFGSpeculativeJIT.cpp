@@ -15561,9 +15561,6 @@ void SpeculativeJIT::compileNewInternalFieldObject(Node* node)
     case JSPromiseAllContextType:
         compileNewInternalFieldObjectImpl<JSPromiseAllContext>(node, operationNewPromiseAllContext);
         break;
-    case JSPromiseReactionType:
-        compileNewInternalFieldObjectImpl<JSPromiseReaction>(node, operationNewPromiseReaction);
-        break;
     case JSRegExpStringIteratorType:
         compileNewInternalFieldObjectImpl<JSRegExpStringIterator>(node, operationNewRegExpStringIterator);
         break;

@@ -276,7 +276,7 @@ void JSPromise::performPromiseThen(JSGlobalObject* globalObject, JSValue onFulfi
     JSValue reactionsOrResult = this->reactionsOrResult();
     switch (status()) {
     case JSPromise::Status::Pending: {
-        auto* reaction = JSPromiseReaction::create(vm, globalObject->promiseReactionStructure(), promiseOrCapability, onFulfilled, onRejected, context, reactionsOrResult);
+        auto* reaction = JSPromiseReaction::create(vm, promiseOrCapability, onFulfilled, onRejected, context, jsDynamicCast<JSPromiseReaction*>(reactionsOrResult));
         setReactionsOrResult(vm, reaction);
         break;
     }
@@ -553,17 +553,17 @@ void JSPromise::triggerPromiseReactions(JSGlobalObject* globalObject, Status sta
         return;
 
     // Reverse the order of singly-linked-list.
-    JSValue previous = jsUndefined();
+    JSPromiseReaction* previous = nullptr;
     {
         auto* current = head;
         while (current) {
-            auto* next = jsDynamicCast<JSPromiseReaction*>(current->next());
+            auto* next = current->next();
             current->setNext(vm, previous);
             previous = current;
             current = next;
         }
     }
-    head = jsCast<JSPromiseReaction*>(previous);
+    head = previous;
 
     bool isResolved = status == JSPromise::Status::Fulfilled;
     auto* current = head;
@@ -571,7 +571,7 @@ void JSPromise::triggerPromiseReactions(JSGlobalObject* globalObject, Status sta
         JSValue promise = current->promise();
         JSValue handler = isResolved ? current->onFulfilled() : current->onRejected();
         JSValue context = current->context();
-        current = jsDynamicCast<JSPromiseReaction*>(current->next());
+        current = current->next();
 
         if (handler.isUndefinedOrNull()) {
             globalObject->queueMicrotask(InternalMicrotask::PromiseResolveWithoutHandlerJob, promise, argument, jsNumber(static_cast<int32_t>(status)), jsUndefined());

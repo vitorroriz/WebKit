@@ -151,7 +151,7 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
 
         switch (promise->status()) {
         case JSPromise::Status::Pending: {
-            auto* reaction = JSPromiseReaction::create(vm, globalObject->promiseReactionStructure(), promiseToResolve, jsUndefined(), jsUndefined(), jsUndefined(), promise->reactionsOrResult());
+            auto* reaction = JSPromiseReaction::create(vm, promiseToResolve, jsUndefined(), jsUndefined(), jsUndefined(), jsDynamicCast<JSPromiseReaction*>(promise->reactionsOrResult()));
             promise->setReactionsOrResult(vm, reaction);
             break;
         }
@@ -187,7 +187,7 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
 
         switch (promise->status()) {
         case JSPromise::Status::Pending: {
-            auto* reaction = JSPromiseReaction::create(vm, globalObject->promiseReactionStructure(), jsUndefined(), onFulfilled, onRejected, context, promise->reactionsOrResult());
+            auto* reaction = JSPromiseReaction::create(vm, jsUndefined(), onFulfilled, onRejected, context, jsDynamicCast<JSPromiseReaction*>(promise->reactionsOrResult()));
             promise->setReactionsOrResult(vm, reaction);
             break;
         }
