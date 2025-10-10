@@ -450,6 +450,15 @@ LayoutUnit PositionedLayoutConstraints::resolveAlignmentShift(LayoutUnit unusedS
     if (ItemPosition::AnchorCenter == resolvedAlignment) {
         auto anchorCenterPosition = m_anchorArea.min() + (m_anchorArea.size() - itemSize) / 2;
         shift = anchorCenterPosition - m_insetModifiedContainingRange.min();
+        if (m_alignment.overflow() == OverflowAlignment::Safe) {
+            if (startIsBefore) {
+                if (shift < 0)
+                    shift = 0;
+            } else {
+                if (shift > unusedSpace)
+                    shift = unusedSpace;
+            }
+        }
         if (!isOverflowing && OverflowAlignment::Default == m_alignment.overflow()) {
             // Avoid introducing overflow of the IMCB.
             if (shift < 0)
