@@ -760,8 +760,8 @@ enum class WebCore::IndexedDB::RequestType : uint8_t {
 
 #if ENABLE(GPU_PROCESS) && ENABLE(WEBGL)
 header: <WebCore/GraphicsContextGLActiveInfo.h>
-[AdditionalEncoder=StreamConnectionEncoder, CustomHeader] struct WebCore::GraphicsContextGLActiveInfo {
-    String name;
+[AdditionalEncoder=StreamConnectionEncoder, CustomHeader] class WebCore::GraphicsContextGLActiveInfo {
+    CString name;
     GCGLenum type;
     GCGLint size;
 };
