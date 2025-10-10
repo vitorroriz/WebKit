@@ -681,6 +681,11 @@ Element* VisibleSelection::rootEditableElement() const
     return editableRootForPosition(start());
 }
 
+RefPtr<Element> VisibleSelection::protectedRootEditableElement() const
+{
+    return rootEditableElement();
+}
+
 Node* VisibleSelection::nonBoundaryShadowTreeRootNode() const
 {
     return start().deprecatedNode() && !start().deprecatedNode()->isShadowRoot() ? start().deprecatedNode()->nonBoundaryShadowTreeRootNode() : nullptr;

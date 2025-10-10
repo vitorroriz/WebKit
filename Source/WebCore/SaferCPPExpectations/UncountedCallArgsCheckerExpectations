@@ -421,7 +421,6 @@ html/FTPDirectoryDocument.cpp
 html/FormAssociatedCustomElement.cpp
 html/FormAssociatedElement.cpp
 html/FormListedElement.cpp
-html/HTMLAnchorElement.cpp
 html/HTMLAttachmentElement.cpp
 html/HTMLBaseElement.cpp
 html/HTMLBodyElement.cpp
