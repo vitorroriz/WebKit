@@ -696,7 +696,7 @@ const Device& Queue::device() const
 {
     auto device = m_device.get();
     RELEASE_ASSERT(device);
-    return *device;
+    return *device.unsafeGet();
 }
 
 void Queue::clearTextureIfNeeded(const WGPUImageCopyTexture& destination, NSUInteger slice)

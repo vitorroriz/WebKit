@@ -385,7 +385,7 @@ void ResourceLoader::addBuffer(const FragmentedSharedBuffer& buffer, DataPayload
 
 const FragmentedSharedBuffer* ResourceLoader::resourceData() const
 {
-    return m_resourceData.get().get();
+    return m_resourceData.get().unsafeGet();
 }
 
 RefPtr<const FragmentedSharedBuffer> ResourceLoader::protectedResourceData() const

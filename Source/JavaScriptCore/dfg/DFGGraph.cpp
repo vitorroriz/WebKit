@@ -1289,7 +1289,7 @@ unsigned Graph::stackPointerOffset()
 unsigned Graph::requiredRegisterCountForExit()
 {
     unsigned count = JIT::frameRegisterCountFor(m_profiledBlock);
-    for (InlineCallFrameSet::iterator iter = m_plan.inlineCallFrames()->begin(); !!iter; ++iter) {
+    for (InlineCallFrameSet::iterator iter = m_plan.inlineCallFrames().unsafeGet()->begin(); !!iter; ++iter) {
         InlineCallFrame* inlineCallFrame = *iter;
         CodeBlock* codeBlock = baselineCodeBlockForInlineCallFrame(inlineCallFrame);
         unsigned requiredCount = VirtualRegister(inlineCallFrame->stackOffset).toLocal() + 1 + JIT::frameRegisterCountFor(codeBlock);

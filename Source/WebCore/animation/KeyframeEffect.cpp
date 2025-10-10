@@ -1914,7 +1914,7 @@ const TimingFunction* KeyframeEffect::timingFunctionForBlendingKeyframe(const Bl
         }
 
         // Failing that, or for a CSS Transition, the timing function is inherited from the backing Animation object.
-        return styleOriginatedAnimation->backingAnimationTimingFunction().get();
+        return styleOriginatedAnimation->backingAnimationTimingFunction().unsafeGet();
     }
 
     return keyframe.timingFunction();
@@ -3163,7 +3163,7 @@ const ViewTimeline* KeyframeEffect::activeViewTimeline()
 
     RefPtr viewTimeline = dynamicDowncast<ViewTimeline>(animation->timeline());
     if (viewTimeline && viewTimeline->currentTime())
-        return viewTimeline.get();
+        return viewTimeline.unsafeGet();
 
     return nullptr;
 }

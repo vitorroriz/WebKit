@@ -1307,7 +1307,7 @@ void WebPage::sendTapHighlightForNodeIfNecessary(WebKit::TapIdentifier requestID
     }
 
     if (RefPtr area = dynamicDowncast<HTMLAreaElement>(*node)) {
-        node = area->imageElement().get();
+        node = area->imageElement().unsafeGet();
         if (!node)
             return;
     }

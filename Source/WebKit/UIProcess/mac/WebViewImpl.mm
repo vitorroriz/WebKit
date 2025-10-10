@@ -6624,7 +6624,7 @@ void WebViewImpl::togglePictureInPicture()
 PlatformPlaybackSessionInterface* WebViewImpl::playbackSessionInterface() const
 {
     if (RefPtr manager = m_page->playbackSessionManager())
-        return manager->controlsManagerInterface().get();
+        return manager->controlsManagerInterface().unsafeGet();
 
     return nullptr;
 }

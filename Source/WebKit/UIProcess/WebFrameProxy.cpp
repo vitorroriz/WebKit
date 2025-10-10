@@ -738,7 +738,7 @@ WebFrameProxy* WebFrameProxy::deepLastChild()
     RefPtr result = this;
     for (RefPtr last = lastChild(); last; last = last->lastChild())
         result = last;
-    return result.get();
+    return result.unsafeGet();
 }
 
 WebFrameProxy* WebFrameProxy::firstChild() const

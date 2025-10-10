@@ -358,7 +358,7 @@ static Node* firstNode(const BoundaryPoint& point)
     if (point.container->isCharacterDataNode())
         return point.container.ptr();
     if (RefPtr child = point.container->traverseToChildAt(point.offset))
-        return child.get();
+        return child.unsafeGet();
     if (!point.offset)
         return point.container.ptr();
     return NodeTraversal::nextSkippingChildren(point.container);

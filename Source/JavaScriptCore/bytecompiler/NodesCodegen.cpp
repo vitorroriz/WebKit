@@ -1031,7 +1031,7 @@ RegisterID* BracketAccessorNode::emitBytecode(BytecodeGenerator& generator, Regi
         }
 
         generator.emitProfileType(finalDest.get(), divotStart(), divotEnd());
-        return finalDest.get();
+        return finalDest.unsafeGet();
     }
 
     RegisterID* ret;
@@ -1335,7 +1335,7 @@ RegisterID* EvalFunctionCallNode::emitBytecode(BytecodeGenerator& generator, Reg
     } else
         generator.emitCallDirectEval(returnValue.get(), func.get(), callArguments, divot(), divotStart(), divotEnd(), DebuggableCall::No);
 
-    return returnValue.get();
+    return returnValue.unsafeGet();
 }
 
 // ------------------------------ FunctionCallValueNode ----------------------------------
@@ -1410,7 +1410,7 @@ RegisterID* StaticBlockFunctionCallNode::emitBytecode(BytecodeGenerator& generat
     RefPtr result = generator.emitCallInTailPosition(returnValue.get(), function.get(), NoExpectedFunction, callArguments, divot(), divotStart(), divotEnd(), DebuggableCall::Yes);
 
     generator.emitProfileType(returnValue.get(), divotStart(), divotEnd());
-    return result.get();
+    return result.unsafeGet();
 }
 
 // ------------------------------ FunctionCallResolveNode ----------------------------------
@@ -2448,7 +2448,7 @@ RegisterID* BytecodeIntrinsicNode::emit_intrinsic_newArrayWithSize(JSC::Bytecode
 
     RefPtr<RegisterID> finalDestination = generator.finalDestination(dst);
     generator.emitNewArrayWithSize(finalDestination.get(), size.get());
-    return finalDestination.get();
+    return finalDestination.unsafeGet();
 }
 
 RegisterID* BytecodeIntrinsicNode::emit_intrinsic_newArrayWithSpecies(JSC::BytecodeGenerator& generator, JSC::RegisterID* dst)
@@ -2461,7 +2461,7 @@ RegisterID* BytecodeIntrinsicNode::emit_intrinsic_newArrayWithSpecies(JSC::Bytec
 
     RefPtr<RegisterID> finalDestination = generator.finalDestination(dst);
     generator.emitNewArrayWithSpecies(finalDestination.get(), size.get(), array.get());
-    return finalDestination.get();
+    return finalDestination.unsafeGet();
 }
 
 RegisterID* BytecodeIntrinsicNode::emit_intrinsic_createPromise(JSC::BytecodeGenerator& generator, JSC::RegisterID* dst)
@@ -2481,7 +2481,7 @@ RegisterID* BytecodeIntrinsicNode::emit_intrinsic_newPromise(JSC::BytecodeGenera
     RefPtr<RegisterID> finalDestination = generator.finalDestination(dst);
     bool isInternalPromise = false;
     generator.emitNewPromise(finalDestination.get(), isInternalPromise);
-    return finalDestination.get();
+    return finalDestination.unsafeGet();
 }
 
 
@@ -2662,7 +2662,7 @@ RegisterID* CallFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator, 
         generator.move(callArguments.thisRegister(), base.get());
         generator.emitCallInTailPosition(returnValue.get(), function.get(), NoExpectedFunction, callArguments, divot(), divotStart(), divotEnd(), DebuggableCall::Yes);
         generator.move(dst, returnValue.get());
-        return returnValue.get();
+        return returnValue.unsafeGet();
     }
 
     Ref<Label> realCall = generator.newLabel();
@@ -2708,7 +2708,7 @@ RegisterID* CallFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator, 
         generator.emitLabel(end.get());
     }
     generator.emitProfileType(returnValue.get(), divotStart(), divotEnd());
-    return returnValue.get();
+    return returnValue.unsafeGet();
 }
 
 RegisterID* HasOwnPropertyFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
@@ -2777,7 +2777,7 @@ RegisterID* HasOwnPropertyFunctionCallDotNode::emitBytecode(BytecodeGenerator& g
     }
 
     generator.emitProfileType(returnValue.get(), divotStart(), divotEnd());
-    return returnValue.get();
+    return returnValue.unsafeGet();
 }
 
 static bool areTrivialApplyArguments(ArgumentsNode* args)
@@ -2818,7 +2818,7 @@ RegisterID* ApplyFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
         generator.move(callArguments.thisRegister(), base.get());
         generator.emitCallInTailPosition(returnValue.get(), function.get(), NoExpectedFunction, callArguments, divot(), divotStart(), divotEnd(), DebuggableCall::Yes);
         generator.move(dst, returnValue.get());
-        return returnValue.get();
+        return returnValue.unsafeGet();
     }
 
     Ref<Label> realCall = generator.newLabel();
@@ -2901,7 +2901,7 @@ RegisterID* ApplyFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
         generator.emitLabel(end.get());
     }
     generator.emitProfileType(returnValue.get(), divotStart(), divotEnd());
-    return returnValue.get();
+    return returnValue.unsafeGet();
 }
 
 // ------------------------------ PostfixNode ----------------------------------
@@ -2944,7 +2944,7 @@ RegisterID* PostfixNode::emitResolve(BytecodeGenerator& generator, RegisterID* d
         }
         RefPtr<RegisterID> oldValue = emitPostIncOrDec(generator, generator.finalDestination(dst), localReg.get(), m_operator);
         generator.emitProfileType(localReg.get(), var, divotStart(), divotEnd());
-        return oldValue.get();
+        return oldValue.unsafeGet();
     }
 
     generator.emitExpressionInfo(newDivot, divotStart(), newDivot);
@@ -2954,7 +2954,7 @@ RegisterID* PostfixNode::emitResolve(BytecodeGenerator& generator, RegisterID* d
     if (var.isReadOnly()) {
         bool threwException = generator.emitReadOnlyExceptionIfNeeded(var);
         if (threwException)
-            return value.get();
+            return value.unsafeGet();
     }
     RefPtr<RegisterID> oldValue = emitPostIncOrDec(generator, generator.finalDestination(dst), value.get(), m_operator);
     if (!var.isReadOnly()) {
@@ -2962,7 +2962,7 @@ RegisterID* PostfixNode::emitResolve(BytecodeGenerator& generator, RegisterID* d
         generator.emitProfileType(value.get(), var, divotStart(), divotEnd());
     }
 
-    return oldValue.get();
+    return oldValue.unsafeGet();
 }
 
 RegisterID* PostfixNode::emitBracket(BytecodeGenerator& generator, RegisterID* dst)
@@ -3257,7 +3257,7 @@ RegisterID* PrefixNode::emitResolve(BytecodeGenerator& generator, RegisterID* ds
     if (var.isReadOnly()) {
         bool threwException = generator.emitReadOnlyExceptionIfNeeded(var);
         if (threwException)
-            return value.get();
+            return value.unsafeGet();
     }
 
     emitIncOrDec(generator, value.get(), m_operator);
@@ -3909,7 +3909,7 @@ RegisterID* OptionalChainNode::emitBytecode(BytecodeGenerator& generator, Regist
     if (m_isOutermost)
         generator.popOptionalChainTarget(finalDest.get(), m_expr->isDeleteNode());
 
-    return finalDest.get();
+    return finalDest.unsafeGet();
 }
 
 // ------------------------------ ConditionalNode ------------------------------
@@ -3936,7 +3936,7 @@ RegisterID* ConditionalNode::emitBytecode(BytecodeGenerator& generator, Register
 
     generator.emitProfileControlFlow(m_expr2->endOffset() + 1);
 
-    return newDst.get();
+    return newDst.unsafeGet();
 }
 
 // ------------------------------ ReadModifyResolveNode -----------------------------------
@@ -4227,7 +4227,7 @@ RegisterID* AssignResolveNode::emitBytecode(BytecodeGenerator& generator, Regist
     if (isReadOnly) {
         bool threwException = generator.emitReadOnlyExceptionIfNeeded(var);
         if (threwException)
-            return result.get();
+            return result.unsafeGet();
     }
     RegisterID* returnResult = result.get();
     if (!isReadOnly) {
@@ -4269,7 +4269,7 @@ RegisterID* ReadModifyDotNode::emitBytecode(BytecodeGenerator& generator, Regist
     generator.emitExpressionInfo(divot(), divotStart(), divotEnd());
     RefPtr<RegisterID> ret = emitPutProperty(generator, base.get(), updatedValue, thisValue);
     generator.emitProfileType(updatedValue, divotStart(), divotEnd());
-    return ret.get();
+    return ret.unsafeGet();
 }
 
 // ------------------------------ ShortCircuitReadModifyDotNode -----------------------------------

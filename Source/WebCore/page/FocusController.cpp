@@ -94,7 +94,7 @@ static Element* openPopoverForInvoker(const Node* candidateInvoker)
         return nullptr;
     RefPtr popover = invoker->invokedPopover();
     if (popover && popover->isPopoverShowing() && popover->popoverData()->invoker() == invoker)
-        return popover.get();
+        return popover.unsafeGet();
     return nullptr;
 }
 
@@ -505,7 +505,7 @@ LocalFrame* FocusController::focusedOrMainFrame() const
     if (auto* frame = focusedLocalFrame())
         return frame;
     if (RefPtr localMainFrame = m_page->localMainFrame())
-        return localMainFrame.get();
+        return localMainFrame.unsafeGet();
     ASSERT(m_page->settings().siteIsolationEnabled());
     return nullptr;
 }
