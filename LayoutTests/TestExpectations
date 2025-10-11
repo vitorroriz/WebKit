@@ -6999,6 +6999,10 @@ imported/w3c/web-platform-tests/navigation-api/ordering-and-transition/reload-no
 imported/w3c/web-platform-tests/navigation-api/ordering-and-transition/transition-to.tentative.html [ Skip ]
 imported/w3c/web-platform-tests/navigation-api/precommit-handler/ [ Skip ]
 
+# Require enabling CSS Scroll Anchoring
+imported/w3c/web-platform-tests/navigation-api/scroll-behavior/after-transition-reload.html [ Skip ]
+imported/w3c/web-platform-tests/navigation-api/scroll-behavior/manual-scroll-reload.html [ Skip ]
+
 # -- View Transitions -- #
 
 imported/w3c/web-platform-tests/css/css-view-transitions/pseudo-element-overflow-clip-with-border-radius.html [ ImageOnlyFailure ]
