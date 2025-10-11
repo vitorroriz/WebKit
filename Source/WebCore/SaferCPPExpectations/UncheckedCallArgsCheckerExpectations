@@ -766,6 +766,7 @@ xml/parser/XMLDocumentParserLibxml2.cpp
 [ iOS ] accessibility/ios/WebAccessibilityObjectWrapperIOS.mm
 [ iOS ] editing/ios/EditorIOS.mm
 [ iOS ] html/ColorInputType.cpp
+[ iOS ] html/HTMLAnchorElement.cpp
 [ iOS ] page/Chrome.cpp
 [ iOS ] page/DOMTimer.cpp
 [ iOS ] page/Page.cpp

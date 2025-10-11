@@ -1024,6 +1024,7 @@ xml/parser/XMLDocumentParserLibxml2.cpp
 [ iOS ] editing/cocoa/DataDetection.mm
 [ iOS ] editing/ios/EditorIOS.mm
 [ iOS ] html/ColorInputType.cpp
+[ iOS ] html/HTMLAnchorElement.cpp
 [ iOS ] html/TextFieldInputType.cpp
 [ iOS ] loader/FrameLoader.cpp
 [ iOS ] loader/cache/CachedRawResource.cpp
