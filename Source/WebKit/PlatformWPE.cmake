@@ -616,6 +616,8 @@ if (ENABLE_WPE_QT_API)
                 Qt::Quick
             PRIVATE
                 Epoxy::Epoxy
+                GLib::GLib
+                GLib::Object
                 WebKit
         )
         target_include_directories(qtwpe PRIVATE
