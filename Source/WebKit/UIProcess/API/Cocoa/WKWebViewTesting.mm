@@ -1192,4 +1192,15 @@ static void dumpCALayer(TextStream& ts, CALayer *layer, bool traverse)
 #endif
 
 @implementation _WKNowPlayingMetadata : NSObject
+- (void)dealloc
+{
+IGNORE_NULL_CHECK_WARNINGS_BEGIN
+    self.title = nil;
+    self.artist = nil;
+    self.album = nil;
+    self.sourceApplicationIdentifier = nil;
+IGNORE_NULL_CHECK_WARNINGS_END
+
+    [super dealloc];
+}
 @end

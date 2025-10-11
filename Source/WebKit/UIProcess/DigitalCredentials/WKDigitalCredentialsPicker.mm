@@ -111,10 +111,17 @@ using WebCore::IdentityCredentialProtocol;
 {
     self = [super init];
     if (self) {
-        _requestDataBytes = requestDataBytes;
-        _protocol = protocol;
+        self.requestDataBytes = requestDataBytes;
+        self.protocol = protocol;
     }
     return self;
+}
+
+- (void)dealloc
+{
+    self.requestDataBytes = nil;
+
+    [super dealloc];
 }
 
 @end // WKRequestDataResult
