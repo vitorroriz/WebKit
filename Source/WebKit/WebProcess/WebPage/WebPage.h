@@ -137,6 +137,10 @@ OBJC_CLASS PDFSelection;
 OBJC_CLASS WKAccessibilityWebPageObject;
 #endif
 
+#if ENABLE(ASYNC_SCROLLING)
+#include "MonotonicObjectIdentifier.h"
+#endif
+
 #define ENABLE_VIEWPORT_RESIZING PLATFORM(IOS_FAMILY)
 
 namespace WTF {
@@ -599,6 +603,8 @@ public:
 
 #if ENABLE(ASYNC_SCROLLING)
     WebCore::ScrollingCoordinator* scrollingCoordinator() const;
+    bool shouldIgnoreScrollPositionUpdate(TransactionID) const;
+    void markPendingLocalScrollPositionChange();
 #endif
 
     WebPageGroupProxy* pageGroup() const { return m_pageGroup.get(); }
@@ -3185,6 +3191,10 @@ private:
 
 #if ENABLE(WRITING_TOOLS)
     const UniqueRef<TextAnimationController> m_textAnimationController;
+#endif
+
+#if ENABLE(ASYNC_SCROLLING)
+    std::optional<TransactionID> m_pendingLocalChangeTransactionID;
 #endif
 
     std::unique_ptr<WebCore::NowPlayingMetadataObserver> m_nowPlayingMetadataObserver;
