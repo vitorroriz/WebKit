@@ -125,6 +125,7 @@
 #import <wtf/ProcessPrivilege.h>
 #import <wtf/RuntimeApplicationChecks.h>
 #import <wtf/SoftLinking.h>
+#import <wtf/SystemFree.h>
 #import <wtf/cf/NotificationCenterCF.h>
 #import <wtf/cocoa/Entitlements.h>
 #import <wtf/cocoa/NSURLExtras.h>
@@ -885,14 +886,13 @@ static void registerLogClient(bool isDebugLoggingEnabled, std::unique_ptr<LogCli
         if (type == OS_LOG_TYPE_FAULT)
             type = OS_LOG_TYPE_ERROR;
 
-        if (char* messageString = os_log_copy_message_string(msg)) {
-            auto logString = spanConstCast<Latin1Character>(unsafeSpan8IncludingNullTerminator(messageString));
+        if (auto messageString = adoptSystem(os_log_copy_message_string(msg))) {
+            auto logString = spanConstCast<Latin1Character>(unsafeSpan8IncludingNullTerminator(messageString.get()));
             if (logString.size() > logStringMaxSize) {
                 logString = logString.first(logStringMaxSize);
                 logString.back() = 0;
             }
             logClient()->log(byteCast<uint8_t>(logChannel), byteCast<uint8_t>(logCategory), byteCast<uint8_t>(logString), type);
-            free(messageString);
         }
     }).get());
 

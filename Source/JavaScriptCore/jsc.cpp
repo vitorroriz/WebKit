@@ -3915,18 +3915,15 @@ static void runInteractive(GlobalObject* globalObject)
         String source;
         do {
             error = ParserError();
-            char* line = readline(source.isEmpty() ? interactivePrompt : "... ");
+            auto line = adoptSystem(readline(source.isEmpty() ? interactivePrompt : "... "));
             shouldQuit = !line;
             if (!line)
                 break;
-            source = makeString(source, String::fromUTF8(line), '\n');
+            source = makeString(source, byteCast<char8_t>(unsafeSpan(line.get())), '\n');
             checkSyntax(vm, jscSource(source, sourceOrigin), error);
-            if (!line[0]) {
-                free(line);
+            if (!*line)
                 break;
-            }
-            add_history(line);
-            free(line);
+            add_history(line.get());
         } while (error.syntaxErrorType() == ParserError::SyntaxErrorRecoverable);
         
         if (error.isValid()) {

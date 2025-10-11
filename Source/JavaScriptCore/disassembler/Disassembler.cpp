@@ -32,6 +32,7 @@
 #include <wtf/Deque.h>
 #include <wtf/Lock.h>
 #include <wtf/NeverDestroyed.h>
+#include <wtf/SystemFree.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/Threading.h>
 

@@ -41,6 +41,7 @@
 #include <webrtc/rtc_base/time_utils.h>
 #include <wtf/BlockPtr.h>
 #include <wtf/SoftLinking.h>
+#include <wtf/SystemFree.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/ThreadSafeRefCounted.h>
 #include <wtf/cocoa/SpanCocoa.h>
@@ -173,9 +174,8 @@ static webrtc::SocketAddress socketAddressFromIncomingConnection(nw_connection_t
     auto endpoint = adoptNS(nw_connection_copy_endpoint(connection));
     auto type = nw_endpoint_get_type(endpoint.get());
     if (type == nw_endpoint_type_address) {
-        auto* ipAddress = nw_endpoint_copy_address_string(endpoint.get());
-        webrtc::SocketAddress remoteAddress { ipAddress, nw_endpoint_get_port(endpoint.get()) };
-        free(ipAddress);
+        auto ipAddress = adoptSystem(nw_endpoint_copy_address_string(endpoint.get()));
+        webrtc::SocketAddress remoteAddress { ipAddress.get(), nw_endpoint_get_port(endpoint.get()) };
         return remoteAddress;
     }
     return webrtc::SocketAddress { nw_endpoint_get_hostname(endpoint.get()), nw_endpoint_get_port(endpoint.get()) };
