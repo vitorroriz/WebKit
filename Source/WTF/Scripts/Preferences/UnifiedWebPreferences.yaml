@@ -7949,17 +7949,17 @@ TextRecognitionInVideosEnabled:
 
 TextShapingAcrossInlineBoxes:
   type: bool
-  status: preview
+  status: stable
   category: css
   humanReadableName: "Text Shaping Across Inline Boxes"
   humanReadableDescription: "Enable Text Shaping Across Inline Boxes"
   defaultValue:
     WebCore:
-      default: false
+      default: true
     WebKitLegacy:
-      default: false
+      default: true
     WebKit:
-      default: false
+      default: true
 
 TextTracksInMSEEnabled:
   type: bool
