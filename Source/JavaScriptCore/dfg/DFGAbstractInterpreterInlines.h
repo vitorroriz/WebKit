@@ -3623,7 +3623,7 @@ bool AbstractInterpreter<AbstractStateType>::executeEffects(unsigned clobberLimi
         }
 
         clobberWorld();
-        makeHeapTopForNode(node);
+        setTypeForNode(node, SpecObject);
         break;
     }
 
