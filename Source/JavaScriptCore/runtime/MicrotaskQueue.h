@@ -62,12 +62,14 @@ public:
     {
     }
 
-    QueuedTask(RefPtr<MicrotaskDispatcher>&& dispatcher, InternalMicrotask job, JSGlobalObject* globalObject, JSValue argument0, JSValue argument1, JSValue argument2, JSValue argument3)
+    template<typename... Args>
+    requires (sizeof...(Args) <= maxArguments) && (std::is_convertible_v<Args, JSValue> && ...)
+    QueuedTask(RefPtr<MicrotaskDispatcher>&& dispatcher, InternalMicrotask job, JSGlobalObject* globalObject, Args&&...args)
         : m_dispatcher(WTFMove(dispatcher))
         , m_identifier(MicrotaskIdentifier::generate())
         , m_job(job)
         , m_globalObject(globalObject)
-        , m_arguments { argument0, argument1, argument2, argument3 }
+        , m_arguments { std::forward<Args>(args)... }
     {
     }
 
