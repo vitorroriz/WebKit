@@ -41,22 +41,25 @@ import subprocess
 UNKNOWN_CRASH_STR = "CRASH_OR_PROBLEM_IN_TEST_EXECUTABLE"
 
 
+def port_options(options):
+    port_options = optparse.Values()
+    if options.debug:
+        setattr(port_options, 'configuration', 'Debug')
+    elif options.release:
+        setattr(port_options, 'configuration', 'Release')
+    return port_options
+
 class TestRunner(object):
     TEST_TARGETS = []
 
     def __init__(self, port, options, tests=[]):
         self._options = options
-        self._port = Host().port_factory.get(port)
+        self._port = Host().port_factory.get(port, port_options(options))
         self._driver = self._create_driver()
         self._weston = None
         self._monado = None
 
-        if self._options.debug:
-            self._build_type = "Debug"
-        elif self._options.release:
-            self._build_type = "Release"
-        else:
-            self._build_type = self._port.default_configuration()
+        self._build_type = self._port.get_option('configuration')
         common.set_build_types((self._build_type,))
 
         self._programs_path = common.binary_build_path(self._port)
