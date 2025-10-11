@@ -61,14 +61,14 @@ public:
 
 private:
 
-    static std::optional<float> effectiveVisualArea(const Element&, CachedImage*, FloatRect imageLocalRect, FloatRect intersectionRect);
+    static std::optional<float> effectiveVisualArea(const Element&, CachedImage*, FloatRect imageLocalRect, FloatRect intersectionRect, FloatSize viewportSize);
 
     static FloatRect computeViewportIntersectionRect(Element&, FloatRect localRect);
     static FloatRect computeViewportIntersectionRectForTextContainer(Element&, const WeakHashSet<Text, WeakPtrImplWithEventTargetData>&);
 
     static bool isEligibleForLargestContentfulPaint(const Element&, float effectiveVisualArea);
 
-    void potentiallyAddLargestContentfulPaintEntry(Element&, CachedImage*, FloatRect imageLocalRect, FloatRect intsectionRect, MonotonicTime loadTime, DOMHighResTimeStamp paintTime);
+    void potentiallyAddLargestContentfulPaintEntry(Element&, CachedImage*, FloatRect imageLocalRect, FloatRect intersectionRect, MonotonicTime loadTime, DOMHighResTimeStamp paintTimestamp, std::optional<FloatSize>& viewportSize);
 
     float m_largestPaintArea { 0 };
 
