@@ -271,11 +271,9 @@ static ALWAYS_INLINE MacroAssemblerCodeRef<JITThunkPtrTag> jitWriteThunkGenerato
 
     auto stubBaseCodePtr = CodePtr<LinkBufferPtrTag>(tagCodePtr<LinkBufferPtrTag>(stubBase));
     LinkBuffer linkBuffer(jit, stubBaseCodePtr, stubSize, LinkBuffer::Profile::Thunk);
-    // We don't use FINALIZE_CODE() for two reasons.
-    // The first is that we don't want the writeable address, as disassembled instructions,
-    // to appear in the console or anywhere in memory, via the PrintStream buffer.
-    // The second is we can't guarantee that the code is readable when using the
-    // asyncDisassembly option as our caller will set our pages execute only.
+    // We don't use FINALIZE_CODE() because we don't want the writeable address, as
+    // disassembled instructions, to appear in the console or anywhere in memory, via
+    // the PrintStream buffer.
     return linkBuffer.finalizeCodeWithoutDisassembly<JITThunkPtrTag>(nullptr);
 }
 #else // not USE(EXECUTE_ONLY_JIT_WRITE_FUNCTION)

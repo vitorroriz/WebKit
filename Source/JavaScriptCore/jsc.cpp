@@ -202,8 +202,6 @@ namespace {
 
 [[noreturn]] static void jscExit(int status)
 {
-    waitForAsynchronousDisassembly();
-    
 #if ENABLE(DFG_JIT)
     if (DFG::isCrashing()) {
         for (;;) {
