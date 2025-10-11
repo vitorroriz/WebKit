@@ -623,7 +623,7 @@ public:
     WEBCORE_EXPORT Ref<HTMLCollection> forms();
     WEBCORE_EXPORT Ref<HTMLCollection> anchors();
     WEBCORE_EXPORT Ref<HTMLCollection> scripts();
-    Ref<HTMLCollection> all();
+    Ref<HTMLAllCollection> all();
     Ref<HTMLCollection> allFilteredByName(const AtomString&);
 
     Ref<HTMLCollection> windowNamedItems(const AtomString&);
