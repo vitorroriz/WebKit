@@ -100,7 +100,7 @@ dom/StaticRange.cpp
 dom/TreeScope.cpp
 dom/TypedElementDescendantIteratorInlines.h
 dom/ViewTransition.cpp
-dom/mac/ImageControlsMac.cpp
+[ Mac ] dom/mac/ImageControlsMac.cpp
 [ Mac ] editing/AlternativeTextController.cpp
 editing/ApplyBlockElementCommand.cpp
 editing/ApplyStyleCommand.cpp

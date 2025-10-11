@@ -69,6 +69,7 @@ WebCoreSupport/WebCryptoClient.h
 [ iOS ] ios/WebView/WebPDFViewPlaceholder.h
 [ iOS ] ios/WebView/WebPDFViewPlaceholder.mm
 [ iOS ] mac/WebView/WebDataSource.mm
+[ iOS ] mac/WebView/WebFeature.h
 [ iOS ] mac/WebView/WebIndicateLayer.h
 [ iOS ] mac/WebView/WebViewPrivate.h
 [ iOS ] mac/WebView/WebViewRenderingUpdateScheduler.h
