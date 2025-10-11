@@ -2764,7 +2764,7 @@ end)
 macro loadWithStructureCheck(opcodeStruct, get, operand, slowPath)
     get(m_scope, t0)
     loadp PayloadOffset[cfr, t0, 8], t0
-    loadp %opcodeStruct%::Metadata::m_structure[t5], t1
+    loadp %opcodeStruct%::Metadata::m_structureID[t5], t1
     bineq JSCell::m_structureID[t0], t1, slowPath
 end
 

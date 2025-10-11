@@ -9465,8 +9465,8 @@ void ByteCodeParser::parseBlock(unsigned limit)
                 resolveType = getPutInfo.resolveType();
                 if (resolveType == GlobalVar || resolveType == GlobalVarWithVarInjectionChecks || resolveType == GlobalLexicalVar || resolveType == GlobalLexicalVarWithVarInjectionChecks)
                     watchpoints = metadata.m_watchpointSet;
-                else if (resolveType != UnresolvedProperty && resolveType != UnresolvedPropertyWithVarInjectionChecks)
-                    structure = metadata.m_structure.get();
+                else if (resolveType == GlobalProperty || resolveType == GlobalPropertyWithVarInjectionChecks)
+                    structure = metadata.m_structureID.get();
                 operand = metadata.m_operand;
             }
 
@@ -9653,8 +9653,8 @@ void ByteCodeParser::parseBlock(unsigned limit)
                 resolveType = getPutInfo.resolveType();
                 if (resolveType == GlobalVar || resolveType == GlobalVarWithVarInjectionChecks || resolveType == ResolvedClosureVar || resolveType == GlobalLexicalVar || resolveType == GlobalLexicalVarWithVarInjectionChecks)
                     watchpoints = metadata.m_watchpointSet;
-                else if (resolveType != UnresolvedProperty && resolveType != UnresolvedPropertyWithVarInjectionChecks)
-                    structure = metadata.m_structure.get();
+                else if (resolveType == GlobalProperty || resolveType == GlobalPropertyWithVarInjectionChecks)
+                    structure = metadata.m_structureID.get();
                 operand = metadata.m_operand;
             }
 
