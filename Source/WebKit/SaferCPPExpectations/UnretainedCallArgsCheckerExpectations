@@ -1,4 +1,3 @@
-GeneratedWebKitSecureCoding.mm
 [ Mac ] NetworkProcess/mac/NetworkProcessMac.mm
 Shared/API/Cocoa/WKBrowsingContextHandle.mm
 Shared/API/Cocoa/WKRemoteObjectCoder.mm
