@@ -6273,16 +6273,6 @@ void WebPageProxy::findString(const String& string, OptionSet<FindOptions> optio
     findString(string, options, maxMatchCount, [](bool) { });
 }
 
-void WebPageProxy::findRectsForStringMatches(const String& string, OptionSet<WebKit::FindOptions> options, unsigned maxMatchCount, CompletionHandler<void(Vector<WebCore::FloatRect>&&)>&& callbackFunction)
-{
-    auto completionHandler = [protectedThis = Ref { *this }, string, callbackFunction = WTFMove(callbackFunction)](Vector<WebCore::FloatRect>&& matchRects) mutable {
-        if (matchRects.isEmpty())
-            protectedThis->findClient().didFailToFindString(protectedThis.ptr(), string);
-        callbackFunction(WTFMove(matchRects));
-    };
-    sendWithAsyncReply(Messages::WebPage::FindRectsForStringMatches(string, options, maxMatchCount), WTFMove(completionHandler));
-}
-
 void WebPageProxy::findTextRangesForStringMatches(const String& string, OptionSet<FindOptions> options, unsigned maxMatchCount, CompletionHandler<void(Vector<WebFoundTextRange>&&)>&& callbackFunction)
 {
     sendWithAsyncReply(Messages::WebPage::FindTextRangesForStringMatches(string, options, maxMatchCount), WTFMove(callbackFunction));

@@ -363,28 +363,6 @@ void FindController::findStringMatches(const String& string, OptionSet<FindOptio
     });
 }
 
-void FindController::findRectsForStringMatches(const String& string, OptionSet<FindOptions> options, unsigned maxMatchCount, CompletionHandler<void(Vector<FloatRect>&&)>&& completionHandler)
-{
-    RefPtr webPage { m_webPage.get() };
-    auto result = webPage->protectedCorePage()->findTextMatches(string, core(options), maxMatchCount);
-    m_findMatches = WTFMove(result.ranges);
-
-    auto rects = m_findMatches.map([&] (auto& range) {
-        FloatRect rect = unionRect(RenderObject::absoluteTextRects(range));
-        return range.startContainer().document().frame()->view()->contentsToRootView(rect);
-    });
-
-    completionHandler(WTFMove(rects));
-
-    if (!options.contains(FindOptions::ShowOverlay) && !options.contains(FindOptions::ShowFindIndicator))
-        return;
-
-    bool found = !m_findMatches.isEmpty();
-    webPage->protectedDrawingArea()->dispatchAfterEnsuringUpdatedScrollPosition([webPage, found, string, options, maxMatchCount] () {
-        webPage->findController().updateFindUIAfterPageScroll(found, string, options, maxMatchCount, WebCore::DidWrap::No, std::nullopt);
-    });
-}
-
 void FindController::getImageForFindMatch(uint32_t matchIndex)
 {
     if (matchIndex >= m_findMatches.size())
