@@ -9972,11 +9972,6 @@ void WebPageProxy::setFullScreenClientForTesting(std::unique_ptr<WebFullScreenMa
 
 #if ENABLE(VIDEO_PRESENTATION_MODE)
 
-PlaybackSessionManagerProxy* WebPageProxy::playbackSessionManager()
-{
-    return m_playbackSessionManager.get();
-}
-
 RefPtr<PlaybackSessionManagerProxy> WebPageProxy::protectedPlaybackSessionManager()
 {
     return m_playbackSessionManager.get();
