@@ -1365,7 +1365,7 @@ void VM::drainMicrotasks()
         std::optional<VMEntryScope> entryScope;
         if (!m_defaultMicrotaskQueue.isEmpty())
             entryScope.emplace(*this, nullptr);
-        do {
+        while (true) {
             m_defaultMicrotaskQueue.performMicrotaskCheckpoint(*this,
                 [&](QueuedTask& task) ALWAYS_INLINE_LAMBDA {
                     auto* globalObject = task.globalObject();
@@ -1401,7 +1401,11 @@ void VM::drainMicrotasks()
             didExhaustMicrotaskQueue();
             if (hasPendingTerminationException()) [[unlikely]]
                 return;
-        } while (!m_defaultMicrotaskQueue.isEmpty());
+            if (m_defaultMicrotaskQueue.isEmpty())
+                break;
+            if (!entryScope)
+                entryScope.emplace(*this, nullptr);
+        }
     }
     finalizeSynchronousJSExecution();
 }
