@@ -30,8 +30,6 @@ class CSSToLengthConversionData;
 class SVGElement;
 class WeakPtrImplWithEventTargetData;
 
-struct Length;
-
 template<typename> class ExceptionOr;
 
 namespace Style {

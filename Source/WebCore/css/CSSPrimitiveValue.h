@@ -39,8 +39,6 @@ class FontCascade;
 class RenderStyle;
 class RenderView;
 
-struct Length;
-
 template<typename> class ExceptionOr;
 
 // Max/min values for CSS, needs to slightly smaller/larger than the true max/min values to allow for rounding without overflowing.
@@ -108,8 +106,6 @@ public:
     static Ref<CSSPrimitiveValue> create(double);
     static Ref<CSSPrimitiveValue> create(double, CSSUnitType);
     static Ref<CSSPrimitiveValue> createInteger(double);
-    static Ref<CSSPrimitiveValue> create(const Length&);
-    static Ref<CSSPrimitiveValue> create(const Length&, const RenderStyle&);
     static Ref<CSSPrimitiveValue> create(Ref<CSSCalcValue>);
     static Ref<CSSPrimitiveValue> create(Ref<CSSAttrValue>);
 
@@ -221,8 +217,6 @@ private:
     friend bool CSSValue::addHash(Hasher&) const;
 
     explicit CSSPrimitiveValue(CSSPropertyID);
-    explicit CSSPrimitiveValue(const Length&);
-    CSSPrimitiveValue(const Length&, const RenderStyle&);
     CSSPrimitiveValue(const String&, CSSUnitType);
     CSSPrimitiveValue(double, CSSUnitType);
     explicit CSSPrimitiveValue(Ref<CSSCalcValue>);

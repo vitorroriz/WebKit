@@ -41,7 +41,6 @@
 #include "FontSelectionValueInlines.h"
 #include "FontTaggedSettings.h"
 #include "IdentityTransformOperation.h"
-#include "Length.h"
 #include "Logging.h"
 #include "Matrix3DTransformOperation.h"
 #include "MatrixTransformOperation.h"
@@ -89,11 +88,6 @@ inline float blendFunc(float from, float to, const Context& context)
 inline WebCore::Color blendFunc(const WebCore::Color& from, const WebCore::Color& to, const Context& context)
 {
     return WebCore::blend(from, to, context);
-}
-
-inline WebCore::Length blendFunc(const WebCore::Length& from, const WebCore::Length& to, const Context& context, ValueRange valueRange = ValueRange::All)
-{
-    return WebCore::blend(from, to, context, valueRange);
 }
 
 inline ContentVisibility blendFunc(ContentVisibility from, ContentVisibility to, const Context& context)

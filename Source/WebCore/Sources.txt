@@ -2300,8 +2300,6 @@ platform/KeyboardScrollingAnimator.cpp
 platform/LLVMProfiling.cpp
 platform/LayoutUnit.cpp
 platform/LegacySchemeRegistry.cpp
-platform/Length.cpp
-platform/LengthFunctions.cpp
 platform/LocalizedStrings.cpp
 platform/LogInitialization.cpp
 platform/Logging.cpp

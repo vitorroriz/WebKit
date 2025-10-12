@@ -146,7 +146,6 @@ enum class InsideLink : uint8_t;
 enum class Isolation : bool;
 enum class ItemPosition : uint8_t;
 enum class Kerning : uint8_t;
-enum class LengthType : uint8_t;
 enum class LineAlign : bool;
 enum class LineBreak : uint8_t;
 enum class LineCap : uint8_t;
@@ -229,7 +228,6 @@ struct CSSPropertiesBitSet;
 struct CounterDirectiveMap;
 struct GridTrackList;
 struct ImageOrientation;
-struct Length;
 struct NameScope;
 struct TransformOperationData;
 

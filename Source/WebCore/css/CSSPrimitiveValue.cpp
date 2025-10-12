@@ -38,7 +38,6 @@
 #include "ComputedStyleDependencies.h"
 #include "ContainerQueryEvaluator.h"
 #include "FontCascade.h"
-#include "Length.h"
 #include "NodeRenderStyle.h"
 #include "RenderBoxInlines.h"
 #include "RenderStyle.h"
@@ -467,65 +466,6 @@ Ref<CSSPrimitiveValue> CSSPrimitiveValue::create(String value)
     return adoptRef(*new CSSPrimitiveValue(WTFMove(value), CSSUnitType::CSS_STRING));
 }
 
-Ref<CSSPrimitiveValue> CSSPrimitiveValue::create(const Length& length)
-{
-    switch (length.type()) {
-    case LengthType::Auto:
-        return create(CSSValueAuto);
-    case LengthType::Content:
-        return create(CSSValueContent);
-    case LengthType::FillAvailable:
-        return create(CSSValueWebkitFillAvailable);
-    case LengthType::FitContent:
-        return create(CSSValueFitContent);
-    case LengthType::Fixed:
-        return create(length.value(), CSSUnitType::CSS_PX);
-    case LengthType::Intrinsic:
-        return create(CSSValueIntrinsic);
-    case LengthType::MinIntrinsic:
-        return create(CSSValueMinIntrinsic);
-    case LengthType::MinContent:
-        return create(CSSValueMinContent);
-    case LengthType::MaxContent:
-        return create(CSSValueMaxContent);
-    case LengthType::Normal:
-        return create(CSSValueNormal);
-    case LengthType::Percent:
-        ASSERT(std::isfinite(length.percent()));
-        return create(length.percent(), CSSUnitType::CSS_PERCENTAGE);
-    case LengthType::Calculated:
-    case LengthType::Relative:
-    case LengthType::Undefined:
-        break;
-    }
-    RELEASE_ASSERT_NOT_REACHED();
-}
-
-Ref<CSSPrimitiveValue> CSSPrimitiveValue::create(const Length& length, const RenderStyle& style)
-{
-    switch (length.type()) {
-    case LengthType::Auto:
-    case LengthType::Content:
-    case LengthType::FillAvailable:
-    case LengthType::FitContent:
-    case LengthType::Intrinsic:
-    case LengthType::MinIntrinsic:
-    case LengthType::MinContent:
-    case LengthType::MaxContent:
-    case LengthType::Normal:
-    case LengthType::Percent:
-        return create(length);
-    case LengthType::Fixed:
-        return create(adjustFloatForAbsoluteZoom(length.value(), style), CSSUnitType::CSS_PX);
-    case LengthType::Calculated:
-        return create(CSSCalcValue::create(length.protectedCalculationValue(), style));
-    case LengthType::Relative:
-    case LengthType::Undefined:
-        break;
-    }
-    RELEASE_ASSERT_NOT_REACHED();
-}
-
 Ref<CSSPrimitiveValue> CSSPrimitiveValue::create(Ref<CSSCalcValue> value)
 {
     return adoptRef(*new CSSPrimitiveValue(WTFMove(value)));
@@ -576,11 +516,6 @@ template<> float CSSPrimitiveValue::resolveAsLength(const CSSToLengthConversionD
 template<> double CSSPrimitiveValue::resolveAsLength(const CSSToLengthConversionData& conversionData) const
 {
     return resolveAsLengthDouble(conversionData);
-}
-
-template<> Length CSSPrimitiveValue::resolveAsLength(const CSSToLengthConversionData& conversionData) const
-{
-    return Length(clampTo<float>(resolveAsLength(conversionData), minValueForCssLength, maxValueForCssLength), LengthType::Fixed);
 }
 
 template<> short CSSPrimitiveValue::resolveAsLength(const CSSToLengthConversionData& conversionData) const

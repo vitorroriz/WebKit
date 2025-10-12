@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <WebCore/Length.h>
+#include <WebCore/CalculationValue.h>
 #include <WebCore/StyleZoomPrimitives.h>
 
 namespace WebCore {
@@ -49,10 +49,6 @@ struct LengthWrapperData {
     LengthWrapperData(uint8_t opaqueType);
     LengthWrapperData(uint8_t opaqueType, float value, bool hasQuirk = false);
     WEBCORE_EXPORT explicit LengthWrapperData(uint8_t opaqueType, Ref<CalculationValue>&&);
-
-    // Special constructor for use by LengthWrapperBase when constructing a calculation value from a WebCore::Length.
-    struct LengthCalculation { WebCore::Length length; };
-    WEBCORE_EXPORT explicit LengthWrapperData(uint8_t opaqueType, LengthCalculation&&);
 
     explicit LengthWrapperData(WTF::HashTableEmptyValueType);
     explicit LengthWrapperData(WTF::HashTableDeletedValueType);

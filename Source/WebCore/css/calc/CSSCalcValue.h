@@ -56,7 +56,6 @@ class RenderStyle;
 
 struct CSSParserContext;
 struct CSSPropertyParserOptions;
-struct Length;
 struct NoConversionDataRequiredToken;
 
 enum CSSValueID : uint16_t;

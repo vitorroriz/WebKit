@@ -62,7 +62,6 @@
 #include "FontCascade.h"
 #include "FontSelectionValueInlines.h"
 #include "HTMLFrameOwnerElement.h"
-#include "Length.h"
 #include "PathOperation.h"
 #include "PerspectiveTransformOperation.h"
 #include "RenderBlock.h"
@@ -123,9 +122,6 @@ public:
     static Ref<CSSPrimitiveValue> convert(ExtractorState&, unsigned short);
     static Ref<CSSPrimitiveValue> convert(ExtractorState&, short);
     static Ref<CSSPrimitiveValue> convert(ExtractorState&, const ScopedName&);
-
-    static Ref<CSSPrimitiveValue> convertLength(ExtractorState&, const WebCore::Length&);
-    static Ref<CSSPrimitiveValue> convertLength(const RenderStyle&, const WebCore::Length&);
 
     template<typename T> static Ref<CSSPrimitiveValue> convertNumberAsPixels(ExtractorState&, T);
 
@@ -233,18 +229,6 @@ inline Ref<CSSPrimitiveValue> ExtractorConverter::convert(ExtractorState&, const
     if (scopedName.isIdentifier)
         return CSSPrimitiveValue::createCustomIdent(scopedName.name);
     return CSSPrimitiveValue::create(scopedName.name);
-}
-
-inline Ref<CSSPrimitiveValue> ExtractorConverter::convertLength(ExtractorState& state, const WebCore::Length& length)
-{
-    return convertLength(state.style, length);
-}
-
-inline Ref<CSSPrimitiveValue> ExtractorConverter::convertLength(const RenderStyle& style, const WebCore::Length& length)
-{
-    if (length.isFixed())
-        return CSSPrimitiveValue::create(adjustFloatForAbsoluteZoom(length.value(), style), CSSUnitType::CSS_PX);
-    return CSSPrimitiveValue::create(length, style);
 }
 
 template<typename T> Ref<CSSPrimitiveValue> ExtractorConverter::convertNumberAsPixels(ExtractorState& state, T number)

@@ -32,7 +32,7 @@
 namespace WebCore {
 
 struct SameSizeAsStyleBoxData : public RefCounted<SameSizeAsStyleBoxData> {
-    Length length[6];
+    Style::LengthWrapperData length[6];
     Style::VerticalAlign verticalAlign;
     uint8_t bitfield;
     int m_zIndex[2];

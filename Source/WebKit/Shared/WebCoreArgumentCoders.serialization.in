@@ -8082,54 +8082,6 @@ header: <WebCore/Image.h>
     RefPtr<WebCore::ShareableBitmap> toShareableBitmap();
 };
 
-struct WebCore::Length {
-    Variant<WebCore::Length::AutoData, WebCore::Length::NormalData, WebCore::Length::RelativeData, WebCore::Length::PercentData, WebCore::Length::FixedData, WebCore::Length::IntrinsicData, WebCore::Length::MinIntrinsicData, WebCore::Length::MinContentData, WebCore::Length::MaxContentData, WebCore::Length::FillAvailableData, WebCore::Length::FitContentData, WebCore::Length::ContentData, WebCore::Length::UndefinedData> ipcData()
-}
-[Nested] struct WebCore::Length::AutoData {
-};
-[Nested] struct WebCore::Length::NormalData {
-};
-[Nested] struct WebCore::Length::RelativeData {
-    Variant<float, int> value
-    bool hasQuirk
-};
-[Nested] struct WebCore::Length::PercentData {
-    Variant<float, int> value
-    bool hasQuirk
-};
-[Nested] struct WebCore::Length::FixedData {
-    Variant<float, int> value
-    bool hasQuirk
-};
-[Nested] struct WebCore::Length::IntrinsicData {
-    Variant<float, int> value
-    bool hasQuirk
-};
-[Nested] struct WebCore::Length::MinIntrinsicData {
-    Variant<float, int> value
-    bool hasQuirk
-};
-[Nested] struct WebCore::Length::MinContentData {
-    Variant<float, int> value
-    bool hasQuirk
-};
-[Nested] struct WebCore::Length::MaxContentData {
-    Variant<float, int> value
-    bool hasQuirk
-};
-[Nested] struct WebCore::Length::FillAvailableData {
-    Variant<float, int> value
-    bool hasQuirk
-};
-[Nested] struct WebCore::Length::FitContentData {
-    Variant<float, int> value
-    bool hasQuirk
-};
-[Nested] struct WebCore::Length::ContentData {
-};
-[Nested] struct WebCore::Length::UndefinedData {
-};
-
 [AdditionalEncoder=StreamConnectionEncoder, RefCounted] class WebCore::FilterFunction subclasses {
     WebCore::SVGFilterRenderer
     WebCore::FEBlend

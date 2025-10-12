@@ -41,7 +41,6 @@
 #include <WebCore/CompositeOperation.h>
 #include <WebCore/FontSizeAdjust.h>
 #include <WebCore/GraphicsTypes.h>
-#include <WebCore/Length.h>
 #include <WebCore/PositionTryFallback.h>
 #include <WebCore/RenderStyleConstants.h>
 #include <WebCore/SVGRenderStyleDefs.h>
