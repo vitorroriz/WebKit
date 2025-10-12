@@ -1098,11 +1098,6 @@ void JSGlobalObject::init(VM& vm)
             init.set(JSFunction::create(init.vm, init.owner, 0, init.vm.propertyNames->builtinNames().valuesPublicName().string(), arrayProtoFuncValues, ImplementationVisibility::Public, ArrayValuesIntrinsic));
         });
 
-    m_promiseResolveFunction.initLater(
-        [] (const Initializer<JSFunction>& init) {
-            init.set(JSFunction::create(init.vm, jsCast<JSGlobalObject*>(init.owner), promiseConstructorResolveCodeGenerator(init.vm), init.owner));
-        });
-
     m_numberProtoToStringFunction.initLater(
         [] (const Initializer<JSFunction>& init) {
             init.set(JSFunction::create(init.vm, jsCast<JSGlobalObject*>(init.owner), 1, init.vm.propertyNames->toString.string(), numberProtoFuncToString, ImplementationVisibility::Public, NumberPrototypeToStringIntrinsic));
@@ -2870,7 +2865,6 @@ void JSGlobalObject::visitChildrenImpl(JSCell* cell, Visitor& visitor)
     thisObject->m_objectProtoToStringFunction.visit(visitor);
     thisObject->m_arrayProtoToStringFunction.visit(visitor);
     thisObject->m_arrayProtoValuesFunction.visit(visitor);
-    thisObject->m_promiseResolveFunction.visit(visitor);
     visitor.append(thisObject->m_objectProtoValueOfFunction);
     thisObject->m_numberProtoToStringFunction.visit(visitor);
     visitor.append(thisObject->m_functionProtoHasInstanceSymbolFunction);

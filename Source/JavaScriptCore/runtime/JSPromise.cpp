@@ -167,20 +167,7 @@ JSPromise::DeferredData JSPromise::createDeferredData(JSGlobalObject* globalObje
 
 JSPromise* JSPromise::resolvedPromise(JSGlobalObject* globalObject, JSValue value)
 {
-    VM& vm = globalObject->vm();
-    auto scope = DECLARE_THROW_SCOPE(vm);
-
-    JSFunction* function = globalObject->promiseResolveFunction();
-    auto callData = JSC::getCallData(function);
-    ASSERT(callData.type != CallData::Type::None);
-
-    MarkedArgumentBuffer arguments;
-    arguments.append(value);
-    ASSERT(!arguments.hasOverflowed());
-    auto result = call(globalObject, function, callData, globalObject->promiseConstructor(), arguments);
-    RETURN_IF_EXCEPTION(scope, nullptr);
-    ASSERT(result.inherits<JSPromise>());
-    return jsCast<JSPromise*>(result);
+    return jsCast<JSPromise*>(promiseResolve(globalObject, globalObject->promiseConstructor(), value));
 }
 
 JSPromise* JSPromise::rejectedPromise(JSGlobalObject* globalObject, JSValue value)
@@ -778,6 +765,41 @@ JSValue JSPromise::then(JSGlobalObject* globalObject, JSValue onFulfilled, JSVal
     scope.release();
     performPromiseThen(globalObject, onFulfilled, onRejected, resultPromiseCapability, jsUndefined());
     return resultPromise;
+}
+
+JSValue JSPromise::promiseResolve(JSGlobalObject* globalObject, JSValue constructor, JSValue argument)
+{
+    VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    if (argument.inherits<JSPromise>()) {
+        auto* promise = jsCast<JSPromise*>(argument);
+        if (promiseSpeciesWatchpointIsValid(vm, promise)) [[likely]]
+            return promise;
+
+        auto property = promise->get(globalObject, vm.propertyNames->constructor);
+        RETURN_IF_EXCEPTION(scope, { });
+
+        if (property == constructor)
+            return promise;
+    }
+
+    if (constructor == globalObject->promiseConstructor()) [[likely]] {
+        JSPromise* promise = JSPromise::create(vm, globalObject->promiseStructure());
+        scope.release();
+        promise->resolve(globalObject, argument);
+        return promise;
+    }
+
+    auto [promise, resolve, reject] = newPromiseCapability(globalObject, constructor);
+    RETURN_IF_EXCEPTION(scope, { });
+
+    MarkedArgumentBuffer arguments;
+    arguments.append(argument);
+    ASSERT(!arguments.hasOverflowed());
+    scope.release();
+    call(globalObject, resolve, jsUndefined(), arguments, "resolve is not a function"_s);
+    return promise;
 }
 
 } // namespace JSC

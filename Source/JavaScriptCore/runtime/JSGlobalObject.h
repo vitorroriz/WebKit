@@ -289,7 +289,6 @@ public:
     LazyProperty<JSGlobalObject, JSFunction> m_objectProtoToStringFunction;
     LazyProperty<JSGlobalObject, JSFunction> m_arrayProtoToStringFunction;
     LazyProperty<JSGlobalObject, JSFunction> m_arrayProtoValuesFunction;
-    LazyProperty<JSGlobalObject, JSFunction> m_promiseResolveFunction;
     LazyProperty<JSGlobalObject, JSFunction> m_numberProtoToStringFunction;
     WriteBarrier<JSFunction> m_objectProtoValueOfFunction;
     WriteBarrier<JSFunction> m_functionProtoHasInstanceSymbolFunction;
@@ -752,7 +751,6 @@ public:
     JSFunction* arrayProtoValuesFunction() const { return m_arrayProtoValuesFunction.get(this); }
     JSFunction* arrayProtoValuesFunctionConcurrently() const { return m_arrayProtoValuesFunction.getConcurrently(); }
     JSFunction* iteratorProtocolFunction() const;
-    JSFunction* promiseResolveFunction() const { return m_promiseResolveFunction.get(this); }
     JSFunction* promiseProtoThenFunction() const;
     JSFunction* objectProtoValueOfFunction() const { return m_objectProtoValueOfFunction.get(); }
     JSFunction* numberProtoToStringFunction() const { return m_numberProtoToStringFunction.getInitializedOnMainThread(this); }

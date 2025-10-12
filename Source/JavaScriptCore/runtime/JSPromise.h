@@ -146,6 +146,7 @@ public:
     static std::tuple<JSFunction*, JSFunction*> createResolvingFunctionsWithoutPromise(VM&, JSGlobalObject*, JSValue onFulfilled, JSValue onRejected, JSValue context);
     static std::tuple<JSObject*, JSObject*, JSObject*> newPromiseCapability(JSGlobalObject*, JSValue constructor);
     static JSValue createPromiseCapability(VM&, JSGlobalObject*, JSObject* promise, JSObject* resolve, JSObject* reject);
+    static JSValue promiseResolve(JSGlobalObject*, JSValue constructor, JSValue);
 
     JSValue then(JSGlobalObject*, JSValue onFulfilled, JSValue onRejected);
 
