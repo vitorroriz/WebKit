@@ -49,7 +49,7 @@
 namespace Gigacage {
 
 struct Callback {
-    Callback() { }
+    Callback() = default;
     
     Callback(void (*function)(void*), void *argument)
         : function(function)

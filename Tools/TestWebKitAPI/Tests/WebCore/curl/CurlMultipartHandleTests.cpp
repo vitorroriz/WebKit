@@ -104,7 +104,7 @@ private:
 
 class CurlMultipartHandleTests : public testing::Test {
 public:
-    CurlMultipartHandleTests() { }
+    CurlMultipartHandleTests() = default;
 };
 
 TEST(CurlMultipartHandleTests, CreateCurlMultipartHandle)

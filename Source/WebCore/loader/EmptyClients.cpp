@@ -205,7 +205,6 @@ private:
 class EmptyDatabaseProvider final : public DatabaseProvider {
     struct EmptyIDBConnectionToServerDeletegate final : public IDBClient::IDBConnectionToServerDelegate, public RefCounted<EmptyIDBConnectionToServerDeletegate> {
         static Ref<EmptyIDBConnectionToServerDeletegate> create() { return adoptRef(*new EmptyIDBConnectionToServerDeletegate); }
-        ~EmptyIDBConnectionToServerDeletegate() = default;
 
         void ref() const final { RefCounted::ref(); }
         void deref() const final { RefCounted::deref(); }
@@ -277,9 +276,6 @@ class EmptyDragClient final : public DragClient {
 
 class EmptyEditorClient final : public EditorClient {
     WTF_MAKE_TZONE_ALLOCATED(EmptyEditorClient);
-public:
-    EmptyEditorClient() = default;
-
 private:
     bool shouldDeleteRange(const std::optional<SimpleRange>&) final { return false; }
     bool smartInsertDeleteEnabled() final { return false; }
@@ -487,8 +483,6 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(EmptyPaymentCoordinatorClient);
 class EmptyCredentialRequestCoordinatorClient final : public CredentialRequestCoordinatorClient {
     WTF_MAKE_TZONE_ALLOCATED(EmptyCredentialRequestCoordinatorClient);
 public:
-    EmptyCredentialRequestCoordinatorClient() = default;
-
     static Ref<EmptyCredentialRequestCoordinatorClient> create()
     {
         return adoptRef(*new EmptyCredentialRequestCoordinatorClient);
@@ -512,6 +506,9 @@ public:
     {
         return Exception { ExceptionCode::InvalidStateError };
     }
+
+private:
+    EmptyCredentialRequestCoordinatorClient() = default;
 };
 WTF_MAKE_TZONE_ALLOCATED_IMPL(EmptyCredentialRequestCoordinatorClient);
 #endif
@@ -523,8 +520,6 @@ class EmptyPluginInfoProvider final : public PluginInfoProvider {
 };
 
 class EmptyPopupMenu : public PopupMenu {
-public:
-    EmptyPopupMenu() = default;
 private:
     void show(const IntRect&, LocalFrameView&, int) final { }
     void hide() final { }

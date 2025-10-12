@@ -75,9 +75,7 @@ static inline WebKitWebViewBase* toWebKitGLibAPI(PlatformWKView view)
     return const_cast<WebKitWebViewBase*>(reinterpret_cast<const WebKitWebViewBase*>(view));
 }
 
-EventSenderProxy::~EventSenderProxy()
-{
-}
+EventSenderProxy::~EventSenderProxy() = default;
 
 static unsigned eventSenderButtonToGDKButton(unsigned button)
 {

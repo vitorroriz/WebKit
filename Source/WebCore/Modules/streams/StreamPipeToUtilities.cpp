@@ -99,7 +99,6 @@ private:
 class PipeToDefaultReadRequest : public ReadableStreamReadRequest {
 public:
     static Ref<PipeToDefaultReadRequest> create(Ref<StreamPipeToState>&& state) { return adoptRef(*new PipeToDefaultReadRequest(WTFMove(state))); }
-    ~PipeToDefaultReadRequest() = default;
 
     void whenSettled(Function<void()>&& callback)
     {

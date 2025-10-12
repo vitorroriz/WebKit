@@ -96,9 +96,7 @@ VideoPresentationInterfaceContext::VideoPresentationInterfaceContext(VideoPresen
 {
 }
 
-VideoPresentationInterfaceContext::~VideoPresentationInterfaceContext()
-{
-}
+VideoPresentationInterfaceContext::~VideoPresentationInterfaceContext() = default;
 
 void VideoPresentationInterfaceContext::setLayerHostingContext(std::unique_ptr<LayerHostingContext>&& context)
 {

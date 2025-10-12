@@ -35,7 +35,6 @@ namespace WebCore {
 
 class WebGLUniformLocation final : public RefCounted<WebGLUniformLocation> {
 public:
-    ~WebGLUniformLocation() = default;
     static Ref<WebGLUniformLocation> create(WebGLProgram&, GCGLint location);
     RefPtr<WebGLProgram> program() const;
     GCGLint location() const;

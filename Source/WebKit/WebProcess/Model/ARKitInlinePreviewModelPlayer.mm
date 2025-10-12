@@ -39,9 +39,7 @@ ARKitInlinePreviewModelPlayer::ARKitInlinePreviewModelPlayer(WebPage& page, WebC
 {
 }
 
-ARKitInlinePreviewModelPlayer::~ARKitInlinePreviewModelPlayer()
-{
-}
+ARKitInlinePreviewModelPlayer::~ARKitInlinePreviewModelPlayer() = default;
 
 #if ENABLE(MODEL_PROCESS)
 WebCore::ModelPlayerIdentifier ARKitInlinePreviewModelPlayer::identifier() const

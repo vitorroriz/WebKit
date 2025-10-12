@@ -81,13 +81,10 @@ void Clipboard::formats(CompletionHandler<void(Vector<String>&&)>&& completionHa
 
 class ClipboardTask final : public RefCounted<ClipboardTask> {
 public:
-
     static Ref<ClipboardTask> create(GdkClipboard* clipboard, Clipboard::ReadMode readMode)
     {
         return adoptRef(*new ClipboardTask(clipboard, readMode));
     }
-
-    ~ClipboardTask() = default;
 
     using ReadTextCompletionHandler = CompletionHandler<void(String&&)>;
 

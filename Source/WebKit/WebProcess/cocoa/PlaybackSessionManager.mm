@@ -67,9 +67,7 @@ PlaybackSessionInterfaceContext::PlaybackSessionInterfaceContext(PlaybackSession
 {
 }
 
-PlaybackSessionInterfaceContext::~PlaybackSessionInterfaceContext()
-{
-}
+PlaybackSessionInterfaceContext::~PlaybackSessionInterfaceContext() = default;
 
 void PlaybackSessionInterfaceContext::durationChanged(double duration)
 {

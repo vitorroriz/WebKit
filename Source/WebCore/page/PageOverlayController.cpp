@@ -28,6 +28,7 @@
 
 #include "Chrome.h"
 #include "ChromeClient.h"
+#include "DocumentView.h"
 #include "GraphicsContext.h"
 #include "GraphicsLayer.h"
 #include "LocalFrameInlines.h"

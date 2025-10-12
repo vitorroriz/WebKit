@@ -60,8 +60,6 @@ public:
     {
     }
 
-    ~InspectorClient() = default;
-
 private:
     // API::InspectorClient
     void openURLExternally(WebKit::WebInspectorUIProxy& inspector, const WTF::String& url) final

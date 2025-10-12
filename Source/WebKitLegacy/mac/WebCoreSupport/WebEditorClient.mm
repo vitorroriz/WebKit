@@ -202,9 +202,7 @@ WebEditorClient::WebEditorClient(WebView *webView)
 {
 }
 
-WebEditorClient::~WebEditorClient()
-{
-}
+WebEditorClient::~WebEditorClient() = default;
 
 bool WebEditorClient::isContinuousSpellCheckingEnabled()
 {

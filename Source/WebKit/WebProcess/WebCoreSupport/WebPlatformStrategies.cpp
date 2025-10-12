@@ -82,9 +82,7 @@ void WebPlatformStrategies::initialize()
     setPlatformStrategies(&platformStrategies.get());
 }
 
-WebPlatformStrategies::WebPlatformStrategies()
-{
-}
+WebPlatformStrategies::WebPlatformStrategies() = default;
 
 LoaderStrategy* WebPlatformStrategies::createLoaderStrategy()
 {

@@ -88,9 +88,7 @@ RemoteResourceCacheProxy::RemoteResourceCacheProxy(RemoteRenderingBackendProxy& 
 {
 }
 
-RemoteResourceCacheProxy::~RemoteResourceCacheProxy()
-{
-}
+RemoteResourceCacheProxy::~RemoteResourceCacheProxy() = default;
 
 Ref<RemoteNativeImageProxy> RemoteResourceCacheProxy::createNativeImage(const IntSize& size, PlatformColorSpace&& colorSpace, bool hasAlpha)
 {

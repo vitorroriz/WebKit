@@ -44,7 +44,6 @@ enum class IntrinsicWidthMode;
 class Line {
 public:
     Line(const InlineFormattingContext&);
-    ~Line() = default;
 
     void initialize(const Vector<InlineItem, 1>& lineSpanningInlineBoxes, bool isFirstFormattedLine);
 

@@ -90,9 +90,7 @@ WebResourceLoadScheduler::WebResourceLoadScheduler()
     maxRequestsInFlightPerHost = initializeMaximumHTTPConnectionCountPerHost();
 }
 
-WebResourceLoadScheduler::~WebResourceLoadScheduler()
-{
-}
+WebResourceLoadScheduler::~WebResourceLoadScheduler() = default;
 
 void WebResourceLoadScheduler::loadResource(LocalFrame& frame, CachedResource& resource, ResourceRequest&& request, const ResourceLoaderOptions& options, CompletionHandler<void(RefPtr<WebCore::SubresourceLoader>&&)>&& completionHandler)
 {

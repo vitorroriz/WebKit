@@ -233,9 +233,6 @@ WEBCORE_EXPORT PageConfiguration pageConfigurationWithEmptyClients(std::optional
 
 class EmptyCryptoClient: public CryptoClient {
     WTF_MAKE_TZONE_ALLOCATED(EmptyCryptoClient);
-public:
-    EmptyCryptoClient() = default;
-    ~EmptyCryptoClient() = default;
 };
 
 }

@@ -71,9 +71,7 @@ FindController::FindController(WebPage* webPage)
 {
 }
 
-FindController::~FindController()
-{
-}
+FindController::~FindController() = default;
 
 #if ENABLE(PDF_PLUGIN)
 

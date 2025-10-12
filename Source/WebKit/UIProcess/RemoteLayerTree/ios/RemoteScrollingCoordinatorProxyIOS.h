@@ -47,7 +47,6 @@ class RemoteScrollingCoordinatorProxyIOS final : public RemoteScrollingCoordinat
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(RemoteScrollingCoordinatorProxyIOS);
 public:
     explicit RemoteScrollingCoordinatorProxyIOS(WebPageProxy&);
-    ~RemoteScrollingCoordinatorProxyIOS() = default;
 
     UIScrollView *scrollViewForScrollingNodeID(std::optional<WebCore::ScrollingNodeID>) const;
 

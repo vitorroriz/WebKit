@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Igalia S.L.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,28 +23,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "config.h"
+#include "EditorClient.h"
 
-#if USE(LIBDRM)
+namespace WebCore {
 
-#include "DisplayVBlankMonitorThreaded.h"
-#include <wtf/unix/UnixFileDescriptor.h>
+EditorClient::~EditorClient() = default;
 
-namespace WebKit {
-
-class DisplayVBlankMonitorDRM final : public DisplayVBlankMonitorThreaded {
-public:
-    static std::unique_ptr<DisplayVBlankMonitor> create(PlatformDisplayID);
-    DisplayVBlankMonitorDRM(unsigned, WTF::UnixFileDescriptor&&, int);
-
-private:
-    Type type() const override { return Type::Drm; }
-    bool waitForVBlank() const override;
-
-    WTF::UnixFileDescriptor m_fd;
-    int m_crtcBitmask { 0 };
-};
-
-} // namespace WebKit
-
-#endif // USE(LIBDRM)
+}
