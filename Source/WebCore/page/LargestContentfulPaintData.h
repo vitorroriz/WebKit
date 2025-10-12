@@ -55,7 +55,7 @@ public:
     void didPaintImage(Element&, CachedImage*, FloatRect localRect);
     void didPaintText(const RenderBlockFlow& formattingContextRoot, FloatRect localRect);
 
-    RefPtr<LargestContentfulPaint> takePendingEntry(DOMHighResTimeStamp);
+    RefPtr<LargestContentfulPaint> generateLargestContentfulPaintEntry(DOMHighResTimeStamp);
 
     static bool isExposedForPaintTiming(const Element&);
 
@@ -76,8 +76,6 @@ private:
         FloatRect rect;
         Markable<MonotonicTime> loadTime;
     };
-
-    WeakHashSet<Element, WeakPtrImplWithEventTargetData> m_textContentSet;
 
     WeakHashMap<Element, WeakHashSet<CachedImage>, WeakPtrImplWithEventTargetData> m_imageContentSet;
     WeakHashMap<Element, WeakHashMap<CachedImage, PendingImageData>, WeakPtrImplWithEventTargetData> m_pendingImageRecords;

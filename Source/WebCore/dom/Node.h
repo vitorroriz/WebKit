@@ -672,7 +672,8 @@ protected:
         IsFullscreen = 1 << 19,
 #endif
         IsShadowRootAttachedEventPending = 1 << 20,
-        // 12 bits free.
+        InLargestContentfulPaintTextContentSet = 1 << 21,
+        // 11 bits free.
     };
 
     enum class TabIndexState : uint8_t {

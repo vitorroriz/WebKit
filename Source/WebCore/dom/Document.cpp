@@ -4426,10 +4426,10 @@ void Document::enqueuePaintTimingEntryIfNeeded()
     };
 
     auto enqueueLargestContentfulPaintIfNecessary = [&]() {
-        if (RefPtr entry = largestContentfulPaintData().takePendingEntry(nowTime)) {
+        if (RefPtr entry = largestContentfulPaintData().generateLargestContentfulPaintEntry(nowTime)) {
             WTFEmitSignpost(this, NavigationAndPaintTiming, "largestContentfulPaint");
             Ref entryRef = entry.releaseNonNull();
-            protectedWindow()->performance().reportLargestContentfulPaint(WTFMove(entryRef));
+            protectedWindow()->performance().enqueueLargestContentfulPaint(WTFMove(entryRef));
         }
     };
 

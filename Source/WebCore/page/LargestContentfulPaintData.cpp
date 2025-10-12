@@ -130,8 +130,11 @@ void LargestContentfulPaintData::potentiallyAddLargestContentfulPaintEntry(Eleme
         isNewCandidate = m_imageContentSet.ensure(element, [] {
             return WeakHashSet<CachedImage> { };
         }).iterator->value.add(*image).isNewEntry;
-    } else
-        isNewCandidate = m_textContentSet.add(element).isNewEntry;
+    } else {
+        ASSERT(!element.isInLargestContentfulPaintTextContentSet());
+        element.setInLargestContentfulPaintTextContentSet();
+        isNewCandidate = true;
+    }
 
     LOG_WITH_STREAM(LargestContentfulPaint, stream << "LargestContentfulPaintData " << this << " potentiallyAddLargestContentfulPaintEntry() " << element << " image " << (image ? image->url().string() : emptyString()) << " rect " << intersectionRect << " - isNewCandidate " << isNewCandidate);
 
@@ -189,7 +192,8 @@ void LargestContentfulPaintData::potentiallyAddLargestContentfulPaintEntry(Eleme
     m_pendingEntry = RefPtr { WTFMove(pendingEntry) };
 }
 
-RefPtr<LargestContentfulPaint> LargestContentfulPaintData::takePendingEntry(DOMHighResTimeStamp paintTimestamp)
+// https://w3c.github.io/largest-contentful-paint/#sec-report-largest-contentful-paint
+RefPtr<LargestContentfulPaint> LargestContentfulPaintData::generateLargestContentfulPaintEntry(DOMHighResTimeStamp paintTimestamp)
 {
     std::optional<FloatSize> viewportSize;
 
@@ -387,7 +391,7 @@ void LargestContentfulPaintData::didPaintText(const RenderBlockFlow& formattingC
     if (!element)
         return;
 
-    if (m_textContentSet.contains(*element))
+    if (element->isInLargestContentfulPaintTextContentSet())
         return;
 
     if (!isExposedForPaintTiming(*element))
