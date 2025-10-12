@@ -44,6 +44,7 @@
 #include "JSMapIterator.h"
 #include "JSPromise.h"
 #include "JSPromiseAllContext.h"
+#include "JSPromiseAllGlobalContext.h"
 #include "JSPromiseReaction.h"
 #include "JSRegExpStringIterator.h"
 #include "JSSetIterator.h"
@@ -1704,16 +1705,25 @@ static JSWrapForValidIterator::Field wrapForValidIteratorInternalFieldIndex(Byte
 static JSPromiseAllContext::Field promiseAllContextInternalFieldIndex(BytecodeIntrinsicNode* node)
 {
     ASSERT(node->entry().type() == BytecodeIntrinsicRegistry::Type::Emitter);
-    if (node->entry().emitter() == &BytecodeIntrinsicNode::emit_intrinsic_promiseAllContextFieldPromise)
-        return JSPromiseAllContext::Field::Promise;
-    if (node->entry().emitter() == &BytecodeIntrinsicNode::emit_intrinsic_promiseAllContextFieldValues)
-        return JSPromiseAllContext::Field::Values;
-    if (node->entry().emitter() == &BytecodeIntrinsicNode::emit_intrinsic_promiseAllContextFieldRemainingElementsCount)
-        return JSPromiseAllContext::Field::RemainingElementsCount;
+    if (node->entry().emitter() == &BytecodeIntrinsicNode::emit_intrinsic_promiseAllContextFieldGlobalContext)
+        return JSPromiseAllContext::Field::GlobalContext;
     if (node->entry().emitter() == &BytecodeIntrinsicNode::emit_intrinsic_promiseAllContextFieldIndex)
         return JSPromiseAllContext::Field::Index;
     RELEASE_ASSERT_NOT_REACHED();
-    return JSPromiseAllContext::Field::Promise;
+    return JSPromiseAllContext::Field::Index;
+}
+
+static JSPromiseAllGlobalContext::Field promiseAllGlobalContextInternalFieldIndex(BytecodeIntrinsicNode* node)
+{
+    ASSERT(node->entry().type() == BytecodeIntrinsicRegistry::Type::Emitter);
+    if (node->entry().emitter() == &BytecodeIntrinsicNode::emit_intrinsic_promiseAllGlobalContextFieldPromise)
+        return JSPromiseAllGlobalContext::Field::Promise;
+    if (node->entry().emitter() == &BytecodeIntrinsicNode::emit_intrinsic_promiseAllGlobalContextFieldValues)
+        return JSPromiseAllGlobalContext::Field::Values;
+    if (node->entry().emitter() == &BytecodeIntrinsicNode::emit_intrinsic_promiseAllGlobalContextFieldRemainingElementsCount)
+        return JSPromiseAllGlobalContext::Field::RemainingElementsCount;
+    RELEASE_ASSERT_NOT_REACHED();
+    return JSPromiseAllGlobalContext::Field::Promise;
 }
 
 static JSDisposableStack::Field disposableStackInternalFieldIndex(BytecodeIntrinsicNode* node)
@@ -1919,6 +1929,19 @@ RegisterID* BytecodeIntrinsicNode::emit_intrinsic_getPromiseAllContextInternalFi
     RELEASE_ASSERT(node->m_expr->isBytecodeIntrinsicNode());
     unsigned index = static_cast<unsigned>(promiseAllContextInternalFieldIndex(static_cast<BytecodeIntrinsicNode*>(node->m_expr)));
     ASSERT(index < JSPromiseAllContext::numberOfInternalFields);
+    ASSERT(!node->m_next);
+
+    return generator.emitGetInternalField(generator.finalDestination(dst), base.get(), index);
+}
+
+RegisterID* BytecodeIntrinsicNode::emit_intrinsic_getPromiseAllGlobalContextInternalField(BytecodeGenerator& generator, RegisterID* dst)
+{
+    ArgumentListNode* node = m_args->m_listNode;
+    RefPtr<RegisterID> base = generator.emitNode(node);
+    node = node->m_next;
+    RELEASE_ASSERT(node->m_expr->isBytecodeIntrinsicNode());
+    unsigned index = static_cast<unsigned>(promiseAllGlobalContextInternalFieldIndex(static_cast<BytecodeIntrinsicNode*>(node->m_expr)));
+    ASSERT(index < JSPromiseAllGlobalContext::numberOfInternalFields);
     ASSERT(!node->m_next);
 
     return generator.emitGetInternalField(generator.finalDestination(dst), base.get(), index);
@@ -2213,6 +2236,22 @@ RegisterID* BytecodeIntrinsicNode::emit_intrinsic_putPromiseAllContextInternalFi
     RELEASE_ASSERT(node->m_expr->isBytecodeIntrinsicNode());
     unsigned index = static_cast<unsigned>(promiseAllContextInternalFieldIndex(static_cast<BytecodeIntrinsicNode*>(node->m_expr)));
     ASSERT(index < JSPromiseAllContext::numberOfInternalFields);
+    node = node->m_next;
+    RefPtr<RegisterID> value = generator.emitNode(node);
+
+    ASSERT(!node->m_next);
+
+    return generator.move(dst, generator.emitPutInternalField(base.get(), index, value.get()));
+}
+
+RegisterID* BytecodeIntrinsicNode::emit_intrinsic_putPromiseAllGlobalContextInternalField(BytecodeGenerator& generator, RegisterID* dst)
+{
+    ArgumentListNode* node = m_args->m_listNode;
+    RefPtr<RegisterID> base = generator.emitNode(node);
+    node = node->m_next;
+    RELEASE_ASSERT(node->m_expr->isBytecodeIntrinsicNode());
+    unsigned index = static_cast<unsigned>(promiseAllGlobalContextInternalFieldIndex(static_cast<BytecodeIntrinsicNode*>(node->m_expr)));
+    ASSERT(index < JSPromiseAllGlobalContext::numberOfInternalFields);
     node = node->m_next;
     RefPtr<RegisterID> value = generator.emitNode(node);
 

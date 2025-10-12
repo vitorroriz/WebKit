@@ -60,6 +60,7 @@
 #include "JSObject.h"
 #include "JSPromise.h"
 #include "JSPromiseAllContext.h"
+#include "JSPromiseAllGlobalContext.h"
 #include "JSPromiseReaction.h"
 #include "JSRemoteFunction.h"
 #include "JSString.h"
@@ -487,12 +488,14 @@ void Interpreter::getAsyncStackTrace(JSCell* owner, Vector<StackFrame>& results,
 
         // handle `Promise.all`
         if (auto* promiseAllContext = jsDynamicCast<JSPromiseAllContext*>(promiseContext)) {
-            JSValue promiseValue = promiseAllContext->promise();
-            ASSERT(promiseValue);
-            if (auto* promise = jsDynamicCast<JSPromise*>(promiseValue)) {
-                if (JSValue promiseContext = getContextValueFromPromise(promise)) {
-                    if (auto* generator = jsDynamicCast<JSGenerator*>(promiseContext))
-                        return generator;
+            if (auto* globalContext = jsDynamicCast<JSPromiseAllGlobalContext*>(promiseAllContext->globalContext())) {
+                JSValue promiseValue = globalContext->promise();
+                ASSERT(promiseValue);
+                if (auto* promise = jsDynamicCast<JSPromise*>(promiseValue)) {
+                    if (JSValue promiseContext = getContextValueFromPromise(promise)) {
+                        if (auto* generator = jsDynamicCast<JSGenerator*>(promiseContext))
+                            return generator;
+                    }
                 }
             }
         }

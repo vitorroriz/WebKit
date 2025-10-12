@@ -75,6 +75,7 @@
 #include "JSModuleEnvironment.h"
 #include "JSModuleNamespaceObject.h"
 #include "JSPromiseAllContext.h"
+#include "JSPromiseAllGlobalContext.h"
 #include "JSPromiseConstructor.h"
 #include "JSPromiseReaction.h"
 #include "JSSetIterator.h"
@@ -4526,16 +4527,29 @@ auto ByteCodeParser::handleIntrinsicCall(Node* callee, Operand resultOperand, Ca
 
             insertChecks();
             JSGlobalObject* globalObject = m_graph.globalObjectFor(currentNodeOrigin().semantic);
+            Node* globalContext = get(virtualRegisterForArgumentIncludingThis(1, registerOffset));
+            Node* index = get(virtualRegisterForArgumentIncludingThis(2, registerOffset));
+            Node* promiseAllContext = addToGraph(NewInternalFieldObject, OpInfo(m_graph.registerStructure(globalObject->promiseAllContextStructure())));
+            addToGraph(PutInternalField, OpInfo(static_cast<uint32_t>(JSPromiseAllContext::Field::GlobalContext)), promiseAllContext, globalContext);
+            addToGraph(PutInternalField, OpInfo(static_cast<uint32_t>(JSPromiseAllContext::Field::Index)), promiseAllContext, index);
+            setResult(promiseAllContext);
+            return CallOptimizationResult::Inlined;
+        }
+
+        case PromiseAllGlobalContextCreateIntrinsic: {
+            if (argumentCountIncludingThis < 4)
+                return CallOptimizationResult::DidNothing;
+
+            insertChecks();
+            JSGlobalObject* globalObject = m_graph.globalObjectFor(currentNodeOrigin().semantic);
             Node* promise = get(virtualRegisterForArgumentIncludingThis(1, registerOffset));
             Node* values = get(virtualRegisterForArgumentIncludingThis(2, registerOffset));
             Node* remainingElementsCount = get(virtualRegisterForArgumentIncludingThis(3, registerOffset));
-            Node* index = get(virtualRegisterForArgumentIncludingThis(4, registerOffset));
-            Node* promiseAllContext = addToGraph(NewInternalFieldObject, OpInfo(m_graph.registerStructure(globalObject->promiseAllContextStructure())));
-            addToGraph(PutInternalField, OpInfo(static_cast<uint32_t>(JSPromiseAllContext::Field::Promise)), promiseAllContext, promise);
-            addToGraph(PutInternalField, OpInfo(static_cast<uint32_t>(JSPromiseAllContext::Field::Values)), promiseAllContext, values);
-            addToGraph(PutInternalField, OpInfo(static_cast<uint32_t>(JSPromiseAllContext::Field::RemainingElementsCount)), promiseAllContext, remainingElementsCount);
-            addToGraph(PutInternalField, OpInfo(static_cast<uint32_t>(JSPromiseAllContext::Field::Index)), promiseAllContext, index);
-            setResult(promiseAllContext);
+            Node* promiseAllGlobalContext = addToGraph(NewInternalFieldObject, OpInfo(m_graph.registerStructure(globalObject->promiseAllGlobalContextStructure())));
+            addToGraph(PutInternalField, OpInfo(static_cast<uint32_t>(JSPromiseAllGlobalContext::Field::Promise)), promiseAllGlobalContext, promise);
+            addToGraph(PutInternalField, OpInfo(static_cast<uint32_t>(JSPromiseAllGlobalContext::Field::Values)), promiseAllGlobalContext, values);
+            addToGraph(PutInternalField, OpInfo(static_cast<uint32_t>(JSPromiseAllGlobalContext::Field::RemainingElementsCount)), promiseAllGlobalContext, remainingElementsCount);
+            setResult(promiseAllGlobalContext);
             return CallOptimizationResult::Inlined;
         }
 

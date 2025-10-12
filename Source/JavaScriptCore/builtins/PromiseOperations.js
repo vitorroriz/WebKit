@@ -116,19 +116,3 @@ function promiseRejectSlow(constructor, reason)
     promiseCapability.reject.@call(@undefined, reason);
     return promiseCapability.promise;
 }
-
-@linkTimeConstant
-function promiseEmptyOnFulfilled(argument)
-{
-    "use strict";
-
-    return argument;
-}
-
-@linkTimeConstant
-function promiseEmptyOnRejected(argument)
-{
-    "use strict";
-
-    throw argument;
-}

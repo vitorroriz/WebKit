@@ -37,6 +37,7 @@
 #include "JSInternalPromiseConstructor.h"
 #include "JSInternalPromisePrototype.h"
 #include "JSPromiseAllContext.h"
+#include "JSPromiseAllGlobalContext.h"
 #include "JSPromiseConstructor.h"
 #include "JSPromisePrototype.h"
 #include "JSPromiseReaction.h"
@@ -457,10 +458,10 @@ JSC_DEFINE_HOST_FUNCTION(promiseResolvingFunctionResolveWithoutPromise, (JSGloba
     callee->setField(vm, JSFunctionWithFields::Field::ResolvingWithoutPromiseOther, jsNull());
     other->setField(vm, JSFunctionWithFields::Field::ResolvingWithoutPromiseOther, jsNull());
 
-    auto* context = jsCast<JSPromiseAllContext*>(callee->getField(JSFunctionWithFields::Field::ResolvingWithoutPromiseContext));
+    auto* context = jsCast<JSPromiseAllGlobalContext*>(callee->getField(JSFunctionWithFields::Field::ResolvingWithoutPromiseContext));
     JSValue argument = callFrame->argument(0);
 
-    JSPromise::resolveWithoutPromise(globalObject, argument, context->values(), context->remainingElementsCount(), context->index());
+    JSPromise::resolveWithoutPromise(globalObject, argument, context->promise(), context->values(), context->remainingElementsCount());
     return JSValue::encode(jsUndefined());
 }
 
@@ -476,10 +477,10 @@ JSC_DEFINE_HOST_FUNCTION(promiseResolvingFunctionRejectWithoutPromise, (JSGlobal
     callee->setField(vm, JSFunctionWithFields::Field::ResolvingWithoutPromiseOther, jsNull());
     other->setField(vm, JSFunctionWithFields::Field::ResolvingWithoutPromiseOther, jsNull());
 
-    auto* context = jsCast<JSPromiseAllContext*>(callee->getField(JSFunctionWithFields::Field::ResolvingWithoutPromiseContext));
+    auto* context = jsCast<JSPromiseAllGlobalContext*>(callee->getField(JSFunctionWithFields::Field::ResolvingWithoutPromiseContext));
     JSValue argument = callFrame->argument(0);
 
-    JSPromise::rejectWithoutPromise(globalObject, argument, context->values(), context->remainingElementsCount(), context->index());
+    JSPromise::rejectWithoutPromise(globalObject, argument, context->promise(), context->values(), context->remainingElementsCount());
     return JSValue::encode(jsUndefined());
 }
 
@@ -533,7 +534,7 @@ std::tuple<JSFunction*, JSFunction*> JSPromise::createResolvingFunctionsWithoutP
     auto* resolve = JSFunctionWithFields::create(vm, globalObject, vm.promiseResolvingFunctionResolveWithoutPromiseExecutable(), 1, nullString());
     auto* reject = JSFunctionWithFields::create(vm, globalObject, vm.promiseResolvingFunctionRejectWithoutPromiseExecutable(), 1, nullString());
 
-    auto* all = JSPromiseAllContext::create(vm, globalObject->promiseAllContextStructure(), jsNull(), onFulfilled, onRejected, context);
+    auto* all = JSPromiseAllGlobalContext::create(vm, globalObject->promiseAllGlobalContextStructure(), onFulfilled, onRejected, context);
 
     resolve->setField(vm, JSFunctionWithFields::Field::ResolvingWithoutPromiseContext, all);
     resolve->setField(vm, JSFunctionWithFields::Field::ResolvingWithoutPromiseOther, reject);

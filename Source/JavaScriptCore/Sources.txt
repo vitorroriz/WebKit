@@ -940,6 +940,7 @@ runtime/JSONObject.cpp
 runtime/JSObject.cpp
 runtime/JSPromise.cpp
 runtime/JSPromiseAllContext.cpp
+runtime/JSPromiseAllGlobalContext.cpp
 runtime/JSPromiseConstructor.cpp
 runtime/JSPromisePrototype.cpp
 runtime/JSPromiseReaction.cpp

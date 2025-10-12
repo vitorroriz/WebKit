@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Codeblog CORP.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,24 +29,26 @@
 
 namespace JSC {
 
-const static uint8_t JSPromiseAllContextNumberOfInternalFields = 2;
+const static uint8_t JSPromiseAllGlobalContextNumberOfInternalFields = 3;
 
-class JSPromiseAllContext final : public JSInternalFieldObjectImpl<JSPromiseAllContextNumberOfInternalFields> {
+class JSPromiseAllGlobalContext final : public JSInternalFieldObjectImpl<JSPromiseAllGlobalContextNumberOfInternalFields> {
 public:
-    using Base = JSInternalFieldObjectImpl<JSPromiseAllContextNumberOfInternalFields>;
+    using Base = JSInternalFieldObjectImpl<JSPromiseAllGlobalContextNumberOfInternalFields>;
 
     DECLARE_EXPORT_INFO;
     DECLARE_VISIT_CHILDREN;
 
     enum class Field : uint8_t {
-        GlobalContext = 0,
-        Index,
+        Promise = 0,
+        Values,
+        RemainingElementsCount,
     };
-    static_assert(numberOfInternalFields == JSPromiseAllContextNumberOfInternalFields);
+    static_assert(numberOfInternalFields == JSPromiseAllGlobalContextNumberOfInternalFields);
 
     static std::array<JSValue, numberOfInternalFields> initialValues()
     {
         return { {
+            jsNull(),
             jsNull(),
             jsNumber(0),
         } };
@@ -58,31 +60,33 @@ public:
     template<typename CellType, SubspaceAccess mode>
     static GCClient::IsoSubspace* subspaceFor(VM& vm)
     {
-        return vm.promiseAllContextSpace<mode>();
+        return vm.promiseAllGlobalContextSpace<mode>();
     }
 
-    inline static Structure* createStructure(VM&, JSGlobalObject*, JSValue);
+    static Structure* createStructure(VM&, JSGlobalObject*, JSValue);
 
-    static JSPromiseAllContext* createWithInitialValues(VM&, Structure*);
-    static JSPromiseAllContext* create(VM&, Structure*, JSValue globalContext, JSValue index);
+    static JSPromiseAllGlobalContext* createWithInitialValues(VM&, Structure*);
+    static JSPromiseAllGlobalContext* create(VM&, Structure*, JSValue promise, JSValue values, JSValue remainingElementsCount);
 
-    JSValue globalContext() const { return internalField(Field::GlobalContext).get(); }
-    JSValue index() const { return internalField(Field::Index).get(); }
+    JSValue promise() const { return internalField(Field::Promise).get(); }
+    JSValue values() const { return internalField(Field::Values).get(); }
+    JSValue remainingElementsCount() const { return internalField(Field::RemainingElementsCount).get(); }
 
-    void setGlobalContext(VM& vm, JSValue globalContext) { internalField(Field::GlobalContext).set(vm, this, globalContext); }
-    void setIndex(VM& vm, JSValue index) { internalField(Field::Index).set(vm, this, index); }
+    void setPromise(VM& vm, JSValue promise) { internalField(Field::Promise).set(vm, this, promise); }
+    void setValues(VM& vm, JSValue values) { internalField(Field::Values).set(vm, this, values); }
+    void setRemainingElementsCount(VM& vm, JSValue remainingElementsCount) { internalField(Field::RemainingElementsCount).set(vm, this, remainingElementsCount); }
 
 private:
-    JSPromiseAllContext(VM& vm, Structure* structure)
+    JSPromiseAllGlobalContext(VM& vm, Structure* structure)
         : Base(vm, structure)
     {
     }
 
-    void finishCreation(VM&, JSValue globalContext, JSValue index);
+    void finishCreation(VM&, JSValue promise, JSValue values, JSValue remainingElementsCount);
 };
 
-STATIC_ASSERT_IS_TRIVIALLY_DESTRUCTIBLE(JSPromiseAllContext);
+STATIC_ASSERT_IS_TRIVIALLY_DESTRUCTIBLE(JSPromiseAllGlobalContext);
 
-JSC_DECLARE_HOST_FUNCTION(promiseAllContextPrivateFuncCreate);
+JSC_DECLARE_HOST_FUNCTION(promiseAllGlobalContextPrivateFuncCreate);
 
 } // namespace JSC

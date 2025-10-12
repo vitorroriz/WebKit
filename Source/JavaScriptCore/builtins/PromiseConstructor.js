@@ -76,34 +76,6 @@ function promiseAllSlow(iterable)
 }
 
 @linkTimeConstant
-function promiseOnRejectedWithContext(argument, context)
-{
-    "use strict";
-
-    @assert(@isPromiseAllContext(context));
-
-    return @rejectPromiseWithFirstResolvingFunctionCallCheck(@getPromiseAllContextInternalField(context, @promiseAllContextFieldPromise), argument);
-}
-
-@linkTimeConstant
-function promiseAllOnFulfilled(argument, context)
-{
-    "use strict";
-
-    @assert(@isPromiseAllContext(context));
-
-    var promise = @getPromiseAllContextInternalField(context, @promiseAllContextFieldPromise);
-    var values = @getPromiseAllContextInternalField(context, @promiseAllContextFieldValues);
-    var remainingElementsCountObj = @getPromiseAllContextInternalField(context, @promiseAllContextFieldRemainingElementsCount);
-    var index = @getPromiseAllContextInternalField(context, @promiseAllContextFieldIndex);
-
-    @putByValDirect(values, index, argument);
-
-    if (!--remainingElementsCountObj.value)
-        return @resolvePromiseWithFirstResolvingFunctionCallCheck(promise, values);
-}
-
-@linkTimeConstant
 function promiseNewOnRejected(promise)
 {
     "use strict";
@@ -114,7 +86,7 @@ function promiseNewOnRejected(promise)
 }
 
 @linkTimeConstant
-function promiseAllNewResolveElement(context, index)
+function promiseAllNewResolveElement(context)
 {
     "use strict";
 
@@ -126,12 +98,15 @@ function promiseAllNewResolveElement(context, index)
             return @undefined;
         alreadyCalled = true;
 
-        var values = @getPromiseAllContextInternalField(context, @promiseAllContextFieldValues);
+        var globalContext = @getPromiseAllContextInternalField(context, @promiseAllContextFieldGlobalContext);
+        var index = @getPromiseAllContextInternalField(context, @promiseAllContextFieldIndex);
+        var values = @getPromiseAllGlobalContextInternalField(globalContext, @promiseAllGlobalContextFieldValues);
         @putByValDirect(values, index, argument);
 
-        var remainingElementsCount = @getPromiseAllContextInternalField(context, @promiseAllContextFieldRemainingElementsCount);
-        if (!--remainingElementsCount.value) {
-            var promise = @getPromiseAllContextInternalField(context, @promiseAllContextFieldPromise);
+        var count = @getPromiseAllGlobalContextInternalField(globalContext, @promiseAllGlobalContextFieldRemainingElementsCount) - 1;
+        @putPromiseAllGlobalContextInternalField(globalContext, @promiseAllGlobalContextFieldRemainingElementsCount, count);
+        if (!count) {
+            var promise = @getPromiseAllGlobalContextInternalField(globalContext, @promiseAllGlobalContextFieldPromise);
             return @resolvePromiseWithFirstResolvingFunctionCallCheck(promise, values);
         }
     };
@@ -146,7 +121,7 @@ function all(iterable)
 
     var promise = @newPromise();
     var values = [];
-    var remainingElementsCountObj = { value: 1 };
+    var globalContext = @promiseAllGlobalContextCreate(promise, values, 1);
     var index = 0;
     var onRejected;
 
@@ -158,9 +133,9 @@ function all(iterable)
         for (var value of iterable) {
             @putByValDirect(values, index, @undefined);
             var nextPromise = promiseResolve.@call(this, value);
-            ++remainingElementsCountObj.value;
+            @putPromiseAllGlobalContextInternalField(globalContext, @promiseAllGlobalContextFieldRemainingElementsCount, @getPromiseAllGlobalContextInternalField(globalContext, @promiseAllGlobalContextFieldRemainingElementsCount) + 1);
             var then = nextPromise.then;
-            var context = @promiseAllContextCreate(promise, values, remainingElementsCountObj, index);
+            var context = @promiseAllContextCreate(globalContext, index);
             if (@isPromise(nextPromise) && then === @defaultPromiseThen) {
                 var constructor = @speciesConstructor(nextPromise, @Promise);
                 var promiseOrCapability;
@@ -170,12 +145,14 @@ function all(iterable)
             } else {
                 if (!onRejected)
                     onRejected = @promiseNewOnRejected(promise);
-                then.@call(nextPromise, @promiseAllNewResolveElement(context, index), onRejected);
+                then.@call(nextPromise, @promiseAllNewResolveElement(context), onRejected);
             }
             ++index;
         }
 
-        if (!--remainingElementsCountObj.value)
+        var count = @getPromiseAllGlobalContextInternalField(globalContext, @promiseAllGlobalContextFieldRemainingElementsCount) - 1;
+        @putPromiseAllGlobalContextInternalField(globalContext, @promiseAllGlobalContextFieldRemainingElementsCount, count);
+        if (!count)
             @resolvePromiseWithFirstResolvingFunctionCallCheck(promise, values);
     } catch (error) {
         @rejectPromiseWithFirstResolvingFunctionCallCheck(promise, error);

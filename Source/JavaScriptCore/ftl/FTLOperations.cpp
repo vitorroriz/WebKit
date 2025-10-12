@@ -48,6 +48,7 @@
 #include "JSLexicalEnvironment.h"
 #include "JSMapIterator.h"
 #include "JSPromiseAllContext.h"
+#include "JSPromiseAllGlobalContext.h"
 #include "JSPromiseReaction.h"
 #include "JSRegExpStringIterator.h"
 #include "JSSetIterator.h"
@@ -190,6 +191,9 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationPopulateObjectInOSR, void, (JSGlobalO
             break;
         case JSPromiseAllContextType:
             materialize(jsCast<JSPromiseAllContext*>(target));
+            break;
+        case JSPromiseAllGlobalContextType:
+            materialize(jsCast<JSPromiseAllGlobalContext*>(target));
             break;
         case JSRegExpStringIteratorType:
             materialize(jsCast<JSRegExpStringIterator*>(target));
@@ -490,6 +494,8 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationMaterializeObjectInOSR, HeapCell*, (J
             return create.operator()<JSAsyncFromSyncIterator>();
         case JSPromiseAllContextType:
             return create.operator()<JSPromiseAllContext>();
+        case JSPromiseAllGlobalContextType:
+            return create.operator()<JSPromiseAllGlobalContext>();
         case JSRegExpStringIteratorType:
             return create.operator()<JSRegExpStringIterator>();
         case JSPromiseType:
