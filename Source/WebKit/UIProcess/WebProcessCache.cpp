@@ -50,6 +50,8 @@ Seconds WebProcessCache::clearingDelayAfterApplicationResignsActive { 5_min };
 Seconds WebProcessCache::cachedProcessLifetime { 5_min };
 Seconds WebProcessCache::clearingDelayAfterApplicationResignsActive = cachedProcessLifetime;
 #endif
+
+int WebProcessCache::capacityOverride { -1 };
 static Seconds cachedProcessSuspensionDelay { 30_s };
 
 void WebProcessCache::setCachedProcessSuspensionDelayForTesting(Seconds delay)
@@ -315,6 +317,8 @@ void WebProcessCache::updateCapacity(WebProcessPool& processPool)
         else
             WEBPROCESSCACHE_RELEASE_LOG("updateCapacity: Cache is disabled because cache model is not PrimaryWebBrowser", 0);
         m_capacity = 0;
+    } else if (capacityOverride >= 0) {
+        m_capacity = capacityOverride;
     } else {
 #if PLATFORM(IOS_FAMILY)
         constexpr unsigned maxProcesses = 10;

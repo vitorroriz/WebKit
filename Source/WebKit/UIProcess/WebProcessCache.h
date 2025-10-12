@@ -72,6 +72,7 @@ public:
 private:
     static Seconds cachedProcessLifetime;
     static Seconds clearingDelayAfterApplicationResignsActive;
+    static int capacityOverride;
 
     class CachedProcess : public RefCounted<CachedProcess> {
         WTF_MAKE_TZONE_ALLOCATED(CachedProcess);
