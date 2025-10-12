@@ -4786,6 +4786,10 @@ imported/w3c/web-platform-tests/dom/events/non-cancelable-when-passive/passive-w
 imported/w3c/web-platform-tests/dom/events/non-cancelable-when-passive/passive-wheel-event-listener-on-root.html [ Skip ]
 imported/w3c/web-platform-tests/dom/events/non-cancelable-when-passive/passive-wheel-event-listener-on-window.html [ Skip ]
 
+imported/w3c/web-platform-tests/dom/events/handler-count.html?document [ Skip ]
+imported/w3c/web-platform-tests/dom/events/handler-count.html?element [ Skip ]
+imported/w3c/web-platform-tests/dom/events/handler-count.html?window [ Skip ]
+
 imported/w3c/web-platform-tests/html/semantics/popovers/popover-light-dismiss-scroll-within.html [ Skip ]
 imported/w3c/web-platform-tests/uievents/order-of-events/mouse-events/wheel-scrolling.html [ Skip ]
 
