@@ -24,17 +24,9 @@ list(APPEND TestWTF_SOURCES
     Tests/WTF/glib/WorkQueueGLib.cpp
 )
 
-list(APPEND TestWTF_SYSTEM_INCLUDE_DIRECTORIES
-    ${GLIB_INCLUDE_DIRS}
-)
-
 # TestJavaScriptCore
 list(APPEND TestJavaScriptCore_SOURCES
     ${test_main_SOURCES}
-)
-
-list(APPEND TestJavaScriptCore_SYSTEM_INCLUDE_DIRECTORIES
-    ${GLIB_INCLUDE_DIRS}
 )
 
 # TestWebCore

@@ -24,10 +24,6 @@ list(APPEND TestWTF_SOURCES
     Tests/WTF/glib/WorkQueueGLib.cpp
 )
 
-list(APPEND TestWTF_SYSTEM_INCLUDE_DIRECTORIES
-    ${GLIB_INCLUDE_DIRS}
-)
-
 list(APPEND TestWTF_LIBRARIES
     GTK::GTK
 )
@@ -80,11 +76,6 @@ list(APPEND TestWebKit_PRIVATE_INCLUDE_DIRECTORIES
     ${WebKitGTK_FRAMEWORK_HEADERS_DIR}
 )
 
-list(APPEND TestWebKit_SYSTEM_INCLUDE_DIRECTORIES
-    ${GIO_UNIX_INCLUDE_DIRS}
-    ${GLIB_INCLUDE_DIRS}
-)
-
 list(APPEND TestWebKit_LIBRARIES
     GTK::GTK
 )
@@ -99,17 +90,10 @@ target_sources(TestWebKitAPIInjectedBundle PRIVATE
 target_include_directories(TestWebKitAPIInjectedBundle PRIVATE
     "${CMAKE_SOURCE_DIR}/Source"
 )
-target_include_directories(TestWebKitAPIInjectedBundle SYSTEM PRIVATE
-    ${GLIB_INCLUDE_DIRS}
-)
 
 # TestJSC
 set(TestJSC_SOURCES
     Tests/JavaScriptCore/glib/TestJSC.cpp
-)
-
-set(TestJSC_SYSTEM_INCLUDE_DIRECTORIES
-    ${GLIB_INCLUDE_DIRS}
 )
 
 set(TestJSC_PRIVATE_INCLUDE_DIRECTORIES
@@ -119,8 +103,6 @@ set(TestJSC_PRIVATE_INCLUDE_DIRECTORIES
 )
 
 set(TestJSC_LIBRARIES
-    ${GLIB_LIBRARIES}
-    ${GLIB_GMODULE_LIBRARIES}
     WebKit::JavaScriptCore
 )
 
@@ -130,8 +112,3 @@ set(TestJSC_DEFINITIONS
 
 WEBKIT_EXECUTABLE_DECLARE(TestJSC)
 WEBKIT_TEST(TestJSC)
-
-# TestJavaScriptCore
-list(APPEND TestJavaScriptCore_SYSTEM_INCLUDE_DIRECTORIES
-    ${GLIB_INCLUDE_DIRS}
-)

@@ -24,18 +24,12 @@ list(APPEND WebKitTestRunner_INCLUDE_DIRECTORIES
     ${FORWARDING_HEADERS_DIR}
 )
 
-list(APPEND WebKitTestRunner_SYSTEM_INCLUDE_DIRECTORIES
-    ${GLIB_INCLUDE_DIRS}
-)
-
 list(APPEND WebKitTestRunner_LIBRARIES
-    ${GLIB_LIBRARIES}
     Cairo::Cairo
     GTK::GTK
 )
 
 list(APPEND TestRunnerInjectedBundle_LIBRARIES
-    ${GLIB_LIBRARIES}
     Fontconfig::Fontconfig
     GTK::GTK
 )
@@ -53,7 +47,6 @@ list(APPEND TestRunnerInjectedBundle_SOURCES
 
 list(APPEND TestRunnerInjectedBundle_INCLUDE_DIRECTORIES
     ${CMAKE_SOURCE_DIR}/Source
-    ${GLIB_INCLUDE_DIRS}
     ${WebKitTestRunner_DIR}/InjectedBundle/atspi
     ${WebKitTestRunner_DIR}/InjectedBundle/glib
     ${WebKitTestRunner_DIR}/InjectedBundle/gtk
