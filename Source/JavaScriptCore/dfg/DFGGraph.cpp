@@ -1526,6 +1526,45 @@ JSValue Graph::tryGetConstantSetter(Node* getterSetter)
     return cell->setterConcurrently();
 }
 
+ObjectPropertyConditionSet Graph::tryEnsureAbsence(JSGlobalObject* globalObject, const StructureSet& structureSet, CacheableIdentifier identifier)
+{
+    if (structureSet.isEmpty())
+        return ObjectPropertyConditionSet::invalid();
+
+    Structure* headStructure = structureSet.onlyStructure();
+    if (!headStructure)
+        return ObjectPropertyConditionSet::invalid();
+
+    auto result = generateConditionsForPropertyMissConcurrently(globalObject->vm(), globalObject, headStructure, identifier.uid());
+    if (!result.isValid())
+        return result;
+
+    for (auto& condition : result) {
+        auto* object = condition.object();
+        if (!object)
+            return ObjectPropertyConditionSet::invalid();
+
+        auto* structure = object->structure();
+        if (structure->typeInfo().overridesGetOwnPropertySlot())
+            return ObjectPropertyConditionSet::invalid();
+
+        if (!structure->propertyAccessesAreCacheable())
+            return ObjectPropertyConditionSet::invalid();
+
+        if (!structure->propertyAccessesAreCacheableForAbsence())
+            return ObjectPropertyConditionSet::invalid();
+
+        unsigned attributes;
+        PropertyOffset offset = structure->getConcurrently(identifier.uid(), attributes);
+        if (isValidOffset(offset))
+            return ObjectPropertyConditionSet::invalid();
+
+        if (structure->hasPolyProto())
+            return ObjectPropertyConditionSet::invalid();
+    }
+    return result;
+}
+
 void Graph::registerFrozenValues()
 {
     ConcurrentJSLocker locker(m_codeBlock->m_lock);

@@ -4344,6 +4344,18 @@ void SpeculativeJIT::compile(Node* node)
         compileCheckJSCast(node);
         break;
 
+    case ResolvePromiseFirstResolving:
+        compileResolvePromiseFirstResolving(node);
+        break;
+
+    case RejectPromiseFirstResolving:
+        compileRejectPromiseFirstResolving(node);
+        break;
+
+    case FulfillPromiseFirstResolving:
+        compileFulfillPromiseFirstResolving(node);
+        break;
+
     case Unreachable:
         unreachable(node);
         break;

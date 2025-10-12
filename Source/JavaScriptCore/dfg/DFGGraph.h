@@ -1146,6 +1146,8 @@ public:
     JSValue tryGetConstantGetter(Node* getterSetter);
     JSValue tryGetConstantSetter(Node* getterSetter);
 
+    ObjectPropertyConditionSet tryEnsureAbsence(JSGlobalObject*, const StructureSet&, CacheableIdentifier);
+
     bool canDoFastSpread(Node*, const AbstractValue&);
     
     void registerFrozenValues();

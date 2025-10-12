@@ -1735,6 +1735,9 @@ private:
         case DataViewSet:
         case InvalidationPoint:
         case ObjectAssign:
+        case ResolvePromiseFirstResolving:
+        case RejectPromiseFirstResolving:
+        case FulfillPromiseFirstResolving:
             break;
             
         // This gets ignored because it only pretends to produce a value.
