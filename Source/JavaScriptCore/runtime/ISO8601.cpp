@@ -1470,9 +1470,10 @@ String temporalTimeToString(PlainTime plainTime, std::tuple<Precision, unsigned>
     return makeString(pad('0', 2, plainTime.hour()), ':', pad('0', 2, plainTime.minute()), ':', pad('0', 2, plainTime.second()), '.', pad('0', paddingLength, emptyString()), fraction);
 }
 
-String temporalDateToString(PlainDate plainDate)
+static String temporalDateToString(int32_t year, int32_t month)
 {
-    auto year = plainDate.year();
+    // If we're printing a date, it should be within range
+    ASSERT(isYearWithinLimits(year));
 
     String prefix;
     auto yearDigits = 4;
@@ -1482,12 +1483,34 @@ String temporalDateToString(PlainDate plainDate)
         year = std::abs(year);
     }
 
-    return makeString(prefix, pad('0', yearDigits, year), '-', pad('0', 2, plainDate.month()), '-', pad('0', 2, plainDate.day()));
+    return makeString(prefix, pad('0', yearDigits, year), '-', pad('0', 2, month));
+}
+
+static String temporalDateToString(int32_t year, int32_t month, int32_t day)
+{
+    auto first = temporalDateToString(year, month);
+    return makeString(first, '-', pad('0', 2, day));
 }
 
 String temporalDateTimeToString(PlainDate plainDate, PlainTime plainTime, std::tuple<Precision, unsigned> precision)
 {
     return makeString(temporalDateToString(plainDate), 'T', temporalTimeToString(plainTime, precision));
+}
+
+String temporalDateToString(PlainDate plainDate)
+{
+    return temporalDateToString(plainDate.year(), plainDate.month(), plainDate.day());
+}
+
+String temporalMonthDayToString(PlainMonthDay plainMonthDay, StringView calendarName)
+{
+    if (calendarName == "always"_s) {
+        // FIXME: print the correct calendar ID when calendars are fully implemented
+        auto first = temporalDateToString(plainMonthDay.isoPlainDate());
+        return makeString(first, "[u-ca=iso8601]"_s);
+    }
+
+    return makeString(pad('0', 2, plainMonthDay.month()), '-', pad('0', 2, plainMonthDay.day()));
 }
 
 String monthCode(uint32_t month)
