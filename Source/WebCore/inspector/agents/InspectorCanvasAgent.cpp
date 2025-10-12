@@ -666,7 +666,7 @@ InspectorCanvas& InspectorCanvasAgent::bindCanvas(CanvasRenderingContext& contex
     }
 #endif
 
-    return inspectorCanvas;
+    return inspectorCanvas.unsafeGet();
 }
 
 void InspectorCanvasAgent::unbindCanvas(InspectorCanvas& inspectorCanvas)

@@ -409,7 +409,7 @@ static CounterNode* makeCounterNode(RenderElement& renderer, const AtomString& i
     renderer.setHasCounterNodeMap(true);
 
     if (newNode->parent() || renderer.shouldApplyStyleContainment())
-        return newNode.ptr();
+        return newNode.unsafePtr();
 
     // Check if some nodes that were previously root nodes should become children of this node now.
     auto* currentRenderer = &renderer;
@@ -430,7 +430,7 @@ static CounterNode* makeCounterNode(RenderElement& renderer, const AtomString& i
         newNode->insertAfter(*currentCounter, newNode->lastChild(), identifier);
     }
 
-    return newNode.ptr();
+    return newNode.unsafePtr();
 }
 
 RenderCounter::RenderCounter(Document& document, const Style::Content::Counter& counter)

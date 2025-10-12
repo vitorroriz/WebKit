@@ -573,7 +573,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& position, Boundar
     if (!next)
         return it.atEnd() ? makeDeprecatedLegacyPosition(searchRange->start) : position;
 
-    auto& node = (it.atEnd() ? *searchRange : it.range()).start.container.get();
+    auto& node = (it.atEnd() ? *searchRange : it.range()).start.container.unsafeGet();
     auto* textNode = dynamicDowncast<Text>(node);
     if (textNode && !suffixLength && next <= textNode->length()) {
         // The next variable contains a usable index into a text node.

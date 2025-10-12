@@ -716,7 +716,7 @@ WebExtensionAction* WebExtensionAction::fallbackAction() const
 
     // Tab actions whose tab references have not dropped fallback to the window action.
     if (RefPtr tab = this->tab())
-        return extensionContext->getAction(tab->window().get()).ptr();
+        return extensionContext->getAction(tab->window().get()).unsafePtr();
 
     // Window actions and tab actions whose tab references have dropped fallback to the default action.
     if (m_window.has_value() || m_tab.has_value())

@@ -2114,7 +2114,7 @@ AccessibilityObject* AccessibilityNodeObject::tableHeaderContainer()
     tableHeader->setParent(this);
     rareData->setTableHeaderContainer(tableHeader.get());
 
-    return tableHeader.ptr();
+    return tableHeader.unsafePtr();
 }
 
 AXCoreObject::AccessibilityChildrenVector AccessibilityNodeObject::columns()
@@ -2772,7 +2772,7 @@ AccessibilityObject* AccessibilityNodeObject::disclosedByRow() const
 
     for (int k = index - 1; k >= 0; --k) {
         if (allRows[k]->hierarchicalLevel() == level - 1)
-            return downcast<AccessibilityObject>(allRows[k]).ptr();
+            return downcast<AccessibilityObject>(allRows[k]).unsafePtr();
     }
     return nullptr;
 }

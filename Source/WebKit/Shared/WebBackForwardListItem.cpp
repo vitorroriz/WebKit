@@ -243,7 +243,7 @@ void WebBackForwardListItem::setWasRestoredFromSession()
 WebBackForwardListFrameItem& WebBackForwardListItem::navigatedFrameItem() const
 {
     if (RefPtr childItem = m_navigatedFrameID ? m_mainFrameItem->childItemForFrameID(*m_navigatedFrameID) : nullptr)
-        return childItem.releaseNonNull();
+        return childItem.releaseNonNull().unsafeGet();
     return m_mainFrameItem;
 }
 

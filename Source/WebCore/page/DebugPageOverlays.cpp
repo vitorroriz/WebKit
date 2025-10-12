@@ -791,7 +791,7 @@ RegionOverlay& DebugPageOverlays::ensureRegionOverlayForPage(Page& page, RegionT
     auto visualizer = RegionOverlay::create(page, regionType);
     visualizers[indexOf(regionType)] = visualizer.copyRef();
     m_pageRegionOverlays.add(page, WTFMove(visualizers));
-    return visualizer;
+    return visualizer.unsafeGet();
 }
 
 void DebugPageOverlays::showRegionOverlay(Page& page, RegionType regionType)

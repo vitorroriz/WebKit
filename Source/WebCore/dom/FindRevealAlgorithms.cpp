@@ -58,7 +58,7 @@ void revealClosedDetailsAndHiddenUntilFoundAncestors(Node& node)
         if (slot && slot->userAgentPart() == UserAgentParts::detailsContent() && slot->shadowHost()) {
             Ref details = downcast<HTMLDetailsElement>(*slot->shadowHost());
             if (!details->hasAttributeWithoutSynchronization(HTMLNames::openAttr))
-                return details.ptr();
+                return details.unsafePtr();
         }
         return nullptr;
     };

@@ -835,7 +835,7 @@ AccessibilityObject* AXObjectCache::getOrCreate(RenderObject& renderer)
     if (object->isDetached())
         return nullptr;
 
-    return object.ptr();
+    return object.unsafePtr();
 }
 
 #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)

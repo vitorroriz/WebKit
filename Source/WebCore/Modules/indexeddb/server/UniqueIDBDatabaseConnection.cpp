@@ -145,7 +145,7 @@ UniqueIDBDatabaseTransaction& UniqueIDBDatabaseConnection::createVersionChangeTr
     Ref<UniqueIDBDatabaseTransaction> transaction = UniqueIDBDatabaseTransaction::create(*this, info);
     m_transactionMap.set(transaction->info().identifier(), &transaction.get());
 
-    return transaction.get();
+    return transaction.unsafeGet();
 }
 
 void UniqueIDBDatabaseConnection::establishTransaction(const IDBTransactionInfo& info)

@@ -126,7 +126,7 @@ Element* DocumentFragment::getElementById(const AtomString& id) const
     // Otherwise, fall back to iterating all of the element descendants.
     for (Ref element : descendantsOfType<Element>(*this)) {
         if (element->getIdAttribute() == id)
-            return const_cast<Element*>(element.ptr());
+            return const_cast<Element*>(element.unsafePtr());
     }
 
     return nullptr;

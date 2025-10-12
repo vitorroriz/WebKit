@@ -390,7 +390,7 @@ RTCRtpTransceiver& LibWebRTCPeerConnectionBackend::newRemoteTransceiver(std::uni
     auto receiver = createReceiver(transceiverBackend->createReceiverBackend());
     auto transceiver = RTCRtpTransceiver::create(WTFMove(sender), WTFMove(receiver), WTFMove(transceiverBackend));
     peerConnection->addInternalTransceiver(transceiver.copyRef());
-    return transceiver.get();
+    return transceiver.unsafeGet();
 }
 
 void LibWebRTCPeerConnectionBackend::collectTransceivers()

@@ -1881,7 +1881,7 @@ bool Quirks::needsPointerTouchCompatibility(const Element& target) const
         RefPtr pageContainer = [&target] -> const HTMLElement* {
             for (Ref ancestor : lineageOfType<HTMLElement>(target)) {
                 if (ancestor->hasClassName("PageContainer"_s))
-                    return ancestor.ptr();
+                    return ancestor.unsafePtr();
             }
             return nullptr;
         }();

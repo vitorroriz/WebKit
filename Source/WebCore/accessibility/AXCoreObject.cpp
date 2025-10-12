@@ -465,7 +465,7 @@ AXCoreObject* AXCoreObject::nextInPreOrder(bool updateChildrenIfNeeded , AXCoreO
         if (role != AccessibilityRole::Column && role != AccessibilityRole::TableHeaderContainer) {
             // Table columns and header containers add cells despite not being their "true" parent (which are the rows).
             // Don't allow a pre-order traversal of these object types to return cells to avoid an infinite loop.
-            return children[0].ptr();
+            return children[0].unsafePtr();
         }
     }
 
@@ -510,7 +510,7 @@ AXCoreObject* AXCoreObject::deepestLastChildIncludingIgnored(bool updateChildren
             break;
         deepestChild = descendants[descendants.size() - 1];
     }
-    return deepestChild.ptr();
+    return deepestChild.unsafePtr();
 }
 
 size_t AXCoreObject::indexInSiblings(const AccessibilityChildrenVector& siblings) const
@@ -543,7 +543,7 @@ AXCoreObject* AXCoreObject::nextSiblingIncludingIgnored(bool updateChildrenIfNee
     if (indexOfThis == notFound)
         return nullptr;
 
-    return indexOfThis + 1 < siblings.size() ? siblings[indexOfThis + 1].ptr() : nullptr;
+    return indexOfThis + 1 < siblings.size() ? siblings[indexOfThis + 1].unsafePtr() : nullptr;
 }
 
 AXCoreObject* AXCoreObject::previousSiblingIncludingIgnored(bool updateChildrenIfNeeded)
@@ -576,7 +576,7 @@ AXCoreObject* AXCoreObject::nextUnignoredSibling(bool updateChildrenIfNeeded, AX
     if (indexOfThis == notFound)
         return nullptr;
 
-    return indexOfThis + 1 < siblings.size() ? siblings[indexOfThis + 1].ptr() : nullptr;
+    return indexOfThis + 1 < siblings.size() ? siblings[indexOfThis + 1].unsafePtr() : nullptr;
 }
 
 AXCoreObject* AXCoreObject::nextSiblingIncludingIgnoredOrParent() const
@@ -1125,7 +1125,7 @@ AXCoreObject* AXCoreObject::rowHeader()
     for (const auto& child : rowChildren) {
         // We found a non-header cell, so this is not an entire row of headers -- return the original header cell.
         if (!isARIAGridRow && !child->hasElementName(ElementName::HTML_th))
-            return firstCell.ptr();
+            return firstCell.unsafePtr();
 
         // For grid rows, the first header encountered is the row header.
         if (isARIAGridRow && child->isRowHeader())
@@ -1499,7 +1499,7 @@ AXCoreObject* AXCoreObject::activeDescendant() const
     auto activeDescendants = relatedObjects(AXRelation::ActiveDescendant);
     ASSERT(activeDescendants.size() <= 1);
     if (!activeDescendants.isEmpty())
-        return activeDescendants[0].ptr();
+        return activeDescendants[0].unsafePtr();
     return nullptr;
 }
 
@@ -1714,9 +1714,9 @@ AXCoreObject* AXCoreObject::titleUIElement() const
 #if PLATFORM(COCOA)
     // We impose the restriction that if there is more than one label, then we should return none.
     // FIXME: the behavior should be the same in all platforms.
-    return labels.size() == 1 ? labels.first().ptr() : nullptr;
+    return labels.size() == 1 ? labels.first().unsafePtr() : nullptr;
 #else
-    return labels.size() ? labels.first().ptr() : nullptr;
+    return labels.size() ? labels.first().unsafePtr() : nullptr;
 #endif
 }
 

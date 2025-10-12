@@ -1868,7 +1868,7 @@ WebProcessProxy* WebProcessPool::webProcessProxyFromConnection(const IPC::Connec
 {
     for (Ref process : m_processes) {
         if (process->hasConnection(connection))
-            return process.ptr();
+            return process.unsafePtr();
     }
 
     ASSERT_NOT_REACHED();

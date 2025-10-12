@@ -103,7 +103,7 @@ Element* DocumentFullscreen::fullscreenElement() const
 {
     for (Ref element : makeReversedRange(document().topLayerElements())) {
         if (element->hasFullscreenFlag())
-            return element.ptr();
+            return element.unsafePtr();
     }
 
     return nullptr;

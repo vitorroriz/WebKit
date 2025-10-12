@@ -2818,7 +2818,7 @@ def check_wtf_move(clean_lines, line_number, file_state, error):
 
 
 def check_unsafe_get(clean_lines, line_number, file_state, error):
-    """Looks for use of 'unsafeGet()' which should be avoided.
+    """Looks for use of 'unsafeGet()' or 'unsafePtr()' which should be avoided.
 
     Args:
       clean_lines: A CleansedLines instance containing the file.
@@ -2836,7 +2836,11 @@ def check_unsafe_get(clean_lines, line_number, file_state, error):
 
     using_unsafe_get = search(r'\bunsafeGet\s*\(\s*\)', line)
     if using_unsafe_get:
-        error(line_number, 'runtime/unsafe_get', 5, "Avoid using 'unsafeGet()' by extending the lifetime of the RefPtr.")
+        error(line_number, 'runtime/unsafe_get_ptr', 5, "Avoid using 'unsafeGet()' by extending the lifetime of the RefPtr.")
+
+    using_unsafe_ptr = search(r'\bunsafePtr\s*\(\s*\)', line)
+    if using_unsafe_ptr:
+        error(line_number, 'runtime/unsafe_get_ptr', 5, "Avoid using 'unsafePtr()' by extending the lifetime of the Ref.")
 
 
 def check_callonmainthread(filename, clean_lines, line_number, file_state, error):
@@ -5030,7 +5034,7 @@ class CppChecker(object):
         'runtime/soft-linked-alloc',
         'runtime/string',
         'runtime/threadsafe_fn',
-        'runtime/unsafe_get',
+        'runtime/unsafe_get_ptr',
         'runtime/unsigned',
         'runtime/virtual',
         'runtime/wtf_checked_size',

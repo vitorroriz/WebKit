@@ -255,7 +255,7 @@ RemotePageProxy* BrowsingContextGroup::remotePageInProcess(const WebPageProxy& p
         return nullptr;
     for (Ref remotePage : it->value) {
         if (remotePage->process().coreProcessIdentifier() == process.coreProcessIdentifier())
-            return remotePage.ptr();
+            return remotePage.unsafePtr();
     }
     return nullptr;
 }

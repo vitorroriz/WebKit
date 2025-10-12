@@ -1240,7 +1240,7 @@ Node* TextIterator::node() const
 {
     auto start = this->range().start;
     if (start.container->isCharacterDataNode())
-        return start.container.ptr();
+        return start.container.unsafePtr();
     return start.container->traverseToChildAt(start.offset);
 }
 

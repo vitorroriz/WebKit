@@ -3530,7 +3530,7 @@ ShadowRoot& Element::createUserAgentShadowRoot()
 {
     ASSERT(!userAgentShadowRoot());
     Ref newShadow = ShadowRoot::create(document(), ShadowRootMode::UserAgent);
-    ShadowRoot& shadow = newShadow;
+    ShadowRoot& shadow = newShadow.unsafeGet();
     addShadowRoot(WTFMove(newShadow));
     return shadow;
 }

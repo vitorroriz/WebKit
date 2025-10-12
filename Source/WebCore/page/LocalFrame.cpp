@@ -749,7 +749,7 @@ const UserContentProvider* LocalFrame::userContentProvider() const
     if (RefPtr userContentProvider = documentLoader ? documentLoader->preferences().userContentProvider : nullptr)
         return userContentProvider.unsafeGet();
     if (RefPtr page = this->page())
-        return page->protectedUserContentProviderForFrame().ptr();
+        return page->protectedUserContentProviderForFrame().unsafePtr();
     return nullptr;
 }
 
@@ -760,7 +760,7 @@ UserContentProvider* LocalFrame::userContentProvider()
     if (RefPtr userContentProvider = documentLoader ? documentLoader->preferences().userContentProvider : nullptr)
         return userContentProvider.unsafeGet();
     if (RefPtr page = this->page())
-        return page->protectedUserContentProviderForFrame().ptr();
+        return page->protectedUserContentProviderForFrame().unsafePtr();
     return nullptr;
 }
 

@@ -87,7 +87,7 @@ public:
 
     operator const CSSPrimitiveValue&() const
     {
-        return downcast<CSSPrimitiveValue>(m_value);
+        return downcast<CSSPrimitiveValue>(m_value).unsafeGet();
     }
 
     operator const CSSValue&() const
