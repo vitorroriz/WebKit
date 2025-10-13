@@ -46,11 +46,7 @@ WebExtension::WebExtension(GFile* resourcesFile, RefPtr<API::Error>& outError)
     outError = nullptr;
 
     GUniquePtr<char> baseURL(g_file_get_uri(resourcesFile));
-
-    // While there is a check below to make sure that the directory has a path suffix, it can sometimes remove the full path
-    // and leave only the protocol.
-    if (!m_resourceBaseURL.hasPath())
-        m_resourceBaseURL.setPath("/"_s);
+    m_resourceBaseURL = URL { makeString(String::fromUTF8(baseURL.get()), "/"_s) };
 
     if (m_resourceBaseURL.isValid()) {
         auto isDirectory = g_file_query_file_type(resourcesFile, G_FILE_QUERY_INFO_NONE, nullptr) == G_FILE_TYPE_DIRECTORY;
@@ -60,9 +56,6 @@ WebExtension::WebExtension(GFile* resourcesFile, RefPtr<API::Error>& outError)
             return;
         }
     }
-
-    if (m_resourceBaseURL.path().right(1) != "/"_s)
-        m_resourceBaseURL = URL::fileURLWithFileSystemPath(FileSystem::pathByAppendingComponent(m_resourceBaseURL.path(), "/"_s));
 
     if (!manifestParsedSuccessfully()) {
         ASSERT(!m_errors.isEmpty());
