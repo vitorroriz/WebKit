@@ -66,7 +66,7 @@ public:
     bool hasNonFinishedTransactions() const;
 
     void fireVersionChangeEvent(const IDBResourceIdentifier& requestIdentifier, uint64_t requestedVersion);
-    UniqueIDBDatabaseTransaction& createVersionChangeTransaction(uint64_t newVersion);
+    Ref<UniqueIDBDatabaseTransaction> createVersionChangeTransaction(uint64_t newVersion);
 
     WEBCORE_EXPORT void establishTransaction(const IDBTransactionInfo&);
     void didAbortTransaction(UniqueIDBDatabaseTransaction&, const IDBError&);

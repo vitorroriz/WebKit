@@ -135,7 +135,7 @@ void UniqueIDBDatabaseConnection::fireVersionChangeEvent(const IDBResourceIdenti
     m_connectionToClient->fireVersionChangeEvent(*this, requestIdentifier, requestedVersion);
 }
 
-UniqueIDBDatabaseTransaction& UniqueIDBDatabaseConnection::createVersionChangeTransaction(uint64_t newVersion)
+Ref<UniqueIDBDatabaseTransaction> UniqueIDBDatabaseConnection::createVersionChangeTransaction(uint64_t newVersion)
 {
     LOG(IndexedDB, "UniqueIDBDatabaseConnection::createVersionChangeTransaction - %s - %" PRIu64, m_openRequestIdentifier.loggingString().utf8().data(), identifier().toUInt64());
     ASSERT(!m_closePending);
@@ -145,7 +145,7 @@ UniqueIDBDatabaseTransaction& UniqueIDBDatabaseConnection::createVersionChangeTr
     Ref<UniqueIDBDatabaseTransaction> transaction = UniqueIDBDatabaseTransaction::create(*this, info);
     m_transactionMap.set(transaction->info().identifier(), &transaction.get());
 
-    return transaction.unsafeGet();
+    return transaction;
 }
 
 void UniqueIDBDatabaseConnection::establishTransaction(const IDBTransactionInfo& info)
