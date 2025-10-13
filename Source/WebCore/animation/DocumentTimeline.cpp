@@ -211,6 +211,11 @@ void DocumentTimeline::styleOriginatedAnimationsWereCreated()
     scheduleAnimationResolution();
 }
 
+void DocumentTimeline::pendingStartTimeWasSetOnAnimation()
+{
+    scheduleAnimationResolution();
+}
+
 bool DocumentTimeline::animationCanBeRemoved(WebAnimation& animation)
 {
     // https://drafts.csswg.org/web-animations/#removing-replaced-animations
