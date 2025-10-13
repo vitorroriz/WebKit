@@ -126,6 +126,9 @@ class TestSDKDB(TestCase):
         self.dbfile = tempfile.NamedTemporaryFile(prefix='TestSDKDB-')
         self.sdkdb = SDKDB(Path(self.dbfile.name))
 
+    def tearDown(self):
+        self.sdkdb.con.close()
+
     def add_library(self):
         with self.sdkdb:
             self.sdkdb._cache_hit_preparing_to_insert(F, F_Hash)
