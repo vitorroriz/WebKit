@@ -413,8 +413,18 @@ static inline void dispatchEventsOnWindowAndFocusedElement(Document* document, b
             return;
     }
 
-    if (!focused && document->focusedElement())
+    if (!focused && document->focusedElement()) {
+        if (document->focusedElement()->transferredFocusToPicker()) {
+            // The webpage lost focus because the focused element transferred focus to
+            // a non-web-content picker when it was activated. We don't want to post any
+            // web-exposed events (e.g. blur) in these cases, so return.
+            document->focusedElement()->didSuppressBlurDueToPickerFocusTransfer();
+            return;
+        }
+
         document->focusedElement()->dispatchBlurEvent(nullptr);
+    }
+
     document->dispatchWindowEvent(Event::create(focused ? eventNames().focusEvent : eventNames().blurEvent, Event::CanBubble::No, Event::IsCancelable::No));
     if (focused && document->focusedElement())
         document->focusedElement()->dispatchFocusEvent(nullptr, { });

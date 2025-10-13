@@ -89,6 +89,8 @@ static const NSWindowStyleMask NSWindowStyleMaskAlertWindow = (NSWindowStyleMask
 - (BOOL)registerScrollViewSeparatorTrackingAdapter:(NSObject<NSScrollViewSeparatorTrackingAdapter> *)adapter;
 - (void)unregisterScrollViewSeparatorTrackingAdapter:(NSObject<NSScrollViewSeparatorTrackingAdapter> *)adapter;
 
+- (void)_setSharesParentFirstResponder:(BOOL)sharesParentFirstResponder;
+
 @end
 
 @class LPLinkMetadata;

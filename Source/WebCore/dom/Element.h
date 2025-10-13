@@ -503,6 +503,13 @@ public:
     virtual bool isFocusable() const;
     virtual bool isKeyboardFocusable(const FocusEventData&) const;
     virtual bool isMouseFocusable() const;
+    // True for elements that transferred focus to a non-web-content picker upon activation.
+    // An example of this is the DateTimeFieldElement (which is what the day / month /
+    // year subfields are rendered as in an <input type="date">). Activating these
+    // elements opens an external date picker on some platforms (e.g. a NSDatePicker inside
+    // a wrapping NSWindow on macOS).
+    virtual bool transferredFocusToPicker() const { return false; }
+    virtual void didSuppressBlurDueToPickerFocusTransfer() { }
 
     virtual bool shouldUseInputMethod();
 

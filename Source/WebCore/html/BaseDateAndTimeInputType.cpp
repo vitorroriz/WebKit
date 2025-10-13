@@ -325,11 +325,13 @@ void BaseDateAndTimeInputType::setValue(const String& value, bool valueChanged, 
         updateInnerTextValue();
 }
 
-void BaseDateAndTimeInputType::handleDOMActivateEvent(Event&)
+void BaseDateAndTimeInputType::handleDOMActivateEvent(Event& event)
 {
     ASSERT(element());
     if (!element()->renderer() || !protectedElement()->isMutable() || !UserGestureIndicator::processingUserGesture())
         return;
+
+    m_pickerWasActivatedByKeyboard = event.isKeyboardEvent();
 
     if (m_dateTimeChooser)
         return;
@@ -576,6 +578,23 @@ void BaseDateAndTimeInputType::didChangeValueFromControl()
         dateTimeChooser->showChooser(parameters);
 }
 
+void BaseDateAndTimeInputType::didReceiveSpaceKeyFromControl()
+{
+    // One of our subfields received a space key event, so let's move focus into the picker.
+    m_pickerWasActivatedByKeyboard = true;
+    m_didTransferFocusToPicker = true;
+
+    RefPtr chooser = m_dateTimeChooser;
+    if (!chooser) {
+        showPicker();
+        return;
+    }
+
+    DateTimeChooserParameters parameters;
+    if (setupDateTimeChooserParameters(parameters))
+        chooser->showChooser(parameters);
+}
+
 bool BaseDateAndTimeInputType::isEditControlOwnerDisabled() const
 {
     ASSERT(element());
@@ -643,6 +662,7 @@ bool BaseDateAndTimeInputType::setupDateTimeChooserParameters(DateTimeChooserPar
     auto date = valueOrDefault(parseToDateComponents(element->value().get()));
     parameters.hasSecondField = shouldHaveSecondField(date);
     parameters.hasMillisecondField = shouldHaveMillisecondField(date);
+    parameters.wasActivatedByKeyboard = m_pickerWasActivatedByKeyboard;
 
     if (auto dataList = element->dataList()) {
         for (Ref option : dataList->suggestions()) {
@@ -663,6 +683,9 @@ void BaseDateAndTimeInputType::closeDateTimeChooser()
 {
     if (RefPtr dateTimeChooser = m_dateTimeChooser)
         dateTimeChooser->endChooser();
+
+    m_didTransferFocusToPicker = false;
+    m_pickerWasActivatedByKeyboard = false;
 }
 
 } // namespace WebCore

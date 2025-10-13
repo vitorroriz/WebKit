@@ -2357,6 +2357,7 @@ struct WebCore::DateTimeChooserParameters {
     bool useDarkAppearance;
     bool hasSecondField;
     bool hasMillisecondField;
+    bool wasActivatedByKeyboard;
 }
 
 header: <WebCore/ScreenProperties.h>

@@ -137,8 +137,11 @@ private:
     // DateTimeEditElementEditControlOwner functions:
     void didBlurFromControl() final;
     void didChangeValueFromControl() final;
+    void didReceiveSpaceKeyFromControl() final;
     bool isEditControlOwnerDisabled() const final;
     bool isEditControlOwnerReadOnly() const final;
+    bool didEditControlOwnerTransferFocusToPicker() final { return m_didTransferFocusToPicker; }
+    void didSuppressBlurDueToPickerFocusTransfer() final { m_didTransferFocusToPicker = false; }
     AtomString localeIdentifier() const final;
 
     // DateTimeChooserClient functions:
@@ -154,6 +157,9 @@ private:
 
     RefPtr<DateTimeChooser> m_dateTimeChooser;
     RefPtr<DateTimeEditElement> m_dateTimeEditElement;
+
+    bool m_didTransferFocusToPicker { false };
+    bool m_pickerWasActivatedByKeyboard { false };
 };
 
 } // namespace WebCore
