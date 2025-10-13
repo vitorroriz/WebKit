@@ -1787,6 +1787,11 @@ void WebPageProxy::close()
             automationSession->willClosePage(*this);
     }
 
+#if ENABLE(FULLSCREEN_API)
+    if (RefPtr fullscreenManager = std::exchange(m_fullScreenManager, nullptr))
+        fullscreenManager->detachFromClient();
+#endif
+
 #if ENABLE(WK_WEB_EXTENSIONS) && PLATFORM(COCOA)
     if (RefPtr webExtensionController = m_webExtensionController)
         webExtensionController->removePage(*this);

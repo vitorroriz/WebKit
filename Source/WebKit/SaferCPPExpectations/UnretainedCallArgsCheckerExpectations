@@ -68,7 +68,6 @@ UIProcess/Cocoa/_WKWarningView.mm
 [ Mac ] UIProcess/mac/DisplayCaptureSessionManager.mm
 [ Mac ] UIProcess/mac/PageClientImplMac.mm
 UIProcess/mac/SecItemShimProxy.cpp
-[ Mac ] UIProcess/mac/WKFullScreenWindowController.mm
 [ Mac ] UIProcess/mac/WKTextAnimationManagerMac.mm
 [ Mac ] UIProcess/mac/WebDataListSuggestionsDropdownMac.mm
 [ Mac ] UIProcess/mac/WebPopupMenuProxyMac.mm
