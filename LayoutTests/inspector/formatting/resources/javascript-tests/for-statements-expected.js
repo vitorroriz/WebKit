@@ -41,65 +41,65 @@ for (;;) {
 x
 // optional chaining
 
-for(;a?.b;)
+for (; a?.b;)
     1
-for (a;b?.c;)
+for (a; b?.c;)
     1
-for (a;b?.c; d)
+for (a; b?.c; d)
     1
-for(;b?.c; d)
+for (; b?.c; d)
     1
-for(a?.b;;)
+for (a?.b;;)
     1
-for(a?.b; c;)
+for (a?.b; c;)
     1
-for(a?.b;; d)
+for (a?.b;; d)
     1
-for(a?.b; c; d)
+for (a?.b; c; d)
     1
-for(;;c?.d)
+for (;; c?.d)
     1
-for (a;;c?.d)
+for (a;; c?.d)
     1
-for (; b;c?.d)
+for (; b; c?.d)
     1
-for (a; b;c?.d)
+for (a; b; c?.d)
     1
 
-for(;a?.b;) {
+for (; a?.b;) {
     1
 }
-for (a;b?.c;) {
+for (a; b?.c;) {
     1
 }
-for (a;b?.c; d) {
+for (a; b?.c; d) {
     1
 }
-for(;b?.c; d) {
+for (; b?.c; d) {
     1
 }
-for(a?.b;;) {
+for (a?.b;;) {
     1
 }
-for(a?.b; c;) {
+for (a?.b; c;) {
     1
 }
-for(a?.b;; d) {
+for (a?.b;; d) {
     1
 }
-for(a?.b; c; d) {
+for (a?.b; c; d) {
     1
 }
-for(;;c?.d) {
+for (;; c?.d) {
     1
 }
-for (a;;c?.d) {
+for (a;; c?.d) {
     1
 }
-for (; b;c?.d) {
+for (; b; c?.d) {
     1
 }
-for (a; b;c?.d) {
+for (a; b; c?.d) {
     1
 }
 

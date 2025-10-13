@@ -442,6 +442,9 @@ _PATH_RULES_SPECIFIER = [
       "-runtime/wtf_move",
       "-whitespace"]),
 
+    ([  # Ignore whitespace issues in third party library esprima.js
+     os.path.join('Source', 'WebInspectorUI', 'UserInterface', 'External', 'Esprima', 'esprima.js')],
+     ["-whitespace/tab"]),
 ]
 
 
