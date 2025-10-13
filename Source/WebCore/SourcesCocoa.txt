@@ -220,7 +220,6 @@ inspector/LegacyWebSocketInspectorInstrumentation.cpp
 inspector/mac/PageDebuggerMac.mm @nonARC
 loader/archive/cf/LegacyWebArchive.cpp
 loader/archive/cf/LegacyWebArchiveMac.mm @nonARC
-loader/cocoa/BundleResourceLoader.mm @nonARC
 loader/cocoa/DiskCacheMonitorCocoa.mm @nonARC
 loader/cocoa/PrivateClickMeasurementCocoa.mm @nonARC
 loader/cocoa/SubresourceLoaderCocoa.mm @nonARC

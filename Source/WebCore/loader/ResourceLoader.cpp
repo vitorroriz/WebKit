@@ -71,10 +71,6 @@
 #include "PreviewConverter.h"
 #endif
 
-#if PLATFORM(COCOA)
-#include "BundleResourceLoader.h"
-#endif
-
 #undef RESOURCELOADER_RELEASE_LOG
 #define PAGE_ID (this->frame() && this->frame()->pageID() ? this->frame()->pageID()->toUInt64() : 0)
 #define FRAME_ID (this->frame() ? this->frame()->frameID().toUInt64() : 0)
@@ -255,13 +251,6 @@ void ResourceLoader::start()
         loadDataURL();
         return;
     }
-
-#if PLATFORM(COCOA)
-    if (isPDFJSResourceLoad()) {
-        BundleResourceLoader::loadResourceFromBundle(*this, "pdfjs/"_s);
-        return;
-    }
-#endif
 
 #if USE(SOUP)
     if (m_request.url().protocolIs("resource"_s) || isPDFJSResourceLoad()) {
