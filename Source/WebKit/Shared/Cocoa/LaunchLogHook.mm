@@ -71,7 +71,7 @@ void LaunchLogHook::initialize(xpc_connection_t connection)
         if (type == OS_LOG_TYPE_FAULT)
             type = OS_LOG_TYPE_ERROR;
 
-        if (auto messageString = adoptSystem(os_log_copy_message_string(msg))) {
+        if (auto messageString = adoptSystemMalloc(os_log_copy_message_string(msg))) {
             auto message = adoptOSObject(xpc_dictionary_create(nullptr, nullptr, 0));
             xpc_dictionary_set_string(message.get(), XPCEndpoint::xpcMessageNameKey, logMessageName);
             if (auto* subsystem = msg->subsystem)

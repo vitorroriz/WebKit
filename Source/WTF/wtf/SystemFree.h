@@ -40,11 +40,11 @@ struct SystemFree {
 };
 
 template<typename T>
-inline std::unique_ptr<T, WTF::SystemFree<T>> adoptSystem(T* value)
+inline std::unique_ptr<T, WTF::SystemFree<T>> adoptSystemMalloc(T* value)
 {
     return std::unique_ptr<T, WTF::SystemFree<T>>(value);
 }
 
 } // namespace WTF
 
-using WTF::adoptSystem;
+using WTF::adoptSystemMalloc;

@@ -886,7 +886,7 @@ static void registerLogClient(bool isDebugLoggingEnabled, std::unique_ptr<LogCli
         if (type == OS_LOG_TYPE_FAULT)
             type = OS_LOG_TYPE_ERROR;
 
-        if (auto messageString = adoptSystem(os_log_copy_message_string(msg))) {
+        if (auto messageString = adoptSystemMalloc(os_log_copy_message_string(msg))) {
             auto logString = spanConstCast<Latin1Character>(unsafeSpan8IncludingNullTerminator(messageString.get()));
             if (logString.size() > logStringMaxSize) {
                 logString = logString.first(logStringMaxSize);

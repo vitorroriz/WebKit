@@ -174,7 +174,7 @@ static webrtc::SocketAddress socketAddressFromIncomingConnection(nw_connection_t
     auto endpoint = adoptNS(nw_connection_copy_endpoint(connection));
     auto type = nw_endpoint_get_type(endpoint.get());
     if (type == nw_endpoint_type_address) {
-        auto ipAddress = adoptSystem(nw_endpoint_copy_address_string(endpoint.get()));
+        auto ipAddress = adoptSystemMalloc(nw_endpoint_copy_address_string(endpoint.get()));
         webrtc::SocketAddress remoteAddress { ipAddress.get(), nw_endpoint_get_port(endpoint.get()) };
         return remoteAddress;
     }

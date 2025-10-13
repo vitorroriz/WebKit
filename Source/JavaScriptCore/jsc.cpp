@@ -3915,7 +3915,7 @@ static void runInteractive(GlobalObject* globalObject)
         String source;
         do {
             error = ParserError();
-            auto line = adoptSystem(readline(source.isEmpty() ? interactivePrompt : "... "));
+            auto line = adoptSystemMalloc(readline(source.isEmpty() ? interactivePrompt : "... "));
             shouldQuit = !line;
             if (!line)
                 break;

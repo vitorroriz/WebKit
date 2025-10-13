@@ -63,7 +63,7 @@ bool NetworkIssueReporter::shouldReport(NSURLSessionTaskMetrics *metrics)
 NetworkIssueReporter::NetworkIssueReporter()
 {
     if (auto* copyStacktrace = ne_tracker_copy_current_stacktracePtr())
-        m_stackTrace = adoptSystem(copyStacktrace(&m_stackTraceSize));
+        m_stackTrace = adoptSystemMalloc(copyStacktrace(&m_stackTraceSize));
 }
 
 NetworkIssueReporter::~NetworkIssueReporter() = default;

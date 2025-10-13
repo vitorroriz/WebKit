@@ -1372,7 +1372,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     
     if (!_temporaryPDFDirectoryPath) {
         NSString *temporaryDirectoryTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"WebKitPDFs-XXXXXX"];
-        auto cTemplate = adoptSystem(strdup([temporaryDirectoryTemplate fileSystemRepresentation]));
+        auto cTemplate = adoptSystemMalloc(strdup([temporaryDirectoryTemplate fileSystemRepresentation]));
         
         if (!mkdtemp(cTemplate.get())) {
             // This should never happen; if it does we'll fail silently on non-debug builds.
