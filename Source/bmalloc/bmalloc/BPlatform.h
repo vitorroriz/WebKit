@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2021 Apple Inc. All rights reserved.
+ * Copyright (C) 2014-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -120,24 +120,30 @@
 #define BPLATFORM_WIN 1
 #endif
 
+/* ==== Platform adaptation macros: these describe properties of the target environment. ==== */
+
+/* BHAVE() - specific system features (headers, functions or similar) that are present or not */
+#define BHAVE(_FEATURE) (defined BHAVE_##_FEATURE && BHAVE_##_FEATURE)
+
 /* ==== Feature decision macros: these define feature choices for a particular port. ==== */
 
-#define BENABLE(WTF_FEATURE) (defined BENABLE_##WTF_FEATURE && BENABLE_##WTF_FEATURE)
+/* BENABLE() - turn on a specific feature of bmalloc */
+#define BENABLE(_FEATURE) (defined BENABLE_##_FEATURE && BENABLE_##_FEATURE)
 
 /* ==== Policy decision macros: these define policy choices for a particular port. ==== */
 
 /* BUSE() - use a particular third-party library or optional OS service */
-#define BUSE(FEATURE) (defined BUSE_##FEATURE && BUSE_##FEATURE)
+#define BUSE(_FEATURE) (defined BUSE_##_FEATURE && BUSE_##_FEATURE)
 
 /* ==== Compiler adaptation macros: these describe the capabilities of the compiler. ==== */
 
 /* BCOMPILER_SUPPORTS() - check for a compiler feature */
-#define BCOMPILER_SUPPORTS(FEATURE) (defined BCOMPILER_SUPPORTS_##FEATURE && BCOMPILER_SUPPORTS_##FEATURE)
+#define BCOMPILER_SUPPORTS(_FEATURE) (defined BCOMPILER_SUPPORTS_##_FEATURE && BCOMPILER_SUPPORTS_##_FEATURE)
 
 /* ==== Platform adaptation macros: these describe properties of the target environment. ==== */
 
 /* BCPU() - the target CPU architecture */
-#define BCPU(_FEATURE) (defined BCPU_##_FEATURE  && BCPU_##_FEATURE)
+#define BCPU(_FEATURE) (defined BCPU_##_FEATURE && BCPU_##_FEATURE)
 
 /* BCPU(X86) - i386 / x86 32-bit */
 #if defined(__i386__) \
@@ -311,14 +317,20 @@
 #error "Unsupported compiler for bmalloc"
 #endif
 
+#if BCPU(ADDRESS64) && BPLATFORM(IOS_FAMILY) && !BPLATFORM(IOS_FAMILY_SIMULATOR) && !BPLATFORM(MACCATALYST)
+#define BHAVE_36BIT_ADDRESS 1
+#endif
+
 #if BCPU(ADDRESS64)
-#if BOS(DARWIN) && !BPLATFORM(IOS_FAMILY_SIMULATOR)
+#if BHAVE(36BIT_ADDRESS)
+#define BOS_EFFECTIVE_ADDRESS_WIDTH 36
+#elif BOS(DARWIN)
 #define BOS_EFFECTIVE_ADDRESS_WIDTH (bmalloc::getMSBSetConstexpr(MACH_VM_MAX_ADDRESS) + 1)
 #else
 /* We strongly assume that effective address width is <= 48 in 64bit architectures (e.g. NaN boxing). */
 #define BOS_EFFECTIVE_ADDRESS_WIDTH 48
 #endif
-#else
+#else /* not BCPU(ADDRESS64) */
 #define BOS_EFFECTIVE_ADDRESS_WIDTH 32
 #endif
 

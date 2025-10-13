@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Apple Inc. All rights reserved.
+ * Copyright (C) 2014-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -250,6 +250,7 @@ inline void* tryVMAllocate(size_t vmSize, VMTag usage)
     void* result = mmap(0, vmSize, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON | BMALLOC_NORESERVE, static_cast<int>(usage), 0);
     if (result == MAP_FAILED)
         return nullptr;
+    RELEASE_BASSERT_DATA_ADDRESS_IS_SANE(result);
     return result;
 }
 
@@ -289,7 +290,7 @@ inline void vmZeroAndPurge(void* p, size_t vmSize, VMTag usage)
     // MAP_ANON guarantees the memory is zeroed. This will also cause
     // page faults on accesses to this range following this call.
     void* result = mmap(p, vmSize, PROT_READ | PROT_WRITE, flags, tag, 0);
-    RELEASE_BASSERT(result == p);
+    RELEASE_BASSERT(result == p && BDATA_ADDRESS_IS_SANE(result));
 }
 
 inline void vmDeallocatePhysicalPages(void* p, size_t vmSize)

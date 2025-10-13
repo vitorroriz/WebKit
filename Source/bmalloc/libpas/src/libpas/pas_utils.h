@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Apple Inc. All rights reserved.
+ * Copyright (c) 2018-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -481,6 +481,14 @@ PAS_IGNORE_WARNINGS_END
     } while (0)
 
 #define PAS_ASSERT_NOT_REACHED(...) PAS_ASSERT(!"Should not be reached", __VA_ARGS__)
+
+#if PAS_HAVE(36BIT_ADDRESS)
+#define PAS_DATA_ADDRESS_IS_SANE(p) ((uintptr_t)(p) < (1ull << 36))
+#define PAS_ASSERT_DATA_ADDRESS_IS_SANE(p) PAS_ASSERT_IF(1, PAS_DATA_ADDRESS_IS_SANE(p))
+#else
+#define PAS_DATA_ADDRESS_IS_SANE(p) (PAS_UNUSED_PARAM(p), 1)
+#define PAS_ASSERT_DATA_ADDRESS_IS_SANE(p) PAS_UNUSED_PARAM(p)
+#endif
 
 static inline bool pas_is_power_of_2(uintptr_t value)
 {

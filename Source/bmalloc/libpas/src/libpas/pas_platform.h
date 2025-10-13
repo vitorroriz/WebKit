@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Apple Inc. All rights reserved.
+ * Copyright (c) 2021-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -217,6 +217,10 @@
 #ifndef PAS_USE_OPENSOURCE_MTE
 #define PAS_USE_OPENSOURCE_MTE 0
 #endif // PAS_USE_OPENSOURCE_MTE
+
+#if PAS_CPU(ADDRESS64) && PAS_PLATFORM(IOS_FAMILY) && !PAS_PLATFORM(IOS_FAMILY_SIMULATOR) && !PAS_PLATFORM(MACCATALYST)
+#define PAS_HAVE_36BIT_ADDRESS 1
+#endif
 
 /* PAS_ALLOW_UNSAFE_BUFFER_USAGE */
 
