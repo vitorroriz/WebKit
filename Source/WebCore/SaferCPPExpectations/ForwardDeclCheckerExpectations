@@ -63,7 +63,6 @@ inspector/InspectorController.h
 inspector/InspectorInstrumentation.h
 inspector/InspectorOverlay.h
 inspector/InspectorStyleSheet.h
-inspector/InspectorWebAgentBase.h
 inspector/InstrumentingAgents.h
 inspector/UserGestureEmulationScope.h
 inspector/agents/InspectorNetworkAgent.h

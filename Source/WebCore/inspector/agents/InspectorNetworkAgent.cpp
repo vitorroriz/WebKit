@@ -802,7 +802,7 @@ Ref<Inspector::Protocol::Network::Initiator> InspectorNetworkAgent::buildInitiat
         initiatorObject->setLineNumber(document->scriptableDocumentParser()->textPosition().m_line.oneBasedInt());
     }
 
-    auto domAgent = m_instrumentingAgents.persistentDOMAgent();
+    auto domAgent = Ref { m_instrumentingAgents.get() }->persistentDOMAgent();
     if (domAgent && resourceRequest) {
         if (auto inspectorInitiatorNodeIdentifier = resourceRequest->inspectorInitiatorNodeIdentifier()) {
             if (!initiatorObject) {
@@ -871,7 +871,7 @@ void InspectorNetworkAgent::didReceiveWebSocketFrameError(WebSocketChannelIdenti
 Inspector::Protocol::ErrorStringOr<void> InspectorNetworkAgent::enable()
 {
     m_enabled = true;
-    m_instrumentingAgents.setEnabledNetworkAgent(this);
+    Ref { m_instrumentingAgents.get() }->setEnabledNetworkAgent(this);
 
     {
         Locker locker { WebSocket::allActiveWebSocketsLock() };
@@ -909,7 +909,7 @@ Inspector::Protocol::ErrorStringOr<void> InspectorNetworkAgent::disable()
     m_enabled = false;
     m_interceptionEnabled = false;
     m_intercepts.clear();
-    m_instrumentingAgents.setEnabledNetworkAgent(nullptr);
+    Ref { m_instrumentingAgents.get() }->setEnabledNetworkAgent(nullptr);
     m_resourcesData->clear();
     m_extraRequestHeaders.clear();
 

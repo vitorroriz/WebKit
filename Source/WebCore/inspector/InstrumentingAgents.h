@@ -33,7 +33,7 @@
 
 #include <JavaScriptCore/InspectorEnvironment.h>
 #include <wtf/Noncopyable.h>
-#include <wtf/RefCounted.h>
+#include <wtf/RefCountedAndCanMakeWeakPtr.h>
 #include <wtf/TZoneMalloc.h>
 
 namespace Inspector {
@@ -138,7 +138,7 @@ class WebHeapAgent;
     DEFINE_TRACKING_INSPECTOR_AGENT(macro, Timeline) \
     DEFINE_TRACKING_INSPECTOR_AGENT(macro, Timeline_Page) \
 
-class InstrumentingAgents : public RefCounted<InstrumentingAgents> {
+class InstrumentingAgents : public WTF::RefCountedAndCanMakeWeakPtr<InstrumentingAgents> {
     WTF_MAKE_NONCOPYABLE(InstrumentingAgents);
     WTF_MAKE_TZONE_ALLOCATED(InstrumentingAgents);
 public:
