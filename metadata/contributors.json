@@ -4009,6 +4009,14 @@
    },
    {
       "emails" : [
+         "jmurphy@igalia.com",
+         "hello@itsjamie.dev"
+      ],
+      "github" : "ItsJamie9494",
+      "name" : "Jamie Murphy"
+   },
+   {
+      "emails" : [
          "jmalonzo@gmail.com",
          "jmalonzo@webkit.org"
       ],
