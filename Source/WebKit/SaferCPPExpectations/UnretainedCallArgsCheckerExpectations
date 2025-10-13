@@ -65,7 +65,6 @@ UIProcess/API/Cocoa/_WKWebPushAction.mm
 [ Mac ] UIProcess/mac/DisplayCaptureSessionManager.mm
 [ Mac ] UIProcess/mac/PageClientImplMac.mm
 UIProcess/mac/SecItemShimProxy.cpp
-[ Mac ] UIProcess/mac/WKTextAnimationManagerMac.mm
 [ Mac ] UIProcess/mac/WebDataListSuggestionsDropdownMac.mm
 [ Mac ] UIProcess/mac/WebPopupMenuProxyMac.mm
 [ Mac ] UIProcess/mac/WebViewImpl.mm
