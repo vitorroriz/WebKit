@@ -36,11 +36,11 @@ namespace WebCore {
 
 static constexpr unsigned maxCountChildNodes = 200;
 
-RefPtr<SVGFilterRenderer> SVGFilterRenderer::create(SVGFilterElement& filterElement, OptionSet<FilterRenderingMode> preferredFilterRenderingModes, const FloatSize& filterScale, const FloatRect& filterRegion, const FloatRect& targetBoundingBox, const GraphicsContext& destinationContext, std::optional<RenderingResourceIdentifier> renderingResourceIdentifier)
+RefPtr<SVGFilterRenderer> SVGFilterRenderer::create(SVGElement *contextElement, SVGFilterElement& filterElement, OptionSet<FilterRenderingMode> preferredFilterRenderingModes, const FloatSize& filterScale, const FloatRect& filterRegion, const FloatRect& targetBoundingBox, const GraphicsContext& destinationContext, std::optional<RenderingResourceIdentifier> renderingResourceIdentifier)
 {
     auto filter = adoptRef(*new SVGFilterRenderer(filterScale, filterRegion, targetBoundingBox, filterElement.primitiveUnits(), renderingResourceIdentifier));
 
-    auto result = buildExpression(filterElement, filter, destinationContext);
+    auto result = buildExpression(contextElement, filterElement, filter, destinationContext);
     if (!result)
         return nullptr;
 
@@ -81,7 +81,7 @@ SVGFilterRenderer::SVGFilterRenderer(const FloatRect& targetBoundingBox, SVGUnit
 {
 }
 
-static std::optional<std::tuple<SVGFilterEffectGraph, FilterEffectGeometryMap>> buildFilterEffectGraph(SVGFilterElement& filterElement, const SVGFilterRenderer& filter, const GraphicsContext& destinationContext)
+static std::optional<std::tuple<SVGFilterEffectGraph, FilterEffectGeometryMap>> buildFilterEffectGraph(SVGElement *contextElement, SVGFilterElement& filterElement, const SVGFilterRenderer& filter, const GraphicsContext& destinationContext)
 {
     if (filterElement.countChildNodes() > maxCountChildNodes)
         return std::nullopt;
@@ -105,7 +105,7 @@ static std::optional<std::tuple<SVGFilterEffectGraph, FilterEffectGeometryMap>> 
             return std::nullopt;
 
         if (auto flags = effectElement->effectGeometryFlags()) {
-            auto effectBoundaries = SVGLengthContext::resolveRectangle<SVGFilterPrimitiveStandardAttributes>(effectElement.ptr(), filter.primitiveUnits(), filter.targetBoundingBox());
+            auto effectBoundaries = SVGLengthContext::resolveRectangle(contextElement, effectElement.get(), filter.primitiveUnits(), filter.targetBoundingBox());
             effectGeometryMap.add(*effect, FilterEffectGeometry(effectBoundaries, flags));
         }
 
@@ -119,9 +119,9 @@ static std::optional<std::tuple<SVGFilterEffectGraph, FilterEffectGeometryMap>> 
     return { { WTFMove(graph), WTFMove(effectGeometryMap) } };
 }
 
-std::optional<std::tuple<SVGFilterExpression, FilterEffectVector>> SVGFilterRenderer::buildExpression(SVGFilterElement& filterElement, const SVGFilterRenderer& filter, const GraphicsContext& destinationContext)
+std::optional<std::tuple<SVGFilterExpression, FilterEffectVector>> SVGFilterRenderer::buildExpression(SVGElement *contextElement, SVGFilterElement& filterElement, const SVGFilterRenderer& filter, const GraphicsContext& destinationContext)
 {
-    auto result = buildFilterEffectGraph(filterElement, filter, destinationContext);
+    auto result = buildFilterEffectGraph(contextElement, filterElement, filter, destinationContext);
     if (!result)
         return std::nullopt;
 
