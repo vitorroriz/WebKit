@@ -97,7 +97,6 @@ JSC_DEFINE_JIT_OPERATION(operationJSToWasmEntryWrapperBuildFrame, JSToWasmCallee
 
     const TypeDefinition& signature = TypeInformation::get(function->typeIndex()).expand();
     const FunctionSignature& functionSignature = *signature.as<FunctionSignature>();
-    CallInformation wasmFrameConvention = wasmCallingConvention().callInformationFor(signature, CallRole::Caller);
 
     if (functionSignature.argumentsOrResultsIncludeV128() || functionSignature.argumentsOrResultsIncludeExnref()) [[unlikely]] {
         throwVMTypeError(globalObject, scope, Wasm::errorMessageForExceptionType(Wasm::ExceptionType::TypeErrorInvalidValueUse));
@@ -109,6 +108,7 @@ JSC_DEFINE_JIT_OPERATION(operationJSToWasmEntryWrapperBuildFrame, JSToWasmCallee
         return &reinterpret_cast<V*>(arr)[i / sizeof(V)];
     };
 
+    CallInformation wasmFrameConvention = wasmCallingConvention().callInformationFor(signature, CallRole::Caller);
     uint64_t* registerSpace = reinterpret_cast<uint64_t*>(sp);
     for (unsigned i = 0; i < functionSignature.argumentCount(); ++i) {
         JSValue jsArg = callFrame->argument(i);
@@ -322,11 +322,11 @@ JSC_DEFINE_JIT_OPERATION(operationWasmToJSExitMarshalArguments, bool, (void* sp,
     const auto& signature = *typeDefinition.as<FunctionSignature>();
     unsigned argCount = signature.argumentCount();
 
-    const auto& wasmCC = wasmCallingConvention().callInformationFor(typeDefinition, CallRole::Caller);
-    const auto& jsCC = jsCallingConvention().callInformationFor(typeDefinition, CallRole::Callee);
-
     if (signature.argumentsOrResultsIncludeV128() || signature.argumentsOrResultsIncludeExnref()) [[unlikely]]
         OPERATION_RETURN(scope, false);
+
+    const auto& wasmCC = wasmCallingConvention().callInformationFor(typeDefinition, CallRole::Caller);
+    const auto& jsCC = jsCallingConvention().callInformationFor(typeDefinition, CallRole::Callee);
 
     for (unsigned argNum = 0; argNum < argCount; ++argNum) {
         Type argType = signature.argumentType(argNum);
