@@ -170,6 +170,7 @@ private:
     void processFormatDescriptionForTrackId(Ref<TrackInfo>&&, TrackID) final;
     void updateTrackIds(Vector<std::pair<TrackID, TrackID>>&&) final;
 
+    Ref<AudioVideoRenderer> protectedRenderer() const { return m_renderer; }
     void enqueueSample(Ref<MediaSampleAVFObjC>&&, TrackID);
     void attachContentKeyToSampleIfNeeded(const MediaSampleAVFObjC&);
     void didBecomeReadyForMoreSamples(TrackID);

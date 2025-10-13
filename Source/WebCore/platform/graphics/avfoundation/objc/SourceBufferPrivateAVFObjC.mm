@@ -251,8 +251,7 @@ void SourceBufferPrivateAVFObjC::processInitializationSegment(std::optional<Init
 
         m_isDetached = false;
     } else {
-        auto tasks = std::exchange(m_pendingTrackChangeTasks, { });
-        for (auto& task : tasks)
+        for (auto& task : std::exchange(m_pendingTrackChangeTasks, { }))
             task();
 
         setTrackChangeCallbacks(*segment, true);
@@ -453,7 +452,7 @@ void SourceBufferPrivateAVFObjC::destroyRendererTracks()
     ALWAYS_LOG(LOGIDENTIFIER);
 
     for (auto& pair : m_trackIdentifiers) {
-        Ref { m_renderer }->removeTrack(pair.second);
+        protectedRenderer()->removeTrack(pair.second);
     }
     m_trackIdentifiers.clear();
 }
@@ -510,7 +509,7 @@ void SourceBufferPrivateAVFObjC::trackDidChangeSelected(VideoTrackPrivate& track
         if (m_enabledVideoTrackID)
             removeTrackID(*m_enabledVideoTrackID);
         m_enabledVideoTrackID = trackId;
-        m_trackIdentifiers.emplace(trackId, Ref { m_renderer }->addTrack(TrackInfo::TrackType::Video));
+        m_trackIdentifiers.emplace(trackId, protectedRenderer()->addTrack(TrackInfo::TrackType::Video));
     }
 
     if (!selected && isEnabledVideoTrackID(trackId)) {
@@ -537,10 +536,10 @@ void SourceBufferPrivateAVFObjC::trackDidChangeEnabled(AudioTrackPrivate& track,
 
     if (auto trackIdentifier = trackIdentifierFor(trackId))
         return;
-    TrackIdentifier trackIdentifier = Ref { m_renderer }->addTrack(TrackInfo::TrackType::Audio);
+    TrackIdentifier trackIdentifier = protectedRenderer()->addTrack(TrackInfo::TrackType::Audio);
     // FIXME: check if error has been set here.
     m_trackIdentifiers.emplace(trackId, trackIdentifier);
-    Ref { m_renderer }->notifyTrackNeedsReenqueuing(trackIdentifier, [weakThis = ThreadSafeWeakPtr { *this }, trackId](TrackIdentifier, const MediaTime&) {
+    protectedRenderer()->notifyTrackNeedsReenqueuing(trackIdentifier, [weakThis = ThreadSafeWeakPtr { *this }, trackId](TrackIdentifier, const MediaTime&) {
         if (RefPtr protectedThis = weakThis.get())
             protectedThis->reenqueSamples(trackId);
     });
@@ -646,7 +645,7 @@ void SourceBufferPrivateAVFObjC::setVideoRenderer(bool videoEnabled)
 void SourceBufferPrivateAVFObjC::flush()
 {
     for (auto pair : m_trackIdentifiers)
-        Ref { m_renderer }->flushTrack(pair.second);
+        protectedRenderer()->flushTrack(pair.second);
 }
 
 void SourceBufferPrivateAVFObjC::flush(TrackID trackId)
@@ -654,7 +653,7 @@ void SourceBufferPrivateAVFObjC::flush(TrackID trackId)
     DEBUG_LOG(LOGIDENTIFIER, trackId);
 
     if (auto trackIdentifier = trackIdentifierFor(trackId))
-        Ref { m_renderer }->flushTrack(*trackIdentifier);
+        protectedRenderer()->flushTrack(*trackIdentifier);
 }
 
 void SourceBufferPrivateAVFObjC::flushAndReenqueueVideo()
@@ -679,7 +678,7 @@ bool SourceBufferPrivateAVFObjC::hasTrackIdentifierFor(TrackID trackID) const
 void SourceBufferPrivateAVFObjC::removeTrackID(TrackID trackID)
 {
     if (auto trackIdentifier = trackIdentifierFor(trackID)) {
-        Ref { m_renderer }->removeTrack(*trackIdentifier);
+        protectedRenderer()->removeTrack(*trackIdentifier);
         m_trackIdentifiers.erase(trackID);
 
         if (m_audioTracks.contains(trackID)) {
@@ -716,9 +715,6 @@ void SourceBufferPrivateAVFObjC::tryToEnqueueBlockedSamples()
 
 bool SourceBufferPrivateAVFObjC::canEnqueueSample(TrackID trackID, const MediaSampleAVFObjC& sample)
 {
-    if (isEnabledVideoTrackID(trackID) && !m_isSelectedForVideo)
-        return false;
-
 #if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
     // if sample is unencrytped: enqueue sample
     if (!sample.isProtected())
@@ -728,7 +724,7 @@ bool SourceBufferPrivateAVFObjC::canEnqueueSample(TrackID trackID, const MediaSa
     if (!m_cdmInstance && !m_session.get())
         return false;
 
-    if (!isEnabledVideoTrackID(trackID))
+    if (isEnabledVideoTrackID(trackID) && !m_isSelectedForVideo)
         return false;
 
     // if sample is encrypted, and keyIDs match the current set of keyIDs: enqueue sample.
@@ -787,7 +783,7 @@ void SourceBufferPrivateAVFObjC::enqueueSample(Ref<MediaSampleAVFObjC>&& sample,
 
     if (auto trackIdentifier = trackIdentifierFor(trackId)) {
         attachContentKeyToSampleIfNeeded(sample);
-        Ref { m_renderer }->enqueueSample(*trackIdentifier, sample, mediaType == kCMMediaType_Video ? minimumUpcomingPresentationTimeForTrackID(trackId) : std::optional<MediaTime> { });
+        protectedRenderer()->enqueueSample(*trackIdentifier, sample, mediaType == kCMMediaType_Video ? minimumUpcomingPresentationTimeForTrackID(trackId) : std::optional<MediaTime> { });
     }
 }
 
@@ -804,7 +800,7 @@ void SourceBufferPrivateAVFObjC::attachContentKeyToSampleIfNeeded(const MediaSam
 bool SourceBufferPrivateAVFObjC::isReadyForMoreSamples(TrackID trackId)
 {
     if (auto trackIdentifier = trackIdentifierFor(trackId))
-        return Ref { m_renderer }->isReadyForMoreSamples(*trackIdentifier);
+        return protectedRenderer()->isReadyForMoreSamples(*trackIdentifier);
 
     return false;
 }
@@ -827,7 +823,7 @@ void SourceBufferPrivateAVFObjC::didBecomeReadyForMoreSamples(TrackID trackId)
     INFO_LOG(LOGIDENTIFIER, trackId);
 
     if (auto trackIdentifier = trackIdentifierFor(trackId))
-        Ref { m_renderer }->stopRequestingMediaData(*trackIdentifier);
+        protectedRenderer()->stopRequestingMediaData(*trackIdentifier);
     else
         return;
 
@@ -840,7 +836,7 @@ void SourceBufferPrivateAVFObjC::didBecomeReadyForMoreSamples(TrackID trackId)
 void SourceBufferPrivateAVFObjC::notifyClientWhenReadyForMoreSamples(TrackID trackId)
 {
     if (auto trackIdentifier = trackIdentifierFor(trackId)) {
-        Ref { m_renderer }->requestMediaDataWhenReady(*trackIdentifier, [weakThis = ThreadSafeWeakPtr { *this }, trackId](auto) {
+        protectedRenderer()->requestMediaDataWhenReady(*trackIdentifier, [weakThis = ThreadSafeWeakPtr { *this }, trackId](auto) {
             if (RefPtr protectedThis = weakThis.get())
                 protectedThis->didBecomeReadyForMoreSamples(trackId);
         });
@@ -856,7 +852,7 @@ void SourceBufferPrivateAVFObjC::setMinimumUpcomingPresentationTime(TrackID trac
 {
     ASSERT_UNUSED(canSetMinimumUpcomingPresentationTime(trackId), trackId);
     if (auto trackIdentifier = trackIdentifierFor(trackId))
-        Ref { m_renderer }->expectMinimumUpcomingPresentationTime(presentationTime);
+        protectedRenderer()->expectMinimumUpcomingPresentationTime(presentationTime);
 }
 
 bool SourceBufferPrivateAVFObjC::canSwitchToType(const ContentType& contentType)

@@ -1739,6 +1739,9 @@ webkit.org/b/222573 media/media-fullscreen-pause-inline.html [ Pass Failure ]
 http/tests/media/fairplay/legacy-fairplay-mse-v2.html [ Pass Failure ]
 http/tests/media/fairplay/legacy-fairplay-mse-v3.html [ Pass Failure ]
 
+webkit.org/b/300597 http/tests/media/fairplay/fps-mse-unmuxed-audio-only-seek.html [ Skip ]
+webkit.org/b/300597 http/tests/media/fairplay/legacy-fairplay-mse-muxed-av-nowait.html [ Skip ]
+
 webkit.org/b/222692 inspector/page/empty-or-missing-resources.html [ Pass Timeout ]
 
 # webkit.org/b/223223 these two tests fail on Apple Silicon only
