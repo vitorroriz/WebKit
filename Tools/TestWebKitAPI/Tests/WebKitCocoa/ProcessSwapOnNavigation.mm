@@ -2628,6 +2628,11 @@ TEST(ProcessSwap, ReuseSuspendedProcess)
     [webViewConfiguration setURLSchemeHandler:handler.get() forURLScheme:@"PSON"];
 
     auto webView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:webViewConfiguration.get()]);
+    // FIXME: Page cache is currently disabled under site isolation; see rdar://161762363.
+    // SuspendingPages depends on backForwardCache, so suspending will always fail
+    if (isSiteIsolationEnabled(webView.get()))
+        return;
+
     auto delegate = adoptNS([[PSONNavigationDelegate alloc] init]);
     [webView setNavigationDelegate:delegate.get()];
 
