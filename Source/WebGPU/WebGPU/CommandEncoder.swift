@@ -29,7 +29,6 @@ public typealias WTFString = String
 public typealias String = Swift.String
 // FIXME: rdar://140819194
 private let WGPU_COPY_STRIDE_UNDEFINED = WGPU_COPY_STRIDE_UNDEFINED_
-private let WGPU_MTLCounterDontSample: UInt = 0xffffffff
 
 // FIXME: rdar://140819448
 private let MTLBlitOptionNone = MTLBlitOptionNone_
@@ -160,7 +159,7 @@ extension WebGPU.CommandEncoder {
         m_cachedCommandBuffer = WebGPU_Internal.commandBufferThreadSafeWeakPtr(result.ptr())
         result.ptr().setBufferMapCount(m_bufferMapCount)
         if m_makeSubmitInvalid {
-            result.ptr().makeInvalid(m_lastErrorString as String)
+            result.ptr().makeInvalid(m_lastErrorString as? String ?? "Invalid CommandEncoder")
         }
 
         return result
@@ -391,17 +390,16 @@ extension WebGPU.CommandEncoder {
         setExistingEncoder(nil)
     }
 
-    private func timestampWriteIndex(writeIndex: UInt32) -> UInt32
-    {
-        return writeIndex == WGPU_QUERY_SET_INDEX_UNDEFINED ? 0 : writeIndex
+    private func timestampWriteIndex(writeIndex: UInt32) -> Int {
+        writeIndex == WGPU_QUERY_SET_INDEX_UNDEFINED ? 0 : Int(UInt(writeIndex))
     }
 
     private func timestampWriteIndex(
-        writeIndex: UInt,
-        defaultValue: UInt,
+        writeIndex: UInt32,
+        defaultValue: Int,
         offset: UInt32
-    ) -> UInt {
-        return writeIndex == WGPU_QUERY_SET_INDEX_UNDEFINED ? defaultValue : (writeIndex + UInt(offset))
+    ) -> Int {
+        writeIndex == WGPU_QUERY_SET_INDEX_UNDEFINED ? defaultValue : Int(UInt(writeIndex + offset))
     }
 
     private func errorValidatingCopyBufferToBuffer(
@@ -853,8 +851,8 @@ extension WebGPU.CommandEncoder {
             if counterSampleBuffer != nil {
                 let timestampWrites = wgpuGetRenderPassDescriptorTimestampWrites(descriptorSpan)![0]
                 mtlDescriptor.sampleBufferAttachments[0].sampleBuffer = counterSampleBuffer;
-                mtlDescriptor.sampleBufferAttachments[0].startOfVertexSampleIndex = Int(UInt(timestampWriteIndex(writeIndex: UInt(timestampWrites.beginningOfPassWriteIndex), defaultValue: WGPU_MTLCounterDontSample, offset: counterSampleBufferOffset)))
-                mtlDescriptor.sampleBufferAttachments[0].endOfVertexSampleIndex = Int(UInt(timestampWriteIndex(writeIndex: UInt(timestampWrites.endOfPassWriteIndex), defaultValue: WGPU_MTLCounterDontSample, offset: counterSampleBufferOffset)))
+                mtlDescriptor.sampleBufferAttachments[0].startOfVertexSampleIndex = timestampWriteIndex(writeIndex: timestampWrites.beginningOfPassWriteIndex, defaultValue: MTLCounterDontSample, offset: counterSampleBufferOffset)
+                mtlDescriptor.sampleBufferAttachments[0].endOfVertexSampleIndex = timestampWriteIndex(writeIndex: timestampWrites.endOfPassWriteIndex, defaultValue: MTLCounterDontSample, offset: counterSampleBufferOffset)
                 mtlDescriptor.sampleBufferAttachments[0].startOfFragmentSampleIndex = mtlDescriptor.sampleBufferAttachments[0].endOfVertexSampleIndex
                 mtlDescriptor.sampleBufferAttachments[0].endOfFragmentSampleIndex = mtlDescriptor.sampleBufferAttachments[0].endOfVertexSampleIndex
                 m_device.ptr().trackTimestampsBuffer(m_commandBuffer, counterSampleBuffer);
@@ -1884,7 +1882,7 @@ extension WebGPU.CommandEncoder {
             // The signal value does not matter, the event alone prevents reordering
             m_commandBuffer.encodeSignalEvent(workaround, value: 1)
             m_commandBuffer.encodeWaitForEvent(workaround, value: 1)
-            guard let blitCommandEncoder = ensureBlitCommandEncoder() else {
+            guard ensureBlitCommandEncoder() != nil else {
                 return
             }
             var counterSampleBuffer: MTLCounterSampleBuffer? = nil
@@ -1895,7 +1893,7 @@ extension WebGPU.CommandEncoder {
             }
             unsafe m_blitCommandEncoder.resolveCounters(
                 counterSampleBuffer,
-                range: Range(uncheckedBounds: (Int(firstQuery + counterSampleBufferOffset), Int(queryCount))),
+                range: Range(uncheckedBounds: (Int(firstQuery + counterSampleBufferOffset), Int(firstQuery + counterSampleBufferOffset + queryCount))),
                 destinationBuffer: destination.buffer(),
                 destinationOffset: Int(destinationOffset)
             )
@@ -2145,8 +2143,8 @@ extension WebGPU.CommandEncoder {
             let timestampWrites = wgpuGetComputePassDescriptorTimestampWrites(collection.span)?[0]
             computePassDescriptor.sampleBufferAttachments[0].sampleBuffer = counterSampleBuffer != nil ? computePassDescriptor.sampleBufferAttachments[0].sampleBuffer : m_device.ptr().timestampsBuffer(m_commandBuffer, 2)
 
-            computePassDescriptor.sampleBufferAttachments[0].startOfEncoderSampleIndex = Int(timestampWriteIndex(writeIndex: UInt(timestampWrites!.beginningOfPassWriteIndex), defaultValue: WGPU_MTLCounterDontSample, offset: counterSampleBufferOffset))
-            computePassDescriptor.sampleBufferAttachments[0].endOfEncoderSampleIndex = Int(timestampWriteIndex(writeIndex: UInt(timestampWrites!.endOfPassWriteIndex), defaultValue: WGPU_MTLCounterDontSample, offset: counterSampleBufferOffset))
+            computePassDescriptor.sampleBufferAttachments[0].startOfEncoderSampleIndex = timestampWriteIndex(writeIndex: timestampWrites!.beginningOfPassWriteIndex, defaultValue: MTLCounterDontSample, offset: counterSampleBufferOffset)
+            computePassDescriptor.sampleBufferAttachments[0].endOfEncoderSampleIndex = timestampWriteIndex(writeIndex: timestampWrites!.endOfPassWriteIndex, defaultValue: MTLCounterDontSample, offset: counterSampleBufferOffset)
 
             if counterSampleBuffer != nil {
                 m_device.ptr().trackTimestampsBuffer(m_commandBuffer, counterSampleBuffer);
