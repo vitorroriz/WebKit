@@ -11,36 +11,32 @@ add_custom_target(TestWebKitAPI-forwarding-headers
 list(APPEND TestWebKit_DEPENDENCIES TestWebKitAPI-forwarding-headers)
 add_dependencies(TestWebKitAPIInjectedBundle TestWebKitAPI-forwarding-headers)
 
-set(test_main_SOURCES gtk/main.cpp)
-
 # TestWTF
 list(APPEND TestWTF_SOURCES
-    ${test_main_SOURCES}
-
     Tests/WTF/glib/ActivityObserver.cpp
     Tests/WTF/glib/GRefPtr.cpp
     Tests/WTF/glib/GUniquePtr.cpp
     Tests/WTF/glib/GWeakPtr.cpp
     Tests/WTF/glib/WorkQueueGLib.cpp
+
+    generic/main.cpp
 )
 
 list(APPEND TestWTF_LIBRARIES
-    GTK::GTK
+    GLib::GLib
 )
 
 # TestJavaScriptCore
 list(APPEND TestJavaScriptCore_SOURCES
-    ${test_main_SOURCES}
+    generic/main.cpp
 )
 
 list(APPEND TestJavaScriptCore_LIBRARIES
-    GTK::GTK
+    GLib::GLib
 )
 
 # TestWebCore
 list(APPEND TestWebCore_SOURCES
-    ${test_main_SOURCES}
-
     Tests/WebCore/UserAgentQuirks.cpp
 
     Tests/WebCore/glib/Damage.cpp
@@ -50,6 +46,8 @@ list(APPEND TestWebCore_SOURCES
     Tests/WebCore/gstreamer/GStreamerTest.cpp
     Tests/WebCore/gstreamer/GstElementHarness.cpp
     Tests/WebCore/gstreamer/GstMappedBuffer.cpp
+
+    gtk/main.cpp
 )
 
 list(APPEND TestWebCore_SYSTEM_INCLUDE_DIRECTORIES
@@ -65,10 +63,9 @@ list(APPEND TestWebCore_LIBRARIES
 
 # TestWebKit
 list(APPEND TestWebKit_SOURCES
-    ${test_main_SOURCES}
-
     gtk/PlatformUtilitiesGtk.cpp
     gtk/PlatformWebViewGtk.cpp
+    gtk/main.cpp
 )
 
 list(APPEND TestWebKit_PRIVATE_INCLUDE_DIRECTORIES
