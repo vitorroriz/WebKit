@@ -176,7 +176,7 @@ static UIBezierPath *pathWithRoundedRectInFrame(CGRect rect, CGFloat borderRadiu
 
 - (id <WKFocusedFormControlViewDelegate>)delegate
 {
-    return _delegate.get().get();
+    return _delegate.get().unsafeGet();
 }
 
 - (void)setDelegate:(id <WKFocusedFormControlViewDelegate>)delegate

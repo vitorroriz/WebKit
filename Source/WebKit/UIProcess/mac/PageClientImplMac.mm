@@ -148,7 +148,7 @@ IntSize PageClientImpl::viewSize()
 NSView *PageClientImpl::activeView() const
 {
     CheckedPtr impl = m_impl.get();
-    return (impl && impl->thumbnailView()) ? (NSView *)impl->thumbnailView() : m_view.getAutoreleased();
+    return (impl && impl->thumbnailView()) ? impl->thumbnailView().unsafeGet() : m_view.getAutoreleased();
 }
 
 NSWindow *PageClientImpl::activeWindow() const

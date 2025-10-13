@@ -1811,7 +1811,7 @@ Widget* AXIsolatedObject::widget() const
 PlatformWidget AXIsolatedObject::platformWidget() const
 {
 #if PLATFORM(COCOA)
-    return propertyValue<RetainPtr<NSView>>(AXProperty::PlatformWidget).get();
+    return propertyValue<RetainPtr<NSView>>(AXProperty::PlatformWidget).unsafeGet();
 #else
     return m_platformWidget;
 #endif

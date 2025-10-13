@@ -3831,7 +3831,7 @@ void WebViewImpl::accessibilityRegisterUIProcessTokens()
 id WebViewImpl::accessibilityFocusedUIElement()
 {
     enableAccessibilityIfNecessary();
-    return remoteAccessibilityChildIfNotSuspended().get();
+    return remoteAccessibilityChildIfNotSuspended().unsafeGet();
 }
 
 id WebViewImpl::accessibilityHitTest(CGPoint)

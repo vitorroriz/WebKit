@@ -1508,7 +1508,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     RELEASE_ASSERT(storageSession);
 
     RetainPtr<NSHTTPCookieStorage> cookieStorage;
-    if (CFHTTPCookieStorageRef storage = storageSession->cookieStorage().get()) {
+    if (CFHTTPCookieStorageRef storage = storageSession->cookieStorage().unsafeGet()) {
         cookieStorage = adoptNS([[NSHTTPCookieStorage alloc] _initWithCFHTTPCookieStorage:storage]);
         configuration.get().HTTPCookieStorage = cookieStorage.get();
     } else

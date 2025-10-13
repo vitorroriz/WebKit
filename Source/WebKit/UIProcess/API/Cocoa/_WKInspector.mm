@@ -90,7 +90,7 @@ private:
 
 - (id <_WKInspectorDelegate>)delegate
 {
-    return _delegate.get().get();
+    return _delegate.get().unsafeGet();
 }
 
 - (void)setDelegate:(id<_WKInspectorDelegate>)delegate

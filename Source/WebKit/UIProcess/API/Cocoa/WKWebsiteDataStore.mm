@@ -1131,7 +1131,7 @@ struct WKWebsiteData {
 
 - (id <_WKWebsiteDataStoreDelegate>)_delegate
 {
-    return _delegate.get().get();
+    return _delegate.get().unsafeGet();
 }
 
 - (void)set_delegate:(id <_WKWebsiteDataStoreDelegate>)delegate

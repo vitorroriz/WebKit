@@ -176,7 +176,7 @@ NSView *Widget::outerView() const
         ASSERT(view);
     }
 
-    return view.get();
+    return view.unsafeGet();
 }
 
 RetainPtr<NSView> Widget::protectedOuterView() const

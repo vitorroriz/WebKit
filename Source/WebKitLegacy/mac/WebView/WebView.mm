@@ -1879,7 +1879,7 @@ static void WebKitInitializeGamepadProviderIfNecessary()
 - (void)_startDrag:(const WebCore::DragItem&)dragItem
 {
     auto& dragImage = dragItem.image;
-    auto image = dragImage.get().get();
+    auto image = dragImage.get().unsafeGet();
     RefPtr<WebCore::TextIndicator> textIndicator = dragImage.textIndicator();
 
     if (textIndicator)
@@ -8634,7 +8634,7 @@ FORWARD(toggleUnderline)
 
 - (id)_objectForIdentifier:(unsigned long)identifier
 {
-    return _private->identifierMap.get(identifier).get();
+    return _private->identifierMap.get(identifier).unsafeGet();
 }
 
 - (void)_removeObjectForIdentifier:(unsigned long)identifier

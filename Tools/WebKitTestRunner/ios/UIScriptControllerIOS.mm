@@ -91,7 +91,7 @@ SOFT_LINK_CLASS(UIKit, UIPhysicalKeyboardEvent)
     for (UIView *subview in self.subviews.reverseObjectEnumerator) {
         CGPoint convertedPoint = [subview convertPoint:point fromView:self];
         if (RetainPtr frontmostView = [subview _wtr_frontmostViewAtPoint:convertedPoint])
-            return frontmostView.get();
+            return frontmostView.unsafeGet();
     }
 
     if (![self.layer.presentationLayer containsPoint:point])

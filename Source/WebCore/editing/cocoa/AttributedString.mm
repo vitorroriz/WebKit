@@ -240,14 +240,14 @@ inline static RetainPtr<NSParagraphStyle> reconstructStyle(const ParagraphStyle&
 
     if (!style.textTableBlockIDs.isEmpty()) {
         RetainPtr blocks = createNSArray(style.textTableBlockIDs, [&] (auto& object) -> id {
-            return tableBlocks.get(object).get();
+            return tableBlocks.get(object).unsafeGet();
         });
         [mutableStyle setTextBlocks:blocks.get()];
     }
 
     if (!style.textListIDs.isEmpty()) {
         RetainPtr textLists = createNSArray(style.textListIDs, [&] (auto& object) -> id {
-            return lists.get(object).get();
+            return lists.get(object).unsafeGet();
         });
         [mutableStyle setTextLists:textLists.get()];
     }

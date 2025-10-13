@@ -223,7 +223,7 @@ static RetainPtr<NSArray<NSArray<WKIdentityDocumentPresentmentRequestAuthenticat
 
 - (id<WKDigitalCredentialsPickerDelegate>)delegate
 {
-    return _delegate.get().get();
+    return _delegate.get().unsafeGet();
 }
 
 - (void)setDelegate:(id<WKDigitalCredentialsPickerDelegate>)delegate

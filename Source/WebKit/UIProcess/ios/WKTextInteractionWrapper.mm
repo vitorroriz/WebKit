@@ -169,7 +169,7 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(HideEditMenuScope);
 
     for (id<UIInteraction> interaction in _view.interactions) {
         if (RetainPtr selectionInteraction = dynamic_objc_cast<UITextSelectionDisplayInteraction>(interaction))
-            return selectionInteraction.get();
+            return selectionInteraction.unsafeGet();
     }
 
     return nil;
@@ -235,7 +235,7 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(HideEditMenuScope);
                 return nil;
 
             if ([foundView superview] == newContainer)
-                return foundView.get();
+                return foundView.unsafeGet();
         }
 
         return nil;

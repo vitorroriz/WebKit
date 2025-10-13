@@ -264,9 +264,9 @@ NSArray *makeNSArray(const WebCore::AXCoreObject::AccessibilityChildrenVector& c
         // otherwise, we get palindrome errors in the AX hierarchy.
         if (child->isAttachment()) {
             if (RetainPtr<id> attachmentView = wrapper.attachmentView)
-                return attachmentView.get();
+                return attachmentView.unsafeGet();
         } else if (child->isRemoteFrame() && returnPlatformElements)
-            return child->remoteFramePlatformElement().get();
+            return child->remoteFramePlatformElement().unsafeGet();
 
         return wrapper;
     }).autorelease();
