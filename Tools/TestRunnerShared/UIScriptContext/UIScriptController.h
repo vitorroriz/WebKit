@@ -57,15 +57,17 @@ struct ScrollToOptions {
 
 ScrollToOptions* toScrollToOptions(JSContextRef, JSValueRef);
 
-struct TextExtractionOptions {
+struct TextExtractionTestOptions {
+    unsigned wordLimit { 0 };
     bool clipToBounds { false };
     bool includeRects { false };
+    bool includeURLs { false };
     bool mergeParagraphs { false };
     bool skipNearlyTransparentContent { false };
     bool canIncludeIdentifiers { false };
 };
 
-TextExtractionOptions* toTextExtractionOptions(JSContextRef, JSValueRef);
+TextExtractionTestOptions* toTextExtractionTestOptions(JSContextRef, JSValueRef);
 
 struct TextExtractionInteractionOptions {
     JSRetainPtr<JSStringRef> nodeIdentifier;
@@ -445,8 +447,8 @@ public:
     virtual void installFakeMachineReadableCodeResultsForImageAnalysis() { }
 
     // Text Extraction
-    virtual void requestTextExtraction(JSValueRef, TextExtractionOptions*) { notImplemented(); }
-    virtual void requestDebugText(JSValueRef) { notImplemented(); }
+    virtual void requestTextExtraction(JSValueRef, TextExtractionTestOptions*) { notImplemented(); }
+    virtual void requestDebugText(JSValueRef, TextExtractionTestOptions*) { notImplemented(); }
     virtual void performTextExtractionInteraction(JSStringRef, TextExtractionInteractionOptions*, JSValueRef) { notImplemented(); }
 
     // Element Targeting

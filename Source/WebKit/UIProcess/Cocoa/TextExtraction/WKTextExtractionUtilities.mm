@@ -160,8 +160,9 @@ inline static RetainPtr<WKTextExtractionItem> createItemWithChildren(const TextE
                 accessibilityRole:accessibilityRole.get()
                 nodeIdentifier:nodeIdentifier.get()]);
         }, [&](const TextExtraction::ImageItemData& data) -> RetainPtr<WKTextExtractionItem> {
+            RetainPtr name = [data.completedSource.createNSURL() lastPathComponent] ?: @"";
             return adoptNS([[WKTextExtractionImageItem alloc]
-                initWithName:data.name.createNSString().get()
+                initWithName:name.get()
                 altText:data.altText.createNSString().get()
                 rectInWebView:rectInWebView
                 children:children

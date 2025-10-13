@@ -26,16 +26,6 @@ body {
     background-color: lightyellow;
     padding: 8px;
 }
-
-canvas {
-    width: 200px;
-    height: 200px;
-}
-
-.canvas-container {
-    border: 1px dashed gray;
-    padding: 1em;
-}
 </style>
 <script src="../../resources/ui-helper.js"></script>
 </head>
@@ -50,6 +40,7 @@ canvas {
     </ul>
 </nav>
 <main role="main">
+    <p>Here’s to the crazy ones. The misfits. The rebels. The troublemakers. The round pegs in the square holes. The ones who see things differently. They’re not fond of rules. And they have no respect for the status quo.</p>
     <section id="section1" aria-label="Interactive Elements">
         <button class="clickable" onclick="console.log('clicked')" aria-label="Test button" aria-describedby="btn-help">Click Me</button>
         <div id="btn-help" aria-hidden="true">This button does nothing</div>
@@ -75,10 +66,8 @@ canvas {
             <div role="status" aria-live="polite" id="status-msg">Ready</div>
             <button onclick="document.getElementById('status-msg').textContent = 'Updated!'">Update Status</button>
         </div>
-        <div class="canvas-container" aria-label="Figure 1">
-            <canvas width="400" height="400"></canvas>
-        </div>
     </section>
+    <p>The quick brown fox jumped over the lazy dog.</p>
 </main>
 <footer role="contentinfo">
     <p>Footer content with <span role="img" aria-label="copyright symbol">©</span> 2024</p>
@@ -88,40 +77,7 @@ canvas {
 </div>
 
 <script>
-function paintIntoCanvas() {
-    const context = document.querySelector("canvas").getContext("2d");
-    context.save();
-    context.clearRect(0, 0, 400, 400);
-    context.beginPath();
-    context.strokeStyle = "black";
-    context.rect(20, 20, 160, 160);
-    context.stroke();
-
-    context.beginPath();
-    context.strokeStyle = "red";
-    context.rect(220, 20, 160, 160);
-    context.stroke();
-    context.fillStyle = "red";
-    context.fill();
-
-    context.beginPath();
-    context.rect(20, 220, 160, 160);
-    context.fillStyle = "green";
-    context.fill();
-
-    context.beginPath();
-    context.strokeStyle = "black";
-    context.lineWidth = 20;
-    context.rect(230, 230, 140, 140);
-    context.stroke();
-    context.fillStyle = "gray";
-    context.fill();
-    context.restore();
-}
-
 addEventListener("load", async () => {
-    paintIntoCanvas();
-
     if (!window.testRunner)
         return;
 
@@ -130,8 +86,9 @@ addEventListener("load", async () => {
 
     document.body.textContent = await UIHelper.requestDebugText({
         normalize: true,
-        includeRects: true,
-        includeURLs: true
+        includeRects: false,
+        includeURLs: false,
+        wordLimit: 5
     });
 
     testRunner.notifyDone();

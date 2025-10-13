@@ -65,14 +65,16 @@ ScrollToOptions* toScrollToOptions(JSContextRef context, JSValueRef argument)
     return &options;
 }
 
-TextExtractionOptions* toTextExtractionOptions(JSContextRef context, JSValueRef argument)
+TextExtractionTestOptions* toTextExtractionTestOptions(JSContextRef context, JSValueRef argument)
 {
     if (!JSValueIsObject(context, argument))
         return nullptr;
 
-    static TextExtractionOptions options;
+    static TextExtractionTestOptions options;
     options.clipToBounds = booleanProperty(context, (JSObjectRef)argument, "clipToBounds", false);
     options.includeRects = booleanProperty(context, (JSObjectRef)argument, "includeRects", false);
+    options.includeURLs = booleanProperty(context, (JSObjectRef)argument, "includeURLs", false);
+    options.wordLimit = static_cast<unsigned>(numericProperty(context, (JSObjectRef)argument, "wordLimit"));
     options.mergeParagraphs = booleanProperty(context, (JSObjectRef)argument, "mergeParagraphs", false);
     options.skipNearlyTransparentContent = booleanProperty(context, (JSObjectRef)argument, "skipNearlyTransparentContent", false);
     options.canIncludeIdentifiers = booleanProperty(context, (JSObjectRef)argument, "canIncludeIdentifiers", false);

@@ -363,7 +363,7 @@ static inline Variant<SkipExtraction, ItemData, URL, Editable> extractItemData(N
     }
 
     if (RefPtr image = dynamicDowncast<HTMLImageElement>(element))
-        return { ImageItemData { image->getURLAttribute(HTMLNames::srcAttr).lastPathComponent().toString(), image->altText() } };
+        return { ImageItemData { image->getURLAttribute(HTMLNames::srcAttr), image->altText() } };
 
     if (RefPtr control = dynamicDowncast<HTMLTextFormControlElement>(element)) {
         RefPtr input = dynamicDowncast<HTMLInputElement>(control);

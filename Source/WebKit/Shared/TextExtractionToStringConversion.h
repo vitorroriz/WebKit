@@ -27,6 +27,7 @@
 
 #include <wtf/CompletionHandler.h>
 #include <wtf/NativePromise.h>
+#include <wtf/OptionSet.h>
 #include <wtf/RefCounted.h>
 #include <wtf/text/WTFString.h>
 
@@ -45,8 +46,35 @@ using NodeIdentifier = ObjectIdentifier<NodeIdentifierType>;
 
 namespace WebKit {
 
+enum class TextExtractionOptionFlag : uint8_t {
+    IncludeURLs     = 1 << 0,
+    IncludeRects    = 1 << 1,
+};
+
+using TextExtractionOptionFlags = OptionSet<TextExtractionOptionFlag>;
 using TextExtractionFilterPromise = NativePromise<String, void>;
 using TextExtractionFilterCallback = Function<Ref<TextExtractionFilterPromise>(const String&, std::optional<WebCore::NodeIdentifier>&&)>;
-void convertToText(WebCore::TextExtraction::Item&&, CompletionHandler<void(String&&)>&&, TextExtractionFilterCallback&& = { }, Vector<String>&& nativeMenuItems = { });
+
+struct TextExtractionOptions {
+    TextExtractionOptions(TextExtractionOptions&& other)
+        : filterCallback(WTFMove(other.filterCallback))
+        , nativeMenuItems(WTFMove(other.nativeMenuItems))
+        , flags(other.flags)
+    {
+    }
+
+    TextExtractionOptions(TextExtractionFilterCallback&& filter, Vector<String>&& items, TextExtractionOptionFlags flags)
+        : filterCallback(WTFMove(filter))
+        , nativeMenuItems(WTFMove(items))
+        , flags(flags)
+    {
+    }
+
+    TextExtractionFilterCallback filterCallback;
+    Vector<String> nativeMenuItems;
+    TextExtractionOptionFlags flags;
+};
+
+void convertToText(WebCore::TextExtraction::Item&&, TextExtractionOptions&&, CompletionHandler<void(String&&)>&&);
 
 } // namespace WebKit

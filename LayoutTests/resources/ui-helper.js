@@ -2459,7 +2459,9 @@ window.UIHelper = class UIHelper {
 
         return new Promise(resolve => {
             testRunner.runUIScript(`(() => {
-                uiController.requestDebugText(result => uiController.uiScriptComplete(result));
+                uiController.requestDebugText(result => {
+                    uiController.uiScriptComplete(result);
+                }, ${JSON.stringify(options)});
             })()`, debugText => {
                 if (options.normalize) {
                     debugText = debugText

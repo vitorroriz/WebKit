@@ -35,6 +35,33 @@ namespace WebKit {
 
 using namespace WebCore;
 
+static String commaSeparatedString(const Vector<String>& parts)
+{
+    return makeStringByJoining(parts, ","_s);
+}
+
+static String escapeString(const String& string)
+{
+    auto result = string;
+    result = makeStringByReplacingAll(result, '\\', "\\\\"_s);
+    result = makeStringByReplacingAll(result, '\n', "\\n"_s);
+    result = makeStringByReplacingAll(result, '\r', "\\r"_s);
+    result = makeStringByReplacingAll(result, '\t', "\\t"_s);
+    result = makeStringByReplacingAll(result, '\'', "\\'"_s);
+    result = makeStringByReplacingAll(result, '"', "\\\""_s);
+    result = makeStringByReplacingAll(result, '\0', "\\0"_s);
+    result = makeStringByReplacingAll(result, '\b', "\\b"_s);
+    result = makeStringByReplacingAll(result, '\f', "\\f"_s);
+    result = makeStringByReplacingAll(result, '\v', "\\v"_s);
+    return result;
+}
+
+static String normalizedURLString(const URL& url)
+{
+    static constexpr auto maxURLStringLength = 150;
+    return url.stringCenterEllipsizedToLength(maxURLStringLength);
+}
+
 struct TextExtractionLine {
     unsigned lineIndex { 0 };
     unsigned indentLevel { 0 };
@@ -44,19 +71,22 @@ class TextExtractionAggregator : public RefCounted<TextExtractionAggregator> {
     WTF_MAKE_NONCOPYABLE(TextExtractionAggregator);
     WTF_MAKE_TZONE_ALLOCATED(TextExtractionAggregator);
 public:
-    TextExtractionAggregator(CompletionHandler<void(String&&)>&& completion)
-        : m_completion(WTFMove(completion))
+    TextExtractionAggregator(TextExtractionOptions&& options, CompletionHandler<void(String&&)>&& completion)
+        : m_options(WTFMove(options))
+        , m_completion(WTFMove(completion))
     {
     }
 
     ~TextExtractionAggregator()
     {
+        addLineForNativeMenuItemsIfNeeded();
+
         m_completion(makeStringByJoining(WTFMove(m_lines), "\n"_s));
     }
 
-    static Ref<TextExtractionAggregator> create(CompletionHandler<void(String&&)>&& completion)
+    static Ref<TextExtractionAggregator> create(TextExtractionOptions&& options, CompletionHandler<void(String&&)>&& completion)
     {
-        return adoptRef(*new TextExtractionAggregator(WTFMove(completion)));
+        return adoptRef(*new TextExtractionAggregator(WTFMove(options), WTFMove(completion)));
     }
 
     void addResult(const TextExtractionLine& line, Vector<String>&& components)
@@ -91,34 +121,44 @@ public:
         return index;
     }
 
+    bool includeRects() const
+    {
+        return m_options.flags.contains(TextExtractionOptionFlag::IncludeRects);
+    }
+
+    bool includeURLs() const
+    {
+        return m_options.flags.contains(TextExtractionOptionFlag::IncludeURLs);
+    }
+
+    RefPtr<TextExtractionFilterPromise> filter(const String& text, std::optional<WebCore::NodeIdentifier>&& identifier) const
+    {
+        if (!m_options.filterCallback)
+            return nullptr;
+
+        return m_options.filterCallback(text, WTFMove(identifier));
+    }
+
 private:
+    void addLineForNativeMenuItemsIfNeeded()
+    {
+        if (m_options.nativeMenuItems.isEmpty())
+            return;
+
+        auto escapedQuotedItemTitles = m_options.nativeMenuItems.map([](auto& itemTitle) {
+            return makeString('\'', escapeString(itemTitle), '\'');
+        });
+        auto itemsDescription = makeString("items=["_s, commaSeparatedString(escapedQuotedItemTitles), ']');
+        addResult({ advanceToNextLine(), 0 }, { "nativePopupMenu"_s, WTFMove(itemsDescription) });
+    }
+
+    TextExtractionOptions m_options;
     Vector<String> m_lines;
     unsigned m_nextLineIndex { 0 };
     CompletionHandler<void(String&&)> m_completion;
 };
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(TextExtractionAggregator);
-
-static String commaSeparatedString(const Vector<String>& parts)
-{
-    return makeStringByJoining(parts, ","_s);
-}
-
-static String escapeString(const String& string)
-{
-    auto result = string;
-    result = makeStringByReplacingAll(result, '\\', "\\\\"_s);
-    result = makeStringByReplacingAll(result, '\n', "\\n"_s);
-    result = makeStringByReplacingAll(result, '\r', "\\r"_s);
-    result = makeStringByReplacingAll(result, '\t', "\\t"_s);
-    result = makeStringByReplacingAll(result, '\'', "\\'"_s);
-    result = makeStringByReplacingAll(result, '"', "\\\""_s);
-    result = makeStringByReplacingAll(result, '\0', "\\0"_s);
-    result = makeStringByReplacingAll(result, '\b', "\\b"_s);
-    result = makeStringByReplacingAll(result, '\f', "\\f"_s);
-    result = makeStringByReplacingAll(result, '\v', "\\v"_s);
-    return result;
-}
 
 static Vector<String> eventListenerTypesToStringArray(OptionSet<TextExtraction::EventListenerCategory> eventListeners)
 {
@@ -136,14 +176,14 @@ static Vector<String> eventListenerTypesToStringArray(OptionSet<TextExtraction::
     return result;
 }
 
-static Vector<String> partsForItem(const TextExtraction::Item& item)
+static Vector<String> partsForItem(const TextExtraction::Item& item, const TextExtractionAggregator& aggregator)
 {
     Vector<String> parts;
 
     if (item.nodeIdentifier)
         parts.append(makeString("uid="_s, item.nodeIdentifier->toUInt64()));
 
-    if (item.children.isEmpty()) {
+    if (item.children.isEmpty() && aggregator.includeRects()) {
         auto origin = item.rectInRootView.location();
         auto size = item.rectInRootView.size();
         parts.append(makeString("["_s,
@@ -167,9 +207,9 @@ static Vector<String> partsForItem(const TextExtraction::Item& item)
     return parts;
 }
 
-static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector<String>&& itemParts, std::optional<NodeIdentifier>&& enclosingNode, const TextExtractionLine& line, const TextExtractionFilterCallback& filter, Ref<TextExtractionAggregator>&& aggregator)
+static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector<String>&& itemParts, std::optional<NodeIdentifier>&& enclosingNode, const TextExtractionLine& line, Ref<TextExtractionAggregator>&& aggregator)
 {
-    auto completion = [itemParts = WTFMove(itemParts), selectedRange = textItem.selectedRange, aggregator = WTFMove(aggregator), line](const String& filteredText) mutable {
+    auto completion = [itemParts = WTFMove(itemParts), selectedRange = textItem.selectedRange, aggregator, line](const String& filteredText) mutable {
         Vector<String> textParts;
         if (!filteredText.isEmpty()) {
             auto isNewline = [](UChar character) {
@@ -215,12 +255,13 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
         aggregator->addResult(line, WTFMove(textParts));
     };
 
-    if (!filter) {
+    RefPtr filterPromise = aggregator->filter(textItem.content, WTFMove(enclosingNode));
+    if (!filterPromise) {
         completion(textItem.content);
         return;
     }
 
-    filter(textItem.content, WTFMove(enclosingNode))->whenSettled(RunLoop::mainSingleton(), [originalContent = textItem.content, completion = WTFMove(completion)](auto&& result) mutable {
+    filterPromise->whenSettled(RunLoop::mainSingleton(), [originalContent = textItem.content, completion = WTFMove(completion)](auto&& result) mutable {
         if (result)
             completion(WTFMove(*result));
         else
@@ -228,7 +269,7 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
     });
 }
 
-static void addPartsForItem(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, const TextExtractionLine& line, const TextExtractionFilterCallback& filter, TextExtractionAggregator& aggregator)
+static void addPartsForItem(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, const TextExtractionLine& line, TextExtractionAggregator& aggregator)
 {
     Vector<String> parts;
     WTF::switchOn(item.data,
@@ -272,15 +313,15 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
             if (!containerString.isEmpty())
                 parts.append(WTFMove(containerString));
 
-            parts.appendVector(partsForItem(item));
+            parts.appendVector(partsForItem(item, aggregator));
             aggregator.addResult(line, WTFMove(parts));
         },
         [&](const TextExtraction::TextItemData& textData) {
-            addPartsForText(textData, partsForItem(item), WTFMove(enclosingNode), line, filter, aggregator);
+            addPartsForText(textData, partsForItem(item, aggregator), WTFMove(enclosingNode), line, aggregator);
         },
         [&](const TextExtraction::ContentEditableData& editableData) {
             parts.append("contentEditable"_s);
-            parts.appendVector(partsForItem(item));
+            parts.appendVector(partsForItem(item, aggregator));
 
             if (editableData.isFocused)
                 parts.append("focused"_s);
@@ -292,7 +333,7 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
         },
         [&](const TextExtraction::TextFormControlData& controlData) {
             parts.append("textFormControl"_s);
-            parts.appendVector(partsForItem(item));
+            parts.appendVector(partsForItem(item, aggregator));
 
             if (!controlData.controlType.isEmpty())
                 parts.insert(1, makeString('\'', controlData.controlType, '\''));
@@ -325,10 +366,10 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
         },
         [&](const TextExtraction::LinkItemData& linkData) {
             parts.append("link"_s);
-            parts.appendVector(partsForItem(item));
+            parts.appendVector(partsForItem(item, aggregator));
 
-            if (!linkData.completedURL.isEmpty())
-                parts.append(makeString("url='"_s, escapeString(linkData.completedURL.string()), '\''));
+            if (!linkData.completedURL.isEmpty() && aggregator.includeURLs())
+                parts.append(makeString("url='"_s, normalizedURLString(linkData.completedURL), '\''));
 
             if (!linkData.target.isEmpty())
                 parts.append(makeString("target='"_s, escapeString(linkData.target), '\''));
@@ -337,13 +378,13 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
         },
         [&](const TextExtraction::ScrollableItemData& scrollableData) {
             parts.append("scrollable"_s);
-            parts.appendVector(partsForItem(item));
+            parts.appendVector(partsForItem(item, aggregator));
             parts.append(makeString("contentSize=["_s, scrollableData.contentSize.width(), 'x', scrollableData.contentSize.height(), ']'));
             aggregator.addResult(line, WTFMove(parts));
         },
         [&](const TextExtraction::SelectData& selectData) {
             parts.append("select"_s);
-            parts.appendVector(partsForItem(item));
+            parts.appendVector(partsForItem(item, aggregator));
 
             if (!selectData.selectedValues.isEmpty()) {
                 auto escapedValues = selectData.selectedValues.map([](auto& value) {
@@ -359,10 +400,10 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
         },
         [&](const TextExtraction::ImageItemData& imageData) {
             parts.append("image"_s);
-            parts.appendVector(partsForItem(item));
+            parts.appendVector(partsForItem(item, aggregator));
 
-            if (!imageData.name.isEmpty())
-                parts.append(makeString("name='"_s, escapeString(imageData.name), '\''));
+            if (!imageData.completedSource.isEmpty() && aggregator.includeURLs())
+                parts.append(makeString("src='"_s, normalizedURLString(imageData.completedSource), '\''));
 
             if (!imageData.altText.isEmpty())
                 parts.append(makeString("alt='"_s, escapeString(imageData.altText), '\''));
@@ -372,41 +413,30 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
     );
 }
 
-static void addTextRepresentationRecursive(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, unsigned depth, const TextExtractionFilterCallback& filter, TextExtractionAggregator& aggregator)
+static void addTextRepresentationRecursive(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, unsigned depth, TextExtractionAggregator& aggregator)
 {
     auto identifier = item.nodeIdentifier;
     if (!identifier)
         identifier = enclosingNode;
 
     TextExtractionLine line { aggregator.advanceToNextLine(), depth };
-    addPartsForItem(item, std::optional { identifier }, line, filter, aggregator);
+    addPartsForItem(item, std::optional { identifier }, line, aggregator);
 
     if (item.children.size() == 1 && std::holds_alternative<TextExtraction::TextItemData>(item.children[0].data)) {
         // In the case of a single text child, we append that text to the same line.
-        addPartsForItem(item.children[0], WTFMove(identifier), line, filter, aggregator);
+        addPartsForItem(item.children[0], WTFMove(identifier), line, aggregator);
         return;
     }
 
     for (auto& child : item.children)
-        addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, filter, aggregator);
+        addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, aggregator);
 }
 
-void convertToText(TextExtraction::Item&& item, CompletionHandler<void(String&&)>&& completion, TextExtractionFilterCallback&& filter, Vector<String>&& nativeMenuItems)
+void convertToText(TextExtraction::Item&& item, TextExtractionOptions&& options, CompletionHandler<void(String&&)>&& completion)
 {
-    Ref aggregator = TextExtractionAggregator::create(WTFMove(completion));
-    addTextRepresentationRecursive(item, { }, 0, WTFMove(filter), aggregator);
+    Ref aggregator = TextExtractionAggregator::create(WTFMove(options), WTFMove(completion));
 
-    if (nativeMenuItems.isEmpty())
-        return;
-
-    auto escapedQuotedItemTitles = nativeMenuItems.map([](auto& itemTitle) {
-        return makeString('\'', escapeString(itemTitle), '\'');
-    });
-
-    aggregator->addResult({ aggregator->advanceToNextLine(), 0 }, {
-        "nativePopupMenu"_s,
-        makeString("items=["_s, commaSeparatedString(escapedQuotedItemTitles), ']')
-    });
+    addTextRepresentationRecursive(item, { }, 0, aggregator);
 }
 
 } // namespace WebKit
