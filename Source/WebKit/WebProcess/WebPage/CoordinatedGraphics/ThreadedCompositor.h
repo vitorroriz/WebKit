@@ -60,6 +60,7 @@ public:
     virtual ~ThreadedCompositor();
 
     uint64_t surfaceID() const;
+    int maxTextureSize() const { return m_maxTextureSize; }
 
     void backgroundColorDidChange();
 #if PLATFORM(WPE) && USE(GBM) && ENABLE(WPE_PLATFORM)
@@ -109,6 +110,7 @@ private:
     std::unique_ptr<WebCore::GLContext> m_context;
 
     bool m_flipY { false };
+    int m_maxTextureSize { 0 };
     std::atomic<unsigned> m_suspendedCount { 0 };
 
     std::unique_ptr<CompositingRunLoop> m_compositingRunLoop;

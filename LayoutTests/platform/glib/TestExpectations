@@ -3461,6 +3461,9 @@ webkit.org/b/98925 fast/viewport/viewport-legacy-ordering-6.html [ Skip ]
 webkit.org/b/98925 fast/viewport/viewport-legacy-xhtmlmp-remove-and-add.html [ Skip ]
 webkit.org/b/98925 fast/viewport/viewport-legacy-xhtmlmp.html [ Skip ]
 
+# Expects a particular fixed size ofr layer tiles.
+fast/images/low-memory-decode.html [ Skip ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of UNSUPPORTED tests.
 #////////////////////////////////////////////////////////////////////////////////////////

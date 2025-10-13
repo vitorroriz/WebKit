@@ -122,6 +122,7 @@ ThreadedCompositor::ThreadedCompositor(LayerTreeHost& layerTreeHost, ThreadedDis
         if (m_context && m_context->makeContextCurrent()) {
             if (!nativeSurfaceHandle)
                 m_flipY = !m_flipY;
+            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
         }
     });
 }

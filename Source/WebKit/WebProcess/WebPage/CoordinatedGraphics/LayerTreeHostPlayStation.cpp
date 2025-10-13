@@ -422,6 +422,11 @@ RunLoop* LayerTreeHost::compositingRunLoop() const
     return m_compositor->runLoop();
 }
 
+int LayerTreeHost::maxTextureSize() const
+{
+    return m_compositor->maxTextureSize();
+}
+
 #if USE(CAIRO)
 Cairo::PaintingEngine& LayerTreeHost::paintingEngine()
 {
