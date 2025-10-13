@@ -2756,10 +2756,12 @@ void WebProcessProxy::markProcessAsRecentlyUsed()
     liveProcessesLRU().moveToLastIfPresent(*this);
 }
 
+#if !USE(GLIB)
 void WebProcessProxy::systemBeep()
 {
     PAL::systemBeep();
 }
+#endif
 
 RefPtr<WebsiteDataStore> WebProcessProxy::protectedWebsiteDataStore() const
 {
