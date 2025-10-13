@@ -30,8 +30,10 @@
 
 namespace WebCore {
 
+namespace Style {
 namespace Calculation {
 enum class Category : uint8_t;
+}
 }
 
 namespace CSSCalc {
@@ -82,7 +84,7 @@ struct Tan;
 
 struct SimplificationOptions {
     // `category` represents the context in which the simplification is taking place.
-    Calculation::Category category;
+    Style::Calculation::Category category;
 
     // `range` represents the allowed numeric range for the calculated result.
     CSS::Range range;

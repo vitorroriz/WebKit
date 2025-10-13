@@ -25,7 +25,7 @@
 #pragma once
 
 #include <WebCore/AnimationUtilities.h>
-#include <WebCore/CalculationValue.h>
+#include <WebCore/StyleCalculationValue.h>
 #include <WebCore/StyleLengthWrapper.h>
 
 namespace WebCore {

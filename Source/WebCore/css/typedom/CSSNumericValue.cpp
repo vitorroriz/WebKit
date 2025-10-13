@@ -50,8 +50,8 @@
 #include "CSSPropertyParserState.h"
 #include "CSSTokenizer.h"
 #include "CSSUnitValue.h"
-#include "CalculationCategory.h"
 #include "ExceptionOr.h"
+#include "StyleCalculationCategory.h"
 #include <algorithm>
 #include <ranges>
 #include <wtf/FixedVector.h>
@@ -482,13 +482,13 @@ ExceptionOr<Ref<CSSNumericValue>> CSSNumericValue::parse(Document& document, Str
                 .context = parserContext,
             };
             auto parserOptions = CSSCalc::ParserOptions {
-                .category = Calculation::Category::LengthPercentage,
+                .category = Style::Calculation::Category::LengthPercentage,
                 .range = CSS::All,
                 .allowedSymbols = { },
                 .propertyOptions = { },
             };
             auto simplificationOptions = CSSCalc::SimplificationOptions {
-                .category = Calculation::Category::LengthPercentage,
+                .category = Style::Calculation::Category::LengthPercentage,
                 .range = CSS::All,
                 .conversionData = std::nullopt,
                 .symbolTable = { },

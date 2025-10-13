@@ -3,7 +3,7 @@ bindings/js/JSLazyEventListener.cpp
 css/CSSToLengthConversionData.h
 css/SelectorChecker.h
 css/SelectorFilter.h
-css/calc/CSSCalcTree+CalculationValue.cpp
+css/calc/CSSCalcTree+StyleCalculationValue.cpp
 css/query/MediaQueryEvaluator.h
 dom/CollectionIndexCache.h
 dom/Node.cpp

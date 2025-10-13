@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <WebCore/CalculationValue.h>
+#include <WebCore/StyleCalculationValue.h>
 #include <WebCore/StylePrimitiveNumericTypes.h>
 #include <wtf/Forward.h>
 

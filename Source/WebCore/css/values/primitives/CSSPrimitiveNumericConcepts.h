@@ -37,8 +37,10 @@ enum class CSSUnitType : uint8_t;
 
 template<CSSValueID> struct Constant;
 
+namespace Style {
 namespace Calculation {
 enum class Category : uint8_t;
+}
 }
 
 namespace CSS {
@@ -49,7 +51,7 @@ template<typename> struct UnitTraits;
 template<typename T> concept UnitEnum = std::is_enum_v<T> && requires {
     requires std::integral<decltype(UnitTraits<T>::count)>;
     requires std::same_as<decltype(UnitTraits<T>::canonical), const T>;
-    requires std::same_as<decltype(UnitTraits<T>::category), const Calculation::Category>;
+    requires std::same_as<decltype(UnitTraits<T>::category), const Style::Calculation::Category>;
     { UnitTraits<T>::validate(std::declval<CSSUnitType>()) } -> std::same_as<std::optional<T>>;
 };
 

@@ -33,8 +33,10 @@ class RenderBox;
 class RenderStyle;
 class RenderView;
 
+namespace Style {
 namespace Calculation {
 enum class Category : uint8_t;
+}
 }
 
 namespace CQ {

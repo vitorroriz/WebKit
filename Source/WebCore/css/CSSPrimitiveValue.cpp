@@ -33,8 +33,6 @@
 #include "CSSToLengthConversionData.h"
 #include "CSSValueKeywords.h"
 #include "CSSValuePool.h"
-#include "CalculationCategory.h"
-#include "CalculationValue.h"
 #include "ComputedStyleDependencies.h"
 #include "ContainerQueryEvaluator.h"
 #include "FontCascade.h"
@@ -42,6 +40,8 @@
 #include "RenderBoxInlines.h"
 #include "RenderStyle.h"
 #include "RenderView.h"
+#include "StyleCalculationCategory.h"
+#include "StyleCalculationValue.h"
 #include "StyleLengthResolution.h"
 #include <wtf/Hasher.h>
 #include <wtf/NeverDestroyed.h>

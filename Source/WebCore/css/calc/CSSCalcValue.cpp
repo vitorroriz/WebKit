@@ -34,7 +34,7 @@
 #include "CSSCalcValue.h"
 
 #include "CSSCalcSymbolTable.h"
-#include "CSSCalcTree+CalculationValue.h"
+#include "CSSCalcTree+StyleCalculationValue.h"
 #include "CSSCalcTree+ComputedStyleDependencies.h"
 #include "CSSCalcTree+Evaluation.h"
 #include "CSSCalcTree+Parser.h"
@@ -45,9 +45,9 @@
 #include "CSSParserTokenRange.h"
 #include "CSSPropertyParserOptions.h"
 #include "CSSSerializationContext.h"
-#include "CalculationCategory.h"
-#include "CalculationValue.h"
 #include "Logging.h"
+#include "StyleCalculationCategory.h"
+#include "StyleCalculationValue.h"
 #include "StyleLengthResolution.h"
 #include "StylePrimitiveNumericTypes.h"
 #include <wtf/MathExtras.h>
@@ -56,7 +56,7 @@
 
 namespace WebCore {
 
-RefPtr<CSSCalcValue> CSSCalcValue::parse(CSSParserTokenRange& tokens, CSS::PropertyParserState& state, Calculation::Category category, CSS::Range range, CSSCalcSymbolsAllowed symbolsAllowed, CSSPropertyParserOptions propertyOptions)
+RefPtr<CSSCalcValue> CSSCalcValue::parse(CSSParserTokenRange& tokens, CSS::PropertyParserState& state, Style::Calculation::Category category, CSS::Range range, CSSCalcSymbolsAllowed symbolsAllowed, CSSPropertyParserOptions propertyOptions)
 {
     auto parserOptions = CSSCalc::ParserOptions {
         .category = category,
@@ -81,15 +81,15 @@ RefPtr<CSSCalcValue> CSSCalcValue::parse(CSSParserTokenRange& tokens, CSS::Prope
     return result;
 }
 
-Ref<CSSCalcValue> CSSCalcValue::create(const CalculationValue& value, const RenderStyle& style)
+Ref<CSSCalcValue> CSSCalcValue::create(const Style::CalculationValue& value, const RenderStyle& style)
 {
-    auto tree = CSSCalc::fromCalculationValue(value, style);
+    auto tree = CSSCalc::fromStyleCalculationValue(value, style);
     Ref result = adoptRef(*new CSSCalcValue(value.category(), { value.range().min, value.range().max }, WTFMove(tree)));
-    LOG_WITH_STREAM(Calc, stream << "CSSCalcValue::create from CalculationValue: " << result);
+    LOG_WITH_STREAM(Calc, stream << "CSSCalcValue::create from Style::CalculationValue: " << result);
     return result;
 }
 
-Ref<CSSCalcValue> CSSCalcValue::create(Calculation::Category category, CSS::Range range, CSSCalc::Tree&& tree)
+Ref<CSSCalcValue> CSSCalcValue::create(Style::Calculation::Category category, CSS::Range range, CSSCalc::Tree&& tree)
 {
     return adoptRef(*new CSSCalcValue(category, range, WTFMove(tree)));
 }
@@ -136,7 +136,7 @@ Ref<CSSCalcValue> CSSCalcValue::copySimplified(NoConversionDataRequiredToken, co
     return create(m_category, m_range, copyAndSimplify(m_tree, simplificationOptions));
 }
 
-CSSCalcValue::CSSCalcValue(Calculation::Category category, CSS::Range range, CSSCalc::Tree&& tree)
+CSSCalcValue::CSSCalcValue(Style::Calculation::Category category, CSS::Range range, CSSCalc::Tree&& tree)
     : CSSValue(ClassType::Calculation)
     , m_category(category)
     , m_range(range)
@@ -151,31 +151,31 @@ CSSUnitType CSSCalcValue::primitiveType() const
     // This returns the CSSUnitType associated with the value returned by doubleValue, or, if CSSUnitType::CSS_CALC_PERCENTAGE_WITH_LENGTH, that a call to createCalculationValue() is needed.
 
     switch (m_category) {
-    case Calculation::Category::Integer:
+    case Style::Calculation::Category::Integer:
         return CSSUnitType::CSS_INTEGER;
-    case Calculation::Category::Number:
+    case Style::Calculation::Category::Number:
         return CSSUnitType::CSS_NUMBER;
-    case Calculation::Category::Percentage:
+    case Style::Calculation::Category::Percentage:
         return CSSUnitType::CSS_PERCENTAGE;
-    case Calculation::Category::Length:
+    case Style::Calculation::Category::Length:
         return CSSUnitType::CSS_PX;
-    case Calculation::Category::Angle:
+    case Style::Calculation::Category::Angle:
         return CSSUnitType::CSS_DEG;
-    case Calculation::Category::Time:
+    case Style::Calculation::Category::Time:
         return CSSUnitType::CSS_S;
-    case Calculation::Category::Frequency:
+    case Style::Calculation::Category::Frequency:
         return CSSUnitType::CSS_HZ;
-    case Calculation::Category::Resolution:
+    case Style::Calculation::Category::Resolution:
         return CSSUnitType::CSS_DPPX;
-    case Calculation::Category::Flex:
+    case Style::Calculation::Category::Flex:
         return CSSUnitType::CSS_FR;
-    case Calculation::Category::LengthPercentage:
+    case Style::Calculation::Category::LengthPercentage:
         if (!m_tree.type.percentHint)
             return CSSUnitType::CSS_PX;
         if (WTF::holdsAlternative<CSSCalc::Percentage>(m_tree.root))
             return CSSUnitType::CSS_PERCENTAGE;
         return CSSUnitType::CSS_CALC_PERCENTAGE_WITH_LENGTH;
-    case Calculation::Category::AnglePercentage:
+    case Style::Calculation::Category::AnglePercentage:
         if (!m_tree.type.percentHint)
             return CSSUnitType::CSS_DEG;
         if (WTF::holdsAlternative<CSSCalc::Percentage>(m_tree.root))
@@ -214,10 +214,10 @@ inline double CSSCalcValue::clampToPermittedRange(double value) const
 
     // If an <angle> must be converted due to exceeding the implementation-defined range of supported values,
     // it must be clamped to the nearest supported multiple of 360deg.
-    if (m_category == Calculation::Category::Angle && std::isinf(value))
+    if (m_category == Style::Calculation::Category::Angle && std::isinf(value))
         return 0;
 
-    if (m_category == Calculation::Category::Integer)
+    if (m_category == Style::Calculation::Category::Integer)
         value = std::floor(value + 0.5);
 
     return std::clamp(value, m_range.min, m_range.max);
@@ -279,12 +279,12 @@ double CSSCalcValue::computeLengthPx(const CSSToLengthConversionData& conversion
     return clampToPermittedRange(Style::computeNonCalcLengthDouble(CSSCalc::evaluateDouble(m_tree, options).value_or(0), CSS::LengthUnit::Px, conversionData));
 }
 
-Ref<CalculationValue> CSSCalcValue::createCalculationValue(const CSSToLengthConversionData& conversionData) const
+Ref<Style::CalculationValue> CSSCalcValue::createCalculationValue(const CSSToLengthConversionData& conversionData) const
 {
     return createCalculationValue(conversionData, { });
 }
 
-Ref<CalculationValue> CSSCalcValue::createCalculationValue(const CSSToLengthConversionData& conversionData, const CSSCalcSymbolTable& symbolTable) const
+Ref<Style::CalculationValue> CSSCalcValue::createCalculationValue(const CSSToLengthConversionData& conversionData, const CSSCalcSymbolTable& symbolTable) const
 {
     auto options = CSSCalc::EvaluationOptions {
         .category = m_category,
@@ -292,15 +292,15 @@ Ref<CalculationValue> CSSCalcValue::createCalculationValue(const CSSToLengthConv
         .conversionData = conversionData,
         .symbolTable = symbolTable
     };
-    return CSSCalc::toCalculationValue(m_tree, options);
+    return CSSCalc::toStyleCalculationValue(m_tree, options);
 }
 
-Ref<CalculationValue> CSSCalcValue::createCalculationValue(NoConversionDataRequiredToken token) const
+Ref<Style::CalculationValue> CSSCalcValue::createCalculationValue(NoConversionDataRequiredToken token) const
 {
     return createCalculationValue(token, { });
 }
 
-Ref<CalculationValue> CSSCalcValue::createCalculationValue(NoConversionDataRequiredToken, const CSSCalcSymbolTable& symbolTable) const
+Ref<Style::CalculationValue> CSSCalcValue::createCalculationValue(NoConversionDataRequiredToken, const CSSCalcSymbolTable& symbolTable) const
 {
     ASSERT(!m_tree.requiresConversionData);
 
@@ -310,7 +310,7 @@ Ref<CalculationValue> CSSCalcValue::createCalculationValue(NoConversionDataRequi
         .conversionData = std::nullopt,
         .symbolTable = symbolTable
     };
-    return CSSCalc::toCalculationValue(m_tree, options);
+    return CSSCalc::toStyleCalculationValue(m_tree, options);
 }
 
 void CSSCalcValue::dump(TextStream& ts) const

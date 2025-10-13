@@ -25,8 +25,8 @@
 #include "config.h"
 #include "StyleLengthWrapperData.h"
 
-#include "CalculationValue.h"
-#include "CalculationValueMap.h"
+#include "StyleCalculationValue.h"
+#include "StyleCalculationValueMap.h"
 #include <cmath>
 
 namespace WebCore {

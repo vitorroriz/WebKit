@@ -36,11 +36,11 @@
 #include "CSSCalcTree.h"
 #include "CSSPrimitiveValue.h"
 #include "CSSUnevaluatedCalc.h"
-#include "CalculationCategory.h"
-#include "CalculationExecutor.h"
 #include "RenderStyle.h"
 #include "RenderStyleInlines.h"
 #include "StyleBuilderState.h"
+#include "StyleCalculationCategory.h"
+#include "StyleCalculationExecutor.h"
 #include "StyleLengthResolution.h"
 #include <wtf/StdLibExtras.h>
 
@@ -56,7 +56,7 @@ static auto copyAndSimplify(const std::optional<T>&, const SimplificationOptions
 
 template<typename Op, typename... Args> static double executeMathOperation(Args&&... args)
 {
-    return Calculation::executeOperation<ToCalculationTreeOp<Op>>(std::forward<Args>(args)...);
+    return Style::Calculation::executeOperation<ToCalculationTreeOp<Op>>(std::forward<Args>(args)...);
 }
 
 template<typename... F> static decltype(auto) switchTogether(const Child& a, const Child& b, F&&... f)
@@ -79,19 +79,19 @@ template<typename... F> static decltype(auto) switchTogether(const Child& a, con
 static bool percentageResolveToDimension(const SimplificationOptions& options)
 {
     switch (options.category) {
-    case Calculation::Category::Integer:
-    case Calculation::Category::Number:
-    case Calculation::Category::Length:
-    case Calculation::Category::Percentage:
-    case Calculation::Category::Angle:
-    case Calculation::Category::Time:
-    case Calculation::Category::Frequency:
-    case Calculation::Category::Resolution:
-    case Calculation::Category::Flex:
+    case Style::Calculation::Category::Integer:
+    case Style::Calculation::Category::Number:
+    case Style::Calculation::Category::Length:
+    case Style::Calculation::Category::Percentage:
+    case Style::Calculation::Category::Angle:
+    case Style::Calculation::Category::Time:
+    case Style::Calculation::Category::Frequency:
+    case Style::Calculation::Category::Resolution:
+    case Style::Calculation::Category::Flex:
         return false;
 
-    case Calculation::Category::AnglePercentage:
-    case Calculation::Category::LengthPercentage:
+    case Style::Calculation::Category::AnglePercentage:
+    case Style::Calculation::Category::LengthPercentage:
         return true;
     }
 
@@ -500,7 +500,7 @@ std::optional<Child> simplify(Number&, const SimplificationOptions&)
 std::optional<Child> simplify(Percentage&, const SimplificationOptions&)
 {
     // 1.1. If root is a percentage that will be resolved against another value, and there is enough information available to resolve it, do so, and express the resulting numeric value in the appropriate canonical unit. Return the value.
-    // NOTE: Handled by the Calculation::Tree / CalculationValue types at use time.
+    // NOTE: Handled by the Style::Calculation::Tree / Style::CalculationValue types at use time.
     return { };
 }
 
@@ -886,26 +886,26 @@ std::optional<Child> simplify(Product& root, const SimplificationOptions& option
     if (success) {
         if (auto category = productResult.type.calculationCategory()) {
             switch (*category) {
-            case Calculation::Category::Integer:
-            case Calculation::Category::Number:
+            case Style::Calculation::Category::Integer:
+            case Style::Calculation::Category::Number:
                 return makeChild(Number { .value = productResult.value });
-            case Calculation::Category::Percentage:
+            case Style::Calculation::Category::Percentage:
                 return makeChild(Percentage { .value = productResult.value, .hint = Type::determinePercentHint(options.category) });
-            case Calculation::Category::LengthPercentage:
+            case Style::Calculation::Category::LengthPercentage:
                 return makeChild(Percentage { .value = productResult.value, .hint = PercentHint::Length });
-            case Calculation::Category::Length:
+            case Style::Calculation::Category::Length:
                 return makeChild(CanonicalDimension { .value = productResult.value, .dimension = CanonicalDimension::Dimension::Length });
-            case Calculation::Category::Angle:
+            case Style::Calculation::Category::Angle:
                 return makeChild(CanonicalDimension { .value = productResult.value, .dimension = CanonicalDimension::Dimension::Angle });
-            case Calculation::Category::AnglePercentage:
+            case Style::Calculation::Category::AnglePercentage:
                 return makeChild(Percentage { .value = productResult.value, .hint = PercentHint::Angle });
-            case Calculation::Category::Time:
+            case Style::Calculation::Category::Time:
                 return makeChild(CanonicalDimension { .value = productResult.value, .dimension = CanonicalDimension::Dimension::Time });
-            case Calculation::Category::Frequency:
+            case Style::Calculation::Category::Frequency:
                 return makeChild(CanonicalDimension { .value = productResult.value, .dimension = CanonicalDimension::Dimension::Frequency });
-            case Calculation::Category::Resolution:
+            case Style::Calculation::Category::Resolution:
                 return makeChild(CanonicalDimension { .value = productResult.value, .dimension = CanonicalDimension::Dimension::Resolution });
-            case Calculation::Category::Flex:
+            case Style::Calculation::Category::Flex:
                 return makeChild(CanonicalDimension { .value = productResult.value, .dimension = CanonicalDimension::Dimension::Flex });
             }
         }

@@ -30,8 +30,10 @@
 
 namespace WebCore {
 
+namespace Style {
 namespace Calculation {
 enum class Category : uint8_t;
+}
 }
 
 class CSSCalcSymbolTable;
@@ -43,7 +45,7 @@ struct Tree;
 
 struct EvaluationOptions {
     // `category` represents the context in which the evaluation is taking place.
-    Calculation::Category category;
+    Style::Calculation::Category category;
 
     // `range` represents the allowed numeric range for the calculated result.
     CSS::Range range;

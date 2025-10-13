@@ -103,33 +103,33 @@ UnevaluatedCalcBase UnevaluatedCalcBase::simplifyBase(const CSSToLengthConversio
     return UnevaluatedCalcBase { protectedCalc()->copySimplified(conversionData, symbolTable) };
 }
 
-double UnevaluatedCalcBase::evaluate(Calculation::Category category, const Style::BuilderState& state) const
+double UnevaluatedCalcBase::evaluate(Style::Calculation::Category category, const Style::BuilderState& state) const
 {
     return evaluate(category, state.cssToLengthConversionData(), { });
 }
 
-double UnevaluatedCalcBase::evaluate(Calculation::Category category, const Style::BuilderState& state, const CSSCalcSymbolTable& symbolTable) const
+double UnevaluatedCalcBase::evaluate(Style::Calculation::Category category, const Style::BuilderState& state, const CSSCalcSymbolTable& symbolTable) const
 {
     return evaluate(category, state.cssToLengthConversionData(), symbolTable);
 }
 
-double UnevaluatedCalcBase::evaluate(Calculation::Category category, const CSSToLengthConversionData& conversionData) const
+double UnevaluatedCalcBase::evaluate(Style::Calculation::Category category, const CSSToLengthConversionData& conversionData) const
 {
     return evaluate(category, conversionData, { });
 }
 
-double UnevaluatedCalcBase::evaluate(Calculation::Category category, const CSSToLengthConversionData& conversionData, const CSSCalcSymbolTable& symbolTable) const
+double UnevaluatedCalcBase::evaluate(Style::Calculation::Category category, const CSSToLengthConversionData& conversionData, const CSSCalcSymbolTable& symbolTable) const
 {
     ASSERT_UNUSED(category, protectedCalc()->category() == category);
     return protectedCalc()->doubleValue(conversionData, symbolTable);
 }
 
-double UnevaluatedCalcBase::evaluate(Calculation::Category category, NoConversionDataRequiredToken token) const
+double UnevaluatedCalcBase::evaluate(Style::Calculation::Category category, NoConversionDataRequiredToken token) const
 {
     return evaluate(category, token, { });
 }
 
-double UnevaluatedCalcBase::evaluate(Calculation::Category category, NoConversionDataRequiredToken token, const CSSCalcSymbolTable& symbolTable) const
+double UnevaluatedCalcBase::evaluate(Style::Calculation::Category category, NoConversionDataRequiredToken token, const CSSCalcSymbolTable& symbolTable) const
 {
     ASSERT_UNUSED(category, protectedCalc()->category() == category);
     return protectedCalc()->doubleValue(token, symbolTable);

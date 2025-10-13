@@ -25,7 +25,6 @@
 #include "config.h"
 #include "MediaQueryFeatures.h"
 
-#include "CalculationCategory.h"
 #include "Chrome.h"
 #include "ComputedStyleDependencies.h"
 #include "DocumentLoader.h"
@@ -42,6 +41,7 @@
 #include "ScreenProperties.h"
 #include "ScriptController.h"
 #include "Settings.h"
+#include "StyleCalculationCategory.h"
 #include "Theme.h"
 #include <wtf/Function.h>
 

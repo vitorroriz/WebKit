@@ -28,8 +28,10 @@
 
 namespace WebCore {
 
+namespace Style {
 namespace Calculation {
 enum class Category : uint8_t;
+}
 }
 
 struct ComputedStyleDependencies;

@@ -29,9 +29,9 @@
 #include "CSSPrimitiveNumericTypes+ComputedStyleDependencies.h"
 #include "CSSSymbol.h"
 #include "CSSToLengthConversionData.h"
-#include "CalculationValue.h"
 #include "FloatConversion.h"
 #include "StyleBuilderState.h"
+#include "StyleCalculationValue.h"
 #include "StylePrimitiveNumericTypes.h"
 
 namespace WebCore {

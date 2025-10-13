@@ -40,11 +40,11 @@ class CSSToLengthConversionData;
 struct ComputedStyleDependencies;
 struct NoConversionDataRequiredToken;
 
+namespace Style {
 namespace Calculation {
 enum class Category : uint8_t;
 }
 
-namespace Style {
 class BuilderState;
 }
 
@@ -80,12 +80,12 @@ struct UnevaluatedCalcBase {
 
     UnevaluatedCalcBase simplifyBase(const CSSToLengthConversionData&, const CSSCalcSymbolTable&) const;
 
-    double evaluate(Calculation::Category, const Style::BuilderState&) const;
-    double evaluate(Calculation::Category, const Style::BuilderState&, const CSSCalcSymbolTable&) const;
-    double evaluate(Calculation::Category, const CSSToLengthConversionData&) const;
-    double evaluate(Calculation::Category, const CSSToLengthConversionData&, const CSSCalcSymbolTable&) const;
-    double evaluate(Calculation::Category, NoConversionDataRequiredToken) const;
-    double evaluate(Calculation::Category, NoConversionDataRequiredToken, const CSSCalcSymbolTable&) const;
+    double evaluate(Style::Calculation::Category, const Style::BuilderState&) const;
+    double evaluate(Style::Calculation::Category, const Style::BuilderState&, const CSSCalcSymbolTable&) const;
+    double evaluate(Style::Calculation::Category, const CSSToLengthConversionData&) const;
+    double evaluate(Style::Calculation::Category, const CSSToLengthConversionData&, const CSSCalcSymbolTable&) const;
+    double evaluate(Style::Calculation::Category, NoConversionDataRequiredToken) const;
+    double evaluate(Style::Calculation::Category, NoConversionDataRequiredToken, const CSSCalcSymbolTable&) const;
 
     bool equal(const UnevaluatedCalcBase&) const;
 

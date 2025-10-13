@@ -29,14 +29,13 @@
 #include <wtf/Ref.h>
 
 namespace WebCore {
+namespace Style {
 
 namespace Calculation {
 struct Child;
 }
 
 class CalculationValue;
-
-namespace Style {
 
 // Non-generic base type to allow code sharing and out-of-line definitions.
 struct UnevaluatedCalculationBase {

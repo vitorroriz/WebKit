@@ -38,8 +38,12 @@
 
 namespace WebCore {
 
+namespace Style {
 namespace Calculation {
 enum class Category : uint8_t;
+}
+
+class CalculationValue;
 }
 
 namespace CSS {
@@ -51,7 +55,6 @@ class CSSCalcSymbolTable;
 class CSSCalcSymbolsAllowed;
 class CSSParserTokenRange;
 class CSSToLengthConversionData;
-class CalculationValue;
 class RenderStyle;
 
 struct CSSParserContext;
@@ -64,10 +67,10 @@ enum class CSSUnitType : uint8_t;
 
 class CSSCalcValue final : public CSSValue {
 public:
-    static RefPtr<CSSCalcValue> parse(CSSParserTokenRange&, CSS::PropertyParserState&, Calculation::Category, CSS::Range, CSSCalcSymbolsAllowed, CSSPropertyParserOptions);
+    static RefPtr<CSSCalcValue> parse(CSSParserTokenRange&, CSS::PropertyParserState&, Style::Calculation::Category, CSS::Range, CSSCalcSymbolsAllowed, CSSPropertyParserOptions);
 
-    static Ref<CSSCalcValue> create(const CalculationValue&, const RenderStyle&);
-    static Ref<CSSCalcValue> create(Calculation::Category, CSS::Range, CSSCalc::Tree&&);
+    static Ref<CSSCalcValue> create(const Style::CalculationValue&, const RenderStyle&);
+    static Ref<CSSCalcValue> create(Style::Calculation::Category, CSS::Range, CSSCalc::Tree&&);
 
     ~CSSCalcValue();
 
@@ -77,7 +80,7 @@ public:
     Ref<CSSCalcValue> copySimplified(NoConversionDataRequiredToken) const;
     Ref<CSSCalcValue> copySimplified(NoConversionDataRequiredToken, const CSSCalcSymbolTable&) const;
 
-    Calculation::Category category() const { return m_category; }
+    Style::Calculation::Category category() const { return m_category; }
     CSS::Range range() const { return m_range; }
 
     CSSUnitType primitiveType() const;
@@ -94,10 +97,10 @@ public:
     double computeLengthPx(const CSSToLengthConversionData&) const;
     double computeLengthPx(const CSSToLengthConversionData&, const CSSCalcSymbolTable&) const;
 
-    Ref<CalculationValue> createCalculationValue(NoConversionDataRequiredToken) const;
-    Ref<CalculationValue> createCalculationValue(NoConversionDataRequiredToken, const CSSCalcSymbolTable&) const;
-    Ref<CalculationValue> createCalculationValue(const CSSToLengthConversionData&) const;
-    Ref<CalculationValue> createCalculationValue(const CSSToLengthConversionData&, const CSSCalcSymbolTable&) const;
+    Ref<Style::CalculationValue> createCalculationValue(NoConversionDataRequiredToken) const;
+    Ref<Style::CalculationValue> createCalculationValue(NoConversionDataRequiredToken, const CSSCalcSymbolTable&) const;
+    Ref<Style::CalculationValue> createCalculationValue(const CSSToLengthConversionData&) const;
+    Ref<Style::CalculationValue> createCalculationValue(const CSSToLengthConversionData&, const CSSCalcSymbolTable&) const;
 
     void collectComputedStyleDependencies(ComputedStyleDependencies&) const;
 
@@ -109,11 +112,11 @@ public:
     const CSSCalc::Tree& tree() const { return m_tree; }
 
 private:
-    explicit CSSCalcValue(Calculation::Category, CSS::Range, CSSCalc::Tree&&);
+    explicit CSSCalcValue(Style::Calculation::Category, CSS::Range, CSSCalc::Tree&&);
 
     double clampToPermittedRange(double) const;
 
-    Calculation::Category m_category;
+    Style::Calculation::Category m_category;
     CSS::Range m_range;
     CSSCalc::Tree m_tree;
 };

@@ -25,7 +25,7 @@
 #include "config.h"
 #include "StyleUnevaluatedCalculation.h"
 
-#include "CalculationValue.h"
+#include "StyleCalculationValue.h"
 
 namespace WebCore {
 namespace Style {

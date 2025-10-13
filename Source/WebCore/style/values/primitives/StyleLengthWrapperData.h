@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <WebCore/CalculationValue.h>
+#include <WebCore/StyleCalculationValue.h>
 #include <WebCore/StyleZoomPrimitives.h>
 
 namespace WebCore {

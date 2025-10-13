@@ -2471,12 +2471,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/audio/SharedAudioDestination.h
     platform/audio/SincResampler.h
 
-    platform/calc/CalculationCategory.h
-    platform/calc/CalculationOperator.h
-    platform/calc/CalculationRange.h
-    platform/calc/CalculationTree.h
-    platform/calc/CalculationValue.h
-
     platform/encryptedmedia/CDMEncryptionScheme.h
     platform/encryptedmedia/CDMFactory.h
     platform/encryptedmedia/CDMInstance.h
@@ -3229,6 +3223,12 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/StyleUpdate.h
     style/StyleValidity.h
     style/Styleable.h
+
+    style/calc/StyleCalculationCategory.h
+    style/calc/StyleCalculationOperator.h
+    style/calc/StyleCalculationRange.h
+    style/calc/StyleCalculationTree.h
+    style/calc/StyleCalculationValue.h
 
     style/values/StyleValueTypes.h
 
