@@ -4589,6 +4589,70 @@ auto ByteCodeParser::handleIntrinsicCall(Node* callee, Operand resultOperand, Ca
             return CallOptimizationResult::Inlined;
         }
 
+        case PromiseConstructorResolveIntrinsic: {
+            if (argumentCountIncludingThis < 2)
+                return CallOptimizationResult::DidNothing;
+
+            if (m_inlineStackTop->m_exitProfile.hasExitSite(m_currentIndex, BadType))
+                return CallOptimizationResult::DidNothing;
+            if (m_inlineStackTop->m_exitProfile.hasExitSite(m_currentIndex, BadConstantValue))
+                return CallOptimizationResult::DidNothing;
+
+            insertChecks();
+            Node* constructor = get(virtualRegisterForArgumentIncludingThis(0, registerOffset));
+            Node* argument = get(virtualRegisterForArgumentIncludingThis(1, registerOffset));
+            setResult(addToGraph(PromiseResolve, Edge(constructor, ObjectUse), Edge(argument)));
+            return CallOptimizationResult::Inlined;
+        }
+
+        case PromiseResolveIntrinsic: {
+            if (argumentCountIncludingThis < 3)
+                return CallOptimizationResult::DidNothing;
+
+            if (m_inlineStackTop->m_exitProfile.hasExitSite(m_currentIndex, BadType))
+                return CallOptimizationResult::DidNothing;
+            if (m_inlineStackTop->m_exitProfile.hasExitSite(m_currentIndex, BadConstantValue))
+                return CallOptimizationResult::DidNothing;
+
+            insertChecks();
+            Node* constructor = get(virtualRegisterForArgumentIncludingThis(1, registerOffset));
+            Node* argument = get(virtualRegisterForArgumentIncludingThis(2, registerOffset));
+            setResult(addToGraph(PromiseResolve, Edge(constructor, ObjectUse), Edge(argument)));
+            return CallOptimizationResult::Inlined;
+        }
+
+        case PromiseConstructorRejectIntrinsic: {
+            if (argumentCountIncludingThis < 2)
+                return CallOptimizationResult::DidNothing;
+
+            if (m_inlineStackTop->m_exitProfile.hasExitSite(m_currentIndex, BadType))
+                return CallOptimizationResult::DidNothing;
+            if (m_inlineStackTop->m_exitProfile.hasExitSite(m_currentIndex, BadConstantValue))
+                return CallOptimizationResult::DidNothing;
+
+            insertChecks();
+            Node* constructor = get(virtualRegisterForArgumentIncludingThis(0, registerOffset));
+            Node* argument = get(virtualRegisterForArgumentIncludingThis(1, registerOffset));
+            setResult(addToGraph(PromiseReject, Edge(constructor, ObjectUse), Edge(argument)));
+            return CallOptimizationResult::Inlined;
+        }
+
+        case PromiseRejectIntrinsic: {
+            if (argumentCountIncludingThis < 3)
+                return CallOptimizationResult::DidNothing;
+
+            if (m_inlineStackTop->m_exitProfile.hasExitSite(m_currentIndex, BadType))
+                return CallOptimizationResult::DidNothing;
+            if (m_inlineStackTop->m_exitProfile.hasExitSite(m_currentIndex, BadConstantValue))
+                return CallOptimizationResult::DidNothing;
+
+            insertChecks();
+            Node* constructor = get(virtualRegisterForArgumentIncludingThis(1, registerOffset));
+            Node* argument = get(virtualRegisterForArgumentIncludingThis(2, registerOffset));
+            setResult(addToGraph(PromiseReject, Edge(constructor, ObjectUse), Edge(argument)));
+            return CallOptimizationResult::Inlined;
+        }
+
         default:
             return CallOptimizationResult::DidNothing;
         }

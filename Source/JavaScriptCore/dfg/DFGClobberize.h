@@ -2512,6 +2512,11 @@ void clobberize(Graph& graph, Node* node, const ReadFunctor& read, const WriteFu
         clobberTop();
         return;
 
+    case PromiseResolve:
+    case PromiseReject:
+        clobberTop();
+        return;
+
     case LastNodeType:
         RELEASE_ASSERT_NOT_REACHED();
         return;

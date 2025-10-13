@@ -6494,6 +6494,14 @@ void SpeculativeJIT::compile(Node* node)
         compileFulfillPromiseFirstResolving(node);
         break;
 
+    case PromiseResolve:
+        compilePromiseResolve(node);
+        break;
+
+    case PromiseReject:
+        compilePromiseReject(node);
+        break;
+
 #if ENABLE(FTL_JIT)        
     case CheckTierUpInLoop: {
         Jump callTierUp = branchAdd32(PositiveOrZero, TrustedImm32(Options::ftlTierUpCounterIncrementForLoop()), Address(GPRInfo::jitDataRegister, JITData::offsetOfTierUpCounter()));

@@ -1803,6 +1803,8 @@ public:
     void compileResolvePromiseFirstResolving(Node*);
     void compileRejectPromiseFirstResolving(Node*);
     void compileFulfillPromiseFirstResolving(Node*);
+    void compilePromiseResolve(Node*);
+    void compilePromiseReject(Node*);
 
     template<typename JSClass, typename Operation>
     void compileCreateInternalFieldObject(Node*, Operation);

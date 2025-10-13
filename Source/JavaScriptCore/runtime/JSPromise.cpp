@@ -124,7 +124,7 @@ std::tuple<JSObject*, JSObject*, JSObject*> JSPromise::newPromiseCapability(JSGl
         return { promise, resolve, reject };
     }
 
-    auto* executor = JSFunctionWithFields::create(vm, globalObject, vm.promiseCapabilityExecutorExecutable(), 2, nullString());
+    auto* executor = JSFunctionWithFields::create(vm, globalObject, vm.promiseCapabilityExecutorExecutable(), 2, emptyString());
     executor->setField(vm, JSFunctionWithFields::Field::ExecutorResolve, jsUndefined());
     executor->setField(vm, JSFunctionWithFields::Field::ExecutorReject, jsUndefined());
 
@@ -767,7 +767,7 @@ JSValue JSPromise::then(JSGlobalObject* globalObject, JSValue onFulfilled, JSVal
     return resultPromise;
 }
 
-JSValue JSPromise::promiseResolve(JSGlobalObject* globalObject, JSValue constructor, JSValue argument)
+JSObject* JSPromise::promiseResolve(JSGlobalObject* globalObject, JSObject* constructor, JSValue argument)
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
@@ -799,6 +799,29 @@ JSValue JSPromise::promiseResolve(JSGlobalObject* globalObject, JSValue construc
     ASSERT(!arguments.hasOverflowed());
     scope.release();
     call(globalObject, resolve, jsUndefined(), arguments, "resolve is not a function"_s);
+    return promise;
+}
+
+JSObject* JSPromise::promiseReject(JSGlobalObject* globalObject, JSObject* constructor, JSValue argument)
+{
+    VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    if (constructor == globalObject->promiseConstructor()) [[likely]] {
+        JSPromise* promise = JSPromise::create(vm, globalObject->promiseStructure());
+        scope.release();
+        promise->reject(globalObject, argument);
+        return promise;
+    }
+
+    auto [promise, resolve, reject] = newPromiseCapability(globalObject, constructor);
+    RETURN_IF_EXCEPTION(scope, { });
+
+    MarkedArgumentBuffer arguments;
+    arguments.append(argument);
+    ASSERT(!arguments.hasOverflowed());
+    scope.release();
+    call(globalObject, reject, jsUndefined(), arguments, "reject is not a function"_s);
     return promise;
 }
 

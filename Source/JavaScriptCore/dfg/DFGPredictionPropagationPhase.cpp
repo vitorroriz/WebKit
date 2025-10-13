@@ -1738,6 +1738,8 @@ private:
         case ResolvePromiseFirstResolving:
         case RejectPromiseFirstResolving:
         case FulfillPromiseFirstResolving:
+        case PromiseResolve:
+        case PromiseReject:
             break;
             
         // This gets ignored because it only pretends to produce a value.

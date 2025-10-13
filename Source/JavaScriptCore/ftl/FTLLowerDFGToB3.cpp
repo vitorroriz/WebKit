@@ -1905,6 +1905,14 @@ private:
             compileFulfillPromiseFirstResolving();
             break;
 
+        case PromiseResolve:
+            compilePromiseResolve();
+            break;
+
+        case PromiseReject:
+            compilePromiseReject();
+            break;
+
         case LoopHint: {
             compileLoopHint();
             codeGenerationResult = CodeGenerationResult::NotGenerated;
@@ -20032,6 +20040,22 @@ IGNORE_CLANG_WARNINGS_END
         LValue promise = lowCell(m_node->child1());
         LValue argument = lowJSValue(m_node->child2());
         vmCall(Void, operationFulfillPromiseFirstResolving, weakPointer(globalObject), promise, argument);
+    }
+
+    void compilePromiseResolve()
+    {
+        auto* globalObject = m_graph.globalObjectFor(m_origin.semantic);
+        LValue constructor = lowObject(m_node->child1());
+        LValue argument = lowJSValue(m_node->child2());
+        setJSValue(vmCall(pointerType(), operationPromiseResolve, weakPointer(globalObject), constructor, argument));
+    }
+
+    void compilePromiseReject()
+    {
+        auto* globalObject = m_graph.globalObjectFor(m_origin.semantic);
+        LValue constructor = lowObject(m_node->child1());
+        LValue argument = lowJSValue(m_node->child2());
+        setJSValue(vmCall(pointerType(), operationPromiseReject, weakPointer(globalObject), constructor, argument));
     }
 
     void compileLoopHint()

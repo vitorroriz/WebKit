@@ -1661,6 +1661,26 @@ JSC_DEFINE_JIT_OPERATION(operationFulfillPromiseFirstResolving, void, (JSGlobalO
     OPERATION_RETURN(scope);
 }
 
+JSC_DEFINE_JIT_OPERATION(operationPromiseResolve, JSObject*, (JSGlobalObject* globalObject, JSObject* constructor, EncodedJSValue encodedArgument))
+{
+    VM& vm = globalObject->vm();
+    CallFrame* callFrame = DECLARE_CALL_FRAME(vm);
+    JITOperationPrologueCallFrameTracer tracer(vm, callFrame);
+    auto scope = DECLARE_THROW_SCOPE(vm);
+    JSValue argument = JSValue::decode(encodedArgument);
+    OPERATION_RETURN(scope, JSPromise::promiseResolve(globalObject, constructor, argument));
+}
+
+JSC_DEFINE_JIT_OPERATION(operationPromiseReject, JSObject*, (JSGlobalObject* globalObject, JSObject* constructor, EncodedJSValue encodedArgument))
+{
+    VM& vm = globalObject->vm();
+    CallFrame* callFrame = DECLARE_CALL_FRAME(vm);
+    JITOperationPrologueCallFrameTracer tracer(vm, callFrame);
+    auto scope = DECLARE_THROW_SCOPE(vm);
+    JSValue argument = JSValue::decode(encodedArgument);
+    OPERATION_RETURN(scope, JSPromise::promiseReject(globalObject, constructor, argument));
+}
+
 JSC_DEFINE_JIT_OPERATION(operationRegExpTestString, size_t, (JSGlobalObject* globalObject, RegExpObject* regExpObject, JSString* input))
 {
     SuperSamplerScope superSamplerScope(false);

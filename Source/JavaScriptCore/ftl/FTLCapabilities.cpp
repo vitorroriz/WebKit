@@ -497,6 +497,8 @@ inline CapabilityLevel canCompile(Node* node)
     case ResolvePromiseFirstResolving:
     case RejectPromiseFirstResolving:
     case FulfillPromiseFirstResolving:
+    case PromiseResolve:
+    case PromiseReject:
         // These are OK.
         break;
 

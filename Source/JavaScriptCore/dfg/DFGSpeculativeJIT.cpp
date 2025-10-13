@@ -17501,6 +17501,40 @@ void SpeculativeJIT::compileFulfillPromiseFirstResolving(Node* node)
     noResult(node);
 }
 
+void SpeculativeJIT::compilePromiseResolve(Node* node)
+{
+    SpeculateCellOperand constructor(this, node->child1());
+    JSValueOperand argument(this, node->child2());
+
+    GPRReg constructorGPR = constructor.gpr();
+    JSValueRegs argumentRegs = argument.jsValueRegs();
+
+    speculateObject(node->child1(), constructorGPR);
+
+    flushRegisters();
+    GPRFlushedCallResult result(this);
+    GPRReg resultGPR = result.gpr();
+    callOperation(operationPromiseResolve, resultGPR, LinkableConstant::globalObject(*this, node), constructorGPR, argumentRegs);
+    cellResult(resultGPR, node);
+}
+
+void SpeculativeJIT::compilePromiseReject(Node* node)
+{
+    SpeculateCellOperand constructor(this, node->child1());
+    JSValueOperand argument(this, node->child2());
+
+    GPRReg constructorGPR = constructor.gpr();
+    JSValueRegs argumentRegs = argument.jsValueRegs();
+
+    speculateObject(node->child1(), constructorGPR);
+
+    flushRegisters();
+    GPRFlushedCallResult result(this);
+    GPRReg resultGPR = result.gpr();
+    callOperation(operationPromiseReject, resultGPR, LinkableConstant::globalObject(*this, node), constructorGPR, argumentRegs);
+    cellResult(resultGPR, node);
+}
+
 unsigned SpeculativeJIT::appendExceptionHandlingOSRExit(ExitKind kind, unsigned eventStreamIndex, CodeOrigin opCatchOrigin, HandlerInfo* exceptionHandler, CallSiteIndex callSite, MacroAssembler::JumpList jumpsToFail)
 {
     if (Options::validateDFGMayExit()) [[unlikely]] {

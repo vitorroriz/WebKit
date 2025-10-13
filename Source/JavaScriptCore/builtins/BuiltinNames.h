@@ -91,6 +91,8 @@ namespace JSC {
     macro(promiseAllOnFulfilled) \
     macro(promiseEmptyOnFulfilled) \
     macro(promiseEmptyOnRejected) \
+    macro(promiseResolve) \
+    macro(promiseReject) \
     macro(performPromiseThen) \
     macro(push) \
     macro(repeatCharacter) \

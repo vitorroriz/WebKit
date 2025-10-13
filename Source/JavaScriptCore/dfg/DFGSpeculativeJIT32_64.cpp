@@ -4356,6 +4356,14 @@ void SpeculativeJIT::compile(Node* node)
         compileFulfillPromiseFirstResolving(node);
         break;
 
+    case PromiseResolve:
+        compilePromiseResolve(node);
+        break;
+
+    case PromiseReject:
+        compilePromiseReject(node);
+        break;
+
     case Unreachable:
         unreachable(node);
         break;

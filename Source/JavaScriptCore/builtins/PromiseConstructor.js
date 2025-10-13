@@ -80,7 +80,7 @@ function promiseNewOnRejected(promise)
 {
     "use strict";
 
-    return function @reject(reason) {
+    return (reason) => {
         return @rejectPromiseWithFirstResolvingFunctionCallCheck(promise, reason);
     };
 }
@@ -324,32 +324,6 @@ function race(iterable)
     }
 
     return promise;
-}
-
-function reject(reason)
-{
-    "use strict";
-
-    if (!@isObject(this))
-        @throwTypeError("|this| is not an object");
-
-    if (this === @Promise) {
-        var promise = @newPromise();
-        @rejectPromiseWithFirstResolvingFunctionCallCheck(promise, reason);
-        return promise;
-    }
-
-    return @promiseRejectSlow(this, reason);
-}
-
-function resolve(value)
-{
-    "use strict";
-
-    if (!@isObject(this))
-        @throwTypeError("|this| is not an object");
-
-    return @promiseResolve(this, value);
 }
 
 function try(callback /*, ...args */)

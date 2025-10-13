@@ -204,6 +204,10 @@ namespace JSC {
     macro(ResolvePromiseWithFirstResolvingFunctionCallCheckIntrinsic) \
     macro(RejectPromiseWithFirstResolvingFunctionCallCheckIntrinsic) \
     macro(FulfillPromiseWithFirstResolvingFunctionCallCheckIntrinsic) \
+    macro(PromiseConstructorResolveIntrinsic) \
+    macro(PromiseResolveIntrinsic) \
+    macro(PromiseConstructorRejectIntrinsic) \
+    macro(PromiseRejectIntrinsic) \
     \
     /* Getter intrinsics. */ \
     macro(TypedArrayLengthIntrinsic) \
