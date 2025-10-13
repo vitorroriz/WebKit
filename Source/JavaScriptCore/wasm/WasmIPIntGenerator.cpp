@@ -929,7 +929,7 @@ PartialResult WARN_UNUSED_RETURN IPIntGenerator::addArguments(const TypeDefiniti
 
     ASSERT(callCC.headerAndArgumentStackSizeInBytes >= callCC.headerIncludingThisSizeInBytes);
     m_argumentAndResultsStackSize = WTF::roundUpToMultipleOf<stackAlignmentBytes()>(callCC.headerAndArgumentStackSizeInBytes) - callCC.headerIncludingThisSizeInBytes;
-    ASSERT(!(m_argumentAndResultsStackSize % 16)); // mINT requires this
+    ASSERT(!Options::useWasmIPInt() || !(m_argumentAndResultsStackSize % 16)); // mINT requires this
 
     auto numArgs = sig->argumentCount();
     m_metadata->m_numLocals += numArgs;
