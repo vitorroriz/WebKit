@@ -59,9 +59,6 @@ UIProcess/API/Cocoa/_WKWebPushAction.mm
 [ Mac ] UIProcess/API/mac/WKWebViewMac.mm
 [ Mac ] UIProcess/API/mac/WKWebViewTestingMac.mm
 [ Mac ] UIProcess/Automation/mac/WebAutomationSessionMac.mm
-UIProcess/Cocoa/UIDelegate.mm
-UIProcess/Cocoa/WKStorageAccessAlert.mm
-UIProcess/Cocoa/_WKWarningView.mm
 [ Mac ] UIProcess/Inspector/Cocoa/InspectorExtensionDelegate.mm
 [ Mac ] UIProcess/Inspector/mac/WKInspectorViewController.mm
 [ Mac ] UIProcess/Inspector/mac/WKInspectorWKWebView.mm
