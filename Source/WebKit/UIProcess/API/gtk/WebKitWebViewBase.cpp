@@ -70,7 +70,6 @@
 #include <WebCore/GtkVersioning.h>
 #include <WebCore/NativeImage.h>
 #include <WebCore/NotImplemented.h>
-#include <WebCore/PlatformKeyboardEvent.h>
 #include <WebCore/PlatformMouseEvent.h>
 #include <WebCore/PointerEvent.h>
 #include <WebCore/RefPtrCairo.h>
@@ -3336,11 +3335,11 @@ void webkitWebViewBaseSynthesizeKeyEvent(WebKitWebViewBase* webViewBase, KeyEven
         if (!filterResult.handled) {
             priv->pageProxy->handleKeyboardEvent(NativeWebKeyboardEvent(
                 WebEventType::KeyDown,
-                filterResult.keyText.isNull() ? PlatformKeyboardEvent::singleCharacterString(keyval) : filterResult.keyText,
-                PlatformKeyboardEvent::keyValueForGdkKeyCode(keyval),
-                PlatformKeyboardEvent::keyCodeForHardwareKeyCode(keycode),
-                PlatformKeyboardEvent::keyIdentifierForGdkKeyCode(keyval),
-                PlatformKeyboardEvent::windowsKeyCodeForGdkKeyCode(keyval),
+                filterResult.keyText.isNull() ? WebKeyboardEvent::singleCharacterStringForGdkKeyval(keyval) : filterResult.keyText,
+                WebKeyboardEvent::keyValueStringForGdkKeyval(keyval),
+                WebKeyboardEvent::keyCodeStringForGdkKeycode(keycode),
+                WebKeyboardEvent::keyIdentifierForGdkKeyval(keyval),
+                WebKeyboardEvent::windowsKeyCodeForGdkKeyval(keyval),
                 static_cast<int>(keyval),
                 priv->keyBindingTranslator.commandsForKeyval(keyval, modifiers),
                 isAutoRepeat,
@@ -3353,11 +3352,11 @@ void webkitWebViewBaseSynthesizeKeyEvent(WebKitWebViewBase* webViewBase, KeyEven
         if (!priv->inputMethodFilter.filterKeyEvent(GDK_KEY_RELEASE, keyval, keycode, modifiers).handled) {
             priv->pageProxy->handleKeyboardEvent(NativeWebKeyboardEvent(
                 WebEventType::KeyUp,
-                PlatformKeyboardEvent::singleCharacterString(keyval),
-                PlatformKeyboardEvent::keyValueForGdkKeyCode(keyval),
-                PlatformKeyboardEvent::keyCodeForHardwareKeyCode(keycode),
-                PlatformKeyboardEvent::keyIdentifierForGdkKeyCode(keyval),
-                PlatformKeyboardEvent::windowsKeyCodeForGdkKeyCode(keyval),
+                WebKeyboardEvent::singleCharacterStringForGdkKeyval(keyval),
+                WebKeyboardEvent::keyValueStringForGdkKeyval(keyval),
+                WebKeyboardEvent::keyCodeStringForGdkKeycode(keycode),
+                WebKeyboardEvent::keyIdentifierForGdkKeyval(keyval),
+                WebKeyboardEvent::windowsKeyCodeForGdkKeyval(keyval),
                 static_cast<int>(keyval),
                 { },
                 false,

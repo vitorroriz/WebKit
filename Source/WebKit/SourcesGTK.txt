@@ -97,6 +97,7 @@ Shared/gtk/NativeWebWheelEventGtk.cpp
 Shared/gtk/PrintInfoGtk.cpp
 Shared/gtk/WebErrorsGtk.cpp
 Shared/gtk/WebEventFactory.cpp
+Shared/gtk/WebKeyboardEventGtk.cpp
 
 Shared/linux/WebMemorySamplerLinux.cpp
 
