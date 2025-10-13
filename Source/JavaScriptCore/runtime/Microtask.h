@@ -30,9 +30,9 @@
 namespace JSC {
 
 enum class MicrotaskIdentifierType { };
-using MicrotaskIdentifier = AtomicObjectIdentifier<MicrotaskIdentifierType>;
+using MicrotaskIdentifier = ObjectIdentifier<MicrotaskIdentifierType>;
 
-enum class InternalMicrotask : int32_t {
+enum class InternalMicrotask : uint16_t {
     PromiseResolveThenableJobFast = 0,
     PromiseResolveThenableJobWithoutPromiseFast,
     PromiseResolveThenableJob,

@@ -1366,34 +1366,16 @@ void VM::drainMicrotasks()
         if (!m_defaultMicrotaskQueue.isEmpty())
             entryScope.emplace(*this, nullptr);
         while (true) {
-            m_defaultMicrotaskQueue.performMicrotaskCheckpoint(*this,
+            m_defaultMicrotaskQueue.performMicrotaskCheckpoint</* useCallOnEachMicrotask */ true>(*this,
                 [&](QueuedTask& task) ALWAYS_INLINE_LAMBDA {
                     auto* globalObject = task.globalObject();
                     entryScope->setGlobalObject(globalObject);
                     if (RefPtr dispatcher = task.dispatcher())
                         return dispatcher->run(task);
 
-                    auto identifier = task.identifier();
-                    {
-                        auto catchScope = DECLARE_CATCH_SCOPE(*this);
-                        if (auto* debugger = globalObject->debugger()) [[unlikely]] {
-                            DeferTerminationForAWhile deferTerminationForAWhile(*this);
-                            debugger->willRunMicrotask(globalObject, identifier);
-                            if (!catchScope.clearExceptionExceptTermination()) [[unlikely]]
-                                return QueuedTask::Result::Executed;
-                        }
-
-                        runInternalMicrotask(globalObject, task.job(), task.arguments());
-                        if (!catchScope.clearExceptionExceptTermination()) [[unlikely]]
-                            return QueuedTask::Result::Executed;
-
-                        if (auto* debugger = globalObject->debugger()) [[unlikely]] {
-                            DeferTerminationForAWhile deferTerminationForAWhile(*this);
-                            debugger->didRunMicrotask(globalObject, identifier);
-                            if (!catchScope.clearExceptionExceptTermination()) [[unlikely]]
-                                return QueuedTask::Result::Executed;
-                        }
-                    }
+                    auto catchScope = DECLARE_CATCH_SCOPE(*this);
+                    runInternalMicrotask(globalObject, task.job(), task.arguments());
+                    catchScope.clearExceptionExceptTermination();
                     return QueuedTask::Result::Executed;
                 });
             if (hasPendingTerminationException()) [[unlikely]]
