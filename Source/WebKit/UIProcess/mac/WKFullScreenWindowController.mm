@@ -359,7 +359,7 @@ static RetainPtr<CGImageRef> createImageWithCopiedData(CGImageRef sourceImage)
     size_t bytesPerRow = CGImageGetBytesPerRow(sourceImage);
     RetainPtr<CGColorSpaceRef> colorSpace = CGImageGetColorSpace(sourceImage);
     CGBitmapInfo bitmapInfo = CGImageGetBitmapInfo(sourceImage);
-    RetainPtr<CGDataProviderRef> provider = createImageProviderWithCopiedData(CGImageGetDataProvider(sourceImage));
+    RetainPtr<CGDataProviderRef> provider = createImageProviderWithCopiedData(retainPtr(CGImageGetDataProvider(sourceImage)).get());
     bool shouldInterpolate = CGImageGetShouldInterpolate(sourceImage);
     CGColorRenderingIntent intent = CGImageGetRenderingIntent(sourceImage);
 
@@ -950,7 +950,8 @@ static RetainPtr<CGImageRef> takeWindowSnapshot(CGSWindowID windowID, bool captu
 {
     RetainPtr<NSArray<NSLayoutConstraint *>> constraints = view.constraints;
     RetainPtr<NSIndexSet> validConstraints = [constraints indexesOfObjectsPassingTest:^BOOL(NSLayoutConstraint *constraint, NSUInteger, BOOL *) {
-        return ![constraint isKindOfClass:objc_getClass("NSAutoresizingMaskLayoutConstraint")];
+        // FIXME: isKindOfClass call can cause a static analysis false positive (https://github.com/llvm/llvm-project/issues/162979).
+        SUPPRESS_UNRETAINED_ARG return ![constraint isKindOfClass:objc_getClass("NSAutoresizingMaskLayoutConstraint")];
     }];
     self.savedConstraints = [constraints objectsAtIndexes:validConstraints.get()];
 }
@@ -991,7 +992,7 @@ static RetainPtr<CALayer> createMask(const WebCore::FloatRect& bounds)
     RetainPtr maskLayer = [CALayer layer];
     maskLayer.get().anchorPoint = CGPointZero;
     maskLayer.get().frame = bounds;
-    maskLayer.get().backgroundColor = CGColorGetConstantColor(kCGColorBlack);
+    maskLayer.get().backgroundColor = retainPtr(CGColorGetConstantColor(kCGColorBlack)).get();
     maskLayer.get().autoresizingMask = (NSViewWidthSizable | NSViewHeightSizable);
     return maskLayer;
 }
@@ -1027,9 +1028,9 @@ static RetainPtr<CAAnimation> fadeAnimation(CFTimeInterval duration, AnimationDi
 {
     RetainPtr fadeAnimation = [CABasicAnimation animationWithKeyPath:@"backgroundColor"];
     if (direction == AnimateIn)
-        fadeAnimation.get().toValue = (id)CGColorGetConstantColor(kCGColorBlack);
+        fadeAnimation.get().toValue = static_cast<id>(RetainPtr<CGColorRef>(CGColorGetConstantColor(kCGColorBlack)).get());
     else
-        fadeAnimation.get().fromValue = (id)CGColorGetConstantColor(kCGColorBlack);
+        fadeAnimation.get().fromValue = static_cast<id>(RetainPtr<CGColorRef>(CGColorGetConstantColor(kCGColorBlack)).get());
     fadeAnimation.get().duration = duration;
     fadeAnimation.get().removedOnCompletion = NO;
     fadeAnimation.get().fillMode = kCAFillModeBoth;
