@@ -1981,6 +1981,16 @@
    },
    {
       "emails" : [
+         "cmurillo@igalia.com"
+      ],
+      "github" : "crmurillo",
+      "name" : "Cristina Murillo",
+      "nicks" : [
+         "cmurillo"
+      ]
+   },
+   {
+      "emails" : [
          "ossy@webkit.org",
          "oszi@inf.u-szeged.hu"
       ],
