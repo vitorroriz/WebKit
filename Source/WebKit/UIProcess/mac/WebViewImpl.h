@@ -911,6 +911,7 @@ private:
 
 #if ENABLE(IMAGE_ANALYSIS)
     CocoaImageAnalyzer* ensureImageAnalyzer();
+    RetainPtr<CocoaImageAnalyzer> ensureProtectedImageAnalyzer();
     int32_t processImageAnalyzerRequest(CocoaImageAnalyzerRequest *, CompletionHandler<void(RetainPtr<CocoaImageAnalysis>&&, NSError *)>&&);
 #endif
 

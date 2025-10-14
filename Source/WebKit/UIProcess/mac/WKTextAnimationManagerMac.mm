@@ -83,8 +83,7 @@
 
     _effectView = adoptNS([PAL::alloc_WTTextEffectViewInstance() initWithAsyncSource:self]);
     [_effectView setClipsToBounds:YES];
-    RetainPtr view = webView.view();
-    [_effectView setFrame:[view bounds]];
+    [_effectView setFrame:webView.protectedView().get().bounds];
 
     return self;
 }
@@ -177,6 +176,10 @@
     if (![_effectView superview])
         [view addSubview:_effectView.get()];
 
+    if (![_effectView superview]) {
+        CheckedRef viewImpl = *_webView;
+        [viewImpl->protectedView() addSubview:_effectView.get()];
+    }
     RetainPtr effectID = [_effectView addEffect:effect.get()];
     RetainPtr effectData = adoptNS([[WKTextAnimationTypeEffectData alloc] initWithEffectID:effectID.get() type:data.style]);
     [_chunkToEffect setObject:effectData.get() forKey:uuid];

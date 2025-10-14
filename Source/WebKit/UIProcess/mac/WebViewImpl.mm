@@ -266,7 +266,7 @@ WTF_DECLARE_CF_TYPE_TRAIT(CGImage);
     _impl = &impl;
 
     RetainPtr workspaceNotificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-    [workspaceNotificationCenter addObserver:self selector:@selector(_settingsDidChange:) name:NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification object:nil];
+    [workspaceNotificationCenter addObserver:self selector:@selector(_settingsDidChange:) name:RetainPtr { NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification }.get() object:nil];
 
     return self;
 }
@@ -274,7 +274,7 @@ WTF_DECLARE_CF_TYPE_TRAIT(CGImage);
 - (void)dealloc
 {
     RetainPtr workspaceNotificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-    [workspaceNotificationCenter removeObserver:self name:NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification object:nil];
+    [workspaceNotificationCenter removeObserver:self name:RetainPtr { NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification }.get() object:nil];
 
     [super dealloc];
 }
@@ -298,7 +298,7 @@ WTF_DECLARE_CF_TYPE_TRAIT(CGImage);
 
 @implementation WKWindowVisibilityObserver {
     WeakPtr<WebKit::WebViewImpl> _impl;
-    __weak NSWindow *_window;
+    WeakObjCPtr<NSWindow> _window;
 
     BOOL _didRegisterForLookupPopoverCloseNotifications;
     BOOL _shouldObserveFontPanel;
@@ -315,7 +315,7 @@ WTF_DECLARE_CF_TYPE_TRAIT(CGImage);
     _impl = impl;
 
     RetainPtr workspaceNotificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-    [workspaceNotificationCenter addObserver:self selector:@selector(_activeSpaceDidChange:) name:NSWorkspaceActiveSpaceDidChangeNotification object:nil];
+    [workspaceNotificationCenter addObserver:self selector:@selector(_activeSpaceDidChange:) name:RetainPtr { NSWorkspaceActiveSpaceDidChangeNotification }.get() object:nil];
 
     return self;
 }
@@ -338,7 +338,7 @@ static void* keyValueObservingContext = &keyValueObservingContext;
 {
     RELEASE_ASSERT(isMainRunLoop());
 
-    if (_window == window)
+    if (_window.get() == window)
         return;
 
     [self stopObserving];
@@ -350,29 +350,29 @@ static void* keyValueObservingContext = &keyValueObservingContext;
     RetainPtr defaultNotificationCenter = [NSNotificationCenter defaultCenter];
 
     // An NSView derived object such as WKView cannot observe these notifications, because NSView itself observes them.
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidOrderOffScreen:) name:NSWindowDidOrderOffScreenNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidOrderOnScreen:) name:NSWindowDidOrderOnScreenNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidOrderOffScreen:) name:RetainPtr { NSWindowDidOrderOffScreenNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidOrderOnScreen:) name:RetainPtr { NSWindowDidOrderOnScreenNotification }.get() object:window];
 
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidBecomeKey:) name:NSWindowDidBecomeKeyNotification object:nil];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidResignKey:) name:NSWindowDidResignKeyNotification object:nil];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidMiniaturize:) name:NSWindowDidMiniaturizeNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidDeminiaturize:) name:NSWindowDidDeminiaturizeNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidMove:) name:NSWindowDidMoveNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidResize:) name:NSWindowDidResizeNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillBeginSheet:) name:NSWindowWillBeginSheetNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidChangeBackingProperties:) name:NSWindowDidChangeBackingPropertiesNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidChangeScreen:) name:NSWindowDidChangeScreenNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidChangeOcclusionState:) name:NSWindowDidChangeOcclusionStateNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillClose:) name:NSWindowWillCloseNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillEnterOrExitFullScreen:) name:NSWindowWillEnterFullScreenNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidEnterOrExitFullScreen:) name:NSWindowDidEnterFullScreenNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillEnterOrExitFullScreen:) name:NSWindowWillExitFullScreenNotification object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidEnterOrExitFullScreen:) name:NSWindowDidExitFullScreenNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidBecomeKey:) name:RetainPtr { NSWindowDidBecomeKeyNotification }.get() object:nil];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidResignKey:) name:RetainPtr { NSWindowDidResignKeyNotification }.get() object:nil];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidMiniaturize:) name:RetainPtr { NSWindowDidMiniaturizeNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidDeminiaturize:) name:RetainPtr { NSWindowDidDeminiaturizeNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidMove:) name:RetainPtr { NSWindowDidMoveNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidResize:) name:RetainPtr { NSWindowDidResizeNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillBeginSheet:) name:RetainPtr { NSWindowWillBeginSheetNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidChangeBackingProperties:) name:RetainPtr { NSWindowDidChangeBackingPropertiesNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidChangeScreen:) name:RetainPtr { NSWindowDidChangeScreenNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidChangeOcclusionState:) name:RetainPtr { NSWindowDidChangeOcclusionStateNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillClose:) name:RetainPtr { NSWindowWillCloseNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillEnterOrExitFullScreen:) name:RetainPtr { NSWindowWillEnterFullScreenNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidEnterOrExitFullScreen:) name:RetainPtr { NSWindowDidEnterFullScreenNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillEnterOrExitFullScreen:) name:RetainPtr { NSWindowWillExitFullScreenNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidEnterOrExitFullScreen:) name:RetainPtr { NSWindowDidExitFullScreenNotification }.get() object:window];
 
-    [defaultNotificationCenter addObserver:self selector:@selector(_screenDidChangeColorSpace:) name:NSScreenColorSpaceDidChangeNotification object:nil];
+    [defaultNotificationCenter addObserver:self selector:@selector(_screenDidChangeColorSpace:) name:RetainPtr { NSScreenColorSpaceDidChangeNotification }.get() object:nil];
 #if HAVE(SUPPORT_HDR_DISPLAY_APIS)
-    [defaultNotificationCenter addObserver:self selector:@selector(_applicationShouldBeginSuppressingHDR:) name:NSApplicationShouldBeginSuppressingHighDynamicRangeContentNotification object:NSApp];
-    [defaultNotificationCenter addObserver:self selector:@selector(_applicationShouldEndSuppressingHDR:) name:NSApplicationShouldEndSuppressingHighDynamicRangeContentNotification object:NSApp];
+    [defaultNotificationCenter addObserver:self selector:@selector(_applicationShouldBeginSuppressingHDR:) name:RetainPtr { NSApplicationShouldBeginSuppressingHighDynamicRangeContentNotification }.get() object:NSApp];
+    [defaultNotificationCenter addObserver:self selector:@selector(_applicationShouldEndSuppressingHDR:) name:RetainPtr { NSApplicationShouldEndSuppressingHighDynamicRangeContentNotification }.get() object:NSApp];
 #endif // HAVE(SUPPORT_HDR_DISPLAY_APIS)
 
     if (_shouldObserveFontPanel) {
@@ -398,33 +398,33 @@ static void* keyValueObservingContext = &keyValueObservingContext;
         [[NSFontPanel sharedFontPanel] removeObserver:self forKeyPath:@"visible" context:keyValueObservingContext];
     }
 
-    RetainPtr<NSWindow> window = std::exchange(_window, nil);
+    RetainPtr<NSWindow> window = std::exchange(_window, nil).get();
     if (!window)
         return;
 
     RetainPtr defaultNotificationCenter = [NSNotificationCenter defaultCenter];
 
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidOrderOffScreenNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidOrderOnScreenNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidOrderOffScreenNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidOrderOnScreenNotification }.get() object:window.get()];
 
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidBecomeKeyNotification object:nil];
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidMiniaturizeNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidDeminiaturizeNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidMoveNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidResizeNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowWillBeginSheetNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidChangeBackingPropertiesNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidChangeScreenNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidBecomeKeyNotification }.get() object:nil];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidResignKeyNotification }.get() object:nil];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidMiniaturizeNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidDeminiaturizeNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidMoveNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidResizeNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowWillBeginSheetNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidChangeBackingPropertiesNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidChangeScreenNotification }.get() object:window.get()];
     [defaultNotificationCenter removeObserver:self name:_NSWindowDidChangeContentsHostedInLayerSurfaceNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidChangeOcclusionStateNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowWillCloseNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowWillEnterFullScreenNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidEnterFullScreenNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowWillExitFullScreenNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:NSWindowDidExitFullScreenNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidChangeOcclusionStateNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowWillCloseNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowWillEnterFullScreenNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidEnterFullScreenNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowWillExitFullScreenNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidExitFullScreenNotification }.get() object:window.get()];
 
-    [defaultNotificationCenter removeObserver:self name:NSScreenColorSpaceDidChangeNotification object:nil];
+    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSScreenColorSpaceDidChangeNotification }.get() object:nil];
 
     if (!objc_getAssociatedObject(window.get(), _impl.get()))
         return;
@@ -1175,8 +1175,8 @@ static NSArray<NSString *> *passwordTextTouchBarDefaultItemIdentifiers()
 
 @implementation WKImageAnalysisOverlayViewDelegate {
     WeakPtr<WebKit::WebViewImpl> _impl;
-    __weak VKCImageAnalysisOverlayView *_overlayView;
-    __weak NSResponder *_lastOverlayResponderView;
+    WeakObjCPtr<VKCImageAnalysisOverlayView> _overlayView;
+    WeakObjCPtr<NSResponder> _lastOverlayResponderView;
 }
 
 static void* imageOverlayObservationContext = &imageOverlayObservationContext;
@@ -1188,15 +1188,13 @@ static void* imageOverlayObservationContext = &imageOverlayObservationContext;
 
     _impl = impl;
     _overlayView = impl.imageAnalysisOverlayView();
-    RetainPtr overlayView = { _overlayView };
-    [overlayView.get() addObserver:self forKeyPath:@"hasActiveTextSelection" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:imageOverlayObservationContext];
+    [_overlayView.get() addObserver:self forKeyPath:@"hasActiveTextSelection" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:imageOverlayObservationContext];
     return self;
 }
 
 - (void)dealloc
 {
-    RetainPtr overlayView = _overlayView;
-    [overlayView removeObserver:self forKeyPath:@"hasActiveTextSelection"];
+    [_overlayView.get() removeObserver:self forKeyPath:@"hasActiveTextSelection"];
     [super dealloc];
 }
 
@@ -1215,7 +1213,7 @@ static void* imageOverlayObservationContext = &imageOverlayObservationContext;
             [webView.get().window makeFirstResponder:webView.get()];
         }
     } else if (!oldHasActiveTextSelection && newHasActiveTextSelection) {
-        if (RetainPtr lastOverlayResponderView = _lastOverlayResponderView; lastOverlayResponderView && currentResponder.get() != _lastOverlayResponderView)
+        if (RetainPtr lastOverlayResponderView = _lastOverlayResponderView.get(); lastOverlayResponderView && currentResponder.get() != lastOverlayResponderView.get())
             [webView.get().window makeFirstResponder:lastOverlayResponderView.get()];
     }
 }
@@ -1226,7 +1224,7 @@ static void* imageOverlayObservationContext = &imageOverlayObservationContext;
         return NO;
 
     for (RetainPtr view = dynamic_objc_cast<NSView>(CheckedPtr { _impl.get() }->protectedView().get().window.firstResponder); view; view = view.get().superview) {
-        if (view == _overlayView)
+        if (view == _overlayView.get())
             return YES;
     }
     return NO;
@@ -1398,7 +1396,7 @@ WebViewImpl::~WebViewImpl()
 
     [m_layoutStrategy invalidate];
 
-    [m_immediateActionController willDestroyView:m_view.getAutoreleased()];
+    [m_immediateActionController willDestroyView:m_view.get().get()];
 
 #if HAVE(TOUCH_BAR)
     [m_textTouchBarItemController didDestroyView];
@@ -1877,7 +1875,7 @@ RetainPtr<NSPrintOperation> WebViewImpl::printOperationWithPrintInfo(NSPrintInfo
 
     // FIXME: If the frame cannot be printed (e.g. if it contains an encrypted PDF that disallows
     // printing), this function should return nil.
-    RetainPtr<WKPrintingView> printingView = adoptNS([[WKPrintingView alloc] initWithFrameProxy:frame view:m_view.getAutoreleased()]);
+    RetainPtr<WKPrintingView> printingView = adoptNS([[WKPrintingView alloc] initWithFrameProxy:frame view:m_view.get().get()]);
     // NSPrintOperation takes ownership of the view.
     RetainPtr<NSPrintOperation> printOperation = [NSPrintOperation printOperationWithView:printingView.get() printInfo:printInfo];
     [printOperation setCanSpawnSeparateThread:YES];
@@ -2032,7 +2030,7 @@ void WebViewImpl::setLayoutMode(WKLayoutMode layoutMode)
         return;
 
     [m_layoutStrategy willChangeLayoutStrategy];
-    m_layoutStrategy = [WKViewLayoutStrategy layoutStrategyWithPage:m_page.get() view:m_view.getAutoreleased() viewImpl:*this mode:layoutMode];
+    m_layoutStrategy = [WKViewLayoutStrategy layoutStrategyWithPage:m_page.get() view:m_view.get().get() viewImpl:*this mode:layoutMode];
 }
 
 bool WebViewImpl::supportsArbitraryLayoutModes() const
@@ -2236,7 +2234,8 @@ bool WebViewImpl::acceptsFirstMouse(NSEvent *event)
         return false;
 
     auto previousEvent = setLastMouseDownEvent(event);
-    bool result = m_page->acceptsFirstMouse(event.eventNumber, WebEventFactory::createWebMouseEvent(event, m_lastPressureEvent.get(), m_view.getAutoreleased()));
+    WebMouseEvent mouseEvent = WebEventFactory::createWebMouseEvent(event, m_lastPressureEvent.get(), m_view.get().get());
+    bool result = m_page->acceptsFirstMouse(event.eventNumber, mouseEvent);
     setLastMouseDownEvent(previousEvent.get());
     return result;
 }
@@ -2264,7 +2263,8 @@ bool WebViewImpl::shouldDelayWindowOrderingForEvent(NSEvent *event)
     }
 
     auto previousEvent = setLastMouseDownEvent(event);
-    bool result = m_page->shouldDelayWindowOrderingForEvent(WebEventFactory::createWebMouseEvent(event, m_lastPressureEvent.get(), m_view.getAutoreleased()));
+    WebMouseEvent mouseEvent = WebEventFactory::createWebMouseEvent(event, m_lastPressureEvent.get(), m_view.get().get());
+    bool result = m_page->shouldDelayWindowOrderingForEvent(mouseEvent);
     setLastMouseDownEvent(previousEvent.get());
     return result;
 }
@@ -2486,7 +2486,7 @@ void WebViewImpl::scheduleMouseDidMoveOverElement(NSEvent *flagsChangedEvent)
     RetainPtr fakeEvent = [NSEvent mouseEventWithType:NSEventTypeMouseMoved location:flagsChangedEvent.window.mouseLocationOutsideOfEventStream
         modifierFlags:flagsChangedEvent.modifierFlags timestamp:flagsChangedEvent.timestamp windowNumber:flagsChangedEvent.windowNumber
         context:nullptr eventNumber:0 clickCount:0 pressure:0];
-    NativeWebMouseEvent webEvent(fakeEvent.get(), m_lastPressureEvent.get(), m_view.getAutoreleased());
+    NativeWebMouseEvent webEvent(fakeEvent.get(), m_lastPressureEvent.get(), m_view.get().get());
     m_page->dispatchMouseDidMoveOverElementAsynchronously(webEvent);
 }
 
@@ -2688,7 +2688,7 @@ void WebViewImpl::pressureChangeWithEvent(NSEvent *event)
     if (event.phase != NSEventPhaseChanged && event.phase != NSEventPhaseBegan && event.phase != NSEventPhaseEnded)
         return;
 
-    NativeWebMouseEvent webEvent(event, m_lastPressureEvent.get(), m_view.getAutoreleased());
+    NativeWebMouseEvent webEvent(event, m_lastPressureEvent.get(), m_view.get().get());
     m_page->handleMouseEvent(webEvent);
 
     m_lastPressureEvent = event;
@@ -2703,7 +2703,7 @@ bool WebViewImpl::hasFullScreenWindowController() const
 WKFullScreenWindowController *WebViewImpl::fullScreenWindowController()
 {
     if (!m_fullScreenWindowController)
-        m_fullScreenWindowController = adoptNS([[WKFullScreenWindowController alloc] initWithWindow:RetainPtr { fullScreenWindow() }.get() webView:m_view.getAutoreleased() page:m_page.get()]);
+        m_fullScreenWindowController = adoptNS([[WKFullScreenWindowController alloc] initWithWindow:RetainPtr { fullScreenWindow() }.get() webView:m_view.get().get() page:m_page.get()]);
 
     return m_fullScreenWindowController.get();
 }
@@ -2800,7 +2800,7 @@ bool WebViewImpl::executeSavedCommandBySelector(SEL selector)
     LOG(TextInput, "Executing previously saved command %s", sel_getName(selector));
     // The sink does two things: 1) Tells us if the responder went unhandled, and
     // 2) prevents any NSBeep; we don't ever want to beep here.
-    RetainPtr<WKResponderChainSink> sink = adoptNS([[WKResponderChainSink alloc] initWithResponderChain:m_view.getAutoreleased()]);
+    RetainPtr<WKResponderChainSink> sink = adoptNS([[WKResponderChainSink alloc] initWithResponderChain:m_view.get().get()]);
     [m_view.get() _web_superDoCommandBySelector:selector];
     [sink detach];
     return ![sink didReceiveUnhandledCommand];
@@ -2903,7 +2903,7 @@ void WebViewImpl::selectionDidChange()
         auto selectionRect = isRange ? m_page->editorState().postLayoutData->selectionBoundingRect : IntRect { };
 
         // The affordance will only show up if the selected range consists of >= 50 characters.
-        [[PAL::getWTWritingToolsClassSingleton() sharedInstance] scheduleShowAffordanceForSelectionRect:selectionRect ofView:m_view.getAutoreleased() forDelegate:(NSObject<WTWritingToolsDelegate> *)m_view.getAutoreleased()];
+        [[PAL::getWTWritingToolsClassSingleton() sharedInstance] scheduleShowAffordanceForSelectionRect:selectionRect ofView:m_view.get().get() forDelegate:(NSObject<WTWritingToolsDelegate> *)m_view.get().get()];
     }
 #endif
 
@@ -3484,7 +3484,7 @@ void WebViewImpl::handleRequestedCandidates(NSInteger sequenceNumber, NSArray<NS
     offsetSelectionRect.move(0, offsetSelectionRect.height());
 
     RetainPtr candidateList = candidateListTouchBarItem();
-    [candidateList setCandidates:candidates forSelectedRange:selectedRange inString:postLayoutData->paragraphContextForCandidateRequest.createNSString().get() rect:offsetSelectionRect view:m_view.getAutoreleased() completionHandler:nil];
+    [candidateList setCandidates:candidates forSelectedRange:selectedRange inString:postLayoutData->paragraphContextForCandidateRequest.createNSString().get() rect:offsetSelectionRect view:m_view.get().get() completionHandler:nil];
 
 #if HAVE(INLINE_PREDICTIONS)
     if (allowsInlinePredictions())
@@ -3822,7 +3822,7 @@ void WebViewImpl::updateRemoteAccessibilityRegistration(bool registerProcess)
 void WebViewImpl::accessibilityRegisterUIProcessTokens()
 {
     // Initialize remote accessibility when the window connection has been established.
-    RetainPtr remoteElementToken = [NSAccessibilityRemoteUIElement remoteTokenForLocalUIElement:m_view.getAutoreleased()];
+    RetainPtr remoteElementToken = [NSAccessibilityRemoteUIElement remoteTokenForLocalUIElement:m_view.get().get()];
     m_remoteAccessibilityTokenGeneratedByUIProcess = remoteElementToken.get();
     RetainPtr remoteWindowToken = [NSAccessibilityRemoteUIElement remoteTokenForLocalUIElement:[m_view.get() window]];
     m_page->registerUIProcessAccessibilityTokens(span(remoteElementToken.get()), span(remoteWindowToken.get()));
@@ -4036,7 +4036,7 @@ void WebViewImpl::toolTipChanged(const String& oldToolTip, const String& newTool
         // See radar 3500217 for why we remove all tooltips rather than just the single one we created.
         [m_view.get() removeAllToolTips];
         NSRect wideOpenRect = NSMakeRect(-100000, -100000, 200000, 200000);
-        m_lastToolTipTag = [m_view.get() addToolTipRect:wideOpenRect owner:m_view.getAutoreleased() userData:NULL];
+        m_lastToolTipTag = [m_view.get() addToolTipRect:wideOpenRect owner:m_view.get().get() userData:NULL];
         sendToolTipMouseEntered();
     }
 }
@@ -4158,7 +4158,7 @@ void WebViewImpl::setInspectorAttachmentView(NSView *newView)
     m_inspectorAttachmentView = newView;
     
     if (RefPtr inspector = m_page->inspector())
-        inspector->attachmentViewDidChange(oldView ? oldView.get() : m_view.getAutoreleased(), newView ? RetainPtr { newView }.get() : m_view.getAutoreleased());
+        inspector->attachmentViewDidChange(oldView ? oldView.get() : m_view.get().get(), newView ? RetainPtr { newView }.get() : m_view.get().get());
 }
 
 RetainPtr<NSView> WebViewImpl::inspectorAttachmentView()
@@ -4218,7 +4218,7 @@ NSDragOperation WebViewImpl::draggingEntered(id<NSDraggingInfo> draggingInfo)
     WebCore::IntPoint global(WebCore::globalPoint(draggingInfo.draggingLocation, [m_view.get() window]));
     auto dragDestinationActionMask = coreDragDestinationActionMask([m_view.get() _web_dragDestinationActionForDraggingInfo:draggingInfo]);
     auto dragOperationMask = coreDragOperationMask(draggingInfo.draggingSourceOperationMask);
-    WebCore::DragData dragData(draggingInfo, client, global, dragOperationMask, applicationFlagsForDrag(m_view.getAutoreleased(), draggingInfo), dragDestinationActionMask, m_page->webPageIDInMainFrameProcess());
+    WebCore::DragData dragData(draggingInfo, client, global, dragOperationMask, applicationFlagsForDrag(m_view.get().get(), draggingInfo), dragDestinationActionMask, m_page->webPageIDInMainFrameProcess());
 
     m_page->resetCurrentDragInformation();
     m_page->dragEntered(dragData, draggingInfo.draggingPasteboard.name);
@@ -4256,7 +4256,7 @@ NSDragOperation WebViewImpl::draggingUpdated(id<NSDraggingInfo> draggingInfo)
     WebCore::IntPoint global(WebCore::globalPoint(draggingInfo.draggingLocation, [m_view.get() window]));
     auto dragDestinationActionMask = coreDragDestinationActionMask([m_view.get() _web_dragDestinationActionForDraggingInfo:draggingInfo]);
     auto dragOperationMask = coreDragOperationMask(draggingInfo.draggingSourceOperationMask);
-    WebCore::DragData dragData(draggingInfo, client, global, dragOperationMask, applicationFlagsForDrag(m_view.getAutoreleased(), draggingInfo), dragDestinationActionMask, m_page->webPageIDInMainFrameProcess());
+    WebCore::DragData dragData(draggingInfo, client, global, dragOperationMask, applicationFlagsForDrag(m_view.get().get(), draggingInfo), dragDestinationActionMask, m_page->webPageIDInMainFrameProcess());
     m_page->dragUpdated(dragData, draggingInfo.draggingPasteboard.name);
 
     NSInteger numberOfValidItemsForDrop = m_page->currentDragNumberOfFilesToBeAccepted();
@@ -4280,7 +4280,7 @@ void WebViewImpl::draggingExited(id<NSDraggingInfo> draggingInfo)
 {
     WebCore::IntPoint client([m_view.get() convertPoint:draggingInfo.draggingLocation fromView:nil]);
     WebCore::IntPoint global(WebCore::globalPoint(draggingInfo.draggingLocation, [m_view.get() window]));
-    WebCore::DragData dragData(draggingInfo, client, global, coreDragOperationMask(draggingInfo.draggingSourceOperationMask), applicationFlagsForDrag(m_view.getAutoreleased(), draggingInfo), WebCore::anyDragDestinationAction(), m_page->webPageIDInMainFrameProcess());
+    WebCore::DragData dragData(draggingInfo, client, global, coreDragOperationMask(draggingInfo.draggingSourceOperationMask), applicationFlagsForDrag(m_view.get().get(), draggingInfo), WebCore::anyDragDestinationAction(), m_page->webPageIDInMainFrameProcess());
     m_page->dragExited(dragData);
     m_page->resetCurrentDragInformation();
     draggingInfo.numberOfValidItemsForDrop = m_initialNumberOfValidItemsForDrop;
@@ -4390,7 +4390,7 @@ bool WebViewImpl::performDragOperation(id<NSDraggingInfo> draggingInfo)
 {
     WebCore::IntPoint client([m_view.get() convertPoint:draggingInfo.draggingLocation fromView:nil]);
     WebCore::IntPoint global(WebCore::globalPoint(draggingInfo.draggingLocation, [m_view.get() window]));
-    auto dragData = Box<WebCore::DragData>::create(draggingInfo, client, global, coreDragOperationMask(draggingInfo.draggingSourceOperationMask), applicationFlagsForDrag(m_view.getAutoreleased(), draggingInfo), WebCore::anyDragDestinationAction(), m_page->webPageIDInMainFrameProcess());
+    auto dragData = Box<WebCore::DragData>::create(draggingInfo, client, global, coreDragOperationMask(draggingInfo.draggingSourceOperationMask), applicationFlagsForDrag(m_view.get().get(), draggingInfo), WebCore::anyDragDestinationAction(), m_page->webPageIDInMainFrameProcess());
 
     RetainPtr<NSArray> types = draggingInfo.draggingPasteboard.types;
     SandboxExtension::Handle sandboxExtensionHandle;
@@ -4514,7 +4514,7 @@ void WebViewImpl::startDrag(const WebCore::DragItem& item, ShareableBitmap::Hand
 
             auto clientDragLocation = IntPoint(dragLocationInMainFrameCoordinates.value());
 
-            RetainPtr pasteboard = [NSPasteboard pasteboardWithName:NSPasteboardNameDrag];
+            RetainPtr pasteboard = [NSPasteboard pasteboardWithName:RetainPtr { NSPasteboardNameDrag }.get()];
 
             if (promisedAttachmentInfo) {
                 RefPtr attachment = page->attachmentForIdentifier(promisedAttachmentInfo.attachmentIdentifier);
@@ -4606,7 +4606,7 @@ void WebViewImpl::setPromisedDataForImage(WebCore::Image& image, NSString *filen
     [pasteboard clearContents];
     if (m_page->sessionID().isEphemeral())
         [pasteboard _setExpirationDate:[NSDate dateWithTimeIntervalSinceNow:pasteboardExpirationDelay.seconds()]];
-    [pasteboard addTypes:types.get() owner:m_view.getAutoreleased()];
+    [pasteboard addTypes:types.get() owner:m_view.get().get()];
     setFileAndURLTypes(filename, extension, uti.createNSString().get(), title, url, visibleURL, pasteboard.get());
 
     if (archiveBuffer) {
@@ -4735,7 +4735,7 @@ static RetainPtr<NSPasteboard> pasteboardForAccessCategory(WebCore::DOMPasteAcce
         return NSPasteboard.generalPasteboard;
 
     case WebCore::DOMPasteAccessCategory::Fonts:
-        return [NSPasteboard pasteboardWithName:NSPasteboardNameFont];
+        return [NSPasteboard pasteboardWithName:RetainPtr { NSPasteboardNameFont }.get()];
     }
 }
 
@@ -4908,7 +4908,7 @@ void WebViewImpl::showWritingTools(WTRequestedTool tool)
         selectionRect = page().selectionBoundingRectInRootViewCoordinates();
 
 ALLOW_DEPRECATED_DECLARATIONS_BEGIN
-    [[PAL::getWTWritingToolsClassSingleton() sharedInstance] showTool:tool forSelectionRect:selectionRect ofView:m_view.getAutoreleased() forDelegate:(NSObject<WTWritingToolsDelegate> *)m_view.getAutoreleased()];
+    [[PAL::getWTWritingToolsClassSingleton() sharedInstance] showTool:tool forSelectionRect:selectionRect ofView:m_view.get().get() forDelegate:(NSObject<WTWritingToolsDelegate> *)m_view.get().get()];
 ALLOW_DEPRECATED_DECLARATIONS_END
 }
 
@@ -5525,11 +5525,11 @@ static BOOL shouldUseHighlightsForMarkedText(NSAttributedString *string)
     __block BOOL result = NO;
 
     [string enumerateAttributesInRange:NSMakeRange(0, string.length) options:0 usingBlock:^(NSDictionary<NSAttributedStringKey, id> *attributes, NSRange, BOOL *stop) {
-        BOOL hasUnderlineStyle = !![attributes objectForKey:NSUnderlineStyleAttributeName];
-        BOOL hasUnderlineColor = !![attributes objectForKey:NSUnderlineColorAttributeName];
+        BOOL hasUnderlineStyle = !![attributes objectForKey:RetainPtr { NSUnderlineStyleAttributeName }.get()];
+        BOOL hasUnderlineColor = !![attributes objectForKey:RetainPtr { NSUnderlineColorAttributeName }.get()];
 
-        BOOL hasBackgroundColor = !![attributes objectForKey:NSBackgroundColorAttributeName];
-        BOOL hasForegroundColor = !![attributes objectForKey:NSForegroundColorAttributeName];
+        BOOL hasBackgroundColor = !![attributes objectForKey:RetainPtr { NSBackgroundColorAttributeName }.get()];
+        BOOL hasForegroundColor = !![attributes objectForKey:RetainPtr { NSForegroundColorAttributeName }.get()];
 
         // Marked text may be represented either as an underline or a highlight; this mode is dictated
         // by the attributes it has, and therefore having both types of attributes is not allowed.
@@ -5555,11 +5555,11 @@ static Vector<WebCore::CompositionHighlight> compositionHighlights(NSAttributedS
     Vector<WebCore::CompositionHighlight> highlights;
     [string enumerateAttributesInRange:NSMakeRange(0, string.length) options:0 usingBlock:[&highlights](NSDictionary<NSAttributedStringKey, id> *attributes, NSRange range, BOOL *) {
         std::optional<WebCore::Color> backgroundHighlightColor;
-        if (RetainPtr<WebCore::CocoaColor> backgroundColor = attributes[NSBackgroundColorAttributeName])
+        if (RetainPtr<WebCore::CocoaColor> backgroundColor = attributes[RetainPtr { NSBackgroundColorAttributeName }.get()])
             backgroundHighlightColor = WebCore::colorFromCocoaColor(backgroundColor.get());
 
         std::optional<WebCore::Color> foregroundHighlightColor;
-        if (RetainPtr<WebCore::CocoaColor> foregroundColor = attributes[NSForegroundColorAttributeName])
+        if (RetainPtr<WebCore::CocoaColor> foregroundColor = attributes[RetainPtr { NSForegroundColorAttributeName }.get()])
             foregroundHighlightColor = WebCore::colorFromCocoaColor(foregroundColor.get());
 
         highlights.append({ static_cast<unsigned>(range.location), static_cast<unsigned>(NSMaxRange(range)), backgroundHighlightColor, foregroundHighlightColor });
@@ -5598,11 +5598,11 @@ static Vector<WebCore::CompositionUnderline> compositionUnderlines(NSAttributedS
     Vector<WebCore::CompositionUnderline> underlines;
 
     [string enumerateAttributesInRange:NSMakeRange(0, string.length) options:0 usingBlock:[&underlines](NSDictionary<NSAttributedStringKey, id> *attributes, NSRange range, BOOL *) {
-        RetainPtr<NSNumber> style = [attributes objectForKey:NSUnderlineStyleAttributeName];
+        RetainPtr<NSNumber> style = [attributes objectForKey:RetainPtr { NSUnderlineStyleAttributeName }.get()];
         if (!style)
             return;
 
-        RetainPtr<NSColor> underlineColor = attributes[NSUnderlineColorAttributeName];
+        RetainPtr<NSColor> underlineColor = attributes[RetainPtr { NSUnderlineColorAttributeName }.get()];
         bool isClear = [underlineColor isEqual:NSColor.clearColor];
 
         if (!isClear)
@@ -5635,10 +5635,10 @@ static Vector<WebCore::CompositionUnderline> compositionUnderlines(NSAttributedS
         NSRange range;
         RetainPtr<NSDictionary> attrs = [string attributesAtIndex:i longestEffectiveRange:&range inRange:NSMakeRange(i, length - i)];
 
-        if (RetainPtr<NSNumber> style = [attrs objectForKey:NSUnderlineStyleAttributeName]) {
+        if (RetainPtr<NSNumber> style = [attrs objectForKey:RetainPtr { NSUnderlineStyleAttributeName }.get()]) {
             WebCore::Color color = WebCore::Color::black;
             WebCore::CompositionUnderlineColor compositionUnderlineColor = WebCore::CompositionUnderlineColor::TextColor;
-            if (RetainPtr<NSColor> colorAttribute = [attrs objectForKey:NSUnderlineColorAttributeName]) {
+            if (RetainPtr<NSColor> colorAttribute = [attrs objectForKey:RetainPtr { NSUnderlineColorAttributeName }.get()]) {
                 color = WebCore::colorFromCocoaColor(colorAttribute.get());
                 compositionUnderlineColor = WebCore::CompositionUnderlineColor::GivenColor;
             }
@@ -5663,7 +5663,7 @@ void WebViewImpl::setMarkedText(id string, NSRange selectedRange, NSRange replac
         BOOL hasTextCompletion = [&] {
             __block BOOL result = NO;
 
-            [attributedString enumerateAttribute:NSTextCompletionAttributeName inRange:NSMakeRange(0, [attributedString length]) options:0 usingBlock:^(id value, NSRange range, BOOL *stop) {
+            [attributedString enumerateAttribute:RetainPtr { NSTextCompletionAttributeName }.get() inRange:NSMakeRange(0, [attributedString length]) options:0 usingBlock:^(id value, NSRange range, BOOL *stop) {
                 if ([value respondsToSelector:@selector(boolValue)] && [value boolValue]) {
                     result = YES;
                     *stop = YES;
@@ -5777,7 +5777,7 @@ void WebViewImpl::showInlinePredictionsForCandidate(NSTextCheckingResult *candid
         offset:offset
         inString:paragraphContextForCandidateRequest.get()
         rect:offsetSelectionRect
-        view:m_view.getAutoreleased()
+        view:m_view.get().get()
         completionHandler:[weakThis](NSDictionary<NSString *, id> *resultDictionary) {
         if (!weakThis)
             return;
@@ -6014,7 +6014,7 @@ void WebViewImpl::nativeMouseEventHandler(NSEvent *event)
         }];
         return;
     }
-    NativeWebMouseEvent webEvent(event, m_lastPressureEvent.get(), m_view.getAutoreleased());
+    NativeWebMouseEvent webEvent(event, m_lastPressureEvent.get(), m_view.get().get());
     m_page->handleMouseEvent(webEvent);
 }
 
@@ -6531,9 +6531,9 @@ void WebViewImpl::updateTextTouchBar()
         m_textTouchBarItemController = adoptNS([[WKTextTouchBarItemController alloc] initWithWebViewImpl:this]);
 
     if (!m_startedListeningToCustomizationEvents) {
-        [[NSNotificationCenter defaultCenter] addObserver:m_textTouchBarItemController.get() selector:@selector(touchBarDidExitCustomization:) name:NSTouchBarDidExitCustomization object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:m_textTouchBarItemController.get() selector:@selector(touchBarWillEnterCustomization:) name:NSTouchBarWillEnterCustomization object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:m_textTouchBarItemController.get() selector:@selector(didChangeAutomaticTextCompletion:) name:NSSpellCheckerDidChangeAutomaticTextCompletionNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:m_textTouchBarItemController.get() selector:@selector(touchBarDidExitCustomization:) name:RetainPtr { NSTouchBarDidExitCustomization }.get() object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:m_textTouchBarItemController.get() selector:@selector(touchBarWillEnterCustomization:) name:RetainPtr { NSTouchBarWillEnterCustomization }.get() object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:m_textTouchBarItemController.get() selector:@selector(didChangeAutomaticTextCompletion:) name:RetainPtr { NSSpellCheckerDidChangeAutomaticTextCompletionNotification }.get() object:nil];
 
         m_startedListeningToCustomizationEvents = true;
     }
@@ -6957,14 +6957,19 @@ CocoaImageAnalyzer* WebViewImpl::ensureImageAnalyzer()
     if (!m_imageAnalyzer) {
         lazyInitialize(m_imageAnalyzerQueue, WorkQueue::create("WebKit image analyzer queue"_s));
         lazyInitialize(m_imageAnalyzer, createImageAnalyzer());
-        [m_imageAnalyzer setCallbackQueue:m_imageAnalyzerQueue->dispatchQueue()];
+        [m_imageAnalyzer setCallbackQueue:m_imageAnalyzerQueue->protectedDispatchQueue().get()];
     }
     return m_imageAnalyzer.get();
 }
 
+RetainPtr<CocoaImageAnalyzer> WebViewImpl::ensureProtectedImageAnalyzer()
+{
+    return ensureImageAnalyzer();
+}
+
 int32_t WebViewImpl::processImageAnalyzerRequest(CocoaImageAnalyzerRequest *request, CompletionHandler<void(RetainPtr<CocoaImageAnalysis>&&, NSError *)>&& completion)
 {
-    return [ensureImageAnalyzer() processRequest:request progressHandler:nil completionHandler:makeBlockPtr([completion = WTFMove(completion)](CocoaImageAnalysis *result, NSError *error) mutable {
+    return [ensureProtectedImageAnalyzer() processRequest:request progressHandler:nil completionHandler:makeBlockPtr([completion = WTFMove(completion)](CocoaImageAnalysis *result, NSError *error) mutable {
         callOnMainRunLoop([completion = WTFMove(completion), result = RetainPtr { result }, error = RetainPtr { error }] mutable {
             completion(WTFMove(result), error.get());
         });
@@ -6996,7 +7001,7 @@ void WebViewImpl::requestTextRecognition(const URL& imageURL, ShareableBitmap::H
 
 #if ENABLE(IMAGE_ANALYSIS_ENHANCEMENTS)
     if (!targetLanguageIdentifier.isEmpty())
-        return requestVisualTranslation(ensureImageAnalyzer(), imageURL.createNSURL().get(), sourceLanguageIdentifier, targetLanguageIdentifier, cgImage.get(), WTFMove(completion));
+        return requestVisualTranslation(ensureProtectedImageAnalyzer().get(), imageURL.createNSURL().get(), sourceLanguageIdentifier, targetLanguageIdentifier, cgImage.get(), WTFMove(completion));
 #else
     UNUSED_PARAM(sourceLanguageIdentifier);
     UNUSED_PARAM(targetLanguageIdentifier);
@@ -7021,10 +7026,10 @@ void WebViewImpl::computeHasVisualSearchResults(const URL& imageURL, ShareableBi
     RetainPtr cgImage = imageBitmap.createPlatformImage(DontCopyBackingStore);
     auto request = createImageAnalyzerRequest(cgImage.get(), imageURL, [NSURL _web_URLWithWTFString:m_page->currentURL()], VKAnalysisTypeVisualSearch);
     auto startTime = MonotonicTime::now();
-    [ensureImageAnalyzer() processRequest:request.get() progressHandler:nil completionHandler:makeBlockPtr([completion = WTFMove(completion), startTime] (CocoaImageAnalysis *analysis, NSError *) mutable {
+    [ensureProtectedImageAnalyzer() processRequest:request.get() progressHandler:nil completionHandler:makeBlockPtr([completion = WTFMove(completion), startTime] (CocoaImageAnalysis *analysis, NSError *) mutable {
         BOOL result = [analysis hasResultsForAnalysisTypes:VKAnalysisTypeVisualSearch];
         RetainPtr loop = CFRunLoopGetMain();
-        CFRunLoopPerformBlock(loop.get(), (__bridge CFStringRef)NSEventTrackingRunLoopMode, makeBlockPtr([completion = WTFMove(completion), result, startTime] () mutable {
+        CFRunLoopPerformBlock(loop.get(), RetainPtr { bridge_cast(NSEventTrackingRunLoopMode) }.get(), makeBlockPtr([completion = WTFMove(completion), result, startTime] () mutable {
             RELEASE_LOG(ImageAnalysis, "Image analysis completed in %.0f ms (found visual search results? %d)", (MonotonicTime::now() - startTime).milliseconds(), result);
             completion(result);
         }).get());

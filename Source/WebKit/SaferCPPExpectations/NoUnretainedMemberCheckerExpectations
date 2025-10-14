@@ -5,7 +5,6 @@ UIProcess/API/Cocoa/_WKAuthenticatorAssertionResponse.h
 UIProcess/API/Cocoa/_WKNotificationData.mm
 UIProcess/API/Cocoa/_WKSpatialBackdropSource.h
 UIProcess/API/Cocoa/_WKWebPushMessage.h
-[ Mac ] UIProcess/mac/WebViewImpl.mm
 [ iOS ] Platform/ios/PaymentAuthorizationController.mm
 [ iOS ] UIProcess/API/Cocoa/WKSnapshotConfiguration.h
 [ iOS ] UIProcess/API/Cocoa/WKWebViewPrivateForTesting.h

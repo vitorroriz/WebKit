@@ -61,12 +61,6 @@ UIProcess/API/Cocoa/_WKWebPushAction.mm
 [ Mac ] UIProcess/Inspector/Cocoa/InspectorExtensionDelegate.mm
 [ Mac ] UIProcess/Inspector/mac/WKInspectorViewController.mm
 [ Mac ] UIProcess/Inspector/mac/WKInspectorWKWebView.mm
-[ Mac ] UIProcess/mac/DisplayCaptureSessionManager.mm
-[ Mac ] UIProcess/mac/PageClientImplMac.mm
-UIProcess/mac/SecItemShimProxy.cpp
-[ Mac ] UIProcess/mac/WebDataListSuggestionsDropdownMac.mm
-[ Mac ] UIProcess/mac/WebPopupMenuProxyMac.mm
-[ Mac ] UIProcess/mac/WebViewImpl.mm
 WebProcess/GPU/webrtc/RemoteVideoFrameObjectHeapProxyProcessor.cpp
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessBundleParameters.mm
 WebProcess/InjectedBundle/API/mac/WKDOMInternals.mm
