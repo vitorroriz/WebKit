@@ -226,14 +226,6 @@ private:
 
 #if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
     using KeyIDs = Vector<Ref<SharedBuffer>>;
-    struct TrackInitData {
-        RefPtr<SharedBuffer> initData;
-        KeyIDs keyIDs;
-    };
-    using TrackInitDataMap = StdUnorderedMap<TrackID, TrackInitData>;
-    TrackInitDataMap m_pendingProtectedTrackInitDataMap;
-    TrackInitDataMap m_protectedTrackInitDataMap;
-
     using TrackKeyIDsMap = StdUnorderedMap<TrackID, KeyIDs>;
     TrackKeyIDsMap m_currentTrackIDs;
 

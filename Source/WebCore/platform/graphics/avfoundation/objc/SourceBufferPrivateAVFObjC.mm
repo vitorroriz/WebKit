@@ -208,8 +208,6 @@ bool SourceBufferPrivateAVFObjC::precheckInitializationSegment(const Initializat
         }
     }
 
-    m_protectedTrackInitDataMap = std::exchange(m_pendingProtectedTrackInitDataMap, { });
-
     for (auto& videoTrackInfo : segment.videoTracks)
         m_videoTracks.try_emplace(videoTrackInfo.track->id(), videoTrackInfo.track);
 
@@ -353,8 +351,6 @@ void SourceBufferPrivateAVFObjC::didProvideContentKeyRequestInitializationDataFo
 #endif
     if (!keyIDs)
         return;
-
-    m_pendingProtectedTrackInitDataMap.try_emplace(trackID, TrackInitData { initData.copyRef(), *keyIDs });
 
     if (RefPtr cdmInstance = m_cdmInstance) {
         if (RefPtr instanceSession = cdmInstance->sessionForKeyIDs(keyIDs.value())) {
