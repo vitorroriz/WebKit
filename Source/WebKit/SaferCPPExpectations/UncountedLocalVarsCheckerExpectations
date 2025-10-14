@@ -1,4 +1,3 @@
-WebProcess/FullScreen/WebFullScreenManager.cpp
 WebProcess/InjectedBundle/API/c/WKBundlePage.cpp
 WebProcess/InjectedBundle/InjectedBundleHitTestResult.cpp
 [ iOS ] GPUProcess/media/RemoteAudioSessionProxyManager.cpp

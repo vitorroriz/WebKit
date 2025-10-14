@@ -16,18 +16,15 @@ UIProcess/API/Cocoa/WKWindowFeatures.mm
 UIProcess/API/Cocoa/_WKAttachment.mm
 UIProcess/API/Cocoa/_WKAutomationSession.mm
 UIProcess/API/Cocoa/_WKContentRuleListAction.mm
-[ Mac ] UIProcess/API/Cocoa/_WKContextMenuElementInfo.mm
 UIProcess/API/Cocoa/_WKCustomHeaderFields.mm
 UIProcess/API/Cocoa/_WKFeature.mm
 UIProcess/API/Cocoa/_WKFrameTreeNode.mm
 UIProcess/API/Cocoa/_WKInspector.mm
 UIProcess/API/Cocoa/_WKInspectorConfiguration.mm
 UIProcess/API/Cocoa/_WKInspectorDebuggableInfo.mm
-[ Mac ] UIProcess/API/Cocoa/_WKInspectorExtension.mm
 UIProcess/API/Cocoa/_WKInspectorTesting.mm
 UIProcess/API/Cocoa/_WKJSHandle.mm
 UIProcess/API/Cocoa/_WKProcessPoolConfiguration.mm
-[ Mac ] UIProcess/API/Cocoa/_WKRemoteWebInspectorViewController.mm
 UIProcess/API/Cocoa/_WKResourceLoadStatisticsFirstParty.mm
 UIProcess/API/Cocoa/_WKResourceLoadStatisticsThirdParty.mm
 UIProcess/API/Cocoa/_WKSerializedNode.mm
@@ -40,7 +37,6 @@ UIProcess/API/Cocoa/_WKWebAuthenticationPanel.mm
 UIProcess/API/Cocoa/_WKWebsiteDataStoreConfiguration.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIAlarmsCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIDeclarativeNetRequestCocoa.mm
-[ Mac ] WebProcess/Extensions/API/Cocoa/WebExtensionAPIDevToolsInspectedWindowCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIExtensionCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPINamespaceCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIPortCocoa.mm
@@ -52,7 +48,6 @@ WebProcess/Extensions/API/Cocoa/WebExtensionAPIWebNavigationEventCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIWebRequestEventCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIWindowsCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIWindowsEventCocoa.mm
-WebProcess/FullScreen/WebFullScreenManager.cpp
 WebProcess/GPU/graphics/RemoteRenderingBackendProxy.cpp
 WebProcess/GPU/media/MediaPlayerPrivateRemote.cpp
 WebProcess/GPU/media/RemoteLegacyCDMFactory.cpp
@@ -67,7 +62,6 @@ WebProcess/InjectedBundle/API/c/WKBundleFrame.cpp
 WebProcess/InjectedBundle/API/c/WKBundleNodeHandle.cpp
 WebProcess/InjectedBundle/API/c/WKBundlePage.cpp
 WebProcess/InjectedBundle/API/c/mac/WKBundleMac.mm
-[ Mac ] WebProcess/InjectedBundle/API/c/mac/WKBundlePageBannerMac.mm
 WebProcess/InjectedBundle/API/mac/WKDOMDocument.mm
 WebProcess/InjectedBundle/API/mac/WKDOMElement.mm
 WebProcess/InjectedBundle/API/mac/WKDOMNode.mm
@@ -79,7 +73,6 @@ WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextController.mm
 WebProcess/InjectedBundle/InjectedBundleDOMWindowExtension.cpp
 WebProcess/InjectedBundle/InjectedBundleHitTestResult.cpp
 WebProcess/Inspector/WebInspectorUI.cpp
-[ Mac ] WebProcess/Inspector/WebInspectorUIExtensionController.cpp
 WebProcess/WebCoreSupport/WebChromeClient.cpp
 WebProcess/WebCoreSupport/mac/WebDragClientMac.mm
 WebProcess/WebPage/Cocoa/TextAnimationController.mm
@@ -89,14 +82,20 @@ WebProcess/WebPage/RemoteLayerTree/PlatformCALayerRemoteModelHosting.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeContext.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeDrawingArea.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteScrollingCoordinator.mm
-[ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
-[ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationScrollingCoordinator.mm
 WebProcess/WebPage/mac/WKAccessibilityWebPageObjectBase.mm
-[ Mac ] WebProcess/WebPage/mac/WKAccessibilityWebPageObjectMac.mm
 WebProcess/cocoa/PlaybackSessionManager.mm
 WebProcess/cocoa/TextTrackRepresentationCocoa.mm
 WebProcess/cocoa/VideoPresentationManager.mm
 WebProcess/cocoa/WebProcessCocoa.mm
+[ Mac ] UIProcess/API/Cocoa/_WKContextMenuElementInfo.mm
+[ Mac ] UIProcess/API/Cocoa/_WKInspectorExtension.mm
+[ Mac ] UIProcess/API/Cocoa/_WKRemoteWebInspectorViewController.mm
+[ Mac ] WebProcess/Extensions/API/Cocoa/WebExtensionAPIDevToolsInspectedWindowCocoa.mm
+[ Mac ] WebProcess/InjectedBundle/API/c/mac/WKBundlePageBannerMac.mm
+[ Mac ] WebProcess/Inspector/WebInspectorUIExtensionController.cpp
+[ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
+[ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationScrollingCoordinator.mm
+[ Mac ] WebProcess/WebPage/mac/WKAccessibilityWebPageObjectMac.mm
 [ iOS ] GPUProcess/GPUConnectionToWebProcess.cpp
 [ iOS ] GPUProcess/cocoa/GPUConnectionToWebProcessCocoa.mm
 [ iOS ] GPUProcess/media/RemoteAudioSessionProxyManager.cpp

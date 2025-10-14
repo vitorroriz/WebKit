@@ -1,10 +1,6 @@
 Platform/IPC/ArgumentCoders.h
-[ Mac ] Platform/cocoa/_WKWebViewTextInputNotifications.mm
 Shared/RemoteLayerTree/RemoteLayerTreeTransaction.mm
 UIProcess/API/Cocoa/WKWebViewTesting.mm
-[ Mac ] UIProcess/API/Cocoa/_WKInspectorExtension.mm
-[ Mac ] UIProcess/API/Cocoa/_WKRemoteWebInspectorViewController.mm
-WebProcess/FullScreen/WebFullScreenManager.cpp
 WebProcess/GPU/graphics/RemoteRenderingBackendProxy.cpp
 WebProcess/GPU/media/MediaPlayerPrivateRemote.cpp
 WebProcess/GPU/media/RemoteLegacyCDMFactory.cpp
@@ -27,22 +23,28 @@ WebProcess/Network/webrtc/LibWebRTCDnsResolverFactory.cpp
 WebProcess/Network/webrtc/LibWebRTCNetwork.h
 WebProcess/Network/webrtc/LibWebRTCProvider.cpp
 WebProcess/Network/webrtc/LibWebRTCResolver.cpp
-[ Mac ] WebProcess/WebCoreSupport/mac/WebPopupMenuMac.mm
 WebProcess/WebPage/Cocoa/TextAnimationController.mm
 WebProcess/WebPage/Cocoa/WebPageCocoa.mm
-[ Mac ] WebProcess/WebPage/MomentumEventDispatcher.cpp
 WebProcess/WebPage/RemoteLayerTree/PlatformCALayerRemote.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeContext.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeDrawingArea.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteScrollingCoordinator.mm
 WebProcess/WebPage/WebFrame.cpp
 WebProcess/WebPage/WebPage.cpp
-[ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
 WebProcess/WebPage/mac/WKAccessibilityWebPageObjectBase.mm
-[ Mac ] WebProcess/WebPage/mac/WebPageMac.mm
 WebProcess/cocoa/PlaybackSessionManager.mm
 WebProcess/cocoa/VideoPresentationManager.mm
 WebProcess/cocoa/WebProcessCocoa.mm
+[ Mac ] Platform/cocoa/_WKWebViewTextInputNotifications.mm
+[ Mac ] UIProcess/API/Cocoa/_WKInspectorExtension.mm
+[ Mac ] UIProcess/API/Cocoa/_WKRemoteWebInspectorViewController.mm
+[ Mac ] UIProcess/API/mac/WKWebViewTestingMac.mm
+[ Mac ] UIProcess/mac/WKTextAnimationManagerMac.mm
+[ Mac ] UIProcess/mac/WebViewImpl.mm
+[ Mac ] WebProcess/WebCoreSupport/mac/WebPopupMenuMac.mm
+[ Mac ] WebProcess/WebPage/MomentumEventDispatcher.cpp
+[ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
+[ Mac ] WebProcess/WebPage/mac/WebPageMac.mm
 [ iOS ] UIProcess/API/ios/WKWebViewIOS.mm
 [ iOS ] UIProcess/API/ios/WKWebViewTestingIOS.mm
 [ iOS ] UIProcess/Cocoa/ExtensionCapabilityGranter.mm
