@@ -36,7 +36,6 @@ UIProcess/API/Cocoa/_WKAuthenticationExtensionsClientInputs.mm
 UIProcess/API/Cocoa/_WKAuthenticatorAssertionResponse.mm
 UIProcess/API/Cocoa/_WKAuthenticatorAttestationResponse.mm
 UIProcess/API/Cocoa/_WKAuthenticatorResponse.mm
-UIProcess/API/Cocoa/_WKDataTask.mm
 UIProcess/API/Cocoa/_WKFeature.mm
 UIProcess/API/Cocoa/_WKInspector.mm
 UIProcess/API/Cocoa/_WKInspectorConfiguration.mm
