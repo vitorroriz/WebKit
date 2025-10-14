@@ -728,7 +728,7 @@ void HTMLAnchorElement::setFullURL(const URL& fullURL)
     checkForSpeculationRules();
 }
 
-void HTMLAnchorElement::setShouldBePrefetched(bool conservative, Vector<String>&& tags, String&& referrerPolicy)
+void HTMLAnchorElement::setShouldBePrefetched(bool conservative, Vector<String>&& tags, std::optional<ReferrerPolicy>&& referrerPolicy)
 {
     m_prefetchEagerness = conservative ? PrefetchEagerness::Conservative : PrefetchEagerness::Immediate;
     m_speculationRulesTags = WTFMove(tags);
@@ -746,7 +746,7 @@ void HTMLAnchorElement::checkForSpeculationRules()
     else {
         m_prefetchEagerness = PrefetchEagerness::None;
         m_speculationRulesTags.clear();
-        m_prefetchReferrerPolicy = String();
+        m_prefetchReferrerPolicy = std::nullopt;
     }
 }
 

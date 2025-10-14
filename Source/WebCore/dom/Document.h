@@ -2028,7 +2028,7 @@ public:
     void attributeAddedToElement(const QualifiedName& attribute);
     void elementDisconnectedFromDocument(const Element&);
 
-    WEBCORE_EXPORT void prefetch(const URL&, const Vector<String>&, const String&, bool lowPriority = false);
+    WEBCORE_EXPORT void prefetch(const URL&, const Vector<String>&, std::optional<ReferrerPolicy>, bool lowPriority = false);
 
     void processSpeculationRulesHeader(const String& headerValue, const URL& baseURL);
 

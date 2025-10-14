@@ -11957,7 +11957,7 @@ double Document::lookupCSSRandomBaseValue(const CSSCalc::RandomCachingKey& key) 
     return m_randomCachingKeyMap->lookupCSSRandomBaseValue(key);
 }
 
-void Document::prefetch(const URL& url, const Vector<String>& tags, const String& referrerPolicy, bool lowPriority)
+void Document::prefetch(const URL& url, const Vector<String>& tags, std::optional<ReferrerPolicy> referrerPolicy, bool lowPriority)
 {
     RefPtr frame = this->frame();
     if (!frame)

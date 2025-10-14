@@ -4959,9 +4959,9 @@ void FrameLoader::prefetchDNSIfNeeded(const URL& url)
         client().prefetchDNS(url.host().toString());
 }
 
-void FrameLoader::prefetch(const URL& url, const Vector<String>& tags, const String& referrerPolicyString, bool lowPriority)
+void FrameLoader::prefetch(const URL& url, const Vector<String>& tags, std::optional<ReferrerPolicy> referrerPolicy, bool lowPriority)
 {
-    m_documentPrefetcher->prefetch(url, tags, referrerPolicyString, lowPriority);
+    m_documentPrefetcher->prefetch(url, tags, referrerPolicy, lowPriority);
 }
 
 } // namespace WebCore

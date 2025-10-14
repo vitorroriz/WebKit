@@ -41,6 +41,8 @@ class DocumentLoader;
 class FrameLoader;
 class ResourceRequest;
 
+enum class ReferrerPolicy : uint8_t;
+
 class DocumentPrefetcher : public RefCounted<DocumentPrefetcher>, public CachedRawResourceClient {
 public:
     struct PrefetchedResourceData {
@@ -52,7 +54,7 @@ public:
     explicit DocumentPrefetcher(FrameLoader&);
     ~DocumentPrefetcher();
 
-    void prefetch(const URL&, const Vector<String>& tags, const String& referrerPolicyString, bool lowPriority = false);
+    void prefetch(const URL&, const Vector<String>& tags, std::optional<ReferrerPolicy>, bool lowPriority = false);
     Box<NetworkLoadMetrics> takePrefetchedNetworkLoadMetrics(const URL&);
 
     // CachedRawResourceClient

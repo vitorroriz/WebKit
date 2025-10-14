@@ -67,15 +67,12 @@ static bool isPassingSecurityChecks(const URL& url, Document& document)
     return true;
 }
 
-static ResourceRequest makePrefetchRequest(URL&& url, const Vector<String>& tags, const String& referrerPolicyString, const URL& referrerURL, const Document& document)
+static ResourceRequest makePrefetchRequest(URL&& url, const Vector<String>& tags, std::optional<ReferrerPolicy> referrerPolicy, const URL& referrerURL, const Document& document)
 {
-    ReferrerPolicy policy = ReferrerPolicy::Default;
-    if (!referrerPolicyString.isEmpty())
-        policy = parseReferrerPolicy(referrerPolicyString, ReferrerPolicySource::SpeculationRules).value_or(ReferrerPolicy::Default);
-    else
-        policy = document.referrerPolicy();
+    if (!referrerPolicy)
+        referrerPolicy = document.referrerPolicy();
 
-    String referrer = SecurityPolicy::generateReferrerHeader(policy, url, referrerURL, OriginAccessPatternsForWebProcess::singleton());
+    String referrer = SecurityPolicy::generateReferrerHeader(*referrerPolicy, url, referrerURL, OriginAccessPatternsForWebProcess::singleton());
 
     ResourceRequest request { WTFMove(url) };
     request.setPriority(ResourceLoadPriority::VeryLow);
@@ -98,7 +95,7 @@ static ResourceRequest makePrefetchRequest(URL&& url, const Vector<String>& tags
     return request;
 }
 
-void DocumentPrefetcher::prefetch(const URL& url, const Vector<String>& tags, const String& referrerPolicyString, bool lowPriority)
+void DocumentPrefetcher::prefetch(const URL& url, const Vector<String>& tags, std::optional<ReferrerPolicy> referrerPolicy, bool lowPriority)
 {
     WeakRef<FrameLoader> frameLoader = m_frameLoader;
     if (!frameLoader.ptr())
@@ -120,7 +117,7 @@ void DocumentPrefetcher::prefetch(const URL& url, const Vector<String>& tags, co
     if (url.hasFragmentIdentifier() && equalIgnoringFragmentIdentifier(url, document->url()))
         return;
 
-    ResourceRequest request = makePrefetchRequest(URL { url }, tags, referrerPolicyString, frameLoader->outgoingReferrerURL(), *document);
+    ResourceRequest request = makePrefetchRequest(URL { url }, tags, referrerPolicy, frameLoader->outgoingReferrerURL(), *document);
 
     ResourceLoaderOptions prefetchOptions(
         SendCallbackPolicy::SendCallbacks,

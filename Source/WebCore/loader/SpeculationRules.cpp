@@ -26,6 +26,7 @@
 #include "config.h"
 #include "SpeculationRules.h"
 
+#include "ReferrerPolicy.h"
 #include <wtf/HashSet.h>
 #include <wtf/JSONValues.h>
 #include <wtf/URL.h>
@@ -266,8 +267,15 @@ static std::optional<SpeculationRules::Rule> parseSingleRule(const JSON::Object&
     }
 
     auto referrerPolicyValue = input.getValue("referrer_policy"_s);
-    if (referrerPolicyValue && referrerPolicyValue->type() == JSON::Value::Type::String)
-        rule.referrerPolicy = referrerPolicyValue->asString();
+    if (referrerPolicyValue && referrerPolicyValue->type() == JSON::Value::Type::String) {
+        String referrerPolicyString = referrerPolicyValue->asString();
+        if (!referrerPolicyString.isEmpty()) {
+            rule.referrerPolicy = parseReferrerPolicy(referrerPolicyString, ReferrerPolicySource::SpeculationRules);
+            // 15.1. If input["referrer_policy"] is not a referrer policy... Return null.
+            if (!rule.referrerPolicy)
+                return std::nullopt;
+        }
+    }
 
     auto eagernessValue = input.getValue("eagerness"_s);
     if (eagernessValue && eagernessValue->type() == JSON::Value::Type::String) {
