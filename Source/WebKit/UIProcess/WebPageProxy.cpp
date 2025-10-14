@@ -7348,6 +7348,12 @@ void WebPageProxy::didCommitLoadForFrame(IPC::Connection& connection, FrameIdent
 
     frame->didCommitLoad(mimeType, certificateInfo, containsPluginDocument);
 
+    if (auto frameProcessSite = frame->frameProcess().site()) {
+        auto frameSite = Site { frame->url() };
+        if (frameProcessSite->isEmpty() && !frameSite.isEmpty())
+            frame->setProcess(protectedBrowsingContextGroup()->ensureProcessForSite(frameSite, Site { protectedMainFrame()->url() }, frame->frameProcess().process(), preferences, InjectBrowsingContextIntoProcess::Yes));
+    }
+
     if (frame->isMainFrame()) {
         std::optional<WebCore::PrivateClickMeasurement> privateClickMeasurement;
         if (internals().privateClickMeasurement)
@@ -8902,7 +8908,7 @@ void WebPageProxy::createNewPage(IPC::Connection& connection, WindowFeatures&& w
             originatingFrameInfoData.frameID
         } });
         WebCore::Site site { openerFrame->url() };
-        ASSERT(!configuration->preferences().siteIsolationEnabled() || openerFrame->frameProcess().isSharedProcess() || site.isEmpty() || (openerFrame->frameProcess().site() && *openerFrame->frameProcess().site() == site));
+        ASSERT(!configuration->preferences().siteIsolationEnabled() || openerFrame->frameProcess().isSharedProcess() || site.isEmpty() || (openerFrame->frameProcess().site() && (*openerFrame->frameProcess().site() == site || openerFrame->frameProcess().site()->isEmpty())));
         configuration->setOpenedSite(site);
     } else {
         configuration->setOpenerInfo(std::nullopt);
