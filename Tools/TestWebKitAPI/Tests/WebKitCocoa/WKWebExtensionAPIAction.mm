@@ -903,6 +903,81 @@ TEST(WKWebExtensionAPIAction, SetIconWithBadDataURL)
     [manager run];
 }
 
+TEST(WKWebExtensionAPIAction, SetIconWithNullPath)
+{
+    auto *backgroundScript = Util::constructScript(@[
+        @"await browser.action.setIcon({ path: null })",
+        @"browser.test.sendMessage('Icon Set')",
+    ]);
+
+    auto *largeToolbarIcon = Util::makePNGData(CGSizeMake(32, 32), @selector(blueColor));
+
+    auto *resources = @{
+        @"background.js": backgroundScript,
+        @"toolbar-32.png": largeToolbarIcon,
+        @"popup.html": @"Hello world!",
+    };
+
+    auto manager = Util::loadExtension(actionPopupManifest, resources);
+
+    [manager runUntilTestMessage:@"Icon Set"];
+
+    auto *action = [manager.get().context actionForTab:nil];
+    auto *icon = [action iconForSize:CGSizeMake(32, 32)];
+    EXPECT_NOT_NULL(icon);
+    EXPECT_TRUE(CGSizeEqualToSize(icon.size, CGSizeMake(32, 32)));
+}
+
+TEST(WKWebExtensionAPIAction, SetIconWithNullImageData)
+{
+    auto *backgroundScript = Util::constructScript(@[
+        @"await browser.action.setIcon({ imageData: null })",
+        @"browser.test.sendMessage('Icon Set')",
+    ]);
+
+    auto *largeToolbarIcon = Util::makePNGData(CGSizeMake(32, 32), @selector(blueColor));
+
+    auto *resources = @{
+        @"background.js": backgroundScript,
+        @"toolbar-32.png": largeToolbarIcon,
+        @"popup.html": @"Hello world!",
+    };
+
+    auto manager = Util::loadExtension(actionPopupManifest, resources);
+
+    [manager runUntilTestMessage:@"Icon Set"];
+
+    auto *action = [manager.get().context actionForTab:nil];
+    auto *icon = [action iconForSize:CGSizeMake(32, 32)];
+    EXPECT_NOT_NULL(icon);
+    EXPECT_TRUE(CGSizeEqualToSize(icon.size, CGSizeMake(32, 32)));
+}
+
+TEST(WKWebExtensionAPIAction, SetIconWithNullVariants)
+{
+    auto *backgroundScript = Util::constructScript(@[
+        @"await browser.action.setIcon({ variants: null })",
+        @"browser.test.sendMessage('Icon Set')",
+    ]);
+
+    auto *largeToolbarIcon = Util::makePNGData(CGSizeMake(32, 32), @selector(blueColor));
+
+    auto *resources = @{
+        @"background.js": backgroundScript,
+        @"toolbar-32.png": largeToolbarIcon,
+        @"popup.html": @"Hello world!",
+    };
+
+    auto manager = Util::loadExtension(actionPopupManifest, resources);
+
+    [manager runUntilTestMessage:@"Icon Set"];
+
+    auto *action = [manager.get().context actionForTab:nil];
+    auto *icon = [action iconForSize:CGSizeMake(32, 32)];
+    EXPECT_NOT_NULL(icon);
+    EXPECT_TRUE(CGSizeEqualToSize(icon.size, CGSizeMake(32, 32)));
+}
+
 TEST(WKWebExtensionAPIAction, SetIconWithMultipleDataURLs)
 {
     auto *backgroundScript = Util::constructScript(@[

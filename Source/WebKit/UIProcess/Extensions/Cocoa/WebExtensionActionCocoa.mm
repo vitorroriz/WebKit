@@ -786,7 +786,7 @@ void WebExtensionAction::setIcons(RefPtr<JSON::Object> icons)
     if (m_customIcons == icons)
         return;
 
-    m_customIcons = icons->size() ? icons : nullptr;
+    m_customIcons = icons && icons->size() ? icons : nullptr;
 #if ENABLE(WK_WEB_EXTENSIONS_ICON_VARIANTS)
     m_customIconVariants = nullptr;
 #endif
@@ -801,7 +801,7 @@ void WebExtensionAction::setIconVariants(RefPtr<JSON::Array> iconVariants)
     if (m_customIconVariants == iconVariants)
         return;
 
-    m_customIconVariants = iconVariants->length() ? iconVariants : nullptr;
+    m_customIconVariants = iconVariants && iconVariants->length() ? iconVariants : nullptr;
     m_customIcons = nullptr;
 
     clearIconCache();
