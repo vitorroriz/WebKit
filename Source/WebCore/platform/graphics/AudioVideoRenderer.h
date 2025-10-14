@@ -94,6 +94,9 @@ public:
     virtual WebCore::FloatSize videoLayerSize() const { return { }; }
     virtual void notifyVideoLayerSizeChanged(Function<void(const MediaTime&, FloatSize)>&&) { }
     virtual void setVideoLayerSizeFenced(const FloatSize&, WTF::MachSendRightAnnotated&&) { }
+#if ENABLE(ENCRYPTED_MEDIA)
+    virtual void notifyInsufficientExternalProtectionChanged(Function<void(bool)>&&) { }
+#endif
 };
 
 class VideoFullscreenInterface {

@@ -170,6 +170,13 @@ MediaPlayerPrivateMediaSourceAVFObjC::MediaPlayerPrivateMediaSourceAVFObjC(Media
         }
     });
 
+#if ENABLE(ENCRYPTED_MEDIA)
+    m_renderer->notifyInsufficientExternalProtectionChanged([weakThis = WeakPtr { *this }](bool obscured) {
+        if (RefPtr protectedThis = weakThis.get())
+            protectedThis->outputObscuredDueToInsufficientExternalProtectionChanged(obscured);
+    });
+#endif
+
 #if ENABLE(LINEAR_MEDIA_PLAYER)
     if (RetainPtr videoTarget = player->videoTarget())
         m_renderer->setVideoTarget(videoTarget.get());

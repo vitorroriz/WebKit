@@ -820,6 +820,13 @@ void AudioVideoRendererAVFObjC::setVideoLayerSizeFenced(const FloatSize& newSize
         updateDisplayLayerIfNeeded();
 }
 
+#if ENABLE(ENCRYPTED_MEDIA)
+void AudioVideoRendererAVFObjC::notifyInsufficientExternalProtectionChanged(Function<void(bool)>&& callback)
+{
+    m_insufficientExternalProtectionChangedCallback = WTFMove(callback);
+}
+#endif
+
 void AudioVideoRendererAVFObjC::setVideoFullscreenLayer(PlatformLayer *videoFullscreenLayer, WTF::Function<void()>&& completionHandler)
 {
     RefPtr currentImage = currentNativeImage();
@@ -1230,9 +1237,18 @@ Ref<GenericPromise> AudioVideoRendererAVFObjC::setVideoRenderer(WebSampleBufferV
     videoRenderer->setPreferences(m_preferences);
     // False positive see webkit.org/b/298024
     SUPPRESS_UNRETAINED_ARG videoRenderer->setTimebase([m_synchronizer timebase]);
-    videoRenderer->notifyWhenDecodingErrorOccurred([weakThis = WeakPtr { *this }](NSError *) {
-        if (RefPtr protectedThis = weakThis.get())
+    videoRenderer->notifyWhenDecodingErrorOccurred([weakThis = WeakPtr { *this }](NSError *error) {
+        if (RefPtr protectedThis = weakThis.get()) {
+#if ENABLE(ENCRYPTED_MEDIA)
+            if ([error code] == 'HDCP') {
+                bool obscured = [[[error userInfo] valueForKey:@"obscured"] boolValue];
+                if (protectedThis->m_insufficientExternalProtectionChangedCallback)
+                    protectedThis->m_insufficientExternalProtectionChangedCallback(obscured);
+                return;
+            }
+#endif
             protectedThis->notifyError(PlatformMediaError::VideoDecodingError);
+        }
     });
     videoRenderer->notifyFirstFrameAvailable([weakThis = WeakPtr { *this }](const MediaTime&, double) {
         if (RefPtr protectedThis = weakThis.get())

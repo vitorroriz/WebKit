@@ -138,6 +138,9 @@ public:
     std::optional<VideoPlaybackQualityMetrics> videoPlaybackQualityMetrics() final;
     PlatformLayer* platformVideoLayer() const final;
     void setVideoLayerSizeFenced(const FloatSize&, WTF::MachSendRightAnnotated&&) final;
+#if ENABLE(ENCRYPTED_MEDIA)
+    void notifyInsufficientExternalProtectionChanged(Function<void(bool)>&&) final;
+#endif
 
     // VideoFullscreenInterface
     void setVideoFullscreenLayer(PlatformLayer*, Function<void()>&&) final;
@@ -254,6 +257,9 @@ private:
     Function<void()> m_notifyWhenRequiresFlushToResume;
     Function<void()> m_renderingModeChangedCallback;
     Function<void(const MediaTime&, FloatSize)> m_sizeChangedCallback;
+#if ENABLE(ENCRYPTED_MEDIA)
+    Function<void(bool)> m_insufficientExternalProtectionChangedCallback;
+#endif
 
     RetainPtr<id> m_currentTimeObserver;
     RetainPtr<id> m_performTaskObserver;
