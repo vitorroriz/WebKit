@@ -676,9 +676,6 @@ public:
     bool isGStreamerHolePunchingEnabled();
 #endif
 
-    void beginSimulatedHDCPError();
-    void endSimulatedHDCPError();
-
     String languageOfPrimaryAudioTrack() const;
 
     size_t extraMemoryCost() const;

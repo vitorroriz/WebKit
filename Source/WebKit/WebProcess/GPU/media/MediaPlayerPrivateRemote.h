@@ -434,9 +434,6 @@ private:
 
     void tracksChanged() final;
 
-    void beginSimulatedHDCPError() final;
-    void endSimulatedHDCPError() final;
-
     String languageOfPrimaryAudioTrack() const final;
 
     size_t extraMemoryCost() const final;

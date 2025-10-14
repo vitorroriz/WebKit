@@ -1510,16 +1510,6 @@ void MediaPlayerPrivateRemote::tracksChanged()
     connection().send(Messages::RemoteMediaPlayerProxy::TracksChanged(), m_id);
 }
 
-void MediaPlayerPrivateRemote::beginSimulatedHDCPError()
-{
-    connection().send(Messages::RemoteMediaPlayerProxy::BeginSimulatedHDCPError(), m_id);
-}
-
-void MediaPlayerPrivateRemote::endSimulatedHDCPError()
-{
-    connection().send(Messages::RemoteMediaPlayerProxy::EndSimulatedHDCPError(), m_id);
-}
-
 String MediaPlayerPrivateRemote::languageOfPrimaryAudioTrack() const
 {
     return m_cachedState.languageOfPrimaryAudioTrack;

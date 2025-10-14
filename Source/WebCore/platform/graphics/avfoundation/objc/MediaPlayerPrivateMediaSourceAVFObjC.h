@@ -141,8 +141,6 @@ public:
 #endif
 
     void outputObscuredDueToInsufficientExternalProtectionChanged(bool);
-    void beginSimulatedHDCPError() override { outputObscuredDueToInsufficientExternalProtectionChanged(true); }
-    void endSimulatedHDCPError() override { outputObscuredDueToInsufficientExternalProtectionChanged(false); }
 
 #if ENABLE(LEGACY_ENCRYPTED_MEDIA) || ENABLE(ENCRYPTED_MEDIA)
     void keyNeeded(const SharedBuffer&);

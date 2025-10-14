@@ -976,8 +976,6 @@ enum ContentsFormat {
     [Conditional=VIDEO] sequence<DOMString> mediaResponseContentRanges(HTMLMediaElement media);
     [Conditional=VIDEO] undefined simulateAudioInterruption(HTMLMediaElement element);
     [Conditional=VIDEO] boolean mediaElementHasCharacteristic(HTMLMediaElement element, DOMString characteristic);
-    [Conditional=VIDEO] undefined beginSimulatedHDCPError(HTMLMediaElement media);
-    [Conditional=VIDEO] undefined endSimulatedHDCPError(HTMLMediaElement media);
     [Conditional=VIDEO] boolean mediaPlayerRenderingCanBeAccelerated(HTMLMediaElement media);
 
     [Conditional=VIDEO] boolean elementShouldBufferData(HTMLMediaElement media);

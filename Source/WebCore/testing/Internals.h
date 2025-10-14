@@ -800,8 +800,6 @@ public:
     void simulateAudioInterruption(HTMLMediaElement&);
     ExceptionOr<bool> mediaElementHasCharacteristic(HTMLMediaElement&, const String&);
     void enterViewerMode(HTMLVideoElement&);
-    void beginSimulatedHDCPError(HTMLMediaElement&);
-    void endSimulatedHDCPError(HTMLMediaElement&);
     ExceptionOr<bool> mediaPlayerRenderingCanBeAccelerated(HTMLMediaElement&);
 
     bool elementShouldBufferData(HTMLMediaElement&);

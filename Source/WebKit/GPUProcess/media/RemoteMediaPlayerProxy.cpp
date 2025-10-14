@@ -1123,16 +1123,6 @@ void RemoteMediaPlayerProxy::setShouldContinueAfterKeyNeeded(bool should)
 }
 #endif
 
-void RemoteMediaPlayerProxy::beginSimulatedHDCPError()
-{
-    protectedPlayer()->beginSimulatedHDCPError();
-}
-
-void RemoteMediaPlayerProxy::endSimulatedHDCPError()
-{
-    protectedPlayer()->endSimulatedHDCPError();
-}
-
 void RemoteMediaPlayerProxy::notifyActiveSourceBuffersChanged()
 {
     protectedConnection()->send(Messages::MediaPlayerPrivateRemote::ActiveSourceBuffersChanged(), m_id);

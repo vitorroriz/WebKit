@@ -1716,18 +1716,6 @@ bool MediaPlayer::isGStreamerHolePunchingEnabled()
 }
 #endif
 
-void MediaPlayer::beginSimulatedHDCPError()
-{
-    if (RefPtr privateInterface = m_private)
-        privateInterface->beginSimulatedHDCPError();
-}
-
-void MediaPlayer::endSimulatedHDCPError()
-{
-    if (RefPtr privateInterface = m_private)
-        privateInterface->endSimulatedHDCPError();
-}
-
 String MediaPlayer::languageOfPrimaryAudioTrack() const
 {
     RefPtr playerPrivate = m_private;
