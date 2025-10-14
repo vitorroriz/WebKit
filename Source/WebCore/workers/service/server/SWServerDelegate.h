@@ -33,15 +33,6 @@
 #include <wtf/WeakPtr.h>
 
 namespace WebCore {
-class SWServerDelegate;
-}
-
-namespace WTF {
-template<typename T> struct IsDeprecatedWeakRefSmartPointerException;
-template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::SWServerDelegate> : std::true_type { };
-}
-
-namespace WebCore {
 
 class BackgroundFetchEngine;
 class BackgroundFetchRecordLoader;
@@ -59,6 +50,12 @@ struct WorkerFetchResult;
 class SWServerDelegate : public CanMakeWeakPtr<SWServerDelegate> {
 public:
     virtual ~SWServerDelegate() = default;
+
+    // CanMakeCheckedPtr.
+    virtual uint32_t checkedPtrCount() const = 0;
+    virtual uint32_t checkedPtrCountWithoutThreadCheck() const = 0;
+    virtual void incrementCheckedPtrCount() const = 0;
+    virtual void decrementCheckedPtrCount() const = 0;
 
     virtual void softUpdate(ServiceWorkerJobData&&, bool shouldRefreshCache, ResourceRequest&&, CompletionHandler<void(WorkerFetchResult&&)>&&) = 0;
     virtual void createContextConnection(const Site&, std::optional<ProcessIdentifier>, std::optional<ScriptExecutionContextIdentifier>, CompletionHandler<void()>&&) = 0;
