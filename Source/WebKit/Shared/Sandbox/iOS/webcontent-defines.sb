@@ -391,7 +391,6 @@
     (syscall-number
         SYS_fgetxattr
         SYS_getxattr
-        SYS_iopolicysys
         SYS_psynch_rw_wrlock
 #if ASAN_ENABLED
         SYS_sigaltstack
