@@ -55,16 +55,17 @@
 #include <wtf/text/TextStream.h>
 
 namespace WebCore {
+namespace CSSCalc {
 
-RefPtr<CSSCalcValue> CSSCalcValue::parse(CSSParserTokenRange& tokens, CSS::PropertyParserState& state, CSS::Category category, CSS::Range range, CSSCalcSymbolsAllowed symbolsAllowed, CSSPropertyParserOptions propertyOptions)
+RefPtr<Value> Value::parse(CSSParserTokenRange& tokens, CSS::PropertyParserState& state, CSS::Category category, CSS::Range range, CSSCalcSymbolsAllowed symbolsAllowed, CSSPropertyParserOptions propertyOptions)
 {
-    auto parserOptions = CSSCalc::ParserOptions {
+    auto parserOptions = ParserOptions {
         .category = category,
         .range = range,
         .allowedSymbols = WTFMove(symbolsAllowed),
         .propertyOptions = propertyOptions
     };
-    auto simplificationOptions = CSSCalc::SimplificationOptions {
+    auto simplificationOptions = SimplificationOptions {
         .category = category,
         .range = range,
         .conversionData = std::nullopt,
@@ -72,36 +73,36 @@ RefPtr<CSSCalcValue> CSSCalcValue::parse(CSSParserTokenRange& tokens, CSS::Prope
         .allowZeroValueLengthRemovalFromSum = false,
     };
 
-    auto tree = CSSCalc::parseAndSimplify(tokens, state, parserOptions, simplificationOptions);
+    auto tree = parseAndSimplify(tokens, state, parserOptions, simplificationOptions);
     if (!tree)
         return nullptr;
 
-    RefPtr result = adoptRef(new CSSCalcValue(category, range, WTFMove(*tree)));
-    LOG_WITH_STREAM(Calc, stream << "CSSCalcValue::create " << *result);
+    RefPtr result = adoptRef(new Value(category, range, WTFMove(*tree)));
+    LOG_WITH_STREAM(Calc, stream << "Value::create " << *result);
     return result;
 }
 
-Ref<CSSCalcValue> CSSCalcValue::create(const Style::CalculationValue& value, const RenderStyle& style)
+Ref<Value> Value::create(const Style::CalculationValue& value, const RenderStyle& style)
 {
-    auto tree = CSSCalc::fromStyleCalculationValue(value, style);
-    Ref result = adoptRef(*new CSSCalcValue(value.category(), { value.range().min, value.range().max }, WTFMove(tree)));
-    LOG_WITH_STREAM(Calc, stream << "CSSCalcValue::create from Style::CalculationValue: " << result);
+    auto tree = fromStyleCalculationValue(value, style);
+    Ref result = adoptRef(*new Value(value.category(), { value.range().min, value.range().max }, WTFMove(tree)));
+    LOG_WITH_STREAM(Calc, stream << "Value::create from Style::CalculationValue: " << result);
     return result;
 }
 
-Ref<CSSCalcValue> CSSCalcValue::create(CSS::Category category, CSS::Range range, CSSCalc::Tree&& tree)
+Ref<Value> Value::create(CSS::Category category, CSS::Range range, CSSCalc::Tree&& tree)
 {
-    return adoptRef(*new CSSCalcValue(category, range, WTFMove(tree)));
+    return adoptRef(*new Value(category, range, WTFMove(tree)));
 }
 
-Ref<CSSCalcValue> CSSCalcValue::copySimplified(const CSSToLengthConversionData& conversionData) const
+Ref<Value> Value::copySimplified(const CSSToLengthConversionData& conversionData) const
 {
     return copySimplified(conversionData, { });
 }
 
-Ref<CSSCalcValue> CSSCalcValue::copySimplified(const CSSToLengthConversionData& conversionData, const CSSCalcSymbolTable& symbolTable) const
+Ref<Value> Value::copySimplified(const CSSToLengthConversionData& conversionData, const CSSCalcSymbolTable& symbolTable) const
 {
-    auto simplificationOptions = CSSCalc::SimplificationOptions {
+    auto simplificationOptions = SimplificationOptions {
         .category = m_category,
         .range = m_range,
         .conversionData = conversionData,
@@ -110,19 +111,19 @@ Ref<CSSCalcValue> CSSCalcValue::copySimplified(const CSSToLengthConversionData& 
     };
 
     if (!canSimplify(m_tree, simplificationOptions))
-        return const_cast<CSSCalcValue&>(*this);
+        return const_cast<Value&>(*this);
 
     return create(m_category, m_range, copyAndSimplify(m_tree, simplificationOptions));
 }
 
-Ref<CSSCalcValue> CSSCalcValue::copySimplified(NoConversionDataRequiredToken token) const
+Ref<Value> Value::copySimplified(NoConversionDataRequiredToken token) const
 {
     return copySimplified(token, { });
 }
 
-Ref<CSSCalcValue> CSSCalcValue::copySimplified(NoConversionDataRequiredToken, const CSSCalcSymbolTable& symbolTable) const
+Ref<Value> Value::copySimplified(NoConversionDataRequiredToken, const CSSCalcSymbolTable& symbolTable) const
 {
-    auto simplificationOptions = CSSCalc::SimplificationOptions {
+    auto simplificationOptions = SimplificationOptions {
         .category = m_category,
         .range = m_range,
         .conversionData = std::nullopt,
@@ -131,22 +132,21 @@ Ref<CSSCalcValue> CSSCalcValue::copySimplified(NoConversionDataRequiredToken, co
     };
 
     if (!canSimplify(m_tree, simplificationOptions))
-        return const_cast<CSSCalcValue&>(*this);
+        return const_cast<Value&>(*this);
 
     return create(m_category, m_range, copyAndSimplify(m_tree, simplificationOptions));
 }
 
-CSSCalcValue::CSSCalcValue(CSS::Category category, CSS::Range range, CSSCalc::Tree&& tree)
-    : CSSValue(ClassType::Calculation)
-    , m_category(category)
+Value::Value(CSS::Category category, CSS::Range range, CSSCalc::Tree&& tree)
+    : m_category(category)
     , m_range(range)
     , m_tree(WTFMove(tree))
 {
 }
 
-CSSCalcValue::~CSSCalcValue() = default;
+Value::~Value() = default;
 
-CSSUnitType CSSCalcValue::primitiveType() const
+CSSUnitType Value::primitiveType() const
 {
     // This returns the CSSUnitType associated with the value returned by doubleValue, or, if CSSUnitType::CSS_CALC_PERCENTAGE_WITH_LENGTH, that a call to createCalculationValue() is needed.
 
@@ -172,13 +172,13 @@ CSSUnitType CSSCalcValue::primitiveType() const
     case CSS::Category::LengthPercentage:
         if (!m_tree.type.percentHint)
             return CSSUnitType::CSS_PX;
-        if (WTF::holdsAlternative<CSSCalc::Percentage>(m_tree.root))
+        if (WTF::holdsAlternative<Percentage>(m_tree.root))
             return CSSUnitType::CSS_PERCENTAGE;
         return CSSUnitType::CSS_CALC_PERCENTAGE_WITH_LENGTH;
     case CSS::Category::AnglePercentage:
         if (!m_tree.type.percentHint)
             return CSSUnitType::CSS_DEG;
-        if (WTF::holdsAlternative<CSSCalc::Percentage>(m_tree.root))
+        if (WTF::holdsAlternative<Percentage>(m_tree.root))
             return CSSUnitType::CSS_PERCENTAGE;
         return CSSUnitType::CSS_CALC_PERCENTAGE_WITH_ANGLE;
     }
@@ -187,26 +187,26 @@ CSSUnitType CSSCalcValue::primitiveType() const
     return CSSUnitType::CSS_NUMBER;
 }
 
-void CSSCalcValue::collectComputedStyleDependencies(ComputedStyleDependencies& dependencies) const
+void Value::collectComputedStyleDependencies(ComputedStyleDependencies& dependencies) const
 {
-    CSSCalc::collectComputedStyleDependencies(m_tree, dependencies);
+    WebCore::CSSCalc::collectComputedStyleDependencies(m_tree, dependencies);
 }
 
-String CSSCalcValue::customCSSText(const CSS::SerializationContext& context) const
+String Value::cssText(const CSS::SerializationContext& context) const
 {
-    auto options = CSSCalc::SerializationOptions {
+    auto options = SerializationOptions {
         .range = m_range,
         .serializationContext = context,
     };
-    return CSSCalc::serializationForCSS(m_tree, options);
+    return serializationForCSS(m_tree, options);
 }
 
-bool CSSCalcValue::equals(const CSSCalcValue& other) const
+bool Value::equals(const Value& other) const
 {
     return m_tree.root == other.m_tree.root;
 }
 
-inline double CSSCalcValue::clampToPermittedRange(double value) const
+inline double Value::clampToPermittedRange(double value) const
 {
     // If a top-level calculation would produce a value whose numeric part is NaN,
     // it instead act as though the numeric part is 0.
@@ -223,115 +223,116 @@ inline double CSSCalcValue::clampToPermittedRange(double value) const
     return std::clamp(value, m_range.min, m_range.max);
 }
 
-double CSSCalcValue::doubleValue(const CSSToLengthConversionData& conversionData) const
+double Value::doubleValue(const CSSToLengthConversionData& conversionData) const
 {
     return doubleValue(conversionData, { });
 }
 
-double CSSCalcValue::doubleValue(const CSSToLengthConversionData& conversionData, const CSSCalcSymbolTable& symbolTable) const
+double Value::doubleValue(const CSSToLengthConversionData& conversionData, const CSSCalcSymbolTable& symbolTable) const
 {
-    auto options = CSSCalc::EvaluationOptions {
+    auto options = EvaluationOptions {
         .category = m_category,
         .range = m_range,
         .conversionData = conversionData,
         .symbolTable = symbolTable
     };
-    return clampToPermittedRange(CSSCalc::evaluateDouble(m_tree, options).value_or(0));
+    return clampToPermittedRange(evaluateDouble(m_tree, options).value_or(0));
 }
 
-double CSSCalcValue::doubleValue(NoConversionDataRequiredToken token) const
+double Value::doubleValue(NoConversionDataRequiredToken token) const
 {
     return doubleValue(token, { });
 }
 
-double CSSCalcValue::doubleValue(NoConversionDataRequiredToken, const CSSCalcSymbolTable& symbolTable) const
+double Value::doubleValue(NoConversionDataRequiredToken, const CSSCalcSymbolTable& symbolTable) const
 {
-    auto options = CSSCalc::EvaluationOptions {
+    auto options = EvaluationOptions {
         .category = m_category,
         .range = m_range,
         .conversionData = std::nullopt,
         .symbolTable = symbolTable,
     };
-    return clampToPermittedRange(CSSCalc::evaluateDouble(m_tree, options).value_or(0));
+    return clampToPermittedRange(evaluateDouble(m_tree, options).value_or(0));
 }
 
-double CSSCalcValue::doubleValueDeprecated() const
+double Value::doubleValueDeprecated() const
 {
     if (m_tree.requiresConversionData)
-        ALWAYS_LOG_WITH_STREAM(stream << "ERROR: The value returned from CSSCalcValue::doubleValueDeprecated is likely incorrect as the calculation tree has unresolved units that require CSSToLengthConversionData to interpret. Update caller to use non-deprecated variant of this function.");
+        ALWAYS_LOG_WITH_STREAM(stream << "ERROR: The value returned from Value::doubleValueDeprecated is likely incorrect as the calculation tree has unresolved units that require CSSToLengthConversionData to interpret. Update caller to use non-deprecated variant of this function.");
 
     return doubleValue(NoConversionDataRequiredToken { });
 }
 
-double CSSCalcValue::computeLengthPx(const CSSToLengthConversionData& conversionData) const
+double Value::computeLengthPx(const CSSToLengthConversionData& conversionData) const
 {
     return computeLengthPx(conversionData, { });
 }
 
-double CSSCalcValue::computeLengthPx(const CSSToLengthConversionData& conversionData, const CSSCalcSymbolTable& symbolTable) const
+double Value::computeLengthPx(const CSSToLengthConversionData& conversionData, const CSSCalcSymbolTable& symbolTable) const
 {
-    auto options = CSSCalc::EvaluationOptions {
+    auto options = EvaluationOptions {
         .category = m_category,
         .range = m_range,
         .conversionData = conversionData,
         .symbolTable = symbolTable
     };
-    return clampToPermittedRange(Style::computeNonCalcLengthDouble(CSSCalc::evaluateDouble(m_tree, options).value_or(0), CSS::LengthUnit::Px, conversionData));
+    return clampToPermittedRange(Style::computeNonCalcLengthDouble(evaluateDouble(m_tree, options).value_or(0), CSS::LengthUnit::Px, conversionData));
 }
 
-Ref<Style::CalculationValue> CSSCalcValue::createCalculationValue(const CSSToLengthConversionData& conversionData) const
+Ref<Style::CalculationValue> Value::createCalculationValue(const CSSToLengthConversionData& conversionData) const
 {
     return createCalculationValue(conversionData, { });
 }
 
-Ref<Style::CalculationValue> CSSCalcValue::createCalculationValue(const CSSToLengthConversionData& conversionData, const CSSCalcSymbolTable& symbolTable) const
+Ref<Style::CalculationValue> Value::createCalculationValue(const CSSToLengthConversionData& conversionData, const CSSCalcSymbolTable& symbolTable) const
 {
-    auto options = CSSCalc::EvaluationOptions {
+    auto options = EvaluationOptions {
         .category = m_category,
         .range = m_range,
         .conversionData = conversionData,
         .symbolTable = symbolTable
     };
-    return CSSCalc::toStyleCalculationValue(m_tree, options);
+    return toStyleCalculationValue(m_tree, options);
 }
 
-Ref<Style::CalculationValue> CSSCalcValue::createCalculationValue(NoConversionDataRequiredToken token) const
+Ref<Style::CalculationValue> Value::createCalculationValue(NoConversionDataRequiredToken token) const
 {
     return createCalculationValue(token, { });
 }
 
-Ref<Style::CalculationValue> CSSCalcValue::createCalculationValue(NoConversionDataRequiredToken, const CSSCalcSymbolTable& symbolTable) const
+Ref<Style::CalculationValue> Value::createCalculationValue(NoConversionDataRequiredToken, const CSSCalcSymbolTable& symbolTable) const
 {
     ASSERT(!m_tree.requiresConversionData);
 
-    auto options = CSSCalc::EvaluationOptions {
+    auto options = EvaluationOptions {
         .category = m_category,
         .range = m_range,
         .conversionData = std::nullopt,
         .symbolTable = symbolTable
     };
-    return CSSCalc::toStyleCalculationValue(m_tree, options);
+    return toStyleCalculationValue(m_tree, options);
 }
 
-void CSSCalcValue::dump(TextStream& ts) const
+void Value::dump(TextStream& ts) const
 {
-    ts << indent << '(' << "CSSCalcValue"_s;
+    ts << indent << '(' << "Value"_s;
 
     TextStream multilineStream;
     multilineStream.setIndent(ts.indent() + 2);
 
     multilineStream.dumpProperty("minimum value"_s, m_range.min);
     multilineStream.dumpProperty("maximum value"_s, m_range.max);
-    multilineStream.dumpProperty("expression"_s, customCSSText(CSS::defaultSerializationContext()));
+    multilineStream.dumpProperty("expression"_s, cssText(CSS::defaultSerializationContext()));
 
     ts << multilineStream.release();
     ts << ")\n"_s;
 }
 
-TextStream& operator<<(TextStream& ts, const CSSCalcValue& value)
+TextStream& operator<<(TextStream& ts, const Value& value)
 {
     value.dump(ts);
     return ts;
 }
 
+} // namespace CSSCalc
 } // namespace WebCore

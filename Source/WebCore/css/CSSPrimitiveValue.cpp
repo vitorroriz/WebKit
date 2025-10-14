@@ -303,7 +303,7 @@ CSSPrimitiveValue::CSSPrimitiveValue(StaticCSSValueTag, ImplicitInitialValueTag)
     m_isImplicitInitialValue = true;
 }
 
-CSSPrimitiveValue::CSSPrimitiveValue(Ref<CSSCalcValue> value)
+CSSPrimitiveValue::CSSPrimitiveValue(Ref<CSSCalc::Value> value)
     : CSSValue(ClassType::Primitive)
 {
     setPrimitiveUnitType(CSSUnitType::CSS_CALC);
@@ -466,7 +466,7 @@ Ref<CSSPrimitiveValue> CSSPrimitiveValue::create(String value)
     return adoptRef(*new CSSPrimitiveValue(WTFMove(value), CSSUnitType::CSS_STRING));
 }
 
-Ref<CSSPrimitiveValue> CSSPrimitiveValue::create(Ref<CSSCalcValue> value)
+Ref<CSSPrimitiveValue> CSSPrimitiveValue::create(Ref<CSSCalc::Value> value)
 {
     return adoptRef(*new CSSPrimitiveValue(WTFMove(value)));
 }
@@ -1272,15 +1272,6 @@ void CSSPrimitiveValue::collectComputedStyleDependencies(ComputedStyleDependenci
 
     if (auto lengthUnit = CSS::toLengthUnit(primitiveUnitType()))
         CSS::collectComputedStyleDependencies(dependencies, *lengthUnit);
-}
-
-IterationStatus CSSPrimitiveValue::customVisitChildren(NOESCAPE const Function<IterationStatus(CSSValue&)>& func) const
-{
-    if (RefPtr calc = cssCalcValue()) {
-        if (func(const_cast<CSSCalcValue&>(*calc)) == IterationStatus::Done)
-            return IterationStatus::Done;
-    }
-    return IterationStatus::Continue;
 }
 
 } // namespace WebCore

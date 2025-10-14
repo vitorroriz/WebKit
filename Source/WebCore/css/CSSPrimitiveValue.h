@@ -106,7 +106,7 @@ public:
     static Ref<CSSPrimitiveValue> create(double);
     static Ref<CSSPrimitiveValue> create(double, CSSUnitType);
     static Ref<CSSPrimitiveValue> createInteger(double);
-    static Ref<CSSPrimitiveValue> create(Ref<CSSCalcValue>);
+    static Ref<CSSPrimitiveValue> create(Ref<CSSCalc::Value>);
     static Ref<CSSPrimitiveValue> create(Ref<CSSAttrValue>);
 
     static inline Ref<CSSPrimitiveValue> create(CSSValueID);
@@ -194,8 +194,8 @@ public:
     std::optional<bool> isNegative() const;
 
     WEBCORE_EXPORT String stringValue() const;
-    const CSSCalcValue* cssCalcValue() const { return isCalculated() ? m_value.calc : nullptr; }
-    RefPtr<const CSSCalcValue> protectedCssCalcValue() const { return cssCalcValue(); }
+    const CSSCalc::Value* cssCalcValue() const { return isCalculated() ? m_value.calc : nullptr; }
+    RefPtr<const CSSCalc::Value> protectedCssCalcValue() const { return cssCalcValue(); }
     const CSSAttrValue* cssAttrValue() const { return isAttr() ? m_value.attr : nullptr; }
     RefPtr<const CSSAttrValue> protectedCssAttrValue() const { return cssAttrValue(); }
 
@@ -205,10 +205,7 @@ public:
 
     static ASCIILiteral unitTypeString(CSSUnitType);
 
-
     void collectComputedStyleDependencies(ComputedStyleDependencies&) const;
-
-    IterationStatus customVisitChildren(NOESCAPE const Function<IterationStatus(CSSValue&)>&) const;
 
 private:
     friend class CSSValuePool;
@@ -219,7 +216,7 @@ private:
     explicit CSSPrimitiveValue(CSSPropertyID);
     CSSPrimitiveValue(const String&, CSSUnitType);
     CSSPrimitiveValue(double, CSSUnitType);
-    explicit CSSPrimitiveValue(Ref<CSSCalcValue>);
+    explicit CSSPrimitiveValue(Ref<CSSCalc::Value>);
     explicit CSSPrimitiveValue(Ref<CSSAttrValue>);
 
     CSSPrimitiveValue(StaticCSSValueTag, CSSValueID);
@@ -272,7 +269,7 @@ private:
         CSSValueID valueID;
         double number;
         StringImpl* string;
-        const CSSCalcValue* calc;
+        const CSSCalc::Value* calc;
         const CSSAttrValue* attr;
     } m_value;
 };

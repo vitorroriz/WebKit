@@ -76,7 +76,6 @@ public:
     bool isBorderImageSliceValue() const { return m_classType == ClassType::BorderImageSlice; }
     bool isBorderImageWidthValue() const { return m_classType == ClassType::BorderImageWidth; }
     bool isBoxShadowPropertyValue() const { return m_classType == ClassType::BoxShadowProperty; }
-    bool isCalcValue() const { return m_classType == ClassType::Calculation; }
     bool isCanvasValue() const { return m_classType == ClassType::Canvas; }
     bool isColor() const { return m_classType == ClassType::Color; }
 #if ENABLE(DARK_MODE_CSS)
@@ -223,7 +222,6 @@ protected:
         BorderImageSlice,
         BorderImageWidth,
         BoxShadowProperty,
-        Calculation,
         Color,
 #if ENABLE(DARK_MODE_CSS)
         ColorScheme,
