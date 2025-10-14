@@ -925,7 +925,6 @@
 		E3EE4E962E8A34BC00398282 /* ulocale.h in Headers */ = {isa = PBXBuildFile; fileRef = E3EE4E8C2E8A34BC00398282 /* ulocale.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E3EE4E972E8A34BC00398282 /* unumberoptions.h in Headers */ = {isa = PBXBuildFile; fileRef = E3EE4E8E2E8A34BC00398282 /* unumberoptions.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E3EE4E982E8A34BC00398282 /* ulocbuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = E3EE4E8D2E8A34BC00398282 /* ulocbuilder.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		E42785652E9BC0F200A0DEF4 /* EnumSet.h in Headers */ = {isa = PBXBuildFile; fileRef = E42785642E9BC0F200A0DEF4 /* EnumSet.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E4A0AD391A96245500536DF6 /* WorkQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4A0AD371A96245500536DF6 /* WorkQueue.cpp */; };
 		E4A0AD3D1A96253C00536DF6 /* WorkQueueCocoa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4A0AD3C1A96253C00536DF6 /* WorkQueueCocoa.cpp */; };
 		EB2C86D9267B275D0052CB9A /* CPUTimePOSIX.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB2C86D8267B275C0052CB9A /* CPUTimePOSIX.cpp */; };
@@ -2003,7 +2002,6 @@
 		E3EE4E8F2E8A34BC00398282 /* usimplenumberformatter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = usimplenumberformatter.h; sourceTree = "<group>"; };
 		E3FD6D6627A1F6AD00935000 /* GenericHashKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GenericHashKey.h; sourceTree = "<group>"; };
 		E419F2E623AB9E2300B26129 /* VectorHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VectorHash.h; sourceTree = "<group>"; };
-		E42785642E9BC0F200A0DEF4 /* EnumSet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnumSet.h; sourceTree = "<group>"; };
 		E4A0AD371A96245500536DF6 /* WorkQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorkQueue.cpp; sourceTree = "<group>"; };
 		E4A0AD381A96245500536DF6 /* WorkQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorkQueue.h; sourceTree = "<group>"; };
 		E4A0AD3C1A96253C00536DF6 /* WorkQueueCocoa.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorkQueueCocoa.cpp; sourceTree = "<group>"; };
@@ -2386,7 +2384,6 @@
 				E3538D4C276220880075DA50 /* EmbeddedFixedVector.h */,
 				5338EBA423AB04D100382662 /* EnumClassOperatorOverloads.h */,
 				1CFD5D3B2851AB3E00A0E30B /* EnumeratedArray.h */,
-				E42785642E9BC0F200A0DEF4 /* EnumSet.h */,
 				1AEA88E11D6BBCF400E5AD64 /* EnumTraits.h */,
 				AD7C434A1DD2A4A70026888B /* Expected.h */,
 				DF292D55278F9BC600BB2918 /* ExperimentalFeatureNames.h */,
@@ -3529,7 +3526,6 @@
 				DDF3076327C086CD006A526F /* Entitlements.h in Headers */,
 				DD3DC97827A4BF8E007E5B61 /* EnumClassOperatorOverloads.h in Headers */,
 				1CFD5D3D2851AB3E00A0E30B /* EnumeratedArray.h in Headers */,
-				E42785652E9BC0F200A0DEF4 /* EnumSet.h in Headers */,
 				DD3DC88C27A4BF8E007E5B61 /* EnumTraits.h in Headers */,
 				93853DD328755A6C00FF4E2B /* EscapedFormsForJSON.h in Headers */,
 				DD3DC87C27A4BF8E007E5B61 /* Expected.h in Headers */,

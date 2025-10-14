@@ -72,7 +72,7 @@ public:
 
     void clearMatchedRules();
 
-    EnumSet<PseudoId> matchedPseudoElementIds() const { return m_matchedPseudoElementIds; }
+    const PseudoIdSet& matchedPseudoElementIds() const { return m_matchedPseudoElementIds; }
     const Relations& styleRelations() const { return m_styleRelations; }
 
     void addAuthorKeyframeRules(const StyleRuleKeyframe&);
@@ -135,7 +135,7 @@ private:
     Vector<RefPtr<const StyleRule>> m_matchedRuleList;
     Ref<MatchResult> m_result;
     Relations m_styleRelations;
-    EnumSet<PseudoId> m_matchedPseudoElementIds;
+    PseudoIdSet m_matchedPseudoElementIds;
 };
 
 }
