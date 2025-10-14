@@ -29,6 +29,7 @@
 #include <limits>
 #include <optional>
 #include <type_traits>
+#include <wtf/EnumSet.h>
 #include <wtf/EnumTraits.h>
 
 namespace WTF {
@@ -83,9 +84,8 @@ enum class StyleDifferenceContextSensitiveProperty : uint8_t {
     WillChange  = 1 << 5,
 };
 
-// Static pseudo styles. Dynamic ones are produced on the fly.
-enum class PseudoId : uint32_t {
-    // The order must be None, public IDs, and then internal IDs.
+enum class PseudoId : uint8_t {
+    // FIXME: Get rid of the None value, use std::optional<PseudoId> instead.
     None,
 
     // Public:
@@ -116,13 +116,40 @@ enum class PseudoId : uint32_t {
     WebKitResizer,
     InternalWritingSuggestions,
 
-    AfterLastInternalPseudoId,
-
-    FirstPublicPseudoId = FirstLine,
-    FirstInternalPseudoId = WebKitScrollbarThumb,
+    HighestEnumValue = InternalWritingSuggestions
 };
 
-constexpr auto PublicPseudoIdMask = static_cast<std::underlying_type_t<PseudoId>>(((1U << enumToUnderlyingType(PseudoId::FirstInternalPseudoId)) - 1U) & ~((1U << enumToUnderlyingType(PseudoId::FirstPublicPseudoId)) - 1U));
+constexpr auto allPublicPseudoIds = EnumSet {
+    PseudoId::FirstLine,
+    PseudoId::FirstLetter,
+    PseudoId::GrammarError,
+    PseudoId::Highlight,
+    PseudoId::Marker,
+    PseudoId::Before,
+    PseudoId::After,
+    PseudoId::Selection,
+    PseudoId::Backdrop,
+    PseudoId::WebKitScrollbar,
+    PseudoId::SpellingError,
+    PseudoId::TargetText,
+    PseudoId::ViewTransition,
+    PseudoId::ViewTransitionGroup,
+    PseudoId::ViewTransitionImagePair,
+    PseudoId::ViewTransitionOld,
+    PseudoId::ViewTransitionNew
+};
+
+constexpr auto allInternalPseudoIds = EnumSet {
+    PseudoId::WebKitScrollbarThumb,
+    PseudoId::WebKitScrollbarButton,
+    PseudoId::WebKitScrollbarTrack,
+    PseudoId::WebKitScrollbarTrackPiece,
+    PseudoId::WebKitScrollbarCorner,
+    PseudoId::WebKitResizer,
+    PseudoId::InternalWritingSuggestions,
+};
+
+constexpr auto allPseudoIds = allPublicPseudoIds | allInternalPseudoIds;
 
 inline std::optional<PseudoId> parentPseudoElement(PseudoId pseudoId)
 {
@@ -135,76 +162,6 @@ inline std::optional<PseudoId> parentPseudoElement(PseudoId pseudoId)
     default: return std::nullopt;
     }
 }
-
-class PseudoIdSet {
-public:
-    PseudoIdSet()
-        : m_data(0)
-    {
-    }
-
-    PseudoIdSet(std::initializer_list<PseudoId> initializerList)
-        : m_data(0)
-    {
-        for (PseudoId pseudoId : initializerList)
-            add(pseudoId);
-    }
-
-    static PseudoIdSet fromMask(unsigned rawPseudoIdSet)
-    {
-        return PseudoIdSet(rawPseudoIdSet);
-    }
-
-    bool has(PseudoId pseudoId) const
-    {
-        ASSERT((sizeof(m_data) * 8) > static_cast<unsigned>(pseudoId));
-        return m_data & (1U << static_cast<unsigned>(pseudoId));
-    }
-
-    void add(PseudoId pseudoId)
-    {
-        ASSERT((sizeof(m_data) * 8) > static_cast<unsigned>(pseudoId));
-        m_data |= (1U << static_cast<unsigned>(pseudoId));
-    }
-
-    void remove(PseudoId pseudoId)
-    {
-        ASSERT((sizeof(m_data) * 8) > static_cast<unsigned>(pseudoId));
-        m_data &= ~(1U << static_cast<unsigned>(pseudoId));
-    }
-
-    void merge(PseudoIdSet source)
-    {
-        m_data |= source.m_data;
-    }
-
-    PseudoIdSet operator &(const PseudoIdSet& pseudoIdSet) const
-    {
-        return PseudoIdSet(m_data & pseudoIdSet.m_data);
-    }
-
-    PseudoIdSet operator |(const PseudoIdSet& pseudoIdSet) const
-    {
-        return PseudoIdSet(m_data | pseudoIdSet.m_data);
-    }
-
-    explicit operator bool() const
-    {
-        return m_data;
-    }
-
-    unsigned data() const { return m_data; }
-
-    static constexpr ptrdiff_t dataMemoryOffset() { return OBJECT_OFFSETOF(PseudoIdSet, m_data); }
-
-private:
-    explicit PseudoIdSet(unsigned rawPseudoIdSet)
-        : m_data(rawPseudoIdSet)
-    {
-    }
-
-    unsigned m_data;
-};
 
 enum class ColumnFill : bool {
     Balance,

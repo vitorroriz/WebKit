@@ -64,7 +64,6 @@ class LayoutSize;
 class LayoutUnit;
 class OutlineValue;
 class PositionArea;
-class PseudoIdSet;
 class RenderElement;
 class RenderStyle;
 class SVGRenderStyle;
@@ -177,7 +176,7 @@ enum class PointerEvents : uint8_t;
 enum class PositionType : uint8_t;
 enum class PositionVisibility : uint8_t;
 enum class PrintColorAdjust : bool;
-enum class PseudoId : uint32_t;
+enum class PseudoId : uint8_t;
 enum class Resize : uint8_t;
 enum class RubyPosition : uint8_t;
 enum class RubyAlign : uint8_t;
@@ -501,8 +500,8 @@ public:
     StyleSelfAlignmentData resolvedJustifySelf(const RenderStyle* parentStyle, ItemPosition normalValueBehavior) const;
     StyleContentAlignmentData resolvedJustifyContent(const StyleContentAlignmentData& normalValueBehavior) const;
 
-    PseudoId pseudoElementType() const { return static_cast<PseudoId>(m_nonInheritedFlags.pseudoElementType); }
-    void setPseudoElementType(PseudoId pseudoElementType) { m_nonInheritedFlags.pseudoElementType = static_cast<unsigned>(pseudoElementType); }
+    PseudoId pseudoElementType() const;
+    void setPseudoElementType(PseudoId);
     const AtomString& pseudoElementNameArgument() const;
     void setPseudoElementNameArgument(const AtomString&);
 
@@ -570,7 +569,7 @@ public:
 
     inline bool hasAnyPublicPseudoStyles() const;
     inline bool hasPseudoStyle(PseudoId) const;
-    inline void setHasPseudoStyles(PseudoIdSet);
+    inline void setHasPseudoStyles(EnumSet<PseudoId>);
 
     inline bool hasDisplayAffectedByAnimations() const;
     inline void setHasDisplayAffectedByAnimations();
@@ -2513,7 +2512,7 @@ private:
 
         inline bool hasAnyPublicPseudoStyles() const;
         bool hasPseudoStyle(PseudoId) const;
-        void setHasPseudoStyles(PseudoIdSet);
+        void setHasPseudoStyles(EnumSet<PseudoId>);
 
 #if !LOG_DISABLED
         void dumpDifferences(TextStream&, const NonInheritedFlags&) const;

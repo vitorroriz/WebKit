@@ -82,6 +82,7 @@ set(WTF_PUBLIC_HEADERS
     DoublyLinkedList.h
     EmbeddedFixedVector.h
     EnumClassOperatorOverloads.h
+    EnumSet.h
     EnumTraits.h
     EnumeratedArray.h
     Expected.h
