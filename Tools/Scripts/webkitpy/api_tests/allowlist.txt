@@ -444,7 +444,6 @@ TestWebKitAPI.WKApplicationManifest
 TestWebKitAPI.WKAttachmentTestsIOS
 TestWebKitAPI.WKBackForwardList
 TestWebKitAPI.WKBrowsingContextLoadDelegateTest
-TestWebKitAPI.WKInspectorDelegate
 TestWebKitAPI.WKInspectorExtensionDelegate
 TestWebKitAPI.WKInspectorExtensionHost
 TestWebKitAPI.WKPreferencesPrivate
