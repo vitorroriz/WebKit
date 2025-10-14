@@ -137,6 +137,7 @@ public:
     static RefPtr<CSSValue> extractWebkitColumnBreakInsideShorthand(ExtractorState&);
     static RefPtr<CSSValue> extractWebkitMaskBoxImageShorthand(ExtractorState&);
     static RefPtr<CSSValue> extractWebkitMaskPositionShorthand(ExtractorState&);
+    static RefPtr<CSSValue> extractMarkerShorthand(ExtractorState&);
 
     // MARK: Custom Serialization
 
@@ -225,6 +226,7 @@ public:
     static void extractWebkitColumnBreakInsideShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractWebkitMaskBoxImageShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractWebkitMaskPositionShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
+    static void extractMarkerShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
 };
 
 template<CSSPropertyID> struct PropertyExtractorAdaptor;
@@ -3133,6 +3135,25 @@ inline void ExtractorCustom::extractWidowsSerialization(ExtractorState& state, S
 inline void ExtractorCustom::extractOrphansSerialization(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context)
 {
     extractSerialization<CSSPropertyOrphans>(state, builder, context);
+}
+
+inline void ExtractorCustom::extractMarkerShorthandSerialization(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context)
+{
+    auto markerStart = state.style.markerStart();
+    auto markerMid = state.style.markerMid();
+    auto markerEnd = state.style.markerEnd();
+    if (markerStart == markerMid && markerMid == markerEnd)
+        serializationForCSS(builder, context, state.style, markerStart);
+}
+
+inline RefPtr<CSSValue> ExtractorCustom::extractMarkerShorthand(ExtractorState& state)
+{
+    auto markerStart = state.style.markerStart();
+    auto markerMid = state.style.markerMid();
+    auto markerEnd = state.style.markerEnd();
+    if (markerStart == markerMid && markerMid == markerEnd)
+        return createCSSValue(state.pool, state.style, markerStart);
+    return nullptr;
 }
 
 } // namespace Style
