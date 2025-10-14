@@ -3,7 +3,6 @@ UIProcess/API/C/mac/WKPagePrivateMac.mm
 UIProcess/API/Cocoa/WKContentWorld.mm
 UIProcess/API/Cocoa/WKFrameInfo.mm
 UIProcess/API/Cocoa/WKOpenPanelParameters.mm
-UIProcess/API/Cocoa/WKPreferences.mm
 UIProcess/API/Cocoa/WKProcessPool.mm
 UIProcess/API/Cocoa/WKScriptMessage.mm
 UIProcess/API/Cocoa/WKURLSchemeTask.mm
