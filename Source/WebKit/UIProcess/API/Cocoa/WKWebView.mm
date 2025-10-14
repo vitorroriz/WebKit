@@ -458,6 +458,9 @@ static uint32_t convertSystemLayoutDirection(NSUserInterfaceLayoutDirection dire
     RetainPtr screenTimeView = [_screenTimeWebpageController view];
 
     if ([_configuration showsSystemScreenTimeBlockingView]) {
+#if PLATFORM(MAC)
+        [screenTimeView _setHostsAutolayoutEngine:YES];
+#endif
         [screenTimeView setFrame:self.bounds];
         [self addSubview:screenTimeView.get()];
     }
