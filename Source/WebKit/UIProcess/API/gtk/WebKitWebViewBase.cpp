@@ -66,8 +66,11 @@
 #include <WebCore/ActivityState.h>
 #include <WebCore/GRefPtrGtk.h>
 #include <WebCore/GUniquePtrGtk.h>
+#include <WebCore/GdkCairoUtilities.h>
+#include <WebCore/GdkSkiaUtilities.h>
 #include <WebCore/GtkUtilities.h>
 #include <WebCore/GtkVersioning.h>
+#include <WebCore/Image.h>
 #include <WebCore/NativeImage.h>
 #include <WebCore/NotImplemented.h>
 #include <WebCore/PlatformMouseEvent.h>
@@ -87,6 +90,7 @@
 #include <wtf/Compiler.h>
 #include <wtf/HashMap.h>
 #include <wtf/MathExtras.h>
+#include <wtf/NeverDestroyed.h>
 #include <wtf/NotFound.h>
 #include <wtf/glib/GRefPtr.h>
 #include <wtf/glib/RunLoopSourcePriority.h>
@@ -3562,3 +3566,162 @@ SkImage* webkitWebViewBaseSnapshotForTesting(WebKitWebViewBase* webViewBase)
     return webkitWebViewBaseSnapshotFromWidget(GTK_WIDGET(webViewBase));
 }
 #endif
+
+#if USE(GTK4)
+static GRefPtr<GdkCursor> fallbackCursor()
+{
+    static NeverDestroyed<GRefPtr<GdkCursor>> cursor(adoptGRef(gdk_cursor_new_from_name("default", nullptr)));
+    return cursor;
+}
+#endif
+
+static const char* cursorName(const Cursor& cursor)
+{
+    switch (cursor.type()) {
+    case Cursor::Type::Pointer:
+        return "default";
+    case Cursor::Type::Cross:
+        return "crosshair";
+    case Cursor::Type::Hand:
+        return "pointer";
+    case Cursor::Type::IBeam:
+        return "text";
+    case Cursor::Type::Wait:
+        return "wait";
+    case Cursor::Type::Help:
+        return "help";
+    case Cursor::Type::Move:
+    case Cursor::Type::MiddlePanning:
+        return "move";
+    case Cursor::Type::EastResize:
+    case Cursor::Type::EastPanning:
+        return "e-resize";
+    case Cursor::Type::NorthResize:
+    case Cursor::Type::NorthPanning:
+        return "n-resize";
+    case Cursor::Type::NorthEastResize:
+    case Cursor::Type::NorthEastPanning:
+        return "ne-resize";
+    case Cursor::Type::NorthWestResize:
+    case Cursor::Type::NorthWestPanning:
+        return "nw-resize";
+    case Cursor::Type::SouthResize:
+    case Cursor::Type::SouthPanning:
+        return "s-resize";
+    case Cursor::Type::SouthEastResize:
+    case Cursor::Type::SouthEastPanning:
+        return "se-resize";
+    case Cursor::Type::SouthWestResize:
+    case Cursor::Type::SouthWestPanning:
+        return "sw-resize";
+    case Cursor::Type::WestResize:
+    case Cursor::Type::WestPanning:
+        return "w-resize";
+    case Cursor::Type::NorthSouthResize:
+        return "ns-resize";
+    case Cursor::Type::EastWestResize:
+        return "ew-resize";
+    case Cursor::Type::NorthEastSouthWestResize:
+        return "nesw-resize";
+    case Cursor::Type::NorthWestSouthEastResize:
+        return "nwse-resize";
+    case Cursor::Type::ColumnResize:
+        return "col-resize";
+    case Cursor::Type::RowResize:
+        return "row-resize";
+    case Cursor::Type::VerticalText:
+        return "vertical-text";
+    case Cursor::Type::Cell:
+        return "cell";
+    case Cursor::Type::ContextMenu:
+        return "context-menu";
+    case Cursor::Type::Alias:
+        return "alias";
+    case Cursor::Type::Progress:
+        return "progress";
+    case Cursor::Type::NoDrop:
+        return "no-drop";
+    case Cursor::Type::NotAllowed:
+        return "not-allowed";
+    case Cursor::Type::Copy:
+        return "copy";
+    case Cursor::Type::None:
+        return "none";
+    case Cursor::Type::ZoomIn:
+        return "zoom-in";
+    case Cursor::Type::ZoomOut:
+        return "zoom-out";
+    case Cursor::Type::Grab:
+        return "grab";
+    case Cursor::Type::Grabbing:
+        return "grabbing";
+    case Cursor::Type::Custom:
+        return nullptr;
+    case Cursor::Type::Invalid:
+        break;
+    }
+    RELEASE_ASSERT_NOT_REACHED();
+}
+
+void webkitWebViewBaseSetCursor(WebKitWebViewBase* webViewBase, const Cursor& cursor)
+{
+    if (cursor.type() == Cursor::Type::Invalid)
+        return;
+
+    // [GTK] Widget::setCursor() gets called frequently
+    // http://bugs.webkit.org/show_bug.cgi?id=16388
+    // Setting the cursor may be an expensive operation in some backends,
+    // so don't re-set the cursor if it's already set to the target value.
+
+#if USE(GTK4)
+    GdkCursor* currentCursor = gtk_widget_get_cursor(GTK_WIDGET(webViewBase));
+#else
+    GdkWindow* window = gtk_widget_get_window(GTK_WIDGET(webViewBase));
+    GdkCursor* currentCursor = gdk_window_get_cursor(window);
+#endif
+
+    if (const char* name = cursorName(cursor)) {
+        if (currentCursor && !g_strcmp0(name, gdk_cursor_get_name(currentCursor)))
+            return;
+
+#if USE(GTK4)
+        GRefPtr<GdkCursor> newCursor = adoptGRef(gdk_cursor_new_from_name(name, fallbackCursor().get()));
+        gtk_widget_set_cursor(GTK_WIDGET(webViewBase), newCursor.get());
+#else
+        GRefPtr<GdkCursor> newCursor = adoptGRef(gdk_cursor_new_from_name(gtk_widget_get_display(GTK_WIDGET(webViewBase)), name));
+        gdk_window_set_cursor(window, newCursor.get());
+#endif
+        return;
+    }
+
+    RefPtr nativeImage = cursor.image()->currentNativeImage();
+    if (!nativeImage)
+        return;
+
+    IntPoint effectiveHotSpot = determineHotSpot(cursor.image().get(), cursor.hotSpot());
+    auto& platformImage = nativeImage->platformImage();
+
+#if USE(GTK4)
+#if USE(CAIRO)
+    auto texture = cairoSurfaceToGdkTexture(platformImage.get());
+#elif USE(SKIA)
+    auto texture = skiaImageToGdkTexture(*platformImage.get());
+#endif
+    if (!texture)
+        return;
+
+    GRefPtr<GdkCursor> newCursor = adoptGRef(gdk_cursor_new_from_texture(texture.get(), effectiveHotSpot.x(), effectiveHotSpot.y(), fallbackCursor().get()));
+    gtk_widget_set_cursor(GTK_WIDGET(webViewBase), newCursor.get());
+#else
+#if USE(CAIRO)
+    auto pixbuf = cairoSurfaceToGdkTexture(platformImage.get());
+#elif USE(SKIA)
+    auto pixbuf = skiaImageToGdkTexture(*platformImage.get());
+#endif
+    if (!pixbuf)
+        return;
+
+    GRefPtr<GdkCursor> newCursor = adoptGRef(gdk_cursor_new_from_pixbuf(gtk_widget_get_display(GTK_WIDGET(webViewBase)), pixbuf.get(), effectiveHotSpot.x(), effectiveHotSpot.y()));
+    gdk_window_set_cursor(window, newCursor.get());
+#endif // USE(GTK4)
+}

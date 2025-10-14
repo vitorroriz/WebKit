@@ -40,6 +40,7 @@
 #include "WebKitWebViewBase.h"
 #include "WebKitWebViewBaseInternal.h"
 #include "WebPageProxy.h"
+#include <WebCore/Cursor.h>
 #include <WebCore/DragActions.h>
 #include <WebCore/GRefPtrGtk.h>
 #include <WebCore/GUniquePtrGtk.h>
@@ -145,3 +146,4 @@ void webkitWebViewBaseSetPlugID(WebKitWebViewBase*, const String&);
 #endif
 
 WebKit::RendererBufferDescription webkitWebViewBaseGetRendererBufferDescription(WebKitWebViewBase*);
+void webkitWebViewBaseSetCursor(WebKitWebViewBase*, const WebCore::Cursor&);

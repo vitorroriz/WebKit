@@ -47,7 +47,6 @@
 #include "WebKitWebViewPrivate.h"
 #include "WebPageProxy.h"
 #include "WebProcessPool.h"
-#include <WebCore/Cursor.h>
 #include <WebCore/DOMPasteAccess.h>
 #include <WebCore/EventNames.h>
 #include <WebCore/GtkUtilities.h>
@@ -177,22 +176,7 @@ void PageClientImpl::setCursor(const WebCore::Cursor& cursor)
     if (!gtk_widget_get_realized(m_viewWidget))
         return;
 
-    // [GTK] Widget::setCursor() gets called frequently
-    // http://bugs.webkit.org/show_bug.cgi?id=16388
-    // Setting the cursor may be an expensive operation in some backends,
-    // so don't re-set the cursor if it's already set to the target value.
-#if USE(GTK4)
-    GdkCursor* currentCursor = gtk_widget_get_cursor(m_viewWidget);
-    GRefPtr<GdkCursor> newCursor = cursor.platformCursor();
-    if (currentCursor != newCursor.get())
-        gtk_widget_set_cursor(m_viewWidget, newCursor.get());
-#else
-    GdkWindow* window = gtk_widget_get_window(m_viewWidget);
-    GdkCursor* currentCursor = gdk_window_get_cursor(window);
-    GRefPtr<GdkCursor> newCursor = cursor.platformCursor();
-    if (currentCursor != newCursor.get())
-        gdk_window_set_cursor(window, newCursor.get());
-#endif
+    webkitWebViewBaseSetCursor(WEBKIT_WEB_VIEW_BASE(m_viewWidget), cursor);
 }
 
 void PageClientImpl::setCursorHiddenUntilMouseMoves(bool hiddenUntilMouseMoves)

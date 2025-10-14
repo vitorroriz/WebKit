@@ -93,7 +93,6 @@ platform/graphics/opentype/OpenTypeVerticalData.cpp
 
 platform/graphics/x11/XErrorTrapper.cpp @no-unify
 
-platform/gtk/CursorGtk.cpp
 platform/gtk/GRefPtrGtk.cpp
 platform/gtk/GtkUtilities.cpp @no-unify
 platform/gtk/LocalizedStringsGtk.cpp
