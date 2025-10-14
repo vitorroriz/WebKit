@@ -28,7 +28,6 @@ UIProcess/API/Cocoa/WKURLSchemeTask.mm
 UIProcess/API/Cocoa/WKUserScript.mm
 UIProcess/API/Cocoa/WKWebViewConfiguration.mm
 UIProcess/API/Cocoa/WKWebsiteDataRecord.mm
-UIProcess/API/Cocoa/WKWebsiteDataStore.mm
 UIProcess/API/Cocoa/_WKApplicationManifest.mm
 UIProcess/API/Cocoa/_WKArchiveConfiguration.mm
 UIProcess/API/Cocoa/_WKAuthenticationExtensionsClientInputs.mm
