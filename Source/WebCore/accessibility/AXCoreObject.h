@@ -108,6 +108,10 @@ struct AccessibilityText;
 struct CharacterRange;
 struct ScrollRectToVisibleOptions;
 
+#if ENABLE(MODEL_ELEMENT_ACCESSIBILITY)
+struct ModelPlayerAccessibilityChildren;
+#endif
+
 enum class ClickHandlerFilter : bool {
     ExcludeBody,
     IncludeBody,
@@ -1250,8 +1254,8 @@ public:
     virtual String innerHTML() const = 0;
     virtual String outerHTML() const = 0;
 
-#if PLATFORM(COCOA) && ENABLE(MODEL_ELEMENT)
-    virtual Vector<RetainPtr<id>> modelElementChildren() = 0;
+#if ENABLE(MODEL_ELEMENT_ACCESSIBILITY)
+    virtual ModelPlayerAccessibilityChildren modelElementChildren() = 0;
 #endif
 
     String infoStringForTesting();

@@ -120,6 +120,10 @@
 #include <wtf/text/WTFString.h>
 #include <wtf/unicode/CharacterNames.h>
 
+#if ENABLE(MODEL_ELEMENT_ACCESSIBILITY)
+#include "ModelPlayerAccessibilityChildren.h"
+#endif
+
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -1770,8 +1774,9 @@ bool AccessibilityObject::replacedNodeNeedsCharacter(Node& replacedNode)
     return true;
 }
 
-#if PLATFORM(COCOA) && ENABLE(MODEL_ELEMENT)
-Vector<RetainPtr<id>> AccessibilityObject::modelElementChildren()
+#if ENABLE(MODEL_ELEMENT_ACCESSIBILITY)
+
+ModelPlayerAccessibilityChildren AccessibilityObject::modelElementChildren()
 {
     RefPtr model = dynamicDowncast<HTMLModelElement>(node());
     if (!model)
@@ -1779,6 +1784,7 @@ Vector<RetainPtr<id>> AccessibilityObject::modelElementChildren()
 
     return model->accessibilityChildren();
 }
+
 #endif
 
 // Finds a RenderListItem parent given a node.

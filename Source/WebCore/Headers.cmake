@@ -634,8 +634,10 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     Modules/model-element/HTMLModelElement.h
     Modules/model-element/HTMLModelElementCamera.h
     Modules/model-element/ModelPlayer.h
+    Modules/model-element/ModelPlayerAccessibilityChildren.h
     Modules/model-element/ModelPlayerAnimationState.h
     Modules/model-element/ModelPlayerClient.h
+    Modules/model-element/ModelPlayerIdentifier.h
     Modules/model-element/ModelPlayerProvider.h
     Modules/model-element/ModelPlayerTransformState.h
 
@@ -2666,7 +2668,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/graphics/MediaUsageInfo.h
     platform/graphics/Model.h
     platform/graphics/ModelContext.h
-    platform/graphics/ModelPlayerIdentifier.h
     platform/graphics/NativeImage.h
     platform/graphics/NullGraphicsContext.h
     platform/graphics/NullImageBufferBackend.h

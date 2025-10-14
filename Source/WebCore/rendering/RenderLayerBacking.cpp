@@ -117,7 +117,7 @@
 #include <wtf/WeakListHashSet.h>
 #endif
 
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_CONTEXT)
 #include "ModelContext.h"
 #endif
 
@@ -1321,14 +1321,14 @@ bool RenderLayerBacking::updateConfiguration(const RenderLayer* compositingAnces
         // but this is a runtime decision.
         if (element->usesPlatformLayer())
             m_graphicsLayer->setContentsToPlatformLayer(element->platformLayer(), GraphicsLayer::ContentsLayerPurpose::Model);
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_CONTEXT)
         else if (auto modelContext = element->modelContext(); modelContext && element->document().settings().modelProcessEnabled()) {
             modelContext->setBackgroundColor(rendererBackgroundColor());
             m_graphicsLayer->setContentsToModelContext(*modelContext, GraphicsLayer::ContentsLayerPurpose::HostedModel);
         }
 #endif
         else if (auto model = element->model()) {
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
             m_graphicsLayer->setContentsDisplayDelegate(element->contentsDisplayDelegate(), GraphicsLayer::ContentsLayerPurpose::Canvas);
 #else
             m_graphicsLayer->setContentsToModel(WTFMove(model), element->isInteractive() ? GraphicsLayer::ModelInteraction::Enabled : GraphicsLayer::ModelInteraction::Disabled);
@@ -3471,7 +3471,7 @@ void RenderLayerBacking::contentChanged(ContentChangeType changeType, const std:
 
 #if ENABLE(MODEL_ELEMENT)
     if (changeType == ContentChangeType::Model) {
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
         if (m_graphicsLayer && m_graphicsLayer->drawsContent())
             m_graphicsLayer->setNeedsDisplay();
 #endif

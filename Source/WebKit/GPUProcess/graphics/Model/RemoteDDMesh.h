@@ -25,7 +25,7 @@
 
 #pragma once
 
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
 
 #include "DDModelIdentifier.h"
 #include "RemoteGPU.h"

@@ -25,7 +25,7 @@
 
 #pragma once
 
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
 
 #include <WebCore/Model.h>
 #include <WebCore/ModelPlayer.h>
@@ -81,7 +81,7 @@ private:
     void hasAudio(CompletionHandler<void(std::optional<bool>&&)>&&) override;
     void isMuted(CompletionHandler<void(std::optional<bool>&&)>&&) override;
     void setIsMuted(bool, CompletionHandler<void(bool success)>&&) override;
-    Vector<RetainPtr<id>> accessibilityChildren() override;
+    ModelPlayerAccessibilityChildren accessibilityChildren() override;
 
     const MachSendRight* displayBuffer() const override;
     GraphicsLayerContentsDisplayDelegate* contentsDisplayDelegate() override;

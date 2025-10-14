@@ -26,6 +26,7 @@
 #pragma once
 
 #include <wtf/Platform.h>
+
 #if ENABLE(MODEL_ELEMENT)
 
 #include <WebCore/ActiveDOMObject.h>
@@ -45,7 +46,7 @@
 #include <WebCore/VisibilityChangeClient.h>
 #include <wtf/UniqueRef.h>
 
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_ELEMENT_STAGE_MODE)
 #include <WebCore/StageModeOperations.h>
 #endif
 
@@ -63,14 +64,14 @@ class Model;
 class ModelPlayerProvider;
 class MouseEvent;
 
-template<typename IDLType> class DOMPromiseDeferred;
-template<typename IDLType> class DOMPromiseProxyWithResolveCallback;
-template<typename> class ExceptionOr;
-
-#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
-template<typename IDLType> class DOMPromiseProxy;
+#if ENABLE(MODEL_CONTEXT)
 class ModelContext;
 #endif
+
+template<typename IDLType> class DOMPromiseDeferred;
+template<typename IDLType> class DOMPromiseProxy;
+template<typename IDLType> class DOMPromiseProxyWithResolveCallback;
+template<typename> class ExceptionOr;
 
 class HTMLModelElement final : public HTMLElement, private CachedRawResourceClient, public ModelPlayerClient, public ActiveDOMObject, public VisibilityChangeClient {
     WTF_MAKE_TZONE_OR_ISO_ALLOCATED(HTMLModelElement);
@@ -102,25 +103,39 @@ public:
     bool usesPlatformLayer() const;
     PlatformLayer* platformLayer() const;
 
+    std::optional<PlatformLayerIdentifier> layerID() const;
+
+    // FIXME: It is a layering violation for WebCore to be concerned with LayerHostingContextIdentifiers. It should not be aware that layer hosting is being used.
     std::optional<LayerHostingContextIdentifier> layerHostingContextIdentifier() const;
 
-    std::optional<PlatformLayerIdentifier> layerID() const;
+#if ENABLE(GPU_PROCESS_MODEL)
+    // FIXME: It is a layering violation for WebCore to be concerned with MachSendRights like this. It should not be aware that other processes are being used.
     WEBCORE_EXPORT const MachSendRight* displayBuffer() const;
     GraphicsLayerContentsDisplayDelegate* contentsDisplayDelegate();
+#endif
+
     RefPtr<GraphicsLayer> graphicsLayer() const;
 
-#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
+#if ENABLE(MODEL_CONTEXT)
     RefPtr<ModelContext> modelContext() const;
+#endif
 
+#if ENABLE(MODEL_ELEMENT_ENTITY_TRANSFORM)
     const DOMMatrixReadOnly& entityTransform() const;
     ExceptionOr<void> setEntityTransform(const DOMMatrixReadOnly&);
+#endif
 
+#if ENABLE(MODEL_ELEMENT_BOUNDING_BOX)
     const DOMPointReadOnly& boundingBoxCenter() const;
     const DOMPointReadOnly& boundingBoxExtents() const;
 #endif
-#if ENABLE(MODEL_PROCESS)
+
+#if ENABLE(MODEL_ELEMENT_ENVIRONMENT_MAP)
     using EnvironmentMapPromise = DOMPromiseProxy<IDLUndefined>;
     EnvironmentMapPromise& environmentMapReady() { return m_environmentMapReadyPromise.get(); }
+
+    const URL& environmentMap() const;
+    void setEnvironmentMap(const URL&);
 #endif
 
     void enterFullscreen();
@@ -155,7 +170,7 @@ public:
 
     bool isInteractive() const;
 
-#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
+#if ENABLE(MODEL_ELEMENT_ANIMATIONS_CONTROL)
     double playbackRate() const { return m_playbackRate; }
     void setPlaybackRate(double);
     double duration() const;
@@ -165,8 +180,9 @@ public:
     void setPaused(bool, DOMPromiseDeferred<void>&&);
     double currentTime() const;
     void setCurrentTime(double);
-    const URL& environmentMap() const;
-    void setEnvironmentMap(const URL&);
+#endif
+
+#if ENABLE(MODEL_ELEMENT_STAGE_MODE_INTERACTION)
     WEBCORE_EXPORT bool supportsStageModeInteraction() const;
     WEBCORE_EXPORT void beginStageModeTransform(const TransformationMatrix&);
     WEBCORE_EXPORT void updateStageModeTransform(const TransformationMatrix&);
@@ -175,8 +191,8 @@ public:
     WEBCORE_EXPORT void resetModelTransformAfterDrag();
 #endif
 
-#if PLATFORM(COCOA)
-    Vector<RetainPtr<id>> accessibilityChildren();
+#if ENABLE(MODEL_ELEMENT_ACCESSIBILITY)
+    ModelPlayerAccessibilityChildren accessibilityChildren();
 #endif
 
     void sizeMayHaveChanged();
@@ -238,14 +254,21 @@ private:
 
     // ModelPlayerClient overrides.
     void didUpdateLayerHostingContextIdentifier(ModelPlayer&, LayerHostingContextIdentifier) final;
+#if ENABLE(GPU_PROCESS_MODEL)
+    void didUpdateDisplayDelegate(ModelPlayer&) const final;
+#endif
+#if ENABLE(MODEL_ELEMENT_ENTITY_TRANSFORM)
+    void didUpdateEntityTransform(ModelPlayer&, const TransformationMatrix&) final;
+#endif
+#if ENABLE(MODEL_ELEMENT_BOUNDING_BOX)
+    void didUpdateBoundingBox(ModelPlayer&, const FloatPoint3D&, const FloatPoint3D&) final;
+#endif
     void didFinishLoading(ModelPlayer&) final;
     void didFailLoading(ModelPlayer&, const ResourceError&) final;
-#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
-    void didUpdateEntityTransform(ModelPlayer&, const TransformationMatrix&) final;
-    void didUpdateBoundingBox(ModelPlayer&, const FloatPoint3D&, const FloatPoint3D&) final;
-    void didFinishEnvironmentMapLoading(bool succeeded) final;
-    void didUnload(ModelPlayer&) final;
+#if ENABLE(MODEL_ELEMENT_ENVIRONMENT_MAP)
+    void didFinishEnvironmentMapLoading(ModelPlayer&, bool succeeded) final;
 #endif
+    void didUnload(ModelPlayer&) final;
     std::optional<PlatformLayerIdentifier> modelContentsLayerID() const final;
     bool isVisible() const final;
     void logWarning(ModelPlayer&, const String&) final;
@@ -266,23 +289,31 @@ private:
 
     void reportExtraMemoryCost();
 
-#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
+#if ENABLE(MODEL_ELEMENT_ANIMATIONS_CONTROL)
     bool autoplay() const;
     void updateAutoplay();
     bool loop() const;
     void updateLoop();
+#endif
+
+#if ENABLE(MODEL_ELEMENT_ENVIRONMENT_MAP)
     void updateEnvironmentMap();
     URL selectEnvironmentMapURL() const;
     void environmentMapRequestResource();
     void environmentMapResetAndReject(Exception&&);
     void environmentMapResourceFinished();
+#endif
+
+#if ENABLE(MODEL_ELEMENT_PORTAL)
     bool hasPortal() const;
     void updateHasPortal();
 #endif
-#if ENABLE(MODEL_PROCESS)
+
+#if ENABLE(MODEL_ELEMENT_STAGE_MODE)
     WebCore::StageModeOperation stageMode() const;
     void updateStageMode();
 #endif
+
     void modelResourceFinished();
     void sourceRequestResource();
     bool shouldDeferLoading() const;
@@ -291,9 +322,6 @@ private:
     bool isModelLoaded() const;
     bool isModelUnloading() const;
     bool isModelUnloaded() const;
-#if ENABLE(GPUP_MODEL)
-    void didUpdateDisplayDelegate() const final;
-#endif
 
     URL m_sourceURL;
     CachedResourceHandle<CachedRawResource> m_resource;
@@ -310,16 +338,25 @@ private:
 
     RefPtr<ModelPlayer> m_modelPlayer;
     EventLoopTimerHandle m_loadModelTimer;
-#if ENABLE(MODEL_PROCESS) || ENABLE(GPUP_MODEL)
+
+#if ENABLE(MODEL_ELEMENT_ENTITY_TRANSFORM)
     Ref<DOMMatrixReadOnly> m_entityTransform;
+#endif
+
+#if ENABLE(MODEL_ELEMENT_BOUNDING_BOX)
     Ref<DOMPointReadOnly> m_boundingBoxCenter;
     Ref<DOMPointReadOnly> m_boundingBoxExtents;
+#endif
+
+#if ENABLE(MODEL_ELEMENT_ANIMATIONS_CONTROL)
     double m_playbackRate { 1.0 };
+#endif
+
+#if ENABLE(MODEL_ELEMENT_ENVIRONMENT_MAP)
     URL m_environmentMapURL;
     SharedBufferBuilder m_environmentMapData;
     mutable std::atomic<size_t> m_environmentMapDataMemoryCost { 0 };
-#endif
-#if ENABLE(MODEL_PROCESS)
+
     CachedResourceHandle<CachedRawResource> m_environmentMapResource;
     UniqueRef<EnvironmentMapPromise> m_environmentMapReadyPromise;
 #endif

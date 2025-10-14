@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Samuel Weinig <sam@webkit.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,42 +25,21 @@
 
 #pragma once
 
-#include <WebCore/DragActions.h>
-#include <WebCore/DragImage.h>
-#include <WebCore/FloatPoint.h>
-#include <WebCore/FrameIdentifier.h>
-#include <WebCore/IntPoint.h>
-#include <WebCore/IntRect.h>
-#include <WebCore/PasteboardWriterData.h>
-#include <WebCore/PlatformLayerIdentifier.h>
-#include <WebCore/PromisedAttachmentInfo.h>
+#if ENABLE(MODEL_ELEMENT_ACCESSIBILITY)
+
+#if PLATFORM(COCOA)
+#include <wtf/RetainPtr.h>
+#include <wtf/Vector.h>
+#endif
 
 namespace WebCore {
 
-struct DragItem final {
-    DragImage image;
-
-    // Where the image should be positioned relative to the cursor.
-    FloatPoint imageAnchorPoint;
-
-    std::optional<DragSourceAction> sourceAction;
-    std::optional<FrameIdentifier> rootFrameID;
-    IntPoint eventPositionInContentCoordinates;
-    IntPoint dragLocationInContentCoordinates;
-    IntPoint dragLocationInWindowCoordinates;
-    String title;
-    URL url;
-    // FIXME: rdar://160803165 dragPreviewFrameInRootViewCoordinates is calculated using convertToRootView, which is incorrect with Site Isolation.
-    IntRect dragPreviewFrameInRootViewCoordinates;
-    bool containsSelection { false };
-
-    PromisedAttachmentInfo promisedAttachmentInfo;
-
-#if ENABLE(MODEL_ELEMENT_STAGE_MODE_INTERACTION)
-    Markable<PlatformLayerIdentifier> modelLayerID;
+struct ModelPlayerAccessibilityChildren {
+#if PLATFORM(COCOA)
+    Vector<RetainPtr<id>> children { };
 #endif
-
-    PasteboardWriterData data { };
 };
 
-}
+} // namespace WebCore
+
+#endif

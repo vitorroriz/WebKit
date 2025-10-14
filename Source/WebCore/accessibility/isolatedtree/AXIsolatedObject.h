@@ -601,8 +601,8 @@ private:
 #endif
     bool hasRemoteFrameChild() const final { return boolAttributeValue(AXProperty::HasRemoteFrameChild); }
 
-#if PLATFORM(COCOA) && ENABLE(MODEL_ELEMENT)
-    Vector<RetainPtr<id>> modelElementChildren() final;
+#if ENABLE(MODEL_ELEMENT_ACCESSIBILITY)
+    ModelPlayerAccessibilityChildren modelElementChildren() final;
 #endif
 
     void updateBackingStore() final;

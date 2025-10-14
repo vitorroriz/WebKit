@@ -274,7 +274,7 @@ void RemoteGPU::createModelBacking(unsigned width, unsigned height, DDModelIdent
 
     RefPtr gpu = m_backing.get();
     auto mesh = gpu->createModelBacking(width, height, WTFMove(callback));
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
     auto remoteMesh = RemoteDDMesh::create(*m_gpuConnectionToWebProcess.get(), *this, *mesh, objectHeap, Ref { *m_streamConnection }, identifier);
     objectHeap->addObject(identifier, remoteMesh);
 #else

@@ -139,7 +139,7 @@ void ModelProcessModelPlayer::didFinishEnvironmentMapLoading(bool succeeded)
 {
     RELEASE_ASSERT(modelProcessEnabled());
 
-    protectedClient()->didFinishEnvironmentMapLoading(succeeded);
+    protectedClient()->didFinishEnvironmentMapLoading(*this, succeeded);
 }
 
 // MARK: - WebCore::ModelPlayer
@@ -326,7 +326,7 @@ void ModelProcessModelPlayer::setIsMuted(bool isMuted, CompletionHandler<void(bo
     completionHandler(false);
 }
 
-Vector<RetainPtr<id>> ModelProcessModelPlayer::accessibilityChildren()
+WebCore::ModelPlayerAccessibilityChildren ModelProcessModelPlayer::accessibilityChildren()
 {
     return { };
 }

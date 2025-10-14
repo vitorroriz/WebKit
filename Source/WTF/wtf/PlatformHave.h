@@ -965,11 +965,12 @@
 #endif
 
 #if PLATFORM(MAC)
-#define HAVE_SCENEKIT !ENABLE_GPUP_MODEL
+#define HAVE_SCENEKIT 1
 #endif
 
 #if PLATFORM(COCOA)
 #define HAVE_WEBGPU_IMPLEMENTATION 1
+// FIXME: PlatformHave.h should not depend or defined ENABLE macros.
 #if !defined(ENABLE_WEBGPU_SWIFT)
 #define ENABLE_WEBGPU_SWIFT 0
 #endif
@@ -1154,6 +1155,7 @@
 
 #if PLATFORM(MAC) || PLATFORM(IOS) || PLATFORM(MACCATALYST) || PLATFORM(VISION)
 #if defined __has_include && __has_include(<CoreFoundation/CFPriv.h>)
+// FIXME: PlatformHave.h should not depend or defined ENABLE macros.
 #define ENABLE_SYSTEM_CONTENT_PATH_SANDBOX_RULES 1
 #endif
 #endif
@@ -1699,6 +1701,7 @@
 #define HAVE_RE_STEREO_CONTENT_SUPPORT 0
 #endif
 
+// FIXME: PlatformHave.h should not depend or defined ENABLE macros.
 #if !defined(ENABLE_UNPREFIXED_BACKDROP_FILTER) \
     && ((PLATFORM(APPLETV) && __TV_OS_VERSION_MIN_REQUIRED >= 180000) \
     || (PLATFORM(WATCHOS) && __WATCH_OS_VERSION_MIN_REQUIRED >= 120000) \

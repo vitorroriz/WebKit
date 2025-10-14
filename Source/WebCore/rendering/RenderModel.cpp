@@ -70,7 +70,7 @@ void RenderModel::update()
         return;
     
     contentChanged(ContentChangeType::Model);
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
     auto renderLayer = layer();
     if (!renderLayer)
         return;

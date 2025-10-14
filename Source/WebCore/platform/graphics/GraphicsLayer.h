@@ -85,7 +85,7 @@ class TransformationMatrix;
 
 typedef unsigned TileCoverage;
 
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_CONTEXT)
 class ModelContext;
 #endif
 
@@ -562,7 +562,7 @@ public:
     virtual void setContentsToSolidColor(const Color&) { }
     virtual void setContentsToPlatformLayer(PlatformLayer*, ContentsLayerPurpose) { }
     virtual void setContentsToPlatformLayerHost(LayerHostingContextIdentifier) { }
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_CONTEXT)
     virtual void setContentsToModelContext(Ref<ModelContext>, ContentsLayerPurpose) { }
 #endif
     virtual void setContentsToVideoElement(HTMLVideoElement&, ContentsLayerPurpose) { }

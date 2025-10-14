@@ -48,7 +48,7 @@ RemoteDDMeshProxy::RemoteDDMeshProxy(Ref<RemoteGPUProxy>&& root, ConvertToBackin
 
 RemoteDDMeshProxy::~RemoteDDMeshProxy()
 {
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
     auto sendResult = send(Messages::RemoteDDMesh::Destruct());
     UNUSED_VARIABLE(sendResult);
 #endif
@@ -56,7 +56,7 @@ RemoteDDMeshProxy::~RemoteDDMeshProxy()
 
 void RemoteDDMeshProxy::addMesh(const WebCore::DDModel::DDMeshDescriptor& descriptor)
 {
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
     auto convertedDescriptor = m_convertToBackingContext->convertToBacking(descriptor);
     if (!convertedDescriptor)
         return;
@@ -70,7 +70,7 @@ void RemoteDDMeshProxy::addMesh(const WebCore::DDModel::DDMeshDescriptor& descri
 
 void RemoteDDMeshProxy::update(const WebCore::DDModel::DDUpdateMeshDescriptor& descriptor)
 {
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
     auto convertedDescriptor = m_convertToBackingContext->convertToBacking(descriptor);
     if (!convertedDescriptor)
         return;
@@ -84,7 +84,7 @@ void RemoteDDMeshProxy::update(const WebCore::DDModel::DDUpdateMeshDescriptor& d
 
 void RemoteDDMeshProxy::render()
 {
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
     auto sendResult = send(Messages::RemoteDDMesh::Render());
     UNUSED_PARAM(sendResult);
 #endif
@@ -92,7 +92,7 @@ void RemoteDDMeshProxy::render()
 
 void RemoteDDMeshProxy::setLabelInternal(const String& label)
 {
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
     auto sendResult = send(Messages::RemoteDDMesh::SetLabel(label));
     UNUSED_VARIABLE(sendResult);
 #else

@@ -89,6 +89,10 @@
 #import <wtf/text/MakeString.h>
 #import <wtf/text/WTFString.h>
 
+#if ENABLE(MODEL_ELEMENT_ACCESSIBILITY)
+#import "ModelPlayerAccessibilityChildren.h"
+#endif
+
 using namespace WebCore;
 
 static id attributeValueForTesting(const RefPtr<AXCoreObject>&, NSString *);
@@ -1070,11 +1074,11 @@ static void WebTransformCGPathToNSBezierPath(void* info, const CGPathElement *el
 // `unignoredChildren` must be the children of `backingObject`.
 static NSArray *transformSpecialChildrenCases(AXCoreObject& backingObject, const Vector<Ref<AXCoreObject>>& unignoredChildren)
 {
-#if ENABLE(MODEL_ELEMENT)
+#if ENABLE(MODEL_ELEMENT_ACCESSIBILITY)
     if (backingObject.isModel()) {
         auto modelChildren = backingObject.modelElementChildren();
-        if (modelChildren.size()) {
-            return createNSArray(WTFMove(modelChildren), [] (auto&& child) -> id {
+        if (modelChildren.children.size()) {
+            return createNSArray(WTFMove(modelChildren.children), [](auto&& child) -> id {
                 return child.get();
             }).autorelease();
         }
@@ -3626,9 +3630,9 @@ ALLOW_DEPRECATED_IMPLEMENTATIONS_END
     if (!children.size()) {
         if (RetainPtr widgetChildren = renderWidgetChildren(*backingObject))
             return [widgetChildren.get() indexOfObject:targetChild];
-#if ENABLE(MODEL_ELEMENT)
+#if ENABLE(MODEL_ELEMENT_ACCESSIBILITY)
         if (backingObject->isModel())
-            return backingObject->modelElementChildren().find(targetChild);
+            return backingObject->modelElementChildren().children.find(targetChild);
 #endif
     }
 
@@ -3662,9 +3666,9 @@ ALLOW_DEPRECATED_DECLARATIONS_BEGIN
         // FIXME: this is duplicating the logic in children(AXCoreObject&) so it should be reworked.
         size_t childrenSize = backingObject->unignoredChildren().size();
         if (!childrenSize) {
-#if ENABLE(MODEL_ELEMENT)
+#if ENABLE(MODEL_ELEMENT_ACCESSIBILITY)
             if (backingObject->isModel())
-                return backingObject->modelElementChildren().size();
+                return backingObject->modelElementChildren().children.size();
 #endif
             if (RetainPtr widgetChildren = renderWidgetChildren(*backingObject))
                 return [widgetChildren.get() count];

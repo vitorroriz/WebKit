@@ -77,7 +77,7 @@ RefPtr<WebCore::ModelPlayer> WebModelPlayerProvider::createModelPlayer(WebCore::
     if (page->corePage() && page->corePage()->settings().modelProcessEnabled())
         return WebProcess::singleton().modelProcessModelPlayerManager().createModelProcessModelPlayer(page, client);
 #endif
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
     if (page->corePage() && page->corePage()->settings().modelElementEnabled())
         return WebCore::DDModelPlayer::create(*page->corePage(), client);
 #endif

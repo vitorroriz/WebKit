@@ -72,10 +72,6 @@ OBJC_CLASS NSData;
 #include <WebCore/MediaUsageInfo.h>
 #endif
 
-#if ENABLE(ARKIT_INLINE_PREVIEW)
-class HTMLModelElement;
-#endif
-
 #if ENABLE(WEBXR)
 #include <WebCore/PlatformXR.h>
 #endif

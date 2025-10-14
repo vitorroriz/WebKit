@@ -1437,7 +1437,7 @@ void DragController::doSystemDrag(DragImage image, const IntPoint& dragLoc, cons
             item.url = frame.document()->completeURL(link->getAttribute(HTMLNames::hrefAttr));
         }
 
-#if ENABLE(MODEL_PROCESS)
+#if ENABLE(MODEL_ELEMENT_STAGE_MODE_INTERACTION)
         if (RefPtr modelElement = dynamicDowncast<HTMLModelElement>(state.source); modelElement && m_dragSourceAction.contains(DragSourceAction::Model))
             item.modelLayerID = modelElement->layerID();
 #endif

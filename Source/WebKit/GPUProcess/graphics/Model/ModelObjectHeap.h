@@ -75,7 +75,7 @@ private:
 
     using Object = Variant<
         std::monostate,
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
         IPC::ScopedActiveMessageReceiveQueue<RemoteDDMesh>
 #else
         uint32_t

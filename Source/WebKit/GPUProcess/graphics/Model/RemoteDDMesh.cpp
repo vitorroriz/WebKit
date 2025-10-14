@@ -26,7 +26,7 @@
 #include "config.h"
 #include "RemoteDDMesh.h"
 
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
 
 #include "DDMeshDescriptor.h"
 #include "GPUConnectionToWebProcess.h"

@@ -224,7 +224,7 @@ void RemoteGPUProxy::requestAdapter(const WebCore::WebGPU::RequestAdapterOptions
 
 RefPtr<WebCore::DDModel::DDMesh> RemoteGPUProxy::createModelBacking(unsigned width, unsigned height, CompletionHandler<void(Vector<MachSendRight>&&)>&& callback)
 {
-#if ENABLE(GPUP_MODEL)
+#if ENABLE(GPU_PROCESS_MODEL)
     auto identifier = DDModelIdentifier::generate();
 
     auto sendResult = sendSync(Messages::RemoteGPU::CreateModelBacking(width, height, identifier));
