@@ -5792,6 +5792,29 @@ bool AbstractInterpreter<AbstractStateType>::executeEffects(unsigned clobberLimi
         break;
     }
 
+    case PromiseThen: {
+        JSGlobalObject* globalObject = m_graph.globalObjectFor(node->origin.semantic);
+        auto& promise = forNode(node->child1());
+        if (promise.isType(SpecPromiseObject)) {
+            auto& structureSet = promise.m_structure;
+            if (structureSet.isFinite()) {
+                if (auto structure = structureSet.onlyStructure()) {
+                    if (structure.get() == globalObject->promiseStructure()) {
+                        if (m_graph.isWatchingPromiseSpeciesWatchpoint(node)) {
+                            clobberWorld();
+                            setForNode(node, globalObject->promiseStructure());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        clobberWorld();
+        setTypeForNode(node, SpecObject);
+        break;
+    }
+
     case Unreachable:
         // It may be that during a previous run of AI we proved that something was unreachable, but
         // during this run of AI we forget that it's unreachable. AI's proofs don't have to get

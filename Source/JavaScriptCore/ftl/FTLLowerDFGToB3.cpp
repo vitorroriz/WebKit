@@ -1913,6 +1913,10 @@ private:
             compilePromiseReject();
             break;
 
+        case PromiseThen:
+            compilePromiseThen();
+            break;
+
         case LoopHint: {
             compileLoopHint();
             codeGenerationResult = CodeGenerationResult::NotGenerated;
@@ -20058,6 +20062,15 @@ IGNORE_CLANG_WARNINGS_END
         setJSValue(vmCall(pointerType(), operationPromiseReject, weakPointer(globalObject), constructor, argument));
     }
 
+    void compilePromiseThen()
+    {
+        auto* globalObject = m_graph.globalObjectFor(m_origin.semantic);
+        LValue promise = lowPromiseObject(m_node->child1());
+        LValue onFulfilled = lowJSValue(m_node->child2());
+        LValue onRejected = lowJSValue(m_node->child3());
+        setJSValue(vmCall(pointerType(), operationPromiseThen, weakPointer(globalObject), promise, onFulfilled, onRejected));
+    }
+
     void compileLoopHint()
     {
         if (!Options::returnEarlyFromInfiniteLoopsForFuzzing()) [[likely]]
@@ -22642,6 +22655,13 @@ IGNORE_CLANG_WARNINGS_END
     {
         LValue result = lowCell(edge);
         speculateGlobalProxy(edge, result);
+        return result;
+    }
+
+    LValue lowPromiseObject(Edge edge)
+    {
+        LValue result = lowCell(edge);
+        speculatePromiseObject(edge, result);
         return result;
     }
 

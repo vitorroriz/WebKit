@@ -4364,6 +4364,10 @@ void SpeculativeJIT::compile(Node* node)
         compilePromiseReject(node);
         break;
 
+    case PromiseThen:
+        compilePromiseThen(node);
+        break;
+
     case Unreachable:
         unreachable(node);
         break;

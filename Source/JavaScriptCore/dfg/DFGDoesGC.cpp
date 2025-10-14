@@ -487,6 +487,7 @@ bool doesGC(Graph& graph, Node* node)
     case FulfillPromiseFirstResolving:
     case PromiseResolve:
     case PromiseReject:
+    case PromiseThen:
 #else // not ASSERT_ENABLED
     // See comment at the top for why the default for all nodes should be to
     // return true.

@@ -711,12 +711,12 @@ Structure* createPromiseCapabilityObjectStructure(VM& vm, JSGlobalObject& global
     return structure;
 }
 
-JSValue JSPromise::then(JSGlobalObject* globalObject, JSValue onFulfilled, JSValue onRejected)
+JSObject* JSPromise::then(JSGlobalObject* globalObject, JSValue onFulfilled, JSValue onRejected)
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
-    JSValue resultPromise;
+    JSObject* resultPromise;
     JSValue resultPromiseCapability;
     if (promiseSpeciesWatchpointIsValid(vm, this)) [[likely]] {
         if (inherits<JSInternalPromise>())

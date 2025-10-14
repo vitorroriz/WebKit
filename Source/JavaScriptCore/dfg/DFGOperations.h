@@ -358,6 +358,7 @@ JSC_DECLARE_JIT_OPERATION(operationRejectPromiseFirstResolving, void, (JSGlobalO
 JSC_DECLARE_JIT_OPERATION(operationFulfillPromiseFirstResolving, void, (JSGlobalObject*, JSPromise*, EncodedJSValue));
 JSC_DECLARE_JIT_OPERATION(operationPromiseResolve, JSObject*, (JSGlobalObject*, JSObject*, EncodedJSValue));
 JSC_DECLARE_JIT_OPERATION(operationPromiseReject, JSObject*, (JSGlobalObject*, JSObject*, EncodedJSValue));
+JSC_DECLARE_JIT_OPERATION(operationPromiseThen, JSObject*, (JSGlobalObject*, JSPromise*, EncodedJSValue, EncodedJSValue));
 
 JSC_DECLARE_JIT_OPERATION(operationNewSymbol, Symbol*, (VM*));
 JSC_DECLARE_JIT_OPERATION(operationNewSymbolWithStringDescription, Symbol*, (JSGlobalObject*, JSString*));

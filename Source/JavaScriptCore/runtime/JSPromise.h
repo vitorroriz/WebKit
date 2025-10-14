@@ -149,7 +149,7 @@ public:
     static JSObject* promiseResolve(JSGlobalObject*, JSObject* constructor, JSValue);
     static JSObject* promiseReject(JSGlobalObject*, JSObject* constructor, JSValue);
 
-    JSValue then(JSGlobalObject*, JSValue onFulfilled, JSValue onRejected);
+    JSObject* then(JSGlobalObject*, JSValue onFulfilled, JSValue onRejected);
 
 protected:
     JSPromise(VM&, Structure*);

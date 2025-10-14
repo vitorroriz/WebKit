@@ -17535,6 +17535,25 @@ void SpeculativeJIT::compilePromiseReject(Node* node)
     cellResult(resultGPR, node);
 }
 
+void SpeculativeJIT::compilePromiseThen(Node* node)
+{
+    SpeculateCellOperand promise(this, node->child1());
+    JSValueOperand onFulfilled(this, node->child2());
+    JSValueOperand onRejected(this, node->child3());
+
+    GPRReg promiseGPR = promise.gpr();
+    JSValueRegs onFulfilledRegs = onFulfilled.jsValueRegs();
+    JSValueRegs onRejectedRegs = onRejected.jsValueRegs();
+
+    speculatePromiseObject(node->child1(), promiseGPR);
+
+    flushRegisters();
+    GPRFlushedCallResult result(this);
+    GPRReg resultGPR = result.gpr();
+    callOperation(operationPromiseThen, resultGPR, LinkableConstant::globalObject(*this, node), promiseGPR, onFulfilledRegs, onRejectedRegs);
+    cellResult(resultGPR, node);
+}
+
 unsigned SpeculativeJIT::appendExceptionHandlingOSRExit(ExitKind kind, unsigned eventStreamIndex, CodeOrigin opCatchOrigin, HandlerInfo* exceptionHandler, CallSiteIndex callSite, MacroAssembler::JumpList jumpsToFail)
 {
     if (Options::validateDFGMayExit()) [[unlikely]] {

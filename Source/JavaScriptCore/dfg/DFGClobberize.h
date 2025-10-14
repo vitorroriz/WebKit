@@ -2514,6 +2514,7 @@ void clobberize(Graph& graph, Node* node, const ReadFunctor& read, const WriteFu
 
     case PromiseResolve:
     case PromiseReject:
+    case PromiseThen:
         clobberTop();
         return;
 
