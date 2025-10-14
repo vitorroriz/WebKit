@@ -163,8 +163,8 @@ void SceneKitModelPlayer::didFinishLoading(SceneKitModelLoader& loader, Ref<Scen
 
     updateScene();
 
-    if (m_client)
-        m_client->didFinishLoading(*this);
+    if (RefPtr client = m_client.get())
+        client->didFinishLoading(*this);
 }
 
 void SceneKitModelPlayer::didFailLoading(SceneKitModelLoader& loader, const ResourceError& error)
@@ -174,8 +174,8 @@ void SceneKitModelPlayer::didFailLoading(SceneKitModelLoader& loader, const Reso
 
     m_loader = nullptr;
 
-    if (!m_client)
-        m_client->didFailLoading(*this, error);
+    if (RefPtr client = m_client.get())
+        client->didFailLoading(*this, error);
 }
 
 void SceneKitModelPlayer::updateScene()

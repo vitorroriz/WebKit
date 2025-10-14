@@ -160,8 +160,8 @@ void DDModelPlayer::load(Model& modelSource, LayoutSize size)
         m_modelLoader = adoptNS([[WebUSDModelLoader alloc] init]);
         RetainPtr nsURL = modelSource.url().createNSURL();
         [m_modelLoader setCallbacksWithModelAddedCallback:^(WebAddMeshRequest *addRequest) {
-            if (m_client)
-                m_client->didFinishLoading(*this);
+            if (RefPtr client = m_client.get())
+                client->didFinishLoading(*this);
 
             if (m_currentModel)
                 m_currentModel->addMesh(toCpp(addRequest));
@@ -296,7 +296,7 @@ void DDModelPlayer::update()
     if (auto* machSendRight = displayBuffer(); machSendRight && contentsDisplayDelegate())
         RefPtr { m_contentsDisplayDelegate }->setDisplayBuffer(*machSendRight);
 
-    if (auto client = m_client.get())
+    if (RefPtr client = m_client.get())
         client->didUpdateDisplayDelegate();
 }
 

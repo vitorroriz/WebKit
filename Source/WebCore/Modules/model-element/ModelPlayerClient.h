@@ -28,26 +28,17 @@
 #include <WebCore/LayerHostingContextIdentifier.h>
 #include <WebCore/PlatformLayerIdentifier.h>
 #include <WebCore/TransformationMatrix.h>
+#include <wtf/AbstractRefCountedAndCanMakeWeakPtr.h>
 #include <wtf/Forward.h>
-#include <wtf/WeakPtr.h>
 
 namespace WebCore {
+
 class FloatPoint3D;
-class ModelPlayerClient;
-}
-
-namespace WTF {
-template<typename T> struct IsDeprecatedWeakRefSmartPointerException;
-template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::ModelPlayerClient> : std::true_type { };
-}
-
-namespace WebCore {
-
 class HTMLModelElement;
 class ModelPlayer;
 class ResourceError;
 
-class WEBCORE_EXPORT ModelPlayerClient : public CanMakeWeakPtr<ModelPlayerClient> {
+class WEBCORE_EXPORT ModelPlayerClient : public AbstractRefCountedAndCanMakeWeakPtr<ModelPlayerClient> {
 public:
     virtual ~ModelPlayerClient();
 
