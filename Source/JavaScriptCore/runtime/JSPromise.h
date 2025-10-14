@@ -97,12 +97,12 @@ public:
     JS_EXPORT_PRIVATE static JSPromise* rejectedPromise(JSGlobalObject*, JSValue);
 
     JS_EXPORT_PRIVATE void resolve(JSGlobalObject*, JSValue);
-    JS_EXPORT_PRIVATE void reject(JSGlobalObject*, JSValue);
-    void fulfill(JSGlobalObject*, JSValue);
-    JS_EXPORT_PRIVATE void rejectAsHandled(JSGlobalObject*, JSValue);
-    JS_EXPORT_PRIVATE void reject(JSGlobalObject*, Exception*);
-    JS_EXPORT_PRIVATE void rejectAsHandled(JSGlobalObject*, Exception*);
-    JS_EXPORT_PRIVATE void performPromiseThenExported(JSGlobalObject*, JSValue onFulfilled, JSValue onRejected, JSValue, JSValue = jsUndefined());
+    JS_EXPORT_PRIVATE void reject(VM&, JSGlobalObject*, JSValue);
+    void fulfill(VM&, JSGlobalObject*, JSValue);
+    JS_EXPORT_PRIVATE void rejectAsHandled(VM&, JSGlobalObject*, JSValue);
+    JS_EXPORT_PRIVATE void reject(VM&, JSGlobalObject*, Exception*);
+    JS_EXPORT_PRIVATE void rejectAsHandled(VM&, JSGlobalObject*, Exception*);
+    JS_EXPORT_PRIVATE void performPromiseThenExported(VM&, JSGlobalObject*, JSValue onFulfilled, JSValue onRejected, JSValue, JSValue = jsUndefined());
 
     JS_EXPORT_PRIVATE JSPromise* rejectWithCaughtException(JSGlobalObject*, ThrowScope&);
 
@@ -129,9 +129,9 @@ public:
     DECLARE_VISIT_CHILDREN;
 
     // This is abstract operations defined in the spec.
-    void performPromiseThen(JSGlobalObject*, JSValue onFulfilled, JSValue onRejected, JSValue, JSValue = jsUndefined());
-    void rejectPromise(JSGlobalObject*, JSValue);
-    void fulfillPromise(JSGlobalObject*, JSValue);
+    void performPromiseThen(VM&, JSGlobalObject*, JSValue onFulfilled, JSValue onRejected, JSValue, JSValue = jsUndefined());
+    void rejectPromise(VM&, JSGlobalObject*, JSValue);
+    void fulfillPromise(VM&, JSGlobalObject*, JSValue);
     void resolvePromise(JSGlobalObject*, JSValue);
 
     static void resolveWithoutPromiseForAsyncAwait(JSGlobalObject*, JSValue resolution, JSValue onFulfilled, JSValue onRejected, JSValue context);
@@ -155,7 +155,7 @@ protected:
     JSPromise(VM&, Structure*);
     void finishCreation(VM&);
 
-    static void triggerPromiseReactions(JSGlobalObject*, JSPromise::Status, JSPromiseReaction* head, JSValue argument);
+    static void triggerPromiseReactions(VM&, JSGlobalObject*, JSPromise::Status, JSPromiseReaction* head, JSValue argument);
 
     inline uint32_t flags() const
     {

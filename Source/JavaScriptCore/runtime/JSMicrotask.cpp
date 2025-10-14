@@ -61,11 +61,8 @@ static void promiseResolveThenableJobFastSlow(JSGlobalObject* globalObject, JSPr
     auto [resolve, reject] = promiseToResolve->createResolvingFunctions(vm, globalObject);
 
     auto capability = JSPromise::createNewPromiseCapability(globalObject, constructor);
-    if (!scope.exception()) [[likely]] {
-        promise->performPromiseThen(globalObject, resolve, reject, capability, jsUndefined());
-        if (!scope.exception()) [[likely]]
-            return;
-    }
+    if (!scope.exception()) [[likely]]
+        promise->performPromiseThen(vm, globalObject, resolve, reject, capability, jsUndefined());
 
     JSValue error = scope.exception()->value();
     if (!scope.clearExceptionExceptTermination()) [[unlikely]]
@@ -91,11 +88,8 @@ static void promiseResolveThenableJobWithoutPromiseFastSlow(JSGlobalObject* glob
     auto [resolve, reject] = JSPromise::createResolvingFunctionsWithoutPromise(vm, globalObject, onFulfilled, onRejected, context);
 
     auto capability = JSPromise::createNewPromiseCapability(globalObject, constructor);
-    if (!scope.exception()) [[likely]] {
-        promise->performPromiseThen(globalObject, resolve, reject, capability, jsUndefined());
-        if (!scope.exception()) [[likely]]
-            return;
-    }
+    if (!scope.exception()) [[likely]]
+        promise->performPromiseThen(vm, globalObject, resolve, reject, capability, jsUndefined());
 
     JSValue error = scope.exception()->value();
     if (!scope.clearExceptionExceptTermination()) [[unlikely]]
@@ -156,12 +150,8 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
             break;
         }
         case JSPromise::Status::Rejected: {
-            if (!promise->isHandled()) {
-                if (globalObject->globalObjectMethodTable()->promiseRejectionTracker) {
-                    globalObject->globalObjectMethodTable()->promiseRejectionTracker(globalObject, promise, JSPromiseRejectionOperation::Handle);
-                    RETURN_IF_EXCEPTION(scope, void());
-                }
-            }
+            if (!promise->isHandled())
+                globalObject->globalObjectMethodTable()->promiseRejectionTracker(globalObject, promise, JSPromiseRejectionOperation::Handle);
             scope.release();
             globalObject->queueMicrotask(InternalMicrotask::PromiseResolveWithoutHandlerJob, promiseToResolve, promise->reactionsOrResult(), jsNumber(static_cast<int32_t>(JSPromise::Status::Rejected)), jsUndefined());
             break;
@@ -192,12 +182,8 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
             break;
         }
         case JSPromise::Status::Rejected: {
-            if (!promise->isHandled()) {
-                if (globalObject->globalObjectMethodTable()->promiseRejectionTracker) {
-                    globalObject->globalObjectMethodTable()->promiseRejectionTracker(globalObject, promise, JSPromiseRejectionOperation::Handle);
-                    RETURN_IF_EXCEPTION(scope, void());
-                }
-            }
+            if (!promise->isHandled())
+                globalObject->globalObjectMethodTable()->promiseRejectionTracker(globalObject, promise, JSPromiseRejectionOperation::Handle);
 
             scope.release();
             globalObject->queueMicrotask(InternalMicrotask::PromiseReactionJobWithoutPromise, onRejected, promise->reactionsOrResult(), context, jsUndefined());
@@ -237,7 +223,7 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
         }
         case JSPromise::Status::Rejected: {
             scope.release();
-            promise->rejectPromise(globalObject, resolution);
+            promise->rejectPromise(vm, globalObject, resolution);
             break;
         }
         }
@@ -270,7 +256,7 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
 
         if (error) {
             if (auto* promise = jsDynamicCast<JSPromise*>(promiseOrCapability))
-                RELEASE_AND_RETURN(scope, promise->rejectPromise(globalObject, error));
+                RELEASE_AND_RETURN(scope, promise->rejectPromise(vm, globalObject, error));
 
             JSValue reject = promiseOrCapability.get(globalObject, vm.propertyNames->reject);
             RETURN_IF_EXCEPTION(scope, void());

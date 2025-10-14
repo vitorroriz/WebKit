@@ -199,8 +199,7 @@ JSC::JSValue JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::next(JSC::JSGlob
     RETURN_IF_EXCEPTION(scope, { });
 
     auto* ongoingPromise = m_ongoingPromise->promise();
-    ongoingPromise->performPromiseThenExported(&lexicalGlobalObject, onSettled, onSettled, afterOngoingPromiseCapability);
-    RETURN_IF_EXCEPTION(scope, { });
+    ongoingPromise->performPromiseThenExported(vm, &lexicalGlobalObject, onSettled, onSettled, afterOngoingPromiseCapability);
 
     m_ongoingPromise = DOMPromise::create(*this->globalObject(), *promise);
     return m_ongoingPromise->promise();
@@ -232,8 +231,7 @@ JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::runNextSteps(
     auto onRejected = createOnRejectedFunction(&globalObject);
     RETURN_IF_EXCEPTION(scope, nullptr);
 
-    nextPromise->performPromiseThenExported(&globalObject, onFulfilled, onRejected, nextPromiseCapability);
-    RETURN_IF_EXCEPTION(scope, nullptr);
+    nextPromise->performPromiseThenExported(vm, &globalObject, onFulfilled, onRejected, nextPromiseCapability);
 
     return promise;
 }

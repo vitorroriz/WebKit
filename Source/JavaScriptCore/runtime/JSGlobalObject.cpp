@@ -663,7 +663,7 @@ const GlobalObjectMethodTable* JSGlobalObject::baseGlobalObjectMethodTable()
         nullptr, // moduleLoaderFetch
         nullptr, // moduleLoaderCreateImportMetaProperties
         nullptr, // moduleLoaderEvaluate
-        nullptr, // promiseRejectionTracker
+        &promiseRejectionTracker,
         &reportUncaughtExceptionAtEventLoop,
         &currentScriptExecutionOwner,
         &scriptExecutionStatus,
@@ -743,7 +743,7 @@ JSC_DEFINE_HOST_FUNCTION(rejectPromise, (JSGlobalObject* globalObject, CallFrame
 {
     auto* promise = jsCast<JSPromise*>(callFrame->uncheckedArgument(0));
     JSValue argument = callFrame->uncheckedArgument(1);
-    promise->rejectPromise(globalObject, argument);
+    promise->rejectPromise(globalObject->vm(), globalObject, argument);
     return encodedJSUndefined();
 }
 
@@ -751,7 +751,7 @@ JSC_DEFINE_HOST_FUNCTION(fulfillPromise, (JSGlobalObject* globalObject, CallFram
 {
     auto* promise = jsCast<JSPromise*>(callFrame->uncheckedArgument(0));
     JSValue argument = callFrame->uncheckedArgument(1);
-    promise->fulfillPromise(globalObject, argument);
+    promise->fulfillPromise(globalObject->vm(), globalObject, argument);
     return encodedJSUndefined();
 }
 
@@ -785,7 +785,7 @@ JSC_DEFINE_HOST_FUNCTION(rejectPromiseWithFirstResolvingFunctionCallCheck, (JSGl
 {
     auto* promise = jsCast<JSPromise*>(callFrame->uncheckedArgument(0));
     JSValue argument = callFrame->uncheckedArgument(1);
-    promise->reject(globalObject, argument);
+    promise->reject(globalObject->vm(), globalObject, argument);
     return encodedJSUndefined();
 }
 
@@ -793,7 +793,7 @@ JSC_DEFINE_HOST_FUNCTION(fulfillPromiseWithFirstResolvingFunctionCallCheck, (JSG
 {
     auto* promise = jsCast<JSPromise*>(callFrame->uncheckedArgument(0));
     JSValue argument = callFrame->uncheckedArgument(1);
-    promise->fulfill(globalObject, argument);
+    promise->fulfill(globalObject->vm(), globalObject, argument);
     return encodedJSUndefined();
 }
 
@@ -830,7 +830,7 @@ JSC_DEFINE_HOST_FUNCTION(promiseOnRejectedWithContext, (JSGlobalObject* globalOb
     auto* context = jsCast<JSPromiseAllContext*>(callFrame->uncheckedArgument(1));
     auto* globalContext = jsCast<JSPromiseAllGlobalContext*>(context->globalContext());
     auto* promise = jsCast<JSPromise*>(globalContext->promise());
-    promise->reject(globalObject, argument);
+    promise->reject(globalObject->vm(), globalObject, argument);
     return encodedJSUndefined();
 }
 
@@ -900,7 +900,7 @@ JSC_DEFINE_HOST_FUNCTION(performPromiseThen, (JSGlobalObject* globalObject, Call
     JSValue onRejected = callFrame->uncheckedArgument(2);
     JSValue promiseOrCapability = callFrame->uncheckedArgument(3);
     JSValue context = callFrame->uncheckedArgument(4);
-    promise->performPromiseThen(globalObject, onFulfilled, onRejected, promiseOrCapability, context);
+    promise->performPromiseThen(globalObject->vm(), globalObject, onFulfilled, onRejected, promiseOrCapability, context);
     return encodedJSUndefined();
 }
 
@@ -3584,6 +3584,19 @@ void JSGlobalObject::queueMicrotask(InternalMicrotask job, JSValue argument0, JS
 {
     QueuedTask task { nullptr, job, this, argument0, argument1, argument2, argument3 };
     globalObjectMethodTable()->queueMicrotaskToEventLoop(*this, WTFMove(task));
+}
+
+void JSGlobalObject::promiseRejectionTracker(JSGlobalObject* globalObject, JSPromise* promise, JSPromiseRejectionOperation operation)
+{
+    switch (operation) {
+    case JSC::JSPromiseRejectionOperation::Handle: {
+        break;
+    }
+    case JSC::JSPromiseRejectionOperation::Reject: {
+        globalObject->vm().promiseRejected(promise);
+        break;
+    }
+    }
 }
 
 void JSGlobalObject::reportUncaughtExceptionAtEventLoop(JSGlobalObject*, Exception* exception)

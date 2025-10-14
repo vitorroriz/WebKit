@@ -53,9 +53,8 @@ auto DOMPromise::whenPromiseIsSettled(JSDOMGlobalObject* globalObject, JSC::JSPr
         return JSC::JSValue::encode(JSC::jsUndefined());
     });
 
-    auto scope = DECLARE_THROW_SCOPE(vm);
-    promise->performPromiseThenExported(&lexicalGlobalObject, handler, handler, JSC::jsUndefined());
-    return scope.exception() ? IsCallbackRegistered::No : IsCallbackRegistered::Yes;
+    promise->performPromiseThenExported(vm, &lexicalGlobalObject, handler, handler, JSC::jsUndefined());
+    return IsCallbackRegistered::Yes;
 }
 
 JSC::JSValue DOMPromise::result() const
