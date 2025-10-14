@@ -1,7 +1,6 @@
 Platform/IPC/ArgumentCoders.h
 UIProcess/API/C/mac/WKPagePrivateMac.mm
 UIProcess/API/Cocoa/WKContentWorld.mm
-UIProcess/API/Cocoa/WKDownload.mm
 UIProcess/API/Cocoa/WKFrameInfo.mm
 UIProcess/API/Cocoa/WKOpenPanelParameters.mm
 UIProcess/API/Cocoa/WKPreferences.mm
@@ -21,7 +20,6 @@ UIProcess/API/Cocoa/_WKContentRuleListAction.mm
 [ Mac ] UIProcess/API/Cocoa/_WKContextMenuElementInfo.mm
 UIProcess/API/Cocoa/_WKCustomHeaderFields.mm
 UIProcess/API/Cocoa/_WKDataTask.mm
-UIProcess/API/Cocoa/_WKDownload.mm
 UIProcess/API/Cocoa/_WKFeature.mm
 UIProcess/API/Cocoa/_WKFrameTreeNode.mm
 UIProcess/API/Cocoa/_WKInspector.mm
