@@ -61,7 +61,6 @@ html/track/TrackBase.h
 inspector/InspectorController.h
 [ Mac ] inspector/InspectorFrontendHost.h
 inspector/InspectorInstrumentation.h
-inspector/InspectorOverlay.h
 inspector/InspectorStyleSheet.h
 inspector/InstrumentingAgents.h
 inspector/UserGestureEmulationScope.h
