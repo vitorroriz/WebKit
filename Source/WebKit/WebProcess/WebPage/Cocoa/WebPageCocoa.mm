@@ -1382,16 +1382,16 @@ BoxSideSet WebPage::sidesRequiringFixedContainerEdges() const
     auto sides = m_page->fixedContainerEdges().fixedEdges();
 
     if ((additionalHeight + obscuredInsets.top()) > 0)
-        sides.add(BoxSideFlag::Top);
+        sides.add(BoxSide::Top);
 
     if (obscuredInsets.left() > 0)
-        sides.add(BoxSideFlag::Left);
+        sides.add(BoxSide::Left);
 
     if (obscuredInsets.right() > 0)
-        sides.add(BoxSideFlag::Right);
+        sides.add(BoxSide::Right);
 
     if (obscuredInsets.bottom() > 0)
-        sides.add(BoxSideFlag::Bottom);
+        sides.add(BoxSide::Bottom);
 
     return sides;
 }

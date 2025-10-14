@@ -5438,22 +5438,21 @@ void Page::updateFixedContainerEdges(BoxSideSet sides)
             || document->parsing();
 
         if (scrollOffset.y() < minimumOffset.y() || !canSampleTopEdge)
-            sidesToSample.remove(BoxSideFlag::Top);
+            sidesToSample.remove(BoxSide::Top);
 
         if (scrollOffset.y() > maximumOffset.y())
-            sidesToSample.remove(BoxSideFlag::Bottom);
+            sidesToSample.remove(BoxSide::Bottom);
 
         if (scrollOffset.x() < minimumOffset.x())
-            sidesToSample.remove(BoxSideFlag::Left);
+            sidesToSample.remove(BoxSide::Left);
 
         if (scrollOffset.x() > maximumOffset.x())
-            sidesToSample.remove(BoxSideFlag::Right);
+            sidesToSample.remove(BoxSide::Right);
 
         return sidesToSample;
     }());
 
-    for (auto sideFlag : sides) {
-        auto side = boxSideFromFlag(sideFlag);
+    for (auto side : sides) {
         if (!edges.hasFixedEdge(side) || (!edges.predominantColor(side).isVisible() && fixedContainerEdges().predominantColor(side).isVisible())) {
             WeakPtr lastElement = m_fixedContainerEdgesAndElements.second.at(side);
             if (!lastElement)

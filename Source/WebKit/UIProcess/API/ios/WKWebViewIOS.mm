@@ -254,13 +254,13 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     auto sidesWithInsets = [](UIEdgeInsets insets) {
         WebCore::BoxSideSet sides;
         if (insets.top > 0)
-            sides.add(WebCore::BoxSideFlag::Top);
+            sides.add(WebCore::BoxSide::Top);
         if (insets.left > 0)
-            sides.add(WebCore::BoxSideFlag::Left);
+            sides.add(WebCore::BoxSide::Left);
         if (insets.bottom > 0)
-            sides.add(WebCore::BoxSideFlag::Bottom);
+            sides.add(WebCore::BoxSide::Bottom);
         if (insets.right > 0)
-            sides.add(WebCore::BoxSideFlag::Right);
+            sides.add(WebCore::BoxSide::Right);
         return sides;
     };
     BOOL updateFixedColorExtensionViews = sidesWithInsets(_obscuredInsets) != sidesWithInsets(obscuredInsets);
