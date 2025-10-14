@@ -2101,21 +2101,21 @@ inline OptionSet<WebKit::FindOptions> toFindOptions(WKFindConfiguration *configu
 {
     id <WKUIDelegatePrivate> uiDelegate = (id <WKUIDelegatePrivate>)self.UIDelegate;
     if ([uiDelegate respondsToSelector:@selector(_webView:didInsertAttachment:withSource:)])
-        [uiDelegate _webView:self didInsertAttachment:WebKit::protectedWrapper(attachment).get() withSource:source];
+        [uiDelegate _webView:self didInsertAttachment:protectedWrapper(attachment).get() withSource:source];
 }
 
 - (void)_didRemoveAttachment:(API::Attachment&)attachment
 {
     id <WKUIDelegatePrivate> uiDelegate = (id <WKUIDelegatePrivate>)self.UIDelegate;
     if ([uiDelegate respondsToSelector:@selector(_webView:didRemoveAttachment:)])
-        [uiDelegate _webView:self didRemoveAttachment:WebKit::protectedWrapper(attachment).get()];
+        [uiDelegate _webView:self didRemoveAttachment:protectedWrapper(attachment).get()];
 }
 
 - (void)_didInvalidateDataForAttachment:(API::Attachment&)attachment
 {
     id <WKUIDelegatePrivate> uiDelegate = (id <WKUIDelegatePrivate>)self.UIDelegate;
     if ([uiDelegate respondsToSelector:@selector(_webView:didInvalidateDataForAttachment:)])
-        [uiDelegate _webView:self didInvalidateDataForAttachment:WebKit::protectedWrapper(attachment).get()];
+        [uiDelegate _webView:self didInvalidateDataForAttachment:protectedWrapper(attachment).get()];
 }
 
 #endif // ENABLE(ATTACHMENT_ELEMENT)
@@ -2229,7 +2229,7 @@ static RetainPtr<NSError> unknownError()
     THROW_IF_SUSPENDED;
     _page->getWebArchiveData([completionHandler = makeBlockPtr(completionHandler)](API::Data* data) {
         if (data)
-            completionHandler(WebKit::protectedWrapper(data).get(), nil);
+            completionHandler(protectedWrapper(data).get(), nil);
         else
             completionHandler(nil, unknownError().get());
     });
@@ -4151,7 +4151,7 @@ static RetainPtr<NSArray> wkTextManipulationErrors(NSArray<_WKTextManipulationIt
 - (void)_dataTaskWithRequest:(NSURLRequest *)request runAtForegroundPriority:(BOOL)runAtForegroundPriority completionHandler:(void(^)(_WKDataTask *))completionHandler
 {
     _page->dataTaskWithRequest(request, std::nullopt, !!runAtForegroundPriority, [completionHandler = makeBlockPtr(completionHandler)] (Ref<API::DataTask>&& task) {
-        completionHandler(WebKit::protectedWrapper(task.get()).get());
+        completionHandler(protectedWrapper(task.get()).get());
     });
 }
 
@@ -5371,7 +5371,7 @@ static inline OptionSet<WebCore::LayoutMilestone> layoutMilestones(_WKRenderingP
 {
     THROW_IF_SUSPENDED;
     _page->getMainResourceDataOfFrame(_page->protectedMainFrame().get(), [completionHandler = makeBlockPtr(completionHandler)](API::Data* data) {
-        completionHandler(WebKit::protectedWrapper(data).get(), nil);
+        completionHandler(protectedWrapper(data).get(), nil);
     });
 }
 
@@ -5404,7 +5404,7 @@ static inline OptionSet<WebCore::LayoutMilestone> layoutMilestones(_WKRenderingP
 
     _page->getWebArchiveDataWithFrame(*webFrame, [completionHandler = makeBlockPtr(completionHandler)](API::Data* data) {
         if (data)
-            completionHandler(WebKit::protectedWrapper(data).get(), nil);
+            completionHandler(protectedWrapper(data).get(), nil);
         else
             completionHandler(nil, unknownError().get());
     });
@@ -5446,7 +5446,7 @@ static inline OptionSet<WebCore::LayoutMilestone> layoutMilestones(_WKRenderingP
 
     _page->getWebArchiveDataWithSelectedFrames(*webRootFrame, targetFrameIDs, [completionHandler = makeBlockPtr(completionHandler)](API::Data* data) {
         if (data)
-            completionHandler(WebKit::protectedWrapper(data).get(), nil);
+            completionHandler(protectedWrapper(data).get(), nil);
         else
             completionHandler(nil, unknownError().get());
     });
@@ -5494,7 +5494,7 @@ static inline OptionSet<WebCore::LayoutMilestone> layoutMilestones(_WKRenderingP
         if (completionHandler) {
             if (manifest) {
                 Ref apiManifest = API::ApplicationManifest::create(*manifest);
-                completionHandler(WebKit::protectedWrapper(apiManifest.get()).get());
+                completionHandler(protectedWrapper(apiManifest.get()).get());
             } else
                 completionHandler(nil);
         }
