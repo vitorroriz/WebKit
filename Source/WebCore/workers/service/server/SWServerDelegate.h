@@ -28,6 +28,7 @@
 #include <WebCore/BackgroundFetchRecordLoader.h>
 #include <WebCore/ProcessIdentifier.h>
 #include <WebCore/ScriptExecutionContextIdentifier.h>
+#include <wtf/AbstractCanMakeCheckedPtr.h>
 #include <wtf/CompletionHandler.h>
 #include <wtf/HashSet.h>
 #include <wtf/WeakPtr.h>
@@ -47,15 +48,9 @@ struct BackgroundFetchRequest;
 struct ServiceWorkerJobData;
 struct WorkerFetchResult;
 
-class SWServerDelegate : public CanMakeWeakPtr<SWServerDelegate> {
+class SWServerDelegate : public CanMakeWeakPtr<SWServerDelegate>, public AbstractCanMakeCheckedPtr {
 public:
     virtual ~SWServerDelegate() = default;
-
-    // CanMakeCheckedPtr.
-    virtual uint32_t checkedPtrCount() const = 0;
-    virtual uint32_t checkedPtrCountWithoutThreadCheck() const = 0;
-    virtual void incrementCheckedPtrCount() const = 0;
-    virtual void decrementCheckedPtrCount() const = 0;
 
     virtual void softUpdate(ServiceWorkerJobData&&, bool shouldRefreshCache, ResourceRequest&&, CompletionHandler<void(WorkerFetchResult&&)>&&) = 0;
     virtual void createContextConnection(const Site&, std::optional<ProcessIdentifier>, std::optional<ScriptExecutionContextIdentifier>, CompletionHandler<void()>&&) = 0;
