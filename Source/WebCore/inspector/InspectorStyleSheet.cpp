@@ -60,6 +60,7 @@
 #include "InspectorCSSAgent.h"
 #include "InspectorDOMAgent.h"
 #include "InspectorPageAgent.h"
+#include "InspectorResourceUtilities.h"
 #include "MediaList.h"
 #include "Node.h"
 #include "SVGElementTypeHelpers.h"
@@ -1741,7 +1742,7 @@ bool InspectorStyleSheet::resourceStyleSheetText(String* result) const
 
     String error;
     bool base64Encoded;
-    InspectorPageAgent::resourceContent(error, ownerDocument()->frame(), URL({ }, m_pageStyleSheet->href()), result, &base64Encoded);
+    ResourceUtilities::resourceContent(error, ownerDocument()->frame(), URL({ }, m_pageStyleSheet->href()), result, &base64Encoded);
     return error.isEmpty() && !base64Encoded;
 }
 

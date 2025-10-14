@@ -34,7 +34,7 @@
 #include "DOMException.h"
 #include "Database.h"
 #include "Document.h"
-#include "InspectorPageAgent.h"
+#include "InspectorResourceUtilities.h"
 #include "InstrumentingAgents.h"
 #include "LocalDOMWindow.h"
 #include "LocalFrame.h"
@@ -213,7 +213,7 @@ RefPtr<StorageArea> InspectorDOMStorageAgent::findStorageArea(Inspector::Protoco
         return nullptr;
     }
 
-    targetFrame = InspectorPageAgent::findFrameWithSecurityOrigin(m_inspectedPage, securityOrigin);
+    targetFrame = ResourceUtilities::findFrameWithSecurityOrigin(m_inspectedPage, securityOrigin);
     if (!targetFrame) {
         errorString = "Missing frame for given securityOrigin"_s;
         return nullptr;

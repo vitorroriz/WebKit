@@ -244,6 +244,7 @@ inspector/InspectorInstrumentation.cpp
 inspector/InspectorInstrumentation.h
 inspector/InspectorNodeFinder.cpp
 inspector/InspectorOverlay.cpp
+inspector/InspectorResourceUtilities.cpp
 inspector/InspectorShaderProgram.cpp
 inspector/InspectorStyleSheet.cpp
 inspector/PageDebugger.cpp

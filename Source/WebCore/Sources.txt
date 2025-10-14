@@ -1837,11 +1837,14 @@ inspector/InspectorHistory.cpp
 inspector/InspectorInstrumentation.cpp
 inspector/InspectorInstrumentationPublic.cpp
 inspector/InspectorInstrumentationWebKit.cpp
+inspector/InspectorNetworkIntercept.cpp
 inspector/InspectorNodeFinder.cpp
 inspector/InspectorOverlay.cpp
 inspector/InspectorOverlayLabel.cpp
+inspector/InspectorResourceUtilities.cpp
 inspector/InspectorShaderProgram.cpp
 inspector/InspectorStyleSheet.cpp
+inspector/InspectorThreadableLoaderClient.cpp
 inspector/InstrumentingAgents.cpp
 inspector/NetworkResourcesData.cpp
 inspector/PageDebugger.cpp

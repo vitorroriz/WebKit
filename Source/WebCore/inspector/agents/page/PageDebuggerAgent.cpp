@@ -36,7 +36,7 @@
 #include "DOMWrapperWorld.h"
 #include "Document.h"
 #include "FrameConsoleClient.h"
-#include "InspectorPageAgent.h"
+#include "InspectorResourceUtilities.h"
 #include "InstrumentingAgents.h"
 #include "JSDOMWindowCustom.h"
 #include "JSExecState.h"
@@ -105,7 +105,7 @@ String PageDebuggerAgent::sourceMapURLForScript(const JSC::Debugger::Script& scr
         if (!localMainFrame)
             return String();
 
-        CachedResource* resource = InspectorPageAgent::cachedResource(localMainFrame.get(), URL({ }, script.url));
+        CachedResource* resource = ResourceUtilities::cachedResource(localMainFrame.get(), URL({ }, script.url));
         if (resource) {
             String sourceMapHeader = resource->response().httpHeaderField(StringView { sourceMapHTTPHeader });
             if (!sourceMapHeader.isEmpty())
