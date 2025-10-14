@@ -29,6 +29,7 @@
 #include <WebCore/DDMeshDescriptor.h>
 #include <WebCore/DDUpdateMeshDescriptor.h>
 #include <WebCore/ModelDDTypes.h>
+#include <wtf/cocoa/VectorCocoa.h>
 
 namespace WebCore {
 static DDModel::DDVertexAttributeFormat toCpp(WebDDVertexAttributeFormat *format)
@@ -86,16 +87,6 @@ static Vector<DDModel::DDFloat4x4> toVector(WebChainedFloat4x4 *input)
     return result;
 }
 
-static Vector<uint8_t> toVector(NSData *input)
-{
-    WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
-    Vector<uint8_t> result;
-    for (NSUInteger i = 0; i < input.length; ++i)
-        result.append(((const uint8_t*)input.bytes)[i]);
-
-    WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
-    return result;
-}
 
 static Vector<KeyValuePair<int32_t, uint64_t>> toCpp(NSArray<WebSetRenderFlags *> *renderFlags)
 {
@@ -130,7 +121,7 @@ static DDModel::DDReplaceVertices toCpp(WebReplaceVertices *a)
 {
     return DDModel::DDReplaceVertices {
         .bufferIndex = static_cast<int32_t>(a.bufferIndex),
-        .buffer = toVector(a.buffer)
+        .buffer = makeVector(a.buffer)
     };
 }
 
@@ -159,7 +150,7 @@ static WebCore::DDModel::DDUpdateMeshDescriptor toCpp(WebUpdateMeshRequest *upda
         .parts = toCpp(update.parts),
         .renderFlags = toCpp(update.renderFlags),
         .vertices = toCpp(update.vertices),
-        .indices = toVector(update.indices),
+        .indices = makeVector(update.indices),
         .transform = update.transform,
         .instanceTransforms4x4 = toVector(update.instanceTransforms),
         .materialIds = toCpp(update.materialIds)
