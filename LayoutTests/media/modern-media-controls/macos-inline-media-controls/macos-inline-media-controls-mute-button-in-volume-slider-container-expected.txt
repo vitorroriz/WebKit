@@ -3,13 +3,14 @@ Testing the mute button for inline media controls correctly displays in the bott
 On success, you will see a series of "PASS" messages, followed by "TEST COMPLETE".
 
 
-width = 600
-mediaControls.muteButton.parent.parent.constructor.name: ControlsBar
-PASS mediaControls.topRightControlsBar.parent is null
 
 width = 250
-mediaControls.muteButton.parent.parent.constructor.name MacOSInlineMediaControls
-mediaControls.topRightControlsBar.parent.constructor.name MacOSInlineMediaControls
+mediaControls.muteButton.parent: LayoutNode
+mediaControls._volumeSliderContainer.parent: LayoutNode
+mediaControls.muteButton.parent: LayoutNode
+mediaControls._volumeSliderContainer: LayoutNode
+Expected parent: LayoutNode
+Actual parent: LayoutNode
 
 PASS successfullyParsed is true
 

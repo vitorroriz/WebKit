@@ -355,6 +355,15 @@ bool MediaControlsHost::needsChromeMediaControlsPseudoElement() const
     return false;
 }
 
+bool MediaControlsHost::isMediaControlsMacInlineSizeSpecsEnabled() const
+{
+#if HAVE(MATERIAL_HOSTING)
+    if (RefPtr mediaElement = m_mediaElement.ptr())
+        return mediaElement->document().settings().mediaControlsMacInlineSizeSpecsEnabled();
+#endif
+    return false;
+}
+
 String MediaControlsHost::externalDeviceDisplayName() const
 {
 #if ENABLE(WIRELESS_PLAYBACK_TARGET)

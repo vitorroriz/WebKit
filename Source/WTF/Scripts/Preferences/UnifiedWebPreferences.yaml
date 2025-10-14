@@ -4930,14 +4930,15 @@ MediaControlsContextMenusEnabled:
 
 MediaControlsMacInlineSizeSpecsEnabled:
   type: bool
-  status: testable
+  status: preview
   category: media
-  humanReadableName: "Media Controls Rounded Corners"
+  humanReadableName: "Mac Inline Media Controls Specs"
   humanReadableDescription: "Adopt new size specs for media controls"
+  condition: HAVE(MATERIAL_HOSTING)
   defaultValue:
-    WebKitLegacy:
-      default: false
     WebKit:
+      default: defaultHostedBlurMaterialInMediaControlsEnabled()
+    WebKitLegacy:
       default: false
     WebCore:
       default: false
