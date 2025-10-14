@@ -124,7 +124,7 @@ RenderImage* toSimpleImage(RenderObject& renderer)
         return nullptr;
 #endif // ENABLE(VIDEO)
 
-    return renderImage.get();
+    return renderImage.unsafeGet();
 }
 
 // FIXME: This probably belongs on Element.

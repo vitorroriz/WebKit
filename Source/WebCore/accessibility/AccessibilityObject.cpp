@@ -2442,7 +2442,7 @@ static RenderObject* nearestRendererFromNode(Node& node)
     for (RefPtr ancestor = &node; ancestor && !renderer; ancestor = composedParentIgnoringDocumentFragments(*ancestor))
         renderer = ancestor->renderer();
 
-    return renderer.get();
+    return renderer.unsafeGet();
 }
 
 static int zIndexFromRenderer(RenderObject* renderer)

@@ -153,7 +153,7 @@ RenderElement* Styleable::renderer() const
 
         // Return early if we're looking for ::view-transition-group().
         if (pseudoElementIdentifier->pseudoId == PseudoId::ViewTransitionGroup)
-            return correctGroup.get();
+            return correctGroup.unsafeGet();
 
         // Go through all descendants until we find the relevant pseudo element otherwise.
         for (auto& descendant : descendantsOfType<RenderBox>(*correctGroup)) {

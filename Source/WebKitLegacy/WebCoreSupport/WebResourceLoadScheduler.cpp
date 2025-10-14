@@ -60,7 +60,7 @@ using namespace WebCore;
 
 WebResourceLoadScheduler& webResourceLoadScheduler()
 {
-    return static_cast<WebResourceLoadScheduler&>(*platformStrategies()->loaderStrategy());
+    return static_cast<WebResourceLoadScheduler&>(*platformStrategies()->loaderStrategy().unsafeGet());
 }
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(WebResourceLoadScheduler);

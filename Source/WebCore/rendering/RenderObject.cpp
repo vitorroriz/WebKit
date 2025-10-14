@@ -437,7 +437,7 @@ RenderObject* RenderObject::traverseNext(const RenderObject* stayWithin, HeightT
             if (overflowType == OverflowHeight)
                 newFixedDepth = currentDepth;
             ASSERT(!stayWithin || child->isDescendantOf(stayWithin));
-            return child.get();
+            return child.unsafeGet();
         }
     }
 
@@ -460,7 +460,7 @@ RenderObject* RenderObject::traverseNext(const RenderObject* stayWithin, HeightT
                 if (overflowType == OverflowHeight)
                     newFixedDepth = currentDepth;
                 ASSERT(!stayWithin || !n->nextSibling() || n->nextSibling()->isDescendantOf(stayWithin));
-                return sibling.get();
+                return sibling.unsafeGet();
             }
         }
         if (!stayWithin || n->parent() != stayWithin) {
@@ -642,7 +642,7 @@ RenderElement* RenderObject::markContainingBlocksForLayout(RenderElement* layout
             if (ancestor == layoutRoot)
                 return layoutRoot;
         } else if (isLayoutBoundary(*ancestor))
-            return ancestor.get();
+            return ancestor.unsafeGet();
 
         if (auto* renderGrid = dynamicDowncast<RenderGrid>(container.get()); renderGrid && renderGrid->isExtrinsicallySized())
             simplifiedNormalFlowLayout = true;
@@ -1710,7 +1710,7 @@ static inline RenderElement* containerForElement(const RenderObject& renderer, c
             if (repaintContainerSkipped && repaintContainer == parent)
                 *repaintContainerSkipped = true;
         }
-        return parent.get();
+        return parent.unsafeGet();
     }
     for (; parent && !parent->canContainFixedPositionObjects(); parent = parent->parent()) {
         if (isInTopLayerOrBackdrop(parent->style(), parent->element())) {
@@ -1720,7 +1720,7 @@ static inline RenderElement* containerForElement(const RenderObject& renderer, c
         if (repaintContainerSkipped && repaintContainer == parent)
             *repaintContainerSkipped = true;
     }
-    return parent.get();
+    return parent.unsafeGet();
 }
 
 RenderElement* RenderObject::container() const

@@ -788,7 +788,7 @@ inline RenderBox* RenderBox::parentBox() const
 inline RenderBox* RenderBox::firstChildBox() const
 {
     if (CheckedPtr box = dynamicDowncast<RenderBox>(firstChild()))
-        return box.get();
+        return box.unsafeGet();
 
     ASSERT(!firstChild());
     return nullptr;
@@ -802,7 +802,7 @@ inline RenderBox* RenderBox::firstInFlowChildBox() const
 inline RenderBox* RenderBox::lastChildBox() const
 {
     if (CheckedPtr box = dynamicDowncast<RenderBox>(lastChild()))
-        return box.get();
+        return box.unsafeGet();
 
     ASSERT(!lastChild());
     return nullptr;
@@ -816,7 +816,7 @@ inline RenderBox* RenderBox::lastInFlowChildBox() const
 inline RenderBox* RenderBox::previousSiblingBox() const
 {
     if (CheckedPtr box = dynamicDowncast<RenderBox>(previousSibling()))
-        return box.get();
+        return box.unsafeGet();
 
     ASSERT(!previousSibling());
     return nullptr;
@@ -826,7 +826,7 @@ inline RenderBox* RenderBox::previousInFlowSiblingBox() const
 {
     for (CheckedPtr curr = previousSiblingBox(); curr; curr = curr->previousSiblingBox()) {
         if (!curr->isFloatingOrOutOfFlowPositioned())
-            return curr.get();
+            return curr.unsafeGet();
     }
     return nullptr;
 }
@@ -834,7 +834,7 @@ inline RenderBox* RenderBox::previousInFlowSiblingBox() const
 inline RenderBox* RenderBox::nextSiblingBox() const
 {
     if (CheckedPtr box = dynamicDowncast<RenderBox>(nextSibling()))
-        return box.get();
+        return box.unsafeGet();
 
     ASSERT(!nextSibling());
     return nullptr;
@@ -844,7 +844,7 @@ inline RenderBox* RenderBox::nextInFlowSiblingBox() const
 {
     for (CheckedPtr curr = nextSiblingBox(); curr; curr = curr->nextSiblingBox()) {
         if (!curr->isFloatingOrOutOfFlowPositioned())
-            return curr.get();
+            return curr.unsafeGet();
     }
     return nullptr;
 }

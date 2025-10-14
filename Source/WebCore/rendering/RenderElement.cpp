@@ -2258,7 +2258,7 @@ const RenderElement* RenderElement::pushMappingToContainer(const RenderLayerMode
 
     geometryMap.push(this, offset, false);
 
-    return container.get();
+    return container.unsafeGet();
 }
 
 RenderBoxModelObject* RenderElement::offsetParent() const

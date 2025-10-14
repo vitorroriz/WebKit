@@ -473,7 +473,7 @@ const RenderElement* ViewTimeline::stickyContainer() const
     auto scrollerRenderer = sourceScrollerRenderer();
     while (renderer && renderer != scrollerRenderer) {
         if (renderer->isStickilyPositioned())
-            return renderer.get();
+            return renderer.unsafeGet();
         renderer = renderer->containingBlock();
     }
     return nullptr;
