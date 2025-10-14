@@ -586,7 +586,7 @@ CacheStorageConnection& WorkerGlobalScope::cacheStorageConnection()
 MessagePortChannelProvider& WorkerGlobalScope::messagePortChannelProvider()
 {
     if (!m_messagePortChannelProvider)
-        lazyInitialize(m_messagePortChannelProvider, makeUnique<WorkerMessagePortChannelProvider>(*this));
+        lazyInitialize(m_messagePortChannelProvider, WorkerMessagePortChannelProvider::create(*this));
     return *m_messagePortChannelProvider;
 }
 
