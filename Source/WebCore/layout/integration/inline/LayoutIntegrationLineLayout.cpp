@@ -1125,7 +1125,7 @@ void LineLayout::paint(PaintInfo& paintInfo, const LayoutPoint& paintOffset, con
         return;
 
     if (isContentConsideredStale()) {
-        ASSERT_NOT_REACHED_WITH_SECURITY_IMPLICATION();
+        ASSERT_NOT_REACHED();
         return;
     }
 
@@ -1160,7 +1160,7 @@ bool LineLayout::hitTest(const HitTestRequest& request, HitTestResult& result, c
         return false;
 
     if (isContentConsideredStale()) {
-        ASSERT_NOT_REACHED_WITH_SECURITY_IMPLICATION();
+        ASSERT_NOT_REACHED();
         return false;
     }
 
