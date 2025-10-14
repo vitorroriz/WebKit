@@ -5205,11 +5205,6 @@ void WebPage::releaseMemory(Critical)
 
 void WebPage::willDestroyDecodedDataForAllImages()
 {
-#if ENABLE(GPU_PROCESS)
-    if (RefPtr renderingBackend = m_remoteRenderingBackendProxy)
-        renderingBackend->releaseNativeImages();
-#endif
-
     if (RefPtr drawingArea = m_drawingArea)
         drawingArea->setNextRenderingUpdateRequiresSynchronousImageDecoding();
 }
@@ -5220,7 +5215,7 @@ unsigned WebPage::remoteImagesCountForTesting() const
     if (RefPtr renderingBackend = m_remoteRenderingBackendProxy)
         return renderingBackend->nativeImageCountForTesting();
 #endif
-return 0;
+    return 0;
 }
 
 WebInspector* WebPage::inspector(LazyCreationPolicy behavior)
