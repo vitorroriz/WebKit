@@ -838,10 +838,8 @@ bool DocumentLoader::tryLoadingSubstituteData()
         handleSubstituteDataLoadNow();
     else {
         auto loadData = [weakThis = WeakPtr { *this }] {
-            if (RefPtr protectedThis = weakThis.get()) {
-                protectedThis->m_dataLoadToken.clear();
+            if (RefPtr protectedThis = weakThis.get())
                 protectedThis->handleSubstituteDataLoadNow();
-            }
         };
 
 #if USE(COCOA_EVENT_LOOP)
@@ -2348,8 +2346,6 @@ void DocumentLoader::cancelMainResourceLoad(const ResourceError& resourceError, 
     ResourceError error = resourceError.isNull() ? protectedFrameLoader()->cancelledError(m_request) : resourceError;
 
     DOCUMENTLOADER_RELEASE_LOG("cancelMainResourceLoad: (type=%d, code=%d)", static_cast<int>(error.type()), error.errorCode());
-
-    m_dataLoadToken.clear();
 
     cancelPolicyCheckIfNeeded();
 
