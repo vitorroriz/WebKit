@@ -6436,12 +6436,14 @@
    },
    {
       "emails" : [
-         "nipun_shukla@apple.com"
+         "nipun_shukla@apple.com",
+         "nipunshukla002@gmail.com"
       ],
       "name" : "Nipun Shukla",
       "nicks" : [
          "nipunshukla21"
-      ]
+      ],
+      "status" : "committer"
    },
    {
       "emails" : [
