@@ -6781,7 +6781,7 @@ void Internals::installImageOverlay(Element& element, Vector<ImageOverlayLine>&&
             return TextRecognitionBlockData { block.text, getQuad(block) };
         })
 #if ENABLE(IMAGE_ANALYSIS_ENHANCEMENTS)
-        , TextRecognitionResult::encodeVKCImageAnalysis(fakeImageAnalysisResultForTesting(lines))
+        , TextRecognitionResult::extractAttributedString(fakeImageAnalysisResultForTesting(lines).get())
 #endif
     });
 #else
