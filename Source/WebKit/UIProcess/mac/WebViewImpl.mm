@@ -1187,7 +1187,7 @@ static void* imageOverlayObservationContext = &imageOverlayObservationContext;
         return nil;
 
     _impl = impl;
-    _overlayView = impl.imageAnalysisOverlayView();
+    _overlayView = RetainPtr { impl.imageAnalysisOverlayView() }.get();
     [_overlayView.get() addObserver:self forKeyPath:@"hasActiveTextSelection" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:imageOverlayObservationContext];
     return self;
 }
