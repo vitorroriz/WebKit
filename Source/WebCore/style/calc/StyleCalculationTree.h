@@ -24,7 +24,8 @@
 
 #pragma once
 
-#include <WebCore/StyleCalculationOperator.h>
+#include <WebCore/CSSCalcOperator.h>
+#include <WebCore/CSSValueKeywords.h>
 #include <optional>
 #include <tuple>
 #include <wtf/Ref.h>
@@ -36,8 +37,6 @@ namespace Style {
 namespace Calculation {
 
 // `Style::Calculation::Tree` is a reduced representation of `CSSCalc::Tree` used in cases where everything else (e.g all non-canonical dimensions) has been resolved except percentages, which can't be resolved until they are used as they need some value to resolve against. Currently, these are only used by the `Length` type to represent <length-percentage> values, but are implemented generically so can be used for any <*-percentage> type if the need ever arises.
-
-enum class Category : uint8_t;
 
 // Container.
 struct Tree;
@@ -116,10 +115,6 @@ struct Dimension {
     bool operator==(const Dimension&) const = default;
 };
 
-struct None {
-    constexpr bool operator==(const None&) const = default;
-};
-
 template<typename Op> struct IndirectNode {
     UniqueRef<Op> op;
 
@@ -183,10 +178,10 @@ struct Child {
 };
 
 struct ChildOrNone {
-    Variant<Child, None> value;
+    Variant<Child, CSS::Keyword::None> value;
 
     ChildOrNone(Child&&);
-    ChildOrNone(None);
+    ChildOrNone(CSS::Keyword::None);
 
     FORWARD_VARIANT_FUNCTIONS(ChildOrNone, value)
 
@@ -236,7 +231,7 @@ struct Tree {
 
 struct Sum {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Sum);
-    static constexpr auto op = Operator::Sum;
+    static constexpr auto op = CSSCalc::Operator::Sum;
 
     Children children;
 
@@ -245,7 +240,7 @@ struct Sum {
 
 struct Product {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Product);
-    static constexpr auto op = Operator::Product;
+    static constexpr auto op = CSSCalc::Operator::Product;
 
     Children children;
 
@@ -254,7 +249,7 @@ struct Product {
 
 struct Negate {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Negate);
-    static constexpr auto op = Operator::Negate;
+    static constexpr auto op = CSSCalc::Operator::Negate;
 
     Child a;
 
@@ -263,7 +258,7 @@ struct Negate {
 
 struct Invert {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Invert);
-    static constexpr auto op = Operator::Invert;
+    static constexpr auto op = CSSCalc::Operator::Invert;
 
     Child a;
 
@@ -275,7 +270,7 @@ struct Invert {
 // Comparison Functions - https://drafts.csswg.org/css-values-4/#comp-func
 struct Min {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Min);
-    static constexpr auto op = Operator::Min;
+    static constexpr auto op = CSSCalc::Operator::Min;
 
     Children children;
 
@@ -284,7 +279,7 @@ struct Min {
 
 struct Max {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Max);
-    static constexpr auto op = Operator::Max;
+    static constexpr auto op = CSSCalc::Operator::Max;
 
     Children children;
 
@@ -293,7 +288,7 @@ struct Max {
 
 struct Clamp {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Clamp);
-    static constexpr auto op = Operator::Clamp;
+    static constexpr auto op = CSSCalc::Operator::Clamp;
 
     ChildOrNone min;
     Child val;
@@ -305,7 +300,7 @@ struct Clamp {
 // Stepped Value Functions - https://drafts.csswg.org/css-values-4/#round-func
 struct RoundNearest {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(RoundNearest);
-    static constexpr auto op = Operator::Nearest;
+    static constexpr auto op = CSSCalc::Operator::RoundNearest;
 
     Child a;
     std::optional<Child> b;
@@ -315,7 +310,7 @@ struct RoundNearest {
 
 struct RoundUp {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(RoundUp);
-    static constexpr auto op = Operator::Up;
+    static constexpr auto op = CSSCalc::Operator::RoundUp;
 
     Child a;
     std::optional<Child> b;
@@ -325,7 +320,7 @@ struct RoundUp {
 
 struct RoundDown {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(RoundDown);
-    static constexpr auto op = Operator::Down;
+    static constexpr auto op = CSSCalc::Operator::RoundDown;
 
     Child a;
     std::optional<Child> b;
@@ -335,7 +330,7 @@ struct RoundDown {
 
 struct RoundToZero {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(RoundToZero);
-    static constexpr auto op = Operator::ToZero;
+    static constexpr auto op = CSSCalc::Operator::RoundToZero;
 
     Child a;
     std::optional<Child> b;
@@ -345,7 +340,7 @@ struct RoundToZero {
 
 struct Mod {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Mod);
-    static constexpr auto op = Operator::Mod;
+    static constexpr auto op = CSSCalc::Operator::Mod;
 
     Child a;
     Child b;
@@ -355,7 +350,7 @@ struct Mod {
 
 struct Rem {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Rem);
-    static constexpr auto op = Operator::Rem;
+    static constexpr auto op = CSSCalc::Operator::Rem;
 
     Child a;
     Child b;
@@ -366,7 +361,7 @@ struct Rem {
 // Trigonometric Functions - https://drafts.csswg.org/css-values-4/#trig-funcs
 struct Sin {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Sin);
-    static constexpr auto op = Operator::Sin;
+    static constexpr auto op = CSSCalc::Operator::Sin;
 
     Child a;
 
@@ -375,7 +370,7 @@ struct Sin {
 
 struct Cos {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Cos);
-    static constexpr auto op = Operator::Cos;
+    static constexpr auto op = CSSCalc::Operator::Cos;
 
     Child a;
 
@@ -384,7 +379,7 @@ struct Cos {
 
 struct Tan {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Tan);
-    static constexpr auto op = Operator::Tan;
+    static constexpr auto op = CSSCalc::Operator::Tan;
 
     Child a;
 
@@ -393,7 +388,7 @@ struct Tan {
 
 struct Asin {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Asin);
-    static constexpr auto op = Operator::Asin;
+    static constexpr auto op = CSSCalc::Operator::Asin;
 
     Child a;
 
@@ -402,7 +397,7 @@ struct Asin {
 
 struct Acos {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Acos);
-    static constexpr auto op = Operator::Acos;
+    static constexpr auto op = CSSCalc::Operator::Acos;
 
     Child a;
 
@@ -411,7 +406,7 @@ struct Acos {
 
 struct Atan {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Atan);
-    static constexpr auto op = Operator::Atan;
+    static constexpr auto op = CSSCalc::Operator::Atan;
 
     Child a;
 
@@ -420,7 +415,7 @@ struct Atan {
 
 struct Atan2 {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Atan2);
-    static constexpr auto op = Operator::Atan2;
+    static constexpr auto op = CSSCalc::Operator::Atan2;
 
     Child a;
     Child b;
@@ -431,7 +426,7 @@ struct Atan2 {
 // Exponential Functions - https://drafts.csswg.org/css-values-4/#exponent-funcs
 struct Pow {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Atan2);
-    static constexpr auto op = Operator::Pow;
+    static constexpr auto op = CSSCalc::Operator::Pow;
 
     Child a;
     Child b;
@@ -441,7 +436,7 @@ struct Pow {
 
 struct Sqrt {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Sqrt);
-    static constexpr auto op = Operator::Sqrt;
+    static constexpr auto op = CSSCalc::Operator::Sqrt;
 
     Child a;
 
@@ -450,7 +445,7 @@ struct Sqrt {
 
 struct Hypot {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Hypot);
-    static constexpr auto op = Operator::Hypot;
+    static constexpr auto op = CSSCalc::Operator::Hypot;
 
     Children children;
 
@@ -459,7 +454,7 @@ struct Hypot {
 
 struct Log {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Log);
-    static constexpr auto op = Operator::Log;
+    static constexpr auto op = CSSCalc::Operator::Log;
 
     Child a;
     std::optional<Child> b;
@@ -469,7 +464,7 @@ struct Log {
 
 struct Exp {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Exp);
-    static constexpr auto op = Operator::Exp;
+    static constexpr auto op = CSSCalc::Operator::Exp;
 
     Child a;
 
@@ -479,7 +474,7 @@ struct Exp {
 // Sign-Related Functions - https://drafts.csswg.org/css-values-4/#sign-funcs
 struct Abs {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Abs);
-    static constexpr auto op = Operator::Abs;
+    static constexpr auto op = CSSCalc::Operator::Abs;
 
     Child a;
 
@@ -488,7 +483,7 @@ struct Abs {
 
 struct Sign {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Sign);
-    static constexpr auto op = Operator::Sign;
+    static constexpr auto op = CSSCalc::Operator::Sign;
 
     Child a;
 
@@ -498,7 +493,7 @@ struct Sign {
 // Progress-Related Functions - https://drafts.csswg.org/css-values-5/#progress
 struct Progress {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Progress);
-    static constexpr auto op = Operator::Progress;
+    static constexpr auto op = CSSCalc::Operator::Progress;
 
     Child progress;
     Child from;
@@ -510,7 +505,7 @@ struct Progress {
 // Random Function - https://drafts.csswg.org/css-values-5/#random
 struct Random {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Random);
-    static constexpr auto op = Operator::Random;
+    static constexpr auto op = CSSCalc::Operator::Random;
 
     struct Fixed {
         double baseValue;
@@ -529,7 +524,7 @@ struct Random {
 // Non-standard
 struct Blend {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(Blend);
-    static constexpr auto op = Operator::Blend;
+    static constexpr auto op = CSSCalc::Operator::Blend;
 
     double progress;
     Child from;
@@ -850,7 +845,7 @@ inline ChildOrNone::ChildOrNone(Child&& child)
 {
 }
 
-inline ChildOrNone::ChildOrNone(None none)
+inline ChildOrNone::ChildOrNone(CSS::Keyword::None none)
     : value(none)
 {
 }

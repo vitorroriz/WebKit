@@ -35,7 +35,7 @@ namespace Calculation {
 static auto copy(double) -> double;
 static auto copy(const std::optional<Child>& root) -> std::optional<Child>;
 static auto copy(const Random::Fixed&) -> Random::Fixed;
-static auto copy(const None&) -> None;
+static auto copy(const CSS::Keyword::None&) -> CSS::Keyword::None;
 static auto copy(const ChildOrNone&) -> ChildOrNone;
 static auto copy(const Children&) -> Children;
 static auto copy(const Child&) -> Child;
@@ -68,7 +68,7 @@ Random::Fixed copy(const Random::Fixed& root)
     return root;
 }
 
-None copy(const None& none)
+CSS::Keyword::None copy(const CSS::Keyword::None& none)
 {
     return none;
 }

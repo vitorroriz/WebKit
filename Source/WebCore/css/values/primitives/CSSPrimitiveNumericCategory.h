@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Samuel Weinig <sam@webkit.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,34 +24,29 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "StyleCalculationCategory.h"
+#pragma once
 
-#include <wtf/text/TextStream.h>
+#include <wtf/Forward.h>
 
 namespace WebCore {
-namespace Style {
-namespace Calculation {
+namespace CSS {
 
-TextStream& operator<<(TextStream& ts, Category category)
-{
-    switch (category) {
-    case Category::Integer: ts << "integer"_s; break;
-    case Category::Number: ts << "number"_s; break;
-    case Category::Percentage: ts << "percentage"_s; break;
-    case Category::Length: ts << "length"_s; break;
-    case Category::Angle: ts << "angle"_s; break;
-    case Category::AnglePercentage: ts << "angle-percentage"_s; break;
-    case Category::Time: ts << "time"_s; break;
-    case Category::Frequency: ts << "frequency"_s; break;
-    case Category::Resolution: ts << "resolution"_s; break;
-    case Category::Flex: ts << "flex"_s; break;
-    case Category::LengthPercentage: ts << "length-percentage"_s; break;
-    }
+// https://www.w3.org/TR/css-values-4/#numeric-types
+enum class Category : uint8_t {
+    Integer,
+    Number,
+    Percentage,
+    Length,
+    Angle,
+    Time,
+    Frequency,
+    Resolution,
+    Flex,
+    LengthPercentage,
+    AnglePercentage,
+};
 
-    return ts;
-}
+TextStream& operator<<(TextStream&, Category);
 
-} // namespace Calculation
-} // namespace Style
+} // namespace CSS
 } // namespace WebCore

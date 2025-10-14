@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2021 Apple Inc. All rights reserved.
- * Copyright (C) 2024 Samuel Weinig <sam@webkit.org>
+ * Copyright (C) 2024-2025 Samuel Weinig <sam@webkit.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,13 +25,12 @@
  */
 
 #include "config.h"
-#include "StyleCalculationOperator.h"
+#include "CSSCalcOperator.h"
 
 #include <wtf/text/TextStream.h>
 
 namespace WebCore {
-namespace Style {
-namespace Calculation {
+namespace CSSCalc {
 
 TextStream& operator<<(TextStream& ts, Operator op)
 {
@@ -59,11 +58,10 @@ TextStream& operator<<(TextStream& ts, Operator op)
     case Operator::Sign: ts << "sign"_s; break;
     case Operator::Mod: ts << "mod"_s; break;
     case Operator::Rem: ts << "rem"_s; break;
-    case Operator::Round: ts << "round"_s; break;
-    case Operator::Up: ts << "up"_s; break;
-    case Operator::Down: ts << "down"_s; break;
-    case Operator::ToZero: ts << "to-zero"_s; break;
-    case Operator::Nearest: ts << "nearest"_s; break;
+    case Operator::RoundUp: ts << "up"_s; break;
+    case Operator::RoundDown: ts << "down"_s; break;
+    case Operator::RoundToZero: ts << "to-zero"_s; break;
+    case Operator::RoundNearest: ts << "nearest"_s; break;
     case Operator::Progress: ts << "progress"_s; break;
     case Operator::Random: ts << "random"_s; break;
     case Operator::Blend: ts << "blend"_s; break;
@@ -71,6 +69,5 @@ TextStream& operator<<(TextStream& ts, Operator op)
     return ts;
 }
 
-} // namespace Calculation
-} // namespace Style
+} // namespace CSSCalc
 } // namespace WebCore

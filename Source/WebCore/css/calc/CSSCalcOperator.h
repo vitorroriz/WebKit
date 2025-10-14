@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021 Apple Inc. All rights reserved.
+ * Copyright (C) 2024-2025 Samuel Weinig <sam@webkit.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,25 +29,43 @@
 #include <wtf/Forward.h>
 
 namespace WebCore {
-namespace Style {
-namespace Calculation {
+namespace CSSCalc {
 
-enum class Category : uint8_t {
-    Integer,
-    Number,
-    Percentage,
-    Length,
-    Angle,
-    AnglePercentage,
-    Time,
-    Frequency,
-    Resolution,
-    Flex,
-    LengthPercentage
+// Don't change these values; parsing uses them.
+enum class Operator : uint8_t {
+    Sum = '+',
+    Negate = '-',
+    Product = '*',
+    Invert = '/',
+    Min = 0,
+    Max,
+    Clamp,
+    Pow,
+    Sqrt,
+    Hypot,
+    Sin,
+    Cos,
+    Tan,
+    Exp,
+    Log,
+    Asin,
+    Acos,
+    Atan,
+    Atan2,
+    Abs,
+    Sign,
+    Mod,
+    Rem,
+    RoundNearest,
+    RoundUp,
+    RoundDown,
+    RoundToZero,
+    Progress,
+    Random,
+    Blend,
 };
 
-TextStream& operator<<(TextStream&, Category);
+TextStream& operator<<(TextStream&, Operator);
 
-} // namespace Calculation
-} // namespace Style
+} // namespace CSSCalc
 } // namespace WebCore

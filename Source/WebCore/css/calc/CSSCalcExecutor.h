@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2021 Apple Inc. All rights reserved.
- * Copyright (C) 2024 Samuel Weinig <sam@webkit.org>
+ * Copyright (C) 2024-2025 Samuel Weinig <sam@webkit.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,21 +25,20 @@
 
 #pragma once
 
-#include "StyleCalculationTree.h"
+#include "CSSCalcOperator.h"
 #include <numbers>
 #include <numeric>
 #include <wtf/Forward.h>
 #include <wtf/MathExtras.h>
 
 namespace WebCore {
-namespace Style {
-namespace Calculation {
+namespace CSSCalc {
 
-// This file contains an implementation of math operations used by Style::Calculation::Tree and CSSCalc::Tree.
+// This file contains an implementation of math operations used by CSSCalc::Tree and Style::Calculation::Tree.
 
-template<typename> struct OperatorExecutor;
+template<auto> struct OperatorExecutor;
 
-template<typename Op, typename... Args> inline auto executeOperation(Args&&... args)
+template<auto Op, typename... Args> inline auto executeOperation(Args&&... args)
 {
     return OperatorExecutor<Op>()(std::forward<Args>(args)...);
 }
@@ -98,7 +97,7 @@ template<typename Range> concept FloatingPointRange = requires(Range range) {
     { *range.end() } -> std::floating_point;
 };
 
-template<> struct OperatorExecutor<Sum> {
+template<> struct OperatorExecutor<Operator::Sum> {
     template<typename Range> double operator()(Range&& range)
     {
         double sum = 0;
@@ -109,7 +108,7 @@ template<> struct OperatorExecutor<Sum> {
 
     template<typename T, std::invocable<const T&> Functor> double operator()(const Vector<T>& range, Functor&& functor)
     {
-        return executeOperation<Sum>(makeSizedTransformRange(range, std::forward<Functor>(functor)));
+        return executeOperation<Operator::Sum>(makeSizedTransformRange(range, std::forward<Functor>(functor)));
     }
 
     double operator()(double a, double b)
@@ -118,14 +117,14 @@ template<> struct OperatorExecutor<Sum> {
     }
 };
 
-template<> struct OperatorExecutor<Negate> {
+template<> struct OperatorExecutor<Operator::Negate> {
     double operator()(double a)
     {
         return -a;
     }
 };
 
-template<> struct OperatorExecutor<Product> {
+template<> struct OperatorExecutor<Operator::Product> {
     template<typename Range> double operator()(Range&& range)
     {
         double product = 1;
@@ -136,7 +135,7 @@ template<> struct OperatorExecutor<Product> {
 
     template<typename T, std::invocable<const T&> Functor> double operator()(const Vector<T>& range, Functor&& functor)
     {
-        return executeOperation<Product>(makeSizedTransformRange(range, std::forward<Functor>(functor)));
+        return executeOperation<Operator::Product>(makeSizedTransformRange(range, std::forward<Functor>(functor)));
     }
 
     double operator()(double a, double b)
@@ -145,14 +144,14 @@ template<> struct OperatorExecutor<Product> {
     }
 };
 
-template<> struct OperatorExecutor<Invert> {
+template<> struct OperatorExecutor<Operator::Invert> {
     double operator()(double a)
     {
         return 1.0 / a;
     }
 };
 
-template<> struct OperatorExecutor<Min> {
+template<> struct OperatorExecutor<Operator::Min> {
     // NOTE: std::floating_point and related concepts can be used for `min`, as there is no precision loss from the operation staying in a lower precision.
 
     template<FloatingPointRange R> auto operator()(R&& range)
@@ -184,11 +183,11 @@ template<> struct OperatorExecutor<Min> {
 
     template<typename T, std::invocable<const T&> Functor> double operator()(const Vector<T>& range, Functor&& functor)
     {
-        return executeOperation<Min>(makeSizedTransformRange(range, std::forward<Functor>(functor)));
+        return executeOperation<Operator::Min>(makeSizedTransformRange(range, std::forward<Functor>(functor)));
     }
 };
 
-template<> struct OperatorExecutor<Max> {
+template<> struct OperatorExecutor<Operator::Max> {
     // NOTE: std::floating_point and related concepts can be used for `max`, as there is no precision loss from the operation staying in a lower precision.
 
     template<FloatingPointRange R> auto operator()(R&& range)
@@ -220,11 +219,11 @@ template<> struct OperatorExecutor<Max> {
 
     template<typename T, std::invocable<const T&> Functor> double operator()(const Vector<T>& range, Functor&& functor)
     {
-        return executeOperation<Max>(makeSizedTransformRange(range, std::forward<Functor>(functor)));
+        return executeOperation<Operator::Max>(makeSizedTransformRange(range, std::forward<Functor>(functor)));
     }
 };
 
-template<> struct OperatorExecutor<Clamp> {
+template<> struct OperatorExecutor<Operator::Clamp> {
     // NOTE: std::floating_point and related concepts can be used for `clamp`, as there is no precision loss from the operation staying in a lower precision.
 
     template<std::floating_point T> T operator()(T min, T val, T max)
@@ -234,10 +233,10 @@ template<> struct OperatorExecutor<Clamp> {
         return std::max(min, std::min(val, max));
     }
 
-    template<std::floating_point T> T operator()(Variant<T, None> min, T val, Variant<T, None> max)
+    template<std::floating_point T> T operator()(Variant<T, CSS::Keyword::None> min, T val, Variant<T, CSS::Keyword::None> max)
     {
-        bool minIsNone = std::holds_alternative<None>(min);
-        bool maxIsNone = std::holds_alternative<None>(max);
+        bool minIsNone = std::holds_alternative<CSS::Keyword::None>(min);
+        bool maxIsNone = std::holds_alternative<CSS::Keyword::None>(max);
 
         // - clamp(none, VAL, none) is equivalent to just calc(VAL).
         if (minIsNone && maxIsNone)
@@ -245,17 +244,17 @@ template<> struct OperatorExecutor<Clamp> {
 
         // - clamp(none, VAL, MAX) is equivalent to min(VAL, MAX)
         if (minIsNone)
-            return executeOperation<Min>(val, std::get<T>(max));
+            return executeOperation<Operator::Min>(val, std::get<T>(max));
 
         // - clamp(MIN, VAL, none) is equivalent to max(MIN, VAL)
         if (maxIsNone)
-            return executeOperation<Max>(std::get<T>(min), val);
+            return executeOperation<Operator::Max>(std::get<T>(min), val);
 
-        return executeOperation<Clamp>(std::get<T>(min), val, std::get<T>(max));
+        return executeOperation<Operator::Clamp>(std::get<T>(min), val, std::get<T>(max));
     }
 };
 
-template<> struct OperatorExecutor<RoundNearest> {
+template<> struct OperatorExecutor<Operator::RoundNearest> {
     double operator()(double valueToRound, double roundingInterval)
     {
         if (!std::isinf(valueToRound) && std::isinf(roundingInterval))
@@ -266,11 +265,11 @@ template<> struct OperatorExecutor<RoundNearest> {
 
     double operator()(double valueToRound, std::optional<double> roundingInterval)
     {
-        return executeOperation<RoundNearest>(valueToRound, roundingInterval.value_or(1.0));
+        return executeOperation<Operator::RoundNearest>(valueToRound, roundingInterval.value_or(1.0));
     }
 };
 
-template<> struct OperatorExecutor<RoundUp> {
+template<> struct OperatorExecutor<Operator::RoundUp> {
     double operator()(double valueToRound, double roundingInterval)
     {
         if (!std::isinf(valueToRound) && std::isinf(roundingInterval)) {
@@ -283,11 +282,11 @@ template<> struct OperatorExecutor<RoundUp> {
 
     double operator()(double valueToRound, std::optional<double> roundingInterval)
     {
-        return executeOperation<RoundUp>(valueToRound, roundingInterval.value_or(1.0));
+        return executeOperation<Operator::RoundUp>(valueToRound, roundingInterval.value_or(1.0));
     }
 };
 
-template<> struct OperatorExecutor<RoundDown> {
+template<> struct OperatorExecutor<Operator::RoundDown> {
     double operator()(double valueToRound, double roundingInterval)
     {
         if (!std::isinf(valueToRound) && std::isinf(roundingInterval)) {
@@ -300,11 +299,11 @@ template<> struct OperatorExecutor<RoundDown> {
 
     double operator()(double valueToRound, std::optional<double> roundingInterval)
     {
-        return executeOperation<RoundDown>(valueToRound, roundingInterval.value_or(1.0));
+        return executeOperation<Operator::RoundDown>(valueToRound, roundingInterval.value_or(1.0));
     }
 };
 
-template<> struct OperatorExecutor<RoundToZero> {
+template<> struct OperatorExecutor<Operator::RoundToZero> {
     double operator()(double valueToRound, double roundingInterval)
     {
         if (!std::isinf(valueToRound) && std::isinf(roundingInterval))
@@ -315,11 +314,11 @@ template<> struct OperatorExecutor<RoundToZero> {
 
     double operator()(double valueToRound, std::optional<double> roundingInterval)
     {
-        return executeOperation<RoundToZero>(valueToRound, roundingInterval.value_or(1.0));
+        return executeOperation<Operator::RoundToZero>(valueToRound, roundingInterval.value_or(1.0));
     }
 };
 
-template<> struct OperatorExecutor<Mod> {
+template<> struct OperatorExecutor<Operator::Mod> {
     double operator()(double a, double b)
     {
         // In mod(A, B) only, if B is infinite and A has opposite sign to B
@@ -337,7 +336,7 @@ template<> struct OperatorExecutor<Mod> {
     }
 };
 
-template<> struct OperatorExecutor<Rem> {
+template<> struct OperatorExecutor<Operator::Rem> {
     double operator()(double a, double b)
     {
         if (!b)
@@ -346,21 +345,21 @@ template<> struct OperatorExecutor<Rem> {
     }
 };
 
-template<> struct OperatorExecutor<Sin> {
+template<> struct OperatorExecutor<Operator::Sin> {
     double operator()(double a)
     {
         return std::sin(a);
     }
 };
 
-template<> struct OperatorExecutor<Cos> {
+template<> struct OperatorExecutor<Operator::Cos> {
     double operator()(double a)
     {
         return std::cos(a);
     }
 };
 
-template<> struct OperatorExecutor<Tan> {
+template<> struct OperatorExecutor<Operator::Tan> {
     double operator()(double a)
     {
         double x = std::fmod(a, std::numbers::pi * 2);
@@ -376,49 +375,49 @@ template<> struct OperatorExecutor<Tan> {
     }
 };
 
-template<> struct OperatorExecutor<Asin> {
+template<> struct OperatorExecutor<Operator::Asin> {
     double operator()(double a)
     {
         return rad2deg(std::asin(a));
     }
 };
 
-template<> struct OperatorExecutor<Acos> {
+template<> struct OperatorExecutor<Operator::Acos> {
     double operator()(double a)
     {
         return rad2deg(std::acos(a));
     }
 };
 
-template<> struct OperatorExecutor<Atan> {
+template<> struct OperatorExecutor<Operator::Atan> {
     double operator()(double a)
     {
         return rad2deg(std::atan(a));
     }
 };
 
-template<> struct OperatorExecutor<Atan2> {
+template<> struct OperatorExecutor<Operator::Atan2> {
     double operator()(double a, double b)
     {
         return rad2deg(atan2(a, b));
     }
 };
 
-template<> struct OperatorExecutor<Pow> {
+template<> struct OperatorExecutor<Operator::Pow> {
     double operator()(double a, double b)
     {
         return std::pow(a, b);
     }
 };
 
-template<> struct OperatorExecutor<Sqrt> {
+template<> struct OperatorExecutor<Operator::Sqrt> {
     double operator()(double a)
     {
         return std::sqrt(a);
     }
 };
 
-template<> struct OperatorExecutor<Hypot> {
+template<> struct OperatorExecutor<Operator::Hypot> {
     template<typename Range> double operator()(Range&& range)
     {
         if (range.isEmpty())
@@ -434,11 +433,11 @@ template<> struct OperatorExecutor<Hypot> {
 
     template<typename T, std::invocable<const T&> Functor> double operator()(const Vector<T>& range, Functor&& functor)
     {
-        return executeOperation<Hypot>(makeSizedTransformRange(range, std::forward<Functor>(functor)));
+        return executeOperation<Operator::Hypot>(makeSizedTransformRange(range, std::forward<Functor>(functor)));
     }
 };
 
-template<> struct OperatorExecutor<Log> {
+template<> struct OperatorExecutor<Operator::Log> {
     double operator()(double a)
     {
         return std::log(a);
@@ -452,26 +451,26 @@ template<> struct OperatorExecutor<Log> {
     double operator()(double a, std::optional<double> b)
     {
         if (b)
-            return executeOperation<Log>(a, *b);
-        return executeOperation<Log>(a);
+            return executeOperation<Operator::Log>(a, *b);
+        return executeOperation<Operator::Log>(a);
     }
 };
 
-template<> struct OperatorExecutor<Exp> {
+template<> struct OperatorExecutor<Operator::Exp> {
     double operator()(double a)
     {
         return std::exp(a);
     }
 };
 
-template<> struct OperatorExecutor<Abs> {
+template<> struct OperatorExecutor<Operator::Abs> {
     double operator()(double a)
     {
         return std::abs(a);
     }
 };
 
-template<> struct OperatorExecutor<Sign> {
+template<> struct OperatorExecutor<Operator::Sign> {
     double operator()(double a)
     {
         if (a > 0)
@@ -482,15 +481,15 @@ template<> struct OperatorExecutor<Sign> {
     }
 };
 
-template<> struct OperatorExecutor<Progress> {
+template<> struct OperatorExecutor<Operator::Progress> {
     double operator()(double progress, double from, double to)
     {
         // (progress value - start value) / (end value - start value)
-        return executeOperation<Clamp>(0.0, (progress - from) / (to - from), 1.0);
+        return executeOperation<Operator::Clamp>(0.0, (progress - from) / (to - from), 1.0);
     }
 };
 
-template<> struct OperatorExecutor<Random> {
+template<> struct OperatorExecutor<Operator::Random> {
     double operator()(double randomBaseValue, double min, double max, std::optional<double> step)
     {
         if (std::isnan(min) || std::isnan(max))
@@ -533,7 +532,7 @@ template<> struct OperatorExecutor<Random> {
         }
 
         // Let step index be a random integer less than N+1, given R.
-        auto stepIndex = OperatorExecutor<RoundDown>{}(randomBaseValue * (N + 1.0), 1.0);
+        auto stepIndex = OperatorExecutor<Operator::RoundDown>{}(randomBaseValue * (N + 1.0), 1.0);
 
         // Let value be min + step index * step.
         auto value = min + stepIndex * *step;
@@ -547,6 +546,5 @@ template<> struct OperatorExecutor<Random> {
     }
 };
 
-} // namespace Calculation
-} // namespace Style
+} // namespace CSSCalc
 } // namespace WebCore

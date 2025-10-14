@@ -1002,6 +1002,7 @@ css/StyleRuleImport.cpp
 css/StyleSheet.cpp
 css/StyleSheetContents.cpp
 css/StyleSheetList.cpp
+css/calc/CSSCalcOperator.cpp
 css/calc/CSSCalcSymbolTable.cpp
 css/calc/CSSCalcSymbolsAllowed.cpp
 css/calc/CSSCalcTree+ComputedStyleDependencies.cpp
@@ -1153,6 +1154,7 @@ css/values/grid/CSSGridNamedAreaMap.cpp
 css/values/images/CSSGradient.cpp
 css/values/motion/CSSRayFunction.cpp
 css/values/primitives/CSSPosition.cpp
+css/values/primitives/CSSPrimitiveNumericCategory.cpp
 css/values/primitives/CSSPrimitiveNumericTypes+Canonicalization.cpp
 css/values/primitives/CSSPrimitiveNumericTypes+ComputedStyleDependencies.cpp
 css/values/primitives/CSSPrimitiveNumericTypes+Serialization.cpp
@@ -3143,8 +3145,6 @@ style/StyleTreeResolver.cpp
 style/StyleUpdate.cpp
 style/Styleable.cpp
 style/UserAgentStyle.cpp
-style/calc/StyleCalculationCategory.cpp
-style/calc/StyleCalculationOperator.cpp
 style/calc/StyleCalculationTree+Copy.cpp
 style/calc/StyleCalculationTree+Evaluation.cpp
 style/calc/StyleCalculationTree.cpp

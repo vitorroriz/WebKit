@@ -25,6 +25,7 @@
 #include "config.h"
 #include "CSSCalcTree+StyleCalculationValue.h"
 
+#include "CSSCalcExecutor.h"
 #include "CSSCalcRandomCachingKey.h"
 #include "CSSCalcSymbolTable.h"
 #include "CSSCalcTree+Evaluation.h"
@@ -32,11 +33,10 @@
 #include "CSSCalcTree+Simplification.h"
 #include "CSSCalcTree+Traversal.h"
 #include "CSSCalcTree.h"
+#include "CSSPrimitiveNumericCategory.h"
 #include "CSSUnevaluatedCalc.h"
 #include "RenderStyleInlines.h"
 #include "StyleBuilderState.h"
-#include "StyleCalculationCategory.h"
-#include "StyleCalculationExecutor.h"
 #include "StyleCalculationTree.h"
 #include "StyleCalculationValue.h"
 #include "StyleLengthResolution.h"
@@ -57,7 +57,7 @@ struct ToConversionOptions {
 };
 
 static auto fromStyleCalculationValue(const Style::Calculation::Random::Fixed&, const FromConversionOptions&) -> Random::Sharing;
-static auto fromStyleCalculationValue(const Style::Calculation::None&, const FromConversionOptions&) -> CSS::Keyword::None;
+static auto fromStyleCalculationValue(const CSS::Keyword::None&, const FromConversionOptions&) -> CSS::Keyword::None;
 static auto fromStyleCalculationValue(const Style::Calculation::ChildOrNone&, const FromConversionOptions&) -> ChildOrNone;
 static auto fromStyleCalculationValue(const Style::Calculation::Children&, const FromConversionOptions&) -> Children;
 static auto fromStyleCalculationValue(const std::optional<Style::Calculation::Child>&, const FromConversionOptions&) -> std::optional<Child>;
@@ -70,7 +70,7 @@ template<typename CalculationOp> auto fromStyleCalculationValue(const Style::Cal
 
 static auto toStyleCalculationValue(const Random::Sharing&, const ToConversionOptions&) -> Style::Calculation::Random::Fixed;
 static auto toStyleCalculationValue(const std::optional<Child>&, const ToConversionOptions&) -> std::optional<Style::Calculation::Child>;
-static auto toStyleCalculationValue(const CSS::Keyword::None&, const ToConversionOptions&) -> Style::Calculation::None;
+static auto toStyleCalculationValue(const CSS::Keyword::None&, const ToConversionOptions&) -> CSS::Keyword::None;
 static auto toStyleCalculationValue(const ChildOrNone&, const ToConversionOptions&) -> Style::Calculation::ChildOrNone;
 static auto toStyleCalculationValue(const Children&, const ToConversionOptions&) -> Style::Calculation::Children;
 static auto toStyleCalculationValue(const Child&, const ToConversionOptions&) -> Style::Calculation::Child;
@@ -85,24 +85,24 @@ static auto toStyleCalculationValue(const IndirectNode<Anchor>&, const ToConvers
 static auto toStyleCalculationValue(const IndirectNode<AnchorSize>&, const ToConversionOptions&) -> Style::Calculation::Child;
 template<typename Op> auto toStyleCalculationValue(const IndirectNode<Op>&, const ToConversionOptions&) -> Style::Calculation::Child;
 
-static CanonicalDimension::Dimension determineCanonicalDimension(Style::Calculation::Category category)
+static CanonicalDimension::Dimension determineCanonicalDimension(CSS::Category category)
 {
     switch (category) {
-    case Style::Calculation::Category::LengthPercentage:
+    case CSS::Category::LengthPercentage:
         return CanonicalDimension::Dimension::Length;
 
-    case Style::Calculation::Category::AnglePercentage:
+    case CSS::Category::AnglePercentage:
         return CanonicalDimension::Dimension::Angle;
 
-    case Style::Calculation::Category::Integer:
-    case Style::Calculation::Category::Number:
-    case Style::Calculation::Category::Percentage:
-    case Style::Calculation::Category::Length:
-    case Style::Calculation::Category::Angle:
-    case Style::Calculation::Category::Time:
-    case Style::Calculation::Category::Frequency:
-    case Style::Calculation::Category::Resolution:
-    case Style::Calculation::Category::Flex:
+    case CSS::Category::Integer:
+    case CSS::Category::Number:
+    case CSS::Category::Percentage:
+    case CSS::Category::Length:
+    case CSS::Category::Angle:
+    case CSS::Category::Time:
+    case CSS::Category::Frequency:
+    case CSS::Category::Resolution:
+    case CSS::Category::Flex:
         break;
     }
 
@@ -117,9 +117,9 @@ Random::Sharing fromStyleCalculationValue(const Style::Calculation::Random::Fixe
     return Random::SharingFixed { randomFixed.baseValue };
 }
 
-CSS::Keyword::None fromStyleCalculationValue(const Style::Calculation::None&, const FromConversionOptions&)
+CSS::Keyword::None fromStyleCalculationValue(const CSS::Keyword::None& none, const FromConversionOptions&)
 {
-    return CSS::Keyword::None { };
+    return none;
 }
 
 ChildOrNone fromStyleCalculationValue(const Style::Calculation::ChildOrNone& root, const FromConversionOptions& options)
@@ -239,7 +239,7 @@ auto toStyleCalculationValue(const Random::Sharing& randomSharing, const ToConve
                     return Style::Calculation::Random::Fixed { raw.value };
                 },
                 [&](const CSS::Number<CSS::ClosedUnitRange>::Calc& calc) -> Style::Calculation::Random::Fixed {
-                    return Style::Calculation::Random::Fixed { calc.evaluate(Style::Calculation::Category::Number, *options.evaluation.conversionData->protectedStyleBuilderState()) };
+                    return Style::Calculation::Random::Fixed { calc.evaluate(CSS::Category::Number, *options.evaluation.conversionData->protectedStyleBuilderState()) };
                 }
             );
         }
@@ -253,9 +253,9 @@ std::optional<Style::Calculation::Child> toStyleCalculationValue(const std::opti
     return std::nullopt;
 }
 
-Style::Calculation::None toStyleCalculationValue(const CSS::Keyword::None&, const ToConversionOptions&)
+CSS::Keyword::None toStyleCalculationValue(const CSS::Keyword::None& none, const ToConversionOptions&)
 {
-    return Style::Calculation::None { };
+    return none;
 }
 
 Style::Calculation::ChildOrNone toStyleCalculationValue(const ChildOrNone& root, const ToConversionOptions& options)
@@ -376,7 +376,7 @@ Tree fromStyleCalculationValue(const Style::CalculationValue& calculationValue, 
 
 Ref<Style::CalculationValue> toStyleCalculationValue(const Tree& tree, const EvaluationOptions& options)
 {
-    ASSERT(options.category == Style::Calculation::Category::LengthPercentage || options.category == Style::Calculation::Category::AnglePercentage);
+    ASSERT(options.category == CSS::Category::LengthPercentage || options.category == CSS::Category::AnglePercentage);
 
     auto category = options.category;
     auto range = options.range;
@@ -397,7 +397,7 @@ Ref<Style::CalculationValue> toStyleCalculationValue(const Tree& tree, const Eva
 
     return Style::CalculationValue::create(
         category,
-        Style::Calculation::Range { range.min, range.max },
+        range,
         Style::Calculation::Tree { WTFMove(root) }
     );
 }

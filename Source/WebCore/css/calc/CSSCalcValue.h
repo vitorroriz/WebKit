@@ -39,16 +39,13 @@
 namespace WebCore {
 
 namespace Style {
-namespace Calculation {
-enum class Category : uint8_t;
-}
-
 class CalculationValue;
 }
 
 namespace CSS {
 struct PropertyParserState;
 struct Range;
+enum class Category : uint8_t;
 }
 
 class CSSCalcSymbolTable;
@@ -67,10 +64,10 @@ enum class CSSUnitType : uint8_t;
 
 class CSSCalcValue final : public CSSValue {
 public:
-    static RefPtr<CSSCalcValue> parse(CSSParserTokenRange&, CSS::PropertyParserState&, Style::Calculation::Category, CSS::Range, CSSCalcSymbolsAllowed, CSSPropertyParserOptions);
+    static RefPtr<CSSCalcValue> parse(CSSParserTokenRange&, CSS::PropertyParserState&, CSS::Category, CSS::Range, CSSCalcSymbolsAllowed, CSSPropertyParserOptions);
 
     static Ref<CSSCalcValue> create(const Style::CalculationValue&, const RenderStyle&);
-    static Ref<CSSCalcValue> create(Style::Calculation::Category, CSS::Range, CSSCalc::Tree&&);
+    static Ref<CSSCalcValue> create(CSS::Category, CSS::Range, CSSCalc::Tree&&);
 
     ~CSSCalcValue();
 
@@ -80,7 +77,7 @@ public:
     Ref<CSSCalcValue> copySimplified(NoConversionDataRequiredToken) const;
     Ref<CSSCalcValue> copySimplified(NoConversionDataRequiredToken, const CSSCalcSymbolTable&) const;
 
-    Style::Calculation::Category category() const { return m_category; }
+    CSS::Category category() const { return m_category; }
     CSS::Range range() const { return m_range; }
 
     CSSUnitType primitiveType() const;
@@ -112,11 +109,11 @@ public:
     const CSSCalc::Tree& tree() const { return m_tree; }
 
 private:
-    explicit CSSCalcValue(Style::Calculation::Category, CSS::Range, CSSCalc::Tree&&);
+    explicit CSSCalcValue(CSS::Category, CSS::Range, CSSCalc::Tree&&);
 
     double clampToPermittedRange(double) const;
 
-    Style::Calculation::Category m_category;
+    CSS::Category m_category;
     CSS::Range m_range;
     CSSCalc::Tree m_tree;
 };

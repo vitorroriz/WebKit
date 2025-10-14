@@ -47,11 +47,11 @@
 #include "CSSNumericType.h"
 #include "CSSParserContext.h"
 #include "CSSParserTokenRange.h"
+#include "CSSPrimitiveNumericCategory.h"
 #include "CSSPropertyParserState.h"
 #include "CSSTokenizer.h"
 #include "CSSUnitValue.h"
 #include "ExceptionOr.h"
-#include "StyleCalculationCategory.h"
 #include <algorithm>
 #include <ranges>
 #include <wtf/FixedVector.h>
@@ -482,13 +482,13 @@ ExceptionOr<Ref<CSSNumericValue>> CSSNumericValue::parse(Document& document, Str
                 .context = parserContext,
             };
             auto parserOptions = CSSCalc::ParserOptions {
-                .category = Style::Calculation::Category::LengthPercentage,
+                .category = CSS::Category::LengthPercentage,
                 .range = CSS::All,
                 .allowedSymbols = { },
                 .propertyOptions = { },
             };
             auto simplificationOptions = CSSCalc::SimplificationOptions {
-                .category = Style::Calculation::Category::LengthPercentage,
+                .category = CSS::Category::LengthPercentage,
                 .range = CSS::All,
                 .conversionData = std::nullopt,
                 .symbolTable = { },

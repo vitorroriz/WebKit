@@ -25,6 +25,7 @@
 #include "CSSCalcValue.h"
 #include "CSSMarkup.h"
 #include "CSSParserIdioms.h"
+#include "CSSPrimitiveNumericCategory.h"
 #include "CSSPrimitiveNumericTypes+ComputedStyleDependencies.h"
 #include "CSSPrimitiveNumericTypes+Serialization.h"
 #include "CSSPrimitiveValueMappings.h"
@@ -40,7 +41,6 @@
 #include "RenderBoxInlines.h"
 #include "RenderStyle.h"
 #include "RenderView.h"
-#include "StyleCalculationCategory.h"
 #include "StyleCalculationValue.h"
 #include "StyleLengthResolution.h"
 #include <wtf/Hasher.h>

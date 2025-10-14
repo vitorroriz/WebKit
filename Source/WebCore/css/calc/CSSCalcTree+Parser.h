@@ -31,10 +31,8 @@
 
 namespace WebCore {
 
-namespace Style {
-namespace Calculation {
+namespace CSS {
 enum class Category : uint8_t;
-}
 }
 
 namespace CSS {
@@ -53,7 +51,7 @@ struct Tree;
 
 struct ParserOptions {
     // `category` represents the context in which the parse is taking place.
-    Style::Calculation::Category category;
+    CSS::Category category;
 
     // `range` represents the allowed numeric range for the calculated result.
     CSS::Range range;

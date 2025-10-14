@@ -34,10 +34,10 @@
 #include "CSSCalcValue.h"
 #include "CSSParserFastPaths.h"
 #include "CSSParserToken.h"
+#include "CSSPrimitiveNumericCategory.h"
 #include "CSSPrimitiveValue.h"
 #include "CSSUnits.h"
 #include "ExceptionOr.h"
-#include "StyleCalculationCategory.h"
 #include <cmath>
 #include <wtf/TZoneMallocInlines.h>
 
@@ -298,14 +298,14 @@ static CSS::Range rangeForProperty(CSSPropertyID propertyID, CSSUnitType)
     }
 }
 
-static Style::Calculation::Category calculationCategoryForProperty(CSSPropertyID, CSSUnitType unit)
+static CSS::Category calculationCategoryForProperty(CSSPropertyID, CSSUnitType unit)
 {
     // FIXME: This should be looking up the supported calculation categories for the CSSPropertyID and picking the one that best matches the unit.
 
     switch (unit) {
     case CSSUnitType::CSS_NUMBER:
     case CSSUnitType::CSS_INTEGER:
-        return Style::Calculation::Category::Number;
+        return CSS::Category::Number;
     case CSSUnitType::CSS_EM:
     case CSSUnitType::CSS_EX:
     case CSSUnitType::CSS_PX:
@@ -355,33 +355,33 @@ static Style::Calculation::Category calculationCategoryForProperty(CSSPropertyID
     case CSSUnitType::CSS_CQB:
     case CSSUnitType::CSS_CQMIN:
     case CSSUnitType::CSS_CQMAX:
-        return Style::Calculation::Category::Length;
+        return CSS::Category::Length;
     case CSSUnitType::CSS_PERCENTAGE:
-        return Style::Calculation::Category::Percentage;
+        return CSS::Category::Percentage;
     case CSSUnitType::CSS_DEG:
     case CSSUnitType::CSS_RAD:
     case CSSUnitType::CSS_GRAD:
     case CSSUnitType::CSS_TURN:
-        return Style::Calculation::Category::Angle;
+        return CSS::Category::Angle;
     case CSSUnitType::CSS_MS:
     case CSSUnitType::CSS_S:
-        return Style::Calculation::Category::Time;
+        return CSS::Category::Time;
     case CSSUnitType::CSS_HZ:
     case CSSUnitType::CSS_KHZ:
-        return Style::Calculation::Category::Frequency;
+        return CSS::Category::Frequency;
     case CSSUnitType::CSS_DPPX:
     case CSSUnitType::CSS_X:
     case CSSUnitType::CSS_DPI:
     case CSSUnitType::CSS_DPCM:
-        return Style::Calculation::Category::Resolution;
+        return CSS::Category::Resolution;
     case CSSUnitType::CSS_FR:
-        return Style::Calculation::Category::Flex;
+        return CSS::Category::Flex;
     default:
         break;
     }
 
     ASSERT_NOT_REACHED();
-    return Style::Calculation::Category::Number;
+    return CSS::Category::Number;
 }
 
 RefPtr<CSSValue> CSSUnitValue::toCSSValueWithProperty(CSSPropertyID propertyID) const

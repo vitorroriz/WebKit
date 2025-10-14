@@ -41,7 +41,7 @@ class CalculationValue;
 struct UnevaluatedCalculationBase {
     explicit UnevaluatedCalculationBase(CalculationValue&);
     explicit UnevaluatedCalculationBase(Ref<CalculationValue>&&);
-    explicit UnevaluatedCalculationBase(Calculation::Child&&, Calculation::Category, CSS::Range);
+    explicit UnevaluatedCalculationBase(Calculation::Child&&, CSS::Category, CSS::Range);
 
     WEBCORE_EXPORT UnevaluatedCalculationBase(const UnevaluatedCalculationBase&);
     WEBCORE_EXPORT UnevaluatedCalculationBase(UnevaluatedCalculationBase&&);

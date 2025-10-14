@@ -43,10 +43,10 @@
 #include "CSSNoConversionDataRequiredToken.h"
 #include "CSSParser.h"
 #include "CSSParserTokenRange.h"
+#include "CSSPrimitiveNumericCategory.h"
 #include "CSSPropertyParserOptions.h"
 #include "CSSSerializationContext.h"
 #include "Logging.h"
-#include "StyleCalculationCategory.h"
 #include "StyleCalculationValue.h"
 #include "StyleLengthResolution.h"
 #include "StylePrimitiveNumericTypes.h"
@@ -56,7 +56,7 @@
 
 namespace WebCore {
 
-RefPtr<CSSCalcValue> CSSCalcValue::parse(CSSParserTokenRange& tokens, CSS::PropertyParserState& state, Style::Calculation::Category category, CSS::Range range, CSSCalcSymbolsAllowed symbolsAllowed, CSSPropertyParserOptions propertyOptions)
+RefPtr<CSSCalcValue> CSSCalcValue::parse(CSSParserTokenRange& tokens, CSS::PropertyParserState& state, CSS::Category category, CSS::Range range, CSSCalcSymbolsAllowed symbolsAllowed, CSSPropertyParserOptions propertyOptions)
 {
     auto parserOptions = CSSCalc::ParserOptions {
         .category = category,
@@ -89,7 +89,7 @@ Ref<CSSCalcValue> CSSCalcValue::create(const Style::CalculationValue& value, con
     return result;
 }
 
-Ref<CSSCalcValue> CSSCalcValue::create(Style::Calculation::Category category, CSS::Range range, CSSCalc::Tree&& tree)
+Ref<CSSCalcValue> CSSCalcValue::create(CSS::Category category, CSS::Range range, CSSCalc::Tree&& tree)
 {
     return adoptRef(*new CSSCalcValue(category, range, WTFMove(tree)));
 }
@@ -136,7 +136,7 @@ Ref<CSSCalcValue> CSSCalcValue::copySimplified(NoConversionDataRequiredToken, co
     return create(m_category, m_range, copyAndSimplify(m_tree, simplificationOptions));
 }
 
-CSSCalcValue::CSSCalcValue(Style::Calculation::Category category, CSS::Range range, CSSCalc::Tree&& tree)
+CSSCalcValue::CSSCalcValue(CSS::Category category, CSS::Range range, CSSCalc::Tree&& tree)
     : CSSValue(ClassType::Calculation)
     , m_category(category)
     , m_range(range)
@@ -151,31 +151,31 @@ CSSUnitType CSSCalcValue::primitiveType() const
     // This returns the CSSUnitType associated with the value returned by doubleValue, or, if CSSUnitType::CSS_CALC_PERCENTAGE_WITH_LENGTH, that a call to createCalculationValue() is needed.
 
     switch (m_category) {
-    case Style::Calculation::Category::Integer:
+    case CSS::Category::Integer:
         return CSSUnitType::CSS_INTEGER;
-    case Style::Calculation::Category::Number:
+    case CSS::Category::Number:
         return CSSUnitType::CSS_NUMBER;
-    case Style::Calculation::Category::Percentage:
+    case CSS::Category::Percentage:
         return CSSUnitType::CSS_PERCENTAGE;
-    case Style::Calculation::Category::Length:
+    case CSS::Category::Length:
         return CSSUnitType::CSS_PX;
-    case Style::Calculation::Category::Angle:
+    case CSS::Category::Angle:
         return CSSUnitType::CSS_DEG;
-    case Style::Calculation::Category::Time:
+    case CSS::Category::Time:
         return CSSUnitType::CSS_S;
-    case Style::Calculation::Category::Frequency:
+    case CSS::Category::Frequency:
         return CSSUnitType::CSS_HZ;
-    case Style::Calculation::Category::Resolution:
+    case CSS::Category::Resolution:
         return CSSUnitType::CSS_DPPX;
-    case Style::Calculation::Category::Flex:
+    case CSS::Category::Flex:
         return CSSUnitType::CSS_FR;
-    case Style::Calculation::Category::LengthPercentage:
+    case CSS::Category::LengthPercentage:
         if (!m_tree.type.percentHint)
             return CSSUnitType::CSS_PX;
         if (WTF::holdsAlternative<CSSCalc::Percentage>(m_tree.root))
             return CSSUnitType::CSS_PERCENTAGE;
         return CSSUnitType::CSS_CALC_PERCENTAGE_WITH_LENGTH;
-    case Style::Calculation::Category::AnglePercentage:
+    case CSS::Category::AnglePercentage:
         if (!m_tree.type.percentHint)
             return CSSUnitType::CSS_DEG;
         if (WTF::holdsAlternative<CSSCalc::Percentage>(m_tree.root))
@@ -214,10 +214,10 @@ inline double CSSCalcValue::clampToPermittedRange(double value) const
 
     // If an <angle> must be converted due to exceeding the implementation-defined range of supported values,
     // it must be clamped to the nearest supported multiple of 360deg.
-    if (m_category == Style::Calculation::Category::Angle && std::isinf(value))
+    if (m_category == CSS::Category::Angle && std::isinf(value))
         return 0;
 
-    if (m_category == Style::Calculation::Category::Integer)
+    if (m_category == CSS::Category::Integer)
         value = std::floor(value + 0.5);
 
     return std::clamp(value, m_range.min, m_range.max);

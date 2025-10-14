@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2021 Apple Inc. All rights reserved.
- * Copyright (C) 2024 Samuel Weinig <sam@webkit.org>
+ * Copyright (C) 2025 Samuel Weinig <sam@webkit.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,51 +24,32 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "config.h"
+#include "CSSPrimitiveNumericCategory.h"
 
-#include <wtf/Forward.h>
+#include <wtf/text/TextStream.h>
 
 namespace WebCore {
-namespace Style {
-namespace Calculation {
+namespace CSS {
 
-// Don't change these values; parsing uses them.
-enum class Operator : uint8_t {
-    Sum = '+',
-    Negate = '-',
-    Product = '*',
-    Invert = '/',
-    Min = 0,
-    Max,
-    Clamp,
-    Pow,
-    Sqrt,
-    Hypot,
-    Sin,
-    Cos,
-    Tan,
-    Exp,
-    Log,
-    Asin,
-    Acos,
-    Atan,
-    Atan2,
-    Abs,
-    Sign,
-    Mod,
-    Rem,
-    Round,
-    Nearest,
-    Up,
-    Down,
-    ToZero,
-    Progress,
-    Random,
-    Blend,
-};
+TextStream& operator<<(TextStream& ts, Category category)
+{
+    switch (category) {
+    case Category::Integer: ts << "integer"_s; break;
+    case Category::Number: ts << "number"_s; break;
+    case Category::Percentage: ts << "percentage"_s; break;
+    case Category::Length: ts << "length"_s; break;
+    case Category::Angle: ts << "angle"_s; break;
+    case Category::Time: ts << "time"_s; break;
+    case Category::Frequency: ts << "frequency"_s; break;
+    case Category::Resolution: ts << "resolution"_s; break;
+    case Category::Flex: ts << "flex"_s; break;
+    case Category::LengthPercentage: ts << "length-percentage"_s; break;
+    case Category::AnglePercentage: ts << "angle-percentage"_s; break;
+    }
 
-TextStream& operator<<(TextStream&, Operator);
+    return ts;
+}
 
-} // namespace Calculation
-} // namespace Style
+} // namespace CSS
 } // namespace WebCore

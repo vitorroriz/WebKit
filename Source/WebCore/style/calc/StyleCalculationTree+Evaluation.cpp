@@ -25,7 +25,7 @@
 #include "config.h"
 #include "StyleCalculationTree+Evaluation.h"
 
-#include "StyleCalculationExecutor.h"
+#include "CSSCalcExecutor.h"
 #include "StyleCalculationTree.h"
 #include <wtf/StdLibExtras.h>
 
@@ -33,8 +33,8 @@ namespace WebCore {
 namespace Style {
 namespace Calculation {
 
-static auto evaluate(const None&, double percentResolutionLength) -> None;
-static auto evaluate(const ChildOrNone&, double percentResolutionLength) -> Variant<double, None>;
+static auto evaluate(const CSS::Keyword::None&, double percentResolutionLength) -> CSS::Keyword::None;
+static auto evaluate(const ChildOrNone&, double percentResolutionLength) -> Variant<double, CSS::Keyword::None>;
 static auto evaluate(const std::optional<Child>&, double percentResolutionLength) -> std::optional<double>;
 static auto evaluate(const Child&, double percentResolutionLength) -> double;
 static auto evaluate(const Number&, double percentResolutionLength) -> double;
@@ -50,17 +50,22 @@ static auto evaluate(const IndirectNode<Blend>&, double percentResolutionLength)
 template<typename Op>
 static auto evaluate(const IndirectNode<Op>&, double percentResolutionLength) -> double;
 
+template<typename Op, typename... Args> static double executeMathOperation(Args&&... args)
+{
+    return CSSCalc::executeOperation<Op::op>(std::forward<Args>(args)...);
+}
+
 // MARK: Evaluation.
 
-None evaluate(const None& root, double)
+CSS::Keyword::None evaluate(const CSS::Keyword::None& root, double)
 {
     return root;
 }
 
-Variant<double, None> evaluate(const ChildOrNone& root, double percentResolutionLength)
+Variant<double, CSS::Keyword::None> evaluate(const ChildOrNone& root, double percentResolutionLength)
 {
     return WTF::switchOn(root, [&](const auto& root) {
-        return Variant<double, None> { evaluate(root, percentResolutionLength) };
+        return Variant<double, CSS::Keyword::None> { evaluate(root, percentResolutionLength) };
     });
 }
 
@@ -93,35 +98,35 @@ double evaluate(const Dimension& root, double)
 
 double evaluate(const IndirectNode<Sum>& root, double percentResolutionLength)
 {
-    return executeOperation<Sum>(root->children.value, [&](const auto& child) -> double {
+    return executeMathOperation<Sum>(root->children.value, [&](const auto& child) -> double {
         return evaluate(child, percentResolutionLength);
     });
 }
 
 double evaluate(const IndirectNode<Product>& root, double percentResolutionLength)
 {
-    return executeOperation<Product>(root->children.value, [&](const auto& child) -> double {
+    return executeMathOperation<Product>(root->children.value, [&](const auto& child) -> double {
         return evaluate(child, percentResolutionLength);
     });
 }
 
 double evaluate(const IndirectNode<Min>& root, double percentResolutionLength)
 {
-    return executeOperation<Min>(root->children.value, [&](const auto& child) -> double {
+    return executeMathOperation<Min>(root->children.value, [&](const auto& child) -> double {
         return evaluate(child, percentResolutionLength);
     });
 }
 
 double evaluate(const IndirectNode<Max>& root, double percentResolutionLength)
 {
-    return executeOperation<Max>(root->children.value, [&](const auto& child) -> double {
+    return executeMathOperation<Max>(root->children.value, [&](const auto& child) -> double {
         return evaluate(child, percentResolutionLength);
     });
 }
 
 double evaluate(const IndirectNode<Hypot>& root, double percentResolutionLength)
 {
-    return executeOperation<Hypot>(root->children.value, [&](const auto& child) -> double {
+    return executeMathOperation<Hypot>(root->children.value, [&](const auto& child) -> double {
         return evaluate(child, percentResolutionLength);
     });
 }
@@ -132,7 +137,7 @@ double evaluate(const IndirectNode<Random>& root, double percentResolutionLength
     auto max = evaluate(root->max, percentResolutionLength);
     auto step = evaluate(root->step, percentResolutionLength);
 
-    return executeOperation<Random>(root->fixed.baseValue, min, max, step);
+    return executeMathOperation<Random>(root->fixed.baseValue, min, max, step);
 }
 
 double evaluate(const IndirectNode<Blend>& root, double percentResolutionLength)
@@ -142,7 +147,7 @@ double evaluate(const IndirectNode<Blend>& root, double percentResolutionLength)
 
 template<typename Op> double evaluate(const IndirectNode<Op>& root, double percentResolutionLength)
 {
-    return WTF::apply([&](const auto& ...x) { return executeOperation<Op>(evaluate(x, percentResolutionLength)...); } , *root);
+    return WTF::apply([&](const auto& ...x) { return executeMathOperation<Op>(evaluate(x, percentResolutionLength)...); } , *root);
 }
 
 double evaluate(const Tree& tree, double percentResolutionLength)

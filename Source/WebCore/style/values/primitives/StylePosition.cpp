@@ -28,7 +28,6 @@
 #include "CSSPositionValue.h"
 #include "RenderStyle.h"
 #include "StyleBuilderChecking.h"
-#include "StyleCalculationCategory.h"
 #include "StyleCalculationTree.h"
 #include "StylePrimitiveNumericTypes+Conversions.h"
 #include "StylePrimitiveNumericTypes+Evaluation.h"

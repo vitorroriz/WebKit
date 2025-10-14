@@ -27,13 +27,13 @@
 
 #include "BoxSides.h"
 #include "CSSCustomPropertyValue.h"
+#include "CSSPrimitiveNumericCategory.h"
 #include "ComputedStyleDependencies.h"
 #include "ContainerQueryEvaluator.h"
 #include "RenderBoxInlines.h"
 #include "RenderElementInlines.h"
 #include "RenderObjectInlines.h"
 #include "StyleBuilder.h"
-#include "StyleCalculationCategory.h"
 #include "StyleCustomProperty.h"
 #include "StyleCustomPropertyRegistry.h"
 #include <wtf/NeverDestroyed.h>

@@ -40,12 +40,12 @@
 namespace WebCore {
 namespace Style {
 
-Ref<CalculationValue> CalculationValue::create(Calculation::Category category, Calculation::Range range, Calculation::Tree&& tree)
+Ref<CalculationValue> CalculationValue::create(CSS::Category category, CSS::Range range, Calculation::Tree&& tree)
 {
     return adoptRef(*new CalculationValue(category, range, WTFMove(tree)));
 }
 
-CalculationValue::CalculationValue(Calculation::Category category, Calculation::Range range, Calculation::Tree&& tree)
+CalculationValue::CalculationValue(CSS::Category category, CSS::Range range, Calculation::Tree&& tree)
     : m_category(category)
     , m_range(range)
     , m_tree(WTFMove(tree))
