@@ -1978,7 +1978,16 @@ void DocumentLoader::stopLoadingPlugIns()
 
 void DocumentLoader::stopLoadingSubresources()
 {
-    cancelAll(m_subresourceLoaders);
+    for (auto& loader : copyToVector(m_subresourceLoaders)) {
+        if (CachedResourceHandle cachedResource = loader->cachedResource()) {
+            // Don't cancel loaders for prefetch resources, as they need to survive navigation.
+            if (cachedResource->options().cachingPolicy == CachingPolicy::AllowCachingMainResourcePrefetch) {
+                m_subresourceLoaders.remove(loader);
+                continue;
+            }
+        }
+        loader->cancel();
+    }
     ASSERT(m_subresourceLoaders.isEmpty());
 }
 
@@ -2325,7 +2334,7 @@ void DocumentLoader::loadMainResource(ResourceRequest&& request)
     // If there was a fragment identifier on m_request, the cache will have stripped it. m_request should include
     // the fragment identifier, so add that back in.
     // Otherwise, if the main resource was loaded from a prefetch, we need to conserve the redirect URL here
-    if (equalIgnoringFragmentIdentifier(m_request.url(), updatedRequest.url()) || (m_mainResource && m_mainResource->options().cachingPolicy == CachingPolicy::AllowCachingPrefetch))
+    if (equalIgnoringFragmentIdentifier(m_request.url(), updatedRequest.url()) || (m_mainResource && m_mainResource->options().cachingPolicy == CachingPolicy::AllowCachingMainResourcePrefetch))
         updatedRequest.setURL(URL { m_request.url() });
     setRequest(WTFMove(updatedRequest));
 }
@@ -2348,6 +2357,10 @@ void DocumentLoader::cancelMainResourceLoad(const ResourceError& resourceError, 
     DOCUMENTLOADER_RELEASE_LOG("cancelMainResourceLoad: (type=%d, code=%d)", static_cast<int>(error.type()), error.errorCode());
 
     cancelPolicyCheckIfNeeded();
+
+    // Don't cancel loaders for prefetch resources, as they need to survive navigation.
+    if (m_mainResource && m_mainResource->options().cachingPolicy == CachingPolicy::AllowCachingMainResourcePrefetch)
+        return;
 
     if (RefPtr loader = mainResourceLoader())
         loader->cancel(error, loadWillContinueInAnotherProcess);

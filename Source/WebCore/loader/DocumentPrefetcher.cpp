@@ -134,7 +134,7 @@ void DocumentPrefetcher::prefetch(const URL& url, const Vector<String>& tags, co
         CertificateInfoPolicy::IncludeCertificateInfo,
         ContentSecurityPolicyImposition::DoPolicyCheck,
         DefersLoadingPolicy::AllowDefersLoading,
-        CachingPolicy::AllowCachingPrefetch
+        CachingPolicy::AllowCachingMainResourcePrefetch
     );
     prefetchOptions.destination = FetchOptions::Destination::Document;
     CachedResourceRequest prefetchRequest(WTFMove(request), prefetchOptions);
