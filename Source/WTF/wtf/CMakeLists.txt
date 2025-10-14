@@ -3,6 +3,7 @@ if (ENABLE_MALLOC_HEAP_BREAKDOWN AND NOT APPLE)
 endif ()
 
 set(WTF_PUBLIC_HEADERS
+    AbstractCanMakeCheckedPtr.h
     AbstractRefCounted.h
     AbstractRefCountedAndCanMakeWeakPtr.h
     AbstractThreadSafeRefCountedAndCanMakeWeakPtr.h

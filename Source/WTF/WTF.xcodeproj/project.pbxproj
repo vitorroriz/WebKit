@@ -91,6 +91,7 @@
 		4448265228D18CA600D916F9 /* NotificationCenterCF.h in Headers */ = {isa = PBXBuildFile; fileRef = 4448265128D18CA600D916F9 /* NotificationCenterCF.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4606FEE72B1E901800D704F1 /* WeakRef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4606FEE62B1E901800D704F1 /* WeakRef.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		461229722ACF6B3100BB1CCC /* FastCharacterComparison.h in Headers */ = {isa = PBXBuildFile; fileRef = 461229712ACF6B3100BB1CCC /* FastCharacterComparison.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4628C0952E9D026A00462A50 /* AbstractCanMakeCheckedPtr.h in Headers */ = {isa = PBXBuildFile; fileRef = 4628C0942E9D026A00462A50 /* AbstractCanMakeCheckedPtr.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		46335BED2E778B1300860373 /* DispatchExtras.h in Headers */ = {isa = PBXBuildFile; fileRef = 46335BEC2E778B1300860373 /* DispatchExtras.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		463CCFBC2B251D77009AB04E /* SingleThreadIntegralWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 463CCFBB2B251D77009AB04E /* SingleThreadIntegralWrapper.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		46449E8B2822E5680005A8BC /* WeakHashCountedSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 46449E8A2822E5670005A8BC /* WeakHashCountedSet.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -1298,6 +1299,7 @@
 		4606FEE62B1E901800D704F1 /* WeakRef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeakRef.h; sourceTree = "<group>"; };
 		461229712ACF6B3100BB1CCC /* FastCharacterComparison.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FastCharacterComparison.h; sourceTree = "<group>"; };
 		46209A27266D543A007F8F4A /* CancellableTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CancellableTask.h; sourceTree = "<group>"; };
+		4628C0942E9D026A00462A50 /* AbstractCanMakeCheckedPtr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AbstractCanMakeCheckedPtr.h; sourceTree = "<group>"; };
 		46335BEC2E778B1300860373 /* DispatchExtras.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DispatchExtras.h; sourceTree = "<group>"; };
 		463CCFBB2B251D77009AB04E /* SingleThreadIntegralWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SingleThreadIntegralWrapper.h; sourceTree = "<group>"; };
 		46449E8A2822E5670005A8BC /* WeakHashCountedSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeakHashCountedSet.h; sourceTree = "<group>"; };
@@ -2275,6 +2277,7 @@
 				A8A4731B151A825B004123FF /* text */,
 				A8A47339151A825B004123FF /* threads */,
 				A8A47348151A825B004123FF /* unicode */,
+				4628C0942E9D026A00462A50 /* AbstractCanMakeCheckedPtr.h */,
 				144EB7452CBC94B100926E1B /* AbstractRefCounted.h */,
 				1404B3E42CBC954D00A7471C /* AbstractRefCountedAndCanMakeWeakPtr.h */,
 				5363861E2CFE391C0034E883 /* AbstractThreadSafeRefCountedAndCanMakeWeakPtr.h */,
@@ -3392,6 +3395,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4628C0952E9D026A00462A50 /* AbstractCanMakeCheckedPtr.h in Headers */,
 				144EB7462CBC94B100926E1B /* AbstractRefCounted.h in Headers */,
 				1404B3E52CBC954D00A7471C /* AbstractRefCountedAndCanMakeWeakPtr.h in Headers */,
 				5363861F2CFE391C0034E883 /* AbstractThreadSafeRefCountedAndCanMakeWeakPtr.h in Headers */,

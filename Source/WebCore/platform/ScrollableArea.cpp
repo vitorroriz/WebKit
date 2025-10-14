@@ -51,14 +51,8 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(ScrollableArea);
 
-struct SameSizeAsScrollableArea : public CanMakeWeakPtr<SameSizeAsScrollableArea> {
+struct SameSizeAsScrollableArea : public CanMakeWeakPtr<SameSizeAsScrollableArea>, public AbstractCanMakeCheckedPtr {
     WTF_DEPRECATED_MAKE_STRUCT_FAST_ALLOCATED(SameSizeAsScrollableArea);
-
-    // CheckedPtr interface
-    virtual uint32_t checkedPtrCount() const { return 0; }
-    virtual uint32_t checkedPtrCountWithoutThreadCheck() const { return 0; }
-    virtual void incrementCheckedPtrCount() const { }
-    virtual void decrementCheckedPtrCount() const { }
 
     virtual ~SameSizeAsScrollableArea() { }
     SameSizeAsScrollableArea() { }
