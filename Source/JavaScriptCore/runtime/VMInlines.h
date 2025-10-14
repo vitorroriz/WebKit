@@ -34,7 +34,7 @@
 #include <JavaScriptCore/Watchdog.h>
 
 #if ENABLE(C_LOOP)
-#include "CLoopStackInlines.h"
+#include <JavaScriptCore/CLoopStackInlines.h>
 #endif
 
 namespace JSC {

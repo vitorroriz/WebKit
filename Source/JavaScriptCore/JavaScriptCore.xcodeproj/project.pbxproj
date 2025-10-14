@@ -1697,7 +1697,7 @@
 		A7BDAEC917F4EA1400F6140C /* ArrayIteratorPrototype.h in Headers */ = {isa = PBXBuildFile; fileRef = A7BDAEC317F4EA1400F6140C /* ArrayIteratorPrototype.h */; };
 		A7BFF3C0179868940002F462 /* DFGFiltrationResult.h in Headers */ = {isa = PBXBuildFile; fileRef = A7BFF3BF179868940002F462 /* DFGFiltrationResult.h */; };
 		A7C0C4AC168103020017011D /* JSScriptRefPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = A7C0C4AB167C08CD0017011D /* JSScriptRefPrivate.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		A7C1EAF017987AB600299DB2 /* CLoopStackInlines.h in Headers */ = {isa = PBXBuildFile; fileRef = A7C1EAEB17987AB600299DB2 /* CLoopStackInlines.h */; };
+		A7C1EAF017987AB600299DB2 /* CLoopStackInlines.h in Headers */ = {isa = PBXBuildFile; fileRef = A7C1EAEB17987AB600299DB2 /* CLoopStackInlines.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		A7C1EAF217987AB600299DB2 /* StackVisitor.h in Headers */ = {isa = PBXBuildFile; fileRef = A7C1EAED17987AB600299DB2 /* StackVisitor.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		A7CA3AE417DA41AE006538AF /* WeakMapConstructor.h in Headers */ = {isa = PBXBuildFile; fileRef = A7CA3ADE17DA41AE006538AF /* WeakMapConstructor.h */; };
 		A7CA3AE617DA41AE006538AF /* WeakMapPrototype.h in Headers */ = {isa = PBXBuildFile; fileRef = A7CA3AE017DA41AE006538AF /* WeakMapPrototype.h */; };
@@ -2170,7 +2170,7 @@
 		FE2CC9302756B2B9003F5AB8 /* HeapSubspaceTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = FE2CC92F2756B2B9003F5AB8 /* HeapSubspaceTypes.h */; };
 		FE2D0B382AE242B000A071A7 /* SideDataRepository.h in Headers */ = {isa = PBXBuildFile; fileRef = FE2D0B362AE242AF00A071A7 /* SideDataRepository.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		FE3022D71E42857300BAC493 /* VMInspector.h in Headers */ = {isa = PBXBuildFile; fileRef = FE3022D51E42856700BAC493 /* VMInspector.h */; };
-		FE3040882E43E58D00E5087B /* StackManagerInlines.h in Headers */ = {isa = PBXBuildFile; fileRef = FE3040872E43E58D00E5087B /* StackManagerInlines.h */; };
+		FE3040882E43E58D00E5087B /* StackManagerInlines.h in Headers */ = {isa = PBXBuildFile; fileRef = FE3040872E43E58D00E5087B /* StackManagerInlines.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		FE336B5325DB497D0098F034 /* MarkingConstraintExecutorPair.h in Headers */ = {isa = PBXBuildFile; fileRef = FE336B5225DB497D0098F034 /* MarkingConstraintExecutorPair.h */; };
 		FE3422121D6B81C30032BE88 /* ThrowScope.h in Headers */ = {isa = PBXBuildFile; fileRef = FE3422111D6B818C0032BE88 /* ThrowScope.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		FE34EE2124398AAE00AA2E7C /* EnsureStillAliveHere.h in Headers */ = {isa = PBXBuildFile; fileRef = FE34EE2024398A9A00AA2E7C /* EnsureStillAliveHere.h */; settings = {ATTRIBUTES = (Private, ); }; };
