@@ -1557,7 +1557,10 @@ TEST(ProcessSwap, CrossSiteBlankTargetWithOpener)
     auto pid2 = [createdWebView _webProcessIdentifier];
     EXPECT_TRUE(!!pid2);
 
-    EXPECT_EQ(pid1, pid2);
+    if (isSiteIsolationEnabled(webView.get()))
+        EXPECT_NE(pid1, pid2);
+    else
+        EXPECT_EQ(pid1, pid2);
 }
 
 TEST(ProcessSwap, CrossSiteBlankTargetImplicitNoOpener)
