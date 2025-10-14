@@ -115,6 +115,9 @@ HTMLFormElement::~HTMLFormElement()
     if (!shouldAutocomplete())
         document().unregisterForDocumentSuspensionCallbacks(*this);
 
+    // formWillBeDestroyed below will try to update the validity of all radio buttons in a given group.
+    m_radioButtonGroups.clear();
+
     m_defaultButton = nullptr;
     for (auto& weakElement : m_listedElements) {
         ASSERT(weakElement);
