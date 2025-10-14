@@ -59,6 +59,15 @@ A = AllowList.from_dict({'temporary-usage': [
 ]})
 A_File = Path('/allowed.toml')
 A_Hash = 23456
+A_ExplicitlyAllowUnused = AllowList.from_dict({'temporary-usage': [
+    {'request': 'rdar://12345',
+     'cleanup': 'rdar://12346',
+     'classes': ['WKDoesntExist'],
+     'selectors': [{'name': 'initWithData:', 'class': '?'}],
+     'symbols': ['WKDoesntExistLibraryVersion'],
+     'allow-unused': True}
+]})
+
 A_UnusedAllow = UnusedAllowedName(name='WKDoesntExist', file=A_File,
                                   kind=OBJC_CLS)
 A_AllowedAPI = UnnecessaryAllowedName(name='WKDoesntExist', file=A_File,
@@ -274,6 +283,15 @@ class TestSDKDB(TestCase):
 
     def test_audit_unused_allow_from_loaded_allowlist(self):
         self.add_allowlist()
+        self.assertIn(A_UnusedAllow, self.sdkdb.audit())
+
+    def test_audit_no_unused_when_explicitly_allowed(self):
+        self.add_allowlist(A_ExplicitlyAllowUnused)
+        self.assertNotIn(A_UnusedAllow, self.sdkdb.audit())
+
+    def test_audit_unused_allow_from_conflicting_allow_unused_keys(self):
+        self.add_allowlist()
+        self.add_allowlist(A_ExplicitlyAllowUnused)
         self.assertIn(A_UnusedAllow, self.sdkdb.audit())
 
     def test_audit_no_unused_allow_from_unloaded_allowlist(self):
