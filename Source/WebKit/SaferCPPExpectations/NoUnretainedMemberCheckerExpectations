@@ -25,7 +25,6 @@ UIProcess/API/Cocoa/_WKWebPushMessage.h
 [ iOS ] UIProcess/API/Cocoa/_WKTextManipulationConfiguration.h
 [ iOS ] UIProcess/API/Cocoa/_WKTextManipulationToken.h
 [ iOS ] UIProcess/API/Cocoa/_WKTouchEventGeneratorInternal.h
-[ iOS ] UIProcess/API/Cocoa/_WKWebPushAction.mm
 [ iOS ] UIProcess/API/Cocoa/_WKWebPushDaemonConnection.h
 [ iOS ] UIProcess/Cocoa/SystemPreviewControllerCocoa.mm
 [ iOS ] UIProcess/RemoteLayerTree/ios/RemoteLayerTreeDrawingAreaProxyIOS.mm

@@ -644,9 +644,9 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     }
 
     NSDictionary *settingsInfo = @{
-        pushActionVersionKey(): currentPushActionVersion(),
-        pushActionPartitionKey(): subscriptionSetIdentifier.pushPartition.createNSString().get(),
-        pushActionTypeKey(): _WKWebPushActionTypePushEvent
+        pushActionVersionKeySingleton(): currentPushActionVersionSingleton(),
+        pushActionPartitionKeySingleton(): subscriptionSetIdentifier.pushPartition.createNSString().get(),
+        pushActionTypeKeySingleton(): _WKWebPushActionTypePushEvent
     };
     RetainPtr<BSMutableSettings> bsSettings = adoptNS([[BSMutableSettings alloc] init]);
     [bsSettings setObject:settingsInfo forSetting:WebKit::WebPushD::pushActionSetting];
