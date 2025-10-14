@@ -32,7 +32,6 @@
 
 #include <WebCore/WritingMode.h>
 #include <array>
-#include <wtf/EnumSet.h>
 
 namespace WebCore {
 
@@ -45,10 +44,26 @@ enum class LogicalBoxAxis : uint8_t {
 
 enum class BoxAxis : uint8_t {
     Horizontal,
-    Vertical,
-
-    HighestEnumValue = Vertical
+    Vertical
 };
+
+// FIXME: BoxAxis etc. should just be OptionSet friendly types themselves.
+enum class BoxAxisFlag : uint8_t {
+    Horizontal = 1 << 0,
+    Vertical = 1 << 1
+};
+
+constexpr BoxAxisFlag boxAxisToFlag(BoxAxis axis)
+{
+    switch (axis) {
+    case BoxAxis::Horizontal:
+        return BoxAxisFlag::Horizontal;
+    case BoxAxis::Vertical:
+        return BoxAxisFlag::Vertical;
+    }
+    ASSERT_NOT_REACHED();
+    return BoxAxisFlag::Horizontal;
+}
 
 constexpr BoxAxis mapAxisLogicalToPhysical(const WritingMode, const LogicalBoxAxis);
 constexpr LogicalBoxAxis mapAxisPhysicalToLogical(const WritingMode, const BoxAxis);
@@ -78,9 +93,14 @@ enum class BoxSide : uint8_t {
     Top,
     Right,
     Bottom,
-    Left,
+    Left
+};
 
-    HighestEnumValue = Left
+enum class BoxSideFlag : uint8_t {
+    Top     = 1 << static_cast<unsigned>(BoxSide::Top),
+    Right   = 1 << static_cast<unsigned>(BoxSide::Right),
+    Bottom  = 1 << static_cast<unsigned>(BoxSide::Bottom),
+    Left    = 1 << static_cast<unsigned>(BoxSide::Left)
 };
 
 constexpr std::array<BoxSide, 4> allBoxSides = {
@@ -90,7 +110,23 @@ constexpr std::array<BoxSide, 4> allBoxSides = {
     BoxSide::Left
 };
 
-using BoxSideSet = EnumSet<BoxSide>;
+constexpr BoxSide boxSideFromFlag(BoxSideFlag flag)
+{
+    switch (flag) {
+    case BoxSideFlag::Top:
+        return BoxSide::Top;
+    case BoxSideFlag::Right:
+        return BoxSide::Right;
+    case BoxSideFlag::Bottom:
+        return BoxSide::Bottom;
+    case BoxSideFlag::Left:
+        return BoxSide::Left;
+    }
+    ASSERT_NOT_REACHED_UNDER_CONSTEXPR_CONTEXT();
+    return BoxSide::Left;
+}
+
+using BoxSideSet = OptionSet<BoxSideFlag>;
 
 constexpr BoxSide mapSideLogicalToPhysical(const WritingMode, const LogicalBoxSide);
 constexpr LogicalBoxSide mapSidePhysicalToLogical(const WritingMode, const BoxSide);

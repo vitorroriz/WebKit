@@ -66,11 +66,11 @@ namespace InlineIterator {
 class InlineBoxIterator;
 };
 
-enum class BoxSide : uint8_t;
+enum class BoxSideFlag : uint8_t;
 enum class DecodingMode : uint8_t;
 enum class InterpolationQuality : uint8_t;
 
-using BoxSideSet = EnumSet<BoxSide>;
+using BoxSideSet = OptionSet<BoxSideFlag>;
 using BorderEdges = RectEdges<BorderEdge>;
 
 // This class is the base for all objects that adhere to the CSS box model as described

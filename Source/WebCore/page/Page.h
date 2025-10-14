@@ -242,6 +242,7 @@ using SharedStringHash = uint32_t;
 enum class ActivityState : uint16_t;
 enum class AdvancedPrivacyProtections : uint16_t;
 enum class BoxSide : uint8_t;
+enum class BoxSideFlag : uint8_t;
 enum class CanWrap : bool;
 enum class ContentSecurityPolicyModeForExtension : uint8_t;
 enum class DidWrap : bool;
@@ -933,7 +934,7 @@ public:
     WEBCORE_EXPORT Color pageExtendedBackgroundColor() const;
     WEBCORE_EXPORT Color sampledPageTopColor() const;
 
-    WEBCORE_EXPORT void updateFixedContainerEdges(EnumSet<BoxSide>);
+    WEBCORE_EXPORT void updateFixedContainerEdges(OptionSet<BoxSideFlag>);
     const FixedContainerEdges& fixedContainerEdges() const { return m_fixedContainerEdgesAndElements.first; }
     Element* lastFixedContainer(BoxSide) const;
 

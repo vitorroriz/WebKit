@@ -2503,7 +2503,8 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
         return blendSourceOver(pageBackgroundColor, color);
     };
 
-    for (auto side : sides) {
+    for (auto sideFlag : sides) {
+        auto side = boxSideFromFlag(sideFlag);
         auto result = findFixedContainer(side, IgnoreCSSPointerEvents::Yes);
         if (result.retryHonoringPointerEvents)
             result = findFixedContainer(side, IgnoreCSSPointerEvents::No);

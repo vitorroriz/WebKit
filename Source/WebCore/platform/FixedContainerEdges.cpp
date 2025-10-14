@@ -44,10 +44,14 @@ bool FixedContainerEdges::hasFixedEdge(BoxSide side) const
 BoxSideSet FixedContainerEdges::fixedEdges() const
 {
     BoxSideSet edges;
-    for (auto boxSide : allBoxSides) {
-        if (hasFixedEdge(boxSide))
-            edges.add(boxSide);
-    }
+    if (hasFixedEdge(BoxSide::Top))
+        edges.add(BoxSideFlag::Top);
+    if (hasFixedEdge(BoxSide::Left))
+        edges.add(BoxSideFlag::Left);
+    if (hasFixedEdge(BoxSide::Bottom))
+        edges.add(BoxSideFlag::Bottom);
+    if (hasFixedEdge(BoxSide::Right))
+        edges.add(BoxSideFlag::Right);
     return edges;
 }
 

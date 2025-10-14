@@ -412,7 +412,7 @@ void BorderPainter::paintSides(const BorderShape& borderShape, const Sides& side
         auto& currEdge = sides.edges.at(boxSide);
 
         if (currEdge.shouldRender())
-            edgesToDraw.add(boxSide);
+            edgesToDraw.add(edgeFlagForSide(boxSide));
 
         if (currEdge.presentButInvisible()) {
             --numEdgesVisible;
@@ -592,7 +592,7 @@ void BorderPainter::paintTranslucentBorderSides(const BorderShape& borderShape, 
 
         BoxSideSet commonColorEdgeSet;
         for (auto side : paintOrderSides) {
-            if (!edgesToDraw.contains(side))
+            if (!edgesToDraw.contains(edgeFlagForSide(side)))
                 continue;
 
             auto& edge = sides.edges.at(side);
@@ -604,7 +604,7 @@ void BorderPainter::paintTranslucentBorderSides(const BorderShape& borderShape, 
                 includeEdge = equalIgnoringSemanticColor(edge.color(), commonColor);
 
             if (includeEdge)
-                commonColorEdgeSet.add(side);
+                commonColorEdgeSet.add(edgeFlagForSide(side));
         }
 
         bool useTransparencyLayer = includesAdjacentEdges(commonColorEdgeSet) && !commonColor.isOpaque();
@@ -628,10 +628,10 @@ static inline bool borderStyleHasUnmatchedColorsAtCorner(BorderStyle style, BoxS
 {
     // These styles match at the top/left and bottom/right.
     if (style == BorderStyle::Inset || style == BorderStyle::Groove || style == BorderStyle::Ridge || style == BorderStyle::Outset) {
-        BoxSideSet topRightSides = { BoxSide::Top, BoxSide::Right };
-        BoxSideSet bottomLeftSides = { BoxSide::Bottom, BoxSide::Left };
+        BoxSideSet topRightSides = { BoxSideFlag::Top, BoxSideFlag::Right };
+        BoxSideSet bottomLeftSides = { BoxSideFlag::Bottom, BoxSideFlag::Left };
 
-        BoxSideSet usedSides { side, adjacentSide };
+        BoxSideSet usedSides { edgeFlagForSide(side), edgeFlagForSide(adjacentSide) };
         return usedSides == topRightSides || usedSides == bottomLeftSides;
     }
     return false;
@@ -748,7 +748,7 @@ void BorderPainter::paintBorderSides(const BorderShape& borderShape, const Sides
 
     auto paintOneSide = [&](BoxSide side, BoxSide adjacentSide1, BoxSide adjacentSide2) {
         auto& edge = sides.edges.at(side);
-        if (!edge.shouldRender() || !edgeSet.contains(side))
+        if (!edge.shouldRender() || !edgeSet.contains(edgeFlagForSide(side)))
             return;
 
         LayoutRect sideRect = borderShape.borderRect();

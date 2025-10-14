@@ -82,8 +82,8 @@ AnchorScrollAdjuster::AnchorScrollAdjuster(RenderBox& anchored, const RenderBoxM
     auto& style = anchored.style();
 
     auto compensatedAxes = style.anchorFunctionScrollCompensatedAxes();
-    m_needsXAdjustment = compensatedAxes.contains(BoxAxis::Horizontal);
-    m_needsYAdjustment = compensatedAxes.contains(BoxAxis::Vertical);
+    m_needsXAdjustment = compensatedAxes.contains(BoxAxisFlag::Horizontal);
+    m_needsYAdjustment = compensatedAxes.contains(BoxAxisFlag::Vertical);
 
     auto containingWritingMode = anchored.container()->style().writingMode();
     if (auto positionArea = style.positionArea()) {
@@ -462,7 +462,7 @@ void AnchorPositionEvaluator::addAnchorFunctionScrollCompensatedAxis(RenderStyle
         return;
 
     auto axes = style.anchorFunctionScrollCompensatedAxes();
-    axes.add(axis);
+    axes.add(boxAxisToFlag(axis));
     style.setAnchorFunctionScrollCompensatedAxes(axes);
 }
 
