@@ -81,18 +81,6 @@ namespace WebCore {
 #pragma mark -
 #pragma mark SourceBufferPrivateAVFObjC
 
-#if ASSERT_ENABLED
-static inline bool supportsAttachContentKey()
-{
-    static bool supportsAttachContentKey;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        supportsAttachContentKey = WTF::processHasEntitlement("com.apple.developer.web-browser-engine.rendering"_s) || WTF::processHasEntitlement("com.apple.private.coremedia.allow-fps-attachment"_s);
-    });
-    return supportsAttachContentKey;
-}
-#endif
-
 Ref<SourceBufferPrivateAVFObjC> SourceBufferPrivateAVFObjC::create(MediaSourcePrivateAVFObjC& parent, Ref<SourceBufferParser>&& parser, Ref<AudioVideoRenderer>&& renderer)
 {
     return adoptRef(*new SourceBufferPrivateAVFObjC(parent, WTFMove(parser), WTFMove(renderer)));
@@ -785,8 +773,6 @@ void SourceBufferPrivateAVFObjC::enqueueSample(Ref<MediaSampleAVFObjC>&& sample,
 
 void SourceBufferPrivateAVFObjC::attachContentKeyToSampleIfNeeded(const MediaSampleAVFObjC& sample)
 {
-    ASSERT((!m_cdmInstance && !m_session.get()) || supportsAttachContentKey());
-
     if (RefPtr cdmInstance = m_cdmInstance)
         cdmInstance->attachContentKeyToSample(sample);
     else if (RefPtr session = m_session.get())
