@@ -64,6 +64,7 @@ namespace WebCore {
 WTF_MAKE_TZONE_ALLOCATED_IMPL(WorkerRunLoop);
 WTF_MAKE_TZONE_ALLOCATED_IMPL(WorkerDedicatedRunLoop);
 WTF_MAKE_TZONE_ALLOCATED_IMPL(WorkerDedicatedRunLoop::Task);
+WTF_MAKE_TZONE_ALLOCATED_IMPL(WorkerMainRunLoop);
 
 class WorkerSharedTimer final : public SharedTimer {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(WorkerSharedTimer);
@@ -426,14 +427,18 @@ void WorkerMainRunLoop::postTaskAndTerminate(ScriptExecutionContext::Task&& task
         return;
 
     RunLoop::mainSingleton().dispatch([weakThis = WeakPtr { *this }, task = WTFMove(task)]() mutable {
-        if (!weakThis || weakThis->m_terminated)
-            return;
-        RefPtr workerOrWorkletGlobalScope = weakThis->m_workerOrWorkletGlobalScope.get();
-        if (!workerOrWorkletGlobalScope)
-            return;
+        RefPtr<WorkerOrWorkletGlobalScope> scope;
+        {
+            CheckedPtr checkedThis = weakThis.get();
+            if (!checkedThis || checkedThis->m_terminated)
+                return;
+            scope = checkedThis->m_workerOrWorkletGlobalScope.get();
+            if (!scope)
+                return;
 
-        weakThis->m_terminated = true;
-        task.performTask(*workerOrWorkletGlobalScope);
+            checkedThis->m_terminated = true;
+        }
+        task.performTask(*scope);
     });
 }
 
@@ -443,13 +448,16 @@ void WorkerMainRunLoop::postTaskForMode(ScriptExecutionContext::Task&& task, con
         return;
 
     RunLoop::mainSingleton().dispatch([weakThis = WeakPtr { *this }, task = WTFMove(task)]() mutable {
-        if (!weakThis || weakThis->m_terminated)
-            return;
-        RefPtr workerOrWorkletGlobalScope = weakThis->m_workerOrWorkletGlobalScope.get();
-        if (!workerOrWorkletGlobalScope)
-            return;
-
-        task.performTask(*workerOrWorkletGlobalScope);
+        RefPtr<WorkerOrWorkletGlobalScope> scope;
+        {
+            CheckedPtr checkedThis = weakThis.get();
+            if (!checkedThis || checkedThis->m_terminated)
+                return;
+            scope = checkedThis->m_workerOrWorkletGlobalScope.get();
+            if (!scope)
+                return;
+        }
+        task.performTask(*scope);
     });
 }
 
