@@ -2381,6 +2381,7 @@ platform/WebCoreMainThread.cpp
 platform/WebCorePersistentCoders.cpp
 platform/Widget.cpp
 platform/animation/AcceleratedEffect.cpp
+platform/animation/AcceleratedEffectStack.cpp @no-unify
 platform/animation/AcceleratedEffectValues.cpp
 platform/animation/TimingFunction.cpp
 platform/animation/values/AcceleratedEffectOffsetAnchor.cpp

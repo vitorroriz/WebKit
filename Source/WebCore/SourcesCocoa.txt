@@ -265,7 +265,6 @@ page/scrolling/mac/ScrollingTreePluginScrollingNodeMac.mm @nonARC
 page/scrolling/mac/ScrollingTreeScrollingNodeDelegateMac.mm @nonARC
 page/writing-tools/WritingToolsController.mm @nonARC
 platform/VideoFrame.mm @nonARC
-platform/animation/AcceleratedEffectStack.mm @nonARC @no-unify
 platform/audio/AudioSession.cpp
 platform/audio/cocoa/AudioDecoderCocoa.cpp
 platform/audio/cocoa/AudioDestinationCocoa.cpp
