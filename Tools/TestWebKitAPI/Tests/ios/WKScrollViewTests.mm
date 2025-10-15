@@ -831,6 +831,31 @@ TEST(WKScrollViewTests, TopScrollPocketCaptureColorAfterSettingHardStyle)
 
 #endif // HAVE(LIQUID_GLASS)
 
+TEST(WKScrollViewTests, SafeAreaEnvironmentVariablesAccountForObscuredContentInsets)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 400, 800)]);
+    [webView setOverrideSafeAreaInset:UIEdgeInsetsMake(66, 10, 34, 10)];
+
+    RetainPtr scrollView = [webView scrollView];
+
+    auto insets = UIEdgeInsetsMake(100, 0, 20, 0);
+    [webView setObscuredContentInsets:insets];
+
+    [scrollView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
+    [scrollView setContentInset:insets];
+
+    [webView synchronouslyLoadTestPageNamed:@"safe-area-env"];
+    [webView waitForNextPresentationUpdate];
+
+    auto computedBodyPadding = [&](NSString *side) {
+        return [webView stringByEvaluatingJavaScript:[NSString stringWithFormat:@"getComputedStyle(document.body).padding%@", side]];
+    };
+    EXPECT_WK_STREQ("0px", computedBodyPadding(@"Top"));
+    EXPECT_WK_STREQ("10px", computedBodyPadding(@"Left"));
+    EXPECT_WK_STREQ("14px", computedBodyPadding(@"Bottom"));
+    EXPECT_WK_STREQ("10px", computedBodyPadding(@"Right"));
+}
+
 } // namespace TestWebKitAPI
 
 #endif // PLATFORM(IOS_FAMILY)
