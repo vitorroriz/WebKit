@@ -101,7 +101,6 @@ platform/gtk/PlatformScreenGtk.cpp
 platform/gtk/RenderThemeGadget.cpp
 platform/gtk/RenderThemeScrollbar.cpp
 platform/gtk/ScrollbarThemeGtk.cpp
-platform/gtk/ValidationBubbleGtk.cpp
 
 platform/text/Hyphenation.cpp
 platform/text/LocaleICU.cpp

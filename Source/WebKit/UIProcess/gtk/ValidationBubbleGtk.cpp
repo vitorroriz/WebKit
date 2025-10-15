@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Igalia S.L.
+ * Copyright (C) 2025 Igalia S.L.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,46 +24,41 @@
  */
 
 #include "config.h"
-#include "ValidationBubble.h"
+#include "ValidationBubbleGtk.h"
 
-#if PLATFORM(GTK)
-
-#include "GtkVersioning.h"
-#include <glib.h>
-#include <gtk/gtk.h>
-#include <wtf/glib/GUniquePtr.h>
+#include "WebKitWebViewBasePrivate.h"
+#include <WebCore/GtkVersioning.h>
 #include <wtf/text/WTFString.h>
 
-namespace WebCore {
+namespace WebKit {
 
-static const float horizontalMargin = 5;
-static const float verticalMargin = 5;
-static const float maxLabelWidthChars = 40;
-static const double minFontSize = 11;
-
-ValidationBubble::ValidationBubble(GtkWidget* webView, String&& message, const Settings& settings, ShouldNotifyFocusEventsCallback&& callback)
-    : m_view(webView)
-    , m_message(WTFMove(message))
-    , m_fontSize(std::max(settings.minimumFontSize, minFontSize))
-    , m_shouldNotifyFocusEventsCallback(WTFMove(callback))
+ValidationBubbleGtk::ValidationBubbleGtk(GtkWidget* webView, String&& message, const WebCore::ValidationBubble::Settings& settings)
+    : m_webView(webView)
 {
+    m_message = WTFMove(message);
+    static constexpr double minFontSize = 11;
+    m_fontSize = std::max(settings.minimumFontSize, minFontSize);
+
     GtkWidget* label = gtk_label_new(nullptr);
 
     // https://docs.gtk.org/Pango/pango_markup.html
-    GUniquePtr<gchar> markup(g_markup_printf_escaped("<span font='%f'>%s</span>", m_fontSize, message.utf8().data()));
-    gtk_label_set_markup(GTK_LABEL(label), markup.get());
+    String markup = makeString("<span font='"_s, m_fontSize, "'>"_s, m_message, "</span>"_s);
+    gtk_label_set_markup(GTK_LABEL(label), markup.utf8().data());
 
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_set_valign(label, GTK_ALIGN_CENTER);
 
-    gtk_widget_set_margin_top(label, verticalMargin);
-    gtk_widget_set_margin_bottom(label, verticalMargin);
-    gtk_widget_set_margin_start(label, horizontalMargin);
-    gtk_widget_set_margin_end(label, horizontalMargin);
+    static constexpr int margin = 5;
+    gtk_widget_set_margin_top(label, margin);
+    gtk_widget_set_margin_bottom(label, margin);
+    gtk_widget_set_margin_start(label, margin);
+    gtk_widget_set_margin_end(label, margin);
 
     gtk_label_set_ellipsize(GTK_LABEL(label), PANGO_ELLIPSIZE_END);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_label_set_lines(GTK_LABEL(label), 4);
+    static constexpr int labelLines = 4;
+    gtk_label_set_lines(GTK_LABEL(label), labelLines);
+    static constexpr int maxLabelWidthChars = 40;
     gtk_label_set_max_width_chars(GTK_LABEL(label), maxLabelWidthChars);
 
 #if USE(GTK4)
@@ -71,9 +66,9 @@ ValidationBubble::ValidationBubble(GtkWidget* webView, String&& message, const S
     gtk_popover_set_autohide(GTK_POPOVER(m_popover), FALSE);
     gtk_popover_set_child(GTK_POPOVER(m_popover), label);
 
-    gtk_widget_set_parent(m_popover, webView);
+    gtk_widget_set_parent(m_popover, m_webView.get());
 #else
-    m_popover = gtk_popover_new(webView);
+    m_popover = gtk_popover_new(m_webView.get());
     gtk_popover_set_modal(GTK_POPOVER(m_popover), FALSE);
     gtk_popover_set_constrain_to(GTK_POPOVER(m_popover), GTK_POPOVER_CONSTRAINT_NONE);
 
@@ -82,17 +77,17 @@ ValidationBubble::ValidationBubble(GtkWidget* webView, String&& message, const S
 #endif
     gtk_popover_set_position(GTK_POPOVER(m_popover), GTK_POS_TOP);
 
-    g_signal_connect_swapped(m_popover, "closed", G_CALLBACK(+[](ValidationBubble* validationBubble) {
+    g_signal_connect_swapped(m_popover, "closed", G_CALLBACK(+[](ValidationBubbleGtk* validationBubble) {
         validationBubble->invalidate();
     }), this);
 }
 
-ValidationBubble::~ValidationBubble()
+ValidationBubbleGtk::~ValidationBubbleGtk()
 {
     invalidate();
 }
 
-void ValidationBubble::invalidate()
+void ValidationBubbleGtk::invalidate()
 {
     if (!m_popover)
         return;
@@ -102,23 +97,23 @@ void ValidationBubble::invalidate()
 #if USE(GTK4)
     g_clear_pointer(&m_popover, gtk_widget_unparent);
 #else
-    gtk_widget_destroy(m_popover);
-    m_popover = nullptr;
+    g_clear_pointer(&m_popover, gtk_widget_destroy);
 #endif
 
-    m_shouldNotifyFocusEventsCallback(m_view, true);
+    if (m_webView)
+        webkitWebViewBaseSetShouldNotifyFocusEvents(WEBKIT_WEB_VIEW_BASE(m_webView.get()), true);
 }
 
-void ValidationBubble::showRelativeTo(const IntRect& anchorRect)
+void ValidationBubbleGtk::showRelativeTo(const WebCore::IntRect& anchorRect)
 {
-    m_shouldNotifyFocusEventsCallback(m_view, false);
+    if (!m_webView)
+        return;
+
+    webkitWebViewBaseSetShouldNotifyFocusEvents(WEBKIT_WEB_VIEW_BASE(m_webView.get()), false);
 
     GdkRectangle rect(anchorRect);
     gtk_popover_set_pointing_to(GTK_POPOVER(m_popover), &rect);
-
     gtk_popover_popup(GTK_POPOVER(m_popover));
 }
 
-} // namespace WebCore
-
-#endif // PLATFORM(GTK)
+} // namespace WebKit
