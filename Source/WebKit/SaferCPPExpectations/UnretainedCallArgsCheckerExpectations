@@ -17,7 +17,6 @@ Shared/RemoteLayerTree/RemoteLayerTreePropertyApplier.mm
 [ Mac ] Shared/mac/AuxiliaryProcessMac.mm
 UIProcess/API/C/mac/WKNotificationPrivateMac.mm
 UIProcess/API/C/mac/WKProtectionSpaceNS.mm
-[ Mac ] UIProcess/API/Cocoa/NSAttributedString.mm
 UIProcess/API/Cocoa/WKFrameInfo.mm
 UIProcess/API/Cocoa/WKNavigationAction.mm
 UIProcess/API/Cocoa/WKNavigationResponse.mm
@@ -43,7 +42,6 @@ UIProcess/API/Cocoa/_WKUserInitiatedAction.mm
 [ Mac ] UIProcess/Automation/mac/WebAutomationSessionMac.mm
 [ Mac ] UIProcess/Inspector/Cocoa/InspectorExtensionDelegate.mm
 [ Mac ] UIProcess/Inspector/mac/WKInspectorViewController.mm
-[ Mac ] UIProcess/Inspector/mac/WKInspectorWKWebView.mm
 WebProcess/GPU/webrtc/RemoteVideoFrameObjectHeapProxyProcessor.cpp
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessBundleParameters.mm
 WebProcess/InjectedBundle/API/mac/WKDOMInternals.mm

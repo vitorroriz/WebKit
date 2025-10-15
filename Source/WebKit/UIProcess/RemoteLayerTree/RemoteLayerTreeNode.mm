@@ -315,9 +315,8 @@ void RemoteLayerTreeNode::setAcceleratedEffectsAndBaseValues(const WebCore::Acce
     if (effects.isEmpty())
         return;
 
-    Ref animationStack = RemoteAnimationStack::create(effects.map([](auto& effect) {
-        Ref protectedEffect { effect };
-        return RemoteAnimation::create(protectedEffect.get());
+    Ref animationStack = RemoteAnimationStack::create(effects.map([](const Ref<AcceleratedEffect>& effect) {
+        return RemoteAnimation::create(Ref { effect }.get());
     }), baseValues.clone(), layer.get().bounds, host.acceleratedTimelineTimeOrigin(m_layerID.processIdentifier()));
     m_animationStack = animationStack.copyRef();
 

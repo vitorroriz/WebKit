@@ -23,7 +23,6 @@ mac/Misc/WebKitNSStringExtras.mm
 mac/Misc/WebNSObjectExtras.mm
 [ Mac ] mac/Misc/WebNSPasteboardExtras.mm
 mac/Misc/WebNSURLExtras.mm
-[ Mac ] mac/Misc/WebNSViewExtras.m
 [ Mac ] mac/Misc/WebSharingServicePickerController.mm
 mac/Misc/WebUserContentURLPattern.mm
 [ Mac ] mac/Panels/WebAuthenticationPanel.m
@@ -37,7 +36,6 @@ mac/Storage/WebDatabaseManager.mm
 mac/Storage/WebDatabaseManagerClient.mm
 mac/Storage/WebDatabaseProvider.mm
 mac/Storage/WebDatabaseQuotaManager.mm
-[ Mac ] mac/WebCoreSupport/PopupMenuMac.mm
 [ Mac ] mac/WebCoreSupport/SearchPopupMenuMac.mm
 mac/WebCoreSupport/WebAlternativeTextClient.mm
 mac/WebCoreSupport/WebChromeClient.mm
