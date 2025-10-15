@@ -55,7 +55,7 @@ Ref<WebInspectorUI> WebInspectorUI::create(WebPage& page)
 
 WebInspectorUI::WebInspectorUI(WebPage& page)
     : m_page(page)
-    , m_frontendAPIDispatcher(InspectorFrontendAPIDispatcher::create(*page.corePage()))
+    , m_frontendAPIDispatcher(InspectorFrontendAPIDispatcher::create(*page.protectedCorePage()))
     , m_debuggableInfo(DebuggableInfoData::empty())
 {
 }
@@ -159,7 +159,7 @@ void WebInspectorUI::closeWindow()
 
     m_inspectedPageIdentifier = std::nullopt;
     m_underTest = false;
-    
+
 #if ENABLE(INSPECTOR_EXTENSIONS)
     m_extensionController = nullptr;
 #endif
@@ -337,7 +337,8 @@ double WebInspectorUI::pageZoomFactor() const
 #if ENABLE(INSPECTOR_TELEMETRY)
 bool WebInspectorUI::supportsDiagnosticLogging()
 {
-    return m_page->corePage()->settings().diagnosticLoggingEnabled();
+    RefPtr page = m_page.get();
+    return page && page->corePage()->settings().diagnosticLoggingEnabled();
 }
 
 void WebInspectorUI::logDiagnosticEvent(const String& eventName, const DiagnosticLoggingClient::ValueDictionary& dictionary)
