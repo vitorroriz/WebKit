@@ -36,6 +36,7 @@
 #include <WebCore/DiagnosticLoggingClient.h>
 #include <WebCore/FrameIdentifier.h>
 #include <WebCore/InspectorDebuggableType.h>
+#include <WebCore/InspectorFrontendAPIDispatcher.h>
 #include <WebCore/UserInterfaceLayoutDirection.h>
 #include <wtf/Forward.h>
 #include <wtf/WeakPtr.h>
@@ -60,7 +61,6 @@ template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::InspectorFro
 namespace WebCore {
 
 class FloatRect;
-class InspectorFrontendAPIDispatcher;
 class Page;
 
 enum class InspectorFrontendClientAppearance : uint8_t {
@@ -169,6 +169,7 @@ public:
 
     WEBCORE_EXPORT virtual void sendMessageToBackend(const String&) = 0;
     WEBCORE_EXPORT virtual InspectorFrontendAPIDispatcher& frontendAPIDispatcher() = 0;
+    Ref<InspectorFrontendAPIDispatcher> protectedFrontendAPIDispatcher() { return frontendAPIDispatcher(); }
     WEBCORE_EXPORT virtual Page* frontendPage() = 0;
 
     WEBCORE_EXPORT virtual bool isUnderTest() = 0;
