@@ -17,7 +17,6 @@ UIProcess/API/Cocoa/_WKResourceLoadStatisticsThirdParty.mm
 UIProcess/API/Cocoa/_WKSerializedNode.mm
 UIProcess/API/Cocoa/_WKTargetedElementInfo.mm
 UIProcess/API/Cocoa/_WKTargetedElementRequest.mm
-UIProcess/API/Cocoa/_WKUserInitiatedAction.mm
 UIProcess/API/Cocoa/_WKUserStyleSheet.mm
 UIProcess/API/Cocoa/_WKWebAuthenticationAssertionResponse.mm
 UIProcess/API/Cocoa/_WKWebsiteDataStoreConfiguration.mm

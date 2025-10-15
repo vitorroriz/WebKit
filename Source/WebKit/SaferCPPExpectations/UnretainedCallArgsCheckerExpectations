@@ -14,7 +14,6 @@ Shared/Cocoa/WKNSURLRequest.mm
 Shared/EntryPointUtilities/Cocoa/Daemon/PCMDaemonEntryPoint.mm
 Shared/EntryPointUtilities/Cocoa/XPCService/XPCServiceMain.mm
 Shared/RemoteLayerTree/RemoteLayerTreePropertyApplier.mm
-[ Mac ] Shared/mac/AuxiliaryProcessMac.mm
 UIProcess/API/C/mac/WKNotificationPrivateMac.mm
 UIProcess/API/C/mac/WKProtectionSpaceNS.mm
 UIProcess/API/Cocoa/WKFrameInfo.mm
@@ -57,10 +56,17 @@ WebProcess/WebPage/Cocoa/WebPageCocoa.mm
 WebProcess/WebPage/RemoteLayerTree/PlatformCAAnimationRemote.mm
 WebProcess/WebPage/RemoteLayerTree/PlatformCALayerRemoteCustom.mm
 WebProcess/WebPage/WebPage.cpp
+WebProcess/cocoa/WebProcessCocoa.mm
+[ Mac ] Shared/mac/AuxiliaryProcessMac.mm
+[ Mac ] UIProcess/API/Cocoa/NSAttributedString.mm
+[ Mac ] UIProcess/API/Cocoa/_WKRemoteWebInspectorViewController.mm
+[ Mac ] UIProcess/Automation/mac/WebAutomationSessionMac.mm
+[ Mac ] UIProcess/Inspector/Cocoa/InspectorExtensionDelegate.mm
+[ Mac ] UIProcess/Inspector/mac/WKInspectorViewController.mm
+[ Mac ] UIProcess/Inspector/mac/WKInspectorWKWebView.mm
 [ Mac ] WebProcess/WebPage/mac/PageBannerMac.mm
 [ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
 [ Mac ] WebProcess/WebPage/mac/WebPageMac.mm
-WebProcess/cocoa/WebProcessCocoa.mm
 [ iOS ] NetworkProcess/cocoa/NetworkSessionCocoa.mm
 [ iOS ] NetworkProcess/cocoa/NetworkTaskCocoa.mm
 [ iOS ] NetworkProcess/ios/NetworkProcessIOS.mm
