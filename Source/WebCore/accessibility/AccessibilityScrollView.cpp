@@ -324,7 +324,9 @@ void AccessibilityScrollView::addLocalFrameChild()
         if (!frameAXObjectCache)
             return;
 
+#if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
         frameAXObjectCache->buildIsolatedTreeIfNeeded();
+#endif
 
         RefPtr frameRoot = frameAXObjectCache->rootObjectForFrame(*localFrame);
         if (!frameRoot)
