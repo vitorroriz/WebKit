@@ -33,9 +33,6 @@ UIProcess/API/Cocoa/_WKAuthenticatorAttestationResponse.mm
 UIProcess/API/Cocoa/_WKAuthenticatorResponse.mm
 UIProcess/API/Cocoa/_WKFeature.mm
 UIProcess/API/Cocoa/_WKProcessPoolConfiguration.mm
-UIProcess/API/Cocoa/_WKTextManipulationConfiguration.mm
-UIProcess/API/Cocoa/_WKTextManipulationToken.mm
-UIProcess/API/Cocoa/_WKUserInitiatedAction.mm
 [ Mac ] UIProcess/Automation/mac/WebAutomationSessionMac.mm
 [ Mac ] UIProcess/Inspector/Cocoa/InspectorExtensionDelegate.mm
 [ Mac ] UIProcess/Inspector/mac/WKInspectorViewController.mm
@@ -56,11 +53,9 @@ WebProcess/WebPage/RemoteLayerTree/PlatformCALayerRemoteCustom.mm
 WebProcess/WebPage/WebPage.cpp
 WebProcess/cocoa/WebProcessCocoa.mm
 [ Mac ] Shared/mac/AuxiliaryProcessMac.mm
-[ Mac ] UIProcess/API/Cocoa/NSAttributedString.mm
 [ Mac ] UIProcess/Automation/mac/WebAutomationSessionMac.mm
 [ Mac ] UIProcess/Inspector/Cocoa/InspectorExtensionDelegate.mm
 [ Mac ] UIProcess/Inspector/mac/WKInspectorViewController.mm
-[ Mac ] UIProcess/Inspector/mac/WKInspectorWKWebView.mm
 [ Mac ] WebProcess/WebPage/mac/PageBannerMac.mm
 [ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
 [ Mac ] WebProcess/WebPage/mac/WebPageMac.mm
