@@ -1555,9 +1555,9 @@ Inspector::Protocol::ErrorStringOr<void> InspectorDOMAgent::highlightSelector(co
             }
 
             if (context.pseudoIDSet) {
-                auto pseudoIDs = PseudoIdSet::fromMask(context.pseudoIDSet.data());
+                auto pseudoIDs = context.pseudoIDSet;
 
-                if (pseudoIDs.has(PseudoId::Before)) {
+                if (pseudoIDs.contains(PseudoId::Before)) {
                     pseudoIDs.remove(PseudoId::Before);
                     if (RefPtr beforePseudoElement = descendantElement->beforePseudoElement()) {
                         if (seenNodes.add(*beforePseudoElement))
@@ -1565,7 +1565,7 @@ Inspector::Protocol::ErrorStringOr<void> InspectorDOMAgent::highlightSelector(co
                     }
                 }
 
-                if (pseudoIDs.has(PseudoId::After)) {
+                if (pseudoIDs.contains(PseudoId::After)) {
                     pseudoIDs.remove(PseudoId::After);
                     if (RefPtr afterPseudoElement = descendantElement->afterPseudoElement()) {
                         if (seenNodes.add(*afterPseudoElement))
