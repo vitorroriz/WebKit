@@ -29,17 +29,8 @@
 #include <JavaScriptCore/SourceProvider.h>
 
 namespace WebCore {
-class AbstractScriptBufferHolder;
-}
 
-namespace WTF {
-template<typename T> struct IsDeprecatedWeakRefSmartPointerException;
-template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::AbstractScriptBufferHolder> : std::true_type { };
-}
-
-namespace WebCore {
-
-class AbstractScriptBufferHolder : public CanMakeWeakPtr<AbstractScriptBufferHolder> {
+class AbstractScriptBufferHolder {
 public:
     virtual void clearDecodedData() = 0;
     virtual void tryReplaceScriptBuffer(const ScriptBuffer&) = 0;
@@ -47,7 +38,7 @@ public:
     virtual ~AbstractScriptBufferHolder() { }
 };
 
-class ScriptBufferSourceProvider final : public JSC::SourceProvider, public AbstractScriptBufferHolder {
+class ScriptBufferSourceProvider final : public JSC::SourceProvider, public AbstractScriptBufferHolder, public CanMakeWeakPtr<ScriptBufferSourceProvider> {
     WTF_MAKE_TZONE_ALLOCATED(ScriptBufferSourceProvider);
 public:
     static Ref<ScriptBufferSourceProvider> create(const ScriptBuffer& scriptBuffer, const JSC::SourceOrigin& sourceOrigin, String sourceURL, String preRedirectURL, const TextPosition& startPosition = TextPosition(), JSC::SourceProviderSourceType sourceType = JSC::SourceProviderSourceType::Program)

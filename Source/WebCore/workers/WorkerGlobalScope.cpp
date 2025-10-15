@@ -715,8 +715,8 @@ void WorkerGlobalScope::clearDecodedScriptData()
 {
     ASSERT(isContextThread());
 
-    if (m_mainScriptSourceProvider)
-        m_mainScriptSourceProvider->clearDecodedData();
+    if (RefPtr provider = m_mainScriptSourceProvider.get())
+        provider->clearDecodedData();
 
     for (auto& sourceProviders : m_importedScriptsSourceProviders.values()) {
         for (Ref sourceProvider : sourceProviders)
@@ -733,8 +733,10 @@ void WorkerGlobalScope::updateSourceProviderBuffers(const ScriptBuffer& mainScri
 {
     ASSERT(isContextThread());
 
-    if (mainScript && m_mainScriptSourceProvider)
-        m_mainScriptSourceProvider->tryReplaceScriptBuffer(mainScript);
+    if (mainScript) {
+        if (RefPtr provider = m_mainScriptSourceProvider.get())
+            provider->tryReplaceScriptBuffer(mainScript);
+    }
 
     for (auto& pair : importedScripts) {
         auto it = m_importedScriptsSourceProviders.find(pair.key);
