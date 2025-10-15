@@ -29,6 +29,7 @@
 #if ENABLE(CONTEXT_MENUS)
 
 #include "APIContextMenuClient.h"
+#include "GtkUtilities.h"
 #include "NativeWebMouseEvent.h"
 #include "WebContextMenuItem.h"
 #include "WebContextMenuItemData.h"
@@ -37,7 +38,6 @@
 #include "WebPopupMenuProxy.h"
 #include "WebProcessProxy.h"
 #include <WebCore/GUniquePtrGtk.h>
-#include <WebCore/GtkUtilities.h>
 #include <gio/gio.h>
 #include <gtk/gtk.h>
 #include <wtf/text/CString.h>

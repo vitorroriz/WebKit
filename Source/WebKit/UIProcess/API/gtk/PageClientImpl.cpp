@@ -30,6 +30,7 @@
 
 #include "Clipboard.h"
 #include "DrawingAreaProxyCoordinatedGraphics.h"
+#include "GtkUtilities.h"
 #include "NativeWebKeyboardEvent.h"
 #include "NativeWebMouseEvent.h"
 #include "NativeWebWheelEvent.h"
@@ -50,7 +51,6 @@
 #include "WebProcessPool.h"
 #include <WebCore/DOMPasteAccess.h>
 #include <WebCore/EventNames.h>
-#include <WebCore/GtkUtilities.h>
 #include <WebCore/NotImplemented.h>
 #include <WebCore/PasteboardCustomData.h>
 #include <WebCore/RefPtrCairo.h>

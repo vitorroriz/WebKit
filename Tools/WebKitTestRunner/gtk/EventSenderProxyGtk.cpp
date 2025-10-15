@@ -36,8 +36,7 @@
 #include "PlatformWebView.h"
 #include "StringFunctions.h"
 #include "TestController.h"
-#include <WebCore/GtkUtilities.h>
-#include <WebCore/GtkVersioning.h>
+#include <WebKit/GtkVersioning.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <webkit/WebKitWebViewBaseInternal.h>
@@ -257,10 +256,15 @@ void EventSenderProxy::rawKeyUp(WKStringRef key, WKEventModifiers wkModifiers, u
     processKeyEvent(toWebKitGLibAPI(m_testController->mainWebView()->platformView()), key, wkModifiers, keyLocation, KeyEventType::Release);
 }
 
+static inline unsigned stateModifierForGdkButton(unsigned button)
+{
+    return 1 << (8 + button - 1);
+}
+
 void EventSenderProxy::mouseDown(unsigned button, WKEventModifiers wkModifiers, WKStringRef pointerType)
 {
     unsigned gdkButton = eventSenderButtonToGDKButton(button);
-    auto modifier = WebCore::stateModifierForGdkButton(gdkButton);
+    auto modifier = stateModifierForGdkButton(gdkButton);
 
     // If the same mouse button is already in the down position don't
     // send another event as it may confuse Xvfb.
@@ -277,7 +281,7 @@ void EventSenderProxy::mouseDown(unsigned button, WKEventModifiers wkModifiers, 
 void EventSenderProxy::mouseUp(unsigned button, WKEventModifiers wkModifiers, WKStringRef pointerType)
 {
     unsigned gdkButton = eventSenderButtonToGDKButton(button);
-    auto modifier = WebCore::stateModifierForGdkButton(gdkButton);
+    auto modifier = stateModifierForGdkButton(gdkButton);
     m_mouseButtonsCurrentlyDown &= ~modifier;
     webkitWebViewBaseSynthesizeMouseEvent(toWebKitGLibAPI(m_testController->mainWebView()->platformView()),
         MouseEventType::Release, gdkButton, m_mouseButtonsCurrentlyDown, m_position.x, m_position.y, webkitModifiersToGDKModifiers(wkModifiers), 0, toWTFString(pointerType));

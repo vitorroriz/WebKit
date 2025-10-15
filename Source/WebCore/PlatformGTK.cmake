@@ -61,14 +61,11 @@ list(APPEND WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/graphics/gbm/PlatformDisplayGBM.h
 
     platform/graphics/gtk/GdkCairoUtilities.h
-    platform/graphics/gtk/GdkSkiaUtilities.h
 
     platform/graphics/x11/XErrorTrapper.h
 
     platform/gtk/GRefPtrGtk.h
     platform/gtk/GUniquePtrGtk.h
-    platform/gtk/GtkUtilities.h
-    platform/gtk/GtkVersioning.h
     platform/gtk/ScrollbarThemeGtk.h
 
     platform/text/enchant/TextCheckerEnchant.h

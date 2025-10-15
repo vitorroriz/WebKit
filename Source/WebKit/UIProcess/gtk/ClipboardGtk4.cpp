@@ -28,9 +28,8 @@
 
 #if USE(GTK4)
 
+#include "GtkUtilities.h"
 #include "WebPasteboardProxy.h"
-#include <WebCore/GtkUtilities.h>
-#include <WebCore/ImageAdapter.h>
 #include <WebCore/PasteboardCustomData.h>
 #include <WebCore/SelectionData.h>
 #include <WebCore/SharedBuffer.h>

@@ -18,35 +18,58 @@
 
 #pragma once
 
-#include "DragActions.h"
+#include <WebCore/DragActions.h>
+#include <cairo.h>
 #include <gtk/gtk.h>
 #include <wtf/MonotonicTime.h>
 #include <wtf/glib/GRefPtr.h>
 #include <wtf/text/CString.h>
 #include <wtf/text/WTFString.h>
 
-namespace WebCore {
+#if USE(SKIA)
+WTF_IGNORE_WARNINGS_IN_THIRD_PARTY_CODE_BEGIN
+#include <skia/core/SkImage.h>
+WTF_IGNORE_WARNINGS_IN_THIRD_PARTY_CODE_END
+#endif
 
+#if USE(CAIRO) && USE(GTK4)
+typedef struct _GdkTexture GdkTexture;
+#endif
+
+namespace WebCore {
 class IntPoint;
 class SelectionData;
+}
 
-IntPoint convertWidgetPointToScreenPoint(GtkWidget*, const IntPoint&);
+namespace WebKit {
+
+WebCore::IntPoint convertWidgetPointToScreenPoint(GtkWidget*, const WebCore::IntPoint&);
 bool widgetIsOnscreenToplevelWindow(GtkWidget*);
-IntPoint widgetRootCoords(GtkWidget*, int, int);
+WebCore::IntPoint widgetRootCoords(GtkWidget*, int, int);
 void widgetDevicePosition(GtkWidget*, GdkDevice*, double*, double*, GdkModifierType*);
 unsigned widgetKeyvalToKeycode(GtkWidget*, unsigned);
 
-WEBCORE_EXPORT unsigned stateModifierForGdkButton(unsigned button);
+unsigned stateModifierForGdkButton(unsigned button);
 
-WEBCORE_EXPORT OptionSet<DragOperation> gdkDragActionToDragOperation(GdkDragAction);
-WEBCORE_EXPORT GdkDragAction dragOperationToGdkDragActions(OptionSet<DragOperation>);
-WEBCORE_EXPORT GdkDragAction dragOperationToSingleGdkDragAction(OptionSet<DragOperation>);
-WEBCORE_EXPORT GRefPtr<GdkPixbuf> selectionDataImageAsGdkPixbuf(const SelectionData&);
+OptionSet<WebCore::DragOperation> gdkDragActionToDragOperation(GdkDragAction);
+GdkDragAction dragOperationToGdkDragActions(OptionSet<WebCore::DragOperation>);
+GdkDragAction dragOperationToSingleGdkDragAction(OptionSet<WebCore::DragOperation>);
+GRefPtr<GdkPixbuf> selectionDataImageAsGdkPixbuf(const WebCore::SelectionData&);
 
 void monitorWorkArea(GdkMonitor*, GdkRectangle*);
 
-bool shouldUseOverlayScrollbars();
+bool eventModifiersContainCapsLock(GdkEvent*);
 
-WEBCORE_EXPORT bool eventModifiersContainCapsLock(GdkEvent*);
+#if USE(CAIRO) && USE(GTK4)
+GRefPtr<GdkTexture> cairoSurfaceToGdkTexture(cairo_surface_t*);
+#endif
 
-} // namespace WebCore
+#if USE(SKIA)
+#if USE(GTK4)
+GRefPtr<GdkTexture> skiaImageToGdkTexture(SkImage&);
+#else
+RefPtr<cairo_surface_t> skiaImageToCairoSurface(SkImage&);
+#endif
+#endif
+
+} // namespace WebKit

@@ -36,6 +36,8 @@
 #include "DrawingAreaProxyCoordinatedGraphics.h"
 #include "DropTarget.h"
 #include "EditorState.h"
+#include "GtkUtilities.h"
+#include "GtkVersioning.h"
 #include "InputMethodFilter.h"
 #include "KeyAutoRepeatHandler.h"
 #include "KeyBindingTranslator.h"
@@ -67,9 +69,6 @@
 #include <WebCore/GRefPtrGtk.h>
 #include <WebCore/GUniquePtrGtk.h>
 #include <WebCore/GdkCairoUtilities.h>
-#include <WebCore/GdkSkiaUtilities.h>
-#include <WebCore/GtkUtilities.h>
-#include <WebCore/GtkVersioning.h>
 #include <WebCore/Image.h>
 #include <WebCore/NativeImage.h>
 #include <WebCore/NotImplemented.h>

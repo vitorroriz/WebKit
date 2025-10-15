@@ -21,14 +21,14 @@
 #include "WebKitWebView.h"
 
 #include "Display.h"
+#include "GtkUtilities.h"
+#include "GtkVersioning.h"
 #include "PageLoadState.h"
 #include "WebKitAuthenticationDialog.h"
 #include "WebKitScriptDialogImpl.h"
 #include "WebKitWebViewBasePrivate.h"
 #include "WebKitWebViewPrivate.h"
 #include <WebCore/Color.h>
-#include <WebCore/GtkUtilities.h>
-#include <WebCore/GtkVersioning.h>
 #include <WebCore/PlatformScreen.h>
 #include <glib/gi18n-lib.h>
 #include <gtk/gtk.h>
@@ -107,7 +107,7 @@ static void fileChooserDialogResponseCallback(GtkFileChooser* dialog, gint respo
 gboolean webkitWebViewRunFileChooser(WebKitWebView* webView, WebKitFileChooserRequest* request)
 {
     GtkWidget* toplevel = gtk_widget_get_toplevel(GTK_WIDGET(webView));
-    if (!WebCore::widgetIsOnscreenToplevelWindow(toplevel))
+    if (!WebKit::widgetIsOnscreenToplevelWindow(toplevel))
         toplevel = 0;
 
     gboolean allowsMultipleSelection = webkit_file_chooser_request_get_select_multiple(request);

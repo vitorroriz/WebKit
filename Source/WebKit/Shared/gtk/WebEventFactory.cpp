@@ -28,9 +28,9 @@
 #include "config.h"
 #include "WebEventFactory.h"
 
+#include "GtkUtilities.h"
+#include "GtkVersioning.h"
 #include "WebEventConversion.h"
-#include <WebCore/GtkUtilities.h>
-#include <WebCore/GtkVersioning.h>
 #include <WebCore/Scrollbar.h>
 #include <WebCore/WindowsKeyboardCodes.h>
 #include <gdk/gdk.h>

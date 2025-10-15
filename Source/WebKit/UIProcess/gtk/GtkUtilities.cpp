@@ -19,14 +19,12 @@
 #include "config.h"
 #include "GtkUtilities.h"
 
-#include "GdkCairoUtilities.h"
-#include "GdkSkiaUtilities.h"
 #include "GtkVersioning.h"
-#include "Image.h"
-#include "IntPoint.h"
-#include "NativeImage.h"
-#include "SelectionData.h"
-#include "SystemSettings.h"
+#include <WebCore/GdkCairoUtilities.h>
+#include <WebCore/Image.h>
+#include <WebCore/IntPoint.h>
+#include <WebCore/NativeImage.h>
+#include <WebCore/SelectionData.h>
 #include <gtk/gtk.h>
 #include <wtf/glib/GUniquePtr.h>
 
@@ -34,7 +32,18 @@
 #include <gdk/x11/gdkx.h>
 #endif
 
-namespace WebCore {
+#if USE(SKIA)
+#if !USE(GTK4)
+#include <WebCore/RefPtrCairo.h>
+#endif
+
+WTF_IGNORE_WARNINGS_IN_THIRD_PARTY_CODE_BEGIN
+#include <skia/core/SkPixmap.h>
+WTF_IGNORE_WARNINGS_IN_THIRD_PARTY_CODE_END
+#endif
+
+namespace WebKit {
+using namespace WebCore;
 
 static IntPoint gtkWindowGetOrigin(GtkWidget* window)
 {
@@ -131,6 +140,75 @@ unsigned stateModifierForGdkButton(unsigned button)
     return 1 << (8 + button - 1);
 }
 
+#if USE(CAIRO) && USE(GTK4)
+GRefPtr<GdkTexture> cairoSurfaceToGdkTexture(cairo_surface_t* surface)
+{
+    ASSERT(cairo_image_surface_get_format(surface) == CAIRO_FORMAT_ARGB32);
+    auto width = cairo_image_surface_get_width(surface);
+    auto height = cairo_image_surface_get_height(surface);
+    if (width <= 0 || height <= 0)
+        return nullptr;
+    auto stride = cairo_image_surface_get_stride(surface);
+    auto* data = cairo_image_surface_get_data(surface);
+    GRefPtr<GBytes> bytes = adoptGRef(g_bytes_new_with_free_func(data, height * stride, [](gpointer data) {
+        cairo_surface_destroy(static_cast<cairo_surface_t*>(data));
+    }, cairo_surface_reference(surface)));
+    return adoptGRef(gdk_memory_texture_new(width, height, GDK_MEMORY_DEFAULT, bytes.get(), stride));
+}
+#endif
+
+#if USE(SKIA)
+static GRefPtr<GdkPixbuf> skiaImageToGdkPixbuf(SkImage& image)
+{
+#if USE(GTK4)
+    auto texture = skiaImageToGdkTexture(image);
+    if (!texture)
+        return { };
+
+    return adoptGRef(gdk_pixbuf_get_from_texture(texture.get()));
+#else
+    RefPtr surface = skiaImageToCairoSurface(image);
+    if (!surface)
+        return { };
+
+    return adoptGRef(gdk_pixbuf_get_from_surface(surface.get(), 0, 0, cairo_image_surface_get_width(surface.get()), cairo_image_surface_get_height(surface.get())));
+#endif
+}
+
+#if USE(GTK4)
+GRefPtr<GdkTexture> skiaImageToGdkTexture(SkImage& image)
+{
+    SkPixmap pixmap;
+    if (!image.peekPixels(&pixmap))
+        return { };
+
+    GRefPtr<GBytes> bytes = adoptGRef(g_bytes_new_with_free_func(pixmap.addr(), pixmap.computeByteSize(), [](gpointer data) {
+        static_cast<SkImage*>(data)->unref();
+    }, SkRef(&image)));
+
+    return adoptGRef(gdk_memory_texture_new(pixmap.width(), pixmap.height(), GDK_MEMORY_DEFAULT, bytes.get(), pixmap.rowBytes()));
+}
+#else
+RefPtr<cairo_surface_t> skiaImageToCairoSurface(SkImage& image)
+{
+    SkPixmap pixmap;
+    if (!image.peekPixels(&pixmap))
+        return { };
+
+    RefPtr<cairo_surface_t> surface = adoptRef(cairo_image_surface_create_for_data(pixmap.writable_addr8(0, 0), CAIRO_FORMAT_ARGB32, pixmap.width(), pixmap.height(), pixmap.rowBytes()));
+    if (cairo_surface_status(surface.get()) != CAIRO_STATUS_SUCCESS)
+        return { };
+
+    static cairo_user_data_key_t surfaceDataKey;
+    cairo_surface_set_user_data(surface.get(), &surfaceDataKey, SkRef(&image), [](void* data) {
+        static_cast<SkImage*>(data)->unref();
+    });
+
+    return surface;
+}
+#endif
+#endif // USE(SKIA)
+
 OptionSet<DragOperation> gdkDragActionToDragOperation(GdkDragAction gdkAction)
 {
     OptionSet<DragOperation> action;
@@ -201,16 +279,6 @@ void monitorWorkArea(GdkMonitor* monitor, GdkRectangle* area)
 #else
     gdk_monitor_get_workarea(monitor, area);
 #endif
-}
-
-bool shouldUseOverlayScrollbars()
-{
-#if !USE(GTK4)
-    if (!g_strcmp0 (g_getenv ("GTK_OVERLAY_SCROLLING"), "0"))
-        return false;
-#endif
-
-    return SystemSettings::singleton().overlayScrolling().value_or(true);
 }
 
 bool eventModifiersContainCapsLock(GdkEvent* event)

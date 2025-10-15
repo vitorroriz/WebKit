@@ -95,6 +95,7 @@
 #include <wtf/text/StringBuilder.h>
 
 #if PLATFORM(GTK)
+#include "GtkUtilities.h"
 #include "WebKitFaviconDatabasePrivate.h"
 #include "WebKitInputMethodContextImplGtk.h"
 #include "WebKitPointerLockPermissionRequest.h"
@@ -103,7 +104,6 @@
 #include "WebKitWebViewBasePrivate.h"
 #include <WebCore/GUniquePtrGtk.h>
 #include <WebCore/GdkCairoUtilities.h>
-#include <WebCore/GdkSkiaUtilities.h>
 #include <WebCore/RefPtrCairo.h>
 #endif
 

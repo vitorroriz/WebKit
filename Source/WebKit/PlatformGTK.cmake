@@ -129,6 +129,10 @@ add_custom_command(
     VERBATIM
 )
 
+list(APPEND WebKit_PUBLIC_FRAMEWORK_HEADERS
+    UIProcess/gtk/GtkVersioning.h
+)
+
 if (USE_GTK4)
     set(GTK_API_VERSION 4)
     set(GTK_PKGCONFIG_PACKAGE gtk4)

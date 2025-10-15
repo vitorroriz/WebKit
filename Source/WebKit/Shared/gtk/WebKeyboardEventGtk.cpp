@@ -30,7 +30,7 @@
 #include "config.h"
 #include "WebKeyboardEvent.h"
 
-#include <WebCore/GtkVersioning.h>
+#include "GtkVersioning.h"
 #include <WebCore/WindowsKeyboardCodes.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>

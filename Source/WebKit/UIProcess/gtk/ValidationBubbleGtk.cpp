@@ -26,8 +26,8 @@
 #include "config.h"
 #include "ValidationBubbleGtk.h"
 
+#include "GtkVersioning.h"
 #include "WebKitWebViewBasePrivate.h"
-#include <WebCore/GtkVersioning.h>
 #include <wtf/text/WTFString.h>
 
 namespace WebKit {

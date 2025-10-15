@@ -28,8 +28,8 @@
 #include "WebProcessMain.h"
 
 #include "AuxiliaryProcessMain.h"
+#include "GtkVersioning.h"
 #include "WebProcess.h"
-#include <WebCore/GtkVersioning.h>
 #include <libintl.h>
 
 #if USE(GSTREAMER)

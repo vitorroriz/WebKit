@@ -26,10 +26,10 @@
 #include "config.h"
 #include "WebPopupMenuProxyGtk.h"
 
+#include "GtkUtilities.h"
+#include "GtkVersioning.h"
 #include "NativeWebMouseEvent.h"
 #include "WebPopupItem.h"
-#include <WebCore/GtkUtilities.h>
-#include <WebCore/GtkVersioning.h>
 #include <WebCore/IntRect.h>
 #include <gtk/gtk.h>
 #include <wtf/glib/GUniquePtr.h>

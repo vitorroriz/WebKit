@@ -35,8 +35,8 @@
 #include <wtf/text/CString.h>
 
 #if PLATFORM(GTK)
+#include "GtkUtilities.h"
 #include <WebCore/GdkCairoUtilities.h>
-#include <WebCore/GdkSkiaUtilities.h>
 #include <WebCore/RefPtrCairo.h>
 #endif
 
