@@ -41,6 +41,7 @@
 #include "PropertyDescriptor.h"
 #include "PropertyNameArray.h"
 #include "ProxyObject.h"
+#include "ResourceExhaustion.h"
 #include "TypeError.h"
 #include "VMInlines.h"
 #include "VMTrapsInlines.h"
@@ -1307,12 +1308,8 @@ static Butterfly* createArrayStorageButterflyImpl(VM& vm, JSObject* intendedOwne
         oldButterfly, vm, intendedOwner, structure, structure->outOfLineCapacity(), false, 0,
         ArrayStorage::sizeFor(vectorLength));
     if (!newButterfly) [[unlikely]] {
-        if (mode == AllocationFailureMode::Assert)
-            RELEASE_ASSERT(newButterfly, length, vectorLength, oldButterfly);
-        else {
-            ASSERT(mode == AllocationFailureMode::ReturnNull);
-            return nullptr;
-        }
+        RELEASE_ASSERT_RESOURCE_AVAILABLE(mode != AllocationFailureMode::Assert, MemoryExhaustion, "Crash intentionally because memory is exhausted.");
+        return nullptr;
     }
 
     ArrayStorage* result = newButterfly->arrayStorage();
