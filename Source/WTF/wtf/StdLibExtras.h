@@ -1536,6 +1536,26 @@ ALWAYS_INLINE std::weak_ordering weakOrderingCast(std::partial_ordering ordering
     return is_lt(ordering) ? std::weak_ordering::less : std::weak_ordering::greater;
 }
 
+template<size_t> struct SizedUnsignedTrait;
+template<>
+struct SizedUnsignedTrait<1> {
+    using Type = uint8_t;
+};
+template<>
+struct SizedUnsignedTrait<2> {
+    using Type = uint16_t;
+};
+template<>
+struct SizedUnsignedTrait<4> {
+    using Type = uint32_t;
+};
+template<>
+struct SizedUnsignedTrait<8> {
+    using Type = uint64_t;
+};
+template<typename T>
+using SameSizeUnsignedInteger = SizedUnsignedTrait<sizeof(T)>::Type;
+
 } // namespace WTF
 
 #define WTFMove(value) std::move<WTF::CheckMoveParameter>(value)
@@ -1611,6 +1631,8 @@ using WTF::weakOrderingCast;
 using WTF::zeroBytes;
 using WTF::zeroSpan;
 using WTF::Invocable;
+using WTF::SameSizeUnsignedInteger;
+using WTF::SizedUnsignedTrait;
 using WTF::VariantWrapper;
 using WTF::VariantOrSingle;
 

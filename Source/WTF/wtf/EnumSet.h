@@ -33,14 +33,9 @@
 #include <wtf/Assertions.h>
 #include <wtf/EnumTraits.h>
 #include <wtf/Forward.h>
+#include <wtf/StdLibExtras.h>
 
 namespace WTF {
-
-template<size_t> struct SizedUnsignedTrait;
-template<> struct SizedUnsignedTrait<1> { using Type = uint8_t; };
-template<> struct SizedUnsignedTrait<2> { using Type = uint16_t; };
-template<> struct SizedUnsignedTrait<4> { using Type = uint32_t; };
-template<> struct SizedUnsignedTrait<8> { using Type = uint64_t; };
 
 // EnumSet is a class that represents a set of enumerators in a space-efficient manner.
 // Unlike with OptionSet the enumerators don't need be powers of two but the highest value must be less than 64.

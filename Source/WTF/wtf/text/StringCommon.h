@@ -1158,7 +1158,7 @@ ALWAYS_INLINE bool charactersContain(std::span<const CharacterType> span)
 
 #if CPU(ARM64) || CPU(X86_64)
     constexpr size_t stride = SIMD::stride<CharacterType>;
-    using UnsignedType = SIMD::SameSizeUnsignedInteger<CharacterType>;
+    using UnsignedType = SameSizeUnsignedInteger<CharacterType>;
     using BulkType = decltype(SIMD::load(static_cast<const UnsignedType*>(nullptr)));
     if (length >= stride) {
         size_t index = 0;
@@ -1183,7 +1183,7 @@ ALWAYS_INLINE bool charactersContain(std::span<const CharacterType> span)
 template<typename CharacterType>
 inline size_t countMatchedCharacters(std::span<const CharacterType> span, CharacterType character)
 {
-    using UnsignedType = SIMD::SameSizeUnsignedInteger<CharacterType>;
+    using UnsignedType = SameSizeUnsignedInteger<CharacterType>;
     auto mask = SIMD::splat<UnsignedType>(character);
     auto vectorMatch = [&](auto input) ALWAYS_INLINE_LAMBDA {
         return SIMD::equal(input, mask);
