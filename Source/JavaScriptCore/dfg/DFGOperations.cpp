@@ -2351,7 +2351,7 @@ JSC_DEFINE_JIT_OPERATION(operationNewTypedArrayBuffer, JSObject*, (JSGlobalObjec
     JITOperationPrologueCallFrameTracer tracer(vm, callFrame);
     auto scope = DECLARE_THROW_SCOPE(vm);
 
-    size_t length = JSValue::decode(encodedArgument).toTypedArrayIndex(globalObject, "length"_s);
+    size_t length = JSValue::decode(encodedArgument).toIndex(globalObject, "length"_s);
     OPERATION_RETURN_IF_EXCEPTION(scope, nullptr);
 
     OPERATION_RETURN(scope, constructArrayBufferWithSize(globalObject, structure, length));
