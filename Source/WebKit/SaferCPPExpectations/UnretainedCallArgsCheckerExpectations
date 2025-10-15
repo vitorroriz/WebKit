@@ -21,7 +21,6 @@ UIProcess/API/C/mac/WKProtectionSpaceNS.mm
 UIProcess/API/Cocoa/WKFrameInfo.mm
 UIProcess/API/Cocoa/WKNavigationAction.mm
 UIProcess/API/Cocoa/WKNavigationResponse.mm
-UIProcess/API/Cocoa/WKProcessPool.mm
 UIProcess/API/Cocoa/WKSecurityOrigin.mm
 UIProcess/API/Cocoa/WKSnapshotConfiguration.mm
 UIProcess/API/Cocoa/WKURLSchemeTask.mm

@@ -450,7 +450,9 @@ public:
     void updateProcessSuppressionState();
 
     NSMutableDictionary *ensureBundleParameters();
+    RetainPtr<NSMutableDictionary> ensureProtectedBundleParameters();
     NSMutableDictionary *bundleParameters() { return m_bundleParameters.get(); }
+    RetainPtr<NSMutableDictionary> protectedBundleParameters();
 #else
     void updateProcessSuppressionState() const { }
 #endif
