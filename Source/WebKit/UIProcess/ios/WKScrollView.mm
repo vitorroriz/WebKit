@@ -664,6 +664,9 @@ static inline bool valuesAreWithinOnePixel(CGFloat a, CGFloat b)
 
 - (void)_setInternalTopPocketColor:(UIColor *)color
 {
+    if ([_topPocketColorSetInternally isEqual:color] || _topPocketColorSetInternally == color)
+        return;
+
     _topPocketColorSetInternally = color;
 
     [self _updateTopPocketColor];

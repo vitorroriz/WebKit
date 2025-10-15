@@ -3189,6 +3189,7 @@ WebCore::CocoaColor *sampledFixedPositionContentColor(const WebCore::FixedContai
         // or it should match the scroll view background color anyways.
         // When using a hard pocket (iPad), the top scroll pocket capture color must be set to ensure
         // that glass elements overlaying the pocket adapt correctly.
+        [_scrollView _setInternalTopPocketColor:nil];
         return;
     }
 

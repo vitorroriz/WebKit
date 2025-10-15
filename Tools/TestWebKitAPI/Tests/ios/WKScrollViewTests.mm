@@ -824,9 +824,17 @@ TEST(WKScrollViewTests, TopScrollPocketCaptureColorAfterSettingHardStyle)
     [scrollView topEdgeEffect].style = UIScrollEdgeEffectStyle.hardStyle;
     [webView waitForNextPresentationUpdate];
 
-    auto topPocketColor = WebCore::colorFromCocoaColor([scrollView _pocketColorForEdge:UIRectEdgeTop]);
-    EXPECT_WK_STREQ("rgb(255, 99, 71)", WebCore::serializationForCSS(topPocketColor));
+    auto topHardPocketColor = WebCore::colorFromCocoaColor([scrollView _pocketColorForEdge:UIRectEdgeTop]);
+    EXPECT_WK_STREQ("rgb(255, 99, 71)", WebCore::serializationForCSS(topHardPocketColor));
     EXPECT_TRUE([scrollView _prefersSolidColorHardPocketForEdge:UIRectEdgeTop]);
+
+    [scrollView topEdgeEffect].style = UIScrollEdgeEffectStyle.softStyle;
+
+    // Removing the top fixed element should also remove the top color extension.
+    [webView objectByEvaluatingJavaScript:@"document.querySelector('header').remove()"];
+    [webView waitForNextPresentationUpdate];
+
+    EXPECT_NULL([scrollView _pocketColorForEdge:UIRectEdgeTop]);
 }
 
 #endif // HAVE(LIQUID_GLASS)
