@@ -3680,13 +3680,14 @@ void webkitWebViewBaseSetCursor(WebKitWebViewBase* webViewBase, const Cursor& cu
 #endif
 
     if (const char* name = cursorName(cursor)) {
+#if USE(GTK4)
         if (currentCursor && !g_strcmp0(name, gdk_cursor_get_name(currentCursor)))
             return;
-
-#if USE(GTK4)
         GRefPtr<GdkCursor> newCursor = adoptGRef(gdk_cursor_new_from_name(name, fallbackCursor().get()));
         gtk_widget_set_cursor(GTK_WIDGET(webViewBase), newCursor.get());
 #else
+        if (!currentCursor)
+            return;
         GRefPtr<GdkCursor> newCursor = adoptGRef(gdk_cursor_new_from_name(gtk_widget_get_display(GTK_WIDGET(webViewBase)), name));
         gdk_window_set_cursor(window, newCursor.get());
 #endif
@@ -3713,9 +3714,9 @@ void webkitWebViewBaseSetCursor(WebKitWebViewBase* webViewBase, const Cursor& cu
     gtk_widget_set_cursor(GTK_WIDGET(webViewBase), newCursor.get());
 #else
 #if USE(CAIRO)
-    auto pixbuf = cairoSurfaceToGdkTexture(platformImage.get());
+    auto pixbuf = cairoSurfaceToGdkPixbuf(platformImage.get());
 #elif USE(SKIA)
-    auto pixbuf = skiaImageToGdkTexture(*platformImage.get());
+    auto pixbuf = skiaImageToGdkPixbuf(*platformImage.get());
 #endif
     if (!pixbuf)
         return;
