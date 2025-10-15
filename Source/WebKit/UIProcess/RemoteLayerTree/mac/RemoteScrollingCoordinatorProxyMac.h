@@ -72,8 +72,8 @@ private:
     void applyScrollingTreeLayerPositionsAfterCommit() override;
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
-    void willCommitLayerAndScrollingTrees() override WTF_ACQUIRES_LOCK(m_eventDispatcher->m_effectStacksLock);
-    void didCommitLayerAndScrollingTrees() override WTF_RELEASES_LOCK(m_eventDispatcher->m_effectStacksLock);
+    void willCommitLayerAndScrollingTrees() override WTF_ACQUIRES_LOCK(m_eventDispatcher->m_animationStacksLock);
+    void didCommitLayerAndScrollingTrees() override WTF_RELEASES_LOCK(m_eventDispatcher->m_animationStacksLock);
 
     void animationsWereAddedToNode(RemoteLayerTreeNode&) override;
     void animationsWereRemovedFromNode(RemoteLayerTreeNode&) override;

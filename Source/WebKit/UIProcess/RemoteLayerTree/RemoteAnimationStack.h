@@ -27,8 +27,7 @@
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
 
-#include <WebCore/AcceleratedEffect.h>
-#include <WebCore/AcceleratedEffectStack.h>
+#include "RemoteAnimation.h"
 #include <WebCore/AcceleratedEffectValues.h>
 #include <WebCore/PlatformCAFilters.h>
 #include <WebCore/PlatformLayer.h>
@@ -41,12 +40,14 @@ OBJC_CLASS CAPresentationModifier;
 
 namespace WebKit {
 
-class RemoteAcceleratedEffectStack final : public WebCore::AcceleratedEffectStack {
-    WTF_MAKE_TZONE_OR_ISO_ALLOCATED(RemoteAcceleratedEffectStack);
-public:
-    static Ref<RemoteAcceleratedEffectStack> create(WebCore::FloatRect, Seconds);
+using RemoteAnimations = Vector<Ref<RemoteAnimation>>;
 
-    void setEffects(WebCore::AcceleratedEffects&&) final;
+class RemoteAnimationStack final : public RefCounted<RemoteAnimationStack> {
+    WTF_MAKE_TZONE_OR_ISO_ALLOCATED(RemoteAnimationStack);
+public:
+    static Ref<RemoteAnimationStack> create(RemoteAnimations&&, WebCore::AcceleratedEffectValues&&, WebCore::FloatRect, Seconds);
+
+    bool isEmpty() const { return m_animations.isEmpty(); }
 
 #if PLATFORM(MAC)
     void initEffectsFromMainThread(PlatformLayer*, MonotonicTime now);
@@ -58,7 +59,7 @@ public:
     void clear(PlatformLayer*);
 
 private:
-    explicit RemoteAcceleratedEffectStack(WebCore::FloatRect, Seconds);
+    explicit RemoteAnimationStack(RemoteAnimations&&, WebCore::AcceleratedEffectValues&&, WebCore::FloatRect, Seconds);
 
     WebCore::AcceleratedEffectValues computeValues(MonotonicTime now) const;
 
@@ -74,6 +75,8 @@ private:
 
     OptionSet<LayerProperty> m_affectedLayerProperties;
 
+    RemoteAnimations m_animations;
+    WebCore::AcceleratedEffectValues m_baseValues;
     WebCore::FloatRect m_bounds;
     Seconds m_acceleratedTimelineTimeOrigin;
 

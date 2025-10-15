@@ -352,7 +352,7 @@ static void blend(AcceleratedEffectProperty property, AcceleratedEffectValues& o
     }
 }
 
-void AcceleratedEffect::apply(WebAnimationTime currentTime, AcceleratedEffectValues& values)
+void AcceleratedEffect::apply(WebAnimationTime currentTime, AcceleratedEffectValues& values) const
 {
     auto localTime = [&]() -> WebAnimationTime {
         ASSERT(m_holdTime || m_startTime);

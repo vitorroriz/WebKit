@@ -24,39 +24,34 @@
  */
 
 #import "config.h"
-#import "RemoteAcceleratedEffectStack.h"
+#import "RemoteAnimationStack.h"
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
 
-#import <WebCore/AcceleratedEffectStack.h>
 #import <pal/spi/cocoa/QuartzCoreSPI.h>
 #import <wtf/TZoneMallocInlines.h>
 
 namespace WebKit {
 
-WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(RemoteAcceleratedEffectStack);
+WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(RemoteAnimationStack);
 
-Ref<RemoteAcceleratedEffectStack> RemoteAcceleratedEffectStack::create(WebCore::FloatRect bounds, Seconds acceleratedTimelineTimeOrigin)
+Ref<RemoteAnimationStack> RemoteAnimationStack::create(RemoteAnimations&& animations, WebCore::AcceleratedEffectValues&& baseValues, WebCore::FloatRect bounds, Seconds acceleratedTimelineTimeOrigin)
 {
-    return adoptRef(*new RemoteAcceleratedEffectStack(bounds, acceleratedTimelineTimeOrigin));
+    return adoptRef(*new RemoteAnimationStack(WTFMove(animations), WTFMove(baseValues), bounds, acceleratedTimelineTimeOrigin));
 }
 
-RemoteAcceleratedEffectStack::RemoteAcceleratedEffectStack(WebCore::FloatRect bounds, Seconds acceleratedTimelineTimeOrigin)
-    : m_bounds(bounds)
+RemoteAnimationStack::RemoteAnimationStack(RemoteAnimations&& animations, WebCore::AcceleratedEffectValues&& baseValues, WebCore::FloatRect bounds, Seconds acceleratedTimelineTimeOrigin)
+    : m_animations(WTFMove(animations))
+    , m_baseValues(WTFMove(baseValues))
+    , m_bounds(bounds)
     , m_acceleratedTimelineTimeOrigin(acceleratedTimelineTimeOrigin)
 {
-}
-
-void RemoteAcceleratedEffectStack::setEffects(WebCore::AcceleratedEffects&& effects)
-{
-    WebCore::AcceleratedEffectStack::setEffects(WTFMove(effects));
-
     bool affectsFilter = false;
     bool affectsOpacity = false;
     bool affectsTransform = false;
 
-    for (auto& effect : m_backdropLayerEffects.isEmpty() ? m_primaryLayerEffects : m_backdropLayerEffects) {
-        auto& properties = effect->animatedProperties();
+    for (auto& animation : m_animations) {
+        auto& properties = animation->animatedProperties();
         affectsFilter = affectsFilter || properties.containsAny({ WebCore::AcceleratedEffectProperty::Filter, WebCore::AcceleratedEffectProperty::BackdropFilter });
         affectsOpacity = affectsOpacity || properties.contains(WebCore::AcceleratedEffectProperty::Opacity);
         affectsTransform = affectsTransform || properties.containsAny(WebCore::transformRelatedAcceleratedProperties);
@@ -75,30 +70,27 @@ void RemoteAcceleratedEffectStack::setEffects(WebCore::AcceleratedEffects&& effe
 }
 
 #if PLATFORM(MAC)
-const WebCore::FilterOperations* RemoteAcceleratedEffectStack::longestFilterList() const
+const WebCore::FilterOperations* RemoteAnimationStack::longestFilterList() const
 {
+    // FIXME: this assumes there is no WebCore::AcceleratedEffectProperty::BackdropFilter anymore, only Filter.
     if (!m_affectedLayerProperties.contains(LayerProperty::Filter))
         return nullptr;
 
-    auto isBackdrop = !m_backdropLayerEffects.isEmpty();
-    auto filterProperty = isBackdrop ? WebCore::AcceleratedEffectProperty::BackdropFilter : WebCore::AcceleratedEffectProperty::Filter;
-    auto& effects = isBackdrop ? m_backdropLayerEffects : m_primaryLayerEffects;
-
     const WebCore::FilterOperations* longestFilterList = nullptr;
-    for (auto& effect : effects) {
-        if (!effect->animatedProperties().contains(filterProperty))
+    for (auto& animation : m_animations) {
+        if (!animation->animatedProperties().contains(WebCore::AcceleratedEffectProperty::Filter))
             continue;
-        for (auto& keyframe : effect->keyframes()) {
-            if (!keyframe.animatedProperties().contains(filterProperty))
+        for (auto& keyframe : animation->keyframes()) {
+            if (!keyframe.animatedProperties().contains(WebCore::AcceleratedEffectProperty::Filter))
                 continue;
-            auto& filter = isBackdrop ? keyframe.values().backdropFilter : keyframe.values().filter;
+            auto& filter = keyframe.values().filter;
             if (!longestFilterList || longestFilterList->size() < filter.size())
                 longestFilterList = &filter;
         }
     }
 
     if (longestFilterList) {
-        auto& baseFilter = isBackdrop ? m_baseValues.backdropFilter : m_baseValues.filter;
+        auto& baseFilter = m_baseValues.filter;
         if (longestFilterList->size() < baseFilter.size())
             longestFilterList = &baseFilter;
     }
@@ -106,7 +98,7 @@ const WebCore::FilterOperations* RemoteAcceleratedEffectStack::longestFilterList
     return longestFilterList && !longestFilterList->isEmpty() ? longestFilterList : nullptr;
 }
 
-void RemoteAcceleratedEffectStack::initEffectsFromMainThread(PlatformLayer *layer, MonotonicTime now)
+void RemoteAnimationStack::initEffectsFromMainThread(PlatformLayer *layer, MonotonicTime now)
 {
     ASSERT(m_filterPresentationModifiers.isEmpty());
     ASSERT(!m_opacityPresentationModifier);
@@ -154,7 +146,7 @@ void RemoteAcceleratedEffectStack::initEffectsFromMainThread(PlatformLayer *laye
     [m_presentationModifierGroup flushWithTransaction];
 }
 
-void RemoteAcceleratedEffectStack::applyEffectsFromScrollingThread(MonotonicTime now) const
+void RemoteAnimationStack::applyEffectsFromScrollingThread(MonotonicTime now) const
 {
     ASSERT(m_presentationModifierGroup);
 
@@ -178,7 +170,7 @@ void RemoteAcceleratedEffectStack::applyEffectsFromScrollingThread(MonotonicTime
 }
 #endif
 
-void RemoteAcceleratedEffectStack::applyEffectsFromMainThread(PlatformLayer *layer, MonotonicTime now, bool backdropRootIsOpaque) const
+void RemoteAnimationStack::applyEffectsFromMainThread(PlatformLayer *layer, MonotonicTime now, bool backdropRootIsOpaque) const
 {
     auto computedValues = computeValues(now);
 
@@ -194,16 +186,16 @@ void RemoteAcceleratedEffectStack::applyEffectsFromMainThread(PlatformLayer *lay
     }
 }
 
-WebCore::AcceleratedEffectValues RemoteAcceleratedEffectStack::computeValues(MonotonicTime now) const
+WebCore::AcceleratedEffectValues RemoteAnimationStack::computeValues(MonotonicTime now) const
 {
     auto values = m_baseValues;
     auto currentTime = now.secondsSinceEpoch() - m_acceleratedTimelineTimeOrigin;
-    for (auto& effect : m_backdropLayerEffects.isEmpty() ? m_primaryLayerEffects : m_backdropLayerEffects)
-        effect->apply(currentTime, values);
+    for (auto& animation : m_animations)
+        animation->apply(currentTime, values);
     return values;
 }
 
-void RemoteAcceleratedEffectStack::clear(PlatformLayer *layer)
+void RemoteAnimationStack::clear(PlatformLayer *layer)
 {
 #if PLATFORM(MAC)
     ASSERT(m_presentationModifierGroup);

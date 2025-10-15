@@ -42,6 +42,10 @@
 #include <wtf/ThreadSafeWeakPtr.h>
 #include <wtf/threads/BinarySemaphore.h>
 
+#if ENABLE(THREADED_ANIMATION_RESOLUTION)
+#include "RemoteAnimationStack.h"
+#endif
+
 namespace WebCore {
 class PlatformWheelEvent;
 class WheelEventDeltaFilter;
@@ -56,7 +60,7 @@ namespace WebKit {
 
 class DisplayLink;
 class NativeWebWheelEvent;
-class RemoteAcceleratedEffectStack;
+class RemoteAnimationStack;
 class RemoteScrollingCoordinatorProxyMac;
 class RemoteLayerTreeDrawingAreaProxyMac;
 class RemoteLayerTreeNode;
@@ -97,8 +101,8 @@ public:
     void renderingUpdateComplete();
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
-    void lockForAnimationChanges() WTF_ACQUIRES_LOCK(m_effectStacksLock);
-    void unlockForAnimationChanges() WTF_RELEASES_LOCK(m_effectStacksLock);
+    void lockForAnimationChanges() WTF_ACQUIRES_LOCK(m_animationStacksLock);
+    void unlockForAnimationChanges() WTF_RELEASES_LOCK(m_animationStacksLock);
     void animationsWereAddedToNode(RemoteLayerTreeNode&);
     void animationsWereRemovedFromNode(RemoteLayerTreeNode&);
     void updateAnimations();
@@ -190,8 +194,8 @@ private:
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
     // For WTF_ACQUIRES_LOCK
     friend class RemoteScrollingCoordinatorProxyMac;
-    Lock m_effectStacksLock;
-    HashMap<WebCore::PlatformLayerIdentifier, Ref<RemoteAcceleratedEffectStack>> m_effectStacks WTF_GUARDED_BY_LOCK(m_effectStacksLock);
+    Lock m_animationStacksLock;
+    HashMap<WebCore::PlatformLayerIdentifier, Ref<RemoteAnimationStack>> m_animationStacks WTF_GUARDED_BY_LOCK(m_animationStacksLock);
 #endif
 
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER)
