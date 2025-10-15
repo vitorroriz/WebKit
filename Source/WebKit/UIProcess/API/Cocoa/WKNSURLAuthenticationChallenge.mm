@@ -38,7 +38,7 @@
 
 - (NSObject *)_web_createTarget
 {
-    Ref challenge = *reinterpret_cast<WebKit::AuthenticationChallengeProxy*>(&self._apiObject);
+    Ref challenge = downcast<WebKit::AuthenticationChallengeProxy>(self._apiObject);
 
     static dispatch_once_t token;
     static NeverDestroyed<RetainPtr<WKNSURLAuthenticationChallengeSender>> sender;
@@ -51,7 +51,7 @@
 
 - (WebKit::AuthenticationChallengeProxy&)_web_authenticationChallengeProxy
 {
-    return *reinterpret_cast<WebKit::AuthenticationChallengeProxy*>(&self._apiObject);
+    return downcast<WebKit::AuthenticationChallengeProxy>(self._apiObject);
 }
 
 @end
