@@ -132,7 +132,7 @@ namespace ax = WebCore::Accessibility;
         }
 
         RefPtr frame = protectedFrame ? WTFMove(protectedFrame) : [protectedSelf focusedLocalFrame];
-        if (RefPtr document = frame->document()) {
+        if (RefPtr document = frame ? frame->document() : nullptr) {
             if (CheckedPtr cache = document->axObjectCache()) {
                 if (RefPtr root = cache->rootObjectForFrame(*frame))
                     return root->wrapper();
