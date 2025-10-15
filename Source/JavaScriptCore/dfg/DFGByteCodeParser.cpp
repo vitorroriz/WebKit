@@ -4522,7 +4522,7 @@ auto ByteCodeParser::handleIntrinsicCall(Node* callee, Operand resultOperand, Ca
         }
 
         case PromiseAllContextCreateIntrinsic: {
-            if (argumentCountIncludingThis < 5)
+            if (argumentCountIncludingThis < 3)
                 return CallOptimizationResult::DidNothing;
 
             insertChecks();
@@ -4662,7 +4662,8 @@ auto ByteCodeParser::handleIntrinsicCall(Node* callee, Operand resultOperand, Ca
         }
 
         case PromisePrototypeThenIntrinsic: {
-            insertChecks();
+            if (argumentCountIncludingThis < 1)
+                return CallOptimizationResult::DidNothing;
 
             if (m_inlineStackTop->m_exitProfile.hasExitSite(m_currentIndex, BadType))
                 return CallOptimizationResult::DidNothing;
@@ -4671,8 +4672,8 @@ auto ByteCodeParser::handleIntrinsicCall(Node* callee, Operand resultOperand, Ca
             if (m_inlineStackTop->m_exitProfile.hasExitSite(m_currentIndex, BadCache))
                 return CallOptimizationResult::DidNothing;
 
+            insertChecks();
             Node* promise = get(virtualRegisterForArgumentIncludingThis(0, registerOffset));
-
             Node* onFulfilled = nullptr;
             if (argumentCountIncludingThis < 2)
                 onFulfilled = addToGraph(JSConstant, OpInfo(m_constantUndefined));
