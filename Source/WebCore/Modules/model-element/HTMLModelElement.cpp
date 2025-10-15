@@ -672,7 +672,13 @@ RefPtr<ModelContext> HTMLModelElement::modelContext() const
     if (!modelContentsLayerHostingContextIdentifier)
         return nullptr;
 
-    return ModelContext::create(*modelLayerIdentifier, *modelContentsLayerHostingContextIdentifier, contentSize(), hasPortal() ? ModelContextDisablePortal::No : ModelContextDisablePortal::Yes, std::nullopt).ptr();
+#if ENABLE(MODEL_ELEMENT_PORTAL)
+    auto shouldEnablePortal = hasPortal() ? ModelContextDisablePortal::No : ModelContextDisablePortal::Yes;
+#else
+    auto shouldEnablePortal = ModelContextDisablePortal::Yes;
+#endif
+
+    return ModelContext::create(*modelLayerIdentifier, *modelContentsLayerHostingContextIdentifier, contentSize(), shouldEnablePortal, std::nullopt).ptr();
 }
 
 #endif
@@ -686,8 +692,10 @@ const DOMMatrixReadOnly& HTMLModelElement::entityTransform() const
 
 ExceptionOr<void> HTMLModelElement::setEntityTransform(const DOMMatrixReadOnly& transform)
 {
+#if ENABLE(MODEL_ELEMENT_STAGE_MODE_INTERACTION)
     if (supportsStageModeInteraction())
         return Exception { ExceptionCode::InvalidStateError,  "Transform is read-only unless StageMode is set to 'none'"_s };
+#endif
 
     auto player = m_modelPlayer;
     if (!player) {
