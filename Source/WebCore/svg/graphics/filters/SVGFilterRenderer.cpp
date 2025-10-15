@@ -313,6 +313,7 @@ RefPtr<FilterImage> SVGFilterRenderer::apply(FilterImage* sourceImage, FilterRes
 {
     ASSERT(!m_expression.isEmpty());
     ASSERT(filterRenderingModes().contains(FilterRenderingMode::Software));
+    ASSERT(isValidSVGFilterExpression(m_expression, m_effects));
 
     FilterImageVector stack;
 
@@ -349,6 +350,9 @@ RefPtr<FilterImage> SVGFilterRenderer::apply(FilterImage* sourceImage, FilterRes
 
 bool SVGFilterRenderer::isValidSVGFilterExpression(const SVGFilterExpression& expression, const FilterEffectVector& effects)
 {
+    if (expression.isEmpty() || effects.isEmpty())
+        return false;
+
     for (const auto& term : expression) {
         if (term.index >= effects.size())
             return false;
