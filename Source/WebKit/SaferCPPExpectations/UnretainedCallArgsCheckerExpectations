@@ -37,13 +37,6 @@ UIProcess/API/Cocoa/_WKFeature.mm
 UIProcess/API/Cocoa/_WKInspector.mm
 UIProcess/API/Cocoa/_WKInspectorConfiguration.mm
 UIProcess/API/Cocoa/_WKProcessPoolConfiguration.mm
-UIProcess/API/Cocoa/_WKPublicKeyCredentialCreationOptions.mm
-UIProcess/API/Cocoa/_WKPublicKeyCredentialDescriptor.mm
-UIProcess/API/Cocoa/_WKPublicKeyCredentialEntity.mm
-UIProcess/API/Cocoa/_WKPublicKeyCredentialParameters.mm
-UIProcess/API/Cocoa/_WKPublicKeyCredentialRelyingPartyEntity.mm
-UIProcess/API/Cocoa/_WKPublicKeyCredentialRequestOptions.mm
-UIProcess/API/Cocoa/_WKPublicKeyCredentialUserEntity.mm
 [ Mac ] UIProcess/API/Cocoa/_WKRemoteWebInspectorViewController.mm
 UIProcess/API/Cocoa/_WKTextManipulationConfiguration.mm
 UIProcess/API/Cocoa/_WKTextManipulationToken.mm
