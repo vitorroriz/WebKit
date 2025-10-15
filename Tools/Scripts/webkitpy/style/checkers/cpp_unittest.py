@@ -6556,6 +6556,8 @@ class WebKitStyleTest(CppStyleTestBase):
         self.assert_lint('postTask([foo = protectedFoo(), bar]() {', '')
         self.assert_lint('postTask([foo = protectedFoo(), bar](ScriptExecutionContext& context) {', '')
         self.assert_lint('postTask([foo = bar().protectedFoo(), bar](ScriptExecutionContext& context) {', '')
+        self.assert_lint('bool ancestorsRevealed = revealClosedDetailsAndHiddenUntilFoundAncestors(simpleRange->protectedStartContainer());', '')
+        self.assert_lint('bool ancestorsRevealed = revealClosedDetailsAndHiddenUntilFoundAncestors(simpleRange-checkedStartContainer());', '')
 
         self.assert_lint('auto foo = checkedFoo()->bar();', '')
         self.assert_lint('postTask([foo = checkedFoo()] {', '')
