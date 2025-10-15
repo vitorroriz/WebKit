@@ -26,6 +26,7 @@
 #include "config.h"
 #include "WebPopupMenuProxyGtk.h"
 
+#include "GUniquePtrGtk.h"
 #include "GtkUtilities.h"
 #include "GtkVersioning.h"
 #include "NativeWebMouseEvent.h"

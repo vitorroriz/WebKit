@@ -28,9 +28,9 @@
 
 #if ENABLE(DRAG_SUPPORT) && !USE(GTK4)
 
+#include "GRefPtrGtk.h"
 #include "GtkUtilities.h"
 #include "WebKitWebViewBasePrivate.h"
-#include <WebCore/GRefPtrGtk.h>
 #include <WebCore/PasteboardCustomData.h>
 #include <gtk/gtk.h>
 

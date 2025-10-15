@@ -22,12 +22,6 @@
 
 #include <gtk/gtk.h>
 
-#if USE(LIBSECRET)
-#define SECRET_WITH_UNSTABLE 1
-#define SECRET_API_SUBJECT_TO_CHANGE 1
-#include <libsecret/secret.h>
-#endif
-
 namespace WTF {
 
 #if USE(GTK4)
@@ -36,10 +30,6 @@ WTF_DEFINE_GREF_TRAITS(GdkEvent, gdk_event_ref, gdk_event_unref)
 #else
 WTF_DEFINE_GREF_TRAITS(GtkTargetList, gtk_target_list_ref, gtk_target_list_unref)
 WTF_DEFINE_GREF_TRAITS(GtkWidgetPath, gtk_widget_path_ref, gtk_widget_path_unref)
-#endif
-
-#if USE(LIBSECRET)
-WTF_DEFINE_GREF_TRAITS(SecretValue, secret_value_ref, secret_value_unref)
 #endif
 
 } // namespace WTF

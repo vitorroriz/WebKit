@@ -36,6 +36,8 @@
 #include "DrawingAreaProxyCoordinatedGraphics.h"
 #include "DropTarget.h"
 #include "EditorState.h"
+#include "GRefPtrGtk.h"
+#include "GUniquePtrGtk.h"
 #include "GtkUtilities.h"
 #include "GtkVersioning.h"
 #include "InputMethodFilter.h"
@@ -66,8 +68,6 @@
 #include "WebProcessPool.h"
 #include "WebUserContentControllerProxy.h"
 #include <WebCore/ActivityState.h>
-#include <WebCore/GRefPtrGtk.h>
-#include <WebCore/GUniquePtrGtk.h>
 #include <WebCore/GdkCairoUtilities.h>
 #include <WebCore/Image.h>
 #include <WebCore/NativeImage.h>

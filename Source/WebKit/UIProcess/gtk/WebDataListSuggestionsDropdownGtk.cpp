@@ -26,11 +26,11 @@
 #include "config.h"
 #include "WebDataListSuggestionsDropdownGtk.h"
 
+#include "GUniquePtrGtk.h"
 #include "GtkUtilities.h"
 #include "GtkVersioning.h"
 #include "WebPageProxy.h"
 #include <WebCore/DataListSuggestionInformation.h>
-#include <WebCore/GUniquePtrGtk.h>
 #include <WebCore/IntPoint.h>
 #include <wtf/glib/GRefPtr.h>
 #include <wtf/glib/GUniquePtr.h>

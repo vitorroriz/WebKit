@@ -28,9 +28,9 @@
 
 #if !USE(GTK4)
 
+#include "GRefPtrGtk.h"
 #include "GtkUtilities.h"
 #include "WebPasteboardProxy.h"
-#include <WebCore/GRefPtrGtk.h>
 #include <WebCore/PasteboardCustomData.h>
 #include <WebCore/SelectionData.h>
 #include <WebCore/SharedBuffer.h>

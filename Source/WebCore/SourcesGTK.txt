@@ -91,7 +91,6 @@ platform/graphics/opentype/OpenTypeVerticalData.cpp
 
 platform/graphics/x11/XErrorTrapper.cpp @no-unify
 
-platform/gtk/GRefPtrGtk.cpp
 platform/gtk/LocalizedStringsGtk.cpp
 platform/gtk/PasteboardGtk.cpp
 platform/gtk/PlatformKeyboardEventGtk.cpp

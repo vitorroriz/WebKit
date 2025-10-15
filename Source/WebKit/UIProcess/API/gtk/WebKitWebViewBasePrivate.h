@@ -28,6 +28,8 @@
 #pragma once
 
 #include "APIPageConfiguration.h"
+#include "GRefPtrGtk.h"
+#include "GUniquePtrGtk.h"
 #include "InputMethodState.h"
 #include "RendererBufferDescription.h"
 #include "SameDocumentNavigationType.h"
@@ -42,8 +44,6 @@
 #include "WebPageProxy.h"
 #include <WebCore/Cursor.h>
 #include <WebCore/DragActions.h>
-#include <WebCore/GRefPtrGtk.h>
-#include <WebCore/GUniquePtrGtk.h>
 #include <WebCore/SelectionData.h>
 #include <WebCore/ShareableBitmap.h>
 

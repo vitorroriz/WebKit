@@ -30,8 +30,12 @@
 #if !USE(GTK4) && USE(CAIRO)
 
 #include "FloatRect.h"
-#include "GRefPtrGtk.h"
+#include <wtf/glib/GRefPtr.h>
 #include <wtf/TZoneMallocInlines.h>
+
+namespace WTF {
+WTF_DEFINE_GREF_TRAITS_INLINE(GtkWidgetPath, gtk_widget_path_ref, gtk_widget_path_unref)
+}
 
 namespace WebCore {
 

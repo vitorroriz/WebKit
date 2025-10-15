@@ -1,5 +1,6 @@
 /*
- *  Copyright (C) 2014 Igalia S.L.
+ *  Copyright (C) 2008 Collabora Ltd.
+ *  Copyright (C) 2009 Martin Robinson
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -17,20 +18,22 @@
  *  Boston, MA 02110-1301, USA.
  */
 
-#ifndef GUniquePtrGtk_h
-#define GUniquePtrGtk_h
+#pragma once
 
-#include <gtk/gtk.h>
-#include <wtf/glib/GUniquePtr.h>
+#include <wtf/glib/GRefPtr.h>
+
+typedef struct _GtkWidgetPath GtkWidgetPath;
+typedef struct _GskRenderNode GskRenderNode;
 
 namespace WTF {
 
-#if !USE(GTK4)
-WTF_DEFINE_GPTR_DELETER(GdkEvent, gdk_event_free)
+#if USE(GTK4)
+WTF_DECLARE_GREF_TRAITS(GskRenderNode)
+WTF_DECLARE_GREF_TRAITS(GdkEvent)
+#else
+WTF_DECLARE_GREF_TRAITS(GtkTargetList)
+WTF_DECLARE_GREF_TRAITS(GtkWidgetPath)
 #endif
-
-WTF_DEFINE_GPTR_DELETER(GtkTreePath, gtk_tree_path_free)
 
 } // namespace WTF
 
-#endif
