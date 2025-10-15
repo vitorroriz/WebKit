@@ -400,7 +400,7 @@ String PrintContext::pageProperty(LocalFrame* frame, const String& propertyName,
                 return "0"_s;
             },
             [&](const Style::LineHeight::Fixed& fixed) -> String {
-                return makeString(fixed.resolveZoom(Style::ZoomNeeded { }));
+                return makeString(fixed.resolveZoom(style->usedZoomForLength()));
             },
             [&](const Style::LineHeight::Percentage& percentage) -> String {
                 return makeString(percentage.value);

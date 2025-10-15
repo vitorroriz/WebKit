@@ -34,6 +34,7 @@
 #include <WebCore/StyleLineHeight.h>
 #include <WebCore/StylePrimitiveNumericTypes+Evaluation.h>
 #include <WebCore/StyleTextBoxEdge.h>
+#include <WebCore/StyleZoomPrimitives.h>
 #include <wtf/OptionSet.h>
 
 namespace WebCore {
@@ -169,6 +170,7 @@ private:
         TextBoxTrim textBoxTrim;
         WebCore::Style::TextBoxEdge textBoxEdge;
         WebCore::Style::LineFitEdge lineFitEdge;
+        WebCore::Style::ZoomFactor zoomFactor { 1.0f, 1.0f };
         OptionSet<WebCore::Style::LineBoxContain> lineBoxContain;
         InlineLayoutUnit primaryFontSize { 0 };
         VerticalAlignment verticalAlignment { };
@@ -198,7 +200,7 @@ inline InlineLayoutUnit InlineLevelBox::preferredLineHeight() const
             return 0;
         },
         [&](const WebCore::Style::LineHeight::Fixed& fixed) -> InlineLayoutUnit {
-            return WebCore::Style::evaluate<InlineLayoutUnit>(fixed, WebCore::Style::ZoomNeeded { });
+            return WebCore::Style::evaluate<InlineLayoutUnit>(fixed, m_style.zoomFactor);
         },
         [&](const WebCore::Style::LineHeight::Percentage& percentage) -> InlineLayoutUnit {
             return WebCore::Style::evaluate<LayoutUnit>(percentage, LayoutUnit { fontSize() });
