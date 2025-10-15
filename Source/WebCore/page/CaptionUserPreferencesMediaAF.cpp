@@ -431,7 +431,7 @@ bool CaptionUserPreferencesMediaAF::captionStrokeWidthForFont(float fontSize, co
 
 bool CaptionUserPreferencesMediaAF::testingMode() const
 {
-    return CaptionUserPreferences::testingMode() || hasNullCaptionProfile();
+    return CaptionUserPreferences::testingMode();
 }
 
 String CaptionUserPreferencesMediaAF::captionsTextEdgeCSS() const
@@ -611,7 +611,7 @@ bool CaptionUserPreferencesMediaAF::hasNullCaptionProfile() const
 
 String CaptionUserPreferencesMediaAF::captionsStyleSheetOverride() const
 {
-    if (testingMode())
+    if (testingMode() || hasNullCaptionProfile())
         return CaptionUserPreferences::captionsStyleSheetOverride();
     
     StringBuilder captionsOverrideStyleSheet;
