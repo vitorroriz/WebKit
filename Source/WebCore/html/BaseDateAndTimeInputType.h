@@ -119,6 +119,7 @@ private:
     bool isMouseFocusable() const final;
 
     void handleDOMActivateEvent(Event&) override;
+    void handleAccessibilityActivation() final;
     void createShadowSubtree() final;
     void removeShadowSubtree() final;
     void updateInnerTextValue() final;

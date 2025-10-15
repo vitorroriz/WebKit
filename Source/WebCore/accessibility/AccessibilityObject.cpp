@@ -1376,10 +1376,10 @@ IntRect AccessibilityObject::boundingBoxForQuads(RenderObject* obj, const Vector
 bool AccessibilityObject::press()
 {
     // The presence of the actionElement will confirm whether we should even attempt a press.
-    RefPtr actionElem = actionElement();
-    if (!actionElem)
+    RefPtr actionElement = this->actionElement();
+    if (!actionElement)
         return false;
-    if (RefPtr frame = actionElem->document().frame())
+    if (RefPtr frame = actionElement->document().frame())
         frame->loader().resetMultipleFormSubmissionProtection();
 
     // Hit test at this location to determine if there is a sub-node element that should act
@@ -1402,8 +1402,8 @@ bool AccessibilityObject::press()
 
     // Prefer the actionElement instead of this node, if the actionElement is inside this node.
     RefPtr pressElement = this->element();
-    if (!pressElement || actionElem->isDescendantOf(*pressElement))
-        pressElement = WTFMove(actionElem);
+    if (!pressElement || actionElement->isDescendantOf(*pressElement))
+        pressElement = actionElement;
 
     ASSERT(pressElement);
     // Prefer the hit test element, if it is inside the target element.
@@ -1418,7 +1418,17 @@ bool AccessibilityObject::press()
         dispatchedEvent = dispatchTouchEvent();
 #endif
 
-    return dispatchedEvent || pressElement->accessKeyAction(true) || pressElement->dispatchSimulatedClick(nullptr, SendMouseUpDownEvents);
+    if (dispatchedEvent)
+        return true;
+
+    if (RefPtr input = dynamicDowncast<HTMLInputElement>(*actionElement)) {
+        if (RefPtr inputType = input->isDateField() || input->isDateTimeLocalField() ? input->inputType() : nullptr) {
+            inputType->handleAccessibilityActivation();
+            return true;
+        }
+    }
+
+    return pressElement->accessKeyAction(true) || pressElement->dispatchSimulatedClick(nullptr, SendMouseUpDownEvents);
 }
 
 bool AccessibilityObject::dispatchTouchEvent()

@@ -339,6 +339,23 @@ void BaseDateAndTimeInputType::handleDOMActivateEvent(Event& event)
     showPicker();
 }
 
+void BaseDateAndTimeInputType::handleAccessibilityActivation()
+{
+    RefPtr element = this->element();
+    if (!element || !element->renderer() || !element->isMutable())
+        return;
+
+    // Consider accessibility activations to be keyboard activations for the purpose of
+    // moving focus into the picker when it's displayed.
+    m_pickerWasActivatedByKeyboard = true;
+
+    if (m_dateTimeChooser)
+        return;
+
+    m_didTransferFocusToPicker = true;
+    showPicker();
+}
+
 void BaseDateAndTimeInputType::showPicker()
 {
     if (!element()->renderer())

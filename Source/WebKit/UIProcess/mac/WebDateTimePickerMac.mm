@@ -212,6 +212,8 @@ void WebDateTimePickerMac::didChooseDate(StringView date)
     _enclosingWindow = adoptNS([[WKDateTimePickerWindow alloc] initWithContentRect:NSZeroRect styleMask:NSWindowStyleMaskBorderless backing:NSBackingStoreBuffered defer:NO]);
     [_enclosingWindow setFrame:windowRect display:YES];
     [[_enclosingWindow contentView] setFocusRingType:NSFocusRingTypeNone];
+    RetainPtr title = WEB_UI_NSSTRING(@"Date Picker Window Accessibility Title", "Base accessibility text for the window containing the date picker of <input type='date'>");
+    [_enclosingWindow setAccessibilityTitle:title.get()];
 
     // Setting _setSharesParentFirstResponder is necessary because AppKit normally disallows
     // a view from one window (in our case, _datePicker belonging to _enclosingWindow) to be
