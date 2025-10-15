@@ -29,6 +29,7 @@
 #if USE(GTK4)
 
 #include "WebPasteboardProxy.h"
+#include <WebCore/GtkUtilities.h>
 #include <WebCore/ImageAdapter.h>
 #include <WebCore/PasteboardCustomData.h>
 #include <WebCore/SelectionData.h>
@@ -273,7 +274,7 @@ void Clipboard::write(WebCore::SelectionData&& selectionData, CompletionHandler<
     }
 
     if (selectionData.hasImage()) {
-        auto pixbuf = selectionData.image()->adapter().gdkPixbuf();
+        auto pixbuf = selectionDataImageAsGdkPixbuf(selectionData);
         providers.append(gdk_content_provider_new_typed(GDK_TYPE_PIXBUF, pixbuf.get()));
     }
 

@@ -21,12 +21,14 @@
 #include "DragActions.h"
 #include <gtk/gtk.h>
 #include <wtf/MonotonicTime.h>
+#include <wtf/glib/GRefPtr.h>
 #include <wtf/text/CString.h>
 #include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
 class IntPoint;
+class SelectionData;
 
 IntPoint convertWidgetPointToScreenPoint(GtkWidget*, const IntPoint&);
 bool widgetIsOnscreenToplevelWindow(GtkWidget*);
@@ -39,6 +41,7 @@ WEBCORE_EXPORT unsigned stateModifierForGdkButton(unsigned button);
 WEBCORE_EXPORT OptionSet<DragOperation> gdkDragActionToDragOperation(GdkDragAction);
 WEBCORE_EXPORT GdkDragAction dragOperationToGdkDragActions(OptionSet<DragOperation>);
 WEBCORE_EXPORT GdkDragAction dragOperationToSingleGdkDragAction(OptionSet<DragOperation>);
+WEBCORE_EXPORT GRefPtr<GdkPixbuf> selectionDataImageAsGdkPixbuf(const SelectionData&);
 
 void monitorWorkArea(GdkMonitor*, GdkRectangle*);
 

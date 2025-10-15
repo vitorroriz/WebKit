@@ -19,8 +19,13 @@
 #include "config.h"
 #include "GtkUtilities.h"
 
+#include "GdkCairoUtilities.h"
+#include "GdkSkiaUtilities.h"
 #include "GtkVersioning.h"
+#include "Image.h"
 #include "IntPoint.h"
+#include "NativeImage.h"
+#include "SelectionData.h"
 #include "SystemSettings.h"
 #include <gtk/gtk.h>
 #include <wtf/glib/GUniquePtr.h>
@@ -162,6 +167,24 @@ GdkDragAction dragOperationToSingleGdkDragAction(OptionSet<DragOperation> coreAc
     if (coreAction.contains(DragOperation::Link))
         return GDK_ACTION_LINK;
     return static_cast<GdkDragAction>(0);
+}
+
+GRefPtr<GdkPixbuf> selectionDataImageAsGdkPixbuf(const SelectionData& selectionData)
+{
+    auto image = selectionData.image();
+    if (!image)
+        return nullptr;
+
+    RefPtr nativeImage = image->currentNativeImage();
+    if (!nativeImage)
+        return nullptr;
+
+    auto& platformImage = nativeImage->platformImage();
+#if USE(CAIRO)
+    return cairoSurfaceToGdkPixbuf(platformImage.get());
+#elif USE(SKIA)
+    return skiaImageToGdkPixbuf(*platformImage.get());
+#endif
 }
 
 void monitorWorkArea(GdkMonitor* monitor, GdkRectangle* area)

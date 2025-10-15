@@ -30,6 +30,7 @@
 
 #include "WebPasteboardProxy.h"
 #include <WebCore/GRefPtrGtk.h>
+#include <WebCore/GtkUtilities.h>
 #include <WebCore/PasteboardCustomData.h>
 #include <WebCore/SelectionData.h>
 #include <WebCore/SharedBuffer.h>
@@ -230,7 +231,7 @@ void Clipboard::write(WebCore::SelectionData&& selectionData, CompletionHandler<
                 break;
             case ClipboardTargetType::Image: {
                 if (data.selectionData.hasImage()) {
-                    auto pixbuf = data.selectionData.image()->adapter().gdkPixbuf();
+                    auto pixbuf = selectionDataImageAsGdkPixbuf(data.selectionData);
                     gtk_selection_data_set_pixbuf(selection, pixbuf.get());
                 }
                 break;
