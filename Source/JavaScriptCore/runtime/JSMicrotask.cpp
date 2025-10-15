@@ -61,8 +61,10 @@ static void promiseResolveThenableJobFastSlow(JSGlobalObject* globalObject, JSPr
     auto [resolve, reject] = promiseToResolve->createResolvingFunctions(vm, globalObject);
 
     auto capability = JSPromise::createNewPromiseCapability(globalObject, constructor);
-    if (!scope.exception()) [[likely]]
+    if (!scope.exception()) [[likely]] {
         promise->performPromiseThen(vm, globalObject, resolve, reject, capability, jsUndefined());
+        return;
+    }
 
     JSValue error = scope.exception()->value();
     if (!scope.clearExceptionExceptTermination()) [[unlikely]]
@@ -88,8 +90,10 @@ static void promiseResolveThenableJobWithoutPromiseFastSlow(JSGlobalObject* glob
     auto [resolve, reject] = JSPromise::createResolvingFunctionsWithoutPromise(vm, globalObject, onFulfilled, onRejected, context);
 
     auto capability = JSPromise::createNewPromiseCapability(globalObject, constructor);
-    if (!scope.exception()) [[likely]]
+    if (!scope.exception()) [[likely]] {
         promise->performPromiseThen(vm, globalObject, resolve, reject, capability, jsUndefined());
+        return;
+    }
 
     JSValue error = scope.exception()->value();
     if (!scope.clearExceptionExceptTermination()) [[unlikely]]
