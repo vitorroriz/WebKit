@@ -803,6 +803,12 @@ static bool didRejectNavigation = false;
 TEST(WKNavigation, ShouldGoToBackForwardListItem)
 {
     auto webView = adoptNS([[WKWebView alloc] init]);
+
+    // FIXME: Page cache is currently disabled under site isolation; see rdar://161762363.
+    // This test relies on the back forward cache. Once it is enabled, remove this early return.
+    if (isSiteIsolationEnabled(webView.get()))
+        return;
+
     auto delegate = adoptNS([[BackForwardDelegateWithShouldGo alloc] init]);
     [webView setNavigationDelegate:delegate.get()];
     [webView loadRequest:[NSURLRequest requestWithURL:[NSBundle.test_resourcesBundle URLForResource:@"simple" withExtension:@"html"]]];
