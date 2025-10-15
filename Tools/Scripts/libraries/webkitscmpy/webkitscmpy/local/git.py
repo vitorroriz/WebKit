@@ -479,10 +479,8 @@ class Git(Scm):
         if self._branch:
             return self._branch
 
-        status = run([self.executable(), 'status'], cwd=self.root_path, capture_output=True, encoding='utf-8')
-        if status.returncode:
-            raise self.Exception('Failed to run `git status` for {}'.format(self.root_path))
-        if status.stdout.splitlines()[0].startswith('HEAD detached at'):
+        head_ref = run([self.executable(), 'symbolic-ref', '-q', 'HEAD'], cwd=self.root_path, stdout=subprocess.DEVNULL)
+        if head_ref.returncode:
             return None
 
         result = run([self.executable(), 'rev-parse', '--abbrev-ref', 'HEAD'], cwd=self.root_path, capture_output=True, encoding='utf-8')

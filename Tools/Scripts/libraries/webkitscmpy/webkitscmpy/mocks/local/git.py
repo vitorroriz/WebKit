@@ -209,6 +209,15 @@ class Git(mocks.Subprocess):
 
         super(Git, self).__init__(
             mocks.Subprocess.Route(
+                self.executable, 'symbolic-ref', '-q', 'HEAD',
+                cwd=self.path,
+                generator=lambda *args, **kwargs:
+                    mocks.ProcessCompletion(
+                        returncode=1 if self.detached else 0,
+                        stdout='' if self.detached else 'refs/heads/{}\n'.format(self.branch)
+                    ),
+            ),
+            mocks.Subprocess.Route(
                 self.executable, 'status',
                 cwd=self.path,
                 generator=lambda *args, **kwargs:
