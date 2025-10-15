@@ -1024,7 +1024,7 @@ static RetainPtr<NSArray<NSNumber *>> wkTransports(const Vector<WebCore::Authent
 
 static RetainPtr<_WKAuthenticatorAttestationResponse> wkAuthenticatorAttestationResponse(const WebCore::AuthenticatorResponseData& data, NSData *clientDataJSON, WebCore::AuthenticatorAttachment attachment)
 {
-    auto value = adoptNS([[_WKAuthenticatorAttestationResponse alloc] initWithClientDataJSON:clientDataJSON rawId:toNSData(data.rawId->span()).get() extensionOutputsCBOR:toNSData(data.extensionOutputs->toCBOR()).autorelease() attestationObject:toNSData(data.attestationObject->span()).get() attachment: authenticatorAttachmentToWKAuthenticatorAttachment(attachment) transports:wkTransports(data.transports).autorelease()]);
+    auto value = adoptNS([[_WKAuthenticatorAttestationResponse alloc] initWithClientDataJSON:clientDataJSON rawId:toNSData(Ref { *data.rawId }->span()).get() extensionOutputsCBOR:toNSData(data.extensionOutputs->toCBOR()).get() attestationObject:toNSData(Ref { *data.attestationObject }->span()).get() attachment: authenticatorAttachmentToWKAuthenticatorAttachment(attachment) transports:wkTransports(data.transports).get()]);
     
     return value;
 }
@@ -1091,10 +1091,10 @@ static RetainPtr<_WKAuthenticatorAttestationResponse> wkAuthenticatorAttestation
 static RetainPtr<_WKAuthenticatorAssertionResponse> wkAuthenticatorAssertionResponse(const WebCore::AuthenticatorResponseData& data, NSData *clientDataJSON, WebCore::AuthenticatorAttachment attachment)
 {
     RetainPtr<NSData> userHandle;
-    if (data.userHandle)
-        userHandle = toNSData(data.userHandle->span());
+    if (RefPtr userHandleArray = data.userHandle)
+        userHandle = toNSData(userHandleArray->span());
 
-    return adoptNS([[_WKAuthenticatorAssertionResponse alloc] initWithClientDataJSON:clientDataJSON rawId:toNSData(data.rawId->span()).get() extensionOutputsCBOR:toNSData(data.extensionOutputs->toCBOR()).autorelease() authenticatorData:toNSData(data.authenticatorData->span()).get() signature:toNSData(data.signature->span()).get() userHandle:userHandle.get() attachment:authenticatorAttachmentToWKAuthenticatorAttachment(attachment)]);
+    return adoptNS([[_WKAuthenticatorAssertionResponse alloc] initWithClientDataJSON:clientDataJSON rawId:toNSData(Ref { *data.rawId }->span()).get() extensionOutputsCBOR:toNSData(data.extensionOutputs->toCBOR()).get() authenticatorData:toNSData(Ref { *data.authenticatorData }->span()).get() signature:toNSData(Ref { *data.signature }->span()).get() userHandle:userHandle.get() attachment:authenticatorAttachmentToWKAuthenticatorAttachment(attachment)]);
 }
 #endif
 

@@ -49,7 +49,6 @@ UIProcess/API/Cocoa/_WKTextManipulationConfiguration.mm
 UIProcess/API/Cocoa/_WKTextManipulationToken.mm
 [ Mac ] UIProcess/API/Cocoa/_WKThumbnailView.mm
 UIProcess/API/Cocoa/_WKUserInitiatedAction.mm
-UIProcess/API/Cocoa/_WKWebAuthenticationPanel.mm
 [ Mac ] UIProcess/Automation/mac/WebAutomationSessionMac.mm
 [ Mac ] UIProcess/Inspector/Cocoa/InspectorExtensionDelegate.mm
 [ Mac ] UIProcess/Inspector/mac/WKInspectorViewController.mm
