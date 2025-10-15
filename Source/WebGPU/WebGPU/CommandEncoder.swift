@@ -374,7 +374,7 @@ extension WebGPU.CommandEncoder {
                 mtlAttachment?.slice = 0
                 mtlAttachment?.depthPlane = Int(textureAndClearColor.depthPlane)
             }
-            clearRenderCommandEncoder = m_commandBuffer.makeRenderCommandEncoder(descriptor: clearDescriptor)
+            clearRenderCommandEncoder = m_commandBuffer?.makeRenderCommandEncoder(descriptor: clearDescriptor)
             setExistingEncoder(clearRenderCommandEncoder)
         }
 
@@ -833,7 +833,7 @@ extension WebGPU.CommandEncoder {
             return WebGPU.RenderPassEncoder.createInvalid(self, m_device.ptr(), error)
         }
 
-        guard m_commandBuffer.status.rawValue < MTLCommandBufferStatus.enqueued.rawValue else {
+        if m_commandBuffer != nil && m_commandBuffer!.status.rawValue >= MTLCommandBufferStatus.enqueued.rawValue {
             return WebGPU.RenderPassEncoder.createInvalid(self, m_device.ptr(), "command buffer has already been committed")
         }
 
@@ -1196,7 +1196,7 @@ extension WebGPU.CommandEncoder {
             return WebGPU.RenderPassEncoder.createInvalid(self, m_device.ptr(), "GPUDevice was invalid, this will be an error submitting the command buffer")
         }
 
-        let mtlRenderCommandEncoder = m_commandBuffer.makeRenderCommandEncoder(descriptor: mtlDescriptor)
+        let mtlRenderCommandEncoder = m_commandBuffer?.makeRenderCommandEncoder(descriptor: mtlDescriptor)
         if m_existingCommandEncoder != nil {
             assertionFailure("!m_existingCommandEncoder")
         }
@@ -1880,8 +1880,8 @@ extension WebGPU.CommandEncoder {
             self.finalizeBlitCommandEncoder()
             let workaround: MTLSharedEvent = m_device.ptr().resolveTimestampsSharedEvent()
             // The signal value does not matter, the event alone prevents reordering
-            m_commandBuffer.encodeSignalEvent(workaround, value: 1)
-            m_commandBuffer.encodeWaitForEvent(workaround, value: 1)
+            m_commandBuffer?.encodeSignalEvent(workaround, value: 1)
+            m_commandBuffer?.encodeWaitForEvent(workaround, value: 1)
             guard ensureBlitCommandEncoder() != nil else {
                 return
             }
@@ -1891,7 +1891,7 @@ extension WebGPU.CommandEncoder {
             guard let counterSampleBuffer else {
                 return
             }
-            unsafe m_blitCommandEncoder.resolveCounters(
+            unsafe m_blitCommandEncoder?.resolveCounters(
                 counterSampleBuffer,
                 range: Range(uncheckedBounds: (Int(firstQuery + counterSampleBufferOffset), Int(firstQuery + counterSampleBufferOffset + queryCount))),
                 destinationBuffer: destination.buffer(),
@@ -2121,7 +2121,7 @@ extension WebGPU.CommandEncoder {
             return WebGPU.ComputePassEncoder.createInvalid(self, m_device.ptr(), String(error!))
         }
 
-        guard m_commandBuffer.status.rawValue < MTLCommandBufferStatus.enqueued.rawValue else {
+        if m_commandBuffer != nil && m_commandBuffer!.status.rawValue >= MTLCommandBufferStatus.enqueued.rawValue {
             return WebGPU.ComputePassEncoder.createInvalid(self, m_device.ptr(), "command buffer has already been committed")
         }
 
@@ -2150,7 +2150,7 @@ extension WebGPU.CommandEncoder {
                 m_device.ptr().trackTimestampsBuffer(m_commandBuffer, counterSampleBuffer);
             }
         }
-        guard let computeCommandEncoder = m_commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor) else {
+        guard let computeCommandEncoder = m_commandBuffer?.makeComputeCommandEncoder(descriptor: computePassDescriptor) else {
             return WebGPU.ComputePassEncoder.createInvalid(self, m_device.ptr(), "computeCommandEncoder is null")
         }
 

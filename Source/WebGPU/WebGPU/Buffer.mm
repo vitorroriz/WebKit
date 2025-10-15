@@ -322,7 +322,7 @@ std::span<uint8_t> Buffer::getBufferContents()
     return span<uint8_t>(m_buffer);
 }
 
-NSString* Buffer::errorValidatingMapAsync(WGPUMapModeFlags mode, size_t offset, size_t rangeSize) const
+NSString *Buffer::errorValidatingMapAsync(WGPUMapModeFlags mode, size_t offset, size_t rangeSize) const
 {
 #define ERROR_STRING(x) (@"GPUBuffer.mapAsync: " x)
     if (!isValid())

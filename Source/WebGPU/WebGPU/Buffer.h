@@ -44,6 +44,8 @@
 #import <wtf/TZoneMalloc.h>
 #import <wtf/WeakPtr.h>
 
+IGNORE_CLANG_WARNINGS_BEGIN("nullability-completeness")
+
 // FIXME(rdar://155970441): this annotation should be in WebGPU.h, move it once we support
 // annotating incomplete types
 struct SWIFT_SHARED_REFERENCE(wgpuBufferReference, wgpuBufferRelease) WGPUBufferImpl {
@@ -140,7 +142,7 @@ private:
     Buffer(Device&);
 
     bool validateGetMappedRange(size_t offset, size_t rangeSize) const;
-    NSString* errorValidatingMapAsync(WGPUMapModeFlags, size_t offset, size_t rangeSize) const;
+    NSString * _Nullable errorValidatingMapAsync(WGPUMapModeFlags, size_t offset, size_t rangeSize) const;
     bool validateUnmap() const;
     void setState(State);
     void incrementBufferMapCount();
@@ -149,8 +151,8 @@ private:
     void takeSlowIndirectValidationPath(CommandBuffer&, uint64_t indirectOffset, uint32_t minVertexCount, uint32_t minInstanceCount);
 
     id<MTLBuffer> m_buffer { nil };
-    id<MTLBuffer> m_indirectBuffer { nil };
-    id<MTLBuffer> m_indirectIndexedBuffer { nil };
+    id<MTLBuffer> _Nullable m_indirectBuffer { nil };
+    id<MTLBuffer> _Nullable m_indirectIndexedBuffer { nil };
 
     // https://gpuweb.github.io/gpuweb/#buffer-interface
 
@@ -202,3 +204,5 @@ inline void derefBuffer(WebGPU::Buffer* obj)
 {
     WTF::deref(obj);
 }
+
+IGNORE_CLANG_WARNINGS_END
