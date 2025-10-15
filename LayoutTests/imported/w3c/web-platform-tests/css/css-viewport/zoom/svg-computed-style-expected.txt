@@ -5,6 +5,12 @@ PASS Property border-spacing value 'inherit' no zoom
 PASS Property border-spacing value '1px' zoom: 2
 PASS Property border-spacing value '1px 2px' zoom: 2
 PASS Property border-spacing value 'inherit' zoom: 2
+PASS Property border-width value '5px 10px' no zoom
+PASS Property border-width value '2px 4px 6px 8px' no zoom
+PASS Property border-width value 'inherit' no zoom
+PASS Property border-width value '5px 10px' zoom: 2
+PASS Property border-width value '2px 4px 6px 8px' zoom: 2
+PASS Property border-width value 'inherit' zoom: 2
 PASS Property text-underline-offset value '4px' no zoom
 PASS Property text-underline-offset value 'inherit' no zoom
 PASS Property text-underline-offset value '4px' zoom: 2

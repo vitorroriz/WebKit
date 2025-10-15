@@ -103,6 +103,7 @@ public:
     bool hasColorFilters() const;
 
     float usedZoom;
+    float deviceScaleFactor { 1.0f };
 
     Style::ImageOrNone listStyleImage;
 

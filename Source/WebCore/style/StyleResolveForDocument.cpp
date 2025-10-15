@@ -109,6 +109,8 @@ RenderStyle resolveForDocument(const Document& document)
 
     documentStyle.setEnableEvaluationTimeZoom(document.settings().evaluationTimeZoomEnabled());
 
+    documentStyle.setDeviceScaleFactor(document.deviceScaleFactor());
+
     return documentStyle;
 }
 

@@ -19,6 +19,11 @@
       "value": "10px 20px",
       "otherValues": ["1px", "1px 2px"]
     },
+    "border-width": {
+      "value": "1px",
+      "otherValues": ["5px 10px", "2px 4px 6px 8px"],
+      "requiredProperties": { "border-style": "solid" }
+    },
     "text-underline-offset": {
       "value": "2px",
       "otherValues": ["4px"]
@@ -29,8 +34,17 @@
     }
   };
 
-  for (const [property, {value, otherValues}] of Object.entries(properties)) {
+  for (const [property, {value, otherValues, requiredProperties}] of Object.entries(properties)) {
+    // setup
+    if (requiredProperties) {
+      for (const [prop, reqValue] of Object.entries(requiredProperties)) {
+        svg.style[prop] = reqValue;
+        target.style[prop] = reqValue;
+      }
+    }
+
     svg.style[property] = value;
+
     for (const otherValue of otherValues) {
       test_computed_value(property, otherValue, otherValue, "no zoom");
     }
@@ -42,7 +56,15 @@
       test_computed_value(property, otherValue, otherValue, "zoom: 2");
     }
     test_computed_value(property, "inherit", value, "zoom: 2");
+
+    // cleanup
     svg.style.removeProperty(property);
+    if (requiredProperties) {
+      for (const [prop, reqValue] of Object.entries(requiredProperties)) {
+        svg.style.removeProperty(reqValue);
+        target.style.removeProperty(reqValue);
+      }
+    }
   }
 </script>
 </body>
