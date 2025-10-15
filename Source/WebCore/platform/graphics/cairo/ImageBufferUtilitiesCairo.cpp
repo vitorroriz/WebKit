@@ -42,7 +42,6 @@
 #include <wtf/text/WTFString.h>
 
 #if PLATFORM(GTK)
-#include "GRefPtrGtk.h"
 #include "GdkCairoUtilities.h"
 #include <gtk/gtk.h>
 #include <wtf/glib/GUniquePtr.h>
