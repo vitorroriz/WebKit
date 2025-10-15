@@ -1847,12 +1847,6 @@ bool isDateTimeWithinLimits(int32_t year, uint8_t month, uint8_t day, unsigned h
     return true;
 }
 
-// More effective for our purposes than isInBounds<int32_t>.
-bool isYearWithinLimits(double year)
-{
-    return year >= minYear && year <= maxYear;
-}
-
 // https://tc39.es/proposal-temporal/#sec-temporal-isvalidisodate
 bool isValidISODate(double year, double month, double day)
 {

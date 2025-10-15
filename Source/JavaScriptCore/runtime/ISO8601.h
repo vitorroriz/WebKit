@@ -247,7 +247,11 @@ private:
 };
 static_assert(sizeof(PlainTime) <= sizeof(uint64_t));
 
-bool isYearWithinLimits(double year);
+// More effective for our purposes than isInBounds<int32_t>.
+constexpr bool isYearWithinLimits(double year)
+{
+    return year >= minYear && year <= maxYear;
+}
 
 // Note that PlainDate does not include week unit.
 // year can be negative. And month and day starts with 1.
