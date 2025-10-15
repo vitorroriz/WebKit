@@ -140,6 +140,7 @@ public:
     void transformRelatedPropertyDidChange();
     enum class RecomputationReason : uint8_t { LogicalPropertyChange, Other };
     std::optional<RecomputationReason> recomputeKeyframesIfNecessary(const RenderStyle* previousUnanimatedStyle, const RenderStyle& unanimatedStyle, const Style::ResolutionContext&);
+    void recomputeKeyframesAtNextOpportunity();
     void applyPendingAcceleratedActions();
     void applyPendingAcceleratedActionsOrUpdateTimingProperties();
 
@@ -176,7 +177,6 @@ public:
     bool requiresPseudoElement() const;
     bool hasImplicitKeyframes() const;
 
-    void keyframesRuleDidChange();
     void customPropertyRegistrationDidChange(const AtomString&);
 
     bool canBeAccelerated() const;

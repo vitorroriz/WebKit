@@ -1088,9 +1088,8 @@ ExceptionOr<void> KeyframeEffect::setKeyframes(JSGlobalObject& lexicalGlobalObje
     return processKeyframesResult;
 }
 
-void KeyframeEffect::keyframesRuleDidChange()
+void KeyframeEffect::recomputeKeyframesAtNextOpportunity()
 {
-    ASSERT(is<CSSAnimation>(animation()));
     clearBlendingKeyframes();
     invalidate();
 }

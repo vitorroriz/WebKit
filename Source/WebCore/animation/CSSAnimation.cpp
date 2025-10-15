@@ -395,7 +395,7 @@ void CSSAnimation::keyframesRuleDidChange()
     if (!owningElement)
         return;
 
-    keyframeEffect->keyframesRuleDidChange();
+    keyframeEffect->recomputeKeyframesAtNextOpportunity();
     owningElement->keyframesRuleDidChange();
 }
 
