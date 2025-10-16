@@ -2042,7 +2042,6 @@ GridAxisPosition RenderGrid::columnAxisPositionForGridItem(const RenderBox& grid
         return GridAxisPosition::GridAxisStart;
     case ItemPosition::Center:
     case ItemPosition::AnchorCenter:
-    case ItemPosition::Dialog:
         return GridAxisPosition::GridAxisCenter;
     case ItemPosition::FlexStart: // Only used in flex layout, otherwise equivalent to 'start'.
         // Aligns the alignment subject to be flush with the alignment container's 'start' edge (block-start) in the column axis.
@@ -2101,7 +2100,6 @@ GridAxisPosition RenderGrid::rowAxisPositionForGridItem(const RenderBox& gridIte
         return writingMode().isBidiLTR() ? GridAxisPosition::GridAxisEnd : GridAxisPosition::GridAxisStart;
     case ItemPosition::Center:
     case ItemPosition::AnchorCenter:
-    case ItemPosition::Dialog:
         return GridAxisPosition::GridAxisCenter;
     case ItemPosition::FlexStart: // Only used in flex layout, otherwise equivalent to 'start'.
         // Aligns the alignment subject to be flush with the alignment container's 'start' edge (inline-start) in the row axis.
