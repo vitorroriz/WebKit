@@ -1310,10 +1310,10 @@ media/media-source/media-managedmse-stall-endofstream.html [ Skip ]
 media/media-source/media-managedmse-video-with-poster.html [ Skip ]
 
 # CRABS WebM isn't supported in WK1
-media/media-webm-opus-buffered.html [ Failure ]
-media/media-webm-opus-error.html [ Failure ]
-media/media-webm-opus-variable-length.html [ Failure ]
-media/media-webm-no-duration.html [ Failure ]
+media/media-webm-opus-buffered.html [ Skip ]
+media/media-webm-opus-error.html [ Skip ]
+media/media-webm-opus-variable-length.html [ Skip ]
+media/media-webm-no-duration.html [ Skip ]
 
 media/video-currenttime-monotonic.html [ Failure ]
 
