@@ -1,10 +1,8 @@
-Shared/API/Cocoa/WKBrowsingContextHandle.mm
 Shared/API/Cocoa/WKRemoteObjectCoder.mm
 Shared/API/Cocoa/_WKRemoteObjectInterface.mm
 Shared/API/c/mac/WKURLRequestNS.mm
 Shared/API/c/mac/WKURLResponseNS.mm
 Shared/Cocoa/ArgumentCodersCocoa.mm
-Shared/Cocoa/CompletionHandlerCallChecker.mm
 Shared/Cocoa/CoreIPCContacts.mm
 Shared/Cocoa/CoreIPCPassKit.mm
 Shared/Cocoa/CoreIPCPersonNameComponents.mm
@@ -16,10 +14,6 @@ Shared/EntryPointUtilities/Cocoa/XPCService/XPCServiceMain.mm
 Shared/RemoteLayerTree/RemoteLayerTreePropertyApplier.mm
 UIProcess/API/C/mac/WKNotificationPrivateMac.mm
 UIProcess/API/C/mac/WKProtectionSpaceNS.mm
-UIProcess/API/Cocoa/WKFrameInfo.mm
-UIProcess/API/Cocoa/WKNavigationAction.mm
-UIProcess/API/Cocoa/WKNavigationResponse.mm
-UIProcess/API/Cocoa/WKSecurityOrigin.mm
 UIProcess/API/Cocoa/WKSnapshotConfiguration.mm
 UIProcess/API/Cocoa/WKURLSchemeTask.mm
 UIProcess/API/Cocoa/WKUserScript.mm
@@ -31,13 +25,10 @@ UIProcess/API/Cocoa/_WKAuthenticationExtensionsClientInputs.mm
 UIProcess/API/Cocoa/_WKAuthenticatorAssertionResponse.mm
 UIProcess/API/Cocoa/_WKAuthenticatorAttestationResponse.mm
 UIProcess/API/Cocoa/_WKAuthenticatorResponse.mm
-UIProcess/API/Cocoa/_WKFeature.mm
-UIProcess/API/Cocoa/_WKProcessPoolConfiguration.mm
 [ Mac ] UIProcess/Automation/mac/WebAutomationSessionMac.mm
 [ Mac ] UIProcess/Inspector/Cocoa/InspectorExtensionDelegate.mm
 [ Mac ] UIProcess/Inspector/mac/WKInspectorViewController.mm
 WebProcess/GPU/webrtc/RemoteVideoFrameObjectHeapProxyProcessor.cpp
-WebProcess/InjectedBundle/API/Cocoa/WKWebProcessBundleParameters.mm
 WebProcess/InjectedBundle/API/mac/WKDOMInternals.mm
 WebProcess/InjectedBundle/API/mac/WKWebProcessPlugIn.mm
 WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextController.mm

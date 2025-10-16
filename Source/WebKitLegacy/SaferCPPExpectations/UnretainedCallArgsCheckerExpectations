@@ -7,7 +7,6 @@ mac/DOM/DOMCustomXPathNSResolver.mm
 mac/DOM/DOMEvent.mm
 mac/DOM/DOMHTMLCollection.mm
 mac/DOM/DOMNode.mm
-mac/DOM/DOMObject.mm
 mac/DOM/DOMStyleSheet.mm
 mac/DOM/ObjCEventListener.mm
 mac/DOM/ObjCNodeFilterCondition.mm
@@ -60,7 +59,6 @@ mac/WebView/WebDelegateImplementationCaching.mm
 mac/WebView/WebDeviceOrientation.mm
 mac/WebView/WebDeviceOrientationProviderMock.mm
 mac/WebView/WebDocumentLoaderMac.mm
-[ Mac ] mac/WebView/WebDynamicScrollBarsView.mm
 mac/WebView/WebFeature.m
 mac/WebView/WebFrame.mm
 mac/WebView/WebFrameView.mm
