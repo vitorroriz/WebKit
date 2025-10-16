@@ -1293,6 +1293,8 @@ CSSBoxType transformBoxToCSSBoxType(TransformBox);
 
 constexpr float defaultMiterLimit = 4;
 
+enum class UsesSVGZoomRulesForLength : bool { No, Yes };
+
 WTF::TextStream& operator<<(WTF::TextStream&, AnimationDirection);
 WTF::TextStream& operator<<(WTF::TextStream&, AnimationFillMode);
 WTF::TextStream& operator<<(WTF::TextStream&, AnimationPlayState);

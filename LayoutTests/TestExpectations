@@ -7590,7 +7590,6 @@ imported/w3c/web-platform-tests/css/css-viewport/zoom/list-style-image.html [ Im
 imported/w3c/web-platform-tests/css/css-viewport/zoom/relative-units-from-parent.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/border.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/bottom.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-viewport/zoom/container-queries.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/height.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/inherited-length.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/left.html [ ImageOnlyFailure ]
