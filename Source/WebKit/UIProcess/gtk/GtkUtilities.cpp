@@ -158,7 +158,7 @@ GRefPtr<GdkTexture> cairoSurfaceToGdkTexture(cairo_surface_t* surface)
 #endif
 
 #if USE(SKIA)
-static GRefPtr<GdkPixbuf> skiaImageToGdkPixbuf(SkImage& image)
+GRefPtr<GdkPixbuf> skiaImageToGdkPixbuf(SkImage& image)
 {
 #if USE(GTK4)
     auto texture = skiaImageToGdkTexture(image);

@@ -65,6 +65,7 @@ GRefPtr<GdkTexture> cairoSurfaceToGdkTexture(cairo_surface_t*);
 #endif
 
 #if USE(SKIA)
+GRefPtr<GdkPixbuf> skiaImageToGdkPixbuf(SkImage&);
 #if USE(GTK4)
 GRefPtr<GdkTexture> skiaImageToGdkTexture(SkImage&);
 #else
