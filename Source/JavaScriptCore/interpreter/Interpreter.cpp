@@ -1215,7 +1215,7 @@ JSValue Interpreter::executeProgram(const SourceCode& source, JSGlobalObject*, J
             case JSONPPathEntryTypeCall: {
                 JSValue function = baseObject.get(globalObject, ident);
                 RETURN_IF_EXCEPTION(throwScope, JSValue());
-                auto callData = JSC::getCallData(function);
+                auto callData = JSC::getCallDataInline(function);
                 if (callData.type == CallData::Type::None)
                     return throwException(globalObject, throwScope, createNotAFunctionError(globalObject, function));
                 MarkedArgumentBuffer jsonArg;
@@ -1305,7 +1305,7 @@ JSValue Interpreter::executeBoundCall(VM& vm, JSBoundFunction* function, JSCell*
 
     JSObject* targetFunction = function->targetFunction();
     JSValue boundThis = function->boundThis();
-    auto callData = JSC::getCallData(targetFunction);
+    auto callData = JSC::getCallDataInline(targetFunction);
     ASSERT(callData.type != CallData::Type::None);
 
     RELEASE_AND_RETURN(scope, executeCallImpl(vm, targetFunction, callData, boundThis, context, combinedArgs));
@@ -1400,7 +1400,7 @@ JSValue Interpreter::executeCall(JSObject* function, const CallData& callData, J
         // Let's just replace and get unwrapped functions again.
         JSObject* targetFunction = boundFunction->targetFunction();
         JSValue boundThis = boundFunction->boundThis();
-        auto targetFunctionCallData = JSC::getCallData(targetFunction);
+        auto targetFunctionCallData = JSC::getCallDataInline(targetFunction);
         ASSERT(targetFunctionCallData.type != CallData::Type::None);
         return executeCallImpl(vm, targetFunction, targetFunctionCallData, boundThis, context, args);
     }

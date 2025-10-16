@@ -73,7 +73,7 @@ static void promiseResolveThenableJobFastSlow(JSGlobalObject* globalObject, JSPr
     MarkedArgumentBuffer arguments;
     arguments.append(error);
     ASSERT(!arguments.hasOverflowed());
-    auto callData = JSC::getCallData(reject);
+    auto callData = JSC::getCallDataInline(reject);
     call(globalObject, reject, callData, jsUndefined(), arguments);
     EXCEPTION_ASSERT(scope.exception() || true);
 }
@@ -102,7 +102,7 @@ static void promiseResolveThenableJobWithoutPromiseFastSlow(JSGlobalObject* glob
     MarkedArgumentBuffer arguments;
     arguments.append(error);
     ASSERT(!arguments.hasOverflowed());
-    auto callData = JSC::getCallData(reject);
+    auto callData = JSC::getCallDataInline(reject);
     call(globalObject, reject, callData, jsUndefined(), arguments);
     EXCEPTION_ASSERT(scope.exception() || true);
 }

@@ -84,7 +84,7 @@ inline void* handleHostCall(VM& vm, JSCell* owner, CallFrame* calleeFrame, JSVal
     calleeFrame->setCodeBlock(nullptr);
 
     if (callLinkInfo->specializationKind() == CodeSpecializationKind::CodeForCall) {
-        auto callData = JSC::getCallData(callee);
+        auto callData = JSC::getCallDataInline(callee);
         ASSERT(callData.type != CallData::Type::JS);
 
         if (callData.type == CallData::Type::Native) {

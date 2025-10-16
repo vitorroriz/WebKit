@@ -2492,7 +2492,7 @@ static ALWAYS_INLINE JSValue callToPrimitiveFunction(JSGlobalObject* globalObjec
             return JSValue();
     }
 
-    auto callData = JSC::getCallData(function);
+    auto callData = JSC::getCallDataInline(function);
     if (callData.type == CallData::Type::None) {
         if constexpr (key == CachedSpecialPropertyKey::ToPrimitive)
             throwTypeError(globalObject, scope, "Symbol.toPrimitive is not a function, undefined, or null"_s);
@@ -2608,7 +2608,7 @@ bool JSObject::hasInstance(JSGlobalObject* globalObject, JSValue value, JSValue 
     auto scope = DECLARE_THROW_SCOPE(vm);
 
     if (!hasInstanceValue.isUndefinedOrNull() && hasInstanceValue != globalObject->functionProtoHasInstanceSymbolFunction()) {
-        auto callData = JSC::getCallData(hasInstanceValue);
+        auto callData = JSC::getCallDataInline(hasInstanceValue);
         if (callData.type == CallData::Type::None) {
             throwException(globalObject, scope, createInvalidInstanceofParameterErrorHasInstanceValueNotFunction(globalObject, this));
             return false;
@@ -4146,7 +4146,7 @@ JSValue JSObject::getMethod(JSGlobalObject* globalObject, CallData& callData, co
         return jsUndefined();
     }
 
-    callData = JSC::getCallData(method.asCell());
+    callData = JSC::getCallDataInline(method.asCell());
     if (callData.type == CallData::Type::None) {
         throwVMTypeError(globalObject, scope, errorMessage);
         return jsUndefined();

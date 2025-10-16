@@ -965,7 +965,7 @@ JSValue WebAssemblyModuleRecord::evaluate(JSGlobalObject* globalObject)
     ASSERT(!exception);
 
     if (JSObject* startFunction = m_startFunction.get()) {
-        auto callData = JSC::getCallData(startFunction);
+        auto callData = JSC::getCallDataInline(startFunction);
         call(globalObject, startFunction, callData, jsUndefined(), *vm.emptyList);
         RETURN_IF_EXCEPTION(scope, { });
     }

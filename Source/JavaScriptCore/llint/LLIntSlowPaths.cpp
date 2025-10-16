@@ -2064,7 +2064,7 @@ static UGPRPair handleHostCall(CallFrame* calleeFrame, JSValue callee, CodeSpeci
     calleeFrame->clearReturnPC();
 
     if (kind == CodeSpecializationKind::CodeForCall) {
-        auto callData = JSC::getCallData(callee);
+        auto callData = JSC::getCallDataInline(callee);
         ASSERT(callData.type != CallData::Type::JS);
 
         if (callData.type == CallData::Type::Native) {

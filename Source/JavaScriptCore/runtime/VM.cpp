@@ -1323,7 +1323,7 @@ void VM::callPromiseRejectionCallback(Strong<JSPromise>& promise)
 
     auto scope = DECLARE_CATCH_SCOPE(*this);
 
-    auto callData = JSC::getCallData(callback);
+    auto callData = JSC::getCallDataInline(callback);
     ASSERT(callData.type != CallData::Type::None);
 
     MarkedArgumentBuffer args;
