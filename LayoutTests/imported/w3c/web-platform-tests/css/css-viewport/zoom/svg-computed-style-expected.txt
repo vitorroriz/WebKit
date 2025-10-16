@@ -23,6 +23,10 @@ PASS Property line-height value '13px' no zoom
 PASS Property line-height value 'inherit' no zoom
 PASS Property line-height value '13px' zoom: 2
 PASS Property line-height value 'inherit' zoom: 2
+PASS Property text-decoration-thickness value '4px' no zoom
+PASS Property text-decoration-thickness value 'inherit' no zoom
+PASS Property text-decoration-thickness value '4px' zoom: 2
+PASS Property text-decoration-thickness value 'inherit' zoom: 2
 PASS Property text-shadow value 'rgb(0, 0, 0) 10px 10px 0px' no zoom
 PASS Property text-shadow value 'inherit' no zoom
 PASS Property text-shadow value 'rgb(0, 0, 0) 10px 10px 0px' zoom: 2

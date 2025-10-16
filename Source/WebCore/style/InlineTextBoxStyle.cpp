@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2014-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -195,7 +195,7 @@ static GlyphOverflow computedInkOverflowForDecorations(const RenderStyle& lineSt
     if (decoration.isNone())
         return GlyphOverflow();
 
-    float strokeThickness = lineStyle.textDecorationThickness().resolve(lineStyle.computedFontSize(), lineStyle.metricsOfPrimaryFont());
+    float strokeThickness = lineStyle.textDecorationThickness().resolve(lineStyle);
     WavyStrokeParameters wavyStrokeParameters;
     float wavyOffset = 0;
 
@@ -224,7 +224,7 @@ static GlyphOverflow computedInkOverflowForDecorations(const RenderStyle& lineSt
     }
     if (decoration.hasOverline()) {
         FloatRect rect(FloatPoint(), FloatSize(1, strokeThickness));
-        float autoTextDecorationThickness = Style::TextDecorationThickness { CSS::Keyword::Auto { } }.resolve(lineStyle.computedFontSize(), lineStyle.metricsOfPrimaryFont());
+        float autoTextDecorationThickness = Style::TextDecorationThickness { CSS::Keyword::Auto { } }.resolve(lineStyle);
         rect.move(0, autoTextDecorationThickness - strokeThickness - wavyOffset);
         if (decorationStyle == TextDecorationStyle::Wavy) {
             FloatBoxExtent wavyExpansion;
@@ -237,7 +237,7 @@ static GlyphOverflow computedInkOverflowForDecorations(const RenderStyle& lineSt
     }
     if (decoration.hasLineThrough()) {
         FloatRect rect(FloatPoint(), FloatSize(1, strokeThickness));
-        float autoTextDecorationThickness = Style::TextDecorationThickness { CSS::Keyword::Auto { } }.resolve(lineStyle.computedFontSize(), lineStyle.metricsOfPrimaryFont());
+        float autoTextDecorationThickness = Style::TextDecorationThickness { CSS::Keyword::Auto { } }.resolve(lineStyle);
         auto center = 2 * lineStyle.metricsOfPrimaryFont().ascent() / 3 + autoTextDecorationThickness / 2;
         rect.move(0, center - strokeThickness / 2);
         if (decorationStyle == TextDecorationStyle::Wavy) {
