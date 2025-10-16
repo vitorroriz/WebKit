@@ -356,8 +356,8 @@ void PositionedLayoutConstraints::resolvePosition(RenderBox::LogicalExtentComput
 
     bool hasAutoBeforeInset = m_insetBefore.isAuto();
     bool hasAutoAfterInset = m_insetAfter.isAuto();
-    bool hasAutoBeforeMargin = m_marginBefore.isAuto();
-    bool hasAutoAfterMargin = m_marginAfter.isAuto();
+    bool hasAutoBeforeMargin = m_marginBefore.isAuto() && !m_defaultAnchorBox;
+    bool hasAutoAfterMargin = m_marginAfter.isAuto() && !m_defaultAnchorBox;
 
     auto distributeSpaceToAutoMargins = [&] {
         ASSERT(!hasAutoBeforeInset && !hasAutoAfterInset && (hasAutoBeforeMargin || hasAutoAfterMargin));
