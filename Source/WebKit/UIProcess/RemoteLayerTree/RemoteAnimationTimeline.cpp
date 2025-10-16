@@ -24,7 +24,7 @@
  */
 
 #import "config.h"
-#import "RemoteAnimation.h"
+#import "RemoteAnimationTimeline.h"
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
 
@@ -32,24 +32,30 @@
 
 namespace WebKit {
 
-WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(RemoteAnimation);
+WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(RemoteAnimationTimeline);
 
-Ref<RemoteAnimation> RemoteAnimation::create(const WebCore::AcceleratedEffect& effect, const RemoteAnimationTimeline& timeline)
+static WebCore::WebAnimationTime computeCurrentTime(Seconds originTime, MonotonicTime now)
 {
-    return adoptRef(*new RemoteAnimation(effect, timeline));
+    return now.secondsSinceEpoch() - originTime;
 }
 
-RemoteAnimation::RemoteAnimation(const WebCore::AcceleratedEffect& effect, const RemoteAnimationTimeline& timeline)
-    : m_effect(effect)
-    , m_timeline(timeline)
+Ref<RemoteAnimationTimeline> RemoteAnimationTimeline::create(Seconds originTime, MonotonicTime now)
+{
+    return adoptRef(*new RemoteAnimationTimeline(originTime, computeCurrentTime(originTime, now)));
+}
+
+RemoteAnimationTimeline::RemoteAnimationTimeline(Seconds originTime, WebCore::WebAnimationTime currentTime)
+    : m_originTime(originTime)
+    , m_currentTime(currentTime)
 {
 }
 
-void RemoteAnimation::apply(WebCore::AcceleratedEffectValues& values)
+void RemoteAnimationTimeline::updateCurrentTime(MonotonicTime now)
 {
-    Ref { m_effect }->apply(m_timeline->currentTime(), values);
+    m_currentTime = computeCurrentTime(m_originTime, now);
 }
 
 } // namespace WebKit
 
 #endif // ENABLE(THREADED_ANIMATION_RESOLUTION)
+

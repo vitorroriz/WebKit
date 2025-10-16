@@ -318,6 +318,21 @@ void RemoteScrollingCoordinatorProxyMac::animationsWereRemovedFromNode(RemoteLay
 {
     m_eventDispatcher->animationsWereRemovedFromNode(node);
 }
+
+void RemoteScrollingCoordinatorProxyMac::registerTimelineIfNecessary(WebCore::ProcessIdentifier processIdentifier, Seconds originTime, MonotonicTime now)
+{
+    m_eventDispatcher->registerTimelineIfNecessary(processIdentifier, originTime, now);
+}
+
+void RemoteScrollingCoordinatorProxyMac::updateTimelineCurrentTime(WebCore::ProcessIdentifier processIdentifier, MonotonicTime now)
+{
+    m_eventDispatcher->updateTimelineCurrentTime(processIdentifier, now);
+}
+
+const RemoteAnimationTimeline* RemoteScrollingCoordinatorProxyMac::timeline(WebCore::ProcessIdentifier processIdentifier) const
+{
+    return m_eventDispatcher->timeline(processIdentifier);
+}
 #endif
 
 } // namespace WebKit

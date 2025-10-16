@@ -77,6 +77,9 @@ private:
 
     void animationsWereAddedToNode(RemoteLayerTreeNode&) override;
     void animationsWereRemovedFromNode(RemoteLayerTreeNode&) override;
+    void registerTimelineIfNecessary(WebCore::ProcessIdentifier, Seconds, MonotonicTime) override;
+    void updateTimelineCurrentTime(WebCore::ProcessIdentifier, MonotonicTime) override;
+    const RemoteAnimationTimeline* timeline(WebCore::ProcessIdentifier) const override;
 #else
     void willCommitLayerAndScrollingTrees() override;
     void didCommitLayerAndScrollingTrees() override;

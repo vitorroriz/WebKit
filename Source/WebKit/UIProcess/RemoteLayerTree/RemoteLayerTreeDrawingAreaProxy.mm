@@ -401,7 +401,6 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTreeTransaction(IPC::Connection
     auto commitLayerAndScrollingTrees = [&] {
         if (layerTreeTransaction.hasAnyLayerChanges())
             ++m_countOfTransactionsWithNonEmptyLayerChanges;
-
         if (m_remoteLayerTreeHost->updateLayerTree(connection, layerTreeTransaction)) {
             if (!m_replyForUnhidingContent && !m_activityStateChangeForUnhidingContent) {
                 if (m_hasDetachedRootLayer)
@@ -415,11 +414,6 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTreeTransaction(IPC::Connection
         requestedScroll = scrollingCoordinatorProxy->commitScrollingTreeState(connection, scrollingTreeTransaction, layerTreeTransaction.remoteContextHostedIdentifier());
 #endif
     };
-
-#if ENABLE(THREADED_ANIMATION_RESOLUTION)
-    state.acceleratedTimelineTimeOrigin = layerTreeTransaction.acceleratedTimelineTimeOrigin();
-    state.animationCurrentTime = MonotonicTime::now();
-#endif
 
     scrollingCoordinatorProxy->willCommitLayerAndScrollingTrees();
     commitLayerAndScrollingTrees();
@@ -846,18 +840,18 @@ void RemoteLayerTreeDrawingAreaProxy::animationsWereRemovedFromNode(RemoteLayerT
         page->checkedScrollingCoordinatorProxy()->animationsWereRemovedFromNode(node);
 }
 
-Seconds RemoteLayerTreeDrawingAreaProxy::acceleratedTimelineTimeOrigin(WebCore::ProcessIdentifier processIdentifier) const
+void RemoteLayerTreeDrawingAreaProxy::registerTimelineIfNecessary(WebCore::ProcessIdentifier processIdentifier, Seconds originTime, MonotonicTime now)
 {
-    const auto& state = processStateForIdentifier(processIdentifier);
-    return state.acceleratedTimelineTimeOrigin;
+    if (RefPtr page = this->page())
+        page->checkedScrollingCoordinatorProxy()->registerTimelineIfNecessary(processIdentifier, originTime, now);
 }
 
-MonotonicTime RemoteLayerTreeDrawingAreaProxy::animationCurrentTime(WebCore::ProcessIdentifier processIdentifier) const
+const RemoteAnimationTimeline* RemoteLayerTreeDrawingAreaProxy::timeline(WebCore::ProcessIdentifier processIdentifier) const
 {
-    const auto& state = processStateForIdentifier(processIdentifier);
-    return state.animationCurrentTime;
+    if (RefPtr page = this->page())
+        return page->checkedScrollingCoordinatorProxy()->timeline(processIdentifier);
+    return nullptr;
 }
-
 #endif // ENABLE(THREADED_ANIMATION_RESOLUTION)
 
 } // namespace WebKit

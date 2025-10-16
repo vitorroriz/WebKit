@@ -35,16 +35,15 @@ namespace WebKit {
 
 WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(RemoteAnimationStack);
 
-Ref<RemoteAnimationStack> RemoteAnimationStack::create(RemoteAnimations&& animations, WebCore::AcceleratedEffectValues&& baseValues, WebCore::FloatRect bounds, Seconds acceleratedTimelineTimeOrigin)
+Ref<RemoteAnimationStack> RemoteAnimationStack::create(RemoteAnimations&& animations, WebCore::AcceleratedEffectValues&& baseValues, WebCore::FloatRect bounds)
 {
-    return adoptRef(*new RemoteAnimationStack(WTFMove(animations), WTFMove(baseValues), bounds, acceleratedTimelineTimeOrigin));
+    return adoptRef(*new RemoteAnimationStack(WTFMove(animations), WTFMove(baseValues), bounds));
 }
 
-RemoteAnimationStack::RemoteAnimationStack(RemoteAnimations&& animations, WebCore::AcceleratedEffectValues&& baseValues, WebCore::FloatRect bounds, Seconds acceleratedTimelineTimeOrigin)
+RemoteAnimationStack::RemoteAnimationStack(RemoteAnimations&& animations, WebCore::AcceleratedEffectValues&& baseValues, WebCore::FloatRect bounds)
     : m_animations(WTFMove(animations))
     , m_baseValues(WTFMove(baseValues))
     , m_bounds(bounds)
-    , m_acceleratedTimelineTimeOrigin(acceleratedTimelineTimeOrigin)
 {
     bool affectsFilter = false;
     bool affectsOpacity = false;
@@ -98,14 +97,14 @@ const WebCore::FilterOperations* RemoteAnimationStack::longestFilterList() const
     return longestFilterList && !longestFilterList->isEmpty() ? longestFilterList : nullptr;
 }
 
-void RemoteAnimationStack::initEffectsFromMainThread(PlatformLayer *layer, MonotonicTime now)
+void RemoteAnimationStack::initEffectsFromMainThread(PlatformLayer *layer)
 {
     ASSERT(m_filterPresentationModifiers.isEmpty());
     ASSERT(!m_opacityPresentationModifier);
     ASSERT(!m_transformPresentationModifier);
     ASSERT(!m_presentationModifierGroup);
 
-    auto computedValues = computeValues(now);
+    auto computedValues = computeValues();
 
     auto* canonicalFilters = longestFilterList();
 
@@ -146,11 +145,11 @@ void RemoteAnimationStack::initEffectsFromMainThread(PlatformLayer *layer, Monot
     [m_presentationModifierGroup flushWithTransaction];
 }
 
-void RemoteAnimationStack::applyEffectsFromScrollingThread(MonotonicTime now) const
+void RemoteAnimationStack::applyEffectsFromScrollingThread() const
 {
     ASSERT(m_presentationModifierGroup);
 
-    auto computedValues = computeValues(now);
+    auto computedValues = computeValues();
 
     if (!m_filterPresentationModifiers.isEmpty())
         WebCore::PlatformCAFilters::updatePresentationModifiers(computedValues.filter, m_filterPresentationModifiers);
@@ -170,9 +169,9 @@ void RemoteAnimationStack::applyEffectsFromScrollingThread(MonotonicTime now) co
 }
 #endif
 
-void RemoteAnimationStack::applyEffectsFromMainThread(PlatformLayer *layer, MonotonicTime now, bool backdropRootIsOpaque) const
+void RemoteAnimationStack::applyEffectsFromMainThread(PlatformLayer *layer, bool backdropRootIsOpaque) const
 {
-    auto computedValues = computeValues(now);
+    auto computedValues = computeValues();
 
     if (m_affectedLayerProperties.contains(LayerProperty::Filter))
         WebCore::PlatformCAFilters::setFiltersOnLayer(layer, computedValues.filter, backdropRootIsOpaque);
@@ -186,12 +185,11 @@ void RemoteAnimationStack::applyEffectsFromMainThread(PlatformLayer *layer, Mono
     }
 }
 
-WebCore::AcceleratedEffectValues RemoteAnimationStack::computeValues(MonotonicTime now) const
+WebCore::AcceleratedEffectValues RemoteAnimationStack::computeValues() const
 {
     auto values = m_baseValues;
-    auto currentTime = now.secondsSinceEpoch() - m_acceleratedTimelineTimeOrigin;
     for (auto& animation : m_animations)
-        animation->apply(currentTime, values);
+        animation->apply(values);
     return values;
 }
 

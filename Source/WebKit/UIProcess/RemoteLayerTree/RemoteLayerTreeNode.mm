@@ -315,15 +315,17 @@ void RemoteLayerTreeNode::setAcceleratedEffectsAndBaseValues(const WebCore::Acce
     if (effects.isEmpty())
         return;
 
-    Ref animationStack = RemoteAnimationStack::create(effects.map([](const Ref<AcceleratedEffect>& effect) {
-        return RemoteAnimation::create(Ref { effect }.get());
-    }), baseValues.clone(), layer.get().bounds, host.acceleratedTimelineTimeOrigin(m_layerID.processIdentifier()));
+    Ref animationStack = RemoteAnimationStack::create(effects.map([&](const Ref<AcceleratedEffect>& effect) {
+        RefPtr timeline = host.timeline(m_layerID.processIdentifier());
+        ASSERT(timeline);
+        return RemoteAnimation::create(Ref { effect }.get(), *timeline);
+    }), baseValues.clone(), layer.get().bounds);
     m_animationStack = animationStack.copyRef();
 
 #if PLATFORM(IOS_FAMILY)
-    animationStack->applyEffectsFromMainThread(layer.get(), host.animationCurrentTime(m_layerID.processIdentifier()), backdropRootIsOpaque());
+    animationStack->applyEffectsFromMainThread(layer.get(), backdropRootIsOpaque());
 #else
-    animationStack->initEffectsFromMainThread(layer.get(), host.animationCurrentTime(m_layerID.processIdentifier()));
+    animationStack->initEffectsFromMainThread(layer.get());
 #endif
 
     host.animationsWereAddedToNode(*this);

@@ -27,6 +27,7 @@
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
 
+#include "RemoteAnimationTimeline.h"
 #include <WebCore/AcceleratedEffect.h>
 #include <WebCore/WebAnimationTime.h>
 #include <wtf/RefCounted.h>
@@ -37,17 +38,20 @@ namespace WebKit {
 class RemoteAnimation : public RefCounted<RemoteAnimation> {
     WTF_MAKE_TZONE_OR_ISO_ALLOCATED(RemoteAnimation);
 public:
-    static Ref<RemoteAnimation> create(const WebCore::AcceleratedEffect&);
+    static Ref<RemoteAnimation> create(const WebCore::AcceleratedEffect&, const RemoteAnimationTimeline&);
+
+    const RemoteAnimationTimeline& timeline() const { return m_timeline.get(); }
 
     const OptionSet<WebCore::AcceleratedEffectProperty>& animatedProperties() const { return m_effect->animatedProperties(); }
     const Vector<WebCore::AcceleratedEffect::Keyframe>& keyframes() const { return m_effect->keyframes(); }
 
-    void apply(WebCore::WebAnimationTime, WebCore::AcceleratedEffectValues&);
+    void apply(WebCore::AcceleratedEffectValues&);
 
 private:
-    RemoteAnimation(const WebCore::AcceleratedEffect&);
+    RemoteAnimation(const WebCore::AcceleratedEffect&, const RemoteAnimationTimeline&);
 
     Ref<const WebCore::AcceleratedEffect> m_effect;
+    Ref<const RemoteAnimationTimeline> m_timeline;
 };
 
 } // namespace WebKit

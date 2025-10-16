@@ -457,12 +457,35 @@ void RemoteScrollingCoordinatorProxyIOS::animationsWereRemovedFromNode(RemoteLay
         drawingAreaIOS().pauseDisplayRefreshCallbacksForAnimation();
 }
 
+void RemoteScrollingCoordinatorProxyIOS::registerTimelineIfNecessary(WebCore::ProcessIdentifier processIdentifier, Seconds originTime, MonotonicTime now)
+{
+    if (m_timelines.find(processIdentifier) == m_timelines.end())
+        m_timelines.set(processIdentifier, RemoteAnimationTimeline::create(originTime, now));
+}
+
+void RemoteScrollingCoordinatorProxyIOS::updateTimelineCurrentTime(WebCore::ProcessIdentifier processIdentifier, MonotonicTime now)
+{
+    auto it = m_timelines.find(processIdentifier);
+    if (it != m_timelines.end())
+        Ref { it->value }->updateCurrentTime(now);
+}
+
+const RemoteAnimationTimeline* RemoteScrollingCoordinatorProxyIOS::timeline(WebCore::ProcessIdentifier processIdentifier) const
+{
+    auto it = m_timelines.find(processIdentifier);
+    if (it != m_timelines.end())
+        return it->value.ptr();
+    return nullptr;
+}
+
 void RemoteScrollingCoordinatorProxyIOS::updateAnimations()
 {
     // FIXME: Rather than using 'now' at the point this is called, we
     // should probably be using the timestamp of the (next?) display
     // link update or vblank refresh.
     auto now = MonotonicTime::now();
+    for (auto& timeline : m_timelines.values())
+        timeline->updateCurrentTime(now);
 
     auto& layerTreeHost = drawingAreaIOS().remoteLayerTreeHost();
 
@@ -470,7 +493,7 @@ void RemoteScrollingCoordinatorProxyIOS::updateAnimations()
     for (auto animatedNodeLayerID : animatedNodeLayerIDs) {
         auto* animatedNode = layerTreeHost.nodeForID(animatedNodeLayerID);
         auto* animationStack = animatedNode->animationStack();
-        animationStack->applyEffectsFromMainThread(animatedNode->layer(), now, animatedNode->backdropRootIsOpaque());
+        animationStack->applyEffectsFromMainThread(animatedNode->layer(), animatedNode->backdropRootIsOpaque());
 
         // We can clear the effect stack if it's empty, but the previous
         // call to applyEffects() is important so that the base values

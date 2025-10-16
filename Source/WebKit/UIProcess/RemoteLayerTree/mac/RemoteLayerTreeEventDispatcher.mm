@@ -643,6 +643,30 @@ void RemoteLayerTreeEventDispatcher::animationsWereRemovedFromNode(RemoteLayerTr
         animationStack->clear(node.protectedLayer().get());
 }
 
+void RemoteLayerTreeEventDispatcher::registerTimelineIfNecessary(WebCore::ProcessIdentifier processIdentifier, Seconds originTime, MonotonicTime now)
+{
+    assertIsHeld(m_animationStacksLock);
+    if (m_timelines.find(processIdentifier) == m_timelines.end())
+        m_timelines.set(processIdentifier, RemoteAnimationTimeline::create(originTime, now));
+}
+
+void RemoteLayerTreeEventDispatcher::updateTimelineCurrentTime(WebCore::ProcessIdentifier processIdentifier, MonotonicTime now)
+{
+    assertIsHeld(m_animationStacksLock);
+    auto it = m_timelines.find(processIdentifier);
+    if (it != m_timelines.end())
+        Ref { it->value }->updateCurrentTime(now);
+}
+
+const RemoteAnimationTimeline* RemoteLayerTreeEventDispatcher::timeline(WebCore::ProcessIdentifier processIdentifier) const
+{
+    assertIsHeld(m_animationStacksLock);
+    auto it = m_timelines.find(processIdentifier);
+    if (it != m_timelines.end())
+        return it->value.ptr();
+    return nullptr;
+}
+
 void RemoteLayerTreeEventDispatcher::updateAnimations()
 {
     ASSERT(!isMainRunLoop());
@@ -652,11 +676,13 @@ void RemoteLayerTreeEventDispatcher::updateAnimations()
     // should probably be using the timestamp of the (next?) display
     // link update or vblank refresh.
     auto now = MonotonicTime::now();
+    for (auto& timeline : m_timelines.values())
+        timeline->updateCurrentTime(now);
 
     auto animationStacks = std::exchange(m_animationStacks, { });
     for (auto [layerID, currentAnimationStack] : animationStacks) {
         Ref animationStack = currentAnimationStack;
-        animationStack->applyEffectsFromScrollingThread(now);
+        animationStack->applyEffectsFromScrollingThread();
 
         // We can clear the effect stack if it's empty, but the previous
         // call to applyEffects() is important so that the base values

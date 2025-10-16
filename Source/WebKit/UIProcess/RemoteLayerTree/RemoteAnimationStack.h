@@ -45,23 +45,23 @@ using RemoteAnimations = Vector<Ref<RemoteAnimation>>;
 class RemoteAnimationStack final : public RefCounted<RemoteAnimationStack> {
     WTF_MAKE_TZONE_OR_ISO_ALLOCATED(RemoteAnimationStack);
 public:
-    static Ref<RemoteAnimationStack> create(RemoteAnimations&&, WebCore::AcceleratedEffectValues&&, WebCore::FloatRect, Seconds);
+    static Ref<RemoteAnimationStack> create(RemoteAnimations&&, WebCore::AcceleratedEffectValues&&, WebCore::FloatRect);
 
     bool isEmpty() const { return m_animations.isEmpty(); }
 
 #if PLATFORM(MAC)
-    void initEffectsFromMainThread(PlatformLayer*, MonotonicTime now);
-    void applyEffectsFromScrollingThread(MonotonicTime now) const;
+    void initEffectsFromMainThread(PlatformLayer*);
+    void applyEffectsFromScrollingThread() const;
 #endif
 
-    void applyEffectsFromMainThread(PlatformLayer*, MonotonicTime now, bool backdropRootIsOpaque) const;
+    void applyEffectsFromMainThread(PlatformLayer*, bool backdropRootIsOpaque) const;
 
     void clear(PlatformLayer*);
 
 private:
-    explicit RemoteAnimationStack(RemoteAnimations&&, WebCore::AcceleratedEffectValues&&, WebCore::FloatRect, Seconds);
+    explicit RemoteAnimationStack(RemoteAnimations&&, WebCore::AcceleratedEffectValues&&, WebCore::FloatRect);
 
-    WebCore::AcceleratedEffectValues computeValues(MonotonicTime now) const;
+    WebCore::AcceleratedEffectValues computeValues() const;
 
 #if PLATFORM(MAC)
     const WebCore::FilterOperations* longestFilterList() const;
@@ -78,7 +78,6 @@ private:
     RemoteAnimations m_animations;
     WebCore::AcceleratedEffectValues m_baseValues;
     WebCore::FloatRect m_bounds;
-    Seconds m_acceleratedTimelineTimeOrigin;
 
 #if PLATFORM(MAC)
     RetainPtr<CAPresentationModifierGroup> m_presentationModifierGroup;

@@ -23,32 +23,30 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "config.h"
-#import "RemoteAnimation.h"
+#pragma once
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
 
-#import <wtf/TZoneMallocInlines.h>
+#include <WebCore/WebAnimationTime.h>
+#include <wtf/Ref.h>
+#include <wtf/TZoneMalloc.h>
 
 namespace WebKit {
 
-WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(RemoteAnimation);
+class RemoteAnimationTimeline final : public RefCounted<RemoteAnimationTimeline> {
+    WTF_MAKE_TZONE_OR_ISO_ALLOCATED(RemoteAnimationTimeline);
+public:
+    static Ref<RemoteAnimationTimeline> create(Seconds, MonotonicTime);
 
-Ref<RemoteAnimation> RemoteAnimation::create(const WebCore::AcceleratedEffect& effect, const RemoteAnimationTimeline& timeline)
-{
-    return adoptRef(*new RemoteAnimation(effect, timeline));
-}
+    void updateCurrentTime(MonotonicTime);
+    const WebCore::WebAnimationTime& currentTime() const { return m_currentTime; }
 
-RemoteAnimation::RemoteAnimation(const WebCore::AcceleratedEffect& effect, const RemoteAnimationTimeline& timeline)
-    : m_effect(effect)
-    , m_timeline(timeline)
-{
-}
+private:
+    RemoteAnimationTimeline(Seconds, WebCore::WebAnimationTime);
 
-void RemoteAnimation::apply(WebCore::AcceleratedEffectValues& values)
-{
-    Ref { m_effect }->apply(m_timeline->currentTime(), values);
-}
+    Seconds m_originTime;
+    WebCore::WebAnimationTime m_currentTime;
+};
 
 } // namespace WebKit
 
