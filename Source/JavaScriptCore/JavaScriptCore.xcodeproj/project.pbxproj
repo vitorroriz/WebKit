@@ -432,7 +432,6 @@
 		0F9332A514CA7DDD0085F3C6 /* StructureSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F93329B14CA7DC10085F3C6 /* StructureSet.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		0F93B4AA18B92C4D00178A3F /* PutByVariant.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F93B4A818B92C4D00178A3F /* PutByVariant.h */; };
 		0F952AA11DF7860900E06FBD /* VisitRaceKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F952AA01DF7860700E06FBD /* VisitRaceKey.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		0F952ABD1B487A7700C367C5 /* TrackedReferences.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F952ABB1B487A7700C367C5 /* TrackedReferences.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		0F96303A1D4192C8005609D9 /* CellAttributes.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F9630361D4192C3005609D9 /* CellAttributes.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		0F96303C1D4192CD005609D9 /* DestructionMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F9630381D4192C3005609D9 /* DestructionMode.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		0F963B3813FC6FE90002D9B2 /* ValueProfile.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F963B3613FC6FDE0002D9B2 /* ValueProfile.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -12189,7 +12188,6 @@
 				141448CD13A1783700F5BA1A /* TinyBloomFilter.h in Headers */,
 				0F55989817C86C5800A1E543 /* ToNativeFromValue.h in Headers */,
 				0F2D4DE919832DAC007D4B19 /* ToThisStatus.h in Headers */,
-				0F952ABD1B487A7700C367C5 /* TrackedReferences.h in Headers */,
 				CD1F9B3C270C0C1A00617EB6 /* TypedArrayAdaptersForwardDeclarations.h in Headers */,
 				0F2B670617B6B5AB00A7AE3F /* TypedArrayAdaptors.h in Headers */,
 				0F2B670817B6B5AB00A7AE3F /* TypedArrayController.h in Headers */,
