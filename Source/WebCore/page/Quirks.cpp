@@ -2002,7 +2002,7 @@ std::optional<Quirks::TikTokOverflowingContentQuirkType> Quirks::needsTikTokOver
     if (parentStyle.position() != PositionType::Fixed)
         return { };
 
-    if (!element.elementData())
+    if (!element.elementData() || !element.hasClass())
         return { };
 
     static LazyNeverDestroyed<AtomString> contentContainerSubstring;
@@ -2025,7 +2025,7 @@ std::optional<Quirks::TikTokOverflowingContentQuirkType> Quirks::needsTikTokOver
 
     auto parentElementClassNamesContainsBrowserModeContainerSubstring = [&] {
         RefPtr parentElement = element.parentElement();
-        if (!parentElement || !parentElement->elementData())
+        if (!parentElement || !parentElement->elementData() || !parentElement->hasClass())
             return false;
 
         for (auto& className : parentElement->classNames()) {
