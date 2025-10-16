@@ -209,7 +209,7 @@ const MathMLElement::Length& MathMLPresentationElement::cachedMathMLLength(const
     return length.value();
 }
 
-MathMLElement::MathVariant MathMLPresentationElement::parseMathVariantAttribute(const AtomString& attributeValue)
+MathVariant MathMLPresentationElement::parseMathVariantAttribute(const AtomString& attributeValue)
 {
     // The mathvariant attribute values is case-sensitive.
     static constexpr std::pair<ComparableASCIILiteral, MathVariant> mappings[] = {
@@ -236,7 +236,7 @@ MathMLElement::MathVariant MathMLPresentationElement::parseMathVariantAttribute(
     return map.get(attributeValue, MathVariant::None);
 }
 
-std::optional<MathMLElement::MathVariant> MathMLPresentationElement::specifiedMathVariant()
+std::optional<MathVariant> MathMLPresentationElement::specifiedMathVariant()
 {
     if (!acceptsMathVariantAttribute())
         return std::nullopt;

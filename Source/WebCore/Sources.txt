@@ -2946,6 +2946,7 @@ rendering/mathml/RenderMathMLScripts.cpp
 rendering/mathml/RenderMathMLSpace.cpp
 rendering/mathml/RenderMathMLToken.cpp
 rendering/mathml/RenderMathMLUnderOver.cpp
+rendering/mathml/MathVariant.cpp
 rendering/shapes/BoxLayoutShape.cpp
 rendering/shapes/LayoutShape.cpp
 rendering/shapes/PolygonLayoutShape.cpp
