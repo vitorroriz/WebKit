@@ -321,11 +321,9 @@ class ServicesFactory(Factory):
     def __init__(self, platform, configuration=None, architectures=None, additionalArguments=None, **kwargs):
         Factory.__init__(self, platform=platform, configuration=configuration, architectures=architectures, buildOnly=False, additionalArguments=additionalArguments, checkRelevance=True)
         self.addStep(ValidateChange(verifyBugClosed=False, addURLs=False))
-        # TODO: update unit-tests for Buildbot 4, see https://bugs.webkit.org/show_bug.cgi?id=299036
-        # self.addStep(RunBuildWebKitOrgUnitTests())
+        self.addStep(RunBuildWebKitOrgUnitTests())
         self.addStep(RunBuildbotCheckConfigForBuildWebKit())
-        # TODO: update EWS unit-tests for Buildbot 4, see https://bugs.webkit.org/show_bug.cgi?id=300401
-        # self.addStep(RunEWSUnitTests())
+        self.addStep(RunEWSUnitTests())
         self.addStep(RunBuildbotCheckConfigForEWS())
         self.addStep(RunResultsdbpyTests())
 

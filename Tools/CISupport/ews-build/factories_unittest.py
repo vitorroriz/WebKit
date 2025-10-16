@@ -787,7 +787,9 @@ class TestExpectedBuildSteps(unittest.TestCase):
             'apply-patch',
             'checkout-pull-request',
             'validate-change',
+            'build-webkit-org-unit-tests',
             'buildbot-check-config-for-build-webkit',
+            'ews-unit-tests',
             'buildbot-check-config-for-ews',
             'resultsdbpy-unit-tests'
         ],
