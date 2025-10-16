@@ -20,7 +20,6 @@ WebProcess/Network/WebLoaderStrategy.cpp
 WebProcess/Network/WebResourceLoader.cpp
 WebProcess/WebPage/Cocoa/TextAnimationController.mm
 WebProcess/WebPage/Cocoa/WebPageCocoa.mm
-WebProcess/WebPage/RemoteLayerTree/PlatformCALayerRemote.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeContext.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeDrawingArea.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteScrollingCoordinator.mm
@@ -32,7 +31,6 @@ WebProcess/cocoa/VideoPresentationManager.mm
 WebProcess/cocoa/WebProcessCocoa.mm
 [ Mac ] Platform/cocoa/_WKWebViewTextInputNotifications.mm
 [ Mac ] WebProcess/WebCoreSupport/mac/WebPopupMenuMac.mm
-[ Mac ] WebProcess/WebPage/MomentumEventDispatcher.cpp
 [ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
 [ Mac ] WebProcess/WebPage/mac/WebPageMac.mm
 [ iOS ] UIProcess/API/ios/WKWebViewIOS.mm

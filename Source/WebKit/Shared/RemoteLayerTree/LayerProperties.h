@@ -133,6 +133,7 @@ struct RemoteLayerBackingStoreOrProperties {
 
     // Used in the WebContent process.
     std::unique_ptr<RemoteLayerBackingStore> store;
+    CheckedPtr<RemoteLayerBackingStore> checkedStore() { return store.get(); }
     // Used in the UI process.
     std::unique_ptr<RemoteLayerBackingStoreProperties> properties;
 };
