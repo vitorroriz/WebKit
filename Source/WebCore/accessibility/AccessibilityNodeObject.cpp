@@ -738,17 +738,13 @@ void AccessibilityNodeObject::updateChildrenIfNecessary()
 void AccessibilityNodeObject::clearChildren()
 {
     AccessibilityObject::clearChildren();
+
     m_childrenDirty = false;
+    m_containsOnlyStaticText = false;
+    m_containsOnlyStaticTextDirty = false;
 
-    if (isNativeLabel()) {
-        m_containsOnlyStaticText = false;
-        m_containsOnlyStaticTextDirty = false;
-    }
-
-    CheckedPtr rareData = isTable() ? this->rareData() : nullptr;
-    if (!rareData)
-        return;
-    rareData->resetChildrenDependentTableFields();
+    if (CheckedPtr rareData = this->rareData())
+        rareData->resetChildrenDependentTableFields();
 }
 
 void AccessibilityNodeObject::updateOwnedChildrenIfNecessary()
