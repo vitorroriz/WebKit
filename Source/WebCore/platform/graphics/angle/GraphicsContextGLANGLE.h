@@ -104,7 +104,6 @@ public:
     void generateMipmap(GCGLenum target) final;
     std::optional<GraphicsContextGLActiveInfo> getActiveAttrib(PlatformGLObject program, GCGLuint index) final;
     std::optional<GraphicsContextGLActiveInfo> getActiveUniform(PlatformGLObject program, GCGLuint index) final;
-    void getAttachedShaders(PlatformGLObject program, GCGLsizei maxCount, GCGLsizei* count, PlatformGLObject* shaders);
     GCGLint getAttribLocation(PlatformGLObject, const CString& name) final;
     void getBooleanv(GCGLenum pname, std::span<GCGLboolean> value) final;
     GCGLint getBufferParameteri(GCGLenum target, GCGLenum pname) final;

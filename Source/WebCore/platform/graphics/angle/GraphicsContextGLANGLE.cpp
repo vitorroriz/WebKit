@@ -1350,18 +1350,6 @@ std::optional<GraphicsContextGLActiveInfo> GraphicsContextGLANGLE::getActiveUnif
     return GraphicsContextGLActiveInfo { buffer.subspan(0, length), type, size };
 }
 
-void GraphicsContextGLANGLE::getAttachedShaders(PlatformGLObject program, GCGLsizei maxCount, GCGLsizei* count, PlatformGLObject* shaders)
-{
-    if (!program) {
-        addError(GCGLErrorCode::InvalidValue);
-        return;
-    }
-    if (!makeContextCurrent())
-        return;
-
-    GL_GetAttachedShaders(program, maxCount, count, shaders);
-}
-
 int GraphicsContextGLANGLE::getAttribLocation(PlatformGLObject program, const CString& name)
 {
     if (!program)

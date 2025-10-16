@@ -943,7 +943,7 @@ void WebGLRenderingContextBase::attachShader(WebGLProgram& program, WebGLShader&
     Locker locker { objectGraphLock() };
     if (!validateWebGLObject("attachShader"_s, program) || !validateWebGLObject("attachShader"_s, shader))
         return;
-    if (!program.attachShader(locker, &shader)) {
+    if (!program.attachShader(locker, shader)) {
         synthesizeGLError(GraphicsContextGL::INVALID_OPERATION, "attachShader"_s, "shader attachment already has shader"_s);
         return;
     }
@@ -1529,7 +1529,7 @@ void WebGLRenderingContextBase::detachShader(WebGLProgram& program, WebGLShader&
     Locker locker { objectGraphLock() };
     if (!validateWebGLObject("detachShader"_s, program) || !validateWebGLObject("detachShader"_s, shader))
         return;
-    if (!program.detachShader(locker, &shader)) {
+    if (!program.detachShader(locker, shader)) {
         synthesizeGLError(GraphicsContextGL::INVALID_OPERATION, "detachShader"_s, "shader not attached"_s);
         return;
     }
@@ -1760,18 +1760,12 @@ std::optional<Vector<Ref<WebGLShader>>> WebGLRenderingContextBase::getAttachedSh
         return std::nullopt;
     if (!validateWebGLObject("getAttachedShaders"_s, program))
         return std::nullopt;
-
-    const GCGLenum shaderTypes[] = {
-        GraphicsContextGL::VERTEX_SHADER,
-        GraphicsContextGL::FRAGMENT_SHADER
-    };
-
-    Vector<Ref<WebGLShader>> shaderObjects;
-    for (auto shaderType : shaderTypes) {
-        if (RefPtr shader = program.getAttachedShader(shaderType))
-            shaderObjects.append(shader.releaseNonNull());
-    }
-    return shaderObjects;
+    Vector<Ref<WebGLShader>> result;
+    if (RefPtr vertexShader = program.vertexShader())
+        result.append(vertexShader.releaseNonNull());
+    if (RefPtr fragmentShader = program.fragmentShader())
+        result.append(fragmentShader.releaseNonNull());
+    return result;
 }
 
 GCGLint WebGLRenderingContextBase::getAttribLocation(WebGLProgram& program, const String& name)
