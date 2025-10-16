@@ -25,10 +25,6 @@ UIProcess/API/Cocoa/_WKAuthenticationExtensionsClientInputs.mm
 UIProcess/API/Cocoa/_WKAuthenticatorAssertionResponse.mm
 UIProcess/API/Cocoa/_WKAuthenticatorAttestationResponse.mm
 UIProcess/API/Cocoa/_WKAuthenticatorResponse.mm
-[ Mac ] UIProcess/Automation/mac/WebAutomationSessionMac.mm
-[ Mac ] UIProcess/Inspector/Cocoa/InspectorExtensionDelegate.mm
-[ Mac ] UIProcess/Inspector/mac/WKInspectorViewController.mm
-WebProcess/GPU/webrtc/RemoteVideoFrameObjectHeapProxyProcessor.cpp
 WebProcess/InjectedBundle/API/mac/WKDOMInternals.mm
 WebProcess/InjectedBundle/API/mac/WKWebProcessPlugIn.mm
 WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextController.mm

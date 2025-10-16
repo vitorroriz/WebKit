@@ -139,23 +139,23 @@ RTCSocketFactory::RTCSocketFactory(WebPageProxyIdentifier pageIdentifier, String
 
 webrtc::AsyncPacketSocket* RTCSocketFactory::CreateUdpSocket(const webrtc::SocketAddress& address, uint16_t minPort, uint16_t maxPort)
 {
-    return WebProcess::singleton().libWebRTCNetwork().socketFactory().createUdpSocket(m_contextIdentifier, address, minPort, maxPort, m_pageIdentifier, m_flags, m_domain);
+    return WebProcess::singleton().libWebRTCNetwork().checkedSocketFactory()->createUdpSocket(m_contextIdentifier, address, minPort, maxPort, m_pageIdentifier, m_flags, m_domain);
 }
 
 webrtc::AsyncPacketSocket* RTCSocketFactory::CreateClientTcpSocket(const webrtc::SocketAddress& localAddress, const webrtc::SocketAddress& remoteAddress, const webrtc::PacketSocketTcpOptions& options)
 {
-    return WebProcess::singleton().libWebRTCNetwork().socketFactory().createClientTcpSocket(m_contextIdentifier, localAddress, remoteAddress, String { m_userAgent }, options, m_pageIdentifier, m_flags, m_domain);
+    return WebProcess::singleton().libWebRTCNetwork().checkedSocketFactory()->createClientTcpSocket(m_contextIdentifier, localAddress, remoteAddress, String { m_userAgent }, options, m_pageIdentifier, m_flags, m_domain);
 }
 
 std::unique_ptr<webrtc::AsyncDnsResolverInterface> RTCSocketFactory::CreateAsyncDnsResolver()
 {
-    return WebProcess::singleton().libWebRTCNetwork().socketFactory().createAsyncDnsResolver();
+    return WebProcess::singleton().libWebRTCNetwork().checkedSocketFactory()->createAsyncDnsResolver();
 }
 
 void RTCSocketFactory::suspend()
 {
     WebCore::LibWebRTCProvider::callOnWebRTCNetworkThread([identifier = m_contextIdentifier] {
-        WebProcess::singleton().libWebRTCNetwork().socketFactory().forSocketInGroup(identifier, [](auto& socket) {
+        WebProcess::singleton().libWebRTCNetwork().checkedSocketFactory()->forSocketInGroup(identifier, [](auto& socket) {
             socket.suspend();
         });
     });
@@ -164,7 +164,7 @@ void RTCSocketFactory::suspend()
 void RTCSocketFactory::resume()
 {
     WebCore::LibWebRTCProvider::callOnWebRTCNetworkThread([identifier = m_contextIdentifier] {
-        WebProcess::singleton().libWebRTCNetwork().socketFactory().forSocketInGroup(identifier, [](auto& socket) {
+        WebProcess::singleton().libWebRTCNetwork().checkedSocketFactory()->forSocketInGroup(identifier, [](auto& socket) {
             socket.resume();
         });
     });
