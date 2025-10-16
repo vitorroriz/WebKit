@@ -1,7 +1,7 @@
 /*
  * (C) 1999 Lars Knoll (knoll@kde.org)
  * (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004-2017 Apple Inc. All rights reserved.
+ * Copyright (C) 2004-2025 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -232,11 +232,12 @@ void TextDecorationPainter::paintBackgroundDecorations(const RenderStyle& style,
     bool clipping = m_shadow.size() > 1 && !areLinesOpaque;
     if (clipping) {
         auto clipRect = FloatRect { boxOrigin, FloatSize { decorationGeometry.textBoxWidth, decorationGeometry.clippingOffset } };
+        const auto& zoomFactor = style.usedZoomForLength();
         for (const auto& shadow : m_shadow) {
-            auto shadowExtent = Style::paintingExtent(shadow);
+            auto shadowExtent = Style::paintingExtent(shadow, zoomFactor);
             auto shadowRect = clipRect;
             shadowRect.inflate(shadowExtent);
-            auto shadowOffset = TextBoxPainter::rotateShadowOffset(shadow.location, m_writingMode);
+            auto shadowOffset = TextBoxPainter::rotateShadowOffset(shadow.location, m_writingMode, zoomFactor);
             shadowRect.move(shadowOffset);
             clipRect.unite(shadowRect);
             extraOffset = std::max(extraOffset, std::max(0.f, shadowOffset.height()) + shadowExtent);
@@ -269,6 +270,7 @@ void TextDecorationPainter::paintBackgroundDecorations(const RenderStyle& style,
     if (m_shadow.isNone())
         draw(nullptr);
     else {
+        const auto& zoomFactor = style.usedZoomForLength();
         for (const auto& shadow : m_shadow) {
             if (&shadow == &m_shadow.last()) {
                 // The last set of lines paints normally inside the clip.
@@ -279,9 +281,9 @@ void TextDecorationPainter::paintBackgroundDecorations(const RenderStyle& style,
 
             m_shadowColorFilter.transformColor(shadowColor);
 
-            auto shadowOffset = TextBoxPainter::rotateShadowOffset(shadow.location, m_writingMode);
+            auto shadowOffset = TextBoxPainter::rotateShadowOffset(shadow.location, m_writingMode, zoomFactor);
             shadowOffset.expand(0, -extraOffset);
-            m_context.setDropShadow({ shadowOffset, shadow.blur.resolveZoom(Style::ZoomNeeded { }), shadowColor, ShadowRadiusMode::Default });
+            m_context.setDropShadow({ shadowOffset, shadow.blur.resolveZoom(zoomFactor), shadowColor, ShadowRadiusMode::Default });
 
             draw(&shadow);
         }

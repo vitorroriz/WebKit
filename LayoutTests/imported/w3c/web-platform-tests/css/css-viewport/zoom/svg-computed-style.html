@@ -24,6 +24,22 @@
       "otherValues": ["5px 10px", "2px 4px 6px 8px"],
       "requiredProperties": { "border-style": "solid" }
     },
+    "box-shadow": {
+      "value": "rgb(0, 0, 0) 5px 5px 5px 0px",
+      "otherValues": ["rgb(0, 0, 0) 10px 10px 10px 0px"]
+    },
+    "filter": {
+      "value": "drop-shadow(rgb(0, 0, 0) 5px 5px 5px)",
+      "otherValues": ["drop-shadow(rgb(0, 0, 0) 10px 10px 10px)"]
+    },
+    "line-height" : {
+      "value": "7px",
+      "otherValues": ["13px"]
+    },
+    "text-shadow": {
+      "value": "rgb(0, 0, 0) 5px 5px 0px",
+      "otherValues": ["rgb(0, 0, 0) 10px 10px 0px"]
+    },
     "text-underline-offset": {
       "value": "2px",
       "otherValues": ["4px"]
@@ -32,10 +48,6 @@
       "value": "2px",
       "otherValues": ["4px"]
     },
-    "line-height" : {
-      "value": "7px",
-      "otherValues": ["13px"]
-    }
   };
 
   for (const [property, {value, otherValues, requiredProperties}] of Object.entries(properties)) {

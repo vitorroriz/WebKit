@@ -1497,10 +1497,10 @@ bool RenderElement::repaintAfterLayoutIfNeeded(SingleThreadWeakPtr<const RenderL
     const RenderStyle& outlineStyle = outlineStyleForRepaint();
     auto& style = this->style();
     auto outlineWidth = LayoutUnit { outlineStyle.outlineSize() };
-    auto insetShadowExtent = Style::shadowInsetExtent(style.boxShadow());
+    auto insetShadowExtent = Style::shadowInsetExtent(style.boxShadow(), style.usedZoomForLength());
     auto sizeDelta = LayoutSize { absoluteValue(newOutlineBoundsRect.width() - oldOutlineBoundsRect.width()), absoluteValue(newOutlineBoundsRect.height() - oldOutlineBoundsRect.height()) };
     if (sizeDelta.width()) {
-        auto [shadowLeft, shadowRight] = Style::shadowHorizontalExtent(style.boxShadow());
+        auto [shadowLeft, shadowRight] = Style::shadowHorizontalExtent(style.boxShadow(), style.usedZoomForLength());
 
         auto insetExtent = [&] {
             // Inset "content" is inside the border box (e.g. border, negative outline and box shadow).
@@ -1544,7 +1544,7 @@ bool RenderElement::repaintAfterLayoutIfNeeded(SingleThreadWeakPtr<const RenderL
         }
     }
     if (sizeDelta.height()) {
-        auto [shadowTop, shadowBottom] = Style::shadowVerticalExtent(style.boxShadow());
+        auto [shadowTop, shadowBottom] = Style::shadowVerticalExtent(style.boxShadow(), style.usedZoomForLength());
 
         auto insetExtent = [&] {
             // Inset "content" is inside the border box (e.g. border, negative outline and box shadow).

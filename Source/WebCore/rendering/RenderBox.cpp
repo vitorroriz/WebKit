@@ -4514,7 +4514,7 @@ LayoutRect RenderBox::applyVisualEffectOverflow(const LayoutRect& borderBox) con
     
     // Compute box-shadow overflow first.
     if (style().hasBoxShadow()) {
-        auto shadowOutsets = Style::shadowOutsetExtent(style().boxShadow());
+        auto shadowOutsets = Style::shadowOutsetExtent(style().boxShadow(), style().usedZoomForLength());
         // Box-shadow extent's left and top are negative when extends to left and top, respectively, so negate to convert to outsets.
         shadowOutsets.left() = -shadowOutsets.left();
         shadowOutsets.top() = -shadowOutsets.top();

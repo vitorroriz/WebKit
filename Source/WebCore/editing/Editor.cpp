@@ -4604,10 +4604,11 @@ FontAttributes Editor::fontAttributesAtSelectionStart()
             return FontShadow { };
         },
         [&](const auto& shadows) {
+            const auto& zoomFactor = style->usedZoomForLength();
             return FontShadow {
                 style->colorWithColorFilter(shadows[0].color),
-                { shadows[0].location.x().resolveZoom(Style::ZoomNeeded { }), shadows[0].location.y().resolveZoom(Style::ZoomNeeded { }) },
-                shadows[0].blur.resolveZoom(Style::ZoomNeeded { })
+                { shadows[0].location.x().resolveZoom(zoomFactor), shadows[0].location.y().resolveZoom(zoomFactor) },
+                shadows[0].blur.resolveZoom(zoomFactor)
             };
         }
     );
