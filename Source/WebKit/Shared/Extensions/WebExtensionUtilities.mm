@@ -316,11 +316,6 @@ bool validateObject(NSObject *object, NSString *sourceKey, id expectedValueType,
     return !errorString;
 }
 
-JSObjectRef toJSError(JSContextRef context, NSString *callingAPIName, NSString *sourceKey, NSString *underlyingErrorString)
-{
-    return toJSError(context, toErrorString(callingAPIName, sourceKey, underlyingErrorString).createNSString().get());
-}
-
 JSObjectRef toJSRejectedPromise(JSContextRef context, NSString *callingAPIName, NSString *sourceKey, NSString *underlyingErrorString)
 {
     auto *error = toJSValue(context, toJSError(context, callingAPIName, sourceKey, underlyingErrorString));

@@ -68,44 +68,48 @@ static NSString * const anyKey = @"any";
 
 namespace WebKit {
 
-bool WebExtensionAPIAction::parseActionDetails(NSDictionary *details, std::optional<WebExtensionWindowIdentifier>& windowIdentifier, std::optional<WebExtensionTabIdentifier>& tabIdentifier, NSString **outExceptionString)
+Expected<void, String> WebExtensionAPIAction::parseActionDetails(NSDictionary *details, std::optional<WebExtensionWindowIdentifier>& windowIdentifier, std::optional<WebExtensionTabIdentifier>& tabIdentifier)
 {
     static NSDictionary<NSString *, id> *types = @{
         tabIdKey: NSNumber.class,
         windowIdKey: NSNumber.class,
     };
 
-    if (!validateDictionary(details, @"details", nil, types, outExceptionString))
-        return false;
+    NSString *outExceptionString;
+
+    if (!validateDictionary(details, @"details", nil, types, &outExceptionString))
+        return makeUnexpected(String(outExceptionString));
 
     if (details[tabIdKey] && details[windowIdKey]) {
-        *outExceptionString = toErrorString(nullString(), @"details", @"it cannot specify both 'tabId' and 'windowID'").createNSString().autorelease();
-        return false;
+        outExceptionString = toErrorString(nullString(), @"details", @"it cannot specify both 'tabId' and 'windowID'").createNSString().autorelease();
+        return makeUnexpected(String(outExceptionString));
     }
 
     if (NSNumber *tabID = details[tabIdKey]) {
         tabIdentifier = toWebExtensionTabIdentifier(tabID.doubleValue);
-        if (!isValid(tabIdentifier, outExceptionString))
-            return false;
+        if (!isValid(tabIdentifier, &outExceptionString))
+            return makeUnexpected(String(outExceptionString));
     }
 
     if (NSNumber *windowID = details[windowIdKey]) {
         windowIdentifier = toWebExtensionWindowIdentifier(windowID.doubleValue);
-        if (!isValid(windowIdentifier, outExceptionString))
-            return false;
+        if (!isValid(windowIdentifier, &outExceptionString))
+            return makeUnexpected(String(outExceptionString));
     }
 
-    return true;
+    return { };
 }
 
-void WebExtensionAPIAction::getTitle(NSDictionary *details, Ref<WebExtensionCallbackHandler>&& callback, NSString **outExceptionString)
+void WebExtensionAPIAction::getTitle(NSDictionary *details, Ref<WebExtensionCallbackHandler>&& callback, String& outExceptionString)
 {
     // Documentation: https://developer.mozilla.org/docs/Mozilla/Add-ons/WebExtensions/API/action/getTitle
 
     std::optional<WebExtensionWindowIdentifier> windowIdentifier;
     std::optional<WebExtensionTabIdentifier> tabIdentifier;
-    if (!parseActionDetails(details, windowIdentifier, tabIdentifier, outExceptionString))
+    if (auto actionDetailsResult = parseActionDetails(details, windowIdentifier, tabIdentifier); !actionDetailsResult) {
+        outExceptionString = actionDetailsResult.error();
         return;
+    }
 
     WebProcess::singleton().sendWithAsyncReply(Messages::WebExtensionContext::ActionGetTitle(windowIdentifier, tabIdentifier), [protectedThis = Ref { *this }, callback = WTFMove(callback)](Expected<String, WebExtensionError>&& result) {
         if (!result) {
@@ -117,7 +121,7 @@ void WebExtensionAPIAction::getTitle(NSDictionary *details, Ref<WebExtensionCall
     }, extensionContext().identifier());
 }
 
-void WebExtensionAPIAction::setTitle(NSDictionary *details, Ref<WebExtensionCallbackHandler>&& callback, NSString **outExceptionString)
+void WebExtensionAPIAction::setTitle(NSDictionary *details, Ref<WebExtensionCallbackHandler>&& callback, String& outExceptionString)
 {
     // Documentation: https://developer.mozilla.org/docs/Mozilla/Add-ons/WebExtensions/API/action/setTitle
 
@@ -127,13 +131,19 @@ void WebExtensionAPIAction::setTitle(NSDictionary *details, Ref<WebExtensionCall
         titleKey: [NSOrderedSet orderedSetWithObjects:NSString.class, NSNull.class, nil],
     };
 
-    if (!validateDictionary(details, @"details", requiredKeys, types, outExceptionString))
+    NSString *cocoaExceptionString;
+
+    if (!validateDictionary(details, @"details", requiredKeys, types, &cocoaExceptionString)) {
+        outExceptionString = String(cocoaExceptionString);
         return;
+    }
 
     std::optional<WebExtensionWindowIdentifier> windowIdentifier;
     std::optional<WebExtensionTabIdentifier> tabIdentifier;
-    if (!parseActionDetails(details, windowIdentifier, tabIdentifier, outExceptionString))
+    if (auto actionDetailsResult = parseActionDetails(details, windowIdentifier, tabIdentifier); !actionDetailsResult) {
+        outExceptionString = actionDetailsResult.error();
         return;
+    }
 
     String title = nullString();
     if (NSString *string = objectForKey<NSString>(details, titleKey, false))
@@ -155,8 +165,10 @@ void WebExtensionAPIAction::getBadgeText(NSDictionary *details, Ref<WebExtension
 
     std::optional<WebExtensionWindowIdentifier> windowIdentifier;
     std::optional<WebExtensionTabIdentifier> tabIdentifier;
-    if (!parseActionDetails(details, windowIdentifier, tabIdentifier, outExceptionString))
+    if (auto actionDetailsResult = parseActionDetails(details, windowIdentifier, tabIdentifier); !actionDetailsResult) {
+        *outExceptionString = actionDetailsResult.error().createNSString().get();
         return;
+    }
 
     WebProcess::singleton().sendWithAsyncReply(Messages::WebExtensionContext::ActionGetBadgeText(windowIdentifier, tabIdentifier), [protectedThis = Ref { *this }, callback = WTFMove(callback)](Expected<String, WebExtensionError>&& result) {
         if (!result) {
@@ -183,8 +195,10 @@ void WebExtensionAPIAction::setBadgeText(NSDictionary *details, Ref<WebExtension
 
     std::optional<WebExtensionWindowIdentifier> windowIdentifier;
     std::optional<WebExtensionTabIdentifier> tabIdentifier;
-    if (!parseActionDetails(details, windowIdentifier, tabIdentifier, outExceptionString))
+    if (auto actionDetailsResult = parseActionDetails(details, windowIdentifier, tabIdentifier); !actionDetailsResult) {
+        *outExceptionString = actionDetailsResult.error().createNSString().get();
         return;
+    }
 
     String text = nullString();
     if (NSString *string = objectForKey<NSString>(details, textKey, false))
@@ -206,8 +220,10 @@ void WebExtensionAPIAction::getBadgeBackgroundColor(NSDictionary *details, Ref<W
 
     std::optional<WebExtensionWindowIdentifier> windowIdentifier;
     std::optional<WebExtensionTabIdentifier> tabIdentifier;
-    if (!parseActionDetails(details, windowIdentifier, tabIdentifier, outExceptionString))
+    if (auto actionDetailsResult = parseActionDetails(details, windowIdentifier, tabIdentifier); !actionDetailsResult) {
+        *outExceptionString = actionDetailsResult.error().createNSString().get();
         return;
+    }
 
     // FIXME: <rdar://problem/57666368> Implement getting/setting the extension toolbar item's badge background color.
 
@@ -220,8 +236,10 @@ void WebExtensionAPIAction::setBadgeBackgroundColor(NSDictionary *details, Ref<W
 
     std::optional<WebExtensionWindowIdentifier> windowIdentifier;
     std::optional<WebExtensionTabIdentifier> tabIdentifier;
-    if (!parseActionDetails(details, windowIdentifier, tabIdentifier, outExceptionString))
+    if (auto actionDetailsResult = parseActionDetails(details, windowIdentifier, tabIdentifier); !actionDetailsResult) {
+        *outExceptionString = actionDetailsResult.error().createNSString().get();
         return;
+    }
 
     // FIXME: <rdar://problem/57666368> Implement getting/setting the extension toolbar item's badge background color.
 
@@ -270,8 +288,10 @@ void WebExtensionAPIAction::isEnabled(NSDictionary *details, Ref<WebExtensionCal
 
     std::optional<WebExtensionWindowIdentifier> windowIdentifier;
     std::optional<WebExtensionTabIdentifier> tabIdentifier;
-    if (!parseActionDetails(details, windowIdentifier, tabIdentifier, outExceptionString))
+    if (auto actionDetailsResult = parseActionDetails(details, windowIdentifier, tabIdentifier); !actionDetailsResult) {
+        *outExceptionString = actionDetailsResult.error().createNSString().get();
         return;
+    }
 
     WebProcess::singleton().sendWithAsyncReply(Messages::WebExtensionContext::ActionGetEnabled(windowIdentifier, tabIdentifier), [protectedThis = Ref { *this }, callback = WTFMove(callback)](Expected<bool, WebExtensionError>&& result) {
         if (!result) {
@@ -514,8 +534,10 @@ void WebExtensionAPIAction::setIcon(WebFrame& frame, NSDictionary *details, Ref<
 
     std::optional<WebExtensionWindowIdentifier> windowIdentifier;
     std::optional<WebExtensionTabIdentifier> tabIdentifier;
-    if (!parseActionDetails(details, windowIdentifier, tabIdentifier, outExceptionString))
+    if (auto actionDetailsResult = parseActionDetails(details, windowIdentifier, tabIdentifier); !actionDetailsResult) {
+        *outExceptionString = actionDetailsResult.error().createNSString().get();
         return;
+    }
 
     static NSDictionary<NSString *, id> *types = @{
         pathKey: [NSOrderedSet orderedSetWithObjects:NSString.class, NSDictionary.class, NSNull.class, nil],
@@ -591,8 +613,10 @@ void WebExtensionAPIAction::getPopup(NSDictionary *details, Ref<WebExtensionCall
 
     std::optional<WebExtensionWindowIdentifier> windowIdentifier;
     std::optional<WebExtensionTabIdentifier> tabIdentifier;
-    if (!parseActionDetails(details, windowIdentifier, tabIdentifier, outExceptionString))
+    if (auto actionDetailsResult = parseActionDetails(details, windowIdentifier, tabIdentifier); !actionDetailsResult) {
+        *outExceptionString = actionDetailsResult.error().createNSString().get();
         return;
+    }
 
     WebProcess::singleton().sendWithAsyncReply(Messages::WebExtensionContext::ActionGetPopup(windowIdentifier, tabIdentifier), [protectedThis = Ref { *this }, callback = WTFMove(callback)](Expected<String, WebExtensionError>&& result) {
         if (!result) {
@@ -619,8 +643,10 @@ void WebExtensionAPIAction::setPopup(NSDictionary *details, Ref<WebExtensionCall
 
     std::optional<WebExtensionWindowIdentifier> windowIdentifier;
     std::optional<WebExtensionTabIdentifier> tabIdentifier;
-    if (!parseActionDetails(details, windowIdentifier, tabIdentifier, outExceptionString))
+    if (auto actionDetailsResult = parseActionDetails(details, windowIdentifier, tabIdentifier); !actionDetailsResult) {
+        *outExceptionString = actionDetailsResult.error().createNSString().get();
         return;
+    }
 
     String popup = nullString();
     if (NSString *string = objectForKey<NSString>(details, popupKey, false))
@@ -642,8 +668,10 @@ void WebExtensionAPIAction::openPopup(WebPageProxyIdentifier webPageProxyIdentif
 
     std::optional<WebExtensionWindowIdentifier> windowIdentifier;
     std::optional<WebExtensionTabIdentifier> tabIdentifier;
-    if (!parseActionDetails(details, windowIdentifier, tabIdentifier, outExceptionString))
+    if (auto actionDetailsResult = parseActionDetails(details, windowIdentifier, tabIdentifier); !actionDetailsResult) {
+        *outExceptionString = actionDetailsResult.error().createNSString().get();
         return;
+    }
 
     WebProcess::singleton().sendWithAsyncReply(Messages::WebExtensionContext::ActionOpenPopup(webPageProxyIdentifier, windowIdentifier, tabIdentifier), [protectedThis = Ref { *this }, callback = WTFMove(callback)](Expected<void, WebExtensionError>&& result) {
         if (!result) {
