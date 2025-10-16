@@ -469,6 +469,9 @@
     (kernel-mig-routine-in-use-watchos))
 #endif
 
+(allow syscall-mig (with telemetry)
+    (kernel-mig-routine mach_vm_remap_external))
+
 (with-filter (require-not (webcontent-process-launched))
     (allow syscall-mig
         (kernel-mig-routine-only-in-use-during-launch)))
