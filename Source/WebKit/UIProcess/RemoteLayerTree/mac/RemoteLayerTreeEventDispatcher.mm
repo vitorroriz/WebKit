@@ -388,7 +388,7 @@ void RemoteLayerTreeEventDispatcher::startOrStopDisplayLinkOnMainThread()
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
         {
-            Locker lock { m_animationStacksLock };
+            Locker lock { m_animationLock };
             if (!m_animationStacks.isEmpty())
                 return true;
         }
@@ -573,7 +573,7 @@ bool RemoteLayerTreeEventDispatcher::scrollingTreeWasRecentlyActive()
         return true;
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
-    Locker lock { m_animationStacksLock };
+    Locker lock { m_animationLock };
     return !m_animationStacks.isEmpty();
 #else
     return false;
@@ -616,20 +616,20 @@ void RemoteLayerTreeEventDispatcher::renderingUpdateComplete()
 void RemoteLayerTreeEventDispatcher::lockForAnimationChanges()
 {
     ASSERT(isMainRunLoop());
-    m_animationStacksLock.lock();
+    m_animationLock.lock();
 }
 
 void RemoteLayerTreeEventDispatcher::unlockForAnimationChanges()
 {
     ASSERT(isMainRunLoop());
-    m_animationStacksLock.unlock();
+    m_animationLock.unlock();
     startOrStopDisplayLink();
 }
 
 void RemoteLayerTreeEventDispatcher::animationsWereAddedToNode(RemoteLayerTreeNode& node)
 {
     ASSERT(isMainRunLoop());
-    assertIsHeld(m_animationStacksLock);
+    assertIsHeld(m_animationLock);
     auto animationStack = node.takeAnimationStack();
     ASSERT(animationStack);
     m_animationStacks.set(node.layerID(), animationStack.releaseNonNull());
@@ -638,21 +638,21 @@ void RemoteLayerTreeEventDispatcher::animationsWereAddedToNode(RemoteLayerTreeNo
 void RemoteLayerTreeEventDispatcher::animationsWereRemovedFromNode(RemoteLayerTreeNode& node)
 {
     ASSERT(isMainRunLoop());
-    assertIsHeld(m_animationStacksLock);
+    assertIsHeld(m_animationLock);
     if (auto animationStack = m_animationStacks.take(node.layerID()))
         animationStack->clear(node.protectedLayer().get());
 }
 
 void RemoteLayerTreeEventDispatcher::registerTimelineIfNecessary(WebCore::ProcessIdentifier processIdentifier, Seconds originTime, MonotonicTime now)
 {
-    assertIsHeld(m_animationStacksLock);
+    assertIsHeld(m_animationLock);
     if (m_timelines.find(processIdentifier) == m_timelines.end())
         m_timelines.set(processIdentifier, RemoteAnimationTimeline::create(originTime, now));
 }
 
 void RemoteLayerTreeEventDispatcher::updateTimelineCurrentTime(WebCore::ProcessIdentifier processIdentifier, MonotonicTime now)
 {
-    assertIsHeld(m_animationStacksLock);
+    assertIsHeld(m_animationLock);
     auto it = m_timelines.find(processIdentifier);
     if (it != m_timelines.end())
         Ref { it->value }->updateCurrentTime(now);
@@ -660,7 +660,7 @@ void RemoteLayerTreeEventDispatcher::updateTimelineCurrentTime(WebCore::ProcessI
 
 const RemoteAnimationTimeline* RemoteLayerTreeEventDispatcher::timeline(WebCore::ProcessIdentifier processIdentifier) const
 {
-    assertIsHeld(m_animationStacksLock);
+    assertIsHeld(m_animationLock);
     auto it = m_timelines.find(processIdentifier);
     if (it != m_timelines.end())
         return it->value.ptr();
@@ -670,7 +670,7 @@ const RemoteAnimationTimeline* RemoteLayerTreeEventDispatcher::timeline(WebCore:
 void RemoteLayerTreeEventDispatcher::updateAnimations()
 {
     ASSERT(!isMainRunLoop());
-    Locker lock { m_animationStacksLock };
+    Locker lock { m_animationLock };
 
     // FIXME: Rather than using 'now' at the point this is called, we
     // should probably be using the timestamp of the (next?) display

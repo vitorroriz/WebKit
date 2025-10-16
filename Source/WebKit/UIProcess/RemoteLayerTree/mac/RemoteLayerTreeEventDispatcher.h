@@ -106,8 +106,8 @@ public:
     void renderingUpdateComplete();
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
-    void lockForAnimationChanges() WTF_ACQUIRES_LOCK(m_animationStacksLock);
-    void unlockForAnimationChanges() WTF_RELEASES_LOCK(m_animationStacksLock);
+    void lockForAnimationChanges() WTF_ACQUIRES_LOCK(m_animationLock);
+    void unlockForAnimationChanges() WTF_RELEASES_LOCK(m_animationLock);
     void animationsWereAddedToNode(RemoteLayerTreeNode&);
     void animationsWereRemovedFromNode(RemoteLayerTreeNode&);
     void updateAnimations();
@@ -202,9 +202,9 @@ private:
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
     // For WTF_ACQUIRES_LOCK
     friend class RemoteScrollingCoordinatorProxyMac;
-    Lock m_animationStacksLock;
-    HashMap<WebCore::PlatformLayerIdentifier, Ref<RemoteAnimationStack>> m_animationStacks WTF_GUARDED_BY_LOCK(m_animationStacksLock);
-    HashMap<WebCore::ProcessIdentifier, Ref<RemoteAnimationTimeline>> m_timelines WTF_GUARDED_BY_LOCK(m_animationStacksLock);
+    Lock m_animationLock;
+    HashMap<WebCore::PlatformLayerIdentifier, Ref<RemoteAnimationStack>> m_animationStacks WTF_GUARDED_BY_LOCK(m_animationLock);
+    HashMap<WebCore::ProcessIdentifier, Ref<RemoteAnimationTimeline>> m_timelines WTF_GUARDED_BY_LOCK(m_animationLock);
 #endif
 
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER)
