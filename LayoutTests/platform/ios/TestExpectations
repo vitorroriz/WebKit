@@ -8267,10 +8267,6 @@ webkit.org/b/298557 [ Debug ] imported/w3c/web-platform-tests/scroll-to-text-fra
 
 webkit.org/b/298560 [ Debug ] editing/selection/ios/clear-selection-after-tapping-on-element-with-click-handler.html [ Pass Failure ]
 
-# webkit.org/b/298556 [iOS] Two tests in fast/images are flaky timeouts
-fast/images/async-image-intersect-different-size-for-drawing.html [ Pass Timeout ]
-fast/images/low-memory-decode.html [ Pass Timeout ]
-
 webkit.org/b/298608 imported/w3c/web-platform-tests/digital-credentials/create.tentative.https.html [ Pass Failure ]
 
 webkit.org/b/298905 imported/w3c/web-platform-tests/html/semantics/popovers/label-in-invoker.html [ Pass Failure ]
