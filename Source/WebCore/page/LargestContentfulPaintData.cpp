@@ -42,6 +42,8 @@
 #include "RenderBox.h"
 #include "RenderElementInlines.h"
 #include "RenderInline.h"
+#include "RenderLayer.h"
+#include "RenderLayerInlines.h"
 #include "RenderLineBreak.h"
 #include "RenderObjectInlines.h"
 #include "RenderReplaced.h"
@@ -87,6 +89,24 @@ bool LargestContentfulPaintData::isEligibleForLargestContentfulPaint(const Eleme
     return true;
 }
 
+bool LargestContentfulPaintData::canCompareWithLargestPaintArea(const Element& element)
+{
+    CheckedPtr renderer = element.renderer();
+    if (!renderer)
+        return false;
+
+    CheckedPtr layer = renderer->enclosingLayer();
+    if (!layer)
+        return false;
+
+    // An ancestor transform may scale the rect.
+    if (layer->isTransformed() || layer->hasTransformedAncestor())
+        return false;
+
+    // Other properties like clipping on ancestors can only ever shrink the area, so it's safe to compare.
+    return true;
+}
+
 // https://w3c.github.io/largest-contentful-paint/#sec-effective-visual-size
 std::optional<float> LargestContentfulPaintData::effectiveVisualArea(const Element& element, CachedImage* image, FloatRect imageLocalRect, FloatRect intersectionRect, FloatSize viewportSize)
 {
@@ -125,20 +145,17 @@ std::optional<float> LargestContentfulPaintData::effectiveVisualArea(const Eleme
 // https://w3c.github.io/largest-contentful-paint/#sec-add-lcp-entry
 void LargestContentfulPaintData::potentiallyAddLargestContentfulPaintEntry(Element& element, CachedImage* image, FloatRect imageLocalRect, FloatRect intersectionRect, MonotonicTime loadTime, DOMHighResTimeStamp paintTimestamp, std::optional<FloatSize>& viewportSize)
 {
-    bool isNewCandidate = false;
-    if (image) {
-        isNewCandidate = m_imageContentSet.ensure(element, [] {
-            return WeakHashSet<CachedImage> { };
-        }).iterator->value.add(*image).isNewEntry;
-    } else {
+    if (!image) {
         ASSERT(!element.isInLargestContentfulPaintTextContentSet());
         element.setInLargestContentfulPaintTextContentSet();
-        isNewCandidate = true;
     }
 
-    LOG_WITH_STREAM(LargestContentfulPaint, stream << "LargestContentfulPaintData " << this << " potentiallyAddLargestContentfulPaintEntry() " << element << " image " << (image ? image->url().string() : emptyString()) << " rect " << intersectionRect << " - isNewCandidate " << isNewCandidate);
+    LOG_WITH_STREAM(LargestContentfulPaint, stream << "LargestContentfulPaintData " << this << " potentiallyAddLargestContentfulPaintEntry() " << element << " image " << (image ? image->url().string() : emptyString()) << " rect " << intersectionRect);
 
-    if (!isNewCandidate)
+    if (intersectionRect.isEmpty())
+        return;
+
+    if (canCompareWithLargestPaintArea(element) && intersectionRect.area() <= m_largestPaintArea)
         return;
 
     Ref document = element.document();
@@ -332,15 +349,18 @@ void LargestContentfulPaintData::didPaintImage(Element& element, CachedImage* im
     if (!image)
         return;
 
+    bool isNewCandidate = m_imageContentSet.ensure(element, [] {
+        return WeakHashSet<CachedImage> { };
+    }).iterator->value.add(*image).isNewEntry;
+
+    if (!isNewCandidate)
+        return;
+
     if (localRect.isEmpty())
         return;
 
-    auto it = m_imageContentSet.find(element);
-    if (it != m_imageContentSet.end()) {
-        auto& imageSet = it->value;
-        if (imageSet.contains(*image))
-            return;
-    }
+    if (canCompareWithLargestPaintArea(element) && localRect.area() <= m_largestPaintArea)
+        return;
 
     if (!isExposedForPaintTiming(element))
         return;
@@ -393,6 +413,8 @@ void LargestContentfulPaintData::didPaintText(const RenderBlockFlow& formattingC
 
     if (element->isInLargestContentfulPaintTextContentSet())
         return;
+
+    // FIXME: If we know that this is the only text paint for a given element, we can use canCompareWithLargestPaintArea() and early return.
 
     if (!isExposedForPaintTiming(*element))
         return;
