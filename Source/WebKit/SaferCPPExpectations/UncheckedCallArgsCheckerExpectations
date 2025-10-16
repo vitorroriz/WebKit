@@ -3,7 +3,6 @@ Shared/RemoteLayerTree/RemoteLayerTreeTransaction.mm
 UIProcess/API/Cocoa/WKWebViewTesting.mm
 WebProcess/GPU/graphics/RemoteRenderingBackendProxy.cpp
 WebProcess/GPU/media/MediaPlayerPrivateRemote.cpp
-WebProcess/GPU/media/RemoteLegacyCDMFactory.cpp
 WebProcess/GPU/media/RemoteMediaPlayerManager.cpp
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInFrame.mm
 WebProcess/InjectedBundle/API/c/WKBundleFrame.cpp
