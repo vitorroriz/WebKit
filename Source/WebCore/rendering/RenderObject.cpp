@@ -925,8 +925,8 @@ RenderObject::RepaintContainerStatus RenderObject::containerForRepaint() const
     auto fullRepaintAlreadyScheduled = false;
 
     if (view().usesCompositing()) {
-        if (CheckedPtr parentLayer = enclosingLayer()) {
-            auto compLayerStatus = parentLayer->enclosingCompositingLayerForRepaint();
+        if (CheckedPtr enclosingLayer = this->enclosingLayer()) {
+            auto compLayerStatus = enclosingLayer->enclosingCompositingLayerForRepaint();
             if (compLayerStatus.layer) {
                 repaintContainer = &compLayerStatus.layer->renderer();
                 fullRepaintAlreadyScheduled = compLayerStatus.fullRepaintAlreadyScheduled && canRelyOnAncestorLayerFullRepaint(*this, *compLayerStatus.layer);
