@@ -44,6 +44,7 @@
 #include "SVGElementTypeHelpers.h"
 #include "SVGImageElement.h"
 #include "SVGVisitedRendererTracking.h"
+#include "Settings.h"
 #include <wtf/StackStats.h>
 #include <wtf/TZoneMallocInlines.h>
 
