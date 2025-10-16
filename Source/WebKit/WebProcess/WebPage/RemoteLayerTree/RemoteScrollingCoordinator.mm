@@ -72,10 +72,8 @@ RemoteScrollingCoordinator::~RemoteScrollingCoordinator()
 
 void RemoteScrollingCoordinator::scheduleTreeStateCommit()
 {
-    if (!m_webPage)
-        return;
-
-    m_webPage->drawingArea()->triggerRenderingUpdate();
+    if (RefPtr webPage = m_webPage.get())
+        webPage->protectedDrawingArea()->triggerRenderingUpdate();
 }
 
 void RemoteScrollingCoordinator::applyScrollUpdate(ScrollUpdate&& update, ScrollType scrollType)
@@ -175,19 +173,19 @@ void RemoteScrollingCoordinator::startMonitoringWheelEvents(bool clearLatchingSt
 
 void RemoteScrollingCoordinator::receivedWheelEventWithPhases(WebCore::PlatformWheelEventPhase phase, WebCore::PlatformWheelEventPhase momentumPhase)
 {
-    if (auto monitor = page()->wheelEventTestMonitor())
+    if (auto monitor = protectedPage()->wheelEventTestMonitor())
         monitor->receivedWheelEventWithPhases(phase, momentumPhase);
 }
 
 void RemoteScrollingCoordinator::startDeferringScrollingTestCompletionForNode(WebCore::ScrollingNodeID nodeID, OptionSet<WebCore::WheelEventTestMonitor::DeferReason> reason)
 {
-    if (auto monitor = page()->wheelEventTestMonitor())
+    if (auto monitor = protectedPage()->wheelEventTestMonitor())
         monitor->deferForReason(nodeID, reason);
 }
 
 void RemoteScrollingCoordinator::stopDeferringScrollingTestCompletionForNode(WebCore::ScrollingNodeID nodeID, OptionSet<WebCore::WheelEventTestMonitor::DeferReason> reason)
 {
-    if (auto monitor = page()->wheelEventTestMonitor())
+    if (auto monitor = protectedPage()->wheelEventTestMonitor())
         monitor->removeDeferralForReason(nodeID, reason);
 }
 
