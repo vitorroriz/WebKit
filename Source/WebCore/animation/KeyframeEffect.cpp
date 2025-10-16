@@ -1153,7 +1153,7 @@ ExceptionOr<void> KeyframeEffect::processKeyframes(JSGlobalObject& lexicalGlobal
 
     // We take a slight detour from the spec text and compute the missing keyframe offsets right away
     // since they can be computed up-front.
-    computeMissingKeyframeOffsets(parsedKeyframes, activeViewTimeline(), animation());
+    computeMissingKeyframeOffsets(parsedKeyframes, activeViewTimeline().get(), animation());
 
     CSSParserContext parserContext(document);
 
@@ -3154,7 +3154,7 @@ bool KeyframeEffect::isPropertyAdditiveOrCumulative(KeyframeInterpolation::Prope
     });
 }
 
-const ViewTimeline* KeyframeEffect::activeViewTimeline()
+RefPtr<const ViewTimeline> KeyframeEffect::activeViewTimeline() const
 {
     RefPtr animation = this->animation();
     if (!animation)
@@ -3162,7 +3162,7 @@ const ViewTimeline* KeyframeEffect::activeViewTimeline()
 
     RefPtr viewTimeline = dynamicDowncast<ViewTimeline>(animation->timeline());
     if (viewTimeline && viewTimeline->currentTime())
-        return viewTimeline.unsafeGet();
+        return viewTimeline;
 
     return nullptr;
 }

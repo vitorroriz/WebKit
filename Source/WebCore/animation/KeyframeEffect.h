@@ -286,7 +286,7 @@ private:
     bool preventsAnimationReadiness() const final;
     void animationProgressBasedTimelineSourceDidChangeMetrics(const Style::SingleAnimationRange&) final;
 
-    const ViewTimeline* activeViewTimeline();
+    RefPtr<const ViewTimeline> activeViewTimeline() const;
     void updateComputedKeyframeOffsetsIfNeeded();
 
     // KeyframeInterpolation
