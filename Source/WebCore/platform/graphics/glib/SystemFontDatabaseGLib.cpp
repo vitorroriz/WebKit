@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2020 Igalia S.L.
- * Copyright (C) 2022 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Igalia S.L.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,12 +21,9 @@
 #include "config.h"
 #include "SystemFontDatabase.h"
 
-#include "PlatformScreen.h"
 #include "SystemSettings.h"
 #include "WebKitFontFamilyNames.h"
-#include <gtk/gtk.h>
 #include <wtf/NeverDestroyed.h>
-#include <wtf/glib/GUniquePtr.h>
 
 namespace WebCore {
 
@@ -39,23 +35,9 @@ SystemFontDatabase& SystemFontDatabase::singleton()
 
 auto SystemFontDatabase::platformSystemFontShorthandInfo(FontShorthand) -> SystemFontShorthandInfo
 {
-    // This will be a font selection string like "Sans 10" so we cannot use it as the family name.
-    auto fontName = SystemSettings::singleton().fontName();
-    if (!fontName || fontName->isEmpty())
-        return { WebKitFontFamilyNames::standardFamily, 16, normalWeightValue() };
-
-    PangoFontDescription* pangoDescription = pango_font_description_from_string(fontName->utf8().data());
-    if (!pangoDescription)
-        return { WebKitFontFamilyNames::standardFamily, 16, normalWeightValue() };
-
-    int size = pango_font_description_get_size(pangoDescription) / PANGO_SCALE;
-    // If the size of the font is in points, we need to convert it to pixels.
-    if (!pango_font_description_get_size_is_absolute(pangoDescription))
-        size = size * (fontDPI() / 72.0);
-
-    SystemFontShorthandInfo result { AtomString(unsafeSpan8(pango_font_description_get_family(pangoDescription))), static_cast<float>(size), normalWeightValue() };
-    pango_font_description_free(pangoDescription);
-    return result;
+    auto& systemSettings = SystemSettings::singleton();
+    auto systemFontFamily = systemSettings.fontFamily();
+    return { systemFontFamily ? AtomString(*systemFontFamily) : WebKitFontFamilyNames::standardFamily, systemSettings.fontSize().value_or(16), FontSelectionValue(systemSettings.fontWeight().value_or(400)) };
 }
 
 void SystemFontDatabase::platformInvalidate()
