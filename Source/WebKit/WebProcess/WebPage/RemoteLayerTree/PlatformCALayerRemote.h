@@ -269,7 +269,8 @@ public:
 
     void moveToContext(RemoteLayerTreeContext&);
     RemoteLayerTreeContext* context() const { return m_context.get(); }
-    
+    RefPtr<RemoteLayerTreeContext> protectedContext() const { return m_context.get(); }
+
     void markFrontBufferVolatileForTesting() override;
     virtual void populateCreationProperties(RemoteLayerTreeTransaction::LayerCreationProperties&, const RemoteLayerTreeContext&, WebCore::PlatformCALayer::LayerType);
 

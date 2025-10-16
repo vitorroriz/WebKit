@@ -125,7 +125,7 @@ PlatformCALayerRemote::PlatformCALayerRemote(const PlatformCALayerRemote& other,
 Ref<PlatformCALayer> PlatformCALayerRemote::clone(PlatformCALayerClient* owner) const
 {
     RELEASE_ASSERT(m_context.get());
-    auto clone = PlatformCALayerRemote::create(*this, owner, *m_context);
+    Ref clone = PlatformCALayerRemote::create(*this, owner, *protectedContext());
 
     updateClonedLayerProperties(clone);
 
@@ -138,14 +138,14 @@ PlatformCALayerRemote::~PlatformCALayerRemote()
     for (const auto& layer : m_children)
         downcast<PlatformCALayerRemote>(*layer).m_superlayer = nullptr;
 
-    if (RefPtr<RemoteLayerTreeContext> protectedContext = m_context.get())
-        protectedContext->layerWillLeaveContext(*this);
+    if (RefPtr context = m_context.get())
+        context->layerWillLeaveContext(*this);
 }
 
 void PlatformCALayerRemote::moveToContext(RemoteLayerTreeContext& context)
 {
-    if (RefPtr protectedContext = m_context.get())
-        protectedContext->layerWillLeaveContext(*this);
+    if (RefPtr oldContext = m_context.get())
+        oldContext->layerWillLeaveContext(*this);
 
     m_context = context;
 
@@ -255,8 +255,8 @@ void PlatformCALayerRemote::recursiveBuildTransaction(RemoteLayerTreeContext& co
         child->recursiveBuildTransaction(context, transaction);
     }
 
-    if (m_maskLayer)
-        downcast<PlatformCALayerRemote>(*m_maskLayer).recursiveBuildTransaction(context, transaction);
+    if (RefPtr maskLayer = downcast<PlatformCALayerRemote>(m_maskLayer))
+        maskLayer->recursiveBuildTransaction(context, transaction);
 }
 
 void PlatformCALayerRemote::didCommit()
@@ -297,7 +297,8 @@ DestinationColorSpace PlatformCALayerRemote::displayColorSpace() const
     if (auto displayColorSpace = contentsFormatExtendedColorSpace(contentsFormat()))
         return displayColorSpace.value();
 #else
-    if (auto displayColorSpace = m_context ? m_context->displayColorSpace() : std::nullopt) {
+    RefPtr context = m_context.get();
+    if (auto displayColorSpace = context ? context->displayColorSpace() : std::nullopt) {
 #if ENABLE(PIXEL_FORMAT_RGBA16F)
         if (contentsFormat() == ContentsFormat::RGBA16F) {
             if (auto extendedDisplayColorSpace = displayColorSpace->asExtended())
@@ -383,8 +384,8 @@ void PlatformCALayerRemote::copyContentsFromLayer(PlatformCALayer* layer)
 {
     ASSERT(m_properties.clonedLayerID == layer->layerID());
     
-    if (RefPtr protectedContext = m_context.get(); protectedContext && !m_properties.changedProperties)
-        protectedContext->layerPropertyChangedWhileBuildingTransaction(*this);
+    if (RefPtr context = m_context.get(); context && !m_properties.changedProperties)
+        context->layerPropertyChangedWhileBuildingTransaction(*this);
 
     m_properties.notePropertiesChanged(LayerChange::ClonedContentsChanged);
 }
@@ -396,10 +397,8 @@ PlatformCALayer* PlatformCALayerRemote::superlayer() const
 
 void PlatformCALayerRemote::removeFromSuperlayer()
 {
-    if (!m_superlayer)
-        return;
-
-    m_superlayer->removeSublayer(this);
+    if (RefPtr superlayer = m_superlayer.get())
+        superlayer->removeSublayer(this);
 }
 
 void PlatformCALayerRemote::removeSublayer(PlatformCALayerRemote* layer)
@@ -461,7 +460,7 @@ void PlatformCALayerRemote::replaceSublayer(PlatformCALayer& reference, Platform
     layer.removeFromSuperlayer();
     size_t referenceIndex = m_children.find(&reference);
     if (referenceIndex != notFound) {
-        m_children[referenceIndex]->removeFromSuperlayer();
+        Ref { *m_children[referenceIndex] }->removeFromSuperlayer();
         m_children.insert(referenceIndex, &layer);
         downcast<PlatformCALayerRemote>(layer).m_superlayer = *this;
     }
@@ -506,8 +505,8 @@ void PlatformCALayerRemote::addAnimationForKey(const String& key, PlatformCAAnim
     
     m_properties.notePropertiesChanged(LayerChange::AnimationsChanged);
 
-    if (RefPtr protectedContext = m_context.get())
-        protectedContext->willStartAnimationOnLayer(*this);
+    if (RefPtr context = m_context.get())
+        context->willStartAnimationOnLayer(*this);
 }
 
 void PlatformCALayerRemote::removeAnimationForKey(const String& key)
@@ -1167,7 +1166,7 @@ void PlatformCALayerRemote::setAppleVisualEffectData(WebCore::AppleVisualEffectD
 Ref<PlatformCALayer> PlatformCALayerRemote::createCompatibleLayer(PlatformCALayer::LayerType layerType, PlatformCALayerClient* client) const
 {
     RELEASE_ASSERT(m_context.get());
-    return PlatformCALayerRemote::create(layerType, client, *m_context);
+    return PlatformCALayerRemote::create(layerType, client, *protectedContext());
 }
 
 void PlatformCALayerRemote::enumerateRectsBeingDrawn(WebCore::GraphicsContext& context, void (^block)(WebCore::FloatRect))
