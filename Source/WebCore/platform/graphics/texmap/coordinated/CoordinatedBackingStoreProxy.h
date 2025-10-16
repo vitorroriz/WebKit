@@ -41,6 +41,8 @@ public:
     static Ref<CoordinatedBackingStoreProxy> create();
     ~CoordinatedBackingStoreProxy() = default;
 
+    static constexpr int s_defaultCPUTileSize = 256;
+
     const IntRect& coverRect() const { return m_coverRect; }
 
     class Update {

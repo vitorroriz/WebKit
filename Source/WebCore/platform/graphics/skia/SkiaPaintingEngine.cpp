@@ -28,6 +28,7 @@
 
 #if USE(COORDINATED_GRAPHICS) && USE(SKIA)
 #include "BitmapTexturePool.h"
+#include "CoordinatedBackingStoreProxy.h"
 #include "CoordinatedTileBuffer.h"
 #include "GLContext.h"
 #include "GraphicsLayer.h"
@@ -167,10 +168,15 @@ RenderingMode SkiaPaintingEngine::decideHybridRenderingMode(const IntRect& dirty
             return RenderingMode::Accelerated;
 
         // If the CPU worker pool has unused workers, use them.
-        if (m_cpuWorkerPool->numberOfTasks() < numberOfCPUPaintingThreads())
-            return RenderingMode::Unaccelerated;
+        if (m_cpuWorkerPool->numberOfTasks() < numberOfCPUPaintingThreads()) {
+            // Do not use the CPU for dirty areas bigger than the default tile area for CPU rendering.
+            static constexpr int maximumAreaForCPURendering = CoordinatedBackingStoreProxy::s_defaultCPUTileSize * CoordinatedBackingStoreProxy::s_defaultCPUTileSize;
+            if (dirtyRect.area() <= maximumAreaForCPURendering)
+                return RenderingMode::Unaccelerated;
+        }
 
-        return handleMinimumFractionOfTasksUsingGPU();
+        // Always prefer GPU when workers are not available.
+        return RenderingMode::Accelerated;
     };
 
     switch (hybridPaintingStrategy()) {

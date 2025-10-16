@@ -386,8 +386,7 @@ IntSize CoordinatedBackingStoreProxy::computeTileSize(const IntSize& viewportSiz
             tileSize = gpuTileSize(baseSize);
         }
     } else {
-        static constexpr int defaultCPUTileSize = 256;
-        tileSize = { defaultCPUTileSize, defaultCPUTileSize };
+        tileSize = { s_defaultCPUTileSize, s_defaultCPUTileSize };
 
         static constexpr int maxUntiledContentSize = 512;
         // If the contents width is small, increase tile size vertically.
