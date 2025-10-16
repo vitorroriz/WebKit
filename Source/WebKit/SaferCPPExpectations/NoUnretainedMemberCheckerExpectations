@@ -1,15 +1,14 @@
 Shared/API/Cocoa/_WKRemoteObjectInterface.h
-[ Mac ] UIProcess/API/Cocoa/WKView.h
 UIProcess/API/Cocoa/_WKAuthenticatorAssertionResponse.h
-[ Mac ] UIProcess/API/Cocoa/_WKInspectorWindowInternal.h
 UIProcess/API/Cocoa/_WKNotificationData.mm
 UIProcess/API/Cocoa/_WKSpatialBackdropSource.h
 UIProcess/API/Cocoa/_WKWebPushMessage.h
+[ Mac ] UIProcess/API/Cocoa/WKView.h
 [ iOS ] Platform/ios/PaymentAuthorizationController.mm
-[ iOS ] UIProcess/API/Cocoa/WKSnapshotConfiguration.h
-[ iOS ] UIProcess/API/Cocoa/WKWebViewPrivateForTesting.h
 [ iOS ] UIProcess/API/Cocoa/WKPreviewActionItem.h
+[ iOS ] UIProcess/API/Cocoa/WKSnapshotConfiguration.h
 [ iOS ] UIProcess/API/Cocoa/WKWebView.h
+[ iOS ] UIProcess/API/Cocoa/WKWebViewPrivateForTesting.h
 [ iOS ] UIProcess/API/Cocoa/_WKArchiveConfiguration.h
 [ iOS ] UIProcess/API/Cocoa/_WKAuthenticationExtensionsClientInputs.h
 [ iOS ] UIProcess/API/Cocoa/_WKAuthenticatorAttestationResponse.h
