@@ -2928,6 +2928,12 @@ imported/w3c/web-platform-tests/html/rendering/widgets/button-layout/propagate-t
 # GTK/WPE don't support the "none" value for selections of input and textarea elements.
 webkit.org/b/180931 imported/w3c/web-platform-tests/html/semantics/forms/textfieldselection/selection-after-content-change.html [ Failure ]
 
+# GTK/WPE fail newly added WPT `meter` element test cases.
+imported/w3c/web-platform-tests/html/semantics/forms/the-meter-element/meter-appearance-none-even-less-good-value-rendering.html [ Failure ]
+imported/w3c/web-platform-tests/html/semantics/forms/the-meter-element/meter-appearance-none-optimum-value-rendering.html [ Failure ]
+imported/w3c/web-platform-tests/html/semantics/forms/the-meter-element/meter-appearance-none-rendering.html [ Failure ]
+imported/w3c/web-platform-tests/html/semantics/forms/the-meter-element/meter-appearance-none-suboptimum-value-rendering.html [ Failure ]
+
 # Passes for GTK/WPE (but not for Mac/iOS) after WPT update of css-writing-modes tests
 webkit.org/b/214291 imported/w3c/web-platform-tests/css/css-writing-modes/available-size-004.html [ Pass ]
 webkit.org/b/214291 imported/w3c/web-platform-tests/css/css-writing-modes/available-size-006.html [ Pass ]
