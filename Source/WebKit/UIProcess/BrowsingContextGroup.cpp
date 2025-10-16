@@ -50,7 +50,7 @@ void BrowsingContextGroup::sharedProcessForSite(WebsiteDataStore& websiteDataSto
 {
     if (!preferences.siteIsolationEnabled() || !preferences.siteIsolationSharedProcessEnabled())
         return completionHandler(nullptr);
-    if (site.isEmpty())
+    if (site.isEmpty() || m_processMap.contains(site))
         return completionHandler(nullptr);
     if (!m_sharedProcessSites.contains(site)) {
         if (isMainFrame == IsMainFrame::Yes)

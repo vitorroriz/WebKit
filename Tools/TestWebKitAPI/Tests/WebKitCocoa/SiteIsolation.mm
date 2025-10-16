@@ -5639,6 +5639,72 @@ TEST(SiteIsolation, SharedProcessMostBasic)
     });
 }
 
+TEST(SiteIsolation, SharedProcessSameOrigin)
+{
+    HTTPServer server({
+        { "/top"_s, { "<!DOCTYPE html><iframe src='./subframe'></iframe>"_s } },
+        { "/subframe"_s, { "<!DOCTYPE html><p>hi</p>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+    auto [webView, navigationDelegate] = siteIsolatedViewWithSharedProcess(server);
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/top"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    checkFrameTreesInProcesses(webView.get(), {
+        {
+            "https://example.com"_s,
+            { { "https://example.com"_s } },
+        },
+    });
+}
+
+TEST(SiteIsolation, SharedProcessLoadIsolatedSiteInSubframeOfNewWindow)
+{
+    HTTPServer server({
+        { "/opener"_s, { "<!DOCTYPE html><a href='javascript:window.open(`https://b.com/top`, `newWindow`);'>opener</a>"_s } },
+        { "/top"_s, { "<!DOCTYPE html><iframe src='https://a.com/content'></iframe>"_s } },
+        { "/content"_s, { "<!DOCTYPE html><p>hi</p>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto [webView, navigationDelegate] = siteIsolatedViewWithSharedProcess(server);
+    webView.get().configuration.preferences.javaScriptCanOpenWindowsAutomatically = YES;
+
+    __block auto *sharedNavigationDelegate = navigationDelegate.get();
+    __block RetainPtr<TestWKWebView> opendWebView;
+    auto uiDelegate = adoptNS([[TestUIDelegate new] init]);
+    webView.get().UIDelegate = uiDelegate.get();
+    uiDelegate.get().createWebViewWithConfiguration = ^(WKWebViewConfiguration *configuration, WKNavigationAction *action, WKWindowFeatures *windowFeatures) {
+        opendWebView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 400, 200) configuration:configuration]);
+        opendWebView.get().navigationDelegate = sharedNavigationDelegate;
+        return opendWebView.get();
+    };
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://a.com/opener"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    checkFrameTreesInProcesses(webView.get(), { { "https://a.com"_s, } });
+
+    [webView evaluateJavaScript:@"document.querySelector('a').click()" completionHandler:nil];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    checkFrameTreesInProcesses(opendWebView.get(), {
+        {
+            "https://b.com"_s,
+            { { RemoteFrame } },
+        },
+        {
+            RemoteFrame,
+            { { "https://a.com"_s } },
+        },
+    });
+
+    auto *mainFrameInfo = [webView mainFrame].info;
+    auto *subFrameInfo = [opendWebView mainFrame].childFrames[0].info;
+    EXPECT_STREQ("a.com", mainFrameInfo.request.URL.host.UTF8String);
+    EXPECT_STREQ("b.com", [opendWebView mainFrame].info.request.URL.host.UTF8String);
+    EXPECT_STREQ("a.com", subFrameInfo.request.URL.host.UTF8String);
+    EXPECT_EQ(mainFrameInfo._processIdentifier, subFrameInfo._processIdentifier);
+}
+
 TEST(SiteIsolation, SharedProcessBasicNavigation)
 {
     HTTPServer server({
@@ -6098,7 +6164,6 @@ TEST(SiteIsolation, SharedProcessAfterUserInteractionInSharedProcesss)
     auto *sharedNavigationDelegate = navigationDelegate.get();
     webView.get().UIDelegate = uiDelegate.get();
     uiDelegate.get().createWebViewWithConfiguration = ^(WKWebViewConfiguration *configuration, WKNavigationAction *action, WKWindowFeatures *windowFeatures) {
-        fprintf(stderr, "hey!");
         opendWebView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 400, 200) configuration:configuration]);
         opendWebView.get().navigationDelegate = sharedNavigationDelegate;
         return opendWebView.get();
