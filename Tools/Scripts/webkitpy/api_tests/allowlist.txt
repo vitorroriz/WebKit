@@ -445,7 +445,6 @@ TestWebKitAPI.WKAttachmentTestsIOS
 TestWebKitAPI.WKBackForwardList
 TestWebKitAPI.WKBrowsingContextLoadDelegateTest
 TestWebKitAPI.WKInspectorExtensionDelegate
-TestWebKitAPI.WKInspectorExtensionHost
 TestWebKitAPI.WKPreferencesPrivate
 TestWebKitAPI.WKProcessPoolConfiguration
 TestWebKitAPI.WKScrollGeometry
