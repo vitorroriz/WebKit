@@ -80,14 +80,14 @@ void WebPopupMenuProxyMac::populate(const Vector<WebPopupItem>& items, NSFont *f
             [paragraphStyle setBaseWritingDirection:writingDirection];
             [paragraphStyle setAlignment:menuTextDirection == TextDirection::LTR ? NSTextAlignmentLeft : NSTextAlignmentRight];
             RetainPtr<NSMutableDictionary> attributes = adoptNS([[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                paragraphStyle.get(), RetainPtr { NSParagraphStyleAttributeName }.get(),
-                font, RetainPtr { NSFontAttributeName }.get(),
+                paragraphStyle.get(), NSParagraphStyleAttributeName,
+                font, NSFontAttributeName,
             nil]);
             if (items[i].m_hasTextDirectionOverride) {
                 auto writingDirectionValue = static_cast<NSInteger>(writingDirection) + static_cast<NSInteger>(NSWritingDirectionOverride);
                 RetainPtr<NSNumber> writingDirectionNumber = adoptNS([[NSNumber alloc] initWithInteger:writingDirectionValue]);
                 RetainPtr<NSArray> writingDirectionArray = adoptNS([[NSArray alloc] initWithObjects:writingDirectionNumber.get(), nil]);
-                [attributes setObject:writingDirectionArray.get() forKey:RetainPtr { NSWritingDirectionAttributeName }.get()];
+                [attributes setObject:writingDirectionArray.get() forKey:NSWritingDirectionAttributeName];
             }
             if (!items[i].m_language.isEmpty())
                 [attributes setObject:items[i].m_language.createNSString().get() forKey:NSLanguageIdentifierAttributeName];

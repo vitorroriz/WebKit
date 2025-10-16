@@ -266,7 +266,7 @@ WTF_DECLARE_CF_TYPE_TRAIT(CGImage);
     _impl = &impl;
 
     RetainPtr workspaceNotificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-    [workspaceNotificationCenter addObserver:self selector:@selector(_settingsDidChange:) name:RetainPtr { NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification }.get() object:nil];
+    [workspaceNotificationCenter addObserver:self selector:@selector(_settingsDidChange:) name:NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification object:nil];
 
     return self;
 }
@@ -274,7 +274,7 @@ WTF_DECLARE_CF_TYPE_TRAIT(CGImage);
 - (void)dealloc
 {
     RetainPtr workspaceNotificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-    [workspaceNotificationCenter removeObserver:self name:RetainPtr { NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification }.get() object:nil];
+    [workspaceNotificationCenter removeObserver:self name:NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification object:nil];
 
     [super dealloc];
 }
@@ -315,7 +315,7 @@ WTF_DECLARE_CF_TYPE_TRAIT(CGImage);
     _impl = impl;
 
     RetainPtr workspaceNotificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-    [workspaceNotificationCenter addObserver:self selector:@selector(_activeSpaceDidChange:) name:RetainPtr { NSWorkspaceActiveSpaceDidChangeNotification }.get() object:nil];
+    [workspaceNotificationCenter addObserver:self selector:@selector(_activeSpaceDidChange:) name:NSWorkspaceActiveSpaceDidChangeNotification object:nil];
 
     return self;
 }
@@ -350,29 +350,29 @@ static void* keyValueObservingContext = &keyValueObservingContext;
     RetainPtr defaultNotificationCenter = [NSNotificationCenter defaultCenter];
 
     // An NSView derived object such as WKView cannot observe these notifications, because NSView itself observes them.
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidOrderOffScreen:) name:RetainPtr { NSWindowDidOrderOffScreenNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidOrderOnScreen:) name:RetainPtr { NSWindowDidOrderOnScreenNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidOrderOffScreen:) name:NSWindowDidOrderOffScreenNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidOrderOnScreen:) name:NSWindowDidOrderOnScreenNotification object:window];
 
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidBecomeKey:) name:RetainPtr { NSWindowDidBecomeKeyNotification }.get() object:nil];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidResignKey:) name:RetainPtr { NSWindowDidResignKeyNotification }.get() object:nil];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidMiniaturize:) name:RetainPtr { NSWindowDidMiniaturizeNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidDeminiaturize:) name:RetainPtr { NSWindowDidDeminiaturizeNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidMove:) name:RetainPtr { NSWindowDidMoveNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidResize:) name:RetainPtr { NSWindowDidResizeNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillBeginSheet:) name:RetainPtr { NSWindowWillBeginSheetNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidChangeBackingProperties:) name:RetainPtr { NSWindowDidChangeBackingPropertiesNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidChangeScreen:) name:RetainPtr { NSWindowDidChangeScreenNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidChangeOcclusionState:) name:RetainPtr { NSWindowDidChangeOcclusionStateNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillClose:) name:RetainPtr { NSWindowWillCloseNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillEnterOrExitFullScreen:) name:RetainPtr { NSWindowWillEnterFullScreenNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidEnterOrExitFullScreen:) name:RetainPtr { NSWindowDidEnterFullScreenNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillEnterOrExitFullScreen:) name:RetainPtr { NSWindowWillExitFullScreenNotification }.get() object:window];
-    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidEnterOrExitFullScreen:) name:RetainPtr { NSWindowDidExitFullScreenNotification }.get() object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidBecomeKey:) name:NSWindowDidBecomeKeyNotification object:nil];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidResignKey:) name:NSWindowDidResignKeyNotification object:nil];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidMiniaturize:) name:NSWindowDidMiniaturizeNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidDeminiaturize:) name:NSWindowDidDeminiaturizeNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidMove:) name:NSWindowDidMoveNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidResize:) name:NSWindowDidResizeNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillBeginSheet:) name:NSWindowWillBeginSheetNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidChangeBackingProperties:) name:NSWindowDidChangeBackingPropertiesNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidChangeScreen:) name:NSWindowDidChangeScreenNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidChangeOcclusionState:) name:NSWindowDidChangeOcclusionStateNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillClose:) name:NSWindowWillCloseNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillEnterOrExitFullScreen:) name:NSWindowWillEnterFullScreenNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidEnterOrExitFullScreen:) name:NSWindowDidEnterFullScreenNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowWillEnterOrExitFullScreen:) name:NSWindowWillExitFullScreenNotification object:window];
+    [defaultNotificationCenter addObserver:self selector:@selector(_windowDidEnterOrExitFullScreen:) name:NSWindowDidExitFullScreenNotification object:window];
 
-    [defaultNotificationCenter addObserver:self selector:@selector(_screenDidChangeColorSpace:) name:RetainPtr { NSScreenColorSpaceDidChangeNotification }.get() object:nil];
+    [defaultNotificationCenter addObserver:self selector:@selector(_screenDidChangeColorSpace:) name:NSScreenColorSpaceDidChangeNotification object:nil];
 #if HAVE(SUPPORT_HDR_DISPLAY_APIS)
-    [defaultNotificationCenter addObserver:self selector:@selector(_applicationShouldBeginSuppressingHDR:) name:RetainPtr { NSApplicationShouldBeginSuppressingHighDynamicRangeContentNotification }.get() object:NSApp];
-    [defaultNotificationCenter addObserver:self selector:@selector(_applicationShouldEndSuppressingHDR:) name:RetainPtr { NSApplicationShouldEndSuppressingHighDynamicRangeContentNotification }.get() object:NSApp];
+    [defaultNotificationCenter addObserver:self selector:@selector(_applicationShouldBeginSuppressingHDR:) name:NSApplicationShouldBeginSuppressingHighDynamicRangeContentNotification object:NSApp];
+    [defaultNotificationCenter addObserver:self selector:@selector(_applicationShouldEndSuppressingHDR:) name:NSApplicationShouldEndSuppressingHighDynamicRangeContentNotification object:NSApp];
 #endif // HAVE(SUPPORT_HDR_DISPLAY_APIS)
 
     if (_shouldObserveFontPanel) {
@@ -404,27 +404,27 @@ static void* keyValueObservingContext = &keyValueObservingContext;
 
     RetainPtr defaultNotificationCenter = [NSNotificationCenter defaultCenter];
 
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidOrderOffScreenNotification }.get() object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidOrderOnScreenNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidOrderOffScreenNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidOrderOnScreenNotification object:window.get()];
 
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidBecomeKeyNotification }.get() object:nil];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidResignKeyNotification }.get() object:nil];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidMiniaturizeNotification }.get() object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidDeminiaturizeNotification }.get() object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidMoveNotification }.get() object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidResizeNotification }.get() object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowWillBeginSheetNotification }.get() object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidChangeBackingPropertiesNotification }.get() object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidChangeScreenNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidBecomeKeyNotification object:nil];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidMiniaturizeNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidDeminiaturizeNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidMoveNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidResizeNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowWillBeginSheetNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidChangeBackingPropertiesNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidChangeScreenNotification object:window.get()];
     [defaultNotificationCenter removeObserver:self name:_NSWindowDidChangeContentsHostedInLayerSurfaceNotification object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidChangeOcclusionStateNotification }.get() object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowWillCloseNotification }.get() object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowWillEnterFullScreenNotification }.get() object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidEnterFullScreenNotification }.get() object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowWillExitFullScreenNotification }.get() object:window.get()];
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSWindowDidExitFullScreenNotification }.get() object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidChangeOcclusionStateNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowWillCloseNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowWillEnterFullScreenNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidEnterFullScreenNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowWillExitFullScreenNotification object:window.get()];
+    [defaultNotificationCenter removeObserver:self name:NSWindowDidExitFullScreenNotification object:window.get()];
 
-    [defaultNotificationCenter removeObserver:self name:RetainPtr { NSScreenColorSpaceDidChangeNotification }.get() object:nil];
+    [defaultNotificationCenter removeObserver:self name:NSScreenColorSpaceDidChangeNotification object:nil];
 
     if (!objc_getAssociatedObject(window.get(), _impl.get()))
         return;
@@ -4514,7 +4514,7 @@ void WebViewImpl::startDrag(const WebCore::DragItem& item, ShareableBitmap::Hand
 
             auto clientDragLocation = IntPoint(dragLocationInMainFrameCoordinates.value());
 
-            RetainPtr pasteboard = [NSPasteboard pasteboardWithName:RetainPtr { NSPasteboardNameDrag }.get()];
+            RetainPtr pasteboard = [NSPasteboard pasteboardWithName:NSPasteboardNameDrag];
 
             if (promisedAttachmentInfo) {
                 RefPtr attachment = page->attachmentForIdentifier(promisedAttachmentInfo.attachmentIdentifier);
@@ -4735,7 +4735,7 @@ static RetainPtr<NSPasteboard> pasteboardForAccessCategory(WebCore::DOMPasteAcce
         return NSPasteboard.generalPasteboard;
 
     case WebCore::DOMPasteAccessCategory::Fonts:
-        return [NSPasteboard pasteboardWithName:RetainPtr { NSPasteboardNameFont }.get()];
+        return [NSPasteboard pasteboardWithName:NSPasteboardNameFont];
     }
 }
 
@@ -5525,11 +5525,11 @@ static BOOL shouldUseHighlightsForMarkedText(NSAttributedString *string)
     __block BOOL result = NO;
 
     [string enumerateAttributesInRange:NSMakeRange(0, string.length) options:0 usingBlock:^(NSDictionary<NSAttributedStringKey, id> *attributes, NSRange, BOOL *stop) {
-        BOOL hasUnderlineStyle = !![attributes objectForKey:RetainPtr { NSUnderlineStyleAttributeName }.get()];
-        BOOL hasUnderlineColor = !![attributes objectForKey:RetainPtr { NSUnderlineColorAttributeName }.get()];
+        BOOL hasUnderlineStyle = !![attributes objectForKey:NSUnderlineStyleAttributeName];
+        BOOL hasUnderlineColor = !![attributes objectForKey:NSUnderlineColorAttributeName];
 
-        BOOL hasBackgroundColor = !![attributes objectForKey:RetainPtr { NSBackgroundColorAttributeName }.get()];
-        BOOL hasForegroundColor = !![attributes objectForKey:RetainPtr { NSForegroundColorAttributeName }.get()];
+        BOOL hasBackgroundColor = !![attributes objectForKey:NSBackgroundColorAttributeName];
+        BOOL hasForegroundColor = !![attributes objectForKey:NSForegroundColorAttributeName];
 
         // Marked text may be represented either as an underline or a highlight; this mode is dictated
         // by the attributes it has, and therefore having both types of attributes is not allowed.
@@ -5555,11 +5555,11 @@ static Vector<WebCore::CompositionHighlight> compositionHighlights(NSAttributedS
     Vector<WebCore::CompositionHighlight> highlights;
     [string enumerateAttributesInRange:NSMakeRange(0, string.length) options:0 usingBlock:[&highlights](NSDictionary<NSAttributedStringKey, id> *attributes, NSRange range, BOOL *) {
         std::optional<WebCore::Color> backgroundHighlightColor;
-        if (RetainPtr<WebCore::CocoaColor> backgroundColor = attributes[RetainPtr { NSBackgroundColorAttributeName }.get()])
+        if (RetainPtr<WebCore::CocoaColor> backgroundColor = attributes[NSBackgroundColorAttributeName])
             backgroundHighlightColor = WebCore::colorFromCocoaColor(backgroundColor.get());
 
         std::optional<WebCore::Color> foregroundHighlightColor;
-        if (RetainPtr<WebCore::CocoaColor> foregroundColor = attributes[RetainPtr { NSForegroundColorAttributeName }.get()])
+        if (RetainPtr<WebCore::CocoaColor> foregroundColor = attributes[NSForegroundColorAttributeName])
             foregroundHighlightColor = WebCore::colorFromCocoaColor(foregroundColor.get());
 
         highlights.append({ static_cast<unsigned>(range.location), static_cast<unsigned>(NSMaxRange(range)), backgroundHighlightColor, foregroundHighlightColor });
@@ -5598,11 +5598,11 @@ static Vector<WebCore::CompositionUnderline> compositionUnderlines(NSAttributedS
     Vector<WebCore::CompositionUnderline> underlines;
 
     [string enumerateAttributesInRange:NSMakeRange(0, string.length) options:0 usingBlock:[&underlines](NSDictionary<NSAttributedStringKey, id> *attributes, NSRange range, BOOL *) {
-        RetainPtr<NSNumber> style = [attributes objectForKey:RetainPtr { NSUnderlineStyleAttributeName }.get()];
+        RetainPtr<NSNumber> style = [attributes objectForKey:NSUnderlineStyleAttributeName];
         if (!style)
             return;
 
-        RetainPtr<NSColor> underlineColor = attributes[RetainPtr { NSUnderlineColorAttributeName }.get()];
+        RetainPtr<NSColor> underlineColor = attributes[NSUnderlineColorAttributeName];
         bool isClear = [underlineColor isEqual:NSColor.clearColor];
 
         if (!isClear)
@@ -5635,10 +5635,10 @@ static Vector<WebCore::CompositionUnderline> compositionUnderlines(NSAttributedS
         NSRange range;
         RetainPtr<NSDictionary> attrs = [string attributesAtIndex:i longestEffectiveRange:&range inRange:NSMakeRange(i, length - i)];
 
-        if (RetainPtr<NSNumber> style = [attrs objectForKey:RetainPtr { NSUnderlineStyleAttributeName }.get()]) {
+        if (RetainPtr<NSNumber> style = [attrs objectForKey:NSUnderlineStyleAttributeName]) {
             WebCore::Color color = WebCore::Color::black;
             WebCore::CompositionUnderlineColor compositionUnderlineColor = WebCore::CompositionUnderlineColor::TextColor;
-            if (RetainPtr<NSColor> colorAttribute = [attrs objectForKey:RetainPtr { NSUnderlineColorAttributeName }.get()]) {
+            if (RetainPtr<NSColor> colorAttribute = [attrs objectForKey:NSUnderlineColorAttributeName]) {
                 color = WebCore::colorFromCocoaColor(colorAttribute.get());
                 compositionUnderlineColor = WebCore::CompositionUnderlineColor::GivenColor;
             }
@@ -5663,7 +5663,7 @@ void WebViewImpl::setMarkedText(id string, NSRange selectedRange, NSRange replac
         BOOL hasTextCompletion = [&] {
             __block BOOL result = NO;
 
-            [attributedString enumerateAttribute:RetainPtr { NSTextCompletionAttributeName }.get() inRange:NSMakeRange(0, [attributedString length]) options:0 usingBlock:^(id value, NSRange range, BOOL *stop) {
+            [attributedString enumerateAttribute:NSTextCompletionAttributeName inRange:NSMakeRange(0, [attributedString length]) options:0 usingBlock:^(id value, NSRange range, BOOL *stop) {
                 if ([value respondsToSelector:@selector(boolValue)] && [value boolValue]) {
                     result = YES;
                     *stop = YES;
@@ -6531,9 +6531,9 @@ void WebViewImpl::updateTextTouchBar()
         m_textTouchBarItemController = adoptNS([[WKTextTouchBarItemController alloc] initWithWebViewImpl:this]);
 
     if (!m_startedListeningToCustomizationEvents) {
-        [[NSNotificationCenter defaultCenter] addObserver:m_textTouchBarItemController.get() selector:@selector(touchBarDidExitCustomization:) name:RetainPtr { NSTouchBarDidExitCustomization }.get() object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:m_textTouchBarItemController.get() selector:@selector(touchBarWillEnterCustomization:) name:RetainPtr { NSTouchBarWillEnterCustomization }.get() object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:m_textTouchBarItemController.get() selector:@selector(didChangeAutomaticTextCompletion:) name:RetainPtr { NSSpellCheckerDidChangeAutomaticTextCompletionNotification }.get() object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:m_textTouchBarItemController.get() selector:@selector(touchBarDidExitCustomization:) name:NSTouchBarDidExitCustomization object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:m_textTouchBarItemController.get() selector:@selector(touchBarWillEnterCustomization:) name:NSTouchBarWillEnterCustomization object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:m_textTouchBarItemController.get() selector:@selector(didChangeAutomaticTextCompletion:) name:NSSpellCheckerDidChangeAutomaticTextCompletionNotification object:nil];
 
         m_startedListeningToCustomizationEvents = true;
     }

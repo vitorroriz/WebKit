@@ -341,8 +341,8 @@ void WebInspectorUIProxy::didBecomeActive()
 
 void WebInspectorUIProxy::attachmentViewDidChange(NSView *oldView, NSView *newView)
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:m_objCAdapter.get() name:RetainPtr { NSViewFrameDidChangeNotification }.get() object:oldView];
-    [[NSNotificationCenter defaultCenter] addObserver:m_objCAdapter.get() selector:@selector(inspectedViewFrameDidChange:) name:RetainPtr { NSViewFrameDidChangeNotification }.get() object:newView];
+    [[NSNotificationCenter defaultCenter] removeObserver:m_objCAdapter.get() name:NSViewFrameDidChangeNotification object:oldView];
+    [[NSNotificationCenter defaultCenter] addObserver:m_objCAdapter.get() selector:@selector(inspectedViewFrameDidChange:) name:NSViewFrameDidChangeNotification object:newView];
 
     if (m_isAttached)
         attach(m_attachmentSide);
@@ -476,7 +476,7 @@ RefPtr<WebPageProxy> WebInspectorUIProxy::platformCreateFrontendPage()
 
     m_objCAdapter = adoptNS([[WKWebInspectorUIProxyObjCAdapter alloc] initWithWebInspectorUIProxy:this]);
     RetainPtr inspectedView = inspectedPage->inspectorAttachmentView();
-    [[NSNotificationCenter defaultCenter] addObserver:m_objCAdapter.get() selector:@selector(inspectedViewFrameDidChange:) name:RetainPtr { NSViewFrameDidChangeNotification }.get() object:inspectedView.get()];
+    [[NSNotificationCenter defaultCenter] addObserver:m_objCAdapter.get() selector:@selector(inspectedViewFrameDidChange:) name:NSViewFrameDidChangeNotification object:inspectedView.get()];
 
     Ref configuration = inspectedPage->uiClient().configurationForLocalInspector(*inspectedPage, *this);
     m_inspectorViewController = adoptNS([[WKInspectorViewController alloc] initWithConfiguration:protectedWrapper(configuration.get()).get() inspectedPage:inspectedPage.get()]);
