@@ -45,6 +45,10 @@ size_t ImageBufferCGPDFDocumentBackend::calculateMemoryCost(const Parameters& pa
 
 std::unique_ptr<ImageBufferCGPDFDocumentBackend> ImageBufferCGPDFDocumentBackend::create(const Parameters& parameters, const ImageBufferCreationContext&)
 {
+    IntSize backendSize = parameters.backendSize;
+    if (backendSize.isEmpty())
+        return nullptr;
+
     auto data = adoptCF(CFDataCreateMutable(kCFAllocatorDefault, 0));
     if (!data)
         return nullptr;
@@ -53,7 +57,6 @@ std::unique_ptr<ImageBufferCGPDFDocumentBackend> ImageBufferCGPDFDocumentBackend
     if (!dataConsumer)
         return nullptr;
 
-    auto backendSize = parameters.backendSize;
     auto mediaBox = CGRectMake(0, 0, backendSize.width(), backendSize.height());
 
     auto pdfContext = adoptCF(CGPDFContextCreate(dataConsumer.get(), &mediaBox, nullptr));
