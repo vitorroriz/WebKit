@@ -76,14 +76,11 @@ WebProcess/cocoa/WebProcessCocoa.mm
 [ iOS ] GPUProcess/GPUConnectionToWebProcess.cpp
 [ iOS ] GPUProcess/cocoa/GPUConnectionToWebProcessCocoa.mm
 [ iOS ] GPUProcess/media/RemoteAudioSessionProxyManager.cpp
-[ iOS ] GPUProcess/media/ios/RemoteMediaSessionHelperProxy.cpp
 [ iOS ] NetworkProcess/NetworkConnectionToWebProcess.cpp
 [ iOS ] NetworkProcess/NetworkProcess.cpp
 [ iOS ] NetworkProcess/cocoa/NetworkProcessCocoa.mm
 [ iOS ] NetworkProcess/ios/NetworkConnectionToWebProcessIOS.mm
 [ iOS ] Shared/ApplePay/ios/WebPaymentCoordinatorProxyIOS.mm
-[ iOS ] UIProcess/API/APIHTTPCookieStore.cpp
-[ iOS ] UIProcess/API/C/WKWebsiteDataStoreRef.cpp
 [ iOS ] UIProcess/API/Cocoa/WKContextMenuElementInfo.mm
 [ iOS ] UIProcess/API/Cocoa/WKWebExtensionCommand.mm
 [ iOS ] UIProcess/API/Cocoa/WKWebView.mm
