@@ -131,13 +131,20 @@ void Navigation::initializeForNewWindow(std::optional<NavigationNavigationType> 
 
     if (previousWindow) {
         Ref previousNavigation = previousWindow->navigation();
+
         bool shouldProcessPreviousNavigationEntries = [&]() {
+            if (!previousNavigation->m_currentEntryIndex)
+                return false;
+
             if (!previousNavigation->m_entries.size())
                 return false;
+
             if (!frame()->protectedDocument()->protectedSecurityOrigin()->isSameOriginAs(previousWindow->protectedDocument()->protectedSecurityOrigin()))
                 return false;
+
             return true;
         }();
+
         if (shouldProcessPreviousNavigationEntries) {
             for (auto& entry : previousNavigation->m_entries)
                 m_entries.append(NavigationHistoryEntry::create(*this, entry.get()));
