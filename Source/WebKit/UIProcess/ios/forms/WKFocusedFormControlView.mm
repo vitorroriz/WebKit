@@ -28,7 +28,7 @@
 
 #if HAVE(PEPPER_UI_CORE)
 
-asm(".linker_option \"-framework\", \"PepperUICore\"");
+__asm__(".linker_option \"-framework\", \"PepperUICore\"");
 
 #import "PepperUICoreSPI.h"
 #import <WebCore/LocalizedStrings.h>

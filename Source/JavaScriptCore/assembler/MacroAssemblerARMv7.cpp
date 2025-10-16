@@ -218,7 +218,7 @@ static_assert(IN_R3_OFFSET == offsetof(IncomingRecord, r3), "IN_R3_OFFSET is inc
 static_assert(IN_ALIGNMENT_PADDING_OFFSET == offsetof(IncomingRecord, alignmentPadding), "IN_ALIGNMENT_PADDING_OFFSET is incorrect");
 static_assert(IN_SIZE == sizeof(IncomingRecord), "IN_SIZE is incorrect");
 
-asm (
+__asm__(
     ".text" "\n"
     ".align 2" "\n"
     ".globl " SYMBOL_STRING(ctiMasmProbeTrampoline) "\n"
