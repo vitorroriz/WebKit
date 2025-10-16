@@ -2309,6 +2309,7 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
         IsHiddenOrTransparent,
         TooSmall,
         TooLarge,
+        NegativeZIndex,
         IsViewportSizedCandidate,
         IsDimmingLayer,
         IsCandidate,
@@ -2359,8 +2360,12 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
         if (isProbablyDimmingContainer)
             return IsDimmingLayer;
 
-        if (lengthOnSide == ViewportComparison::Similar && lengthOnAdjacentSide == ViewportComparison::Similar)
+        if (lengthOnSide == ViewportComparison::Similar && lengthOnAdjacentSide == ViewportComparison::Similar) {
+            if (auto zIndex = renderer.style().usedZIndex().tryValue(); zIndex && zIndex->isNegative())
+                return NegativeZIndex;
+
             return IsViewportSizedCandidate;
+        }
 
         return IsCandidate;
     };
@@ -2412,6 +2417,7 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
             case NotFixedOrSticky:
             case TooSmall:
                 break;
+            case NegativeZIndex:
             case TooLarge:
             case IsHiddenOrTransparent: {
                 hitInvisiblePointerEventsNoneContainer = ancestor->usedPointerEvents() == PointerEvents::None;
