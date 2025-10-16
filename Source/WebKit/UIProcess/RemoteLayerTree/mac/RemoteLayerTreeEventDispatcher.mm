@@ -650,14 +650,6 @@ void RemoteLayerTreeEventDispatcher::registerTimelineIfNecessary(WebCore::Proces
         m_timelines.set(processIdentifier, RemoteAnimationTimeline::create(originTime, now));
 }
 
-void RemoteLayerTreeEventDispatcher::updateTimelineCurrentTime(WebCore::ProcessIdentifier processIdentifier, MonotonicTime now)
-{
-    assertIsHeld(m_animationLock);
-    auto it = m_timelines.find(processIdentifier);
-    if (it != m_timelines.end())
-        Ref { it->value }->updateCurrentTime(now);
-}
-
 const RemoteAnimationTimeline* RemoteLayerTreeEventDispatcher::timeline(WebCore::ProcessIdentifier processIdentifier) const
 {
     assertIsHeld(m_animationLock);

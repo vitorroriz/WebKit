@@ -324,11 +324,6 @@ void RemoteScrollingCoordinatorProxyMac::registerTimelineIfNecessary(WebCore::Pr
     m_eventDispatcher->registerTimelineIfNecessary(processIdentifier, originTime, now);
 }
 
-void RemoteScrollingCoordinatorProxyMac::updateTimelineCurrentTime(WebCore::ProcessIdentifier processIdentifier, MonotonicTime now)
-{
-    m_eventDispatcher->updateTimelineCurrentTime(processIdentifier, now);
-}
-
 const RemoteAnimationTimeline* RemoteScrollingCoordinatorProxyMac::timeline(WebCore::ProcessIdentifier processIdentifier) const
 {
     return m_eventDispatcher->timeline(processIdentifier);

@@ -146,7 +146,6 @@ public:
     virtual void animationsWereAddedToNode(RemoteLayerTreeNode&) { }
     virtual void animationsWereRemovedFromNode(RemoteLayerTreeNode&) { }
     virtual void registerTimelineIfNecessary(WebCore::ProcessIdentifier, Seconds, MonotonicTime) { }
-    virtual void updateTimelineCurrentTime(WebCore::ProcessIdentifier, MonotonicTime) { }
     virtual const RemoteAnimationTimeline* timeline(WebCore::ProcessIdentifier) const { return nullptr; }
 #endif
 

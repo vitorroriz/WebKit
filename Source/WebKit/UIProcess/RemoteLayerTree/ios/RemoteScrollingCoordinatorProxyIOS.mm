@@ -463,13 +463,6 @@ void RemoteScrollingCoordinatorProxyIOS::registerTimelineIfNecessary(WebCore::Pr
         m_timelines.set(processIdentifier, RemoteAnimationTimeline::create(originTime, now));
 }
 
-void RemoteScrollingCoordinatorProxyIOS::updateTimelineCurrentTime(WebCore::ProcessIdentifier processIdentifier, MonotonicTime now)
-{
-    auto it = m_timelines.find(processIdentifier);
-    if (it != m_timelines.end())
-        Ref { it->value }->updateCurrentTime(now);
-}
-
 const RemoteAnimationTimeline* RemoteScrollingCoordinatorProxyIOS::timeline(WebCore::ProcessIdentifier processIdentifier) const
 {
     auto it = m_timelines.find(processIdentifier);

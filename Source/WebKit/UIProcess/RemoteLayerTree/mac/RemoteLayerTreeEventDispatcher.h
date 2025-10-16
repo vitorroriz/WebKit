@@ -112,7 +112,6 @@ public:
     void animationsWereRemovedFromNode(RemoteLayerTreeNode&);
     void updateAnimations();
     void registerTimelineIfNecessary(WebCore::ProcessIdentifier, Seconds, MonotonicTime);
-    void updateTimelineCurrentTime(WebCore::ProcessIdentifier, MonotonicTime);
     const RemoteAnimationTimeline* timeline(WebCore::ProcessIdentifier) const;
 #endif
 
