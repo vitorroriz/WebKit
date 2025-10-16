@@ -37,6 +37,12 @@
 
 namespace WebCore::DDModel {
 class DDMesh;
+struct DDMaterialDescriptor;
+struct DDMeshDescriptor;
+struct DDTextureDescriptor;
+struct DDUpdateMaterialDescriptor;
+struct DDUpdateMeshDescriptor;
+struct DDUpdateTextureDescriptor;
 }
 
 namespace IPC {
@@ -50,8 +56,6 @@ class GPUConnectionToWebProcess;
 
 namespace DDModel {
 class ObjectHeap;
-struct DDMeshDescriptor;
-struct DDUpdateMeshDescriptor;
 }
 
 class RemoteDDMesh final : public IPC::StreamMessageReceiver {
@@ -79,7 +83,6 @@ private:
     RemoteDDMesh& operator=(RemoteDDMesh&&) = delete;
 
     WebCore::DDModel::DDMesh& backing() { return m_backing; }
-    Ref<WebCore::DDModel::DDMesh> protectedBacking();
 
     RefPtr<IPC::Connection> connection() const;
 
@@ -88,11 +91,16 @@ private:
     void destruct();
 
     void setLabel(String&&);
-    void addMesh(const DDModel::DDMeshDescriptor&);
-    void update(const DDModel::DDUpdateMeshDescriptor&);
+    void addMesh(const WebCore::DDModel::DDMeshDescriptor&);
+    void update(const WebCore::DDModel::DDUpdateMeshDescriptor&);
+    void addTexture(const WebCore::DDModel::DDTextureDescriptor&);
+    void updateTexture(const WebCore::DDModel::DDUpdateTextureDescriptor&);
+    void addMaterial(const WebCore::DDModel::DDMaterialDescriptor&);
+    void updateMaterial(const WebCore::DDModel::DDUpdateMaterialDescriptor&);
+
     void render();
 
-    Ref<WebCore::DDModel::DDMesh> m_backing;
+    const Ref<WebCore::DDModel::DDMesh> m_backing;
     WeakRef<DDModel::ObjectHeap> m_objectHeap;
     const Ref<IPC::StreamServerConnection> m_streamConnection;
     DDModelIdentifier m_identifier;

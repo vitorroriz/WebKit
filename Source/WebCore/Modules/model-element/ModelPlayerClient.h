@@ -30,6 +30,7 @@
 #include <WebCore/TransformationMatrix.h>
 #include <wtf/AbstractRefCountedAndCanMakeWeakPtr.h>
 #include <wtf/Forward.h>
+#include <wtf/ThreadSafeWeakPtr.h>
 
 namespace WebCore {
 
@@ -38,7 +39,11 @@ class HTMLModelElement;
 class ModelPlayer;
 class ResourceError;
 
+#if ENABLE(GPU_PROCESS_MODEL)
+class WEBCORE_EXPORT ModelPlayerClient : public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<ModelPlayerClient> {
+#else
 class WEBCORE_EXPORT ModelPlayerClient : public AbstractRefCountedAndCanMakeWeakPtr<ModelPlayerClient> {
+#endif
 public:
     virtual ~ModelPlayerClient();
 

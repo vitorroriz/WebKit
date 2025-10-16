@@ -28,7 +28,6 @@
 
 #if ENABLE(GPU_PROCESS)
 
-#include "DDMeshDescriptor.h"
 #include "GPUConnectionToWebProcess.h"
 #include "Logging.h"
 #include "ModelObjectHeap.h"
@@ -42,7 +41,6 @@
 #include "StreamServerConnection.h"
 #include "WebGPUObjectHeap.h"
 #include <WebCore/DDMesh.h>
-#include <WebCore/DDMeshDescriptor.h>
 #include <WebCore/GraphicsContext.h>
 #include <WebCore/NativeImage.h>
 #include <WebCore/RenderingResourceIdentifier.h>

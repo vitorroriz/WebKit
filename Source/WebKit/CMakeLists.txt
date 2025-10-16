@@ -600,12 +600,6 @@ set(WebKit_SERIALIZATION_IN_FILES
 
     Shared/Gamepad/GamepadData.serialization.in
 
-    Shared/Model/DDMeshDescriptor.serialization.in
-    Shared/Model/DDMeshPart.serialization.in
-    Shared/Model/DDReplaceVertices.serialization.in
-    Shared/Model/DDUpdateMeshDescriptor.serialization.in
-    Shared/Model/DDVertexAttributeFormat.serialization.in
-    Shared/Model/DDVertexLayout.serialization.in
     Shared/Model/ModelObjectDescriptorBase.serialization.in
 
     Shared/WebGPU/WebGPUBindGroupDescriptor.serialization.in

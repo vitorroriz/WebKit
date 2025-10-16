@@ -74,6 +74,11 @@ private:
 #if PLATFORM(COCOA)
     void addMesh(const DDMeshDescriptor&) final;
     void update(const DDUpdateMeshDescriptor&) final;
+    void addTexture(const DDTextureDescriptor&) final;
+    void updateTexture(const DDUpdateTextureDescriptor&) final;
+    void addMaterial(const DDMaterialDescriptor&) final;
+    void updateMaterial(const DDUpdateMaterialDescriptor&) final;
+
     void render() final;
 #endif
 

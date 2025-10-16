@@ -103,7 +103,7 @@ private:
         , m_isOpaque(isOpaque)
     {
     }
-    WeakRef<DDModelPlayer> m_modelPlayer;
+    ThreadSafeWeakPtr<DDModelPlayer> m_modelPlayer;
     WTF::MachSendRight m_displayBuffer;
     const float m_contentsScale;
     bool m_isOpaque;
@@ -124,6 +124,13 @@ DDModelPlayer::DDModelPlayer(Page& page, ModelPlayerClient& client)
 
 DDModelPlayer::~DDModelPlayer()
 {
+}
+
+void DDModelPlayer::ensureOnMainThreadWithProtectedThis(Function<void(Ref<DDModelPlayer>)>&& task)
+{
+    ensureOnMainThread([protectedThis = Ref { *this }, task = WTFMove(task)]() mutable {
+        task(protectedThis);
+    });
 }
 
 // MARK: - ModelPlayer overrides.
@@ -152,15 +159,52 @@ void DDModelPlayer::load(Model& modelSource, LayoutSize size)
 
         m_modelLoader = adoptNS([[WebUSDModelLoader alloc] init]);
         RetainPtr nsURL = modelSource.url().createNSURL();
+        Ref protectedThis = Ref { *this };
         [m_modelLoader setCallbacksWithModelAddedCallback:^(WebAddMeshRequest *addRequest) {
-            if (RefPtr client = m_client.get())
-                client->didFinishLoading(*this);
+            ensureOnMainThreadWithProtectedThis([addRequest] (Ref<DDModelPlayer> protectedThis) {
+                if (RefPtr client = protectedThis->m_client.get())
+                    client->didFinishLoading(protectedThis.get());
 
-            if (m_currentModel)
-                m_currentModel->addMesh(toCpp(addRequest));
+                if (protectedThis->m_currentModel)
+                    protectedThis->m_currentModel->addMesh(toCpp(addRequest));
+
+                [protectedThis->m_modelLoader requestCompleted:addRequest];
+            });
         } modelUpdatedCallback:^(WebUpdateMeshRequest *updateRequest) {
-            if (m_currentModel)
-                m_currentModel->update(toCpp(updateRequest));
+            ensureOnMainThreadWithProtectedThis([updateRequest] (Ref<DDModelPlayer> protectedThis) {
+                if (protectedThis->m_currentModel)
+                    protectedThis->m_currentModel->update(toCpp(updateRequest));
+
+                [protectedThis->m_modelLoader requestCompleted:updateRequest];
+            });
+        } textureAddedCallback:^(WebDDAddTextureRequest *addTexture) {
+            ensureOnMainThreadWithProtectedThis([addTexture] (Ref<DDModelPlayer> protectedThis) {
+                if (protectedThis->m_currentModel)
+                    protectedThis->m_currentModel->addTexture(toCpp(addTexture));
+
+                [protectedThis->m_modelLoader requestCompleted:addTexture];
+            });
+        } textureUpdatedCallback:^(WebDDUpdateTextureRequest *updateTexture) {
+            ensureOnMainThreadWithProtectedThis([updateTexture] (Ref<DDModelPlayer> protectedThis) {
+                if (protectedThis->m_currentModel)
+                    protectedThis->m_currentModel->updateTexture(toCpp(updateTexture));
+
+                [protectedThis->m_modelLoader requestCompleted:updateTexture];
+            });
+        } materialAddedCallback:^(WebDDAddMaterialRequest *addMaterial) {
+            ensureOnMainThreadWithProtectedThis([addMaterial] (Ref<DDModelPlayer> protectedThis) {
+                if (protectedThis->m_currentModel)
+                    protectedThis->m_currentModel->addMaterial(toCpp(addMaterial));
+
+                [protectedThis->m_modelLoader requestCompleted:addMaterial];
+            });
+        } materialUpdatedCallback:^(WebDDUpdateMaterialRequest *updateMaterial) {
+            ensureOnMainThreadWithProtectedThis([updateMaterial] (Ref<DDModelPlayer> protectedThis) {
+                if (protectedThis->m_currentModel)
+                    protectedThis->m_currentModel->updateMaterial(toCpp(updateMaterial));
+
+                [protectedThis->m_modelLoader requestCompleted:updateMaterial];
+            });
         }];
         [m_modelLoader loadModelFrom:nsURL.get()];
     }
@@ -279,6 +323,7 @@ GraphicsLayerContentsDisplayDelegate* DDModelPlayer::contentsDisplayDelegate()
 
 void DDModelPlayer::update()
 {
+    [m_modelLoader update:1.0 / 60.0];
     if (RefPtr currentModel = m_currentModel)
         currentModel->render();
 

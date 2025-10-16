@@ -31,8 +31,12 @@
 messages -> RemoteDDMesh Stream {
     void SetLabel(String label)
     void Destruct()
-    void AddMesh(WebKit::DDModel::DDMeshDescriptor descriptor)
-    void Update(WebKit::DDModel::DDUpdateMeshDescriptor descriptor)
+    void AddMesh(WebCore::DDModel::DDMeshDescriptor descriptor)
+    void Update(WebCore::DDModel::DDUpdateMeshDescriptor descriptor)
     void Render()
+    void AddTexture(WebCore::DDModel::DDTextureDescriptor descriptor)
+    void UpdateTexture(WebCore::DDModel::DDUpdateTextureDescriptor descriptor)
+    void AddMaterial(WebCore::DDModel::DDMaterialDescriptor descriptor)
+    void UpdateMaterial(WebCore::DDModel::DDUpdateMaterialDescriptor descriptor)
 }
 #endif

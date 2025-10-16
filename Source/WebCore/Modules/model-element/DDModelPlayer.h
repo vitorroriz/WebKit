@@ -33,7 +33,6 @@
 #include <wtf/Forward.h>
 #include <wtf/RetainPtr.h>
 #include <wtf/URL.h>
-#include <wtf/WeakPtr.h>
 
 OBJC_CLASS WebUSDModelLoader;
 
@@ -47,7 +46,7 @@ class ModelDisplayBufferDisplayDelegate;
 class ModelPlayerClient;
 class Page;
 
-class WEBCORE_EXPORT DDModelPlayer final : public ModelPlayer, public CanMakeWeakPtr<DDModelPlayer> {
+class WEBCORE_EXPORT DDModelPlayer final : public ModelPlayer {
 public:
     static Ref<DDModelPlayer> create(Page&, ModelPlayerClient&);
     virtual ~DDModelPlayer();
@@ -85,8 +84,9 @@ private:
 
     const MachSendRight* displayBuffer() const override;
     GraphicsLayerContentsDisplayDelegate* contentsDisplayDelegate() override;
+    void ensureOnMainThreadWithProtectedThis(Function<void(Ref<DDModelPlayer>)>&& task);
 
-    WeakPtr<ModelPlayerClient> m_client;
+    ThreadSafeWeakPtr<ModelPlayerClient> m_client;
 
     WebCore::ModelPlayerIdentifier m_id;
     RetainPtr<WebUSDModelLoader> m_modelLoader;

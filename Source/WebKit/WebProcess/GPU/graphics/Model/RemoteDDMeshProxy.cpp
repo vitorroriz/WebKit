@@ -28,11 +28,12 @@
 
 #if ENABLE(GPU_PROCESS)
 
-#include "DDMeshDescriptor.h"
-#include "DDUpdateMeshDescriptor.h"
 #include "ModelConvertToBackingContext.h"
 #include "RemoteDDMeshMessages.h"
+#include <WebCore/DDMeshDescriptor.h>
+#include <WebCore/DDTextureDescriptor.h>
 #include <WebCore/DDUpdateMeshDescriptor.h>
+#include <WebCore/DDUpdateTextureDescriptor.h>
 #include <wtf/TZoneMallocInlines.h>
 
 namespace WebKit::DDModel {
@@ -57,11 +58,7 @@ RemoteDDMeshProxy::~RemoteDDMeshProxy()
 void RemoteDDMeshProxy::addMesh(const WebCore::DDModel::DDMeshDescriptor& descriptor)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
-    auto convertedDescriptor = m_convertToBackingContext->convertToBacking(descriptor);
-    if (!convertedDescriptor)
-        return;
-
-    auto sendResult = send(Messages::RemoteDDMesh::AddMesh(*convertedDescriptor));
+    auto sendResult = send(Messages::RemoteDDMesh::AddMesh(descriptor));
     UNUSED_PARAM(sendResult);
 #else
     UNUSED_PARAM(descriptor);
@@ -71,11 +68,7 @@ void RemoteDDMeshProxy::addMesh(const WebCore::DDModel::DDMeshDescriptor& descri
 void RemoteDDMeshProxy::update(const WebCore::DDModel::DDUpdateMeshDescriptor& descriptor)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
-    auto convertedDescriptor = m_convertToBackingContext->convertToBacking(descriptor);
-    if (!convertedDescriptor)
-        return;
-
-    auto sendResult = send(Messages::RemoteDDMesh::Update(*convertedDescriptor));
+    auto sendResult = send(Messages::RemoteDDMesh::Update(descriptor));
     UNUSED_PARAM(sendResult);
 #else
     UNUSED_PARAM(descriptor);
@@ -97,6 +90,46 @@ void RemoteDDMeshProxy::setLabelInternal(const String& label)
     UNUSED_VARIABLE(sendResult);
 #else
     UNUSED_PARAM(label);
+#endif
+}
+
+void RemoteDDMeshProxy::addTexture(const WebCore::DDModel::DDTextureDescriptor& descriptor)
+{
+#if ENABLE(GPU_PROCESS_MODEL)
+    auto sendResult = send(Messages::RemoteDDMesh::AddTexture(descriptor));
+    UNUSED_PARAM(sendResult);
+#else
+    UNUSED_PARAM(descriptor);
+#endif
+}
+
+void RemoteDDMeshProxy::updateTexture(const WebCore::DDModel::DDUpdateTextureDescriptor& descriptor)
+{
+#if ENABLE(GPU_PROCESS_MODEL)
+    auto sendResult = send(Messages::RemoteDDMesh::UpdateTexture(descriptor));
+    UNUSED_PARAM(sendResult);
+#else
+    UNUSED_PARAM(descriptor);
+#endif
+}
+
+void RemoteDDMeshProxy::addMaterial(const WebCore::DDModel::DDMaterialDescriptor& descriptor)
+{
+#if ENABLE(GPU_PROCESS_MODEL)
+    auto sendResult = send(Messages::RemoteDDMesh::AddMaterial(descriptor));
+    UNUSED_PARAM(sendResult);
+#else
+    UNUSED_PARAM(descriptor);
+#endif
+}
+
+void RemoteDDMeshProxy::updateMaterial(const WebCore::DDModel::DDUpdateMaterialDescriptor& descriptor)
+{
+#if ENABLE(GPU_PROCESS_MODEL)
+    auto sendResult = send(Messages::RemoteDDMesh::UpdateMaterial(descriptor));
+    UNUSED_PARAM(sendResult);
+#else
+    UNUSED_PARAM(descriptor);
 #endif
 }
 

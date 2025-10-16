@@ -333,12 +333,6 @@ $(PROJECT_DIR)/Shared/LayerTreeContext.serialization.in
 $(PROJECT_DIR)/Shared/LoadParameters.serialization.in
 $(PROJECT_DIR)/Shared/MediaPlaybackState.serialization.in
 $(PROJECT_DIR)/Shared/Model.serialization.in
-$(PROJECT_DIR)/Shared/Model/DDMeshDescriptor.serialization.in
-$(PROJECT_DIR)/Shared/Model/DDMeshPart.serialization.in
-$(PROJECT_DIR)/Shared/Model/DDReplaceVertices.serialization.in
-$(PROJECT_DIR)/Shared/Model/DDUpdateMeshDescriptor.serialization.in
-$(PROJECT_DIR)/Shared/Model/DDVertexAttributeFormat.serialization.in
-$(PROJECT_DIR)/Shared/Model/DDVertexLayout.serialization.in
 $(PROJECT_DIR)/Shared/Model/ModelObjectDescriptorBase.serialization.in
 $(PROJECT_DIR)/Shared/ModelProcessConnectionParameters.serialization.in
 $(PROJECT_DIR)/Shared/MonotonicObjectIdentifier.serialization.in

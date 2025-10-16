@@ -33,8 +33,12 @@
 
 namespace WebCore::DDModel {
 
+struct DDMaterialDescriptor;
 struct DDMeshDescriptor;
+struct DDTextureDescriptor;
+struct DDUpdateMaterialDescriptor;
 struct DDUpdateMeshDescriptor;
+struct DDUpdateTextureDescriptor;
 
 class DDMesh : public RefCountedAndCanMakeWeakPtr<DDMesh> {
 public:
@@ -50,6 +54,11 @@ public:
 
     virtual void addMesh(const DDMeshDescriptor&) = 0;
     virtual void update(const DDUpdateMeshDescriptor&) = 0;
+    virtual void addTexture(const DDTextureDescriptor&) = 0;
+    virtual void updateTexture(const DDUpdateTextureDescriptor&) = 0;
+    virtual void addMaterial(const DDMaterialDescriptor&) = 0;
+    virtual void updateMaterial(const DDUpdateMaterialDescriptor&) = 0;
+
     virtual void render() = 0;
 #if PLATFORM(COCOA)
     virtual Vector<MachSendRight> ioSurfaceHandles() { return { }; }

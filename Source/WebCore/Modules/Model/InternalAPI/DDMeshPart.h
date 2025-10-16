@@ -26,13 +26,10 @@
 #pragma once
 
 #include <WebCore/DDFloat3.h>
-#include <WebCore/DDVertexAttributeFormat.h>
-#include <WebCore/DDVertexLayout.h>
-#include <WebCore/ModelObjectDescriptorBase.h>
 
 namespace WebCore::DDModel {
 
-struct DDMeshPart : public ObjectDescriptorBase {
+struct DDMeshPart {
     uint32_t indexOffset;
     uint32_t indexCount;
     uint32_t topology;

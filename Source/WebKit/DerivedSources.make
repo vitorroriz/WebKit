@@ -829,18 +829,6 @@ SERIALIZATION_DESCRIPTION_FILES = \
 	Shared/mac/SecItemRequestData.serialization.in \
 	Shared/mac/SecItemResponseData.serialization.in \
 	Shared/mac/WebHitTestResultPlatformData.serialization.in \
-	Shared/Model/DDMeshDescriptor.serialization.in \
-	Shared/Model/DDMeshPart.serialization.in \
-	Shared/Model/DDReplaceVertices.serialization.in \
-	Shared/Model/DDUpdateMeshDescriptor.serialization.in \
-	Shared/Model/DDVertexAttributeFormat.serialization.in \
-	Shared/Model/DDVertexLayout.serialization.in \
-	Shared/Model/DDMeshDescriptor.serialization.in \
-	Shared/Model/DDMeshPart.serialization.in \
-	Shared/Model/DDReplaceVertices.serialization.in \
-	Shared/Model/DDUpdateMeshDescriptor.serialization.in \
-	Shared/Model/DDVertexAttributeFormat.serialization.in \
-	Shared/Model/DDVertexLayout.serialization.in \
 	Shared/Model/ModelObjectDescriptorBase.serialization.in \
 	Shared/WebsiteDataStoreParameters.serialization.in \
 	Shared/WebsiteData/UnifiedOriginStorageLevel.serialization.in \

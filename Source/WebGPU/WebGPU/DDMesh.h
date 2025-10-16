@@ -59,6 +59,11 @@ public:
     bool isValid() const;
     void addMesh(WGPUDDMeshDescriptor*);
     void update(WGPUDDUpdateMeshDescriptor*);
+    void addTexture(WGPUDDTextureDescriptor*);
+    void updateTexture(WGPUDDUpdateTextureDescriptor*);
+    void addMaterial(WGPUDDMaterialDescriptor*);
+    void updateMaterial(WGPUDDUpdateMaterialDescriptor*);
+
     id<MTLTexture> texture() const;
     void render() const;
 

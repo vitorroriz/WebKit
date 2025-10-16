@@ -326,8 +326,6 @@ Shared/Gamepad/GamepadData.cpp
 
 Shared/graphics/ImageBufferSet.cpp
 
-Shared/Model/DDMeshDescriptor.cpp
-Shared/Model/DDUpdateMeshDescriptor.cpp
 Shared/Model/ModelObjectDescriptorBase.cpp
 
 Shared/WebGPU/WebGPUBindGroupDescriptor.cpp

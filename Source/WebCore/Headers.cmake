@@ -3,11 +3,17 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     Modules/Model/InternalAPI/DDFloat3.h
     Modules/Model/InternalAPI/DDFloat4x4.h
+    Modules/Model/InternalAPI/DDImageAsset.h
+    Modules/Model/InternalAPI/DDMaterialDescriptor.h
     Modules/Model/InternalAPI/DDMesh.h
     Modules/Model/InternalAPI/DDMeshDescriptor.h
     Modules/Model/InternalAPI/DDMeshPart.h
+    Modules/Model/InternalAPI/DDModel.serialization.in
     Modules/Model/InternalAPI/DDReplaceVertices.h
+    Modules/Model/InternalAPI/DDTextureDescriptor.h
+    Modules/Model/InternalAPI/DDUpdateMaterialDescriptor.h
     Modules/Model/InternalAPI/DDUpdateMeshDescriptor.h
+    Modules/Model/InternalAPI/DDUpdateTextureDescriptor.h
     Modules/Model/InternalAPI/DDVertexAttributeFormat.h
     Modules/Model/InternalAPI/DDVertexLayout.h
     Modules/Model/InternalAPI/ModelObjectDescriptorBase.h
