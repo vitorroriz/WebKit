@@ -175,7 +175,6 @@ wasm/WasmPlan.cpp
 wasm/WasmSectionParser.cpp
 wasm/WasmStreamingCompiler.cpp
 wasm/WasmStreamingParser.cpp
-wasm/WasmTag.h
 wasm/WasmTypeDefinition.cpp
 wasm/WasmTypeDefinition.h
 wasm/WasmTypeDefinitionInlines.h
