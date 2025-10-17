@@ -3069,7 +3069,8 @@ DEFINE_VISIT_CHILDREN_WITH_MODIFIER(JS_EXPORT_PRIVATE, JSGlobalObject);
 SUPPRESS_ASAN void JSGlobalObject::exposeDollarVM(VM& vm)
 {
     RELEASE_ASSERT(g_jscConfig.restrictedOptionsEnabled && Options::useDollarVM());
-    if (hasOwnProperty(this, vm.propertyNames->builtinNames().dollarVMPrivateName()))
+    PropertySlot slot(this, PropertySlot::InternalMethodType::VMInquiry, &vm);
+    if (getOwnPropertySlot(this, this, vm.propertyNames->builtinNames().dollarVMPrivateName(), slot))
         return;
 
     JSDollarVM* dollarVM = JSDollarVM::create(vm, JSDollarVM::createStructure(vm, this, m_objectPrototype.get()));

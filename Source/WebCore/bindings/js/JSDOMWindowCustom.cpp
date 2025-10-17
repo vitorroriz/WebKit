@@ -198,10 +198,6 @@ bool JSDOMWindow::getOwnPropertySlot(JSObject* object, JSGlobalObject* lexicalGl
 
     ASSERT(lexicalGlobalObject->vm().currentThreadIsHoldingAPILock());
 
-    // FIXME (rdar://115751655): This should be replaced with a same-origin check between the active and target document.
-    if (!is<LocalDOMWindow>(thisObject->wrapped()) && propertyName == "$vm"_s) [[unlikely]]
-        return true;
-
     // Hand off all cross-domain access to jsDOMWindowGetOwnPropertySlotRestrictedAccess.
     String errorMessage;
     if (!BindingSecurity::shouldAllowAccessToDOMWindow(*lexicalGlobalObject, thisObject->wrapped(), errorMessage))
