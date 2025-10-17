@@ -1013,6 +1013,9 @@ accessibility/datetime/input-time-field-labels-and-value-changes.html [ Skip ] #
 # -webkit-overflow-scrolling (ENABLE_WEBKIT_OVERFLOW_SCROLLING_CSS_PROPERTY) is only for iOS
 fast/repaint/overflow-scroll-touch-repaint.html [ Skip ]
 
+# On GTK, arrow keys are incrementing date fields by 2 steps, both with and without this change, so this test doesn't need to run since the code is guarded with PLATFORM(COCOA).
+accessibility/contenteditable-spinbutton-uses-arrow-keys.html [ Skip ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Accessibility-related bugs
 #////////////////////////////////////////////////////////////////////////////////////////

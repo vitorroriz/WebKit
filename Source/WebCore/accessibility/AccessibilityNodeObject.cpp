@@ -1689,6 +1689,19 @@ void AccessibilityNodeObject::alterRangeValue(StepAction stepAction)
     if (!element || element->isDisabledFormControl())
         return;
 
+#if PLATFORM(COCOA)
+    if (role() == AccessibilityRole::SpinButton) {
+        // First try a keyboard event to see if that affects the value of the spinbutton, since authors are supposed to handle up/down keys.
+        // We can't check the event listeners directly here since those may be on an ancestor or the document.
+        float beforeValue = valueForRange();
+        postKeyboardKeysForValueChange(stepAction);
+        if (beforeValue != valueForRange()) {
+            // Performing a keyboard action (up/down arrow) resulted in a value change, so return early to avoid doubly-modifing the value.
+            return;
+        }
+    }
+#endif
+
     if (!getAttribute(stepAttr).isEmpty())
         changeValueByStep(stepAction);
     else
