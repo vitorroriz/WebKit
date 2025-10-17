@@ -36,7 +36,6 @@
 
 #if PLATFORM(GTK)
 #include "GtkUtilities.h"
-#include <WebCore/GdkCairoUtilities.h>
 #include <WebCore/RefPtrCairo.h>
 #endif
 

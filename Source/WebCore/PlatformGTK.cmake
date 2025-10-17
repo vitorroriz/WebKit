@@ -60,8 +60,6 @@ list(APPEND WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/graphics/gbm/GBMVersioning.h
     platform/graphics/gbm/PlatformDisplayGBM.h
 
-    platform/graphics/gtk/GdkCairoUtilities.h
-
     platform/graphics/x11/XErrorTrapper.h
 
     platform/gtk/ScrollbarThemeGtk.h

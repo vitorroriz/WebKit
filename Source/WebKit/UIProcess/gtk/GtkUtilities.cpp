@@ -21,7 +21,6 @@
 
 #include "GtkVersioning.h"
 #include <WebCore/Color.h>
-#include <WebCore/GdkCairoUtilities.h>
 #include <WebCore/Image.h>
 #include <WebCore/IntPoint.h>
 #include <WebCore/NativeImage.h>
@@ -209,6 +208,13 @@ RefPtr<cairo_surface_t> skiaImageToCairoSurface(SkImage& image)
 }
 #endif
 #endif // USE(SKIA)
+
+#if USE(CAIRO)
+GRefPtr<GdkPixbuf> cairoSurfaceToGdkPixbuf(cairo_surface_t* surface)
+{
+    return adoptGRef(gdk_pixbuf_get_from_surface(surface, 0, 0, cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface)));
+}
+#endif
 
 OptionSet<DragOperation> gdkDragActionToDragOperation(GdkDragAction gdkAction)
 {

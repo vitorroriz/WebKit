@@ -103,7 +103,6 @@
 #include "WebKitPrintOperationPrivate.h"
 #include "WebKitWebInspectorPrivate.h"
 #include "WebKitWebViewBasePrivate.h"
-#include <WebCore/GdkCairoUtilities.h>
 #include <WebCore/RefPtrCairo.h>
 #endif
 
