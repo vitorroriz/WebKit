@@ -2397,6 +2397,4 @@ webkit.org/b/299830 imported/w3c/web-platform-tests/storage-access-api/hasStorag
 
 webkit.org/b/299826 [ Release x86_64 ] media/modern-media-controls/media-controller/media-controller-click-on-video-background-should-pause.html [ Crash ]
 
-webkit.org/b/300864 [ Debug ] imported/w3c/web-platform-tests/editing/crashtests/insertHTML-before-comment-at-end-of-editing-host.html [ Skip ]
-
 webkit.org/b/300864 imported/w3c/web-platform-tests/css/css-viewport/zoom/filters-drop-shadow.html [ Pass Failure ]
