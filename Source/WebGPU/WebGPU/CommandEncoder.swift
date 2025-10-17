@@ -842,9 +842,10 @@ extension WebGPU.CommandEncoder {
         var counterSampleBufferOffset: UInt32 = 0
         if let wgpuTimestampWrites = wgpuGetRenderPassDescriptorTimestampWrites(descriptorSpan)?[0] {
             let wgpuQuerySet = wgpuTimestampWrites.querySet
-            let querySet = WebGPU.fromAPI(wgpuQuerySet)
-            counterSampleBuffer = unsafe querySet.counterSampleBufferWithOffset().first
-            counterSampleBufferOffset = unsafe querySet.counterSampleBufferWithOffset().second
+            let timestampsWrites = WebGPU.fromAPI(wgpuQuerySet)
+            counterSampleBuffer = unsafe timestampsWrites.counterSampleBufferWithOffset().first
+            counterSampleBufferOffset = unsafe timestampsWrites.counterSampleBufferWithOffset().second
+            timestampsWrites.setCommandEncoder(self)
         }
 
         if m_device.ptr().enableEncoderTimestamps() || counterSampleBuffer != nil {
@@ -2153,8 +2154,10 @@ extension WebGPU.CommandEncoder {
         var counterSampleBuffer: MTLCounterSampleBuffer? = nil
         var counterSampleBufferOffset: UInt32 = 0
         if let wgpuTimestampWrites = wgpuGetComputePassDescriptorTimestampWrites(collection.span)?[0] {
-            counterSampleBuffer = unsafe WebGPU.fromAPI(wgpuTimestampWrites.querySet).counterSampleBufferWithOffset().first
-            counterSampleBufferOffset = unsafe WebGPU.fromAPI(wgpuTimestampWrites.querySet).counterSampleBufferWithOffset().second
+            let timestampsWrites = WebGPU.fromAPI(wgpuTimestampWrites.querySet)
+            counterSampleBuffer = unsafe timestampsWrites.counterSampleBufferWithOffset().first
+            counterSampleBufferOffset = unsafe timestampsWrites.counterSampleBufferWithOffset().second
+            timestampsWrites.setCommandEncoder(self)
         }
 
         if m_device.ptr().enableEncoderTimestamps() || counterSampleBuffer != nil {
