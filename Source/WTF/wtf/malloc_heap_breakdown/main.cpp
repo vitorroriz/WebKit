@@ -130,7 +130,8 @@ private:
     ~MallocZoneHeapManager()
     {
         m_forceThreadExit = true;
-        m_monitorThread->join();
+        if (m_monitorThread)
+            m_monitorThread->join();
     }
 
     void monitoringThreadMain()
