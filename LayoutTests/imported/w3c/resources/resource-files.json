@@ -11712,7 +11712,6 @@
         "web-platform-tests/html/semantics/forms/the-textarea-element/multiline-placeholder-ref.html",
         "web-platform-tests/html/semantics/forms/the-textarea-element/placeholder-white-space-notref.html",
         "web-platform-tests/html/semantics/forms/the-textarea-element/textarea-newline-bidi-ref.html",
-        "web-platform-tests/html/semantics/forms/the-textarea-element/textarea-textLength.html",
         "web-platform-tests/html/semantics/forms/the-textarea-element/wrap-enumerated-ascii-case-insensitive-child.html",
         "web-platform-tests/html/semantics/forms/the-textarea-element/wrap-reflect-1-ref.html",
         "web-platform-tests/html/semantics/grouping-content/the-li-element/grouping-li-reftest-001-ref.html",
