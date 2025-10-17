@@ -92,8 +92,10 @@ protected:
     bool antialias() const { return std::get<0>(GetParam()); }
     bool preserveDrawingBuffer() const { return std::get<1>(GetParam()); }
     bool isWebGL2() const { return std::get<2>(GetParam()); }
+#if ENABLE(WEBXR)
     GraphicsContextGLAttributes attributes();
     RefPtr<TestedGraphicsContextGLTextureMapper> createTestContext(IntSize contextSize);
+#endif
 
     void SetUp() override // NOLINT
     {
@@ -108,6 +110,7 @@ private:
     std::optional<ScopedSetAuxiliaryProcessTypeForTesting> m_scopedProcessType;
 };
 
+#if ENABLE(WEBXR)
 GraphicsContextGLAttributes AnyContextAttributeTest::attributes()
 {
     GraphicsContextGLAttributes attributes;
@@ -128,6 +131,7 @@ RefPtr<TestedGraphicsContextGLTextureMapper> AnyContextAttributeTest::createTest
     context->reshape(contextSize.width(), contextSize.height());
     return context;
 }
+#endif
 
 } // namespace
 
