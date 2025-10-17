@@ -45,6 +45,19 @@ class WeakPtrImplWithEventTargetData;
 
 using DOMHighResTimeStamp = double;
 
+struct PerElementImageData {
+    WeakPtr<CachedImage> image;
+    FloatRect rect;
+    Markable<MonotonicTime> loadTime;
+    bool inContentSet { false };
+};
+
+struct ElementLargestContentfulPaintData {
+    WTF_MAKE_STRUCT_TZONE_ALLOCATED(ElementLargestContentfulPaintData);
+    FloatRect accumulatedTextRect;
+    Vector<PerElementImageData> imageData;
+};
+
 class LargestContentfulPaintData {
     WTF_MAKE_TZONE_ALLOCATED(LargestContentfulPaintData);
 public:
@@ -71,19 +84,15 @@ private:
 
     void potentiallyAddLargestContentfulPaintEntry(Element&, CachedImage*, FloatRect imageLocalRect, FloatRect intersectionRect, MonotonicTime loadTime, DOMHighResTimeStamp paintTimestamp, std::optional<FloatSize>& viewportSize);
 
+    void scheduleRenderingUpdateIfNecessary(Element&);
+
     float m_largestPaintArea { 0 };
 
-    struct PendingImageData {
-        FloatRect rect;
-        Markable<MonotonicTime> loadTime;
-    };
-
-    WeakHashMap<Element, WeakHashSet<CachedImage>, WeakPtrImplWithEventTargetData> m_imageContentSet;
-    WeakHashMap<Element, WeakHashMap<CachedImage, PendingImageData>, WeakPtrImplWithEventTargetData> m_pendingImageRecords;
-
-    WeakHashMap<Element, FloatRect, WeakPtrImplWithEventTargetData> m_paintedTextRecords;
+    WeakHashSet<Element, WeakPtrImplWithEventTargetData> m_paintedTextRecords;
+    WeakHashMap<Element, Vector<WeakPtr<CachedImage>>, WeakPtrImplWithEventTargetData> m_pendingImageRecords;
 
     RefPtr<LargestContentfulPaint> m_pendingEntry;
+    bool m_haveNewCandidate { false };
 };
 
 } // namespace WebCore

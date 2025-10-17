@@ -99,6 +99,7 @@
 #include "KeyboardEvent.h"
 #include "KeyframeAnimationOptions.h"
 #include "KeyframeEffect.h"
+#include "LargestContentfulPaintData.h"
 #include "LocalDOMWindow.h"
 #include "LocalFrame.h"
 #include "LocalFrameView.h"
@@ -5201,7 +5202,7 @@ IntersectionObserverData& Element::ensureIntersectionObserverData()
     return *rareData.intersectionObserverData();
 }
 
-IntersectionObserverData* Element::intersectionObserverDataIfExists()
+IntersectionObserverData* Element::intersectionObserverDataIfExists() const
 {
     return hasRareData() ? elementRareData()->intersectionObserverData() : nullptr;
 }
@@ -5384,9 +5385,22 @@ ResizeObserverData& Element::ensureResizeObserverData()
     return *rareData.resizeObserverData();
 }
 
-ResizeObserverData* Element::resizeObserverDataIfExists()
+ResizeObserverData* Element::resizeObserverDataIfExists() const
 {
     return hasRareData() ? elementRareData()->resizeObserverData() : nullptr;
+}
+
+ElementLargestContentfulPaintData& Element::ensureLargestContentfulPaintData()
+{
+    auto& rareData = ensureElementRareData();
+    if (!rareData.largestContentfulPaintData())
+        rareData.setLargestContentfulPaintData(makeUnique<ElementLargestContentfulPaintData>());
+    return *rareData.largestContentfulPaintData();
+}
+
+ElementLargestContentfulPaintData* Element::largestContentfulPaintDataIfExists() const
+{
+    return hasRareData() ? elementRareData()->largestContentfulPaintData() : nullptr;
 }
 
 std::optional<LayoutUnit> Element::lastRememberedLogicalWidth() const

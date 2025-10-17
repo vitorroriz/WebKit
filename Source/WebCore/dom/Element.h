@@ -137,6 +137,7 @@ struct GetAnimationsOptions;
 struct GetHTMLOptions;
 struct IntersectionObserverData;
 struct KeyframeAnimationOptions;
+struct ElementLargestContentfulPaintData;
 struct PointerLockOptions;
 struct ResizeObserverData;
 struct ScrollIntoViewOptions;
@@ -859,10 +860,13 @@ public:
     void setAttributeEventListener(const AtomString& eventType, const QualifiedName& attributeName, const AtomString& value);
 
     virtual IntersectionObserverData& ensureIntersectionObserverData();
-    virtual IntersectionObserverData* intersectionObserverDataIfExists();
+    virtual IntersectionObserverData* intersectionObserverDataIfExists() const;
 
     ResizeObserverData& ensureResizeObserverData();
-    ResizeObserverData* resizeObserverDataIfExists();
+    ResizeObserverData* resizeObserverDataIfExists() const;
+
+    ElementLargestContentfulPaintData& ensureLargestContentfulPaintData();
+    ElementLargestContentfulPaintData* largestContentfulPaintDataIfExists() const;
 
     std::optional<LayoutUnit> lastRememberedLogicalWidth() const;
     std::optional<LayoutUnit> lastRememberedLogicalHeight() const;

@@ -1067,7 +1067,7 @@ IntersectionObserverData& HTMLImageElement::ensureIntersectionObserverData()
     return *m_intersectionObserverData;
 }
 
-IntersectionObserverData* HTMLImageElement::intersectionObserverDataIfExists()
+IntersectionObserverData* HTMLImageElement::intersectionObserverDataIfExists() const
 {
     return m_intersectionObserverData.get();
 }
