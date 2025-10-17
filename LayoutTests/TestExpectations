@@ -7657,7 +7657,7 @@ webkit.org/b/294638 imported/w3c/web-platform-tests/css/selectors/focus-visible-
 
 # Skip large regular expression tests on Debug to avoid timeout.
 [ Debug ] fast/regex/slow.html [ Skip ]
-[ Debug ] imported/w3c/web-platform-tests/html/semantics/forms/constraints/infinite_backtracking.html [ Skip ]
+[ Debug ] imported/w3c/web-platform-tests/html/semantics/forms/constraints/infinite_backtracking.tentative.html [ Skip ]
 
 # Cocoa-only test.
 webkit.org/b/286318 http/tests/iframe-monitor [ Skip ]

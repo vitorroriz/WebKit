@@ -3773,6 +3773,9 @@
     "imported/w3c/web-platform-tests/html/semantics/forms/beforeinput.tentative.html": [
         "slow"
     ],
+    "imported/w3c/web-platform-tests/html/semantics/forms/constraints/form-validation-reportValidity.html": [
+        "slow"
+    ],
     "imported/w3c/web-platform-tests/html/semantics/forms/form-submission-0/submit-entity-body.html": [
         "slow"
     ],
