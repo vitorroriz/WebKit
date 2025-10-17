@@ -109,8 +109,13 @@ public:
             zoneFree(zone, memory);
             return nullptr;
         }
-        m_zoneAllocations[zone][memory] = size;
-        return realloc(memory, size);
+        void* ptr = realloc(memory, size);
+        if (ptr) {
+            if (ptr != memory)
+                m_zoneAllocations[zone].erase(memory);
+            m_zoneAllocations[zone][ptr] = size;
+        }
+        return ptr;
     }
     void* zoneMemalign(malloc_zone_t* zone, size_t alignment, size_t size)
     {
