@@ -97,7 +97,7 @@ static KeyframeEffectStack* keyframeEffectStackForElementAndPseudoId(const Eleme
     if (!element.mayHaveKeyframeEffects())
         return nullptr;
 
-    return element.keyframeEffectStack(pseudoId == PseudoId::None ? std::nullopt : std::optional(Style::PseudoElementIdentifier { pseudoId }));
+    return element.keyframeEffectStack(std::optional(Style::PseudoElementIdentifier { pseudoId }));
 }
 
 static bool needsPseudoElementForAnimation(const Element& element, PseudoId pseudoId)
@@ -221,7 +221,7 @@ void RenderTreeUpdater::GeneratedContent::updateBeforeOrAfterPseudoElement(Eleme
         // For display:contents we create an inline wrapper that inherits its
         // style from the display:contents style.
         auto contentsStyle = RenderStyle::createPtr();
-        contentsStyle->setPseudoElementType(pseudoId);
+        contentsStyle->setPseudoElementIdentifier({ { pseudoId } });
         contentsStyle->inheritFrom(*updateStyle);
         contentsStyle->copyContentFrom(*updateStyle);
         contentsStyle->copyPseudoElementsFrom(*updateStyle);

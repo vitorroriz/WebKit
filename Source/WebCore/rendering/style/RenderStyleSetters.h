@@ -446,7 +446,7 @@ inline void RenderStyle::NonInheritedFlags::setHasPseudoStyles(EnumSet<PseudoId>
 {
     ASSERT(pseudoIdSet);
     ASSERT(pseudoIdSet.containsOnly(allPublicPseudoIds));
-    pseudoBits = pseudoIdSet.toRaw() >> 1; // Shift down as we do not store a bit for PseudoId::None.
+    pseudoBits = pseudoIdSet.toRaw();
 }
 
 inline void RenderStyle::resetBorder()
@@ -508,20 +508,15 @@ inline bool RenderStyle::setUsedZoom(float zoomLevel)
     return true;
 }
 
-inline void RenderStyle::setPseudoElementNameArgument(const AtomString& identifier)
+inline void RenderStyle::setPseudoElementIdentifier(std::optional<Style::PseudoElementIdentifier>&& identifier)
 {
-    ASSERT(pseudoElementType() == PseudoId::ViewTransitionGroup
-        || pseudoElementType() == PseudoId::ViewTransitionImagePair
-        || pseudoElementType() == PseudoId::ViewTransitionNew
-        || pseudoElementType() == PseudoId::ViewTransitionOld
-        || pseudoElementType() == PseudoId::Highlight
-        || identifier.isNull());
-    SET_NESTED(m_nonInheritedData, rareData, pseudoElementNameArgument, identifier);
-}
-
-inline void RenderStyle::setPseudoElementType(PseudoId pseudoElementType)
-{
-    m_nonInheritedFlags.pseudoElementType = enumToUnderlyingType(pseudoElementType);
+    if (identifier) {
+        m_nonInheritedFlags.pseudoElementType = enumToUnderlyingType(identifier->pseudoId) + 1;
+        SET_NESTED(m_nonInheritedData, rareData, pseudoElementNameArgument, WTFMove(identifier->nameArgument));
+    } else {
+        m_nonInheritedFlags.pseudoElementType = 0;
+        SET_NESTED(m_nonInheritedData, rareData, pseudoElementNameArgument, nullAtom());
+    }
 }
 
 inline void RenderStyle::setGridTemplateColumns(Style::GridTemplateList&& list)

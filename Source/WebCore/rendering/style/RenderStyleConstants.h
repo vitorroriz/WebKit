@@ -85,9 +85,6 @@ enum class StyleDifferenceContextSensitiveProperty : uint8_t {
 };
 
 enum class PseudoId : uint8_t {
-    // FIXME: Get rid of the None value, use std::optional<PseudoId> instead.
-    None,
-
     // Public:
     FirstLine,
     FirstLetter,

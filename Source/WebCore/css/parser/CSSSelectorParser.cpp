@@ -1410,9 +1410,9 @@ CSSSelectorList CSSSelectorParser::resolveNestingParent(const CSSSelectorList& n
 static std::optional<Style::PseudoElementIdentifier> pseudoElementIdentifierFor(CSSSelectorPseudoElement type)
 {
     auto pseudoId = CSSSelector::pseudoId(type);
-    if (pseudoId == PseudoId::None)
+    if (!pseudoId)
         return { };
-    return Style::PseudoElementIdentifier { pseudoId };
+    return Style::PseudoElementIdentifier { *pseudoId };
 }
 
 // FIXME: It's probably worth investigating if more logic can be shared with
@@ -1467,7 +1467,7 @@ std::pair<bool, std::optional<Style::PseudoElementIdentifier>> CSSSelectorParser
         auto& ident = block.consumeIncludingWhitespace();
         if (ident.type() != IdentToken || !isValidCustomIdentifier(ident.id()) || !block.atEnd())
             return { };
-        return { true, Style::PseudoElementIdentifier { CSSSelector::pseudoId(*pseudoElement), ident.value().toAtomString() } };
+        return { true, Style::PseudoElementIdentifier { *CSSSelector::pseudoId(*pseudoElement), ident.value().toAtomString() } };
     }
     default:
         return { };

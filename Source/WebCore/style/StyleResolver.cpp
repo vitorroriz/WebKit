@@ -421,8 +421,9 @@ std::unique_ptr<RenderStyle> Resolver::styleForKeyframe(Element& element, const 
 
     ElementRuleCollector collector(element, m_ruleSets, context.selectorMatchingState);
 
-    if (elementStyle.pseudoElementType() != PseudoId::None)
-        collector.setPseudoElementRequest(elementStyle.pseudoElementIdentifier());
+    auto pseudoElementIdentifier = elementStyle.pseudoElementIdentifier();
+    if (pseudoElementIdentifier)
+        collector.setPseudoElementRequest(*pseudoElementIdentifier);
 
     if (hasRevert) {
         // In the animation origin, 'revert' rolls back the cascaded value to the user level.
@@ -436,7 +437,7 @@ std::unique_ptr<RenderStyle> Resolver::styleForKeyframe(Element& element, const 
     builder.state().setIsBuildingKeyframeStyle();
     builder.applyAllProperties();
 
-    Adjuster adjuster(document(), *state.parentStyle(), nullptr, elementStyle.pseudoElementType() == PseudoId::None ? &element : nullptr);
+    Adjuster adjuster(document(), *state.parentStyle(), nullptr, !pseudoElementIdentifier ? &element : nullptr);
     adjuster.adjust(*state.style());
 
     return state.takeStyle();
@@ -583,8 +584,7 @@ std::optional<ResolvedStyle> Resolver::styleForPseudoElement(Element& element, c
     }
 
     ElementRuleCollector collector(element, m_ruleSets, context.selectorMatchingState);
-    if (pseudoElementRequest.pseudoId() != PseudoId::None)
-        collector.setPseudoElementRequest(pseudoElementRequest);
+    collector.setPseudoElementRequest(pseudoElementRequest);
     collector.setMedium(m_mediaQueryEvaluator);
     collector.matchUARules();
 
@@ -598,9 +598,7 @@ std::optional<ResolvedStyle> Resolver::styleForPseudoElement(Element& element, c
     if (collector.matchResult().isEmpty())
         return { };
 
-    state.style()->setPseudoElementType(pseudoElementRequest.pseudoId());
-    if (!pseudoElementRequest.nameArgument().isNull())
-        state.style()->setPseudoElementNameArgument(pseudoElementRequest.nameArgument());
+    state.style()->setPseudoElementIdentifier(pseudoElementRequest.identifier());
 
     applyMatchedProperties(state, collector.matchResult(), PropertyCascade::normalProperties());
 

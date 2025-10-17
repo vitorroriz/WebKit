@@ -508,7 +508,7 @@ std::optional<ElementUpdate> TreeResolver::resolvePseudoElement(Element& element
             // ::first-line can inherit to ::before/::after
             if (auto firstLineContext = makeResolutionContextForInheritedFirstLine(elementUpdate, *elementUpdate.style)) {
                 auto firstLineStyle = scope().resolver->styleForPseudoElement(element, pseudoElementIdentifier, *firstLineContext);
-                firstLineStyle->style->setPseudoElementType(PseudoId::FirstLine);
+                firstLineStyle->style->setPseudoElementIdentifier({ { PseudoId::FirstLine } });
                 animatedUpdate.style->addCachedPseudoStyle(WTFMove(firstLineStyle->style));
             }
         }
@@ -573,7 +573,7 @@ std::optional<ResolvedStyle> TreeResolver::resolveAncestorFirstLinePseudoElement
             return { };
 
         auto elementStyle = scope().resolver->styleForElement(element, *resolutionContext);
-        elementStyle.style->setPseudoElementType(PseudoId::FirstLine);
+        elementStyle.style->setPseudoElementIdentifier({ { PseudoId::FirstLine } });
 
         return elementStyle;
     }
@@ -937,8 +937,7 @@ std::unique_ptr<RenderStyle> TreeResolver::resolveAgainInDifferentContext(const 
     auto newStyle = RenderStyle::createPtr();
     newStyle->inheritFrom(parentStyle);
 
-    newStyle->setPseudoElementType(resolvedStyle.style->pseudoElementType());
-    newStyle->setPseudoElementNameArgument(resolvedStyle.style->pseudoElementNameArgument());
+    newStyle->setPseudoElementIdentifier(resolvedStyle.style->pseudoElementIdentifier());
     newStyle->copyPseudoElementBitsFrom(*resolvedStyle.style);
 
     auto builderContext = BuilderContext {

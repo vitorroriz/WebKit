@@ -1981,28 +1981,30 @@ bool RenderBlock::isPointInOverflowControl(HitTestResult& result, const LayoutPo
 
 Node* RenderBlock::nodeForHitTest() const
 {
-    switch (style().pseudoElementType()) {
-    // If we're a ::backdrop pseudo-element, we should hit-test to the element that generated it.
-    // This matches the behavior that other browsers have.
-    case PseudoId::Backdrop:
-        for (auto& element : document().topLayerElements()) {
-            if (!element->renderer())
-                continue;
-            ASSERT(element->renderer()->backdropRenderer());
-            if (element->renderer()->backdropRenderer() == this)
-                return element.ptr();
+    if (auto pseudoId = style().pseudoElementType()) {
+        switch (*pseudoId) {
+        case PseudoId::Backdrop:
+            // If we're a ::backdrop pseudo-element, we should hit-test to the element that generated it.
+            // This matches the behavior that other browsers have.
+            for (auto& element : document().topLayerElements()) {
+                if (!element->renderer())
+                    continue;
+                ASSERT(element->renderer()->backdropRenderer());
+                if (element->renderer()->backdropRenderer() == this)
+                    return element.ptr();
+            }
+            ASSERT_NOT_REACHED();
+            break;
+
+        case PseudoId::ViewTransition:
+        case PseudoId::ViewTransitionGroup:
+        case PseudoId::ViewTransitionImagePair:
+            // The view transition pseudo-elements should hit-test to their originating element (the document element).
+            return document().documentElement();
+
+        default:
+            break;
         }
-        ASSERT_NOT_REACHED();
-        break;
-
-    // The view transition pseudo-elements should hit-test to their originating element (the document element).
-    case PseudoId::ViewTransition:
-    case PseudoId::ViewTransitionGroup:
-    case PseudoId::ViewTransitionImagePair:
-        return document().documentElement();
-
-    default:
-        break;
     }
 
     // If we are in the margins of block elements that are part of a

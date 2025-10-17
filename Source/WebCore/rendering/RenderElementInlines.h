@@ -53,7 +53,7 @@ inline bool RenderElement::isAnonymousBlock() const
 {
     return isAnonymous()
         && (style().display() == DisplayType::Block || style().display() == DisplayType::Box)
-        && style().pseudoElementType() == PseudoId::None
+        && !style().pseudoElementType()
         && isRenderBlock()
 #if ENABLE(MATHML)
         && !isRenderMathMLBlock()

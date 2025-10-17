@@ -67,7 +67,13 @@ namespace WebCore {
 
 const std::optional<const Styleable> Styleable::fromRenderer(const RenderElement& renderer)
 {
-    switch (renderer.style().pseudoElementType()) {
+    if (!renderer.style().pseudoElementType()) {
+        if (auto* element = renderer.element())
+            return fromElement(*element);
+        return { };
+    }
+
+    switch (*renderer.style().pseudoElementType()) {
     case PseudoId::Backdrop:
         for (auto& topLayerElement : renderer.document().topLayerElements()) {
             if (topLayerElement->renderer() && topLayerElement->renderer()->backdropRenderer() == &renderer)
@@ -97,7 +103,6 @@ const std::optional<const Styleable> Styleable::fromRenderer(const RenderElement
         break;
     case PseudoId::After:
     case PseudoId::Before:
-    case PseudoId::None:
         if (auto* element = renderer.element())
             return fromElement(*element);
         break;

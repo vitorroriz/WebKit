@@ -203,7 +203,7 @@ double computeNonCalcLengthDouble(double value, CSS::LengthUnit lengthUnit, cons
         if (!element)
             return { };
 
-        auto mode = conversionData.style()->pseudoElementType() == PseudoId::None
+        auto mode = !conversionData.style()->pseudoElementType()
             ? Style::ContainerQueryEvaluator::SelectionMode::Element
             : Style::ContainerQueryEvaluator::SelectionMode::PseudoElement;
 

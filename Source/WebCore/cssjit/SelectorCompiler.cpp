@@ -4360,15 +4360,15 @@ void SelectorCodeGenerator::generateRequestedPseudoElementEqualsToSelectorPseudo
 {
     ASSERT(m_selectorContext != SelectorContext::QuerySelector);
     // Make sure that the requested pseudoId equals to the pseudo element of the rightmost fragment.
-    // If the rightmost fragment doesn't have a pseudo element, the requested pseudoId need to be PseudoId::None to succeed the matching.
-    // Otherwise, if the requested pseudoId is not PseudoId::None, the requested pseudoId need to equal to the pseudo element of the rightmost fragment.
+    // If the rightmost fragment doesn't have a pseudo element, the request must not have one either to succeed the matching.
+    // Otherwise, the requested pseudoId need to equal to the pseudo element of the rightmost fragment.
     if (fragmentMatchesTheRightmostElement(fragment)) {
         static_assert(sizeof(SelectorChecker::CheckingContext::pseudoId) == 1);
         if (!fragment.pseudoElementSelector)
-            failureCases.append(m_assembler.branch8(Assembler::NotEqual, Assembler::Address(checkingContext, OBJECT_OFFSETOF(SelectorChecker::CheckingContext, pseudoId)), Assembler::TrustedImm32(static_cast<unsigned>(PseudoId::None))));
+            failureCases.append(m_assembler.branchTest8(Assembler::NonZero, Assembler::Address(checkingContext, OBJECT_OFFSETOF(SelectorChecker::CheckingContext, hasRequestedPseudoElement))));
         else {
-            Assembler::Jump skip = m_assembler.branch8(Assembler::Equal, Assembler::Address(checkingContext, OBJECT_OFFSETOF(SelectorChecker::CheckingContext, pseudoId)), Assembler::TrustedImm32(static_cast<unsigned>(PseudoId::None)));
-            failureCases.append(m_assembler.branch8(Assembler::NotEqual, Assembler::Address(checkingContext, OBJECT_OFFSETOF(SelectorChecker::CheckingContext, pseudoId)), Assembler::TrustedImm32(static_cast<unsigned>(CSSSelector::pseudoId(fragment.pseudoElementSelector->pseudoElement())))));
+            Assembler::Jump skip = m_assembler.branchTest8(Assembler::Zero, Assembler::Address(checkingContext, OBJECT_OFFSETOF(SelectorChecker::CheckingContext, hasRequestedPseudoElement)));
+            failureCases.append(m_assembler.branch8(Assembler::NotEqual, Assembler::Address(checkingContext, OBJECT_OFFSETOF(SelectorChecker::CheckingContext, pseudoId)), Assembler::TrustedImm32(static_cast<unsigned>(*CSSSelector::pseudoId(fragment.pseudoElementSelector->pseudoElement())))));
             skip.link(&m_assembler);
         }
     }
@@ -4451,15 +4451,16 @@ void SelectorCodeGenerator::generateMarkPseudoStyleForPseudoElement(Assembler::J
 
     Assembler::JumpList successCases;
 
-    // When the requested pseudoId isn't PseudoId::None, there's no need to mark the pseudo element style.
+    // When there is a requested pseudoId, there's no need to mark the pseudo element style.
+    static_assert(sizeof(SelectorChecker::CheckingContext::hasRequestedPseudoElement) == 1);
     static_assert(sizeof(SelectorChecker::CheckingContext::pseudoId) == 1);
-    successCases.append(m_assembler.branch8(Assembler::NotEqual, Assembler::Address(checkingContext, OBJECT_OFFSETOF(SelectorChecker::CheckingContext, pseudoId)), Assembler::TrustedImm32(static_cast<unsigned>(PseudoId::None))));
+    successCases.append(m_assembler.branchTest8(Assembler::NonZero, Assembler::Address(checkingContext, OBJECT_OFFSETOF(SelectorChecker::CheckingContext, hasRequestedPseudoElement))));
 
     // When style invalidation, there's no need to mark the pseudo element style.
     successCases.append(branchOnResolvingModeWithCheckingContext(Assembler::Equal, SelectorChecker::Mode::StyleInvalidation, checkingContext));
 
     // When resolving mode is ResolvingStyle, mark the pseudo style for pseudo element.
-    PseudoId dynamicPseudo = CSSSelector::pseudoId(fragment.pseudoElementSelector->pseudoElement());
+    auto dynamicPseudo = *CSSSelector::pseudoId(fragment.pseudoElementSelector->pseudoElement());
     if (allPublicPseudoIds.contains(dynamicPseudo)) {
         failureCases.append(branchOnResolvingModeWithCheckingContext(Assembler::NotEqual, SelectorChecker::Mode::ResolvingStyle, checkingContext));
 
@@ -4471,7 +4472,7 @@ void SelectorCodeGenerator::generateMarkPseudoStyleForPseudoElement(Assembler::J
     }
 
     // We have a pseudoElementSelector, we are not in CollectingRulesIgnoringVirtualPseudoElements so
-    // we must match that pseudo element. Since the context's pseudo selector is PseudoId::None, we fail matching
+    // we must match that pseudo element. Since the context does not have a requested pseudo element we fail matching
     // after the marking.
     failureCases.append(m_assembler.jump());
 

@@ -111,7 +111,8 @@ static_assert(PublicPseudoIDBits == allPublicPseudoIds.size());
 
 static_assert(!(static_cast<unsigned>(maxTextTransformValue) >> TextTransformBits));
 
-static_assert(!(enumToUnderlyingType(PseudoId::HighestEnumValue) >> PseudoElementTypeBits));
+// Value zero is used to indicate no pseudo-element.
+static_assert(!((enumToUnderlyingType(PseudoId::HighestEnumValue) + 1) >> PseudoElementTypeBits));
 
 DEFINE_ALLOCATOR_WITH_HEAP_IDENTIFIER(PseudoStyleCache);
 DEFINE_ALLOCATOR_WITH_HEAP_IDENTIFIER(RenderStyle);
@@ -224,7 +225,7 @@ RenderStyle::RenderStyle(CreateDefaultStyleTag)
     m_nonInheritedFlags.firstChildState = false;
     m_nonInheritedFlags.lastChildState = false;
     m_nonInheritedFlags.isLink = false;
-    m_nonInheritedFlags.pseudoElementType = static_cast<unsigned>(PseudoId::None);
+    m_nonInheritedFlags.pseudoElementType = 0;
     m_nonInheritedFlags.pseudoBits = 0;
 
     static_assert((sizeof(InheritedFlags) <= 8), "InheritedFlags does not grow");
@@ -477,7 +478,7 @@ RenderStyle* RenderStyle::addCachedPseudoStyle(std::unique_ptr<RenderStyle> pseu
     if (!pseudo)
         return nullptr;
 
-    ASSERT(pseudo->pseudoElementType() > PseudoId::None);
+    ASSERT(pseudo->pseudoElementType());
 
     RenderStyle* result = pseudo.get();
 
@@ -3690,9 +3691,9 @@ void RenderStyle::setUsedPositionOptionIndex(std::optional<size_t> index)
 
 std::optional<Style::PseudoElementIdentifier> RenderStyle::pseudoElementIdentifier() const
 {
-    if (pseudoElementType() == PseudoId::None)
+    if (!pseudoElementType())
         return { };
-    return Style::PseudoElementIdentifier { pseudoElementType(), pseudoElementNameArgument() };
+    return Style::PseudoElementIdentifier { *pseudoElementType(), pseudoElementNameArgument() };
 }
 
 void RenderStyle::adjustScrollTimelines()

@@ -3084,7 +3084,7 @@ RenderLayer::OverflowControlRects RenderLayer::overflowControlsRects() const
     auto overflowControlsPositioningRect = snappedIntRect(renderBox.paddingBoxRectIncludingScrollbar());
 
     bool placeVerticalScrollbarOnTheLeft = renderBox.shouldPlaceVerticalScrollbarOnLeft();
-    bool haveResizer = renderer().style().resize() != Resize::None && renderer().style().pseudoElementType() == PseudoId::None;
+    bool haveResizer = renderer().style().resize() != Resize::None && !renderer().style().pseudoElementType();
 
     OverflowControlRects result;
     auto cornerRect = [&](IntSize cornerSize) {
@@ -4666,9 +4666,11 @@ bool RenderLayer::ancestorLayerIsDOMParent(const RenderLayer* ancestor) const
     auto parent = flattenedParent(renderer().element());
     if (parent && ancestor->renderer().element() == parent)
         return true;
-
-    std::optional<PseudoId> parentPseudoId = parentPseudoElement(renderer().style().pseudoElementType());
-    return parentPseudoId && *parentPseudoId == ancestor->renderer().style().pseudoElementType();
+    if (renderer().style().pseudoElementType()) {
+        auto parentPseudoId = parentPseudoElement(*renderer().style().pseudoElementType());
+        return parentPseudoId && *parentPseudoId == ancestor->renderer().style().pseudoElementType();
+    }
+    return false;
 }
 
 bool RenderLayer::participatesInPreserve3D() const

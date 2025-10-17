@@ -206,18 +206,19 @@ static std::optional<CounterPlan> planCounter(RenderElement& renderer, const Ato
 
     auto& style = renderer.style();
 
-    switch (style.pseudoElementType()) {
-    case PseudoId::None:
+    if (style.pseudoElementType()) {
+        switch (*style.pseudoElementType()) {
+        case PseudoId::Before:
+        case PseudoId::After:
+            break;
+        default:
+            return std::nullopt; // Counters are forbidden from all other pseudo elements.
+        }
+    } else {
         // Sometimes elements have more then one renderer. Only the first one gets the counter
         // LayoutTests/http/tests/css/counter-crash.html
         if (generatingElement->renderer() != &renderer)
             return std::nullopt;
-        break;
-    case PseudoId::Before:
-    case PseudoId::After:
-        break;
-    default:
-        return std::nullopt; // Counters are forbidden from all other pseudo elements.
     }
 
     auto directives = style.counterDirectives().map.get(identifier);

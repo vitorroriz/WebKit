@@ -980,7 +980,6 @@ TextStream& operator<<(TextStream& ts, PrintColorAdjust colorAdjust)
 TextStream& operator<<(TextStream& ts, PseudoId pseudoId)
 {
     switch (pseudoId) {
-    case PseudoId::None: ts << "none"_s; break;
     case PseudoId::FirstLine: ts << "first-line"_s; break;
     case PseudoId::FirstLetter: ts << "first-letter"_s; break;
     case PseudoId::GrammarError: ts << "grammar-error"_s; break;

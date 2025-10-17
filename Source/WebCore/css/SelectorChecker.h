@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "PseudoElementIdentifier.h"
 #include "SelectorMatchingState.h"
 #include "StyleRelations.h"
 #include "StyleScrollbarState.h"
@@ -41,6 +42,10 @@ class Element;
 class RenderScrollbar;
 class RenderStyle;
 class StyleRuleScope;
+
+namespace SelectorCompiler {
+class SelectorCodeGenerator;
+}
 
 class SelectorChecker {
     WTF_MAKE_NONCOPYABLE(SelectorChecker);
@@ -87,9 +92,19 @@ public:
         { }
 
         const SelectorChecker::Mode resolvingMode;
-        // FIXME: Switch to PseudoElementIdentifier.
-        PseudoId pseudoId { PseudoId::None };
+
+        void setRequestedPseudoElement(Style::PseudoElementIdentifier);
+        std::optional<Style::PseudoElementIdentifier> requestedPseudoElement() const;
+
+    private:
+        friend class SelectorCompiler::SelectorCodeGenerator;
+
+        // These are simple fields so they are easier for SelectorCompiler to generate code against.
+        bool hasRequestedPseudoElement { false };
+        PseudoId pseudoId { };
         AtomString pseudoElementNameArgument;
+
+    public:
         std::optional<StyleScrollbarState> scrollbarState;
         Vector<AtomString> classList;
         RefPtr<const ContainerNode> scope;

@@ -121,19 +121,28 @@ inline RefPtr<Element> Node::protectedParentElement() const
 
 bool Node::isBeforePseudoElement() const
 {
-    return pseudoId() == PseudoId::Before;
+    auto* pseudoElement = dynamicDowncast<PseudoElement>(*this);
+    return pseudoElement && pseudoElement->pseudoId() == PseudoId::Before;
 }
 
 bool Node::isAfterPseudoElement() const
 {
-    return pseudoId() == PseudoId::After;
+    auto* pseudoElement = dynamicDowncast<PseudoElement>(*this);
+    return pseudoElement && pseudoElement->pseudoId() == PseudoId::After;
 }
 
-PseudoId Node::pseudoId() const
+std::optional<PseudoId> Node::pseudoId() const
 {
     if (auto* pseudoElement = dynamicDowncast<PseudoElement>(*this))
         return pseudoElement->pseudoId();
-    return PseudoId::None;
+    return { };
+}
+
+std::optional<Style::PseudoElementIdentifier> Node::pseudoElementIdentifier() const
+{
+    if (auto pseudoId = this->pseudoId())
+        return Style::PseudoElementIdentifier { *pseudoId };
+    return { };
 }
 
 inline void Node::setTabIndexState(TabIndexState state)

@@ -275,7 +275,7 @@ unsigned CSSSelector::specificityForPage() const
     return s;
 }
 
-PseudoId CSSSelector::pseudoId(PseudoElement type)
+std::optional<PseudoId> CSSSelector::pseudoId(PseudoElement type)
 {
     switch (type) {
     case PseudoElement::FirstLine:
@@ -334,11 +334,11 @@ PseudoId CSSSelector::pseudoId(PseudoElement type)
     case PseudoElement::UserAgentPart:
     case PseudoElement::UserAgentPartLegacyAlias:
     case PseudoElement::WebKitUnknown:
-        return PseudoId::None;
+        return { };
     }
 
     ASSERT_NOT_REACHED();
-    return PseudoId::None;
+    return { };
 }
 
 std::optional<CSSSelector::PseudoElement> CSSSelector::parsePseudoElementName(StringView name, const CSSSelectorParserContext& context)

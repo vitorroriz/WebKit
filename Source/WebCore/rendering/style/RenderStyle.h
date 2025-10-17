@@ -499,12 +499,11 @@ public:
     StyleSelfAlignmentData resolvedJustifySelf(const RenderStyle* parentStyle, ItemPosition normalValueBehavior) const;
     StyleContentAlignmentData resolvedJustifyContent(const StyleContentAlignmentData& normalValueBehavior) const;
 
-    PseudoId pseudoElementType() const;
-    void setPseudoElementType(PseudoId);
+    std::optional<PseudoId> pseudoElementType() const;
     const AtomString& pseudoElementNameArgument() const;
-    void setPseudoElementNameArgument(const AtomString&);
 
     std::optional<Style::PseudoElementIdentifier> pseudoElementIdentifier() const;
+    void setPseudoElementIdentifier(std::optional<Style::PseudoElementIdentifier>&&);
 
     RenderStyle* getCachedPseudoStyle(const Style::PseudoElementIdentifier&) const;
     RenderStyle* addCachedPseudoStyle(std::unique_ptr<RenderStyle>);

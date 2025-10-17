@@ -121,7 +121,7 @@ public:
 
     enum AttributeMatchType { CaseSensitive, CaseInsensitive };
 
-    static PseudoId pseudoId(PseudoElement);
+    static std::optional<PseudoId> pseudoId(PseudoElement);
     static bool isPseudoClassEnabled(PseudoClass, const CSSSelectorParserContext&);
     static bool isPseudoElementEnabled(PseudoElement, StringView, const CSSSelectorParserContext&);
     static std::optional<PseudoElement> parsePseudoElementName(StringView, const CSSSelectorParserContext&);

@@ -316,7 +316,7 @@ void TextDecorationPainter::paintLineThrough(const ForegroundDecorationGeometry&
         m_context.drawLineForText(rect, m_isPrinting, style == TextDecorationStyle::Double, strokeStyle);
 }
 
-static void collectStylesForRenderer(TextDecorationPainter::Styles& result, const RenderObject& renderer, Style::TextDecorationLine remainingDecorations, bool firstLineStyle, OptionSet<PaintBehavior> paintBehavior, PseudoId pseudoId)
+static void collectStylesForRenderer(TextDecorationPainter::Styles& result, const RenderObject& renderer, Style::TextDecorationLine remainingDecorations, bool firstLineStyle, OptionSet<PaintBehavior> paintBehavior, std::optional<PseudoId> pseudoId)
 {
     auto extractDecorations = [&] (const RenderStyle& style, Style::TextDecorationLine decorations) {
         if (!decorations.containsAny({ Style::TextDecorationLine::Flag::Underline, Style::TextDecorationLine::Flag::Overline, Style::TextDecorationLine::Flag::LineThrough }))
@@ -343,10 +343,10 @@ static void collectStylesForRenderer(TextDecorationPainter::Styles& result, cons
     };
 
     auto styleForRenderer = [&] (const RenderObject& renderer) -> const RenderStyle& {
-        if (pseudoId != PseudoId::None && renderer.style().hasPseudoStyle(pseudoId)) {
+        if (pseudoId && renderer.style().hasPseudoStyle(*pseudoId)) {
             if (auto textRenderer = dynamicDowncast<RenderText>(renderer))
-                return *textRenderer->getCachedPseudoStyle({ pseudoId });
-            return *downcast<RenderElement>(renderer).getCachedPseudoStyle({ pseudoId });
+                return *textRenderer->getCachedPseudoStyle({ *pseudoId });
+            return *downcast<RenderElement>(renderer).getCachedPseudoStyle({ *pseudoId });
         }
         return firstLineStyle ? renderer.firstLineStyle() : renderer.style();
     };
@@ -386,7 +386,7 @@ Color TextDecorationPainter::decorationColor(const RenderStyle& style, OptionSet
     return style.visitedDependentColorWithColorFilter(CSSPropertyTextDecorationColor, paintBehavior);
 }
 
-auto TextDecorationPainter::stylesForRenderer(const RenderObject& renderer, Style::TextDecorationLine requestedDecorations, bool firstLineStyle, OptionSet<PaintBehavior> paintBehavior, PseudoId pseudoId) -> Styles
+auto TextDecorationPainter::stylesForRenderer(const RenderObject& renderer, Style::TextDecorationLine requestedDecorations, bool firstLineStyle, OptionSet<PaintBehavior> paintBehavior, std::optional<PseudoId> pseudoId) -> Styles
 {
     if (requestedDecorations.isNone())
         return { };
