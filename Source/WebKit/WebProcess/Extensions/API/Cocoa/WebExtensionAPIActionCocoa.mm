@@ -60,7 +60,9 @@ static NSString * const titleKey = @"title";
 
 #if ENABLE(WK_WEB_EXTENSIONS_ICON_VARIANTS)
 static NSString * const variantsKey = @"variants";
-static NSString * const colorSchemesKey = @"color_schemes";
+// FIXME: <https://webkit.org/b/300927> Deprecate `color_schemes` key.
+static NSString * const deprecatedColorSchemesKey = @"color_schemes";
+static NSString * const colorSchemesKey = @"colorSchemes";
 static NSString * const lightKey = @"light";
 static NSString * const darkKey = @"dark";
 static NSString * const anyKey = @"any";
@@ -422,7 +424,7 @@ NSMutableDictionary *WebExtensionAPIAction::parseIconPathsDictionary(NSDictionar
 
     for (NSString *key in input) {
 #if ENABLE(WK_WEB_EXTENSIONS_ICON_VARIANTS)
-        if (forVariants && [key isEqualToString:colorSchemesKey])
+        if (forVariants && ([key isEqualToString:colorSchemesKey] || [key isEqualToString:deprecatedColorSchemesKey]))
             continue;
 #endif
 
@@ -448,7 +450,7 @@ NSMutableDictionary *WebExtensionAPIAction::parseIconImageDataDictionary(NSDicti
 
     for (NSString *key in input) {
 #if ENABLE(WK_WEB_EXTENSIONS_ICON_VARIANTS)
-        if (forVariants && [key isEqualToString:colorSchemesKey])
+        if (forVariants && ([key isEqualToString:colorSchemesKey] || [key isEqualToString:deprecatedColorSchemesKey]))
             continue;
 #endif
 
@@ -495,8 +497,9 @@ NSArray *WebExtensionAPIAction::parseIconVariants(NSArray *input, const URL& bas
             continue;
         }
 
-        if (NSArray *colorSchemes = dictionary[colorSchemesKey]) {
-            auto *colorSchemesCompositeKey = [NSString stringWithFormat:@"%@['%@']", compositeKey, colorSchemesKey];
+        auto *usedColorSchemesKey = dictionary[colorSchemesKey] ? colorSchemesKey : deprecatedColorSchemesKey;
+        if (NSArray *colorSchemes = dictionary[usedColorSchemesKey]) {
+            auto *colorSchemesCompositeKey = [NSString stringWithFormat:@"%@['%@']", compositeKey, usedColorSchemesKey];
             if (!validateObject(colorSchemes, colorSchemesCompositeKey, @[ NSString.class ], !firstExceptionString ? &firstExceptionString : nullptr))
                 continue;
 
@@ -506,7 +509,7 @@ NSArray *WebExtensionAPIAction::parseIconVariants(NSArray *input, const URL& bas
                 continue;
             }
 
-            parsedDictionary[colorSchemesKey] = colorSchemes;
+            parsedDictionary[usedColorSchemesKey] = colorSchemes;
         }
 
         ASSERT(parsedDictionary);
