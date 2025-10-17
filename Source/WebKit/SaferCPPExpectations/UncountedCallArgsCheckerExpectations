@@ -34,6 +34,8 @@ WebProcess/Extensions/API/Cocoa/WebExtensionAPIWebNavigationEventCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIWebRequestEventCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIWindowsCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIWindowsEventCocoa.mm
+WebProcess/Extensions/Bindings/Cocoa/JSWebExtensionWrapperCocoa.mm
+WebProcess/Extensions/Cocoa/WebExtensionControllerProxyCocoa.mm
 WebProcess/GPU/graphics/RemoteRenderingBackendProxy.cpp
 WebProcess/GPU/media/MediaPlayerPrivateRemote.cpp
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInCSSStyleDeclarationHandle.mm
