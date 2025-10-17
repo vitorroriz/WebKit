@@ -114,6 +114,7 @@ public:
 
     WebPage& webPage();
     Ref<WebPage> protectedWebPage();
+    Ref<const WebPage> protectedWebPage() const;
 
 private:
     explicit RemoteLayerTreeContext(WebPage&);

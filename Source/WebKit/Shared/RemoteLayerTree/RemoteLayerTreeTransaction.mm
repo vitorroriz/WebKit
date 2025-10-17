@@ -481,10 +481,11 @@ void ArgumentCoder<WebKit::RemoteLayerBackingStoreOrProperties>::encode(Encoder&
     // The web content process has a std::unique_ptr<RemoteLayerBackingStore> but we want it to decode
     // in the UI process as a std::unique_ptr<RemoteLayerBackingStoreProperties>.
     ASSERT(isInWebProcess());
-    bool hasFrontBuffer = instance.store && instance.store->hasFrontBuffer();
+    CheckedPtr store = instance.store.get();
+    bool hasFrontBuffer = store && store->hasFrontBuffer();
     encoder << hasFrontBuffer;
     if (hasFrontBuffer)
-        encoder << *instance.store;
+        encoder << *store;
 }
 
 }

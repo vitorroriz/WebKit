@@ -288,13 +288,13 @@ bool VideoPresentationManager::canEnterVideoFullscreen(HTMLVideoElement& videoEl
     ASSERT(mode != HTMLMediaElementEnums::VideoFullscreenModeNone);
 
 #if ENABLE(FULLSCREEN_API)
-    if (videoElement.document().fullscreen().isAnimatingFullscreen())
+    if (videoElement.protectedDocument()->fullscreen().isAnimatingFullscreen())
         return false;
 #endif
 
 #if PLATFORM(IOS) || PLATFORM(VISION)
     if (m_currentVideoFullscreenMode == mode)
-        return videoElement.document().quirks().allowLayeredFullscreenVideos();
+        return videoElement.protectedDocument()->quirks().allowLayeredFullscreenVideos();
 #endif
     return true;
 }
@@ -472,7 +472,7 @@ void VideoPresentationManager::enterVideoFullscreenForVideoElement(HTMLVideoElem
     auto setupFullscreen = [protectedThis = Ref { *this }, page = WeakPtr { m_page }, contextId = contextId, initialSize = initialSize, videoRect = videoRect, videoElement = WeakPtr { videoElement }, allowsPictureInPicture = allowsPictureInPicture, standby = standby, fullscreenMode = interface->fullscreenMode()] (HostingContext hostingContext, const FloatSize& size) {
         if (!page || !videoElement)
             return;
-        page->send(Messages::VideoPresentationManagerProxy::SetupFullscreenWithID(processQualify(contextId), hostingContext, videoRect, initialSize, size, page->deviceScaleFactor(), fullscreenMode, allowsPictureInPicture, standby, videoElement->document().quirks().blocksReturnToFullscreenFromPictureInPictureQuirk()));
+        page->send(Messages::VideoPresentationManagerProxy::SetupFullscreenWithID(processQualify(contextId), hostingContext, videoRect, initialSize, size, page->deviceScaleFactor(), fullscreenMode, allowsPictureInPicture, standby, videoElement->protectedDocument()->quirks().blocksReturnToFullscreenFromPictureInPictureQuirk()));
 
         if (RefPtr player = videoElement->player()) {
             if (auto identifier = player->identifier())
@@ -867,11 +867,10 @@ void VideoPresentationManager::fullscreenMayReturnToInline(WebCore::MediaPlayerC
     if (!m_page)
         return;
 
-    Ref model = ensureModel(contextId);
+    RefPtr videoElement = ensureModel(contextId)->videoElement();
 
     if (!isPageVisible)
-        model->videoElement()->scrollIntoViewIfNotVisible(false);
-    RefPtr videoElement = model->videoElement();
+        videoElement->scrollIntoViewIfNotVisible(false);
     RefPtr { m_page.get() }->send(Messages::VideoPresentationManagerProxy::PreparedToReturnToInline(processQualify(contextId), true, inlineVideoFrame(*videoElement)));
 }
 

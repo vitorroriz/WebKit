@@ -1,9 +1,6 @@
 Platform/IPC/ArgumentCoders.h
-Shared/RemoteLayerTree/RemoteLayerTreeTransaction.mm
 UIProcess/API/Cocoa/WKWebViewTesting.mm
 WebProcess/GPU/graphics/RemoteRenderingBackendProxy.cpp
-WebProcess/GPU/media/MediaPlayerPrivateRemote.cpp
-WebProcess/GPU/media/RemoteMediaPlayerManager.cpp
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInFrame.mm
 WebProcess/InjectedBundle/API/c/WKBundleFrame.cpp
 WebProcess/InjectedBundle/API/c/WKBundlePage.cpp
@@ -20,13 +17,11 @@ WebProcess/Network/WebLoaderStrategy.cpp
 WebProcess/Network/WebResourceLoader.cpp
 WebProcess/WebPage/Cocoa/TextAnimationController.mm
 WebProcess/WebPage/Cocoa/WebPageCocoa.mm
-WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeContext.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeDrawingArea.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteScrollingCoordinator.mm
 WebProcess/WebPage/WebFrame.cpp
 WebProcess/WebPage/WebPage.cpp
 WebProcess/WebPage/mac/WKAccessibilityWebPageObjectBase.mm
-WebProcess/cocoa/PlaybackSessionManager.mm
 WebProcess/cocoa/VideoPresentationManager.mm
 WebProcess/cocoa/WebProcessCocoa.mm
 [ Mac ] Platform/cocoa/_WKWebViewTextInputNotifications.mm
