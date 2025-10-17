@@ -186,7 +186,6 @@ void MediaControlTextTrackContainerElement::updateDisplay()
             if (cue->protectedTrack()->isSpoken())
                 continue;
 
-            cue->setFontSize(m_fontSize, m_fontSizeIsImportant);
             if (RefPtr vttCue = dynamicDowncast<VTTCue>(cue))
                 processActiveVTTCue(*vttCue);
             else {
@@ -262,12 +261,6 @@ void MediaControlTextTrackContainerElement::updateActiveCuesFontSize()
     // scale by display size. Since |vh| is a decimal percentage, multiply
     // the scale factor by 100 to achive the final font size.
     m_fontSize = lroundf(100 * fontScale);
-
-    for (auto& activeCue : mediaElement->currentlyActiveCues()) {
-        RefPtr cue = activeCue.data();
-        if (cue->isRenderable())
-            cue->setFontSize(m_fontSize, m_fontSizeIsImportant);
-    }
 }
 
 void MediaControlTextTrackContainerElement::updateTextStrokeStyle()
