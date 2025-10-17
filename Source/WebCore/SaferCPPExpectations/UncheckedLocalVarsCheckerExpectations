@@ -565,4 +565,3 @@ testing/ServiceWorkerInternals.cpp
 testing/js/WebCoreTestSupport.cpp
 workers/WorkerGlobalScope.cpp
 workers/WorkerOrWorkletThread.cpp
-workers/WorkerRunLoop.cpp
