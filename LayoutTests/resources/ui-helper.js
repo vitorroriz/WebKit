@@ -859,6 +859,19 @@ window.UIHelper = class UIHelper {
         });
     }
 
+    static waitForViewControllerToShow()
+    {
+        if (!this.isWebKit2() || !this.isIOSFamily())
+            return Promise.resolve();
+
+        return new Promise(resolve => {
+            testRunner.runUIScript(`
+                (function() {
+                    uiController.didPresentViewControllerCallback = () => uiController.uiScriptComplete();
+                })()`, resolve);
+        });
+    }
+
     static waitForContextMenuToShow()
     {
         if (!this.isWebKit2() || !this.isIOSFamily())

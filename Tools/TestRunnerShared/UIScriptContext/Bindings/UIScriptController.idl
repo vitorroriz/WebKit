@@ -298,6 +298,8 @@ interface UIScriptController {
     attribute object willPresentPopoverCallback;
     attribute object didDismissPopoverCallback;
 
+    attribute object didPresentViewControllerCallback;
+
     attribute object willBeginZoomingCallback;
     attribute object didEndZoomingCallback;
 

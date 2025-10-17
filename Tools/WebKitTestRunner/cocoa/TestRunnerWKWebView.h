@@ -46,6 +46,7 @@
 @property (nonatomic, copy) void (^willStartInputSessionCallback)(void);
 @property (nonatomic, copy) void (^willPresentPopoverCallback)(void);
 @property (nonatomic, copy) void (^didDismissPopoverCallback)(void);
+@property (nonatomic, copy) void (^didPresentViewControllerCallback)(void);
 @property (nonatomic, copy) void (^didEndScrollingCallback)(void);
 @property (nonatomic, copy) void (^rotationDidEndCallback)(void);
 @property (nonatomic, copy) void (^windowTapRecognizedCallback)(void);

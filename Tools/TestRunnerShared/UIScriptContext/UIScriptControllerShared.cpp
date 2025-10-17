@@ -280,6 +280,16 @@ JSValueRef UIScriptController::didDismissPopoverCallback() const
     return m_context->callbackWithID(CallbackTypeDidDismissPopover);
 }
 
+void UIScriptController::setDidPresentViewControllerCallback(JSValueRef callback)
+{
+    m_context->registerCallback(callback, CallbackTypeDidPresentViewController);
+}
+
+JSValueRef UIScriptController::didPresentViewControllerCallback() const
+{
+    return m_context->callbackWithID(CallbackTypeDidPresentViewController);
+}
+
 void UIScriptController::setDidShowContactPickerCallback(JSValueRef callback)
 {
     m_context->registerCallback(callback, CallbackTypeDidShowContactPicker);

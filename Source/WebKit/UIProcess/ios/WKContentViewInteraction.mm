@@ -9667,7 +9667,10 @@ static bool canUseQuickboardControllerFor(UITextContentType type)
 - (void)fileUploadPanelDidDismiss:(WKFileUploadPanel *)fileUploadPanel
 {
     ASSERT(_fileUploadPanel.get() == fileUploadPanel);
-    
+
+    if ([self window] && ![[self window] firstResponder])
+        [self becomeFirstResponder];
+
     [_fileUploadPanel setDelegate:nil];
     _fileUploadPanel = nil;
 }

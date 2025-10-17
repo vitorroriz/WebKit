@@ -225,6 +225,7 @@ IGNORE_WARNINGS_END
     self.willStartInputSessionCallback = nil;
     self.willPresentPopoverCallback = nil;
     self.didDismissPopoverCallback = nil;
+    self.didPresentViewControllerCallback = nil;
     self.didEndScrollingCallback = nil;
     self.rotationDidEndCallback = nil;
     self.windowTapRecognizedCallback = nil;
@@ -559,6 +560,9 @@ static bool isQuickboardViewController(UIViewController *viewController)
 
 - (void)_didPresentViewController:(UIViewController *)viewController
 {
+    if (self.didPresentViewControllerCallback)
+        self.didPresentViewControllerCallback();
+
     if (isQuickboardViewController(viewController))
         [self _invokeShowKeyboardCallbackIfNecessary];
 }

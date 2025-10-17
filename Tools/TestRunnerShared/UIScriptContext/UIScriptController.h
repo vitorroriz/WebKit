@@ -438,6 +438,9 @@ public:
     virtual void setWillPresentPopoverCallback(JSValueRef);
     JSValueRef willPresentPopoverCallback() const;
 
+    virtual void setDidPresentViewControllerCallback(JSValueRef);
+    JSValueRef didPresentViewControllerCallback() const;
+
     virtual void setDidEndScrollingCallback(JSValueRef);
     JSValueRef didEndScrollingCallback() const;
 

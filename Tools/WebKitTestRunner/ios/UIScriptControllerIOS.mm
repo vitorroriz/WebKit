@@ -1303,6 +1303,16 @@ void UIScriptControllerIOS::setDidDismissPopoverCallback(JSValueRef callback)
     }).get();
 }
 
+void UIScriptControllerIOS::setDidPresentViewControllerCallback(JSValueRef callback)
+{
+    UIScriptController::setDidPresentViewControllerCallback(callback);
+    webView().didPresentViewControllerCallback = makeBlockPtr([this, protectedThis = Ref { *this }] {
+        if (!m_context)
+            return;
+        m_context->fireCallback(CallbackTypeDidPresentViewController);
+    }).get();
+}
+
 JSObjectRef UIScriptControllerIOS::rectForMenuAction(JSStringRef jsAction) const
 {
     auto action = adoptCF(JSStringCopyCFString(kCFAllocatorDefault, jsAction));

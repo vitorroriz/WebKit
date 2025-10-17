@@ -175,6 +175,7 @@ private:
     void setWillStartInputSessionCallback(JSValueRef) override;
     void setWillPresentPopoverCallback(JSValueRef) override;
     void setDidDismissPopoverCallback(JSValueRef) override;
+    void setDidPresentViewControllerCallback(JSValueRef) override;
     void setDidEndScrollingCallback(JSValueRef) override;
     void clearAllCallbacks() override;
 
