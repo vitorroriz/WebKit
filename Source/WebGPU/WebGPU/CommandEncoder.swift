@@ -1854,7 +1854,18 @@ extension WebGPU.CommandEncoder {
             self.generateInvalidEncoderStateError()
             return
         }
-        guard self.validateResolveQuerySet(querySet: querySet, firstQuery: firstQuery, queryCount: queryCount, destination: destination, destinationOffset: destinationOffset) else {
+
+        guard
+            self.validateResolveQuerySet(
+                querySet: querySet,
+                firstQuery: firstQuery,
+                queryCount: queryCount,
+                destination: destination,
+                destinationOffset: destinationOffset
+            ),
+            WebGPU_Internal.isValidToUseWithQuerySetCommandEncoder(querySet, self),
+            WebGPU_Internal.isValidToUseWithBufferCommandEncoder(destination, self)
+        else {
             self.makeInvalid("GPUCommandEncoder.resolveQuerySet validation failed")
             return
         }
@@ -1862,7 +1873,7 @@ extension WebGPU.CommandEncoder {
         // FIXME: rdar://138042799 need to pass in the default argument.
         destination.setCommandEncoder(self, false)
         destination.indirectBufferInvalidated(self);
-        guard !(querySet.isDestroyed() || destination.isDestroyed() || queryCount == 0) else {
+        if querySet.isDestroyed() || destination.isDestroyed() || queryCount == 0 {
             return
         }
 
@@ -1901,32 +1912,39 @@ extension WebGPU.CommandEncoder {
     }
     public func validateResolveQuerySet(querySet: WebGPU.QuerySet, firstQuery: UInt32, queryCount: UInt32, destination: WebGPU.Buffer, destinationOffset: UInt64) -> Bool
     {
-        guard (destinationOffset % 256) == 0 else {
+        if !querySet.isDestroyed() && !querySet.isValid() {
             return false
         }
-        guard querySet.isDestroyed() || querySet.isValid() else {
+        if !destination.isDestroyed() && !destination.isValid() {
             return false
         }
-        guard destination.isDestroyed() || destination.isValid() else {
+        if (destination.usage() & WGPUBufferUsage_QueryResolve.rawValue) == 0 {
             return false
         }
-        guard (destination.usage() & WGPUBufferUsage_QueryResolve.rawValue) != 0 else {
+
+        if firstQuery >= querySet.count() {
             return false
         }
-        guard firstQuery < querySet.count() else {
+
+        let (countEnd, didOverflow) = firstQuery.addingReportingOverflow(queryCount)
+        if didOverflow || countEnd > querySet.count() {
             return false
         }
-        let countEnd: UInt32 = firstQuery
-        var (additionResult, didOverflow) = countEnd.addingReportingOverflow(queryCount)
-        guard !didOverflow && additionResult <= querySet.count() else {
+
+        if (destinationOffset % 256) != 0 {
             return false
         }
-        let countTimes8PlusOffset = destinationOffset
-        let additionResult64: UInt64
-        (additionResult64, didOverflow) = countTimes8PlusOffset.addingReportingOverflow(8 * UInt64(queryCount))
-        guard !didOverflow && destination.initialSize() >= additionResult64 else {
+
+        let (queryCountTimes8, didOverflowMul) = UInt64(queryCount).multipliedReportingOverflow(by: 8)
+        if didOverflowMul {
             return false
         }
+
+        let (countTimes8PlusOffset, didOverflowSum) = destinationOffset.addingReportingOverflow(UInt64(queryCountTimes8))
+        if didOverflowSum || countTimes8PlusOffset > destination.initialSize() {
+            return false
+        }
+
         return true
     }
 
@@ -2147,7 +2165,7 @@ extension WebGPU.CommandEncoder {
             computePassDescriptor.sampleBufferAttachments[0].endOfEncoderSampleIndex = timestampWriteIndex(writeIndex: timestampWrites!.endOfPassWriteIndex, defaultValue: MTLCounterDontSample, offset: counterSampleBufferOffset)
 
             if counterSampleBuffer != nil {
-                m_device.ptr().trackTimestampsBuffer(m_commandBuffer, counterSampleBuffer);
+                m_device.ptr().trackTimestampsBuffer(m_commandBuffer, counterSampleBuffer)
             }
         }
         guard let computeCommandEncoder = m_commandBuffer?.makeComputeCommandEncoder(descriptor: computePassDescriptor) else {
