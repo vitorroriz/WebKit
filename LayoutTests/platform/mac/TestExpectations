@@ -2556,3 +2556,5 @@ fast/forms/textarea-metrics.html [ Pass Failure ]
 fast/forms/time/time-editable-components/time-editable-components-mouse-events.html [ Pass Failure ]
 
 webkit.org/b/300994 fast/animation/request-animation-frame-throttling-aggressiveThermalMitigation.html [ Pass Failure ]
+
+webkit.org/b/300997 webrtc/filtering-ice-candidate-after-reload.html [ Pass Failure ]
