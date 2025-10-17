@@ -442,22 +442,25 @@ void ResourceLoadStatisticsStore::removeDataRecords(CompletionHandler<void()>&& 
     });
 }
 
-void ResourceLoadStatisticsStore::processStatisticsAndDataRecords()
+void ResourceLoadStatisticsStore::processStatisticsAndDataRecords(CompletionHandler<void()>&& completionHandler)
 {
     ASSERT(!RunLoop::isMain());
 
     if (m_parameters.shouldClassifyResourcesBeforeDataRecordsRemoval)
         classifyPrevalentResources();
     
-    removeDataRecords([weakThis = WeakPtr { *this }] () mutable {
+    removeDataRecords([weakThis = WeakPtr { *this }, completionHandler = WTFMove(completionHandler)] () mutable {
         ASSERT(!RunLoop::isMain());
         RefPtr protectedThis = weakThis.get();
-        if (!protectedThis)
+        if (!protectedThis) {
+            completionHandler();
             return;
+        }
 
         protectedThis->pruneStatisticsIfNeeded();
 
         protectedThis->logTestingEvent("Storage Synced"_s);
+        completionHandler();
     });
 }
 
@@ -556,7 +559,7 @@ void ResourceLoadStatisticsStore::scheduleStatisticsProcessingRequestIfNecessary
         }
 
         protectedThis->updateCookieBlocking([]() { });
-        protectedThis->processStatisticsAndDataRecords();
+        protectedThis->processStatisticsAndDataRecords([]() { });
     });
 }
 
