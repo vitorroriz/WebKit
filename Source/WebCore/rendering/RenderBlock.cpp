@@ -2080,8 +2080,11 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request, HitTestResult& resu
 
 bool RenderBlock::hitTestContents(const HitTestRequest& request, HitTestResult& result, const HitTestLocation& locationInContainer, const LayoutPoint& accumulatedOffset, HitTestAction hitTestAction)
 {
-    if (childrenInline() && !isRenderTable())
+    if (childrenInline() && !isRenderTable()) {
+        if (style().isSkippedRootOrSkippedContent())
+            return false;
         return hitTestInlineChildren(request, result, locationInContainer, accumulatedOffset, hitTestAction);
+    }
 
     // Hit test our children.
     HitTestAction childHitTest = hitTestAction;
