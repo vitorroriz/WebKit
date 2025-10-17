@@ -1773,9 +1773,6 @@ webkit.org/b/223975 inspector/protocol/condition.html [ Pass Timeout ]
 
 webkit.org/b/223976 [ Debug ] imported/w3c/web-platform-tests/cors/redirect-preflight.htm [ Pass Failure ]
 
-# webkit.org/b/224123 For failure, webkit.org/b/300944 for timeout
-media/modern-media-controls/macos-inline-media-controls/macos-inline-media-dropping-controls.html [ Failure Timeout ]
-
 webkit.org/b/224212 [ arm64 ] compositing/background-color/no-composited-background-color-when-perspective.html [ Pass ImageOnlyFailure ]
 
 webkit.org/b/215397 media/modern-media-controls/media-controller/media-controller-fullscreen-ltr.html [ Pass Failure ]

@@ -126,7 +126,13 @@ class MacOSInlineMediaControls extends InlineMediaControls
             this._volumeSliderContainer.y = this.bottomControlsBar.y - this._inlineBottomControlsBarHeight - this._inlineInsideMargin;
         } else {
             const hasMinimumHeight = this.height >= MinimumHeightToShowVolumeSlider;
-            const shouldShowVolumeContainer = hasMinimumHeight && !this.showsStartButton && this.visible && this.playPauseButton && this.playPauseButton.enabled;
+            const hasMinimumWidth = this.width >= 60;
+            const shouldShowVolumeContainer = hasMinimumHeight && hasMinimumWidth && !this.showsStartButton && this.visible && this.playPauseButton && this.playPauseButton.enabled;
+
+            // Force mute button visibility based on width even if container logic doesn't run
+            if (this.width < 60 && this.muteButton) {
+                this.muteButton.visible = false;
+            }
 
             const children = this.children ? [...this.children] : [];
             if (shouldShowVolumeContainer && !children.includes(this._volumeSliderContainer)) {
