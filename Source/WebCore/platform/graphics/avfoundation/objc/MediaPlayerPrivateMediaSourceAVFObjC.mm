@@ -287,7 +287,7 @@ void MediaPlayerPrivateMediaSourceAVFObjC::load(const URL&, const LoadOptions& o
     m_loadOptions = options;
     m_renderer->setPreferences(options.videoRendererPreferences);
     if (RefPtr player = m_player.get())
-        m_renderer->acceleratedRenderingStateChanged(player->renderingCanBeAccelerated());
+        m_renderer->renderingCanBeAcceleratedChanged(player->renderingCanBeAccelerated());
 }
 
 void MediaPlayerPrivateMediaSourceAVFObjC::setResourceOwner(const ProcessIdentity& resourceOwner)
@@ -798,7 +798,7 @@ Ref<AudioVideoRenderer> MediaPlayerPrivateMediaSourceAVFObjC::audioVideoRenderer
 void MediaPlayerPrivateMediaSourceAVFObjC::acceleratedRenderingStateChanged()
 {
     RefPtr player = m_player.get();
-    m_renderer->acceleratedRenderingStateChanged(player ? player->renderingCanBeAccelerated() : false);
+    m_renderer->renderingCanBeAcceleratedChanged(player ? player->renderingCanBeAccelerated() : false);
 }
 
 void MediaPlayerPrivateMediaSourceAVFObjC::notifyActiveSourceBuffersChanged()

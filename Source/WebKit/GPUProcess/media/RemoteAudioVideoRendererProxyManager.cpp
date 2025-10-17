@@ -410,10 +410,10 @@ void RemoteAudioVideoRendererProxyManager::setShouldMaintainAspectRatio(RemoteAu
         renderer->setShouldMaintainAspectRatio(maintain);
 }
 
-void RemoteAudioVideoRendererProxyManager::acceleratedRenderingStateChanged(RemoteAudioVideoRendererIdentifier identifier, bool renderingIsAccelerated)
+void RemoteAudioVideoRendererProxyManager::renderingCanBeAcceleratedChanged(RemoteAudioVideoRendererIdentifier identifier, bool renderingIsAccelerated)
 {
     if (RefPtr renderer = rendererFor(identifier))
-        renderer->acceleratedRenderingStateChanged(renderingIsAccelerated);
+        renderer->renderingCanBeAcceleratedChanged(renderingIsAccelerated);
 }
 
 void RemoteAudioVideoRendererProxyManager::contentBoxRectChanged(RemoteAudioVideoRendererIdentifier identifier, const WebCore::LayoutRect& rect)

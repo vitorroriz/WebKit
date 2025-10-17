@@ -121,7 +121,7 @@ public:
     void setIsVisible(bool);
     void setPresentationSize(const IntSize&) final;
     void setShouldMaintainAspectRatio(bool) final;
-    void acceleratedRenderingStateChanged(bool) final;
+    void renderingCanBeAcceleratedChanged(bool) final;
     void contentBoxRectChanged(const LayoutRect&) final;
     void notifyFirstFrameAvailable(Function<void()>&&) final;
     void notifyWhenHasAvailableVideoFrame(Function<void(const MediaTime&, double)>&&) final;

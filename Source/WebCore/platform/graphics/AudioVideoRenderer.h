@@ -70,7 +70,7 @@ public:
     virtual void setIsVisible(bool) = 0;
     virtual void setPresentationSize(const IntSize&) = 0;
     virtual void setShouldMaintainAspectRatio(bool) { }
-    virtual void acceleratedRenderingStateChanged(bool) { }
+    virtual void renderingCanBeAcceleratedChanged(bool) { }
     virtual void contentBoxRectChanged(const LayoutRect&) { }
     virtual void notifyFirstFrameAvailable(Function<void()>&&) { }
     virtual void notifyWhenHasAvailableVideoFrame(Function<void(const MediaTime&, double)>&&) { }

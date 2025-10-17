@@ -698,7 +698,7 @@ void AudioVideoRendererAVFObjC::setShouldMaintainAspectRatio(bool shouldMaintain
     [CATransaction commit];
 }
 
-void AudioVideoRendererAVFObjC::acceleratedRenderingStateChanged(bool isAccelerated)
+void AudioVideoRendererAVFObjC::renderingCanBeAcceleratedChanged(bool isAccelerated)
 {
     m_renderingCanBeAccelerated = isAccelerated;
     if (isAccelerated)
@@ -1083,7 +1083,7 @@ bool AudioVideoRendererAVFObjC::shouldEnsureLayerOrVideoRenderer() const
     if (!canUseDecompressionSession())
         return true;
 
-    return ((m_sampleBufferDisplayLayer && !CGRectIsEmpty([m_sampleBufferDisplayLayer bounds])) || (!m_presentationSize.isEmpty() && m_renderingCanBeAccelerated));
+    return m_renderingCanBeAccelerated;
 }
 
 WebSampleBufferVideoRendering *AudioVideoRendererAVFObjC::layerOrVideoRenderer() const

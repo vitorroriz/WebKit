@@ -185,13 +185,13 @@ void AudioVideoRendererRemote::setShouldMaintainAspectRatio(bool maintain)
     gpuProcessConnection->connection().send(Messages::RemoteAudioVideoRendererProxyManager::SetShouldMaintainAspectRatio(m_identifier, maintain), 0);
 }
 
-void AudioVideoRendererRemote::acceleratedRenderingStateChanged(bool acceleratedRendering)
+void AudioVideoRendererRemote::renderingCanBeAcceleratedChanged(bool acceleratedRendering)
 {
     RefPtr gpuProcessConnection = m_gpuProcessConnection.get();
     if (!isGPURunning() || !gpuProcessConnection)
         return;
 
-    gpuProcessConnection->connection().send(Messages::RemoteAudioVideoRendererProxyManager::AcceleratedRenderingStateChanged(m_identifier, acceleratedRendering), 0);
+    gpuProcessConnection->connection().send(Messages::RemoteAudioVideoRendererProxyManager::RenderingCanBeAcceleratedChanged(m_identifier, acceleratedRendering), 0);
 }
 
 void AudioVideoRendererRemote::contentBoxRectChanged(const LayoutRect& rect)
