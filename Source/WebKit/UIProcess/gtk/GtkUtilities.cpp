@@ -20,6 +20,7 @@
 #include "GtkUtilities.h"
 
 #include "GtkVersioning.h"
+#include <WebCore/Color.h>
 #include <WebCore/GdkCairoUtilities.h>
 #include <WebCore/Image.h>
 #include <WebCore/IntPoint.h>
@@ -291,6 +292,17 @@ bool eventModifiersContainCapsLock(GdkEvent* event)
 #else
     return gdk_keymap_get_caps_lock_state(gdk_keymap_get_for_display(gdk_event_get_display(event)));
 #endif
+}
+
+WebCore::Color gdkRGBAToColor(const GdkRGBA& color)
+{
+    return convertColor<SRGBA<uint8_t>>(SRGBA<float> { static_cast<float>(color.red), static_cast<float>(color.green), static_cast<float>(color.blue), static_cast<float>(color.alpha) });
+}
+
+GdkRGBA colorToGdkRGBA(const WebCore::Color& color)
+{
+    auto [r, g, b, a] = color.toColorTypeLossy<SRGBA<float>>().resolved();
+    return { r, g, b, a };
 }
 
 } // namespace WebCore

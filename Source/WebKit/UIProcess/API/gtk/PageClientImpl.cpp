@@ -610,19 +610,19 @@ WebCore::Color PageClientImpl::accentColor()
 
     // libadwaita
     if (gtk_style_context_lookup_color(context, "accent_bg_color", &accentColor))
-        return WebCore::Color(accentColor);
+        return gdkRGBAToColor(accentColor);
 
     // elementary OS 6.x
     if (gtk_style_context_lookup_color(context, "accent_color", &accentColor))
-        return WebCore::Color(accentColor);
+        return gdkRGBAToColor(accentColor);
 
     // elementary OS 5.x
     if (gtk_style_context_lookup_color(context, "accentColor", &accentColor))
-        return WebCore::Color(accentColor);
+        return gdkRGBAToColor(accentColor);
 
     // Legacy
     if (gtk_style_context_lookup_color(context, "theme_selected_bg_color", &accentColor))
-        return WebCore::Color(accentColor);
+        return gdkRGBAToColor(accentColor);
 
     return SRGBA<uint8_t> { 52, 132, 228 };
 }

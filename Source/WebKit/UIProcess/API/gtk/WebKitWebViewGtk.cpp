@@ -447,7 +447,7 @@ void webkit_web_view_set_background_color(WebKitWebView* webView, const GdkRGBA*
     g_return_if_fail(rgba);
 
     auto& page = *webkitWebViewBaseGetPage(reinterpret_cast<WebKitWebViewBase*>(webView));
-    page.setBackgroundColor(WebCore::Color(*rgba));
+    page.setBackgroundColor(WebKit::gdkRGBAToColor(*rgba));
 }
 
 /**
@@ -469,7 +469,7 @@ void webkit_web_view_get_background_color(WebKitWebView* webView, GdkRGBA* rgba)
     g_return_if_fail(rgba);
 
     auto& page = *webkitWebViewBaseGetPage(reinterpret_cast<WebKitWebViewBase*>(webView));
-    *rgba = page.backgroundColor().value_or(WebCore::Color::white);
+    *rgba = WebKit::colorToGdkRGBA(page.backgroundColor().value_or(WebCore::Color::white));
 }
 
 /**
@@ -493,10 +493,10 @@ gboolean webkit_web_view_get_theme_color(WebKitWebView* webView, GdkRGBA* rgba)
     auto& page = webkitWebViewGetPage(webView);
 
     if (!page.themeColor().isValid()) {
-        *rgba = static_cast<WebCore::Color>(WebCore::Color::transparentBlack);
+        *rgba = { 0, 0, 0, 0 };
         return FALSE;
     }
 
-    *rgba = page.themeColor();
+    *rgba = WebKit::colorToGdkRGBA(page.themeColor());
     return TRUE;
 }
