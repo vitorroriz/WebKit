@@ -146,7 +146,7 @@ kern_return_t pas_report_crash_extract_pgm_failure(vm_address_t fault_address, m
         if (pgm_metadata.alloc_backtrace) {
             if (!pas_enumerator_copy_remote(enumerator, &alloc_backtrace_data, pgm_metadata.alloc_backtrace, sizeof(pas_backtrace_metadata)))
                 return pas_enumerator_destroy_and_fail(enumerator);
-            if (alloc_backtrace_data.frame_size < 0 || alloc_backtrace_data.frame_size > PGM_BACKTRACE_MAX_FRAMES)
+            if (alloc_backtrace_data.frame_size < 0 || alloc_backtrace_data.frame_size > PAS_PGM_BACKTRACE_MAX_FRAMES)
                 return pas_enumerator_destroy_and_fail(enumerator);
         }
 
@@ -154,7 +154,7 @@ kern_return_t pas_report_crash_extract_pgm_failure(vm_address_t fault_address, m
         if (pgm_metadata.dealloc_backtrace) {
             if (!pas_enumerator_copy_remote(enumerator, &dealloc_backtrace_data, pgm_metadata.dealloc_backtrace, sizeof(pas_backtrace_metadata)))
                 return pas_enumerator_destroy_and_fail(enumerator);
-            if (dealloc_backtrace_data.frame_size < 0 || dealloc_backtrace_data.frame_size > PGM_BACKTRACE_MAX_FRAMES)
+            if (dealloc_backtrace_data.frame_size < 0 || dealloc_backtrace_data.frame_size > PAS_PGM_BACKTRACE_MAX_FRAMES)
                 return pas_enumerator_destroy_and_fail(enumerator);
         }
 
