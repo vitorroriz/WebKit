@@ -8282,3 +8282,5 @@ webkit.org/b/299501 http/tests/site-isolation/focus-tab-navigation-activeElement
 webkit.org/b/299501 http/tests/site-isolation/focus-click-navigation-activeElement.html [ Pass Failure ]
 
 webkit.org/b/300137 imported/w3c/web-platform-tests/html/semantics/scripting-1/the-script-element/json-module/repeated-imports.any.sharedworker.html [ Pass Failure ]
+
+webkit.org/b/300946 http/tests/site-isolation/key-events.html [ Pass Failure ]
