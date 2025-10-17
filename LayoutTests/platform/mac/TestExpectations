@@ -2539,7 +2539,6 @@ imported/w3c/web-platform-tests/css/css-ui/compute-kind-widget-no-fallback-props
 imported/w3c/web-platform-tests/css/css-contain/contain-layout-suppress-baseline-002.html [ Pass ImageOnlyFailure ]
 media/modern-media-controls/volume-support/volume-support-drag-to-mute.html [ Pass Timeout ]
 fast/forms/input-appearance-spinbutton-up.html [ Pass Failure ]
-fast/forms/month/month-editable-components/month-editable-components-mouse-events.html [ Pass Failure ]
 fast/forms/001.html [ Pass Failure ]
 fast/forms/basic-textareas.html [ Pass Failure ]
 fast/forms/basic-textareas-quirks.html [ Pass Failure ]
@@ -2564,3 +2563,8 @@ webkit.org/b/300997 webrtc/filtering-ice-candidate-after-reload.html [ Pass Fail
 [ Tahoe Debug ] fast/forms/switch/click-animation.html [ ImageOnlyFailure ]
 [ Tahoe Debug ] fast/forms/switch/click-animation-redundant-disabled.html [ ImageOnlyFailure ]
 [ Tahoe Debug ] fast/forms/switch/click-animation-redundant-checked.html  [ ImageOnlyFailure ]
+
+# https://bugs.webkit.org/show_bug.cgi?id=301000 [ macOS Tahoe ] 3x fast/ tests (layout-tests) are constant text failures
+[ Tahoe Debug ] fast/forms/month/month-editable-components/month-editable-components-mouse-events.html [ Failure ]
+[ Tahoe Debug ] fast/html/text-field-input-types.html [ Failure ]
+[ Tahoe Debug ] fast/repaint/block-inputrange-repaint.html [ Failure ]
