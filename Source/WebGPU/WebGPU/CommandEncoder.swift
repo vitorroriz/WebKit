@@ -101,7 +101,7 @@ extension WebGPU.CommandEncoder {
         }
 
         if getEncoderState() != WebGPU.CommandsMixin.EncoderState.Open {
-            return "GPUCommandEncoder.finish: encoder state is \(String(describing: encoderStateNameWrapper())), expected 'Open'"
+            return "GPUCommandEncoder.finish: encoder state is '\(encoderStateName() ?? "")', expected 'Open'"
         }
 
         if m_debugGroupStackSize != 0 {

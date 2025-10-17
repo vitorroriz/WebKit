@@ -115,7 +115,6 @@ public:
 #if ENABLE(WEBGPU_SWIFT)
     void setEncoderState(EncoderState state) { m_state = state; }
     EncoderState getEncoderState() { return m_state; }
-    NSString * _Nullable encoderStateNameWrapper() { return encoderStateName(); }
 #endif
 
     id<MTLBlitCommandEncoder> ensureBlitCommandEncoder();
