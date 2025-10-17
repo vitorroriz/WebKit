@@ -474,9 +474,9 @@ String CaptionUserPreferencesMediaAF::captionsDefaultFontCSS() const
         return emptyString();
 
     if (fontNameIsSystemFont(name.get())) {
-        if (CFStringHasPrefix(CFSTR(".AppleSystemUIFontMonospaced"), name.get()))
-            name = CFSTR("system-ui-monospaced");
-        else if (CFStringHasPrefix(CFSTR(".AppleSystemUIFont"), name.get()))
+        if (CFStringHasPrefix(name.get(), CFSTR(".AppleSystemUIFontMonospaced")))
+            name = CFSTR("ui-monospace");
+        else if (CFStringHasPrefix(name.get(), CFSTR(".AppleSystemUIFont")))
             name = CFSTR("system-ui");
         else {
             // FIXME: Add more fallbacks for system font names
