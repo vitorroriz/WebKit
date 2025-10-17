@@ -343,7 +343,7 @@ Inspector::Protocol::ErrorStringOr<Ref<Inspector::Protocol::DOM::Styleable>> Ins
     if (!domAgent)
         return makeUnexpected("DOM domain must be enabled"_s);
 
-    RefPtr keyframeEffect = dynamicDowncast<KeyframeEffect>(animation->effect());
+    RefPtr keyframeEffect = animation->keyframeEffect();
     if (!keyframeEffect)
         return makeUnexpected("Animation for given animationId does not have an effect"_s);
 

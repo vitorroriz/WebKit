@@ -194,9 +194,9 @@ bool Styleable::computeAnimationExtent(LayoutRect& bounds) const
     if (!animations)
         return false;
 
-    KeyframeEffect* matchingEffect = nullptr;
+    RefPtr<KeyframeEffect> matchingEffect = nullptr;
     for (const auto& animation : *animations) {
-        if (auto* keyframeEffect = dynamicDowncast<KeyframeEffect>(animation->effect())) {
+        if (RefPtr keyframeEffect = animation->keyframeEffect()) {
             if (keyframeEffect->blendingKeyframes().containsProperty(CSSPropertyTransform))
                 matchingEffect = keyframeEffect;
         }
@@ -255,7 +255,7 @@ bool Styleable::hasRunningAcceleratedAnimations() const
 
     if (auto* animations = this->animations()) {
         for (const auto& animation : *animations) {
-            if (RefPtr keyframeEffect = dynamicDowncast<KeyframeEffect>(animation->effect())) {
+            if (RefPtr keyframeEffect = animation->keyframeEffect()) {
                 if (keyframeEffect->isRunningAccelerated())
                     return true;
             }
@@ -978,7 +978,7 @@ void Styleable::queryContainerDidChange() const
     if (!animations)
         return;
     for (auto& animation : *animations) {
-        RefPtr keyframeEffect = dynamicDowncast<KeyframeEffect>(animation->effect());
+        RefPtr keyframeEffect = animation->keyframeEffect();
         if (keyframeEffect && keyframeEffect->blendingKeyframes().usesContainerUnits()) {
             if (RefPtr cssAnimation = dynamicDowncast<CSSAnimation>(animation))
                 cssAnimation->keyframesRuleDidChange();

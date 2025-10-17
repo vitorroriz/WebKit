@@ -291,7 +291,7 @@ void ScrollTimeline::updateCurrentTimeIfStale()
 
     bool needsStyleUpdate = false;
     for (auto& animation : m_animations) {
-        if (RefPtr effect = dynamicDowncast<KeyframeEffect>(animation->effect())) {
+        if (RefPtr effect = animation->keyframeEffect()) {
             effect->invalidate();
             needsStyleUpdate = true;
         }

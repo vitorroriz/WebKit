@@ -387,7 +387,7 @@ void CSSAnimation::keyframesRuleDidChange()
     if (m_overriddenProperties.contains(Property::Keyframes))
         return;
 
-    RefPtr keyframeEffect = dynamicDowncast<KeyframeEffect>(effect());
+    RefPtr keyframeEffect = this->keyframeEffect();
     if (!keyframeEffect)
         return;
 
@@ -404,7 +404,7 @@ void CSSAnimation::updateKeyframesIfNeeded(const RenderStyle* oldStyle, const Re
     if (m_overriddenProperties.contains(Property::Keyframes))
         return;
 
-    RefPtr keyframeEffect = dynamicDowncast<KeyframeEffect>(effect());
+    RefPtr keyframeEffect = this->keyframeEffect();
     if (!keyframeEffect)
         return;
 
