@@ -35,6 +35,7 @@
 #import "WKInspectorWKWebView.h"
 #import "WKOpenPanelParameters.h"
 #import "WKProcessPoolInternal.h"
+#import "WKWebViewInternal.h"
 #import "WKWebsiteDataStoreInternal.h"
 #import "WebInspectorUIProxy.h"
 #import "WebInspectorUtilities.h"
@@ -47,7 +48,6 @@
 #import <WebKit/WKPreferencesPrivate.h>
 #import <WebKit/WKUIDelegatePrivate.h>
 #import <WebKit/WKWebViewConfigurationPrivate.h>
-#import <WebKit/WKWebViewPrivate.h>
 #import <wtf/WeakObjCPtr.h>
 #import <wtf/cocoa/RuntimeApplicationChecksCocoa.h>
 

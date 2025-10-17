@@ -52,7 +52,6 @@
 #import <wtf/spi/cocoa/NSObjCRuntimeSPI.h>
 
 #if ENABLE(SCREEN_TIME)
-#import <ScreenTime/STScreenTimeConfiguration.h>
 #import <ScreenTime/STWebpageController.h>
 #endif
 
@@ -168,6 +167,10 @@ enum class HideScrollPocketReason : uint8_t {
 
 #if HAVE(DIGITAL_CREDENTIALS_UI)
 @class WKDigitalCredentialsPicker;
+#endif
+
+#if ENABLE(SCREEN_TIME)
+@class WKScreenTimeConfigurationObserver;
 #endif
 
 #if ENABLE(WRITING_TOOLS)
@@ -317,7 +320,7 @@ struct PerWebProcessState {
 
 #if ENABLE(SCREEN_TIME)
     RetainPtr<STWebpageController> _screenTimeWebpageController;
-    RetainPtr<STScreenTimeConfigurationObserver> _screenTimeConfigurationObserver;
+    RetainPtr<WKScreenTimeConfigurationObserver> _screenTimeConfigurationObserver;
 #if PLATFORM(MAC)
     RetainPtr<NSVisualEffectView> _screenTimeBlurredSnapshot;
 #else

@@ -30,6 +30,7 @@
 
 #import "AppKitSPI.h"
 #import "WebPageProxy.h"
+#import <WebCore/LocalizedStrings.h>
 
 constexpr CGFloat kCalendarWidth = 139;
 constexpr CGFloat kCalendarHeight = 148;

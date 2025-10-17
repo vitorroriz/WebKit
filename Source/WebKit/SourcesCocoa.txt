@@ -477,6 +477,7 @@ UIProcess/Cocoa/WKContactPicker.mm @nonARC
 UIProcess/Cocoa/WKEditCommand.mm @nonARC
 UIProcess/Cocoa/WKFullKeyboardAccessWatcher.mm @nonARC
 UIProcess/Cocoa/WKReloadFrameErrorRecoveryAttempter.mm @nonARC
+UIProcess/Cocoa/WKScreenTimeConfigurationObserver.mm @nonARC
 UIProcess/Cocoa/WKTextPlaceholder.mm @nonARC
 UIProcess/Cocoa/WKTextSelectionRect.mm @nonARC
 UIProcess/Cocoa/WKWebViewContentProviderRegistry.mm @nonARC
