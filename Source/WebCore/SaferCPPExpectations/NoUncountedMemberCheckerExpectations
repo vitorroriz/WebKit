@@ -32,11 +32,9 @@ editing/cocoa/NodeHTMLConverter.mm
 html/FormListedElement.cpp
 html/parser/HTMLTreeBuilder.h
 html/track/TrackBase.h
-inspector/DOMPatchSupport.cpp
 [ Mac ] inspector/InspectorFrontendHost.cpp
 [ Mac ] inspector/InspectorFrontendHost.h
 inspector/InspectorShaderProgram.h
-inspector/InspectorStyleSheet.cpp
 inspector/InspectorStyleSheet.h
 inspector/InspectorWebAgentBase.h
 layout/formattingContexts/inline/InlineItemsBuilder.h

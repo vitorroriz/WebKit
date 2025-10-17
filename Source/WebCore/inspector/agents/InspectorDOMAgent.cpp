@@ -209,7 +209,7 @@ public:
     void timerFired();
 
 private:
-    InspectorDOMAgent* m_domAgent;
+    const CheckedPtr<InspectorDOMAgent> m_domAgent;
     Timer m_timer;
     HashSet<RefPtr<Element>> m_elements;
 };
@@ -265,14 +265,14 @@ public:
     void handleEvent(ScriptExecutionContext&, Event& event) final
     {
         RefPtr node = dynamicDowncast<Node>(event.target());
-        if (!node || m_domAgent.m_dispatchedEvents.contains(&event))
+        if (!node || m_domAgent->m_dispatchedEvents.contains(&event))
             return;
 
-        auto nodeId = m_domAgent.pushNodePathToFrontend(node.get());
+        auto nodeId = m_domAgent->pushNodePathToFrontend(node.get());
         if (!nodeId)
             return;
 
-        m_domAgent.m_dispatchedEvents.add(&event);
+        m_domAgent->m_dispatchedEvents.add(&event);
 
         RefPtr<JSON::Object> data = JSON::Object::create();
 
@@ -281,8 +281,8 @@ public:
             data->setBoolean("enabled"_s, !!node->document().fullscreen().fullscreenElement());
 #endif // ENABLE(FULLSCREEN_API)
 
-        auto timestamp = m_domAgent.m_environment.executionStopwatch().elapsedTime().seconds();
-        m_domAgent.m_frontendDispatcher->didFireEvent(nodeId, event.type(), timestamp, data->size() ? WTFMove(data) : nullptr);
+        auto timestamp = m_domAgent->m_environment.executionStopwatch().elapsedTime().seconds();
+        m_domAgent->m_frontendDispatcher->didFireEvent(nodeId, event.type(), timestamp, data->size() ? WTFMove(data) : nullptr);
     }
 
 private:
@@ -292,7 +292,7 @@ private:
     {
     }
 
-    InspectorDOMAgent& m_domAgent;
+    const CheckedRef<InspectorDOMAgent> m_domAgent;
 };
 
 String InspectorDOMAgent::toErrorString(ExceptionCode ec)
