@@ -125,16 +125,16 @@ Element* ScrollTimeline::source() const
     case Scroller::Nearest: {
         if (CheckedPtr subjectRenderer = source->renderer()) {
             if (CheckedPtr nearestScrollableContainer = subjectRenderer->enclosingScrollableContainer()) {
-                if (RefPtr nearestSource = nearestScrollableContainer->element()) {
-                    Ref document = nearestSource->document();
+                if (auto* nearestSource = nearestScrollableContainer->element()) {
+                    Ref document = Ref { *nearestSource }->document();
                     RefPtr documentElement = document->documentElement();
                     if (nearestSource != documentElement)
-                        return nearestSource.unsafeGet();
+                        return nearestSource;
                     // RenderObject::enclosingScrollableContainer() will return the document element even in
                     // quirks mode, but the scrolling element in that case is the <body> element, so we must
                     // make sure to return Document::scrollingElement() in case the document element is
                     // returned by enclosingScrollableContainer() but it was not explicitly set as the source.
-                    return &source->element == documentElement ? nearestSource.unsafeGet() : document->scrollingElement();
+                    return &source->element == documentElement ? nearestSource : document->scrollingElement();
                 }
             }
         }
