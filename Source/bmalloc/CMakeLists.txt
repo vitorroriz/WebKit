@@ -706,6 +706,7 @@ set(bmalloc_LIBRARIES
 )
 
 if (ENABLE_MALLOC_HEAP_BREAKDOWN)
+    list(APPEND bmalloc_DEFINITIONS BENABLE_MALLOC_HEAP_BREAKDOWN=1)
     list(APPEND bmalloc_LIBRARIES ${MALLOC_HEAP_BREAKDOWN_LIBRARIES})
 endif ()
 
@@ -728,10 +729,6 @@ add_definitions(-DPAS_BMALLOC=1)
 if (MSVC)
     add_compile_options(/wd4206)
     add_compile_options(-mcx16)
-endif ()
-
-if (ENABLE_MALLOC_HEAP_BREAKDOWN)
-    add_definitions(-DBENABLE_MALLOC_HEAP_BREAKDOWN=1)
 endif ()
 
 WEBKIT_FRAMEWORK_DECLARE(bmalloc)
