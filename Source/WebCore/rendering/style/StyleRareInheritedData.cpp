@@ -36,7 +36,9 @@ namespace WebCore {
 
 struct GreaterThanOrSameSizeAsStyleRareInheritedData : public RefCounted<GreaterThanOrSameSizeAsStyleRareInheritedData> {
     float firstFloat;
-    void* styleImage;
+    float secondFloat;
+    Style::ImageOrNone styleImage;
+    Style::WebkitTextStrokeWidth textStrokeWidth;
     Style::Color firstColor;
     Style::Color colors[10];
     Style::ScrollbarColor scrollbarColor;
@@ -44,7 +46,7 @@ struct GreaterThanOrSameSizeAsStyleRareInheritedData : public RefCounted<Greater
     void* ownPtrs[1];
     AtomString atomStrings[5];
     void* refPtrs[3];
-    float secondFloat;
+    float thirdFloat;
     Style::TextEmphasisStyle textEmphasisStyle;
     Style::TextIndent textIndent;
     Style::TextUnderlineOffset offset;
