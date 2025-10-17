@@ -2469,15 +2469,15 @@ void RenderBlockFlow::addFloatsToNewParent(RenderBlockFlow& toBlockFlow) const
     }
 }
 
-void RenderBlockFlow::computeOverflow(LayoutUnit oldClientAfterEdge, bool recomputeFloats)
+void RenderBlockFlow::computeOverflow(LayoutUnit oldClientAfterEdge, OptionSet<ComputeOverflowOptions> options)
 {
-    RenderBlock::computeOverflow(oldClientAfterEdge, recomputeFloats);
+    RenderBlock::computeOverflow(oldClientAfterEdge, options);
 
     auto addOverflowFromFloatsIfApplicable = [&] {
 
         if (!m_floatingObjects)
             return;
-        auto shouldIncludeFloats = !multiColumnFlow() && (recomputeFloats || createsNewFormattingContext() || hasSelfPaintingLayer());
+        auto shouldIncludeFloats = !multiColumnFlow() && (options.contains(ComputeOverflowOptions::RecomputeFloats) || createsNewFormattingContext() || hasSelfPaintingLayer());
         if (!shouldIncludeFloats)
             return;
 
@@ -3225,6 +3225,20 @@ void RenderBlockFlow::addOverflowFromInlineChildren()
     
     if (svgTextLayout())
         svgTextLayout()->addOverflowFromInlineChildren();
+}
+
+void RenderBlockFlow::addOverflowFromInFlowChildren(OptionSet<ComputeOverflowOptions> options)
+{
+    if (childrenInline()) {
+        addOverflowFromInlineChildren();
+
+        // If this block is flowed inside a flow thread, make sure its overflow is propagated to the containing fragments.
+        if (m_overflow) {
+            if (CheckedPtr flow = enclosingFragmentedFlow())
+                flow->addFragmentsVisualOverflow(*this, m_overflow->visualOverflowRect());
+        }
+    } else
+        RenderBlock::addOverflowFromInFlowChildren(options);
 }
 
 std::optional<LayoutUnit> RenderBlockFlow::firstLineBaseline() const

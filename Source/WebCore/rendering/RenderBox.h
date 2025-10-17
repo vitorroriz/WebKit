@@ -165,11 +165,18 @@ public:
     void addLayoutOverflow(const LayoutRect&);
     void addVisualOverflow(const LayoutRect&);
     void clearOverflow();
+    RenderOverflow& ensureOverflow();
 
     void addVisualEffectOverflow();
     LayoutRect applyVisualEffectOverflow(const LayoutRect&) const;
 
-    void addOverflowFromInFlowChildOrAbsolutePositionedDescendant(const RenderBox&);
+
+    enum class ComputeOverflowOptions {
+        None,
+        RecomputeFloats = 1 << 0,
+    };
+    virtual void addOverflowFromInFlowChildren(OptionSet<ComputeOverflowOptions> = { });
+    void addOverflowFromContainedBox(const RenderBox& child, OptionSet<ComputeOverflowOptions> = { });
     void addOverflowFromFloatBox(const FloatingObject&);
 
     void applyTransform(TransformationMatrix&, const RenderStyle&, const FloatRect& boundingBox, OptionSet<RenderStyle::TransformOperationOption>) const override;
@@ -693,7 +700,7 @@ protected:
     bool overflowChangesMayAffectLayout() const final;
 
 private:
-    void addOverflowWithRendererOffset(const RenderBox&, LayoutSize);
+    void addOverflowWithRendererOffset(const RenderBox&, LayoutSize, OptionSet<ComputeOverflowOptions> = { });
 
     void updateShapeOutsideInfoAfterStyleChange(const RenderStyle&, const RenderStyle* oldStyle);
 
@@ -747,8 +754,6 @@ private:
     RepaintRects computeVisibleRectsUsingPaintOffset(const RepaintRects&) const;
     
     LayoutPoint topLeftLocationWithFlipping() const;
-
-    void addLayoutOverflow(const LayoutRect&, const LayoutRect& flippedClientRect);
 
     ShapeOutsideInfo& ensureShapeOutsideInfo();
     void removeShapeOutsideInfo();

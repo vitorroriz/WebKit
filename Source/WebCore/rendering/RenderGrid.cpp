@@ -2575,9 +2575,9 @@ void RenderGrid::GridWrapper::resetCurrentGrid() const
     m_currentGrid = std::ref(const_cast<Grid&>(m_layoutGrid));
 }
 
-void RenderGrid::computeOverflow(LayoutUnit oldClientAfterEdge, bool recomputeFloats)
+void RenderGrid::computeOverflow(LayoutUnit oldClientAfterEdge, OptionSet<ComputeOverflowOptions> options)
 {
-    RenderBlock::computeOverflow(oldClientAfterEdge, recomputeFloats);
+    RenderBlock::computeOverflow(oldClientAfterEdge, options);
 
     if (!hasPotentiallyScrollableOverflow() || isMasonry() || isSubgridRows() || isSubgridColumns())
         return;

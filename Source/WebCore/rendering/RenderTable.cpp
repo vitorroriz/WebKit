@@ -741,8 +741,10 @@ void RenderTable::recalcCollapsedBorders()
     m_collapsedBordersValid = true;
 }
 
-void RenderTable::addOverflowFromChildren()
+void RenderTable::addOverflowFromInFlowChildren(OptionSet<ComputeOverflowOptions> options)
 {
+    UNUSED_PARAM(options);
+
     // Add overflow from borders.
     // Technically it's odd that we are incorporating the borders into layout overflow, which is only supposed to be about overflow from our
     // descendant objects, but since tables don't support overflow:auto, this works out fine.
@@ -761,12 +763,12 @@ void RenderTable::addOverflowFromChildren()
     // Add overflow from our caption.
     for (unsigned i = 0; i < m_captions.size(); ++i) {
         if (auto* caption = m_captions[i].get())
-            addOverflowFromInFlowChildOrAbsolutePositionedDescendant(*caption);
+            addOverflowFromContainedBox(*caption);
     }
 
     // Add overflow from our sections.
     for (auto* section = topSection(); section; section = sectionBelow(section))
-        addOverflowFromInFlowChildOrAbsolutePositionedDescendant(*section);
+        addOverflowFromContainedBox(*section);
 }
 
 void RenderTable::paint(PaintInfo& paintInfo, const LayoutPoint& paintOffset)

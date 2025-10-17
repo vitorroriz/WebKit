@@ -4548,10 +4548,18 @@ LayoutRect RenderBox::applyVisualEffectOverflow(const LayoutRect& borderBox) con
     return LayoutRect(overflowMinX, overflowMinY, overflowMaxX - overflowMinX, overflowMaxY - overflowMinY);
 }
 
-void RenderBox::addOverflowFromInFlowChildOrAbsolutePositionedDescendant(const RenderBox& inFlowChildOrAbsolutePositionedDescendant)
+void RenderBox::addOverflowFromInFlowChildren(OptionSet<ComputeOverflowOptions> options)
 {
-    ASSERT(!inFlowChildOrAbsolutePositionedDescendant.isFloating());
-    addOverflowWithRendererOffset(inFlowChildOrAbsolutePositionedDescendant, inFlowChildOrAbsolutePositionedDescendant.locationOffset());
+    for (auto& child : childrenOfType<RenderBox>(*this)) {
+        if (!child.isFloatingOrOutOfFlowPositioned())
+            addOverflowFromContainedBox(child, options);
+    }
+}
+
+void RenderBox::addOverflowFromContainedBox(const RenderBox& child, OptionSet<ComputeOverflowOptions> options)
+{
+    ASSERT(!child.isFloating());
+    addOverflowWithRendererOffset(child, child.locationOffset(), options);
 }
 
 void RenderBox::addOverflowFromFloatBox(const FloatingObject& floatBox)
@@ -4559,16 +4567,18 @@ void RenderBox::addOverflowFromFloatBox(const FloatingObject& floatBox)
     addOverflowWithRendererOffset(floatBox.renderer(), floatBox.locationOffsetOfBorderBox());
 }
 
-void RenderBox::addOverflowWithRendererOffset(const RenderBox& renderer, LayoutSize offsetFromThis)
+// 'offsetFromThis' is normally the renderer's position (RenderBox::location()).
+// However in case of a float box, it may belong to a different container
+// (but is intrusive to this container hence calling this function),
+// meaning that the renderer's position may not be the same as its actual offset from this container.
+void RenderBox::addOverflowWithRendererOffset(const RenderBox& renderer, LayoutSize offsetFromThis, OptionSet<ComputeOverflowOptions> options)
 {
+    UNUSED_PARAM(options);
+
     // Never allow flow threads to propagate overflow up to a parent.
     if (renderer.isRenderFragmentedFlow())
         return;
 
-    // 'offsetFromThis' is normally the renderer's position (RenderBox::location()).
-    // However in case of a float box, it may belong to a different container (but is intrusive to this container hence calling this function),
-    // meaning that the renderer's position may not be the same as its actual offset from this container.
-    auto flippedClientRect = flippedClientBoxRect();
     CheckedPtr fragmentedFlow = enclosingFragmentedFlow();
     if (fragmentedFlow)
         fragmentedFlow->addFragmentsOverflowFromChild(*this, renderer, offsetFromThis);
@@ -4578,7 +4588,7 @@ void RenderBox::addOverflowWithRendererOffset(const RenderBox& renderer, LayoutS
     // and just propagates the border box rect instead.
     auto childLayoutOverflowRect = renderer.layoutOverflowRectForPropagation(writingMode());
     childLayoutOverflowRect.move(offsetFromThis);
-    addLayoutOverflow(childLayoutOverflowRect, flippedClientRect);
+    addLayoutOverflow(childLayoutOverflowRect);
 
     auto ensurePaddingEndIsIncluded = [&] {
         if (!hasNonVisibleOverflow())
@@ -4678,11 +4688,7 @@ LayoutOptionalOutsets RenderBox::allowedLayoutOverflow() const
 
 void RenderBox::addLayoutOverflow(const LayoutRect& rect)
 {
-    addLayoutOverflow(rect, flippedClientBoxRect());
-}
-
-void RenderBox::addLayoutOverflow(const LayoutRect& rect, const LayoutRect& clientBox)
-{
+    auto clientBox = flippedClientBoxRect();
     if (clientBox.contains(rect) || rect.isEmpty())
         return;
 
@@ -4706,10 +4712,7 @@ void RenderBox::addLayoutOverflow(const LayoutRect& rect, const LayoutRect& clie
             return;
     }
 
-    if (!m_overflow)
-        m_overflow = makeUnique<RenderOverflow>(clientBox, borderBoxRect());
-    
-    m_overflow->addLayoutOverflow(overflowRect);
+    ensureOverflow().addLayoutOverflow(overflowRect);
 }
 
 void RenderBox::addVisualOverflow(const LayoutRect& rect)
@@ -4718,10 +4721,7 @@ void RenderBox::addVisualOverflow(const LayoutRect& rect)
     if (borderBox.contains(rect) || rect.isEmpty())
         return;
 
-    if (!m_overflow)
-        m_overflow = makeUnique<RenderOverflow>(flippedClientBoxRect(), borderBox);
-    
-    m_overflow->addVisualOverflow(rect);
+    ensureOverflow().addVisualOverflow(rect);
 }
 
 void RenderBox::clearOverflow()
@@ -4729,6 +4729,14 @@ void RenderBox::clearOverflow()
     m_overflow = { };
     if (CheckedPtr fragmentedFlow = enclosingFragmentedFlow())
         fragmentedFlow->clearFragmentsOverflow(*this);
+}
+
+RenderOverflow& RenderBox::ensureOverflow()
+{
+    if (!m_overflow)
+        m_overflow = makeUnique<RenderOverflow>(flippedClientBoxRect(), borderBoxRect());
+
+    return *m_overflow;
 }
 
 bool RenderBox::percentageLogicalHeightIsResolvable() const
