@@ -26,9 +26,9 @@
 #if ENABLE(GPU_PROCESS) && ENABLE(VIDEO)
 
 [
+    ExceptionForEnabledBy,
     DispatchedFrom=WebContent,
-    DispatchedTo=GPU,
-    EnabledBy=UseGPUProcessForMediaEnabled
+    DispatchedTo=GPU
 ]
 messages -> RemoteAudioVideoRendererProxyManager {
     Create(WebKit::RemoteAudioVideoRendererIdentifier identifier, WebCore::MediaPlayerClientIdentifier mediaElementIdentifier, WebCore::MediaPlayerIdentifier playerIdentifier)
