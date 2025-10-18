@@ -627,6 +627,9 @@ messages -> WebPage WantsAsyncDispatchMessage {
     StartDeferringScrollEvents();
     FlushDeferredScrollEvents();
 
+    StartDeferringIntersectionObservations();
+    FlushDeferredIntersectionObservations();
+
     FlushDeferredDidReceiveMouseEvent()
 
     PerformHitTestForMouseEvent(WebKit::WebMouseEvent event) -> (struct WebKit::WebHitTestResultData hitTestResult, OptionSet<WebKit::WebEventModifier> modifiers)

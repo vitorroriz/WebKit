@@ -5878,6 +5878,11 @@ void Document::flushDeferredScrollEvents()
     runScrollSteps();
 }
 
+void Document::flushDeferredIntersectionObservations()
+{
+    scheduleRenderingUpdate(RenderingUpdateStep::IntersectionObservations);
+}
+
 void Document::invalidateScrollbars()
 {
     if (RefPtr frameView = view())
@@ -10275,6 +10280,10 @@ void Document::updateIntersectionObservations(const Vector<WeakPtr<IntersectionO
 {
     RefPtr frameView = view();
     if (!frameView)
+        return;
+
+    RefPtr page = this->page();
+    if (!page || page->shouldDeferIntersectionObservations())
         return;
 
     bool needsLayout = frameView->layoutContext().isLayoutPending() || (renderView() && renderView()->needsLayout());

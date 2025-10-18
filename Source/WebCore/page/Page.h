@@ -1339,6 +1339,10 @@ public:
     WEBCORE_EXPORT void startDeferringScrollEvents();
     WEBCORE_EXPORT void flushDeferredScrollEvents();
 
+    bool shouldDeferIntersectionObservations() const { return m_shouldDeferIntersectionObservations; }
+    WEBCORE_EXPORT void startDeferringIntersectionObservations();
+    WEBCORE_EXPORT void flushDeferredIntersectionObservations();
+
     bool reportScriptTrackingPrivacy(const URL&, ScriptTrackingPrivacyCategory);
     bool shouldAllowScriptAccess(const URL&, const SecurityOrigin& topOrigin, ScriptTrackingPrivacyCategory) const;
     bool requiresScriptTrackingPrivacyProtections(const URL&) const;
@@ -1833,6 +1837,7 @@ private:
 
     bool m_shouldDeferResizeEvents { false };
     bool m_shouldDeferScrollEvents { false };
+    bool m_shouldDeferIntersectionObservations { false };
 
     Ref<DocumentSyncData> m_topDocumentSyncData;
 

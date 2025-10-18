@@ -1959,6 +1959,9 @@ public:
     void startDeferringScrollEvents();
     void flushDeferredScrollEvents();
 
+    void startDeferringIntersectionObservations();
+    void flushDeferredIntersectionObservations();
+
     void flushDeferredDidReceiveMouseEvent();
 
     void generateTestReport(String&& message, String&& group);

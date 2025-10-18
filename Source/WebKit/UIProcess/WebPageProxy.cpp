@@ -10236,6 +10236,16 @@ void WebPageProxy::flushDeferredScrollEvents()
     internals().protectedPage()->send(Messages::WebPage::FlushDeferredScrollEvents());
 }
 
+void WebPageProxy::startDeferringIntersectionObservations()
+{
+    internals().protectedPage()->send(Messages::WebPage::StartDeferringIntersectionObservations());
+}
+
+void WebPageProxy::flushDeferredIntersectionObservations()
+{
+    internals().protectedPage()->send(Messages::WebPage::FlushDeferredIntersectionObservations());
+}
+
 bool WebPageProxy::isProcessingKeyboardEvents() const
 {
     return !internals().keyEventQueue.isEmpty();

@@ -1065,6 +1065,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     page->setSuppressVisibilityUpdates(true);
     page->startDeferringResizeEvents();
     page->startDeferringScrollEvents();
+    page->startDeferringIntersectionObservations();
 
     _viewState.store(webView.get());
 
@@ -1212,6 +1213,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
             page->setSuppressVisibilityUpdates(false);
             page->flushDeferredResizeEvents();
             page->flushDeferredScrollEvents();
+            page->flushDeferredIntersectionObservations();
 
             [_fullscreenViewController showBanner];
 
@@ -1443,6 +1445,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     if (auto page = [self._webView _page]) {
         page->flushDeferredResizeEvents();
         page->flushDeferredScrollEvents();
+        page->flushDeferredIntersectionObservations();
     }
 
     RefPtr videoPresentationInterface = self._videoPresentationManager ? self._videoPresentationManager->controlsManagerInterface() : nullptr;
@@ -1465,6 +1468,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
             page->setNeedsDOMWindowResizeEvent();
             page->flushDeferredResizeEvents();
             page->flushDeferredScrollEvents();
+            page->flushDeferredIntersectionObservations();
         }
 
         _exitRequested = NO;

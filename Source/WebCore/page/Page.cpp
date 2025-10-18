@@ -5805,6 +5805,19 @@ void Page::flushDeferredScrollEvents()
     });
 }
 
+void Page::startDeferringIntersectionObservations()
+{
+    m_shouldDeferIntersectionObservations = true;
+}
+
+void Page::flushDeferredIntersectionObservations()
+{
+    m_shouldDeferIntersectionObservations = false;
+    forEachDocument([&] (Document& document) {
+        document.flushDeferredIntersectionObservations();
+    });
+}
+
 bool Page::reportScriptTrackingPrivacy(const URL& url, ScriptTrackingPrivacyCategory category)
 {
     return !url.isEmpty() && m_scriptTrackingPrivacyReports.add({ url, category }).isNewEntry;

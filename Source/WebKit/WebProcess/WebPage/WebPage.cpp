@@ -3685,6 +3685,16 @@ void WebPage::flushDeferredScrollEvents()
     protectedCorePage()->flushDeferredScrollEvents();
 }
 
+void WebPage::startDeferringIntersectionObservations()
+{
+    protectedCorePage()->startDeferringIntersectionObservations();
+}
+
+void WebPage::flushDeferredIntersectionObservations()
+{
+    protectedCorePage()->flushDeferredIntersectionObservations();
+}
+
 void WebPage::flushDeferredDidReceiveMouseEvent()
 {
     if (auto info = std::exchange(m_deferredDidReceiveMouseEvent, std::nullopt))

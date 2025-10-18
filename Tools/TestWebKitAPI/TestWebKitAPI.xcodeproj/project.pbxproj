@@ -1319,7 +1319,10 @@
 		CDC0932B21C872C10030C4B0 /* ScrollingDoesNotPauseMedia.mm in Sources */ = {isa = PBXBuildFile; fileRef = CDC0932A21C872C10030C4B0 /* ScrollingDoesNotPauseMedia.mm */; };
 		CDC8E48D1BC5CB4500594FEC /* AudioSessionCategoryIOS.mm in Sources */ = {isa = PBXBuildFile; fileRef = CDC8E4851BC5B19400594FEC /* AudioSessionCategoryIOS.mm */; };
 		CDC9442E1EF1FC080059C3C4 /* MediaStreamTrackDetached.mm in Sources */ = {isa = PBXBuildFile; fileRef = CDC9442C1EF1FC080059C3C4 /* MediaStreamTrackDetached.mm */; };
+		CDC94E402EA0B94800149E34 /* CaptionPreferencesTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CDC94E3E2EA0B94800149E34 /* CaptionPreferencesTests.mm */; };
 		CDCFA7AA1E45183200C2433D /* SampleMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CDCFA7A91E45122F00C2433D /* SampleMap.cpp */; };
+		CDD99F362EA2F02D003FAFB8 /* ElementFullscreenIntersectionObserver.mm in Sources */ = {isa = PBXBuildFile; fileRef = CDD99F352EA2F02D003FAFB8 /* ElementFullscreenIntersectionObserver.mm */; };
+		CDD99F402EA2F3E8003FAFB8 /* TestElementFullscreenDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = CDD99F3F2EA2F3E8003FAFB8 /* TestElementFullscreenDelegate.mm */; };
 		CDDFA89E2DBD6BFF00312417 /* spatial-audio-experience-with-audio.html in Copy Resources */ = {isa = PBXBuildFile; fileRef = CDDFA89D2DBD6BFF00312417 /* spatial-audio-experience-with-audio.html */; };
 		CDE4E4E52B7E787900B3AE35 /* InWindowFullscreen.mm in Sources */ = {isa = PBXBuildFile; fileRef = CDE4E4E42B7E787900B3AE35 /* InWindowFullscreen.mm */; };
 		CDE77D2525A6591C00D4115E /* FullscreenPointerLeave.mm in Sources */ = {isa = PBXBuildFile; fileRef = CDE77D2425A6591C00D4115E /* FullscreenPointerLeave.mm */; };
@@ -3970,10 +3973,15 @@
 		CDC8E48C1BC5C96200594FEC /* video-without-audio.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "video-without-audio.mp4"; sourceTree = "<group>"; };
 		CDC9442B1EF1FBD20059C3C4 /* mediastreamtrack-detached.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "mediastreamtrack-detached.html"; sourceTree = "<group>"; };
 		CDC9442C1EF1FC080059C3C4 /* MediaStreamTrackDetached.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MediaStreamTrackDetached.mm; sourceTree = "<group>"; };
+		CDC94E352EA0B4E700149E34 /* SoftLinkShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoftLinkShim.h; sourceTree = "<group>"; };
+		CDC94E3E2EA0B94800149E34 /* CaptionPreferencesTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CaptionPreferencesTests.mm; sourceTree = "<group>"; };
 		CDCF78A7244A2EDB00480311 /* FullscreenAlert.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FullscreenAlert.mm; sourceTree = "<group>"; };
 		CDCFA7A91E45122F00C2433D /* SampleMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SampleMap.cpp; sourceTree = "<group>"; };
 		CDCFFEC022E268D500DF4223 /* NoPauseWhenSwitchingTabs.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NoPauseWhenSwitchingTabs.mm; sourceTree = "<group>"; };
 		CDD68F0C22C18317000CF0AE /* WKWebViewCloseAllMediaPresentations.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WKWebViewCloseAllMediaPresentations.mm; sourceTree = "<group>"; };
+		CDD99F352EA2F02D003FAFB8 /* ElementFullscreenIntersectionObserver.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ElementFullscreenIntersectionObserver.mm; sourceTree = "<group>"; };
+		CDD99F3E2EA2F3E8003FAFB8 /* TestElementFullscreenDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestElementFullscreenDelegate.h; sourceTree = "<group>"; };
+		CDD99F3F2EA2F3E8003FAFB8 /* TestElementFullscreenDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TestElementFullscreenDelegate.mm; sourceTree = "<group>"; };
 		CDDC7C6825FFF6D000224278 /* FullscreenRemoveNodeBeforeEnter.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FullscreenRemoveNodeBeforeEnter.mm; sourceTree = "<group>"; };
 		CDDFA89D2DBD6BFF00312417 /* spatial-audio-experience-with-audio.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "spatial-audio-experience-with-audio.html"; sourceTree = "<group>"; };
 		CDE195B21CFE0ADE0053D256 /* FullscreenTopContentInset.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = FullscreenTopContentInset.html; sourceTree = "<group>"; };
@@ -4537,6 +4545,7 @@
 				BC575BBF126F5752006F0F12 /* PlatformUtilities.cpp */,
 				BC131883117114A800B69727 /* PlatformUtilities.h */,
 				BC90951B125533D700083756 /* PlatformWebView.h */,
+				CDC94E352EA0B4E700149E34 /* SoftLinkShim.h */,
 				BCB9E7FA112359A300A137E0 /* Test.h */,
 				EB4D320727C045430081A8E4 /* TestNotificationProvider.cpp */,
 				EB4D320827C045440081A8E4 /* TestNotificationProvider.h */,
@@ -4605,6 +4614,8 @@
 				5CE7594722A883A500C12409 /* TestContextMenuDriver.mm */,
 				DF6BC4702534E120008F63CC /* TestDownloadDelegate.h */,
 				DF6BC46F2534E120008F63CC /* TestDownloadDelegate.mm */,
+				CDD99F3E2EA2F3E8003FAFB8 /* TestElementFullscreenDelegate.h */,
+				CDD99F3F2EA2F3E8003FAFB8 /* TestElementFullscreenDelegate.mm */,
 				99C607F426FD5A1E00A0953F /* TestInspectorURLSchemeHandler.h */,
 				99C607F526FD5A1F00A0953F /* TestInspectorURLSchemeHandler.mm */,
 				5C72E8CD244FFCE300381EB7 /* TestLegacyDownloadDelegate.h */,
@@ -4796,6 +4807,7 @@
 				0F1D13EF2D2F564B00967D50 /* DrawingToPDF.mm */,
 				A15502281E05020B00A24C57 /* DuplicateCompletionHandlerCalls.mm */,
 				F44D06461F395C4D001A0E29 /* EditorStateTests.mm */,
+				CDD99F352EA2F02D003FAFB8 /* ElementFullscreenIntersectionObserver.mm */,
 				F4DADCF62BABA65B008B398F /* ElementTargetingTests.mm */,
 				E502E42E2D39B79500C3D56D /* ElementTextPreview.mm */,
 				869429BF2E53635100E0DA9D /* EnhancedSecurity.mm */,
@@ -6818,6 +6830,7 @@
 			children = (
 				7BE875FB2919457B00B15289 /* AudioStreamDescriptionCocoa.mm */,
 				0711DF51226A95FB003DD2F7 /* AVFoundationSoftLinkTest.mm */,
+				CDC94E3E2EA0B94800149E34 /* CaptionPreferencesTests.mm */,
 				31F865E526701E73003BFC6D /* CoreCryptoSPI.h */,
 				510A667A27D2FC7A00D22629 /* CoreMediaUtilities.mm */,
 				751B05D51F8EAC1A0028A09E /* DatabaseTrackerTest.mm */,
@@ -7988,6 +8001,7 @@
 				D2E870752D9A96F50010AA23 /* TestCocoaImageAndCocoaColor.mm in Sources */,
 				5CE7594922A883D200C12409 /* TestContextMenuDriver.mm in Sources */,
 				F46128CB211D475100D9FADB /* TestDraggingInfo.mm in Sources */,
+				CDD99F402EA2F3E8003FAFB8 /* TestElementFullscreenDelegate.mm in Sources */,
 				F4E0A2B82122847400AF7C7F /* TestFilePromiseReceiver.mm in Sources */,
 				F4F5BB5221667BAA002D06B9 /* TestFontOptions.mm in Sources */,
 				7BA3936C271EDFCA0015911C /* TestGraphicsContextGLCocoa.mm in Sources */,
@@ -8143,6 +8157,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CDC94E402EA0B94800149E34 /* CaptionPreferencesTests.mm in Sources */,
 				2E7765CD16C4D80A00BA2BB1 /* mainIOS.mm in Sources */,
 				2E7765CF16C4D81100BA2BB1 /* mainMac.mm in Sources */,
 			);
@@ -8193,6 +8208,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A18898FB2CA9F1ED00FEB09A /* AppCommon.mm in Sources */,
+				CDD99F362EA2F02D003FAFB8 /* ElementFullscreenIntersectionObserver.mm in Sources */,
 				A18898FF2CA9F88600FEB09A /* main.mm in Sources */,
 				A17C58172C9AA132009DD0B5 /* main.mm in Sources */,
 			);

@@ -1366,6 +1366,9 @@ public:
     void startDeferringScrollEvents();
     void flushDeferredScrollEvents();
 
+    void startDeferringIntersectionObservations();
+    void flushDeferredIntersectionObservations();
+
     bool isProcessingMouseEvents() const;
     void processNextQueuedMouseEvent();
     void sendMouseEvent(WebCore::FrameIdentifier, const NativeWebMouseEvent&, std::optional<Vector<SandboxExtensionHandle>>&&);

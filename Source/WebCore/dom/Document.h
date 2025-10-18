@@ -1662,6 +1662,7 @@ public:
     void setNeedsVisualViewportScrollEvent();
     void runScrollSteps();
     void flushDeferredScrollEvents();
+    void flushDeferredIntersectionObservations();
 
     void invalidateScrollbars();
 
