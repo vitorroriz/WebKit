@@ -60,7 +60,7 @@ template<auto R, typename V> struct ConversionDataSpecializer<CSS::LengthRaw<R, 
                 : state.cssToLengthConversionData();
         } else if constexpr (R.zoomOptions == CSS::RangeZoomOptions::Unzoomed) {
             if (shouldUseEvaluationTimeZoom(state))
-                return state.cssToLengthConversionData().copyWithAdjustedZoom(1.0f);
+                return state.cssToLengthConversionData().copyWithAdjustedZoom(1.0f, R.zoomOptions);
 
             return state.useSVGZoomRulesForLength()
                 ? state.cssToLengthConversionData().copyWithAdjustedZoom(1.0f)

@@ -69,9 +69,9 @@ inline void BuilderState::setFontDescriptionFontSize(float fontSize)
     }
 
     SUPPRESS_UNCOUNTED_ARG auto computedSize = Style::computedFontSizeFromSpecifiedSize(fontSize, m_style.fontDescription().isAbsoluteSize(), useSVGZoomRules(), &style(), document());
-    if (m_style.fontDescription().computedSize() != computedSize) {
+    if (m_style.fontDescription().computedSize() != computedSize.size || m_style.fontDescription().usedZoomFactor() != computedSize.usedZoomFactor) {
         m_fontDirty = true;
-        m_style.mutableFontDescriptionWithoutUpdate().setComputedSize(computedSize);
+        m_style.mutableFontDescriptionWithoutUpdate().setComputedSize(computedSize.size, computedSize.usedZoomFactor);
     }
 }
 

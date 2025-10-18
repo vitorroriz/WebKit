@@ -40,7 +40,7 @@ auto CSSValueConversion<WordSpacing>::operator()(BuilderState& state, const CSSV
         auto zoom = zoomWithTextZoomFactor(state);
         if (zoom == state.cssToLengthConversionData().zoom())
             return state.cssToLengthConversionData();
-        return state.cssToLengthConversionData().copyWithAdjustedZoom(zoom);
+        return state.cssToLengthConversionData().copyWithAdjustedZoom(zoom, WordSpacing::Fixed::range.zoomOptions);
     };
 
     RefPtr primitiveValue = requiredDowncast<CSSPrimitiveValue>(state, value);

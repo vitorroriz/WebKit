@@ -60,7 +60,7 @@ auto CSSValueConversion<LineHeight>::operator()(BuilderState& state, const CSSPr
         if (primitiveValue.isLength())
             fixedValue = primitiveValue.resolveAsLength(conversionData);
         else
-            fixedValue = primitiveValue.protectedCssCalcValue()->createCalculationValue(conversionData, CSSCalcSymbolTable { })->evaluate(state.style().computedFontSize());
+            fixedValue = primitiveValue.protectedCssCalcValue()->createCalculationValue(conversionData, CSSCalcSymbolTable { })->evaluate(state.style().fontDescription().computedSizeForRangeZoomOption(conversionData.rangeZoomOption()));
 
         if (multiplier != 1.0f)
             fixedValue *= multiplier;
@@ -78,8 +78,9 @@ auto CSSValueConversion<LineHeight>::operator()(BuilderState& state, const CSSPr
     // values and raw numbers to percentages.
     if (primitiveValue.isPercentage()) {
         // FIXME: percentage should not be restricted to an integer here.
+        auto textZoom = shouldUseEvaluationTimeZoom(state) ? conversionData.zoom() : 1.0f;
         return LineHeight::Fixed {
-            CSS::clampToRange<LineHeight::Fixed::range, float>((state.style().computedFontSize() * primitiveValue.resolveAsPercentage<int>(conversionData)) / 100.0, minValueForCssLength, maxValueForCssLength)
+            CSS::clampToRange<LineHeight::Fixed::range, float>((state.style().fontDescription().computedSizeForRangeZoomOption(conversionData.rangeZoomOption()) * primitiveValue.resolveAsPercentage<int>(conversionData) * textZoom) / 100.0, minValueForCssLength, maxValueForCssLength)
         };
     }
 
