@@ -1665,7 +1665,20 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     return _impl->topScrollPocket();
 }
 
-#endif
+- (BOOL)_prefersSolidColorHardScrollPocket
+{
+    return _preferSolidColorHardPocketReasons.contains(WebKit::PreferSolidColorHardPocketReason::RequestedByClient);
+}
+
+- (void)_setPrefersSolidColorHardScrollPocket:(BOOL)value
+{
+    if (value)
+        [self _addReasonToPreferSolidColorHardPocket:WebKit::PreferSolidColorHardPocketReason::RequestedByClient];
+    else
+        [self _removeReasonToPreferSolidColorHardPocket:WebKit::PreferSolidColorHardPocketReason::RequestedByClient];
+}
+
+#endif // ENABLE(CONTENT_INSET_BACKGROUND_FILL)
 
 - (void)_setUsesAutomaticContentInsetBackgroundFill:(BOOL)value
 {

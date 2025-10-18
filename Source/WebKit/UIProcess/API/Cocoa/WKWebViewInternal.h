@@ -152,6 +152,11 @@ enum class HideScrollPocketReason : uint8_t {
     ScrolledToTop       = 1 << 1,
     SiteSpecificQuirk   = 1 << 2,
 };
+
+enum class PreferSolidColorHardPocketReason : uint8_t {
+    AttachedInspector   = 1 << 0,
+    RequestedByClient   = 1 << 1,
+};
 }
 
 @class NSScrollPocket;
@@ -300,7 +305,7 @@ struct PerWebProcessState {
     BOOL _usesAutomaticContentInsetBackgroundFill;
     BOOL _shouldSuppressTopColorExtensionView;
 #if PLATFORM(MAC)
-    BOOL _alwaysPrefersSolidColorHardPocket;
+    OptionSet<WebKit::PreferSolidColorHardPocketReason> _preferSolidColorHardPocketReasons;
     BOOL _isGettingAdjustedColorForTopContentInsetColorFromDelegate;
     RetainPtr<NSColor> _overrideTopScrollEdgeEffectColor;
 #endif
@@ -580,7 +585,8 @@ struct PerWebProcessState {
 #if PLATFORM(MAC) && ENABLE(CONTENT_INSET_BACKGROUND_FILL)
 - (NSColor *)_adjustedColorForTopContentInsetColorFromUIDelegate:(NSColor *)proposedColor;
 @property (nonatomic, readonly) RetainPtr<NSScrollPocket> _copyTopScrollPocket;
-@property (nonatomic, setter=_setAlwaysPrefersSolidColorHardPocket:) BOOL _alwaysPrefersSolidColorHardPocket;
+- (void)_addReasonToPreferSolidColorHardPocket:(WebKit::PreferSolidColorHardPocketReason)reason;
+- (void)_removeReasonToPreferSolidColorHardPocket:(WebKit::PreferSolidColorHardPocketReason)reason;
 #endif
 
 #if ENABLE(GAMEPAD)

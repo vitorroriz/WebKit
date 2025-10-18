@@ -925,6 +925,7 @@ typedef NS_OPTIONS(NSUInteger, _WKWebViewDataType) {
 
 #if __MAC_OS_X_VERSION_MIN_REQUIRED >= 260000
 @property (nonatomic, readonly) NSScrollPocket *_topScrollPocket WK_API_AVAILABLE(macos(26.0));
+@property (nonatomic, setter=_setPrefersSolidColorHardScrollPocket:) BOOL _prefersSolidColorHardScrollPocket WK_API_AVAILABLE(macos(WK_MAC_TBA));
 #endif
 
 - (void)_showWritingTools WK_API_AVAILABLE(macos(15.2));

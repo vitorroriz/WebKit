@@ -3403,18 +3403,26 @@ WebCore::CocoaColor *sampledFixedPositionContentColor(const WebCore::FixedContai
     return clonedScrollPocket;
 }
 
-- (BOOL)_alwaysPrefersSolidColorHardPocket
+- (void)_addReasonToPreferSolidColorHardPocket:(WebKit::PreferSolidColorHardPocketReason)reason
 {
-    return _alwaysPrefersSolidColorHardPocket;
-}
-
-- (void)_setAlwaysPrefersSolidColorHardPocket:(BOOL)value
-{
-    if (_alwaysPrefersSolidColorHardPocket == value)
+    if (_preferSolidColorHardPocketReasons.contains(reason))
         return;
 
-    _alwaysPrefersSolidColorHardPocket = value;
-    _impl->updatePrefersSolidColorHardPocket();
+    _preferSolidColorHardPocketReasons.add(WebKit::PreferSolidColorHardPocketReason::RequestedByClient);
+
+    if (_preferSolidColorHardPocketReasons.hasExactlyOneBitSet())
+        _impl->updatePrefersSolidColorHardPocket();
+}
+
+- (void)_removeReasonToPreferSolidColorHardPocket:(WebKit::PreferSolidColorHardPocketReason)reason
+{
+    if (!_preferSolidColorHardPocketReasons.contains(reason))
+        return;
+
+    _preferSolidColorHardPocketReasons.remove(WebKit::PreferSolidColorHardPocketReason::RequestedByClient);
+
+    if (!_preferSolidColorHardPocketReasons)
+        _impl->updatePrefersSolidColorHardPocket();
 }
 
 #endif // PLATFORM(MAC)

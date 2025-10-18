@@ -231,10 +231,15 @@ static void* const safeAreaInsetsKVOContext = (void*)&safeAreaInsetsKVOContext;
 #if ENABLE(CONTENT_INSET_BACKGROUND_FILL)
     RetainPtr attachedView = [self _horizontallyAttachedInspectedWebView];
     [_webView _setOverrideTopScrollEdgeEffectColor:[attachedView _topScrollPocket].captureColor];
-    [_webView _setAlwaysPrefersSolidColorHardPocket:!!attachedView];
+
+    if (attachedView)
+        [_webView _addReasonToPreferSolidColorHardPocket:WebKit::PreferSolidColorHardPocketReason::AttachedInspector];
+    else
+        [_webView _removeReasonToPreferSolidColorHardPocket:WebKit::PreferSolidColorHardPocketReason::AttachedInspector];
+
     [_webView _setOverflowHeightForTopScrollEdgeEffect:[attachedView _overflowHeightForTopScrollEdgeEffect]];
     [_webView _updateHiddenScrollPocketEdges];
-#endif
+#endif // ENABLE(CONTENT_INSET_BACKGROUND_FILL)
 }
 
 - (WKWebView *)_horizontallyAttachedInspectedWebView

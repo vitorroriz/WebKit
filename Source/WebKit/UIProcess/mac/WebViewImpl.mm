@@ -7174,7 +7174,7 @@ void WebViewImpl::updatePrefersSolidColorHardPocket()
         if (m_pageIsScrolledToTop)
             return YES;
 
-        if ([view _alwaysPrefersSolidColorHardPocket])
+        if (view->_preferSolidColorHardPocketReasons)
             return YES;
 
         return NO;
