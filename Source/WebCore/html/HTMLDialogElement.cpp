@@ -134,7 +134,7 @@ ExceptionOr<void> HTMLDialogElement::showModal()
 
     setIsModal(true);
 
-    auto containingBlockBeforeStyleResolution = SingleThreadWeakPtr<RenderBlock> { };
+    CheckedPtr<RenderBlock> containingBlockBeforeStyleResolution;
     if (auto* renderer = this->renderer())
         containingBlockBeforeStyleResolution = renderer->containingBlock();
 

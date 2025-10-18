@@ -1,4 +1,9 @@
 Modules/websockets/WorkerThreadableWebSocketChannel.h
+[ iOS ] accessibility/ios/WebAccessibilityObjectWrapperIOS.h
+[ iOS ] page/ios/ContentChangeObserver.h
+[ iOS ] platform/ios/DeviceMotionClientIOS.h
+[ iOS ] platform/ios/DeviceOrientationClientIOS.h
+[ iOS ] rendering/ios/RenderThemeIOS.mm
 bindings/js/JSLazyEventListener.cpp
 css/CSSToLengthConversionData.h
 css/SelectorChecker.h
@@ -10,7 +15,6 @@ dom/Node.cpp
 dom/Node.h
 editing/TextCheckingHelper.h
 editing/VisiblePosition.h
-html/HTMLLinkElement.h
 html/parser/HTMLTreeBuilder.h
 inspector/InstrumentingAgents.h
 inspector/agents/WebHeapAgent.cpp
@@ -99,8 +103,3 @@ style/StyleTreeResolver.h
 style/Styleable.h
 style/values/color/StyleColorResolutionState.h
 svg/properties/SVGPropertyOwnerRegistry.h
-[ iOS ] accessibility/ios/WebAccessibilityObjectWrapperIOS.h
-[ iOS ] page/ios/ContentChangeObserver.h
-[ iOS ] platform/ios/DeviceMotionClientIOS.h
-[ iOS ] platform/ios/DeviceOrientationClientIOS.h
-[ iOS ] rendering/ios/RenderThemeIOS.mm

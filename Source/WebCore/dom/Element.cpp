@@ -3527,6 +3527,11 @@ ShadowRoot& Element::ensureUserAgentShadowRoot()
     return createUserAgentShadowRoot();
 }
 
+Ref<ShadowRoot> Element::ensureProtectedUserAgentShadowRoot()
+{
+    return ensureUserAgentShadowRoot();
+}
+
 ShadowRoot& Element::createUserAgentShadowRoot()
 {
     ASSERT(!userAgentShadowRoot());
