@@ -1295,7 +1295,7 @@ void RenderTableSection::paintObject(PaintInfo& paintInfo, const LayoutPoint& pa
             return;
 
         auto* row = m_grid[rowIndex].rowRenderer;
-        if (row && !row->hasSelfPaintingLayer())
+        if (row && !row->hasSelfPaintingLayer() && row->hasOutline())
             row->paintOutlineForRowIfNeeded(paintInfo, paintOffset);
     };
 

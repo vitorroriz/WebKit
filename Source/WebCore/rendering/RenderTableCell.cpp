@@ -620,7 +620,6 @@ void RenderTableCell::styleDidChange(StyleDifference diff, const RenderStyle* ol
     ASSERT(!row() || row()->rowIndexWasSet());
 
     RenderBlockFlow::styleDidChange(diff, oldStyle);
-    setHasVisibleBoxDecorations(true); // FIXME: Optimize this to only set to true if necessary.
 
     if (parent() && section() && oldStyle && style().height() != oldStyle->height())
         section()->rowLogicalHeightChanged(rowIndex());
