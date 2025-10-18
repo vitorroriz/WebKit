@@ -158,19 +158,34 @@ void WebFoundTextRangeController::decorateTextRangeWithStyle(const WebFoundTextR
         case FindDecorationStyle::Normal:
             simpleRange->start.protectedDocument()->checkedMarkers()->removeMarkers(*simpleRange, WebCore::DocumentMarkerType::TextMatch);
             break;
-        case FindDecorationStyle::Found:
-            simpleRange->start.protectedDocument()->checkedMarkers()->addMarker(*simpleRange, WebCore::DocumentMarkerType::TextMatch);
+        case FindDecorationStyle::Found: {
+            auto addedMarker = simpleRange->start.protectedDocument()->checkedMarkers()->addMarker(*simpleRange, WebCore::DocumentMarkerType::TextMatch);
+            if (!addedMarker)
+                m_unhighlightedFoundRanges.add(range);
             break;
+        }
         case FindDecorationStyle::Highlighted: {
             m_highlightedRange = range;
 
-            revealClosedDetailsAndHiddenUntilFoundAncestors(simpleRange->protectedStartContainer());
+            auto ancestorsRevealed = revealClosedDetailsAndHiddenUntilFoundAncestors(simpleRange->protectedStartContainer());
 
             if (m_findPageOverlay)
                 setTextIndicatorWithRange(*simpleRange);
             else
                 flashTextIndicatorAndUpdateSelectionWithRange(*simpleRange);
 
+            if (ancestorsRevealed) {
+                HashSet<WebFoundTextRange> rangesToRemove;
+                for (auto unhighlightedRange : m_unhighlightedFoundRanges) {
+                    if (auto unhighlightedSimpleRange = simpleRangeFromFoundTextRange(unhighlightedRange)) {
+                        auto addedMarker = unhighlightedSimpleRange->start.protectedDocument()->checkedMarkers()->addMarker(*unhighlightedSimpleRange, WebCore::DocumentMarkerType::TextMatch);
+                        if (addedMarker)
+                            rangesToRemove.add(unhighlightedRange);
+                    }
+                }
+                for (auto rangeToRemove : rangesToRemove)
+                    m_unhighlightedFoundRanges.remove(rangeToRemove);
+            }
             break;
         }
         }
@@ -232,6 +247,7 @@ void WebFoundTextRangeController::clearAllDecoratedFoundText()
 {
     clearCachedRanges();
     m_decoratedRanges.clear();
+    m_unhighlightedFoundRanges.clear();
     protectedWebPage()->protectedCorePage()->unmarkAllTextMatches();
 
     m_highlightedRange = { };
