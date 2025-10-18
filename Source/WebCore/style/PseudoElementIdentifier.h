@@ -33,7 +33,7 @@
 namespace WebCore::Style {
 
 struct PseudoElementIdentifier {
-    PseudoId pseudoId;
+    PseudoElementType type;
 
     // highlight name for ::highlight or view transition name for view transition pseudo elements.
     AtomString nameArgument { nullAtom() };
@@ -43,12 +43,12 @@ struct PseudoElementIdentifier {
 
 inline void add(Hasher& hasher, const PseudoElementIdentifier& pseudoElementIdentifier)
 {
-    add(hasher, pseudoElementIdentifier.pseudoId, pseudoElementIdentifier.nameArgument);
+    add(hasher, pseudoElementIdentifier.type, pseudoElementIdentifier.nameArgument);
 }
 
 inline WTF::TextStream& operator<<(WTF::TextStream& ts, const PseudoElementIdentifier& pseudoElementIdentifier)
 {
-    ts << "::"_s << pseudoElementIdentifier.pseudoId;
+    ts << "::"_s << pseudoElementIdentifier.type;
     if (!pseudoElementIdentifier.nameArgument.isNull())
         ts << '(' << pseudoElementIdentifier.nameArgument << ')';
     return ts;
@@ -59,11 +59,11 @@ inline bool isNamedViewTransitionPseudoElement(const std::optional<Style::Pseudo
     if (!pseudoElementIdentifier)
         return false;
 
-    switch (pseudoElementIdentifier->pseudoId) {
-    case PseudoId::ViewTransitionGroup:
-    case PseudoId::ViewTransitionImagePair:
-    case PseudoId::ViewTransitionOld:
-    case PseudoId::ViewTransitionNew:
+    switch (pseudoElementIdentifier->type) {
+    case PseudoElementType::ViewTransitionGroup:
+    case PseudoElementType::ViewTransitionImagePair:
+    case PseudoElementType::ViewTransitionOld:
+    case PseudoElementType::ViewTransitionNew:
         return true;
     default:
         return false;

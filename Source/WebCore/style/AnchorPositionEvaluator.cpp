@@ -728,7 +728,7 @@ CheckedPtr<RenderBoxModelObject> AnchorPositionEvaluator::findAnchorForAnchorFun
 
         // FIXME: Support remaining box generating pseudo-elements (like ::marker).
         auto pseudoElement = style.pseudoElementType();
-        if (pseudoElement && pseudoElement != PseudoId::Before && pseudoElement != PseudoId::After)
+        if (pseudoElement && pseudoElement != PseudoElementType::Before && pseudoElement != PseudoElementType::After)
             return false;
 
         return true;
@@ -1534,7 +1534,7 @@ RefPtr<const Element> AnchorPositionEvaluator::anchorPositionedElementOrPseudoEl
 AnchorPositionedKey AnchorPositionEvaluator::keyForElementOrPseudoElement(const Element& element)
 {
     if (auto* pseudoElement = dynamicDowncast<PseudoElement>(element))
-        return { pseudoElement->hostElement(), PseudoElementIdentifier { pseudoElement->pseudoId() } };
+        return { pseudoElement->hostElement(), PseudoElementIdentifier { pseudoElement->pseudoElementType() } };
     return { &element, { } };
 }
 
@@ -1555,8 +1555,8 @@ bool AnchorPositionEvaluator::isImplicitAnchor(const RenderStyle& style)
 
     // "The implicit anchor element of a pseudo-element is its originating element, unless otherwise specified."
     // https://drafts.csswg.org/css-anchor-position-1/#implicit
-    auto isImplicitAnchorForPseudoElement = [&](PseudoId pseudoId) {
-        const RenderStyle* pseudoElementStyle = style.getCachedPseudoStyle({ pseudoId });
+    auto isImplicitAnchorForPseudoElement = [&](PseudoElementType pseudoElementType) {
+        const RenderStyle* pseudoElementStyle = style.getCachedPseudoStyle({ pseudoElementType });
         if (!pseudoElementStyle)
             return false;
         // If we have an explicit anchor name then there is no need for an implicit anchor.
@@ -1565,7 +1565,7 @@ bool AnchorPositionEvaluator::isImplicitAnchor(const RenderStyle& style)
 
         return pseudoElementStyle->usesAnchorFunctions() || isLayoutTimeAnchorPositioned(*pseudoElementStyle);
     };
-    return isImplicitAnchorForPseudoElement(PseudoId::Before) || isImplicitAnchorForPseudoElement(PseudoId::After);
+    return isImplicitAnchorForPseudoElement(PseudoElementType::Before) || isImplicitAnchorForPseudoElement(PseudoElementType::After);
 }
 
 ScopedName AnchorPositionEvaluator::defaultAnchorName(const RenderStyle& style)

@@ -34,7 +34,7 @@ inline const Styleable Styleable::fromElement(Element& element)
 {
     if (auto* pseudoElement = dynamicDowncast<PseudoElement>(element))
         return Styleable(*pseudoElement->hostElement(), *element.pseudoElementIdentifier());
-    ASSERT(!element.pseudoId());
+    ASSERT(!element.pseudoElementType());
     return Styleable(element, std::nullopt);
 }
 

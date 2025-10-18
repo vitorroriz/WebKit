@@ -275,57 +275,57 @@ unsigned CSSSelector::specificityForPage() const
     return s;
 }
 
-std::optional<PseudoId> CSSSelector::pseudoId(PseudoElement type)
+std::optional<PseudoElementType> CSSSelector::stylePseudoElementTypeFor(PseudoElement type)
 {
     switch (type) {
     case PseudoElement::FirstLine:
-        return PseudoId::FirstLine;
+        return PseudoElementType::FirstLine;
     case PseudoElement::FirstLetter:
-        return PseudoId::FirstLetter;
+        return PseudoElementType::FirstLetter;
     case PseudoElement::GrammarError:
-        return PseudoId::GrammarError;
+        return PseudoElementType::GrammarError;
     case PseudoElement::SpellingError:
-        return PseudoId::SpellingError;
+        return PseudoElementType::SpellingError;
     case PseudoElement::Selection:
-        return PseudoId::Selection;
+        return PseudoElementType::Selection;
     case PseudoElement::TargetText:
-        return PseudoId::TargetText;
+        return PseudoElementType::TargetText;
     case PseudoElement::Highlight:
-        return PseudoId::Highlight;
+        return PseudoElementType::Highlight;
     case PseudoElement::Marker:
-        return PseudoId::Marker;
+        return PseudoElementType::Marker;
     case PseudoElement::Backdrop:
-        return PseudoId::Backdrop;
+        return PseudoElementType::Backdrop;
     case PseudoElement::Before:
-        return PseudoId::Before;
+        return PseudoElementType::Before;
     case PseudoElement::After:
-        return PseudoId::After;
+        return PseudoElementType::After;
     case PseudoElement::WebKitScrollbar:
-        return PseudoId::WebKitScrollbar;
+        return PseudoElementType::WebKitScrollbar;
     case PseudoElement::WebKitScrollbarButton:
-        return PseudoId::WebKitScrollbarButton;
+        return PseudoElementType::WebKitScrollbarButton;
     case PseudoElement::WebKitScrollbarCorner:
-        return PseudoId::WebKitScrollbarCorner;
+        return PseudoElementType::WebKitScrollbarCorner;
     case PseudoElement::WebKitScrollbarThumb:
-        return PseudoId::WebKitScrollbarThumb;
+        return PseudoElementType::WebKitScrollbarThumb;
     case PseudoElement::WebKitScrollbarTrack:
-        return PseudoId::WebKitScrollbarTrack;
+        return PseudoElementType::WebKitScrollbarTrack;
     case PseudoElement::WebKitScrollbarTrackPiece:
-        return PseudoId::WebKitScrollbarTrackPiece;
+        return PseudoElementType::WebKitScrollbarTrackPiece;
     case PseudoElement::WebKitResizer:
-        return PseudoId::WebKitResizer;
+        return PseudoElementType::WebKitResizer;
     case PseudoElement::ViewTransition:
-        return PseudoId::ViewTransition;
+        return PseudoElementType::ViewTransition;
     case PseudoElement::ViewTransitionGroup:
-        return PseudoId::ViewTransitionGroup;
+        return PseudoElementType::ViewTransitionGroup;
     case PseudoElement::ViewTransitionImagePair:
-        return PseudoId::ViewTransitionImagePair;
+        return PseudoElementType::ViewTransitionImagePair;
     case PseudoElement::ViewTransitionOld:
-        return PseudoId::ViewTransitionOld;
+        return PseudoElementType::ViewTransitionOld;
     case PseudoElement::ViewTransitionNew:
-        return PseudoId::ViewTransitionNew;
+        return PseudoElementType::ViewTransitionNew;
     case PseudoElement::InternalWritingSuggestions:
-        return PseudoId::InternalWritingSuggestions;
+        return PseudoElementType::InternalWritingSuggestions;
 #if ENABLE(VIDEO)
     case PseudoElement::Cue:
 #endif

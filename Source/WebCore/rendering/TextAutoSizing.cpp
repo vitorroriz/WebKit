@@ -54,7 +54,7 @@ static RenderStyle cloneRenderStyleWithState(const RenderStyle& currentStyle)
     auto newStyle = RenderStyle::clone(currentStyle);
 
     // FIXME: This should probably handle at least ::first-line too.
-    if (auto* firstLetterStyle = currentStyle.getCachedPseudoStyle({ PseudoId::FirstLetter }))
+    if (auto* firstLetterStyle = currentStyle.getCachedPseudoStyle({ PseudoElementType::FirstLetter }))
         newStyle.addCachedPseudoStyle(makeUnique<RenderStyle>(RenderStyle::clone(*firstLetterStyle)));
 
     if (currentStyle.lastChildState())
@@ -191,7 +191,7 @@ auto TextAutoSizingValue::adjustTextNodeSizes() -> StillHasNodes
         auto [firstLetter, firstLetterContainer] = block->firstLetterAndContainer();
         if (firstLetter && firstLetter->parent() && firstLetter->parent()->parent()) {
             auto& parentStyle = firstLetter->parent()->parent()->style();
-            auto* firstLetterStyle = parentStyle.getCachedPseudoStyle({ PseudoId::FirstLetter });
+            auto* firstLetterStyle = parentStyle.getCachedPseudoStyle({ PseudoElementType::FirstLetter });
             if (!firstLetterStyle)
                 continue;
             auto fontDescription = firstLetterStyle->fontDescription();

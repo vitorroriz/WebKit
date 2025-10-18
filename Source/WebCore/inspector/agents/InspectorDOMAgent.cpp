@@ -587,9 +587,9 @@ static Element* elementToPushForStyleable(const Styleable& styleable)
     auto* element = &styleable.element;
     // FIXME: We want to get rid of PseudoElement.
     if (styleable.pseudoElementIdentifier) {
-        if (styleable.pseudoElementIdentifier->pseudoId == PseudoId::Before)
+        if (styleable.pseudoElementIdentifier->type == PseudoElementType::Before)
             return element->beforePseudoElement();
-        if (styleable.pseudoElementIdentifier->pseudoId == PseudoId::After)
+        if (styleable.pseudoElementIdentifier->type == PseudoElementType::After)
             return element->afterPseudoElement();
     }
     return element;
@@ -762,7 +762,7 @@ Ref<Inspector::Protocol::DOM::Styleable> InspectorDOMAgent::pushStyleablePathToF
 
     // FIXME: This should support PseudoElementIdentifier name argument.
     if (styleable.pseudoElementIdentifier) {
-        if (auto pseudoId = InspectorCSSAgent::protocolValueForPseudoId(styleable.pseudoElementIdentifier->pseudoId))
+        if (auto pseudoId = InspectorCSSAgent::protocolValueForPseudoElementType(styleable.pseudoElementIdentifier->type))
             protocolStyleable->setPseudoId(*pseudoId);
     }
 
@@ -1555,26 +1555,26 @@ Inspector::Protocol::ErrorStringOr<void> InspectorDOMAgent::highlightSelector(co
                     nodeList.append(*descendantElement);
             }
 
-            if (context.pseudoIDSet) {
-                auto pseudoIDs = context.pseudoIDSet;
+            if (context.publicPseudoElements) {
+                auto pseudoElements = context.publicPseudoElements;
 
-                if (pseudoIDs.contains(PseudoId::Before)) {
-                    pseudoIDs.remove(PseudoId::Before);
+                if (pseudoElements.contains(PseudoElementType::Before)) {
+                    pseudoElements.remove(PseudoElementType::Before);
                     if (RefPtr beforePseudoElement = descendantElement->beforePseudoElement()) {
                         if (seenNodes.add(*beforePseudoElement))
                             nodeList.append(*beforePseudoElement);
                     }
                 }
 
-                if (pseudoIDs.contains(PseudoId::After)) {
-                    pseudoIDs.remove(PseudoId::After);
+                if (pseudoElements.contains(PseudoElementType::After)) {
+                    pseudoElements.remove(PseudoElementType::After);
                     if (RefPtr afterPseudoElement = descendantElement->afterPseudoElement()) {
                         if (seenNodes.add(*afterPseudoElement))
                             nodeList.append(*afterPseudoElement);
                     }
                 }
 
-                if (pseudoIDs) {
+                if (pseudoElements) {
                     if (seenNodes.add(*descendantElement))
                         nodeList.append(*descendantElement);
                 }
@@ -1917,13 +1917,13 @@ static String documentBaseURLString(Document* document)
     return document->completeURL(emptyString()).string();
 }
 
-static bool pseudoElementType(PseudoId pseudoId, Inspector::Protocol::DOM::PseudoType* type)
+static bool pseudoElementType(PseudoElementType pseudoElementType, Inspector::Protocol::DOM::PseudoType* type)
 {
-    switch (pseudoId) {
-    case PseudoId::Before:
+    switch (pseudoElementType) {
+    case PseudoElementType::Before:
         *type = Inspector::Protocol::DOM::PseudoType::Before;
         return true;
-    case PseudoId::After:
+    case PseudoElementType::After:
         *type = Inspector::Protocol::DOM::PseudoType::After;
         return true;
     default:
@@ -2054,7 +2054,7 @@ Ref<Inspector::Protocol::DOM::Node> InspectorDOMAgent::buildObjectForNode(Node* 
 
         if (element->pseudoElementIdentifier()) {
             Inspector::Protocol::DOM::PseudoType pseudoType;
-            if (pseudoElementType(element->pseudoElementIdentifier()->pseudoId, &pseudoType))
+            if (pseudoElementType(element->pseudoElementIdentifier()->type, &pseudoType))
                 value->setPseudoType(pseudoType);
         } else {
             if (auto pseudoElements = buildArrayForPseudoElements(*element))

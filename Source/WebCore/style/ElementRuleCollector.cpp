@@ -570,7 +570,7 @@ inline bool ElementRuleCollector::ruleMatches(const RuleData& ruleData, unsigned
             specificity = selector->computeSpecificity();
     }
 
-    m_matchedPseudoElementIds.add(context.pseudoIDSet);
+    m_matchedPseudoElements.add(context.publicPseudoElements);
     m_styleRelations.appendVector(context.styleRelations);
 
     return selectorMatches;
@@ -935,7 +935,7 @@ void ElementRuleCollector::addMatchedProperties(MatchedProperties&& matchedPrope
 void ElementRuleCollector::addAuthorKeyframeRules(const StyleRuleKeyframe& keyframe)
 {
     ASSERT(m_result->authorDeclarations.isEmpty());
-    auto propertyAllowlist = m_pseudoElementRequest ? propertyAllowlistForPseudoId(m_pseudoElementRequest->pseudoId()) : PropertyAllowlist::None;
+    auto propertyAllowlist = m_pseudoElementRequest ? propertyAllowlistForPseudoElement(m_pseudoElementRequest->type()) : PropertyAllowlist::None;
     m_result->authorDeclarations.append({ keyframe.properties(), SelectorChecker::MatchAll, propertyAllowlist });
 }
 

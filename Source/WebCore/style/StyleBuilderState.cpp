@@ -130,7 +130,7 @@ RefPtr<StyleImage> BuilderState::createStyleImage(const CSSValue& value) const
 
 void BuilderState::registerContentAttribute(const AtomString& attributeLocalName)
 {
-    if (style().pseudoElementType() == PseudoId::Before || style().pseudoElementType() == PseudoId::After)
+    if (style().pseudoElementType() == PseudoElementType::Before || style().pseudoElementType() == PseudoElementType::After)
         m_registeredContentAttributes.append(attributeLocalName);
 }
 

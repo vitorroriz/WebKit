@@ -1958,9 +1958,9 @@ bool RenderBlock::isPointInOverflowControl(HitTestResult& result, const LayoutPo
 
 Node* RenderBlock::nodeForHitTest() const
 {
-    if (auto pseudoId = style().pseudoElementType()) {
-        switch (*pseudoId) {
-        case PseudoId::Backdrop:
+    if (auto type = style().pseudoElementType()) {
+        switch (*type) {
+        case PseudoElementType::Backdrop:
             // If we're a ::backdrop pseudo-element, we should hit-test to the element that generated it.
             // This matches the behavior that other browsers have.
             for (auto& element : document().topLayerElements()) {
@@ -1973,9 +1973,9 @@ Node* RenderBlock::nodeForHitTest() const
             ASSERT_NOT_REACHED();
             break;
 
-        case PseudoId::ViewTransition:
-        case PseudoId::ViewTransitionGroup:
-        case PseudoId::ViewTransitionImagePair:
+        case PseudoElementType::ViewTransition:
+        case PseudoElementType::ViewTransitionGroup:
+        case PseudoElementType::ViewTransitionImagePair:
             // The view transition pseudo-elements should hit-test to their originating element (the document element).
             return document().documentElement();
 
@@ -2466,7 +2466,7 @@ static inline RenderBlock* findFirstLetterBlock(RenderBlock* start)
 {
     RenderBlock* firstLetterBlock = start;
     while (true) {
-        bool canHaveFirstLetterRenderer = firstLetterBlock->style().hasPseudoStyle(PseudoId::FirstLetter)
+        bool canHaveFirstLetterRenderer = firstLetterBlock->style().hasPseudoStyle(PseudoElementType::FirstLetter)
             && firstLetterBlock->canHaveGeneratedChildren()
             && isRenderBlockFlowOrRenderButton(*firstLetterBlock);
         if (canHaveFirstLetterRenderer)
@@ -2485,7 +2485,7 @@ static inline RenderBlock* findFirstLetterBlock(RenderBlock* start)
 std::pair<RenderObject*, RenderElement*> RenderBlock::firstLetterAndContainer(RenderObject* skipThisAsFirstLetter)
 {
     // Don't recur
-    if (style().pseudoElementType() == PseudoId::FirstLetter)
+    if (style().pseudoElementType() == PseudoElementType::FirstLetter)
         return { };
     
     // FIXME: We need to destroy the first-letter object if it is no longer the first child. Need to find
@@ -2509,7 +2509,7 @@ std::pair<RenderObject*, RenderElement*> RenderBlock::firstLetterAndContainer(Re
         if (is<RenderListMarker>(current))
             firstLetter = current.nextSibling();
         else if (current.isFloatingOrOutOfFlowPositioned()) {
-            if (current.style().pseudoElementType() == PseudoId::FirstLetter) {
+            if (current.style().pseudoElementType() == PseudoElementType::FirstLetter) {
                 firstLetter = current.firstChild();
                 break;
             }
@@ -2518,7 +2518,7 @@ std::pair<RenderObject*, RenderElement*> RenderBlock::firstLetterAndContainer(Re
             break;
         else if (current.isFlexibleBoxIncludingDeprecated() || current.isRenderGrid())
             return { };
-        else if (current.style().hasPseudoStyle(PseudoId::FirstLetter) && current.canHaveGeneratedChildren())  {
+        else if (current.style().hasPseudoStyle(PseudoElementType::FirstLetter) && current.canHaveGeneratedChildren())  {
             // We found a lower-level node with first-letter, which supersedes the higher-level style
             firstLetterContainer = &current;
             firstLetter = current.firstChild();
@@ -2985,8 +2985,8 @@ String RenderBlock::debugDescription() const
         builder.append(renderName(), " 0x"_s, hex(reinterpret_cast<uintptr_t>(this), Lowercase));
 
         builder.append(" ::view-transition"_s);
-        if (style().pseudoElementType() != PseudoId::ViewTransition) {
-            builder.append("-"_s, style().pseudoElementType() == PseudoId::ViewTransitionGroup ? "group("_s : "image-pair("_s);
+        if (style().pseudoElementType() != PseudoElementType::ViewTransition) {
+            builder.append("-"_s, style().pseudoElementType() == PseudoElementType::ViewTransitionGroup ? "group("_s : "image-pair("_s);
             builder.append(style().pseudoElementNameArgument(), ')');
         }
         return builder.toString();

@@ -1569,7 +1569,7 @@ AXTextRuns AccessibilityRenderObject::textRuns()
     if (!renderText)
         return { };
 
-    // FIXME: Need to handle PseudoId::FirstLetter. Right now, it will be chopped off from the other
+    // FIXME: Need to handle PseudoElementType::FirstLetter. Right now, it will be chopped off from the other
     // other text in the line, and AccessibilityRenderObject::computeIsIgnored ignores the
     // first-letter RenderText, meaning we can't recover it later by combining text across AX objects.
 

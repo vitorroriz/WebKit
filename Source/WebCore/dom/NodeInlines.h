@@ -122,26 +122,26 @@ inline RefPtr<Element> Node::protectedParentElement() const
 bool Node::isBeforePseudoElement() const
 {
     auto* pseudoElement = dynamicDowncast<PseudoElement>(*this);
-    return pseudoElement && pseudoElement->pseudoId() == PseudoId::Before;
+    return pseudoElement && pseudoElement->pseudoElementType() == PseudoElementType::Before;
 }
 
 bool Node::isAfterPseudoElement() const
 {
     auto* pseudoElement = dynamicDowncast<PseudoElement>(*this);
-    return pseudoElement && pseudoElement->pseudoId() == PseudoId::After;
+    return pseudoElement && pseudoElement->pseudoElementType() == PseudoElementType::After;
 }
 
-std::optional<PseudoId> Node::pseudoId() const
+std::optional<PseudoElementType> Node::pseudoElementType() const
 {
     if (auto* pseudoElement = dynamicDowncast<PseudoElement>(*this))
-        return pseudoElement->pseudoId();
+        return pseudoElement->pseudoElementType();
     return { };
 }
 
 std::optional<Style::PseudoElementIdentifier> Node::pseudoElementIdentifier() const
 {
-    if (auto pseudoId = this->pseudoId())
-        return Style::PseudoElementIdentifier { *pseudoId };
+    if (auto type = pseudoElementType())
+        return Style::PseudoElementIdentifier { *type };
     return { };
 }
 

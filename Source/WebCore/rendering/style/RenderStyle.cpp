@@ -107,12 +107,12 @@ struct SameSizeAsRenderStyle : CanMakeCheckedPtr<SameSizeAsRenderStyle> {
 
 static_assert(sizeof(RenderStyle) == sizeof(SameSizeAsRenderStyle), "RenderStyle should stay small");
 
-static_assert(PublicPseudoIDBits == allPublicPseudoIds.size());
+static_assert(PublicPseudoIDBits == allPublicPseudoElementTypes.size());
 
 static_assert(!(static_cast<unsigned>(maxTextTransformValue) >> TextTransformBits));
 
 // Value zero is used to indicate no pseudo-element.
-static_assert(!((enumToUnderlyingType(PseudoId::HighestEnumValue) + 1) >> PseudoElementTypeBits));
+static_assert(!((enumToUnderlyingType(PseudoElementType::HighestEnumValue) + 1) >> PseudoElementTypeBits));
 
 DEFINE_ALLOCATOR_WITH_HEAP_IDENTIFIER(PseudoStyleCache);
 DEFINE_ALLOCATOR_WITH_HEAP_IDENTIFIER(RenderStyle);
@@ -166,7 +166,7 @@ RenderStyle RenderStyle::createAnonymousStyleWithDisplay(const RenderStyle& pare
 
 RenderStyle RenderStyle::createStyleInheritingFromPseudoStyle(const RenderStyle& pseudoStyle)
 {
-    ASSERT(pseudoStyle.pseudoElementType() == PseudoId::Before || pseudoStyle.pseudoElementType() == PseudoId::After);
+    ASSERT(pseudoStyle.pseudoElementType() == PseudoElementType::Before || pseudoStyle.pseudoElementType() == PseudoElementType::After);
 
     auto style = create();
     style.inheritFrom(pseudoStyle);
@@ -1139,15 +1139,15 @@ bool RenderStyle::changeRequiresLayout(const RenderStyle& other, OptionSet<Style
     if ((usedVisibility() == Visibility::Collapse) != (other.usedVisibility() == Visibility::Collapse))
         return true;
 
-    bool hasFirstLineStyle = hasPseudoStyle(PseudoId::FirstLine);
-    if (hasFirstLineStyle != other.hasPseudoStyle(PseudoId::FirstLine))
+    bool hasFirstLineStyle = hasPseudoStyle(PseudoElementType::FirstLine);
+    if (hasFirstLineStyle != other.hasPseudoStyle(PseudoElementType::FirstLine))
         return true;
 
     if (hasFirstLineStyle) {
-        auto* firstLineStyle = getCachedPseudoStyle({ PseudoId::FirstLine });
+        auto* firstLineStyle = getCachedPseudoStyle({ PseudoElementType::FirstLine });
         if (!firstLineStyle)
             return true;
-        auto* otherFirstLineStyle = other.getCachedPseudoStyle({ PseudoId::FirstLine });
+        auto* otherFirstLineStyle = other.getCachedPseudoStyle({ PseudoElementType::FirstLine });
         if (!otherFirstLineStyle)
             return true;
         // FIXME: Not all first line style changes actually need layout.

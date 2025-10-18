@@ -101,7 +101,7 @@ public:
 
         // These are simple fields so they are easier for SelectorCompiler to generate code against.
         bool hasRequestedPseudoElement { false };
-        PseudoId pseudoId { };
+        PseudoElementType pseudoElementType { };
         AtomString pseudoElementNameArgument;
 
     public:
@@ -116,7 +116,7 @@ public:
 
         // FIXME: It would be nicer to have a separate object for return values. This requires some more work in the selector compiler.
         Style::Relations styleRelations;
-        EnumSet<PseudoId> pseudoIDSet;
+        EnumSet<PseudoElementType> publicPseudoElements;
         bool matchedInsideScope { false };
         bool disallowHasPseudoClass { false };
         bool scopingRootMatchesVisited { false };
@@ -135,7 +135,7 @@ public:
     struct LocalContext;
     
 private:
-    MatchResult matchRecursively(CheckingContext&, LocalContext&, EnumSet<PseudoId>&) const;
+    MatchResult matchRecursively(CheckingContext&, LocalContext&, EnumSet<PseudoElementType>&) const;
     bool checkOne(CheckingContext&, LocalContext&, MatchType&) const;
     bool matchSelectorList(CheckingContext&, const LocalContext&, const Element&, const CSSSelectorList&) const;
     bool matchHasPseudoClass(CheckingContext&, const Element&, const CSSSelector&) const;

@@ -1879,11 +1879,11 @@ bool AccessibilityObject::shouldCacheStringValue() const
     if (CheckedPtr containingBlock = renderer->containingBlock()) {
         // Check for ::first-letter, which would require some special handling to serve off the main-thread
         // that we don't have right now.
-        if (containingBlock->style().hasPseudoStyle(PseudoId::FirstLetter))
+        if (containingBlock->style().hasPseudoStyle(PseudoElementType::FirstLetter))
             return true;
         if (containingBlock->isAnonymous()) {
             containingBlock = containingBlock->containingBlock();
-            return containingBlock && containingBlock->style().hasPseudoStyle(PseudoId::FirstLetter);
+            return containingBlock && containingBlock->style().hasPseudoStyle(PseudoElementType::FirstLetter);
         }
     }
     // Getting to the end means we can avoid caching string value.

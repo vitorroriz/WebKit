@@ -333,8 +333,8 @@ UnadjustedStyle Resolver::unadjustedStyleForElement(Element& element, const Reso
     else
         collector.matchAllRules(m_matchAuthorAndUserStyles, matchingBehavior != RuleMatchingBehavior::MatchAllRulesExcludingSMIL);
 
-    if (collector.matchedPseudoElementIds())
-        style.setHasPseudoStyles(collector.matchedPseudoElementIds());
+    if (collector.matchedPseudoElements())
+        style.setHasPseudoStyles(collector.matchedPseudoElements());
 
     auto elementStyleRelations = commitRelationsToRenderStyle(style, element, collector.styleRelations());
 
@@ -593,7 +593,7 @@ std::optional<ResolvedStyle> Resolver::styleForPseudoElement(Element& element, c
         collector.matchAuthorRules();
     }
 
-    ASSERT(!collector.matchedPseudoElementIds());
+    ASSERT(!collector.matchedPseudoElements());
 
     if (collector.matchResult().isEmpty())
         return { };

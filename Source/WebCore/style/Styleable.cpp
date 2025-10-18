@@ -74,35 +74,35 @@ const std::optional<const Styleable> Styleable::fromRenderer(const RenderElement
     }
 
     switch (*renderer.style().pseudoElementType()) {
-    case PseudoId::Backdrop:
+    case PseudoElementType::Backdrop:
         for (auto& topLayerElement : renderer.document().topLayerElements()) {
             if (topLayerElement->renderer() && topLayerElement->renderer()->backdropRenderer() == &renderer)
-                return Styleable(topLayerElement.get(), Style::PseudoElementIdentifier { PseudoId::Backdrop });
+                return Styleable(topLayerElement.get(), Style::PseudoElementIdentifier { PseudoElementType::Backdrop });
         }
         break;
-    case PseudoId::Marker: {
+    case PseudoElementType::Marker: {
         auto* ancestor = renderer.parent();
         while (ancestor) {
             auto* renderListItem = dynamicDowncast<RenderListItem>(ancestor);
             if (renderListItem && ancestor->element() && renderListItem->markerRenderer() == &renderer)
-                return Styleable(*ancestor->element(), Style::PseudoElementIdentifier { PseudoId::Marker });
+                return Styleable(*ancestor->element(), Style::PseudoElementIdentifier { PseudoElementType::Marker });
             ancestor = ancestor->parent();
         }
         break;
     }
-    case PseudoId::ViewTransitionGroup:
-    case PseudoId::ViewTransitionImagePair:
-    case PseudoId::ViewTransitionNew:
-    case PseudoId::ViewTransitionOld:
+    case PseudoElementType::ViewTransitionGroup:
+    case PseudoElementType::ViewTransitionImagePair:
+    case PseudoElementType::ViewTransitionNew:
+    case PseudoElementType::ViewTransitionOld:
         if (auto* documentElement = renderer.document().documentElement())
             return Styleable(*documentElement, renderer.style().pseudoElementIdentifier());
         break;
-    case PseudoId::ViewTransition:
+    case PseudoElementType::ViewTransition:
         if (auto* documentElement = renderer.document().documentElement())
-            return Styleable(*documentElement, Style::PseudoElementIdentifier { PseudoId::ViewTransition });
+            return Styleable(*documentElement, Style::PseudoElementIdentifier { PseudoElementType::ViewTransition });
         break;
-    case PseudoId::After:
-    case PseudoId::Before:
+    case PseudoElementType::After:
+    case PseudoElementType::Before:
         if (auto* element = renderer.element())
             return fromElement(*element);
         break;
@@ -118,36 +118,36 @@ RenderElement* Styleable::renderer() const
     if (!pseudoElementIdentifier)
         return element.renderer();
 
-    switch (pseudoElementIdentifier->pseudoId) {
-    case PseudoId::After:
+    switch (pseudoElementIdentifier->type) {
+    case PseudoElementType::After:
         if (auto* afterPseudoElement = element.afterPseudoElement())
             return afterPseudoElement->renderer();
         break;
-    case PseudoId::Backdrop:
+    case PseudoElementType::Backdrop:
         if (auto* hostRenderer = element.renderer())
             return hostRenderer->backdropRenderer().get();
         break;
-    case PseudoId::Before:
+    case PseudoElementType::Before:
         if (auto* beforePseudoElement = element.beforePseudoElement())
             return beforePseudoElement->renderer();
         break;
-    case PseudoId::Marker:
+    case PseudoElementType::Marker:
         if (auto* renderListItem = dynamicDowncast<RenderListItem>(element.renderer())) {
             auto* markerRenderer = renderListItem->markerRenderer();
             if (markerRenderer && !markerRenderer->style().hasUsedContentNone())
                 return markerRenderer;
         }
         break;
-    case PseudoId::ViewTransition:
+    case PseudoElementType::ViewTransition:
         if (element.renderer() && element.renderer()->isDocumentElementRenderer()) {
             if (WeakPtr containingBlock = element.renderer()->view().viewTransitionContainingBlock())
                 return containingBlock->firstChildBox();
         }
         break;
-    case PseudoId::ViewTransitionGroup:
-    case PseudoId::ViewTransitionImagePair:
-    case PseudoId::ViewTransitionNew:
-    case PseudoId::ViewTransitionOld: {
+    case PseudoElementType::ViewTransitionGroup:
+    case PseudoElementType::ViewTransitionImagePair:
+    case PseudoElementType::ViewTransitionNew:
+    case PseudoElementType::ViewTransitionOld: {
         if (!element.renderer() || !element.renderer()->isDocumentElementRenderer())
             return nullptr;
 
@@ -157,12 +157,12 @@ RenderElement* Styleable::renderer() const
             return nullptr;
 
         // Return early if we're looking for ::view-transition-group().
-        if (pseudoElementIdentifier->pseudoId == PseudoId::ViewTransitionGroup)
+        if (pseudoElementIdentifier->type == PseudoElementType::ViewTransitionGroup)
             return correctGroup.unsafeGet();
 
         // Go through all descendants until we find the relevant pseudo element otherwise.
         for (auto& descendant : descendantsOfType<RenderBox>(*correctGroup)) {
-            if (descendant.style().pseudoElementType() == pseudoElementIdentifier->pseudoId)
+            if (descendant.style().pseudoElementType() == pseudoElementIdentifier->type)
                 return &descendant;
         }
         break;

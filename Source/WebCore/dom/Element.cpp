@@ -4610,12 +4610,12 @@ void Element::removeFromTopLayer()
     });
 }
 
-static PseudoElement* beforeOrAfterPseudoElement(const Element& host, PseudoId pseudoElementSpecifier)
+static PseudoElement* beforeOrAfterPseudoElement(const Element& host, PseudoElementType pseudoElementSpecifier)
 {
     switch (pseudoElementSpecifier) {
-    case PseudoId::Before:
+    case PseudoElementType::Before:
         return host.beforePseudoElement();
-    case PseudoId::After:
+    case PseudoElementType::After:
         return host.afterPseudoElement();
     default:
         return nullptr;
@@ -4777,7 +4777,7 @@ const RenderStyle* Element::computedStyle(const std::optional<Style::PseudoEleme
         return nullptr;
 
     if (pseudoElementIdentifier) {
-        if (RefPtr pseudoElement = beforeOrAfterPseudoElement(*this, pseudoElementIdentifier->pseudoId))
+        if (RefPtr pseudoElement = beforeOrAfterPseudoElement(*this, pseudoElementIdentifier->type))
             return pseudoElement->computedStyle();
     }
 
@@ -4886,17 +4886,17 @@ void Element::normalizeAttributes()
         attrNode->normalize();
 }
 
-PseudoElement& Element::ensurePseudoElement(PseudoId pseudoId)
+PseudoElement& Element::ensurePseudoElement(PseudoElementType type)
 {
-    if (pseudoId == PseudoId::Before) {
+    if (type == PseudoElementType::Before) {
         if (!beforePseudoElement())
-            ensureElementRareData().setBeforePseudoElement(PseudoElement::create(*this, pseudoId));
+            ensureElementRareData().setBeforePseudoElement(PseudoElement::create(*this, type));
         return *beforePseudoElement();
     }
 
-    ASSERT(pseudoId == PseudoId::After);
+    ASSERT(type == PseudoElementType::After);
     if (!afterPseudoElement())
-        ensureElementRareData().setAfterPseudoElement(PseudoElement::create(*this, pseudoId));
+        ensureElementRareData().setAfterPseudoElement(PseudoElement::create(*this, type));
     return *afterPseudoElement();
 }
 
@@ -4912,9 +4912,9 @@ PseudoElement* Element::afterPseudoElement() const
 
 RefPtr<PseudoElement> Element::pseudoElementIfExists(Style::PseudoElementIdentifier pseudoElementIdentifier)
 {
-    if (pseudoElementIdentifier.pseudoId == PseudoId::Before)
+    if (pseudoElementIdentifier.type == PseudoElementType::Before)
         return beforePseudoElement();
-    if (pseudoElementIdentifier.pseudoId == PseudoId::After)
+    if (pseudoElementIdentifier.type == PseudoElementType::After)
         return afterPseudoElement();
     return nullptr;
 }

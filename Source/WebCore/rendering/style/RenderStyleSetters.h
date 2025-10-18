@@ -177,7 +177,7 @@ inline void RenderStyle::setHasExplicitlySetPaddingRight(bool value) { SET_NESTE
 inline void RenderStyle::setHasExplicitlySetPaddingTop(bool value) { SET_NESTED(m_nonInheritedData, surroundData, hasExplicitlySetPaddingTop, value); }
 inline void RenderStyle::setHasExplicitlySetStrokeColor(bool value) { SET(m_rareInheritedData, hasSetStrokeColor, static_cast<unsigned>(value)); }
 inline void RenderStyle::setHasExplicitlySetStrokeWidth(bool value) { SET(m_rareInheritedData, hasSetStrokeWidth, static_cast<unsigned>(value)); }
-inline void RenderStyle::setHasPseudoStyles(EnumSet<PseudoId> set) { m_nonInheritedFlags.setHasPseudoStyles(set); }
+inline void RenderStyle::setHasPseudoStyles(EnumSet<PseudoElementType> set) { m_nonInheritedFlags.setHasPseudoStyles(set); }
 inline void RenderStyle::setHasVisitedLinkAutoCaretColor() { SET_PAIR(m_rareInheritedData, hasVisitedLinkAutoCaretColor, true, visitedLinkCaretColor, Style::Color::currentColor()); }
 inline void RenderStyle::setHeight(Style::PreferredSize&& length) { SET_NESTED(m_nonInheritedData, boxData, m_height, WTFMove(length)); }
 inline void RenderStyle::setHyphenateLimitAfter(Style::HyphenateLimitEdge limit) { SET(m_rareInheritedData, hyphenateLimitAfter, limit); }
@@ -442,11 +442,11 @@ inline void RenderStyle::setMarkerStart(Style::SVGMarkerResource&& marker) { SET
 inline void RenderStyle::setMarkerMid(Style::SVGMarkerResource&& marker) { SET_NESTED(m_svgStyle, inheritedResourceData, markerMid, WTFMove(marker)); }
 inline void RenderStyle::setMarkerEnd(Style::SVGMarkerResource&& marker) { SET_NESTED(m_svgStyle, inheritedResourceData, markerEnd, WTFMove(marker)); }
 
-inline void RenderStyle::NonInheritedFlags::setHasPseudoStyles(EnumSet<PseudoId> pseudoIdSet)
+inline void RenderStyle::NonInheritedFlags::setHasPseudoStyles(EnumSet<PseudoElementType> pseudoElementSet)
 {
-    ASSERT(pseudoIdSet);
-    ASSERT(pseudoIdSet.containsOnly(allPublicPseudoIds));
-    pseudoBits = pseudoIdSet.toRaw();
+    ASSERT(pseudoElementSet);
+    ASSERT(pseudoElementSet.containsOnly(allPublicPseudoElementTypes));
+    pseudoBits = pseudoElementSet.toRaw();
 }
 
 inline void RenderStyle::resetBorder()
@@ -511,7 +511,7 @@ inline bool RenderStyle::setUsedZoom(float zoomLevel)
 inline void RenderStyle::setPseudoElementIdentifier(std::optional<Style::PseudoElementIdentifier>&& identifier)
 {
     if (identifier) {
-        m_nonInheritedFlags.pseudoElementType = enumToUnderlyingType(identifier->pseudoId) + 1;
+        m_nonInheritedFlags.pseudoElementType = enumToUnderlyingType(identifier->type) + 1;
         SET_NESTED(m_nonInheritedData, rareData, pseudoElementNameArgument, WTFMove(identifier->nameArgument));
     } else {
         m_nonInheritedFlags.pseudoElementType = 0;

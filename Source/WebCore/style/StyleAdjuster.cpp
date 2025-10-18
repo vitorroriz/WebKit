@@ -479,7 +479,7 @@ void Adjuster::adjustFromBuilder(RenderStyle& style)
 
 void Adjuster::adjustFirstLetterStyle(RenderStyle& style)
 {
-    if (style.pseudoElementType() != PseudoId::FirstLetter)
+    if (style.pseudoElementType() != PseudoElementType::FirstLetter)
         return;
 
     // Force inline display (except for floating first-letters).
@@ -885,7 +885,7 @@ void Adjuster::adjustDisplayContentsStyle(RenderStyle& style) const
         return;
     }
 
-    if (!m_element && style.pseudoElementType() != PseudoId::Before && style.pseudoElementType() != PseudoId::After) {
+    if (!m_element && style.pseudoElementType() != PseudoElementType::Before && style.pseudoElementType() != PseudoElementType::After) {
         style.setEffectiveDisplay(DisplayType::None);
         return;
     }
@@ -1255,8 +1255,8 @@ bool Adjuster::adjustForTextAutosizing(RenderStyle& style, const Element& elemen
 
 void Adjuster::adjustVisibilityForPseudoElement(RenderStyle& style, const Element& host)
 {
-    if ((style.pseudoElementType() == PseudoId::After && host.visibilityAdjustment().contains(VisibilityAdjustment::AfterPseudo))
-        || (style.pseudoElementType() == PseudoId::Before && host.visibilityAdjustment().contains(VisibilityAdjustment::BeforePseudo)))
+    if ((style.pseudoElementType() == PseudoElementType::After && host.visibilityAdjustment().contains(VisibilityAdjustment::AfterPseudo))
+        || (style.pseudoElementType() == PseudoElementType::Before && host.visibilityAdjustment().contains(VisibilityAdjustment::BeforePseudo)))
         style.setIsForceHidden();
 }
 

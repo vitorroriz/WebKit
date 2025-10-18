@@ -282,13 +282,13 @@ const RenderStyle& RenderElement::firstLineStyle() const
     // FIXME: It would be better to just set anonymous block first-line styles correctly.
     if (isAnonymousBlock()) {
         if (!previousInFlowSibling()) {
-            if (auto* firstLineStyle = parent()->style().getCachedPseudoStyle({ PseudoId::FirstLine }))
+            if (auto* firstLineStyle = parent()->style().getCachedPseudoStyle({ PseudoElementType::FirstLine }))
                 return *firstLineStyle;
         }
         return style();
     }
 
-    if (auto* firstLineStyle = style().getCachedPseudoStyle({ PseudoId::FirstLine }))
+    if (auto* firstLineStyle = style().getCachedPseudoStyle({ PseudoElementType::FirstLine }))
         return *firstLineStyle;
 
     return style();
@@ -1074,7 +1074,7 @@ void RenderElement::styleDidChange(StyleDifference diff, const RenderStyle* oldS
     registerImages(&style(), oldStyle);
 
     // Are there other pseudo-elements that need the resources to be registered?
-    registerImages(style().getCachedPseudoStyle({ PseudoId::FirstLine }), oldStyle ? oldStyle->getCachedPseudoStyle({ PseudoId::FirstLine }) : nullptr);
+    registerImages(style().getCachedPseudoStyle({ PseudoElementType::FirstLine }), oldStyle ? oldStyle->getCachedPseudoStyle({ PseudoElementType::FirstLine }) : nullptr);
 
     SVGRenderSupport::styleChanged(*this, oldStyle);
 
@@ -1228,7 +1228,7 @@ void RenderElement::willBeDestroyed()
         if (style().hasOutline())
             checkedView()->decrementRendersWithOutline();
 
-        if (auto* firstLineStyle = style().getCachedPseudoStyle({ PseudoId::FirstLine }))
+        if (auto* firstLineStyle = style().getCachedPseudoStyle({ PseudoElementType::FirstLine }))
             unregisterImages(*firstLineStyle);
     }
 
@@ -1793,7 +1793,7 @@ bool RenderElement::repaintForPausedImageAnimationsIfNeeded(const IntRect& visib
 
 const RenderStyle* RenderElement::getCachedPseudoStyle(const Style::PseudoElementIdentifier& pseudoElementIdentifier, const RenderStyle* parentStyle) const
 {
-    if (allPublicPseudoIds.contains(pseudoElementIdentifier.pseudoId) && !style().hasPseudoStyle(pseudoElementIdentifier.pseudoId))
+    if (allPublicPseudoElementTypes.contains(pseudoElementIdentifier.type) && !style().hasPseudoStyle(pseudoElementIdentifier.type))
         return nullptr;
 
     auto* cachedStyle = style().getCachedPseudoStyle(pseudoElementIdentifier);
@@ -1808,7 +1808,7 @@ const RenderStyle* RenderElement::getCachedPseudoStyle(const Style::PseudoElemen
 
 std::unique_ptr<RenderStyle> RenderElement::getUncachedPseudoStyle(const Style::PseudoElementRequest& pseudoElementRequest, const RenderStyle* parentStyle, const RenderStyle* ownStyle) const
 {
-    if (allPublicPseudoIds.contains(pseudoElementRequest.pseudoId()) && !ownStyle && !style().hasPseudoStyle(pseudoElementRequest.pseudoId()))
+    if (allPublicPseudoElementTypes.contains(pseudoElementRequest.type()) && !ownStyle && !style().hasPseudoStyle(pseudoElementRequest.type()))
         return nullptr;
 
     if (!parentStyle) {
@@ -1848,12 +1848,12 @@ RenderElement* RenderElement::rendererForPseudoStyleAcrossShadowBoundary() const
     return nullptr;
 }
 
-const RenderStyle* RenderElement::textSegmentPseudoStyle(PseudoId pseudoId) const
+const RenderStyle* RenderElement::textSegmentPseudoStyle(PseudoElementType pseudoElementType) const
 {
     if (isAnonymous())
         return nullptr;
 
-    if (auto* pseudoStyle = getCachedPseudoStyle({ pseudoId })) {
+    if (auto* pseudoStyle = getCachedPseudoStyle({ pseudoElementType })) {
         // We intentionally return the pseudo style here if it exists before ascending to the
         // shadow host element. This allows us to apply pseudo styles in user agent shadow
         // roots, instead of always deferring to the shadow host's selection pseudo style.
@@ -1861,7 +1861,7 @@ const RenderStyle* RenderElement::textSegmentPseudoStyle(PseudoId pseudoId) cons
     }
 
     if (auto* renderer = rendererForPseudoStyleAcrossShadowBoundary())
-        return renderer->getCachedPseudoStyle({ pseudoId });
+        return renderer->getCachedPseudoStyle({ pseudoElementType });
 
     return nullptr;
 }
@@ -1891,7 +1891,7 @@ std::unique_ptr<RenderStyle> RenderElement::selectionPseudoStyle() const
     if (isAnonymous())
         return nullptr;
 
-    if (auto selectionStyle = getUncachedPseudoStyle({ PseudoId::Selection })) {
+    if (auto selectionStyle = getUncachedPseudoStyle({ PseudoElementType::Selection })) {
         // We intentionally return the pseudo selection style here if it exists before ascending to
         // the shadow host element. This allows us to apply selection pseudo styles in user agent
         // shadow roots, instead of always deferring to the shadow host's selection pseudo style.
@@ -1899,7 +1899,7 @@ std::unique_ptr<RenderStyle> RenderElement::selectionPseudoStyle() const
     }
 
     if (auto* renderer = rendererForPseudoStyleAcrossShadowBoundary())
-        return renderer->getUncachedPseudoStyle({ PseudoId::Selection });
+        return renderer->getUncachedPseudoStyle({ PseudoElementType::Selection });
 
     return nullptr;
 }
@@ -1939,17 +1939,17 @@ Color RenderElement::selectionBackgroundColor() const
 
 const RenderStyle* RenderElement::spellingErrorPseudoStyle() const
 {
-    return textSegmentPseudoStyle(PseudoId::SpellingError);
+    return textSegmentPseudoStyle(PseudoElementType::SpellingError);
 }
 
 const RenderStyle* RenderElement::grammarErrorPseudoStyle() const
 {
-    return textSegmentPseudoStyle(PseudoId::GrammarError);
+    return textSegmentPseudoStyle(PseudoElementType::GrammarError);
 }
 
 const RenderStyle* RenderElement::targetTextPseudoStyle() const
 {
-    return textSegmentPseudoStyle(PseudoId::TargetText);
+    return textSegmentPseudoStyle(PseudoElementType::TargetText);
 }
 
 bool RenderElement::getLeadingCorner(FloatPoint& point, bool& insideFixed) const
@@ -2329,7 +2329,7 @@ bool RenderElement::requiresRenderingConsolidationForViewTransition() const
 
 bool RenderElement::isViewTransitionRoot() const
 {
-    return style().pseudoElementType() == PseudoId::ViewTransition;
+    return style().pseudoElementType() == PseudoElementType::ViewTransition;
 }
 
 bool RenderElement::checkForRepaintDuringLayout() const

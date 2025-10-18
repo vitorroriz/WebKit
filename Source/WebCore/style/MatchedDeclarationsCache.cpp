@@ -71,7 +71,7 @@ bool MatchedDeclarationsCache::isCacheable(const Element& element, const RenderS
     if (&element == element.document().documentElement())
         return false;
     // FIXME: Without the following early return we hit the final assert in
-    // Element::resolvePseudoElementStyle(). Making matchedPseudoElementIds
+    // Element::resolvePseudoElementStyle(). Making matchedPseudoElements
     // PseudoElementIdentifier-aware might be a possible solution.
     if (!style.pseudoElementNameArgument().isNull())
         return false;

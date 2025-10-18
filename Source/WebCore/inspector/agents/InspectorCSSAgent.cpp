@@ -414,56 +414,56 @@ bool InspectorCSSAgent::forcePseudoState(const Element& element, CSSSelector::Ps
     return m_nodeIdToForcedPseudoState.get(nodeId).contains(pseudoClass);
 }
 
-std::optional<Inspector::Protocol::CSS::PseudoId> InspectorCSSAgent::protocolValueForPseudoId(PseudoId pseudoId)
+std::optional<Inspector::Protocol::CSS::PseudoId> InspectorCSSAgent::protocolValueForPseudoElementType(PseudoElementType pseudoElementType)
 {
-    switch (pseudoId) {
-    case PseudoId::FirstLine:
+    switch (pseudoElementType) {
+    case PseudoElementType::FirstLine:
         return Inspector::Protocol::CSS::PseudoId::FirstLine;
-    case PseudoId::FirstLetter:
+    case PseudoElementType::FirstLetter:
         return Inspector::Protocol::CSS::PseudoId::FirstLetter;
-    case PseudoId::GrammarError:
+    case PseudoElementType::GrammarError:
         return Inspector::Protocol::CSS::PseudoId::GrammarError;
-    case PseudoId::Marker:
+    case PseudoElementType::Marker:
         return Inspector::Protocol::CSS::PseudoId::Marker;
-    case PseudoId::Backdrop:
+    case PseudoElementType::Backdrop:
         return Inspector::Protocol::CSS::PseudoId::Backdrop;
-    case PseudoId::Before:
+    case PseudoElementType::Before:
         return Inspector::Protocol::CSS::PseudoId::Before;
-    case PseudoId::After:
+    case PseudoElementType::After:
         return Inspector::Protocol::CSS::PseudoId::After;
-    case PseudoId::Selection:
+    case PseudoElementType::Selection:
         return Inspector::Protocol::CSS::PseudoId::Selection;
-    case PseudoId::Highlight:
+    case PseudoElementType::Highlight:
         return Inspector::Protocol::CSS::PseudoId::Highlight;
-    case PseudoId::SpellingError:
+    case PseudoElementType::SpellingError:
         return Inspector::Protocol::CSS::PseudoId::SpellingError;
-    case PseudoId::TargetText:
+    case PseudoElementType::TargetText:
         return Inspector::Protocol::CSS::PseudoId::TargetText;
-    case PseudoId::ViewTransition:
+    case PseudoElementType::ViewTransition:
         return Inspector::Protocol::CSS::PseudoId::ViewTransition;
-    case PseudoId::ViewTransitionGroup:
+    case PseudoElementType::ViewTransitionGroup:
         return Inspector::Protocol::CSS::PseudoId::ViewTransitionGroup;
-    case PseudoId::ViewTransitionImagePair:
+    case PseudoElementType::ViewTransitionImagePair:
         return Inspector::Protocol::CSS::PseudoId::ViewTransitionImagePair;
-    case PseudoId::ViewTransitionOld:
+    case PseudoElementType::ViewTransitionOld:
         return Inspector::Protocol::CSS::PseudoId::ViewTransitionOld;
-    case PseudoId::ViewTransitionNew:
+    case PseudoElementType::ViewTransitionNew:
         return Inspector::Protocol::CSS::PseudoId::ViewTransitionNew;
-    case PseudoId::WebKitResizer:
+    case PseudoElementType::WebKitResizer:
         return Inspector::Protocol::CSS::PseudoId::WebKitResizer;
-    case PseudoId::WebKitScrollbar:
+    case PseudoElementType::WebKitScrollbar:
         return Inspector::Protocol::CSS::PseudoId::WebKitScrollbar;
-    case PseudoId::WebKitScrollbarThumb:
+    case PseudoElementType::WebKitScrollbarThumb:
         return Inspector::Protocol::CSS::PseudoId::WebKitScrollbarThumb;
-    case PseudoId::WebKitScrollbarButton:
+    case PseudoElementType::WebKitScrollbarButton:
         return Inspector::Protocol::CSS::PseudoId::WebKitScrollbarButton;
-    case PseudoId::WebKitScrollbarTrack:
+    case PseudoElementType::WebKitScrollbarTrack:
         return Inspector::Protocol::CSS::PseudoId::WebKitScrollbarTrack;
-    case PseudoId::WebKitScrollbarTrackPiece:
+    case PseudoElementType::WebKitScrollbarTrackPiece:
         return Inspector::Protocol::CSS::PseudoId::WebKitScrollbarTrackPiece;
-    case PseudoId::WebKitScrollbarCorner:
+    case PseudoElementType::WebKitScrollbarCorner:
         return Inspector::Protocol::CSS::PseudoId::WebKitScrollbarCorner;
-    case PseudoId::InternalWritingSuggestions:
+    case PseudoElementType::InternalWritingSuggestions:
         return { };
 
     default:
@@ -501,25 +501,25 @@ Inspector::Protocol::ErrorStringOr<std::tuple<RefPtr<JSON::ArrayOf<Inspector::Pr
     if (!originalElement->isPseudoElement()) {
         if (!includePseudo || *includePseudo) {
             pseudoElements = JSON::ArrayOf<Inspector::Protocol::CSS::PseudoIdMatches>::create();
-            for (PseudoId pseudoId : allPseudoIds) {
+            for (auto pseudoElementType : allPseudoElementTypes) {
                 // `*::marker` selectors are only applicable to elements with `display: list-item`.
-                if (pseudoId == PseudoId::Marker && element->computedStyle()->display() != DisplayType::ListItem)
+                if (pseudoElementType == PseudoElementType::Marker && element->computedStyle()->display() != DisplayType::ListItem)
                     continue;
 
-                if (pseudoId == PseudoId::Backdrop && !element->isInTopLayer())
+                if (pseudoElementType == PseudoElementType::Backdrop && !element->isInTopLayer())
                     continue;
 
-                if (pseudoId == PseudoId::ViewTransition && (!element->document().activeViewTransition() || element != element->document().documentElement()))
+                if (pseudoElementType == PseudoElementType::ViewTransition && (!element->document().activeViewTransition() || element != element->document().documentElement()))
                     continue;
 
-                auto pseudoElementIdentifier = Style::PseudoElementIdentifier { pseudoId };
+                auto pseudoElementIdentifier = Style::PseudoElementIdentifier { pseudoElementType };
 
                 // FIXME: Add named view transition pseudo-element support to Web Inspector. (webkit.org/b/283951)
                 if (isNamedViewTransitionPseudoElement(pseudoElementIdentifier))
                     continue;
 
-                if (auto protocolPseudoId = protocolValueForPseudoId(pseudoId)) {
-                    auto matchedRules = styleResolver.pseudoStyleRulesForElement(element, pseudoId, Style::Resolver::AllCSSRules);
+                if (auto protocolPseudoId = protocolValueForPseudoElementType(pseudoElementType)) {
+                    auto matchedRules = styleResolver.pseudoStyleRulesForElement(element, pseudoElementType, Style::Resolver::AllCSSRules);
                     if (!matchedRules.isEmpty()) {
                         auto matches = Inspector::Protocol::CSS::PseudoIdMatches::create()
                             .setPseudoId(protocolPseudoId.value())

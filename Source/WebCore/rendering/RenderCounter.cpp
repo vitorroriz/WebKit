@@ -208,8 +208,8 @@ static std::optional<CounterPlan> planCounter(RenderElement& renderer, const Ato
 
     if (style.pseudoElementType()) {
         switch (*style.pseudoElementType()) {
-        case PseudoId::Before:
-        case PseudoId::After:
+        case PseudoElementType::Before:
+        case PseudoElementType::After:
             break;
         default:
             return std::nullopt; // Counters are forbidden from all other pseudo elements.
@@ -494,7 +494,7 @@ void RenderCounter::updateCounter()
             if (!beforeAfterContainer->isAnonymous() && !beforeAfterContainer->isPseudoElement())
                 return;
             auto containerStyle = beforeAfterContainer->style().pseudoElementType();
-            if (containerStyle == PseudoId::Before || containerStyle == PseudoId::After)
+            if (containerStyle == PseudoElementType::Before || containerStyle == PseudoElementType::After)
                 break;
             beforeAfterContainer = beforeAfterContainer->parent();
         }

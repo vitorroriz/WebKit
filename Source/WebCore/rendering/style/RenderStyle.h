@@ -499,7 +499,7 @@ public:
     StyleSelfAlignmentData resolvedJustifySelf(const RenderStyle* parentStyle, ItemPosition normalValueBehavior) const;
     StyleContentAlignmentData resolvedJustifyContent(const StyleContentAlignmentData& normalValueBehavior) const;
 
-    std::optional<PseudoId> pseudoElementType() const;
+    std::optional<PseudoElementType> pseudoElementType() const;
     const AtomString& pseudoElementNameArgument() const;
 
     std::optional<Style::PseudoElementIdentifier> pseudoElementIdentifier() const;
@@ -566,8 +566,8 @@ public:
     bool isStyleAvailable() const;
 
     inline bool hasAnyPublicPseudoStyles() const;
-    inline bool hasPseudoStyle(PseudoId) const;
-    inline void setHasPseudoStyles(EnumSet<PseudoId>);
+    inline bool hasPseudoStyle(PseudoElementType) const;
+    inline void setHasPseudoStyles(EnumSet<PseudoElementType>);
 
     inline bool hasDisplayAffectedByAnimations() const;
     inline void setHasDisplayAffectedByAnimations();
@@ -2512,8 +2512,8 @@ private:
         inline void copyNonInheritedFrom(const NonInheritedFlags&);
 
         inline bool hasAnyPublicPseudoStyles() const;
-        bool hasPseudoStyle(PseudoId) const;
-        void setHasPseudoStyles(EnumSet<PseudoId>);
+        bool hasPseudoStyle(PseudoElementType) const;
+        void setHasPseudoStyles(EnumSet<PseudoElementType>);
 
 #if !LOG_DISABLED
         void dumpDifferences(TextStream&, const NonInheritedFlags&) const;
@@ -2539,7 +2539,7 @@ private:
         PREFERRED_TYPE(bool) unsigned firstChildState : 1;
         PREFERRED_TYPE(bool) unsigned lastChildState : 1;
         PREFERRED_TYPE(bool) unsigned isLink : 1;
-        PREFERRED_TYPE(PseudoId) unsigned pseudoElementType : PseudoElementTypeBits;
+        PREFERRED_TYPE(PseudoElementType) unsigned pseudoElementType : PseudoElementTypeBits;
         unsigned pseudoBits : PublicPseudoIDBits;
         PREFERRED_TYPE(Style::TextDecorationLine) unsigned textDecorationLine : TextDecorationLineBits; // Text decorations defined *only* by this element.
 
