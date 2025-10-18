@@ -27,6 +27,7 @@
 #include "IDBStorageManager.h"
 
 #include "IDBStorageRegistry.h"
+#include "Logging.h"
 #include <WebCore/IDBRequestData.h>
 #include <WebCore/IDBServer.h>
 #include <WebCore/MemoryIDBBackingStore.h>
@@ -353,6 +354,18 @@ void IDBStorageManager::handleLowMemoryWarning()
 {
     for (auto& database : m_databases.values())
         database->handleLowMemoryWarning();
+}
+
+void IDBStorageManager::tryCloseDatabase(const WebCore::IDBDatabaseIdentifier& identifier)
+{
+    bool closed = false;
+    if (CheckedPtr database = m_databases.get(identifier))
+        closed = database->tryClose();
+
+    if (closed) {
+        RELEASE_LOG(IndexedDB, "%p - IDBStorageManager::tryCloseDatabase: Closed database", this);
+        m_databases.remove(identifier);
+    }
 }
 
 } // namespace WebKit
