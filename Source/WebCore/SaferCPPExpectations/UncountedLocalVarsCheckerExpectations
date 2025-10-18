@@ -208,12 +208,8 @@ editing/ChangeListTypeCommand.cpp
 editing/Editing.cpp
 editing/Editor.cpp
 editing/EditorCommand.cpp
-editing/FormatBlockCommand.cpp
 editing/FrameSelection.cpp
-editing/IndentOutdentCommand.cpp
-editing/InsertParagraphSeparatorCommand.cpp
 editing/MarkupAccumulator.cpp
-editing/MergeIdenticalElementsCommand.cpp
 editing/cocoa/DataDetection.mm
 editing/cocoa/DictionaryLookup.mm
 editing/cocoa/EditorCocoa.mm

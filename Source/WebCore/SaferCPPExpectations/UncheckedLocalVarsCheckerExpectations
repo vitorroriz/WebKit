@@ -134,13 +134,7 @@ editing/DictationCommand.cpp
 editing/Editing.cpp
 editing/Editor.cpp
 editing/EditorCommand.cpp
-editing/FormatBlockCommand.cpp
 editing/FrameSelection.cpp
-editing/IndentOutdentCommand.cpp
-editing/InsertParagraphSeparatorCommand.cpp
-editing/MarkupAccumulator.cpp
-editing/MergeIdenticalElementsCommand.cpp
-editing/ModifySelectionListLevel.cpp
 editing/RenderedPosition.cpp
 editing/SimplifyMarkupCommand.cpp
 editing/TextIterator.cpp

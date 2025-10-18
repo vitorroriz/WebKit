@@ -421,7 +421,6 @@ editing/AlternativeTextController.cpp
 editing/ApplyBlockElementCommand.cpp
 editing/ApplyStyleCommand.cpp
 editing/BreakBlockquoteCommand.cpp
-editing/ChangeListTypeCommand.cpp
 editing/CompositeEditCommand.cpp
 editing/DeleteSelectionCommand.cpp
 editing/Editing.cpp
@@ -447,7 +446,6 @@ editing/VisiblePosition.cpp
 editing/VisiblePosition.h
 editing/VisibleSelection.cpp
 editing/VisibleUnits.cpp
-editing/cocoa/AutofillElements.cpp
 editing/cocoa/EditingHTMLConverter.mm
 editing/cocoa/EditorCocoa.mm
 editing/cocoa/NodeHTMLConverter.mm

@@ -307,7 +307,7 @@ void MarkupAccumulator::serializeNodesWithNamespaces(Node& targetNode, Serialize
                 }
             }
 
-            if (auto* child = firstChild(*current)) {
+            if (RefPtr child = firstChild(*current)) {
                 current = child;
                 namespaceStack.append(namespaceStack.last());
                 continue;
@@ -328,7 +328,7 @@ void MarkupAccumulator::serializeNodesWithNamespaces(Node& targetNode, Serialize
             if (shouldIncludeShadowRoots() && current->isShadowRoot()) {
                 current = current->shadowHost();
                 if (m_serializeShadowRoots != SerializeShadowRoots::AllForInterchange) {
-                    if (auto* child = firstChild(*current)) {
+                    if (RefPtr child = firstChild(*current)) {
                         current = child;
                         namespaceStack.append(namespaceStack.last());
                         break;
@@ -403,7 +403,7 @@ void MarkupAccumulator::startAppendingNode(const Node& node, Namespaces* namespa
         if (m_serializationContext && is<HTMLHeadElement>(element))
             m_markup.append("<meta charset=\"UTF-8\"><!-- Encoding specified by WebKit -->"_s);
 
-    } else if (auto* shadowRoot = suitableShadowRoot(node)) {
+    } else if (RefPtr shadowRoot = suitableShadowRoot(node)) {
         m_markup.append("<template shadowrootmode=\""_s);
         switch (shadowRoot->mode()) {
         case ShadowRootMode::Open:
