@@ -29,26 +29,13 @@ namespace TestWebKitAPI {
 using namespace WTF;
 using namespace WebCore;
 
-static void setUpTest()
-{
-    WTF::initializeMainThread();
-
-#if PLATFORM(GTK)
-    // GTK under X11 has pending sources from gtk_init() when we run the loop,
-    // we need to process them to ensure the tests start with no pending sources.
-    auto* context = RunLoop::currentSingleton().mainContext();
-    while (g_main_context_pending(context))
-        g_main_context_iteration(context, FALSE);
-#endif
-}
-
 // ============================================================================
 // 1. RunLoopObserver lifecycle tests
 // ============================================================================
 
 TEST(RunLoopObserver, Schedule)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     bool observerCalled = false;
     auto observer = makeUniqueRef<RunLoopObserver>(RunLoopObserver::WellKnownOrder::PostRenderingUpdate, [&] {
@@ -76,7 +63,7 @@ TEST(RunLoopObserver, Schedule)
 
 TEST(RunLoopObserver, Invalidate)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
     auto observer = makeUniqueRef<RunLoopObserver>(RunLoopObserver::WellKnownOrder::PostRenderingUpdate, [&] {
@@ -118,7 +105,7 @@ TEST(RunLoopObserver, Invalidate)
 
 TEST(RunLoopObserver, MultipleSchedule)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
     auto observer = makeUniqueRef<RunLoopObserver>(RunLoopObserver::WellKnownOrder::PostRenderingUpdate, [&] {
@@ -163,7 +150,7 @@ TEST(RunLoopObserver, MultipleSchedule)
 
 TEST(RunLoopObserver, MultipleInvalidate)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
     auto observer = makeUniqueRef<RunLoopObserver>(RunLoopObserver::WellKnownOrder::PostRenderingUpdate, [&] {
@@ -211,7 +198,7 @@ TEST(RunLoopObserver, MultipleInvalidate)
 
 TEST(RunLoopObserver, Destruction)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
     {
@@ -239,7 +226,7 @@ TEST(RunLoopObserver, Destruction)
 
 TEST(RunLoopObserver, Repeating)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
 
@@ -278,7 +265,7 @@ TEST(RunLoopObserver, Repeating)
 
 TEST(RunLoopObserver, OneShot)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
 
@@ -320,7 +307,7 @@ TEST(RunLoopObserver, OneShot)
 // ============================================================================
 TEST(RunLoopObserver, DefaultActivities)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
 
@@ -346,7 +333,7 @@ TEST(RunLoopObserver, DefaultActivities)
 
 TEST(RunLoopObserver, ActivityEntry)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
 
@@ -371,7 +358,7 @@ TEST(RunLoopObserver, ActivityEntry)
 
 TEST(RunLoopObserver, ActivityExit)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
 
@@ -396,7 +383,7 @@ TEST(RunLoopObserver, ActivityExit)
 
 TEST(RunLoopObserver, ActivityBeforeWaiting)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
 
@@ -420,7 +407,7 @@ TEST(RunLoopObserver, ActivityBeforeWaiting)
 
 TEST(RunLoopObserver, ActivityAfterWaiting)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
 
@@ -444,7 +431,7 @@ TEST(RunLoopObserver, ActivityAfterWaiting)
 
 TEST(RunLoopObserver, ActivityCombination)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
 
@@ -473,7 +460,7 @@ TEST(RunLoopObserver, ActivityCombination)
 
 TEST(RunLoopObserver, RemovesSelfDuringCallback)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
 
@@ -508,7 +495,7 @@ TEST(RunLoopObserver, RemovesSelfDuringCallback)
 
 TEST(RunLoopObserver, AddsNewObserverDuringCallback)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount1 = 0;
     unsigned observerCallCount2 = 0;
@@ -553,7 +540,7 @@ TEST(RunLoopObserver, AddsNewObserverDuringCallback)
 
 TEST(RunLoopObserver, AcrossMultipleIterations)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount = 0;
 
@@ -582,7 +569,7 @@ TEST(RunLoopObserver, AcrossMultipleIterations)
 
 TEST(RunLoopObserver, WellKnownOrderValues)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     Vector<unsigned> observerExecutionOrder;
 
@@ -620,7 +607,7 @@ TEST(RunLoopObserver, WellKnownOrderValues)
 
 TEST(RunLoopObserver, DifferentWellKnownOrderValues)
 {
-    setUpTest();
+    WTF::initializeMainThread();
 
     unsigned observerCallCount1 = 0;
     unsigned observerCallCount2 = 0;

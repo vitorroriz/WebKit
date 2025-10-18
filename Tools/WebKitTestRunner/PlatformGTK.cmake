@@ -31,7 +31,7 @@ list(APPEND WebKitTestRunner_LIBRARIES
 
 list(APPEND TestRunnerInjectedBundle_LIBRARIES
     Fontconfig::Fontconfig
-    GTK::GTK
+    GLib::GLib
 )
 
 list(APPEND TestRunnerInjectedBundle_SOURCES

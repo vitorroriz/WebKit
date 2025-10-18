@@ -74,7 +74,8 @@ list(APPEND WebCore_LIBRARIES
     ${HYPHEN_LIBRARIES}
     ${UPOWERGLIB_LIBRARIES}
     ${X11_X11_LIB}
-    GTK::GTK
+    Cairo::Cairo
+    GLib::GLib
 )
 
 list(APPEND WebCore_SYSTEM_INCLUDE_DIRECTORIES
@@ -83,6 +84,13 @@ list(APPEND WebCore_SYSTEM_INCLUDE_DIRECTORIES
     ${LIBTASN1_INCLUDE_DIRS}
     ${UPOWERGLIB_INCLUDE_DIRS}
 )
+
+if (USE_CAIRO)
+    # GTK is only used by WebCore when building with cairo enabled.
+    list(APPEND WebCore_LIBRARIES
+        GTK::GTK
+    )
+endif ()
 
 if (ENABLE_WAYLAND_TARGET)
     list(APPEND WebCore_SYSTEM_INCLUDE_DIRECTORIES
@@ -130,7 +138,7 @@ include_directories(SYSTEM
     ${WebCore_SYSTEM_INCLUDE_DIRECTORIES}
 )
 
-list(APPEND WebCoreTestSupport_LIBRARIES PRIVATE GTK::GTK)
+list(APPEND WebCoreTestSupport_LIBRARIES PRIVATE GLib::GLib)
 
 if (ENABLE_SMOOTH_SCROLLING)
     list(APPEND WebCore_SOURCES

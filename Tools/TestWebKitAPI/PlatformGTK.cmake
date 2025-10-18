@@ -47,7 +47,7 @@ list(APPEND TestWebCore_SOURCES
     Tests/WebCore/gstreamer/GstElementHarness.cpp
     Tests/WebCore/gstreamer/GstMappedBuffer.cpp
 
-    gtk/main.cpp
+    generic/main.cpp
 )
 
 list(APPEND TestWebCore_SYSTEM_INCLUDE_DIRECTORIES
@@ -58,7 +58,7 @@ list(APPEND TestWebCore_SYSTEM_INCLUDE_DIRECTORIES
 )
 
 list(APPEND TestWebCore_LIBRARIES
-    GTK::GTK
+    GLib::GLib
 )
 
 # TestWebKit
