@@ -820,6 +820,14 @@ void WebChromeClient::didFinishLoadingImageForElement(HTMLImageElement& element)
         page->didFinishLoadingImageForElement(element);
 }
 
+#if ENABLE(MODEL_PROCESS)
+void WebChromeClient::setHasModelElement(bool hasModelElement)
+{
+    if (RefPtr page = m_page.get())
+        page->setHasModelElement(hasModelElement);
+}
+#endif
+
 PlatformPageClient WebChromeClient::platformPageClient() const
 {
     notImplemented();

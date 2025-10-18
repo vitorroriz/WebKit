@@ -293,6 +293,10 @@ public:
     virtual void didFinishLoadingImageForElement(HTMLImageElement&) = 0;
     virtual void didFinishLoadingImageForSVGImage(SVGImageElement&) { }
 
+#if ENABLE(MODEL_PROCESS)
+    virtual void setHasModelElement(bool) { }
+#endif
+
     virtual PlatformPageClient platformPageClient() const = 0;
 
     virtual void setCursor(const Cursor&) = 0;

@@ -9357,6 +9357,13 @@ void WebPage::didFinishLoadingImageForElement(WebCore::HTMLImageElement&)
 
 #endif
 
+#if ENABLE(MODEL_PROCESS)
+void WebPage::setHasModelElement(bool hasModelElement)
+{
+    send(Messages::WebPageProxy::SetHasModelElement(hasModelElement));
+}
+#endif
+
 #if ENABLE(TEXT_AUTOSIZING)
 void WebPage::textAutoSizingAdjustmentTimerFired()
 {

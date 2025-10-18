@@ -212,6 +212,9 @@ private:
 
     JSRetainPtr<JSStringRef> scrollbarStateForScrollingNodeID(unsigned long long scrollingNodeID, unsigned long long processID, bool) const override;
 
+    bool didCallEnsurePositionInformationIsUpToDateSinceLastCheck() const final;
+    void clearEnsurePositionInformationIsUpToDateTracking() final;
+
 #if USE(BROWSERENGINEKIT)
     id<BETextInput> asyncTextInput() const;
 #endif

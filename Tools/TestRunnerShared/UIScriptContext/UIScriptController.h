@@ -461,6 +461,9 @@ public:
 
     virtual JSRetainPtr<JSStringRef> frontmostViewAtPoint(int, int) { notImplemented(); return { }; }
 
+    virtual bool didCallEnsurePositionInformationIsUpToDateSinceLastCheck() const { notImplemented(); return false; }
+    virtual void clearEnsurePositionInformationIsUpToDateTracking() { notImplemented(); }
+
 protected:
     explicit UIScriptController(UIScriptContext&);
     

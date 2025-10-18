@@ -1475,6 +1475,9 @@ Node::InsertedIntoAncestorResult HTMLModelElement::insertedIntoAncestor(Insertio
 
     if (insertionType.connectedToDocument) {
         document().registerForVisibilityStateChangedCallbacks(*this);
+#if ENABLE(MODEL_PROCESS)
+        document().incrementModelElementCount();
+#endif
         m_modelPlayerProvider = document().page()->modelPlayerProvider();
         LazyLoadModelObserver::observe(*this);
     }
@@ -1488,6 +1491,9 @@ void HTMLModelElement::removedFromAncestor(RemovalType removalType, ContainerNod
 
     if (removalType.disconnectedFromDocument) {
         document().unregisterForVisibilityStateChangedCallbacks(*this);
+#if ENABLE(MODEL_PROCESS)
+        document().decrementModelElementCount();
+#endif
         LazyLoadModelObserver::unobserve(*this, document());
 
         m_loadModelTimer = nullptr;

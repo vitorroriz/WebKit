@@ -978,6 +978,33 @@ window.UIHelper = class UIHelper {
         return UIHelper.scrollbarState(scroller, false);
     }
 
+    static didCallEnsurePositionInformationIsUpToDateSinceLastCheck()
+    {
+        if (!this.isWebKit2() || !this.isIOSFamily())
+            return Promise.resolve(false);
+
+        return new Promise(resolve => {
+            testRunner.runUIScript(`(function() {
+                uiController.uiScriptComplete(uiController.didCallEnsurePositionInformationIsUpToDateSinceLastCheck);
+            })()`, result => {
+                resolve(result === "true");
+            });
+        });
+    }
+
+    static clearEnsurePositionInformationIsUpToDateTracking()
+    {
+        if (!this.isWebKit2() || !this.isIOSFamily())
+            return Promise.resolve();
+
+        return new Promise(resolve => {
+            testRunner.runUIScript(`(function() {
+                uiController.clearEnsurePositionInformationIsUpToDateTracking();
+                uiController.uiScriptComplete();
+            })()`, resolve);
+        });
+    }
+
     static getUICaretViewRect()
     {
         if (!this.isWebKit2() || !this.isIOSFamily())

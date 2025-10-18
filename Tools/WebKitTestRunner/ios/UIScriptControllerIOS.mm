@@ -1717,6 +1717,16 @@ JSRetainPtr<JSStringRef> UIScriptControllerIOS::frontmostViewAtPoint(int x, int 
     return nil;
 }
 
+bool UIScriptControllerIOS::didCallEnsurePositionInformationIsUpToDateSinceLastCheck() const
+{
+    return webView().didCallEnsurePositionInformationIsUpToDateSinceLastCheck;
+}
+
+void UIScriptControllerIOS::clearEnsurePositionInformationIsUpToDateTracking()
+{
+    [webView() clearEnsurePositionInformationIsUpToDateTracking];
+}
+
 }
 
 #endif // PLATFORM(IOS_FAMILY)

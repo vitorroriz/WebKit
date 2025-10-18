@@ -143,6 +143,10 @@ private:
 
     void didFinishLoadingImageForElement(WebCore::HTMLImageElement&) final;
 
+#if ENABLE(MODEL_PROCESS)
+    void setHasModelElement(bool) final;
+#endif
+
     PlatformPageClient platformPageClient() const final;
     void contentsSizeChanged(WebCore::LocalFrame&, const WebCore::IntSize&) const final;
     void intrinsicContentsSizeChanged(const WebCore::IntSize&) const final;

@@ -451,4 +451,7 @@ interface UIScriptController {
     undefined resetVisibilityAdjustments(object callback);
 
     DOMString frontmostViewAtPoint(long x, long y);
+
+    readonly attribute boolean didCallEnsurePositionInformationIsUpToDateSinceLastCheck;
+    undefined clearEnsurePositionInformationIsUpToDateTracking();
 };

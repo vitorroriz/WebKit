@@ -1033,6 +1033,11 @@ public:
 
     void setHasActiveAnimatedScrolls(bool isRunning);
 
+#if ENABLE(MODEL_PROCESS)
+    bool hasModelElement() const { return m_hasModelElement; }
+    void setHasModelElement(bool);
+#endif
+
     void setPrivateClickMeasurement(std::nullopt_t);
     void setPrivateClickMeasurement(WebCore::PrivateClickMeasurement&&);
     void setPrivateClickMeasurement(WebCore::PrivateClickMeasurement&&, String sourceDescription, String purchaser);
@@ -3694,6 +3699,10 @@ private:
 
     bool m_hasActiveAnimatedScroll { false };
     bool m_registeredForFullSpeedUpdates { false };
+
+#if ENABLE(MODEL_PROCESS)
+    bool m_hasModelElement { false };
+#endif
 
     bool m_shouldSuppressAppLinksInNextNavigationPolicyDecision { false };
 

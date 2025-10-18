@@ -742,6 +742,8 @@ typedef NS_OPTIONS(NSUInteger, _WKWebViewDataType) {
 - (void)didStartFormControlInteraction WK_API_AVAILABLE(ios(10.3));
 - (void)didEndFormControlInteraction WK_API_AVAILABLE(ios(10.3));
 
+- (void)didEnsurePositionInformationIsUpToDate WK_API_AVAILABLE(ios(WK_IOS_TBA), visionos(WK_XROS_TBA));
+
 - (void)_beginInteractiveObscuredInsetsChange;
 - (void)_endInteractiveObscuredInsetsChange;
 - (void)_hideContentUntilNextUpdate;

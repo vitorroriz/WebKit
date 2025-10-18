@@ -3279,6 +3279,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 
 - (BOOL)ensurePositionInformationIsUpToDate:(WebKit::InteractionInformationRequest)request
 {
+    [_webView didEnsurePositionInformationIsUpToDate];
     if ([self _currentPositionInformationIsValidForRequest:request])
         return YES;
 
@@ -3468,6 +3469,9 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 
 #if ENABLE(MODEL_PROCESS)
     if (gestureRecognizer == _modelInteractionPanGestureRecognizer) {
+        if (!_page->hasModelElement())
+            return NO;
+
         WebKit::InteractionInformationRequest request(WebCore::roundedIntPoint(point));
         if (![self ensurePositionInformationIsUpToDate:request])
             return NO;

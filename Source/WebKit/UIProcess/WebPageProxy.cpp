@@ -9327,6 +9327,13 @@ void WebPageProxy::setHasActiveAnimatedScrolls(bool isRunning)
 #endif
 }
 
+#if ENABLE(MODEL_PROCESS)
+void WebPageProxy::setHasModelElement(bool hasModelElement)
+{
+    m_hasModelElement = hasModelElement;
+}
+#endif
+
 void WebPageProxy::runOpenPanel(IPC::Connection& connection, FrameIdentifier frameID, FrameInfoData&& frameInfo, const FileChooserSettings& settings)
 {
     if (RefPtr openPanelResultListener = std::exchange(m_openPanelResultListener, nullptr))
@@ -11779,6 +11786,10 @@ void WebPageProxy::resetStateAfterProcessExited(ProcessTerminationReason termina
 
     // FIXME: <rdar://problem/38676604> In case of process swaps, the old process should gracefully suspend instead of terminating.
     protectedLegacyMainFrameProcess()->processTerminated();
+
+#if ENABLE(MODEL_PROCESS)
+    m_hasModelElement = false;
+#endif
 }
 
 WebPageProxyTesting* WebPageProxy::pageForTesting() const
