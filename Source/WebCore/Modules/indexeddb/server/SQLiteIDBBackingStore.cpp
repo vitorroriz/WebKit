@@ -431,25 +431,21 @@ std::unique_ptr<IDBDatabaseInfo> SQLiteIDBBackingStore::createAndPopulateInitial
 
     if (!sqliteDB->executeCommand("CREATE TABLE IDBDatabaseInfo (key TEXT NOT NULL ON CONFLICT FAIL UNIQUE ON CONFLICT REPLACE, value TEXT NOT NULL ON CONFLICT FAIL);"_s)) {
         LOG_ERROR("Could not create IDBDatabaseInfo table in database (%i) - %s", sqliteDB->lastError(), sqliteDB->lastErrorMsg());
-        closeSQLiteDB();
         return nullptr;
     }
 
     if (!sqliteDB->executeCommand(v2ObjectStoreInfoSchema)) {
         LOG_ERROR("Could not create ObjectStoreInfo table in database (%i) - %s", sqliteDB->lastError(), sqliteDB->lastErrorMsg());
-        closeSQLiteDB();
         return nullptr;
     }
 
     if (!sqliteDB->executeCommand(indexInfoTableSchema())) {
         LOG_ERROR("Could not create IndexInfo table in database (%i) - %s", sqliteDB->lastError(), sqliteDB->lastErrorMsg());
-        closeSQLiteDB();
         return nullptr;
     }
 
     if (!sqliteDB->executeCommand("CREATE TABLE KeyGenerators (objectStoreID INTEGER NOT NULL ON CONFLICT FAIL UNIQUE ON CONFLICT REPLACE, currentKey INTEGER NOT NULL ON CONFLICT FAIL);"_s)) {
         LOG_ERROR("Could not create KeyGenerators table in database (%i) - %s", sqliteDB->lastError(), sqliteDB->lastErrorMsg());
-        closeSQLiteDB();
         return nullptr;
     }
 
@@ -459,7 +455,6 @@ std::unique_ptr<IDBDatabaseInfo> SQLiteIDBBackingStore::createAndPopulateInitial
             || CheckedRef { *sql }->bindInt(1, currentMetadataVersion) != SQLITE_OK
             || CheckedRef { *sql }->step() != SQLITE_DONE) {
             LOG_ERROR("Could not insert database metadata version into IDBDatabaseInfo table (%i) - %s", sqliteDB->lastError(), sqliteDB->lastErrorMsg());
-            closeSQLiteDB();
             return nullptr;
         }
     }
@@ -469,7 +464,6 @@ std::unique_ptr<IDBDatabaseInfo> SQLiteIDBBackingStore::createAndPopulateInitial
             || CheckedRef { *sql }->bindBlob(1, m_identifier.databaseName()) != SQLITE_OK
             || CheckedRef { *sql }->step() != SQLITE_DONE) {
             LOG_ERROR("Could not insert database name into IDBDatabaseInfo table (%i) - %s", sqliteDB->lastError(), sqliteDB->lastErrorMsg());
-            closeSQLiteDB();
             return nullptr;
         }
     }
@@ -481,14 +475,12 @@ std::unique_ptr<IDBDatabaseInfo> SQLiteIDBBackingStore::createAndPopulateInitial
             || CheckedRef { *sql }->bindText(1, String::number(0)) != SQLITE_OK
             || CheckedRef { *sql }->step() != SQLITE_DONE) {
             LOG_ERROR("Could not insert default version into IDBDatabaseInfo table (%i) - %s", sqliteDB->lastError(), sqliteDB->lastErrorMsg());
-            closeSQLiteDB();
             return nullptr;
         }
     }
 
     if (!sqliteDB->executeCommand("INSERT INTO IDBDatabaseInfo VALUES ('MaxObjectStoreID', 1);"_s)) {
         LOG_ERROR("Could not insert default version into IDBDatabaseInfo table (%i) - %s", sqliteDB->lastError(), sqliteDB->lastErrorMsg());
-        closeSQLiteDB();
         return nullptr;
     }
 
