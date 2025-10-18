@@ -500,7 +500,7 @@ std::optional<Child> simplify(Number&, const SimplificationOptions&)
 std::optional<Child> simplify(Percentage&, const SimplificationOptions&)
 {
     // 1.1. If root is a percentage that will be resolved against another value, and there is enough information available to resolve it, do so, and express the resulting numeric value in the appropriate canonical unit. Return the value.
-    // NOTE: Handled by the Style::Calculation::Tree / Style::CalculationValue types at use time.
+    // NOTE: Handled by the Style::Calculation::Tree / Style::Calculation::Value types at use time.
     return { };
 }
 

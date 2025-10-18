@@ -1011,7 +1011,6 @@ css/calc/CSSCalcTree+Evaluation.cpp
 css/calc/CSSCalcTree+Parser.cpp
 css/calc/CSSCalcTree+Serialization.cpp
 css/calc/CSSCalcTree+Simplification.cpp
-css/calc/CSSCalcTree+StyleCalculationValue.cpp
 css/calc/CSSCalcTree.cpp
 css/calc/CSSCalcType.cpp
 css/calc/CSSCalcValue.cpp
@@ -3146,6 +3145,7 @@ style/StyleTreeResolver.cpp
 style/StyleUpdate.cpp
 style/Styleable.cpp
 style/UserAgentStyle.cpp
+style/calc/StyleCalculationTree+Conversion.cpp
 style/calc/StyleCalculationTree+Copy.cpp
 style/calc/StyleCalculationTree+Evaluation.cpp
 style/calc/StyleCalculationTree.cpp

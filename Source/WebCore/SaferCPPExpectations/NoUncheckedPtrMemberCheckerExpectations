@@ -8,7 +8,6 @@ bindings/js/JSLazyEventListener.cpp
 css/CSSToLengthConversionData.h
 css/SelectorChecker.h
 css/SelectorFilter.h
-css/calc/CSSCalcTree+StyleCalculationValue.cpp
 css/query/MediaQueryEvaluator.h
 dom/CollectionIndexCache.h
 dom/Node.cpp
@@ -100,5 +99,6 @@ style/StyleResolver.h
 style/StyleScope.h
 style/StyleTreeResolver.h
 style/Styleable.h
+style/calc/StyleCalculationTree+Conversion.h
 style/values/color/StyleColorResolutionState.h
 svg/properties/SVGPropertyOwnerRegistry.h

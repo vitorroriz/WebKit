@@ -48,7 +48,7 @@ enum class LengthWrapperDataEvaluationKind : uint8_t {
 struct LengthWrapperData {
     LengthWrapperData(uint8_t opaqueType);
     LengthWrapperData(uint8_t opaqueType, float value, bool hasQuirk = false);
-    WEBCORE_EXPORT explicit LengthWrapperData(uint8_t opaqueType, Ref<CalculationValue>&&);
+    WEBCORE_EXPORT explicit LengthWrapperData(uint8_t opaqueType, Ref<Calculation::Value>&&);
 
     explicit LengthWrapperData(WTF::HashTableEmptyValueType);
     explicit LengthWrapperData(WTF::HashTableDeletedValueType);
@@ -66,8 +66,8 @@ struct LengthWrapperData {
     bool hasQuirk() const { return m_hasQuirk; }
 
     float value() const { ASSERT(m_kind != LengthWrapperDataKind::Calculation); return m_floatValue; }
-    CalculationValue& calculationValue() const;
-    Ref<CalculationValue> protectedCalculationValue() const;
+    Calculation::Value& calculationValue() const;
+    Ref<Calculation::Value> protectedCalculationValue() const;
 
     struct IPCData {
         float value;

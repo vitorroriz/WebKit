@@ -39,22 +39,23 @@
 
 namespace WebCore {
 namespace Style {
+namespace Calculation {
 
-Ref<CalculationValue> CalculationValue::create(CSS::Category category, CSS::Range range, Calculation::Tree&& tree)
+Ref<Value> Value::create(CSS::Category category, CSS::Range range, Tree&& tree)
 {
-    return adoptRef(*new CalculationValue(category, range, WTFMove(tree)));
+    return adoptRef(*new Value(category, range, WTFMove(tree)));
 }
 
-CalculationValue::CalculationValue(CSS::Category category, CSS::Range range, Calculation::Tree&& tree)
+Value::Value(CSS::Category category, CSS::Range range, Tree&& tree)
     : m_category(category)
     , m_range(range)
     , m_tree(WTFMove(tree))
 {
 }
 
-CalculationValue::~CalculationValue() = default;
+Value::~Value() = default;
 
-double CalculationValue::evaluate(double percentResolutionLength) const
+double Value::evaluate(double percentResolutionLength) const
 {
     auto result = Calculation::evaluate(m_tree, percentResolutionLength);
     if (std::isnan(result))
@@ -62,26 +63,27 @@ double CalculationValue::evaluate(double percentResolutionLength) const
     return std::clamp(result, m_range.min, m_range.max);
 }
 
-Calculation::Tree CalculationValue::copyTree() const
+Tree Value::copyTree() const
 {
     return Calculation::copy(m_tree);
 }
 
-Calculation::Child CalculationValue::copyRoot() const
+Child Value::copyRoot() const
 {
     auto tree = copyTree();
     return { WTFMove(tree.root) };
 }
 
-bool CalculationValue::operator==(const CalculationValue& other) const
+bool Value::operator==(const Value& other) const
 {
     return m_tree == other.m_tree;
 }
 
-TextStream& operator<<(TextStream& ts, const CalculationValue& value)
+TextStream& operator<<(TextStream& ts, const Value& value)
 {
     return ts << "calc("_s << value.tree() << ')';
 }
 
+} // namespace Calculation
 } // namespace Style
 } // namespace WebCore
