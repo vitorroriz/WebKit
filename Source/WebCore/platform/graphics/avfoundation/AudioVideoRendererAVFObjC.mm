@@ -675,8 +675,9 @@ void AudioVideoRendererAVFObjC::setIsVisible(bool visible)
 
 void AudioVideoRendererAVFObjC::setPresentationSize(const IntSize& newSize)
 {
-    m_presentationSize = newSize;
-    updateDisplayLayerIfNeeded();
+    if (std::exchange(m_presentationSize, newSize) == newSize || !m_sampleBufferDisplayLayer)
+        return;
+    m_videoLayerManager->setPresentationSize(newSize);
 }
 
 void AudioVideoRendererAVFObjC::setShouldMaintainAspectRatio(bool shouldMaintainAspectRatio)

@@ -171,8 +171,6 @@ MediaPlayerPrivateWebM::MediaPlayerPrivateWebM(MediaPlayer* player)
         }
     });
 
-    m_renderer->renderingCanBeAcceleratedChanged(player->renderingCanBeAccelerated());
-
 #if HAVE(SPATIAL_TRACKING_LABEL)
     m_defaultSpatialTrackingLabel = player->defaultSpatialTrackingLabel();
     m_spatialTrackingLabel = player->spatialTrackingLabel();
@@ -263,6 +261,11 @@ void MediaPlayerPrivateWebM::load(const URL& url, const LoadOptions& options)
         m_parser->allowLimitedMatroska();
 
     m_renderer->setPreferences(options.videoRendererPreferences | VideoRendererPreference::PrefersDecompressionSession);
+
+    if (RefPtr player = m_player.get()) {
+        m_renderer->setPresentationSize(player->presentationSize());
+        m_renderer->renderingCanBeAcceleratedChanged(player->renderingCanBeAccelerated());
+    }
 
     doPreload();
 }

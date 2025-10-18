@@ -286,8 +286,10 @@ void MediaPlayerPrivateMediaSourceAVFObjC::load(const URL&, const LoadOptions& o
 
     m_loadOptions = options;
     m_renderer->setPreferences(options.videoRendererPreferences);
-    if (RefPtr player = m_player.get())
+    if (RefPtr player = m_player.get()) {
+        m_renderer->setPresentationSize(player->presentationSize());
         m_renderer->renderingCanBeAcceleratedChanged(player->renderingCanBeAccelerated());
+    }
 }
 
 void MediaPlayerPrivateMediaSourceAVFObjC::setResourceOwner(const ProcessIdentity& resourceOwner)
