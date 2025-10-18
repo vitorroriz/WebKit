@@ -621,6 +621,9 @@ webkit.org/b/91611 media/media-higher-prio-audio-stream.html [ Skip ]
 webkit.org/b/158836 imported/w3c/web-platform-tests/encrypted-media [ Skip ]
 ## --- End unimplemeted media tests ---
 
+## --- This tests fails, the values for width and the height of the video are zero
+webkit.org/b/299529 media/video-large-pixel-aspect-ratio.html [ Skip ]
+
 # HTML sandboxing produces two or three messages flakily.
 webkit.org/b/137368 media/video-controls-no-scripting.html [ Pass Failure ]
 

@@ -247,6 +247,37 @@ bool getSampleVideoInfo(GstSample* sample, GstVideoInfo& videoInfo)
 
     return true;
 }
+
+std::optional<WebCore::IntSize> getDisplaySize(WebCore::IntSize originalSize, int pixelAspectRatioNumerator, int pixelAspectRatioDenominator)
+{
+    WebCore::IntSize computedSize { 0, 0 };
+    unsigned width = 0, height = 0;
+
+    // Calculate DAR based on PAR and video size.
+    // Assume regular display (1:1).
+    if (!gst_video_calculate_display_ratio(&width, &height, originalSize.width(), originalSize.height(), pixelAspectRatioNumerator, pixelAspectRatioDenominator, 1, 1))
+        return std::nullopt;
+
+    // Apply DAR to original video size. This is the same behavior as in xvimagesink's setcaps function.
+    if (!(originalSize.height() % height)) {
+        GST_DEBUG("Keeping video original height");
+        width = gst_util_uint64_scale_int(originalSize.height(), width, height);
+        height = originalSize.height();
+    } else if (!(originalSize.width() % width)) {
+        GST_DEBUG("Keeping video original width");
+        height = gst_util_uint64_scale_int(originalSize.width(), height, width);
+        width = originalSize.width();
+    } else {
+        GST_DEBUG("Approximating while keeping original video height");
+        width = gst_util_uint64_scale_int(originalSize.height(), width, height);
+        height = originalSize.height();
+    }
+
+    computedSize.setWidth(width);
+    computedSize.setHeight(height);
+
+    return computedSize;
+}
 #endif
 
 std::optional<TrackID> getStreamIdFromPad(const GRefPtr<GstPad>& pad)
