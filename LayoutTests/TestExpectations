@@ -2150,10 +2150,8 @@ imported/w3c/web-platform-tests/svg/animations/switch-animation-02.html [ ImageO
 imported/w3c/web-platform-tests/svg/embedded/image-crossorigin.sub.html [ Skip ]
 imported/w3c/web-platform-tests/svg/embedded/image-embedding-svg-with-near-integral-width.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/embedded/image-fractional-width-vertical-fidelity.svg [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/interact/parsing/pointer-events-computed.svg [ Skip ]
 imported/w3c/web-platform-tests/svg/interact/scripted/tabindex-focus-flag.svg [ Skip ]
 imported/w3c/web-platform-tests/svg/linking/reftests/use-descendant-combinator-003.html [ Skip ]
-imported/w3c/web-platform-tests/svg/painting/parsing/color-interpolation-valid.svg [ Skip ]
 webkit.org/b/269522 imported/w3c/web-platform-tests/svg/linking/reftests/url-processing-whitespace-001.svg [ ImageOnlyFailure ]
 webkit.org/b/269522 imported/w3c/web-platform-tests/svg/linking/reftests/url-processing-whitespace-002.svg [ ImageOnlyFailure ]
 webkit.org/b/269522 imported/w3c/web-platform-tests/svg/linking/reftests/url-processing-whitespace-003.svg [ ImageOnlyFailure ]
@@ -2175,10 +2173,6 @@ imported/w3c/web-platform-tests/svg/animations/eventbase-non-svg-element.html [ 
 imported/w3c/web-platform-tests/svg/animations/first-interval-in-the-past-contribute.html [ Skip ]
 imported/w3c/web-platform-tests/svg/animations/first-interval-in-the-past-dont-contribute.html [ Skip ]
 imported/w3c/web-platform-tests/svg/animations/cyclic-syncbase-events.html [ Skip ]
-imported/w3c/web-platform-tests/svg/animations/onrepeat.svg [ Skip ]
-imported/w3c/web-platform-tests/svg/animations/repeat-event.svg [ Skip ]
-[ Debug ] imported/w3c/web-platform-tests/svg/painting/parsing/stroke-dashoffset-valid.svg [ Skip ]
-[ Debug ] imported/w3c/web-platform-tests/svg/painting/parsing/stroke-width-valid.svg [ Skip ]
 imported/w3c/web-platform-tests/svg/painting/marker-orient-001.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/painting/mask-containing-image-with-clip-path.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/painting/reftests/gradient-external-reference.svg [ ImageOnlyFailure ]
@@ -2212,10 +2206,6 @@ imported/w3c/web-platform-tests/svg/extensibility/foreignObject/isolation-with-s
 imported/w3c/web-platform-tests/svg/painting/reftests/display-none-mask.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/coordinate-systems/viewBox-baseVal-change-invalid.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/coordinate-systems/viewBox-synthesized-in-img-001.tentative.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/shapes/rect-03.svg [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/shapes/rect-04.svg [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/shapes/reftests/pathlength-002.svg [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/shapes/reftests/pathlength-003.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/styling/image-sizing-min-content.tentative.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/styling/nested-svg-sizing-auto.tentative.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/styling/nested-svg-sizing-calc-size.tentative.svg [ ImageOnlyFailure ]
@@ -2242,7 +2232,6 @@ webkit.org/b/201110 imported/w3c/web-platform-tests/svg/extensibility/foreignObj
 webkit.org/b/201110 imported/w3c/web-platform-tests/svg/extensibility/foreignObject/will-change-in-transformed-foreign-object.html [ Skip ]
 webkit.org/b/201946 imported/w3c/web-platform-tests/svg/extensibility/foreignObject/composited-inside-object.html [ Skip ]
 webkit.org/b/201946 imported/w3c/web-platform-tests/svg/extensibility/foreignObject/compositing-backface-visibility.html [ Skip ]
-webkit.org/b/173154 imported/w3c/web-platform-tests/svg/linking/reftests/use-keyframes.html [ Skip ]
 webkit.org/b/201992 imported/w3c/web-platform-tests/svg/linking/reftests/href-filter-element.html [ Skip ]
 
 webkit.org/b/139595 http/tests/xmlhttprequest/workers/abort-exception-assert.html [ Pass Failure Timeout ]
@@ -7735,7 +7724,6 @@ webkit.org/b/289926 imported/w3c/web-platform-tests/css/css-position/sticky/posi
 webkit.org/b/289926 imported/w3c/web-platform-tests/css/css-position/sticky/position-sticky-stacking-context-002.html [ ImageOnlyFailure ]
 webkit.org/b/289926 imported/w3c/web-platform-tests/css/css-position/sticky/position-sticky-table-pixel-rounding.html [ ImageOnlyFailure ]
 
-imported/w3c/web-platform-tests/svg/styling/use-element-animations.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/styling/use-element-transitions.tentative.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/styling/use-element-web-animations.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/styling/nested-svg-sizing.svg [ ImageOnlyFailure ]
@@ -7894,6 +7882,11 @@ imported/w3c/web-platform-tests/mixed-content/gen/top.meta/opt-in/video-tag.http
 webkit.org/b/293973 [ Debug ] http/tests/ipc/gpu-load-error-empty-user-info-crssh.html [ Skip ]
 
 webkit.org/b/297505 ipc/LocalSampleBufferDisplayLayer-LogIdentifier-data-race-uaf.html [ Skip ]
+
+# Fix upstream in WPT by increasing pixel tolerance
+imported/w3c/web-platform-tests/svg/shapes/rect-03.svg [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/svg/shapes/reftests/pathlength-002.svg [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/svg/shapes/reftests/pathlength-003.svg [ ImageOnlyFailure ]
 
 imported/w3c/web-platform-tests/css/css-pseudo/first-line-line-height-003.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-pseudo/highlight-styling-003.html [ ImageOnlyFailure ]
