@@ -5012,15 +5012,12 @@ void WebPageProxy::receivedNavigationActionPolicyDecision(WebProcessProxy& proce
     auto lockdownMode = (websitePolicies ? websitePolicies->lockdownModeEnabled() : shouldEnableLockdownMode()) ? WebProcessProxy::LockdownMode::Enabled : WebProcessProxy::LockdownMode::Disabled;
     auto enhancedSecurity = ((websitePolicies && websitePolicies->enhancedSecurityEnabled()) ? WebProcessProxy::EnhancedSecurity::Enabled : WebProcessProxy::EnhancedSecurity::Disabled);
 
-    if (processSwapRequestedByClient == ProcessSwapRequestedByClient::Yes)
-        m_browsingContextGroup = BrowsingContextGroup::create();
-
     Ref browsingContextGroup = m_browsingContextGroup;
     bool usesSameWebsiteDataStore = websiteDataStore.ptr() == &this->websiteDataStore();
     bool mainFrameSiteChanges = !m_mainFrame || Site { m_mainFrame->url() } != Site { navigation.currentRequest().url() };
     if (RefPtr targetBackForwardItem = navigation.targetItem(); targetBackForwardItem && targetBackForwardItem->browsingContextGroup() && usesSameWebsiteDataStore)
         browsingContextGroup = *targetBackForwardItem->browsingContextGroup();
-    else if (!usesSameWebsiteDataStore || (navigation.isRequestFromClientOrUserInput() && !navigation.isFromLoadData() && mainFrameSiteChanges))
+    else if (processSwapRequestedByClient == ProcessSwapRequestedByClient::Yes || !usesSameWebsiteDataStore || (navigation.isRequestFromClientOrUserInput() && !navigation.isFromLoadData() && mainFrameSiteChanges))
         browsingContextGroup = BrowsingContextGroup::create();
 
     auto continueWithProcessForNavigation = [
@@ -8617,7 +8614,7 @@ void WebPageProxy::triggerBrowsingContextGroupSwitchForNavigation(WebCore::Navig
         return completionHandler(false);
 
     m_openedMainFrameName = { };
-    m_browsingContextGroup = BrowsingContextGroup::create();
+    setBrowsingContextGroup(BrowsingContextGroup::create());
 
     RefPtr<WebProcessProxy> processForNavigation;
     RefPtr provisionalPage = m_provisionalPage;

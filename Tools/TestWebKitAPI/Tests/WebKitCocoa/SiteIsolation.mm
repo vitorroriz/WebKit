@@ -1634,16 +1634,38 @@ TEST(SiteIsolation, CrossOriginOpenerPolicy)
     [webView waitForNextPresentationUpdate];
 }
 
-TEST(SiteIsolation, CrossOriginOpenerPolicyMainFrame)
+static void testCrossOriginOpenerPolicyMainFrame(bool useSharedProcess)
 {
     HTTPServer server({
-        { "/example"_s, { { { "cross-origin-opener-policy"_s, "same-origin-allow-popups"_s } }, "hi"_s } }
+        { "/example"_s, { { { "cross-origin-opener-policy"_s, "same-origin-allow-popups"_s } }, "<iframe src='https://webkit.org/webkit'></iframe>"_s } },
+        { "/webkit"_s, { "iframe content"_s } },
     }, HTTPServer::Protocol::HttpsProxy);
 
-    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+    RetainPtr<TestWKWebView> webView;
+    RetainPtr<TestNavigationDelegate> navigationDelegate;
+
+    if (useSharedProcess)
+        std::tie(webView, navigationDelegate) = siteIsolatedViewWithSharedProcess(server);
+    else
+        std::tie(webView, navigationDelegate) = siteIsolatedViewAndDelegate(server);
 
     [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/example"]]];
     [navigationDelegate waitForDidFinishNavigation];
+    checkFrameTreesInProcesses(webView.get(), {
+        { "https://example.com"_s, { { RemoteFrame } } },
+        { RemoteFrame, { { "https://webkit.org"_s } } }
+    });
+    [webView waitForNextPresentationUpdate];
+}
+
+TEST(SiteIsolation, CrossOriginOpenerPolicyMainFrame)
+{
+    testCrossOriginOpenerPolicyMainFrame(false);
+}
+
+TEST(SiteIsolation, CrossOriginOpenerPolicyMainFrameWithSharedProcess)
+{
+    testCrossOriginOpenerPolicyMainFrame(true);
 }
 
 TEST(SiteIsolation, NavigationWithIFrames)
