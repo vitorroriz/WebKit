@@ -146,6 +146,7 @@
 		31E9BDA1247F4C62002E51A2 /* WebGLPrepareDisplayOnWebThread.mm in Sources */ = {isa = PBXBuildFile; fileRef = 31E9BDA0247F4C62002E51A2 /* WebGLPrepareDisplayOnWebThread.mm */; };
 		332F97BB2E49E07300185626 /* element-targeting-13.html in Copy Resources */ = {isa = PBXBuildFile; fileRef = 332F97BA2E49E07300185626 /* element-targeting-13.html */; };
 		333A213E2DA71F3E0023C9C6 /* anchor-element-with-invalid-href.html in Copy Resources */ = {isa = PBXBuildFile; fileRef = 333A213D2DA71F3E0023C9C6 /* anchor-element-with-invalid-href.html */; };
+		3358575B2EA3899800DF4DC4 /* textInput.pdf in Copy Resources */ = {isa = PBXBuildFile; fileRef = 3358575A2EA3899800DF4DC4 /* textInput.pdf */; };
 		33976D8324DC479B00812304 /* IndexSparseSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33976D8224DC479B00812304 /* IndexSparseSet.cpp */; };
 		33B767682CC066E400E4314F /* notEncrypted.pdf in Copy Resources */ = {isa = PBXBuildFile; fileRef = 33B767672CC066E400E4314F /* notEncrypted.pdf */; };
 		33BE5AF9137B5AAE00705813 /* MouseMoveAfterCrash_Bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33BE5AF8137B5AAE00705813 /* MouseMoveAfterCrash_Bundle.cpp */; };
@@ -2280,6 +2281,7 @@
 				A17C480E2C98E5C20023F3C7 /* text-with-deferred-script.html in Copy Resources */,
 				A17C480F2C98E5C20023F3C7 /* text-with-web-font.webarchive in Copy Resources */,
 				A17C48102C98E5C20023F3C7 /* textarea-to-input.html in Copy Resources */,
+				3358575B2EA3899800DF4DC4 /* textInput.pdf in Copy Resources */,
 				A17C48112C98E5C20023F3C7 /* TextWidth.html in Copy Resources */,
 				F4EBD7702E0B6E23000DB069 /* top-fixed-element.html in Copy Resources */,
 				A17C48122C98E5C20023F3C7 /* try-text-select-with-disabled-text-interaction.html in Copy Resources */,
@@ -2728,6 +2730,7 @@
 		333A213D2DA71F3E0023C9C6 /* anchor-element-with-invalid-href.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "anchor-element-with-invalid-href.html"; sourceTree = "<group>"; };
 		333B9CE11277F23100FEFCE3 /* PreventEmptyUserAgent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PreventEmptyUserAgent.cpp; sourceTree = "<group>"; };
 		335406B42E3BEA96008B3349 /* LegacyPDFPluginTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LegacyPDFPluginTests.mm; sourceTree = "<group>"; };
+		3358575A2EA3899800DF4DC4 /* textInput.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = textInput.pdf; sourceTree = "<group>"; };
 		3378222C2947C095002106BB /* WKWebExtensionAPIWebNavigation.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = WKWebExtensionAPIWebNavigation.mm; sourceTree = "<group>"; };
 		33976D8224DC479B00812304 /* IndexSparseSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IndexSparseSet.cpp; sourceTree = "<group>"; };
 		33B6F9E32CCB29EA009AD8FE /* WKPrinting.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKPrinting.h; sourceTree = "<group>"; };
@@ -5966,6 +5969,7 @@
 				F44C7A0420FAAE320014478C /* text-with-deferred-script.html */,
 				F40398892B2D0AC700A7AA85 /* text-with-web-font.webarchive */,
 				F41AB9951EF4692C0083FA08 /* textarea-to-input.html */,
+				3358575A2EA3899800DF4DC4 /* textInput.pdf */,
 				C22FA32C228F877A009D7988 /* TextWidth.html */,
 				F4EBD76F2E0B6E23000DB069 /* top-fixed-element.html */,
 				4952BE5C2578113900B0AEF1 /* try-text-select-with-disabled-text-interaction.html */,
