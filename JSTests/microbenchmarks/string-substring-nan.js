@@ -1,16 +1,18 @@
 function shouldBe(actual, expected) {
-    if (actual !== expected)
+    if (actual !== expected) {
         throw new Error("bad value: " + actual);
+    }
 }
 
-function test1() {
-    return "/assets/omfg".substring(0, 8) === "/assets/";
+function test() {
+    return "/assets/sakana".substring(0, NaN) === "";
 }
-noInline(test1);
+noInline(test);
 
 var count = 0;
 for (var i = 0; i < testLoopCount; ++i) {
-    if (test1())
+    if (test()) {
         ++count;
+    }
 }
 shouldBe(count, testLoopCount);
