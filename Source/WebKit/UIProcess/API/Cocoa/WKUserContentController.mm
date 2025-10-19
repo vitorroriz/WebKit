@@ -323,7 +323,7 @@ ALLOW_DEPRECATED_DECLARATIONS_BEGIN
 
 - (void)_addScriptMessageHandler:(id <WKScriptMessageHandler>)scriptMessageHandler name:(NSString *)name contentWorld:(WKContentWorld *)contentWorld
 {
-    [self _addScriptMessageHandler:scriptMessageHandler name:name userContentWorld:contentWorld._userContentWorld];
+    [self _addScriptMessageHandler:scriptMessageHandler name:name userContentWorld:retainPtr(contentWorld._userContentWorld).get()];
 }
 
 - (void)_removeScriptMessageHandlerForName:(NSString *)name userContentWorld:(_WKUserContentWorld *)userContentWorld

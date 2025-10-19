@@ -55,7 +55,7 @@ WK_OBJECT_DISABLE_DISABLE_KVC_IVAR_ACCESS;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p; webView = %p; isMainFrame = %s; request = %@>", NSStringFromClass(self.class), self, self.webView, self.mainFrame ? "YES" : "NO", self.request];
+    return [NSString stringWithFormat:@"<%@: %p; webView = %p; isMainFrame = %s; request = %@>", NSStringFromClass(self.class), self, retainPtr(self.webView).get(), self.mainFrame ? "YES" : "NO", retainPtr(self.request).get()];
 }
 
 - (BOOL)isMainFrame

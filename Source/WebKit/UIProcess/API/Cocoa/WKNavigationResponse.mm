@@ -46,7 +46,7 @@ WK_OBJECT_DISABLE_DISABLE_KVC_IVAR_ACCESS;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p; response = %@>", NSStringFromClass(self.class), self, self.response];
+    return [NSString stringWithFormat:@"<%@: %p; response = %@>", NSStringFromClass(self.class), self, retainPtr(self.response).get()];
 }
 
 - (BOOL)isForMainFrame

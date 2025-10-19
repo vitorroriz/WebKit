@@ -134,7 +134,7 @@
 #if PLATFORM(IOS_FAMILY)
         dumpCALayer(ts, [_contentView layer], true);
 #else
-        dumpCALayer(ts, self.layer, true);
+        dumpCALayer(ts, retainPtr(self.layer).get(), true);
 #endif
     }
 
