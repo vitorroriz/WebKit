@@ -445,7 +445,7 @@ ExceptionOr<void> InternalSettings::setShouldDisplayTrackKind(TrackKind kind, bo
     if (!m_page)
         return Exception { ExceptionCode::InvalidAccessError };
 #if ENABLE(VIDEO)
-    auto& captionPreferences = m_page->group().ensureCaptionPreferences();
+    auto& captionPreferences = m_page->checkedGroup()->ensureCaptionPreferences();
     switch (kind) {
     case TrackKind::Subtitles:
         captionPreferences.setUserPrefersSubtitles(enabled);
@@ -469,7 +469,7 @@ ExceptionOr<bool> InternalSettings::shouldDisplayTrackKind(TrackKind kind)
     if (!m_page)
         return Exception { ExceptionCode::InvalidAccessError };
 #if ENABLE(VIDEO)
-    auto& captionPreferences = m_page->group().ensureCaptionPreferences();
+    auto& captionPreferences = m_page->checkedGroup()->ensureCaptionPreferences();
     switch (kind) {
     case TrackKind::Subtitles:
         return captionPreferences.userPrefersSubtitles();

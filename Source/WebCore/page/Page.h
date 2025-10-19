@@ -462,6 +462,7 @@ public:
     WEBCORE_EXPORT const String& groupName() const;
 
     WEBCORE_EXPORT PageGroup& group();
+    WEBCORE_EXPORT CheckedRef<PageGroup> checkedGroup();
 
     BroadcastChannelRegistry& broadcastChannelRegistry() { return m_broadcastChannelRegistry; }
     WEBCORE_EXPORT Ref<BroadcastChannelRegistry> protectedBroadcastChannelRegistry() const;

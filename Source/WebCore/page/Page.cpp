@@ -1058,10 +1058,10 @@ void Page::goToItemForNavigationAPI(LocalFrame& frame, HistoryItem& item, FrameL
 
 void Page::setGroupName(const String& name)
 {
-    if (m_group && !m_group->name().isEmpty()) {
-        ASSERT(m_group != m_singlePageGroup.get());
+    if (CheckedPtr group = m_group.get(); group && !group->name().isEmpty()) {
+        ASSERT(group != m_singlePageGroup.get());
         ASSERT(!m_singlePageGroup);
-        m_group->removePage(*this);
+        group->removePage(*this);
     }
 
     if (name.isEmpty())
@@ -1069,7 +1069,7 @@ void Page::setGroupName(const String& name)
     else {
         m_singlePageGroup = nullptr;
         m_group = PageGroup::pageGroup(name);
-        m_group->addPage(*this);
+        CheckedRef { *m_group }->addPage(*this);
     }
 }
 
@@ -2019,6 +2019,11 @@ PageGroup& Page::group()
     if (!m_group)
         initGroup();
     return *m_group;
+}
+
+CheckedRef<PageGroup> Page::checkedGroup()
+{
+    return group();
 }
     
 void Page::setVerticalScrollElasticity(ScrollElasticity elasticity)
