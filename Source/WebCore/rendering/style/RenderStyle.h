@@ -74,7 +74,6 @@ class StyleNonInheritedData;
 class StyleRareInheritedData;
 class StyleSelfAlignmentData;
 class TextAutospace;
-class TextSpacingTrim;
 class TransformationMatrix;
 class ViewTimeline;
 class WillChangeData;
@@ -359,6 +358,7 @@ struct TextEmphasisStyle;
 struct TextIndent;
 struct TextShadow;
 struct TextSizeAdjust;
+struct TextSpacingTrim;
 struct TextUnderlineOffset;
 struct Transform;
 struct TransformOrigin;
@@ -786,7 +786,7 @@ public:
     inline float usedLetterSpacing() const;
     inline float usedWordSpacing() const;
 
-    TextSpacingTrim textSpacingTrim() const;
+    inline Style::TextSpacingTrim textSpacingTrim() const;
     TextAutospace textAutospace() const;
 
     inline float zoom() const;
@@ -1990,7 +1990,7 @@ public:
     inline void setMathShift(const MathShift&);
     inline void setMathStyle(const MathStyle&);
 
-    void setTextSpacingTrim(TextSpacingTrim v);
+    void setTextSpacingTrim(Style::TextSpacingTrim);
     void setTextAutospace(TextAutospace v);
 
     static constexpr Overflow initialOverflowX();
@@ -2030,7 +2030,7 @@ public:
     static inline AtomString initialLocale();
     static constexpr TextAutospace initialTextAutospace();
     static constexpr TextRenderingMode initialTextRendering();
-    static constexpr TextSpacingTrim initialTextSpacingTrim();
+    static constexpr Style::TextSpacingTrim initialTextSpacingTrim();
     static constexpr BreakBetween initialBreakBetween();
     static constexpr BreakInside initialBreakInside();
     static constexpr OptionSet<HangingPunctuation> initialHangingPunctuation();

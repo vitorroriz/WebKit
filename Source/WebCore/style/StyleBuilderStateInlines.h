@@ -235,11 +235,11 @@ inline void BuilderState::setFontDescriptionTextRenderingMode(TextRenderingMode 
 
 inline void BuilderState::setFontDescriptionTextSpacingTrim(TextSpacingTrim textSpacingTrim)
 {
-    if (m_style.fontDescription().textSpacingTrim() == textSpacingTrim)
+    if (m_style.fontDescription().textSpacingTrim() == textSpacingTrim.platform())
         return;
 
     m_fontDirty = true;
-    m_style.mutableFontDescriptionWithoutUpdate().setTextSpacingTrim(textSpacingTrim);
+    m_style.mutableFontDescriptionWithoutUpdate().setTextSpacingTrim(textSpacingTrim.platform());
 }
 
 inline void BuilderState::setFontDescriptionVariantCaps(FontVariantCaps variantCaps)

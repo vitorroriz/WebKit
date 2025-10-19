@@ -73,7 +73,6 @@ public:
     static void serializeImageOrientation(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, ImageOrientation);
     static void serializeContain(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<Containment>);
     static void serializeSmoothScrolling(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, bool);
-    static void serializeTextSpacingTrim(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, TextSpacingTrim);
     static void serializeTextAutospace(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, TextAutospace);
     static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
     static void serializeWillChange(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const WillChangeData*);
@@ -300,23 +299,6 @@ inline void ExtractorSerializer::serializeContain(ExtractorState& state, StringB
     appendOption(Containment::Layout, CSSValueLayout);
     appendOption(Containment::Style, CSSValueStyle);
     appendOption(Containment::Paint, CSSValuePaint);
-}
-
-inline void ExtractorSerializer::serializeTextSpacingTrim(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, TextSpacingTrim textSpacingTrim)
-{
-    switch (textSpacingTrim.type()) {
-    case TextSpacingTrim::TrimType::SpaceAll:
-        serializationForCSS(builder, context, state.style, CSS::Keyword::SpaceAll { });
-        return;
-    case TextSpacingTrim::TrimType::Auto:
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Auto { });
-        return;
-    case TextSpacingTrim::TrimType::TrimAll:
-        serializationForCSS(builder, context, state.style, CSS::Keyword::TrimAll { });
-        return;
-    }
-
-    RELEASE_ASSERT_NOT_REACHED();
 }
 
 inline void ExtractorSerializer::serializeTextAutospace(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, TextAutospace textAutospace)

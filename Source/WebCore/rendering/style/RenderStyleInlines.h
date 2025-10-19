@@ -67,6 +67,7 @@
 #include <WebCore/StyleRareInheritedData.h>
 #include <WebCore/StyleRareNonInheritedData.h>
 #include <WebCore/StyleSurroundData.h>
+#include <WebCore/StyleTextSpacingTrim.h>
 #include <WebCore/StyleTransformData.h>
 #include <WebCore/StyleVisitedLinkColorData.h>
 #include <WebCore/UnicodeBidi.h>
@@ -442,7 +443,7 @@ constexpr FontVariantPosition RenderStyle::initialFontVariantPosition() { return
 inline AtomString RenderStyle::initialLocale() { return nullAtom(); }
 constexpr TextAutospace RenderStyle::initialTextAutospace() { return { }; }
 constexpr TextRenderingMode RenderStyle::initialTextRendering() { return TextRenderingMode::AutoTextRendering; }
-constexpr TextSpacingTrim RenderStyle::initialTextSpacingTrim() { return { }; }
+constexpr Style::TextSpacingTrim RenderStyle::initialTextSpacingTrim() { return CSS::Keyword::SpaceAll { }; }
 inline Style::GridTrackSizes RenderStyle::initialGridAutoColumns() { return CSS::Keyword::Auto { }; }
 constexpr GridAutoFlow RenderStyle::initialGridAutoFlow() { return AutoFlowRow; }
 inline Style::GridTrackSizes RenderStyle::initialGridAutoRows() { return CSS::Keyword::Auto { }; }
@@ -829,6 +830,7 @@ inline TextOverflow RenderStyle::textOverflow() const { return static_cast<TextO
 inline TextSecurity RenderStyle::textSecurity() const { return static_cast<TextSecurity>(m_rareInheritedData->textSecurity); }
 inline const Style::TextShadows& RenderStyle::textShadow() const { return m_rareInheritedData->textShadow; }
 inline bool RenderStyle::hasTextShadow() const { return !textShadow().isNone(); }
+inline Style::TextSpacingTrim RenderStyle::textSpacingTrim() const { return fontDescription().textSpacingTrim(); }
 inline const Style::Color& RenderStyle::textStrokeColor() const { return m_rareInheritedData->textStrokeColor; }
 inline Style::WebkitTextStrokeWidth RenderStyle::textStrokeWidth() const { return m_rareInheritedData->textStrokeWidth; }
 inline OptionSet<TextTransform> RenderStyle::textTransform() const { return OptionSet<TextTransform>::fromRaw(m_inheritedFlags.textTransform); }

@@ -3474,6 +3474,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/text/StyleLetterSpacing.h
     style/values/text/StyleTabSize.h
     style/values/text/StyleTextIndent.h
+    style/values/text/StyleTextSpacingTrim.h
     style/values/text/StyleWordSpacing.h
 
     style/values/text-decoration/StyleTextDecorationLine.h

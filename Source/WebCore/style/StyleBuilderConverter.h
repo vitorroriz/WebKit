@@ -677,24 +677,6 @@ inline OptionSet<MarginTrimType> BuilderConverter::convertMarginTrim(BuilderStat
     return marginTrim;
 }
 
-inline TextSpacingTrim BuilderConverter::convertTextSpacingTrim(BuilderState&, const CSSValue& value)
-{
-    if (auto* primitiveValue = dynamicDowncast<CSSPrimitiveValue>(value)) {
-        switch (primitiveValue->valueID()) {
-        case CSSValueSpaceAll:
-            return TextSpacingTrim::TrimType::SpaceAll;
-        case CSSValueTrimAll:
-            return TextSpacingTrim::TrimType::TrimAll;
-        case CSSValueAuto:
-            return TextSpacingTrim::TrimType::Auto;
-        default:
-            ASSERT_NOT_REACHED();
-            break;
-        }
-    }
-    return { };
-}
-
 inline TextAutospace BuilderConverter::convertTextAutospace(BuilderState& builderState, const CSSValue& value)
 {
     if (auto* primitiveValue = dynamicDowncast<CSSPrimitiveValue>(value)) {

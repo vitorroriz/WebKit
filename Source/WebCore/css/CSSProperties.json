@@ -1389,7 +1389,7 @@
                 "font-property": true,
                 "high-priority": true,
                 "sink-priority": true,
-                "style-converter": "TextSpacingTrim",
+                "style-converter": "StyleType<TextSpacingTrim>",
                 "parser-grammar": "<<values>>",
                 "parser-grammar-comment": "Current spec grammar is 'space-all | normal | space-first | trim-start | trim-both | trim-all | auto'"
             },

@@ -138,7 +138,6 @@ public:
     static Ref<CSSValue> convertWebkitTextCombine(ExtractorState&, TextCombine);
     static Ref<CSSValue> convertImageOrientation(ExtractorState&, ImageOrientation);
     static Ref<CSSValue> convertContain(ExtractorState&, OptionSet<Containment>);
-    static Ref<CSSValue> convertTextSpacingTrim(ExtractorState&, TextSpacingTrim);
     static Ref<CSSValue> convertTextAutospace(ExtractorState&, TextAutospace);
     static Ref<CSSValue> convertPositionTryFallbacks(ExtractorState&, const FixedVector<PositionTryFallback>&);
     static Ref<CSSValue> convertWillChange(ExtractorState&, const WillChangeData*);
@@ -334,22 +333,6 @@ inline Ref<CSSValue> ExtractorConverter::convertContain(ExtractorState&, OptionS
     if (containment & Containment::Paint)
         list.append(CSSPrimitiveValue::create(CSSValuePaint));
     return CSSValueList::createSpaceSeparated(WTFMove(list));
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertTextSpacingTrim(ExtractorState&, TextSpacingTrim textSpacingTrim)
-{
-    switch (textSpacingTrim.type()) {
-    case TextSpacingTrim::TrimType::SpaceAll:
-        return CSSPrimitiveValue::create(CSSValueSpaceAll);
-    case TextSpacingTrim::TrimType::Auto:
-        return CSSPrimitiveValue::create(CSSValueAuto);
-    case TextSpacingTrim::TrimType::TrimAll:
-        return CSSPrimitiveValue::create(CSSValueTrimAll);
-    default:
-        ASSERT_NOT_REACHED();
-        break;
-    }
-    return CSSPrimitiveValue::create(CSSValueSpaceAll);
 }
 
 inline Ref<CSSValue> ExtractorConverter::convertTextAutospace(ExtractorState&, TextAutospace textAutospace)

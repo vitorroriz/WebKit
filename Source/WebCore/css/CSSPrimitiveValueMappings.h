@@ -50,6 +50,7 @@
 #include "StyleWebKitOverflowScrolling.h"
 #include "StyleWebKitTouchCallout.h"
 #include "TextFlags.h"
+#include "TextSpacing.h"
 #include "ThemeTypes.h"
 #include "TouchAction.h"
 #include "UnicodeBidi.h"
@@ -2559,6 +2560,12 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 
 #define TYPE TextEdgeUnder
 #define FOR_EACH(CASE) CASE(Text) CASE(Ideographic) CASE(IdeographicInk) CASE(Alphabetic)
+DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
+#undef TYPE
+#undef FOR_EACH
+
+#define TYPE TextSpacingTrim::TrimType
+#define FOR_EACH(CASE) CASE(SpaceAll) CASE(TrimAll) CASE(Auto)
 DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH
