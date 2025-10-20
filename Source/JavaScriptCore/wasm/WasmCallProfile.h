@@ -68,7 +68,7 @@ public:
 
     static constexpr EncodedJSValue initCallee = 0b00;
     static constexpr EncodedJSValue polymorphicCallee = 0b01;
-    static constexpr EncodedJSValue megamorphicCallee = 0b11;
+    static constexpr EncodedJSValue megamorphicCallee = 0b10;
 
 private:
     uint32_t m_count { 0 };
