@@ -371,7 +371,7 @@ void RenderDeprecatedFlexibleBox::layoutBlock(RelayoutChildren relayoutChildren,
         repaintChildrenDuringLayoutIfMoved(this, oldChildRects);
         ASSERT(view().frameView().layoutContext().layoutDeltaMatches(oldLayoutDelta));
 
-        LayoutUnit oldClientAfterEdge = clientLogicalBottom();
+        auto contentArea = flippedContentBoxRect();
         updateLogicalHeight();
 
         if (previousSize.height() != height())
@@ -384,7 +384,7 @@ void RenderDeprecatedFlexibleBox::layoutBlock(RelayoutChildren relayoutChildren,
 
         updateDescendantTransformsAfterLayout();
 
-        computeOverflow(oldClientAfterEdge);
+        computeOverflow(contentArea);
     }
 
     updateLayerTransform();
@@ -752,7 +752,7 @@ void RenderDeprecatedFlexibleBox::layoutSingleClampedFlexItem()
     setHeight(childBoxBottom + paddingBottom() + borderBottom());
     updateLogicalHeight();
 
-    computeOverflow({ });
+    computeOverflow(flippedContentBoxRect());
 
     endAndCommitUpdateScrollInfoAfterLayoutTransaction();
 
