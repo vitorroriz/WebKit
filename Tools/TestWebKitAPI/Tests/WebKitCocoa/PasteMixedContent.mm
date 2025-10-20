@@ -262,7 +262,7 @@ TEST(PasteMixedContent, PasteOneOrMoreURLs)
     NSURL *webKitURL = [NSURL URLWithString:@"https://webkit.org/"];
 
     auto webView = setUpWebView();
-    auto runTest = [webView] (NSString *description, NSString *expectedURLString, void(^writeURLsToPasteboard)(NSPasteboard *)) {
+    auto runTest = [webView] (NSString *description, NSString *expectedURLString, Function<void(NSPasteboard *)>&& writeURLsToPasteboard) {
         NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
 
         [pasteboard clearContents];

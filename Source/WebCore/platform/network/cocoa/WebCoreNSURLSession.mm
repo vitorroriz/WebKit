@@ -485,7 +485,7 @@ NS_ASSUME_NONNULL_END
 - (void)resetWithCompletionHandler:(void (^)(void))completionHandler
 {
     // FIXME: This cannot currently be implemented. We cannot guarantee that the next connection will happen on a new socket.
-    [self addDelegateOperation:[completionHandler = makeBlockPtr(completionHandler)] {
+    [self addDelegateOperation:[completionHandler = BlockPtr<void()>(completionHandler)] {
         completionHandler();
     }];
 }
@@ -493,7 +493,7 @@ NS_ASSUME_NONNULL_END
 - (void)flushWithCompletionHandler:(void (^)(void))completionHandler
 {
     // FIXME: This cannot currently be implemented. We cannot guarantee that the next connection will happen on a new socket.
-    [self addDelegateOperation:[completionHandler = makeBlockPtr(completionHandler)] {
+    [self addDelegateOperation:[completionHandler = BlockPtr<void()>(completionHandler)] {
         completionHandler();
     }];
 }
@@ -507,7 +507,7 @@ NS_ASSUME_NONNULL_END
             return task.get();
         });
     }
-    [self addDelegateOperation:[array, completionHandler = makeBlockPtr(completionHandler)] {
+    [self addDelegateOperation:^{
         completionHandler(array.get(), nil, nil);
     }];
 }
@@ -521,7 +521,7 @@ NS_ASSUME_NONNULL_END
             return task.get();
         });
     }
-    [self addDelegateOperation:[array, completionHandler = makeBlockPtr(completionHandler)] {
+    [self addDelegateOperation:^{
         completionHandler(array.get());
     }];
 }

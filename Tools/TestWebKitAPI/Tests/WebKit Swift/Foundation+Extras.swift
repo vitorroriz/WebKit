@@ -23,9 +23,6 @@
 
 import Foundation
 
-typealias String = Swift.String
-typealias URL = Foundation.URL
-
 #if compiler(>=6.2)
 
 extension RangeReplaceableCollection {

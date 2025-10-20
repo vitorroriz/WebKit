@@ -1804,7 +1804,7 @@ static void parallelPromiseResolveTest()
         auto* startedThreadPtr = &startedThread;
 
         JSValue *promise = [JSValue valueWithNewPromiseInContext:context fromExecutor:^(JSValue *resolve, JSValue *) {
-            thread = Thread::create("async thread"_s, [shouldResolveSoonPtr, startedThreadPtr, resolve] {
+            thread = Thread::create("async thread"_s, ^() {
                 startedThreadPtr->store(true);
                 while (!shouldResolveSoonPtr->load()) { }
                 [resolve callWithArguments:@[[NSNull null]]];

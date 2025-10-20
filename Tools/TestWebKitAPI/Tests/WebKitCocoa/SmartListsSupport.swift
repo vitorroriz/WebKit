@@ -37,7 +37,7 @@ extension SmartListsTestSelectionConfiguration {
     }
 
     @objc(caretSelectionWithPath:offset:)
-    class func caretSelection(withPath path: String, offset: Int) -> SmartListsTestSelectionConfiguration {
+    open class func caretSelection(withPath path: String, offset: Int) -> SmartListsTestSelectionConfiguration {
         SmartListsTestSelectionConfiguration(path: path, offset: offset)
     }
 }
@@ -61,10 +61,10 @@ extension SmartListsTestConfiguration {
 @objc
 @implementation
 extension SmartListsTestResult {
-    let expectedRenderTree: String?
-    let actualRenderTree: String?
-    let expectedHTML: String?
-    let actualHTML: String?
+    open let expectedRenderTree: String?
+    open let actualRenderTree: String?
+    open let expectedHTML: String?
+    open let actualHTML: String?
 
     fileprivate init(expectedRenderTree: String?, actualRenderTree: String?, expectedHTML: String?, actualHTML: String?) {
         self.expectedRenderTree = expectedRenderTree
