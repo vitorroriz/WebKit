@@ -465,15 +465,9 @@ imported/w3c/web-platform-tests/editing/run/undo-redo.html [ Skip ]
 # Failing as we disable setting kAUVoiceIOProperty_MuteOutput
 http/wpt/mediasession/voiceActivityDetection.html [ Failure ]
 
-# Newly imported service worker tests that are timing out.
-imported/w3c/web-platform-tests/service-workers/service-worker/dedicated-worker-service-worker-interception.https.html [ Skip ]
-webkit.org/b/201665 imported/w3c/web-platform-tests/service-workers/service-worker/fetch-canvas-tainting-video.https.html [ Skip ]
-imported/w3c/web-platform-tests/service-workers/service-worker/multipart-image.https.html [ Skip ]
-imported/w3c/web-platform-tests/service-workers/service-worker/worker-in-sandboxed-iframe-by-csp-fetch-event.https.html [ Skip ]
-imported/w3c/web-platform-tests/service-workers/service-worker/fetch-event-worker-timing-frame.tentative.https.html [ Skip ]
-imported/w3c/web-platform-tests/service-workers/service-worker/claim-worker-fetch.https.html [ Skip ]
-imported/w3c/web-platform-tests/service-workers/service-worker/client-navigate.https.html [ Skip ]
-imported/w3c/web-platform-tests/service-workers/service-worker/update-bytecheck-cors-import.https.html [ Skip ]
+# Imported service worker tests that are flaky.
+imported/w3c/web-platform-tests/service-workers/service-worker/client-navigate.https.html [ Pass Failure ]
+imported/w3c/web-platform-tests/service-workers/service-worker/multipart-image.https.html [ Pass Failure ]
 
 # This crash test is a consistent timeout.
 imported/w3c/web-platform-tests/service-workers/cache-storage/crashtests/cache-response-clone.https.html [ Skip ]
