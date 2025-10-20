@@ -8290,3 +8290,11 @@ webkit.org/b/300946 http/tests/site-isolation/key-events.html [ Pass Failure ]
 fast/forms/auto-fill-button/input-strong-password-auto-fill-button.html [ Pass Failure ]
 fast/forms/datalist/datalist-textinput-appearance.html [ Pass Failure ]
 fast/forms/datalist/datalist-searchinput-appearance.html [ Pass Failure ]
+
+# https://bugs.webkit.org/show_bug.cgi?id=301131 [ iOS 26 ] 6x tests (layout-tests) are constant text failures 
+fast/html/details-no-summary4.html [ Pass Failure ]
+fast/html/details-open-javascript.html [ Pass Failure ]
+fast/html/details-open2.html [ Pass Failure ]
+fast/html/details-open4.html [ Pass Failure ]
+fast/html/details-replace-summary-child.html [ Pass Failure ]
+fast/html/details-replace-text.html [ Pass Failure ]
