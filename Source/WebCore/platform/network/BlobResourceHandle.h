@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 Google Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -34,6 +35,7 @@
 #include <WebCore/FileStreamClient.h>
 #include <WebCore/HTTPParsers.h>
 #include <WebCore/ResourceHandle.h>
+#include <wtf/Variant.h>
 #include <wtf/Vector.h>
 #include <wtf/text/WTFString.h>
 
@@ -46,9 +48,7 @@ class ResourceHandleClient;
 class ResourceRequest;
 class BlobDataItem;
 
-// FIXME: Move even more logic from BlobResourceHandle / NetworkDataTaskBlob to
-// BlobResourceHandleBase and make data members private.
-class BlobResourceHandleBase {
+class BlobResourceHandleBase : public FileStreamClient {
 public:
     enum class Error {
         NoError = 0,
@@ -58,77 +58,111 @@ public:
         NotReadableError = 4,
         MethodNotAllowed = 5
     };
-protected:
-    WEBCORE_EXPORT BlobResourceHandleBase(RefPtr<BlobData>&& = nullptr);
-    ~BlobResourceHandleBase() = default;
 
-    WEBCORE_EXPORT std::optional<Error> seek();
-    WEBCORE_EXPORT std::optional<Error> adjustAndValidateRangeBounds();
+protected:
+    WEBCORE_EXPORT BlobResourceHandleBase(bool async = true, RefPtr<BlobData>&& = nullptr);
+    WEBCORE_EXPORT virtual ~BlobResourceHandleBase();
+
+    WEBCORE_EXPORT void start();
+    WEBCORE_EXPORT void readAsync();
+    WEBCORE_EXPORT void closeFileIfOpen();
+    bool isFileOpen() const { return m_isFileOpen; }
+    void setIsFileOpen(bool isOpen) { m_isFileOpen = isOpen; }
+    bool async() const { return std::holds_alternative<std::unique_ptr<AsyncFileStream>>(m_stream); }
+    uint64_t totalSize() { return m_totalSize; }
+    uint64_t totalRemainingSize() const { return m_totalRemainingSize; }
+    uint64_t currentItemReadSize() const { return m_currentItemReadSize; }
+    void setCurrentItemReadSize(uint64_t size) { m_currentItemReadSize = size; }
+    void decrementTotalRemainingSizeBy(uint64_t value) { m_totalRemainingSize -= value; }
+    uint64_t readItemCount() const { return m_readItemCount; }
+    void incrementReadItemCount() { ++m_readItemCount; }
+    uint64_t lengthOfItemBeingRead() const { return m_itemLengthList[m_readItemCount]; }
+    WEBCORE_EXPORT void clearAsyncStream();
+    WEBCORE_EXPORT BlobData* blobData() const;
+    FileStream* syncStream() const;
+    AsyncFileStream* asyncStream() const;
+    Vector<uint8_t>& buffer() { return m_buffer; }
+    const Vector<uint8_t>& buffer() const { return m_buffer; }
+
+private:
+    void getSizeForNext();
+    std::optional<Error> seek();
+    std::optional<Error> adjustAndValidateRangeBounds();
+    bool consumeData(std::span<const uint8_t>);
+    bool readDataAsync(const BlobDataItem&);
+    void readFileAsync(const BlobDataItem&);
+    void dispatchDidReceiveResponse();
+    void doStart();
+
+    virtual void didReceiveResponse(ResourceResponse&&) = 0;
+    virtual void didFail(Error) = 0;
+    virtual bool didReceiveData(std::span<const uint8_t>) = 0;
+    virtual void didFinish() = 0;
+    virtual bool erroredOrAborted() const = 0;
+    virtual bool shouldAbortDispatchDidReceiveResponse() { return false; }
+    virtual const ResourceRequest& firstRequest() const = 0;
+    virtual void clearStream() { }
+
+    // FileStreamClient methods.
+    WEBCORE_EXPORT void didOpen(bool) final;
+    WEBCORE_EXPORT void didGetSize(long long) final;
+    WEBCORE_EXPORT void didRead(int) final;
 
     RefPtr<BlobData> m_blobData;
-    bool m_isRangeRequest { false };
+    // For Async or Sync loading.
+    Variant<std::unique_ptr<AsyncFileStream>, std::unique_ptr<FileStream>> m_stream;
     std::optional<HTTPRange> m_range;
+    Vector<uint8_t> m_buffer;
     Vector<uint64_t> m_itemLengthList;
     uint64_t m_totalSize { 0 };
     uint64_t m_totalRemainingSize { 0 };
     uint64_t m_currentItemReadSize { 0 };
     unsigned m_readItemCount { 0 };
+    unsigned m_sizeItemCount { 0 };
+    bool m_isFileOpen { false };
+    bool m_isRangeRequest { false };
 };
 
-class BlobResourceHandle final : public BlobResourceHandleBase, public FileStreamClient, public ResourceHandle  {
+class BlobResourceHandle final : public BlobResourceHandleBase, public ResourceHandle  {
 public:
     static Ref<BlobResourceHandle> createAsync(BlobData*, const ResourceRequest&, ResourceHandleClient*);
 
     static void loadResourceSynchronously(BlobData*, const ResourceRequest&, ResourceError&, ResourceResponse&, Vector<uint8_t>& data);
 
-    void start();
+    using BlobResourceHandleBase::start;
     int readSync(std::span<uint8_t>);
 
     bool aborted() const { return m_aborted; }
 
     bool isBlobResourceHandle() const final { return true; }
 
+    // FileStreamClient.
+    void ref() const final { ResourceHandle::ref(); }
+    void deref() const final { ResourceHandle::deref(); }
+
 private:
     BlobResourceHandle(BlobData*, const ResourceRequest&, ResourceHandleClient*, bool async);
     virtual ~BlobResourceHandle();
 
-    // FileStreamClient methods.
-    void didGetSize(long long) override;
-    void didOpen(bool) override;
-    void didRead(int) override;
-
     // ResourceHandle methods.
-    void cancel() override;
+    void cancel() final;
+
+    // BlobResourceHandleBase.
+    bool didReceiveData(std::span<const uint8_t>) final;
+    void didReceiveResponse(ResourceResponse&&) final;
+    void didFail(Error) final;
+    bool erroredOrAborted() const final { return m_aborted || m_errorCode != Error::NoError; }
+    bool shouldAbortDispatchDidReceiveResponse() final;
+    void didFinish() final;
+    const ResourceRequest& firstRequest() const final { return ResourceHandle::firstRequest(); }
 
     void doStart();
-    void getSizeForNext();
-    void consumeData(std::span<const uint8_t>);
-    void failed(Error);
-
-    void readAsync();
-    void readDataAsync(const BlobDataItem&);
-    void readFileAsync(const BlobDataItem&);
 
     int readDataSync(const BlobDataItem&, std::span<uint8_t>);
     int readFileSync(const BlobDataItem&, std::span<uint8_t>);
 
-    void notifyResponse();
-    void notifyResponseOnSuccess();
-    void notifyResponseOnError();
-    void notifyReceiveData(std::span<const uint8_t>);
-    void notifyFail(Error);
-    void notifyFinish();
-
-    bool erroredOrAborted() const { return m_aborted || m_errorCode != Error::NoError; }
-
-    bool m_async;
-    std::unique_ptr<AsyncFileStream> m_asyncStream; // For asynchronous loading.
-    std::unique_ptr<FileStream> m_stream; // For synchronous loading.
-    Vector<uint8_t> m_buffer;
     Error m_errorCode { Error::NoError };
     bool m_aborted { false };
-    unsigned m_sizeItemCount { 0 };
-    bool m_fileOpened { false };
 };
 
 } // namespace WebCore
