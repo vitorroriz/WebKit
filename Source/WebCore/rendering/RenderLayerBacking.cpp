@@ -1088,7 +1088,7 @@ void RenderLayerBacking::updateAllowsBackingStoreDetaching(bool allowDetachingFo
             m_scrolledContentsLayer->setAllowsBackingStoreDetaching(allowDetaching);
     };
 
-    if (!m_owningLayer.behavesAsFixed() && !m_owningLayer.behavesAsSticky()) {
+    if (!m_owningLayer.behavesAsFixed()) {
         setAllowsBackingStoreDetaching(true);
         return;
     }
