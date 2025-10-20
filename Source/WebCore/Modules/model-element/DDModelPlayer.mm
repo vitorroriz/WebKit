@@ -162,9 +162,6 @@ void DDModelPlayer::load(Model& modelSource, LayoutSize size)
         Ref protectedThis = Ref { *this };
         [m_modelLoader setCallbacksWithModelAddedCallback:^(WebAddMeshRequest *addRequest) {
             ensureOnMainThreadWithProtectedThis([addRequest] (Ref<DDModelPlayer> protectedThis) {
-                if (RefPtr client = protectedThis->m_client.get())
-                    client->didFinishLoading(protectedThis.get());
-
                 if (protectedThis->m_currentModel)
                     protectedThis->m_currentModel->addMesh(toCpp(addRequest));
 
@@ -176,6 +173,9 @@ void DDModelPlayer::load(Model& modelSource, LayoutSize size)
                     protectedThis->m_currentModel->update(toCpp(updateRequest));
 
                 [protectedThis->m_modelLoader requestCompleted:updateRequest];
+
+                if (RefPtr client = protectedThis->m_client.get())
+                    client->didFinishLoading(protectedThis.get());
             });
         } textureAddedCallback:^(WebDDAddTextureRequest *addTexture) {
             ensureOnMainThreadWithProtectedThis([addTexture] (Ref<DDModelPlayer> protectedThis) {
