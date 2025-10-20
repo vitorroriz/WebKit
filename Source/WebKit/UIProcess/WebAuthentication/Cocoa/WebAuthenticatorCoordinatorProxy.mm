@@ -616,10 +616,10 @@ void WebAuthenticatorCoordinatorProxy::performRequest(WebAuthenticationRequestDa
             } else if ([auth.get().credential isKindOfClass:getASAuthorizationPlatformPublicKeyCredentialRegistrationClassSingleton()]) {
                 response.isAuthenticatorAttestationResponse = true;
                 auto credential = retainPtr((ASAuthorizationPlatformPublicKeyCredentialRegistration *)auth.get().credential);
-                response.rawId = toArrayBuffer(credential.get().credentialID);
-                response.attestationObject = toArrayBuffer(credential.get().rawAttestationObject);
+                response.rawId = toArrayBuffer(retainPtr(credential.get().credentialID).get());
+                response.attestationObject = toArrayBuffer(retainPtr(credential.get().rawAttestationObject).get());
                 response.transports = { AuthenticatorTransport::Internal, AuthenticatorTransport::Hybrid };
-                response.clientDataJSON = toArrayBuffer(credential.get().rawClientDataJSON);
+                response.clientDataJSON = toArrayBuffer(retainPtr(credential.get().rawClientDataJSON).get());
 
                 attachment = fromASAuthorizationPublicKeyCredentialAttachment(credential.get().attachment);
 
@@ -636,9 +636,9 @@ void WebAuthenticatorCoordinatorProxy::performRequest(WebAuthenticationRequestDa
                     RefPtr<ArrayBuffer> first = nullptr;
                     RefPtr<ArrayBuffer> second = nullptr;
                     if (credential.get().prf.first)
-                        first = toArrayBuffer(credential.get().prf.first);
+                        first = toArrayBuffer(retainPtr(credential.get().prf.first).get());
                     if (credential.get().prf.second)
-                        second = toArrayBuffer(credential.get().prf.second);
+                        second = toArrayBuffer(retainPtr(credential.get().prf.second).get());
                     if (first)
                         extensionOutputs.prf = { credential.get().prf.isSupported, { { first, second } } };
                     else
@@ -650,11 +650,11 @@ void WebAuthenticatorCoordinatorProxy::performRequest(WebAuthenticationRequestDa
                     response.extensionOutputs = extensionOutputs;
             } else if ([auth.get().credential isKindOfClass:getASAuthorizationPlatformPublicKeyCredentialAssertionClassSingleton()]) {
                 auto credential = retainPtr((ASAuthorizationPlatformPublicKeyCredentialAssertion *)auth.get().credential);
-                response.rawId = toArrayBuffer(credential.get().credentialID);
-                response.authenticatorData = toArrayBuffer(credential.get().rawAuthenticatorData);
-                response.signature = toArrayBuffer(credential.get().signature);
-                response.userHandle = toArrayBufferNilIfEmpty(credential.get().userID);
-                response.clientDataJSON = toArrayBuffer(credential.get().rawClientDataJSON);
+                response.rawId = toArrayBuffer(retainPtr(credential.get().credentialID).get());
+                response.authenticatorData = toArrayBuffer(retainPtr(credential.get().rawAuthenticatorData).get());
+                response.signature = toArrayBuffer(retainPtr(credential.get().signature).get());
+                response.userHandle = toArrayBufferNilIfEmpty(retainPtr(credential.get().userID).get());
+                response.clientDataJSON = toArrayBuffer(retainPtr(credential.get().rawClientDataJSON).get());
 
                 attachment = fromASAuthorizationPublicKeyCredentialAttachment(credential.get().attachment);
 
@@ -664,17 +664,17 @@ void WebAuthenticatorCoordinatorProxy::performRequest(WebAuthenticationRequestDa
                     hasExtensionOutput = true;
                     RefPtr<ArrayBuffer> protector = nullptr;
                     if (credential.get().largeBlob.readData)
-                        protector = toArrayBuffer(credential.get().largeBlob.readData);
+                        protector = toArrayBuffer(retainPtr(credential.get().largeBlob.readData).get());
                     extensionOutputs.largeBlob = { std::nullopt, protector, credential.get().largeBlob.didWrite };
                 }
 
 #if HAVE(WEB_AUTHN_PRF_API)
                 if ([credential respondsToSelector:@selector(prf)] && credential.get().prf) {
                     hasExtensionOutput = true;
-                    RefPtr<ArrayBuffer> first = toArrayBuffer(credential.get().prf.first);
+                    RefPtr<ArrayBuffer> first = toArrayBuffer(retainPtr(credential.get().prf.first).get());
                     RefPtr<ArrayBuffer> second = nullptr;
                     if (credential.get().prf.second)
-                        second = toArrayBuffer(credential.get().prf.second);
+                        second = toArrayBuffer(retainPtr(credential.get().prf.second).get());
                     extensionOutputs.prf = { std::nullopt, { { first, second } } };
                 }
 #endif
@@ -684,21 +684,21 @@ void WebAuthenticatorCoordinatorProxy::performRequest(WebAuthenticationRequestDa
             } else if ([auth.get().credential isKindOfClass:getASAuthorizationSecurityKeyPublicKeyCredentialRegistrationClassSingleton()]) {
                 auto credential = retainPtr((ASAuthorizationSecurityKeyPublicKeyCredentialRegistration *)auth.get().credential);
                 response.isAuthenticatorAttestationResponse = true;
-                response.rawId = toArrayBuffer(credential.get().credentialID);
-                response.attestationObject = toArrayBuffer(credential.get().rawAttestationObject);
+                response.rawId = toArrayBuffer(retainPtr(credential.get().credentialID).get());
+                response.attestationObject = toArrayBuffer(retainPtr(credential.get().rawAttestationObject).get());
                 if ([credential respondsToSelector:@selector(transports)])
-                    response.transports = toTransports(credential.get().transports);
+                    response.transports = toTransports(retainPtr(credential.get().transports).get());
                 else
                     response.transports = { };
-                response.clientDataJSON = toArrayBuffer(credential.get().rawClientDataJSON);
+                response.clientDataJSON = toArrayBuffer(retainPtr(credential.get().rawClientDataJSON).get());
                 attachment = AuthenticatorAttachment::CrossPlatform;
             } else if ([auth.get().credential isKindOfClass:getASAuthorizationSecurityKeyPublicKeyCredentialAssertionClassSingleton()]) {
                 auto credential = retainPtr((ASAuthorizationSecurityKeyPublicKeyCredentialAssertion *)auth.get().credential);
-                response.rawId = toArrayBuffer(credential.get().credentialID);
-                response.authenticatorData = toArrayBuffer(credential.get().rawAuthenticatorData);
-                response.signature = toArrayBuffer(credential.get().signature);
-                response.userHandle = toArrayBufferNilIfEmpty(credential.get().userID);
-                response.clientDataJSON = toArrayBuffer(credential.get().rawClientDataJSON);
+                response.rawId = toArrayBuffer(retainPtr(credential.get().credentialID).get());
+                response.authenticatorData = toArrayBuffer(retainPtr(credential.get().rawAuthenticatorData).get());
+                response.signature = toArrayBuffer(retainPtr(credential.get().signature).get());
+                response.userHandle = toArrayBufferNilIfEmpty(retainPtr(credential.get().userID).get());
+                response.clientDataJSON = toArrayBuffer(retainPtr(credential.get().rawClientDataJSON).get());
                 attachment = AuthenticatorAttachment::CrossPlatform;
                 if ([credential respondsToSelector:@selector(appID)]) {
                     AuthenticationExtensionsClientOutputs extensionOutputs;
@@ -1052,14 +1052,14 @@ static inline void continueAfterRequest(RetainPtr<id <ASCCredentialProtocol>> cr
         response.isAuthenticatorAttestationResponse = true;
 
         ASCPlatformPublicKeyCredentialRegistration *registrationCredential = credential.get();
-        response.rawId = toArrayBuffer(registrationCredential.credentialID);
-        response.attestationObject = toArrayBuffer(registrationCredential.attestationObject);
-        response.clientDataJSON = toArrayBuffer(registrationCredential.rawClientDataJSON);
+        response.rawId = toArrayBuffer(retainPtr(registrationCredential.credentialID).get());
+        response.attestationObject = toArrayBuffer(retainPtr(registrationCredential.attestationObject).get());
+        response.clientDataJSON = toArrayBuffer(retainPtr(registrationCredential.rawClientDataJSON).get());
         rawAttachment = registrationCredential.attachment;
         if ([registrationCredential respondsToSelector:@selector(transports)])
-            response.transports = toAuthenticatorTransports(registrationCredential.transports);
+            response.transports = toAuthenticatorTransports(retainPtr(registrationCredential.transports).get());
         if ([registrationCredential respondsToSelector:@selector(extensionOutputsCBOR)])
-            response.extensionOutputs = toExtensionOutputs(registrationCredential.extensionOutputsCBOR);
+            response.extensionOutputs = toExtensionOutputs(retainPtr(registrationCredential.extensionOutputsCBOR).get());
     } else if ([credential isKindOfClass:getASCSecurityKeyPublicKeyCredentialRegistrationClassSingleton()]) {
         response.isAuthenticatorAttestationResponse = true;
 
@@ -1076,14 +1076,14 @@ static inline void continueAfterRequest(RetainPtr<id <ASCCredentialProtocol>> cr
         response.isAuthenticatorAttestationResponse = false;
 
         ASCPlatformPublicKeyCredentialAssertion *assertionCredential = credential.get();
-        response.rawId = toArrayBuffer(assertionCredential.credentialID);
-        response.authenticatorData = toArrayBuffer(assertionCredential.authenticatorData);
-        response.signature = toArrayBuffer(assertionCredential.signature);
-        response.userHandle = toArrayBufferNilIfEmpty(assertionCredential.userHandle);
-        response.clientDataJSON = toArrayBuffer(assertionCredential.rawClientDataJSON);
+        response.rawId = toArrayBuffer(retainPtr(assertionCredential.credentialID).get());
+        response.authenticatorData = toArrayBuffer(retainPtr(assertionCredential.authenticatorData).get());
+        response.signature = toArrayBuffer(retainPtr(assertionCredential.signature).get());
+        response.userHandle = toArrayBufferNilIfEmpty(retainPtr(assertionCredential.userHandle).get());
+        response.clientDataJSON = toArrayBuffer(retainPtr(assertionCredential.rawClientDataJSON).get());
         rawAttachment = assertionCredential.attachment;
         if ([assertionCredential respondsToSelector:@selector(extensionOutputsCBOR)])
-            response.extensionOutputs = toExtensionOutputs(assertionCredential.extensionOutputsCBOR);
+            response.extensionOutputs = toExtensionOutputs(retainPtr(assertionCredential.extensionOutputsCBOR).get());
     } else if ([credential isKindOfClass:getASCSecurityKeyPublicKeyCredentialAssertionClassSingleton()]) {
         response.isAuthenticatorAttestationResponse = false;
 

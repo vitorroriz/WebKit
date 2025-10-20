@@ -440,7 +440,7 @@ static BOOL shouldShowDividersBetweenCells(const Vector<WebCore::DataListSuggest
     _table = nil;
     _scrollView = nil;
 
-    [[_presentingView window] removeChildWindow:_enclosingWindow.get()];
+    [retainPtr([_presentingView window]) removeChildWindow:_enclosingWindow.get()];
     [_enclosingWindow close];
     _enclosingWindow = nil;
 
@@ -478,9 +478,9 @@ static BOOL shouldShowDividersBetweenCells(const Vector<WebCore::DataListSuggest
 - (void)showSuggestionsDropdown:(WebKit::WebDataListSuggestionsDropdownMac&)dropdown
 {
     _dropdown = dropdown;
-    [[_enclosingWindow contentView] addSubview:_scrollView.get()];
+    [retainPtr([_enclosingWindow contentView]) addSubview:_scrollView.get()];
     [_table reload];
-    [[_presentingView window] addChildWindow:_enclosingWindow.get() ordered:NSWindowAbove];
+    [retainPtr([_presentingView window]) addChildWindow:_enclosingWindow.get() ordered:NSWindowAbove];
     [_scrollView flashScrollers];
 
     // Notify accessibility clients of datalist becoming visible.

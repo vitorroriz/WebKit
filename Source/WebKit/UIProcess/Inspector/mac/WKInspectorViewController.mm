@@ -154,32 +154,32 @@ static void* const safeAreaInsetsKVOContext = (void*)&safeAreaInsetsKVOContext;
     }
 #endif
 
-    WKPreferences *preferences = configuration.get().preferences;
-    preferences._allowFileAccessFromFileURLs = YES;
+    RetainPtr<WKPreferences> preferences = configuration.get().preferences;
+    preferences.get()._allowFileAccessFromFileURLs = YES;
     [configuration _setAllowUniversalAccessFromFileURLs:YES];
     [configuration _setAllowTopNavigationToDataURLs:YES];
-    preferences._storageBlockingPolicy = _WKStorageBlockingPolicyAllowAll;
-    preferences._javaScriptRuntimeFlags = 0;
+    preferences.get()._storageBlockingPolicy = _WKStorageBlockingPolicyAllowAll;
+    preferences.get()._javaScriptRuntimeFlags = 0;
 
 #ifndef NDEBUG
     // Allow developers to inspect the Web Inspector in debug builds without changing settings.
-    preferences._developerExtrasEnabled = YES;
-    preferences._logsPageMessagesToSystemConsoleEnabled = YES;
+    preferences.get()._developerExtrasEnabled = YES;
+    preferences.get()._logsPageMessagesToSystemConsoleEnabled = YES;
 #endif
 
-    preferences._diagnosticLoggingEnabled = YES;
+    preferences.get()._diagnosticLoggingEnabled = YES;
 
     // Disable Site Isolation for Web Inspector View.
-    preferences._siteIsolationEnabled = NO;
+    preferences.get()._siteIsolationEnabled = NO;
 
     [_configuration applyToWebViewConfiguration:configuration.get()];
 
     RetainPtr delegate = _delegate.get();
     if (!!delegate && [delegate respondsToSelector:@selector(inspectorViewControllerInspectorIsUnderTest:)]) {
         if ([delegate inspectorViewControllerInspectorIsUnderTest:self]) {
-            preferences._hiddenPageDOMTimerThrottlingEnabled = NO;
-            preferences._pageVisibilityBasedProcessSuppressionEnabled = NO;
-            preferences.inactiveSchedulingPolicy = WKInactiveSchedulingPolicyNone;
+            preferences.get()._hiddenPageDOMTimerThrottlingEnabled = NO;
+            preferences.get()._pageVisibilityBasedProcessSuppressionEnabled = NO;
+            preferences.get().inactiveSchedulingPolicy = WKInactiveSchedulingPolicyNone;
         }
     }
 
@@ -187,7 +187,7 @@ static void* const safeAreaInsetsKVOContext = (void*)&safeAreaInsetsKVOContext;
     // If not specified or the inspection level is >1, use the default strategy.
     // This ensures that Inspector^2 cannot be affected by client (mis)configuration.
     ALLOW_DEPRECATED_DECLARATIONS_BEGIN
-    auto* customProcessPool = configuration.get().processPool;
+    RetainPtr<WKProcessPool> customProcessPool = configuration.get().processPool;
     ALLOW_DEPRECATED_DECLARATIONS_END
     auto inspectorLevel = WebKit::inspectorLevelForPage(inspectedPage.get());
     auto useDefaultProcessPool = inspectorLevel > 1 || !customProcessPool;
@@ -299,8 +299,8 @@ static void* const safeAreaInsetsKVOContext = (void*)&safeAreaInsetsKVOContext;
 - (NSMenu *)_webView:(WKWebView *)webView contextMenu:(NSMenu *)menu forElement:(_WKContextMenuElementInfo *)element
 {
     for (NSInteger i = menu.numberOfItems - 1; i >= 0; --i) {
-        NSMenuItem *item = [menu itemAtIndex:i];
-        switch (item.tag) {
+        RetainPtr<NSMenuItem> item = [menu itemAtIndex:i];
+        switch (item.get().tag) {
         case kWKContextMenuItemTagOpenLinkInNewWindow:
         case kWKContextMenuItemTagOpenImageInNewWindow:
         case kWKContextMenuItemTagOpenFrameInNewWindow:
