@@ -181,7 +181,6 @@ enum class RubyAlign : uint8_t;
 enum class RubyOverhang : bool;
 enum class ScrollAxis : uint8_t;
 enum class ScrollSnapStop : bool;
-enum class ScrollbarWidth : uint8_t;
 enum class SpeakAs : uint8_t;
 enum class StyleAppearance : uint8_t;
 enum class StyleColorOptions : uint8_t;
@@ -347,6 +346,7 @@ struct ScrollSnapType;
 struct ScrollTimelines;
 struct ScrollbarColor;
 struct ScrollbarGutter;
+struct ScrollbarWidth;
 struct ShapeMargin;
 struct ShapeOutside;
 struct StrokeMiterlimit;
@@ -1204,7 +1204,7 @@ public:
     Color usedScrollbarTrackColor() const;
     inline const Style::ScrollbarColor& scrollbarColor() const;
     inline const Style::ScrollbarGutter& scrollbarGutter() const;
-    inline ScrollbarWidth scrollbarWidth() const;
+    inline Style::ScrollbarWidth scrollbarWidth() const;
 
 #if ENABLE(TOUCH_EVENTS)
     inline Style::Color tapHighlightColor() const;
@@ -1723,7 +1723,7 @@ public:
 
     inline void setScrollbarColor(Style::ScrollbarColor&&);
     inline void setScrollbarGutter(Style::ScrollbarGutter&&);
-    inline void setScrollbarWidth(ScrollbarWidth);
+    inline void setScrollbarWidth(Style::ScrollbarWidth);
 
 #if ENABLE(TOUCH_EVENTS)
     inline void setTapHighlightColor(Style::Color&&);
@@ -2252,7 +2252,7 @@ public:
 
     static inline Style::ScrollbarColor initialScrollbarColor();
     static constexpr Style::ScrollbarGutter initialScrollbarGutter();
-    static constexpr ScrollbarWidth initialScrollbarWidth();
+    static constexpr Style::ScrollbarWidth initialScrollbarWidth();
 
 #if ENABLE(APPLE_PAY)
     static constexpr ApplePayButtonStyle initialApplePayButtonStyle();

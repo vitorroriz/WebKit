@@ -282,7 +282,7 @@ inline void RenderStyle::setViewTimelineNames(Style::ProgressTimelineNames&& nam
 inline void RenderStyle::setTimelineScope(const NameScope& scope) { SET_NESTED(m_nonInheritedData, rareData, timelineScope, scope); }
 inline void RenderStyle::setScrollbarColor(Style::ScrollbarColor&& color) { SET(m_rareInheritedData, scrollbarColor, WTFMove(color)); }
 inline void RenderStyle::setScrollbarGutter(Style::ScrollbarGutter&& gutter) { SET_NESTED(m_nonInheritedData, rareData, scrollbarGutter, WTFMove(gutter)); }
-inline void RenderStyle::setScrollbarWidth(ScrollbarWidth width) { SET_NESTED(m_nonInheritedData, rareData, scrollbarWidth, static_cast<unsigned>(width)); }
+inline void RenderStyle::setScrollbarWidth(Style::ScrollbarWidth width) { SET_NESTED(m_nonInheritedData, rareData, scrollbarWidth, static_cast<unsigned>(width.value)); }
 inline void RenderStyle::setShapeImageThreshold(Style::ShapeImageThreshold shapeImageThreshold) { SET_NESTED(m_nonInheritedData, rareData, shapeImageThreshold, shapeImageThreshold); }
 inline void RenderStyle::setShapeMargin(Style::ShapeMargin&& shapeMargin) { SET_NESTED(m_nonInheritedData, rareData, shapeMargin, WTFMove(shapeMargin)); }
 inline void RenderStyle::setShapeOutside(Style::ShapeOutside&& shapeOutside) { SET_NESTED(m_nonInheritedData, rareData, shapeOutside, WTFMove(shapeOutside)); }

@@ -11861,7 +11861,7 @@
             ],
             "codegen-properties": {
                 "settings-flag": "cssScrollbarWidthEnabled",
-                "style-builder-converter": "ScrollbarWidth",
+                "style-converter": "StyleType<ScrollbarWidth>",
                 "parser-grammar": "<<values>>"
             },
             "specification": {

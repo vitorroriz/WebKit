@@ -63,6 +63,7 @@
 #include <WebCore/StyleScrollSnapType.h>
 #include <WebCore/StyleScrollTimelines.h>
 #include <WebCore/StyleScrollbarGutter.h>
+#include <WebCore/StyleScrollbarWidth.h>
 #include <WebCore/StyleSelfAlignmentData.h>
 #include <WebCore/StyleShapeImageThreshold.h>
 #include <WebCore/StyleShapeMargin.h>
@@ -265,7 +266,7 @@ public:
 #if HAVE(CORE_MATERIAL)
     PREFERRED_TYPE(AppleVisualEffect) unsigned appleVisualEffect : 5;
 #endif
-    PREFERRED_TYPE(ScrollbarWidth) unsigned scrollbarWidth : 2;
+    PREFERRED_TYPE(Style::ScrollbarWidth) unsigned scrollbarWidth : 2;
     PREFERRED_TYPE(bool) unsigned usesAnchorFunctions : 1;
     PREFERRED_TYPE(EnumSet<BoxAxis>) unsigned anchorFunctionScrollCompensatedAxes : 2;
     PREFERRED_TYPE(bool) unsigned usesTreeCountingFunctions : 1;

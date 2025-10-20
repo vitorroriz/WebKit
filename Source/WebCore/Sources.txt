@@ -3279,6 +3279,7 @@ style/values/scroll-snap/StyleScrollPadding.cpp
 style/values/scroll-snap/StyleScrollSnapAlign.cpp
 style/values/scroll-snap/StyleScrollSnapType.cpp
 style/values/scrollbars/StyleScrollbarColor.cpp
+style/values/scrollbars/StyleScrollbarWidth.cpp
 style/values/shapes/StyleBasicShape.cpp
 style/values/shapes/StyleCircleFunction.cpp
 style/values/shapes/StyleEllipseFunction.cpp

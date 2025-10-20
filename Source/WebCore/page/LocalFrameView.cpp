@@ -6934,7 +6934,7 @@ ScrollbarWidth LocalFrameView::scrollbarWidthStyle()  const
     auto* document = m_frame->document();
     auto scrollingObject = document && document->documentElement() ? document->documentElement()->renderer() : nullptr;
     if (scrollingObject && renderView())
-        return scrollingObject->style().scrollbarWidth();
+        return scrollingObject->style().scrollbarWidth().value;
     return ScrollbarWidth::Auto;
 }
 

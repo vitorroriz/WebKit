@@ -138,7 +138,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
 #if HAVE(CORE_MATERIAL)
     , appleVisualEffect(static_cast<unsigned>(RenderStyle::initialAppleVisualEffect()))
 #endif
-    , scrollbarWidth(static_cast<unsigned>(RenderStyle::initialScrollbarWidth()))
+    , scrollbarWidth(static_cast<unsigned>(RenderStyle::initialScrollbarWidth().platform()))
     , usesAnchorFunctions(false)
     , anchorFunctionScrollCompensatedAxes(0)
     , isPopoverInvoker(false)

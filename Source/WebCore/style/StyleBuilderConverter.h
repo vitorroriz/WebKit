@@ -127,8 +127,6 @@ public:
     static Resize convertResize(BuilderState&, const CSSValue&);
     static OptionSet<TextUnderlinePosition> convertTextUnderlinePosition(BuilderState&, const CSSValue&);
     static OptionSet<LineBoxContain> convertLineBoxContain(BuilderState&, const CSSValue&);
-    // scrollbar-width converter is only needed for quirking.
-    static ScrollbarWidth convertScrollbarWidth(BuilderState&, const CSSValue&);
     static GridAutoFlow convertGridAutoFlow(BuilderState&, const CSSValue&);
     static OptionSet<TouchAction> convertTouchAction(BuilderState&, const CSSValue&);
 
@@ -397,15 +395,6 @@ inline OptionSet<LineBoxContain> BuilderConverter::convertLineBoxContain(Builder
         }
     }
     return result;
-}
-
-inline ScrollbarWidth BuilderConverter::convertScrollbarWidth(BuilderState& builderState, const CSSValue& value)
-{
-    auto scrollbarWidth = fromCSSValue<ScrollbarWidth>(value);
-    if (scrollbarWidth == ScrollbarWidth::Thin && builderState.document().quirks().needsScrollbarWidthThinDisabledQuirk())
-        return ScrollbarWidth::Auto;
-
-    return scrollbarWidth;
 }
 
 inline GridAutoFlow BuilderConverter::convertGridAutoFlow(BuilderState& builderState, const CSSValue& value)

@@ -990,8 +990,8 @@ void Adjuster::adjustForSiteSpecificQuirks(RenderStyle& style) const
         return;
 
     if (is<HTMLBodyElement>(*m_element) && m_document->quirks().needsBodyScrollbarWidthNoneDisabledQuirk()) {
-        if (style.scrollbarWidth() == ScrollbarWidth::None)
-            style.setScrollbarWidth(ScrollbarWidth::Auto);
+        if (style.scrollbarWidth().isNone())
+            style.setScrollbarWidth(CSS::Keyword::Auto { });
     }
 
     if (m_document->quirks().needsGMailOverflowScrollQuirk()) {

@@ -548,7 +548,7 @@ inline Style::ProgressTimelineAxes RenderStyle::initialScrollTimelineAxes() { re
 inline Style::ProgressTimelineNames RenderStyle::initialScrollTimelineNames() { return CSS::Keyword::None { }; }
 inline Style::ScrollbarColor RenderStyle::initialScrollbarColor() { return CSS::Keyword::Auto { }; }
 constexpr Style::ScrollbarGutter RenderStyle::initialScrollbarGutter() { return CSS::Keyword::Auto { }; }
-constexpr ScrollbarWidth RenderStyle::initialScrollbarWidth() { return ScrollbarWidth::Auto; }
+constexpr Style::ScrollbarWidth RenderStyle::initialScrollbarWidth() { return CSS::Keyword::Auto { }; }
 constexpr StyleSelfAlignmentData RenderStyle::initialSelfAlignment() { return { ItemPosition::Auto, OverflowAlignment::Default }; }
 constexpr Style::ShapeImageThreshold RenderStyle::initialShapeImageThreshold() { return 0_css_number; }
 inline Style::ShapeMargin RenderStyle::initialShapeMargin() { return 0_css_px; }
@@ -787,7 +787,7 @@ inline bool RenderStyle::hasViewTimelines() const { return m_nonInheritedData->r
 inline const NameScope& RenderStyle::timelineScope() const { return m_nonInheritedData->rareData->timelineScope; }
 inline const Style::ScrollbarColor& RenderStyle::scrollbarColor() const { return m_rareInheritedData->scrollbarColor; }
 inline const Style::ScrollbarGutter& RenderStyle::scrollbarGutter() const { return m_nonInheritedData->rareData->scrollbarGutter; }
-inline ScrollbarWidth RenderStyle::scrollbarWidth() const { return static_cast<ScrollbarWidth>(m_nonInheritedData->rareData->scrollbarWidth); }
+inline Style::ScrollbarWidth RenderStyle::scrollbarWidth() const { return static_cast<ScrollbarWidth>(m_nonInheritedData->rareData->scrollbarWidth); }
 inline Style::ShapeImageThreshold RenderStyle::shapeImageThreshold() const { return m_nonInheritedData->rareData->shapeImageThreshold; }
 inline const Style::ShapeMargin& RenderStyle::shapeMargin() const { return m_nonInheritedData->rareData->shapeMargin; }
 inline const Style::ShapeOutside& RenderStyle::shapeOutside() const { return m_nonInheritedData->rareData->shapeOutside; }
@@ -887,7 +887,7 @@ inline const Style::CornerShapeValue& RenderStyle::cornerTopLeftShape() const { 
 inline const Style::CornerShapeValue& RenderStyle::cornerTopRightShape() const { return border().topRightCornerShape(); }
 
 // ignore non-standard ::-webkit-scrollbar when standard properties are in use
-inline bool RenderStyle::usesStandardScrollbarStyle() const { return scrollbarWidth() != ScrollbarWidth::Auto || !scrollbarColor().isAuto(); }
+inline bool RenderStyle::usesStandardScrollbarStyle() const { return !scrollbarWidth().isAuto() || !scrollbarColor().isAuto(); }
 inline bool RenderStyle::usesLegacyScrollbarStyle() const { return hasPseudoStyle(PseudoElementType::WebKitScrollbar) && !usesStandardScrollbarStyle(); }
 
 #if ENABLE(APPLE_PAY)

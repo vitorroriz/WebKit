@@ -3429,6 +3429,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/scroll-snap/StyleScrollSnapType.h
 
     style/values/scrollbars/StyleScrollbarColor.h
+    style/values/scrollbars/StyleScrollbarWidth.h
 
     style/values/shapes/StyleBasicShape.h
     style/values/shapes/StyleCircleFunction.h
