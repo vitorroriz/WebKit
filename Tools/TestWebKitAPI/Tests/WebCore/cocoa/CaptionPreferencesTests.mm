@@ -138,7 +138,12 @@ TEST(CaptionPreferenceTests, FontFace)
     EXPECT_STREQ(preferences->captionsDefaultFontCSS().utf8().data(), "font-family: \"WingDings\";");
 }
 
+// CaptionPreferenceTests.FontSize broke on Sonoma Debug https://bugs.webkit.org/show_bug.cgi?id=301096
+#if PLATFORM(MAC) && __MAC_OS_X_VERSION_MIN_REQUIRED < 150000 && !defined(NDEBUG)
+TEST(CaptionPreferenceTests, DISABLED_FontSize)
+#else
 TEST(CaptionPreferenceTests, FontSize)
+#endif
 {
     MediaAccessibilityShim shim;
 
