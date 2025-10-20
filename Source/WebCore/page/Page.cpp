@@ -1900,7 +1900,7 @@ void Page::didCommitLoad()
 #endif
 
 #if ENABLE(GEOLOCATION)
-    if (auto* geolocationController = GeolocationController::from(this))
+    if (CheckedPtr geolocationController = GeolocationController::from(this))
         geolocationController->didNavigatePage();
 #endif
 
@@ -3364,8 +3364,8 @@ void Page::setActivityState(OptionSet<ActivityState> activityState)
     if (changed.containsAny({ActivityState::IsVisible, ActivityState::IsVisuallyIdle, ActivityState::IsAudible, ActivityState::IsLoading, ActivityState::IsCapturingMedia }))
         updateTimerThrottlingState();
 
-    for (auto& observer : m_activityStateChangeObservers)
-        observer.activityStateDidChange(oldActivityState, m_activityState);
+    for (CheckedRef observer : m_activityStateChangeObservers)
+        observer->activityStateDidChange(oldActivityState, m_activityState);
 
     if (wasVisibleAndActive != isVisibleAndActive()) {
         if (RefPtr manager = mediaSessionManager())
