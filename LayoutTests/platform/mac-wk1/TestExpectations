@@ -3303,3 +3303,5 @@ webkit.org/b/299636 imported/w3c/web-platform-tests/event-timing/only-observe-fi
 webkit.org/b/300050 imported/w3c/web-platform-tests/infrastructure/server/wpt-server-http.sub.html [ Skip ]
 
 webkit.org/b/301065 imported/w3c/web-platform-tests/upgrade-insecure-requests/gen [ Skip ]
+
+webkit.org/b/301116 webaudio/audiobuffersource-not-gced-until-ended.html [ Pass Crash ]
