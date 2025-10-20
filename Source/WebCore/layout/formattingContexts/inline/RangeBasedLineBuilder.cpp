@@ -124,9 +124,12 @@ LineLayoutResult RangeBasedLineBuilder::layoutInlineContent(const LineInput& lin
     return lineLayoutResult;
 }
 
-bool RangeBasedLineBuilder::isEligibleForRangeInlineLayout(const InlineFormattingContext& inlineFormattingContext, const InlineContentCache::InlineItems& inlineItems, const PlacedFloats& placedFloats)
+bool RangeBasedLineBuilder::isEligibleForRangeInlineLayout(const InlineFormattingContext& inlineFormattingContext, InlineItemRange needsLayoutRange, const InlineContentCache::InlineItems& inlineItems, const PlacedFloats& placedFloats)
 {
     if (inlineItems.isEmpty())
+        return false;
+
+    if (needsLayoutRange.start || needsLayoutRange.end.index != inlineItems.size())
         return false;
 
     // Range based line builder only supports the following content <inline box>eligible for text only layout</inline box>
