@@ -186,7 +186,7 @@ static const NSInteger InvalidAttachmentErrorCode = 2;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@ %p id='%@'>", [self class], self, self.uniqueIdentifier];
+    return [NSString stringWithFormat:@"<%@ %p id='%@'>", [self class], self, retainPtr(self.uniqueIdentifier).get()];
 }
 
 - (BOOL)isConnected

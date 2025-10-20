@@ -63,8 +63,8 @@ IGNORE_WARNINGS_END
 
 + (instancetype)downloadWithDownload:(WKDownload *)download
 {
-    if (_WKDownload *wrapper = [downloadWrapperMapSingleton() objectForKey:download])
-        return wrapper;
+    if (RetainPtr<_WKDownload> wrapper = [downloadWrapperMapSingleton() objectForKey:download])
+        return wrapper.autorelease();
     auto wrapper = adoptNS([[_WKDownload alloc] initWithDownload2:download]);
     [downloadWrapperMapSingleton() setObject:wrapper.get() forKey:download];
     return wrapper.autorelease();

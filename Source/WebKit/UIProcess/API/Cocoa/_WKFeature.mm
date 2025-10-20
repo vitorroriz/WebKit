@@ -44,7 +44,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p; name = %@; key = %@; defaultValue = %s >", NSStringFromClass(self.class), self, self.name, self.key, self.defaultValue ? "on" : "off"];
+    return [NSString stringWithFormat:@"<%@: %p; name = %@; key = %@; defaultValue = %s >", NSStringFromClass(self.class), self, retainPtr(self.name).get(), retainPtr(self.key).get(), self.defaultValue ? "on" : "off"];
 }
 
 - (NSString *)name

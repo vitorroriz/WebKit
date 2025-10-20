@@ -347,7 +347,7 @@ ALLOW_DEPRECATED_IMPLEMENTATIONS_END
     RetainPtr description = adoptNS([[NSString alloc] initWithFormat:@"<%@: %p", NSStringFromClass(self.class), self]);
 
     if (!_processPoolConfiguration->injectedBundlePath().isEmpty())
-        return [description stringByAppendingFormat:@"; injectedBundleURL: \"%@\">", [self injectedBundleURL]];
+        return [description stringByAppendingFormat:@"; injectedBundleURL: \"%@\">", retainPtr([self injectedBundleURL]).get()];
 
     return [description stringByAppendingString:@">"];
 }

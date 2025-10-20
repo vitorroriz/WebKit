@@ -124,8 +124,8 @@ static NSString *dataTypesToString(NSSet *dataTypes)
 {
     auto result = adoptNS([[NSMutableString alloc] initWithFormat:@"<%@: %p; displayName = %@; dataTypes = { %@ }", RetainPtr { NSStringFromClass(self.class) }.get(), self, self.displayName, dataTypesToString(self.dataTypes)]);
 
-    if (auto* dataSize = self._dataSize)
-        [result appendFormat:@"; _dataSize = { %llu bytes }", dataSize.totalSize];
+    if (RetainPtr<_WKWebsiteDataSize> dataSize = self._dataSize)
+        [result appendFormat:@"; _dataSize = { %llu bytes }", dataSize.get().totalSize];
 
     [result appendString:@">"];
     return result.autorelease();

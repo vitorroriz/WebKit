@@ -293,7 +293,7 @@ static RetainPtr<NSArray> getAllLocalAuthenticatorCredentialsImpl(NSString *acce
 
     auto result = adoptNS([[NSMutableArray alloc] init]);
     for (NSDictionary *attributes in (NSArray *)attributesArrayRef) {
-        auto decodedResponse = cbor::CBORReader::read(makeVector(attributes[bridge_id_cast(kSecAttrApplicationTag)]));
+        auto decodedResponse = cbor::CBORReader::read(makeVector(retainPtr(attributes[bridge_id_cast(kSecAttrApplicationTag)]).get()));
         if (!decodedResponse || !decodedResponse->isMap()) {
             ASSERT_NOT_REACHED();
             return nullptr;
@@ -307,15 +307,15 @@ static RetainPtr<NSArray> getAllLocalAuthenticatorCredentialsImpl(NSString *acce
         }
         auto& username = it->second.getString();
 
-        id credentialID = attributes[bridge_cast(kSecAttrAlias)];
+        RetainPtr<id> credentialID = attributes[bridge_cast(kSecAttrAlias)];
         if (!credentialID)
             credentialID = attributes[bridge_cast(kSecAttrApplicationLabel)];
         auto credential = adoptNS([[NSMutableDictionary alloc] initWithObjectsAndKeys:
             username.createNSString().get(), _WKLocalAuthenticatorCredentialNameKey,
-            credentialID, _WKLocalAuthenticatorCredentialIDKey,
-            attributes[bridge_cast(kSecAttrLabel)], _WKLocalAuthenticatorCredentialRelyingPartyIDKey,
-            attributes[bridge_cast(kSecAttrModificationDate)], _WKLocalAuthenticatorCredentialLastModificationDateKey,
-            attributes[bridge_cast(kSecAttrCreationDate)], _WKLocalAuthenticatorCredentialCreationDateKey,
+            credentialID.get(), _WKLocalAuthenticatorCredentialIDKey,
+            retainPtr(attributes[bridge_cast(kSecAttrLabel)]).get(), _WKLocalAuthenticatorCredentialRelyingPartyIDKey,
+            retainPtr(attributes[bridge_cast(kSecAttrModificationDate)]).get(), _WKLocalAuthenticatorCredentialLastModificationDateKey,
+            retainPtr(attributes[bridge_cast(kSecAttrCreationDate)]).get(), _WKLocalAuthenticatorCredentialCreationDateKey,
             nil
         ]);
         it = responseMap.find(cbor::CBORValue(fido::kEntityIdMapKey));
@@ -461,7 +461,7 @@ static RetainPtr<NSArray> getAllLocalAuthenticatorCredentialsImpl(NSString *acce
     }
 
     auto attributes = adoptNS((__bridge NSDictionary *)attributesArrayRef);
-    auto decodedResponse = cbor::CBORReader::read(makeVector(attributes.get()[bridge_id_cast(kSecAttrApplicationTag)]));
+    auto decodedResponse = cbor::CBORReader::read(makeVector(retainPtr(attributes.get()[bridge_id_cast(kSecAttrApplicationTag)]).get()));
     if (!decodedResponse || !decodedResponse->isMap()) {
         ASSERT_NOT_REACHED();
         return;
@@ -533,7 +533,7 @@ static RetainPtr<NSArray> getAllLocalAuthenticatorCredentialsImpl(NSString *acce
         return;
     }
     auto attributes = adoptNS((__bridge NSDictionary *)attributesArrayRef);
-    auto decodedResponse = cbor::CBORReader::read(makeVector(attributes.get()[bridge_id_cast(kSecAttrApplicationTag)]));
+    auto decodedResponse = cbor::CBORReader::read(makeVector(retainPtr(attributes.get()[bridge_id_cast(kSecAttrApplicationTag)]).get()));
     if (!decodedResponse || !decodedResponse->isMap()) {
         ASSERT_NOT_REACHED();
         return;
@@ -774,11 +774,11 @@ static void createNSErrorFromWKErrorIfNecessary(NSError **error, WKErrorCode err
     auto attributes = adoptNS((__bridge NSDictionary *)attributesArrayRef);
 
     int64_t keyType, keySize;
-    if (!CFNumberGetValue((__bridge CFNumberRef)attributes.get()[bridge_id_cast(kSecAttrKeyType)], kCFNumberSInt64Type, &keyType)) {
+    if (!CFNumberGetValue((__bridge CFNumberRef)retainPtr(attributes.get()[bridge_id_cast(kSecAttrKeyType)]).get(), kCFNumberSInt64Type, &keyType)) {
         createNSErrorFromWKErrorIfNecessary(error, WKErrorMalformedCredential);
         return nullptr;
     }
-    if (!CFNumberGetValue((__bridge CFNumberRef)attributes.get()[bridge_id_cast(kSecAttrKeySizeInBits)], kCFNumberSInt64Type, &keySize)) {
+    if (!CFNumberGetValue((__bridge CFNumberRef)retainPtr(attributes.get()[bridge_id_cast(kSecAttrKeySizeInBits)]).get(), kCFNumberSInt64Type, &keySize)) {
         createNSErrorFromWKErrorIfNecessary(error, WKErrorMalformedCredential);
         return nullptr;
     }
@@ -788,7 +788,7 @@ static void createNSErrorFromWKErrorIfNecessary(NSError **error, WKErrorCode err
     credentialMap[cbor::CBORValue(WebCore::keyTypeKey)] = cbor::CBORValue(keyType);
     credentialMap[cbor::CBORValue(WebCore::keySizeKey)] = cbor::CBORValue(keySize);
     credentialMap[cbor::CBORValue(WebCore::relyingPartyKey)] = cbor::CBORValue(String(dynamic_objc_cast<NSString>(attributes.get()[bridge_id_cast(kSecAttrLabel)])));
-    auto decodedResponse = cbor::CBORReader::read(makeVector(attributes.get()[bridge_id_cast(kSecAttrApplicationTag)]));
+    auto decodedResponse = cbor::CBORReader::read(makeVector(retainPtr(attributes.get()[bridge_id_cast(kSecAttrApplicationTag)]).get()));
     if (!decodedResponse || !decodedResponse->isMap()) {
         createNSErrorFromWKErrorIfNecessary(error, WKErrorMalformedCredential);
         return nullptr;
@@ -825,7 +825,7 @@ static WebCore::PublicKeyCredentialUserEntity publicKeyCredentialUserEntity(_WKP
     WebCore::PublicKeyCredentialUserEntity result;
     result.name = userEntity.name;
     result.icon = userEntity.icon;
-    result.id = WebCore::toBufferSource(userEntity.identifier).variant();
+    result.id = WebCore::toBufferSource(retainPtr(userEntity.identifier).get()).variant();
     result.displayName = userEntity.displayName;
 
     return result;
@@ -870,8 +870,11 @@ static Vector<WebCore::AuthenticatorTransport> authenticatorTransports(NSArray<N
 static Vector<WebCore::PublicKeyCredentialDescriptor> publicKeyCredentialDescriptors(NSArray<_WKPublicKeyCredentialDescriptor *> *credentials)
 {
     return Vector<WebCore::PublicKeyCredentialDescriptor>(credentials.count, [credentials](size_t i) {
-        _WKPublicKeyCredentialDescriptor *credential = credentials[i];
-        return WebCore::PublicKeyCredentialDescriptor { WebCore::PublicKeyCredentialType::PublicKey, WebCore::toBufferSource(credential.identifier).variant(), authenticatorTransports(credential.transports) };
+        RetainPtr<_WKPublicKeyCredentialDescriptor> credential = credentials[i];
+        return WebCore::PublicKeyCredentialDescriptor {
+            WebCore::PublicKeyCredentialType::PublicKey,
+            WebCore::toBufferSource(retainPtr(credential.get().identifier).get()).variant(),
+            authenticatorTransports(retainPtr(credential.get().transports).get()) };
     });
 }
 
@@ -981,22 +984,22 @@ static WebCore::MediationRequirement toWebCore(_WKWebAuthenticationMediationRequ
     WebCore::PublicKeyCredentialCreationOptions result;
 
 #if ENABLE(WEB_AUTHN)
-    result.rp = publicKeyCredentialRpEntity(options.relyingParty);
-    result.user = publicKeyCredentialUserEntity(options.user);
+    result.rp = publicKeyCredentialRpEntity(retainPtr(options.relyingParty).get());
+    result.user = publicKeyCredentialUserEntity(retainPtr(options.user).get());
 
-    result.pubKeyCredParams = publicKeyCredentialParameters(options.publicKeyCredentialParamaters);
+    result.pubKeyCredParams = publicKeyCredentialParameters(retainPtr(options.publicKeyCredentialParamaters).get());
 
     if (options.timeout)
         result.timeout = options.timeout.unsignedIntValue;
     if (options.excludeCredentials)
-        result.excludeCredentials = publicKeyCredentialDescriptors(options.excludeCredentials);
+        result.excludeCredentials = publicKeyCredentialDescriptors(retainPtr(options.excludeCredentials).get());
     if (options.authenticatorSelection)
-        result.authenticatorSelection = authenticatorSelectionCriteria(options.authenticatorSelection);
+        result.authenticatorSelection = authenticatorSelectionCriteria(retainPtr(options.authenticatorSelection).get());
     result.attestation = attestationConveyancePreference(options.attestation);
     if (options.extensionsCBOR)
         result.extensions = WebCore::AuthenticationExtensionsClientInputs::fromCBOR(span(options.extensionsCBOR));
     else
-        result.extensions = authenticationExtensionsClientInputs(options.extensions);
+        result.extensions = authenticationExtensionsClientInputs(retainPtr(options.extensions).get());
 #endif
 
     return result;
@@ -1075,11 +1078,11 @@ static RetainPtr<_WKAuthenticatorAttestationResponse> wkAuthenticatorAttestation
     if (options.relyingPartyIdentifier)
         result.rpId = options.relyingPartyIdentifier;
     if (options.allowCredentials)
-        result.allowCredentials = publicKeyCredentialDescriptors(options.allowCredentials);
+        result.allowCredentials = publicKeyCredentialDescriptors(retainPtr(options.allowCredentials).get());
     if (options.extensionsCBOR)
         result.extensions = WebCore::AuthenticationExtensionsClientInputs::fromCBOR(span(options.extensionsCBOR));
     else
-        result.extensions = authenticationExtensionsClientInputs(options.extensions);
+        result.extensions = authenticationExtensionsClientInputs(retainPtr(options.extensions).get());
     result.userVerification = userVerification(options.userVerification);
     result.authenticatorAttachment = authenticatorAttachment(options.authenticatorAttachment);
 #endif

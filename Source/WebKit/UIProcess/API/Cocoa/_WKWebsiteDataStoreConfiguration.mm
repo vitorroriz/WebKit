@@ -87,8 +87,8 @@ static void checkURLArgument(NSURL *url)
     if (!directory)
         [NSException raise:NSInvalidArgumentException format:@"Directory is nil"];
 
-    NSString *path = directory.path;
-    API::Object::constructInWrapper<WebKit::WebsiteDataStoreConfiguration>(self, path, path);
+    RetainPtr<NSString> path = directory.path;
+    API::Object::constructInWrapper<WebKit::WebsiteDataStoreConfiguration>(self, path.get(), path.get());
 
     return self;
 }
