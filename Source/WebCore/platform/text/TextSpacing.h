@@ -87,7 +87,7 @@ public:
     bool isSpaceAll() const { return m_trim == TrimType::SpaceAll; }
     bool shouldTrimSpacing(const TextSpacing::CharactersData&) const;
     friend bool operator==(const TextSpacingTrim&, const TextSpacingTrim&) = default;
-    TrimType type() const { return m_trim; }
+    constexpr TrimType type() const { return m_trim; }
 private:
     TrimType m_trim { TrimType::SpaceAll };
 };
