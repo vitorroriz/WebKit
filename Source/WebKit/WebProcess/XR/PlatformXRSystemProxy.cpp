@@ -41,8 +41,6 @@
 #include <WebCore/XRCanvasConfiguration.h>
 #include <wtf/Vector.h>
 
-using namespace PlatformXR;
-
 namespace WebKit {
 
 PlatformXRSystemProxy::PlatformXRSystemProxy(WebPage& page)
@@ -61,13 +59,13 @@ Ref<WebPage> PlatformXRSystemProxy::protectedPage() const
     return m_page.get();
 }
 
-void PlatformXRSystemProxy::enumerateImmersiveXRDevices(CompletionHandler<void(const Instance::DeviceList&)>&& completionHandler)
+void PlatformXRSystemProxy::enumerateImmersiveXRDevices(CompletionHandler<void(const PlatformXR::DeviceList&)>&& completionHandler)
 {
     protectedPage()->sendWithAsyncReply(Messages::PlatformXRSystem::EnumerateImmersiveXRDevices(), [this, weakThis = WeakPtr { *this }, completionHandler = WTFMove(completionHandler)](Vector<XRDeviceInfo>&& devicesInfos) mutable {
         if (!weakThis)
             return;
 
-        PlatformXR::Instance::DeviceList devices;
+        PlatformXR::DeviceList devices;
         for (auto& deviceInfo : devicesInfos) {
             if (auto device = deviceByIdentifier(deviceInfo.identifier))
                 devices.append(*device);

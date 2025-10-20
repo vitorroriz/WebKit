@@ -716,7 +716,6 @@ platform/text/mac/TextBoundaries.mm @nonARC
 platform/text/mac/TextCheckingMac.mm @nonARC
 platform/video-codecs/cocoa/RTCVideoDecoderVTBAV1.mm @nonARC
 platform/video-codecs/cocoa/WebRTCVideoDecoder.mm @nonARC
-platform/xr/cocoa/PlatformXRCocoa.mm @nonARC
 platform/xr/cocoa/PlatformXRPose.cpp
 platform/text/mac/CoreTextChineseCompositionEngine.cpp
 platform/text/mac/CoreTextCompositionEngine.cpp

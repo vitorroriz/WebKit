@@ -28,7 +28,6 @@
 #include <wtf/CompletionHandler.h>
 #include <wtf/HashMap.h>
 #include <wtf/Platform.h>
-#include <wtf/Ref.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/ThreadSafeWeakPtr.h>
 #include <wtf/UniqueRef.h>
@@ -479,6 +478,8 @@ protected:
     WeakPtr<TrackingAndRenderingClient> m_trackingAndRenderingClient;
 };
 
+using DeviceList = Vector<Ref<Device>>;
+
 class TrackingAndRenderingClient : public CanMakeWeakPtr<TrackingAndRenderingClient> {
 public:
     virtual ~TrackingAndRenderingClient() = default;
@@ -490,24 +491,6 @@ public:
     virtual void sessionDidEnd() = 0;
     virtual void updateSessionVisibilityState(VisibilityState) = 0;
     // FIXME: handle frame update
-};
-
-class Instance {
-public:
-    WEBCORE_EXPORT static Instance& singleton();
-
-    using DeviceList = Vector<Ref<Device>>;
-    WEBCORE_EXPORT void enumerateImmersiveXRDevices(CompletionHandler<void(const DeviceList&)>&&);
-
-private:
-    friend LazyNeverDestroyed<Instance>;
-    Instance();
-    ~Instance() = default;
-
-    struct Impl;
-    UniqueRef<Impl> m_impl;
-
-    DeviceList m_immersiveXRDevices;
 };
 
 inline FrameData FrameData::copy() const

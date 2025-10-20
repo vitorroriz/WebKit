@@ -2170,7 +2170,7 @@ void WebChromeClient::showMediaControlsContextMenu(FloatRect&& targetFrame, Vect
 #endif // ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
 
 #if ENABLE(WEBXR)
-void WebChromeClient::enumerateImmersiveXRDevices(CompletionHandler<void(const PlatformXR::Instance::DeviceList&)>&& completionHandler)
+void WebChromeClient::enumerateImmersiveXRDevices(CompletionHandler<void(const PlatformXR::DeviceList&)>&& completionHandler)
 {
     if (RefPtr page = m_page.get())
         page->xrSystemProxy().enumerateImmersiveXRDevices(WTFMove(completionHandler));
