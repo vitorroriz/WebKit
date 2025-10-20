@@ -100,7 +100,7 @@ static void raiseExceptionIfNecessary(WebKit::WebURLSchemeTask::ExceptionType ex
 
 - (BOOL)_requestOnlyIfCached
 {
-    return self._protectedURLSchemeTask->nsRequest().cachePolicy == NSURLRequestReturnCacheDataDontLoad;
+    return self._protectedURLSchemeTask->protectedNSRequest().get().cachePolicy == NSURLRequestReturnCacheDataDontLoad;
 }
 
 - (void)_willPerformRedirection:(NSURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest *))completionHandler

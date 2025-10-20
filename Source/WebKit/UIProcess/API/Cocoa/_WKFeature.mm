@@ -37,7 +37,7 @@
     if (WebCoreObjCScheduleDeallocateOnMainRunLoop(_WKFeature.class, self))
         return;
 
-    _wrappedFeature->API::Feature::~Feature();
+    SUPPRESS_UNRETAINED_ARG _wrappedFeature->API::Feature::~Feature();
 
     [super dealloc];
 }

@@ -667,7 +667,7 @@ static NSString *defaultApplicationNameForUserAgent()
 
 - (void)_setAllowPostingLegacySynchronousMessages:(BOOL)allow
 {
-    RetainPtr bundleID = (__bridge NSString *)CFBundleGetIdentifier(CFBundleGetMainBundle());
+    RetainPtr bundleID = (__bridge NSString *)CFBundleGetIdentifier(RetainPtr { CFBundleGetMainBundle() }.get());
     RELEASE_ASSERT([bundleID isEqualToString:@"com.apple.WebKit.TestWebKitAPI"]
 #if PLATFORM(MAC)
         || [bundleID isEqualToString:@"com.apple.TV"]

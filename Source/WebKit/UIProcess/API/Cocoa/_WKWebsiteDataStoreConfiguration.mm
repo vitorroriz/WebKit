@@ -760,7 +760,7 @@ static WebKit::UnifiedOriginStorageLevel toUnifiedOriginStorageLevel(_WKUnifiedO
 
 - (void)setProxyConfiguration:(NSDictionary *)configuration
 {
-    _configuration->setProxyConfiguration((__bridge CFDictionaryRef)adoptNS([configuration copy]).get());
+    Ref { *_configuration }->setProxyConfiguration((__bridge CFDictionaryRef)adoptNS([configuration copy]).get());
 }
 
 - (NSURL *)standaloneApplicationURL

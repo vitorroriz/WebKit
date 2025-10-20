@@ -150,7 +150,7 @@ static void* const safeAreaInsetsKVOContext = (void*)&safeAreaInsetsKVOContext;
 #if ENABLE(WK_WEB_EXTENSIONS) && ENABLE(INSPECTOR_EXTENSIONS)
     if (inspectedPage) {
         if (RefPtr webExtensionController = inspectedPage->webExtensionController())
-            configuration.get().webExtensionController = webExtensionController->wrapper();
+            configuration.get().webExtensionController = webExtensionController->protectedWrapper().get();
     }
 #endif
 
@@ -173,9 +173,10 @@ static void* const safeAreaInsetsKVOContext = (void*)&safeAreaInsetsKVOContext;
     preferences._siteIsolationEnabled = NO;
 
     [_configuration applyToWebViewConfiguration:configuration.get()];
-    
-    if (!!_delegate && [_delegate respondsToSelector:@selector(inspectorViewControllerInspectorIsUnderTest:)]) {
-        if ([_delegate inspectorViewControllerInspectorIsUnderTest:self]) {
+
+    RetainPtr delegate = _delegate.get();
+    if (!!delegate && [delegate respondsToSelector:@selector(inspectorViewControllerInspectorIsUnderTest:)]) {
+        if ([delegate inspectorViewControllerInspectorIsUnderTest:self]) {
             preferences._hiddenPageDOMTimerThrottlingEnabled = NO;
             preferences._pageVisibilityBasedProcessSuppressionEnabled = NO;
             preferences.inactiveSchedulingPolicy = WKInactiveSchedulingPolicyNone;
@@ -195,7 +196,7 @@ static void* const safeAreaInsetsKVOContext = (void*)&safeAreaInsetsKVOContext;
 
     ALLOW_DEPRECATED_DECLARATIONS_BEGIN
     if (useDefaultProcessPool)
-        [configuration setProcessPool:wrapper(Ref { WebKit::defaultInspectorProcessPool(inspectorLevel) }.get())];
+        [configuration setProcessPool:protectedWrapper(Ref { WebKit::defaultInspectorProcessPool(inspectorLevel) }.get()).get()];
     ALLOW_DEPRECATED_DECLARATIONS_END
 
     // Ensure that a page group identifier is set. This is for computing inspection levels.
@@ -244,7 +245,7 @@ static void* const safeAreaInsetsKVOContext = (void*)&safeAreaInsetsKVOContext;
 
 - (WKWebView *)_horizontallyAttachedInspectedWebView
 {
-    if (![_delegate inspectorViewControllerInspectorIsHorizontallyAttached:self])
+    if (![_delegate.get() inspectorViewControllerInspectorIsHorizontallyAttached:self])
         return nil;
 
     if (RefPtr inspectedPage = _inspectedPage.get())
@@ -322,8 +323,9 @@ static void* const safeAreaInsetsKVOContext = (void*)&safeAreaInsetsKVOContext;
 {
     [_webView removeObserver:self forKeyPath:safeAreaInsetsKVOKey];
 
-    if (!!_delegate && [_delegate respondsToSelector:@selector(inspectorViewControllerInspectorDidCrash:)])
-        [_delegate inspectorViewControllerInspectorDidCrash:self];
+    RetainPtr delegate = _delegate.get();
+    if (!!delegate && [delegate respondsToSelector:@selector(inspectorViewControllerInspectorDidCrash:)])
+        [delegate inspectorViewControllerInspectorDidCrash:self];
 }
 
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
@@ -343,8 +345,9 @@ static void* const safeAreaInsetsKVOContext = (void*)&safeAreaInsetsKVOContext;
     // Prevent everything else.
     decisionHandler(WKNavigationActionPolicyCancel);
 
-    if (!!_delegate && [_delegate respondsToSelector:@selector(inspectorViewController:openURLExternally:)]) {
-        [_delegate inspectorViewController:self openURLExternally:navigationAction.request.URL];
+    RetainPtr delegate = _delegate.get();
+    if (delegate && [delegate respondsToSelector:@selector(inspectorViewController:openURLExternally:)]) {
+        [delegate inspectorViewController:self openURLExternally:navigationAction.request.URL];
         return;
     }
 
@@ -357,8 +360,9 @@ static void* const safeAreaInsetsKVOContext = (void*)&safeAreaInsetsKVOContext;
 
 - (void)inspectorWKWebViewDidBecomeActive:(WKInspectorWKWebView *)webView
 {
-    if ([_delegate respondsToSelector:@selector(inspectorViewControllerDidBecomeActive:)])
-        [_delegate inspectorViewControllerDidBecomeActive:self];
+    RetainPtr delegate = _delegate.get();
+    if ([delegate respondsToSelector:@selector(inspectorViewControllerDidBecomeActive:)])
+        [delegate inspectorViewControllerDidBecomeActive:self];
 }
 
 - (void)inspectorWKWebViewReload:(WKInspectorWKWebView *)webView
@@ -385,14 +389,16 @@ static void* const safeAreaInsetsKVOContext = (void*)&safeAreaInsetsKVOContext;
 
 - (void)inspectorWKWebView:(WKInspectorWKWebView *)webView willMoveToWindow:(NSWindow *)newWindow
 {
-    if (!!_delegate && [_delegate respondsToSelector:@selector(inspectorViewController:willMoveToWindow:)])
-        [_delegate inspectorViewController:self willMoveToWindow:newWindow];
+    RetainPtr delegate = _delegate.get();
+    if (delegate && [delegate respondsToSelector:@selector(inspectorViewController:willMoveToWindow:)])
+        [delegate inspectorViewController:self willMoveToWindow:newWindow];
 }
 
 - (void)inspectorWKWebViewDidMoveToWindow:(WKInspectorWKWebView *)webView
 {
-    if (!!_delegate && [_delegate respondsToSelector:@selector(inspectorViewControllerDidMoveToWindow:)])
-        [_delegate inspectorViewControllerDidMoveToWindow:self];
+    RetainPtr delegate = _delegate.get();
+    if (!!delegate && [delegate respondsToSelector:@selector(inspectorViewControllerDidMoveToWindow:)])
+        [delegate inspectorViewControllerDidMoveToWindow:self];
 }
 
 @end

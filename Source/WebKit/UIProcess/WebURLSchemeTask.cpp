@@ -246,6 +246,11 @@ NSURLRequest *WebURLSchemeTask::nsRequest() const
     Locker locker { m_requestLock };
     return m_request.nsURLRequest(WebCore::HTTPBodyUpdatePolicy::UpdateHTTPBody);
 }
+
+RetainPtr<NSURLRequest> WebURLSchemeTask::protectedNSRequest() const
+{
+    return nsRequest();
+}
 #endif
 
 } // namespace WebKit

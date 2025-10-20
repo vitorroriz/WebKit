@@ -56,7 +56,7 @@ WK_OBJECT_DISABLE_DISABLE_KVC_IVAR_ACCESS;
 
 - (void)dealloc
 {
-    [_snapshotWidth release];
+    SUPPRESS_UNRETAINED_ARG [_snapshotWidth release];
 
     [super dealloc];
 }

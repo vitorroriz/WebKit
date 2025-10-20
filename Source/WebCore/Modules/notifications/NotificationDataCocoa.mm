@@ -124,4 +124,9 @@ NSDictionary *NotificationData::dictionaryRepresentation() const
     return result.autorelease();
 }
 
+RetainPtr<NSDictionary> NotificationData::protectedDictionaryRepresentation() const
+{
+    return dictionaryRepresentation();
+}
+
 } // namespace WebKit

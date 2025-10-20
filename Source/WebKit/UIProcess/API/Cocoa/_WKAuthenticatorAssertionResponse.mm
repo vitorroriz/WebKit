@@ -56,9 +56,9 @@
 
 - (void)dealloc
 {
-    [_authenticatorData release];
-    [_signature release];
-    [_userHandle release];
+    SUPPRESS_UNRETAINED_ARG [_authenticatorData release];
+    SUPPRESS_UNRETAINED_ARG [_signature release];
+    SUPPRESS_UNRETAINED_ARG [_userHandle release];
     [super dealloc];
 }
 

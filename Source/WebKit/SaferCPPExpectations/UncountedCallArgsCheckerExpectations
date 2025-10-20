@@ -1,25 +1,6 @@
 Platform/IPC/ArgumentCoders.h
 UIProcess/API/Cocoa/WKUserScript.mm
-UIProcess/API/Cocoa/WKWebViewTesting.mm
-UIProcess/API/Cocoa/WKWebsiteDataRecord.mm
-UIProcess/API/Cocoa/WKWindowFeatures.mm
-UIProcess/API/Cocoa/_WKAttachment.mm
-UIProcess/API/Cocoa/_WKAutomationSession.mm
-UIProcess/API/Cocoa/_WKContentRuleListAction.mm
-UIProcess/API/Cocoa/_WKCustomHeaderFields.mm
-UIProcess/API/Cocoa/_WKFeature.mm
 UIProcess/API/Cocoa/_WKFrameTreeNode.mm
-UIProcess/API/Cocoa/_WKJSHandle.mm
-UIProcess/API/Cocoa/_WKProcessPoolConfiguration.mm
-UIProcess/API/Cocoa/_WKRemoteWebInspectorViewController.mm
-UIProcess/API/Cocoa/_WKResourceLoadStatisticsFirstParty.mm
-UIProcess/API/Cocoa/_WKResourceLoadStatisticsThirdParty.mm
-UIProcess/API/Cocoa/_WKSerializedNode.mm
-UIProcess/API/Cocoa/_WKTargetedElementInfo.mm
-UIProcess/API/Cocoa/_WKTargetedElementRequest.mm
-UIProcess/API/Cocoa/_WKUserStyleSheet.mm
-UIProcess/API/Cocoa/_WKWebAuthenticationAssertionResponse.mm
-UIProcess/API/Cocoa/_WKWebsiteDataStoreConfiguration.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIAlarmsCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIDeclarativeNetRequestCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIExtensionCocoa.mm
@@ -65,7 +46,6 @@ WebProcess/WebPage/mac/WKAccessibilityWebPageObjectBase.mm
 WebProcess/cocoa/TextTrackRepresentationCocoa.mm
 WebProcess/cocoa/VideoPresentationManager.mm
 WebProcess/cocoa/WebProcessCocoa.mm
-[ Mac ] UIProcess/API/Cocoa/_WKContextMenuElementInfo.mm
 [ Mac ] WebProcess/Extensions/API/Cocoa/WebExtensionAPIDevToolsInspectedWindowCocoa.mm
 [ Mac ] WebProcess/InjectedBundle/API/c/mac/WKBundlePageBannerMac.mm
 [ Mac ] WebProcess/Inspector/WebInspectorUIExtensionController.cpp

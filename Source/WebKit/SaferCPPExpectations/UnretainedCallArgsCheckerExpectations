@@ -12,19 +12,7 @@ Shared/Cocoa/WKNSURLRequest.mm
 Shared/EntryPointUtilities/Cocoa/Daemon/PCMDaemonEntryPoint.mm
 Shared/EntryPointUtilities/Cocoa/XPCService/XPCServiceMain.mm
 Shared/RemoteLayerTree/RemoteLayerTreePropertyApplier.mm
-UIProcess/API/C/mac/WKNotificationPrivateMac.mm
-UIProcess/API/C/mac/WKProtectionSpaceNS.mm
-UIProcess/API/Cocoa/WKSnapshotConfiguration.mm
-UIProcess/API/Cocoa/WKURLSchemeTask.mm
-UIProcess/API/Cocoa/WKUserScript.mm
-UIProcess/API/Cocoa/WKWebViewConfiguration.mm
 UIProcess/API/Cocoa/WKWebsiteDataRecord.mm
-UIProcess/API/Cocoa/_WKApplicationManifest.mm
-UIProcess/API/Cocoa/_WKArchiveConfiguration.mm
-UIProcess/API/Cocoa/_WKAuthenticationExtensionsClientInputs.mm
-UIProcess/API/Cocoa/_WKAuthenticatorAssertionResponse.mm
-UIProcess/API/Cocoa/_WKAuthenticatorAttestationResponse.mm
-UIProcess/API/Cocoa/_WKAuthenticatorResponse.mm
 WebProcess/InjectedBundle/API/mac/WKDOMInternals.mm
 WebProcess/InjectedBundle/API/mac/WKWebProcessPlugIn.mm
 WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextController.mm
@@ -40,9 +28,6 @@ WebProcess/WebPage/RemoteLayerTree/PlatformCALayerRemoteCustom.mm
 WebProcess/WebPage/WebPage.cpp
 WebProcess/cocoa/WebProcessCocoa.mm
 [ Mac ] Shared/mac/AuxiliaryProcessMac.mm
-[ Mac ] UIProcess/Automation/mac/WebAutomationSessionMac.mm
-[ Mac ] UIProcess/Inspector/Cocoa/InspectorExtensionDelegate.mm
-[ Mac ] UIProcess/Inspector/mac/WKInspectorViewController.mm
 [ Mac ] WebProcess/WebPage/mac/PageBannerMac.mm
 [ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
 [ Mac ] WebProcess/WebPage/mac/WebPageMac.mm

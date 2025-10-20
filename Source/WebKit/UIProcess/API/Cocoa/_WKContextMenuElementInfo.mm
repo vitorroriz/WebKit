@@ -53,7 +53,7 @@
 - (_WKHitTestResult *)hitTestResult
 {
     auto& hitTestResultData = _contextMenuElementInfoMac->hitTestResultData();
-    auto apiHitTestResult = API::HitTestResult::create(hitTestResultData, _contextMenuElementInfoMac->page());
+    auto apiHitTestResult = API::HitTestResult::create(hitTestResultData, _contextMenuElementInfoMac->protectedPage().get());
     return retainPtr(wrapper(apiHitTestResult)).autorelease();
 }
 
