@@ -67,6 +67,8 @@
 		07C02FD22D6D6FBC0004ED97 /* rtl-sideways-scrolling.html in Copy Resources */ = {isa = PBXBuildFile; fileRef = 07C02FD12D6D6FBC0004ED97 /* rtl-sideways-scrolling.html */; };
 		07C046CA1E4262A8007201E7 /* CARingBufferTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07C046C91E42573E007201E7 /* CARingBufferTest.cpp */; };
 		07CE1CF31F06A7E000BF89F5 /* GetUserMediaNavigation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07CE1CF21F06A7E000BF89F5 /* GetUserMediaNavigation.mm */; };
+		07DC68852EA33D5D00976E84 /* SwiftCxxInteropTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DC68742EA33A9A00976E84 /* SwiftCxxInteropTests.swift */; };
+		07DC68862EA33D6A00976E84 /* SwiftCxxInteropTestbed.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07DC68722EA33A3300976E84 /* SwiftCxxInteropTestbed.cpp */; };
 		07DEB43E2E7900B100066C32 /* SmartListsSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DEB43D2E7900B100066C32 /* SmartListsSupport.swift */; };
 		07DEB4492E7A030F00066C32 /* WebPage+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DEB4482E7A030F00066C32 /* WebPage+Extras.swift */; };
 		07DEB44A2E7A079400066C32 /* Foundation+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 078B04492CF139BF00B453A6 /* Foundation+Extras.swift */; };
@@ -2451,6 +2453,9 @@
 		07CD32F52065B5420064A4BE /* AVFoundationPreference.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AVFoundationPreference.mm; sourceTree = "<group>"; };
 		07CD32F72065B72A0064A4BE /* video.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = video.html; sourceTree = "<group>"; };
 		07CE1CF21F06A7E000BF89F5 /* GetUserMediaNavigation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GetUserMediaNavigation.mm; sourceTree = "<group>"; };
+		07DC68712EA33A3300976E84 /* SwiftCxxInteropTestbed.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwiftCxxInteropTestbed.h; sourceTree = "<group>"; };
+		07DC68722EA33A3300976E84 /* SwiftCxxInteropTestbed.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SwiftCxxInteropTestbed.cpp; sourceTree = "<group>"; };
+		07DC68742EA33A9A00976E84 /* SwiftCxxInteropTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftCxxInteropTests.swift; sourceTree = "<group>"; };
 		07DEB43D2E7900B100066C32 /* SmartListsSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartListsSupport.swift; sourceTree = "<group>"; };
 		07DEB4462E7906F800066C32 /* SmartListsSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SmartListsSupport.h; sourceTree = "<group>"; };
 		07DEB4482E7A030F00066C32 /* WebPage+Extras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebPage+Extras.swift"; sourceTree = "<group>"; };
@@ -6923,6 +6928,9 @@
 				A1C7D7D22AB817A90055AD62 /* LoggerCocoa.mm */,
 				44FBAEFD2C7A7FDB00AF51BC /* RetainPtrHashingCocoa.mm */,
 				44FBAEFE2C7A7FDB00AF51BC /* RetainPtrHashingCocoaARC.mm */,
+				07DC68722EA33A3300976E84 /* SwiftCxxInteropTestbed.cpp */,
+				07DC68712EA33A3300976E84 /* SwiftCxxInteropTestbed.h */,
+				07DC68742EA33A9A00976E84 /* SwiftCxxInteropTests.swift */,
 				1C4616A626BB172F00F8C9F6 /* TextStreamCocoa.cpp */,
 				1C46169E26BA510700F8C9F6 /* TextStreamCocoa.mm */,
 				44CDE4D326EE6E41009F6ACB /* TypeCastsCocoa.mm */,
@@ -8226,6 +8234,8 @@
 				078B044A2CF139BF00B453A6 /* Foundation+Extras.swift in Sources */,
 				A17C58472C9BF524009DD0B5 /* GoogleTests.mm in Sources */,
 				DD5698002DC1320500050321 /* rdar150228472.swift in Sources */,
+				07DC68862EA33D6A00976E84 /* SwiftCxxInteropTestbed.cpp in Sources */,
+				07DC68852EA33D5D00976E84 /* SwiftCxxInteropTests.swift in Sources */,
 				07A1E0042E2C1F25004E5C66 /* SwiftUI+Extras.swift in Sources */,
 				078B0CA92DF656BD00B3E569 /* TestPDFDocument.swift in Sources */,
 				078B04482CF118BD00B453A6 /* URLSchemeHandlerTests.swift in Sources */,
