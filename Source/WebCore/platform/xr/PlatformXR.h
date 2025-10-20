@@ -133,6 +133,9 @@ enum class SessionFeature : uint8_t {
 #if ENABLE(WEBXR_HANDS)
     HandTracking,
 #endif
+#if ENABLE(WEBXR_HIT_TEST)
+    HitTest,
+#endif
     WebGPU,
 };
 
@@ -175,6 +178,10 @@ inline std::optional<SessionFeature> parseSessionFeatureDescriptor(StringView st
     if (feature == "hand-tracking"_s)
         return SessionFeature::HandTracking;
 #endif
+#if ENABLE(WEBXR_HIT_TEST)
+    if (feature == "hit-test"_s)
+        return SessionFeature::HitTest;
+#endif
     if (feature == "webgpu"_s)
         return SessionFeature::WebGPU;
 
@@ -197,6 +204,10 @@ inline String sessionFeatureDescriptor(SessionFeature sessionFeature)
 #if ENABLE(WEBXR_HANDS)
     case SessionFeature::HandTracking:
         return "hand-tracking"_s;
+#endif
+#if ENABLE(WEBXR_HIT_TEST)
+    case SessionFeature::HitTest:
+        return "hit-test"_s;
 #endif
     case SessionFeature::WebGPU:
         return "webgpu"_s;

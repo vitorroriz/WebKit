@@ -1837,8 +1837,11 @@ list(APPEND WebCore_NON_SVG_IDL_FILES
     Modules/webxr/Navigator+WebXR.idl
     Modules/webxr/WebXRBoundedReferenceSpace.idl
     Modules/webxr/WebXRFrame+HandInput.idl
+    Modules/webxr/WebXRFrame+HitTest.idl
     Modules/webxr/WebXRFrame.idl
     Modules/webxr/WebXRHand.idl
+    Modules/webxr/WebXRHitTestResult.idl
+    Modules/webxr/WebXRHitTestSource.idl
     Modules/webxr/WebXRInputSource+Gamepad.idl
     Modules/webxr/WebXRInputSource+HandInput.idl
     Modules/webxr/WebXRInputSource.idl
@@ -1847,14 +1850,18 @@ list(APPEND WebCore_NON_SVG_IDL_FILES
     Modules/webxr/WebXRJointSpace.idl
     Modules/webxr/WebXRLayer.idl
     Modules/webxr/WebXRPose.idl
+    Modules/webxr/WebXRRay.idl
     Modules/webxr/WebXRReferenceSpace.idl
     Modules/webxr/WebXRRenderState+Layers.idl
     Modules/webxr/WebXRRenderState.idl
     Modules/webxr/WebXRRigidTransform.idl
     Modules/webxr/WebXRSession+AR.idl
+    Modules/webxr/WebXRSession+HitTest.idl
     Modules/webxr/WebXRSession.idl
     Modules/webxr/WebXRSpace.idl
     Modules/webxr/WebXRSystem.idl
+    Modules/webxr/WebXRTransientInputHitTestResult.idl
+    Modules/webxr/WebXRTransientInputHitTestSource.idl
     Modules/webxr/WebXRView.idl
     Modules/webxr/WebXRViewerPose.idl
     Modules/webxr/WebXRViewport.idl
@@ -1875,6 +1882,8 @@ list(APPEND WebCore_NON_SVG_IDL_FILES
     Modules/webxr/XRGPUSubImage.idl
     Modules/webxr/XRHandJoint.idl
     Modules/webxr/XRHandedness.idl
+    Modules/webxr/XRHitTestOptionsInit.idl
+    Modules/webxr/XRHitTestTrackableType.idl
     Modules/webxr/XRInputSourceEvent.idl
     Modules/webxr/XRInputSourcesChangeEvent.idl
     Modules/webxr/XRInteractionMode.idl
@@ -1886,6 +1895,7 @@ list(APPEND WebCore_NON_SVG_IDL_FILES
     Modules/webxr/XRProjectionLayerInit.idl
     Modules/webxr/XRQuadLayer.idl
     Modules/webxr/XRQuadLayerInit.idl
+    Modules/webxr/XRRayDirectionInit.idl
     Modules/webxr/XRReferenceSpaceEvent.idl
     Modules/webxr/XRReferenceSpaceType.idl
     Modules/webxr/XRRenderStateInit.idl
@@ -1895,6 +1905,7 @@ list(APPEND WebCore_NON_SVG_IDL_FILES
     Modules/webxr/XRSubImage.idl
     Modules/webxr/XRTargetRayMode.idl
     Modules/webxr/XRTextureType.idl
+    Modules/webxr/XRTransientInputHitTestOptionsInit.idl
     Modules/webxr/XRVisibilityState.idl
     Modules/webxr/XRWebGLBinding.idl
     Modules/webxr/XRWebGLLayerInit.idl

@@ -119,6 +119,10 @@ void OpenXRCoordinator::getPrimaryDeviceInfo(WebPageProxy& page, DeviceInfoCallb
     }
 #endif
 
+#if ENABLE(WEBXR_HIT_TEST)
+    deviceInfo.arFeatures.append(PlatformXR::SessionFeature::HitTest);
+#endif
+
     // In order to get the supported reference space types, we need the session to be created. However at this point we shouldn't do it.
     // Instead, we report ReferenceSpaceTypeLocalFloor as available, because we can supoport it via either the STAGE reference space, the
     // LOCAL_FLOOR reference space or even via an educated guess from the LOCAL reference space as a backup.

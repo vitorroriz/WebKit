@@ -30,16 +30,21 @@
 #if ENABLE(WEBXR)
 
 #include "ContextDestructionObserverInlines.h"
+#include "DocumentPage.h"
 #include "EventNames.h"
 #include "JSDOMPromiseDeferred.h"
+#include "JSWebXRHitTestSource.h"
 #include "JSWebXRReferenceSpace.h"
+#include "JSWebXRTransientInputHitTestSource.h"
 #include "Page.h"
 #include "PlatformXR.h"
 #include "SecurityOrigin.h"
 #include "WebCoreOpaqueRoot.h"
 #include "WebXRBoundedReferenceSpace.h"
 #include "WebXRFrame.h"
+#include "WebXRHitTestSource.h"
 #include "WebXRSystem.h"
+#include "WebXRTransientInputHitTestSource.h"
 #include "WebXRView.h"
 #include "XRFrameRequestCallback.h"
 #include "XRGPUProjectionLayerInit.h"
@@ -743,6 +748,18 @@ bool WebXRSession::posesCanBeReported(const Document& document) const
 bool WebXRSession::isHandTrackingEnabled() const
 {
     return m_requestedFeatures.contains(PlatformXR::SessionFeature::HandTracking);
+}
+#endif
+
+#if ENABLE(WEBXR_HIT_TEST)
+void WebXRSession::requestHitTestSource(const XRHitTestOptionsInit&, RequestHitTestSourcePromise&& promise)
+{
+    promise.resolve(WebXRHitTestSource::create());
+}
+
+void WebXRSession::requestHitTestSourceForTransientInput(const XRTransientInputHitTestOptionsInit&, RequestHitTestSourceForTransientInputPromise&& promise)
+{
+    promise.resolve(WebXRTransientInputHitTestSource::create());
 }
 #endif
 

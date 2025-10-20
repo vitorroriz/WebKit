@@ -9666,6 +9666,21 @@ WebXRHandInputModuleEnabled:
     WebCore:
       default: true
 
+WebXRHitTestModuleEnabled:
+  type: bool
+  status: testable
+  category: dom
+  humanReadableName: "WebXR Hit Test Module"
+  humanReadableDescription: "Adds support for the Hit Test Module for WebXR"
+  condition: ENABLE(WEBXR_HIT_TEST)
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+
 WebXRLayersAPIEnabled:
   type: bool
   status: Webxr_layers_feature_status
