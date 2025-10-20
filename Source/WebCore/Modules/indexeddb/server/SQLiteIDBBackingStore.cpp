@@ -664,17 +664,33 @@ bool SQLiteIDBBackingStore::migrateIndexRecordsTableForIDUpdate(const HashMap<st
     return true;
 }
 
-static String getDatabaseNameFromDatabase(SQLiteDatabase& database, uint64_t metadataVersion)
+static Expected<std::pair<uint64_t, String>, IDBError> databaseMetadataVersionAndNameFromDatabase(SQLiteDatabase& database)
 {
+    uint64_t metadataVersion = 0;
+    {
+        auto sql = database.prepareStatement("SELECT value FROM IDBDatabaseInfo WHERE key = 'MetadataVersion';"_s);
+        if (!sql)
+            return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Failed to prepare statement for getting metadata version ("_s, database.lastError(), ") - "_s, unsafeSpan(database.lastErrorMsg())) });
+        CheckedRef statement = *sql;
+        String stringVersion = statement->columnText(0);
+        auto parsedVersion = parseInteger<uint64_t>(stringVersion);
+        if (!parsedVersion)
+            return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Database metadata version on disk ("_s, stringVersion, ") cannot be converted to unsigned 64-bit integer"_s) });
+        metadataVersion = *parsedVersion;
+    }
+
     auto sql = database.prepareStatement("SELECT value FROM IDBDatabaseInfo WHERE key = 'DatabaseName';"_s);
     if (!sql)
-        return { };
+        return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Cannot get stored database name"_s) });
 
+    String databaseName;
     CheckedRef statement = *sql;
     if (metadataVersion == 1)
-        return statement->columnText(0);
+        databaseName = statement->columnText(0);
+    else
+        databaseName = statement->columnBlobAsString(0);
 
-    return statement->columnBlobAsString(0);
+    return std::pair<uint64_t, String> { metadataVersion, databaseName };
 }
 
 static IDBError migrateIDBDatabaseInfoTableIfNecessary(SQLiteDatabase& database, const String& databaseName)
@@ -683,20 +699,13 @@ static IDBError migrateIDBDatabaseInfoTableIfNecessary(SQLiteDatabase& database,
     if (tableStatement.isEmpty())
         return IDBError { ExceptionCode::UnknownError, makeString("IDBDatabaseInfo table does not exist ("_s, database.lastError(), ") - "_s, unsafeSpan(database.lastErrorMsg())) };
 
-    uint64_t metadataVersion = 0;
-    {
-        auto sql = database.prepareStatement("SELECT value FROM IDBDatabaseInfo WHERE key = 'MetadataVersion';"_s);
-        if (!sql)
-            return IDBError { ExceptionCode::UnknownError, makeString("Failed to prepare statement for getting metadata version ("_s, database.lastError(), ") - "_s, unsafeSpan(database.lastErrorMsg())) };
-        CheckedRef statement = *sql;
-        String stringVersion = statement->columnText(0);
-        auto parsedVersion = parseInteger<uint64_t>(stringVersion);
-        if (!parsedVersion)
-            return IDBError { ExceptionCode::UnknownError, makeString("Database metadata version on disk ("_s, stringVersion, ") cannot be converted to unsigned 64-bit integer"_s) };
-        metadataVersion = *parsedVersion;
+    auto result = databaseMetadataVersionAndNameFromDatabase(database);
+    if (!result) {
+        ASSERT(!result.error().isNull());
+        return result.error();
     }
 
-    String existingDatabaseName = getDatabaseNameFromDatabase(database, metadataVersion);
+    auto [metadataVersion, existingDatabaseName] = result.value();
     // UTF-8 encoded names should always match regardless of metadata version.
     if (existingDatabaseName.utf8() != databaseName.utf8())
         return IDBError { ExceptionCode::UnknownError, "Stored database name does not match requested name"_s };
@@ -911,13 +920,14 @@ std::optional<IDBDatabaseNameAndVersion> SQLiteIDBBackingStore::databaseNameAndV
         return std::nullopt;
     }
 
-    auto namesql = database.prepareStatement("SELECT value FROM IDBDatabaseInfo WHERE key = 'DatabaseName';"_s);
-    if (!namesql) {
-        LOG_ERROR("Could not prepare statement to get database name(%i) - %s", database.lastError(), database.lastErrorMsg());
+    auto result = databaseMetadataVersionAndNameFromDatabase(database);
+    if (!result) {
+        ASSERT(!result.error().isNull());
+        LOG_ERROR("SQLiteIDBBackingStore::databaseNameAndVersionFromFile(): Got error %s", result.error().message().utf8().data());
         return std::nullopt;
     }
-    auto databaseName = CheckedRef { *namesql }->columnBlobAsString(0);
 
+    auto databaseName = result.value().second;
     auto versql = database.prepareStatement("SELECT value FROM IDBDatabaseInfo WHERE key = 'DatabaseVersion';"_s);
     String stringVersion = versql ? CheckedRef { *versql }->columnText(0) : String();
     auto databaseVersion = parseInteger<uint64_t>(stringVersion);

@@ -50,12 +50,7 @@
 
 @end
 
-// REGRESSION(301753@main): Broke TestWebKitAPI.IndexedDB.DeleteRecovery on Debug https://bugs.webkit.org/show_bug.cgi?id=301097
-#if !defined(NDEBUG)
-TEST(IndexedDB, DISABLED_DeleteRecovery)
-#else
 TEST(IndexedDB, DeleteRecovery)
-#endif
 {
     RetainPtr<IDBDeleteRecoveryMessageHandler> handler = adoptNS([[IDBDeleteRecoveryMessageHandler alloc] init]);
     RetainPtr<WKWebViewConfiguration> configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
