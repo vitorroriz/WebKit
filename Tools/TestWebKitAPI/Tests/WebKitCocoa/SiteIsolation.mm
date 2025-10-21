@@ -4358,17 +4358,25 @@ TEST(SiteIsolation, IframeOpener)
 
 TEST(SiteIsolation, CrossProtocolNavigationWithAboutURL)
 {
-    HTTPServer server({
+    HTTPServer secureServer({
         { "/example"_s, { "hi"_s } },
     }, HTTPServer::Protocol::HttpsProxy);
 
-    RetainPtr processPoolConfiguration = adoptNS([[_WKProcessPoolConfiguration alloc] init]);
-    processPoolConfiguration.get().usesWebProcessCache = YES;
-    RetainPtr processPool = adoptNS([[WKProcessPool alloc] _initWithConfiguration:processPoolConfiguration.get()]);
-    RetainPtr webViewConfiguration = server.httpsProxyConfiguration();
-    [webViewConfiguration setProcessPool:processPool.get()];
+    HTTPServer plaintextServer({
+        { "http://example.com/example"_s, { "hi"_s } },
+    });
 
-    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(webViewConfiguration.get());
+    RetainPtr navigationDelegate = adoptNS([TestNavigationDelegate new]);
+    [navigationDelegate allowAnyTLSCertificate];
+    RetainPtr storeConfiguration = adoptNS([[_WKWebsiteDataStoreConfiguration alloc] initNonPersistentConfiguration]);
+    [storeConfiguration setHTTPSProxy:[NSURL URLWithString:[NSString stringWithFormat:@"https://127.0.0.1:%d/", secureServer.port()]]];
+    [storeConfiguration setHTTPProxy:[NSURL URLWithString:[NSString stringWithFormat:@"https://127.0.0.1:%d/", plaintextServer.port()]]];
+    RetainPtr viewConfiguration = adoptNS([WKWebViewConfiguration new]);
+    [viewConfiguration setWebsiteDataStore:adoptNS([[WKWebsiteDataStore alloc] _initWithConfiguration:storeConfiguration.get()]).get()];
+    enableSiteIsolation(viewConfiguration.get());
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectZero configuration:viewConfiguration.get()]);
+    webView.get().navigationDelegate = navigationDelegate.get();
+
     [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/example"]]];
     [navigationDelegate waitForDidFinishNavigation];
     auto processIdentifier1 = [webView _webProcessIdentifier];
