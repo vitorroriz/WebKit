@@ -10567,8 +10567,10 @@ mintAlign(_call)
     pop wasmInstance, ws0
     # pop targetInstance, targetEntrypoint
 
-    # Save stack pointer, if we tail call someone who changes the frame above's stack argument size
+    # Save stack pointer, if we tail call someone who changes the frame above's stack argument size.
+    # Store its value relative to cfp so stack frames can be easily relocated for JSPI.
     move sp, sc1
+    subp cfr, sc1
     storep sc1, ThisArgumentOffset[cfr]
 
     # Swap instances
@@ -10597,6 +10599,7 @@ _wasm_ipint_call_return_location_wide16:
 _wasm_ipint_call_return_location_wide32:
     # Restore the stack pointer
     loadp ThisArgumentOffset[cfr], sc0
+    addp cfr, sc0
     move sc0, sp
 
     # <first non-arg>   <- t3
