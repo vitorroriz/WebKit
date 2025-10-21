@@ -2728,7 +2728,7 @@ EventTimingEnabled:
   humanReadableDescription: "Enable the Event Timing API and supporting instrumentation"
   defaultValue:
     WebKitLegacy:
-      default: true
+      default: false
     WebKit:
       default: true
     WebCore:
