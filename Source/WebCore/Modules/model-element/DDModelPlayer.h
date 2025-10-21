@@ -86,7 +86,7 @@ private:
     GraphicsLayerContentsDisplayDelegate* contentsDisplayDelegate() override;
     void ensureOnMainThreadWithProtectedThis(Function<void(Ref<DDModelPlayer>)>&& task);
 
-    ThreadSafeWeakPtr<ModelPlayerClient> m_client;
+    WeakPtr<ModelPlayerClient> m_client;
 
     WebCore::ModelPlayerIdentifier m_id;
     RetainPtr<WebUSDModelLoader> m_modelLoader;

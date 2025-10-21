@@ -72,11 +72,7 @@ private:
     GraphicsLayerContentsDisplayDelegate* contentsDisplayDelegate() override;
 #endif
 
-#if ENABLE(GPU_PROCESS_MODEL)
-    ThreadSafeWeakPtr<ModelPlayerClient> m_client;
-#else
     WeakPtr<ModelPlayerClient> m_client;
-#endif
     ModelPlayerIdentifier m_id;
 };
 
