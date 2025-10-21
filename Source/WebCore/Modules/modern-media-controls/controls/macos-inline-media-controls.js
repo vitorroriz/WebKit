@@ -139,10 +139,16 @@ class MacOSInlineMediaControls extends InlineMediaControls
                 this._volumeSliderContainer.children = [new BackgroundTint, this.volumeSlider, this.muteButton];
                 children.push(this._volumeSliderContainer);
                 this.children = children;
+
+                if (this.muteButton)
+                    this.muteButton.visible = true;
             } else if (!shouldShowVolumeContainer && children.includes(this._volumeSliderContainer)) {
                 const volumeContainerIndex = children.indexOf(this._volumeSliderContainer);
                 children.splice(volumeContainerIndex, 1);
                 this.children = children;
+
+                if (this.muteButton)
+                    this.muteButton.visible = false;
             }
         }
     }
