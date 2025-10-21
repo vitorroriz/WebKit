@@ -76,13 +76,12 @@ public:
     CString(std::span<const Latin1Character>); // Latin1
     CString(std::span<const char8_t> characters) : CString(byteCast<Latin1Character>(characters)) { } // UTF-8
     CString(CStringBuffer* buffer) : m_buffer(buffer) { }
-    CString(const std::string&); // Any encoding.
     WTF_EXPORT_PRIVATE static CString newUninitialized(size_t length, std::span<char>& characterBuffer);
     CString(HashTableDeletedValueType) : m_buffer(HashTableDeletedValue) { }
 
     const char* data() const LIFETIME_BOUND; // Any encoding
 
-    std::string toStdString() const;
+    std::string toStdString() const { return m_buffer ? std::string(m_buffer->spanIncludingNullTerminator().data()) : std::string(); }
 
     std::span<const char> span() const LIFETIME_BOUND; // Any encoding
     std::span<const char> spanIncludingNullTerminator() const LIFETIME_BOUND; // Any encoding
@@ -129,11 +128,6 @@ inline CString::CString(std::span<const Latin1Character> bytes)
 {
 }
 
-inline CString::CString(const std::string& value)
-    : CString(unsafeMakeSpan(value.data(), value.size()))
-{
-}
-
 inline const char* CString::data() const
 {
     return m_buffer ? m_buffer->spanIncludingNullTerminator().data() : nullptr;
@@ -156,12 +150,6 @@ inline std::span<const char> CString::spanIncludingNullTerminator() const
 inline size_t CString::length() const
 {
     return m_buffer ? m_buffer->length() : 0;
-}
-
-inline std::string CString::toStdString() const
-{
-    auto span = this->span();
-    return std::string { span.data(), span.size() };
 }
 
 // CString is null terminated
