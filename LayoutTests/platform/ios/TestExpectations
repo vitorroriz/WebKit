@@ -8304,3 +8304,6 @@ editing/input/cocoa/writing-suggestions-textarea-multiple-lines.html [ Pass Fail
 
 # https://bugs.webkit.org/show_bug.cgi?id=301173 [ iOS 26 ] fast/text/international/hindi-spacing.html is a constant text failure
 fast/text/international/hindi-spacing.html [ Pass Failure ]
+
+# https://bugs.webkit.org/show_bug.cgi?id=301174 [ iOS 26 ] fast/text/text-underline-position-under.html is a constant image failure
+fast/text/text-underline-position-under.html [ Pass ImageOnlyFailure ]
