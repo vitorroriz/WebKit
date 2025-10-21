@@ -11521,6 +11521,7 @@
         "web-platform-tests/html/rendering/widgets/the-select-element/option-label-ref.html",
         "web-platform-tests/html/rendering/widgets/the-select-element/select-invalidation-ref.html",
         "web-platform-tests/html/rendering/widgets/the-select-element/select-size-ref.html",
+        "web-platform-tests/html/select/select-capitalize-sizing-ref.html",
         "web-platform-tests/html/semantics/document-metadata/the-base-element/example.html",
         "web-platform-tests/html/semantics/document-metadata/the-base-element/example2.html",
         "web-platform-tests/html/semantics/document-metadata/the-link-element/link-rel-attribute-ascii-case-insensitive-notref.html",
