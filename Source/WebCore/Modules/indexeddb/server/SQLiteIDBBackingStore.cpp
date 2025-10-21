@@ -744,19 +744,17 @@ static IDBError migrateIDBDatabaseInfoTableIfNecessary(SQLiteDatabase& database,
     return IDBError { };
 }
 
-std::unique_ptr<IDBDatabaseInfo> SQLiteIDBBackingStore::extractExistingDatabaseInfo()
+Expected<std::unique_ptr<IDBDatabaseInfo>, IDBError> SQLiteIDBBackingStore::extractExistingDatabaseInfo()
 {
     CheckedPtr sqliteDB = m_sqliteDB.get();
     ASSERT(sqliteDB);
 
     if (!sqliteDB->tableExists("IDBDatabaseInfo"_s))
-        return nullptr;
+        return std::unique_ptr<IDBDatabaseInfo> { nullptr };
 
     IDBError error = migrateIDBDatabaseInfoTableIfNecessary(*sqliteDB, m_identifier.databaseName());
-    if (!error.isNull()) {
-        RELEASE_LOG_ERROR(IndexedDB, "%p - SQLiteIDBBackingStore::extractExistingDatabaseInfo(): Failed to migrate IDBDatabaseInfo table (%s)", this, error.messageForSerialization().utf8().data());
-        return nullptr;
-    }
+    if (!error.isNull())
+        return makeUnexpected(error);
 
     uint64_t databaseVersion;
     {
@@ -764,24 +762,22 @@ std::unique_ptr<IDBDatabaseInfo> SQLiteIDBBackingStore::extractExistingDatabaseI
         CheckedRef statement = *sql;
         String stringVersion = statement->columnText(0);
         auto parsedVersion = parseInteger<uint64_t>(stringVersion);
-        if (!parsedVersion) {
-            LOG_ERROR("Database version on disk ('%s') does not cleanly convert to an unsigned 64-bit integer version", stringVersion.utf8().data());
-            return nullptr;
-        }
+        if (!parsedVersion)
+            return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Stored database version ("_s, stringVersion, ") is not valid integer"_s) });
         databaseVersion = *parsedVersion;
     }
 
     auto databaseInfo = makeUnique<IDBDatabaseInfo>(m_identifier.databaseName(), databaseVersion, 0);
     auto result = ensureValidObjectStoreInfoTable();
     if (!result)
-        return nullptr;
+        return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Stored object info table is invalid"_s) });
 
     bool shouldUpdateIndexID = (result.value() == IsSchemaUpgraded::Yes);
 
     {
         auto sql = sqliteDB->prepareStatement("SELECT id, name, keyPath, autoInc FROM ObjectStoreInfo;"_s);
         if (!sql)
-            return nullptr;
+            return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Failed to object store info from database"_s) });
 
         CheckedRef statement = *sql;
         int result = statement->step();
@@ -791,10 +787,8 @@ std::unique_ptr<IDBDatabaseInfo> SQLiteIDBBackingStore::extractExistingDatabaseI
             auto keyPathBufferSpan = statement->columnBlobAsSpan(2);
 
             std::optional<IDBKeyPath> objectStoreKeyPath;
-            if (!deserializeIDBKeyPath(keyPathBufferSpan, objectStoreKeyPath)) {
-                LOG_ERROR("Unable to extract key path from database");
-                return nullptr;
-            }
+            if (!deserializeIDBKeyPath(keyPathBufferSpan, objectStoreKeyPath))
+                return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Cannot extract key path from database"_s) });
 
             bool autoIncrement = statement->columnInt(3);
 
@@ -803,10 +797,8 @@ std::unique_ptr<IDBDatabaseInfo> SQLiteIDBBackingStore::extractExistingDatabaseI
             result = statement->step();
         }
 
-        if (result != SQLITE_DONE) {
-            LOG_ERROR("Error fetching object store info from database on disk");
-            return nullptr;
-        }
+        if (result != SQLITE_DONE)
+            return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Failed to complete object store info fetching from database"_s) });
     }
 
     uint64_t maxIndexID = 0;
@@ -814,10 +806,8 @@ std::unique_ptr<IDBDatabaseInfo> SQLiteIDBBackingStore::extractExistingDatabaseI
     HashSet<IDBIndexIdentifier> existingIndexIDs;
     {
         auto sql = sqliteDB->prepareStatement("SELECT id, name, objectStoreID, keyPath, isUnique, multiEntry FROM IndexInfo;"_s);
-        if (!sql) {
-            LOG_ERROR("Unable to prepare statement to fetch records from the IndexInfo table.");
-            return nullptr;
-        }
+        if (!sql)
+            return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Failed to fetch index info from database"_s) });
 
         CheckedRef statement = *sql;
         int result = statement->step();
@@ -828,23 +818,15 @@ std::unique_ptr<IDBDatabaseInfo> SQLiteIDBBackingStore::extractExistingDatabaseI
             auto keyPathBufferSpan = statement->columnBlobAsSpan(3);
 
             std::optional<IDBKeyPath> indexKeyPath;
-            if (!deserializeIDBKeyPath(keyPathBufferSpan, indexKeyPath)) {
-                LOG_ERROR("Unable to extract key path from database");
-                return nullptr;
-            }
-            if (!indexKeyPath) {
-                LOG_ERROR("Unable to extract key path from database");
-                return nullptr;
-            }
+            if (!deserializeIDBKeyPath(keyPathBufferSpan, indexKeyPath) || !indexKeyPath)
+                return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Failed to extract index key path from database"_s) });
 
             bool unique = statement->columnInt(4);
             bool multiEntry = statement->columnInt(5);
 
             auto objectStore = databaseInfo->infoForExistingObjectStore(objectStoreID);
-            if (!objectStore) {
-                LOG_ERROR("Found index referring to a non-existent object store");
-                return nullptr;
-            }
+            if (!objectStore)
+                return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Index refers to a non-existent object store"_s) });
 
             if (shouldUpdateIndexID) {
                 indexIDMap.set({ objectStoreID, indexID }, IDBIndexIdentifier { ++maxIndexID });
@@ -853,10 +835,8 @@ std::unique_ptr<IDBDatabaseInfo> SQLiteIDBBackingStore::extractExistingDatabaseI
 
             if (!shouldUpdateIndexID) {
                 auto addResult = existingIndexIDs.add(indexID);
-                if (!addResult.isNewEntry) {
-                    RELEASE_LOG_ERROR(IndexedDB, "%p - SQLiteIDBBackingStore::extractExistingDatabaseInfo(): Index with the same index ID already exists", this);
-                    return nullptr;
-                }
+                if (!addResult.isNewEntry)
+                    return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Index with the same ID already exists"_s) });
             }
 
             auto indexInfo = IDBIndexInfo { indexID, objectStoreID, indexName, WTFMove(indexKeyPath.value()), unique, multiEntry };
@@ -866,16 +846,15 @@ std::unique_ptr<IDBDatabaseInfo> SQLiteIDBBackingStore::extractExistingDatabaseI
             result = statement->step();
         }
 
-        if (result != SQLITE_DONE) {
-            LOG_ERROR("Error fetching index info from database on disk");
-            return nullptr;
-        }
+        if (result != SQLITE_DONE)
+            return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Failed to complete index info fetching from database"_s) });
+
         databaseInfo->setMaxIndexID(maxIndexID);
     }
 
     if (shouldUpdateIndexID) {
         if (!migrateIndexInfoTableForIDUpdate(indexIDMap) || !migrateIndexRecordsTableForIDUpdate(indexIDMap))
-            return nullptr;
+            return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Stored index records table is invalid"_s) });
     }
 
     return databaseInfo;
@@ -1000,10 +979,14 @@ IDBError SQLiteIDBBackingStore::getOrEstablishDatabaseInfo(IDBDatabaseInfo& info
         return error;
     }
 
-    auto databaseInfo = extractExistingDatabaseInfo();
-    if (!databaseInfo)
-        databaseInfo = createAndPopulateInitialDatabaseInfo();
+    auto result = extractExistingDatabaseInfo();
+    if (!result) {
+        ASSERT(!result.error().isNull());
+        closeSQLiteDB();
+        return result.error();
+    }
 
+    auto databaseInfo = result.value() ? std::exchange(result.value(), nullptr) : createAndPopulateInitialDatabaseInfo();
     if (!databaseInfo) {
         LOG_ERROR("Unable to establish IDB database at path '%s'", databasePath.utf8().data());
         closeSQLiteDB();
