@@ -483,6 +483,7 @@ class RemoteLayerTreeNode;
 class RemoteLayerTreeScrollingPerformanceData;
 class RemoteLayerTreeTransaction;
 class RemoteMediaSessionCoordinatorProxy;
+class RemoteMediaSessionManagerProxy;
 class RemotePageProxy;
 class RemoteScrollingCoordinatorProxy;
 class RevealItem;
@@ -822,6 +823,10 @@ public:
     VideoPresentationManagerProxy* videoPresentationManager();
     RefPtr<VideoPresentationManagerProxy> protectedVideoPresentationManager();
     void setMockVideoPresentationModeEnabled(bool);
+#endif
+
+#if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
+    void ensureRemoteMediaSessionManagerProxy();
 #endif
 
 #if PLATFORM(IOS_FAMILY)
@@ -3989,6 +3994,10 @@ private:
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
     String m_defaultSpatialTrackingLabel;
+#endif
+
+#if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
+    RefPtr<RemoteMediaSessionManagerProxy> m_mediaSessionManagerProxy;
 #endif
 
     WeakHashSet<WebCore::NowPlayingMetadataObserver> m_nowPlayingMetadataObservers;

@@ -236,6 +236,9 @@ public:
     virtual String description() const = 0;
 #endif
 
+    virtual std::optional<MediaSessionGroupIdentifier> mediaSessionGroupIdentifier() const { return client().mediaSessionGroupIdentifier(); }
+    virtual bool isPlayingOnSecondScreen() const { return client().isPlayingOnSecondScreen(); }
+
     void invalidateClient() { m_client = emptyPlatformMediaSessionClient(); }
     PlatformMediaSessionClient& client() const { return m_client; }
 

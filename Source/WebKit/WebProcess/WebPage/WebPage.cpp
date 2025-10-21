@@ -504,6 +504,10 @@
 #include "CoreIPCAuditToken.h"
 #endif
 
+#if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
+#include "RemoteMediaSessionManager.h"
+#endif
+
 #if __has_include(<WebKitAdditions/WebPreferencesDefaultValuesAdditions.h>)
 #include <WebKitAdditions/WebPreferencesDefaultValuesAdditions.h>
 #endif
@@ -913,6 +917,34 @@ WebPage::WebPage(PageIdentifier pageID, WebPageCreationParameters&& parameters)
 
 #if ENABLE(IMAGE_ANALYSIS)
     pageConfiguration.imageTranslationLanguageIdentifiers = WTFMove(parameters.imageTranslationLanguageIdentifiers);
+#endif
+
+#if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
+    if (parameters.store.getBoolValueForKey(WebPreferencesKey::remoteMediaSessionManagerEnabledKey())) {
+        pageConfiguration.mediaSessionManagerFactory = [weakThis = WeakPtr { *this }](PageIdentifier) -> RefPtr<MediaSessionManagerInterface> {
+
+            RefPtr protectedThis = weakThis.get();
+            if (!protectedThis)
+                return nullptr;
+
+            RefPtr topDocument = protectedThis->localTopDocument();
+            if (!topDocument)
+                return nullptr;
+
+            RefPtr topCorePage = topDocument->page();
+            if (!topCorePage)
+                return nullptr;
+
+            RefPtr topWebPage = WebPage::fromCorePage(*topCorePage);
+            if (!topWebPage)
+                return nullptr;
+
+            RefPtr<PlatformMediaSessionManager> manager = RemoteMediaSessionManager::create(*topWebPage, *protectedThis);
+            manager->resetRestrictions();
+
+            return manager;
+        };
+    }
 #endif
 
     Ref page = Page::create(WTFMove(pageConfiguration));

@@ -6290,7 +6290,7 @@ RemoteMediaSessionManagerEnabled:
   status: unstable
   category: media
   humanReadableName: "Remote MediaSessionManager"
-  humanReadableDescription: "Enable MediaSessionManager in the GPU process"
+  humanReadableDescription: "Enable MediaSessionManager in the UI process"
   defaultValue:
     WebKitLegacy:
       default: false

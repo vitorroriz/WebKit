@@ -109,6 +109,7 @@ set(WebKit_PRIVATE_INCLUDE_DIRECTORIES
     "${WEBKIT_DIR}/WebProcess/InjectedBundle/DOM"
     "${WEBKIT_DIR}/WebProcess/Inspector"
     "${WEBKIT_DIR}/WebProcess/Launching"
+    "${WEBKIT_DIR}/WebProcess/Media"
     "${WEBKIT_DIR}/WebProcess/MediaCache"
     "${WEBKIT_DIR}/WebProcess/MediaStream"
     "${WEBKIT_DIR}/WebProcess/Model"
@@ -295,6 +296,7 @@ set(WebKit_MESSAGES_IN_FILES
     UIProcess/Extensions/WebExtensionController
 
     UIProcess/Media/RemoteMediaSessionCoordinatorProxy
+    UIProcess/Media/RemoteMediaSessionManagerProxy
 
     UIProcess/SpeechRecognitionRemoteRealtimeMediaSourceManager
     UIProcess/SpeechRecognitionServer
@@ -372,6 +374,7 @@ set(WebKit_MESSAGES_IN_FILES
     WebProcess/Inspector/WebInspectorInterruptDispatcher
     WebProcess/Inspector/WebInspectorUI
 
+    WebProcess/Media/RemoteMediaSessionManager
     WebProcess/MediaSession/RemoteMediaSessionCoordinator
 
     WebProcess/Model/ModelProcessConnection
@@ -697,6 +700,8 @@ set(WebKit_SERIALIZATION_IN_FILES
     WebProcess/GPU/media/RemoteVideoFrameProxyProperties.serialization.in
 
     WebProcess/GPU/webrtc/SharedVideoFrame.serialization.in
+
+    WebProcess/Media/RemoteMediaSessionState.serialization.in
 
     WebProcess/MediaStream/MediaDeviceSandboxExtensions.serialization.in
 

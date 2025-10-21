@@ -455,6 +455,10 @@
 #include "WebKit-Swift-CPP.h"
 #endif
 
+#if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
+#include "RemoteMediaSessionManagerProxy.h"
+#endif
+
 #define MESSAGE_CHECK(process, assertion) MESSAGE_CHECK_BASE(assertion, process->connection())
 #define MESSAGE_CHECK_URL(process, url) MESSAGE_CHECK_BASE(checkURLReceivedFromCurrentOrPreviousWebProcess(process, url), process->connection())
 #define MESSAGE_CHECK_URL_COROUTINE(process, url) MESSAGE_CHECK_BASE_COROUTINE(checkURLReceivedFromCurrentOrPreviousWebProcess(process, url), process->connection())
@@ -10042,6 +10046,14 @@ void WebPageProxy::setMockVideoPresentationModeEnabled(bool enabled)
         videoPresentationManager->setMockVideoPresentationModeEnabled(enabled);
 }
 
+#endif
+
+#if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
+void WebPageProxy::ensureRemoteMediaSessionManagerProxy()
+{
+    if (!m_mediaSessionManagerProxy)
+        m_mediaSessionManagerProxy = RemoteMediaSessionManagerProxy::create(webPageIDInMainFrameProcess(), Ref { siteIsolatedProcess() });
+}
 #endif
 
 #if PLATFORM(IOS_FAMILY)
