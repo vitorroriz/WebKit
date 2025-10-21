@@ -8319,3 +8319,5 @@ imported/w3c/web-platform-tests/html/semantics/popovers/popover-light-dismiss-co
 # https://bugs.webkit.org/show_bug.cgi?id=301224 [ iOS 26 ] 2x imported/w3c/web-platform-tests/uievents/mouse/ tests (layout-tests)
 imported/w3c/web-platform-tests/uievents/mouse/mouseover-at-removing-mousedown-target.html?duration=42 [ Pass Failure ]
 imported/w3c/web-platform-tests/uievents/mouse/mouseover-at-removing-mousedown-target.html?duration=16 [ Pass Failure ]
+
+webkit.org/b/301225 [ Debug ] ipc/serialized-type-info.html [ Failure ]
