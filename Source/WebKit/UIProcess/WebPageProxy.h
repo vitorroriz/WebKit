@@ -2911,7 +2911,10 @@ private:
     void setNetworkRequestsInProgress(bool);
 
     void didEndNetworkRequestsForPageLoadTimingTimerFired();
-    void generatePageLoadingTimingSoon();
+
+    enum class GeneratePageLoadTimingResult : uint8_t { WaitForPageLoadTimingObject, WaitForFirstVisualLayout, WaitForFirstMeaningfulPaint, WaitForDOMContentLoaded, WaitForLoadEvent, WaitForSubresourcesFinishedLoading, WaitForQuiescence };
+    GeneratePageLoadTimingResult generatePageLoadTimingSoonImpl();
+    void generatePageLoadTimingSoon();
 #if PLATFORM(COCOA)
     void didGeneratePageLoadTiming(const WebPageLoadTiming&);
 #else

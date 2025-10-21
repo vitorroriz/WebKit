@@ -58,6 +58,7 @@
 #import "WebContextMenuProxy.h"
 #import "WebFrameProxy.h"
 #import "WebPage.h"
+#import "WebPageLoadTiming.h"
 #import "WebPageMessages.h"
 #import "WebPageProxyInternals.h"
 #import "WebPasteboardProxy.h"
@@ -150,6 +151,19 @@ constexpr IntSize iconSize = IntSize(400, 400);
 
 void WebPageProxy::didGeneratePageLoadTiming(const WebPageLoadTiming& timing)
 {
+    // These times will not exactly match times reported by the PLT benchmark, since the benchmark
+    // uses loadRequestForNavigation as the start timestamp, while this object uses navigationStart
+    // (didStartProvisionalLoadForFrameShared) as the start timestamp.
+    auto url = m_mainFrame ? m_mainFrame->url() : URL();
+    auto startTime = timing.navigationStart();
+    auto firstVisualLayoutDuration = timing.firstVisualLayout() - startTime;
+    auto firstMeaningfulPaintDuration = timing.firstMeaningfulPaint() - startTime;
+    auto documentFinishedLoadingDuration = timing.documentFinishedLoading() - startTime;
+    auto finishedLoadingDuration = timing.finishedLoading() - startTime;
+    auto subresourcesFinishedLoadingDuration = timing.allSubresourcesFinishedLoading() - startTime;
+
+    WEBPAGEPROXY_RELEASE_LOG(Loading, "didGeneratePageLoadTiming: url=%" SENSITIVE_LOG_STRING " firstVisualLayout=%.3f firstMeaningfulPaint=%.3f domContentLoaded=%.3f loadEvent=%.3f subresourcesFinished=%.3f", url.string().ascii().data(), firstVisualLayoutDuration.seconds(), firstMeaningfulPaintDuration.seconds(), documentFinishedLoadingDuration.seconds(), finishedLoadingDuration.seconds(), subresourcesFinishedLoadingDuration.seconds());
+
     if (RefPtr state = NavigationState::fromWebPage(*this))
         state->didGeneratePageLoadTiming(timing);
 }

@@ -6638,8 +6638,14 @@ void WebPageProxy::didDestroyFrame(IPC::Connection& connection, FrameIdentifier 
     if (RefPtr frame = WebFrameProxy::webFrame(frameID))
         frame->disconnect();
 
-    if (m_framesWithSubresourceLoadingForPageLoadTiming.remove(frameID) && m_framesWithSubresourceLoadingForPageLoadTiming.isEmpty())
-        generatePageLoadingTimingSoon();
+    bool didRemove = m_framesWithSubresourceLoadingForPageLoadTiming.remove(frameID);
+#if PLATFORM(COCOA)
+    if (didRemove)
+        WTFEndSignpost(static_cast<uintptr_t>(frameID.toUInt64()), PLTSubresourceLoading, "didDestroyFrame(%llu)", frameID.toUInt64());
+#endif
+
+    if (didRemove && m_framesWithSubresourceLoadingForPageLoadTiming.isEmpty())
+        generatePageLoadTimingSoon();
 
     forEachWebContentProcess([&](auto& webProcess, auto pageID) {
         if (!webProcess.hasConnection() || &webProcess.connection() == &connection)
@@ -6709,57 +6715,89 @@ void WebPageProxy::startNetworkRequestsForPageLoadTiming(WebCore::FrameIdentifie
 
     m_generatePageLoadTimingTimer.stop();
     auto addResult = m_framesWithSubresourceLoadingForPageLoadTiming.add(frameID);
+#if PLATFORM(COCOA)
+    if (addResult.isNewEntry)
+        WTFBeginSignpost(static_cast<uintptr_t>(frameID.toUInt64()), PLTSubresourceLoading, "startNetworkRequestsForPageLoadTiming(%llu)", frameID.toUInt64());
+#endif
     ASSERT_UNUSED(addResult, addResult.isNewEntry);
 }
 
 void WebPageProxy::endNetworkRequestsForPageLoadTiming(WebCore::FrameIdentifier frameID, WallTime timestamp)
 {
-    m_framesWithSubresourceLoadingForPageLoadTiming.remove(frameID);
+    bool didRemove = m_framesWithSubresourceLoadingForPageLoadTiming.remove(frameID);
+#if PLATFORM(COCOA)
+    if (didRemove)
+        WTFEndSignpost(static_cast<uintptr_t>(frameID.toUInt64()), PLTSubresourceLoading, "endNetworkRequestsForPageLoadTiming(%llu)", frameID.toUInt64());
+#else
+    UNUSED_PARAM(didRemove);
+#endif
+
     if (!m_pageLoadTiming)
         return;
     m_pageLoadTiming->updateEndOfNetworkRequests(timestamp);
     if (m_framesWithSubresourceLoadingForPageLoadTiming.isEmpty())
-        generatePageLoadingTimingSoon();
+        generatePageLoadTimingSoon();
 }
 
-void WebPageProxy::generatePageLoadingTimingSoon()
+void WebPageProxy::generatePageLoadTimingSoon()
 {
+#if PLATFORM(COCOA)
+    static bool shouldLog = CFPreferencesGetAppBooleanValue(CFSTR("WebKitDebugGeneratePageLoadTimingLogs"), kCFPreferencesCurrentApplication, nullptr);
+
+    auto result = generatePageLoadTimingSoonImpl();
+    if (shouldLog && result != GeneratePageLoadTimingResult::WaitForPageLoadTimingObject)
+        WEBPAGEPROXY_RELEASE_LOG(Loading, "generatePageLoadTimingSoon: %d", static_cast<int>(result));
+#else
+    generatePageLoadTimingSoonImpl();
+#endif
+}
+
+WebPageProxy::GeneratePageLoadTimingResult WebPageProxy::generatePageLoadTimingSoonImpl()
+{
+    using enum WebPageProxy::GeneratePageLoadTimingResult;
+
     m_generatePageLoadTimingTimer.stop();
     if (!m_pageLoadTiming)
-        return;
-    if (m_framesWithSubresourceLoadingForPageLoadTiming.size())
-        return;
+        return WaitForPageLoadTimingObject;
 
     WallTime lastTimestamp;
     if (!m_pageLoadTiming->firstVisualLayout())
-        return;
+        return WaitForFirstVisualLayout;
     lastTimestamp = std::max(lastTimestamp, m_pageLoadTiming->firstVisualLayout());
 
     if (!m_pageLoadTiming->firstMeaningfulPaint())
-        return;
+        return WaitForFirstMeaningfulPaint;
     lastTimestamp = std::max(lastTimestamp, m_pageLoadTiming->firstMeaningfulPaint());
 
     if (!m_pageLoadTiming->documentFinishedLoading())
-        return;
+        return WaitForDOMContentLoaded;
     lastTimestamp = std::max(lastTimestamp, m_pageLoadTiming->documentFinishedLoading());
 
     if (!m_pageLoadTiming->finishedLoading())
-        return;
+        return WaitForLoadEvent;
     lastTimestamp = std::max(lastTimestamp, m_pageLoadTiming->finishedLoading());
 
-    if (!m_pageLoadTiming->allSubresourcesFinishedLoading())
-        return;
+    if (m_framesWithSubresourceLoadingForPageLoadTiming.size())
+        return WaitForSubresourcesFinishedLoading;
     lastTimestamp = std::max(lastTimestamp, m_pageLoadTiming->allSubresourcesFinishedLoading());
 
     // Stop waiting for page load to end 100 ms after the last of the timestamps we care about.
     Seconds interval = std::max(0_ms, lastTimestamp + 100_ms - WallTime::now());
     m_generatePageLoadTimingTimer.startOneShot(interval);
+    return WaitForQuiescence;
 }
 
 void WebPageProxy::didEndNetworkRequestsForPageLoadTimingTimerFired()
 {
     if (!m_pageLoadTiming)
         return;
+
+    // If the page had no subresources, just say that all subresources finished loading when the
+    // load event fired.
+    if (!m_pageLoadTiming->allSubresourcesFinishedLoading()) {
+        auto loadEventEnd = m_pageLoadTiming->finishedLoading();
+        m_pageLoadTiming->updateEndOfNetworkRequests(loadEventEnd);
+    }
 
     didGeneratePageLoadTiming(*m_pageLoadTiming);
     m_pageLoadTiming = nullptr;
@@ -7333,6 +7371,11 @@ void WebPageProxy::didCommitLoadForFrame(IPC::Connection& connection, FrameIdent
         protectedPageLoadState->didCommitLoad(transaction, certificateInfo, markPageInsecure, usedLegacyTLS, wasPrivateRelayed, WTFMove(proxyName), source, frameInfo.securityOrigin);
         m_shouldSuppressNextAutomaticNavigationSnapshot = false;
 
+#if PLATFORM(COCOA)
+        for (auto frameIDWithPendingLoad : m_framesWithSubresourceLoadingForPageLoadTiming)
+            WTFEndSignpost(static_cast<uintptr_t>(frameID.toUInt64()), PLTSubresourceLoading, "didCommitLoadForFrame(%llu), ending pending resource loads for frame %llu", frameID.toUInt64(), frameIDWithPendingLoad.toUInt64());
+#endif
+
         m_pageLoadTiming = std::exchange(m_pageLoadTimingPendingCommit, nullptr);
         m_framesWithSubresourceLoadingForPageLoadTiming.clear();
     }
@@ -7467,7 +7510,7 @@ void WebPageProxy::didFinishDocumentLoadForFrame(IPC::Connection& connection, Fr
 
     if (m_pageLoadTiming && frame->isMainFrame() && !frame->url().isAboutBlank()) {
         m_pageLoadTiming->setDocumentFinishedLoading(timestamp);
-        generatePageLoadingTimingSoon();
+        generatePageLoadTimingSoon();
     }
 
     WEBPAGEPROXY_RELEASE_LOG(Loading, "didFinishDocumentLoadForFrame: frameID=%" PRIu64 ", isMainFrame=%d", frameID.toUInt64(), frame->isMainFrame());
@@ -7608,7 +7651,7 @@ void WebPageProxy::didFinishLoadForFrame(IPC::Connection& connection, FrameIdent
 
         if (m_pageLoadTiming && !frame->url().isAboutBlank()) {
             m_pageLoadTiming->setFinishedLoading(timestamp);
-            generatePageLoadingTimingSoon();
+            generatePageLoadTimingSoon();
         }
     }
 
@@ -7932,7 +7975,7 @@ void WebPageProxy::didFirstVisuallyNonEmptyLayoutForFrame(IPC::Connection& conne
 
     if (m_pageLoadTiming && !m_pageLoadTiming->firstVisualLayout()) {
         m_pageLoadTiming->setFirstVisualLayout(timestamp);
-        generatePageLoadingTimingSoon();
+        generatePageLoadTimingSoon();
     }
 }
 
@@ -7951,7 +7994,7 @@ void WebPageProxy::didReachLayoutMilestone(OptionSet<WebCore::LayoutMilestone> l
     if (layoutMilestones.contains(WebCore::LayoutMilestone::DidFirstMeaningfulPaint)) {
         if (m_pageLoadTiming && !m_pageLoadTiming->firstMeaningfulPaint()) {
             m_pageLoadTiming->setFirstMeaningfulPaint(timestamp);
-            generatePageLoadingTimingSoon();
+            generatePageLoadTimingSoon();
         }
     }
 
