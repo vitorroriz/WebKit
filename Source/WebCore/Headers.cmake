@@ -2967,6 +2967,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/network/BlobRegistry.h
     platform/network/BlobRegistryImpl.h
     platform/network/BlobResourceHandle.h
+    platform/network/BlobResourceHandleBase.h
     platform/network/CacheValidation.h
     platform/network/CertificateSummary.h
     platform/network/CookieRequestHeaderFieldProxy.h

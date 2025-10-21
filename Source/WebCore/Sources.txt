@@ -2734,6 +2734,7 @@ platform/network/BlobDataFileReference.cpp
 platform/network/BlobRegistry.cpp
 platform/network/BlobRegistryImpl.cpp
 platform/network/BlobResourceHandle.cpp
+platform/network/BlobResourceHandleBase.cpp
 platform/network/CacheValidation.cpp
 platform/network/Cookie.cpp
 platform/network/CredentialBase.cpp

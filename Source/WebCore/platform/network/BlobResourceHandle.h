@@ -31,97 +31,12 @@
 
 #pragma once
 
-#include <WebCore/BlobData.h>
-#include <WebCore/FileStreamClient.h>
-#include <WebCore/HTTPParsers.h>
+#include <WebCore/BlobResourceHandleBase.h>
 #include <WebCore/ResourceHandle.h>
-#include <wtf/Variant.h>
-#include <wtf/Vector.h>
-#include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
-class AsyncFileStream;
-class BlobData;
-class FileStream;
 class ResourceHandleClient;
-class ResourceRequest;
-class BlobDataItem;
-
-class BlobResourceHandleBase : public FileStreamClient {
-public:
-    enum class Error {
-        NoError = 0,
-        NotFoundError = 1,
-        SecurityError = 2,
-        RangeError = 3,
-        NotReadableError = 4,
-        MethodNotAllowed = 5
-    };
-
-protected:
-    WEBCORE_EXPORT BlobResourceHandleBase(bool async = true, RefPtr<BlobData>&& = nullptr);
-    WEBCORE_EXPORT virtual ~BlobResourceHandleBase();
-
-    WEBCORE_EXPORT void start();
-    WEBCORE_EXPORT void readAsync();
-    WEBCORE_EXPORT void closeFileIfOpen();
-    bool isFileOpen() const { return m_isFileOpen; }
-    void setIsFileOpen(bool isOpen) { m_isFileOpen = isOpen; }
-    bool async() const { return std::holds_alternative<std::unique_ptr<AsyncFileStream>>(m_stream); }
-    uint64_t totalSize() { return m_totalSize; }
-    uint64_t totalRemainingSize() const { return m_totalRemainingSize; }
-    uint64_t currentItemReadSize() const { return m_currentItemReadSize; }
-    void setCurrentItemReadSize(uint64_t size) { m_currentItemReadSize = size; }
-    void decrementTotalRemainingSizeBy(uint64_t value) { m_totalRemainingSize -= value; }
-    uint64_t readItemCount() const { return m_readItemCount; }
-    void incrementReadItemCount() { ++m_readItemCount; }
-    uint64_t lengthOfItemBeingRead() const { return m_itemLengthList[m_readItemCount]; }
-    WEBCORE_EXPORT void clearAsyncStream();
-    WEBCORE_EXPORT BlobData* blobData() const;
-    FileStream* syncStream() const;
-    AsyncFileStream* asyncStream() const;
-    Vector<uint8_t>& buffer() { return m_buffer; }
-    const Vector<uint8_t>& buffer() const { return m_buffer; }
-
-private:
-    void getSizeForNext();
-    std::optional<Error> seek();
-    std::optional<Error> adjustAndValidateRangeBounds();
-    bool consumeData(std::span<const uint8_t>);
-    bool readDataAsync(const BlobDataItem&);
-    void readFileAsync(const BlobDataItem&);
-    void dispatchDidReceiveResponse();
-    void doStart();
-
-    virtual void didReceiveResponse(ResourceResponse&&) = 0;
-    virtual void didFail(Error) = 0;
-    virtual bool didReceiveData(std::span<const uint8_t>) = 0;
-    virtual void didFinish() = 0;
-    virtual bool erroredOrAborted() const = 0;
-    virtual bool shouldAbortDispatchDidReceiveResponse() { return false; }
-    virtual const ResourceRequest& firstRequest() const = 0;
-    virtual void clearStream() { }
-
-    // FileStreamClient methods.
-    WEBCORE_EXPORT void didOpen(bool) final;
-    WEBCORE_EXPORT void didGetSize(long long) final;
-    WEBCORE_EXPORT void didRead(int) final;
-
-    RefPtr<BlobData> m_blobData;
-    // For Async or Sync loading.
-    Variant<std::unique_ptr<AsyncFileStream>, std::unique_ptr<FileStream>> m_stream;
-    std::optional<HTTPRange> m_range;
-    Vector<uint8_t> m_buffer;
-    Vector<uint64_t> m_itemLengthList;
-    uint64_t m_totalSize { 0 };
-    uint64_t m_totalRemainingSize { 0 };
-    uint64_t m_currentItemReadSize { 0 };
-    unsigned m_readItemCount { 0 };
-    unsigned m_sizeItemCount { 0 };
-    bool m_isFileOpen { false };
-    bool m_isRangeRequest { false };
-};
 
 class BlobResourceHandle final : public BlobResourceHandleBase, public ResourceHandle  {
 public:

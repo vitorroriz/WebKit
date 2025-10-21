@@ -33,7 +33,7 @@
 #pragma once
 
 #include "NetworkDataTask.h"
-#include <WebCore/BlobResourceHandle.h>
+#include <WebCore/BlobResourceHandleBase.h>
 #include <WebCore/FileStreamClient.h>
 #include <WebCore/HTTPParsers.h>
 #include <wtf/FileHandle.h>
