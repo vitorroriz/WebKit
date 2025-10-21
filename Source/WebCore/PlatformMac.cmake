@@ -242,9 +242,9 @@ list(APPEND WebCore_SOURCES
     platform/graphics/avfoundation/AVTrackPrivateAVFObjCImpl.mm
     platform/graphics/avfoundation/AudioSourceProviderAVFObjC.mm
     platform/graphics/avfoundation/CDMFairPlayStreaming.cpp
-    platform/graphics/avfoundation/CDMPrivateMediaSourceAVFObjC.mm
     platform/graphics/avfoundation/InbandMetadataTextTrackPrivateAVF.cpp
     platform/graphics/avfoundation/InbandTextTrackPrivateAVF.cpp
+    platform/graphics/avfoundation/LegacyCDMPrivateAVFObjC.mm
     platform/graphics/avfoundation/MediaPlaybackTargetCocoa.mm
     platform/graphics/avfoundation/MediaPlayerPrivateAVFoundation.cpp
     platform/graphics/avfoundation/MediaSelectionGroupAVFObjC.mm

@@ -26,13 +26,13 @@
 #import "config.h"
 #import "CDMSessionAVContentKeySession.h"
 
-#if ENABLE(LEGACY_ENCRYPTED_MEDIA) && ENABLE(MEDIA_SOURCE)
+#if ENABLE(LEGACY_ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
 
 #import "AudioVideoRenderer.h"
 #import "CDMFairPlayStreaming.h"
 #import "CDMInstanceFairPlayStreamingAVFObjC.h"
-#import "CDMPrivateMediaSourceAVFObjC.h"
 #import "LegacyCDM.h"
+#import "LegacyCDMPrivateAVFObjC.h"
 #import "Logging.h"
 #import "MediaPlayer.h"
 #import "MediaSampleAVFObjC.h"
@@ -124,7 +124,7 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(CDMSessionAVContentKeySession);
 
 constexpr Seconds kDidProvideContentKeyRequestTimeout { 5_s };
 
-CDMSessionAVContentKeySession::CDMSessionAVContentKeySession(Vector<int>&& protocolVersions, int cdmVersion, CDMPrivateMediaSourceAVFObjC& cdm, LegacyCDMSessionClient& client)
+CDMSessionAVContentKeySession::CDMSessionAVContentKeySession(Vector<int>&& protocolVersions, int cdmVersion, LegacyCDMPrivateAVFObjC& cdm, LegacyCDMSessionClient& client)
     : m_cdm(cdm)
     , m_client(client)
     , m_contentKeySessionDelegate(adoptNS([[WebCDMSessionAVContentKeySessionDelegate alloc] initWithParent:this]))

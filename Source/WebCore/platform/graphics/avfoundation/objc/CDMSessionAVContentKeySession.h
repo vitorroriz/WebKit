@@ -32,7 +32,7 @@
 #include <wtf/ThreadSafeWeakPtr.h>
 #include <wtf/WTFSemaphore.h>
 
-#if ENABLE(LEGACY_ENCRYPTED_MEDIA) && ENABLE(MEDIA_SOURCE)
+#if ENABLE(LEGACY_ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
 
 OBJC_CLASS AVContentKeyRequest;
 OBJC_CLASS AVContentKeySession;
@@ -45,13 +45,13 @@ class WorkQueue;
 namespace WebCore {
 
 class AudioVideoRenderer;
-class CDMPrivateMediaSourceAVFObjC;
+class LegacyCDMPrivateAVFObjC;
 class MediaSampleAVFObjC;
 
 class CDMSessionAVContentKeySession final : public LegacyCDMSession, public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<CDMSessionAVContentKeySession> {
     WTF_MAKE_TZONE_ALLOCATED(CDMSessionAVContentKeySession);
 public:
-    static Ref<CDMSessionAVContentKeySession> create(Vector<int>&& protocolVersions, int cdmVersion, CDMPrivateMediaSourceAVFObjC& parent, LegacyCDMSessionClient& client)
+    static Ref<CDMSessionAVContentKeySession> create(Vector<int>&& protocolVersions, int cdmVersion, LegacyCDMPrivateAVFObjC& parent, LegacyCDMSessionClient& client)
     {
         return adoptRef(*new CDMSessionAVContentKeySession(WTFMove(protocolVersions), cdmVersion, parent, client));
     }
@@ -91,7 +91,7 @@ public:
     void didProvideContentKeyRequest(AVContentKeyRequest *);
 
 private:
-    CDMSessionAVContentKeySession(Vector<int>&& protocolVersions, int cdmVersion, CDMPrivateMediaSourceAVFObjC&, LegacyCDMSessionClient&);
+    CDMSessionAVContentKeySession(Vector<int>&& protocolVersions, int cdmVersion, LegacyCDMPrivateAVFObjC&, LegacyCDMSessionClient&);
 
     RefPtr<Uint8Array> generateKeyReleaseMessage(unsigned short& errorCode, uint32_t& systemCode);
 
@@ -108,7 +108,7 @@ private:
     bool hasContentKeyRequest() const;
     RetainPtr<AVContentKeyRequest> contentKeyRequest() const;
 
-    WeakPtr<CDMPrivateMediaSourceAVFObjC> m_cdm;
+    WeakPtr<LegacyCDMPrivateAVFObjC> m_cdm;
     const WeakPtr<LegacyCDMSessionClient> m_client;
     const RetainPtr<AVContentKeySession> m_contentKeySession;
     const RetainPtr<WebCDMSessionAVContentKeySessionDelegate> m_contentKeySessionDelegate;

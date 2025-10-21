@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Apple Inc. All rights reserved.
+ * Copyright (C) 2014-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,7 +25,7 @@
 
 #pragma once
 
-#if ENABLE(LEGACY_ENCRYPTED_MEDIA) && ENABLE(MEDIA_SOURCE)
+#if ENABLE(LEGACY_ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
 
 #include "LegacyCDMPrivate.h"
 #include <wtf/TZoneMalloc.h>
@@ -37,13 +37,13 @@ namespace WebCore {
 class LegacyCDM;
 class CDMSessionAVContentKeySession;
 
-class CDMPrivateMediaSourceAVFObjC final : public CDMPrivateInterface, public CanMakeWeakPtr<CDMPrivateMediaSourceAVFObjC> {
-    WTF_MAKE_TZONE_ALLOCATED(CDMPrivateMediaSourceAVFObjC);
+class LegacyCDMPrivateAVFObjC final : public CDMPrivateInterface, public CanMakeWeakPtr<LegacyCDMPrivateAVFObjC> {
+    WTF_MAKE_TZONE_ALLOCATED(LegacyCDMPrivateAVFObjC);
 public:
-    explicit CDMPrivateMediaSourceAVFObjC(LegacyCDM& cdm)
+    explicit LegacyCDMPrivateAVFObjC(LegacyCDM& cdm)
         : m_cdm(cdm)
     { }
-    ~CDMPrivateMediaSourceAVFObjC();
+    ~LegacyCDMPrivateAVFObjC();
 
     static bool supportsKeySystem(const String&);
     static bool supportsKeySystemAndMimeType(const String& keySystem, const String& mimeType);
@@ -71,4 +71,4 @@ private:
 
 }
 
-#endif // ENABLE(LEGACY_ENCRYPTED_MEDIA) && ENABLE(MEDIA_SOURCE)
+#endif // ENABLE(LEGACY_ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)

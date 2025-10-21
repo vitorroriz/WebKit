@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 Apple Inc. All rights reserved.
+ * Copyright (C) 2014-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,13 +24,14 @@
  */
 
 #import "config.h"
-#import "CDMPrivateMediaSourceAVFObjC.h"
+#import "LegacyCDMPrivateAVFObjC.h"
 
-#if ENABLE(LEGACY_ENCRYPTED_MEDIA) && ENABLE(MEDIA_SOURCE)
+#if ENABLE(LEGACY_ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
 
 #import "CDMSessionAVContentKeySession.h"
 #import "ContentType.h"
 #import "LegacyCDM.h"
+#import "MediaPlayer.h"
 #import "MediaPlayerPrivateMediaSourceAVFObjC.h"
 #import <JavaScriptCore/RegularExpression.h>
 #import <wtf/NeverDestroyed.h>
@@ -44,9 +45,9 @@ using JSC::Yarr::RegularExpression;
 
 namespace WebCore {
 
-WTF_MAKE_TZONE_ALLOCATED_IMPL(CDMPrivateMediaSourceAVFObjC);
+WTF_MAKE_TZONE_ALLOCATED_IMPL(LegacyCDMPrivateAVFObjC);
 
-auto CDMPrivateMediaSourceAVFObjC::parseKeySystem(const String& keySystem) -> std::optional<KeySystemParameters>
+auto LegacyCDMPrivateAVFObjC::parseKeySystem(const String& keySystem) -> std::optional<KeySystemParameters>
 {
     static NeverDestroyed<RegularExpression> keySystemRE("^com\\.apple\\.fps\\.[23]_\\d+(?:,\\d+)*$"_s, OptionSet<JSC::Yarr::Flags> { JSC::Yarr::Flags::IgnoreCase });
 
@@ -62,7 +63,7 @@ auto CDMPrivateMediaSourceAVFObjC::parseKeySystem(const String& keySystem) -> st
     return { { cdmVersion, WTFMove(protocolVersions) } };
 }
 
-CDMPrivateMediaSourceAVFObjC::~CDMPrivateMediaSourceAVFObjC()
+LegacyCDMPrivateAVFObjC::~LegacyCDMPrivateAVFObjC()
 {
     for (auto& session : m_sessions)
         session->invalidateCDM();
@@ -70,15 +71,15 @@ CDMPrivateMediaSourceAVFObjC::~CDMPrivateMediaSourceAVFObjC()
 
 static bool queryDecoderAvailability()
 {
-    if (!canLoad_VideoToolbox_VTGetGVADecoderAvailability()) {
+    if (!canLoad_VideoToolbox_VTGetGVADecoderAvailability())
         return true;
-    }
+
     uint32_t totalInstanceCount = 0;
     OSStatus status = VTGetGVADecoderAvailability(&totalInstanceCount, nullptr);
     return status == noErr && totalInstanceCount;
 }
 
-bool CDMPrivateMediaSourceAVFObjC::supportsKeySystem(const String& keySystem)
+bool LegacyCDMPrivateAVFObjC::supportsKeySystem(const String& keySystem)
 {
     if (!queryDecoderAvailability())
         return false;
@@ -93,7 +94,7 @@ bool CDMPrivateMediaSourceAVFObjC::supportsKeySystem(const String& keySystem)
     return true;
 }
 
-bool CDMPrivateMediaSourceAVFObjC::supportsKeySystemAndMimeType(const String& keySystem, const String& mimeType)
+bool LegacyCDMPrivateAVFObjC::supportsKeySystemAndMimeType(const String& keySystem, const String& mimeType)
 {
     if (!supportsKeySystem(keySystem))
         return false;
@@ -101,6 +102,7 @@ bool CDMPrivateMediaSourceAVFObjC::supportsKeySystemAndMimeType(const String& ke
     if (mimeType.isEmpty())
         return true;
 
+#if ENABLE(MEDIA_SOURCE)
     // FIXME: Why is this ignoring case since the check in supportsMIMEType is checking case?
     if (equalLettersIgnoringASCIICase(mimeType, "keyrelease"_s))
         return true;
@@ -110,10 +112,14 @@ bool CDMPrivateMediaSourceAVFObjC::supportsKeySystemAndMimeType(const String& ke
     parameters.type = ContentType(mimeType);
 
     return MediaPlayerPrivateMediaSourceAVFObjC::supportsTypeAndCodecs(parameters) != MediaPlayer::SupportsType::IsNotSupported;
+#else
+    return MediaPlayer::supportsKeySystem(keySystem, mimeType);
+#endif
 }
 
-bool CDMPrivateMediaSourceAVFObjC::supportsMIMEType(const String& mimeType) const
+bool LegacyCDMPrivateAVFObjC::supportsMIMEType(const String& mimeType) const
 {
+#if ENABLE(MEDIA_SOURCE)
     // FIXME: Why is this checking case since the check in supportsKeySystemAndMimeType is ignoring case?
     if (mimeType == "keyrelease"_s)
         return true;
@@ -123,9 +129,12 @@ bool CDMPrivateMediaSourceAVFObjC::supportsMIMEType(const String& mimeType) cons
     parameters.type = ContentType(mimeType);
 
     return MediaPlayerPrivateMediaSourceAVFObjC::supportsTypeAndCodecs(parameters) != MediaPlayer::SupportsType::IsNotSupported;
+#else
+    return MediaPlayer::supportsKeySystem(m_cdm->keySystem(), mimeType);
+#endif
 }
 
-RefPtr<LegacyCDMSession> CDMPrivateMediaSourceAVFObjC::createSession(LegacyCDMSessionClient& client)
+RefPtr<LegacyCDMSession> LegacyCDMPrivateAVFObjC::createSession(LegacyCDMSessionClient& client)
 {
     String keySystem = m_cdm->keySystem(); // Local copy for StringView usage
     auto parameters = parseKeySystem(m_cdm->keySystem());
@@ -139,27 +148,27 @@ RefPtr<LegacyCDMSession> CDMPrivateMediaSourceAVFObjC::createSession(LegacyCDMSe
     return WTFMove(session);
 }
 
-void CDMPrivateMediaSourceAVFObjC::invalidateSession(CDMSessionAVContentKeySession* session)
+void LegacyCDMPrivateAVFObjC::invalidateSession(CDMSessionAVContentKeySession* session)
 {
     ASSERT(m_sessions.contains(session));
     m_sessions.removeAll(session);
 }
 
-void CDMPrivateMediaSourceAVFObjC::ref() const
+void LegacyCDMPrivateAVFObjC::ref() const
 {
     m_cdm->ref();
 }
 
-void CDMPrivateMediaSourceAVFObjC::deref() const
+void LegacyCDMPrivateAVFObjC::deref() const
 {
     m_cdm->deref();
 }
 
-LegacyCDM& CDMPrivateMediaSourceAVFObjC::cdm() const
+LegacyCDM& LegacyCDMPrivateAVFObjC::cdm() const
 {
     return m_cdm.get();
 }
 
 }
 
-#endif // ENABLE(LEGACY_ENCRYPTED_MEDIA) && ENABLE(MEDIA_SOURCE)
+#endif // ENABLE(LEGACY_ENCRYPTED_MEDIA)
