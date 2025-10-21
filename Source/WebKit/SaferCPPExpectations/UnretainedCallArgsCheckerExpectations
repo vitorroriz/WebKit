@@ -12,7 +12,6 @@ Shared/Cocoa/WKNSURLRequest.mm
 Shared/EntryPointUtilities/Cocoa/Daemon/PCMDaemonEntryPoint.mm
 Shared/EntryPointUtilities/Cocoa/XPCService/XPCServiceMain.mm
 Shared/RemoteLayerTree/RemoteLayerTreePropertyApplier.mm
-UIProcess/API/Cocoa/WKWebsiteDataRecord.mm
 WebProcess/InjectedBundle/API/mac/WKDOMInternals.mm
 WebProcess/InjectedBundle/API/mac/WKWebProcessPlugIn.mm
 WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextController.mm

@@ -29,6 +29,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WKDeclarationSpecifiers.h>
+#import <wtf/Compiler.h>
 
 #if !defined(WK_UNUSED_INSTANCE_VARIABLE)
 #define WK_UNUSED_INSTANCE_VARIABLE
@@ -44,7 +45,7 @@
 WK_CLASS_DEPRECATED_WITH_REPLACEMENT("WKWebView", macos(10.10, 10.14.4), ios(8.0, 12.2))
 @interface WKView : NSView <NSTextInputClient> {
 @private
-    WK_UNUSED_INSTANCE_VARIABLE WKViewData *_data;
+    WK_UNUSED_INSTANCE_VARIABLE WKViewData *_data SUPPRESS_UNRETAINED_MEMBER; /* This variable is unused so it is fine not to use a smart pointer */
     WK_UNUSED_INSTANCE_VARIABLE unsigned _unused;
 }
 

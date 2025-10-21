@@ -1,6 +1,4 @@
 Platform/IPC/ArgumentCoders.h
-UIProcess/API/Cocoa/WKUserScript.mm
-UIProcess/API/Cocoa/_WKFrameTreeNode.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIAlarmsCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIDeclarativeNetRequestCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIExtensionCocoa.mm
