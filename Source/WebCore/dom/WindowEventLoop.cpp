@@ -165,10 +165,8 @@ void WindowEventLoop::opportunisticallyRunIdleCallbacks(std::optional<MonotonicT
         RefPtr document = dynamicDowncast<Document>(context);
         if (!document || !document->hasPendingIdleCallback())
             return;
-        auto* idleCallbackController = document->idleCallbackController();
-        if (!idleCallbackController)
-            return;
-        idleCallbackController->startIdlePeriod();
+        if (CheckedPtr idleCallbackController = document->idleCallbackController())
+            idleCallbackController->startIdlePeriod();
     });
 
     auto duration = MonotonicTime::now() - m_lastIdlePeriodStartTime;
