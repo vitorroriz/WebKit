@@ -42,8 +42,6 @@
 #include <wtf/RetainPtr.h>
 #include <wtf/ThreadSafeWeakPtr.h>
 #include <wtf/Vector.h>
-#include <wtf/WTFSemaphore.h>
-#include <wtf/threads/BinarySemaphore.h>
 
 OBJC_CLASS AVStreamDataParser;
 OBJC_CLASS AVSampleBufferAudioRenderer;
@@ -191,13 +189,10 @@ private:
 
     const Ref<SourceBufferParser> m_parser;
     Vector<Function<void()>> m_pendingTrackChangeTasks;
-    Deque<std::pair<TrackID, Ref<MediaSampleAVFObjC>>> m_blockedSamples;
-    Box<Semaphore> m_abortSemaphore;
     const Ref<WTF::WorkQueue> m_appendQueue;
 
 #if ENABLE(LEGACY_ENCRYPTED_MEDIA)
     RefPtr<SharedBuffer> m_initData;
-    ThreadSafeWeakPtr<CDMSessionAVContentKeySession> m_session;
 #endif
 
     std::optional<FloatSize> m_cachedSize;
@@ -207,17 +202,6 @@ private:
     std::optional<TrackID> m_protectedTrackID;
     Ref<AudioVideoRenderer> m_renderer;
     bool m_isSelectedForVideo { false };
-
-#if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
-    using KeyIDs = Vector<Ref<SharedBuffer>>;
-    using TrackKeyIDsMap = StdUnorderedMap<TrackID, KeyIDs>;
-    TrackKeyIDsMap m_currentTrackIDs;
-
-    RefPtr<CDMInstanceFairPlayStreamingAVFObjC> m_cdmInstance;
-    UniqueRef<Observer<void()>> m_keyStatusesChangedObserver;
-    KeyIDs m_keyIDs;
-    const RetainPtr<AVStreamDataParser> m_streamDataParser;
-#endif
 
 #if !RELEASE_LOG_DISABLED
     const Ref<const Logger> m_logger;

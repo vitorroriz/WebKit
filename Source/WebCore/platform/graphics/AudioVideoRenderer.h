@@ -44,6 +44,7 @@ namespace WebCore {
 class CDMInstance;
 class FloatRect;
 class GraphicsContext;
+class LegacyCDMSession;
 class LayoutRect;
 class MediaSample;
 class NativeImage;
@@ -168,6 +169,12 @@ public:
 
 #if ENABLE(ENCRYPTED_MEDIA)
     virtual void setCDMInstance(CDMInstance*) { }
+    virtual Ref<MediaPromise> setInitData(Ref<SharedBuffer>) { return MediaPromise::createAndResolve(); }
+    virtual void attemptToDecrypt() { }
+#endif
+#if ENABLE(LEGACY_ENCRYPTED_MEDIA)
+    virtual RefPtr<SharedBuffer> initData() const { return nullptr; }
+    virtual void setCDMSession(LegacyCDMSession*) { }
 #endif
 };
 

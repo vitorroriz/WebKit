@@ -27,12 +27,15 @@
 #import "AudioVideoRendererAVFObjC.h"
 
 #import "AudioMediaStreamTrackRenderer.h"
+#import "CDMFairPlayStreaming.h"
 #import "CDMInstanceFairPlayStreamingAVFObjC.h"
+#import "CDMSessionAVContentKeySession.h"
 #import "EffectiveRateChangedListener.h"
 #import "FormatDescriptionUtilities.h"
 #import "GraphicsContext.h"
 #import "LayoutRect.h"
 #import "Logging.h"
+#import "MediaSampleAVFObjC.h"
 #import "MediaSessionManagerCocoa.h"
 #import "NativeImage.h"
 #import "PixelBufferConformerCV.h"
@@ -85,6 +88,9 @@ AudioVideoRendererAVFObjC::AudioVideoRendererAVFObjC(const Logger& originalLogge
     , m_synchronizer([adoptNS(PAL::allocAVSampleBufferRenderSynchronizerInstance()) init])
     , m_listener(WebAVSampleBufferListener::create(*this))
     , m_startupTime(MonotonicTime::now())
+#if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
+    , m_keyStatusesChangedObserver(makeUniqueRef<Observer<void()>>([this] { tryToEnqueueBlockedSamples(); }))
+#endif
 {
     // addPeriodicTimeObserverForInterval: throws an exception if you pass a non-numeric CMTime, so just use
     // an arbitrarily large time value of once an hour:
@@ -192,6 +198,14 @@ void AudioVideoRendererAVFObjC::enqueueSample(TrackIdentifier trackId, Ref<Media
     auto type = typeOf(trackId);
     if (!type)
         return;
+
+#if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
+    if (!canEnqueueSample(trackId, sample)) {
+        m_blockedSamples.append({ trackId, sample });
+        return;
+    }
+    attachContentKeyToSampleIfNeeded(sample);
+#endif
 
     switch (*type) {
     case TrackType::Video: {
@@ -1562,15 +1576,150 @@ void AudioVideoRendererAVFObjC::updateSpatialTrackingLabel()
 }
 #endif
 
-#if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
+#if HAVE(AVCONTENTKEYSESSION)
+#if ENABLE(ENCRYPTED_MEDIA)
 void AudioVideoRendererAVFObjC::setCDMInstance(CDMInstance* instance)
 {
     RefPtr fpsInstance = dynamicDowncast<CDMInstanceFairPlayStreamingAVFObjC>(instance);
     if (fpsInstance == m_cdmInstance)
         return;
 
+    ALWAYS_LOG(LOGIDENTIFIER);
+    if (RefPtr cdmInstance = m_cdmInstance)
+        cdmInstance->removeKeyStatusesChangedObserver(m_keyStatusesChangedObserver);
+
     m_cdmInstance = fpsInstance;
+    if (fpsInstance)
+        fpsInstance->addKeyStatusesChangedObserver(m_keyStatusesChangedObserver);
+
+    attemptToDecrypt();
 }
+
+Ref<MediaPromise> AudioVideoRendererAVFObjC::setInitData(Ref<SharedBuffer> initData)
+{
+#if ENABLE(LEGACY_ENCRYPTED_MEDIA)
+    m_initData = initData.copyRef();
+    if (RefPtr session = m_session.get()) {
+        session->setInitData(initData);
+        return MediaPromise::createAndResolve();
+    }
+#endif
+    auto keyIDs = CDMPrivateFairPlayStreaming::extractKeyIDsSinf(initData);
+    AtomString initDataType = CDMPrivateFairPlayStreaming::sinfName();
+#if HAVE(FAIRPLAYSTREAMING_MTPS_INITDATA)
+    if (!keyIDs) {
+        keyIDs = CDMPrivateFairPlayStreaming::extractKeyIDsMpts(initData);
+        initDataType = CDMPrivateFairPlayStreaming::mptsName();
+    }
+#endif
+    if (!keyIDs)
+        return MediaPromise::createAndResolve();
+
+    if (RefPtr cdmInstance = m_cdmInstance) {
+        if (RefPtr instanceSession = cdmInstance->sessionForKeyIDs(keyIDs.value()))
+            return MediaPromise::createAndResolve();
+    }
+
+    m_keyIDs = WTFMove(keyIDs.value());
+    return MediaPromise::createAndReject(PlatformMediaError::CDMInstanceKeyNeeded);
+}
+
+void AudioVideoRendererAVFObjC::attemptToDecrypt()
+{
+    if (m_blockedSamples.isEmpty())
+        return;
+    if (m_cdmInstance && m_keyIDs.isEmpty()) {
+        ALWAYS_LOG(LOGIDENTIFIER, "CDMInstance set, but no keyIDs");
+        return;
+    }
+
+    if (RefPtr cdmInstance = m_cdmInstance) {
+        RefPtr instanceSession = cdmInstance->sessionForKeyIDs(m_keyIDs);
+        if (!instanceSession)
+            return;
+    } else if (!m_session.get())
+        return;
+
+    tryToEnqueueBlockedSamples();
+}
+
+void AudioVideoRendererAVFObjC::tryToEnqueueBlockedSamples()
+{
+    while (!m_blockedSamples.isEmpty()) {
+        auto& firstPair = m_blockedSamples.first();
+
+        // If we still can't enqueue the sample, bail.
+        if (!canEnqueueSample(firstPair.first, firstPair.second))
+            return;
+
+        auto firstPairTaken = m_blockedSamples.takeFirst();
+        enqueueSample(firstPairTaken.first, WTFMove(firstPairTaken.second), { });
+    }
+}
+
+bool AudioVideoRendererAVFObjC::canEnqueueSample(TrackIdentifier trackId, const MediaSample& sample)
+{
+    // if sample is unencrytped: enqueue sample
+    if (!sample.isProtected())
+        return true;
+
+    // if sample is encrypted, but we are not attached to a CDM: do not enqueue sample.
+    if (!m_cdmInstance && !m_session.get())
+        return false;
+
+    if (!isEnabledVideoTrackId(trackId))
+        return false;
+
+    Ref sampleAVFObjC = downcast<MediaSampleAVFObjC>(sample);
+
+    // if sample is encrypted, and keyIDs match the current set of keyIDs: enqueue sample.
+    if (auto findResult = m_currentTrackIds.find(trackId); findResult != m_currentTrackIds.end() && findResult->value == sampleAVFObjC->keyIDs())
+        return true;
+
+    // if sample's set of keyIDs does not match the current set of keyIDs, consult with the CDM
+    // to determine if the keyIDs are usable; if so, update the current set of keyIDs and enqueue sample.
+    if (RefPtr cdmInstance = m_cdmInstance; cdmInstance && cdmInstance->isAnyKeyUsable(sampleAVFObjC->keyIDs())) {
+        m_currentTrackIds.add(trackId, sampleAVFObjC->keyIDs());
+        return true;
+    }
+
+    if (RefPtr session = m_session.get(); session && session->isAnyKeyUsable(sampleAVFObjC->keyIDs())) {
+        m_currentTrackIds.add(trackId, sampleAVFObjC->keyIDs());
+        return true;
+    }
+
+    ALWAYS_LOG(LOGIDENTIFIER, "Can't enqueue sample: ", sample, " no suitable CDM");
+    return false;
+}
+
+void AudioVideoRendererAVFObjC::attachContentKeyToSampleIfNeeded(const MediaSample& sample)
+{
+    if (RefPtr cdmInstance = m_cdmInstance)
+        cdmInstance->attachContentKeyToSample(downcast<MediaSampleAVFObjC>(sample));
+    else if (RefPtr session = m_session.get())
+        session->attachContentKeyToSample(downcast<MediaSampleAVFObjC>(sample));
+}
+#endif
+
+#if ENABLE(LEGACY_ENCRYPTED_MEDIA)
+void AudioVideoRendererAVFObjC::setCDMSession(LegacyCDMSession* session)
+{
+    RefPtr oldSession = m_session.get();
+    if (session == oldSession)
+        return;
+
+    ALWAYS_LOG(LOGIDENTIFIER);
+
+    m_session = dynamicDowncast<CDMSessionAVContentKeySession>(session);
+
+    if (RefPtr session = m_session.get()) {
+        session->addRenderer(*this);
+        if (RefPtr initData = m_initData)
+            session->setInitData(*initData);
+        attemptToDecrypt();
+    }
+}
+#endif
 #endif
 
 void AudioVideoRendererAVFObjC::setSynchronizerRate(float rate, std::optional<MonotonicTime> hostTime)

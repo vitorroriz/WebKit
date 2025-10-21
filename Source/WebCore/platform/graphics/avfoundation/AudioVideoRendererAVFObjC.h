@@ -48,6 +48,7 @@ typedef struct CF_BRIDGED_TYPE(id) __CVBuffer *CVPixelBufferRef;
 namespace WebCore {
 
 class CDMInstanceFairPlayStreamingAVFObjC;
+class CDMSessionAVContentKeySession;
 class EffectiveRateChangedListener;
 class MediaSample;
 class NativeImage;
@@ -201,8 +202,16 @@ private:
     void updateSpatialTrackingLabel();
 #endif
 
-#if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
+#if HAVE(AVCONTENTKEYSESSION)
+#if ENABLE(ENCRYPTED_MEDIA)
     void setCDMInstance(CDMInstance*) final;
+    Ref<MediaPromise> setInitData(Ref<SharedBuffer>) final;
+    void attemptToDecrypt() final;
+#endif
+#if ENABLE(LEGACY_ENCRYPTED_MEDIA)
+    RefPtr<SharedBuffer> initData() const final { return m_initData; }
+    void setCDMSession(LegacyCDMSession*) final;
+#endif
 #endif
 
     void setSynchronizerRate(float, std::optional<MonotonicTime>);
@@ -226,6 +235,12 @@ private:
 
     void sizeWillChangeAtTime(const MediaTime&, const FloatSize&);
     void flushPendingSizeChanges();
+
+#if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
+    void tryToEnqueueBlockedSamples();
+    bool canEnqueueSample(TrackIdentifier, const MediaSample&);
+    void attachContentKeyToSampleIfNeeded(const MediaSample&);
+#endif
 
     // Logger
     const Logger& logger() const final { return m_logger.get(); }
@@ -341,9 +356,21 @@ private:
 #if ENABLE(LINEAR_MEDIA_PLAYER)
     RetainPtr<FigVideoTargetRef> m_videoTarget;
 #endif
-#if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
+#if HAVE(AVCONTENTKEYSESSION)
+#if ENABLE(ENCRYPTED_MEDIA)
     RefPtr<CDMInstanceFairPlayStreamingAVFObjC> m_cdmInstance;
+    UniqueRef<Observer<void()>> m_keyStatusesChangedObserver;
+    using KeyIDs = Vector<Ref<SharedBuffer>>;
+    KeyIDs m_keyIDs;
+    using TrackKeyIdsMap = HashMap<TrackIdentifier, KeyIDs>;
+    TrackKeyIdsMap m_currentTrackIds;
+    Deque<std::pair<TrackIdentifier, Ref<MediaSample>>> m_blockedSamples;
+#endif
+#if ENABLE(LEGACY_ENCRYPTED_MEDIA)
+    RefPtr<SharedBuffer> m_initData;
+    ThreadSafeWeakPtr<CDMSessionAVContentKeySession> m_session;
+#endif
 #endif
 };
 
-}
+} // namespace WebCore
