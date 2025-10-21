@@ -1966,6 +1966,28 @@ bool Quirks::needsHotelsAnimationQuirk(Element& element, const RenderStyle& styl
     return !matches.hasException() && matches.returnValue();
 }
 
+#if PLATFORM(IOS_FAMILY)
+// claude.ai rdar://162616694
+bool Quirks::needsClaudeSidebarViewportUnitQuirk(Element& element, const RenderStyle& style) const
+{
+    if (!needsQuirks() || !m_quirksData.needsClaudeSidebarViewportUnitQuirk)
+        return false;
+
+    if (style.position() != PositionType::Fixed)
+        return false;
+
+    if (element.attributeWithoutSynchronization(HTMLNames::aria_labelAttr) != "Sidebar"_s)
+        return false;
+
+    if (auto fixedHeight = style.height().tryFixed()) {
+        if (fixedHeight->resolveZoom(Style::ZoomNeeded { }) == m_document->renderView()->sizeForCSSDefaultViewportUnits().height())
+            return true;
+    }
+
+    return false;
+}
+#endif
+
 bool Quirks::needsLimitedMatroskaSupport() const
 {
 #if ENABLE(MEDIA_RECORDER) && ENABLE(COCOA_WEBM_PLAYER)
@@ -2459,6 +2481,19 @@ static void handleDailyMailCoUkQuirks(QuirksData& quirksData, const URL& quirksU
 
     quirksData.shouldUnloadHeavyFrames = true;
 }
+
+#if PLATFORM(IOS_FAMILY)
+static void handleClaudeQuirks(QuirksData& quirksData, const URL& quirksURL, const String& quirksDomainString, const URL& documentURL)
+{
+    if (quirksDomainString != "claude.ai"_s)
+        return;
+
+    UNUSED_PARAM(quirksURL);
+    UNUSED_PARAM(documentURL);
+
+    quirksData.needsClaudeSidebarViewportUnitQuirk = true;
+}
+#endif
 
 #if ENABLE(TEXT_AUTOSIZING)
 static void handleYCombinatorQuirks(QuirksData& quirksData, const URL& quirksURL, const String& quirksDomainString, const URL& documentURL)
@@ -3256,7 +3291,10 @@ void Quirks::determineRelevantQuirks()
         { "zomato"_s, &handleZomatoQuirks },
 #endif
         { "zoom"_s, &handleZoomQuirks },
-        { "dailymail"_s, &handleDailyMailCoUkQuirks }
+        { "dailymail"_s, &handleDailyMailCoUkQuirks },
+#if PLATFORM(IOS_FAMILY)
+        { "claude"_s, &handleClaudeQuirks },
+#endif
     });
 
     auto findResult = dispatchMap->find(quirkDomainWithoutPSL);
