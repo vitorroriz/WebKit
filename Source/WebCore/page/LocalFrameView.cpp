@@ -2395,6 +2395,36 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
         if (!renderer)
             return { };
 
+        auto containerResultFromBackdrop = [&] -> std::optional<FixedContainerResult> {
+            RefPtr container = dynamicDowncast<Element>(*hitNode);
+            if (!container)
+                return std::nullopt;
+
+            CheckedPtr elementRenderer = dynamicDowncast<RenderElement>(*renderer);
+            if (!elementRenderer)
+                return std::nullopt;
+
+            auto backdropRenderer = elementRenderer->backdropRenderer();
+            if (!backdropRenderer)
+                return std::nullopt;
+
+            auto backgroundColor = primaryBackgroundColorForRenderer(side, *backdropRenderer);
+            if (!backgroundColor.isVisible())
+                backgroundColor = page->pageExtendedBackgroundColor();
+
+            return { {
+                .container = container.releaseNonNull(),
+                .foundBackdropFilter = false,
+                .retryHonoringPointerEvents = false,
+                .isViewportSized = true,
+                .isDimmingLayer = true,
+                .backgroundColor = WTFMove(backgroundColor),
+            } };
+        }();
+
+        if (containerResultFromBackdrop)
+            return WTFMove(*containerResultFromBackdrop);
+
         bool hasMultipleBackgroundColors = false;
         Color primaryBackgroundColor;
         bool foundBackdropFilter = false;
