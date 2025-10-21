@@ -264,8 +264,6 @@ TEST(WebTransport, ServerBidirectional)
         "    let c = await t.createBidirectionalStream();"
         "    let w = c.writable.getWriter();"
         "    await w.write(new TextEncoder().encode('abc'));"
-        "    await w.close();"
-        "    await c.readable.getReader().cancel();"
         "    let sr = t.incomingBidirectionalStreams.getReader();"
         "    let {value: s, d} = await sr.read();"
         "    let r = s.readable.getReader();"
