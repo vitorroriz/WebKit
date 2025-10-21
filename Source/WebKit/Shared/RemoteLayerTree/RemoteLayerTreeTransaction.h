@@ -254,9 +254,6 @@ public:
 
     TransactionID transactionID() const { return m_transactionID; }
 
-    ActivityStateChangeID activityStateChangeID() const { return m_activityStateChangeID; }
-    void setActivityStateChangeID(ActivityStateChangeID activityStateChangeID) { m_activityStateChangeID = activityStateChangeID; }
-
     using TransactionCallbackID = IPC::AsyncReplyID;
     const Vector<TransactionCallbackID>& callbackIDs() const { return m_callbackIDs; }
     void setCallbackIDs(Vector<TransactionCallbackID>&& callbackIDs) { m_callbackIDs = WTFMove(callbackIDs); }
@@ -324,7 +321,6 @@ private:
     double m_viewportMetaTagWidth { -1 };
     uint64_t m_renderTreeSize { 0 };
     TransactionID m_transactionID;
-    ActivityStateChangeID m_activityStateChangeID { ActivityStateChangeAsynchronous };
     OptionSet<WebCore::LayoutMilestone> m_newlyReachedPaintingMilestones;
     bool m_scaleWasSetByUIProcess { false };
     bool m_allowsUserScaling { false };

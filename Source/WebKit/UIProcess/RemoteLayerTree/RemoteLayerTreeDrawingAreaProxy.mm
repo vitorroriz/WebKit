@@ -32,6 +32,7 @@
 #import "Logging.h"
 #import "MessageSenderInlines.h"
 #import "ProcessThrottler.h"
+#import "RemoteLayerTreeCommitBundle.h"
 #import "RemoteLayerTreeDrawingAreaProxyMessages.h"
 #import "RemotePageDrawingAreaProxy.h"
 #import "RemotePageProxy.h"
@@ -286,12 +287,12 @@ void RemoteLayerTreeDrawingAreaProxy::willCommitLayerTree(IPC::Connection& conne
     state.pendingLayerTreeTransactionID = transactionID;
 }
 
-void RemoteLayerTreeDrawingAreaProxy::commitLayerTree(IPC::Connection& connection, const Vector<std::pair<RemoteLayerTreeTransaction, RemoteScrollingCoordinatorTransaction>>& transactions, HashMap<ImageBufferSetIdentifier, std::unique_ptr<BufferSetBackendHandle>>&& handlesMap)
+void RemoteLayerTreeDrawingAreaProxy::commitLayerTree(IPC::Connection& connection, const RemoteLayerTreeCommitBundle& bundle, HashMap<ImageBufferSetIdentifier, std::unique_ptr<BufferSetBackendHandle>>&& handlesMap)
 {
     // The `sendRights` vector must have __block scope to be captured by
     // the commit handler block below without the need to copy it.
     __block Vector<MachSendRight, 16> sendRights;
-    for (auto& transaction : transactions) {
+    for (auto& transaction : bundle.transactions) {
         // commitLayerTreeTransaction consumes the incoming buffers, so we need to grab them first.
         for (auto& [layerID, properties] : CheckedRef { transaction.first }->changedLayerProperties()) {
             auto* backingStoreProperties = properties->backingStoreOrProperties.properties.get();
@@ -309,9 +310,18 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTree(IPC::Connection& connectio
         }
     }
 
+    if (bundle.mainFrameData) {
+        m_activityStateChangeID = bundle.mainFrameData->activityStateChangeID;
+
+        if (m_activityStateChangeID == m_activityStateChangeForUnhidingContent) {
+            RELEASE_LOG(RemoteLayerTree, "RemoteLayerTreeDrawingAreaProxy(%" PRIu64 ")::hideContentUntilDidUpdateActivityState completed", identifier().toUInt64());
+            m_activityStateChangeForUnhidingContent = std::nullopt;
+        }
+    }
+
     WeakPtr weakThis { *this };
 
-    for (auto& transaction : transactions) {
+    for (auto& transaction : bundle.transactions) {
         commitLayerTreeTransaction(connection, CheckedRef { transaction.first }.get(), transaction.second);
         if (!weakThis)
             return;
@@ -370,12 +380,6 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTreeTransaction(IPC::Connection
     if (layerTreeTransaction.isMainFrameProcessTransaction()) {
         ASSERT(layerTreeTransaction.transactionID() == m_lastVisibleTransactionID.next());
         m_transactionIDForPendingCACommit = layerTreeTransaction.transactionID();
-        m_activityStateChangeID = layerTreeTransaction.activityStateChangeID();
-
-        if (m_activityStateChangeID == m_activityStateChangeForUnhidingContent) {
-            RELEASE_LOG(RemoteLayerTree, "RemoteLayerTreeDrawingAreaProxy(%" PRIu64 ")::hideContentUntilDidUpdateActivityState completed", identifier().toUInt64());
-            m_activityStateChangeForUnhidingContent = std::nullopt;
-        }
 
         // FIXME(site-isolation): Editor state should be updated for subframes.
         didUpdateEditorState = layerTreeTransaction.hasEditorState() && page->updateEditorState(EditorState { layerTreeTransaction.editorState() }, WebPageProxy::ShouldMergeVisualEditorState::Yes);

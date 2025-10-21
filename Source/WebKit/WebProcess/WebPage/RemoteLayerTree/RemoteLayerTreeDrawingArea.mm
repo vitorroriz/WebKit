@@ -32,6 +32,7 @@
 #import "PlatformCALayerRemote.h"
 #import "RemoteImageBufferSetProxy.h"
 #import "RemoteLayerBackingStoreCollection.h"
+#import "RemoteLayerTreeCommitBundle.h"
 #import "RemoteLayerTreeContext.h"
 #import "RemoteLayerTreeDrawingAreaProxyMessages.h"
 #import "RemoteScrollingCoordinator.h"
@@ -370,7 +371,7 @@ void RemoteLayerTreeDrawingArea::updateRendering()
 
     // FIXME: Minimize these transactions if nothing changed.
     auto transactionID = takeNextTransactionID();
-    auto transactions = WTF::map(m_rootLayers, [&](auto& rootLayer) -> std::pair<RemoteLayerTreeTransaction, RemoteScrollingCoordinatorTransaction> {
+    auto transactions = WTF::map(m_rootLayers, [&](auto& rootLayer) -> RemoteLayerTreeCommitBundle::RootFrameData {
         backingStoreCollection->willBuildTransaction();
         rootLayer.layer->flushCompositingStateForThisLayerOnly();
 
@@ -384,7 +385,6 @@ void RemoteLayerTreeDrawingArea::updateRendering()
         webPage->willCommitLayerTree(layerTransaction, rootLayer.frameID);
 
         layerTransaction.setNewlyReachedPaintingMilestones(std::exchange(m_pendingNewlyReachedPaintingMilestones, { }));
-        layerTransaction.setActivityStateChangeID(std::exchange(m_activityStateChangeID, ActivityStateChangeAsynchronous));
 
         willCommitLayerTree(layerTransaction);
 
@@ -405,11 +405,15 @@ void RemoteLayerTreeDrawingArea::updateRendering()
     for (auto& transaction : transactions)
         backingStoreCollection->willCommitLayerTree(transaction.first);
 
+    RemoteLayerTreeCommitBundle bundle { WTFMove(transactions) };
+    if (webPage->mainWebFrame().coreLocalFrame())
+        bundle.mainFrameData = { std::exchange(m_activityStateChangeID, ActivityStateChangeAsynchronous) };
+
     auto commitEncoder = makeUniqueRef<IPC::Encoder>(Messages::RemoteLayerTreeDrawingAreaProxy::CommitLayerTree::name(), m_identifier.toUInt64());
-    commitEncoder.get() << transactions;
+    commitEncoder.get() << bundle;
 
     Vector<std::unique_ptr<ThreadSafeImageBufferSetFlusher>> flushers;
-    for (auto& transaction : transactions)
+    for (auto& transaction : bundle.transactions)
         flushers.appendVector(backingStoreCollection->didFlushLayers(transaction.first));
 
     OptionSet<WebPage::DidUpdateRenderingFlags> didUpdateRenderingFlags;

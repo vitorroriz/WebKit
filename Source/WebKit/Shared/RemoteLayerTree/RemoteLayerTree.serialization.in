@@ -149,7 +149,6 @@ header: "RemoteLayerBackingStore.h"
     WebCore::InteractiveWidget m_viewportMetaTagInteractiveWidget;
     uint64_t m_renderTreeSize;
     WebKit::TransactionID m_transactionID;
-    WebKit::ActivityStateChangeID m_activityStateChangeID;
     OptionSet<WebCore::LayoutMilestone> m_newlyReachedPaintingMilestones;
     bool m_scaleWasSetByUIProcess;
     bool m_allowsUserScaling;
@@ -290,3 +289,15 @@ headers: "LayerProperties.h" "PlatformCALayerRemote.h"
 };
 
 using WebKit::LayerHostingContextID = uint32_t;
+
+using WebKit::RemoteLayerTreeCommitBundle::RootFrameData = std::pair<WebKit::RemoteLayerTreeTransaction, WebKit::RemoteScrollingCoordinatorTransaction>;
+
+headers: "RemoteLayerTreeCommitBundle.h"
+struct WebKit::RemoteLayerTreeCommitBundle {
+    Vector<WebKit::RemoteLayerTreeCommitBundle::RootFrameData> transactions;
+    std::optional<WebKit::RemoteLayerTreeCommitBundle::MainFrameData> mainFrameData;
+};
+
+[Nested] struct WebKit::RemoteLayerTreeCommitBundle::MainFrameData {
+    WebKit::ActivityStateChangeID activityStateChangeID;
+};
