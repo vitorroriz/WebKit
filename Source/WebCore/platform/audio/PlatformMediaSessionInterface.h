@@ -105,8 +105,6 @@ public:
     virtual std::optional<NowPlayingInfo> nowPlayingInfo() const { return { }; }
     virtual WeakPtr<PlatformMediaSessionInterface> selectBestMediaSession(const Vector<WeakPtr<PlatformMediaSessionInterface>>&, PlatformMediaSessionPlaybackControlsPurpose) { return nullptr; }
 
-    virtual void isActiveNowPlayingSessionChanged() = 0;
-
 #if !RELEASE_LOG_DISABLED
     virtual const Logger& logger() const = 0;
     Ref<const Logger> protectedLogger() const { return logger(); }

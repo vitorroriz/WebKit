@@ -259,7 +259,6 @@ public:
     std::optional<MediaSessionGroupIdentifier> mediaSessionGroupIdentifier() const final;
 
     WEBCORE_EXPORT bool isActiveNowPlayingSession() const;
-    void isActiveNowPlayingSessionChanged() final;
 
 // DOM API
 // error state
