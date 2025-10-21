@@ -1365,7 +1365,8 @@ void Document::setCompatibilityMode(DocumentCompatibilityMode mode)
         // All user stylesheets have to reparse using the different mode.
         if (auto* extensionStyleSheets = extensionStyleSheetsIfExists()) {
             extensionStyleSheets->clearPageUserSheet();
-            extensionStyleSheets->invalidateInjectedStyleSheetCache();
+            if (extensionStyleSheets->hasCachedInjectedStyleSheets())
+                extensionStyleSheets->invalidateInjectedStyleSheetCache();
         }
     }
 
