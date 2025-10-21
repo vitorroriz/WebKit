@@ -582,6 +582,8 @@ private:
     HashSet<WebCore::ProcessIdentifier> activeWebProcesses() const;
     void removeDataInNetworkProcess(WebsiteDataStore::ProcessAccessType, OptionSet<WebsiteDataType>, WallTime, CompletionHandler<void()>&&);
 
+    HashSet<WebCore::RegistrableDomain> platformAdditionalDomainsWithUserInteraction() const;
+
     const PAL::SessionID m_sessionID;
 
     mutable Lock m_resolveDirectoriesLock;

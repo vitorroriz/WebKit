@@ -851,6 +851,16 @@ static WebKit::UnifiedOriginStorageLevel toUnifiedOriginStorageLevel(_WKUnifiedO
     _configuration->setDefaultTrackingPreventionEnabledOverride(enabled);
 }
 
+- (NSString *)additionalDomainsWithUserInteractionForTesting
+{
+    return _configuration->additionalDomainsWithUserInteractionForTesting().createNSString().autorelease();
+}
+
+- (void)setAdditionalDomainsWithUserInteractionForTesting:(NSString *)domains
+{
+    _configuration->setAdditionalDomainsWithUserInteractionForTesting(domains);
+}
+
 - (NSUUID *)identifier
 {
     auto currentIdentifier = _configuration->identifier();
