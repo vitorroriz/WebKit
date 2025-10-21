@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,44 +23,14 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#import "config.h"
 
-DECLARE_SYSTEM_HEADER
+#if HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
 
-#if USE(APPLE_INTERNAL_SDK)
+#import <pal/spi/cocoa/WebFilterEvaluatorSPI.h>
+#import <wtf/SoftLinking.h>
 
-#if HAVE(WEBCONTENTANALYSIS_FRAMEWORK)
-#import <WebContentAnalysis/WebFilterEvaluator.h>
-#endif
+SOFT_LINK_PRIVATE_FRAMEWORK_FOR_SOURCE_WITH_EXPORT(PAL, WebContentAnalysis, PAL_EXPORT)
+SOFT_LINK_CLASS_FOR_SOURCE_OPTIONAL_WITH_EXPORT(PAL, WebContentAnalysis, WebFilterEvaluator, PAL_EXPORT)
 
-#else
-
-#import <Foundation/Foundation.h>
-#import <TargetConditionals.h>
-
-enum {
-    kWFEStateAllowed = 0,
-    kWFEStateBlocked = 1,
-    kWFEStateBuffering = 2,
-    kWFEStateEvaluating = 3
-};
-
-@interface WebFilterEvaluator : NSObject
-@end
-
-@interface WebFilterEvaluator ()
-+ (BOOL)isManagedSession;
-- (BOOL)wasBlocked;
-- (NSData *)addData:(NSData *)receivedData;
-- (NSData *)dataComplete;
-- (OSStatus)filterState;
-- (id)initWithResponse:(NSURLResponse *)response;
-#if TARGET_OS_IPHONE
-- (void)unblockWithCompletion:(void (^)(BOOL unblocked, NSError *error))completion;
-#endif
-#if HAVE(WEBFILTEREVALUATOR_AUDIT_TOKEN)
-@property (nonatomic, assign) audit_token_t browserAuditToken;
-#endif
-@end
-
-#endif
+#endif // ENABLE(ADVANCED_PRIVACY_PROTECTIONS)

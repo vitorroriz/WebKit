@@ -74,6 +74,9 @@
 #if USE(PASSKIT)
 #import <pal/cocoa/ContactsSoftLink.h>
 #endif
+#if HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
+#import <pal/cocoa/WebContentAnalysisSoftLink.h>
+#endif
 
 #if !HAVE(WK_SECURE_CODING_NSURLREQUEST)
 
@@ -332,6 +335,13 @@ template<> Class getClass<PKPaymentMethod>()
 template<> Class getClass<PKSecureElementPass>()
 {
     return PAL::getPKSecureElementPassClassSingleton();
+}
+#endif
+
+#if HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
+template<> Class getClass<WebFilterEvaluator>()
+{
+    return PAL::getWebFilterEvaluatorClassSingleton();
 }
 #endif
 
