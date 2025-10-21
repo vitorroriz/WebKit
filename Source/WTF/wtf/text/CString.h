@@ -32,6 +32,7 @@
 #include <wtf/Ref.h>
 #include <wtf/RefCounted.h>
 #include <wtf/StdLibExtras.h>
+#include <wtf/SwiftBridging.h>
 
 namespace WTF {
 
@@ -105,7 +106,7 @@ private:
     void copyBufferIfNeeded();
     void init(std::span<const char>);
     RefPtr<CStringBuffer> m_buffer;
-};
+} SWIFT_ESCAPABLE;
 
 WTF_EXPORT_PRIVATE bool operator==(const CString&, const CString&);
 WTF_EXPORT_PRIVATE bool operator<(const CString&, const CString&);

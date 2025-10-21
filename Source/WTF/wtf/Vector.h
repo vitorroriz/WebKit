@@ -38,6 +38,7 @@
 #include <wtf/Noncopyable.h>
 #include <wtf/NotFound.h>
 #include <wtf/StdLibExtras.h>
+#include <wtf/SwiftBridging.h>
 #include <wtf/ValueCheck.h>
 #include <wtf/VectorTraits.h>
 
@@ -936,7 +937,7 @@ private:
 #if ASAN_ENABLED
     using Base::endOfBuffer;
 #endif
-};
+} SWIFT_ESCAPABLE_IF(T);
 
 template<typename T, size_t inlineCapacity, typename OverflowHandler, size_t minCapacity, typename Malloc>
 Vector<T, inlineCapacity, OverflowHandler, minCapacity, Malloc>::Vector(const Vector& other)
