@@ -1558,6 +1558,13 @@ std::optional<String> Quirks::needsCustomUserAgentOverride(const URL& url, const
     if (hostDomain.string() == "app.aktiv.com")
         return firefoxUserAgent;
 
+#if PLATFORM(IOS)
+    auto chromeUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"_s;
+    // amazon.com rdar://117771731
+    if (PublicSuffixStore::singleton().topPrivatelyControlledDomain(hostDomain.string()).startsWith("amazon."_s) && url.path() == "/gp/video/"_s)
+        return chromeUserAgent;
+#endif
+
 #if PLATFORM(COCOA)
     // FIXME(rdar://148759791): Remove this once TikTok removes the outdated error message.
     if (hostDomain.string() == "tiktok.com"_s)
@@ -2573,6 +2580,7 @@ static void handleRedditQuirks(QuirksData& quirksData, const URL& quirksURL, con
 
 static void handleAmazonQuirks(QuirksData& quirksData, const URL& quirksURL, const String& quirksDomainString, const URL& documentURL)
 {
+    // Note: There is a userAgent override for rdar://117771731, see needsCustomUserAgentOverride()
     UNUSED_PARAM(quirksDomainString);
     UNUSED_PARAM(quirksURL);
     UNUSED_PARAM(documentURL);
