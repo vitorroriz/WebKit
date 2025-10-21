@@ -538,7 +538,7 @@ void LocalDOMWindow::willDestroyCachedFrame()
     // It is necessary to copy m_observers to a separate vector because the LocalDOMWindowObserver may
     // unregister themselves from the LocalDOMWindow as a result of the call to willDestroyGlobalObjectInCachedFrame.
     m_observers.forEach([](auto& observer) {
-        observer.willDestroyGlobalObjectInCachedFrame();
+        Ref { observer }->willDestroyGlobalObjectInCachedFrame();
     });
 }
 
@@ -547,7 +547,7 @@ void LocalDOMWindow::willDestroyDocumentInFrame()
     // It is necessary to copy m_observers to a separate vector because the LocalDOMWindowObserver may
     // unregister themselves from the LocalDOMWindow as a result of the call to willDestroyGlobalObjectInFrame.
     m_observers.forEach([](auto& observer) {
-        observer.willDestroyGlobalObjectInFrame();
+        Ref { observer }->willDestroyGlobalObjectInFrame();
     });
 }
 
@@ -561,7 +561,7 @@ void LocalDOMWindow::willDetachDocumentFromFrame()
     // It is necessary to copy m_observers to a separate vector because the LocalDOMWindowObserver may
     // unregister themselves from the LocalDOMWindow as a result of the call to willDetachGlobalObjectFromFrame.
     m_observers.forEach([](auto& observer) {
-        observer.willDetachGlobalObjectFromFrame();
+        Ref { observer }->willDetachGlobalObjectFromFrame();
     });
 
     if (RefPtr performance = m_performance)
@@ -614,7 +614,7 @@ void LocalDOMWindow::suspendForBackForwardCache()
     RELEASE_ASSERT(frame());
 
     m_observers.forEach([](auto& observer) {
-        observer.suspendForBackForwardCache();
+        Ref { observer }->suspendForBackForwardCache();
     });
     RELEASE_ASSERT(frame());
 
@@ -624,7 +624,7 @@ void LocalDOMWindow::suspendForBackForwardCache()
 void LocalDOMWindow::resumeFromBackForwardCache()
 {
     m_observers.forEach([](auto& observer) {
-        observer.resumeFromBackForwardCache();
+        Ref { observer }->resumeFromBackForwardCache();
     });
 
     m_suspendedForDocumentSuspension = false;

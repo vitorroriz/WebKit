@@ -35,22 +35,13 @@
 #include <WebCore/PushSubscriptionOwner.h>
 #include <WebCore/Supplementable.h>
 #include <WebCore/WindowOrWorkerGlobalScope.h>
+#include <wtf/AbstractRefCountedAndCanMakeWeakPtr.h>
 #include <wtf/FixedVector.h>
 #include <wtf/Function.h>
 #include <wtf/HashSet.h>
 #include <wtf/MonotonicTime.h>
 #include <wtf/Platform.h>
 #include <wtf/WeakHashSet.h>
-#include <wtf/WeakPtr.h>
-
-namespace WebCore {
-class LocalDOMWindowObserver;
-}
-
-namespace WTF {
-template<typename T> struct IsDeprecatedWeakRefSmartPointerException;
-template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::LocalDOMWindowObserver> : std::true_type { };
-}
 
 namespace JSC {
 class CallFrame;
@@ -72,7 +63,7 @@ using ReducedResolutionSeconds = Seconds;
 
 template<typename> class ExceptionOr;
 
-class LocalDOMWindowObserver : public CanMakeWeakPtr<LocalDOMWindowObserver> {
+class LocalDOMWindowObserver : public AbstractRefCountedAndCanMakeWeakPtr<LocalDOMWindowObserver> {
 public:
     virtual ~LocalDOMWindowObserver() { }
 
