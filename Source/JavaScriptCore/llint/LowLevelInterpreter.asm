@@ -3043,10 +3043,6 @@ op(ipint_entry, macro ()
     crash()
 end)
 
-op(ipint_simd_entry, macro ()
-    crash()
-end)
-
 op(ipint_catch_entry, macro()
     crash()
 end)

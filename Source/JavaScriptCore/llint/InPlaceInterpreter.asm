@@ -1285,10 +1285,6 @@ else
     break
 end
 
-op(ipint_simd_entry, macro ()
-    break
-end)
-
 macro ipintCatchCommon()
     validateOpcodeConfig(t0)
     getVMFromCallFrame(t3, t0)
