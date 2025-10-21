@@ -1730,10 +1730,13 @@ RefPtr<WebGLActiveInfo> WebGLRenderingContextBase::getActiveAttrib(WebGLProgram&
         return nullptr;
     if (!validateWebGLObject("getActiveAttrib"_s, program))
         return nullptr;
-    auto info = protectedGraphicsContextGL()->getActiveAttrib(program.object(), index);
-    if (!info)
+    const auto& activeAttribs = program.activeAttribs();
+    if (index >= activeAttribs.size()) {
+        synthesizeGLError(GraphicsContextGL::INVALID_VALUE, "getActiveAttrib"_s, "index out of range"_s);
         return nullptr;
-    return WebGLActiveInfo::create(String::fromUTF8(info->name.span()), info->type, info->size);
+    }
+    auto& info = activeAttribs[index];
+    return WebGLActiveInfo::create(String::fromUTF8(info.name.span()), info.type, 1);
 }
 
 RefPtr<WebGLActiveInfo> WebGLRenderingContextBase::getActiveUniform(WebGLProgram& program, GCGLuint index)
@@ -1742,16 +1745,13 @@ RefPtr<WebGLActiveInfo> WebGLRenderingContextBase::getActiveUniform(WebGLProgram
         return nullptr;
     if (!validateWebGLObject("getActiveUniform"_s, program))
         return nullptr;
-    auto info = protectedGraphicsContextGL()->getActiveUniform(program.object(), index);
-    if (!info)
+    const auto& activeUniforms = program.activeUniforms();
+    if (index >= activeUniforms.size()) {
+        synthesizeGLError(GraphicsContextGL::INVALID_VALUE, "getActiveUniform"_s, "index out of range"_s);
         return nullptr;
-    auto name = String::fromUTF8(info->name.span());
-    // FIXME: Do we still need this for the ANGLE backend?
-    if (!isWebGL2()) {
-        if (info->size > 1 && !name.endsWith("[0]"_s))
-            name = makeString(name, "[0]"_s);
     }
-    return WebGLActiveInfo::create(name, info->type, info->size);
+    auto& info = activeUniforms[index];
+    return WebGLActiveInfo::create(String::fromUTF8(info.name.span()), info.type, info.locations.size());
 }
 
 std::optional<Vector<Ref<WebGLShader>>> WebGLRenderingContextBase::getAttachedShaders(WebGLProgram& program)
@@ -1780,11 +1780,11 @@ GCGLint WebGLRenderingContextBase::getAttribLocation(WebGLProgram& program, cons
         return -1;
     if (isPrefixReserved(name))
         return -1;
-    if (!program.getLinkStatus()) {
+    if (!program.linkStatus()) {
         synthesizeGLError(GraphicsContextGL::INVALID_OPERATION, "getAttribLocation"_s, "program not linked"_s);
         return -1;
     }
-    return protectedGraphicsContextGL()->getAttribLocation(program.object(), name.utf8());
+    return program.attribLocations().getOptional(name).value_or(-1);
 }
 
 WebGLAny WebGLRenderingContextBase::getBufferParameter(GCGLenum target, GCGLenum pname)
@@ -2167,12 +2167,13 @@ WebGLAny WebGLRenderingContextBase::getProgramParameter(WebGLProgram& program, G
     case GraphicsContextGL::VALIDATE_STATUS:
         return static_cast<bool>(protectedGraphicsContextGL()->getProgrami(program.object(), pname));
     case GraphicsContextGL::LINK_STATUS:
-        return program.getLinkStatus();
+        return program.linkStatus();
     case GraphicsContextGL::ATTACHED_SHADERS:
         return protectedGraphicsContextGL()->getProgrami(program.object(), pname);
     case GraphicsContextGL::ACTIVE_ATTRIBUTES:
+        return program.activeAttribs().size();
     case GraphicsContextGL::ACTIVE_UNIFORMS:
-        return protectedGraphicsContextGL()->getProgrami(program.object(), pname);
+        return program.activeUniforms().size();
     case GraphicsContextGL::COMPLETION_STATUS_KHR:
         if (m_khrParallelShaderCompile)
             return static_cast<bool>(protectedGraphicsContextGL()->getProgrami(program.object(), pname));
@@ -2390,28 +2391,12 @@ WebGLAny WebGLRenderingContextBase::getUniform(WebGLProgram& program, WebGLUnifo
 
     auto type = uniformLocation.type();
     RefPtr context = m_context;
-
     if (!type) {
-        GCGLint activeUniforms = context->getProgrami(program.object(), GraphicsContextGL::ACTIVE_UNIFORMS);
-        for (GCGLint i = 0; i < activeUniforms; i++) {
-            auto info = context->getActiveUniform(program.object(), i);
-            if (!info)
+        for (auto& info : program.activeUniforms()) {
+            if (info.locations.contains(uniformLocation.location())) {
+                type = info.type;
                 break;
-            auto baseName = String::fromUTF8(info->name.data());
-            // Strip "[0]" from the name if it's an array. FIXME: Is this still needed with ANGLE?
-            if (baseName.endsWith("[0]"_s))
-                baseName = baseName.left(baseName.length() - 3);
-            // If it's an array, we need to iterate through each element, appending "[index]" to the name.
-            for (GCGLint index = 0; index < info->size; ++index) {
-                auto currentName = !index ? baseName : makeString(baseName, '[', index, ']');
-                auto currentLocation = context->getUniformLocation(program.object(), currentName.utf8());
-                if (location == currentLocation) {
-                    type = info->type;
-                    break;
-                }
             }
-            if (type)
-                break;
         }
         if (!type) {
             synthesizeGLError(GraphicsContextGL::INVALID_VALUE, "getUniform"_s, "unknown error"_s);
@@ -2610,17 +2595,13 @@ RefPtr<WebGLUniformLocation> WebGLRenderingContextBase::getUniformLocation(WebGL
         return nullptr;
     if (isPrefixReserved(name))
         return nullptr;
-    if (!program.getLinkStatus()) {
+    if (!program.linkStatus()) {
         synthesizeGLError(GraphicsContextGL::INVALID_OPERATION, "getUniformLocation"_s, "program not linked"_s);
         return nullptr;
     }
-
-    RefPtr context = m_context;
-    auto uniformLocation = context->getUniformLocation(program.object(), name.utf8());
-    if (uniformLocation == -1)
-        return nullptr;
-
-    return WebGLUniformLocation::create(program, uniformLocation);
+    if (auto location = program.uniformLocations().getOptional(name))
+        return WebGLUniformLocation::create(program, location.value());
+    return nullptr;
 }
 
 WebGLAny WebGLRenderingContextBase::getVertexAttrib(GCGLuint index, GCGLenum pname)
@@ -4472,7 +4453,7 @@ void WebGLRenderingContextBase::useProgram(WebGLProgram* program)
     Locker locker { objectGraphLock() };
     if (!validateNullableWebGLObject("useProgram"_s, program))
         return;
-    if (program && !program->getLinkStatus()) {
+    if (program && !program->linkStatus()) {
         synthesizeGLError(GraphicsContextGL::INVALID_OPERATION, "useProgram"_s, "program not valid"_s);
         return;
     }
