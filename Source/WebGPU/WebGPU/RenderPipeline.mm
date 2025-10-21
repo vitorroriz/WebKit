@@ -1978,6 +1978,9 @@ id<MTLRenderPipelineState> RenderPipeline::renderPipelineState() const
         return m_renderPipelineState;
 
     m_renderPipelineState = [m_device->device() newRenderPipelineStateWithDescriptor:m_renderPipelineDescriptor error:nil];
+    if (!m_renderPipelineState)
+        m_device->generateAnOutOfMemoryError("Render pipeline failed compilation likely due to being too complex, please reduce its size"_s);
+
     return m_renderPipelineState;
 }
 
@@ -1988,6 +1991,9 @@ id<MTLRenderPipelineState> RenderPipeline::icbRenderPipelineState() const
 
     m_renderPipelineDescriptor.supportIndirectCommandBuffers = YES;
     m_renderPipelineState = [m_device->device() newRenderPipelineStateWithDescriptor:m_renderPipelineDescriptor error:nil];
+    if (!m_renderPipelineState)
+        m_device->generateAnOutOfMemoryError("Render pipeline failed compilation likely due to being too complex, please reduce its size"_s);
+
     return m_renderPipelineState;
 }
 
