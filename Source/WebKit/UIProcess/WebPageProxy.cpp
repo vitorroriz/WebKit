@@ -852,7 +852,6 @@ WebPageProxy::WebPageProxy(PageClient& pageClient, WebProcessProxy& process, Ref
     , m_cpuLimit(configuration->cpuLimit())
     , m_backForwardList(WebBackForwardList::create(*this))
     , m_waitsForPaintAfterViewDidMoveToWindow(configuration->waitsForPaintAfterViewDidMoveToWindow())
-    , m_hasRunningProcess(process.state() != WebProcessProxy::State::Terminated)
     , m_controlledByAutomation(configuration->isControlledByAutomation())
 #if PLATFORM(COCOA)
     , m_isSmartInsertDeleteEnabled(TextChecker::isSmartInsertDeleteEnabled())
@@ -1155,7 +1154,7 @@ bool WebPageProxy::hasRunningProcess() const
     if (m_isClosed)
         return false;
 
-    return m_hasRunningProcess;
+    return m_legacyMainFrameProcess->state() != WebProcessProxy::State::Terminated;
 }
 
 void WebPageProxy::notifyProcessPoolToPrewarm()
@@ -1374,7 +1373,6 @@ void WebPageProxy::launchProcess(const Site& site, ProcessLaunchReason reason)
     } else
         m_legacyMainFrameProcess = processPool->processForSite(protectedWebsiteDataStore(), WebProcessPool::IsSharedProcess::No, site, site, { }, shouldEnableLockdownMode() ? WebProcessProxy::LockdownMode::Enabled : WebProcessProxy::LockdownMode::Disabled, shouldEnableEnhancedSecurity() ? WebProcessProxy::EnhancedSecurity::Enabled : WebProcessProxy::EnhancedSecurity::Disabled, m_configuration, WebCore::ProcessSwapDisposition::None);
 
-    m_hasRunningProcess = true;
     m_shouldReloadDueToCrashWhenVisible = false;
     m_isLockdownModeExplicitlySet = m_configuration->isLockdownModeExplicitlySet();
 
@@ -1515,8 +1513,6 @@ void WebPageProxy::swapToProvisionalPage(Ref<ProvisionalPageProxy>&& provisional
     // FIXME: Do we really need to disable this logging in ephemeral sessions?
     if (RefPtr logger = m_logger)
         logger->setEnabled(this, isAlwaysOnLoggingAllowed());
-
-    m_hasRunningProcess = true;
 
     ASSERT(!m_mainFrame);
     m_mainFrame = provisionalPage->mainFrame();
@@ -11445,8 +11441,6 @@ void WebPageProxy::resetStateAfterProcessTermination(ProcessTerminationReason re
     if (reason != ProcessTerminationReason::NavigationSwap)
         WEBPAGEPROXY_RELEASE_LOG_ERROR(Process, "processDidTerminate: (pid %d), reason=%" PUBLIC_LOG_STRING, legacyMainFrameProcessID(), processTerminationReasonToString(reason).characters());
 
-    ASSERT(m_hasRunningProcess);
-
     resetStateAfterProcessExited(reason);
     stopAllURLSchemeTasks(protectedLegacyMainFrameProcess().ptr());
 #if ENABLE(PDF_HUD)
@@ -11750,9 +11744,6 @@ void WebPageProxy::resetState(ResetStateReason resetStateReason)
 
 void WebPageProxy::resetStateAfterProcessExited(ProcessTerminationReason terminationReason)
 {
-    if (!hasRunningProcess())
-        return;
-
     RefPtr protectedPageClient { pageClient() };
 
 #if ASSERT_ENABLED
@@ -11772,7 +11763,6 @@ void WebPageProxy::resetStateAfterProcessExited(ProcessTerminationReason termina
     internals().pageAllowedToRunInTheBackgroundActivityDueToTitleChanges = nullptr;
     internals().pageAllowedToRunInTheBackgroundActivityDueToNotifications = nullptr;
 
-    m_hasRunningProcess = false;
     m_areActiveDOMObjectsAndAnimationsSuspended = false;
     m_isServiceWorkerPage = false;
 
