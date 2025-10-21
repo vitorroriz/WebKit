@@ -151,7 +151,7 @@ StyleRareInheritedData::StyleRareInheritedData()
     , autoRevealsWhenFound(false)
     , insideDefaultButton(false)
     , insideSubmitButton(false)
-    , enableEvaluationTimeZoom(false)
+    , evaluationTimeZoomEnabled(false)
 #if HAVE(CORE_MATERIAL)
     , usedAppleVisualEffectForSubtree(static_cast<unsigned>(AppleVisualEffect::None))
 #endif
@@ -256,7 +256,7 @@ inline StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedDa
     , autoRevealsWhenFound(o.autoRevealsWhenFound)
     , insideDefaultButton(o.insideDefaultButton)
     , insideSubmitButton(o.insideSubmitButton)
-    , enableEvaluationTimeZoom(o.enableEvaluationTimeZoom)
+    , evaluationTimeZoomEnabled(o.evaluationTimeZoomEnabled)
 #if HAVE(CORE_MATERIAL)
     , usedAppleVisualEffectForSubtree(o.usedAppleVisualEffectForSubtree)
 #endif
@@ -397,7 +397,7 @@ bool StyleRareInheritedData::operator==(const StyleRareInheritedData& o) const
         && listStyleImage == o.listStyleImage
         && listStyleType == o.listStyleType
         && blockEllipsis == o.blockEllipsis
-        && enableEvaluationTimeZoom == o.enableEvaluationTimeZoom
+        && evaluationTimeZoomEnabled == o.evaluationTimeZoomEnabled
         && deviceScaleFactor == o.deviceScaleFactor;
 }
 
@@ -556,7 +556,7 @@ void StyleRareInheritedData::dumpDifferences(TextStream& ts, const StyleRareInhe
     LOG_IF_DIFFERENT(listStyleType);
     LOG_IF_DIFFERENT(blockEllipsis);
 
-    LOG_IF_DIFFERENT(enableEvaluationTimeZoom);
+    LOG_IF_DIFFERENT(evaluationTimeZoomEnabled);
 }
 #endif
 

@@ -78,7 +78,7 @@ auto CSSValueConversion<LineHeight>::operator()(BuilderState& state, const CSSPr
     // values and raw numbers to percentages.
     if (primitiveValue.isPercentage()) {
         // FIXME: percentage should not be restricted to an integer here.
-        auto textZoom = shouldUseEvaluationTimeZoom(state) ? conversionData.zoom() : 1.0f;
+        auto textZoom = evaluationTimeZoomEnabled(state) ? conversionData.zoom() : 1.0f;
         return LineHeight::Fixed {
             CSS::clampToRange<LineHeight::Fixed::range, float>((state.style().fontDescription().computedSizeForRangeZoomOption(conversionData.rangeZoomOption()) * primitiveValue.resolveAsPercentage<int>(conversionData) * textZoom) / 100.0, minValueForCssLength, maxValueForCssLength)
         };

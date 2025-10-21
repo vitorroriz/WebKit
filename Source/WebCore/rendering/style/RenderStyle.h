@@ -1803,8 +1803,8 @@ public:
     inline void setVisitedLinkFill(Style::SVGPaint&&);
     static inline Style::SVGPaint initialFill();
 
-    inline bool enableEvaluationTimeZoom() const;
-    void setEnableEvaluationTimeZoom(bool);
+    inline bool evaluationTimeZoomEnabled() const;
+    void setEvaluationTimeZoomEnabled(bool);
 
     inline float deviceScaleFactor() const;
     void setDeviceScaleFactor(float);

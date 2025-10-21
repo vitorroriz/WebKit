@@ -1412,9 +1412,9 @@ inline bool RenderStyle::fontCascadeEqual(const RenderStyle& other) const
         || m_inheritedData->fontData->fontCascade == other.m_inheritedData->fontData->fontCascade;
 }
 
-inline bool RenderStyle::enableEvaluationTimeZoom() const
+inline bool RenderStyle::evaluationTimeZoomEnabled() const
 {
-    return m_rareInheritedData->enableEvaluationTimeZoom;
+    return m_rareInheritedData->evaluationTimeZoomEnabled;
 }
 
 inline float RenderStyle::deviceScaleFactor() const
@@ -1432,7 +1432,7 @@ inline Style::ZoomFactor RenderStyle::usedZoomForLength() const
     if (useSVGZoomRulesForLength())
         return Style::ZoomFactor(1.0f, deviceScaleFactor());
 
-    if (enableEvaluationTimeZoom())
+    if (evaluationTimeZoomEnabled())
         return Style::ZoomFactor(usedZoom(), deviceScaleFactor());
 
     return Style::ZoomFactor(1.0f, deviceScaleFactor());

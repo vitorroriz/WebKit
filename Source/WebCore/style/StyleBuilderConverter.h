@@ -443,7 +443,7 @@ inline float zoomWithTextZoomFactor(BuilderState& builderState)
 {
     if (auto* frame = builderState.document().frame()) {
         float textZoomFactor = builderState.style().textZoom() != TextZoom::Reset ? frame->textZoomFactor() : 1.0f;
-        auto usedZoom = shouldUseEvaluationTimeZoom(builderState) ? 1.0f : builderState.style().usedZoom();
+        auto usedZoom = evaluationTimeZoomEnabled(builderState) ? 1.0f : builderState.style().usedZoom();
         return usedZoom * textZoomFactor;
     }
     return builderState.cssToLengthConversionData().zoom();
