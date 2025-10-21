@@ -27,11 +27,9 @@
 #include "WebExtensionUtilities.h"
 #include <WebCore/DataURLDecoder.h>
 #include <WebCore/LocalizedStrings.h>
-#include <gtk/gtk.h>
 #include <wtf/FileSystem.h>
 #include <wtf/Language.h>
 #include <wtf/glib/GRefPtr.h>
-#include <wtf/text/Base64.h>
 
 namespace WebKit {
 
@@ -134,60 +132,6 @@ void WebExtension::recordError(Ref<API::Error> error)
         return;
 
     m_errors.append(error);
-}
-
-Expected<Ref<WebCore::Icon>, RefPtr<API::Error>> WebExtension::iconForPath(const String& path, WebCore::FloatSize sizeForResizing, std::optional<double> idealDisplayScale)
-{
-    ASSERT(path);
-
-    auto dataResult = resourceDataForPath(path);
-    if (!dataResult)
-        return makeUnexpected(dataResult.error());
-
-    Ref imageData = dataResult.value();
-    auto gimageBytes = adoptGRef(g_bytes_new(imageData->span().data(), imageData->size()));
-
-    if (!sizeForResizing.isZero()) {
-        GUniqueOutPtr<GError> error;
-
-        auto loader = adoptGRef(gdk_pixbuf_loader_new());
-        gdk_pixbuf_loader_write_bytes(loader.get(), gimageBytes.get(), &error.outPtr());
-        if (error) {
-            RELEASE_LOG_ERROR(Extensions, "Unknown error when loading an icon: %s", error.get()->message);
-            return makeUnexpected(createError(Error::Unknown));
-        }
-        if (!gdk_pixbuf_loader_close(loader.get(), &error.outPtr()) && error) {
-            RELEASE_LOG_ERROR(Extensions, "Unknown error when loading an icon: %s", error.get()->message);
-            return makeUnexpected(createError(Error::Unknown));
-        }
-        auto pixbuf = adoptGRef(gdk_pixbuf_copy(gdk_pixbuf_loader_get_pixbuf(loader.get())));
-        if (!pixbuf)
-            return makeUnexpected(nullptr);
-
-        // Proportionally scale the size
-        auto originalWidth = gdk_pixbuf_get_width(pixbuf.get());
-        auto originalHeight = gdk_pixbuf_get_height(pixbuf.get());
-        auto aspectWidth = originalWidth ? (sizeForResizing.width() / originalWidth) : 0;
-        auto aspectHeight = originalHeight ? (sizeForResizing.height() / originalHeight) : 0;
-        auto aspectRatio = std::min(aspectWidth, aspectHeight);
-
-        gdk_pixbuf_scale_simple(pixbuf.get(), originalWidth * aspectRatio, originalHeight * aspectRatio, GDK_INTERP_BILINEAR);
-
-        gchar* buffer;
-        gsize bufferSize;
-        if (!gdk_pixbuf_save_to_buffer(pixbuf.get(), &buffer, &bufferSize, "png", &error.outPtr(), nullptr) && error) {
-            RELEASE_LOG_ERROR(Extensions, "Unknown error when loading an icon: %s", error.get()->message);
-            return makeUnexpected(createError(Error::Unknown));
-        }
-
-        gimageBytes = adoptGRef(g_bytes_new_take(buffer, bufferSize));
-    }
-
-    GRefPtr<GIcon> image = adoptGRef(g_bytes_icon_new(gimageBytes.get()));
-
-    if (RefPtr iconResult = WebCore::Icon::create(WTFMove(image)))
-        return iconResult.releaseNonNull();
-    return makeUnexpected(nullptr);
 }
 
 RefPtr<WebCore::Icon> WebExtension::bestIcon(RefPtr<JSON::Object> icons, WebCore::FloatSize idealSize, NOESCAPE const Function<void(Ref<API::Error>)>& reportError)
