@@ -270,7 +270,15 @@ void TextBoxPainter::paint()
             paintCompositionUnderlines();
 
         m_renderer.page().addRelevantRepaintedObject(m_renderer, enclosingLayoutRect(m_paintRect));
-        m_document.didPaintText(textBox().formattingContextRoot(), textBox().visualRectIgnoringBlockDirection());
+
+        bool isOnlyTextBoxForElement = [&]() {
+            if (m_textBox.boxIndex() != 1)
+                return false;
+            auto& content = m_textBox.inlineContent().displayContent();
+            return content.lines.size() == 1 && content.boxes.size() == 2;
+        }();
+
+        m_document.didPaintText(textBox().formattingContextRoot(), textBox().visualRectIgnoringBlockDirection(), isOnlyTextBoxForElement);
     }
 
     if (glyphRotation) {

@@ -401,7 +401,7 @@ void LargestContentfulPaintData::didPaintImage(Element& element, CachedImage* im
     scheduleRenderingUpdateIfNecessary(element);
 }
 
-void LargestContentfulPaintData::didPaintText(const RenderBlockFlow& formattingContextRoot, FloatRect localRect)
+void LargestContentfulPaintData::didPaintText(const RenderBlockFlow& formattingContextRoot, FloatRect localRect, bool isOnlyTextBoxForElement)
 {
     if (localRect.isEmpty())
         return;
@@ -427,7 +427,8 @@ void LargestContentfulPaintData::didPaintText(const RenderBlockFlow& formattingC
     if (element->isInLargestContentfulPaintTextContentSet())
         return;
 
-    // FIXME: If we know that this is the only text paint for a given element, we can use canCompareWithLargestPaintArea() and early return.
+    if (isOnlyTextBoxForElement && canCompareWithLargestPaintArea(*element) && localRect.area() <= m_largestPaintArea)
+        return;
 
     if (!isExposedForPaintTiming(*element))
         return;
