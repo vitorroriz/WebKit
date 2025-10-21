@@ -443,14 +443,16 @@ template<CSSPropertyID propertyID, typename InsetEdgeApplier, typename NumberAsP
             else
                 containingBlockSize = enclosingClippingBox.contentBoxLogicalWidth();
         } else {
-            if (isVerticalProperty == containingBlock->isHorizontalWritingMode()) {
-                containingBlockSize = box->isOutOfFlowPositioned()
-                    ? box->containingBlockLogicalHeightForPositioned(*containingBlock, false)
-                    : box->containingBlockLogicalHeightForContent(AvailableLogicalHeightType::ExcludeMarginBorderPadding);
+            if (box->isOutOfFlowPositioned()) {
+                if (isVerticalProperty)
+                    containingBlockSize = box->containingBlockRangeForPositioned(*containingBlock, BoxAxis::Vertical).size();
+                else
+                    containingBlockSize = box->containingBlockRangeForPositioned(*containingBlock, BoxAxis::Horizontal).size();
             } else {
-                containingBlockSize = box->isOutOfFlowPositioned()
-                    ? box->containingBlockLogicalWidthForPositioned(*containingBlock, false)
-                    : box->containingBlockLogicalWidthForContent();
+                if (isVerticalProperty == containingBlock->isHorizontalWritingMode())
+                    containingBlockSize = box->containingBlockLogicalHeightForContent(AvailableLogicalHeightType::ExcludeMarginBorderPadding);
+                else
+                    containingBlockSize = box->containingBlockLogicalWidthForContent();
             }
         }
         return numberAsPixelsApplier(Style::evaluate<LayoutUnit>(inset, containingBlockSize, Style::ZoomNeeded { }));

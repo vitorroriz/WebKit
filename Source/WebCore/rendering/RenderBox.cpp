@@ -4003,92 +4003,69 @@ LayoutUnit RenderBox::constrainBlockMarginInAvailableSpaceOrTrim(const RenderBox
 
 // MARK: - Positioned Layout
 
-LayoutUnit RenderBox::containingBlockLogicalWidthForPositioned(const RenderBoxModelObject& containingBlock, bool checkForPerpendicularWritingMode) const
+LayoutRange RenderBox::containingBlockRangeForPositioned(const RenderBoxModelObject& container, BoxAxis physicalAxis) const
 {
-    ASSERT(containingBlock.canContainAbsolutelyPositionedObjects() || containingBlock.canContainFixedPositionObjects());
+    ASSERT(container.canContainAbsolutelyPositionedObjects() || container.canContainFixedPositionObjects());
 
-    if (checkForPerpendicularWritingMode && containingBlock.isHorizontalWritingMode() != isHorizontalWritingMode())
-        return containingBlockLogicalHeightForPositioned(containingBlock, false);
+    bool isContainerInlineAxis = physicalAxis == container.writingMode().inlineAxis();
+    auto startEdge = isContainerInlineAxis ? container.borderLogicalLeft() : container.borderBefore();
 
-    if (CheckedPtr inlineBox = containingBlock.inlineContinuation()) {
+    if (isFixedPositioned()) {
+        if (auto* renderView = dynamicDowncast<RenderView>(container)) {
+            return isContainerInlineAxis
+                ? LayoutRange(startEdge, renderView->clientLogicalWidthForFixedPosition())
+                : LayoutRange(startEdge, renderView->clientLogicalHeightForFixedPosition());
+        }
+    }
+
+    // Inline containing blocks are formed by relatively-positioned inline boxes.
+    CheckedPtr<const RenderInline> inlineContainer;
+    if ((inlineContainer = container.inlineContinuation())) {
         auto relativelyPositionedInlineBoxAncestor = [&] {
-            // Since we stop splitting inlines over 200 nested boxes (see RenderTreeBuilder::Inline::splitInlines), we may not be able to find the real containing block here.
-            CheckedPtr<RenderElement> ancestor = inlineBox;
+            CheckedPtr<const RenderElement> ancestor = inlineContainer;
             for (; ancestor && !ancestor->isRelativelyPositioned(); ancestor = ancestor->parent()) { }
-            return ancestor;
-        };
-        if (auto containingBlock = relativelyPositionedInlineBoxAncestor(); containingBlock && is<RenderInline>(*containingBlock))
-            return containingBlockLogicalWidthForPositioned(*dynamicDowncast<RenderInline>(*containingBlock), checkForPerpendicularWritingMode);
+            return ancestor ? dynamicDowncast<RenderInline>(ancestor.get()) : nullptr;
+        }();
+        // Since we stop splitting inlines over 200 nested boxes (see RenderTreeBuilder::Inline::splitInlines), we may not be able to find the real containing block here.
+        if (relativelyPositionedInlineBoxAncestor)
+            inlineContainer = relativelyPositionedInlineBoxAncestor;
+    } else
+        inlineContainer = dynamicDowncast<RenderInline>(container);
+    if (inlineContainer) {
+        return isContainerInlineAxis
+            ? LayoutRange(startEdge, inlineContainer->innerPaddingBoxWidth())
+            : LayoutRange(startEdge, inlineContainer->innerPaddingBoxHeight());
     }
 
-    if (auto* box = dynamicDowncast<RenderBox>(containingBlock)) {
-        bool isFixedPosition = isFixedPositioned();
+    auto* containingBlock = dynamicDowncast<RenderBlock>(container) ? : container.containingBlock();
+    if (!containingBlock) {
+        ASSERT_NOT_REACHED();
+        return { };
+    }
 
-        if (!enclosingFragmentedFlow()) {
-            if (isFixedPosition) {
-                if (auto* renderView = dynamicDowncast<RenderView>(containingBlock))
-                    return renderView->clientLogicalWidthForFixedPosition();
+    if (auto* fragmentedFlow = dynamicDowncast<RenderFragmentedFlow>(containingBlock)) {
+        return isContainerInlineAxis
+            ? LayoutRange(startEdge, fragmentedFlow->contentLogicalWidthOfFirstFragment())
+            : LayoutRange(startEdge, fragmentedFlow->contentLogicalHeightOfFirstFragment());
+    }
+
+    if (enclosingFragmentedFlow() && enclosingFragmentedFlow()->writingMode().inlineAxis() == physicalAxis) {
+        LayoutUnit pageOffset = containingBlock->offsetFromLogicalTopOfFirstPage();
+        if (RenderFragmentContainer* fragment = containingBlock->fragmentAtBlockOffset(pageOffset)) {
+            if (auto boxInfo = containingBlock->renderBoxFragmentInfo(fragment)) {
+                auto size = boxInfo->logicalWidth();
+                if (BoxAxis::Horizontal == physicalAxis)
+                    size -= containingBlock->width() - containingBlock->clientWidth();
+                else
+                    size -= containingBlock->height() - containingBlock->clientHeight();
+                return LayoutRange(startEdge, std::max<LayoutUnit>(0, size));
             }
-            return downcast<RenderBox>(containingBlock).clientLogicalWidth();
         }
-
-        CheckedPtr cb = dynamicDowncast<RenderBlock>(containingBlock);
-        if (!cb)
-            return box->clientLogicalWidth();
-
-        RenderBoxFragmentInfo* boxInfo = nullptr;
-        if (auto* fragmentedFlow = dynamicDowncast<RenderFragmentedFlow>(containingBlock); fragmentedFlow && !checkForPerpendicularWritingMode)
-            return fragmentedFlow->contentLogicalWidthOfFirstFragment();
-        if (isWritingModeRoot()) {
-            LayoutUnit cbPageOffset = cb->offsetFromLogicalTopOfFirstPage();
-            RenderFragmentContainer* cbFragment = cb->fragmentAtBlockOffset(cbPageOffset);
-            if (cbFragment)
-                boxInfo = cb->renderBoxFragmentInfo(cbFragment);
-        }
-        return (boxInfo) ? std::max<LayoutUnit>(0, cb->clientLogicalWidth() - (cb->logicalWidth() - boxInfo->logicalWidth())) : cb->clientLogicalWidth();
     }
 
-    if (auto* inlineBox = dynamicDowncast<RenderInline>(containingBlock))
-        return inlineBox->innerPaddingBoxWidth();
-
-    ASSERT_NOT_REACHED();
-    return { };
-}
-
-LayoutUnit RenderBox::containingBlockLogicalHeightForPositioned(const RenderBoxModelObject& containingBlock, bool checkForPerpendicularWritingMode) const
-{
-    ASSERT(containingBlock.canContainAbsolutelyPositionedObjects() || containingBlock.canContainFixedPositionObjects());
-
-    if (checkForPerpendicularWritingMode && containingBlock.isHorizontalWritingMode() != isHorizontalWritingMode())
-        return containingBlockLogicalWidthForPositioned(containingBlock, false);
-
-    if (auto* box = dynamicDowncast<RenderBox>(containingBlock)) {
-        bool isFixedPosition = isFixedPositioned();
-
-        if (isFixedPosition) {
-            if (auto* renderView = dynamicDowncast<RenderView>(*box))
-                return renderView->clientLogicalHeightForFixedPosition();
-        }
-
-        if (enclosingFragmentedFlow() && enclosingFragmentedFlow()->isHorizontalWritingMode() == containingBlock.isHorizontalWritingMode()) {
-            if (CheckedPtr containingBlockFragmentedFlow = dynamicDowncast<RenderFragmentedFlow>(containingBlock))
-                return containingBlockFragmentedFlow->contentLogicalHeightOfFirstFragment();
-        }
-
-        auto logicalHeight = LayoutUnit { };
-        if (CheckedPtr containingBlockAsRenderBlock = dynamicDowncast<RenderBlock>(*box))
-            logicalHeight = containingBlockAsRenderBlock->clientLogicalHeight();
-        else
-            logicalHeight = box->containingBlock()->clientLogicalHeight();
-
-        return logicalHeight;
-    }
-
-    if (auto* inlineBox = dynamicDowncast<RenderInline>(containingBlock))
-        return inlineBox->innerPaddingBoxHeight();
-
-    ASSERT_NOT_REACHED();
-    return { };
+    return BoxAxis::Horizontal == physicalAxis
+        ? LayoutRange(startEdge, containingBlock->clientWidth())
+        : LayoutRange(startEdge, containingBlock->clientHeight());
 }
 
 void RenderBox::computeOutOfFlowPositionedLogicalWidth(LogicalExtentComputedValues& computedValues) const

@@ -65,13 +65,10 @@ PositionedLayoutConstraints::PositionedLayoutConstraints(const RenderBox& render
     ASSERT(m_container);
 
     // Compute basic containing block info.
-    auto containingInlineSize = renderer.containingBlockLogicalWidthForPositioned(*m_container, false);
-    if (LogicalBoxAxis::Inline == m_containingAxis)
-        m_containingRange.set(m_container->borderLogicalLeft(), containingInlineSize);
-    else
-        m_containingRange.set(m_container->borderBefore(), renderer.containingBlockLogicalHeightForPositioned(*m_container, false));
-    m_containingInlineSize = containingInlineSize;
-    m_originalContainingRange = m_containingRange;
+    m_originalContainingRange = renderer.containingBlockRangeForPositioned(*m_container, m_physicalAxis);
+    m_containingRange = m_originalContainingRange;
+    m_containingInlineSize = (LogicalBoxAxis::Inline == m_containingAxis) ? m_containingRange.size()
+        : renderer.containingBlockRangeForPositioned(*m_container, oppositeAxis(m_physicalAxis)).size();
 
     // Adjust for scrollable area.
     captureScrollableArea();

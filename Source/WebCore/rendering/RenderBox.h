@@ -24,6 +24,7 @@
 #pragma once
 
 #include <WebCore/FontBaseline.h>
+#include <WebCore/LayoutRange.h>
 #include <WebCore/LocalFrameView.h>
 #include <WebCore/RenderBoxModelObject.h>
 #include <WebCore/RenderOverflow.h>
@@ -360,8 +361,7 @@ public:
 
     LayoutUnit containingBlockLogicalWidthForContent() const override;
     LayoutUnit containingBlockLogicalHeightForContent(AvailableLogicalHeightType) const;
-    LayoutUnit containingBlockLogicalWidthForPositioned(const RenderBoxModelObject& containingBlock, bool checkForPerpendicularWritingMode = true) const;
-    LayoutUnit containingBlockLogicalHeightForPositioned(const RenderBoxModelObject& containingBlock, bool checkForPerpendicularWritingMode = true) const;
+    LayoutRange containingBlockRangeForPositioned(const RenderBoxModelObject& containingBlock, BoxAxis physicalAxis) const;
     LayoutUnit containingBlockAvailableLineWidth() const;
     LayoutUnit perpendicularContainingBlockLogicalHeight() const;
 
