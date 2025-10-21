@@ -127,7 +127,6 @@ public:
     static Resize convertResize(BuilderState&, const CSSValue&);
     static OptionSet<TextUnderlinePosition> convertTextUnderlinePosition(BuilderState&, const CSSValue&);
     static OptionSet<LineBoxContain> convertLineBoxContain(BuilderState&, const CSSValue&);
-    static GridAutoFlow convertGridAutoFlow(BuilderState&, const CSSValue&);
     static OptionSet<TouchAction> convertTouchAction(BuilderState&, const CSSValue&);
 
     static PaintOrder convertPaintOrder(BuilderState&, const CSSValue&);
@@ -395,48 +394,6 @@ inline OptionSet<LineBoxContain> BuilderConverter::convertLineBoxContain(Builder
         }
     }
     return result;
-}
-
-inline GridAutoFlow BuilderConverter::convertGridAutoFlow(BuilderState& builderState, const CSSValue& value)
-{
-    ASSERT(!is<CSSPrimitiveValue>(value) || downcast<CSSPrimitiveValue>(value).isValueID());
-
-    auto* list = dynamicDowncast<CSSValueList>(value);
-    if (list && !list->size())
-        return RenderStyle::initialGridAutoFlow();
-
-    auto* first = requiredDowncast<CSSPrimitiveValue>(builderState, list ? *(list->item(0)) : value);
-    if (!first)
-        return { };
-    auto* second = dynamicDowncast<CSSPrimitiveValue>(list && list->size() == 2 ? list->item(1) : nullptr);
-
-    GridAutoFlow autoFlow;
-    switch (first->valueID()) {
-    case CSSValueRow:
-        if (second && second->valueID() == CSSValueDense)
-            autoFlow = AutoFlowRowDense;
-        else
-            autoFlow = AutoFlowRow;
-        break;
-    case CSSValueColumn:
-        if (second && second->valueID() == CSSValueDense)
-            autoFlow = AutoFlowColumnDense;
-        else
-            autoFlow = AutoFlowColumn;
-        break;
-    case CSSValueDense:
-        if (second && second->valueID() == CSSValueColumn)
-            autoFlow = AutoFlowColumnDense;
-        else
-            autoFlow = AutoFlowRowDense;
-        break;
-    default:
-        ASSERT_NOT_REACHED();
-        autoFlow = RenderStyle::initialGridAutoFlow();
-        break;
-    }
-
-    return autoFlow;
 }
 
 inline float zoomWithTextZoomFactor(BuilderState& builderState)

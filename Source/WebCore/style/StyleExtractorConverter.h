@@ -172,10 +172,6 @@ public:
     // MARK: Font conversions
 
     static Ref<CSSValue> convertFontFamily(ExtractorState&, const AtomString&);
-
-    // MARK: Grid conversions
-
-    static Ref<CSSValue> convertGridAutoFlow(ExtractorState&, GridAutoFlow);
 };
 
 // MARK: - Strong value conversions
@@ -934,24 +930,6 @@ inline Ref<CSSValue> ExtractorConverter::convertFontFamily(ExtractorState& state
     if (auto familyIdentifier = identifierForFamily(family))
         return CSSPrimitiveValue::create(familyIdentifier);
     return state.pool.createFontFamilyValue(family);
-}
-
-// MARK: - Grid conversions
-
-inline Ref<CSSValue> ExtractorConverter::convertGridAutoFlow(ExtractorState&, GridAutoFlow gridAutoFlow)
-{
-    ASSERT(gridAutoFlow & static_cast<GridAutoFlow>(InternalAutoFlowDirectionRow) || gridAutoFlow & static_cast<GridAutoFlow>(InternalAutoFlowDirectionColumn));
-
-    CSSValueListBuilder list;
-    if (gridAutoFlow & static_cast<GridAutoFlow>(InternalAutoFlowDirectionColumn))
-        list.append(CSSPrimitiveValue::create(CSSValueColumn));
-    else if (!(gridAutoFlow & static_cast<GridAutoFlow>(InternalAutoFlowAlgorithmDense)))
-        list.append(CSSPrimitiveValue::create(CSSValueRow));
-
-    if (gridAutoFlow & static_cast<GridAutoFlow>(InternalAutoFlowAlgorithmDense))
-        list.append(CSSPrimitiveValue::create(CSSValueDense));
-
-    return CSSValueList::createSpaceSeparated(WTFMove(list));
 }
 
 } // namespace Style

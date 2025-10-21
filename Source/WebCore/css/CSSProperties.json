@@ -10029,7 +10029,7 @@
             "animation-type": "discrete",
             "initial": "row",
             "codegen-properties": {
-                "style-converter": "GridAutoFlow",
+                "style-converter": "StyleType<GridAutoFlow>",
                 "parser-function": "consumeGridAutoFlow",
                 "parser-grammar-unused": "[ row | column ] || dense",
                 "parser-grammar-unused-reason": "Needs support for transforming parsed input to minimal form."

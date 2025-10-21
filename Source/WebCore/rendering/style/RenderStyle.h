@@ -79,7 +79,6 @@ class ViewTimeline;
 class WillChangeData;
 
 enum CSSPropertyID : uint16_t;
-enum GridAutoFlow : uint8_t;
 
 enum class AlignmentBaseline : uint8_t;
 enum class ApplePayButtonStyle : uint8_t;
@@ -282,6 +281,7 @@ struct FontVariationSettings;
 struct FontWeight;
 struct FontWidth;
 struct GapGutter;
+struct GridAutoFlow;
 struct GridPosition;
 struct GridTemplateAreas;
 struct GridTemplateList;
@@ -964,11 +964,7 @@ public:
     inline const StyleSelfAlignmentData& justifyItems() const;
     inline const StyleSelfAlignmentData& justifySelf() const;
 
-    inline GridAutoFlow gridAutoFlow() const;
-    inline bool isGridAutoFlowDirectionRow() const;
-    inline bool isGridAutoFlowDirectionColumn() const;
-    inline bool isGridAutoFlowAlgorithmSparse() const;
-    inline bool isGridAutoFlowAlgorithmDense() const;
+    inline Style::GridAutoFlow gridAutoFlow() const;
     inline const Style::GridTrackSizes& gridAutoColumns() const;
     inline const Style::GridTrackSizes& gridAutoRows() const;
     inline const Style::GridTrackSizes& gridAutoList(Style::GridTrackSizingDirection) const;
@@ -1576,7 +1572,7 @@ public:
 
     inline void setBoxDecorationBreak(BoxDecorationBreak);
 
-    inline void setGridAutoFlow(GridAutoFlow);
+    inline void setGridAutoFlow(Style::GridAutoFlow);
     inline void setGridAutoColumns(Style::GridTrackSizes&&);
     inline void setGridAutoRows(Style::GridTrackSizes&&);
     inline void setGridTemplateAreas(Style::GridTemplateAreas&&);
@@ -2263,7 +2259,7 @@ public:
     static constexpr AppleVisualEffect initialAppleVisualEffect();
 #endif
 
-    static constexpr GridAutoFlow initialGridAutoFlow();
+    static constexpr Style::GridAutoFlow initialGridAutoFlow();
     static inline Style::GridTrackSizes initialGridAutoColumns();
     static inline Style::GridTrackSizes initialGridAutoRows();
     static inline Style::GridTemplateAreas initialGridTemplateAreas();

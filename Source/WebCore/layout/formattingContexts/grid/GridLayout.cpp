@@ -102,8 +102,8 @@ std::pair<UsedTrackSizes, GridItemRects> GridLayout::layout(GridFormattingContex
 
     // 1. Run the Grid Item Placement Algorithm to resolve the placement of all grid items in the grid.
     GridAutoFlowOptions autoFlowOptions {
-        .strategy = gridContainerStyle->isGridAutoFlowAlgorithmDense() ? PackingStrategy::Dense : PackingStrategy::Sparse,
-        .direction = gridContainerStyle->isGridAutoFlowDirectionRow() ? GridAutoFlowDirection::Row : GridAutoFlowDirection::Column
+        .strategy = gridContainerStyle->gridAutoFlow().isDense() ? PackingStrategy::Dense : PackingStrategy::Sparse,
+        .direction = gridContainerStyle->gridAutoFlow().isRow() ? GridAutoFlowDirection::Row : GridAutoFlowDirection::Column
     };
     auto [ gridAreas, implicitGridColumnsCount, implicitGridRowsCount ] = placeGridItems(unplacedGridItems, gridTemplateColumnsTrackSizes, gridTemplateRowsTrackSizes, autoFlowOptions);
     auto placedGridItems = formattingContext().constructPlacedGridItems(gridAreas);

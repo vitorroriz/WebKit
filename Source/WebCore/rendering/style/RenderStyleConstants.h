@@ -991,21 +991,6 @@ enum class ColorScheme : uint8_t {
 
 constexpr size_t ColorSchemeBits = 2;
 
-constexpr size_t GridAutoFlowBits = 4;
-enum InternalGridAutoFlow : uint8_t {
-    InternalAutoFlowAlgorithmSparse = 1 << 0,
-    InternalAutoFlowAlgorithmDense  = 1 << 1,
-    InternalAutoFlowDirectionRow    = 1 << 2,
-    InternalAutoFlowDirectionColumn = 1 << 3
-};
-
-enum GridAutoFlow : uint8_t {
-    AutoFlowRow = InternalAutoFlowAlgorithmSparse | InternalAutoFlowDirectionRow,
-    AutoFlowColumn = InternalAutoFlowAlgorithmSparse | InternalAutoFlowDirectionColumn,
-    AutoFlowRowDense = InternalAutoFlowAlgorithmDense | InternalAutoFlowDirectionRow,
-    AutoFlowColumnDense = InternalAutoFlowAlgorithmDense | InternalAutoFlowDirectionColumn
-};
-
 enum class AutoRepeatType : uint8_t {
     None,
     Fill,
@@ -1342,7 +1327,6 @@ WTF::TextStream& operator<<(WTF::TextStream&, FlexDirection);
 WTF::TextStream& operator<<(WTF::TextStream&, FlexWrap);
 WTF::TextStream& operator<<(WTF::TextStream&, Float);
 WTF::TextStream& operator<<(WTF::TextStream&, UsedFloat);
-WTF::TextStream& operator<<(WTF::TextStream&, GridAutoFlow);
 WTF::TextStream& operator<<(WTF::TextStream&, HangingPunctuation);
 WTF::TextStream& operator<<(WTF::TextStream&, Hyphens);
 WTF::TextStream& operator<<(WTF::TextStream&, ImageRendering);

@@ -649,17 +649,6 @@ TextStream& operator<<(TextStream& ts, UsedFloat floating)
     return ts;
 }
 
-TextStream& operator<<(TextStream& ts, GridAutoFlow gridAutoFlow)
-{
-    switch (gridAutoFlow) {
-    case AutoFlowRow: ts << "row"_s; break;
-    case AutoFlowColumn: ts << "column"_s; break;
-    case AutoFlowRowDense: ts << "row-dense"_s; break;
-    case AutoFlowColumnDense: ts << "column-dense"_s; break;
-    }
-    return ts;
-}
-
 TextStream& operator<<(TextStream& ts, HangingPunctuation punctuation)
 {
     switch (punctuation) {

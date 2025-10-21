@@ -108,9 +108,6 @@ public:
 
     static void serializeFontFamily(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const AtomString&);
 
-    // MARK: Grid serializations
-
-    static void serializeGridAutoFlow(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, GridAutoFlow);
 };
 
 // MARK: - Strong value serializations
@@ -861,29 +858,6 @@ inline void ExtractorSerializer::serializeFontFamily(ExtractorState&, StringBuil
         builder.append(nameLiteralForSerialization(familyIdentifier));
     else
         builder.append(WebCore::serializeFontFamily(family));
-}
-
-// MARK: - Grid serializations
-
-inline void ExtractorSerializer::serializeGridAutoFlow(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, GridAutoFlow gridAutoFlow)
-{
-    ASSERT(gridAutoFlow & static_cast<GridAutoFlow>(InternalAutoFlowDirectionRow) || gridAutoFlow & static_cast<GridAutoFlow>(InternalAutoFlowDirectionColumn));
-
-    bool needsSpace = false;
-
-    if (gridAutoFlow & static_cast<GridAutoFlow>(InternalAutoFlowDirectionColumn)) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Column { });
-        needsSpace = true;
-    } else if (!(gridAutoFlow & static_cast<GridAutoFlow>(InternalAutoFlowAlgorithmDense))) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Row { });
-        needsSpace = true;
-    }
-
-    if (gridAutoFlow & static_cast<GridAutoFlow>(InternalAutoFlowAlgorithmDense)) {
-        if (needsSpace)
-            builder.append(' ');
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Dense { });
-    }
 }
 
 } // namespace Style
