@@ -9688,10 +9688,13 @@ WebXRLayersAPIEnabled:
   condition: ENABLE(WEBXR_LAYERS)
   defaultValue:
     WebKitLegacy:
+      "PLATFORM(GTK) || PLATFORM(WPE)": true
       default: false
     WebKit:
+      "PLATFORM(GTK) || PLATFORM(WPE)": true
       default: false
     WebCore:
+      "PLATFORM(GTK) || PLATFORM(WPE)": true
       default: false
 
 WebXRWebGPUBindingsEnabled:
