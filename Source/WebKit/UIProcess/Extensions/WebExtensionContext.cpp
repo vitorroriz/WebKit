@@ -1899,6 +1899,13 @@ Ref<WebExtensionStorageSQLiteStore> WebExtensionContext::storageForType(WebExten
     return sessionStorageStore();
 }
 
+Ref<WebExtensionRegisteredScriptsSQLiteStore> WebExtensionContext::registeredContentScriptsStore()
+{
+    if (!m_registeredContentScriptsStorage)
+        m_registeredContentScriptsStorage = WebExtensionRegisteredScriptsSQLiteStore::create(m_uniqueIdentifier, storageDirectory(), !storageIsPersistent());
+    return *m_registeredContentScriptsStorage;
+}
+
 } // namespace WebKit
 
 #endif // ENABLE(WK_WEB_EXTENSIONS)

@@ -153,7 +153,7 @@ NSDictionary *toWebAPI(const WebExtensionRegisteredScriptParameters& parameters)
         result[matchOriginAsFallbackKey] = parameters.matchParentFrame.value() == WebCore::UserContentMatchParentFrame::ForOpaqueOrigins ? @YES : @NO;
 
     if (parameters.injectionTime)
-        result[runAtKey] = toWebAPI(parameters.injectionTime.value());
+        result[runAtKey] = toWebAPI(parameters.injectionTime.value()).createNSString().get();
 
     if (parameters.styleLevel)
         result[cssOriginKey] = parameters.styleLevel.value() == WebCore::UserStyleLevel::User ? userValue : authorValue;
@@ -164,7 +164,7 @@ NSDictionary *toWebAPI(const WebExtensionRegisteredScriptParameters& parameters)
     return [result copy];
 }
 
-NSString *toWebAPI(WebExtension::InjectionTime injectionTime)
+String toWebAPI(WebExtension::InjectionTime injectionTime)
 {
     switch (injectionTime) {
     case WebExtension::InjectionTime::DocumentEnd:

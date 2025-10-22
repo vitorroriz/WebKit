@@ -166,11 +166,7 @@ Shared/Authentication/cocoa/ClientCertificateAuthenticationXPCConstants.cpp
 Shared/EntryPointUtilities/Cocoa/Daemon/PCMDaemonConnectionSet.mm @nonARC
 Shared/EntryPointUtilities/Cocoa/Daemon/PCMDaemonEntryPoint.mm @nonARC
 
-Shared/Extensions/_WKWebExtensionRegisteredScriptsSQLiteStore.mm
-Shared/Extensions/_WKWebExtensionSQLiteDatabase.mm
-Shared/Extensions/_WKWebExtensionSQLiteRow.mm
-Shared/Extensions/_WKWebExtensionSQLiteStatement.mm
-Shared/Extensions/_WKWebExtensionSQLiteStore.mm
+Shared/Extensions/WebExtensionRegisteredScriptsSQLiteStoreCocoa.mm
 Shared/Extensions/WebExtensionUtilities.mm
 
 Shared/Extensions/Cocoa/WebExtensionFrameIdentifierCocoa.mm @nonARC
