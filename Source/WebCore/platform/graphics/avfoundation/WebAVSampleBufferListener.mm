@@ -212,7 +212,7 @@ static bool isSampleBufferVideoRenderer(id object)
 - (void)layerFailedToDecode:(NSNotification *)notification
 {
     RetainPtr renderer = WebCore::isSampleBufferVideoRenderer(notification.object) ? (WebSampleBufferVideoRendering *)notification.object : nil;
-    RetainPtr error = dynamic_objc_cast<NSError>([notification.userInfo valueForKey:AVSampleBufferDisplayLayerFailedToDecodeNotificationErrorKey]);
+    RetainPtr error = dynamic_objc_cast<NSError>([retainPtr(notification.userInfo) valueForKey:AVSampleBufferDisplayLayerFailedToDecodeNotificationErrorKey]);
 
     ensureOnMainThread([self, protectedSelf = RetainPtr { self }, renderer = WTFMove(renderer), error = WTFMove(error)] {
         if (!_videoRenderers.contains(renderer.get()))
@@ -254,7 +254,7 @@ static bool isSampleBufferVideoRenderer(id object)
 - (void)audioRendererWasAutomaticallyFlushed:(NSNotification *)notification
 {
     RetainPtr renderer = dynamic_objc_cast<AVSampleBufferAudioRenderer>(notification.object);
-    CMTime flushTime = [[notification.userInfo valueForKey:AVSampleBufferAudioRendererFlushTimeKey] CMTimeValue];
+    CMTime flushTime = [[retainPtr(notification.userInfo) valueForKey:AVSampleBufferAudioRendererFlushTimeKey] CMTimeValue];
 
     ensureOnMainThread([self, protectedSelf = RetainPtr { self }, renderer = WTFMove(renderer), flushTime] {
         if (!_audioRenderers.contains(renderer.get()))

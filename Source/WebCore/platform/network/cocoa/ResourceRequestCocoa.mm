@@ -197,7 +197,7 @@ void ResourceRequest::doUpdateResourceRequest()
         m_requestData.m_priority = toResourceLoadPriority(m_nsRequest ? CFURLRequestGetRequestPriority([m_nsRequest _CFURLRequest]) : 0);
 
     m_requestData.m_httpHeaderFields.clear();
-    [[m_nsRequest allHTTPHeaderFields] enumerateKeysAndObjectsUsingBlock: ^(NSString *name, NSString *value, BOOL *) {
+    [retainPtr([m_nsRequest allHTTPHeaderFields]) enumerateKeysAndObjectsUsingBlock: ^(NSString *name, NSString *value, BOOL *) {
         m_requestData.m_httpHeaderFields.set(name, value);
     }];
 
@@ -307,7 +307,7 @@ void ResourceRequest::doUpdatePlatformRequest()
         [nsRequest setHTTPMethod:httpMethod().createNSString().get()];
     [nsRequest setHTTPShouldHandleCookies:allowCookies()];
 
-    [nsRequest _setProperty:RetainPtr { siteForCookies(m_requestData.m_sameSiteDisposition, [nsRequest URL]) }.get() forKey:@"_kCFHTTPCookiePolicyPropertySiteForCookies"];
+    [nsRequest _setProperty:RetainPtr { siteForCookies(m_requestData.m_sameSiteDisposition, retainPtr([nsRequest URL]).get()) }.get() forKey:@"_kCFHTTPCookiePolicyPropertySiteForCookies"];
     // FIXME: This is a safer cpp false positive (rdar://160851489).
     SUPPRESS_UNRETAINED_ARG [nsRequest _setProperty:m_requestData.m_isTopSite ? @YES : @NO forKey:@"_kCFHTTPCookiePolicyPropertyIsTopLevelNavigation"];
 

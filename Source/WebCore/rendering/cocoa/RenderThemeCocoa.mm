@@ -570,7 +570,7 @@ Vector<String, 2> RenderThemeCocoa::mediaControlsScripts()
     // FIXME: Localized strings are not worth having a script. We should make it JSON data etc. instead.
     if (m_mediaControlsLocalizedStringsScript.isEmpty()) {
         NSBundle *bundle = [NSBundle bundleForClass:[WebCoreRenderThemeBundle class]];
-        m_mediaControlsLocalizedStringsScript = [NSString stringWithContentsOfFile:[bundle pathForResource:@"modern-media-controls-localized-strings" ofType:@"js"] encoding:NSUTF8StringEncoding error:nil];
+        m_mediaControlsLocalizedStringsScript = [NSString stringWithContentsOfFile:retainPtr([bundle pathForResource:@"modern-media-controls-localized-strings" ofType:@"js"]).get() encoding:NSUTF8StringEncoding error:nil];
     }
 
     if (m_mediaControlsScript.isEmpty())
@@ -586,14 +586,14 @@ RefPtr<FragmentedSharedBuffer> RenderThemeCocoa::mediaControlsImageDataForIconNa
 {
     NSString *directory = @"modern-media-controls/images";
     NSBundle *bundle = [NSBundle bundleForClass:[WebCoreRenderThemeBundle class]];
-    return SharedBuffer::create([NSData dataWithContentsOfFile:[bundle pathForResource:iconName.createNSString().get() ofType:iconType.createNSString().get() inDirectory:directory]]);
+    return SharedBuffer::create([NSData dataWithContentsOfFile:retainPtr([bundle pathForResource:iconName.createNSString().get() ofType:iconType.createNSString().get() inDirectory:directory]).get()]);
 }
 
 String RenderThemeCocoa::mediaControlsBase64StringForIconNameAndType(const String& iconName, const String& iconType)
 {
     NSString *directory = @"modern-media-controls/images";
     NSBundle *bundle = [NSBundle bundleForClass:[WebCoreRenderThemeBundle class]];
-    return [[NSData dataWithContentsOfFile:[bundle pathForResource:iconName.createNSString().get() ofType:iconType.createNSString().get() inDirectory:directory]] base64EncodedStringWithOptions:0];
+    return [[NSData dataWithContentsOfFile:retainPtr([bundle pathForResource:iconName.createNSString().get() ofType:iconType.createNSString().get() inDirectory:directory]).get()] base64EncodedStringWithOptions:0];
 }
 
 String RenderThemeCocoa::mediaControlsFormattedStringForDuration(const double durationInSeconds)

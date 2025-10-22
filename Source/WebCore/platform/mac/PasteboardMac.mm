@@ -268,11 +268,11 @@ static void writeFileWrapperAsRTFDAttachment(NSFileWrapper *wrapper, const Strin
 {
     RetainPtr string = [NSAttributedString attributedStringWithAttachment:adoptNS([[NSTextAttachment alloc] initWithFileWrapper:wrapper]).get()];
 
-    NSData *RTFDData = [string RTFDFromRange:NSMakeRange(0, [string length]) documentAttributes:@{ }];
+    RetainPtr<NSData> RTFDData = [string RTFDFromRange:NSMakeRange(0, [string length]) documentAttributes:@{ }];
     if (!RTFDData)
         return;
 
-    newChangeCount = platformStrategies()->pasteboardStrategy()->setBufferForType(SharedBuffer::create(RTFDData).ptr(), legacyRTFDPasteboardTypeSingleton(), pasteboardName, context);
+    newChangeCount = platformStrategies()->pasteboardStrategy()->setBufferForType(SharedBuffer::create(RTFDData.get()).ptr(), legacyRTFDPasteboardTypeSingleton(), pasteboardName, context);
 }
 
 void Pasteboard::write(const PasteboardImage& pasteboardImage)
@@ -754,9 +754,9 @@ static void setDragImageImpl(NSImage *image, NSPoint offset)
     NSSize imageSize = image.size;
     CGRect imageRect = CGRectMake(0, 0, imageSize.width, imageSize.height);
     NSRect convertedRect = NSRectFromCGRect(imageRect);
-    NSImageRep *imageRep = [image bestRepresentationForRect:convertedRect context:nil hints:nil];
+    RetainPtr<NSImageRep> imageRep = [image bestRepresentationForRect:convertedRect context:nil hints:nil];
     RetainPtr<NSBitmapImageRep> bitmapImage;
-    if (!imageRep || ![imageRep isKindOfClass:[NSBitmapImageRep class]] || !NSEqualSizes(imageRep.size, imageSize)) {
+    if (!imageRep || ![imageRep isKindOfClass:[NSBitmapImageRep class]] || !NSEqualSizes(imageRep.get().size, imageSize)) {
         [image lockFocus];
 ALLOW_DEPRECATED_DECLARATIONS_BEGIN
         bitmapImage = adoptNS([[NSBitmapImageRep alloc] initWithFocusedViewRect:convertedRect]);
@@ -770,7 +770,7 @@ ALLOW_DEPRECATED_DECLARATIONS_BEGIN
 ALLOW_DEPRECATED_DECLARATIONS_END
     } else {
         flipImage = false;
-        bitmapImage = checked_objc_cast<NSBitmapImageRep>(imageRep);
+        bitmapImage = checked_objc_cast<NSBitmapImageRep>(imageRep.get());
     }
     ASSERT(bitmapImage);
 

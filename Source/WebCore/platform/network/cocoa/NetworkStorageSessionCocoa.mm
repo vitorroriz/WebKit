@@ -122,13 +122,13 @@ static Vector<Cookie> nsCookiesToCookieVector(NSArray<NSHTTPCookie *> *nsCookies
 Vector<Cookie> NetworkStorageSession::getAllCookies()
 {
     ASSERT(hasProcessPrivilege(ProcessPrivilege::CanAccessRawCookies));
-    return nsCookiesToCookieVector([nsCookieStorage() cookies]);
+    return nsCookiesToCookieVector(retainPtr([nsCookieStorage() cookies]).get());
 }
 
 Vector<Cookie> NetworkStorageSession::getCookies(const URL& url)
 {
     ASSERT(hasProcessPrivilege(ProcessPrivilege::CanAccessRawCookies));
-    return nsCookiesToCookieVector([nsCookieStorage() cookiesForURL:url.createNSURL().get()]);
+    return nsCookiesToCookieVector(retainPtr([nsCookieStorage() cookiesForURL:url.createNSURL().get()]).get());
 }
 
 void NetworkStorageSession::hasCookies(const RegistrableDomain& domain, CompletionHandler<void(bool)>&& completionHandler) const
@@ -726,7 +726,7 @@ void NetworkStorageSession::deleteCookiesForHostnames(const Vector<String>& host
         if (!cookie.domain || (includeHttpOnlyCookies == IncludeHttpOnlyCookies::No && cookie.isHTTPOnly))
             return false;
 #if ENABLE(JS_COOKIE_CHECKING)
-        bool setInJS = [[cookie properties] valueForKey:@"SetInJavaScript"];
+        bool setInJS = [retainPtr([cookie properties]) valueForKey:@"SetInJavaScript"];
         if (scriptWrittenCookiesOnly == ScriptWrittenCookiesOnly::Yes && !setInJS)
             return false;
 #else

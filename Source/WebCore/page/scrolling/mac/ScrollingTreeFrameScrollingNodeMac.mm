@@ -265,7 +265,7 @@ unsigned ScrollingTreeFrameScrollingNodeMac::exposedUnfilledArea() const
         auto sublayers = adoptNS([[layer sublayers] copy]);
 
         // If this layer is the parent of a tile, it is the parent of all of the tiles and nothing else.
-        if ([[[sublayers objectAtIndex:0] valueForKey:@"isTile"] boolValue]) {
+        if ([[retainPtr([sublayers objectAtIndex:0]) valueForKey:@"isTile"] boolValue]) {
             for (CALayer* sublayer in sublayers.get())
                 tiles.append(sublayer);
         } else {

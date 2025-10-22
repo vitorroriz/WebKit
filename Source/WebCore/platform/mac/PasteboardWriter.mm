@@ -87,15 +87,15 @@ ALLOW_DEPRECATED_DECLARATIONS_END
         [pasteboardItem setPropertyList:paths.get() forType:toUTI(@"WebURLsWithTitlesPboardType").get()];
 
         // NSURLPboardType.
-        if (NSURL *baseCocoaURL = nsURL.get().baseURL)
-            [pasteboardItem setPropertyList:@[ nsURL.get().relativeString, baseCocoaURL.absoluteString ] forType:toUTI(WebCore::legacyURLPasteboardTypeSingleton()).get()];
+        if (RetainPtr<NSURL> baseCocoaURL = nsURL.get().baseURL)
+            [pasteboardItem setPropertyList:@[ nsURL.get().relativeString, baseCocoaURL.get().absoluteString ] forType:toUTI(WebCore::legacyURLPasteboardTypeSingleton()).get()];
         else if (nsURL)
             [pasteboardItem setPropertyList:@[ nsURL.get().absoluteString, @"" ] forType:toUTI(WebCore::legacyURLPasteboardTypeSingleton()).get()];
         else
             [pasteboardItem setPropertyList:@[ @"", @"" ] forType:toUTI(WebCore::legacyURLPasteboardTypeSingleton()).get()];
 
         if (nsURL.get().fileURL)
-            [pasteboardItem setString:nsURL.get().absoluteString forType:UTTypeFileURL.identifier];
+            [pasteboardItem setString:retainPtr(nsURL.get().absoluteString).get() forType:UTTypeFileURL.identifier];
         [pasteboardItem setString:userVisibleString.get() forType:UTTypeURL.identifier];
 
         // WebURLNamePboardType.

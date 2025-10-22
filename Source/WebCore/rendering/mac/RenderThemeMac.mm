@@ -105,7 +105,7 @@
 
     [[NSNotificationCenter defaultCenter] addObserver:self
         selector:@selector(systemColorsDidChange:) name:systemColorsChangedNotification.get() object:nil];
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+    [retainPtr([[NSWorkspace sharedWorkspace] notificationCenter]) addObserver:self
         selector:@selector(accessibilityDisplayOptionsDidChange:) name:accessibilityDisplayOptionsChangedNotification.get() object:nil];
 
     return self;
@@ -720,13 +720,13 @@ Color RenderThemeMac::systemColor(CSSValueID cssValueID, OptionSet<StyleColorOpt
         case CSSValueAppleSystemEvenAlternatingContentBackground: {
             NSArray<NSColor *> *alternateColors = [NSColor alternatingContentBackgroundColors];
             ASSERT(alternateColors.count >= 2);
-            return semanticColorFromNSColor(alternateColors[0]);
+            return semanticColorFromNSColor(retainPtr(alternateColors[0]).get());
         }
 
         case CSSValueAppleSystemOddAlternatingContentBackground: {
             NSArray<NSColor *> *alternateColors = [NSColor alternatingContentBackgroundColors];
             ASSERT(alternateColors.count >= 2);
-            return semanticColorFromNSColor(alternateColors[1]);
+            return semanticColorFromNSColor(retainPtr(alternateColors[1]).get());
         }
 
         // FIXME: Remove this fallback when AppKit without tertiary-fill is not used anymore; see rdar://108340604.
@@ -1801,12 +1801,12 @@ static RefPtr<Icon> iconForAttachment(const String& fileName, const String& atta
     }
 
     RetainPtr nsTitle = title.createNSString();
-    if (auto fileExtension = nsTitle.get().pathExtension; fileExtension.length) {
-        if (auto icon = Icon::createIconForFileExtension(fileExtension)) {
-            LOG_ATTACHMENT("-> Got icon for title file extension '%s'", String(fileExtension).utf8().data());
+    if (RetainPtr<NSString> fileExtension = nsTitle.get().pathExtension; fileExtension.get().length) {
+        if (auto icon = Icon::createIconForFileExtension(fileExtension.get())) {
+            LOG_ATTACHMENT("-> Got icon for title file extension '%s'", String(fileExtension.get()).utf8().data());
             return icon;
         }
-        LOG_ATTACHMENT("-> No icon for title file extension '%s'! Will fallback to public.data icon", String(fileExtension).utf8().data());
+        LOG_ATTACHMENT("-> No icon for title file extension '%s'! Will fallback to public.data icon", String(fileExtension.get()).utf8().data());
     } else
         LOG_ATTACHMENT("-> No file extension in title! Will fallback to public.data icon");
 

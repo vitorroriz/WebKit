@@ -1253,7 +1253,7 @@ Ref<GenericPromise> AudioVideoRendererAVFObjC::setVideoRenderer(WebSampleBufferV
         if (RefPtr protectedThis = weakThis.get()) {
 #if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
             if ([error code] == 'HDCP') {
-                bool obscured = [[[error userInfo] valueForKey:@"obscured"] boolValue];
+                bool obscured = [[retainPtr([error userInfo]) valueForKey:@"obscured"] boolValue];
                 if (RefPtr cdmInstance = protectedThis->m_cdmInstance)
                     cdmInstance->setHDCPStatus(obscured ? CDMInstance::HDCPStatus::OutputRestricted : CDMInstance::HDCPStatus::Valid);
                 return;
