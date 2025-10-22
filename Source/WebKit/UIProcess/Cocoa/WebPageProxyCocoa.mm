@@ -299,12 +299,7 @@ void WebPageProxy::contentFilterDidBlockLoadForFrame(IPC::Connection& connection
 void WebPageProxy::contentFilterDidBlockLoadForFrameShared(IPC::Connection& connection, const WebCore::ContentFilterUnblockHandler& unblockHandler, FrameIdentifier frameID)
 {
 #if HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
-    bool usesWebContentRestrictions = false;
-#if HAVE(WEBCONTENTRESTRICTIONS)
-    usesWebContentRestrictions = protectedPreferences()->usesWebContentRestrictionsForFilter();
-#endif
-    if (usesWebContentRestrictions)
-        MESSAGE_CHECK(!unblockHandler.webFilterEvaluator(), connection);
+    MESSAGE_CHECK(!unblockHandler.webFilterEvaluator(), connection);
 #else
     UNUSED_PARAM(connection);
 #endif

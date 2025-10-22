@@ -121,11 +121,6 @@ public:
     static bool modelDocumentEnabled() { return singleton().m_modelDocumentEnabled; }
 #endif
 
-#if HAVE(WEBCONTENTRESTRICTIONS)
-    static void setUsesWebContentRestrictionsForFilter(bool uses) { singleton().m_usesWebContentRestrictionsForFilter = uses; }
-    static bool usesWebContentRestrictionsForFilter() { return singleton().m_usesWebContentRestrictionsForFilter; };
-#endif
-
 private:
     WEBCORE_EXPORT static DeprecatedGlobalSettings& singleton();
     DeprecatedGlobalSettings() = default;
@@ -182,9 +177,6 @@ private:
     bool m_modelDocumentEnabled { false };
 #endif
 
-#if HAVE(WEBCONTENTRESTRICTIONS)
-    bool m_usesWebContentRestrictionsForFilter { false };
-#endif
     friend class NeverDestroyed<DeprecatedGlobalSettings>;
 };
 
