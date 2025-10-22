@@ -316,7 +316,7 @@ void PlatformXRSystem::setImmersiveSessionState(ImmersiveSessionState state, Com
     m_immersiveSessionState = state;
 #if PLATFORM(COCOA)
     RefPtr page = m_page.get();
-    if (!page) {
+    if (!page || page->isClosed()) {
         completion(false);
         return;
     }

@@ -2058,6 +2058,9 @@ void WebPageProxy::addPlatformLoadParameters(WebProcessProxy&, LoadParameters&)
 
 WebProcessProxy& WebPageProxy::ensureRunningProcess()
 {
+    // Callers should perform page close check.
+    RELEASE_ASSERT(!m_isClosed);
+
     if (!hasRunningProcess())
         launchProcess(Site(aboutBlankURL()), ProcessLaunchReason::InitialProcess);
 
