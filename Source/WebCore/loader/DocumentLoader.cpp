@@ -2605,6 +2605,13 @@ void DocumentLoader::handleProvisionalLoadFailureFromContentFilter(const URL& bl
     protectedFrameLoader()->load(FrameLoadRequest(*frame(), URL { blockedPageURL }, WTFMove(substituteData)));
 }
 
+#if HAVE(WEBCONTENTRESTRICTIONS)
+bool DocumentLoader::usesWebContentRestrictions()
+{
+    return DeprecatedGlobalSettings::usesWebContentRestrictionsForFilter();
+}
+#endif
+
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
 String DocumentLoader::webContentRestrictionsConfigurationPath() const
 {

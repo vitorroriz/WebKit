@@ -58,15 +58,15 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(ParentalControlsContentFilter);
 bool ParentalControlsContentFilter::enabled() const
 {
 #if HAVE(WEBCONTENTRESTRICTIONS)
-
+    if (m_usesWebContentRestrictions) {
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
-    auto& filter = ParentalControlsURLFilter::filterWithConfigurationPath(m_webContentRestrictionsConfigurationPath);
+        auto& filter = ParentalControlsURLFilter::filterWithConfigurationPath(m_webContentRestrictionsConfigurationPath);
 #else
-    auto& filter = ParentalControlsURLFilter::singleton();
+        auto& filter = ParentalControlsURLFilter::singleton();
 #endif
-    return filter.isEnabled();
-
-#else
+        return filter.isEnabled();
+    }
+#endif // HAVE(WEBCONTENTRESTRICTIONS)
 
 #if HAVE(WEBCONTENTANALYSIS_FRAMEWORK)
     bool enabled = [getWebFilterEvaluatorClassSingleton() isManagedSession];
@@ -74,8 +74,6 @@ bool ParentalControlsContentFilter::enabled() const
     return enabled;
 #else
     return false;
-#endif
-
 #endif
 }
 
@@ -85,8 +83,11 @@ Ref<ParentalControlsContentFilter> ParentalControlsContentFilter::create(const P
 }
 
 ParentalControlsContentFilter::ParentalControlsContentFilter(const PlatformContentFilter::FilterParameters& params)
+#if HAVE(WEBCONTENTRESTRICTIONS)
+    : m_usesWebContentRestrictions(params.usesWebContentRestrictions)
+#endif
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
-    : m_webContentRestrictionsConfigurationPath(params.webContentRestrictionsConfigurationPath)
+    , m_webContentRestrictionsConfigurationPath(params.webContentRestrictionsConfigurationPath)
 #endif
 {
     UNUSED_PARAM(params);
@@ -109,18 +110,19 @@ void ParentalControlsContentFilter::responseReceived(const ResourceResponse& res
     }
 
 #if HAVE(WEBCONTENTRESTRICTIONS)
-
-    ASSERT(!m_evaluatedURL);
-    m_evaluatedURL = response.url();
-    m_state = State::Filtering;
+    if (m_usesWebContentRestrictions) {
+        ASSERT(!m_evaluatedURL);
+        m_evaluatedURL = response.url();
+        m_state = State::Filtering;
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
-    auto& filter = ParentalControlsURLFilter::filterWithConfigurationPath(m_webContentRestrictionsConfigurationPath);
+        auto& filter = ParentalControlsURLFilter::filterWithConfigurationPath(m_webContentRestrictionsConfigurationPath);
 #else
-    auto& filter = ParentalControlsURLFilter::singleton();
+        auto& filter = ParentalControlsURLFilter::singleton();
 #endif
-    filter.isURLAllowed(*m_evaluatedURL, *this);
-
-#else
+        filter.isURLAllowed(*m_evaluatedURL, *this);
+        return;
+    }
+#endif
 
 #if HAVE(WEBCONTENTANALYSIS_FRAMEWORK)
     ASSERT(!m_webFilterEvaluator);
@@ -133,13 +135,16 @@ void ParentalControlsContentFilter::responseReceived(const ResourceResponse& res
 #endif // HAVE(WEBCONTENTANALYSIS_FRAMEWORK)
 
     updateFilterState();
-
-#endif
 }
 
 void ParentalControlsContentFilter::addData(const SharedBuffer& data)
 {
-#if !HAVE(WEBCONTENTRESTRICTIONS) && HAVE(WEBCONTENTANALYSIS_FRAMEWORK)
+#if HAVE(WEBCONTENTRESTRICTIONS)
+    if (m_usesWebContentRestrictions)
+        return;
+#endif
+
+#if HAVE(WEBCONTENTANALYSIS_FRAMEWORK)
     ASSERT(![m_replacementData length]);
     m_replacementData = [m_webFilterEvaluator addData:data.createNSData().get()];
     updateFilterState();
@@ -152,26 +157,25 @@ void ParentalControlsContentFilter::addData(const SharedBuffer& data)
 void ParentalControlsContentFilter::finishedAddingData()
 {
 #if HAVE(WEBCONTENTRESTRICTIONS)
+    if (m_usesWebContentRestrictions) {
+        if (m_state != State::Filtering)
+            return;
 
-    if (m_state != State::Filtering)
+        // Callers expect state is ready after finishing adding data.
+        Locker resultLocker { m_resultLock };
+        while (!m_isAllowdByWebContentRestrictions)
+            m_resultCondition.wait(m_resultLock);
+
+        m_state = *m_isAllowdByWebContentRestrictions ? State::Allowed : State::Blocked;
+        m_replacementData = std::exchange(m_webContentRestrictionsReplacementData, nullptr);
         return;
-
-    // Callers expect state is ready after finishing adding data.
-    Locker resultLocker { m_resultLock };
-    while (!m_isAllowdByWebContentRestrictions)
-        m_resultCondition.wait(m_resultLock);
-
-    m_state = *m_isAllowdByWebContentRestrictions ? State::Allowed : State::Blocked;
-    m_replacementData = std::exchange(m_webContentRestrictionsReplacementData, nullptr);
-
-#else
+    }
+#endif
 
 #if HAVE(WEBCONTENTANALYSIS_FRAMEWORK)
     ASSERT(![m_replacementData length]);
     m_replacementData = [m_webFilterEvaluator dataComplete];
     updateFilterState();
-#endif
-
 #endif
 }
 
@@ -185,7 +189,8 @@ Ref<FragmentedSharedBuffer> ParentalControlsContentFilter::replacementData() con
 ContentFilterUnblockHandler ParentalControlsContentFilter::unblockHandler() const
 {
 #if HAVE(WEBCONTENTRESTRICTIONS)
-    return ContentFilterUnblockHandler { *m_evaluatedURL };
+    if (m_usesWebContentRestrictions)
+        return ContentFilterUnblockHandler { *m_evaluatedURL };
 #endif
 
 #if HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)

@@ -2214,6 +2214,13 @@ CheckedPtr<WebCore::ContentFilter> NetworkResourceLoader::checkedContentFilter()
     return m_contentFilter.get();
 }
 
+#if HAVE(WEBCONTENTRESTRICTIONS)
+bool NetworkResourceLoader::usesWebContentRestrictions()
+{
+    return protectedConnectionToWebProcess()->usesWebContentRestrictionsForFilter();
+}
+#endif
+
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
 String NetworkResourceLoader::webContentRestrictionsConfigurationPath() const
 {

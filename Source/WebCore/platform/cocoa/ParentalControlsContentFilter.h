@@ -70,6 +70,7 @@ private:
     RetainPtr<NSData> m_replacementData;
 
 #if HAVE(WEBCONTENTRESTRICTIONS)
+    bool m_usesWebContentRestrictions { false };
     std::optional<URL> m_evaluatedURL;
     Lock m_resultLock;
     Condition m_resultCondition;
