@@ -8310,10 +8310,12 @@ fast/text/text-underline-position-under.html [ Pass ImageOnlyFailure ]
 
 webkit.org/b/301204 imported/w3c/web-platform-tests/css/css-flexbox/negative-overflow-002.html [ Failure ]
 
-# https://bugs.webkit.org/show_bug.cgi?id=301221 [ iOS 26 ] 4x imported/w3c/web-platform-tests/html tests (layout-tests) are flaky text failures
+# https://bugs.webkit.org/show_bug.cgi?id=301221 [ iOS 26 ] 3x imported/w3c/web-platform-tests/html tests (layout-tests) are flaky text failures
 imported/w3c/web-platform-tests/html/user-activation/activation-trigger-pointerevent.html?touch [ Pass Failure Timeout ]
-imported/w3c/web-platform-tests/html/semantics/disabled-elements/disabled-event-dispatch.tentative.html [ Pass Failure ]
 imported/w3c/web-platform-tests/html/semantics/popovers/popover-invoking-attribute.html [ Pass Failure ]
 imported/w3c/web-platform-tests/html/semantics/popovers/popover-light-dismiss-command.html [ Pass Failure ]
 
 webkit.org/b/301225 [ Debug ] ipc/serialized-type-info.html [ Failure ]
+
+# https://bugs.webkit.org/show_bug.cgi?id=301243 [ iOS 26 ] imported/w3c/web-platform-tests/html/semantics/disabled-elements/disabled-event-dispatch.tentative.html is a flaky text failure
+imported/w3c/web-platform-tests/html/semantics/disabled-elements/disabled-event-dispatch.tentative.html [ Pass Failure ]
