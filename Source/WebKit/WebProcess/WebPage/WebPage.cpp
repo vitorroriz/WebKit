@@ -5030,10 +5030,10 @@ void WebPage::willCommitLayerTree(RemoteLayerTreeTransaction& layerTransaction, 
 
     Ref page = *corePage();
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
-    if (auto* document = localRootFrame->document()) {
+    if (RefPtr document = localRootFrame->document()) {
         if (CheckedPtr timelinesController = document->timelinesController()) {
             if (auto* acceleratedEffectStackUpdater = timelinesController->existingAcceleratedEffectStackUpdater())
-                layerTransaction.setAcceleratedTimelineTimeOrigin(acceleratedEffectStackUpdater->timeOrigin());
+                layerTransaction.setTimelines(acceleratedEffectStackUpdater->timelines());
         }
     }
 #endif

@@ -445,6 +445,7 @@ def serialized_identifiers():
         'WebCore::TextCheckingRequestIdentifier',
         'WebCore::TextManipulationItemIdentifier',
         'WebCore::TextManipulationTokenIdentifier',
+        'WebCore::TimelineIdentifier',
         'WebCore::IDBDatabaseConnectionIdentifier',
         'WebCore::IDBResourceObjectIdentifier',
         'WebCore::UserGestureTokenIdentifierID',
@@ -682,6 +683,7 @@ def conditions_for_header(header):
         '<WebCore/PlaybackTargetClientContextIdentifier.h>': ["ENABLE(WIRELESS_PLAYBACK_TARGET)"],
         '<WebCore/SoupNetworkProxySettings.h>': ["USE(SOUP)"],
         '<WebCore/SelectionData.h>': ["PLATFORM(GTK)", "PLATFORM(WPE)"],
+        '<WebCore/TimelineIdentifier.h>': ["ENABLE(THREADED_ANIMATION_RESOLUTION)"],
         '<WebCore/VideoFrameCV.h>': ["PLATFORM(COCOA)", ],
     }
     if not header in conditions:

@@ -457,17 +457,19 @@ void RemoteScrollingCoordinatorProxyIOS::animationsWereRemovedFromNode(RemoteLay
         drawingAreaIOS().pauseDisplayRefreshCallbacksForAnimation();
 }
 
-void RemoteScrollingCoordinatorProxyIOS::registerTimelineIfNecessary(WebCore::ProcessIdentifier processIdentifier, Seconds originTime, MonotonicTime now)
+void RemoteScrollingCoordinatorProxyIOS::updateTimelineRegistration(WebCore::ProcessIdentifier processIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>& timelineRepresentations, MonotonicTime now)
 {
-    if (m_timelines.find(processIdentifier) == m_timelines.end())
-        m_timelines.set(processIdentifier, RemoteAnimationTimeline::create(originTime, now));
+    if (!m_timelineRegistry)
+        m_timelineRegistry = makeUnique<RemoteAnimationTimelineRegistry>();
+    m_timelineRegistry->update(processIdentifier, timelineRepresentations, now);
+    if (m_timelineRegistry->isEmpty())
+        m_timelineRegistry = nullptr;
 }
 
-const RemoteAnimationTimeline* RemoteScrollingCoordinatorProxyIOS::timeline(WebCore::ProcessIdentifier processIdentifier) const
+const RemoteAnimationTimeline* RemoteScrollingCoordinatorProxyIOS::timeline(WebCore::ProcessIdentifier processIdentifier, const WebCore::TimelineIdentifier& timelineIdentifier) const
 {
-    auto it = m_timelines.find(processIdentifier);
-    if (it != m_timelines.end())
-        return it->value.ptr();
+    if (m_timelineRegistry)
+        return m_timelineRegistry->get(processIdentifier, timelineIdentifier);
     return nullptr;
 }
 
@@ -476,9 +478,8 @@ void RemoteScrollingCoordinatorProxyIOS::updateAnimations()
     // FIXME: Rather than using 'now' at the point this is called, we
     // should probably be using the timestamp of the (next?) display
     // link update or vblank refresh.
-    auto now = MonotonicTime::now();
-    for (auto& timeline : m_timelines.values())
-        timeline->updateCurrentTime(now);
+    if (m_timelineRegistry)
+        m_timelineRegistry->advanceCurrentTime(MonotonicTime::now());
 
     auto& layerTreeHost = drawingAreaIOS().remoteLayerTreeHost();
 

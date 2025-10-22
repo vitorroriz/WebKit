@@ -6570,6 +6570,11 @@ struct WebCore::AnimationEffectTiming {
     [NotSerialized] std::optional<Seconds> specifiedIterationDuration;
 };
 
+[RefCounted] class WebCore::AcceleratedTimeline {
+    WebCore::TimelineIdentifier identifier();
+    Seconds originTime();
+};
+
 header: <WebCore/AcceleratedEffect.h>
 [CustomHeader, Nested] class WebCore::AcceleratedEffect::Keyframe {
     double offset();
@@ -6581,6 +6586,8 @@ header: <WebCore/AcceleratedEffect.h>
 
 [RefCounted] class WebCore::AcceleratedEffect {
     WebCore::AnimationEffectTiming timing();
+    [NotSerialized] RefPtr<WebCore::AcceleratedTimeline> timeline();
+    WebCore::TimelineIdentifier timelineIdentifier();
     Vector<WebCore::AcceleratedEffect::Keyframe> keyframes();
     WebCore::WebAnimationType animationType();
     WebCore::CompositeOperation compositeOperation();

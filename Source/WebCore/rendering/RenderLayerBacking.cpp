@@ -4428,7 +4428,7 @@ bool RenderLayerBacking::startAnimation(double timeOffset, const GraphicsLayerAn
 }
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
-bool RenderLayerBacking::updateAcceleratedEffectsAndBaseValues()
+bool RenderLayerBacking::updateAcceleratedEffectsAndBaseValues(HashSet<Ref<AcceleratedTimeline>>& timelines)
 {
     auto& renderer = this->renderer();
     OptionSet<AcceleratedEffectProperty> disallowedAcceleratedProperties;
@@ -4462,7 +4462,10 @@ bool RenderLayerBacking::updateAcceleratedEffectsAndBaseValues()
                 if ((animatesWidth && blendingKeyframes.hasWidthDependentTransform()) || (animatesHeight && blendingKeyframes.hasHeightDependentTransform()))
                     disallowedAcceleratedProperties.add(transformRelatedAcceleratedProperties);
             }
-            auto acceleratedEffect = AcceleratedEffect::create(*effect, borderBoxRect, baseValues, disallowedAcceleratedProperties);
+            ASSERT(effect->animation());
+            ASSERT(effect->animation()->timeline());
+            Ref acceleratedTimeline = Ref { *effect->animation()->timeline() }->acceleratedRepresentation();
+            auto acceleratedEffect = AcceleratedEffect::create(*effect, acceleratedTimeline->identifier(), borderBoxRect, baseValues, disallowedAcceleratedProperties);
             if (!acceleratedEffect)
                 continue;
             if (!hasInterpolatingEffect && effect->isRunningAccelerated())
@@ -4470,6 +4473,7 @@ bool RenderLayerBacking::updateAcceleratedEffectsAndBaseValues()
             effect->setAcceleratedRepresentation(acceleratedEffect.get());
             weakAcceleratedEffects.add(*acceleratedEffect);
             acceleratedEffects.append(acceleratedEffect.releaseNonNull());
+            timelines.add(WTFMove(acceleratedTimeline));
         }
         effectStack->setAcceleratedEffects(WTFMove(weakAcceleratedEffects));
     }

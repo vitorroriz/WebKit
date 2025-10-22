@@ -162,7 +162,6 @@ accessibility/AccessibilityScrollView.cpp
 accessibility/AccessibilitySlider.cpp
 accessibility/AccessibilitySpinButton.cpp
 accessibility/AccessibilityTableHeaderContainer.cpp
-animation/AcceleratedEffectStackUpdater.cpp
 animation/AnimationEffectTiming.cpp
 animation/AnimationTimeline.cpp
 animation/AnimationTimelinesController.cpp

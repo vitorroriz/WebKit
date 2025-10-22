@@ -54,8 +54,7 @@
 #endif
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
-#include <WebCore/AcceleratedEffect.h>
-#include <WebCore/AcceleratedEffectValues.h>
+#include <WebCore/AcceleratedTimeline.h>
 #endif
 
 #if ENABLE(MODEL_ELEMENT)
@@ -270,13 +269,13 @@ public:
     void setDynamicViewportSizeUpdateID(DynamicViewportSizeUpdateID resizeID) { m_dynamicViewportSizeUpdateID = resizeID; }
 #endif
 
-#if ENABLE(THREADED_ANIMATION_RESOLUTION)
-    Seconds acceleratedTimelineTimeOrigin() const { return m_acceleratedTimelineTimeOrigin; }
-    void setAcceleratedTimelineTimeOrigin(Seconds timeOrigin) { m_acceleratedTimelineTimeOrigin = timeOrigin; }
-#endif
-
     const std::optional<WebCore::FixedContainerEdges>& fixedContainerEdges() const { return m_fixedContainerEdges; }
     void setFixedContainerEdges(const WebCore::FixedContainerEdges& edges) { m_fixedContainerEdges = edges; }
+
+#if ENABLE(THREADED_ANIMATION_RESOLUTION)
+    const HashSet<Ref<WebCore::AcceleratedTimeline>>& timelines() const { return m_timelines; }
+    void setTimelines(const HashSet<Ref<WebCore::AcceleratedTimeline>>& timelines) { m_timelines = timelines; }
+#endif
 
 private:
     friend struct IPC::ArgumentCoder<RemoteLayerTreeTransaction, void>;
@@ -335,7 +334,7 @@ private:
     std::optional<DynamicViewportSizeUpdateID> m_dynamicViewportSizeUpdateID;
 #endif
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
-    Seconds m_acceleratedTimelineTimeOrigin;
+    HashSet<Ref<WebCore::AcceleratedTimeline>> m_timelines;
 #endif
 };
 

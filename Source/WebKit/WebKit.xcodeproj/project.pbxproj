@@ -1556,6 +1556,7 @@
 		7121A3CF2B73728B00C8F7A4 /* CAFrameRateRangeUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 7121A3CE2B73727B00C8F7A4 /* CAFrameRateRangeUtilities.h */; };
 		7134A3DA2603B92500624BD3 /* WKModelInteractionGestureRecognizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 7134A3D92603B80E00624BD3 /* WKModelInteractionGestureRecognizer.h */; };
 		7137BA8025F1542000914EE3 /* ModelElementController.h in Headers */ = {isa = PBXBuildFile; fileRef = 7137BA7F25F1540C00914EE3 /* ModelElementController.h */; };
+		71983F112EA6398D00594BCE /* RemoteAnimationTimelineRegistry.h in Headers */ = {isa = PBXBuildFile; fileRef = 71983F0F2EA6397000594BCE /* RemoteAnimationTimelineRegistry.h */; };
 		71A676A622C62325007D6295 /* WKTouchActionGestureRecognizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 71A676A422C62318007D6295 /* WKTouchActionGestureRecognizer.h */; };
 		71BAA73325FFD09800D7CD5D /* WKModelView.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BAA73125FFCCBA00D7CD5D /* WKModelView.h */; };
 		71C9EC9F2CF9FB6400B8AF06 /* RemoteAnimationTimeline.h in Headers */ = {isa = PBXBuildFile; fileRef = 71C9EC9D2CF9F93600B8AF06 /* RemoteAnimationTimeline.h */; };
@@ -6686,6 +6687,8 @@
 		7177AD5C2743D7A9002F103B /* ARKitInlinePreviewModelPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARKitInlinePreviewModelPlayer.h; sourceTree = "<group>"; };
 		7177AD662743F66C002F103B /* ARKitInlinePreviewModelPlayerIOS.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ARKitInlinePreviewModelPlayerIOS.mm; sourceTree = "<group>"; };
 		7177AD672743F66C002F103B /* ARKitInlinePreviewModelPlayerIOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARKitInlinePreviewModelPlayerIOS.h; sourceTree = "<group>"; };
+		71983F0F2EA6397000594BCE /* RemoteAnimationTimelineRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteAnimationTimelineRegistry.h; sourceTree = "<group>"; };
+		71983F102EA6397000594BCE /* RemoteAnimationTimelineRegistry.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteAnimationTimelineRegistry.cpp; sourceTree = "<group>"; };
 		71A676A422C62318007D6295 /* WKTouchActionGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WKTouchActionGestureRecognizer.h; path = ios/WKTouchActionGestureRecognizer.h; sourceTree = "<group>"; };
 		71A676A522C62318007D6295 /* WKTouchActionGestureRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WKTouchActionGestureRecognizer.mm; path = ios/WKTouchActionGestureRecognizer.mm; sourceTree = "<group>"; };
 		71BAA73125FFCCBA00D7CD5D /* WKModelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WKModelView.h; path = ios/WKModelView.h; sourceTree = "<group>"; };
@@ -11404,6 +11407,8 @@
 				71371D1F2B1F89C10092C32D /* RemoteAnimationStack.mm */,
 				71C9EC9E2CF9F93600B8AF06 /* RemoteAnimationTimeline.cpp */,
 				71C9EC9D2CF9F93600B8AF06 /* RemoteAnimationTimeline.h */,
+				71983F102EA6397000594BCE /* RemoteAnimationTimelineRegistry.cpp */,
+				71983F0F2EA6397000594BCE /* RemoteAnimationTimelineRegistry.h */,
 				1AB16AE01648656D00290D62 /* RemoteLayerTreeDrawingAreaProxy.h */,
 				0FF24A2F1879E4FE003ABF0C /* RemoteLayerTreeDrawingAreaProxy.messages.in */,
 				1AB16ADF1648656D00290D62 /* RemoteLayerTreeDrawingAreaProxy.mm */,
@@ -17984,6 +17989,7 @@
 				71F62F752D076DEE00B591D2 /* RemoteAnimation.h in Headers */,
 				71E29A342B20610C0010F3C9 /* RemoteAnimationStack.h in Headers */,
 				71C9EC9F2CF9FB6400B8AF06 /* RemoteAnimationTimeline.h in Headers */,
+				71983F112EA6398D00594BCE /* RemoteAnimationTimelineRegistry.h in Headers */,
 				9B1229D223FF2BCC008CA751 /* RemoteAudioDestinationIdentifier.h in Headers */,
 				9B1229CD23FF25F2008CA751 /* RemoteAudioDestinationManager.h in Headers */,
 				9B5BEC2A240101580070C6EF /* RemoteAudioDestinationProxy.h in Headers */,

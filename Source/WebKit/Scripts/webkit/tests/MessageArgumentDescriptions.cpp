@@ -487,6 +487,7 @@ Vector<ASCIILiteral> serializedIdentifiers()
         "WebCore::TextCheckingRequestIdentifier"_s,
         "WebCore::TextManipulationItemIdentifier"_s,
         "WebCore::TextManipulationTokenIdentifier"_s,
+        "WebCore::TimelineIdentifier"_s,
         "WebCore::IDBDatabaseConnectionIdentifier"_s,
         "WebCore::IDBResourceObjectIdentifier"_s,
         "WebCore::UserGestureTokenIdentifierID"_s,

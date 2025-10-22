@@ -677,6 +677,7 @@ UIProcess/RemoteLayerTree/ios/ScrollingTreeScrollingNodeDelegateIOS.mm @nonARC
 UIProcess/RemoteLayerTree/RemoteAnimation.cpp
 UIProcess/RemoteLayerTree/RemoteAnimationStack.mm @nonARC
 UIProcess/RemoteLayerTree/RemoteAnimationTimeline.cpp
+UIProcess/RemoteLayerTree/RemoteAnimationTimelineRegistry.cpp
 UIProcess/RemoteLayerTree/RemoteLayerTreeDrawingAreaProxy.mm @nonARC
 UIProcess/RemoteLayerTree/RemoteLayerTreeHost.mm @nonARC
 UIProcess/RemoteLayerTree/RemoteLayerTreeInteractionRegionLayers.mm @nonARC

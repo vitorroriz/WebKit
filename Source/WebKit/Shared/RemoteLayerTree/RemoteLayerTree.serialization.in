@@ -163,7 +163,7 @@ header: "RemoteLayerBackingStore.h"
 #endif
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
-    Seconds m_acceleratedTimelineTimeOrigin;
+    HashSet<Ref<WebCore::AcceleratedTimeline>> m_timelines;
 #endif
 }
 

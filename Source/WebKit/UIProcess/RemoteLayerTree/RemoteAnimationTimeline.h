@@ -27,6 +27,8 @@
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
 
+#include <WebCore/AcceleratedTimeline.h>
+#include <WebCore/TimelineIdentifier.h>
 #include <WebCore/WebAnimationTime.h>
 #include <wtf/Ref.h>
 #include <wtf/TZoneMalloc.h>
@@ -36,14 +38,16 @@ namespace WebKit {
 class RemoteAnimationTimeline final : public RefCounted<RemoteAnimationTimeline> {
     WTF_MAKE_TZONE_OR_ISO_ALLOCATED(RemoteAnimationTimeline);
 public:
-    static Ref<RemoteAnimationTimeline> create(Seconds, MonotonicTime);
+    static Ref<RemoteAnimationTimeline> create(const WebCore::AcceleratedTimeline&, MonotonicTime);
 
     void updateCurrentTime(MonotonicTime);
     const WebCore::WebAnimationTime& currentTime() const { return m_currentTime; }
+    const WebCore::TimelineIdentifier& identifier() const { return m_identifier; }
 
 private:
-    RemoteAnimationTimeline(Seconds, WebCore::WebAnimationTime);
+    RemoteAnimationTimeline(WebCore::TimelineIdentifier, Seconds, WebCore::WebAnimationTime);
 
+    WebCore::TimelineIdentifier m_identifier;
     Seconds m_originTime;
     WebCore::WebAnimationTime m_currentTime;
 };

@@ -844,16 +844,16 @@ void RemoteLayerTreeDrawingAreaProxy::animationsWereRemovedFromNode(RemoteLayerT
         page->checkedScrollingCoordinatorProxy()->animationsWereRemovedFromNode(node);
 }
 
-void RemoteLayerTreeDrawingAreaProxy::registerTimelineIfNecessary(WebCore::ProcessIdentifier processIdentifier, Seconds originTime, MonotonicTime now)
+void RemoteLayerTreeDrawingAreaProxy::updateTimelineRegistration(WebCore::ProcessIdentifier processIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>& timelineRepresentations, MonotonicTime now)
 {
     if (RefPtr page = this->page())
-        page->checkedScrollingCoordinatorProxy()->registerTimelineIfNecessary(processIdentifier, originTime, now);
+        page->checkedScrollingCoordinatorProxy()->updateTimelineRegistration(processIdentifier, timelineRepresentations, now);
 }
 
-const RemoteAnimationTimeline* RemoteLayerTreeDrawingAreaProxy::timeline(WebCore::ProcessIdentifier processIdentifier) const
+const RemoteAnimationTimeline* RemoteLayerTreeDrawingAreaProxy::timeline(WebCore::ProcessIdentifier processIdentifier, const WebCore::TimelineIdentifier& timelineIdentifier) const
 {
     if (RefPtr page = this->page())
-        return page->checkedScrollingCoordinatorProxy()->timeline(processIdentifier);
+        return page->checkedScrollingCoordinatorProxy()->timeline(processIdentifier, timelineIdentifier);
     return nullptr;
 }
 #endif // ENABLE(THREADED_ANIMATION_RESOLUTION)
