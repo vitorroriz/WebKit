@@ -209,7 +209,7 @@ Color RenderReplaced::calculateHighlightColor() const
                         continue;
 
                     OptionSet<StyleColorOptions> styleColorOptions = { StyleColorOptions::UseSystemAppearance };
-                    return theme().annotationHighlightColor(styleColorOptions);
+                    return theme().annotationHighlightBackgroundColor(styleColorOptions);
                 }
             }
         }
@@ -243,7 +243,7 @@ Color RenderReplaced::calculateHighlightColor() const
                         continue;
 
                     OptionSet<StyleColorOptions> styleColorOptions = { StyleColorOptions::UseSystemAppearance };
-                    return theme().annotationHighlightColor(styleColorOptions);
+                    return theme().annotationHighlightBackgroundColor(styleColorOptions);
                 }
             }
         }

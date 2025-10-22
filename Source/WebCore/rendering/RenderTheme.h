@@ -168,7 +168,8 @@ public:
     Color textSearchHighlightColor(OptionSet<StyleColorOptions>) const;
 
     // Default highlighting color for app highlights.
-    Color annotationHighlightColor(OptionSet<StyleColorOptions>) const;
+    Color annotationHighlightBackgroundColor(OptionSet<StyleColorOptions>) const;
+    Color annotationHighlightForegroundColor(OptionSet<StyleColorOptions>) const;
 
     Color defaultButtonTextColor(OptionSet<StyleColorOptions>) const;
 
@@ -287,7 +288,7 @@ protected:
     virtual Color platformInactiveListBoxSelectionForegroundColor(OptionSet<StyleColorOptions>) const;
 
     virtual Color platformTextSearchHighlightColor(OptionSet<StyleColorOptions>) const;
-    virtual Color platformAnnotationHighlightColor(OptionSet<StyleColorOptions>) const;
+    virtual Color platformAnnotationHighlightBackgroundColor(OptionSet<StyleColorOptions>) const;
 
     virtual Color platformDefaultButtonTextColor(OptionSet<StyleColorOptions>) const;
 
@@ -448,7 +449,8 @@ protected:
         Color inactiveListBoxSelectionForegroundColor;
 
         Color textSearchHighlightColor;
-        Color annotationHighlightColor;
+        Color annotationHighlightBackgroundColor;
+        Color annotationHighlightForegroundColor;
 
         Color defaultButtonTextColor;
         Color defaultSubmitButtonTextColor;

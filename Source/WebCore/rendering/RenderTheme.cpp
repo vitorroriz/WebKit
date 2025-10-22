@@ -24,6 +24,7 @@
 
 #include "BorderShape.h"
 #include "ButtonPart.h"
+#include "CSSContrastColorResolver.h"
 #include "CSSPropertyNames.h"
 #include "CSSValueKeywords.h"
 #include "ColorBlending.h"
@@ -2032,17 +2033,25 @@ Color RenderTheme::platformTextSearchHighlightColor(OptionSet<StyleColorOptions>
     return Color::yellow;
 }
 
-Color RenderTheme::annotationHighlightColor(OptionSet<StyleColorOptions> options) const
+Color RenderTheme::annotationHighlightBackgroundColor(OptionSet<StyleColorOptions> options) const
 {
     auto& cache = colorCache(options);
-    if (!cache.annotationHighlightColor.isValid())
-        cache.annotationHighlightColor = transformSelectionBackgroundColor(platformAnnotationHighlightColor(options), options);
-    return cache.annotationHighlightColor;
+    if (!cache.annotationHighlightBackgroundColor.isValid())
+        cache.annotationHighlightBackgroundColor = transformSelectionBackgroundColor(platformAnnotationHighlightBackgroundColor(options), options);
+    return cache.annotationHighlightBackgroundColor;
 }
 
-Color RenderTheme::platformAnnotationHighlightColor(OptionSet<StyleColorOptions>) const
+Color RenderTheme::platformAnnotationHighlightBackgroundColor(OptionSet<StyleColorOptions>) const
 {
     return Color::yellow;
+}
+
+Color RenderTheme::annotationHighlightForegroundColor(OptionSet<StyleColorOptions> options) const
+{
+    auto& cache = colorCache(options);
+    if (!cache.annotationHighlightForegroundColor.isValid())
+        cache.annotationHighlightForegroundColor = resolve(CSS::ContrastColorResolver { annotationHighlightBackgroundColor(options) });
+    return cache.annotationHighlightForegroundColor;
 }
 
 Color RenderTheme::defaultButtonTextColor(OptionSet<StyleColorOptions> options) const

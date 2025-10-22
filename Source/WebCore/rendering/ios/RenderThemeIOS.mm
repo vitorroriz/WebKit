@@ -1041,7 +1041,7 @@ Color RenderThemeIOS::autocorrectionReplacementMarkerColor(const RenderText& ren
     return caretColor.colorWithAlpha(0.3);
 }
 
-Color RenderThemeIOS::platformAnnotationHighlightColor(OptionSet<StyleColorOptions>) const
+Color RenderThemeIOS::platformAnnotationHighlightBackgroundColor(OptionSet<StyleColorOptions>) const
 {
     // FIXME: expose the real value from UIKit.
     return SRGBA<uint8_t> { 255, 238, 190 };

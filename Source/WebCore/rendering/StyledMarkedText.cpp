@@ -100,13 +100,15 @@ static StyledMarkedText resolveStyleForMarkedText(const MarkedText& markedText, 
         }
 
         OptionSet<StyleColorOptions> styleColorOptions = { StyleColorOptions::UseSystemAppearance };
-        style.backgroundColor = renderer.theme().annotationHighlightColor(styleColorOptions);
+        style.backgroundColor = renderer.theme().annotationHighlightBackgroundColor(styleColorOptions);
+        style.textStyles.fillColor = renderer.theme().annotationHighlightForegroundColor(styleColorOptions);
         break;
     }
 #if ENABLE(APP_HIGHLIGHTS)
     case MarkedText::Type::AppHighlight: {
         OptionSet<StyleColorOptions> styleColorOptions = { StyleColorOptions::UseSystemAppearance };
-        style.backgroundColor = renderer.theme().annotationHighlightColor(styleColorOptions);
+        style.backgroundColor = renderer.theme().annotationHighlightBackgroundColor(styleColorOptions);
+        style.textStyles.fillColor = renderer.theme().annotationHighlightForegroundColor(styleColorOptions);
         break;
     }
 #endif
