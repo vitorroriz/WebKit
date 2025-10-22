@@ -294,6 +294,7 @@ public:
     void setUserAgentPart(Element&, const AtomString&);
 
     // DOMTimers throttling testing.
+    int timerNestingLevel();
     ExceptionOr<bool> isTimerThrottled(int timeoutId);
     String requestAnimationFrameThrottlingReasons() const;
     double requestAnimationFrameInterval() const;
