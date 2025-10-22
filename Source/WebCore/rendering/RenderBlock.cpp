@@ -373,6 +373,9 @@ bool RenderBlock::isSelfCollapsingBlock() const
     // (d) have a min-height
     // (e) have specified that one of our margins can't collapse using a CSS extension
 
+    if (isOutOfFlowPositioned())
+        return false;
+
     auto minHeightIsPositive = [&] {
         return WTF::switchOn(style().logicalMinHeight(),
             [](const Style::MinimumSize::Fixed& fixedValue) {
