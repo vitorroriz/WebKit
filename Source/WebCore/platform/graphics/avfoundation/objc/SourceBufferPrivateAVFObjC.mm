@@ -100,6 +100,40 @@ SourceBufferPrivateAVFObjC::SourceBufferPrivateAVFObjC(MediaSourcePrivateAVFObjC
     if (RefPtr webmParser = dynamicDowncast<SourceBufferParserWebM>(m_parser); webmParser && player && player->supportsLimitedMatroska())
         webmParser->allowLimitedMatroska();
 
+    m_parser->setCallOnClientThreadCallback([dispatcher = m_dispatcher](auto&& function) {
+        dispatcher->dispatch(WTFMove(function));
+    });
+
+    m_parser->setDidParseInitializationDataCallback([weakThis = ThreadSafeWeakPtr { *this }, dispatcher = m_dispatcher] (InitializationSegment&& segment) {
+        assertIsCurrent(dispatcher);
+        if (RefPtr protectedThis = weakThis.get())
+            protectedThis->didReceiveInitializationSegment(WTFMove(segment));
+    });
+
+    m_parser->setDidProvideMediaDataCallback([weakThis = ThreadSafeWeakPtr { *this }, dispatcher = m_dispatcher] (Ref<MediaSampleAVFObjC>&& sample, TrackID trackId, const String& mediaType) {
+        assertIsCurrent(dispatcher);
+        if (RefPtr protectedThis = weakThis.get())
+            protectedThis->didProvideMediaDataForTrackId(WTFMove(sample), trackId, mediaType);
+    });
+
+    m_parser->setDidUpdateFormatDescriptionForTrackIDCallback([weakThis = ThreadSafeWeakPtr { *this }, dispatcher = m_dispatcher] (Ref<TrackInfo>&& formatDescription, TrackID trackId) {
+        assertIsCurrent(dispatcher);
+        if (RefPtr protectedThis = weakThis.get(); protectedThis)
+            protectedThis->didUpdateFormatDescriptionForTrackId(WTFMove(formatDescription), trackId);
+    });
+
+    m_parser->setDidProvideContentKeyRequestInitializationDataForTrackIDCallback([weakThis = ThreadSafeWeakPtr { *this }, dispatcher = m_dispatcher](Ref<SharedBuffer>&& initData, TrackID trackID) {
+        assertIsCurrent(dispatcher);
+        if (RefPtr protectedThis = weakThis.get())
+            protectedThis->didProvideContentKeyRequestInitializationDataForTrackID(WTFMove(initData), trackID);
+    });
+
+    m_parser->setDidProvideContentKeyRequestIdentifierForTrackIDCallback([weakThis = ThreadSafeWeakPtr { *this }, dispatcher = m_dispatcher] (Ref<SharedBuffer>&& initData, TrackID trackID) {
+        assertIsCurrent(dispatcher);
+        if (RefPtr protectedThis = weakThis.get())
+            protectedThis->didProvideContentKeyRequestInitializationDataForTrackID(WTFMove(initData), trackID);
+    });
+
 #if !RELEASE_LOG_DISABLED
     m_parser->setLogger(m_logger.get(), m_logIdentifier);
 #endif
@@ -369,42 +403,10 @@ Ref<MediaPromise> SourceBufferPrivateAVFObjC::appendInternal(Ref<SharedBuffer>&&
 {
     ALWAYS_LOG(LOGIDENTIFIER, "data length = ", data->size());
 
-    return invokeAsync(m_appendQueue, [data = WTFMove(data), parser = m_parser, weakThis = ThreadSafeWeakPtr { *this }]() mutable {
-        parser->setDidParseInitializationDataCallback([weakThis] (InitializationSegment&& segment) {
-            ASSERT(isMainThread());
-            if (RefPtr protectedThis = weakThis.get())
-                protectedThis->didReceiveInitializationSegment(WTFMove(segment));
-        });
-
-        parser->setDidProvideMediaDataCallback([weakThis] (Ref<MediaSampleAVFObjC>&& sample, TrackID trackId, const String& mediaType) {
-            ASSERT(isMainThread());
-            if (RefPtr protectedThis = weakThis.get())
-                protectedThis->didProvideMediaDataForTrackId(WTFMove(sample), trackId, mediaType);
-        });
-
-        parser->setDidUpdateFormatDescriptionForTrackIDCallback([weakThis] (Ref<TrackInfo>&& formatDescription, TrackID trackId) {
-            ASSERT(isMainThread());
-            if (RefPtr protectedThis = weakThis.get(); protectedThis)
-                protectedThis->didUpdateFormatDescriptionForTrackId(WTFMove(formatDescription), trackId);
-        });
-
-        parser->setDidProvideContentKeyRequestInitializationDataForTrackIDCallback([weakThis](Ref<SharedBuffer>&& initData, TrackID trackID) mutable {
-            // Called on the data parser queue.
-            callOnMainThread([weakThis, initData = WTFMove(initData), trackID] () mutable {
-                if (RefPtr protectedThis = weakThis.get())
-                    protectedThis->didProvideContentKeyRequestInitializationDataForTrackID(WTFMove(initData), trackID);
-            });
-        });
-
-        parser->setDidProvideContentKeyRequestIdentifierForTrackIDCallback([weakThis] (Ref<SharedBuffer>&& initData, TrackID trackID) {
-            ASSERT(isMainThread());
-            if (RefPtr protectedThis = weakThis.get())
-                protectedThis->didProvideContentKeyRequestInitializationDataForTrackID(WTFMove(initData), trackID);
-        });
-
+    return invokeAsync(m_appendQueue, [data = WTFMove(data), parser = m_parser, weakThis = ThreadSafeWeakPtr { *this }, dispatcher = m_dispatcher]() mutable {
         Ref ensureDestroyedSharedBuffer = WTFMove(data);
         return MediaPromise::createAndSettle(parser->appendData(WTFMove(ensureDestroyedSharedBuffer)));
-    })->whenSettled(RunLoop::currentSingleton(), [weakThis = ThreadSafeWeakPtr { *this }](auto&& result) {
+    })->whenSettled(m_dispatcher, [weakThis = ThreadSafeWeakPtr { *this }, parser = m_parser](auto&& result) {
         if (RefPtr protectedThis = weakThis.get())
             protectedThis->appendCompleted(!!result);
         return MediaPromise::createAndSettle(WTFMove(result));
