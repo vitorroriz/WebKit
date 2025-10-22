@@ -627,6 +627,10 @@ private:
     void platformInitialize();
     void platformDestroy();
 
+#if PLATFORM(COCOA)
+    static void registerNotifyObservers();
+#endif
+
     ProcessTerminationReason terminationReason() const;
 
     // IPC message handlers.

@@ -380,7 +380,6 @@ void WebProcessPool::platformInitialize(NeedsGlobalStaticInitialization needsGlo
         RestrictedOpenerDomainsController::singleton();
     });
 #endif
-
 }
 
 void WebProcessPool::platformResolvePathsForSandboxExtensions()

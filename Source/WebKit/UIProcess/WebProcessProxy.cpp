@@ -327,6 +327,14 @@ WebProcessProxy::WebProcessProxy(WebProcessPool& processPool, WebsiteDataStore* 
     WebPasteboardProxy::singleton().addWebProcessProxy(*this);
 
     platformInitialize();
+
+#if PLATFORM(COCOA)
+    static bool registeredObservers;
+    if (!registeredObservers) {
+        registeredObservers = true;
+        registerNotifyObservers();
+    }
+#endif
 }
 
 #if !PLATFORM(IOS_FAMILY)

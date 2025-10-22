@@ -6479,6 +6479,40 @@ void WebPageProxy::getAllFrameTrees(CompletionHandler<void(Vector<FrameTreeNodeD
     });
 }
 
+#if RELEASE_LOG_DISABLED
+
+void WebPageProxy::logFrameTree()
+{
+}
+
+#else
+
+static void logFrameTreeHelper(int indent, const FrameTreeNodeData& node)
+{
+    int spaces = (indent > 2) ? indent - 2 : 0;
+    RELEASE_LOG(FrameTree, "%*s|- pid: %d | site: %" SENSITIVE_LOG_STRING " | url: %" SENSITIVE_LOG_STRING, spaces, "", node.info.processID, Site(node.info.securityOrigin).toString().ascii().data(), node.info.request.url().string().ascii().data());
+    for (const auto& child : node.children)
+        logFrameTreeHelper(indent + 2, child);
+}
+
+static void logFrameTreeRoot(uintptr_t pagePointer, const FrameTreeNodeData& root)
+{
+    RELEASE_LOG(FrameTree, "WebPageProxy %p | pid: %d | site: %" SENSITIVE_LOG_STRING " | url: %" SENSITIVE_LOG_STRING, reinterpret_cast<void*>(pagePointer), root.info.processID, Site(root.info.securityOrigin).toString().ascii().data(), root.info.request.url().string().ascii().data());
+    for (const auto& child : root.children)
+        logFrameTreeHelper(2, child);
+}
+
+void WebPageProxy::logFrameTree()
+{
+    getAllFrames([pagePointer = reinterpret_cast<uintptr_t>(this)](auto&& maybeFrameTree) {
+        if (!maybeFrameTree)
+            return;
+        logFrameTreeRoot(pagePointer, *maybeFrameTree);
+    });
+}
+
+#endif
+
 void WebPageProxy::getBytecodeProfile(CompletionHandler<void(const String&)>&& callback)
 {
     sendWithAsyncReply(Messages::WebPage::GetBytecodeProfile(), WTFMove(callback));
