@@ -38,11 +38,8 @@
 #include <wtf/Platform.h>
 #include <wtf/Seconds.h>
 #include <wtf/TZoneMalloc.h>
-
-#if ENABLE(GPU_PROCESS_MODEL)
 #include <wtf/ThreadSafeRefCounted.h>
 #include <wtf/ThreadSafeWeakPtr.h>
-#endif
 
 #if ENABLE(MODEL_ELEMENT_STAGE_MODE)
 #include <WebCore/StageModeOperations.h>
@@ -63,11 +60,7 @@ class ModelPlayerTransformState;
 class SharedBuffer;
 class TransformationMatrix;
 
-#if ENABLE(GPU_PROCESS_MODEL)
 class WEBCORE_EXPORT ModelPlayer : public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<ModelPlayer> {
-#else
-class WEBCORE_EXPORT ModelPlayer : public RefCounted<ModelPlayer> {
-#endif
     WTF_MAKE_TZONE_ALLOCATED_EXPORT(ModelPlayer, WEBCORE_EXPORT);
 public:
     virtual ~ModelPlayer();
