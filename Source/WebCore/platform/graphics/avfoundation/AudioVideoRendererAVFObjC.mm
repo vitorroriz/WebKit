@@ -1510,12 +1510,20 @@ void AudioVideoRendererAVFObjC::audioRendererWasAutomaticallyFlushed(AVSampleBuf
 #if HAVE(SPATIAL_TRACKING_LABEL)
 void AudioVideoRendererAVFObjC::setSpatialTrackingInfo(bool prefersSpatialAudioExperience, SoundStageSize soundStage, const String& sceneIdentifier, const String& defaultLabel, const String& label)
 {
+    if (m_prefersSpatialAudioExperience == prefersSpatialAudioExperience
+        && m_soundStage == soundStage
+        && m_sceneIdentifier == sceneIdentifier
+        && m_defaultSpatialTrackingLabel == defaultLabel
+        && m_spatialTrackingLabel == label)
+        return;
+
     m_prefersSpatialAudioExperience = prefersSpatialAudioExperience;
     m_soundStage = soundStage;
     m_sceneIdentifier = sceneIdentifier;
     m_defaultSpatialTrackingLabel = defaultLabel;
     m_spatialTrackingLabel = label;
 
+    ALWAYS_LOG(LOGIDENTIFIER, "prefersSpatialAudioExperience(", prefersSpatialAudioExperience, "), soundStage(", soundStage, "), sceneIdentifier(", sceneIdentifier, "), defaultLabel(", defaultLabel, "), label(", label, ")");
     updateSpatialTrackingLabel();
 }
 
@@ -1535,6 +1543,7 @@ void AudioVideoRendererAVFObjC::updateSpatialTrackingLabel()
             .spatialTrackingLabel = m_spatialTrackingLabel,
 #endif
         });
+        ALWAYS_LOG(LOGIDENTIFIER, "Setting spatialAudioExperience: ", spatialAudioExperienceDescription(experience.get()));
         [m_synchronizer setIntendedSpatialAudioExperience:experience.get()];
         return;
     }
