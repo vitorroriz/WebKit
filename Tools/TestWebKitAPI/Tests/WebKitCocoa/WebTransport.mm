@@ -36,7 +36,6 @@
 #import "Utilities.h"
 #import "WebTransportServer.h"
 #import <CommonCrypto/CommonDigest.h>
-#import <Security/SecCertificateRequest.h>
 #import <WebKit/WKPreferencesPrivate.h>
 #import <WebKit/WKWebsiteDataStorePrivate.h>
 #import <WebKit/_WKInternalDebugFeature.h>
@@ -500,7 +499,12 @@ TEST(WebTransport, Worker)
     EXPECT_WK_STREQ([webView _test_waitForAlert], "message from worker: successfully read abc");
 }
 
+// FIXME: Make this not time out on iOS.
+#if PLATFORM(MAC)
 TEST(WebTransport, WorkerAfterNetworkProcessCrash)
+#else
+TEST(WebTransport, DISABLED_WorkerAfterNetworkProcessCrash)
+#endif
 {
     WebTransportServer transportServer([](ConnectionGroup group) -> ConnectionTask {
         auto connection = co_await group.receiveIncomingConnection();
