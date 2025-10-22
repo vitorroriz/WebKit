@@ -101,10 +101,10 @@ public:
     bool needsVideoLayer() const;
 
 #if (ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)) || ENABLE(LEGACY_ENCRYPTED_MEDIA)
-    void setCDMSession(LegacyCDMSession*) final;
-    void setCDMInstance(CDMInstance*) final;
-    void attemptToDecrypt() final;
     bool waitingForKey() const final { return m_waitingForKey; }
+#endif
+#if ENABLE(LEGACY_ENCRYPTED_MEDIA)
+    RefPtr<SharedBuffer> initData() const { return m_initData; }
 #endif
 
     // Used by CDMSessionAVContentKeySession

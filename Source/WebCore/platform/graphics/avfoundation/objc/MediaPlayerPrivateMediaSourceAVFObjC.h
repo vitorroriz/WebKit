@@ -140,8 +140,6 @@ public:
     void waitingForKeyChanged();
 #endif
 
-    void outputObscuredDueToInsufficientExternalProtectionChanged(bool);
-
 #if ENABLE(LEGACY_ENCRYPTED_MEDIA) || ENABLE(ENCRYPTED_MEDIA)
     void keyNeeded(const SharedBuffer&);
 #endif

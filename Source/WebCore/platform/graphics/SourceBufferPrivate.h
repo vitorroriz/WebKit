@@ -161,13 +161,8 @@ public:
     virtual uint64_t sourceBufferLogIdentifier() = 0;
 #endif
 
-#if ENABLE(LEGACY_ENCRYPTED_MEDIA)
-    virtual void setCDMSession(LegacyCDMSession*) { }
-#endif
 #if ENABLE(ENCRYPTED_MEDIA)
-    virtual void setCDMInstance(CDMInstance*) { }
     virtual bool waitingForKey() const { return false; }
-    virtual void attemptToDecrypt() { }
 #endif
 
 protected:

@@ -128,6 +128,11 @@ AudioVideoRendererAVFObjC::~AudioVideoRendererAVFObjC()
     destroyVideoTrack();
     destroyAudioRenderers();
     m_listener->invalidate();
+
+#if ENABLE(LEGACY_ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
+    if (RefPtr session = m_session.get())
+        session->removeRenderer(*this);
+#endif
 }
 
 void AudioVideoRendererAVFObjC::setPreferences(VideoRendererPreferences preferences)
@@ -201,6 +206,7 @@ void AudioVideoRendererAVFObjC::enqueueSample(TrackIdentifier trackId, Ref<Media
 
 #if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
     if (!canEnqueueSample(trackId, sample)) {
+        DEBUG_LOG(LOGIDENTIFIER, "Can't enqueue sample: ", sample.get(), " for track: ", toString(trackId));
         m_blockedSamples.append({ trackId, sample });
         return;
     }
@@ -835,13 +841,6 @@ void AudioVideoRendererAVFObjC::setVideoLayerSizeFenced(const FloatSize& newSize
         updateDisplayLayerIfNeeded();
 }
 
-#if ENABLE(ENCRYPTED_MEDIA)
-void AudioVideoRendererAVFObjC::notifyInsufficientExternalProtectionChanged(Function<void(bool)>&& callback)
-{
-    m_insufficientExternalProtectionChangedCallback = WTFMove(callback);
-}
-#endif
-
 void AudioVideoRendererAVFObjC::setVideoFullscreenLayer(PlatformLayer *videoFullscreenLayer, WTF::Function<void()>&& completionHandler)
 {
     RefPtr currentImage = currentNativeImage();
@@ -1254,13 +1253,15 @@ Ref<GenericPromise> AudioVideoRendererAVFObjC::setVideoRenderer(WebSampleBufferV
     SUPPRESS_UNRETAINED_ARG videoRenderer->setTimebase([m_synchronizer timebase]);
     videoRenderer->notifyWhenDecodingErrorOccurred([weakThis = WeakPtr { *this }](NSError *error) {
         if (RefPtr protectedThis = weakThis.get()) {
-#if ENABLE(ENCRYPTED_MEDIA)
+#if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
             if ([error code] == 'HDCP') {
                 bool obscured = [[[error userInfo] valueForKey:@"obscured"] boolValue];
-                if (protectedThis->m_insufficientExternalProtectionChangedCallback)
-                    protectedThis->m_insufficientExternalProtectionChangedCallback(obscured);
+                if (RefPtr cdmInstance = protectedThis->m_cdmInstance)
+                    cdmInstance->setHDCPStatus(obscured ? CDMInstance::HDCPStatus::OutputRestricted : CDMInstance::HDCPStatus::Valid);
                 return;
             }
+#else
+            UNUSED_PARAM(error);
 #endif
             protectedThis->notifyError(PlatformMediaError::VideoDecodingError);
         }
@@ -1676,7 +1677,7 @@ bool AudioVideoRendererAVFObjC::canEnqueueSample(TrackIdentifier trackId, const 
     if (!m_cdmInstance && !m_session.get())
         return false;
 
-    if (!isEnabledVideoTrackId(trackId))
+    if (typeOf(trackId) == TrackType::Video && !isEnabledVideoTrackId(trackId))
         return false;
 
     Ref sampleAVFObjC = downcast<MediaSampleAVFObjC>(sample);
@@ -1718,6 +1719,9 @@ void AudioVideoRendererAVFObjC::setCDMSession(LegacyCDMSession* session)
         return;
 
     ALWAYS_LOG(LOGIDENTIFIER);
+
+    if (RefPtr oldSession = m_session.get())
+        oldSession->removeRenderer(*this);
 
     m_session = dynamicDowncast<CDMSessionAVContentKeySession>(session);
 

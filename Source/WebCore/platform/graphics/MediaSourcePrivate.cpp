@@ -268,16 +268,6 @@ const PlatformTimeRanges& MediaSourcePrivate::liveSeekableRange() const
     IGNORE_CLANG_WARNINGS_END
 }
 
-#if ENABLE(LEGACY_ENCRYPTED_MEDIA)
-void MediaSourcePrivate::setCDMSession(LegacyCDMSession* session)
-{
-    assertIsCurrent(m_dispatcher);
-
-    for (auto& sourceBuffer : m_sourceBuffers)
-        sourceBuffer->setCDMSession(session);
-}
-#endif
-
 void MediaSourcePrivate::ensureOnDispatcher(Function<void()>&& function) const
 {
     Ref dispatcher = m_dispatcher;

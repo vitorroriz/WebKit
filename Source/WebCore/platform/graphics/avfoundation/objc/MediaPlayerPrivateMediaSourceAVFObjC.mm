@@ -170,13 +170,6 @@ MediaPlayerPrivateMediaSourceAVFObjC::MediaPlayerPrivateMediaSourceAVFObjC(Media
         }
     });
 
-#if ENABLE(ENCRYPTED_MEDIA)
-    m_renderer->notifyInsufficientExternalProtectionChanged([weakThis = WeakPtr { *this }](bool obscured) {
-        if (RefPtr protectedThis = weakThis.get())
-            protectedThis->outputObscuredDueToInsufficientExternalProtectionChanged(obscured);
-    });
-#endif
-
 #if ENABLE(LINEAR_MEDIA_PLAYER)
     if (RetainPtr videoTarget = player->videoTarget())
         m_renderer->setVideoTarget(videoTarget.get());
@@ -909,27 +902,14 @@ RefPtr<CDMSessionAVContentKeySession> MediaPlayerPrivateMediaSourceAVFObjC::cdmS
 
 void MediaPlayerPrivateMediaSourceAVFObjC::setCDMSession(LegacyCDMSession* session)
 {
-    if (session == m_session.get())
-        return;
-
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    if (RefPtr oldSession = m_session.get())
-        oldSession->removeRenderer(m_renderer);
-
-    m_session = dynamicDowncast<CDMSessionAVContentKeySession>(session);
-
-    if (RefPtr mediaSourcePrivate = m_mediaSourcePrivate)
-        mediaSourcePrivate->setCDMSession(session);
-
-    if (RefPtr session = m_session.get())
-        session->addRenderer(m_renderer);
+    m_renderer->setCDMSession(session);
 }
 
 void MediaPlayerPrivateMediaSourceAVFObjC::keyAdded()
 {
-    if (RefPtr mediaSourcePrivate = m_mediaSourcePrivate)
-        mediaSourcePrivate->keyAdded();
+    m_renderer->attemptToDecrypt();
 }
 
 #endif // ENABLE(LEGACY_ENCRYPTED_MEDIA)
@@ -942,45 +922,27 @@ void MediaPlayerPrivateMediaSourceAVFObjC::keyNeeded(const SharedBuffer& initDat
 }
 #endif
 
-void MediaPlayerPrivateMediaSourceAVFObjC::outputObscuredDueToInsufficientExternalProtectionChanged(bool obscured)
-{
-#if ENABLE(ENCRYPTED_MEDIA)
-    ALWAYS_LOG(LOGIDENTIFIER, obscured);
-    if (RefPtr mediaSourcePrivate = m_mediaSourcePrivate)
-        mediaSourcePrivate->outputObscuredDueToInsufficientExternalProtectionChanged(obscured);
-#else
-    UNUSED_PARAM(obscured);
-#endif
-}
-
 #if ENABLE(ENCRYPTED_MEDIA)
 void MediaPlayerPrivateMediaSourceAVFObjC::cdmInstanceAttached(CDMInstance& instance)
 {
     ALWAYS_LOG(LOGIDENTIFIER);
-    if (RefPtr mediaSourcePrivate = m_mediaSourcePrivate)
-        mediaSourcePrivate->cdmInstanceAttached(instance);
-
     m_renderer->setCDMInstance(&instance);
 
     needsVideoLayerChanged();
 }
 
-void MediaPlayerPrivateMediaSourceAVFObjC::cdmInstanceDetached(CDMInstance& instance)
+void MediaPlayerPrivateMediaSourceAVFObjC::cdmInstanceDetached(CDMInstance&)
 {
     ALWAYS_LOG(LOGIDENTIFIER);
-    if (RefPtr mediaSourcePrivate = m_mediaSourcePrivate)
-        mediaSourcePrivate->cdmInstanceDetached(instance);
-
     m_renderer->setCDMInstance(nullptr);
 
     needsVideoLayerChanged();
 }
 
-void MediaPlayerPrivateMediaSourceAVFObjC::attemptToDecryptWithInstance(CDMInstance& instance)
+void MediaPlayerPrivateMediaSourceAVFObjC::attemptToDecryptWithInstance(CDMInstance&)
 {
     ALWAYS_LOG(LOGIDENTIFIER);
-    if (RefPtr mediaSourcePrivate = m_mediaSourcePrivate)
-        mediaSourcePrivate->attemptToDecryptWithInstance(instance);
+    m_renderer->attemptToDecrypt();
 }
 
 bool MediaPlayerPrivateMediaSourceAVFObjC::waitingForKey() const
@@ -1011,10 +973,8 @@ const Vector<ContentType>& MediaPlayerPrivateMediaSourceAVFObjC::mediaContentTyp
 
 void MediaPlayerPrivateMediaSourceAVFObjC::needsVideoLayerChanged()
 {
-    if (!m_mediaSourcePrivate)
-        return;
-    RefPtr mediaSourcePrivate = m_mediaSourcePrivate;
-    m_renderer->setHasProtectedVideoContent(mediaSourcePrivate->cdmInstance() && mediaSourcePrivate->needsVideoLayer());
+    if (RefPtr mediaSourcePrivate = m_mediaSourcePrivate)
+        m_renderer->setHasProtectedVideoContent(mediaSourcePrivate->needsVideoLayer());
 }
 
 void MediaPlayerPrivateMediaSourceAVFObjC::setReadyState(MediaPlayer::ReadyState readyState)

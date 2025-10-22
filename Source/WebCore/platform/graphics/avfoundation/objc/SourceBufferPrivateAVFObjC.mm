@@ -313,7 +313,7 @@ void SourceBufferPrivateAVFObjC::didProvideContentKeyRequestInitializationDataFo
 
     m_protectedTrackID = trackID;
     m_initData = initData.copyRef();
-    mediaSource->sourceBufferKeyNeeded(this, initData);
+    player->keyNeeded(initData);
 #endif
 
 #if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
@@ -323,6 +323,8 @@ void SourceBufferPrivateAVFObjC::didProvideContentKeyRequestInitializationDataFo
             return;
         if (result) {
             protectedThis->m_waitingForKey = false;
+            if (RefPtr player = protectedThis->player())
+                player->waitingForKeyChanged();
             return;
         }
         switch (result.error()) {
@@ -526,34 +528,6 @@ void SourceBufferPrivateAVFObjC::trackDidChangeEnabled(AudioTrackPrivate& track,
     if (RefPtr player = this->player())
         player->addAudioTrack(trackIdentifier);
 }
-
-#if (ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)) || ENABLE(LEGACY_ENCRYPTED_MEDIA)
-void SourceBufferPrivateAVFObjC::setCDMSession(LegacyCDMSession* session)
-{
-#if ENABLE(LEGACY_ENCRYPTED_MEDIA)
-    ALWAYS_LOG(LOGIDENTIFIER);
-    protectedRenderer()->setCDMSession(session);
-#else
-    UNUSED_PARAM(session);
-#endif
-}
-
-void SourceBufferPrivateAVFObjC::setCDMInstance(CDMInstance* instance)
-{
-#if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
-    protectedRenderer()->setCDMInstance(instance);
-#else
-    UNUSED_PARAM(instance);
-#endif
-}
-
-void SourceBufferPrivateAVFObjC::attemptToDecrypt()
-{
-#if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
-    protectedRenderer()->attemptToDecrypt();
-#endif
-}
-#endif // (ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)) || ENABLE(LEGACY_ENCRYPTED_MEDIA)
 
 std::optional<AudioVideoRenderer::TrackIdentifier> SourceBufferPrivateAVFObjC::trackIdentifierFor(TrackID trackId) const
 {

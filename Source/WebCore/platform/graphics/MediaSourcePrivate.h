@@ -123,10 +123,6 @@ public:
     void setStreamingAllowed(bool value) { m_streamingAllowed = value; }
     bool streamingAllowed() const { return m_streamingAllowed; }
 
-#if ENABLE(LEGACY_ENCRYPTED_MEDIA)
-    void setCDMSession(LegacyCDMSession*);
-#endif
-
 protected:
     MediaSourcePrivate(MediaSourcePrivateClient&, GuaranteedSerialFunctionDispatcher&);
     void ensureOnDispatcher(Function<void()>&&) const;
