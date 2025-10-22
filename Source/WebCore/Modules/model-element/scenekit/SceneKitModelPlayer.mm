@@ -160,13 +160,13 @@ void SceneKitModelPlayer::setIsMuted(bool, CompletionHandler<void(bool success)>
 ModelPlayerAccessibilityChildren SceneKitModelPlayer::accessibilityChildren()
 {
 #if PLATFORM(IOS_FAMILY)
-    NSArray *children = [m_model->defaultScene() accessibilityElements];
+    RetainPtr<NSArray> children = [m_model->defaultScene() accessibilityElements];
 #else
 ALLOW_DEPRECATED_DECLARATIONS_BEGIN
-    NSArray *children = [m_model->defaultScene() accessibilityAttributeValue:NSAccessibilityChildrenAttribute];
+    RetainPtr<NSArray> children = [m_model->defaultScene() accessibilityAttributeValue:NSAccessibilityChildrenAttribute];
 ALLOW_DEPRECATED_DECLARATIONS_END
 #endif
-    return { makeVector<RetainPtr<id>>(children) };
+    return { makeVector<RetainPtr<id>>(children.get()) };
 }
 
 // MARK: - SceneKitModelLoaderClient overrides.
