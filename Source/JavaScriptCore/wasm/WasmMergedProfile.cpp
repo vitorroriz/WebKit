@@ -40,26 +40,91 @@ MergedProfile::MergedProfile(const IPIntCallee& callee)
 {
 }
 
-void MergedProfile::CallSite::merge(const CallProfile& slot)
+void MergedProfile::Candidates::markAsMegamorphic(uint32_t count)
 {
-    m_count += slot.count();
+    if (!m_isMegamorphic) {
+        m_size = 0;
+        m_callees.fill({ });
+        m_isMegamorphic = true;
+    }
+    m_totalCount += count;
+}
 
-    auto bits = slot.boxedCallee();
-    if (bits == CallProfile::megamorphicCallee) {
-        m_callee = megamorphic;
+bool MergedProfile::Candidates::add(Callee* observedCallee, uint32_t observedCount)
+{
+    for (auto& [callee, count] : m_callees) {
+        if (callee == observedCallee) {
+            count += observedCount;
+            return true;
+        }
+        if (!callee) {
+            callee = observedCallee;
+            count = observedCount;
+            ++m_size;
+            return true;
+        }
+    }
+    return false;
+}
+
+void MergedProfile::Candidates::merge(const CallProfile& slot)
+{
+    EncodedJSValue boxedCallee = slot.boxedCallee();
+    uint32_t speculativeTotalCount = slot.count();
+
+    if (!boxedCallee) {
+        // boxedCallee becomes nullptr when it is (1) a direct call or (2) an indirect call not recording anything yet.
+        m_totalCount += speculativeTotalCount;
         return;
     }
-    if (!bits)
-        return;
 
-    auto callee = std::bit_cast<uintptr_t>(CalleeBits(bits).asNativeCallee());
-    if (!m_callee) {
-        m_callee = callee;
+    if (CallProfile::isMegamorphic(boxedCallee)) {
+        markAsMegamorphic(speculativeTotalCount);
         return;
     }
-    if (m_callee == callee)
-        return;
-    m_callee = megamorphic;
+
+    // Let's not use slot.count() as we are concurrently reading polymorphic callee.
+    // Make m_count consistent with all the polymorphic callee's counts.
+    uint32_t addedCount = 0;
+    if (auto* poly = CallProfile::polymorphic(boxedCallee)) {
+        for (auto& profile : *poly) {
+            if (SUPPRESS_UNCOUNTED_LOCAL auto* callee = CallProfile::monomorphic(profile.boxedCallee())) {
+                if (add(callee, profile.count()))
+                    addedCount += profile.count();
+                else {
+                    markAsMegamorphic(speculativeTotalCount);
+                    return;
+                }
+            }
+        }
+    } else if (SUPPRESS_UNCOUNTED_LOCAL auto* callee = CallProfile::monomorphic(boxedCallee)) {
+        if (add(callee, speculativeTotalCount))
+            addedCount += speculativeTotalCount;
+        else {
+            markAsMegamorphic(speculativeTotalCount);
+            return;
+        }
+    }
+    m_totalCount += addedCount;
+}
+
+auto MergedProfile::Candidates::finalize() const -> Candidates
+{
+    Candidates result(*this);
+    auto mutableSpan = std::span { result.m_callees }.first(result.m_size);
+    std::sort(mutableSpan.begin(), mutableSpan.end(),
+        [&](const auto& lhs, const auto& rhs) {
+            return std::get<1>(lhs) > std::get<1>(rhs);
+        });
+    return result;
+}
+
+void MergedProfile::merge(BaselineData& data)
+{
+    auto span = m_callSites.mutableSpan();
+    RELEASE_ASSERT(data.size() == span.size());
+    for (unsigned i = 0; i < data.size(); ++i)
+        span[i].merge(data.at(i));
 }
 
 } // namespace JSC::Wasm

@@ -6622,7 +6622,9 @@ auto OMGIRGenerator::addCallIndirect(unsigned callProfileIndex, unsigned tableIn
 
     ValueResults fastValues;
     if (m_profile->isCalled(callProfileIndex)) {
-        if (auto* callee = m_profile->callee(callProfileIndex)) {
+        auto candidates = m_profile->candidates(callProfileIndex);
+        if (!candidates.isEmpty()) {
+            auto* callee = std::get<0>(candidates.callees()[0]);
             if (callee->compilationMode() == Wasm::CompilationMode::IPIntMode) {
                 BasicBlock* slowCase = m_proc.addBlock();
                 BasicBlock* directCall = m_proc.addBlock();
@@ -6782,7 +6784,9 @@ auto OMGIRGenerator::addCallRef(unsigned callProfileIndex, const TypeDefinition&
 
     ValueResults fastValues;
     if (m_profile->isCalled(callProfileIndex)) {
-        if (auto* callee = m_profile->callee(callProfileIndex)) {
+        auto candidates = m_profile->candidates(callProfileIndex);
+        if (!candidates.isEmpty()) {
+            auto* callee = std::get<0>(candidates.callees()[0]);
             if (callee->compilationMode() == Wasm::CompilationMode::IPIntMode) {
                 BasicBlock* slowCase = m_proc.addBlock();
                 BasicBlock* directCall = m_proc.addBlock();
