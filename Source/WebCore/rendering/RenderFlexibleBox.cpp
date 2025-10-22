@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011 Google Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -1689,7 +1690,7 @@ LayoutUnit RenderFlexibleBox::computeFlexItemMarginValue(const Style::MarginEdge
 {
     // When resolving the margins, we use the content size for resolving percent and calc (for percents in calc expressions) margins.
     // Fortunately, percent margins are always computed with respect to the block's width, even for margin-top and margin-bottom.
-    return Style::evaluateMinimum<LayoutUnit>(margin, contentBoxLogicalWidth(), Style::ZoomNeeded { });
+    return Style::evaluateMinimum<LayoutUnit>(margin, contentBoxLogicalWidth(), style().usedZoomForLength());
 }
 
 void RenderFlexibleBox::prepareOrderIteratorAndMargins()

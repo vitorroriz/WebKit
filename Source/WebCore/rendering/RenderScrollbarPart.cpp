@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -115,8 +115,8 @@ void RenderScrollbarPart::computeScrollbarWidth()
     setWidth(std::max(minWidth, std::min(maxWidth, width)));
     
     // Buttons and track pieces can all have margins along the axis of the scrollbar. 
-    m_marginBox.setLeft(Style::evaluateMinimum<LayoutUnit>(style().marginLeft(), 0_lu, Style::ZoomNeeded { }));
-    m_marginBox.setRight(Style::evaluateMinimum<LayoutUnit>(style().marginRight(), 0_lu, Style::ZoomNeeded { }));
+    m_marginBox.setLeft(Style::evaluateMinimum<LayoutUnit>(style().marginLeft(), 0_lu, style().usedZoomForLength()));
+    m_marginBox.setRight(Style::evaluateMinimum<LayoutUnit>(style().marginRight(), 0_lu, style().usedZoomForLength()));
 }
 
 void RenderScrollbarPart::computeScrollbarHeight()
@@ -129,8 +129,8 @@ void RenderScrollbarPart::computeScrollbarHeight()
     setHeight(std::max(minHeight, std::min(maxHeight, height)));
 
     // Buttons and track pieces can all have margins along the axis of the scrollbar. 
-    m_marginBox.setTop(Style::evaluateMinimum<LayoutUnit>(style().marginTop(), 0_lu, Style::ZoomNeeded { }));
-    m_marginBox.setBottom(Style::evaluateMinimum<LayoutUnit>(style().marginBottom(), 0_lu, Style::ZoomNeeded { }));
+    m_marginBox.setTop(Style::evaluateMinimum<LayoutUnit>(style().marginTop(), 0_lu, style().usedZoomForLength()));
+    m_marginBox.setBottom(Style::evaluateMinimum<LayoutUnit>(style().marginBottom(), 0_lu, style().usedZoomForLength()));
 }
 
 void RenderScrollbarPart::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)

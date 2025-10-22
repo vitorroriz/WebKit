@@ -3,7 +3,7 @@
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2005 Allan Sandfeld Jensen (kde@carewolf.com)
  *           (C) 2005, 2006 Samuel Weinig (sam.weinig@gmail.com)
- * Copyright (C) 2005-2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2005-2025 Apple Inc. All rights reserved.
  * Copyright (C) 2010-2018 Google Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -548,13 +548,15 @@ void RenderBoxModelObject::computeStickyPositionConstraints(StickyPositionViewpo
 
     LayoutUnit maxWidth = containingBlock->contentBoxLogicalWidth();
 
+    const auto& zoomFactor = style().usedZoomForLength();
+
     // Sticky positioned element ignore any override logical width on the containing block (as they don't call
     // containingBlockLogicalWidthForContent). It's unclear whether this is totally fine.
     LayoutBoxExtent minMargin(
-        Style::evaluateMinimum<LayoutUnit>(style().marginTop(), maxWidth, Style::ZoomNeeded { }),
-        Style::evaluateMinimum<LayoutUnit>(style().marginRight(), maxWidth, Style::ZoomNeeded { }),
-        Style::evaluateMinimum<LayoutUnit>(style().marginBottom(), maxWidth, Style::ZoomNeeded { }),
-        Style::evaluateMinimum<LayoutUnit>(style().marginLeft(), maxWidth, Style::ZoomNeeded { })
+        Style::evaluateMinimum<LayoutUnit>(style().marginTop(), maxWidth, zoomFactor),
+        Style::evaluateMinimum<LayoutUnit>(style().marginRight(), maxWidth, zoomFactor),
+        Style::evaluateMinimum<LayoutUnit>(style().marginBottom(), maxWidth, zoomFactor),
+        Style::evaluateMinimum<LayoutUnit>(style().marginLeft(), maxWidth, zoomFactor)
     );
 
     // Compute the container-relative area within which the sticky element is allowed to move.

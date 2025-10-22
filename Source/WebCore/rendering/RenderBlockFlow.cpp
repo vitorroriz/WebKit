@@ -2,7 +2,7 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2007 David Smith (catfish.man@gmail.com)
- * Copyright (C) 2003-2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2003-2025 Apple Inc. All rights reserved.
  * Copyright (C) 2014-2016 Google Inc. All rights reserved.
  * Copyright (C) Research In Motion Limited 2010. All rights reserved.
  *
@@ -4476,9 +4476,12 @@ RenderObject* InlineMinMaxIterator::next()
 
 static LayoutUnit getBorderPaddingMargin(const RenderBoxModelObject& child, bool endOfInline)
 {
-    auto borderMarginWidth = [](LayoutUnit childValue, const Style::MarginEdge& margin) -> LayoutUnit {
+    auto& childStyle = child.style();
+    const auto& childZoomFactor = childStyle.usedZoomForLength();
+
+    auto borderMarginWidth = [&childZoomFactor](LayoutUnit childValue, const Style::MarginEdge& margin) -> LayoutUnit {
         if (auto fixed = margin.tryFixed())
-            return LayoutUnit(fixed->resolveZoom(Style::ZoomNeeded { }));
+            return LayoutUnit(fixed->resolveZoom(childZoomFactor));
         if (margin.isAuto())
             return { };
         return childValue;
@@ -4490,7 +4493,6 @@ static LayoutUnit getBorderPaddingMargin(const RenderBoxModelObject& child, bool
         return childValue;
     };
 
-    auto& childStyle = child.style();
     if (endOfInline) {
         return borderMarginWidth(child.marginEnd(), childStyle.marginEnd()) +
             borderPaddingWidth(child.paddingEnd(), childStyle.paddingEnd()) +
@@ -4746,14 +4748,16 @@ void RenderBlockFlow::computeInlinePreferredLogicalWidths(LayoutUnit& minLogical
 
                     child->clearNeedsPreferredWidthsUpdate();
                 } else {
+                    const auto& childZoomFactor = childStyle.usedZoomForLength();
+
                     // Inline replaced boxes add in their margins to their min/max values.
                     if (!child->isFloating())
                         lastText = nullptr;
                     LayoutUnit margins;
                     if (auto fixedMarginStart = childStyle.marginStart(writingMode()).tryFixed())
-                        margins += LayoutUnit::fromFloatCeil(fixedMarginStart->resolveZoom(Style::ZoomNeeded { }));
+                        margins += LayoutUnit::fromFloatCeil(fixedMarginStart->resolveZoom(childZoomFactor));
                     if (auto fixedMarginEnd = childStyle.marginEnd(writingMode()).tryFixed())
-                        margins += LayoutUnit::fromFloatCeil(fixedMarginEnd->resolveZoom(Style::ZoomNeeded { }));
+                        margins += LayoutUnit::fromFloatCeil(fixedMarginEnd->resolveZoom(childZoomFactor));
                     childMin += margins.ceilToFloat();
                     childMax += margins.ceilToFloat();
                 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Apple Inc. All rights reserved.
+ * Copyright (C) 2018-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -1116,19 +1116,21 @@ BoxGeometry::Edges FormattingGeometry::computedPadding(const Box& layoutBox, con
 ComputedHorizontalMargin FormattingGeometry::computedHorizontalMargin(const Box& layoutBox, const HorizontalConstraints& horizontalConstraints) const
 {
     auto& style = layoutBox.style();
+    const auto& zoomFactor = style.usedZoomForLength();
     auto containingBlockWidth = horizontalConstraints.logicalWidth;
     if (usedWritingMode(layoutBox).isHorizontal())
-        return { computedValue(style.marginLeft(), containingBlockWidth), computedValue(style.marginRight(), containingBlockWidth) };
-    return { computedValue(style.marginTop(), containingBlockWidth), computedValue(style.marginBottom(), containingBlockWidth) };
+        return { computedValue(style.marginLeft(), containingBlockWidth, zoomFactor), computedValue(style.marginRight(), containingBlockWidth, zoomFactor) };
+    return { computedValue(style.marginTop(), containingBlockWidth, zoomFactor), computedValue(style.marginBottom(), containingBlockWidth, zoomFactor) };
 }
 
 ComputedVerticalMargin FormattingGeometry::computedVerticalMargin(const Box& layoutBox, const HorizontalConstraints& horizontalConstraints) const
 {
     auto& style = layoutBox.style();
+    const auto& zoomFactor = style.usedZoomForLength();
     auto containingBlockWidth = horizontalConstraints.logicalWidth;
     if (usedWritingMode(layoutBox).isHorizontal())
-        return { computedValue(style.marginTop(), containingBlockWidth), computedValue(style.marginBottom(), containingBlockWidth) };
-    return { computedValue(style.marginLeft(), containingBlockWidth), computedValue(style.marginRight(), containingBlockWidth) };
+        return { computedValue(style.marginTop(), containingBlockWidth, zoomFactor), computedValue(style.marginBottom(), containingBlockWidth, zoomFactor) };
+    return { computedValue(style.marginLeft(), containingBlockWidth, zoomFactor), computedValue(style.marginRight(), containingBlockWidth, zoomFactor) };
 }
 
 IntrinsicWidthConstraints FormattingGeometry::constrainByMinMaxWidth(const Box& layoutBox, IntrinsicWidthConstraints intrinsicWidth) const

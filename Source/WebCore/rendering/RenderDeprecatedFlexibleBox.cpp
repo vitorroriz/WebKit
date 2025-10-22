@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003-2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2003-2025 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -145,11 +145,12 @@ static LayoutUnit marginWidthForChild(RenderBox* child)
     // A margin basically has three types: fixed, percentage, and auto (variable).
     // Auto and percentage margins simply become 0 when computing min/max width.
     // Fixed margins can be added in as is.
+    const auto& zoomFactor = child->style().usedZoomForLength();
     LayoutUnit margin;
     if (auto fixedMarginLeft = child->style().marginLeft().tryFixed())
-        margin += fixedMarginLeft->resolveZoom(Style::ZoomNeeded { });
+        margin += fixedMarginLeft->resolveZoom(zoomFactor);
     if (auto fixedMarginRight = child->style().marginRight().tryFixed())
-        margin += fixedMarginRight->resolveZoom(Style::ZoomNeeded { });
+        margin += fixedMarginRight->resolveZoom(zoomFactor);
     return margin;
 }
 

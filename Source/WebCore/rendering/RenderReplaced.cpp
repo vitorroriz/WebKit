@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  * Copyright (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004-2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2004-2025 Apple Inc. All rights reserved.
  * Copyright (C) 2018 Google Inc. All rights reserved.
  * Copyright (C) Research In Motion Limited 2011-2012. All rights reserved.
  *
@@ -614,8 +614,8 @@ LayoutUnit RenderReplaced::computeConstrainedLogicalWidth() const
     LayoutUnit logicalWidth = isOutOfFlowPositioned() ? containingBlock()->clientLogicalWidth() : containingBlock()->contentBoxLogicalWidth();
 
     // This solves above equation for 'width' (== logicalWidth).
-    auto marginStart = Style::evaluateMinimum<LayoutUnit>(style().marginStart(), logicalWidth, Style::ZoomNeeded { });
-    auto marginEnd = Style::evaluateMinimum<LayoutUnit>(style().marginEnd(), logicalWidth, Style::ZoomNeeded { });
+    auto marginStart = Style::evaluateMinimum<LayoutUnit>(style().marginStart(), logicalWidth, style().usedZoomForLength());
+    auto marginEnd = Style::evaluateMinimum<LayoutUnit>(style().marginEnd(), logicalWidth, style().usedZoomForLength());
 
     return std::max(0_lu, (logicalWidth - (marginStart + marginEnd + borderLeft() + borderRight() + paddingLeft() + paddingRight())));
 }

@@ -2,7 +2,7 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2007 David Smith (catfish.man@gmail.com)
- * Copyright (C) 2003-2022 Apple Inc. All rights reserved.
+ * Copyright (C) 2003-2025 Apple Inc. All rights reserved.
  * Copyright (C) Research In Motion Limited 2010. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -774,11 +774,12 @@ LayoutUnit RenderBlock::marginIntrinsicLogicalWidthForChild(RenderBox& child) co
     // Fixed margins can be added in as is.
     auto& marginLeft = child.style().marginStart(writingMode());
     auto& marginRight = child.style().marginEnd(writingMode());
+    const auto& zoomFactor = child.style().usedZoomForLength();
     LayoutUnit margin;
     if (auto fixedMarginLeft = marginLeft.tryFixed(); fixedMarginLeft && !shouldTrimChildMargin(MarginTrimType::InlineStart, child))
-        margin += fixedMarginLeft->resolveZoom(Style::ZoomNeeded { });
+        margin += fixedMarginLeft->resolveZoom(zoomFactor);
     if (auto fixedMarginRight = marginRight.tryFixed(); fixedMarginRight && !shouldTrimChildMargin(MarginTrimType::InlineEnd, child))
-        margin += fixedMarginRight->resolveZoom(Style::ZoomNeeded { });
+        margin += fixedMarginRight->resolveZoom(zoomFactor);
     return margin;
 }
 
@@ -2300,10 +2301,11 @@ void RenderBlock::computeBlockPreferredLogicalWidths(LayoutUnit& minLogicalWidth
         // Fixed margins can be added in as is.
         LayoutUnit marginStart;
         LayoutUnit marginEnd;
+        const auto& childZoomFactor = childStyle.usedZoomForLength();
         if (auto fixedMarginStart = childStyle.marginStart(writingMode()).tryFixed())
-            marginStart += fixedMarginStart->resolveZoom(Style::ZoomNeeded { });
+            marginStart += fixedMarginStart->resolveZoom(childZoomFactor);
         if (auto fixedMarginEnd = childStyle.marginEnd(writingMode()).tryFixed())
-            marginEnd += fixedMarginEnd->resolveZoom(Style::ZoomNeeded { });
+            marginEnd += fixedMarginEnd->resolveZoom(childZoomFactor);
         auto margin = marginStart + marginEnd;
 
         LayoutUnit childMinPreferredLogicalWidth;
@@ -3330,13 +3332,14 @@ bool RenderBlock::computePreferredWidthsForExcludedChildren(LayoutUnit& minWidth
     maxWidth -= scrollbarWidth;
     
     const auto& childStyle = legend->style();
+    const auto& childZoomFactor = childStyle.usedZoomForLength();
 
     LayoutUnit marginStart;
     LayoutUnit marginEnd;
     if (auto fixedMarginStart = childStyle.marginStart(writingMode()).tryFixed())
-        marginStart += fixedMarginStart->resolveZoom(Style::ZoomNeeded { });
+        marginStart += fixedMarginStart->resolveZoom(childZoomFactor);
     if (auto fixedMarginEnd = childStyle.marginEnd(writingMode()).tryFixed())
-        marginEnd += fixedMarginEnd->resolveZoom(Style::ZoomNeeded { });
+        marginEnd += fixedMarginEnd->resolveZoom(childZoomFactor);
 
     auto margin = marginStart + marginEnd;
 
