@@ -97,9 +97,6 @@ WebXRSession::WebXRSession(Document& document, WebXRSystem& system, XRSessionMod
 
 WebXRSession::~WebXRSession()
 {
-    if (RefPtr sessionDocument = downcast<Document>(scriptExecutionContext()))
-        sessionDocument->unregisterForVisibilityStateChangedCallbacks(*this);
-
     auto device = m_device.get();
     if (!m_ended && device)
         device->shutDownTrackingAndRendering();
