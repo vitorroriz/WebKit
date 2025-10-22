@@ -1162,7 +1162,7 @@ template<typename SizeType> LayoutUnit RenderFlexibleBox::computeMainSizeFromAsp
         [&](const SizeType::Calc& calcCrossSizeLength) -> std::optional<LayoutUnit> {
             return mainAxisIsFlexItemInlineAxis(flexItem)
                 ? flexItem.computePercentageLogicalHeight(calcCrossSizeLength)
-                : adjustBorderBoxLogicalWidthForBoxSizing(Style::evaluate<LayoutUnit>(calcCrossSizeLength, contentBoxWidth()));
+                : adjustBorderBoxLogicalWidthForBoxSizing(Style::evaluate<LayoutUnit>(calcCrossSizeLength, contentBoxWidth(), Style::ZoomNeeded { }));
         },
         [&](const CSS::Keyword::Auto&) -> std::optional<LayoutUnit> {
             ASSERT(flexItemCrossSizeShouldUseContainerCrossSize(flexItem));

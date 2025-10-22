@@ -1269,7 +1269,7 @@ inline void BuilderCustom::applyValueFontSize(BuilderState& builderState, CSSVal
         else if (primitiveValue->isPercentage())
             size = (primitiveValue->resolveAsPercentage<float>(conversionData) * parentSize) / 100.0f;
         else if (primitiveValue->isCalculatedPercentageWithLength())
-            size = primitiveValue->cssCalcValue()->createCalculationValue(conversionData, CSSCalcSymbolTable { })->evaluate(parentSize);
+            size = primitiveValue->cssCalcValue()->createCalculationValue(conversionData, CSSCalcSymbolTable { })->evaluate(parentSize, Style::ZoomNeeded { });
         else
             return;
     }

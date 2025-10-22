@@ -909,7 +909,7 @@ unsigned RenderGrid::computeAutoRepeatTracksCount(Style::GridTrackSizingDirectio
                     : adjustContentBoxLogicalHeightForBoxSizing(maxSizeValue);
             },
             [&](const Style::MaximumSize::Calc& calcMaxSize) -> std::optional<LayoutUnit> {
-                auto maxSizeValue = Style::evaluate<LayoutUnit>(calcMaxSize, containingBlockAvailableSize());
+                auto maxSizeValue = Style::evaluate<LayoutUnit>(calcMaxSize, containingBlockAvailableSize(), Style::ZoomNeeded { });
                 return isRowAxis
                     ? adjustContentBoxLogicalWidthForBoxSizing(maxSizeValue)
                     : adjustContentBoxLogicalHeightForBoxSizing(maxSizeValue);
@@ -941,7 +941,7 @@ unsigned RenderGrid::computeAutoRepeatTracksCount(Style::GridTrackSizingDirectio
                     : adjustContentBoxLogicalHeightForBoxSizing(minSizeValue);
             },
             [&](const Style::MinimumSize::Calc& calcMinSize) -> std::optional<LayoutUnit> {
-                auto minSizeValue = Style::evaluate<LayoutUnit>(calcMinSize, containingBlockAvailableSize());
+                auto minSizeValue = Style::evaluate<LayoutUnit>(calcMinSize, containingBlockAvailableSize(), Style::ZoomNeeded { });
                 return isRowAxis
                     ? adjustContentBoxLogicalWidthForBoxSizing(minSizeValue)
                     : adjustContentBoxLogicalHeightForBoxSizing(minSizeValue);

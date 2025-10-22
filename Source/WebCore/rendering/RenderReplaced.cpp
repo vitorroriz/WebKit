@@ -1056,11 +1056,15 @@ LayoutUnit RenderReplaced::computeReplacedLogicalWidthUsing(const SizeType& logi
         return perpendicularContainingBlockLogicalHeight();
     };
 
-    auto percentageOrCalc = [&](const auto& logicalWidth) {
+    auto percentageOrCalc = [&](Style::IsPercentageOrCalc auto const& logicalWidth) {
         // FIXME: Handle cases when containing block width is calculated or viewport percent.
         // https://bugs.webkit.org/show_bug.cgi?id=91071
-        if (auto containerWidth = calculateContainerWidth(); containerWidth > 0 || (!containerWidth && (containingBlock()->style().logicalWidth().isSpecified())))
-            return adjustContentBoxLogicalWidthForBoxSizing(Style::evaluate<LayoutUnit>(logicalWidth, containerWidth));
+        if (auto containerWidth = calculateContainerWidth(); containerWidth > 0 || (!containerWidth && (containingBlock()->style().logicalWidth().isSpecified()))) {
+            if constexpr (Style::IsPercentage<std::decay_t<decltype(logicalWidth)>>)
+                return adjustContentBoxLogicalWidthForBoxSizing(Style::evaluate<LayoutUnit>(logicalWidth, containerWidth));
+            else
+                return adjustContentBoxLogicalWidthForBoxSizing(Style::evaluate<LayoutUnit>(logicalWidth, containerWidth, Style::ZoomNeeded { }));
+        }
         return 0_lu;
     };
 
@@ -1173,7 +1177,7 @@ LayoutUnit RenderReplaced::computeReplacedLogicalHeightUsingGeneric(const SizeTy
         ASSERT(!replacedMaxLogicalHeightComputesAsNone());
 #endif
 
-    auto percentageOrCalculated = [&](const auto& logicalHeight) {
+    auto percentageOrCalculated = [&](Style::IsPercentageOrCalc auto const& logicalHeight) {
         auto* container = isOutOfFlowPositioned() ? this->container() : containingBlock();
         while (container && container->isAnonymousForPercentageResolution()) {
             // Stop at rendering context root.
@@ -1201,7 +1205,10 @@ LayoutUnit RenderReplaced::computeReplacedLogicalHeightUsingGeneric(const SizeTy
             LayoutUnit borderPaddingAdjustment = isOutOfFlowPositioned() ? block.borderLogicalHeight() : block.borderAndPaddingLogicalHeight();
             LayoutUnit newContentHeight = computedValues.m_extent - block.scrollbarLogicalHeight() - borderPaddingAdjustment;
 
-            return adjustContentBoxLogicalHeightForBoxSizing(Style::evaluate<LayoutUnit>(logicalHeight, newContentHeight));
+            if constexpr (Style::IsPercentage<std::decay_t<decltype(logicalHeight)>>)
+                return adjustContentBoxLogicalHeightForBoxSizing(Style::evaluate<LayoutUnit>(logicalHeight, newContentHeight));
+            else
+                return adjustContentBoxLogicalHeightForBoxSizing(Style::evaluate<LayoutUnit>(logicalHeight, newContentHeight, Style::ZoomNeeded { }));
         }
 
         LayoutUnit availableHeight;
@@ -1225,13 +1232,20 @@ LayoutUnit RenderReplaced::computeReplacedLogicalHeightUsingGeneric(const SizeTy
                     // Don't let table cells squeeze percent-height replaced elements
                     // <http://bugs.webkit.org/show_bug.cgi?id=15359>
                     availableHeight = std::max(availableHeight, intrinsicLogicalHeight());
-                    return Style::evaluate<LayoutUnit>(logicalHeight, availableHeight - borderAndPaddingLogicalHeight());
+                    if constexpr (Style::IsPercentage<std::decay_t<decltype(logicalHeight)>>)
+                        return Style::evaluate<LayoutUnit>(logicalHeight, availableHeight - borderAndPaddingLogicalHeight());
+                    else
+                        return Style::evaluate<LayoutUnit>(logicalHeight, availableHeight - borderAndPaddingLogicalHeight(), Style::ZoomNeeded { });
                 }
                 downcast<RenderBlock>(*container).addPercentHeightDescendant(const_cast<RenderReplaced&>(*this));
                 container = container->containingBlock();
             }
         }
-        return adjustContentBoxLogicalHeightForBoxSizing(Style::evaluate<LayoutUnit>(logicalHeight, availableHeight));
+
+        if constexpr (Style::IsPercentage<std::decay_t<decltype(logicalHeight)>>)
+            return adjustContentBoxLogicalHeightForBoxSizing(Style::evaluate<LayoutUnit>(logicalHeight, availableHeight));
+        else
+            return adjustContentBoxLogicalHeightForBoxSizing(Style::evaluate<LayoutUnit>(logicalHeight, availableHeight, Style::ZoomNeeded { }));
     };
 
     auto content = [&] {

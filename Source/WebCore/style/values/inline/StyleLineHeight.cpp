@@ -55,12 +55,23 @@ auto CSSValueConversion<LineHeight>::operator()(BuilderState& state, const CSSPr
         .cssToLengthConversionData()
         .copyForLineHeight(zoomWithTextZoomFactor(state));
 
+    // If EvaluationTimeZoom is not enabled then we will scale the lengths in the
+    // calc values when we create the CalculationValue below by using the zoom from conversionData.
+    // To avoid double zooming when we evaluate the calc expression we need to make sure
+    // we have a ZoomFactor of 1.0. Otherwise, we defer to whatever is on the conversionData
+    // since EvaluationTimeZoom will set the appropriate value.
+    auto zoomFactor = [&] {
+        if (!state.style().evaluationTimeZoomEnabled())
+            return Style::ZoomFactor { 1.0f, state.style().deviceScaleFactor() };
+        return Style::ZoomFactor { conversionData.zoom(), state.style().deviceScaleFactor() };
+    };
+
     if (primitiveValue.isLength() || primitiveValue.isCalculatedPercentageWithLength()) {
         double fixedValue = 0;
         if (primitiveValue.isLength())
             fixedValue = primitiveValue.resolveAsLength(conversionData);
         else
-            fixedValue = primitiveValue.protectedCssCalcValue()->createCalculationValue(conversionData, CSSCalcSymbolTable { })->evaluate(state.style().fontDescription().computedSizeForRangeZoomOption(conversionData.rangeZoomOption()));
+            fixedValue = primitiveValue.protectedCssCalcValue()->createCalculationValue(conversionData, CSSCalcSymbolTable { })->evaluate(state.style().fontDescription().computedSizeForRangeZoomOption(conversionData.rangeZoomOption()), zoomFactor());
 
         if (multiplier != 1.0f)
             fixedValue *= multiplier;
