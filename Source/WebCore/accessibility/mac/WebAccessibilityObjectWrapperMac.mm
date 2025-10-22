@@ -2152,7 +2152,7 @@ id attributeValueForTesting(const RefPtr<AXCoreObject>& backingObject, NSString 
             RefPtr axRemoteFrame = dynamicDowncast<AXRemoteFrame>(axObject);
             if (page && axRemoteFrame) {
                 auto clientCallback = [callback = makeBlockPtr(callback)] (String result) {
-                    callback(nsStringNilIfEmpty(result));
+                    callback(nsStringNilIfEmpty(result).get());
                 };
 
                 page->chrome().client().resolveAccessibilityHitTestForTesting(*axRemoteFrame->frameID(), IntPoint(point), WTFMove(clientCallback));

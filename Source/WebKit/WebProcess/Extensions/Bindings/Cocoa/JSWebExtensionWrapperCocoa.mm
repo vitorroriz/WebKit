@@ -440,7 +440,7 @@ using namespace WebKit;
 
 - (NSString *)_toJSONString
 {
-    return nsStringNilIfEmpty(serializeJSObject(self.context.JSGlobalContextRef, self.JSValueRef, nullptr));
+    return nsStringNilIfEmpty(serializeJSObject(self.context.JSGlobalContextRef, self.JSValueRef, nullptr)).autorelease();
 }
 
 - (NSString *)_toSortedJSONString

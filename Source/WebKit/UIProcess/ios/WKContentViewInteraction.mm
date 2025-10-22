@@ -16055,10 +16055,10 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 + (WKAutocorrectionContext *)autocorrectionContextWithWebContext:(const WebKit::WebAutocorrectionContext&)webCorrection
 {
     auto correction = adoptNS([[WKAutocorrectionContext alloc] init]);
-    [correction setContextBeforeSelection:nsStringNilIfEmpty(webCorrection.contextBefore)];
-    [correction setSelectedText:nsStringNilIfEmpty(webCorrection.selectedText)];
-    [correction setMarkedText:nsStringNilIfEmpty(webCorrection.markedText)];
-    [correction setContextAfterSelection:nsStringNilIfEmpty(webCorrection.contextAfter)];
+    [correction setContextBeforeSelection:nsStringNilIfEmpty(webCorrection.contextBefore).get()];
+    [correction setSelectedText:nsStringNilIfEmpty(webCorrection.selectedText).get()];
+    [correction setMarkedText:nsStringNilIfEmpty(webCorrection.markedText).get()];
+    [correction setContextAfterSelection:nsStringNilIfEmpty(webCorrection.contextAfter).get()];
     [correction setRangeInMarkedText:webCorrection.selectedRangeInMarkedText];
     return correction.autorelease();
 }

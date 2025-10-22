@@ -5508,7 +5508,7 @@ static inline OptionSet<WebCore::LayoutMilestone> layoutMilestones(_WKRenderingP
 {
     THROW_IF_SUSPENDED;
     _page->getTextFragmentMatch([completionHandler = makeBlockPtr(completionHandler)](const String& textFragmentMatch) {
-        completionHandler(RetainPtr { nsStringNilIfNull(textFragmentMatch) }.get());
+        completionHandler(nsStringNilIfNull(textFragmentMatch).get());
     });
 }
 

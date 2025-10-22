@@ -539,12 +539,12 @@ static NSString *defaultApplicationNameForUserAgent()
 
 - (NSString *)_applicationNameForDesktopUserAgent
 {
-    return nsStringNilIfNull(_pageConfiguration->applicationNameForUserAgent().value_or(String()));
+    return nsStringNilIfNull(_pageConfiguration->applicationNameForUserAgent().value_or(String())).autorelease();
 }
 
 - (NSString *)applicationNameForUserAgent
 {
-    return nsStringNilIfNull(_pageConfiguration->applicationNameForUserAgent().value_or(defaultApplicationNameForUserAgent()));
+    return nsStringNilIfNull(_pageConfiguration->applicationNameForUserAgent().value_or(defaultApplicationNameForUserAgent())).autorelease();
 }
 
 - (void)setApplicationNameForUserAgent:(NSString *)applicationNameForUserAgent
@@ -714,7 +714,7 @@ static NSString *defaultApplicationNameForUserAgent()
 
 - (NSString *)_groupIdentifier
 {
-    return nsStringNilIfNull(_pageConfiguration->groupIdentifier());
+    return nsStringNilIfNull(_pageConfiguration->groupIdentifier()).autorelease();
 }
 
 - (void)_setGroupIdentifier:(NSString *)groupIdentifier

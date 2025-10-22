@@ -5278,7 +5278,7 @@ ALLOW_DEPRECATED_IMPLEMENTATIONS_END
 @implementation WKWebView(WKPrivateVision)
 - (NSString *)_defaultSTSLabel
 {
-    return nsStringNilIfNull(_page->defaultSpatialTrackingLabel());
+    return nsStringNilIfNull(_page->defaultSpatialTrackingLabel()).autorelease();
 }
 
 - (void)_setDefaultSTSLabel:(NSString *)defaultSTSLabel

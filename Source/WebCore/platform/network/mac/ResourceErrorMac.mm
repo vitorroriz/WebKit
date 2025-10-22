@@ -149,7 +149,7 @@ auto ResourceError::ipcData() const -> std::optional<IPCData>
 }
 
 ResourceError::ResourceError(CFErrorRef cfError)
-    : ResourceError { (__bridge NSError *)cfError }
+    : ResourceError { bridge_cast(cfError) }
 {
 }
 
@@ -217,7 +217,7 @@ void ResourceError::mapPlatformError()
     auto domain = [m_platformError domain];
     auto errorCode = [m_platformError code];
 
-    if ([domain isEqualToString:NSURLErrorDomain] || [domain isEqualToString:(__bridge NSString *)kCFErrorDomainCFNetwork])
+    if ([domain isEqualToString:NSURLErrorDomain] || [domain isEqualToString:bridge_cast(kCFErrorDomainCFNetwork)])
         setType((errorCode == NSURLErrorTimedOut) ? Type::Timeout : (errorCode == NSURLErrorCancelled) ? Type::Cancellation : Type::General);
     else
         setType(Type::General);
@@ -292,12 +292,22 @@ ResourceError::operator NSError *() const
 
 CFErrorRef ResourceError::cfError() const
 {
-    return (__bridge CFErrorRef)nsError();
+    return bridge_cast(nsError());
+}
+
+RetainPtr<CFErrorRef> ResourceError::protectedCFError() const
+{
+    return cfError();
 }
 
 CFErrorRef ResourceError::cfError(CFErrorRef underlyingError) const
 {
-    return (__bridge CFErrorRef)nsError((__bridge NSError *)underlyingError);
+    return bridge_cast(nsError(bridge_cast(underlyingError)));
+}
+
+RetainPtr<CFErrorRef> ResourceError::protectedCFError(CFErrorRef underlyingError) const
+{
+    return cfError(underlyingError);
 }
 
 ResourceError::operator CFErrorRef() const

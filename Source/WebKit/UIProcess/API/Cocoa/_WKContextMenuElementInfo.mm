@@ -60,7 +60,7 @@
 - (NSString *)qrCodePayloadString
 {
     auto& qrCodePayloadString = _contextMenuElementInfoMac->qrCodePayloadString();
-    return nsStringNilIfEmpty(qrCodePayloadString);
+    return nsStringNilIfEmpty(qrCodePayloadString).autorelease();
 }
 
 - (BOOL)hasEntireImage
