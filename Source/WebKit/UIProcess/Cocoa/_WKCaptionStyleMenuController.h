@@ -25,40 +25,25 @@
 
 #pragma once
 
-namespace TestWebKitAPI {
+#import <WebKit/WKFoundation.h>
 
-template<typename R, typename... Args>
-class SoftLinkShim {
-public:
-    using Pointer = R(*)(Args...);
-    using CanLoadPtr = bool(*)();
+#if TARGET_OS_OSX
 
-    SoftLinkShim(Pointer* originalFunctor, Pointer replacementFunctor)
-        : m_originalFunctor { originalFunctor }
-        , m_originalFunctorValue { *originalFunctor }
-    {
-        *m_originalFunctor = replacementFunctor;
-    }
+@class NSMenu;
 
-    SoftLinkShim(Pointer* originalFunctor, Pointer replacementFunctor, CanLoadPtr canLoadPtr)
-        : m_originalFunctor { originalFunctor }
-    {
-        if (canLoadPtr)
-            canLoadPtr();
-        m_originalFunctorValue = *originalFunctor;
-        *m_originalFunctor = replacementFunctor;
-    }
+NS_ASSUME_NONNULL_BEGIN
 
-    ~SoftLinkShim()
-    {
-        *m_originalFunctor = m_originalFunctorValue;
-    }
+@protocol WKCaptionStyleMenuControllerDelegate <NSObject>
+- (void)captionStyleMenuWillOpen:(NSMenu *)menu;
+- (void)captionStyleMenuDidClose:(NSMenu *)menu;
+@end
 
-private:
-    Pointer* m_originalFunctor;
-    Pointer m_originalFunctorValue;
-};
+WK_EXTERN
+@interface WKCaptionStyleMenuController : NSObject
+@property (weak, nonatomic) id<WKCaptionStyleMenuControllerDelegate> delegate;
+@property (readonly, nonatomic) NSMenu *captionStyleMenu;
+@end
 
+NS_ASSUME_NONNULL_END
 
-
-}
+#endif

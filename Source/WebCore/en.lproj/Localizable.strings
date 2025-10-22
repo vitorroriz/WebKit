@@ -991,6 +991,9 @@
 /* Media Element Source Type */
 "ManagedMediaSource (Media Element Source Type)" = "Managed Media Source";
 
+/* Subtitle Styles Submenu Link to System Preferences */
+"Manage Styles (Caption Style Menu Title)" = "Manage Styles";
+
 /* WKWebExtensionErrorInvalidBackgroundContent description for empty or invalid preferred environment key */
 "Manifest `background` entry has an empty or invalid `preferred_environment` key." = "Manifest `background` entry has an empty or invalid `preferred_environment` key.";
 
