@@ -139,16 +139,18 @@ inline TypeDeducingCSSValueMapper fromCSSValueDeducingType(const Style::BuilderS
 
 #define EMIT_TO_CSS_SWITCH_CASE(VALUE) case TYPE::VALUE: return CSSValue##VALUE;
 #define EMIT_FROM_CSS_SWITCH_CASE(VALUE) case CSSValue##VALUE: return TYPE::VALUE;
+#define EMIT_VALUE_REPRESENTATION_CSS_SWITCH_CASE(VALUE) case WebCore::TYPE::VALUE: return visitor(CSS::Keyword::VALUE { });
 
-#define DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS \
+#define DEFINE_TO_CSS_VALUE_ID_FUNCTION \
 constexpr CSSValueID toCSSValueID(TYPE value) { \
     switch (value) { \
     FOR_EACH(EMIT_TO_CSS_SWITCH_CASE) \
     } \
     ASSERT_NOT_REACHED_UNDER_CONSTEXPR_CONTEXT(); \
     return CSSValueInvalid; \
-} \
-\
+}
+
+#define DEFINE_FROM_CSS_VALUE_ID_FUNCTION \
 template<> constexpr TYPE fromCSSValueID(CSSValueID value) { \
     switch (value) { \
     FOR_EACH(EMIT_FROM_CSS_SWITCH_CASE) \
@@ -158,6 +160,23 @@ template<> constexpr TYPE fromCSSValueID(CSSValueID value) { \
     ASSERT_NOT_REACHED_UNDER_CONSTEXPR_CONTEXT(); \
     return { }; \
 }
+
+#define DEFINE_VALUE_REPRESENTATION_CSS_VALUE_ID_FUNCTION \
+template<> struct Style::ValueRepresentation<WebCore::TYPE> { \
+    template<typename... F> constexpr decltype(auto) operator()(WebCore::TYPE value, F&&... f) \
+    { \
+        auto visitor = WTF::makeVisitor(std::forward<F>(f)...); \
+        switch (value) { \
+        FOR_EACH(EMIT_VALUE_REPRESENTATION_CSS_SWITCH_CASE) \
+        } \
+        RELEASE_ASSERT_NOT_REACHED_UNDER_CONSTEXPR_CONTEXT(); \
+    } \
+};
+
+#define DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS \
+    DEFINE_TO_CSS_VALUE_ID_FUNCTION \
+    DEFINE_FROM_CSS_VALUE_ID_FUNCTION \
+    DEFINE_VALUE_REPRESENTATION_CSS_VALUE_ID_FUNCTION
 
 #define TYPE ReflectionDirection
 #define FOR_EACH(CASE) CASE(Above) CASE(Below) CASE(Left) CASE(Right)
@@ -2592,6 +2611,10 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 
 #undef EMIT_TO_CSS_SWITCH_CASE
 #undef EMIT_FROM_CSS_SWITCH_CASE
+#undef EMIT_VALUE_REPRESENTATION_CSS_SWITCH_CASE
+#undef DEFINE_TO_CSS_VALUE_ID_FUNCTION
+#undef DEFINE_FROM_CSS_VALUE_ID_FUNCTION
+#undef DEFINE_VALUE_REPRESENTATION_CSS_VALUE_ID_FUNCTION
 #undef DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 
 }
