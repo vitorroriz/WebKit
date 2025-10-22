@@ -60,18 +60,28 @@ def main(argv):
     # string, so it needs to be split again.
     browser_args = [decode(s, "utf-8") for s in option_parser.convert_arg_line_to_args(' '.join(args))[0].split()]
     if options.url:
-        # Normalize URL by adding scheme if missing.
-        url = options.url
-        parsed = urlparse(url)
+        # Check if this "URL" is actually the value for -WebCoreLogging
+        url_index = argv.index(options.url)
+        skip_normalization = url_index > 0 and argv[url_index - 1] == '-WebCoreLogging'
 
-        # If no scheme is given, add https://
-        if not parsed.scheme:
-            # Handle localhost and IP addresses specially
-            if url.startswith('localhost') or url.split(':')[0].replace('.', '').isdigit():
-                url = f'http://{url}'
-            else:
-                url = f'https://{url}'
-        browser_args.append(url)
+        if not skip_normalization:
+            # Normalize URL by adding scheme if missing.
+            url = options.url
+            parsed = urlparse(url)
+
+        # Only normalize if it actually looks like a URL (to not accidentally normalize a logging stream):
+        # - starts with localhost
+        # - looks like an IP address
+        # - contains a dot (likely a domain) or slash (path)
+            if not parsed.scheme:
+                if url.startswith('localhost') or url.split(':')[0].replace('.', '').isdigit():
+                    url = f'http://{url}'
+                elif '.' in url or '/' in url:
+                    url = f'https://{url}'
+            browser_args.append(url)
+        else:
+            # It's the logging channel for -WebCoreLogging, pass through unchanged
+            browser_args.append(options.url)
     if options.platform == "mac" and options.site_isolation is not None:
         browser_args.append('--force-site-isolation')
         browser_args.append('YES' if options.site_isolation else 'NO')
