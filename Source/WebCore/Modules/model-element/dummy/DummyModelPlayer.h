@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Samuel Weinig <sam@webkit.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -45,9 +46,8 @@ private:
     // ModelPlayer overrides.
     ModelPlayerIdentifier identifier() const final { return m_id; }
     void load(Model&, LayoutSize) override;
+    void configureGraphicsLayer(GraphicsLayer&, ModelPlayerGraphicsLayerConfiguration&&) override;
     void sizeDidChange(LayoutSize) override;
-    PlatformLayer* layer() override;
-    std::optional<LayerHostingContextIdentifier> layerHostingContextIdentifier() override;
     void enterFullscreen() override;
     void handleMouseDown(const LayoutPoint&, MonotonicTime) override;
     void handleMouseMove(const LayoutPoint&, MonotonicTime) override;
@@ -66,10 +66,6 @@ private:
     void setIsMuted(bool, CompletionHandler<void(bool success)>&&) override;
 #if ENABLE(MODEL_ELEMENT_ACCESSIBILITY)
     ModelPlayerAccessibilityChildren accessibilityChildren() override;
-#endif
-#if ENABLE(GPU_PROCESS_MODEL)
-    const MachSendRight* displayBuffer() const override;
-    GraphicsLayerContentsDisplayDelegate* contentsDisplayDelegate() override;
 #endif
 
     WeakPtr<ModelPlayerClient> m_client;

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021-2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Samuel Weinig <sam@webkit.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,6 +36,7 @@
 #import "HTMLModelElement.h"
 #import "ModelDDInlineConverters.h"
 #import "ModelDDTypes.h"
+#import "ModelPlayerGraphicsLayerConfiguration.h"
 #import "Navigator.h"
 #import "Page.h"
 #import "PlatformCALayer.h"
@@ -214,16 +216,6 @@ void DDModelPlayer::sizeDidChange(LayoutSize)
 {
 }
 
-PlatformLayer* DDModelPlayer::layer()
-{
-    return nullptr;
-}
-
-std::optional<LayerHostingContextIdentifier> DDModelPlayer::layerHostingContextIdentifier()
-{
-    return std::nullopt;
-}
-
 void DDModelPlayer::enterFullscreen()
 {
 }
@@ -302,6 +294,11 @@ WebCore::ModelPlayerIdentifier DDModelPlayer::identifier() const
     return m_id;
 }
 
+void DDModelPlayer::configureGraphicsLayer(GraphicsLayer& graphicsLayer, ModelPlayerGraphicsLayerConfiguration&&)
+{
+    graphicsLayer.setContentsDisplayDelegate(contentsDisplayDelegate(), GraphicsLayer::ContentsLayerPurpose::Canvas);
+}
+
 const MachSendRight* DDModelPlayer::displayBuffer() const
 {
     if (m_currentTexture >= m_displayBuffers.size())
@@ -333,9 +330,9 @@ void DDModelPlayer::update()
         RefPtr { m_contentsDisplayDelegate }->setDisplayBuffer(*machSendRight);
 
     if (RefPtr client = m_client.get())
-        client->didUpdateDisplayDelegate(*this);
+        client->didUpdate(*this);
 }
 
-}
+} // namespace WebCore
 
 #endif

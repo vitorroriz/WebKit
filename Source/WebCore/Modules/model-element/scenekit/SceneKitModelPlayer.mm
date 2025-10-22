@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021-2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Samuel Weinig <sam@webkit.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,6 +30,8 @@
 
 #import "SceneKitModelPlayer.h"
 
+#import "GraphicsLayer.h"
+#import "ModelPlayerGraphicsLayerConfiguration.h"
 #import "SceneKitModel.h"
 #import "SceneKitModelLoader.h"
 #import <pal/spi/cocoa/SceneKitSPI.h>
@@ -83,14 +86,9 @@ void SceneKitModelPlayer::sizeDidChange(LayoutSize)
 {
 }
 
-PlatformLayer* SceneKitModelPlayer::layer()
+void SceneKitModelPlayer::configureGraphicsLayer(GraphicsLayer& graphicsLayer, ModelPlayerGraphicsLayerConfiguration&&)
 {
-    return m_layer.get();
-}
-
-std::optional<LayerHostingContextIdentifier> SceneKitModelPlayer::layerHostingContextIdentifier()
-{
-    return std::nullopt;
+    graphicsLayer.setContentsToPlatformLayer(m_layer.get(), GraphicsLayer::ContentsLayerPurpose::Model);
 }
 
 void SceneKitModelPlayer::enterFullscreen()

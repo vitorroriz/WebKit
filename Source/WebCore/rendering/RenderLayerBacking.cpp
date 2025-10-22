@@ -1317,29 +1317,13 @@ bool RenderLayerBacking::updateConfiguration(const RenderLayer* compositingAnces
     else if (is<RenderModel>(renderer())) {
         auto element = downcast<HTMLModelElement>(renderer().element());
 
-        // Some ModelPlayers use a platformLayer() and some pass the Model to the layer as contents,
-        // but this is a runtime decision.
-        if (element->usesPlatformLayer())
-            m_graphicsLayer->setContentsToPlatformLayer(element->platformLayer(), GraphicsLayer::ContentsLayerPurpose::Model);
-#if ENABLE(MODEL_CONTEXT) && !ENABLE(GPU_PROCESS_MODEL)
-        else if (auto modelContext = element->modelContext(); modelContext && element->document().settings().modelProcessEnabled()) {
-            modelContext->setBackgroundColor(rendererBackgroundColor());
-            m_graphicsLayer->setContentsToModelContext(*modelContext, GraphicsLayer::ContentsLayerPurpose::HostedModel);
-        }
-#endif
-        else if (auto model = element->model()) {
-#if ENABLE(GPU_PROCESS_MODEL)
-            m_graphicsLayer->setContentsDisplayDelegate(element->contentsDisplayDelegate(), GraphicsLayer::ContentsLayerPurpose::Canvas);
-#else
-            m_graphicsLayer->setContentsToModel(WTFMove(model), element->isInteractive() ? GraphicsLayer::ModelInteraction::Enabled : GraphicsLayer::ModelInteraction::Disabled);
-#endif
-        }
-
+        element->configureGraphicsLayer(*m_graphicsLayer, rendererBackgroundColor());
         element->sizeMayHaveChanged();
 
         layerConfigChanged = true;
     }
 #endif // ENABLE(MODEL_ELEMENT)
+
     // FIXME: Why do we do this twice?
     if (CheckedPtr widget = dynamicDowncast<RenderWidget>(renderer())) {
         if (compositor.attachWidgetContentLayersIfNecessary(*widget).layerHierarchyChanged) {
