@@ -1664,7 +1664,7 @@ void TreeResolver::sortPositionOptionsIfNeeded(PositionOptions& options, const S
 
         // If there's one, move it to the beginning.
         // (if it's at index zero, do nothing since it's already at the beginning)
-        if (lastSuccessfulIndexInOptionStyles > 0) {
+        if (lastSuccessfulIndexInOptionStyles && lastSuccessfulIndexInOptionStyles != notFound) {
             auto lastSuccessfulOption = WTFMove(options.optionStyles[lastSuccessfulIndexInOptionStyles]);
             options.optionStyles.removeAt(lastSuccessfulIndexInOptionStyles);
             options.optionStyles.insert(0, WTFMove(lastSuccessfulOption));
