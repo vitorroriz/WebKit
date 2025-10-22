@@ -5059,23 +5059,6 @@ static bool selectionIsInsideFixedPositionContainer(LocalFrame& frame)
     return isInsideFixedPosition;
 }
 
-void WebPage::markPendingLocalScrollPositionChange()
-{
-    if (m_pendingLocalChangeTransactionID)
-        return;
-
-    if (auto* drawingArea = dynamicDowncast<RemoteLayerTreeDrawingArea>(this->drawingArea()))
-        m_pendingLocalChangeTransactionID = drawingArea->nextTransactionID();
-}
-
-bool WebPage::shouldIgnoreScrollPositionUpdate(TransactionID receivedTransactionID) const
-{
-    if (m_pendingLocalChangeTransactionID)
-        return receivedTransactionID.lessThanSameProcess(*m_pendingLocalChangeTransactionID);
-
-    return false;
-}
-
 void WebPage::updateVisibleContentRects(const VisibleContentRectUpdateInfo& visibleContentRectUpdateInfo, MonotonicTime oldestTimestamp)
 {
     LOG_WITH_STREAM(VisibleRects, stream << "\nWebPage " << m_identifier << " updateVisibleContentRects " << visibleContentRectUpdateInfo);
@@ -5121,7 +5104,7 @@ void WebPage::updateVisibleContentRects(const VisibleContentRectUpdateInfo& visi
 
     auto layoutViewportRect = visibleContentRectUpdateInfo.layoutViewportRect();
     auto unobscuredContentRect = visibleContentRectUpdateInfo.unobscuredContentRect();
-    auto scrollPosition = shouldIgnoreScrollPositionUpdate(visibleContentRectUpdateInfo.lastLayerTreeTransactionID()) ? frameView.scrollPosition() : roundedIntPoint(unobscuredContentRect.location());
+    auto scrollPosition = roundedIntPoint(unobscuredContentRect.location());
 
     // Computation of layoutViewportRect is done in LayoutUnits which loses some precision, so test with an epsilon.
     // FIXME: The loss of precision when converting floating point values to LayoutUnit does not, by itself, explain

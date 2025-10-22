@@ -5077,8 +5077,6 @@ void WebPage::willCommitLayerTree(RemoteLayerTreeTransaction& layerTransaction, 
         m_lastTransactionPageScaleFactor = layerTransaction.pageScaleFactor();
         m_internals->lastTransactionIDWithScaleChange = layerTransaction.transactionID();
     }
-
-    m_pendingLocalChangeTransactionID = std::nullopt;
 #endif
 
     layerTransaction.setScrollPosition(frameView->scrollPosition());
@@ -10881,17 +10879,6 @@ std::unique_ptr<FrameInfoData> WebPage::takeMainFrameNavigationInitiator()
 bool WebPage::hasAccessoryMousePointingDevice() const
 {
     return true;
-}
-#endif
-
-#if ENABLE(ASYNC_SCROLLING) && !PLATFORM(IOS_FAMILY)
-bool WebPage::shouldIgnoreScrollPositionUpdate(TransactionID) const
-{
-    return false;
-}
-
-void WebPage::markPendingLocalScrollPositionChange()
-{
 }
 #endif
 
