@@ -9600,7 +9600,7 @@ Element* eventTargetElementForDocument(Document* document)
 // https://drafts.csswg.org/css-viewport/#zoom-om
 std::optional<float> Document::zoomForClient(const RenderStyle& style) const
 {
-    if (!settings().getBoundingClientRectZoomed())
+    if (!settings().getBoundingClientRectZoomedEnabled())
         return style.usedZoom();
     return { };
 }

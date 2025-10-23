@@ -420,6 +420,15 @@ bool defaultTrustedTypesEnabled()
 #endif
 }
 
+bool defaultGetBoundingClientRectZoomedEnabled()
+{
+#if PLATFORM(IOS_FAMILY)
+    return linkedOnOrAfterSDKWithBehavior(SDKAlignedBehavior::GetBoundingClientRectZoomed);
+#else
+    return true;
+#endif
+}
+
 #if !PLATFORM(COCOA)
 bool defaultContentInsetBackgroundFillEnabled()
 {

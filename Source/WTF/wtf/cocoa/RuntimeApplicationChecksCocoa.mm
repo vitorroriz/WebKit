@@ -238,8 +238,10 @@ static SDKAlignedBehaviors computeSDKAlignedBehaviors()
     if (linkedBefore(dyld_2024_SU_F_os_versions, DYLD_IOS_VERSION_18_5, DYLD_MACOSX_VERSION_15_5))
         disableBehavior(SDKAlignedBehavior::NavigationActionSourceFrameNonNull);
 
-    if (linkedBefore(dyld_2025_SU_B_os_versions, DYLD_IOS_VERSION_26_1, DYLD_MACOSX_VERSION_26_1))
+    if (linkedBefore(dyld_2025_SU_B_os_versions, DYLD_IOS_VERSION_26_1, DYLD_MACOSX_VERSION_26_1)) {
         disableBehavior(SDKAlignedBehavior::AllowBackgroundAudioPlayback);
+        disableBehavior(SDKAlignedBehavior::GetBoundingClientRectZoomed);
+    }
 
     disableAdditionalSDKAlignedBehaviors(behaviors);
 
