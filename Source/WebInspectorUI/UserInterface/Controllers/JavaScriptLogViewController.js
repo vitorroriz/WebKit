@@ -135,7 +135,7 @@ WI.JavaScriptLogViewController = class JavaScriptLogViewController extends WI.Ob
                 classNames.push("special-user-log");
 
             let commandMessageView = new WI.ConsoleCommandView(text, {classNames, handleClick});
-            this._appendConsoleMessageView(commandMessageView, true);
+            this._appendConsoleCommandView(commandMessageView);
             this._lastCommitted = {text, special: addSpecialUserLogClass};
         }
 
@@ -249,7 +249,7 @@ WI.JavaScriptLogViewController = class JavaScriptLogViewController extends WI.Ob
 
         if (this._lastCommitted.text !== text || this._lastCommitted.special) {
             let commandMessageView = new WI.ConsoleCommandView(text);
-            this._appendConsoleMessageView(commandMessageView, true);
+            this._appendConsoleCommandView(commandMessageView);
             this._lastCommitted = {text, special: false};
         }
 
@@ -293,13 +293,9 @@ WI.JavaScriptLogViewController = class JavaScriptLogViewController extends WI.Ob
 
     _appendConsoleMessageView(messageView, repeatCountWasInterrupted)
     {
-        let pendingMessagesForSession = this._pendingMessagesForSessionOrGroup.get(this._currentSessionOrGroup);
-        if (!pendingMessagesForSession) {
-            pendingMessagesForSession = [];
-            this._pendingMessagesForSessionOrGroup.set(this._currentSessionOrGroup, pendingMessagesForSession);
-        }
-        pendingMessagesForSession.push(messageView);
+        console.assert(messageView instanceof WI.ConsoleMessageView);
 
+        this._addToPendingMessages(messageView);
         this._cleared = false;
         this._repeatCountWasInterrupted = repeatCountWasInterrupted || false;
 
@@ -318,6 +314,25 @@ WI.JavaScriptLogViewController = class JavaScriptLogViewController extends WI.Ob
 
         if (!WI.isShowingConsoleTab() && message.shouldRevealConsole)
             WI.showSplitConsole();
+    }
+
+    _appendConsoleCommandView(commandView)
+    {
+        console.assert(commandView instanceof WI.ConsoleCommandView);
+
+        this._addToPendingMessages(commandView);
+        this._cleared = false;
+        this._repeatCountWasInterrupted = true;
+
+        if (WI.consoleContentView.isAttached)
+            this.renderPendingMessagesSoon();
+    }
+
+    _addToPendingMessages(messageView)
+    {
+        let pendingMessagesForSession = this._pendingMessagesForSessionOrGroup.getOrInitialize(this._currentSessionOrGroup, []);
+        pendingMessagesForSession.push(messageView);
+        this._pendingMessagesForSessionOrGroup.set(this._currentSessionOrGroup, pendingMessagesForSession);
     }
 
     renderPendingMessages()
