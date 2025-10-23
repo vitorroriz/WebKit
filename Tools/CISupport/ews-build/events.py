@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2025 Apple Inc. All rights reserved.
+# Copyright (C) 2019-2024 Apple Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -65,7 +65,6 @@ class Events(service.BuildbotService):
         'bindings-tests', 'check-webkit-style',
         'webkitperl-tests', 're-run-webkitperl-tests', 'webkitpy-tests'
     ]
-    QUEUES_TO_SKIP_REPORTING = ['__Janitor', 'Safe-Merge-Queue']
 
     def __init__(self, master_hostname, type_prefix='', name='Events'):
         """
@@ -126,8 +125,6 @@ class Events(service.BuildbotService):
 
     @defer.inlineCallbacks
     def buildStarted(self, key, build):
-        if self.getBuilderName(build) in self.QUEUES_TO_SKIP_REPORTING:
-            return
         if not build.get('properties'):
             build['properties'] = yield self.master.db.builds.getBuildProperties(build.get('buildid'))
 
@@ -187,8 +184,6 @@ class Events(service.BuildbotService):
 
     @defer.inlineCallbacks
     def buildFinished(self, key, build):
-        if self.getBuilderName(build) in self.QUEUES_TO_SKIP_REPORTING:
-            return
         if not build.get('properties'):
             build['properties'] = yield self.master.db.builds.getBuildProperties(build.get('buildid'))
         if not build.get('steps'):
