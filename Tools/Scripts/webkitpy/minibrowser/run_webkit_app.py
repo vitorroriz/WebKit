@@ -19,6 +19,7 @@
 import argparse
 import sys
 import traceback
+import os
 from urllib.parse import urlparse
 
 from webkitpy.common.host import Host
@@ -69,14 +70,18 @@ def main(argv):
             url = options.url
             parsed = urlparse(url)
 
-        # Only normalize if it actually looks like a URL (to not accidentally normalize a logging stream):
-        # - starts with localhost
-        # - looks like an IP address
-        # - contains a dot (likely a domain) or slash (path)
+            # Only normalize if it actually looks like a URL (to not accidentally normalize a logging stream):
+            # - starts with a file path (/, ./, ../, ~/)
+            # - starts with localhost
+            # - looks like an IP address
+            # - contains a dot (likely a domain)
             if not parsed.scheme:
-                if url.startswith('localhost') or url.split(':')[0].replace('.', '').isdigit():
+                if url.startswith(('/', './', '../', '~/')):
+                    abs_path = os.path.abspath(os.path.expanduser(url))
+                    url = f'file://{abs_path}'
+                elif url.startswith('localhost') or url.split(':')[0].replace('.', '').isdigit():
                     url = f'http://{url}'
-                elif '.' in url or '/' in url:
+                elif '.' in url:
                     url = f'https://{url}'
             browser_args.append(url)
         else:
