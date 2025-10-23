@@ -11428,6 +11428,11 @@ TextManipulationController& Document::textManipulationController()
     return *m_textManipulationController;
 }
 
+CheckedRef<TextManipulationController> Document::checkedTextManipulationController()
+{
+    return textManipulationController();
+}
+
 LazyLoadImageObserver& Document::lazyLoadImageObserver()
 {
     if (!m_lazyLoadImageObserver)

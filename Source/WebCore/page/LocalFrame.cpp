@@ -847,6 +847,11 @@ RenderView* LocalFrame::contentRenderer() const
     return document() ? document()->renderView() : nullptr;
 }
 
+CheckedPtr<RenderView> LocalFrame::checkedContentRenderer() const
+{
+    return contentRenderer();
+}
+
 LocalFrame* LocalFrame::frameForWidget(const Widget& widget)
 {
     SUPPRESS_UNCOUNTED_LOCAL auto* renderer = RenderWidget::find(widget);

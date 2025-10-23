@@ -1911,6 +1911,7 @@ public:
 #endif
 
     WEBCORE_EXPORT TextManipulationController& textManipulationController();
+    WEBCORE_EXPORT CheckedRef<TextManipulationController> checkedTextManipulationController();
     TextManipulationController* textManipulationControllerIfExists() { return m_textManipulationController.get(); }
 
     bool hasHighlight() const;
