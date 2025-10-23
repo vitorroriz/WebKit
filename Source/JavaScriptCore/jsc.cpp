@@ -311,6 +311,7 @@ static JSC_DECLARE_HOST_FUNCTION(functionCreateBigInt32);
 static JSC_DECLARE_HOST_FUNCTION(functionUseBigInt32);
 static JSC_DECLARE_HOST_FUNCTION(functionIsBigInt32);
 static JSC_DECLARE_HOST_FUNCTION(functionIsHeapBigInt);
+static JSC_DECLARE_HOST_FUNCTION(functionIs8BitString);
 static JSC_DECLARE_HOST_FUNCTION(functionCreateNonRopeNonAtomString);
 
 static JSC_DECLARE_HOST_FUNCTION(functionPrintStdOut);
@@ -719,6 +720,7 @@ private:
         addFunction(vm, "isBigInt32"_s, functionIsBigInt32, 1);
         addFunction(vm, "isHeapBigInt"_s, functionIsHeapBigInt, 1);
 
+        addFunction(vm, "is8BitString"_s, functionIs8BitString, 1);
         addFunction(vm, "createNonRopeNonAtomString"_s, functionCreateNonRopeNonAtomString, 1);
 
         addFunction(vm, "dumpTypesForAllVariables"_s, functionDumpTypesForAllVariables , 0);
@@ -3083,6 +3085,14 @@ JSC_DEFINE_HOST_FUNCTION(functionIsBigInt32, (JSGlobalObject*, CallFrame* callFr
 JSC_DEFINE_HOST_FUNCTION(functionIsHeapBigInt, (JSGlobalObject*, CallFrame* callFrame))
 {
     return JSValue::encode(jsBoolean(callFrame->argument(0).isHeapBigInt()));
+}
+
+JSC_DEFINE_HOST_FUNCTION(functionIs8BitString, (JSGlobalObject*, CallFrame* callFrame))
+{
+    JSString* string = jsDynamicCast<JSString*>(callFrame->argument(0));
+    if (!string)
+        return JSValue::encode(jsBoolean(false));
+    return JSValue::encode(jsBoolean(string->is8Bit()));
 }
 
 JSC_DEFINE_HOST_FUNCTION(functionCreateNonRopeNonAtomString, (JSGlobalObject* globalObject, CallFrame* callFrame))
