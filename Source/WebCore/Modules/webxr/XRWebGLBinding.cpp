@@ -32,6 +32,7 @@
 #include "WebGL2RenderingContext.h"
 #include "WebGLRenderingContext.h"
 #include "WebGLRenderingContextBase.h"
+#include "WebXRSession.h"
 #include <wtf/TZoneMallocInlines.h>
 
 namespace WebCore {

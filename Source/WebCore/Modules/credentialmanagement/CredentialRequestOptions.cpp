@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,12 +23,26 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-[
-    Conditional=WEB_AUTHN,
-    ExportMacro=WEBCORE_EXPORT,
-    ImplementedAs=ResidentKeyRequirement
-] enum ResidentKeyRequirement {
-    "required",
-    "preferred",
-    "discouraged"
-};
+#include "config.h"
+#include "CredentialRequestOptions.h"
+
+#if ENABLE(WEB_AUTHN)
+
+#include "DocumentPage.h"
+#include "ExceptionOr.h"
+#include "FrameDestructionObserverInlines.h"
+#include "JSCredentialMediationRequirement.h"
+
+namespace WebCore {
+
+MediationRequirement CredentialRequestOptions::mediation() const
+{
+    if (auto parsed = parseEnumerationFromString<MediationRequirement>(mediationString))
+        return *parsed;
+    // Default value if string is invalid/unknown
+    return MediationRequirement::Optional;
+}
+
+} // namespace WebCore
+
+#endif // ENABLE(WEB_AUTHN)

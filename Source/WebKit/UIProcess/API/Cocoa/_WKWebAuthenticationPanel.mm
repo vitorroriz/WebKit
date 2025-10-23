@@ -71,6 +71,14 @@
 
 #if ENABLE(WEB_AUTHN)
 
+namespace WebCore {
+String convertEnumerationToString(AttestationConveyancePreference);
+String convertEnumerationToString(AuthenticatorAttachment);
+String convertEnumerationToString(AuthenticatorTransport);
+String convertEnumerationToString(ResidentKeyRequirement);
+String convertEnumerationToString(UserVerificationRequirement);
+}
+
 #if USE(APPLE_INTERNAL_SDK)
 #import <WebKitAdditions/LocalAuthenticatorAdditions.h>
 #else
@@ -857,13 +865,16 @@ static WebCore::AuthenticatorTransport authenticatorTransport(_WKWebAuthenticati
     case _WKWebAuthenticationTransportSmartCard:
         return WebCore::AuthenticatorTransport::SmartCard;
     }
+    ASSERT_NOT_REACHED();
+    return WebCore::AuthenticatorTransport::Usb;
 }
 
-static Vector<WebCore::AuthenticatorTransport> authenticatorTransports(NSArray<NSNumber *> *transports)
+static Vector<String> authenticatorTransports(NSArray<NSNumber *> *transports)
 {
-    return Vector<WebCore::AuthenticatorTransport>(transports.count, [transports](size_t i) {
+    return Vector<String>(transports.count, [transports](size_t i) {
         NSNumber *transport = transports[i];
-        return authenticatorTransport((_WKWebAuthenticationTransport)transport.intValue);
+        auto enumTransport = authenticatorTransport((_WKWebAuthenticationTransport)transport.intValue);
+        return WebCore::convertEnumerationToString(enumTransport);
     });
 }
 
@@ -928,10 +939,14 @@ static std::optional<WebCore::ResidentKeyRequirement> toWebCore(_WKResidentKeyRe
 static WebCore::AuthenticatorSelectionCriteria authenticatorSelectionCriteria(_WKAuthenticatorSelectionCriteria *authenticatorSelection)
 {
     WebCore::AuthenticatorSelectionCriteria result;
-    result.authenticatorAttachment = authenticatorAttachment(authenticatorSelection.authenticatorAttachment);
-    result.residentKey = toWebCore(authenticatorSelection.residentKey);
+    auto attachment = authenticatorAttachment(authenticatorSelection.authenticatorAttachment);
+    if (attachment)
+        result.authenticatorAttachmentString = WebCore::convertEnumerationToString(*attachment);
+    auto rk = toWebCore(authenticatorSelection.residentKey);
+    if (rk)
+        result.residentKeyString = WebCore::convertEnumerationToString(*rk);
     result.requireResidentKey = authenticatorSelection.requireResidentKey;
-    result.userVerification = userVerification(authenticatorSelection.userVerification);
+    result.userVerificationString = WebCore::convertEnumerationToString(userVerification(authenticatorSelection.userVerification));
 
     return result;
 }
@@ -995,7 +1010,7 @@ static WebCore::MediationRequirement toWebCore(_WKWebAuthenticationMediationRequ
         result.excludeCredentials = publicKeyCredentialDescriptors(retainPtr(options.excludeCredentials).get());
     if (options.authenticatorSelection)
         result.authenticatorSelection = authenticatorSelectionCriteria(retainPtr(options.authenticatorSelection).get());
-    result.attestation = attestationConveyancePreference(options.attestation);
+    result.attestationString = WebCore::convertEnumerationToString(attestationConveyancePreference(options.attestation));
     if (options.extensionsCBOR)
         result.extensions = WebCore::AuthenticationExtensionsClientInputs::fromCBOR(span(options.extensionsCBOR));
     else
@@ -1014,16 +1029,28 @@ static _WKAuthenticatorAttachment authenticatorAttachmentToWKAuthenticatorAttach
     case WebCore::AuthenticatorAttachment::CrossPlatform:
         return _WKAuthenticatorAttachmentCrossPlatform;
     }
+    ASSERT_NOT_REACHED();
+    return _WKAuthenticatorAttachmentPlatform;
+}
+
+static RetainPtr<NSArray<NSNumber *>> wkTransports(const Vector<String>& transports)
+{
+    auto wkTransports = adoptNS([NSMutableArray<NSNumber *> new]);
+    for (const auto& transportString : transports) {
+        if (auto transport = WebCore::convertStringToAuthenticatorTransport(transportString))
+            [wkTransports addObject:[NSNumber numberWithInt:(int)*transport]];
+    }
+    return wkTransports;
 }
 
 static RetainPtr<NSArray<NSNumber *>> wkTransports(const Vector<WebCore::AuthenticatorTransport>& transports)
 {
-    auto wkTransports = adoptNS([NSMutableArray<NSNumber *> new]);
+    Vector<String> transportStrings;
+    transportStrings.reserveInitialCapacity(transports.size());
     for (auto transport : transports)
-        [wkTransports addObject:[NSNumber numberWithInt:(int)transport]];
-    return wkTransports;
+        transportStrings.append(WebCore::convertEnumerationToString(transport));
+    return wkTransports(transportStrings);
 }
-
 
 static RetainPtr<_WKAuthenticatorAttestationResponse> wkAuthenticatorAttestationResponse(const WebCore::AuthenticatorResponseData& data, NSData *clientDataJSON, WebCore::AuthenticatorAttachment attachment)
 {
@@ -1083,7 +1110,7 @@ static RetainPtr<_WKAuthenticatorAttestationResponse> wkAuthenticatorAttestation
         result.extensions = WebCore::AuthenticationExtensionsClientInputs::fromCBOR(span(options.extensionsCBOR));
     else
         result.extensions = authenticationExtensionsClientInputs(retainPtr(options.extensions).get());
-    result.userVerification = userVerification(options.userVerification);
+    result.userVerificationString = WebCore::convertEnumerationToString(userVerification(options.userVerification));
     result.authenticatorAttachment = authenticatorAttachment(options.authenticatorAttachment);
 #endif
 

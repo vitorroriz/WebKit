@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,12 +23,23 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-[
-    Conditional=WEB_AUTHN,
-    ExportMacro=WEBCORE_EXPORT,
-    ImplementedAs=ResidentKeyRequirement
-] enum ResidentKeyRequirement {
-    "required",
-    "preferred",
-    "discouraged"
-};
+#include "config.h"
+#include "PublicKeyCredentialCreationOptions.h"
+
+#if ENABLE(WEB_AUTHN)
+
+#include "JSAttestationConveyancePreference.h"
+
+namespace WebCore {
+
+AttestationConveyancePreference PublicKeyCredentialCreationOptions::attestation() const
+{
+    if (auto parsed = parseEnumerationFromString<AttestationConveyancePreference>(attestationString))
+        return *parsed;
+    // Default value if string is invalid/unknown
+    return AttestationConveyancePreference::None;
+}
+
+} // namespace WebCore
+
+#endif // ENABLE(WEB_AUTHN)
