@@ -576,7 +576,7 @@ RefPtr<ViewSnapshot> PageClientImpl::takeViewSnapshot(std::optional<WebCore::Int
             return WTFMove(snapshot.value());
     }
 #else
-    UNUSED_PARAM(clipRect)
+    UNUSED_PARAM(clipRect);
 #endif
     return nullptr;
 }
