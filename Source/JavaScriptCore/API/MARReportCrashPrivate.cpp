@@ -125,6 +125,8 @@ void** MARCrashReportBacktraceGetBacktraceBuffer(PASMARCrashReportBacktraceRef b
 
 #else
 
+IGNORE_CLANG_WARNINGS_BEGIN("missing-noreturn")
+
 PASMARCrashReportRef MARCrashReportCreate()
 {
     ASSERT_NOT_REACHED();
@@ -189,6 +191,8 @@ void** MARCrashReportBacktraceGetBacktraceBuffer(PASMARCrashReportBacktraceRef)
     ASSERT_NOT_REACHED();
     return nullptr;
 }
+
+IGNORE_CLANG_WARNINGS_END // "missing-noreturn"
 
 #endif /* !USE(SYSTEM_MALLOC) && BENABLE(LIBPAS) */
 
