@@ -150,4 +150,8 @@ NSString * const NSInspectorBarTextAlignmentItemIdentifier = @"NSInspectorBarTex
 - (void)_chooseFace:(id)sender;
 @end
 
+@interface NSFontEffectsBox: NSBox
+- (void)_openEffectsButton:(id)sender;
+@end
+
 #endif // PLATFORM(MAC)

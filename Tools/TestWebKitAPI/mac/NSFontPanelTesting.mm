@@ -28,11 +28,52 @@
 
 #if PLATFORM(MAC)
 
+#import "AppKitSPI.h"
 #import <objc/runtime.h>
 
 @interface NSBox (NSFontEffectsBox)
-// Invoked after a font effect (e.g. single strike-through) is chosen.
-- (void)_openEffectsButton:(id)sender;
+
+- (void)_addAttribute:(NSString *)attribute value:(id)value;
+- (void)_removeAttribute:(NSString *)attribute;
+- (void)_clearAttributes;
+
+@end
+
+@implementation NSBox (NSFontEffectsBox)
+
+- (void)_addAttribute:(NSString *)attribute value:(id)value
+{
+    void* result = nullptr;
+    object_getInstanceVariable(self, "_attributesToAdd", &result);
+    if (result) {
+        [static_cast<NSMutableDictionary *>(result) setObject:value forKey:attribute];
+        return;
+    }
+
+    RetainPtr dictionary = adoptNS([NSMutableDictionary new]);
+    [dictionary setObject:value forKey:attribute];
+    object_setInstanceVariableWithStrongDefault(self, "_attributesToAdd", dictionary.get());
+}
+
+- (void)_removeAttribute:(NSString *)attribute
+{
+    void* result = nullptr;
+    object_getInstanceVariable(self, "_attributesToRemove", &result);
+    if (result) {
+        [static_cast<NSMutableArray *>(result) addObject:attribute];
+        return;
+    }
+
+    RetainPtr array = [NSMutableArray arrayWithObject:attribute];
+    object_setInstanceVariableWithStrongDefault(self, "_attributesToRemove", array.get());
+}
+
+- (void)_clearAttributes
+{
+    object_setInstanceVariableWithStrongDefault(self, "_attributesToAdd", nil);
+    object_setInstanceVariableWithStrongDefault(self, "_attributesToRemove", nil);
+}
+
 @end
 
 static NSView *findSubviewOfClass(NSView *view, Class targetClass)
@@ -47,22 +88,13 @@ static NSView *findSubviewOfClass(NSView *view, Class targetClass)
     return nil;
 }
 
-static NSMenuItem *findMenuItemWithTitle(NSPopUpButton *button, NSString *title)
-{
-    for (NSMenuItem *item in button.itemArray) {
-        if ([item.title.lowercaseString isEqualToString:title.lowercaseString])
-            return item;
-    }
-    return nil;
-}
-
 @implementation NSFontPanel (TestWebKitAPI)
 
-- (NSBox *)fontEffectsBox
+- (NSFontEffectsBox *)fontEffectsBox
 {
     void* result = nullptr;
     object_getInstanceVariable(self, "_fontEffectsBox", &result);
-    return static_cast<NSBox *>(result);
+    return static_cast<NSFontEffectsBox *>(result);
 }
 
 - (NSPopUpButton *)underlineToolbarButton
@@ -80,20 +112,29 @@ static NSMenuItem *findMenuItemWithTitle(NSPopUpButton *button, NSString *title)
     return (NSColorWell *)[self _toolbarItemWithIdentifier:@"NSFontPanelTextColorToolbarItem"].view;
 }
 
-- (void)chooseUnderlineMenuItemWithTitle:(NSString *)itemTitle
+- (void)setUnderlineStyle:(NSUnderlineStyle)style
 {
-    NSPopUpButton *button = [self underlineToolbarButton];
-    [button selectItem:findMenuItemWithTitle(button, itemTitle)];
-    [self.fontEffectsBox _openEffectsButton:button];
-    [self _didChangeAttributes];
+    [[self fontEffectsBox] _addAttribute:NSUnderlineStyleAttributeName value:@(style)];
 }
 
-- (void)chooseStrikeThroughMenuItemWithTitle:(NSString *)itemTitle
+- (void)setStrikethroughStyle:(NSUnderlineStyle)style
 {
-    NSPopUpButton *button = [self strikeThroughToolbarButton];
-    [button selectItem:findMenuItemWithTitle(button, itemTitle)];
-    [self.fontEffectsBox _openEffectsButton:button];
+    [[self fontEffectsBox] _addAttribute:NSStrikethroughStyleAttributeName value:@(style)];
+}
+
+- (void)setTextShadow:(NSShadow *)shadow
+{
+    RetainPtr fontEffectsBox = [self fontEffectsBox];
+    if (shadow)
+        [fontEffectsBox _addAttribute:NSShadowAttributeName value:shadow];
+    else
+        [fontEffectsBox _removeAttribute:NSShadowAttributeName];
+}
+
+- (void)commitAttributeChanges
+{
     [self _didChangeAttributes];
+    [self.fontEffectsBox _clearAttributes];
 }
 
 - (void)_didChangeAttributes
@@ -126,13 +167,6 @@ static NSMenuItem *findMenuItemWithTitle(NSPopUpButton *button, NSString *title)
 - (BOOL)hasShadow
 {
     return self.shadowToggleButton.state == NSControlStateValueOn;
-}
-
-- (void)toggleShadow
-{
-    NSButton *shadowToggleButton = self.shadowToggleButton;
-    shadowToggleButton.state = shadowToggleButton.state == NSControlStateValueOff ? NSControlStateValueOn : NSControlStateValueOff;
-    [self _didChangeAttributes];
 }
 
 - (double)shadowLength
