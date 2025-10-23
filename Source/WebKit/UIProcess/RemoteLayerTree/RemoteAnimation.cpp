@@ -32,7 +32,7 @@
 
 namespace WebKit {
 
-WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(RemoteAnimation);
+WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteAnimation);
 
 Ref<RemoteAnimation> RemoteAnimation::create(const WebCore::AcceleratedEffect& effect, const RemoteAnimationTimeline& timeline)
 {

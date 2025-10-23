@@ -32,7 +32,7 @@
 
 namespace WebKit {
 
-WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(RemoteAnimationTimeline);
+WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteAnimationTimeline);
 
 static WebCore::WebAnimationTime computeCurrentTime(Seconds originTime, MonotonicTime now)
 {

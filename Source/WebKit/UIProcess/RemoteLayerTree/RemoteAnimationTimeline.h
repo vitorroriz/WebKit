@@ -36,7 +36,7 @@
 namespace WebKit {
 
 class RemoteAnimationTimeline final : public RefCounted<RemoteAnimationTimeline> {
-    WTF_MAKE_TZONE_OR_ISO_ALLOCATED(RemoteAnimationTimeline);
+    WTF_MAKE_TZONE_ALLOCATED(RemoteAnimationTimeline);
 public:
     static Ref<RemoteAnimationTimeline> create(const WebCore::AcceleratedTimeline&, MonotonicTime);
 

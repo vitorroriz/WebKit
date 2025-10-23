@@ -46,7 +46,7 @@ class IntRect;
 class KeyframeEffect;
 
 class AcceleratedEffect : public RefCountedAndCanMakeWeakPtr<AcceleratedEffect>, public KeyframeInterpolation {
-    WTF_MAKE_TZONE_OR_ISO_ALLOCATED(AcceleratedEffect);
+    WTF_MAKE_TZONE_ALLOCATED(AcceleratedEffect);
 public:
 
     class WEBCORE_EXPORT Keyframe final : public KeyframeInterpolation::Keyframe {
