@@ -1960,7 +1960,12 @@ TEST(SiteIsolation, RunOpenPanel)
         Util::spinRunLoop();
 }
 
+// FIXME when rdar://163227871 is resolved.
+#if PLATFORM(MAC)
+TEST(SiteIsolation, DISABLED_CancelOpenPanel)
+#else
 TEST(SiteIsolation, CancelOpenPanel)
+#endif
 {
     auto subframeHTML = "<!DOCTYPE html><input style='width: 100vw; height: 100vh;' id='file' type='file'>"
         "<script>"
