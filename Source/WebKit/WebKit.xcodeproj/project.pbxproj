@@ -1993,14 +1993,8 @@
 		B66F88C02B6D1F2300FB1734 /* WKPreviewWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66F88BF2B6D1F1200FB1734 /* WKPreviewWindowController.swift */; };
 		B66F88C22B6D202600FB1734 /* WKPreviewWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = B66F88C12B6D202600FB1734 /* WKPreviewWindowController.h */; };
 		B69E1A682AFF5F0C000FB98E /* WebExtensionRegisteredScriptParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = B69E1A672AFF5F0B000FB98E /* WebExtensionRegisteredScriptParameters.h */; };
-		B6A292362B18FCF30061930E /* _WKWebExtensionSQLiteStore.h in Headers */ = {isa = PBXBuildFile; fileRef = B6A292342B18FCF20061930E /* _WKWebExtensionSQLiteStore.h */; };
-		B6A2923D2B193ED50061930E /* _WKWebExtensionSQLiteDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = B6A2923B2B193ED40061930E /* _WKWebExtensionSQLiteDatabase.h */; };
 		B6B1565C2B5E177A004F9894 /* WebExtensionDataType.h in Headers */ = {isa = PBXBuildFile; fileRef = B6B156582B5E1779004F9894 /* WebExtensionDataType.h */; };
 		B6B1565E2B5E177A004F9894 /* WebExtensionStorageAccessLevel.h in Headers */ = {isa = PBXBuildFile; fileRef = B6B1565A2B5E177A004F9894 /* WebExtensionStorageAccessLevel.h */; };
-		B6BF18362B1A49EF00FA39D3 /* _WKWebExtensionSQLiteStatement.h in Headers */ = {isa = PBXBuildFile; fileRef = B6BF18342B1A49EE00FA39D3 /* _WKWebExtensionSQLiteStatement.h */; };
-		B6BF183A2B1A510500FA39D3 /* _WKWebExtensionSQLiteRow.h in Headers */ = {isa = PBXBuildFile; fileRef = B6BF18382B1A510500FA39D3 /* _WKWebExtensionSQLiteRow.h */; };
-		B6BF18402B1A8C3600FA39D3 /* _WKWebExtensionSQLiteHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = B6BF183F2B1A8C3600FA39D3 /* _WKWebExtensionSQLiteHelpers.h */; };
-		B6BF18422B1A8F8B00FA39D3 /* _WKWebExtensionSQLiteDatatypeTraits.h in Headers */ = {isa = PBXBuildFile; fileRef = B6BF18412B1A8F8A00FA39D3 /* _WKWebExtensionSQLiteDatatypeTraits.h */; };
 		B6CDC0652CECFCCC008A91FE /* WKSeparatedImageView.h in Headers */ = {isa = PBXBuildFile; fileRef = B6CDC0642CECFC85008A91FE /* WKSeparatedImageView.h */; };
 		B6D031052AC1F241006C8E0B /* WebExtensionDynamicScripts.h in Headers */ = {isa = PBXBuildFile; fileRef = B6D031032AC1F240006C8E0B /* WebExtensionDynamicScripts.h */; };
 		B6D0310A2AC1F631006C8E0B /* WebExtensionScriptInjectionParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = B6D031082AC1F631006C8E0B /* WebExtensionScriptInjectionParameters.h */; };
@@ -7621,20 +7615,10 @@
 		B6746A9C2AA8CC79002B244A /* WebExtensionAPIScripting.idl */ = {isa = PBXFileReference; lastKnownFileType = text; path = WebExtensionAPIScripting.idl; sourceTree = "<group>"; };
 		B67DA51A2BBC89D10056A855 /* WebExtensionDataRecordCocoa.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WebExtensionDataRecordCocoa.mm; sourceTree = "<group>"; };
 		B69E1A672AFF5F0B000FB98E /* WebExtensionRegisteredScriptParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebExtensionRegisteredScriptParameters.h; sourceTree = "<group>"; };
-		B6A292332B18FCF20061930E /* _WKWebExtensionSQLiteStore.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = _WKWebExtensionSQLiteStore.mm; sourceTree = "<group>"; };
-		B6A292342B18FCF20061930E /* _WKWebExtensionSQLiteStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WKWebExtensionSQLiteStore.h; sourceTree = "<group>"; };
-		B6A2923B2B193ED40061930E /* _WKWebExtensionSQLiteDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WKWebExtensionSQLiteDatabase.h; sourceTree = "<group>"; };
-		B6A2923C2B193ED50061930E /* _WKWebExtensionSQLiteDatabase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = _WKWebExtensionSQLiteDatabase.mm; sourceTree = "<group>"; };
 		B6B156582B5E1779004F9894 /* WebExtensionDataType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebExtensionDataType.h; sourceTree = "<group>"; };
 		B6B156592B5E1779004F9894 /* WebExtensionStorage.serialization.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = WebExtensionStorage.serialization.in; sourceTree = "<group>"; };
 		B6B1565A2B5E177A004F9894 /* WebExtensionStorageAccessLevel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebExtensionStorageAccessLevel.h; sourceTree = "<group>"; };
 		B6B1565B2B5E177A004F9894 /* WebExtensionContextParameters.serialization.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = WebExtensionContextParameters.serialization.in; sourceTree = "<group>"; };
-		B6BF18332B1A49EE00FA39D3 /* _WKWebExtensionSQLiteStatement.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = _WKWebExtensionSQLiteStatement.mm; sourceTree = "<group>"; };
-		B6BF18342B1A49EE00FA39D3 /* _WKWebExtensionSQLiteStatement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WKWebExtensionSQLiteStatement.h; sourceTree = "<group>"; };
-		B6BF18372B1A510500FA39D3 /* _WKWebExtensionSQLiteRow.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = _WKWebExtensionSQLiteRow.mm; sourceTree = "<group>"; };
-		B6BF18382B1A510500FA39D3 /* _WKWebExtensionSQLiteRow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WKWebExtensionSQLiteRow.h; sourceTree = "<group>"; };
-		B6BF183F2B1A8C3600FA39D3 /* _WKWebExtensionSQLiteHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WKWebExtensionSQLiteHelpers.h; sourceTree = "<group>"; };
-		B6BF18412B1A8F8A00FA39D3 /* _WKWebExtensionSQLiteDatatypeTraits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WKWebExtensionSQLiteDatatypeTraits.h; sourceTree = "<group>"; };
 		B6CCAAB629A445E90092E846 /* JSWebExtensionAPILocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSWebExtensionAPILocalization.h; sourceTree = "<group>"; };
 		B6CCAAB729A445E90092E846 /* JSWebExtensionAPILocalization.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = JSWebExtensionAPILocalization.mm; sourceTree = "<group>"; };
 		B6CDC0622CECED85008A91FE /* WKSeparatedImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WKSeparatedImageView.swift; path = "$(BUILT_PRODUCTS_DIR)/DerivedSources/WebKit/WKSeparatedImageView.swift"; sourceTree = "<group>"; };
@@ -14792,16 +14776,6 @@
 			isa = PBXGroup;
 			children = (
 				1CA584002CF14036002C6DAD /* Cocoa */,
-				B6A2923B2B193ED40061930E /* _WKWebExtensionSQLiteDatabase.h */,
-				B6A2923C2B193ED50061930E /* _WKWebExtensionSQLiteDatabase.mm */,
-				B6BF18412B1A8F8A00FA39D3 /* _WKWebExtensionSQLiteDatatypeTraits.h */,
-				B6BF183F2B1A8C3600FA39D3 /* _WKWebExtensionSQLiteHelpers.h */,
-				B6BF18382B1A510500FA39D3 /* _WKWebExtensionSQLiteRow.h */,
-				B6BF18372B1A510500FA39D3 /* _WKWebExtensionSQLiteRow.mm */,
-				B6BF18342B1A49EE00FA39D3 /* _WKWebExtensionSQLiteStatement.h */,
-				B6BF18332B1A49EE00FA39D3 /* _WKWebExtensionSQLiteStatement.mm */,
-				B6A292342B18FCF20061930E /* _WKWebExtensionSQLiteStore.h */,
-				B6A292332B18FCF20061930E /* _WKWebExtensionSQLiteStore.mm */,
 				020A179F2C99FCF90012CFA5 /* WebExtensionActionClickBehavior.h */,
 				020A17A12C99FD9B0012CFA5 /* WebExtensionActionClickBehavior.serialization.in */,
 				1C2B4D412A817D6B00C528A1 /* WebExtensionAlarmParameters.h */,
@@ -17402,12 +17376,6 @@
 				1CC5CA782C5ACB8500DF3B94 /* _WKWebExtensionPrivate.h in Headers */,
 				028D30882C63DEE1004F4FC6 /* _WKWebExtensionSidebar.h in Headers */,
 				028D308E2C63E764004F4FC6 /* _WKWebExtensionSidebarInternal.h in Headers */,
-				B6A2923D2B193ED50061930E /* _WKWebExtensionSQLiteDatabase.h in Headers */,
-				B6BF18422B1A8F8B00FA39D3 /* _WKWebExtensionSQLiteDatatypeTraits.h in Headers */,
-				B6BF18402B1A8C3600FA39D3 /* _WKWebExtensionSQLiteHelpers.h in Headers */,
-				B6BF183A2B1A510500FA39D3 /* _WKWebExtensionSQLiteRow.h in Headers */,
-				B6BF18362B1A49EF00FA39D3 /* _WKWebExtensionSQLiteStatement.h in Headers */,
-				B6A292362B18FCF30061930E /* _WKWebExtensionSQLiteStore.h in Headers */,
 				1CC5CA6F2C5ACB8500DF3B94 /* _WKWebExtensionTab.h in Headers */,
 				1CC5CA7C2C5ACB8500DF3B94 /* _WKWebExtensionTabCreationOptions.h in Headers */,
 				337822442947F679002106BB /* _WKWebExtensionWebNavigationURLFilter.h in Headers */,
@@ -21239,10 +21207,6 @@
 				3326F2652B06A1F4001A535F /* _WKWebExtensionDeclarativeNetRequestRule.mm in Sources */,
 				3326F2682B06A1F4001A535F /* _WKWebExtensionDeclarativeNetRequestTranslator.mm in Sources */,
 				028D308A2C63E14B004F4FC6 /* _WKWebExtensionSidebar.mm in Sources */,
-				B6A2923E2B193ED50061930E /* _WKWebExtensionSQLiteDatabase.mm in Sources */,
-				B6BF18392B1A510500FA39D3 /* _WKWebExtensionSQLiteRow.mm in Sources */,
-				B6BF18352B1A49EF00FA39D3 /* _WKWebExtensionSQLiteStatement.mm in Sources */,
-				B6A292352B18FCF30061930E /* _WKWebExtensionSQLiteStore.mm in Sources */,
 				337822432947F679002106BB /* _WKWebExtensionWebNavigationURLFilter.mm in Sources */,
 				3370420A2B58A8390077FF78 /* _WKWebExtensionWebRequestFilter.mm in Sources */,
 				07E4BDC82A3A7089000D5509 /* _WKWebViewTextInputNotifications.mm in Sources */,
