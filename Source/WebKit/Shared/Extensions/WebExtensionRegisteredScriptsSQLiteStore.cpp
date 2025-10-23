@@ -28,6 +28,7 @@
 
 #include "Logging.h"
 #include "WebExtensionSQLiteHelpers.h"
+#include <wtf/CrossThreadCopier.h>
 #include <wtf/JSONValues.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/text/MakeString.h>
