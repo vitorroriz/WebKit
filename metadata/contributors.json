@@ -6113,6 +6113,14 @@
    },
    {
       "emails" : [
+         "michaeldo@chromium.org",
+         "michaeldo@google.com"
+      ],
+      "github" : "michaeldo1",
+      "name" : "Mike Dougherty"
+   },
+   {
+      "emails" : [
          "mifenton@blackberry.com",
          "mifenton@rim.com",
          "mike.fenton@torchmobile.com"
