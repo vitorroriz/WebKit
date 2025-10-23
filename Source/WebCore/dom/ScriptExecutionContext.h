@@ -238,7 +238,8 @@ public:
     WEBCORE_EXPORT void ref();
     WEBCORE_EXPORT void deref();
 
-    WEBCORE_EXPORT bool requiresScriptTrackingPrivacyProtection(ScriptTrackingPrivacyCategory);
+    enum class IncludeConsoleLog : bool { No, Yes };
+    WEBCORE_EXPORT bool requiresScriptTrackingPrivacyProtection(ScriptTrackingPrivacyCategory, IncludeConsoleLog = IncludeConsoleLog::Yes);
 
     class Task {
         WTF_MAKE_TZONE_ALLOCATED(Task);

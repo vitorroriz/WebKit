@@ -155,6 +155,7 @@ void HTMLTextFormControlElement::didEditInnerTextValue(bool wasUserEdit)
     LOG(Editing, "HTMLTextFormControlElement %p didEditInnerTextValue", this);
 
     m_lastChangeWasUserEdit = wasUserEdit;
+    m_wasEverChangedByUserEdit |= wasUserEdit;
     subtreeHasChanged();
 }
 
@@ -652,6 +653,13 @@ bool HTMLTextFormControlElement::lastChangeWasUserEdit() const
     return m_lastChangeWasUserEdit;
 }
 
+bool HTMLTextFormControlElement::wasEverChangedByUserEdit() const
+{
+    if (!isTextField())
+        return false;
+    return m_wasEverChangedByUserEdit;
+}
+
 static void stripTrailingNewline(StringBuilder& result)
 {
     // Remove one trailing newline; there's always one that's collapsed out by rendering.
@@ -945,6 +953,12 @@ void HTMLTextFormControlElement::adjustInnerTextStyle(const RenderStyle& parentS
         textBlockStyle.setDirection(TextDirection::LTR);
     }
 #endif
+}
+
+bool HTMLTextFormControlElement::shouldApplyScriptTrackingPrivacyProtection() const
+{
+    return (wasEverChangedByUserEdit() || !wasCreatedByTaintedScript())
+        && protectedDocument()->requiresScriptTrackingPrivacyProtection(ScriptTrackingPrivacyCategory::FormControls);
 }
 
 } // namespace WebCore
