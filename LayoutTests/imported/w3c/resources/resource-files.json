@@ -11500,6 +11500,7 @@
         "web-platform-tests/html/rendering/widgets/button-layout/scrollable-button-centering-ref.html",
         "web-platform-tests/html/rendering/widgets/field-sizing-input-number-relayout-ref.html",
         "web-platform-tests/html/rendering/widgets/field-sizing-input-text-relayout-ref.html",
+        "web-platform-tests/html/rendering/widgets/field-sizing-placeholder-stretch-ref.html",
         "web-platform-tests/html/rendering/widgets/field-sizing-textarea-relayout-ref.html",
         "web-platform-tests/html/rendering/widgets/input-checkbox-disabled-checked-notref.html",
         "web-platform-tests/html/rendering/widgets/input-checkbox-switch-indeterminate-ref.html",
