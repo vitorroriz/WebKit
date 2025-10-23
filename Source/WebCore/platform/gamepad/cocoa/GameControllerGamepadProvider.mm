@@ -148,8 +148,8 @@ void GameControllerGamepadProvider::controllerDidConnect(GCController *controlle
 
     makeInvisibleGamepadsVisible();
 
-    for (auto& client : m_clients)
-        client.platformGamepadConnected(*m_gamepadVector[index], EventMakesGamepadsVisible::Yes);
+    for (Ref client : m_clients)
+        client->platformGamepadConnected(*m_gamepadVector[index], EventMakesGamepadsVisible::Yes);
 }
 
 void GameControllerGamepadProvider::controllerDidDisconnect(GCController *controller)
@@ -172,8 +172,8 @@ void GameControllerGamepadProvider::controllerDidDisconnect(GCController *contro
 
     m_invisibleGamepads.remove(*removedGamepad.get());
 
-    for (auto& client : m_clients)
-        client.platformGamepadDisconnected(*removedGamepad);
+    for (Ref client : m_clients)
+        client->platformGamepadDisconnected(*removedGamepad);
 }
 
 void GameControllerGamepadProvider::prewarmGameControllerDevicesIfNecessary()
@@ -277,8 +277,8 @@ void GameControllerGamepadProvider::gamepadHadInput(GameControllerGamepad&, bool
 void GameControllerGamepadProvider::makeInvisibleGamepadsVisible()
 {
     for (auto& gamepad : m_invisibleGamepads) {
-        for (auto& client : m_clients)
-            client.platformGamepadConnected(gamepad, EventMakesGamepadsVisible::Yes);
+        for (Ref client : m_clients)
+            client->platformGamepadConnected(gamepad, EventMakesGamepadsVisible::Yes);
     }
 
     m_invisibleGamepads.clear();
