@@ -336,6 +336,10 @@ void LargestContentfulPaintData::didLoadImage(Element& element, CachedImage* ima
     if (!image)
         return;
 
+    // `loadTime` isn't interesting for a data URI, so let's avoid the overhead of tracking it.
+    if (image->url().protocolIsData())
+        return;
+
     auto& lcpData = element.ensureLargestContentfulPaintData();
     auto findIndex = lcpData.imageData.findIf([&](auto& value) {
         return image == value.image;
