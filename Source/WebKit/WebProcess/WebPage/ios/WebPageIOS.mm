@@ -771,11 +771,6 @@ WebCore::IntPoint WebPage::accessibilityRemoteFrameOffset()
     return [m_mockAccessibilityElement accessibilityRemoteFrameOffset];
 }
 
-WKAccessibilityWebPageObject* WebPage::accessibilityRemoteObject()
-{
-    return m_mockAccessibilityElement.get();
-}
-
 bool WebPage::platformCanHandleRequest(const WebCore::ResourceRequest& request)
 {
     NSURLRequest *nsRequest = request.nsURLRequest(HTTPBodyUpdatePolicy::DoNotUpdateHTTPBody);

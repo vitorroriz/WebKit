@@ -1466,6 +1466,16 @@ bool WebPage::shouldFallbackToWebContentAXObjectForMainFramePlugin() const
 #endif
 }
 
+WKAccessibilityWebPageObject* WebPage::accessibilityRemoteObject()
+{
+    return m_mockAccessibilityElement.get();
+}
+
+RetainPtr<WKAccessibilityWebPageObject> WebPage::protectedAccessibilityRemoteObject()
+{
+    return accessibilityRemoteObject();
+}
+
 } // namespace WebKit
 
 #endif // PLATFORM(COCOA)

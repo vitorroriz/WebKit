@@ -496,11 +496,6 @@ void WebPage::getDataSelectionForPasteboard(const String pasteboardType, Complet
     completionHandler(buffer.releaseNonNull());
 }
 
-WKAccessibilityWebPageObject* WebPage::accessibilityRemoteObject()
-{
-    return m_mockAccessibilityElement.get();
-}
-
 WebCore::IntPoint WebPage::accessibilityRemoteFrameOffset()
 {
     return [m_mockAccessibilityElement accessibilityRemoteFrameOffset];

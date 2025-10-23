@@ -41,9 +41,6 @@ WebProcess/WebCoreSupport/mac/WebDragClientMac.mm
 WebProcess/WebPage/Cocoa/TextAnimationController.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeDrawingArea.mm
 WebProcess/WebPage/mac/WKAccessibilityWebPageObjectBase.mm
-WebProcess/cocoa/TextTrackRepresentationCocoa.mm
-WebProcess/cocoa/VideoPresentationManager.mm
-WebProcess/cocoa/WebProcessCocoa.mm
 [ Mac ] WebProcess/Extensions/API/Cocoa/WebExtensionAPIDevToolsInspectedWindowCocoa.mm
 [ Mac ] WebProcess/InjectedBundle/API/c/mac/WKBundlePageBannerMac.mm
 [ Mac ] WebProcess/Inspector/WebInspectorUIExtensionController.cpp
