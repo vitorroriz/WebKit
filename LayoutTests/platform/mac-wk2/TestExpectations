@@ -2397,7 +2397,4 @@ webkit.org/b/299826 [ Release x86_64 ] media/modern-media-controls/media-control
 
 webkit.org/b/300864 imported/w3c/web-platform-tests/css/css-viewport/zoom/filters-drop-shadow.html [ Pass Failure ]
 
-# https://bugs.webkit.org/show_bug.cgi?id=301021 [ macOS Tahoe wk2 Debug x86_64 ] ipc/serialized-type-info.html is a constant text failure
-[ Tahoe Debug x86_64 ] ipc/serialized-type-info.html [ Failure ]
-
 webkit.org/b/301153 [ Debug ] fast/parser/entity-comment-in-textarea.html [ Pass Timeout ]
