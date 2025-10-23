@@ -499,8 +499,8 @@ void WebFullScreenManager::willExitFullScreen(CompletionHandler<void()>&& comple
     setPIPStandbyElement(nullptr);
 #endif
 
-    m_finalFrame = screenRectOfContents(*m_element);
-    if (!m_element->protectedDocument()->fullscreen().willExitFullscreen()) {
+    m_finalFrame = screenRectOfContents(*element);
+    if (!element->protectedDocument()->protectedFullscreen()->willExitFullscreen()) {
         close();
         return completionHandler();
     }
