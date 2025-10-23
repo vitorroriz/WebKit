@@ -448,6 +448,11 @@ inline Ref<CSSValue> ExtractorConverter::convertTextTransform(ExtractorState&, O
     if (textTransform.contains(TextTransform::FullSizeKana))
         list.append(CSSPrimitiveValue::create(CSSValueFullSizeKana));
 
+    if (textTransform.contains(TextTransform::MathAuto)) {
+        ASSERT(list.isEmpty());
+        list.append(CSSPrimitiveValue::create(CSSValueMathAuto));
+    }
+
     if (list.isEmpty())
         return CSSPrimitiveValue::create(CSSValueNone);
     return CSSValueList::createSpaceSeparated(WTFMove(list));

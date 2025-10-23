@@ -620,6 +620,7 @@ enum class TextTransform : uint8_t {
     Lowercase     = 1 << 2,
     FullSizeKana  = 1 << 3,
     FullWidth     = 1 << 4,
+    MathAuto      = 1 << 5,
 };
 constexpr auto maxTextTransformValue = TextTransform::FullWidth;
 

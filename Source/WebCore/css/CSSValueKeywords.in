@@ -601,6 +601,7 @@ uppercase
 lowercase
 full-size-kana
 // full-width
+math-auto
 // none
 //
 // CSS_PROP_VISIBILITY:

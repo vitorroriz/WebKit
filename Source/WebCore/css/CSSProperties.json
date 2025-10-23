@@ -7855,6 +7855,10 @@
                 "lowercase",
                 "full-size-kana",
                 "full-width",
+                {
+                    "value": "math-auto",
+                    "settings-flag": "cssTextTransformMathAutoEnabled"
+                },
                 "none"
             ],
             "codegen-properties": {
@@ -7862,7 +7866,7 @@
                     "-epub-text-transform"
                 ],
                 "style-converter": "TextTransform",
-                "parser-grammar": "none | [ [ capitalize | uppercase | lowercase ] || full-width || full-size-kana ]@(no-single-item-opt)"
+                "parser-grammar": "none | [ [ capitalize | uppercase | lowercase ] || full-width || full-size-kana ]@(no-single-item-opt) | math-auto@(settings-flag=cssTextTransformMathAutoEnabled)"
             },
             "specification": {
                 "category": "css-text",

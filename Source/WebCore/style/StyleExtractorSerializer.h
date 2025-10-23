@@ -456,6 +456,13 @@ inline void ExtractorSerializer::serializeTextTransform(ExtractorState& state, S
     appendOption(TextTransform::FullWidth, CSSValueFullWidth);
     appendOption(TextTransform::FullSizeKana, CSSValueFullSizeKana);
 
+    if (textTransform.contains(TextTransform::MathAuto)) {
+        // math-auto can't be used in combination with other values, the parser already makes sure that is the case.
+        ASSERT(listEmpty);
+        serializationForCSS(builder, context, state.style, CSS::Keyword::MathAuto { });
+        listEmpty = false;
+    }
+
     if (listEmpty)
         serializationForCSS(builder, context, state.style, CSS::Keyword::None { });
 }

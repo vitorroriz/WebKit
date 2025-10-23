@@ -168,6 +168,9 @@ inline OptionSet<TextTransform> BuilderConverter::convertTextTransform(BuilderSt
     if (auto* list = dynamicDowncast<CSSValueList>(value)) {
         for (auto& currentValue : *list)
             result.add(fromCSSValue<TextTransform>(currentValue));
+    } else if (auto* primitiveValue = dynamicDowncast<CSSPrimitiveValue>(value)) {
+        if (primitiveValue->valueID() == CSSValueMathAuto)
+            result.add(TextTransform::MathAuto);
     }
     return result;
 }

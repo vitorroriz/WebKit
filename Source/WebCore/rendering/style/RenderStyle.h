@@ -429,7 +429,7 @@ using WebkitBoxOrdinalGroup = Integer<CSS::Positive>;
 
 constexpr auto PublicPseudoIDBits = 17;
 constexpr auto TextDecorationLineBits = 5;
-constexpr auto TextTransformBits = 5;
+constexpr auto TextTransformBits = 6;
 constexpr auto PseudoElementTypeBits = 5;
 
 DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(PseudoStyleCache);

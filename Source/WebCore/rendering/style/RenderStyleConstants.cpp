@@ -1302,6 +1302,7 @@ TextStream& operator<<(TextStream& ts, TextTransform textTransform)
     case TextTransform::Lowercase: ts << "lowercase"_s; break;
     case TextTransform::FullSizeKana: ts << "full-size-kana"_s; break;
     case TextTransform::FullWidth: ts << "full-width"_s; break;
+    case TextTransform::MathAuto: ts << "math-auto"_s; break;
     }
     return ts;
 }

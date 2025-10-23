@@ -1483,6 +1483,21 @@ CSSTextSpacingTrimEnabled:
     WebCore:
       default: false
 
+CSSTextTransformMathAutoEnabled:
+  type: bool
+  status: testable
+  category: css
+  humanReadableName: "CSS text-transform: math-auto"
+  humanReadableDescription: "Enable the math-auto text transform."
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      "PLATFORM(GTK) || PLATFORM(WPE)": true
+      default: false
+    WebCore:
+      default: false
+
 CSSTextUnderlinePositionLeftRightEnabled:
   type: bool
   status: stable
