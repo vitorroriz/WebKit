@@ -165,6 +165,8 @@ public:
 
     WEBCORE_EXPORT static void useFastMalloc();
 
+    WEBCORE_EXPORT static void setIsDatabaseOpeningForbidden(bool);
+
     WEBCORE_EXPORT void releaseMemory();
 
     void incrementStatementCount();
