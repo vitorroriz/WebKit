@@ -60,9 +60,14 @@ public:
     static ASCIILiteral supplementName() { return WindowOrWorkerGlobalScopeTrustedTypes::workerGlobalSupplementName(); }
 
 private:
+    bool isWorkerGlobalScopeTrustedTypes() const final { return true; }
+
     WeakPtr<WorkerGlobalScope, WeakPtrImplWithEventTargetData> m_scope;
     mutable RefPtr<TrustedTypePolicyFactory> m_trustedTypes;
 };
 
-
 } // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::WorkerGlobalScopeTrustedTypes)
+    static bool isType(const WebCore::SupplementBase& supplement) { return supplement.isWorkerGlobalScopeTrustedTypes(); }
+SPECIALIZE_TYPE_TRAITS_END()
