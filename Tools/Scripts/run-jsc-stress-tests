@@ -630,9 +630,20 @@ $isFTLPlatform = !($architecture == "x86" || $architecture == "arm" || $architec
 $isWasmPlatform = (not $cloop) && $jitTests && ($isFTLPlatform || $architecture == "arm" || ($hostOS == "windows" && $architecture == "x86_64"))
 $isOMGPlatform = $isFTLPlatform
 $isSIMDPlatform = $isWasmPlatform && ($architecture == "arm64" || $architecture == "x86_64")
+# This should match the JSC build flag. This configuration is for local development of the 32-bit port on 64-bit platforms only.
+$useCompressedHeap = false
 
 $skipLockdown = false
 $skipMiniMode = false
+
+if $useCompressedHeap
+    $jitTests = false
+    $isFTLPlatform = false
+    $isWasmPlatform = false
+    $skipLockdown = true
+    $skipMiniMode = true
+    $memoryLimited = true
+end
 
 if $platform == "watchos"
     $jitTests = false
