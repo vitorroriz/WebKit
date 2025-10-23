@@ -8199,15 +8199,6 @@ void WebPage::didGetLoadDecisionForIcon(bool decision, CallbackID loadIdentifier
     });
 }
 
-void WebPage::setUseIconLoadingClient(bool useIconLoadingClient)
-{
-    RefPtr localMainFrame = dynamicDowncast<WebCore::LocalFrame>(corePage()->mainFrame());
-    if (!localMainFrame)
-        return;
-    if (auto* client = dynamicDowncast<WebLocalFrameLoaderClient>(localMainFrame->loader().client()))
-        client->setUseIconLoadingClient(useIconLoadingClient);
-}
-
 WebURLSchemeHandlerProxy* WebPage::urlSchemeHandlerForScheme(StringView scheme)
 {
     return m_schemeToURLSchemeHandlerProxyMap.get<StringViewHashTranslator>(scheme);
