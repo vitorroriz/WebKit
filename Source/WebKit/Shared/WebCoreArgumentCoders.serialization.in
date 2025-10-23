@@ -8986,7 +8986,7 @@ struct WebCore::MessageForTesting {
 struct WebCore::HostingContext {
     uint32_t contextID;
 #if ENABLE(MACH_PORT_LAYER_HOSTING)
-    WTF::MachSendRightAnnotated sendRightAnnotated;
+    MachSendRightAnnotated sendRightAnnotated;
 #endif
 }
 
