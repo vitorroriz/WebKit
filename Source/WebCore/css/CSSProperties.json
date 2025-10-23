@@ -1569,7 +1569,7 @@
             "codegen-properties": {
                 "cascade-alias": "ruby-position",
                 "skip-style-builder": true,
-                "style-extractor-converter": "WebkitRubyPosition",
+                "style-extractor-custom": true,
                 "parser-grammar": "before | after | inter-character@(aliased-to=legacy-inter-character)",
                 "parser-grammar-comment": "Current spec grammar is '[ alternate || [ over | under ] ] | inter-character'."
             },
@@ -10641,7 +10641,7 @@
                 ],
                 "cascade-alias": "text-combine-upright",
                 "skip-style-builder": true,
-                "style-extractor-converter": "WebkitTextCombine",
+                "style-extractor-custom": true,
                 "parser-grammar": "<<values>>"
             },
             "status": {

@@ -69,7 +69,6 @@ public:
     // MARK: Shared serializations
 
     static void serializeMarginTrim(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<MarginTrimType>);
-    static void serializeWebkitTextCombine(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, TextCombine);
     static void serializeImageOrientation(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, ImageOrientation);
     static void serializeContain(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<Containment>);
     static void serializeSmoothScrolling(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, bool);
@@ -78,17 +77,12 @@ public:
     static void serializeWillChange(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const WillChangeData*);
     static void serializeTabSize(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const TabSize&);
     static void serializeLineBoxContain(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<Style::LineBoxContain>);
-    static void serializeWebkitRubyPosition(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, RubyPosition);
     static void serializeTouchAction(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TouchAction>);
     static void serializeTextTransform(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TextTransform>);
     static void serializeTextUnderlinePosition(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TextUnderlinePosition>);
     static void serializeTextEmphasisPosition(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TextEmphasisPosition>);
     static void serializeSpeakAs(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<SpeakAs>);
     static void serializeHangingPunctuation(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<HangingPunctuation>);
-    static void serializePageBreak(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, BreakBetween);
-    static void serializePageBreak(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, BreakInside);
-    static void serializeWebkitColumnBreak(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, BreakBetween);
-    static void serializeWebkitColumnBreak(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, BreakInside);
     static void serializeSelfOrDefaultAlignmentData(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const StyleSelfAlignmentData&);
     static void serializeContentAlignmentData(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const StyleContentAlignmentData&);
     static void serializePaintOrder(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, PaintOrder);
@@ -253,15 +247,6 @@ inline void ExtractorSerializer::serializeMarginTrim(ExtractorState& state, Stri
 }
 
 
-inline void ExtractorSerializer::serializeWebkitTextCombine(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, TextCombine textCombine)
-{
-    if (textCombine == TextCombine::All) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Horizontal { });
-        return;
-    }
-    serialize(state, builder, context, textCombine);
-}
-
 inline void ExtractorSerializer::serializeImageOrientation(ExtractorState&, StringBuilder& builder, const CSS::SerializationContext&, ImageOrientation imageOrientation)
 {
     builder.append(nameLiteralForSerialization(imageOrientation == ImageOrientation::Orientation::FromImage ? CSSValueFromImage : CSSValueNone));
@@ -413,24 +398,6 @@ inline void ExtractorSerializer::serializeLineBoxContain(ExtractorState& state, 
     appendOption(LineBoxContain::InitialLetter, CSSValueInitialLetter);
 }
 
-inline void ExtractorSerializer::serializeWebkitRubyPosition(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, RubyPosition position)
-{
-    switch (position) {
-    case RubyPosition::Over:
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Before { });
-        return;
-    case RubyPosition::Under:
-        serializationForCSS(builder, context, state.style, CSS::Keyword::After { });
-        return;
-    case RubyPosition::InterCharacter:
-    case RubyPosition::LegacyInterCharacter:
-        serializationForCSS(builder, context, state.style, CSS::Keyword::InterCharacter { });
-        return;
-    }
-
-    RELEASE_ASSERT_NOT_REACHED();
-}
-
 inline void ExtractorSerializer::serializeTouchAction(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<TouchAction> touchActions)
 {
     if (touchActions & TouchAction::Auto) {
@@ -580,51 +547,6 @@ inline void ExtractorSerializer::serializeHangingPunctuation(ExtractorState& sta
 
     if (listEmpty)
         serializationForCSS(builder, context, state.style, CSS::Keyword::None { });
-}
-
-inline void ExtractorSerializer::serializePageBreak(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, BreakBetween value)
-{
-    if (value == BreakBetween::Page || value == BreakBetween::LeftPage || value == BreakBetween::RightPage
-        || value == BreakBetween::RectoPage || value == BreakBetween::VersoPage) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Always { }); // CSS 2.1 allows us to map these to always.
-        return;
-    }
-    if (value == BreakBetween::Avoid || value == BreakBetween::AvoidPage) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Avoid { });
-        return;
-    }
-    serializationForCSS(builder, context, state.style, CSS::Keyword::Auto { });
-}
-
-inline void ExtractorSerializer::serializePageBreak(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, BreakInside value)
-{
-    if (value == BreakInside::Avoid || value == BreakInside::AvoidPage) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Avoid { });
-        return;
-    }
-    serializationForCSS(builder, context, state.style, CSS::Keyword::Auto { });
-}
-
-inline void ExtractorSerializer::serializeWebkitColumnBreak(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, BreakBetween value)
-{
-    if (value == BreakBetween::Column) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Always { });
-        return;
-    }
-    if (value == BreakBetween::Avoid || value == BreakBetween::AvoidColumn) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Avoid { });
-        return;
-    }
-    serializationForCSS(builder, context, state.style, CSS::Keyword::Auto { });
-}
-
-inline void ExtractorSerializer::serializeWebkitColumnBreak(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, BreakInside value)
-{
-    if (value == BreakInside::Avoid || value == BreakInside::AvoidColumn) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Avoid { });
-        return;
-    }
-    serializationForCSS(builder, context, state.style, CSS::Keyword::Auto { });
 }
 
 inline void ExtractorSerializer::serializeSelfOrDefaultAlignmentData(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const StyleSelfAlignmentData& data)

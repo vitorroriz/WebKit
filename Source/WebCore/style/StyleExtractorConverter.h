@@ -135,24 +135,18 @@ public:
     // MARK: Shared conversions
 
     static Ref<CSSValue> convertMarginTrim(ExtractorState&, OptionSet<MarginTrimType>);
-    static Ref<CSSValue> convertWebkitTextCombine(ExtractorState&, TextCombine);
     static Ref<CSSValue> convertImageOrientation(ExtractorState&, ImageOrientation);
     static Ref<CSSValue> convertContain(ExtractorState&, OptionSet<Containment>);
     static Ref<CSSValue> convertTextAutospace(ExtractorState&, TextAutospace);
     static Ref<CSSValue> convertPositionTryFallbacks(ExtractorState&, const FixedVector<PositionTryFallback>&);
     static Ref<CSSValue> convertWillChange(ExtractorState&, const WillChangeData*);
     static Ref<CSSValue> convertLineBoxContain(ExtractorState&, OptionSet<Style::LineBoxContain>);
-    static Ref<CSSValue> convertWebkitRubyPosition(ExtractorState&, RubyPosition);
     static Ref<CSSValue> convertTouchAction(ExtractorState&, OptionSet<TouchAction>);
     static Ref<CSSValue> convertTextTransform(ExtractorState&, OptionSet<TextTransform>);
     static Ref<CSSValue> convertTextUnderlinePosition(ExtractorState&, OptionSet<TextUnderlinePosition>);
     static Ref<CSSValue> convertTextEmphasisPosition(ExtractorState&, OptionSet<TextEmphasisPosition>);
     static Ref<CSSValue> convertSpeakAs(ExtractorState&, OptionSet<SpeakAs>);
     static Ref<CSSValue> convertHangingPunctuation(ExtractorState&, OptionSet<HangingPunctuation>);
-    static Ref<CSSValue> convertPageBreak(ExtractorState&, BreakBetween);
-    static Ref<CSSValue> convertPageBreak(ExtractorState&, BreakInside);
-    static Ref<CSSValue> convertWebkitColumnBreak(ExtractorState&, BreakBetween);
-    static Ref<CSSValue> convertWebkitColumnBreak(ExtractorState&, BreakInside);
     static Ref<CSSValue> convertSelfOrDefaultAlignmentData(ExtractorState&, const StyleSelfAlignmentData&);
     static Ref<CSSValue> convertContentAlignmentData(ExtractorState&, const StyleContentAlignmentData&);
     static Ref<CSSValue> convertPaintOrder(ExtractorState&, PaintOrder);
@@ -295,13 +289,6 @@ inline Ref<CSSValue> ExtractorConverter::convertMarginTrim(ExtractorState&, Opti
     return CSSValueList::createSpaceSeparated(WTFMove(list));
 }
 
-inline Ref<CSSValue> ExtractorConverter::convertWebkitTextCombine(ExtractorState& state, TextCombine textCombine)
-{
-    if (textCombine == TextCombine::All)
-        return CSSPrimitiveValue::create(CSSValueHorizontal);
-    return convert(state, textCombine);
-}
-
 inline Ref<CSSValue> ExtractorConverter::convertImageOrientation(ExtractorState&, ImageOrientation imageOrientation)
 {
     if (imageOrientation == ImageOrientation::Orientation::FromImage)
@@ -424,22 +411,6 @@ inline Ref<CSSValue> ExtractorConverter::convertLineBoxContain(ExtractorState&, 
     return CSSValueList::createSpaceSeparated(WTFMove(list));
 }
 
-inline Ref<CSSValue> ExtractorConverter::convertWebkitRubyPosition(ExtractorState&, RubyPosition position)
-{
-    return CSSPrimitiveValue::create([&] {
-        switch (position) {
-        case RubyPosition::Over:
-            return CSSValueBefore;
-        case RubyPosition::Under:
-            return CSSValueAfter;
-        case RubyPosition::InterCharacter:
-        case RubyPosition::LegacyInterCharacter:
-            return CSSValueInterCharacter;
-        }
-        return CSSValueBefore;
-    }());
-}
-
 inline Ref<CSSValue> ExtractorConverter::convertTouchAction(ExtractorState&, OptionSet<TouchAction> touchActions)
 {
     if (touchActions & TouchAction::Auto)
@@ -549,39 +520,6 @@ inline Ref<CSSValue> ExtractorConverter::convertHangingPunctuation(ExtractorStat
     if (list.isEmpty())
         return CSSPrimitiveValue::create(CSSValueNone);
     return CSSValueList::createSpaceSeparated(WTFMove(list));
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertPageBreak(ExtractorState&, BreakBetween value)
-{
-    if (value == BreakBetween::Page || value == BreakBetween::LeftPage || value == BreakBetween::RightPage
-        || value == BreakBetween::RectoPage || value == BreakBetween::VersoPage)
-        return CSSPrimitiveValue::create(CSSValueAlways); // CSS 2.1 allows us to map these to always.
-    if (value == BreakBetween::Avoid || value == BreakBetween::AvoidPage)
-        return CSSPrimitiveValue::create(CSSValueAvoid);
-    return CSSPrimitiveValue::create(CSSValueAuto);
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertPageBreak(ExtractorState&, BreakInside value)
-{
-    if (value == BreakInside::Avoid || value == BreakInside::AvoidPage)
-        return CSSPrimitiveValue::create(CSSValueAvoid);
-    return CSSPrimitiveValue::create(CSSValueAuto);
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertWebkitColumnBreak(ExtractorState&, BreakBetween value)
-{
-    if (value == BreakBetween::Column)
-        return CSSPrimitiveValue::create(CSSValueAlways);
-    if (value == BreakBetween::Avoid || value == BreakBetween::AvoidColumn)
-        return CSSPrimitiveValue::create(CSSValueAvoid);
-    return CSSPrimitiveValue::create(CSSValueAuto);
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertWebkitColumnBreak(ExtractorState&, BreakInside value)
-{
-    if (value == BreakInside::Avoid || value == BreakInside::AvoidColumn)
-        return CSSPrimitiveValue::create(CSSValueAvoid);
-    return CSSPrimitiveValue::create(CSSValueAuto);
 }
 
 inline Ref<CSSValue> ExtractorConverter::convertSelfOrDefaultAlignmentData(ExtractorState& state, const StyleSelfAlignmentData& data)
