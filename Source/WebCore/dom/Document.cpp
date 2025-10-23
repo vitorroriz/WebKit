@@ -9869,6 +9869,11 @@ Document& Document::ensureTemplateDocument()
     return *m_templateDocument;
 }
 
+Ref<Document> Document::ensureProtectedTemplateDocument()
+{
+    return ensureTemplateDocument();
+}
+
 Ref<DocumentFragment> Document::documentFragmentForInnerOuterHTML()
 {
     if (!m_documentFragmentForInnerOuterHTML) [[unlikely]]

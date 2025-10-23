@@ -261,10 +261,7 @@ html/HTMLTablePartElement.cpp
 html/HTMLTableRowElement.cpp
 html/HTMLTableRowsCollection.cpp
 html/HTMLTableSectionElement.cpp
-html/HTMLTemplateElement.cpp
-html/HTMLTextAreaElement.cpp
 html/HTMLTextFormControlElement.cpp
-html/HTMLTitleElement.cpp
 html/HTMLVideoElement.cpp
 html/ImageBitmap.cpp
 html/ImageDocument.cpp
