@@ -145,4 +145,9 @@ NSString * const NSInspectorBarTextAlignmentItemIdentifier = @"NSInspectorBarTex
 + (instancetype)sharedFontOptions;
 @end
 
+@interface NSFontPanel (IPI)
+@property (nonatomic, readonly) NSString *_selectedFaceName;
+- (void)_chooseFace:(id)sender;
+@end
+
 #endif // PLATFORM(MAC)

@@ -28,6 +28,7 @@
 #if PLATFORM(MAC)
 
 #import "AppKitSPI.h"
+#import "InstanceMethodSwizzler.h"
 #import "NSFontPanelTesting.h"
 #import "PlatformUtilities.h"
 #import "Test.h"
@@ -188,10 +189,25 @@ TEST(FontManagerTests, ChangeFontSizeWithMenuItems)
     EXPECT_WK_STREQ(@"14px", [webView stylePropertyAtSelectionEnd:@"font-size"]);
 }
 
+static NeverDestroyed<RetainPtr<NSString>> gOverrideSelectedFaceName;
+static NSString *overrideSelectedFaceName(id, SEL)
+{
+    return gOverrideSelectedFaceName->get();
+}
+
+static void setOverrideSelectedFaceName(NSFontPanel *panel, NSString *name)
+{
+    gOverrideSelectedFaceName.get() = name;
+
+    if ([panel respondsToSelector:@selector(_chooseFace:)])
+        [panel _chooseFace:nil];
+}
+
 TEST(FontManagerTests, ChangeFontWithPanel)
 {
     NSFontManager *fontManager = NSFontManager.sharedFontManager;
     auto webView = webViewForFontManagerTesting(fontManager);
+    InstanceMethodSwizzler swizzler { NSFontPanel.class, @selector(_selectedFaceName), reinterpret_cast<IMP>(overrideSelectedFaceName) };
 
     NSFontPanel *fontPanel = [fontManager fontPanel:YES];
     [fontPanel setIsVisible:YES];
@@ -222,6 +238,7 @@ TEST(FontManagerTests, ChangeFontWithPanel)
     NSFont *smallBoldTimesFont = [fontManager fontWithFamily:@"Times New Roman" traits:NSBoldFontMask weight:NSFontWeightBold size:10];
     [fontPanel setPanelFont:smallBoldTimesFont isMultiple:NO];
     [webView selectNextWord];
+    setOverrideSelectedFaceName(fontPanel, @"Bold");
     [fontManager modifyFontViaPanel:fontPanel];
     EXPECT_WK_STREQ("bar", [webView selectedText]);
     EXPECT_WK_STREQ("<span id=\"bar\"><font face=\"Times New Roman\" size=\"1\"><b>bar</b></font></span>", [webView stringByEvaluatingJavaScript:@"bar.outerHTML"]);
@@ -233,6 +250,7 @@ TEST(FontManagerTests, ChangeFontWithPanel)
     NSFont *boldItalicArialFont = [fontManager fontWithFamily:@"Arial" traits:NSBoldFontMask | NSItalicFontMask weight:NSFontWeightBold size:14];
     [fontPanel setPanelFont:boldItalicArialFont isMultiple:NO];
     [webView selectNextWord];
+    setOverrideSelectedFaceName(fontPanel, @"Bold Italic");
     [fontManager modifyFontViaPanel:fontPanel];
     EXPECT_WK_STREQ("baz", [webView selectedText]);
     EXPECT_WK_STREQ("<span id=\"baz\" style=\"font-size: 14px;\"><font face=\"Arial\"><b><i>baz</i></b></font></span>", [webView stringByEvaluatingJavaScript:@"baz.outerHTML"]);
@@ -245,6 +263,7 @@ TEST(FontManagerTests, ChangeFontWithPanel)
     NSFont *largeItalicLightAvenirFont = [fontManager fontWithFamily:@"Avenir" traits:NSItalicFontMask weight:NSFontWeightLight size:24];
     [fontPanel setPanelFont:largeItalicLightAvenirFont isMultiple:NO];
     [webView selectAll:nil];
+    setOverrideSelectedFaceName(fontPanel, @"Light Oblique");
     [fontManager modifyFontViaPanel:fontPanel];
     EXPECT_WK_STREQ("foo bar baz", [webView selectedText]);
     EXPECT_WK_STREQ("<font face=\"Avenir-LightOblique\" size=\"5\"><i><span id=\"foo\"><font>foo</font></span> <span id=\"bar\">bar</span> <span id=\"baz\"><font>baz</font></span></i></font>", [webView stringByEvaluatingJavaScript:@"document.body.innerHTML"]);
