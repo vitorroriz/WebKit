@@ -852,10 +852,10 @@ void RemoteLayerTreeDrawingAreaProxy::updateTimelineRegistration(WebCore::Proces
         page->checkedScrollingCoordinatorProxy()->updateTimelineRegistration(processIdentifier, timelineRepresentations, now);
 }
 
-const RemoteAnimationTimeline* RemoteLayerTreeDrawingAreaProxy::timeline(WebCore::ProcessIdentifier processIdentifier, const WebCore::TimelineIdentifier& timelineIdentifier) const
+const RemoteAnimationTimeline* RemoteLayerTreeDrawingAreaProxy::timeline(const TimelineID& timelineID) const
 {
     if (RefPtr page = this->page())
-        return page->checkedScrollingCoordinatorProxy()->timeline(processIdentifier, timelineIdentifier);
+        return page->checkedScrollingCoordinatorProxy()->timeline(timelineID);
     return nullptr;
 }
 #endif // ENABLE(THREADED_ANIMATION_RESOLUTION)

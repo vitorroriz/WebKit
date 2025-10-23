@@ -466,10 +466,10 @@ void RemoteScrollingCoordinatorProxyIOS::updateTimelineRegistration(WebCore::Pro
         m_timelineRegistry = nullptr;
 }
 
-const RemoteAnimationTimeline* RemoteScrollingCoordinatorProxyIOS::timeline(WebCore::ProcessIdentifier processIdentifier, const WebCore::TimelineIdentifier& timelineIdentifier) const
+const RemoteAnimationTimeline* RemoteScrollingCoordinatorProxyIOS::timeline(const TimelineID& timelineID) const
 {
     if (m_timelineRegistry)
-        return m_timelineRegistry->get(processIdentifier, timelineIdentifier);
+        return m_timelineRegistry->get(timelineID);
     return nullptr;
 }
 

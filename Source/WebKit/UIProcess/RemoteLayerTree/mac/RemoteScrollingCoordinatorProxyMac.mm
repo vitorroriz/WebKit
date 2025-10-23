@@ -324,9 +324,9 @@ void RemoteScrollingCoordinatorProxyMac::updateTimelineRegistration(WebCore::Pro
     m_eventDispatcher->updateTimelineRegistration(processIdentifier, timelineRepresentations, now);
 }
 
-const RemoteAnimationTimeline* RemoteScrollingCoordinatorProxyMac::timeline(WebCore::ProcessIdentifier processIdentifier, const WebCore::TimelineIdentifier& timelineIdentifier) const
+const RemoteAnimationTimeline* RemoteScrollingCoordinatorProxyMac::timeline(const TimelineID& timelineID) const
 {
-    return m_eventDispatcher->timeline(processIdentifier, timelineIdentifier);
+    return m_eventDispatcher->timeline(timelineID);
 }
 #endif
 

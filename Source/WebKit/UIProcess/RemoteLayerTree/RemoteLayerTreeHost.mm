@@ -519,9 +519,9 @@ void RemoteLayerTreeHost::animationsWereRemovedFromNode(RemoteLayerTreeNode& nod
     protectedDrawingArea()->animationsWereRemovedFromNode(node);
 }
 
-const RemoteAnimationTimeline* RemoteLayerTreeHost::timeline(WebCore::ProcessIdentifier processIdentifier, const WebCore::TimelineIdentifier& timelineIdentifier) const
+const RemoteAnimationTimeline* RemoteLayerTreeHost::timeline(const TimelineID& timelineID) const
 {
-    return protectedDrawingArea()->timeline(processIdentifier, timelineIdentifier);
+    return protectedDrawingArea()->timeline(timelineID);
 }
 #endif
 

@@ -112,7 +112,7 @@ public:
     void animationsWereAddedToNode(RemoteLayerTreeNode&);
     void animationsWereRemovedFromNode(RemoteLayerTreeNode&);
     void updateTimelineRegistration(WebCore::ProcessIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>&, MonotonicTime);
-    const RemoteAnimationTimeline* timeline(WebCore::ProcessIdentifier, const WebCore::TimelineIdentifier&);
+    const RemoteAnimationTimeline* timeline(const TimelineID&);
     void updateAnimations();
 #endif
 

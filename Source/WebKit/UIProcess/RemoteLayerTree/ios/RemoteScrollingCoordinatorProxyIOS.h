@@ -76,7 +76,7 @@ public:
     void animationsWereAddedToNode(RemoteLayerTreeNode&) override WTF_IGNORES_THREAD_SAFETY_ANALYSIS;
     void animationsWereRemovedFromNode(RemoteLayerTreeNode&) override;
     void updateTimelineRegistration(WebCore::ProcessIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>&, MonotonicTime) override;
-    const RemoteAnimationTimeline* timeline(WebCore::ProcessIdentifier, const WebCore::TimelineIdentifier&) const override;
+    const RemoteAnimationTimeline* timeline(const TimelineID&) const override;
     void updateAnimations();
 #endif
 

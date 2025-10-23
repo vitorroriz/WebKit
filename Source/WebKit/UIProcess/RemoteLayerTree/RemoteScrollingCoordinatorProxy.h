@@ -40,6 +40,10 @@
 #include <wtf/TZoneMalloc.h>
 #include <wtf/WeakPtr.h>
 
+#if ENABLE(THREADED_ANIMATION_RESOLUTION)
+#include "RemoteAnimationTimeline.h"
+#endif
+
 OBJC_CLASS UIScrollView;
 
 namespace WebCore {
@@ -56,10 +60,6 @@ class RemoteScrollingCoordinatorTransaction;
 class RemoteScrollingTree;
 class WebPageProxy;
 class WebWheelEvent;
-
-#if ENABLE(THREADED_ANIMATION_RESOLUTION)
-class RemoteAnimationTimeline;
-#endif
 
 class RemoteScrollingCoordinatorProxy : public CanMakeWeakPtr<RemoteScrollingCoordinatorProxy>, public CanMakeCheckedPtr<RemoteScrollingCoordinatorProxy> {
     WTF_MAKE_TZONE_ALLOCATED(RemoteScrollingCoordinatorProxy);
@@ -146,7 +146,7 @@ public:
     virtual void animationsWereAddedToNode(RemoteLayerTreeNode&) { }
     virtual void animationsWereRemovedFromNode(RemoteLayerTreeNode&) { }
     virtual void updateTimelineRegistration(WebCore::ProcessIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>&, MonotonicTime) { }
-    virtual const RemoteAnimationTimeline* timeline(WebCore::ProcessIdentifier, const WebCore::TimelineIdentifier&) const { return nullptr; }
+    virtual const RemoteAnimationTimeline* timeline(const TimelineID&) const { return nullptr; }
 #endif
 
     String scrollingTreeAsText() const;

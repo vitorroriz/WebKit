@@ -39,12 +39,12 @@ static WebCore::WebAnimationTime computeCurrentTime(Seconds originTime, Monotoni
     return now.secondsSinceEpoch() - originTime;
 }
 
-Ref<RemoteAnimationTimeline> RemoteAnimationTimeline::create(const WebCore::AcceleratedTimeline& input, MonotonicTime now)
+Ref<RemoteAnimationTimeline> RemoteAnimationTimeline::create(TimelineID identifier, const WebCore::AcceleratedTimeline& input, MonotonicTime now)
 {
-    return adoptRef(*new RemoteAnimationTimeline(input.identifier(), input.originTime(), computeCurrentTime(input.originTime(), now)));
+    return adoptRef(*new RemoteAnimationTimeline(identifier, input.originTime(), computeCurrentTime(input.originTime(), now)));
 }
 
-RemoteAnimationTimeline::RemoteAnimationTimeline(WebCore::TimelineIdentifier identifier, Seconds originTime, WebCore::WebAnimationTime currentTime)
+RemoteAnimationTimeline::RemoteAnimationTimeline(TimelineID identifier, Seconds originTime, WebCore::WebAnimationTime currentTime)
     : m_identifier(identifier)
     , m_originTime(originTime)
     , m_currentTime(currentTime)

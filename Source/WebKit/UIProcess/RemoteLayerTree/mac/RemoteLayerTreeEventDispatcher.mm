@@ -653,11 +653,11 @@ void RemoteLayerTreeEventDispatcher::updateTimelineRegistration(WebCore::Process
         m_timelineRegistry = nullptr;
 }
 
-const RemoteAnimationTimeline* RemoteLayerTreeEventDispatcher::timeline(WebCore::ProcessIdentifier processIdentifier, const WebCore::TimelineIdentifier& timelineIdentifier)
+const RemoteAnimationTimeline* RemoteLayerTreeEventDispatcher::timeline(const TimelineID& timelineID)
 {
     assertIsHeld(m_animationLock);
     if (m_timelineRegistry)
-        return m_timelineRegistry->get(processIdentifier, timelineIdentifier);
+        return m_timelineRegistry->get(timelineID);
     return nullptr;
 }
 

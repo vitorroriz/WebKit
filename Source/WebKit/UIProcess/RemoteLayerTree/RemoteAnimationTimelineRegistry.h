@@ -38,7 +38,7 @@ public:
 
     bool isEmpty() const { return m_timelines.isEmpty(); }
     void update(WebCore::ProcessIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>&, MonotonicTime);
-    RemoteAnimationTimeline* get(WebCore::ProcessIdentifier, const WebCore::TimelineIdentifier&) const;
+    RemoteAnimationTimeline* get(const TimelineID&) const;
     void advanceCurrentTime(MonotonicTime);
 
 private:

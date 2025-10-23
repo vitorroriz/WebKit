@@ -48,24 +48,25 @@ void RemoteAnimationTimelineRegistry::update(WebCore::ProcessIdentifier processI
     // Populate the list of active timelines, creating new timelines as necessary.
     HashSet<Ref<RemoteAnimationTimeline>> activeTimelines;
     for (auto& timelineRepresentation : timelineRepresentations) {
-        if (RefPtr existingTimeline = get(processIdentifier, timelineRepresentation->identifier()))
+        TimelineID timelineID { timelineRepresentation->identifier(), processIdentifier };
+        if (RefPtr existingTimeline = get(timelineID))
             activeTimelines.add(existingTimeline.releaseNonNull());
         else
-            activeTimelines.add(RemoteAnimationTimeline::create(timelineRepresentation, now));
+            activeTimelines.add(RemoteAnimationTimeline::create(timelineID, timelineRepresentation, now));
     }
 
     // Replace the timelines, which will clear any remaining timeline.
     m_timelines.set(processIdentifier, WTFMove(activeTimelines));
 }
 
-RemoteAnimationTimeline* RemoteAnimationTimelineRegistry::get(WebCore::ProcessIdentifier processIdentifier, const WebCore::TimelineIdentifier& timelineIdentifier) const
+RemoteAnimationTimeline* RemoteAnimationTimelineRegistry::get(const TimelineID& timelineID) const
 {
-    auto it = m_timelines.find(processIdentifier);
+    auto it = m_timelines.find(timelineID.processIdentifier());
     if (it == m_timelines.end())
         return nullptr;
 
     for (auto& timeline : it->value) {
-        if (timeline->identifier() == timelineIdentifier)
+        if (timeline->identifier() == timelineID)
             return timeline.ptr();
     }
 
