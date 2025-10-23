@@ -459,6 +459,7 @@ Vector<ASCIILiteral> serializedIdentifiers()
         "WebCore::MediaKeySystemRequestIdentifier"_s,
         "WebCore::MediaPlayerClientIdentifier"_s,
         "WebCore::MediaPlayerIdentifier"_s,
+        "WebCore::MediaSessionGroupIdentifier"_s,
         "WebCore::MediaSessionIdentifier"_s,
         "WebCore::ModelPlayerIdentifier"_s,
         "WebCore::MediaUniqueIdentifier"_s,
