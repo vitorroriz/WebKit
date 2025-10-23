@@ -155,12 +155,12 @@ extern unsigned pas_mar_qualifying_page_index;
 extern struct pas_mar_registry pas_mar_global_registry;
 extern struct pas_mar_registry* pas_mar_registry_for_crash_reporter_enumeration;
 
-PAS_END_EXTERN_C;
-
 PAS_ALWAYS_INLINE bool pas_mar_is_address_in_qualifying_page(void* address)
 {
     return pas_mar_address_to_virtual_page_number(address) % PAS_MAR_PROBABILITY == pas_mar_qualifying_page_index;
 }
+
+PAS_END_EXTERN_C;
 
 #endif /* PAS_OS(DARWIN) */
 
