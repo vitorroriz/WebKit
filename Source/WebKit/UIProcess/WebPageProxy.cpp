@@ -4242,6 +4242,9 @@ void WebPageProxy::sendWheelEvent(WebCore::FrameIdentifier frameID, const WebWhe
     internals().wheelEventActivityHysteresis.impulse();
 #endif
 
+    if (!hasRunningProcess())
+        return;
+
     Ref process = processContainingFrame(frameID);
     if (protectedDrawingArea()->shouldSendWheelEventsToEventDispatcher()) {
         sendWheelEventScrollingAccelerationCurveIfNecessary(frameID, event);
@@ -4252,7 +4255,7 @@ void WebPageProxy::sendWheelEvent(WebCore::FrameIdentifier frameID, const WebWhe
             if (!protectedThis)
                 return;
 
-            if (protectedThis->isClosed())
+            if (!protectedThis->hasRunningProcess())
                 return;
 
             if (remoteWheelEventData) {
