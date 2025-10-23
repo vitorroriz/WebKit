@@ -1672,12 +1672,14 @@ static String convertToFullSizeKana(const String& string)
 // https://w3c.github.io/mathml-core/#math-auto-transform
 static String convertToMathAuto(const String& string)
 {
+#if ENABLE(MATHML)
     StringView view = string;
     if (auto codePoint = view.convertToSingleCodePoint()) {
         char32_t transformedCodePoint = mathVariantMapCodePoint(codePoint.value(), MathVariant::Italic);
         if (transformedCodePoint != codePoint.value())
             return String::fromCodePoint(transformedCodePoint);
     }
+#endif
     return string;
 }
 
