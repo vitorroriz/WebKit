@@ -30,6 +30,7 @@
 
 #import "AppKitSPI.h"
 #import <objc/runtime.h>
+#import <wtf/cocoa/TypeCastsCocoa.h>
 
 @interface NSBox (NSFontEffectsBox)
 
@@ -76,18 +77,6 @@
 
 @end
 
-static NSView *findSubviewOfClass(NSView *view, Class targetClass)
-{
-    if ([view isKindOfClass:targetClass])
-        return view;
-
-    for (NSView *subview in view.subviews) {
-        if (NSView *targetView = findSubviewOfClass(subview, targetClass))
-            return targetView;
-    }
-    return nil;
-}
-
 @implementation NSFontPanel (TestWebKitAPI)
 
 - (NSFontEffectsBox *)fontEffectsBox
@@ -95,16 +84,6 @@ static NSView *findSubviewOfClass(NSView *view, Class targetClass)
     void* result = nullptr;
     object_getInstanceVariable(self, "_fontEffectsBox", &result);
     return static_cast<NSFontEffectsBox *>(result);
-}
-
-- (NSPopUpButton *)underlineToolbarButton
-{
-    return (NSPopUpButton *)[self _toolbarItemWithIdentifier:@"NSFontPanelUnderlineToolbarItem"].view;
-}
-
-- (NSPopUpButton *)strikeThroughToolbarButton
-{
-    return (NSPopUpButton *)[self _toolbarItemWithIdentifier:@"NSFontPanelStrikethroughToolbarItem"].view;
 }
 
 - (NSColorWell *)foregroundColorToolbarColorWell
@@ -144,63 +123,16 @@ static NSView *findSubviewOfClass(NSView *view, Class targetClass)
         [fontManager.target changeAttributes:self.fontEffectsBox];
 }
 
-- (NSSlider *)shadowBlurSlider
+- (id)_selectionAttributeValue:(NSString *)attribute
 {
-    return (NSSlider *)findSubviewOfClass([self _toolbarItemWithIdentifier:@"NSFontPanelShadowBlurToolbarItem"].view, NSSlider.class);
+    void* result = nullptr;
+    object_getInstanceVariable(self, "_selection", &result);
+    return [static_cast<NSDictionary *>(result) objectForKey:attribute];
 }
 
-- (NSSlider *)shadowOpacitySlider
+- (NSShadow *)lastTextShadow
 {
-    return (NSSlider *)findSubviewOfClass([self _toolbarItemWithIdentifier:@"NSFontPanelShadowOpacityToolbarItem"].view, NSSlider.class);
-}
-
-- (NSSlider *)shadowLengthSlider
-{
-    return (NSSlider *)findSubviewOfClass([self _toolbarItemWithIdentifier:@"NSFontPanelShadowOffsetToolbarItem"].view, NSSlider.class);
-}
-
-- (NSButton *)shadowToggleButton
-{
-    return (NSButton *)[self _toolbarItemWithIdentifier:@"NSFontPanelShadowToggleToolbarItem"].view;
-}
-
-- (BOOL)hasShadow
-{
-    return self.shadowToggleButton.state == NSControlStateValueOn;
-}
-
-- (double)shadowLength
-{
-    return self.shadowLengthSlider.doubleValue;
-}
-
-- (void)setShadowLength:(double)shadowLength
-{
-    self.shadowLengthSlider.doubleValue = shadowLength;
-}
-
-- (double)shadowOpacity
-{
-    return self.shadowOpacitySlider.doubleValue;
-}
-
-- (void)setShadowOpacity:(double)shadowOpacity
-{
-    self.shadowOpacitySlider.doubleValue = shadowOpacity;
-    if (self.shadowToggleButton.state == NSControlStateValueOn)
-        [self _didChangeAttributes];
-}
-
-- (double)shadowBlur
-{
-    return self.shadowBlurSlider.doubleValue;
-}
-
-- (void)setShadowBlur:(double)shadowBlur
-{
-    self.shadowBlurSlider.doubleValue = shadowBlur;
-    if (self.shadowToggleButton.state == NSControlStateValueOn)
-        [self _didChangeAttributes];
+    return dynamic_objc_cast<NSShadow>([self _selectionAttributeValue:NSShadowAttributeName]);
 }
 
 - (NSToolbarItem *)_toolbarItemWithIdentifier:(NSString *)itemIdentifier
@@ -214,14 +146,14 @@ static NSView *findSubviewOfClass(NSView *view, Class targetClass)
 
 - (BOOL)hasUnderline
 {
-    NSMenuItem *singleUnderlineMenuItem = [self.underlineToolbarButton itemAtIndex:2];
-    return singleUnderlineMenuItem.state == NSControlStateValueOn;
+    RetainPtr underlineStyle = dynamic_objc_cast<NSNumber>([self _selectionAttributeValue:NSUnderlineStyleAttributeName]);
+    return underlineStyle && ![underlineStyle isEqual:@(NSUnderlineStyleNone)];
 }
 
 - (BOOL)hasStrikeThrough
 {
-    NSMenuItem *singleStrikeThroughMenuItem = [self.strikeThroughToolbarButton itemAtIndex:2];
-    return singleStrikeThroughMenuItem.state == NSControlStateValueOn;
+    RetainPtr underlineStyle = dynamic_objc_cast<NSNumber>([self _selectionAttributeValue:NSStrikethroughStyleAttributeName]);
+    return underlineStyle && ![underlineStyle isEqual:@(NSUnderlineStyleNone)];
 }
 
 - (NSColor *)foregroundColor

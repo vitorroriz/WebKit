@@ -34,13 +34,7 @@
 - (void)setTextShadow:(NSShadow *)shadow;
 - (void)commitAttributeChanges;
 
-// FIXME: The following properties below no longer work on macOS 26,
-// as they depend on the state of UI that no longer exists.
-@property (nonatomic) double shadowOpacity;
-@property (nonatomic) double shadowBlur;
-@property (nonatomic) double shadowLength;
-
-@property (nonatomic, readonly) BOOL hasShadow;
+@property (nonatomic, readonly) NSShadow *lastTextShadow;
 @property (nonatomic, readonly) BOOL hasUnderline;
 @property (nonatomic, readonly) BOOL hasStrikeThrough;
 @property (nonatomic, readonly) NSColor *foregroundColor;
