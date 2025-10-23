@@ -722,7 +722,7 @@ static IDBError migrateIDBDatabaseInfoTableIfNecessary(SQLiteDatabase& database,
     SQLiteTransaction transaction(database);
     transaction.begin();
 
-    if (existingDatabaseName != databaseName) {
+    {
         auto sql = database.prepareStatement("REPLACE INTO IDBDatabaseInfo VALUES ('DatabaseName', ?);"_s);
         if (!sql
             || CheckedRef { *sql }->bindBlob(1, databaseName) != SQLITE_OK
