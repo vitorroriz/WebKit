@@ -28,6 +28,8 @@
 #if ENABLE(WEBXR_HIT_TEST)
 
 #include "ExceptionOr.h"
+#include "FloatPoint3D.h"
+#include "TransformationMatrix.h"
 #include <JavaScriptCore/Float32Array.h>
 #include <wtf/Ref.h>
 #include <wtf/RefCounted.h>
@@ -51,9 +53,11 @@ public:
     const Float32Array& matrix();
 
 private:
-    WebXRRay(WebXRRigidTransform&);
+    WebXRRay(Ref<DOMPointReadOnly>&& origin, Ref<DOMPointReadOnly>&& direction);
 
-    Ref<WebXRRigidTransform> m_transform;
+    Ref<DOMPointReadOnly> m_origin;
+    Ref<DOMPointReadOnly> m_direction;
+    RefPtr<Float32Array> m_matrix;
 };
 
 } // namespace WebCore

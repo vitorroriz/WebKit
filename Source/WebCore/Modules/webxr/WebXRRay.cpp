@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2025 Igalia S.L. All rights reserved.
+ * Copyright (C) 2018 The Chromium Authors
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -38,21 +39,37 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(WebXRRay);
 
+// https://immersive-web.github.io/hit-test/#dom-xrray-xrray
 ExceptionOr<Ref<WebXRRay>> WebXRRay::create(const DOMPointInit& origin, const XRRayDirectionInit& direction)
 {
-    auto exceptionOrTransform = WebXRRigidTransform::create(origin, DOMPointInit { direction.x, direction.y, direction.z, direction.w });
-    if (exceptionOrTransform.hasException())
-        return exceptionOrTransform.releaseException();
-    return adoptRef(*new WebXRRay(exceptionOrTransform.releaseReturnValue()));
+    if (!direction.x && !direction.y && !direction.z)
+        return Exception { ExceptionCode::TypeError };
+    if (direction.w)
+        return Exception { ExceptionCode::TypeError };
+    if (origin.w != 1)
+        return Exception { ExceptionCode::TypeError };
+    Ref<DOMPointReadOnly> dpOrigin = DOMPointReadOnly::fromPoint(origin);
+    std::optional<Ref<DOMPointReadOnly>> dpDirection;
+    double length = std::hypot(direction.x, direction.y, direction.z);
+    if (length)
+        dpDirection = DOMPointReadOnly::create(direction.x / length, direction.y / length, direction.z / length, 0);
+    else
+        dpDirection = DOMPointReadOnly::create(0, 0, -1, 0);
+    return adoptRef(*new WebXRRay(WTFMove(dpOrigin), *WTFMove(dpDirection)));
 }
 
 Ref<WebXRRay> WebXRRay::create(WebXRRigidTransform& transform)
 {
-    return adoptRef(*new WebXRRay(transform));
+    FloatPoint3D origin = transform.rawTransform().mapPoint({ 0, 0, 0 });
+    FloatPoint3D z = transform.rawTransform().mapPoint({ 0, 0, -1 });
+    FloatPoint3D direction = z - origin;
+    Ref dpDirection = DOMPointReadOnly::create(direction.x(), direction.y(), direction.z(), 0);
+    return adoptRef(*new WebXRRay(DOMPointReadOnly::fromFloatPoint(origin), WTFMove(dpDirection)));
 }
 
-WebXRRay::WebXRRay(WebXRRigidTransform& transform)
-    : m_transform(transform)
+WebXRRay::WebXRRay(Ref<DOMPointReadOnly>&& origin, Ref<DOMPointReadOnly>&& direction)
+    : m_origin(WTFMove(origin))
+    , m_direction(WTFMove(direction))
 {
 }
 
@@ -60,17 +77,42 @@ WebXRRay::~WebXRRay() = default;
 
 const DOMPointReadOnly& WebXRRay::origin()
 {
-    return m_transform->position();
+    return m_origin;
 }
 
 const DOMPointReadOnly& WebXRRay::direction()
 {
-    return m_transform->orientation();
+    return m_direction;
 }
 
+// https://immersive-web.github.io/hit-test/#dom-xrray-matrix
 const Float32Array& WebXRRay::matrix()
 {
-    return m_transform->matrix();
+    if (m_matrix && !m_matrix->isDetached())
+        return *m_matrix;
+
+    TransformationMatrix transform;
+    transform.translate3d(m_origin->x(), m_origin->y(), m_origin->z());
+    FloatPoint3D z { 0, 0, -1 };
+    FloatPoint3D direction(m_direction->x(), m_direction->y(), m_direction->z());
+    float cosAngle = z.dot(direction);
+    if (cosAngle > 0.9999) {
+        // Vectors are co-linear or almost co-linear & face the same direction,
+        // no rotation is needed.
+    } else if (cosAngle < -0.9999) {
+        // Vectors are co-linear or almost co-linear & face the opposite
+        // direction, rotation by 180 degrees is needed & can be around any vector
+        // perpendicular to (0,0,-1) so let's rotate about the x-axis.
+        transform.rotate3d(1, 0, 0, 180);
+    } else {
+        // Rotation needed - create it from axis-angle.
+        FloatPoint3D axis = z.cross(direction);
+        transform.rotate3d(axis.x(), axis.y(), axis.z(), rad2deg(std::acos(cosAngle)));
+    }
+
+    auto matrixData = transform.toColumnMajorFloatArray();
+    m_matrix = Float32Array::create(matrixData.data(), matrixData.size());
+    return *m_matrix;
 }
 
 } // namespace WebCore

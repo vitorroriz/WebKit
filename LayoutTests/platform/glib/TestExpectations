@@ -2856,6 +2856,8 @@ imported/w3c/web-platform-tests/webxr/webGLCanvasContext_create_xrcompatible.htt
 imported/w3c/web-platform-tests/webxr/hand-input/ [ Pass ]
 
 imported/w3c/web-platform-tests/webxr/hit-test/idlharness.https.html [ Pass ]
+imported/w3c/web-platform-tests/webxr/hit-test/xrRay_constructor.https.html [ Pass ]
+imported/w3c/web-platform-tests/webxr/hit-test/xrRay_matrix.https.html [ Pass ]
 
 http/wpt/webxr [ Pass ]
 webxr [ Pass ]
