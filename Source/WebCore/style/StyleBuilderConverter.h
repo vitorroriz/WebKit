@@ -514,26 +514,31 @@ inline StyleSelfAlignmentData BuilderConverter::convertSelfOrDefaultAlignmentDat
 
     // Flip the position according to position-try fallback, if specified.
     if (auto positionTryFallback = builderState.positionTryFallback()) {
+        auto writingMode = builderState.style().writingMode();
         for (auto tactic : positionTryFallback->tactics) {
             switch (tactic) {
             case PositionTryFallback::Tactic::FlipBlock:
                 if (builderState.cssPropertyID() == CSSPropertyAlignSelf)
                     alignmentData.setPosition(oppositeItemPosition(alignmentData.position()));
                 break;
-
             case PositionTryFallback::Tactic::FlipInline:
                 if (builderState.cssPropertyID() == CSSPropertyJustifySelf)
                     alignmentData.setPosition(oppositeItemPosition(alignmentData.position()));
                 break;
-
+            case PositionTryFallback::Tactic::FlipX:
+                if (builderState.cssPropertyID() == (writingMode.isHorizontal() ? CSSPropertyJustifySelf : CSSPropertyAlignSelf))
+                    alignmentData.setPosition(oppositeItemPosition(alignmentData.position()));
+                break;
+            case PositionTryFallback::Tactic::FlipY:
+                if (builderState.cssPropertyID() == (writingMode.isHorizontal() ? CSSPropertyAlignSelf : CSSPropertyJustifySelf))
+                    alignmentData.setPosition(oppositeItemPosition(alignmentData.position()));
+                break;
             case PositionTryFallback::Tactic::FlipStart:
                 // justify-self additionally takes left/right, align-self doesn't. When
                 // applying flip-start, justify-self gets swapped with align-self. So if
                 // we're resolving justify-self (which later gets swapped with align-self),
                 // and the position is 'left' or 'right', resolve it to self-start/self-end.
                 if (builderState.cssPropertyID() == CSSPropertyJustifySelf) {
-                    auto writingMode = builderState.style().writingMode();
-
                     switch (alignmentData.position()) {
                     case ItemPosition::Left:
                         alignmentData.setPosition(writingMode.bidiDirection() == TextDirection::LTR ? ItemPosition::SelfStart : ItemPosition::SelfEnd);
@@ -990,6 +995,29 @@ inline PositionArea flipPositionAreaByLogicalAxis(LogicalBoxAxis flipAxis, Posit
     };
 }
 
+// Flip a PositionArea across a physical axis (x or y), given the current writing mode.
+inline PositionArea flipPositionAreaByPhysicalAxis(BoxAxis flipAxis, PositionArea area, WritingMode writingMode)
+{
+    auto blockOrXSpan = area.blockOrXAxis();
+    auto inlineOrYSpan = area.inlineOrYAxis();
+
+    // blockOrXSpan is on the flip axis, so flip its track and keep inlineOrYSpan intact.
+    if (mapPositionAreaAxisToPhysicalAxis(blockOrXSpan.axis(), writingMode) == flipAxis) {
+        return {
+            { blockOrXSpan.axis(), flipPositionAreaTrack(blockOrXSpan.track()), blockOrXSpan.self() },
+            inlineOrYSpan
+        };
+    }
+
+    // The two spans are orthogonal in axis, so if blockOrXSpan isn't on the flip axis,
+    // inlineOrYSpan must be. In this case, flip the track of inlineOrYSpan, and
+    // keep blockOrXSpan intact.
+    return {
+        blockOrXSpan,
+        { inlineOrYSpan.axis(), flipPositionAreaTrack(inlineOrYSpan.track()), inlineOrYSpan.self() }
+    };
+}
+
 // Flip a PositionArea as specified by flip-start tactic.
 // Intuitively, this mirrors the PositionArea across a diagonal line drawn from the
 // block-start/inline-start corner to the block-end/inline-end corner. This is done
@@ -1060,6 +1088,12 @@ inline std::optional<PositionArea> BuilderConverter::convertPositionArea(Builder
                 break;
             case PositionTryFallback::Tactic::FlipInline:
                 area = flipPositionAreaByLogicalAxis(LogicalBoxAxis::Inline, area, builderState.style().writingMode());
+                break;
+            case PositionTryFallback::Tactic::FlipX:
+                area = flipPositionAreaByPhysicalAxis(BoxAxis::Horizontal, area, builderState.style().writingMode());
+                break;
+            case PositionTryFallback::Tactic::FlipY:
+                area = flipPositionAreaByPhysicalAxis(BoxAxis::Vertical, area, builderState.style().writingMode());
                 break;
             case PositionTryFallback::Tactic::FlipStart:
                 area = mirrorPositionAreaAcrossDiagonal(area);
