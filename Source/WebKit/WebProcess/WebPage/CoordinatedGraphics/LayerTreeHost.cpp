@@ -68,7 +68,6 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(LayerTreeHost);
 LayerTreeHost::LayerTreeHost(WebPage& webPage)
     : m_webPage(webPage)
     , m_sceneState(CoordinatedSceneState::create())
-    , m_layerFlushTimer(RunLoop::mainSingleton(), "LayerTreeHost::LayerFlushTimer"_s, this, &LayerTreeHost::layerFlushTimerFired)
 #if USE(CAIRO)
     , m_paintingEngine(Cairo::PaintingEngine::create())
 #elif USE(SKIA)
@@ -89,8 +88,9 @@ LayerTreeHost::LayerTreeHost(WebPage& webPage)
         rootLayer.setSize(m_webPage.size());
     }
 
-    m_layerFlushTimer.setPriority(RunLoopSourcePriority::LayerFlushTimer);
-    scheduleLayerFlush();
+    m_layerFlushRunLoopObserver = makeUnique<RunLoopObserver>(RunLoopObserver::WellKnownOrder::RenderingUpdate, [this] {
+        this->layerFlushRunLoopObserverFired();
+    });
 
     m_compositor = ThreadedCompositor::create(*this);
 #if ENABLE(DAMAGE_TRACKING)
@@ -152,13 +152,20 @@ void LayerTreeHost::scheduleLayerFlush()
         return;
     }
 
-    if (!m_layerFlushTimer.isActive())
-        m_layerFlushTimer.startOneShot(0_s);
+    if (m_layerFlushRunLoopObserver->isScheduled())
+        return;
+
+    tracePoint(RenderingUpdateRunLoopObserverStart);
+    m_layerFlushRunLoopObserver->schedule();
 }
 
 void LayerTreeHost::cancelPendingLayerFlush()
 {
-    m_layerFlushTimer.stop();
+    if (!m_layerFlushRunLoopObserver->isScheduled())
+        return;
+
+    tracePoint(RenderingUpdateRunLoopObserverEnd);
+    m_layerFlushRunLoopObserver->invalidate();
 }
 
 void LayerTreeHost::flushLayers()
@@ -214,6 +221,7 @@ void LayerTreeHost::flushLayers()
     m_forceFrameSync = false;
 
     page->didUpdateRendering();
+    cancelPendingLayerFlush();
 
     // Eject any backing stores whose only reference is held in the HashMap cache.
     m_imageBackingStores.removeIf([](auto& it) {
@@ -226,23 +234,23 @@ void LayerTreeHost::flushLayers()
     }
 }
 
-void LayerTreeHost::layerFlushTimerFired()
+void LayerTreeHost::layerFlushRunLoopObserverFired()
 {
-    WTFBeginSignpost(this, LayerFlushTimerFired, "isWaitingForRenderer %i", m_isWaitingForRenderer);
+    WTFBeginSignpost(this, LayerFlushRLOFired, "isWaitingForRenderer %i", m_isWaitingForRenderer);
 
     if (m_isSuspended) {
-        WTFEndSignpost(this, LayerFlushTimerFired);
+        WTFEndSignpost(this, LayerFlushRLOFired);
         return;
     }
 
     if (m_isWaitingForRenderer) {
-        WTFEndSignpost(this, LayerFlushTimerFired);
+        WTFEndSignpost(this, LayerFlushRLOFired);
         return;
     }
 
     flushLayers();
 
-    WTFEndSignpost(this, LayerFlushTimerFired);
+    WTFEndSignpost(this, LayerFlushRLOFired);
 }
 
 void LayerTreeHost::updateRootLayer()
@@ -474,7 +482,7 @@ void LayerTreeHost::didComposite(uint32_t compositionResponseID)
                 if (m_forceRepaintAsync.callback)
                     m_forceRepaintAsync.compositionRequestID = m_compositionRequestID;
             }
-        } else if (!m_isSuspended && !m_layerTreeStateIsFrozen && (scheduledWhileWaitingForRenderer || m_layerFlushTimer.isActive())) {
+        } else if (!m_isSuspended && !m_layerTreeStateIsFrozen && (scheduledWhileWaitingForRenderer || m_layerFlushRunLoopObserver->isScheduled())) {
             cancelPendingLayerFlush();
             flushLayers();
         }
