@@ -395,11 +395,12 @@ void UniqueIDBDatabase::handleDatabaseOperations()
 void UniqueIDBDatabase::handleCurrentOperation()
 {
     LOG(IndexedDB, "UniqueIDBDatabase::handleCurrentOperation");
-    ASSERT(m_currentOpenDBRequest);
+    RefPtr currentOpenDBRequest = m_currentOpenDBRequest;
+    RELEASE_ASSERT(currentOpenDBRequest);
 
-    if (m_currentOpenDBRequest->isOpenRequest())
+    if (currentOpenDBRequest->isOpenRequest())
         performCurrentOpenOperation();
-    else if (m_currentOpenDBRequest->isDeleteRequest())
+    else if (currentOpenDBRequest->isDeleteRequest())
         performCurrentDeleteOperation();
     else
         ASSERT_NOT_REACHED();
