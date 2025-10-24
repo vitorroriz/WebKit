@@ -2718,7 +2718,15 @@ void LocalDOMWindow::dispatchPendingEventTimingEntries()
 {
     auto renderingTime = performance().nowInReducedResolutionSeconds();
     if (m_pendingPointerDown && !m_pendingPointerDown->duration)
-        m_pendingPointerDown->duration = renderingTime - m_pendingPointerDown->startTime;
+        m_pendingPointerDown->duration = std::max(renderingTime - m_pendingPointerDown->startTime, Seconds::fromMilliseconds(1));
+
+    for (auto& keydownEntry : m_pendingKeyDowns) {
+        if (!keydownEntry.value.keyDown.duration)
+            keydownEntry.value.keyDown.duration = std::max(renderingTime - keydownEntry.value.keyDown.startTime, Seconds::fromMilliseconds(1));
+
+        if (keydownEntry.value.keyPress && !keydownEntry.value.keyPress->duration)
+            keydownEntry.value.keyPress->duration = std::max(renderingTime - keydownEntry.value.keyPress->startTime, Seconds::fromMilliseconds(1));
+    }
 
     if (m_performanceEventTimingCandidates.isEmpty())
         return;
@@ -2726,7 +2734,8 @@ void LocalDOMWindow::dispatchPendingEventTimingEntries()
     LOG_WITH_STREAM(PerformanceTimeline, stream << "Dispatching " << m_performanceEventTimingCandidates.size() << " event timing entries at t=" << renderingTime);
     for (auto& candidateEntry : m_performanceEventTimingCandidates) {
         performance().countEvent(candidateEntry.type);
-        candidateEntry.duration = renderingTime - candidateEntry.startTime;
+        if (!candidateEntry.duration)
+            candidateEntry.duration = renderingTime - candidateEntry.startTime;
         performance().processEventEntry(candidateEntry);
     }
     m_performanceEventTimingCandidates.clear();

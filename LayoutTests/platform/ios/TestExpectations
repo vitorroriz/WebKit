@@ -4545,6 +4545,10 @@ webkit.org/b/214677 imported/w3c/web-platform-tests/event-timing/shadow-dom-null
 webkit.org/b/214677 imported/w3c/web-platform-tests/event-timing/timingconditions.html [ Skip ]
 webkit.org/b/214677 imported/w3c/web-platform-tests/event-timing/toJSON.html [ Skip ]
 
+# Timing out because single down/up events are not issued by iOS when testing:
+webkit.org/b/301105 imported/w3c/web-platform-tests/event-timing/gap-keydown-keyup.html [ Skip ]
+webkit.org/b/301105 imported/w3c/web-platform-tests/event-timing/gap-pointerdown-pointerup.html [ Skip ]
+
 webkit.org/b/299907 imported/w3c/web-platform-tests/largest-contentful-paint/transparent-text.html [ Failure ]
 webkit.org/b/301028 imported/w3c/web-platform-tests/largest-contentful-paint/web-font-styled-text-resize-swap-after-interaction.html [ Failure ]
 

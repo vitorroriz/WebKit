@@ -1980,7 +1980,9 @@ imported/w3c/web-platform-tests/event-timing/interaction-count-click.html [ Skip
 imported/w3c/web-platform-tests/event-timing/interaction-count-press-key.html [ Skip ]
 
 # Timeout:
-imported/w3c/web-platform-tests/event-timing/interactionid-orphan-pointerup.html [ Skip ]
+webkit.org/b/301110 imported/w3c/web-platform-tests/event-timing/gap-keydown-keyup.html [ Skip ]
+webkit.org/b/301110 imported/w3c/web-platform-tests/event-timing/gap-pointerdown-pointerup.html [ Skip ]
+webkit.org/b/301110 imported/w3c/web-platform-tests/event-timing/interactionid-orphan-pointerup.html [ Skip ]
 
 # Fail with AccessDeniedAccess
 imported/w3c/web-platform-tests/event-timing/contextmenu.html [ Skip ]
