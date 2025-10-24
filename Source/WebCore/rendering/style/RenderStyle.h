@@ -302,6 +302,7 @@ struct MaskBorderSlice;
 struct MaskBorderSource;
 struct MaskBorderWidth;
 struct MaskLayer;
+struct MathDepth;
 struct MaximumLines;
 struct MaximumSize;
 struct MinimumSize;
@@ -1275,6 +1276,7 @@ public:
     inline AppleVisualEffect usedAppleVisualEffectForSubtree() const;
 #endif
 
+    inline Style::MathDepth mathDepth() const;
     inline MathShift mathShift() const;
     inline MathStyle mathStyle() const;
 
@@ -1983,6 +1985,7 @@ public:
     bool disallowsFastPathInheritance() const { return m_nonInheritedFlags.disallowsFastPathInheritance; }
     void setDisallowsFastPathInheritance() { m_nonInheritedFlags.disallowsFastPathInheritance = true; }
 
+    inline void setMathDepth(Style::MathDepth);
     inline void setMathShift(const MathShift&);
     inline void setMathStyle(const MathStyle&);
 
@@ -2306,6 +2309,7 @@ public:
     static constexpr BlendMode initialBlendMode();
     static constexpr Isolation initialIsolation();
 
+    static constexpr Style::MathDepth initialMathDepth();
     static constexpr MathShift initialMathShift();
     static constexpr MathStyle initialMathStyle();
 

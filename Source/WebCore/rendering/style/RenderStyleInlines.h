@@ -490,6 +490,7 @@ constexpr Style::WebkitMarqueeSpeed RenderStyle::initialMarqueeSpeed() { return 
 inline Style::MaskBorder RenderStyle::initialMaskBorder() { return Style::MaskBorder { }; }
 inline Style::MaskBorderSource RenderStyle::initialMaskBorderSource() { return CSS::Keyword::None { }; }
 inline Style::MaskLayers RenderStyle::initialMaskLayers() { return { }; }
+constexpr Style::MathDepth RenderStyle::initialMathDepth() { return 0_css_integer; }
 constexpr MathShift RenderStyle::initialMathShift() { return MathShift::Normal; }
 constexpr MathStyle RenderStyle::initialMathStyle() { return MathStyle::Normal; }
 constexpr Style::MaximumLines RenderStyle::initialMaxLines() { return CSS::Keyword::None { }; }
@@ -706,6 +707,7 @@ inline const Style::MaskBorderSource& RenderStyle::maskBorderSource() const { re
 inline NinePieceImageRule RenderStyle::maskBorderVerticalRule() const { return maskBorderRepeat().verticalRule(); }
 inline const Style::MaskBorderWidth& RenderStyle::maskBorderWidth() const { return maskBorder().width(); }
 inline const Style::MaskLayers& RenderStyle::maskLayers() const { return m_nonInheritedData->miscData->mask; }
+inline Style::MathDepth RenderStyle::mathDepth() const { return m_rareInheritedData->mathDepth; }
 inline MathShift RenderStyle::mathShift() const { return static_cast<MathShift>(m_rareInheritedData->mathShift); }
 inline MathStyle RenderStyle::mathStyle() const { return static_cast<MathStyle>(m_rareInheritedData->mathStyle); }
 inline const Style::MaximumSize& RenderStyle::maxHeight() const { return m_nonInheritedData->boxData->maxHeight(); }

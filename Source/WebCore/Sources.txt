@@ -3261,6 +3261,7 @@ style/values/masking/StyleMaskBorderSource.cpp
 style/values/masking/StyleMaskBorderWidth.cpp
 style/values/masking/StyleMaskBorder.cpp
 style/values/masking/StyleMaskLayer.cpp
+style/values/math/StyleMathDepth.cpp
 style/values/motion/StyleOffsetAnchor.cpp
 style/values/motion/StyleOffsetPath.cpp
 style/values/motion/StyleOffsetPosition.cpp

@@ -219,6 +219,7 @@ inline void RenderStyle::setMarqueeRepetition(Style::WebkitMarqueeRepetition rep
 inline void RenderStyle::setMarqueeSpeed(Style::WebkitMarqueeSpeed speed) { SET_DOUBLY_NESTED(m_nonInheritedData, rareData, marquee, speed, speed); }
 inline void RenderStyle::setMaskBorder(Style::MaskBorder&& image) { SET_NESTED(m_nonInheritedData, rareData, maskBorder, WTFMove(image)); }
 inline void RenderStyle::setMaskLayers(Style::MaskLayers&& layers) { SET_NESTED(m_nonInheritedData, miscData, mask, WTFMove(layers)); }
+inline void RenderStyle::setMathDepth(Style::MathDepth depth) { SET(m_rareInheritedData, mathDepth, depth); }
 inline void RenderStyle::setMathShift(const MathShift& shift) { SET(m_rareInheritedData, mathShift, static_cast<unsigned>(shift)); }
 inline void RenderStyle::setMathStyle(const MathStyle& style) { SET(m_rareInheritedData, mathStyle, static_cast<unsigned>(style)); }
 inline void RenderStyle::setMaxHeight(Style::MaximumSize&& length) { SET_NESTED(m_nonInheritedData, boxData, m_maxHeight, WTFMove(length)); }

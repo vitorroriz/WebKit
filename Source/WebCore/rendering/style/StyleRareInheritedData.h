@@ -40,6 +40,7 @@
 #include <WebCore/StyleLineBoxContain.h>
 #include <WebCore/StyleLineFitEdge.h>
 #include <WebCore/StyleListStyleType.h>
+#include <WebCore/StyleMathDepth.h>
 #include <WebCore/StyleOrphans.h>
 #include <WebCore/StyleQuotes.h>
 #include <WebCore/StyleScrollbarColor.h>
@@ -233,6 +234,8 @@ public:
 #endif
     Style::ListStyleType listStyleType;
     Style::BlockEllipsis blockEllipsis;
+
+    Style::MathDepth mathDepth;
 
 private:
     StyleRareInheritedData();

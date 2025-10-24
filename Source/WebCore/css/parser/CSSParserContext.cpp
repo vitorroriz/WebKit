@@ -55,6 +55,7 @@ static void applyUASheetBehaviorsToContext(CSSParserContext& context)
     context.propertySettings.supportHDRDisplayEnabled = true;
     context.propertySettings.viewTransitionsEnabled = true;
     context.propertySettings.cssFieldSizingEnabled = true;
+    context.propertySettings.cssMathDepthEnabled = true;
 #if HAVE(CORE_MATERIAL)
     context.propertySettings.useSystemAppearance = true;
 #endif

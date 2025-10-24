@@ -3368,6 +3368,8 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/masking/StyleMaskBorderWidth.h
     style/values/masking/StyleMaskLayer.h
 
+    style/values/math/StyleMathDepth.h
+
     style/values/motion/StyleOffsetAnchor.h
     style/values/motion/StyleOffsetDistance.h
     style/values/motion/StyleOffsetPath.h
