@@ -40,6 +40,19 @@ namespace TestWebKitAPI {
 
 #if !PLATFORM(IOS)
 
+class EnhancedSecurityTest : public testing::Test {
+public:
+    virtual void SetUp()
+    {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"EnhancedSecurityFeatureEnabled"];
+    }
+
+    virtual void TearDown()
+    {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"EnhancedSecurityFeatureEnabled"];
+    }
+};
+
 static bool isEnhancedSecurityEnabled(WKWebView *webView)
 {
     __block bool gotResponse = false;
@@ -66,11 +79,10 @@ static bool isJITEnabled(WKWebView *webView)
     return isJITEnabledResult;
 }
 
-
-TEST(EnhancedSecurity, EnhancedSecurityEnablesTrue)
+TEST_F(EnhancedSecurityTest, EnhancedSecurityEnablesTrue)
 {
     auto webViewConfiguration = adoptNS([WKWebViewConfiguration new]);
-    webViewConfiguration.get().defaultWebpagePreferences._enhancedSecurityEnabled = YES;
+    webViewConfiguration.get().defaultWebpagePreferences.securityRestrictionMode = WKSecurityRestrictionModeMaximizeCompatibility;
     auto webView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:webViewConfiguration.get()]);
     NSURL *url = [NSBundle.test_resourcesBundle URLForResource:@"simple" withExtension:@"html"];
     [webView loadRequest:[NSURLRequest requestWithURL:url]];
@@ -82,10 +94,10 @@ TEST(EnhancedSecurity, EnhancedSecurityEnablesTrue)
 #endif
 }
 
-TEST(EnhancedSecurity, EnhancedSecurityEnableFalse)
+TEST_F(EnhancedSecurityTest, EnhancedSecurityEnableFalse)
 {
     auto webViewConfiguration = adoptNS([WKWebViewConfiguration new]);
-    webViewConfiguration.get().defaultWebpagePreferences._enhancedSecurityEnabled = NO;
+    webViewConfiguration.get().defaultWebpagePreferences.securityRestrictionMode = WKSecurityRestrictionModeNone;
     auto webView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:webViewConfiguration.get()]);
     NSURL *url = [NSBundle.test_resourcesBundle URLForResource:@"simple" withExtension:@"html"];
     [webView loadRequest:[NSURLRequest requestWithURL:url]];
@@ -97,10 +109,10 @@ TEST(EnhancedSecurity, EnhancedSecurityEnableFalse)
 #endif
 }
 
-TEST(EnhancedSecurity, EnhancedSecurityDisablesJIT)
+TEST_F(EnhancedSecurityTest, EnhancedSecurityDisablesJIT)
 {
     auto webViewConfiguration = adoptNS([WKWebViewConfiguration new]);
-    webViewConfiguration.get().defaultWebpagePreferences._enhancedSecurityEnabled = YES;
+    webViewConfiguration.get().defaultWebpagePreferences.securityRestrictionMode = WKSecurityRestrictionModeMaximizeCompatibility;
     auto webView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:webViewConfiguration.get()]);
     NSURL *url = [NSBundle.test_resourcesBundle URLForResource:@"simple" withExtension:@"html"];
     [webView loadRequest:[NSURLRequest requestWithURL:url]];
@@ -108,10 +120,10 @@ TEST(EnhancedSecurity, EnhancedSecurityDisablesJIT)
     EXPECT_EQ(false, isJITEnabled(webView.get()));
 }
 
-TEST(EnhancedSecurity, EnhancedSecurityNavigationStaysEnabledAfterNavigation)
+TEST_F(EnhancedSecurityTest, EnhancedSecurityNavigationStaysEnabledAfterNavigation)
 {
     auto webViewConfiguration = adoptNS([WKWebViewConfiguration new]);
-    webViewConfiguration.get().defaultWebpagePreferences._enhancedSecurityEnabled = YES;
+    webViewConfiguration.get().defaultWebpagePreferences.securityRestrictionMode = WKSecurityRestrictionModeMaximizeCompatibility;
     auto webView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:webViewConfiguration.get()]);
     auto delegate = adoptNS([TestNavigationDelegate new]);
     [webView setNavigationDelegate:delegate.get()];
@@ -134,10 +146,10 @@ TEST(EnhancedSecurity, EnhancedSecurityNavigationStaysEnabledAfterNavigation)
     EXPECT_EQ(true, isEnhancedSecurityEnabled(webView.get()));
 }
 
-TEST(EnhancedSecurity, PSONToEnhancedSecurity)
+TEST_F(EnhancedSecurityTest, PSONToEnhancedSecurity)
 {
     auto webViewConfiguration = adoptNS([WKWebViewConfiguration new]);
-    webViewConfiguration.get().defaultWebpagePreferences._enhancedSecurityEnabled = NO;
+    webViewConfiguration.get().defaultWebpagePreferences.securityRestrictionMode = WKSecurityRestrictionModeNone;
     auto webView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:webViewConfiguration.get()]);
     auto delegate = adoptNS([TestNavigationDelegate new]);
     [webView setNavigationDelegate:delegate.get()];
@@ -160,8 +172,8 @@ TEST(EnhancedSecurity, PSONToEnhancedSecurity)
     finishedNavigation = false;
 
     delegate.get().decidePolicyForNavigationActionWithPreferences = ^(WKNavigationAction *action, WKWebpagePreferences *preferences, void (^completionHandler)(WKNavigationActionPolicy, WKWebpagePreferences *)) {
-        EXPECT_FALSE(preferences._enhancedSecurityEnabled);
-        preferences._enhancedSecurityEnabled = YES;
+        EXPECT_EQ(preferences.securityRestrictionMode, WKSecurityRestrictionModeNone);
+        preferences.securityRestrictionMode = WKSecurityRestrictionModeMaximizeCompatibility;
         completionHandler(WKNavigationActionPolicyAllow, preferences);
     };
 
@@ -176,10 +188,10 @@ TEST(EnhancedSecurity, PSONToEnhancedSecurity)
     EXPECT_NE(pid1, [webView _webProcessIdentifier]);
 }
 
-TEST(EnhancedSecurity, PSONToEnhancedSecuritySamePage)
+TEST_F(EnhancedSecurityTest, PSONToEnhancedSecuritySamePage)
 {
     auto webViewConfiguration = adoptNS([WKWebViewConfiguration new]);
-    webViewConfiguration.get().defaultWebpagePreferences._enhancedSecurityEnabled = NO;
+    webViewConfiguration.get().defaultWebpagePreferences.securityRestrictionMode = WKSecurityRestrictionModeNone;
     auto webView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:webViewConfiguration.get()]);
     auto delegate = adoptNS([TestNavigationDelegate new]);
     [webView setNavigationDelegate:delegate.get()];
@@ -202,8 +214,8 @@ TEST(EnhancedSecurity, PSONToEnhancedSecuritySamePage)
     finishedNavigation = false;
 
     delegate.get().decidePolicyForNavigationActionWithPreferences = ^(WKNavigationAction *action, WKWebpagePreferences *preferences, void (^completionHandler)(WKNavigationActionPolicy, WKWebpagePreferences *)) {
-        EXPECT_FALSE(preferences._enhancedSecurityEnabled);
-        preferences._enhancedSecurityEnabled = YES;
+        EXPECT_EQ(preferences.securityRestrictionMode, WKSecurityRestrictionModeNone);
+        preferences.securityRestrictionMode = WKSecurityRestrictionModeMaximizeCompatibility;
         completionHandler(WKNavigationActionPolicyAllow, preferences);
     };
 
@@ -228,14 +240,14 @@ static RetainPtr<_WKProcessPoolConfiguration> psonProcessPoolConfiguration()
     return processPoolConfiguration;
 }
 
-TEST(EnhancedSecurity, PSONToEnhancedSecuritySharedProcessPool)
+TEST_F(EnhancedSecurityTest, PSONToEnhancedSecuritySharedProcessPool)
 {
     auto processPoolConfiguration = psonProcessPoolConfiguration();
     auto processPool = adoptNS([[WKProcessPool alloc] _initWithConfiguration:processPoolConfiguration.get()]);
 
     auto webViewConfiguration = adoptNS([WKWebViewConfiguration new]);
     [webViewConfiguration setProcessPool:processPool.get()];
-    webViewConfiguration.get().defaultWebpagePreferences._enhancedSecurityEnabled = NO;
+    webViewConfiguration.get().defaultWebpagePreferences.securityRestrictionMode = WKSecurityRestrictionModeNone;
 
     auto webView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:webViewConfiguration.get()]);
 
@@ -262,8 +274,8 @@ TEST(EnhancedSecurity, PSONToEnhancedSecuritySharedProcessPool)
     [webView2 setNavigationDelegate:delegate.get()];
 
     delegate.get().decidePolicyForNavigationActionWithPreferences = ^(WKNavigationAction *action, WKWebpagePreferences *preferences, void (^completionHandler)(WKNavigationActionPolicy, WKWebpagePreferences *)) {
-        EXPECT_FALSE(preferences._enhancedSecurityEnabled);
-        preferences._enhancedSecurityEnabled = YES;
+        EXPECT_EQ(preferences.securityRestrictionMode, WKSecurityRestrictionModeNone);
+        preferences.securityRestrictionMode = WKSecurityRestrictionModeMaximizeCompatibility;
         completionHandler(WKNavigationActionPolicyAllow, preferences);
     };
 
@@ -278,14 +290,14 @@ TEST(EnhancedSecurity, PSONToEnhancedSecuritySharedProcessPool)
     EXPECT_NE(pid1, [webView2 _webProcessIdentifier]);
 }
 
-TEST(EnhancedSecurity, PSONToEnhancedSecuritySharedProcessPoolReverse)
+TEST_F(EnhancedSecurityTest, PSONToEnhancedSecuritySharedProcessPoolReverse)
 {
     auto processPoolConfiguration = psonProcessPoolConfiguration();
     auto processPool = adoptNS([[WKProcessPool alloc] _initWithConfiguration:processPoolConfiguration.get()]);
 
     auto webViewConfiguration = adoptNS([WKWebViewConfiguration new]);
     [webViewConfiguration setProcessPool:processPool.get()];
-    webViewConfiguration.get().defaultWebpagePreferences._enhancedSecurityEnabled = YES;
+    webViewConfiguration.get().defaultWebpagePreferences.securityRestrictionMode = WKSecurityRestrictionModeMaximizeCompatibility;
 
     auto webView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:webViewConfiguration.get()]);
 
@@ -312,8 +324,8 @@ TEST(EnhancedSecurity, PSONToEnhancedSecuritySharedProcessPoolReverse)
     [webView2 setNavigationDelegate:delegate.get()];
 
     delegate.get().decidePolicyForNavigationActionWithPreferences = ^(WKNavigationAction *action, WKWebpagePreferences *preferences, void (^completionHandler)(WKNavigationActionPolicy, WKWebpagePreferences *)) {
-        EXPECT_TRUE(preferences._enhancedSecurityEnabled);
-        preferences._enhancedSecurityEnabled = NO;
+        EXPECT_EQ(preferences.securityRestrictionMode, WKSecurityRestrictionModeMaximizeCompatibility);
+        preferences.securityRestrictionMode = WKSecurityRestrictionModeNone;
         completionHandler(WKNavigationActionPolicyAllow, preferences);
     };
 
@@ -329,14 +341,14 @@ TEST(EnhancedSecurity, PSONToEnhancedSecuritySharedProcessPoolReverse)
 }
 
 #if USE(APPLE_INTERNAL_SDK)
-TEST(EnhancedSecurity, ProcessVariantMatchesConfiguration)
+TEST_F(EnhancedSecurityTest, ProcessVariantMatchesConfiguration)
 {
     auto webViewConfiguration1 = adoptNS([WKWebViewConfiguration new]);
-    webViewConfiguration1.get().defaultWebpagePreferences._enhancedSecurityEnabled = YES;
+    webViewConfiguration1.get().defaultWebpagePreferences.securityRestrictionMode = WKSecurityRestrictionModeMaximizeCompatibility;
     auto webView1 = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:webViewConfiguration1.get()]);
 
     auto webViewConfiguration2 = adoptNS([WKWebViewConfiguration new]);
-    webViewConfiguration2.get().defaultWebpagePreferences._enhancedSecurityEnabled = NO;
+    webViewConfiguration2.get().defaultWebpagePreferences.securityRestrictionMode = WKSecurityRestrictionModeNone;
     auto webView2 = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:webViewConfiguration2.get()]);
 
     NSURL *url = [NSBundle.test_resourcesBundle URLForResource:@"simple" withExtension:@"html"];
@@ -353,12 +365,12 @@ TEST(EnhancedSecurity, ProcessVariantMatchesConfiguration)
 }
 #endif
 
-TEST(EnhancedSecurity, ProcessCanLaunch)
+TEST_F(EnhancedSecurityTest, ProcessCanLaunch)
 {
     auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
     configuration.get().websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
     configuration.get().processPool = adoptNS([[WKProcessPool alloc] init]).get();
-    configuration.get().defaultWebpagePreferences._enhancedSecurityEnabled = YES;
+    configuration.get().defaultWebpagePreferences.securityRestrictionMode = WKSecurityRestrictionModeMaximizeCompatibility;
 
     auto webView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:configuration.get()]);
     [webView loadHTMLString:@"<html><body>test</body></html>" baseURL:nil];
@@ -387,7 +399,7 @@ TEST(EnhancedSecurity, ProcessCanLaunch)
 
 }
 
-TEST(EnhancedSecurity, CaptivePortalProcessCanLaunch)
+TEST_F(EnhancedSecurityTest, CaptivePortalProcessCanLaunch)
 {
     [WKProcessPool _setCaptivePortalModeEnabledGloballyForTesting:YES];
 

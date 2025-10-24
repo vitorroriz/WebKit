@@ -164,6 +164,12 @@ static WebCore::ModalContainerObservationPolicy coreModalContainerObservationPol
 
 } // namespace WebKit
 
+// EnhancedSecurityFeatureEnabled is a temporary NSUserDefault, See: rdar://163369863
+static BOOL isEnhancedSecurityFeatureEnabled()
+{
+    return [[NSUserDefaults standardUserDefaults] boolForKey:@"EnhancedSecurityFeatureEnabled"];
+}
+
 static Ref<API::WebsitePolicies> protectedWebsitePolicies(WKWebpagePreferences *preferences)
 {
     return *preferences->_websitePolicies;
@@ -499,15 +505,22 @@ static _WKWebsiteDeviceOrientationAndMotionAccessPolicy toWKWebsiteDeviceOrienta
     }
 }
 
+ALLOW_DEPRECATED_IMPLEMENTATIONS_BEGIN
 - (void)_setEnhancedSecurityEnabled:(BOOL)enhancedSecurityEnabled
 {
+    if (!isEnhancedSecurityFeatureEnabled())
+        return;
+
     _websitePolicies->setEnhancedSecurityEnabled(enhancedSecurityEnabled ? true : false);
 }
 
 - (BOOL)_enhancedSecurityEnabled
 {
+    if (!isEnhancedSecurityFeatureEnabled())
+        return NO;
     return _websitePolicies->enhancedSecurityEnabled();
 }
+ALLOW_DEPRECATED_IMPLEMENTATIONS_END
 
 - (void)_setCaptivePortalModeEnabled:(BOOL)enabled
 {
@@ -826,6 +839,38 @@ static _WKWebsiteDeviceOrientationAndMotionAccessPolicy toWKWebsiteDeviceOrienta
 - (BOOL)_allowsJSHandleCreationInPageWorld
 {
     return _websitePolicies->allowsJSHandleCreationInPageWorld();
+}
+
+- (void)setSecurityRestrictionMode:(WKSecurityRestrictionMode)mode
+{
+    if (!isEnhancedSecurityFeatureEnabled())
+        return;
+
+    switch (mode) {
+    case WKSecurityRestrictionModeNone:
+        _websitePolicies->setEnhancedSecurityEnabled(false);
+        _websitePolicies->setLockdownModeEnabled(false);
+        break;
+    case WKSecurityRestrictionModeMaximizeCompatibility:
+        _websitePolicies->setEnhancedSecurityEnabled(true);
+        _websitePolicies->setLockdownModeEnabled(false);
+        break;
+    case WKSecurityRestrictionModeLockdown:
+        _websitePolicies->setEnhancedSecurityEnabled(false);
+        _websitePolicies->setLockdownModeEnabled(true);
+        break;
+    }
+}
+
+- (WKSecurityRestrictionMode)securityRestrictionMode
+{
+    if (!isEnhancedSecurityFeatureEnabled())
+        return WKSecurityRestrictionModeNone;
+    if (_websitePolicies->lockdownModeEnabled())
+        return WKSecurityRestrictionModeLockdown;
+    if (_websitePolicies->enhancedSecurityEnabled())
+        return WKSecurityRestrictionModeMaximizeCompatibility;
+    return WKSecurityRestrictionModeNone;
 }
 
 @end
