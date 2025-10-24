@@ -8867,7 +8867,7 @@ enum class WebCore::DOMAudioSessionType : uint8_t {
 #endif
 
 header: <WebCore/TrackInfo.h>
-[Nested] enum class WebCore::TrackInfoTrackType : uint8_t {
+enum class WebCore::TrackInfoTrackType : uint8_t {
     Unknown,
     Audio,
     Video,
@@ -8875,10 +8875,21 @@ header: <WebCore/TrackInfo.h>
 };
 
 header: <WebCore/TrackInfo.h>
+enum class WebCore::EncryptionBoxType : uint8_t {
+    CommonEncryptionTrackEncryptionBox,
+    TransportStreamEncryptionInitData
+};
+
+header: <WebCore/TrackInfo.h>
 [CustomHeader, RefCounted, DisableMissingMemberCheck] struct WebCore::AudioInfo {
     WebCore::FourCC codecName;
     String codecString;
     WebCore::TrackID trackID;
+#if ENABLE(ENCRYPTED_MEDIA)
+    std::optional<std::pair<WebCore::EncryptionBoxType, Ref<WebCore::SharedBuffer>>> encryptionData;
+    std::optional<WebCore::FourCC> encryptionOriginalFormat;
+    Vector<std::pair<WebCore::FourCC, Ref<WebCore::SharedBuffer>>> encryptionInitDatas;
+#endif
     [NotSerialized] WebCore::TrackInfoTrackType m_type;
     uint32_t rate;
     uint32_t channels;
@@ -8892,12 +8903,17 @@ header: <WebCore/TrackInfo.h>
     WebCore::FourCC codecName;
     String codecString;
     WebCore::TrackID trackID;
+#if ENABLE(ENCRYPTED_MEDIA)
+    std::optional<std::pair<WebCore::EncryptionBoxType, Ref<WebCore::SharedBuffer>>> encryptionData;
+    std::optional<WebCore::FourCC> encryptionOriginalFormat;
+    Vector<std::pair<WebCore::FourCC, Ref<WebCore::SharedBuffer>>> encryptionInitDatas;
+#endif
     [NotSerialized] WebCore::TrackInfoTrackType m_type;
     WebCore::FloatSize size;
     WebCore::FloatSize displaySize;
     uint8_t bitDepth;
     WebCore::PlatformVideoColorSpace colorSpace;
-    String boxType;
+    WebCore::FourCC boxType;
     RefPtr<WebCore::SharedBuffer> atomData;
 };
 
@@ -8915,6 +8931,11 @@ header: <WebCore/MediaSamplesBlock.h>
     RefPtr<WebCore::SharedBuffer> hdrMetadata;
     std::optional<WebCore::HdrMetadataType> hdrMetadataType;
     uint32_t flags;
+#if ENABLE(ENCRYPTED_MEDIA)
+    int32_t bytesOfClearDataCount;
+    RefPtr<WebCore::SharedBuffer> cryptorIV;
+    RefPtr<WebCore::SharedBuffer> cryptorSubsampleAuxiliaryData;
+#endif
 };
 
 class WebCore::MediaSamplesBlock {
