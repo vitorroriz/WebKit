@@ -175,12 +175,13 @@ void RenderTreeUpdater::updateRebuildRoots()
             return true;
         }
 
-        if (!element.renderer())
-            return element.hasDisplayContents();
+        CheckedPtr existingStyle = element.renderOrDisplayContentsStyle();
+        if (!existingStyle)
+            return false;
 
         auto* parent = composedTreeAncestors(element).first();
         m_styleUpdate->addElement(element, parent, Style::ElementUpdate {
-            makeUnique<RenderStyle>(RenderStyle::cloneIncludingPseudoElements(element.renderer()->style())),
+            makeUnique<RenderStyle>(RenderStyle::cloneIncludingPseudoElements(*existingStyle)),
             Style::Change::Renderer
         });
         return true;
