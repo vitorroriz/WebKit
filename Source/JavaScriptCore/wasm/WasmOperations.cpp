@@ -1178,12 +1178,12 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationWasmLoopOSREnterBBQJIT, void, (Probe:
         } else if (value.isFPR()) {
             if (type.isVector()) {
 #if CPU(X86_64) || CPU(ARM64)
-                *std::bit_cast<v128_t*>(&context.vector(value.fpr())) = *std::bit_cast<v128_t*>(bufferSlot);
+                context.vector(value.fpr()) = *std::bit_cast<v128_t*>(bufferSlot);
 #else
                 UNREACHABLE_FOR_PLATFORM();
 #endif
             } else
-                context.fpr(value.fpr()) = *bufferSlot;
+                context.fpr(value.fpr()) = *std::bit_cast<double*>(bufferSlot);
         } else if (value.isStack()) {
             auto* baseStore = std::bit_cast<uint8_t*>(context.fp()) + value.offsetFromFP();
             switch (type.kind()) {
