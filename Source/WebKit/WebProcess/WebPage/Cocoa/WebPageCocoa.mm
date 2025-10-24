@@ -374,7 +374,7 @@ void WebPage::insertDictatedTextAsync(const String& text, const EditingRange& re
     if (replacementEditingRange.location != notFound) {
         auto replacementRange = EditingRange::toRange(*frame, replacementEditingRange);
         if (replacementRange)
-            frame->selection().setSelection(VisibleSelection { *replacementRange });
+            frame->checkedSelection()->setSelection(VisibleSelection { *replacementRange });
     }
 
     if (options.registerUndoGroup)
@@ -430,7 +430,7 @@ void WebPage::addDictationAlternative(const String& text, DictationContext conte
         return;
     }
 
-    document->markers().addMarker(matchRange, DocumentMarkerType::DictationAlternatives, { DocumentMarker::DictationData { context, text } });
+    document->checkedMarkers()->addMarker(matchRange, DocumentMarkerType::DictationAlternatives, { DocumentMarker::DictationData { context, text } });
     completion(true);
 }
 
@@ -453,7 +453,7 @@ void WebPage::dictationAlternativesAtSelection(CompletionHandler<void(Vector<Dic
         return;
     }
 
-    auto markers = document->markers().markersInRange(*expandedSelectionRange, DocumentMarkerType::DictationAlternatives);
+    auto markers = document->checkedMarkers()->markersInRange(*expandedSelectionRange, DocumentMarkerType::DictationAlternatives);
     auto contexts = WTF::compactMap(markers, [](auto& marker) -> std::optional<DictationContext> {
         if (std::holds_alternative<DocumentMarker::DictationData>(marker->data()))
             return std::get<DocumentMarker::DictationData>(marker->data()).context;
@@ -478,7 +478,7 @@ void WebPage::clearDictationAlternatives(Vector<DictationContext>&& contexts)
         setOfContextsToRemove.add(context);
 
     auto documentRange = makeRangeSelectingNodeContents(*document);
-    document->markers().filterMarkers(documentRange, [&] (auto& marker) {
+    document->checkedMarkers()->filterMarkers(documentRange, [&] (auto& marker) {
         if (!std::holds_alternative<DocumentMarker::DictationData>(marker.data()))
             return FilterMarkerResult::Keep;
         return setOfContextsToRemove.contains(std::get<WebCore::DocumentMarker::DictationData>(marker.data()).context) ? FilterMarkerResult::Remove : FilterMarkerResult::Keep;
@@ -860,7 +860,7 @@ void WebPage::replaceImageForRemoveBackground(const ElementContext& elementConte
 
     constexpr auto restoreSelectionOptions = FrameSelection::defaultSetSelectionOptions(UserTriggered::Yes);
     if (!originalSelection.isNoneOrOrphaned()) {
-        frame->selection().setSelection(originalSelection, restoreSelectionOptions);
+        frame->checkedSelection()->setSelection(originalSelection, restoreSelectionOptions);
         return;
     }
 
@@ -879,7 +879,7 @@ void WebPage::replaceImageForRemoveBackground(const ElementContext& elementConte
     // The node replacement may have orphaned the original selection range; in this case, try to restore
     // the original selected character range.
     auto newSelectionRange = resolveCharacterRange(selectionHostRange, *rangeToRestore, iteratorOptions);
-    frame->selection().setSelection(newSelectionRange, restoreSelectionOptions);
+    frame->checkedSelection()->setSelection(newSelectionRange, restoreSelectionOptions);
 }
 
 #endif // ENABLE(IMAGE_ANALYSIS_ENHANCEMENTS)
@@ -1356,7 +1356,7 @@ void WebPage::drawPagesToPDFFromPDFDocument(GraphicsContext& context, PDFDocumen
             break;
 
         context.beginPage(mediaBox);
-        drawPDFPage(pdfDocument, page, context.platformContext(), printInfo.pageSetupScaleFactor, CGSizeMake(printInfo.availablePaperWidth, printInfo.availablePaperHeight));
+        drawPDFPage(pdfDocument, page, context.protectedPlatformContext().get(), printInfo.pageSetupScaleFactor, CGSizeMake(printInfo.availablePaperWidth, printInfo.availablePaperHeight));
         context.endPage();
     }
 }

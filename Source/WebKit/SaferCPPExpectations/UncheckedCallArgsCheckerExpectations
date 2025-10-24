@@ -15,7 +15,6 @@ WebProcess/InjectedBundle/InjectedBundleHitTestResult.cpp
 WebProcess/Network/WebLoaderStrategy.cpp
 WebProcess/Network/WebResourceLoader.cpp
 WebProcess/WebPage/Cocoa/TextAnimationController.mm
-WebProcess/WebPage/Cocoa/WebPageCocoa.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeDrawingArea.mm
 WebProcess/WebPage/RemoteLayerTree/RemoteScrollingCoordinator.mm
 WebProcess/WebPage/WebFrame.cpp
@@ -23,7 +22,6 @@ WebProcess/WebPage/mac/WKAccessibilityWebPageObjectBase.mm
 [ Mac ] Platform/cocoa/_WKWebViewTextInputNotifications.mm
 [ Mac ] WebProcess/WebCoreSupport/mac/WebPopupMenuMac.mm
 [ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
-[ Mac ] WebProcess/WebPage/mac/WebPageMac.mm
 [ iOS ] UIProcess/API/ios/WKWebViewIOS.mm
 [ iOS ] UIProcess/API/ios/WKWebViewTestingIOS.mm
 [ iOS ] UIProcess/Cocoa/ExtensionCapabilityGranter.mm

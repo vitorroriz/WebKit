@@ -7,12 +7,10 @@ WebProcess/Plugins/PDF/PDFPluginChoiceAnnotation.mm
 WebProcess/Plugins/PDF/PDFPluginTextAnnotation.mm
 WebProcess/Plugins/PDF/UnifiedPDF/UnifiedPDFPlugin.mm
 WebProcess/Plugins/PDF/WKAccessibilityPDFDocumentObject.mm
-WebProcess/WebPage/Cocoa/WebPageCocoa.mm
 WebProcess/WebPage/RemoteLayerTree/PlatformCAAnimationRemote.mm
 WebProcess/WebPage/RemoteLayerTree/PlatformCALayerRemoteCustom.mm
 [ Mac ] WebProcess/WebPage/mac/PageBannerMac.mm
 [ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
-[ Mac ] WebProcess/WebPage/mac/WebPageMac.mm
 [ iOS ] NetworkProcess/cocoa/NetworkSessionCocoa.mm
 [ iOS ] NetworkProcess/cocoa/NetworkTaskCocoa.mm
 [ iOS ] NetworkProcess/ios/NetworkProcessIOS.mm
