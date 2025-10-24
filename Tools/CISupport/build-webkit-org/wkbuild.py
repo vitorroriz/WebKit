@@ -48,6 +48,7 @@ def _should_file_trigger_build(target_platform, file):
         "mac-ventura",
         "mac-sonoma",
         "mac-sequoia",
+        "mac-tahoe",
         "ios-26",
         "ios-simulator-26",
         "visionos-26",
