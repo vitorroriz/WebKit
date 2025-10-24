@@ -490,7 +490,7 @@ bool WebXROpaqueFramebuffer::setupFramebuffer(GraphicsContextGL& gl, const Platf
 
 const std::array<WebXRExternalAttachments, 2>* WebXROpaqueFramebuffer::reusableDisplayAttachments(const PlatformXR::FrameData::ExternalTextureData& textureData) const
 {
-    if (!textureData.colorTexture.isNull())
+    if (textureData.colorTexture)
         return nullptr;
 
     auto reusableTextureIndex = textureData.reusableTextureIndex;
@@ -527,8 +527,8 @@ void WebXROpaqueFramebuffer::bindCompositorTexturesForDisplay(GraphicsContextGL&
     releaseDisplayAttachmentsAtIndex(m_currentDisplayAttachmentIndex);
 
     for (int layer = 0; layer < layerCount; ++layer) {
-        ASSERT(!layerData.textureData->colorTexture.isNull());
-        if (layerData.textureData->colorTexture.isNull())
+        ASSERT(layerData.textureData->colorTexture);
+        if (!layerData.textureData->colorTexture)
             return;
 
         auto colorTextureSource = makeExternalImageSource(layerData.textureData->colorTexture, framebufferSize);
@@ -537,7 +537,7 @@ void WebXROpaqueFramebuffer::bindCompositorTexturesForDisplay(GraphicsContextGL&
         if (!m_displayAttachmentsSets[m_currentDisplayAttachmentIndex][layer].colorBuffer.image)
             return;
 
-        if (!layerData.textureData->depthStencilBuffer.isNull()) {
+        if (layerData.textureData->depthStencilBuffer) {
             auto depthStencilBufferSource = makeExternalImageSource(layerData.textureData->depthStencilBuffer, framebufferSize);
             createAndBindCompositorBuffer(gl, m_displayAttachmentsSets[m_currentDisplayAttachmentIndex][layer].depthStencilBuffer, GL::DEPTH24_STENCIL8, WTFMove(depthStencilBufferSource), layer);
         }
