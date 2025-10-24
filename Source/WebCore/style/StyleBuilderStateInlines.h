@@ -214,11 +214,11 @@ inline void BuilderState::setFontDescriptionSpecifiedLocale(const AtomString& sp
 
 inline void BuilderState::setFontDescriptionTextAutospace(TextAutospace textAutospace)
 {
-    if (m_style.fontDescription().textAutospace() == textAutospace)
+    if (m_style.fontDescription().textAutospace() == toPlatform(textAutospace))
         return;
 
     m_fontDirty = true;
-    m_style.mutableFontDescriptionWithoutUpdate().setTextAutospace(textAutospace);
+    m_style.mutableFontDescriptionWithoutUpdate().setTextAutospace(toPlatform(textAutospace));
 }
 
 inline void BuilderState::setFontDescriptionTextRenderingMode(TextRenderingMode textRenderingMode)

@@ -117,18 +117,21 @@ public:
 
     using Options = OptionSet<Type>;
 
-    TextAutospace() = default;
-    TextAutospace(Options options)
+    constexpr TextAutospace() = default;
+    constexpr TextAutospace(Options options)
         : m_options(options)
-        { }
+    {
+    }
 
-    bool isAuto() const { return m_options.contains(Type::Auto); }
-    bool isNoAutospace() const { return m_options.isEmpty(); }
-    bool isNormal() const { return m_options.contains(Type::Normal); }
-    bool hasIdeographAlpha() const { return m_options.containsAny({ Type::IdeographAlpha, Type::Normal }); }
-    bool hasIdeographNumeric() const { return m_options.containsAny({ Type::IdeographNumeric, Type::Normal }); }
-    Options options() { return m_options; }
-    friend bool operator==(const TextAutospace&, const TextAutospace&) = default;
+    constexpr bool isAuto() const { return m_options.contains(Type::Auto); }
+    constexpr bool isNoAutospace() const { return m_options.isEmpty(); }
+    constexpr bool isNormal() const { return m_options.contains(Type::Normal); }
+    constexpr bool hasIdeographAlpha() const { return m_options.containsAny({ Type::IdeographAlpha, Type::Normal }); }
+    constexpr bool hasIdeographNumeric() const { return m_options.containsAny({ Type::IdeographNumeric, Type::Normal }); }
+    constexpr Options options() { return m_options; }
+
+    bool operator==(const TextAutospace&) const = default;
+
     bool shouldApplySpacing(TextSpacing::CharacterClass firstCharacterClass, TextSpacing::CharacterClass secondCharacterClass) const;
     bool shouldApplySpacing(char32_t firstCharacter, char32_t secondCharacter) const;
     static float textAutospaceSize(const Font&);

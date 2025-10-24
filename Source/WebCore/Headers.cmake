@@ -3476,6 +3476,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/text/StyleHyphenateLimitLines.h
     style/values/text/StyleLetterSpacing.h
     style/values/text/StyleTabSize.h
+    style/values/text/StyleTextAutospace.h
     style/values/text/StyleTextIndent.h
     style/values/text/StyleTextSpacingTrim.h
     style/values/text/StyleWordSpacing.h

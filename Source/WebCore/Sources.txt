@@ -3321,6 +3321,7 @@ style/values/text-decoration/StyleTextShadow.cpp
 style/values/text-decoration/StyleTextUnderlineOffset.cpp
 style/values/text/StyleLetterSpacing.cpp
 style/values/text/StyleTabSize.cpp
+style/values/text/StyleTextAutospace.cpp
 style/values/text/StyleTextIndent.cpp
 style/values/text/StyleWordSpacing.cpp
 style/values/transforms/functions/StyleMatrix3DTransformFunction.cpp

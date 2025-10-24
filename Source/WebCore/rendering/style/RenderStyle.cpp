@@ -2517,11 +2517,6 @@ float RenderStyle::computedFontSize() const
     return fontDescription().computedSize();
 }
 
-TextAutospace RenderStyle::textAutospace() const
-{
-    return fontDescription().textAutospace();
-}
-
 void RenderStyle::setFontCascade(FontCascade&& fontCascade)
 {
     if (fontCascade == this->fontCascade())
@@ -2611,10 +2606,10 @@ void RenderStyle::setTextSpacingTrim(Style::TextSpacingTrim value)
     setFontDescription(WTFMove(description));
 }
 
-void RenderStyle::setTextAutospace(TextAutospace value)
+void RenderStyle::setTextAutospace(Style::TextAutospace value)
 {
     auto description = fontDescription();
-    description.setTextAutospace(value);
+    description.setTextAutospace(Style::toPlatform(value));
     setFontDescription(WTFMove(description));
 }
 

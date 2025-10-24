@@ -141,9 +141,6 @@ public:
 
     static OptionSet<MarginTrimType> convertMarginTrim(BuilderState&, const CSSValue&);
 
-    static TextSpacingTrim convertTextSpacingTrim(BuilderState&, const CSSValue&);
-    static TextAutospace convertTextAutospace(BuilderState&, const CSSValue&);
-
     static RefPtr<WillChangeData> convertWillChange(BuilderState&, const CSSValue&);
 
     static std::optional<ScopedName> convertPositionAnchor(BuilderState&, const CSSValue&);
@@ -629,39 +626,6 @@ inline OptionSet<MarginTrimType> BuilderConverter::convertMarginTrim(BuilderStat
     }
     ASSERT(list->size() <= 4);
     return marginTrim;
-}
-
-inline TextAutospace BuilderConverter::convertTextAutospace(BuilderState& builderState, const CSSValue& value)
-{
-    if (auto* primitiveValue = dynamicDowncast<CSSPrimitiveValue>(value)) {
-        if (primitiveValue->valueID() == CSSValueNoAutospace)
-            return { };
-        if (primitiveValue->valueID() == CSSValueAuto)
-            return { TextAutospace::Type::Auto };
-        if (primitiveValue->valueID() == CSSValueNormal)
-            return { TextAutospace::Type::Normal };
-    }
-
-    TextAutospace::Options options;
-
-    auto list = requiredListDowncast<CSSValueList, CSSPrimitiveValue>(builderState, value);
-    if (!list)
-        return { };
-
-    for (auto& value : *list) {
-        switch (value.valueID()) {
-        case CSSValueIdeographAlpha:
-            options.add(TextAutospace::Type::IdeographAlpha);
-            break;
-        case CSSValueIdeographNumeric:
-            options.add(TextAutospace::Type::IdeographNumeric);
-            break;
-        default:
-            ASSERT_NOT_REACHED();
-            break;
-        }
-    }
-    return options;
 }
 
 inline OptionSet<Containment> BuilderConverter::convertContain(BuilderState& builderState, const CSSValue& value)

@@ -72,7 +72,6 @@ public:
     static void serializeImageOrientation(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, ImageOrientation);
     static void serializeContain(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<Containment>);
     static void serializeSmoothScrolling(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, bool);
-    static void serializeTextAutospace(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, TextAutospace);
     static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
     static void serializeWillChange(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const WillChangeData*);
     static void serializeTabSize(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const TabSize&);
@@ -281,41 +280,6 @@ inline void ExtractorSerializer::serializeContain(ExtractorState& state, StringB
     appendOption(Containment::Layout, CSSValueLayout);
     appendOption(Containment::Style, CSSValueStyle);
     appendOption(Containment::Paint, CSSValuePaint);
-}
-
-inline void ExtractorSerializer::serializeTextAutospace(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, TextAutospace textAutospace)
-{
-    if (textAutospace.isAuto()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Auto { });
-        return;
-    }
-
-    if (textAutospace.isNoAutospace()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::NoAutospace { });
-        return;
-    }
-
-    if (textAutospace.isNormal()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Normal { });
-        return;
-    }
-
-    if (textAutospace.hasIdeographAlpha() && textAutospace.hasIdeographNumeric()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::IdeographAlpha { });
-        builder.append(' ');
-        serializationForCSS(builder, context, state.style, CSS::Keyword::IdeographNumeric { });
-        return;
-    }
-
-    if (textAutospace.hasIdeographAlpha()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::IdeographAlpha { });
-        return;
-    }
-
-    if (textAutospace.hasIdeographNumeric()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::IdeographNumeric { });
-        return;
-    }
 }
 
 inline void ExtractorSerializer::serializePositionTryFallbacks(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const FixedVector<PositionTryFallback>& fallbacks)

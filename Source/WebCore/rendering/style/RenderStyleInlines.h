@@ -67,6 +67,7 @@
 #include <WebCore/StyleRareInheritedData.h>
 #include <WebCore/StyleRareNonInheritedData.h>
 #include <WebCore/StyleSurroundData.h>
+#include <WebCore/StyleTextAutospace.h>
 #include <WebCore/StyleTextSpacingTrim.h>
 #include <WebCore/StyleTransformData.h>
 #include <WebCore/StyleVisitedLinkColorData.h>
@@ -441,7 +442,7 @@ constexpr Style::FontVariantLigatures RenderStyle::initialFontVariantLigatures()
 constexpr Style::FontVariantNumeric RenderStyle::initialFontVariantNumeric() { return CSS::Keyword::Normal { }; }
 constexpr FontVariantPosition RenderStyle::initialFontVariantPosition() { return FontVariantPosition::Normal; }
 inline AtomString RenderStyle::initialLocale() { return nullAtom(); }
-constexpr TextAutospace RenderStyle::initialTextAutospace() { return { }; }
+constexpr Style::TextAutospace RenderStyle::initialTextAutospace() { return CSS::Keyword::NoAutospace { }; }
 constexpr TextRenderingMode RenderStyle::initialTextRendering() { return TextRenderingMode::AutoTextRendering; }
 constexpr Style::TextSpacingTrim RenderStyle::initialTextSpacingTrim() { return CSS::Keyword::SpaceAll { }; }
 inline Style::GridTrackSizes RenderStyle::initialGridAutoColumns() { return CSS::Keyword::Auto { }; }
@@ -805,6 +806,7 @@ inline const AtomString& RenderStyle::pseudoElementNameArgument() const { return
 inline const Style::TabSize& RenderStyle::tabSize() const { return m_rareInheritedData->tabSize; }
 inline TableLayoutType RenderStyle::tableLayout() const { return static_cast<TableLayoutType>(m_nonInheritedData->miscData->tableLayout); }
 inline TextAlignLast RenderStyle::textAlignLast() const { return static_cast<TextAlignLast>(m_rareInheritedData->textAlignLast); }
+inline Style::TextAutospace RenderStyle::textAutospace() const { return fontDescription().textAutospace(); }
 inline TextBoxTrim RenderStyle::textBoxTrim() const { return static_cast<TextBoxTrim>(m_nonInheritedData->rareData->textBoxTrim); }
 inline Style::TextBoxEdge RenderStyle::textBoxEdge() const { return m_rareInheritedData->textBoxEdge; }
 inline Style::LineFitEdge RenderStyle::lineFitEdge() const { return m_rareInheritedData->lineFitEdge; }

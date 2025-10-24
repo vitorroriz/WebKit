@@ -137,7 +137,6 @@ public:
     static Ref<CSSValue> convertMarginTrim(ExtractorState&, OptionSet<MarginTrimType>);
     static Ref<CSSValue> convertImageOrientation(ExtractorState&, ImageOrientation);
     static Ref<CSSValue> convertContain(ExtractorState&, OptionSet<Containment>);
-    static Ref<CSSValue> convertTextAutospace(ExtractorState&, TextAutospace);
     static Ref<CSSValue> convertPositionTryFallbacks(ExtractorState&, const FixedVector<PositionTryFallback>&);
     static Ref<CSSValue> convertWillChange(ExtractorState&, const WillChangeData*);
     static Ref<CSSValue> convertLineBoxContain(ExtractorState&, OptionSet<Style::LineBoxContain>);
@@ -317,25 +316,6 @@ inline Ref<CSSValue> ExtractorConverter::convertContain(ExtractorState&, OptionS
         list.append(CSSPrimitiveValue::create(CSSValuePaint));
     return CSSValueList::createSpaceSeparated(WTFMove(list));
 }
-
-inline Ref<CSSValue> ExtractorConverter::convertTextAutospace(ExtractorState&, TextAutospace textAutospace)
-{
-    if (textAutospace.isAuto())
-        return CSSPrimitiveValue::create(CSSValueAuto);
-    if (textAutospace.isNoAutospace())
-        return CSSPrimitiveValue::create(CSSValueNoAutospace);
-    if (textAutospace.isNormal())
-        return CSSPrimitiveValue::create(CSSValueNormal);
-
-    CSSValueListBuilder list;
-    if (textAutospace.hasIdeographAlpha())
-        list.append(CSSPrimitiveValue::create(CSSValueIdeographAlpha));
-    if (textAutospace.hasIdeographNumeric())
-        list.append(CSSPrimitiveValue::create(CSSValueIdeographNumeric));
-
-    return CSSValueList::createSpaceSeparated(WTFMove(list));
-}
-
 
 inline Ref<CSSValue> ExtractorConverter::convertPositionTryFallbacks(ExtractorState& state, const FixedVector<PositionTryFallback>& fallbacks)
 {

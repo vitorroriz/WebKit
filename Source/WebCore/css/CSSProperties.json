@@ -1416,7 +1416,7 @@
                 "font-property": true,
                 "high-priority": true,
                 "sink-priority": true,
-                "style-converter": "TextAutospace",
+                "style-converter": "StyleType<TextAutospace>",
                 "parser-grammar": "normal | auto | no-autospace | [ ideograph-alpha || ideograph-numeric ]@(no-single-item-opt)",
                 "parser-grammar-comment": "Current spec grammar is 'normal | auto | no-autospace | [ [ ideograph-alpha || ideograph-numeric || punctuation ] || [ insert | replace ] ]'"
             },

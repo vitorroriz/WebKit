@@ -73,7 +73,6 @@ class StyleInheritedData;
 class StyleNonInheritedData;
 class StyleRareInheritedData;
 class StyleSelfAlignmentData;
-class TextAutospace;
 class TransformationMatrix;
 class ViewTimeline;
 class WillChangeData;
@@ -352,6 +351,7 @@ struct ShapeOutside;
 struct StrokeMiterlimit;
 struct StrokeWidth;
 struct TabSize;
+struct TextAutospace;
 struct TextBoxEdge;
 struct TextDecorationThickness;
 struct TextEmphasisStyle;
@@ -787,7 +787,7 @@ public:
     inline float usedWordSpacing() const;
 
     inline Style::TextSpacingTrim textSpacingTrim() const;
-    TextAutospace textAutospace() const;
+    inline Style::TextAutospace textAutospace() const;
 
     inline float zoom() const;
     inline float usedZoom() const;
@@ -1987,7 +1987,7 @@ public:
     inline void setMathStyle(const MathStyle&);
 
     void setTextSpacingTrim(Style::TextSpacingTrim);
-    void setTextAutospace(TextAutospace v);
+    void setTextAutospace(Style::TextAutospace);
 
     static constexpr Overflow initialOverflowX();
     static constexpr Overflow initialOverflowY();
@@ -2024,7 +2024,7 @@ public:
     static constexpr Style::FontVariantNumeric initialFontVariantNumeric();
     static constexpr FontVariantPosition initialFontVariantPosition();
     static inline AtomString initialLocale();
-    static constexpr TextAutospace initialTextAutospace();
+    static constexpr Style::TextAutospace initialTextAutospace();
     static constexpr TextRenderingMode initialTextRendering();
     static constexpr Style::TextSpacingTrim initialTextSpacingTrim();
     static constexpr BreakBetween initialBreakBetween();
