@@ -529,14 +529,14 @@ public:
     //    Similar to client coordinates, but affected by page zoom (but not page scale).
     //
 
-    float documentToAbsoluteScaleFactor(std::optional<float> usedZoom = std::nullopt) const;
-    float absoluteToDocumentScaleFactor(std::optional<float> usedZoom = std::nullopt) const;
+    float documentToAbsoluteScaleFactor(std::optional<float> usedZoom = { }) const;
+    float absoluteToDocumentScaleFactor(std::optional<float> usedZoom = { }) const;
 
-    WEBCORE_EXPORT FloatRect absoluteToDocumentRect(FloatRect, std::optional<float> usedZoom = std::nullopt) const;
-    WEBCORE_EXPORT FloatPoint absoluteToDocumentPoint(FloatPoint, std::optional<float> usedZoom = std::nullopt) const;
-    WEBCORE_EXPORT DoublePoint absoluteToDocumentPoint(DoublePoint, std::optional<float> usedZoom = std::nullopt) const;
+    WEBCORE_EXPORT FloatRect absoluteToDocumentRect(FloatRect, std::optional<float> usedZoom = { }) const;
+    WEBCORE_EXPORT FloatPoint absoluteToDocumentPoint(FloatPoint, std::optional<float> usedZoom = { }) const;
+    WEBCORE_EXPORT DoublePoint absoluteToDocumentPoint(DoublePoint, std::optional<float> usedZoom = { }) const;
 
-    FloatRect absoluteToClientRect(FloatRect, std::optional<float> usedZoom = std::nullopt) const;
+    FloatRect absoluteToClientRect(FloatRect, std::optional<float> usedZoom = { }) const;
 
     FloatSize documentToClientOffset() const;
     WEBCORE_EXPORT FloatRect documentToClientRect(FloatRect) const;
@@ -1035,7 +1035,8 @@ private:
 
     OptionSet<PaintBehavior> m_paintBehavior;
 
-    float m_lastZoomFactor { 1 };
+    float m_lastUsedZoomFactor { 1 };
+    float m_lastFrameScaleFactor { 1 };
     unsigned m_visuallyNonEmptyCharacterCount { 0 };
     unsigned m_visuallyNonEmptyPixelCount { 0 };
     unsigned m_textRendererCountForVisuallyNonEmptyCharacters { 0 };

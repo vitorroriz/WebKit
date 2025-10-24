@@ -1124,10 +1124,20 @@ float LocalFrame::frameScaleFactor() const
 {
     RefPtr page = this->page();
 
-    // Main frame is scaled with respect to he container but inner frames are not scaled with respect to the main frame.
-    if (!page || !isMainFrame())
+    if (!page)
         return 1;
 
+    // https://github.com/w3c/csswg-drafts/issues/9644
+    // Check if this frame's owner element (iframe) has CSS zoom applied.
+    if (!isMainFrame()) {
+        if (RefPtr ownerElement = this->ownerElement()) {
+            if (auto* ownerRenderer = ownerElement->renderer())
+                return ownerRenderer->style().usedZoom();
+        }
+        return 1;
+    }
+
+    // Main frame is scaled with respect to the container.
     if (page->delegatesScaling())
         return 1;
 

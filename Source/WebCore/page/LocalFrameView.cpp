@@ -276,7 +276,7 @@ void LocalFrameView::reset()
     m_pendingTextFragmentIndicatorText = String();
     m_haveCreatedTextIndicator = false;
     m_lastViewportSize = IntSize();
-    m_lastZoomFactor = 1.0f;
+    m_lastUsedZoomFactor = 1.0f;
     m_isTrackingRepaints = false;
     m_trackedRepaintRects.clear();
     m_lastPaintTime = MonotonicTime();
@@ -1279,7 +1279,7 @@ void LocalFrameView::willDoLayout(SingleThreadWeakPtr<RenderElement> layoutRoot)
     auto firstLayout = !layoutContext().didFirstLayout();
     if (firstLayout) {
         m_lastViewportSize = sizeForResizeEvent();
-        m_lastZoomFactor = layoutRoot->style().zoom();
+        m_lastUsedZoomFactor = layoutRoot->style().usedZoom();
         m_firstLayoutCallbackPending = true;
     }
     adjustScrollbarsForLayout(firstLayout);
@@ -4688,13 +4688,15 @@ void LocalFrameView::scheduleResizeEventIfNeeded()
         return;
 
     IntSize currentSize = sizeForResizeEvent();
-    float currentZoomFactor = renderView->style().zoom();
+    float currentZoomFactor = renderView->style().usedZoom();
+    float currentFrameScaleFactor = m_frame->frameScaleFactor();
 
-    if (currentSize == m_lastViewportSize && currentZoomFactor == m_lastZoomFactor)
+    if (currentSize == m_lastViewportSize && currentZoomFactor == m_lastUsedZoomFactor && currentFrameScaleFactor == m_lastFrameScaleFactor)
         return;
 
     m_lastViewportSize = currentSize;
-    m_lastZoomFactor = currentZoomFactor;
+    m_lastUsedZoomFactor = currentZoomFactor;
+    m_lastFrameScaleFactor = currentFrameScaleFactor;
 
     if (!layoutContext().didFirstLayout())
         return;
