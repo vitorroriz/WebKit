@@ -60,18 +60,22 @@
 #include <WebKitAdditions/WTFConfigAdditions.h>
 #endif
 #if !USE(SYSTEM_MALLOC)
+#if BUSE(LIBPAS)
 #include "bmalloc/pas_mte_config.h"
+#endif
 #endif
 
 #include <mutex>
 
 #if OS(DARWIN) && !USE(SYSTEM_MALLOC)
 
+#if BUSE(LIBPAS)
 #if HAVE(36BIT_ADDRESS) && !PAS_HAVE(36BIT_ADDRESS)
 #error HAVE(36BIT_ADDRESS) is true, but PAS_HAVE(36BIT_ADDRESS) is false. They should match.
 #elif !HAVE(36BIT_ADDRESS) && PAS_HAVE(36BIT_ADDRESS)
 #error HAVE(36BIT_ADDRESS) is false, but PAS_HAVE(36BIT_ADDRESS) is true. They should match.
 #endif
+#endif // BUSE(LIBPAS)
 
 #endif // OS(DARWIN)
 
