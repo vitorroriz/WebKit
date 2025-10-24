@@ -2233,6 +2233,8 @@ page/VisitedLinkStore.cpp
 page/VisualViewport.cpp
 page/WebKitJSHandle.cpp
 page/WebKitSerializedNode.cpp
+page/WebKitStringMatchersNamespace.cpp
+page/WebKitStringMatcher.cpp
 page/WheelEventDeltaFilter.cpp
 page/WheelEventTestMonitor.cpp
 page/WindowFeatures.cpp
@@ -4896,6 +4898,9 @@ JSStorage.cpp
 JSStorageEvent.cpp
 JSStorageManager.cpp
 JSStreamPipeOptions.cpp
+JSWebKitStringMatcher.cpp
+JSWebKitStringMatchersNamespace.cpp
+JSWebKitStringMatcherOptions.cpp
 JSStringCallback.cpp
 JSStructuredSerializeOptions.cpp
 JSStyleMedia.cpp

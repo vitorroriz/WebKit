@@ -30,6 +30,7 @@
 
 #import "AppKitSPI.h"
 #import "WebPageProxy.h"
+#import "WebPreferencesDefaultValues.h"
 #import <WebCore/IntRect.h>
 #import <WebCore/LocalizedStrings.h>
 #import <pal/spi/mac/NSColorSPI.h>

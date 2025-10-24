@@ -1635,6 +1635,9 @@ JS_BINDING_IDLS := \
     $(WebCore)/page/WindowOrWorkerGlobalScope.idl \
     $(WebCore)/page/WindowPostMessageOptions.idl \
     $(WebCore)/page/WindowSessionStorage.idl \
+    $(WebCore)/page/WebKitStringMatcher.idl \
+    $(WebCore)/page/WebKitStringMatcherOptions.idl \
+    $(WebCore)/page/WebKitStringMatchersNamespace.idl \
     $(WebCore)/page/WorkerNavigator.idl \
     $(WebCore)/page/csp/CSPViolationReportBody.idl \
     $(WebCore)/plugins/DOMMimeType.idl \

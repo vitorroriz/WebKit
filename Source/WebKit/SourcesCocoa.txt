@@ -306,6 +306,7 @@ UIProcess/API/Cocoa/_WKResourceLoadInfo.mm @nonARC
 UIProcess/API/Cocoa/_WKSerializedNode.mm @nonARC
 UIProcess/API/Cocoa/_WKSessionState.mm @nonARC
 UIProcess/API/Cocoa/_WKSpatialBackdropSource.mm @nonARC
+UIProcess/API/Cocoa/_WKStringMatcher.mm @nonARC
 UIProcess/API/Cocoa/_WKSystemPreferences.mm @nonARC
 UIProcess/API/Cocoa/_WKTargetedElementInfo.mm @nonARC
 UIProcess/API/Cocoa/_WKTargetedElementRequest.mm @nonARC

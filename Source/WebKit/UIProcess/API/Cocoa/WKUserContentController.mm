@@ -41,6 +41,7 @@
 #import "WebPageProxy.h"
 #import "WebScriptMessageHandler.h"
 #import "WebUserContentControllerProxy.h"
+#import "_WKStringMatcherInternal.h"
 #import "_WKUserContentFilterInternal.h"
 #import "_WKUserContentWorldInternal.h"
 #import "_WKUserStyleSheetInternal.h"
@@ -311,6 +312,16 @@ private:
 - (void)_removeAllUserStyleSheetsAssociatedWithContentWorld:(WKContentWorld *)contentWorld
 {
     protectedUserContentControllerProxy(self)->removeAllUserStyleSheets(Ref { *contentWorld->_contentWorld });
+}
+
+- (void)_addStringMatcher:(_WKStringMatcher *)matcher contentWorld:(WKContentWorld *)world name:(NSString *)name
+{
+    protectedUserContentControllerProxy(self)->addStringMatcher(Ref { *matcher->_matcher }, Ref { *world->_contentWorld }, name);
+}
+
+- (void)_removeStringMatcherWithName:(NSString *)name contentWorld:(WKContentWorld *)world
+{
+    protectedUserContentControllerProxy(self)->removeStringMatcher(Ref { *world->_contentWorld }, name);
 }
 
 ALLOW_DEPRECATED_DECLARATIONS_BEGIN

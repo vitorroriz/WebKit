@@ -2195,6 +2195,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     page/WebKitJSHandle.h
     page/WebKitNamespace.h
     page/WebKitSerializedNode.h
+    page/WebKitStringMatcher.h
     page/WheelEventDeltaFilter.h
     page/WheelEventTestMonitor.h
     page/WindowFeatures.h

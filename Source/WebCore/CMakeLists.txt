@@ -1586,6 +1586,9 @@ set(WebCore_NON_SVG_IDL_FILES
     page/WebKitJSHandle.idl
     page/WebKitPoint.idl
     page/WebKitSerializedNode.idl
+    page/WebKitStringMatcher.idl
+    page/WebKitStringMatcherOptions.idl
+    page/WebKitStringMatchersNamespace.idl
     page/WindowEventHandlers.idl
     page/WindowLocalStorage.idl
     page/WindowOrWorkerGlobalScope+Crypto.idl

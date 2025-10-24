@@ -868,7 +868,10 @@ bool LocalDOMWindow::shouldHaveWebKitNamespaceForWorld(DOMWrapperWorld& world, J
         }
     });
 
-    return hasUserMessageHandler;
+    if (hasUserMessageHandler)
+        return true;
+
+    return userContentProvider->hasStringMatchersForWorld(world);
 }
 
 WebKitNamespace* LocalDOMWindow::webkitNamespace()
