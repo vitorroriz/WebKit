@@ -281,15 +281,13 @@ CustomElementQueue& WindowEventLoop::backupElementQueue()
 
 void WindowEventLoop::breakToAllowRenderingUpdate()
 {
-#if PLATFORM(MAC)
-    // On Mac rendering updates happen in a runloop observer.
+    // On Mac/Gtk/WPE rendering updates happen in a runloop observer.
     // Avoid running timers and doing other work (like processing asyncronous IPC) until it is completed.
 
     // FIXME: Also bail out from the task loop in EventLoop::run().
     threadGlobalDataSingleton().threadTimers().breakFireLoopForRenderingUpdate();
 
     RunLoop::mainSingleton().suspendFunctionDispatchForCurrentCycle();
-#endif
 }
 
 } // namespace WebCore

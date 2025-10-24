@@ -48,6 +48,7 @@
 #include <WebCore/ScrollingThread.h>
 #include <WebCore/Settings.h>
 #include <WebCore/ThreadedScrollingTree.h>
+#include <WebCore/WindowEventLoop.h>
 #include <wtf/SetForScope.h>
 #include <wtf/SystemTracing.h>
 #include <wtf/TZoneMallocInlines.h>
@@ -157,6 +158,9 @@ void LayerTreeHost::scheduleLayerFlush()
 
     tracePoint(RenderingUpdateRunLoopObserverStart);
     m_layerFlushRunLoopObserver->schedule();
+
+    // Avoid running any more tasks before the runloop observer fires.
+    WebCore::WindowEventLoop::breakToAllowRenderingUpdate();
 }
 
 void LayerTreeHost::cancelPendingLayerFlush()
