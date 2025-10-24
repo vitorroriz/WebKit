@@ -1061,16 +1061,8 @@ end
     move cfr, a1
     move wasmInstance, a3
     cCall4(_operationWasmToJSExitMarshalArguments)
-    btpnz r1, .oom
+    btpnz r0, .handleException
 
-    bineq r0, 0, .safe
-    move wasmInstance, a0
-    move (constexpr Wasm::ExceptionType::TypeErrorInvalidValueUse), a1
-    cCall2(_operationWasmToJSException)
-    jumpToException()
-    break
-
-.safe:
     loadp WasmToJSCallableFunctionSlot[cfr], t2
     loadp JSC::Wasm::WasmOrJSImportableFunctionCallLinkInfo::importFunction[t2], t0
 if not JSVALUE64
@@ -1110,24 +1102,10 @@ if not JSVALUE64
     storep r1, TagOffset[sp]
 end
 
-    loadp WasmToJSCallableFunctionSlot[cfr], a0
-    call _operationWasmToJSExitNeedToUnpack
-    btpnz r0, .unpack
-
     move sp, a0
     move cfr, a1
     move wasmInstance, a2
     cCall3(_operationWasmToJSExitMarshalReturnValues)
-    btpnz r0, .handleException
-    jmp .end
-
-.unpack:
-
-    move r0, a1
-    move wasmInstance, a0
-    move sp, a2
-    move cfr, a3
-    cCall4(_operationWasmToJSExitIterateResults)
     btpnz r0, .handleException
 
 .end:
@@ -1168,9 +1146,6 @@ end
     move wasmInstance, a0
     call _operationWasmUnwind
     jumpToException()
-
-.oom:
-    throwException(OutOfMemory)
 end)
 
 macro jumpToException()
