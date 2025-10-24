@@ -243,7 +243,7 @@ template<CSSPropertyID propertyID> struct InsetEdgeSharedAdaptor {
         if (!box)
             return functor(value);
 
-        auto* containingBlock = box->containingBlock();
+        auto* containingBlock = dynamicDowncast<RenderBoxModelObject>(box->container());
 
         // Resolve a "computed value" percentage if the element is positioned.
         if (containingBlock && value.isPercentOrCalculated() && box->isPositioned()) {
@@ -304,19 +304,34 @@ template<CSSPropertyID propertyID> struct InsetEdgeSharedAdaptor {
         if (box->isRelativelyPositioned())
             return functor(Length<> { insetUsedStyleRelative(*box) });
 
-        auto insetUsedStyleOutOfFlowPositioned = [&](const RenderBlock& container, const RenderBox& box) {
+        auto insetUsedStyleOutOfFlowPositioned = [&](auto& container, auto& box) {
             // For out-of-flow positioned boxes, the inset is how far an box's margin
             // edge is inset below the edge of the box's containing block.
             // See http://www.w3.org/TR/CSS2/visuren.html#position-props
             //
             // Margins are included in offsetTop/offsetLeft so we need to remove them here.
-
+            auto paddingBoxWidth = [&]() -> LayoutUnit {
+                if (CheckedPtr renderBlock = dynamicDowncast<RenderBlock>(container))
+                    return renderBlock->paddingBoxWidth();
+                if (CheckedPtr inlineBox = dynamicDowncast<RenderInline>(container))
+                    return inlineBox->innerPaddingBoxWidth();
+                ASSERT_NOT_REACHED();
+                return { };
+            };
+            auto paddingBoxHeight = [&]() -> LayoutUnit {
+                if (CheckedPtr renderBlock = dynamicDowncast<RenderBlock>(container))
+                    return renderBlock->paddingBoxHeight();
+                if (CheckedPtr inlineBox = dynamicDowncast<RenderInline>(container))
+                    return inlineBox->innerPaddingBoxHeight();
+                ASSERT_NOT_REACHED();
+                return { };
+            };
             if constexpr (propertyID == CSSPropertyTop)
                 return box.offsetTop() - box.marginTop();
             else if constexpr (propertyID == CSSPropertyRight)
-                return container.clientWidth() - (box.offsetLeft() + box.offsetWidth()) - box.marginRight();
+                return paddingBoxWidth() - (box.offsetLeft() + box.offsetWidth()) - box.marginRight();
             else if constexpr (propertyID == CSSPropertyBottom)
-                return container.clientHeight() - (box.offsetTop() + box.offsetHeight()) - box.marginBottom();
+                return paddingBoxHeight() - (box.offsetTop() + box.offsetHeight()) - box.marginBottom();
             else if constexpr (propertyID == CSSPropertyLeft)
                 return box.offsetLeft() - box.marginLeft();
         };
