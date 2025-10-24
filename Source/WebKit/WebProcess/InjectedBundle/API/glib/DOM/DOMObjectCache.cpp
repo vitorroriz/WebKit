@@ -35,6 +35,15 @@
 #include <wtf/glib/GRefPtr.h>
 
 namespace WebKit {
+class DOMObjectCacheFrameObserver;
+}
+
+namespace WTF {
+template<typename T> struct IsDeprecatedWeakRefSmartPointerException;
+template<> struct IsDeprecatedWeakRefSmartPointerException<WebKit::DOMObjectCacheFrameObserver> : std::true_type { };
+}
+
+namespace WebKit {
 
 struct DOMObjectCacheData {
     WTF_DEPRECATED_MAKE_STRUCT_FAST_ALLOCATED(DOMObjectCacheData);
