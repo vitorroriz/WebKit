@@ -616,7 +616,7 @@ void WebGLRenderingContextBase::initializeContextState()
     m_supportedTexImageSourceInternalFormats.addAll(supportedFormatsES2);
     m_supportedTexImageSourceFormats.addAll(supportedFormatsES2);
     m_supportedTexImageSourceTypes.addAll(supportedTypesES2);
-    m_packReverseRowOrderSupported = enableSupportedExtension("GL_ANGLE_reverse_row_order"_s);
+    m_packReverseRowOrderSupported = context->isExtensionEnabled("GL_ANGLE_pack_reverse_row_order"_s);
 }
 
 void WebGLRenderingContextBase::initializeDefaultObjects()
@@ -5419,17 +5419,6 @@ void WebGLRenderingContextBase::vertexAttribDivisor(GCGLuint index, GCGLuint div
 
     protectedBoundVertexArrayObject()->setVertexAttribDivisor(index, divisor);
     protectedGraphicsContextGL()->vertexAttribDivisor(index, divisor);
-}
-
-bool WebGLRenderingContextBase::enableSupportedExtension(ASCIILiteral extensionNameLiteral)
-{
-    ASSERT(m_context);
-    CString extensionName { extensionNameLiteral };
-    RefPtr context = m_context;
-    if (!context->supportsExtension(extensionName))
-        return false;
-    context->ensureExtensionEnabled(extensionName);
-    return true;
 }
 
 template<typename T> void loseExtension(RefPtr<T> extension)

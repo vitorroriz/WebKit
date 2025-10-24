@@ -198,19 +198,25 @@ bool GraphicsContextGLANGLE::initialize()
         usedDisplays().add(m_displayObj);
     }
 
-    if (supportsExtension("GL_KHR_debug"_s)) {
-        ensureExtensionEnabled("GL_KHR_debug"_s);
-        GL_Enable(DEBUG_OUTPUT);
-        GL_Enable(DEBUG_OUTPUT_SYNCHRONOUS);
-        GL_DebugMessageControlKHR(DONT_CARE, DONT_CARE, DONT_CARE, 0, nullptr, 0);
-        GL_DebugMessageControlKHR(DEBUG_SOURCE_API, DONT_CARE, DONT_CARE, 0, nullptr, 1);
-        auto debugMessageCallback = [](GCGLenum, GCGLenum type, GCGLenum id, GCGLenum severity, GCGLsizei length, const GCGLchar* message, const void* context) {
-            auto* gl = reinterpret_cast<const GraphicsContextGLANGLE*>(context);
-            if (gl->m_client)
-                gl->m_client->addDebugMessage(type, id, severity, CString { unsafeMakeSpan(message, length) });
-        };
-        GL_DebugMessageCallbackKHR(debugMessageCallback, this);
-    }
+    bool khrDebugIsSupported = enableExtension("GL_KHR_debug"_s);
+    ASSERT_UNUSED(khrDebugIsSupported, khrDebugIsSupported);
+    GL_Enable(DEBUG_OUTPUT);
+    GL_Enable(DEBUG_OUTPUT_SYNCHRONOUS);
+    GL_DebugMessageControlKHR(DONT_CARE, DONT_CARE, DONT_CARE, 0, nullptr, 0);
+    GL_DebugMessageControlKHR(DEBUG_SOURCE_API, DONT_CARE, DONT_CARE, 0, nullptr, 1);
+    auto debugMessageCallback = [](GCGLenum, GCGLenum type, GCGLenum id, GCGLenum severity, GCGLsizei length, const GCGLchar* message, const void* context) {
+        auto* gl = reinterpret_cast<const GraphicsContextGLANGLE*>(context);
+        if (gl->m_client)
+            gl->m_client->addDebugMessage(type, id, severity, CString { unsafeMakeSpan(message, length) });
+    };
+    GL_DebugMessageCallbackKHR(debugMessageCallback, this);
+
+    bool packReverseRowOrderIsSupported = enableExtension("GL_ANGLE_pack_reverse_row_order"_s);
+#if PLATFORM(COCOA)
+    ASSERT_UNUSED(packReverseRowOrderIsSupported, packReverseRowOrderIsSupported);
+#else
+    UNUSED_VARIABLE(packReverseRowOrderIsSupported);
+#endif
 
     ASSERT(GL_GetError() == NO_ERROR);
 
