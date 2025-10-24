@@ -375,7 +375,7 @@ class TestExpectedBuildSteps(unittest.TestCase):
             'builtins-generator-tests',
             'trigger-crash-log-submission'
         ],
-        'Apple-Tahoe-Safer-CPP-Checks': [
+        'Apple-Sequoia-Safer-CPP-Checks': [
             'configure-build',
             'configuration',
             'clean-and-update-working-directory',

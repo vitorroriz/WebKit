@@ -54,6 +54,7 @@ WebKitBuildbot = function()
         "Apple-Sequoia-Debug-AppleSilicon-WK2-Tests": {platform: Dashboard.Platform.macOSSequoia, debug: true, tester: true, testCategory: Buildbot.TestCategory.WebKit2, heading: "Debug AppleSilicon"},
         "Apple-Sequoia-Release-AppleSilicon-WK1-Tests": {platform: Dashboard.Platform.macOSSequoia, debug: false, tester: true, testCategory: Buildbot.TestCategory.WebKit1, heading: "Release AppleSilicon"},
         "Apple-Sequoia-Release-AppleSilicon-WK2-Tests": {platform: Dashboard.Platform.macOSSequoia, debug: false, tester: true, testCategory: Buildbot.TestCategory.WebKit2, heading: "Release AppleSilicon"},
+        "Apple-Sequoia-Safer-CPP-Checks": {platform: Dashboard.Platform.macOSSequoia, debug: false, performance: true, heading: "Safer CPP Checks"},
         "Apple-Sonoma-Release-Build": {platform: Dashboard.Platform.macOSSonoma, debug: false, builder: true, architecture: Buildbot.BuildArchitecture.SixtyFourBit},
         "Apple-Sonoma-Debug-Build": {platform: Dashboard.Platform.macOSSonoma, debug: true, builder: true, architecture: Buildbot.BuildArchitecture.SixtyFourBit},
         "Apple-Sonoma-Debug-WK1-Tests": {platform: Dashboard.Platform.macOSSonoma, debug: true, tester: true, testCategory: Buildbot.TestCategory.WebKit1},
