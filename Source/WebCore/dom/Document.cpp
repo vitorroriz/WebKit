@@ -2640,7 +2640,7 @@ void Document::visibilityStateChanged()
     });
 
     m_visibilityStateCallbackClients.forEach([](auto& client) {
-        Ref { client }->visibilityStateChanged();
+        client.visibilityStateChanged();
     });
 
 #if ENABLE(MEDIA_STREAM) && PLATFORM(IOS_FAMILY)
@@ -2696,7 +2696,7 @@ void Document::forEachMediaElement(NOESCAPE const Function<void(HTMLMediaElement
 {
     ASSERT(!m_mediaElements.hasNullReferences());
     m_mediaElements.forEach([&](auto& element) {
-        function(Ref { element });
+        function(element);
     });
 }
 
@@ -7780,7 +7780,7 @@ void Document::captionPreferencesChanged()
 {
     ASSERT(!m_captionPreferencesChangedElements.hasNullReferences());
     m_captionPreferencesChangedElements.forEach([](HTMLMediaElement& element) {
-        Ref { element }->captionPreferencesChanged();
+        element.captionPreferencesChanged();
     });
 }
 

@@ -1856,6 +1856,13 @@ struct CompactMapTraits<RefPtr<T>> {
 };
 
 template<typename T>
+struct CompactMapTraits<CheckedPtr<T>> {
+    using ItemType = CheckedRef<T>;
+    static bool hasValue(const CheckedPtr<T>& returnValue) { return !!returnValue; }
+    static ItemType extractValue(CheckedPtr<T>&& returnValue) { return returnValue.releaseNonNull(); }
+};
+
+template<typename T>
 struct CompactMapTraits<RetainPtr<T>> {
     using ItemType = RetainPtr<T>;
     static bool hasValue(const RetainPtr<T>& returnValue) { return !!returnValue; }
