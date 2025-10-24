@@ -42,6 +42,7 @@
 #import "PlatformDynamicRangeLimitCocoa.h"
 #import "SpatialAudioExperienceHelper.h"
 #import "TextTrackRepresentation.h"
+#import "Timer.h"
 #import "VideoFrameCV.h"
 #import "VideoLayerManagerObjC.h"
 #import "VideoMediaSampleRenderer.h"
@@ -1416,7 +1417,8 @@ Ref<GenericPromise> AudioVideoRendererAVFObjC::stageVideoRenderer(WebSampleBuffe
     }
     ASSERT(!renderer || hasSelectedVideo());
 
-    Vector<RetainPtr<WebSampleBufferVideoRendering>> renderersToExpire { 2u };
+    Vector<RetainPtr<WebSampleBufferVideoRendering>> renderersToExpire;
+    renderersToExpire.reserveInitialCapacity(2);
     if (renderer) {
         switch (acceleratedVideoMode()) {
         case AcceleratedVideoMode::Layer:
@@ -1447,6 +1449,14 @@ Ref<GenericPromise> AudioVideoRendererAVFObjC::stageVideoRenderer(WebSampleBuffe
             // False positive see webkit.org/b/298024
             SUPPRESS_UNRETAINED_ARG CMTime currentTime = PAL::CMTimebaseGetTime([protectedThis->m_synchronizer timebase]);
             [protectedThis->m_synchronizer removeRenderer:rendererToExpire.get() atTime:currentTime completionHandler:nil];
+#if ENABLE(LINEAR_MEDIA_PLAYER)
+            if (RetainPtr videoRenderer = dynamic_objc_cast<AVSampleBufferVideoRenderer>(rendererToExpire)) {
+                // FIXME: Wait for enqueued samples in AVSBDL to actually become visible before deleting the videoRenderer rather than use 1s delay.
+                Timer::schedule(1_s, [videoRenderer = WTFMove(videoRenderer)] {
+                    [videoRenderer removeAllVideoTargets];
+                });
+            }
+#endif
         }
         if (flushRequired)
             protectedThis->notifyRequiresFlushToResume();
