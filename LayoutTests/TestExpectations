@@ -7884,3 +7884,9 @@ imported/w3c/web-platform-tests/css/css-pseudo/svg-text-selection-fill-only.html
 imported/w3c/web-platform-tests/css/css-pseudo/svg-text-selection-shadow.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-pseudo/svg-text-selection-stroke-only.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-pseudo/svg-text-selection-transparent-background.html [ ImageOnlyFailure ]
+
+# The "tentative" tests are skipped since they time out, unskip when page lifecycle is added.
+imported/w3c/web-platform-tests/page-lifecycle/child-display-none.tentative.html [ Skip ]
+imported/w3c/web-platform-tests/page-lifecycle/child-out-of-viewport.tentative.html [ Skip ]
+imported/w3c/web-platform-tests/page-lifecycle/worker-dispay-none.tentative.html [ Skip ]
+imported/w3c/web-platform-tests/page-lifecycle/set-composited-layer-position.html [ ImageOnlyFailure ]
