@@ -625,7 +625,7 @@ ALWAYS_INLINE void assertCalleeIsReferenced(CallFrame* frame, JSWebAssemblyInsta
 }
 
 
-JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationWasmToJSExitIterateResults, bool, (JSWebAssemblyInstance* instance, const TypeDefinition* type, uint64_t* registerResults, uint64_t* calleeFramePointer))
+JSC_DEFINE_JIT_OPERATION(operationWasmToJSExitIterateResults, void, (JSWebAssemblyInstance* instance, const TypeDefinition* type, uint64_t* registerResults, uint64_t* calleeFramePointer))
 {
     EncodedJSValue encResult = registerResults[0];
     CallFrame* callFrame = DECLARE_WASM_CALL_FRAME(instance);
@@ -651,16 +651,16 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationWasmToJSExitIterateResults, bool, (JS
         }
         ++iterationCount;
     });
-    RETURN_IF_EXCEPTION(scope, true);
+    OPERATION_RETURN_IF_EXCEPTION(scope);
 
     if (buffer.hasOverflowed()) {
         throwOutOfMemoryError(globalObject, scope, "JS results to Wasm are too large"_s);
-        return true;
+        OPERATION_RETURN(scope);
     }
 
     if (iterationCount != signature->returnCount()) {
         throwVMTypeError(globalObject, scope, "Incorrect number of values returned to Wasm from JS"_s);
-        return true;
+        OPERATION_RETURN(scope);
     }
 
     for (unsigned index = 0; index < buffer.size(); ++index) {
@@ -690,21 +690,21 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationWasmToJSExitIterateResults, bool, (JS
                     WebAssemblyWrapperFunction* wasmWrapperFunction = nullptr;
                     if (!isWebAssemblyHostFunction(value, wasmFunction, wasmWrapperFunction) && !value.isNull()) [[unlikely]] {
                         throwTypeError(globalObject, scope, "Argument value did not match the reference type"_s);
-                        return true;
+                        OPERATION_RETURN(scope);
                     }
                     if (Wasm::isRefWithTypeIndex(returnType) && !value.isNull()) {
                         Wasm::TypeIndex paramIndex = returnType.index;
                         Wasm::TypeIndex argIndex = wasmFunction ? wasmFunction->typeIndex() : wasmWrapperFunction->typeIndex();
                         if (paramIndex != argIndex) {
                             throwTypeError(globalObject, scope, "Argument value did not match the reference type"_s);
-                            return true;
+                            OPERATION_RETURN(scope);
                         }
                     }
                 } else {
                     value = Wasm::internalizeExternref(value);
                     if (!Wasm::TypeInformation::isReferenceValueAssignable(value, returnType.isNullable(), returnType.index)) [[unlikely]] {
                         throwTypeError(globalObject, scope, "Argument value did not match the reference type"_s);
-                        return true;
+                        OPERATION_RETURN(scope);
                     }
                 }
             } else
@@ -712,7 +712,7 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationWasmToJSExitIterateResults, bool, (JS
             unboxedValue = std::bit_cast<uint64_t>(value);
         }
         }
-        RETURN_IF_EXCEPTION(scope, true);
+        OPERATION_RETURN_IF_EXCEPTION(scope);
 
         auto rep = wasmCallInfo.results[index];
         if (rep.location.isGPR())
@@ -722,7 +722,7 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationWasmToJSExitIterateResults, bool, (JS
         else
             calleeFramePointer[rep.location.offsetFromFP() / sizeof(uint64_t)] = unboxedValue;
     }
-    return false;
+    OPERATION_RETURN(scope);
 }
 
 #if ENABLE(WEBASSEMBLY_OMGJIT)
@@ -1295,47 +1295,51 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationWasmUnwind, void*, (JSWebAssemblyInst
     return vm.targetMachinePCForThrow;
 }
 
-JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationConvertToI64, int64_t, (JSWebAssemblyInstance* instance, EncodedJSValue v))
+JSC_DEFINE_JIT_OPERATION(operationConvertToI64, int64_t, (JSWebAssemblyInstance* instance, EncodedJSValue v))
 {
     CallFrame* callFrame = DECLARE_WASM_CALL_FRAME(instance);
     assertCalleeIsReferenced(callFrame, instance);
     VM& vm = instance->vm();
     JSGlobalObject* globalObject = instance->globalObject();
     WasmOperationPrologueCallFrameTracer tracer(vm, callFrame, OUR_RETURN_ADDRESS);
-    return JSValue::decode(v).toBigInt64(globalObject);
+    auto scope = DECLARE_THROW_SCOPE(vm);
+    OPERATION_RETURN(scope, JSValue::decode(v).toBigInt64(globalObject));
 }
 
-JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationConvertToF64, double, (JSWebAssemblyInstance* instance, EncodedJSValue v))
+JSC_DEFINE_JIT_OPERATION(operationConvertToF64, double, (JSWebAssemblyInstance* instance, EncodedJSValue v))
 {
     CallFrame* callFrame = DECLARE_WASM_CALL_FRAME(instance);
     assertCalleeIsReferenced(callFrame, instance);
     VM& vm = instance->vm();
     JSGlobalObject* globalObject = instance->globalObject();
     WasmOperationPrologueCallFrameTracer tracer(vm, callFrame, OUR_RETURN_ADDRESS);
-    return JSValue::decode(v).toNumber(globalObject);
+    auto scope = DECLARE_THROW_SCOPE(vm);
+    OPERATION_RETURN(scope, JSValue::decode(v).toNumber(globalObject));
 }
 
-JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationConvertToI32, UCPUStrictInt32, (JSWebAssemblyInstance* instance, EncodedJSValue v))
+JSC_DEFINE_JIT_OPERATION(operationConvertToI32, UCPUStrictInt32, (JSWebAssemblyInstance* instance, EncodedJSValue v))
 {
     CallFrame* callFrame = DECLARE_WASM_CALL_FRAME(instance);
     assertCalleeIsReferenced(callFrame, instance);
     VM& vm = instance->vm();
     JSGlobalObject* globalObject = instance->globalObject();
     WasmOperationPrologueCallFrameTracer tracer(vm, callFrame, OUR_RETURN_ADDRESS);
-    return toUCPUStrictInt32(JSValue::decode(v).toInt32(globalObject));
+    auto scope = DECLARE_THROW_SCOPE(vm);
+    OPERATION_RETURN(scope, toUCPUStrictInt32(JSValue::decode(v).toInt32(globalObject)));
 }
 
-JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationConvertToF32, float, (JSWebAssemblyInstance* instance, EncodedJSValue v))
+JSC_DEFINE_JIT_OPERATION(operationConvertToF32, float, (JSWebAssemblyInstance* instance, EncodedJSValue v))
 {
     CallFrame* callFrame = DECLARE_WASM_CALL_FRAME(instance);
     assertCalleeIsReferenced(callFrame, instance);
     VM& vm = instance->vm();
     JSGlobalObject* globalObject = instance->globalObject();
     WasmOperationPrologueCallFrameTracer tracer(vm, callFrame, OUR_RETURN_ADDRESS);
-    return static_cast<float>(JSValue::decode(v).toNumber(globalObject));
+    auto scope = DECLARE_THROW_SCOPE(vm);
+    OPERATION_RETURN(scope, static_cast<float>(JSValue::decode(v).toNumber(globalObject)));
 }
 
-JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationConvertToFuncref, EncodedJSValue, (JSWebAssemblyInstance* instance, const TypeDefinition* type, EncodedJSValue v))
+JSC_DEFINE_JIT_OPERATION(operationConvertToFuncref, EncodedJSValue, (JSWebAssemblyInstance* instance, const TypeDefinition* type, EncodedJSValue v))
 {
     CallFrame* callFrame = DECLARE_WASM_CALL_FRAME(instance);
     assertCalleeIsReferenced(callFrame, instance);
@@ -1347,10 +1351,8 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationConvertToFuncref, EncodedJSValue, (JS
     JSValue value = JSValue::decode(v);
     WebAssemblyFunction* wasmFunction = nullptr;
     WebAssemblyWrapperFunction* wasmWrapperFunction = nullptr;
-    if (!isWebAssemblyHostFunction(value, wasmFunction, wasmWrapperFunction) && !value.isNull()) [[unlikely]] {
-        throwTypeError(globalObject, scope, "Argument value did not match the reference type"_s);
-        return { };
-    }
+    if (!isWebAssemblyHostFunction(value, wasmFunction, wasmWrapperFunction) && !value.isNull()) [[unlikely]]
+        OPERATION_RETURN(scope, throwVMTypeError(globalObject, scope, "Argument value did not match the reference type"_s));
 
     const FunctionSignature* signature = type->as<FunctionSignature>();
     ASSERT(signature->returnCount() == 1);
@@ -1360,12 +1362,13 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationConvertToFuncref, EncodedJSValue, (JS
         Wasm::TypeIndex paramIndex = resultType.index;
         Wasm::TypeIndex argIndex = wasmFunction ? wasmFunction->typeIndex() : wasmWrapperFunction->typeIndex();
         if (paramIndex != argIndex)
-            return throwVMTypeError(globalObject, scope, "Argument value did not match the reference type"_s);
+            OPERATION_RETURN(scope, throwVMTypeError(globalObject, scope, "Argument value did not match the reference type"_s));
     }
-    return v;
+
+    OPERATION_RETURN(scope, v);
 }
 
-JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationConvertToAnyref, EncodedJSValue, (JSWebAssemblyInstance* instance, const TypeDefinition* type, EncodedJSValue v))
+JSC_DEFINE_JIT_OPERATION(operationConvertToAnyref, EncodedJSValue, (JSWebAssemblyInstance* instance, const TypeDefinition* type, EncodedJSValue v))
 {
     CallFrame* callFrame = DECLARE_WASM_CALL_FRAME(instance);
     assertCalleeIsReferenced(callFrame, instance);
@@ -1380,25 +1383,25 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationConvertToAnyref, EncodedJSValue, (JSW
 
     JSValue value = JSValue::decode(v);
     value = Wasm::internalizeExternref(value);
-    if (!Wasm::TypeInformation::isReferenceValueAssignable(value, resultType.isNullable(), resultType.index)) [[unlikely]] {
-        throwTypeError(globalObject, scope, "Argument value did not match the reference type"_s);
-        return { };
-    }
-    return JSValue::encode(value);
+    if (!Wasm::TypeInformation::isReferenceValueAssignable(value, resultType.isNullable(), resultType.index)) [[unlikely]]
+        OPERATION_RETURN(scope, throwVMTypeError(globalObject, scope, "Argument value did not match the reference type"_s));
+
+    OPERATION_RETURN(scope, JSValue::encode(value));
 }
 
-JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationConvertToBigInt, EncodedJSValue, (JSWebAssemblyInstance* instance, EncodedWasmValue value))
+JSC_DEFINE_JIT_OPERATION(operationConvertToBigInt, EncodedJSValue, (JSWebAssemblyInstance* instance, EncodedWasmValue value))
 {
     CallFrame* callFrame = DECLARE_WASM_CALL_FRAME(instance);
     assertCalleeIsReferenced(callFrame, instance);
     VM& vm = instance->vm();
     JSGlobalObject* globalObject = instance->globalObject();
     WasmOperationPrologueCallFrameTracer tracer(vm, callFrame, OUR_RETURN_ADDRESS);
-    return JSValue::encode(JSBigInt::makeHeapBigIntOrBigInt32(globalObject, value));
+    auto scope = DECLARE_THROW_SCOPE(vm);
+    OPERATION_RETURN(scope, JSValue::encode(JSBigInt::makeHeapBigIntOrBigInt32(globalObject, value)));
 }
 
 // https://webassembly.github.io/multi-value/js-api/index.html#run-a-host-function
-JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationIterateResults, bool, (JSWebAssemblyInstance* instance, const TypeDefinition* type, EncodedJSValue encResult, uint64_t* registerResults, uint64_t* calleeFramePointer))
+JSC_DEFINE_JIT_OPERATION(operationIterateResults, void, (JSWebAssemblyInstance* instance, const TypeDefinition* type, EncodedJSValue encResult, uint64_t* registerResults, uint64_t* calleeFramePointer))
 {
     CallFrame* callFrame = DECLARE_WASM_CALL_FRAME(instance);
     assertCalleeIsReferenced(callFrame, instance);
@@ -1424,16 +1427,16 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationIterateResults, bool, (JSWebAssemblyI
         }
         ++iterationCount;
     });
-    RETURN_IF_EXCEPTION(scope, true);
+    OPERATION_RETURN_IF_EXCEPTION(scope);
 
     if (buffer.hasOverflowed()) {
         throwOutOfMemoryError(globalObject, scope, "JS results to Wasm are too large"_s);
-        return true;
+        OPERATION_RETURN(scope);
     }
 
     if (iterationCount != signature->returnCount()) {
         throwVMTypeError(globalObject, scope, "Incorrect number of values returned to Wasm from JS"_s);
-        return true;
+        OPERATION_RETURN(scope);
     }
 
     for (unsigned index = 0; index < buffer.size(); ++index) {
@@ -1463,21 +1466,21 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationIterateResults, bool, (JSWebAssemblyI
                     WebAssemblyWrapperFunction* wasmWrapperFunction = nullptr;
                     if (!isWebAssemblyHostFunction(value, wasmFunction, wasmWrapperFunction) && !value.isNull()) [[unlikely]] {
                         throwTypeError(globalObject, scope, "Argument value did not match the reference type"_s);
-                        return true;
+                        OPERATION_RETURN(scope);
                     }
                     if (Wasm::isRefWithTypeIndex(returnType) && !value.isNull()) {
                         Wasm::TypeIndex paramIndex = returnType.index;
                         Wasm::TypeIndex argIndex = wasmFunction ? wasmFunction->typeIndex() : wasmWrapperFunction->typeIndex();
                         if (paramIndex != argIndex) {
                             throwTypeError(globalObject, scope, "Argument value did not match the reference type"_s);
-                            return true;
+                            OPERATION_RETURN(scope);
                         }
                     }
                 } else {
                     value = Wasm::internalizeExternref(value);
                     if (!Wasm::TypeInformation::isReferenceValueAssignable(value, returnType.isNullable(), returnType.index)) [[unlikely]] {
                         throwTypeError(globalObject, scope, "Argument value did not match the reference type"_s);
-                        return true;
+                        OPERATION_RETURN(scope);
                     }
                 }
             } else
@@ -1485,7 +1488,7 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationIterateResults, bool, (JSWebAssemblyI
             unboxedValue = std::bit_cast<uint64_t>(value);
         }
         }
-        RETURN_IF_EXCEPTION(scope, true);
+        OPERATION_RETURN_IF_EXCEPTION(scope);
 
         auto rep = wasmCallInfo.results[index];
         if (rep.location.isGPR())
@@ -1495,7 +1498,7 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationIterateResults, bool, (JSWebAssemblyI
         else
             calleeFramePointer[rep.location.offsetFromFP() / sizeof(uint64_t)] = unboxedValue;
     }
-    return false;
+    OPERATION_RETURN(scope);
 }
 
 // FIXME: It would be much easier to inline this when we have a global GC, which could probably mean we could avoid
@@ -1869,12 +1872,6 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationWasmArrayInitElem, UCPUStrictInt32, (
 JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationWasmArrayInitData, UCPUStrictInt32, (JSWebAssemblyInstance* instance, EncodedJSValue dst, uint32_t dstOffset, uint32_t srcDataIndex, uint32_t srcOffset, uint32_t size))
 {
     return toUCPUStrictInt32(arrayInitData(instance, dst, dstOffset, srcDataIndex, srcOffset, size));
-}
-
-JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationWasmIsStrictSubRTT, bool, (RTT* maybeSubRTT, RTT* targetRTT))
-{
-    ASSERT(maybeSubRTT && targetRTT);
-    return maybeSubRTT->isStrictSubRTT(*targetRTT);
 }
 
 JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationWasmAnyConvertExtern, EncodedJSValue, (EncodedJSValue reference))

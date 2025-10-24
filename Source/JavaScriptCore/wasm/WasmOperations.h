@@ -62,7 +62,7 @@ JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationGetWasmCalleeStackSize, UCPUStrictIn
 JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationWasmToJSExitNeedToUnpack, const TypeDefinition*, (WasmOrJSImportableFunctionCallLinkInfo*));
 JSC_DECLARE_JIT_OPERATION(operationWasmToJSExitMarshalArguments, bool, (void*, CallFrame*, void*, JSWebAssemblyInstance*));
 JSC_DECLARE_JIT_OPERATION(operationWasmToJSExitMarshalReturnValues, void, (void* sp, CallFrame* cfr, JSWebAssemblyInstance*));
-JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationWasmToJSExitIterateResults, bool, (JSWebAssemblyInstance*, const TypeDefinition*, uint64_t* registerResults, uint64_t* calleeFramePointer));
+JSC_DECLARE_JIT_OPERATION(operationWasmToJSExitIterateResults, void, (JSWebAssemblyInstance*, const TypeDefinition*, uint64_t* registerResults, uint64_t* calleeFramePointer));
 
 #if ENABLE(WEBASSEMBLY_OMGJIT)
 void loadValuesIntoBuffer(Probe::Context&, const StackMap&, uint64_t* buffer, SavedFPWidth);
@@ -78,15 +78,15 @@ JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationWasmMaterializePolymorphicCallee, Wa
 #endif
 JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationWasmUnwind, void*, (JSWebAssemblyInstance*));
 
-JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationConvertToI64, int64_t, (JSWebAssemblyInstance*, EncodedJSValue));
-JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationConvertToF64, double, (JSWebAssemblyInstance*, EncodedJSValue));
-JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationConvertToI32, UCPUStrictInt32, (JSWebAssemblyInstance*, EncodedJSValue));
-JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationConvertToF32, float, (JSWebAssemblyInstance*, EncodedJSValue));
-JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationConvertToFuncref, EncodedJSValue, (JSWebAssemblyInstance*, const TypeDefinition*, EncodedJSValue));
-JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationConvertToAnyref, EncodedJSValue, (JSWebAssemblyInstance*, const TypeDefinition*, EncodedJSValue));
-JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationConvertToBigInt, EncodedJSValue, (JSWebAssemblyInstance*, EncodedWasmValue));
+JSC_DECLARE_JIT_OPERATION(operationConvertToI64, int64_t, (JSWebAssemblyInstance*, EncodedJSValue));
+JSC_DECLARE_JIT_OPERATION(operationConvertToF64, double, (JSWebAssemblyInstance*, EncodedJSValue));
+JSC_DECLARE_JIT_OPERATION(operationConvertToI32, UCPUStrictInt32, (JSWebAssemblyInstance*, EncodedJSValue));
+JSC_DECLARE_JIT_OPERATION(operationConvertToF32, float, (JSWebAssemblyInstance*, EncodedJSValue));
+JSC_DECLARE_JIT_OPERATION(operationConvertToFuncref, EncodedJSValue, (JSWebAssemblyInstance*, const TypeDefinition*, EncodedJSValue));
+JSC_DECLARE_JIT_OPERATION(operationConvertToAnyref, EncodedJSValue, (JSWebAssemblyInstance*, const TypeDefinition*, EncodedJSValue));
+JSC_DECLARE_JIT_OPERATION(operationConvertToBigInt, EncodedJSValue, (JSWebAssemblyInstance*, EncodedWasmValue));
 
-JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationIterateResults, bool, (JSWebAssemblyInstance*, const TypeDefinition*, EncodedJSValue, uint64_t*, uint64_t*));
+JSC_DECLARE_JIT_OPERATION(operationIterateResults, void, (JSWebAssemblyInstance*, const TypeDefinition*, EncodedJSValue, uint64_t*, uint64_t*));
 JSC_DECLARE_JIT_OPERATION(operationAllocateResultsArray, JSArray*, (JSWebAssemblyInstance*, const FunctionSignature*, IndexingType, JSValue*));
 
 JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationWasmWriteBarrierSlowPath, void, (JSCell*, VM*));
@@ -140,7 +140,6 @@ JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationWasmArrayFillVector, UCPUStrictInt32
 JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationWasmArrayCopy, UCPUStrictInt32, (JSWebAssemblyInstance*, EncodedJSValue, uint32_t, EncodedJSValue, uint32_t, uint32_t));
 JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationWasmArrayInitElem, UCPUStrictInt32, (JSWebAssemblyInstance*, EncodedJSValue, uint32_t, uint32_t, uint32_t, uint32_t));
 JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationWasmArrayInitData, UCPUStrictInt32, (JSWebAssemblyInstance*, EncodedJSValue, uint32_t, uint32_t, uint32_t, uint32_t));
-JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationWasmIsStrictSubRTT, bool, (Wasm::RTT*, Wasm::RTT*));
 JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationWasmAnyConvertExtern, EncodedJSValue, (EncodedJSValue));
 
 JSC_DECLARE_NOEXCEPT_JIT_OPERATION(operationWasmRefTest, UCPUStrictInt32, (JSWebAssemblyInstance*, EncodedJSValue, uint32_t, int32_t, bool));
