@@ -37,7 +37,7 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(EXTPolygonOffsetClamp);
 EXTPolygonOffsetClamp::EXTPolygonOffsetClamp(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::EXTPolygonOffsetClamp)
 {
-    context.protectedGraphicsContextGL()->ensureExtensionEnabled("GL_EXT_polygon_offset_clamp"_s);
+    context.graphicsContextGL()->ensureExtensionEnabled("GL_EXT_polygon_offset_clamp"_s);
 }
 
 EXTPolygonOffsetClamp::~EXTPolygonOffsetClamp() = default;
@@ -51,7 +51,7 @@ void EXTPolygonOffsetClamp::polygonOffsetClampEXT(GCGLfloat factor, GCGLfloat un
 {
     if (isContextLost())
         return;
-    protectedContext()->protectedGraphicsContextGL()->polygonOffsetClampEXT(factor, units, clamp);
+    context()->graphicsContextGL()->polygonOffsetClampEXT(factor, units, clamp);
 }
 
 } // namespace WebCore

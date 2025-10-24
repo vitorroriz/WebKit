@@ -37,7 +37,7 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(EXTConservativeDepth);
 EXTConservativeDepth::EXTConservativeDepth(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::EXTConservativeDepth)
 {
-    context.protectedGraphicsContextGL()->ensureExtensionEnabled("GL_EXT_conservative_depth"_s);
+    context.graphicsContextGL()->ensureExtensionEnabled("GL_EXT_conservative_depth"_s);
 }
 
 EXTConservativeDepth::~EXTConservativeDepth() = default;

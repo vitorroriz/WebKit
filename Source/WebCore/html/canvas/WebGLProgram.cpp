@@ -57,7 +57,7 @@ Lock& WebGLProgram::instancesLock()
 
 RefPtr<WebGLProgram> WebGLProgram::create(WebGLRenderingContextBase& context)
 {
-    auto object = context.protectedGraphicsContextGL()->createProgram();
+    auto object = context.graphicsContextGL()->createProgram();
     if (!object)
         return nullptr;
     return adoptRef(*new WebGLProgram { context, object });

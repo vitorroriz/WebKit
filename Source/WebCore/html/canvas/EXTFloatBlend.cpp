@@ -37,7 +37,7 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(EXTFloatBlend);
 EXTFloatBlend::EXTFloatBlend(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::EXTFloatBlend)
 {
-    context.protectedGraphicsContextGL()->ensureExtensionEnabled("GL_EXT_float_blend"_s);
+    context.graphicsContextGL()->ensureExtensionEnabled("GL_EXT_float_blend"_s);
 }
 
 EXTFloatBlend::~EXTFloatBlend() = default;

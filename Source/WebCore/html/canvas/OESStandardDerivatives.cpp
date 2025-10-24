@@ -37,7 +37,7 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(OESStandardDerivatives);
 OESStandardDerivatives::OESStandardDerivatives(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::OESStandardDerivatives)
 {
-    context.protectedGraphicsContextGL()->ensureExtensionEnabled("GL_OES_standard_derivatives"_s);
+    context.graphicsContextGL()->ensureExtensionEnabled("GL_OES_standard_derivatives"_s);
 }
 
 OESStandardDerivatives::~OESStandardDerivatives() = default;

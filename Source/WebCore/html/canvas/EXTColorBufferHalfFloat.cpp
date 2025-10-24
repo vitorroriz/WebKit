@@ -37,7 +37,7 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(EXTColorBufferHalfFloat);
 EXTColorBufferHalfFloat::EXTColorBufferHalfFloat(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::EXTColorBufferHalfFloat)
 {
-    context.protectedGraphicsContextGL()->ensureExtensionEnabled("GL_EXT_color_buffer_half_float"_s);
+    context.graphicsContextGL()->ensureExtensionEnabled("GL_EXT_color_buffer_half_float"_s);
 }
 
 EXTColorBufferHalfFloat::~EXTColorBufferHalfFloat() = default;
