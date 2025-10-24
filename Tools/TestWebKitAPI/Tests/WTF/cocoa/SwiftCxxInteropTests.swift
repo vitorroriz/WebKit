@@ -1,4 +1,4 @@
-// Copyright (C) 2024 Apple Inc. All rights reserved.
+// Copyright (C) 2025 Apple Inc. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -21,33 +21,42 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-import Foundation
+#if compiler(>=6.2) && ENABLE_CXX_INTEROP
 
-typealias String = Swift.String
-typealias URL = Foundation.URL
+import Testing
+import wtf
 
-#if compiler(>=6.2)
+private typealias Cxx = SwiftCxxInteropTestbed
 
-extension RangeReplaceableCollection {
-    init<Failure>(
-        _ sequence: some AsyncSequence<Element, Failure>,
-        isolation: isolated (any Actor)? = #isolation
-    ) async throws(Failure) where Failure: Error {
-        self.init()
-
-        // Safety: this is actually safe; false positive is rdar://154775389
-        for try await unsafe element in sequence {
-            append(element)
+@MainActor
+struct SwiftCxxInteropTests {
+    @Test
+    func wtfFunctionCanBeInvokedFromSwift() async throws {
+        let function = Cxx.IntBoolFunction { argument in
+            argument ? 1 : 0
         }
+
+        let result = Cxx.callIntBoolFunction(true, consuming: function)
+
+        #expect(result == 1)
+    }
+
+    @Test
+    func wtfCompletionHandlerCanBeInvokedFromSwift() async throws {
+        // FIXME: Improve the ergonomics of using this from Swift.
+
+        let result = await withCheckedContinuation { continuation in
+            let completionHandler = Cxx.IntCompletionHandler(
+                { result in continuation.resume(returning: result)
+                },
+                WTF.ThreadLikeAssertion(WTF.CurrentThreadLike())
+            )
+
+            Cxx.callIntCompletionHandler(3, consuming: completionHandler)
+        }
+
+        #expect(result == 3)
     }
 }
 
-extension AsyncSequence {
-    func wait(isolation: isolated (any Actor)? = #isolation) async throws(Failure) {
-        // Safety: this is actually safe; false positive is rdar://154775389
-        for try await unsafe _ in self {
-        }
-    }
-}
-
-#endif // compiler(>=6.2)
+#endif // compiler(>=6.2) && ENABLE_CXX_INTEROP

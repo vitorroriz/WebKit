@@ -25,6 +25,7 @@
 #include <wtf/Compiler.h>
 
 #include <limits.h>
+#include <unicode/uchar.h>
 #include <unicode/ustring.h>
 #include <wtf/ASCIICType.h>
 #include <wtf/CheckedArithmetic.h>

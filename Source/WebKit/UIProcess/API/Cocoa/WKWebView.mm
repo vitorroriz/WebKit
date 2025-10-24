@@ -1300,7 +1300,10 @@ static bool validateArgument(id argument)
 - (void)closeAllMediaPresentationsWithCompletionHandler:(void (^)(void))completionHandler
 {
     THROW_IF_SUSPENDED;
-    auto callbackAggregator = CallbackAggregator::create(WTFMove(completionHandler ?: ^{ }));
+    auto callbackAggregator = CallbackAggregator::create([completionHandler = makeBlockPtr(completionHandler)] {
+        if (completionHandler)
+            completionHandler();
+    });
 
 #if ENABLE(FULLSCREEN_API)
     if (RefPtr videoPresentationManager = _page->videoPresentationManager()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,9 +23,27 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "../../TestPDFDocument.h"
-#import "../WTF/cocoa/SwiftCxxInteropTestbed.h"
-#import "../WebKitCocoa/SmartListsSupport.h"
-#import "TestWKWebView.h"
-#import "UIKitSPIForTesting.h"
-#import <pal/spi/cg/CoreGraphicsSPI.h>
+#pragma once
+
+#ifdef __cplusplus
+
+#import <wtf/CompletionHandler.h>
+#import <wtf/Function.h>
+
+namespace SwiftCxxInteropTestbed {
+
+// MARK: Using declarations
+
+using IntBoolFunction = WTF::Function<int(bool)>;
+
+using IntCompletionHandler = WTF::CompletionHandler<void(int)>;
+
+// MARK: Function declarations
+
+int callIntBoolFunction(bool, IntBoolFunction&&);
+
+void callIntCompletionHandler(int, IntCompletionHandler&&);
+
+}
+
+#endif // __cplusplus
