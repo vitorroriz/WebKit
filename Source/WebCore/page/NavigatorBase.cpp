@@ -110,6 +110,8 @@ String NavigatorBase::platform() const
     return "MacIntel"_s;
 #elif OS(WINDOWS)
     return "Win32"_s;
+#elif OS(HAIKU)
+    return "Haiku"_s;
 #else
     return ""_s;
 #endif

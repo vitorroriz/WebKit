@@ -177,7 +177,7 @@ class EmptyChromeClient : public ChromeClient {
     void AXFinishFrameLoad() final { }
 #endif
 
-#if PLATFORM(PLAYSTATION)
+#if PLATFORM(PLAYSTATION) || PLATFORM(HAIKU)
     void postAccessibilityNotification(AccessibilityObject&, AXNotification) final { }
     void postAccessibilityNodeTextChangeNotification(AccessibilityObject*, AXTextChange, unsigned, const String&) final { }
     void postAccessibilityFrameLoadingEventNotification(AccessibilityObject*, AXLoadingEvent) final { }
