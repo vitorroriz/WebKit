@@ -269,7 +269,7 @@ template<CSSPropertyID propertyID> struct InsetEdgeSharedAdaptor {
                         containingBlockSize = box->containingBlockLogicalWidthForContent();
                 }
             }
-            return functor(Length<> { evaluate<LayoutUnit>(value, containingBlockSize, ZoomNeeded { }) });
+            return functor(Length<> { evaluate<LayoutUnit>(value, containingBlockSize, containingBlock->style().usedZoomForLength()) });
         }
 
         // Return a "computed value" length.

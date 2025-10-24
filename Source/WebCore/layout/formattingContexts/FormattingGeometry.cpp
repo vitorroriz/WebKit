@@ -344,8 +344,8 @@ VerticalGeometry FormattingGeometry::outOfFlowNonReplacedVerticalGeometry(const 
     auto containingBlockHeight = verticalConstraints.logicalHeight;
     auto containingBlockWidth = horizontalConstraints.logicalWidth;
 
-    auto top = computedValue(style.logicalTop(), containingBlockWidth);
-    auto bottom = computedValue(style.logicalBottom(), containingBlockWidth);
+    auto top = computedValue(style.logicalTop(), containingBlockWidth, style.usedZoomForLength());
+    auto bottom = computedValue(style.logicalBottom(), containingBlockWidth, style.usedZoomForLength());
     auto height = overriddenVerticalValues.height ? overriddenVerticalValues.height.value() : computedHeight(layoutBox, containingBlockHeight);
     auto computedVerticalMargin = FormattingGeometry::computedVerticalMargin(layoutBox, horizontalConstraints);
     UsedVerticalMargin::NonCollapsedValues usedVerticalMargin; 
@@ -464,8 +464,8 @@ HorizontalGeometry FormattingGeometry::outOfFlowNonReplacedHorizontalGeometry(co
     auto containingBlockWidth = horizontalConstraints.logicalWidth;
     auto isLeftToRightDirection = FormattingContext::containingBlock(layoutBox).writingMode().isBidiLTR();
     
-    auto left = computedValue(style.logicalLeft(), containingBlockWidth);
-    auto right = computedValue(style.logicalRight(), containingBlockWidth);
+    auto left = computedValue(style.logicalLeft(), containingBlockWidth, style.usedZoomForLength());
+    auto right = computedValue(style.logicalRight(), containingBlockWidth, style.usedZoomForLength());
     auto width = overriddenHorizontalValues.width ? overriddenHorizontalValues.width : computedWidth(layoutBox, containingBlockWidth);
     auto computedHorizontalMargin = FormattingGeometry::computedHorizontalMargin(layoutBox, horizontalConstraints);
     UsedHorizontalMargin usedHorizontalMargin;
@@ -591,8 +591,8 @@ VerticalGeometry FormattingGeometry::outOfFlowReplacedVerticalGeometry(const Ele
     auto containingBlockHeight = verticalConstraints.logicalHeight;
     auto containingBlockWidth = horizontalConstraints.logicalWidth;
 
-    auto top = computedValue(style.logicalTop(), containingBlockWidth);
-    auto bottom = computedValue(style.logicalBottom(), containingBlockWidth);
+    auto top = computedValue(style.logicalTop(), containingBlockWidth, style.usedZoomForLength());
+    auto bottom = computedValue(style.logicalBottom(), containingBlockWidth, style.usedZoomForLength());
     auto height = inlineReplacedContentHeightAndMargin(replacedBox, horizontalConstraints, verticalConstraints, overriddenVerticalValues).contentHeight;
     auto computedVerticalMargin = FormattingGeometry::computedVerticalMargin(replacedBox, horizontalConstraints);
     std::optional<LayoutUnit> usedMarginBefore = computedVerticalMargin.before;
@@ -676,8 +676,8 @@ HorizontalGeometry FormattingGeometry::outOfFlowReplacedHorizontalGeometry(const
     auto containingBlockWidth = horizontalConstraints.logicalWidth;
     auto isLeftToRightDirection = FormattingContext::containingBlock(replacedBox).writingMode().isBidiLTR();
 
-    auto left = computedValue(style.logicalLeft(), containingBlockWidth);
-    auto right = computedValue(style.logicalRight(), containingBlockWidth);
+    auto left = computedValue(style.logicalLeft(), containingBlockWidth, style.usedZoomForLength());
+    auto right = computedValue(style.logicalRight(), containingBlockWidth, style.usedZoomForLength());
     auto computedHorizontalMargin = FormattingGeometry::computedHorizontalMargin(replacedBox, horizontalConstraints);
     std::optional<LayoutUnit> usedMarginStart = computedHorizontalMargin.start;
     std::optional<LayoutUnit> usedMarginEnd = computedHorizontalMargin.end;
@@ -1013,8 +1013,8 @@ LayoutSize FormattingGeometry::inFlowPositionedPositionOffset(const Box& layoutB
     auto& style = layoutBox.style();
     auto containingBlockWidth = horizontalConstraints.logicalWidth;
 
-    auto top = computedValue(style.logicalTop(), containingBlockWidth);
-    auto bottom = computedValue(style.logicalBottom(), containingBlockWidth);
+    auto top = computedValue(style.logicalTop(), containingBlockWidth, style.usedZoomForLength());
+    auto bottom = computedValue(style.logicalBottom(), containingBlockWidth, style.usedZoomForLength());
 
     if (!top && !bottom) {
         // #1
@@ -1041,8 +1041,8 @@ LayoutSize FormattingGeometry::inFlowPositionedPositionOffset(const Box& layoutB
     //    If the 'direction' property of the containing block is 'ltr', the value of 'left' wins and 'right' becomes -'left'.
     //    If 'direction' of the containing block is 'rtl', 'right' wins and 'left' is ignored.
 
-    auto left = computedValue(style.logicalLeft(), containingBlockWidth);
-    auto right = computedValue(style.logicalRight(), containingBlockWidth);
+    auto left = computedValue(style.logicalLeft(), containingBlockWidth, style.usedZoomForLength());
+    auto right = computedValue(style.logicalRight(), containingBlockWidth, style.usedZoomForLength());
 
     if (!left && !right) {
         // #1

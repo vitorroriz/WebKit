@@ -7502,16 +7502,12 @@ fast/canvas/image-buffer-resource-limits.html [ Slow ]
 # Standardized CSS zoom tests.
 imported/w3c/web-platform-tests/css/css-viewport/width.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/border.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-viewport/zoom/bottom.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/height.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/inherited-length.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-viewport/zoom/left.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/max-height.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/max-width.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/min-height.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/min-width.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-viewport/zoom/right.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-viewport/zoom/top.html [ ImageOnlyFailure ]
 
 # has-slotted is not implemeneted - https://bugs.webkit.org/show_bug.cgi?id=280608
 imported/w3c/web-platform-tests/css/css-scoping/has-slotted-001.html [ ImageOnlyFailure ]
