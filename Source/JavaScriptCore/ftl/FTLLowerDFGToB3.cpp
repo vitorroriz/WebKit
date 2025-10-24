@@ -24419,7 +24419,7 @@ IGNORE_CLANG_WARNINGS_END
     }
 
     template<typename OperationType, typename... Args>
-    requires (!std::is_same_v<OperationType, LValue> && !std::is_same_v<CodePtr<OperationPtrTag>, OperationType>)
+    requires (!std::is_same_v<OperationType, LValue> && !std::is_same_v<CodePtr<OperationPtrTag>, OperationType>) && (std::is_convertible_v<Args, LValue> && ...)
     LValue vmCall(LType type, OperationType function, Args&&... args)
     {
         static_assert(FunctionTraits<OperationType>::cCallArity() == sizeof...(Args), "Sanity check");
@@ -24430,6 +24430,7 @@ IGNORE_CLANG_WARNINGS_END
     }
 
     template<typename OperationType, typename... Args>
+    requires (std::is_convertible_v<Args, LValue> && ...)
     LValue vmCall(LType type, CodePtr<OperationPtrTag> function, Args&&... args)
     {
         static_assert(FunctionTraits<OperationType>::cCallArity() == sizeof...(Args), "Sanity check");
