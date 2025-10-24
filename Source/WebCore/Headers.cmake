@@ -1041,9 +1041,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     bridge/jsc/BridgeJSC.h
 
-    bridge/objc/WebScriptObject.h
-    bridge/objc/WebScriptObjectPrivate.h
-
     bridge/runtime_method.h
     bridge/runtime_object.h
     bridge/runtime_root.h
