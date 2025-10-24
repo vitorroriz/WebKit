@@ -8328,3 +8328,7 @@ imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-targe
 imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-target/interesttarget-button-event-dispatch.tentative.html [ Failure ]
 imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-target/interesttarget-on-popover-behavior.tentative.html [ Failure ]
 imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-target/interesttarget-svg-a-event-dispatch.tentative.html [ Failure ]
+
+# https://bugs.webkit.org/show_bug.cgi?id=301384 REGRESSION(301931@main): [macOS x86_64, iOS] two tests in imported/w3c/web-platform-tests/css/css-backgrounds are constant image only failure
+imported/w3c/web-platform-tests/css/css-backgrounds/background-repeat-space-6.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/css-backgrounds/background-repeat-space-7.html [ ImageOnlyFailure ]
