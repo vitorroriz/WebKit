@@ -8332,3 +8332,8 @@ imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-targe
 # https://bugs.webkit.org/show_bug.cgi?id=301384 REGRESSION(301931@main): [macOS x86_64, iOS] two tests in imported/w3c/web-platform-tests/css/css-backgrounds are constant image only failure
 imported/w3c/web-platform-tests/css/css-backgrounds/background-repeat-space-6.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-backgrounds/background-repeat-space-7.html [ ImageOnlyFailure ]
+
+# [ iOS 26 ] 3x imported/w3c/web-platform-tests/dom/ tests (layout-tests) are constant failures
+imported/w3c/web-platform-tests/dom/events/focus-event-document-move.html [ Failure ]
+imported/w3c/web-platform-tests/dom/events/pointer-event-document-move.html [ Failure ]
+imported/w3c/web-platform-tests/dom/nodes/Document-createEvent.https.html [ Failure ]
