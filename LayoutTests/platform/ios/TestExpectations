@@ -8319,3 +8319,12 @@ scrollingcoordinator/ios/fixed-scrolling-with-keyboard.html [ Pass Failure ]
 
 # https://bugs.webkit.org/show_bug.cgi?id=301247 [ iOS 26 ] fast/forms/ios/inputmode-removing-none.html is a constant text failure
 fast/forms/ios/inputmode-removing-none.html [ Pass Failure ]
+
+# webkit.org/b/301449 [iOS26] 7x test in imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-target are constantly failing
+imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-target/interestevent-dispatch-shadow.tentative.html [ Failure ]
+imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-target/interesttarget-anchor-event-dispatch.tentative.html [ Failure ]
+imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-target/interesttarget-area-event-dispatch.tentative.html [ Failure ]
+imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-target/interesttarget-basic-delays.tentative.html [ Failure ]
+imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-target/interesttarget-button-event-dispatch.tentative.html [ Failure ]
+imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-target/interesttarget-on-popover-behavior.tentative.html [ Failure ]
+imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-target/interesttarget-svg-a-event-dispatch.tentative.html [ Failure ]
