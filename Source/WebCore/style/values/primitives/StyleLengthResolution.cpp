@@ -203,6 +203,16 @@ double computeUnzoomedNonCalcLengthDouble(double value, CSS::LengthUnit lengthUn
     RELEASE_ASSERT_NOT_REACHED();
 }
 
+double computeCanonicalNonCalcLengthDouble(double value, CSS::LengthUnit lengthUnit, const CSSToLengthConversionData& conversionData)
+{
+    // We are only interested in canonicalizing to `px`, not adjusting for zoom, which will be handled later. When computing font-size, zoom is not applied in the same way, so must be special cased here.
+    auto computedValue = computeNonCalcLengthDouble(value, lengthUnit, conversionData);
+    if (conversionData.computingFontSize() || (conversionData.evaluationTimeZoomEnabled() && conversionData.rangeZoomOption() == CSS::RangeZoomOptions::Unzoomed))
+        return computedValue;
+
+    return computedValue / conversionData.style()->usedZoom();
+}
+
 double computeNonCalcLengthDouble(double value, CSS::LengthUnit lengthUnit, const CSSToLengthConversionData& conversionData)
 {
     using enum CSS::LengthUnit;
