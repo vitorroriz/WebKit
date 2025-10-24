@@ -3341,6 +3341,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     style/values/images/StyleGradient.h
     style/values/images/StyleImageOrNone.h
+    style/values/images/StyleImageOrientation.h
     style/values/images/StyleImageWrapper.h
     style/values/images/StyleObjectPosition.h
 

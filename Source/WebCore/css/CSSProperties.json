@@ -4593,13 +4593,13 @@
                 "none"
             ],
             "codegen-properties": {
-                "style-converter": "ImageOrientation",
+                "style-converter": "StyleType<ImageOrientation>",
                 "parser-grammar": "<<values>>",
                 "parser-grammar-comment": "Current spec grammar is 'from-image | none | [ <angle> || flip ]'"
             },
             "specification": {
                 "category": "css-images",
-                "url": "https://www.w3.org/TR/css3-images/#the-image-orientation"
+                "url": "https://drafts.csswg.org/css-images-3/#propdef-image-orientation"
             }
         },
         "image-rendering": {

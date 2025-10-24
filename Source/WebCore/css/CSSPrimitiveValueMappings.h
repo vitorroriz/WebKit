@@ -45,6 +45,7 @@
 #include "SVGRenderStyleDefs.h"
 #include "ScrollAxis.h"
 #include "ScrollTypes.h"
+#include "StyleImageOrientation.h"
 #include "StyleScrollBehavior.h"
 #include "StyleTextDecorationLine.h"
 #include "StyleWebKitOverflowScrolling.h"
@@ -2585,6 +2586,12 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 
 #define TYPE TextSpacingTrim::TrimType
 #define FOR_EACH(CASE) CASE(SpaceAll) CASE(TrimAll) CASE(Auto)
+DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
+#undef TYPE
+#undef FOR_EACH
+
+#define TYPE Style::ImageOrientation
+#define FOR_EACH(CASE) CASE(FromImage) CASE(None)
 DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH

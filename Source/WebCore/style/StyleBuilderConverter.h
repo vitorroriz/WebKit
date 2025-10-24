@@ -118,7 +118,6 @@ public:
     template<typename T, typename... Rest> static T convertStyleType(BuilderState&, const CSSValue&, Rest&&...);
 
     static OptionSet<TextTransform> convertTextTransform(BuilderState&, const CSSValue&);
-    static ImageOrientation convertImageOrientation(BuilderState&, const CSSValue&);
     template<CSSValueID> static AtomString convertCustomIdentAtomOrKeyword(BuilderState&, const CSSValue&);
 
     static OptionSet<TextEmphasisPosition> convertTextEmphasisPosition(BuilderState&, const CSSValue&);
@@ -170,16 +169,6 @@ inline OptionSet<TextTransform> BuilderConverter::convertTextTransform(BuilderSt
             result.add(TextTransform::MathAuto);
     }
     return result;
-}
-
-inline ImageOrientation BuilderConverter::convertImageOrientation(BuilderState& builderState, const CSSValue& value)
-{
-    auto* primitiveValue = requiredDowncast<CSSPrimitiveValue>(builderState, value);
-    if (!primitiveValue)
-        return { };
-    if (primitiveValue->valueID() == CSSValueFromImage)
-        return ImageOrientation::Orientation::FromImage;
-    return ImageOrientation::Orientation::None;
 }
 
 template<CSSValueID keyword> inline AtomString BuilderConverter::convertCustomIdentAtomOrKeyword(BuilderState& builderState, const CSSValue& value)

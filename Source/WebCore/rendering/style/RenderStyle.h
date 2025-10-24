@@ -221,7 +221,6 @@ enum class WordBreak : uint8_t;
 struct CSSPropertiesBitSet;
 struct CounterDirectiveMap;
 struct GridTrackList;
-struct ImageOrientation;
 struct NameScope;
 struct TransformOperationData;
 
@@ -384,6 +383,7 @@ struct ZoomFactor;
 
 enum class Change : uint8_t;
 enum class GridTrackSizingDirection : bool;
+enum class ImageOrientation : bool;
 enum class LineBoxContain : uint8_t;
 enum class PositionTryOrder : uint8_t;
 enum class SVGGlyphOrientationHorizontal : uint8_t;
@@ -1226,7 +1226,7 @@ public:
     inline TextSecurity textSecurity() const;
     inline InputSecurity inputSecurity() const;
 
-    inline ImageOrientation imageOrientation() const;
+    inline Style::ImageOrientation imageOrientation() const;
     inline ImageRendering imageRendering() const;
 
     inline OptionSet<SpeakAs> speakAs() const;
@@ -1438,7 +1438,7 @@ public:
     void setSpecifiedLineHeight(Style::LineHeight&&);
 #endif
 
-    inline void setImageOrientation(ImageOrientation);
+    inline void setImageOrientation(Style::ImageOrientation);
     inline void setImageRendering(ImageRendering);
 
     void setWhiteSpaceCollapse(WhiteSpaceCollapse v) { m_inheritedFlags.whiteSpaceCollapse = static_cast<unsigned>(v); }
@@ -2197,7 +2197,7 @@ public:
     static constexpr RubyAlign initialRubyAlign();
     static constexpr RubyOverhang initialRubyOverhang();
     static constexpr OptionSet<Style::LineBoxContain> initialLineBoxContain();
-    static constexpr ImageOrientation initialImageOrientation();
+    static constexpr Style::ImageOrientation initialImageOrientation();
     static constexpr ImageRendering initialImageRendering();
     static inline Style::BorderImageSource initialBorderImageSource();
     static inline Style::MaskBorderSource initialMaskBorderSource();

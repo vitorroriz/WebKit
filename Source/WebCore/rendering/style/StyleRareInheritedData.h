@@ -36,6 +36,7 @@
 #include <WebCore/StyleHyphenateLimitEdge.h>
 #include <WebCore/StyleHyphenateLimitLines.h>
 #include <WebCore/StyleImageOrNone.h>
+#include <WebCore/StyleImageOrientation.h>
 #include <WebCore/StyleLineBoxContain.h>
 #include <WebCore/StyleLineFitEdge.h>
 #include <WebCore/StyleListStyleType.h>
@@ -160,7 +161,7 @@ public:
     PREFERRED_TYPE(TextEmphasisPosition) unsigned textEmphasisPosition : 4;
     PREFERRED_TYPE(TextUnderlinePosition) unsigned textUnderlinePosition : 4;
     PREFERRED_TYPE(OptionSet<Style::LineBoxContain>) unsigned lineBoxContain: 7;
-    PREFERRED_TYPE(ImageOrientation) unsigned imageOrientation : 1;
+    PREFERRED_TYPE(Style::ImageOrientation) unsigned imageOrientation : 1;
     PREFERRED_TYPE(ImageRendering) unsigned imageRendering : 3;
     PREFERRED_TYPE(LineSnap) unsigned lineSnap : 2;
     PREFERRED_TYPE(LineAlign) unsigned lineAlign : 1;

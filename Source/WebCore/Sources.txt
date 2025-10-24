@@ -3244,6 +3244,7 @@ style/values/grid/StyleGridTrackSize.cpp
 style/values/grid/StyleGridTrackSizes.cpp
 style/values/images/StyleGradient.cpp
 style/values/images/StyleImageOrNone.cpp
+style/values/images/StyleImageOrientation.cpp
 style/values/images/StyleImageWrapper.cpp
 style/values/inline/StyleLineHeight.cpp
 style/values/inline/StyleVerticalAlign.cpp
