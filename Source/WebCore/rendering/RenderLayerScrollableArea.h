@@ -240,11 +240,6 @@ public:
 
     void updateAllScrollbarRelatedStyle();
 
-    LayoutUnit overflowTop() const;
-    LayoutUnit overflowBottom() const;
-    LayoutUnit overflowLeft() const;
-    LayoutUnit overflowRight() const;
-
     RenderLayer::OverflowControlRects overflowControlsRects() const;
 
     bool overflowControlsIntersectRect(const IntRect& localRect) const;
