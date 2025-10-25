@@ -60,6 +60,7 @@
 #include <WebCore/HTMLFrameOwnerElement.h>
 #include <WebCore/HitTestResult.h>
 #include <WebCore/InspectorInstrumentationWebKit.h>
+#include <WebCore/LocalFrame.h>
 #include <WebCore/LocalFrameInlines.h>
 #include <WebCore/NetscapePlugInStreamLoader.h>
 #include <WebCore/NetworkLoadInformation.h>

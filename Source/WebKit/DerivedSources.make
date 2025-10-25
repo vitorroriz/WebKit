@@ -227,6 +227,7 @@ MESSAGE_RECEIVERS = \
 	WebProcess/GPU/webrtc/RemoteVideoFrameObjectHeapProxyProcessor \
 	WebProcess/WebStorage/StorageAreaMap \
 	WebProcess/UserContent/WebUserContentController \
+	WebProcess/Inspector/WasmDebuggerDispatcher \
 	WebProcess/Inspector/WebInspectorInterruptDispatcher \
 	WebProcess/Inspector/WebInspectorUI \
 	WebProcess/Inspector/WebInspectorUIExtensionController \
