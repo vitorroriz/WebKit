@@ -44,11 +44,17 @@ static const UIMenuIdentifier WKCaptionStyleMenuProfileGroupIdentifier = @"WKCap
 static const UIMenuIdentifier WKCaptionStyleMenuProfileIdentifier = @"WKCaptionStyleMenuProfileIdentifier";
 static const UIMenuIdentifier WKCaptionStyleMenuSystemSettingsIdentifier = @"WKCaptionStyleMenuSystemSettingsIdentifier";
 
+#if USE(UICONTEXTMENU)
 @interface WKCaptionStyleMenuController () <UIContextMenuInteractionDelegate> {
+#else
+@interface WKCaptionStyleMenuController () {
+#endif
     Vector<String> _profileIDs;
     String _savedActiveProfileID;
     RetainPtr<UIMenu> _menu;
+#if USE(UICONTEXTMENU)
     RetainPtr<UIContextMenuInteraction> _interaction;
+#endif
 }
 @end
 
@@ -120,16 +126,14 @@ static const UIMenuIdentifier WKCaptionStyleMenuSystemSettingsIdentifier = @"WKC
     return _menu.get();
 }
 
+#if USE(UICONTEXTMENU)
 - (UIContextMenuInteraction *)contextMenuInteraction
 {
-#if !PLATFORM(WATCHOS)
     if (!_interaction)
         _interaction = adoptNS([[UIContextMenuInteraction alloc] initWithDelegate:self]);
     return _interaction.get();
-#else
-    return nil;
-#endif
 }
+#endif
 
 #pragma mark - Actions
 
@@ -164,16 +168,13 @@ static const UIMenuIdentifier WKCaptionStyleMenuSystemSettingsIdentifier = @"WKC
         [delegate captionStyleMenuDidClose:_menu.get()];
 }
 
-- (nullable UIContextMenuConfiguration *)contextMenuInteraction:(nonnull UIContextMenuInteraction *)interaction configurationForMenuAtLocation:(CGPoint)location {
 #if USE(UICONTEXTMENU)
+- (nullable UIContextMenuConfiguration *)contextMenuInteraction:(nonnull UIContextMenuInteraction *)interaction configurationForMenuAtLocation:(CGPoint)location {
     return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:makeBlockPtr([weakSelf = WeakObjCPtr<WKCaptionStyleMenuController>(self)] (NSArray<UIMenuElement *> *) -> UIMenu * {
         if (auto strongSelf = weakSelf.get())
             return strongSelf->_menu.get();
         return nil;
     }).get()];
-#else
-    return nil;
-#endif
 }
 
 - (void)contextMenuInteraction:(UIContextMenuInteraction *)interaction willDisplayMenuForConfiguration:(UIContextMenuConfiguration *)configuration animator:(nullable id<UIContextMenuInteractionAnimating>)animator
@@ -185,6 +186,7 @@ static const UIMenuIdentifier WKCaptionStyleMenuSystemSettingsIdentifier = @"WKC
 {
     [self notifyMenuDidClose];
 }
+#endif // USE(UICONTEXTMENU)
 @end
 
 #endif
