@@ -39,8 +39,8 @@ StringMatcher::StringMatcher(Ref<WebCore::SharedBuffer>&& sharedBuffer)
 
 RefPtr<WebCore::SharedMemory> StringMatcher::sharedMemory()
 {
-    if (m_sharedBuffer && !m_sharedMemory)
-        m_sharedMemory = WebCore::SharedMemory::copyBuffer(*m_sharedBuffer);
+    if (RefPtr sharedBuffer = m_sharedBuffer; sharedBuffer && !m_sharedMemory)
+        m_sharedMemory = WebCore::SharedMemory::copyBuffer(*sharedBuffer);
     return m_sharedMemory;
 }
 

@@ -866,7 +866,7 @@ ALLOW_DEPRECATED_IMPLEMENTATIONS_END
 {
     if (!isEnhancedSecurityFeatureEnabled())
         return WKSecurityRestrictionModeNone;
-    if (_websitePolicies->lockdownModeEnabled())
+    if (Ref { *_websitePolicies }->lockdownModeEnabled())
         return WKSecurityRestrictionModeLockdown;
     if (_websitePolicies->enhancedSecurityEnabled())
         return WKSecurityRestrictionModeMaximizeCompatibility;

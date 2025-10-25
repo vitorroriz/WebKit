@@ -112,7 +112,7 @@ UserContentControllerParameters WebUserContentControllerProxy::parametersForProc
     Vector<WebStringMatcherData> stringMatchers;
     for (auto& [pair, matcher] : m_stringMatchers) {
         if (RefPtr world = API::ContentWorld::worldForIdentifier(pair.first))
-            stringMatchers.append(WebStringMatcherData { matcher->sharedMemory(), world->worldDataForProcess(process), pair.second });
+            stringMatchers.append(WebStringMatcherData { matcher.copyRef()->sharedMemory(), world->worldDataForProcess(process), pair.second });
     }
 
     auto messageHandlers = WTF::map(m_scriptMessageHandlers, [&](auto entry) {
