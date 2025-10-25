@@ -2,6 +2,7 @@ Platform/IPC/ArgumentCoders.h
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIAlarmsCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIDeclarativeNetRequestCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIExtensionCocoa.mm
+WebProcess/Extensions/API/Cocoa/WebExtensionAPIMenusCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPINamespaceCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIPortCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIRuntimeCocoa.mm
@@ -13,6 +14,7 @@ WebProcess/Extensions/API/Cocoa/WebExtensionAPIWebRequestEventCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIWindowsCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIWindowsEventCocoa.mm
 WebProcess/Extensions/Bindings/Cocoa/JSWebExtensionWrapperCocoa.mm
+WebProcess/Extensions/Bindings/JSWebExtensionWrapper.cpp
 WebProcess/Extensions/Cocoa/WebExtensionControllerProxyCocoa.mm
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInCSSStyleDeclarationHandle.mm
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInFrame.mm
