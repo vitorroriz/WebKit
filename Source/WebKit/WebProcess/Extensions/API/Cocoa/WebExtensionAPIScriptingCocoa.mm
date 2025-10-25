@@ -479,7 +479,7 @@ bool WebExtensionAPIScripting::parseScriptInjectionOptions(NSDictionary *script,
         parameters.world = worldType.value();
 
     if (JSValue *function = script[usedFunctionKey]) {
-        if (!function._isFunction) {
+        if (!isFunction(function.context.JSGlobalContextRef, function.JSValueRef)) {
             *outExceptionString = toErrorString(nullString(), usedFunctionKey, @"it is not a function").createNSString().autorelease();
             return false;
         }

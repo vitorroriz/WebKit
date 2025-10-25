@@ -44,16 +44,6 @@
 
 namespace WebKit {
 
-WebExtensionCallbackHandler::WebExtensionCallbackHandler(JSValue *callbackFunction)
-    : m_callbackFunction(JSValueToObject(callbackFunction.context.JSGlobalContextRef, callbackFunction.JSValueRef, nullptr))
-    , m_globalContext(callbackFunction.context.JSGlobalContextRef)
-{
-    ASSERT(callbackFunction);
-    ASSERT(callbackFunction._isFunction);
-
-    JSValueProtect(m_globalContext.get(), m_callbackFunction);
-}
-
 WebExtensionCallbackHandler::WebExtensionCallbackHandler(JSContextRef context, JSObjectRef callbackFunction, WebExtensionAPIRuntimeBase& runtime)
     : m_callbackFunction(callbackFunction)
     , m_globalContext(JSContextGetGlobalContext(context))
@@ -176,7 +166,7 @@ id toNSObject(JSContextRef context, JSValueRef valueRef, Class containingObjects
 
         for (NSUInteger i = 0; i < length; ++i) {
             JSValue *itemValue = [value valueAtIndex:i];
-            if (valuePolicy == ValuePolicy::StopAtTopLevel && (itemValue.isArray || itemValue._isDictionary)) {
+            if (valuePolicy == ValuePolicy::StopAtTopLevel && (itemValue.isArray || isDictionary(context, itemValue.JSValueRef))) {
                 if (itemValue)
                     [mutableArray addObject:itemValue];
             } else if (id convertedItem = toNSObject(context, itemValue.JSValueRef, Nil, nullPolicy))
@@ -192,7 +182,7 @@ id toNSObject(JSContextRef context, JSValueRef valueRef, Class containingObjects
         });
     }
 
-    if (value._isDictionary)
+    if (isDictionary(context, value.JSValueRef))
         return toNSDictionary(context, valueRef, nullPolicy, valuePolicy);
 
     if (value.isObject && !value.isDate && !value.isNull)
@@ -239,7 +229,7 @@ NSDictionary *toNSDictionary(JSContextRef context, JSValueRef valueRef, NullValu
         return nil;
 
     JSValue *value = [JSValue valueWithJSValueRef:valueRef inContext:toJSContext(context)];
-    if (!value._isDictionary)
+    if (!isDictionary(context, value.JSValueRef))
         return nil;
 
     JSPropertyNameArrayRef propertyNames = JSObjectCopyPropertyNames(context, object);
@@ -266,7 +256,7 @@ NSDictionary *toNSDictionary(JSContextRef context, JSValueRef valueRef, NullValu
             continue;
         }
 
-        if (itemValue._isDictionary) {
+        if (isDictionary(context, itemValue.JSValueRef)) {
             if (auto *itemDictionary = toNSDictionary(context, item, nullPolicy))
                 result[key] = itemDictionary;
         } else if (id value = toNSObject(context, item))
@@ -430,82 +420,26 @@ JSValueRef toJSValueRef(JSContextRef context, id object)
     return [JSValue valueWithObject:object inContext:toJSContext(context)].JSValueRef;
 }
 
-} // namespace WebKit
-
-using namespace WebKit;
-
-#if JSC_OBJC_API_ENABLED
-
-@implementation JSValue (WebKitExtras)
-
-- (NSString *)_toJSONString
-{
-    return nsStringNilIfEmpty(serializeJSObject(self.context.JSGlobalContextRef, self.JSValueRef, nullptr)).autorelease();
-}
-
-- (NSString *)_toSortedJSONString
+// This function lexicographically sorts the JSON output. The WTF JSON implementation does not yet support sorting keys,
+// so this function has to stay on Cocoa for now.
+String toSortedJSONString(JSContextRef context, JSValueRef value)
 {
     // This double-JSON approach works best since it avoids JSC's Cocoa object conversion, which can produce JSValue's that NSJSONSerialization can't convert.
-    auto* data = [self._toJSONString dataUsingEncoding:NSUTF8StringEncoding];
+    auto* data = [nsStringNilIfEmpty(toJSONString(context, value)).autorelease() dataUsingEncoding:NSUTF8StringEncoding];
     if (!data)
-        return nil;
+        return nullString();
 
     id object = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingFragmentsAllowed error:nullptr];
     if (!object)
-        return nil;
+        return nullString();
 
     data = [NSJSONSerialization dataWithJSONObject:object options:NSJSONWritingFragmentsAllowed | NSJSONWritingSortedKeys error:nullptr];
     if (!data)
-        return nil;
+        return nullString();
 
     return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 }
 
-- (BOOL)_isFunction
-{
-    JSGlobalContextRef context = self.context.JSGlobalContextRef;
-    JSValueRef valueRef = self.JSValueRef;
+} // namespace WebKit
 
-    if (!valueRef || !JSValueIsObject(context, valueRef))
-        return NO;
-
-    JSObjectRef functionRef = JSValueToObject(context, valueRef, nullptr);
-    return functionRef && JSObjectIsFunction(context, functionRef);
-}
-
-- (BOOL)_isDictionary
-{
-    // Equivalent to JavaScript: this.__proto__ === Object.prototype
-    // Using isInstanceOf: is too permissive here since all built-in objects inherit from Object.
-    return self.isObject && [self[@"__proto__"] isEqualToObject:self.context[@"Object"][@"prototype"]] && !self._isThenable;
-}
-
-- (BOOL)_isRegularExpression
-{
-    return self.isObject && [self isInstanceOf:self.context[@"RegExp"]];
-}
-
-- (BOOL)_isThenable
-{
-    return self.isObject && dynamic_objc_cast<JSValue>(self[@"then"])._isFunction;
-}
-
-- (void)_awaitThenableResolutionWithCompletionHandler:(void (^)(JSValue *result, JSValue *error))completionHandler
-{
-    ASSERT(self._isThenable);
-
-    auto resolveBlock = ^(JSValue *result) {
-        completionHandler(result, nil);
-    };
-
-    auto rejectBlock = ^(JSValue *error) {
-        completionHandler(nil, error);
-    };
-
-    [self invokeMethod:@"then" withArguments:@[ resolveBlock, rejectBlock ]];
-}
-
-@end
-
-#endif // JSC_OBJC_API_ENABLED
 #endif // ENABLE(WK_WEB_EXTENSIONS)

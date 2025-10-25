@@ -686,17 +686,20 @@ void WebExtensionContextProxy::internalDispatchRuntimeMessageEvent(WebExtensionC
             }
 
             JSValue *value = dynamic_objc_cast<JSValue>(returnValue);
-            if (!value._isThenable)
+            if (!isThenable(value.context.JSGlobalContextRef, value.JSValueRef))
                 continue;
 
             anyListenerHandledMessage = true;
 
-            [value _awaitThenableResolutionWithCompletionHandler:^(JSValue *replyMessage, id error) {
-                if (error)
-                    return;
-
+            auto resolveBlock = ^(JSValue *replyMessage) {
                 callbackAggregatorWrapper.get().aggregator(replyMessage, IsDefaultReply::No);
-            }];
+            };
+
+            auto rejectBlock = ^(JSValue *error) {
+                return;
+            };
+
+            [value invokeMethod:@"then" withArguments:@[ resolveBlock, rejectBlock ]];
         }
     }, toDOMWrapperWorld(contentWorldType));
 
