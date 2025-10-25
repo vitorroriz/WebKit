@@ -1116,6 +1116,7 @@ fast/dom/connected-subframe-counter-overflow.html [ Slow ]
 # Slow on debug webkit.org/b/300706
 [ Debug ] fast/dom/DOMURL/url-very-large-password-no-crash.html [ Skip ]
 [ Debug ] fast/dom/DOMURL/url-very-large-username-no-crash.html [ Skip ]
+[ Debug ] fast/url/url-pattern-very-large-string.html [ Skip ]
 
 http/wpt/service-workers/basic-fetch-with-contentfilter-allow-after-adding-data.html [ Skip ]
 http/wpt/service-workers/basic-fetch-with-contentfilter.https.html [ Skip ]
