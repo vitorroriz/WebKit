@@ -59,6 +59,8 @@ private:
     RemoteDDMeshProxy& operator=(const RemoteDDMeshProxy&) = delete;
     RemoteDDMeshProxy& operator=(RemoteDDMeshProxy&&) = delete;
 
+    bool isRemoteDDMeshProxy() const final { return true; }
+
     DDModelIdentifier backing() const { return m_backing; }
 
     template<typename T>
@@ -83,5 +85,9 @@ private:
 };
 
 }
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebKit::DDModel::RemoteDDMeshProxy)
+    static bool isType(const WebCore::DDModel::DDMesh& mesh) { return mesh.isRemoteDDMeshProxy(); }
+SPECIALIZE_TYPE_TRAITS_END()
 
 #endif // ENABLE(GPU_PROCESS)

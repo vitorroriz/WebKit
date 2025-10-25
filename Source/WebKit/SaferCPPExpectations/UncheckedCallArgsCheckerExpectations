@@ -1,5 +1,4 @@
 Platform/IPC/ArgumentCoders.h
-WebProcess/GPU/graphics/RemoteRenderingBackendProxy.cpp
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInFrame.mm
 WebProcess/InjectedBundle/API/c/WKBundleFrame.cpp
 WebProcess/InjectedBundle/API/c/WKBundlePage.cpp

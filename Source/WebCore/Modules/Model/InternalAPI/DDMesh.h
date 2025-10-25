@@ -58,6 +58,7 @@ public:
     virtual void updateTexture(const DDUpdateTextureDescriptor&) = 0;
     virtual void addMaterial(const DDMaterialDescriptor&) = 0;
     virtual void updateMaterial(const DDUpdateMaterialDescriptor&) = 0;
+    virtual bool isRemoteDDMeshProxy() const { return false; }
 
     virtual void render() = 0;
 #if PLATFORM(COCOA)
