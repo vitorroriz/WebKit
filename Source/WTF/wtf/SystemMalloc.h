@@ -31,9 +31,6 @@
 #include <malloc/malloc.h>
 #endif
 #if USE(APPLE_INTERNAL_SDK) // FIXME: Remove when OS 26 or later is oldest supported OS.
-#if HAVE(TYPE_AWARE_MALLOC) && !(defined(_MALLOC_TYPE_ENABLED) && _MALLOC_TYPE_ENABLED)
-#error HAVE_TYPE_AWARE_MALLOC is enabled without _MALLOC_TYPE_ENABLED
-#endif
 #if !HAVE(TYPE_AWARE_MALLOC) && (defined(_MALLOC_TYPE_ENABLED) && _MALLOC_TYPE_ENABLED)
 #error _MALLOC_TYPE_ENABLED is enabled without HAVE_TYPE_AWARE_MALLOC
 #endif
