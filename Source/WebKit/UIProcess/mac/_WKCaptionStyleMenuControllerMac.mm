@@ -89,6 +89,17 @@ using namespace WTF;
     [_menu addItem:systemCaptionSettingsItem.get()];
 }
 
+- (BOOL)isAncestorOf:(NSMenu *)menu
+{
+    do {
+        if (_menu == menu)
+            return true;
+        menu = menu.supermenu;
+    } while (menu);
+
+    return false;
+}
+
 #pragma mark - Properties
 
 - (NSMenu *)captionStyleMenu

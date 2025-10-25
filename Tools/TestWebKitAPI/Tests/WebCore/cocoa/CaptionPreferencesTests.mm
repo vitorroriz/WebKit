@@ -32,7 +32,12 @@
 #import <WebCore/Color.h>
 #import <WebCore/PageGroup.h>
 #import <WebKit/_WKCaptionStyleMenuController.h>
+#import <wtf/cocoa/TypeCastsCocoa.h>
 #import <wtf/darwin/DispatchExtras.h>
+
+#if PLATFORM(IOS_FAMILY)
+#import <UIKit/UIAction.h>
+#endif
 
 #import <WebCore/MediaAccessibilitySoftLink.h>
 
@@ -40,7 +45,29 @@
 @interface NSMenu (PrivateHighlightItem)
 - (void)highlightItem:(NSMenuItem *)item;
 @end
+#else
+@interface UIContextMenuInteraction (PrivatePresentMenu)
+- (void)_presentMenuAtLocation:(CGPoint)location;
+@end
 #endif
+
+static bool s_captionStyleMenuWillOpenCalled = false;
+static bool s_captionStyleMenuDidCloseCalled = false;
+
+@interface CaptionPreferenceTestMenuControllerDelegate : NSObject<WKCaptionStyleMenuControllerDelegate>
+@end
+
+@implementation CaptionPreferenceTestMenuControllerDelegate
+- (void)captionStyleMenuWillOpen:(PlatformMenu *)menu
+{
+    s_captionStyleMenuWillOpenCalled = true;
+}
+
+- (void)captionStyleMenuDidClose:(PlatformMenu *)menu
+{
+    s_captionStyleMenuDidCloseCalled = true;
+}
+@end
 
 namespace TestWebKitAPI {
 
@@ -134,8 +161,87 @@ SOFT_LINK_SHIM_DEFINE_RESULT(MACaptionAppearanceGetTextEdgeStyle, MACaptionAppea
 SOFT_LINK_SHIM_DEFINE_RESULT(MACaptionAppearanceCopyProfileIDs, RetainPtr<CFArrayRef>);
 SOFT_LINK_SHIM_DEFINE_RESULT(MACaptionAppearanceCopyActiveProfileID, RetainPtr<CFStringRef>);
 
+class CaptionPreferenceTests : public testing::Test {
+public:
+    WKCaptionStyleMenuController *ensureController()
+    {
+        if (!m_styleMenuController) {
+            m_delegate = adoptNS([[CaptionPreferenceTestMenuControllerDelegate alloc] init]);
+            m_styleMenuController = adoptNS([[WKCaptionStyleMenuController alloc] init]);
+            [m_styleMenuController setDelegate:m_delegate.get()];
+        }
+        return m_styleMenuController.get();
+    }
 
-TEST(CaptionPreferenceTests, ShimTest)
+    PlatformMenu *ensureMenu()
+    {
+        return [ensureController() captionStyleMenu];
+    }
+
+    void showMenuAndThen(Function<void(PlatformMenu*)>&& function)
+    {
+#if PLATFORM(MAC)
+        RetainPtr window = adoptNS([[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 300, 300) styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO]);
+
+        bool done = false;
+        RetainPtr menu = ensureMenu();
+        RunLoop::mainSingleton().dispatch([&] {
+            function(menu.get());
+            [menu cancelTracking];
+            done = true;
+        });
+
+        [menu popUpMenuPositioningItem:nil atLocation:NSMakePoint(0, 0) inView:[window contentView]];
+        Util::run(&done);
+#elif PLATFORM(IOS_FAMILY)
+        RetainPtr window = adoptNS([[UIWindow alloc] initWithFrame:NSMakeRect(0, 0, 300, 300)]);
+
+        RetainPtr viewController = adoptNS([[UIViewController alloc] init]);
+        RetainPtr testView = adoptNS([[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 300)]);
+        [viewController setView:testView.get()];
+        [window setRootViewController:viewController.get()];
+        [window makeKeyAndVisible];
+        [testView addInteraction:ensureController().contextMenuInteraction];
+
+        [ensureController().contextMenuInteraction _presentMenuAtLocation:CGPointMake(0, 0)];
+
+        function(ensureMenu());
+
+        [ensureController().contextMenuInteraction dismissMenu];
+#else
+        function(nil);
+#endif
+    }
+
+    void runAndWaitForCaptionStyleMenuWillOpenCalled(Function<void()>&& function)
+    {
+        s_captionStyleMenuWillOpenCalled = false;
+        function();
+        Util::run(&s_captionStyleMenuWillOpenCalled);
+    }
+
+    void runAndWaitForCaptionStyleMenuDidCloseCalled(Function<void()>&& function)
+    {
+        s_captionStyleMenuDidCloseCalled = false;
+        function();
+        Util::run(&s_captionStyleMenuDidCloseCalled);
+    }
+
+    void selectProfileAtIndex(NSUInteger index)
+    {
+#if PLATFORM(MAC)
+        [ensureMenu() performActionForItemAtIndex:index];
+#elif PLATFORM(IOS_FAMILY)
+        PlatformMenu *profileMenu = dynamic_objc_cast<PlatformMenu>(ensureMenu().children.firstObject);
+        [dynamic_objc_cast<UIAction>(profileMenu.children[index]) performWithSender:nil target:nil];
+#endif
+    }
+private:
+    RetainPtr<WKCaptionStyleMenuController> m_styleMenuController;
+    RetainPtr<CaptionPreferenceTestMenuControllerDelegate> m_delegate;
+};
+
+TEST_F(CaptionPreferenceTests, ShimTest)
 {
     auto originalOpacity = MACaptionAppearanceGetForegroundOpacity(kMACaptionAppearanceDomainDefault, nullptr);
     {
@@ -148,7 +254,7 @@ TEST(CaptionPreferenceTests, ShimTest)
     EXPECT_EQ(originalOpacity, MACaptionAppearanceGetForegroundOpacity(kMACaptionAppearanceDomainDefault, nullptr));
 }
 
-TEST(CaptionPreferenceTests, FontFace)
+TEST_F(CaptionPreferenceTests, FontFace)
 {
     MediaAccessibilityShim shim;
 
@@ -165,13 +271,11 @@ TEST(CaptionPreferenceTests, FontFace)
     EXPECT_STREQ(preferences->captionsDefaultFontCSS().utf8().data(), "font-family: \"WingDings\";");
 }
 
-// CaptionPreferenceTests.FontSize broke on Sonoma Debug https://bugs.webkit.org/show_bug.cgi?id=301096
-#if PLATFORM(MAC) && __MAC_OS_X_VERSION_MIN_REQUIRED < 150000 && !defined(NDEBUG)
-TEST(CaptionPreferenceTests, DISABLED_FontSize)
-#else
-TEST(CaptionPreferenceTests, FontSize)
-#endif
+TEST_F(CaptionPreferenceTests, FontSize)
 {
+    if (!canLoad_MediaAccessibility_MACaptionAppearanceIsCustomized())
+        return;
+
     MediaAccessibilityShim shim;
 
     PageGroup group { "CaptionPreferenceTests"_s };
@@ -185,7 +289,7 @@ TEST(CaptionPreferenceTests, FontSize)
     EXPECT_STREQ(preferences->captionsFontSizeCSS().utf8().data(), "font-size: 10cqmin;");
 }
 
-TEST(CaptionPreferenceTests, Colors)
+TEST_F(CaptionPreferenceTests, Colors)
 {
     MediaAccessibilityShim shim;
 
@@ -209,7 +313,7 @@ TEST(CaptionPreferenceTests, Colors)
     EXPECT_STREQ(preferences->captionsWindowCSS().utf8().data(), "background-color:rgba(0, 255, 0, 0.25);");
 }
 
-TEST(CaptionPreferenceTests, BorderRadius)
+TEST_F(CaptionPreferenceTests, BorderRadius)
 {
     MediaAccessibilityShim shim;
 
@@ -220,7 +324,7 @@ TEST(CaptionPreferenceTests, BorderRadius)
     EXPECT_STREQ(preferences->windowRoundedCornerRadiusCSS().utf8().data(), "border-radius:8px;padding:2px;");
 }
 
-TEST(CaptionPreferenceTests, TextEdge)
+TEST_F(CaptionPreferenceTests, TextEdge)
 {
     MediaAccessibilityShim shim;
 
@@ -242,17 +346,16 @@ TEST(CaptionPreferenceTests, TextEdge)
     EXPECT_STREQ(preferences->captionsTextEdgeCSS().utf8().data(), "stroke-color:black;paint-order:stroke;stroke-linejoin:round;stroke-linecap:round;");
 }
 
-#if PLATFORM(MAC)
-TEST(CaptionPreferenceTests, CaptionStyleMenu)
+TEST_F(CaptionPreferenceTests, CaptionStyleMenu)
 {
     if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
         return;
 
     MediaAccessibilityShim shim;
 
-    RetainPtr styleMenuController = adoptNS([[WKCaptionStyleMenuController alloc] init]);
-    NSMenu *menu = [styleMenuController captionStyleMenu];
+    PlatformMenu *menu = ensureMenu();
 
+#if PLATFORM(MAC)
     EXPECT_EQ(menu.numberOfItems, 5);
     EXPECT_WK_STREQ("Profile 1", [[menu itemAtIndex:0] title]);
     EXPECT_WK_STREQ("Profile 2", [[menu itemAtIndex:1] title]);
@@ -267,69 +370,81 @@ TEST(CaptionPreferenceTests, CaptionStyleMenu)
 
     [menu performActionForItemAtIndex:2];
     EXPECT_WK_STREQ("Profile 3", CaptionUserPreferencesMediaAF::platformActiveProfileID());
+#elif PLATFORM(IOS_FAMILY)
+    EXPECT_EQ(menu.children.count, 2UL);
+    PlatformMenu *profileMenu = dynamic_objc_cast<PlatformMenu>(menu.children.firstObject);
+
+    EXPECT_EQ(profileMenu.children.count, 3UL);
+    EXPECT_WK_STREQ("Profile 1", profileMenu.children[0].title);
+    EXPECT_WK_STREQ("Profile 2", profileMenu.children[1].title);
+    EXPECT_WK_STREQ("Profile 3", profileMenu.children[2].title);
+
+    EXPECT_EQ(UIMenuElementStateOn, dynamic_objc_cast<UIAction>(profileMenu.children[0]).state);
+    EXPECT_EQ(UIMenuElementStateOff, dynamic_objc_cast<UIAction>(profileMenu.children[1]).state);
+    EXPECT_EQ(UIMenuElementStateOff, dynamic_objc_cast<UIAction>(profileMenu.children[2]).state);
+
+    [dynamic_objc_cast<UIAction>(profileMenu.children[1]) performWithSender:nil target:nil];
+    EXPECT_WK_STREQ("Profile 2", CaptionUserPreferencesMediaAF::platformActiveProfileID());
+
+    [dynamic_objc_cast<UIAction>(profileMenu.children[2]) performWithSender:nil target:nil];
+    EXPECT_WK_STREQ("Profile 3", CaptionUserPreferencesMediaAF::platformActiveProfileID());
+#endif
 }
 
-TEST(CaptionPreferenceTests, CaptionStyleMenuHighlight)
+TEST_F(CaptionPreferenceTests, CaptionStyleMenuHighlight)
 {
     if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
         return;
 
     MediaAccessibilityShim shim;
 
-    RetainPtr styleMenuController = adoptNS([[WKCaptionStyleMenuController alloc] init]);
-    NSMenu *menu = [styleMenuController captionStyleMenu];
-
-    RetainPtr window = adoptNS([[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 300, 300) styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO]);
-
-    __block bool done = false;
-    dispatch_async(mainDispatchQueueSingleton(), ^{
+    showMenuAndThen([&] (PlatformMenu *menu) {
+        // TODO: Menu highlighting is currently not supported on IOS_FAMILY
+#if PLATFORM(MAC)
         [menu performSelector:@selector(highlightItem:) withObject:[menu itemAtIndex:1]];
         EXPECT_WK_STREQ("Profile 2", CaptionUserPreferencesMediaAF::platformActiveProfileID());
 
         [menu performSelector:@selector(highlightItem:) withObject:[menu itemAtIndex:2]];
         EXPECT_WK_STREQ("Profile 3", CaptionUserPreferencesMediaAF::platformActiveProfileID());
-
-        [menu cancelTracking];
-        done = true;
+#endif
     });
-
-    [menu popUpMenuPositioningItem:nil atLocation:NSMakePoint(0, 0) inView:[window contentView]];
-    Util::run(&done);
 
     // Verify that cancelling the menu without making a selection will restore the active profile
     // to its previous state.
     EXPECT_WK_STREQ("Profile 1", CaptionUserPreferencesMediaAF::platformActiveProfileID());
 }
 
-TEST(CaptionPreferenceTests, CaptionStyleMenuSelect)
+TEST_F(CaptionPreferenceTests, CaptionStyleMenuSelect)
 {
     if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
         return;
 
     MediaAccessibilityShim shim;
 
-    RetainPtr styleMenuController = adoptNS([[WKCaptionStyleMenuController alloc] init]);
-    NSMenu *menu = [styleMenuController captionStyleMenu];
-
-    RetainPtr window = adoptNS([[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 300, 300) styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO]);
-
-    __block bool done = false;
-    dispatch_async(mainDispatchQueueSingleton(), ^{
-        [menu performActionForItemAtIndex:1];
+    showMenuAndThen([&] (PlatformMenu *menu) {
+        selectProfileAtIndex(1);
         EXPECT_WK_STREQ("Profile 2", CaptionUserPreferencesMediaAF::platformActiveProfileID());
 
-        [menu performActionForItemAtIndex:2];
+        selectProfileAtIndex(2);
         EXPECT_WK_STREQ("Profile 3", CaptionUserPreferencesMediaAF::platformActiveProfileID());
-
-        [menu cancelTracking];
-        done = true;
     });
-
-    [menu popUpMenuPositioningItem:nil atLocation:NSMakePoint(0, 0) inView:[window contentView]];
-    Util::run(&done);
 
     EXPECT_WK_STREQ("Profile 3", CaptionUserPreferencesMediaAF::platformActiveProfileID());
 }
-#endif
+
+TEST_F(CaptionPreferenceTests, CaptionStyleMenuDelegate)
+{
+    if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
+        return;
+
+    MediaAccessibilityShim shim;
+
+    runAndWaitForCaptionStyleMenuWillOpenCalled([&] {
+        runAndWaitForCaptionStyleMenuDidCloseCalled([&] {
+            showMenuAndThen([] (PlatformMenu *) {
+            });
+        });
+    });
+}
 
 }

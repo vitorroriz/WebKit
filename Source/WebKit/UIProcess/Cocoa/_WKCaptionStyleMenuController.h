@@ -28,22 +28,30 @@
 #import <WebKit/WKFoundation.h>
 
 #if TARGET_OS_OSX
-
 @class NSMenu;
+typedef NSMenu PlatformMenu;
+#else
+@class UIContextMenuInteraction;
+@class UIMenu;
+typedef UIMenu PlatformMenu;
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol WKCaptionStyleMenuControllerDelegate <NSObject>
-- (void)captionStyleMenuWillOpen:(NSMenu *)menu;
-- (void)captionStyleMenuDidClose:(NSMenu *)menu;
+- (void)captionStyleMenuWillOpen:(PlatformMenu *)menu;
+- (void)captionStyleMenuDidClose:(PlatformMenu *)menu;
 @end
 
 WK_EXTERN
 @interface WKCaptionStyleMenuController : NSObject
 @property (weak, nonatomic) id<WKCaptionStyleMenuControllerDelegate> delegate;
-@property (readonly, nonatomic) NSMenu *captionStyleMenu;
+@property (readonly, nonatomic) PlatformMenu *captionStyleMenu;
+#if !TARGET_OS_OSX
+@property (readonly, nullable, nonatomic) UIContextMenuInteraction *contextMenuInteraction;
+#endif
+
+- (BOOL)isAncestorOf:(PlatformMenu*)menu;
 @end
 
 NS_ASSUME_NONNULL_END
-
-#endif

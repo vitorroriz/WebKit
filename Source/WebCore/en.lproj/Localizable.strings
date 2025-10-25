@@ -1450,6 +1450,9 @@
 /* Styles context menu item */
 "Styles…" = "Styles…";
 
+/* Subtitles media controls menu title */
+"Styles (Media Controls Menu)" = "Styles";
+
 /* default label for Submit buttons in forms on web pages */
 "Submit" = "Submit";
 
