@@ -311,7 +311,7 @@ private:
 #endif
 
     private:
-        static constexpr unsigned s_maximumBuffers = 3;
+        static constexpr unsigned s_maximumBuffers = 4;
 
         std::unique_ptr<RenderTarget> createTarget() const;
 
