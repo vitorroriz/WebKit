@@ -4301,17 +4301,17 @@ LargeImageAsyncDecodingEnabled:
 
 LargestContentfulPaintEnabled:
   type: bool
-  status: preview
+  status: stable
   category: dom
   humanReadableName: "Largest Contentful Paint"
   humanReadableDescription: "Enable Largest Contentful Paint performance entries"
   defaultValue:
     WebKitLegacy:
-      default: false
+      default: true
     WebKit:
-      default: false
+      default: true
     WebCore:
-      default: false
+      default: true
 
 
 LayerBasedSVGEngineEnabled:
