@@ -40,7 +40,7 @@ void WebPopupMenu::setUpPlatformData(const IntRect&, PlatformPopupMenuData& data
 #if USE(APPKIT)
     CheckedPtr popupClient = m_popupClient;
     // FIXME: font will be nil here for custom fonts, we should fix that.
-    RetainPtr font = popupClient->menuStyle().font().primaryFont()->ctFont();
+    RetainPtr font = popupClient->menuStyle().checkedFont()->primaryFont()->ctFont();
     if (!font)
         return;
 
