@@ -1392,7 +1392,7 @@ private:
     RefPtr<Blob> m_blob;
     URLKeepingBlobAlive m_blobURLForReading;
     MediaProvider m_mediaProvider;
-    WTF::Observer<WebCoreOpaqueRoot()> m_opaqueRootProvider;
+    const Ref<WTF::Observer<WebCoreOpaqueRoot()>> m_opaqueRootProvider;
 
 #if ENABLE(LEGACY_ENCRYPTED_MEDIA)
     bool m_hasNeedkeyListener { false };
@@ -1462,7 +1462,7 @@ private:
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
     using DefaultSpatialTrackingLabelChangedObserver = WTF::Observer<void(String&&)>;
-    DefaultSpatialTrackingLabelChangedObserver m_defaultSpatialTrackingLabelChangedObserver;
+    const Ref<DefaultSpatialTrackingLabelChangedObserver> m_defaultSpatialTrackingLabelChangedObserver;
     String m_spatialTrackingLabel;
 #endif
 

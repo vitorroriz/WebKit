@@ -26,6 +26,7 @@
 #pragma once
 
 #include <algorithm>
+#include <wtf/CheckedPtr.h>
 #include <wtf/HashSet.h>
 #include <wtf/WeakPtr.h>
 

@@ -16898,15 +16898,15 @@ void WebPageProxy::removeNowPlayingMetadataObserver(const NowPlayingMetadataObse
         send(Messages::WebPage::StopObservingNowPlayingMetadata());
 }
 
-void WebPageProxy::setNowPlayingMetadataObserverForTesting(std::unique_ptr<WebCore::NowPlayingMetadataObserver>&& observer)
+void WebPageProxy::setNowPlayingMetadataObserverForTesting(RefPtr<WebCore::NowPlayingMetadataObserver>&& observer)
 {
-    if (auto previousObserver = std::exchange(m_nowPlayingMetadataObserverForTesting, nullptr))
+    if (RefPtr previousObserver = std::exchange(m_nowPlayingMetadataObserverForTesting, nullptr))
         removeNowPlayingMetadataObserver(*previousObserver);
 
     m_nowPlayingMetadataObserverForTesting = WTFMove(observer);
 
-    if (m_nowPlayingMetadataObserverForTesting)
-        addNowPlayingMetadataObserver(*m_nowPlayingMetadataObserverForTesting);
+    if (RefPtr observer = m_nowPlayingMetadataObserverForTesting)
+        addNowPlayingMetadataObserver(*observer);
 }
 
 void WebPageProxy::nowPlayingMetadataChanged(const WebCore::NowPlayingMetadata& metadata)

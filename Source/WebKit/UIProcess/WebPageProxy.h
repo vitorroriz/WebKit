@@ -2748,7 +2748,7 @@ public:
 
     void addNowPlayingMetadataObserver(const WebCore::NowPlayingMetadataObserver&);
     void removeNowPlayingMetadataObserver(const WebCore::NowPlayingMetadataObserver&);
-    void setNowPlayingMetadataObserverForTesting(std::unique_ptr<WebCore::NowPlayingMetadataObserver>&&);
+    void setNowPlayingMetadataObserverForTesting(RefPtr<WebCore::NowPlayingMetadataObserver>&&);
     void nowPlayingMetadataChanged(const WebCore::NowPlayingMetadata&);
 
     void didAdjustVisibilityWithSelectors(Vector<String>&&);
@@ -4000,7 +4000,7 @@ private:
 #endif
 
     WeakHashSet<WebCore::NowPlayingMetadataObserver> m_nowPlayingMetadataObservers;
-    std::unique_ptr<WebCore::NowPlayingMetadataObserver> m_nowPlayingMetadataObserverForTesting;
+    RefPtr<WebCore::NowPlayingMetadataObserver> m_nowPlayingMetadataObserverForTesting;
 
 #if ENABLE(WRITING_TOOLS)
     bool m_isWritingToolsActive { false };

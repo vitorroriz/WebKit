@@ -291,7 +291,7 @@ static void dumpCALayer(TextStream& ts, CALayer *layer, bool traverse)
         return;
     }
 
-    auto nowPlayingMetadataObserver = makeUnique<WebCore::NowPlayingMetadataObserver>([observer = makeBlockPtr(observer)](auto& metadata) {
+    auto nowPlayingMetadataObserver = WebCore::NowPlayingMetadataObserver::create([observer = makeBlockPtr(observer)](auto& metadata) {
         RetainPtr nowPlayingMetadata = adoptNS([[_WKNowPlayingMetadata alloc] init]);
         [nowPlayingMetadata setTitle:metadata.title.createNSString().get()];
         [nowPlayingMetadata setArtist:metadata.artist.createNSString().get()];

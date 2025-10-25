@@ -59,7 +59,10 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(PlaybackSessionModelMediaElement);
 PlaybackSessionModelMediaElement::PlaybackSessionModelMediaElement()
     : EventListener(EventListener::CPPEventListenerType)
     , m_soundStageSize { AudioSessionSoundStageSize::Automatic }
-    , m_videoTrackConfigurationObserver { [&] { videoTrackConfigurationChanged(); } }
+    , m_videoTrackConfigurationObserver { Observer<void()>::create([weakThis = WeakPtr { *this }] {
+        if (RefPtr protectedThis = weakThis.get())
+            protectedThis->videoTrackConfigurationChanged();
+    }) }
 {
 }
 

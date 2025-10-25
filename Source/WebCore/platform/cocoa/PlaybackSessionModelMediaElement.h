@@ -60,6 +60,8 @@ public:
     }
     WEBCORE_EXPORT virtual ~PlaybackSessionModelMediaElement();
 
+    USING_CAN_MAKE_WEAKPTR(PlaybackSessionModel);
+
     // CheckedPtr interface
     uint32_t checkedPtrCount() const final { return CanMakeCheckedPtr::checkedPtrCount(); }
     uint32_t checkedPtrCountWithoutThreadCheck() const final { return CanMakeCheckedPtr::checkedPtrCountWithoutThreadCheck(); }
@@ -168,7 +170,7 @@ private:
     std::optional<SpatialVideoMetadata> m_spatialVideoMetadata;
     std::optional<VideoProjectionMetadata> m_videoProjectionMetadata;
 
-    Observer<void()> m_videoTrackConfigurationObserver;
+    const Ref<Observer<void()>> m_videoTrackConfigurationObserver;
 };
 
 }

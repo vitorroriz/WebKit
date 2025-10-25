@@ -215,7 +215,7 @@ static void makeResponderFirstResponderIfDescendantOfView(NSWindow *window, NSRe
 }
 
 @implementation WKFullScreenWindowController {
-    std::unique_ptr<WebKit::VideoPresentationManagerProxy::VideoInPictureInPictureDidChangeObserver> _pipObserver;
+    RefPtr<WebKit::VideoPresentationManagerProxy::VideoInPictureInPictureDidChangeObserver> _pipObserver;
 
 #if !RELEASE_LOG_DISABLED
     RefPtr<Logger> _logger;
@@ -842,14 +842,14 @@ static RetainPtr<CGImageRef> takeWindowSnapshot(CGSWindowID windowID, bool captu
     if (_pipObserver)
         return;
 
-    _pipObserver = WTF::makeUnique<WebKit::VideoPresentationManagerProxy::VideoInPictureInPictureDidChangeObserver>([strongSelf = retainPtr(self)] (bool inPiP) {
+    _pipObserver = WebKit::VideoPresentationManagerProxy::VideoInPictureInPictureDidChangeObserver::create([strongSelf = retainPtr(self)] (bool inPiP) {
         if (inPiP)
             [strongSelf didEnterPictureInPicture];
         else
             [strongSelf didExitPictureInPicture];
     });
 
-    videoPresentationManager->addVideoInPictureInPictureDidChangeObserver(*_pipObserver);
+    videoPresentationManager->addVideoInPictureInPictureDidChangeObserver(Ref { *_pipObserver });
 }
 
 - (void)didEnterPictureInPicture

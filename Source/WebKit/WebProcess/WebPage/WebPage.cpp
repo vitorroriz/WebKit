@@ -9897,19 +9897,19 @@ void WebPage::startObservingNowPlayingMetadata()
     if (!sessionManager || m_nowPlayingMetadataObserver)
         return;
 
-    m_nowPlayingMetadataObserver = makeUnique<NowPlayingMetadataObserver>([weakThis = WeakPtr { *this }](auto& metadata) {
+    m_nowPlayingMetadataObserver = NowPlayingMetadataObserver::create([weakThis = WeakPtr { *this }](auto& metadata) {
         if (RefPtr protectedThis = weakThis.get())
             protectedThis->send(Messages::WebPageProxy::NowPlayingMetadataChanged { metadata });
     });
 
-    sessionManager->addNowPlayingMetadataObserver(*m_nowPlayingMetadataObserver);
+    sessionManager->addNowPlayingMetadataObserver(Ref { *m_nowPlayingMetadataObserver });
 #endif
 }
 
 void WebPage::stopObservingNowPlayingMetadata()
 {
 #if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
-    auto nowPlayingMetadataObserver = std::exchange(m_nowPlayingMetadataObserver, nullptr);
+    RefPtr nowPlayingMetadataObserver = std::exchange(m_nowPlayingMetadataObserver, nullptr);
     if (!nowPlayingMetadataObserver)
         return;
 

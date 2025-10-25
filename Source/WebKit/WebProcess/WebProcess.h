@@ -946,7 +946,7 @@ private:
     const std::unique_ptr<SpeechRecognitionRealtimeMediaSourceManager> m_speechRecognitionRealtimeMediaSourceManager;
 #endif
 #if ENABLE(ROUTING_ARBITRATION)
-    std::unique_ptr<AudioSessionRoutingArbitrator> m_routingArbitrator;
+    const std::unique_ptr<AudioSessionRoutingArbitrator> m_routingArbitrator;
 #endif
     bool m_hadMainFrameMainResourcePrivateRelayed { false };
     bool m_imageAnimationEnabled { true };

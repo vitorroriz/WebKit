@@ -90,7 +90,10 @@ AudioVideoRendererAVFObjC::AudioVideoRendererAVFObjC(const Logger& originalLogge
     , m_listener(WebAVSampleBufferListener::create(*this))
     , m_startupTime(MonotonicTime::now())
 #if ENABLE(ENCRYPTED_MEDIA) && HAVE(AVCONTENTKEYSESSION)
-    , m_keyStatusesChangedObserver(makeUniqueRef<Observer<void()>>([this] { tryToEnqueueBlockedSamples(); }))
+    , m_keyStatusesChangedObserver(Observer<void()>::create([weakThis = ThreadSafeWeakPtr { *this }] {
+        if (RefPtr protectedThis = weakThis.get())
+            protectedThis->tryToEnqueueBlockedSamples();
+    }))
 #endif
 {
     // addPeriodicTimeObserverForInterval: throws an exception if you pass a non-numeric CMTime, so just use

@@ -3193,7 +3193,7 @@ private:
     const UniqueRef<TextAnimationController> m_textAnimationController;
 #endif
 
-    std::unique_ptr<WebCore::NowPlayingMetadataObserver> m_nowPlayingMetadataObserver;
+    RefPtr<WebCore::NowPlayingMetadataObserver> m_nowPlayingMetadataObserver;
     std::unique_ptr<FrameInfoData> m_mainFrameNavigationInitiator;
 
     mutable RefPtr<Logger> m_logger;

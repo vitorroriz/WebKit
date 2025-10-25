@@ -780,7 +780,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 #endif // QUICKLOOK_FULLSCREEN
 #endif
 
-    std::unique_ptr<WebKit::VideoPresentationManagerProxy::VideoInPictureInPictureDidChangeObserver> _pipObserver;
+    RefPtr<WebKit::VideoPresentationManagerProxy::VideoInPictureInPictureDidChangeObserver> _pipObserver;
     BOOL _shouldReturnToFullscreenFromPictureInPicture;
     BOOL _enterFullscreenNeedsExitPictureInPicture;
     BOOL _returnToFullscreenFromPictureInPicture;
@@ -1229,11 +1229,14 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 
             if (auto* videoPresentationManager = self._videoPresentationManager) {
                 if (!_pipObserver) {
-                    _pipObserver = WTF::makeUnique<WebKit::VideoPresentationManagerProxy::VideoInPictureInPictureDidChangeObserver>([self] (bool inPiP) {
+                    _pipObserver = WebKit::VideoPresentationManagerProxy::VideoInPictureInPictureDidChangeObserver::create([weakSelf = WeakObjCPtr { self }] (bool inPiP) {
+                        RetainPtr strongSelf = weakSelf.get();
+                        if (!strongSelf)
+                            return;
                         if (inPiP)
-                            [self didEnterPictureInPicture];
+                            [strongSelf didEnterPictureInPicture];
                         else
-                            [self didExitPictureInPicture];
+                            [strongSelf didExitPictureInPicture];
                     });
                     videoPresentationManager->addVideoInPictureInPictureDidChangeObserver(*_pipObserver);
                 }

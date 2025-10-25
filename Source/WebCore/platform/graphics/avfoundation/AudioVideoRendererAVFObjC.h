@@ -353,7 +353,7 @@ private:
 #if HAVE(AVCONTENTKEYSESSION)
 #if ENABLE(ENCRYPTED_MEDIA)
     RefPtr<CDMInstanceFairPlayStreamingAVFObjC> m_cdmInstance;
-    UniqueRef<Observer<void()>> m_keyStatusesChangedObserver;
+    const Ref<Observer<void()>> m_keyStatusesChangedObserver;
     using KeyIDs = Vector<Ref<SharedBuffer>>;
     KeyIDs m_keyIDs;
     using TrackKeyIdsMap = HashMap<TrackIdentifier, KeyIDs>;

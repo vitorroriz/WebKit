@@ -641,13 +641,19 @@ HTMLMediaElement::HTMLMediaElement(const QualifiedName& tagName, Document& docum
     , m_haveVisibleTextTrack(false)
     , m_processingPreferenceChange(false)
     , m_volumeLocked(defaultVolumeLocked())
-    , m_opaqueRootProvider([this] { return opaqueRoot(); })
+    , m_opaqueRootProvider(WTF::Observer<WebCoreOpaqueRoot()>::create([weakThis = WeakPtr { *this }] {
+        // This gets called on the GC thread so we cannot ref `this`.
+        return weakThis->opaqueRoot();
+    }))
 #if USE(AUDIO_SESSION)
     , m_categoryAtMostRecentPlayback(AudioSessionCategory::None)
     , m_modeAtMostRecentPlayback(AudioSessionMode::Default)
 #endif
 #if HAVE(SPATIAL_TRACKING_LABEL)
-    , m_defaultSpatialTrackingLabelChangedObserver([this] (const String& defaultSpatialTrackingLabel) { defaultSpatialTrackingLabelChanged(defaultSpatialTrackingLabel); })
+    , m_defaultSpatialTrackingLabelChangedObserver(DefaultSpatialTrackingLabelChangedObserver::create([weakThis = WeakPtr { *this }] (const String& defaultSpatialTrackingLabel) {
+        if (RefPtr protectedThis = weakThis.get())
+            protectedThis->defaultSpatialTrackingLabelChanged(defaultSpatialTrackingLabel);
+    }))
 #endif
 #if !RELEASE_LOG_DISABLED
     , m_logger(&document.logger())

@@ -135,7 +135,10 @@ GroupActivitiesCoordinator::GroupActivitiesCoordinator(GroupActivitiesSession& s
     : m_session(session)
     , m_delegate(adoptNS([[WKGroupActivitiesCoordinatorDelegate alloc] initWithParent:*this]))
     , m_playbackCoordinator(adoptNS([PAL::allocAVDelegatingPlaybackCoordinatorInstance() initWithPlaybackControlDelegate:m_delegate.get()]))
-    , m_stateChangeObserver([this] (auto& session, auto state) { sessionStateChanged(session, state); })
+    , m_stateChangeObserver(GroupActivitiesSession::StateChangeObserver::create([weakThis = WeakPtr { *this }] (auto& session, auto state) {
+        if (RefPtr protectedThis = weakThis.get())
+            protectedThis->sessionStateChanged(session, state);
+    }))
 {
     [session.protectedGroupSession() coordinateWithCoordinator:m_playbackCoordinator.get()];
     session.addStateChangeObserver(m_stateChangeObserver);

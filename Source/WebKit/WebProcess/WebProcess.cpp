@@ -2650,7 +2650,7 @@ void WebProcess::enableMediaPlayback()
 #endif
 
 #if ENABLE(ROUTING_ARBITRATION)
-    m_routingArbitrator = makeUnique<AudioSessionRoutingArbitrator>(*this);
+    lazyInitialize(m_routingArbitrator, makeUniqueWithoutRefCountedCheck<AudioSessionRoutingArbitrator>(*this));
 #endif
 }
 
