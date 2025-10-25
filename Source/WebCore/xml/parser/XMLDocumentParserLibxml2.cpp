@@ -636,13 +636,16 @@ RefPtr<XMLParserContext> XMLParserContext::createMemoryParser(xmlSAXHandlerPtr h
     // FIXME: Why is XML_PARSE_NODICT needed? This is different from what createStringParser does.
     xmlCtxtUseOptions(parser, XML_PARSE_NODICT | XML_PARSE_NOENT | XML_PARSE_HUGE);
 
-    // Internal initialization
+#if LIBXML_VERSION < 21300
+    // Internal initialization required before libxml2 2.13.
+    // Fixed with https://gitlab.gnome.org/GNOME/libxml2/-/commit/8c5848bd
     parser->sax2 = 1;
     parser->instate = XML_PARSER_CONTENT; // We are parsing a CONTENT
     parser->depth = 0;
     parser->str_xml = xmlDictLookup(parser->dict, byteCast<xmlChar>(const_cast<char*>("xml")), 3);
     parser->str_xmlns = xmlDictLookup(parser->dict, byteCast<xmlChar>(const_cast<char*>("xmlns")), 5);
     parser->str_xml_ns = xmlDictLookup(parser->dict, XML_XML_NAMESPACE, 36);
+#endif
     parser->_private = userData;
 
     return adoptRef(*new XMLParserContext(parser));
@@ -1485,6 +1488,7 @@ bool XMLDocumentParser::appendFragmentSource(const String& chunk)
     xmlParseContent(context());
     endDocument(); // Close any open text nodes.
 
+#if LIBXML_VERSION < 21400
     // FIXME: If this code is actually needed, it should probably move to finish()
     // XMLDocumentParserQt has a similar check (m_stream.error() == QXmlStreamReader::PrematureEndOfDocumentError) in doEnd().
     // Check if all the chunk has been processed.
@@ -1495,6 +1499,7 @@ bool XMLDocumentParser::appendFragmentSource(const String& chunk)
         ASSERT(m_sawError || (bytesProcessed >= 0 && !chunkAsUTF8.span()[bytesProcessed]));
         return false;
     }
+#endif
 
     // No error if the chunk is well formed or it is not but we have no error.
     return context()->wellFormed || !xmlCtxtGetLastError(context());
