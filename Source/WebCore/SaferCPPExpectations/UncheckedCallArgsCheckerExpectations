@@ -24,8 +24,6 @@ Modules/webdatabase/DatabaseContext.cpp
 Modules/webdatabase/DatabaseManager.cpp
 Modules/webdatabase/LocalDOMWindowWebDatabase.cpp
 Modules/webdatabase/SQLTransaction.cpp
-Modules/websockets/WebSocketChannelInspector.cpp
-Modules/websockets/WorkerThreadableWebSocketChannel.cpp
 StyleBuilderGenerated.cpp
 StyleExtractorGenerated.cpp
 [ Mac ] accessibility/isolatedtree/AXIsolatedTree.cpp
