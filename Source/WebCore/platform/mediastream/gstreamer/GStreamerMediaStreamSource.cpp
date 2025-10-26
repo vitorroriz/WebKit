@@ -103,12 +103,18 @@ GstStream* webkitMediaStreamNew(const RefPtr<MediaStreamTrackPrivate>& track)
 
 static void webkitMediaStreamSrcCharacteristicsChanged(WebKitMediaStreamSrc*);
 
-class WebKitMediaStreamObserver : public MediaStreamPrivateObserver {
+class WebKitMediaStreamObserver : public MediaStreamPrivateObserver, public RefCounted<WebKitMediaStreamObserver> {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(WebKitMediaStreamObserver);
 public:
-    virtual ~WebKitMediaStreamObserver() { };
-    WebKitMediaStreamObserver(GstElement* src)
-        : m_src(src) { }
+    static Ref<WebKitMediaStreamObserver> create(GstElement* src)
+    {
+        return adoptRef(*new WebKitMediaStreamObserver(src));
+    }
+
+    virtual ~WebKitMediaStreamObserver() { }
+
+    void ref() const final { RefCounted::ref(); }
+    void deref() const final { RefCounted::deref(); }
 
     void characteristicsChanged() final
     {
@@ -128,6 +134,10 @@ public:
     void didRemoveTrack(MediaStreamTrackPrivate&) final;
 
 private:
+    WebKitMediaStreamObserver(GstElement* src)
+        : m_src(src)
+    { }
+
     GstElement* m_src;
 };
 
@@ -762,7 +772,7 @@ private:
 struct _WebKitMediaStreamSrcPrivate {
     CString uri;
     HashMap<String, std::unique_ptr<InternalSource>> sources;
-    std::unique_ptr<WebKitMediaStreamObserver> mediaStreamObserver;
+    RefPtr<WebKitMediaStreamObserver> mediaStreamObserver;
     RefPtr<MediaStreamPrivate> stream;
     Vector<RefPtr<MediaStreamTrackPrivate>> tracks;
     GUniquePtr<GstFlowCombiner> flowCombiner;
@@ -984,7 +994,7 @@ static void webkitMediaStreamSrcConstructed(GObject* object)
     GST_OBJECT_FLAG_SET(GST_OBJECT_CAST(self), static_cast<GstElementFlags>(GST_ELEMENT_FLAG_SOURCE | static_cast<GstElementFlags>(GST_BIN_FLAG_STREAMS_AWARE)));
     gst_bin_set_suppressed_flags(GST_BIN_CAST(self), static_cast<GstElementFlags>(GST_ELEMENT_FLAG_SOURCE | GST_ELEMENT_FLAG_SINK));
 
-    priv->mediaStreamObserver = makeUnique<WebKitMediaStreamObserver>(GST_ELEMENT_CAST(self));
+    priv->mediaStreamObserver = WebKitMediaStreamObserver::create(GST_ELEMENT_CAST(self));
     priv->flowCombiner = GUniquePtr<GstFlowCombiner>(gst_flow_combiner_new());
     priv->groupId = gst_util_group_id_next();
 
