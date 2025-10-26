@@ -45,7 +45,7 @@
 @interface NSMenu (PrivateHighlightItem)
 - (void)highlightItem:(NSMenuItem *)item;
 @end
-#else
+#elif USE(UICONTEXTMENU)
 @interface UIContextMenuInteraction (PrivatePresentMenu)
 - (void)_presentMenuAtLocation:(CGPoint)location;
 @end
@@ -193,7 +193,7 @@ public:
 
         [menu popUpMenuPositioningItem:nil atLocation:NSMakePoint(0, 0) inView:[window contentView]];
         Util::run(&done);
-#elif PLATFORM(IOS_FAMILY)
+#elif USE(UICONTEXTMENU)
         RetainPtr window = adoptNS([[UIWindow alloc] initWithFrame:NSMakeRect(0, 0, 300, 300)]);
 
         RetainPtr viewController = adoptNS([[UIViewController alloc] init]);
