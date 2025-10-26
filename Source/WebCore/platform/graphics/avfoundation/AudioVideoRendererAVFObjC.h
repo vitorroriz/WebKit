@@ -174,14 +174,15 @@ private:
     Ref<GenericPromise> ensureLayerOrVideoRenderer();
     void ensureLayer();
     void destroyLayer();
-    void destroyVideoLayerIfNeeded();
     void ensureVideoRenderer();
     void destroyVideoRenderer();
+    void destroyExpiringVideoRenderersIfNeeded();
     Ref<GenericPromise> setVideoRenderer(WebSampleBufferVideoRendering *);
     void configureHasAvailableVideoFrameCallbackIfNeeded();
     void configureLayerOrVideoRenderer(WebSampleBufferVideoRendering *);
     Ref<GenericPromise> stageVideoRenderer(WebSampleBufferVideoRendering *);
     void destroyVideoTrack();
+    void removeRendererFromSynchronizerIfNeeded(id);
 
     enum class AcceleratedVideoMode: uint8_t {
         Layer = 0,
@@ -310,6 +311,13 @@ private:
     RetainPtr<AVSampleBufferDisplayLayer> m_sampleBufferDisplayLayer;
     RetainPtr<AVSampleBufferVideoRenderer> m_sampleBufferVideoRenderer;
     RefPtr<VideoMediaSampleRenderer> m_videoRenderer;
+    Vector<RetainPtr<AVSampleBufferVideoRenderer>> m_expiringSampleBufferVideoRenderers;
+    enum class SampleBufferLayerState : uint8_t {
+        AddedToSynchronizer,
+        PendingRemovalFromSynchronizer,
+        RemovedFromSynchronizer
+    };
+    SampleBufferLayerState m_sampleBufferDisplayLayerState { SampleBufferLayerState::RemovedFromSynchronizer };
     bool m_renderingCanBeAccelerated { false };
     bool m_visible { false };
     IntSize m_presentationSize;
@@ -346,7 +354,6 @@ private:
     String m_spatialTrackingLabel;
 #endif
 
-    bool m_needsDestroyVideoLayer { false };
 #if ENABLE(LINEAR_MEDIA_PLAYER)
     RetainPtr<FigVideoTargetRef> m_videoTarget;
 #endif

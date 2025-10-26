@@ -880,8 +880,7 @@ void AudioVideoRendererAVFObjC::isInFullscreenOrPictureInPictureChanged(bool isI
 {
 #if ENABLE(LINEAR_MEDIA_PLAYER)
     ALWAYS_LOG(LOGIDENTIFIER, isInFullscreenOrPictureInPicture);
-    if (acceleratedVideoMode() == AcceleratedVideoMode::VideoRenderer)
-        destroyVideoLayerIfNeeded();
+    destroyExpiringVideoRenderersIfNeeded();
 #else
     UNUSED_PARAM(isInFullscreenOrPictureInPicture);
 #endif
@@ -956,10 +955,7 @@ void AudioVideoRendererAVFObjC::removeAudioRenderer(TrackIdentifier trackId)
 
 void AudioVideoRendererAVFObjC::destroyAudioRenderer(RetainPtr<AVSampleBufferAudioRenderer> renderer)
 {
-    // False positive see webkit.org/b/298024
-    SUPPRESS_UNRETAINED_ARG CMTime currentTime = PAL::CMTimebaseGetTime([m_synchronizer timebase]);
-    [m_synchronizer removeRenderer:renderer.get() atTime:currentTime completionHandler:nil];
-
+    removeRendererFromSynchronizerIfNeeded(renderer.get());
     m_listener->stopObservingAudioRenderer(renderer.get());
     [renderer flush];
     [renderer stopRequestingMediaData];
@@ -1148,10 +1144,12 @@ Ref<GenericPromise> AudioVideoRendererAVFObjC::ensureLayerOrVideoRenderer()
 
 void AudioVideoRendererAVFObjC::ensureLayer()
 {
-    if (m_sampleBufferDisplayLayer)
+    if (m_sampleBufferDisplayLayer) {
+        if (m_sampleBufferDisplayLayerState == SampleBufferLayerState::AddedToSynchronizer)
+            return;
+        configureLayerOrVideoRenderer(m_sampleBufferDisplayLayer.get());
         return;
-
-    destroyVideoLayerIfNeeded();
+    }
 
     m_sampleBufferDisplayLayer = [adoptNS(PAL::allocAVSampleBufferDisplayLayerInstance()) init];
     if (!m_sampleBufferDisplayLayer) {
@@ -1179,27 +1177,18 @@ void AudioVideoRendererAVFObjC::destroyLayer()
 
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    // False positive see webkit.org/b/298024
-    SUPPRESS_UNRETAINED_ARG CMTime currentTime = PAL::CMTimebaseGetTime([m_synchronizer timebase]);
-    [m_synchronizer removeRenderer:m_sampleBufferDisplayLayer.get() atTime:currentTime completionHandler:nil];
+    removeRendererFromSynchronizerIfNeeded(m_sampleBufferDisplayLayer.get());
 
     m_videoLayerManager->didDestroyVideoLayer();
 
     m_sampleBufferDisplayLayer = nullptr;
-    m_needsDestroyVideoLayer = false;
-}
-
-void AudioVideoRendererAVFObjC::destroyVideoLayerIfNeeded()
-{
-    if (!m_needsDestroyVideoLayer)
-        return;
-    m_needsDestroyVideoLayer = false;
-    m_videoLayerManager->didDestroyVideoLayer();
 }
 
 void AudioVideoRendererAVFObjC::ensureVideoRenderer()
 {
 #if ENABLE(LINEAR_MEDIA_PLAYER)
+    destroyExpiringVideoRenderersIfNeeded();
+
     if (m_sampleBufferVideoRenderer)
         return;
 
@@ -1225,14 +1214,20 @@ void AudioVideoRendererAVFObjC::destroyVideoRenderer()
 
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    // False positive see webkit.org/b/298024
-    SUPPRESS_UNRETAINED_ARG CMTime currentTime = PAL::CMTimebaseGetTime([m_synchronizer timebase]);
-    [m_synchronizer removeRenderer:m_sampleBufferVideoRenderer.get() atTime:currentTime completionHandler:nil];
+    removeRendererFromSynchronizerIfNeeded(m_sampleBufferVideoRenderer.get());
 
     if ([m_sampleBufferVideoRenderer respondsToSelector:@selector(removeAllVideoTargets)])
         [m_sampleBufferVideoRenderer removeAllVideoTargets];
     m_sampleBufferVideoRenderer = nullptr;
 #endif // ENABLE(LINEAR_MEDIA_PLAYER)
+}
+
+void AudioVideoRendererAVFObjC::destroyExpiringVideoRenderersIfNeeded()
+{
+#if ENABLE(LINEAR_MEDIA_PLAYER)
+    for (RetainPtr renderer : std::exchange(m_expiringSampleBufferVideoRenderers, { }))
+        [renderer removeAllVideoTargets];
+#endif
 }
 
 Ref<GenericPromise> AudioVideoRendererAVFObjC::setVideoRenderer(WebSampleBufferVideoRendering *renderer)
@@ -1331,6 +1326,10 @@ void AudioVideoRendererAVFObjC::configureLayerOrVideoRenderer(WebSampleBufferVid
     if ([renderer respondsToSelector:@selector(setPreventsAutomaticBackgroundingDuringVideoPlayback:)])
         renderer.preventsAutomaticBackgroundingDuringVideoPlayback = NO;
 
+    bool isAVSBDL = is_objc<AVSampleBufferDisplayLayer>(renderer);
+    if (isAVSBDL && m_sampleBufferDisplayLayerState == SampleBufferLayerState::AddedToSynchronizer)
+        return;
+
     @try {
         [m_synchronizer addRenderer:renderer];
     } @catch(NSException *exception) {
@@ -1340,6 +1339,9 @@ void AudioVideoRendererAVFObjC::configureLayerOrVideoRenderer(WebSampleBufferVid
         notifyError(PlatformMediaError::DecoderCreationError);
         return;
     }
+
+    if (isAVSBDL)
+        m_sampleBufferDisplayLayerState = SampleBufferLayerState::AddedToSynchronizer;
 }
 
 RefPtr<VideoMediaSampleRenderer> AudioVideoRendererAVFObjC::protectedVideoRenderer() const
@@ -1420,16 +1422,17 @@ Ref<GenericPromise> AudioVideoRendererAVFObjC::stageVideoRenderer(WebSampleBuffe
     }
     ASSERT(!renderer || hasSelectedVideo());
 
-    Vector<RetainPtr<WebSampleBufferVideoRendering>> renderersToExpire;
-    renderersToExpire.reserveInitialCapacity(2);
+    RetainPtr<WebSampleBufferVideoRendering> rendererToExpire;
     if (renderer) {
         switch (acceleratedVideoMode()) {
         case AcceleratedVideoMode::Layer:
-            renderersToExpire.append(std::exchange(m_sampleBufferVideoRenderer, { }));
+            m_expiringSampleBufferVideoRenderers.append(m_sampleBufferVideoRenderer);
+            rendererToExpire = std::exchange(m_sampleBufferVideoRenderer, { });
             break;
         case AcceleratedVideoMode::VideoRenderer:
-            m_needsDestroyVideoLayer = true;
-            renderersToExpire.append(std::exchange(m_sampleBufferDisplayLayer, { }));
+            // We only need to remove the AVSampleBufferDisplayLayer from the synchronizer.
+            rendererToExpire = m_sampleBufferDisplayLayer;
+            m_sampleBufferDisplayLayerState = SampleBufferLayerState::PendingRemovalFromSynchronizer;
             break;
         }
     } else {
@@ -1442,25 +1445,12 @@ Ref<GenericPromise> AudioVideoRendererAVFObjC::stageVideoRenderer(WebSampleBuffe
     m_readyToRequestVideoData = !flushRequired;
     ALWAYS_LOG(LOGIDENTIFIER, "renderer: ", !!renderer, " videoTrackChangeOnly: ", videoTrackChangeOnly, " flushRequired: ", flushRequired);
 
-    return videoRenderer->changeRenderer(renderer)->whenSettled(RunLoop::mainSingleton(), [weakThis = WeakPtr { *this }, renderersToExpire = WTFMove(renderersToExpire), flushRequired]() mutable {
+    return videoRenderer->changeRenderer(renderer)->whenSettled(RunLoop::mainSingleton(), [weakThis = WeakPtr { *this }, rendererToExpire = WTFMove(rendererToExpire), flushRequired]() {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis)
             return GenericPromise::createAndReject();
-        for (auto& rendererToExpire : renderersToExpire) {
-            if (!rendererToExpire)
-                continue;
-            // False positive see webkit.org/b/298024
-            SUPPRESS_UNRETAINED_ARG CMTime currentTime = PAL::CMTimebaseGetTime([protectedThis->m_synchronizer timebase]);
-            [protectedThis->m_synchronizer removeRenderer:rendererToExpire.get() atTime:currentTime completionHandler:nil];
-#if ENABLE(LINEAR_MEDIA_PLAYER)
-            if (RetainPtr videoRenderer = dynamic_objc_cast<AVSampleBufferVideoRenderer>(rendererToExpire)) {
-                // FIXME: Wait for enqueued samples in AVSBDL to actually become visible before deleting the videoRenderer rather than use 1s delay.
-                Timer::schedule(1_s, [videoRenderer = WTFMove(videoRenderer)] {
-                    [videoRenderer removeAllVideoTargets];
-                });
-            }
-#endif
-        }
+        if (rendererToExpire)
+            protectedThis->removeRendererFromSynchronizerIfNeeded(rendererToExpire.get());
         if (flushRequired)
             protectedThis->notifyRequiresFlushToResume();
         return GenericPromise::createAndResolve();
@@ -1474,6 +1464,18 @@ void AudioVideoRendererAVFObjC::destroyVideoTrack()
     destroyLayer();
     destroyVideoRenderer();
     m_enabledVideoTrackId.reset();
+}
+
+void AudioVideoRendererAVFObjC::removeRendererFromSynchronizerIfNeeded(id renderer)
+{
+    bool isAVSBDL = is_objc<AVSampleBufferDisplayLayer>(renderer);
+    if (isAVSBDL && m_sampleBufferDisplayLayerState == SampleBufferLayerState::RemovedFromSynchronizer)
+        return;
+    // False positive see webkit.org/b/298024
+    SUPPRESS_UNRETAINED_ARG CMTime currentTime = PAL::CMTimebaseGetTime([m_synchronizer timebase]);
+    [m_synchronizer removeRenderer:renderer atTime:currentTime completionHandler:nil];
+    if (isAVSBDL)
+        m_sampleBufferDisplayLayerState = SampleBufferLayerState::RemovedFromSynchronizer;
 }
 
 AudioVideoRendererAVFObjC::AcceleratedVideoMode AudioVideoRendererAVFObjC::acceleratedVideoMode() const
