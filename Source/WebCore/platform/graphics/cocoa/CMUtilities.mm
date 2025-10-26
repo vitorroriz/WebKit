@@ -519,8 +519,11 @@ Expected<RetainPtr<CMSampleBufferRef>, CString> toCMSampleBuffer(const MediaSamp
     if (!samples.info() || !samples.info()->encryptionData)
         return adoptCF(rawSampleBuffer);
 
-    RetainPtr attachmentsArray = PAL::CMSampleBufferGetSampleAttachmentsArray(rawSampleBuffer, false);
-    if (!attachmentsArray || static_cast<size_t>(CFArrayGetCount(attachmentsArray.get())) < samples.size()) {
+    RetainPtr attachmentsArray = PAL::CMSampleBufferGetSampleAttachmentsArray(rawSampleBuffer, true);
+    ASSERT(attachmentsArray);
+    if (!attachmentsArray)
+        return makeUnexpected("No sample attachment found");
+    if (static_cast<size_t>(CFArrayGetCount(attachmentsArray.get())) < samples.size()) {
         RELEASE_LOG_DEBUG(Media, "Encrypted sample doesn't contain sufficient attachments: %u (expected:%u)", static_cast<unsigned>(CFArrayGetCount(attachmentsArray.get())), static_cast<unsigned>(samples.size()));
         return adoptCF(rawSampleBuffer);
     }
