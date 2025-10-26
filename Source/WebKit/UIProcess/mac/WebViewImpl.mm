@@ -4215,16 +4215,17 @@ static OptionSet<WebCore::DragApplicationFlags> applicationFlagsForDrag(NSView *
     if ([NSApp currentEvent].modifierFlags & NSEventModifierFlagOption)
         flags.add(WebCore::DragApplicationFlags::IsCopyKeyDown);
     return flags;
-
 }
 
 NSDragOperation WebViewImpl::draggingEntered(id<NSDraggingInfo> draggingInfo)
 {
-    WebCore::IntPoint client([m_view.get() convertPoint:draggingInfo.draggingLocation fromView:nil]);
-    WebCore::IntPoint global(WebCore::globalPoint(draggingInfo.draggingLocation, retainPtr([m_view.get() window]).get()));
-    auto dragDestinationActionMask = coreDragDestinationActionMask([m_view.get() _web_dragDestinationActionForDraggingInfo:draggingInfo]);
+    RetainPtr view = m_view.get();
+    WebCore::IntPoint client([view convertPoint:draggingInfo.draggingLocation fromView:nil]);
+    WebCore::IntPoint global(WebCore::globalPoint(draggingInfo.draggingLocation, retainPtr([view window]).get()));
+    auto dragDestinationActionMask = coreDragDestinationActionMask([view _web_dragDestinationActionForDraggingInfo:draggingInfo]);
     auto dragOperationMask = coreDragOperationMask(draggingInfo.draggingSourceOperationMask);
-    WebCore::DragData dragData(draggingInfo, client, global, dragOperationMask, applicationFlagsForDrag(m_view.get().get(), draggingInfo), dragDestinationActionMask, m_page->webPageIDInMainFrameProcess());
+    WebCore::DragData dragData(draggingInfo, client, global, dragOperationMask, applicationFlagsForDrag(view.get(), draggingInfo), dragDestinationActionMask, m_page->webPageIDInMainFrameProcess());
+    dragData.setPromisedFileMIMETypes([view _promisedFileMIMETypes:draggingInfo]);
 
     m_page->resetCurrentDragInformation();
     m_page->dragEntered(dragData, draggingInfo.draggingPasteboard.name);
@@ -4258,11 +4259,13 @@ static NSDragOperation kit(std::optional<WebCore::DragOperation> dragOperation)
 
 NSDragOperation WebViewImpl::draggingUpdated(id<NSDraggingInfo> draggingInfo)
 {
-    WebCore::IntPoint client([m_view.get() convertPoint:draggingInfo.draggingLocation fromView:nil]);
-    WebCore::IntPoint global(WebCore::globalPoint(draggingInfo.draggingLocation, retainPtr([m_view.get() window]).get()));
-    auto dragDestinationActionMask = coreDragDestinationActionMask([m_view.get() _web_dragDestinationActionForDraggingInfo:draggingInfo]);
+    RetainPtr view = m_view.get();
+    WebCore::IntPoint client([view convertPoint:draggingInfo.draggingLocation fromView:nil]);
+    WebCore::IntPoint global(WebCore::globalPoint(draggingInfo.draggingLocation, retainPtr([view window]).get()));
+    auto dragDestinationActionMask = coreDragDestinationActionMask([view _web_dragDestinationActionForDraggingInfo:draggingInfo]);
     auto dragOperationMask = coreDragOperationMask(draggingInfo.draggingSourceOperationMask);
-    WebCore::DragData dragData(draggingInfo, client, global, dragOperationMask, applicationFlagsForDrag(m_view.get().get(), draggingInfo), dragDestinationActionMask, m_page->webPageIDInMainFrameProcess());
+    WebCore::DragData dragData(draggingInfo, client, global, dragOperationMask, applicationFlagsForDrag(view.get(), draggingInfo), dragDestinationActionMask, m_page->webPageIDInMainFrameProcess());
+    dragData.setPromisedFileMIMETypes([view _promisedFileMIMETypes:draggingInfo]);
     m_page->dragUpdated(dragData, draggingInfo.draggingPasteboard.name);
 
     NSInteger numberOfValidItemsForDrop = m_page->currentDragNumberOfFilesToBeAccepted();

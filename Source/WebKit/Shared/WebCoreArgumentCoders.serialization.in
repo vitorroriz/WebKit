@@ -2720,6 +2720,7 @@ class WebCore::DragData {
     WebCore::IntPoint globalPosition();
 #if PLATFORM(COCOA)
     Vector<String> fileNames();
+    Vector<String> promisedFileMIMETypes();
 #endif
     OptionSet<WebCore::DragOperation> draggingSourceOperationMask();
     OptionSet<WebCore::DragApplicationFlags> flags();

@@ -42,6 +42,7 @@
 #import "_WKHitTestResultInternal.h"
 #import "_WKWarningView.h"
 #import <WebCore/CGWindowUtilities.h>
+#import <WebCore/LegacyNSPasteboardTypes.h>
 #import <WebKit/WKUIDelegatePrivate.h>
 #import <pal/spi/mac/NSTextFinderSPI.h>
 #import <pal/spi/mac/NSTextInputContextSPI.h>
@@ -1443,6 +1444,46 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 - (void)endPreviewPanelControl:(QLPreviewPanel *)panel
 {
     _impl->endPreviewPanelControl(panel);
+}
+
+- (Vector<String>)_promisedFileMIMETypes:(id<NSDraggingInfo>)info
+{
+    __block Vector<String> mimeTypes;
+    [info enumerateDraggingItemsWithOptions:0 forView:self classes:@[NSFilePromiseReceiver.class] searchOptions:@{ } usingBlock:^(NSDraggingItem *item, NSInteger, BOOL *) {
+        RetainPtr receiver = dynamic_objc_cast<NSFilePromiseReceiver>(item.item);
+        if (!receiver)
+            return;
+
+        for (NSString *typeIdentifier in [receiver fileTypes]) {
+            RetainPtr type = [UTType typeWithIdentifier:typeIdentifier];
+            if (!type)
+                continue;
+
+            if (RetainPtr mimeType = [type preferredMIMEType])
+                mimeTypes.append({ mimeType.get() });
+        }
+    }];
+
+    if (mimeTypes.isEmpty()) {
+        RetainPtr filenames = dynamic_objc_cast<NSArray>([info.draggingPasteboard propertyListForType:WebCore::legacyFilenamesPasteboardTypeSingleton()]);
+        if (!filenames)
+            return { };
+
+        for (id name in filenames.get()) {
+            RetainPtr pathExtension = [dynamic_objc_cast<NSString>(name) pathExtension];
+            if (![pathExtension length])
+                continue;
+
+            RetainPtr type = [UTType typeWithFilenameExtension:pathExtension.get()];
+            if (!type)
+                continue;
+
+            if (RetainPtr mimeType = [type preferredMIMEType])
+                mimeTypes.append({ mimeType.get() });
+        }
+    }
+
+    return mimeTypes;
 }
 
 #pragma mark - NSTextCheckingClient_WritingTools
