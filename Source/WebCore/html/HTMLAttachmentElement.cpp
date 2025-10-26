@@ -655,7 +655,7 @@ void HTMLAttachmentElement::setUniqueIdentifier(const String& uniqueIdentifier)
 
     m_uniqueIdentifier = uniqueIdentifier;
 
-    if (auto associatedElement = this->associatedElement())
+    if (RefPtr associatedElement = this->associatedElement())
         associatedElement->didUpdateAttachmentIdentifier();
 }
 
@@ -798,7 +798,7 @@ String HTMLAttachmentElement::attachmentPath() const
 void HTMLAttachmentElement::updateAttributes(std::optional<uint64_t>&& newFileSize, const AtomString& newContentType, const AtomString& newFilename)
 {
     RefPtr<HTMLImageElement> enclosingImage;
-    if (auto associatedElement = this->associatedElement())
+    if (RefPtr associatedElement = this->associatedElement())
         enclosingImage = dynamicDowncast<HTMLImageElement>(associatedElement->asHTMLElement());
 
     if (!newFilename.isNull()) {
