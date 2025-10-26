@@ -47,6 +47,9 @@ public:
     static Ref<MediaStreamTrackAudioSourceProviderCocoa> create(MediaStreamTrackPrivate&);
     ~MediaStreamTrackAudioSourceProviderCocoa();
 
+    void ref() const final { WebAudioSourceProviderCocoa::ref(); }
+    void deref() const final { WebAudioSourceProviderCocoa::deref(); }
+
 private:
     explicit MediaStreamTrackAudioSourceProviderCocoa(MediaStreamTrackPrivate&);
 

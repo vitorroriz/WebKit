@@ -79,6 +79,9 @@ public:
     void addObserver(MediaStreamPrivateObserver&);
     void removeObserver(MediaStreamPrivateObserver&);
 
+    void ref() const final { RefCounted::ref(); }
+    void deref() const final { RefCounted::deref(); }
+
     String id() const { return m_id; }
 
     MediaStreamTrackPrivateVector tracks() const;

@@ -145,6 +145,7 @@ static void webkitMediaStreamSrcEnsureStreamCollectionPosted(WebKitMediaStreamSr
 
 
 class InternalSource final : public MediaStreamTrackPrivateObserver,
+    public RefCounted<InternalSource>,
     public RealtimeMediaSourceObserver,
     public RealtimeMediaSource::AudioSampleObserver,
     public RealtimeMediaSource::VideoFrameObserver,
@@ -152,99 +153,13 @@ class InternalSource final : public MediaStreamTrackPrivateObserver,
     WTF_MAKE_TZONE_ALLOCATED_INLINE(InternalSource);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(InternalSource);
 public:
-    InternalSource(GstElement* parent, MediaStreamTrackPrivate& track, const String& padName, bool consumerIsVideoPlayer)
-        : m_parent(parent)
-        , m_track(&track)
-        , m_padName(padName)
-        , m_consumerIsVideoPlayer(consumerIsVideoPlayer)
+    static Ref<InternalSource> create(GstElement* parent, MediaStreamTrackPrivate& track, const String& padName, bool consumerIsVideoPlayer)
     {
-        auto& trackSource = m_track->source();
-        m_isIncomingVideoSource = trackSource.isIncomingVideoSource();
-        m_isVideoTrack = m_track->isVideo();
-
-        ASCIILiteral namePrefix;
-        if (trackSource.isIncomingAudioSource() || m_isIncomingVideoSource)
-            namePrefix = "incoming-"_s;
-        else if (trackSource.isCaptureSource())
-            namePrefix = "capture-"_s;
-
-        static uint64_t audioCounter = 0;
-        static uint64_t videoCounter = 0;
-        String elementName;
-        if (track.isAudio()) {
-            m_audioTrack = AudioTrackPrivateMediaStream::create(track);
-            elementName = makeString(namePrefix, "audiosrc"_s, audioCounter);
-            audioCounter++;
-        } else {
-            RELEASE_ASSERT(m_isVideoTrack);
-            m_videoTrack = VideoTrackPrivateMediaStream::create(track);
-            elementName = makeString(namePrefix, "videosrc"_s, videoCounter);
-            videoCounter++;
-        }
-
-        bool isCaptureTrack = track.isCaptureTrack();
-        m_src = makeGStreamerElement("appsrc"_s, elementName);
-
-        g_object_set(m_src.get(), "is-live", TRUE, "format", GST_FORMAT_TIME, "min-percent", 100,
-            "do-timestamp", isCaptureTrack, "handle-segment-change", TRUE, "automatic-eos", FALSE, nullptr);
-
-        static GstAppSrcCallbacks callbacks = {
-            // need_data
-            [](GstAppSrc*, unsigned, gpointer userData) {
-                auto self = reinterpret_cast<InternalSource*>(userData);
-                self->m_enoughData = false;
-            },
-            // enough_data
-            [](GstAppSrc*, gpointer userData) {
-                auto self = reinterpret_cast<InternalSource*>(userData);
-                self->m_enoughData = true;
-            },
-            nullptr,
-            { nullptr }
-        };
-        gst_app_src_set_callbacks(GST_APP_SRC(m_src.get()), &callbacks, this, nullptr);
-
-        createGstStream();
-
-        // RealtimeMediaSource::source() is usable only from the main thread, so keep track of
-        // capture sources separately.
-        if (m_track->source().isCaptureSource())
-            m_trackSource = &(m_track->source());
-
-        auto pad = adoptGRef(gst_element_get_static_pad(m_src.get(), "src"));
-        gst_pad_add_probe(pad.get(), GST_PAD_PROBE_TYPE_QUERY_UPSTREAM, reinterpret_cast<GstPadProbeCallback>(+[](GstPad*, GstPadProbeInfo* info, gpointer userData) -> GstPadProbeReturn {
-            auto self = reinterpret_cast<InternalSource*>(userData);
-            auto query = GST_PAD_PROBE_INFO_QUERY(info);
-            switch (GST_QUERY_TYPE(query)) {
-#if GST_CHECK_VERSION(1, 22, 0)
-            case GST_QUERY_SELECTABLE:
-                gst_query_set_selectable(query, TRUE);
-                return GST_PAD_PROBE_HANDLED;
-#endif
-            case GST_QUERY_LATENCY: {
-                std::pair<GstClockTime, GstClockTime> latency { GST_CLOCK_TIME_NONE, GST_CLOCK_TIME_NONE };
-                if (self->m_trackSource)
-                    latency = self->m_trackSource->queryCaptureLatency();
-
-                auto [minLatency, maxLatency] = latency;
-                GST_DEBUG_OBJECT(self->m_src.get(), "Latency from capture source is min: %" GST_TIME_FORMAT " max: %" GST_TIME_FORMAT, GST_TIME_ARGS(minLatency), GST_TIME_ARGS(maxLatency));
-                if (GST_CLOCK_TIME_IS_VALID(minLatency) && GST_CLOCK_TIME_IS_VALID(maxLatency)) {
-                    gst_query_set_latency(query, TRUE, minLatency, maxLatency);
-                    return GST_PAD_PROBE_HANDLED;
-                }
-                break;
-            }
-            default:
-                break;
-            }
-            return GST_PAD_PROBE_OK;
-        }), this, nullptr);
-
-        if (!trackSource.isIncomingAudioSource() && !trackSource.isIncomingVideoSource())
-            return;
-
-        connectIncomingTrack();
+        return adoptRef(*new InternalSource(parent, track, padName, consumerIsVideoPlayer));
     }
+
+    void ref() const final { RefCounted::ref(); }
+    void deref() const final { RefCounted::deref(); }
 
     void replaceTrack(RefPtr<MediaStreamTrackPrivate>&& newTrack)
     {
@@ -645,6 +560,100 @@ public:
     bool receivedAudioSampleBeforeVideo();
 
 private:
+    InternalSource(GstElement* parent, MediaStreamTrackPrivate& track, const String& padName, bool consumerIsVideoPlayer)
+        : m_parent(parent)
+        , m_track(&track)
+        , m_padName(padName)
+        , m_consumerIsVideoPlayer(consumerIsVideoPlayer)
+    {
+        auto& trackSource = m_track->source();
+        m_isIncomingVideoSource = trackSource.isIncomingVideoSource();
+        m_isVideoTrack = m_track->isVideo();
+
+        ASCIILiteral namePrefix;
+        if (trackSource.isIncomingAudioSource() || m_isIncomingVideoSource)
+            namePrefix = "incoming-"_s;
+        else if (trackSource.isCaptureSource())
+            namePrefix = "capture-"_s;
+
+        static uint64_t audioCounter = 0;
+        static uint64_t videoCounter = 0;
+        String elementName;
+        if (track.isAudio()) {
+            m_audioTrack = AudioTrackPrivateMediaStream::create(track);
+            elementName = makeString(namePrefix, "audiosrc"_s, audioCounter);
+            audioCounter++;
+        } else {
+            RELEASE_ASSERT(m_isVideoTrack);
+            m_videoTrack = VideoTrackPrivateMediaStream::create(track);
+            elementName = makeString(namePrefix, "videosrc"_s, videoCounter);
+            videoCounter++;
+        }
+
+        bool isCaptureTrack = track.isCaptureTrack();
+        m_src = makeGStreamerElement("appsrc"_s, elementName);
+
+        g_object_set(m_src.get(), "is-live", TRUE, "format", GST_FORMAT_TIME, "min-percent", 100,
+            "do-timestamp", isCaptureTrack, "handle-segment-change", TRUE, "automatic-eos", FALSE, nullptr);
+
+        static GstAppSrcCallbacks callbacks = {
+            // need_data
+            [](GstAppSrc*, unsigned, gpointer userData) {
+                auto self = reinterpret_cast<InternalSource*>(userData);
+                self->m_enoughData = false;
+            },
+            // enough_data
+            [](GstAppSrc*, gpointer userData) {
+                auto self = reinterpret_cast<InternalSource*>(userData);
+                self->m_enoughData = true;
+            },
+            nullptr,
+            { nullptr }
+        };
+        gst_app_src_set_callbacks(GST_APP_SRC(m_src.get()), &callbacks, this, nullptr);
+
+        createGstStream();
+
+        // RealtimeMediaSource::source() is usable only from the main thread, so keep track of
+        // capture sources separately.
+        if (m_track->source().isCaptureSource())
+            m_trackSource = &(m_track->source());
+
+        auto pad = adoptGRef(gst_element_get_static_pad(m_src.get(), "src"));
+        gst_pad_add_probe(pad.get(), GST_PAD_PROBE_TYPE_QUERY_UPSTREAM, reinterpret_cast<GstPadProbeCallback>(+[](GstPad*, GstPadProbeInfo* info, gpointer userData) -> GstPadProbeReturn {
+            auto self = reinterpret_cast<InternalSource*>(userData);
+            auto query = GST_PAD_PROBE_INFO_QUERY(info);
+            switch (GST_QUERY_TYPE(query)) {
+#if GST_CHECK_VERSION(1, 22, 0)
+            case GST_QUERY_SELECTABLE:
+                gst_query_set_selectable(query, TRUE);
+                return GST_PAD_PROBE_HANDLED;
+#endif
+            case GST_QUERY_LATENCY: {
+                std::pair<GstClockTime, GstClockTime> latency { GST_CLOCK_TIME_NONE, GST_CLOCK_TIME_NONE };
+                if (self->m_trackSource)
+                    latency = self->m_trackSource->queryCaptureLatency();
+
+                auto [minLatency, maxLatency] = latency;
+                GST_DEBUG_OBJECT(self->m_src.get(), "Latency from capture source is min: %" GST_TIME_FORMAT " max: %" GST_TIME_FORMAT, GST_TIME_ARGS(minLatency), GST_TIME_ARGS(maxLatency));
+                if (GST_CLOCK_TIME_IS_VALID(minLatency) && GST_CLOCK_TIME_IS_VALID(maxLatency)) {
+                    gst_query_set_latency(query, TRUE, minLatency, maxLatency);
+                    return GST_PAD_PROBE_HANDLED;
+                }
+                break;
+            }
+            default:
+                break;
+            }
+            return GST_PAD_PROBE_OK;
+        }), this, nullptr);
+
+        if (!trackSource.isIncomingAudioSource() && !trackSource.isIncomingVideoSource())
+            return;
+
+        connectIncomingTrack();
+    }
+
     // CheckedPtr interface
     uint32_t checkedPtrCount() const final { return CanMakeCheckedPtr::checkedPtrCount(); }
     uint32_t checkedPtrCountWithoutThreadCheck() const final { return CanMakeCheckedPtr::checkedPtrCountWithoutThreadCheck(); }
@@ -771,7 +780,7 @@ private:
 
 struct _WebKitMediaStreamSrcPrivate {
     CString uri;
-    HashMap<String, std::unique_ptr<InternalSource>> sources;
+    HashMap<String, RefPtr<InternalSource>> sources;
     RefPtr<WebKitMediaStreamObserver> mediaStreamObserver;
     RefPtr<MediaStreamPrivate> stream;
     Vector<RefPtr<MediaStreamTrackPrivate>> tracks;
@@ -819,7 +828,7 @@ void WebKitMediaStreamObserver::activeStatusChanged()
     webkitMediaStreamSrcEnsureStreamCollectionPosted(element);
 }
 
-static void webkitMediaStreamSrcCleanup(WebKitMediaStreamSrc* self, const std::unique_ptr<InternalSource>& source)
+static void webkitMediaStreamSrcCleanup(WebKitMediaStreamSrc* self, const RefPtr<InternalSource>& source)
 {
     ASSERT(isMainThread());
     auto element = GST_ELEMENT_CAST(self);
@@ -841,7 +850,7 @@ static void webkitMediaStreamSrcCleanup(WebKitMediaStreamSrc* self, const std::u
 
 struct CleanupData {
     GThreadSafeWeakPtr<GstElement> element;
-    std::unique_ptr<InternalSource> source;
+    RefPtr<InternalSource> source;
 };
 WEBKIT_DEFINE_ASYNC_DATA_STRUCT(CleanupData);
 
@@ -1257,7 +1266,7 @@ void webkitMediaStreamSrcAddTrack(WebKitMediaStreamSrc* self, MediaStreamTrackPr
     GST_DEBUG_OBJECT(self, "Setup %s source for track %s", sourceType.characters(), track->id().utf8().data());
 
     auto padName = makeString(sourceType, "_src"_s, counter);
-    auto source = makeUnique<InternalSource>(GST_ELEMENT_CAST(self), *track, padName, consumerIsVideoPlayer);
+    Ref source = InternalSource::create(GST_ELEMENT_CAST(self), *track, padName, consumerIsVideoPlayer);
     auto* element = source->get();
     gst_bin_add(GST_BIN_CAST(self), element);
 

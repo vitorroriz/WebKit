@@ -31,18 +31,10 @@
 
 #include <WebCore/MediaStreamTrackHintValue.h>
 #include <WebCore/RealtimeMediaSource.h>
+#include <wtf/AbstractRefCountedAndCanMakeWeakPtr.h>
 #include <wtf/LoggerHelper.h>
 #include <wtf/RefCounted.h>
 #include <wtf/WeakHashSet.h>
-
-namespace WebCore {
-class MediaStreamTrackPrivateObserver;
-}
-
-namespace WTF {
-template<typename T> struct IsDeprecatedWeakRefSmartPointerException;
-template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::MediaStreamTrackPrivateObserver> : std::true_type { };
-}
 
 namespace WebCore {
 
@@ -55,7 +47,7 @@ class WebAudioSourceProvider;
 
 struct MediaStreamTrackDataHolder;
 
-class MediaStreamTrackPrivateObserver : public CanMakeWeakPtr<MediaStreamTrackPrivateObserver> {
+class MediaStreamTrackPrivateObserver : public AbstractRefCountedAndCanMakeWeakPtr<MediaStreamTrackPrivateObserver> {
 public:
     virtual ~MediaStreamTrackPrivateObserver() = default;
 
