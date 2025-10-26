@@ -137,7 +137,9 @@ private:
 
     const Ref<Connection> m_connection;
     class DedicatedConnectionClient final : public Connection::Client {
+        WTF_MAKE_TZONE_ALLOCATED(DedicatedConnectionClient);
         WTF_MAKE_NONCOPYABLE(DedicatedConnectionClient);
+        WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(DedicatedConnectionClient);
     public:
         DedicatedConnectionClient(StreamClientConnection&, Connection::Client&);
 

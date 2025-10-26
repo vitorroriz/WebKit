@@ -35,6 +35,7 @@
 namespace IPC {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(StreamClientConnection);
+WTF_MAKE_TZONE_ALLOCATED_IMPL(StreamClientConnection::DedicatedConnectionClient);
 
 // FIXME(http://webkit.org/b/238986): Workaround for not being able to deliver messages from the dedicated connection to the work queue the client uses.
 
