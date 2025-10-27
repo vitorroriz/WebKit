@@ -8333,10 +8333,12 @@ imported/w3c/web-platform-tests/html/semantics/the-button-element/interest-targe
 imported/w3c/web-platform-tests/css/css-backgrounds/background-repeat-space-6.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-backgrounds/background-repeat-space-7.html [ ImageOnlyFailure ]
 
-# https://bugs.webkit.org/show_bug.cgi?id=301452 [ iOS 26 ] 3x imported/w3c/web-platform-tests/dom/ tests (layout-tests) are constant failures
+# https://bugs.webkit.org/show_bug.cgi?id=301452 [ iOS 26 ] 2x imported/w3c/web-platform-tests/dom/ tests (layout-tests) are constant failures
 imported/w3c/web-platform-tests/dom/events/focus-event-document-move.html [ Failure ]
 imported/w3c/web-platform-tests/dom/events/pointer-event-document-move.html [ Failure ]
-imported/w3c/web-platform-tests/dom/nodes/Document-createEvent.https.html [ Failure ]
 
 # https://bugs.webkit.org/show_bug.cgi?id=301454 [ iOS 26 ] 3x imported/w3c/web-platform-tests/dom/ tests (layout-tests) are constant failures
 imported/w3c/web-platform-tests/css/css-cascade/scope-hover.html [ Failure ]
+
+# https://bugs.webkit.org/show_bug.cgi?id=301534 [ iOS 26 ] imported/w3c/web-platform-tests/dom/nodes/Document-createEvent.https.html is a constant text failure 
+imported/w3c/web-platform-tests/dom/nodes/Document-createEvent.https.html [ Failure ]
