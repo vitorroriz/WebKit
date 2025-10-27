@@ -2554,6 +2554,25 @@ static void handleFacebookQuirks(QuirksData& quirksData, const URL& quirksURL, c
 #endif
 }
 
+static void handleFacebookMessengerQuirks(QuirksData& quirksData, const URL& quirksURL, const String& quirksDomainString, const URL& documentURL)
+{
+    UNUSED_PARAM(quirksData);
+    UNUSED_PARAM(quirksURL);
+    UNUSED_PARAM(documentURL);
+
+    if (quirksDomainString != "messenger.com"_s)
+        return;
+
+#if ENABLE(MEDIA_STREAM)
+    // facebook.com rdar://158736355
+    quirksData.shouldEnableCameraAndMicrophonePermissionStateQuirk = true;
+#endif
+#if ENABLE(WEB_RTC)
+    // facebook.com rdar://158736355
+    quirksData.shouldEnableRTCEncodedStreamsQuirk = true;
+#endif
+}
+
 #if ENABLE(VIDEO_PRESENTATION_MODE)
 static void handleForbesQuirks(QuirksData& quirksData, const URL& quirksURL, const String& quirksDomainString, const URL& documentURL)
 {
@@ -3237,6 +3256,7 @@ void Quirks::determineRelevantQuirks()
 #endif
         { "medium"_s, &handleMediumQuirks },
         { "menlosecurity"_s, &handleMenloSecurityQuirks },
+        { "messenger"_s, &handleFacebookMessengerQuirks },
         { "netflix"_s, &handleNetflixQuirks },
         { "nba"_s, &handleNBAQuirks },
         { "nhl"_s, &handleNHLQuirks },
