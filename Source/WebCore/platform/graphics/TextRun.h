@@ -42,7 +42,7 @@ class Font;
 
 struct GlyphData;
 
-class TextRun final : public CanMakeCheckedPtr<TextRun, WTF::DefaultedOperatorEqual::No, WTF::CheckedPtrDeleteCheckException::Yes> {
+class TextRun final : public CanMakeCheckedPtr<TextRun> {
     WTF_MAKE_TZONE_ALLOCATED(TextRun);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(TextRun);
     friend void add(Hasher&, const TextRun&);

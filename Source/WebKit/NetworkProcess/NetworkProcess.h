@@ -164,7 +164,6 @@ public:
     uint32_t checkedPtrCountWithoutThreadCheck() const final { return AuxiliaryProcess::checkedPtrCountWithoutThreadCheck(); }
     void incrementCheckedPtrCount() const final { AuxiliaryProcess::incrementCheckedPtrCount(); }
     void decrementCheckedPtrCount() const final { AuxiliaryProcess::decrementCheckedPtrCount(); }
-    void setDidBeginCheckedPtrDeletion() final { AuxiliaryProcess::setDidBeginCheckedPtrDeletion(); }
 
     template<typename T>
     T* supplement()

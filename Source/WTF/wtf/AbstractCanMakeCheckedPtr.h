@@ -35,7 +35,6 @@ public:
     virtual uint32_t checkedPtrCountWithoutThreadCheck() const = 0;
     virtual void incrementCheckedPtrCount() const = 0;
     virtual void decrementCheckedPtrCount() const = 0;
-    virtual void setDidBeginCheckedPtrDeletion() = 0;
 
 protected:
     virtual ~AbstractCanMakeCheckedPtr() = default;

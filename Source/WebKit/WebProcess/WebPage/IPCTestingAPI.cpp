@@ -214,7 +214,6 @@ private:
     JSIPCStreamClientConnection(JSIPC& jsIPC, RefPtr<IPC::StreamClientConnection> connection)
         : m_jsIPC(jsIPC)
         , m_streamConnection { WTFMove(connection) }
-        , m_dummyMessageReceiver { makeUniqueRefWithoutRefCountedCheck<MessageReceiver>(*this) }
     {
     }
 
@@ -264,8 +263,7 @@ private:
 
     private:
         WeakRef<JSIPCStreamClientConnection> m_connection;
-    };
-    UniqueRef<MessageReceiver> m_dummyMessageReceiver;
+    } m_dummyMessageReceiver { *this };
 };
 
 class JSIPCStreamServerConnectionHandle : public RefCounted<JSIPCStreamServerConnectionHandle> {
@@ -1059,7 +1057,7 @@ JSValueRef JSIPCStreamClientConnection::open(JSContextRef context, JSObjectRef, 
         *exception = createTypeError(context, "Wrong type"_s);
         return JSValueMakeUndefined(context);
     }
-    jsIPC->m_streamConnection->open(jsIPC->m_dummyMessageReceiver.get());
+    jsIPC->m_streamConnection->open(jsIPC->m_dummyMessageReceiver);
     return JSValueMakeUndefined(context);
 }
 

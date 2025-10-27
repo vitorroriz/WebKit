@@ -105,11 +105,10 @@ public:
     ServiceWorkerDebuggable& remoteDebuggable() { return m_remoteDebuggable; }
 #endif
 
-    uint32_t checkedPtrCount() const final { return CanMakeThreadSafeCheckedPtr<ServiceWorkerThreadProxy>::checkedPtrCount(); }
-    uint32_t checkedPtrCountWithoutThreadCheck() const final { return CanMakeThreadSafeCheckedPtr<ServiceWorkerThreadProxy>::checkedPtrCountWithoutThreadCheck(); }
-    void incrementCheckedPtrCount() const final { CanMakeThreadSafeCheckedPtr<ServiceWorkerThreadProxy>::incrementCheckedPtrCount(); }
-    void decrementCheckedPtrCount() const final { CanMakeThreadSafeCheckedPtr<ServiceWorkerThreadProxy>::decrementCheckedPtrCount(); }
-    void setDidBeginCheckedPtrDeletion() final { CanMakeThreadSafeCheckedPtr<ServiceWorkerThreadProxy>::setDidBeginCheckedPtrDeletion(); }
+    uint32_t checkedPtrCount() const { return CanMakeThreadSafeCheckedPtr<ServiceWorkerThreadProxy>::checkedPtrCount(); }
+    uint32_t checkedPtrCountWithoutThreadCheck() const { return CanMakeThreadSafeCheckedPtr<ServiceWorkerThreadProxy>::checkedPtrCountWithoutThreadCheck(); }
+    void incrementCheckedPtrCount() const { CanMakeThreadSafeCheckedPtr<ServiceWorkerThreadProxy>::incrementCheckedPtrCount(); }
+    void decrementCheckedPtrCount() const { CanMakeThreadSafeCheckedPtr<ServiceWorkerThreadProxy>::decrementCheckedPtrCount(); }
 
 private:
     WEBCORE_EXPORT ServiceWorkerThreadProxy(Ref<Page>&&, ServiceWorkerContextData&&, ServiceWorkerData&&, String&& userAgent, WorkerThreadMode, CacheStorageProvider&, std::unique_ptr<NotificationClient>&&);

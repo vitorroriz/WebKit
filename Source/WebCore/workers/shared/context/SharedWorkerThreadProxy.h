@@ -61,11 +61,10 @@ public:
     bool isTerminatingOrTerminated() const { return m_isTerminatingOrTerminated; }
     void setAsTerminatingOrTerminated() { m_isTerminatingOrTerminated = true; }
 
-    uint32_t checkedPtrCount() const final { return CanMakeThreadSafeCheckedPtr<SharedWorkerThreadProxy>::checkedPtrCount(); }
-    uint32_t checkedPtrCountWithoutThreadCheck() const final { return CanMakeThreadSafeCheckedPtr<SharedWorkerThreadProxy>::checkedPtrCountWithoutThreadCheck(); }
-    void incrementCheckedPtrCount() const final { CanMakeThreadSafeCheckedPtr<SharedWorkerThreadProxy>::incrementCheckedPtrCount(); }
-    void decrementCheckedPtrCount() const final { CanMakeThreadSafeCheckedPtr<SharedWorkerThreadProxy>::decrementCheckedPtrCount(); }
-    void setDidBeginCheckedPtrDeletion() final { CanMakeThreadSafeCheckedPtr<SharedWorkerThreadProxy>::setDidBeginCheckedPtrDeletion(); }
+    uint32_t checkedPtrCount() const { return CanMakeThreadSafeCheckedPtr<SharedWorkerThreadProxy>::checkedPtrCount(); }
+    uint32_t checkedPtrCountWithoutThreadCheck() const { return CanMakeThreadSafeCheckedPtr<SharedWorkerThreadProxy>::checkedPtrCountWithoutThreadCheck(); }
+    void incrementCheckedPtrCount() const { CanMakeThreadSafeCheckedPtr<SharedWorkerThreadProxy>::incrementCheckedPtrCount(); }
+    void decrementCheckedPtrCount() const { CanMakeThreadSafeCheckedPtr<SharedWorkerThreadProxy>::decrementCheckedPtrCount(); }
 
 private:
     WEBCORE_EXPORT SharedWorkerThreadProxy(Ref<Page>&&, SharedWorkerIdentifier, const ClientOrigin&, WorkerFetchResult&&, WorkerOptions&&, WorkerInitializationData&&, CacheStorageProvider&);

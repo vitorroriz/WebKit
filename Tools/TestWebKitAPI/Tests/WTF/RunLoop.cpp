@@ -149,8 +149,8 @@ TEST(WTF_RunLoop, OneShotTimer)
     WTF::initializeMainThread();
 
     bool testFinished = false;
-    auto timer = makeUniqueRef<DerivedOneShotTimer>(testFinished);
-    timer->startOneShot(100_ms);
+    DerivedOneShotTimer timer(testFinished);
+    timer.startOneShot(100_ms);
     Util::run(&testFinished);
 }
 
@@ -188,10 +188,10 @@ TEST(WTF_RunLoop, RepeatingTimer)
     WTF::initializeMainThread();
 
     bool testFinished = false;
-    auto timer = makeUniqueRef<DerivedRepeatingTimer>(testFinished);
-    timer->startRepeating(10_ms);
+    DerivedRepeatingTimer timer(testFinished);
+    timer.startRepeating(10_ms);
     Util::run(&testFinished);
-    ASSERT_FALSE(timer->isActive());
+    ASSERT_FALSE(timer.isActive());
 }
 
 TEST(WTF_RunLoop, ManyTimes)

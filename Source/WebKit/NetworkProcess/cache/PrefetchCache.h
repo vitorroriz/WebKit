@@ -39,7 +39,7 @@
 
 namespace WebKit {
 
-class PrefetchCache final : public CanMakeCheckedPtr<PrefetchCache, WTF::DefaultedOperatorEqual::No, WTF::CheckedPtrDeleteCheckException::Yes> {
+class PrefetchCache final : public CanMakeCheckedPtr<PrefetchCache> {
     WTF_MAKE_TZONE_ALLOCATED(PrefetchCache);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(PrefetchCache);
     WTF_MAKE_NONCOPYABLE(PrefetchCache);
