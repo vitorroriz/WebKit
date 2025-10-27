@@ -2186,10 +2186,11 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
 
     struct FixedContainerResult {
         RefPtr<Element> container;
-        bool foundBackdropFilter { false };
-        bool retryHonoringPointerEvents { false };
-        bool isViewportSized { false };
-        bool isDimmingLayer { false };
+        bool foundBackdropFilter : 1 { false };
+        bool retryHonoringPointerEvents : 1 { false };
+        bool isViewportSized : 1 { false };
+        bool isDimmingLayer : 1 { false };
+        bool isSidebar : 1 { false };
         Color backgroundColor;
     };
 
@@ -2311,6 +2312,7 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
         TooLarge,
         NegativeZIndex,
         IsViewportSizedCandidate,
+        IsSidebar,
         IsDimmingLayer,
         IsCandidate,
     };
@@ -2352,7 +2354,7 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
         }
 
         if (lengthOnSide == ViewportComparison::Smaller)
-            return TooSmall;
+            return lengthOnAdjacentSide != ViewportComparison::Smaller ? IsSidebar : TooSmall;
 
         if (!isProbablyDimmingContainer && lengthOnAdjacentSide == ViewportComparison::Larger)
             return TooLarge;
@@ -2418,6 +2420,7 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
                 .retryHonoringPointerEvents = false,
                 .isViewportSized = true,
                 .isDimmingLayer = true,
+                .isSidebar = false,
                 .backgroundColor = WTFMove(backgroundColor),
             } };
         }();
@@ -2455,6 +2458,7 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
             }
             case IsViewportSizedCandidate:
             case IsDimmingLayer:
+            case IsSidebar:
             case IsCandidate: {
                 return {
                     .container = { ancestor->element() },
@@ -2462,6 +2466,7 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
                     .retryHonoringPointerEvents = false,
                     .isViewportSized = candidateType == IsViewportSizedCandidate,
                     .isDimmingLayer = candidateType == IsDimmingLayer,
+                    .isSidebar = candidateType == IsSidebar,
                     .backgroundColor = hasMultipleBackgroundColors ? Color { } : WTFMove(primaryBackgroundColor),
                 };
             }
@@ -2474,6 +2479,7 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
             .retryHonoringPointerEvents = hitInvisiblePointerEventsNoneContainer,
             .isViewportSized = false,
             .isDimmingLayer = false,
+            .isSidebar = false,
             .backgroundColor = { },
         };
     };
@@ -2554,7 +2560,7 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
             continue;
         }
 
-        bool preferExistingColor = result.isDimmingLayer || result.isViewportSized;
+        bool preferExistingColor = result.isDimmingLayer || result.isViewportSized || result.isSidebar;
         if (preferExistingColor && page->fixedContainerEdges().hasFixedEdge(side)) {
             edges.colors.setAt(side, page->fixedContainerEdges().colors.at(side));
             continue;
