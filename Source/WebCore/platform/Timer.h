@@ -186,17 +186,6 @@ public:
     {
     }
 
-    // FIXME: This constructor isn't as safe as the other ones and should ideally be removed.
-    template <typename TimerFiredClass, typename TimerFiredBaseClass>
-    requires (!WTF::HasRefPtrMemberFunctions<TimerFiredClass>::value && !WTF::HasCheckedPtrMemberFunctions<TimerFiredClass>::value)
-    Timer(TimerFiredClass& object, void (TimerFiredBaseClass::*function)())
-        : m_function(std::bind(function, &object))
-    {
-        static_assert(WTF::IsDeprecatedTimerSmartPointerException<std::remove_cv_t<TimerFiredClass>>::value,
-            "Classes that use Timer should be ref-counted or CanMakeCheckedPtr. Please do not add new exceptions."
-        );
-    }
-
     Timer(Function<void()>&& function)
         : m_function(WTFMove(function))
     {
