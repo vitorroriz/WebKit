@@ -31,15 +31,6 @@
 #include <wtf/WeakPtr.h>
 
 namespace WebCore {
-class DocumentStorageAccess;
-}
-
-namespace WTF {
-template<typename T> struct IsDeprecatedWeakRefSmartPointerException;
-template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::DocumentStorageAccess> : std::true_type { };
-}
-
-namespace WebCore {
 
 class DeferredPromise;
 class Document;
@@ -77,6 +68,9 @@ class DocumentStorageAccess final : public Supplement<Document>, public CanMakeW
 public:
     explicit DocumentStorageAccess(Document&);
     ~DocumentStorageAccess();
+
+    void ref() const;
+    void deref() const;
 
     static void hasStorageAccess(Document&, Ref<DeferredPromise>&&);
     static bool hasStorageAccessForDocumentQuirk(Document&);
