@@ -116,7 +116,7 @@ protected:
     void addDebugMessage(GCGLenum, GCGLenum, GCGLenum, const CString&) final;
 
     // Messages to be received.
-    void ensureExtensionEnabled(CString&&);
+    void ensureExtensionEnabled(WebCore::GCGLExtension);
     void reshape(int32_t width, int32_t height);
 #if PLATFORM(COCOA)
     virtual void prepareForDisplay(IPC::Semaphore&&, CompletionHandler<void(WTF::MachSendRight&&)>&&) = 0;

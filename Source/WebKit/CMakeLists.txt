@@ -542,6 +542,7 @@ set(WebKit_SERIALIZATION_IN_FILES
     Shared/WebFindOptions.serialization.in
     Shared/WebFoundTextRange.serialization.in
     Shared/WebFrameMetrics.serialization.in
+    Shared/WebGL.serialization.in
     Shared/WebHitTestResultData.serialization.in
     Shared/WebImage.serialization.in
     Shared/WebNavigationDataStore.serialization.in

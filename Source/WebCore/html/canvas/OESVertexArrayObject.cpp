@@ -39,14 +39,14 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(OESVertexArrayObject);
 OESVertexArrayObject::OESVertexArrayObject(WebGLRenderingContext& context)
     : WebGLExtension(context, WebGLExtensionName::OESVertexArrayObject)
 {
-    context.graphicsContextGL()->ensureExtensionEnabled("GL_OES_vertex_array_object"_s);
+    context.graphicsContextGL()->enableExtension(GCGLExtension::OES_vertex_array_object);
 }
 
 OESVertexArrayObject::~OESVertexArrayObject() = default;
 
 bool OESVertexArrayObject::supported(GraphicsContextGL& context)
 {
-    return context.supportsExtension("GL_OES_vertex_array_object"_s);
+    return context.supportsExtension(GCGLExtension::OES_vertex_array_object);
 }
 
 RefPtr<WebGLVertexArrayObjectOES> OESVertexArrayObject::createVertexArrayOES()

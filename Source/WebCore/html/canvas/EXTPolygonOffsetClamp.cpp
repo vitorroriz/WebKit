@@ -37,14 +37,14 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(EXTPolygonOffsetClamp);
 EXTPolygonOffsetClamp::EXTPolygonOffsetClamp(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::EXTPolygonOffsetClamp)
 {
-    context.graphicsContextGL()->ensureExtensionEnabled("GL_EXT_polygon_offset_clamp"_s);
+    context.graphicsContextGL()->enableExtension(GCGLExtension::EXT_polygon_offset_clamp);
 }
 
 EXTPolygonOffsetClamp::~EXTPolygonOffsetClamp() = default;
 
 bool EXTPolygonOffsetClamp::supported(GraphicsContextGL& context)
 {
-    return context.supportsExtension("GL_EXT_polygon_offset_clamp"_s);
+    return context.supportsExtension(GCGLExtension::EXT_polygon_offset_clamp);
 }
 
 void EXTPolygonOffsetClamp::polygonOffsetClampEXT(GCGLfloat factor, GCGLfloat units, GCGLfloat clamp)

@@ -576,7 +576,7 @@ void WebGLRenderingContextBase::initializeContextState()
     m_maxRenderbufferSize = context->getInteger(GraphicsContextGL::MAX_RENDERBUFFER_SIZE);
     m_maxViewportDims = { 0, 0 };
     context->getIntegerv(GraphicsContextGL::MAX_VIEWPORT_DIMS, m_maxViewportDims);
-    m_isDepthStencilSupported = context->isExtensionEnabled("GL_OES_packed_depth_stencil"_s) || context->isExtensionEnabled("GL_ANGLE_depth_texture"_s);
+    m_isDepthStencilSupported = context->enableExtension(GCGLExtension::OES_packed_depth_stencil) || context->enableExtension(GCGLExtension::ANGLE_depth_texture);
     auto glAttributes = m_context->contextAttributes();
     m_attributes.powerPreference = glAttributes.powerPreference;
     if (!isWebGL2()) {
@@ -616,7 +616,7 @@ void WebGLRenderingContextBase::initializeContextState()
     m_supportedTexImageSourceInternalFormats.addAll(supportedFormatsES2);
     m_supportedTexImageSourceFormats.addAll(supportedFormatsES2);
     m_supportedTexImageSourceTypes.addAll(supportedTypesES2);
-    m_packReverseRowOrderSupported = context->isExtensionEnabled("GL_ANGLE_pack_reverse_row_order"_s);
+    m_packReverseRowOrderSupported = context->enableExtension(GCGLExtension::ANGLE_pack_reverse_row_order);
 }
 
 void WebGLRenderingContextBase::initializeDefaultObjects()

@@ -29,6 +29,7 @@
 #if ENABLE(WEBGL)
 
 #include <WebCore/DestinationColorSpace.h>
+#include <WebCore/GCGLExtension.h>
 #include <WebCore/GraphicsContextGLActiveInfo.h>
 #include <WebCore/GraphicsContextGLAttributes.h>
 #include <WebCore/GraphicsContextGLEnums.h>
@@ -38,6 +39,7 @@
 #include <WebCore/IntRect.h>
 #include <WebCore/IntSize.h>
 #include <span>
+#include <wtf/EnumSet.h>
 #include <wtf/FunctionDispatcher.h>
 #include <wtf/HashSet.h>
 #include <wtf/RefCounted.h>
@@ -1579,15 +1581,9 @@ public:
     virtual void multiDrawElementsANGLE(GCGLenum mode, GCGLSpanTuple<const GCGLsizei, const GCGLsizei> countsAndOffsets, GCGLenum type) = 0;
     virtual void multiDrawElementsInstancedANGLE(GCGLenum mode, GCGLSpanTuple<const GCGLsizei, const GCGLsizei, const GCGLsizei> countsOffsetsAndInstanceCounts, GCGLenum type) = 0;
 
-    virtual bool supportsExtension(const CString&) = 0;
-
-    // This method may only be called with extension names for which supports returns true.
-    virtual void ensureExtensionEnabled(const CString&) = 0;
-
-    // Takes full name of extension: for example, "GL_EXT_texture_format_BGRA8888".
-    // Checks to see whether the given extension is actually enabled (see ensureExtensionEnabled).
-    // Has no other side-effects.
-    virtual bool isExtensionEnabled(const CString&) = 0;
+    WEBCORE_EXPORT virtual bool supportsExtension(GCGLExtension);
+    // Returns true if extension was supported and thus enabled.
+    virtual bool enableExtension(GCGLExtension) = 0;
 
 #if ENABLE(WEBXR)
     virtual bool enableRequiredWebXRExtensions() { return false; }
@@ -1739,6 +1735,8 @@ protected:
     int m_currentHeight { 0 };
     Client* m_client { nullptr };
     bool m_contextLost { false };
+    EnumSet<GCGLExtension> m_knownActiveExtensions; // Not a full list since some extensions are implicitly enabled once another extension is enabled.
+    EnumSet<GCGLExtension> m_requestableExtensions;
 
 private:
     GraphicsContextGLAttributes m_attrs;

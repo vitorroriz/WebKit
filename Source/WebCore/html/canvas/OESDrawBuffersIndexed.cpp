@@ -37,14 +37,14 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(OESDrawBuffersIndexed);
 OESDrawBuffersIndexed::OESDrawBuffersIndexed(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::OESDrawBuffersIndexed)
 {
-    context.graphicsContextGL()->ensureExtensionEnabled("GL_OES_draw_buffers_indexed"_s);
+    context.graphicsContextGL()->enableExtension(GCGLExtension::OES_draw_buffers_indexed);
 }
 
 OESDrawBuffersIndexed::~OESDrawBuffersIndexed() = default;
 
 bool OESDrawBuffersIndexed::supported(GraphicsContextGL& context)
 {
-    return context.supportsExtension("GL_OES_draw_buffers_indexed"_s);
+    return context.supportsExtension(GCGLExtension::OES_draw_buffers_indexed);
 }
 
 void OESDrawBuffersIndexed::enableiOES(GCGLenum target, GCGLuint index)

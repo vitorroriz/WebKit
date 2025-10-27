@@ -758,32 +758,6 @@ enum class WebCore::IndexedDB::RequestType : uint8_t {
     Downloads
 };
 
-#if ENABLE(GPU_PROCESS) && ENABLE(WEBGL)
-header: <WebCore/GraphicsContextGLActiveInfo.h>
-[AdditionalEncoder=StreamConnectionEncoder, CustomHeader] class WebCore::GCGLUniformActiveInfo {
-    CString name;
-    GCGLenum type;
-    Vector<int> locations;
-    int blockIndex;
-    int offset;
-    int arrayStride;
-    int matrixStride;
-    int isRowMajor;
-};
-header: <WebCore/GraphicsContextGLActiveInfo.h>
-[AdditionalEncoder=StreamConnectionEncoder, CustomHeader] class WebCore::GCGLAttribActiveInfo {
-    CString name;
-    GCGLenum type;
-    int location;
-};
-header: <WebCore/GraphicsContextGLActiveInfo.h>
-[AdditionalEncoder=StreamConnectionEncoder, CustomHeader] class WebCore::GCGLTransformFeedbackActiveInfo {
-    CString name;
-    GCGLenum type;
-    int size;
-};
-#endif
-
 enum class WebCore::ViewportFit : uint8_t {
     Auto,
     Contain,
@@ -2133,17 +2107,6 @@ enum class WebCore::MediaCaptureType : uint8_t {
     MediaCaptureTypeEnvironment
 };
 
-#if PLATFORM(COCOA) && ENABLE(GPU_PROCESS) && ENABLE(WEBGL)
-header: <WebCore/GraphicsContextGL.h>
-[CustomHeader, RValue] struct WebCore::GraphicsContextGLExternalImageSourceIOSurfaceHandle {
-    MachSendRight handle;
-};
-
-[CustomHeader, RValue] struct WebCore::GraphicsContextGLExternalImageSourceMTLSharedTextureHandle {
-    MachSendRight handle;
-};
-#endif // PLATFORM(COCOA) && ENABLE(GPU_PROCESS) && ENABLE(WEBGL)
-
 #if ENABLE(ATTACHMENT_ELEMENT)
 struct WebCore::SerializedAttachmentData {
     String identifier;
@@ -2955,48 +2918,6 @@ header: <WebCore/ThreadSafeDataBuffer.h>
 class WebCore::ThreadSafeDataBuffer {
     RefPtr<WebCore::ThreadSafeDataBufferImpl> m_impl;
 };
-
-#if ENABLE(GPU_PROCESS) && ENABLE(WEBGL)
-header: <WebCore/GraphicsContextGLAttributes.h>
-[CustomHeader] enum class WebCore::GraphicsContextGLPowerPreference : uint8_t {
-    Default,
-    LowPower,
-    HighPerformance
-};
-
-header: <WebCore/GraphicsContextGLAttributes.h>
-[CustomHeader] enum class WebCore::GraphicsContextGLSimulatedCreationFailure : uint8_t {
-    None,
-    IPCBufferOOM,
-    CreationTimeout,
-    FailPlatformContextCreation
-};
-
-struct WebCore::GraphicsContextGLAttributes {
-    bool alpha;
-    bool depth;
-    bool stencil;
-    bool antialias;
-    bool premultipliedAlpha;
-    bool preserveDrawingBuffer;
-    WebCore::GraphicsContextGLPowerPreference powerPreference;
-    bool isWebGL2;
-#if PLATFORM(MAC)
-    uint64_t windowGPUID;
-#endif
-#if ENABLE(WEBXR)
-    bool xrCompatible;
-#endif
-    WebCore::GraphicsContextGLSimulatedCreationFailure failContextCreationForTesting;
-};
-
-enum class WebCore::GraphicsContextGLSimulatedEventForTesting : uint8_t {
-    GPUStatusFailure,
-    Timeout,
-    DisplayBufferAllocationFailure
-};
-
-#endif // ENABLE(GPU_PROCESS) && ENABLE(WEBGL)
 
 [RefCounted] class WebCore::TimingFunction subclasses {
   WebCore::LinearTimingFunction,
@@ -5025,10 +4946,6 @@ header: <WebCore/GraphicsTypes.h>
     WebCore::DocumentMarkerLineStyleMode mode;
     WebCore::Color color;
 };
-
-header: <WebCore/GraphicsTypesGL.h>
-using PlatformGLObject = GCGLuint
-using GCGLuint = unsigned
 
 [Nested, AdditionalEncoder=StreamConnectionEncoder]  enum class WebCore::ShadowRadiusMode : bool;
 
@@ -8515,35 +8432,6 @@ using WebCore::Glyph = unsigned short
 
 enum class WebCore::ContentExtensionDefaultEnablement : bool
 using WebCore::ContentExtensionEnablement = std::pair<WebCore::ContentExtensionDefaultEnablement, HashSet<String>>;
-
-#if ENABLE(WEBGL)
-header: <WebCore/GraphicsContextGL.h>
-#endif
-#if PLATFORM(COCOA) && ENABLE(WEBGL)
-using WebCore::GraphicsContextGL::ExternalImageSource = Variant<WebCore::GraphicsContextGLExternalImageSourceIOSurfaceHandle, WebCore::GraphicsContextGLExternalImageSourceMTLSharedTextureHandle>
-using WebCore::GraphicsContextGL::ExternalSyncSource = std::tuple<MachSendRight, uint64_t>
-#endif
-#if !PLATFORM(COCOA) && ENABLE(WEBGL)
-#if (PLATFORM(GTK) || PLATFORM(WPE))
-header: <WebCore/GraphicsContextGL.h>
-[CustomHeader] struct WebCore::GraphicsContextGLExternalImageSource {
-#if OS(ANDROID)
-    RefPtr<AHardwareBuffer> hardwareBuffer;
-#else
-    Vector<WTF::UnixFileDescriptor> fds;
-    Vector<uint32_t> strides;
-    Vector<uint32_t> offsets;
-    uint32_t fourcc;
-    uint64_t modifier;
-#endif
-    WebCore::IntSize size;
-};
-using WebCore::GraphicsContextGL::ExternalImageSource = WebCore::GraphicsContextGLExternalImageSource;
-#else
-using WebCore::GraphicsContextGL::ExternalImageSource = int
-#endif
-using WebCore::GraphicsContextGL::ExternalSyncSource = int
-#endif
 
 using WebCore::DOMCacheEngine::CacheInfosOrError = Expected<WebCore::DOMCacheEngine::CacheInfos, WebCore::DOMCacheEngine::Error>;
 using WebCore::DOMCacheEngine::CacheIdentifierOrError = Expected<WebCore::DOMCacheEngine::CacheIdentifierOperationResult, WebCore::DOMCacheEngine::Error>

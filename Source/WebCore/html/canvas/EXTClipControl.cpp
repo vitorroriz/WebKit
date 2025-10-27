@@ -37,14 +37,14 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(EXTClipControl);
 EXTClipControl::EXTClipControl(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::EXTClipControl)
 {
-    context.graphicsContextGL()->ensureExtensionEnabled("GL_EXT_clip_control"_s);
+    context.graphicsContextGL()->enableExtension(GCGLExtension::EXT_clip_control);
 }
 
 EXTClipControl::~EXTClipControl() = default;
 
 bool EXTClipControl::supported(GraphicsContextGL& context)
 {
-    return context.supportsExtension("GL_EXT_clip_control"_s);
+    return context.supportsExtension(GCGLExtension::EXT_clip_control);
 }
 
 void EXTClipControl::clipControlEXT(GCGLenum origin, GCGLenum depth)

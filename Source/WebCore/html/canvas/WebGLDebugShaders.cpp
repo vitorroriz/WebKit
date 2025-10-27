@@ -39,14 +39,14 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(WebGLDebugShaders);
 WebGLDebugShaders::WebGLDebugShaders(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::WebGLDebugShaders)
 {
-    context.graphicsContextGL()->ensureExtensionEnabled("GL_ANGLE_translated_shader_source"_s);
+    context.graphicsContextGL()->enableExtension(GCGLExtension::ANGLE_translated_shader_source);
 }
 
 WebGLDebugShaders::~WebGLDebugShaders() = default;
 
 bool WebGLDebugShaders::supported(GraphicsContextGL& context)
 {
-    return context.supportsExtension("GL_ANGLE_translated_shader_source"_s);
+    return context.supportsExtension(GCGLExtension::ANGLE_translated_shader_source);
 }
 
 String WebGLDebugShaders::getTranslatedShaderSource(WebGLShader& shader)

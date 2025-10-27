@@ -37,14 +37,14 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(ANGLEInstancedArrays);
 ANGLEInstancedArrays::ANGLEInstancedArrays(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::ANGLEInstancedArrays)
 {
-    context.graphicsContextGL()->ensureExtensionEnabled("GL_ANGLE_instanced_arrays"_s);
+    context.graphicsContextGL()->enableExtension(GCGLExtension::ANGLE_instanced_arrays);
 }
 
 ANGLEInstancedArrays::~ANGLEInstancedArrays() = default;
 
 bool ANGLEInstancedArrays::supported(GraphicsContextGL& context)
 {
-    return context.supportsExtension("GL_ANGLE_instanced_arrays"_s);
+    return context.supportsExtension(GCGLExtension::ANGLE_instanced_arrays);
 }
 
 void ANGLEInstancedArrays::drawArraysInstancedANGLE(GCGLenum mode, GCGLint first, GCGLsizei count, GCGLsizei primcount)

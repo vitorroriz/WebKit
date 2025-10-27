@@ -41,14 +41,14 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(EXTDisjointTimerQueryWebGL2);
 EXTDisjointTimerQueryWebGL2::EXTDisjointTimerQueryWebGL2(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::EXTDisjointTimerQueryWebGL2)
 {
-    context.graphicsContextGL()->ensureExtensionEnabled("GL_EXT_disjoint_timer_query"_s);
+    context.graphicsContextGL()->enableExtension(GCGLExtension::EXT_disjoint_timer_query);
 }
 
 EXTDisjointTimerQueryWebGL2::~EXTDisjointTimerQueryWebGL2() = default;
 
 bool EXTDisjointTimerQueryWebGL2::supported(GraphicsContextGL& context)
 {
-    return context.supportsExtension("GL_EXT_disjoint_timer_query"_s);
+    return context.supportsExtension(GCGLExtension::EXT_disjoint_timer_query);
 }
 
 void EXTDisjointTimerQueryWebGL2::queryCounterEXT(WebGLQuery& query, GCGLenum target)

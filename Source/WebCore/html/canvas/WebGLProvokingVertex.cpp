@@ -37,14 +37,14 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(WebGLProvokingVertex);
 WebGLProvokingVertex::WebGLProvokingVertex(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::WebGLProvokingVertex)
 {
-    context.graphicsContextGL()->ensureExtensionEnabled("GL_ANGLE_provoking_vertex"_s);
+    context.graphicsContextGL()->enableExtension(GCGLExtension::ANGLE_provoking_vertex);
 }
 
 WebGLProvokingVertex::~WebGLProvokingVertex() = default;
 
 bool WebGLProvokingVertex::supported(GraphicsContextGL& context)
 {
-    return context.supportsExtension("GL_ANGLE_provoking_vertex"_s);
+    return context.supportsExtension(GCGLExtension::ANGLE_provoking_vertex);
 }
 
 void WebGLProvokingVertex::provokingVertexWEBGL(GCGLenum provokeMode)

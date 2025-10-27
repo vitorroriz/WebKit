@@ -37,14 +37,14 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(WebGLDrawBuffers);
 WebGLDrawBuffers::WebGLDrawBuffers(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::WebGLDrawBuffers)
 {
-    context.graphicsContextGL()->ensureExtensionEnabled("GL_EXT_draw_buffers"_s);
+    context.graphicsContextGL()->enableExtension(GCGLExtension::EXT_draw_buffers);
 }
 
 WebGLDrawBuffers::~WebGLDrawBuffers() = default;
 
 bool WebGLDrawBuffers::supported(WebGLRenderingContextBase& context)
 {
-    return context.graphicsContextGL()->supportsExtension("GL_EXT_draw_buffers"_s);
+    return context.graphicsContextGL()->supportsExtension(GCGLExtension::EXT_draw_buffers);
 }
 
 void WebGLDrawBuffers::drawBuffersWEBGL(const Vector<GCGLenum>& buffers)

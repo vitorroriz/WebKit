@@ -293,9 +293,7 @@ public:
     void multiDrawArraysInstancedANGLE(GCGLenum mode, GCGLSpanTuple<const GCGLint, const GCGLsizei, const GCGLsizei> firstsCountsAndInstanceCounts) final;
     void multiDrawElementsANGLE(GCGLenum mode, GCGLSpanTuple<const GCGLsizei, const GCGLsizei> countsAndOffsets, GCGLenum type) final;
     void multiDrawElementsInstancedANGLE(GCGLenum mode, GCGLSpanTuple<const GCGLsizei, const GCGLsizei, const GCGLsizei> countsOffsetsAndInstanceCounts, GCGLenum type) final;
-    bool supportsExtension(const CString&) override;
-    void ensureExtensionEnabled(const CString&) override;
-    bool isExtensionEnabled(const CString&) override;
+    bool enableExtension(GCGLExtension) override;
     void drawBuffersEXT(std::span<const GCGLenum>) override;
     CString getTranslatedShaderSourceANGLE(PlatformGLObject) override;
     PlatformGLObject createQueryEXT() final;
@@ -353,6 +351,10 @@ public:
     std::optional<IntSize> readPixelsWithStatus(IntRect, GCGLenum format, GCGLenum type, GCGLboolean packReverseRowOrder, std::span<uint8_t> data);
 
     void addError(GCGLErrorCode);
+
+    EnumSet<GCGLExtension> knownActiveExtensions() const;
+    EnumSet<GCGLExtension> requestableExtensions() const;
+
 protected:
     GraphicsContextGLANGLE(GraphicsContextGLAttributes);
 
@@ -401,8 +403,10 @@ protected:
     static void platformReleaseThreadResources();
 
     virtual void invalidateKnownTextureContent(GCGLuint);
-    bool enableExtension(const CString&) WARN_UNUSED_RETURN;
-    void requestExtension(const CString&);
+    bool supportsExtensionImpl(ASCIILiteral) const;
+    // Enables extensions only if all are supported, returns true if all the extensions are supported. No changes if false is returned.
+    bool enableExtensionsImpl(std::initializer_list<ASCIILiteral>) WARN_UNUSED_RETURN;
+    bool isExtensionEnabledImpl(ASCIILiteral) const;
 
     // Only for non-WebGL 2.0 contexts.
     GCGLenum adjustWebGL1TextureInternalFormat(GCGLenum internalformat, GCGLenum format, GCGLenum type);
@@ -411,9 +415,9 @@ protected:
     void prepareForDrawingBufferWriteIfBound();
     virtual void prepareForDrawingBufferWrite();
 
-    HashSet<CString> m_availableExtensions;
-    HashSet<CString> m_requestableExtensions;
-    HashSet<CString> m_enabledExtensions;
+    HashSet<CString> m_allRequestableExtensions;
+    HashSet<CString> m_allEnabledRequestableExtensions;
+    HashSet<CString> m_extensions;
     bool m_webglColorBufferFloatRGB { false };
     bool m_webglColorBufferFloatRGBA { false };
     GCGLuint m_texture { 0 };

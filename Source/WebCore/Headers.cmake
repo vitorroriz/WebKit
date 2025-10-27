@@ -2584,6 +2584,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/graphics/FontSizeAdjust.h
     platform/graphics/FontTaggedSettings.h
     platform/graphics/FourCC.h
+    platform/graphics/GCGLExtension.h
     platform/graphics/GCGLSpan.h
     platform/graphics/GeneratedImage.h
     platform/graphics/GeometryUtilities.h

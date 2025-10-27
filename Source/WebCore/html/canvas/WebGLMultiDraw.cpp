@@ -39,7 +39,7 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(WebGLMultiDraw);
 WebGLMultiDraw::WebGLMultiDraw(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::WebGLMultiDraw)
 {
-    context.graphicsContextGL()->ensureExtensionEnabled("GL_ANGLE_multi_draw"_s);
+    context.graphicsContextGL()->enableExtension(GCGLExtension::ANGLE_multi_draw);
 
     // Spec requires ANGLE_instanced_arrays to be turned on implicitly here.
     // Enable it both in the backend and in WebKit.
@@ -51,8 +51,8 @@ WebGLMultiDraw::~WebGLMultiDraw() = default;
 
 bool WebGLMultiDraw::supported(GraphicsContextGL& context)
 {
-    return context.supportsExtension("GL_ANGLE_multi_draw"_s)
-        && context.supportsExtension("GL_ANGLE_instanced_arrays"_s);
+    return context.supportsExtension(GCGLExtension::ANGLE_multi_draw)
+        && context.supportsExtension(GCGLExtension::ANGLE_instanced_arrays);
 }
 
 void WebGLMultiDraw::multiDrawArraysWEBGL(GCGLenum mode, Int32List&& firstsList, GCGLuint firstsOffset, Int32List&& countsList, GCGLuint countsOffset, GCGLsizei drawcount)

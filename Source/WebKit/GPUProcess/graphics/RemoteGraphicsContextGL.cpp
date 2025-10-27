@@ -131,11 +131,15 @@ void RemoteGraphicsContextGL::workQueueInitialize(WebCore::GraphicsContextGLAttr
     m_connection->open(*this, m_workQueue);
     if (RefPtr context = m_context) {
         context->setClient(this);
-        CString extensions = context->getString(GraphicsContextGL::EXTENSIONS);
-        CString requestableExtensions = context->getString(GraphicsContextGL::REQUESTABLE_EXTENSIONS_ANGLE);
+        auto knownActiveExtensions = context->knownActiveExtensions();
+        auto requestableExtensions = context->requestableExtensions();
         auto [externalImageTarget, externalImageBindingQuery] = context->externalImageTextureBindingPoint();
-        RemoteGraphicsContextGLInitializationState initializationState { extensions, requestableExtensions, externalImageTarget, externalImageBindingQuery };
-
+        RemoteGraphicsContextGLInitializationState initializationState {
+            .knownActiveExtensions = knownActiveExtensions.toRaw(),
+            .requestableExtensions = requestableExtensions.toRaw(),
+            .externalImageTarget = externalImageTarget,
+            .externalImageBindingQuery = externalImageBindingQuery
+        };
         send(Messages::RemoteGraphicsContextGLProxy::WasCreated(workQueue().wakeUpSemaphore(), m_connection->clientWaitSemaphore(), { initializationState }));
         m_connection->startReceivingMessages(*this, Messages::RemoteGraphicsContextGL::messageReceiverName(), m_identifier.toUInt64());
     } else
@@ -199,10 +203,11 @@ void RemoteGraphicsContextGL::getErrors(CompletionHandler<void(GCGLErrorCodeSet)
     completionHandler(protectedContext()->getErrors());
 }
 
-void RemoteGraphicsContextGL::ensureExtensionEnabled(CString&& extension)
+void RemoteGraphicsContextGL::ensureExtensionEnabled(GCGLExtension extension)
 {
     assertIsCurrent(workQueue());
-    protectedContext()->ensureExtensionEnabled(extension);
+    bool success = protectedContext()->enableExtension(extension);
+    MESSAGE_CHECK(success);
 }
 
 void RemoteGraphicsContextGL::drawSurfaceBufferToImageBuffer(WebCore::GraphicsContextGL::SurfaceBuffer buffer, WebCore::RenderingResourceIdentifier imageBufferIdentifier, CompletionHandler<void()>&& completionHandler)

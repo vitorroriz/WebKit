@@ -123,37 +123,32 @@ void RemoteGraphicsContextGLProxy::initializeIPC(Ref<IPC::StreamClientConnection
 
 }
 
-bool RemoteGraphicsContextGLProxy::supportsExtension(const CString& name)
+bool RemoteGraphicsContextGLProxy::supportsExtension(GCGLExtension extension)
 {
     waitUntilInitialized();
-    return m_availableExtensions.contains(name) || m_requestableExtensions.contains(name);
+    return GraphicsContextGL::supportsExtension(extension);
 }
 
-void RemoteGraphicsContextGLProxy::ensureExtensionEnabled(const CString& name)
+bool RemoteGraphicsContextGLProxy::enableExtension(GCGLExtension extension)
 {
+    if (m_knownActiveExtensions.contains(extension))
+        return true;
     waitUntilInitialized();
-    if (m_requestableExtensions.contains(name) && !m_enabledExtensions.contains(name)) {
-        m_enabledExtensions.add(name);
-        if (isContextLost())
-            return;
-        auto sendResult = send(Messages::RemoteGraphicsContextGL::EnsureExtensionEnabled(name));
+    if (!m_requestableExtensions.contains(extension))
+        return false;
+    m_knownActiveExtensions.add(extension);
+    if (!isContextLost()) {
+        auto sendResult = send(Messages::RemoteGraphicsContextGL::EnsureExtensionEnabled(extension));
         if (sendResult != IPC::Error::NoError)
             markContextLost();
     }
-}
-
-bool RemoteGraphicsContextGLProxy::isExtensionEnabled(const CString& name)
-{
-    waitUntilInitialized();
-    return m_availableExtensions.contains(name) || m_enabledExtensions.contains(name);
+    return true;
 }
 
 void RemoteGraphicsContextGLProxy::initialize(const RemoteGraphicsContextGLInitializationState& initializationState)
 {
-    for (auto extension : StringView(initializationState.availableExtensions.span()).split(' '))
-        m_availableExtensions.add(extension.utf8());
-    for (auto extension : StringView(initializationState.requestableExtensions.span()).split(' '))
-        m_requestableExtensions.add(extension.utf8());
+    m_knownActiveExtensions = EnumSet<GCGLExtension>::fromRaw(initializationState.knownActiveExtensions);
+    m_requestableExtensions = EnumSet<GCGLExtension>::fromRaw(initializationState.requestableExtensions);
     m_externalImageTarget = initializationState.externalImageTarget;
     m_externalImageBindingQuery = initializationState.externalImageBindingQuery;
 }

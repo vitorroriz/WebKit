@@ -39,14 +39,14 @@ WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(WebGLDrawInstancedBaseVertexBaseInstance);
 WebGLDrawInstancedBaseVertexBaseInstance::WebGLDrawInstancedBaseVertexBaseInstance(WebGLRenderingContextBase& context)
     : WebGLExtension(context, WebGLExtensionName::WebGLDrawInstancedBaseVertexBaseInstance)
 {
-    context.graphicsContextGL()->ensureExtensionEnabled("GL_ANGLE_base_vertex_base_instance"_s);
+    context.graphicsContextGL()->enableExtension(GCGLExtension::ANGLE_base_vertex_base_instance);
 }
 
 WebGLDrawInstancedBaseVertexBaseInstance::~WebGLDrawInstancedBaseVertexBaseInstance() = default;
 
 bool WebGLDrawInstancedBaseVertexBaseInstance::supported(GraphicsContextGL& context)
 {
-    return context.supportsExtension("GL_ANGLE_base_vertex_base_instance"_s);
+    return context.supportsExtension(GCGLExtension::ANGLE_base_vertex_base_instance);
 }
 
 void WebGLDrawInstancedBaseVertexBaseInstance::drawArraysInstancedBaseInstanceWEBGL(GCGLenum mode, GCGLint first, GCGLsizei count, GCGLsizei instanceCount, GCGLuint baseInstance)

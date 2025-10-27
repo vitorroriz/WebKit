@@ -76,9 +76,9 @@ public:
     // WebCore::GraphicsContextGL overrides.
     std::tuple<GCGLenum, GCGLenum> externalImageTextureBindingPoint() final;
     void reshape(int width, int height) final;
-    bool supportsExtension(const CString&) final;
-    void ensureExtensionEnabled(const CString&) final;
-    bool isExtensionEnabled(const CString&) final;
+    bool supportsExtension(WebCore::GCGLExtension) final;
+    bool enableExtension(WebCore::GCGLExtension) final;
+
     void drawSurfaceBufferToImageBuffer(SurfaceBuffer, WebCore::ImageBuffer&) final;
 #if ENABLE(MEDIA_STREAM) || ENABLE(WEB_CODECS)
     RefPtr<WebCore::VideoFrame> surfaceBufferToVideoFrame(SurfaceBuffer) final;
@@ -416,9 +416,6 @@ private:
     WeakPtr<GPUProcessConnection> m_gpuProcessConnection; // Only main thread use.
     RefPtr<IPC::StreamClientConnection> m_streamConnection;
     bool m_didInitialize { false };
-    HashSet<CString> m_availableExtensions; // Guarded by waitUntilInitialized().
-    HashSet<CString> m_requestableExtensions; // Guarded by waitUntilInitialized().
-    HashSet<CString> m_enabledExtensions;
 #if PLATFORM(COCOA)
     SharedVideoFrameWriter m_sharedVideoFrameWriter;
 #endif
