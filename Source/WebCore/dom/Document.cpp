@@ -11307,6 +11307,11 @@ DeviceOrientationAndMotionAccessController& Document::deviceOrientationAndMotion
     return *m_deviceOrientationAndMotionAccessController;
 }
 
+CheckedRef<DeviceOrientationAndMotionAccessController> Document::checkedDeviceOrientationAndMotionAccessController()
+{
+    return deviceOrientationAndMotionAccessController();
+}
+
 #endif
 
 PaintWorklet& Document::ensurePaintWorklet()
