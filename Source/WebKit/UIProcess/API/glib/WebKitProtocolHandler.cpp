@@ -24,17 +24,17 @@
 #include "BuildRevision.h"
 #include "DRMMainDevice.h"
 #include "DisplayVBlankMonitor.h"
+#include "RenderProcessInfo.h"
 #include "RendererBufferTransportMode.h"
 #include "WebKitError.h"
 #include "WebKitURISchemeRequestPrivate.h"
 #include "WebKitVersion.h"
 #include "WebKitWebViewPrivate.h"
+#include "WebPageMessages.h"
 #include "WebProcessPool.h"
 #include <WebCore/FloatRect.h>
 #include <WebCore/GLContext.h>
 #include <WebCore/IntRect.h>
-#include <WebCore/PlatformDisplay.h>
-#include <WebCore/PlatformDisplaySurfaceless.h>
 #include <WebCore/PlatformScreen.h>
 #include <cstdlib>
 #include <epoxy/gl.h>
@@ -72,11 +72,6 @@
 #endif
 #endif
 
-#if USE(GBM)
-#include <WebCore/PlatformDisplayGBM.h>
-#include <gbm.h>
-#endif
-
 #if USE(LIBDRM)
 #include <xf86drm.h>
 #endif
@@ -111,7 +106,10 @@ void WebKitProtocolHandler::handleRequest(WebKitURISchemeRequest* request)
 {
     URL requestURL = URL(String::fromLatin1(webkit_uri_scheme_request_get_uri(request)));
     if (requestURL.host() == "gpu"_s) {
-        handleGPU(request);
+        auto& page = webkitURISchemeRequestGetWebPage(request);
+        page.protectedLegacyMainFrameProcess()->sendWithAsyncReply(Messages::WebPage::GetRenderProcessInfo(), [this, request = GRefPtr<WebKitURISchemeRequest>(request)](RenderProcessInfo&& info) {
+            handleGPU(request.get(), WTFMove(info));
+        }, page.webPageIDInMainFrameProcess());
         return;
     }
 
@@ -370,7 +368,7 @@ static String prettyPrintJSON(const String& jsonString)
     return result.toString();
 }
 
-void WebKitProtocolHandler::handleGPU(WebKitURISchemeRequest* request)
+void WebKitProtocolHandler::handleGPU(WebKitURISchemeRequest* request, RenderProcessInfo&& info)
 {
     URL requestURL = URL(String::fromLatin1(webkit_uri_scheme_request_get_uri(request)));
     GString* html = g_string_new(
@@ -566,123 +564,27 @@ void WebKitProtocolHandler::handleGPU(WebKitURISchemeRequest* request)
     stopTable();
     jsonObject->setObject("Hardware Acceleration Information"_s, WTFMove(hardwareAccelerationObject));
 
-#if PLATFORM(GTK)
-    if (usingDMABufRenderer && policy != "never"_s) {
-        std::unique_ptr<PlatformDisplay> platformDisplay;
-#if USE(GBM)
-        UnixFileDescriptor fd;
-        struct gbm_device* device = nullptr;
-        const char* disableGBM = getenv("WEBKIT_DMABUF_RENDERER_DISABLE_GBM");
-        if (!disableGBM || !strcmp(disableGBM, "0")) {
-            auto drmDevice = drmMainDevice();
-            if (!drmDevice.isNull()) {
-                const auto& filename = !drmDevice.renderNode.isNull() ? drmDevice.renderNode : drmDevice.primaryNode;
-                fd = UnixFileDescriptor { open(filename.data(), O_RDWR | O_CLOEXEC), UnixFileDescriptor::Adopt };
-                if (fd) {
-                    device = gbm_create_device(fd.value());
-                    if (device)
-                        platformDisplay = PlatformDisplayGBM::create(device);
-                }
-            }
-        }
-#endif
-        if (!platformDisplay)
-            platformDisplay = PlatformDisplaySurfaceless::create();
+    if (policy != "never"_s && !info.platform.isEmpty()) {
+        auto hardwareAccelerationObject = JSON::Object::create();
+        startTable("Hardware Acceleration Information (Render Process)"_s);
 
-        if (platformDisplay) {
-            auto hardwareAccelerationObject = JSON::Object::create();
-            startTable("Hardware Acceleration Information (Render Process)"_s);
+        addTableRow(hardwareAccelerationObject, "Platform"_s, info.platform);
 
-            addTableRow(hardwareAccelerationObject, "Platform"_s, String::fromUTF8(platformDisplay->type() == PlatformDisplay::Type::Surfaceless ? "Surfaceless"_s : "GBM"_s));
+        if (!info.drmVersion.isEmpty())
+            addTableRow(hardwareAccelerationObject, "DRM version"_s, info.drmVersion);
 
-#if USE(GBM)
-            if (platformDisplay->type() == PlatformDisplay::Type::GBM) {
-                if (drmVersion* version = drmGetVersion(gbm_device_get_fd(device))) {
-                    addTableRow(hardwareAccelerationObject, "DRM version"_s, makeString(unsafeSpan(version->name), " ("_s, unsafeSpan(version->desc), ") "_s, version->version_major, '.', version->version_minor, '.', version->version_patchlevel, ". "_s, unsafeSpan(version->date)));
-                    drmFreeVersion(version);
-                }
-            }
-#endif
+        addTableRow(jsonObject, "GL_RENDERER"_s, info.glRenderer);
+        addTableRow(jsonObject, "GL_VENDOR"_s, info.glVendor);
+        addTableRow(jsonObject, "GL_VERSION"_s, info.glVersion);
+        addTableRow(jsonObject, "GL_SHADING_LANGUAGE_VERSION"_s, info.glShadingVersion);
+        addTableRow(jsonObject, "GL_EXTENSIONS"_s, info.glExtensions);
+        addTableRow(jsonObject, "EGL_VERSION"_s, info.eglVersion);
+        addTableRow(jsonObject, "EGL_VENDOR"_s, info.eglVendor);
+        addTableRow(jsonObject, "EGL_EXTENSIONS"_s, info.eglExtensions);
 
-            if (uiProcessContextIsEGL()) {
-                GLContext::ScopedGLContext glContext(GLContext::createOffscreen(*platformDisplay));
-                addEGLInfo(hardwareAccelerationObject);
-            } else {
-                // Create the context in a different thread to ensure it doesn't affect any current context in the main thread.
-                WorkQueue::create("GPU handler EGL context"_s)->dispatchSync([&] {
-                    auto glContext = GLContext::createOffscreen(*platformDisplay);
-                    glContext->makeContextCurrent();
-                    addEGLInfo(hardwareAccelerationObject);
-                });
-            }
-
-            stopTable();
-            jsonObject->setObject("Hardware Acceleration Information (Render process)"_s, WTFMove(hardwareAccelerationObject));
-
-            // Clear the contexts used by the display before it's destroyed.
-            platformDisplay->clearGLContexts();
-        }
-
-#if USE(GBM)
-        if (device)
-            gbm_device_destroy(device);
-#endif
+        stopTable();
+        jsonObject->setObject("Hardware Acceleration Information (Render process)"_s, WTFMove(hardwareAccelerationObject));
     }
-#endif
-
-#if PLATFORM(WPE) && ENABLE(WPE_PLATFORM)
-    if (usingWPEPlatformAPI) {
-        std::unique_ptr<PlatformDisplay> platformDisplay;
-#if USE(GBM)
-        UnixFileDescriptor fd;
-        struct gbm_device* device = nullptr;
-        if (auto* drmDevice = wpe_display_get_drm_device(wpe_display_get_primary())) {
-            const char* node = wpe_drm_device_get_render_node(drmDevice);
-            if (!node)
-                node = wpe_drm_device_get_primary_node(drmDevice);
-            fd = UnixFileDescriptor { open(node, O_RDWR | O_CLOEXEC), UnixFileDescriptor::Adopt };
-            if (fd) {
-                device = gbm_create_device(fd.value());
-                if (device)
-                    platformDisplay = PlatformDisplayGBM::create(device);
-            }
-        }
-#endif
-        if (!platformDisplay)
-            platformDisplay = PlatformDisplaySurfaceless::create();
-
-        if (platformDisplay) {
-            auto hardwareAccelerationObject = JSON::Object::create();
-            startTable("Hardware Acceleration Information (Render Process)"_s);
-
-            addTableRow(hardwareAccelerationObject, "Platform"_s, String::fromUTF8(platformDisplay->type() == PlatformDisplay::Type::Surfaceless ? "Surfaceless"_s : "GBM"_s));
-
-#if USE(GBM)
-            if (platformDisplay->type() == PlatformDisplay::Type::GBM) {
-                if (drmVersion* version = drmGetVersion(fd.value())) {
-                    addTableRow(hardwareAccelerationObject, "DRM version"_s, makeString(unsafeSpan(version->name), " ("_s, unsafeSpan(version->desc), ") "_s, version->version_major, '.', version->version_minor, '.', version->version_patchlevel, ". "_s, unsafeSpan(version->date)));
-                    drmFreeVersion(version);
-                }
-            }
-#endif
-
-            {
-                GLContext::ScopedGLContext glContext(GLContext::createOffscreen(*platformDisplay));
-                addEGLInfo(hardwareAccelerationObject);
-            }
-
-            stopTable();
-            jsonObject->setObject("Hardware Acceleration Information (Render process)"_s, WTFMove(hardwareAccelerationObject));
-
-            platformDisplay->clearGLContexts();
-        }
-
-#if USE(GBM)
-        if (device)
-            gbm_device_destroy(device);
-#endif
-    }
-#endif
 
     auto infoAsString = jsonObject->toJSONString();
     g_string_append_printf(html, "<script>function copyAsJSON() { "

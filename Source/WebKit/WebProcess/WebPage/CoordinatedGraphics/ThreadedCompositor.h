@@ -50,6 +50,7 @@ namespace WebKit {
 class AcceleratedSurface;
 class CoordinatedSceneState;
 class LayerTreeHost;
+struct RenderProcessInfo;
 
 class ThreadedCompositor : public ThreadSafeRefCounted<ThreadedCompositor>, public CanMakeThreadSafeCheckedPtr<ThreadedCompositor> {
     WTF_MAKE_TZONE_ALLOCATED(ThreadedCompositor);
@@ -88,6 +89,8 @@ public:
     void setDamagePropagationFlags(std::optional<OptionSet<DamagePropagationFlags>>);
     void enableFrameDamageNotificationForTesting();
 #endif
+
+    void fillGLInformation(RenderProcessInfo&&, CompletionHandler<void(RenderProcessInfo&&)>&&);
 
 private:
     explicit ThreadedCompositor(LayerTreeHost&);

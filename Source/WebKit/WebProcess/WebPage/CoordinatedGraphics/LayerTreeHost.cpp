@@ -617,6 +617,11 @@ void LayerTreeHost::foreachRegionInDamageHistoryForTesting(Function<void(const R
 }
 #endif
 
+void LayerTreeHost::fillGLInformation(RenderProcessInfo&& info, CompletionHandler<void(RenderProcessInfo&&)>&& completionHandler)
+{
+    m_compositor->fillGLInformation(WTFMove(info), WTFMove(completionHandler));
+}
+
 } // namespace WebKit
 
 #endif // USE(COORDINATED_GRAPHICS)

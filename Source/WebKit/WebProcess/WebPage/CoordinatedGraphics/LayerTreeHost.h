@@ -64,12 +64,9 @@ class PaintingEngine;
 }
 
 namespace WebKit {
-class LayerTreeHost;
-}
-
-namespace WebKit {
 class CoordinatedSceneState;
 class WebPage;
+struct RenderProcessInfo;
 
 class LayerTreeHost final : public CanMakeCheckedPtr<LayerTreeHost>, public WebCore::GraphicsLayerFactory, public WebCore::CoordinatedPlatformLayer::Client
 {
@@ -121,6 +118,8 @@ public:
 #if PLATFORM(WPE) && USE(GBM) && ENABLE(WPE_PLATFORM)
     void preferredBufferFormatsDidChange();
 #endif
+
+    void fillGLInformation(RenderProcessInfo&&, CompletionHandler<void(RenderProcessInfo&&)>&&);
 private:
     void updateRootLayer();
     WebCore::FloatRect visibleContentsRect() const;

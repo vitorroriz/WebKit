@@ -725,6 +725,8 @@ messages -> WebPage WantsAsyncDispatchMessage {
 #if PLATFORM(GTK) || PLATFORM(WPE)
     SendMessageToWebProcessExtension(struct WebKit::UserMessage userMessage)
     SendMessageToWebProcessExtensionWithReply(struct WebKit::UserMessage userMessage) -> (struct WebKit::UserMessage replyMessage)
+
+    GetRenderProcessInfo() -> (struct WebKit::RenderProcessInfo info)
 #endif
 
 #if PLATFORM(WPE) && USE(GBM) && ENABLE(WPE_PLATFORM)

@@ -510,6 +510,9 @@ struct PDFPluginIdentifierType;
 struct PlatformFontInfo;
 struct PrintInfo;
 struct ProvisionalFrameCreationParameters;
+#if PLATFORM(GTK) || PLATFORM(WPE)
+struct RenderProcessInfo;
+#endif
 struct RunJavaScriptParameters;
 struct StorageNamespaceIdentifierType;
 struct TapIdentifierType;
@@ -2556,6 +2559,8 @@ private:
 #if PLATFORM(GTK) || PLATFORM(WPE)
     void sendMessageToWebProcessExtension(UserMessage&&);
     void sendMessageToWebProcessExtensionWithReply(UserMessage&&, CompletionHandler<void(UserMessage&&)>&&);
+
+    void getRenderProcessInfo(CompletionHandler<void(RenderProcessInfo&&)>&&);
 #endif
 
 #if PLATFORM(WPE) && USE(GBM) && ENABLE(WPE_PLATFORM)
