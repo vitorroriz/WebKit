@@ -33,6 +33,10 @@
 #include <WebCore/DDMeshDescriptor.h>
 #include <wtf/TZoneMalloc.h>
 
+#if PLATFORM(COCOA)
+#include <simd/simd.h>
+#endif
+
 namespace WebKit::DDModel {
 
 class ConvertToBackingContext;
@@ -75,6 +79,9 @@ private:
     void updateTexture(const WebCore::DDModel::DDUpdateTextureDescriptor&) final;
     void addMaterial(const WebCore::DDModel::DDMaterialDescriptor&) final;
     void updateMaterial(const WebCore::DDModel::DDUpdateMaterialDescriptor&) final;
+#if PLATFORM(COCOA)
+    std::pair<simd_float4, simd_float4> getCenterAndExtents() const final;
+#endif
 
     void render() final;
     void setLabelInternal(const String&) final;
@@ -82,6 +89,10 @@ private:
     const DDModelIdentifier m_backing;
     const Ref<ConvertToBackingContext> m_convertToBackingContext;
     const Ref<RemoteGPUProxy> m_root;
+#if PLATFORM(COCOA)
+    simd_float4 m_center;
+    simd_float4 m_extents;
+#endif
 };
 
 }

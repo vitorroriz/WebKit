@@ -43,6 +43,7 @@ class DDMesh;
 
 namespace WebCore {
 
+class GraphicsLayerContentsDisplayDelegate;
 class ModelDisplayBufferDisplayDelegate;
 class ModelPlayerClient;
 class Page;
@@ -95,6 +96,7 @@ private:
     WeakRef<Page> m_page;
     mutable RefPtr<ModelDisplayBufferDisplayDelegate> m_contentsDisplayDelegate;
     uint32_t m_currentTexture { 0 };
+    bool m_didFinishLoading { false };
 };
 
 }

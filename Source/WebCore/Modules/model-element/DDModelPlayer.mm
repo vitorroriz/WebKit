@@ -30,6 +30,7 @@
 #if ENABLE(GPU_PROCESS_MODEL)
 
 #import "Document.h"
+#import "FloatPoint3D.h"
 #import "GPU.h"
 #import "GraphicsLayer.h"
 #import "GraphicsLayerContentsDisplayDelegate.h"
@@ -41,7 +42,6 @@
 #import "Page.h"
 #import "PlatformCALayer.h"
 #import "PlatformCALayerDelegatedContents.h"
-#import "WebGPU.h"
 
 namespace WebCore {
 
@@ -141,75 +141,78 @@ void DDModelPlayer::load(Model& modelSource, LayoutSize size)
 {
     RefPtr corePage = m_page.get();
     m_modelLoader = nil;
-    if (!m_modelLoader) {
-        RefPtr document = corePage->localTopDocument();
-        if (!document)
-            return;
+    m_didFinishLoading = false;
+    RefPtr document = corePage->localTopDocument();
+    if (!document)
+        return;
 
-        RefPtr window = document->window();
-        if (!window)
-            return;
+    RefPtr window = document->window();
+    if (!window)
+        return;
 
-        RefPtr gpu = window->protectedNavigator()->gpu();
-        if (!gpu)
-            return;
+    RefPtr gpu = window->protectedNavigator()->gpu();
+    if (!gpu)
+        return;
 
-        m_currentModel = gpu->backing().createModelBacking(size.width().toUnsigned(), size.height().toUnsigned(), [protectedThis = Ref { *this }] (Vector<MachSendRight>&& surfaceHandles) {
-            if (surfaceHandles.size())
-                protectedThis->m_displayBuffers = WTFMove(surfaceHandles);
+    m_currentModel = gpu->backing().createModelBacking(size.width().toUnsigned(), size.height().toUnsigned(), [protectedThis = Ref { *this }] (Vector<MachSendRight>&& surfaceHandles) {
+        if (surfaceHandles.size())
+            protectedThis->m_displayBuffers = WTFMove(surfaceHandles);
+    });
+
+    m_modelLoader = adoptNS([[WebUSDModelLoader alloc] init]);
+    RetainPtr nsURL = modelSource.url().createNSURL();
+    Ref protectedThis = Ref { *this };
+    [m_modelLoader setCallbacksWithModelAddedCallback:^(WebAddMeshRequest *addRequest) {
+        ensureOnMainThreadWithProtectedThis([addRequest] (Ref<DDModelPlayer> protectedThis) {
+            if (protectedThis->m_currentModel)
+                protectedThis->m_currentModel->addMesh(toCpp(addRequest));
+
+            [protectedThis->m_modelLoader requestCompleted:addRequest];
         });
+    } modelUpdatedCallback:^(WebUpdateMeshRequest *updateRequest) {
+        ensureOnMainThreadWithProtectedThis([updateRequest] (Ref<DDModelPlayer> protectedThis) {
+            if (protectedThis->m_currentModel)
+                protectedThis->m_currentModel->update(toCpp(updateRequest));
 
-        m_modelLoader = adoptNS([[WebUSDModelLoader alloc] init]);
-        RetainPtr nsURL = modelSource.url().createNSURL();
-        Ref protectedThis = Ref { *this };
-        [m_modelLoader setCallbacksWithModelAddedCallback:^(WebAddMeshRequest *addRequest) {
-            ensureOnMainThreadWithProtectedThis([addRequest] (Ref<DDModelPlayer> protectedThis) {
-                if (protectedThis->m_currentModel)
-                    protectedThis->m_currentModel->addMesh(toCpp(addRequest));
+            [protectedThis->m_modelLoader requestCompleted:updateRequest];
 
-                [protectedThis->m_modelLoader requestCompleted:addRequest];
-            });
-        } modelUpdatedCallback:^(WebUpdateMeshRequest *updateRequest) {
-            ensureOnMainThreadWithProtectedThis([updateRequest] (Ref<DDModelPlayer> protectedThis) {
-                if (protectedThis->m_currentModel)
-                    protectedThis->m_currentModel->update(toCpp(updateRequest));
+            if (RefPtr client = protectedThis->m_client.get(); client && !protectedThis->m_didFinishLoading) {
+                protectedThis->m_didFinishLoading = true;
+                client->didFinishLoading(protectedThis.get());
+                auto [simdCenter, simdExtents] = protectedThis->m_currentModel->getCenterAndExtents();
+                client->didUpdateBoundingBox(protectedThis.get(), FloatPoint3D(simdCenter.x, simdCenter.y, simdCenter.z), FloatPoint3D(simdExtents.x, simdExtents.y, simdExtents.z));
+            }
+        });
+    } textureAddedCallback:^(WebDDAddTextureRequest *addTexture) {
+        ensureOnMainThreadWithProtectedThis([addTexture] (Ref<DDModelPlayer> protectedThis) {
+            if (protectedThis->m_currentModel)
+                protectedThis->m_currentModel->addTexture(toCpp(addTexture));
 
-                [protectedThis->m_modelLoader requestCompleted:updateRequest];
+            [protectedThis->m_modelLoader requestCompleted:addTexture];
+        });
+    } textureUpdatedCallback:^(WebDDUpdateTextureRequest *updateTexture) {
+        ensureOnMainThreadWithProtectedThis([updateTexture] (Ref<DDModelPlayer> protectedThis) {
+            if (protectedThis->m_currentModel)
+                protectedThis->m_currentModel->updateTexture(toCpp(updateTexture));
 
-                if (RefPtr client = protectedThis->m_client.get())
-                    client->didFinishLoading(protectedThis.get());
-            });
-        } textureAddedCallback:^(WebDDAddTextureRequest *addTexture) {
-            ensureOnMainThreadWithProtectedThis([addTexture] (Ref<DDModelPlayer> protectedThis) {
-                if (protectedThis->m_currentModel)
-                    protectedThis->m_currentModel->addTexture(toCpp(addTexture));
+            [protectedThis->m_modelLoader requestCompleted:updateTexture];
+        });
+    } materialAddedCallback:^(WebDDAddMaterialRequest *addMaterial) {
+        ensureOnMainThreadWithProtectedThis([addMaterial] (Ref<DDModelPlayer> protectedThis) {
+            if (protectedThis->m_currentModel)
+                protectedThis->m_currentModel->addMaterial(toCpp(addMaterial));
 
-                [protectedThis->m_modelLoader requestCompleted:addTexture];
-            });
-        } textureUpdatedCallback:^(WebDDUpdateTextureRequest *updateTexture) {
-            ensureOnMainThreadWithProtectedThis([updateTexture] (Ref<DDModelPlayer> protectedThis) {
-                if (protectedThis->m_currentModel)
-                    protectedThis->m_currentModel->updateTexture(toCpp(updateTexture));
+            [protectedThis->m_modelLoader requestCompleted:addMaterial];
+        });
+    } materialUpdatedCallback:^(WebDDUpdateMaterialRequest *updateMaterial) {
+        ensureOnMainThreadWithProtectedThis([updateMaterial] (Ref<DDModelPlayer> protectedThis) {
+            if (protectedThis->m_currentModel)
+                protectedThis->m_currentModel->updateMaterial(toCpp(updateMaterial));
 
-                [protectedThis->m_modelLoader requestCompleted:updateTexture];
-            });
-        } materialAddedCallback:^(WebDDAddMaterialRequest *addMaterial) {
-            ensureOnMainThreadWithProtectedThis([addMaterial] (Ref<DDModelPlayer> protectedThis) {
-                if (protectedThis->m_currentModel)
-                    protectedThis->m_currentModel->addMaterial(toCpp(addMaterial));
-
-                [protectedThis->m_modelLoader requestCompleted:addMaterial];
-            });
-        } materialUpdatedCallback:^(WebDDUpdateMaterialRequest *updateMaterial) {
-            ensureOnMainThreadWithProtectedThis([updateMaterial] (Ref<DDModelPlayer> protectedThis) {
-                if (protectedThis->m_currentModel)
-                    protectedThis->m_currentModel->updateMaterial(toCpp(updateMaterial));
-
-                [protectedThis->m_modelLoader requestCompleted:updateMaterial];
-            });
-        }];
-        [m_modelLoader loadModelFrom:nsURL.get()];
-    }
+            [protectedThis->m_modelLoader requestCompleted:updateMaterial];
+        });
+    }];
+    [m_modelLoader loadModelFrom:nsURL.get()];
 }
 
 void DDModelPlayer::sizeDidChange(LayoutSize)
