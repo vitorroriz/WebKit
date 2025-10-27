@@ -196,21 +196,21 @@ public:
 
     void forEach(NOESCAPE const Function<void(T&)>& callback) requires WTF::HasRefPtrMemberFunctions<T>::value
     {
-            auto items = compactMap(m_set, [](const Ref<WeakPtrImpl>& item) -> RefPtr<T> {
-                return RefPtr { static_cast<T*>(item->template get<T>()) };
-            });
-            for (auto& item : items)
-                callback(item.get());
+        auto items = compactMap(m_set, [](const Ref<WeakPtrImpl>& item) -> RefPtr<T> {
+            return RefPtr { static_cast<T*>(item->template get<T>()) };
+        });
+        for (auto& item : items)
+            callback(item.get());
     }
 
     void forEach(NOESCAPE const Function<void(T&)>& callback) requires (WTF::HasCheckedPtrMemberFunctions<T>::value && !WTF::HasRefPtrMemberFunctions<T>::value)
     {
-            auto items = compactMap(m_set, [](const Ref<WeakPtrImpl>& item) -> CheckedPtr<T> {
-                return CheckedPtr { static_cast<T*>(item->template get<T>()) };
-            });
-            for (auto& item : items)
-                callback(item.get());
-        }
+        auto items = compactMap(m_set, [](const Ref<WeakPtrImpl>& item) -> CheckedPtr<T> {
+            return CheckedPtr { static_cast<T*>(item->template get<T>()) };
+        });
+        for (auto& item : items)
+            callback(item.get());
+    }
 
 #if ASSERT_ENABLED
     void checkConsistency() const { m_set.checkConsistency(); }
