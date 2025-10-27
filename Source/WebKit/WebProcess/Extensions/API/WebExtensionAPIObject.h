@@ -57,16 +57,16 @@ public:
 
     WebExtensionAPIObject(WebExtensionContentWorldType contentWorldType, WebExtensionAPIRuntimeBase& runtime, WebExtensionContextProxy& context)
         : m_contentWorldType(contentWorldType)
-        , m_runtime(&runtime)
         , m_extensionContext(&context)
     {
+        lazyInitialize(m_runtime, Ref { runtime });
     }
 
     WebExtensionAPIObject(const WebExtensionAPIObject& parentObject)
         : m_contentWorldType(parentObject.contentWorldType())
-        , m_runtime(&parentObject.runtime())
         , m_extensionContext(parentObject.m_extensionContext) // Using parentObject.extensionContext() is not safe for APIWebPage objects.
     {
+        lazyInitialize(m_runtime, Ref { parentObject.runtime() });
     }
 
     virtual ~WebExtensionAPIObject() = default;
@@ -92,7 +92,7 @@ public:
 
 private:
     WebExtensionContentWorldType m_contentWorldType { WebExtensionContentWorldType::Main };
-    RefPtr<WebExtensionAPIRuntimeBase> m_runtime;
+    const RefPtr<WebExtensionAPIRuntimeBase> m_runtime;
     RefPtr<WebExtensionContextProxy> m_extensionContext;
     String m_propertyPath;
 };
