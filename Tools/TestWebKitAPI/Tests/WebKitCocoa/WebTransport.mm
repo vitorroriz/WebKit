@@ -499,8 +499,8 @@ TEST(WebTransport, Worker)
     EXPECT_WK_STREQ([webView _test_waitForAlert], "message from worker: successfully read abc");
 }
 
-// FIXME: Make this not time out on iOS.
-#if PLATFORM(MAC)
+// FIXME: https://bugs.webkit.org/show_bug.cgi?id=301526 Make this not time out on iOS and Debug builds
+#if PLATFORM(MAC) && defined(NDEBUG)
 TEST(WebTransport, WorkerAfterNetworkProcessCrash)
 #else
 TEST(WebTransport, DISABLED_WorkerAfterNetworkProcessCrash)
