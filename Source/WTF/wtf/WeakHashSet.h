@@ -194,32 +194,23 @@ public:
         return m_set.size();
     }
 
-    void forEach(NOESCAPE const Function<void(T&)>& callback)
+    void forEach(NOESCAPE const Function<void(T&)>& callback) requires WTF::HasRefPtrMemberFunctions<T>::value
     {
-        if constexpr (WTF::HasRefPtrMemberFunctions<T>::value) {
             auto items = compactMap(m_set, [](const Ref<WeakPtrImpl>& item) -> RefPtr<T> {
                 return RefPtr { static_cast<T*>(item->template get<T>()) };
             });
             for (auto& item : items)
                 callback(item.get());
-        } else if constexpr (WTF::HasCheckedPtrMemberFunctions<T>::value) {
+    }
+
+    void forEach(NOESCAPE const Function<void(T&)>& callback) requires (WTF::HasCheckedPtrMemberFunctions<T>::value && !WTF::HasRefPtrMemberFunctions<T>::value)
+    {
             auto items = compactMap(m_set, [](const Ref<WeakPtrImpl>& item) -> CheckedPtr<T> {
                 return CheckedPtr { static_cast<T*>(item->template get<T>()) };
             });
             for (auto& item : items)
                 callback(item.get());
-        } else {
-            // Exception case: unsafe.
-            auto items = map(m_set, [](const Ref<WeakPtrImpl>& item) {
-                auto* pointer = static_cast<T*>(item->template get<T>());
-                return WeakPtr<T, WeakPtrImpl> { pointer };
-            });
-            for (auto& item : items) {
-                if (item && m_set.contains(*item.m_impl))
-                    callback(*item); // Exception case.
-            }
         }
-    }
 
 #if ASSERT_ENABLED
     void checkConsistency() const { m_set.checkConsistency(); }
