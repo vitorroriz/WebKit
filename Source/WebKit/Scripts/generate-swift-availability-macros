@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 for search_path in "${BUILT_PRODUCTS_DIR}" "${SDKROOT}"; do
     candidate="${search_path}/usr/local/include/WebKitAdditions/Scripts/postprocess-framework-headers-definitions"
@@ -12,27 +12,27 @@ done
 
 if [[ "${WK_PLATFORM_NAME}" == "macosx" ]]; then
     [[ -n ${OSX_VERSION} ]] || OSX_VERSION=${MACOSX_DEPLOYMENT_TARGET}
-    [[ -n ${XROS_VERSION} ]] || XROS_VERSION="9999"
-    [[ -n ${IOS_VERSION} ]] || IOS_VERSION="9999"
 elif [[ "${WK_PLATFORM_NAME}" == "maccatalyst" ]]; then
     # On Mac Catalyst `LLVM_TARGET_TRIPLE_OS_VERSION` will be in the format `ios{major}.{minor}`.
     [[ -n ${IOS_VERSION} ]] || IOS_VERSION=${LLVM_TARGET_TRIPLE_OS_VERSION#ios}
-    [[ -n ${XROS_VERSION} ]] || XROS_VERSION="9999"
-    [[ -n ${OSX_VERSION} ]] || OSX_VERSION="9999"
 elif [[ "${WK_PLATFORM_NAME}" =~ "iphone" ]]; then
     [[ -n ${IOS_VERSION} ]] || IOS_VERSION=${IPHONEOS_DEPLOYMENT_TARGET}
-    [[ -n ${XROS_VERSION} ]] || XROS_VERSION="9999"
-    [[ -n ${OSX_VERSION} ]] || OSX_VERSION="9999"
 elif [[ "${PLATFORM_NAME}" == xr* ]]; then
     [[ -n ${XROS_VERSION} ]] || XROS_VERSION=${XROS_DEPLOYMENT_TARGET}
-    [[ -n ${IOS_VERSION} ]] || IOS_VERSION="9999"
-    [[ -n ${OSX_VERSION} ]] || OSX_VERSION="9999"
-else
-    [[ -n ${OSX_VERSION} ]] || OSX_VERSION="9999"
-    [[ -n ${XROS_VERSION} ]] || XROS_VERSION="9999"
-    [[ -n ${IOS_VERSION} ]] || IOS_VERSION="9999"
+elif [[ "${PLATFORM_NAME}" == watch* ]]; then
+    [[ -n ${WATCHOS_VERSION} ]] || WATCHOS_VERSION=${WATCHOS_DEPLOYMENT_TARGET}
+elif [[ "${PLATFORM_NAME}" == appletv* ]]; then
+    [[ -n ${TVOS_VERSION} ]] | TVOS_VERSION=${TVOS_DEPLOYMENT_TARGET}
 fi
+
+[[ -n ${OSX_VERSION} ]] || OSX_VERSION="9999"
+[[ -n ${IOS_VERSION} ]] || IOS_VERSION="9999"
+[[ -n ${XROS_VERSION} ]] || XROS_VERSION="9999"
+[[ -n ${WATCHOS_VERSION} ]] || WATCHOS_VERSION="9999"
+[[ -n ${TVOS_VERSION} ]] || TVOS_VERSION="9999"
 
 echo "-Xfrontend -define-availability -Xfrontend \"WK_IOS_TBA:iOS ${IOS_VERSION}\"" \
     "-Xfrontend -define-availability -Xfrontend \"WK_MAC_TBA:macOS ${OSX_VERSION}\"" \
-    "-Xfrontend -define-availability -Xfrontend \"WK_XROS_TBA:visionOS ${XROS_VERSION}\"" | tee "${SCRIPT_OUTPUT_FILE_0}"
+    "-Xfrontend -define-availability -Xfrontend \"WK_XROS_TBA:visionOS ${XROS_VERSION}\"" \
+    "-Xfrontend -define-availability -Xfrontend \"WK_WATCHOS_TBA:watchOS ${WATCHOS_VERSION}\"" \
+    "-Xfrontend -define-availability -Xfrontend \"WK_TVOS_TBA:tvOS ${TVOS_VERSION}\"" | tee "${SCRIPT_OUTPUT_FILE_0}"
