@@ -413,18 +413,6 @@ RenderLayer::~RenderLayer()
     RELEASE_ASSERT_WITH_SECURITY_IMPLICATION(renderer().renderTreeBeingDestroyed() || !firstChild());
 }
 
-RenderLayer::PaintedContentRequest::PaintedContentRequest(const RenderLayer& owningLayer)
-{
-#if HAVE(SUPPORT_HDR_DISPLAY)
-    if (owningLayer.renderer().document().drawsHDRContent())
-        makeHDRContentUnknown();
-    else
-        makeHDRContentFalse();
-#else
-    UNUSED_PARAM(owningLayer);
-#endif
-}
-
 void RenderLayer::removeClipperClientIfNeeded() const
 {
     WTF::switchOn(renderer().style().clipPath(),
@@ -6081,20 +6069,20 @@ static void determineNonLayerDescendantsPaintedContent(const RenderElement& rend
                 return;
         }
         
-        CheckedPtr childElement = dynamicDowncast<RenderElement>(child);
-        if (!childElement)
+        CheckedPtr childRenderElement = dynamicDowncast<RenderElement>(child);
+        if (!childRenderElement)
             continue;
 
-        if (auto* modelObject = dynamicDowncast<RenderLayerModelObject>(*childElement); modelObject && modelObject->hasSelfPaintingLayer())
+        if (auto* modelObject = dynamicDowncast<RenderLayerModelObject>(*childRenderElement); modelObject && modelObject->hasSelfPaintingLayer())
             continue;
 
-        if (hasVisibleBoxDecorationsOrBackground(*childElement)) {
+        if (hasVisibleBoxDecorationsOrBackground(*childRenderElement)) {
             request.setHasPaintedContent();
             if (request.isSatisfied())
                 return;
         }
         
-        if (is<RenderReplaced>(*childElement)) {
+        if (is<RenderReplaced>(*childRenderElement)) {
             request.setHasPaintedContent();
 
             if (request.isSatisfied())
@@ -6102,7 +6090,7 @@ static void determineNonLayerDescendantsPaintedContent(const RenderElement& rend
         }
 
 #if HAVE(SUPPORT_HDR_DISPLAY)
-        if (!request.isHDRContentSatisfied() && rendererHasHDRContent(*childElement)) {
+        if (!request.isHDRContentSatisfied() && rendererHasHDRContent(*childRenderElement)) {
             request.setHasHDRContent();
 
             if (request.isSatisfied())
@@ -6110,7 +6098,7 @@ static void determineNonLayerDescendantsPaintedContent(const RenderElement& rend
         }
 #endif
 
-        determineNonLayerDescendantsPaintedContent(*childElement, renderersTraversed, request);
+        determineNonLayerDescendantsPaintedContent(*childRenderElement, renderersTraversed, request);
         if (request.isSatisfied())
             return;
     }
@@ -6164,6 +6152,15 @@ bool RenderLayer::isVisuallyNonEmpty(PaintedContentRequest* request) const
         if (request->isSatisfied())
             return true;
     }
+
+#if HAVE(SUPPORT_HDR_DISPLAY)
+    if (request && !request->isHDRContentSatisfied() && WebCore::rendererHasHDRContent(renderer())) {
+        request->setHasHDRContent();
+
+        if (request->isSatisfied())
+            return true;
+    }
+#endif
 
     if (hasVisibleBoxDecorationsOrBackground()) {
         if (!request)

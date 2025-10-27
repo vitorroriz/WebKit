@@ -570,7 +570,6 @@ public:
 
     struct PaintedContentRequest {
         PaintedContentRequest() = default;
-        PaintedContentRequest(const RenderLayer& owningLayer);
 
         void setHasPaintedContent() { hasPaintedContent = RequestState::True; }
         void makePaintedContentUndetermined() { hasPaintedContent = RequestState::Undetermined; }
@@ -580,7 +579,8 @@ public:
 #if HAVE(SUPPORT_HDR_DISPLAY)
         void setHasHDRContent() { hasHDRContent = RequestState::True; }
         void makeHDRContentFalse() { hasHDRContent = RequestState::False; }
-        void makeHDRContentUnknown() { hasHDRContent = RequestState::Unknown; }
+
+        void setHDRRequestState(RequestState state) { hasHDRContent = state; }
         bool isHDRContentSatisfied() const { return hasHDRContent != RequestState::Unknown; }
 #endif
 

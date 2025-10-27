@@ -156,13 +156,15 @@ public:
     PaintedContentsInfo(RenderLayerBacking& inBacking)
         : m_backing(inBacking)
     {
-#if HAVE(SUPPORT_HDR_DISPLAY)
-        if (m_backing.renderer().document().drawsHDRContent()) {
-            m_hasHDRContent = RequestState::Unknown;
-            m_rendererHasHDRContent = RequestState::Unknown;
-        }
-#endif
     }
+
+#if HAVE(SUPPORT_HDR_DISPLAY)
+    void setDetectsHDRContent()
+    {
+        m_hdrContent = RequestState::Unknown;
+        m_rendererHDRContent = RequestState::Unknown;
+    }
+#endif
 
     void determinePaintsBoxDecorations();
     bool paintsBoxDecorations()
@@ -175,7 +177,7 @@ public:
     bool isPaintsContentSatisfied() const
     {
 #if HAVE(SUPPORT_HDR_DISPLAY)
-        if (m_hasHDRContent == RequestState::Unknown)
+        if (m_hdrContent == RequestState::Unknown)
             return false;
 #endif
         return m_content != RequestState::Unknown;
@@ -192,14 +194,14 @@ public:
     bool paintsHDRContent()
     {
         determinePaintsContent();
-        return m_hasHDRContent == RequestState::True;
+        return m_hdrContent == RequestState::True;
     }
 #endif
 
     bool isContentsTypeSatisfied() const
     {
 #if HAVE(SUPPORT_HDR_DISPLAY)
-        if (m_rendererHasHDRContent == RequestState::Unknown)
+        if (m_rendererHDRContent == RequestState::Unknown)
             return false;
 #endif
         return m_contentsType != ContentsType::Unknown;
@@ -225,10 +227,10 @@ public:
     }
 
 #if HAVE(SUPPORT_HDR_DISPLAY)
-    bool rendererHasHDRContent()
+    bool rendererHasHDRContent() // FIXME: Why do we need this?
     {
         determineContentsType();
-        return m_rendererHasHDRContent == RequestState::True;
+        return m_rendererHDRContent == RequestState::True;
     }
 #endif
 
@@ -236,8 +238,8 @@ public:
     RequestState m_boxDecorations { RequestState::Unknown };
     RequestState m_content { RequestState::Unknown };
 #if HAVE(SUPPORT_HDR_DISPLAY)
-    RequestState m_hasHDRContent { RequestState::DontCare };
-    RequestState m_rendererHasHDRContent { RequestState::DontCare };
+    RequestState m_hdrContent { RequestState::DontCare };
+    RequestState m_rendererHDRContent { RequestState::DontCare };
 #endif
 
     ContentsType m_contentsType { ContentsType::Unknown };
@@ -256,12 +258,15 @@ void PaintedContentsInfo::determinePaintsContent()
     if (isPaintsContentSatisfied())
         return;
 
-    RenderLayer::PaintedContentRequest contentRequest(m_backing.owningLayer());
+    auto contentRequest = RenderLayer::PaintedContentRequest { };
+#if HAVE(SUPPORT_HDR_DISPLAY)
+    contentRequest.setHDRRequestState(m_hdrContent);
+#endif
 
     m_backing.determinePaintsContent(contentRequest);
     m_content = contentRequest.hasPaintedContent;
 #if HAVE(SUPPORT_HDR_DISPLAY)
-    m_hasHDRContent = contentRequest.hasHDRContent;
+    m_hdrContent = contentRequest.hasHDRContent;
 #endif
 }
 
@@ -280,8 +285,8 @@ void PaintedContentsInfo::determineContentsType()
         m_contentsType = ContentsType::Painted;
 
 #if HAVE(SUPPORT_HDR_DISPLAY)
-    if (m_rendererHasHDRContent == RequestState::Unknown)
-        m_rendererHasHDRContent = m_backing.rendererHasHDRContent() ? RequestState::True : RequestState::False;
+    if (m_rendererHDRContent == RequestState::Unknown)
+        m_rendererHDRContent = m_backing.rendererHasHDRContent() ? RequestState::True : RequestState::False;
 #endif
 }
 
@@ -2032,6 +2037,11 @@ void RenderLayerBacking::updateDrawsContent(PaintedContentsInfo& contentsInfo)
         return;
     }
 
+#if HAVE(SUPPORT_HDR_DISPLAY)
+    if (renderer().document().drawsHDRContent())
+        contentsInfo.setDetectsHDRContent();
+#endif
+
     bool hasPaintedContent = containsPaintedContent(contentsInfo);
 
     // FIXME: we could refine this to only allocate backing for one of these layers if possible.
@@ -3257,12 +3267,14 @@ static std::optional<bool> intersectsWithAncestor(const RenderLayer& child, cons
     return overlap.intersects(ancestorCompositedBounds);
 }
 
-// Conservative test for having no rendered children.
 void RenderLayerBacking::determineNonCompositedLayerDescendantsPaintedContent(RenderLayer::PaintedContentRequest& request) const
 {
     bool hasPaintingDescendant = false;
     traverseVisibleNonCompositedDescendantLayers(m_owningLayer, [&hasPaintingDescendant, &request, this](const RenderLayer& layer) {
-        RenderLayer::PaintedContentRequest localRequest(m_owningLayer);
+        auto localRequest = RenderLayer::PaintedContentRequest { };
+#if HAVE(SUPPORT_HDR_DISPLAY)
+        localRequest.setHDRRequestState(request.hasHDRContent);
+#endif
         if (layer.isVisuallyNonEmpty(&localRequest)) {
             bool mayIntersect = intersectsWithAncestor(layer, m_owningLayer, compositedBounds()).value_or(true);
             if (mayIntersect) {
@@ -3271,8 +3283,8 @@ void RenderLayerBacking::determineNonCompositedLayerDescendantsPaintedContent(Re
             }
         }
 #if HAVE(SUPPORT_HDR_DISPLAY)
-        if (localRequest.probablyHasPaintedContent())
-            request.hasHDRContent = localRequest.hasHDRContent;
+        if (localRequest.probablyHasPaintedContent() && localRequest.hasHDRContent == RequestState::True)
+            request.hasHDRContent = RequestState::True;
 #endif
         return (hasPaintingDescendant && request.isSatisfied()) ? LayerTraversal::Stop : LayerTraversal::Continue;
     });
