@@ -426,8 +426,14 @@ bool CocoaApplication::shouldOSFaultLogForAppleApplicationUsingWebKit1()
 bool MacApplication::isSafari()
 {
     static bool isSafari = applicationBundleIsEqualTo("com.apple.Safari"_s)
-        || applicationBundleIsEqualTo("com.apple.SafariTechnologyPreview"_s)
+        || isSafariTechnologyPreview()
         || applicationBundleIdentifier().startsWith("com.apple.Safari."_s);
+    return isSafari;
+}
+
+bool MacApplication::isSafariTechnologyPreview()
+{
+    static bool isSafari = applicationBundleIsEqualTo("com.apple.SafariTechnologyPreview"_s);
     return isSafari;
 }
 

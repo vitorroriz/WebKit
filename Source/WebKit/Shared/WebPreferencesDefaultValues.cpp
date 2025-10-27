@@ -391,6 +391,15 @@ bool defaultPreferSpatialAudioExperience()
 }
 #endif
 
+bool defaultRTCEncodedStreamsQuirkEnabled()
+{
+#if PLATFORM(MAC)
+    return WTF::MacApplication::isSafariTechnologyPreview();
+#else
+    return false;
+#endif
+}
+
 #if PLATFORM(COCOA)
 static bool isSafariOrWebApp()
 {

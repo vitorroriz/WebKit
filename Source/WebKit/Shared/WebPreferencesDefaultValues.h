@@ -185,6 +185,8 @@ bool defaultIFrameResourceMonitoringEnabled();
 bool defaultPreferSpatialAudioExperience();
 #endif
 
+bool defaultRTCEncodedStreamsQuirkEnabled();
+
 bool defaultMutationEventsEnabled();
 
 bool defaultTrustedTypesEnabled();
