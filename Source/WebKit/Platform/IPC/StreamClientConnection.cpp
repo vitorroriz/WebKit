@@ -122,7 +122,7 @@ void StreamClientConnection::setMaxBatchSize(unsigned size)
 
 void StreamClientConnection::open(Connection::Client& receiver, SerialFunctionDispatcher& dispatcher)
 {
-    m_dedicatedConnectionClient.emplace(*this, receiver);
+    lazyInitialize(m_dedicatedConnectionClient, makeUniqueWithoutRefCountedCheck<DedicatedConnectionClient>(*this, receiver));
     m_connection->open(Ref { *m_dedicatedConnectionClient }.get(), dispatcher);
 }
 

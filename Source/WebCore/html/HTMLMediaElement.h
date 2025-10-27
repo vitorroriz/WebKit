@@ -736,6 +736,11 @@ public:
     uint32_t checkedPtrCountWithoutThreadCheck() const { return CanMakeCheckedPtr<Node>::checkedPtrCountWithoutThreadCheck(); }
     void incrementCheckedPtrCount() const { CanMakeCheckedPtr<Node>::incrementCheckedPtrCount(); }
     void decrementCheckedPtrCount() const { CanMakeCheckedPtr<Node>::decrementCheckedPtrCount(); }
+    void setDidBeginCheckedPtrDeletion()
+    {
+        PlatformMediaSessionClient::setDidBeginCheckedPtrDeletion();
+        CanMakeCheckedPtr<Node>::setDidBeginCheckedPtrDeletion();
+    }
 
     void forceStereoDecoding() { m_forceStereoDecoding = true; }
 protected:
