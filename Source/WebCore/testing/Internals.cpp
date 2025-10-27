@@ -99,6 +99,7 @@
 #include "FontCache.h"
 #include "FormController.h"
 #include "FragmentDirectiveGenerator.h"
+#include "FrameInspectorController.h"
 #include "FrameLoader.h"
 #include "FrameMemoryMonitor.h"
 #include "FrameSnapshotting.h"
@@ -283,6 +284,7 @@
 #include <wtf/RunLoop.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/URLHelpers.h>
+#include <wtf/WeakPtr.h>
 #include <wtf/text/MakeString.h>
 #include <wtf/text/StringBuilder.h>
 #include <wtf/text/StringToIntegerConversion.h>
@@ -446,7 +448,7 @@ using namespace HTMLNames;
 class InspectorStubFrontend final : public InspectorFrontendClientLocal, public FrontendChannel {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(InspectorStubFrontend);
 public:
-    InspectorStubFrontend(Page& inspectedPage, RefPtr<LocalDOMWindow>&& frontendWindow);
+    InspectorStubFrontend(Page& inspectedPage, LocalFrame& mainFrame, RefPtr<LocalDOMWindow>&& frontendWindow);
     virtual ~InspectorStubFrontend();
 
 private:
@@ -473,16 +475,19 @@ private:
     ConnectionType connectionType() const final { return ConnectionType::Local; }
 
     RefPtr<LocalDOMWindow> m_frontendWindow;
+    WeakPtr<FrameInspectorController> m_mainFrameInspectorController;
 };
 
-InspectorStubFrontend::InspectorStubFrontend(Page& inspectedPage, RefPtr<LocalDOMWindow>&& frontendWindow)
-    : InspectorFrontendClientLocal(&inspectedPage.inspectorController(), frontendWindow->document()->page(), makeUnique<InspectorFrontendClientLocal::Settings>())
+InspectorStubFrontend::InspectorStubFrontend(Page& inspectedPage, LocalFrame& mainFrame, RefPtr<LocalDOMWindow>&& frontendWindow)
+    : InspectorFrontendClientLocal(&inspectedPage.inspectorController(), frontendWindow->document()->page(), makeUnique<InspectorFrontendClientLocal::Settings>(), InspectorFrontendClientLocal::DispatchBackendTarget::MainFrame)
     , m_frontendWindow(frontendWindow.copyRef())
+    , m_mainFrameInspectorController(mainFrame.inspectorController())
 {
     ASSERT_ARG(frontendWindow, frontendWindow);
 
     frontendPage()->inspectorController().setInspectorFrontendClient(this);
-    inspectedPage.inspectorController().connectFrontend(*this);
+    inspectedPage.protectedInspectorController()->connectFrontend(*this);
+    mainFrame.protectedInspectorController()->connectFrontend(*this);
 }
 
 InspectorStubFrontend::~InspectorStubFrontend()
@@ -496,7 +501,10 @@ void InspectorStubFrontend::closeWindow()
         return;
 
     frontendPage()->inspectorController().setInspectorFrontendClient(nullptr);
-    inspectedPage()->inspectorController().disconnectFrontend(*this);
+    if (RefPtr controller = m_mainFrameInspectorController.get())
+        controller->disconnectFrontend(*this);
+    if (RefPtr page = inspectedPage())
+        page->protectedInspectorController()->disconnectFrontend(*this);
 
     m_frontendWindow->close();
     m_frontendWindow = nullptr;
@@ -3296,7 +3304,7 @@ RefPtr<WindowProxy> Internals::openDummyInspectorFrontend(const String& url)
 #endif
 
     auto frontendWindowProxy = window->open(*window, *window, url, emptyAtom(), emptyString()).releaseReturnValue();
-    m_inspectorFrontend = makeUnique<InspectorStubFrontend>(*inspectedPage, downcast<LocalDOMWindow>(frontendWindowProxy->window()));
+    m_inspectorFrontend = makeUnique<InspectorStubFrontend>(*inspectedPage, *localMainFrame, downcast<LocalDOMWindow>(frontendWindowProxy->window()));
     return frontendWindowProxy;
 }
 
