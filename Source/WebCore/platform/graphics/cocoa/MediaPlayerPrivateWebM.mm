@@ -88,6 +88,11 @@ Ref<AudioVideoRenderer> MediaPlayerPrivateWebM::createRenderer(LoggerHelper& log
     return AudioVideoRendererAVFObjC::create(Ref { loggerHelper.logger() }, loggerHelper.logIdentifier());
 }
 
+Ref<MediaPlayerPrivateWebM> MediaPlayerPrivateWebM::create(MediaPlayer* player)
+{
+    return adoptRef(*new MediaPlayerPrivateWebM(player));
+}
+
 MediaPlayerPrivateWebM::MediaPlayerPrivateWebM(MediaPlayer* player)
     : m_player(player)
     , m_parser(SourceBufferParserWebM::create().releaseNonNull())
@@ -1371,7 +1376,7 @@ private:
 
     Ref<MediaPlayerPrivateInterface> createMediaEnginePlayer(MediaPlayer* player) const final
     {
-        return adoptRef(*new MediaPlayerPrivateWebM(player));
+        return MediaPlayerPrivateWebM::create(player);
     }
 
     void getSupportedTypes(HashSet<String>& types) const final

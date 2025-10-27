@@ -173,7 +173,7 @@ static bool isSampleBufferVideoRenderer(id object)
 
             ensureOnMainThread([self, protectedSelf = RetainPtr { self }, renderer = WTFMove(renderer), error = WTFMove(error)] {
                 ASSERT(_videoRenderers.contains(renderer.get()));
-                if (auto client = _client.get())
+                if (RefPtr client = _client.get())
                     client->videoRendererDidReceiveError(renderer.get(), error.get());
             });
             return;
@@ -184,7 +184,7 @@ static bool isSampleBufferVideoRenderer(id object)
 
             ensureOnMainThread([self, protectedSelf = RetainPtr { self }, renderer = WTFMove(renderer), error = WTFMove(error)] {
                 ASSERT(_audioRenderers.contains(renderer.get()));
-                if (auto client = _client.get())
+                if (RefPtr client = _client.get())
                     client->audioRendererDidReceiveError(renderer.get(), error.get());
             });
             return;
@@ -200,7 +200,7 @@ static bool isSampleBufferVideoRenderer(id object)
 
         ensureOnMainThread([self, protectedSelf = RetainPtr { self }, renderer = WTFMove(renderer), isObscured] {
             ASSERT(_videoRenderers.contains(renderer.get()));
-            if (auto client = _client.get())
+            if (RefPtr client = _client.get())
                 client->outputObscuredDueToInsufficientExternalProtectionChanged(isObscured);
         });
         return;
@@ -217,7 +217,7 @@ static bool isSampleBufferVideoRenderer(id object)
     ensureOnMainThread([self, protectedSelf = RetainPtr { self }, renderer = WTFMove(renderer), error = WTFMove(error)] {
         if (!_videoRenderers.contains(renderer.get()))
             return;
-        if (auto client = _client.get())
+        if (RefPtr client = _client.get())
             client->videoRendererDidReceiveError(renderer.get(), error.get());
     });
 }
@@ -230,7 +230,7 @@ static bool isSampleBufferVideoRenderer(id object)
     ensureOnMainThread([self, protectedSelf = RetainPtr { self }, renderer = WTFMove(renderer), requiresFlush] {
         if (!_videoRenderers.contains(renderer.get()))
             return;
-        if (auto client = _client.get())
+        if (RefPtr client = _client.get())
             client->videoRendererRequiresFlushToResumeDecodingChanged(renderer.get(), requiresFlush);
     });
 }
@@ -246,7 +246,7 @@ static bool isSampleBufferVideoRenderer(id object)
     ensureOnMainThread([self, protectedSelf = RetainPtr { self }, layer = WTFMove(layer), isReadyForDisplay] {
         if (!_videoRenderers.contains(layer.get()))
             return;
-        if (auto client = _client.get())
+        if (RefPtr client = _client.get())
             client->videoRendererReadyForDisplayChanged(layer.get(), isReadyForDisplay);
     });
 }
@@ -259,7 +259,7 @@ static bool isSampleBufferVideoRenderer(id object)
     ensureOnMainThread([self, protectedSelf = RetainPtr { self }, renderer = WTFMove(renderer), flushTime] {
         if (!_audioRenderers.contains(renderer.get()))
             return;
-        if (auto client = _client.get())
+        if (RefPtr client = _client.get())
             client->audioRendererWasAutomaticallyFlushed(renderer.get(), flushTime);
     });
 }
