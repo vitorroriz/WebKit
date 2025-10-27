@@ -377,7 +377,7 @@ private:
     MediaTime m_lastSeekTime;
     std::optional<SeekTarget> m_pendingSeek;
     std::optional<GenericPromise::Producer> m_waitForTimeBufferedPromise;
-    NativePromiseRequest m_rendererSeekRequest;
+    const Ref<NativePromiseRequest> m_rendererSeekRequest;
     bool m_seeking { false };
 #if HAVE(SPATIAL_TRACKING_LABEL)
     String m_defaultSpatialTrackingLabel;

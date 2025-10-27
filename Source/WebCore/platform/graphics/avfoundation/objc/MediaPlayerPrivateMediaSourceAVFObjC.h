@@ -339,7 +339,7 @@ private:
     Timer m_seekTimer;
     bool m_seeking { false };
     std::optional<SeekTarget> m_pendingSeek;
-    NativePromiseRequest m_rendererSeekRequest;
+    const Ref<NativePromiseRequest> m_rendererSeekRequest;
 
 #if ENABLE(LEGACY_ENCRYPTED_MEDIA)
     ThreadSafeWeakPtr<CDMSessionAVContentKeySession> m_session;

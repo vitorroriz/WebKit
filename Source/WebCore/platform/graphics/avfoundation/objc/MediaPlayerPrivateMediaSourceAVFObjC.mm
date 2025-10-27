@@ -103,6 +103,7 @@ Ref<AudioVideoRenderer> MediaPlayerPrivateMediaSourceAVFObjC::createRenderer(Log
 MediaPlayerPrivateMediaSourceAVFObjC::MediaPlayerPrivateMediaSourceAVFObjC(MediaPlayer* player)
     : m_player(player)
     , m_seekTimer(*this, &MediaPlayerPrivateMediaSourceAVFObjC::seekInternal)
+    , m_rendererSeekRequest(NativePromiseRequest::create())
     , m_networkState(MediaPlayer::NetworkState::Empty)
     , m_readyState(MediaPlayer::ReadyState::HaveNothing)
     , m_logger(player->mediaPlayerLogger())
@@ -508,7 +509,7 @@ void MediaPlayerPrivateMediaSourceAVFObjC::seekInternal()
 
 void MediaPlayerPrivateMediaSourceAVFObjC::startSeek(const MediaTime& seekTime)
 {
-    if (m_rendererSeekRequest) {
+    if (m_rendererSeekRequest->hasCallback()) {
         ALWAYS_LOG(LOGIDENTIFIER, "Seeking pending, cancel earlier seek");
         cancelPendingSeek();
     }
@@ -520,7 +521,7 @@ void MediaPlayerPrivateMediaSourceAVFObjC::startSeek(const MediaTime& seekTime)
         if (!protectedThis)
             return;
 
-        protectedThis->m_rendererSeekRequest.complete();
+        protectedThis->m_rendererSeekRequest->complete();
 
         if (!result) {
             ASSERT(result.error() == PlatformMediaError::RequiresFlushToResume);
@@ -530,13 +531,13 @@ void MediaPlayerPrivateMediaSourceAVFObjC::startSeek(const MediaTime& seekTime)
             return;
         }
         protectedThis->completeSeek(*result);
-    })->track(m_rendererSeekRequest);
+    })->track(m_rendererSeekRequest.get());
 }
 
 void MediaPlayerPrivateMediaSourceAVFObjC::cancelPendingSeek()
 {
-    if (m_rendererSeekRequest)
-        m_rendererSeekRequest.disconnect();
+    if (m_rendererSeekRequest->hasCallback())
+        m_rendererSeekRequest->disconnect();
 }
 
 void MediaPlayerPrivateMediaSourceAVFObjC::completeSeek(const MediaTime& seekedTime)
