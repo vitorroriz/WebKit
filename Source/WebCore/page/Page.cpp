@@ -2769,7 +2769,7 @@ void Page::handleThermalMitigationChange(bool thermalMitigationEnabled)
 
     m_throttlingReasons.set(ThrottlingReason::ThermalMitigation, thermalMitigationEnabled);
 
-    if (settings().respondToThermalPressureAggressively() && canUpdateThrottlingReason(ThrottlingReason::AggressiveThermalMitigation)) {
+    if (settings().respondToThermalPressureAggressively()) {
         m_throttlingReasons.set(ThrottlingReason::AggressiveThermalMitigation, thermalMitigationEnabled);
         if (CheckedPtr scheduler = existingRenderingUpdateScheduler())
             scheduler->adjustRenderingUpdateFrequency();
