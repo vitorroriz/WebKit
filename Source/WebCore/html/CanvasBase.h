@@ -150,7 +150,7 @@ protected:
     RefPtr<ScriptExecutionContext> protectedCanvasBaseScriptExecutionContext() const;
     virtual std::unique_ptr<CSSParserContext> createCSSParserContext() const = 0;
 
-    virtual void setSize(const IntSize&);
+    void setSize(const IntSize&);
 
     RefPtr<ImageBuffer> setImageBuffer(RefPtr<ImageBuffer>&&) const;
     String lastFillText() const { return m_lastFillText; }
