@@ -89,6 +89,8 @@ http/wpt/webxr [ Pass ]
 webxr [ Pass ]
 http/tests/iframe-monitor [ Pass ]
 
+media/modern-media-controls/visionos-inline-media-controls [ Pass ]
+
 ###################################################################################################
 ### START OF Legitimate failures (due to platform behavioral differences)
 
