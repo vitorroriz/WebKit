@@ -98,6 +98,7 @@ private:
     void captureGridArea();
     void captureAnchorGeometry();
     LayoutRange adjustForPositionArea(const LayoutRange rangeToAdjust, const LayoutRange anchorArea, const BoxAxis containerAxis);
+    std::pair<bool, bool> containerAllowsInfiniteOverflow() const;
 
     bool needsGridAreaAdjustmentBeforeStaticPositioning() const;
     std::optional<LayoutUnit> remainingSpaceForStaticAlignment(LayoutUnit itemSize) const;

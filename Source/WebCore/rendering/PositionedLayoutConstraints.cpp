@@ -438,23 +438,25 @@ LayoutUnit PositionedLayoutConstraints::resolveAlignmentShift(LayoutUnit unusedS
         auto spaceAfter = std::max(0_lu, m_originalContainingRange.max() - m_insetModifiedContainingRange.max());
         auto spaceBefore = std::max(0_lu, m_insetModifiedContainingRange.min() - m_originalContainingRange.min());
 
+        auto [allowsInfiniteOverflowBefore, allowsInfiniteOverflowAfter] = containerAllowsInfiniteOverflow();
+
         if (startIsBefore) {
             // Avoid overflow on the end side
             spaceAfter += (unusedSpace - shift);
-            if (spaceAfter < 0)
+            if (spaceAfter < 0 && !allowsInfiniteOverflowAfter)
                 shift += spaceAfter;
             // Disallow overflow on the start side.
             spaceBefore += shift;
-            if (spaceBefore < 0)
+            if (spaceBefore < 0 && !allowsInfiniteOverflowBefore)
                 shift -= spaceBefore;
         } else {
             // Avoid overflow on the end side
             spaceBefore += shift;
-            if (spaceBefore < 0)
+            if (spaceBefore < 0 && !allowsInfiniteOverflowBefore)
                 shift -= spaceBefore;
             // Disallow overflow on the start side.
             spaceAfter += (unusedSpace - shift);
-            if (spaceAfter < 0)
+            if (spaceAfter < 0 && !allowsInfiniteOverflowAfter)
                 shift += spaceAfter;
         }
 
@@ -483,6 +485,21 @@ ItemPosition PositionedLayoutConstraints::resolveAlignmentValue() const
     if (!m_defaultAnchorBox && alignmentPosition == ItemPosition::AnchorCenter)
         return ItemPosition::Center;
     return alignmentPosition;
+}
+
+std::pair<bool, bool> PositionedLayoutConstraints::containerAllowsInfiniteOverflow() const
+{
+    if (!m_container->hasPotentiallyScrollableOverflow())
+        return { false, false };
+    auto* containerBox = dynamicDowncast<RenderBox>(m_container.get());
+    ASSERT(containerBox);
+    if (!containerBox)
+        return { false, false };
+
+    auto overflowLimits = containerBox->allowedLayoutOverflow(); // Already in flipped coordinates.
+    return m_physicalAxis == BoxAxis::Vertical
+        ? std::pair<bool, bool> { !overflowLimits.top(), !overflowLimits.bottom() }
+        : std::pair<bool, bool> { !overflowLimits.left(), !overflowLimits.right() };
 }
 
 bool PositionedLayoutConstraints::alignmentAppliesStretch(ItemPosition normalAlignment) const
