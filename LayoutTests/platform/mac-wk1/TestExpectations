@@ -1695,9 +1695,6 @@ http/wpt/cross-origin-opener-policy [ Skip ]
 http/wpt/html/cross-origin-embedder-policy [ Skip ]
 
 # Quota check missing in WK1
-http/tests/IndexedDB/storage-limit.https.html [ Skip ]
-http/tests/IndexedDB/storage-limit-1.https.html [ Skip ]
-http/tests/IndexedDB/storage-limit-2.https.html [ Skip ]
 storage/indexeddb/storage-limit.html [ Skip ]
 storage/indexeddb/storage-limit-with-indices.html [ Skip ]
 storage/indexeddb/request-size-estimate.html [ Skip ]

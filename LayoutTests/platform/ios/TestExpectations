@@ -6341,8 +6341,6 @@ webkit.org/b/210201 [ Debug ] editing/editability/empty-document-delete.html [ P
 
 webkit.org/b/210219 [ Debug ] http/tests/IndexedDB/collect-IDB-objects.https.html [ Pass Crash ]
 
-webkit.org/b/209189 http/tests/IndexedDB/storage-limit.https.html [ Pass Failure Timeout ]
-
 webkit.org/b/211928 http/tests/resourceLoadStatistics/standalone-web-application-exempt-from-website-data-deletion.html [ Pass Timeout ]
 
 webkit.org/b/231295 http/tests/app-privacy-report/app-attribution-ping-load.html [ Timeout ]
@@ -8102,8 +8100,6 @@ webkit.org/b/295999 media/media-garbage-collection.html [ Pass Failure Timeout ]
 webkit.org/b/296010 [ Debug ] fast/frames/frame-append-body-child-crash.html [ Pass Failure ]
 
 webkit.org/b/295992 [ Release ] http/tests/geolocation/geolocation-watch-position-does-not-leak.https.html [ Pass Failure ]
-
-webkit.org/b/295993 http/tests/IndexedDB/storage-limit-1.https.html [ Pass Failure ]
 
 webkit.org/b/295989 [ Release ] http/tests/misc/embed-image-load-outlives-gc-without-crashing.html [ Pass Timeout ]
 

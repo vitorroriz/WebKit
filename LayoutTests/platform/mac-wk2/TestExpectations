@@ -1046,8 +1046,6 @@ webkit.org/b/209148 imported/w3c/web-platform-tests/mediacapture-streams/MediaSt
 
 webkit.org/b/209183 webrtc/concurrentVideoPlayback.html [ Pass Timeout ]
 
-webkit.org/b/209189 http/tests/IndexedDB/storage-limit.https.html [ Pass Failure ]
-
 webkit.org/b/209283 tiled-drawing/scrolling/scroll-iframe-latched-selects.html [ Pass Failure ]
 
 webkit.org/b/209564 svg/as-image/svg-image-with-data-uri-background.html [ Pass ImageOnlyFailure ]
