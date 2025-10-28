@@ -100,7 +100,7 @@ private:
     LayoutRange adjustForPositionArea(const LayoutRange rangeToAdjust, const LayoutRange anchorArea, const BoxAxis containerAxis);
 
     bool needsGridAreaAdjustmentBeforeStaticPositioning() const;
-    bool isEligibleForStaticRangeAlignment(LayoutUnit spaceInStaticRange, LayoutUnit itemSize) const;
+    std::optional<LayoutUnit> remainingSpaceForStaticAlignment(LayoutUnit itemSize) const;
     void computeStaticPosition();
     void computeInlineStaticDistance();
     void computeBlockStaticDistance();
