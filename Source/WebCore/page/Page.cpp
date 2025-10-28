@@ -1092,7 +1092,7 @@ void Page::initGroup()
 {
     ASSERT(!m_singlePageGroup);
     ASSERT(!m_group);
-    m_singlePageGroup = makeUnique<PageGroup>(*this);
+    m_singlePageGroup = PageGroup::create(*this).moveToUniquePtr();
     m_group = m_singlePageGroup.get();
 }
 

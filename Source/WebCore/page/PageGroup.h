@@ -28,6 +28,7 @@
 #include <wtf/CheckedRef.h>
 #include <wtf/Noncopyable.h>
 #include <wtf/TZoneMalloc.h>
+#include <wtf/UniqueRef.h>
 #include <wtf/WeakHashSet.h>
 #include <wtf/text/WTFString.h>
 
@@ -43,8 +44,8 @@ class PageGroup final : public CanMakeWeakPtr<PageGroup>, public CanMakeCheckedP
     WTF_MAKE_NONCOPYABLE(PageGroup);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(PageGroup);
 public:
-    WEBCORE_EXPORT explicit PageGroup(const String& name);
-    explicit PageGroup(Page&);
+    WEBCORE_EXPORT static UniqueRef<PageGroup> create(const String&);
+    WEBCORE_EXPORT static UniqueRef<PageGroup> create(Page&);
     WEBCORE_EXPORT ~PageGroup();
 
     WEBCORE_EXPORT static PageGroup* pageGroup(const String& groupName);
@@ -65,6 +66,9 @@ public:
 #endif
 
 private:
+    WEBCORE_EXPORT explicit PageGroup(const String&);
+    WEBCORE_EXPORT explicit PageGroup(Page&);
+
     String m_name;
     WeakHashSet<Page> m_pages;
 

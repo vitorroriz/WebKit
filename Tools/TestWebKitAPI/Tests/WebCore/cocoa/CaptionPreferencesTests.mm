@@ -258,7 +258,7 @@ TEST_F(CaptionPreferenceTests, FontFace)
 {
     MediaAccessibilityShim shim;
 
-    PageGroup group { "CaptionPreferenceTests"_s };
+    UniqueRef group = PageGroup::create("CaptionPreferenceTests"_s);
     auto preferences = CaptionUserPreferencesMediaAF::create(group);
 
     SOFT_LINK_SHIM_SET_RESULT(MACaptionAppearanceCopyFontDescriptorForStyle, adoptCF(CTFontDescriptorCreateWithNameAndSize(CFSTR(".AppleSystemUIFontMonospaced-Romulan"), 10)));
@@ -278,7 +278,7 @@ TEST_F(CaptionPreferenceTests, FontSize)
 
     MediaAccessibilityShim shim;
 
-    PageGroup group { "CaptionPreferenceTests"_s };
+    UniqueRef group = PageGroup::create("CaptionPreferenceTests"_s);
     auto preferences = CaptionUserPreferencesMediaAF::create(group);
 
     SOFT_LINK_SHIM_SET_RESULT(MACaptionAppearanceGetRelativeCharacterSize, 2.f);
@@ -293,7 +293,7 @@ TEST_F(CaptionPreferenceTests, Colors)
 {
     MediaAccessibilityShim shim;
 
-    PageGroup group { "CaptionPreferenceTests"_s };
+    UniqueRef group = PageGroup::create("CaptionPreferenceTests"_s);
     auto preferences = CaptionUserPreferencesMediaAF::create(group);
 
     SOFT_LINK_SHIM_SET_RESULT(MACaptionAppearanceCopyForegroundColor, cachedCGColor(Color::red));
@@ -317,7 +317,7 @@ TEST_F(CaptionPreferenceTests, BorderRadius)
 {
     MediaAccessibilityShim shim;
 
-    PageGroup group { "CaptionPreferenceTests"_s };
+    UniqueRef group = PageGroup::create("CaptionPreferenceTests"_s);
     auto preferences = CaptionUserPreferencesMediaAF::create(group);
 
     SOFT_LINK_SHIM_SET_RESULT(MACaptionAppearanceGetWindowRoundedCornerRadius, 8.f);
@@ -328,7 +328,7 @@ TEST_F(CaptionPreferenceTests, TextEdge)
 {
     MediaAccessibilityShim shim;
 
-    PageGroup group { "CaptionPreferenceTests"_s };
+    UniqueRef group = PageGroup::create("CaptionPreferenceTests"_s);
     auto preferences = CaptionUserPreferencesMediaAF::create(group);
 
     EXPECT_STREQ(preferences->captionsTextEdgeCSS().utf8().data(), "");

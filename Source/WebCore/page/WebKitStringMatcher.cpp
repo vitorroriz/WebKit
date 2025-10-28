@@ -110,9 +110,7 @@ struct WebKitStringMatcher::Trie {
     bool operator==(const Trie&) const = default;
     struct Node;
     using Edges = HashMap<uint32_t, Node, WTF::IntHash<uint32_t>, WTF::UnsignedWithZeroKeyHashTraits<uint32_t>>;
-    struct Node : public CanMakeCheckedPtr<Node> {
-        WTF_MAKE_STRUCT_TZONE_ALLOCATED(Node);
-        WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(Node);
+    struct Node {
     public:
         bool operator==(const Node&) const = default;
         bool traverse(const Function<bool(const Node&)>& visitor) const;
@@ -132,14 +130,12 @@ struct WebKitStringMatcher::Trie {
     Node root;
 };
 
-WTF_MAKE_STRUCT_TZONE_ALLOCATED_IMPL(WebKitStringMatcher::Trie::Node);
-
 bool WebKitStringMatcher::Trie::Node::traverse(const Function<bool(const Node&)>& visitor) const
 {
     if (!visitor(*this))
         return false;
-    for (CheckedRef child : edges.values()) {
-        if (!child->traverse(visitor))
+    for (auto& child : edges.values()) {
+        if (!child.traverse(visitor))
             return false;
     }
     return true;
@@ -148,16 +144,16 @@ bool WebKitStringMatcher::Trie::Node::traverse(const Function<bool(const Node&)>
 WebKitStringMatcher::Trie::Trie(const Vector<std::pair<String, uint16_t>>& stringsAndIdentifiers)
 {
     for (auto& [string, identifier] : stringsAndIdentifiers) {
-        CheckedRef node { root };
+        auto* node = &root;
         for (auto codeUnit : StringView(string).codeUnits()) {
             uint32_t key = codeUnit & std::numeric_limits<uint16_t>::max();
             RELEASE_ASSERT(Edges::isValidKey(key));
-            auto addResult = node.get().edges.ensure(key, [] {
+            auto addResult = node->edges.ensure(key, [] {
                 return Trie::Node { };
             });
-            node = addResult.iterator->value;
+            node = &addResult.iterator->value;
         }
-        node.get().identifiers.append(identifier);
+        node->identifiers.append(identifier);
     }
 }
 
@@ -166,12 +162,12 @@ auto WebKitStringMatcher::Trie::serialize() const -> std::optional<SerializedDFA
     Vector<std::optional<WebKitStringMatcher::State>> states;
     Vector<WebKitStringMatcher::Transition> transitions;
 
-    HashMap<CheckedRef<const Trie::Node>, uint16_t> nodeToStateIndex;
+    HashMap<const Trie::Node*, uint16_t> nodeToStateIndex;
     bool serializedStates = root.traverse([&] (const Trie::Node& node) {
         ASSERT(!nodeToStateIndex.contains(&node));
         if (states.size() > std::numeric_limits<uint16_t>::max())
             return false;
-        nodeToStateIndex.set(node, static_cast<uint16_t>(states.size()));
+        nodeToStateIndex.set(&node, static_cast<uint16_t>(states.size()));
         for (auto& identifier : node.identifiers)
             states.append(WebKitStringMatcher::State { identifier, WebKitStringMatcher::State::matchSentinel });
         states.append(std::nullopt);
