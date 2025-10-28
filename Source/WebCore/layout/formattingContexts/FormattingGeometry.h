@@ -78,8 +78,9 @@ public:
 
     std::optional<LayoutUnit> computedValue(const auto&, LayoutUnit containingBlockWidth) const;
     std::optional<LayoutUnit> computedValue(const auto&, LayoutUnit containingBlockWidth, const Style::ZoomFactor&) const;
-    std::optional<LayoutUnit> fixedValue(const auto&) const;
+
     std::optional<LayoutUnit> fixedValue(const auto&, const Style::ZoomFactor&) const;
+    std::optional<LayoutUnit> fixedValue(const auto&) const;
 
     std::optional<LayoutUnit> computedMinHeight(const Box&, std::optional<LayoutUnit> containingBlockHeight = std::nullopt) const;
     std::optional<LayoutUnit> computedMaxHeight(const Box&, std::optional<LayoutUnit> containingBlockHeight = std::nullopt) const;

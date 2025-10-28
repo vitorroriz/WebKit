@@ -1993,7 +1993,7 @@ bool Quirks::needsClaudeSidebarViewportUnitQuirk(Element& element, const RenderS
         return false;
 
     if (auto fixedHeight = style.height().tryFixed()) {
-        if (fixedHeight->resolveZoom(Style::ZoomNeeded { }) == m_document->renderView()->sizeForCSSDefaultViewportUnits().height())
+        if (fixedHeight->resolveZoom(style.usedZoomForLength()) == m_document->renderView()->sizeForCSSDefaultViewportUnits().height())
             return true;
     }
 
