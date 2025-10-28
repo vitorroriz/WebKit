@@ -2402,3 +2402,11 @@ webkit.org/b/301566 [ Debug ] imported/w3c/web-platform-tests/custom-elements/re
 # webkit.org/b/301384 REGRESSION(301931@main): [macOS x86_64] two tests in imported/w3c/web-platform-tests/css/css-backgrounds are constant image only failure 
 [ Release x86_64 ] imported/w3c/web-platform-tests/css/css-backgrounds/background-repeat-space-6.html [ ImageOnlyFailure ]
 [ Release x86_64 ] imported/w3c/web-platform-tests/css/css-backgrounds/background-repeat-space-7.html [ ImageOnlyFailure ]
+
+# webkit.org/b/301589 [Tahoe wk2 Debug arm64] 6 tests in http/tests/media/hls are timing out
+[ Tahoe Debug arm64 ] http/tests/media/hls/hls-audio-tracks-language.html [ Timeout ]
+[ Tahoe Debug arm64 ] http/tests/media/hls/hls-webvtt-default.html [ Timeout ]
+[ Tahoe Debug arm64 ] http/tests/media/hls/hls-webvtt-style.html [ Timeout ]
+[ Tahoe Debug arm64 ] http/tests/media/hls/range-request-cross-origin.html [ Timeout ]
+[ Tahoe Debug arm64 ] http/tests/media/hls/track-in-band-multiple-cues.html [ Timeout ]
+[ Tahoe Debug arm64 ] http/tests/media/hls/track-webvtt-multitracks.html [ Timeout ]
