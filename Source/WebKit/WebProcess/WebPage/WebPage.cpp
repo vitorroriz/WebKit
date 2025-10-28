@@ -9698,7 +9698,7 @@ void WebPage::takeSnapshotOfExtractedText(TextExtraction::ExtractedText&& extrac
 
 void WebPage::describeTextExtractionInteraction(TextExtraction::Interaction&& interaction, CompletionHandler<void(TextExtraction::InteractionDescription&&)>&& completion)
 {
-    completion(TextExtraction::interactionDescription(interaction));
+    completion(TextExtraction::interactionDescription(interaction, Ref { *corePage() }));
 }
 
 void WebPage::handleTextExtractionInteraction(TextExtraction::Interaction&& interaction, CompletionHandler<void(bool, String&&)>&& completion)

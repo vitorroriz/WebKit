@@ -1010,6 +1010,17 @@ static void dispatchSimulatedClick(Page& page, IntPoint location, CompletionHand
     completion(true, { });
 }
 
+static Node* findNodeAtRootViewLocation(const LocalFrameView& view, Document& document, FloatPoint locationInRootView)
+{
+    static constexpr OptionSet defaultHitTestOptions {
+        HitTestRequest::Type::ReadOnly,
+        HitTestRequest::Type::DisallowUserAgentShadowContent,
+    };
+
+    HitTestResult result { view.rootViewToContents(roundedIntPoint(locationInRootView)) };
+    return document.hitTest(defaultHitTestOptions, result) ? result.innerNode() : nullptr;
+}
+
 static void dispatchSimulatedClick(Node& targetNode, const String& searchText, CompletionHandler<void(bool, String&&)>&& completion)
 {
     RefPtr element = dynamicDowncast<Element>(targetNode);
@@ -1037,11 +1048,6 @@ static void dispatchSimulatedClick(Node& targetNode, const String& searchText, C
     if (!page)
         return completion(false, "Document has been detached from the page"_s);
 
-    static constexpr OptionSet defaultHitTestOptions {
-        HitTestRequest::Type::ReadOnly,
-        HitTestRequest::Type::DisallowUserAgentShadowContent,
-    };
-
     std::optional<FloatRect> targetRectInRootView;
     if (!searchText.isEmpty()) {
         auto foundRange = searchForText(*element, searchText);
@@ -1061,13 +1067,9 @@ static void dispatchSimulatedClick(Node& targetNode, const String& searchText, C
         targetRectInRootView = rootViewBounds(*element);
 
     auto centerInRootView = roundedIntPoint(targetRectInRootView->center());
-    auto centerInContents = view->rootViewToContents(centerInRootView);
-    HitTestResult result { centerInContents };
-    if (document->hitTest(defaultHitTestOptions, result)) {
-        if (RefPtr target = result.innerNode(); target && (target == element || target->isShadowIncludingDescendantOf(*element))) {
-            // Dispatch mouse events over the center of the element, if possible.
-            return dispatchSimulatedClick(*page, centerInRootView, WTFMove(completion));
-        }
+    if (RefPtr target = findNodeAtRootViewLocation(*view, document, centerInRootView); target && (target == element || target->isShadowIncludingDescendantOf(*element))) {
+        // Dispatch mouse events over the center of the element, if possible.
+        return dispatchSimulatedClick(*page, centerInRootView, WTFMove(completion));
     }
 
     UserGestureIndicator indicator { IsProcessingUserGesture::Yes, element->protectedDocument().ptr() };
@@ -1429,12 +1431,8 @@ static String textDescription(const Element& element, Vector<String>& stringsToV
     return parentDescription;
 }
 
-static String textDescription(std::optional<NodeIdentifier> identifier, Vector<String>& stringsToValidate)
+static String textDescription(Node* node, Vector<String>& stringsToValidate)
 {
-    if (!identifier)
-        return { };
-
-    RefPtr node = Node::fromIdentifier(*identifier);
     if (!node)
         return { };
 
@@ -1474,7 +1472,36 @@ static String textDescription(std::optional<NodeIdentifier> identifier, Vector<S
     return { };
 }
 
-InteractionDescription interactionDescription(const Interaction& interaction)
+static String textDescription(std::optional<NodeIdentifier> identifier, Vector<String>& stringsToValidate)
+{
+    if (!identifier)
+        return { };
+
+    return textDescription(RefPtr { Node::fromIdentifier(*identifier) }.get(), stringsToValidate);
+}
+
+static String textDescription(Page& page, FloatPoint locationInRootView, Vector<String>& stringsToValidate)
+{
+    RefPtr frame = page.localMainFrame();
+    if (!frame)
+        return { };
+
+    RefPtr document = frame->document();
+    if (!document)
+        return { };
+
+    RefPtr view = frame->view();
+    if (!view)
+        return { };
+
+    RefPtr targetNode = findNodeAtRootViewLocation(*view, *document, locationInRootView);
+    if (!targetNode)
+        return { };
+
+    return textDescription(targetNode.get(), stringsToValidate);
+}
+
+InteractionDescription interactionDescription(const Interaction& interaction, Page& page)
 {
     auto action = interaction.action;
     bool isSingleKeyPress = action == Action::KeyPress && PlatformKeyboardEvent::syntheticEventFromText(PlatformEvent::Type::KeyUp, interaction.text);
@@ -1511,13 +1538,12 @@ InteractionDescription interactionDescription(const Interaction& interaction)
         }
     }
 
-    if (auto location = interaction.locationInRootView) {
-        auto roundedLocation = roundedIntPoint(*location);
-        description.append(" at coordinates ("_s, roundedLocation.x(), ", "_s, roundedLocation.y(), ')');
-    }
+    auto appendElementString = [&]<typename... T>(T&&... args) {
+        auto elementString = textDescription(std::forward<T>(args)...);
+        if (elementString.isEmpty())
+            return;
 
-    if (auto elementString = textDescription(interaction.nodeIdentifier, stringsToValidate); !elementString.isEmpty()) {
-        auto prefix = [action] -> String {
+        auto elementPrefix = [action] -> String {
             switch (action) {
             case Action::Click:
                 return " on "_s;
@@ -1533,8 +1559,16 @@ InteractionDescription interactionDescription(const Interaction& interaction)
             ASSERT_NOT_REACHED();
             return { };
         }();
-        description.append(makeString(WTFMove(prefix), WTFMove(elementString)));
-    }
+
+        description.append(makeString(WTFMove(elementPrefix), WTFMove(elementString)));
+    };
+
+    if (auto location = interaction.locationInRootView) {
+        auto roundedLocation = roundedIntPoint(*location);
+        description.append(" at coordinates ("_s, roundedLocation.x(), ", "_s, roundedLocation.y(), ')');
+        appendElementString(page, *location, stringsToValidate);
+    } else
+        appendElementString(interaction.nodeIdentifier, stringsToValidate);
 
     bool appendedReplaceTextDescription = false;
     if ((action == Action::KeyPress || action == Action::TextInput) && interaction.replaceAll) {
