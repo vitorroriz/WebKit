@@ -30,7 +30,7 @@
 
 namespace WebKit {
 
-class IconDatabase : public ThreadSafeRefCounted<IconDatabase> {
+class IconDatabase : public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<IconDatabase> {
 public:
     enum class AllowDatabaseWrite : bool { No, Yes };
 

@@ -203,22 +203,47 @@ public:
         WTF_DEPRECATED_MAKE_FAST_ALLOCATED(Timer);
     public:
         template <typename TimerFiredClass>
-        requires (WTF::HasRefPtrMemberFunctions<TimerFiredClass>::value)
+        requires (WTF::HasThreadSafeWeakPtrFunctions<TimerFiredClass>::value)
         Timer(Ref<RunLoop>&& runLoop, ASCIILiteral description, TimerFiredClass* object, void (TimerFiredClass::*function)())
-            : Timer(WTFMove(runLoop), description, [object, function] SUPPRESS_UNCOUNTED_LAMBDA_CAPTURE { // The Timer's owner is expected to cancel the Timer in its destructor.
-                RefPtr protectedObject { object };
-                (object->*function)();
+            : Timer(WTFMove(runLoop), description, [weakObject = ThreadSafeWeakPtr { *object }, function] {
+                if (RefPtr object = weakObject.get())
+                    (object.get()->*function)();
             })
         {
         }
 
         template <typename TimerFiredClass>
-        requires (WTF::HasCheckedPtrMemberFunctions<TimerFiredClass>::value && !WTF::HasRefPtrMemberFunctions<TimerFiredClass>::value)
+        requires (!WTF::HasThreadSafeWeakPtrFunctions<TimerFiredClass>::value && WTF::HasWeakPtrFunctions<TimerFiredClass>::value && WTF::HasRefPtrMemberFunctions<TimerFiredClass>::value)
         Timer(Ref<RunLoop>&& runLoop, ASCIILiteral description, TimerFiredClass* object, void (TimerFiredClass::*function)())
-            : Timer(WTFMove(runLoop), description, [object, function] SUPPRESS_UNCOUNTED_LAMBDA_CAPTURE { // The Timer's owner is expected to cancel the Timer in its destructor.
-                CheckedPtr checkedObject { object };
-                (object->*function)();
+            : Timer(WTFMove(runLoop), description, [weakObject = WeakPtr { *object }, function] {
+                if (RefPtr object = weakObject.get())
+                    (object.get()->*function)();
             })
+        {
+        }
+
+        template <typename TimerFiredClass>
+        requires (!WTF::HasThreadSafeWeakPtrFunctions<TimerFiredClass>::value && WTF::HasWeakPtrFunctions<TimerFiredClass>::value && !WTF::HasRefPtrMemberFunctions<TimerFiredClass>::value && WTF::HasCheckedPtrMemberFunctions<TimerFiredClass>::value)
+        Timer(Ref<RunLoop>&& runLoop, ASCIILiteral description, TimerFiredClass* object, void (TimerFiredClass::*function)())
+            : Timer(WTFMove(runLoop), description, [weakObject = WeakPtr { *object }, function] {
+                if (CheckedPtr object = weakObject.get())
+                    (object.get()->*function)();
+            })
+        {
+        }
+
+        template <typename TimerFiredClass>
+        requires (!WTF::HasThreadSafeWeakPtrFunctions<TimerFiredClass>::value && !WTF::HasWeakPtrFunctions<TimerFiredClass>::value && WTF::HasCheckedPtrMemberFunctions<TimerFiredClass>::value)
+        Timer(Ref<RunLoop>&& runLoop, ASCIILiteral description, TimerFiredClass* object, void (TimerFiredClass::*function)())
+            : Timer(WTFMove(runLoop), description, [object = CheckedRef { *object }, function] {
+                (object.ptr()->*function)();
+            })
+        {
+        }
+
+        Timer(Ref<RunLoop>&& runLoop, ASCIILiteral description, Function<void ()>&& function)
+            : TimerBase(WTFMove(runLoop), description)
+            , m_function(WTFMove(function))
         {
         }
 
@@ -227,15 +252,6 @@ public:
         requires (!WTF::HasRefPtrMemberFunctions<TimerFiredClass>::value && !WTF::HasCheckedPtrMemberFunctions<TimerFiredClass>::value)
         Timer(Ref<RunLoop>&& runLoop, ASCIILiteral description, TimerFiredClass* object, void (TimerFiredClass::*function)())
             : Timer(WTFMove(runLoop), description, std::bind(function, object))
-        {
-            static_assert(IsDeprecatedTimerSmartPointerException<std::remove_cv_t<TimerFiredClass>>::value,
-                "Classes that use Timer should be ref-counted or CanMakeCheckedPtr. Please do not add new exceptions."
-            );
-        }
-
-        Timer(Ref<RunLoop>&& runLoop, ASCIILiteral description, Function<void ()>&& function)
-            : TimerBase(WTFMove(runLoop), description)
-            , m_function(WTFMove(function))
         {
         }
 
