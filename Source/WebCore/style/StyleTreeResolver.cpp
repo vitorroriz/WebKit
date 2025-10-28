@@ -232,14 +232,16 @@ ResolvedStyle TreeResolver::styleForStyleable(const Styleable& styleable, Resolu
     return resolvedStyle;
 }
 
-static void resetStyleForNonRenderedDescendants(Element& current)
+void TreeResolver::resetStyleForNonRenderedDescendants(Element& subtreeRoot)
 {
-    auto descendants = descendantsOfType<Element>(current);
+    auto descendants = composedTreeDescendants(subtreeRoot);
     for (auto it = descendants.begin(); it != descendants.end();) {
-        if (it->needsStyleRecalc()) {
-            it->resetComputedStyle();
-            it->resetStyleRelations();
-            it->setHasValidStyle();
+        if (auto* element = dynamicDowncast<Element>(*it)) {
+            if (element->needsStyleRecalc()) {
+                element->resetComputedStyle();
+                element->resetStyleRelations();
+                element->setHasValidStyle();
+            }
         }
 
         if (it->childNeedsStyleRecalc()) {
@@ -248,7 +250,22 @@ static void resetStyleForNonRenderedDescendants(Element& current)
         } else
             it.traverseNextSkippingChildren();
     }
-    current.clearChildNeedsStyleRecalc();
+
+    auto nonRenderedElementsWithPositionOptions = [&] () {
+        Vector<RefPtr<const Element>> result;
+        for (auto& styleable : m_positionOptions.keys()) {
+            if (styleable.first->isComposedTreeDescendantOf(subtreeRoot))
+                result.append(styleable.first);
+        }
+
+        return result;
+    }();
+
+    m_positionOptions.removeIf([&nonRenderedElementsWithPositionOptions] (const auto& kv) {
+        return nonRenderedElementsWithPositionOptions.contains(kv.key.first);
+    });
+
+    subtreeRoot.clearChildNeedsStyleRecalc();
 }
 
 static bool affectsRenderedSubtree(Element& element, const RenderStyle& newStyle)
