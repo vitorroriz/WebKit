@@ -1603,6 +1603,14 @@ struct WKWebsiteData {
     }).get()];
 }
 
+- (void)_isStorageSuspendedForTesting:(void(^)(BOOL))completionHandler
+{
+    auto completionHandlerCopy = makeBlockPtr(completionHandler);
+    protectedWebsiteDataStore(self)->isStorageSuspendedForTesting([completionHandlerCopy = WTFMove(completionHandlerCopy)](auto result) {
+        completionHandlerCopy(result);
+    });
+}
+
 @end
 
 #if PLATFORM(IOS)

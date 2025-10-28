@@ -2944,4 +2944,9 @@ void WebsiteDataStore::clearStorageAccessForTesting(CompletionHandler<void()>&& 
     protectedNetworkProcess()->sendWithAsyncReply(Messages::NetworkProcess::ClearStorageAccessForTesting(m_sessionID), WTFMove(completionHandler));
 }
 
+void WebsiteDataStore::isStorageSuspendedForTesting(CompletionHandler<void(bool)>&& completionHandler) const
+{
+    protectedNetworkProcess()->isStorageSuspendedForTesting(m_sessionID, WTFMove(completionHandler));
+}
+
 } // namespace WebKit

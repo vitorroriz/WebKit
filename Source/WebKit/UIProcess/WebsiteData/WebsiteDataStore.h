@@ -521,6 +521,7 @@ public:
 
     void setStorageAccessPermissionForTesting(bool, WebPageProxyIdentifier, const String& topFrameDomain, const String& subFrameDomain, CompletionHandler<void()>&&);
     void clearStorageAccessForTesting(CompletionHandler<void()>&&);
+    void isStorageSuspendedForTesting(CompletionHandler<void(bool)>&&) const;
 
 private:
     enum class ForceReinitialization : bool { No, Yes };
