@@ -2250,7 +2250,13 @@ LayoutRange RenderGrid::gridAreaRangeForOutOfFlow(const RenderBox& gridItem, Sty
 
     LayoutUnit start;
     LayoutUnit end;
+
     auto& positions = this->positions(direction);
+    if (positions.isEmpty()) {
+        ASSERT_WITH_SECURITY_IMPLICATION(!positions.isEmpty());
+        return LayoutRange(borderEdge, isRowAxis ? clientLogicalWidth() : clientLogicalHeight());
+    }
+
     if (startIsAuto)
         start = borderEdge;
     else {
