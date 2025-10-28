@@ -155,7 +155,7 @@ private:
         const CheckedRef<StreamClientConnection> m_owner;
         WeakPtr<Connection::Client> m_receiver;
     };
-    std::optional<DedicatedConnectionClient> m_dedicatedConnectionClient;
+    const std::unique_ptr<DedicatedConnectionClient> m_dedicatedConnectionClient;
     uint64_t m_currentDestinationID { 0 };
     StreamClientConnectionBuffer m_buffer;
     unsigned m_maxBatchSize { 100 }; // Number of messages marked as StreamBatched to accumulate before notifying the server.
