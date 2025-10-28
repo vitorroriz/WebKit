@@ -98,11 +98,11 @@ void initialize()
     auto osVersionSupports = [] (void* storageAddress) {
         auto addressValue = reinterpret_cast<uintptr_t>(storageAddress);
         uintptr_t pageSizeMask = CeilingOnPageSize - 1;
-        uintptr_t fourGigabyteBoundary = 4 * GB;
 
         if (addressValue & pageSizeMask)
             return false; // os_script_config_storage should be page aligned.
 #if CPU(ADDRESS64)
+        uintptr_t fourGigabyteBoundary = 4 * GB;
         if (addressValue < fourGigabyteBoundary)
             return false; // os_script_config_storage would not be positioned under 4G on a 64 bit system.
 #endif
