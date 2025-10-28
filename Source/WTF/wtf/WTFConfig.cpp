@@ -248,7 +248,7 @@ void permanentlyFreezePages(void* base, size_t size, FreezePagePermission permis
     result = vm_protect(mach_task_self(), reinterpret_cast<vm_address_t>(base), size, UpdateMaximumPermission, permission == FreezePagePermission::ReadOnly ? VM_PROT_READ : VM_PROT_NONE);
 #elif OS(LINUX)
     result = mprotect(base, size, permission == FreezePagePermission::ReadOnly ? PROT_READ : PROT_NONE);
-#elif OS(WINDOWS) || PLATFORM(PLAYSTATION)
+#else
     // FIXME: Implement equivalent for Windows, maybe with VirtualProtect.
     // Also need to fix WebKitTestRunner.
     UNUSED_PARAM(base);
