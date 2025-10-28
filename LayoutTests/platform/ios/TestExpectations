@@ -8350,3 +8350,5 @@ imported/w3c/web-platform-tests/editing/run/inserttext.html?2001-last [ Failure 
 # webkit.org/b/301546 [iOS26] Two tests in imported/w3c/web-platform-tests/uievents/mouse are constant failures
 imported/w3c/web-platform-tests/uievents/mouse/mouseover-at-removing-mousedown-target.html?duration=16 [ Failure ]
 imported/w3c/web-platform-tests/uievents/mouse/mouseover-at-removing-mousedown-target.html?duration=42 [ Failure ]
+
+webkit.org/b/301548 imported/w3c/web-platform-tests/uievents/mouse/offset_and_page_after_dispatch.tentative.html [ Failure ]
