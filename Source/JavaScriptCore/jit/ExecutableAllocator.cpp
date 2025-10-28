@@ -1317,6 +1317,8 @@ void* endOfFixedExecutableMemoryPoolImpl()
     return allocator->memoryEnd();
 }
 
+WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
+
 void dumpJITMemory(const void* dst, const void* src, size_t size)
 {
     RELEASE_ASSERT(Options::dumpJITMemoryPath());
@@ -1324,8 +1326,8 @@ void dumpJITMemory(const void* dst, const void* src, size_t size)
 #if OS(DARWIN)
     static Lock dumpJITMemoryLock;
     static int fd WTF_GUARDED_BY_LOCK(dumpJITMemoryLock) = -1;
+    static uint8_t* buffer;
     static constexpr size_t bufferSize = fixedExecutableMemoryPoolSize;
-    static LazyNeverDestroyed<std::array<uint8_t, bufferSize>> buffer;
     static size_t offset WTF_GUARDED_BY_LOCK(dumpJITMemoryLock) = 0;
     static bool needsToFlush WTF_GUARDED_BY_LOCK(dumpJITMemoryLock) = false;
     static LazyNeverDestroyed<Ref<WorkQueue>> flushQueue;
@@ -1339,8 +1341,7 @@ void dumpJITMemory(const void* dst, const void* src, size_t size)
                 fd = open(FileSystem::fileSystemRepresentation(path).data(), O_CREAT | O_TRUNC | O_APPEND | O_WRONLY | O_EXLOCK | O_NONBLOCK, 0666);
                 RELEASE_ASSERT(fd != -1);
             }
-            auto writeSpan = std::span { buffer.get() }.first(offset);
-            ::write(fd, writeSpan.data(), offset);
+            ::write(fd, buffer, offset);
             offset = 0;
             needsToFlush = false;
         }
@@ -1359,20 +1360,19 @@ void dumpJITMemory(const void* dst, const void* src, size_t size)
             });
         }
 
-        static void write(std::span<const uint8_t> sourceSpan) WTF_REQUIRES_LOCK(dumpJITMemoryLock)
+        static void write(const void* src, size_t size) WTF_REQUIRES_LOCK(dumpJITMemoryLock)
         {
-            if (offset + sourceSpan.size() > bufferSize) [[unlikely]]
+            if (offset + size > bufferSize) [[unlikely]]
                 flush();
-            auto bufferSpan = std::span { buffer.get() }.subspan(offset);
-            memcpySpan(bufferSpan, sourceSpan);
-            offset += sourceSpan.size();
+            memcpy(buffer + offset, src, size);
+            offset += size;
             enqueueFlush();
         }
     };
 
     static std::once_flag once;
     std::call_once(once, [] {
-        buffer.construct();
+        buffer = std::bit_cast<uint8_t*>(malloc(bufferSize));
         flushQueue.construct(WorkQueue::create("jsc.dumpJITMemory.queue"_s, WorkQueue::QOS::Background));
         std::atexit([] {
             Locker locker { dumpJITMemoryLock };
@@ -1387,10 +1387,10 @@ void dumpJITMemory(const void* dst, const void* src, size_t size)
     uint64_t dst64 = std::bit_cast<uintptr_t>(dst);
     uint64_t size64 = size;
     TraceScope(DumpJITMemoryStart, DumpJITMemoryStop, time, dst64, size64);
-    DumpJIT::write(asByteSpan(time));
-    DumpJIT::write(asByteSpan(dst64));
-    DumpJIT::write(asByteSpan(size64));
-    DumpJIT::write(unsafeMakeSpan(static_cast<const uint8_t*>(src), size));
+    DumpJIT::write(&time, sizeof(time));
+    DumpJIT::write(&dst64, sizeof(dst64));
+    DumpJIT::write(&size64, sizeof(size64));
+    DumpJIT::write(src, size);
 #else
     UNUSED_PARAM(dst);
     UNUSED_PARAM(src);
@@ -1398,6 +1398,8 @@ void dumpJITMemory(const void* dst, const void* src, size_t size)
     RELEASE_ASSERT_NOT_REACHED();
 #endif
 }
+
+WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 
 #if ENABLE(MPROTECT_RX_TO_RWX)
 void ExecutableAllocator::startWriting(const void* start, size_t sizeInBytes) { g_jscConfig.fixedVMPoolExecutableAllocator->startWriting(start, sizeInBytes); }

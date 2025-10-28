@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 Apple Inc. All rights reserved.
+ * Copyright (C) 2021 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,17 +25,6 @@
 
 #pragma once
 
-// Require that HAVE(TYPE_AWARE_MALLOC) from PlatformHave.h is enabled when
-// _MALLOC_TYPE_ENABLED is true.
-#if defined __has_include && __has_include(<malloc/malloc.h>)
-#include <malloc/malloc.h>
-#endif
-#if USE(APPLE_INTERNAL_SDK) // FIXME: Remove when OS 26 or later is oldest supported OS.
-#if !HAVE(TYPE_AWARE_MALLOC) && (defined(_MALLOC_TYPE_ENABLED) && _MALLOC_TYPE_ENABLED)
-#error _MALLOC_TYPE_ENABLED is enabled without HAVE_TYPE_AWARE_MALLOC
-#endif
-#endif
-
 #if PLATFORM(MAC) || PLATFORM(IOS_FAMILY)
 // Probabilistic Guard Malloc is not really enabled on older platforms but opt those to system malloc too for consistency.
 #define HAVE_PROBABILISTIC_GUARD_MALLOC 1
@@ -43,27 +32,23 @@
 
 namespace WTF {
 
-// Non-template tag type for compatibility with MallocSpan.
-struct SystemMalloc { };
-
-template<typename T>
-struct SystemMallocBase {
-    static T* malloc(size_t size)
+struct SystemMalloc {
+    static void* malloc(size_t size)
     {
-        T* result = static_cast<T*>(::malloc(size));
+        void* result = ::malloc(size);
         if (!result)
             CRASH();
         return result;
     }
 
-    static T* tryMalloc(size_t size)
+    static void* tryMalloc(size_t size)
     {
-        return static_cast<T*>(::malloc(size));
+        return ::malloc(size);
     }
 
-    static T* zeroedMalloc(size_t size)
+    static void* zeroedMalloc(size_t size)
     {
-        T* result = static_cast<T*>(::malloc(size));
+        void* result = ::malloc(size);
         if (!result)
             CRASH();
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
@@ -72,9 +57,9 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
         return result;
     }
 
-    static T* tryZeroedMalloc(size_t size)
+    static void* tryZeroedMalloc(size_t size)
     {
-        T* result = static_cast<T*>(::malloc(size));
+        void* result = ::malloc(size);
         if (!result)
             return nullptr;
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
@@ -83,17 +68,17 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
         return result;
     }
 
-    static T* realloc(void* p, size_t size)
+    static void* realloc(void* p, size_t size)
     {
-        T* result = static_cast<T*>(::realloc(p, size));
+        void* result = ::realloc(p, size);
         if (!result)
             CRASH();
         return result;
     }
 
-    static T* tryRealloc(void* p, size_t size)
+    static void* tryRealloc(void* p, size_t size)
     {
-        return static_cast<T*>(::realloc(p, size));
+        return ::realloc(p, size);
     }
 
     static void free(void* p)
@@ -114,7 +99,6 @@ using ProbabilisticGuardMalloc = SystemMalloc;
 }
 
 using WTF::SystemMalloc;
-using WTF::SystemMallocBase;
 #if HAVE(PROBABILISTIC_GUARD_MALLOC)
 using WTF::ProbabilisticGuardMalloc;
 #endif

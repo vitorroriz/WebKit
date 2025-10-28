@@ -115,26 +115,33 @@ static inline bool shouldRenderInXMLTreeViewerMode(Document& document)
 // infinite recusion.
 
 #if HAVE(TYPE_AWARE_MALLOC)
-using XMLMalloc = WTF::SystemMalloc;
+static void* xmlMallocHelper(size_t size, malloc_type_id_t typeID)
+{
+    return malloc_type_malloc(size, typeID);
+}
 #else
 static void* xmlMallocHelper(size_t size)
 {
     return xmlMalloc(size);
 }
+#endif
 
 static void xmlFreeHelper(void* p)
 {
+#if HAVE(TYPE_AWARE_MALLOC)
+    free(p);
+#else
     xmlFree(p);
+#endif
 }
 
 struct XMLMalloc {
-    static void* malloc(size_t size)
+    static void* malloc(size_t size) WTF_TYPE_AWARE_MALLOC_FUNCTION(xmlMallocHelper, 1)
     {
         return xmlMallocHelper(size);
     }
     static void free(void* p) { xmlFreeHelper(p); }
 };
-#endif
 
 static std::span<xmlChar> unsafeSpanIncludingNullTerminator(xmlChar* string)
 {
