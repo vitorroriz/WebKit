@@ -996,6 +996,8 @@ void Document::commonTeardown()
         highlightRegistry->clear();
     if (RefPtr fragmentHighlightRegistry = m_fragmentHighlightRegistry)
         fragmentHighlightRegistry->clear();
+    if (RefPtr textExtractionHighlightRegistry = m_textExtractionHighlightRegistry)
+        textExtractionHighlightRegistry->clear();
 #if ENABLE(APP_HIGHLIGHTS)
     if (RefPtr appHighlightRegistry = m_appHighlightRegistry)
         appHighlightRegistry->clear();
@@ -3881,6 +3883,7 @@ bool Document::hasHighlight() const
 {
     return (m_highlightRegistry && !m_highlightRegistry->isEmpty())
         || (m_fragmentHighlightRegistry && !m_fragmentHighlightRegistry->isEmpty())
+        || (m_textExtractionHighlightRegistry && !m_textExtractionHighlightRegistry->isEmpty())
 #if ENABLE(APP_HIGHLIGHTS)
         || (m_appHighlightRegistry && !m_appHighlightRegistry->isEmpty())
 #endif
@@ -3899,6 +3902,13 @@ HighlightRegistry& Document::fragmentHighlightRegistry()
     if (!m_fragmentHighlightRegistry)
         m_fragmentHighlightRegistry = HighlightRegistry::create();
     return *m_fragmentHighlightRegistry;
+}
+
+HighlightRegistry& Document::textExtractionHighlightRegistry()
+{
+    if (!m_textExtractionHighlightRegistry)
+        m_textExtractionHighlightRegistry = HighlightRegistry::create();
+    return *m_textExtractionHighlightRegistry;
 }
 
 #if ENABLE(APP_HIGHLIGHTS)
@@ -3957,6 +3967,8 @@ void Document::updateHighlightPositions()
         collectHighlightRangesFromRegister(highlightRanges, *m_highlightRegistry.get());
     if (m_fragmentHighlightRegistry)
         collectHighlightRangesFromRegister(highlightRanges, *m_fragmentHighlightRegistry.get());
+    if (m_textExtractionHighlightRegistry)
+        collectHighlightRangesFromRegister(highlightRanges, *m_textExtractionHighlightRegistry.get());
 #if ENABLE(APP_HIGHLIGHTS)
     if (m_appHighlightRegistry)
         collectHighlightRangesFromRegister(highlightRanges, *m_appHighlightRegistry.get());

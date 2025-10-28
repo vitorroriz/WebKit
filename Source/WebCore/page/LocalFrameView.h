@@ -75,6 +75,7 @@ class RenderView;
 class RenderWidget;
 class ScrollingCoordinator;
 class ScrollAnchoringController;
+class TemporarySelectionChange;
 class TiledBacking;
 
 struct FixedContainerEdges;
@@ -84,6 +85,7 @@ struct VelocityData;
 
 enum class NullGraphicsContextPaintInvalidationReasons : uint8_t;
 enum class StyleColorOptions : uint8_t;
+enum class TemporarySelectionOption : uint16_t;
 enum class TiledBackingScrollability : uint8_t;
 
 Pagination::Mode paginationModeForRenderStyle(const RenderStyle&);
@@ -759,6 +761,8 @@ public:
     IntSize totalScrollbarSpace() const final;
     int scrollbarGutterWidth(bool isHorizontalWritingMode = true) const;
     int insetForLeftScrollbarSpace() const final;
+
+    TemporarySelectionChange revealRangeWithTemporarySelection(const SimpleRange&, OptionSet<TemporarySelectionOption> extraOptions = { });
 
 #if ASSERT_ENABLED
     struct AutoPreventLayerAccess {

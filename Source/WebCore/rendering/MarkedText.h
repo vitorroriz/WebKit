@@ -56,6 +56,7 @@ struct MarkedText : public CanMakeCheckedPtr<MarkedText, WTF::DefaultedOperatorE
         DictationAlternatives,
         Highlight,
         FragmentHighlight,
+        TextExtractionHighlight,
 #if ENABLE(APP_HIGHLIGHTS)
         AppHighlight,
 #endif

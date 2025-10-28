@@ -1383,6 +1383,8 @@ enum ContentsFormat {
     [Conditional=APP_HIGHLIGHTS] readonly attribute sequence<DOMString> appHighlightContextMenuItemTitles;
     [Conditional=APP_HIGHLIGHTS] unsigned long numberOfAppHighlights();
 
+    readonly attribute sequence<AbstractRange> textExtractionHighlightRanges;
+
 #if defined(ENABLE_WEBXR) && ENABLE_WEBXR
     [Conditional=WEBXR] readonly attribute WebXRTest xrTest;
 #endif

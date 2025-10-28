@@ -1922,12 +1922,15 @@ public:
     TextManipulationController* textManipulationControllerIfExists() { return m_textManipulationController.get(); }
 
     bool hasHighlight() const;
-    HighlightRegistry* highlightRegistryIfExists() { return m_highlightRegistry.get(); }
+    HighlightRegistry* highlightRegistryIfExists() const { return m_highlightRegistry.get(); }
     HighlightRegistry& highlightRegistry();
     void updateHighlightPositions();
 
-    HighlightRegistry* fragmentHighlightRegistryIfExists() { return m_fragmentHighlightRegistry.get(); }
+    HighlightRegistry* fragmentHighlightRegistryIfExists() const { return m_fragmentHighlightRegistry.get(); }
     HighlightRegistry& fragmentHighlightRegistry();
+
+    HighlightRegistry* textExtractionHighlightRegistryIfExists() const { return m_textExtractionHighlightRegistry.get(); }
+    HighlightRegistry& textExtractionHighlightRegistry();
         
 #if ENABLE(APP_HIGHLIGHTS)
     HighlightRegistry* appHighlightRegistryIfExists() { return m_appHighlightRegistry.get(); }
@@ -2468,6 +2471,7 @@ private:
         
     RefPtr<HighlightRegistry> m_highlightRegistry;
     RefPtr<HighlightRegistry> m_fragmentHighlightRegistry;
+    RefPtr<HighlightRegistry> m_textExtractionHighlightRegistry;
 #if ENABLE(APP_HIGHLIGHTS)
     RefPtr<HighlightRegistry> m_appHighlightRegistry;
     std::unique_ptr<AppHighlightStorage> m_appHighlightStorage;

@@ -7389,6 +7389,23 @@ unsigned Internals::numberOfAppHighlights()
 }
 #endif
 
+Vector<Ref<AbstractRange>> Internals::textExtractionHighlightRanges() const
+{
+    RefPtr document = contextDocument();
+    if (!document)
+        return { };
+
+    RefPtr registry = document->textExtractionHighlightRegistryIfExists();
+    if (!registry)
+        return { };
+
+    return flatMap(copyToVector(registry->map().values()), [](auto&& highlight) {
+        return highlight->highlightRanges().map([](auto& range) {
+            return Ref { range->range() };
+        });
+    });
+}
+
 bool Internals::supportsPictureInPicture()
 {
     return WebCore::supportsPictureInPicture();

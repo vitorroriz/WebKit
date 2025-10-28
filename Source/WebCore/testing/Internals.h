@@ -1489,6 +1489,8 @@ public:
     unsigned numberOfAppHighlights();
 #endif
 
+    Vector<Ref<AbstractRange>> textExtractionHighlightRanges() const;
+
 #if ENABLE(WEBXR)
     ExceptionOr<RefPtr<WebXRTest>> xrTest();
 #endif

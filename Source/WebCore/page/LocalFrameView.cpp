@@ -3025,7 +3025,7 @@ bool LocalFrameView::scrollToTextFragment(IsRetry isRetry)
     }
 
     // FIXME: <http://webkit.org/b/245262> (Scroll To Text Fragment should use DelegateMainFrameScroll)
-    TemporarySelectionChange selectionChange(document, { range }, { TemporarySelectionOption::RevealSelection, TemporarySelectionOption::RevealSelectionBounds, TemporarySelectionOption::UserTriggered, TemporarySelectionOption::ForceCenterScroll });
+    auto selectionChange = revealRangeWithTemporarySelection(range);
     if (m_frame->settings().scrollToTextFragmentIndicatorEnabled() && !m_frame->page()->isControlledByAutomation())
         m_delayedTextFragmentIndicatorTimer.startOneShot(100_ms);
 
@@ -3323,7 +3323,7 @@ void LocalFrameView::textFragmentIndicatorTimerFired()
     auto range = m_pendingTextFragmentIndicatorRange.value();
 
     // FIXME: <http://webkit.org/b/245262> (Scroll To Text Fragment should use DelegateMainFrameScroll)
-    TemporarySelectionChange selectionChange(document, { range }, { TemporarySelectionOption::RevealSelection, TemporarySelectionOption::RevealSelectionBounds, TemporarySelectionOption::UserTriggered, TemporarySelectionOption::ForceCenterScroll });
+    auto selectionChange = revealRangeWithTemporarySelection(range);
     
     maintainScrollPositionAtScrollToTextFragmentRange(range);
 }
@@ -3380,6 +3380,17 @@ bool LocalFrameView::scrollRectToVisible(const LayoutRect& absoluteRect, const R
     else
         frameView.scrollRectToVisibleInTopLevelView(adjustedRect, insideFixed, adjustedOptions);
     return true;
+}
+
+TemporarySelectionChange LocalFrameView::revealRangeWithTemporarySelection(const SimpleRange& range, OptionSet<TemporarySelectionOption> extraOptions)
+{
+    static constexpr OptionSet defaultOptions {
+        TemporarySelectionOption::RevealSelection,
+        TemporarySelectionOption::RevealSelectionBounds,
+        TemporarySelectionOption::UserTriggered,
+        TemporarySelectionOption::ForceCenterScroll
+    };
+    return { range.startContainer().protectedDocument(), { range }, defaultOptions | extraOptions };
 }
 
 static ScrollPositionChangeOptions scrollPositionChangeOptionsForElement(const LocalFrameView& frameView, Element* element, const ScrollRectToVisibleOptions& options)
@@ -4462,9 +4473,7 @@ void LocalFrameView::scrollToPendingTextFragmentRange()
     SetForScope skipScrollResetOfScrollToTextFragmentRange(m_skipScrollResetOfScrollToTextFragmentRange, true);
 
     // FIXME: <http://webkit.org/b/245262> (Scroll To Text Fragment should use DelegateMainFrameScroll)
-    TemporarySelectionChange selectionChange(document, { range }, { TemporarySelectionOption::RevealSelection, TemporarySelectionOption::RevealSelectionBounds, TemporarySelectionOption::UserTriggered, TemporarySelectionOption::ForceCenterScroll,
-        TemporarySelectionOption::OnlyAllowForwardScrolling
-    });
+    auto selectionChange = revealRangeWithTemporarySelection(range, TemporarySelectionOption::OnlyAllowForwardScrolling);
 
     if (m_delayedTextFragmentIndicatorTimer.isActive())
         return;
