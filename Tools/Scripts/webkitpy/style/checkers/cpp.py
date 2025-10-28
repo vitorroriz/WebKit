@@ -1100,16 +1100,13 @@ def check_for_extra_new_line_at_eof(lines, error):
                   'There was more than one newline at the end of the file.')
 
 
-def check_for_multiline_comments_and_strings(clean_lines, line_number, error):
-    """Logs an error if we see /* ... */ or "..." that extend past one line.
+def check_for_multiline_comments(clean_lines, line_number, error):
+    """Logs an error if we see /* ... */ that extend past one line.
 
     /* ... */ comments are legit inside macros, for one line.
     Otherwise, we prefer // comments, so it's ok to warn about the
-    other.  Likewise, it's ok for strings to extend across multiple
-    lines, as long as a line continuation character (backslash)
-    terminates each line. Although not currently prohibited by the C++
-    style guide, it's ugly and unnecessary. We don't do well with either
-    in this lint program, so we warn about both.
+    other. Although not currently prohibited by the C++
+    style guide, multi-line comments are ugly and unnecessary.
 
     Args:
       clean_lines: A CleansedLines instance containing the file.
@@ -1129,13 +1126,6 @@ def check_for_multiline_comments_and_strings(clean_lines, line_number, error):
               'Consider replacing these with //-style comments, '
               'with #if 0...#endif, '
               'or with more clearly structured multi-line comments.')
-
-    if (line.count('"') - line.count('\\"')) % 2:
-        error(line_number, 'readability/multiline_string', 5,
-              'Multi-line string ("...") found.  This lint script doesn\'t '
-              'do well with such strings, and may give bogus warnings.  They\'re '
-              'ugly and unnecessary, and you should use concatenation instead".')
-
 
 _THREADING_LIST = (
     ('asctime(', 'asctime_r('),
@@ -4897,7 +4887,7 @@ def process_line(filename, file_extension,
     check_function_definition(filename, file_extension, clean_lines, line, class_state, function_state, error)
     check_function_body(filename, file_extension, clean_lines, line, class_state, function_state, error)
     check_for_leaky_patterns(clean_lines, line, function_state, error)
-    check_for_multiline_comments_and_strings(clean_lines, line, error)
+    check_for_multiline_comments(clean_lines, line, error)
     check_style(clean_lines, line, file_extension, class_state, file_state, enum_state, error)
     check_language(filename, clean_lines, line, file_extension, include_state,
                    file_state, error)

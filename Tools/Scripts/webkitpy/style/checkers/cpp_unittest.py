@@ -1381,24 +1381,6 @@ class CppStyleTest(CppStyleTestBase):
                                      'structured multi-line comments.  [readability/multiline_comment] [5]'])
         self.assert_multi_line_lint(r'''    // /* comment, but not multi-line''', '')
 
-    def test_multiline_strings(self):
-        multiline_string_error_message = (
-            'Multi-line string ("...") found.  This lint script doesn\'t '
-            'do well with such strings, and may give bogus warnings.  They\'re '
-            'ugly and unnecessary, and you should use concatenation instead".'
-            '  [readability/multiline_string] [5]')
-
-        file_path = 'mydir/foo.cpp'
-
-        error_collector = ErrorCollector(self.assertTrue)
-        self.process_file_data(file_path, 'cpp',
-                               ['const char* str = "This is a\\',
-                                ' multiline string.";'],
-                               error_collector)
-        self.assertEqual(
-            2,  # One per line.
-            error_collector.result_list().count(multiline_string_error_message))
-
     def test_platformh_comments(self):
         check_platformh_message = (
             'CPP comments are not allowed in Platform.h, '
