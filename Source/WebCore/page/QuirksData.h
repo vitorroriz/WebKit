@@ -157,6 +157,7 @@ struct WEBCORE_EXPORT QuirksData {
     bool shouldEnableSpeakerSelectionPermissionsPolicyQuirk : 1 { false };
     bool shouldEnableEnumerateDeviceQuirk : 1 { false };
     bool shouldEnableCameraAndMicrophonePermissionStateQuirk : 1 { false };
+    bool shouldEnableRemoteTrackLabelQuirk : 1 { false };
 #endif
 #if ENABLE(WEB_RTC)
     bool shouldEnableRTCEncodedStreamsQuirk : 1 { false };
