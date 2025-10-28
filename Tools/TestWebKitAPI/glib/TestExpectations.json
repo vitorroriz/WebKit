@@ -226,7 +226,7 @@
     "TestLoaderClient": {
         "subtests": {
             "/webkit/WebKitWebPage/get-uri": {
-                "expected": {"all": {"status": ["FAIL", "PASS"], "bug": "webkit.org/b/206728"}}
+                "expected": {"all": {"status": ["FAIL", "PASS", "TIMEOUT"], "bug": "webkit.org/b/206728"}}
             },
             "/webkit/WebKitWebView/load-twice-and-reload": {
                 "expected": {"gtk": {"status": ["PASS", "TIMEOUT"], "bug": "webkit.org/b/281979"}}
