@@ -148,9 +148,19 @@ Ref<Wasm::InstanceAnchor> Module::registerAnchor(JSWebAssemblyInstance* instance
     return anchor;
 }
 
-std::unique_ptr<MergedProfile> Module::createMergedProfile(IPIntCallee& callee)
+std::unique_ptr<MergedProfile> Module::createMergedProfile(const IPIntCallee& callee)
 {
-    auto result = makeUnique<MergedProfile>(callee);
+    double totalCount = callee.tierUpCounter().count();
+#if ENABLE(WEBASSEMBLY_BBQJIT)
+    for (unsigned i = 0; i < numberOfMemoryModes; ++i) {
+        if (RefPtr group = m_calleeGroups[i]) {
+            if (RefPtr bbq = group->tryGetBBQCallee(callee.functionIndex()))
+                totalCount += bbq->tierUpCounter().count();
+        }
+    }
+#endif
+
+    auto result = makeUnique<MergedProfile>(callee, totalCount);
     for (Ref anchor : m_anchors) {
         RefPtr<BaselineData> data;
         {
@@ -160,7 +170,7 @@ std::unique_ptr<MergedProfile> Module::createMergedProfile(IPIntCallee& callee)
         }
         if (!data)
             continue;
-        result->merge(*data);
+        result->merge(*this, callee, *data);
     }
     return result;
 }

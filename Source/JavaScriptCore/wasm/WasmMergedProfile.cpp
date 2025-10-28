@@ -26,6 +26,8 @@
 #include "config.h"
 #include "WasmMergedProfile.h"
 
+#include "WasmModule.h"
+#include "WasmModuleInformation.h"
 #include <wtf/NeverDestroyed.h>
 #include <wtf/TZoneMallocInlines.h>
 
@@ -35,8 +37,9 @@ namespace JSC::Wasm {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(MergedProfile);
 
-MergedProfile::MergedProfile(const IPIntCallee& callee)
+MergedProfile::MergedProfile(const IPIntCallee& callee, double totalCount)
     : m_callSites(callee.numCallProfiles())
+    , m_totalCount(totalCount)
 {
 }
 
@@ -67,13 +70,17 @@ bool MergedProfile::Candidates::add(Callee* observedCallee, uint32_t observedCou
     return false;
 }
 
-void MergedProfile::Candidates::merge(const CallProfile& slot)
+void MergedProfile::Candidates::merge(IPIntCallee* target, const CallProfile& slot)
 {
     EncodedJSValue boxedCallee = slot.boxedCallee();
     uint32_t speculativeTotalCount = slot.count();
 
     if (!boxedCallee) {
         // boxedCallee becomes nullptr when it is (1) a direct call or (2) an indirect call not recording anything yet.
+        if (target) {
+            // Direct call case.
+            add(target, speculativeTotalCount);
+        }
         m_totalCount += speculativeTotalCount;
         return;
     }
@@ -111,20 +118,32 @@ void MergedProfile::Candidates::merge(const CallProfile& slot)
 auto MergedProfile::Candidates::finalize() const -> Candidates
 {
     Candidates result(*this);
+    unsigned totalCount = 0;
     auto mutableSpan = std::span { result.m_callees }.first(result.m_size);
     std::sort(mutableSpan.begin(), mutableSpan.end(),
         [&](const auto& lhs, const auto& rhs) {
             return std::get<1>(lhs) > std::get<1>(rhs);
         });
+    for (auto& [callee, count] : mutableSpan)
+        totalCount += count;
+    result.m_totalCount = totalCount;
     return result;
 }
 
-void MergedProfile::merge(BaselineData& data)
+void MergedProfile::merge(const Module& module, const IPIntCallee& callee, BaselineData& data)
 {
+    m_merged = true;
     auto span = m_callSites.mutableSpan();
     RELEASE_ASSERT(data.size() == span.size());
-    for (unsigned i = 0; i < data.size(); ++i)
-        span[i].merge(data.at(i));
+    for (unsigned i = 0; i < data.size(); ++i) {
+        IPIntCallee* target = nullptr;
+        FunctionSpaceIndex index = callee.callTarget(i);
+        if (index != FunctionSpaceIndex { }) {
+            if (!module.moduleInformation().isImportedFunctionFromFunctionIndexSpace(index))
+                target = module.ipintCallees().at(module.moduleInformation().toCodeIndex(index)).ptr();
+        }
+        span[i].merge(target, data.at(i));
+    }
 }
 
 } // namespace JSC::Wasm
