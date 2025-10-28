@@ -4614,6 +4614,9 @@ webgl/1.0.x/conformance/textures/misc [ Pass Slow ]
 # WebGL conformance test suite 2.0.1 is skipped until 2.0.0 is retired.
 webgl/2.0.y [ Skip ]
 
+# Conformance test needs to be updated (see comments in https://chromium-review.googlesource.com/c/angle/angle/+/6197735)
+webgl/2.0.y/conformance2/textures/misc/immutable-tex-render-feedback.html [ Failure ]
+
 webkit.org/b/254730 [ Debug ] webgl/2.0.y/conformance/extensions/webgl-compressed-texture-astc.html [ Slow ]
 
 # Explicitly enable tests which we have fixed and do not have corresponding 2.0.0 test functionality.
