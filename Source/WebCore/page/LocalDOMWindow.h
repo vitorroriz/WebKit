@@ -460,6 +460,9 @@ private:
 
     bool m_contextMenuTriggered { false };
 
+    // Workaround for https://webkit.org/b/301443 causing very old timestamps to be produced:
+    Seconds m_lastInputEventStartTime;
+
     struct PendingKeyDownState {
         PerformanceEventTimingCandidate keyDown;
         std::optional<PerformanceEventTimingCandidate> keyPress { std::nullopt };

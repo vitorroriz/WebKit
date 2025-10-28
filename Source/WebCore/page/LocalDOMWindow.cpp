@@ -2636,6 +2636,14 @@ PerformanceEventTimingCandidate LocalDOMWindow::initializeEventTimingEntry(Event
     if (startTime > processingStart)
         startTime = processingStart;
 
+    // Workaround for https://webkit.org/b/301443 firing keyup events with very old timestamps:
+    if (type == EventType::input) {
+        m_lastInputEventStartTime = std::max(startTime, m_lastInputEventStartTime);
+    } else if (type == EventType::keyup && startTime < m_lastInputEventStartTime) {
+        LOG_WITH_STREAM(PerformanceTimeline, stream << "Late keyup event received; refreshing timestamp: " << startTime << " -> " << m_lastInputEventStartTime);
+        startTime = m_lastInputEventStartTime;
+    }
+
     return PerformanceEventTimingCandidate {
         .type = type,
         .cancelable = event.cancelable(),
