@@ -71,10 +71,7 @@ OpenXRCoordinator::OpenXRCoordinator()
 
 OpenXRCoordinator::~OpenXRCoordinator()
 {
-    m_viewConfigurationViews.clear();
-
-    if (m_instance != XR_NULL_HANDLE)
-        xrDestroyInstance(m_instance);
+    cleanupInstanceAndAssociatedResources();
 }
 
 void OpenXRCoordinator::getPrimaryDeviceInfo(WebPageProxy& page, DeviceInfoCallback&& callback)
@@ -223,6 +220,8 @@ void OpenXRCoordinator::startSession(WebPageProxy& page, WeakPtr<PlatformXRCoord
     ASSERT(RunLoop::isMain());
     LOG(XR, "OpenXRCoordinator::startSession");
 
+    initializeDevice(page.protectedPreferences()->openXRDMABufRelaxedForTesting());
+
     WTF::switchOn(m_state,
         [&](Idle&) {
             m_sessionMode = sessionMode;
@@ -274,7 +273,7 @@ void OpenXRCoordinator::endSessionIfExists(WebPageProxy& page)
             active.renderState->terminateRequested = true;
             active.renderQueue->dispatchSync([this, renderState = active.renderState] {
                 if (!m_isSessionRunning) {
-                    cleanupSessionAndAssociatedResources();
+                    cleanupAllResources();
                     return;
                 }
                 // OpenXR will transition the session to STOPPING state and then we will call xrEndSession().
@@ -638,6 +637,27 @@ void OpenXRCoordinator::cleanupSessionAndAssociatedResources()
     m_glContext.reset();
 }
 
+void OpenXRCoordinator::cleanupInstanceAndAssociatedResources()
+{
+    m_viewConfigurationViews.clear();
+    m_systemId = XR_NULL_SYSTEM_ID;
+
+    ASSERT(!m_glContext);
+    m_glDisplay = nullptr;
+
+    if (m_instance == XR_NULL_HANDLE)
+        return;
+
+    xrDestroyInstance(m_instance);
+    m_instance = XR_NULL_HANDLE;
+}
+
+void OpenXRCoordinator::cleanupAllResources()
+{
+    cleanupSessionAndAssociatedResources();
+    cleanupInstanceAndAssociatedResources();
+}
+
 void OpenXRCoordinator::handleSessionStateChange()
 {
     ASSERT(!RunLoop::isMain());
@@ -668,7 +688,7 @@ void OpenXRCoordinator::handleSessionStateChange()
         break;
     case XR_SESSION_STATE_LOSS_PENDING:
     case XR_SESSION_STATE_EXITING:
-        cleanupSessionAndAssociatedResources();
+        cleanupAllResources();
         break;
     default:
         break;

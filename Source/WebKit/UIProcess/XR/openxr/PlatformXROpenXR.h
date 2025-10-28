@@ -81,6 +81,8 @@ private:
     void createSessionIfNeeded();
     void handleSessionStateChange();
     void tryInitializeGraphicsBinding();
+    void cleanupAllResources();
+    void cleanupInstanceAndAssociatedResources();
     void cleanupSessionAndAssociatedResources();
     bool collectSwapchainFormatsIfNeeded();
     enum class PollResult : bool;
