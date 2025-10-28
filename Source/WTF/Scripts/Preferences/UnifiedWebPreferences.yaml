@@ -2720,6 +2720,10 @@ EnumeratingVisibleNetworkInterfacesEnabled:
     WebKit:
       default: true
 
+# Before this feature is enabled on other platforms, there needs to be a look at
+# form controls. See the following bugzillas:
+# https://bugs.webkit.org/show_bug.cgi?id=301556
+# https://bugs.webkit.org/show_bug.cgi?id=301555
 EvaluationTimeZoomEnabled:
   category: css
   type: bool

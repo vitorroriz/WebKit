@@ -1367,24 +1367,24 @@ Style::PaddingBox RenderThemeMac::popupInternalPaddingBox(const RenderStyle& sty
     if (style.usedAppearance() == StyleAppearance::Menulist) {
         auto padding = popupButtonPadding(controlSizeForFont(style), style.writingMode().isBidiRTL());
         return {
-            toTruncatedPaddingEdge(padding[topPadding] * style.usedZoom()),
-            toTruncatedPaddingEdge(padding[rightPadding] * style.usedZoom()),
-            toTruncatedPaddingEdge(padding[bottomPadding] * style.usedZoom()),
-            toTruncatedPaddingEdge(padding[leftPadding] * style.usedZoom()),
+            toTruncatedPaddingEdge(padding[topPadding]),
+            toTruncatedPaddingEdge(padding[rightPadding]),
+            toTruncatedPaddingEdge(padding[bottomPadding]),
+            toTruncatedPaddingEdge(padding[leftPadding]),
         };
     }
 
     if (style.usedAppearance() == StyleAppearance::MenulistButton) {
         float arrowWidth = baseArrowWidth * (style.computedFontSize() / baseFontSize);
         float rightPadding = ceilf(arrowWidth + (arrowPaddingBefore + arrowPaddingAfter + paddingBeforeSeparator) * style.usedZoom());
-        float leftPadding = styledPopupPaddingLeft * style.usedZoom();
+        float leftPadding = styledPopupPaddingLeft;
         if (style.writingMode().isBidiRTL())
             std::swap(rightPadding, leftPadding);
 
         return {
-            toTruncatedPaddingEdge(styledPopupPaddingTop * style.usedZoom()),
-            toTruncatedPaddingEdge(rightPadding),
-            toTruncatedPaddingEdge(styledPopupPaddingBottom * style.usedZoom()),
+            toTruncatedPaddingEdge(styledPopupPaddingTop),
+            toTruncatedPaddingEdge(rightPadding / style.usedZoom()),
+            toTruncatedPaddingEdge(styledPopupPaddingBottom),
             toTruncatedPaddingEdge(leftPadding),
         };
     }

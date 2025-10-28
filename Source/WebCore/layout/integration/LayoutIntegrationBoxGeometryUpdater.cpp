@@ -82,15 +82,15 @@ static LayoutUnit usedValueOrZero(const Style::MarginEdge& marginEdge, std::opti
     return Style::evaluateMinimum<LayoutUnit>(marginEdge, *availableWidth, zoomFactor);
 }
 
-static LayoutUnit usedValueOrZero(const Style::PaddingEdge& paddingEdge, std::optional<LayoutUnit> availableWidth)
+static LayoutUnit usedValueOrZero(const Style::PaddingEdge& paddingEdge, std::optional<LayoutUnit> availableWidth, Style::ZoomFactor usedZoom)
 {
     if (auto fixed = paddingEdge.tryFixed())
-        return LayoutUnit { fixed->resolveZoom(Style::ZoomNeeded { }) };
+        return LayoutUnit { fixed->resolveZoom(usedZoom) };
 
     if (!availableWidth)
         return { };
 
-    return Style::evaluateMinimum<LayoutUnit>(paddingEdge, *availableWidth, Style::ZoomNeeded { });
+    return Style::evaluateMinimum<LayoutUnit>(paddingEdge, *availableWidth, usedZoom);
 }
 
 static inline void adjustBorderForTableAndFieldset(const RenderBoxModelObject& renderer, RectEdges<LayoutUnit>& borderWidths)
@@ -264,11 +264,12 @@ Layout::BoxGeometry::Edges BoxGeometryUpdater::logicalBorder(const RenderBoxMode
 Layout::BoxGeometry::Edges BoxGeometryUpdater::logicalPadding(const RenderBoxModelObject& renderer, std::optional<LayoutUnit> availableWidth, WritingMode writingMode, bool retainPaddingStart, bool retainPaddingEnd)
 {
     auto& style = renderer.style();
+    auto usedZoom = style.usedZoomForLength();
 
-    auto paddingLeft = usedValueOrZero(style.paddingLeft(), availableWidth);
-    auto paddingRight = usedValueOrZero(style.paddingRight(), availableWidth);
-    auto paddingTop = usedValueOrZero(style.paddingTop(), availableWidth);
-    auto paddingBottom = usedValueOrZero(style.paddingBottom(), availableWidth);
+    auto paddingLeft = usedValueOrZero(style.paddingLeft(), availableWidth, usedZoom);
+    auto paddingRight = usedValueOrZero(style.paddingRight(), availableWidth, usedZoom);
+    auto paddingTop = usedValueOrZero(style.paddingTop(), availableWidth, usedZoom);
+    auto paddingBottom = usedValueOrZero(style.paddingBottom(), availableWidth, usedZoom);
 
     if (writingMode.isHorizontal()) {
         auto paddingInlineStart = retainPaddingStart ? writingMode.isInlineLeftToRight() ? paddingLeft : paddingRight : 0_lu;

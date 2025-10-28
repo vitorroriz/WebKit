@@ -1101,14 +1101,16 @@ BoxGeometry::Edges FormattingGeometry::computedPadding(const Box& layoutBox, con
         return { };
 
     auto& style = layoutBox.style();
+    auto usedZoom = style.usedZoomForLength();
     LOG_WITH_STREAM(FormattingContextLayout, stream << "[Padding] -> layoutBox: " << &layoutBox);
     return {
         {
-            Style::evaluate<LayoutUnit>(style.paddingStart(), containingBlockWidth, Style::ZoomNeeded { }),
-            Style::evaluate<LayoutUnit>(style.paddingEnd(), containingBlockWidth, Style::ZoomNeeded { }) },
+            Style::evaluate<LayoutUnit>(style.paddingStart(), containingBlockWidth, usedZoom),
+            Style::evaluate<LayoutUnit>(style.paddingEnd(), containingBlockWidth, usedZoom)
+        },
         {
-            Style::evaluate<LayoutUnit>(style.paddingBefore(), containingBlockWidth, Style::ZoomNeeded { }),
-            Style::evaluate<LayoutUnit>(style.paddingAfter(), containingBlockWidth, Style::ZoomNeeded { })
+            Style::evaluate<LayoutUnit>(style.paddingBefore(), containingBlockWidth, usedZoom),
+            Style::evaluate<LayoutUnit>(style.paddingAfter(), containingBlockWidth, usedZoom)
         }
     };
 }

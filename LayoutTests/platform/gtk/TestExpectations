@@ -553,6 +553,9 @@ fast/forms/validation-message-in-relative-body.html [ Skip ]
 fast/forms/validation-message-appearance.html [ Skip ]
 fast/forms/validation-message-on-textarea.html [ Skip ]
 
+
+webkit.org/b/301556 transforms/2d/zoom-menulist.html [ Skip ]
+
 webkit.org/b/137096 svg/W3C-SVG-1.1/text-altglyph-01-b.svg [ Failure ]
 webkit.org/b/137096 svg/custom/altglyph.svg [ Failure ]
 webkit.org/b/137096 svg/text/text-altglyph-01-b.svg [ Failure ]
