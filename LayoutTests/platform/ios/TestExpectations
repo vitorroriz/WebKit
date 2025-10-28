@@ -8352,3 +8352,6 @@ webkit.org/b/301548 imported/w3c/web-platform-tests/uievents/mouse/offset_and_pa
 
 # webkit.org/b/301591 [ iOS 26 ] imported/w3c/web-platform-tests/editing/other/empty-elements-insertion.html is a constant text failure 
 imported/w3c/web-platform-tests/editing/other/empty-elements-insertion.html [ Failure ]
+
+# webkit.org/b/301602 [ iOS 26 ] imported/w3c/web-platform-tests/inert/inert-pseudo-element-hittest.html is a constant text failure
+imported/w3c/web-platform-tests/inert/inert-pseudo-element-hittest.html [ Failure ]
