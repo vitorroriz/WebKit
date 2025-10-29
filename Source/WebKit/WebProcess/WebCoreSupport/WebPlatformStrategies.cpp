@@ -255,11 +255,11 @@ static void collectFrameWebArchives(WebCore::FrameIdentifier frameIdentifier, Ha
     if (!webFrame)
         return;
 
-    RefPtr frame = webFrame->coreFrame();
-    if (!frame)
+    RefPtr rootFrame = webFrame->coreFrame();
+    if (!rootFrame)
         return;
 
-    for (; frame; frame = frame->tree().traverseNext()) {
+    for (RefPtr frame = rootFrame; frame; frame = frame->tree().traverseNext(rootFrame.get())) {
         RefPtr localFrame = dynamicDowncast<LocalFrame>(frame);
         if (!localFrame) {
             remoteFrameIdentifiers.append(frame->frameID());
