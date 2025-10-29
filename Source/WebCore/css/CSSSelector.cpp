@@ -814,6 +814,23 @@ bool CSSSelector::RareData::matchNth(int count)
     return count == b;
 }
 
+bool CSSSelector::RareData::equals(const RareData& other) const
+{
+    if (selectorList || other.selectorList) {
+        if (!selectorList || !other.selectorList || *selectorList != *other.selectorList)
+            return false;
+    }
+    return matchingValue == other.matchingValue
+        && serializingValue == other.serializingValue
+        && a == other.a
+        && b == other.b
+        && attribute == other.attribute
+        && argument == other.argument
+        && argumentList == other.argumentList
+        && langList == other.langList
+        && serializingValue == other.serializingValue;
+}
+
 CSSSelector::CSSSelector(const CSSSelector& other)
     : m_relation(other.m_relation)
     , m_match(other.m_match)
@@ -962,6 +979,75 @@ bool complexSelectorMatchesElementBackedPseudoElement(const CSSSelector& complex
         }
     }
     return result;
+}
+
+bool CSSSelector::simpleSelectorEqual(const CSSSelector& other) const
+{
+    auto valuesEqual = [&] {
+        if (m_hasRareData)
+            return m_data.rareData->equals(*other.m_data.rareData);
+        if (match() == Match::Tag)
+            return *m_data.tagQName == *other.m_data.tagQName;
+        return m_data.value == other.m_data.value;
+    };
+
+    // Relation and selector list bits are ignored.
+    return m_match == other.m_match
+        && m_pseudoType == other.m_pseudoType
+        && m_hasRareData == other.m_hasRareData
+        && m_tagIsForNamespaceRule == other.m_tagIsForNamespaceRule
+        && m_caseInsensitiveAttributeValueMatching == other.m_caseInsensitiveAttributeValueMatching
+        && m_isImplicit == other.m_isImplicit
+        && valuesEqual();
+}
+
+bool isElementBackedPseudoElement(CSSSelector::PseudoElement pseudoElement)
+{
+    switch (pseudoElement) {
+    case CSSSelector::PseudoElement::Part:
+    case CSSSelector::PseudoElement::Slotted:
+    case CSSSelector::PseudoElement::UserAgentPart:
+    case CSSSelector::PseudoElement::UserAgentPartLegacyAlias:
+#if ENABLE(VIDEO)
+    case CSSSelector::PseudoElement::Cue:
+#endif
+        return true;
+    default:
+        return false;
+    }
+}
+
+bool complexSelectorsEqual(const CSSSelector& complexA, const CSSSelector& complexB, ComplexSelectorsEqualMode mode)
+{
+    auto aRelation = CSSSelector::Relation::Subselector;
+    auto bRelation = CSSSelector::Relation::Subselector;
+
+    for (auto a = &complexA, b = &complexB; a || b; a = a->precedingInComplexSelector(), b = b->precedingInComplexSelector()) {
+        if (mode == ComplexSelectorsEqualMode::IgnoreNonElementBackedPseudoElements) {
+            auto canSkipPseudoElement = [](const CSSSelector& simpleSelector) {
+                if (!simpleSelector.matchesPseudoElement())
+                    return false;
+                return !isElementBackedPseudoElement(simpleSelector.pseudoElement());
+            };
+            if (a && canSkipPseudoElement(*a)) {
+                aRelation = a->relation();
+                a = a->precedingInComplexSelector();
+            }
+            if (b && canSkipPseudoElement(*b)) {
+                bRelation = b->relation();
+                b = b->precedingInComplexSelector();
+            }
+        }
+        if (!a || !b)
+            return a == b;
+        if (aRelation != bRelation)
+            return false;
+        if (!a->simpleSelectorEqual(*b))
+            return false;
+        aRelation = a->relation();
+        bRelation = b->relation();
+    }
+    return true;
 }
 
 } // namespace WebCore
