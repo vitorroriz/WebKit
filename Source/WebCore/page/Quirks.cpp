@@ -2554,6 +2554,8 @@ static void handleFacebookQuirks(QuirksData& quirksData, const URL& quirksURL, c
     quirksData.shouldEnableRemoteTrackLabelQuirk = true;
     // facebook.com rdar://41104397
     quirksData.shouldEnableFacebookFlagQuirk = true;
+    // facebook.com rdar://161269819
+    quirksData.shouldEnableEnumerateDeviceQuirk = true;
 #endif
 #if ENABLE(WEB_RTC)
     // facebook.com rdar://158736355
@@ -2574,6 +2576,8 @@ static void handleFacebookMessengerQuirks(QuirksData& quirksData, const URL& qui
     // facebook.com rdar://158736355
     quirksData.shouldEnableCameraAndMicrophonePermissionStateQuirk = true;
     quirksData.shouldEnableRemoteTrackLabelQuirk = true;
+    // facebook.com rdar://161269819
+    quirksData.shouldEnableEnumerateDeviceQuirk = true;
 #endif
 #if ENABLE(WEB_RTC)
     // facebook.com rdar://158736355
