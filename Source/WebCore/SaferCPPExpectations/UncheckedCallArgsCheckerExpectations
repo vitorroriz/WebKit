@@ -403,7 +403,6 @@ page/LocalFrameViewLayoutContext.cpp
 page/Location.cpp
 page/MemoryRelease.cpp
 page/NavigateEvent.cpp
-page/Navigator.cpp
 [ iOS ] page/Page.cpp
 page/PageColorSampler.cpp
 page/PageOverlay.cpp

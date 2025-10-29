@@ -44,14 +44,9 @@ NavigatorGeolocation::NavigatorGeolocation(Navigator& navigator)
 
 NavigatorGeolocation::~NavigatorGeolocation() = default;
 
-ASCIILiteral NavigatorGeolocation::supplementName()
-{
-    return "NavigatorGeolocation"_s;
-}
-
 NavigatorGeolocation* NavigatorGeolocation::from(Navigator& navigator)
 {
-    NavigatorGeolocation* supplement = static_cast<NavigatorGeolocation*>(Supplement<Navigator>::from(&navigator, supplementName()));
+    auto* supplement = downcast<NavigatorGeolocation>(Supplement<Navigator>::from(&navigator, supplementName()));
     if (!supplement) {
         auto newSupplement = makeUnique<NavigatorGeolocation>(navigator);
         supplement = newSupplement.get();

@@ -573,8 +573,6 @@ page/Location.cpp
 page/NavigateEvent.cpp
 page/NavigationDestination.cpp
 page/NavigationDestination.h
-page/Navigator.cpp
-page/NavigatorLoginStatus.cpp
 page/PageColorSampler.cpp
 page/PageOverlay.cpp
 page/PageOverlayController.cpp

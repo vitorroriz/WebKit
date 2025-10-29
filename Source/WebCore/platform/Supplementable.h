@@ -82,9 +82,22 @@ public:
 
     virtual bool isDOMWindowCaches() const { return false; }
     virtual bool isDOMWindowIndexedDatabase() const { return false; }
+    virtual bool isNavigatorAudioSession() const { return false; }
+    virtual bool isNavigatorBeacon() const { return false; }
     virtual bool isNavigatorClipboard() const { return false; }
+    virtual bool isNavigatorContacts() const { return false; }
     virtual bool isNavigatorCookieConsent() const { return false; }
+    virtual bool isNavigatorCredentials() const { return false; }
     virtual bool isNavigatorGamepad() const { return false; }
+    virtual bool isNavigatorGeolocation() const { return false; }
+    virtual bool isNavigatorLoginStatus() const { return false; }
+    virtual bool isNavigatorMediaCapabilities() const { return false; }
+    virtual bool isNavigatorMediaDevices() const { return false; }
+    virtual bool isNavigatorMediaSession() const { return false; }
+    virtual bool isNavigatorPermissions() const { return false; }
+    virtual bool isNavigatorScreenWakeLock() const { return false; }
+    virtual bool isNavigatorUserActivation() const { return false; }
+    virtual bool isNavigatorWebDriver() const { return false; }
     virtual bool isUserMediaController() const { return false; }
     virtual bool isWorkerGlobalScopeCaches() const { return false; }
     virtual bool isLocalDOMWindowMediaControls() const { return false; }
