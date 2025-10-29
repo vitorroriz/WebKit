@@ -2837,6 +2837,10 @@ public:
     bool toolbarsAreVisible() const { return m_toolbarsAreVisible; }
     void setToolbarsAreVisible(bool);
 
+#if USE(GBM) && (PLATFORM(GTK) || PLATFORM(WPE))
+    Vector<RendererBufferFormat> preferredBufferFormats() const;
+#endif
+
 private:
     WebPageProxy(PageClient&, WebProcessProxy&, Ref<API::PageConfiguration>&&);
     void platformInitialize();
@@ -3089,9 +3093,6 @@ private:
 #if PLATFORM(GTK) || PLATFORM(WPE)
     void bindAccessibilityTree(const String&);
     OptionSet<WebCore::PlatformEventModifier> currentStateOfModifierKeys();
-#if USE(GBM)
-    Vector<RendererBufferFormat> preferredBufferFormats() const;
-#endif
 #endif
 
 #if PLATFORM(GTK)

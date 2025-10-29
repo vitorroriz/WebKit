@@ -32,6 +32,7 @@
 #if USE(COORDINATED_GRAPHICS)
 #include "CoordinatedSceneState.h"
 #include "DrawingArea.h"
+#include "RenderProcessInfo.h"
 #include "WebPageInlines.h"
 #include "WebPageProxyMessages.h"
 #include "WebProcess.h"
@@ -619,6 +620,10 @@ void LayerTreeHost::foreachRegionInDamageHistoryForTesting(Function<void(const R
 
 void LayerTreeHost::fillGLInformation(RenderProcessInfo&& info, CompletionHandler<void(RenderProcessInfo&&)>&& completionHandler)
 {
+#if USE(SKIA)
+    info.cpuPaintingThreadsCount = SkiaPaintingEngine::numberOfCPUPaintingThreads();
+    info.gpuPaintingThreadsCount = SkiaPaintingEngine::numberOfGPUPaintingThreads();
+#endif
     m_compositor->fillGLInformation(WTFMove(info), WTFMove(completionHandler));
 }
 

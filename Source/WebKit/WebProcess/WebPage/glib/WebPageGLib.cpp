@@ -287,6 +287,16 @@ void WebPage::getRenderProcessInfo(CompletionHandler<void(RenderProcessInfo&&)>&
         break;
     }
 
+#if USE(SKIA)
+    info.msaaSampleCount = display->msaaSampleCount();
+#endif
+
+    if (info.platform != "WPE"_s) {
+        info.supportedBufferFormats = display->bufferFormats().map([](const auto& format) -> RendererBufferFormat::Format {
+            return { format.fourcc.value, format.modifiers };
+        });
+    }
+
     static_cast<DrawingAreaCoordinatedGraphics*>(m_drawingArea.get())->fillGLInformation(WTFMove(info), WTFMove(completionHandler));
 }
 

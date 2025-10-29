@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include "RendererBufferFormat.h"
 #include <wtf/text/WTFString.h>
 
 namespace WebKit {
@@ -40,6 +41,10 @@ struct RenderProcessInfo {
     String eglVersion;
     String eglVendor;
     String eglExtensions;
+    unsigned cpuPaintingThreadsCount { 0 };
+    unsigned gpuPaintingThreadsCount { 0 };
+    unsigned msaaSampleCount { 0 };
+    Vector<RendererBufferFormat::Format> supportedBufferFormats;
 };
 
 } // namespace WebKit
