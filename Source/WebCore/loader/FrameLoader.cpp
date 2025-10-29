@@ -881,7 +881,7 @@ void FrameLoader::didBeginDocument(bool dispatch, LocalDOMWindow* previousWindow
         if (auto integrityPolicyReportOnly = documentLoader->integrityPolicyReportOnly())
             document->setIntegrityPolicyReportOnly(WTFMove(integrityPolicyReportOnly));
 
-        navigationType = m_documentLoader->triggeringAction().navigationAPIType();
+        navigationType = documentLoader->triggeringAction().navigationAPIType();
     }
 
     if (document->settings().navigationAPIEnabled() && document->window() && !document->protectedSecurityOrigin()->isOpaque())
