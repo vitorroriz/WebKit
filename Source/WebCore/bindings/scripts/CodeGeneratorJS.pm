@@ -4180,7 +4180,6 @@ sub GetGnuVTableOffsetForType
         || $typename eq "SVGGElement"
         || $typename eq "SVGImageElement"
         || $typename eq "SVGLineElement"
-        || $typename eq "SVGPathElement"
         || $typename eq "SVGPolyElement"
         || $typename eq "SVGPolygonElement"
         || $typename eq "SVGPolylineElement"
