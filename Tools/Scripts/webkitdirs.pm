@@ -3354,7 +3354,15 @@ sub simulatorRuntime($)
 
     my $output = `xcrun --sdk $xcodeSDK simctl list runtimes $platformName --json` or die "Failed to run find simulator runtime";
     for my $runtime (@{decode_json($output)->{runtimes}}) {
-        return $runtime->{identifier} if $runtime->{version} eq $xcodeSDKVersion;
+        if ($runtime->{version} eq $xcodeSDKVersion) {
+            return $runtime->{identifier};
+        }
+        if ($runtime->{version} =~ /^$xcodeSDKVersion/) {
+            my $runtime_version = $runtime->{version};
+            my $runtime_id = $runtime->{identifier};
+            warn "WARNING: Fuzzy-matched $platformName SDK version $xcodeSDKVersion to runtime $runtime_id with version $runtime_version.";
+            return $runtime_id;
+        }
     }
 }
 
