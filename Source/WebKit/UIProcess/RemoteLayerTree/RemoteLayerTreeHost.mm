@@ -519,7 +519,7 @@ void RemoteLayerTreeHost::animationsWereRemovedFromNode(RemoteLayerTreeNode& nod
     protectedDrawingArea()->animationsWereRemovedFromNode(node);
 }
 
-const RemoteAnimationTimeline* RemoteLayerTreeHost::timeline(const TimelineID& timelineID) const
+RefPtr<const RemoteAnimationTimeline> RemoteLayerTreeHost::timeline(const TimelineID& timelineID) const
 {
     return protectedDrawingArea()->timeline(timelineID);
 }

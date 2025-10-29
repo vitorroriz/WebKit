@@ -2448,6 +2448,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/animation/AcceleratedEffectValues.h
     platform/animation/AcceleratedTimeline.h
     platform/animation/AnimationUtilities.h
+    platform/animation/ProgressResolutionData.h
     platform/animation/TimelineIdentifier.h
     platform/animation/TimingFunction.h
     platform/animation/values/AcceleratedEffectOffsetAnchor.h

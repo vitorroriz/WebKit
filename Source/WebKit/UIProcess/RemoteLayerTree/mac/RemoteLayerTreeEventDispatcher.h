@@ -44,7 +44,7 @@
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
 #include "RemoteAnimationStack.h"
-#include "RemoteAnimationTimelineRegistry.h"
+#include "RemoteMonotonicTimelineRegistry.h"
 #endif
 
 namespace WebCore {
@@ -112,7 +112,7 @@ public:
     void animationsWereAddedToNode(RemoteLayerTreeNode&);
     void animationsWereRemovedFromNode(RemoteLayerTreeNode&);
     void updateTimelineRegistration(WebCore::ProcessIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>&, MonotonicTime);
-    const RemoteAnimationTimeline* timeline(const TimelineID&);
+    RefPtr<const RemoteAnimationTimeline> timeline(const TimelineID&);
     void updateAnimations();
 #endif
 
@@ -204,7 +204,7 @@ private:
     friend class RemoteScrollingCoordinatorProxyMac;
     Lock m_animationLock;
     HashMap<WebCore::PlatformLayerIdentifier, Ref<RemoteAnimationStack>> m_animationStacks WTF_GUARDED_BY_LOCK(m_animationLock);
-    std::unique_ptr<RemoteAnimationTimelineRegistry> m_timelineRegistry WTF_GUARDED_BY_LOCK(m_animationLock);
+    std::unique_ptr<RemoteMonotonicTimelineRegistry> m_monotonicTimelineRegistry WTF_GUARDED_BY_LOCK(m_animationLock);
 #endif
 
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER)

@@ -6505,9 +6505,19 @@ struct WebCore::AnimationEffectTiming {
     [NotSerialized] std::optional<Seconds> specifiedIterationDuration;
 };
 
+struct WebCore::ProgressResolutionData {
+    WebCore::ScrollingNodeID source;
+    WebCore::WebAnimationTime duration;
+    bool isVertical;
+    bool isReversed;
+    float scrollOffset;
+    float rangeStart;
+    float rangeEnd;
+};
+
 [RefCounted] class WebCore::AcceleratedTimeline {
     WebCore::TimelineIdentifier identifier();
-    Seconds originTime();
+    Variant<Seconds, WebCore::ProgressResolutionData> data();
 };
 
 header: <WebCore/AcceleratedEffect.h>

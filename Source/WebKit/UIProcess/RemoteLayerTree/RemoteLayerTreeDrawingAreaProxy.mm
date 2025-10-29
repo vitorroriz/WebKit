@@ -852,7 +852,7 @@ void RemoteLayerTreeDrawingAreaProxy::updateTimelineRegistration(WebCore::Proces
         page->checkedScrollingCoordinatorProxy()->updateTimelineRegistration(processIdentifier, timelineRepresentations, now);
 }
 
-const RemoteAnimationTimeline* RemoteLayerTreeDrawingAreaProxy::timeline(const TimelineID& timelineID) const
+RefPtr<const RemoteAnimationTimeline> RemoteLayerTreeDrawingAreaProxy::timeline(const TimelineID& timelineID) const
 {
     if (RefPtr page = this->page())
         return page->checkedScrollingCoordinatorProxy()->timeline(timelineID);

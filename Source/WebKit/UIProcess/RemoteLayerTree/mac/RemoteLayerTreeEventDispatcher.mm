@@ -46,6 +46,10 @@
 #import <wtf/SystemTracing.h>
 #import <wtf/TZoneMallocInlines.h>
 
+#if ENABLE(THREADED_ANIMATION_RESOLUTION)
+#import "RemoteMonotonicTimeline.h"
+#endif
+
 namespace WebKit {
 using namespace WebCore;
 
@@ -646,18 +650,24 @@ void RemoteLayerTreeEventDispatcher::animationsWereRemovedFromNode(RemoteLayerTr
 void RemoteLayerTreeEventDispatcher::updateTimelineRegistration(WebCore::ProcessIdentifier processIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>& timelineRepresentations, MonotonicTime now)
 {
     assertIsHeld(m_animationLock);
-    if (!m_timelineRegistry)
-        m_timelineRegistry = makeUnique<RemoteAnimationTimelineRegistry>();
-    m_timelineRegistry->update(processIdentifier, timelineRepresentations, now);
-    if (m_timelineRegistry->isEmpty())
-        m_timelineRegistry = nullptr;
+    if (auto scrollingTree = this->scrollingTree())
+        scrollingTree->updateTimelineRegistration(processIdentifier, timelineRepresentations);
+    if (!m_monotonicTimelineRegistry)
+        m_monotonicTimelineRegistry = makeUnique<RemoteMonotonicTimelineRegistry>();
+    m_monotonicTimelineRegistry->update(processIdentifier, timelineRepresentations, now);
+    if (m_monotonicTimelineRegistry->isEmpty())
+        m_monotonicTimelineRegistry = nullptr;
 }
 
-const RemoteAnimationTimeline* RemoteLayerTreeEventDispatcher::timeline(const TimelineID& timelineID)
+RefPtr<const RemoteAnimationTimeline> RemoteLayerTreeEventDispatcher::timeline(const TimelineID& timelineID)
 {
     assertIsHeld(m_animationLock);
-    if (m_timelineRegistry)
-        return m_timelineRegistry->get(timelineID);
+    if (m_monotonicTimelineRegistry) {
+        if (RefPtr timeline = m_monotonicTimelineRegistry->get(timelineID))
+            return timeline;
+    }
+    if (auto scrollingTree = this->scrollingTree())
+        return scrollingTree->timeline(timelineID);
     return nullptr;
 }
 
@@ -669,8 +679,8 @@ void RemoteLayerTreeEventDispatcher::updateAnimations()
     // FIXME: Rather than using 'now' at the point this is called, we
     // should probably be using the timestamp of the (next?) display
     // link update or vblank refresh.
-    if (m_timelineRegistry)
-        m_timelineRegistry->advanceCurrentTime(MonotonicTime::now());
+    if (m_monotonicTimelineRegistry)
+        m_monotonicTimelineRegistry->advanceCurrentTime(MonotonicTime::now());
 
     auto animationStacks = std::exchange(m_animationStacks, { });
     for (auto [layerID, currentAnimationStack] : animationStacks) {

@@ -146,7 +146,7 @@ public:
     virtual void animationsWereAddedToNode(RemoteLayerTreeNode&) { }
     virtual void animationsWereRemovedFromNode(RemoteLayerTreeNode&) { }
     virtual void updateTimelineRegistration(WebCore::ProcessIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>&, MonotonicTime) { }
-    virtual const RemoteAnimationTimeline* timeline(const TimelineID&) const { return nullptr; }
+    virtual RefPtr<const RemoteAnimationTimeline> timeline(const TimelineID&) const { return nullptr; }
 #endif
 
     String scrollingTreeAsText() const;

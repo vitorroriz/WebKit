@@ -34,26 +34,10 @@ namespace WebKit {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteAnimationTimeline);
 
-static WebCore::WebAnimationTime computeCurrentTime(Seconds originTime, MonotonicTime now)
-{
-    return now.secondsSinceEpoch() - originTime;
-}
-
-Ref<RemoteAnimationTimeline> RemoteAnimationTimeline::create(TimelineID identifier, const WebCore::AcceleratedTimeline& input, MonotonicTime now)
-{
-    return adoptRef(*new RemoteAnimationTimeline(identifier, input.originTime(), computeCurrentTime(input.originTime(), now)));
-}
-
-RemoteAnimationTimeline::RemoteAnimationTimeline(TimelineID identifier, Seconds originTime, WebCore::WebAnimationTime currentTime)
+RemoteAnimationTimeline::RemoteAnimationTimeline(TimelineID identifier, std::optional<WebCore::WebAnimationTime> duration)
     : m_identifier(identifier)
-    , m_originTime(originTime)
-    , m_currentTime(currentTime)
+    , m_duration(duration)
 {
-}
-
-void RemoteAnimationTimeline::updateCurrentTime(MonotonicTime now)
-{
-    m_currentTime = computeCurrentTime(m_originTime, now);
 }
 
 } // namespace WebKit

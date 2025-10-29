@@ -27,28 +27,42 @@
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
 
+#include "ProgressResolutionData.h"
 #include "TimelineIdentifier.h"
 #include <wtf/Seconds.h>
 #include <wtf/TZoneMalloc.h>
+#include <wtf/Variant.h>
 
 namespace WebCore {
 
 class AcceleratedTimeline : public RefCounted<AcceleratedTimeline> {
     WTF_MAKE_TZONE_ALLOCATED(AcceleratedTimeline);
 public:
-    WEBCORE_EXPORT static Ref<AcceleratedTimeline> create(const TimelineIdentifier&, Seconds originTime);
+
+    static Ref<AcceleratedTimeline> create(const TimelineIdentifier&, Seconds originTime);
+    static Ref<AcceleratedTimeline> create(const TimelineIdentifier&, ProgressResolutionData);
+
+    bool isMonotonic() const { return !!originTime(); }
+    bool isProgressBased() const { return !isMonotonic(); }
+
+    WEBCORE_EXPORT std::optional<Seconds> originTime() const;
+    WEBCORE_EXPORT std::optional<ProgressResolutionData> progressResolutionData() const;
 
     // Encoding support.
+    using Data = Variant<Seconds, ProgressResolutionData>;
+    WEBCORE_EXPORT static Ref<AcceleratedTimeline> create(TimelineIdentifier&&, Data&&);
     const TimelineIdentifier& identifier() const { return m_identifier; }
-    const Seconds originTime() const { return m_originTime; }
+    const Data& data() const { return m_data; }
 
-    WEBCORE_EXPORT virtual ~AcceleratedTimeline() = default;
+    virtual ~AcceleratedTimeline() = default;
 
 private:
     AcceleratedTimeline(const TimelineIdentifier&, Seconds originTime);
+    AcceleratedTimeline(const TimelineIdentifier&, ProgressResolutionData);
+    AcceleratedTimeline(TimelineIdentifier&&, Data&&);
 
     TimelineIdentifier m_identifier;
-    Seconds m_originTime;
+    Data m_data;
 };
 
 } // namespace WebCore
