@@ -234,7 +234,7 @@ int ScrollbarThemeMac::scrollbarThickness(ScrollbarWidth scrollbarWidth, Scrollb
         return 0;
     NSScrollerImp *scrollerImp = [NSScrollerImp scrollerImpWithStyle:ScrollerStyle::recommendedScrollerStyle() controlSize:nsControlSizeFromScrollbarWidth(scrollbarWidth) horizontal:NO replacingScrollerImp:nil];
     [scrollerImp setExpanded:(expansionState == ScrollbarExpansionState::Expanded)];
-    return [[scrollerImp class] scrollerWidth];
+    return [scrollerImp trackBoxWidth];
     END_BLOCK_OBJC_EXCEPTIONS
 }
 
