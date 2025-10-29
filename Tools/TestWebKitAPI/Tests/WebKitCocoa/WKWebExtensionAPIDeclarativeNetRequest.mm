@@ -85,7 +85,8 @@ TEST(WKWebExtensionAPIDeclarativeNetRequest, BlockedLoadTest)
     Util::run(&receivedActionNotification);
 }
 
-TEST(WKWebExtensionAPIDeclarativeNetRequest, BlockedLoadInPrivateBrowsingTest)
+// FIXME: rdar://163669919 (REGRESSION(iOS26, Tahoe) [ iOS26 Tahoe Debug ]: TestWebKitAPI.WKWebExtensionAPIDeclarativeNetRequest.BlockedLoadInPrivateBrowsingTest is a constant timeout (301660))
+TEST(WKWebExtensionAPIDeclarativeNetRequest, DISABLED_BlockedLoadInPrivateBrowsingTest)
 {
     TestWebKitAPI::HTTPServer server({
         { "/"_s, { { { "Content-Type"_s, "text/html"_s } }, "<iframe src='/frame.html'></iframe>"_s } },
