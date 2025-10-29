@@ -499,12 +499,7 @@ TEST(WebTransport, Worker)
     EXPECT_WK_STREQ([webView _test_waitForAlert], "message from worker: successfully read abc");
 }
 
-// FIXME: https://bugs.webkit.org/show_bug.cgi?id=301526 Make this not time out on iOS and Debug builds
-#if PLATFORM(MAC) && defined(NDEBUG)
 TEST(WebTransport, WorkerAfterNetworkProcessCrash)
-#else
-TEST(WebTransport, DISABLED_WorkerAfterNetworkProcessCrash)
-#endif
 {
     WebTransportServer transportServer([](ConnectionGroup group) -> ConnectionTask {
         auto connection = co_await group.receiveIncomingConnection();
@@ -535,7 +530,8 @@ TEST(WebTransport, DISABLED_WorkerAfterNetworkProcessCrash)
         "    self.postMessage('successfully read ' + new TextDecoder().decode(value));"
         "  } catch (e) { self.postMessage('caught ' + e); }"
         "};"
-        "addEventListener('message', test);", transportServer.port()];
+        "addEventListener('message', test);"
+        "self.postMessage('started worker');", transportServer.port()];
 
     HTTPServer loadingServer({
         { "/"_s, { mainHTML } },
@@ -550,7 +546,11 @@ TEST(WebTransport, DISABLED_WorkerAfterNetworkProcessCrash)
     [webView setNavigationDelegate:delegate.get()];
     [webView loadRequest:loadingServer.request()];
     [delegate waitForDidFinishNavigation];
+    EXPECT_WK_STREQ([webView _test_waitForAlert], "message from worker: started worker");
     kill([configuration.get().websiteDataStore _networkProcessIdentifier], SIGKILL);
+    while ([[configuration websiteDataStore] _networkProcessExists])
+        TestWebKitAPI::Util::spinRunLoop();
+    [webView objectByEvaluatingJavaScript:@"'wait for web process to be informed of network process termination'"];
     [webView evaluateJavaScript:@"worker.postMessage('start')" completionHandler:nil];
     EXPECT_WK_STREQ([webView _test_waitForAlert], "message from worker: successfully read abc");
 }
