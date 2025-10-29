@@ -1874,7 +1874,7 @@ class ValidateChange(buildstep.BuildStep, BugzillaMixin, GitHubMixin):
     @defer.inlineCallbacks
     def run(self):
         patch_id = self.getProperty('patch_id', '')
-        pr_number = self.getProperty('github.number', self.getProperty('pr_number', ''))
+        pr_number = self.getProperty('github.number', '')
         branch = self.getProperty('github.base.ref', DEFAULT_BRANCH)
 
         if not any(candidate.match(branch) for candidate in self.branches):
@@ -1971,18 +1971,6 @@ class ValidateChange(buildstep.BuildStep, BugzillaMixin, GitHubMixin):
         pr_json = yield self.get_pr_json(pr_number, repository_url, retry=3)
 
         if pr_json:
-            # Manually triggered from "Try build" button, manually populate data
-            if not self.getProperty('github.number', ''):
-                self.setProperty('github.base.ref', pr_json['base']['ref'])
-                self.setProperty('github.head.ref', pr_json['head']['ref'])
-                self.setProperty('github.head.repo.full_name', pr_json['head']['repo']['full_name'])
-                self.setProperty('github.head.sha', pr_json['head']['sha'])
-                self.setProperty('github.head.user.login', pr_json['head']['user']['login'])
-                self.setProperty('github.number', pr_json['number'])
-                self.setProperty('github.title', pr_json['title'])
-                self.setProperty('owners', [pr_json['head']['user']['login']])
-                yield ConfigureBuild.add_pr_details(self)
-
             # Only track actionable labels, since bug category labels may reveal information about security bugs
             self.setProperty('github_labels', [
                 data.get('name')
