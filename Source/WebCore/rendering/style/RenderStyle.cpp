@@ -3542,33 +3542,6 @@ bool RenderStyle::shouldPlaceVerticalScrollbarOnLeft() const
     return !writingMode().isAnyLeftToRight();
 }
 
-std::span<const PaintType, 3> RenderStyle::paintTypesForPaintOrder(PaintOrder order)
-{
-    static constexpr std::array fill { PaintType::Fill, PaintType::Stroke, PaintType::Markers };
-    static constexpr std::array fillMarkers { PaintType::Fill, PaintType::Markers, PaintType::Stroke };
-    static constexpr std::array stroke { PaintType::Stroke, PaintType::Fill, PaintType::Markers };
-    static constexpr std::array strokeMarkers { PaintType::Stroke, PaintType::Markers, PaintType::Fill };
-    static constexpr std::array markers { PaintType::Markers, PaintType::Fill, PaintType::Stroke };
-    static constexpr std::array markersStroke { PaintType::Markers, PaintType::Stroke, PaintType::Fill };
-    switch (order) {
-    case PaintOrder::Normal:
-    case PaintOrder::Fill:
-        return fill;
-    case PaintOrder::FillMarkers:
-        return fillMarkers;
-    case PaintOrder::Stroke:
-        return stroke;
-    case PaintOrder::StrokeMarkers:
-        return strokeMarkers;
-    case PaintOrder::Markers:
-        return markers;
-    case PaintOrder::MarkersStroke:
-        return markersStroke;
-    };
-    ASSERT_NOT_REACHED();
-    return fill;
-}
-
 float RenderStyle::computedStrokeWidth(const IntSize& viewportSize) const
 {
     // Use the stroke-width and stroke-color value combination only if stroke-color has been explicitly specified.

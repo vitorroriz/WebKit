@@ -7182,7 +7182,7 @@
                 "markers"
             ],
             "codegen-properties": {
-                "style-converter": "PaintOrder",
+                "style-converter": "StyleType<SVGPaintOrder>",
                 "parser-function": "consumePaintOrder",
                 "parser-grammar-unused": "normal | [ fill || stroke || markers ]",
                 "parser-grammar-unused-reason": "Needs support for transforming parsed input to minimal form."

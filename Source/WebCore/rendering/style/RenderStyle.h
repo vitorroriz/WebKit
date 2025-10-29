@@ -166,8 +166,6 @@ enum class OverflowWrap : uint8_t;
 enum class OverscrollBehavior : uint8_t;
 enum class PaginationMode : uint8_t;
 enum class PaintBehavior : uint32_t;
-enum class PaintOrder : uint8_t;
-enum class PaintType : uint8_t;
 enum class PointerEvents : uint8_t;
 enum class PositionType : uint8_t;
 enum class PositionVisibility : uint8_t;
@@ -331,6 +329,7 @@ struct SVGCenterCoordinateComponent;
 struct SVGCoordinateComponent;
 struct SVGMarkerResource;
 struct SVGPaint;
+struct SVGPaintOrder;
 struct SVGPathData;
 struct SVGRadius;
 struct SVGRadiusComponent;
@@ -1757,11 +1756,9 @@ public:
 
     void addCustomPaintWatchProperty(const AtomString&);
 
-    // Support for paint-order, stroke-linecap, stroke-linejoin, and stroke-miterlimit from https://drafts.fxtf.org/paint/.
-    inline void setPaintOrder(PaintOrder);
-    inline PaintOrder paintOrder() const;
-    static constexpr PaintOrder initialPaintOrder();
-    static std::span<const PaintType, 3> paintTypesForPaintOrder(PaintOrder);
+    inline void setPaintOrder(Style::SVGPaintOrder);
+    inline Style::SVGPaintOrder paintOrder() const;
+    static constexpr Style::SVGPaintOrder initialPaintOrder();
     
     inline void setCapStyle(LineCap);
     inline LineCap capStyle() const;

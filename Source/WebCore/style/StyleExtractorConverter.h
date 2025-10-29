@@ -147,7 +147,6 @@ public:
     static Ref<CSSValue> convertHangingPunctuation(ExtractorState&, OptionSet<HangingPunctuation>);
     static Ref<CSSValue> convertSelfOrDefaultAlignmentData(ExtractorState&, const StyleSelfAlignmentData&);
     static Ref<CSSValue> convertContentAlignmentData(ExtractorState&, const StyleContentAlignmentData&);
-    static Ref<CSSValue> convertPaintOrder(ExtractorState&, PaintOrder);
     static Ref<CSSValue> convertPositionAnchor(ExtractorState&, const std::optional<ScopedName>&);
     static Ref<CSSValue> convertPositionArea(ExtractorState&, const PositionArea&);
     static Ref<CSSValue> convertPositionArea(ExtractorState&, const std::optional<PositionArea>&);
@@ -549,41 +548,6 @@ inline Ref<CSSValue> ExtractorConverter::convertContentAlignmentData(ExtractorSt
     ASSERT(list.size() > 0);
     ASSERT(list.size() <= 3);
     return CSSValueList::createSpaceSeparated(WTFMove(list));
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertPaintOrder(ExtractorState&, PaintOrder paintOrder)
-{
-    if (paintOrder == PaintOrder::Normal)
-        return CSSPrimitiveValue::create(CSSValueNormal);
-
-    CSSValueListBuilder paintOrderList;
-    switch (paintOrder) {
-    case PaintOrder::Normal:
-        ASSERT_NOT_REACHED();
-        break;
-    case PaintOrder::Fill:
-        paintOrderList.append(CSSPrimitiveValue::create(CSSValueFill));
-        break;
-    case PaintOrder::FillMarkers:
-        paintOrderList.append(CSSPrimitiveValue::create(CSSValueFill));
-        paintOrderList.append(CSSPrimitiveValue::create(CSSValueMarkers));
-        break;
-    case PaintOrder::Stroke:
-        paintOrderList.append(CSSPrimitiveValue::create(CSSValueStroke));
-        break;
-    case PaintOrder::StrokeMarkers:
-        paintOrderList.append(CSSPrimitiveValue::create(CSSValueStroke));
-        paintOrderList.append(CSSPrimitiveValue::create(CSSValueMarkers));
-        break;
-    case PaintOrder::Markers:
-        paintOrderList.append(CSSPrimitiveValue::create(CSSValueMarkers));
-        break;
-    case PaintOrder::MarkersStroke:
-        paintOrderList.append(CSSPrimitiveValue::create(CSSValueMarkers));
-        paintOrderList.append(CSSPrimitiveValue::create(CSSValueStroke));
-        break;
-    }
-    return CSSValueList::createSpaceSeparated(WTFMove(paintOrderList));
 }
 
 inline Ref<CSSValue> ExtractorConverter::convertPositionAnchor(ExtractorState& state, const std::optional<ScopedName>& positionAnchor)

@@ -128,7 +128,6 @@ public:
     static OptionSet<LineBoxContain> convertLineBoxContain(BuilderState&, const CSSValue&);
     static OptionSet<TouchAction> convertTouchAction(BuilderState&, const CSSValue&);
 
-    static PaintOrder convertPaintOrder(BuilderState&, const CSSValue&);
     static StyleSelfAlignmentData convertSelfOrDefaultAlignmentData(BuilderState&, const CSSValue&);
     static StyleContentAlignmentData convertContentAlignmentData(BuilderState&, const CSSValue&);
 
@@ -412,30 +411,6 @@ inline OptionSet<TouchAction> BuilderConverter::convertTouchAction(BuilderState&
     }
 
     return RenderStyle::initialTouchActions();
-}
-
-inline PaintOrder BuilderConverter::convertPaintOrder(BuilderState& builderState, const CSSValue& value)
-{
-    if (is<CSSPrimitiveValue>(value)) {
-        ASSERT(value.valueID() == CSSValueNormal);
-        return PaintOrder::Normal;
-    }
-
-    auto list = requiredListDowncast<CSSValueList, CSSPrimitiveValue>(builderState, value);
-    if (!list)
-        return { };
-
-    switch (list->item(0).valueID()) {
-    case CSSValueFill:
-        return list->size() > 1 ? PaintOrder::FillMarkers : PaintOrder::Fill;
-    case CSSValueStroke:
-        return list->size() > 1 ? PaintOrder::StrokeMarkers : PaintOrder::Stroke;
-    case CSSValueMarkers:
-        return list->size() > 1 ? PaintOrder::MarkersStroke : PaintOrder::Markers;
-    default:
-        ASSERT_NOT_REACHED();
-        return PaintOrder::Normal;
-    }
 }
 
 // Get the "opposite" ItemPosition to the provided ItemPosition.

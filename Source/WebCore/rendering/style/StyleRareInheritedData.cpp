@@ -137,7 +137,7 @@ StyleRareInheritedData::StyleRareInheritedData()
     , webkitTouchCallout(static_cast<unsigned>(RenderStyle::initialTouchCallout()))
 #endif
     , hangingPunctuation(RenderStyle::initialHangingPunctuation().toRaw())
-    , paintOrder(static_cast<unsigned>(RenderStyle::initialPaintOrder()))
+    , paintOrder(static_cast<unsigned>(RenderStyle::initialPaintOrder().type()))
     , capStyle(static_cast<unsigned>(RenderStyle::initialCapStyle()))
     , joinStyle(static_cast<unsigned>(RenderStyle::initialJoinStyle()))
     , hasSetStrokeWidth(false)
@@ -499,7 +499,7 @@ void StyleRareInheritedData::dumpDifferences(TextStream& ts, const StyleRareInhe
 
     LOG_RAW_OPTIONSET_IF_DIFFERENT(HangingPunctuation, hangingPunctuation);
 
-    LOG_IF_DIFFERENT_WITH_CAST(PaintOrder, paintOrder);
+    LOG_IF_DIFFERENT_WITH_CAST_AND_CONSTRUCTION(Style::SVGPaintOrder::Type, Style::SVGPaintOrder, paintOrder);
     LOG_IF_DIFFERENT_WITH_CAST(LineCap, capStyle);
     LOG_IF_DIFFERENT_WITH_CAST(LineJoin, joinStyle);
 

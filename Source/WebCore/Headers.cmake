@@ -3471,6 +3471,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/svg/StyleSVGGlyphOrientationVertical.h
     style/values/svg/StyleSVGMarkerResource.h
     style/values/svg/StyleSVGPaint.h
+    style/values/svg/StyleSVGPaintOrder.h
     style/values/svg/StyleSVGPathData.h
     style/values/svg/StyleSVGRadius.h
     style/values/svg/StyleSVGRadiusComponent.h

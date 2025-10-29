@@ -913,20 +913,6 @@ TextStream& operator<<(TextStream& ts, OverflowWrap overflowWrap)
     return ts;
 }
 
-TextStream& operator<<(TextStream& ts, PaintOrder paintOrder)
-{
-    switch (paintOrder) {
-    case PaintOrder::Normal: ts << "normal"_s; break;
-    case PaintOrder::Fill: ts << "fill"_s; break;
-    case PaintOrder::FillMarkers: ts << "fill markers"_s; break;
-    case PaintOrder::Stroke: ts << "stroke"_s; break;
-    case PaintOrder::StrokeMarkers: ts << "stroke markers"_s; break;
-    case PaintOrder::Markers: ts << "markers"_s; break;
-    case PaintOrder::MarkersStroke: ts << "markers stroke"_s; break;
-    }
-    return ts;
-}
-
 TextStream& operator<<(TextStream& ts, PointerEvents pointerEvents)
 {
     switch (pointerEvents) {

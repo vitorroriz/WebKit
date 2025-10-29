@@ -1049,23 +1049,6 @@ enum class ScrollSnapStop : bool {
     Always,
 };
 
-// These are all minimized combinations of paint-order.
-enum class PaintOrder : uint8_t {
-    Normal,
-    Fill,
-    FillMarkers,
-    Stroke,
-    StrokeMarkers,
-    Markers,
-    MarkersStroke
-};
-
-enum class PaintType : uint8_t {
-    Fill,
-    Stroke,
-    Markers
-};
-
 enum class FontLoadingBehavior : uint8_t {
     Auto,
     Block,
@@ -1351,7 +1334,6 @@ WTF::TextStream& operator<<(WTF::TextStream&, OutlineStyle);
 WTF::TextStream& operator<<(WTF::TextStream&, WebCore::Overflow);
 WTF::TextStream& operator<<(WTF::TextStream&, OverflowAlignment);
 WTF::TextStream& operator<<(WTF::TextStream&, OverflowWrap);
-WTF::TextStream& operator<<(WTF::TextStream&, PaintOrder);
 WTF::TextStream& operator<<(WTF::TextStream&, PointerEvents);
 WTF::TextStream& operator<<(WTF::TextStream&, PositionType);
 WTF::TextStream& operator<<(WTF::TextStream&, PositionVisibility);

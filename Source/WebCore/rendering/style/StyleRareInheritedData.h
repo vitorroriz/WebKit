@@ -43,6 +43,7 @@
 #include <WebCore/StyleMathDepth.h>
 #include <WebCore/StyleOrphans.h>
 #include <WebCore/StyleQuotes.h>
+#include <WebCore/StyleSVGPaintOrder.h>
 #include <WebCore/StyleScrollbarColor.h>
 #include <WebCore/StyleStrokeMiterlimit.h>
 #include <WebCore/StyleStrokeWidth.h>
@@ -182,7 +183,7 @@ public:
     PREFERRED_TYPE(Style::WebkitTouchCallout) unsigned webkitTouchCallout : 1;
 #endif
     PREFERRED_TYPE(OptionSet<HangingPunctuation>) unsigned hangingPunctuation : 4;
-    PREFERRED_TYPE(PaintOrder) unsigned paintOrder : 3;
+    PREFERRED_TYPE(Style::SVGPaintOrder::Type) unsigned paintOrder : 3;
     PREFERRED_TYPE(LineCap) unsigned capStyle : 2;
     PREFERRED_TYPE(LineJoin) unsigned joinStyle : 2;
     PREFERRED_TYPE(bool) unsigned hasSetStrokeWidth : 1;

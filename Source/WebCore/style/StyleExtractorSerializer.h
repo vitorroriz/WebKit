@@ -83,7 +83,6 @@ public:
     static void serializeHangingPunctuation(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<HangingPunctuation>);
     static void serializeSelfOrDefaultAlignmentData(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const StyleSelfAlignmentData&);
     static void serializeContentAlignmentData(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const StyleContentAlignmentData&);
-    static void serializePaintOrder(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, PaintOrder);
     static void serializePositionAnchor(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const std::optional<ScopedName>&);
     static void serializePositionArea(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const std::optional<PositionArea>&);
     static void serializeNameScope(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const NameScope&);
@@ -563,48 +562,6 @@ inline void ExtractorSerializer::serializeContentAlignmentData(ExtractorState& s
     ASSERT(list.size() > 0);
     ASSERT(list.size() <= 3);
     builder.append(CSSValueList::createSpaceSeparated(WTFMove(list))->cssText(context));
-}
-
-inline void ExtractorSerializer::serializePaintOrder(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, PaintOrder paintOrder)
-{
-    if (paintOrder == PaintOrder::Normal) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Normal { });
-        return;
-    }
-
-    auto appendOne = [&](auto a) {
-        builder.append(nameLiteralForSerialization(a));
-    };
-
-    auto appendTwo = [&](auto a, auto b) {
-        builder.append(nameLiteralForSerialization(a), ' ', nameLiteralForSerialization(b));
-    };
-
-    switch (paintOrder) {
-    case PaintOrder::Normal:
-        ASSERT_NOT_REACHED();
-        return;
-    case PaintOrder::Fill:
-        appendOne(CSSValueFill);
-        return;
-    case PaintOrder::FillMarkers:
-        appendTwo(CSSValueFill, CSSValueMarkers);
-        return;
-    case PaintOrder::Stroke:
-        appendOne(CSSValueStroke);
-        return;
-    case PaintOrder::StrokeMarkers:
-        appendTwo(CSSValueStroke, CSSValueMarkers);
-        return;
-    case PaintOrder::Markers:
-        appendOne(CSSValueMarkers);
-        return;
-    case PaintOrder::MarkersStroke:
-        appendTwo(CSSValueMarkers, CSSValueStroke);
-        return;
-    }
-
-    RELEASE_ASSERT_NOT_REACHED();
 }
 
 inline void ExtractorSerializer::serializePositionAnchor(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const std::optional<ScopedName>& positionAnchor)

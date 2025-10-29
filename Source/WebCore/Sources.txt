@@ -3315,6 +3315,7 @@ style/values/svg/StyleSVGBaselineShift.cpp
 style/values/svg/StyleSVGGlyphOrientationHorizontal.cpp
 style/values/svg/StyleSVGGlyphOrientationVertical.cpp
 style/values/svg/StyleSVGPaint.cpp
+style/values/svg/StyleSVGPaintOrder.cpp
 style/values/svg/StyleSVGPathData.cpp
 style/values/svg/StyleSVGStrokeDasharray.cpp
 style/values/svg/StyleSVGStrokeDashoffset.cpp
