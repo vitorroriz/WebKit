@@ -142,10 +142,18 @@ IntOutsets RenderLayerFilters::calculateOutsets(RenderElement& renderer, const F
     return CSSFilterRenderer::calculateOutsets(renderer, filter, targetBoundingBox);
 }
 
-GraphicsContext* RenderLayerFilters::beginFilterEffect(RenderElement& renderer, GraphicsContext& context, const LayoutRect& filterBoxRect, const LayoutRect& dirtyRect, const LayoutRect& layerRepaintRect, const LayoutRect& clipRect)
+GraphicsContext* RenderLayerFilters::beginFilterEffect(RenderElement& renderer, GraphicsContext& context, OptionSet<PaintBehavior> paintBehavior, const LayoutRect& filterBoxRect, const LayoutRect& dirtyRect, const LayoutRect& layerRepaintRect, const LayoutRect& clipRect)
 {
     auto expandedDirtyRect = dirtyRect;
     auto targetBoundingBox = intersection(filterBoxRect, dirtyRect);
+
+    auto preferredFilterRenderingModes = renderer.page().preferredFilterRenderingModes();
+#if PLATFORM(COCOA) && !HAVE(FIX_FOR_RADAR_104392017)
+    if (context.renderingMode() == RenderingMode::Unaccelerated && paintBehavior.contains(PaintBehavior::DrawsHDRContent))
+        preferredFilterRenderingModes.remove(FilterRenderingMode::GraphicsContext);
+#else
+    UNUSED_PARAM(paintBehavior);
+#endif
 
     auto outsets = calculateOutsets(renderer, targetBoundingBox);
     if (!outsets.isZero()) {
@@ -163,10 +171,10 @@ GraphicsContext* RenderLayerFilters::beginFilterEffect(RenderElement& renderer, 
     if (targetBoundingBox.isEmpty())
         return nullptr;
 
-    if (!m_filter || m_targetBoundingBox != targetBoundingBox) {
+    if (!m_filter || m_targetBoundingBox != targetBoundingBox || m_preferredFilterRenderingModes != preferredFilterRenderingModes) {
         m_targetBoundingBox = targetBoundingBox;
         // FIXME: This rebuilds the entire effects chain even if the filter style didn't change.
-        m_filter = CSSFilterRenderer::create(renderer, renderer.style().filter(), m_preferredFilterRenderingModes, m_filterScale, m_targetBoundingBox, context);
+        m_filter = CSSFilterRenderer::create(renderer, renderer.style().filter(), preferredFilterRenderingModes, m_filterScale, m_targetBoundingBox, context);
     }
 
     if (!m_filter)
@@ -186,8 +194,9 @@ GraphicsContext* RenderLayerFilters::beginFilterEffect(RenderElement& renderer, 
 
     // For CSSFilterRenderer, sourceImageRect = filterRegion.
     bool hasUpdatedBackingStore = false;
-    if (m_filterRegion != filterRegion) {
+    if (m_filterRegion != filterRegion || m_preferredFilterRenderingModes != preferredFilterRenderingModes) {
         m_filterRegion = filterRegion;
+        m_preferredFilterRenderingModes = preferredFilterRenderingModes;
         hasUpdatedBackingStore = true;
     }
 

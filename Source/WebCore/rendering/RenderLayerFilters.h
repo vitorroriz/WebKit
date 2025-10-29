@@ -63,7 +63,6 @@ public:
     void updateReferenceFilterClients(const Style::Filter&);
     void removeReferenceFilterClients();
 
-    void setPreferredFilterRenderingModes(OptionSet<FilterRenderingMode> preferredFilterRenderingModes) { m_preferredFilterRenderingModes = preferredFilterRenderingModes; }
     void setFilterScale(const FloatSize& filterScale) { m_filterScale = filterScale; }
 
     static bool isIdentity(RenderElement&);
@@ -72,7 +71,7 @@ public:
     // Per render
     LayoutRect repaintRect() const { return m_repaintRect; }
 
-    GraphicsContext* beginFilterEffect(RenderElement&, GraphicsContext&, const LayoutRect& filterBoxRect, const LayoutRect& dirtyRect, const LayoutRect& layerRepaintRect, const LayoutRect& clipRect);
+    GraphicsContext* beginFilterEffect(RenderElement&, GraphicsContext&, OptionSet<PaintBehavior>, const LayoutRect& filterBoxRect, const LayoutRect& dirtyRect, const LayoutRect& layerRepaintRect, const LayoutRect& clipRect);
     void applyFilterEffect(GraphicsContext& destinationContext);
 
 private:
