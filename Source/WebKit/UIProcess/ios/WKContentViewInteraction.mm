@@ -3513,7 +3513,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
             if (![self ensurePositionInformationIsUpToDate:request])
                 return NO;
         }
-        return _positionInformation.nodeAtPositionHasDoubleClickHandler.value_or(false);
+        return _positionInformation.hitNodeOrWindowHasDoubleClickListener.value_or(false);
     }
 
     if (gestureRecognizer == _highlightLongPressGestureRecognizer
