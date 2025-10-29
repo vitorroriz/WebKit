@@ -141,4 +141,3 @@ platform/text/cocoa/LocalizedDateCache.mm
 rendering/AttachmentLayout.mm
 [ iOS ] rendering/ios/RenderThemeIOS.mm
 [ Mac ] testing/ServiceWorkerInternals.mm
-testing/cocoa/WebArchiveDumpSupport.mm

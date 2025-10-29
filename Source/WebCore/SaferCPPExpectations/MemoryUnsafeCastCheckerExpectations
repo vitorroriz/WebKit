@@ -117,4 +117,3 @@ svg/properties/SVGAnimatedPropertyPairAccessorImpl.h
 svg/properties/SVGAnimatedValueProperty.h
 testing/InternalSettings.cpp
 testing/Internals.cpp
-testing/cocoa/WebArchiveDumpSupport.mm
