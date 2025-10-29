@@ -55,6 +55,25 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(ImageBufferSkiaAcceleratedBackend);
 
+static inline bool shouldEnableDynamicMSAA()
+{
+    static std::once_flag onceFlag;
+    static bool enableDynamicMSAA = false;
+    std::call_once(onceFlag, [] {
+        if (const char* enableDynamicMSAAEnv = getenv("WEBKIT_SKIA_ENABLE_DYNAMIC_MSAA")) {
+            enableDynamicMSAA = *enableDynamicMSAAEnv != '0';
+            return;
+        }
+
+#if PLATFORM(GTK)
+        enableDynamicMSAA = true;
+#else
+        enableDynamicMSAA = false;
+#endif
+    });
+    return enableDynamicMSAA;
+}
+
 std::unique_ptr<ImageBufferSkiaAcceleratedBackend> ImageBufferSkiaAcceleratedBackend::create(const Parameters& parameters, const ImageBufferCreationContext& creationContext)
 {
     IntSize backendSize = calculateSafeBackendSize(parameters);
@@ -75,7 +94,7 @@ std::unique_ptr<ImageBufferSkiaAcceleratedBackend> ImageBufferSkiaAcceleratedBac
     auto imageInfo = SkImageInfo::Make(backendSize.width(), backendSize.height(), kRGBA_8888_SkColorType, kPremul_SkAlphaType, parameters.colorSpace.platformColorSpace());
     auto msaaSampleCount = PlatformDisplay::sharedDisplay().msaaSampleCount();
     uint32_t flags = 0;
-    if (parameters.purpose == RenderingPurpose::Canvas && msaaSampleCount) {
+    if (parameters.purpose == RenderingPurpose::Canvas && msaaSampleCount && shouldEnableDynamicMSAA()) {
         flags |= SkSurfaceProps::kDynamicMSAA_Flag;
         msaaSampleCount = 1;
     }
