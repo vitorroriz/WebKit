@@ -109,7 +109,7 @@ class WebKit_Survey {
             ],
             'other' => [
                 'flags'     => FILTER_REQUIRE_ARRAY,
-                'filter'    => FILTER_VALIDATE_SCALAR
+                'filter'    => FILTER_SANITIZE_STRING
             ]
         ]);
 

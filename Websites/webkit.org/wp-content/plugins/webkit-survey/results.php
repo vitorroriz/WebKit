@@ -1,3 +1,6 @@
+<?php if(WebKit_Survey::responded()): ?>
+    <p>Thank you for your feedback!</p>
+<?php elseif (is_admin()): ?>
 <style>
     .webkit-survey-results {
         display: none;
@@ -44,6 +47,12 @@
         overflow: visible;
     }
     
+    .webkit-survey-results .other-responses {
+        flex: 100%;
+        display: flex;
+        margin-bottom: 0.5rem;
+    }
+    
     .webkit-survey-results .percentage {
         flex-shrink: 1;
         width: 3.8ch;
@@ -78,11 +87,20 @@
         <li<?php if (isset($SurveyResults->winner) && $SurveyResults->winner == $value) echo ' class="winner"'; ?>>
             <div class="label">
                 <div class="option" style="min-width: calc(<?php esc_attr_e($percentage); ?>% - 4.8ch);"><?php echo esc_html($option); ?></div>
+
+                <div class="other-responses">
+                        <?php 
+                            if (isset($Entry->other) && is_array($Entry->other)):
+                                foreach($Entry->other as $other_response): ?>
+                            <span><?php echo esc_html($other_response); ?> | </span>
+                        <?php endforeach; endif; ?>
+                </div>
+
                 <div class="percentage"><?php echo number_format($percentage, 0); ?>%</div>
-            </div>
             <div class="bar" style="width: <?php echo esc_attr(max(1,$percentage)); ?>%">&nbsp;</div>
         </li>
     <?php endforeach; ?>
     </ul>
 </div>
 <?php endforeach; ?>
+<?php endif; ?>
