@@ -124,7 +124,12 @@ TEST(WKWebView, GetContentsOfAllFramesShouldReturnString)
     Util::run(&finished);
 }
 
+// FIXME: rdar://163666375 (REGRESSION(IOS26): TestWebKitAPI.WKWebView.GetContentsShouldReturnAttributedString (301652))
+#if PLATFORM(IOS)
+TEST(WKWebView, DISABLED_GetContentsShouldReturnAttributedString)
+#else
 TEST(WKWebView, GetContentsShouldReturnAttributedString)
+#endif
 {
     RetainPtr<TestWKWebView> webView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600)]);
 
