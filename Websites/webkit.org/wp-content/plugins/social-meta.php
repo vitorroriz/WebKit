@@ -20,7 +20,7 @@ add_action('wp_head', function() {
     $modified_time = '';
 
     // Default preview image
-    $image_url = get_stylesheet_directory_uri() . '/images/preview-card.png';
+    $image_url = get_stylesheet_directory_uri() . '/images/preview-card.jpg';
 
     if (is_front_page()) { // Landing page
         $title = get_bloginfo('name');
