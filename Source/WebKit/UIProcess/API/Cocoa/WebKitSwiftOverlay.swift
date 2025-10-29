@@ -23,7 +23,7 @@
 
 // FIXME: Eliminate this file since the refined API can now just go with the rest of the normal API where it belongs.
 
-#if USE_APPLE_INTERNAL_SDK || (!os(tvOS) && !os(watchOS))
+#if !os(tvOS) && !os(watchOS)
 
 // Older versions of the Swift compiler fail to import WebKit_Private. Can be
 // removed when WebKit drops support for macOS Sonoma.
@@ -32,7 +32,6 @@ internal import WebKit_Private.WKWebExtensionPrivate
 #endif
 
 @available(iOS 14.0, macOS 10.16, *)
-@_spi_available(WK_WATCHOS_TBA, WK_TVOS_TBA, *)
 extension WKPDFConfiguration {
     // This is pre-existing API whose documentation does not use the source code.
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
@@ -43,7 +42,6 @@ extension WKPDFConfiguration {
 }
 
 @available(iOS 14.0, macOS 10.16, *)
-@_spi_available(WK_WATCHOS_TBA, WK_TVOS_TBA, *)
 extension WKWebView {
     // This is pre-existing API whose documentation does not use the source code.
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
@@ -102,7 +100,6 @@ extension WKWebView {
 }
 
 @available(iOS 15.0, macOS 12.0, *)
-@_spi_available(WK_WATCHOS_TBA, WK_TVOS_TBA, *)
 extension WKWebView {
     // This is pre-existing API whose documentation does not use the source code.
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation

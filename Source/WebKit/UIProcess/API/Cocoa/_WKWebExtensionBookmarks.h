@@ -22,7 +22,6 @@ typedef NS_ENUM(NSInteger, _WKWebExtensionBookmarkType) {
 
 /*! @abstract A class conforming to the ``_WKWebExtensionBookmark`` protocol represents a single bookmark node (a bookmark or folder) to web extensions. */
 WK_SWIFT_UI_ACTOR
-WK_API_UNAVAILABLE(watchos, tvos)
 @protocol _WKWebExtensionBookmark <NSObject>
 @optional
 
