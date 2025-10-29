@@ -59,7 +59,7 @@ namespace WebCore {
 class TimerAlignment : public CanMakeWeakPtr<TimerAlignment> {
 public:
     virtual ~TimerAlignment() = default;
-    virtual std::optional<MonotonicTime> alignedFireTime(bool hasReachedMaxNestingLevel, MonotonicTime) const = 0;
+    virtual MonotonicTime alignedFireTime(bool hasReachedMaxNestingLevel, MonotonicTime) const = 0;
 };
 
 class TimerBase {

@@ -1591,7 +1591,25 @@ ExceptionOr<bool> Internals::isTimerThrottled(int timeoutId)
     if (timer->intervalClampedToMinimum() > timer->m_originalInterval)
         return true;
 
-    return !!scriptExecutionContext()->alignedFireTime(timer->hasReachedMaxNestingLevel(), MonotonicTime { });
+    constexpr MonotonicTime unalignedFireTime { };
+    constexpr MonotonicTime alignmentForMaximallyNestedTimerToBeConsideredUnthrottled = unalignedFireTime + 2.0 * DOMTimer::minimumAlignmentForMaximallyNestedTimers();
+    constexpr MonotonicTime alignmentForLowNestingTimerToBeConsideredUnthrottled = unalignedFireTime + 2.0 * DOMTimer::defaultAlignmentInterval();
+
+    MonotonicTime alignedFireTime = scriptExecutionContext()->alignedFireTime(timer->hasReachedMaxNestingLevel(), unalignedFireTime);
+    if (timer->hasReachedMaxNestingLevel())
+        return alignedFireTime > alignmentForMaximallyNestedTimerToBeConsideredUnthrottled;
+    return alignedFireTime > alignmentForLowNestingTimerToBeConsideredUnthrottled;
+}
+
+ExceptionOr<bool> Internals::isTimerAligned(int timeoutId)
+{
+    auto* timer = scriptExecutionContext()->findTimeout(timeoutId);
+    if (!timer)
+        return Exception { ExceptionCode::NotFoundError };
+
+    constexpr MonotonicTime unalignedFireTime { };
+    MonotonicTime alignedFireTime = scriptExecutionContext()->alignedFireTime(timer->hasReachedMaxNestingLevel(), unalignedFireTime);
+    return alignedFireTime != unalignedFireTime;
 }
 
 String Internals::requestAnimationFrameThrottlingReasons() const

@@ -913,6 +913,7 @@ enum ContentsFormat {
     long timerNestingLevel();
     // Query if a timer is currently throttled, to debug timer throttling.
     boolean isTimerThrottled(long timerHandle);
+    boolean isTimerAligned(long timerHandle);
 
     DOMString requestAnimationFrameThrottlingReasons();
     boolean areTimersThrottled();

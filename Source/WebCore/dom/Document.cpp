@@ -4595,6 +4595,8 @@ Seconds Document::domTimerAlignmentInterval(bool hasReachedMaxNestingLevel) cons
         return alignmentInterval;
 
     // Apply Document-level DOMTimer throttling only if timers have reached their maximum nesting level as the Page may still be visible.
+    alignmentInterval = std::max(alignmentInterval, DOMTimer::minimumAlignmentForMaximallyNestedTimers());
+
     if (m_isTimerThrottlingEnabled)
         alignmentInterval = std::max(alignmentInterval, DOMTimer::hiddenPageAlignmentInterval());
 

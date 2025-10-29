@@ -296,6 +296,7 @@ public:
     // DOMTimers throttling testing.
     int timerNestingLevel();
     ExceptionOr<bool> isTimerThrottled(int timeoutId);
+    ExceptionOr<bool> isTimerAligned(int timeoutId);
     String requestAnimationFrameThrottlingReasons() const;
     double requestAnimationFrameInterval() const;
     bool scriptedAnimationsAreSuspended() const;

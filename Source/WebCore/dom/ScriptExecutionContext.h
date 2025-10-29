@@ -301,7 +301,7 @@ public:
     virtual Seconds domTimerAlignmentInterval(bool hasReachedMaxNestingLevel) const;
 
     // TimerAlignment
-    WEBCORE_EXPORT std::optional<MonotonicTime> alignedFireTime(bool hasReachedMaxNestingLevel, MonotonicTime fireTime) const final;
+    WEBCORE_EXPORT MonotonicTime alignedFireTime(bool hasReachedMaxNestingLevel, MonotonicTime fireTime) const final;
 
     virtual EventTarget* errorEventTarget() = 0;
 
