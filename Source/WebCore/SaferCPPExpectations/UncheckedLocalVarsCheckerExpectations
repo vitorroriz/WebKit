@@ -135,21 +135,16 @@ html/CollectionTraversalInlines.h
 html/FormAssociatedCustomElement.cpp
 html/FormListedElement.cpp
 [ iOS ] html/HTMLAnchorElement.cpp
-html/HTMLAttachmentElement.cpp
-html/HTMLDialogElement.cpp
 html/HTMLDocument.cpp
 html/HTMLFormControlElement.cpp
 html/HTMLFormElement.cpp
 html/HTMLImageElement.cpp
 [ iOS ] html/HTMLImageLoader.cpp
 html/HTMLInputElement.cpp
-html/HTMLMarqueeElement.cpp
 html/HTMLMediaElement.cpp
-html/HTMLPlugInElement.cpp
 html/HTMLSlotElement.cpp
 html/HTMLStyleElement.cpp
 html/HTMLTextFormControlElement.cpp
-html/HTMLTitleElement.cpp
 html/HTMLVideoElement.cpp
 html/MediaElementSession.cpp
 html/ModelDocument.cpp

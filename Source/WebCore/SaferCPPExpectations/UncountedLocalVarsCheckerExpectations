@@ -375,7 +375,6 @@ rendering/GlyphDisplayListCache.cpp
 rendering/HitTestResult.cpp
 rendering/ImageQualityController.cpp
 rendering/MarkedText.cpp
-rendering/RenderAttachment.cpp
 rendering/RenderBox.cpp
 rendering/RenderCounter.cpp
 rendering/RenderElement.cpp

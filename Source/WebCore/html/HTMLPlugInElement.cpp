@@ -123,7 +123,7 @@ bool HTMLPlugInElement::willRespondToMouseClickEventsWithEditability(Editability
 {
     if (isDisabledFormControl())
         return false;
-    auto renderer = this->renderer();
+    CheckedPtr renderer = this->renderer();
     return renderer && renderer->isRenderWidget();
 }
 
@@ -648,10 +648,10 @@ void HTMLPlugInElement::didAttachRenderers()
 
     // Update the RenderImageResource of the associated RenderImage.
     if (m_imageLoader) {
-        if (auto* renderImage = dynamicDowncast<RenderImage>(renderer())) {
-            auto& renderImageResource = renderImage->imageResource();
-            if (!renderImageResource.cachedImage())
-                renderImageResource.setCachedImage(m_imageLoader->protectedImage());
+        if (CheckedPtr renderImage = dynamicDowncast<RenderImage>(renderer())) {
+            CheckedRef renderImageResource = renderImage->imageResource();
+            if (!renderImageResource->cachedImage())
+                renderImageResource->setCachedImage(m_imageLoader->protectedImage());
         }
     }
 

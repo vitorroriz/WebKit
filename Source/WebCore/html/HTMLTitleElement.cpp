@@ -103,7 +103,7 @@ StringWithDirection HTMLTitleElement::computedTextWithDirection()
     if (!firstChild())
         return { };
     auto direction = TextDirection::LTR;
-    if (auto* computedStyle = this->computedStyle())
+    if (CheckedPtr computedStyle = this->computedStyle())
         direction = computedStyle->writingMode().computedTextDirection();
     return { text(), direction };
 }
