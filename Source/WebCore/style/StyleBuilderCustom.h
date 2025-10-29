@@ -280,23 +280,67 @@ void applyInheritPrimaryFillLayerProperty(BuilderState& builderState)
     );
 }
 
-template<auto layersSetter, auto converter, typename Layers>
+template<auto layersMutableGetter, auto layersSetter, auto setter, auto getter, auto initial, auto converter, typename Layers>
 void applyValuePrimaryFillLayerProperty(BuilderState& builderState, CSSValue& value)
 {
-    if (RefPtr valueList = dynamicDowncast<CSSValueList>(value)) {
-        (builderState.style().*layersSetter)(
-            Layers {
-                Layers::Container::map(valueList->size(), *valueList, [&](const CSSValue& item) {
-                    return typename Layers::Layer { converter(builderState, item) };
-                })
-            }
-        );
+    auto& layers = (builderState.style().*layersMutableGetter)();
+
+    if (layers.isNone()) {
+        if (RefPtr valueList = dynamicDowncast<CSSValueList>(value)) {
+            (builderState.style().*layersSetter)(
+                Layers {
+                    Layers::Container::map(valueList->size(), *valueList, [&](const CSSValue& item) {
+                        return typename Layers::Layer { converter(builderState, item) };
+                    })
+                }
+            );
+        } else {
+            (builderState.style().*layersSetter)(
+                Layers {
+                    Layers::Container::create({ typename Layers::Layer { converter(builderState, value) } })
+                }
+            );
+        }
     } else {
-        (builderState.style().*layersSetter)(
-            Layers {
-                Layers::Container::create({ typename Layers::Layer { converter(builderState, value) } })
+        auto set = [&](auto& layer, auto& item) {
+            // When the `background` or `mask` shorthands are used, implicit `initial` values may be inserted
+            // by the parser and must be handled explicitly here.
+            if (item.valueID() == CSSValueInitial)
+                (layer.*setter)(initial());
+            else
+                (layer.*setter)(converter(builderState, item));
+        };
+
+        size_t maxIndexSet = 0;
+        if (RefPtr valueList = dynamicDowncast<CSSValueList>(value)) {
+            auto numberOfOldLayers = layers.size();
+            auto numberOfNewLayers = valueList->size();
+
+            if (numberOfNewLayers > numberOfOldLayers) {
+                (builderState.style().*layersSetter)(
+                    Layers {
+                        Layers::Container::createWithSizeFromGenerator(numberOfNewLayers, [&](auto i) {
+                            auto newLayer = layers[i % numberOfOldLayers];
+                            set(newLayer, (*valueList)[i]);
+                            return newLayer;
+                        })
+                    }
+                );
+                maxIndexSet = numberOfNewLayers - 1;
+            } else {
+                for (auto [index, item] : indexedRange(*valueList)) {
+                    if (index >= numberOfOldLayers)
+                        break;
+
+                    set(layers[index], item);
+                    maxIndexSet = index;
+                }
             }
-        );
+        } else
+            set(layers[0], value);
+
+        // We need to fill in any remaining values with the pattern specified.
+        fillRemainingViaRepetition<setter, getter>(layers, maxIndexSet + 1);
     }
 }
 
