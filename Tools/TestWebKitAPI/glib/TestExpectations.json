@@ -585,12 +585,5 @@
                 "expected": {"gtk": {"status": ["TIMEOUT", "PASS"], "bug": "webkit.org/b/284812"}}
             }
         }
-    },
-    "TestWebKitWebXR": {
-        "subtests": {
-            "/webkit/WebKitWebXR/permission-request": {
-                "expected": {"all": {"status": ["TIMEOUT", "PASS"], "bug": "webkit.org/b/301508"}}
-            }
-        }
     }
 }
