@@ -4666,3 +4666,47 @@ TEST(Navigation, CookieTransformOnRedirect)
     TestWebKitAPI::Util::run(&done);
     EXPECT_EQ(transformCallbackCount, 2u);
 }
+
+TEST(WKNavigation, AllowResourceLoadFromBlockedPortWithCustomScheme)
+{
+    using namespace TestWebKitAPI;
+    HTTPServer httpsServer({
+        { "/page1"_s, { 302, {{ "Location"_s, "custom://site.example:0/"_s } }, "redirecting..."_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    auto handler = adoptNS([TestURLSchemeHandler new]);
+    __block unsigned requestsSchemeHandled = 0;
+    [handler setStartURLSchemeTaskHandler:^(WKWebView *, id<WKURLSchemeTask> task) {
+        NSString *responseString = nil;
+        if ([task.request.URL.absoluteString isEqualToString:@"custom://site.example:0/"])
+            responseString = @"<script src='custom://site.example:0/script.js'></script>";
+        else if ([task.request.URL.absoluteString isEqualToString:@"custom://site.example:0/script.js"])
+            responseString = @"alert('This resource was loaded');";
+        ASSERT(responseString);
+        requestsSchemeHandled++;
+        auto response = adoptNS([[NSURLResponse alloc] initWithURL:task.request.URL MIMEType:@"text/html" expectedContentLength:responseString.length textEncodingName:nil]);
+        [task didReceiveResponse:response.get()];
+        [task didReceiveData:[responseString dataUsingEncoding:NSUTF8StringEncoding]];
+        [task didFinish];
+    }];
+    [configuration setURLSchemeHandler:handler.get() forURLScheme:@"custom"];
+
+    auto storeConfiguration = adoptNS([[_WKWebsiteDataStoreConfiguration alloc] initNonPersistentConfiguration]);
+    [storeConfiguration setProxyConfiguration:@{
+        (NSString *)kCFStreamPropertyHTTPSProxyHost: @"127.0.0.1",
+        (NSString *)kCFStreamPropertyHTTPSProxyPort: @(httpsServer.port())
+    }];
+    auto dataStore = adoptNS([[WKWebsiteDataStore alloc] _initWithConfiguration:storeConfiguration.get()]);
+    [configuration setWebsiteDataStore:dataStore.get()];
+
+    auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectZero configuration:configuration.get()]);
+    auto navDelegate = adoptNS([TestNavigationDelegate new]);
+    [navDelegate allowAnyTLSCertificate];
+    [webView setNavigationDelegate:navDelegate.get()];
+    auto uiDelegate = adoptNS([TestUIDelegate new]);
+    [webView setUIDelegate:uiDelegate.get()];
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://site.example/page1"]]];
+    EXPECT_WK_STREQ([uiDelegate waitForAlert], "This resource was loaded");
+    EXPECT_EQ(requestsSchemeHandled, 2u);
+}
