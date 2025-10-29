@@ -3866,6 +3866,11 @@ AXObjectCache* Document::axObjectCache() const
     return m_axObjectCache.get();
 }
 
+CheckedPtr<AXObjectCache> Document::checkedAXObjectCache() const
+{
+    return axObjectCache();
+}
+
 void Document::setVisuallyOrdered()
 {
     m_visuallyOrdered = true;

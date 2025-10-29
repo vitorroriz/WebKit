@@ -1,24 +1,4 @@
 Platform/IPC/ArgumentCoders.h
-WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInFrame.mm
-WebProcess/InjectedBundle/API/c/WKBundleFrame.cpp
-WebProcess/InjectedBundle/API/c/WKBundlePage.cpp
-WebProcess/InjectedBundle/API/mac/WKDOMDocument.mm
-WebProcess/InjectedBundle/API/mac/WKDOMElement.mm
-WebProcess/InjectedBundle/API/mac/WKDOMNode.mm
-WebProcess/InjectedBundle/API/mac/WKDOMRange.mm
-WebProcess/InjectedBundle/API/mac/WKDOMText.mm
-WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextController.mm
-WebProcess/InjectedBundle/DOM/InjectedBundleNodeHandle.cpp
-WebProcess/InjectedBundle/DOM/InjectedBundleRangeHandle.cpp
-WebProcess/InjectedBundle/InjectedBundleHitTestResult.cpp
-WebProcess/Network/WebLoaderStrategy.cpp
-WebProcess/Network/WebResourceLoader.cpp
-WebProcess/WebPage/Cocoa/TextAnimationController.mm
-WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeDrawingArea.mm
-WebProcess/WebPage/RemoteLayerTree/RemoteScrollingCoordinator.mm
-WebProcess/WebPage/WebFrame.cpp
-WebProcess/WebPage/mac/WKAccessibilityWebPageObjectBase.mm
-[ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
 [ iOS ] UIProcess/API/ios/WKWebViewIOS.mm
 [ iOS ] UIProcess/API/ios/WKWebViewTestingIOS.mm
 [ iOS ] UIProcess/Cocoa/ExtensionCapabilityGranter.mm
@@ -34,7 +14,25 @@ WebProcess/WebPage/mac/WKAccessibilityWebPageObjectBase.mm
 [ iOS ] UIProcess/ios/WKContentViewInteraction.mm
 [ iOS ] UIProcess/ios/WebPageProxyIOS.mm
 [ iOS ] UIProcess/ios/fullscreen/WKFullScreenViewController.mm
+WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInFrame.mm
+WebProcess/InjectedBundle/API/c/WKBundleFrame.cpp
+WebProcess/InjectedBundle/API/c/WKBundlePage.cpp
+WebProcess/InjectedBundle/API/mac/WKDOMDocument.mm
+WebProcess/InjectedBundle/API/mac/WKDOMElement.mm
+WebProcess/InjectedBundle/API/mac/WKDOMNode.mm
+WebProcess/InjectedBundle/API/mac/WKDOMRange.mm
+WebProcess/InjectedBundle/API/mac/WKDOMText.mm
+WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextController.mm
+WebProcess/InjectedBundle/DOM/InjectedBundleNodeHandle.cpp
+WebProcess/InjectedBundle/DOM/InjectedBundleRangeHandle.cpp
+WebProcess/InjectedBundle/InjectedBundleHitTestResult.cpp
+WebProcess/Network/WebLoaderStrategy.cpp
+WebProcess/Network/WebResourceLoader.cpp
 [ iOS ] WebProcess/Plugins/PDF/UnifiedPDF/UnifiedPDFPlugin.mm
+WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeDrawingArea.mm
+WebProcess/WebPage/RemoteLayerTree/RemoteScrollingCoordinator.mm
 [ iOS ] WebProcess/WebPage/WebFoundTextRangeController.cpp
+WebProcess/WebPage/WebFrame.cpp
 [ iOS ] WebProcess/WebPage/ios/FindControllerIOS.mm
 [ iOS ] WebProcess/WebPage/ios/WebPageIOS.mm
+[ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm

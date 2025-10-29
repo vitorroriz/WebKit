@@ -124,7 +124,7 @@ namespace ax = WebCore::Accessibility;
             // is built, so that when text annotations are created on-the-fly as users focus on text fields,
             // isolated objects are able to be attached to those text annotation object wrappers.
             // If they aren't, we never have a backing object to serve any requests from.
-            if (auto cache = protectedSelf.get().axObjectCache)
+            if (CheckedPtr cache = protectedSelf.get().axObjectCache.get())
                 cache->buildIsolatedTreeIfNeeded();
 #endif // ENABLE(ACCESSIBILITY_ISOLATED_TREE)
             if (![protectedSelf shouldFallbackToWebContentAXObjectForMainFramePlugin])
@@ -139,7 +139,7 @@ namespace ax = WebCore::Accessibility;
             }
         }
 
-        if (auto cache = protectedSelf.get().axObjectCache) {
+        if (CheckedPtr cache = protectedSelf.get().axObjectCache.get()) {
             // It's possible we were given a null frame (this is explicitly expected when off the main-thread, since
             // we can't access the webpage off the main-thread to get a frame). Now that we are actually on the main-thread,
             // try again if necessary.
@@ -228,7 +228,7 @@ namespace ax = WebCore::Accessibility;
 - (void)_buildIsolatedTreeIfNeeded
 {
     ensureOnMainThread([protectedSelf = RetainPtr { self }] {
-        if (auto cache = protectedSelf.get().axObjectCache)
+        if (CheckedPtr cache = protectedSelf.get().axObjectCache.get())
             cache->buildIsolatedTreeIfNeeded();
     });
 }
