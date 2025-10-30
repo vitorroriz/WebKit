@@ -672,19 +672,32 @@ void PositionedLayoutConstraints::computeInlineStaticDistance()
         staticDistance -= m_containingRange.min();
     }
 
+    // Since the static position is computed during in flow layout, the computed
+    // position should already have zoom computed in. We need to divide out the zoom
+    // so that we get the same position when evaluating the inset.
+    auto usedZoom = m_style.usedZoomForLength().value;
     if (shouldUseInsetAfter) {
-        m_insetAfter = Style::InsetEdge::Fixed { containingSize() - staticDistance };
+        m_insetAfter = Style::InsetEdge::Fixed { (containingSize() - staticDistance) / usedZoom };
         return;
     }
-    m_insetBefore = Style::InsetEdge::Fixed { staticDistance };
+    m_insetBefore = Style::InsetEdge::Fixed { staticDistance / usedZoom };
 }
 
 void PositionedLayoutConstraints::computeBlockStaticDistance()
 {
+    // Since the static position is computed during in flow layout, the computed
+    // position should already have zoom computed in. We need to divide out the zoom
+    // so that we get the same position when evaluating the inset.
+    auto usedZoom = m_style.usedZoomForLength().value;
+
     // Note that at this point staticPosition is relative to the containing block (x is inline direction, y is block direction)
     // which may not match with the box's slef writing mode.
-    auto staticPosition = staticDistance(*m_container, m_renderer.get());
-    m_insetBefore = Style::InsetEdge::Fixed { !isOrthogonal() ? staticPosition.y() : staticPosition.x() };
+    auto staticPosition = [&] {
+        if (!isOrthogonal())
+            return staticDistance(*m_container, m_renderer.get()).y() / usedZoom;
+        return staticDistance(*m_container, m_renderer.get()).x() / usedZoom;
+    };
+    m_insetBefore = Style::InsetEdge::Fixed { staticPosition() };
 }
 
 static bool shouldInlineStaticDistanceAdjustedWithBoxHeight(WritingMode containinigBlockWritingMode, WritingMode parentWritingMode, WritingMode outOfFlowBoxWritingMode)
