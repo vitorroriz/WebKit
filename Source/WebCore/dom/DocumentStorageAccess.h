@@ -91,7 +91,8 @@ private:
     void requestStorageAccessQuirk(RegistrableDomain&& requestingDomain, CompletionHandler<void(StorageAccessWasGranted)>&&);
 
     static DocumentStorageAccess* from(Document&);
-    static ASCIILiteral supplementName();
+    static ASCIILiteral supplementName() { return "DocumentStorageAccess"_s; }
+    bool isDocumentStorageAccess() const final { return true; }
     bool hasFrameSpecificStorageAccess() const;
     void setWasExplicitlyDeniedFrameSpecificStorageAccess() { ++m_numberOfTimesExplicitlyDeniedFrameSpecificStorageAccess; };
     bool isAllowedToRequestStorageAccess() { return m_numberOfTimesExplicitlyDeniedFrameSpecificStorageAccess < maxNumberOfTimesExplicitlyDeniedStorageAccess; };
@@ -110,3 +111,7 @@ private:
 };
 
 } // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::DocumentStorageAccess)
+    static bool isType(const WebCore::SupplementBase& supplement) { return supplement.isDocumentStorageAccess(); }
+SPECIALIZE_TYPE_TRAITS_END()

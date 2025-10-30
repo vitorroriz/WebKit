@@ -41,7 +41,6 @@ template<typename> class ExceptionOr;
 
 class WindowOrWorkerGlobalScopeTrustedTypes {
 public:
-    static ASCIILiteral workerGlobalSupplementName();
     static TrustedTypePolicyFactory* trustedTypes(DOMWindow&);
     static TrustedTypePolicyFactory* trustedTypes(WorkerGlobalScope&);
 };
@@ -57,7 +56,7 @@ public:
 
     void prepareForDestruction();
 
-    static ASCIILiteral supplementName() { return WindowOrWorkerGlobalScopeTrustedTypes::workerGlobalSupplementName(); }
+    static ASCIILiteral supplementName() { return "WorkerGlobalScopeTrustedTypes"_s; }
 
 private:
     bool isWorkerGlobalScopeTrustedTypes() const final { return true; }

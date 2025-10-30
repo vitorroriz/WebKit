@@ -39,14 +39,9 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(MediaKeySystemController);
 
-ASCIILiteral MediaKeySystemController::supplementName()
-{
-    return "MediaKeySystemController"_s;
-}
-
 MediaKeySystemController* MediaKeySystemController::from(Page* page)
 {
-    return static_cast<MediaKeySystemController*>(Supplement<Page>::from(page, MediaKeySystemController::supplementName()));
+    return downcast<MediaKeySystemController>(Supplement<Page>::from(page, MediaKeySystemController::supplementName()));
 }
 
 MediaKeySystemController::MediaKeySystemController(Ref<MediaKeySystemClient>&& client)

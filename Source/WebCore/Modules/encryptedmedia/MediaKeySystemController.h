@@ -47,10 +47,12 @@ public:
 
     void logRequestMediaKeySystemDenial(Document&);
 
-    WEBCORE_EXPORT static ASCIILiteral supplementName();
+    static ASCIILiteral supplementName() { return "MediaKeySystemController"_s; }
     static MediaKeySystemController* from(Page*);
 
 private:
+    bool isMediaKeySystemController() const final { return true; }
+
     const Ref<MediaKeySystemClient> m_client;
 };
 
@@ -65,5 +67,9 @@ inline void MediaKeySystemController::cancelMediaKeySystemRequest(MediaKeySystem
 }
 
 } // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::MediaKeySystemController)
+    static bool isType(const WebCore::SupplementBase& supplement) { return supplement.isMediaKeySystemController(); }
+SPECIALIZE_TYPE_TRAITS_END()
 
 #endif // ENABLE(ENCRYPTED_MEDIA)

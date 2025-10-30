@@ -79,14 +79,9 @@ RefPtr<Event> DeviceMotionController::getLastEvent()
     return DeviceMotionEvent::create(eventNames().devicemotionEvent, lastMotion.get());
 }
 
-ASCIILiteral DeviceMotionController::supplementName()
-{
-    return "DeviceMotionController"_s;
-}
-
 DeviceMotionController* DeviceMotionController::from(Page* page)
 {
-    return static_cast<DeviceMotionController*>(Supplement<Page>::from(page, supplementName()));
+    return downcast<DeviceMotionController>(Supplement<Page>::from(page, supplementName()));
 }
 
 bool DeviceMotionController::isActiveAt(Page* page)

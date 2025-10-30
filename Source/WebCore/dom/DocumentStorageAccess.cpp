@@ -68,12 +68,7 @@ DocumentStorageAccess* DocumentStorageAccess::from(Document& document)
         auto newSupplement = makeUniqueWithoutRefCountedCheck<DocumentStorageAccess>(document);
         provideTo(&document, supplementName(), WTFMove(newSupplement));
     }
-    return static_cast<DocumentStorageAccess*>(Supplement<Document>::from(&document, supplementName()));
-}
-
-ASCIILiteral DocumentStorageAccess::supplementName()
-{
-    return "DocumentStorageAccess"_s;
+    return downcast<DocumentStorageAccess>(Supplement<Document>::from(&document, supplementName()));
 }
 
 void DocumentStorageAccess::hasStorageAccess(Document& document, Ref<DeferredPromise>&& promise)

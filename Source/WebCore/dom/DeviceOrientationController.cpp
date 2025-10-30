@@ -82,14 +82,9 @@ RefPtr<Event> DeviceOrientationController::getLastEvent()
 
 #endif // PLATFORM(IOS_FAMILY)
 
-ASCIILiteral DeviceOrientationController::supplementName()
-{
-    return "DeviceOrientationController"_s;
-}
-
 DeviceOrientationController* DeviceOrientationController::from(Page* page)
 {
-    return static_cast<DeviceOrientationController*>(Supplement<Page>::from(page, supplementName()));
+    return downcast<DeviceOrientationController>(Supplement<Page>::from(page, supplementName()));
 }
 
 bool DeviceOrientationController::isActiveAt(Page* page)
