@@ -404,6 +404,68 @@ static String supportedBufferFormats(const RenderProcessInfo& info, JSON::Array&
 }
 #endif
 
+static String viewActivityState(WebKitURISchemeRequest* request)
+{
+    auto& page = webkitURISchemeRequestGetWebPage(request);
+    Vector<String, 4> state;
+    if (page.isInWindow())
+        state.append("in window"_s);
+    if (page.isViewVisible())
+        state.append("visible"_s);
+    if (page.isViewFocused())
+        state.append("focused"_s);
+    if (page.isViewWindowActive())
+        state.append("active"_s);
+    return makeStringByJoining(state.span(), ", "_s);
+}
+
+#if PLATFORM(GTK)
+static String toplevelState(WebKitURISchemeRequest* request)
+{
+#if USE(GTK4)
+    auto* webView = webkit_uri_scheme_request_get_web_view(request);
+    auto* root = gtk_widget_get_root(GTK_WIDGET(webView));
+    if (!root)
+        return { };
+
+    auto* surface = gtk_native_get_surface(GTK_NATIVE(root));
+    if (!surface || !GDK_IS_TOPLEVEL(surface))
+        return { };
+
+    auto state = gdk_toplevel_get_state(GDK_TOPLEVEL(surface));
+    if (state & GDK_TOPLEVEL_STATE_FULLSCREEN)
+        return "fullscreen"_s;
+    if (state & GDK_TOPLEVEL_STATE_MAXIMIZED)
+        return "maximized"_s;
+    return "normal"_s;
+#else
+    return { };
+#endif
+}
+#elif PLATFORM(WPE)
+static String toplevelState(WebKitURISchemeRequest* request)
+{
+#if ENABLE(WPE_PLATFORM)
+    if (!WKWPE::isUsingWPEPlatformAPI())
+        return { };
+
+    auto* webView = webkit_uri_scheme_request_get_web_view(request);
+    auto* view = webkit_web_view_get_wpe_view(webView);
+    if (!view)
+        return { };
+
+    auto state = wpe_view_get_toplevel_state(view);
+    if (state & WPE_TOPLEVEL_STATE_FULLSCREEN)
+        return "fullscreen"_s;
+    if (state & WPE_TOPLEVEL_STATE_MAXIMIZED)
+        return "maximized"_s;
+    return "normal"_s;
+#else
+    return { };
+#endif
+}
+#endif
+
 static String prettyPrintJSON(const String& jsonString)
 {
     StringBuilder result;
@@ -481,6 +543,7 @@ void WebKitProtocolHandler::handleGPU(WebKitURISchemeRequest* request, RenderPro
         "  table { width: 100%; border-collapse: collapse; }"
         "  table, td { border: 1px solid #d3d7cf; border-left: none; border-right: none; }"
         "  p { margin-bottom: 30px; }"
+        "  table tr > td:first-child { width: 25% }"
         "  td { padding: 15px; }"
         "  td.data { width: 200px; }"
         "  .titlename { font-weight: bold; }"
@@ -627,6 +690,18 @@ void WebKitProtocolHandler::handleGPU(WebKitURISchemeRequest* request, RenderPro
 
     stopTable();
     jsonObject->setObject("Display Information"_s, WTFMove(displayObject));
+
+    auto viewObject = JSON::Object::create();
+    startTable("View Information"_s);
+
+    addTableRow(viewObject, "Size"_s, makeString(page->viewSize().width(), 'x', page->viewSize().height()));
+    addTableRow(viewObject, "State"_s, viewActivityState(request));
+    auto state = toplevelState(request);
+    if (!state.isNull())
+        addTableRow(viewObject, "Toplevel state"_s, state);
+
+    stopTable();
+    jsonObject->setObject("View Information"_s, WTFMove(viewObject));
 
     auto hardwareAccelerationObject = JSON::Object::create();
     startTable("Hardware Acceleration Information"_s);
