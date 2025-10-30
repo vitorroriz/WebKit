@@ -755,7 +755,7 @@ static void testWebsiteDataITP(WebsiteDataTest* test, gconstpointer)
     g_assert_true(g_file_test(itpDatabaseFile.get(), G_FILE_TEST_IS_REGULAR));
 
     // Give some time for the database to be updated.
-    test->wait(0.5);
+    test->wait(1);
 
     GList* dataList = test->fetch(WEBKIT_WEBSITE_DATA_ITP);
     g_assert_nonnull(dataList);
@@ -794,6 +794,7 @@ static void testWebsiteDataServiceWorkerRegistrations(WebsiteDataTest* test, gco
 
     test->loadURI(kServer->getURIForPath("/service/register.html").data());
     test->waitUntilLoadFinished();
+    test->wait(1);
 
     dataList = test->fetch(WEBKIT_WEBSITE_DATA_SERVICE_WORKER_REGISTRATIONS);
     g_assert_cmpuint(g_list_length(dataList), ==, 1);

@@ -552,9 +552,6 @@
             "/webkit/WebKitWebsiteData/storage": {
                 "expected": {"gtk": {"status": ["TIMEOUT", "PASS"], "bug": "webkit.org/b/284812"}}
             },
-            "/webkit/WebKitWebsiteData/service-worker-registrations": {
-                "expected": {"all" : { "status": ["PASS", "FAIL", "TIMEOUT"], "bug": "webkit.org/b/287621"}}
-            },
             "/webkit/WebKitWebsiteData/configuration": {
                 "expected": {"all" : { "status": ["PASS", "FAIL", "TIMEOUT"], "bug": "webkit.org/b/301570"}}
             },
