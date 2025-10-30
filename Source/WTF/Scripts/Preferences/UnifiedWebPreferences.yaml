@@ -700,6 +700,17 @@ AutomaticallyAdjustsViewScaleUsingMinimumEffectiveDeviceWidth:
     WebCore:
       default: false
 
+AutomaticallyForceEnableScrollingIfNeededToRevealUI:
+  type: bool
+  status: embedder
+  defaultValue:
+    WebKitLegacy:
+      default: true
+    WebKit:
+      default: true
+    WebCore:
+      default: true
+
 AuxclickEventEnabled:
   type: bool
   status: stable
