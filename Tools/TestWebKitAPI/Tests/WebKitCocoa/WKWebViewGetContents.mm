@@ -124,12 +124,7 @@ TEST(WKWebView, GetContentsOfAllFramesShouldReturnString)
     Util::run(&finished);
 }
 
-// FIXME: rdar://163666375 (REGRESSION(IOS26): TestWebKitAPI.WKWebView.GetContentsShouldReturnAttributedString (301652))
-#if PLATFORM(IOS)
-TEST(WKWebView, DISABLED_GetContentsShouldReturnAttributedString)
-#else
 TEST(WKWebView, GetContentsShouldReturnAttributedString)
-#endif
 {
     RetainPtr<TestWKWebView> webView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600)]);
 
@@ -169,7 +164,7 @@ TEST(WKWebView, GetContentsShouldReturnAttributedString)
 #if USE(APPKIT)
         EXPECT_WK_STREQ(@"sRGB IEC61966-2.1 colorspace 1 0 0 1", dynamic_objc_cast<NSColor>(documentAttributes[NSBackgroundColorDocumentAttribute]).description);
 #else
-        EXPECT_WK_STREQ(@"kCGColorSpaceModelRGB 1 0 0 1 ", dynamic_objc_cast<UIColor>(documentAttributes[NSBackgroundColorDocumentAttribute]).description);
+        EXPECT_WK_STREQ(@"kCGColorSpaceModelRGB 1 0 0 1", dynamic_objc_cast<UIColor>(documentAttributes[NSBackgroundColorDocumentAttribute]).description);
 #endif
 
         finished = true;
