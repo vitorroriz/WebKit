@@ -177,7 +177,7 @@ std::optional<std::pair<double, double>> ViewGestureGeometryCollector::computeTe
     RefPtr webPage = m_webPage.get();
     if (!webPage)
         return std::nullopt;
-    RefPtr localMainFrame = dynamicDowncast<WebCore::LocalFrame>(m_webPage->mainFrame());
+    RefPtr localMainFrame = dynamicDowncast<WebCore::LocalFrame>(webPage->mainFrame());
     if (!localMainFrame)
         return std::nullopt;
     RefPtr document = localMainFrame->document();
@@ -198,12 +198,12 @@ std::optional<std::pair<double, double>> ViewGestureGeometryCollector::computeTe
         if (!is<Text>(documentTextIterator.node()))
             continue;
 
-        auto& textNode = downcast<Text>(*documentTextIterator.node());
-        auto textLength = textNode.length();
-        if (!textLength || !textNode.renderer() || allTextNodes.contains(textNode))
+        Ref textNode = downcast<Text>(*documentTextIterator.node());
+        auto textLength = textNode->length();
+        if (!textLength || !textNode->renderer() || allTextNodes.contains(textNode))
             continue;
 
-        unsigned fontSizeBin = fontSizeBinningInterval * round(textNode.renderer()->style().fontCascade().size() / fontSizeBinningInterval);
+        unsigned fontSizeBin = fontSizeBinningInterval * round(textNode->renderer()->style().fontCascade().size() / fontSizeBinningInterval);
         if (!FontSizeCounter::isValidValue(fontSizeBin))
             continue;
 
@@ -279,8 +279,8 @@ void ViewGestureGeometryCollector::computeMinimumAndMaximumViewportScales(double
     if (!webPage)
         return;
 
-    viewportMinimumScale = m_webPage->minimumPageScaleFactor();
-    viewportMaximumScale = m_webPage->maximumPageScaleFactor();
+    viewportMinimumScale = webPage->minimumPageScaleFactor();
+    viewportMaximumScale = webPage->maximumPageScaleFactor();
 #else
     viewportMinimumScale = 0;
     viewportMaximumScale = std::numeric_limits<double>::max();

@@ -92,9 +92,7 @@ WebProcess/InjectedBundle/InjectedBundleHitTestResult.cpp
 [ iOS ] WebProcess/Plugins/PDF/UnifiedPDF/UnifiedPDFPlugin.mm
 [ iOS ] WebProcess/WebCoreSupport/WebChromeClientCocoa.mm
 [ iOS ] WebProcess/WebCoreSupport/WebLocalFrameLoaderClient.cpp
-[ iOS ] WebProcess/WebCoreSupport/WebPlatformStrategies.cpp
 WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeDrawingArea.mm
-[ iOS ] WebProcess/WebPage/ViewGestureGeometryCollector.cpp
 [ iOS ] WebProcess/WebPage/WKAccessibilityWebPageObjectIOS.mm
 [ iOS ] WebProcess/WebPage/WebPage.cpp
 [ iOS ] WebProcess/WebPage/ios/FindControllerIOS.mm

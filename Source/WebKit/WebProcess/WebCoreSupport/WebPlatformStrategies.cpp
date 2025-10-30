@@ -326,7 +326,7 @@ String WebPlatformStrategies::urlStringSuitableForLoading(const String& pasteboa
 void WebPlatformStrategies::writeToPasteboard(const PasteboardURL& url, const String& pasteboardName, const PasteboardContext* context)
 {
     WebProcess::singleton().willWriteToPasteboardAsynchronously(pasteboardName);
-    WebProcess::singleton().parentProcessConnection()->send(Messages::WebPasteboardProxy::WriteURLToPasteboard(url, pasteboardName, pageIdentifier(context)), 0);
+    WebProcess::singleton().protectedParentProcessConnection()->send(Messages::WebPasteboardProxy::WriteURLToPasteboard(url, pasteboardName, pageIdentifier(context)), 0);
 }
 
 static std::optional<WebCore::PasteboardWebContent> updateContentForWebArchive(const WebCore::PasteboardWebContent& content)
@@ -359,7 +359,7 @@ void WebPlatformStrategies::writeToPasteboard(const WebCore::PasteboardWebConten
 {
     WebProcess::singleton().willWriteToPasteboardAsynchronously(pasteboardName);
     if (auto updatedContent = updateContentForWebArchive(content)) {
-        WebProcess::singleton().parentProcessConnection()->send(Messages::WebPasteboardProxy::WriteWebContentToPasteboard(*updatedContent, pasteboardName, pageIdentifier(context)), 0);
+        WebProcess::singleton().protectedParentProcessConnection()->send(Messages::WebPasteboardProxy::WriteWebContentToPasteboard(*updatedContent, pasteboardName, pageIdentifier(context)), 0);
         return;
     }
     WebProcess::singleton().parentProcessConnection()->send(Messages::WebPasteboardProxy::WriteWebContentToPasteboard(content, pasteboardName, pageIdentifier(context)), 0);
@@ -368,18 +368,18 @@ void WebPlatformStrategies::writeToPasteboard(const WebCore::PasteboardWebConten
 void WebPlatformStrategies::writeToPasteboard(const WebCore::PasteboardImage& image, const String& pasteboardName, const PasteboardContext* context)
 {
     WebProcess::singleton().willWriteToPasteboardAsynchronously(pasteboardName);
-    WebProcess::singleton().parentProcessConnection()->send(Messages::WebPasteboardProxy::WriteImageToPasteboard(image, pasteboardName, pageIdentifier(context)), 0);
+    WebProcess::singleton().protectedParentProcessConnection()->send(Messages::WebPasteboardProxy::WriteImageToPasteboard(image, pasteboardName, pageIdentifier(context)), 0);
 }
 
 void WebPlatformStrategies::writeToPasteboard(const String& pasteboardType, const String& text, const String& pasteboardName, const PasteboardContext* context)
 {
     WebProcess::singleton().willWriteToPasteboardAsynchronously(pasteboardName);
-    WebProcess::singleton().parentProcessConnection()->send(Messages::WebPasteboardProxy::WriteStringToPasteboard(pasteboardType, text, pasteboardName, pageIdentifier(context)), 0);
+    WebProcess::singleton().protectedParentProcessConnection()->send(Messages::WebPasteboardProxy::WriteStringToPasteboard(pasteboardType, text, pasteboardName, pageIdentifier(context)), 0);
 }
 
 void WebPlatformStrategies::updateSupportedTypeIdentifiers(const Vector<String>& identifiers, const String& pasteboardName, const PasteboardContext* context)
 {
-    WebProcess::singleton().parentProcessConnection()->send(Messages::WebPasteboardProxy::UpdateSupportedTypeIdentifiers(identifiers, pasteboardName, pageIdentifier(context)), 0);
+    WebProcess::singleton().protectedParentProcessConnection()->send(Messages::WebPasteboardProxy::UpdateSupportedTypeIdentifiers(identifiers, pasteboardName, pageIdentifier(context)), 0);
 }
 #endif // PLATFORM(IOS_FAMILY)
 
@@ -445,7 +445,7 @@ void WebPlatformStrategies::getTypes(Vector<String>& types)
 
 void WebPlatformStrategies::writeToPasteboard(const WebCore::PasteboardWebContent& content)
 {
-    WebProcess::singleton().parentProcessConnection()->send(Messages::WebPasteboardProxy::WriteWebContentToPasteboard(content), 0);
+    WebProcess::singleton().protectedParentProcessConnection()->send(Messages::WebPasteboardProxy::WriteWebContentToPasteboard(content), 0);
 }
 
 void WebPlatformStrategies::writeToPasteboard(const String& pasteboardType, const String& text)
