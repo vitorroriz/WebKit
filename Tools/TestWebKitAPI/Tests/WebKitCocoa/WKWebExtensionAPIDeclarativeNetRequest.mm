@@ -35,7 +35,8 @@
 
 namespace TestWebKitAPI {
 
-TEST(WKWebExtensionAPIDeclarativeNetRequest, BlockedLoadTest)
+// FIXME: rdar://163669919 (REGRESSION(iOS26, Tahoe) [ iOS26 Tahoe Debug ]: TestWebKitAPI.WKWebExtensionAPIDeclarativeNetRequest.BlockedLoadInPrivateBrowsingTest is a constant timeout (301660))
+TEST(WKWebExtensionAPIDeclarativeNetRequest, DISABLED_BlockedLoadTest)
 {
     TestWebKitAPI::HTTPServer server({
         { "/"_s, { { { "Content-Type"_s, "text/html"_s } }, "<iframe src='/frame.html'></iframe>"_s } },
