@@ -46,6 +46,7 @@
 #include <wtf/glib/GRefPtr.h>
 #include <wtf/glib/GUniquePtr.h>
 #include <wtf/text/MakeString.h>
+#include <wtf/text/StringToIntegerConversion.h>
 #include <wtf/text/StringView.h>
 #include <wtf/text/WTFString.h>
 #include <wtf/unix/UnixFileDescriptor.h>
@@ -529,13 +530,26 @@ static String prettyPrintJSON(const String& jsonString)
     return result.toString();
 }
 
+static unsigned refreshParameter(const URL& url)
+{
+    auto parameters = queryParameters(url);
+    for (const auto& parameter : parameters) {
+        if (parameter.key == "refresh"_s)
+            return parseInteger<unsigned>(parameter.value).value_or(0);
+    }
+    return 0;
+}
+
 void WebKitProtocolHandler::handleGPU(WebKitURISchemeRequest* request, RenderProcessInfo&& info)
 {
     URL requestURL = URL(String::fromLatin1(webkit_uri_scheme_request_get_uri(request)));
-    GString* html = g_string_new(
-        "<html><head><title>GPU information</title>"
-        "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"
-        "<style>"
+
+    StringBuilder htmlBuilder;
+    htmlBuilder.append("<html><head><title>GPU information</title>"
+        "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"_s);
+    if (auto refresh = refreshParameter(requestURL))
+        htmlBuilder.append("<meta http-equiv=\"refresh\" content=\""_s, refresh, "\" />"_s);
+    htmlBuilder.append("<style>"
         "  h1 { color: #babdb6; text-shadow: 0 1px 0 white; margin-bottom: 0; }"
         "  html { font-family: -webkit-system-font; font-size: 11pt; color: #2e3436; padding: 20px 20px 0 20px; background-color: #f6f6f4; "
         "         background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #eeeeec), color-stop(1, #f6f6f4));"
@@ -547,7 +561,7 @@ void WebKitProtocolHandler::handleGPU(WebKitURISchemeRequest* request, RenderPro
         "  td { padding: 15px; }"
         "  td.data { width: 200px; }"
         "  .titlename { font-weight: bold; }"
-        "</style>");
+        "</style>"_s);
 
     StringBuilder tablesBuilder;
 
@@ -780,29 +794,28 @@ void WebKitProtocolHandler::handleGPU(WebKitURISchemeRequest* request, RenderPro
         jsonObject->setObject("Hardware Acceleration Information (Render process)"_s, WTFMove(hardwareAccelerationObject));
     }
 
-    WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN // GTK/WPE port
-
     auto infoAsString = jsonObject->toJSONString();
-    g_string_append_printf(html, "<script>function copyAsJSON() { "
+    htmlBuilder.append("<script>function copyAsJSON() { "
         "var textArea = document.createElement('textarea');"
-        "textArea.value = JSON.stringify(%s, null, 4);"
+        "textArea.value = JSON.stringify("_s, infoAsString, "null, 4);"_s,
         "document.body.appendChild(textArea);"
         "textArea.focus();"
         "textArea.select();"
         "document.execCommand('copy');"
         "document.body.removeChild(textArea);"
-        "}</script></head><body>", infoAsString.utf8().data());
+        "}</script></head><body>"_s);
+
 #if PLATFORM(GTK)
     // WPE doesn't seem to pass clipboard data yet.
-    g_string_append(html, "<button onclick=\"copyAsJSON()\">Copy to clipboard</button>");
+    htmlBuilder.append("<button onclick=\"copyAsJSON()\">Copy to clipboard</button>"_s);
 #endif
-    g_string_append(html, "<button onclick=\"window.location.href='webkit://gpu/stdout'\">Print in stdout</button>");
-    g_string_append_printf(html, "%s</body></html>", tablesBuilder.toString().utf8().data());
+    htmlBuilder.append("<button onclick=\"window.location.href='webkit://gpu/stdout'\">Print in stdout</button>"_s);
 
-    WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
+    htmlBuilder.append(tablesBuilder.toString(), "</body></html>"_s);
 
-    gsize streamLength = html->len;
-    GRefPtr<GInputStream> stream = adoptGRef(g_memory_input_stream_new_from_data(g_string_free(html, FALSE), streamLength, g_free));
+    auto html = htmlBuilder.toString().utf8();
+    gsize streamLength = html.length();
+    GRefPtr<GInputStream> stream = adoptGRef(g_memory_input_stream_new_from_data(g_strdup(html.data()), streamLength, g_free));
     webkit_uri_scheme_request_finish(request, stream.get(), streamLength, "text/html");
 
     if (requestURL.path() == "/stdout"_s)
