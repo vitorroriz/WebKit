@@ -111,13 +111,17 @@ void PlatformXRSystemProxy::requestFrame(std::optional<PlatformXR::RequestData>&
 std::optional<PlatformXR::LayerHandle> PlatformXRSystemProxy::createLayerProjection(uint32_t width, uint32_t height, bool alpha)
 {
 #if USE(OPENXR)
-    protectedPage()->send(Messages::PlatformXRSystem::CreateLayerProjection(width, height, alpha));
+    auto result = protectedPage()->sendSync(Messages::PlatformXRSystem::CreateLayerProjection(width, height, alpha));
+    if (!result.succeeded())
+        return std::nullopt;
+    auto [layerHandle] = result.takeReply();
+    return layerHandle;
 #else
     UNUSED_PARAM(width);
     UNUSED_PARAM(height);
     UNUSED_PARAM(alpha);
-#endif
     return PlatformXRCoordinator::defaultLayerHandle();
+#endif
 }
 
 #if USE(OPENXR)

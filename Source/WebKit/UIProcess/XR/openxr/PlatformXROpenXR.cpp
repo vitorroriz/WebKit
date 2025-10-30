@@ -186,21 +186,23 @@ std::unique_ptr<OpenXRSwapchain> OpenXRCoordinator::createSwapchain(uint32_t wid
     return OpenXRSwapchain::create(m_session, info, alpha ? OpenXRSwapchain::HasAlpha::Yes : OpenXRSwapchain::HasAlpha::No);
 }
 
-void OpenXRCoordinator::createLayerProjection(uint32_t width, uint32_t height, bool alpha)
+void OpenXRCoordinator::createLayerProjection(uint32_t width, uint32_t height, bool alpha, CompletionHandler<void(std::optional<PlatformXR::LayerHandle>)>&& reply)
 {
     ASSERT(RunLoop::isMain());
     WTF::switchOn(m_state,
-        [&](Idle&) { },
+        [&](Idle&) { reply(std::nullopt); },
         [&](Active& active) {
-            active.renderQueue->dispatch([this, width, height, alpha] {
+            active.renderQueue->dispatch([this, width, height, alpha, completionHandler = WTFMove(reply)] mutable {
                 if (!collectSwapchainFormatsIfNeeded()) {
                     RELEASE_LOG(XR, "OpenXRCoordinator: no supported swapchain formats");
+                    completionHandler(std::nullopt);
                     return;
                 }
 
                 auto swapchain = createSwapchain(width, height, alpha);
                 if (!swapchain) {
                     RELEASE_LOG(XR, "OpenXRCoordinator: failed to create swapchain");
+                    completionHandler(std::nullopt);
                     return;
                 }
 
@@ -209,7 +211,9 @@ void OpenXRCoordinator::createLayerProjection(uint32_t width, uint32_t height, b
                     if (m_gbmDevice)
                         layer->setGBMDevice(m_gbmDevice);
 #endif
-                    m_layers.add(defaultLayerHandle(), WTFMove(layer));
+                    auto layerHandle = m_nextLayerHandle++;
+                    m_layers.add(layerHandle, WTFMove(layer));
+                    completionHandler(layerHandle);
                 }
             });
         });
