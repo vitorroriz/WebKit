@@ -1256,13 +1256,20 @@ void WebAuthenticatorCoordinatorProxy::isUserVerifyingPlatformAuthenticatorAvail
             handler(false);
             return;
         }
-        if ([getASCWebKitSPISupportClassSingleton() shouldUseAlternateCredentialStore]) {
-            getArePasskeysDisallowedForRelyingParty(data, [handler = WTFMove(handler)](bool passkeysDisallowed) mutable {
-                handler(!passkeysDisallowed);
-            });
+
+        if (![getASCWebKitSPISupportClassSingleton() shouldUseAlternateCredentialStore]) {
+            handler(false);
             return;
         }
-        handler(LocalService::isAvailable());
+
+        if (![getASAuthorizationWebBrowserPublicKeyCredentialManagerClassSingleton() isDeviceConfiguredForPasskeys]) {
+            handler(false);
+            return;
+        }
+
+        getArePasskeysDisallowedForRelyingParty(data, [handler = WTFMove(handler)](bool passkeysDisallowed) mutable {
+            handler(!passkeysDisallowed);
+        });
     });
 }
 
