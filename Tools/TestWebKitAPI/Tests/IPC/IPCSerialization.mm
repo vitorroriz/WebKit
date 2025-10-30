@@ -102,7 +102,6 @@ struct CFHolderForTesting {
 
     using ValueType = Variant<
         std::nullptr_t,
-        RetainPtr<CFArrayRef>,
         RetainPtr<CFBooleanRef>,
         RetainPtr<CFCharacterSetRef>,
         RetainPtr<CFDataRef>,
@@ -288,8 +287,6 @@ CFHolderForTesting cfHolder(CFTypeRef type)
     if (!type)
         return { nullptr };
     CFTypeID typeID = CFGetTypeID(type);
-    if (typeID == CFArrayGetTypeID())
-        return { (CFArrayRef)type };
     if (typeID == CFBooleanGetTypeID())
         return { (CFBooleanRef)type };
     if (typeID == CFCharacterSetGetTypeID())
@@ -1263,20 +1260,6 @@ TEST(IPCSerialization, Basic)
         (id)accessControlRef.get(),
         @{ @"key": NSNull.null }
     ];
-
-    runTestCFWithExpectedResult({ (__bridge CFArrayRef)@[
-        nestedArray,
-        (id)trust.get(),
-        NSUUID.UUID, // Removed when encoding because CFUUIDRef is not a recognized type in CFArrayRef or CFDictionaryRef
-        @{
-            @"should be removed before encoding" : NSUUID.UUID,
-            NSUUID.UUID : @"should also be removed before encoding"
-        }
-    ] }, { (__bridge CFArrayRef)@[
-        nestedArray,
-        (id)trust.get(),
-        @{ }
-    ] });
 
     runTestCFWithExpectedResult({ (__bridge CFDictionaryRef) @{
         @"key" : nestedArray,
