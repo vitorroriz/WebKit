@@ -3352,13 +3352,7 @@ void GraphicsContextGLANGLE::simulateEventForTesting(SimulatedEventForTesting ev
     }
 }
 
-void GraphicsContextGLANGLE::drawSurfaceBufferToImageBuffer(SurfaceBuffer buffer, ImageBuffer& imageBuffer)
-{
-    if (RefPtr image = bufferAsNativeImage(buffer))
-        paintToCanvas(*image, imageBuffer.backendSize(), imageBuffer.context());
-}
-
-RefPtr<NativeImage> GraphicsContextGLANGLE::bufferAsNativeImage(SurfaceBuffer source)
+RefPtr<NativeImage> GraphicsContextGLANGLE::copyNativeImageYFlipped(SurfaceBuffer source)
 {
     if (!makeContextCurrent())
         return nullptr;

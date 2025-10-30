@@ -835,7 +835,7 @@ void GraphicsContextGLCocoa::invalidateKnownTextureContent(GCGLuint texture)
         m_cv->invalidateKnownTextureContent(texture);
 }
 
-RefPtr<NativeImage> GraphicsContextGLCocoa::bufferAsNativeImage(SurfaceBuffer buffer)
+RefPtr<NativeImage> GraphicsContextGLCocoa::copyNativeImageYFlipped(SurfaceBuffer buffer)
 {
     RetainPtr<CGContextRef> cgContext;
     RefPtr<NativeImage> image;

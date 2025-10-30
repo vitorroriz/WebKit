@@ -133,7 +133,7 @@ messages -> RemoteGraphicsContextGL Stream {{
 #endif
     void EnsureExtensionEnabled(WebCore::GCGLExtension extension)
     void GetErrors() -> (GCGLErrorCodeSet returnValue) Synchronous
-    void DrawSurfaceBufferToImageBuffer(enum:bool WebCore::GraphicsContextGLSurfaceBuffer buffer, WebCore::RenderingResourceIdentifier imageBuffer) -> () Synchronous
+    void copyNativeImageYFlipped(enum:bool WebCore::GraphicsContextGLSurfaceBuffer buffer, WebCore::RenderingResourceIdentifier nativeImageIdentifier)
 #if ENABLE(MEDIA_STREAM) || ENABLE(WEB_CODECS)
     void SurfaceBufferToVideoFrame(enum:bool WebCore::GraphicsContextGLSurfaceBuffer buffer) -> (struct std::optional<WebKit::RemoteVideoFrameProxyProperties> properties) Synchronous
 #endif
@@ -160,6 +160,7 @@ messages -> RemoteGraphicsContextGL Stream {{
 #if ENABLE(WEBXR)
     [EnabledBy=WebXREnabled] void FramebufferDiscard(uint32_t target, std::span<const uint32_t> attachments)
 #endif
+    void SetDrawingBufferColorSpace(WebCore::DestinationColorSpace colorSpace)
 {}
 }}
 

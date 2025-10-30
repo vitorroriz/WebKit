@@ -2927,17 +2927,6 @@ void RemoteGraphicsContextGLProxy::getInternalformativ(GCGLenum target, GCGLenum
     memcpySpan(params, paramsReply);
 }
 
-void RemoteGraphicsContextGLProxy::setDrawingBufferColorSpace(const WebCore::DestinationColorSpace& arg0)
-{
-    if (isContextLost())
-        return;
-    auto sendResult = send(Messages::RemoteGraphicsContextGL::SetDrawingBufferColorSpace(arg0));
-    if (sendResult != IPC::Error::NoError) {
-        markContextLost();
-        return;
-    }
-}
-
 #if ENABLE(WEBXR)
 GCGLExternalImage RemoteGraphicsContextGLProxy::createExternalImage(WebCore::GraphicsContextGL::ExternalImageSource&& arg0, GCGLenum internalFormat, GCGLint layer)
 {

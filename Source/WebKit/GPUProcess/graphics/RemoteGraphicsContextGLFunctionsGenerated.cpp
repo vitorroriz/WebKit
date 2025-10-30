@@ -1926,12 +1926,6 @@ void RemoteGraphicsContextGL::getInternalformativ(uint32_t target, uint32_t inte
     completionHandler(spanReinterpretCast<const int32_t>(params.span()));
 }
 
-void RemoteGraphicsContextGL::setDrawingBufferColorSpace(WebCore::DestinationColorSpace&& arg0)
-{
-    assertIsCurrent(workQueue());
-    protectedContext()->setDrawingBufferColorSpace(arg0);
-}
-
 #if ENABLE(WEBXR)
 void RemoteGraphicsContextGL::createExternalImage(uint32_t name, WebCore::GraphicsContextGL::ExternalImageSource&& arg0, uint32_t internalFormat, int32_t layer)
 {

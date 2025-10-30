@@ -778,7 +778,10 @@ RefPtr<ImageBuffer> WebGLRenderingContextBase::surfaceBufferToImageBuffer(Surfac
     // Avoid leaking the WebGL content in the cases where a WebGL canvas element is drawn to a Context2D
     // canvas element repeatedly.
     buffer->flushDrawingContext();
-    graphicsContextGL()->drawSurfaceBufferToImageBuffer(toGCGLSurfaceBuffer(sourceBuffer), *buffer);
+    RefPtr image = graphicsContextGL()->copyNativeImageYFlipped(toGCGLSurfaceBuffer(sourceBuffer));
+    if (!image)
+        return buffer;
+    GraphicsContextGL::paintToCanvas(*image, buffer->backendSize(), buffer->context());
     return buffer;
 }
 
@@ -839,7 +842,9 @@ RefPtr<ImageBuffer> WebGLRenderingContextBase::transferToImageBuffer()
         return nullptr;
     if (compositingResultsNeedUpdating())
         prepareForDisplay();
-    graphicsContextGL()->drawSurfaceBufferToImageBuffer(GraphicsContextGL::SurfaceBuffer::DisplayBuffer, *buffer);
+    RefPtr image = graphicsContextGL()->copyNativeImageYFlipped(GraphicsContextGL::SurfaceBuffer::DisplayBuffer);
+    if (image)
+        GraphicsContextGL::paintToCanvas(*image, buffer->backendSize(), buffer->context());
     // Any draw or read sees cleared drawing buffer.
     m_defaultFramebuffer->markAllBuffersDirty();
     // Next transfer uses the cleared drawing buffer.

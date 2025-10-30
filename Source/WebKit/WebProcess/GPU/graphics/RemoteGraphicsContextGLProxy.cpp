@@ -33,6 +33,7 @@
 #include "RemoteGraphicsContextGLInitializationState.h"
 #include "RemoteGraphicsContextGLMessages.h"
 #include "RemoteGraphicsContextGLProxyMessages.h"
+#include "RemoteNativeImageProxy.h"
 #include "RemoteRenderingBackendProxy.h"
 #include "RemoteVideoFrameObjectHeapProxy.h"
 #include "WebPage.h"
@@ -88,7 +89,7 @@ RefPtr<RemoteGraphicsContextGLProxy> RemoteGraphicsContextGLProxy::create(const 
     if (!connectionPair)
         return nullptr;
     auto [clientConnection, serverConnectionHandle] = WTFMove(*connectionPair);
-    Ref instance = platformCreate(attributes);
+    Ref instance = platformCreate(attributes, renderingBackend);
     instance->initializeIPC(WTFMove(clientConnection), renderingBackend.ensureBackendCreated(), WTFMove(serverConnectionHandle), dispatcher);
     if (attributes.failContextCreationForTesting == WebCore::GraphicsContextGLAttributes::SimulatedCreationFailure::CreationTimeout)
         instance->markContextLost();
@@ -98,8 +99,9 @@ RefPtr<RemoteGraphicsContextGLProxy> RemoteGraphicsContextGLProxy::create(const 
     return instance;
 }
 
-RemoteGraphicsContextGLProxy::RemoteGraphicsContextGLProxy(const GraphicsContextGLAttributes& attributes)
+RemoteGraphicsContextGLProxy::RemoteGraphicsContextGLProxy(const GraphicsContextGLAttributes& attributes, RemoteRenderingBackendProxy& renderingBackend)
     : GraphicsContextGL(attributes)
+    , m_renderingBackend(renderingBackend)
 {
 }
 
@@ -165,6 +167,9 @@ void RemoteGraphicsContextGLProxy::reshape(int width, int height)
 {
     if (isContextLost())
         return;
+    if (m_currentWidth == width && m_currentHeight == height)
+        return;
+    m_hasPreparedForDisplay = false;
     m_currentWidth = width;
     m_currentHeight = height;
     auto sendResult = send(Messages::RemoteGraphicsContextGL::Reshape(width, height));
@@ -172,16 +177,27 @@ void RemoteGraphicsContextGLProxy::reshape(int width, int height)
         markContextLost();
 }
 
-void RemoteGraphicsContextGLProxy::drawSurfaceBufferToImageBuffer(SurfaceBuffer buffer, ImageBuffer& imageBuffer)
+RefPtr<NativeImage> RemoteGraphicsContextGLProxy::copyNativeImageYFlipped(SurfaceBuffer buffer)
 {
-    if (isContextLost())
-        return;
-    imageBuffer.flushDrawingContext();
-    auto sendResult = sendSync(Messages::RemoteGraphicsContextGL::DrawSurfaceBufferToImageBuffer(buffer, imageBuffer.renderingResourceIdentifier()));
-    if (!sendResult.succeeded()) {
+    if (isContextLost()) [[unlikely]]
+        return nullptr;
+    RefPtr renderingBackend = m_renderingBackend.get();
+    if (!renderingBackend) [[unlikely]]
+        return nullptr;
+    auto size = getInternalFramebufferSize();
+    if (size.isEmpty()) [[unlikely]]
+        return nullptr;
+    if (buffer == SurfaceBuffer::DisplayBuffer && !m_hasPreparedForDisplay) [[unlikely]]
+        return nullptr;
+    auto attributes = contextAttributes();
+    Ref nativeImage = renderingBackend->remoteResourceCacheProxy().createNativeImage(size, m_drawingBufferColorSpace.platformColorSpace(), attributes.alpha);
+    renderingBackend->cacheNativeImageFromSharedNativeImage(nativeImage);
+    auto sendResult = send(Messages::RemoteGraphicsContextGL::copyNativeImageYFlipped(buffer, nativeImage->renderingResourceIdentifier()));
+    if (sendResult != IPC::Error::NoError) [[unlikely]] {
         markContextLost();
-        return;
+        return nullptr;
     }
+    return nativeImage;
 }
 
 #if ENABLE(MEDIA_STREAM) || ENABLE(WEB_CODECS)
@@ -512,6 +528,18 @@ void RemoteGraphicsContextGLProxy::framebufferDiscard(GCGLenum target, std::span
     }
 }
 #endif
+
+void RemoteGraphicsContextGLProxy::setDrawingBufferColorSpace(const WebCore::DestinationColorSpace& colorSpace)
+{
+    if (isContextLost())
+        return;
+    auto sendResult = send(Messages::RemoteGraphicsContextGL::SetDrawingBufferColorSpace(colorSpace));
+    if (sendResult != IPC::Error::NoError) {
+        markContextLost();
+        return;
+    }
+    m_drawingBufferColorSpace = colorSpace;
+}
 
 void RemoteGraphicsContextGLProxy::wasCreated(IPC::Semaphore&& wakeUpSemaphore, IPC::Semaphore&& clientWaitSemaphore, std::optional<RemoteGraphicsContextGLInitializationState>&& initializationState)
 {

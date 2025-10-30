@@ -1662,11 +1662,8 @@ public:
 
     virtual void prepareForDisplay() = 0;
 
-    // FIXME: these should be removed, they're part of drawing buffer and
-    // display buffer abstractions that the caller should hold separate to
-    // the context.
     using SurfaceBuffer = GraphicsContextGLSurfaceBuffer;
-    virtual void drawSurfaceBufferToImageBuffer(SurfaceBuffer, ImageBuffer&) = 0;
+    virtual RefPtr<NativeImage> copyNativeImageYFlipped(SurfaceBuffer) = 0;
 #if ENABLE(MEDIA_STREAM) || ENABLE(WEB_CODECS)
     virtual RefPtr<VideoFrame> surfaceBufferToVideoFrame(SurfaceBuffer) = 0;
 #endif

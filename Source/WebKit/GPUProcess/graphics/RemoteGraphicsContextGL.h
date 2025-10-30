@@ -128,7 +128,7 @@ protected:
     void prepareForDisplay(CompletionHandler<void()>&&);
 #endif
     void getErrors(CompletionHandler<void(GCGLErrorCodeSet)>&&);
-    void drawSurfaceBufferToImageBuffer(WebCore::GraphicsContextGL::SurfaceBuffer, WebCore::RenderingResourceIdentifier, CompletionHandler<void()>&&);
+    void copyNativeImageYFlipped(WebCore::GraphicsContextGL::SurfaceBuffer, WebCore::RenderingResourceIdentifier);
 #if ENABLE(MEDIA_STREAM) || ENABLE(WEB_CODECS)
     void surfaceBufferToVideoFrame(WebCore::GraphicsContextGL::SurfaceBuffer, CompletionHandler<void(std::optional<WebKit::RemoteVideoFrameProxy::Properties>&&)>&&);
 #endif
@@ -155,6 +155,7 @@ protected:
 #if ENABLE(WEBXR)
     void framebufferDiscard(uint32_t target, std::span<const uint32_t> attachments);
 #endif
+    void setDrawingBufferColorSpace(WebCore::DestinationColorSpace&&);
 
 #if PLATFORM(COCOA)
     using GCGLContext = WebCore::GraphicsContextGLCocoa;
@@ -167,7 +168,6 @@ protected:
 #include "RemoteGraphicsContextGLFunctionsGenerated.h" // NOLINT
 
 private:
-    void paintNativeImageToImageBuffer(WebCore::NativeImage&, WebCore::RenderingResourceIdentifier);
     bool webXREnabled() const;
     bool webXRPromptAccepted() const;
     RefPtr<GCGLContext> protectedContext();

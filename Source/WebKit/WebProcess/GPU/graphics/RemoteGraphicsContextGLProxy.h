@@ -79,7 +79,7 @@ public:
     bool supportsExtension(WebCore::GCGLExtension) final;
     bool enableExtension(WebCore::GCGLExtension) final;
 
-    void drawSurfaceBufferToImageBuffer(SurfaceBuffer, WebCore::ImageBuffer&) final;
+    RefPtr<WebCore::NativeImage> copyNativeImageYFlipped(SurfaceBuffer) final;
 #if ENABLE(MEDIA_STREAM) || ENABLE(WEB_CODECS)
     RefPtr<WebCore::VideoFrame> surfaceBufferToVideoFrame(SurfaceBuffer) final;
 #endif
@@ -105,6 +105,7 @@ public:
 #if ENABLE(WEBXR)
     void framebufferDiscard(GCGLenum target, std::span<const GCGLenum> attachments) final;
 #endif
+    void setDrawingBufferColorSpace(const WebCore::DestinationColorSpace&) final;
 
     // Functions with a generated implementation. This list is used by generate-gpup-webgl script.
     void activeTexture(GCGLenum texture) final;
@@ -358,7 +359,6 @@ public:
     void polygonOffsetClampEXT(GCGLfloat factor, GCGLfloat units, GCGLfloat clamp) final;
     void renderbufferStorageMultisampleANGLE(GCGLenum target, GCGLsizei samples, GCGLenum internalformat, GCGLsizei width, GCGLsizei height) final;
     void getInternalformativ(GCGLenum target, GCGLenum internalformat, GCGLenum pname, std::span<GCGLint> params) final;
-    void setDrawingBufferColorSpace(const WebCore::DestinationColorSpace&) final;
 
 #if ENABLE(WEBXR)
     GCGLExternalImage createExternalImage(WebCore::GraphicsContextGL::ExternalImageSource&&, GCGLenum internalFormat, GCGLint layer) IPC_ENABLED_BY_AND_MESSAGE_CHECK(WebXREnabled, webXRPromptAccepted()) final;
@@ -377,7 +377,7 @@ public:
     static bool handleMessageToRemovedDestination(IPC::Connection&, IPC::Decoder&);
 
 protected:
-    explicit RemoteGraphicsContextGLProxy(const WebCore::GraphicsContextGLAttributes&);
+    explicit RemoteGraphicsContextGLProxy(const WebCore::GraphicsContextGLAttributes&, RemoteRenderingBackendProxy&);
 
     bool isContextLost() const { return !m_streamConnection; }
     void markContextLost();
@@ -394,8 +394,10 @@ protected:
     }
 
     RemoteGraphicsContextGLIdentifier m_identifier { RemoteGraphicsContextGLIdentifier::generate() };
+    bool m_hasPreparedForDisplay { false };
+
 private:
-    static Ref<RemoteGraphicsContextGLProxy> platformCreate(const WebCore::GraphicsContextGLAttributes&);
+    static Ref<RemoteGraphicsContextGLProxy> platformCreate(const WebCore::GraphicsContextGLAttributes&, RemoteRenderingBackendProxy&);
     void initializeIPC(Ref<IPC::StreamClientConnection>&&, RemoteRenderingBackendIdentifier, IPC::StreamServerConnection::Handle&&, SerialFunctionDispatcher&);
     // Messages to be received.
     void wasCreated(IPC::Semaphore&&, IPC::Semaphore&&, std::optional<RemoteGraphicsContextGLInitializationState>&&);
@@ -425,6 +427,8 @@ private:
     GCGLenum m_externalImageTarget { 0 };
     GCGLenum m_externalImageBindingQuery { 0 };
     uint32_t m_nextObjectName { 0 };
+    WebCore::DestinationColorSpace m_drawingBufferColorSpace { WebCore::DestinationColorSpace::SRGB() };
+    WeakPtr<RemoteRenderingBackendProxy> m_renderingBackend;
 };
 
 // The GCGL types map to following WebKit IPC types. The list is used by generate-gpup-webgl script.
