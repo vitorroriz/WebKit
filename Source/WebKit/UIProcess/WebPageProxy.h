@@ -826,6 +826,8 @@ public:
     void setMockVideoPresentationModeEnabled(bool);
 #endif
 
+    WebScreenOrientationManagerProxy* screenOrientationManager() { return m_screenOrientationManager.get(); }
+
 #if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
     void ensureRemoteMediaSessionManagerProxy();
 #endif

@@ -429,6 +429,7 @@ UIProcess/RemotePageDrawingAreaProxy.cpp
 UIProcess/RemotePageFullscreenManagerProxy.cpp
 UIProcess/RemotePagePlaybackSessionManagerProxy.cpp
 UIProcess/RemotePageProxy.cpp
+UIProcess/RemotePageScreenOrientationManagerProxy.cpp
 UIProcess/RemotePageVideoPresentationManagerProxy.cpp
 UIProcess/ResponsivenessTimer.cpp
 UIProcess/SpeechRecognitionRemoteRealtimeMediaSource.cpp

@@ -23,37 +23,34 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "config.h"
-#import "RemoteMonotonicTimeline.h"
+#pragma once
 
-#if ENABLE(THREADED_ANIMATION_RESOLUTION)
-
-#import <wtf/MonotonicTime.h>
-#import <wtf/TZoneMallocInlines.h>
+#include "MessageReceiver.h"
+#include <WebCore/PageIdentifier.h>
 
 namespace WebKit {
 
-WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(RemoteMonotonicTimeline);
+class WebProcessProxy;
+class WebScreenOrientationManagerProxy;
 
-Ref<RemoteMonotonicTimeline> RemoteMonotonicTimeline::create(TimelineID identifier, const Seconds& originTime, MonotonicTime now)
-{
-    auto monotonicTimeline = adoptRef(*new RemoteMonotonicTimeline(identifier, originTime));
-    monotonicTimeline->updateCurrentTime(now);
-    return monotonicTimeline;
+class RemotePageScreenOrientationManagerProxy : public IPC::MessageReceiver, public RefCounted<RemotePageScreenOrientationManagerProxy> {
+public:
+    static Ref<RemotePageScreenOrientationManagerProxy> create(WebCore::PageIdentifier, WebScreenOrientationManagerProxy*, WebProcessProxy&);
+
+    ~RemotePageScreenOrientationManagerProxy();
+
+    void ref() const final { RefCounted::ref(); }
+    void deref() const final { RefCounted::deref(); }
+
+private:
+    RemotePageScreenOrientationManagerProxy(WebCore::PageIdentifier, WebScreenOrientationManagerProxy*, WebProcessProxy&);
+
+    void didReceiveMessage(IPC::Connection&, IPC::Decoder&) final;
+    void didReceiveSyncMessage(IPC::Connection&, IPC::Decoder&, UniqueRef<IPC::Encoder>&) final;
+
+    const WebCore::PageIdentifier m_identifier;
+    const WeakPtr<WebScreenOrientationManagerProxy> m_manager;
+    const Ref<WebProcessProxy> m_process;
+};
+
 }
-
-RemoteMonotonicTimeline::RemoteMonotonicTimeline(TimelineID identifier, const Seconds& originTime)
-    : RemoteAnimationTimeline(identifier, std::nullopt)
-    , m_originTime(originTime)
-{
-}
-
-void RemoteMonotonicTimeline::updateCurrentTime(MonotonicTime monotonicTime)
-{
-    m_currentTime = monotonicTime.secondsSinceEpoch() - m_originTime;
-}
-
-} // namespace WebKit
-
-#endif // ENABLE(THREADED_ANIMATION_RESOLUTION)
-

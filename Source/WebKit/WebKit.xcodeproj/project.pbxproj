@@ -632,6 +632,7 @@
 		2984F589164BA095004BC0C6 /* LegacyCustomProtocolManagerMessages.h in Headers */ = {isa = PBXBuildFile; fileRef = 2984F587164BA095004BC0C6 /* LegacyCustomProtocolManagerMessages.h */; };
 		29AD3093164B4C5D0072DEA9 /* LegacyCustomProtocolManagerProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 29AD3092164B4C5D0072DEA9 /* LegacyCustomProtocolManagerProxy.h */; };
 		29CD55AA128E294F00133C85 /* WKAccessibilityWebPageObjectBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 29CD55A8128E294F00133C85 /* WKAccessibilityWebPageObjectBase.h */; };
+		2BBCCE242EB2B3F500FE7E5A /* RemotePageScreenOrientationManagerProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 2BBCCE232EB2B3F500FE7E5A /* RemotePageScreenOrientationManagerProxy.h */; };
 		2D0C56FD229F1DEA00BD33E7 /* DeviceManagementSoftLink.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D0C56FB229F1DEA00BD33E7 /* DeviceManagementSoftLink.h */; };
 		2D0C56FE229F1DEA00BD33E7 /* DeviceManagementSoftLink.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2D0C56FC229F1DEA00BD33E7 /* DeviceManagementSoftLink.mm */; };
 		2D1087611D2C573E00B85F82 /* LoadParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D10875F1D2C573E00B85F82 /* LoadParameters.h */; };
@@ -4695,6 +4696,8 @@
 		2B1B1C3A2E3A86F400D7D9ED /* UnretainedCallArgsCheckerExpectations */ = {isa = PBXFileReference; lastKnownFileType = text; path = UnretainedCallArgsCheckerExpectations; sourceTree = "<group>"; };
 		2B1B1C3B2E3A86F400D7D9ED /* UnretainedLambdaCapturesCheckerExpectations */ = {isa = PBXFileReference; lastKnownFileType = text; path = UnretainedLambdaCapturesCheckerExpectations; sourceTree = "<group>"; };
 		2B1B1C3C2E3A86F400D7D9ED /* UnretainedLocalVarsCheckerExpectations */ = {isa = PBXFileReference; lastKnownFileType = text; path = UnretainedLocalVarsCheckerExpectations; sourceTree = "<group>"; };
+		2BBCCE222EB2B3DA00FE7E5A /* RemotePageScreenOrientationManagerProxy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RemotePageScreenOrientationManagerProxy.cpp; sourceTree = "<group>"; };
+		2BBCCE232EB2B3F500FE7E5A /* RemotePageScreenOrientationManagerProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemotePageScreenOrientationManagerProxy.h; sourceTree = "<group>"; };
 		2D0035221BC7414800DA8716 /* PDFPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PDFPlugin.h; path = PDF/PDFPlugin.h; sourceTree = "<group>"; };
 		2D0035231BC7414800DA8716 /* PDFPlugin.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PDFPlugin.mm; path = PDF/PDFPlugin.mm; sourceTree = "<group>"; };
 		2D0440922D58810D00E98A2E /* RemoteImageBufferSetConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteImageBufferSetConfiguration.h; sourceTree = "<group>"; };
@@ -15257,6 +15260,8 @@
 				FA4EFC4E2E024493005DADAF /* RemotePagePlaybackSessionManagerProxy.h */,
 				5C907E9A294D507100B3402D /* RemotePageProxy.cpp */,
 				5C907E99294D507100B3402D /* RemotePageProxy.h */,
+				2BBCCE222EB2B3DA00FE7E5A /* RemotePageScreenOrientationManagerProxy.cpp */,
+				2BBCCE232EB2B3F500FE7E5A /* RemotePageScreenOrientationManagerProxy.h */,
 				FA1A7DE52E012DB3005E394B /* RemotePageVideoPresentationManagerProxy.cpp */,
 				FA1A7DE42E012DB3005E394B /* RemotePageVideoPresentationManagerProxy.h */,
 				5CEB40A22A534EE100563C91 /* RemotePageVisitedLinkStoreRegistration.h */,
@@ -18061,6 +18066,7 @@
 				1AC1338618590C4600F3EC05 /* RemoteObjectRegistryMessages.h in Headers */,
 				71C9ECA12CF9FB7100B8AF06 /* RemoteProgressBasedTimeline.h in Headers */,
 				71722EB22EA919E9004218E6 /* RemoteProgressBasedTimelineRegistry.h in Headers */,
+				2BBCCE242EB2B3F500FE7E5A /* RemotePageScreenOrientationManagerProxy.h in Headers */,
 				46088A00261FA8BC00E2500D /* RemoteRenderingBackend.h in Headers */,
 				F4517D7C26FBCD39004C8475 /* RemoteRenderingBackendMessages.h in Headers */,
 				0F594790187B3B3A00437857 /* RemoteScrollingCoordinator.h in Headers */,
