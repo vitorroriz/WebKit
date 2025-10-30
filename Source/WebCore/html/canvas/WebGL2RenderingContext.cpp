@@ -676,6 +676,13 @@ void WebGL2RenderingContext::deleteFramebuffer(WebGLFramebuffer* framebuffer)
 {
     Locker locker { objectGraphLock() };
 
+#if ENABLE(WEBXR)
+    if (framebuffer && framebuffer->isOpaque()) {
+        synthesizeGLError(GraphicsContextGL::INVALID_OPERATION, "deleteFramebuffer"_s, "An opaque framebuffer can't be deleted"_s);
+        return;
+    }
+#endif
+
     if (!deleteObject(locker, framebuffer))
         return;
 

@@ -1203,6 +1203,16 @@ GCGLenum WebGLRenderingContextBase::checkFramebufferStatus(GCGLenum target)
         synthesizeGLError(GraphicsContextGL::INVALID_ENUM, "checkFramebufferStatus"_s, "invalid target"_s);
         return 0;
     }
+#if ENABLE(WEBXR)
+    // An opaque framebuffer is considered incomplete outside of a requestAnimationFrame() callback.
+    // When not in the requestAnimationFrame() callback of its session, calls to
+    // checkFramebufferStatus MUST generate a FRAMEBUFFER_UNSUPPORTED error and attempts to clear,
+    // draw to, or read from the opaque framebuffer MUST generate an INVALID_FRAMEBUFFER_OPERATION
+    // error.
+    RefPtr framebuffer = getFramebufferBinding(target);
+    if (framebuffer && framebuffer->isOpaque() && !framebuffer->isInsideWebXRRAF())
+        return GraphicsContextGL::FRAMEBUFFER_UNSUPPORTED;
+#endif
     return graphicsContextGL()->checkFramebufferStatus(target);
 }
 
@@ -1429,7 +1439,7 @@ void WebGLRenderingContextBase::deleteFramebuffer(WebGLFramebuffer* framebuffer)
 
 #if ENABLE(WEBXR)
     if (framebuffer && framebuffer->isOpaque()) {
-        synthesizeGLError(GraphicsContextGL::INVALID_OPERATION, "deleteFramebuffer"_s, "An opaque framebuffer's attachments cannot be inspected or changed"_s);
+        synthesizeGLError(GraphicsContextGL::INVALID_OPERATION, "deleteFramebuffer"_s, "An opaque framebuffer can't be deleted"_s);
         return;
     }
 #endif

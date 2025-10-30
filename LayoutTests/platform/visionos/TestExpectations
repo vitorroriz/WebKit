@@ -134,7 +134,6 @@ imported/w3c/web-platform-tests/digital-credentials/ [ Skip ]
 imported/w3c/web-platform-tests/webxr/webGLCanvasContext_create_xrcompatible.https.html [ Failure ]
 imported/w3c/web-platform-tests/webxr/webxr_feature_policy.https.html [ Failure ]
 imported/w3c/web-platform-tests/webxr/xrWebGLLayer_framebuffer_scale.https.html [ Failure ]
-imported/w3c/web-platform-tests/webxr/xrWebGLLayer_opaque_framebuffer.https.html [ Failure ]
 imported/w3c/web-platform-tests/webxr/xr_viewport_scale.https.html [ Failure ]
 
 webkit.org/b/274980 imported/w3c/web-platform-tests/webxr/xrViewport_valid.https.html [ Failure ]

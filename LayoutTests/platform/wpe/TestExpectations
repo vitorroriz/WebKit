@@ -246,6 +246,7 @@ imported/w3c/web-platform-tests/xhr/xmlhttprequest-timeout-worker-overridesexpir
 # WebXR
 
 webkit.org/b/299366 imported/w3c/web-platform-tests/webxr/xrSession_visibilityState_inline.https.html [ Skip ] # Timeout
+webkit.org/b/301551 imported/w3c/web-platform-tests/webxr/xrWebGLLayer_opaque_framebuffer.https.html [ Failure ]
 webkit.org/b/301493 imported/w3c/web-platform-tests/webxr/xrWebGLLayer_opaque_framebuffer_stencil.https.html [ Failure ]
 
 # WTR window size handling

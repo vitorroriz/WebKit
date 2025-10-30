@@ -176,6 +176,7 @@ void WebXROpaqueFramebuffer::startFrame(PlatformXR::FrameData::LayerData& data)
     ScopedWebGLRestoreTexture restoreTexture { m_context, textureTarget };
     ScopedWebGLRestoreRenderbuffer restoreRenderBuffer { m_context };
 
+    m_drawFramebuffer->setInsideWebXRRAF(true);
     gl->bindFramebuffer(GL::FRAMEBUFFER, m_drawFramebuffer->object());
     // https://immersive-web.github.io/webxr/#opaque-framebuffer
     // The buffers attached to an opaque framebuffer MUST be cleared to the values in the provided table when first created,
@@ -228,6 +229,8 @@ void WebXROpaqueFramebuffer::startFrame(PlatformXR::FrameData::LayerData& data)
 
 void WebXROpaqueFramebuffer::endFrame()
 {
+    m_drawFramebuffer->setInsideWebXRRAF(false);
+
     RefPtr gl = m_context->graphicsContextGL();
     if (!gl)
         return;
