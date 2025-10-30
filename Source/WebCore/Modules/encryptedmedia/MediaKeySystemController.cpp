@@ -49,20 +49,16 @@ MediaKeySystemController* MediaKeySystemController::from(Page* page)
     return static_cast<MediaKeySystemController*>(Supplement<Page>::from(page, MediaKeySystemController::supplementName()));
 }
 
-MediaKeySystemController::MediaKeySystemController(MediaKeySystemClient& client)
-    : m_client(client)
+MediaKeySystemController::MediaKeySystemController(Ref<MediaKeySystemClient>&& client)
+    : m_client(WTFMove(client))
 {
 }
 
-MediaKeySystemController::~MediaKeySystemController()
-{
-    if (m_client)
-        m_client->pageDestroyed();
-}
+MediaKeySystemController::~MediaKeySystemController() = default;
 
-void provideMediaKeySystemTo(Page& page, MediaKeySystemClient& client)
+void provideMediaKeySystemTo(Page& page, Ref<MediaKeySystemClient>&& client)
 {
-    Supplement<Page>::provideTo(&page, MediaKeySystemController::supplementName(), makeUnique<MediaKeySystemController>(client));
+    Supplement<Page>::provideTo(&page, MediaKeySystemController::supplementName(), makeUnique<MediaKeySystemController>(WTFMove(client)));
 }
 
 void MediaKeySystemController::logRequestMediaKeySystemDenial(Document& document)

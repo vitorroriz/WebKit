@@ -39,7 +39,7 @@ class MediaKeySystemController : public Supplement<Page> {
     WTF_MAKE_TZONE_ALLOCATED(MediaKeySystemController);
     WTF_MAKE_NONCOPYABLE(MediaKeySystemController);
 public:
-    explicit MediaKeySystemController(MediaKeySystemClient&);
+    explicit MediaKeySystemController(Ref<MediaKeySystemClient>&&);
     ~MediaKeySystemController();
 
     void requestMediaKeySystem(MediaKeySystemRequest&);
@@ -51,19 +51,17 @@ public:
     static MediaKeySystemController* from(Page*);
 
 private:
-    WeakPtr<MediaKeySystemClient> m_client;
+    const Ref<MediaKeySystemClient> m_client;
 };
 
 inline void MediaKeySystemController::requestMediaKeySystem(MediaKeySystemRequest& request)
 {
-    if (m_client)
-        m_client->requestMediaKeySystem(request);
+    m_client->requestMediaKeySystem(request);
 }
 
 inline void MediaKeySystemController::cancelMediaKeySystemRequest(MediaKeySystemRequest& request)
 {
-    if (m_client)
-        m_client->cancelMediaKeySystemRequest(request);
+    m_client->cancelMediaKeySystemRequest(request);
 }
 
 } // namespace WebCore
