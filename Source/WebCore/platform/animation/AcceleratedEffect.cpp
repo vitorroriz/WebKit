@@ -217,8 +217,8 @@ AcceleratedEffect::AcceleratedEffect(const KeyframeEffect& effect, const Timelin
         m_paused = animation->playState() == WebAnimation::PlayState::Paused;
         m_playbackRate = animation->playbackRate();
         ASSERT(animation->holdTime() || animation->startTime());
-        m_holdTime = animation->holdTime() ? animation->holdTime()->time() : std::nullopt;
-        m_startTime = animation->startTime() ? animation->startTime()->time() : std::nullopt;
+        m_holdTime = animation->holdTime();
+        m_startTime = animation->startTime();
         if (RefPtr styleAnimation = dynamicDowncast<StyleOriginatedAnimation>(*animation)) {
             if (RefPtr defaultKeyframeTimingFunction = styleAnimation->backingAnimationTimingFunction())
                 m_defaultKeyframeTimingFunction = WTFMove(defaultKeyframeTimingFunction);
@@ -354,22 +354,20 @@ static void blend(AcceleratedEffectProperty property, AcceleratedEffectValues& o
     }
 }
 
-void AcceleratedEffect::apply(WebAnimationTime currentTime, AcceleratedEffectValues& values) const
+void AcceleratedEffect::apply(AcceleratedEffectValues& values, WebAnimationTime timelineTime, std::optional<WebAnimationTime> timelineDuration) const
 {
-    auto localTime = [&]() -> WebAnimationTime {
+    auto localTime = [&] {
         ASSERT(m_holdTime || m_startTime);
         if (m_holdTime)
             return *m_holdTime;
-        return (currentTime - *m_startTime) * m_playbackRate;
+        return (timelineTime - *m_startTime) * m_playbackRate;
     }();
 
-    // FIXME: when we add threaded animation support support for scroll-driven animations,
-    // pass in the associated timeline's current time and duration.
     auto resolvedTiming = m_timing.resolve({
-        std::nullopt,
-        std::nullopt,
-        { m_holdTime ? *m_holdTime : *m_startTime },
-        { localTime },
+        timelineTime,
+        timelineDuration,
+        m_holdTime ? *m_holdTime : *m_startTime,
+        localTime,
         EndpointInclusiveActiveInterval::No,
         m_playbackRate
     });
