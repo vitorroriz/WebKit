@@ -241,7 +241,8 @@ void SOAuthorizationSession::continueStartAfterDecidePolicy(const SOAuthorizatio
     RetainPtr<NSDictionary> authorizationOptions = @{
         SOAuthorizationOptionUserActionInitiated: @(m_navigationAction->isProcessingUserGesture()),
         SOAuthorizationOptionInitiatorOrigin: initiatorOrigin.createNSString().get(),
-        SOAuthorizationOptionInitiatingAction: @(static_cast<NSInteger>(m_action))
+        SOAuthorizationOptionInitiatingAction: @(static_cast<NSInteger>(m_action)),
+        kSOAuthorizationOptionInitiatingPath: m_page->mainFrame()->url().path().createNSString().get()
     };
 #if PLATFORM(IOS_FAMILY)
     RetainPtr<WKWebView> webView = m_page->cocoaView();
