@@ -152,13 +152,14 @@ GroupActivitiesCoordinator::~GroupActivitiesCoordinator()
 
 void GroupActivitiesCoordinator::sessionStateChanged(const GroupActivitiesSession& session, GroupActivitiesSession::State state)
 {
-    if (!client())
+    RefPtr client = this->client();
+    if (!client)
         return;
 
     static_assert(static_cast<size_t>(MediaSessionCoordinatorState::Waiting) == static_cast<size_t>(GroupActivitiesSession::State::Waiting), "MediaSessionCoordinatorState::Waiting != WKGroupSessionStateWaiting");
     static_assert(static_cast<size_t>(MediaSessionCoordinatorState::Joined) == static_cast<size_t>(GroupActivitiesSession::State::Joined), "MediaSessionCoordinatorState::Joined != WKGroupSessionStateJoined");
     static_assert(static_cast<size_t>(MediaSessionCoordinatorState::Closed) == static_cast<size_t>(GroupActivitiesSession::State::Invalidated), "MediaSessionCoordinatorState::Closed != WKGroupSessionStateInvalidated");
-    client()->coordinatorStateChanged(static_cast<MediaSessionCoordinatorState>(state));
+    client->coordinatorStateChanged(static_cast<MediaSessionCoordinatorState>(state));
 }
 
 String GroupActivitiesCoordinator::identifier() const
@@ -229,7 +230,8 @@ void GroupActivitiesCoordinator::trackIdentifierChanged(const String& identifier
 
 void GroupActivitiesCoordinator::issuePlayCommand(AVDelegatingPlaybackCoordinatorPlayCommand *playCommand, CommandCompletionHandler&& callback)
 {
-    if (!client()) {
+    RefPtr client = this->client();
+    if (!client) {
         callback();
         return;
     }
@@ -241,26 +243,28 @@ void GroupActivitiesCoordinator::issuePlayCommand(AVDelegatingPlaybackCoordinato
     if (CMTIME_IS_NUMERIC(playCommand.hostClockTime))
         hostTime = MonotonicTime::fromMachAbsoluteTime(PAL::CMClockConvertHostTimeToSystemUnits(playCommand.hostClockTime));
 
-    client()->playSession(itemTime, hostTime, [callback = WTFMove(callback)] (bool) {
+    client->playSession(itemTime, hostTime, [callback = WTFMove(callback)] (bool) {
         callback();
     });
 }
 
 void GroupActivitiesCoordinator::issuePauseCommand(AVDelegatingPlaybackCoordinatorPauseCommand *pauseCommand, CommandCompletionHandler&& callback)
 {
-    if (!client()) {
+    RefPtr client = this->client();
+    if (!client) {
         callback();
         return;
     }
 
-    client()->pauseSession([callback = WTFMove(callback)] (bool) {
+    client->pauseSession([callback = WTFMove(callback)] (bool) {
         callback();
     });
 }
 
 void GroupActivitiesCoordinator::issueSeekCommand(AVDelegatingPlaybackCoordinatorSeekCommand *seekCommand, CommandCompletionHandler&& callback)
 {
-    if (!client()) {
+    RefPtr client = this->client();
+    if (!client) {
         callback();
         return;
     }
@@ -271,7 +275,7 @@ void GroupActivitiesCoordinator::issueSeekCommand(AVDelegatingPlaybackCoordinato
         return;
     }
 
-    client()->seekSessionToTime(PAL::CMTimeGetSeconds(seekCommand.itemTime), [callback = WTFMove(callback)] (bool) mutable {
+    client->seekSessionToTime(PAL::CMTimeGetSeconds(seekCommand.itemTime), [callback = WTFMove(callback)] (bool) mutable {
         callback();
     });
 }
