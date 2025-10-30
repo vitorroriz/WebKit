@@ -98,10 +98,6 @@ webkit.org/b/254733 inspector/canvas/shaderProgram-add-remove-webgl.html [ Failu
 # Crash on EWS bot.
 webrtc/vp8-then-h264-gpu-process-crash.html [ Skip ]
 
-# WebXR
-webkit.org/b/301551 imported/w3c/web-platform-tests/webxr/xrWebGLLayer_opaque_framebuffer.https.html [ Failure ]
-webkit.org/b/301494 imported/w3c/web-platform-tests/webxr/xrWebGLLayer_opaque_framebuffer_stencil.https.html [ Failure ]
-
 #//////////////////////////////////////////////////////////////////////////////////////////
 # End of Triaged Expectations
 # Legacy Expectations sections below
