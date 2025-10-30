@@ -543,7 +543,7 @@ The uniform type identifier kUTTypeWebArchive can be used get the related pasteb
 
 /*! @abstract A Boolean value indicating whether Screen Time blocking has occurred.
  */
-@property (nonatomic, readonly) BOOL isBlockedByScreenTime WK_API_AVAILABLE(macos(26.0), ios(26.0));
+@property (nonatomic, readonly) BOOL isBlockedByScreenTime WK_API_AVAILABLE(macos(26.0), ios(26.0)) WK_API_UNAVAILABLE(visionos);
 
 /*! @abstract Sets the webpage contents from the passed data as if it was the
  response to the supplied request. The request is never actually sent to the
