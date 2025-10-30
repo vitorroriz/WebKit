@@ -191,12 +191,12 @@
                   "workernames": ["bot678"]
                   },
                   { "name": "Apple-Tahoe-Release-WK1-Tests", "factory": "TestWebKit1AllButJSCFactory",
-                  "platform": "mac-tahoe", "configuration": "release", "architectures": ["x86_64"],
+                  "platform": "mac-tahoe", "configuration": "release", "architectures": ["x86_64", "arm64"],
                   "additionalArguments": ["--no-retry-failures"],
                   "workernames": ["bot669"]
                   },
                   { "name": "Apple-Tahoe-Release-World-Leaks-Tests", "factory": "TestWorldLeaksFactory",
-                  "platform": "mac-tahoe", "configuration": "release", "architectures": ["arm64"],
+                  "platform": "mac-tahoe", "configuration": "release", "architectures": ["x86_64", "arm64"],
                   "additionalArguments": ["--no-retry-failures"],
                   "workernames": ["bot303"]
                   },
