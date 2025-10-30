@@ -795,8 +795,8 @@ void TextBoxPainter::collectDecoratingBoxesForBackgroundPainting(DecoratingBoxLi
         return;
     }
 
-    if (!textBox->isHorizontal()) {
-        // FIXME: Vertical writing mode needs some coordinate space transformation for parent inline boxes as we rotate the content with m_paintRect (see ::paint)
+    if (writingMode().isLineInverted()) {
+        // FIXME: underlineOffsetForTextBoxPainting returns incorrect value for vertical-lr.
         decoratingBoxList.append({ ancestorInlineBox, m_style, overrideDecorationStyle, textBoxLocation });
         return;
     }
