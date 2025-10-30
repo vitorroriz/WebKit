@@ -2552,8 +2552,6 @@ fast/forms/number/number-appearance-spinbutton-disabled-readonly.html [ Pass Fai
 fast/forms/number/number-appearance-spinbutton-layer.html [ Pass Failure ]
 fast/forms/select-style.html [ Pass Failure ]
 fast/forms/textarea-metrics.html [ Pass Failure ]
-fast/forms/time/time-editable-components/time-editable-components-mouse-events.html [ Pass Failure ]
-fast/forms/month/month-editable-components/month-editable-components-mouse-events.html [ Pass Failure ]
 http/tests/workers/service/shownotification-allowed.html [ Pass Failure ]
 webgl/2.0.y/conformance/glsl/bugs/sampler-array-using-loop-index.html [ Pass Failure ]
 webgl/2.0.y/conformance/ogles/GL/greaterThan/greaterThan_001_to_008.html [ Pass Failure ]
