@@ -12641,6 +12641,7 @@
         "web-platform-tests/svg/top-level-document/svg-image-document-svg-xml-mime-type-ref.html",
         "web-platform-tests/svg/types/helper-SVGElement.ownerSVGElement-02.svg",
         "web-platform-tests/test_keys_wdspec.html",
+        "web-platform-tests/trusted-types/cjk-string-assignment-to-paragraph-ref.html",
         "web-platform-tests/trusted-types/support/HTMLScriptElement-internal-slot-support.html",
         "web-platform-tests/trusted-types/support/create-trusted-type-policies.html",
         "web-platform-tests/trusted-types/support/frame-without-trusted-types.html",
