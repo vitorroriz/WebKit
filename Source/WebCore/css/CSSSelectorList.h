@@ -122,4 +122,6 @@ private:
     UniqueArray<CSSSelector> m_selectorArray;
 };
 
+void add(Hasher&, const CSSSelectorList&);
+
 } // namespace WebCore

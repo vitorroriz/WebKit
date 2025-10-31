@@ -268,4 +268,11 @@ bool CSSSelectorList::operator==(const CSSSelectorList& other) const
     return true;
 }
 
+void add(Hasher& hasher, const CSSSelectorList& list)
+{
+    for (auto& selector : list)
+        addComplexSelector(hasher, selector);
+}
+
+
 } // namespace WebCore
