@@ -133,11 +133,6 @@ static void serverCallback(SoupServer*, SoupServerMessage* message, const char* 
 
 static void testWebKitWebXRLeaveImmersiveModeAndWaitUntilImmersiveModeChanged(WebXRTest* test, gconstpointer)
 {
-    if (!g_getenv("WITH_OPENXR_RUNTIME")) {
-        g_test_skip("Unable to run without an OpenXR runtime");
-        return;
-    }
-
     WebViewTest::NetworkPolicyGuard guard(test, WEBKIT_TLS_ERRORS_POLICY_IGNORE);
 
     g_assert_false(webkit_web_view_is_immersive_mode_enabled(test->m_webView.get()));
@@ -155,11 +150,6 @@ static void testWebKitWebXRLeaveImmersiveModeAndWaitUntilImmersiveModeChanged(We
 
 static void testWebKitXRPermissionRequest(WebXRTest* test, gconstpointer)
 {
-    if (!g_getenv("WITH_OPENXR_RUNTIME")) {
-        g_test_skip("Unable to run without an OpenXR runtime");
-        return;
-    }
-
     enum class Answer {
         Deny,
         Allow,
