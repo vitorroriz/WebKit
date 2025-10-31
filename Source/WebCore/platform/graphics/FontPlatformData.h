@@ -183,13 +183,6 @@ struct FontPlatformOpticalSize {
     Variant<RetainPtr<CFNumberRef>, String> opticalSize;
 };
 
-struct FontPlatformFeatureSetting {
-    std::optional<RetainPtr<CFNumberRef>> type;
-    std::optional<RetainPtr<CFNumberRef>> selector;
-    std::optional<RetainPtr<CFStringRef>> tag;
-    std::optional<RetainPtr<CFNumberRef>> value;
-};
-
 struct FontPlatformSerializedAttributes {
     static std::optional<FontPlatformSerializedAttributes> fromCF(CFDictionaryRef);
     RetainPtr<CFDictionaryRef> toCFDictionary() const;
@@ -218,7 +211,8 @@ struct FontPlatformSerializedAttributes {
     std::optional<FontPlatformOpticalSize> opticalSize;
     std::optional<FontPlatformSerializedTraits> traits;
 
-    std::optional<Vector<FontPlatformFeatureSetting>> featureSettings;
+    // FIXME: featureSettings is an array of CFDictionaries whose layouts are highly variable
+    std::optional<RetainPtr<CFArrayRef>> featureSettings;
 
 #if HAVE(ADDITIONAL_FONT_PLATFORM_SERIALIZED_ATTRIBUTES)
     std::optional<RetainPtr<CFNumberRef>> additionalNumber;
