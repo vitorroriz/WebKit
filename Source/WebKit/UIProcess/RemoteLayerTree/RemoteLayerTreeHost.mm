@@ -29,6 +29,7 @@
 #import "AuxiliaryProcessProxy.h"
 #import "LayerProperties.h"
 #import "Logging.h"
+#import "RemoteLayerTreeCommitBundle.h"
 #import "RemoteLayerTreeDrawingAreaProxy.h"
 #import "RemoteLayerTreePropertyApplier.h"
 #import "RemoteLayerTreeTransaction.h"
@@ -115,9 +116,12 @@ bool RemoteLayerTreeHost::cssUnprefixedBackdropFilterEnabled() const
 }
 
 #if PLATFORM(MAC)
-bool RemoteLayerTreeHost::updateBannerLayers(const RemoteLayerTreeTransaction& transaction)
+bool RemoteLayerTreeHost::updateBannerLayers(const std::optional<MainFrameData>& mainFrameData)
 {
-    RetainPtr scrolledContentsLayer = layerForID(transaction.scrolledContentsLayerID());
+    if (!mainFrameData)
+        return false;
+
+    RetainPtr scrolledContentsLayer = layerForID(mainFrameData->scrolledContentsLayerID);
     if (!scrolledContentsLayer)
         return false;
 
@@ -142,7 +146,7 @@ bool RemoteLayerTreeHost::updateBannerLayers(const RemoteLayerTreeTransaction& t
 }
 #endif
 
-bool RemoteLayerTreeHost::updateLayerTree(const IPC::Connection& connection, const RemoteLayerTreeTransaction& transaction, float indicatorScaleFactor)
+bool RemoteLayerTreeHost::updateLayerTree(const IPC::Connection& connection, const RemoteLayerTreeTransaction& transaction, const std::optional<MainFrameData>& mainFrameData, float indicatorScaleFactor)
 {
     if (!m_drawingArea)
         return false;
@@ -248,7 +252,7 @@ bool RemoteLayerTreeHost::updateLayerTree(const IPC::Connection& connection, con
     }
 
 #if PLATFORM(MAC)
-    if (updateBannerLayers(transaction))
+    if (updateBannerLayers(mainFrameData))
         rootLayerChanged = true;
 #endif
 

@@ -39,6 +39,7 @@
 #import "RemoteScrollingCoordinatorProxy.h"
 #import "RemoteScrollingCoordinatorTransaction.h"
 #import "RemoteScrollingTreeCocoa.h"
+#import "WebFrameProxy.h"
 #import "WebPageMessages.h"
 #import "WebPageProxy.h"
 #import "WebProcessProxy.h"
@@ -289,6 +290,23 @@ void RemoteLayerTreeDrawingAreaProxy::willCommitLayerTree(IPC::Connection& conne
 
 void RemoteLayerTreeDrawingAreaProxy::commitLayerTree(IPC::Connection& connection, const RemoteLayerTreeCommitBundle& bundle, HashMap<ImageBufferSetIdentifier, std::unique_ptr<BufferSetBackendHandle>>&& handlesMap)
 {
+    bool hasMainFrameProcessTransaction { false };
+    for (const auto& [layerTreeTransaction, scrollingTreeTransaction] : bundle.transactions) {
+        if (layerTreeTransaction.isMainFrameProcessTransaction()) {
+            hasMainFrameProcessTransaction = true;
+            break;
+        }
+    }
+    if (bundle.mainFrameData || hasMainFrameProcessTransaction) {
+        RefPtr page = this->page();
+        if (!page)
+            return;
+        RefPtr mainFrame = page->mainFrame();
+        if (!mainFrame)
+            return;
+        MESSAGE_CHECK_BASE(mainFrame->process().hasConnection(connection), connection);
+    }
+
     // The `sendRights` vector must have __block scope to be captured by
     // the commit handler block below without the need to copy it.
     __block Vector<MachSendRight, 16> sendRights;
@@ -317,14 +335,42 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTree(IPC::Connection& connectio
             RELEASE_LOG(RemoteLayerTree, "RemoteLayerTreeDrawingAreaProxy(%" PRIu64 ")::hideContentUntilDidUpdateActivityState completed", identifier().toUInt64());
             m_activityStateChangeForUnhidingContent = std::nullopt;
         }
+
+        RefPtr page = this->page();
+        if (!page)
+            return;
+        // FIXME(site-isolation): Editor state should be updated for subframes.
+        if (bundle.mainFrameData->editorState && page->updateEditorState(EditorState { *bundle.mainFrameData->editorState }, WebPageProxy::ShouldMergeVisualEditorState::Yes))
+            page->dispatchDidUpdateEditorState();
+
+        // Process any callbacks for unhiding content early, so that we
+        // set the root node during the same CA transaction.
+        for (auto& callbackID : bundle.pageData.callbackIDs) {
+            if (callbackID == m_replyForUnhidingContent) {
+                RELEASE_LOG(RemoteLayerTree, "RemoteLayerTreeDrawingAreaProxy(%" PRIu64 ")::hideContentUntilPendingUpdate completed", identifier().toUInt64());
+                m_replyForUnhidingContent = std::nullopt;
+                break;
+            }
+        }
+
+        page->didCommitMainFrameData(*bundle.mainFrameData);
+
+        if (auto milestones = bundle.mainFrameData->newlyReachedPaintingMilestones)
+            page->didReachLayoutMilestone(milestones, WallTime::now());
     }
 
     WeakPtr weakThis { *this };
 
     for (auto& transaction : bundle.transactions) {
-        commitLayerTreeTransaction(connection, CheckedRef { transaction.first }.get(), transaction.second);
+        commitLayerTreeTransaction(connection, CheckedRef { transaction.first }.get(), transaction.second, bundle.mainFrameData);
         if (!weakThis)
             return;
+    }
+
+    for (auto& callbackID : bundle.pageData.callbackIDs) {
+        removeOutstandingPresentationUpdateCallback(connection, callbackID);
+        if (auto callback = connection.takeAsyncReplyHandler(callbackID))
+            callback(nullptr, nullptr);
     }
 
     // Keep IOSurface send rights alive until the transaction is commited, otherwise we will
@@ -360,7 +406,7 @@ WebCore::TrackingType RemoteLayerTreeDrawingAreaProxy::eventTrackingTypeForPoint
 }
 #endif
 
-void RemoteLayerTreeDrawingAreaProxy::commitLayerTreeTransaction(IPC::Connection& connection, const RemoteLayerTreeTransaction& layerTreeTransaction, const RemoteScrollingCoordinatorTransaction& scrollingTreeTransaction)
+void RemoteLayerTreeDrawingAreaProxy::commitLayerTreeTransaction(IPC::Connection& connection, const RemoteLayerTreeTransaction& layerTreeTransaction, const RemoteScrollingCoordinatorTransaction& scrollingTreeTransaction, const std::optional<MainFrameData>& mainFrameData)
 {
     TraceScope tracingScope(CommitLayerTreeStart, CommitLayerTreeEnd);
     ProcessState& state = processStateForConnection(connection);
@@ -376,37 +422,21 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTreeTransaction(IPC::Connection
     if (!state.pendingLayerTreeTransactionID || state.pendingLayerTreeTransactionID->lessThanSameProcess(layerTreeTransaction.transactionID()))
         state.pendingLayerTreeTransactionID = state.lastLayerTreeTransactionID;
 
-    bool didUpdateEditorState { false };
     if (layerTreeTransaction.isMainFrameProcessTransaction()) {
         ASSERT(layerTreeTransaction.transactionID() == m_lastVisibleTransactionID.next());
         m_transactionIDForPendingCACommit = layerTreeTransaction.transactionID();
-
-        // FIXME(site-isolation): Editor state should be updated for subframes.
-        didUpdateEditorState = layerTreeTransaction.hasEditorState() && page->updateEditorState(EditorState { layerTreeTransaction.editorState() }, WebPageProxy::ShouldMergeVisualEditorState::Yes);
     }
 
 #if ENABLE(ASYNC_SCROLLING)
     std::optional<RequestedScrollData> requestedScroll;
 #endif
 
-    // Process any callbacks for unhiding content early, so that we
-    // set the root node during the same CA transaction.
-    if (layerTreeTransaction.isMainFrameProcessTransaction()) {
-        for (auto& callbackID : layerTreeTransaction.callbackIDs()) {
-            if (callbackID == m_replyForUnhidingContent) {
-                RELEASE_LOG(RemoteLayerTree, "RemoteLayerTreeDrawingAreaProxy(%" PRIu64 ")::hideContentUntilPendingUpdate completed", identifier().toUInt64());
-                m_replyForUnhidingContent = std::nullopt;
-                break;
-            }
-        }
-    }
-
     {
         CheckedRef scrollingCoordinatorProxy = *page->scrollingCoordinatorProxy();
         auto commitLayerAndScrollingTrees = [&] {
             if (layerTreeTransaction.hasAnyLayerChanges())
                 ++m_countOfTransactionsWithNonEmptyLayerChanges;
-            if (m_remoteLayerTreeHost->updateLayerTree(connection, layerTreeTransaction)) {
+            if (m_remoteLayerTreeHost->updateLayerTree(connection, layerTreeTransaction, mainFrameData)) {
                 if (!m_replyForUnhidingContent && !m_activityStateChangeForUnhidingContent) {
                     if (m_hasDetachedRootLayer)
                         RELEASE_LOG(RemoteLayerTree, "RemoteLayerTreeDrawingAreaProxy(%" PRIu64 ") Unhiding layer tree", identifier().toUInt64());
@@ -424,8 +454,8 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTreeTransaction(IPC::Connection
         commitLayerAndScrollingTrees();
         scrollingCoordinatorProxy->didCommitLayerAndScrollingTrees();
 
-        page->didCommitLayerTree(layerTreeTransaction);
-        didCommitLayerTree(connection, layerTreeTransaction, scrollingTreeTransaction);
+        page->didCommitLayerTree(layerTreeTransaction, mainFrameData);
+        didCommitLayerTree(connection, layerTreeTransaction, scrollingTreeTransaction, mainFrameData);
 
 #if ENABLE(ASYNC_SCROLLING)
         scrollingCoordinatorProxy->applyScrollingTreeLayerPositionsAfterCommit();
@@ -450,7 +480,7 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTreeTransaction(IPC::Connection
         if (m_debugIndicatorLayerTreeHost && layerTreeTransaction.isMainFrameProcessTransaction()) {
             float scale = indicatorScale(layerTreeTransaction.contentsSize());
             scrollingCoordinatorProxy->willCommitLayerAndScrollingTrees();
-            bool rootLayerChanged = m_debugIndicatorLayerTreeHost->updateLayerTree(connection, layerTreeTransaction, scale);
+            bool rootLayerChanged = m_debugIndicatorLayerTreeHost->updateLayerTree(connection, layerTreeTransaction, mainFrameData, scale);
             scrollingCoordinatorProxy->didCommitLayerAndScrollingTrees();
             IntPoint scrollPosition;
 #if PLATFORM(MAC)
@@ -462,20 +492,6 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTreeTransaction(IPC::Connection
     }
 
     page->layerTreeCommitComplete();
-
-    if (didUpdateEditorState)
-        page->dispatchDidUpdateEditorState();
-
-    if (layerTreeTransaction.isMainFrameProcessTransaction()) {
-        if (auto milestones = layerTreeTransaction.newlyReachedPaintingMilestones())
-            page->didReachLayoutMilestone(milestones, WallTime::now());
-    }
-
-    for (auto& callbackID : layerTreeTransaction.callbackIDs()) {
-        removeOutstandingPresentationUpdateCallback(connection, callbackID);
-        if (auto callback = connection.takeAsyncReplyHandler(callbackID))
-            callback(nullptr, nullptr);
-    }
 }
 
 void RemoteLayerTreeDrawingAreaProxy::asyncSetLayerContents(WebCore::PlatformLayerIdentifier layerID, RemoteLayerBackingStoreProperties&& properties)

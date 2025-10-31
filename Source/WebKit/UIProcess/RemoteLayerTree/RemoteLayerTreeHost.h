@@ -49,6 +49,7 @@ namespace WebKit {
 
 class RemoteLayerTreeDrawingAreaProxy;
 class WebPageProxy;
+struct MainFrameData;
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
 class RemoteAnimationTimeline;
@@ -72,7 +73,7 @@ public:
     RemoteLayerTreeDrawingAreaProxy& drawingArea() const;
 
     // Returns true if the root layer changed.
-    bool updateLayerTree(const IPC::Connection&, const RemoteLayerTreeTransaction&, float indicatorScaleFactor  = 1);
+    bool updateLayerTree(const IPC::Connection&, const RemoteLayerTreeTransaction&, const std::optional<MainFrameData>&, float indicatorScaleFactor  = 1);
     void asyncSetLayerContents(WebCore::PlatformLayerIdentifier, RemoteLayerBackingStoreProperties&&);
 
     void setIsDebugLayerTreeHost(bool flag) { m_isDebugLayerTreeHost = flag; }
@@ -111,7 +112,7 @@ private:
     void createLayer(const RemoteLayerTreeTransaction::LayerCreationProperties&);
     RefPtr<RemoteLayerTreeNode> makeNode(const RemoteLayerTreeTransaction::LayerCreationProperties&);
 
-    bool updateBannerLayers(const RemoteLayerTreeTransaction&);
+    bool updateBannerLayers(const std::optional<MainFrameData>&);
 
     void layerWillBeRemoved(WebCore::ProcessIdentifier, WebCore::PlatformLayerIdentifier);
 

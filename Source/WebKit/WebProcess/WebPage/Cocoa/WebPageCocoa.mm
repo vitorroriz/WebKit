@@ -35,6 +35,7 @@
 #import "PDFPlugin.h"
 #import "PluginView.h"
 #import "PrintInfo.h"
+#import "RemoteLayerTreeCommitBundle.h"
 #import "RemoteLayerTreeTransaction.h"
 #import "RemoteRenderingBackendProxy.h"
 #import "RemoteSnapshotRecorderProxy.h"
@@ -1989,16 +1990,6 @@ void WebPage::willCommitLayerTree(RemoteLayerTreeTransaction& layerTransaction, 
     layerTransaction.setScrollOrigin(frameView->scrollOrigin());
     layerTransaction.setPageScaleFactor(page->pageScaleFactor());
     layerTransaction.setRenderTreeSize(page->renderTreeSize());
-    layerTransaction.setThemeColor(page->themeColor());
-    layerTransaction.setPageExtendedBackgroundColor(page->pageExtendedBackgroundColor());
-    layerTransaction.setSampledPageTopColor(page->sampledPageTopColor());
-
-    bool isMainFrameProcess = !!page->localMainFrame();
-    if (isMainFrameProcess && std::exchange(m_needsFixedContainerEdgesUpdate, false)) {
-        page->updateFixedContainerEdges(sidesRequiringFixedContainerEdges());
-        layerTransaction.setFixedContainerEdges(page->fixedContainerEdges());
-    }
-
     layerTransaction.setBaseLayoutViewportSize(frameView->baseLayoutViewportSize());
     layerTransaction.setMinStableLayoutViewportOrigin(frameView->minStableLayoutViewportOrigin());
     layerTransaction.setMaxStableLayoutViewportOrigin(frameView->maxStableLayoutViewportOrigin());
@@ -2013,7 +2004,6 @@ void WebPage::willCommitLayerTree(RemoteLayerTreeTransaction& layerTransaction, 
     layerTransaction.setViewportMetaTagWidthWasExplicit(m_viewportConfiguration.viewportArguments().widthWasExplicit);
     layerTransaction.setViewportMetaTagCameFromImageDocument(m_viewportConfiguration.viewportArguments().type == ViewportArguments::Type::ImageDocument);
     layerTransaction.setAvoidsUnsafeArea(m_viewportConfiguration.avoidsUnsafeArea());
-    layerTransaction.setIsInStableState(m_isInStableState);
     layerTransaction.setAllowsUserScaling(allowsUserScaling());
     if (m_pendingDynamicViewportSizeUpdateID) {
         layerTransaction.setDynamicViewportSizeUpdateID(*m_pendingDynamicViewportSizeUpdateID);
@@ -2030,9 +2020,26 @@ void WebPage::willCommitLayerTree(RemoteLayerTreeTransaction& layerTransaction, 
     m_pendingThemeColorChange = false;
     m_pendingPageExtendedBackgroundColorChange = false;
     m_pendingSampledPageTopColorChange = false;
+}
+
+void WebPage::willCommitMainFrameData(MainFrameData& data)
+{
+    Ref page = *corePage();
+    data.themeColor = page->themeColor();
+    data.pageExtendedBackgroundColor = page->pageExtendedBackgroundColor();
+    data.sampledPageTopColor = page->sampledPageTopColor();
+
+    if (std::exchange(m_needsFixedContainerEdgesUpdate, false)) {
+        page->updateFixedContainerEdges(sidesRequiringFixedContainerEdges());
+        data.fixedContainerEdges = page->fixedContainerEdges();
+    }
+
+#if PLATFORM(IOS_FAMILY)
+    data.isInStableState = m_isInStableState;
+#endif
 
     if (hasPendingEditorStateUpdate() || m_needsEditorStateVisualDataUpdate) {
-        layerTransaction.setEditorState(editorState());
+        data.editorState = editorState();
         m_pendingEditorStateUpdateStatus = PendingEditorStateUpdateStatus::NotScheduled;
         m_needsEditorStateVisualDataUpdate = false;
     }
