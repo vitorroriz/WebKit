@@ -195,19 +195,19 @@ std::optional<std::pair<double, double>> ViewGestureGeometryCollector::computeTe
         if (++numberOfIterations >= maximumNumberOfTextRunsToConsider)
             break;
 
-        if (!is<Text>(documentTextIterator.node()))
+        RefPtr textNode = dynamicDowncast<Text>(documentTextIterator.node());
+        if (!textNode)
             continue;
 
-        Ref textNode = downcast<Text>(*documentTextIterator.node());
         auto textLength = textNode->length();
-        if (!textLength || !textNode->renderer() || allTextNodes.contains(textNode))
+        if (!textLength || !textNode->renderer() || allTextNodes.contains(*textNode))
             continue;
 
         unsigned fontSizeBin = fontSizeBinningInterval * round(textNode->renderer()->style().fontCascade().size() / fontSizeBinningInterval);
         if (!FontSizeCounter::isValidValue(fontSizeBin))
             continue;
 
-        allTextNodes.add(textNode);
+        allTextNodes.add(*textNode);
 
         fontSizeCounter.add(fontSizeBin, textLength);
         totalSampledTextLength += textLength;

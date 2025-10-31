@@ -1551,10 +1551,11 @@ Node* Internals::shadowRoot(Element& host)
 
 ExceptionOr<String> Internals::shadowRootType(const Node& root) const
 {
-    if (!is<ShadowRoot>(root))
+    auto* shadowRoot = dynamicDowncast<ShadowRoot>(root);
+    if (!shadowRoot)
         return Exception { ExceptionCode::InvalidAccessError };
 
-    switch (downcast<ShadowRoot>(root).mode()) {
+    switch (shadowRoot->mode()) {
     case ShadowRootMode::UserAgent:
         return "UserAgentShadowRoot"_str;
     case ShadowRootMode::Closed:
@@ -1690,11 +1691,10 @@ String Internals::visiblePlaceholder(Element& element)
 {
     element.document().updateLayout(LayoutOptions::IgnorePendingStylesheets);
 
-    if (is<HTMLTextFormControlElement>(element)) {
-        const HTMLTextFormControlElement& textFormControlElement = downcast<HTMLTextFormControlElement>(element);
-        if (!textFormControlElement.isPlaceholderVisible())
+    if (auto* textFormControlElement = dynamicDowncast<HTMLTextFormControlElement>(element)) {
+        if (!textFormControlElement->isPlaceholderVisible())
             return String();
-        if (HTMLElement* placeholderElement = textFormControlElement.placeholderElement())
+        if (auto* placeholderElement = textFormControlElement->placeholderElement())
             return placeholderElement->textContent();
     }
 
@@ -1703,8 +1703,8 @@ String Internals::visiblePlaceholder(Element& element)
 
 void Internals::setCanShowPlaceholder(Element& element, bool canShowPlaceholder)
 {
-    if (is<HTMLTextFormControlElement>(element))
-        downcast<HTMLTextFormControlElement>(element).setCanShowPlaceholder(canShowPlaceholder);
+    if (auto* textFormControlElement = dynamicDowncast<HTMLTextFormControlElement>(element))
+        textFormControlElement->setCanShowPlaceholder(canShowPlaceholder);
 }
 
 Element* Internals::insertTextPlaceholder(int width, int height)
@@ -1715,8 +1715,8 @@ Element* Internals::insertTextPlaceholder(int width, int height)
 
 void Internals::removeTextPlaceholder(Element& element)
 {
-    if (is<TextPlaceholderElement>(element))
-        frame()->editor().removeTextPlaceholder(downcast<TextPlaceholderElement>(element));
+    if (auto* placeholderElement = dynamicDowncast<TextPlaceholderElement>(element))
+        frame()->editor().removeTextPlaceholder(*placeholderElement);
 }
 
 void Internals::selectColorInColorChooser(HTMLInputElement& element, const String& colorValue)
@@ -2470,11 +2470,11 @@ ExceptionOr<String> Internals::configurationForViewport(float devicePixelRatio, 
 
 ExceptionOr<bool> Internals::wasLastChangeUserEdit(Element& textField)
 {
-    if (is<HTMLInputElement>(textField))
-        return downcast<HTMLInputElement>(textField).lastChangeWasUserEdit();
+    if (auto* input = dynamicDowncast<HTMLInputElement>(textField))
+        return input->lastChangeWasUserEdit();
 
-    if (is<HTMLTextAreaElement>(textField))
-        return downcast<HTMLTextAreaElement>(textField).lastChangeWasUserEdit();
+    if (auto* textArea = dynamicDowncast<HTMLTextAreaElement>(textField))
+        return textArea->lastChangeWasUserEdit();
 
     return Exception { ExceptionCode::InvalidNodeTypeError };
 }
@@ -2560,13 +2560,12 @@ Vector<String> Internals::recentSearches(const HTMLInputElement& element)
         return { };
 
     element.document().updateLayout(LayoutOptions::IgnorePendingStylesheets);
-    auto* renderer = element.renderer();
-    if (!is<RenderSearchField>(renderer))
+    auto* searchField = dynamicDowncast<RenderSearchField>(element.renderer());
+    if (!searchField)
         return { };
 
     Vector<String> result;
-    auto& searchField = downcast<RenderSearchField>(*renderer);
-    for (auto search : searchField.recentSearches())
+    for (auto search : searchField->recentSearches())
         result.append(search.string);
 
     return result;
@@ -2583,10 +2582,11 @@ ExceptionOr<void> Internals::scrollElementToRect(Element& element, int x, int y,
 
 ExceptionOr<String> Internals::autofillFieldName(Element& element)
 {
-    if (!is<HTMLFormControlElement>(element))
-        return Exception { ExceptionCode::InvalidNodeTypeError };
+    if (auto* formControl = dynamicDowncast<HTMLFormControlElement>(element))
+        return String { formControl->autofillData().fieldName };
 
-    return String { downcast<HTMLFormControlElement>(element).autofillData().fieldName };
+    return Exception { ExceptionCode::InvalidNodeTypeError };
+
 }
 
 ExceptionOr<void> Internals::invalidateControlTints()
@@ -3545,14 +3545,13 @@ ExceptionOr<ScrollableArea*> Internals::scrollableAreaForNode(Node* node) const
             return Exception { ExceptionCode::InvalidAccessError };
 
         scrollableArea = frameView;
-    } else if (is<Element>(nodeRef)) {
-        auto& element = downcast<Element>(nodeRef.get());
-        if (!element.renderBox())
+    } else if (RefPtr element = dynamicDowncast<Element>(nodeRef)) {
+        if (!element->renderBox())
             return Exception { ExceptionCode::InvalidAccessError };
 
-        auto& renderBox = *element.renderBox();
-        if (is<RenderListBox>(renderBox))
-            scrollableArea = &downcast<RenderListBox>(renderBox);
+        auto& renderBox = *element->renderBox();
+        if (auto* renderListBox = dynamicDowncast<RenderListBox>(renderBox))
+            scrollableArea = renderListBox;
         else {
             ASSERT(renderBox.layer());
             scrollableArea = renderBox.layer()->scrollableArea();
@@ -3829,15 +3828,16 @@ ExceptionOr<String> Internals::cachedGlyphDisplayListsForTextNode(Node& node, un
     if (!document || !document->renderView())
         return Exception { ExceptionCode::InvalidAccessError };
 
-    if (!is<Text>(node))
+    RefPtr textNode = dynamicDowncast<Text>(node);
+    if (!textNode)
         return Exception { ExceptionCode::InvalidAccessError };
 
-    node.document().updateLayout(LayoutOptions::IgnorePendingStylesheets);
+    textNode->document().updateLayout(LayoutOptions::IgnorePendingStylesheets);
 
-    if (!node.renderer())
+    if (!textNode->renderer())
         return Exception { ExceptionCode::InvalidAccessError };
 
-    return TextPainter::cachedGlyphDisplayListsForTextNodeAsText(downcast<Text>(node), toDisplayListFlags(flags));
+    return TextPainter::cachedGlyphDisplayListsForTextNodeAsText(*textNode, toDisplayListFlags(flags));
 }
 
 ExceptionOr<void> Internals::garbageCollectDocumentResources() const
@@ -4354,10 +4354,10 @@ ExceptionOr<void> Internals::updateLayoutIgnorePendingStylesheetsAndRunPostLayou
     Document* document;
     if (!node)
         document = contextDocument();
-    else if (is<Document>(*node))
-        document = downcast<Document>(node);
-    else if (is<HTMLIFrameElement>(*node))
-        document = downcast<HTMLIFrameElement>(*node).contentDocument();
+    else if (auto* documentNode = dynamicDowncast<Document>(*node))
+        document = documentNode;
+    else if (auto* iframe = dynamicDowncast<HTMLIFrameElement>(*node))
+        document = iframe->contentDocument();
     else
         return Exception { ExceptionCode::TypeError };
 
@@ -4733,12 +4733,9 @@ bool Internals::isSelectPopupVisible(HTMLSelectElement& element)
 {
     element.document().updateLayout(LayoutOptions::IgnorePendingStylesheets);
 
-    auto* renderer = element.renderer();
-    if (!is<RenderMenuList>(renderer))
-        return false;
-
 #if !PLATFORM(IOS_FAMILY)
-    return downcast<RenderMenuList>(*renderer).popupIsVisible();
+    auto* renderer = dynamicDowncast<RenderMenuList>(element.renderer());
+    return renderer && renderer->popupIsVisible();
 #else
     return false;
 #endif
@@ -6206,10 +6203,10 @@ ExceptionOr<bool> Internals::hasSameEventLoopAs(WindowProxy& proxy)
     if (!context || !proxy.frame())
         return Exception { ExceptionCode::InvalidStateError };
 
-    auto& proxyFrame = *proxy.frame();
-    if (!is<LocalFrame>(proxyFrame))
+    auto* proxyFrame = dynamicDowncast<LocalFrame>(*proxy.frame());
+    if (!proxyFrame)
         return false;
-    RefPtr<ScriptExecutionContext> proxyContext = downcast<LocalFrame>(proxyFrame).document();
+    RefPtr<ScriptExecutionContext> proxyContext = proxyFrame->document();
     if (!proxyContext)
         return Exception { ExceptionCode::InvalidStateError };
 
@@ -6344,10 +6341,8 @@ bool Internals::isPageActive() const
 #if ENABLE(MEDIA_STREAM)
 void Internals::setMockAudioTrackChannelNumber(MediaStreamTrack& track, unsigned short channelNumber)
 {
-    auto& source = track.source();
-    if (!is<MockRealtimeAudioSource>(source))
-        return;
-    downcast<MockRealtimeAudioSource>(source).setChannelCount(channelNumber);
+    if (auto* source = dynamicDowncast<MockRealtimeAudioSource>(track.source()))
+        source->setChannelCount(channelNumber);
 }
 
 void Internals::setCameraMediaStreamTrackOrientation(MediaStreamTrack& track, int orientation)
@@ -6472,9 +6467,8 @@ bool Internals::isMockRealtimeMediaSourceCenterEnabled()
 
 bool Internals::shouldAudioTrackPlay(const AudioTrack& track)
 {
-    if (!is<AudioTrackPrivateMediaStream>(track.privateTrack()))
-        return false;
-    return downcast<AudioTrackPrivateMediaStream>(track.privateTrack()).shouldPlay();
+    auto* audioTrack = dynamicDowncast<AudioTrackPrivateMediaStream>(track.privateTrack());
+    return audioTrack && audioTrack->shouldPlay();
 }
 #endif // ENABLE(MEDIA_STREAM)
 
@@ -6837,7 +6831,8 @@ bool Internals::hasActiveDataDetectorHighlight() const
 bool Internals::isSystemPreviewLink(Element& element) const
 {
 #if USE(SYSTEM_PREVIEW)
-    return is<HTMLAnchorElement>(element) && downcast<HTMLAnchorElement>(element).isSystemPreviewLink();
+    auto* anchor = dynamicDowncast<HTMLAnchorElement>(element);
+    return anchor && anchor->isSystemPreviewLink();
 #else
     UNUSED_PARAM(element);
     return false;
@@ -6847,10 +6842,10 @@ bool Internals::isSystemPreviewLink(Element& element) const
 bool Internals::isSystemPreviewImage(Element& element) const
 {
 #if USE(SYSTEM_PREVIEW)
-    if (is<HTMLImageElement>(element))
-        return downcast<HTMLImageElement>(element).isSystemPreviewImage();
-    if (is<HTMLPictureElement>(element))
-        return downcast<HTMLPictureElement>(element).isSystemPreviewImage();
+    if (auto* image = dynamicDowncast<HTMLImageElement>(element))
+        return image->isSystemPreviewImage();
+    if (auto* picture = dynamicDowncast<HTMLPictureElement>(element))
+        return picture->isSystemPreviewImage();
     return false;
 #else
     UNUSED_PARAM(element);
