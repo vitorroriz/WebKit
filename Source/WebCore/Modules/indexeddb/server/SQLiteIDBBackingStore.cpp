@@ -664,6 +664,22 @@ bool SQLiteIDBBackingStore::migrateIndexRecordsTableForIDUpdate(const HashMap<st
     return true;
 }
 
+static Expected<String, IDBError> databaseNameFromDatabase(SQLiteDatabase& database, uint64_t metadataVersion)
+{
+    auto sql = database.prepareStatement("SELECT value FROM IDBDatabaseInfo WHERE key = 'DatabaseName';"_s);
+    if (!sql)
+        return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Cannot get stored database name"_s) });
+
+    String databaseName;
+    CheckedRef statement = *sql;
+    if (metadataVersion == 1)
+        databaseName = statement->columnText(0);
+    else
+        databaseName = statement->columnBlobAsString(0);
+
+    return databaseName;
+}
+
 static Expected<std::pair<uint64_t, String>, IDBError> databaseMetadataVersionAndNameFromDatabase(SQLiteDatabase& database)
 {
     uint64_t metadataVersion = 0;
@@ -679,18 +695,11 @@ static Expected<std::pair<uint64_t, String>, IDBError> databaseMetadataVersionAn
         metadataVersion = *parsedVersion;
     }
 
-    auto sql = database.prepareStatement("SELECT value FROM IDBDatabaseInfo WHERE key = 'DatabaseName';"_s);
-    if (!sql)
-        return makeUnexpected(IDBError { ExceptionCode::UnknownError, makeString("Cannot get stored database name"_s) });
+    auto databaseNameOrError = databaseNameFromDatabase(database, metadataVersion);
+    if (!databaseNameOrError)
+        return makeUnexpected(databaseNameOrError.error());
 
-    String databaseName;
-    CheckedRef statement = *sql;
-    if (metadataVersion == 1)
-        databaseName = statement->columnText(0);
-    else
-        databaseName = statement->columnBlobAsString(0);
-
-    return std::pair<uint64_t, String> { metadataVersion, databaseName };
+    return std::pair<uint64_t, String> { metadataVersion, databaseNameOrError.value() };
 }
 
 static IDBError migrateIDBDatabaseInfoTableIfNecessary(SQLiteDatabase& database, const String& databaseName)
@@ -707,8 +716,23 @@ static IDBError migrateIDBDatabaseInfoTableIfNecessary(SQLiteDatabase& database,
 
     auto [metadataVersion, existingDatabaseName] = result.value();
     // UTF-8 encoded names should always match regardless of metadata version.
-    if (existingDatabaseName.utf8() != databaseName.utf8())
-        return IDBError { ExceptionCode::UnknownError, "Stored database name does not match requested name"_s };
+    if (existingDatabaseName.utf8() != databaseName.utf8()) {
+        bool validated = false;
+        // Some clients might have newer metadata version with old name due to rdar://163219457.
+        // In that case, downgrade the metadata version to let database be upgraded again.
+        // Remove this temporary workaround after clients upgrade to new version.
+        if (metadataVersion == 2) {
+            if (auto utf8ExistingDatabaseName = databaseNameFromDatabase(database, 1)) {
+                if (utf8ExistingDatabaseName == databaseName) {
+                    metadataVersion = 1;
+                    validated = true;
+                    RELEASE_LOG(IndexedDB, "migrateIDBDatabaseInfoTableIfNecessary: Found mismatched metadata version; will upgrade again");
+                }
+            }
+        }
+        if (!validated)
+            return IDBError { ExceptionCode::UnknownError, "Stored database name does not match requested name"_s };
+    }
 
     if (metadataVersion == currentMetadataVersion) {
         if (existingDatabaseName == databaseName)
