@@ -74,5 +74,4 @@ WebProcess/InjectedBundle/InjectedBundleHitTestResult.cpp
 [ iOS ] WebProcess/WebPage/WebPage.cpp
 [ iOS ] WebProcess/WebPage/ios/FindControllerIOS.mm
 [ iOS ] WebProcess/WebPage/ios/WebPageIOS.mm
-[ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
 [ iOS ] WebProcess/WebProcess.cpp
