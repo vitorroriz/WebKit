@@ -397,8 +397,9 @@ void TextAnimationController::clearAnimationsForActiveWritingToolsSession()
 
     auto textAnimationRanges = std::exchange(m_textAnimationRanges, { });
 
+    RefPtr page = m_webPage.get();
     for (auto textAnimationRange : textAnimationRanges)
-        protectedWebPage()->removeTextAnimationForAnimationID(textAnimationRange.animationUUID);
+        page->removeTextAnimationForAnimationID(textAnimationRange.animationUUID);
 
     if (auto finalReplaceHander = std::exchange(m_finalReplaceHandler, std::nullopt))
         (*finalReplaceHander)(WebCore::TextAnimationRunMode::DoNotRun);

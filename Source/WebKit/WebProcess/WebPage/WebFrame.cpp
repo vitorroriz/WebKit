@@ -864,7 +864,7 @@ String WebFrame::layerTreeAsText() const
     if (!localFrame)
         return emptyString();
 
-    return localFrame->contentRenderer()->compositor().layerTreeAsText();
+    return localFrame->contentRenderer()->checkedCompositor()->layerTreeAsText();
 }
 
 unsigned WebFrame::pendingUnloadCount() const
@@ -933,7 +933,7 @@ void WebFrame::setAccessibleName(const AtomString& accessibleName)
     RefPtr document = localFrame->document();
     if (!document)
         return;
-    
+
     RefPtr rootObject = document->checkedAXObjectCache()->rootObjectForFrame(*localFrame);
     if (!rootObject)
         return;

@@ -870,7 +870,7 @@ void WebLoaderStrategy::loadResourceSynchronously(FrameLoader& frameLoader, WebC
     if (!sendResult.succeeded()) {
         WEBLOADERSTRATEGY_WITH_FRAMELOADER_RELEASE_LOG_ERROR("loadResourceSynchronously: failed sending synchronous network process message %" PUBLIC_LOG_STRING, IPC::errorAsString(sendResult.error()).characters());
         if (page)
-            page->diagnosticLoggingClient().logDiagnosticMessage(WebCore::DiagnosticLoggingKeys::internalErrorKey(), WebCore::DiagnosticLoggingKeys::synchronousMessageFailedKey(), WebCore::ShouldSample::No);
+            page->checkedDiagnosticLoggingClient()->logDiagnosticMessage(WebCore::DiagnosticLoggingKeys::internalErrorKey(), WebCore::DiagnosticLoggingKeys::synchronousMessageFailedKey(), WebCore::ShouldSample::No);
         response = ResourceResponse();
         error = internalError(request.url());
     } else

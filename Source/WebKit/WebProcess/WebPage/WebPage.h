@@ -793,9 +793,10 @@ public:
 
     WebFrame& mainWebFrame() const { return m_mainFrame; }
 
-    WebCore::Frame* mainFrame() const; // May return nullptr.
-    WebCore::FrameView* mainFrameView() const; // May return nullptr.
-    WebCore::LocalFrameView* localMainFrameView() const; // May return nullptr.
+    WebCore::Frame* mainFrame() const;
+    WebCore::FrameView* mainFrameView() const;
+    WebCore::LocalFrameView* localMainFrameView() const;
+    CheckedPtr<WebCore::LocalFrameView> checkedLocalMainFrameView() const;
     RefPtr<WebCore::LocalFrame> localMainFrame() const;
     RefPtr<WebCore::Document> localTopDocument() const;
 

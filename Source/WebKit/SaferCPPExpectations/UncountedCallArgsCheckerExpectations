@@ -74,7 +74,6 @@ WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInRangeHandle.mm
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInScriptWorld.mm
 WebProcess/InjectedBundle/API/c/WKBundleFrame.cpp
 WebProcess/InjectedBundle/API/c/WKBundleNodeHandle.cpp
-WebProcess/InjectedBundle/API/c/WKBundlePage.cpp
 WebProcess/InjectedBundle/API/c/mac/WKBundleMac.mm
 [ Mac ] WebProcess/InjectedBundle/API/c/mac/WKBundlePageBannerMac.mm
 WebProcess/InjectedBundle/API/mac/WKDOMDocument.mm
@@ -98,7 +97,4 @@ WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeDrawingArea.mm
 [ iOS ] WebProcess/WebPage/ios/FindControllerIOS.mm
 [ iOS ] WebProcess/WebPage/ios/WebPageIOS.mm
 [ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm
-[ Mac ] WebProcess/WebPage/mac/TiledCoreAnimationScrollingCoordinator.mm
-WebProcess/WebPage/mac/WKAccessibilityWebPageObjectBase.mm
-[ Mac ] WebProcess/WebPage/mac/WKAccessibilityWebPageObjectMac.mm
 [ iOS ] WebProcess/WebProcess.cpp
