@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2018 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,34 +25,15 @@
 
 #pragma once
 
-#include <objc/runtime.h>
-#include <wtf/FastMalloc.h>
-#include <wtf/Noncopyable.h>
+#if PLATFORM(IOS_FAMILY)
 
-class InstanceMethodSwizzler {
-    WTF_DEPRECATED_MAKE_FAST_ALLOCATED(InstanceMethodSwizzler);
-    WTF_MAKE_NONCOPYABLE(InstanceMethodSwizzler);
-public:
-    InstanceMethodSwizzler(Class, SEL, IMP);
-    ~InstanceMethodSwizzler();
+#import <UIKit/UIKit.h>
 
-private:
-    Method m_method;
-    IMP m_originalImplementation;
-};
+@interface UIGestureRecognizer (TestWebKitAPI)
 
-// Allows users to (more conveniently) invoke the original method in the swizzled method.
-// Restores the original method upon destruction.
-class InstanceMethodSwapper {
-    WTF_DEPRECATED_MAKE_FAST_ALLOCATED(InstanceMethodSwapper);
-    WTF_MAKE_NONCOPYABLE(InstanceMethodSwapper);
-public:
-    InstanceMethodSwapper(Class, SEL original, SEL swizzled);
-    ~InstanceMethodSwapper();
+- (void)_setStateForTesting:(UIGestureRecognizerState)state;
+- (void)_clearOverriddenStateForTesting;
 
-private:
-    Class m_class;
-    Method m_method;
-    SEL m_originalSelector;
-    IMP m_originalImplementation;
-};
+@end
+
+#endif // PLATFORM(IOS_FAMILY)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2018 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,32 +24,39 @@
  */
 
 #import "config.h"
+#import "UIKitTestingHelpers.h"
+
+#if PLATFORM(IOS_FAMILY)
+
 #import "InstanceMethodSwizzler.h"
+#import <wtf/HashMap.h>
 
-InstanceMethodSwizzler::InstanceMethodSwizzler(Class cls, SEL selector, IMP implementation)
-    : m_method(class_getInstanceMethod(cls, selector))
-    , m_originalImplementation(method_setImplementation(m_method, implementation))
+using GestureStateOverrideMap = HashMap<RetainPtr<UIGestureRecognizer>, UIGestureRecognizerState>;
+static GestureStateOverrideMap& allStateOverrides()
 {
+    static NeverDestroyed<GestureStateOverrideMap> overrides;
+    return overrides.get();
 }
 
-InstanceMethodSwizzler::~InstanceMethodSwizzler()
+@implementation UIGestureRecognizer (TestWebKitAPI)
+
+- (UIGestureRecognizerState)swizzled_state
 {
-    method_setImplementation(m_method, m_originalImplementation);
+    return allStateOverrides().getOptional(self).value_or([self swizzled_state]);
 }
 
-InstanceMethodSwapper::InstanceMethodSwapper(Class theClass, SEL originalSelector, SEL swizzledSelector)
-    : m_class { theClass }
-    , m_method { class_getInstanceMethod(theClass, originalSelector) }
-    , m_originalSelector { originalSelector }
-    , m_originalImplementation { method_getImplementation(m_method) }
+- (void)_setStateForTesting:(UIGestureRecognizerState)state
 {
-    auto swizzledMethod = class_getInstanceMethod(theClass, swizzledSelector);
-    auto swizzledImplementation = method_getImplementation(swizzledMethod);
-    class_replaceMethod(theClass, swizzledSelector, m_originalImplementation, method_getTypeEncoding(m_method));
-    class_replaceMethod(theClass, originalSelector, swizzledImplementation, method_getTypeEncoding(swizzledMethod));
+    static InstanceMethodSwapper swizzler { UIGestureRecognizer.class, @selector(state), @selector(swizzled_state) };
+
+    allStateOverrides().set(self, state);
 }
 
-InstanceMethodSwapper::~InstanceMethodSwapper()
+- (void)_clearOverriddenStateForTesting
 {
-    class_replaceMethod(m_class, m_originalSelector, m_originalImplementation, method_getTypeEncoding(m_method));
+    allStateOverrides().clear();
 }
+
+@end
+
+#endif // PLATFORM(IOS_FAMILY)
