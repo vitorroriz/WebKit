@@ -1031,7 +1031,15 @@ void JSIPCStreamClientConnection::initialize(JSContextRef, JSObjectRef object)
 
 void JSIPCStreamClientConnection::finalize(JSObjectRef object)
 {
-    unwrap(object)->deref();
+    auto* wrapper = unwrap(object);
+
+    // The StreamClientConnection destructor asserts the connection is not valid
+    // when it runs, so we need to invalidate it here if it hasn't already been
+    // done explicitly in the test code.
+    if (wrapper->m_streamConnection)
+        wrapper->m_streamConnection->invalidate();
+
+    wrapper->deref();
 }
 
 const JSStaticFunction* JSIPCStreamClientConnection::staticFunctions()
