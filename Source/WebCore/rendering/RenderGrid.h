@@ -202,7 +202,6 @@ private:
     bool isPlacedWithinExtrinsicallySizedExplicitTracks(const RenderBox&) const;
     void placeSpecifiedMajorAxisItemsOnGrid(const Vector<RenderBox*>&);
     void placeAutoMajorAxisItemsOnGrid(const Vector<RenderBox*>&);
-    void placeItemUsingMasonryPositioning(Grid&, RenderBox*) const;
     typedef std::pair<unsigned, unsigned> AutoPlacementCursor;
     void placeAutoMajorAxisItemOnGrid(RenderBox&, AutoPlacementCursor&);
     Style::GridTrackSizingDirection autoPlacementMajorAxisDirection() const;
