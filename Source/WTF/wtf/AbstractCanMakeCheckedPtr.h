@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace WTF {
 
 // Use this class when an abstract base class needs CheckedPtr/CheckedRef support, and the
