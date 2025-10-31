@@ -130,6 +130,7 @@ enum class SDKAlignedBehavior {
     CrashWhenPreconnectingFromBackgroundThread,
     ExecutionTimingChangeOfModuleScripts,
     GetBoundingClientRectZoomed,
+    CrashWhenMutatingProcessAssertionsFromBackgroundThread,
 
     NumberOfBehaviors
 };
