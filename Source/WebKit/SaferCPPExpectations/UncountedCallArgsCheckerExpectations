@@ -47,17 +47,6 @@ Platform/IPC/ArgumentCoders.h
 [ iOS ] UIProcess/ios/forms/WKFormPopover.mm
 [ iOS ] UIProcess/ios/fullscreen/WKFullScreenViewController.mm
 [ iOS ] UIProcess/ios/fullscreen/WKFullScreenWindowControllerIOS.mm
-[ Mac ] WebProcess/Extensions/API/Cocoa/WebExtensionAPIDevToolsInspectedWindowCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPIExtensionCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPIMenusCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPINamespaceCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPIPortCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPIRuntimeCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPIStorageAreaCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPIStorageCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPITabsCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPIWebNavigationEventCocoa.mm
-WebProcess/Extensions/Bindings/JSWebExtensionWrapper.cpp
 [ iOS ] WebProcess/GPU/media/ios/RemoteMediaSessionHelper.cpp
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInCSSStyleDeclarationHandle.mm
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInFrame.mm
@@ -66,7 +55,6 @@ WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInNodeHandle.mm
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInRangeHandle.mm
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInScriptWorld.mm
 WebProcess/InjectedBundle/API/c/WKBundleFrame.cpp
-WebProcess/InjectedBundle/API/c/WKBundleNodeHandle.cpp
 WebProcess/InjectedBundle/API/c/mac/WKBundleMac.mm
 [ Mac ] WebProcess/InjectedBundle/API/c/mac/WKBundlePageBannerMac.mm
 WebProcess/InjectedBundle/API/mac/WKDOMDocument.mm
@@ -77,14 +65,11 @@ WebProcess/InjectedBundle/API/mac/WKDOMText.mm
 WebProcess/InjectedBundle/API/mac/WKDOMTextIterator.mm
 WebProcess/InjectedBundle/API/mac/WKWebProcessPlugIn.mm
 WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextController.mm
-WebProcess/InjectedBundle/InjectedBundleDOMWindowExtension.cpp
 WebProcess/InjectedBundle/InjectedBundleHitTestResult.cpp
-[ Mac ] WebProcess/Inspector/WebInspectorUIExtensionController.cpp
 [ iOS ] WebProcess/Network/NetworkProcessConnection.cpp
 [ iOS ] WebProcess/Plugins/PDF/UnifiedPDF/UnifiedPDFPlugin.mm
 [ iOS ] WebProcess/WebCoreSupport/WebChromeClientCocoa.mm
 [ iOS ] WebProcess/WebCoreSupport/WebLocalFrameLoaderClient.cpp
-WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeDrawingArea.mm
 [ iOS ] WebProcess/WebPage/WKAccessibilityWebPageObjectIOS.mm
 [ iOS ] WebProcess/WebPage/WebPage.cpp
 [ iOS ] WebProcess/WebPage/ios/FindControllerIOS.mm
