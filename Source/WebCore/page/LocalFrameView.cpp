@@ -3348,6 +3348,25 @@ static void adjustScrollRectToVisibleOptionsForHiddenOverflow(ScrollRectToVisibl
         options.alignY = ScrollAlignment::noScroll;
 }
 
+static void adjustForScrollByAnchor(const RenderLayerModelObject& renderer, EnumSet<BoxAxis>& isFixed)
+{
+    if (!renderer.isFixedPositioned())
+        return;
+    auto* renderBox = dynamicDowncast<RenderBox>(&renderer);
+    ASSERT(renderBox);
+
+    if (!renderBox || !Style::AnchorPositionEvaluator::isAnchorPositioned(renderBox->style()))
+        return;
+    auto adjuster = renderBox->layoutContext().anchorScrollAdjusterFor(*renderBox);
+    if (!adjuster || !adjuster->hasViewportSnapshot())
+        return;
+
+    if (adjuster->mayNeedXAdjustment())
+        isFixed.remove(BoxAxis::Horizontal);
+    if (adjuster->mayNeedYAdjustment())
+        isFixed.remove(BoxAxis::Vertical);
+}
+
 bool LocalFrameView::scrollRectToVisible(const LayoutRect& absoluteRect, const RenderObject& renderer, bool insideFixed, const ScrollRectToVisibleOptions& options)
 {
     if (options.revealMode == SelectionRevealMode::DoNotReveal)
@@ -3363,6 +3382,7 @@ bool LocalFrameView::scrollRectToVisible(const LayoutRect& absoluteRect, const R
     // FIXME: It would be nice to use RenderLayer::enclosingScrollableLayer here, but that seems to skip overflow:hidden layers.
     auto adjustedRect = absoluteRect;
     ScrollRectToVisibleOptions adjustedOptions = options;
+    EnumSet<BoxAxis> isFixed(insideFixed ? EnumSet<BoxAxis> { BoxAxis::Horizontal, BoxAxis::Vertical } : EnumSet<BoxAxis> { });
 
     for (; layer; layer = layer->enclosingContainingBlockLayer(CrossFrameBoundaries::No)) {
         if (layer->shouldTryToScrollForScrollIntoView(adjustedOptions)) {
@@ -3371,14 +3391,17 @@ bool LocalFrameView::scrollRectToVisible(const LayoutRect& absoluteRect, const R
             if (adjustedOptions.visibilityCheckRect)
                 adjustedOptions.visibilityCheckRect->setLocation(adjustedRect.location());
         }
+        // FIXME: Make scroll adjustments work for more than just fixedpos elements.
+        if (insideFixed)
+            adjustForScrollByAnchor(layer->renderer(), isFixed);
     }
 
     auto& frameView = renderer.view().frameView();
     RefPtr ownerElement = frameView.m_frame->document() ? frameView.m_frame->document()->ownerElement() : nullptr;
     if (ownerElement && ownerElement->renderer())
-        frameView.scrollRectToVisibleInChildView(adjustedRect, insideFixed, adjustedOptions, ownerElement.get());
+        frameView.scrollRectToVisibleInChildView(adjustedRect, isFixed, adjustedOptions, ownerElement.get());
     else
-        frameView.scrollRectToVisibleInTopLevelView(adjustedRect, insideFixed, adjustedOptions);
+        frameView.scrollRectToVisibleInTopLevelView(adjustedRect, isFixed, adjustedOptions);
     return true;
 }
 
@@ -3403,7 +3426,7 @@ static ScrollPositionChangeOptions scrollPositionChangeOptionsForElement(const L
     return scrollPositionOptions;
 };
 
-void LocalFrameView::scrollRectToVisibleInChildView(const LayoutRect& absoluteRect, bool insideFixed, const ScrollRectToVisibleOptions& options, const HTMLFrameOwnerElement* ownerElement)
+void LocalFrameView::scrollRectToVisibleInChildView(const LayoutRect& absoluteRect, EnumSet<BoxAxis> isFixed, const ScrollRectToVisibleOptions& options, const HTMLFrameOwnerElement* ownerElement)
 {
     // If scrollbars aren't explicitly forbidden, permit scrolling.
     if (m_frame->scrollingMode() == ScrollbarMode::AlwaysOff) {
@@ -3427,7 +3450,7 @@ void LocalFrameView::scrollRectToVisibleInChildView(const LayoutRect& absoluteRe
     if (auto* renderer = element ? element->renderBox() : nullptr)
         targetRect.expand(renderer->scrollPaddingForViewportRect(viewRect));
 
-    auto revealRect = getPossiblyFixedRectToExpose(viewRect, targetRect, insideFixed, options.alignX, options.alignY);
+    auto revealRect = getPossiblyFixedRectToExpose(viewRect, targetRect, isFixed, options.alignX, options.alignY);
     auto scrollPosition = roundedIntPoint(revealRect.location());
     scrollPosition = constrainedScrollPosition(scrollPosition);
 
@@ -3443,7 +3466,7 @@ void LocalFrameView::scrollRectToVisibleInChildView(const LayoutRect& absoluteRe
         scrollRectToVisible(contentsToContainingViewContents(enclosingIntRect(targetRect)), *ownerRenderer, false /* insideFixed */, options);
 }
 
-void LocalFrameView::scrollRectToVisibleInTopLevelView(const LayoutRect& absoluteRect, bool insideFixed, const ScrollRectToVisibleOptions& options)
+void LocalFrameView::scrollRectToVisibleInTopLevelView(const LayoutRect& absoluteRect, EnumSet<BoxAxis> isFixed, const ScrollRectToVisibleOptions& options)
 {
     if (options.revealMode == SelectionRevealMode::RevealUpToMainFrame && m_frame->isMainFrame())
         return;
@@ -3485,7 +3508,7 @@ void LocalFrameView::scrollRectToVisibleInTopLevelView(const LayoutRect& absolut
     if (auto* renderBox = element ? element->renderBox() : nullptr)
         targetRect.expand(renderBox->scrollPaddingForViewportRect(viewRect));
 
-    LayoutRect revealRect = getPossiblyFixedRectToExpose(viewRect, targetRect, insideFixed, options.alignX, options.alignY);
+    LayoutRect revealRect = getPossiblyFixedRectToExpose(viewRect, targetRect, isFixed, options.alignX, options.alignY);
 
     // Avoid scrolling to the rounded value of revealRect.location() if we don't actually need to scroll
     if (revealRect != viewRect) {
@@ -7008,9 +7031,23 @@ bool LocalFrameView::isVisibleToHitTesting() const
     return isVisibleToHitTest;
 }
 
-LayoutRect LocalFrameView::getPossiblyFixedRectToExpose(const LayoutRect& visibleRect, const LayoutRect& exposeRect, bool insideFixed, const ScrollAlignment& alignX, const ScrollAlignment& alignY) const
+LayoutRect LocalFrameView::getPossiblyFixedRectToExpose(const LayoutRect& visibleRect, const LayoutRect& exposeRect, EnumSet<BoxAxis> isFixed, const ScrollAlignment& alignX, const ScrollAlignment& alignY) const
 {
-    if (!insideFixed)
+    if (!isFixed.containsAny({ BoxAxis::Horizontal, BoxAxis::Vertical }))
+        return getPossiblyFixedRectToExpose(visibleRect, exposeRect, false, alignX, alignY);
+    if (isFixed.containsAll({ BoxAxis::Horizontal, BoxAxis::Vertical }))
+        return getPossiblyFixedRectToExpose(visibleRect, exposeRect, true, alignX, alignY);
+
+    auto fixedRect = getPossiblyFixedRectToExpose(visibleRect, exposeRect, true, alignX, alignY);
+    auto scrollRect = getPossiblyFixedRectToExpose(visibleRect, exposeRect, false, alignX, alignY);
+    if (isFixed.contains(BoxAxis::Horizontal))
+        return { fixedRect.x(), scrollRect.y(), fixedRect.width(), scrollRect.height() };
+    return { scrollRect.x(), fixedRect.y(), scrollRect.width(), fixedRect.height() };
+}
+
+LayoutRect LocalFrameView::getPossiblyFixedRectToExpose(const LayoutRect& visibleRect, const LayoutRect& exposeRect, bool isFixed, const ScrollAlignment& alignX, const ScrollAlignment& alignY) const
+{
+    if (!isFixed)
         return getRectToExposeForScrollIntoView(visibleRect, exposeRect, alignX, alignY);
 
     // If the element is inside position:fixed and we're not scaled, no amount of scrolling is going to move things around.
