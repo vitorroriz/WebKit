@@ -4988,12 +4988,16 @@ void WebPageProxy::receivedNavigationActionPolicyDecision(WebProcessProxy& proce
             else {
                 auto nonPersistentDataStore = WebsiteDataStore::createNonPersistent();
                 replacedDataStoreForWebArchiveLoad = websiteDataStore.ptr();
-                websiteDataStore = WTFMove(nonPersistentDataStore);
+                m_websiteDataStore = WTFMove(nonPersistentDataStore);
+                m_configuration->protectedProcessPool()->pageBeginUsingWebsiteDataStore(*this, protectedWebsiteDataStore());
+                websiteDataStore = m_websiteDataStore;
                 processSwapRequestedByClient = ProcessSwapRequestedByClient::Yes;
             }
             loadedWebArchive = LoadedWebArchive::Yes;
         } else if (didLoadWebArchive()) {
-            websiteDataStore = m_replacedDataStoreForWebArchiveLoad.releaseNonNull();
+            m_configuration->protectedProcessPool()->pageEndUsingWebsiteDataStore(*this, protectedWebsiteDataStore());
+            m_websiteDataStore = m_replacedDataStoreForWebArchiveLoad.releaseNonNull();
+            websiteDataStore = m_websiteDataStore;
             m_replacedDataStoreForWebArchiveLoad = nullptr;
             processSwapRequestedByClient = ProcessSwapRequestedByClient::Yes;
         }
