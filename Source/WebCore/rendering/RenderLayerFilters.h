@@ -71,7 +71,7 @@ public:
     // Per render
     LayoutRect repaintRect() const { return m_repaintRect; }
 
-    GraphicsContext* beginFilterEffect(RenderElement&, GraphicsContext&, OptionSet<PaintBehavior>, const LayoutRect& filterBoxRect, const LayoutRect& dirtyRect, const LayoutRect& layerRepaintRect, const LayoutRect& clipRect);
+    GraphicsContext* beginFilterEffect(RenderElement&, GraphicsContext&, const LayoutRect& filterBoxRect, const LayoutRect& dirtyRect, const LayoutRect& layerRepaintRect, const LayoutRect& clipRect);
     void applyFilterEffect(GraphicsContext& destinationContext);
 
 private:

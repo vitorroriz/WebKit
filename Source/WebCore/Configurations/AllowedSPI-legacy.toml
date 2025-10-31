@@ -564,6 +564,7 @@ symbols = [
     "CGIOSurfaceContextCreateImage",
     "CGIOSurfaceContextCreateImageReference",
     "CGIOSurfaceContextGetColorSpace",
+    "CGIOSurfaceContextGetBitmapInfo",
     "CGImageGetCachingFlags",
     "CGImageSetCachingFlags",
     "CGImageSetProperty",

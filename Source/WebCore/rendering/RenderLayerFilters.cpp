@@ -142,18 +142,12 @@ IntOutsets RenderLayerFilters::calculateOutsets(RenderElement& renderer, const F
     return CSSFilterRenderer::calculateOutsets(renderer, filter, targetBoundingBox);
 }
 
-GraphicsContext* RenderLayerFilters::beginFilterEffect(RenderElement& renderer, GraphicsContext& context, OptionSet<PaintBehavior> paintBehavior, const LayoutRect& filterBoxRect, const LayoutRect& dirtyRect, const LayoutRect& layerRepaintRect, const LayoutRect& clipRect)
+GraphicsContext* RenderLayerFilters::beginFilterEffect(RenderElement& renderer, GraphicsContext& context, const LayoutRect& filterBoxRect, const LayoutRect& dirtyRect, const LayoutRect& layerRepaintRect, const LayoutRect& clipRect)
 {
     auto expandedDirtyRect = dirtyRect;
     auto targetBoundingBox = intersection(filterBoxRect, dirtyRect);
 
-    auto preferredFilterRenderingModes = renderer.page().preferredFilterRenderingModes();
-#if PLATFORM(COCOA) && !HAVE(FIX_FOR_RADAR_104392017)
-    if (context.renderingMode() == RenderingMode::Unaccelerated && paintBehavior.contains(PaintBehavior::DrawsHDRContent))
-        preferredFilterRenderingModes.remove(FilterRenderingMode::GraphicsContext);
-#else
-    UNUSED_PARAM(paintBehavior);
-#endif
+    auto preferredFilterRenderingModes = renderer.page().preferredFilterRenderingModes(context);
 
     auto outsets = calculateOutsets(renderer, targetBoundingBox);
     if (!outsets.isZero()) {

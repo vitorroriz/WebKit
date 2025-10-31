@@ -4910,23 +4910,34 @@ void Page::recomputeTextAutoSizingInAllFrames()
 
 #endif
 
-OptionSet<FilterRenderingMode> Page::preferredFilterRenderingModes() const
+OptionSet<FilterRenderingMode> Page::preferredFilterRenderingModes(const GraphicsContext& context) const
 {
     OptionSet<FilterRenderingMode> modes = FilterRenderingMode::Software;
 #if USE(CORE_IMAGE)
     if (settings().acceleratedFiltersEnabled())
         modes.add(FilterRenderingMode::Accelerated);
 #endif
+
 #if USE(SKIA)
     if (settings().acceleratedCompositingEnabled())
         modes.add(FilterRenderingMode::Accelerated);
 #endif
+
+    UNUSED_PARAM(context);
+
 #if USE(GRAPHICS_CONTEXT_FILTERS)
-    if (settings().graphicsContextFiltersEnabled())
-        modes.add(FilterRenderingMode::GraphicsContext);
-    if (settings().graphicsContextBlurFilterEnabled())
-        modes.add(FilterRenderingMode::GraphicsContextBlur);
+#if !HAVE(FIX_FOR_RADAR_104392017)
+    if (context.renderingMode() == RenderingMode::Accelerated || !context.knownToHaveFloatBasedBacking()) {
 #endif
+        if (settings().graphicsContextFiltersEnabled())
+            modes.add(FilterRenderingMode::GraphicsContext);
+        if (settings().graphicsContextBlurFilterEnabled())
+            modes.add(FilterRenderingMode::GraphicsContextBlur);
+#if !HAVE(FIX_FOR_RADAR_104392017)
+    }
+#endif
+#endif
+
     return modes;
 }
 
