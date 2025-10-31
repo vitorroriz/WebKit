@@ -26,7 +26,6 @@ WebProcess/InjectedBundle/DOM/InjectedBundleNodeHandle.cpp
 WebProcess/InjectedBundle/DOM/InjectedBundleRangeHandle.cpp
 WebProcess/InjectedBundle/InjectedBundleHitTestResult.cpp
 [ iOS ] WebProcess/Plugins/PDF/UnifiedPDF/UnifiedPDFPlugin.mm
-WebProcess/WebPage/RemoteLayerTree/RemoteLayerTreeDrawingArea.mm
 [ iOS ] WebProcess/WebPage/WebFoundTextRangeController.cpp
 WebProcess/WebPage/WebFrame.cpp
 [ iOS ] WebProcess/WebPage/ios/FindControllerIOS.mm
