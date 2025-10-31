@@ -1,4 +1,0 @@
-
-PASS Ensure that the framebuffer given by the WebGL layer works with stencil for immersive - webgl
-PASS Ensure that the framebuffer given by the WebGL layer works with stencil for immersive - webgl2
-
