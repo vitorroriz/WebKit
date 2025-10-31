@@ -199,7 +199,7 @@ public:
     NetworkCache::Cache* cache() { return m_cache.get(); }
 
     CheckedRef<PrefetchCache> checkedPrefetchCache();
-    void clearPrefetchCache() { m_prefetchCache.clear(); }
+    void clearPrefetchCache() { m_prefetchCache->clear(); }
 
     virtual RefPtr<WebSocketTask> createWebSocketTask(WebPageProxyIdentifier, std::optional<WebCore::FrameIdentifier>, std::optional<WebCore::PageIdentifier>, NetworkSocketChannel&, const WebCore::ResourceRequest&, const String& protocol, const WebCore::ClientOrigin&, bool hadMainFrameMainResourcePrivateRelayed, bool allowPrivacyProxy, OptionSet<WebCore::AdvancedPrivacyProtections>, WebCore::StoredCredentialsPolicy);
     virtual void removeWebSocketTask(SessionSet&, WebSocketTask&) { }
@@ -372,7 +372,7 @@ protected:
     };
     HashMap<NetworkResourceLoadIdentifier, Ref<CachedNetworkResourceLoader>> m_loadersAwaitingWebProcessTransfer;
 
-    PrefetchCache m_prefetchCache;
+    const UniqueRef<PrefetchCache> m_prefetchCache;
 
 #if ASSERT_ENABLED
     bool m_isInvalidated { false };
