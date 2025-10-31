@@ -7873,3 +7873,4 @@ imported/w3c/web-platform-tests/page-lifecycle/child-display-none.tentative.html
 imported/w3c/web-platform-tests/page-lifecycle/child-out-of-viewport.tentative.html [ Skip ]
 imported/w3c/web-platform-tests/page-lifecycle/worker-dispay-none.tentative.html [ Skip ]
 imported/w3c/web-platform-tests/page-lifecycle/set-composited-layer-position.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/cookies/partitioned-cookies/partitioned-cookies-a-b-a-embed.tentative.https.html [ Skip ]
