@@ -57,7 +57,6 @@
 #include "StyleInheritedData.h"
 #include "TransformState.h"
 #include "VisiblePosition.h"
-#include "WillChangeData.h"
 #include <wtf/SetForScope.h>
 #include <wtf/TZoneMallocInlines.h>
 
@@ -995,14 +994,14 @@ bool isEmptyInline(const RenderInline& renderer)
     return true;
 }
 
-inline bool RenderInline::willChangeCreatesStackingContext() const
-{
-    return style().willChange() && style().willChange()->canCreateStackingContext();
-}
-
 bool RenderInline::requiresLayer() const
 {
-    return isInFlowPositioned() || createsGroup() || hasClipPath() || willChangeCreatesStackingContext() || hasRunningAcceleratedAnimations() || requiresRenderingConsolidationForViewTransition();
+    return isInFlowPositioned()
+        || createsGroup()
+        || hasClipPath()
+        || style().willChange().canCreateStackingContext()
+        || hasRunningAcceleratedAnimations()
+        || requiresRenderingConsolidationForViewTransition();
 }
 
 } // namespace WebCore

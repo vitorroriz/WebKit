@@ -72,7 +72,6 @@ public:
     static void serializeContain(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<Containment>);
     static void serializeSmoothScrolling(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, bool);
     static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
-    static void serializeWillChange(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const WillChangeData*);
     static void serializeTabSize(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const TabSize&);
     static void serializeLineBoxContain(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<Style::LineBoxContain>);
     static void serializeTouchAction(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TouchAction>);
@@ -298,34 +297,6 @@ inline void ExtractorSerializer::serializePositionTryFallbacks(ExtractorState& s
         list.append(CSSValueList::createSpaceSeparated(singleFallbackList));
     }
 
-    builder.append(CSSValueList::createCommaSeparated(WTFMove(list))->cssText(context));
-}
-
-inline void ExtractorSerializer::serializeWillChange(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const WillChangeData* willChangeData)
-{
-    if (!willChangeData || !willChangeData->numFeatures()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Auto { });
-        return;
-    }
-
-    CSSValueListBuilder list;
-    for (size_t i = 0; i < willChangeData->numFeatures(); ++i) {
-        auto feature = willChangeData->featureAt(i);
-        switch (feature.first) {
-        case WillChangeData::Feature::ScrollPosition:
-            list.append(CSSPrimitiveValue::create(CSSValueScrollPosition));
-            break;
-        case WillChangeData::Feature::Contents:
-            list.append(CSSPrimitiveValue::create(CSSValueContents));
-            break;
-        case WillChangeData::Feature::Property:
-            list.append(CSSPrimitiveValue::create(feature.second));
-            break;
-        case WillChangeData::Feature::Invalid:
-            ASSERT_NOT_REACHED();
-            break;
-        }
-    }
     builder.append(CSSValueList::createCommaSeparated(WTFMove(list))->cssText(context));
 }
 

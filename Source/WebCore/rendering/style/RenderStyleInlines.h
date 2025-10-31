@@ -73,7 +73,6 @@
 #include <WebCore/UnicodeBidi.h>
 #include <WebCore/ViewTimeline.h>
 #include <WebCore/WebAnimationTypes.h>
-#include <WebCore/WillChangeData.h>
 
 #if ENABLE(APPLE_PAY)
 #include <WebCore/ApplePayButtonPart.h>
@@ -621,6 +620,7 @@ constexpr Visibility RenderStyle::initialVisibility() { return Visibility::Visib
 inline const NameScope RenderStyle::initialTimelineScope() { return { }; }
 constexpr WhiteSpaceCollapse RenderStyle::initialWhiteSpaceCollapse() { return WhiteSpaceCollapse::Collapse; }
 constexpr Style::Widows RenderStyle::initialWidows() { return CSS::Keyword::Auto { }; }
+inline Style::WillChange RenderStyle::initialWillChange() { return CSS::Keyword::Auto { }; }
 constexpr WordBreak RenderStyle::initialWordBreak() { return WordBreak::Normal; }
 inline Style::WordSpacing RenderStyle::initialWordSpacing() { return CSS::Keyword::Normal { }; }
 constexpr StyleWritingMode RenderStyle::initialWritingMode() { return StyleWritingMode::HorizontalTb; }
@@ -872,8 +872,7 @@ inline const Style::Color& RenderStyle::visitedLinkTextFillColor() const { retur
 inline const Style::Color& RenderStyle::visitedLinkTextStrokeColor() const { return m_rareInheritedData->visitedLinkTextStrokeColor; }
 inline Style::Widows RenderStyle::widows() const { return m_rareInheritedData->widows; }
 inline const Style::PreferredSize& RenderStyle::width() const { return m_nonInheritedData->boxData->width(); }
-inline WillChangeData* RenderStyle::willChange() const { return m_nonInheritedData->rareData->willChange.get(); }
-inline bool RenderStyle::willChangeCreatesStackingContext() const { return willChange() && willChange()->canCreateStackingContext(); }
+inline const Style::WillChange& RenderStyle::willChange() const { return m_nonInheritedData->rareData->willChange; }
 inline WordBreak RenderStyle::wordBreak() const { return static_cast<WordBreak>(m_rareInheritedData->wordBreak); }
 inline float RenderStyle::usedWordSpacing() const { return m_inheritedData->fontData->fontCascade.wordSpacing(); }
 inline float RenderStyle::zoom() const { return m_nonInheritedData->rareData->zoom; }

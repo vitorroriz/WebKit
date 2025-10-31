@@ -75,7 +75,6 @@ class StyleRareInheritedData;
 class StyleSelfAlignmentData;
 class TransformationMatrix;
 class ViewTimeline;
-class WillChangeData;
 
 enum CSSPropertyID : uint16_t;
 
@@ -377,6 +376,7 @@ struct WebkitMarqueeRepetition;
 struct WebkitMarqueeSpeed;
 struct WebkitTextStrokeWidth;
 struct Widows;
+struct WillChange;
 struct WordSpacing;
 struct ZIndex;
 struct ZoomFactor;
@@ -1908,10 +1908,8 @@ public:
     inline void setViewTransitionClasses(Style::ViewTransitionClasses&&);
     inline void setViewTransitionName(Style::ViewTransitionName&&);
 
-    inline WillChangeData* willChange() const;
-    void setWillChange(RefPtr<WillChangeData>&&);
-
-    bool willChangeCreatesStackingContext() const;
+    inline const Style::WillChange& willChange() const;
+    inline void setWillChange(Style::WillChange&&);
 
     const AtomString& hyphenString() const;
 
@@ -2226,7 +2224,7 @@ public:
     static constexpr Style::TextSizeAdjust initialTextSizeAdjust();
 #endif
 
-    static WillChangeData* initialWillChange() { return nullptr; }
+    static inline Style::WillChange initialWillChange();
 
     static constexpr TouchAction initialTouchActions();
 

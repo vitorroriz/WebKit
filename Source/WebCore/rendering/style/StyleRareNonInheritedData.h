@@ -77,6 +77,7 @@
 #include <WebCore/StyleWebKitBoxReflect.h>
 #include <WebCore/StyleWebKitInitialLetter.h>
 #include <WebCore/StyleWebKitLineClamp.h>
+#include <WebCore/StyleWillChange.h>
 #include <WebCore/TouchAction.h>
 #include <memory>
 #include <wtf/DataRef.h>
@@ -101,7 +102,6 @@ class StyleGridItemData;
 class StyleMultiColData;
 class StyleResolver;
 class StyleTransformData;
-class WillChangeData;
 
 struct StyleMarqueeData;
 
@@ -163,7 +163,7 @@ public:
 
     CounterDirectiveMap counterDirectives;
 
-    RefPtr<WillChangeData> willChange; // Null indicates 'auto'.
+    Style::WillChange willChange;
 
     Style::WebkitBoxReflect boxReflect;
 

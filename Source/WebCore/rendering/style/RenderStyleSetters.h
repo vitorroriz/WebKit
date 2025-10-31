@@ -358,6 +358,7 @@ inline void RenderStyle::setVisitedLinkTextFillColor(Style::Color&& value) { SET
 inline void RenderStyle::setVisitedLinkTextStrokeColor(Style::Color&& value) { SET(m_rareInheritedData, visitedLinkTextStrokeColor, WTFMove(value)); }
 inline void RenderStyle::setWidows(Style::Widows widows) { SET(m_rareInheritedData, widows, widows); }
 inline void RenderStyle::setWidth(Style::PreferredSize&& length) { SET_NESTED(m_nonInheritedData, boxData, m_width, WTFMove(length)); }
+inline void RenderStyle::setWillChange(Style::WillChange&& willChange) { SET_NESTED(m_nonInheritedData, rareData, willChange, WTFMove(willChange)); }
 inline void RenderStyle::setWordBreak(WordBreak rule) { SET(m_rareInheritedData, wordBreak, static_cast<unsigned>(rule)); }
 inline void RenderStyle::setWordSpacing(Style::WordSpacing&& wordSpacing) { SET_NESTED(m_inheritedData, fontData, wordSpacing, WTFMove(wordSpacing)); }
 inline void RenderStyle::setCornerBottomLeftShape(Style::CornerShapeValue&& shape) { SET_NESTED(m_nonInheritedData, surroundData, border.m_cornerShapes.bottomLeft(), WTFMove(shape)); }

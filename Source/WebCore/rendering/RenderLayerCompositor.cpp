@@ -78,7 +78,6 @@
 #include "TransformState.h"
 #include "TranslateTransformOperation.h"
 #include "ViewTransition.h"
-#include "WillChangeData.h"
 #include <wtf/HexNumber.h>
 #include <wtf/MemoryPressureHandler.h>
 #include <wtf/ObjectIdentifier.h>
@@ -3972,7 +3971,7 @@ bool RenderLayerCompositor::requiresCompositingForFilters(RenderLayerModelObject
 
 bool RenderLayerCompositor::requiresCompositingForWillChange(RenderLayerModelObject& renderer) const
 {
-    if (!renderer.style().willChange() || !renderer.style().willChange()->canTriggerCompositing())
+    if (!renderer.style().willChange().canTriggerCompositing())
         return false;
 
 #if ENABLE(FULLSCREEN_API)
@@ -3990,7 +3989,7 @@ bool RenderLayerCompositor::requiresCompositingForWillChange(RenderLayerModelObj
     if (is<RenderBox>(renderer))
         return true;
 
-    return renderer.style().willChange()->canTriggerCompositingOnInline();
+    return renderer.style().willChange().canTriggerCompositingOnInline();
 }
 
 bool RenderLayerCompositor::requiresCompositingForModel(RenderLayerModelObject& renderer) const

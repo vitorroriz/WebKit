@@ -3200,7 +3200,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     rendering/style/StyleSurroundData.h
     rendering/style/StyleTransformData.h
     rendering/style/StyleVisitedLinkColorData.h
-    rendering/style/WillChangeData.h
 
     rendering/svg/RenderSVGInlineText.h
     rendering/svg/RenderSVGModelObject.h
@@ -3526,6 +3525,8 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     style/values/view-transitions/StyleViewTransitionClass.h
     style/values/view-transitions/StyleViewTransitionName.h
+
+    style/values/will-change/StyleWillChange.h
 
     svg/SVGAngle.h
     svg/SVGDocument.h

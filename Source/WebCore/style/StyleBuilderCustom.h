@@ -173,6 +173,7 @@ inline WebkitInitialLetter forwardInheritedValue(const WebkitInitialLetter& valu
 inline WebkitLineClamp forwardInheritedValue(const WebkitLineClamp& value) { auto copy = value; return copy; }
 inline WebkitLineGrid forwardInheritedValue(const WebkitLineGrid& value) { auto copy = value; return copy; }
 inline WebkitMarqueeIncrement forwardInheritedValue(const WebkitMarqueeIncrement& value) { auto copy = value; return copy; }
+inline WillChange forwardInheritedValue(const WillChange& value) { auto copy = value; return copy; }
 inline WordSpacing forwardInheritedValue(const WordSpacing& value) { auto copy = value; return copy; }
 
 // Note that we assume the CSS parser only allows valid CSSValue types.

@@ -869,7 +869,7 @@ static bool rareDataChangeRequiresLayout(const StyleRareNonInheritedData& first,
         || first.gridItem != second.gridItem)
         return true;
 
-    if (!arePointingToEqualData(first.willChange, second.willChange)) {
+    if (first.willChange != second.willChange) {
         changedContextSensitiveProperties.add(StyleDifferenceContextSensitiveProperty::WillChange);
         // Don't return; keep looking for another change
     }
@@ -2261,14 +2261,6 @@ void RenderStyle::setQuotes(Style::Quotes&& quotes)
 {
     if (m_rareInheritedData->quotes != quotes)
         m_rareInheritedData.access().quotes = WTFMove(quotes);
-}
-
-void RenderStyle::setWillChange(RefPtr<WillChangeData>&& willChangeData)
-{
-    if (arePointingToEqualData(m_nonInheritedData->rareData->willChange.get(), willChangeData.get()))
-        return;
-
-    m_nonInheritedData.access().rareData.access().willChange = WTFMove(willChangeData);
 }
 
 bool RenderStyle::affectedByTransformOrigin() const

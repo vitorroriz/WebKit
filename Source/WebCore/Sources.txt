@@ -3013,7 +3013,6 @@ rendering/style/StyleSelfAlignmentData.cpp
 rendering/style/StyleSurroundData.cpp
 rendering/style/StyleTransformData.cpp
 rendering/style/StyleVisitedLinkColorData.cpp
-rendering/style/WillChangeData.cpp
 rendering/svg/RenderSVGBlock.cpp
 rendering/svg/RenderSVGContainer.cpp
 rendering/svg/RenderSVGEllipse.cpp
@@ -3349,6 +3348,7 @@ style/values/transitions/StyleTransition.cpp
 style/values/ui/StyleAccentColor.cpp
 style/values/ui/StyleCursor.cpp
 style/values/view-transitions/StyleViewTransitionName.cpp
+style/values/will-change/StyleWillChange.cpp
 svg/DocumentSVG.cpp
 svg/SVGAElement.cpp
 svg/SVGAltGlyphDefElement.cpp

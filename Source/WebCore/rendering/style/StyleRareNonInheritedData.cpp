@@ -280,7 +280,7 @@ bool StyleRareNonInheritedData::operator==(const StyleRareNonInheritedData& o) c
         && scrollMargin == o.scrollMargin
         && scrollPadding == o.scrollPadding
         && counterDirectives == o.counterDirectives
-        && arePointingToEqualData(willChange, o.willChange)
+        && willChange == o.willChange
         && boxReflect == o.boxReflect
         && maskBorder == o.maskBorder
         && pageSize == o.pageSize

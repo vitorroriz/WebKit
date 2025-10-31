@@ -326,7 +326,7 @@ StyleDifference RenderElement::adjustStyleDifference(StyleDifference diff, Optio
     }
     
     if (contextSensitiveProperties & StyleDifferenceContextSensitiveProperty::WillChange) {
-        if (style().willChange() && style().willChange()->canTriggerCompositing())
+        if (style().willChange().canTriggerCompositing())
             diff = std::max(diff, StyleDifference::RecompositeLayer);
     }
     

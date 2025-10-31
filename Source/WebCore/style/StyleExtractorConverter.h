@@ -137,7 +137,6 @@ public:
     static Ref<CSSValue> convertMarginTrim(ExtractorState&, OptionSet<MarginTrimType>);
     static Ref<CSSValue> convertContain(ExtractorState&, OptionSet<Containment>);
     static Ref<CSSValue> convertPositionTryFallbacks(ExtractorState&, const FixedVector<PositionTryFallback>&);
-    static Ref<CSSValue> convertWillChange(ExtractorState&, const WillChangeData*);
     static Ref<CSSValue> convertLineBoxContain(ExtractorState&, OptionSet<Style::LineBoxContain>);
     static Ref<CSSValue> convertTouchAction(ExtractorState&, OptionSet<TouchAction>);
     static Ref<CSSValue> convertTextTransform(ExtractorState&, OptionSet<TextTransform>);
@@ -330,32 +329,6 @@ inline Ref<CSSValue> ExtractorConverter::convertPositionTryFallbacks(ExtractorSt
         list.append(CSSValueList::createSpaceSeparated(singleFallbackList));
     }
 
-    return CSSValueList::createCommaSeparated(WTFMove(list));
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertWillChange(ExtractorState&, const WillChangeData* willChangeData)
-{
-    if (!willChangeData || !willChangeData->numFeatures())
-        return CSSPrimitiveValue::create(CSSValueAuto);
-
-    CSSValueListBuilder list;
-    for (size_t i = 0; i < willChangeData->numFeatures(); ++i) {
-        auto feature = willChangeData->featureAt(i);
-        switch (feature.first) {
-        case WillChangeData::Feature::ScrollPosition:
-            list.append(CSSPrimitiveValue::create(CSSValueScrollPosition));
-            break;
-        case WillChangeData::Feature::Contents:
-            list.append(CSSPrimitiveValue::create(CSSValueContents));
-            break;
-        case WillChangeData::Feature::Property:
-            list.append(CSSPrimitiveValue::create(feature.second));
-            break;
-        case WillChangeData::Feature::Invalid:
-            ASSERT_NOT_REACHED();
-            break;
-        }
-    }
     return CSSValueList::createCommaSeparated(WTFMove(list));
 }
 

@@ -8335,7 +8335,7 @@
                 "contents"
             ],
             "codegen-properties": {
-                "style-converter": "WillChange",
+                "style-converter": "StyleType<WillChange>",
                 "parser-function": "consumeWillChange",
                 "parser-grammar-unused": "auto | [ scroll-position | contents | <custom-ident excluding=will-change,none,all,auto,scroll-position,contents> ]#",
                 "parser-grammar-unused-reason": "Needs support for CSS property names in the value of a property."

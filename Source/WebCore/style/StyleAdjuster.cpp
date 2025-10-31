@@ -454,7 +454,7 @@ static bool shouldTreatAutoZIndexAsZero(const RenderStyle& style)
         || style.hasIsolation()
         || style.position() == PositionType::Sticky
         || style.position() == PositionType::Fixed
-        || style.willChangeCreatesStackingContext();
+        || style.willChange().canCreateStackingContext();
 }
 
 void Adjuster::adjustFromBuilder(RenderStyle& style)
