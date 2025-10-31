@@ -171,7 +171,7 @@ bool RangeBasedLineBuilder::isEligibleForRangeInlineLayout(const InlineFormattin
         auto& inlineBoxStyle = inlineItemList.first().layoutBox().style();
         if (inlineBoxStyle.textAlign() != rootStyle.textAlign())
             return false;
-        if (!TextOnlySimpleLineBuilder::isEligibleForSimplifiedInlineLayoutByStyle(rootStyle) || !TextOnlySimpleLineBuilder::isEligibleForSimplifiedInlineLayoutByStyle(inlineBoxStyle))
+        if (!TextOnlySimpleLineBuilder::isEligibleForSimplifiedInlineLayoutByStyle(inlineFormattingContext.root()) || !TextOnlySimpleLineBuilder::isEligibleForSimplifiedInlineLayoutByStyle(inlineItemList.first().layoutBox()))
             return false;
     }
 
