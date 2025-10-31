@@ -6215,6 +6215,11 @@ ScrollingCoordinator* WebPage::scrollingCoordinator() const
 {
     return protectedCorePage()->scrollingCoordinator();
 }
+
+RefPtr<ScrollingCoordinator> WebPage::protectedScrollingCoordinator() const
+{
+    return scrollingCoordinator();
+}
 #endif
 
 WebPage::SandboxExtensionTracker::~SandboxExtensionTracker()

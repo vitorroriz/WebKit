@@ -136,6 +136,10 @@
 #import "PDFKitSPI.h"
 #endif
 
+#if ENABLE(WK_WEB_EXTENSIONS)
+#include "WebExtensionControllerProxy.h"
+#endif
+
 #import "PDFKitSoftLink.h"
 
 #define WEBPAGE_RELEASE_LOG(channel, fmt, ...) RELEASE_LOG(channel, "%p - [webPageID=%" PRIu64 "] WebPage::" fmt, this, m_identifier.toUInt64(), ##__VA_ARGS__)
@@ -2060,6 +2064,13 @@ bool WebPage::isSpeaking() const
     auto [result] = sendResult.takeReplyOr(false);
     return result;
 }
+
+#if ENABLE(WK_WEB_EXTENSIONS)
+RefPtr<WebExtensionControllerProxy> WebPage::protectedWebExtensionControllerProxy() const
+{
+    return webExtensionControllerProxy();
+}
+#endif
 
 } // namespace WebKit
 

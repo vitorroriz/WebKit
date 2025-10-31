@@ -47,8 +47,6 @@ Platform/IPC/ArgumentCoders.h
 [ iOS ] UIProcess/ios/forms/WKFormPopover.mm
 [ iOS ] UIProcess/ios/fullscreen/WKFullScreenViewController.mm
 [ iOS ] UIProcess/ios/fullscreen/WKFullScreenWindowControllerIOS.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPIAlarmsCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPIDeclarativeNetRequestCocoa.mm
 [ Mac ] WebProcess/Extensions/API/Cocoa/WebExtensionAPIDevToolsInspectedWindowCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIExtensionCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIMenusCocoa.mm
@@ -59,12 +57,7 @@ WebProcess/Extensions/API/Cocoa/WebExtensionAPIStorageAreaCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIStorageCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPITabsCocoa.mm
 WebProcess/Extensions/API/Cocoa/WebExtensionAPIWebNavigationEventCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPIWebRequestEventCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPIWindowsCocoa.mm
-WebProcess/Extensions/API/Cocoa/WebExtensionAPIWindowsEventCocoa.mm
-WebProcess/Extensions/Bindings/Cocoa/JSWebExtensionWrapperCocoa.mm
 WebProcess/Extensions/Bindings/JSWebExtensionWrapper.cpp
-WebProcess/Extensions/Cocoa/WebExtensionControllerProxyCocoa.mm
 [ iOS ] WebProcess/GPU/media/ios/RemoteMediaSessionHelper.cpp
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInCSSStyleDeclarationHandle.mm
 WebProcess/InjectedBundle/API/Cocoa/WKWebProcessPlugInFrame.mm

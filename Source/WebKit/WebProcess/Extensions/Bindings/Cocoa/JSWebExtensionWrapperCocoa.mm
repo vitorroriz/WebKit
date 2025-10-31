@@ -241,7 +241,8 @@ NSDictionary *toNSDictionary(JSContextRef context, JSValueRef valueRef, NullValu
         JSRetainPtr propertyName = JSPropertyNameArrayGetNameAtIndex(propertyNames, i);
         if (!propertyName)
             continue;
-        JSValueRef item = JSObjectGetProperty(context, object, propertyName.get(), 0);
+        // This is a safer cpp false positive (rdar://163760990).
+        SUPPRESS_UNCOUNTED_ARG JSValueRef item = JSObjectGetProperty(context, object, propertyName.get(), 0);
 
         // Chrome does not include null values in dictionaries for web extensions.
         if (nullPolicy == NullValuePolicy::NotAllowed && JSValueIsNull(context, item))
@@ -279,8 +280,10 @@ JSValueRef toJSValueRef(JSContextRef context, const String& string, NullOrEmptyS
         [[fallthrough]];
 
     case NullOrEmptyString::NullStringAsEmptyString:
-        if (JSRetainPtr stringRef = toJSString(string))
-            return JSValueMakeString(context, stringRef.get());
+        if (JSRetainPtr stringRef = toJSString(string)) {
+            // This is a safer cpp false positive (rdar://163760990).
+            SUPPRESS_UNCOUNTED_ARG return JSValueMakeString(context, stringRef.get());
+        }
         return JSValueMakeNull(context);
     }
 }
@@ -327,7 +330,8 @@ JSValueRef deserializeJSONString(JSContextRef context, const String& jsonString)
         return JSValueMakeNull(context);
 
     if (JSRetainPtr string = toJSString(jsonString)) {
-        if (JSValueRef value = JSValueMakeFromJSONString(context, string.get()))
+        // This is a safer cpp false positive (rdar://163760990).
+        SUPPRESS_UNCOUNTED_ARG if (JSValueRef value = JSValueMakeFromJSONString(context, string.get()))
             return value;
     }
 

@@ -176,9 +176,10 @@ bool isDictionary(JSContextRef context, JSValueRef value)
     JSObjectRef thisObject = JSValueToObject(context, value, nullptr);
     JSObjectRef globalObject = JSContextGetGlobalObject(context);
 
-    JSValueRef protoObject = JSObjectGetProperty(context, thisObject, protoString.get(), nullptr);
-    JSObjectRef contextObject = JSValueToObject(context, JSObjectGetProperty(context, globalObject, objectString.get(), nullptr), nullptr);
-    JSValueRef prototypeObject = JSObjectGetProperty(context, contextObject, prototypeString.get(), nullptr);
+    // This is a safer cpp false positive (rdar://163760990).
+    SUPPRESS_UNCOUNTED_ARG JSValueRef protoObject = JSObjectGetProperty(context, thisObject, protoString.get(), nullptr);
+    SUPPRESS_UNCOUNTED_ARG JSObjectRef contextObject = JSValueToObject(context, JSObjectGetProperty(context, globalObject, objectString.get(), nullptr), nullptr);
+    SUPPRESS_UNCOUNTED_ARG JSValueRef prototypeObject = JSObjectGetProperty(context, contextObject, prototypeString.get(), nullptr);
 
     return JSValueIsStrictEqual(context, protoObject, prototypeObject);
 }
@@ -190,7 +191,8 @@ bool isRegularExpression(JSContextRef context, JSValueRef value)
 
     JSRetainPtr regexpString = toJSString("RegExp");
     JSObjectRef globalObject = JSContextGetGlobalObject(context);
-    JSObjectRef regexpValue = JSValueToObject(context, JSObjectGetProperty(context, globalObject, regexpString.get(), nullptr), nullptr);
+    // This is a safer cpp false positive (rdar://163760990).
+    SUPPRESS_UNCOUNTED_ARG JSObjectRef regexpValue = JSValueToObject(context, JSObjectGetProperty(context, globalObject, regexpString.get(), nullptr), nullptr);
 
     return JSValueIsInstanceOfConstructor(context, value, regexpValue, nullptr);
 }
@@ -202,7 +204,8 @@ bool isThenable(JSContextRef context, JSValueRef value)
 
     JSRetainPtr thenableString = toJSString("then");
     JSObjectRef valueObject = JSValueToObject(context, value, nullptr);
-    JSValueRef thenableObject = JSObjectGetProperty(context, valueObject, thenableString.get(), nullptr);
+    // This is a safer cpp false positive (rdar://163760990).
+    SUPPRESS_UNCOUNTED_ARG JSValueRef thenableObject = JSObjectGetProperty(context, valueObject, thenableString.get(), nullptr);
 
     return isFunction(context, thenableObject);
 }
