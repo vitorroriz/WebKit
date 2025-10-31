@@ -383,7 +383,7 @@ public:
 
     // These layers are positioned differently when there are obscured content insets, a header, or a footer.
     // These value need to be computed on both the main thread and the scrolling thread.
-    static FloatPoint positionForInsetClipLayer(const FloatPoint& scrollPosition, const FloatBoxExtent& obscuredContentInsets);
+    static FloatRect insetClipLayerRect(const FloatPoint& scrollPosition, const FloatBoxExtent& obscuredContentInsets, const FloatSize& sizeForVisibleContent);
     WEBCORE_EXPORT static FloatPoint positionForRootContentLayer(const FloatPoint& scrollPosition, const FloatPoint& scrollOrigin, const FloatBoxExtent& obscuredContentInsets, float headerHeight);
     WEBCORE_EXPORT FloatPoint positionForRootContentLayer() const;
 

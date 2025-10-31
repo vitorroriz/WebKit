@@ -2861,15 +2861,17 @@ void RenderLayerCompositor::updateScrollLayerClipping()
     if (!layerForClipping)
         return;
 
-    auto layerSize = m_renderView.frameView().sizeForVisibleContent();
-    layerForClipping->setSize(layerSize);
-    layerForClipping->setPosition(positionForClipLayer());
+    Ref frameView = m_renderView.frameView();
+
+    auto layerRect = insetClipLayerRect();
+    layerForClipping->setSize(layerRect.size());
+    layerForClipping->setPosition(layerRect.location());
 
 #if ENABLE(SCROLLING_THREAD)
     if (layerForClipping == m_clipLayer) {
         EventRegion eventRegion;
         auto eventRegionContext = eventRegion.makeContext();
-        eventRegionContext.unite(FloatRoundedRect(FloatRect({ }, layerSize)), m_renderView, RenderStyle::defaultStyleSingleton());
+        eventRegionContext.unite(FloatRoundedRect(FloatRect({ }, layerRect.size())), m_renderView, RenderStyle::defaultStyleSingleton());
 #if ENABLE(INTERACTION_REGIONS_IN_EVENT_REGION)
         eventRegionContext.copyInteractionRegionsToEventRegion(m_renderView.settings().interactionRegionMinimumCornerRadius());
 #endif
@@ -2878,12 +2880,13 @@ void RenderLayerCompositor::updateScrollLayerClipping()
 #endif
 }
 
-FloatPoint RenderLayerCompositor::positionForClipLayer() const
+FloatRect RenderLayerCompositor::insetClipLayerRect() const
 {
     Ref frameView = m_renderView.frameView();
 
-    auto clipLayerPosition = LocalFrameView::positionForInsetClipLayer(frameView->scrollPosition(), frameView->obscuredContentInsets());
-    return FloatPoint(frameView->insetForLeftScrollbarSpace() + clipLayerPosition.x(), clipLayerPosition.y());
+    auto insetClipLayerRect = LocalFrameView::insetClipLayerRect(frameView->scrollPosition(), frameView->obscuredContentInsets(), frameView->sizeForVisibleContent());
+    insetClipLayerRect.move(frameView->insetForLeftScrollbarSpace(), 0);
+    return insetClipLayerRect;
 }
 
 void RenderLayerCompositor::frameViewDidScroll()
@@ -5144,7 +5147,7 @@ void RenderLayerCompositor::ensureRootLayer()
             }
 #endif
             // FIXME: m_scrollContainerLayer and m_clipLayer have similar roles here, but m_clipLayer has some special positioning to
-            // account for clipping and top content inset (see LocalFrameView::positionForInsetClipLayer()).
+            // account for clipping and top content inset (see LocalFrameView::insetClipLayerRect()).
             if (!m_scrollContainerLayer) {
                 m_clipLayer = GraphicsLayer::create(graphicsLayerFactory(), *this);
                 RefPtr clipLayer = m_clipLayer;

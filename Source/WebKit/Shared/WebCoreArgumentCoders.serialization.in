@@ -4255,6 +4255,7 @@ header: <WebCore/ScrollingStateNode.h>
     WheelEventGesturesBecomeNonBlocking
     ScrollingPerformanceTestingEnabled
     LayoutViewport
+    SizeForVisibleContent
     MinLayoutViewportOrigin
     MaxLayoutViewportOrigin
     OverrideVisualViewportSize

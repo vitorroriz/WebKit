@@ -2596,7 +2596,7 @@ std::pair<FixedContainerEdges, WeakElementEdges> LocalFrameView::fixedContainerE
     return { WTFMove(edges), WTFMove(containers) };
 }
 
-FloatPoint LocalFrameView::positionForInsetClipLayer(const FloatPoint& scrollPosition, const FloatBoxExtent& obscuredContentInset)
+FloatRect LocalFrameView::insetClipLayerRect(const FloatPoint& scrollPosition, const FloatBoxExtent& obscuredContentInset, const FloatSize& sizeForVisibleContent)
 {
     auto computeOffset = [](float scrollAmount, float insetAmount) {
         if (!insetAmount)
@@ -2609,7 +2609,14 @@ FloatPoint LocalFrameView::positionForInsetClipLayer(const FloatPoint& scrollPos
 
         return insetAmount - clampedScrollPosition;
     };
-    return { computeOffset(scrollPosition.x(), obscuredContentInset.left()), computeOffset(scrollPosition.y(), obscuredContentInset.top()) };
+
+    FloatPoint position { computeOffset(scrollPosition.x(), obscuredContentInset.left()), computeOffset(scrollPosition.y(), obscuredContentInset.top()) };
+
+    auto adjustedSize = sizeForVisibleContent;
+    if (obscuredContentInset.top())
+        adjustedSize.setHeight(std::max(0.f, sizeForVisibleContent.height() - position.y()));
+
+    return { position, adjustedSize };
 }
 
 float LocalFrameView::yPositionForHeaderLayer(const FloatPoint& scrollPosition, float topInset)
