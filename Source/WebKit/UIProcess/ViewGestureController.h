@@ -214,6 +214,7 @@ public:
     // Testing
     bool beginSimulatedSwipeInDirectionForTesting(SwipeDirection);
     bool completeSimulatedSwipeInDirectionForTesting(SwipeDirection);
+    bool didCallEndSwipeGesture() const { return m_didCallEndSwipeGesture; }
 
 private:
     explicit ViewGestureController(WebPageProxy&);
