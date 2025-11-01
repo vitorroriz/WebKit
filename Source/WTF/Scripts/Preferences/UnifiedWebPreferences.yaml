@@ -942,6 +942,19 @@ BlockWebInspectorInWebContentSandbox:
     WebKit:
       default: false
 
+BlocksInInlineLayoutEnabled:
+  type: bool
+  status: unstable
+  humanReadableName: "Blocks in inline layout (disable continuations)"
+  humanReadableDescription: "Enable blocks in inline layout (disable continuations)"
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+
 # We would have to partition BroadcastChannel based on PageGroups if we wanted to enable this for WebKitLegacy.
 BroadcastChannelEnabled:
   type: bool
