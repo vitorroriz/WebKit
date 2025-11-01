@@ -307,7 +307,7 @@ Ref<WebProcessProxy> WebProcessProxy::createForRemoteWorkers(RemoteWorkerType wo
 WebProcessProxy::WebProcessProxy(WebProcessPool& processPool, WebsiteDataStore* websiteDataStore, IsPrewarmed isPrewarmed, CrossOriginMode crossOriginMode, LockdownMode lockdownMode, EnhancedSecurity enhancedSecurity)
     : AuxiliaryProcessProxy(processPool.shouldTakeUIBackgroundAssertion() ? ShouldTakeUIBackgroundAssertion::Yes : ShouldTakeUIBackgroundAssertion::No
     , processPool.alwaysRunsAtBackgroundPriority() ? AlwaysRunsAtBackgroundPriority::Yes : AlwaysRunsAtBackgroundPriority::No)
-    , m_backgroundResponsivenessTimer(*this)
+    , m_backgroundResponsivenessTimer(makeUniqueRef<BackgroundProcessResponsivenessTimer>(*this))
     , m_processPool(processPool, isPrewarmed == IsPrewarmed::Yes ? IsWeak::Yes : IsWeak::No)
     , m_mayHaveUniversalFileReadSandboxExtension(false)
     , m_numberOfTimesSuddenTerminationWasDisabled(0)
@@ -716,7 +716,7 @@ void WebProcessProxy::shutDown()
         destroyWasmDebuggerTarget();
 #endif
 
-    m_backgroundResponsivenessTimer.invalidate();
+    m_backgroundResponsivenessTimer->invalidate();
     m_audibleMediaActivity = std::nullopt;
     m_mediaStreamingActivity = std::nullopt;
     m_foregroundToken = nullptr;
@@ -1441,7 +1441,7 @@ void WebProcessProxy::didFinishLaunching(ProcessLauncher* launcher, IPC::Connect
 #endif
 
     protectedProcessPool()->processDidFinishLaunching(*this);
-    m_backgroundResponsivenessTimer.updateState();
+    m_backgroundResponsivenessTimer->updateState();
 
 #if ENABLE(REMOTE_INSPECTOR) && ENABLE(WEBASSEMBLY)
     if (JSC::Options::enableWasmDebugger()) [[unlikely]]
@@ -1561,7 +1561,7 @@ void WebProcessProxy::consumeIfNotVerifiablyFromUIProcess(PageIdentifier pageID,
 
 bool WebProcessProxy::isResponsive() const
 {
-    return responsivenessTimer().isResponsive() && m_backgroundResponsivenessTimer.isResponsive();
+    return responsivenessTimer().isResponsive() && m_backgroundResponsivenessTimer->isResponsive();
 }
 
 void WebProcessProxy::didDestroyUserGestureToken(PageIdentifier pageID, UserGestureTokenIdentifier identifier)
@@ -1912,12 +1912,12 @@ void WebProcessProxy::didChangeThrottleState(ProcessThrottleState type)
     }
 
     ASSERT(!m_backgroundToken || !m_foregroundToken);
-    m_backgroundResponsivenessTimer.updateState();
+    m_backgroundResponsivenessTimer->updateState();
 }
 
 void WebProcessProxy::didDropLastAssertion()
 {
-    m_backgroundResponsivenessTimer.updateState();
+    m_backgroundResponsivenessTimer->updateState();
     updateRuntimeStatistics();
 }
 
@@ -2066,13 +2066,13 @@ bool WebProcessProxy::isJITEnabled() const
 
 void WebProcessProxy::didReceiveBackgroundResponsivenessPing()
 {
-    m_backgroundResponsivenessTimer.didReceiveBackgroundResponsivenessPong();
+    m_backgroundResponsivenessTimer->didReceiveBackgroundResponsivenessPong();
 }
 
 void WebProcessProxy::processTerminated()
 {
     WEBPROCESSPROXY_RELEASE_LOG(Process, "processTerminated:");
-    m_backgroundResponsivenessTimer.processTerminated();
+    m_backgroundResponsivenessTimer->processTerminated();
 }
 
 void WebProcessProxy::logDiagnosticMessageForResourceLimitTermination(const String& limitKey)
@@ -2186,7 +2186,7 @@ void WebProcessProxy::didExceedCPULimit()
 
 void WebProcessProxy::updateBackgroundResponsivenessTimer()
 {
-    m_backgroundResponsivenessTimer.updateState();
+    m_backgroundResponsivenessTimer->updateState();
 }
 
 #if !PLATFORM(COCOA)

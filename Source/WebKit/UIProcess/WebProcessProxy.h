@@ -767,7 +767,7 @@ private:
         RefPtr<T> m_strongObject;
     };
 
-    BackgroundProcessResponsivenessTimer m_backgroundResponsivenessTimer;
+    const UniqueRef<BackgroundProcessResponsivenessTimer> m_backgroundResponsivenessTimer;
     
     WeakOrStrongPtr<WebProcessPool> m_processPool; // Pre-warmed and cached processes do not hold a strong reference to their pool.
 
