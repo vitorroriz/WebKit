@@ -79,18 +79,16 @@ struct DDFloat4x4 {
     }
 };
 
+#if PLATFORM(COCOA)
 struct DDFloat3x3 {
     union {
-#if PLATFORM(COCOA)
         simd_float3x3 v;
         struct {
             simd_float3 column0;
             simd_float3 column1;
             simd_float3 column2;
         };
-#endif
     };
-#if PLATFORM(COCOA)
     DDFloat3x3(const simd_float3x3& s)
         : v(s)
     {
@@ -102,11 +100,11 @@ struct DDFloat3x3 {
 
     operator simd_float3x3() { return v; } // NOLINT
     operator const simd_float3x3() const { return v; } // NOLINT
-#endif
 
     DDFloat3x3()
     {
     }
 };
+#endif
 
 }
