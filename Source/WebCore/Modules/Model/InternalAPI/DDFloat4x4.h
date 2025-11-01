@@ -35,6 +35,12 @@ struct DDFloat4x4 {
     union {
 #if PLATFORM(COCOA)
         simd_float4x4 v;
+        struct {
+            simd_float4 column0;
+            simd_float4 column1;
+            simd_float4 column2;
+            simd_float4 column3;
+        };
 #endif
         struct {
             float m00, m01, m02, m03;
@@ -46,6 +52,10 @@ struct DDFloat4x4 {
 #if PLATFORM(COCOA)
     DDFloat4x4(const simd_float4x4& s)
         : v(s)
+    {
+    }
+    DDFloat4x4(simd_float4x4&& s)
+        : v(WTFMove(s))
     {
     }
 
@@ -61,6 +71,40 @@ struct DDFloat4x4 {
             , m10(vm10), m11(vm11), m12(vm12), m13(vm13)
             , m20(vm20), m21(vm21), m22(vm22), m23(vm23)
             , m30(vm30), m31(vm31), m32(vm32), m33(vm33)
+    {
+    }
+
+    DDFloat4x4()
+    {
+    }
+};
+
+struct DDFloat3x3 {
+    union {
+#if PLATFORM(COCOA)
+        simd_float3x3 v;
+        struct {
+            simd_float3 column0;
+            simd_float3 column1;
+            simd_float3 column2;
+        };
+#endif
+    };
+#if PLATFORM(COCOA)
+    DDFloat3x3(const simd_float3x3& s)
+        : v(s)
+    {
+    }
+    DDFloat3x3(simd_float3x3&& s)
+        : v(WTFMove(s))
+    {
+    }
+
+    operator simd_float3x3() { return v; } // NOLINT
+    operator const simd_float3x3() const { return v; } // NOLINT
+#endif
+
+    DDFloat3x3()
     {
     }
 };
