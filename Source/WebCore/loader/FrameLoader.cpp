@@ -1311,8 +1311,12 @@ void FrameLoader::loadInSameDocument(URL url, RefPtr<SerializedScriptValue> stat
     history().updateForSameDocumentNavigation();
 
     auto navigationType = determineNavigationType(m_loadType, historyHandling);
-    if (document->settings().navigationAPIEnabled() && document->window() && history().currentItem())
-        document->protectedWindow()->protectedNavigation()->updateForNavigation(*history().currentItem(), navigationType, ShouldCopyStateObjectFromCurrentEntry::Yes);
+    if (document->settings().navigationAPIEnabled() && document->window() && history().currentItem()) {
+        Ref navigation = document->protectedWindow()->navigation();
+        // Skip updateForNavigation() for intercepted traverse navigations, as it was already called after intercept detection in innerDispatchNavigateEvent().
+        if (navigationType != NavigationNavigationType::Traverse || !navigation->hasInterceptedOngoingNavigateEvent())
+            navigation->updateForNavigation(*history().currentItem(), navigationType, ShouldCopyStateObjectFromCurrentEntry::Yes);
+    }
 
     // If we were in the autoscroll/panScroll mode we want to stop it before following the link to the anchor
     if (hashChange)
