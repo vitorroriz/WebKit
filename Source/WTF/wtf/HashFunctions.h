@@ -259,6 +259,17 @@ namespace WTF {
     template<typename T, typename U> struct DefaultHash<std::pair<T, U>> : PairHash<T, U> { };
     template<typename... Types> struct DefaultHash<std::tuple<Types...>> : TupleHash<Types...> { };
 
+    // Default hash for any type with a hash() member function and an equality operator.
+    template<typename T> concept HashableWithMemberFunction = std::equality_comparable<T> && requires(const T& t) {
+        { t.hash() } -> std::same_as<unsigned>;
+    };
+    template<HashableWithMemberFunction T> struct MemberBasedHash {
+        static unsigned hash(const T& key) { return key.hash(); }
+        static bool equal(const T& a, const T& b) { return a == b; }
+        static constexpr bool safeToCompareToEmptyOrDeleted = false;
+    };
+    template<HashableWithMemberFunction T> struct DefaultHash<T> : MemberBasedHash<T> { };
+
 } // namespace WTF
 
 using WTF::DefaultHash;
