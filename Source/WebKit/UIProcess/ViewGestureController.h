@@ -235,7 +235,7 @@ private:
     WebBackForwardList* backForwardListForNavigation() const;
 #endif
 
-    class SnapshotRemovalTracker : public CanMakeCheckedPtr<SnapshotRemovalTracker, WTF::DefaultedOperatorEqual::No, WTF::CheckedPtrDeleteCheckException::Yes> {
+    class SnapshotRemovalTracker : public CanMakeCheckedPtr<SnapshotRemovalTracker> {
         WTF_DEPRECATED_MAKE_FAST_ALLOCATED(SnapshotRemovalTracker);
         WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(SnapshotRemovalTracker);
     public:
@@ -513,7 +513,7 @@ private:
     bool m_didCallEndSwipeGesture { false };
     bool m_removeSnapshotImmediatelyWhenGestureEnds { false };
 
-    SnapshotRemovalTracker m_snapshotRemovalTracker;
+    const UniqueRef<SnapshotRemovalTracker> m_snapshotRemovalTracker;
     WTF::Function<void()> m_loadCallback;
 };
 
