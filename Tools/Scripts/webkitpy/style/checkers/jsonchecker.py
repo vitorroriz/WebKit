@@ -390,7 +390,7 @@ class JSONCSSPropertiesChecker(JSONChecker):
             'coordinated-value-list-property-initial': self.validate_string,
             'coordinated-value-list-property-name-for-methods': self.validate_string,
             'coordinated-value-list-property-setter': self.validate_string,
-            'coordinated-value-list-property', self.validate_boolean,
+            'coordinated-value-list-property': self.validate_boolean,
             'color-property': self.validate_boolean,
             'comment': self.validate_string,
             'disables-native-appearance': self.validate_boolean,

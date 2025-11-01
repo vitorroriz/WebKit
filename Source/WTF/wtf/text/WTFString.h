@@ -69,6 +69,9 @@ public:
     WTF_EXPORT_PRIVATE String(std::span<const char> characters);
     ALWAYS_INLINE static String fromLatin1(const char* characters) { return String { characters }; }
 
+    // Construct a string with UTF-8 data, null string if it contains invalid UTF-8 sequences.
+    WTF_EXPORT_PRIVATE String(std::span<const char8_t>);
+
     // Construct a string referencing an existing StringImpl.
     String(StringImpl&);
     String(StringImpl*);
