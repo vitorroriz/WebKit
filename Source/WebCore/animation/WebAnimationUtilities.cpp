@@ -39,6 +39,8 @@
 #include "EventTargetInlines.h"
 #include "KeyframeEffectStack.h"
 #include "NodeDocument.h"
+#include "RenderStyle.h"
+#include "RenderStyleInlines.h"
 #include "ScriptExecutionContext.h"
 #include "StyleAnimations.h"
 #include "StyleOriginatedAnimation.h"
@@ -388,6 +390,36 @@ AtomString animatablePropertyAsString(AnimatableCSSProperty property)
             return customProperty;
         }
     );
+}
+
+bool styleHasDisplayTransition(const RenderStyle& style)
+{
+    if (!style.hasTransitions())
+        return false;
+
+    for (auto& transition : style.transitions().usedValues()) {
+        auto result = WTF::switchOn(transition.property(),
+            [&](const CSS::Keyword::All&) {
+                return transition.behavior() == TransitionBehavior::AllowDiscrete;
+            },
+            [&](const CSS::Keyword::None&) {
+                return false;
+            },
+            [&](const Style::SingleTransitionProperty::UnknownProperty&) {
+                return false;
+            },
+            [&](const Style::SingleTransitionProperty::SingleProperty& property) {
+                if (auto* ptr = std::get_if<CSSPropertyID>(&property.value); ptr && *ptr == CSSPropertyDisplay)
+                    return transition.behavior() == TransitionBehavior::AllowDiscrete;
+                return false;
+            }
+        );
+
+        if (result)
+            return true;
+    }
+
+    return false;
 }
 
 } // namespace WebCore

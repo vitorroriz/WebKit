@@ -760,42 +760,9 @@ void Styleable::updateCSSTransitions(const RenderStyle& currentStyle, const Rend
     if (currentStyle.display() == DisplayType::None)
         return;
 
-    auto transitionsDisplay = [](const RenderStyle& style) {
-        if (!style.hasTransitions())
-            return false;
-
-        for (auto& transition : style.transitions().usedValues()) {
-            auto result = WTF::switchOn(transition.property(),
-                [&](const CSS::Keyword::All&) {
-                    if (transition.behavior() == TransitionBehavior::AllowDiscrete)
-                        return true;
-                    return false;
-                },
-                [&](const CSS::Keyword::None&) {
-                    return false;
-                },
-                [&](const Style::SingleTransitionProperty::UnknownProperty&) {
-                    return false;
-                },
-                [&](const Style::SingleTransitionProperty::SingleProperty& property) {
-                    if (std::holds_alternative<CSSPropertyID>(property.value)) {
-                        if (std::get<CSSPropertyID>(property.value) == CSSPropertyDisplay) {
-                            if (transition.behavior() == TransitionBehavior::AllowDiscrete)
-                                return true;
-                        }
-                    }
-                    return false;
-                }
-            );
-            if (result)
-                return true;
-        }
-        return false;
-    };
-
     // In case this element is newly getting a "display: none" we need to cancel all of its transitions and disregard new ones,
     // unless it will transition the "display" property itself.
-    if (currentStyle.hasTransitions() && currentStyle.display() != DisplayType::None && newStyle.display() == DisplayType::None && !transitionsDisplay(newStyle)) {
+    if (currentStyle.hasTransitions() && currentStyle.display() != DisplayType::None && newStyle.display() == DisplayType::None && !styleHasDisplayTransition(newStyle)) {
         if (hasRunningTransitions()) {
             auto runningTransitions = ensureRunningTransitionsByProperty();
             for (const auto& cssTransitionsByAnimatableCSSPropertyMapItem : runningTransitions)
