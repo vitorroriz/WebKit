@@ -3257,6 +3257,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/animations/StyleSingleAnimationTimeline.h
 
     style/values/backgrounds/StyleBackgroundLayer.h
+    style/values/backgrounds/StyleBackgroundLayers.h
     style/values/backgrounds/StyleBackgroundSize.h
     style/values/backgrounds/StyleBorderImage.h
     style/values/backgrounds/StyleBorderImageOutset.h
@@ -3368,6 +3369,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/masking/StyleMaskBorderSource.h
     style/values/masking/StyleMaskBorderWidth.h
     style/values/masking/StyleMaskLayer.h
+    style/values/masking/StyleMaskLayers.h
 
     style/values/math/StyleMathDepth.h
 
@@ -3401,6 +3403,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/position/StyleInset.h
 
     style/values/primitives/StyleCoordinatedValueList.h
+    style/values/primitives/StyleCoordinatedValueListValue.h
     style/values/primitives/StyleLengthWrapper+Blending.h
     style/values/primitives/StyleLengthWrapper.h
     style/values/primitives/StyleLengthWrapperData.h

@@ -167,11 +167,11 @@ static bool compareCSSAnimations(const CSSAnimation& a, const CSSAnimation& b)
     // Sort A and B based on their position in the computed value of the animation-name property of the (common) owning element.
     auto& cssAnimationList = aOwningElement->ensureKeyframeEffectStack().cssAnimationList();
     ASSERT(cssAnimationList);
-    ASSERT(!cssAnimationList->isNone());
+    ASSERT(!cssAnimationList->isInitial());
 
     auto& aBackingAnimation = a.backingStyleAnimation();
     auto& bBackingAnimation = b.backingStyleAnimation();
-    for (auto& animation : *cssAnimationList) {
+    for (auto& animation : cssAnimationList->usedValues()) {
         if (animation.sortingIdentity() == aBackingAnimation.sortingIdentity())
             return true;
         if (animation.sortingIdentity() == bBackingAnimation.sortingIdentity())
