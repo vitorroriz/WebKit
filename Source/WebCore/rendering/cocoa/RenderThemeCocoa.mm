@@ -206,8 +206,12 @@ static Color colorWithTargetLuminance(Color color, float targetLuminance)
 
 namespace WebCore {
 
-static constexpr auto logicalSwitchHeight = 31.f;
 static constexpr auto logicalSwitchWidth = 51.f;
+#if PLATFORM(IOS_FAMILY)
+static constexpr auto logicalSwitchHeight = 31.f;
+#else
+static constexpr auto logicalSwitchHeight = 18.f;
+#endif
 
 static constexpr FloatSize idealRefreshedSwitchSize = { 64, 28 };
 static constexpr auto logicalRefreshedSwitchWidth = logicalSwitchHeight * (idealRefreshedSwitchSize.width() / idealRefreshedSwitchSize.height());
