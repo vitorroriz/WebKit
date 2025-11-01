@@ -101,8 +101,10 @@ private:
     simd_float4 m_maxCorner;
 #endif
     std::optional<WebCore::DDModel::DDFloat4x4> m_transform;
+#if ENABLE(GPU_PROCESS_MODEL)
     float m_cameraDistance { 1.f };
     WebCore::StageModeOperation m_stageMode;
+#endif
 };
 
 }
