@@ -54,7 +54,7 @@ static GestureStateOverrideMap& allStateOverrides()
 
 - (void)_clearOverriddenStateForTesting
 {
-    allStateOverrides().clear();
+    allStateOverrides().remove(self);
 }
 
 @end
