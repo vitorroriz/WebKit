@@ -452,6 +452,9 @@ bool GraphicsContextSkia::drawPathAsSingleElement(const Path& path, SkPaint& pai
                 m_canvas.drawLine(line.start().x(), line.start().y(), line.end().x(), line.end().y(), paint);
             handled = true;
         },
+        [&](const PathMoveTo&) {
+            handled = true;
+        },
         [&](const auto&) {
             handled = false;
         }
