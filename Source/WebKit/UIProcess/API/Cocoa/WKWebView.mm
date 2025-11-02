@@ -6837,7 +6837,7 @@ static inline std::optional<WebCore::NodeIdentifier> toNodeIdentifier(const Stri
 
     auto rectInWebView = configuration.targetRect;
     bool mergeParagraphs = configuration.mergeParagraphs;
-    bool canIncludeIdentifiers = configuration.canIncludeIdentifiers;
+    bool includeNodeIdentifiers = configuration.includeNodeIdentifiers;
     bool skipNearlyTransparentContent = configuration.skipNearlyTransparentContent;
     auto rectInRootView = [&]() -> std::optional<WebCore::FloatRect> {
         if (CGRectIsNull(rectInWebView))
@@ -6854,7 +6854,9 @@ static inline std::optional<WebCore::NodeIdentifier> toNodeIdentifier(const Stri
         .collectionRectInRootView = WTFMove(rectInRootView),
         .mergeParagraphs = mergeParagraphs,
         .skipNearlyTransparentContent = skipNearlyTransparentContent,
-        .canIncludeIdentifiers = canIncludeIdentifiers,
+        .includeNodeIdentifiers = includeNodeIdentifiers,
+        .includeEventListeners = !!configuration.includeEventListeners,
+        .includeAccessibilityAttributes = !!configuration.includeAccessibilityAttributes,
     };
 
     _page->requestTextExtraction(WTFMove(request), WTFMove(completion));

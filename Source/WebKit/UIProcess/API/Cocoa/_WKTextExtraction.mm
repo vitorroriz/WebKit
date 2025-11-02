@@ -37,10 +37,12 @@
     if (!(self = [super init]))
         return nil;
 
-    _canIncludeIdentifiers = YES;
     _shouldFilterText = YES;
     _includeURLs = YES;
     _includeRects = YES;
+    _includeNodeIdentifiers = YES;
+    _includeEventListeners = YES;
+    _includeAccessibilityAttributes = YES;
     _targetRect = CGRectNull;
     _maxWordsPerParagraph = NSUIntegerMax;
     return self;

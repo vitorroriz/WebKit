@@ -6735,7 +6735,9 @@ header: <WebCore/TextExtractionTypes.h>
     std::optional<WebCore::FloatRect> collectionRectInRootView;
     bool mergeParagraphs;
     bool skipNearlyTransparentContent;
-    bool canIncludeIdentifiers;
+    bool includeNodeIdentifiers;
+    bool includeEventListeners;
+    bool includeAccessibilityAttributes;
 };
 
 header: <WebCore/TextExtractionTypes.h>

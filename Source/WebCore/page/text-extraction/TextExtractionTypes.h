@@ -75,7 +75,9 @@ struct Request {
     std::optional<WebCore::FloatRect> collectionRectInRootView;
     bool mergeParagraphs { false };
     bool skipNearlyTransparentContent { false };
-    bool canIncludeIdentifiers { false };
+    bool includeNodeIdentifiers { false };
+    bool includeEventListeners { false };
+    bool includeAccessibilityAttributes { false };
 };
 
 struct Editable {

@@ -54,6 +54,24 @@ WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
 @property (nonatomic) BOOL includeRects;
 
 /*!
+ Include node IDs for interactive nodes.
+ The default value is `YES`.
+ */
+@property (nonatomic) BOOL includeNodeIdentifiers;
+
+/*!
+ Include information about event listeners.
+ The default value is `YES`.
+ */
+@property (nonatomic) BOOL includeEventListeners;
+
+/*!
+ Include accessibility attributes (e.g. `role`, `aria-label`).
+ The default value is `YES`.
+ */
+@property (nonatomic) BOOL includeAccessibilityAttributes;
+
+/*!
  Max number of words to include per paragraph; remaining text is truncated with an ellipsis (…).
  The default value is `NSUIntegerMax`.
  */

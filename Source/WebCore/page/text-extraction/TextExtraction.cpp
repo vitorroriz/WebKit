@@ -144,7 +144,9 @@ struct TraversalContext {
     unsigned onlyCollectTextAndLinksCount { 0 };
     bool mergeParagraphs { false };
     bool skipNearlyTransparentContent { false };
-    bool canIncludeIdentifiers { false };
+    bool includeNodeIdentifiers { false };
+    bool includeEventListeners { false };
+    bool includeAccessibilityAttributes { false };
 
     inline bool shouldIncludeNodeWithRect(const FloatRect& rect) const
     {
@@ -497,32 +499,34 @@ static inline void extractRecursive(Node& node, Item& parentItem, TraversalConte
     bool shouldSkipSubtree = false;
 
     OptionSet<EventListenerCategory> eventListeners;
-    node.enumerateEventListenerTypes([&](auto& type, unsigned) {
-        auto typeInfo = eventNames().typeInfoForEvent(type);
-        if (typeInfo.isInCategory(EventCategory::Wheel))
-            eventListeners.add(EventListenerCategory::Wheel);
-        else if (typeInfo.isInCategory(EventCategory::MouseClickRelated))
-            eventListeners.add(EventListenerCategory::Click);
-        else if (typeInfo.isInCategory(EventCategory::MouseMoveRelated))
-            eventListeners.add(EventListenerCategory::Hover);
-        else if (typeInfo.isInCategory(EventCategory::TouchRelated))
-            eventListeners.add(EventListenerCategory::Touch);
+    if (context.includeEventListeners) {
+        node.enumerateEventListenerTypes([&](auto& type, unsigned) {
+            auto typeInfo = eventNames().typeInfoForEvent(type);
+            if (typeInfo.isInCategory(EventCategory::Wheel))
+                eventListeners.add(EventListenerCategory::Wheel);
+            else if (typeInfo.isInCategory(EventCategory::MouseClickRelated))
+                eventListeners.add(EventListenerCategory::Click);
+            else if (typeInfo.isInCategory(EventCategory::MouseMoveRelated))
+                eventListeners.add(EventListenerCategory::Hover);
+            else if (typeInfo.isInCategory(EventCategory::TouchRelated))
+                eventListeners.add(EventListenerCategory::Touch);
 
-        switch (typeInfo.type()) {
-        case EventType::keydown:
-        case EventType::keypress:
-        case EventType::keyup:
-            eventListeners.add(EventListenerCategory::Keyboard);
-            break;
+            switch (typeInfo.type()) {
+            case EventType::keydown:
+            case EventType::keypress:
+            case EventType::keyup:
+                eventListeners.add(EventListenerCategory::Keyboard);
+                break;
 
-        default:
-            break;
-        }
-    });
+            default:
+                break;
+            }
+        });
+    }
 
     HashMap<String, String> ariaAttributes;
     String role;
-    if (RefPtr element = dynamicDowncast<Element>(node)) {
+    if (RefPtr element = dynamicDowncast<Element>(node); element && context.includeAccessibilityAttributes) {
         auto attributesToExtract = std::array {
             HTMLNames::aria_labelAttr.get(),
             HTMLNames::aria_expandedAttr.get(),
@@ -572,7 +576,7 @@ static inline void extractRecursive(Node& node, Item& parentItem, TraversalConte
                 return;
 
             std::optional<NodeIdentifier> nodeIdentifier;
-            if (context.canIncludeIdentifiers && shouldIncludeNodeIdentifier(eventListeners, AccessibilityObject::ariaRoleToWebCoreRole(role), result))
+            if (context.includeNodeIdentifiers && shouldIncludeNodeIdentifier(eventListeners, AccessibilityObject::ariaRoleToWebCoreRole(role), result))
                 nodeIdentifier = node.nodeIdentifier();
 
             item = { {
@@ -713,7 +717,9 @@ Item extractItem(Request&& request, Page& page)
             .onlyCollectTextAndLinksCount = 0,
             .mergeParagraphs = request.mergeParagraphs,
             .skipNearlyTransparentContent = request.skipNearlyTransparentContent,
-            .canIncludeIdentifiers = request.canIncludeIdentifiers,
+            .includeNodeIdentifiers = request.includeNodeIdentifiers,
+            .includeEventListeners = request.includeEventListeners,
+            .includeAccessibilityAttributes = request.includeAccessibilityAttributes,
         };
         extractRecursive(*bodyElement, root, context);
     }
