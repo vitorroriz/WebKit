@@ -12442,6 +12442,7 @@
         "web-platform-tests/svg/painting/marker-orient-001-ref.svg",
         "web-platform-tests/svg/painting/reftests/display-none-mask-ref.html",
         "web-platform-tests/svg/painting/reftests/green-100x100.svg",
+        "web-platform-tests/svg/painting/reftests/large-transform-ref.html",
         "web-platform-tests/svg/painting/reftests/marker-context-fill-transform-ref.html",
         "web-platform-tests/svg/painting/reftests/marker-path-001-ref.svg",
         "web-platform-tests/svg/painting/reftests/marker-path-002-ref.svg",
