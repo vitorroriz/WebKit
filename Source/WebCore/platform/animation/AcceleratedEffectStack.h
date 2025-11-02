@@ -42,7 +42,7 @@ public:
     bool hasEffects() const;
     const AcceleratedEffects& primaryLayerEffects() const { return m_primaryLayerEffects; }
     const AcceleratedEffects& backdropLayerEffects() const { return m_backdropLayerEffects; }
-    virtual void setEffects(AcceleratedEffects&&);
+    void setEffects(AcceleratedEffects&&);
 
     const AcceleratedEffectValues& baseValues() { return m_baseValues; }
     void setBaseValues(AcceleratedEffectValues&&);
@@ -50,7 +50,7 @@ public:
     virtual ~AcceleratedEffectStack() = default;
 
 protected:
-    WEBCORE_EXPORT explicit AcceleratedEffectStack();
+    explicit AcceleratedEffectStack();
 
     AcceleratedEffectValues m_baseValues;
     AcceleratedEffects m_primaryLayerEffects;
