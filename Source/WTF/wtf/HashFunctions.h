@@ -173,28 +173,32 @@ namespace WTF {
     template<typename... Types>
     struct TupleHash {
         template<size_t I = 0>
-        static typename std::enable_if<I < sizeof...(Types) - 1, unsigned>::type hash(const std::tuple<Types...>& t)
+            requires (I < sizeof...(Types) - 1)
+        static unsigned hash(const std::tuple<Types...>& t)
         {
             using IthTupleElementType = typename std::tuple_element<I, typename std::tuple<Types...>>::type;
             return pairIntHash(DefaultHash<IthTupleElementType>::hash(std::get<I>(t)), hash<I + 1>(t));
         }
 
         template<size_t I = 0>
-        static typename std::enable_if<I == sizeof...(Types) - 1, unsigned>::type hash(const std::tuple<Types...>& t)
+            requires (I == sizeof...(Types) - 1)
+        static unsigned hash(const std::tuple<Types...>& t)
         {
             using IthTupleElementType = typename std::tuple_element<I, typename std::tuple<Types...>>::type;
             return DefaultHash<IthTupleElementType>::hash(std::get<I>(t));
         }
 
         template<size_t I = 0>
-        static typename std::enable_if<I < sizeof...(Types) - 1, bool>::type equal(const std::tuple<Types...>& a, const std::tuple<Types...>& b)
+            requires (I < sizeof...(Types) - 1)
+        static bool equal(const std::tuple<Types...>& a, const std::tuple<Types...>& b)
         {
             using IthTupleElementType = typename std::tuple_element<I, typename std::tuple<Types...>>::type;
             return DefaultHash<IthTupleElementType>::equal(std::get<I>(a), std::get<I>(b)) && equal<I + 1>(a, b);
         }
 
         template<size_t I = 0>
-        static typename std::enable_if<I == sizeof...(Types) - 1, bool>::type equal(const std::tuple<Types...>& a, const std::tuple<Types...>& b)
+            requires (I == sizeof...(Types) - 1)
+        static bool equal(const std::tuple<Types...>& a, const std::tuple<Types...>& b)
         {
             using IthTupleElementType = typename std::tuple_element<I, typename std::tuple<Types...>>::type;
             return DefaultHash<IthTupleElementType>::equal(std::get<I>(a), std::get<I>(b));

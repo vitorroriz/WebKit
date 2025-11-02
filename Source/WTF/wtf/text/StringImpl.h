@@ -476,7 +476,8 @@ public:
     size_t find(Latin1Character, size_t start = 0);
     size_t find(char, size_t start = 0);
     size_t find(char16_t, size_t start = 0);
-    template<typename CodeUnitMatchFunction, std::enable_if_t<std::is_invocable_r_v<bool, CodeUnitMatchFunction, char16_t>>* = nullptr>
+    template<typename CodeUnitMatchFunction>
+        requires (std::is_invocable_r_v<bool, CodeUnitMatchFunction, char16_t>)
     size_t find(CodeUnitMatchFunction, size_t start = 0);
     ALWAYS_INLINE size_t find(ASCIILiteral literal, size_t start = 0) { return find(literal.span8(), start); }
     WTF_EXPORT_PRIVATE size_t find(StringView);
@@ -638,7 +639,8 @@ WTF_EXPORT_PRIVATE bool equalIgnoringASCIICaseNonNull(const StringImpl*, const S
 bool equalLettersIgnoringASCIICase(const StringImpl&, ASCIILiteral);
 bool equalLettersIgnoringASCIICase(const StringImpl*, ASCIILiteral);
 
-template<typename CodeUnit, typename CodeUnitMatchFunction, std::enable_if_t<std::is_invocable_r_v<bool, CodeUnitMatchFunction, CodeUnit>>* = nullptr>
+template<typename CodeUnit, typename CodeUnitMatchFunction>
+    requires (std::is_invocable_r_v<bool, CodeUnitMatchFunction, CodeUnit>)
 size_t find(std::span<const CodeUnit>, CodeUnitMatchFunction&&, size_t start = 0);
 
 template<typename CharacterType> size_t reverseFindLineTerminator(std::span<const CharacterType>, size_t start = StringImpl::MaxLength);
@@ -693,7 +695,8 @@ template<> ALWAYS_INLINE std::span<const char16_t> StringImpl::span<char16_t>() 
     return span16();
 }
 
-template<typename CodeUnit, typename CodeUnitMatchFunction, std::enable_if_t<std::is_invocable_r_v<bool, CodeUnitMatchFunction, CodeUnit>>*>
+template<typename CodeUnit, typename CodeUnitMatchFunction>
+    requires (std::is_invocable_r_v<bool, CodeUnitMatchFunction, CodeUnit>)
 inline size_t find(std::span<const CodeUnit> characters, CodeUnitMatchFunction&& matchFunction, size_t start)
 {
     while (start < characters.size()) {
@@ -763,7 +766,8 @@ inline size_t StringImpl::find(char16_t character, size_t start)
     return WTF::find(span16(), character, start);
 }
 
-template<typename CodeUnitMatchFunction, std::enable_if_t<std::is_invocable_r_v<bool, CodeUnitMatchFunction, char16_t>>*>
+template<typename CodeUnitMatchFunction>
+    requires (std::is_invocable_r_v<bool, CodeUnitMatchFunction, char16_t>)
 size_t StringImpl::find(CodeUnitMatchFunction matchFunction, size_t start)
 {
     if (is8Bit())

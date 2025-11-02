@@ -241,7 +241,7 @@ public:
 #endif
 
 private:
-    friend struct IPC::ArgumentCoder<RemoteLayerTreeTransaction, void>;
+    friend struct IPC::ArgumentCoder<RemoteLayerTreeTransaction>;
 
     // Do not use, IPC constructor only
     explicit RemoteLayerTreeTransaction();
