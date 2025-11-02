@@ -147,7 +147,7 @@ header: "RemoteLayerBackingStore.h"
     std::optional<uint64_t> m_dynamicViewportSizeUpdateID;
 #endif
 
-#if ENABLE(THREADED_ANIMATION_RESOLUTION)
+#if ENABLE(THREADED_ANIMATIONS)
     HashSet<Ref<WebCore::AcceleratedTimeline>> m_timelines;
 #endif
 }
@@ -194,7 +194,7 @@ headers: "LayerProperties.h" "PlatformCALayerRemote.h"
 [Nested] struct WebKit::LayerProperties::AnimationChanges {
     Vector<std::pair<String, WebKit::PlatformCAAnimationRemoteProperties>> addedAnimations;
     HashSet<String> keysOfAnimationsToRemove;
-#if ENABLE(THREADED_ANIMATION_RESOLUTION)
+#if ENABLE(THREADED_ANIMATIONS)
     Vector<Ref<WebCore::AcceleratedEffect>> effects;
     WebCore::AcceleratedEffectValues baseValues;
 #endif

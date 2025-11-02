@@ -561,7 +561,7 @@ class StylePropertyCodeGenProperties:
         if "animation-wrapper-acceleration" in json_value:
             if json_value["animation-wrapper-acceleration"] not in ['always', 'threaded-only']:
                 raise Exception(f"{key_path} must be either 'always' or 'threaded-only'.")
-            if json_value["animation-wrapper-acceleration"] == 'threaded-only' and not parsing_context.is_enabled(conditional="ENABLE_THREADED_ANIMATION_RESOLUTION"):
+            if json_value["animation-wrapper-acceleration"] == 'threaded-only' and not parsing_context.is_enabled(conditional="ENABLE_THREADED_ANIMATIONS"):
                 json_value["animation-wrapper-acceleration"] = None
 
         if "style-builder-custom" not in json_value:
@@ -3260,7 +3260,7 @@ class GenerateCSSPropertyNames:
 
                 to.write(f"}};")
 
-                to.write(f"if (settings.threadedAnimationResolutionEnabled())")
+                to.write(f"if (settings.threadedScrollDrivenAnimationsEnabled() || settings.threadedTimeBasedAnimationsEnabled())")
                 with to.indent():
                     to.write(f"return std::span<const CSSPropertyID> {{ propertiesIncludingThreadedOnly }};")
 
@@ -3365,7 +3365,7 @@ class GenerateCSSPropertyNames:
 
     def _property_is_accelerated_return_clause(self, p):
         if p.codegen_properties.animation_wrapper_acceleration == 'threaded-only':
-            return "settings.threadedAnimationResolutionEnabled()"
+            return "settings.threadedScrollDrivenAnimationsEnabled() || settings.threadedTimeBasedAnimationsEnabled()"
         return "true"
 
     def generate_css_property_names_gperf(self):

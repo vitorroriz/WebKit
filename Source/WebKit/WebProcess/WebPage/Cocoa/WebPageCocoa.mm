@@ -129,7 +129,7 @@
 #import "WKProcessExtension.h"
 #endif
 
-#if ENABLE(THREADED_ANIMATION_RESOLUTION)
+#if ENABLE(THREADED_ANIMATIONS)
 #import <WebCore/AcceleratedEffectStackUpdater.h>
 #endif
 
@@ -1976,7 +1976,7 @@ void WebPage::willCommitLayerTree(RemoteLayerTreeTransaction& layerTransaction, 
         return;
 
     Ref page = *corePage();
-#if ENABLE(THREADED_ANIMATION_RESOLUTION)
+#if ENABLE(THREADED_ANIMATIONS)
     if (RefPtr document = localRootFrame->document()) {
         if (CheckedPtr timelinesController = document->timelinesController()) {
             if (auto* acceleratedEffectStackUpdater = timelinesController->existingAcceleratedEffectStackUpdater())

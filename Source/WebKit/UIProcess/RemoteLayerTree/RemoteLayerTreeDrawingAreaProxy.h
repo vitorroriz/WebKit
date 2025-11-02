@@ -46,7 +46,7 @@ class RemoteScrollingCoordinatorTransaction;
 struct MainFrameData;
 struct RemoteLayerTreeCommitBundle;
 
-#if ENABLE(THREADED_ANIMATION_RESOLUTION)
+#if ENABLE(THREADED_ANIMATIONS)
 class RemoteAnimationTimeline;
 #endif
 
@@ -81,7 +81,7 @@ public:
     void viewWillStartLiveResize() final;
     void viewWillEndLiveResize() final;
 
-#if ENABLE(THREADED_ANIMATION_RESOLUTION)
+#if ENABLE(THREADED_ANIMATIONS)
     void animationsWereAddedToNode(RemoteLayerTreeNode&);
     void animationsWereRemovedFromNode(RemoteLayerTreeNode&);
     void updateTimelineRegistration(WebCore::ProcessIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>&, MonotonicTime);

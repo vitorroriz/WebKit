@@ -8054,13 +8054,13 @@ TextTracksInMSEEnabled:
     WebKit:
       default: false
 
-ThreadedAnimationResolutionEnabled:
+ThreadedScrollDrivenAnimationsEnabled:
   type: bool
   status: unstable
   category: animation
-  humanReadableName: "Threaded animation resolution"
-  humanReadableDescription: "Run accelerated animations on a separate thread"
-  condition: ENABLE(THREADED_ANIMATION_RESOLUTION)
+  humanReadableName: "Threaded Scroll-driven Animations"
+  humanReadableDescription: "Run qualifying scroll-driven animations on a separate thread"
+  condition: ENABLE(THREADED_ANIMATIONS)
   defaultValue:
     WebKitLegacy:
       default: false
@@ -8077,6 +8077,21 @@ ThreadedScrollingEnabled:
   defaultValue:
     WebKit:
       default: true
+
+ThreadedTimeBasedAnimationsEnabled:
+  type: bool
+  status: unstable
+  category: animation
+  humanReadableName: "Threaded Time-based Animations"
+  humanReadableDescription: "Run qualifying time-based animations on a separate thread"
+  condition: ENABLE(THREADED_ANIMATIONS)
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
 
 ThumbAndTrackPseudoElementsEnabled:
   type: bool
