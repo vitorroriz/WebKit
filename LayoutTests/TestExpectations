@@ -7867,3 +7867,12 @@ imported/w3c/web-platform-tests/page-lifecycle/child-out-of-viewport.tentative.h
 imported/w3c/web-platform-tests/page-lifecycle/worker-dispay-none.tentative.html [ Skip ]
 imported/w3c/web-platform-tests/page-lifecycle/set-composited-layer-position.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/cookies/partitioned-cookies/partitioned-cookies-a-b-a-embed.tentative.https.html [ Skip ]
+
+imported/w3c/web-platform-tests/css/CSS2/visudet/inline-block-baseline-003.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/visudet/inline-block-baseline-004.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/visudet/inline-block-baseline-005.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/visudet/inline-block-baseline-006.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-height-20.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-height-40.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-width-40.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-width-80.html [ ImageOnlyFailure ]
