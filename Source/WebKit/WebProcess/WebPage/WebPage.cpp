@@ -3369,7 +3369,7 @@ Ref<WebContextMenu> WebPage::protectedContextMenu()
     return contextMenu();
 }
 
-RefPtr<WebContextMenu> WebPage::contextMenuAtPointInWindow(FrameIdentifier frameID, const IntPoint& point)
+RefPtr<WebContextMenu> WebPage::contextMenuAtPointInWindow(FrameIdentifier frameID, const DoublePoint& point)
 {
     RefPtr frame = WebProcess::singleton().webFrame(frameID);
     if (!frame)

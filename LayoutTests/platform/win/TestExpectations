@@ -4340,6 +4340,8 @@ fast/css/sticky/sticky-top-zoomed.html [ ImageOnlyFailure ]
 fast/events/wheel/wheel-event-destroys-frame.html [ Skip ] # Timeout
 fast/text/install-font-style-recalc.html [ Skip ] # Timeout
 
+webkit.org/b/301856 fast/events/contextmenu-items-match-node-receiving-contextmenu-event.html [ Skip ]
+
 
 # Tests depend on the system timezone.
 storage/indexeddb/modern/date-basic-private.html [ Failure Pass ]

@@ -4864,6 +4864,8 @@ webkit.org/b/157179 fast/events/dropzone-005.html [ Failure ]
 webkit.org/b/157179 fast/events/ondragenter.html [ Failure ]
 webkit.org/b/157179 fast/events/remove-target-with-shadow-in-drag.html [ Failure ]
 
+webkit.org/b/301856 fast/events/contextmenu-items-match-node-receiving-contextmenu-event.html [ Skip ]
+
 webkit.org/b/163779 http/tests/xmlhttprequest/on-network-timeout-error-during-preflight.html [ Skip ] # Timeout.
 
 imported/w3c/web-platform-tests/css/css-view-transitions/transition-in-hidden-page.html [ Skip ]
