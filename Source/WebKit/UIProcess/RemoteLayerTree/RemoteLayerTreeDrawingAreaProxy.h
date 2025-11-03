@@ -117,8 +117,8 @@ protected:
 
         CommitLayerTreeMessageState commitLayerTreeMessageState { Idle };
         std::optional<MonotonicTime> transactionStartTime;
-        std::optional<TransactionID> lastLayerTreeTransactionID;
         std::optional<TransactionID> pendingLayerTreeTransactionID;
+        bool receivedCommitLayerTreePendingConfirmation { false };
     };
 
     ProcessState& processStateForConnection(IPC::Connection&);
@@ -177,8 +177,7 @@ private:
     // per-frame.
     virtual void setPreferredFramesPerSecond(IPC::Connection&, WebCore::FramesPerSecond) { }
 
-    void willCommitLayerTree(IPC::Connection&, TransactionID);
-    void commitLayerTreeNotTriggered(IPC::Connection&, TransactionID);
+    void notifyPendingCommitLayerTree(IPC::Connection&, std::optional<TransactionID>);
     void commitLayerTree(IPC::Connection&, const RemoteLayerTreeCommitBundle&, HashMap<ImageBufferSetIdentifier, std::unique_ptr<BufferSetBackendHandle>>&&);
     void commitLayerTreeTransaction(IPC::Connection&, const RemoteLayerTreeTransaction&, const RemoteScrollingCoordinatorTransaction&, const std::optional<MainFrameData>&);
     virtual void didCommitLayerTree(IPC::Connection&, const RemoteLayerTreeTransaction&, const RemoteScrollingCoordinatorTransaction&, const std::optional<MainFrameData>&) { }
