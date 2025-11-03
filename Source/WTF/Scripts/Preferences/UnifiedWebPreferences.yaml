@@ -3417,17 +3417,17 @@ GridFormattingContextIntegrationEnabled:
 
 HTMLEnhancedSelectParsingEnabled:
    type: bool
-   status: testable
+   status: stable
    category: dom
    humanReadableName: "Enhanced HTML select element parsing"
    humanReadableDescription: "Enable enhanced HTML select element parsing"
    defaultValue:
      WebKitLegacy:
-       default: false
+       default: true
      WebKit:
-       default: false
+       default: true
      WebCore:
-       default: false
+       default: true
 
 HTMLEnhancedSelectSelectedContentEnabled:
    type: bool
