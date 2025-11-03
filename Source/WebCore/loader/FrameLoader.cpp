@@ -1668,9 +1668,13 @@ void FrameLoader::loadURL(FrameLoadRequest&& frameLoadRequest, const String& ref
         return;
     }
 
-    if (isSameOrigin && newLoadType != FrameLoadType::Reload) {
-        if (!dispatchNavigateEvent(newLoadType, frameLoadRequest, false, formState.get(), event))
-            return;
+    if (isSameOrigin && newLoadType != FrameLoadType::Reload && !frameLoadRequest.isInitialFrameSrcLoad()) {
+        // FIXME: Ideally, we'd call dispatchNavigateEvent() directly from continueLoadAfterNavigationPolicy()
+        // instead of storing a lambda on the NavigationAction.
+        action.setPendingDispatchNavigateEvent([weakThis = WeakPtr { *this }, newLoadType, frameLoadRequest, formState, event = RefPtr { event }] {
+            RefPtr protectedThis = weakThis.get();
+            return protectedThis && protectedThis->dispatchNavigateEvent(newLoadType, frameLoadRequest, false, formState.get(), event.get());
+        });
     }
 
     // Must grab this now, since this load may stop the previous load and clear this flag.
@@ -4118,6 +4122,11 @@ void FrameLoader::continueLoadAfterNavigationPolicy(const ResourceRequest& reque
         setPolicyDocumentLoader(nullptr);
         executeJavaScriptURL(request.url(), action);
         return;
+    }
+
+    if (auto pendingDispatchNavigateEvent = m_policyDocumentLoader->triggeringAction().takePendingDispatchNavigateEvent()) {
+        if (!pendingDispatchNavigateEvent())
+            return;
     }
 
     FrameLoadType type = policyChecker().loadType();
