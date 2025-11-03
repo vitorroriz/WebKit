@@ -250,7 +250,7 @@ id WebProcess::accessibilityFocusedUIElement()
             bool foundValidTree = false;
             switchOn(tree,
                 [&] (RefPtr<AXIsolatedTree>& typedTree) {
-                    if (typedTree) {
+                    if (typedTree && typedTree->focusedNode()) {
                         OptionSet<ActivityState> state = typedTree->lockedPageActivityState();
                         if (state.containsAll({ ActivityState::IsVisible, ActivityState::IsFocused, ActivityState::WindowIsActive }))
                             foundValidTree = true;

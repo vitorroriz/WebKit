@@ -6589,18 +6589,17 @@ bool Document::setFocusedElement(Element* newFocusedElement, const FocusOptions&
     }
 
     if (m_focusedElement) {
-
         if (settings().navigationAPIEnabled())
             window()->navigation().setFocusChanged(FocusDidChange::Yes);
+    }
 
 #if PLATFORM(GTK)
-        // GTK relies on creating the AXObjectCache when a focus change happens.
-        if (CheckedPtr cache = axObjectCache())
+    // GTK relies on creating the AXObjectCache when a focus change happens.
+    if (CheckedPtr cache = axObjectCache())
 #else
-        if (CheckedPtr cache = existingAXObjectCache())
+    if (CheckedPtr cache = existingAXObjectCache())
 #endif
-            cache->onFocusChange(oldFocusedElement.get(), newFocusedElement);
-    }
+        cache->onFocusChange(oldFocusedElement.get(), newFocusedElement);
 
     if (RefPtr page = this->page())
         page->chrome().focusedElementChanged(protectedFocusedElement().get(), page->focusController().focusedLocalFrame(), options, broadcast);
