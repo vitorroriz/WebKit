@@ -30,6 +30,7 @@
 #include <WebCore/InlineLineTypes.h>
 #include <WebCore/InlineTextItem.h>
 #include <WebCore/RenderStyle.h>
+#include <ranges>
 #include <unicode/ubidi.h>
 #include <wtf/Range.h>
 
@@ -333,7 +334,7 @@ inline bool Line::hasContentOrListMarker() const
 
 inline bool Line::hasContent() const
 {
-    for (auto& run : makeReversedRange(m_runs)) {
+    for (auto& run : m_runs | std::views::reverse) {
         if (run.isContentful() && !run.isGenerated())
             return true;
     }

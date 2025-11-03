@@ -172,6 +172,7 @@
 #include "markup.h"
 #include <JavaScriptCore/JSCJSValue.h>
 #include <JavaScriptCore/JSONObject.h>
+#include <ranges>
 #include <wtf/NeverDestroyed.h>
 #include <wtf/Scope.h>
 #include <wtf/TZoneMallocInlines.h>
@@ -4676,7 +4677,7 @@ const RenderStyle* Element::resolveComputedStyle(ResolveComputedStyleMode mode)
     // Resolve and cache styles starting from the most distant ancestor.
     // FIXME: This is not as efficient as it could be. For example if an ancestor has a non-inherited style change but
     // the styles are otherwise clean we would not need to re-resolve descendants.
-    for (auto& element : makeReversedRange(elementsRequiringComputedStyle)) {
+    for (auto& element : elementsRequiringComputedStyle | std::views::reverse) {
         if (computedStyle && computedStyle->containerType() != ContainerType::Normal && mode != ResolveComputedStyleMode::Editability) {
             // If we find a query container we need to bail out and do full style update to resolve it.
             if (document->updateStyleIfNeeded())

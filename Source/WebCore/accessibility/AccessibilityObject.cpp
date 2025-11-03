@@ -112,6 +112,7 @@
 #include "UserGestureIndicator.h"
 #include "VisibleUnits.h"
 #include <numeric>
+#include <ranges>
 #include <wtf/NeverDestroyed.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/text/MakeString.h>
@@ -460,7 +461,7 @@ std::optional<SimpleRange> AccessibilityObject::misspellingRange(const SimpleRan
                 return *misspellingRange;
         }
     } else {
-        for (auto& misspelling : makeReversedRange(misspellings)) {
+        for (auto& misspelling : misspellings | std::views::reverse) {
             auto misspellingRange = editor->rangeForTextCheckingResult(misspelling);
             if (misspellingRange && is_lt(treeOrder<ComposedTree>(misspellingRange->start, start.start)))
                 return *misspellingRange;

@@ -1197,7 +1197,7 @@ static RefPtr<Element> findLastAcceptableAnchorWithName(ResolvedScopedName ancho
 
     const auto& anchors = anchorsForAnchorName.get(anchorName);
 
-    for (auto& anchor : makeReversedRange(anchors)) {
+    for (auto& anchor : anchors | std::views::reverse) {
         if (isAcceptableAnchorElement(anchor.get(), anchorPositionedElement, anchorName))
             return anchor->element();
     }

@@ -79,6 +79,7 @@
 #include "TextBoxTrimmer.h"
 #include "TextUtil.h"
 #include "VisiblePosition.h"
+#include <ranges>
 #include <wtf/Scope.h>
 #include <wtf/TZoneMallocInlines.h>
 
@@ -3200,7 +3201,7 @@ bool RenderBlockFlow::hitTestFloats(const HitTestRequest& request, HitTestResult
     if (auto* renderView = dynamicDowncast<RenderView>(*this))
         adjustedLocation += toLayoutSize(renderView->frameView().scrollPosition());
 
-    for (auto& floatingObject : makeReversedRange(m_floatingObjects->set())) {
+    for (auto& floatingObject : m_floatingObjects->set() | std::views::reverse) {
         auto& renderer = floatingObject->renderer();
         if (floatingObject->shouldPaint()) {
             LayoutPoint childPoint = flipFloatForWritingModeForChild(*floatingObject, adjustedLocation + floatingObject->translationOffsetToAncestor());

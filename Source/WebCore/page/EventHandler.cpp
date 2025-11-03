@@ -143,6 +143,7 @@
 #include "WheelEventDeltaFilter.h"
 #include "WheelEventTestMonitor.h"
 #include "WindowsKeyboardCodes.h"
+#include <ranges>
 #include <wtf/Assertions.h>
 #include <wtf/NeverDestroyed.h>
 #include <wtf/RuntimeApplicationChecks.h>
@@ -3063,7 +3064,7 @@ void EventHandler::updateMouseEventTargetNode(const AtomString& eventType, Node*
             if (auto elementUnderMouse = m_elementUnderMouse)
                 elementUnderMouse->dispatchMouseEvent(platformMouseEvent, eventNames.mouseoverEvent, 0, m_lastElementUnderMouse.get());
 
-            for (auto& chain : makeReversedRange(enteredElementsChain)) {
+            for (auto& chain : enteredElementsChain | std::views::reverse) {
                 if (!chain)
                     continue;
 

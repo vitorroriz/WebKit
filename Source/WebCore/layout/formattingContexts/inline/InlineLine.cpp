@@ -33,6 +33,7 @@
 #include "RenderStyleInlines.h"
 #include "TextFlags.h"
 #include "TextUtil.h"
+#include <ranges>
 #include <wtf/TZoneMallocInlines.h>
 
 namespace WebCore {
@@ -346,7 +347,7 @@ void Line::appendText(const InlineTextItem& inlineTextItem, const RenderStyle& s
         if (InlineTextItem::shouldPreserveSpacesAndTabs(inlineTextItem))
             return false;
         // This content is collapsible. Let's check if the last item is collapsed.
-        for (auto& run : makeReversedRange(m_runs)) {
+        for (auto& run : m_runs | std::views::reverse) {
             if (run.isAtomicInlineBox())
                 return false;
             // https://drafts.csswg.org/css-text-3/#white-space-phase-1
@@ -417,7 +418,7 @@ void Line::appendText(const InlineTextItem& inlineTextItem, const RenderStyle& s
                     return m_contentLogicalWidth - std::max(0.f, lastRun.logicalWidth());
                 // FIXME: Let's see if we need to optimize for this is the rare case of both letter and word spacing being negative.
                 auto rightMostPosition = InlineLayoutUnit { };
-                for (auto& run : makeReversedRange(m_runs))
+                for (auto& run : m_runs | std::views::reverse)
                     rightMostPosition = std::max(rightMostPosition, run.logicalRight());
                 return std::max(0.f, rightMostPosition);
             }();
@@ -587,7 +588,7 @@ void Line::appendOpaqueBox(const InlineItem& inlineItem, const RenderStyle& styl
 
 void Line::addTrailingHyphen(InlineLayoutUnit hyphenLogicalWidth)
 {
-    for (auto& run : makeReversedRange(m_runs)) {
+    for (auto& run : m_runs | std::views::reverse) {
         if (!run.isText())
             continue;
         run.setNeedsHyphen(hyphenLogicalWidth);
@@ -600,7 +601,7 @@ void Line::addTrailingHyphen(InlineLayoutUnit hyphenLogicalWidth)
 bool Line::lineHasVisuallyNonEmptyContent() const
 {
     auto& formattingContext = this->formattingContext();
-    for (auto& run : makeReversedRange(m_runs)) {
+    for (auto& run : m_runs | std::views::reverse) {
         if (Line::Run::isContentfulOrHasDecoration(run, formattingContext))
             return true;
     }

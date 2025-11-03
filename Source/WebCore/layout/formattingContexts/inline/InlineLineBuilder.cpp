@@ -39,6 +39,7 @@
 #include "StyleLineBoxContain.h"
 #include "TextUtil.h"
 #include "UnicodeBidi.h"
+#include <ranges>
 #include <wtf/unicode/CharacterNames.h>
 
 namespace WebCore {
@@ -410,7 +411,7 @@ void LineBuilder::initialize(const InlineRect& initialLineLogicalRect, const Inl
             ancestor = &ancestor->parent();
         }
         // Let's treat these spanning inline items as opaque bidi content. They should not change the bidi levels on adjacent content.
-        for (auto* spanningInlineBox : makeReversedRange(spanningLayoutBoxList))
+        for (auto* spanningInlineBox : spanningLayoutBoxList | std::views::reverse)
             m_lineSpanningInlineBoxes.append({ *spanningInlineBox, InlineItem::Type::InlineBoxStart, InlineItem::opaqueBidiLevel });
     };
     createLineSpanningInlineBoxes();
@@ -1798,7 +1799,7 @@ bool LineBuilder::isLastLineWithInlineContent(const LineContent& lineContent, si
             // This is both the first and the last line.
             return true;
         }
-        for (auto& lineRun : makeReversedRange(lineRuns)) {
+        for (auto& lineRun : lineRuns | std::views::reverse) {
             if (Line::Run::isContentfulOrHasDecoration(lineRun, formattingContext))
                 return true;
         }

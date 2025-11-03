@@ -35,6 +35,7 @@
 #include "RenderStyleInlines.h"
 #include "RubyFormattingContext.h"
 #include "TextUtil.h"
+#include <ranges>
 #include <wtf/ListHashSet.h>
 #include <wtf/Range.h>
 #include <wtf/text/MakeString.h>
@@ -924,7 +925,7 @@ void InlineDisplayContentBuilder::processBidiContent(const LineLayoutResult& lin
     handleInlineBoxes();
 
     auto handleTrailingOpenInlineBoxes = [&] {
-        for (auto& lineRun : makeReversedRange(lineLayoutResult.inlineAndOpaqueContent)) {
+        for (auto& lineRun : lineLayoutResult.inlineAndOpaqueContent | std::views::reverse) {
             if (!lineRun.isInlineBoxStart() || lineRun.bidiLevel() != InlineItem::opaqueBidiLevel)
                 break;
             // These are trailing inline box start runs (without the closing inline box end <span> <-line breaks here</span>).
@@ -1217,7 +1218,7 @@ void InlineDisplayContentBuilder::processRubyContent(InlineDisplay::Boxes& displ
     auto lineBoxLogicalRect = lineBox().logicalRect();
     auto writingMode = root().writingMode();
     auto isHorizontalWritingMode = writingMode.isHorizontal();
-    for (auto baseIndex : makeReversedRange(rubyBaseStartIndexListWithAnnotation)) {
+    for (auto baseIndex : rubyBaseStartIndexListWithAnnotation | std::views::reverse) {
         auto& annotationBox = *displayBoxes[baseIndex].layoutBox().associatedRubyAnnotationBox();
         auto annotationBorderBoxVisualRect = [&] {
             // FIXME: We may wanna go back to full logical geometry on BoxGeometry (instead of this with visual left) and resolve it when

@@ -130,6 +130,7 @@
 #include "SVGViewElement.h"
 #include "SVGViewSpec.h"
 #include "ScriptController.h"
+#include "ScriptDisallowedScope.h"
 #include "ScriptSourceCode.h"
 #include "ScrollAnimator.h"
 #include "SecurityOrigin.h"
@@ -147,7 +148,7 @@
 #include "UserGestureIndicator.h"
 #include "WindowFeatures.h"
 #include "XMLDocumentParser.h"
-#include <dom/ScriptDisallowedScope.h>
+#include <ranges>
 #include <wtf/CheckedPtr.h>
 #include <wtf/CompletionHandler.h>
 #include <wtf/Ref.h>
@@ -3209,7 +3210,7 @@ void FrameLoader::checkLoadComplete(LoadWillContinueInAnotherProcess loadWillCon
     }
 
     // To process children before their parents, iterate the vector backwards.
-    for (Ref frame : makeReversedRange(frames)) {
+    for (Ref frame : frames | std::views::reverse) {
         if (frame->page())
             frame->loader().checkLoadCompleteForThisFrame(loadWillContinueInAnotherProcess);
     }

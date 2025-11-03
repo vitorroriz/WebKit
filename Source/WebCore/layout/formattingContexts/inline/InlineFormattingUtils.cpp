@@ -37,6 +37,7 @@
 #include "LayoutElementBox.h"
 #include "RenderStyleInlines.h"
 #include "RubyFormattingContext.h"
+#include <ranges>
 
 namespace WebCore {
 namespace Layout {
@@ -611,7 +612,7 @@ LineEndingTruncationPolicy InlineFormattingUtils::lineEndingTruncationPolicy(con
 
 std::optional<LineLayoutResult::InlineContentEnding> InlineFormattingUtils::inlineContentEnding(const Line::Result& lineContent)
 {
-    for (auto& run : makeReversedRange(lineContent.runs)) {
+    for (auto& run : lineContent.runs | std::views::reverse) {
         if (run.isOpaque())
             continue;
 

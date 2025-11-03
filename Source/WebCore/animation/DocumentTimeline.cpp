@@ -50,6 +50,7 @@
 #include "Settings.h"
 #include "StyleOriginatedAnimation.h"
 #include "WebAnimationTypes.h"
+#include <ranges>
 
 #if ENABLE(THREADED_ANIMATIONS)
 #include "AcceleratedEffectStackUpdater.h"
@@ -268,7 +269,7 @@ IGNORE_GCC_WARNINGS_END
         return { };
     }();
 
-    for (auto& animationWithHigherCompositeOrder : makeReversedRange(protectedAnimations)) {
+    for (auto& animationWithHigherCompositeOrder : protectedAnimations | std::views::reverse) {
         if (&animation == animationWithHigherCompositeOrder)
             break;
 

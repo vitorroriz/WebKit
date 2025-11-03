@@ -10929,7 +10929,7 @@ void Document::removeTopLayerElement(Element& element)
 
 HTMLDialogElement* Document::activeModalDialog() const
 {
-    for (auto& element : makeReversedRange(m_topLayerElements)) {
+    for (auto& element : m_topLayerElements | std::views::reverse) {
         if (auto* dialog = dynamicDowncast<HTMLDialogElement>(element.get()); dialog && dialog->isModal())
             return dialog;
     }
@@ -11023,7 +11023,7 @@ void Document::handlePopoverLightDismiss(const PointerEvent& event, Node& target
                 return second;
             if (!second)
                 return first;
-            for (auto& element : makeReversedRange(m_autoPopoverList)) {
+            for (auto& element : m_autoPopoverList | std::views::reverse) {
                 if (element.ptr() == first || element.ptr() == second)
                     return element.ptr();
             }

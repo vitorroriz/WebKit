@@ -59,6 +59,7 @@
 #include "RenderView.h"
 #include "SVGTextFragment.h"
 #include "ShapeOutsideInfo.h"
+#include <ranges>
 #include <wtf/Assertions.h>
 #include <wtf/Range.h>
 
@@ -223,7 +224,7 @@ static const InlineDisplay::Line& lastLineWithInlineContent(const InlineDisplay:
 {
     // Out-of-flow/float content only don't produce lines with inline content. They should not be taken into
     // account when computing content box height/baselines.
-    for (auto& line : makeReversedRange(lines)) {
+    for (auto& line : lines | std::views::reverse) {
         ASSERT(line.boxCount());
         if (line.boxCount() > 1)
             return line;
@@ -804,7 +805,7 @@ bool LineLayout::hasEllipsisInBlockDirectionOnLastFormattedLine() const
     if (!m_inlineContent)
         return false;
 
-    for (auto& line : makeReversedRange(m_inlineContent->displayContent().lines)) {
+    for (auto& line : m_inlineContent->displayContent().lines | std::views::reverse) {
         if (line.boxCount() == 1) {
             // Out-of-flow content could initiate a line with no inline content.
             continue;
@@ -1178,7 +1179,7 @@ bool LineLayout::hitTest(const HitTestRequest& request, HitTestResult& result, c
 
     LayerPaintScope layerPaintScope(layerRenderer);
 
-    for (auto& box : makeReversedRange(boxRange)) {
+    for (auto& box : boxRange | std::views::reverse) {
         bool visibleForHitTesting = request.userTriggered() ? box.isVisible() : box.isVisibleIgnoringUsedVisibility();
         if (!visibleForHitTesting)
             continue;
