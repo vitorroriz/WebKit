@@ -92,6 +92,7 @@ class SerializedType(object):
         self.condition = condition
         self.encoders = ['Encoder']
         self.return_ref = False
+        self.return_uniqueref = False
         self.construct_subclass = None
         self.create_using = False
         self.populate_from_empty_constructor = False
@@ -133,6 +134,8 @@ class SerializedType(object):
                         self.nested = True
                     elif attribute == 'RefCounted':
                         self.return_ref = True
+                    elif attribute == 'UniqueRef':
+                        self.return_uniqueref = True
                     elif attribute == 'DisableMissingMemberCheck':
                         self.disableMissingMemberCheck = True
                     elif attribute == 'RValue':
@@ -543,6 +546,8 @@ def one_argument_coder_declaration(type, template_argument):
             result.append(f'    static void encode({encoder}&, const {name_with_template}&);')
     if type.return_ref:
         result.append(f'    static std::optional<Ref<{name_with_template}>> decode(Decoder&);')
+    elif type.return_uniqueref:
+        result.append(f'    static std::optional<UniqueRef<{name_with_template}>> decode(Decoder&);')
     else:
         result.append(f'    static std::optional<{name_with_template}> decode(Decoder&);')
     result.append('};')
@@ -999,6 +1004,8 @@ def construct_type(type, specialization, indentation):
         result.append(f'{indent(indentation)}{fulltype}::{type.create_using}(')
     elif type.return_ref:
         result.append(f'{indent(indentation)}{fulltype}::create(')
+    elif type.return_uniqueref:
+        result.append(f'{indent(indentation)}makeUniqueRef<{fulltype}>(')
     else:
         result.append(f'{indent(indentation)}{fulltype} {{')
     if type.parent_class is not None:
@@ -1076,6 +1083,8 @@ def generate_one_impl(type, template_argument, serialized_types):
         result.append(f'std::optional<RetainPtr<{name_with_template}>> ArgumentCoder<RetainPtr<{name_with_template}>>::decode(Decoder& decoder)')
     elif type.return_ref:
         result.append(f'std::optional<Ref<{name_with_template}>> ArgumentCoder<{name_with_template}>::decode(Decoder& decoder)')
+    elif type.return_uniqueref:
+        result.append(f'std::optional<UniqueRef<{name_with_template}>> ArgumentCoder<{name_with_template}>::decode(Decoder& decoder)')
     else:
         result.append(f'std::optional<{name_with_template}> ArgumentCoder<{name_with_template}>::decode(Decoder& decoder)')
     result.append('{')
@@ -1085,11 +1094,17 @@ def generate_one_impl(type, template_argument, serialized_types):
             result.append('    if (!decoder.isValid()) [[unlikely]]')
             result.append('        return std::nullopt;')
             if type.populate_from_empty_constructor and not type.has_optional_tuple_bits():
-                result.append(f'    {name_with_template} result;')
+                if type.return_uniqueref:
+                    result.append(f'    auto result = makeUniqueRef<{name_with_template}>();')
+                else:
+                    result.append(f'    {name_with_template} result;')
                 for member in type.serialized_members():
                     if member.condition is not None:
                         result.append(f'#if {member.condition}')
-                    result.append(f'    result.{member.name} = WTFMove(*{member.name});')
+                    if type.return_uniqueref:
+                        result.append(f'    result->{member.name} = WTFMove(*{member.name});')
+                    else:
+                        result.append(f'    result.{member.name} = WTFMove(*{member.name});')
                     if member.condition is not None:
                         result.append('#endif')
                 result.append('    return { WTFMove(result) };')

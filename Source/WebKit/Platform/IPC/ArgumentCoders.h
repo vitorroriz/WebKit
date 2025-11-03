@@ -343,7 +343,10 @@ template<typename T> struct ArgumentCoder<UniqueRef<T>> {
         auto object = decoder.template decode<T>();
         if (!object)
             return std::nullopt;
-        return makeUniqueRef<T>(WTFMove(*object));
+        if constexpr (std::is_same_v<decltype(object), std::optional<UniqueRef<T>>>)
+            return object;
+        else
+            return makeUniqueRef<T>(WTFMove(*object));
     }
 };
 

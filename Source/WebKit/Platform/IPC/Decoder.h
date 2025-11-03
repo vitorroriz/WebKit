@@ -140,9 +140,9 @@ public:
     }
 
     template<typename T>
-    std::optional<T> decode()
+    auto decode()
     {
-        std::optional<T> t { ArgumentCoder<std::remove_cvref_t<T>>::decode(*this) };
+        auto t = ArgumentCoder<std::remove_cvref_t<T>>::decode(*this);
         if (!t) [[unlikely]]
             markInvalid();
         return t;
@@ -208,7 +208,7 @@ private:
 };
 
 template<>
-inline std::optional<Attachment> Decoder::decode<Attachment>()
+inline auto Decoder::decode<Attachment>()
 {
     return takeLastAttachment();
 }

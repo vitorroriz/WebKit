@@ -377,13 +377,14 @@ void RemoteLayerTreeDrawingArea::updateRendering()
         backingStoreCollection->willBuildTransaction();
         rootLayer.layer->flushCompositingStateForThisLayerOnly();
 
-        RemoteLayerTreeTransaction layerTransaction(transactionID);
+        auto layerTransaction = makeUniqueRef<RemoteLayerTreeTransaction>(transactionID);
+        CheckedRef checkedLayerTransaction = layerTransaction.get();
 
         RefPtr layer = downcast<GraphicsLayerCARemote>(rootLayer.layer.get()).platformCALayer();
-        m_remoteLayerTreeContext->buildTransaction(layerTransaction, *layer, rootLayer.frameID);
+        m_remoteLayerTreeContext->buildTransaction(checkedLayerTransaction.get(), *layer, rootLayer.frameID);
 
         // FIXME: Investigate whether this needs to be done multiple times in a page with multiple root frames. <rdar://116202678>
-        webPage->willCommitLayerTree(layerTransaction, rootLayer.frameID);
+        webPage->willCommitLayerTree(checkedLayerTransaction.get(), rootLayer.frameID);
 
         m_waitingForBackingStoreSwap = true;
 
@@ -398,7 +399,7 @@ void RemoteLayerTreeDrawingArea::updateRendering()
     });
 
     for (auto& transaction : transactions)
-        backingStoreCollection->willCommitLayerTree(CheckedRef { transaction.first });
+        backingStoreCollection->willCommitLayerTree(CheckedRef { transaction.first.get() });
 
     RemoteLayerTreeCommitBundle bundle { WTFMove(transactions), { WTFMove(m_pendingCallbackIDs) } };
 
@@ -415,7 +416,7 @@ void RemoteLayerTreeDrawingArea::updateRendering()
 
     Vector<std::unique_ptr<ThreadSafeImageBufferSetFlusher>> flushers;
     for (auto& transaction : bundle.transactions)
-        flushers.appendVector(backingStoreCollection->didFlushLayers(CheckedRef { transaction.first }));
+        flushers.appendVector(backingStoreCollection->didFlushLayers(CheckedRef { transaction.first.get() }));
 
     OptionSet<WebPage::DidUpdateRenderingFlags> didUpdateRenderingFlags;
     if (flushers.size())
