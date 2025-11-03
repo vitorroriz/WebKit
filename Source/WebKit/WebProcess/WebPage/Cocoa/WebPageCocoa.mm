@@ -962,7 +962,7 @@ std::pair<URL, DidFilterLinkDecoration> WebPage::applyLinkDecorationFilteringWit
 
         const auto& conditionals = it->value;
         bool isEmptyOrFoundDomain = conditionals.domains.isEmpty() || conditionals.domains.contains(RegistrableDomain { url });
-        bool isEmptyOrFoundPath = conditionals.paths.isEmpty() || std::any_of(conditionals.paths.begin(), conditionals.paths.end(),
+        bool isEmptyOrFoundPath = conditionals.paths.isEmpty() || std::ranges::any_of(conditionals.paths,
             [&url](auto& path) {
                 return url.path().contains(path);
             });
