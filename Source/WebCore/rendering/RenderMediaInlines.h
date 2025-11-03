@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Igalia S.L. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,31 +23,31 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "WebXRHitTestSource.h"
+#pragma once
 
-#include <wtf/Ref.h>
-#include <wtf/TZoneMallocInlines.h>
-
-#if ENABLE(WEBXR_HIT_TEST)
+#include <WebCore/HTMLMediaElement.h>
+#include <WebCore/RenderMedia.h>
 
 namespace WebCore {
 
-WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(WebXRHitTestSource);
-
-Ref<WebXRHitTestSource> WebXRHitTestSource::create()
+inline bool HTMLMediaElement::hasRenderer() const
 {
-    return adoptRef(*new WebXRHitTestSource);
+    return is<RenderMedia>(Node::renderer());
 }
 
-WebXRHitTestSource::WebXRHitTestSource() = default;
-
-WebXRHitTestSource::~WebXRHitTestSource() = default;
-
-void WebXRHitTestSource::cancel()
+inline RenderMedia* HTMLMediaElement::renderer() const
 {
+    return downcast<RenderMedia>(Node::renderer());
 }
 
-} // namespace WebCore
+inline HTMLMediaElement& RenderMedia::mediaElement() const
+{
+    return downcast<HTMLMediaElement>(nodeForNonAnonymous());
+}
 
-#endif // ENABLE(WEBXR_HIT_TEST)
+inline Ref<HTMLMediaElement> RenderMedia::protectedMediaElement() const
+{
+    return mediaElement();
+}
+
+}

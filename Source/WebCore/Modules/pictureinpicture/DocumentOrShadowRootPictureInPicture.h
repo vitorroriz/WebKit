@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Igalia S.L. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,31 +23,20 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "WebXRHitTestSource.h"
+#pragma once
 
-#include <wtf/Ref.h>
-#include <wtf/TZoneMallocInlines.h>
-
-#if ENABLE(WEBXR_HIT_TEST)
+#if ENABLE(PICTURE_IN_PICTURE_API)
 
 namespace WebCore {
 
-WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(WebXRHitTestSource);
+class Element;
+class TreeScope;
 
-Ref<WebXRHitTestSource> WebXRHitTestSource::create()
-{
-    return adoptRef(*new WebXRHitTestSource);
-}
-
-WebXRHitTestSource::WebXRHitTestSource() = default;
-
-WebXRHitTestSource::~WebXRHitTestSource() = default;
-
-void WebXRHitTestSource::cancel()
-{
-}
+class DocumentOrShadowRootPictureInPicture {
+public:
+    static Element* pictureInPictureElement(TreeScope&);
+};
 
 } // namespace WebCore
 
-#endif // ENABLE(WEBXR_HIT_TEST)
+#endif

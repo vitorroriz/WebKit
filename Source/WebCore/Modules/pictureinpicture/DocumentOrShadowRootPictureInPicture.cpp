@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Igalia S.L. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,30 +24,34 @@
  */
 
 #include "config.h"
-#include "WebXRHitTestSource.h"
 
-#include <wtf/Ref.h>
-#include <wtf/TZoneMallocInlines.h>
+#if ENABLE(PICTURE_IN_PICTURE_API)
+#include "DocumentOrShadowRootPictureInPicture.h"
 
-#if ENABLE(WEBXR_HIT_TEST)
+#include "Document.h"
+#include "HTMLVideoElement.h"
+#include "TreeScopeInlines.h"
 
 namespace WebCore {
 
-WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(WebXRHitTestSource);
-
-Ref<WebXRHitTestSource> WebXRHitTestSource::create()
+// https://w3c.github.io/picture-in-picture/#documentorshadowroot-extension
+Element* DocumentOrShadowRootPictureInPicture::pictureInPictureElement(TreeScope& treeScope)
 {
-    return adoptRef(*new WebXRHitTestSource);
-}
+    // The pictureInPictureElement attribute’s getter must run these steps:
+    // 1. If this is a shadow root and its host is not connected, return null and abort these steps.
+    if (RefPtr shadowHost = treeScope.rootNode().shadowHost(); shadowHost && shadowHost->isConnected())
+        return nullptr;
 
-WebXRHitTestSource::WebXRHitTestSource() = default;
+    // 2. Let candidate be the result of retargeting Picture-in-Picture element against this.
+    // 3. If candidate and this are in the same tree, return candidate and abort these steps.
+    Ref document = treeScope.documentScope();
+    if (RefPtr pictureInPictureElement = document->pictureInPictureElement())
+        return treeScope.ancestorElementInThisScope(pictureInPictureElement.get());
 
-WebXRHitTestSource::~WebXRHitTestSource() = default;
-
-void WebXRHitTestSource::cancel()
-{
+    // 4. Return null.
+    return nullptr;
 }
 
 } // namespace WebCore
 
-#endif // ENABLE(WEBXR_HIT_TEST)
+#endif

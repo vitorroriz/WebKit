@@ -139,16 +139,6 @@ class RemotePlayback;
 using CueInterval = PODInterval<MediaTime, TextTrackCue*>;
 using CueList = Vector<CueInterval>;
 
-enum class HTMLMediaElementSourceType : uint8_t {
-    File,
-    HLS,
-    MediaSource,
-    ManagedMediaSource,
-    MediaStream,
-    LiveStream,
-    StoredStream,
-};
-
 using MediaProvider = std::optional < Variant <
 #if ENABLE(MEDIA_STREAM)
     RefPtr<MediaStream>,
@@ -604,8 +594,8 @@ public:
     void allowsMediaDocumentInlinePlaybackChanged();
     void updateShouldPlay();
 
-    inline bool hasRenderer() const; // Defined in RenderMedia.h.
-    inline RenderMedia* renderer() const; // Defined in RenderMedia.h.
+    inline bool hasRenderer() const; // Defined in RenderMediaInlines.h.
+    inline RenderMedia* renderer() const; // Defined in RenderMediaInlines.h.
 
     void resetPlaybackSessionState();
     WEBCORE_EXPORT bool isVisibleInViewport() const;

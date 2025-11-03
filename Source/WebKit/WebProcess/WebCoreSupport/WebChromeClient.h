@@ -27,12 +27,12 @@
 #pragma once
 
 #include <WebCore/ChromeClient.h>
-#include <WebCore/HTMLVideoElement.h>
 #include <wtf/TZoneMalloc.h>
 #include <wtf/WeakRef.h>
 
 namespace WebCore {
 class HTMLImageElement;
+class HTMLVideoElement;
 class RegistrableDomain;
 enum class BroadcastFocusedElement : bool;
 enum class CookieConsentDecisionResult : uint8_t;

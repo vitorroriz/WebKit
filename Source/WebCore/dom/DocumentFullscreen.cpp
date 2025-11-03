@@ -53,7 +53,7 @@
 #include "PseudoClassChangeInvalidation.h"
 #include "QualifiedName.h"
 #include "RenderBlock.h"
-#include "RenderVideo.h"
+#include "RenderVideoInlines.h"
 #include "SVGElementTypeHelpers.h"
 #include "SVGSVGElement.h"
 #include "Settings.h"

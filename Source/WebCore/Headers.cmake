@@ -3119,6 +3119,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     rendering/RenderLineBreak.h
     rendering/RenderListItem.h
     rendering/RenderMedia.h
+    rendering/RenderMediaInlines.h
     rendering/RenderModel.h
     rendering/RenderObject.h
     rendering/RenderObjectDocument.h
@@ -3138,6 +3139,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     rendering/RenderTreeAsText.h
     rendering/RenderTreeMutationDisallowedScope.h
     rendering/RenderVideo.h
+    rendering/RenderVideoInlines.h
     rendering/RenderView.h
     rendering/RenderViewTransitionCapture.h
     rendering/RenderWidget.h

@@ -36,7 +36,7 @@
 #import "PlaybackSessionInterfaceAVKitLegacy.h"
 #import "PlaybackSessionModelMediaElement.h"
 #import "RenderObjectInlines.h"
-#import "RenderVideo.h"
+#import "RenderVideoInlines.h"
 #import "TimeRanges.h"
 #import "VideoPresentationInterfaceAVKitLegacy.h"
 #import "VideoPresentationModelVideoElement.h"

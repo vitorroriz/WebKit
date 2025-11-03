@@ -119,6 +119,7 @@
 #include "PseudoClassChangeInvalidation.h"
 #include "RegistrableDomain.h"
 #include "RenderBoxInlines.h"
+#include "RenderMediaInlines.h"
 #include "RenderTheme.h"
 #include "RenderVideo.h"
 #include "RenderView.h"

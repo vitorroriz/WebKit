@@ -27,7 +27,6 @@
 
 #if ENABLE(VIDEO)
 
-#include "HTMLMediaElement.h"
 #include "JSValueInWrappedObject.h"
 #include "MediaSession.h"
 #include <wtf/Ref.h>
@@ -48,6 +47,8 @@ class TextTrack;
 class TextTrackList;
 class TextTrackRepresentation;
 class VoidCallback;
+
+enum class HTMLMediaElementSourceType : uint8_t;
 
 class MediaControlsHost final
     : public CanMakeWeakPtr<MediaControlsHost>
@@ -127,7 +128,7 @@ public:
     bool showMediaControlsContextMenu(HTMLElement&, String&& optionsJSONString, Ref<VoidCallback>&&);
 #endif // ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS)
 
-    using SourceType = HTMLMediaElement::SourceType;
+    using SourceType = HTMLMediaElementSourceType;
     std::optional<SourceType> sourceType() const;
 
     void presentationModeChanged();
