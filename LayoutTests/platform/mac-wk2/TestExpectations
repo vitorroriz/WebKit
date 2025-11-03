@@ -2409,6 +2409,3 @@ webkit.org/b/301566 [ Debug ] imported/w3c/web-platform-tests/custom-elements/re
 [ Tahoe Debug arm64 ] http/tests/media/hls/range-request-cross-origin.html [ Timeout ]
 [ Tahoe Debug arm64 ] http/tests/media/hls/track-in-band-multiple-cues.html [ Timeout ]
 [ Tahoe Debug arm64 ] http/tests/media/hls/track-webvtt-multitracks.html [ Timeout ]
-
-webkit.org/b/301700 [ Tahoe ] fast/forms/month/month-editable-components/month-editable-components-mouse-events.html [ Failure ]
-webkit.org/b/301700 [ Tahoe ] fast/forms/time/time-editable-components/time-editable-components-mouse-events.html [ Failure ]
