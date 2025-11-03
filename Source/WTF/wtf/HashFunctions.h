@@ -270,7 +270,13 @@ namespace WTF {
     template<HashableWithMemberFunction T> struct MemberBasedHash {
         static unsigned hash(const T& key) { return key.hash(); }
         static bool equal(const T& a, const T& b) { return a == b; }
-        static constexpr bool safeToCompareToEmptyOrDeleted = false;
+        static constexpr bool safeToCompareToEmptyOrDeleted = [] {
+            if constexpr (requires { T::safeToCompareToHashTableEmptyOrDeletedValue; }) {
+                static_assert(std::same_as<decltype(T::safeToCompareToHashTableEmptyOrDeletedValue), const bool>);
+                return T::safeToCompareToHashTableEmptyOrDeletedValue;
+            } else
+                return false;
+        }();
     };
     template<HashableWithMemberFunction T> struct DefaultHash<T> : MemberBasedHash<T> { };
 

@@ -399,6 +399,8 @@ public:
         return m_isHashTableDeletedValue;
     }
 
+    static constexpr bool safeToCompareToHashTableEmptyOrDeletedValue = true;
+
     bool isEmoji() const
     {
 #if PLATFORM(IOS_FAMILY)
