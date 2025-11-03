@@ -1389,6 +1389,7 @@ set(WebCore_NON_SVG_IDL_FILES
     html/HTMLQuoteElement.idl
     html/HTMLScriptElement.idl
     html/HTMLSelectElement.idl
+    html/HTMLSelectedContentElement.idl
     html/HTMLSlotElement.idl
     html/HTMLSourceElement.idl
     html/HTMLSpanElement.idl

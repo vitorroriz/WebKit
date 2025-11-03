@@ -1642,6 +1642,8 @@ $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSHTMLScriptElement.cpp
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSHTMLScriptElement.h
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSHTMLSelectElement.cpp
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSHTMLSelectElement.h
+$(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSHTMLSelectedContentElement.cpp
+$(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSHTMLSelectedContentElement.h
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSHTMLSlotElement.cpp
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSHTMLSlotElement.h
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSHTMLSourceElement.cpp

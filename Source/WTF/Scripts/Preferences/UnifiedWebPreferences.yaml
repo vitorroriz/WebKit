@@ -3430,6 +3430,20 @@ HTMLEnhancedSelectParsingEnabled:
      WebCore:
        default: false
 
+HTMLEnhancedSelectSelectedContentEnabled:
+   type: bool
+   status: unstable
+   category: dom
+   humanReadableName: "Enhanced HTML select: selectedcontent element"
+   humanReadableDescription: "Enable enhanced HTML select: selectedcontent element"
+   defaultValue:
+     WebKitLegacy:
+       default: false
+     WebKit:
+       default: false
+     WebCore:
+       default: false
+
 HTMLLegacyAttributeValueSerializationEnabled:
    type: bool
    status: internal

@@ -1676,6 +1676,7 @@ $(PROJECT_DIR)/html/HTMLProgressElement.idl
 $(PROJECT_DIR)/html/HTMLQuoteElement.idl
 $(PROJECT_DIR)/html/HTMLScriptElement.idl
 $(PROJECT_DIR)/html/HTMLSelectElement.idl
+$(PROJECT_DIR)/html/HTMLSelectedContentElement.idl
 $(PROJECT_DIR)/html/HTMLSlotElement.idl
 $(PROJECT_DIR)/html/HTMLSourceElement.idl
 $(PROJECT_DIR)/html/HTMLSpanElement.idl

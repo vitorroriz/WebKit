@@ -1356,6 +1356,7 @@ JS_BINDING_IDLS := \
     $(WebCore)/html/HTMLQuoteElement.idl \
     $(WebCore)/html/HTMLScriptElement.idl \
     $(WebCore)/html/HTMLSelectElement.idl \
+    $(WebCore)/html/HTMLSelectedContentElement.idl \
     $(WebCore)/html/HTMLSlotElement.idl \
     $(WebCore)/html/HTMLSourceElement.idl \
     $(WebCore)/html/HTMLSpanElement.idl \
