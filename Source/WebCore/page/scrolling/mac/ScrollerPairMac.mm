@@ -139,8 +139,8 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(ScrollerPairMac);
 
 ScrollerPairMac::ScrollerPairMac(ScrollingTreeScrollingNode& node)
     : m_scrollingNode(node)
-    , m_verticalScroller(*this, ScrollbarOrientation::Vertical)
-    , m_horizontalScroller(*this, ScrollbarOrientation::Horizontal)
+    , m_verticalScroller(makeUniqueRef<ScrollerMac>(*this, ScrollbarOrientation::Vertical))
+    , m_horizontalScroller(makeUniqueRef<ScrollerMac>(*this, ScrollbarOrientation::Horizontal))
 {
 }
 
@@ -234,18 +234,18 @@ void ScrollerPairMac::contentsSizeChanged()
 void ScrollerPairMac::setUsePresentationValues(bool inMomentumPhase)
 {
     m_usingPresentationValues = inMomentumPhase;
-    m_horizontalScroller.setUsePresentationValue(m_usingPresentationValues);
-    m_verticalScroller.setUsePresentationValue(m_usingPresentationValues);
+    m_horizontalScroller->setUsePresentationValue(m_usingPresentationValues);
+    m_verticalScroller->setUsePresentationValue(m_usingPresentationValues);
 }
 
 void ScrollerPairMac::setHorizontalScrollbarPresentationValue(float scrollbValue)
 {
-    m_horizontalScroller.setUsePresentationValue(scrollbValue);
+    m_horizontalScroller->setUsePresentationValue(scrollbValue);
 }
 
 void ScrollerPairMac::setVerticalScrollbarPresentationValue(float scrollbValue)
 {
-    m_verticalScroller.setUsePresentationValue(scrollbValue);
+    m_verticalScroller->setUsePresentationValue(scrollbValue);
 }
 
 void ScrollerPairMac::updateValues()
@@ -355,8 +355,8 @@ void ScrollerPairMac::setScrollbarStyle(ScrollbarStyle style)
     m_scrollbarStyle = style;
 
     ensureOnMainThreadWithProtectedThis([scrollerStyle = nsScrollerStyle(style)](auto& scrollerPair) {
-        scrollerPair.m_horizontalScroller.updateScrollbarStyle();
-        scrollerPair.m_verticalScroller.updateScrollbarStyle();
+        scrollerPair.m_horizontalScroller->updateScrollbarStyle();
+        scrollerPair.m_verticalScroller->updateScrollbarStyle();
         [scrollerPair.m_scrollerImpPair setScrollerStyle:scrollerStyle];
     });
 }
