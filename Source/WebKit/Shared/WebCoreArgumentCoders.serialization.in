@@ -6733,6 +6733,7 @@ header: <WebCore/TextExtractionTypes.h>
 header: <WebCore/TextExtractionTypes.h>
 [CustomHeader] struct WebCore::TextExtraction::Request {
     std::optional<WebCore::FloatRect> collectionRectInRootView;
+    std::optional<WebCore::JSHandleIdentifier> targetNodeHandleIdentifier;
     bool mergeParagraphs;
     bool skipNearlyTransparentContent;
     bool includeNodeIdentifiers;

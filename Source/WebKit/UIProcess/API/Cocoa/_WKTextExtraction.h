@@ -30,6 +30,7 @@
 NS_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @class WKWebView;
+@class _WKJSHandle;
 
 WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
 @interface _WKTextExtractionConfiguration : NSObject
@@ -76,6 +77,12 @@ WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
  The default value is `NSUIntegerMax`.
  */
 @property (nonatomic) NSUInteger maxWordsPerParagraph;
+
+/*!
+ If specified, text extraction is limited to the subtree of this node.
+ The default value is `nil`.
+ */
+@property (nonatomic, copy, nullable) _WKJSHandle *targetNode;
 
 @end
 

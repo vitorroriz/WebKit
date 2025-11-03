@@ -59,6 +59,7 @@
 #include "HighlightRegistry.h"
 #include "HitTestResult.h"
 #include "ImageOverlay.h"
+#include "JSNode.h"
 #include "LocalFrame.h"
 #include "Page.h"
 #include "PlatformKeyboardEvent.h"
@@ -154,30 +155,41 @@ struct TraversalContext {
     }
 };
 
-static inline TextAndSelectedRangeMap collectText(Document& document)
+static inline TextAndSelectedRangeMap collectText(Node& node)
 {
-    auto fullRange = makeRangeSelectingNodeContents(*document.body());
-    auto selection = document.selection().selection();
+    auto nodeRange = makeRangeSelectingNodeContents(node);
+    auto selection = node.document().selection().selection();
     TextNodesAndText textBeforeRangedSelection;
     TextNodesAndText textInRangedSelection;
     TextNodesAndText textAfterRangedSelection;
-    [&] {
-        if (selection.isRange()) {
-            auto selectionStart = selection.start();
-            auto selectionEnd = selection.end();
-            auto rangeBeforeSelection = makeSimpleRange(fullRange.start, selectionStart);
-            auto selectionRange = makeSimpleRange(selectionStart, selectionEnd);
-            auto rangeAfterSelection = makeSimpleRange(selectionEnd, fullRange.end);
-            if (rangeBeforeSelection && selectionRange && rangeAfterSelection) {
-                textBeforeRangedSelection = collectText(*rangeBeforeSelection);
-                textInRangedSelection = collectText(*selectionRange);
-                textAfterRangedSelection = collectText(*rangeAfterSelection);
-                return;
-            }
-        }
-        // Fall back to collecting the full document.
-        textBeforeRangedSelection = collectText(fullRange);
+    bool populatedRangesAroundSelection = [&] {
+        if (!selection.isRange())
+            return false;
+
+        auto selectionStart = makeBoundaryPoint(selection.start());
+        auto selectionEnd = makeBoundaryPoint(selection.end());
+        if (!selectionStart || !selectionEnd)
+            return false;
+
+        if (is_lt(treeOrder(*selectionStart, nodeRange.start)))
+            selectionStart = { nodeRange.start };
+
+        if (is_gt(treeOrder(*selectionEnd, nodeRange.end)))
+            selectionEnd = { nodeRange.end };
+
+        auto rangeBeforeSelection = makeSimpleRange(nodeRange.start, *selectionStart);
+        auto selectionRange = makeSimpleRange(*selectionStart, *selectionEnd);
+        auto rangeAfterSelection = makeSimpleRange(*selectionEnd, nodeRange.end);
+        textBeforeRangedSelection = collectText(rangeBeforeSelection);
+        textInRangedSelection = collectText(selectionRange);
+        textAfterRangedSelection = collectText(rangeAfterSelection);
+        return true;
     }();
+
+    if (!populatedRangesAroundSelection) {
+        // Fall back to collecting the full contents of the node.
+        textBeforeRangedSelection = collectText(nodeRange);
+    }
 
     TextAndSelectedRangeMap result;
     for (auto& [node, text] : textBeforeRangedSelection)
@@ -710,9 +722,26 @@ Item extractItem(Request&& request, Page& page)
     mainDocument->updateLayoutIgnorePendingStylesheets();
     root.rectInRootView = rootViewBounds(*bodyElement);
 
+    RefPtr extractionRootNode = [&] -> Node* {
+        if (!request.targetNodeHandleIdentifier)
+            return bodyElement.get();
+
+        auto [globalObject, object] = WebKitJSHandle::objectForIdentifier(*request.targetNodeHandleIdentifier);
+        if (!globalObject || !object)
+            return nullptr;
+
+        if (auto* jsNode = jsDynamicCast<JSNode*>(object))
+            return &jsNode->wrapped();
+
+        return nullptr;
+    }();
+
+    if (!extractionRootNode)
+        return root;
+
     {
         TraversalContext context {
-            .visibleText = collectText(*mainDocument),
+            .visibleText = collectText(*extractionRootNode),
             .rectInRootView = WTFMove(request.collectionRectInRootView),
             .onlyCollectTextAndLinksCount = 0,
             .mergeParagraphs = request.mergeParagraphs,
@@ -721,7 +750,7 @@ Item extractItem(Request&& request, Page& page)
             .includeEventListeners = request.includeEventListeners,
             .includeAccessibilityAttributes = request.includeAccessibilityAttributes,
         };
-        extractRecursive(*bodyElement, root, context);
+        extractRecursive(*extractionRootNode, root, context);
     }
 
     pruneWhitespaceRecursive(root);
