@@ -3452,6 +3452,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/shapes/StylePathOperationWrappers.h
     style/values/shapes/StylePolygonFunction.h
     style/values/shapes/StyleRectFunction.h
+    style/values/shapes/StyleShapeForward.h
     style/values/shapes/StyleShapeFunction.h
     style/values/shapes/StyleShapeImageThreshold.h
     style/values/shapes/StyleShapeMargin.h
