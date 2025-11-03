@@ -2940,8 +2940,7 @@ FacebookLiveRecordingQuirkEnabled:
     WebKitLegacy:
       default: false
     WebKit:
-      PLATFORM(MAC): true
-      default: false
+      default: WebKit::defaultFacebookLiveRecordingQuirkEnabled()
     WebCore:
       default: false
 
