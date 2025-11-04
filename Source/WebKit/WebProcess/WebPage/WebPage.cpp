@@ -4924,7 +4924,7 @@ void WebPage::updatePreferences(const WebPreferencesStore& store)
 void WebPage::setDataDetectionResults(NSArray *detectionResults)
 {
     DataDetectionResult dataDetectionResult;
-    dataDetectionResult.results = detectionResults;
+    dataDetectionResult.setResults(detectionResults);
     send(Messages::WebPageProxy::SetDataDetectionResult(dataDetectionResult));
 }
 
@@ -4960,7 +4960,7 @@ static void detectDataInFrame(const Ref<Frame>& frame, OptionSet<WebCore::DataDe
     DataDetection::detectContentInFrame(localFrame.get(), dataDetectorTypes, dataDetectionReferenceDate, [localFrame, mainFrameResult = WTFMove(mainFrameResult), dataDetectionReferenceDate, completionHandler = WTFMove(completionHandler), dataDetectorTypes](NSArray *results) mutable {
         localFrame->dataDetectionResults().setDocumentLevelResults(results);
         if (localFrame->isMainFrame())
-            mainFrameResult->results = results;
+            mainFrameResult->setResults(results);
 
         RefPtr next = localFrame->tree().traverseNext();
         if (!next) {

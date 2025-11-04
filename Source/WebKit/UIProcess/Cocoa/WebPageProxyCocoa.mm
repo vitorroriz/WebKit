@@ -225,7 +225,9 @@ void WebPageProxy::layerTreeCommitComplete()
 
 void WebPageProxy::setDataDetectionResult(DataDetectionResult&& dataDetectionResult)
 {
-    m_dataDetectionResults = WTFMove(dataDetectionResult.results);
+    m_dataDetectionResults = createNSArray(dataDetectionResult.results, [](const RetainPtr<DDScannerResult>& result) {
+        return result.get();
+    });
 }
 
 void WebPageProxy::handleClickForDataDetectionResult(const DataDetectorElementInfo& info, const IntPoint& clickLocation)

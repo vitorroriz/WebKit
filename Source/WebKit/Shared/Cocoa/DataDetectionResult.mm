@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,27 +23,24 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DataDetectionResult_h
-#define DataDetectionResult_h
+#import "config.h"
 
 #if ENABLE(DATA_DETECTION)
+#import "DataDetectionResult.h"
 
-#import "ArgumentCoders.h"
+#import <wtf/cocoa/TypeCastsCocoa.h>
+#import <wtf/cocoa/VectorCocoa.h>
 
-#import <wtf/RetainPtr.h>
-
-OBJC_CLASS DDScannerResult;
+#import <pal/cocoa/DataDetectorsCoreSoftLink.h>
 
 namespace WebKit {
 
-struct DataDetectionResult {
-    WTF_DEPRECATED_MAKE_STRUCT_FAST_ALLOCATED(DataDetectionResult);
-    void setResults(NSArray *detectionResults);
-    Vector<RetainPtr<DDScannerResult>> results;
-};
-
+void DataDetectionResult::setResults(NSArray *detectionResults)
+{
+    results = makeVector(detectionResults, [](DDScannerResult *result) {
+        return std::optional(RetainPtr<DDScannerResult>(result));
+    });
 }
 
-#endif // ENABLE(DATA_DETECTION)
-
-#endif // DataDetectionResult_h
+}
+#endif
