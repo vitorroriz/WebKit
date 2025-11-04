@@ -766,49 +766,6 @@ TEST_P(ConnectionRunLoopTest, SendSyncMaintainOrderingWithAsyncMessagesWaitForOr
     localReferenceBarrier();
 }
 
-class AutoWorkQueue {
-public:
-    class WorkQueueWithShutdown : public WorkQueue {
-    public:
-        static Ref<WorkQueueWithShutdown> create(ASCIILiteral name) { return adoptRef(*new WorkQueueWithShutdown(name)); }
-        void beginShutdown()
-        {
-            dispatch([this, strong = Ref { *this }] {
-                m_shutdown = true;
-                m_semaphore.signal();
-            });
-        }
-        void waitUntilShutdown()
-        {
-            while (!m_shutdown)
-                m_semaphore.wait();
-        }
-
-    private:
-        WorkQueueWithShutdown(ASCIILiteral name)
-            : WorkQueue(name, QOS::Default)
-        {
-        }
-        std::atomic<bool> m_shutdown { false };
-        BinarySemaphore m_semaphore;
-    };
-
-    AutoWorkQueue()
-        : m_workQueue(WorkQueueWithShutdown::create("com.apple.WebKit.Test.simple"_s))
-    {
-    }
-
-    Ref<WorkQueueWithShutdown> queue() { return m_workQueue; }
-
-    ~AutoWorkQueue()
-    {
-        m_workQueue->waitUntilShutdown();
-    }
-
-private:
-    Ref<WorkQueueWithShutdown> m_workQueue;
-};
-
 TEST_P(ConnectionRunLoopTest, RunLoopSendAsyncOnTarget)
 {
     HashSet<uint64_t> replies;
