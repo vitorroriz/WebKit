@@ -293,7 +293,14 @@ void WebPage::getRenderProcessInfo(CompletionHandler<void(RenderProcessInfo&&)>&
 
     if (info.platform != "WPE"_s) {
         info.supportedBufferFormats = display->bufferFormats().map([](const auto& format) -> RendererBufferFormat::Format {
-            return { format.fourcc.value, format.modifiers };
+            return {
+                format.fourcc.value,
+#if USE(GBM)
+                format.modifiers,
+#else
+                { },
+#endif
+            };
         });
     }
 
