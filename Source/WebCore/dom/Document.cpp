@@ -4194,6 +4194,11 @@ HTMLElement* Document::bodyOrFrameset() const
     return nullptr;
 }
 
+RefPtr<HTMLElement> Document::protectedBodyOrFrameset() const
+{
+    return bodyOrFrameset();
+}
+
 ExceptionOr<void> Document::setBodyOrFrameset(RefPtr<HTMLElement>&& newBody)
 {
     if (!is<HTMLBodyElement>(newBody) && !is<HTMLFrameSetElement>(newBody))

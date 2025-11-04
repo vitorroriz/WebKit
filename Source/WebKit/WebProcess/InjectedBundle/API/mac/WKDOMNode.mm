@@ -64,7 +64,7 @@
     if (!node)
         return;
 
-    _impl->insertBefore(*WebKit::toWebCoreNode(node), WebKit::toWebCoreNode(refNode));
+    _impl->insertBefore(*WebKit::toProtectedWebCoreNode(node).get(), WebKit::toProtectedWebCoreNode(refNode).get());
 }
 
 - (void)appendChild:(WKDOMNode *)node
@@ -72,7 +72,7 @@
     if (!node)
         return;
 
-    _impl->appendChild(*WebKit::toWebCoreNode(node));
+    _impl->appendChild(*WebKit::toProtectedWebCoreNode(node).get());
 }
 
 - (void)removeChild:(WKDOMNode *)node
@@ -80,42 +80,42 @@
     if (!node)
         return;
 
-    _impl->removeChild(*WebKit::toWebCoreNode(node));
+    _impl->removeChild(*WebKit::toProtectedWebCoreNode(node).get());
 }
 
 - (WKDOMDocument *)document
 {
-    return WebKit::toWKDOMDocument(&_impl->document());
+    return WebKit::toWKDOMDocument(_impl->protectedDocument().ptr());
 }
 
 - (WKDOMNode *)parentNode
 {
-    return WebKit::toWKDOMNode(_impl->parentNode());
+    return WebKit::toWKDOMNode(_impl->protectedParentNode().get());
 }
 
 - (WKDOMNode *)firstChild
 {
-    return WebKit::toWKDOMNode(_impl->firstChild());
+    return WebKit::toWKDOMNode(_impl->protectedFirstChild().get());
 }
 
 - (WKDOMNode *)lastChild
 {
-    return WebKit::toWKDOMNode(_impl->lastChild());
+    return WebKit::toWKDOMNode(_impl->protectedLastChild().get());
 }
 
 - (WKDOMNode *)previousSibling
 {
-    return WebKit::toWKDOMNode(_impl->previousSibling());
+    return WebKit::toWKDOMNode(_impl->protectedPreviousSibling().get());
 }
 
 - (WKDOMNode *)nextSibling
 {
-    return WebKit::toWKDOMNode(_impl->nextSibling());
+    return WebKit::toWKDOMNode(_impl->protectedNextSibling().get());
 }
 
 - (NSArray *)textRects
 {
-    _impl->document().updateLayout(WebCore::LayoutOptions::IgnorePendingStylesheets);
+    _impl->protectedDocument()->updateLayout(WebCore::LayoutOptions::IgnorePendingStylesheets);
     if (!_impl->renderer())
         return nil;
     return createNSArray(WebCore::RenderObject::absoluteTextRects(WebCore::makeRangeSelectingNodeContents(*_impl))).autorelease();
@@ -127,7 +127,7 @@
 
 - (WKBundleNodeHandleRef)_copyBundleNodeHandleRef
 {
-    return toAPI(WebKit::InjectedBundleNodeHandle::getOrCreate(_impl.get()).leakRef());
+    return toAPILeakingRef(WebKit::InjectedBundleNodeHandle::getOrCreate(_impl.get()));
 }
 
 @end

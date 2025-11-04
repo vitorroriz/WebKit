@@ -69,7 +69,7 @@
 
 - (WKDOMElement *)body
 {
-    return WebKit::toWKDOMElement(downcast<WebCore::Document>(*_impl).bodyOrFrameset());
+    return WebKit::toWKDOMElement(downcast<WebCore::Document>(*_impl).protectedBodyOrFrameset().get());
 }
 
 - (WKDOMNode *)createDocumentFragmentWithMarkupString:(NSString *)markupString baseURL:(NSURL *)baseURL
