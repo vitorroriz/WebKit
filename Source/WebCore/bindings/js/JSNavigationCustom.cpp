@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Apple Inc. All rights reserved.
+* Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,19 +24,21 @@
  */
 
 #include "config.h"
+#include "JSNavigation.h"
+
 #include "JSNavigateEvent.h"
+#include "NavigateEvent.h"
 
 namespace WebCore {
 
 template<typename Visitor>
-void JSNavigateEvent::visitAdditionalChildren(Visitor& visitor)
+void JSNavigation::visitAdditionalChildren(Visitor& visitor)
 {
-    auto& event = wrapped();
-    event.infoWrapper().visit(visitor);
-    if (auto* signal = event.signal())
-        addWebCoreOpaqueRoot(visitor, signal);
+    // We cannot ref the event on the GC thread.
+    SUPPRESS_UNCOUNTED_ARG if (auto* event = wrapped().ongoingNavigateEvent())
+        addWebCoreOpaqueRoot(visitor, event);
 }
 
-DEFINE_VISIT_ADDITIONAL_CHILDREN(JSNavigateEvent);
+DEFINE_VISIT_ADDITIONAL_CHILDREN(JSNavigation);
 
 } // namespace WebCore
