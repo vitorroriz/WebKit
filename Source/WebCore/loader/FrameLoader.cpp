@@ -4426,11 +4426,6 @@ bool FrameLoader::dispatchNavigateEvent(FrameLoadType loadType, const FrameLoadR
 
     RefPtr sourceElement = event ? dynamicDowncast<Element>(event->target()) : nullptr;
 
-    // For non-form navigations, if sourceElement is from a different frame, it should be null.
-    // For form submissions, sourceElement can be from a different frame (when form has target attribute).
-    if (!formState && sourceElement && sourceElement->document().frame() != m_frame.ptr())
-        sourceElement = nullptr;
-
     return window->protectedNavigation()->dispatchPushReplaceReloadNavigateEvent(newURL, navigationType, isSameDocument, formState, classicHistoryAPIState, sourceElement.get());
 }
 
