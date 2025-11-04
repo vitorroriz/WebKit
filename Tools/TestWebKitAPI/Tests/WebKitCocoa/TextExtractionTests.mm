@@ -262,4 +262,32 @@ TEST(TextExtractionTests, TargetNodeAndClientAttributes)
     EXPECT_FALSE([debugText containsString:@"Recipient address"]);
 }
 
+TEST(TextExtractionTests, ReplacementStrings)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:^{
+        RetainPtr configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+        [[configuration preferences] _setTextExtractionEnabled:YES];
+        return configuration.autorelease();
+    }()]);
+    [webView synchronouslyLoadTestPageNamed:@"debug-text-extraction"];
+
+    RetainPtr debugTextWithoutReplacements = [webView synchronouslyGetDebugText:nil];
+    EXPECT_TRUE([debugTextWithoutReplacements containsString:@"The quick brown fox jumped over the lazy dog"]);
+
+    RetainPtr debugTextWithReplacements = [webView synchronouslyGetDebugText:^{
+        RetainPtr configuration = adoptNS([_WKTextExtractionConfiguration new]);
+        [configuration setReplacementStrings:@{
+            @"fox": @"cat",
+            @"dog": @"mouse",
+            @"lazy": @""
+        }];
+        return configuration.autorelease();
+    }()];
+
+    EXPECT_FALSE([debugTextWithReplacements containsString:@"fox"]);
+    EXPECT_FALSE([debugTextWithReplacements containsString:@"dog"]);
+    EXPECT_FALSE([debugTextWithReplacements containsString:@"lazy"]);
+    EXPECT_TRUE([debugTextWithReplacements containsString:@"The quick brown cat jumped over the  mouse"]);
+}
+
 } // namespace TestWebKitAPI

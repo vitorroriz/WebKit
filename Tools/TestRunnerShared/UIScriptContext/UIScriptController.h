@@ -65,6 +65,7 @@ struct TextExtractionTestOptions {
     bool includeNodeIdentifiers { false };
     bool includeEventListeners { false };
     bool includeAccessibilityAttributes { false };
+    bool includeTextInAutoFilledControls { false };
     bool mergeParagraphs { false };
     bool skipNearlyTransparentContent { false };
 };

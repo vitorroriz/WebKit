@@ -81,6 +81,7 @@ struct Request {
     bool includeNodeIdentifiers { false };
     bool includeEventListeners { false };
     bool includeAccessibilityAttributes { false };
+    bool includeTextInAutoFilledControls { false };
 };
 
 struct Editable {

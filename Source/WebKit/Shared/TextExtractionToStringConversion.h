@@ -59,19 +59,22 @@ struct TextExtractionOptions {
     TextExtractionOptions(TextExtractionOptions&& other)
         : filterCallback(WTFMove(other.filterCallback))
         , nativeMenuItems(WTFMove(other.nativeMenuItems))
+        , replacementStrings(WTFMove(other.replacementStrings))
         , flags(other.flags)
     {
     }
 
-    TextExtractionOptions(TextExtractionFilterCallback&& filter, Vector<String>&& items, TextExtractionOptionFlags flags)
+    TextExtractionOptions(TextExtractionFilterCallback&& filter, Vector<String>&& items, HashMap<String, String>&& replacementStrings, TextExtractionOptionFlags flags)
         : filterCallback(WTFMove(filter))
         , nativeMenuItems(WTFMove(items))
+        , replacementStrings(WTFMove(replacementStrings))
         , flags(flags)
     {
     }
 
     TextExtractionFilterCallback filterCallback;
     Vector<String> nativeMenuItems;
+    HashMap<String, String> replacementStrings;
     TextExtractionOptionFlags flags;
 };
 

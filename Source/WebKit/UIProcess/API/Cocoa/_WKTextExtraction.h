@@ -73,6 +73,12 @@ WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
 @property (nonatomic) BOOL includeAccessibilityAttributes;
 
 /*!
+ Include text content underneath form controls that have been modified via AutoFill.
+ The default value is `YES`.
+ */
+@property (nonatomic) BOOL includeTextInAutoFilledControls;
+
+/*!
  Max number of words to include per paragraph; remaining text is truncated with an ellipsis (…).
  The default value is `NSUIntegerMax`.
  */
@@ -89,6 +95,14 @@ WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
  Will appear as "attribute=value" in text extraction output.
  */
 - (void)addClientAttribute:(NSString *)attributeName value:(NSString *)attributeValue forNode:(_WKJSHandle *)node;
+
+/*!
+ A mapping of strings to replace in text extraction output.
+ Each key represents a string that should be replaced, and the corresponding
+ value represents the string to replace it with.
+ The default value is `nil`.
+ */
+@property (nonatomic, copy, nullable) NSDictionary<NSString *, NSString *> *replacementStrings;
 
 @end
 

@@ -6611,6 +6611,19 @@ static String joinAndTruncateLinesToWordLimit(Vector<String>&& components, std::
     return makeStringByJoining(WTFMove(truncatedComponents), "\n"_s);
 }
 
+static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfiguration *configuration)
+{
+    HashMap<String, String> result;
+    RetainPtr replacementStrings = [configuration replacementStrings];
+    for (NSString *replacement in replacementStrings.get()) {
+        if (!replacement.length)
+            continue;
+
+        result.set(String { replacement }, String { [replacementStrings objectForKey:replacement] });
+    }
+    return result;
+}
+
 - (void)_debugTextWithConfiguration:(_WKTextExtractionConfiguration *)configuration completionHandler:(void(^)(NSString *))completionHandler
 {
     bool shouldFilter = configuration.shouldFilterText && _page->protectedPreferences()->textExtractionFilterEnabled();
@@ -6630,8 +6643,9 @@ static String joinAndTruncateLinesToWordLimit(Vector<String>&& components, std::
         shouldFilter,
         includeURLs = configuration.includeURLs,
         includeRects = configuration.includeRects,
-        maxWordsPerParagraph = WTFMove(maxWordsPerParagraph)
-    ](auto&& item) {
+        maxWordsPerParagraph = WTFMove(maxWordsPerParagraph),
+        replacementStrings = extractReplacementStrings(configuration)
+    ](auto&& item) mutable {
         RetainPtr strongSelf = weakSelf.get();
         if (!strongSelf)
             return completionHandler(nil);
@@ -6699,7 +6713,7 @@ static String joinAndTruncateLinesToWordLimit(Vector<String>&& components, std::
         if (includeRects)
             optionFlags.add(IncludeRects);
 
-        WebKit::TextExtractionOptions options { WTFMove(filterCallback), [strongSelf _activeNativeMenuItemTitles], optionFlags };
+        WebKit::TextExtractionOptions options { WTFMove(filterCallback), [strongSelf _activeNativeMenuItemTitles], WTFMove(replacementStrings), optionFlags };
         WebKit::convertToText(WTFMove(*item), WTFMove(options), [completionHandler = WTFMove(completionHandler)](auto&& string) {
             completionHandler(string.createNSString().get());
         });
@@ -6894,6 +6908,7 @@ static HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> extractClie
         .includeNodeIdentifiers = includeNodeIdentifiers,
         .includeEventListeners = !!configuration.includeEventListeners,
         .includeAccessibilityAttributes = !!configuration.includeAccessibilityAttributes,
+        .includeTextInAutoFilledControls = !!configuration.includeTextInAutoFilledControls,
     };
 
     _page->requestTextExtraction(WTFMove(request), WTFMove(completion));

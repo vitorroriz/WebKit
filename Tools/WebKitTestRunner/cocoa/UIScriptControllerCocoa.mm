@@ -348,6 +348,7 @@ RetainPtr<_WKTextExtractionConfiguration> createTextExtractionConfiguration(WKWe
     [configuration setIncludeNodeIdentifiers:options && options->includeNodeIdentifiers];
     [configuration setIncludeEventListeners:options && options->includeEventListeners];
     [configuration setIncludeAccessibilityAttributes:options && options->includeAccessibilityAttributes];
+    [configuration setIncludeTextInAutoFilledControls:options && options->includeTextInAutoFilledControls];
     if (auto wordLimit = options ? options->wordLimit : 0)
         [configuration setMaxWordsPerParagraph:static_cast<NSUInteger>(wordLimit)];
     [configuration setTargetRect:extractionRect];

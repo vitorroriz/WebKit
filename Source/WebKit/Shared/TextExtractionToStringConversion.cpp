@@ -139,6 +139,12 @@ public:
         return m_options.filterCallback(text, WTFMove(identifier));
     }
 
+    void applyReplacements(String& text)
+    {
+        for (auto& [original, replacement] : m_options.replacementStrings)
+            text = makeStringByReplacingAll(text, original, replacement);
+    }
+
 private:
     void addLineForNativeMenuItemsIfNeeded()
     {
@@ -152,7 +158,7 @@ private:
         addResult({ advanceToNextLine(), 0 }, { "nativePopupMenu"_s, WTFMove(itemsDescription) });
     }
 
-    TextExtractionOptions m_options;
+    const TextExtractionOptions m_options;
     Vector<String> m_lines;
     unsigned m_nextLineIndex { 0 };
     CompletionHandler<void(String&&)> m_completion;
@@ -216,9 +222,13 @@ static Vector<String> partsForItem(const TextExtraction::Item& item, const TextE
 
 static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector<String>&& itemParts, std::optional<NodeIdentifier>&& enclosingNode, const TextExtractionLine& line, Ref<TextExtractionAggregator>&& aggregator)
 {
-    auto completion = [itemParts = WTFMove(itemParts), selectedRange = textItem.selectedRange, aggregator, line](const String& filteredText) mutable {
+    auto completion = [itemParts = WTFMove(itemParts), selectedRange = textItem.selectedRange, aggregator, line](String&& filteredText) mutable {
         Vector<String> textParts;
         if (!filteredText.isEmpty()) {
+            // Apply replacements only after filtering, so any filtering steps that rely on comparing DOM text against
+            // visual data (e.g. recognized text) won't result in false positives.
+            aggregator->applyReplacements(filteredText);
+
             auto isNewline = [](UChar character) {
                 return character == '\n' || character == '\r';
             };
@@ -264,7 +274,7 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
 
     RefPtr filterPromise = aggregator->filter(textItem.content, WTFMove(enclosingNode));
     if (!filterPromise) {
-        completion(textItem.content);
+        completion(String { textItem.content });
         return;
     }
 

@@ -92,11 +92,22 @@ namespace TextExtraction {
 
 static constexpr auto minOpacityToConsiderVisible = 0.05;
 
+enum class IncludeTextInAutoFilledControls : bool { No, Yes };
+
 using TextNodesAndText = Vector<std::pair<Ref<Text>, String>>;
 using TextAndSelectedRange = std::pair<String, std::optional<CharacterRange>>;
 using TextAndSelectedRangeMap = HashMap<RefPtr<Text>, TextAndSelectedRange>;
 
-static inline TextNodesAndText collectText(const SimpleRange& range)
+static bool hasEnclosingAutoFilledInput(Node& node)
+{
+    RefPtr input = dynamicDowncast<HTMLInputElement>(node.shadowHost());
+    if (!input)
+        return false;
+
+    return input->autofilled() || input->autofilledAndViewable() || input->autofilledAndObscured();
+}
+
+static inline TextNodesAndText collectText(const SimpleRange& range, IncludeTextInAutoFilledControls includeTextInAutoFilledControls)
 {
     TextNodesAndText nodesAndText;
     RefPtr<Text> lastTextNode;
@@ -113,7 +124,16 @@ static inline TextNodesAndText collectText(const SimpleRange& range)
         if (iterator.text().isEmpty())
             continue;
 
-        RefPtr textNode = dynamicDowncast<Text>(iterator.node());
+        RefPtr node = iterator.node();
+        if (!node) {
+            textForLastTextNode.append(iterator.text());
+            continue;
+        }
+
+        if (includeTextInAutoFilledControls == IncludeTextInAutoFilledControls::No && hasEnclosingAutoFilledInput(*node))
+            continue;
+
+        RefPtr textNode = dynamicDowncast<Text>(*node);
         if (!textNode) {
             textForLastTextNode.append(iterator.text());
             continue;
@@ -158,7 +178,7 @@ struct TraversalContext {
     }
 };
 
-static inline TextAndSelectedRangeMap collectText(Node& node)
+static inline TextAndSelectedRangeMap collectText(Node& node, IncludeTextInAutoFilledControls includeTextInAutoFilledControls)
 {
     auto nodeRange = makeRangeSelectingNodeContents(node);
     auto selection = node.document().selection().selection();
@@ -183,15 +203,15 @@ static inline TextAndSelectedRangeMap collectText(Node& node)
         auto rangeBeforeSelection = makeSimpleRange(nodeRange.start, *selectionStart);
         auto selectionRange = makeSimpleRange(*selectionStart, *selectionEnd);
         auto rangeAfterSelection = makeSimpleRange(*selectionEnd, nodeRange.end);
-        textBeforeRangedSelection = collectText(rangeBeforeSelection);
-        textInRangedSelection = collectText(selectionRange);
-        textAfterRangedSelection = collectText(rangeAfterSelection);
+        textBeforeRangedSelection = collectText(rangeBeforeSelection, includeTextInAutoFilledControls);
+        textInRangedSelection = collectText(selectionRange, includeTextInAutoFilledControls);
+        textAfterRangedSelection = collectText(rangeAfterSelection, includeTextInAutoFilledControls);
         return true;
     }();
 
     if (!populatedRangesAroundSelection) {
         // Fall back to collecting the full contents of the node.
-        textBeforeRangedSelection = collectText(nodeRange);
+        textBeforeRangedSelection = collectText(nodeRange, includeTextInAutoFilledControls);
     }
 
     TextAndSelectedRangeMap result;
@@ -779,9 +799,11 @@ Item extractItem(Request&& request, Page& page)
             }
         }
 
+        auto includeTextInAutoFilledControls = request.includeTextInAutoFilledControls ? IncludeTextInAutoFilledControls::Yes : IncludeTextInAutoFilledControls::No;
+
         TraversalContext context {
             .clientNodeAttributes = WTFMove(clientNodeAttributes),
-            .visibleText = collectText(*extractionRootNode),
+            .visibleText = collectText(*extractionRootNode, includeTextInAutoFilledControls),
             .rectInRootView = WTFMove(request.collectionRectInRootView),
             .onlyCollectTextAndLinksCount = 0,
             .mergeParagraphs = request.mergeParagraphs,

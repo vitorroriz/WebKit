@@ -6740,6 +6740,7 @@ header: <WebCore/TextExtractionTypes.h>
     bool includeNodeIdentifiers;
     bool includeEventListeners;
     bool includeAccessibilityAttributes;
+    bool includeTextInAutoFilledControls;
 };
 
 header: <WebCore/TextExtractionTypes.h>
