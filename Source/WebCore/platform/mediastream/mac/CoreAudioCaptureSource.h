@@ -49,6 +49,7 @@ namespace WebCore {
 
 class AudioSampleBufferList;
 class AudioSampleDataSource;
+class CoreAudioSharedUnit;
 class CaptureDeviceInfo;
 class WebAudioSourceProviderAVFObjC;
 
@@ -105,7 +106,11 @@ private:
     ASCIILiteral logClassName() const override { return "CoreAudioCaptureSource"_s; }
 #endif
 
+    Ref<CoreAudioSharedUnit> protectedUnit();
+    Ref<const CoreAudioSharedUnit> protectedUnit() const;
+
     uint32_t m_captureDeviceID { 0 };
+    Ref<CoreAudioSharedUnit> m_unit;
 
     std::optional<RealtimeMediaSourceCapabilities> m_capabilities;
     std::optional<RealtimeMediaSourceSettings> m_currentSettings;
@@ -115,7 +120,6 @@ private:
     bool m_echoCancellationChanging { false };
 
     std::optional<bool> m_echoCancellationCapability;
-    BaseAudioSharedUnit* m_overrideUnit { nullptr };
 };
 
 class CoreAudioSpeakerSamplesProducer {

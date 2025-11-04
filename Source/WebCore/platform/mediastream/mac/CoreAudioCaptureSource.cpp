@@ -199,15 +199,27 @@ bool CoreAudioCaptureSourceFactory::shouldAudioCaptureUnitRenderAudio()
 CoreAudioCaptureSource::CoreAudioCaptureSource(const CaptureDevice& device, uint32_t captureDeviceID, MediaDeviceHashSalts&& hashSalts, std::optional<PageIdentifier> pageIdentifier)
     : RealtimeMediaSource(device, WTFMove(hashSalts), pageIdentifier)
     , m_captureDeviceID(captureDeviceID)
+    , m_unit(CoreAudioSharedUnit::defaultSingleton())
 {
     // We ensure that we unsuspend ourselves on the constructor as a capture source
     // is created when getUserMedia grants access which only happens when the process is foregrounded.
     // We also reset unit capture values to default.
-    CoreAudioSharedUnit::defaultSingleton().prepareForNewCapture();
+    Ref unit = m_unit;
+    unit->prepareForNewCapture();
 
-    initializeEchoCancellation(CoreAudioSharedUnit::defaultSingleton().enableEchoCancellation());
-    initializeSampleRate(CoreAudioSharedUnit::defaultSingleton().sampleRate());
-    initializeVolume(CoreAudioSharedUnit::defaultSingleton().volume());
+    initializeEchoCancellation(unit->enableEchoCancellation());
+    initializeSampleRate(unit->sampleRate());
+    initializeVolume(unit->volume());
+}
+
+Ref<CoreAudioSharedUnit> CoreAudioCaptureSource::protectedUnit()
+{
+    return m_unit;
+}
+
+Ref<const CoreAudioSharedUnit> CoreAudioCaptureSource::protectedUnit() const
+{
+    return m_unit;
 }
 
 void CoreAudioCaptureSource::initializeToStartProducingData()
@@ -218,59 +230,60 @@ void CoreAudioCaptureSource::initializeToStartProducingData()
     ALWAYS_LOG_IF(loggerPtr(), LOGIDENTIFIER, "is Default ", captureDevice().isDefault());
     m_isReadyToStart = true;
 
-    CoreAudioSharedUnit::defaultSingleton().setCaptureDevice(String { persistentID() }, m_captureDeviceID, captureDevice().isDefault());
+    Ref unit = m_unit;
+    unit->setCaptureDevice(String { persistentID() }, m_captureDeviceID, captureDevice().isDefault());
 
-    bool shouldReconfigure = echoCancellation() != CoreAudioSharedUnit::defaultSingleton().enableEchoCancellation() || sampleRate() != CoreAudioSharedUnit::defaultSingleton().sampleRate() || volume() != CoreAudioSharedUnit::defaultSingleton().volume();
-    CoreAudioSharedUnit::defaultSingleton().setEnableEchoCancellation(echoCancellation());
-    CoreAudioSharedUnit::defaultSingleton().setSampleRate(sampleRate());
-    CoreAudioSharedUnit::defaultSingleton().setVolume(volume());
+    bool shouldReconfigure = echoCancellation() != unit->enableEchoCancellation() || sampleRate() != unit->sampleRate() || volume() != unit->volume();
+    unit->setEnableEchoCancellation(echoCancellation());
+    unit->setSampleRate(sampleRate());
+    unit->setVolume(volume());
 
-    CoreAudioSharedUnit::defaultSingleton().addClient(*this);
+    unit->addClient(*this);
 
     if (shouldReconfigure)
-        CoreAudioSharedUnit::defaultSingleton().reconfigure();
+        unit->reconfigure();
 
     m_currentSettings = std::nullopt;
 }
 
 CoreAudioCaptureSource::~CoreAudioCaptureSource()
 {
-    CoreAudioSharedUnit::defaultSingleton().removeClient(*this);
+    protectedUnit()->removeClient(*this);
 }
 
 void CoreAudioCaptureSource::startProducingData()
 {
     m_canResumeAfterInterruption = true;
     initializeToStartProducingData();
-    CoreAudioSharedUnit::defaultSingleton().startProducingData();
+    protectedUnit()->startProducingData();
     m_currentSettings = { };
 }
 
 void CoreAudioCaptureSource::stopProducingData()
 {
     ALWAYS_LOG_IF(loggerPtr(), LOGIDENTIFIER);
-    CoreAudioSharedUnit::defaultSingleton().stopProducingData();
+    protectedUnit()->stopProducingData();
 }
 
 void CoreAudioCaptureSource::endProducingData()
 {
     ALWAYS_LOG_IF(loggerPtr(), LOGIDENTIFIER);
-    CoreAudioSharedUnit::defaultSingleton().removeClient(*this);
+
+    Ref unit = m_unit;
+    unit->removeClient(*this);
     if (isProducingData())
-        CoreAudioSharedUnit::defaultSingleton().stopProducingData();
+        unit->stopProducingData();
 }
 
 const RealtimeMediaSourceCapabilities& CoreAudioCaptureSource::capabilities()
 {
     if (!m_capabilities) {
-        BaseAudioSharedUnit& unit = CoreAudioSharedUnit::defaultSingleton();
-
         RealtimeMediaSourceCapabilities capabilities(settings().supportedConstraints());
         capabilities.setDeviceId(hashedId());
         capabilities.setGroupId(hashedGroupId());
         capabilities.setEchoCancellation(m_echoCancellationCapability ? (*m_echoCancellationCapability ? RealtimeMediaSourceCapabilities::EchoCancellation::On : RealtimeMediaSourceCapabilities::EchoCancellation::Off) : RealtimeMediaSourceCapabilities::EchoCancellation::OnOrOff);
         capabilities.setVolume({ 0.0, 1.0 });
-        capabilities.setSampleRate(unit.sampleRateCapacities());
+        capabilities.setSampleRate(m_unit->sampleRateCapacities());
         m_capabilities = WTFMove(capabilities);
     }
     return m_capabilities.value();
@@ -279,11 +292,11 @@ const RealtimeMediaSourceCapabilities& CoreAudioCaptureSource::capabilities()
 const RealtimeMediaSourceSettings& CoreAudioCaptureSource::settings()
 {
     if (!m_currentSettings) {
-        BaseAudioSharedUnit& unit = CoreAudioSharedUnit::defaultSingleton();
+        Ref unit = m_unit.get();
 
         RealtimeMediaSourceSettings settings;
         settings.setVolume(volume());
-        settings.setSampleRate(unit.isRenderingAudio() ? unit.actualSampleRate() : sampleRate());
+        settings.setSampleRate(unit->isRenderingAudio() ? unit->actualSampleRate() : sampleRate());
         settings.setDeviceId(hashedId());
         settings.setGroupId(hashedGroupId());
         settings.setLabel(name());
@@ -311,35 +324,34 @@ void CoreAudioCaptureSource::settingsDidChange(OptionSet<RealtimeMediaSourceSett
 
     bool shouldReconfigure = false;
     if (settings.contains(RealtimeMediaSourceSettings::Flag::EchoCancellation)) {
-        CoreAudioSharedUnit::defaultSingleton().setEnableEchoCancellation(echoCancellation());
+        protectedUnit()->setEnableEchoCancellation(echoCancellation());
         shouldReconfigure = true;
     }
     if (settings.contains(RealtimeMediaSourceSettings::Flag::SampleRate)) {
-        CoreAudioSharedUnit::defaultSingleton().setSampleRate(sampleRate());
+        protectedUnit()->setSampleRate(sampleRate());
         shouldReconfigure = true;
     }
     if (shouldReconfigure)
-        CoreAudioSharedUnit::defaultSingleton().reconfigure();
+        protectedUnit()->reconfigure();
 
     m_currentSettings = std::nullopt;
 }
 
 bool CoreAudioCaptureSource::interrupted() const
 {
-    return CoreAudioSharedUnit::defaultSingleton().isSuspended() || RealtimeMediaSource::interrupted();
+    return protectedUnit()->isSuspended() || RealtimeMediaSource::interrupted();
 }
 
 void CoreAudioCaptureSource::delaySamples(Seconds seconds)
 {
-    BaseAudioSharedUnit& unit = CoreAudioSharedUnit::defaultSingleton();
-    unit.delaySamples(seconds);
+    protectedUnit()->delaySamples(seconds);
 }
 
 #if PLATFORM(IOS_FAMILY)
 void CoreAudioCaptureSource::setIsInBackground(bool value)
 {
     if (isProducingData())
-        CoreAudioSharedUnit::defaultSingleton().setIsInBackground(value);
+        protectedUnit()->setIsInBackground(value);
 }
 #endif
 
@@ -370,11 +382,11 @@ void CoreAudioCaptureSource::handleNewCurrentMicrophoneDevice(const CaptureDevic
 
 void CoreAudioCaptureSource::echoCancellationChanged()
 {
-    if (!isProducingData() || echoCancellation() == CoreAudioSharedUnit::defaultSingleton().enableEchoCancellation())
+    if (!isProducingData() || echoCancellation() == m_unit->enableEchoCancellation())
         return;
 
     m_echoCancellationChanging = true;
-    setEchoCancellation(CoreAudioSharedUnit::defaultSingleton().enableEchoCancellation());
+    setEchoCancellation(m_unit->enableEchoCancellation());
     m_echoCancellationChanging = false;
 
     configurationChanged();
@@ -382,9 +394,9 @@ void CoreAudioCaptureSource::echoCancellationChanged()
 
 const AudioStreamDescription* CoreAudioCaptureSource::audioStreamDescription() const
 {
-    if (!CoreAudioSharedUnit::defaultSingleton().microphoneProcFormat())
+    if (!m_unit->microphoneProcFormat())
         return nullptr;
-    return &CoreAudioSharedUnit::defaultSingleton().microphoneProcFormat().value();
+    return &m_unit->microphoneProcFormat().value();
 }
 
 } // namespace WebCore

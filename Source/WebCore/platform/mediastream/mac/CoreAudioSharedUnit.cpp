@@ -555,8 +555,8 @@ OSStatus CoreAudioSharedUnit::processMicrophoneSamples(AudioUnitRenderActionFlag
             m_minimumMicrophoneSampleFrames = inNumberFrames;
             // Our buffer might be too small, the preferred buffer size or sample rate might have changed.
             callOnMainThread([weakThis = WeakPtr { *this }] {
-                if (weakThis)
-                    weakThis->reconfigure();
+                if (RefPtr protectedThis = weakThis.get())
+                    protectedThis->reconfigure();
             });
         }
         return err;

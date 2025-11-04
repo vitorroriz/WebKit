@@ -126,6 +126,11 @@ public:
 
     const std::optional<CAAudioStreamDescription>& microphoneProcFormat() const { return m_microphoneProcFormat; }
 
+    LongCapabilityRange sampleRateCapacities() const final { return m_sampleRateCapabilities; }
+    int actualSampleRate() const final;
+
+    void delaySamples(Seconds) final;
+
 private:
     CoreAudioSharedUnit();
 
@@ -135,12 +140,10 @@ private:
 
     static size_t preferredIOBufferSize();
 
-    LongCapabilityRange sampleRateCapacities() const final { return m_sampleRateCapabilities; }
 
     bool hasAudioUnit() const final { return !!m_ioUnit; }
     void captureDeviceChanged() final;
     OSStatus reconfigureAudioUnit() final;
-    void delaySamples(Seconds) final;
 
     OSStatus setupAudioUnit();
     void cleanupAudioUnit() final;
@@ -154,7 +157,6 @@ private:
     bool migrateToNewDefaultDevice(const CaptureDevice&) final;
     void deallocateStoredVPIOUnit();
 #endif
-    int actualSampleRate() const final;
     void resetSampleRate();
 
     void willChangeCaptureDevice() final;
