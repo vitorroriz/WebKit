@@ -96,11 +96,7 @@ public:
 
     // Only for use by WebScrollerImpPairDelegateMac. Do not use elsewhere!
     ScrollerMac& verticalScroller() { return m_verticalScroller.get(); }
-    CheckedRef<ScrollerMac> checkedVerticalScroller()  { return m_verticalScroller.get(); }
-    CheckedRef<const ScrollerMac> checkedVerticalScroller() const { return m_verticalScroller.get(); }
     ScrollerMac& horizontalScroller() { return m_horizontalScroller.get(); }
-    CheckedRef<ScrollerMac> checkedHorizontalScroller() { return m_horizontalScroller.get(); }
-    CheckedRef<const ScrollerMac> checkedHorizontalScroller() const { return m_horizontalScroller.get(); }
 
     String scrollbarStateForOrientation(ScrollbarOrientation) const;
 

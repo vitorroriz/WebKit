@@ -154,8 +154,8 @@ void ScrollerPairMac::init()
     m_scrollbarStyle = WebCore::scrollbarStyle(style);
     [m_scrollerImpPair setScrollerStyle:style];
 
-    checkedVerticalScroller()->attach();
-    checkedHorizontalScroller()->attach();
+    m_verticalScroller->attach();
+    m_horizontalScroller->attach();
 }
 
 ScrollerPairMac::~ScrollerPairMac()
@@ -163,10 +163,10 @@ ScrollerPairMac::~ScrollerPairMac()
     [m_scrollerImpPairDelegate invalidate];
     [m_scrollerImpPair setDelegate:nil];
 
-    checkedVerticalScroller()->detach();
-    checkedHorizontalScroller()->detach();
+    m_verticalScroller->detach();
+    m_horizontalScroller->detach();
 
-    ensureOnMainThread([scrollerImpPair = std::exchange(m_scrollerImpPair, nil), verticalScrollerImp = checkedVerticalScroller()->takeScrollerImp(), horizontalScrollerImp = checkedHorizontalScroller()->takeScrollerImp()] {
+    ensureOnMainThread([scrollerImpPair = std::exchange(m_scrollerImpPair, nil), verticalScrollerImp = m_verticalScroller->takeScrollerImp(), horizontalScrollerImp = m_horizontalScroller->takeScrollerImp()] {
     });
 }
 
@@ -265,8 +265,8 @@ void ScrollerPairMac::updateValues()
         m_lastScrollOffset = offset;
     }
 
-    checkedHorizontalScroller()->updateValues();
-    checkedVerticalScroller()->updateValues();
+    m_horizontalScroller->updateValues();
+    m_verticalScroller->updateValues();
 }
 
 FloatSize ScrollerPairMac::visibleSize() const
@@ -318,7 +318,7 @@ ScrollerPairMac::Values ScrollerPairMac::valuesForOrientation(ScrollbarOrientati
 
 bool ScrollerPairMac::hasScrollerImp()
 {
-    return checkedVerticalScroller()->hasScrollerImp() || checkedHorizontalScroller()->hasScrollerImp();
+    return m_verticalScroller->hasScrollerImp() || m_horizontalScroller->hasScrollerImp();
 }
 
 void ScrollerPairMac::releaseReferencesToScrollerImpsOnTheMainThread()
@@ -326,14 +326,14 @@ void ScrollerPairMac::releaseReferencesToScrollerImpsOnTheMainThread()
     if (hasScrollerImp()) {
         // FIXME: This is a workaround in place for the time being since NSScrollerImps cannot be deallocated
         // on a non-main thread. rdar://problem/24535055
-        WTF::callOnMainThread([verticalScrollerImp = checkedVerticalScroller()->takeScrollerImp(), horizontalScrollerImp = checkedHorizontalScroller()->takeScrollerImp()] {
+        WTF::callOnMainThread([verticalScrollerImp = m_verticalScroller->takeScrollerImp(), horizontalScrollerImp = m_horizontalScroller->takeScrollerImp()] {
         });
     }
 }
 
 String ScrollerPairMac::scrollbarStateForOrientation(ScrollbarOrientation orientation) const
 {
-    return orientation == ScrollbarOrientation::Vertical ? checkedVerticalScroller()->scrollbarState() : checkedHorizontalScroller()->scrollbarState();
+    return orientation == ScrollbarOrientation::Vertical ? m_verticalScroller->scrollbarState() : m_horizontalScroller->scrollbarState();
 }
 
 void ScrollerPairMac::setVerticalScrollerImp(NSScrollerImp *scrollerImp)
@@ -411,16 +411,16 @@ void ScrollerPairMac::mouseIsInScrollbar(ScrollbarHoverState hoverState)
 {
     if (m_scrollbarHoverState.mouseIsOverVerticalScrollbar != hoverState.mouseIsOverVerticalScrollbar) {
         if (hoverState.mouseIsOverVerticalScrollbar)
-            checkedVerticalScroller()->mouseEnteredScrollbar();
+            m_verticalScroller->mouseEnteredScrollbar();
         else
-            checkedVerticalScroller()->mouseExitedScrollbar();
+            m_verticalScroller->mouseExitedScrollbar();
     }
 
     if (m_scrollbarHoverState.mouseIsOverHorizontalScrollbar != hoverState.mouseIsOverHorizontalScrollbar) {
         if (hoverState.mouseIsOverHorizontalScrollbar)
-            checkedHorizontalScroller()->mouseEnteredScrollbar();
+            m_horizontalScroller->mouseEnteredScrollbar();
         else
-            checkedHorizontalScroller()->mouseExitedScrollbar();
+            m_horizontalScroller->mouseExitedScrollbar();
     }
     m_scrollbarHoverState = hoverState;
 }
@@ -431,8 +431,8 @@ void ScrollerPairMac::setUseDarkAppearance(bool useDarkAppearance)
         return;
     m_useDarkAppearance = useDarkAppearance;
 
-    checkedHorizontalScroller()->setNeedsDisplay();
-    checkedVerticalScroller()->setNeedsDisplay();
+    m_horizontalScroller->setNeedsDisplay();
+    m_verticalScroller->setNeedsDisplay();
 }
 
 void ScrollerPairMac::setScrollbarWidth(ScrollbarWidth scrollbarWidth)
@@ -441,14 +441,14 @@ void ScrollerPairMac::setScrollbarWidth(ScrollbarWidth scrollbarWidth)
         return;
     m_scrollbarWidth = scrollbarWidth;
 
-    checkedHorizontalScroller()->updateScrollbarStyle();
-    checkedVerticalScroller()->updateScrollbarStyle();
+    m_horizontalScroller->updateScrollbarStyle();
+    m_verticalScroller->updateScrollbarStyle();
 }
 
 void ScrollerPairMac::scrollbarColorChanged(const std::optional<ScrollbarColor>& scrollbarColor)
 {
-    checkedHorizontalScroller()->scrollbarColorChanged(scrollbarColor);
-    checkedVerticalScroller()->scrollbarColorChanged(scrollbarColor);
+    m_horizontalScroller->scrollbarColorChanged(scrollbarColor);
+    m_verticalScroller->scrollbarColorChanged(scrollbarColor);
 }
 
 void ScrollerPairMac::updateScrollbarPainters()
