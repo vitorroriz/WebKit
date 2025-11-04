@@ -1384,6 +1384,15 @@ void GPUConnectionToWebProcess::setPresentingApplicationAuditToken(WebCore::Page
 }
 #endif
 
+#if ENABLE(IPC_TESTING_API)
+void GPUConnectionToWebProcess::takeInvalidMessageStringForTesting(CompletionHandler<void(String&&)>&& callback)
+{
+    ASCIILiteral error = connection().takeErrorString();
+    String errorString = !error.isNull() ? String::fromUTF8(error) : emptyString();
+    callback(WTFMove(errorString));
+}
+#endif
+
 } // namespace WebKit
 
 #undef MESSAGE_CHECK

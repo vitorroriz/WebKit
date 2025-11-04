@@ -1436,11 +1436,11 @@ public:
         } else {
             // Cause a validation error, MESSAGE_CHECK.
             serverClient().setAsyncMessageHandler([] (IPC::Connection& connection, IPC::Decoder&) {
-                connection.markCurrentlyDispatchedMessageAsInvalid();
+                connection.markCurrentlyDispatchedMessageAsInvalid("async message check"_s);
                 return true;
             });
             serverClient().setSyncMessageHandler([] (IPC::Connection& connection, IPC::Decoder&, UniqueRef<IPC::Encoder>&) {
-                connection.markCurrentlyDispatchedMessageAsInvalid();
+                connection.markCurrentlyDispatchedMessageAsInvalid("sync message check"_s);
                 return true;
             });
         }

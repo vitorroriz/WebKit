@@ -644,11 +644,11 @@ public:
         } else {
             // Cause a validation error, MESSAGE_CHECK.
             m_mockServerReceiver->setAsyncMessageHandler([] (IPC::StreamServerConnection& connection, IPC::Decoder&) {
-                connection.markCurrentlyDispatchedMessageAsInvalid();
+                connection.markCurrentlyDispatchedMessageAsInvalid("async stream message check"_s);
                 return true;
             });
             m_mockServerReceiver->setSyncMessageHandler([] (IPC::StreamServerConnection& connection, IPC::Decoder&) {
-                connection.markCurrentlyDispatchedMessageAsInvalid();
+                connection.markCurrentlyDispatchedMessageAsInvalid("sync stream message check"_s);
                 return true;
             });
         }
