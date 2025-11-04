@@ -206,12 +206,12 @@ InspectorBackend.registerCommand("DOM.performSearch", null, [{"name": "query", "
 InspectorBackend.registerCommand("DOM.getSearchResults", null, [{"name": "searchId", "type": "string"}, {"name": "fromIndex", "type": "number"}, {"name": "toIndex", "type": "number"}], ["nodeIds"]);
 InspectorBackend.registerCommand("DOM.discardSearchResults", null, [{"name": "searchId", "type": "string"}], []);
 InspectorBackend.registerCommand("DOM.requestNode", ["page"], [{"name": "objectId", "type": "string"}], ["nodeId"]);
-InspectorBackend.registerCommand("DOM.setInspectModeEnabled", null, [{"name": "enabled", "type": "boolean"}, {"name": "highlightConfig", "type": "object", "optional": true}, {"name": "gridOverlayConfig", "type": "object", "optional": true}, {"name": "flexOverlayConfig", "type": "object", "optional": true}], []);
+InspectorBackend.registerCommand("DOM.setInspectModeEnabled", null, [{"name": "enabled", "type": "boolean"}, {"name": "highlightConfig", "type": "object", "optional": true}, {"name": "gridOverlayConfig", "type": "object", "optional": true}, {"name": "flexOverlayConfig", "type": "object", "optional": true}, {"name": "showRulers", "type": "boolean", "optional": true}], []);
 InspectorBackend.registerCommand("DOM.highlightRect", ["page"], [{"name": "x", "type": "number"}, {"name": "y", "type": "number"}, {"name": "width", "type": "number"}, {"name": "height", "type": "number"}, {"name": "color", "type": "object", "optional": true}, {"name": "outlineColor", "type": "object", "optional": true}, {"name": "usePageCoordinates", "type": "boolean", "optional": true}], []);
 InspectorBackend.registerCommand("DOM.highlightQuad", ["page"], [{"name": "quad", "type": "object"}, {"name": "color", "type": "object", "optional": true}, {"name": "outlineColor", "type": "object", "optional": true}, {"name": "usePageCoordinates", "type": "boolean", "optional": true}], []);
-InspectorBackend.registerCommand("DOM.highlightSelector", ["page"], [{"name": "selectorString", "type": "string"}, {"name": "frameId", "type": "string", "optional": true}, {"name": "highlightConfig", "type": "object"}, {"name": "gridOverlayConfig", "type": "object", "optional": true}, {"name": "flexOverlayConfig", "type": "object", "optional": true}], []);
-InspectorBackend.registerCommand("DOM.highlightNode", null, [{"name": "nodeId", "type": "number", "optional": true}, {"name": "objectId", "type": "string", "optional": true}, {"name": "highlightConfig", "type": "object"}, {"name": "gridOverlayConfig", "type": "object", "optional": true}, {"name": "flexOverlayConfig", "type": "object", "optional": true}], []);
-InspectorBackend.registerCommand("DOM.highlightNodeList", null, [{"name": "nodeIds", "type": "object"}, {"name": "highlightConfig", "type": "object"}, {"name": "gridOverlayConfig", "type": "object", "optional": true}, {"name": "flexOverlayConfig", "type": "object", "optional": true}], []);
+InspectorBackend.registerCommand("DOM.highlightSelector", ["page"], [{"name": "selectorString", "type": "string"}, {"name": "frameId", "type": "string", "optional": true}, {"name": "highlightConfig", "type": "object"}, {"name": "gridOverlayConfig", "type": "object", "optional": true}, {"name": "flexOverlayConfig", "type": "object", "optional": true}, {"name": "showRulers", "type": "boolean", "optional": true}], []);
+InspectorBackend.registerCommand("DOM.highlightNode", null, [{"name": "nodeId", "type": "number", "optional": true}, {"name": "objectId", "type": "string", "optional": true}, {"name": "highlightConfig", "type": "object"}, {"name": "gridOverlayConfig", "type": "object", "optional": true}, {"name": "flexOverlayConfig", "type": "object", "optional": true}, {"name": "showRulers", "type": "boolean", "optional": true}], []);
+InspectorBackend.registerCommand("DOM.highlightNodeList", null, [{"name": "nodeIds", "type": "object"}, {"name": "highlightConfig", "type": "object"}, {"name": "gridOverlayConfig", "type": "object", "optional": true}, {"name": "flexOverlayConfig", "type": "object", "optional": true}, {"name": "showRulers", "type": "boolean", "optional": true}], []);
 InspectorBackend.registerCommand("DOM.hideHighlight", null, [], []);
 InspectorBackend.registerCommand("DOM.highlightFrame", ["page"], [{"name": "frameId", "type": "string"}, {"name": "contentColor", "type": "object", "optional": true}, {"name": "contentOutlineColor", "type": "object", "optional": true}], []);
 InspectorBackend.registerCommand("DOM.showGridOverlay", ["page"], [{"name": "nodeId", "type": "number"}, {"name": "gridOverlayConfig", "type": "object"}], []);
@@ -454,6 +454,7 @@ InspectorBackend.registerCommand("Page.getResourceContent", null, [{"name": "fra
 InspectorBackend.registerCommand("Page.setBootstrapScript", ["page"], [{"name": "source", "type": "string", "optional": true}], []);
 InspectorBackend.registerCommand("Page.searchInResource", ["page"], [{"name": "frameId", "type": "string"}, {"name": "url", "type": "string"}, {"name": "query", "type": "string"}, {"name": "caseSensitive", "type": "boolean", "optional": true}, {"name": "isRegex", "type": "boolean", "optional": true}, {"name": "requestId", "type": "string", "optional": true}], ["result"]);
 InspectorBackend.registerCommand("Page.searchInResources", ["page"], [{"name": "text", "type": "string"}, {"name": "caseSensitive", "type": "boolean", "optional": true}, {"name": "isRegex", "type": "boolean", "optional": true}], ["result"]);
+InspectorBackend.registerCommand("Page.setShowRulers", ["page"], [{"name": "result", "type": "boolean"}], []);
 InspectorBackend.registerCommand("Page.setShowPaintRects", ["page"], [{"name": "result", "type": "boolean"}], []);
 InspectorBackend.registerCommand("Page.setEmulatedMedia", ["page"], [{"name": "media", "type": "string"}], []);
 InspectorBackend.registerCommand("Page.snapshotNode", ["page"], [{"name": "nodeId", "type": "number"}], ["dataURL"]);
@@ -526,7 +527,7 @@ InspectorBackend.activateDomain("ServiceWorker", ["service-worker"]);
 
 // Target
 InspectorBackend.registerDomain("Target", ["web-page"]);
-InspectorBackend.registerEnum("Target.TargetInfoType", {Page: "page", ServiceWorker: "service-worker", Worker: "worker"});
+InspectorBackend.registerEnum("Target.TargetInfoType", {Page: "page", Frame: "frame", ServiceWorker: "service-worker", Worker: "worker"});
 InspectorBackend.registerCommand("Target.setPauseOnStart", null, [{"name": "pauseOnStart", "type": "boolean"}], []);
 InspectorBackend.registerCommand("Target.resume", null, [{"name": "targetId", "type": "string"}], []);
 InspectorBackend.registerCommand("Target.sendMessageToTarget", null, [{"name": "targetId", "type": "string"}, {"name": "message", "type": "string"}], []);

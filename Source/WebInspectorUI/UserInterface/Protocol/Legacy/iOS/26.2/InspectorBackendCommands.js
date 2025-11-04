@@ -526,7 +526,7 @@ InspectorBackend.activateDomain("ServiceWorker", ["service-worker"]);
 
 // Target
 InspectorBackend.registerDomain("Target", ["web-page"]);
-InspectorBackend.registerEnum("Target.TargetInfoType", {Page: "page", ServiceWorker: "service-worker", Worker: "worker"});
+InspectorBackend.registerEnum("Target.TargetInfoType", {Page: "page", Frame: "frame", ServiceWorker: "service-worker", Worker: "worker"});
 InspectorBackend.registerCommand("Target.setPauseOnStart", null, [{"name": "pauseOnStart", "type": "boolean"}], []);
 InspectorBackend.registerCommand("Target.resume", null, [{"name": "targetId", "type": "string"}], []);
 InspectorBackend.registerCommand("Target.sendMessageToTarget", null, [{"name": "targetId", "type": "string"}, {"name": "message", "type": "string"}], []);
