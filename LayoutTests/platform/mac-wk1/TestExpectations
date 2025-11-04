@@ -1766,6 +1766,7 @@ fast/scrolling/iframe-scrollable-after-back.html [ Skip ]
 fast/scrolling/overflow-scrollable-after-back.html [ Skip ]
 
 compositing/rtl/rtl-fixed-overflow-scrolled.html [ Failure ]
+compositing/rtl/rtl-fixed-clipping-layer.html [ ImageOnlyFailure ]
 compositing/iframes/border-uneven-radius-composited-frame.html [ ImageOnlyFailure ]
 compositing/iframes/overlapped-nested-iframes.html [ Pass Failure ]
 compositing/clipping/border-radius-async-overflow-non-stacking.html [ ImageOnlyFailure ]
