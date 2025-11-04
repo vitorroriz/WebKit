@@ -148,9 +148,6 @@ const struct wl_registry_listener WindowViewBackend::s_registryListener = {
         if (!std::strcmp(interface, "xdg_wm_base"))
             window->m_xdg.wm = static_cast<struct xdg_wm_base*>(wl_registry_bind(registry, name, &xdg_wm_base_interface, 1));
 
-        if (!std::strcmp(interface, "zxdg_shell_v6"))
-            window->m_zxdg.shell = static_cast<struct zxdg_shell_v6*>(wl_registry_bind(registry, name, &zxdg_shell_v6_interface, 1));
-
         if (!std::strcmp(interface, "wl_seat"))
             window->m_seat = static_cast<struct wl_seat*>(wl_registry_bind(registry, name, &wl_seat_interface, 5));
     },
@@ -163,14 +160,6 @@ const struct xdg_wm_base_listener WindowViewBackend::XDGStable::s_wmListener = {
     [](void*, struct xdg_wm_base* xdgWM, uint32_t serial)
     {
         xdg_wm_base_pong(xdgWM, serial);
-    },
-};
-
-const struct zxdg_shell_v6_listener WindowViewBackend::XDGUnstable::s_shellListener = {
-    // ping
-    [](void*, struct zxdg_shell_v6* shell, uint32_t serial)
-    {
-        zxdg_shell_v6_pong(shell, serial);
     },
 };
 
@@ -593,60 +582,6 @@ const struct xdg_toplevel_listener WindowViewBackend::XDGStable::s_toplevelListe
 #endif
 };
 
-const struct zxdg_surface_v6_listener WindowViewBackend::XDGUnstable::s_surfaceListener = {
-    // configure
-    [](void*, struct zxdg_surface_v6* surface, uint32_t serial)
-    {
-        zxdg_surface_v6_ack_configure(surface, serial);
-    },
-};
-
-const struct zxdg_toplevel_v6_listener WindowViewBackend::XDGUnstable::s_toplevelListener = {
-    // configure
-    [](void* data, struct zxdg_toplevel_v6*, int32_t width, int32_t height, struct wl_array* states)
-    {
-        auto& window = *static_cast<WindowViewBackend*>(data);
-        window.resize(std::max(0, width), std::max(0, height));
-
-        bool isFocused = false;
-        bool isFullscreen = false;
-        // FIXME: It would be nice if the following loop could use
-        // wl_array_for_each, but at the time of writing it relies on
-        // GCC specific extension to work properly:
-        // https://gitlab.freedesktop.org/wayland/wayland/issues/34
-        assert(!(states->size % sizeof(uint32_t)));
-        auto statesSpan = std::span(static_cast<uint32_t*>(states->data), states->size / sizeof(uint32_t));
-        for (auto state : statesSpan) {
-            switch (state) {
-            case ZXDG_TOPLEVEL_V6_STATE_ACTIVATED:
-                isFocused = true;
-                break;
-            case ZXDG_TOPLEVEL_V6_STATE_FULLSCREEN:
-                isFullscreen = true;
-                break;
-            case ZXDG_TOPLEVEL_V6_STATE_MAXIMIZED:
-            case ZXDG_TOPLEVEL_V6_STATE_RESIZING:
-            default:
-                break;
-            }
-        }
-
-        if (isFocused)
-            window.addActivityState(wpe_view_activity_state_focused);
-        else
-            window.removeActivityState(wpe_view_activity_state_focused);
-
-        if (window.m_is_fullscreen != isFullscreen)
-            window.onFullscreenChanged(isFullscreen);
-    },
-    // close
-    [](void* data, struct zxdg_toplevel_v6*)
-    {
-        auto& window = *static_cast<WindowViewBackend*>(data);
-        window.removeActivityState(wpe_view_activity_state_visible | wpe_view_activity_state_focused | wpe_view_activity_state_in_window);
-    },
-};
-
 #if WPE_CHECK_VERSION(1, 11, 1)
 
 bool WindowViewBackend::onDOMFullscreenRequest(void* data, bool fullscreen)
@@ -667,11 +602,6 @@ bool WindowViewBackend::onDOMFullscreenRequest(void* data, bool fullscreen)
             xdg_toplevel_set_fullscreen(window.m_xdg.toplevel, nullptr);
         else
             xdg_toplevel_unset_fullscreen(window.m_xdg.toplevel);
-    } else if (window.m_zxdg.toplevel) {
-        if (fullscreen)
-            zxdg_toplevel_v6_set_fullscreen(window.m_zxdg.toplevel, nullptr);
-        else
-            zxdg_toplevel_v6_unset_fullscreen(window.m_zxdg.toplevel);
     }
 
     return true;
@@ -730,8 +660,6 @@ WindowViewBackend::WindowViewBackend(uint32_t width, uint32_t height)
 
         if (m_xdg.wm)
             xdg_wm_base_add_listener(m_xdg.wm, &XDGStable::s_wmListener, nullptr);
-        else if (m_zxdg.shell)
-            zxdg_shell_v6_add_listener(m_zxdg.shell, &XDGUnstable::s_shellListener, nullptr);
 
         if (m_seat)
             wl_seat_add_listener(m_seat, &s_seatListener, this);
@@ -760,16 +688,6 @@ WindowViewBackend::WindowViewBackend(uint32_t width, uint32_t height)
         if (m_xdg.toplevel) {
             xdg_toplevel_add_listener(m_xdg.toplevel, &XDGStable::s_toplevelListener, this);
             xdg_toplevel_set_title(m_xdg.toplevel, "WPE");
-            wl_surface_commit(m_surface);
-            addActivityState(wpe_view_activity_state_visible | wpe_view_activity_state_in_window);
-        }
-    } else if (m_zxdg.shell) {
-        m_zxdg.surface = zxdg_shell_v6_get_xdg_surface(m_zxdg.shell, m_surface);
-        zxdg_surface_v6_add_listener(m_zxdg.surface, &XDGUnstable::s_surfaceListener, nullptr);
-        m_zxdg.toplevel = zxdg_surface_v6_get_toplevel(m_zxdg.surface);
-        if (m_zxdg.toplevel) {
-            zxdg_toplevel_v6_add_listener(m_zxdg.toplevel, &XDGUnstable::s_toplevelListener, this);
-            zxdg_toplevel_v6_set_title(m_zxdg.toplevel, "WPE");
             wl_surface_commit(m_surface);
             addActivityState(wpe_view_activity_state_visible | wpe_view_activity_state_in_window);
         }
@@ -845,11 +763,6 @@ WindowViewBackend::~WindowViewBackend()
     if (m_xdg.surface)
         xdg_surface_destroy(m_xdg.surface);
 
-    if (m_zxdg.toplevel)
-        zxdg_toplevel_v6_destroy(m_zxdg.toplevel);
-    if (m_zxdg.surface)
-        zxdg_surface_v6_destroy(m_zxdg.surface);
-
     if (m_surface)
         wl_surface_destroy(m_surface);
 
@@ -858,9 +771,6 @@ WindowViewBackend::~WindowViewBackend()
 
     if (m_xdg.wm)
         xdg_wm_base_destroy(m_xdg.wm);
-
-    if (m_zxdg.shell)
-        zxdg_shell_v6_destroy(m_zxdg.shell);
 
     if (m_seat)
         wl_seat_destroy(m_seat);

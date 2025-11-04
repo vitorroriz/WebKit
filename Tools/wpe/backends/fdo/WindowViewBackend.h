@@ -27,7 +27,6 @@
 
 #include "ViewBackend.h"
 #include "xdg-shell-client-protocol.h"
-#include "xdg-shell-unstable-v6-client-protocol.h"
 #include <glib.h>
 #include <unordered_map>
 #include <wpe/fdo.h>
@@ -156,16 +155,6 @@ private:
         struct xdg_surface* surface { nullptr };
         struct xdg_toplevel* toplevel { nullptr };
     } m_xdg;
-
-    struct XDGUnstable {
-        static const struct zxdg_shell_v6_listener s_shellListener;
-        static const struct zxdg_surface_v6_listener s_surfaceListener;
-        static const struct zxdg_toplevel_v6_listener s_toplevelListener;
-
-        struct zxdg_shell_v6* shell { nullptr };
-        struct zxdg_surface_v6* surface { nullptr };
-        struct zxdg_toplevel_v6* toplevel { nullptr };
-    } m_zxdg;
 };
 
 } // WPEToolingBackends
