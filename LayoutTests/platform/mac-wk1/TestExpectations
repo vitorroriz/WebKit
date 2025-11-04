@@ -2189,9 +2189,9 @@ webkit.org/b/177397 [ Release ] compositing/masks/compositing-clip-path-change-n
 webkit.org/b/172384 fast/hidpi/hidpi-long-page-with-inset-element.html [ Skip ]
 
 webkit.org/b/195098 pointerevents/mouse/enter-leave-order.html [ Failure ]
-webkit.org/b/195098 pointerevents/mouse/over-enter-out-leave.html [ Failure ]
-webkit.org/b/195098 pointerevents/mouse/pointer-capture.html [ Failure ]
-webkit.org/b/195098 pointerevents/mouse/pointer-events-before-mouse-events.html [ Failure ]
+webkit.org/b/195098 pointerevents/mouse/over-enter-out-leave.html [ Skip ]
+webkit.org/b/195098 pointerevents/mouse/pointer-capture.html [ Skip ]
+webkit.org/b/195098 pointerevents/mouse/pointer-events-before-mouse-events.html [ Skip ]
 
 webkit.org/b/244304 pointer-lock/pointermove-movement-delta.html [ Pass Timeout ]
 
