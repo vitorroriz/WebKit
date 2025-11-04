@@ -782,13 +782,12 @@ void RemoteLayerTreeDrawingAreaProxy::waitForDidUpdateActivityState(ActivityStat
         switch (m_webPageProxyProcessState.commitLayerTreeMessageState) {
         case CommitLayerTreePending:
         case MissedCommit:
+        case Idle:
             if (!m_webPageProxyProcessState.receivedCommitLayerTreePendingConfirmation) {
                 if (connection->waitForAndDispatchImmediately<Messages::RemoteLayerTreeDrawingAreaProxy::NotifyPendingCommitLayerTree>(identifier(), activityStateUpdateTimeout - (MonotonicTime::now() - startTime), IPC::WaitForOption::InterruptWaitingIfSyncMessageArrives) != IPC::Error::NoError)
                     return;
             }
 
-            [[fallthrough]];
-        case Idle:
             if (connection->waitForAndDispatchImmediately<Messages::RemoteLayerTreeDrawingAreaProxy::CommitLayerTree>(identifier(), activityStateUpdateTimeout - (MonotonicTime::now() - startTime), IPC::WaitForOption::InterruptWaitingIfSyncMessageArrives) != IPC::Error::NoError)
                 return;
             break;
