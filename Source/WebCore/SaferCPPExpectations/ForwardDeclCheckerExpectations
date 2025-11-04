@@ -39,6 +39,7 @@ css/CSSToLengthConversionData.h
 css/MediaList.h
 css/StyleSheetContents.cpp
 css/StyleSheetContents.h
+css/values/primitives/CSSPrimitiveData.h
 dom/CustomElementReactionQueue.h
 dom/Element.h
 dom/FragmentDirectiveRangeFinder.cpp
