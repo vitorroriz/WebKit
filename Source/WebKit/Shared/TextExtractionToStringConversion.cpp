@@ -176,6 +176,13 @@ static Vector<String> eventListenerTypesToStringArray(OptionSet<TextExtraction::
     return result;
 }
 
+template<typename T> static Vector<String> sortedKeys(const HashMap<String, T>& dictionary)
+{
+    auto keys = copyToVector(dictionary.keys());
+    std::ranges::sort(keys, codePointCompareLessThan);
+    return keys;
+}
+
 static Vector<String> partsForItem(const TextExtraction::Item& item, const TextExtractionAggregator& aggregator)
 {
     Vector<String> parts;
@@ -198,11 +205,11 @@ static Vector<String> partsForItem(const TextExtraction::Item& item, const TextE
     if (!listeners.isEmpty())
         parts.append(makeString("events=["_s, commaSeparatedString(listeners), ']'));
 
-    auto attributeKeys = copyToVector(item.ariaAttributes.keys());
-    std::ranges::sort(attributeKeys, codePointCompareLessThan);
-
-    for (auto& key : attributeKeys)
+    for (auto& key : sortedKeys(item.ariaAttributes))
         parts.append(makeString(key, "='"_s, escapeString(item.ariaAttributes.get(key)), '\''));
+
+    for (auto& key : sortedKeys(item.clientAttributes))
+        parts.append(makeString(key, "='"_s, item.clientAttributes.get(key), '\''));
 
     return parts;
 }

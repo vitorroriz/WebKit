@@ -27,11 +27,13 @@
 #import "_WKTextExtractionInternal.h"
 
 #import "WKWebViewInternal.h"
+#import "_WKJSHandleInternal.h"
 #import <WebKit/WKError.h>
 #import <wtf/RetainPtr.h>
 
 @implementation _WKTextExtractionConfiguration {
     RetainPtr<_WKJSHandle> _targetNode;
+    HashMap<RetainPtr<NSString>, HashMap<RetainPtr<_WKJSHandle>, RetainPtr<NSString>>> _clientNodeAttributes;
 }
 
 - (instancetype)init
@@ -58,6 +60,21 @@
 - (void)setTargetNode:(_WKJSHandle *)targetNode
 {
     _targetNode = adoptNS([targetNode copy]);
+}
+
+- (void)addClientAttribute:(NSString *)attributeName value:(NSString *)attributeValue forNode:(_WKJSHandle *)node
+{
+    _clientNodeAttributes.ensure(RetainPtr { attributeName }, [] {
+        return HashMap<RetainPtr<_WKJSHandle>, RetainPtr<NSString>> { };
+    }).iterator->value.set(RetainPtr { node }, RetainPtr { attributeValue });
+}
+
+- (void)forEachClientNodeAttribute:(void(^)(NSString *attribute, NSString *value, _WKJSHandle *))block
+{
+    for (auto [attribute, values] : _clientNodeAttributes) {
+        for (auto [handle, value] : values)
+            block(attribute.get(), value.get(), handle.get());
+    }
 }
 
 @end

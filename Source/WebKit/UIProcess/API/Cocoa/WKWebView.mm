@@ -6844,6 +6844,23 @@ static std::optional<WebCore::JSHandleIdentifier> mainFrameJSHandleIdentifier(_W
     return info.identifier;
 }
 
+static HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> extractClientNodeAttributes(_WKTextExtractionConfiguration *configuration)
+{
+    __block HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> result;
+
+    [configuration forEachClientNodeAttribute:^(NSString *attribute, NSString *value, _WKJSHandle *nodeHandle) {
+        auto handleIdentifier = mainFrameJSHandleIdentifier(nodeHandle);
+        if (!handleIdentifier)
+            return;
+
+        result.ensure(String { attribute }, [] {
+            return HashMap<WebCore::JSHandleIdentifier, String> { };
+        }).iterator->value.add(WTFMove(*handleIdentifier), String { value });
+    }];
+
+    return result;
+}
+
 #endif // USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
 
 - (void)_requestTextExtractionInternal:(_WKTextExtractionConfiguration *)configuration completion:(CompletionHandler<void(std::optional<WebCore::TextExtraction::Item>&&)>&&)completion
@@ -6869,6 +6886,7 @@ static std::optional<WebCore::JSHandleIdentifier> mainFrameJSHandleIdentifier(_W
     }();
 
     WebCore::TextExtraction::Request request {
+        .clientNodeAttributes = extractClientNodeAttributes(configuration),
         .collectionRectInRootView = WTFMove(rectInRootView),
         .targetNodeHandleIdentifier = mainFrameJSHandleIdentifier(configuration.targetNode),
         .mergeParagraphs = mergeParagraphs,

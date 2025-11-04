@@ -84,6 +84,12 @@ WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
  */
 @property (nonatomic, copy, nullable) _WKJSHandle *targetNode;
 
+/*!
+ Client-specified attributes and values to add when extracting DOM nodes.
+ Will appear as "attribute=value" in text extraction output.
+ */
+- (void)addClientAttribute:(NSString *)attributeName value:(NSString *)attributeValue forNode:(_WKJSHandle *)node;
+
 @end
 
 typedef NS_ENUM(NSInteger, _WKTextExtractionAction) {

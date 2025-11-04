@@ -225,14 +225,13 @@ TEST(TextExtractionTests, InteractionDebugDescription)
     }
 }
 
-TEST(TextExtractionTests, TargetNode)
+TEST(TextExtractionTests, TargetNodeAndClientAttributes)
 {
     RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:^{
         RetainPtr configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
         [[configuration preferences] _setTextExtractionEnabled:YES];
         return configuration.autorelease();
     }()]);
-
     [webView synchronouslyLoadTestPageNamed:@"debug-text-extraction"];
     [webView evaluateJavaScript:@"getSelection().selectAllChildren(document.querySelector('h3[aria-label=\"Heading\"]'))" completionHandler:nil];
 
@@ -242,14 +241,20 @@ TEST(TextExtractionTests, TargetNode)
         return configuration.autorelease();
     }()];
 
+    RetainPtr editorHandle = [webView querySelector:@"div[contenteditable]" frame:nil world:world.get()];
+    RetainPtr headingHandle = [webView querySelector:@"h3[aria-label='Heading']" frame:nil world:world.get()];
     RetainPtr debugText = [webView synchronouslyGetDebugText:^{
         RetainPtr configuration = adoptNS([_WKTextExtractionConfiguration new]);
-        [configuration setTargetNode:[webView querySelector:@"div[contenteditable]" frame:nil world:world.get()]];
+        [configuration setTargetNode:editorHandle.get()];
+        [configuration addClientAttribute:@"extra-data-1" value:@"abc" forNode:editorHandle.get()];
+        [configuration addClientAttribute:@"extra-data-1" value:@"123" forNode:headingHandle.get()];
+        [configuration addClientAttribute:@"extra-data-2" value:@"xyz" forNode:headingHandle.get()];
         return configuration.autorelease();
     }()];
 
     EXPECT_TRUE([debugText containsString:@"Compose a new message"]);
-    EXPECT_TRUE([debugText containsString:@"Heading"]);
+    EXPECT_TRUE([debugText containsString:@"aria-label='Compose a new message',extra-data-1='abc'"]);
+    EXPECT_TRUE([debugText containsString:@"aria-label='Heading',extra-data-1='123',extra-data-2='xyz'"]);
     EXPECT_TRUE([debugText containsString:@"Subject"]);
     EXPECT_TRUE([debugText containsString:@"The quick brown fox jumped over the lazy dog"]);
     EXPECT_FALSE([debugText containsString:@"select,"]);

@@ -139,7 +139,10 @@ static inline TextNodesAndText collectText(const SimpleRange& range)
     return nodesAndText;
 }
 
+using ClientNodeAttributesMap = WeakHashMap<Node, HashMap<String, String>, WeakPtrImplWithEventTargetData>;
+
 struct TraversalContext {
+    const ClientNodeAttributesMap clientNodeAttributes;
     const TextAndSelectedRangeMap visibleText;
     const std::optional<WebCore::FloatRect> rectInRootView;
     unsigned onlyCollectTextAndLinksCount { 0 };
@@ -536,6 +539,8 @@ static inline void extractRecursive(Node& node, Item& parentItem, TraversalConte
         });
     }
 
+    auto clientAttributes = context.clientNodeAttributes.get(node);
+
     HashMap<String, String> ariaAttributes;
     String role;
     if (RefPtr element = dynamicDowncast<Element>(node); element && context.includeAccessibilityAttributes) {
@@ -562,7 +567,21 @@ static inline void extractRecursive(Node& node, Item& parentItem, TraversalConte
         role = element->attributeWithoutSynchronization(HTMLNames::roleAttr);
     }
 
-    auto policy = eventListeners || !ariaAttributes.isEmpty() || !role.isEmpty() ? FallbackPolicy::Extract : FallbackPolicy::Skip;
+    auto policy = [&] {
+        if (eventListeners)
+            return FallbackPolicy::Extract;
+
+        if (!ariaAttributes.isEmpty())
+            return FallbackPolicy::Extract;
+
+        if (!role.isEmpty())
+            return FallbackPolicy::Extract;
+
+        if (!clientAttributes.isEmpty())
+            return FallbackPolicy::Extract;
+
+        return FallbackPolicy::Skip;
+    }();
 
     WTF::switchOn(extractItemData(node, policy, context),
         [&](SkipExtraction skipExtraction) {
@@ -599,6 +618,7 @@ static inline void extractRecursive(Node& node, Item& parentItem, TraversalConte
                 eventListeners,
                 WTFMove(ariaAttributes),
                 WTFMove(role),
+                WTFMove(clientAttributes),
             } };
         });
 
@@ -616,6 +636,7 @@ static inline void extractRecursive(Node& node, Item& parentItem, TraversalConte
                 eventListeners,
                 WTFMove(ariaAttributes),
                 WTFMove(role),
+                { },
             };
         }
         context.onlyCollectTextAndLinksCount++;
@@ -702,9 +723,21 @@ static void pruneEmptyContainersRecursive(Item& item)
     });
 }
 
+static Node* nodeFromJSHandle(JSHandleIdentifier identifier)
+{
+    auto [globalObject, object] = WebKitJSHandle::objectForIdentifier(identifier);
+    if (!globalObject || !object)
+        return nullptr;
+
+    if (auto* jsNode = jsDynamicCast<JSNode*>(object))
+        return &jsNode->wrapped();
+
+    return nullptr;
+}
+
 Item extractItem(Request&& request, Page& page)
 {
-    Item root { ContainerType::Root, { }, { }, { }, { }, { }, { } };
+    Item root { ContainerType::Root, { }, { }, { }, { }, { }, { }, { } };
     RefPtr mainFrame = dynamicDowncast<LocalFrame>(page.mainFrame());
     if (!mainFrame) {
         // FIXME: Propagate text extraction to RemoteFrames.
@@ -726,21 +759,28 @@ Item extractItem(Request&& request, Page& page)
         if (!request.targetNodeHandleIdentifier)
             return bodyElement.get();
 
-        auto [globalObject, object] = WebKitJSHandle::objectForIdentifier(*request.targetNodeHandleIdentifier);
-        if (!globalObject || !object)
-            return nullptr;
-
-        if (auto* jsNode = jsDynamicCast<JSNode*>(object))
-            return &jsNode->wrapped();
-
-        return nullptr;
+        return nodeFromJSHandle(*request.targetNodeHandleIdentifier);
     }();
 
     if (!extractionRootNode)
         return root;
 
     {
+        ClientNodeAttributesMap clientNodeAttributes;
+        for (auto&& [attribute, values] : WTFMove(request.clientNodeAttributes)) {
+            for (auto&& [identifier, value] : WTFMove(values)) {
+                RefPtr node = nodeFromJSHandle(identifier);
+                if (!node)
+                    continue;
+
+                clientNodeAttributes.ensure(*node, [] {
+                    return HashMap<String, String> { };
+                }).iterator->value.set(attribute, WTFMove(value));
+            }
+        }
+
         TraversalContext context {
+            .clientNodeAttributes = WTFMove(clientNodeAttributes),
             .visibleText = collectText(*extractionRootNode),
             .rectInRootView = WTFMove(request.collectionRectInRootView),
             .onlyCollectTextAndLinksCount = 0,

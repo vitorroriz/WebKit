@@ -27,6 +27,8 @@
 
 #import <WebKit/_WKTextExtraction.h>
 
+@class _WKJSHandle;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface _WKTextExtractionConfiguration ()
@@ -48,6 +50,11 @@ NS_ASSUME_NONNULL_BEGIN
  Defaults to `YES`.
  */
 @property (nonatomic) BOOL shouldFilterText;
+
+/*!
+ Iterates over all custom node attributes added via -addClientAttribute:value:forNode:.
+ */
+- (void)forEachClientNodeAttribute:(void(^)(NSString *attribute, NSString *value, _WKJSHandle *))block;
 
 @end
 

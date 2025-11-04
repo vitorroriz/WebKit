@@ -73,6 +73,7 @@ enum class EventListenerCategory : uint8_t {
 };
 
 struct Request {
+    HashMap<String, HashMap<JSHandleIdentifier, String>> clientNodeAttributes;
     std::optional<FloatRect> collectionRectInRootView;
     std::optional<JSHandleIdentifier> targetNodeHandleIdentifier;
     bool mergeParagraphs { false };
@@ -153,6 +154,7 @@ struct Item {
     OptionSet<EventListenerCategory> eventListeners;
     HashMap<String, String> ariaAttributes;
     String accessibilityRole;
+    HashMap<String, String> clientAttributes;
 };
 
 } // namespace TextExtraction
