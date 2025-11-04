@@ -79,8 +79,8 @@ public:
 
     int index() const;
     TrackID id() const;
-    AtomString label() const;
-    AtomString language() const;
+    String label() const;
+    String language() const;
 
     static String languageForAVAssetTrack(AVAssetTrack*);
     static String languageForAVMediaSelectionOption(AVMediaSelectionOption *);

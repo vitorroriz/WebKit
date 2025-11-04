@@ -101,10 +101,10 @@
 #include <wtf/WallTime.h>
 #include <wtf/glib/GSpanExtras.h>
 #include <wtf/glib/RunLoopSourcePriority.h>
-#include <wtf/text/AtomString.h>
 #include <wtf/text/CString.h>
 #include <wtf/text/MakeString.h>
 #include <wtf/text/StringToIntegerConversion.h>
+#include <wtf/text/WTFString.h>
 
 #if USE(GSTREAMER_MPEGTS)
 #define GST_USE_UNSTABLE_API
@@ -1695,17 +1695,17 @@ void MediaPlayerPrivateGStreamer::playbin3SendSelectStreamsIfAppropriate()
     if (m_wantedVideoStreamId) {
         auto track = m_videoTracks.get(m_wantedVideoStreamId.value());
         m_requestedVideoStreamId = m_wantedVideoStreamId;
-        streams = g_list_append(streams, g_strdup(track->gstStreamId().string().utf8().data()));
+        streams = g_list_append(streams, g_strdup(track->gstStreamId().utf8().data()));
     }
     if (m_wantedAudioStreamId) {
         auto track = m_audioTracks.get(m_wantedAudioStreamId.value());
         m_requestedAudioStreamId = m_wantedAudioStreamId;
-        streams = g_list_append(streams, g_strdup(track->gstStreamId().string().utf8().data()));
+        streams = g_list_append(streams, g_strdup(track->gstStreamId().utf8().data()));
     }
     if (m_wantedTextStreamId) {
         auto track = m_textTracks.get(m_wantedTextStreamId.value());
         m_requestedTextStreamId = m_wantedTextStreamId;
-        streams = g_list_append(streams, g_strdup(track->gstStreamId().string().utf8().data()));
+        streams = g_list_append(streams, g_strdup(track->gstStreamId().utf8().data()));
     }
 
     if (!streams)
@@ -2488,9 +2488,9 @@ void MediaPlayerPrivateGStreamer::processMpegTsSection(GstMpegtsSection* section
         GRefPtr<GPtrArray> streams = pmt->streams;
         for (auto stream : span<GstMpegtsPMTStream*>(streams)) {
             if (stream->stream_type == 0x05 || stream->stream_type >= 0x80) {
-                AtomString pid = AtomString::number(stream->pid);
+                TrackID pid = stream->pid;
                 RefPtr<InbandMetadataTextTrackPrivateGStreamer> track = InbandMetadataTextTrackPrivateGStreamer::create(
-                    InbandTextTrackPrivate::Kind::Metadata, InbandTextTrackPrivate::CueFormat::Data, pid);
+                    InbandTextTrackPrivate::Kind::Metadata, InbandTextTrackPrivate::CueFormat::Data, String::number(pid));
 
                 // 4.7.10.12.2 Sourcing in-band text tracks
                 // If the new text track's kind is metadata, then set the text track in-band metadata track dispatch
@@ -2510,7 +2510,7 @@ void MediaPlayerPrivateGStreamer::processMpegTsSection(GstMpegtsSection* section
                     for (unsigned k = 0; k < descriptor->length; ++k)
                         inbandMetadataTrackDispatchType.append(hex(descriptorData[k], 2));
                 }
-                track->setInBandMetadataTrackDispatchType(inbandMetadataTrackDispatchType.toAtomString());
+                track->setInBandMetadataTrackDispatchType(inbandMetadataTrackDispatchType.toString());
 
                 m_metadataTracks.add(stream->pid, track);
                 if (RefPtr player = m_player.get())

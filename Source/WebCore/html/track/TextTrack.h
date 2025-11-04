@@ -71,7 +71,7 @@ public:
     const AtomString& kindKeyword() const;
     void setKindKeywordIgnoringASCIICase(StringView);
 
-    virtual AtomString inBandMetadataTrackDispatchType() const { return emptyAtom(); }
+    virtual String inBandMetadataTrackDispatchType() const { return emptyString(); }
 
     enum class Mode { Disabled, Hidden, Showing };
     Mode mode() const;

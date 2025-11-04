@@ -279,7 +279,7 @@ TrackID AVTrackPrivateAVFObjCImpl::id() const
     return 0;
 }
 
-AtomString AVTrackPrivateAVFObjCImpl::label() const
+String AVTrackPrivateAVFObjCImpl::label() const
 {
     ASSERT(m_assetTrack || m_mediaSelectionOption);
 
@@ -291,7 +291,7 @@ AtomString AVTrackPrivateAVFObjCImpl::label() const
 
     NSArray *titles = [PAL::getAVMetadataItemClassSingleton() metadataItemsFromArray:commonMetadata withKey:AVMetadataCommonKeyTitle keySpace:AVMetadataKeySpaceCommon];
     if (![titles count])
-        return emptyAtom();
+        return emptyString();
 
     // If possible, return a title in one of the user's preferred languages.
     NSArray *titlesForPreferredLanguages = [PAL::getAVMetadataItemClassSingleton() metadataItemsFromArray:titles filteredAndSortedAccordingToPreferredLanguages:[NSLocale preferredLanguages]];
@@ -300,21 +300,21 @@ AtomString AVTrackPrivateAVFObjCImpl::label() const
     return [[titles objectAtIndex:0] stringValue];
 }
 
-AtomString AVTrackPrivateAVFObjCImpl::language() const
+String AVTrackPrivateAVFObjCImpl::language() const
 {
     if (m_assetTrack) {
         auto language = languageForAVAssetTrack(m_assetTrack.get());
         if (!language.isEmpty())
-            return AtomString { language };
+            return language;
     }
 
     if (m_mediaSelectionOption) {
         auto language = languageForAVMediaSelectionOption(m_mediaSelectionOption->avMediaSelectionOption());
         if (!language.isEmpty())
-            return AtomString { language };
+            return language;
     }
 
-    return emptyAtom();
+    return emptyString();
 }
 
 String AVTrackPrivateAVFObjCImpl::languageForAVAssetTrack(AVAssetTrack* track)

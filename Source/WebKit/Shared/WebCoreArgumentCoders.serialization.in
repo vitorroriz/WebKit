@@ -6189,7 +6189,7 @@ header: <WebCore/ISOVTTCue.h>
 [CustomHeader] class WebCore::ISOWebVTTCue {
     MediaTime presentationTime();
     MediaTime duration();
-    AtomString id();
+    String id();
     String cueText();
     String settings();
     String sourceID();
