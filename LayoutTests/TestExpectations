@@ -6241,10 +6241,6 @@ imported/w3c/web-platform-tests/trusted-types/trusted-types-reporting-for-Shared
 imported/w3c/web-platform-tests/trusted-types/should-sink-type-mismatch-violation-be-blocked-by-csp-002-worker.html [ Skip ]
 imported/w3c/web-platform-tests/trusted-types/should-trusted-type-policy-creation-be-blocked-by-csp-004-worker.html [ Skip ]
 
-webkit.org/b/298792 imported/w3c/web-platform-tests/trusted-types/navigate-to-javascript-url-006.sub.html [ Skip ]
-webkit.org/b/298792 imported/w3c/web-platform-tests/trusted-types/navigate-to-javascript-url-003.html [ Skip ]
-webkit.org/b/298792 imported/w3c/web-platform-tests/trusted-types/navigate-to-javascript-url-csp-headers.html [ Skip ]
-
 # Close watchers aren't implemented yet
 webkit.org/b/263305 imported/w3c/web-platform-tests/close-watcher/user-activation/n-activate-preventDefault.html?dialog [ Skip ]
 webkit.org/b/263305 imported/w3c/web-platform-tests/close-watcher/user-activation/n-activate.html?dialog [ Skip ]
