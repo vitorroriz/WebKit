@@ -63,6 +63,7 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
 #include <JavaScriptCore/ThunkGenerator.h>
 #include <JavaScriptCore/VMThreadContext.h>
 #include <JavaScriptCore/WasmContext.h>
+#include <JavaScriptCore/WasmDebugServerUtilities.h>
 #include <JavaScriptCore/WeakGCMap.h>
 #include <JavaScriptCore/WriteBarrier.h>
 #include <wtf/BumpPointerAllocator.h>
@@ -1111,6 +1112,13 @@ public:
     bool isWasmStopWorldActive() { return m_isWasmStopWorldActive; }
     void setIsWasmStopWorldActive(bool isWasmStopWorldActive) { m_isWasmStopWorldActive = isWasmStopWorldActive; }
 
+#if ENABLE(WEBASSEMBLY)
+    bool takeStepIntoWasmCall() { return m_stepIntoEvent.take(Wasm::StepIntoEvent::StepIntoCall); }
+    void setStepIntoWasmCall() { m_stepIntoEvent.set(Wasm::StepIntoEvent::StepIntoCall); }
+    bool takeStepIntoWasmThrow() { return m_stepIntoEvent.take(Wasm::StepIntoEvent::StepIntoThrow); }
+    void setStepIntoWasmThrow() { m_stepIntoEvent.set(Wasm::StepIntoEvent::StepIntoThrow); }
+#endif
+
 private:
     VM(VMType, HeapType, WTF::RunLoop* = nullptr, bool* success = nullptr);
     static VM*& sharedInstanceInternal();
@@ -1237,6 +1245,10 @@ private:
     bool m_executionForbiddenOnTermination { false };
     bool m_isDebuggerHookInjected { false };
     bool m_isWasmStopWorldActive { false };
+
+#if ENABLE(WEBASSEMBLY)
+    Wasm::StepIntoEvent m_stepIntoEvent;
+#endif
 
     Lock m_loopHintExecutionCountLock;
     UncheckedKeyHashMap<const JSInstruction*, std::pair<unsigned, std::unique_ptr<uintptr_t>>> m_loopHintExecutionCounts;
