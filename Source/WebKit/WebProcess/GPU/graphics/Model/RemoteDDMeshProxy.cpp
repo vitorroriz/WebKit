@@ -240,6 +240,14 @@ void RemoteDDMeshProxy::setEntityTransform(const WebCore::DDModel::DDFloat4x4& t
 #endif
 }
 
+void RemoteDDMeshProxy::play(bool playing)
+{
+#if ENABLE(GPU_PROCESS_MODEL)
+    auto sendResult = send(Messages::RemoteDDMesh::Play(playing));
+    UNUSED_PARAM(sendResult);
+#endif
+}
+
 std::optional<WebCore::DDModel::DDFloat4x4> RemoteDDMeshProxy::entityTransform() const
 {
     return m_transform;
@@ -311,7 +319,7 @@ void RemoteDDMeshProxy::setScale(float scale)
 void RemoteDDMeshProxy::setStageMode(WebCore::StageModeOperation stageMode)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
-    if (m_stageMode == stageMode || stageMode == WebCore::StageModeOperation::None)
+    if (stageMode == WebCore::StageModeOperation::None)
         return;
 
     m_stageMode = stageMode;

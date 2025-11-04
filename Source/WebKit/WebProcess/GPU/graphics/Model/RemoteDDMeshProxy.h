@@ -83,6 +83,7 @@ private:
 #if PLATFORM(COCOA)
     std::pair<simd_float4, simd_float4> getCenterAndExtents() const final;
 #endif
+    void play(bool) final;
 
     void render() final;
     void setLabelInternal(const String&) final;

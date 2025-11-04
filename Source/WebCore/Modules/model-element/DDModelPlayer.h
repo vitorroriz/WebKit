@@ -89,6 +89,12 @@ private:
 
     const MachSendRight* displayBuffer() const;
     GraphicsLayerContentsDisplayDelegate* contentsDisplayDelegate();
+
+    void setAutoplay(bool) override;
+    void setPaused(bool, CompletionHandler<void(bool succeeded)>&&) override;
+    bool paused() const override;
+    void play(bool);
+
     void ensureOnMainThreadWithProtectedThis(Function<void(Ref<DDModelPlayer>)>&& task);
     void setStageMode(WebCore::StageModeOperation) final;
     void notifyEntityTransformUpdated();
@@ -105,6 +111,12 @@ private:
     StageModeOperation m_stageMode { StageModeOperation::None };
     float m_currentScale { 1.f };
     bool m_didFinishLoading { false };
+    enum class PauseState {
+        None,
+        Playing,
+        Paused
+    };
+    PauseState m_pauseState { PauseState::None };
 };
 
 }

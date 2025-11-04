@@ -367,6 +367,34 @@ bool DDModelPlayer::supportsTransform(TransformationMatrix transformationMatrix)
     return false;
 }
 
+void DDModelPlayer::play(bool playing)
+{
+    if (RefPtr model = m_currentModel) {
+        model->play(playing);
+        m_pauseState = playing ? PauseState::Playing : PauseState::Paused;
+    }
+}
+
+void DDModelPlayer::setAutoplay(bool autoplay)
+{
+    if (m_pauseState == PauseState::Paused)
+        return;
+
+    play(autoplay);
+    m_pauseState = autoplay ? PauseState::Playing : PauseState::Paused;
+}
+
+void DDModelPlayer::setPaused(bool paused, CompletionHandler<void(bool succeeded)>&& completion)
+{
+    play(!paused);
+    completion(!!m_currentModel);
+}
+
+bool DDModelPlayer::paused() const
+{
+    return m_pauseState != PauseState::Playing;
+}
+
 std::optional<TransformationMatrix> DDModelPlayer::entityTransform() const
 {
     if (RefPtr model = m_currentModel) {
@@ -391,8 +419,10 @@ void DDModelPlayer::setStageMode(StageModeOperation stageMode)
 
 void DDModelPlayer::setEntityTransform(TransformationMatrix matrix)
 {
-    if (RefPtr model = m_currentModel)
+    if (RefPtr model = m_currentModel) {
         model->setEntityTransform(static_cast<simd_float4x4>(matrix));
+        notifyEntityTransformUpdated();
+    }
 }
 
 } // namespace WebCore

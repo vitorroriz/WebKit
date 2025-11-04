@@ -465,6 +465,10 @@ void DDMeshImpl::setCameraDistance(float distance)
     wgpuDDMeshSetCameraDistance(m_backing.get(), distance);
 }
 
+void DDMeshImpl::play(bool play)
+{
+    wgpuDDMeshPlay(m_backing.get(), play);
+}
 #endif
 
 Vector<MachSendRight> DDMeshImpl::ioSurfaceHandles()
