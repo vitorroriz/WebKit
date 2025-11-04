@@ -33,7 +33,7 @@
 #include "AudioSession.h"
 #include "CoreAudioCaptureDevice.h"
 #include "CoreAudioCaptureDeviceManager.h"
-#include "CoreAudioSharedUnit.h"
+#include "CoreAudioCaptureUnit.h"
 #include "Logging.h"
 #include "PlatformMediaSessionManager.h"
 #include "Timer.h"
@@ -120,7 +120,7 @@ CoreAudioCaptureSourceFactory::~CoreAudioCaptureSourceFactory()
 void CoreAudioCaptureSourceFactory::beginInterruption()
 {
     ensureOnMainThread([] {
-        CoreAudioSharedUnit::forEach([](auto& unit) {
+        CoreAudioCaptureUnit::forEach([](auto& unit) {
             unit.suspend();
         });
     });
@@ -129,7 +129,7 @@ void CoreAudioCaptureSourceFactory::beginInterruption()
 void CoreAudioCaptureSourceFactory::endInterruption()
 {
     ensureOnMainThread([] {
-        CoreAudioSharedUnit::forEach([](auto& unit) {
+        CoreAudioCaptureUnit::forEach([](auto& unit) {
             unit.resume();
         });
     });
@@ -138,7 +138,7 @@ void CoreAudioCaptureSourceFactory::endInterruption()
 void CoreAudioCaptureSourceFactory::scheduleReconfiguration()
 {
     ensureOnMainThread([] {
-        CoreAudioSharedUnit::forEach([](auto& unit) {
+        CoreAudioCaptureUnit::forEach([](auto& unit) {
             unit.reconfigure();
         });
     });
@@ -169,37 +169,37 @@ const Vector<CaptureDevice>& CoreAudioCaptureSourceFactory::speakerDevices() con
 
 void CoreAudioCaptureSourceFactory::enableMutedSpeechActivityEventListener(Function<void()>&& callback)
 {
-    CoreAudioSharedUnit::defaultSingleton().enableMutedSpeechActivityEventListener(WTFMove(callback));
+    CoreAudioCaptureUnit::defaultSingleton().enableMutedSpeechActivityEventListener(WTFMove(callback));
 }
 
 void CoreAudioCaptureSourceFactory::disableMutedSpeechActivityEventListener()
 {
-    CoreAudioSharedUnit::defaultSingleton().disableMutedSpeechActivityEventListener();
+    CoreAudioCaptureUnit::defaultSingleton().disableMutedSpeechActivityEventListener();
 }
 
 void CoreAudioCaptureSourceFactory::registerSpeakerSamplesProducer(CoreAudioSpeakerSamplesProducer& producer)
 {
-    CoreAudioSharedUnit::defaultSingleton().registerSpeakerSamplesProducer(producer);
+    CoreAudioCaptureUnit::defaultSingleton().registerSpeakerSamplesProducer(producer);
 }
 
 void CoreAudioCaptureSourceFactory::unregisterSpeakerSamplesProducer(CoreAudioSpeakerSamplesProducer& producer)
 {
-    CoreAudioSharedUnit::defaultSingleton().unregisterSpeakerSamplesProducer(producer);
+    CoreAudioCaptureUnit::defaultSingleton().unregisterSpeakerSamplesProducer(producer);
 }
 
 bool CoreAudioCaptureSourceFactory::shouldAudioCaptureUnitRenderAudio()
 {
 #if PLATFORM(IOS_FAMILY)
-    return CoreAudioSharedUnit::defaultSingleton().isRunning();
+    return CoreAudioCaptureUnit::defaultSingleton().isRunning();
 #else
-    return CoreAudioSharedUnit::defaultSingleton().isRunning() && CoreAudioSharedUnit::defaultSingleton().canRenderAudio();
+    return CoreAudioCaptureUnit::defaultSingleton().isRunning() && CoreAudioCaptureUnit::defaultSingleton().canRenderAudio();
 #endif // PLATFORM(IOS_FAMILY)
 }
 
 CoreAudioCaptureSource::CoreAudioCaptureSource(const CaptureDevice& device, uint32_t captureDeviceID, MediaDeviceHashSalts&& hashSalts, std::optional<PageIdentifier> pageIdentifier)
     : RealtimeMediaSource(device, WTFMove(hashSalts), pageIdentifier)
     , m_captureDeviceID(captureDeviceID)
-    , m_unit(CoreAudioSharedUnit::defaultSingleton())
+    , m_unit(CoreAudioCaptureUnit::defaultSingleton())
 {
     // We ensure that we unsuspend ourselves on the constructor as a capture source
     // is created when getUserMedia grants access which only happens when the process is foregrounded.
@@ -212,12 +212,12 @@ CoreAudioCaptureSource::CoreAudioCaptureSource(const CaptureDevice& device, uint
     initializeVolume(unit->volume());
 }
 
-Ref<CoreAudioSharedUnit> CoreAudioCaptureSource::protectedUnit()
+Ref<CoreAudioCaptureUnit> CoreAudioCaptureSource::protectedUnit()
 {
     return m_unit;
 }
 
-Ref<const CoreAudioSharedUnit> CoreAudioCaptureSource::protectedUnit() const
+Ref<const CoreAudioCaptureUnit> CoreAudioCaptureSource::protectedUnit() const
 {
     return m_unit;
 }

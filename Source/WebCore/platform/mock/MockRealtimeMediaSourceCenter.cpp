@@ -45,7 +45,7 @@
 #if PLATFORM(COCOA)
 #include "CoreAudioCaptureSource.h"
 #include "DisplayCaptureSourceCocoa.h"
-#include "MockAudioSharedUnit.h"
+#include "MockAudioCaptureUnit.h"
 #include "MockRealtimeVideoSourceMac.h"
 #endif
 
@@ -381,7 +381,7 @@ void MockRealtimeMediaSourceCenter::setMockRealtimeMediaSourceCenterEnabled(bool
     if (mock.m_isEnabled) {
         if (mock.m_isMockAudioCaptureEnabled) {
 #if PLATFORM(COCOA)
-            MockAudioSharedUnit::enable();
+            MockAudioCaptureUnit::enable();
 #endif
             center.setAudioCaptureFactory(mock.audioCaptureFactory());
         }
@@ -394,7 +394,7 @@ void MockRealtimeMediaSourceCenter::setMockRealtimeMediaSourceCenterEnabled(bool
 
     if (mock.m_isMockAudioCaptureEnabled) {
 #if PLATFORM(COCOA)
-        MockAudioSharedUnit::disable();
+        MockAudioCaptureUnit::disable();
 #endif
         center.unsetAudioCaptureFactory(mock.audioCaptureFactory());
     }
@@ -447,8 +447,8 @@ void MockRealtimeMediaSourceCenter::triggerMockCaptureConfigurationChange(bool f
     if (forMicrophone) {
         auto devices = audioCaptureDeviceManager().captureDevices();
         if (devices.size() > 1) {
-            MockAudioSharedUnit::increaseBufferSize();
-            CoreAudioSharedUnit::forEach([&devices](auto& unit) {
+            MockAudioCaptureUnit::increaseBufferSize();
+            CoreAudioCaptureUnit::forEach([&devices](auto& unit) {
                 unit.handleNewCurrentMicrophoneDevice(devices[1]);
             });
         }

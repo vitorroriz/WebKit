@@ -25,12 +25,12 @@
 
 
 #import "config.h"
-#import "MockAudioSharedUnit.h"
+#import "MockAudioCaptureUnit.h"
 
 #if ENABLE(MEDIA_STREAM)
 #import "AudioSampleBufferList.h"
 #import "AudioSession.h"
-#import "BaseAudioSharedUnit.h"
+#import "BaseAudioCaptureUnit.h"
 #import "CAAudioStreamDescription.h"
 #import "CoreAudioCaptureSource.h"
 #import "MediaConstraints.h"
@@ -93,9 +93,9 @@ CaptureSourceOrError MockRealtimeAudioSource::create(String&& deviceID, AtomStri
     return CoreAudioCaptureSource::createForTesting(WTFMove(deviceID), WTFMove(name), WTFMove(hashSalts), constraints, pageIdentifier, std::get<MockMicrophoneProperties>(device->properties).echoCancellation);
 }
 
-class MockAudioSharedInternalUnitState : public ThreadSafeRefCounted<MockAudioSharedInternalUnitState> {
+class MockAudioCaptureInternalUnitState : public ThreadSafeRefCounted<MockAudioCaptureInternalUnitState> {
 public:
-    static Ref<MockAudioSharedInternalUnitState> create() { return adoptRef(*new MockAudioSharedInternalUnitState()); }
+    static Ref<MockAudioCaptureInternalUnitState> create() { return adoptRef(*new MockAudioCaptureInternalUnitState()); }
 
     bool isProducingData() const { return m_isProducingData; }
     void setIsProducingData(bool value) { m_isProducingData = value; }
@@ -104,11 +104,11 @@ private:
     bool m_isProducingData { false };
 };
 
-class MockAudioSharedInternalUnit :  public CoreAudioSharedUnit::InternalUnit {
-    WTF_MAKE_TZONE_ALLOCATED_INLINE(MockAudioSharedInternalUnit);
+class MockAudioCaptureInternalUnit :  public CoreAudioCaptureUnit::InternalUnit {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(MockAudioCaptureInternalUnit);
 public:
-    explicit MockAudioSharedInternalUnit(bool enableEchoCancellation);
-    ~MockAudioSharedInternalUnit();
+    explicit MockAudioCaptureInternalUnit(bool enableEchoCancellation);
+    ~MockAudioCaptureInternalUnit();
 
 private:
     OSStatus initialize() final;
@@ -148,7 +148,7 @@ private:
 
     Vector<float> m_bipBopBuffer;
     bool m_hasAudioUnit { false };
-    const Ref<MockAudioSharedInternalUnitState> m_internalState;
+    const Ref<MockAudioCaptureInternalUnitState> m_internalState;
     bool m_enableEchoCancellation { true };
     bool m_isOutputMuted { false };
     bool m_voiceActivityDetectionEnabled { false };
@@ -159,31 +159,33 @@ private:
 
     const Ref<WorkQueue> m_workQueue;
     unsigned m_channelCount { 2 };
-    
+
     AURenderCallbackStruct m_microphoneCallback;
     AURenderCallbackStruct m_speakerCallback;
 };
 
 static bool s_shouldIncreaseBufferSize;
-void MockAudioSharedUnit::enable()
+void MockAudioCaptureUnit::enable()
 {
     s_shouldIncreaseBufferSize = false;
-    CoreAudioSharedUnit::defaultSingleton().setSampleRateRange({ 44100, 96000 });
-    CoreAudioSharedUnit::defaultSingleton().setInternalUnitCreationCallback([](bool enableEchoCancellation) {
-        UniqueRef<CoreAudioSharedUnit::InternalUnit> result = makeUniqueRef<MockAudioSharedInternalUnit>(enableEchoCancellation);
+    CoreAudioCaptureUnit::defaultSingleton().setSampleRateRange({ 44100, 96000 });
+    CoreAudioCaptureUnit::defaultSingleton().setInternalUnitCreationCallback([](bool enableEchoCancellation) {
+        UniqueRef<CoreAudioCaptureUnit::InternalUnit> result = makeUniqueRef<MockAudioCaptureInternalUnit>(enableEchoCancellation);
         return result;
     });
-    CoreAudioSharedUnit::defaultSingleton().setInternalUnitGetSampleRateCallback([] { return 44100; });
+    CoreAudioCaptureUnit::defaultSingleton().setInternalUnitGetSampleRateCallback([] {
+        return 44100;
+    });
 }
 
-void MockAudioSharedUnit::disable()
+void MockAudioCaptureUnit::disable()
 {
-    CoreAudioSharedUnit::defaultSingleton().setSampleRateRange({ 8000, 96000 });
-    CoreAudioSharedUnit::defaultSingleton().setInternalUnitCreationCallback({ });
-    CoreAudioSharedUnit::defaultSingleton().setInternalUnitGetSampleRateCallback({ });
+    CoreAudioCaptureUnit::defaultSingleton().setSampleRateRange({ 8000, 96000 });
+    CoreAudioCaptureUnit::defaultSingleton().setInternalUnitCreationCallback({ });
+    CoreAudioCaptureUnit::defaultSingleton().setInternalUnitGetSampleRateCallback({ });
 }
 
-void MockAudioSharedUnit::increaseBufferSize()
+void MockAudioCaptureUnit::increaseBufferSize()
 {
     s_shouldIncreaseBufferSize = true;
 }
@@ -200,22 +202,22 @@ static AudioStreamBasicDescription createAudioFormat(Float64 sampleRate, UInt32 
     return format;
 }
 
-MockAudioSharedInternalUnit::MockAudioSharedInternalUnit(bool enableEchoCancellation)
-    : m_internalState(MockAudioSharedInternalUnitState::create())
+MockAudioCaptureInternalUnit::MockAudioCaptureInternalUnit(bool enableEchoCancellation)
+    : m_internalState(MockAudioCaptureInternalUnitState::create())
     , m_enableEchoCancellation(enableEchoCancellation)
-    , m_timer(RunLoop::currentSingleton(), "MockAudioSharedInternalUnit::Timer"_s, [this] { this->start(); })
-    , m_voiceDetectionTimer(RunLoop::currentSingleton(), "MockAudioSharedInternalUnit::VoiceDetectionTimer"_s, [this] { this->voiceDetected(); })
-    , m_workQueue(WorkQueue::create("MockAudioSharedInternalUnit Capture Queue"_s, WorkQueue::QOS::UserInteractive))
+    , m_timer(RunLoop::currentSingleton(), "MockAudioCaptureInternalUnit::Timer"_s, [this] { this->start(); })
+    , m_voiceDetectionTimer(RunLoop::currentSingleton(), "MockAudioCaptureInternalUnit::VoiceDetectionTimer"_s, [this] { this->voiceDetected(); })
+    , m_workQueue(WorkQueue::create("MockAudioCaptureInternalUnit Capture Queue"_s, WorkQueue::QOS::UserInteractive))
 {
     m_streamFormat = m_outputStreamFormat = createAudioFormat(44100, 2);
 }
 
-MockAudioSharedInternalUnit::~MockAudioSharedInternalUnit()
+MockAudioCaptureInternalUnit::~MockAudioCaptureInternalUnit()
 {
     ASSERT(!m_internalState->isProducingData());
 }
 
-OSStatus MockAudioSharedInternalUnit::initialize()
+OSStatus MockAudioCaptureInternalUnit::initialize()
 {
     ASSERT(m_outputStreamFormat.mSampleRate == m_streamFormat.mSampleRate);
     if (m_outputStreamFormat.mSampleRate != m_streamFormat.mSampleRate)
@@ -224,7 +226,7 @@ OSStatus MockAudioSharedInternalUnit::initialize()
     return 0;
 }
 
-OSStatus MockAudioSharedInternalUnit::start()
+OSStatus MockAudioCaptureInternalUnit::start()
 {
     if (!m_hasAudioUnit)
         m_hasAudioUnit = true;
@@ -238,7 +240,7 @@ OSStatus MockAudioSharedInternalUnit::start()
     return 0;
 }
 
-OSStatus MockAudioSharedInternalUnit::stop()
+OSStatus MockAudioCaptureInternalUnit::stop()
 {
     m_internalState->setIsProducingData(false);
     if (m_hasAudioUnit)
@@ -249,19 +251,19 @@ OSStatus MockAudioSharedInternalUnit::stop()
     return 0;
 }
 
-OSStatus MockAudioSharedInternalUnit::uninitialize()
+OSStatus MockAudioCaptureInternalUnit::uninitialize()
 {
     ASSERT(!m_internalState->isProducingData());
     return 0;
 }
 
-void MockAudioSharedInternalUnit::delaySamples(Seconds delta)
+void MockAudioCaptureInternalUnit::delaySamples(Seconds delta)
 {
     stop();
     m_timer.startOneShot(delta);
 }
 
-bool MockAudioSharedInternalUnit::setVoiceActivityDetection(bool shouldEnable)
+bool MockAudioCaptureInternalUnit::setVoiceActivityDetection(bool shouldEnable)
 {
     m_voiceActivityDetectionEnabled = shouldEnable;
     if (!m_voiceActivityDetectionEnabled || !m_isOutputMuted)
@@ -272,13 +274,13 @@ bool MockAudioSharedInternalUnit::setVoiceActivityDetection(bool shouldEnable)
     return true;
 }
 
-void MockAudioSharedInternalUnit::voiceDetected()
+void MockAudioCaptureInternalUnit::voiceDetected()
 {
-    CoreAudioSharedUnit::defaultSingleton().voiceActivityDetected();
-    CoreAudioSharedUnit::defaultSingleton().disableVoiceActivityThrottleTimerForTesting();
+    CoreAudioCaptureUnit::defaultSingleton().voiceActivityDetected();
+    CoreAudioCaptureUnit::defaultSingleton().disableVoiceActivityThrottleTimerForTesting();
 }
 
-void MockAudioSharedInternalUnit::reconfigure()
+void MockAudioCaptureInternalUnit::reconfigure()
 {
     ASSERT(!isMainThread());
 
@@ -307,7 +309,7 @@ void MockAudioSharedInternalUnit::reconfigure()
         addHum(NoiseVolume, NoiseFrequency, rate, 0, m_bipBopBuffer.mutableSpan().first(sampleCount));
 }
 
-void MockAudioSharedInternalUnit::emitSampleBuffers(uint32_t frameCount)
+void MockAudioCaptureInternalUnit::emitSampleBuffers(uint32_t frameCount)
 {
     ASSERT(!isMainThread());
     ASSERT(m_formatDescription);
@@ -318,7 +320,7 @@ void MockAudioSharedInternalUnit::emitSampleBuffers(uint32_t frameCount)
 
     auto* bufferList = m_audioBufferList->list();
     AudioUnitRenderActionFlags ioActionFlags = 0;
-    
+
     AudioTimeStamp timeStamp;
     zeroBytes(timeStamp);
     timeStamp.mSampleTime = sampleTime;
@@ -333,7 +335,7 @@ void MockAudioSharedInternalUnit::emitSampleBuffers(uint32_t frameCount)
         m_speakerCallback.inputProc(m_speakerCallback.inputProcRefCon, &ioActionFlags, &timeStamp, 1, frameCount, bufferList);
 }
 
-void MockAudioSharedInternalUnit::generateSampleBuffers(MonotonicTime renderTime)
+void MockAudioCaptureInternalUnit::generateSampleBuffers(MonotonicTime renderTime)
 {
     auto delta = renderInterval();
     auto currentTime = MonotonicTime::now();
@@ -372,7 +374,7 @@ void MockAudioSharedInternalUnit::generateSampleBuffers(MonotonicTime renderTime
     }
 }
 
-OSStatus MockAudioSharedInternalUnit::render(AudioUnitRenderActionFlags*, const AudioTimeStamp*, UInt32, UInt32 frameCount, AudioBufferList* buffer)
+OSStatus MockAudioCaptureInternalUnit::render(AudioUnitRenderActionFlags*, const AudioTimeStamp*, UInt32, UInt32 frameCount, AudioBufferList* buffer)
 {
     auto destinationBuffers = span(*buffer);
     if (s_shouldIncreaseBufferSize) {
@@ -399,7 +401,7 @@ OSStatus MockAudioSharedInternalUnit::render(AudioUnitRenderActionFlags*, const 
     return 0;
 }
 
-OSStatus MockAudioSharedInternalUnit::set(AudioUnitPropertyID property, AudioUnitScope scope, AudioUnitElement, const void* value, UInt32)
+OSStatus MockAudioCaptureInternalUnit::set(AudioUnitPropertyID property, AudioUnitScope scope, AudioUnitElement, const void* value, UInt32)
 {
     if (property == kAudioUnitProperty_StreamFormat) {
         auto& typedValue = *static_cast<const AudioStreamBasicDescription*>(value);
@@ -419,7 +421,7 @@ OSStatus MockAudioSharedInternalUnit::set(AudioUnitPropertyID property, AudioUni
     }
     if (property == kAudioOutputUnitProperty_CurrentDevice) {
         ASSERT(!*static_cast<const uint32_t*>(value));
-        auto device = MockRealtimeMediaSourceCenter::mockDeviceWithPersistentID(CoreAudioSharedUnit::defaultSingleton().persistentIDForTesting());
+        auto device = MockRealtimeMediaSourceCenter::mockDeviceWithPersistentID(CoreAudioCaptureUnit::defaultSingleton().persistentIDForTesting());
         if (!device)
             return -1;
 
@@ -431,11 +433,11 @@ OSStatus MockAudioSharedInternalUnit::set(AudioUnitPropertyID property, AudioUni
         setVoiceActivityDetection(m_voiceActivityDetectionEnabled);
         return 0;
     }
-    
+
     return 0;
 }
 
-OSStatus MockAudioSharedInternalUnit::get(AudioUnitPropertyID property, AudioUnitScope scope, AudioUnitElement, void* value, UInt32* valueSize)
+OSStatus MockAudioCaptureInternalUnit::get(AudioUnitPropertyID property, AudioUnitScope scope, AudioUnitElement, void* value, UInt32* valueSize)
 {
     if (property == kAudioUnitProperty_StreamFormat) {
         auto& typedValue = *static_cast<AudioStreamBasicDescription*>(value);
@@ -450,13 +452,13 @@ OSStatus MockAudioSharedInternalUnit::get(AudioUnitPropertyID property, AudioUni
     return 0;
 }
 
-OSStatus MockAudioSharedInternalUnit::defaultInputDevice(uint32_t* device)
+OSStatus MockAudioCaptureInternalUnit::defaultInputDevice(uint32_t* device)
 {
     *device = 0;
     return 0;
 }
 
-OSStatus MockAudioSharedInternalUnit::defaultOutputDevice(uint32_t* device)
+OSStatus MockAudioCaptureInternalUnit::defaultOutputDevice(uint32_t* device)
 {
     *device = 0;
     return 0;

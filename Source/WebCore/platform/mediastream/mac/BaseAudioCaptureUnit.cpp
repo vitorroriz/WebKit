@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#include "BaseAudioSharedUnit.h"
+#include "BaseAudioCaptureUnit.h"
 
 #if ENABLE(MEDIA_STREAM)
 
@@ -40,18 +40,18 @@ namespace WebCore {
 
 constexpr Seconds voiceActivityThrottlingDuration = 5_s;
 
-BaseAudioSharedUnit::BaseAudioSharedUnit()
+BaseAudioCaptureUnit::BaseAudioCaptureUnit()
     : m_sampleRate(AudioSession::singleton().sampleRate())
 {
     RealtimeMediaSourceCenter::singleton().addDevicesChangedObserver(*this);
 }
 
-BaseAudioSharedUnit::~BaseAudioSharedUnit()
+BaseAudioCaptureUnit::~BaseAudioCaptureUnit()
 {
     RealtimeMediaSourceCenter::singleton().removeDevicesChangedObserver(*this);
 }
 
-void BaseAudioSharedUnit::addClient(CoreAudioCaptureSource& client)
+void BaseAudioCaptureUnit::addClient(CoreAudioCaptureSource& client)
 {
     ASSERT(isMainThread());
     m_clients.add(client);
@@ -59,7 +59,7 @@ void BaseAudioSharedUnit::addClient(CoreAudioCaptureSource& client)
     m_audioThreadClients = m_clients.weakValues();
 }
 
-void BaseAudioSharedUnit::removeClient(CoreAudioCaptureSource& client)
+void BaseAudioCaptureUnit::removeClient(CoreAudioCaptureSource& client)
 {
     ASSERT(isMainThread());
     m_clients.remove(client);
@@ -72,7 +72,7 @@ void BaseAudioSharedUnit::removeClient(CoreAudioCaptureSource& client)
         stopRunning();
 }
 
-void BaseAudioSharedUnit::clearClients()
+void BaseAudioCaptureUnit::clearClients()
 {
     ASSERT(isMainThread());
     m_clients.clear();
@@ -80,7 +80,7 @@ void BaseAudioSharedUnit::clearClients()
     m_audioThreadClients.clear();
 }
 
-void BaseAudioSharedUnit::forEachClient(NOESCAPE const Function<void(CoreAudioCaptureSource&)>& apply) const
+void BaseAudioCaptureUnit::forEachClient(NOESCAPE const Function<void(CoreAudioCaptureSource&)>& apply) const
 {
     ASSERT(isMainThread());
     m_clients.forEach(apply);
@@ -90,18 +90,18 @@ const static OSStatus lowPriorityError1 = 560557684;
 const static OSStatus lowPriorityError2 = 561017449;
 
 #if ASSERT_ENABLED
-static bool s_isBaseAudioSharedUnitAllowedToStart = false;
+static bool s_isBaseAudioCaptureUnitAllowedToStart = false;
 
-void BaseAudioSharedUnit::allowStarting()
+void BaseAudioCaptureUnit::allowStarting()
 {
-    s_isBaseAudioSharedUnitAllowedToStart = true;
+    s_isBaseAudioCaptureUnitAllowedToStart = true;
 }
 #endif
 
-void BaseAudioSharedUnit::startProducingData()
+void BaseAudioCaptureUnit::startProducingData()
 {
     ASSERT(isMainThread());
-    ASSERT(s_isBaseAudioSharedUnitAllowedToStart);
+    ASSERT(s_isBaseAudioCaptureUnitAllowedToStart);
 
     if (m_suspended)
         resume();
@@ -121,7 +121,7 @@ void BaseAudioSharedUnit::startProducingData()
 #endif
 }
 
-void BaseAudioSharedUnit::continueStartProducingData()
+void BaseAudioCaptureUnit::continueStartProducingData()
 {
     if (!m_producingCount || m_clients.isEmptyIgnoringNullReferences())
         return;
@@ -136,14 +136,14 @@ void BaseAudioSharedUnit::continueStartProducingData()
     auto error = startUnit();
     if (error) {
         if (error == lowPriorityError1 || error == lowPriorityError2) {
-            RELEASE_LOG_ERROR(WebRTC, "BaseAudioSharedUnit::startProducingData failed due to not high enough priority, suspending unit");
+            RELEASE_LOG_ERROR(WebRTC, "BaseAudioCaptureUnit::startProducingData failed due to not high enough priority, suspending unit");
             suspend();
         } else
             captureFailed();
     }
 }
 
-OSStatus BaseAudioSharedUnit::startUnit()
+OSStatus BaseAudioCaptureUnit::startUnit()
 {
     forEachClient([](auto& client) {
         client.audioUnitWillStart();
@@ -152,7 +152,7 @@ OSStatus BaseAudioSharedUnit::startUnit()
 
 #if PLATFORM(IOS_FAMILY)
     if (AudioSession::singleton().category() != AudioSession::CategoryType::PlayAndRecord) {
-        RELEASE_LOG_ERROR(WebRTC, "BaseAudioSharedUnit::startUnit cannot call startInternal if category is not set to PlayAndRecord");
+        RELEASE_LOG_ERROR(WebRTC, "BaseAudioCaptureUnit::startUnit cannot call startInternal if category is not set to PlayAndRecord");
         return lowPriorityError2;
     }
 #endif
@@ -160,7 +160,7 @@ OSStatus BaseAudioSharedUnit::startUnit()
     return startInternal();
 }
 
-void BaseAudioSharedUnit::prepareForNewCapture()
+void BaseAudioCaptureUnit::prepareForNewCapture()
 {
     m_volume = 1;
     resetSampleRate();
@@ -172,11 +172,11 @@ void BaseAudioSharedUnit::prepareForNewCapture()
     if (!m_producingCount)
         return;
 
-    RELEASE_LOG_ERROR(WebRTC, "BaseAudioSharedUnit::prepareForNewCapture, notifying suspended sources of capture failure");
+    RELEASE_LOG_ERROR(WebRTC, "BaseAudioCaptureUnit::prepareForNewCapture, notifying suspended sources of capture failure");
     captureFailed();
 }
 
-void BaseAudioSharedUnit::setCaptureDevice(String&& persistentID, uint32_t captureDeviceID, bool isDefault)
+void BaseAudioCaptureUnit::setCaptureDevice(String&& persistentID, uint32_t captureDeviceID, bool isDefault)
 {
     bool hasChanged = this->persistentID() != persistentID || this->captureDeviceID() != captureDeviceID || m_isCapturingWithDefaultMicrophone != isDefault;
     if (hasChanged)
@@ -189,7 +189,7 @@ void BaseAudioSharedUnit::setCaptureDevice(String&& persistentID, uint32_t captu
         captureDeviceChanged();
 }
 
-void BaseAudioSharedUnit::devicesChanged()
+void BaseAudioCaptureUnit::devicesChanged()
 {
     Ref protectedThis { *this };
 
@@ -207,17 +207,17 @@ void BaseAudioSharedUnit::devicesChanged()
     }
 
     if (devices.size() && m_isCapturingWithDefaultMicrophone && migrateToNewDefaultDevice(devices[0])) {
-        RELEASE_LOG_ERROR(WebRTC, "BaseAudioSharedUnit::devicesChanged - migrating to new default device");
+        RELEASE_LOG_ERROR(WebRTC, "BaseAudioCaptureUnit::devicesChanged - migrating to new default device");
         return;
     }
 
-    RELEASE_LOG_ERROR(WebRTC, "BaseAudioSharedUnit::devicesChanged - failing capture, capturing device is missing");
+    RELEASE_LOG_ERROR(WebRTC, "BaseAudioCaptureUnit::devicesChanged - failing capture, capturing device is missing");
     captureFailed();
 }
 
-void BaseAudioSharedUnit::captureFailed()
+void BaseAudioCaptureUnit::captureFailed()
 {
-    RELEASE_LOG_ERROR(WebRTC, "BaseAudioSharedUnit::captureFailed");
+    RELEASE_LOG_ERROR(WebRTC, "BaseAudioCaptureUnit::captureFailed");
     forEachClient([](auto& client) {
         client.captureFailed();
     });
@@ -229,7 +229,7 @@ void BaseAudioSharedUnit::captureFailed()
     stopRunning();
 }
 
-void BaseAudioSharedUnit::stopProducingData()
+void BaseAudioCaptureUnit::stopProducingData()
 {
     ASSERT(isMainThread());
     ASSERT(m_producingCount);
@@ -245,7 +245,7 @@ void BaseAudioSharedUnit::stopProducingData()
     continueStopProducingData();
 }
 
-void BaseAudioSharedUnit::continueStopProducingData()
+void BaseAudioCaptureUnit::continueStopProducingData()
 {
     if (m_producingCount && --m_producingCount)
         return;
@@ -258,26 +258,26 @@ void BaseAudioSharedUnit::continueStopProducingData()
     stopRunning();
 }
 
-void BaseAudioSharedUnit::setIsProducingMicrophoneSamples(bool value)
+void BaseAudioCaptureUnit::setIsProducingMicrophoneSamples(bool value)
 {
     m_isProducingMicrophoneSamples = value;
     isProducingMicrophoneSamplesChanged();
 }
 
-void BaseAudioSharedUnit::setIsRenderingAudio(bool value)
+void BaseAudioCaptureUnit::setIsRenderingAudio(bool value)
 {
     m_isRenderingAudio = value;
     if (!shouldContinueRunning())
         stopRunning();
 }
 
-void BaseAudioSharedUnit::stopRunning()
+void BaseAudioCaptureUnit::stopRunning()
 {
     stopInternal();
     cleanupAudioUnit();
 }
 
-void BaseAudioSharedUnit::reconfigure()
+void BaseAudioCaptureUnit::reconfigure()
 {
     ASSERT(isMainThread());
     if (m_suspended) {
@@ -287,7 +287,7 @@ void BaseAudioSharedUnit::reconfigure()
     reconfigureAudioUnit();
 }
 
-OSStatus BaseAudioSharedUnit::resume()
+OSStatus BaseAudioCaptureUnit::resume()
 {
     ASSERT(isMainThread());
     if (!m_suspended)
@@ -295,7 +295,7 @@ OSStatus BaseAudioSharedUnit::resume()
 
     ASSERT(!isProducingData());
 
-    RELEASE_LOG_INFO(WebRTC, "BaseAudioSharedUnit::resume");
+    RELEASE_LOG_INFO(WebRTC, "BaseAudioCaptureUnit::resume");
 
     m_suspended = false;
 
@@ -320,11 +320,11 @@ OSStatus BaseAudioSharedUnit::resume()
     return 0;
 }
 
-OSStatus BaseAudioSharedUnit::suspend()
+OSStatus BaseAudioCaptureUnit::suspend()
 {
     ASSERT(isMainThread());
 
-    RELEASE_LOG_INFO(WebRTC, "BaseAudioSharedUnit::suspend");
+    RELEASE_LOG_INFO(WebRTC, "BaseAudioCaptureUnit::suspend");
 
     m_suspended = true;
     stopInternal();
@@ -339,7 +339,7 @@ OSStatus BaseAudioSharedUnit::suspend()
     return 0;
 }
 
-void BaseAudioSharedUnit::audioSamplesAvailable(const MediaTime& time, const PlatformAudioData& data, const AudioStreamDescription& description, size_t numberOfFrames)
+void BaseAudioCaptureUnit::audioSamplesAvailable(const MediaTime& time, const PlatformAudioData& data, const AudioStreamDescription& description, size_t numberOfFrames)
 {
     // We hold the lock here since adding/removing clients can only happen in main thread.
     Locker locker { m_audioThreadClientsLock };
@@ -356,14 +356,14 @@ void BaseAudioSharedUnit::audioSamplesAvailable(const MediaTime& time, const Pla
     }
 }
 
-void BaseAudioSharedUnit::handleNewCurrentMicrophoneDevice(const CaptureDevice& device)
+void BaseAudioCaptureUnit::handleNewCurrentMicrophoneDevice(const CaptureDevice& device)
 {
     forEachClient([&device](auto& client) {
         client.handleNewCurrentMicrophoneDevice(device);
     });
 }
 
-void BaseAudioSharedUnit::voiceActivityDetected()
+void BaseAudioCaptureUnit::voiceActivityDetected()
 {
     if (!m_voiceActivityThrottleTimer)
         m_voiceActivityThrottleTimer = makeUnique<Timer>([] { });
@@ -371,13 +371,13 @@ void BaseAudioSharedUnit::voiceActivityDetected()
     if (m_voiceActivityThrottleTimer->isActive() || !m_voiceActivityCallback)
         return;
 
-    RELEASE_LOG_INFO(WebRTC, "BaseAudioSharedUnit::voiceActivityDetected");
+    RELEASE_LOG_INFO(WebRTC, "BaseAudioCaptureUnit::voiceActivityDetected");
 
     m_voiceActivityCallback();
     m_voiceActivityThrottleTimer->startOneShot(voiceActivityThrottlingDuration);
 }
 
-void BaseAudioSharedUnit::disableVoiceActivityThrottleTimerForTesting()
+void BaseAudioCaptureUnit::disableVoiceActivityThrottleTimerForTesting()
 {
     if (m_voiceActivityThrottleTimer)
         m_voiceActivityThrottleTimer->stop();

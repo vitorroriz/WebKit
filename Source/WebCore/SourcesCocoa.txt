@@ -657,14 +657,14 @@ platform/mediastream/ios/ReplayKitCaptureSource.mm @nonARC @no-unify
 platform/mediastream/libwebrtc/LibWebRTCProviderCocoa.cpp
 platform/mediastream/mac/AVCaptureDeviceManager.mm @nonARC
 platform/mediastream/mac/AVVideoCaptureSource.mm @nonARC @no-unify
-platform/mediastream/mac/BaseAudioSharedUnit.cpp
+platform/mediastream/mac/BaseAudioCaptureUnit.cpp
 platform/mediastream/mac/CoreAudioCaptureDevice.cpp
 platform/mediastream/mac/CoreAudioCaptureDeviceManager.cpp
 platform/mediastream/mac/CoreAudioCaptureSource.cpp
-platform/mediastream/mac/CoreAudioSharedUnit.cpp
+platform/mediastream/mac/CoreAudioCaptureUnit.cpp
 platform/mediastream/mac/DisplayCaptureManagerCocoa.cpp
 platform/mediastream/mac/MediaStreamTrackAudioSourceProviderCocoa.cpp
-platform/mediastream/mac/MockAudioSharedUnit.mm @nonARC
+platform/mediastream/mac/MockAudioCaptureUnit.mm @nonARC
 platform/mediastream/mac/MockRealtimeVideoSourceMac.mm @nonARC
 platform/mediastream/mac/RealtimeIncomingAudioSourceCocoa.cpp
 platform/mediastream/mac/RealtimeIncomingVideoSourceCocoa.mm @nonARC

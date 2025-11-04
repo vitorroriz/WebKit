@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2016-2022 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,35 +27,19 @@
 
 #if ENABLE(MEDIA_STREAM)
 
-#include "CoreAudioSharedUnit.h"
-#include <wtf/TZoneMallocInlines.h>
+#include <WebCore/CoreAudioCaptureUnit.h>
 
 namespace WebCore {
 
-class CoreAudioSharedInternalUnit final :  public CoreAudioSharedUnit::InternalUnit {
-    WTF_MAKE_TZONE_ALLOCATED_INLINE(CoreAudioSharedInternalUnit);
-public:
-    static Expected<UniqueRef<InternalUnit>, OSStatus> create(bool shouldUseVPIO);
-    CoreAudioSharedInternalUnit(CoreAudioSharedUnit::StoredAudioUnit&&, bool shouldUseVPIO);
-    ~CoreAudioSharedInternalUnit() final;
+namespace MockAudioCaptureUnit {
+void enable();
+void disable();
+CoreAudioCaptureUnit& singleton();
+void increaseBufferSize();
 
-private:
-    OSStatus initialize() final;
-    OSStatus uninitialize() final;
-    OSStatus start() final;
-    OSStatus stop() final;
-    OSStatus set(AudioUnitPropertyID, AudioUnitScope, AudioUnitElement, const void*, UInt32) final;
-    OSStatus get(AudioUnitPropertyID, AudioUnitScope, AudioUnitElement, void*, UInt32*) final;
-    OSStatus render(AudioUnitRenderActionFlags*, const AudioTimeStamp*, UInt32, UInt32, AudioBufferList*) final;
-    OSStatus defaultInputDevice(uint32_t*) final;
-    OSStatus defaultOutputDevice(uint32_t*) final;
-    bool setVoiceActivityDetection(bool) final;
-    bool canRenderAudio() const final { return m_shouldUseVPIO; }
-
-    CoreAudioSharedUnit::StoredAudioUnit m_audioUnit;
-    bool m_shouldUseVPIO { false };
-};
+}
 
 } // namespace WebCore
 
 #endif // ENABLE(MEDIA_STREAM)
+

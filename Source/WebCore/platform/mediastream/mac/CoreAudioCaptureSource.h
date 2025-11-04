@@ -31,7 +31,7 @@
 #include <AudioToolbox/AudioToolbox.h>
 #include <CoreAudio/CoreAudioTypes.h>
 #include <WebCore/AudioSession.h>
-#include <WebCore/BaseAudioSharedUnit.h>
+#include <WebCore/BaseAudioCaptureUnit.h>
 #include <WebCore/CAAudioStreamDescription.h>
 #include <WebCore/CaptureDevice.h>
 #include <WebCore/RealtimeMediaSource.h>
@@ -49,7 +49,7 @@ namespace WebCore {
 
 class AudioSampleBufferList;
 class AudioSampleDataSource;
-class CoreAudioSharedUnit;
+class CoreAudioCaptureUnit;
 class CaptureDeviceInfo;
 class WebAudioSourceProviderAVFObjC;
 
@@ -75,8 +75,8 @@ protected:
     void setCanResumeAfterInterruption(bool value) { m_canResumeAfterInterruption = value; }
 
 private:
-    friend class BaseAudioSharedUnit;
-    friend class CoreAudioSharedUnit;
+    friend class BaseAudioCaptureUnit;
+    friend class CoreAudioCaptureUnit;
     friend class CoreAudioCaptureSourceFactory;
 
     bool isCaptureSource() const final { return true; }
@@ -106,11 +106,11 @@ private:
     ASCIILiteral logClassName() const override { return "CoreAudioCaptureSource"_s; }
 #endif
 
-    Ref<CoreAudioSharedUnit> protectedUnit();
-    Ref<const CoreAudioSharedUnit> protectedUnit() const;
+    Ref<CoreAudioCaptureUnit> protectedUnit();
+    Ref<const CoreAudioCaptureUnit> protectedUnit() const;
 
     uint32_t m_captureDeviceID { 0 };
-    Ref<CoreAudioSharedUnit> m_unit;
+    Ref<CoreAudioCaptureUnit> m_unit;
 
     std::optional<RealtimeMediaSourceCapabilities> m_capabilities;
     std::optional<RealtimeMediaSourceSettings> m_currentSettings;

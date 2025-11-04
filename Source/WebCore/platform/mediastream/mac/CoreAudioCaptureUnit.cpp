@@ -24,14 +24,14 @@
  */
 
 #include "config.h"
-#include "CoreAudioSharedUnit.h"
+#include "CoreAudioCaptureUnit.h"
 
 #if ENABLE(MEDIA_STREAM)
 
 #include "AudioSampleBufferList.h"
 #include "AudioSession.h"
+#include "CoreAudioCaptureInternalUnit.h"
 #include "CoreAudioCaptureSource.h"
-#include "CoreAudioSharedInternalUnit.h"
 #include "Logging.h"
 #include "SpanCoreAudio.h"
 #include <AudioToolbox/AudioConverter.h>
@@ -67,12 +67,12 @@ namespace WebCore {
 const UInt32 outputBus = 0;
 const UInt32 inputBus = 1;
 
-void CoreAudioSharedUnit::AudioUnitDeallocator::operator()(AudioUnit unit) const
+void CoreAudioCaptureUnit::AudioUnitDeallocator::operator()(AudioUnit unit) const
 {
     PAL::AudioComponentInstanceDispose(unit);
 }
 
-static Expected<CoreAudioSharedUnit::StoredAudioUnit, OSStatus> createAudioUnit(bool shouldUseVPIO)
+static Expected<CoreAudioCaptureUnit::StoredAudioUnit, OSStatus> createAudioUnit(bool shouldUseVPIO)
 {
     OSType unitSubType = kAudioUnitSubType_VoiceProcessingIO;
     if (!shouldUseVPIO) {
@@ -87,7 +87,7 @@ static Expected<CoreAudioSharedUnit::StoredAudioUnit, OSStatus> createAudioUnit(
     AudioComponent ioComponent = PAL::AudioComponentFindNext(nullptr, &ioUnitDescription);
     ASSERT(ioComponent);
     if (!ioComponent) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedInternalUnit unable to find capture unit component");
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureInternalUnit unable to find capture unit component");
         return makeUnexpected(-1);
     }
 
@@ -97,27 +97,27 @@ static Expected<CoreAudioSharedUnit::StoredAudioUnit, OSStatus> createAudioUnit(
     if (name) {
         String ioUnitName = name;
         CFRelease(name);
-        RELEASE_LOG(WebRTC, "CoreAudioSharedInternalUnit created \"%" PRIVATE_LOG_STRING "\" component", ioUnitName.utf8().data());
+        RELEASE_LOG(WebRTC, "CoreAudioCaptureInternalUnit created \"%" PRIVATE_LOG_STRING "\" component", ioUnitName.utf8().data());
     }
 #endif
 
     AudioUnit ioUnit;
     auto err = PAL::AudioComponentInstanceNew(ioComponent, &ioUnit);
     if (err) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedInternalUnit unable to open capture unit, error %d (%.4s)", (int)err, (char*)&err);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureInternalUnit unable to open capture unit, error %d (%.4s)", (int)err, (char*)&err);
         return makeUnexpected(err);
     }
 
-    return CoreAudioSharedUnit::StoredAudioUnit(ioUnit);
+    return CoreAudioCaptureUnit::StoredAudioUnit(ioUnit);
 }
 
-Expected<UniqueRef<CoreAudioSharedUnit::InternalUnit>, OSStatus> CoreAudioSharedInternalUnit::create(bool shouldUseVPIO)
+Expected<UniqueRef<CoreAudioCaptureUnit::InternalUnit>, OSStatus> CoreAudioCaptureInternalUnit::create(bool shouldUseVPIO)
 {
 #if PLATFORM(MAC)
     if (shouldUseVPIO) {
-        if (auto ioUnit = CoreAudioSharedUnit::defaultSingleton().takeStoredVPIOUnit()) {
-            RELEASE_LOG(WebRTC, "Creating a CoreAudioSharedInternalUnit with a stored VPIO unit");
-            UniqueRef<CoreAudioSharedUnit::InternalUnit> result = makeUniqueRef<CoreAudioSharedInternalUnit>(WTFMove(ioUnit), shouldUseVPIO);
+        if (auto ioUnit = CoreAudioCaptureUnit::defaultSingleton().takeStoredVPIOUnit()) {
+            RELEASE_LOG(WebRTC, "Creating a CoreAudioCaptureInternalUnit with a stored VPIO unit");
+            UniqueRef<CoreAudioCaptureUnit::InternalUnit> result = makeUniqueRef<CoreAudioCaptureInternalUnit>(WTFMove(ioUnit), shouldUseVPIO);
             return result;
         }
     }
@@ -127,66 +127,66 @@ Expected<UniqueRef<CoreAudioSharedUnit::InternalUnit>, OSStatus> CoreAudioShared
     if (!audioUnitOrError.has_value())
         return makeUnexpected(audioUnitOrError.error());
 
-    RELEASE_LOG(WebRTC, "Successfully created a CoreAudioSharedInternalUnit");
-    UniqueRef<CoreAudioSharedUnit::InternalUnit> result = makeUniqueRef<CoreAudioSharedInternalUnit>(WTFMove(audioUnitOrError.value()), shouldUseVPIO);
+    RELEASE_LOG(WebRTC, "Successfully created a CoreAudioCaptureInternalUnit");
+    UniqueRef<CoreAudioCaptureUnit::InternalUnit> result = makeUniqueRef<CoreAudioCaptureInternalUnit>(WTFMove(audioUnitOrError.value()), shouldUseVPIO);
     return result;
 }
 
-CoreAudioSharedInternalUnit::CoreAudioSharedInternalUnit(CoreAudioSharedUnit::StoredAudioUnit&& audioUnit, bool shouldUseVPIO)
+CoreAudioCaptureInternalUnit::CoreAudioCaptureInternalUnit(CoreAudioCaptureUnit::StoredAudioUnit&& audioUnit, bool shouldUseVPIO)
     : m_audioUnit(WTFMove(audioUnit))
     , m_shouldUseVPIO(shouldUseVPIO)
 {
 }
 
-CoreAudioSharedInternalUnit::~CoreAudioSharedInternalUnit()
+CoreAudioCaptureInternalUnit::~CoreAudioCaptureInternalUnit()
 {
 #if PLATFORM(MAC)
     if (m_shouldUseVPIO)
-        CoreAudioSharedUnit::defaultSingleton().setStoredVPIOUnit(std::exchange(m_audioUnit, { }));
+        CoreAudioCaptureUnit::defaultSingleton().setStoredVPIOUnit(std::exchange(m_audioUnit, { }));
 #endif
 }
 
-OSStatus CoreAudioSharedInternalUnit::initialize()
+OSStatus CoreAudioCaptureInternalUnit::initialize()
 {
     return PAL::AudioUnitInitialize(m_audioUnit.get());
 }
 
-OSStatus CoreAudioSharedInternalUnit::uninitialize()
+OSStatus CoreAudioCaptureInternalUnit::uninitialize()
 {
     return PAL::AudioUnitUninitialize(m_audioUnit.get());
 }
 
-OSStatus CoreAudioSharedInternalUnit::start()
+OSStatus CoreAudioCaptureInternalUnit::start()
 {
     return PAL::AudioOutputUnitStart(m_audioUnit.get());
 }
 
-OSStatus CoreAudioSharedInternalUnit::stop()
+OSStatus CoreAudioCaptureInternalUnit::stop()
 {
     return PAL::AudioOutputUnitStop(m_audioUnit.get());
 }
 
-OSStatus CoreAudioSharedInternalUnit::set(AudioUnitPropertyID propertyID, AudioUnitScope scope, AudioUnitElement element, const void* value, UInt32 size)
+OSStatus CoreAudioCaptureInternalUnit::set(AudioUnitPropertyID propertyID, AudioUnitScope scope, AudioUnitElement element, const void* value, UInt32 size)
 {
     return PAL::AudioUnitSetProperty(m_audioUnit.get(), propertyID, scope, element, value, size);
 }
 
-OSStatus CoreAudioSharedInternalUnit::get(AudioUnitPropertyID propertyID, AudioUnitScope scope, AudioUnitElement element, void* value, UInt32* size)
+OSStatus CoreAudioCaptureInternalUnit::get(AudioUnitPropertyID propertyID, AudioUnitScope scope, AudioUnitElement element, void* value, UInt32* size)
 {
     return PAL::AudioUnitGetProperty(m_audioUnit.get(), propertyID, scope, element, value, size);
 }
 
-OSStatus CoreAudioSharedInternalUnit::render(AudioUnitRenderActionFlags* ioActionFlags, const AudioTimeStamp* inTimeStamp, UInt32 inOutputBusNumber, UInt32 inNumberFrames, AudioBufferList* list)
+OSStatus CoreAudioCaptureInternalUnit::render(AudioUnitRenderActionFlags* ioActionFlags, const AudioTimeStamp* inTimeStamp, UInt32 inOutputBusNumber, UInt32 inNumberFrames, AudioBufferList* list)
 {
     return PAL::AudioUnitRender(m_audioUnit.get(), ioActionFlags, inTimeStamp, inOutputBusNumber, inNumberFrames, list);
 }
 
-OSStatus CoreAudioSharedInternalUnit::defaultInputDevice(uint32_t* deviceID)
+OSStatus CoreAudioCaptureInternalUnit::defaultInputDevice(uint32_t* deviceID)
 {
 #if PLATFORM(MAC)
     UInt32 propertySize = sizeof(*deviceID);
     auto err = get(kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, inputBus, deviceID, &propertySize);
-    RELEASE_LOG_ERROR_IF(err, WebRTC, "CoreAudioSharedInternalUnit unable to get default input device ID, error %d (%.4s)", (int)err, (char*)&err);
+    RELEASE_LOG_ERROR_IF(err, WebRTC, "CoreAudioCaptureInternalUnit unable to get default input device ID, error %d (%.4s)", (int)err, (char*)&err);
     return err;
 #else
     UNUSED_PARAM(deviceID);
@@ -194,7 +194,7 @@ OSStatus CoreAudioSharedInternalUnit::defaultInputDevice(uint32_t* deviceID)
 #endif
 }
 
-OSStatus CoreAudioSharedInternalUnit::defaultOutputDevice(uint32_t* deviceID)
+OSStatus CoreAudioCaptureInternalUnit::defaultOutputDevice(uint32_t* deviceID)
 {
 #if PLATFORM(MAC)
     AudioObjectPropertyAddress address = {
@@ -213,65 +213,65 @@ OSStatus CoreAudioSharedInternalUnit::defaultOutputDevice(uint32_t* deviceID)
     return -1;
 }
 
-CoreAudioSharedUnit& CoreAudioSharedUnit::defaultSingleton()
+CoreAudioCaptureUnit& CoreAudioCaptureUnit::defaultSingleton()
 {
-    static NeverDestroyed<Ref<CoreAudioSharedUnit>> singleton(adoptRef(*new CoreAudioSharedUnit));
+    static NeverDestroyed<Ref<CoreAudioCaptureUnit>> singleton(adoptRef(*new CoreAudioCaptureUnit));
     return singleton.get();
 }
 
-static WeakHashSet<CoreAudioSharedUnit>& allCoreAudioSharedUnits()
+static WeakHashSet<CoreAudioCaptureUnit>& allCoreAudioCaptureUnits()
 {
-    static NeverDestroyed<WeakHashSet<CoreAudioSharedUnit>> units;
+    static NeverDestroyed<WeakHashSet<CoreAudioCaptureUnit>> units;
     return units;
 }
 
-void CoreAudioSharedUnit::forEach(NOESCAPE Function<void(CoreAudioSharedUnit&)>&& callback)
+void CoreAudioCaptureUnit::forEach(NOESCAPE Function<void(CoreAudioCaptureUnit&)>&& callback)
 {
-    allCoreAudioSharedUnits().forEach(WTFMove(callback));
+    allCoreAudioCaptureUnits().forEach(WTFMove(callback));
 }
 
-CoreAudioSharedUnit::CoreAudioSharedUnit()
+CoreAudioCaptureUnit::CoreAudioCaptureUnit()
     : m_sampleRateCapabilities(8000, 96000)
 #if PLATFORM(MAC)
-    , m_storedVPIOUnitDeallocationTimer(*this, &CoreAudioSharedUnit::deallocateStoredVPIOUnit)
+    , m_storedVPIOUnitDeallocationTimer(*this, &CoreAudioCaptureUnit::deallocateStoredVPIOUnit)
 #endif
 {
-    allCoreAudioSharedUnits().add(*this);
+    allCoreAudioCaptureUnits().add(*this);
 }
 
-CoreAudioSharedUnit::~CoreAudioSharedUnit()
+CoreAudioCaptureUnit::~CoreAudioCaptureUnit()
 {
-    allCoreAudioSharedUnits().remove(*this);
+    allCoreAudioCaptureUnits().remove(*this);
 
     updateVoiceActivityDetection();
     setMuteStatusChangedCallback({ });
 }
 
 #if PLATFORM(MAC)
-void CoreAudioSharedUnit::setStoredVPIOUnit(StoredAudioUnit&& unit)
+void CoreAudioCaptureUnit::setStoredVPIOUnit(StoredAudioUnit&& unit)
 {
-    RELEASE_LOG(WebRTC, "CoreAudioSharedUnit::setStoredVPIOUnit");
+    RELEASE_LOG(WebRTC, "CoreAudioCaptureUnit::setStoredVPIOUnit");
 
     static constexpr Seconds delayBeforeStoredVPIOUnitDeallocation = 3_s;
     m_storedVPIOUnit = WTFMove(unit);
     m_storedVPIOUnitDeallocationTimer.startOneShot(delayBeforeStoredVPIOUnitDeallocation);
 }
 
-CoreAudioSharedUnit::StoredAudioUnit CoreAudioSharedUnit::takeStoredVPIOUnit()
+CoreAudioCaptureUnit::StoredAudioUnit CoreAudioCaptureUnit::takeStoredVPIOUnit()
 {
-    RELEASE_LOG(WebRTC, "CoreAudioSharedUnit::takeStoredVPIOUnit");
+    RELEASE_LOG(WebRTC, "CoreAudioCaptureUnit::takeStoredVPIOUnit");
 
     m_storedVPIOUnitDeallocationTimer.stop();
     return std::exchange(m_storedVPIOUnit, nullptr);
 }
 #endif
 
-void CoreAudioSharedUnit::resetSampleRate()
+void CoreAudioCaptureUnit::resetSampleRate()
 {
     setSampleRate(m_getSampleRateCallback ? m_getSampleRateCallback() : AudioSession::singleton().sampleRate());
 }
 
-void CoreAudioSharedUnit::captureDeviceChanged()
+void CoreAudioCaptureUnit::captureDeviceChanged()
 {
 #if PLATFORM(MAC)
     reconfigureAudioUnit();
@@ -281,12 +281,12 @@ void CoreAudioSharedUnit::captureDeviceChanged()
     updateVoiceActivityDetection();
 }
 
-size_t CoreAudioSharedUnit::preferredIOBufferSize()
+size_t CoreAudioCaptureUnit::preferredIOBufferSize()
 {
     return AudioSession::singleton().bufferSize();
 }
 
-OSStatus CoreAudioSharedUnit::setupAudioUnit()
+OSStatus CoreAudioCaptureUnit::setupAudioUnit()
 {
     if (m_ioUnit)
         return 0;
@@ -299,7 +299,7 @@ OSStatus CoreAudioSharedUnit::setupAudioUnit()
 
     bool isEchoCancellationChanging = m_shouldUseVPIO != enableEchoCancellation();
     m_shouldUseVPIO = enableEchoCancellation();
-    auto result = m_creationCallback ? m_creationCallback(m_shouldUseVPIO) : CoreAudioSharedInternalUnit::create(m_shouldUseVPIO);
+    auto result = m_creationCallback ? m_creationCallback(m_shouldUseVPIO) : CoreAudioCaptureInternalUnit::create(m_shouldUseVPIO);
     if (!result.has_value())
         return result.error();
 
@@ -326,7 +326,7 @@ OSStatus CoreAudioSharedUnit::setupAudioUnit()
         AUVoiceIOOtherAudioDuckingConfiguration configuration { true, kAUVoiceIOOtherAudioDuckingLevelMin };
         if (auto err = m_ioUnit->set(kAUVoiceIOProperty_OtherAudioDuckingConfiguration, kAudioUnitScope_Global, inputBus, &configuration, sizeof(configuration))) {
             if (err != kAudioUnitErr_InvalidProperty) {
-                RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::setupAudioUnit(%p) unable to set ducking level, error %d (%.4s)", this, (int)err, (char*)&err);
+                RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::setupAudioUnit(%p) unable to set ducking level, error %d (%.4s)", this, (int)err, (char*)&err);
                 return err;
             }
         }
@@ -336,19 +336,19 @@ OSStatus CoreAudioSharedUnit::setupAudioUnit()
 #if PLATFORM(IOS_FAMILY)
     uint32_t param = 1;
     if (auto err = m_ioUnit->set(kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input, inputBus, &param, sizeof(param))) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::setupAudioUnit(%p) unable to enable capture unit input, error %d (%.4s)", this, (int)err, (char*)&err);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::setupAudioUnit(%p) unable to enable capture unit input, error %d (%.4s)", this, (int)err, (char*)&err);
         return err;
     }
 #else
     if (!m_shouldUseVPIO) {
         uint32_t param = 1;
         if (auto err = m_ioUnit->set(kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input, inputBus, &param, sizeof(param))) {
-            RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::setupAudioUnit(%p) unable to enable capture unit input, error %d (%.4s)", this, (int)err, (char*)&err);
+            RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::setupAudioUnit(%p) unable to enable capture unit input, error %d (%.4s)", this, (int)err, (char*)&err);
             return err;
         }
         param = 0;
         if (auto err = m_ioUnit->set(kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Output, outputBus, &param, sizeof(param))) {
-            RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::setupAudioUnit(%p) unable to enable capture unit output, error %d (%.4s)", this, (int)err, (char*)&err);
+            RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::setupAudioUnit(%p) unable to enable capture unit output, error %d (%.4s)", this, (int)err, (char*)&err);
             return err;
         }
     }
@@ -361,7 +361,7 @@ OSStatus CoreAudioSharedUnit::setupAudioUnit()
     }
 
     if (auto err = m_ioUnit->set(kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, inputBus, &deviceID, sizeof(deviceID))) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::setupAudioUnit(%p) unable to set capture unit capture device ID %d, error %d (%.4s)", this, (int)deviceID, (int)err, (char*)&err);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::setupAudioUnit(%p) unable to set capture unit capture device ID %d, error %d (%.4s)", this, (int)deviceID, (int)err, (char*)&err);
         return err;
     }
 
@@ -370,7 +370,7 @@ OSStatus CoreAudioSharedUnit::setupAudioUnit()
         auto err = m_ioUnit->defaultOutputDevice(&defaultOutputDeviceID);
         if (!err) {
             err = m_ioUnit->set(kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, outputBus, &defaultOutputDeviceID, sizeof(defaultOutputDeviceID));
-            RELEASE_LOG_ERROR_IF(err, WebRTC, "CoreAudioSharedUnit::setupAudioUnit(%p) unable to set capture unit output device ID %d, error %d (%.4s)", this, (int)defaultOutputDeviceID, (int)err, (char*)&err);
+            RELEASE_LOG_ERROR_IF(err, WebRTC, "CoreAudioCaptureUnit::setupAudioUnit(%p) unable to set capture unit output device ID %d, error %d (%.4s)", this, (int)defaultOutputDeviceID, (int)err, (char*)&err);
         }
         setOutputDeviceID(!err ? defaultOutputDeviceID : 0);
     } else {
@@ -397,7 +397,7 @@ OSStatus CoreAudioSharedUnit::setupAudioUnit()
         return err;
 
     if (auto err = m_ioUnit->initialize()) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::setupAudioUnit(%p) AudioUnitInitialize() failed, error %d (%.4s)", this, (int)err, (char*)&err);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::setupAudioUnit(%p) AudioUnitInitialize() failed, error %d (%.4s)", this, (int)err, (char*)&err);
         return err;
     }
     m_ioUnitInitialized = true;
@@ -407,26 +407,26 @@ OSStatus CoreAudioSharedUnit::setupAudioUnit()
     return 0;
 }
 
-void CoreAudioSharedUnit::unduck()
+void CoreAudioCaptureUnit::unduck()
 {
     uint32_t outputDevice;
     if (m_ioUnit && !m_ioUnit->defaultOutputDevice(&outputDevice))
         AudioDeviceDuck(outputDevice, 1.0, nullptr, 0);
 }
 
-int CoreAudioSharedUnit::actualSampleRate() const
+int CoreAudioCaptureUnit::actualSampleRate() const
 {
     Locker locker { m_speakerSamplesProducerLock };
     return m_speakerSamplesProducer ? m_speakerSamplesProducer->format().streamDescription().mSampleRate : sampleRate();
 }
 
-OSStatus CoreAudioSharedUnit::configureMicrophoneProc(int sampleRate)
+OSStatus CoreAudioCaptureUnit::configureMicrophoneProc(int sampleRate)
 {
     ASSERT(isMainThread());
 
     AURenderCallbackStruct callback = { microphoneCallback, this };
     if (auto err = m_ioUnit->set(kAudioOutputUnitProperty_SetInputCallback, kAudioUnitScope_Global, inputBus, &callback, sizeof(callback))) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::configureMicrophoneProc(%p) unable to set capture unit mic proc, error %d (%.4s)", this, (int)err, (char*)&err);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::configureMicrophoneProc(%p) unable to set capture unit mic proc, error %d (%.4s)", this, (int)err, (char*)&err);
         return err;
     }
 
@@ -434,13 +434,13 @@ OSStatus CoreAudioSharedUnit::configureMicrophoneProc(int sampleRate)
 
     UInt32 size = sizeof(microphoneProcFormat);
     if (auto err = m_ioUnit->get(kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, inputBus, &microphoneProcFormat, &size)) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::configureMicrophoneProc(%p) unable to get output stream format, error %d (%.4s)", this, (int)err, (char*)&err);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::configureMicrophoneProc(%p) unable to get output stream format, error %d (%.4s)", this, (int)err, (char*)&err);
         return err;
     }
 
     microphoneProcFormat.mSampleRate = sampleRate;
     if (auto err = m_ioUnit->set(kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, inputBus, &microphoneProcFormat, size)) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::configureMicrophoneProc(%p) unable to set output stream format, error %d (%.4s)", this, (int)err, (char*)&err);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::configureMicrophoneProc(%p) unable to set output stream format, error %d (%.4s)", this, (int)err, (char*)&err);
         return err;
     }
 
@@ -457,13 +457,13 @@ OSStatus CoreAudioSharedUnit::configureMicrophoneProc(int sampleRate)
     return noErr;
 }
 
-OSStatus CoreAudioSharedUnit::configureSpeakerProc(int sampleRate)
+OSStatus CoreAudioCaptureUnit::configureSpeakerProc(int sampleRate)
 {
     ASSERT(isMainThread());
 
     AURenderCallbackStruct callback = { speakerCallback, this };
     if (auto err = m_ioUnit->set(kAudioUnitProperty_SetRenderCallback, kAudioUnitScope_Input, outputBus, &callback, sizeof(callback))) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::configureSpeakerProc(%p) unable to set capture unit speaker proc, error %d (%.4s)", this, (int)err, (char*)&err);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::configureSpeakerProc(%p) unable to set capture unit speaker proc, error %d (%.4s)", this, (int)err, (char*)&err);
         return err;
     }
 
@@ -476,7 +476,7 @@ OSStatus CoreAudioSharedUnit::configureSpeakerProc(int sampleRate)
             ASSERT(speakerProcFormat.mSampleRate == sampleRate);
         } else {
             if (auto err = m_ioUnit->get(kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, outputBus, &speakerProcFormat, &size)) {
-                RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::configureSpeakerProc(%p) unable to get input stream format, error %d (%.4s)", this, (int)err, (char*)&err);
+                RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::configureSpeakerProc(%p) unable to get input stream format, error %d (%.4s)", this, (int)err, (char*)&err);
                 return err;
             }
         }
@@ -484,7 +484,7 @@ OSStatus CoreAudioSharedUnit::configureSpeakerProc(int sampleRate)
     speakerProcFormat.mSampleRate = sampleRate;
 
     if (auto err = m_ioUnit->set(kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, outputBus, &speakerProcFormat, size)) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::configureSpeakerProc(%p) unable to get input stream format, error %d (%.4s)", this, (int)err, (char*)&err);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::configureSpeakerProc(%p) unable to get input stream format, error %d (%.4s)", this, (int)err, (char*)&err);
         return err;
     }
 
@@ -494,14 +494,14 @@ OSStatus CoreAudioSharedUnit::configureSpeakerProc(int sampleRate)
 }
 
 #if !LOG_DISABLED
-void CoreAudioSharedUnit::checkTimestamps(const AudioTimeStamp& timeStamp, double hostTime)
+void CoreAudioCaptureUnit::checkTimestamps(const AudioTimeStamp& timeStamp, double hostTime)
 {
     if (!timeStamp.mSampleTime || timeStamp.mSampleTime == m_latestMicTimeStamp || !hostTime)
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::checkTimestamps: unusual timestamps, sample time = %f, previous sample time = %f, hostTime %f", timeStamp.mSampleTime, m_latestMicTimeStamp, hostTime);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::checkTimestamps: unusual timestamps, sample time = %f, previous sample time = %f, hostTime %f", timeStamp.mSampleTime, m_latestMicTimeStamp, hostTime);
 }
 #endif
 
-OSStatus CoreAudioSharedUnit::provideSpeakerData(AudioUnitRenderActionFlags& flags, const AudioTimeStamp& timeStamp, UInt32 /*inBusNumber*/, UInt32 inNumberFrames, AudioBufferList& ioData)
+OSStatus CoreAudioCaptureUnit::provideSpeakerData(AudioUnitRenderActionFlags& flags, const AudioTimeStamp& timeStamp, UInt32 /*inBusNumber*/, UInt32 inNumberFrames, AudioBufferList& ioData)
 {
     if (m_isReconfiguring || m_shouldNotifySpeakerSamplesProducer || !m_hasNotifiedSpeakerSamplesProducer || !m_speakerSamplesProducerLock.tryLock()) {
         if (m_shouldNotifySpeakerSamplesProducer) {
@@ -532,15 +532,15 @@ OSStatus CoreAudioSharedUnit::provideSpeakerData(AudioUnitRenderActionFlags& fla
     return m_speakerSamplesProducer->produceSpeakerSamples(inNumberFrames, ioData, timeStamp.mSampleTime, timeStamp.mHostTime, flags);
 }
 
-OSStatus CoreAudioSharedUnit::speakerCallback(void *inRefCon, AudioUnitRenderActionFlags* ioActionFlags, const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList* ioData)
+OSStatus CoreAudioCaptureUnit::speakerCallback(void *inRefCon, AudioUnitRenderActionFlags* ioActionFlags, const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList* ioData)
 {
     ASSERT(ioActionFlags);
     ASSERT(inTimeStamp);
-    auto dataSource = static_cast<CoreAudioSharedUnit*>(inRefCon);
+    auto dataSource = static_cast<CoreAudioCaptureUnit*>(inRefCon);
     return dataSource->provideSpeakerData(*ioActionFlags, *inTimeStamp, inBusNumber, inNumberFrames, *ioData);
 }
 
-OSStatus CoreAudioSharedUnit::processMicrophoneSamples(AudioUnitRenderActionFlags& ioActionFlags, const AudioTimeStamp& timeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList* /*ioData*/)
+OSStatus CoreAudioCaptureUnit::processMicrophoneSamples(AudioUnitRenderActionFlags& ioActionFlags, const AudioTimeStamp& timeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList* /*ioData*/)
 {
     if (m_isReconfiguring)
         return false;
@@ -550,7 +550,7 @@ OSStatus CoreAudioSharedUnit::processMicrophoneSamples(AudioUnitRenderActionFlag
     microphoneSampleBuffer->reset();
     AudioBufferList& bufferList = microphoneSampleBuffer->bufferList();
     if (auto err = m_ioUnit->render(&ioActionFlags, &timeStamp, inBusNumber, inNumberFrames, &bufferList)) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::processMicrophoneSamples(%p) AudioUnitRender failed with error %d (%.4s), bufferList size %d, inNumberFrames %d ", this, (int)err, (char*)&err, (int)span(bufferList)[0].mDataByteSize, (int)inNumberFrames);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::processMicrophoneSamples(%p) AudioUnitRender failed with error %d (%.4s), bufferList size %d, inNumberFrames %d ", this, (int)err, (char*)&err, (int)span(bufferList)[0].mDataByteSize, (int)inNumberFrames);
         if (err == kAudio_ParamError && !m_minimumMicrophoneSampleFrames) {
             m_minimumMicrophoneSampleFrames = inNumberFrames;
             // Our buffer might be too small, the preferred buffer size or sample rate might have changed.
@@ -582,20 +582,20 @@ OSStatus CoreAudioSharedUnit::processMicrophoneSamples(AudioUnitRenderActionFlag
     return noErr;
 }
 
-OSStatus CoreAudioSharedUnit::microphoneCallback(void *inRefCon, AudioUnitRenderActionFlags* ioActionFlags, const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList* ioData)
+OSStatus CoreAudioCaptureUnit::microphoneCallback(void *inRefCon, AudioUnitRenderActionFlags* ioActionFlags, const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList* ioData)
 {
     ASSERT(ioActionFlags);
     ASSERT(inTimeStamp);
-    CoreAudioSharedUnit* dataSource = static_cast<CoreAudioSharedUnit*>(inRefCon);
+    CoreAudioCaptureUnit* dataSource = static_cast<CoreAudioCaptureUnit*>(inRefCon);
     return dataSource->processMicrophoneSamples(*ioActionFlags, *inTimeStamp, inBusNumber, inNumberFrames, ioData);
 }
 
-void CoreAudioSharedUnit::cleanupAudioUnit()
+void CoreAudioCaptureUnit::cleanupAudioUnit()
 {
     if (m_ioUnitInitialized) {
         ASSERT(m_ioUnit);
         if (auto err = m_ioUnit->uninitialize())
-            RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::cleanupAudioUnit(%p) AudioUnitUninitialize failed with error %d (%.4s)", this, (int)err, (char*)&err);
+            RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::cleanupAudioUnit(%p) AudioUnitUninitialize failed with error %d (%.4s)", this, (int)err, (char*)&err);
         m_ioUnitInitialized = false;
     }
 
@@ -607,30 +607,32 @@ void CoreAudioSharedUnit::cleanupAudioUnit()
     m_microphoneSampleBuffer = nullptr;
 }
 
-void CoreAudioSharedUnit::delaySamples(Seconds seconds)
+void CoreAudioCaptureUnit::delaySamples(Seconds seconds)
 {
     if (m_ioUnit)
         m_ioUnit->delaySamples(seconds);
 }
 
-OSStatus CoreAudioSharedUnit::reconfigureAudioUnit()
+OSStatus CoreAudioCaptureUnit::reconfigureAudioUnit()
 {
     ASSERT(isMainThread());
     if (!hasAudioUnit())
         return 0;
 
     if (!hasClients()) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::reconfigureAudioUnit(%p) stopping since there are no clients", this);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::reconfigureAudioUnit(%p) stopping since there are no clients", this);
         stopRunning();
         return 0;
     }
 
     m_isReconfiguring = true;
-    auto scope = makeScopeExit([this] { m_isReconfiguring = false; });
+    auto scope = makeScopeExit([this] {
+        m_isReconfiguring = false;
+    });
 
     if (m_ioUnitStarted) {
         if (auto err = m_ioUnit->stop()) {
-            RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::reconfigureAudioUnit(%p) AudioOutputUnitStop failed with error %d (%.4s)", this, (int)err, (char*)&err);
+            RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::reconfigureAudioUnit(%p) AudioOutputUnitStop failed with error %d (%.4s)", this, (int)err, (char*)&err);
             return err;
         }
     }
@@ -641,14 +643,14 @@ OSStatus CoreAudioSharedUnit::reconfigureAudioUnit()
 
     if (m_ioUnitStarted) {
         if (auto err = m_ioUnit->start()) {
-            RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::reconfigureAudioUnit(%p) AudioOutputUnitStart failed with error %d (%.4s)", this, (int)err, (char*)&err);
+            RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::reconfigureAudioUnit(%p) AudioOutputUnitStart failed with error %d (%.4s)", this, (int)err, (char*)&err);
             return err;
         }
     }
     return noErr;
 }
 
-OSStatus CoreAudioSharedUnit::startInternal()
+OSStatus CoreAudioCaptureUnit::startInternal()
 {
     ASSERT(isMainThread());
 
@@ -675,7 +677,7 @@ OSStatus CoreAudioSharedUnit::startInternal()
                 m_speakerSamplesProducer->captureUnitHasStopped();
         }
 
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::start(%p) AudioOutputUnitStart failed with error %d (%.4s)", this, (int)err, (char*)&err);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::start(%p) AudioOutputUnitStart failed with error %d (%.4s)", this, (int)err, (char*)&err);
         cleanupAudioUnit();
         ASSERT(!m_ioUnit);
         return err;
@@ -686,7 +688,7 @@ OSStatus CoreAudioSharedUnit::startInternal()
     m_microphoneProcsCalled = 0;
     m_microphoneProcsCalledLastTime = 0;
     if (!m_verifyCapturingTimer)
-        m_verifyCapturingTimer = makeUnique<Timer>(*this, &CoreAudioSharedUnit::verifyIsCapturing);
+        m_verifyCapturingTimer = makeUnique<Timer>(*this, &CoreAudioCaptureUnit::verifyIsCapturing);
     m_verifyCapturingTimer->startRepeating(m_ioUnit->verifyCaptureInterval(!m_microphoneProcsCalledLastTime || isProducingMicrophoneSamples()));
 
     updateVoiceActivityDetection();
@@ -695,7 +697,7 @@ OSStatus CoreAudioSharedUnit::startInternal()
     return noErr;
 }
 
-void CoreAudioSharedUnit::isProducingMicrophoneSamplesChanged()
+void CoreAudioCaptureUnit::isProducingMicrophoneSamplesChanged()
 {
     updateMutedState();
     updateVoiceActivityDetection();
@@ -704,21 +706,21 @@ void CoreAudioSharedUnit::isProducingMicrophoneSamplesChanged()
         return;
 
     if (!m_verifyCapturingTimer)
-        m_verifyCapturingTimer = makeUnique<Timer>(*this, &CoreAudioSharedUnit::verifyIsCapturing);
+        m_verifyCapturingTimer = makeUnique<Timer>(*this, &CoreAudioCaptureUnit::verifyIsCapturing);
     m_verifyCapturingTimer->startRepeating(m_ioUnit->verifyCaptureInterval(!m_microphoneProcsCalledLastTime || isProducingMicrophoneSamples()));
 }
 
-void CoreAudioSharedUnit::updateMutedState(SyncUpdate syncUpdate)
+void CoreAudioCaptureUnit::updateMutedState(SyncUpdate syncUpdate)
 {
     UInt32 muteUplinkOutput = m_ioUnit && isProducingData() && !isProducingMicrophoneSamples();
 
     if (syncUpdate == SyncUpdate::No && muteUplinkOutput) {
-        RELEASE_LOG_INFO(WebRTC, "CoreAudioSharedUnit::updateMutedState(%p) delaying mute in case unit gets stopped or unmuted soon", this);
+        RELEASE_LOG_INFO(WebRTC, "CoreAudioCaptureUnit::updateMutedState(%p) delaying mute in case unit gets stopped or unmuted soon", this);
         // We leave some time for playback to stop or for capture to restart, but not too long if the user decided to stop capture.
         static constexpr Seconds mutedStateDelay = 500_ms;
 
         if (!m_updateMutedStateTimer)
-            m_updateMutedStateTimer = makeUnique<Timer>(*this, &CoreAudioSharedUnit::updateMutedStateTimerFired);
+            m_updateMutedStateTimer = makeUnique<Timer>(*this, &CoreAudioCaptureUnit::updateMutedStateTimerFired);
         m_updateMutedStateTimer->startOneShot(mutedStateDelay);
         return;
     }
@@ -727,17 +729,17 @@ void CoreAudioSharedUnit::updateMutedState(SyncUpdate syncUpdate)
 
     if (m_ioUnit) {
         auto error = m_ioUnit->set(kAUVoiceIOProperty_MuteOutput, kAudioUnitScope_Global, outputBus, &muteUplinkOutput, sizeof(muteUplinkOutput));
-        RELEASE_LOG_ERROR_IF(error, WebRTC, "CoreAudioSharedUnit::updateMutedState(%p) unable to set kAUVoiceIOProperty_MuteOutput, error %d (%.4s)", this, (int)error, (char*)&error);
+        RELEASE_LOG_ERROR_IF(error, WebRTC, "CoreAudioCaptureUnit::updateMutedState(%p) unable to set kAUVoiceIOProperty_MuteOutput, error %d (%.4s)", this, (int)error, (char*)&error);
     }
     setMutedState(muteUplinkOutput);
 }
 
-void CoreAudioSharedUnit::updateMutedStateTimerFired()
+void CoreAudioCaptureUnit::updateMutedStateTimerFired()
 {
     updateMutedState(SyncUpdate::Yes);
 }
 
-void CoreAudioSharedUnit::validateOutputDevice(uint32_t currentOutputDeviceID)
+void CoreAudioCaptureUnit::validateOutputDevice(uint32_t currentOutputDeviceID)
 {
 #if PLATFORM(MAC)
     if (!m_shouldUseVPIO || !m_ioUnit)
@@ -757,7 +759,7 @@ void CoreAudioSharedUnit::validateOutputDevice(uint32_t currentOutputDeviceID)
 }
 
 #if PLATFORM(MAC)
-bool CoreAudioSharedUnit::migrateToNewDefaultDevice(const CaptureDevice& captureDevice)
+bool CoreAudioCaptureUnit::migrateToNewDefaultDevice(const CaptureDevice& captureDevice)
 {
     auto newDefaultDevicePersistentId = captureDevice.persistentId();
     auto device = CoreAudioCaptureDeviceManager::singleton().coreAudioDeviceWithUID(newDefaultDevicePersistentId);
@@ -770,7 +772,7 @@ bool CoreAudioSharedUnit::migrateToNewDefaultDevice(const CaptureDevice& capture
     return true;
 }
 
-void CoreAudioSharedUnit::prewarmAudioUnitCreation(CompletionHandler<void()>&& callback)
+void CoreAudioCaptureUnit::prewarmAudioUnitCreation(CompletionHandler<void()>&& callback)
 {
     if (RefPtr audioUnitCreationWarmupPromise = m_audioUnitCreationWarmupPromise) {
         audioUnitCreationWarmupPromise->whenSettled(RunLoop::mainSingleton(), WTFMove(callback));
@@ -782,7 +784,7 @@ void CoreAudioSharedUnit::prewarmAudioUnitCreation(CompletionHandler<void()>&& c
         return;
     }
 
-    m_audioUnitCreationWarmupPromise = invokeAsync(WorkQueue::create("CoreAudioSharedUnit AudioUnit creation"_s, WorkQueue::QOS::UserInitiated).get(), [] {
+    m_audioUnitCreationWarmupPromise = invokeAsync(WorkQueue::create("CoreAudioCaptureUnit AudioUnit creation"_s, WorkQueue::QOS::UserInitiated).get(), [] {
         return createAudioUnit(true);
     })->whenSettled(RunLoop::mainSingleton(), [weakThis = WeakPtr { *this }, callback = WTFMove(callback)] (auto&& vpioUnitOrError) mutable {
         if (weakThis && vpioUnitOrError.has_value())
@@ -792,30 +794,30 @@ void CoreAudioSharedUnit::prewarmAudioUnitCreation(CompletionHandler<void()>&& c
     });
 }
 
-void CoreAudioSharedUnit::deallocateStoredVPIOUnit()
+void CoreAudioCaptureUnit::deallocateStoredVPIOUnit()
 {
     if (!m_storedVPIOUnit)
         return;
 
-    RELEASE_LOG(WebRTC, "CoreAudioSharedUnit::deallocateStoredVPIOUnit");
+    RELEASE_LOG(WebRTC, "CoreAudioCaptureUnit::deallocateStoredVPIOUnit");
 
     m_storedVPIOUnit = { };
     m_audioUnitCreationWarmupPromise = nullptr;
 }
 #endif
 
-void CoreAudioSharedUnit::verifyIsCapturing()
+void CoreAudioCaptureUnit::verifyIsCapturing()
 {
     if (m_microphoneProcsCalledLastTime != m_microphoneProcsCalled) {
         m_microphoneProcsCalledLastTime = m_microphoneProcsCalled;
         return;
     }
 
-    RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::verifyIsCapturing - no audio received in %d seconds, failing", static_cast<int>(m_verifyCapturingTimer->repeatInterval().value()));
+    RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::verifyIsCapturing - no audio received in %d seconds, failing", static_cast<int>(m_verifyCapturingTimer->repeatInterval().value()));
     captureFailed();
 }
 
-void CoreAudioSharedUnit::stopInternal()
+void CoreAudioCaptureUnit::stopInternal()
 {
     ASSERT(isMainThread());
 
@@ -826,7 +828,7 @@ void CoreAudioSharedUnit::stopInternal()
         return;
 
     if (auto err = m_ioUnit->stop()) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit::stop(%p) AudioOutputUnitStop failed with error %d (%.4s)", this, (int)err, (char*)&err);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::stop(%p) AudioOutputUnitStop failed with error %d (%.4s)", this, (int)err, (char*)&err);
         return;
     }
     {
@@ -843,7 +845,7 @@ void CoreAudioSharedUnit::stopInternal()
     updateMutedState();
 }
 
-void CoreAudioSharedUnit::registerSpeakerSamplesProducer(CoreAudioSpeakerSamplesProducer& producer)
+void CoreAudioCaptureUnit::registerSpeakerSamplesProducer(CoreAudioSpeakerSamplesProducer& producer)
 {
     ASSERT(isMainThread());
 
@@ -862,7 +864,7 @@ void CoreAudioSharedUnit::registerSpeakerSamplesProducer(CoreAudioSpeakerSamples
         reconfigure();
 }
 
-void CoreAudioSharedUnit::unregisterSpeakerSamplesProducer(CoreAudioSpeakerSamplesProducer& producer)
+void CoreAudioCaptureUnit::unregisterSpeakerSamplesProducer(CoreAudioSpeakerSamplesProducer& producer)
 {
     ASSERT(isMainThread());
 
@@ -876,7 +878,7 @@ void CoreAudioSharedUnit::unregisterSpeakerSamplesProducer(CoreAudioSpeakerSampl
     setIsRenderingAudio(false);
 }
 
-bool CoreAudioSharedUnit::shouldEnableVoiceActivityDetection() const
+bool CoreAudioCaptureUnit::shouldEnableVoiceActivityDetection() const
 {
     return hasVoiceActivityListenerCallback()
 #if PLATFORM(IOS_FAMILY)
@@ -885,7 +887,7 @@ bool CoreAudioSharedUnit::shouldEnableVoiceActivityDetection() const
         && m_ioUnitStarted;
 }
 
-void CoreAudioSharedUnit::updateVoiceActivityDetection(bool shouldDisableVoiceActivityDetection)
+void CoreAudioCaptureUnit::updateVoiceActivityDetection(bool shouldDisableVoiceActivityDetection)
 {
     if (!m_ioUnit)
         return;
@@ -904,25 +906,25 @@ void CoreAudioSharedUnit::updateVoiceActivityDetection(bool shouldDisableVoiceAc
         m_voiceActivityDetectionEnabled = true;
 }
 
-void CoreAudioSharedUnit::enableMutedSpeechActivityEventListener(Function<void()>&& callback)
+void CoreAudioCaptureUnit::enableMutedSpeechActivityEventListener(Function<void()>&& callback)
 {
     setVoiceActivityListenerCallback(WTFMove(callback));
     updateVoiceActivityDetection();
 }
 
-void CoreAudioSharedUnit::disableMutedSpeechActivityEventListener()
+void CoreAudioCaptureUnit::disableMutedSpeechActivityEventListener()
 {
     setVoiceActivityListenerCallback({ });
     updateVoiceActivityDetection();
 }
 
-void CoreAudioSharedUnit::handleMuteStatusChangedNotification(bool isMuting)
+void CoreAudioCaptureUnit::handleMuteStatusChangedNotification(bool isMuting)
 {
     if (m_muteStatusChangedCallback && isMuting == isProducingMicrophoneSamples())
         m_muteStatusChangedCallback(isMuting);
 }
 
-void CoreAudioSharedUnit::willChangeCaptureDevice()
+void CoreAudioCaptureUnit::willChangeCaptureDevice()
 {
     if (!m_voiceActivityDetectionEnabled)
         return;
@@ -932,7 +934,8 @@ void CoreAudioSharedUnit::willChangeCaptureDevice()
 }
 
 #if PLATFORM(IOS_FAMILY)
-void CoreAudioSharedUnit::setIsInBackground(bool isInBackground)
+void CoreAudioCaptureUnit::setIsInBackground(bool isInBackground)
+
 {
     if (!MediaCaptureStatusBarManager::hasSupport())
         return;
@@ -952,7 +955,7 @@ void CoreAudioSharedUnit::setIsInBackground(bool isInBackground)
         if (m_statusBarWasTappedCallback)
             m_statusBarWasTappedCallback(WTFMove(completionHandler));
     }, [this] {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit status bar failed");
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit status bar failed");
         auto statusBarManager = std::exchange(m_statusBarManager, { });
         statusBarManager->stop();
         if (isRunning())

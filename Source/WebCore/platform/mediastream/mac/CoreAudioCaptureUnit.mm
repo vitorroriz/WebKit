@@ -24,11 +24,11 @@
  */
 
 #include "config.h"
-#include "CoreAudioSharedUnit.h"
+#include "CoreAudioCaptureUnit.h"
 
 #if ENABLE(MEDIA_STREAM)
 
-#include "CoreAudioSharedInternalUnit.h"
+#include "CoreAudioCaptureInternalUnit.h"
 #include "Logging.h"
 
 #include <AudioUnit/AudioUnit.h>
@@ -71,7 +71,7 @@ void unregisterAudioInputMuteChangeListener(WebCoreAudioInputMuteChangeListener*
 - (void)handleMuteStatusChangedNotification:(NSNotification*)notification
 {
     RetainPtr<NSNumber> newMuteState = [notification.userInfo valueForKey:AVAudioApplicationMuteStateKey];
-    WebCore::CoreAudioSharedUnit::defaultSingleton().handleMuteStatusChangedNotification(newMuteState.get().boolValue);
+    WebCore::CoreAudioCaptureUnit::defaultSingleton().handleMuteStatusChangedNotification(newMuteState.get().boolValue);
 }
 
 @end
@@ -135,7 +135,7 @@ void unregisterAudioInputMuteChangeListener(WebCoreAudioInputMuteChangeListener 
 #if PLATFORM(MAC) && HAVE(VOICEACTIVITYDETECTION)
 static int speechActivityListenerCallback(AudioObjectID deviceID, UInt32, const AudioObjectPropertyAddress*, void*)
 {
-    CoreAudioSharedUnit::processVoiceActivityEvent(deviceID);
+    CoreAudioCaptureUnit::processVoiceActivityEvent(deviceID);
     return 0;
 }
 
@@ -149,7 +149,7 @@ static bool manageSpeechActivityListener(uint32_t deviceID, bool enable)
     UInt32 shouldEnable = enable;
     auto error = AudioObjectSetPropertyData(deviceID, &kVoiceActivityDetectionEnable, 0, NULL, sizeof(UInt32), &shouldEnable);
     if (error) {
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioSharedUnit manageSpeechActivityListener unable to set kVoiceActivityDetectionEnable, error %d (%.4s)", (int)error, (char*)&error);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit manageSpeechActivityListener unable to set kVoiceActivityDetectionEnable, error %d (%.4s)", (int)error, (char*)&error);
         return false;
     }
 
@@ -161,16 +161,16 @@ static bool manageSpeechActivityListener(uint32_t deviceID, bool enable)
 
     if (!enable) {
         error = AudioObjectRemovePropertyListener(deviceID, &kVoiceActivityDetectionState, (AudioObjectPropertyListenerProc)speechActivityListenerCallback, NULL);
-        RELEASE_LOG_ERROR_IF(error, WebRTC, "CoreAudioSharedUnit manageSpeechActivityListener unable to remove kVoiceActivityDetectionEnable listener, error %d (%.4s)", (int)error, (char*)&error);
+        RELEASE_LOG_ERROR_IF(error, WebRTC, "CoreAudioCaptureUnit manageSpeechActivityListener unable to remove kVoiceActivityDetectionEnable listener, error %d (%.4s)", (int)error, (char*)&error);
         return !error;
     }
 
     error = AudioObjectAddPropertyListener(deviceID, &kVoiceActivityDetectionState, (AudioObjectPropertyListenerProc)speechActivityListenerCallback, NULL);
-    RELEASE_LOG_ERROR_IF(error, WebRTC, "CoreAudioSharedUnit manageSpeechActivityListener unable to set kVoiceActivityDetectionEnable listener, error %d (%.4s)", (int)error, (char*)&error);
+    RELEASE_LOG_ERROR_IF(error, WebRTC, "CoreAudioCaptureUnit manageSpeechActivityListener unable to set kVoiceActivityDetectionEnable listener, error %d (%.4s)", (int)error, (char*)&error);
     return !error;
 }
 
-void CoreAudioSharedUnit::processVoiceActivityEvent(AudioObjectID deviceID)
+void CoreAudioCaptureUnit::processVoiceActivityEvent(AudioObjectID deviceID)
 {
     UInt32 voiceDetected = 0;
     UInt32 propertySize = sizeof(UInt32);
@@ -188,16 +188,16 @@ void CoreAudioSharedUnit::processVoiceActivityEvent(AudioObjectID deviceID)
         return;
 
     callOnMainRunLoop([] {
-        CoreAudioSharedUnit::defaultSingleton().voiceActivityDetected();
+        CoreAudioCaptureUnit::defaultSingleton().voiceActivityDetected();
     });
 }
 #endif // PLATFORM(MAC) && HAVE(VOICEACTIVITYDETECTION)
 
-bool CoreAudioSharedInternalUnit::setVoiceActivityDetection(bool shouldEnable)
+bool CoreAudioCaptureInternalUnit::setVoiceActivityDetection(bool shouldEnable)
 {
 #if HAVE(VOICEACTIVITYDETECTION)
 #if PLATFORM(MAC)
-    auto deviceID = CoreAudioSharedUnit::defaultSingleton().captureDeviceID();
+    auto deviceID = CoreAudioCaptureUnit::defaultSingleton().captureDeviceID();
     if (!deviceID && defaultInputDevice(&deviceID))
         return false;
     return manageSpeechActivityListener(deviceID, shouldEnable);
@@ -206,13 +206,13 @@ bool CoreAudioSharedInternalUnit::setVoiceActivityDetection(bool shouldEnable)
     AUVoiceIOMutedSpeechActivityEventListener listener = ^(AUVoiceIOSpeechActivityEvent event) {
         if (event == kAUVoiceIOSpeechActivityHasStarted) {
             callOnMainThread([] {
-                CoreAudioSharedUnit::defaultSingleton().voiceActivityDetected();
+                CoreAudioCaptureUnit::defaultSingleton().voiceActivityDetected();
             });
         }
     };
 
     auto err = set(kAUVoiceIOProperty_MutedSpeechActivityEventListener, kAudioUnitScope_Global, outputBus, shouldEnable ? &listener : nullptr, shouldEnable ? sizeof(AUVoiceIOMutedSpeechActivityEventListener) : 0);
-    RELEASE_LOG_ERROR_IF(err, WebRTC, "CoreAudioSharedInternalUnit::setVoiceActivityDetection failed activation, error %d (%.4s)", (int)err, (char*)&err);
+    RELEASE_LOG_ERROR_IF(err, WebRTC, "CoreAudioCaptureInternalUnit::setVoiceActivityDetection failed activation, error %d (%.4s)", (int)err, (char*)&err);
     return !err;
 #endif
 #else
@@ -221,7 +221,7 @@ bool CoreAudioSharedInternalUnit::setVoiceActivityDetection(bool shouldEnable)
 #endif // HAVE(VOICEACTIVITYDETECTION)
 }
 
-void CoreAudioSharedUnit::setMuteStatusChangedCallback(Function<void(bool)>&& callback)
+void CoreAudioCaptureUnit::setMuteStatusChangedCallback(Function<void(bool)>&& callback)
 {
     if (!m_muteStatusChangedCallback && !callback)
         return;
@@ -241,7 +241,7 @@ void CoreAudioSharedUnit::setMuteStatusChangedCallback(Function<void(bool)>&& ca
 #endif
 }
 
-void CoreAudioSharedUnit::setMutedState(bool isMuted)
+void CoreAudioCaptureUnit::setMutedState(bool isMuted)
 {
 #if HAVE(AVAUDIOAPPLICATION)
     auto *audioApplication = getSharedAVAudioApplication();
@@ -250,7 +250,7 @@ void CoreAudioSharedUnit::setMutedState(bool isMuted)
 
     NSError *error = nil;
     [audioApplication setInputMuted:isMuted error:&error];
-    RELEASE_LOG_ERROR_IF(error, WebRTC, "CoreAudioSharedUnit::setMutedState failed due to error: %@.", error.localizedDescription);
+    RELEASE_LOG_ERROR_IF(error, WebRTC, "CoreAudioCaptureUnit::setMutedState failed due to error: %@.", error.localizedDescription);
 #else
     UNUSED_PARAM(isMuted);
 #endif

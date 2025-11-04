@@ -159,7 +159,7 @@
 #endif
 
 #if PLATFORM(MAC) && ENABLE(MEDIA_STREAM)
-#include <WebCore/CoreAudioSharedUnit.h>
+#include <WebCore/CoreAudioCaptureUnit.h>
 #endif
 
 #if ENABLE(MEDIA_STREAM)
@@ -1262,7 +1262,7 @@ void GPUConnectionToWebProcess::updateCaptureAccess(bool allowAudioCapture, bool
 {
 #if PLATFORM(MAC) && ENABLE(MEDIA_STREAM)
     if (allowAudioCapture)
-        CoreAudioSharedUnit::defaultSingleton().prewarmAudioUnitCreation([] { });
+        CoreAudioCaptureUnit::defaultSingleton().prewarmAudioUnitCreation([] { });
 #endif
 
     m_allowsAudioCapture |= allowAudioCapture;
