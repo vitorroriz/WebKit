@@ -71,7 +71,7 @@ void unregisterAudioInputMuteChangeListener(WebCoreAudioInputMuteChangeListener*
 - (void)handleMuteStatusChangedNotification:(NSNotification*)notification
 {
     RetainPtr<NSNumber> newMuteState = [notification.userInfo valueForKey:AVAudioApplicationMuteStateKey];
-    WebCore::CoreAudioSharedUnit::singleton().handleMuteStatusChangedNotification(newMuteState.get().boolValue);
+    WebCore::CoreAudioSharedUnit::defaultSingleton().handleMuteStatusChangedNotification(newMuteState.get().boolValue);
 }
 
 @end
@@ -188,7 +188,7 @@ void CoreAudioSharedUnit::processVoiceActivityEvent(AudioObjectID deviceID)
         return;
 
     callOnMainRunLoop([] {
-        CoreAudioSharedUnit::singleton().voiceActivityDetected();
+        CoreAudioSharedUnit::defaultSingleton().voiceActivityDetected();
     });
 }
 #endif // PLATFORM(MAC) && HAVE(VOICEACTIVITYDETECTION)
@@ -197,7 +197,7 @@ bool CoreAudioSharedInternalUnit::setVoiceActivityDetection(bool shouldEnable)
 {
 #if HAVE(VOICEACTIVITYDETECTION)
 #if PLATFORM(MAC)
-    auto deviceID = CoreAudioSharedUnit::singleton().captureDeviceID();
+    auto deviceID = CoreAudioSharedUnit::defaultSingleton().captureDeviceID();
     if (!deviceID && defaultInputDevice(&deviceID))
         return false;
     return manageSpeechActivityListener(deviceID, shouldEnable);
@@ -206,7 +206,7 @@ bool CoreAudioSharedInternalUnit::setVoiceActivityDetection(bool shouldEnable)
     AUVoiceIOMutedSpeechActivityEventListener listener = ^(AUVoiceIOSpeechActivityEvent event) {
         if (event == kAUVoiceIOSpeechActivityHasStarted) {
             callOnMainThread([] {
-                CoreAudioSharedUnit::singleton().voiceActivityDetected();
+                CoreAudioSharedUnit::defaultSingleton().voiceActivityDetected();
             });
         }
     };

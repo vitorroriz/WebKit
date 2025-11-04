@@ -115,7 +115,7 @@ Expected<UniqueRef<CoreAudioSharedUnit::InternalUnit>, OSStatus> CoreAudioShared
 {
 #if PLATFORM(MAC)
     if (shouldUseVPIO) {
-        if (auto ioUnit = CoreAudioSharedUnit::singleton().takeStoredVPIOUnit()) {
+        if (auto ioUnit = CoreAudioSharedUnit::defaultSingleton().takeStoredVPIOUnit()) {
             RELEASE_LOG(WebRTC, "Creating a CoreAudioSharedInternalUnit with a stored VPIO unit");
             UniqueRef<CoreAudioSharedUnit::InternalUnit> result = makeUniqueRef<CoreAudioSharedInternalUnit>(WTFMove(ioUnit), shouldUseVPIO);
             return result;
@@ -142,7 +142,7 @@ CoreAudioSharedInternalUnit::~CoreAudioSharedInternalUnit()
 {
 #if PLATFORM(MAC)
     if (m_shouldUseVPIO)
-        CoreAudioSharedUnit::singleton().setStoredVPIOUnit(std::exchange(m_audioUnit, { }));
+        CoreAudioSharedUnit::defaultSingleton().setStoredVPIOUnit(std::exchange(m_audioUnit, { }));
 #endif
 }
 
@@ -213,10 +213,21 @@ OSStatus CoreAudioSharedInternalUnit::defaultOutputDevice(uint32_t* deviceID)
     return -1;
 }
 
-CoreAudioSharedUnit& CoreAudioSharedUnit::singleton()
+CoreAudioSharedUnit& CoreAudioSharedUnit::defaultSingleton()
 {
     static NeverDestroyed<Ref<CoreAudioSharedUnit>> singleton(adoptRef(*new CoreAudioSharedUnit));
     return singleton.get();
+}
+
+static WeakHashSet<CoreAudioSharedUnit>& allCoreAudioSharedUnits()
+{
+    static NeverDestroyed<WeakHashSet<CoreAudioSharedUnit>> units;
+    return units;
+}
+
+void CoreAudioSharedUnit::forEach(NOESCAPE Function<void(CoreAudioSharedUnit&)>&& callback)
+{
+    allCoreAudioSharedUnits().forEach(WTFMove(callback));
 }
 
 CoreAudioSharedUnit::CoreAudioSharedUnit()
@@ -225,10 +236,13 @@ CoreAudioSharedUnit::CoreAudioSharedUnit()
     , m_storedVPIOUnitDeallocationTimer(*this, &CoreAudioSharedUnit::deallocateStoredVPIOUnit)
 #endif
 {
+    allCoreAudioSharedUnits().add(*this);
 }
 
 CoreAudioSharedUnit::~CoreAudioSharedUnit()
 {
+    allCoreAudioSharedUnits().remove(*this);
+
     updateVoiceActivityDetection();
     setMuteStatusChangedCallback({ });
 }

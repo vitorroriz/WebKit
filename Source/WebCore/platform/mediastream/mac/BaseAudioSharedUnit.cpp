@@ -356,7 +356,7 @@ void BaseAudioSharedUnit::audioSamplesAvailable(const MediaTime& time, const Pla
     }
 }
 
-void BaseAudioSharedUnit::handleNewCurrentMicrophoneDevice(CaptureDevice&& device)
+void BaseAudioSharedUnit::handleNewCurrentMicrophoneDevice(const CaptureDevice& device)
 {
     forEachClient([&device](auto& client) {
         client.handleNewCurrentMicrophoneDevice(device);

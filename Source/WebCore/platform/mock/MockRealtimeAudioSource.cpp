@@ -190,10 +190,15 @@ void MockRealtimeAudioSource::setIsInterrupted(bool isInterrupted)
 {
     UNUSED_PARAM(isInterrupted);
 #if PLATFORM(COCOA)
-    if (isInterrupted)
-        CoreAudioSharedUnit::singleton().suspend();
-    else
-        CoreAudioSharedUnit::singleton().resume();
+    if (isInterrupted) {
+        CoreAudioSharedUnit::forEach([](auto& unit) {
+            unit.suspend();
+        });
+    } else {
+        CoreAudioSharedUnit::forEach([](auto& unit) {
+            unit.resume();
+        });
+    }
 #elif USE(GSTREAMER)
     for (auto* source : MockRealtimeAudioSourceGStreamer::allMockRealtimeAudioSources())
         source->setInterruptedForTesting(isInterrupted);

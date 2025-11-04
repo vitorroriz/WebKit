@@ -314,7 +314,7 @@ void RemoteAudioMediaStreamTrackRendererInternalUnitManagerUnit::captureUnitIsSt
 void RemoteAudioMediaStreamTrackRendererInternalUnitManagerUnit::captureUnitHasStopped()
 {
     // Capture unit has stopped and audio will no longer be rendered through it so start the local unit.
-    if (m_isPlaying && !WebCore::CoreAudioSharedUnit::singleton().isSuspended())
+    if (m_isPlaying && !WebCore::CoreAudioSharedUnit::defaultSingleton().isSuspended())
         protectedLocalUnit()->start();
 }
 
@@ -343,7 +343,7 @@ void RemoteAudioMediaStreamTrackRendererInternalUnitManagerUnit::endAudioSession
     if (!m_isPlaying)
         return;
 
-    if (m_shouldRegisterAsSpeakerSamplesProducer && (WebCore::CoreAudioSharedUnit::singleton().isRunning() || WebCore::CoreAudioSharedUnit::singleton().isSuspended()))
+    if (m_shouldRegisterAsSpeakerSamplesProducer && (WebCore::CoreAudioSharedUnit::defaultSingleton().isRunning() || WebCore::CoreAudioSharedUnit::defaultSingleton().isSuspended()))
         return;
 
     protectedLocalUnit()->start();

@@ -250,7 +250,9 @@ Vector<AVAudioSessionCaptureDevice> AVAudioSessionCaptureDeviceManager::retrieve
         if (currentInput != m_lastDefaultMicrophone.get()) {
             auto device = AVAudioSessionCaptureDevice::createInput(currentInput, currentInput);
             callOnWebThreadOrDispatchAsyncOnMainThread(makeBlockPtr([device = crossThreadCopy(WTFMove(device))] () mutable {
-                CoreAudioSharedUnit::singleton().handleNewCurrentMicrophoneDevice(WTFMove(device));
+                CoreAudioSharedUnit::forEach([&device](auto& unit) {
+                    unit.handleNewCurrentMicrophoneDevice(device);
+                });
             }).get());
         }
         m_lastDefaultMicrophone = currentInput;

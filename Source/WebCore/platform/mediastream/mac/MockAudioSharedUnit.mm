@@ -168,19 +168,19 @@ static bool s_shouldIncreaseBufferSize;
 void MockAudioSharedUnit::enable()
 {
     s_shouldIncreaseBufferSize = false;
-    CoreAudioSharedUnit::singleton().setSampleRateRange({ 44100, 96000 });
-    CoreAudioSharedUnit::singleton().setInternalUnitCreationCallback([](bool enableEchoCancellation) {
+    CoreAudioSharedUnit::defaultSingleton().setSampleRateRange({ 44100, 96000 });
+    CoreAudioSharedUnit::defaultSingleton().setInternalUnitCreationCallback([](bool enableEchoCancellation) {
         UniqueRef<CoreAudioSharedUnit::InternalUnit> result = makeUniqueRef<MockAudioSharedInternalUnit>(enableEchoCancellation);
         return result;
     });
-    CoreAudioSharedUnit::singleton().setInternalUnitGetSampleRateCallback([] { return 44100; });
+    CoreAudioSharedUnit::defaultSingleton().setInternalUnitGetSampleRateCallback([] { return 44100; });
 }
 
 void MockAudioSharedUnit::disable()
 {
-    CoreAudioSharedUnit::singleton().setSampleRateRange({ 8000, 96000 });
-    CoreAudioSharedUnit::singleton().setInternalUnitCreationCallback({ });
-    CoreAudioSharedUnit::singleton().setInternalUnitGetSampleRateCallback({ });
+    CoreAudioSharedUnit::defaultSingleton().setSampleRateRange({ 8000, 96000 });
+    CoreAudioSharedUnit::defaultSingleton().setInternalUnitCreationCallback({ });
+    CoreAudioSharedUnit::defaultSingleton().setInternalUnitGetSampleRateCallback({ });
 }
 
 void MockAudioSharedUnit::increaseBufferSize()
@@ -274,8 +274,8 @@ bool MockAudioSharedInternalUnit::setVoiceActivityDetection(bool shouldEnable)
 
 void MockAudioSharedInternalUnit::voiceDetected()
 {
-    CoreAudioSharedUnit::singleton().voiceActivityDetected();
-    CoreAudioSharedUnit::singleton().disableVoiceActivityThrottleTimerForTesting();
+    CoreAudioSharedUnit::defaultSingleton().voiceActivityDetected();
+    CoreAudioSharedUnit::defaultSingleton().disableVoiceActivityThrottleTimerForTesting();
 }
 
 void MockAudioSharedInternalUnit::reconfigure()
@@ -419,7 +419,7 @@ OSStatus MockAudioSharedInternalUnit::set(AudioUnitPropertyID property, AudioUni
     }
     if (property == kAudioOutputUnitProperty_CurrentDevice) {
         ASSERT(!*static_cast<const uint32_t*>(value));
-        auto device = MockRealtimeMediaSourceCenter::mockDeviceWithPersistentID(CoreAudioSharedUnit::singleton().persistentIDForTesting());
+        auto device = MockRealtimeMediaSourceCenter::mockDeviceWithPersistentID(CoreAudioSharedUnit::defaultSingleton().persistentIDForTesting());
         if (!device)
             return -1;
 

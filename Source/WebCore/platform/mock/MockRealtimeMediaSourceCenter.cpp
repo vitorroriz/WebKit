@@ -448,7 +448,9 @@ void MockRealtimeMediaSourceCenter::triggerMockCaptureConfigurationChange(bool f
         auto devices = audioCaptureDeviceManager().captureDevices();
         if (devices.size() > 1) {
             MockAudioSharedUnit::increaseBufferSize();
-            CoreAudioSharedUnit::singleton().handleNewCurrentMicrophoneDevice(WTFMove(devices[1]));
+            CoreAudioSharedUnit::forEach([&devices](auto& unit) {
+                unit.handleNewCurrentMicrophoneDevice(devices[1]);
+            });
         }
     }
     if (forDisplay) {

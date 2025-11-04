@@ -94,7 +94,7 @@ public:
 
     const String& persistentIDForTesting() const { return m_capturingDevice ? m_capturingDevice->first : emptyString(); }
 
-    void handleNewCurrentMicrophoneDevice(CaptureDevice&&);
+    void handleNewCurrentMicrophoneDevice(const CaptureDevice&);
 
     uint32_t captureDeviceID() const { return m_capturingDevice ? m_capturingDevice->second : 0; }
 

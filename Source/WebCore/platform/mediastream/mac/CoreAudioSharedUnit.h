@@ -81,7 +81,9 @@ public:
         virtual bool canRenderAudio() const { return true; }
     };
 
-    WEBCORE_EXPORT static CoreAudioSharedUnit& singleton();
+    // The default unit - the only one that may render audio when capturing
+    WEBCORE_EXPORT static CoreAudioSharedUnit& defaultSingleton();
+    WEBCORE_EXPORT static void forEach(NOESCAPE Function<void(CoreAudioSharedUnit&)>&&);
     ~CoreAudioSharedUnit();
 
     using CreationCallback = Function<Expected<UniqueRef<InternalUnit>, OSStatus>(bool enableEchoCancellation)>;
