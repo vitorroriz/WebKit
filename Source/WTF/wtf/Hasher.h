@@ -34,9 +34,6 @@ namespace WTF {
 
 template<typename... Types> uint32_t computeHash(const Types&...);
 template<typename T, typename... OtherTypes> uint32_t computeHash(std::initializer_list<T>, std::initializer_list<OtherTypes>...);
-template<std::unsigned_integral UnsignedInteger>
-    requires (sizeof(UnsignedInteger) <= sizeof(uint32_t) && !std::is_enum_v<UnsignedInteger>)
-void add(Hasher&, UnsignedInteger);
 
 class Hasher {
     WTF_DEPRECATED_MAKE_FAST_ALLOCATED(Hasher);
@@ -58,14 +55,7 @@ public:
 
     template<std::unsigned_integral UnsignedInteger>
         requires (sizeof(UnsignedInteger) <= sizeof(uint32_t) && !std::is_enum_v<UnsignedInteger>)
-    friend void add(Hasher& hasher, UnsignedInteger integer)
-    {
-        // We can consider adding a more efficient code path for hashing booleans or individual bytes if needed.
-        // We can consider adding a more efficient code path for hashing 16-bit values if needed, perhaps using addCharacter,
-        // but getting rid of "assuming aligned" would make hashing values 32-bit or larger slower.
-        uint32_t sizedInteger = integer;
-        hasher.m_underlyingHasher.addCharactersAssumingAligned(sizedInteger, sizedInteger >> 16);
-    }
+    friend void add(Hasher&, UnsignedInteger);
 
     unsigned hash() const
     {
@@ -75,6 +65,17 @@ public:
 private:
     SuperFastHash m_underlyingHasher;
 };
+
+template<std::unsigned_integral UnsignedInteger>
+requires (sizeof(UnsignedInteger) <= sizeof(uint32_t) && !std::is_enum_v<UnsignedInteger>)
+void add(Hasher& hasher, UnsignedInteger integer)
+{
+    // We can consider adding a more efficient code path for hashing booleans or individual bytes if needed.
+    // We can consider adding a more efficient code path for hashing 16-bit values if needed, perhaps using addCharacter,
+    // but getting rid of "assuming aligned" would make hashing values 32-bit or larger slower.
+    uint32_t sizedInteger = integer;
+    hasher.m_underlyingHasher.addCharactersAssumingAligned(sizedInteger, sizedInteger >> 16);
+}
 
 template<typename UnsignedInteger>
     requires (std::is_unsigned<UnsignedInteger>::value && sizeof(UnsignedInteger) == sizeof(uint64_t))
