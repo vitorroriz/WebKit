@@ -1365,7 +1365,7 @@ void WebExtensionContext::addInjectedContent(const InjectedContentVector& inject
 
             auto scriptString = scriptStringResult.value();
 
-            Ref userScript = API::UserScript::create(WebCore::UserScript { WTFMove(scriptString), URL { m_baseURL, scriptPath }, WTFMove(includeMatchPatterns), WTFMove(excludeMatchPatterns), injectionTime, injectedFrames, matchParentFrame }, executionWorld);
+            Ref userScript = API::UserScript::create(WebCore::UserScript { WTFMove(scriptString), URL { m_baseURL, scriptPath }, Vector { includeMatchPatterns }, Vector { excludeMatchPatterns }, injectionTime, injectedFrames, matchParentFrame }, executionWorld);
             originInjectedScripts.append(userScript);
 
             for (Ref userContentController : userContentControllers)
@@ -1388,11 +1388,9 @@ void WebExtensionContext::addInjectedContent(const InjectedContentVector& inject
                 continue;
             }
 
-            auto styleSheetString = styleSheetStringResult.value();
+            auto styleSheetString = localizedResourceString(styleSheetStringResult.value(), "text/css"_s);
 
-            styleSheetString = localizedResourceString(styleSheetString, "text/css"_s);
-
-            Ref userStyleSheet = API::UserStyleSheet::create(WebCore::UserStyleSheet { WTFMove(styleSheetString), URL { m_baseURL, styleSheetPath }, WTFMove(includeMatchPatterns), WTFMove(excludeMatchPatterns), injectedFrames, matchParentFrame, styleLevel, std::nullopt }, executionWorld);
+            Ref userStyleSheet = API::UserStyleSheet::create(WebCore::UserStyleSheet { WTFMove(styleSheetString), URL { m_baseURL, styleSheetPath }, Vector { includeMatchPatterns }, Vector { excludeMatchPatterns }, injectedFrames, matchParentFrame, styleLevel, std::nullopt }, executionWorld);
             originInjectedStyleSheets.append(userStyleSheet);
 
             for (Ref userContentController : userContentControllers)
@@ -1559,6 +1557,7 @@ bool WebExtensionContext::purgeMatchedRulesFromBefore(const WallTime& startTime)
     }
 
     m_matchedRules = WTFMove(filteredMatchedRules);
+
     return !m_matchedRules.isEmpty();
 }
 
