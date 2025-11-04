@@ -1168,6 +1168,8 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     runtime/JSDateMath.h
     runtime/JSDestructibleObject.h
     runtime/JSDestructibleObjectHeapCellType.h
+    runtime/JSHeapDouble.h
+    runtime/JSHeapInt32.h
     runtime/JSExportMacros.h
     runtime/JSFloat16Array.h
     runtime/JSFloat32Array.h
