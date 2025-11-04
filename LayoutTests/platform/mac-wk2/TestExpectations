@@ -2265,9 +2265,6 @@ apple-visual-effects/apple-visual-effect-automatic-vibrancy.html [ Slow ]
 applicationmanifest/developer-warnings.html [ Slow ]
 compositing/animation/animated-composited-inside-hidden.html [ Slow ]
 compositing/backface-visibility/backface-visibility-3d.html [ Slow ]
-fast/events/popup-allowed-from-gesture-initiated-event.html [ Pass Timeout ]
-fast/events/popup-blocked-from-fake-user-gesture.html [ Pass Timeout ]
-fast/events/popup-blocking-timers1.html [ Pass Timeout ]
 fast/history/history_reload.html [ Pass Timeout ]
 fast/mediacapturefromelement/CanvasCaptureMediaStream-offscreencanvas.html [ Pass Timeout Failure ]
 http/tests/privateClickMeasurement/attribution-conversion-through-image-redirect-in-new-window.html [ Timeout ]
@@ -2409,3 +2406,8 @@ webkit.org/b/301566 [ Debug ] imported/w3c/web-platform-tests/custom-elements/re
 [ Tahoe Debug arm64 ] http/tests/media/hls/range-request-cross-origin.html [ Timeout ]
 [ Tahoe Debug arm64 ] http/tests/media/hls/track-in-band-multiple-cues.html [ Timeout ]
 [ Tahoe Debug arm64 ] http/tests/media/hls/track-webvtt-multitracks.html [ Timeout ]
+
+# webkit.org/b/301951 3x fast/events/popup tests (layout-tests) are constantly timing out 
+fast/events/popup-blocking-timers1.html [ Timeout ]
+fast/events/popup-blocked-from-fake-user-gesture.html [ Timeout ]
+fast/events/popup-allowed-from-gesture-initiated-event.html [ Timeout ]
