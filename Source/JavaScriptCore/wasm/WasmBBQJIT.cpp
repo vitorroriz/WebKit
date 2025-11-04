@@ -749,7 +749,6 @@ bool BBQJIT::canTierUpToOMG() const
 
 void BBQJIT::emitIncrementCallProfileCount(unsigned callProfileIndex)
 {
-    ASSERT(m_profiledCallee.needsProfiling());
     m_jit.add32(TrustedImm32(1), CCallHelpers::Address(GPRInfo::jitDataRegister, safeCast<int32_t>(BaselineData::offsetOfData() + sizeof(CallProfile) * callProfileIndex + CallProfile::offsetOfCount())));
 }
 
@@ -3185,19 +3184,18 @@ ControlData WARN_UNUSED_RETURN BBQJIT::addTopLevel(BlockSignature signature)
 
     m_jit.move(wasmScratchGPR, MacroAssembler::stackPointerRegister);
 
-    if (m_profiledCallee.needsProfiling()) {
-        Address baselineDataAddress(GPRInfo::wasmContextInstancePointer, JSWebAssemblyInstance::offsetOfBaselineData(m_info, m_functionIndex));
-        m_jit.loadPtr(baselineDataAddress, GPRInfo::jitDataRegister);
-        Jump materialize = m_jit.branchTestPtr(CCallHelpers::Zero, GPRInfo::jitDataRegister);
-        MacroAssembler::Label done = m_jit.label();
-        addLatePath(origin(), [materialize = WTFMove(materialize), done, baselineDataAddress](BBQJIT&, CCallHelpers& jit) {
-            materialize.link(&jit);
-            jit.move(GPRInfo::callFrameRegister, GPRInfo::nonPreservedNonArgumentGPR0);
-            jit.nearCallThunk(CodeLocationLabel<JITThunkPtrTag>(Thunks::singleton().stub(materializeBaselineDataGenerator).code()));
-            jit.loadPtr(baselineDataAddress, GPRInfo::jitDataRegister);
-            jit.jump(done);
-        });
-    }
+    Address baselineDataAddress(GPRInfo::wasmContextInstancePointer, JSWebAssemblyInstance::offsetOfBaselineData(m_info, m_functionIndex));
+    m_jit.loadPtr(baselineDataAddress, GPRInfo::jitDataRegister);
+    Jump materialize = m_jit.branchTestPtr(CCallHelpers::Zero, GPRInfo::jitDataRegister);
+    MacroAssembler::Label done = m_jit.label();
+    addLatePath(origin(), [materialize = WTFMove(materialize), done, baselineDataAddress](BBQJIT&, CCallHelpers& jit) {
+        materialize.link(&jit);
+        jit.move(GPRInfo::callFrameRegister, GPRInfo::nonPreservedNonArgumentGPR0);
+        jit.nearCallThunk(CodeLocationLabel<JITThunkPtrTag>(Thunks::singleton().stub(materializeBaselineDataGenerator).code()));
+        jit.loadPtr(baselineDataAddress, GPRInfo::jitDataRegister);
+        jit.jump(done);
+    });
+    m_jit.add32(TrustedImm32(1), CCallHelpers::Address(GPRInfo::jitDataRegister, BaselineData::offsetOfTotalCount()));
 
     LocalOrTempIndex i = 0;
     for (; i < m_arguments.size(); ++i)
@@ -3345,10 +3343,8 @@ MacroAssembler::Label BBQJIT::addLoopOSREntrypoint()
     } else
         m_jit.storePairPtr(GPRInfo::wasmContextInstancePointer, wasmScratchGPR, GPRInfo::callFrameRegister, CCallHelpers::TrustedImm32(CallFrameSlot::codeBlock * sizeof(Register)));
 
-    if (m_profiledCallee.needsProfiling()) {
-        // Because tiering up code materializes BaselineData, this is always non nullptr.
-        m_jit.loadPtr(Address(GPRInfo::wasmContextInstancePointer, JSWebAssemblyInstance::offsetOfBaselineData(m_info, m_functionIndex)), GPRInfo::jitDataRegister);
-    }
+    // Because tiering up code materializes BaselineData, this is always non nullptr.
+    m_jit.loadPtr(Address(GPRInfo::wasmContextInstancePointer, JSWebAssemblyInstance::offsetOfBaselineData(m_info, m_functionIndex)), GPRInfo::jitDataRegister);
 
     int roundedFrameSize = stackCheckSize();
 #if CPU(X86_64) || CPU(ARM64)

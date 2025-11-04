@@ -446,8 +446,6 @@ public:
     const Vector<FunctionSpaceIndex>& callTargets() const { return m_callTargets; }
     unsigned numCallProfiles() const { return m_callTargets.size(); }
 
-    bool needsProfiling() const;
-
     IPIntTierUpCounter& tierUpCounter() { return m_tierUpCounter; }
     const IPIntTierUpCounter& tierUpCounter() const { return m_tierUpCounter; }
 

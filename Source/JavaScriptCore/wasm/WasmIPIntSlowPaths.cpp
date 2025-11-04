@@ -930,6 +930,13 @@ WASM_IPINT_EXTERN_CPP_DECL(ref_cast, int32_t heapType, bool allowNull, EncodedJS
     IPINT_RETURN(value);
 }
 
+WASM_IPINT_EXTERN_CPP_DECL(prepare_function_body, CallFrame* callFrame)
+{
+    Wasm::IPIntCallee* callee = IPINT_CALLEE(callFrame);
+    instance->ensureBaselineData(callee->functionIndex()).incrementTotalCount();
+    WASM_RETURN_TWO(callee, nullptr);
+}
+
 /**
  * Given a function index, determine the pointer to its executable code.
  * Return a pair of the wasm instance pointer received as the first argument and the code pointer.
