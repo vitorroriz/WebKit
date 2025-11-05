@@ -938,7 +938,7 @@ EOF
 
             push(@contents, <<EOF);
 
-    return @{[$self->_returnExpression($attribute, $getterExpression, $interface)]};
+    SUPPRESS_UNCOUNTED_ARG return @{[$self->_returnExpression($attribute, $getterExpression, $interface)]};
 }
 EOF
 
