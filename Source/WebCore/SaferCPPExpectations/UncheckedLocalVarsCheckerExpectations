@@ -72,8 +72,6 @@ dom/ComposedTreeIterator.cpp
 dom/ComposedTreeIterator.h
 dom/ContainerNodeAlgorithms.cpp
 dom/CustomElementReactionQueue.cpp
-dom/DeviceMotionController.cpp
-dom/DeviceOrientationController.cpp
 dom/Document.cpp
 dom/Element.cpp
 dom/ElementAndTextDescendantIterator.h
@@ -244,7 +242,6 @@ page/AutoscrollController.cpp
 [ iOS ] page/Chrome.cpp
 [ Mac ] page/ContextMenuController.cpp
 [ iOS ] page/DOMTimer.cpp
-page/DeviceController.cpp
 page/DragController.cpp
 page/ElementTargetingController.cpp
 page/EventHandler.cpp
