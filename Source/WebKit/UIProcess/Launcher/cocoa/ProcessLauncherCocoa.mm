@@ -303,7 +303,7 @@ void ProcessLauncher::finishLaunchingProcess(ASCIILiteral name)
     mach_port_t listeningPort = MACH_PORT_NULL;
     auto kr = IPC::allocateImmovableConnectionPort(&listeningPort);
     if (kr != KERN_SUCCESS) {
-        LOG_ERROR("Could not allocate mach port, error %x: %s", kr, mach_error_string(kr));
+        RELEASE_LOG_ERROR(IPC, "Could not allocate mach port, error: %{private}s (%x)", mach_error_string(kr), kr);
         CRASH();
     }
 
