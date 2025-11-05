@@ -423,7 +423,7 @@ void testReduceStrengthTruncConstant(Type64 filler, Type32 value)
     reduceStrength(proc);
 
     CHECK_EQ(root->last()->opcode(), Return);
-    if constexpr (std::is_same_v<B3ContType, ConstDoubleValue>) {
+    if constexpr (std::same_as<B3ContType, ConstDoubleValue>) {
         CHECK_EQ(root->last()->child(0)->opcode(), ConstFloat);
         CHECK_EQ(std::bit_cast<int32_t>(root->last()->child(0)->asFloat()), std::bit_cast<int32_t>(value));
     } else
@@ -2086,10 +2086,10 @@ static void testFMaxMin()
     runMinTest(-inf, 0, -inf);
     runMinTest(-inf, inf, -inf);
     runMinTest(inf, 42.0, 42.0);
-    if constexpr (std::is_same_v<FloatType, float>) {
+    if constexpr (std::same_as<FloatType, float>) {
         runMinTest(0.0, std::nanf(""), std::nanf(""));
         runMinTest(std::nanf(""), 42.0, std::nanf(""));
-    } else if constexpr (std::is_same_v<FloatType, double>) {
+    } else if constexpr (std::same_as<FloatType, double>) {
         runMinTest(0.0, std::nan(""), std::nan(""));
         runMinTest(std::nan(""), 42.0, std::nan(""));
     }
@@ -2105,10 +2105,10 @@ static void testFMaxMin()
     runMaxTest(-inf, 0, 0);
     runMaxTest(-inf, inf, inf);
     runMaxTest(inf, 42.0, inf);
-    if constexpr (std::is_same_v<FloatType, float>) {
+    if constexpr (std::same_as<FloatType, float>) {
         runMaxTest(0.0, std::nanf(""), std::nanf(""));
         runMaxTest(std::nanf(""), 42.0, std::nanf(""));
-    } else if constexpr (std::is_same_v<FloatType, double>) {
+    } else if constexpr (std::same_as<FloatType, double>) {
         runMaxTest(0.0, std::nan(""), std::nan(""));
         runMaxTest(std::nan(""), 42.0, std::nan(""));
     }
