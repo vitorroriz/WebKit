@@ -56,11 +56,9 @@ public:
 
 class WebExtensionCallbackHandler : public RefCounted<WebExtensionCallbackHandler> {
 public:
-    template<typename... Args>
-    static Ref<WebExtensionCallbackHandler> create(Args&&... args)
-    {
-        return adoptRef(*new WebExtensionCallbackHandler(std::forward<Args>(args)...));
-    }
+    static Ref<WebExtensionCallbackHandler> create(JSContextRef, JSObjectRef resolveFunction, JSObjectRef rejectFunction);
+    static Ref<WebExtensionCallbackHandler> create(JSContextRef, JSObjectRef callbackFunction, WebExtensionAPIRuntimeBase&);
+    static Ref<WebExtensionCallbackHandler> create(JSContextRef, WebExtensionAPIRuntimeBase&);
 
     ~WebExtensionCallbackHandler();
 

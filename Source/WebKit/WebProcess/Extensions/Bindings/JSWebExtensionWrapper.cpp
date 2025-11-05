@@ -29,12 +29,28 @@
 #if ENABLE(WK_WEB_EXTENSIONS)
 
 #include "JSWebExtensionWrappable.h"
+#include "WebExtensionAPIRuntime.h"
 #include "WebFrame.h"
 #include "WebPage.h"
 #include <JavaScriptCore/JSObjectRef.h>
 #include <JavaScriptCore/JSWeakObjectMapRefPrivate.h>
 
 namespace WebKit {
+
+Ref<WebExtensionCallbackHandler> WebExtensionCallbackHandler::create(JSContextRef context, JSObjectRef resolveFunction, JSObjectRef rejectFunction)
+{
+    return adoptRef(*new WebExtensionCallbackHandler(context, resolveFunction, rejectFunction));
+}
+
+Ref<WebExtensionCallbackHandler> WebExtensionCallbackHandler::create(JSContextRef context, JSObjectRef callbackFunction, WebExtensionAPIRuntimeBase& runtime)
+{
+    return adoptRef(*new WebExtensionCallbackHandler(context, callbackFunction, runtime));
+}
+
+Ref<WebExtensionCallbackHandler> WebExtensionCallbackHandler::create(JSContextRef context, WebExtensionAPIRuntimeBase& runtime)
+{
+    return adoptRef(*new WebExtensionCallbackHandler(context, runtime));
+}
 
 WebExtensionCallbackHandler::WebExtensionCallbackHandler(JSContextRef context, JSObjectRef callbackFunction, WebExtensionAPIRuntimeBase& runtime)
     : m_callbackFunction(callbackFunction)
