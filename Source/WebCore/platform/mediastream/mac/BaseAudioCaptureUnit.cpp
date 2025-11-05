@@ -40,8 +40,10 @@ namespace WebCore {
 
 constexpr Seconds voiceActivityThrottlingDuration = 5_s;
 
-BaseAudioCaptureUnit::BaseAudioCaptureUnit()
-    : m_sampleRate(AudioSession::singleton().sampleRate())
+BaseAudioCaptureUnit::BaseAudioCaptureUnit(CanEnableEchoCancellation canEnableEchoCancellation)
+    : m_canEnableEchoCancellation(canEnableEchoCancellation == CanEnableEchoCancellation::Yes)
+    , m_enableEchoCancellation(m_canEnableEchoCancellation)
+    , m_sampleRate(AudioSession::singleton().sampleRate())
 {
     RealtimeMediaSourceCenter::singleton().addDevicesChangedObserver(*this);
 }
@@ -49,6 +51,12 @@ BaseAudioCaptureUnit::BaseAudioCaptureUnit()
 BaseAudioCaptureUnit::~BaseAudioCaptureUnit()
 {
     RealtimeMediaSourceCenter::singleton().removeDevicesChangedObserver(*this);
+}
+
+void BaseAudioCaptureUnit::setEnableEchoCancellation(bool enableEchoCancellation)
+{
+    ASSERT(m_canEnableEchoCancellation || (!enableEchoCancellation && !m_enableEchoCancellation));
+    m_enableEchoCancellation = enableEchoCancellation;
 }
 
 void BaseAudioCaptureUnit::addClient(CoreAudioCaptureSource& client)

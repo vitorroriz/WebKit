@@ -116,7 +116,7 @@ private:
     std::optional<RealtimeMediaSourceSettings> m_currentSettings;
 
     bool m_canResumeAfterInterruption { true };
-    bool m_isReadyToStart { false };
+    bool m_shouldInitializeAudioUnit { true };
     bool m_echoCancellationChanging { false };
 
     std::optional<bool> m_echoCancellationCapability;

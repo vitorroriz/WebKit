@@ -224,11 +224,16 @@ Ref<const CoreAudioCaptureUnit> CoreAudioCaptureSource::protectedUnit() const
 
 void CoreAudioCaptureSource::initializeToStartProducingData()
 {
-    if (m_isReadyToStart)
+    if (!m_shouldInitializeAudioUnit)
         return;
 
     ALWAYS_LOG_IF(loggerPtr(), LOGIDENTIFIER, "is Default ", captureDevice().isDefault());
-    m_isReadyToStart = true;
+    m_shouldInitializeAudioUnit = false;
+
+#if PLATFORM(MAC)
+    if (echoCancellation() != protectedUnit()->enableEchoCancellation())
+        m_unit = echoCancellation() ? Ref { CoreAudioCaptureUnit::defaultSingleton() } : CoreAudioCaptureUnit::createNonVPIOUnit();
+#endif
 
     Ref unit = m_unit;
     unit->setCaptureDevice(String { persistentID() }, m_captureDeviceID, captureDevice().isDefault());
@@ -317,15 +322,28 @@ const RealtimeMediaSourceSettings& CoreAudioCaptureSource::settings()
 
 void CoreAudioCaptureSource::settingsDidChange(OptionSet<RealtimeMediaSourceSettings::Flag> settings)
 {
-    if (!m_isReadyToStart || m_echoCancellationChanging) {
+    if (m_shouldInitializeAudioUnit || m_echoCancellationChanging) {
         m_currentSettings = std::nullopt;
         return;
     }
 
     bool shouldReconfigure = false;
     if (settings.contains(RealtimeMediaSourceSettings::Flag::EchoCancellation)) {
+#if PLATFORM(MAC)
+        Ref unit = m_unit;
+        unit->removeClient(*this);
+        if (isProducingData())
+            unit->stopProducingData();
+
+        m_unit = echoCancellation() ? Ref { CoreAudioCaptureUnit::defaultSingleton() } : CoreAudioCaptureUnit::createNonVPIOUnit();
+        m_shouldInitializeAudioUnit = true;
+        if (isProducingData())
+            startProducingData();
+        return;
+#else
         protectedUnit()->setEnableEchoCancellation(echoCancellation());
         shouldReconfigure = true;
+#endif
     }
     if (settings.contains(RealtimeMediaSourceSettings::Flag::SampleRate)) {
         protectedUnit()->setSampleRate(sampleRate());

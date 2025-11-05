@@ -6450,6 +6450,15 @@ size_t Internals::audioCaptureSourceCount() const
     return false;
 }
 
+bool Internals::supportsMultiMicrophoneCaptureWithoutEchoCancellation() const
+{
+#if PLATFORM(MAC)
+    return true;
+#else
+    return false;
+#endif
+}
+
 bool Internals::isMediaStreamSourceInterrupted(MediaStreamTrack& track) const
 {
     return track.source().interrupted();

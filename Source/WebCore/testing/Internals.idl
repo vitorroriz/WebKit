@@ -1202,6 +1202,7 @@ enum ContentsFormat {
     [Conditional=MEDIA_STREAM] boolean shouldAudioTrackPlay(AudioTrack track);
     [Conditional=MEDIA_STREAM] DOMString mediaStreamTrackPersistentId(MediaStreamTrack track);
     [Conditional=MEDIA_STREAM] unsigned long audioCaptureSourceCount();
+    [Conditional=MEDIA_STREAM] boolean supportsMultiMicrophoneCaptureWithoutEchoCancellation();
 
     [Conditional=WEB_RTC] readonly attribute DOMString rtcNetworkInterfaceName;
 

@@ -215,12 +215,19 @@ OSStatus CoreAudioCaptureInternalUnit::defaultOutputDevice(uint32_t* deviceID)
 
 CoreAudioCaptureUnit& CoreAudioCaptureUnit::defaultSingleton()
 {
-    static NeverDestroyed<Ref<CoreAudioCaptureUnit>> singleton(adoptRef(*new CoreAudioCaptureUnit));
+    static NeverDestroyed<Ref<CoreAudioCaptureUnit>> singleton(adoptRef(*new CoreAudioCaptureUnit(CanEnableEchoCancellation::Yes)));
     return singleton.get();
+}
+
+Ref<CoreAudioCaptureUnit> CoreAudioCaptureUnit::createNonVPIOUnit()
+{
+    return adoptRef(*new CoreAudioCaptureUnit(CanEnableEchoCancellation::No));
 }
 
 static WeakHashSet<CoreAudioCaptureUnit>& allCoreAudioCaptureUnits()
 {
+    ASSERT(isMainThread());
+
     static NeverDestroyed<WeakHashSet<CoreAudioCaptureUnit>> units;
     return units;
 }
@@ -230,13 +237,29 @@ void CoreAudioCaptureUnit::forEach(NOESCAPE Function<void(CoreAudioCaptureUnit&)
     allCoreAudioCaptureUnits().forEach(WTFMove(callback));
 }
 
-CoreAudioCaptureUnit::CoreAudioCaptureUnit()
-    : m_sampleRateCapabilities(8000, 96000)
+static Function<void(CoreAudioCaptureUnit&)>& coreAudioCaptureNewUnitCallback()
+{
+    ASSERT(isMainThread());
+
+    static NeverDestroyed<Function<void(CoreAudioCaptureUnit&)>> callback;
+    return callback.get();
+}
+
+void CoreAudioCaptureUnit::forNewUnit(Function<void(CoreAudioCaptureUnit&)>&& callback)
+{
+    coreAudioCaptureNewUnitCallback() = WTFMove(callback);
+}
+
+CoreAudioCaptureUnit::CoreAudioCaptureUnit(CanEnableEchoCancellation canEnableEchoCancellation)
+    : BaseAudioCaptureUnit(canEnableEchoCancellation)
+    , m_sampleRateCapabilities(8000, 96000)
 #if PLATFORM(MAC)
     , m_storedVPIOUnitDeallocationTimer(*this, &CoreAudioCaptureUnit::deallocateStoredVPIOUnit)
 #endif
 {
     allCoreAudioCaptureUnits().add(*this);
+    if (coreAudioCaptureNewUnitCallback())
+        coreAudioCaptureNewUnitCallback()(*this);
 }
 
 CoreAudioCaptureUnit::~CoreAudioCaptureUnit()

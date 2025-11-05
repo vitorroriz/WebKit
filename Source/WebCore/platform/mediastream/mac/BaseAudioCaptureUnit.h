@@ -77,7 +77,7 @@ public:
 
     void setVolume(double volume) { m_volume = volume; }
     void setSampleRate(int sampleRate) { m_sampleRate = sampleRate; }
-    void setEnableEchoCancellation(bool enableEchoCancellation) { m_enableEchoCancellation = enableEchoCancellation; }
+    void setEnableEchoCancellation(bool);
 
     void addClient(CoreAudioCaptureSource&);
     void removeClient(CoreAudioCaptureSource&);
@@ -103,7 +103,8 @@ public:
 #endif
 
 protected:
-    BaseAudioCaptureUnit();
+    enum class CanEnableEchoCancellation : bool { No, Yes };
+    explicit BaseAudioCaptureUnit(CanEnableEchoCancellation);
 
     void forEachClient(NOESCAPE const Function<void(CoreAudioCaptureSource&)>&) const;
     void captureFailed();
@@ -153,6 +154,7 @@ private:
     void continueStartProducingData();
     void continueStopProducingData();
 
+    const bool m_canEnableEchoCancellation { true };
     bool m_enableEchoCancellation { true };
     double m_volume { 1 };
     int m_sampleRate;

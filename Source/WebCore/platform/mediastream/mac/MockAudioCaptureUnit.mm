@@ -164,26 +164,44 @@ private:
     AURenderCallbackStruct m_speakerCallback;
 };
 
+static void mockAudioUnit(CoreAudioCaptureUnit& unit)
+{
+    unit.setSampleRateRange({ 44100, 96000 });
+    unit.setInternalUnitCreationCallback([](bool enableEchoCancellation) {
+        UniqueRef<CoreAudioCaptureUnit::InternalUnit> result = makeUniqueRef<MockAudioCaptureInternalUnit>(enableEchoCancellation);
+        return result;
+    });
+    unit.setInternalUnitGetSampleRateCallback([] { return 44100; });
+}
+
+static void unmockAudioUnit(CoreAudioCaptureUnit& unit)
+{
+    unit.setSampleRateRange({ 8000, 96000 });
+    unit.setInternalUnitCreationCallback({ });
+    unit.setInternalUnitGetSampleRateCallback({ });
+    unit.setSampleRateRange({ 44100, 96000 });
+}
+
 static bool s_shouldIncreaseBufferSize;
 void MockAudioCaptureUnit::enable()
 {
     s_shouldIncreaseBufferSize = false;
-    CoreAudioCaptureUnit::defaultSingleton().setSampleRateRange({ 44100, 96000 });
-    CoreAudioCaptureUnit::defaultSingleton().setInternalUnitCreationCallback([](bool enableEchoCancellation) {
-        UniqueRef<CoreAudioCaptureUnit::InternalUnit> result = makeUniqueRef<MockAudioCaptureInternalUnit>(enableEchoCancellation);
-        return result;
+    CoreAudioCaptureUnit::forEach([](auto& unit) {
+        mockAudioUnit(unit);
     });
-    CoreAudioCaptureUnit::defaultSingleton().setInternalUnitGetSampleRateCallback([] {
-        return 44100;
+    CoreAudioCaptureUnit::forNewUnit([](auto& unit) {
+        mockAudioUnit(unit);
     });
 }
 
 void MockAudioCaptureUnit::disable()
 {
-    CoreAudioCaptureUnit::defaultSingleton().setSampleRateRange({ 8000, 96000 });
-    CoreAudioCaptureUnit::defaultSingleton().setInternalUnitCreationCallback({ });
-    CoreAudioCaptureUnit::defaultSingleton().setInternalUnitGetSampleRateCallback({ });
+    CoreAudioCaptureUnit::forEach([](auto& unit) {
+        unmockAudioUnit(unit);
+    });
+    CoreAudioCaptureUnit::forNewUnit({ });
 }
+
 
 void MockAudioCaptureUnit::increaseBufferSize()
 {

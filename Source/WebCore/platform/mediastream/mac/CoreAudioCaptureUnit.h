@@ -83,8 +83,11 @@ public:
 
     // The default unit - the only one that may render audio when capturing
     WEBCORE_EXPORT static CoreAudioCaptureUnit& defaultSingleton();
-    WEBCORE_EXPORT static void forEach(NOESCAPE Function<void(CoreAudioCaptureUnit&)>&&);
+    static Ref<CoreAudioCaptureUnit> createNonVPIOUnit();
     ~CoreAudioCaptureUnit();
+
+    WEBCORE_EXPORT static void forEach(NOESCAPE Function<void(CoreAudioCaptureUnit&)>&&);
+    static void forNewUnit(Function<void(CoreAudioCaptureUnit&)>&&);
 
     using CreationCallback = Function<Expected<UniqueRef<InternalUnit>, OSStatus>(bool enableEchoCancellation)>;
     void setInternalUnitCreationCallback(CreationCallback&& callback) { m_creationCallback = WTFMove(callback); }
@@ -132,7 +135,7 @@ public:
     void delaySamples(Seconds) final;
 
 private:
-    CoreAudioCaptureUnit();
+    explicit CoreAudioCaptureUnit(CanEnableEchoCancellation);
 
     friend class NeverDestroyed<CoreAudioCaptureUnit>;
     friend class MockAudioCaptureInternalUnit;

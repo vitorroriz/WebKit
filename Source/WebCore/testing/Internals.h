@@ -1025,6 +1025,7 @@ public:
     void setMediaStreamSourceInterrupted(MediaStreamTrack&, bool);
     const String& mediaStreamTrackPersistentId(const MediaStreamTrack&);
     size_t audioCaptureSourceCount() const;
+    bool supportsMultiMicrophoneCaptureWithoutEchoCancellation() const;
     bool isMediaStreamSourceInterrupted(MediaStreamTrack&) const;
     bool isMediaStreamSourceEnded(MediaStreamTrack&) const;
     bool isMockRealtimeMediaSourceCenterEnabled();
