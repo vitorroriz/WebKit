@@ -621,7 +621,6 @@ page/scrolling/ScrollingCoordinator.cpp
 [ Mac ] page/scrolling/ScrollingTreeGestureState.cpp
 [ Mac ] page/scrolling/ThreadedScrollingCoordinator.cpp
 [ Mac ] page/scrolling/mac/ScrollingCoordinatorMac.mm
-[ Mac ] page/scrolling/mac/ScrollingTreeScrollingNodeDelegateMac.mm
 page/text-extraction/TextExtraction.cpp
 page/writing-tools/WritingToolsController.mm
 platform/DragImage.cpp
