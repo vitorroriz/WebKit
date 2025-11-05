@@ -4592,3 +4592,5 @@ webkit.org/b/298727 css3/text-decoration/text-decoration-line-grammar-error-3.ht
 imported/w3c/web-platform-tests/css/CSS2/visudet/height-applies-to-010a.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/visudet/inline-block-baseline-001.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/visudet/inline-block-baseline-002.xht [ ImageOnlyFailure ]
+
+imported/w3c/web-platform-tests/css/CSS2/stacking-context/composite-change-after-scroll-preserves-stacking-order.html [ ImageOnlyFailure ]

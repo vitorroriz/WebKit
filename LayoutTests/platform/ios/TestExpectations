@@ -7939,6 +7939,8 @@ webkit.org/b/292402 http/tests/site-isolation/draw-after-cross-origin-navigation
 
 webkit.org/b/288957 imported/w3c/web-platform-tests/css/CSS2/tables/border-collapse-dynamic-column-001.xht [ ImageOnlyFailure ]
 
+imported/w3c/web-platform-tests/css/CSS2/stacking-context/composite-change-after-scroll-preserves-stacking-order.html [ ImageOnlyFailure ]
+
 webkit.org/b/288518 fast/text/emoji-num-glyphs.html [ Failure ]
 
 # rdar://148254605 (REGRESSION (iOS 18.4): media/sources-fallback-codecs.html is constantly failing.)

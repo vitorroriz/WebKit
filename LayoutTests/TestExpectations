@@ -8154,3 +8154,6 @@ imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-height-20
 imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-height-40.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-width-40.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-width-80.html [ ImageOnlyFailure ]
+
+imported/w3c/web-platform-tests/css/CSS2/stacking-context/opacity-affects-block-in-inline.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/stacking-context/zindex-affects-block-in-inline.html [ ImageOnlyFailure ]

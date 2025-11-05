@@ -3300,3 +3300,5 @@ webkit.org/b/301065 imported/w3c/web-platform-tests/upgrade-insecure-requests/ge
 webkit.org/b/301198 [ Sonoma ] imported/w3c/web-platform-tests/media-source/mediasource-seek-during-pending-seek.html [ Failure ]
 webkit.org/b/299137 imported/w3c/web-platform-tests/css/css-font-loading/fontfacesetloadevent-constructor.html [ Failure ]
 imported/w3c/web-platform-tests/cookies/partitioned-cookies/partitioned-cookies-same-site-subresource-to-cross-site-redirect.tentative.https.html [ Failure Pass ]
+
+imported/w3c/web-platform-tests/css/CSS2/stacking-context/composite-change-after-scroll-preserves-stacking-order.html [ ImageOnlyFailure ]
