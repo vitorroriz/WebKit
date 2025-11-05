@@ -122,6 +122,7 @@ overlay-region [ Skip ]
 pdf [ Skip ]
 ipc/mac [ Skip ]
 ipc/restrictedendpoints/mac [ Skip ]
+webanimations/threaded-animations [ Skip ]
 
 # Requires async overflow scrolling
 compositing/shared-backing/overflow-scroll [ Skip ]

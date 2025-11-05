@@ -1,0 +1,37 @@
+<!DOCTYPE html><!-- webkit-test-runner [ ThreadedScrollDrivenAnimationsEnabled=true ] -->
+<body>
+<style>
+
+body {
+    height: 2000px;
+}
+
+@keyframes slide {
+    to { translate: 100px }
+}
+
+.target {
+    width: 100px;
+    height: 100px;
+    background-color: black;
+
+    animation: slide auto linear;
+    animation-timeline: scroll();
+    will-change: translate;
+}
+
+</style>
+<script src="../../resources/testharness.js"></script>
+<script src="../../resources/testharnessreport.js"></script>
+<script src="../../imported/w3c/web-platform-tests/web-animations/testcommon.js"></script>
+<script>
+
+promise_test(async t => {
+    const target = createDiv(t);
+    target.className = "target";
+    await new Promise(requestAnimationFrame);
+    assert_equals(window.internals?.acceleratedAnimationsForElement(target).length, 1);
+}, "A scroll-driven CSS animation can be accelerated.");
+
+</script>
+</body>

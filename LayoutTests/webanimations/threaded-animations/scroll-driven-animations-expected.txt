@@ -1,0 +1,3 @@
+
+PASS A scroll-driven CSS animation can be accelerated.
+

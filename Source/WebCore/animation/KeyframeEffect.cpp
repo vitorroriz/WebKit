@@ -1935,13 +1935,10 @@ const TimingFunction* KeyframeEffect::timingFunctionForKeyframeAtIndex(size_t in
 
 bool KeyframeEffect::canBeAccelerated() const
 {
-    if (!animation())
+    if (!animation() || animation()->pending())
         return false;
 
     if (m_acceleratedPropertiesState == AcceleratedProperties::None)
-        return false;
-
-    if (m_isAssociatedWithProgressBasedTimeline)
         return false;
 
     if (m_hasAcceleratedPropertyOverriddenByCascadeProperty)
@@ -1962,9 +1959,17 @@ bool KeyframeEffect::canBeAccelerated() const
     }
 
 #if ENABLE(THREADED_ANIMATIONS)
-    if (threadedAnimationsEnabled())
-        return true;
+    if (RefPtr document = this->document()) {
+        Ref settings = document->settings();
+        if (m_isAssociatedWithProgressBasedTimeline && settings->threadedScrollDrivenAnimationsEnabled())
+            return true;
+        if (!m_isAssociatedWithProgressBasedTimeline && settings->threadedTimeBasedAnimationsEnabled())
+            return true;
+    }
 #endif
+
+    if (m_isAssociatedWithProgressBasedTimeline)
+        return false;
 
     if (m_someKeyframesUseStepsTimingFunction || is<StepsTimingFunction>(timingFunction()))
         return false;
