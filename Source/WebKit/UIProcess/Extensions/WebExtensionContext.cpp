@@ -271,7 +271,6 @@ void WebExtensionContext::setGrantedPermissions(PermissionsMap&& grantedPermissi
         }
 
         addedPermissions.add(entry.key);
-        addedPermissions.add(entry.key);
     }
 
     if (addedPermissions.isEmpty() && removedPermissions.isEmpty())
@@ -328,7 +327,7 @@ void WebExtensionContext::setGrantedPermissionMatchPatterns(PermissionMatchPatte
         removedMatchPatterns.add(entry.key);
 
     m_nextGrantedPermissionMatchPatternsExpirationDate = WallTime::nan();
-    m_grantedPermissionMatchPatterns = removeExpired(grantedPermissionMatchPatterns, m_nextGrantedPermissionsExpirationDate);
+    m_grantedPermissionMatchPatterns = removeExpired(grantedPermissionMatchPatterns, m_nextGrantedPermissionMatchPatternsExpirationDate);
 
     MatchPatternSet addedMatchPatterns;
     for (auto& entry : m_grantedPermissionMatchPatterns) {
@@ -881,7 +880,7 @@ WebExtensionContext::PermissionState WebExtensionContext::permissionState(const 
         m_cachedPermissionURLs.appendOrMoveToLast(url);
         m_cachedPermissionStates.set(url, result);
 
-        ASSERT(m_cachedPermissionURLs.size() == m_cachedPermissionURLs.size());
+        ASSERT(m_cachedPermissionURLs.size() == m_cachedPermissionStates.size());
 
         if (m_cachedPermissionURLs.size() <= maximumCachedPermissionResults)
             return result;
@@ -889,7 +888,7 @@ WebExtensionContext::PermissionState WebExtensionContext::permissionState(const 
         URL firstCachedURL = m_cachedPermissionURLs.takeFirst();
         m_cachedPermissionStates.remove(firstCachedURL);
 
-        ASSERT(m_cachedPermissionURLs.size() == m_cachedPermissionURLs.size());
+        ASSERT(m_cachedPermissionURLs.size() == m_cachedPermissionStates.size());
 
         return result;
     };
