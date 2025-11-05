@@ -75,7 +75,6 @@ private:
 
     String aaguidForDebugging() const;
 
-    fido::PINUVAuthProtocol selectPinProtocol() const;
     bool isUVSetup() const;
 
     void continueSetupPinAfterCommand(Vector<uint8_t>&&, const String& pin, Ref<WebCore::CryptoKeyEC> peerKey);

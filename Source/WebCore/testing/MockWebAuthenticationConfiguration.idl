@@ -106,7 +106,6 @@
     boolean expectCancel = false;
     boolean supportClientPin = false;
     boolean supportInternalUV = false;
-    sequence<octet> pinProtocols;
     long maxCredentialCountInList = 1;
     long maxCredentialIdLength = 64;
 };

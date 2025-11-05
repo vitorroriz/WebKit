@@ -92,7 +92,6 @@ struct MockWebAuthenticationConfiguration {
         bool expectCancel { false };
         bool supportClientPin { false };
         bool supportInternalUV { false };
-        Vector<uint8_t> pinProtocols;
         int64_t maxCredentialCountInList { 1 };
         int64_t maxCredentialIdLength { 64 };
     };
