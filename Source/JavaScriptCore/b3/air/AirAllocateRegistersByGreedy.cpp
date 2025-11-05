@@ -55,7 +55,6 @@ namespace Greedy {
 
 // Experiments
 static constexpr bool eagerGroupsExhaustiveSearch = false;
-static constexpr bool spillCostDivideBySize = true;
 static constexpr bool spillCostSizeBias = 1000; // Only relevant when spillCostDivideBySize
 
 // Quickly filters out short ranges from live range splitting consideration.
@@ -63,7 +62,9 @@ static constexpr size_t splitMinRangeSize = 8;
 
 static constexpr float unspillableCost = std::numeric_limits<float>::infinity();
 static constexpr float fastTmpSpillCost = std::numeric_limits<float>::max();
+static constexpr float maxSpillableSpillCost = std::numeric_limits<float>::max();
 static_assert(unspillableCost > fastTmpSpillCost);
+static_assert(unspillableCost > maxSpillableSpillCost);
 
 // Phase constants used for the PhaseInsertionSet. Ensures that the fixup and spill/fill instructions
 // inserted in a particular gap ends up in the correct order.
@@ -543,7 +544,6 @@ struct TmpData {
 
     float spillCost()
     {
-        ASSERT(liveRange.size()); // 0-sized ranges shouldn't be allocated
         switch (spillability) {
         case Spillability::Unspillable:
             return unspillableCost;
@@ -554,14 +554,12 @@ struct TmpData {
         default:
             ASSERT_NOT_REACHED();
         }
+        ASSERT(liveRange.size()); // 0-sized ranges shouldn't be allocated
         // Heuristic that favors not spilling higher use/def frequency-adjusted counts and
         // shorter ranges. The spillCostSizeBias causes the penalty for larger ranges to
         // be more dramatic as the range size gets larger.
-        if (spillCostDivideBySize)
-            return useDefCost / (liveRange.size() + spillCostSizeBias);
-
-        // Simplest heuristic: favors not spill higher use/def frequency-adjusted counts.
-        return useDefCost;
+        float cost = useDefCost / (liveRange.size() + spillCostSizeBias);
+        return std::min(cost, maxSpillableSpillCost);
     }
 
     void validate()
