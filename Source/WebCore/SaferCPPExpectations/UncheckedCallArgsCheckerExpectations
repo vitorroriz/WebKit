@@ -49,7 +49,6 @@ accessibility/cocoa/AccessibilityObjectCocoa.mm
 [ Mac ] accessibility/mac/AccessibilityObjectMac.mm
 animation/AnimationTimelinesController.cpp
 animation/BlendingKeyframes.cpp
-animation/DocumentTimeline.cpp
 animation/ElementAnimationRareData.cpp
 animation/KeyframeEffect.cpp
 animation/ScrollTimeline.cpp
@@ -114,7 +113,6 @@ dom/ContainerNode.cpp
 dom/ContainerNodeAlgorithms.cpp
 dom/ContentVisibilityDocumentState.cpp
 dom/CurrentScriptIncrementer.h
-dom/DataTransfer.cpp
 dom/DeviceMotionController.cpp
 dom/DeviceOrientationController.cpp
 dom/Document.cpp

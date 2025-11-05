@@ -128,7 +128,6 @@ editing/cocoa/WebContentReaderCocoa.mm
 [ Mac ] editing/mac/FrameSelectionMac.mm
 editing/markup.cpp
 history/CachedFrame.cpp
-html/Autofill.cpp
 html/CachedHTMLCollectionInlines.h
 html/CollectionTraversalInlines.h
 html/FormAssociatedCustomElement.cpp
@@ -287,7 +286,6 @@ page/scrolling/ScrollSnapOffsetsInfo.cpp
 page/scrolling/ScrollingCoordinator.cpp
 page/text-extraction/TextExtraction.cpp
 page/writing-tools/WritingToolsController.mm
-platform/CaretAnimator.cpp
 platform/DictationCaretAnimator.cpp
 platform/DragImage.cpp
 platform/ScrollView.cpp

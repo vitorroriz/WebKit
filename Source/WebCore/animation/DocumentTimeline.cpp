@@ -75,7 +75,7 @@ DocumentTimeline::DocumentTimeline(Document& document, Seconds originTime)
     , m_document(document)
     , m_originTime(originTime)
 {
-    document.ensureTimelinesController().addTimeline(*this);
+    document.ensureCheckedTimelinesController()->addTimeline(*this);
 }
 
 DocumentTimeline::~DocumentTimeline() = default;
@@ -239,7 +239,7 @@ bool DocumentTimeline::animationCanBeRemoved(WebAnimation& animation)
         return false;
 
     auto target = keyframeEffect->targetStyleable();
-    if (!target || !target->element.isDescendantOf(*m_document))
+    if (!target || !target->protectedElement()->isDescendantOf(Ref { *m_document }))
         return false;
 
 IGNORE_GCC_WARNINGS_BEGIN("dangling-reference")
@@ -497,7 +497,8 @@ unsigned DocumentTimeline::numberOfAnimationTimelineInvalidationsForTesting() co
 
 ExceptionOr<Ref<WebAnimation>> DocumentTimeline::animate(Ref<CustomEffectCallback>&& callback, std::optional<Variant<double, CustomAnimationOptions>>&& options)
 {
-    if (!m_document)
+    RefPtr document = m_document.get();
+    if (!document)
         return Exception { ExceptionCode::InvalidStateError };
 
     String id = emptyString();
@@ -517,11 +518,11 @@ ExceptionOr<Ref<WebAnimation>> DocumentTimeline::animate(Ref<CustomEffectCallbac
         customEffectOptions = customEffectOptionsVariant;
     }
 
-    auto customEffectResult = CustomEffect::create(*m_document, WTFMove(callback), WTFMove(customEffectOptions));
+    auto customEffectResult = CustomEffect::create(*document, WTFMove(callback), WTFMove(customEffectOptions));
     if (customEffectResult.hasException())
         return customEffectResult.releaseException();
 
-    auto animation = WebAnimation::create(*document(), &customEffectResult.returnValue().get());
+    auto animation = WebAnimation::create(*document, &customEffectResult.returnValue().get());
     animation->setId(WTFMove(id));
     animation->setBindingsFrameRate(WTFMove(frameRate));
 
