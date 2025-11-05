@@ -838,9 +838,10 @@ bool Editor::shouldInsertText(const String& text, const std::optional<SimpleRang
 void Editor::respondToChangedContents(const VisibleSelection& endingSelection)
 {
     if (AXObjectCache::accessibilityEnabled()) {
-        RefPtr node = endingSelection.start().deprecatedNode();
-        if (AXObjectCache* cache = document().existingAXObjectCache())
-            cache->onEditableTextValueChanged(*node.get());
+        if (RefPtr node = endingSelection.start().deprecatedNode()) {
+            if (AXObjectCache* cache = document().existingAXObjectCache())
+                cache->onEditableTextValueChanged(*node.get());
+        }
     }
 
     updateMarkersForWordsAffectedByEditing(true);
