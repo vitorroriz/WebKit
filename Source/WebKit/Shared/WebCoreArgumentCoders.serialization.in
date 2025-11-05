@@ -6243,6 +6243,7 @@ header: <WebCore/ISOVTTCue.h>
     bool expectCancel;
     bool supportClientPin;
     bool supportInternalUV;
+    Vector<uint8_t> pinProtocols;
     int64_t maxCredentialCountInList;
     int64_t maxCredentialIdLength;
 };
