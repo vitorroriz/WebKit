@@ -894,6 +894,12 @@ TEST(WKWebExtension, ActionParsing)
     EXPECT_NS_EQUAL(testExtension.errors, @[ ]);
     EXPECT_NULL(testExtension.displayActionLabel);
     EXPECT_NULL([testExtension actionIconForSize:NSMakeSize(16, 16)]);
+
+    // Invalid cases
+
+    testManifestDictionary = @{ @"manifest_version": @3, @"name": @"Test", @"description": @"Test", @"version": @"1.0", @"action": @{ @"default_title": @"Button Title", @"default_icon": @"test.png" } };
+    testExtension = [[WKWebExtension alloc] _initWithManifestDictionary:testManifestDictionary resources:@{ }];
+    EXPECT_EQ(testExtension.errors.count, 2ul);
 }
 
 TEST(WKWebExtension, ContentScriptsParsing)
