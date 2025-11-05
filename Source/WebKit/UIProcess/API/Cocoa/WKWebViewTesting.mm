@@ -1143,13 +1143,28 @@ static void dumpCALayer(TextStream& ts, CALayer *layer, bool traverse)
         return @"standard";
 
     Ref connection = process->connection();
+
+#if !PLATFORM(IOS_FAMILY)
+    bool hasAllowJIT = hasEntitlement(connection->xpcConnection(), "com.apple.security.cs.allow-jit"_s);
+    bool hasVerifiedJIT = hasEntitlement(connection->xpcConnection(), "com.apple.private.verified-jit"_s);
+    bool hasSingleJIT = hasEntitlement(connection->xpcConnection(), "com.apple.security.cs.single-jit"_s);
+    bool hasJIT = hasAllowJIT || hasVerifiedJIT || hasSingleJIT;
+
+    bool hasEnhancedSecurityEntitlement = hasEntitlement(connection->xpcConnection(), "com.apple.private.webkit.enhanced-security"_s);
+
+    bool hasEnhancedSecurity = hasEnhancedSecurityEntitlement || !hasJIT;
+    bool hasLockdownMode = !hasAllowJIT && !hasEnhancedSecurity;
+
+#else
     bool hasEnhancedSecurity = hasEntitlement(connection->xpcConnection(), "com.apple.private.webkit.enhanced-security"_s);
     bool hasLockdownMode = hasEntitlement(connection->xpcConnection(), "com.apple.private.webkit.lockdown-mode"_s);
 
-    if (hasEnhancedSecurity)
-        return @"security";
+#endif
+
     if (hasLockdownMode)
         return @"lockdown";
+    if (hasEnhancedSecurity)
+        return @"security";
 
 #endif
     return @"standard";
