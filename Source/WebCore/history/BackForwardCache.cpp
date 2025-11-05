@@ -124,7 +124,8 @@ static bool canCacheFrame(LocalFrame& frame, DiagnosticLoggingClient& diagnostic
     }
 
     URL currentURL = documentLoader->url();
-    URL newURL = frameLoader->provisionalDocumentLoader() ? frameLoader->provisionalDocumentLoader()->url() : URL();
+    RefPtr provisionalDocumentLoader = frameLoader->provisionalDocumentLoader();
+    URL newURL = provisionalDocumentLoader ? provisionalDocumentLoader->url() : URL();
     if (!newURL.isEmpty())
         PCLOG(" Determining if frame can be cached navigating from ("_s, currentURL.string(), ") to ("_s, newURL.string(), "):"_s);
     else
@@ -322,8 +323,10 @@ void BackForwardCache::dump() const
 {
     WTFLogAlways("Back/Forward Cache:");
     for (auto& item : m_cachedPageMap) {
-        if (auto* cachedPage = std::get_if<UniqueRef<CachedPage>>(&item.value))
-            WTFLogAlways("  Page %p, document %p %s", &(*cachedPage)->page(), (*cachedPage)->document(), (*cachedPage)->document() ? (*cachedPage)->document()->url().string().utf8().data() : "");
+        if (auto* cachedPage = std::get_if<UniqueRef<CachedPage>>(&item.value)) {
+            RefPtr document = (*cachedPage)->document();
+            WTFLogAlways("  Page %p, document %p %s", &(*cachedPage)->page(), document.get(), document ? document->url().string().utf8().data() : "");
+        }
     }
 }
 

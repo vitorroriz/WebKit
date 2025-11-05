@@ -196,7 +196,6 @@ editing/mac/FrameSelectionMac.mm
 editing/markup.cpp
 fileapi/BlobLoader.h
 fileapi/FileReader.cpp
-history/BackForwardCache.cpp
 history/CachedFrame.cpp
 html/CachedHTMLCollection.h
 html/CachedHTMLCollectionInlines.h
