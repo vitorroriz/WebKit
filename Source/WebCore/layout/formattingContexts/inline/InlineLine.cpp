@@ -355,7 +355,7 @@ void Line::appendText(const InlineTextItem& inlineTextItem, const RenderStyle& s
             // provided both spaces are within the same inline formatting context—is collapsed to have zero advance width.
             if (run.isText())
                 return run.hasCollapsibleTrailingWhitespace();
-            ASSERT(run.isListMarker() || run.isLineSpanningInlineBoxStart() || run.isInlineBoxStart() || run.isInlineBoxEnd() || run.isWordBreakOpportunity() || run.isOpaque() || run.isBlock());
+            ASSERT(run.isListMarker() || run.isLineSpanningInlineBoxStart() || run.isInlineBoxStart() || run.isInlineBoxEnd() || run.isWordBreakOpportunity() || run.isOpaque());
         }
         // Leading whitespace.
         return true;
@@ -563,6 +563,13 @@ void Line::appendAtomicInlineBox(const InlineItem& inlineItem, const RenderStyle
     // e.g. <img style="width: 100px; margin-left: -100px;"> pulls the replaced box to -100px with the margin box width of 0px.
     // Instead we need to position it at -100px and size it to 100px so the subsequent content starts at 0px. 
     m_runs.append({ inlineItem, style, lastRunLogicalRight() + marginStart, marginBoxLogicalWidth - marginStart });
+}
+
+void Line::appendBlock(const InlineItem& blockItem, InlineLayoutUnit marginBoxLogicalWidth)
+{
+    // We may have added line spanning inline boxes when initializing this line for the block content.
+    ASSERT(m_runs.isEmpty() || !hasContentOrListMarker());
+    m_runs.append({ blockItem, blockItem.style(), { }, marginBoxLogicalWidth });
 }
 
 void Line::appendLineBreak(const InlineItem& inlineItem, const RenderStyle& style)
