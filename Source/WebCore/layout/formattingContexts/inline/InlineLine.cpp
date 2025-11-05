@@ -567,8 +567,14 @@ void Line::appendAtomicInlineBox(const InlineItem& inlineItem, const RenderStyle
 
 void Line::appendBlock(const InlineItem& blockItem, InlineLayoutUnit marginBoxLogicalWidth)
 {
+#if ASSERT_ENABLED
     // We may have added line spanning inline boxes when initializing this line for the block content.
-    ASSERT(m_runs.isEmpty() || !hasContentOrListMarker());
+    for (auto& run : m_runs)
+        ASSERT(run.isLineSpanningInlineBoxStart());
+#endif
+    // Let's remove any spanning inline boxes. Lines with block content should only contain the block content itself.
+    m_runs.clear();
+    m_contentLogicalWidth = marginBoxLogicalWidth;
     m_runs.append({ blockItem, blockItem.style(), { }, marginBoxLogicalWidth });
 }
 

@@ -61,16 +61,24 @@ LineBox LineBoxBuilder::build(size_t lineIndex)
         return lineLayoutResult.contentGeometry.logicalWidth;
     };
     auto lineBox = LineBox { rootBox(), lineLayoutResult.contentGeometry.logicalLeft, contentLogicalWidth(), lineIndex, isFirstFormattedLine(), lineLayoutResult.nonSpanningInlineLevelBoxCount };
-    constructInlineLevelBoxes(lineBox);
-    adjustIdeographicBaselineIfApplicable(lineBox);
-    adjustInlineBoxHeightsForLineBoxContainIfApplicable(lineBox);
-    if (m_lineHasNonLineSpanningRubyContent)
-        RubyFormattingContext::applyAnnotationContributionToLayoutBounds(lineBox, formattingContext());
-    computeLineBoxGeometry(lineBox);
-    adjustOutsideListMarkersPosition(lineBox);
+    auto& runs = lineLayoutResult.runs;
+    if (!runs.isEmpty() && runs[0].isBlock()) {
+        // Since we don't need to position and align block content inside the line, we don't need to create any boxes for this block content.
+        auto lineBoxLogicalHeight = formattingContext().geometryForBox(runs[0].layoutBox()).marginBoxHeight();
+        lineBox.setLogicalRect({ lineLayoutResult.lineGeometry.logicalTopLeft, lineLayoutResult.lineGeometry.logicalWidth, lineBoxLogicalHeight });
+        setVerticalPropertiesForInlineLevelBox(lineBox, lineBox.rootInlineBox());
+    } else {
+        constructInlineLevelBoxes(lineBox);
+        adjustIdeographicBaselineIfApplicable(lineBox);
+        adjustInlineBoxHeightsForLineBoxContainIfApplicable(lineBox);
+        if (m_lineHasNonLineSpanningRubyContent)
+            RubyFormattingContext::applyAnnotationContributionToLayoutBounds(lineBox, formattingContext());
+        computeLineBoxGeometry(lineBox);
+        adjustOutsideListMarkersPosition(lineBox);
 
-    if (auto adjustment = formattingContext().quirks().adjustmentForLineGridLineSnap(lineBox))
-        expandAboveRootInlineBox(lineBox, *adjustment);
+        if (auto adjustment = formattingContext().quirks().adjustmentForLineGridLineSnap(lineBox))
+            expandAboveRootInlineBox(lineBox, *adjustment);
+    }
 
     return lineBox;
 }
@@ -502,14 +510,6 @@ void LineBoxBuilder::constructInlineLevelBoxes(LineBox& lineBox)
         }
         if (run.isWordBreakOpportunity()) {
             lineBox.addInlineLevelBox(InlineLevelBox::createGenericInlineLevelBox(layoutBox, style, logicalLeft));
-            continue;
-        }
-        if (run.isBlock()) {
-            auto& inlineLevelBoxGeometry = formattingContext.geometryForBox(layoutBox);
-            logicalLeft += inlineLevelBoxGeometry.marginStart();
-            auto atomicInlineBox = InlineLevelBox::createAtomicInlineBox(layoutBox, style, logicalLeft, inlineLevelBoxGeometry.borderBoxWidth());
-            setVerticalPropertiesForInlineLevelBox(lineBox, atomicInlineBox);
-            lineBox.addInlineLevelBox(WTFMove(atomicInlineBox));
             continue;
         }
         ASSERT(run.isOpaque());

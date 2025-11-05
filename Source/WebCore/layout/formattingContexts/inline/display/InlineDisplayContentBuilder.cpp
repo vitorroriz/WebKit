@@ -300,8 +300,7 @@ void InlineDisplayContentBuilder::appendHardLineBreakDisplayBox(const Line::Run&
 
 void InlineDisplayContentBuilder::appendAtomicInlineLevelDisplayBox(const Line::Run& lineRun, const InlineRect& borderBoxRect, InlineDisplay::Boxes& boxes)
 {
-    // FIXME: Blocks in inline. Refactor and remove the block test.
-    ASSERT(lineRun.layoutBox().isAtomicInlineBox() || lineRun.isBlock());
+    ASSERT(lineRun.layoutBox().isAtomicInlineBox());
     auto& layoutBox = lineRun.layoutBox();
 
     auto isContentful = true;
@@ -325,6 +324,26 @@ void InlineDisplayContentBuilder::appendAtomicInlineLevelDisplayBox(const Line::
         , { }
         , isContentful
         , isLineFullyTruncatedInBlockDirection()
+    });
+}
+
+void InlineDisplayContentBuilder::appendBlockLevelDisplayBox(const Line::Run& lineRun, const InlineRect& borderBoxRect, InlineDisplay::Boxes& boxes)
+{
+    ASSERT(lineRun.isBlock());
+    auto& layoutBox = lineRun.layoutBox();
+
+    auto isContentful = true;
+    boxes.append({ lineIndex()
+        , InlineDisplay::Box::Type::BlockLevelBox
+        , layoutBox
+        , lineRun.bidiLevel()
+        , borderBoxRect
+        , borderBoxRect
+        , isFirstFormattedLine()
+        , { }
+        , { }
+        , isContentful
+        , { }
     });
 }
 
@@ -487,10 +506,9 @@ void InlineDisplayContentBuilder::processNonBidiContent(const LineLayoutResult& 
             }
             if (lineRun.isLineSpanningInlineBoxStart())
                 return lineBox.logicalBorderBoxForInlineBox(layoutBox, boxGeometry);
-            if (lineRun.isBlock()) {
-                // FIXME: Blocks in inline.
-                return lineBox.logicalBorderBoxForAtomicInlineBox(layoutBox, boxGeometry);
-            }
+            if (lineRun.isBlock())
+                return { { }, { }, boxGeometry.marginBoxWidth(), boxGeometry.marginBoxHeight() };
+
             ASSERT_NOT_REACHED();
             return { };
         }();
@@ -510,10 +528,9 @@ void InlineDisplayContentBuilder::processNonBidiContent(const LineLayoutResult& 
                 appendHardLineBreakDisplayBox(lineRun, visualRectRelativeToRoot, boxes);
             else if (lineRun.isAtomicInlineBox() || lineRun.isListMarker())
                 appendAtomicInlineLevelDisplayBox(lineRun, visualRectRelativeToRoot, boxes);
-            else if (lineRun.isBlock()) {
-                // FIXME: Blocks in inline.
-                appendAtomicInlineLevelDisplayBox(lineRun, visualRectRelativeToRoot, boxes);
-            } else if (lineRun.isInlineBoxStart() || lineRun.isLineSpanningInlineBoxStart()) {
+            else if (lineRun.isBlock())
+                appendBlockLevelDisplayBox(lineRun, visualRectRelativeToRoot, boxes);
+            else if (lineRun.isInlineBoxStart() || lineRun.isLineSpanningInlineBoxStart()) {
                 // Do not generate display boxes for inline boxes on non-contentful lines (e.g. <span></span>)
                 if (lineBox.hasContent())
                     appendInlineBoxDisplayBox(lineRun, lineBox.inlineLevelBoxFor(lineRun), visualRectRelativeToRoot, boxes);
