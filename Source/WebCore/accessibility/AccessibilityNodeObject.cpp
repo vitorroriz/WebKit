@@ -1945,10 +1945,10 @@ VisiblePositionRange AccessibilityNodeObject::visiblePositionRangeForLine(unsign
     // make a caret selection for the marker position, then extend it to the line
     // NOTE: Ignores results of sel.modify because it returns false when starting at an empty line.
     // The resulting selection in that case will be a caret at position.
-    FrameSelection selection;
-    selection.setSelection(position);
-    selection.modify(FrameSelection::Alteration::Extend, SelectionDirection::Right, TextGranularity::LineBoundary);
-    return selection.selection();
+    auto selection = makeUniqueRef<FrameSelection>();
+    selection->setSelection(position);
+    selection->modify(FrameSelection::Alteration::Extend, SelectionDirection::Right, TextGranularity::LineBoundary);
+    return selection->selection();
 }
 
 bool AccessibilityNodeObject::isGenericFocusableElement() const
