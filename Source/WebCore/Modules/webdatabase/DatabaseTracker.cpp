@@ -1107,10 +1107,10 @@ bool DatabaseTracker::deleteDatabaseFile(const SecurityOriginData& origin, const
         // We'll instead truncate the database file to 0 bytes. If another process is operating on this same database file after
         // the truncation, it should get an error since the database file is no longer valid. When Safari is launched
         // next time, it'll go through the database files and clean up any zero-bytes ones.
-        SQLiteDatabase database;
-        if (!database.open(fullPath))
+        auto database = makeUniqueRef<SQLiteDatabase>();
+        if (!database->open(fullPath))
             return false;
-        return SQLiteFileSystem::truncateDatabaseFile(database.sqlite3Handle());
+        return SQLiteFileSystem::truncateDatabaseFile(database->sqlite3Handle());
     }
 #else
     UNUSED_PARAM(deletionMode);
@@ -1207,14 +1207,14 @@ bool DatabaseTracker::deleteDatabaseFileIfEmpty(const String& path)
     if (!isZeroByteFile(path))
         return false;
     
-    SQLiteDatabase database;
-    if (!database.open(path))
+    auto database = makeUniqueRef<SQLiteDatabase>();
+    if (!database->open(path))
         return false;
     
     // Specify that we want the exclusive locking mode, so after the next write,
     // we'll be holding the lock to this database file.
     {
-        auto lockStatement = database.prepareStatement("PRAGMA locking_mode=EXCLUSIVE;"_s);
+        auto lockStatement = database->prepareStatement("PRAGMA locking_mode=EXCLUSIVE;"_s);
         if (!lockStatement)
             return false;
         int result = lockStatement->step();
@@ -1222,17 +1222,17 @@ bool DatabaseTracker::deleteDatabaseFileIfEmpty(const String& path)
             return false;
     }
 
-    if (!database.executeCommand("BEGIN EXCLUSIVE TRANSACTION;"_s))
+    if (!database->executeCommand("BEGIN EXCLUSIVE TRANSACTION;"_s))
         return false;
 
     // At this point, we hold the exclusive lock to this file.
     // Check that the database doesn't contain any tables.
-    if (!database.executeCommand("SELECT name FROM sqlite_master WHERE type='table';"_s))
+    if (!database->executeCommand("SELECT name FROM sqlite_master WHERE type='table';"_s))
         return false;
 
-    database.executeCommand("COMMIT TRANSACTION;"_s);
+    database->executeCommand("COMMIT TRANSACTION;"_s);
 
-    database.close();
+    database->close();
 
     return SQLiteFileSystem::deleteDatabaseFile(path);
 }
