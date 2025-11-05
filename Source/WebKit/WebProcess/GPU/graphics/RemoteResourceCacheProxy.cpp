@@ -128,6 +128,8 @@ void RemoteResourceCacheProxy::recordNativeImageUse(NativeImage& image, const De
     if (entry != m_nativeImages.end()) {
         if (entry->value.existsInRemote)
             return;
+        if (!entry->value.bitmap)
+            return;
         handle = RefPtr { entry->value.bitmap }->createHandle();
         if (handle)
             entry->value.existsInRemote = true;
