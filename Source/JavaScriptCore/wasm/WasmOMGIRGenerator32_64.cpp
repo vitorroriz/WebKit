@@ -168,6 +168,7 @@ public:
         }
 
         static bool isIf(const ControlData& control) { return control.blockType() == BlockType::If; }
+        static bool isElse(const ControlData& control) { return control.blockType() == BlockType::Else; }
         static bool isTry(const ControlData& control) { return control.blockType() == BlockType::Try; }
         static bool isTryTable(const ControlData& control) { return control.blockType() == BlockType::TryTable; }
         static bool isAnyCatch(const ControlData& control) { return control.blockType() == BlockType::Catch; }
@@ -186,6 +187,9 @@ public:
             switch (blockType()) {
             case BlockType::If:
                 out.print("If:       ");
+                break;
+            case BlockType::Else:
+                out.print("Else:     ");
                 break;
             case BlockType::Block:
                 out.print("Block:    ");

@@ -135,6 +135,7 @@ struct IPIntControlType {
     { }
 
     static bool isIf(const IPIntControlType& control) { return control.blockType() == BlockType::If; }
+    static bool isElse(const IPIntControlType& control) { return control.blockType() == BlockType::Else; }
     static bool isTry(const IPIntControlType& control) { return control.blockType() == BlockType::Try; }
     static bool isTryTable(const IPIntControlType& control) { return control.blockType() == BlockType::TryTable; }
     static bool isAnyCatch(const IPIntControlType& control) { return control.blockType() == BlockType::Catch; }
@@ -175,8 +176,6 @@ private:
     BlockSignature m_signature;
     BlockType m_blockType;
     CatchKind m_catchKind;
-
-    bool isElse { false };
 
     int32_t m_pendingOffset { -1 };
 
@@ -2312,21 +2311,19 @@ PartialResult WARN_UNUSED_RETURN IPIntGenerator::addElseToUnreachable(ControlTyp
     if (m_parser->currentOpcode() == OpType::End) {
         // Edge case: if ... end with no else
         mdIf->elseDeltaMC = curMC() - block.m_mc;
-        block = ControlType(block.signature(), block.stackSize(), BlockType::Block);
+        block = ControlType(block.signature(), block.stackSize(), BlockType::Else);
         block.m_index = ifIndex;
         block.m_pendingOffset = -1;
-        block.isElse = true;
         return { };
     }
 
     // New MC, normal case
     mdIf->elseDeltaMC = safeCast<uint32_t>(curMC() + sizeof(IPInt::BlockMetadata)) - block.m_mc;
-    block = ControlType(block.signature(), block.stackSize(), BlockType::Block);
+    block = ControlType(block.signature(), block.stackSize(), BlockType::Else);
     block.m_index = ifIndex;
     block.m_pc = curPC();
     block.m_mc = curMC();
     block.m_pendingOffset = curMC();
-    block.isElse = true;
 
     m_metadata->addBlankSpace<IPInt::BlockMetadata>();
     return { };
@@ -2763,18 +2760,15 @@ PartialResult WARN_UNUSED_RETURN IPIntGenerator::addEndToUnreachable(ControlEntr
 
     if (ControlType::isIf(block)) {
         m_exitHandlersAwaitingCoalescing.append({ block.m_pc, block.m_mc });
+    } else if (ControlType::isElse(block)) {
+        // if it's not an if ... end, coalesce
+        if (block.m_pendingOffset != -1)
+            m_exitHandlersAwaitingCoalescing.append({ block.m_pc, block.m_mc });
+        m_coalesceQueue.append({ static_cast<unsigned>(block.m_index), false });
+        --m_coalesceDebt;
     } else if (ControlType::isBlock(block)) {
-        if (block.isElse) {
-            // if it's not an if ... end, coalesce
-            if (block.m_pendingOffset != -1)
-                m_exitHandlersAwaitingCoalescing.append({ block.m_pc, block.m_mc });
-            m_coalesceQueue.append({ static_cast<unsigned>(block.m_index), false });
-            --m_coalesceDebt;
-        } else {
-            // block
-            m_coalesceQueue.append({ static_cast<unsigned>(block.m_index), false });
-            --m_coalesceDebt;
-        }
+        m_coalesceQueue.append({ static_cast<unsigned>(block.m_index), false });
+        --m_coalesceDebt;
     } else if (ControlType::isLoop(block)) {
         m_coalesceQueue.append({ static_cast<unsigned>(block.m_index), false });
         --m_coalesceDebt;

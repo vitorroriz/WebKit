@@ -3576,7 +3576,7 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::addIf(Value condition, BlockSignature s
 PartialResult WARN_UNUSED_RETURN BBQJIT::addElse(ControlData& data, Stack& expressionStack)
 {
     data.flushAndSingleExit(*this, data, expressionStack, false, true);
-    ControlData dataElse(ControlData::UseBlockCallingConventionOfOtherBranch, BlockType::Block, data);
+    ControlData dataElse(ControlData::UseBlockCallingConventionOfOtherBranch, BlockType::Else, data);
     data.linkJumps(&m_jit);
     dataElse.addBranch(m_jit.jump());
     data.linkIfBranch(&m_jit); // Link specifically the conditional branch of the preceding If
@@ -3604,7 +3604,7 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::addElseToUnreachable(ControlData& data)
     // state entering the else block.
     data.flushAtBlockBoundary(*this, 0, m_parser->expressionStack(), true);
 
-    ControlData dataElse(ControlData::UseBlockCallingConventionOfOtherBranch, BlockType::Block, data);
+    ControlData dataElse(ControlData::UseBlockCallingConventionOfOtherBranch, BlockType::Else, data);
     data.linkJumps(&m_jit);
     dataElse.addBranch(m_jit.jump()); // Still needed even when the parent was unreachable to avoid running code within the else block.
     data.linkIfBranch(&m_jit); // Link specifically the conditional branch of the preceding If
