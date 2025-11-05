@@ -14956,7 +14956,7 @@ ALLOW_DEPRECATED_DECLARATIONS_BEGIN
         if (imageInfo && [uiDelegate respondsToSelector:@selector(_webView:previewViewControllerForImage:alternateURL:defaultActions:elementInfo:)])
             previewViewController = [uiDelegate _webView:self.webView previewViewControllerForImage:uiImage.get() alternateURL:nsURL.get() defaultActions:defaultActionsFromAssistant.get() elementInfo:elementInfo.get()];
         else
-            previewViewController = adoptNS([[WKImagePreviewViewController alloc] initWithCGImage:cgImage defaultActions:defaultActionsFromAssistant.get() elementInfo:elementInfo.get()]);
+            previewViewController = adoptNS([[WKImagePreviewViewController alloc] initWithCGImage:cgImage defaultActions:defaultActionsFromAssistant.get() elementInfo:elementInfo.get() presentingView:self]);
 ALLOW_DEPRECATED_DECLARATIONS_END
 
         _contextMenuLegacyMenu = menuFromLegacyPreviewOrDefaultActions(previewViewController.get(), defaultActionsFromAssistant, elementInfo, _positionInformation.title.createNSString().get());
@@ -15181,7 +15181,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
                         return previewViewController;
                 }
 
-                return adoptNS([[WKImagePreviewViewController alloc] initWithCGImage:cgImage defaultActions:nil elementInfo:elementInfo.get()]).autorelease();
+                return adoptNS([[WKImagePreviewViewController alloc] initWithCGImage:cgImage defaultActions:nil elementInfo:elementInfo.get() presentingView:strongSelf.get()]).autorelease();
             };
 
             continueWithContextMenuConfiguration([UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:contentPreviewProvider actionProvider:actionMenuProvider]);
@@ -15691,7 +15691,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
                 return previewViewController;
         }
 
-        return adoptNS([[WKImagePreviewViewController alloc] initWithCGImage:cgImage defaultActions:defaultActions elementInfo:elementInfo]).autorelease();
+        return adoptNS([[WKImagePreviewViewController alloc] initWithCGImage:cgImage defaultActions:defaultActions elementInfo:elementInfo presentingView:self]).autorelease();
     }
 
     return nil;
