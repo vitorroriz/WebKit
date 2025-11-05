@@ -57,7 +57,6 @@ enum class Incredible;
 
 namespace Namespace {
 class ReturnRefClass;
-class ReturnUniqueRefClass;
 struct EmptyConstructorStruct;
 class EmptyConstructorWithIf;
 #if ENABLE(TEST_FEATURE)
@@ -166,11 +165,6 @@ template<> struct ArgumentCoder<Namespace::Subnamespace::StructName> {
 template<> struct ArgumentCoder<Namespace::ReturnRefClass> {
     static void encode(Encoder&, const Namespace::ReturnRefClass&);
     static std::optional<Ref<Namespace::ReturnRefClass>> decode(Decoder&);
-};
-
-template<> struct ArgumentCoder<Namespace::ReturnUniqueRefClass> {
-    static void encode(Encoder&, const Namespace::ReturnUniqueRefClass&);
-    static std::optional<UniqueRef<Namespace::ReturnUniqueRefClass>> decode(Decoder&);
 };
 
 template<> struct ArgumentCoder<Namespace::EmptyConstructorStruct> {

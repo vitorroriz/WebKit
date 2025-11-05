@@ -56,7 +56,6 @@
 #include <Namespace/OuterClass.h>
 #endif
 #include <Namespace/ReturnRefClass.h>
-#include <Namespace/ReturnUniqueRefClass.h>
 #if USE(APPKIT)
 #include <WebCore/AppKitControlSystemImage.h>
 #endif
@@ -306,25 +305,6 @@ std::optional<Ref<Namespace::ReturnRefClass>> ArgumentCoder<Namespace::ReturnRef
             WTFMove(*functionCallmember2),
             WTFMove(*uniqueMember)
         )
-    };
-}
-
-void ArgumentCoder<Namespace::ReturnUniqueRefClass>::encode(Encoder& encoder, const Namespace::ReturnUniqueRefClass& instance)
-{
-    static_assert(std::is_same_v<std::remove_cvref_t<decltype(instance.someValie())>, int>);
-
-    encoder << instance.someValie();
-}
-
-std::optional<UniqueRef<Namespace::ReturnUniqueRefClass>> ArgumentCoder<Namespace::ReturnUniqueRefClass>::decode(Decoder& decoder)
-{
-    auto someValie = decoder.decode<int>();
-    if (!decoder.isValid()) [[unlikely]]
-        return std::nullopt;
-    return {
-        makeUniqueRef<Namespace::ReturnUniqueRefClass>(
-            WTFMove(*someValie)
-        }
     };
 }
 

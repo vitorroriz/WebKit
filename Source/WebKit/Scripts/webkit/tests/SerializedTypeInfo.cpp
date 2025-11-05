@@ -57,7 +57,6 @@
 #include <Namespace/OuterClass.h>
 #endif
 #include <Namespace/ReturnRefClass.h>
-#include <Namespace/ReturnUniqueRefClass.h>
 #if USE(APPKIT)
 #include <WebCore/AppKitControlSystemImage.h>
 #endif
@@ -172,12 +171,6 @@ Vector<SerializedTypeInfo> allSerializedTypes()
             {
                 "std::unique_ptr<int>"_s,
                 "uniqueMember"_s
-            },
-        } },
-        { "Namespace::ReturnUniqueRefClass"_s, {
-            {
-                "int"_s,
-                "someValie()"_s
             },
         } },
         { "Namespace::EmptyConstructorStruct"_s, {

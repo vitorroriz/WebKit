@@ -85,7 +85,7 @@ struct ChangedLayers {
     ~ChangedLayers();
 };
 
-class RemoteLayerTreeTransaction final : public CanMakeCheckedPtr<RemoteLayerTreeTransaction> {
+class RemoteLayerTreeTransaction final : public CanMakeCheckedPtr<RemoteLayerTreeTransaction, WTF::DefaultedOperatorEqual::No, WTF::CheckedPtrDeleteCheckException::Yes> {
     WTF_MAKE_TZONE_ALLOCATED(RemoteLayerTreeTransaction);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(RemoteLayerTreeTransaction);
 public:
@@ -242,7 +242,6 @@ public:
 
 private:
     friend struct IPC::ArgumentCoder<RemoteLayerTreeTransaction>;
-    friend UniqueRef<RemoteLayerTreeTransaction> WTF::makeUniqueRefWithoutFastMallocCheck<RemoteLayerTreeTransaction>();
 
     // Do not use, IPC constructor only
     explicit RemoteLayerTreeTransaction();

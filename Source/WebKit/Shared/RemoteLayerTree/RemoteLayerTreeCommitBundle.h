@@ -59,7 +59,7 @@ struct MainFrameData {
 };
 
 struct RemoteLayerTreeCommitBundle {
-    using RootFrameData = std::pair<UniqueRef<RemoteLayerTreeTransaction>, RemoteScrollingCoordinatorTransaction>;
+    using RootFrameData = std::pair<RemoteLayerTreeTransaction, RemoteScrollingCoordinatorTransaction>;
 
     Vector<RootFrameData> transactions;
     PageData pageData;
