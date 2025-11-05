@@ -100,11 +100,11 @@ std::optional<RequestedScrollData> RemoteScrollingCoordinatorProxy::commitScroll
         return { };
     }
 
-    CheckedRef { stateTree->get() }->setRootFrameIdentifier(transaction.rootFrameIdentifier());
+    stateTree->setRootFrameIdentifier(transaction.rootFrameIdentifier());
 
     ASSERT(stateTree);
-    connectStateNodeLayers(CheckedRef { stateTree->get() }.get(), *layerTreeHost);
-    bool succeeded = m_scrollingTree->commitTreeState(stateTree->moveToUniquePtr(), identifier);
+    connectStateNodeLayers(*stateTree, *layerTreeHost);
+    bool succeeded = m_scrollingTree->commitTreeState(WTFMove(stateTree), identifier);
 
     MESSAGE_CHECK_WITH_RETURN_VALUE(succeeded, std::nullopt);
 

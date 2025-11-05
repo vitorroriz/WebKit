@@ -23,12 +23,12 @@
 headers: <WebCore/ScrollingStateTree.h> <WebCore/ScrollingStateFrameScrollingNode.h>
 
 class WebKit::RemoteScrollingCoordinatorTransaction {
-    std::optional<UniqueRef<WebCore::ScrollingStateTree>> scrollingStateTree()
+    std::unique_ptr<WebCore::ScrollingStateTree> scrollingStateTree()
     bool clearScrollLatching()
     std::optional<WebCore::FrameIdentifier> rootFrameIdentifier()
 }
 
-[UniqueRef, CreateUsing=createAfterReconstruction] class WebCore::ScrollingStateTree {
+[CreateUsing=createAfterReconstruction] class WebCore::ScrollingStateTree {
     bool hasNewRootStateNode()
     bool hasChangedProperties()
     RefPtr<WebCore::ScrollingStateFrameScrollingNode> rootStateNode()

@@ -1348,7 +1348,7 @@ bool AsyncScrollingCoordinator::scrollAnimatorEnabled() const
     return settings.scrollAnimatorEnabled();
 }
 
-UniqueRef<ScrollingStateTree> AsyncScrollingCoordinator::commitTreeStateForRootFrameID(FrameIdentifier rootFrameID, LayerRepresentation::Type type)
+std::unique_ptr<ScrollingStateTree> AsyncScrollingCoordinator::commitTreeStateForRootFrameID(FrameIdentifier rootFrameID, LayerRepresentation::Type type)
 {
     auto& scrollingStateTree = ensureScrollingStateTreeForRootFrameID(rootFrameID);
     return scrollingStateTree.commit(type);

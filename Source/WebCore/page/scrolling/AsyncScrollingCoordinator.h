@@ -89,7 +89,7 @@ public:
     WEBCORE_EXPORT CheckedRef<ScrollingStateTree> ensureCheckedScrollingStateTreeForRootFrameID(FrameIdentifier);
     const ScrollingStateTree* existingScrollingStateTreeForRootFrameID(std::optional<FrameIdentifier>) const;
     ScrollingStateTree* stateTreeForNodeID(std::optional<ScrollingNodeID>) const;
-    UniqueRef<ScrollingStateTree> commitTreeStateForRootFrameID(FrameIdentifier, LayerRepresentation::Type);
+    std::unique_ptr<ScrollingStateTree> commitTreeStateForRootFrameID(FrameIdentifier, LayerRepresentation::Type);
 
     WEBCORE_EXPORT void scrollableAreaWillBeDetached(ScrollableArea&) override;
 
