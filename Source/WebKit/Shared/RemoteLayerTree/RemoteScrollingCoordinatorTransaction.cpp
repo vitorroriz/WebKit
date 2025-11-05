@@ -49,15 +49,15 @@ using namespace WebCore;
 
 RemoteScrollingCoordinatorTransaction::RemoteScrollingCoordinatorTransaction() = default;
 
-RemoteScrollingCoordinatorTransaction::RemoteScrollingCoordinatorTransaction(std::unique_ptr<WebCore::ScrollingStateTree>&& scrollingStateTree, bool clearScrollLatching, std::optional<WebCore::FrameIdentifier> frameID, FromDeserialization fromDeserialization)
+RemoteScrollingCoordinatorTransaction::RemoteScrollingCoordinatorTransaction(std::optional<UniqueRef<WebCore::ScrollingStateTree>>&& scrollingStateTree, bool clearScrollLatching, std::optional<WebCore::FrameIdentifier> frameID, FromDeserialization fromDeserialization)
     : m_scrollingStateTree(WTFMove(scrollingStateTree))
     , m_clearScrollLatching(clearScrollLatching)
     , m_rootFrameID(frameID)
 {
     if (!m_scrollingStateTree)
-        m_scrollingStateTree = makeUnique<WebCore::ScrollingStateTree>();
+        m_scrollingStateTree = makeUniqueRef<WebCore::ScrollingStateTree>();
     if (fromDeserialization == FromDeserialization::Yes)
-        CheckedRef { *m_scrollingStateTree }->attachDeserializedNodes();
+        CheckedRef { m_scrollingStateTree->get() }->attachDeserializedNodes();
 }
 
 RemoteScrollingCoordinatorTransaction::RemoteScrollingCoordinatorTransaction(RemoteScrollingCoordinatorTransaction&&) = default;
@@ -314,10 +314,10 @@ String RemoteScrollingCoordinatorTransaction::description() const
     ts << "scrolling state tree"_s;
 
     if (m_scrollingStateTree) {
-        if (!m_scrollingStateTree->hasChangedProperties())
+        if (!m_scrollingStateTree->get().hasChangedProperties())
             ts << " - no changes"_s;
         else
-            WebKit::dump(ts, *m_scrollingStateTree.get(), true);
+            WebKit::dump(ts, m_scrollingStateTree->get(), true);
     } else
         ts << " - none"_s;
 

@@ -70,7 +70,7 @@ void ThreadedScrollingCoordinator::commitTreeStateIfNeeded()
 
         auto stateTree = commitTreeStateForRootFrameID(key, LayerRepresentation::PlatformLayerRepresentation);
         stateTree->setRootFrameIdentifier(key);
-        scrollingTree()->commitTreeState(WTFMove(stateTree));
+        scrollingTree()->commitTreeState(stateTree.moveToUniquePtr());
     });
 }
 

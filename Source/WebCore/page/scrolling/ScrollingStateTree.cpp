@@ -70,14 +70,14 @@ ScrollingStateTree::ScrollingStateTree(ScrollingStateTree&&) = default;
 
 ScrollingStateTree::~ScrollingStateTree() = default;
 
-std::optional<ScrollingStateTree> ScrollingStateTree::createAfterReconstruction(bool hasNewRootStateNode, bool hasChangedProperties, RefPtr<ScrollingStateFrameScrollingNode>&& rootStateNode)
+std::optional<UniqueRef<ScrollingStateTree>> ScrollingStateTree::createAfterReconstruction(bool hasNewRootStateNode, bool hasChangedProperties, RefPtr<ScrollingStateFrameScrollingNode>&& rootStateNode)
 {
-    ScrollingStateTree tree(hasNewRootStateNode, hasChangedProperties, WTFMove(rootStateNode));
+    auto tree = makeUniqueRef<ScrollingStateTree>(hasNewRootStateNode, hasChangedProperties, WTFMove(rootStateNode));
 
     bool allIdentifiersUnique { true };
-    if (RefPtr rootStateNode = tree.m_rootStateNode) {
+    if (RefPtr rootStateNode = tree->m_rootStateNode) {
         rootStateNode->traverse([&] (auto& node) {
-            auto addResult = tree.m_stateNodeMap.add(node.scrollingNodeID(), node);
+            auto addResult = tree->m_stateNodeMap.add(node.scrollingNodeID(), node);
             if (!addResult.isNewEntry)
                 allIdentifiersUnique = false;
         });
@@ -334,7 +334,7 @@ void ScrollingStateTree::clear()
     m_unparentedNodes.clear();
 }
 
-std::unique_ptr<ScrollingStateTree> ScrollingStateTree::commit(LayerRepresentation::Type preferredLayerRepresentation)
+UniqueRef<ScrollingStateTree> ScrollingStateTree::commit(LayerRepresentation::Type preferredLayerRepresentation)
 {
     ASSERT(isValid());
 
@@ -344,11 +344,11 @@ std::unique_ptr<ScrollingStateTree> ScrollingStateTree::commit(LayerRepresentati
     }
 
     // This function clones and resets the current state tree, but leaves the tree structure intact.
-    auto treeStateClone = makeUnique<ScrollingStateTree>();
+    auto treeStateClone = makeUniqueRef<ScrollingStateTree>();
     treeStateClone->setPreferredLayerRepresentation(preferredLayerRepresentation);
 
     if (RefPtr rootStateNode = m_rootStateNode)
-        treeStateClone->setRootStateNode(downcast<ScrollingStateFrameScrollingNode>(rootStateNode->cloneAndReset(*treeStateClone)));
+        treeStateClone->setRootStateNode(downcast<ScrollingStateFrameScrollingNode>(rootStateNode->cloneAndReset(CheckedRef { treeStateClone.get() }.get())));
 
     // Now the clone tree has changed properties, and the original tree does not.
     treeStateClone->m_hasChangedProperties = std::exchange(m_hasChangedProperties, false);

@@ -31,6 +31,7 @@
 #include <wtf/CheckedPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/TZoneMalloc.h>
+#include <wtf/UniqueRef.h>
  
 namespace WebCore {
 
@@ -42,12 +43,12 @@ class ScrollingStateFrameScrollingNode;
 // will be informed and will schedule a timer that will clone the new state tree and send it over to
 // the scrolling thread, avoiding locking. 
 
-class ScrollingStateTree final : public CanMakeCheckedPtr<ScrollingStateTree, WTF::DefaultedOperatorEqual::No, WTF::CheckedPtrDeleteCheckException::Yes> {
+class ScrollingStateTree final : public CanMakeCheckedPtr<ScrollingStateTree> {
     WTF_MAKE_TZONE_ALLOCATED_EXPORT(ScrollingStateTree, WEBCORE_EXPORT);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(ScrollingStateTree);
     friend class ScrollingStateNode;
 public:
-    WEBCORE_EXPORT static std::optional<ScrollingStateTree> createAfterReconstruction(bool, bool, RefPtr<ScrollingStateFrameScrollingNode>&&);
+    WEBCORE_EXPORT static std::optional<UniqueRef<ScrollingStateTree>> createAfterReconstruction(bool, bool, RefPtr<ScrollingStateFrameScrollingNode>&&);
     WEBCORE_EXPORT ScrollingStateTree(AsyncScrollingCoordinator* = nullptr);
     WEBCORE_EXPORT ScrollingStateTree(ScrollingStateTree&&);
     WEBCORE_EXPORT ~ScrollingStateTree();
@@ -63,7 +64,7 @@ public:
     void clear();
 
     // Copies the current tree state and clears the changed properties mask in the original.
-    WEBCORE_EXPORT std::unique_ptr<ScrollingStateTree> commit(LayerRepresentation::Type preferredLayerRepresentation);
+    WEBCORE_EXPORT UniqueRef<ScrollingStateTree> commit(LayerRepresentation::Type preferredLayerRepresentation);
 
     WEBCORE_EXPORT void attachDeserializedNodes();
 
@@ -98,6 +99,8 @@ public:
     void setRootFrameIdentifier(std::optional<FrameIdentifier> frameID) { m_rootFrameIdentifier = frameID; }
 
 private:
+    template<typename T, class... Args> friend WTF::UniqueRef<T> WTF::makeUniqueRefWithoutFastMallocCheck(Args&&...);
+
     ScrollingStateTree(bool hasNewRootStateNode, bool hasChangedProperties, RefPtr<ScrollingStateFrameScrollingNode>&&);
 
     void setRootStateNode(Ref<ScrollingStateFrameScrollingNode>&&);

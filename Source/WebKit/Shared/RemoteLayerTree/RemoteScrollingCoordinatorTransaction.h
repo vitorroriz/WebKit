@@ -28,6 +28,7 @@
 #if ENABLE(UI_SIDE_COMPOSITING)
 
 #include <WebCore/FrameIdentifier.h>
+#include <wtf/UniqueRef.h>
 #include <wtf/text/WTFString.h>
 
 namespace WebCore {
@@ -40,13 +41,13 @@ class RemoteScrollingCoordinatorTransaction {
 public:
     enum class FromDeserialization : bool { No, Yes };
     RemoteScrollingCoordinatorTransaction();
-    RemoteScrollingCoordinatorTransaction(std::unique_ptr<WebCore::ScrollingStateTree>&&, bool, std::optional<WebCore::FrameIdentifier> = std::nullopt, FromDeserialization = FromDeserialization::Yes);
+    RemoteScrollingCoordinatorTransaction(std::optional<UniqueRef<WebCore::ScrollingStateTree>>&&, bool, std::optional<WebCore::FrameIdentifier> = std::nullopt, FromDeserialization = FromDeserialization::Yes);
     RemoteScrollingCoordinatorTransaction(RemoteScrollingCoordinatorTransaction&&);
     RemoteScrollingCoordinatorTransaction& operator=(RemoteScrollingCoordinatorTransaction&&);
     ~RemoteScrollingCoordinatorTransaction();
 
-    std::unique_ptr<WebCore::ScrollingStateTree>& scrollingStateTree() { return m_scrollingStateTree; }
-    const std::unique_ptr<WebCore::ScrollingStateTree>& scrollingStateTree() const { return m_scrollingStateTree; }
+    std::optional<UniqueRef<WebCore::ScrollingStateTree>>& scrollingStateTree() { return m_scrollingStateTree; }
+    const std::optional<UniqueRef<WebCore::ScrollingStateTree>>& scrollingStateTree() const { return m_scrollingStateTree; }
 
     std::optional<WebCore::FrameIdentifier> rootFrameIdentifier() const { return m_rootFrameID; }
     void setFrameIdentifier(WebCore::FrameIdentifier identifier) { m_rootFrameID = identifier; }
@@ -59,8 +60,8 @@ public:
 #endif
 
 private:
-    std::unique_ptr<WebCore::ScrollingStateTree> m_scrollingStateTree;
-    
+    std::optional<UniqueRef<WebCore::ScrollingStateTree>> m_scrollingStateTree;
+
     // Data encoded here should be "imperative" (valid just for one transaction). Stateful things should live on scrolling tree nodes.
     // Maybe RequestedScrollData should move here.
     bool m_clearScrollLatching { false };
