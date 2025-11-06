@@ -812,7 +812,7 @@ public:
     void updateTopScrollPocketCaptureColor();
     void updateTopScrollPocketStyle();
     void updatePrefersSolidColorHardPocket();
-    void setCanInstallScrollPocket();
+    void setClientImplicitlyRequestedTopScrollPocket();
 #endif
 
 private:
@@ -1098,7 +1098,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 #if ENABLE(CONTENT_INSET_BACKGROUND_FILL)
     RetainPtr<NSScrollPocket> m_topScrollPocket;
     RetainPtr<NSHashTable<NSView *>> m_viewsAboveScrollPocket;
-    bool m_canInstallScrollPocket { false };
+    bool m_clientImplicitlyRequestedTopScrollPocket { false };
 #endif
 
 #if HAVE(INLINE_PREDICTIONS)

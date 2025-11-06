@@ -7163,12 +7163,12 @@ void WebViewImpl::fulfillDeferredImageAnalysisOverlayViewHierarchyTask()
 
 #if ENABLE(CONTENT_INSET_BACKGROUND_FILL)
 
-void WebViewImpl::setCanInstallScrollPocket()
+void WebViewImpl::setClientImplicitlyRequestedTopScrollPocket()
 {
-    if (m_canInstallScrollPocket)
+    if (m_clientImplicitlyRequestedTopScrollPocket)
         return;
 
-    m_canInstallScrollPocket = true;
+    m_clientImplicitlyRequestedTopScrollPocket = true;
     updateScrollPocket();
 }
 
@@ -7202,15 +7202,13 @@ void WebViewImpl::updateScrollPocket()
         return;
 
     Ref page = m_page.get();
-    if (!m_canInstallScrollPocket)
-        return;
-
     RetainPtr view = m_view.get();
     CGFloat topContentInset = obscuredContentInsets().top();
     CGFloat additionalHeight = page->overflowHeightForTopScrollEdgeEffect();
     bool needsTopView = page->preferences().contentInsetBackgroundFillEnabled()
         && view
         && !view->_reasonsToHideTopScrollPocket
+        && (m_clientImplicitlyRequestedTopScrollPocket || automaticallyAdjustsContentInsets())
         && (topContentInset > 0 || additionalHeight > 0);
 
     RetainPtr topScrollPocketSelector = NSStringFromSelector(@selector(_topScrollPocket));
