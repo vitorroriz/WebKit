@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Igalia S.L.
+ * Copyright (C) 2025 Igalia S.L.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,39 +24,42 @@
  */
 
 #include "config.h"
-#include "PlatformDisplayDefault.h"
+#include "PlatformDisplayAndroid.h"
 
-#if PLATFORM(GTK) || OS(ANDROID)
+#if OS(ANDROID)
 
 #include "GLContext.h"
 #include <epoxy/egl.h>
 
 namespace WebCore {
 
-std::unique_ptr<PlatformDisplayDefault> PlatformDisplayDefault::create()
+std::unique_ptr<PlatformDisplayAndroid> PlatformDisplayAndroid::create()
 {
-    auto glDisplay = GLDisplay::create(eglGetDisplay(EGL_DEFAULT_DISPLAY));
-    if (!glDisplay) {
-        WTFLogAlways("Could not create default EGL display: %s. Aborting...", GLContext::lastErrorString());
-        CRASH();
+#if defined(EGL_PLATFORM_ANDROID_KHR)
+    // While not terribly common, custom Android builds other than AOSP
+    // or official Google ones may support more than one window system,
+    // so try being explicit before falling back to the default display.
+    const char* extensions = eglQueryString(nullptr, EGL_EXTENSIONS);
+    if (GLContext::isExtensionSupported(extensions, "EGL_KHR_platform_android")) [[unlikely]] {
+        if (auto glDisplay = GLDisplay::create(eglGetPlatformDisplay(EGL_PLATFORM_ANDROID_KHR, EGL_DEFAULT_DISPLAY, nullptr)))
+            return std::unique_ptr<PlatformDisplayAndroid>(new PlatformDisplayAndroid(glDisplay.releaseNonNull()));
     }
+#endif
 
-    return std::unique_ptr<PlatformDisplayDefault>(new PlatformDisplayDefault(glDisplay.releaseNonNull()));
+    return nullptr;
 }
 
-PlatformDisplayDefault::PlatformDisplayDefault(Ref<GLDisplay>&& glDisplay)
+PlatformDisplayAndroid::PlatformDisplayAndroid(Ref<GLDisplay>&& glDisplay)
     : PlatformDisplay(WTFMove(glDisplay))
 {
-#if ENABLE(WEBGL)
-    m_anglePlatform = 0;
+#if ENABLE(WEBGL) && defined(EGL_PLATFORM_ANDROID_KHR)
+    m_anglePlatform = EGL_PLATFORM_ANDROID_KHR;
     m_angleNativeDisplay = EGL_DEFAULT_DISPLAY;
 #endif
 }
 
-PlatformDisplayDefault::~PlatformDisplayDefault()
-{
-}
+PlatformDisplayAndroid::~PlatformDisplayAndroid() = default;
 
 } // namespace WebCore
 
-#endif // PLATFORM(GTK) || OS(ANDROID)
+#endif // OS(ANDROID)

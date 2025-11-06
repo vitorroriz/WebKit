@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Igalia S.L.
+ * Copyright (C) 2025 Igalia S.L.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,40 +23,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "PlatformDisplayDefault.h"
+#pragma once
 
-#if PLATFORM(GTK) || OS(ANDROID)
+#if OS(ANDROID)
 
-#include "GLContext.h"
-#include <epoxy/egl.h>
+#include "PlatformDisplay.h"
 
 namespace WebCore {
 
-std::unique_ptr<PlatformDisplayDefault> PlatformDisplayDefault::create()
-{
-    auto glDisplay = GLDisplay::create(eglGetDisplay(EGL_DEFAULT_DISPLAY));
-    if (!glDisplay) {
-        WTFLogAlways("Could not create default EGL display: %s. Aborting...", GLContext::lastErrorString());
-        CRASH();
-    }
+class PlatformDisplayAndroid final : public PlatformDisplay {
+public:
+    static std::unique_ptr<PlatformDisplayAndroid> create();
 
-    return std::unique_ptr<PlatformDisplayDefault>(new PlatformDisplayDefault(glDisplay.releaseNonNull()));
-}
+    virtual ~PlatformDisplayAndroid();
 
-PlatformDisplayDefault::PlatformDisplayDefault(Ref<GLDisplay>&& glDisplay)
-    : PlatformDisplay(WTFMove(glDisplay))
-{
-#if ENABLE(WEBGL)
-    m_anglePlatform = 0;
-    m_angleNativeDisplay = EGL_DEFAULT_DISPLAY;
-#endif
-}
+private:
+    explicit PlatformDisplayAndroid(Ref<GLDisplay>&&);
 
-PlatformDisplayDefault::~PlatformDisplayDefault()
-{
-}
+    Type type() const override { return PlatformDisplay::Type::Android; }
+};
 
 } // namespace WebCore
 
-#endif // PLATFORM(GTK) || OS(ANDROID)
+#endif // OS(ANDROID)
