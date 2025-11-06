@@ -44,10 +44,8 @@ accessibility/AccessibilitySpinButton.cpp
 accessibility/cocoa/AccessibilityObjectCocoa.mm
 [ iOS ] accessibility/ios/AccessibilityObjectIOS.mm
 [ iOS ] accessibility/ios/WebAccessibilityObjectWrapperIOS.mm
-[ Mac ] accessibility/isolatedtree/AXIsolatedTree.cpp
 [ Mac ] accessibility/mac/AXObjectCacheMac.mm
 [ Mac ] accessibility/mac/AccessibilityObjectMac.mm
-animation/AnimationTimelinesController.cpp
 animation/BlendingKeyframes.cpp
 animation/ElementAnimationRareData.cpp
 animation/KeyframeEffect.cpp

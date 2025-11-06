@@ -111,7 +111,6 @@ accessibility/AccessibilityTableHeaderContainer.cpp
 [ iOS ] accessibility/mac/WebAccessibilityObjectWrapperBase.mm
 animation/AnimationEffectTiming.cpp
 animation/AnimationTimeline.cpp
-animation/AnimationTimelinesController.cpp
 animation/BlendingKeyframes.cpp
 animation/DocumentTimeline.cpp
 animation/KeyframeEffect.cpp
