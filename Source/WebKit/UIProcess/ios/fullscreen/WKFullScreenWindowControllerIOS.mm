@@ -265,9 +265,9 @@ class FullScreenWindowControllerVideoPresentationModelClient final : WebCore::Vi
     WTF_MAKE_TZONE_ALLOCATED_INLINE(FullScreenWindowControllerVideoPresentationModelClient);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(FullScreenWindowControllerVideoPresentationModelClient);
 public:
-    void setWindowController(WKFullScreenWindowController *windowController)
+    explicit FullScreenWindowControllerVideoPresentationModelClient(WKFullScreenWindowController *windowController)
+        : m_windowController { windowController }
     {
-        m_windowController = windowController;
     }
 
     void setInterface(WebCore::VideoPresentationInterfaceIOS* interface)
@@ -857,7 +857,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     RetainPtr<id> _notificationListener;
 
 #if PLATFORM(VISION)
-    WebKit::FullScreenWindowControllerVideoPresentationModelClient _bestVideoPresentationModelClient;
+    const std::unique_ptr<WebKit::FullScreenWindowControllerVideoPresentationModelClient> _bestVideoPresentationModelClient;
 #endif
 
 #if !RELEASE_LOG_DISABLED
@@ -883,7 +883,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:[UIApplication sharedApplication]];
 
 #if PLATFORM(VISION)
-    _bestVideoPresentationModelClient.setWindowController(self);
+    lazyInitialize(_bestVideoPresentationModelClient, makeUnique<WebKit::FullScreenWindowControllerVideoPresentationModelClient>(self));
 #endif
 
     return self;
@@ -2070,7 +2070,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 
 - (BOOL)_isBestVideoInFullScreen
 {
-    return _bestVideoPresentationModelClient.interface() && _bestVideoPresentationModelClient.interface()->hasMode(WebCore::MediaPlayerEnums::VideoFullscreenModeStandard);
+    return _bestVideoPresentationModelClient->interface() && _bestVideoPresentationModelClient->interface()->hasMode(WebCore::MediaPlayerEnums::VideoFullscreenModeStandard);
 }
 
 - (BOOL)_shouldShowOrnaments
@@ -2223,7 +2223,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 
         _lastKnownParentWindow = nil;
         _parentWindowState = nil;
-        _bestVideoPresentationModelClient.setInterface(nullptr);
+        _bestVideoPresentationModelClient->setInterface(nullptr);
     }];
 }
 
@@ -2261,14 +2261,14 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 {
 #if PLATFORM(VISION)
     if (!self._isBestVideoInFullScreen)
-        _bestVideoPresentationModelClient.setInterface(nullptr);
+        _bestVideoPresentationModelClient->setInterface(nullptr);
 #endif
 }
 
 #if PLATFORM(VISION)
 - (void)fullScreenViewController:(WKFullScreenViewController *)fullScreenViewController bestVideoPresentationInterfaceDidChange:(nullable WebCore::PlatformVideoPresentationInterface*)bestVideoPresentationInterface
 {
-    _bestVideoPresentationModelClient.setInterface(bestVideoPresentationInterface);
+    _bestVideoPresentationModelClient->setInterface(bestVideoPresentationInterface);
 }
 #endif
 
