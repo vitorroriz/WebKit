@@ -50,8 +50,8 @@ public:
 private:
     RemoteAnimation(const WebCore::AcceleratedEffect&, const RemoteAnimationTimeline&);
 
-    Ref<const WebCore::AcceleratedEffect> m_effect;
-    Ref<const RemoteAnimationTimeline> m_timeline;
+    const Ref<const WebCore::AcceleratedEffect> m_effect;
+    const Ref<const RemoteAnimationTimeline> m_timeline;
 };
 
 } // namespace WebKit

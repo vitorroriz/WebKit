@@ -47,7 +47,7 @@ RemoteAnimation::RemoteAnimation(const WebCore::AcceleratedEffect& effect, const
 
 void RemoteAnimation::apply(WebCore::AcceleratedEffectValues& values)
 {
-    Ref { m_effect }->apply(values, m_timeline->currentTime(), m_timeline->duration());
+    m_effect->apply(values, m_timeline->currentTime(), m_timeline->duration());
 }
 
 } // namespace WebKit
