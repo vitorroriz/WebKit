@@ -565,12 +565,15 @@ AccessibilityObject* AXObjectCache::focusedObjectForLocalFrame()
     if (!document)
         return nullptr;
 
+#if ENABLE_ACCESSIBILITY_LOCAL_FRAME
+    // If there's one AXObjectCache per frame, then we should return null if focus is in a different frame.
     RefPtr page = document->page();
     RefPtr focusedOrMainFrame = page ? page->focusController().focusedOrMainFrame() : nullptr;
     if (!focusedOrMainFrame)
         return nullptr;
     if (focusedOrMainFrame->document() != document.get())
         return nullptr;
+#endif
 
     document->updateStyleIfNeeded();
     if (RefPtr focusedElement = document->focusedElement())
