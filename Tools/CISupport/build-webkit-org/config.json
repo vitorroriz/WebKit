@@ -228,9 +228,9 @@
                     "additionalArguments": ["--no-retry-failures", "--accessibility-isolated-tree", "accessibility/"],
                     "workernames": ["bot179"]
                   },
-                  { "name": "Apple-Tahoe-Release-WK2-Site-Isolation-Tree-Tests", "factory": "TestLayoutFactory",
+                  { "name": "Apple-Tahoe-Release-WK2-Site-Isolation-Tree-Tests", "factory": "TestLayoutAndAPIOnlyFactory",
                   "platform": "mac-tahoe", "configuration": "release", "architectures": ["x86_64", "arm64"],
-                  "additionalArguments": ["--no-retry-failures", "--site-isolation", "--load-in-cross-origin-iframe", "--child-processes=19"],
+                  "additionalArguments": ["--no-retry-failures", "--site-isolation"],
                   "workernames": ["bot2000", "bot2001"]
                   },
                   { "name": "Apple-Tahoe-Debug-Build", "factory": "BuildFactory",

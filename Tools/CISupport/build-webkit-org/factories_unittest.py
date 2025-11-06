@@ -328,7 +328,7 @@ class TestExpectedBuildSteps(unittest.TestCase):
             'archive-test-results',
             'upload',
             'extract-test-results',
-            'set-permissions',
+            'set-permissions'
         ],
         'Apple-Tahoe-Release-WK2-Site-Isolation-Tree-Tests': [
             'configure-build',
@@ -348,6 +348,7 @@ class TestExpectedBuildSteps(unittest.TestCase):
             'upload',
             'extract-test-results',
             'set-permissions',
+            'run-api-tests'
         ],
         'Apple-Tahoe-Release-World-Leaks-Tests': [
             'configure-build',
