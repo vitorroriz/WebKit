@@ -554,8 +554,7 @@ extension WebGPU.CommandEncoder {
         }
 
         // https://gpuweb.github.io/gpuweb/#abstract-opdef-set-of-subresources-for-texture-copy
-        // FIXME(rdar://130765784): we should be able use === here once the radar lands
-        if unsafe unsafeBitCast(source.texture, to: UnsafeRawPointer.self) == unsafeBitCast(destination.texture, to: UnsafeRawPointer.self) {
+        if source.texture === destination.texture {
             // Mip levels are never ranges.
             if source.mipLevel == destination.mipLevel {
                 switch WebGPU.fromAPI(source.texture).dimension() {
