@@ -861,6 +861,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     Modules/webxr/XRCanvasConfiguration.h
     Modules/webxr/XRGPUProjectionLayerInit.h
+    Modules/webxr/XRHitTestTrackableType.h
 
     Scripts/generate-log-declarations.py
 
