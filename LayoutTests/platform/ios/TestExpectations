@@ -8105,8 +8105,6 @@ webkit.org/b/295999 media/media-garbage-collection.html [ Pass Failure Timeout ]
 
 webkit.org/b/296010 [ Debug ] fast/frames/frame-append-body-child-crash.html [ Pass Failure ]
 
-webkit.org/b/295992 [ Release ] http/tests/geolocation/geolocation-watch-position-does-not-leak.https.html [ Pass Failure ]
-
 webkit.org/b/295989 [ Release ] http/tests/misc/embed-image-load-outlives-gc-without-crashing.html [ Pass Timeout ]
 
 webkit.org/b/296095 fast/forms/switch/click-animation-disabled.html [ Pass Timeout ]
@@ -8169,11 +8167,6 @@ webkit.org/b/296338 http/tests/site-isolation/fullscreen.html [ Pass Failure ]
 
 webkit.org/b/296389 [ Release ] http/tests/dom/noreferrer-window-not-targetable.html [ Pass Failure ]
 
-# webkit.org/b/296388 [ Release ] 3x http/tests/canvas/ (layout-tests) are flakey text failures
-[ Release ] http/tests/canvas/ctx.2d-canvas-style-color-no-document-leak.html [ Pass Failure ]
-[ Release ] http/tests/canvas/ctx.2d-canvas-style-gradient-no-document-leak.html [ Pass Failure ]
-[ Release ] http/tests/canvas/ctx.2d-canvas-style-pattern-no-document-leak.html [ Pass Failure ]
-
 webkit.org/b/296566 [ Release ] imported/w3c/web-platform-tests/screen-orientation/lock-basic.html [ Pass Failure ]
 
 # webkit.org/b/295803 2x http/tests/webcodecs/ (layout-tests) tests flakey text failures
@@ -8189,8 +8182,6 @@ webkit.org/b/296707 imported/w3c/web-platform-tests/screen-orientation/non-fully
 webkit.org/b/296709 imported/w3c/web-platform-tests/webvtt/rendering/cues-with-video/processing-model/evil/media_height_19.html [ ImageOnlyFailure ]
 
 webkit.org/b/296816 [ Release ] imported/w3c/web-platform-tests/css/css-shapes/spec-examples/shape-outside-012.html [ Pass Failure ]
-
-webkit.org/b/296824 [ Release ] http/tests/webcodecs/audio-encoder-callbacks-do-not-leak.html [ Pass Failure ]
 
 webkit.org/b/296833 imported/w3c/web-platform-tests/css/css-contain/content-visibility/content-visibility-096.html [ Pass ImageOnlyFailure ]
 
@@ -8223,8 +8214,6 @@ fast/forms/form-control-refresh/accent-color-contrast-does-not-affect-inactive-w
 webkit.org/b/297144 fast/forms/state-restore-to-non-edited-controls.html [ Pass Timeout ]
 
 webkit.org/b/297240 http/tests/site-isolation/edge-sampling-commit-root-frame-load.html [ Failure ]
-
-webkit.org/b/295751 [ Release ] http/tests/geolocation/geolocation-get-current-position-does-not-leak.https.html [ Pass Failure ]
 
 webkit.org/b/297251 [ Release ] fast/mediastream/getUserMedia-echoCancellation.html [ Pass Failure ]
 
