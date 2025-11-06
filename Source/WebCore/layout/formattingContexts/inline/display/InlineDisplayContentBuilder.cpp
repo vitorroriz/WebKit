@@ -782,7 +782,7 @@ void InlineDisplayContentBuilder::processBidiContent(const LineLayoutResult& lin
 
             auto& layoutBox = lineRun.layoutBox();
             auto parentDisplayBoxNodeIndex = ensureDisplayBoxForContainer(layoutBox.parent(), displayBoxTree, ancestorStack, boxes);
-            hasInlineBox = hasInlineBox || parentDisplayBoxNodeIndex || lineRun.isInlineBoxStart() || lineRun.isLineSpanningInlineBoxStart();
+            hasInlineBox = hasInlineBox || (!lineRun.isBlock() && (parentDisplayBoxNodeIndex || lineRun.isInlineBoxStart() || lineRun.isLineSpanningInlineBoxStart()));
 
             if (lineRun.isOpaque()) {
                 if (layoutBox.style().isOriginalDisplayInlineType()) {
@@ -806,6 +806,8 @@ void InlineDisplayContentBuilder::processBidiContent(const LineLayoutResult& lin
                 auto& boxGeometry = formattingContext().geometryForBox(layoutBox);
                 if (lineRun.isAtomicInlineBox() || lineRun.isListMarker())
                     return lineBox.logicalBorderBoxForAtomicInlineBox(layoutBox, boxGeometry);
+                if (lineRun.isBlock())
+                    return { { }, { }, boxGeometry.marginBoxWidth(), boxGeometry.marginBoxHeight() };
                 ASSERT_NOT_REACHED();
                 return { };
             }();
@@ -891,6 +893,20 @@ void InlineDisplayContentBuilder::processBidiContent(const LineLayoutResult& lin
                     appendInlineDisplayBoxAtBidiBoundary(layoutBox, boxes);
                     createDisplayBoxNodeForContainerAndPushToAncestorStack(downcast<ElementBox>(layoutBox), boxes.size() - 1, parentDisplayBoxNodeIndex, displayBoxTree, ancestorStack);
                 }
+                continue;
+            }
+            if (lineRun.isBlock()) {
+                ASSERT(!hasInlineBox);
+
+                auto parentWritingMode = layoutBox.parent().writingMode();
+                auto& boxGeometry = formattingContext().geometryForBox(layoutBox);
+                auto boxMarginLeft = marginLineLeft(boxGeometry, parentWritingMode);
+                isHorizontalWritingMode ? visualRectRelativeToRoot.moveHorizontally(boxMarginLeft) : visualRectRelativeToRoot.moveVertically(boxMarginLeft);
+
+                appendBlockLevelDisplayBox(lineRun, visualRectRelativeToRoot, boxes);
+                boxGeometry.setTopLeft({ lineLogicalLeft + contentLineRightEdge, lineLogicalTop + logicalRect.top() });
+
+                contentLineRightEdge += boxMarginLeft + logicalRect.width() + marginLineRight(boxGeometry, parentWritingMode);
                 continue;
             }
             ASSERT_NOT_REACHED();

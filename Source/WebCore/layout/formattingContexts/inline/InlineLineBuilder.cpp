@@ -1352,6 +1352,8 @@ void LineBuilder::handleBlockContent(const InlineItem& blockItem)
     formattingContext().integrationUtils().layoutWithFormattingContextForBox(downcast<ElementBox>(blockItem.layoutBox()));
     auto marginBoxLogicalWidth = formattingContext().formattingUtils().inlineItemWidth(blockItem, { }, false);
     m_line.appendBlock(blockItem, marginBoxLogicalWidth);
+    if (rootStyle().writingMode().isBidiRTL())
+        m_line.setContentNeedsBidiReordering();
 }
 
 LineBuilder::Result LineBuilder::handleInlineContent(const InlineItemRange& layoutRange, LineCandidate& lineCandidate)
