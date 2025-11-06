@@ -14,10 +14,6 @@ body {
     width: 100px;
     height: 100px;
     background-color: black;
-
-    animation: slide auto linear;
-    animation-timeline: scroll();
-    will-change: translate;
 }
 
 </style>
@@ -26,12 +22,37 @@ body {
 <script src="../../imported/w3c/web-platform-tests/web-animations/testcommon.js"></script>
 <script>
 
-promise_test(async t => {
+const make_target = t => {
     const target = createDiv(t);
     target.className = "target";
-    await new Promise(requestAnimationFrame);
+    return target;
+};
+
+const animationAcceleration = async animation => {
+    // An animation must be ready to be considered for acceleration.
+    await animation.ready;
+    // We only need to wait for the next JS run loop here
+    // because composition will happen during the animation frame,
+    // but after the requestAnimationFrame callbacks have been serviced.
+    await new Promise(setTimeout);
+};
+
+promise_test(async t => {
+    const target = make_target(t);
+    target.style.animation = "slide auto linear";
+    target.style.animationTimeline = "scroll()";
+    const animation = document.getAnimations()[0];
+    await animationAcceleration(animation);
     assert_equals(window.internals?.acceleratedAnimationsForElement(target).length, 1);
 }, "A scroll-driven CSS animation can be accelerated.");
+
+promise_test(async t => {
+    const target = make_target(t);
+    const timeline = new ScrollTimeline({ source: document.documentElement });
+    const animation = target.animate({ translate: '100px' }, { timeline });
+    await animationAcceleration(animation);
+    assert_equals(window.internals?.acceleratedAnimationsForElement(target).length, 1);
+}, "A scroll-driven JS-originated animation can be accelerated.");
 
 </script>
 </body>

@@ -414,17 +414,27 @@ void DocumentTimeline::animationAcceleratedRunningStateDidChange(WebAnimation& a
         clearTickScheduleTimer();
 }
 
+void DocumentTimeline::runPostRenderingUpdateTasks()
+{
+#if ENABLE(THREADED_ANIMATIONS)
+    if (!m_document || m_acceleratedAnimationsPendingRunningStateChange.isEmpty())
+        return;
+    Ref settings = m_document->settings();
+    if (!settings->threadedScrollDrivenAnimationsEnabled() && !settings->threadedTimeBasedAnimationsEnabled())
+        return;
+    m_acceleratedAnimationsPendingRunningStateChange.clear();
+    if (CheckedPtr timelinesController = m_document->timelinesController())
+        timelinesController->updateAcceleratedEffectStacks();
+#endif
+}
+
 void DocumentTimeline::applyPendingAcceleratedAnimations()
 {
 #if ENABLE(THREADED_ANIMATIONS)
     if (m_document) {
         Ref settings = m_document->settings();
-        if (settings->threadedScrollDrivenAnimationsEnabled() || settings->threadedTimeBasedAnimationsEnabled()) {
-            m_acceleratedAnimationsPendingRunningStateChange.clear();
-            if (CheckedPtr timelinesController = m_document->timelinesController())
-                timelinesController->updateAcceleratedEffectStacks();
+        if (settings->threadedScrollDrivenAnimationsEnabled() || settings->threadedTimeBasedAnimationsEnabled())
             return;
-        }
     }
 #endif
 

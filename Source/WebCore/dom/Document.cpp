@@ -10819,8 +10819,10 @@ void Document::updateAnimationsAndSendEvents()
         timelinesController->updateAnimationsAndSendEvents(window->frozenNowTimestamp());
 }
 
-void Document::updateStaleScrollTimelines()
+void Document::runPostRenderingUpdateAnimationTasks()
 {
+    if (m_timeline)
+        m_timeline->runPostRenderingUpdateTasks();
     if (CheckedPtr timelinesController = this->timelinesController())
         timelinesController->updateStaleScrollTimelines();
 }
