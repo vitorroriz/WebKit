@@ -762,9 +762,7 @@ void LineLayout::preparePlacedFloats()
         auto& visualRect = floatingObject->frameRect();
 
         auto usedPosition = RenderStyle::usedFloat(floatingObject->renderer());
-        auto logicalPosition = (usedPosition == UsedFloat::Left) == placedFloatsIsLeftToRight
-            ? Layout::PlacedFloats::Item::Position::Start
-            : Layout::PlacedFloats::Item::Position::End;
+        auto logicalPosition = (usedPosition == UsedFloat::Left) == placedFloatsIsLeftToRight ? Layout::PlacedFloats::Item::Position::Start : Layout::PlacedFloats::Item::Position::End;
 
         auto boxGeometry = Layout::BoxGeometry { };
         auto logicalRect = [&] {
@@ -791,7 +789,7 @@ void LineLayout::preparePlacedFloats()
         auto shapeOutsideInfo = floatingObject->renderer().shapeOutsideInfo();
         auto* shape = shapeOutsideInfo ? &shapeOutsideInfo->computedShape() : nullptr;
 
-        placedFloats.append({ logicalPosition, boxGeometry, logicalRect.location(), shape });
+        placedFloats.add({ logicalPosition, boxGeometry, logicalRect.location(), shape });
     }
 }
 

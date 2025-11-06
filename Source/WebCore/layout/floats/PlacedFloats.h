@@ -86,7 +86,7 @@ public:
     const List& list() const { return m_list; }
     const Item* last() const { return list().isEmpty() ? nullptr : &m_list.last(); }
 
-    void append(Item);
+    void add(Item);
     bool remove(const Box&);
     void clear();
 

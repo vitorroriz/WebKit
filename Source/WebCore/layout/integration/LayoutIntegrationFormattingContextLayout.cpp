@@ -26,6 +26,7 @@
 #include "config.h"
 #include "LayoutIntegrationFormattingContextLayout.h"
 
+#include "BlockLayoutState.h"
 #include "LayoutIntegrationBoxGeometryUpdater.h"
 #include "RenderBlock.h"
 #include "RenderBoxInlines.h"
@@ -65,6 +66,43 @@ void layoutWithFormattingContextForBox(const Layout::ElementBox& box, std::optio
     };
     auto updater = BoxGeometryUpdater { layoutState, rootLayoutBox() };
     updater.updateBoxGeometryAfterIntegrationLayout(box, widthConstraint.value_or(renderer.containingBlock()->contentBoxLogicalWidth()));
+}
+
+void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block, Layout::BlockLayoutState& parentBlockLayoutState, Layout::LayoutState& layoutState)
+{
+    auto* renderer = dynamicDowncast<RenderBlockFlow>(*block.rendererForIntegration());
+    if (!renderer) {
+        ASSERT_NOT_REACHED();
+        return;
+    }
+
+    layoutWithFormattingContextForBox(block, { }, { }, layoutState);
+
+    if (!renderer->containsFloats() || renderer->createsNewFormattingContext())
+        return;
+
+    auto& placedFloats = parentBlockLayoutState.placedFloats();
+    for (auto& floatingObject : *renderer->floatingObjectSet()) {
+        if (!floatingObject->isDescendant())
+            continue;
+
+        auto& floatRect = floatingObject->frameRect();
+
+        auto boxGeometry = Layout::BoxGeometry { };
+        boxGeometry.setTopLeft(floatRect.location());
+        boxGeometry.setContentBoxWidth(floatRect.width());
+        boxGeometry.setContentBoxHeight(floatRect.height());
+        boxGeometry.setBorder({ });
+        boxGeometry.setPadding({ });
+        boxGeometry.setHorizontalMargin({ });
+        boxGeometry.setVerticalMargin({ });
+
+        auto shapeOutsideInfo = floatingObject->renderer().shapeOutsideInfo();
+        auto* shape = shapeOutsideInfo ? &shapeOutsideInfo->computedShape() : nullptr;
+
+        auto usedPosition = RenderStyle::usedFloat(floatingObject->renderer()) == UsedFloat::Left ? Layout::PlacedFloats::Item::Position::Start : Layout::PlacedFloats::Item::Position::End;
+        placedFloats.add({ usedPosition, boxGeometry, floatRect.location(), shape });
+    }
 }
 
 LayoutUnit formattingContextRootLogicalWidthForType(const Layout::ElementBox& box, LogicalWidthType logicalWidthType)

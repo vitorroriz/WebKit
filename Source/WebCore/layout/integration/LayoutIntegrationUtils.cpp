@@ -62,6 +62,12 @@ LayoutUnit IntegrationUtils::minContentHeight(const ElementBox& box) const
     return m_globalLayoutState->logicalHeightWithFormattingContextForBox(box, LayoutIntegration::LogicalHeightType::MinContent);
 }
 
+void IntegrationUtils::layoutWithFormattingContextForBlockInInline(const ElementBox& block, const BlockLayoutState& parentBlockLayoutState) const
+{
+    ASSERT(block.isBlockLevelBox());
+    m_globalLayoutState->layoutWithFormattingContextForBlockInInline(block, parentBlockLayoutState);
+}
+
 }
 }
 

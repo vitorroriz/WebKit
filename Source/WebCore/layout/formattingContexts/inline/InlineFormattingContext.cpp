@@ -372,7 +372,7 @@ void InlineFormattingContext::layoutFloatContentOnly(const ConstraintsForInlineC
 
             auto floatBoxTopLeft = floatingContext.positionForFloat(floatBox, floatBoxGeometry, constraints.horizontal());
             floatBoxGeometry.setTopLeft(floatBoxTopLeft);
-            placedFloats.append(floatingContext.makeFloatItem(floatBox, floatBoxGeometry));
+            placedFloats.add(floatingContext.makeFloatItem(floatBox, floatBoxGeometry));
             continue;
         }
         ASSERT_NOT_REACHED();

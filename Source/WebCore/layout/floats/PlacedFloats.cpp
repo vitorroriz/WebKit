@@ -71,7 +71,7 @@ PlacedFloats::PlacedFloats(const ElementBox& blockFormattingContextRoot)
     ASSERT(blockFormattingContextRoot.establishesBlockFormattingContext());
 }
 
-void PlacedFloats::append(Item newFloatItem)
+void PlacedFloats::add(Item newFloatItem)
 {
     auto isStartPositioned = newFloatItem.isStartPositioned();
     m_positionTypes.add(isStartPositioned ? PositionType::Start : PositionType::End);

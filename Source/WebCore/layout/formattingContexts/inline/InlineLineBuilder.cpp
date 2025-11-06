@@ -1324,7 +1324,7 @@ bool LineBuilder::tryPlacingFloatBox(const Box& floatBox, MayOverConstrainLine m
     auto placeFloatBox = [&] {
         auto lineIndex = m_previousLine ? (m_previousLine->lineIndex + 1) : 0lu;
         auto floatItem = floatingContext.makeFloatItem(floatBox, boxGeometry, lineIndex);
-        layoutState().placedFloats().append(floatItem);
+        layoutState().placedFloats().add(floatItem);
         m_placedFloats.append(floatItem);
     };
     placeFloatBox();
@@ -1349,7 +1349,7 @@ void LineBuilder::handleBlockContent(const InlineItem& blockItem)
     // Blocks are always the only content on the line.
     ASSERT(!m_line.hasContentOrListMarker());
 
-    formattingContext().integrationUtils().layoutWithFormattingContextForBox(downcast<ElementBox>(blockItem.layoutBox()));
+    formattingContext().integrationUtils().layoutWithFormattingContextForBlockInInline(downcast<ElementBox>(blockItem.layoutBox()), blockLayoutState());
     auto marginBoxLogicalWidth = formattingContext().formattingUtils().inlineItemWidth(blockItem, { }, false);
     m_line.appendBlock(blockItem, marginBoxLogicalWidth);
     if (rootStyle().writingMode().isBidiRTL())
