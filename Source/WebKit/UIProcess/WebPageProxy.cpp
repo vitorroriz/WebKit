@@ -7536,6 +7536,9 @@ void WebPageProxy::didCommitLoadForFrame(IPC::Connection& connection, FrameIdent
     if (frame->isMainFrame())
         m_internals->imageTranslationLanguageIdentifiers = std::nullopt;
 #endif
+
+    if (frame->isMainFrame())
+        m_internals->textManipulationParameters = std::nullopt;
 }
 
 void WebPageProxy::didFinishDocumentLoadForFrame(IPC::Connection& connection, FrameIdentifier frameID, std::optional<WebCore::NavigationIdentifier> navigationID, const UserData& userData, WallTime timestamp)
@@ -12249,6 +12252,8 @@ WebPageCreationParameters WebPageProxy::creationParameters(WebProcessProxy& proc
     parameters.imageTranslationLanguageIdentifiers = m_internals->imageTranslationLanguageIdentifiers;
 #endif
 
+    parameters.textManipulationParameters = m_internals->textManipulationParameters;
+
     return parameters;
 }
 
@@ -15516,6 +15521,8 @@ void WebPageProxy::setMockWebAuthenticationConfiguration(MockWebAuthenticationCo
 void WebPageProxy::startTextManipulations(const Vector<TextManipulationController::ExclusionRule>& exclusionRules, bool includeSubframes, TextManipulationItemCallback&& callback, CompletionHandler<void()>&& completionHandler)
 {
     m_textManipulationItemCallback = WTFMove(callback);
+    m_internals->textManipulationParameters = { includeSubframes, exclusionRules };
+
     auto callbackAggregator = CallbackAggregator::create(WTFMove(completionHandler));
     forEachWebContentProcess([&](auto& webProcess, auto pageID) {
         webProcess.sendWithAsyncReply(Messages::WebPage::StartTextManipulations(exclusionRules, includeSubframes), [callbackAggregator] { }, pageID);

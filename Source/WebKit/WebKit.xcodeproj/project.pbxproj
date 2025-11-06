@@ -1605,6 +1605,7 @@
 		7B73123E25CC8525003B2796 /* StreamConnectionWorkQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B73123525CC8524003B2796 /* StreamConnectionWorkQueue.h */; };
 		7B73124125CC8525003B2796 /* StreamServerConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B73123825CC8524003B2796 /* StreamServerConnection.h */; };
 		7B73124225CC8525003B2796 /* StreamConnectionEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B73123925CC8525003B2796 /* StreamConnectionEncoder.h */; };
+		7B7C380F2EBABD7F00F71B4A /* TextManipulationParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B7C380E2EBABD5300F71B4A /* TextManipulationParameters.h */; };
 		7B9FC5A828A38D1E007570E7 /* PlatformUnifiedSource1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7B9FC59628A28D13007570E7 /* PlatformUnifiedSource1.cpp */; };
 		7B9FC5BB28A5233B007570E7 /* libWebKitPlatform.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B9FC59D28A28F88007570E7 /* libWebKitPlatform.a */; };
 		7B9FC5D028A5300D007570E7 /* PlatformUnifiedSource2-nonARC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7B9FC5C628A52702007570E7 /* PlatformUnifiedSource2-nonARC.mm */; };
@@ -6819,6 +6820,8 @@
 		7B73123725CC8524003B2796 /* StreamServerConnection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StreamServerConnection.cpp; sourceTree = "<group>"; };
 		7B73123825CC8524003B2796 /* StreamServerConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StreamServerConnection.h; sourceTree = "<group>"; };
 		7B73123925CC8525003B2796 /* StreamConnectionEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StreamConnectionEncoder.h; sourceTree = "<group>"; };
+		7B7C380E2EBABD5300F71B4A /* TextManipulationParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextManipulationParameters.h; sourceTree = "<group>"; };
+		7B7C38102EBABF1500F71B4A /* TextManipulationParameters.serialization.in */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextManipulationParameters.serialization.in; sourceTree = "<group>"; };
 		7B8679072C2D3D9D00268208 /* GPUProcessConnectionIdentifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GPUProcessConnectionIdentifier.h; sourceTree = "<group>"; };
 		7B904165254AFDEA006EEB8C /* RemoteGraphicsContextGLProxy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteGraphicsContextGLProxy.cpp; sourceTree = "<group>"; };
 		7B904166254AFDEB006EEB8C /* RemoteGraphicsContextGLProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteGraphicsContextGLProxy.h; sourceTree = "<group>"; };
@@ -10099,6 +10102,8 @@
 				F4217F1D2E8EFF8A0036AAC1 /* TextExtractionToStringConversion.cpp */,
 				F4217F1C2E8EFF8A0036AAC1 /* TextExtractionToStringConversion.h */,
 				86DD518B28EF028500DF2A58 /* TextFlags.serialization.in */,
+				7B7C380E2EBABD5300F71B4A /* TextManipulationParameters.h */,
+				7B7C38102EBABF1500F71B4A /* TextManipulationParameters.serialization.in */,
 				86890B81294B6FD900DB95CE /* TextRecognitionResult.serialization.in */,
 				F4A7CE842667EB4E00228685 /* TextRecognitionUpdateResult.h */,
 				2D9BECFA2B30A5F600D0AE99 /* TextRecognitionUpdateResult.serialization.in */,
@@ -18178,6 +18183,7 @@
 				1A5E4DA412D3BD3D0099A2BB /* TextCheckerState.h in Headers */,
 				F42CDFFF2E6E28A9005837F8 /* TextExtractionFilter.h in Headers */,
 				CE1A0BD71A48E6C60054EF74 /* TextInputSPI.h in Headers */,
+				7B7C380F2EBABD7F00F71B4A /* TextManipulationParameters.h in Headers */,
 				E3C6727329D4A3AD00AD4452 /* TextTrackRepresentationCocoa.h in Headers */,
 				1AAF263914687C39004A1E8A /* TiledCoreAnimationDrawingArea.h in Headers */,
 				1AF05D8714688348008B1E81 /* TiledCoreAnimationDrawingAreaProxy.h in Headers */,

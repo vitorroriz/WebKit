@@ -523,6 +523,7 @@ set(WebKit_SERIALIZATION_IN_FILES
     Shared/SessionState.serialization.in
     Shared/SyntheticEditingCommandType.serialization.in
     Shared/TextFlags.serialization.in
+    Shared/TextManipulationParameters.serialization.in
     Shared/TextRecognitionResult.serialization.in
     Shared/TextRecognitionUpdateResult.serialization.in
     Shared/URLSchemeTaskParameters.serialization.in

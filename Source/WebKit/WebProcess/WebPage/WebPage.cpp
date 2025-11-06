@@ -912,6 +912,11 @@ WebPage::WebPage(PageIdentifier pageID, WebPageCreationParameters&& parameters)
     pageConfiguration.imageTranslationLanguageIdentifiers = WTFMove(parameters.imageTranslationLanguageIdentifiers);
 #endif
 
+    if (parameters.textManipulationParameters) {
+        m_textManipulationIncludesSubframes = parameters.textManipulationParameters->includeSubframes;
+        m_internals->textManipulationExclusionRules = WTFMove(parameters.textManipulationParameters->exclusionRules);
+    }
+
 #if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
     if (parameters.store.getBoolValueForKey(WebPreferencesKey::remoteMediaSessionManagerEnabledKey())) {
         pageConfiguration.mediaSessionManagerFactory = [weakThis = WeakPtr { *this }](PageIdentifier) -> RefPtr<MediaSessionManagerInterface> {
