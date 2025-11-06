@@ -365,10 +365,7 @@ void RemoteAudioVideoRendererProxyManager::seekTo(RemoteAudioVideoRendererIdenti
         completionHandler(makeUnexpected(PlatformMediaError::NotSupportedError));
         return;
     }
-    renderer->seekTo(time)->whenSettled(RunLoop::mainSingleton(), [protectedThis = Ref { *this }, identifier, completionHandler = WTFMove(completionHandler)](auto&& result) mutable {
-        protectedThis->m_gpuConnectionToWebProcess.get()->connection().send(Messages::AudioVideoRendererRemoteMessageReceiver::StateUpdate(protectedThis->stateFor(identifier)), identifier);
-        completionHandler(WTFMove(result));
-    });
+    renderer->seekTo(time)->whenSettled(RunLoop::currentSingleton(), WTFMove(completionHandler));
 }
 
 void RemoteAudioVideoRendererProxyManager::setVolume(RemoteAudioVideoRendererIdentifier identifier, float volume)
