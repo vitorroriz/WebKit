@@ -8366,3 +8366,5 @@ fast/forms/ios/focus-input-via-button.html [ Failure ]
 fast/forms/ios/focus-long-textarea.html [ Failure ]
 fast/forms/ios/zoom-after-input-tap-wide-input.html [ Failure ]
 fast/forms/ios/zoom-after-input-tap.html [ Failure ]
+
+webkit.org/b/302104 fast/scrolling/ios/bounding-client-rect-on-fixed.html [ Pass Failure ]
