@@ -27,38 +27,26 @@
 
 #if ENABLE(THREADED_ANIMATIONS)
 
-#include <WebCore/ProcessQualified.h>
-#include <WebCore/TimelineIdentifier.h>
-#include <WebCore/WebAnimationTime.h>
 #include <wtf/JSONValues.h>
-#include <wtf/RefCounted.h>
-#include <wtf/TZoneMalloc.h>
+
+namespace WebCore {
+enum class AcceleratedEffectProperty : uint16_t;
+enum class CompositeOperation : uint8_t;
+struct AcceleratedEffectValues;
+struct AnimationEffectTiming;
+class TimingFunction;
+class WebAnimationTime;
+}
 
 namespace WebKit {
 
-using TimelineID = WebCore::ProcessQualified<WebCore::TimelineIdentifier>;
+String toStringForTesting(WebCore::AcceleratedEffectProperty);
+Ref<JSON::Value> toJSONForTesting(std::optional<WebCore::WebAnimationTime>);
+Ref<JSON::Value> toJSONForTesting(std::optional<WebCore::CompositeOperation>);
+Ref<JSON::Value> toJSONForTesting(const RefPtr<WebCore::TimingFunction>&);
+Ref<JSON::Object> toJSONForTesting(const WebCore::AcceleratedEffectValues&, const OptionSet<WebCore::AcceleratedEffectProperty>&);
+Ref<JSON::Object> toJSONForTesting(const WebCore::AnimationEffectTiming&);
 
-class RemoteAnimationTimeline : public RefCounted<RemoteAnimationTimeline> {
-    WTF_MAKE_TZONE_ALLOCATED(RemoteAnimationTimeline);
-public:
-    virtual ~RemoteAnimationTimeline() = default;
-
-    const WebCore::WebAnimationTime& currentTime() const { return m_currentTime; }
-    const std::optional<WebCore::WebAnimationTime>& duration() const { return m_duration; }
-    const TimelineID& identifier() const { return m_identifier; }
-
-    Ref<JSON::Object> toJSONForTesting() const;
-
-protected:
-    RemoteAnimationTimeline(TimelineID, std::optional<WebCore::WebAnimationTime> duration);
-
-    WebCore::WebAnimationTime m_currentTime;
-
-private:
-    TimelineID m_identifier;
-    std::optional<WebCore::WebAnimationTime> m_duration;
-};
-
-} // namespace WebKit
+}
 
 #endif // ENABLE(THREADED_ANIMATIONS)
