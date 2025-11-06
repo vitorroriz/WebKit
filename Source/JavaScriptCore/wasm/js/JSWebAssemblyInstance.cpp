@@ -55,7 +55,22 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
 
 namespace JSC {
 
-using namespace Wasm;
+using Wasm::CalleeGroup;
+using Wasm::CompilationMode;
+using Wasm::CreationMode;
+using Wasm::Element;
+using Wasm::Global;
+using Wasm::GlobalInformation;
+using Wasm::Memory;
+using Wasm::ModuleInformation;
+using Wasm::RTTKind;
+using Wasm::Table;
+using Wasm::Tag;
+using Wasm::Type;
+using Wasm::TypeIndex;
+using Wasm::TypeInformation;
+using Wasm::FunctionSpaceIndex;
+using Wasm::isRefType;
 
 const ClassInfo JSWebAssemblyInstance::s_info = { "WebAssembly.Instance"_s, &Base::s_info, nullptr, nullptr, CREATE_METHOD_TABLE(JSWebAssemblyInstance) };
 
