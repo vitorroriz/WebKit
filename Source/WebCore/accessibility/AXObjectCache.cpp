@@ -832,6 +832,11 @@ AccessibilityObject* AXObjectCache::getOrCreate(RenderObject& renderer)
     if (renderer.beingDestroyed())
         return nullptr;
 
+    // We should never create objects that have dirty layout. Doing so can cause
+    // incorrect accessibility tree updates and also for renderers to be deleted
+    // out from under us, causing memory safety issues (or CheckedPtr crashes if we're lucky).
+    AX_BROKEN_ASSERT(!renderer.needsLayout());
+
     Ref object = createObjectFromRenderer(renderer);
 
     // Will crash later if we have two objects for the same renderer.
@@ -2647,11 +2652,12 @@ void AXObjectCache::onSelectedTextChanged(const VisiblePositionRange& selection,
 
 void AXObjectCache::frameLoadingEventNotification(LocalFrame* frame, AXLoadingEvent loadingEvent)
 {
-    if (!frame)
-        return;
-
-    // Delegate on the right platform
-    frameLoadingEventPlatformNotification(getOrCreate(frame->contentRenderer()), loadingEvent);
+    if (frame) {
+        // We pass the RenderView* (via contentRenderer()) rather than calling getOrCreate and passing
+        // that because some platforms don't handle all loading event types, and we don't want to call
+        // getOrCreate unnecessarily (because doing so is not always safe, and can do a fair amount of work).
+        frameLoadingEventPlatformNotification(frame->contentRenderer(), loadingEvent);
+    }
 }
 
 void AXObjectCache::postLiveRegionChangeNotification(AccessibilityObject& object)
