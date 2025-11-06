@@ -405,7 +405,7 @@ private:
     void handleAutoplayEvent(WebCore::AutoplayEvent, OptionSet<WebCore::AutoplayEventFlags>) final;
 
     void setTextIndicator(const WebCore::TextIndicatorData&) const final;
-    void updateTextIndicator(const WebCore::TextIndicatorData&) const final;
+    void updateTextIndicator(RefPtr<WebCore::TextIndicator>&&) const final;
 
 #if ENABLE(TELEPHONE_NUMBER_DETECTION) && PLATFORM(MAC)
     void handleTelephoneNumberClick(const String& number, const WebCore::IntPoint&, const WebCore::IntRect&) final;

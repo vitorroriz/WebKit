@@ -1785,10 +1785,10 @@ void WebChromeClient::setTextIndicator(const WebCore::TextIndicatorData& indicat
         page->setTextIndicator(indicatorData);
 }
 
-void WebChromeClient::updateTextIndicator(const WebCore::TextIndicatorData& indicatorData) const
+void WebChromeClient::updateTextIndicator(RefPtr<WebCore::TextIndicator>&& textIndicator) const
 {
     if (RefPtr page = m_page.get())
-        page->updateTextIndicator(indicatorData);
+        page->updateTextIndicator(WTFMove(textIndicator));
 }
 
 #if ENABLE(TELEPHONE_NUMBER_DETECTION) && PLATFORM(MAC)

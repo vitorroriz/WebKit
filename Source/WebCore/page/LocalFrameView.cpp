@@ -4545,7 +4545,7 @@ void LocalFrameView::scrollToPendingTextFragmentRange()
                 return;
         }
         if (m_haveCreatedTextIndicator)
-            document->protectedPage()->chrome().client().updateTextIndicator(textIndicator->data());
+            document->protectedPage()->chrome().client().updateTextIndicator(WTFMove(textIndicator));
         else {
             document->protectedPage()->chrome().client().setTextIndicator(textIndicator->data());
             m_haveCreatedTextIndicator = true;

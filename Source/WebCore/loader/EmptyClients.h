@@ -150,7 +150,7 @@ class EmptyChromeClient : public ChromeClient {
     RefPtr<DateTimeChooser> createDateTimeChooser(DateTimeChooserClient&) final;
 
     void setTextIndicator(const TextIndicatorData&) const final;
-    void updateTextIndicator(const TextIndicatorData&) const final;
+    void updateTextIndicator(RefPtr<TextIndicator>&&) const final;
 
     DisplayRefreshMonitorFactory* displayRefreshMonitorFactory() const final;
 

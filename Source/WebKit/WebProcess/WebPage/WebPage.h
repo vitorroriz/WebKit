@@ -792,7 +792,7 @@ public:
     void replaceStringMatchesFromInjectedBundle(const Vector<uint32_t>& matchIndices, const String& replacementText, bool selectionOnly);
 
     void setTextIndicator(const WebCore::TextIndicatorData&);
-    void updateTextIndicator(const WebCore::TextIndicatorData&);
+    void updateTextIndicator(RefPtr<WebCore::TextIndicator>&&);
 
     WebFrame& mainWebFrame() const { return m_mainFrame; }
 
