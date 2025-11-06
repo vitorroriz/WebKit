@@ -575,6 +575,7 @@ public:
     MediaPlayer::Preload effectivePreloadValue() const;
     MediaElementSession* mediaSessionIfExists() const { return m_mediaSession.get(); }
     WEBCORE_EXPORT MediaElementSession& mediaSession() const;
+    Ref<MediaElementSession> protectedMediaSession() const { return mediaSession(); }
 
     void pageScaleFactorChanged();
     void userInterfaceLayoutDirectionChanged();
@@ -624,7 +625,7 @@ public:
     using Identified<HTMLMediaElementIdentifier>::identifier;
 
 #if !RELEASE_LOG_DISABLED
-    const Logger& logger() const final { return *m_logger.get(); }
+    const Logger& logger() const final { return m_logger.get(); }
     using PlatformMediaSessionClient::protectedLogger;
     uint64_t logIdentifier() const final { return m_logIdentifier; }
     ASCIILiteral logClassName() const final { return "HTMLMediaElement"_s; }
@@ -681,7 +682,7 @@ public:
     void setShowingStats(bool);
 
     enum class SpeechSynthesisState : uint8_t { None, Speaking, CompletingExtendedDescription, Paused };
-    WEBCORE_EXPORT RefPtr<TextTrackCue> cueBeingSpoken() const;
+    TextTrackCue* cueBeingSpoken() const { return m_cueBeingSpoken.get(); }
 #if ENABLE(SPEECH_SYNTHESIS)
     WEBCORE_EXPORT SpeechSynthesis& speechSynthesis();
     Ref<SpeechSynthesis> protectedSpeechSynthesis();
@@ -1352,9 +1353,9 @@ private:
 
     std::optional<CaptionUserPreferences::CaptionDisplayMode> m_captionDisplayMode;
 
-    RefPtr<AudioTrackList> m_audioTracks;
-    RefPtr<TextTrackList> m_textTracks;
-    RefPtr<VideoTrackList> m_videoTracks;
+    const RefPtr<AudioTrackList> m_audioTracks;
+    const RefPtr<TextTrackList> m_textTracks;
+    const RefPtr<VideoTrackList> m_videoTracks;
     Vector<RefPtr<TextTrack>> m_textTracksWhenResourceSelectionBegan;
 
     struct CueData;
@@ -1462,7 +1463,7 @@ private:
 #endif
 
 #if !RELEASE_LOG_DISABLED
-    RefPtr<Logger> m_logger;
+    const Ref<Logger> m_logger;
     const uint64_t m_logIdentifier;
 #endif
 
