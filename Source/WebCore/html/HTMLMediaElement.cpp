@@ -7830,6 +7830,22 @@ void HTMLMediaElement::updateTextTrackRepresentationImageIfNeeded()
         m_mediaControlsHost->updateTextTrackRepresentationImageIfNeeded();
 }
 
+void HTMLMediaElement::showCaptionDisplaySettingsPreview()
+{
+#if ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS)
+    if (RefPtr mediaControlsHost = m_mediaControlsHost.get())
+        mediaControlsHost->showCaptionDisplaySettingsPreview();
+#endif
+}
+
+void HTMLMediaElement::hideCaptionDisplaySettingsPreview()
+{
+#if ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS)
+    if (RefPtr mediaControlsHost = m_mediaControlsHost.get())
+        mediaControlsHost->hideCaptionDisplaySettingsPreview();
+#endif
+}
+
 void HTMLMediaElement::setClosedCaptionsVisible(bool closedCaptionVisible)
 {
     ALWAYS_LOG(LOGIDENTIFIER, closedCaptionVisible);
@@ -7973,7 +7989,7 @@ void HTMLMediaElement::captionPreferencesChanged()
         return;
 
     if (RefPtr mediaControlsHost = m_mediaControlsHost.get())
-        mediaControlsHost->updateCaptionDisplaySizes(MediaControlsHost::ForceUpdate::Yes);
+        mediaControlsHost->captionPreferencesChanged();
 
     if (RefPtr player = m_player)
         player->tracksChanged();

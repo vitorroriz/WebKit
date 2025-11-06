@@ -2159,10 +2159,10 @@ double WebChromeClient::baseViewportLayoutSizeScaleFactor() const
 
 #if ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
 
-void WebChromeClient::showMediaControlsContextMenu(FloatRect&& targetFrame, Vector<MediaControlsContextMenuItem>&& items, CompletionHandler<void(MediaControlsContextMenuItem::ID)>&& completionHandler)
+void WebChromeClient::showMediaControlsContextMenu(FloatRect&& targetFrame, Vector<MediaControlsContextMenuItem>&& items, HTMLMediaElement& element, CompletionHandler<void(MediaControlsContextMenuItem::ID)>&& completionHandler)
 {
     if (RefPtr page = m_page.get())
-        page->showMediaControlsContextMenu(WTFMove(targetFrame), WTFMove(items), WTFMove(completionHandler));
+        page->showMediaControlsContextMenu(WTFMove(targetFrame), WTFMove(items), element.identifier(), WTFMove(completionHandler));
     else
         completionHandler({ });
 }
@@ -2402,6 +2402,17 @@ bool WebChromeClient::usePluginRendererScrollableArea(LocalFrame& frame) const
         return !pluginView->pluginDelegatesScrollingToMainFrame();
 #endif
     return true;
+}
+
+void WebChromeClient::showCaptionDisplaySettings(CompletionHandler<void(bool)>&& callback)
+{
+    RefPtr page = m_page.get();
+    if (!page) {
+        callback(false);
+        return;
+    }
+
+    page->sendWithAsyncReply(Messages::WebPageProxy::ShowCaptionDisplaySettings(), WTFMove(callback));
 }
 
 } // namespace WebKit

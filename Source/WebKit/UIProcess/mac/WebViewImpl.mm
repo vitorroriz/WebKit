@@ -81,6 +81,7 @@
 #import "WebPageProxy.h"
 #import "WebProcessPool.h"
 #import "WebProcessProxy.h"
+#import "_WKCaptionStyleMenuController.h"
 #import "_WKDragActionsInternal.h"
 #import "_WKRemoteObjectRegistryInternal.h"
 #import "_WKThumbnailViewInternal.h"
@@ -7300,6 +7301,15 @@ void WebViewImpl::unregisterViewAboveScrollPocket(NSView *containerView)
 }
 
 #endif // ENABLE(CONTENT_INSET_BACKGROUND_FILL)
+
+#if ENABLE(VIDEO)
+void WebViewImpl::showCaptionDisplaySettings(CompletionHandler<void(bool)>&& callback)
+{
+    RetainPtr controller = adoptNS([[WKCaptionStyleMenuController alloc] init]);
+    NSMenu *menu = [controller captionStyleMenu];
+    callback([menu popUpMenuPositioningItem:nil atLocation:NSMakePoint(0, 0) inView:[protectedWindow() contentView]]);
+}
+#endif
 
 } // namespace WebKit
 

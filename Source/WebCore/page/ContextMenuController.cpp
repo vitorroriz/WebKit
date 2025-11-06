@@ -247,7 +247,10 @@ std::unique_ptr<ContextMenu> ContextMenuController::maybeCreateContextMenu(Event
 #if ENABLE(CONTEXT_MENU_QR_CODE_DETECTION)
     prepareContextForQRCode(m_context);
 #endif
-    
+
+    if (RefPtr menuProvider = m_menuProvider)
+        menuProvider->prepareContext(m_context);
+
     return makeUnique<ContextMenu>();
 }
 
@@ -1863,6 +1866,10 @@ void ContextMenuController::checkOrEnableIfNeeded(ContextMenuItem& item) const
         case ContextMenuItemTagRewrite:
         case ContextMenuItemTagSummarize:
             break;
+#if ENABLE(VIDEO)
+        case ContextMenuItemCaptionDisplayStyleSubmenu:
+            break;
+#endif
     }
 
     item.setChecked(shouldCheck);

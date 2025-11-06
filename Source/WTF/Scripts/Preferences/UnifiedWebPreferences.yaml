@@ -1770,6 +1770,21 @@ CanvasUsesAcceleratedDrawing:
     WebCore:
       default: false
 
+CaptionDisplaySettingsEnabled:
+  type: bool
+  status: unstable
+  category: media
+  humanReadableName: "Caption Display Settings API"
+  humanReadableDescription: "Enable Caption Display Settings API"
+  condition: ENABLE(VIDEO)
+  defaultValue:
+    WebKit:
+      default: false
+    WebKitLegacy:
+      default: false
+    WebCore:
+      default: false
+
 CaptureAudioInGPUProcessEnabled:
   type: bool
   status: internal

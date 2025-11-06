@@ -1023,6 +1023,9 @@ enum ContentsFormat {
      endTimes);
     [Conditional=VIDEO] unrestricted double closestTimeToTimeRanges(unrestricted double time, TimeRanges ranges);
 
+    [Conditional=VIDEO] undefined showCaptionDisplaySettingsPreviewForMediaElement(HTMLMediaElement element);
+    [Conditional=VIDEO] undefined hideCaptionDisplaySettingsPreviewForMediaElement(HTMLMediaElement element);
+
     boolean isSelectPopupVisible(HTMLSelectElement element);
 
     DOMRect selectionBounds();

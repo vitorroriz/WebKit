@@ -2188,7 +2188,7 @@ public:
 #endif
 
 #if ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
-    void showMediaControlsContextMenu(WebCore::FloatRect&&, Vector<WebCore::MediaControlsContextMenuItem>&&, CompletionHandler<void(WebCore::MediaControlsContextMenuItemID)>&&);
+    void showMediaControlsContextMenu(WebCore::FloatRect&&, Vector<WebCore::MediaControlsContextMenuItem>&&, const FrameInfoData&,  WebCore::HTMLMediaElementIdentifier, CompletionHandler<void(WebCore::MediaControlsContextMenuItemID)>&&);
 #endif
 
     static RefPtr<WebPageProxy> nonEphemeralWebPageProxy();
@@ -2844,6 +2844,11 @@ public:
     Vector<RendererBufferFormat> preferredBufferFormats() const;
 #endif
 
+#if ENABLE(VIDEO)
+    void showCaptionDisplaySettingsPreview(const FrameInfoData&, WebCore::HTMLMediaElementIdentifier);
+    void hideCaptionDisplaySettingsPreview(const FrameInfoData&, WebCore::HTMLMediaElementIdentifier);
+#endif
+
 private:
     WebPageProxy(PageClient&, WebProcessProxy&, Ref<API::PageConfiguration>&&);
     void platformInitialize();
@@ -3448,6 +3453,10 @@ private:
 
     void setAllowsLayoutViewportHeightExpansion(bool);
     void setBrowsingContextGroup(BrowsingContextGroup&);
+
+#if ENABLE(VIDEO)
+    void showCaptionDisplaySettings(CompletionHandler<void(bool)>&&);
+#endif
 
     struct Internals;
     Internals& internals() { return m_internals; }

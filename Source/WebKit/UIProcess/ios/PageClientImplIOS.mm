@@ -1185,9 +1185,9 @@ void PageClientImpl::setMouseEventPolicy(WebCore::MouseEventPolicy policy)
 }
 
 #if ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
-void PageClientImpl::showMediaControlsContextMenu(FloatRect&& targetFrame, Vector<MediaControlsContextMenuItem>&& items, CompletionHandler<void(MediaControlsContextMenuItem::ID)>&& completionHandler)
+void PageClientImpl::showMediaControlsContextMenu(FloatRect&& targetFrame, Vector<MediaControlsContextMenuItem>&& items, const FrameInfoData& frameInfo, HTMLMediaElementIdentifier identifier, CompletionHandler<void(MediaControlsContextMenuItem::ID)>&& completionHandler)
 {
-    [contentView() _showMediaControlsContextMenu:WTFMove(targetFrame) items:WTFMove(items) completionHandler:WTFMove(completionHandler)];
+    [contentView() _showMediaControlsContextMenu:WTFMove(targetFrame) items:WTFMove(items) frameInfo:frameInfo identifier:identifier completionHandler:WTFMove(completionHandler)];
 }
 #endif // ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
 

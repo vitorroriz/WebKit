@@ -1481,6 +1481,29 @@ void WebPageProxy::setBrowsingContextGroup(BrowsingContextGroup& browsingContext
     m_browsingContextGroup = browsingContextGroup;
 }
 
+#if ENABLE(VIDEO)
+void WebPageProxy::showCaptionDisplaySettings(CompletionHandler<void(bool)>&& callback)
+{
+    if (RefPtr pageClient = this->pageClient()) {
+        pageClient->showCaptionDisplaySettings(WTFMove(callback));
+        return;
+    }
+
+    callback(false);
+}
+
+void WebPageProxy::showCaptionDisplaySettingsPreview(const FrameInfoData& frameInfo, WebCore::HTMLMediaElementIdentifier identifier)
+{
+    sendToProcessContainingFrame(frameInfo.frameID, Messages::WebPage::ShowCaptionDisplaySettingsPreview(identifier));
+}
+
+void WebPageProxy::hideCaptionDisplaySettingsPreview(const FrameInfoData& frameInfo, WebCore::HTMLMediaElementIdentifier identifier)
+{
+    sendToProcessContainingFrame(frameInfo.frameID, Messages::WebPage::HideCaptionDisplaySettingsPreview(identifier));
+}
+
+#endif
+
 void WebPageProxy::swapToProvisionalPage(Ref<ProvisionalPageProxy>&& provisionalPage)
 {
     ASSERT(!m_isClosed);
@@ -12998,12 +13021,11 @@ Ref<MediaKeySystemPermissionRequestManagerProxy> WebPageProxy::protectedMediaKey
 
 #if ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
 
-void WebPageProxy::showMediaControlsContextMenu(FloatRect&& targetFrame, Vector<MediaControlsContextMenuItem>&& items, CompletionHandler<void(MediaControlsContextMenuItem::ID)>&& completionHandler)
+void WebPageProxy::showMediaControlsContextMenu(FloatRect&& targetFrame, Vector<MediaControlsContextMenuItem>&& items, const FrameInfoData& frameInfo, HTMLMediaElementIdentifier identifier, CompletionHandler<void(MediaControlsContextMenuItem::ID)>&& completionHandler)
 {
     if (RefPtr pageClient = this->pageClient())
-        pageClient->showMediaControlsContextMenu(WTFMove(targetFrame), WTFMove(items), WTFMove(completionHandler));
+        pageClient->showMediaControlsContextMenu(WTFMove(targetFrame), WTFMove(items), frameInfo, identifier, WTFMove(completionHandler));
 }
-
 #endif // ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
 
 #if ENABLE(NOTIFICATIONS)

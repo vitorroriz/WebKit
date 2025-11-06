@@ -4837,6 +4837,16 @@ double Internals::closestTimeToTimeRanges(double time, TimeRanges& ranges)
     return ranges.nearest(time);
 }
 
+void Internals::showCaptionDisplaySettingsPreviewForMediaElement(HTMLMediaElement& element)
+{
+    element.showCaptionDisplaySettingsPreview();
+}
+
+void Internals::hideCaptionDisplaySettingsPreviewForMediaElement(HTMLMediaElement& element)
+{
+    element.hideCaptionDisplaySettingsPreview();
+}
+
 #endif
 
 ExceptionOr<Ref<DOMRect>> Internals::selectionBounds()

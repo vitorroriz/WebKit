@@ -499,7 +499,7 @@ private:
     URL allowedQueryParametersForAdvancedPrivacyProtections(const URL&) const final;
 
 #if ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
-    void showMediaControlsContextMenu(WebCore::FloatRect&&, Vector<WebCore::MediaControlsContextMenuItem>&&, CompletionHandler<void(WebCore::MediaControlsContextMenuItem::ID)>&&) final;
+    void showMediaControlsContextMenu(WebCore::FloatRect&&, Vector<WebCore::MediaControlsContextMenuItem>&&, WebCore::HTMLMediaElement&, CompletionHandler<void(WebCore::MediaControlsContextMenuItem::ID)>&&) final;
 #endif // ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
 
 #if ENABLE(WEBXR)
@@ -575,6 +575,10 @@ private:
     void setNeedsFixedContainerEdgesUpdate() final;
 
     bool usePluginRendererScrollableArea(WebCore::LocalFrame&) const final;
+
+#if ENABLE(VIDEO)
+    void showCaptionDisplaySettings(CompletionHandler<void(bool)>&&) final;
+#endif
 
     mutable bool m_cachedMainFrameHasHorizontalScrollbar { false };
     mutable bool m_cachedMainFrameHasVerticalScrollbar { false };

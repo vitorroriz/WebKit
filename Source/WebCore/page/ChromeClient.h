@@ -698,7 +698,7 @@ public:
     virtual bool needsScrollGeometryUpdates() const { return false; }
 
 #if ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
-    virtual void showMediaControlsContextMenu(FloatRect&&, Vector<MediaControlsContextMenuItem>&&, CompletionHandler<void(MediaControlsContextMenuItem::ID)>&& completionHandler) { completionHandler(MediaControlsContextMenuItem::invalidID); }
+    virtual void showMediaControlsContextMenu(FloatRect&&, Vector<MediaControlsContextMenuItem>&&, HTMLMediaElement&,  CompletionHandler<void(MediaControlsContextMenuItem::ID)>&& completionHandler) { completionHandler(MediaControlsContextMenuItem::invalidID); }
 #endif // ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
 
 #if ENABLE(WEBXR)
@@ -775,6 +775,10 @@ public:
 #endif
 
     virtual bool usePluginRendererScrollableArea(LocalFrame&) const { return true; }
+
+#if ENABLE(VIDEO)
+    virtual void showCaptionDisplaySettings(CompletionHandler<void(bool)>&& callback) { callback(false); }
+#endif
 
     WEBCORE_EXPORT virtual ~ChromeClient();
 

@@ -472,6 +472,9 @@ public:
     void textTrackReadyStateChanged(TextTrack*);
     void updateTextTrackRepresentationImageIfNeeded();
 
+    WEBCORE_EXPORT void showCaptionDisplaySettingsPreview();
+    WEBCORE_EXPORT void hideCaptionDisplaySettingsPreview();
+
     WEBCORE_EXPORT bool addEventListener(const AtomString& eventType, Ref<EventListener>&&, const AddEventListenerOptions&) override;
     WEBCORE_EXPORT bool removeEventListener(const AtomString& eventType, EventListener&, const EventListenerOptions&) override;
 

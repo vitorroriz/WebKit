@@ -815,6 +815,10 @@ public:
     void setClientImplicitlyRequestedTopScrollPocket();
 #endif
 
+#if ENABLE(VIDEO)
+    void showCaptionDisplaySettings(CompletionHandler<void(bool)>&&);
+#endif
+
 private:
 #if HAVE(TOUCH_BAR)
     void setUpTextTouchBar(NSTouchBar *);

@@ -12259,11 +12259,20 @@ static WebKit::DocumentEditingContextRequest toWebRequest(id request)
 
 #if ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
 
-- (void)_showMediaControlsContextMenu:(WebCore::FloatRect&&)targetFrame items:(Vector<WebCore::MediaControlsContextMenuItem>&&)items completionHandler:(CompletionHandler<void(WebCore::MediaControlsContextMenuItem::ID)>&&)completionHandler
+- (void)_showMediaControlsContextMenu:(WebCore::FloatRect&&)targetFrame items:(Vector<WebCore::MediaControlsContextMenuItem>&&)items frameInfo:(const WebKit::FrameInfoData&)frameInfo identifier:(WebCore::HTMLMediaElementIdentifier)identifier completionHandler:(CompletionHandler<void(WebCore::MediaControlsContextMenuItem::ID)>&&)completionHandler
 {
-    [_actionSheetAssistant showMediaControlsContextMenu:WTFMove(targetFrame) items:WTFMove(items) completionHandler:WTFMove(completionHandler)];
+    [_actionSheetAssistant showMediaControlsContextMenu:WTFMove(targetFrame) items:WTFMove(items) frameInfo:frameInfo identifier:identifier completionHandler:WTFMove(completionHandler)];
 }
 
+- (void)captionStyleMenuWillOpenWithFrameInfo:(const WebKit::FrameInfoData&)frameInfo identifier:(WebCore::HTMLMediaElementIdentifier)identifier
+{
+    _page->showCaptionDisplaySettingsPreview(frameInfo, identifier);
+}
+
+- (void)captionStyleMenuDidCloseWithFrameInfo:(const WebKit::FrameInfoData&)frameInfo identifier:(WebCore::HTMLMediaElementIdentifier)identifier
+{
+    _page->hideCaptionDisplaySettingsPreview(frameInfo, identifier);
+}
 #endif // ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
 
 #if HAVE(UI_POINTER_INTERACTION)
