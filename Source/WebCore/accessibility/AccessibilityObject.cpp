@@ -3085,6 +3085,8 @@ AccessibilityObject* AccessibilityObject::focusedUIElement() const
 AccessibilityObject* AccessibilityObject::focusedUIElementInAnyLocalFrame() const
 {
     RefPtr page = this->page();
+    if (!page)
+        return nullptr;
 
     RefPtr focusedOrMainFrame = page->focusController().focusedOrMainFrame();
     if (!focusedOrMainFrame)
