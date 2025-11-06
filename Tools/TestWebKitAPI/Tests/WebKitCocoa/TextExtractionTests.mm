@@ -290,4 +290,29 @@ TEST(TextExtractionTests, ReplacementStrings)
     EXPECT_TRUE([debugTextWithReplacements containsString:@"The quick brown cat jumped over the  mouse"]);
 }
 
+TEST(TextExtractionTests, VisibleTextOnly)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:^{
+        RetainPtr configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+        [[configuration preferences] _setTextExtractionEnabled:YES];
+        return configuration.autorelease();
+    }()]);
+    [webView synchronouslyLoadTestPageNamed:@"debug-text-extraction"];
+
+    RetainPtr debugText = [webView synchronouslyGetDebugText:[_WKTextExtractionConfiguration configurationForVisibleTextOnly]];
+
+    EXPECT_TRUE([debugText containsString:@"Test"]);
+    EXPECT_TRUE([debugText containsString:@"foo"]);
+    EXPECT_TRUE([debugText containsString:@"Subject “The quick brown fox jumped over the lazy dog”"]);
+    EXPECT_TRUE([debugText containsString:@"0"]);
+#if ENABLE(TEXT_EXTRACTION_FILTER)
+    EXPECT_FALSE([debugText containsString:@"Here’s to the crazy ones"]);
+    EXPECT_FALSE([debugText containsString:@"The round pegs in the square holes"]);
+    EXPECT_FALSE([debugText containsString:@"The ones who see things differently"]);
+    EXPECT_FALSE([debugText containsString:@"And they have no respect for the status quo"]);
+    EXPECT_FALSE([debugText containsString:@"They push the human race forward"]);
+    EXPECT_FALSE([debugText containsString:@"Because the people who are crazy"]);
+#endif // ENABLE(TEXT_EXTRACTION_FILTER)
+}
+
 } // namespace TestWebKitAPI

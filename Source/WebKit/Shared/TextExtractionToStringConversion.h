@@ -49,6 +49,7 @@ namespace WebKit {
 enum class TextExtractionOptionFlag : uint8_t {
     IncludeURLs     = 1 << 0,
     IncludeRects    = 1 << 1,
+    OnlyIncludeText = 1 << 2,
 };
 
 using TextExtractionOptionFlags = OptionSet<TextExtractionOptionFlag>;

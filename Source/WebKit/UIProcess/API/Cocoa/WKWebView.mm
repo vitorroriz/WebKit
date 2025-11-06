@@ -6643,6 +6643,7 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
         shouldFilter,
         includeURLs = configuration.includeURLs,
         includeRects = configuration.includeRects,
+        onlyIncludeText = configuration.onlyIncludeVisibleText,
         maxWordsPerParagraph = WTFMove(maxWordsPerParagraph),
         replacementStrings = extractReplacementStrings(configuration)
     ](auto&& item) mutable {
@@ -6712,7 +6713,8 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
             optionFlags.add(IncludeURLs);
         if (includeRects)
             optionFlags.add(IncludeRects);
-
+        if (onlyIncludeText)
+            optionFlags.add(OnlyIncludeText);
         WebKit::TextExtractionOptions options { WTFMove(filterCallback), [strongSelf _activeNativeMenuItemTitles], WTFMove(replacementStrings), optionFlags };
         WebKit::convertToText(WTFMove(*item), WTFMove(options), [completionHandler = WTFMove(completionHandler)](auto&& string) {
             completionHandler(string.createNSString().get());

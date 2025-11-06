@@ -35,6 +35,8 @@ NS_HEADER_AUDIT_BEGIN(nullability, sendability)
 WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
 @interface _WKTextExtractionConfiguration : NSObject
 
+@property (nonatomic, class, copy, readonly) _WKTextExtractionConfiguration *configurationForVisibleTextOnly NS_SWIFT_NAME(visibleTextOnly);
+
 /*!
  Element extraction is constrained to this rect (in the web view's coordinate space).
  Extracted elements must intersect with this rect, to be included.
