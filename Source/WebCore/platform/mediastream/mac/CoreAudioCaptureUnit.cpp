@@ -754,7 +754,13 @@ void CoreAudioCaptureUnit::updateMutedState(SyncUpdate syncUpdate)
         auto error = m_ioUnit->set(kAUVoiceIOProperty_MuteOutput, kAudioUnitScope_Global, outputBus, &muteUplinkOutput, sizeof(muteUplinkOutput));
         RELEASE_LOG_ERROR_IF(error, WebRTC, "CoreAudioCaptureUnit::updateMutedState(%p) unable to set kAUVoiceIOProperty_MuteOutput, error %d (%.4s)", this, (int)error, (char*)&error);
     }
-    setMutedState(muteUplinkOutput);
+
+    auto isAnyUnitCapturing = [] {
+        return std::ranges::any_of(allCoreAudioCaptureUnits(), [](auto& unit) {
+            return unit.isProducingData();
+        });
+    };
+    setMutedState(muteUplinkOutput && !isAnyUnitCapturing());
 }
 
 void CoreAudioCaptureUnit::updateMutedStateTimerFired()
