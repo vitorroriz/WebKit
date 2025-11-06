@@ -8298,9 +8298,6 @@ fast/html/details-open4.html [ Pass Failure ]
 fast/html/details-replace-summary-child.html [ Pass Failure ]
 fast/html/details-replace-text.html [ Pass Failure ]
 
-# https://bugs.webkit.org/show_bug.cgi?id=301133 [ iOS 26 ] editing/input/cocoa/writing-suggestions-textarea-multiple-lines.html is a constant text failure 
-editing/input/cocoa/writing-suggestions-textarea-multiple-lines.html [ Pass Failure ]
-
 # https://bugs.webkit.org/show_bug.cgi?id=301173 [ iOS 26 ] fast/text/international/hindi-spacing.html is a constant text failure
 fast/text/international/hindi-spacing.html [ Pass Failure ]
 
