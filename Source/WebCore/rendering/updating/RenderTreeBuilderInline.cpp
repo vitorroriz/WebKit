@@ -431,4 +431,61 @@ void RenderTreeBuilder::Inline::childBecameNonInline(RenderInline& parent, Rende
     splitFlow(parent, beforeChild, WTFMove(newBox), WTFMove(removedChild), oldContinuation);
 }
 
+void RenderTreeBuilder::Inline::updateAfterDescendants(RenderInline& parent)
+{
+    if (m_buildsContinuations)
+        return;
+    wrapRunsOfBlocksInAnonymousBlock(parent);
+}
+
+void RenderTreeBuilder::Inline::wrapRunsOfBlocksInAnonymousBlock(RenderInline& parent)
+{
+    // Wrap runs of block boxes with an anonymous block so their margins collapse correctly for blocks-in-inline.
+    ASSERT(!m_buildsContinuations);
+
+    auto dropNestedAnonymousBlocks = [&](CheckedRef<RenderBlock> anonymousBlock) {
+        ASSERT(anonymousBlock->isAnonymousBlock());
+        SingleThreadWeakPtr<RenderObject> nextChild;
+        for (SingleThreadWeakPtr<RenderObject> movedChild = anonymousBlock->firstChild(); movedChild; movedChild = nextChild) {
+            nextChild = movedChild->nextSibling();
+            auto blockChild = dynamicDowncast<RenderBlockFlow>(movedChild.get());
+            if (blockChild && blockChild->isAnonymousBlock() && !blockChild->childrenInline())
+                m_builder.blockBuilder().dropAnonymousBoxChild(anonymousBlock, *blockChild);
+        }
+    };
+
+    SingleThreadWeakPtr<RenderBlock> firstInRun;
+    SingleThreadWeakPtr<RenderBlock> lastInRun;
+
+    auto wrapInAnonymousBlockIfNeeded = [&] {
+        // Only wrap if there are multiple consecutive blocks.
+        if (firstInRun == lastInRun)
+            return;
+
+        auto newBlock = Block::createAnonymousBlockWithStyle(parent.protectedDocument(), parent.style());
+        newBlock->setChildrenInline(false);
+        CheckedRef block = *newBlock;
+        m_builder.attachToRenderElementInternal(parent, WTFMove(newBlock), firstInRun.get());
+        m_builder.moveChildren(parent, block, firstInRun.get(), lastInRun->nextSibling(), RenderTreeBuilder::NormalizeAfterInsertion::No);
+
+        // We might have wrapped existing anonymous blocks and they are now nested. Get rid of them,
+        dropNestedAnonymousBlocks(block);
+    };
+
+    for (CheckedPtr child = parent.firstChild() ; child; child = child->nextSibling()) {
+        if (child->isInline()) {
+            wrapInAnonymousBlockIfNeeded();
+            firstInRun = nullptr;
+            lastInRun = nullptr;
+            continue;
+        }
+        if (auto* blockChild = dynamicDowncast<RenderBlock>(*child)) {
+            if (!firstInRun)
+                firstInRun = blockChild;
+            lastInRun = blockChild;
+        }
+    }
+    wrapInAnonymousBlockIfNeeded();
+}
+
 }
