@@ -207,6 +207,8 @@ struct WEBCORE_EXPORT QuirksData {
 #if HAVE(PIP_SKIP_PREROLL)
     bool shouldDisableAdSkippingInPip : 1 { false };
 #endif
+
+    bool needsSuppressPostLayoutBoundaryEventsQuirk : 1 { false };
 };
 
 } // namespace WebCore
