@@ -32,7 +32,15 @@ DECLARE_SYSTEM_HEADER
 #if USE(APPLE_INTERNAL_SDK)
 
 #import <nw/private.h>
+
+#if __has_include(<sys/socket_private.h>)
 #import <sys/socket_private.h>
+#else
+#define SO_TC_BK_SYS 100
+#define SO_TC_BE 0
+#define SO_TC_VI 700
+#define SO_TC_VO 800
+#endif
 
 #if PLATFORM(MAC) && defined(__OBJC__)
 // Only needed for running tests.
