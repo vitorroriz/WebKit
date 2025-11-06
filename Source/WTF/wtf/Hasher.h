@@ -22,6 +22,7 @@
 
 #include <optional>
 #include <wtf/CheckedPtr.h>
+#include <wtf/HashFunctions.h>
 #include <wtf/Int128.h>
 #include <wtf/RefPtr.h>
 #include <wtf/StdLibExtras.h>
@@ -238,6 +239,20 @@ template<typename T, typename U> void add(Hasher& hasher, const CheckedPtr<T, U>
 {
     add(hasher, checkedPtr.get());
 }
+
+// Default hash for any type that has add(Hasher&, const T&) standalone function so it works with computeHash().
+template<typename T> concept HashableWithHasher = requires(Hasher& hasher, const T& t) {
+    requires std::equality_comparable<T>;
+    // Don't enable if there is hash() member function.
+    requires !HashableWithMemberFunction<T>;
+    add(hasher, t);
+};
+template<HashableWithHasher T> struct HasherBasedHash {
+    static unsigned hash(const T& key) { return computeHash(key); }
+    static bool equal(const T& a, const T& b) { return a == b; }
+    static constexpr bool safeToCompareToEmptyOrDeleted = isSafeToCompareToHashTableEmptyOrDeletedValue<T>();
+};
+template<HashableWithHasher T> struct DefaultHash<T> : HasherBasedHash<T> { };
 
 } // namespace WTF
 
