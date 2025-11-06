@@ -1298,7 +1298,6 @@ void webkitMediaStreamSrcAddTrack(WebKitMediaStreamSrc* self, MediaStreamTrackPr
 
     auto* ghostPad = webkitGstGhostPadFromStaticTemplate(padTemplate, CStringView::unsafeFromUTF8(padName.utf8().data()), pad.get());
     gst_pad_store_sticky_event(ghostPad, stickyStreamStartEvent.get());
-    gst_pad_set_active(ghostPad, TRUE);
     gst_element_add_pad(GST_ELEMENT_CAST(self), ghostPad);
 
     auto proxyPad = adoptGRef(GST_PAD_CAST(gst_proxy_pad_get_internal(GST_PROXY_PAD(ghostPad))));
@@ -1323,7 +1322,6 @@ void webkitMediaStreamSrcAddTrack(WebKitMediaStreamSrc* self, MediaStreamTrackPr
         return gst_pad_event_default(pad, parent, event);
     }));
 
-    gst_pad_set_active(pad.get(), TRUE);
     gst_element_sync_state_with_parent(element);
 }
 
