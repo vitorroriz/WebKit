@@ -86,6 +86,7 @@ private:
     std::optional<TransformationMatrix> entityTransform() const final;
     void setEntityTransform(TransformationMatrix) final;
     bool supportsTransform(TransformationMatrix) override;
+    bool supportsMouseInteraction() override;
 
     const MachSendRight* displayBuffer() const;
     GraphicsLayerContentsDisplayDelegate* contentsDisplayDelegate();
@@ -94,6 +95,7 @@ private:
     void setPaused(bool, CompletionHandler<void(bool succeeded)>&&) override;
     bool paused() const override;
     void play(bool);
+    void simulate(float elapsedTime);
 
     void ensureOnMainThreadWithProtectedThis(Function<void(Ref<DDModelPlayer>)>&& task);
     void setStageMode(WebCore::StageModeOperation) final;
@@ -117,6 +119,11 @@ private:
         Paused
     };
     PauseState m_pauseState { PauseState::None };
+    std::optional<LayoutPoint> m_currentPoint;
+    float m_yawAcceleration { 0.f };
+    float m_pitchAcceleration { 0.f };
+    float m_yaw { 0.f };
+    float m_pitch { 0.f };
 };
 
 }
