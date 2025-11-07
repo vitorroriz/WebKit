@@ -393,7 +393,7 @@ void RemoteLayerTreeEventDispatcher::startOrStopDisplayLinkOnMainThread()
 #if ENABLE(THREADED_ANIMATIONS)
         {
             Locker lock { m_animationLock };
-            if (!m_animationStacks.isEmpty())
+            if (m_monotonicTimelineRegistry && !m_monotonicTimelineRegistry->isEmpty())
                 return true;
         }
 #endif

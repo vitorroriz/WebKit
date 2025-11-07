@@ -148,6 +148,7 @@ public:
     virtual void animationsWereRemovedFromNode(RemoteLayerTreeNode&) { }
     virtual void updateTimelineRegistration(WebCore::ProcessIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>&, MonotonicTime) { }
     virtual RefPtr<const RemoteAnimationTimeline> timeline(const TimelineID&) const { return nullptr; }
+    virtual void progressBasedTimelinesWereUpdatedForNode(const WebCore::ScrollingTreeScrollingNode&) { }
     virtual RefPtr<const RemoteAnimationStack> animationStackForNodeWithIDForTesting(WebCore::PlatformLayerIdentifier) const { return nullptr; }
 #endif
 

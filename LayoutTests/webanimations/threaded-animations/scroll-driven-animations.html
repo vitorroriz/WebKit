@@ -22,6 +22,7 @@ body {
 <script src="../../resources/testharnessreport.js"></script>
 <script src="../../resources/ui-helper.js"></script>
 <script src="../../imported/w3c/web-platform-tests/web-animations/testcommon.js"></script>
+<script src="threaded-animations-utils.js"></script>
 
 <script>
 
@@ -29,15 +30,6 @@ const make_target = t => {
     const target = createDiv(t);
     target.className = "target";
     return target;
-};
-
-const animationAcceleration = async animation => {
-    // An animation must be ready to be considered for acceleration.
-    await animation.ready;
-    // We only need to wait for the next JS run loop here
-    // because composition will happen during the animation frame,
-    // but after the requestAnimationFrame callbacks have been serviced.
-    await new Promise(setTimeout);
 };
 
 promise_test(async t => {
