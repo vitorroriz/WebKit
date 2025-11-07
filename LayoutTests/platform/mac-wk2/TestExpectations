@@ -2417,3 +2417,5 @@ webkit.org/b/302165 [ Debug ] media/track/webvtt-parser-does-not-leak.html [ Pas
 webkit.org/b/302169 [ Debug ] css3/filters/backdrop/effect-hw.html [ ImageOnlyFailure ]
 
 webkit.org/b/302172 [ Debug ] imported/w3c/web-platform-tests/css/css-view-transitions/backdrop-filter-animated.html [ ImageOnlyFailure ]
+
+webkit.org/b/302174 [ Tahoe Debug arm64 ] platform/mac/media/encrypted-media/fps-generateRequest.html [ Timeout ]
