@@ -9,7 +9,6 @@ dom/CollectionIndexCache.h
 dom/Node.cpp
 dom/Node.h
 editing/TextCheckingHelper.h
-html/parser/HTMLTreeBuilder.h
 inspector/InstrumentingAgents.h
 inspector/agents/WebHeapAgent.cpp
 layout/formattingContexts/inline/AbstractLineBuilder.h
