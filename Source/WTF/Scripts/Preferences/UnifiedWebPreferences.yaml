@@ -3099,6 +3099,22 @@ ForceCompositingMode:
     WebKit:
       default: false
 
+ForceEnhancedSecurity:
+  type: bool
+  status: internal
+  defaultsOverridable: true
+  humanReadableName: "Force Enhanced Security Mode"
+  humanReadableDescription: "Force all navigations to use Enhanced Security"
+  webcoreBinding: none
+  exposed: [ WebKit ]
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+
 ForceFTPDirectoryListings:
   type: bool
   status: embedder
