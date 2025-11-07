@@ -7159,7 +7159,6 @@ imported/w3c/web-platform-tests/navigation-api/navigate-event/cross-window/submi
 # General flakes, almost exclusively on mac-wk2-stress.
 imported/w3c/web-platform-tests/navigation-api/navigation-history-entry/entries-after-bfcache-in-iframe.html [ Failure ]
 imported/w3c/web-platform-tests/navigation-api/navigation-methods/return-value/navigate-intercept-rejected.html [ Crash Pass ]
-imported/w3c/web-platform-tests/navigation-api/ordering-and-transition/navigate-204-205-download-then-same-document.html [ Failure Pass ]
 imported/w3c/web-platform-tests/navigation-api/scroll-behavior/ [ Failure Pass ]
 
 # WPT Test infrastructure issue. Tested in http/wpt. rdar://158262060
