@@ -2413,3 +2413,5 @@ fast/events/popup-blocked-from-fake-user-gesture.html [ Timeout ]
 fast/events/popup-allowed-from-gesture-initiated-event.html [ Timeout ]
 
 webkit.org/b/302165 [ Debug ] media/track/webvtt-parser-does-not-leak.html [ Pass Failure Timeout ]
+
+webkit.org/b/302169 [ Debug ] css3/filters/backdrop/effect-hw.html [ ImageOnlyFailure ]
