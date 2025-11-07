@@ -209,7 +209,6 @@ html/HTMLFormControlsCollection.cpp
 html/HTMLFormElement.cpp
 html/HTMLFrameElementBase.cpp
 html/HTMLFrameSetElement.cpp
-html/HTMLImageElement.cpp
 html/HTMLInputElement.cpp
 html/HTMLLinkElement.cpp
 html/HTMLMediaElement.cpp

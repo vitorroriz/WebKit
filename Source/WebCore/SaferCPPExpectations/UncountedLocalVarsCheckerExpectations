@@ -202,7 +202,6 @@ html/FormListedElement.cpp
 [ iOS ] html/HTMLAnchorElement.cpp
 html/HTMLDocument.cpp
 html/HTMLFormElement.cpp
-html/HTMLImageElement.cpp
 [ iOS ] html/HTMLImageLoader.cpp
 html/HTMLInputElement.cpp
 html/HTMLMediaElement.cpp
