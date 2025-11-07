@@ -1178,7 +1178,8 @@ void MediaPlayerPrivateWebM::didParseInitializationData(InitializationSegment&& 
     RefPtr player = m_player.get();
     for (auto videoTrackInfo : segment.videoTracks) {
         if (videoTrackInfo.track) {
-            auto track = static_pointer_cast<VideoTrackPrivateWebM>(videoTrackInfo.track);
+            // FIXME: Use downcast instead.
+            auto track = unsafeRefPtrDowncast<VideoTrackPrivateWebM>(videoTrackInfo.track);
 #if PLATFORM(IOS_FAMILY)
             if (shouldCheckHardwareSupport() && (videoTrackInfo.description->codec() == "vp8"_s || (videoTrackInfo.description->codec() == "vp9"_s && !(canLoad_VideoToolbox_VTIsHardwareDecodeSupported() && VTIsHardwareDecodeSupported(kCMVideoCodecType_VP9))))) {
                 m_errored = true;
@@ -1216,7 +1217,8 @@ void MediaPlayerPrivateWebM::didParseInitializationData(InitializationSegment&& 
 
     for (auto audioTrackInfo : segment.audioTracks) {
         if (audioTrackInfo.track) {
-            auto track = static_pointer_cast<AudioTrackPrivateWebM>(audioTrackInfo.track);
+            // FIXME: Use downcast instead.
+            auto track = unsafeRefPtrDowncast<AudioTrackPrivateWebM>(audioTrackInfo.track);
             addTrackBuffer(track->id(), WTFMove(audioTrackInfo.description));
 
             track->setEnabledChangedCallback([weakThis = ThreadSafeWeakPtr { *this }] (AudioTrackPrivate& track, bool enabled) {

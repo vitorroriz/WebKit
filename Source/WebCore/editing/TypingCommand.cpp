@@ -314,11 +314,10 @@ void TypingCommand::insertParagraphSeparator(Ref<Document>&& document, OptionSet
 
 RefPtr<TypingCommand> TypingCommand::lastTypingCommandIfStillOpenForTyping(Document& document)
 {
-    RefPtr lastEditCommand = document.editor().lastEditCommand();
-    if (!lastEditCommand || !lastEditCommand->isTypingCommand() || !static_cast<TypingCommand*>(lastEditCommand.get())->isOpenForMoreTyping())
+    RefPtr lastEditCommand = dynamicDowncast<TypingCommand>(document.editor().lastEditCommand());
+    if (!lastEditCommand || !lastEditCommand->isOpenForMoreTyping())
         return nullptr;
-
-    return static_pointer_cast<TypingCommand>(WTFMove(lastEditCommand));
+    return lastEditCommand;
 }
 
 bool TypingCommand::shouldDeferWillApplyCommandUntilAddingTypingCommand() const

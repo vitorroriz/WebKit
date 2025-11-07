@@ -2793,10 +2793,10 @@ EventHandler::DragTargetResponse EventHandler::updateDragAndDrop(const PlatformM
     RefPtr<Element> newTarget;
     if (RefPtr targetNode = mouseEvent.targetNode()) {
         // Drag events should never go to non-element nodes (following IE, and proper mouseover/out dispatch)
-        if (!is<Element>(*targetNode))
-            newTarget = targetNode->parentOrShadowHostElement();
+        if (is<Element>(*targetNode))
+            newTarget = uncheckedDowncast<Element>(WTFMove(targetNode));
         else
-            newTarget = static_pointer_cast<Element>(WTFMove(targetNode));
+            newTarget = targetNode->parentOrShadowHostElement();
     }
 
     m_autoscrollController->updateDragAndDrop(newTarget.get(), flooredIntPoint(event.position()), event.timestamp());
