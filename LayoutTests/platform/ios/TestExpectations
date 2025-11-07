@@ -8357,3 +8357,11 @@ fast/forms/ios/zoom-after-input-tap-wide-input.html [ Failure ]
 fast/forms/ios/zoom-after-input-tap.html [ Failure ]
 
 webkit.org/b/302104 fast/scrolling/ios/bounding-client-rect-on-fixed.html [ Pass Failure ]
+
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-002.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-003.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-004.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-005.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-006.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-007.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-022.xht [ ImageOnlyFailure ]

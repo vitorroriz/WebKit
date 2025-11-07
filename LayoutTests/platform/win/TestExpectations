@@ -4593,4 +4593,11 @@ imported/w3c/web-platform-tests/css/CSS2/visudet/height-applies-to-010a.xht [ Im
 imported/w3c/web-platform-tests/css/CSS2/visudet/inline-block-baseline-001.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/visudet/inline-block-baseline-002.xht [ ImageOnlyFailure ]
 
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-002.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-003.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-004.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-005.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-006.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-007.xht [ ImageOnlyFailure ]
+
 imported/w3c/web-platform-tests/css/CSS2/stacking-context/composite-change-after-scroll-preserves-stacking-order.html [ ImageOnlyFailure ]

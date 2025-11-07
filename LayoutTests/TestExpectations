@@ -8155,5 +8155,16 @@ imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-height-40
 imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-width-40.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-width-80.html [ ImageOnlyFailure ]
 
+imported/w3c/web-platform-tests/css/CSS2/linebox/baseline-block-with-overflow-001.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-023.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/vertical-align-117a.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/vertical-align-118a.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/vertical-align-baseline-003.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/vertical-align-baseline-004a.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/vertical-align-baseline-005a.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/vertical-align-baseline-009.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/vertical-align-sub-001.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/vertical-align-super-001.xht [ ImageOnlyFailure ]
+
 imported/w3c/web-platform-tests/css/CSS2/stacking-context/opacity-affects-block-in-inline.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/stacking-context/zindex-affects-block-in-inline.html [ ImageOnlyFailure ]
