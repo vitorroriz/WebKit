@@ -2571,5 +2571,3 @@ webkit.org/b/300997 webrtc/filtering-ice-candidate-after-reload.html [ Pass Fail
 webkit.org/b/301655 fast/images/page-wide-animation-toggle.html [ Pass Timeout ]
 
 webkit.org/b/301668 fast/repaint/iframe-avoid-redundant-repaint.html [ Pass Failure ]
-
-webkit.org/b/302119 webanimations/accelerated-animation-easing-update-after-pause.html [ Pass ImageOnlyFailure ]

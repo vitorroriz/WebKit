@@ -1935,7 +1935,7 @@ const TimingFunction* KeyframeEffect::timingFunctionForKeyframeAtIndex(size_t in
 
 bool KeyframeEffect::canBeAccelerated() const
 {
-    if (!animation() || animation()->pending())
+    if (!animation())
         return false;
 
     if (m_acceleratedPropertiesState == AcceleratedProperties::None)
@@ -1962,7 +1962,7 @@ bool KeyframeEffect::canBeAccelerated() const
     if (RefPtr document = this->document()) {
         Ref settings = document->settings();
         if (m_isAssociatedWithProgressBasedTimeline && settings->threadedScrollDrivenAnimationsEnabled())
-            return true;
+            return !animation()->pending();
         if (!m_isAssociatedWithProgressBasedTimeline && settings->threadedTimeBasedAnimationsEnabled())
             return true;
     }
