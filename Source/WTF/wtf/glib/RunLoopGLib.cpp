@@ -29,6 +29,7 @@
 #include <wtf/RunLoop.h>
 
 #include <glib.h>
+#include <wtf/BubbleSort.h>
 #include <wtf/MainThread.h>
 #include <wtf/SafeStrerror.h>
 #include <wtf/glib/ActivityObserver.h>
@@ -175,9 +176,12 @@ void RunLoop::observeActivity(const Ref<ActivityObserver>& observer)
         ASSERT(!m_activityObservers.contains(observer));
         m_activityObservers.append(observer);
 
-        std::ranges::sort(m_activityObservers, [](const auto& a, const auto& b) {
-            return a->order() < b->order();
-        });
+        if (m_activityObservers.size() > 1) {
+            // We use bubble sort here because the input is always sorted already. See BubbleSort.h.
+            WTF::bubbleSort(m_activityObservers.mutableSpan(), [](const auto& a, const auto& b) {
+                return a->order() < b->order();
+            });
+        }
     }
 
     wakeUp();
