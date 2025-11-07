@@ -231,6 +231,7 @@ static void registerUserDefaults()
     
     [registrationDictionary setObject:@YES forKey:WebKitJSCJITEnabledDefaultsKey];
     [registrationDictionary setObject:@YES forKey:WebKitJSCFTLJITEnabledDefaultsKey];
+    [registrationDictionary setObject:@YES forKey:@"WebKitPrefersFullScreenDimming"];
 
     [[NSUserDefaults standardUserDefaults] registerDefaults:registrationDictionary.get()];
 }

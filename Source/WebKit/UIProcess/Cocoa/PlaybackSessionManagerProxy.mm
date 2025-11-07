@@ -577,13 +577,6 @@ PlaybackSessionManagerProxy::PlaybackSessionManagerProxy(WebPageProxy& page)
 {
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        [[NSUserDefaults standardUserDefaults] registerDefaults:@{
-            @"WebKitPrefersFullScreenDimming": @YES
-        }];
-    });
-
     RefPtr protectedPage = m_page.get();
     protectedPage->protectedLegacyMainFrameProcess()->addMessageReceiver(Messages::PlaybackSessionManagerProxy::messageReceiverName(), protectedPage->webPageIDInMainFrameProcess(), *this);
 }
