@@ -59,6 +59,7 @@ promise_test(async t => {
 
     await scrollAndCheckTimeline(scroller, 0);
     await scrollAndCheckTimeline(scroller, 0.5);
+    await scrollAndCheckTimeline(scroller, 1);
     await scrollAndCheckTimeline(scroller, 0.25);
     await scrollAndCheckTimeline(scroller, 0.75);
 }, "The timeline current time updates as its source is scrolled with a nested scroller");

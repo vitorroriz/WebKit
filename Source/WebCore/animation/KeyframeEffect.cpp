@@ -1647,9 +1647,11 @@ bool KeyframeEffect::isRunningAccelerated() const
     if (threadedAnimationsEnabled()) {
         if (!m_inTargetEffectStack || !canBeAccelerated())
             return false;
-        RefPtr animation = this->animation();
-        ASSERT(animation);
-        return !animation->isSuspended() && animation->playState() == WebAnimation::PlayState::Running;
+        ASSERT(animation());
+        Ref animation = *this->animation();
+        if (animation->isSuspended())
+            return false;
+        return m_isAssociatedWithProgressBasedTimeline || animation->playState() == WebAnimation::PlayState::Running;
     }
 #endif
     return m_runningAccelerated == RunningAccelerated::Yes;
