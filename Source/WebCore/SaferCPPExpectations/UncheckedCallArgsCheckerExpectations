@@ -571,7 +571,6 @@ rendering/TextDecorationPainter.cpp
 [ iOS ] rendering/ios/RenderThemeIOS.mm
 rendering/line/BreakingContext.h
 rendering/line/LineInlineHeaders.h
-rendering/line/LineWidth.cpp
 rendering/line/TrailingObjects.cpp
 rendering/line/WordTrailingSpace.h
 rendering/mathml/MathOperator.cpp

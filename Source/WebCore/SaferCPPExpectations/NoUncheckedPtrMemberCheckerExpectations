@@ -70,10 +70,6 @@ rendering/TextBoxPainter.h
 rendering/TextDecorationPainter.h
 [ iOS ] rendering/ios/RenderThemeIOS.mm
 rendering/line/BreakingContext.h
-rendering/line/LineBreaker.h
-rendering/line/LineWidth.h
-rendering/line/TrailingObjects.h
-rendering/line/WordTrailingSpace.h
 rendering/mathml/RenderMathMLScripts.h
 rendering/shapes/ShapeOutsideInfo.h
 rendering/svg/SVGRenderingContext.h
