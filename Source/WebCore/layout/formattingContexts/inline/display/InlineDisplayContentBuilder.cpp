@@ -506,8 +506,10 @@ void InlineDisplayContentBuilder::processNonBidiContent(const LineLayoutResult& 
             }
             if (lineRun.isLineSpanningInlineBoxStart())
                 return lineBox.logicalBorderBoxForInlineBox(layoutBox, boxGeometry);
-            if (lineRun.isBlock())
-                return { { }, { }, boxGeometry.marginBoxWidth(), boxGeometry.marginBoxHeight() };
+            if (lineRun.isBlock()) {
+                auto borderBoxRect = BoxGeometry::borderBoxRect(boxGeometry);
+                return { borderBoxRect.top(), borderBoxRect.left(), borderBoxRect.width(), borderBoxRect.height() };
+            }
 
             ASSERT_NOT_REACHED();
             return { };
@@ -814,8 +816,10 @@ void InlineDisplayContentBuilder::processBidiContent(const LineLayoutResult& lin
                 auto& boxGeometry = formattingContext().geometryForBox(layoutBox);
                 if (lineRun.isAtomicInlineBox() || lineRun.isListMarker())
                     return lineBox.logicalBorderBoxForAtomicInlineBox(layoutBox, boxGeometry);
-                if (lineRun.isBlock())
-                    return { { }, { }, boxGeometry.marginBoxWidth(), boxGeometry.marginBoxHeight() };
+                if (lineRun.isBlock()) {
+                    auto borderBoxRect = BoxGeometry::borderBoxRect(boxGeometry);
+                    return { borderBoxRect.top(), borderBoxRect.left(), borderBoxRect.width(), borderBoxRect.height() };
+                }
                 ASSERT_NOT_REACHED();
                 return { };
             }();
