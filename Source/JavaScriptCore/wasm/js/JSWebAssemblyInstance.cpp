@@ -533,7 +533,7 @@ void JSWebAssemblyInstance::initElementSegment(uint32_t tableIndex, const Elemen
             auto functionIndex = Wasm::FunctionSpaceIndex(initialBitsOrIndex);
             TypeIndex typeIndex = m_module->typeIndexFromFunctionIndexSpace(functionIndex);
             if (isImportFunction(functionIndex)) {
-                JSObject* functionImport = importFunction(functionIndex).get();
+                JSObject* functionImport = getImportFunctionObject(functionIndex, globalObject);
                 if (isWebAssemblyHostFunction(functionImport)) {
                     // If we ever import a WebAssemblyWrapperFunction, we set the import as the unwrapped value.
                     // Because a WebAssemblyWrapperFunction can never wrap another WebAssemblyWrapperFunction,
@@ -755,6 +755,21 @@ Wasm::BaselineData& JSWebAssemblyInstance::ensureBaselineData(Wasm::FunctionCode
         slot = WTFMove(result);
     }
     return *slot;
+}
+
+JSObject* JSWebAssemblyInstance::getImportFunctionObject(unsigned importFunctionIndex, JSGlobalObject* globalObject)
+{
+    JSObject* fun = importFunction(importFunctionIndex).get();
+    if (!fun) [[unlikely]] {
+        // No fun means the import is a Wasm builtin, and we should use its jsWrapper().
+        // The boxed callee in callLinkInfo is a WasmBuiltinCallee with a pointer to the builtin.
+        auto* callLinkInfo = importFunctionInfo(importFunctionIndex);
+        auto* callee = uncheckedDowncast<Wasm::WasmBuiltinCallee>(uncheckedDowncast<Wasm::Callee>(callLinkInfo->boxedCallee.asNativeCallee()));
+        ASSERT(callee->compilationMode() == Wasm::CompilationMode::WasmBuiltinMode);
+        const WebAssemblyBuiltin* builtin = callee->builtin();
+        fun = builtin->jsWrapper(globalObject);
+    }
+    return fun;
 }
 
 } // namespace JSC
