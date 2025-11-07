@@ -10,9 +10,9 @@ class WebKitBuildArchives {
     private static $object = null;
 
     public static $platforms = array(
-        'mac-tahoe-x86_64%20arm64'      => 'Tahoe',
-        'mac-sequoia-x86_64%20arm64'    => 'Sequoia',
-        'mac-sonoma-x86_64%20arm64'     => 'Sonoma',
+        'mac-tahoe-x86_64-arm64'      => 'Tahoe',
+        'mac-sequoia-x86_64-arm64'    => 'Sequoia',
+        'mac-sonoma-x86_64-arm64'     => 'Sonoma',
     );
 
     public static function object() {

@@ -668,7 +668,7 @@ class ConfigureBuild(buildstep.BuildStep, AddToLogMixin):
             self.platform = platform.split('-', 1)[0]
         self.fullPlatform = platform
         self.configuration = configuration
-        self.architecture = ' '.join(architectures) if architectures else None
+        self.architecture = '-'.join(architectures) if architectures else None
         self.buildOnly = buildOnly
         self.triggers = triggers
         self.triggered_by = triggered_by
