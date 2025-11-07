@@ -528,8 +528,16 @@ void InlineDisplayContentBuilder::processNonBidiContent(const LineLayoutResult& 
                 appendHardLineBreakDisplayBox(lineRun, visualRectRelativeToRoot, boxes);
             else if (lineRun.isAtomicInlineBox() || lineRun.isListMarker())
                 appendAtomicInlineLevelDisplayBox(lineRun, visualRectRelativeToRoot, boxes);
-            else if (lineRun.isBlock())
-                appendBlockLevelDisplayBox(lineRun, visualRectRelativeToRoot, boxes);
+            else if (lineRun.isBlock()) {
+                // Block content should always be placed at the start of the content box even when floats shrink the line.
+                auto adjustedVisualRect = [&] {
+                    auto lineOffset = lineBoxLogicalRect.left() - lineLayoutResult.lineGeometry.initialLogicalLeft;
+                    auto rect = visualRectRelativeToRoot;
+                    writingMode.isHorizontal() ? rect.moveHorizontally(-lineOffset) : rect.moveVertically(-lineOffset);
+                    return rect;
+                };
+                appendBlockLevelDisplayBox(lineRun, adjustedVisualRect(), boxes);
+            }
             else if (lineRun.isInlineBoxStart() || lineRun.isLineSpanningInlineBoxStart()) {
                 // Do not generate display boxes for inline boxes on non-contentful lines (e.g. <span></span>)
                 if (lineBox.hasContent())
@@ -898,15 +906,14 @@ void InlineDisplayContentBuilder::processBidiContent(const LineLayoutResult& lin
             if (lineRun.isBlock()) {
                 ASSERT(!hasInlineBox);
 
-                auto parentWritingMode = layoutBox.parent().writingMode();
                 auto& boxGeometry = formattingContext().geometryForBox(layoutBox);
-                auto boxMarginLeft = marginLineLeft(boxGeometry, parentWritingMode);
-                isHorizontalWritingMode ? visualRectRelativeToRoot.moveHorizontally(boxMarginLeft) : visualRectRelativeToRoot.moveVertically(boxMarginLeft);
+                auto boxMarginLeft = marginLineLeft(boxGeometry, writingMode);
+                // Block content should always be placed at the start of the content box even when floats shrink the line.
+                auto lineOffset = lineBoxLogicalRect.left() - lineLayoutResult.lineGeometry.initialLogicalLeft;
+                isHorizontalWritingMode ? visualRectRelativeToRoot.moveHorizontally(lineOffset + boxMarginLeft) : visualRectRelativeToRoot.moveVertically(lineOffset + boxMarginLeft);
 
                 appendBlockLevelDisplayBox(lineRun, visualRectRelativeToRoot, boxes);
-                boxGeometry.setTopLeft({ lineLogicalLeft + contentLineRightEdge, lineLogicalTop + logicalRect.top() });
-
-                contentLineRightEdge += boxMarginLeft + logicalRect.width() + marginLineRight(boxGeometry, parentWritingMode);
+                boxGeometry.setTopLeft({ lineLogicalLeft + contentLineRightEdge - lineOffset, lineLogicalTop + logicalRect.top() });
                 continue;
             }
             ASSERT_NOT_REACHED();
