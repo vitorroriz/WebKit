@@ -326,12 +326,13 @@ void ThreadedCompositor::renderLayerTree()
     UNUSED_VARIABLE(compositionRequestID);
 #endif
 
+    m_didCompositeRunLoopObserver->schedule(&RunLoop::mainSingleton());
+
     WTFEmitSignpost(this, DidRenderFrame, "compositionResponseID %i", compositionRequestID);
 
     m_context->swapBuffers();
 
     m_surface->didRenderFrame();
-    m_didCompositeRunLoopObserver->schedule(&RunLoop::mainSingleton());
 
     RunLoop::mainSingleton().dispatch([this, protectedThis = Ref { *this }] {
         if (m_layerTreeHost)
