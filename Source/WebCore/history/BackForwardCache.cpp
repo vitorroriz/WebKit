@@ -78,7 +78,7 @@ static inline void logBackForwardCacheFailureDiagnosticMessage(Page* page, const
     if (!page)
         return;
 
-    logBackForwardCacheFailureDiagnosticMessage(page->diagnosticLoggingClient(), reason);
+    logBackForwardCacheFailureDiagnosticMessage(page->checkedDiagnosticLoggingClient(), reason);
 }
 
 static bool canCacheFrame(LocalFrame& frame, DiagnosticLoggingClient& diagnosticLoggingClient, unsigned indentLevel)
@@ -325,7 +325,7 @@ void BackForwardCache::dump() const
     for (auto& item : m_cachedPageMap) {
         if (auto* cachedPage = std::get_if<UniqueRef<CachedPage>>(&item.value)) {
             RefPtr document = (*cachedPage)->document();
-            WTFLogAlways("  Page %p, document %p %s", &(*cachedPage)->page(), document.get(), document ? document->url().string().utf8().data() : "");
+            WTFLogAlways("  Page %p, document %p %s", (*cachedPage)->protectedPage().ptr(), document.get(), document ? document->url().string().utf8().data() : "");
         }
     }
 }
@@ -378,7 +378,7 @@ void BackForwardCache::markPagesForDeviceOrPageScaleChanged(Page& page)
             ASSERT(!m_items.contains(item.key));
             continue;
         }
-        if (&page.mainFrame() == &(*cachedPage)->cachedMainFrame()->view()->frame())
+        if (&page.mainFrame() == &(*cachedPage)->cachedMainFrame()->protectedView()->frame())
             (*cachedPage)->markForDeviceOrPageScaleChanged();
     }
 }
@@ -391,7 +391,7 @@ void BackForwardCache::markPagesForContentsSizeChanged(Page& page)
             ASSERT(!m_items.contains(item.key));
             continue;
         }
-        if (&page.mainFrame() == &(*cachedPage)->cachedMainFrame()->view()->frame())
+        if (&page.mainFrame() == &(*cachedPage)->cachedMainFrame()->protectedView()->frame())
             (*cachedPage)->markForContentsSizeChanged();
     }
 }

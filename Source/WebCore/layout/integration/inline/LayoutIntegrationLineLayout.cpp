@@ -787,9 +787,9 @@ void LineLayout::preparePlacedFloats()
         boxGeometry.setVerticalMargin({ });
 
         auto shapeOutsideInfo = floatingObject->renderer().shapeOutsideInfo();
-        auto* shape = shapeOutsideInfo ? &shapeOutsideInfo->computedShape() : nullptr;
+        RefPtr shape = shapeOutsideInfo ? &shapeOutsideInfo->computedShape() : nullptr;
 
-        placedFloats.add({ logicalPosition, boxGeometry, logicalRect.location(), shape });
+        placedFloats.add({ logicalPosition, boxGeometry, logicalRect.location(), WTFMove(shape) });
     }
 }
 

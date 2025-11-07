@@ -47,11 +47,11 @@ PlacedFloats::Item::Item(const Box& layoutBox, Position position, const BoxGeome
 {
 }
 
-PlacedFloats::Item::Item(Position position, const BoxGeometry& absoluteBoxGeometry, LayoutPoint localTopLeft, const LayoutShape* shape)
+PlacedFloats::Item::Item(Position position, const BoxGeometry& absoluteBoxGeometry, LayoutPoint localTopLeft, RefPtr<const LayoutShape>&& shape)
     : m_position(position)
     , m_absoluteBoxGeometry(absoluteBoxGeometry)
     , m_localTopLeft(localTopLeft)
-    , m_shape(shape)
+    , m_shape(WTFMove(shape))
 {
 }
 

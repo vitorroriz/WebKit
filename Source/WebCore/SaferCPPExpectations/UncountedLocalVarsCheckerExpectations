@@ -248,7 +248,6 @@ inspector/agents/page/PageDOMDebuggerAgent.cpp
 inspector/agents/page/PageNetworkAgent.cpp
 layout/formattingContexts/inline/InlineItemsBuilder.cpp
 layout/formattingContexts/inline/InlineLineBoxBuilder.cpp
-layout/integration/inline/LayoutIntegrationLineLayout.cpp
 layout/layouttree/LayoutTreeBuilder.cpp
 loader/ApplicationManifestLoader.cpp
 loader/EmptyClients.cpp

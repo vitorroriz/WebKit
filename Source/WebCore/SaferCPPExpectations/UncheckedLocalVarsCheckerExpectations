@@ -136,7 +136,6 @@ html/HTMLFormControlElement.cpp
 html/HTMLFormElement.cpp
 [ iOS ] html/HTMLImageLoader.cpp
 html/HTMLInputElement.cpp
-html/HTMLMediaElement.cpp
 html/HTMLSlotElement.cpp
 html/HTMLStyleElement.cpp
 html/HTMLTextFormControlElement.cpp

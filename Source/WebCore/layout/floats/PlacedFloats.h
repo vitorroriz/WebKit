@@ -53,7 +53,7 @@ public:
     public:
         // FIXME: This c'tor is only used by the render tree integation codepath.
         enum class Position { Start, End };
-        Item(Position, const BoxGeometry& absoluteBoxGeometry, LayoutPoint localTopLeft, const LayoutShape*);
+        Item(Position, const BoxGeometry& absoluteBoxGeometry, LayoutPoint localTopLeft, RefPtr<const LayoutShape>&&);
         Item(const Box&, Position, const BoxGeometry& absoluteBoxGeometry, LayoutPoint localTopLeft, std::optional<size_t> line);
 
         ~Item();

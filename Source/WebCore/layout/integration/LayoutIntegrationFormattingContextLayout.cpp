@@ -99,10 +99,10 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
         boxGeometry.setVerticalMargin({ });
 
         auto shapeOutsideInfo = floatingObject->renderer().shapeOutsideInfo();
-        auto* shape = shapeOutsideInfo ? &shapeOutsideInfo->computedShape() : nullptr;
+        RefPtr shape = shapeOutsideInfo ? &shapeOutsideInfo->computedShape() : nullptr;
 
         auto usedPosition = RenderStyle::usedFloat(floatingObject->renderer()) == UsedFloat::Left ? Layout::PlacedFloats::Item::Position::Start : Layout::PlacedFloats::Item::Position::End;
-        placedFloats.add({ usedPosition, boxGeometry, floatRect.location(), shape });
+        placedFloats.add({ usedPosition, boxGeometry, floatRect.location(), WTFMove(shape) });
     }
 }
 
