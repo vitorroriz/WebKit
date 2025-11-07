@@ -212,7 +212,6 @@ html/HTMLFrameSetElement.cpp
 html/HTMLImageElement.cpp
 html/HTMLInputElement.cpp
 html/HTMLLinkElement.cpp
-html/HTMLMarqueeElement.cpp
 html/HTMLMediaElement.cpp
 html/HTMLMetaElement.cpp
 html/HTMLNameCollectionInlines.h
