@@ -214,6 +214,12 @@ void RenderTreeBuilder::Inline::attachIgnoringContinuation(RenderInline& parent,
         return;
     }
 
+    if (!m_buildsContinuations) {
+        // In blocks-in-inline case we allow blocks that may need splitting.
+        if (beforeChild && beforeChild->parent() != &parent)
+            beforeChild = m_builder.splitAnonymousBoxesAroundChild(parent, *beforeChild);
+    }
+
     auto& childToAdd = *child;
     m_builder.attachToRenderElement(parent, WTFMove(child), beforeChild);
     childToAdd.setNeedsLayoutAndPreferredWidthsUpdate();
