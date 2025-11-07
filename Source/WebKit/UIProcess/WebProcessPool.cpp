@@ -1864,11 +1864,11 @@ bool WebProcessPool::httpPipeliningEnabled() const
 #endif
 }
 
-WebProcessProxy* WebProcessPool::webProcessProxyFromConnection(const IPC::Connection& connection) const
+RefPtr<WebProcessProxy> WebProcessPool::webProcessProxyFromConnection(const IPC::Connection& connection) const
 {
     for (Ref process : m_processes) {
         if (process->hasConnection(connection))
-            return process.unsafePtr();
+            return process;
     }
 
     ASSERT_NOT_REACHED();
