@@ -92,7 +92,7 @@ add_action('wp_head', function() { ?>
                     list.classList.add("current");
                 };
 
-            var currentHash = window.location.hash.length ? window.location.hash.replace("#", "") : "mac-sequoia-x86_64 arm64";
+            var currentHash = window.location.hash.length ? window.location.hash.replace("#", "") : <?= array_keys($platforms)[0] ?>;
             for (var link of tabnav) {
                 link.addEventListener("click", currentTab);
                 if (link.className.indexOf(currentHash) !== -1)
