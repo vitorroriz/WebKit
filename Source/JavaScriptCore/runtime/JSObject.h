@@ -51,12 +51,7 @@ namespace DOMJIT {
 class Signature;
 }
 
-inline JSCell* getJSFunction(JSValue value)
-{
-    if (value.isCell() && (value.asCell()->type() == JSFunctionType))
-        return value.asCell();
-    return nullptr;
-}
+inline JSCell* getJSFunction(JSValue); // Defined in JSObjectInlines.h
 
 class ArrayProfile;
 class Exception;
@@ -249,7 +244,7 @@ public:
     // otherwise, it creates a property with the provided attributes. Semantically, this is performing defineOwnProperty.
     bool putDirectIndex(JSGlobalObject* globalObject, unsigned propertyName, JSValue value, unsigned attributes, PutDirectIndexMode mode)
     {
-        ASSERT(!value.isCustomGetterSetter());
+        ASSERT(!value.isCustomGetterSetterSlow());
         auto canSetIndexQuicklyForPutDirect = [&] () -> bool {
             switch (indexingMode()) {
             case ALL_BLANK_INDEXING_TYPES:
@@ -1447,23 +1442,23 @@ ALWAYS_INLINE bool JSObject::getPropertySlot(JSGlobalObject* globalObject, Prope
 
 inline bool JSObject::putDirect(VM& vm, PropertyName propertyName, JSValue value, unsigned attributes)
 {
-    ASSERT(!value.isGetterSetter() && !(attributes & PropertyAttribute::Accessor));
-    ASSERT(!value.isCustomGetterSetter() && !(attributes & PropertyAttribute::CustomAccessorOrValue));
+    ASSERT(!value.isGetterSetterSlow() && !(attributes & PropertyAttribute::Accessor));
+    ASSERT(!value.isCustomGetterSetterSlow() && !(attributes & PropertyAttribute::CustomAccessorOrValue));
     PutPropertySlot slot(this);
     return putDirectInternal<PutModeDefineOwnProperty>(vm, propertyName, value, attributes, slot).isNull();
 }
 
 inline bool JSObject::putDirect(VM& vm, PropertyName propertyName, JSValue value, unsigned attributes, PutPropertySlot& slot)
 {
-    ASSERT(!value.isGetterSetter());
-    ASSERT(!value.isCustomGetterSetter());
+    ASSERT(!value.isGetterSetterSlow());
+    ASSERT(!value.isCustomGetterSetterSlow());
     return putDirectInternal<PutModeDefineOwnProperty>(vm, propertyName, value, attributes, slot).isNull();
 }
 
 inline bool JSObject::putDirect(VM& vm, PropertyName propertyName, JSValue value, PutPropertySlot& slot)
 {
-    ASSERT(!value.isGetterSetter());
-    ASSERT(!value.isCustomGetterSetter());
+    ASSERT(!value.isGetterSetterSlow());
+    ASSERT(!value.isCustomGetterSetterSlow());
     return putDirectInternal<PutModeDefineOwnProperty>(vm, propertyName, value, 0, slot).isNull();
 }
 

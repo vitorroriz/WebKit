@@ -32,6 +32,7 @@
 #include <JavaScriptCore/JSArrayBufferViewInlines.h>
 #include <JavaScriptCore/JSCellInlines.h>
 #include <JavaScriptCore/JSGenericTypedArrayView.h>
+#include <JavaScriptCore/ToNativeFromValue.h>
 #include <JavaScriptCore/TypeError.h>
 #include <JavaScriptCore/TypedArrays.h>
 #include <wtf/CheckedArithmetic.h>

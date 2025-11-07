@@ -27,7 +27,6 @@
 
 #include <JavaScriptCore/JSArrayBufferView.h>
 #include <JavaScriptCore/ThrowScope.h>
-#include <JavaScriptCore/ToNativeFromValue.h>
 #include <wtf/CheckedArithmetic.h>
 
 namespace JSC {

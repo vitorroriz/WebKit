@@ -55,7 +55,7 @@
 #include "JSArrayIterator.h"
 #include "JSAsyncFromSyncIterator.h"
 #include "JSAsyncGenerator.h"
-#include "JSBigInt.h"
+#include "JSBigIntInlines.h"
 #include "JSBoundFunction.h"
 #include "JSGenericTypedArrayViewConstructorInlines.h"
 #include "JSGenericTypedArrayViewInlines.h"

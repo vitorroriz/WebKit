@@ -45,6 +45,13 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
 
 namespace JSC {
 
+inline JSCell* getJSFunction(JSValue value)
+{
+    if (value.isCell() && (value.asCell()->type() == JSFunctionType))
+        return value.asCell();
+    return nullptr;
+}
+
 inline Structure* JSObject::createStructure(VM& vm, JSGlobalObject* globalObject, JSValue prototype)
 {
     return Structure::create(vm, globalObject, prototype, TypeInfo(ObjectType, StructureFlags), info());
