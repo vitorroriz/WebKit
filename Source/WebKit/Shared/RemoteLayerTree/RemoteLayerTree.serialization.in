@@ -298,4 +298,5 @@ struct WebKit::RemoteLayerTreeCommitBundle {
     Vector<WebKit::RemoteLayerTreeCommitBundle::RootFrameData> transactions;
     WebKit::PageData pageData;
     std::optional<WebKit::MainFrameData> mainFrameData;
+    MonotonicTime startTime;
 };
