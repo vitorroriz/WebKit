@@ -5127,12 +5127,12 @@ void WebPage::updateVisibleContentRects(const VisibleContentRectUpdateInfo& visi
     auto scrollPosition = roundedIntPoint(unobscuredContentRect.location());
 
     // Computation of layoutViewportRect is done in LayoutUnits which loses some precision, so test with an epsilon.
-    // FIXME: The loss of precision when converting floating point values to LayoutUnit does not, by itself, explain
+    // FIXME (302123): The loss of precision when converting floating point values to LayoutUnit does not, by itself, explain
     // the differences between the `layoutViewportRect` and `unobscuredContentRect`'s locations. While scrolling on iOS,
     // the absolute differences can sometimes exceed 3px, which is well over this fractional error threshold.
     // For now, we maintain behavior shipped in iOS 26 by snapping to the unobscured content rect location as long as
-    // the difference is fairly small (~5 px).
-    static constexpr auto maxEpsilon = 5.0;
+    // the difference is fairly small (~45 px).
+    static constexpr auto maxEpsilon = 45.0;
     static constexpr auto epsilonRatio = 1.0 / (2 * kFixedPointDenominator);
     auto unobscuredContentRectLocation = unobscuredContentRect.location();
     auto epsilonX = std::min(maxEpsilon, epsilonRatio * std::abs(unobscuredContentRectLocation.x()));
