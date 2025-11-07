@@ -185,9 +185,8 @@ void RunLoop::observeActivity(const Ref<ActivityObserver>& observer)
 
 void RunLoop::unobserveActivity(const Ref<ActivityObserver>& observer)
 {
-    // Don't assert that m_activityObservers contains the observer -- it might have been
-    // removed during notifyActivity() if it was a non-repeating observer.
     Locker locker { m_activityObserversLock };
+    ASSERT(m_activityObservers.contains(observer));
     m_activityObservers.removeFirst(observer);
 }
 
@@ -208,17 +207,9 @@ void RunLoop::notifyActivity(Activity activity)
 
     // Notify the activity observers, without holding a lock - as mutations
     // to the activity observers are allowed.
-    ActivityObservers observersToBeInvalidated;
     for (Ref observer : observersToBeNotified) {
         if (observer->notify() == ActivityObserver::NotifyResult::Stop)
-            observersToBeInvalidated.append(observer);
-    }
-
-    // Invalidation needs to happen _after_ dispatching all notifications.
-    if (!observersToBeInvalidated.isEmpty()) {
-        Locker locker { m_activityObserversLock };
-        for (Ref observer : observersToBeInvalidated)
-            m_activityObservers.removeFirst(observer);
+            observer->stop();
     }
 }
 
