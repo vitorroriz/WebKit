@@ -3031,7 +3031,8 @@ static void handleVimeoQuirks(QuirksData& quirksData, const URL& quirksURL, cons
     // Vimeo.com has incorrect layout on iOS on certain videos with wider
     // aspect ratios than the device's screen in landscape mode.
     // (Ref: rdar://116531089)
-    quirksData.shouldDisableElementFullscreen = true;
+    if (PAL::currentUserInterfaceIdiomIsSmallScreen())
+        quirksData.shouldDisableElementFullscreen = true;
 #endif
 #if ENABLE(VIDEO_PRESENTATION_MODE)
     // vimeo.com: rdar://problem/73227900
