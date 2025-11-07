@@ -21,34 +21,39 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if PLATFORM(MAC) && HAVE(WK_SECURE_CODING_DATA_DETECTORS)
-secure_coding_header: <pal/mac/DataDetectorsSoftLink.h>
 
-[WebKitSecureCodingClass=PAL::getWKDDActionContextClassSingleton()] webkit_secure_coding DDSecureActionContext {
-    highlightFrame: NSValue
-    aimFrame: NSValue
-    eventTitle: String
-    leadingText: String
-    trailingText: String
-    coreSpotlightUniqueIdentifier: String
-    referenceDate: Date
-    hostUUID: String
-    authorABUUID: String
-    authorEmailAddress: String
-    authorName: String
-    url: URL
-    matchedString: String
+webkit_platform_headers: "CoreIPCDDSecureActionContext.h"
+[WebKitPlatform, CustomHeader] struct WebKit::CoreIPCDDSecureActionContextData {
+    WebCore::IntRect highlightFrame;
+    WebCore::IntRect aimFrame;
+    RetainPtr<NSString> eventTitle;
+    RetainPtr<NSString> leadingText;
+    RetainPtr<NSString> trailingText;
+    RetainPtr<NSString> coreSpotlightUniqueIdentifier;
+    RetainPtr<NSDate> referenceDate;
+    RetainPtr<NSString> hostUUID;
+    RetainPtr<NSString> authorABUUID;
+    RetainPtr<NSString> authorEmailAddress;
+    RetainPtr<NSString> authorName;
+    RetainPtr<NSURL> url;
+    RetainPtr<NSString> matchedString;
 
-    allResults: Array<DDScannerResult>?
-    groupAllResults: Array<DDScannerResult>
-    groupCategory: Number
-    groupTranscript: String
-    selectionString: String
+    std::optional<Vector<RetainPtr<DDScannerResult>>> allResults;
+    Vector<RetainPtr<DDScannerResult>> groupAllResults;
+    RetainPtr<NSNumber> groupCategory;
+    RetainPtr<NSString> groupTranscript;
+    RetainPtr<NSString> selectionString;
 
-    mainResult: DDScannerResult?
+    std::optional<RetainPtr<DDScannerResult>> mainResult;
 
-    immediate: Number
-    isRightClick: Number
-    authorNameComponents: PersonNameComponents
+    bool immediate;
+    bool isRightClick;
+    std::optional<bool> bypassScreentimeContactShield;
+    RetainPtr<NSPersonNameComponents> authorNameComponents;
 }
 
-#endif // PLATFORM(MAC) && HAVE(WK_SECURE_CODING_DATA_DETECTORS)
+[WebKitPlatform] class WebKit::CoreIPCDDSecureActionContext {
+    WebKit::CoreIPCDDSecureActionContextData m_data;
+}
+
+#endif

@@ -656,7 +656,6 @@ SERIALIZATION_DESCRIPTION_FILES = \
 	Shared/Cocoa/CoreIPCCFURL.serialization.in \
 	Shared/Cocoa/CoreIPCColor.serialization.in \
 	Shared/Cocoa/CoreIPCContacts.serialization.in \
-	Shared/Cocoa/CoreIPCDDActionContext.serialization.in \
 	Shared/Cocoa/CoreIPCDDScannerResult.serialization.in \
 	Shared/Cocoa/CoreIPCData.serialization.in \
 	Shared/Cocoa/CoreIPCDate.serialization.in \
@@ -741,6 +740,7 @@ SERIALIZATION_DESCRIPTION_FILES = \
 	Shared/ios/DragInitiationResult.serialization.in \
 	Shared/ios/WebAutocorrectionContext.serialization.in \
 	Shared/ios/WebAutocorrectionData.serialization.in \
+	Shared/mac/CoreIPCDDSecureActionContext.serialization.in \
 	Shared/JavaScriptCore.serialization.in \
 	Shared/LayerTreeContext.serialization.in \
 	Shared/LoadParameters.serialization.in \

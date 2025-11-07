@@ -1748,7 +1748,7 @@ static RetainPtr<DDScannerResult> fakeDataDetectorResultForTesting()
                                  signature:(NSData *)signature;
 @end
 
-TEST(IPCSerialization, SecureCoding)
+TEST(IPCSerialization, DataDetectors)
 {
     // DDScannerResult
     //   - Note: For now, there's no reasonable way to create anything but an empty DDScannerResult object
@@ -1764,7 +1764,10 @@ TEST(IPCSerialization, SecureCoding)
     [actionContext setHighlightFrame:NSMakeRect(1, 2, 3, 4)];
 
     runTestNS({ actionContext.get() });
+}
 
+TEST(IPCSerialization, SecureCoding)
+{
     // PKPaymentMerchantSession
     // This initializer doesn't exercise retryNonce or domain
     RetainPtr<PKPaymentMerchantSession> session = adoptNS([[PAL::getPKPaymentMerchantSessionClassSingleton() alloc]

@@ -855,17 +855,19 @@ header: <WebCore/RenderStyleConstants.h>
     WebCore::FloatSize radii().bottomRight();
 }
 
-[AdditionalEncoder=StreamConnectionEncoder] class WebCore::IntRect {
+webkit_platform_headers: <WebCore/IntRect.h>
+
+[AdditionalEncoder=StreamConnectionEncoder, WebKitPlatform] class WebCore::IntRect {
     WebCore::IntPoint location();
     [Validator='WebCore::IntRect { *location, *size }.isValid()'] WebCore::IntSize size();
 }
 
-[AdditionalEncoder=StreamConnectionEncoder] class WebCore::IntPoint {
+[AdditionalEncoder=StreamConnectionEncoder, WebKitPlatform] class WebCore::IntPoint {
     int x();
     int y();
 }
 
-[AdditionalEncoder=StreamConnectionEncoder] class WebCore::IntSize {
+[AdditionalEncoder=StreamConnectionEncoder, WebKitPlatform] class WebCore::IntSize {
     int width();
     int height();
 }
