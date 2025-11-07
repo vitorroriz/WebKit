@@ -98,7 +98,6 @@ static NSString * const WebSubframeArchivesKey = @"WebSubframeArchives";
 
 - (void)setCoreArchive:(Ref<LegacyWebArchive>&&)newCoreArchive
 {
-    ASSERT(coreArchive);
     coreArchive = WTFMove(newCoreArchive);
 }
 
