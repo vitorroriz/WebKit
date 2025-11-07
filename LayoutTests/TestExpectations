@@ -8154,6 +8154,8 @@ imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-height-40
 imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-width-40.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/visudet/replaced-elements-min-width-80.html [ ImageOnlyFailure ]
 
+imported/w3c/web-platform-tests/css/CSS2/abspos/remove-block-between-inline-and-abspos.html [ ImageOnlyFailure ]
+
 imported/w3c/web-platform-tests/css/CSS2/linebox/baseline-block-with-overflow-001.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/linebox/inline-formatting-context-023.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/linebox/vertical-align-117a.xht [ ImageOnlyFailure ]
