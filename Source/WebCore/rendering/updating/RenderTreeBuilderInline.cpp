@@ -443,7 +443,7 @@ void RenderTreeBuilder::Inline::wrapRunsOfBlocksInAnonymousBlock(RenderInline& p
     // Wrap runs of block boxes with an anonymous block so their margins collapse correctly for blocks-in-inline.
     ASSERT(!m_buildsContinuations);
 
-    auto dropNestedAnonymousBlocks = [&](CheckedRef<RenderBlock> anonymousBlock) {
+    auto dropNestedAnonymousBlocks = [&](CheckedRef<RenderBlockFlow> anonymousBlock) {
         ASSERT(anonymousBlock->isAnonymousBlock());
         SingleThreadWeakPtr<RenderObject> nextChild;
         for (SingleThreadWeakPtr<RenderObject> movedChild = anonymousBlock->firstChild(); movedChild; movedChild = nextChild) {
@@ -454,10 +454,10 @@ void RenderTreeBuilder::Inline::wrapRunsOfBlocksInAnonymousBlock(RenderInline& p
         }
     };
 
-    SingleThreadWeakPtr<RenderBlock> firstInRun;
-    SingleThreadWeakPtr<RenderBlock> lastInRun;
+    SingleThreadWeakPtr<RenderBox> firstInRun;
+    SingleThreadWeakPtr<RenderBox> lastInRun;
 
-    auto wrapInAnonymousBlockIfNeeded = [&] {
+    auto wrapRunInAnonymousBlockIfNeeded = [&] {
         // Only wrap if there are multiple consecutive blocks.
         if (firstInRun == lastInRun)
             return;
@@ -474,19 +474,19 @@ void RenderTreeBuilder::Inline::wrapRunsOfBlocksInAnonymousBlock(RenderInline& p
 
     for (CheckedPtr child = parent.firstChild() ; child; child = child->nextSibling()) {
         if (child->isInline()) {
-            wrapInAnonymousBlockIfNeeded();
+            wrapRunInAnonymousBlockIfNeeded();
             firstInRun = nullptr;
             lastInRun = nullptr;
             continue;
         }
-        if (auto* blockChild = dynamicDowncast<RenderBlock>(*child); blockChild && blockChild->isInFlow()) {
+        if (auto* blockChild = dynamicDowncast<RenderBox>(*child); blockChild && blockChild->isInFlow()) {
             // Floats and out-of-flow boxes are wrapped if they are in the middle of a block run.
             if (!firstInRun)
                 firstInRun = blockChild;
             lastInRun = blockChild;
         }
     }
-    wrapInAnonymousBlockIfNeeded();
+    wrapRunInAnonymousBlockIfNeeded();
 }
 
 }
