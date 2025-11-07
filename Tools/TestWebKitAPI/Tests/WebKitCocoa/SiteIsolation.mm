@@ -6139,10 +6139,10 @@ TEST(SiteIsolation, SharedProcessWithResourceLoadStatistics)
     [defaultFileManager copyItemAtPath:sourceFile.path toPath:itpDatabaseFile.path error:nil];
     EXPECT_TRUE([defaultFileManager fileExistsAtPath:itpDatabaseFile.path]);
 
-    WebCore::SQLiteDatabase database;
-    EXPECT_TRUE(database.open(itpDatabaseFile.path));
-    EXPECT_TRUE(database.executeCommand("UPDATE ObservedDomains SET hadUserInteraction = 1 WHERE registrableDomain = 'webkit.org'"_s));
-    database.close();
+    auto database = makeUniqueRef<WebCore::SQLiteDatabase>();
+    EXPECT_TRUE(database->open(itpDatabaseFile.path));
+    EXPECT_TRUE(database->executeCommand("UPDATE ObservedDomains SET hadUserInteraction = 1 WHERE registrableDomain = 'webkit.org'"_s));
+    database->close();
 
     auto [webView, navigationDelegate] = siteIsolatedViewWithSharedProcess(server, EnableProcessCache::No, dataStoreRoot, itpRoot);
     [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/example"]]];
