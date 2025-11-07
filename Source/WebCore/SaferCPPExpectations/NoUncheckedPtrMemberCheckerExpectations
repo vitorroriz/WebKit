@@ -38,8 +38,6 @@ rendering/BackgroundPainter.h
 rendering/GlyphDisplayListCache.cpp
 rendering/GridTrackSizingAlgorithm.h
 rendering/InlineBoxPainter.h
-rendering/LayerOverlapMap.cpp
-rendering/LayerOverlapMap.h
 rendering/LayoutRepainter.h
 rendering/LegacyInlineIterator.h
 rendering/LegacyLineLayout.h

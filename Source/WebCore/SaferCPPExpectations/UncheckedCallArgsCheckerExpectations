@@ -469,7 +469,6 @@ rendering/GridTrackSizingAlgorithm.cpp
 rendering/HitTestResult.cpp
 rendering/ImageQualityController.cpp
 rendering/InlineBoxPainter.cpp
-rendering/LayerOverlapMap.cpp
 rendering/LayoutRepainter.cpp
 rendering/LegacyInlineBox.cpp
 rendering/LegacyInlineBox.h
