@@ -64,9 +64,9 @@ namespace WebCore {
 static inline Vector<MockMediaDevice> defaultDevices()
 {
     return Vector<MockMediaDevice> {
-        MockMediaDevice { "239c24b0-2b15-11e3-8224-0800200c9a66"_s, "Mock audio device 1"_s, { }, true, MockMicrophoneProperties { 44100 , { } } },
-        MockMediaDevice { "239c24b1-2b15-11e3-8224-0800200c9a66"_s, "Mock audio device 2"_s, { }, false, MockMicrophoneProperties { 48000, { false } } },
-        MockMediaDevice { "239c24b1-3b15-11e3-8224-0800200c9a66"_s, "Mock audio device 3"_s, { }, false, MockMicrophoneProperties { 96000, { true } } },
+        MockMediaDevice { "239c24b0-2b15-11e3-8224-0800200c9a66"_s, "Mock audio device 1"_s, { }, true, MockMicrophoneProperties { 44100 , { }, 1 } },
+        MockMediaDevice { "239c24b1-2b15-11e3-8224-0800200c9a66"_s, "Mock audio device 2"_s, { }, false, MockMicrophoneProperties { 48000, { false }, 2 } },
+        MockMediaDevice { "239c24b1-3b15-11e3-8224-0800200c9a66"_s, "Mock audio device 3"_s, { }, false, MockMicrophoneProperties { 96000, { true }, 3 } },
 
         MockMediaDevice { "239c24b0-2b15-11e3-8224-0800200c9a67"_s, "Mock speaker device 1"_s, { }, true, MockSpeakerProperties { "239c24b0-2b15-11e3-8224-0800200c9a66"_s, 44100 } },
         MockMediaDevice { "239c24b1-2b15-11e3-8224-0800200c9a67"_s, "Mock speaker device 2"_s, { }, false, MockSpeakerProperties { "239c24b1-2b15-11e3-8224-0800200c9a66"_s, 48000 } },
@@ -503,8 +503,13 @@ static bool shouldBeDefaultDevice(const MockMediaDevice& device)
     return cameraProperties && cameraProperties->facingMode == VideoFacingMode::Unknown;
 }
 
-void MockRealtimeMediaSourceCenter::addDevice(const MockMediaDevice& device)
+void MockRealtimeMediaSourceCenter::addDevice(const MockMediaDevice& newDevice)
 {
+    auto device = newDevice;
+
+    if (device.isMicrophone())
+        std::get<MockMicrophoneProperties>(device.properties).deviceID = microphoneDevices().size() + 1;
+
     bool isDefault = device.isDefault || shouldBeDefaultDevice(device);
 
     if (isDefault)
@@ -565,6 +570,15 @@ std::optional<MockMediaDevice> MockRealtimeMediaSourceCenter::mockDeviceWithPers
         return std::nullopt;
 
     return iterator->value;
+}
+
+std::optional<MockMediaDevice> MockRealtimeMediaSourceCenter::mockMicrophoneFromDeviceID(uint32_t deviceID)
+{
+    for (auto& device : deviceMap().values()) {
+        if (device.isMicrophone() && std::get<MockMicrophoneProperties>(device.properties).deviceID == deviceID)
+            return device;
+    }
+    return { };
 }
 
 std::optional<CaptureDevice> MockRealtimeMediaSourceCenter::captureDeviceWithPersistentID(CaptureDevice::DeviceType type, const String& id)

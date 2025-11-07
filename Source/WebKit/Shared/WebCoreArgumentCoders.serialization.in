@@ -6336,6 +6336,7 @@ header: <WebCore/MockMediaDevice.h>
 [CustomHeader] struct WebCore::MockMicrophoneProperties {
     int defaultSampleRate;
     std::optional<bool> echoCancellation;
+    uint32_t deviceID;
 };
 
 header: <WebCore/MockMediaDevice.h>

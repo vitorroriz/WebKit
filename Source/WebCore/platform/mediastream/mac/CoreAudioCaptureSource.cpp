@@ -96,9 +96,9 @@ CaptureSourceOrError CoreAudioCaptureSource::create(const CaptureDevice& device,
     return initializeCoreAudioCaptureSource(WTFMove(source), constraints);
 }
 
-CaptureSourceOrError CoreAudioCaptureSource::createForTesting(String&& deviceID, AtomString&& label, MediaDeviceHashSalts&& hashSalts, const MediaConstraints* constraints, std::optional<PageIdentifier> pageIdentifier, std::optional<bool> echoCancellation)
+CaptureSourceOrError CoreAudioCaptureSource::createForTesting(String&& persistentID, uint32_t deviceID, AtomString&& label, MediaDeviceHashSalts&& hashSalts, const MediaConstraints* constraints, std::optional<PageIdentifier> pageIdentifier, std::optional<bool> echoCancellation)
 {
-    auto source = adoptRef(*new CoreAudioCaptureSource(CaptureDevice { WTFMove(deviceID), CaptureDevice::DeviceType::Microphone, WTFMove(label) }, 0, WTFMove(hashSalts), pageIdentifier));
+    auto source = adoptRef(*new CoreAudioCaptureSource(CaptureDevice { WTFMove(persistentID), CaptureDevice::DeviceType::Microphone, WTFMove(label) }, deviceID, WTFMove(hashSalts), pageIdentifier));
     if (echoCancellation) {
         source->m_echoCancellationCapability = *echoCancellation;
         source->initializeEchoCancellation(*echoCancellation);

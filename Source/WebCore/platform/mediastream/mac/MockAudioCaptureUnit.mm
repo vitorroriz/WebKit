@@ -90,7 +90,7 @@ CaptureSourceOrError MockRealtimeAudioSource::create(String&& deviceID, AtomStri
     if (!device)
         return CaptureSourceOrError({ "No mock microphone device"_s , MediaAccessDenialReason::PermissionDenied });
 
-    return CoreAudioCaptureSource::createForTesting(WTFMove(deviceID), WTFMove(name), WTFMove(hashSalts), constraints, pageIdentifier, std::get<MockMicrophoneProperties>(device->properties).echoCancellation);
+    return CoreAudioCaptureSource::createForTesting(WTFMove(deviceID), std::get<MockMicrophoneProperties>(device->properties).deviceID, WTFMove(name), WTFMove(hashSalts), constraints, pageIdentifier, std::get<MockMicrophoneProperties>(device->properties).echoCancellation);
 }
 
 class MockAudioCaptureInternalUnitState : public ThreadSafeRefCounted<MockAudioCaptureInternalUnitState> {
@@ -419,7 +419,7 @@ OSStatus MockAudioCaptureInternalUnit::render(AudioUnitRenderActionFlags*, const
     return 0;
 }
 
-OSStatus MockAudioCaptureInternalUnit::set(AudioUnitPropertyID property, AudioUnitScope scope, AudioUnitElement, const void* value, UInt32)
+OSStatus MockAudioCaptureInternalUnit::set(AudioUnitPropertyID property, AudioUnitScope scope, AudioUnitElement bus, const void* value, UInt32)
 {
     if (property == kAudioUnitProperty_StreamFormat) {
         auto& typedValue = *static_cast<const AudioStreamBasicDescription*>(value);
@@ -438,8 +438,15 @@ OSStatus MockAudioCaptureInternalUnit::set(AudioUnitPropertyID property, AudioUn
         return 0;
     }
     if (property == kAudioOutputUnitProperty_CurrentDevice) {
-        ASSERT(!*static_cast<const uint32_t*>(value));
-        auto device = MockRealtimeMediaSourceCenter::mockDeviceWithPersistentID(CoreAudioCaptureUnit::defaultSingleton().persistentIDForTesting());
+        uint32_t deviceID = *static_cast<const uint32_t*>(value);
+        static const AudioUnitElement outputBus = 0;
+        if (bus == outputBus) {
+            ASSERT(!deviceID);
+            return 0;
+        }
+
+        ASSERT(deviceID);
+        auto device = MockRealtimeMediaSourceCenter::mockMicrophoneFromDeviceID(deviceID);
         if (!device)
             return -1;
 
@@ -472,7 +479,7 @@ OSStatus MockAudioCaptureInternalUnit::get(AudioUnitPropertyID property, AudioUn
 
 OSStatus MockAudioCaptureInternalUnit::defaultInputDevice(uint32_t* device)
 {
-    *device = 0;
+    *device = 1;
     return 0;
 }
 
