@@ -2197,7 +2197,7 @@ void testVectorXorOrAllOnesToVectorAndXor()
     Value* address = arguments[0];
     Value* constant = root->appendNew<Const128Value>(proc, Origin(), vectorAllOnes());
     Value* input0 = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address);
-    Value* input1 = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address, sizeof(v128_t));
+    Value* input1 = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address, static_cast<int32_t>(sizeof(v128_t)));
     Value* result0 = root->appendNew<SIMDValue>(proc, Origin(), VectorXor, B3::V128, SIMDLane::v128, SIMDSignMode::None, input0, constant);
     Value* result1 = root->appendNew<SIMDValue>(proc, Origin(), VectorXor, B3::V128, SIMDLane::v128, SIMDSignMode::None, input1, constant);
     Value* result = root->appendNew<SIMDValue>(proc, Origin(), VectorOr, B3::V128, SIMDLane::v128, SIMDSignMode::None, result0, result1);
@@ -2226,7 +2226,7 @@ void testVectorXorAndAllOnesToVectorOrXor()
     Value* address = arguments[0];
     Value* constant = root->appendNew<Const128Value>(proc, Origin(), vectorAllOnes());
     Value* input0 = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address);
-    Value* input1 = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address, sizeof(v128_t));
+    Value* input1 = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address, static_cast<int32_t>(sizeof(v128_t)));
     Value* result0 = root->appendNew<SIMDValue>(proc, Origin(), VectorXor, B3::V128, SIMDLane::v128, SIMDSignMode::None, input0, constant);
     Value* result1 = root->appendNew<SIMDValue>(proc, Origin(), VectorXor, B3::V128, SIMDLane::v128, SIMDSignMode::None, input1, constant);
     Value* result = root->appendNew<SIMDValue>(proc, Origin(), VectorAnd, B3::V128, SIMDLane::v128, SIMDSignMode::None, result0, result1);
@@ -2681,7 +2681,7 @@ void testVectorMulHigh()
 
         Value* address = arguments[0];
         Value* input0 = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address);
-        Value* input1 = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address, sizeof(v128_t));
+        Value* input1 = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address, static_cast<int32_t>(sizeof(v128_t)));
         Value* result = root->appendNew<SIMDValue>(proc, Origin(), VectorMulHigh, B3::V128, lane, signMode, input0, input1);
         root->appendNew<MemoryValue>(proc, Store, Origin(), result, address);
         root->appendNewControlValue(proc, Return, Origin());
@@ -2736,7 +2736,7 @@ void testVectorMulLow()
 
         Value* address = arguments[0];
         Value* input0 = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address);
-        Value* input1 = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address, sizeof(v128_t));
+        Value* input1 = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address, static_cast<int32_t>(sizeof(v128_t)));
         Value* result = root->appendNew<SIMDValue>(proc, Origin(), VectorMulLow, B3::V128, lane, signMode, input0, input1);
         root->appendNew<MemoryValue>(proc, Store, Origin(), result, address);
         root->appendNewControlValue(proc, Return, Origin());

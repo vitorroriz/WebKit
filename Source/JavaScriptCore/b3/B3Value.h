@@ -62,7 +62,7 @@ class Procedure;
 // isLegalOffset runtime method used to determine value legality at runtime. This is exposed to users
 // of B3 to force them to reason about the target's offset.
 template<typename Int>
-concept IsLegalOffset = std::integral<Int>;
+concept IsLegalOffset = std::signed_integral<Int> && sizeof(Int) <= sizeof(int32_t);
 
 class JS_EXPORT_PRIVATE Value {
     WTF_MAKE_SEQUESTERED_ARENA_ALLOCATED(Value);
