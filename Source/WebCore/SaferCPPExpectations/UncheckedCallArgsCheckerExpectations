@@ -214,8 +214,6 @@ html/HTMLLinkElement.cpp
 html/HTMLMediaElement.cpp
 html/HTMLMetaElement.cpp
 html/HTMLNameCollectionInlines.h
-html/HTMLObjectElement.cpp
-html/HTMLOptionElement.cpp
 html/HTMLOptionsCollection.cpp
 html/HTMLPlugInElement.cpp
 html/HTMLSelectElement.cpp

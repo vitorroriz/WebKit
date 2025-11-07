@@ -429,7 +429,6 @@ html/HTMLMaybeFormAssociatedCustomElement.cpp
 html/HTMLMediaElement.cpp
 html/HTMLMetaElement.cpp
 html/HTMLNameCollectionInlines.h
-html/HTMLObjectElement.cpp
 html/HTMLOptionsCollection.cpp
 html/HTMLPlugInElement.cpp
 html/HTMLTableRowsCollection.cpp

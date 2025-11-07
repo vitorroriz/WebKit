@@ -213,8 +213,8 @@ void HTMLOptionElement::attributeChanged(const QualifiedName& name, const AtomSt
         if (m_disabled != newDisabled) {
             Style::PseudoClassChangeInvalidation disabledInvalidation(*this, { { CSSSelector::PseudoClass::Disabled, newDisabled },  { CSSSelector::PseudoClass::Enabled, !newDisabled } });
             m_disabled = newDisabled;
-            if (renderer() && renderer()->style().hasUsedAppearance())
-                renderer()->repaint();
+            if (CheckedPtr renderer = this->renderer(); renderer && renderer->style().hasUsedAppearance())
+                renderer->repaint();
         }
         break;
     }
