@@ -460,6 +460,8 @@
                 "inline-flex",
                 "grid",
                 "inline-grid",
+                "masonry",
+                "inline-masonry",
                 {
                     "value": "ruby",
                     "status": "unimplemented"
@@ -14015,7 +14017,7 @@
             }
         },
         "<display-inside>": {
-            "grammar": "flow | flow-root | table | flex | grid | ruby",
+            "grammar": "flow | flow-root | table | flex | grid | masonry | ruby",
             "specification": {
                 "category": "css-display",
                 "url": "https://www.w3.org/TR/css-display-3/#typedef-display-inside"
@@ -14043,7 +14045,7 @@
             }
         },
         "<display-legacy>": {
-            "grammar": "inline-block | inline-table | inline-flex | inline-grid",
+            "grammar": "inline-block | inline-table | inline-flex | inline-grid | inline-masonry",
             "specification": {
                 "category": "css-display",
                 "url": "https://www.w3.org/TR/css-display-3/#typedef-display-legacy"

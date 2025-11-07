@@ -3750,6 +3750,7 @@ static bool displayTypeNeedsSpace(DisplayType type)
         || type == DisplayType::InlineBlock
         || type == DisplayType::InlineFlex
         || type == DisplayType::InlineGrid
+        || type == DisplayType::InlineMasonry
         || type == DisplayType::InlineTable
         || type == DisplayType::TableCell;
 }
