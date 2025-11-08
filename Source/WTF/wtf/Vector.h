@@ -1114,7 +1114,7 @@ void Vector<T, inlineCapacity, OverflowHandler, minCapacity, Malloc>::fill(const
 
     asanBufferSizeWillChangeTo(newSize);
 
-    std::fill(begin(), end(), val);
+    std::ranges::fill(*this, val);
     TypeOperations::uninitializedFill(end(), begin() + newSize, val);
     m_size = newSize;
 }
