@@ -2816,8 +2816,7 @@ auto ByteCodeParser::handleIntrinsicCall(Node* callee, Operand resultOperand, Ca
         }
 
         case ArrayIncludesIntrinsic:
-        case ArrayIndexOfIntrinsic:
-        case ArrayLastIndexOfIntrinsic: {
+        case ArrayIndexOfIntrinsic: {
             if (argumentCountIncludingThis < 2)
                 return CallOptimizationResult::DidNothing;
 
@@ -2862,9 +2861,7 @@ auto ByteCodeParser::handleIntrinsicCall(Node* callee, Operand resultOperand, Ca
 
                     Node* node = intrinsic == ArrayIncludesIntrinsic
                         ? addToGraph(Node::VarArg, ArrayIncludes, OpInfo(arrayMode.asWord()), OpInfo())
-                        : intrinsic == ArrayIndexOfIntrinsic
-                            ? addToGraph(Node::VarArg, ArrayIndexOf, OpInfo(arrayMode.asWord()), OpInfo())
-                            : addToGraph(Node::VarArg, ArrayLastIndexOf, OpInfo(arrayMode.asWord()), OpInfo());
+                        : addToGraph(Node::VarArg, ArrayIndexOf, OpInfo(arrayMode.asWord()), OpInfo());
                     setResult(node);
                     return CallOptimizationResult::Inlined;
                 }
