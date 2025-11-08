@@ -655,7 +655,7 @@ class ExtractBuiltProduct(shell.ShellCommand):
 class UploadBuiltProduct(transfer.FileUpload):
     name = 'upload-built-product'
     workersrc = WithProperties("WebKitBuild/%(configuration)s.zip")
-    masterdest = WithProperties("archives/%(fullPlatform)s-%(architecture)s-%(configuration)s/%(archive_revision)s.zip")
+    masterdest = WithProperties("archives/%(fullPlatform)s-%(archForUpload)s-%(configuration)s/%(archive_revision)s.zip")
     haltOnFailure = True
 
     def __init__(self, **kwargs):
@@ -669,14 +669,14 @@ class UploadBuiltProduct(transfer.FileUpload):
 class UploadMinifiedBuiltProduct(UploadBuiltProduct):
     name = 'upload-minified-built-product'
     workersrc = WithProperties("WebKitBuild/minified-%(configuration)s.zip")
-    masterdest = WithProperties("archives/%(fullPlatform)s-%(architecture)s-%(configuration)s/minified-%(archive_revision)s.zip")
+    masterdest = WithProperties("archives/%(fullPlatform)s-%(archForUpload)s-%(configuration)s/minified-%(archive_revision)s.zip")
 
 
 class DownloadBuiltProduct(shell.ShellCommand):
     command = [
         "python3", "Tools/CISupport/download-built-product",
         WithProperties("--platform=%(platform)s"), WithProperties("--%(configuration)s"),
-        WithProperties(S3URL + S3_BUCKET + "/%(fullPlatform)s-%(architecture)s-%(configuration)s/%(archive_revision)s.zip"),
+        WithProperties(S3URL + S3_BUCKET + "/%(fullPlatform)s-%(archForUpload)s-%(configuration)s/%(archive_revision)s.zip"),
     ]
     name = "download-built-product"
     description = ["downloading built product"]
@@ -698,7 +698,7 @@ class DownloadBuiltProduct(shell.ShellCommand):
 
 
 class DownloadBuiltProductFromMaster(transfer.FileDownload):
-    mastersrc = WithProperties('archives/%(fullPlatform)s-%(architecture)s-%(configuration)s/%(archive_revision)s.zip')
+    mastersrc = WithProperties('archives/%(fullPlatform)s-%(archForUpload)s-%(configuration)s/%(archive_revision)s.zip')
     workerdest = WithProperties('WebKitBuild/%(configuration)s.zip')
     name = 'download-built-product-from-master'
     description = ['downloading built product from buildbot master']
@@ -2024,9 +2024,9 @@ class TransferToS3(master.MasterShellCommand):
     name = "transfer-to-s3"
     description = ["transferring to s3"]
     descriptionDone = ["transferred to s3"]
-    archive = WithProperties("archives/%(fullPlatform)s-%(architecture)s-%(configuration)s/%(archive_revision)s.zip")
-    minifiedArchive = WithProperties("archives/%(fullPlatform)s-%(architecture)s-%(configuration)s/minified-%(archive_revision)s.zip")
-    identifier = WithProperties("%(fullPlatform)s-%(architecture)s-%(configuration)s")
+    archive = WithProperties("archives/%(fullPlatform)s-%(archForUpload)s-%(configuration)s/%(archive_revision)s.zip")
+    minifiedArchive = WithProperties("archives/%(fullPlatform)s-%(archForUpload)s-%(configuration)s/minified-%(archive_revision)s.zip")
+    identifier = WithProperties("%(fullPlatform)s-%(archForUpload)s-%(configuration)s")
     revision = WithProperties("%(archive_revision)s")
     command = ["python3", "../Shared/transfer-archive-to-s3", "--revision", revision, "--identifier", identifier, "--archive", archive]
     haltOnFailure = True

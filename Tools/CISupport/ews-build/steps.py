@@ -5374,7 +5374,7 @@ class ArchiveBuiltProduct(shell.ShellCommand):
 class UploadBuiltProduct(transfer.FileUpload):
     name = 'upload-built-product'
     workersrc = WithProperties('WebKitBuild/%(configuration)s.zip')
-    masterdest = WithProperties('public_html/archives/%(fullPlatform)s-%(architecture)s-%(configuration)s/%(change_id)s.zip')
+    masterdest = WithProperties('public_html/archives/%(fullPlatform)s-%(archForUpload)s-%(configuration)s/%(change_id)s.zip')
     descriptionDone = ['Uploaded built product']
     haltOnFailure = True
 
@@ -5513,8 +5513,8 @@ class TransferToS3(master.MasterShellCommand):
     name = 'transfer-to-s3'
     description = ['transferring to s3']
     descriptionDone = ['Transferred archive to S3']
-    archive = WithProperties('public_html/archives/%(fullPlatform)s-%(architecture)s-%(configuration)s/%(change_id)s.zip')
-    identifier = WithProperties('%(fullPlatform)s-%(architecture)s-%(configuration)s')
+    archive = WithProperties('public_html/archives/%(fullPlatform)s-%(archForUpload)s-%(configuration)s/%(change_id)s.zip')
+    identifier = WithProperties('%(fullPlatform)s-%(archForUpload)s-%(configuration)s')
     change_id = WithProperties('%(change_id)s')
     command = ['python3', '../Shared/transfer-archive-to-s3', '--change-id', change_id, '--identifier', identifier, '--archive', archive]
     haltOnFailure = False
@@ -5555,7 +5555,7 @@ class DownloadBuiltProduct(shell.ShellCommand):
     command = [
         'python3', 'Tools/CISupport/download-built-product',
         WithProperties('--%(configuration)s'),
-        WithProperties(S3URL + S3_BUCKET + '/%(fullPlatform)s-%(architecture)s-%(configuration)s/%(change_id)s.zip'),
+        WithProperties(S3URL + S3_BUCKET + '/%(fullPlatform)s-%(archForUpload)s-%(configuration)s/%(change_id)s.zip'),
     ]
     name = 'download-built-product'
     description = ['downloading built product']
@@ -5585,7 +5585,7 @@ class DownloadBuiltProduct(shell.ShellCommand):
 
 
 class DownloadBuiltProductFromMaster(transfer.FileDownload):
-    mastersrc = WithProperties('public_html/archives/%(fullPlatform)s-%(architecture)s-%(configuration)s/%(change_id)s.zip')
+    mastersrc = WithProperties('public_html/archives/%(fullPlatform)s-%(archForUpload)s-%(configuration)s/%(change_id)s.zip')
     workerdest = WithProperties('WebKitBuild/%(configuration)s.zip')
     name = 'download-built-product-from-master'
     description = ['downloading built product from buildbot master']
