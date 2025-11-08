@@ -2089,13 +2089,16 @@ void KeyframeEffect::animationDidTick()
     invalidate();
     updateAcceleratedActions();
 
+    if (RefPtr viewTimeline = activeViewTimeline())
+        computeMissingKeyframeOffsets(m_parsedKeyframes, viewTimeline.get(), animation());
+}
+
+void KeyframeEffect::animationBecameReady()
+{
 #if ENABLE(THREADED_ANIMATIONS)
     if (threadedAnimationsEnabled())
         updateAcceleratedAnimationIfNecessary();
 #endif
-
-    if (RefPtr viewTimeline = activeViewTimeline())
-        computeMissingKeyframeOffsets(m_parsedKeyframes, viewTimeline.get(), animation());
 }
 
 void KeyframeEffect::animationDidChangeTimingProperties()

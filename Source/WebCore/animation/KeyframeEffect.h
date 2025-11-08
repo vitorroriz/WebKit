@@ -273,6 +273,7 @@ private:
     // AnimationEffect
     bool isKeyframeEffect() const final { return true; }
     void animationDidTick() final;
+    void animationBecameReady() final;
     void animationDidChangeTimingProperties() final;
     void animationWasCanceled() final;
     void animationSuspensionStateDidChange(bool) final;

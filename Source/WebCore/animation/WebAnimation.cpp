@@ -1536,6 +1536,8 @@ bool WebAnimation::needsTick() const
 
 void WebAnimation::tick()
 {
+    auto wasPending = pending();
+
     // https://drafts.csswg.org/scroll-animations-1/#event-loop
     // When updating timeline current time, the start time of any attached animation is
     // conditionally updated. For each attached animation, run the procedure for calculating
@@ -1549,8 +1551,11 @@ void WebAnimation::tick()
     updateFinishedState(DidSeek::No, SynchronouslyNotify::Yes);
     m_shouldSkipUpdatingFinishedStateWhenResolving = true;
 
-    if (!isEffectInvalidationSuspended() && m_effect)
+    if (!isEffectInvalidationSuspended() && m_effect) {
         m_effect->animationDidTick();
+        if (wasPending && !pending())
+            m_effect->animationBecameReady();
+    }
 }
 
 void WebAnimation::maybeMarkAsReady()
