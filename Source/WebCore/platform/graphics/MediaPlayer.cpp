@@ -107,6 +107,10 @@
 #include "MediaPlayerPrivateHolePunch.h"
 #endif
 
+#if ENABLE(WIRELESS_PLAYBACK_MEDIA_PLAYER)
+#include "MediaPlayerPrivateWirelessPlayback.h"
+#endif
+
 namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(MediaPlayer);
@@ -360,6 +364,15 @@ static void buildMediaEnginesVector() WTF_REQUIRES_LOCK(mediaEngineVectorLock)
 
 #if USE(EXTERNAL_HOLEPUNCH)
     MediaPlayerPrivateHolePunch::registerMediaEngine(addMediaEngine);
+#endif
+
+#if ENABLE(WIRELESS_PLAYBACK_MEDIA_PLAYER)
+    if (DeprecatedGlobalSettings::isWirelessPlaybackMediaPlayerEnabled()) {
+        if (registerRemoteEngine)
+            registerRemoteEngine(addMediaEngine, MediaPlayerEnums::MediaEngineIdentifier::WirelessPlayback);
+        else
+            MediaPlayerPrivateWirelessPlayback::registerMediaEngine(addMediaEngine);
+    }
 #endif
 
     haveMediaEnginesVector() = true;
