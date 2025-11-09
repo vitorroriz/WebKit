@@ -4046,7 +4046,7 @@ void MediaPlayerPrivateAVFoundationObjC::setDefaultSpatialTrackingLabel(const St
 {
     if (m_defaultSpatialTrackingLabel == defaultSpatialTrackingLabel)
         return;
-    m_defaultSpatialTrackingLabel = WTFMove(defaultSpatialTrackingLabel);
+    m_defaultSpatialTrackingLabel = defaultSpatialTrackingLabel;
     updateSpatialTrackingLabel();
 }
 
@@ -4059,7 +4059,7 @@ void MediaPlayerPrivateAVFoundationObjC::setSpatialTrackingLabel(const String& s
 {
     if (m_spatialTrackingLabel == spatialTrackingLabel)
         return;
-    m_spatialTrackingLabel = WTFMove(spatialTrackingLabel);
+    m_spatialTrackingLabel = spatialTrackingLabel;
     updateSpatialTrackingLabel();
 }
 

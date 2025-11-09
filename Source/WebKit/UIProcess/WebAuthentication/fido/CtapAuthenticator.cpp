@@ -133,7 +133,7 @@ void CtapAuthenticator::makeCredential()
         if (!m_pinAuth.isEmpty())
             pinParameters = PinParameters { static_cast<uint8_t>(selectPinProtocol()), m_pinAuth };
         Vector<uint8_t> cborCmd = encodeSilentGetAssertion(options.rp.id, requestData().hash, m_batches[m_currentBatch], pinParameters);
-        protectedDriver()->transact(WTFMove(cborCmd), [weakThis = WeakPtr { *this }](Vector<uint8_t>&& data) {
+        protectedDriver()->transact(WTFMove(cborCmd), [weakThis = WeakPtr { *this }](Vector<uint8_t>&& data) mutable {
             ASSERT(RunLoop::isMain());
             if (!weakThis)
                 return;
@@ -300,7 +300,7 @@ void CtapAuthenticator::getAssertion()
         if (!m_pinAuth.isEmpty())
             pinParameters = PinParameters { static_cast<uint8_t>(selectPinProtocol()), m_pinAuth };
         Vector<uint8_t> cborCmd = encodeSilentGetAssertion(options.rpId, requestData().hash, m_batches[m_currentBatch], pinParameters);
-        protectedDriver()->transact(WTFMove(cborCmd), [weakThis = WeakPtr { *this }](Vector<uint8_t>&& data) {
+        protectedDriver()->transact(WTFMove(cborCmd), [weakThis = WeakPtr { *this }](Vector<uint8_t>&& data) mutable {
             ASSERT(RunLoop::isMain());
             if (!weakThis)
                 return;
@@ -713,7 +713,7 @@ void CtapAuthenticator::continueSetupPinAfterGetKeyAgreement(Vector<uint8_t>&& d
     }
     m_pinAuth = setPinRequest->pinAuth();
     auto cborCmd = encodeAsCBOR(*setPinRequest);
-    protectedDriver()->transact(WTFMove(cborCmd), [weakThis = WeakPtr { *this }, pin, peerKey = WTFMove( keyAgreement->peerKey)](Vector<uint8_t>&& response) {
+    protectedDriver()->transact(WTFMove(cborCmd), [weakThis = WeakPtr { *this }, pin, peerKey = WTFMove( keyAgreement->peerKey)](Vector<uint8_t>&& response) mutable {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis)
             return;
@@ -728,7 +728,7 @@ void CtapAuthenticator::setupPin()
         return;
     CTAP_RELEASE_LOG("setupPin: Requesting new pin from delegate");
     uint64_t minLength = m_info.minPINLength().value_or(4);
-    observer->requestNewPin(minLength, [weakThis = WeakPtr { *this }] (const String& pin) {
+    observer->requestNewPin(minLength, [weakThis = WeakPtr { *this }] (const String& pin) mutable {
         ASSERT(RunLoop::isMain());
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis)

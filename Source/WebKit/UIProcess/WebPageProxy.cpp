@@ -10305,7 +10305,7 @@ void WebPageProxy::setTextIndicator(const TextIndicatorData& indicatorData, WebC
     notImplemented();
 }
 
-void WebPageProxy::updateTextIndicatorFromFrame(FrameIdentifier frameID, const RefPtr<WebCore::TextIndicator>&& textIndicator)
+void WebPageProxy::updateTextIndicatorFromFrame(FrameIdentifier frameID, RefPtr<WebCore::TextIndicator>&& textIndicator)
 {
     notImplemented();
 }

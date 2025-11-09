@@ -2209,7 +2209,7 @@ void WebChromeClient::abortApplePayAMSUISession()
 void WebChromeClient::beginSystemPreview(const URL& url, const SecurityOriginData& topOrigin, const SystemPreviewInfo& systemPreviewInfo, CompletionHandler<void()>&& completionHandler)
 {
     if (RefPtr page = m_page.get())
-        page->sendWithAsyncReply(Messages::WebPageProxy::BeginSystemPreview(WTFMove(url), topOrigin, WTFMove(systemPreviewInfo)), WTFMove(completionHandler));
+        page->sendWithAsyncReply(Messages::WebPageProxy::BeginSystemPreview(url, topOrigin, systemPreviewInfo), WTFMove(completionHandler));
     else
         completionHandler();
 }

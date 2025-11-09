@@ -3440,7 +3440,7 @@ private:
     void drawFrameToSnapshot(WebCore::FrameIdentifier, const WebCore::IntRect&, RemoteSnapshotIdentifier, CompletionHandler<void(bool)>&&);
 
     void setTextIndicatorFromFrame(WebCore::FrameIdentifier, const WebCore::TextIndicatorData&, WebCore::TextIndicatorLifetime);
-    void updateTextIndicatorFromFrame(WebCore::FrameIdentifier, const RefPtr<WebCore::TextIndicator>&&);
+    void updateTextIndicatorFromFrame(WebCore::FrameIdentifier, RefPtr<WebCore::TextIndicator>&&);
 
     void frameNameChanged(IPC::Connection&, WebCore::FrameIdentifier, const String& frameName);
 

@@ -5586,7 +5586,7 @@ void Page::setDefaultSpatialTrackingLabel(const String& label)
 {
     if (m_defaultSpatialTrackingLabel == label)
         return;
-    m_defaultSpatialTrackingLabel = WTFMove(label);
+    m_defaultSpatialTrackingLabel = label;
 
     forEachDocument([&] (Document& document) {
         document.defaultSpatialTrackingLabelChanged(m_defaultSpatialTrackingLabel);

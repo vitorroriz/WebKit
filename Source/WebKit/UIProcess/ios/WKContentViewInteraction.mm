@@ -11304,7 +11304,7 @@ static Vector<WebCore::IntSize> sizesOfPlaceholderElementsToInsertWhenDroppingIt
     for (auto& previewView : previewViews)
         [previewView setAlpha:0];
 
-    [animator addCompletion:[protectedSelf = retainPtr(self), previewViews = WTFMove(previewViews), page = _page] (UIViewAnimatingPosition finalPosition) {
+    [animator addCompletion:[protectedSelf = retainPtr(self), previewViews = WTFMove(previewViews), page = _page] (UIViewAnimatingPosition finalPosition) mutable {
         RELEASE_LOG(DragAndDrop, "Drag interaction willAnimateCancelWithAnimator (animation completion block fired)");
         for (auto& previewView : previewViews)
             [previewView setAlpha:1];

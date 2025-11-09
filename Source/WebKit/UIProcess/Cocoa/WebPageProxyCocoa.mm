@@ -1532,7 +1532,7 @@ void WebPageProxy::setTextIndicatorFromFrame(FrameIdentifier frameID, const WebC
         return;
 
     auto rect = indicatorData.textBoundingRectInRootViewCoordinates;
-    convertRectToMainFrameCoordinates(rect, frame->rootFrame().frameID(), [weakThis = WeakPtr { *this }, indicatorData = WTFMove(indicatorData), lifetime] (std::optional<FloatRect> convertedRect) mutable {
+    convertRectToMainFrameCoordinates(rect, frame->rootFrame().frameID(), [weakThis = WeakPtr { *this }, indicatorData = indicatorData, lifetime](std::optional<FloatRect> convertedRect) mutable {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis || !convertedRect)
             return;
@@ -1567,7 +1567,7 @@ void WebPageProxy::setTextIndicator(const WebCore::TextIndicatorData& indicatorD
         m_textIndicatorFadeTimer.startOneShot(WebCore::timeBeforeFadeStarts);
 }
 
-void WebPageProxy::updateTextIndicatorFromFrame(FrameIdentifier frameID, const RefPtr<WebCore::TextIndicator>&& textIndicator)
+void WebPageProxy::updateTextIndicatorFromFrame(FrameIdentifier frameID, RefPtr<WebCore::TextIndicator>&& textIndicator)
 {
     RefPtr frame = WebFrameProxy::webFrame(frameID);
     if (!frame)

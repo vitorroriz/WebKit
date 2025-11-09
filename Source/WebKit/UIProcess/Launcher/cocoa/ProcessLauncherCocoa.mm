@@ -132,21 +132,21 @@ static void launchWithExtensionKit(ProcessLauncher& processLauncher, ProcessLaun
 
     switch (processType) {
     case ProcessLauncher::ProcessType::Web: {
-        auto block = makeBlockPtr([handler = WTFMove(handler), weakProcessLauncher = ThreadSafeWeakPtr { processLauncher }, name = name](BEWebContentProcess *_Nullable process, NSError *_Nullable error) {
+        auto block = makeBlockPtr([handler = WTFMove(handler), weakProcessLauncher = ThreadSafeWeakPtr { processLauncher }, name = name](BEWebContentProcess *_Nullable process, NSError *_Nullable error) mutable {
             handler(WTFMove(weakProcessLauncher), process, name, error);
         });
         [BEWebContentProcess webContentProcessWithBundleID:identifier.get() interruptionHandler:^{ } completion:block.get()];
         break;
     }
     case ProcessLauncher::ProcessType::Network: {
-        auto block = makeBlockPtr([handler = WTFMove(handler), weakProcessLauncher = ThreadSafeWeakPtr { processLauncher }, name = name](BENetworkingProcess *_Nullable process, NSError *_Nullable error) {
+        auto block = makeBlockPtr([handler = WTFMove(handler), weakProcessLauncher = ThreadSafeWeakPtr { processLauncher }, name = name](BENetworkingProcess *_Nullable process, NSError *_Nullable error) mutable {
             handler(WTFMove(weakProcessLauncher), process, name, error);
         });
         [BENetworkingProcess networkProcessWithBundleID:identifier.get() interruptionHandler:^{ } completion:block.get()];
         break;
     }
     case ProcessLauncher::ProcessType::GPU: {
-        auto block = makeBlockPtr([handler = WTFMove(handler), weakProcessLauncher = ThreadSafeWeakPtr { processLauncher }, name = name](BERenderingProcess *_Nullable process, NSError *_Nullable error) {
+        auto block = makeBlockPtr([handler = WTFMove(handler), weakProcessLauncher = ThreadSafeWeakPtr { processLauncher }, name = name](BERenderingProcess *_Nullable process, NSError *_Nullable error) mutable {
             handler(WTFMove(weakProcessLauncher), process, name, error);
         });
         [BERenderingProcess renderingProcessWithBundleID:identifier.get() interruptionHandler:^{ } completion:block.get()];

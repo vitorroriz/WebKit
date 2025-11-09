@@ -6797,7 +6797,7 @@ static inline std::optional<WebCore::NodeIdentifier> toNodeIdentifier(const Stri
     }
 #endif // PLATFORM(MAC)
 
-    page->handleTextExtractionInteraction(WTFMove(interaction), [weakSelf = WeakObjCPtr<WKWebView>(self), weakPage = WeakPtr { *page }, completionHandler = makeBlockPtr(WTFMove(completionHandler))](bool success, String&& description) {
+    page->handleTextExtractionInteraction(WTFMove(interaction), [weakSelf = WeakObjCPtr<WKWebView>(self), weakPage = WeakPtr { *page }, completionHandler = makeBlockPtr(WTFMove(completionHandler))](bool success, String&& description) mutable {
         RetainPtr<NSString> errorDescription;
         if (!success)
             errorDescription = description.createNSString();
@@ -6957,7 +6957,7 @@ static HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> extractClie
         return completionHandler([NSString stringWithFormat:@"Select popup menu item labeled '%s'", interaction.text.utf8().data()], nil);
 #endif
 
-    page->describeTextExtractionInteraction(WTFMove(interaction), [weakSelf = WeakObjCPtr<WKWebView>(self), weakPage = WeakPtr { *page }, completionHandler = makeBlockPtr(WTFMove(completionHandler))](auto&& result) {
+    page->describeTextExtractionInteraction(WTFMove(interaction), [weakSelf = WeakObjCPtr<WKWebView>(self), weakPage = WeakPtr { *page }, completionHandler = makeBlockPtr(WTFMove(completionHandler))](auto&& result) mutable {
         auto [description, stringsToValidate] = WTFMove(result);
         auto valid = Box<bool>::create(true);
         Ref aggregator = MainRunLoopCallbackAggregator::create([completionHandler = WTFMove(completionHandler), description, valid] {
