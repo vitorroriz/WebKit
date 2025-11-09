@@ -123,6 +123,7 @@
 #include "RemotePageProxy.h"
 #include "RemoteWebTouchEvent.h"
 #include "RestrictedOpenerType.h"
+#include "RunJavaScriptParameters.h"
 #include "SharedBufferReference.h"
 #include "SpeechRecognitionPermissionManager.h"
 #include "SpeechRecognitionRemoteRealtimeMediaSource.h"
@@ -6418,6 +6419,12 @@ void WebPageProxy::runJavaScriptInMainFrame(RunJavaScriptParameters&& parameters
 
 void WebPageProxy::runJavaScriptInFrameInScriptWorld(RunJavaScriptParameters&& parameters, std::optional<WebCore::FrameIdentifier> frameID, API::ContentWorld& world, bool wantsResult, CompletionHandler<void(Expected<JavaScriptEvaluationResult, std::optional<WebCore::ExceptionDetails>>)>&& callbackFunction)
 {
+    static uintptr_t nextLoggingIdentifier;
+    uintptr_t loggingIdentifier = nextLoggingIdentifier++;
+#if PLATFORM(COCOA)
+    WTFBeginSignpost(loggingIdentifier, EvaluateJavaScript, "evaluateJavaScript: frameID=%llu sourceURL=%" PRIVATE_LOG_STRING, frameID ? frameID->toUInt64() : 0, parameters.sourceURL.string().ascii().data());
+#endif
+
     // For backward-compatibility support running script in a WebView which has not done any loads yets.
     launchInitialProcessIfNecessary();
 
@@ -6430,7 +6437,12 @@ void WebPageProxy::runJavaScriptInFrameInScriptWorld(RunJavaScriptParameters&& p
         activity = processContainingFrame(frameID)->protectedThrottler()->foregroundActivity("WebPageProxy::runJavaScriptInFrameInScriptWorld"_s);
 #endif
 
-    sendWithAsyncReplyToProcessContainingFrame(frameID, Messages::WebPage::RunJavaScriptInFrameInScriptWorld(parameters, frameID, world.worldDataForProcess(processContainingFrame(frameID)), wantsResult), [activity = WTFMove(activity), callbackFunction = WTFMove(callbackFunction)] (auto&& result) mutable {
+    sendWithAsyncReplyToProcessContainingFrame(frameID, Messages::WebPage::RunJavaScriptInFrameInScriptWorld(parameters, frameID, world.worldDataForProcess(processContainingFrame(frameID)), wantsResult), [activity = WTFMove(activity), loggingIdentifier, callbackFunction = WTFMove(callbackFunction)] (auto&& result) mutable {
+#if PLATFORM(COCOA)
+        WTFEndSignpost(loggingIdentifier, EvaluateJavaScript);
+#else
+        UNUSED_PARAM(loggingIdentifier);
+#endif
         callbackFunction(WTFMove(result));
     });
 }
