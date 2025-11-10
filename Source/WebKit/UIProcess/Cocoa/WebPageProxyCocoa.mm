@@ -1586,7 +1586,7 @@ void WebPageProxy::updateTextIndicatorFromFrame(FrameIdentifier frameID, RefPtr<
 void WebPageProxy::updateTextIndicator(RefPtr<WebCore::TextIndicator>&& textIndicator)
 {
     if (m_textIndicator && m_textIndicatorLayer)
-        [m_textIndicatorLayer updateWithFrame:m_textIndicator->textBoundingRectInRootViewCoordinates() textIndicator:textIndicator margin:CGSizeZero offset:CGPointZero updatingIndicator:YES];
+        [m_textIndicatorLayer updateWithFrame:m_textIndicator->textBoundingRectInRootViewCoordinates() textIndicator:textIndicator.get() margin:CGSizeZero offset:CGPointZero updatingIndicator:YES];
 }
 
 void WebPageProxy::clearTextIndicator()
