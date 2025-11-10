@@ -150,7 +150,7 @@ WebWheelEvent WebEventFactory::createWebWheelEvent(NSEvent *event, NSView *windo
         deltaY *= static_cast<float>(WebCore::Scrollbar::pixelsPerLineStep());
     }
 
-    WebWheelEvent::Granularity granularity  = WebWheelEvent::ScrollByPixelWheelEvent;
+    WebWheelEvent::Granularity granularity  = WebWheelEvent::Granularity::ScrollByPixelWheelEvent;
     bool directionInvertedFromDevice        = [event isDirectionInvertedFromDevice];
     WebWheelEvent::Phase phase              = phaseForEvent(event);
     WebWheelEvent::Phase momentumPhase      = momentumPhaseForEvent(event);

@@ -308,7 +308,7 @@ public:
         m_deltaY = webEvent.delta().height();
         m_wheelTicksX = webEvent.wheelTicks().width();
         m_wheelTicksY = webEvent.wheelTicks().height();
-        m_granularity = (webEvent.granularity() == WebWheelEvent::ScrollByPageWheelEvent) ? WebCore::ScrollByPageWheelEvent : WebCore::ScrollByPixelWheelEvent;
+        m_granularity = (webEvent.granularity() == WebWheelEvent::Granularity::ScrollByPageWheelEvent) ? WebCore::PlatformWheelEventGranularity::ScrollByPageWheelEvent : WebCore::PlatformWheelEventGranularity::ScrollByPixelWheelEvent;
         m_directionInvertedFromDevice = webEvent.directionInvertedFromDevice();
 #if ENABLE(KINETIC_SCROLLING)
         m_phase = static_cast<WebCore::PlatformWheelEventPhase>(webEvent.phase());

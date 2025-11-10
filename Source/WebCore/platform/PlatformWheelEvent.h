@@ -51,7 +51,7 @@ enum class WheelScrollGestureState : uint8_t {
 // In this case, WebKit built in paging behavior is used to page up and down.
 // This yields the same behavior as clicking in a scrollbar track to page up and down.
 
-enum PlatformWheelEventGranularity : uint8_t {
+enum class PlatformWheelEventGranularity : uint8_t {
     ScrollByPageWheelEvent,
     ScrollByPixelWheelEvent,
 };
@@ -185,7 +185,7 @@ public:
 #endif
 
 protected:
-    PlatformWheelEventGranularity m_granularity { ScrollByPixelWheelEvent };
+    PlatformWheelEventGranularity m_granularity { PlatformWheelEventGranularity::ScrollByPixelWheelEvent };
     bool m_directionInvertedFromDevice { false };
     bool m_hasPreciseScrollingDeltas { false };
 

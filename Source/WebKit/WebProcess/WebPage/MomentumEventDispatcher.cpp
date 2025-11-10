@@ -183,7 +183,7 @@ void MomentumEventDispatcher::dispatchSyntheticMomentumEvent(WebWheelEvent::Phas
         initiatingEvent->globalPosition(),
         appKitAcceleratedDelta,
         wheelTicks,
-        WebWheelEvent::ScrollByPixelWheelEvent,
+        WebWheelEvent::Granularity::ScrollByPixelWheelEvent,
         initiatingEvent->directionInvertedFromDevice(),
         WebWheelEvent::PhaseNone,
         phase,

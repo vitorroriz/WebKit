@@ -34,7 +34,7 @@ namespace WebKit {
 
 class WebWheelEvent : public WebEvent {
 public:
-    enum Granularity : uint8_t {
+    enum class Granularity : uint8_t {
         ScrollByPageWheelEvent,
         ScrollByPixelWheelEvent
     };
@@ -68,7 +68,7 @@ public:
     const WebCore::IntPoint globalPosition() const { return m_globalPosition; }
     const WebCore::FloatSize delta() const { return m_delta; }
     const WebCore::FloatSize wheelTicks() const { return m_wheelTicks; }
-    Granularity granularity() const { return static_cast<Granularity>(m_granularity); }
+    Granularity granularity() const { return m_granularity; }
     bool directionInvertedFromDevice() const { return m_directionInvertedFromDevice; }
     Phase phase() const { return static_cast<Phase>(m_phase); }
     Phase momentumPhase() const { return static_cast<Phase>(m_momentumPhase); }
@@ -92,7 +92,7 @@ private:
     WebCore::IntPoint m_globalPosition;
     WebCore::FloatSize m_delta;
     WebCore::FloatSize m_wheelTicks;
-    uint32_t m_granularity { ScrollByPageWheelEvent };
+    Granularity m_granularity { Granularity::ScrollByPageWheelEvent };
     uint32_t m_phase { Phase::PhaseNone };
     uint32_t m_momentumPhase { Phase::PhaseNone };
 

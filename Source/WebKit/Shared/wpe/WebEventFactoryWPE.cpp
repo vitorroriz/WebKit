@@ -209,7 +209,7 @@ WebWheelEvent WebEventFactory::createWebWheelEvent(WPEEvent* event, WebWheelEven
     }
 
     return WebWheelEvent({ WebEventType::Wheel, modifiersFromWPEModifiers(wpe_event_get_modifiers(event)), monotonicTimeForEvent(event) },
-        position, position, delta, wheelTicks, WebWheelEvent::ScrollByPixelWheelEvent, phase, WebWheelEvent::Phase::PhaseNone, hasPreciseScrollingDeltas);
+        position, position, delta, wheelTicks, WebWheelEvent::Granularity::ScrollByPixelWheelEvent, phase, WebWheelEvent::Phase::PhaseNone, hasPreciseScrollingDeltas);
 }
 
 WebKeyboardEvent WebEventFactory::createWebKeyboardEvent(WPEEvent* event, const String& text, bool isAutoRepeat)
