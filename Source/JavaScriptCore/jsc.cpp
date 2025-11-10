@@ -1712,9 +1712,13 @@ JSC_DEFINE_HOST_FUNCTION(functionDebug, (JSGlobalObject* globalObject, CallFrame
 JSC_DEFINE_HOST_FUNCTION(functionDescribe, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
     VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
     if (callFrame->argumentCount() < 1)
         return JSValue::encode(jsUndefined());
-    return JSValue::encode(jsString(vm, toString(callFrame->argument(0))));
+    std::optional<String> string = toStringWithBoundsCheck(callFrame->argument(0));
+    if (!string)
+        return JSValue::encode(throwException(globalObject, scope, createRangeError(globalObject, "Out of memory."_s)));
+    return JSValue::encode(jsString(vm, *string));
 }
 
 JSC_DEFINE_HOST_FUNCTION(functionDescribeArray, (JSGlobalObject* globalObject, CallFrame* callFrame))
