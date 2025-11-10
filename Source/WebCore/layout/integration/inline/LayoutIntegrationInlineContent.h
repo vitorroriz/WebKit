@@ -79,6 +79,7 @@ public:
     float firstLinePaginationOffset() const { return m_firstLinePaginationOffset.value_or(0.f); }
     float clearBeforeAfterGaps() const { return m_clearGapBeforeFirstLine + m_clearGapAfterLastLine; }
     float clearGapBeforeFirstLine() const { return m_clearGapBeforeFirstLine; }
+    bool hasBlockLevelBoxes() const { return m_hasBlockLevelBoxes; }
 
     IteratorRange<const InlineDisplay::Box*> boxesForRect(const LayoutRect&) const;
 
@@ -107,6 +108,8 @@ private:
     void setClearGapBeforeFirstLine(float clearGapBeforeFirstLine) { m_clearGapBeforeFirstLine = clearGapBeforeFirstLine; }
     void setClearGapAfterLastLine(float clearGapAfterLastLine) { m_clearGapAfterLastLine = clearGapAfterLastLine; }
     void setFirstLinePaginationOffset(float firstLinePaginationOffset) { m_firstLinePaginationOffset = firstLinePaginationOffset; }
+    void setHasBlockLevelBoxes() { m_hasBlockLevelBoxes = true; }
+
     const Vector<size_t>& nonRootInlineBoxIndexesForLayoutBox(const Layout::Box&) const;
 
     CheckedRef<const RenderBlockFlow> m_formattingContextRoot;
@@ -124,6 +127,7 @@ private:
     std::optional<float> m_firstLinePaginationOffset { };
 
     bool m_hasMultilinePaintOverlap { false };
+    bool m_hasBlockLevelBoxes { false };
 
     Vector<Vector<SVGTextFragment>> m_svgTextFragmentsForBoxes;
 };

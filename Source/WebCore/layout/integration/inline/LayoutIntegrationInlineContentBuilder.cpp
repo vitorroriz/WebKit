@@ -206,6 +206,11 @@ void InlineContentBuilder::adjustDisplayLines(InlineContent& inlineContent, size
             if (box.isInlineBox()) {
                 if (!downcast<RenderElement>(*box.layoutBox().rendererForIntegration()).hasSelfPaintingLayer())
                     lineInkOverflowRect.unite(box.inkOverflow());
+                continue;
+            }
+            if (box.isBlockLevelBox()) {
+                inlineContent.setHasBlockLevelBoxes();
+                continue;
             }
         }
 

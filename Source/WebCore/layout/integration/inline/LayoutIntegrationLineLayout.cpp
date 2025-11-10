@@ -1148,6 +1148,11 @@ void LineLayout::paint(PaintInfo& paintInfo, const LayoutPoint& paintOffset, con
         case PaintPhase::ChildOutlines:
         case PaintPhase::SelfOutline:
             return true;
+        case PaintPhase::ChildBlockBackground:
+        case PaintPhase::ChildBlockBackgrounds:
+        case PaintPhase::Float:
+            // These phases are only needed in blocks-in-inline case.
+            return m_inlineContent->hasBlockLevelBoxes();
         default:
             return false;
         }
@@ -1178,14 +1183,14 @@ bool LineLayout::hitTest(const HitTestRequest& request, HitTestResult& result, c
     LayerPaintScope layerPaintScope(layerRenderer);
 
     for (auto& box : boxRange | std::views::reverse) {
+        if (!layerPaintScope.testIsIncludesAndUpdate(box))
+            continue;
+
         bool visibleForHitTesting = request.userTriggered() ? box.isVisible() : box.isVisibleIgnoringUsedVisibility();
         if (!visibleForHitTesting)
             continue;
 
         auto& renderer = *box.layoutBox().rendererForIntegration();
-
-        if (!layerPaintScope.includes(box))
-            continue;
 
         if (box.isAtomicInlineBox()) {
             if (renderer.hitTest(request, result, locationInContainer, flippedContentOffsetIfNeeded(flow(), downcast<RenderBox>(renderer), accumulatedOffset)))
