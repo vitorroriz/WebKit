@@ -225,7 +225,7 @@ protected:
     WTF_EXPORT_PRIVATE bool getValue(const String& name, RefPtr<Value>& output) const;
 
 protected:
-    ObjectBase();
+    WTF_EXPORT_PRIVATE ObjectBase();
 
 private:
     size_t memoryCostImpl() const;
