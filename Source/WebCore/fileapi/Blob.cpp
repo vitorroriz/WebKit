@@ -38,10 +38,10 @@
 #include "BlobURL.h"
 #include "ContextDestructionObserverInlines.h"
 #include "File.h"
+#include "JSDOMPromise.h"
 #include "JSDOMPromiseDeferred.h"
 #include "PolicyContainer.h"
 #include "ReadableStream.h"
-#include "ReadableStreamSource.h"
 #include "ScriptExecutionContext.h"
 #include "ScriptWrappableInlines.h"
 #include "SecurityOrigin.h"
@@ -343,7 +343,7 @@ void Blob::bytes(Ref<DeferredPromise>&& promise)
 
 ExceptionOr<Ref<ReadableStream>> Blob::stream()
 {
-    class BlobStreamSource : public FileReaderLoaderClient, public RefCountedReadableStreamSource {
+    class BlobStreamSource : public FileReaderLoaderClient, public RefCounted<BlobStreamSource> {
     public:
         static Ref<BlobStreamSource> create(ScriptExecutionContext& scriptExecutionContext, Blob& blob)
         {
@@ -351,8 +351,33 @@ ExceptionOr<Ref<ReadableStream>> Blob::stream()
         }
 
         // FileReaderLoaderClient.
-        void ref() const final { RefCountedReadableStreamSource::ref(); }
-        void deref() const final { RefCountedReadableStreamSource::deref(); }
+        void ref() const final { RefCounted::ref(); }
+        void deref() const final { RefCounted::deref(); }
+
+        void pull(JSDOMGlobalObject& globalObject, ReadableByteStreamController& controller, Ref<DeferredPromise>&& promise)
+        {
+            if (closeStreamIfNeeded(globalObject, controller, promise.get()))
+                return;
+
+            if (m_queue.isEmpty()) {
+                m_promise = WTFMove(promise);
+                m_controller = &controller;
+                return;
+            }
+
+            tryEnqueuing(m_queue.takeFirst().get(), controller, WTFMove(promise), &globalObject);
+        }
+
+        void cancel(Ref<DeferredPromise>&& promise)
+        {
+            m_loaderState = LoaderState::Cancelled;
+            m_loader->cancel();
+            m_queue.clear();
+            m_promise = nullptr;
+            m_controller = nullptr;
+
+            promise->resolve();
+        }
 
     private:
         BlobStreamSource(ScriptExecutionContext& scriptExecutionContext, Blob& blob)
@@ -362,61 +387,25 @@ ExceptionOr<Ref<ReadableStream>> Blob::stream()
             m_loader->start(&scriptExecutionContext, blob);
         }
 
-        // ReadableStreamSource
-        void setActive() final { }
-        void setInactive() final { }
-        void doStart() final
-        {
-            ASSERT(m_streamState == StreamState::NotStarted);
-            m_streamState = StreamState::Waiting;
-
-            closeStreamIfNeeded();
-        }
-
-        void doPull() final
-        {
-            if (closeStreamIfNeeded())
-                return;
-
-            if (m_queue.isEmpty()) {
-                m_streamState = StreamState::Waiting;
-                return;
-            }
-
-            if (!tryEnqueuing(m_queue.takeFirst().get()))
-                return;
-
-            pullFinished();
-        }
-
-        void doCancel() final
-        {
-            m_loaderState = LoaderState::Cancelled;
-            m_loader->cancel();
-            m_queue.clear();
-        }
-
         // FileReaderLoaderClient
         void didStartLoading() final { }
         void didReceiveData() final { }
         void didReceiveBinaryChunk(const SharedBuffer& buffer) final
         {
-            if (m_streamState != StreamState::Waiting) {
+            if (!m_promise) {
                 m_queue.append(buffer.asFragmentedSharedBuffer());
                 return;
             }
 
-            m_streamState = StreamState::Started;
-            if (!tryEnqueuing(buffer))
-                return;
-
-            pullFinished();
+            tryEnqueuing(buffer, m_controller.releaseNonNull(), m_promise.releaseNonNull(), nullptr);
         }
 
         void didFinishLoading() final
         {
             m_loaderState = LoaderState::Completed;
-            closeStreamIfNeeded();
+
+            if (m_queue.isEmpty())
+                closeStreamIfPossible();
         }
 
         void didFail(ExceptionCode code) final
@@ -425,46 +414,96 @@ ExceptionOr<Ref<ReadableStream>> Blob::stream()
             m_exception = Exception { code };
 
             m_loaderState = LoaderState::Completed;
-            closeStreamIfNeeded();
+
+            closeStreamIfPossible();
         }
 
-        bool closeStreamIfNeeded()
+        void closeStreamIfPossible()
         {
-            if (m_loaderState != LoaderState::Completed || m_streamState == StreamState::NotStarted || !m_queue.isEmpty())
+            RefPtr promise = std::exchange(m_promise, { });
+            if (!promise)
+                return;
+
+            RefPtr controller = m_controller;
+            auto* globalObject = controller->protectedStream()->globalObject();
+            if (!globalObject)
+                return;
+
+            closeStream(*globalObject, *controller, *promise);
+        }
+
+        bool closeStreamIfNeeded(JSDOMGlobalObject& globalObject, ReadableByteStreamController& controller, DeferredPromise& promise)
+        {
+            if (m_loaderState != LoaderState::Completed || !m_queue.isEmpty())
                 return false;
 
-            if (m_exception) {
-                controller().error(*m_exception);
-                return true;
-            }
-
-            controller().close();
+            closeStream(globalObject, controller, promise);
             return true;
         }
 
-        bool tryEnqueuing(const FragmentedSharedBuffer& buffer)
+        void closeStream(JSDOMGlobalObject& globalObject, ReadableByteStreamController& controller, DeferredPromise& promise)
         {
-            bool didSucceed = controller().enqueue(buffer.tryCreateArrayBuffer());
-            if (!didSucceed)
-                didFail(ExceptionCode::OutOfMemoryError);
+            if (m_exception) {
+                controller.error(globalObject, *m_exception);
+                promise.resolve();
+                return;
+            }
 
-            return didSucceed;
+            controller.closeAndRespondToPendingPullIntos(globalObject);
+            promise.resolve();
+        }
+
+        void tryEnqueuing(const FragmentedSharedBuffer& sharedBuffer, ReadableByteStreamController& controller, Ref<DeferredPromise>&& promise, JSDOMGlobalObject* globalObject)
+        {
+            auto scope = makeScopeExit([promise = WTFMove(promise)] {
+                promise->resolve();
+            });
+
+            if (!globalObject) {
+                globalObject = controller.protectedStream()->globalObject();
+                if (!globalObject)
+                    return;
+            }
+
+            RefPtr buffer = sharedBuffer.tryCreateArrayBuffer();
+            if (!buffer) {
+                controller.error(*globalObject, Exception { ExceptionCode::OutOfMemoryError, "Unable to create buffer"_s });
+                return;
+            }
+
+            auto result = controller.enqueue(*globalObject, *buffer);
+            if (result.hasException())
+                controller.error(*globalObject, result.releaseException());
         }
 
         const Ref<FileReaderLoader> m_loader;
         Deque<Ref<FragmentedSharedBuffer>> m_queue;
         std::optional<Exception> m_exception;
-        enum class StreamState : uint8_t { NotStarted, Started, Waiting };
-        StreamState m_streamState { StreamState::NotStarted };
         enum class LoaderState : uint8_t { Started, Completed, Cancelled };
         LoaderState m_loaderState { LoaderState::Started };
+        RefPtr<DeferredPromise> m_promise;
+        RefPtr<ReadableByteStreamController> m_controller;
     };
 
     RefPtr context = scriptExecutionContext();
     auto* globalObject = context ? context->globalObject() : nullptr;
     if (!globalObject)
         return Exception { ExceptionCode::InvalidStateError };
-    return ReadableStream::create(*JSC::jsCast<JSDOMGlobalObject*>(globalObject), BlobStreamSource::create(*context, *this));
+
+    Ref source = BlobStreamSource::create(*context, *this);
+    ReadableByteStreamController::PullAlgorithm pullAlgorithm = [source](auto& globalObject, auto&& controller) {
+        auto [promise, deferred] = createPromiseAndWrapper(globalObject);
+        source->pull(globalObject, controller, WTFMove(deferred));
+        return promise;
+    };
+
+    ReadableByteStreamController::CancelAlgorithm cancelAlgorithm = [source](auto& globalObject, auto&&, auto&&) {
+        auto [promise, deferred] = createPromiseAndWrapper(globalObject);
+        source->cancel(WTFMove(deferred));
+        return promise;
+    };
+
+    return ReadableStream::createReadableByteStream(*JSC::jsCast<JSDOMGlobalObject*>(globalObject), WTFMove(pullAlgorithm), WTFMove(cancelAlgorithm));
 }
 
 #if ASSERT_ENABLED
