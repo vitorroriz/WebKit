@@ -278,6 +278,13 @@ struct WKSelectionDrawingInfo {
     Vector<WebCore::SelectionGeometry> selectionGeometries;
     WebCore::IntRect selectionClipRect;
     std::optional<WebCore::PlatformLayerIdentifier> enclosingLayerID;
+
+    enum class ComparisonResult : uint8_t {
+        VisuallyDistinct,
+        EquivalentExceptForEnclosingLayer,
+        EquivalentIncludingEnclosingLayer,
+    };
+    ComparisonResult compare(const WKSelectionDrawingInfo&) const;
 };
 
 WTF::TextStream& operator<<(WTF::TextStream&, const WKSelectionDrawingInfo&);

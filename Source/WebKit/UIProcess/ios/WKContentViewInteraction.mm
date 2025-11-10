@@ -415,43 +415,45 @@ WKSelectionDrawingInfo::WKSelectionDrawingInfo(const EditorState& editorState)
     enclosingLayerID = visualData.enclosingLayerID;
 }
 
-inline bool operator==(const WKSelectionDrawingInfo& a, const WKSelectionDrawingInfo& b)
+auto WKSelectionDrawingInfo::compare(const WKSelectionDrawingInfo& other) const -> ComparisonResult
 {
-    if (a.type != b.type)
-        return false;
+    using enum ComparisonResult;
 
-    if (a.type == WKSelectionDrawingInfo::SelectionType::Range) {
-        if (a.caretRect != b.caretRect)
-            return false;
+    if (type != other.type)
+        return VisuallyDistinct;
 
-        if (a.caretColor != b.caretColor)
-            return false;
+    if (type == WKSelectionDrawingInfo::SelectionType::Range) {
+        if (caretRect != other.caretRect)
+            return VisuallyDistinct;
 
-        if (a.selectionGeometries.size() != b.selectionGeometries.size())
-            return false;
+        if (caretColor != other.caretColor)
+            return VisuallyDistinct;
 
-        for (unsigned i = 0; i < a.selectionGeometries.size(); ++i) {
-            auto& aGeometry = a.selectionGeometries[i];
-            auto& bGeometry = b.selectionGeometries[i];
+        if (selectionGeometries.size() != other.selectionGeometries.size())
+            return VisuallyDistinct;
+
+        for (unsigned i = 0; i < selectionGeometries.size(); ++i) {
+            auto& aGeometry = selectionGeometries[i];
+            auto& bGeometry = other.selectionGeometries[i];
             auto behavior = aGeometry.behavior();
             if (behavior != bGeometry.behavior())
-                return false;
+                return VisuallyDistinct;
 
             if (behavior == WebCore::SelectionRenderingBehavior::CoalesceBoundingRects && aGeometry.rect() != bGeometry.rect())
-                return false;
+                return VisuallyDistinct;
 
             if (behavior == WebCore::SelectionRenderingBehavior::UseIndividualQuads && aGeometry.quad() != bGeometry.quad())
-                return false;
+                return VisuallyDistinct;
         }
     }
 
-    if (a.type != WKSelectionDrawingInfo::SelectionType::None && a.selectionClipRect != b.selectionClipRect)
-        return false;
+    if (type != WKSelectionDrawingInfo::SelectionType::None && selectionClipRect != other.selectionClipRect)
+        return VisuallyDistinct;
 
-    if (a.enclosingLayerID != b.enclosingLayerID)
-        return false;
+    if (enclosingLayerID != other.enclosingLayerID)
+        return EquivalentExceptForEnclosingLayer;
 
-    return true;
+    return EquivalentIncludingEnclosingLayer;
 }
 
 static TextStream& operator<<(TextStream& stream, WKSelectionDrawingInfo::SelectionType type)
@@ -9408,9 +9410,12 @@ static bool canUseQuickboardControllerFor(UITextContentType type)
     if (!editorState.hasPostLayoutAndVisualData())
         return;
 
+    using enum WebKit::WKSelectionDrawingInfo::ComparisonResult;
+
     auto& postLayoutData = *editorState.postLayoutData;
     WebKit::WKSelectionDrawingInfo selectionDrawingInfo { editorState };
-    if (force || selectionDrawingInfo != _lastSelectionDrawingInfo) {
+    auto comparison = selectionDrawingInfo.compare(_lastSelectionDrawingInfo);
+    if (force || comparison != EquivalentIncludingEnclosingLayer) {
         LOG_WITH_STREAM(Selection, stream << "_updateChangedSelection " << selectionDrawingInfo);
 
         _cachedSelectedTextRange = nil;
@@ -9422,7 +9427,8 @@ static bool canUseQuickboardControllerFor(UITextContentType type)
                 _isDeferringKeyEventsToInputMethod = NO;
             RetainPtr containerView = [self _selectionContainerViewInternal];
             [_textInteractionWrapper prepareToMoveSelectionContainer:containerView.get()];
-            [_textInteractionWrapper selectionChanged];
+            if (comparison == VisuallyDistinct)
+                [_textInteractionWrapper selectionChanged];
             _lastSelectionChildScrollViewContentOffset = [containerView] -> std::optional<WebCore::IntPoint> {
                 RetainPtr scrollView = [containerView _wk_parentScrollView];
                 if (is_objc<WKChildScrollView>(scrollView.get()))
