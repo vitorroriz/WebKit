@@ -59,7 +59,6 @@
 #include <WebCore/StyleGridItemData.h>
 #include <WebCore/StyleGridTrackSizingDirection.h>
 #include <WebCore/StyleInheritedData.h>
-#include <WebCore/StyleLineBoxContain.h>
 #include <WebCore/StyleMarqueeData.h>
 #include <WebCore/StyleMiscNonInheritedData.h>
 #include <WebCore/StyleMultiColData.h>
@@ -474,7 +473,7 @@ inline const Style::InsetBox& RenderStyle::insetBox() const { return m_nonInheri
 inline const Style::WebkitInitialLetter& RenderStyle::initialLetter() const { return m_nonInheritedData->rareData->initialLetter; }
 inline Style::LetterSpacing RenderStyle::initialLetterSpacing() { return CSS::Keyword::Normal { }; }
 constexpr LineAlign RenderStyle::initialLineAlign() { return LineAlign::None; }
-constexpr OptionSet<Style::LineBoxContain> RenderStyle::initialLineBoxContain() { return { Style::LineBoxContain::Block, Style::LineBoxContain::Inline, Style::LineBoxContain::Replaced }; }
+constexpr Style::WebkitLineBoxContain RenderStyle::initialLineBoxContain() { return { Style::WebkitLineBoxContainValue::Block, Style::WebkitLineBoxContainValue::Inline, Style::WebkitLineBoxContainValue::Replaced }; }
 constexpr LineBreak RenderStyle::initialLineBreak() { return LineBreak::Auto; }
 constexpr Style::WebkitLineClamp RenderStyle::initialLineClamp() { return CSS::Keyword::None { }; }
 inline Style::WebkitLineGrid RenderStyle::initialLineGrid() { return CSS::Keyword::None { }; }
@@ -658,7 +657,7 @@ inline const Style::InsetEdge& RenderStyle::left() const { return m_nonInherited
 inline float RenderStyle::usedLetterSpacing() const { return m_inheritedData->fontData->fontCascade.letterSpacing(); }
 inline const FontCascade& RenderStyle::fontCascade() const { return m_inheritedData->fontData->fontCascade; }
 inline LineAlign RenderStyle::lineAlign() const { return static_cast<LineAlign>(m_rareInheritedData->lineAlign); }
-inline OptionSet<Style::LineBoxContain> RenderStyle::lineBoxContain() const { return OptionSet<Style::LineBoxContain>::fromRaw(m_rareInheritedData->lineBoxContain); }
+inline Style::WebkitLineBoxContain RenderStyle::lineBoxContain() const { return Style::WebkitLineBoxContain::fromRaw(m_rareInheritedData->lineBoxContain); }
 inline LineBreak RenderStyle::lineBreak() const { return static_cast<LineBreak>(m_rareInheritedData->lineBreak); }
 inline const Style::WebkitLineClamp& RenderStyle::lineClamp() const { return m_nonInheritedData->rareData->lineClamp; }
 inline const Style::WebkitLineGrid& RenderStyle::lineGrid() const { return m_rareInheritedData->lineGrid; }
@@ -752,7 +751,7 @@ inline const Style::PaddingEdge& RenderStyle::paddingStart() const { return padd
 inline const Style::PaddingEdge& RenderStyle::paddingStart(const WritingMode writingMode) const { return paddingBox().start(writingMode); }
 inline const Style::PaddingEdge& RenderStyle::paddingTop() const { return paddingBox().top(); }
 inline const Style::PageSize& RenderStyle::pageSize() const { return m_nonInheritedData->rareData->pageSize; }
-inline Style::SVGPaintOrder RenderStyle::paintOrder() const { return static_cast<Style::SVGPaintOrder::Type>(m_rareInheritedData->paintOrder); }
+inline Style::SVGPaintOrder RenderStyle::paintOrder() const { return Style::SVGPaintOrder::fromRaw(m_rareInheritedData->paintOrder); }
 inline const Style::Perspective& RenderStyle::perspective() const { return m_nonInheritedData->rareData->perspective; }
 inline const Style::PerspectiveOrigin& RenderStyle::perspectiveOrigin() const { return m_nonInheritedData->rareData->perspectiveOrigin; }
 inline const Style::PerspectiveOriginX& RenderStyle::perspectiveOriginX() const { return m_nonInheritedData->rareData->perspectiveOrigin.x; }

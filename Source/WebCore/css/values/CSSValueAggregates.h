@@ -32,6 +32,7 @@
 #include <optional>
 #include <tuple>
 #include <utility>
+#include <wtf/EnumSet.h>
 #include <wtf/FixedVector.h>
 #include <wtf/Markable.h>
 #include <wtf/RefCountedFixedVector.h>
@@ -259,6 +260,146 @@ template<CSSValueID C, typename T> TextStream& operator<<(TextStream& ts, const 
 }
 
 template<CSSValueID C, typename T> inline constexpr auto TreatAsTupleLike<FunctionNotation<C, T>> = true;
+
+// Wraps an enum set, semantically marking it as serializing as "space separated".
+template<typename T>
+    requires (std::is_enum_v<T>)
+struct SpaceSeparatedEnumSet {
+    using Container = EnumSet<T>;
+    using StorageType = typename Container::StorageType;
+    using const_iterator = typename Container::iterator;
+    using value_type = T;
+
+    constexpr SpaceSeparatedEnumSet() = default;
+
+    constexpr SpaceSeparatedEnumSet(std::initializer_list<T> initializerList)
+        : value { initializerList }
+    {
+    }
+
+    constexpr SpaceSeparatedEnumSet(Container&& value)
+        : value { WTFMove(value) }
+    {
+    }
+
+    template<typename SizedRange, typename Mapper>
+    static SpaceSeparatedEnumSet map(SizedRange&& range, NOESCAPE Mapper&& mapper)
+    {
+        Container result;
+        for (auto&& value : range)
+            result.add(mapper(value));
+        return result;
+    }
+
+    static constexpr SpaceSeparatedEnumSet fromRaw(StorageType rawValue)
+    {
+        return Container::fromRaw(rawValue);
+    }
+
+    constexpr StorageType toRaw() const { return value.toRaw(); }
+
+    constexpr const_iterator begin() const { return value.begin(); }
+    constexpr const_iterator end() const { return value.end(); }
+
+    constexpr bool isEmpty() const { return value.isEmpty(); }
+    constexpr size_t size() const { return value.size(); }
+
+    constexpr bool contains(T e) const
+    {
+        return value.contains(e);
+    }
+
+    constexpr bool containsAny(Container other) const
+    {
+        return value.containsAny(other);
+    }
+
+    constexpr bool containsAll(Container other) const
+    {
+        return value.containsAll(other);
+    }
+
+    constexpr bool containsOnly(Container other) const
+    {
+        return value.containsOnly(other);
+    }
+
+    constexpr bool operator==(const SpaceSeparatedEnumSet&) const = default;
+
+    Container value;
+};
+template<typename T> inline constexpr auto TreatAsRangeLike<SpaceSeparatedEnumSet<T>> = true;
+template<typename T> inline constexpr auto SerializationSeparator<SpaceSeparatedEnumSet<T>> = SerializationSeparatorType::Space;
+
+// Wraps an enum set, semantically marking it as serializing as "comma separated".
+template<typename T>
+    requires (std::is_enum_v<T>)
+struct CommaSeparatedEnumSet {
+    using Container = EnumSet<T>;
+    using StorageType = typename Container::StorageType;
+    using const_iterator = typename Container::iterator;
+    using value_type = T;
+
+    CommaSeparatedEnumSet() = default;
+
+    CommaSeparatedEnumSet(std::initializer_list<T> initializerList)
+        : value { initializerList }
+    {
+    }
+
+    CommaSeparatedEnumSet(Container&& value)
+        : value { WTFMove(value) }
+    {
+    }
+
+    template<typename SizedRange, typename Mapper>
+    static CommaSeparatedEnumSet map(SizedRange&& range, NOESCAPE Mapper&& mapper)
+    {
+        Container result;
+        for (auto&& value : range)
+            result.add(mapper(value));
+        return result;
+    }
+
+    static constexpr CommaSeparatedEnumSet fromRaw(StorageType rawValue)
+    {
+        return Container::fromRaw(rawValue);
+    }
+
+    constexpr StorageType toRaw() const { return value.toRaw(); }
+
+    const_iterator begin() const { return value.begin(); }
+    const_iterator end() const { return value.end(); }
+
+    bool isEmpty() const { return value.isEmpty(); }
+    size_t size() const { return value.size(); }
+
+    constexpr bool contains(T e) const
+    {
+        return value.contains(e);
+    }
+
+    constexpr bool containsAny(Container other) const
+    {
+        return value.containsAny(other);
+    }
+
+    constexpr bool containsAll(Container other) const
+    {
+        return value.containsAll(other);
+    }
+
+    constexpr bool containsOnly(Container other) const
+    {
+        return value.containsOnly(other);
+    }
+
+    bool operator==(const CommaSeparatedEnumSet&) const = default;
+
+    Container value;
+};
+template<typename T> inline constexpr auto TreatAsRangeLike<CommaSeparatedEnumSet<T>> = true;
+template<typename T> inline constexpr auto SerializationSeparator<CommaSeparatedEnumSet<T>> = SerializationSeparatorType::Comma;
 
 // Wraps a variable number of elements of a single type, semantically marking them as serializing as "space separated".
 template<typename T, size_t inlineCapacity = 0> struct SpaceSeparatedVector {
@@ -787,6 +928,74 @@ template<typename T> concept ListOrDefaultDerived = WTF::IsBaseOfTemplate<ListOr
     DEFINE_RANGE_LIKE_CONFORMANCE(t) \
     template<> inline constexpr auto WebCore::SerializationSeparator<t> = WebCore::SerializationSeparator<typename t::List>;
 
+// Wraps an `EnumSet` and enforces the invariant that it is either created with a non-empty value or specified keyword.
+// Required to be subclassed, passing the derived type as the first template parameter.
+template<typename Derived, typename T, typename K> struct EnumSetOrKeywordBase {
+    using Base = EnumSetOrKeywordBase<Derived, T, K>;
+    using EnumSet = T;
+    using Keyword = K;
+    using value_type = typename EnumSet::value_type;
+
+    constexpr EnumSetOrKeywordBase(EnumSet&& list)
+        : m_value { WTFMove(list) }
+    {
+        RELEASE_ASSERT(!m_value.isEmpty());
+    }
+
+    constexpr EnumSetOrKeywordBase(Keyword)
+        : m_value { }
+    {
+    }
+
+    constexpr EnumSetOrKeywordBase(std::initializer_list<value_type> initializerList)
+        : EnumSetOrKeywordBase { EnumSet { initializerList } }
+    {
+    }
+
+    static constexpr Derived fromRaw(typename EnumSet::StorageType rawValue)
+    {
+        if (!rawValue)
+            return Keyword { };
+        return EnumSet::fromRaw(rawValue);
+    }
+    constexpr typename EnumSet::StorageType toRaw() const { return m_value.toRaw(); }
+
+    constexpr bool contains(value_type e) const { return m_value.contains(e); }
+    constexpr bool containsAny(EnumSet other) const { return m_value.containsAny(other.value); }
+    constexpr bool containsAll(EnumSet other) const { return m_value.containsAll(other.value); }
+    constexpr bool containsOnly(EnumSet other) const { return m_value.containsOnly(other.value); }
+
+    constexpr decltype(auto) begin() const LIFETIME_BOUND { return m_value.begin(); }
+    constexpr decltype(auto) end() const LIFETIME_BOUND { return m_value.end(); }
+
+    constexpr size_t size() const { return m_value.size(); }
+
+    constexpr bool contains(const auto& x) const { return m_value.contains(x); }
+
+    constexpr bool operator==(const EnumSetOrKeywordBase&) const = default;
+
+    constexpr bool isKeyword() const { return m_value.isEmpty(); }
+    constexpr bool isEnumSet() const { return !m_value.isEmpty(); }
+    constexpr const EnumSet* tryEnumSet() const { return isEnumSet() ? &m_value : nullptr; }
+
+    template<typename... F> constexpr decltype(auto) switchOn(F&&... f) const
+    {
+        auto visitor = WTF::makeVisitor(std::forward<F>(f)...);
+
+        if (isKeyword())
+            return visitor(Keyword { });
+        return visitor(m_value);
+    }
+
+protected:
+    // An empty enum set indicates the value is `Keyword`. This invariant is ensured
+    // with a release assert in the constructor.
+    EnumSet m_value;
+};
+
+// Concept to constrain types to only those that derive from `EnumSetOrKeywordBase`.
+template<typename T> concept EnumSetOrKeywordBaseDerived = WTF::IsBaseOfTemplate<EnumSetOrKeywordBase, T>::value;
+
 // Wraps a fixed size list of elements of a single type, semantically marking them as serializing as "space separated".
 template<typename T, size_t N> struct SpaceSeparatedArray {
     using Array = std::array<T, N>;
@@ -1295,6 +1504,18 @@ template<typename T> void logForCSSOnVariantLike(TextStream& ts, const T& value)
     WTF::switchOn(value, [&](const auto& value) { ts << value; });
 }
 
+template<typename T> TextStream& operator<<(TextStream& ts, const SpaceSeparatedEnumSet<T>& value)
+{
+    logForCSSOnRangeLike(ts, value, SerializationSeparatorString<SpaceSeparatedEnumSet<T>>);
+    return ts;
+}
+
+template<typename T> TextStream& operator<<(TextStream& ts, const CommaSeparatedEnumSet<T>& value)
+{
+    logForCSSOnRangeLike(ts, value, SerializationSeparatorString<CommaSeparatedEnumSet<T>>);
+    return ts;
+}
+
 template<typename T, size_t inlineCapacity> TextStream& operator<<(TextStream& ts, const SpaceSeparatedVector<T, inlineCapacity>& value)
 {
     logForCSSOnRangeLike(ts, value, SerializationSeparatorString<SpaceSeparatedVector<T, inlineCapacity>>);
@@ -1489,6 +1710,12 @@ public:
 } // namespace std
 
 namespace WTF {
+
+template<typename T>
+struct supports_text_stream_insertion<WebCore::SpaceSeparatedEnumSet<T>> : supports_text_stream_insertion<T> { };
+
+template<typename T>
+struct supports_text_stream_insertion<WebCore::CommaSeparatedEnumSet<T>> : supports_text_stream_insertion<T> { };
 
 template<typename T, size_t inlineCapacity>
 struct supports_text_stream_insertion<WebCore::SpaceSeparatedVector<T, inlineCapacity>> : supports_text_stream_insertion<T> { };

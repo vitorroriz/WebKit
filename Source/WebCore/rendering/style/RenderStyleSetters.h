@@ -195,7 +195,7 @@ inline void RenderStyle::setJustifySelf(Style::JustifySelf justifySelf) { SET_NE
 inline void RenderStyle::setLeft(Style::InsetEdge&& edge) { SET_NESTED(m_nonInheritedData, surroundData, inset.left(), WTFMove(edge)); }
 inline void RenderStyle::setLetterSpacing(Style::LetterSpacing&& letterSpacing) { SET_NESTED(m_inheritedData, fontData, letterSpacing, WTFMove(letterSpacing)); }
 inline void RenderStyle::setLineAlign(LineAlign alignment) { SET(m_rareInheritedData, lineAlign, static_cast<unsigned>(alignment)); }
-inline void RenderStyle::setLineBoxContain(OptionSet<Style::LineBoxContain> c) { SET(m_rareInheritedData, lineBoxContain, c.toRaw()); }
+inline void RenderStyle::setLineBoxContain(Style::WebkitLineBoxContain lineBoxContain) { SET(m_rareInheritedData, lineBoxContain, lineBoxContain.toRaw()); }
 inline void RenderStyle::setLineBreak(LineBreak rule) { SET(m_rareInheritedData, lineBreak, static_cast<unsigned>(rule)); }
 inline void RenderStyle::setLineClamp(Style::WebkitLineClamp&& value) { SET_NESTED(m_nonInheritedData, rareData, lineClamp, WTFMove(value)); }
 inline void RenderStyle::setLineGrid(Style::WebkitLineGrid&& lineGrid) { SET(m_rareInheritedData, lineGrid, WTFMove(lineGrid)); }
@@ -249,7 +249,7 @@ inline void RenderStyle::setPaddingLeft(Style::PaddingEdge&& edge) { SET_NESTED(
 inline void RenderStyle::setPaddingRight(Style::PaddingEdge&& edge) { SET_NESTED(m_nonInheritedData, surroundData, padding.right(), WTFMove(edge)); }
 inline void RenderStyle::setPaddingTop(Style::PaddingEdge&& edge) { SET_NESTED(m_nonInheritedData, surroundData, padding.top(), WTFMove(edge)); }
 inline void RenderStyle::setPageSize(Style::PageSize&& pageSize) { SET_NESTED(m_nonInheritedData, rareData, pageSize, WTFMove(pageSize)); }
-inline void RenderStyle::setPaintOrder(Style::SVGPaintOrder paintOrder) { SET(m_rareInheritedData, paintOrder, static_cast<unsigned>(paintOrder.type())); }
+inline void RenderStyle::setPaintOrder(Style::SVGPaintOrder paintOrder) { SET(m_rareInheritedData, paintOrder, paintOrder.toRaw()); }
 inline void RenderStyle::setPerspective(Style::Perspective&& perspective) { SET_NESTED(m_nonInheritedData, rareData, perspective, WTFMove(perspective)); }
 inline void RenderStyle::setPerspectiveOrigin(Style::PerspectiveOrigin&& origin) { SET_NESTED(m_nonInheritedData, rareData, perspectiveOrigin, WTFMove(origin)); }
 inline void RenderStyle::setPerspectiveOriginX(Style::PerspectiveOriginX&& originX) { SET_NESTED(m_nonInheritedData, rareData, perspectiveOrigin.x, WTFMove(originX)); }

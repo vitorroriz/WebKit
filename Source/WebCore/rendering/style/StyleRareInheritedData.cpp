@@ -465,14 +465,14 @@ void StyleRareInheritedData::dumpDifferences(TextStream& ts, const StyleRareInhe
     LOG_IF_DIFFERENT_WITH_CAST(UserSelect, userSelect);
     LOG_IF_DIFFERENT_WITH_CAST(ColorSpace, colorSpace);
 
-    LOG_RAW_OPTIONSET_IF_DIFFERENT(SpeakAs, speakAs);
+    LOG_IF_DIFFERENT_WITH_FROM_RAW(OptionSet<SpeakAs>, speakAs);
 
     LOG_IF_DIFFERENT_WITH_CAST(Hyphens, hyphens);
     LOG_IF_DIFFERENT_WITH_CAST(TextCombine, textCombine);
     LOG_IF_DIFFERENT_WITH_CAST(TextEmphasisPosition, textEmphasisPosition);
     LOG_IF_DIFFERENT_WITH_CAST(TextUnderlinePosition, textUnderlinePosition);
 
-    LOG_RAW_OPTIONSET_IF_DIFFERENT(Style::LineBoxContain, lineBoxContain);
+    LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::WebkitLineBoxContain, lineBoxContain);
 
     LOG_IF_DIFFERENT_WITH_CAST(Style::ImageOrientation, imageOrientation);
     LOG_IF_DIFFERENT_WITH_CAST(ImageRendering, imageRendering);
@@ -497,9 +497,9 @@ void StyleRareInheritedData::dumpDifferences(TextStream& ts, const StyleRareInhe
     LOG_IF_DIFFERENT_WITH_CAST(Style::WebkitTouchCallout, webkitTouchCallout);
 #endif
 
-    LOG_RAW_OPTIONSET_IF_DIFFERENT(HangingPunctuation, hangingPunctuation);
+    LOG_IF_DIFFERENT_WITH_FROM_RAW(OptionSet<HangingPunctuation>, hangingPunctuation);
 
-    LOG_IF_DIFFERENT_WITH_CAST_AND_CONSTRUCTION(Style::SVGPaintOrder::Type, Style::SVGPaintOrder, paintOrder);
+    LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::SVGPaintOrder, paintOrder);
     LOG_IF_DIFFERENT_WITH_CAST(LineCap, capStyle);
     LOG_IF_DIFFERENT_WITH_CAST(LineJoin, joinStyle);
 

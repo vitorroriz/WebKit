@@ -143,6 +143,7 @@ css/typedom/transform/CSSScale.cpp
 css/typedom/transform/CSSSkew.cpp
 css/typedom/transform/CSSTransformValue.cpp
 css/typedom/transform/CSSTranslate.cpp
+css/values/CSSValueAggregates.h
 cssjit/SelectorCompiler.cpp
 dom/CollectionIndexCacheInlines.h
 dom/ComposedTreeAncestorIterator.h

@@ -373,6 +373,7 @@ struct ViewTransitionClasses;
 struct ViewTransitionName;
 struct WebkitBoxReflect;
 struct WebkitInitialLetter;
+struct WebkitLineBoxContain;
 struct WebkitLineClamp;
 struct WebkitLineGrid;
 struct WebkitMarqueeIncrement;
@@ -388,7 +389,6 @@ struct ZoomFactor;
 enum class Change : uint8_t;
 enum class GridTrackSizingDirection : bool;
 enum class ImageOrientation : bool;
-enum class LineBoxContain : uint8_t;
 enum class PositionTryOrder : uint8_t;
 enum class SVGGlyphOrientationHorizontal : uint8_t;
 enum class SVGGlyphOrientationVertical : uint8_t;
@@ -1155,7 +1155,7 @@ public:
 
     inline const Style::PageSize& pageSize() const;
 
-    inline OptionSet<Style::LineBoxContain> lineBoxContain() const;
+    inline Style::WebkitLineBoxContain lineBoxContain() const;
     inline const Style::WebkitLineClamp& lineClamp() const;
     inline const Style::BlockEllipsis& blockEllipsis() const;
     inline Style::MaximumLines maxLines() const;
@@ -1679,7 +1679,7 @@ public:
     inline void setPageSize(Style::PageSize&&);
     inline void resetPageSize();
 
-    inline void setLineBoxContain(OptionSet<Style::LineBoxContain>);
+    inline void setLineBoxContain(Style::WebkitLineBoxContain);
     inline void setLineClamp(Style::WebkitLineClamp&&);
 
     inline void setMaxLines(Style::MaximumLines);
@@ -2187,7 +2187,7 @@ public:
     static constexpr RubyPosition initialRubyPosition();
     static constexpr RubyAlign initialRubyAlign();
     static constexpr RubyOverhang initialRubyOverhang();
-    static constexpr OptionSet<Style::LineBoxContain> initialLineBoxContain();
+    static constexpr Style::WebkitLineBoxContain initialLineBoxContain();
     static constexpr Style::ImageOrientation initialImageOrientation();
     static constexpr ImageRendering initialImageRendering();
     static inline Style::BorderImageSource initialBorderImageSource();

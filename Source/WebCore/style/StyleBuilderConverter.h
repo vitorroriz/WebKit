@@ -73,7 +73,6 @@
 #include "StyleFlexBasis.h"
 #include "StyleInset.h"
 #include "StyleLengthWrapper+CSSValueConversion.h"
-#include "StyleLineBoxContain.h"
 #include "StyleMargin.h"
 #include "StyleMaximumSize.h"
 #include "StyleMinimumSize.h"
@@ -123,7 +122,6 @@ public:
     static TextAlignLast convertTextAlignLast(BuilderState&, const CSSValue&);
     static Resize convertResize(BuilderState&, const CSSValue&);
     static OptionSet<TextUnderlinePosition> convertTextUnderlinePosition(BuilderState&, const CSSValue&);
-    static OptionSet<LineBoxContain> convertLineBoxContain(BuilderState&, const CSSValue&);
     static OptionSet<TouchAction> convertTouchAction(BuilderState&, const CSSValue&);
 
     static OptionSet<HangingPunctuation> convertHangingPunctuation(BuilderState&, const CSSValue&);
@@ -313,68 +311,6 @@ inline OptionSet<TextUnderlinePosition> BuilderConverter::convertTextUnderlinePo
     auto position = valueToUnderlinePosition(pair->first);
     position.add(valueToUnderlinePosition(pair->second));
     return position;
-}
-
-inline OptionSet<LineBoxContain> BuilderConverter::convertLineBoxContain(BuilderState& builderState, const CSSValue& value)
-{
-    if (RefPtr primitive = dynamicDowncast<CSSPrimitiveValue>(value)) {
-        switch (primitive->valueID()) {
-        case CSSValueNone:
-            return { };
-        case CSSValueBlock:
-            return LineBoxContain::Block;
-        case CSSValueInline:
-            return LineBoxContain::Inline;
-        case CSSValueFont:
-            return LineBoxContain::Font;
-        case CSSValueGlyphs:
-            return LineBoxContain::Glyphs;
-        case CSSValueReplaced:
-            return LineBoxContain::Replaced;
-        case CSSValueInlineBox:
-            return LineBoxContain::InlineBox;
-        case CSSValueInitialLetter:
-            return LineBoxContain::InitialLetter;
-        default:
-            builderState.setCurrentPropertyInvalidAtComputedValueTime();
-            return { };
-        }
-    }
-
-    auto list = requiredListDowncast<CSSValueList, CSSPrimitiveValue>(builderState, value);
-    if (!list)
-        return { };
-
-    OptionSet<LineBoxContain> result;
-    for (Ref primitive : *list) {
-        switch (primitive->valueID()) {
-        case CSSValueBlock:
-            result.add(LineBoxContain::Block);
-            break;
-        case CSSValueInline:
-            result.add(LineBoxContain::Inline);
-            break;
-        case CSSValueFont:
-            result.add(LineBoxContain::Font);
-            break;
-        case CSSValueGlyphs:
-            result.add(LineBoxContain::Glyphs);
-            break;
-        case CSSValueReplaced:
-            result.add(LineBoxContain::Replaced);
-            break;
-        case CSSValueInlineBox:
-            result.add(LineBoxContain::InlineBox);
-            break;
-        case CSSValueInitialLetter:
-            result.add(LineBoxContain::InitialLetter);
-            break;
-        default:
-            builderState.setCurrentPropertyInvalidAtComputedValueTime();
-            return { };
-        }
-    }
-    return result;
 }
 
 inline float zoomWithTextZoomFactor(BuilderState& builderState)

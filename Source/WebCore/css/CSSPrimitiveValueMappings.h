@@ -48,6 +48,7 @@
 #include "StyleImageOrientation.h"
 #include "StyleScrollBehavior.h"
 #include "StyleTextDecorationLine.h"
+#include "StyleWebKitLineBoxContain.h"
 #include "StyleWebKitOverflowScrolling.h"
 #include "StyleWebKitTouchCallout.h"
 #include "TextFlags.h"
@@ -2600,6 +2601,12 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 
 #define TYPE Style::ImageOrientation
 #define FOR_EACH(CASE) CASE(FromImage) CASE(None)
+DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
+#undef TYPE
+#undef FOR_EACH
+
+#define TYPE Style::WebkitLineBoxContainValue
+#define FOR_EACH(CASE) CASE(Block) CASE(Inline) CASE(Font) CASE(Glyphs) CASE(Replaced) CASE(InlineBox) CASE(InitialLetter)
 DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH

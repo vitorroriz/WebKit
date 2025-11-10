@@ -116,6 +116,32 @@ template<TupleLike StyleType> requires (std::tuple_size_v<StyleType> == 1) struc
     }
 };
 
+// Specialization for `SpaceSeparatedEnumSet`.
+template<typename T> struct CSSValueConversion<SpaceSeparatedEnumSet<T>> {
+    SpaceSeparatedEnumSet<T> operator()(BuilderState& state, const CSSValue& value)
+    {
+        if (auto list = dynamicDowncast<CSSValueList>(value)) {
+            return SpaceSeparatedEnumSet<T>::map(*list, [&](const CSSValue& element) {
+                return toStyleFromCSSValue<T>(state, element);
+            });
+        }
+        return { toStyleFromCSSValue<T>(state, value) };
+    }
+};
+
+// Specialization for `CommaSeparatedEnumSet`.
+template<typename T> struct CSSValueConversion<CommaSeparatedEnumSet<T>> {
+    CommaSeparatedEnumSet<T> operator()(BuilderState& state, const CSSValue& value)
+    {
+        if (auto list = dynamicDowncast<CSSValueList>(value)) {
+            return CommaSeparatedEnumSet<T>::map(*list, [&](const CSSValue& element) {
+                return toStyleFromCSSValue<T>(state, element);
+            });
+        }
+        return { toStyleFromCSSValue<T>(state, value) };
+    }
+};
+
 // Specialization for `SpaceSeparatedFixedVector`.
 template<typename StyleType> struct CSSValueConversion<SpaceSeparatedFixedVector<StyleType>> {
     SpaceSeparatedFixedVector<StyleType> operator()(BuilderState& state, const CSSValue& value)
@@ -195,6 +221,16 @@ template<ListOrDefaultDerived T> struct CSSValueConversion<T> {
     T operator()(BuilderState& state, const CSSValue& value)
     {
         return toStyleFromCSSValue<typename T::List>(state, value);
+    }
+};
+
+// Specialization for types derived from `EnumSetOrKeywordBase`.
+template<EnumSetOrKeywordBaseDerived T> struct CSSValueConversion<T> {
+    T operator()(BuilderState& state, const CSSValue& value)
+    {
+        if (value.valueID() == typename T::Keyword { }.value)
+            return typename T::Keyword { };
+        return toStyleFromCSSValue<typename T::EnumSet>(state, value);
     }
 };
 

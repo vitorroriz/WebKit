@@ -10173,7 +10173,7 @@
                 "initial-letter"
             ],
             "codegen-properties": {
-                "style-converter": "LineBoxContain",
+                "style-converter": "StyleType<WebkitLineBoxContain>",
                 "parser-grammar": "none | [ block || inline || font || glyphs || replaced || inline-box || initial-letter ]"
             },
             "status": {

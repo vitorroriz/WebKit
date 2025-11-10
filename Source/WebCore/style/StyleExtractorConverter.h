@@ -81,7 +81,6 @@
 #include "StyleExtractorState.h"
 #include "StyleFlexBasis.h"
 #include "StyleInset.h"
-#include "StyleLineBoxContain.h"
 #include "StyleMargin.h"
 #include "StyleMaximumSize.h"
 #include "StyleMinimumSize.h"
@@ -137,7 +136,6 @@ public:
     static Ref<CSSValue> convertMarginTrim(ExtractorState&, OptionSet<MarginTrimType>);
     static Ref<CSSValue> convertContain(ExtractorState&, OptionSet<Containment>);
     static Ref<CSSValue> convertPositionTryFallbacks(ExtractorState&, const FixedVector<PositionTryFallback>&);
-    static Ref<CSSValue> convertLineBoxContain(ExtractorState&, OptionSet<Style::LineBoxContain>);
     static Ref<CSSValue> convertTouchAction(ExtractorState&, OptionSet<TouchAction>);
     static Ref<CSSValue> convertTextTransform(ExtractorState&, OptionSet<TextTransform>);
     static Ref<CSSValue> convertTextUnderlinePosition(ExtractorState&, OptionSet<TextUnderlinePosition>);
@@ -328,29 +326,6 @@ inline Ref<CSSValue> ExtractorConverter::convertPositionTryFallbacks(ExtractorSt
     }
 
     return CSSValueList::createCommaSeparated(WTFMove(list));
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertLineBoxContain(ExtractorState&, OptionSet<Style::LineBoxContain> lineBoxContain)
-{
-    if (!lineBoxContain)
-        return CSSPrimitiveValue::create(CSSValueNone);
-
-    CSSValueListBuilder list;
-    if (lineBoxContain.contains(LineBoxContain::Block))
-        list.append(CSSPrimitiveValue::create(CSSValueBlock));
-    if (lineBoxContain.contains(LineBoxContain::Inline))
-        list.append(CSSPrimitiveValue::create(CSSValueInline));
-    if (lineBoxContain.contains(LineBoxContain::Font))
-        list.append(CSSPrimitiveValue::create(CSSValueFont));
-    if (lineBoxContain.contains(LineBoxContain::Glyphs))
-        list.append(CSSPrimitiveValue::create(CSSValueGlyphs));
-    if (lineBoxContain.contains(LineBoxContain::Replaced))
-        list.append(CSSPrimitiveValue::create(CSSValueReplaced));
-    if (lineBoxContain.contains(LineBoxContain::InlineBox))
-        list.append(CSSPrimitiveValue::create(CSSValueInlineBox));
-    if (lineBoxContain.contains(LineBoxContain::InitialLetter))
-        list.append(CSSPrimitiveValue::create(CSSValueInitialLetter));
-    return CSSValueList::createSpaceSeparated(WTFMove(list));
 }
 
 inline Ref<CSSValue> ExtractorConverter::convertTouchAction(ExtractorState&, OptionSet<TouchAction> touchActions)

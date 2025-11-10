@@ -73,7 +73,6 @@ public:
     static void serializeSmoothScrolling(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, bool);
     static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
     static void serializeTabSize(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const TabSize&);
-    static void serializeLineBoxContain(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<Style::LineBoxContain>);
     static void serializeTouchAction(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TouchAction>);
     static void serializeTextTransform(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TextTransform>);
     static void serializeTextUnderlinePosition(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TextUnderlinePosition>);
@@ -296,31 +295,6 @@ inline void ExtractorSerializer::serializePositionTryFallbacks(ExtractorState& s
     }
 
     builder.append(CSSValueList::createCommaSeparated(WTFMove(list))->cssText(context));
-}
-
-inline void ExtractorSerializer::serializeLineBoxContain(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<Style::LineBoxContain> lineBoxContain)
-{
-    if (!lineBoxContain) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::None { });
-        return;
-    }
-
-    bool listEmpty = true;
-    auto appendOption = [&](LineBoxContain test, CSSValueID value) {
-        if (lineBoxContain.contains(test)) {
-            if (!listEmpty)
-                builder.append(' ');
-            builder.append(nameLiteralForSerialization(value));
-            listEmpty = false;
-        }
-    };
-    appendOption(LineBoxContain::Block, CSSValueBlock);
-    appendOption(LineBoxContain::Inline, CSSValueInline);
-    appendOption(LineBoxContain::Font, CSSValueFont);
-    appendOption(LineBoxContain::Glyphs, CSSValueGlyphs);
-    appendOption(LineBoxContain::Replaced, CSSValueReplaced);
-    appendOption(LineBoxContain::InlineBox, CSSValueInlineBox);
-    appendOption(LineBoxContain::InitialLetter, CSSValueInitialLetter);
 }
 
 inline void ExtractorSerializer::serializeTouchAction(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<TouchAction> touchActions)

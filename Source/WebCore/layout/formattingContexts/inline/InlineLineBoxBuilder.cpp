@@ -33,7 +33,7 @@
 #include "LayoutBoxGeometry.h"
 #include "RenderStyleInlines.h"
 #include "RubyFormattingContext.h"
-#include "StyleLineBoxContain.h"
+#include "StyleWebKitLineBoxContain.h"
 
 namespace WebCore {
 namespace Layout {
@@ -525,7 +525,7 @@ void LineBoxBuilder::adjustInlineBoxHeightsForLineBoxContainIfApplicable(LineBox
     // Collect layout bounds based on the contain property and set them on the inline boxes when they are applicable.
     HashMap<InlineLevelBox*, TextUtil::EnclosingAscentDescent> inlineBoxBoundsMap;
 
-    if (lineBoxContain.contains(Style::LineBoxContain::InlineBox)) {
+    if (lineBoxContain.contains(Style::WebkitLineBoxContainValue::InlineBox)) {
         for (auto& inlineLevelBox : lineBox.nonRootInlineLevelBoxes()) {
             if (!inlineLevelBox.isInlineBox())
                 continue;
@@ -536,7 +536,7 @@ void LineBoxBuilder::adjustInlineBoxHeightsForLineBoxContainIfApplicable(LineBox
         }
     }
 
-    if (lineBoxContain.contains(Style::LineBoxContain::Font)) {
+    if (lineBoxContain.contains(Style::WebkitLineBoxContainValue::Font)) {
         // Assign font based layout bounds to all inline boxes.
         auto ensureFontMetricsBasedHeight = [&] (auto& inlineBox) {
             ASSERT(inlineBox.isInlineBox());
@@ -561,7 +561,7 @@ void LineBoxBuilder::adjustInlineBoxHeightsForLineBoxContainIfApplicable(LineBox
         }
     }
 
-    if (lineBoxContain.contains(Style::LineBoxContain::Glyphs)) {
+    if (lineBoxContain.contains(Style::WebkitLineBoxContainValue::Glyphs)) {
         // Compute text content (glyphs) hugging inline box layout bounds.
         for (auto run : lineLayoutResult().runs) {
             if (!run.isText())
@@ -581,7 +581,7 @@ void LineBoxBuilder::adjustInlineBoxHeightsForLineBoxContainIfApplicable(LineBox
         }
     }
 
-    if (lineBoxContain.contains(Style::LineBoxContain::InitialLetter)) {
+    if (lineBoxContain.contains(Style::WebkitLineBoxContainValue::InitialLetter)) {
         // Initial letter contain is based on the font metrics cap geometry and we hug descent.
         auto& rootInlineBox = lineBox.rootInlineBox();
         auto& fontMetrics = rootInlineBox.primarymetricsOfPrimaryFont();
@@ -612,7 +612,7 @@ void LineBoxBuilder::adjustInlineBoxHeightsForLineBoxContainIfApplicable(LineBox
         auto inlineBoxLayoutBounds = inlineBox->layoutBounds();
 
         // "line-box-container: block" The extended block progression dimension of the root inline box must fit within the line box.
-        auto mayShrinkLineBox = inlineBox->isRootInlineBox() ? !lineBoxContain.contains(Style::LineBoxContain::Block) : true;
+        auto mayShrinkLineBox = inlineBox->isRootInlineBox() ? !lineBoxContain.contains(Style::WebkitLineBoxContainValue::Block) : true;
         auto ascent = mayShrinkLineBox ? enclosingAscentDescentForInlineBox.ascent : std::max(enclosingAscentDescentForInlineBox.ascent, inlineBoxLayoutBounds.ascent);
         auto descent = mayShrinkLineBox ? enclosingAscentDescentForInlineBox.descent : std::max(enclosingAscentDescentForInlineBox.descent, inlineBoxLayoutBounds.descent);
         inlineBox->setLayoutBounds({ ceilf(ascent), ceilf(descent) });
