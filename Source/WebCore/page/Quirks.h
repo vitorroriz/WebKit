@@ -298,6 +298,8 @@ public:
 
     bool needsSuppressPostLayoutBoundaryEventsQuirk() const;
 
+    bool shouldExposeCredentialsContainerQuirk() const;
+
     void determineRelevantQuirks();
 
 private:

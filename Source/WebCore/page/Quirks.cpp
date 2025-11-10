@@ -2134,6 +2134,15 @@ bool Quirks::shouldDisableDOMAudioSessionQuirk() const
     return needsQuirks() && m_quirksData.shouldDisableDOMAudioSession;
 }
 
+bool Quirks::shouldExposeCredentialsContainerQuirk() const
+{
+#if ENABLE(WEB_AUTHN)
+    if (m_document && m_document->settings().webAuthenticationEnabled())
+        return true;
+#endif
+    return needsQuirks() && m_quirksData.isGoogleAccounts;
+}
+
 URL Quirks::topDocumentURL() const
 {
     if (!m_topDocumentURLForTesting.isEmpty()) [[unlikely]]
@@ -2765,6 +2774,7 @@ static void handleGoogleQuirks(QuirksData& quirksData, const URL& quirksURL, con
 #if ENABLE(MEDIA_STREAM)
     quirksData.shouldEnableEnumerateDeviceQuirk = topDocumentHost == "meet.google.com"_s;
 #endif
+    quirksData.isGoogleAccounts = topDocumentHost == "accounts.google.com"_s;
 }
 
 static void handleHBOMaxQuirks(QuirksData& quirksData, const URL& quirksURL, const String& quirksDomainString, const URL& documentURL)
