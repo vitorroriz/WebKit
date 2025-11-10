@@ -488,8 +488,7 @@
                     "name": "GTK-Linux-64-bit-Release-Build", "factory": "BuildAndGenerateJSCBundleFactory",
                     "platform": "gtk", "configuration": "release", "architectures": ["x86_64"],
                     "triggers": ["gtk-linux-64-release-tests", "gtk-linux-64-release-tests-js", "gtk-linux-64-release-tests-webdriver",
-                                 "gtk-linux-64-release-wayland-tests", "gtk-linux-64-release-perf-tests",
-                                 "gtk-linux-64-release-skip-failing-tests", "gtk-linux-64-release-tests-mvt"],
+                                 "gtk-linux-64-release-perf-tests", "gtk-linux-64-release-tests-mvt"],
                     "workernames": ["gtk-linux-bot-2"]
                   },
                   {
@@ -535,12 +534,6 @@
                     "workernames": ["gtk-linux-bot-8"]
                   },
                   {
-                    "name": "GTK-Linux-64-bit-Release-Wayland-Tests", "factory": "TestAllButJSCFactory",
-                    "platform": "gtk", "configuration": "release", "architectures": ["x86_64"],
-                    "additionalArguments": ["--display-server=wayland"],
-                    "workernames": ["gtk-linux-bot-9"]
-                  },
-                  {
                     "name": "GTK-Linux-64-bit-Release-Debian-Stable-Build", "factory": "NoInstallDependenciesBuildFactory",
                     "platform": "gtk", "configuration": "release", "architectures": ["x86_64"],
                     "additionalArguments": ["--no-experimental-features"],
@@ -574,12 +567,6 @@
                     "name": "GTK-Linux-64-bit-Release-GTK3-Build", "factory": "BuildFactory",
                     "platform": "gtk-3", "configuration": "release", "architectures": ["x86_64"],
                     "workernames": ["gtk-linux-bot-18"]
-                  },
-                  {
-                    "name": "GTK-Linux-64-bit-Release-Skip-Failing-Tests", "factory": "TestLayoutFactory",
-                    "platform": "gtk", "configuration": "release", "architectures": ["x86_64"],
-                    "additionalArguments": ["--skip-failing-tests"],
-                    "workernames": ["gtk-linux-bot-19"]
                   },
                   {
                     "name": "GTK-Linux-64-bit-Release-Clang-Build", "factory": "BuildFactory",
@@ -960,12 +947,6 @@
                   },
                   { "type": "Triggerable", "name": "gtk-linux-64-release-perf-tests",
                     "builderNames": ["GTK-Linux-64-bit-Release-Perf"]
-                  },
-                  { "type": "Triggerable", "name": "gtk-linux-64-release-wayland-tests",
-                    "builderNames": ["GTK-Linux-64-bit-Release-Wayland-Tests"]
-                  },
-                  { "type": "Triggerable", "name": "gtk-linux-64-release-skip-failing-tests",
-                    "builderNames": ["GTK-Linux-64-bit-Release-Skip-Failing-Tests"]
                   },
                   { "type": "Triggerable", "name": "gtk-linux-64-release-tests-mvt",
                     "builderNames": ["GTK-Linux-64-bit-Release-MVT-Tests"]

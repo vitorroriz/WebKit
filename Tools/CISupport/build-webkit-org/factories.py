@@ -125,8 +125,6 @@ class TestFactory(Factory):
 
         if platform.startswith("gtk"):
             self.addStep(RunGtkAPITests())
-            if additionalArguments and "--display-server=wayland" in additionalArguments:
-                self.addStep(RunWebDriverTests())
         if platform == "wpe":
             self.addStep(RunWPEAPITests())
 

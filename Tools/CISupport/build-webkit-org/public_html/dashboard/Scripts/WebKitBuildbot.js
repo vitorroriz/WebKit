@@ -103,9 +103,6 @@ WebKitBuildbot = function()
             "GTK-Linux-64-bit-Release-Debian-Stable-Build": {heading: "Debian Stable (Build)"},
             "GTK-Linux-64-bit-Release-Ubuntu-LTS-Build": {heading: "Ubuntu LTS (Build)"},
         }},
-        "GTK Wayland Testers": {platform: Dashboard.Platform.LinuxGTK, heading: "Wayland", combinedQueues: {
-            "GTK-Linux-64-bit-Release-Wayland-Tests": {heading: "Wayland"},
-        }},
         "JSCOnly AArch64 Testers": {platform: Dashboard.Platform.LinuxJSCOnly, heading: "AArch64", combinedQueues: {
             "JSCOnly-Linux-AArch64-Release": {heading: "AArch64"},
         }},
