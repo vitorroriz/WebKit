@@ -877,7 +877,6 @@ css/CSSColorValue.cpp
 css/CSSComputedStyleDeclaration.cpp
 css/CSSConditionRule.cpp
 css/CSSContainerRule.cpp
-css/CSSContentDistributionValue.cpp
 css/CSSCounterStyle.cpp
 css/CSSCounterStyleDescriptors.cpp
 css/CSSCounterStyleRegistry.cpp
@@ -3166,6 +3165,12 @@ style/calc/StyleCalculationTree+Evaluation.cpp
 style/calc/StyleCalculationTree.cpp
 style/calc/StyleCalculationValue.cpp
 style/calc/StyleCalculationValueMap.cpp
+style/values/align/StyleAlignContent.cpp
+style/values/align/StyleAlignItems.cpp
+style/values/align/StyleAlignSelf.cpp
+style/values/align/StyleJustifyContent.cpp
+style/values/align/StyleJustifyItems.cpp
+style/values/align/StyleJustifySelf.cpp
 style/values/animations/StyleAnimation.cpp
 style/values/animations/StyleSingleAnimationName.cpp
 style/values/animations/StyleSingleAnimationRangeName.cpp

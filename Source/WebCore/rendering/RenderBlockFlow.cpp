@@ -725,7 +725,7 @@ void RenderBlockFlow::dirtyForLayoutFromPercentageHeightDescendants()
 
 LayoutUnit RenderBlockFlow::shiftForAlignContent(LayoutUnit intrinsicLogicalHeight, LayoutUnit& repaintLogicalTop, LayoutUnit& repaintLogicalBottom)
 {
-    auto& alignment = style().alignContent();
+    auto alignment = style().alignContent().resolve();
 
     // Exit if no alignment necessary.
     if (alignment.isNormal() || alignment.isStartward())
@@ -4392,7 +4392,7 @@ LayoutOptionalOutsets RenderBlockFlow::allowedLayoutOverflow() const
 {
     LayoutOptionalOutsets allowance = RenderBox::allowedLayoutOverflow();
 
-    if (style().alignContent().position() != ContentPosition::Normal) {
+    if (!style().alignContent().isNormal()) {
         if (hasRareBlockFlowData()) {
             if (isHorizontalWritingMode())
                 allowance.setTop(-rareBlockFlowData()->m_alignContentShift);

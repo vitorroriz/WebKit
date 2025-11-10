@@ -777,7 +777,7 @@ void Adjuster::adjust(RenderStyle& style) const
 
     // If the inherited value of justify-items includes the 'legacy' keyword (plus 'left', 'right' or
     // 'center'), 'legacy' computes to the the inherited value. Otherwise, 'auto' computes to 'normal'.
-    if (m_parentBoxStyle.justifyItems().positionType() == ItemPositionType::Legacy && style.justifyItems().position() == ItemPosition::Legacy)
+    if (m_parentBoxStyle.justifyItems().resolve().positionType() == ItemPositionType::Legacy && style.justifyItems().resolve().position() == ItemPosition::Legacy)
         style.setJustifyItems(m_parentBoxStyle.justifyItems());
 
 #if HAVE(CORE_MATERIAL)

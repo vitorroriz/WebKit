@@ -253,12 +253,12 @@ static std::optional<AvoidanceReason> gridLayoutAvoidanceReason(const RenderGrid
         if (gridItemHasMargins())
             return AvoidanceReason::GridItemHasMargin;
 
-        auto& justifySelf = gridItemStyle->justifySelf();
+        auto justifySelf = gridItemStyle->justifySelf().resolve();
         if (justifySelf.position() != ItemPosition::Start && justifySelf.overflow() != OverflowAlignment::Default
             && justifySelf.positionType() != ItemPositionType::NonLegacy)
             return AvoidanceReason::GridItemHasUnsupportedInlineAxisAlignment;
 
-        auto& alignSelf = gridItemStyle->alignSelf();
+        auto alignSelf = gridItemStyle->alignSelf().resolve();
         if (alignSelf.position() != ItemPosition::Start && alignSelf.overflow() != OverflowAlignment::Default
             && alignSelf.positionType() != ItemPositionType::NonLegacy)
             return AvoidanceReason::GridItemHasUnsupportedBlockAxisAlignment;

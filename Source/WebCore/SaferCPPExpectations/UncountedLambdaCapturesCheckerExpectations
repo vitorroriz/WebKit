@@ -28,7 +28,6 @@ crypto/SubtleCrypto.cpp
 css/CSSPendingSubstitutionValue.cpp
 css/CSSValue.cpp
 css/CSSVariableReferenceValue.cpp
-css/StyleRule.cpp
 dom/ContentVisibilityDocumentState.cpp
 dom/CustomElementDefaultARIA.cpp
 dom/RejectedPromiseTracker.cpp
@@ -86,6 +85,7 @@ style/StyleCustomProperty.cpp
 style/Styleable.cpp
 style/values/StyleValueTypes.h
 style/values/backgrounds/StyleFillLayers.h
+style/values/fonts/StyleFontFeatureSettings.cpp
 style/values/fonts/StyleFontVariationSettings.cpp
 style/values/images/StyleGradient.cpp
 style/values/primitives/StylePrimitiveKeyword+CSSValueCreation.h

@@ -252,11 +252,11 @@ bool hasAutoSizeInColumnAxis(const RenderBox& gridItem, WritingMode parentWritin
 {
     if (gridItem.style().hasAspectRatio()) {
         // FIXME: should align-items + align-self: auto/justify-items + justify-self: auto be taken into account?
-        if (parentWritingMode.isHorizontal() == gridItem.isHorizontalWritingMode() && gridItem.style().alignSelf().position() != ItemPosition::Stretch) {
+        if (parentWritingMode.isHorizontal() == gridItem.isHorizontalWritingMode() && !gridItem.style().alignSelf().isStretch()) {
             // A non-auto inline size means the same for block size (column axis size) because of the aspect ratio.
             if (!gridItem.style().logicalWidth().isAuto())
                 return false;
-        } else if (gridItem.style().justifySelf().position() != ItemPosition::Stretch) {
+        } else if (!gridItem.style().justifySelf().isStretch()) {
             auto& logicalHeight = gridItem.style().logicalHeight();
             if (logicalHeight.isFixed() || (logicalHeight.isPercentOrCalculated() && gridItem.percentageLogicalHeightIsResolvable()))
                 return false;
@@ -269,12 +269,12 @@ bool hasAutoSizeInRowAxis(const RenderBox& gridItem, WritingMode parentWritingMo
 {
     if (gridItem.style().hasAspectRatio()) {
         // FIXME: should align-items + align-self: auto/justify-items + justify-self: auto be taken into account?
-        if (parentWritingMode.isHorizontal() == gridItem.isHorizontalWritingMode() && gridItem.style().alignSelf().position() != ItemPosition::Stretch) {
+        if (parentWritingMode.isHorizontal() == gridItem.isHorizontalWritingMode() && !gridItem.style().alignSelf().isStretch()) {
             // A non-auto block size means the same for inline size (row axis size) because of the aspect ratio.
             auto& logicalHeight = gridItem.style().logicalHeight();
             if (logicalHeight.isFixed() || (logicalHeight.isPercentOrCalculated() && gridItem.percentageLogicalHeightIsResolvable()))
                 return false;
-        } else if (gridItem.style().justifySelf().position() != ItemPosition::Stretch) {
+        } else if (!gridItem.style().justifySelf().isStretch()) {
             if (!gridItem.style().logicalWidth().isAuto())
                 return false;
         }

@@ -56,7 +56,7 @@ PositionedLayoutConstraints::PositionedLayoutConstraints(const RenderBox& render
     , m_containingAxis(!isOrthogonal() ? selfAxis : oppositeAxis(selfAxis))
     , m_physicalAxis(selfAxis == LogicalBoxAxis::Inline ? m_writingMode.inlineAxis() : m_writingMode.blockAxis())
     , m_style(style)
-    , m_alignment(m_containingAxis == LogicalBoxAxis::Inline ? style.justifySelf() : style.alignSelf())
+    , m_alignment(m_containingAxis == LogicalBoxAxis::Inline ? style.justifySelf().resolve() : style.alignSelf().resolve())
     , m_defaultAnchorBox(needsAnchor() ? Style::AnchorPositionEvaluator::defaultAnchorForBox(renderer) : nullptr)
     , m_marginBefore { 0_css_px }
     , m_marginAfter { 0_css_px }
@@ -280,9 +280,14 @@ std::optional<LayoutUnit> PositionedLayoutConstraints::remainingSpaceForStaticAl
         return { };
 
     if (auto* parent = dynamicDowncast<RenderGrid>(m_renderer->parent())) {
-
         auto& itemStyle = m_renderer->style();
-        auto itemResolvedAlignSelf = itemStyle.resolvedAlignSelf(&parent->style(), ItemPosition::Start);
+
+        auto itemResolvedAlignSelf = [&] {
+            if (!itemStyle.alignSelf().isAuto())
+                return itemStyle.alignSelf().resolve(ItemPosition::Start);
+            return parent->style().alignItems().resolve(ItemPosition::Start);
+        }();
+
         switch (itemResolvedAlignSelf.position()) {
         case ItemPosition::Center:
         case ItemPosition::FlexEnd:
@@ -487,7 +492,10 @@ ItemPosition PositionedLayoutConstraints::resolveAlignmentValue() const
         ASSERT(m_isEligibleForStaticRangeAlignment);
 #endif
         auto* parentStyle = m_renderer->parentStyle();
-        return m_style.resolvedAlignSelf(parentStyle, ItemPosition::Start).position();
+
+        if (!parentStyle || !m_style.alignSelf().isAuto())
+            return m_style.alignSelf().resolve(ItemPosition::Start).position();
+        return parentStyle->alignItems().resolve(ItemPosition::Start).position();
     }
 
     auto alignmentPosition = [&] {
@@ -565,11 +573,10 @@ void PositionedLayoutConstraints::computeStaticPosition()
 
             if (ItemPosition::Auto == m_alignment.position()) {
                 if (LogicalBoxAxis::Inline == m_containingAxis) {
-                    auto justifyItems = m_container->style().justifyItems();
-                    if (ItemPosition::Legacy != justifyItems.position())
-                        m_alignment = justifyItems;
+                    if (auto justifyItems = m_container->style().justifyItems(); !justifyItems.isLegacyNone())
+                        m_alignment = justifyItems.resolve();
                 } else
-                    m_alignment = m_container->style().alignItems();
+                    m_alignment = m_container->style().alignItems().resolve();
             }
             if (ItemPosition::Auto == m_alignment.position() || ItemPosition::Normal == m_alignment.position())
                 m_alignment.setPosition(ItemPosition::Start);
