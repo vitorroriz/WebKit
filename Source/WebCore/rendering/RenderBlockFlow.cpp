@@ -241,10 +241,18 @@ void RenderBlockFlow::rebuildFloatingObjectSetFromIntrudingFloats()
         return;
     }
 
-    // We should not process floats if the parent node is not a RenderBlock. Otherwise, we will add 
-    // floats in an invalid context. This will cause a crash arising from a bad cast on the parent.
-    // See <rdar://problem/8049753>, where float property is applied on a text node in a SVG.
-    CheckedPtr parentBlock = dynamicDowncast<RenderBlockFlow>(parent());
+    auto parentBlock = [&]() -> CheckedPtr<RenderBlockFlow> {
+        if (auto* blockFlowParent = dynamicDowncast<RenderBlockFlow>(parent()))
+            return blockFlowParent;
+        if (auto* inlineBoxParent = dynamicDowncast<RenderInline>(parent())) {
+            ASSERT(settings().blocksInInlineLayoutEnabled());
+            return dynamicDowncast<RenderBlockFlow>(inlineBoxParent->containingBlock());
+        }
+        // We should not process floats if the parent node is not a RenderBlock. Otherwise, we will add
+        // floats in an invalid context. This will cause a crash arising from a bad cast on the parent.
+        // See <rdar://problem/8049753>, where float property is applied on a text node in a SVG.
+        return { };
+    }();
     if (!parentBlock)
         return;
 
