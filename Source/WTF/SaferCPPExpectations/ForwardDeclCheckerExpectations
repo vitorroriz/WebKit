@@ -9,4 +9,3 @@ wtf/URLParser.cpp
 wtf/cocoa/FileSystemCocoa.mm
 wtf/text/StringView.cpp
 wtf/text/TextBreakIterator.cpp
-wtf/unicode/icu/CollatorICU.cpp
