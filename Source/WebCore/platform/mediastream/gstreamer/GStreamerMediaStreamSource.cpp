@@ -44,6 +44,7 @@
 #endif
 
 #include <gst/app/gstappsrc.h>
+#include <gst/base/gstbasesrc.h>
 #include <gst/base/gstflowcombiner.h>
 #include <wtf/UUID.h>
 #include <wtf/glib/GThreadSafeWeakPtr.h>
@@ -594,7 +595,8 @@ private:
         m_src = makeGStreamerElement("appsrc"_s, elementName);
 
         g_object_set(m_src.get(), "is-live", TRUE, "format", GST_FORMAT_TIME, "min-percent", 100,
-            "do-timestamp", isCaptureTrack, "handle-segment-change", TRUE, "automatic-eos", FALSE, nullptr);
+            "do-timestamp", isCaptureTrack, "handle-segment-change", TRUE, nullptr);
+        gst_base_src_set_automatic_eos(GST_BASE_SRC_CAST(m_src.get()), FALSE);
 
         static GstAppSrcCallbacks callbacks = {
             // need_data
