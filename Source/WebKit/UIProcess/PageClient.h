@@ -132,6 +132,7 @@ enum class DOMPasteRequiresInteraction : bool;
 enum class ScrollIsAnimated : bool;
 
 struct AppHighlight;
+struct AriaNotifyData;
 struct DataDetectorElementInfo;
 struct DictionaryPopupInfo;
 struct ElementContext;
@@ -412,6 +413,7 @@ public:
     virtual WebCore::IntRect rootViewToAccessibilityScreen(const WebCore::IntRect&) = 0;
 #if PLATFORM(IOS_FAMILY)
     virtual void relayAccessibilityNotification(String&&, RetainPtr<NSData>&&) = 0;
+    virtual void relayAriaNotifyNotification(const WebCore::AriaNotifyData&) = 0;
 #endif
 #if PLATFORM(MAC)
     virtual WebCore::IntRect rootViewToWindow(const WebCore::IntRect&) = 0;

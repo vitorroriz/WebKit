@@ -246,6 +246,7 @@ struct AXDebugInfo;
 struct AppHighlight;
 struct ApplePayAMSUIRequest;
 struct ApplicationManifest;
+struct AriaNotifyData;
 struct AttributedString;
 struct BackForwardItemIdentifierType;
 struct BackForwardFrameItemIdentifierType;
@@ -2987,6 +2988,7 @@ private:
     void rootViewToAccessibilityScreen(const WebCore::IntRect& viewRect, CompletionHandler<void(WebCore::IntRect)>&&);
 #if PLATFORM(IOS_FAMILY)
     void relayAccessibilityNotification(String&&, std::span<const uint8_t>);
+    void relayAriaNotifyNotification(WebCore::AriaNotifyData&&);
 #endif
     void runBeforeUnloadConfirmPanel(IPC::Connection&, WebCore::FrameIdentifier, FrameInfoData&&, String&& message, CompletionHandler<void(bool)>&&);
     void pageDidScroll(const WebCore::IntPoint&);

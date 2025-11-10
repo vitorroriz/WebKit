@@ -3658,6 +3658,7 @@ JSAnimationFrameRatePreset.cpp
 JSAnimationPlaybackEvent.cpp
 JSAnimationPlaybackEventInit.cpp
 JSAnimationTimeline.cpp
+JSAriaNotifyOptions.cpp
 JSAttestationConveyancePreference.cpp
 JSAttr.cpp
 JSAudioBuffer.cpp

@@ -27,6 +27,7 @@
 #include "Element.h"
 
 #include "AXObjectCache.h"
+#include "AriaNotifyOptions.h"
 #include "Attr.h"
 #include "AttributeChangeInvalidation.h"
 #include "CheckVisibilityOptions.h"
@@ -6857,6 +6858,24 @@ const AtomString& Element::ariaSort() const
     }
 
     return value.isNull() ? nullAtom() : value;
+}
+
+void Element::ariaNotify(const String& announcement)
+{
+    if (!document().settings().isARIANotifyEnabled())
+        return;
+
+    if (CheckedPtr cache = document().axObjectCache())
+        cache->postARIANotifyNotification(*this, announcement, { });
+}
+
+void Element::ariaNotify(const String& announcement, const AriaNotifyOptions& options)
+{
+    if (!document().settings().isARIANotifyEnabled())
+        return;
+
+    if (CheckedPtr cache = document().axObjectCache())
+        cache->postARIANotifyNotification(*this, announcement, options);
 }
 
 } // namespace WebCore

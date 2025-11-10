@@ -132,6 +132,7 @@ private:
     WebCore::IntPoint accessibilityScreenToRootView(const WebCore::IntPoint&) override;
     WebCore::IntRect rootViewToAccessibilityScreen(const WebCore::IntRect&) override;
     void relayAccessibilityNotification(String&&, RetainPtr<NSData>&&) override;
+    void relayAriaNotifyNotification(const WebCore::AriaNotifyData&) override;
     void doneWithKeyEvent(const NativeWebKeyboardEvent&, bool wasEventHandled) override;
 #if ENABLE(TOUCH_EVENTS)
     void doneWithTouchEvent(const WebTouchEvent&, bool wasEventHandled) override;

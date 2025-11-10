@@ -55,6 +55,7 @@ messages -> WebPageProxy {
     RootViewToAccessibilityScreen(WebCore::IntRect rect) -> (WebCore::IntRect screenFrame) Synchronous
 #if PLATFORM(IOS_FAMILY)
     RelayAccessibilityNotification(String notificationName, std::span<const uint8_t> notificationData)
+    RelayAriaNotifyNotification(struct WebCore::AriaNotifyData notificationData)
 #endif
     EnableAccessibilityForAllProcesses()
 

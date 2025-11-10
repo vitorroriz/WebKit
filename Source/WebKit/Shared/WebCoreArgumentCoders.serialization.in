@@ -8934,6 +8934,19 @@ struct WebCore::FocusEventData {
 }
 
 header: <WebCore/AXObjectCache.h>
+[CustomHeader] enum class WebCore::NotifyPriority : uint8_t {
+    Normal,
+    High
+};
+
+header: <WebCore/AXObjectCache.h>
+[CustomHeader] enum class WebCore::InterruptBehavior : uint8_t {
+    None,
+    All,
+    Pending
+};
+
+header: <WebCore/AXObjectCache.h>
 [CustomHeader] struct WebCore::AXDebugInfo {
     bool isAccessibilityEnabled;
     bool isAccessibilityThreadInitialized;
@@ -8941,7 +8954,15 @@ header: <WebCore/AXObjectCache.h>
     String isolatedTree;
     uint64_t remoteTokenHash;
     uint64_t webProcessLocalTokenHash;
-}
+};
+
+header: <WebCore/AXObjectCache.h>
+[CustomHeader] struct WebCore::AriaNotifyData {
+    String message;
+    WebCore::NotifyPriority priority;
+    WebCore::InterruptBehavior interrupt;
+    String language;
+};
 
 header: <WebCore/ScriptTrackingPrivacyCategory.h>
 [OptionSet] enum class WebCore::ScriptTrackingPrivacyFlag : uint16_t {

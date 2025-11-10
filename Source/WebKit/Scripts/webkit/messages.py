@@ -1016,6 +1016,7 @@ def headers_for_type(type, for_implementation_file=False):
         'WTF::UUID': ['<wtf/UUID.h>'],
         'WallTime': ['<wtf/WallTime.h>'],
         'WebCore::AXDebugInfo': ['<WebCore/AXObjectCache.h>'],
+        'WebCore::AriaNotifyData': ['<WebCore/AXObjectCache.h>'],
         'WebCore::AlternativeTextType': ['<WebCore/AlternativeTextClient.h>'],
         'WebCore::ApplyTrackingPrevention': ['<WebCore/NetworkStorageSession.h>'],
         'WebCore::AttachmentAssociatedElementType': ['<WebCore/AttachmentAssociatedElement.h>'],

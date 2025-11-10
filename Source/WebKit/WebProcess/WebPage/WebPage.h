@@ -280,6 +280,7 @@ enum class PaginationMode : uint8_t;
 
 struct AXDebugInfo;
 struct AppHighlight;
+struct AriaNotifyData;
 struct AttributedString;
 struct BackForwardItemIdentifierType;
 struct CharacterRange;
@@ -986,6 +987,7 @@ public:
     WebCore::IntRect rootViewToAccessibilityScreen(const WebCore::IntRect&);
 #if PLATFORM(IOS_FAMILY)
     void relayAccessibilityNotification(String&&, RetainPtr<NSData>&&);
+    void relayAriaNotifyNotification(WebCore::AriaNotifyData&&);
 #endif
 
     RefPtr<WebImage> scaledSnapshotWithOptions(const WebCore::IntRect&, double additionalScaleFactor, SnapshotOptions);

@@ -32,6 +32,7 @@
 #include "AXObjectCacheInlines.h"
 #include "AnimationTimelinesController.h"
 #include "ApplicationManifest.h"
+#include "AriaNotifyOptions.h"
 #include "AsyncNodeDeletionQueueInlines.h"
 #include "Attr.h"
 #include "BeforeUnloadEvent.h"
@@ -12101,6 +12102,24 @@ void Document::processSpeculationRulesHeader(const String& headerValue, const UR
                 protectedThis->m_loadableSpeculationRules.append(WTFMove(loadableSpeculationRules));
         });
     }
+}
+
+void Document::ariaNotify(const String& announcement)
+{
+    if (!settings().isARIANotifyEnabled())
+        return;
+
+    if (CheckedPtr cache = axObjectCache())
+        cache->postARIANotifyNotification(*this, announcement, { });
+}
+
+void Document::ariaNotify(const String& announcement, const AriaNotifyOptions& options)
+{
+    if (!settings().isARIANotifyEnabled())
+        return;
+
+    if (CheckedPtr cache = axObjectCache())
+        cache->postARIANotifyNotification(*this, announcement, options);
 }
 
 } // namespace WebCore

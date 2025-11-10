@@ -4167,6 +4167,19 @@ InvisibleAutoplayNotPermitted:
     WebCore:
       default: false
 
+IsARIANotifyEnabled:
+  type: bool
+  status: unstable
+  humanReadableName: "ariaNotify()"
+  humanReadableDescription: "Enable ariaNotify support"
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+
 IsAccessibilityIsolatedTreeEnabled:
   type: bool
   status: embedder

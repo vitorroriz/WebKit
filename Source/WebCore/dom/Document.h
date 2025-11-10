@@ -289,6 +289,7 @@ class DOMTimerHoldingTank;
 #endif
 
 struct ApplicationManifest;
+struct AriaNotifyOptions;
 struct BoundaryPoint;
 struct CSSParserContext;
 struct CaretPositionFromPointOptions;
@@ -2054,6 +2055,9 @@ public:
     WEBCORE_EXPORT void prefetch(const URL&, const Vector<String>&, std::optional<ReferrerPolicy>, bool lowPriority = false);
 
     void processSpeculationRulesHeader(const String& headerValue, const URL& baseURL);
+
+    WEBCORE_EXPORT void ariaNotify(const String&);
+    WEBCORE_EXPORT void ariaNotify(const String&, const AriaNotifyOptions&);
 
 protected:
     enum class ConstructionFlag : uint8_t {

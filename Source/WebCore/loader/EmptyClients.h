@@ -126,6 +126,7 @@ class EmptyChromeClient : public ChromeClient {
     IntRect rootViewToAccessibilityScreen(const IntRect& r) const final { return r; };
 #if PLATFORM(IOS_FAMILY)
     void relayAccessibilityNotification(String&&, RetainPtr<NSData>&&) const final { };
+    void relayAriaNotifyNotification(AriaNotifyData&&) const final { };
 #endif
 
     void didFinishLoadingImageForElement(HTMLImageElement&) final { }

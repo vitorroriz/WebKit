@@ -303,6 +303,11 @@ void WebPage::relayAccessibilityNotification(String&& notificationName, RetainPt
     send(Messages::WebPageProxy::RelayAccessibilityNotification(WTFMove(notificationName), span(notificationData.get())));
 }
 
+void WebPage::relayAriaNotifyNotification(WebCore::AriaNotifyData&& notificationData)
+{
+    send(Messages::WebPageProxy::RelayAriaNotifyNotification(WTFMove(notificationData)));
+}
+
 static void computeEditableRootHasContentAndPlainText(const VisibleSelection& selection, EditorState::PostLayoutData& data)
 {
     data.hasContent = false;

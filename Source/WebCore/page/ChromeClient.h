@@ -154,6 +154,7 @@ struct GraphicsContextGLAttributes;
 
 struct AppHighlight;
 struct ApplePayAMSUIRequest;
+struct AriaNotifyData;
 struct CharacterRange;
 struct ContactsRequestData;
 struct ContentRuleListMatchedRule;
@@ -287,6 +288,7 @@ public:
     virtual IntRect rootViewToAccessibilityScreen(const IntRect&) const = 0;
 #if PLATFORM(IOS_FAMILY)
     virtual void relayAccessibilityNotification(String&&, RetainPtr<NSData>&&) const = 0;
+    virtual void relayAriaNotifyNotification(AriaNotifyData&&) const = 0;
 #endif
 
     virtual void mainFrameDidChange() { };
