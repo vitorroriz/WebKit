@@ -1813,7 +1813,7 @@ void KeyframeEffect::getAnimatedStyle(std::unique_ptr<RenderStyle>& animatedStyl
     setAnimatedPropertiesInStyle(*animatedStyle.get(), computedTiming);
 }
 
-void KeyframeEffect::setAnimatedPropertiesInStyle(RenderStyle& targetStyle, const ComputedEffectTiming& computedTiming)
+void KeyframeEffect::setAnimatedPropertiesInStyle(RenderStyle& targetStyle, const ComputedEffectTiming& computedTiming) const
 {
     ASSERT(computedTiming.progress);
     ASSERT(computedTiming.currentIteration);
@@ -1839,7 +1839,6 @@ void KeyframeEffect::setAnimatedPropertiesInStyle(RenderStyle& targetStyle, cons
     // The effect value of a single property referenced by a keyframe effect as one of its target properties,
     // for a given iteration progress, current iteration and underlying value is calculated as follows.
 
-    updateBlendingKeyframes(targetStyle, { nullptr });
     if (m_blendingKeyframes.isEmpty())
         return;
 
