@@ -173,7 +173,6 @@ enum class MediaPlayerType {
     GStreamer,
     GStreamerMSE,
     HolePunch,
-    WirelessPlayback,
     Remote
 };
 

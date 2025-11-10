@@ -9885,10 +9885,8 @@ WindowFocusRestricted:
 WirelessPlaybackMediaPlayerEnabled:
   type: bool
   status: unstable
-  category: media
   humanReadableName: "Wireless Playback Media Player"
   humanReadableDescription: "Enable wireless playback via MediaPlayerPrivateWirelessPlayback"
-  webcoreBinding: DeprecatedGlobalSettings
   condition: ENABLE(REMOTE_PLAYBACK_MEDIA_PLAYER)
   defaultValue:
     WebCore:
@@ -9898,6 +9896,7 @@ WirelessPlaybackMediaPlayerEnabled:
     WebKitLegacy:
       default: false
   disableInLockdownMode: true
+  sharedPreferenceForWebProcess: true
 
 WirelessPlaybackTargetAPIEnabled:
   type: bool
