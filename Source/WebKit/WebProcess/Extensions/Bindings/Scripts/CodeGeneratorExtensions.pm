@@ -326,7 +326,7 @@ ${implementationClassName}* to${implementationClassName}(JSContextRef context, J
 {
     if (!context || !value || !${className}::${classRefGetter}() || !JSValueIsObjectOfClass(context, value, ${className}::${classRefGetter}()))
         return nullptr;
-    return static_cast<${implementationClassName}*>(JSWebExtensionWrapper::unwrap(context, value));
+    return downcast<${implementationClassName}>(JSWebExtensionWrapper::unwrap(context, value));
 }
 
 JSClassRef ${className}::${classRefGetter}()
