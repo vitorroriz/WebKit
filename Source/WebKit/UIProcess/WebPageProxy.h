@@ -2745,7 +2745,7 @@ public:
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
     void setDefaultSpatialTrackingLabel(const String&);
-    const String& defaultSpatialTrackingLabel() const;
+    String defaultSpatialTrackingLabel() const;
     void updateDefaultSpatialTrackingLabel();
 #endif
 

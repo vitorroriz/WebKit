@@ -16889,7 +16889,7 @@ void WebPageProxy::setDefaultSpatialTrackingLabel(const String& spatialTrackingL
     updateDefaultSpatialTrackingLabel();
 }
 
-const String& WebPageProxy::defaultSpatialTrackingLabel() const
+String WebPageProxy::defaultSpatialTrackingLabel() const
 {
     return m_defaultSpatialTrackingLabel;
 }

@@ -9961,7 +9961,7 @@ void HTMLMediaElement::updateSpatialTrackingLabel()
     player->setDefaultSpatialTrackingLabel(page->defaultSpatialTrackingLabel());
 }
 
-const String& HTMLMediaElement::spatialTrackingLabel() const
+String HTMLMediaElement::spatialTrackingLabel() const
 {
     return m_spatialTrackingLabel;
 }

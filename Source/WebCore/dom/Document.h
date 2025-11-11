@@ -1449,7 +1449,7 @@ public:
     void addScreenPropertiesChangedObserver(const ScreenPropertiesChangedObserver&);
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-    const String& defaultSpatialTrackingLabel() const;
+    String defaultSpatialTrackingLabel() const;
     void defaultSpatialTrackingLabelChanged(const String&);
 
     using DefaultSpatialTrackingLabelChangedObserver = WTF::Observer<void(const String&)>;

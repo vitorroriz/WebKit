@@ -355,9 +355,9 @@ public:
     virtual void setVideoTarget(const PlatformVideoTarget&) { }
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-    virtual const String& defaultSpatialTrackingLabel() const { return emptyString(); }
+    virtual String defaultSpatialTrackingLabel() const { return emptyString(); }
     virtual void setDefaultSpatialTrackingLabel(const String&) { }
-    virtual const String& spatialTrackingLabel() const { return emptyString(); }
+    virtual String spatialTrackingLabel() const { return emptyString(); }
     virtual void setSpatialTrackingLabel(const String&) { }
 #endif
 

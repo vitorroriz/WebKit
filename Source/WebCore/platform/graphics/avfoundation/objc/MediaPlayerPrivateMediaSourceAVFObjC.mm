@@ -39,6 +39,7 @@
 #import "GraphicsContext.h"
 #import "IOSurface.h"
 #import "Logging.h"
+#import "MediaPlayerIdentifier.h"
 #import "MediaSessionManagerCocoa.h"
 #import "MediaSourcePrivate.h"
 #import "MediaSourcePrivateAVFObjC.h"
@@ -108,17 +109,14 @@ MediaPlayerPrivateMediaSourceAVFObjC::MediaPlayerPrivateMediaSourceAVFObjC(Media
     , m_readyState(MediaPlayer::ReadyState::HaveNothing)
     , m_logger(player.mediaPlayerLogger())
     , m_logIdentifier(player.mediaPlayerLogIdentifier())
+#if HAVE(SPATIAL_TRACKING_LABEL)
+    , m_defaultSpatialTrackingLabel(player.defaultSpatialTrackingLabel())
+    , m_spatialTrackingLabel(player.spatialTrackingLabel())
+#endif
     , m_playerIdentifier(MediaPlayerIdentifier::generate())
     , m_renderer(createRenderer(*this, player.clientIdentifier(), m_playerIdentifier))
 {
-    auto logSiteIdentifier = LOGIDENTIFIER;
-    ALWAYS_LOG(logSiteIdentifier);
-    UNUSED_PARAM(logSiteIdentifier);
-
-#if HAVE(SPATIAL_TRACKING_LABEL)
-    m_defaultSpatialTrackingLabel = player.defaultSpatialTrackingLabel();
-    m_spatialTrackingLabel = player.spatialTrackingLabel();
-#endif
+    ALWAYS_LOG(LOGIDENTIFIER);
 }
 
 MediaPlayerPrivateMediaSourceAVFObjC::~MediaPlayerPrivateMediaSourceAVFObjC()
@@ -1292,7 +1290,7 @@ void MediaPlayerPrivateMediaSourceAVFObjC::setShouldMaintainAspectRatio(bool sho
 }
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-const String& MediaPlayerPrivateMediaSourceAVFObjC::defaultSpatialTrackingLabel() const
+String MediaPlayerPrivateMediaSourceAVFObjC::defaultSpatialTrackingLabel() const
 {
     assertIsMainThread();
     return m_defaultSpatialTrackingLabel;
@@ -1307,7 +1305,7 @@ void MediaPlayerPrivateMediaSourceAVFObjC::setDefaultSpatialTrackingLabel(const 
     updateSpatialTrackingLabel();
 }
 
-const String& MediaPlayerPrivateMediaSourceAVFObjC::spatialTrackingLabel() const
+String MediaPlayerPrivateMediaSourceAVFObjC::spatialTrackingLabel() const
 {
     assertIsMainThread();
     return m_spatialTrackingLabel;

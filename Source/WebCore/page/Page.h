@@ -1280,7 +1280,7 @@ public:
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
     WEBCORE_EXPORT void setDefaultSpatialTrackingLabel(const String&);
-    const String& defaultSpatialTrackingLabel() const { return m_defaultSpatialTrackingLabel; }
+    String defaultSpatialTrackingLabel() const { return m_defaultSpatialTrackingLabel; }
 #endif
 
 #if ENABLE(GAMEPAD)

@@ -1463,7 +1463,7 @@ void MediaPlayerPrivateWebM::setShouldMaintainAspectRatio(bool shouldMaintainAsp
 }
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-const String& MediaPlayerPrivateWebM::defaultSpatialTrackingLabel() const
+String MediaPlayerPrivateWebM::defaultSpatialTrackingLabel() const
 {
     return m_defaultSpatialTrackingLabel;
 }
@@ -1476,7 +1476,7 @@ void MediaPlayerPrivateWebM::setDefaultSpatialTrackingLabel(const String& defaul
     updateSpatialTrackingLabel();
 }
 
-const String& MediaPlayerPrivateWebM::spatialTrackingLabel() const
+String MediaPlayerPrivateWebM::spatialTrackingLabel() const
 {
     return m_spatialTrackingLabel;
 }

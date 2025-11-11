@@ -7935,7 +7935,7 @@ void Internals::registerPDFTest(Ref<VoidCallback>&& callback, Element& element)
         pluginViewBase->registerPDFTestCallback(WTFMove(callback));
 }
 
-const String& Internals::defaultSpatialTrackingLabel() const
+String Internals::defaultSpatialTrackingLabel() const
 {
 #if HAVE(SPATIAL_TRACKING_LABEL)
     auto* document = contextDocument();

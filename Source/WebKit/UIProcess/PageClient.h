@@ -815,7 +815,7 @@ public:
 #endif
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-    virtual const String& spatialTrackingLabel() const = 0;
+    virtual String spatialTrackingLabel() const = 0;
 #endif
 
 #if ENABLE(GAMEPAD)

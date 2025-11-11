@@ -9028,7 +9028,7 @@ void Document::addScreenPropertiesChangedObserver(const ScreenPropertiesChangedO
 }
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-const String& Document::defaultSpatialTrackingLabel() const
+String Document::defaultSpatialTrackingLabel() const
 {
     if (RefPtr page = this->page())
         return page->defaultSpatialTrackingLabel();

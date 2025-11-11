@@ -2009,7 +2009,7 @@ void MediaPlayer::setShouldCheckHardwareSupport(bool value)
 }
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-const String& MediaPlayer::defaultSpatialTrackingLabel() const
+String MediaPlayer::defaultSpatialTrackingLabel() const
 {
     return m_defaultSpatialTrackingLabel;
 }
@@ -2022,7 +2022,7 @@ void MediaPlayer::setDefaultSpatialTrackingLabel(const String& defaultSpatialTra
     protectedPrivate()->setDefaultSpatialTrackingLabel(defaultSpatialTrackingLabel);
 }
 
-const String& MediaPlayer::spatialTrackingLabel() const
+String MediaPlayer::spatialTrackingLabel() const
 {
     return m_spatialTrackingLabel;
 }

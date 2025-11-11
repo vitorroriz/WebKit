@@ -1338,7 +1338,7 @@ FloatPoint PageClientImpl::webViewToRootView(const FloatPoint& point) const
 }
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-const String& PageClientImpl::spatialTrackingLabel() const
+String PageClientImpl::spatialTrackingLabel() const
 {
     return [contentView() spatialTrackingLabel];
 }

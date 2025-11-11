@@ -1782,7 +1782,7 @@ void MediaPlayerPrivateRemote::setShouldCheckHardwareSupport(bool value)
 
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-const String& MediaPlayerPrivateRemote::defaultSpatialTrackingLabel() const
+String MediaPlayerPrivateRemote::defaultSpatialTrackingLabel() const
 {
     return m_defaultSpatialTrackingLabel;
 }
@@ -1796,7 +1796,7 @@ void MediaPlayerPrivateRemote::setDefaultSpatialTrackingLabel(const String& defa
     protectedConnection()->send(Messages::RemoteMediaPlayerProxy::SetDefaultSpatialTrackingLabel(m_defaultSpatialTrackingLabel), m_id);
 }
 
-const String& MediaPlayerPrivateRemote::spatialTrackingLabel() const
+String MediaPlayerPrivateRemote::spatialTrackingLabel() const
 {
     return m_spatialTrackingLabel;
 }

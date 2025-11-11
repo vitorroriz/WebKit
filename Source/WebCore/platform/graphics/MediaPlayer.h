@@ -779,10 +779,10 @@ public:
     void setVideoTarget(const PlatformVideoTarget&);
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-    const String& defaultSpatialTrackingLabel() const;
+    String defaultSpatialTrackingLabel() const;
     void setDefaultSpatialTrackingLabel(const String&);
 
-    const String& spatialTrackingLabel() const;
+    String spatialTrackingLabel() const;
     void setSpatialTrackingLabel(const String&);
 #endif
 

@@ -4037,7 +4037,7 @@ void MediaPlayerPrivateAVFoundationObjC::audioOutputDeviceChanged()
 }
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-const String& MediaPlayerPrivateAVFoundationObjC::defaultSpatialTrackingLabel() const
+String MediaPlayerPrivateAVFoundationObjC::defaultSpatialTrackingLabel() const
 {
     return m_defaultSpatialTrackingLabel;
 }
@@ -4050,7 +4050,7 @@ void MediaPlayerPrivateAVFoundationObjC::setDefaultSpatialTrackingLabel(const St
     updateSpatialTrackingLabel();
 }
 
-const String& MediaPlayerPrivateAVFoundationObjC::spatialTrackingLabel() const
+String MediaPlayerPrivateAVFoundationObjC::spatialTrackingLabel() const
 {
     return m_spatialTrackingLabel;
 }

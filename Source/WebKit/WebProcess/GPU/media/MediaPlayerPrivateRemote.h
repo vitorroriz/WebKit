@@ -474,9 +474,9 @@ private:
     void setShouldCheckHardwareSupport(bool) final;
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-    const String& defaultSpatialTrackingLabel() const final;
+    String defaultSpatialTrackingLabel() const final;
     void setDefaultSpatialTrackingLabel(const String&) final;
-    const String& spatialTrackingLabel() const final;
+    String spatialTrackingLabel() const final;
     void setSpatialTrackingLabel(const String&) final;
 #endif
 

@@ -371,7 +371,7 @@ private:
 #endif
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-    const String& spatialTrackingLabel() const final;
+    String spatialTrackingLabel() const final;
 #endif
 
     void scheduleVisibleContentRectUpdate() final;
