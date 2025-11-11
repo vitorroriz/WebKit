@@ -432,7 +432,7 @@ void OpenXRCoordinator::requestTransientInputHitTestSource(WebPageProxy& page, c
                 return;
             }
 
-            active.renderQueue->dispatch([this, renderState = active.renderState, completionHandler = WTFMove(completionHandler)]() mutable {
+            active.renderQueue->dispatch([renderState = active.renderState, completionHandler = WTFMove(completionHandler)]() mutable {
                 auto addResult = renderState->transientInputHitTestSources.add(renderState->nextTransientInputHitTestSource);
                 ASSERT_UNUSED(addResult.isNewEntry, addResult);
                 callOnMainRunLoop([source = renderState->nextTransientInputHitTestSource, completionHandler = WTFMove(completionHandler)] mutable {
@@ -461,7 +461,7 @@ void OpenXRCoordinator::deleteTransientInputHitTestSource(WebPageProxy& page, Pl
                 return;
             }
 
-            active.renderQueue->dispatch([this, renderState = active.renderState, source]() mutable {
+            active.renderQueue->dispatch([renderState = active.renderState, source]() mutable {
                 bool removed = renderState->transientInputHitTestSources.remove(source);
                 ASSERT_UNUSED(removed, removed);
             });
