@@ -88,21 +88,21 @@ Ref<AudioVideoRenderer> MediaPlayerPrivateWebM::createRenderer(LoggerHelper& log
     return AudioVideoRendererAVFObjC::create(Ref { loggerHelper.logger() }, loggerHelper.logIdentifier());
 }
 
-Ref<MediaPlayerPrivateWebM> MediaPlayerPrivateWebM::create(MediaPlayer* player)
+Ref<MediaPlayerPrivateWebM> MediaPlayerPrivateWebM::create(MediaPlayer& player)
 {
     return adoptRef(*new MediaPlayerPrivateWebM(player));
 }
 
-MediaPlayerPrivateWebM::MediaPlayerPrivateWebM(MediaPlayer* player)
+MediaPlayerPrivateWebM::MediaPlayerPrivateWebM(MediaPlayer& player)
     : m_player(player)
     , m_parser(SourceBufferParserWebM::create().releaseNonNull())
     , m_appendQueue(WorkQueue::create("MediaPlayerPrivateWebM data parser queue"_s))
-    , m_logger(player->mediaPlayerLogger())
-    , m_logIdentifier(player->mediaPlayerLogIdentifier())
+    , m_logger(player.mediaPlayerLogger())
+    , m_logIdentifier(player.mediaPlayerLogIdentifier())
     , m_seekTimer(*this, &MediaPlayerPrivateWebM::seekInternal)
     , m_rendererSeekRequest(NativePromiseRequest::create())
     , m_playerIdentifier(MediaPlayerIdentifier::generate())
-    , m_renderer(createRenderer(*this, player->clientIdentifier(), m_playerIdentifier))
+    , m_renderer(createRenderer(*this, player.clientIdentifier(), m_playerIdentifier))
 {
     ALWAYS_LOG(LOGIDENTIFIER);
     m_parser->setLogger(m_logger, m_logIdentifier);
@@ -117,8 +117,8 @@ MediaPlayerPrivateWebM::MediaPlayerPrivateWebM(MediaPlayer* player)
     });
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-    m_defaultSpatialTrackingLabel = player->defaultSpatialTrackingLabel();
-    m_spatialTrackingLabel = player->spatialTrackingLabel();
+    m_defaultSpatialTrackingLabel = player.defaultSpatialTrackingLabel();
+    m_spatialTrackingLabel = player.spatialTrackingLabel();
 #endif
 }
 
@@ -1398,7 +1398,7 @@ class MediaPlayerFactoryWebM final : public MediaPlayerFactory {
 private:
     MediaPlayerEnums::MediaEngineIdentifier identifier() const final { return MediaPlayerEnums::MediaEngineIdentifier::CocoaWebM; };
 
-    Ref<MediaPlayerPrivateInterface> createMediaEnginePlayer(MediaPlayer* player) const final
+    Ref<MediaPlayerPrivateInterface> createMediaEnginePlayer(MediaPlayer& player) const final
     {
         return MediaPlayerPrivateWebM::create(player);
     }

@@ -80,7 +80,7 @@ class WebCoreAVFResourceLoader;
 
 class MediaPlayerPrivateAVFoundationObjC final : public MediaPlayerPrivateAVFoundation {
 public:
-    explicit MediaPlayerPrivateAVFoundationObjC(MediaPlayer*);
+    explicit MediaPlayerPrivateAVFoundationObjC(MediaPlayer&);
     virtual ~MediaPlayerPrivateAVFoundationObjC();
 
     static void registerMediaEngine(MediaEngineRegistrar);

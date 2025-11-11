@@ -42,7 +42,7 @@ class MediaSourceTrackGStreamer;
 class MediaPlayerPrivateGStreamerMSE : public MediaPlayerPrivateGStreamer {
 
 public:
-    Ref<MediaPlayerPrivateGStreamerMSE> create(MediaPlayer* player) { return adoptRef(*new MediaPlayerPrivateGStreamerMSE(player)); }
+    Ref<MediaPlayerPrivateGStreamerMSE> create(MediaPlayer& player) { return adoptRef(*new MediaPlayerPrivateGStreamerMSE(player)); }
     virtual ~MediaPlayerPrivateGStreamerMSE();
 
     static void registerMediaEngine(MediaEngineRegistrar);
@@ -103,7 +103,7 @@ public:
     void mirrorEnabledVideoTrackIfNeeded(const VideoTrackPrivateGStreamer& originalVideoTrackPrivate) final;
 
 private:
-    explicit MediaPlayerPrivateGStreamerMSE(MediaPlayer*);
+    explicit MediaPlayerPrivateGStreamerMSE(MediaPlayer&);
 
     friend class MediaPlayerFactoryGStreamerMSE;
     static void getSupportedTypes(HashSet<String>&);

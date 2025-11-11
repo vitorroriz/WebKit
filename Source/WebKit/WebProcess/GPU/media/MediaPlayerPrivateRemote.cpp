@@ -183,20 +183,20 @@ void MediaPlayerPrivateRemote::TimeProgressEstimator::setRate(double value)
     m_rate = value;
 }
 
-MediaPlayerPrivateRemote::MediaPlayerPrivateRemote(MediaPlayer* player, MediaPlayerEnums::MediaEngineIdentifier engineIdentifier, MediaPlayerIdentifier playerIdentifier, RemoteMediaPlayerManager& manager)
+MediaPlayerPrivateRemote::MediaPlayerPrivateRemote(MediaPlayer& player, MediaPlayerEnums::MediaEngineIdentifier engineIdentifier, MediaPlayerIdentifier playerIdentifier, RemoteMediaPlayerManager& manager)
     : m_currentTimeEstimator(*this)
 #if !RELEASE_LOG_DISABLED
-    , m_logger(player->mediaPlayerLogger())
-    , m_logIdentifier(player->mediaPlayerLogIdentifier())
+    , m_logger(player.mediaPlayerLogger())
+    , m_logIdentifier(player.mediaPlayerLogIdentifier())
 #endif
-    , m_player(*player)
+    , m_player(player)
 #if PLATFORM(COCOA)
     , m_videoLayerManager(makeUniqueRef<VideoLayerManagerObjC>(logger(), logIdentifier()))
 #endif
     , m_manager(manager)
     , m_remoteEngineIdentifier(engineIdentifier)
     , m_id(playerIdentifier)
-    , m_documentSecurityOrigin(player->documentSecurityOrigin())
+    , m_documentSecurityOrigin(player.documentSecurityOrigin())
 {
     ALWAYS_LOG(LOGIDENTIFIER);
 }

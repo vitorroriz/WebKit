@@ -118,7 +118,7 @@ class MediaPlayerPrivateGStreamer
 {
     WTF_MAKE_TZONE_ALLOCATED(MediaPlayerPrivateGStreamer);
 public:
-    MediaPlayerPrivateGStreamer(MediaPlayer*);
+    MediaPlayerPrivateGStreamer(MediaPlayer&);
     virtual ~MediaPlayerPrivateGStreamer();
 
     constexpr MediaPlayerType mediaPlayerType() const override { return MediaPlayerType::GStreamer; }

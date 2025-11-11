@@ -100,24 +100,24 @@ Ref<AudioVideoRenderer> MediaPlayerPrivateMediaSourceAVFObjC::createRenderer(Log
     return AudioVideoRendererAVFObjC::create(Ref { loggerHelper.logger() }, loggerHelper.logIdentifier());
 }
 
-MediaPlayerPrivateMediaSourceAVFObjC::MediaPlayerPrivateMediaSourceAVFObjC(MediaPlayer* player)
+MediaPlayerPrivateMediaSourceAVFObjC::MediaPlayerPrivateMediaSourceAVFObjC(MediaPlayer& player)
     : m_player(player)
     , m_seekTimer(*this, &MediaPlayerPrivateMediaSourceAVFObjC::seekInternal)
     , m_rendererSeekRequest(NativePromiseRequest::create())
     , m_networkState(MediaPlayer::NetworkState::Empty)
     , m_readyState(MediaPlayer::ReadyState::HaveNothing)
-    , m_logger(player->mediaPlayerLogger())
-    , m_logIdentifier(player->mediaPlayerLogIdentifier())
+    , m_logger(player.mediaPlayerLogger())
+    , m_logIdentifier(player.mediaPlayerLogIdentifier())
     , m_playerIdentifier(MediaPlayerIdentifier::generate())
-    , m_renderer(createRenderer(*this, player->clientIdentifier(), m_playerIdentifier))
+    , m_renderer(createRenderer(*this, player.clientIdentifier(), m_playerIdentifier))
 {
     auto logSiteIdentifier = LOGIDENTIFIER;
     ALWAYS_LOG(logSiteIdentifier);
     UNUSED_PARAM(logSiteIdentifier);
 
 #if HAVE(SPATIAL_TRACKING_LABEL)
-    m_defaultSpatialTrackingLabel = player->defaultSpatialTrackingLabel();
-    m_spatialTrackingLabel = player->spatialTrackingLabel();
+    m_defaultSpatialTrackingLabel = player.defaultSpatialTrackingLabel();
+    m_spatialTrackingLabel = player.spatialTrackingLabel();
 #endif
 }
 
@@ -139,7 +139,7 @@ class MediaPlayerFactoryMediaSourceAVFObjC final : public MediaPlayerFactory {
 private:
     MediaPlayerEnums::MediaEngineIdentifier identifier() const final { return MediaPlayerEnums::MediaEngineIdentifier::AVFoundationMSE; };
 
-    Ref<MediaPlayerPrivateInterface> createMediaEnginePlayer(MediaPlayer* player) const final
+    Ref<MediaPlayerPrivateInterface> createMediaEnginePlayer(MediaPlayer& player) const final
     {
         return adoptRef(*new MediaPlayerPrivateMediaSourceAVFObjC(player));
     }

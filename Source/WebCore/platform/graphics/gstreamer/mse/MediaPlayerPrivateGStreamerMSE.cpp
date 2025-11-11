@@ -82,7 +82,7 @@ class MediaPlayerFactoryGStreamerMSE final : public MediaPlayerFactory {
 private:
     MediaPlayerEnums::MediaEngineIdentifier identifier() const final { return MediaPlayerEnums::MediaEngineIdentifier::GStreamerMSE; };
 
-    Ref<MediaPlayerPrivateInterface> createMediaEnginePlayer(MediaPlayer* player) const final
+    Ref<MediaPlayerPrivateInterface> createMediaEnginePlayer(MediaPlayer& player) const final
     {
         return adoptRef(*new MediaPlayerPrivateGStreamerMSE(player));
     }
@@ -109,7 +109,7 @@ void MediaPlayerPrivateGStreamerMSE::registerMediaEngine(MediaEngineRegistrar re
     registrar(makeUnique<MediaPlayerFactoryGStreamerMSE>());
 }
 
-MediaPlayerPrivateGStreamerMSE::MediaPlayerPrivateGStreamerMSE(MediaPlayer* player)
+MediaPlayerPrivateGStreamerMSE::MediaPlayerPrivateGStreamerMSE(MediaPlayer& player)
     : MediaPlayerPrivateGStreamer(player)
 {
     GST_TRACE("creating the player (%p)", this);

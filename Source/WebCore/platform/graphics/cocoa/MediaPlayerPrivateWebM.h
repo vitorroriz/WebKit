@@ -78,7 +78,7 @@ class MediaPlayerPrivateWebM
     , public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<MediaPlayerPrivateWebM, WTF::DestructionThread::Main> {
     WTF_MAKE_TZONE_ALLOCATED(MediaPlayerPrivateWebM);
 public:
-    static Ref<MediaPlayerPrivateWebM> create(MediaPlayer*);
+    static Ref<MediaPlayerPrivateWebM> create(MediaPlayer&);
     ~MediaPlayerPrivateWebM();
 
     constexpr MediaPlayerType mediaPlayerType() const final { return MediaPlayerType::CocoaWebM; }
@@ -88,7 +88,7 @@ public:
     WTF_ABSTRACT_THREAD_SAFE_REF_COUNTED_AND_CAN_MAKE_WEAK_PTR_IMPL;
 
 private:
-    explicit MediaPlayerPrivateWebM(MediaPlayer*);
+    explicit MediaPlayerPrivateWebM(MediaPlayer&);
 
     void setPreload(MediaPlayer::Preload) final;
     void doPreload();

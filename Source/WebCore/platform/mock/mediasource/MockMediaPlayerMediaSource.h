@@ -47,7 +47,7 @@ public:
     void ref() const final { RefCounted::ref(); }
     void deref() const final { RefCounted::deref(); }
 
-    explicit MockMediaPlayerMediaSource(MediaPlayer*);
+    explicit MockMediaPlayerMediaSource(MediaPlayer&);
 
     // MediaPlayer Engine Support
     WEBCORE_EXPORT static void registerMediaEngine(MediaEngineRegistrar);

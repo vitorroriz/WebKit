@@ -162,24 +162,24 @@ MediaLogObserver& mediaLogObserverSingleton()
 }
 #endif // GST_DISABLE_GST_DEBUG
 
-MediaPlayerPrivateGStreamer::MediaPlayerPrivateGStreamer(MediaPlayer* player)
+MediaPlayerPrivateGStreamer::MediaPlayerPrivateGStreamer(MediaPlayer& player)
     : m_notifier(MainThreadNotifier<MainThreadNotification>::create())
     , m_player(player)
-    , m_referrer(player->referrer())
+    , m_referrer(player.referrer())
     , m_cachedDuration(MediaTime::invalidTime())
     , m_timeOfOverlappingSeek(MediaTime::invalidTime())
     , m_fillTimer(*this, &MediaPlayerPrivateGStreamer::fillTimerFired)
     , m_maxTimeLoaded(MediaTime::zeroTime())
-    , m_preload(player->preload())
+    , m_preload(player.preload())
     , m_maxTimeLoadedAtLastDidLoadingProgress(MediaTime::zeroTime())
     , m_drawTimer(RunLoop::mainSingleton(), "MediaPlayerPrivateGStreamer::DrawTimer"_s, this, &MediaPlayerPrivateGStreamer::repaint)
     , m_pausedTimerHandler(RunLoop::mainSingleton(), "MediaPlayerPrivateGStreamer::PausedTimerHandler"_s, this, &MediaPlayerPrivateGStreamer::pausedTimerFired)
 #if !RELEASE_LOG_DISABLED
-    , m_logger(player->mediaPlayerLogger())
-    , m_logIdentifier(player->mediaPlayerLogIdentifier())
+    , m_logger(player.mediaPlayerLogger())
+    , m_logIdentifier(player.mediaPlayerLogIdentifier())
 #endif
     , m_startTime(MediaTime::invalidTime())
-    , m_loader(player->mediaResourceLoader())
+    , m_loader(player.mediaResourceLoader())
 {
 
 #if !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
@@ -196,7 +196,7 @@ MediaPlayerPrivateGStreamer::MediaPlayerPrivateGStreamer(MediaPlayer* player)
 #endif
     m_isPlayerShuttingDown.store(false);
 
-    if (player->isGStreamerHolePunchingEnabled()) {
+    if (player.isGStreamerHolePunchingEnabled()) {
         m_quirksManagerForTesting = GStreamerQuirksManager::createForTesting();
         m_quirksManagerForTesting->setHolePunchEnabledForTesting(true);
     }
@@ -304,7 +304,7 @@ class MediaPlayerFactoryGStreamer final : public MediaPlayerFactory {
 private:
     MediaPlayerEnums::MediaEngineIdentifier identifier() const final { return MediaPlayerEnums::MediaEngineIdentifier::GStreamer; };
 
-    Ref<MediaPlayerPrivateInterface> createMediaEnginePlayer(MediaPlayer* player) const final
+    Ref<MediaPlayerPrivateInterface> createMediaEnginePlayer(MediaPlayer& player) const final
     {
         return adoptRef(*new MediaPlayerPrivateGStreamer(player));
     }

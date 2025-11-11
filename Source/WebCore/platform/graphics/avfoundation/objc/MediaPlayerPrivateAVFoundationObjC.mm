@@ -268,7 +268,7 @@ class MediaPlayerPrivateAVFoundationObjC::Factory final : public MediaPlayerFact
 private:
     MediaPlayerEnums::MediaEngineIdentifier identifier() const final { return MediaPlayerEnums::MediaEngineIdentifier::AVFoundation; };
 
-    Ref<MediaPlayerPrivateInterface> createMediaEnginePlayer(MediaPlayer* player) const final
+    Ref<MediaPlayerPrivateInterface> createMediaEnginePlayer(MediaPlayer& player) const final
     {
         return adoptRef(*new MediaPlayerPrivateAVFoundationObjC(player));
     }
@@ -423,7 +423,7 @@ void MediaPlayerPrivateAVFoundationObjC::clearMediaCacheForOrigins(const String&
     }
 }
 
-MediaPlayerPrivateAVFoundationObjC::MediaPlayerPrivateAVFoundationObjC(MediaPlayer* player)
+MediaPlayerPrivateAVFoundationObjC::MediaPlayerPrivateAVFoundationObjC(MediaPlayer& player)
     : MediaPlayerPrivateAVFoundation(player)
     , m_videoLayerManager(makeUniqueRef<VideoLayerManagerObjC>(protectedLogger(), logIdentifier()))
     , m_objcObserver(adoptNS([[WebCoreAVFMovieObserver alloc] initWithPlayer:*this]))
@@ -431,13 +431,13 @@ MediaPlayerPrivateAVFoundationObjC::MediaPlayerPrivateAVFoundationObjC(MediaPlay
     , m_cachedItemStatus(MediaPlayerAVPlayerItemStatusDoesNotExist)
 {
     ALWAYS_LOG(LOGIDENTIFIER);
-    m_muted = player->muted();
+    m_muted = player.muted();
 #if HAVE(SPATIAL_TRACKING_LABEL)
-    m_defaultSpatialTrackingLabel = player->defaultSpatialTrackingLabel();
-    m_spatialTrackingLabel = player->spatialTrackingLabel();
+    m_defaultSpatialTrackingLabel = player.defaultSpatialTrackingLabel();
+    m_spatialTrackingLabel = player.spatialTrackingLabel();
 #endif
 #if ENABLE(LINEAR_MEDIA_PLAYER)
-    setVideoTarget(player->videoTarget());
+    setVideoTarget(player.videoTarget());
 #endif
 }
 

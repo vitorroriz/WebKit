@@ -646,7 +646,7 @@ void MediaPlayer::loadWithNextMediaEngine(const MediaPlayerFactory* current)
     } else if (m_currentMediaEngine != engine) {
         m_currentMediaEngine = engine;
         m_attemptedEngines.add(*engine);
-        RefPtr playerPrivate = engine->createMediaEnginePlayer(this);
+        RefPtr playerPrivate = engine->createMediaEnginePlayer(*this);
         m_private = playerPrivate;
         if (playerPrivate) {
             protectedClient()->mediaPlayerEngineUpdated();

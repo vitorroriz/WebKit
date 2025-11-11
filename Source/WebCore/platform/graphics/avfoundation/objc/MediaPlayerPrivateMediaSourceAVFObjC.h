@@ -75,7 +75,7 @@ public:
     void ref() const final { RefCounted::ref(); }
     void deref() const final { RefCounted::deref(); }
 
-    explicit MediaPlayerPrivateMediaSourceAVFObjC(MediaPlayer*);
+    explicit MediaPlayerPrivateMediaSourceAVFObjC(MediaPlayer&);
     virtual ~MediaPlayerPrivateMediaSourceAVFObjC();
 
     constexpr MediaPlayerType mediaPlayerType() const final { return MediaPlayerType::AVFObjCMSE; }
