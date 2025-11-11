@@ -99,14 +99,13 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
 
     layoutWithFormattingContextForBox(block, { }, { }, layoutState);
     ASSERT(!block.rendererForIntegration()->needsLayout());
+    auto& blockGeometry = layoutState.ensureGeometryForBox(block);
+    blockGeometry.setTopLeft(LayoutPoint { blockGeometry.marginStart(), blockGeometry.marginBefore() });
 
     auto populateIFCWithNewlyPlacedFloats = [&] {
         auto* renderBlockFlow = dynamicDowncast<RenderBlockFlow>(*block.rendererForIntegration());
         if (!renderBlockFlow)
             return;
-
-        auto& blockBoxGeometry = layoutState.ensureGeometryForBox(block);
-        blockBoxGeometry.setTopLeft(LayoutPoint { blockBoxGeometry.marginStart(), blockBoxGeometry.marginBefore() });
 
         if (!renderBlockFlow->containsFloats() || renderBlockFlow->createsNewFormattingContext())
             return;
