@@ -17306,8 +17306,24 @@ IGNORE_CLANG_WARNINGS_END
 
     void compileMaterializeNewArrayWithButterfly()
     {
-        for (unsigned i = 0; i < m_node->numChildren(); ++i)
-            RELEASE_ASSERT(!m_interpreter.needsTypeCheck(m_graph.varArgChild(m_node, i)));
+        SpeculatedType validTypes = [&]() {
+            switch (m_node->indexingType()) {
+            // We can get JSValue() (aka SpecEmpty) when the property hasn't been initialized yet and is still a hole.
+            case ALL_INT32_INDEXING_TYPES: return SpecInt32Only | SpecEmpty;
+            case ALL_DOUBLE_INDEXING_TYPES: return SpecBytecodeNumber;
+            case ALL_CONTIGUOUS_INDEXING_TYPES: return SpecBytecodeTop;
+            default: break;
+            }
+            RELEASE_ASSERT_NOT_REACHED();
+        }();
+        for (unsigned i = 0; i < m_node->numChildren(); ++i) {
+            Edge child = m_graph.varArgChild(m_node, i);
+            DFG_ASSERT(m_graph, m_node, !m_interpreter.needsTypeCheck(child));
+            if (i >= 2) {
+                SpeculatedType provenType = m_state.forNode(child).m_type;
+                DFG_ASSERT(m_graph, m_node, isSubtypeSpeculation(provenType, validTypes), provenType, validTypes);
+            }
+        }
 
         IndexingType indexingType = m_node->indexingType();
         LValue publicLength = lowInt32(m_graph.varArgChild(m_node, 0));
