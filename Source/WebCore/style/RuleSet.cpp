@@ -136,11 +136,10 @@ static bool shouldHaveBucketForAttributeName(const CSSSelector& attributeSelecto
 void RuleSet::addRule(const StyleRule& rule, unsigned selectorIndex, unsigned selectorListIndex)
 {
     RuleData ruleData(rule, selectorIndex, selectorListIndex, m_ruleCount, { });
-    // This path is used when building invalidation RuleSets, no need to collect features (nullptr CollectionContext).
-    addRule(WTFMove(ruleData), 0, 0, 0, nullptr);
+    addRule(WTFMove(ruleData), 0, 0, 0);
 }
 
-void RuleSet::addRule(RuleData&& ruleData, CascadeLayerIdentifier cascadeLayerIdentifier, ContainerQueryIdentifier containerQueryIdentifier, ScopeRuleIdentifier scopeRuleIdentifier, RuleFeatureSet::CollectionContext* featureCollectionContext)
+void RuleSet::addRule(RuleData&& ruleData, CascadeLayerIdentifier cascadeLayerIdentifier, ContainerQueryIdentifier containerQueryIdentifier, ScopeRuleIdentifier scopeRuleIdentifier)
 {
     ASSERT(ruleData.position() == m_ruleCount);
 
@@ -171,8 +170,7 @@ void RuleSet::addRule(RuleData&& ruleData, CascadeLayerIdentifier cascadeLayerId
     };
     ruleData.setLinkMatchType(computeLinkMatchType());
 
-    if (featureCollectionContext)
-        m_features.collectFeatures(*featureCollectionContext, ruleData, scopeRules);
+    m_features.collectFeatures(ruleData, scopeRules);
 
     unsigned classBucketSize = 0;
     const CSSSelector* idSelector = nullptr;
