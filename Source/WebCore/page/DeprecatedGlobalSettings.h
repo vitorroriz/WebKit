@@ -121,6 +121,11 @@ public:
     static bool modelDocumentEnabled() { return singleton().m_modelDocumentEnabled; }
 #endif
 
+#if ENABLE(WIRELESS_PLAYBACK_MEDIA_PLAYER)
+    static void setWirelessPlaybackMediaPlayerEnabled(bool isEnabled) { singleton().m_wirelessPlaybackMediaPlayerEnabled = isEnabled; }
+    static bool isWirelessPlaybackMediaPlayerEnabled() { return singleton().m_wirelessPlaybackMediaPlayerEnabled; }
+#endif
+
 private:
     WEBCORE_EXPORT static DeprecatedGlobalSettings& singleton();
     DeprecatedGlobalSettings() = default;
@@ -175,6 +180,10 @@ private:
 
 #if ENABLE(MODEL_ELEMENT)
     bool m_modelDocumentEnabled { false };
+#endif
+
+#if ENABLE(WIRELESS_PLAYBACK_MEDIA_PLAYER)
+    bool m_wirelessPlaybackMediaPlayerEnabled { false };
 #endif
 
     friend class NeverDestroyed<DeprecatedGlobalSettings>;

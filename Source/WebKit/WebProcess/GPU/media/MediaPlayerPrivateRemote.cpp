@@ -1850,6 +1850,7 @@ bool MediaPlayerPrivateRemote::supportsLinearMediaPlayer() const
     case MediaPlayerMediaEngineIdentifier::HolePunch:
     case MediaPlayerMediaEngineIdentifier::MediaFoundation:
     case MediaPlayerMediaEngineIdentifier::MockMSE:
+    case MediaPlayerMediaEngineIdentifier::WirelessPlayback:
         return false;
     }
 
