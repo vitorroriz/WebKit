@@ -3434,17 +3434,17 @@ GraphicsContextFiltersEnabled:
 
 GridFormattingContextIntegrationEnabled:
   type: bool
-  status: unstable
+  status: stable
   category: dom
   humanReadableName: "Next-generation grid layout integration (GFC)"
   humanReadableDescription: "Enable next-generation grid layout integration (GFC)"
   defaultValue:
     WebKitLegacy:
-      default: false
+      default: true
     WebKit:
-      default: false
+      default: true
     WebCore:
-      default: false
+      default: true
 
 HTMLEnhancedSelectParsingEnabled:
    type: bool
