@@ -536,6 +536,7 @@
 
 (define (kernel-mig-routine-rarely-used-need-backtrace-blocked-in-lockdown-mode)
     (kernel-mig-routine
+        ;; rdar://131735906 - we should see if we can modify the dependent library to remove the clock_get_time call
         clock_get_time
 #if !ENABLE(WEBCONTENT_GPU_SANDBOX_EXTENSIONS_BLOCKING)
         io_connect_add_client
