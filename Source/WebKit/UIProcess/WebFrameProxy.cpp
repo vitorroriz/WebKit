@@ -71,6 +71,10 @@
 #include <wtf/WeakRef.h>
 #include <wtf/text/WTFString.h>
 
+#if ENABLE(WEBDRIVER_BIDI)
+#include "WebAutomationSession.h"
+#endif
+
 #if ENABLE(APPLE_PAY)
 #include <WebCore/PaymentSession.h>
 #endif
@@ -466,9 +470,23 @@ void WebFrameProxy::collapseSelection()
 
 void WebFrameProxy::disconnect()
 {
-    if (RefPtr parentFrame = m_parentFrame.get())
+    if (RefPtr parentFrame = m_parentFrame.get()) {
+#if ENABLE(WEBDRIVER_BIDI)
+        if (RefPtr page = m_page.get()) {
+            if (RefPtr session = page->activeAutomationSession())
+                session->willDestroyFrame(*this);
+        }
+#endif
         parentFrame->m_childFrames.remove(*this);
+    }
     m_parentFrame = nullptr;
+}
+
+bool WebFrameProxy::isConnected() const
+{
+    if (RefPtr parentFrame = m_parentFrame.get())
+        return parentFrame->m_childFrames.contains(*this);
+    return false;
 }
 
 void WebFrameProxy::didCreateSubframe(WebCore::FrameIdentifier frameID, String&& frameName, SandboxFlags effectiveSandboxFlags, ReferrerPolicy effectiveReferrerPolicy, WebCore::ScrollbarMode scrollingMode)
@@ -493,6 +511,11 @@ void WebFrameProxy::didCreateSubframe(WebCore::FrameIdentifier frameID, String&&
     child->m_frameName = WTFMove(frameName);
     page->observeAndCreateRemoteSubframesInOtherProcesses(child, child->m_frameName);
     m_childFrames.add(WTFMove(child));
+
+#if ENABLE(WEBDRIVER_BIDI)
+    if (RefPtr session = page->activeAutomationSession())
+        session->didCreateFrame(child.get());
+#endif
 }
 
 void WebFrameProxy::prepareForProvisionalLoadInProcess(WebProcessProxy& process, API::Navigation& navigation, BrowsingContextGroup& group, CompletionHandler<void(WebCore::PageIdentifier)>&& completionHandler)

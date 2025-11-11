@@ -29,6 +29,7 @@
 #include "AutomationBackendDispatchers.h"
 #include "AutomationFrontendDispatchers.h"
 #include "Connection.h"
+#include "FrameTreeNodeData.h"
 #include "MessageReceiver.h"
 #include "MessageSender.h"
 #include "SimulatedInputDispatcher.h"
@@ -173,6 +174,12 @@ public:
     void navigationFailedForFrame(const WebFrameProxy&, std::optional<WebCore::NavigationIdentifier>);
     void navigationAbortedForFrame(const WebFrameProxy&, std::optional<WebCore::NavigationIdentifier>);
     void fragmentNavigatedForFrame(const WebFrameProxy&, std::optional<WebCore::NavigationIdentifier>);
+    void emitContextCreatedEvent(const WebPageProxy&);
+    void didCreateFrame(const WebFrameProxy&);
+    void willDestroyFrame(const WebFrameProxy&);
+    void contextCreatedForFrame(const WebFrameProxy&);
+    void contextDestroyedForPage(const WebPageProxy&);
+    void contextDestroyedForFrame(const WebFrameProxy&);
 #endif
     void willClosePage(const WebPageProxy&);
     void handleRunOpenPanel(const WebPageProxy&, const WebFrameProxy&, const API::OpenPanelParameters&, WebOpenPanelResultListenerProxy&);
@@ -321,6 +328,11 @@ private:
     void restoreWindowForPage(WebPageProxy&, WTF::CompletionHandler<void()>&&);
     void maximizeWindowForPage(WebPageProxy&, WTF::CompletionHandler<void()>&&);
     void hideWindowForPage(WebPageProxy&, WTF::CompletionHandler<void()>&&);
+
+#if ENABLE(WEBDRIVER_BIDI)
+    void recursivelyEmitContextCreatedEvent(const FrameTreeNodeData&, std::optional<String>&& parentContext);
+    WebPageProxy* getOpenerPage(const WebPageProxy&);
+#endif
 
     // IPC::MessageReceiver (Implemented by generated code in WebAutomationSessionMessageReceiver.cpp).
     void didReceiveMessage(IPC::Connection&, IPC::Decoder&) override;

@@ -447,9 +447,6 @@ void WebAutomationSession::closeBrowsingContext(const Inspector::Protocol::Autom
     auto page = webPageProxyForHandle(handle);
     ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(!page, WindowNotFound);
 
-    // Prevent further uses of the page's handle while the page is being closed.
-    m_handleWebPageMap.remove(handle);
-
     page->closePage();
 
     RunLoop::mainSingleton().dispatch([callback = WTFMove(callback)] {
@@ -1023,6 +1020,7 @@ void WebAutomationSession::wheelEventsFlushedForPage(const WebPageProxy& page)
 void WebAutomationSession::didCreatePage(WebPageProxy& page)
 {
     m_bidiProcessor->browserAgent().didCreatePage(page);
+    emitContextCreatedEvent(page);
 }
 
 void WebAutomationSession::navigationStartedForFrame(const WebFrameProxy& frame, std::optional<WebCore::NavigationIdentifier> navigationID)
@@ -1049,12 +1047,161 @@ void WebAutomationSession::fragmentNavigatedForFrame(const WebFrameProxy& frame,
 {
     m_bidiProcessor->browsingContextDomainNotifier().fragmentNavigated(handleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), WallTime::now().secondsSinceEpoch().milliseconds(), frame.url().string());
 }
+
+void WebAutomationSession::emitContextCreatedEvent(const WebPageProxy& page)
+{
+    if (RefPtr mutablePage = WebProcessProxy::webPage(page.identifier())) {
+        mutablePage->getAllFrameTrees([this, protectedThis = Ref { *this }, pageID = page.identifier()](Vector<FrameTreeNodeData>&& trees) {
+            RefPtr page = WebProcessProxy::webPage(pageID);
+            if (!page)
+                return;
+
+            for (auto& tree : trees)
+                recursivelyEmitContextCreatedEvent(tree, std::nullopt);
+        });
+    }
+}
+
+static std::pair<String, String> getClientWindowAndUserContext(const WebPageProxy& page)
+{
+    String clientWindow = makeString(page.identifier().toUInt64());
+    String userContext = "default"_s;
+    // FIXME: https://bugs.webkit.org/show_bug.cgi?id=281941 - Add support for reporting user context
+    return { clientWindow, userContext };
+}
+
+WebPageProxy* WebAutomationSession::getOpenerPage(const WebPageProxy& page)
+{
+    if (auto openerFrameID = page.openerFrameIdentifier()) {
+        if (RefPtr openerFrame = WebFrameProxy::webFrame(*openerFrameID))
+            return openerFrame->page();
+    }
+    return nullptr;
+}
+
+void WebAutomationSession::didCreateFrame(const WebFrameProxy& frame)
+{
+    handleForWebFrameProxy(frame);
+#if ENABLE(WEBDRIVER_BIDI)
+    contextCreatedForFrame(frame);
+#endif
+}
+
+void WebAutomationSession::willDestroyFrame(const WebFrameProxy& frame)
+{
+#if ENABLE(WEBDRIVER_BIDI)
+    contextDestroyedForFrame(frame);
+#endif
+}
+
+void WebAutomationSession::contextCreatedForFrame(const WebFrameProxy& frame)
+{
+    auto contextHandle = handleForWebFrameProxy(frame);
+    auto url = frame.url().string();
+    String parentHandle = "null"_s;
+    if (RefPtr parentFrame = frame.parentFrame())
+        parentHandle = handleForWebFrameProxy(*parentFrame);
+
+    // FIXME: https://bugs.webkit.org/show_bug.cgi?id=281941 - Add support for reporting clientWindow for frames
+    String clientWindow = "unknown-window"_s;
+    String userContext = "default"_s;
+
+    if (RefPtr page = frame.page()) {
+        auto [windowId, contextId] = getClientWindowAndUserContext(*page);
+        clientWindow = windowId;
+        userContext = contextId;
+    }
+
+    m_bidiProcessor->browsingContextDomainNotifier().contextCreated(contextHandle, url, "null"_s, parentHandle, JSON::ArrayOf<Inspector::Protocol::BidiBrowsingContext::Info>::create(), clientWindow, userContext);
+}
+
+void WebAutomationSession::recursivelyEmitContextCreatedEvent(const FrameTreeNodeData& tree, std::optional<String>&& parentContext)
+{
+    RefPtr frame = WebFrameProxy::webFrame(tree.info.frameID);
+    if (!frame)
+        return;
+
+    RefPtr page = frame->page();
+    if (!page)
+        return;
+
+    String contextHandle;
+    String originalOpenerHandle = "null"_s;
+
+    if (tree.info.isMainFrame) {
+        contextHandle = handleForWebPageProxy(*page);
+        if (RefPtr openerPage = this->getOpenerPage(*page))
+            originalOpenerHandle = handleForWebPageProxy(*openerPage);
+    } else
+        contextHandle = handleForWebFrameID(tree.info.frameID);
+
+    String url = tree.info.request.url().string();
+    auto [clientWindow, userContext] = getClientWindowAndUserContext(*page);
+    auto children = JSON::ArrayOf<Inspector::Protocol::BidiBrowsingContext::Info>::create();
+    // FIXME: Use JSON null instead of string "null" when Inspector::Protocol supports RefPtr<String> or std::optional<String>
+    String parentContextHandle = parentContext.value_or("null"_s);
+
+    m_bidiProcessor->browsingContextDomainNotifier().contextCreated(contextHandle, url, originalOpenerHandle, parentContextHandle, WTFMove(children), clientWindow, userContext);
+
+    for (const auto& child : tree.children)
+        recursivelyEmitContextCreatedEvent(child, contextHandle);
+}
+
+void WebAutomationSession::contextDestroyedForPage(const WebPageProxy& page)
+{
+    auto contextHandle = handleForWebPageProxy(page);
+    auto url = page.currentURL();
+
+    String parentContext = "null"_s;
+    if (RefPtr mainFrame = page.mainFrame()) {
+        if (RefPtr parentFrame = mainFrame->parentFrame())
+            parentContext = handleForWebFrameProxy(*parentFrame);
+    }
+
+    String originalOpenerHandle = "null"_s;
+    if (RefPtr openerPage = this->getOpenerPage(page))
+        originalOpenerHandle = handleForWebPageProxy(*openerPage);
+
+    auto [clientWindow, userContext] = getClientWindowAndUserContext(page);
+
+    m_bidiProcessor->browsingContextDomainNotifier().contextDestroyed(contextHandle, url, originalOpenerHandle, parentContext, JSON::ArrayOf<Inspector::Protocol::BidiBrowsingContext::Info>::create(), clientWindow, userContext);
+
+    m_handleWebPageMap.remove(contextHandle);
+    m_webPageHandleMap.remove(page.identifier());
+}
+
+void WebAutomationSession::contextDestroyedForFrame(const WebFrameProxy& frame)
+{
+    auto contextHandle = handleForWebFrameProxy(frame);
+    auto url = frame.url().string();
+    String parentHandle = "null"_s;
+    if (RefPtr parentFrame = frame.parentFrame())
+        parentHandle = handleForWebFrameProxy(*parentFrame);
+
+    String clientWindow = "unknown-window"_s;
+    String userContext = "default"_s;
+
+    if (RefPtr page = frame.page()) {
+        auto [windowId, contextId] = getClientWindowAndUserContext(*page);
+        clientWindow = windowId;
+        userContext = contextId;
+    }
+
+    m_bidiProcessor->browsingContextDomainNotifier().contextDestroyed(contextHandle, url, "null"_s, parentHandle, JSON::ArrayOf<Inspector::Protocol::BidiBrowsingContext::Info>::create(), clientWindow, userContext);
+
+    // Note: Frame handle cleanup is done by didDestroyFrame(), so we don't duplicate that here
+}
+
 #endif
 
 void WebAutomationSession::willClosePage(const WebPageProxy& page)
 {
     String handle = handleForWebPageProxy(page);
     m_domainNotifier->browsingContextCleared(handle);
+
+#if ENABLE(WEBDRIVER_BIDI)
+    contextDestroyedForPage(page);
+#endif
 
     // Cancel pending interactions on this page. By providing an error, this will cause subsequent
     // actions to be aborted and the SimulatedInputDispatcher::run() call will unwind and fail.
