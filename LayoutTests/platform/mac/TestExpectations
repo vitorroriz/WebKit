@@ -364,7 +364,6 @@ webkit.org/b/107118 fast/canvas/canvas-quadratic-same-endpoint.html [ Failure ]
 webkit.org/b/142258 fast/css/object-fit/object-fit-canvas.html [ Pass ImageOnlyFailure ]
 
 # --- Compositing ----
-css3/filters/composited-during-transition-layertree.html
 
 platform/mac/fast/text/combining-character-sequence-fallback.html [ Pass Failure ]
 
