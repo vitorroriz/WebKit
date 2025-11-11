@@ -146,17 +146,17 @@ void WorkerConsoleClient::timeStamp(JSC::JSGlobalObject*, Ref<ScriptArguments>&&
 static CanvasRenderingContext* canvasRenderingContext(JSC::VM& vm, JSC::JSValue target)
 {
 #if ENABLE(OFFSCREEN_CANVAS)
-    if (auto* canvas = JSOffscreenCanvas::toWrapped(vm, target))
+    if (RefPtr canvas = JSOffscreenCanvas::toWrapped(vm, target))
         return canvas->renderingContext();
-    if (auto* context = JSOffscreenCanvasRenderingContext2D::toWrapped(vm, target))
+    SUPPRESS_UNCOUNTED_LOCAL if (auto* context = JSOffscreenCanvasRenderingContext2D::toWrapped(vm, target))
         return context;
 #endif
-    if (auto* context = JSImageBitmapRenderingContext::toWrapped(vm, target))
+    SUPPRESS_UNCOUNTED_LOCAL if (auto* context = JSImageBitmapRenderingContext::toWrapped(vm, target))
         return context;
 #if ENABLE(WEBGL)
-    if (auto* context = JSWebGLRenderingContext::toWrapped(vm, target))
+    SUPPRESS_UNCOUNTED_LOCAL if (auto* context = JSWebGLRenderingContext::toWrapped(vm, target))
         return context;
-    if (auto* context = JSWebGL2RenderingContext::toWrapped(vm, target))
+    SUPPRESS_UNCOUNTED_LOCAL if (auto* context = JSWebGL2RenderingContext::toWrapped(vm, target))
         return context;
 #endif
     return nullptr;
@@ -181,7 +181,7 @@ void WorkerConsoleClient::screenshot(JSC::JSGlobalObject* lexicalGlobalObject, R
     if (arguments->argumentCount()) {
         auto possibleTarget = arguments->argumentAt(0);
 
-        if (auto* imageData = JSImageData::toWrapped(vm, possibleTarget)) {
+        if (RefPtr imageData = JSImageData::toWrapped(vm, possibleTarget)) {
             target = possibleTarget;
             if (InspectorInstrumentation::hasFrontends()) [[unlikely]] {
                 if (auto imageBuffer = ImageBuffer::create(imageData->size(), RenderingMode::Unaccelerated, RenderingPurpose::Unspecified, /* scale */ 1, DestinationColorSpace::SRGB(), PixelFormat::BGRA8)) {
@@ -189,13 +189,13 @@ void WorkerConsoleClient::screenshot(JSC::JSGlobalObject* lexicalGlobalObject, R
                     dataURL = imageBuffer->toDataURL("image/png"_s, /* quality */ std::nullopt, PreserveResolution::Yes);
                 }
             }
-        } else if (auto* imageBitmap = JSImageBitmap::toWrapped(vm, possibleTarget)) {
+        } else if (RefPtr imageBitmap = JSImageBitmap::toWrapped(vm, possibleTarget)) {
             target = possibleTarget;
             if (InspectorInstrumentation::hasFrontends()) [[unlikely]] {
-                if (auto* imageBuffer = imageBitmap->buffer())
+                if (RefPtr imageBuffer = imageBitmap->buffer())
                     dataURL = imageBuffer->toDataURL("image/png"_s, /* quality */ std::nullopt, PreserveResolution::Yes);
             }
-        } else if (auto* context = canvasRenderingContext(vm, possibleTarget)) {
+        } else if (RefPtr context = canvasRenderingContext(vm, possibleTarget)) {
             target = possibleTarget;
             if (InspectorInstrumentation::hasFrontends()) [[unlikely]] {
                 if (auto result = InspectorCanvas::getContentAsDataURL(*context))
@@ -212,7 +212,7 @@ void WorkerConsoleClient::screenshot(JSC::JSGlobalObject* lexicalGlobalObject, R
 
     if (InspectorInstrumentation::hasFrontends()) [[unlikely]] {
         if (dataURL.isEmpty()) {
-            InspectorInstrumentation::addMessageToConsole(m_globalScope, makeUnique<Inspector::ConsoleMessage>(MessageSource::ConsoleAPI, MessageType::Image, MessageLevel::Error, "Could not capture screenshot"_s, WTFMove(arguments)));
+            InspectorInstrumentation::addMessageToConsole(protectedGlobalScope(), makeUnique<Inspector::ConsoleMessage>(MessageSource::ConsoleAPI, MessageType::Image, MessageLevel::Error, "Could not capture screenshot"_s, WTFMove(arguments)));
             return;
         }
     }
@@ -222,7 +222,12 @@ void WorkerConsoleClient::screenshot(JSC::JSGlobalObject* lexicalGlobalObject, R
     adjustedArguments.append({ vm, target ? target : JSC::jsNontrivialString(vm, "Viewport"_s) });
     for (size_t i = (!target ? 0 : 1); i < arguments->argumentCount(); ++i)
         adjustedArguments.append({ vm, arguments->argumentAt(i) });
-    InspectorInstrumentation::addMessageToConsole(m_globalScope, makeUnique<Inspector::ConsoleMessage>(MessageSource::ConsoleAPI, MessageType::Image, MessageLevel::Log, dataURL, ScriptArguments::create(lexicalGlobalObject, WTFMove(adjustedArguments)), lexicalGlobalObject, /* requestIdentifier */ 0, timestamp));
+    InspectorInstrumentation::addMessageToConsole(protectedGlobalScope(), makeUnique<Inspector::ConsoleMessage>(MessageSource::ConsoleAPI, MessageType::Image, MessageLevel::Log, dataURL, ScriptArguments::create(lexicalGlobalObject, WTFMove(adjustedArguments)), lexicalGlobalObject, /* requestIdentifier */ 0, timestamp));
+}
+
+Ref<WorkerOrWorkletGlobalScope> WorkerConsoleClient::protectedGlobalScope()
+{
+    return m_globalScope.get();
 }
 
 } // namespace WebCore
