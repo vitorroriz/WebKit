@@ -255,6 +255,10 @@
 #import <pal/cocoa/LockdownModeCocoa.h>
 #endif
 
+#if PLATFORM(COCOA)
+#import <pal/cocoa/EnhancedSecurityCocoa.h>
+#endif
+
 #if PLATFORM(MAC)
 #import <wtf/spi/darwin/SandboxSPI.h>
 #endif
@@ -669,6 +673,10 @@ void WebProcess::initializeWebProcess(WebProcessCreationParameters&& parameters,
 
 #if ENABLE(LOCKDOWN_MODE_API)
     PAL::setLockdownModeEnabledForCurrentProcess(isLockdownModeEnabled());
+#endif
+
+#if PLATFORM(COCOA)
+    PAL::setEnhancedSecurityEnabledForCurrentProcess(enhancedSecurityEnabled());
 #endif
 
 #if ENABLE(SERVICE_CONTROLS)

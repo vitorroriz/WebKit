@@ -384,6 +384,7 @@ public:
 
     void isJITEnabled(CompletionHandler<void(bool)>&&);
     void isEnhancedSecurityEnabled(CompletionHandler<void(bool)>&&);
+    bool enhancedSecurityEnabled() const { return m_isEnhancedSecurityEnabled.value_or(false); }
 
     RefPtr<API::Object> transformHandlesToObjects(API::Object*);
     static RefPtr<API::Object> transformObjectsToHandles(API::Object*);

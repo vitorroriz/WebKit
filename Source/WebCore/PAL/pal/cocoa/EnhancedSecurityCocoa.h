@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,16 +25,16 @@
 
 #pragma once
 
-namespace WebCore {
+#include <wtf/Platform.h>
 
-enum class DebugOverlayRegions : uint8_t {
-    NonFastScrollableRegion = 1 << 0,
-    WheelEventHandlerRegion = 1 << 1,
-    TouchActionRegion = 1 << 2,
-    EditableElementRegion = 1 << 3,
-    InteractionRegion = 1 << 4,
-    // We must leave 1 << 5 empty due to prior use by SiteIsolation.
-    EnhancedSecurity = 1 << 6,
-};
+#if PLATFORM(COCOA)
 
-}
+namespace PAL {
+
+PAL_EXPORT bool isEnhancedSecurityEnabledForCurrentProcess();
+
+PAL_EXPORT void setEnhancedSecurityEnabledForCurrentProcess(bool);
+
+} // namespace PAL
+
+#endif // PLATFORM(COCOA)

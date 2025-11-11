@@ -588,7 +588,9 @@ static BOOL areEssentiallyEqual(double a, double b)
         visibleOverlayRegions |= _WKWheelEventHandlerRegion;
     if (settings.interactionRegionOverlayVisible)
         visibleOverlayRegions |= _WKInteractionRegion;
-    
+    if (settings.enhancedSecurityOverlayVisible)
+        visibleOverlayRegions |= _WKEnhancedSecurityRegion;
+
     preferences._visibleDebugOverlayRegions = visibleOverlayRegions;
 
     int headerBannerHeight = [settings isSpaceReservedForBanners] ? testHeaderBannerHeight : 0;

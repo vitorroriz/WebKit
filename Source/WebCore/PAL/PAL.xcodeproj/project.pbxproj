@@ -71,6 +71,8 @@
 		5157AE072B23CD8100C0E095 /* ContactsSPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 5157AE062B23CD8100C0E095 /* ContactsSPI.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		57F1C90A25DCF0CF00E8F6EA /* CryptoKitPrivateSoftLink.mm in Sources */ = {isa = PBXBuildFile; fileRef = 57F1C90825DCF0CF00E8F6EA /* CryptoKitPrivateSoftLink.mm */; };
 		57FD318A22B3593E008D0E8B /* AppSSOSoftLink.mm in Sources */ = {isa = PBXBuildFile; fileRef = 57FD318922B3593E008D0E8B /* AppSSOSoftLink.mm */; };
+		58E7ACFA2EB3CE2C00DEFC26 /* EnhancedSecurityCocoa.h in Headers */ = {isa = PBXBuildFile; fileRef = 58E7ACF62EB3CE1900DEFC26 /* EnhancedSecurityCocoa.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		58E7ACFC2EB3CE4600DEFC26 /* EnhancedSecurityCocoa.mm in Sources */ = {isa = PBXBuildFile; fileRef = 58E7ACFB2EB3CE3400DEFC26 /* EnhancedSecurityCocoa.mm */; };
 		5C7C787423AC3E770065F47E /* ManagedConfigurationSoftLink.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5C7C787223AC3E770065F47E /* ManagedConfigurationSoftLink.mm */; };
 		5CB898B2286274FA00CA3485 /* QuarantineSPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 5CB898B1286274FA00CA3485 /* QuarantineSPI.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		5CF869ED29D266AE0045F0D2 /* NSKeyedUnarchiverSPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 5CF869EC29D266AE0045F0D2 /* NSKeyedUnarchiverSPI.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -643,6 +645,8 @@
 		57F1C90825DCF0CF00E8F6EA /* CryptoKitPrivateSoftLink.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CryptoKitPrivateSoftLink.mm; sourceTree = "<group>"; };
 		57FD318822B3592F008D0E8B /* AppSSOSoftLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppSSOSoftLink.h; sourceTree = "<group>"; };
 		57FD318922B3593E008D0E8B /* AppSSOSoftLink.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppSSOSoftLink.mm; sourceTree = "<group>"; };
+		58E7ACF62EB3CE1900DEFC26 /* EnhancedSecurityCocoa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnhancedSecurityCocoa.h; sourceTree = "<group>"; };
+		58E7ACFB2EB3CE3400DEFC26 /* EnhancedSecurityCocoa.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EnhancedSecurityCocoa.mm; sourceTree = "<group>"; };
 		5C7C787123AC3E770065F47E /* ManagedConfigurationSoftLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManagedConfigurationSoftLink.h; sourceTree = "<group>"; };
 		5C7C787223AC3E770065F47E /* ManagedConfigurationSoftLink.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ManagedConfigurationSoftLink.mm; sourceTree = "<group>"; };
 		5C7C787523AC3E850065F47E /* ManagedConfigurationSPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManagedConfigurationSPI.h; sourceTree = "<group>"; };
@@ -1131,6 +1135,8 @@
 				57F1C90825DCF0CF00E8F6EA /* CryptoKitPrivateSoftLink.mm */,
 				F4DDD01A264DC69E00EF1B91 /* DataDetectorsCoreSoftLink.h */,
 				F4DDD019264DC69E00EF1B91 /* DataDetectorsCoreSoftLink.mm */,
+				58E7ACF62EB3CE1900DEFC26 /* EnhancedSecurityCocoa.h */,
+				58E7ACFB2EB3CE3400DEFC26 /* EnhancedSecurityCocoa.mm */,
 				F44291661FA52705002CC93E /* FileSizeFormatterCocoa.mm */,
 				F47471EC2ACA17AF00E0D4AB /* LinkPresentationSoftLink.h */,
 				F47471ED2ACA17AF00E0D4AB /* LinkPresentationSoftLink.mm */,
@@ -1452,6 +1458,7 @@
 				DD20DE4427BC90D80093D175 /* DefaultSearchProvider.h in Headers */,
 				44B1A8682A7C5BAD00DC80A6 /* Device.h in Headers */,
 				DD20DE4E27BC90D80093D175 /* EncodingTables.h in Headers */,
+				58E7ACFA2EB3CE2C00DEFC26 /* EnhancedSecurityCocoa.h in Headers */,
 				DD20DE5E27BC90D80093D175 /* ExportMacros.h in Headers */,
 				DD20DDE527BC90D70093D175 /* FeatureFlagsSPI.h in Headers */,
 				DD20DDE627BC90D70093D175 /* FilePortSPI.h in Headers */,
@@ -1784,6 +1791,7 @@
 				A1175B581F6B470500C4B9F0 /* DefaultSearchProvider.cpp in Sources */,
 				44B1A8642A7C334F00DC80A6 /* Device.cpp in Sources */,
 				1C5C57D427571626003B540D /* EncodingTables.cpp in Sources */,
+				58E7ACFC2EB3CE4600DEFC26 /* EnhancedSecurityCocoa.mm in Sources */,
 				F44291641FA52670002CC93E /* FileSizeFormatter.cpp in Sources */,
 				F44291681FA52705002CC93E /* FileSizeFormatterCocoa.mm in Sources */,
 				A30D41221F0DD0EA00B71954 /* KillRing.cpp in Sources */,
