@@ -110,7 +110,7 @@ WebCore::IntSize SimulatedXRDevice::recommendedResolution(PlatformXR::SessionMod
     return IntSize(32, 32);
 }
 
-void SimulatedXRDevice::initializeTrackingAndRendering(const WebCore::SecurityOriginData&, PlatformXR::SessionMode, const PlatformXR::Device::FeatureList&, std::optional<WebCore::XRCanvasConfiguration>&&)
+void SimulatedXRDevice::initializeTrackingAndRendering(const WebCore::SecurityOriginData&, PlatformXR::SessionMode sessionMode, const PlatformXR::Device::FeatureList&, std::optional<WebCore::XRCanvasConfiguration>&&)
 {
     if (m_trackingAndRenderingClient) {
         // WebXR FakeDevice waits for simulateInputConnection calls to add input sources-
@@ -125,6 +125,7 @@ void SimulatedXRDevice::initializeTrackingAndRendering(const WebCore::SecurityOr
                 m_trackingAndRenderingClient->sessionDidInitializeInputSources({ });
         });
     }
+    m_frameData.environmentBlendMode = (sessionMode == PlatformXR::SessionMode::ImmersiveAr) ? PlatformXR::XREnvironmentBlendMode::AlphaBlend : PlatformXR::XREnvironmentBlendMode::Opaque;
 }
 
 void SimulatedXRDevice::shutDownTrackingAndRendering()

@@ -847,6 +847,11 @@ OpenXRCoordinator::PollResult OpenXRCoordinator::pollEvents()
     return PollResult::Continue;
 }
 
+XrEnvironmentBlendMode OpenXRCoordinator::blendModeForSessionMode(Box<RenderState> renderState) const
+{
+    return (m_sessionMode == PlatformXR::SessionMode::ImmersiveAr && !renderState->passthroughFullyObscured) ? m_arBlendMode : m_vrBlendMode;
+}
+
 PlatformXR::FrameData OpenXRCoordinator::populateFrameData(Box<RenderState> renderState)
 {
     ASSERT(!RunLoop::isMain());
@@ -903,6 +908,21 @@ PlatformXR::FrameData OpenXRCoordinator::populateFrameData(Box<RenderState> rend
     for (auto source : renderState->transientInputHitTestSources)
         frameData.transientInputHitTestResults.add(source, Vector<PlatformXR::FrameData::TransientInputHitTestResult> { });
 #endif
+
+    auto toXREnvironmentBlendMode = [](XrEnvironmentBlendMode mode) {
+        switch (mode) {
+        case XR_ENVIRONMENT_BLEND_MODE_OPAQUE:
+            return PlatformXR::XREnvironmentBlendMode::Opaque;
+        case XR_ENVIRONMENT_BLEND_MODE_ADDITIVE:
+            return PlatformXR::XREnvironmentBlendMode::Additive;
+        case XR_ENVIRONMENT_BLEND_MODE_ALPHA_BLEND:
+            return PlatformXR::XREnvironmentBlendMode::AlphaBlend;
+        default:
+            ASSERT_NOT_REACHED();
+            return PlatformXR::XREnvironmentBlendMode::Opaque;
+        }
+    };
+    frameData.environmentBlendMode = toXREnvironmentBlendMode(blendModeForSessionMode(renderState));
 
     return frameData;
 }
@@ -1033,7 +1053,7 @@ void OpenXRCoordinator::endFrame(Box<RenderState> renderState, Vector<XRDeviceLa
 
     XrFrameEndInfo frameEndInfo = createOpenXRStruct<XrFrameEndInfo, XR_TYPE_FRAME_END_INFO>();
     frameEndInfo.displayTime = renderState->frameState.predictedDisplayTime;
-    frameEndInfo.environmentBlendMode = (m_sessionMode == PlatformXR::SessionMode::ImmersiveAr && !renderState->passthroughFullyObscured) ? m_arBlendMode : m_vrBlendMode;
+    frameEndInfo.environmentBlendMode = blendModeForSessionMode(renderState);
     frameEndInfo.layerCount = static_cast<uint32_t>(frameEndLayers.size());
     frameEndInfo.layers = frameEndLayers.mutableSpan().data();
     CHECK_XRCMD(xrEndFrame(m_session, &frameEndInfo));

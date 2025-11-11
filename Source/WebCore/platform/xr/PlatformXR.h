@@ -130,6 +130,12 @@ enum class XRTargetRayMode : uint8_t {
     TransientPointer,
 };
 
+enum class XREnvironmentBlendMode : uint8_t {
+    Opaque,
+    AlphaBlend,
+    Additive
+};
+
 // https://immersive-web.github.io/webxr/#feature-descriptor
 enum class SessionFeature : uint8_t {
     ReferenceSpaceTypeViewer,
@@ -437,6 +443,7 @@ struct FrameData {
     HashMap<TransientInputHitTestSource, Vector<TransientInputHitTestResult>> transientInputHitTestResults;
 #endif
     Vector<InputSource> inputSources;
+    XREnvironmentBlendMode environmentBlendMode { XREnvironmentBlendMode::Opaque };
 
     FrameData copy() const;
 };
@@ -555,6 +562,7 @@ inline FrameData FrameData::copy() const
     frameData.stageParameters = stageParameters;
     frameData.views = views;
     frameData.inputSources = inputSources;
+    frameData.environmentBlendMode = environmentBlendMode;
     return frameData;
 }
 

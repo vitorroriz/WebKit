@@ -100,6 +100,7 @@ private:
     void beginFrame(Box<RenderState>);
     void endFrame(Box<RenderState>, Vector<XRDeviceLayer>&&);
     void renderLoop(Box<RenderState>);
+    XrEnvironmentBlendMode blendModeForSessionMode(Box<RenderState>) const;
 
     XRDeviceIdentifier m_deviceIdentifier { XRDeviceIdentifier::generate() };
     XrInstance m_instance { XR_NULL_HANDLE };

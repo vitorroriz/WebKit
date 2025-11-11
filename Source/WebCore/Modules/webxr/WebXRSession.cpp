@@ -106,7 +106,7 @@ WebXRSession::~WebXRSession()
 
 XREnvironmentBlendMode WebXRSession::environmentBlendMode() const
 {
-    return m_environmentBlendMode;
+    return m_frameData.environmentBlendMode;
 }
 
 XRInteractionMode WebXRSession::interactionMode() const

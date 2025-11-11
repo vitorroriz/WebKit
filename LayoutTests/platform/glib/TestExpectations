@@ -2867,6 +2867,8 @@ imported/w3c/web-platform-tests/webxr/hand-input/ [ Pass ]
 
 imported/w3c/web-platform-tests/webxr/hit-test [ Pass ]
 
+imported/w3c/web-platform-tests/webxr/ar-module/xrSession_environmentBlendMode.https.html [ Pass ]
+
 http/wpt/webxr [ Pass ]
 webxr [ Pass ]
 

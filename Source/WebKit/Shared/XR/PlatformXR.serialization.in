@@ -62,6 +62,12 @@ enum class PlatformXR::XRTargetRayMode : uint8_t {
     TransientPointer,
 };
 
+enum class PlatformXR::XREnvironmentBlendMode : uint8_t {
+    Opaque,
+    AlphaBlend,
+    Additive,
+};
+
 [Nested] struct PlatformXR::DepthRange {
     float near;
     float far;
@@ -238,6 +244,7 @@ header: <WebCore/PlatformXR.h>
     HashMap<PlatformXR::TransientInputHitTestSource, Vector<PlatformXR::FrameData::TransientInputHitTestResult>> transientInputHitTestResults;
 #endif
     Vector<PlatformXR::FrameData::InputSource> inputSources;
+    PlatformXR::XREnvironmentBlendMode environmentBlendMode;
 };
 
 #if USE(OPENXR)
