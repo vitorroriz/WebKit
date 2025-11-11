@@ -865,6 +865,7 @@ class RunTest262Tests(TestWithFailureCount, CustomFlagsMixin, ShellMixin):
 
 
 class RunWebKitTests(shell.Test, CustomFlagsMixin, ShellMixin):
+    DO_REPORT = True
     name = "layout-test"
     description = ["layout-tests running"]
     descriptionDone = ["layout-tests"]
@@ -878,7 +879,6 @@ class RunWebKitTests(shell.Test, CustomFlagsMixin, ShellMixin):
                "--build-number", WithProperties("%(buildnumber)s"),
                "--buildbot-worker", WithProperties("%(workername)s"),
                "--buildbot-master", DNS_NAME,
-               "--report", RESULTS_WEBKIT_URL,
                "--exit-after-n-crashes-or-timeouts", "50",
                "--exit-after-n-failures", "500",
                WithProperties("--%(configuration)s")]
@@ -910,6 +910,8 @@ class RunWebKitTests(shell.Test, CustomFlagsMixin, ShellMixin):
         self.appendCustomTestingFlags(platform, self.getProperty('device_model'))
         additionalArguments = self.getProperty('additionalArguments')
 
+        if self.DO_REPORT:
+            self.command += ["--report", RESULTS_WEBKIT_URL]
         self.command += ["--results-directory", self.resultDirectory]
         self.command += ['--debug-rwt-logging']
 
@@ -1008,6 +1010,7 @@ class RunWebKitTests(shell.Test, CustomFlagsMixin, ShellMixin):
 
 
 class RunDashboardTests(RunWebKitTests):
+    DO_REPORT = False
     name = "dashboard-tests"
     description = ["dashboard-tests running"]
     descriptionDone = ["dashboard-tests"]
