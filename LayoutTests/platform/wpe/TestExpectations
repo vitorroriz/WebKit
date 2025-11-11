@@ -449,6 +449,8 @@ dom/xsl/lockdown-mode [ Skip ]
 http/tests/lockdown-mode [ Skip ]
 js/dom/lockdown-mode [ Skip ]
 
+webkit.org/b/302297 scrollbars/scrollbar-drag-thumb-with-large-content.html [ Failure ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # 3. UNRESOLVED TESTS
 #////////////////////////////////////////////////////////////////////////////////////////
@@ -1026,7 +1028,6 @@ fast/encoding/char-encoding.html [ Skip ] # Timeout.
 fast/html/history-action-user-activation.html [ Skip ] # Timeout.
 fast/mediastream/video-srcObject-set-twice.html [ Skip ] # Timeout.
 fast/replaced/pdf-as-embed-with-no-mime-type-is-not-blank.html [ Skip ] # Timeout.
-fast/text/large-synthetic-bold-with-scale-transform.html [ Skip ] # Timeout.
 http/tests/misc/ftp-eplf-directory.py [ Skip ] # Timeout.
 media/video-audio-session-mode.html [ Skip ] # Timeout.
 webgl/2.0.y/conformance/offscreencanvas/offscreencanvas-transfer-image-bitmap.html [ Skip ] # Timeout.
