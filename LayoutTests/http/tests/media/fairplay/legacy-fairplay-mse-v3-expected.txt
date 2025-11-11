@@ -7,6 +7,7 @@ FETCH: content/elementary-stream-video-header-keyid-1.m4v OK
 EVENT(webkitneedkey)
 EVENT(webkitkeymessage)
 EXPECTED (uInt8ArrayToString(event.message) == 'certificate') OK
+EVENT(updateend)
 FETCH: resources/cert.der OK
 EVENT(webkitkeymessage)
 PROMISE: licenseResponse resolved
