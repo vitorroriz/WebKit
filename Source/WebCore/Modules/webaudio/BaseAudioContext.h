@@ -259,6 +259,7 @@ protected:
 
     void clear();
 
+    RefPtr<MediaSessionManagerInterface> mediaSessionManagerIfExists() const;
     RefPtr<MediaSessionManagerInterface> mediaSessionManager() const;
 
 protected:

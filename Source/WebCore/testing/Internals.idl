@@ -1285,6 +1285,8 @@ enum ContentsFormat {
 
     undefined setMaxCanvasArea(unsigned long size);
 
+    readonly attribute boolean hasMediaSessionManager;
+
     [Conditional=VIDEO] readonly attribute NowPlayingMetadata? nowPlayingMetadata;
     [Conditional=VIDEO] readonly attribute NowPlayingState nowPlayingState;
     [Conditional=VIDEO] boolean elementIsActiveNowPlayingSession(HTMLMediaElement element);

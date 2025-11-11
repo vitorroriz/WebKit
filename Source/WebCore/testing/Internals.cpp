@@ -8082,6 +8082,19 @@ RefPtr<MediaSessionManagerInterface> Internals::sessionManager() const
     return page->mediaSessionManager();
 }
 
+bool Internals::hasMediaSessionManager() const
+{
+    RefPtr document = contextDocument();
+    if (!document)
+        return false;
+
+    RefPtr page = document->page();
+    if (!page)
+        return false;
+
+    return !!page->mediaSessionManagerIfExists();
+}
+
 #if ENABLE(MODEL_ELEMENT)
 void Internals::disableModelLoadDelaysForTesting()
 {
