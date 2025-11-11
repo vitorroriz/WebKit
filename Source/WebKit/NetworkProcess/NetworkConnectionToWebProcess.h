@@ -276,10 +276,6 @@ public:
 
     bool isAlwaysOnLoggingAllowed() const;
 
-#if HAVE(WEBCONTENTRESTRICTIONS)
-    bool usesWebContentRestrictionsForFilter() const { return m_sharedPreferencesForWebProcess.usesWebContentRestrictionsForFilter; };
-#endif
-
 private:
     NetworkConnectionToWebProcess(NetworkProcess&, WebCore::ProcessIdentifier, PAL::SessionID, NetworkProcessConnectionParameters&&, IPC::Connection::Identifier&&);
 

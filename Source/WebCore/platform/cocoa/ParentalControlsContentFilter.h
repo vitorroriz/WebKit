@@ -32,7 +32,10 @@
 #include <wtf/UniqueRef.h>
 
 OBJC_CLASS NSData;
+
+#if !HAVE(WEBCONTENTRESTRICTIONS) && HAVE(WEBCONTENTANALYSIS_FRAMEWORK)
 OBJC_CLASS WebFilterEvaluator;
+#endif
 
 namespace WebCore {
 
@@ -63,24 +66,28 @@ private:
     explicit ParentalControlsContentFilter(const PlatformContentFilter::FilterParameters&);
     bool enabled() const;
 
-    void updateFilterState();
 #if HAVE(WEBCONTENTRESTRICTIONS)
+    ParentalControlsURLFilter& impl() const;
     void updateFilterStateOnMain();
+#elif HAVE(WEBCONTENTANALYSIS_FRAMEWORK)
+    void updateFilterState();
 #endif
 
-    RetainPtr<WebFilterEvaluator> m_webFilterEvaluator;
     RetainPtr<NSData> m_replacementData;
 
 #if HAVE(WEBCONTENTRESTRICTIONS)
-    bool m_usesWebContentRestrictions { false };
     std::optional<URL> m_evaluatedURL;
     Lock m_resultLock;
     Condition m_resultCondition;
     std::optional<bool> m_isAllowdByWebContentRestrictions WTF_GUARDED_BY_LOCK(m_resultLock);
     RetainPtr<NSData> m_webContentRestrictionsReplacementData WTF_GUARDED_BY_LOCK(m_resultLock);
-#endif
+
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
     String m_webContentRestrictionsConfigurationPath;
+#endif
+
+#elif HAVE(WEBCONTENTANALYSIS_FRAMEWORK)
+    RetainPtr<WebFilterEvaluator> m_webFilterEvaluator;
 #endif
 };
     

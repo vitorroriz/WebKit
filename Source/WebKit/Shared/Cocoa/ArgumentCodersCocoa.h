@@ -65,7 +65,7 @@ OBJC_CLASS PKPaymentToken;
 OBJC_CLASS PKShippingMethod;
 #endif
 
-#if HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
+#if !HAVE(WEBCONTENTRESTRICTIONS) && HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
 OBJC_CLASS WebFilterEvaluator;
 #endif
 
@@ -160,7 +160,7 @@ template<> Class getClass<PKDateComponentsRange>();
 template<> Class getClass<PKPaymentMethod>();
 template<> Class getClass<PKSecureElementPass>();
 #endif
-#if HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
+#if !HAVE(WEBCONTENTRESTRICTIONS) && HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
 template<> Class getClass<WebFilterEvaluator>();
 #endif
 

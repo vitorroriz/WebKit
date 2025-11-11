@@ -338,7 +338,7 @@ template<> Class getClass<PKSecureElementPass>()
 }
 #endif
 
-#if HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
+#if !HAVE(WEBCONTENTRESTRICTIONS) && HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
 template<> Class getClass<WebFilterEvaluator>()
 {
     return PAL::getWebFilterEvaluatorClassSingleton();

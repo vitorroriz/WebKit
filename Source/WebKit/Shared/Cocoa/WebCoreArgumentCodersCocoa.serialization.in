@@ -23,7 +23,7 @@
 headers: "ArgumentCodersCocoa.h"
 
 # FIXME: Make WebFilterEvaluator no longer use WKKeyedCoder once rdar://163060208 is complete.
-#if HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
+#if !HAVE(WEBCONTENTRESTRICTIONS) && HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
 secure_coding_header: <pal/cocoa/WebContentAnalysisSoftLink.h>
 [WebKitSecureCodingClass=PAL::getWebFilterEvaluatorClassSingleton()] webkit_secure_coding WebFilterEvaluator {
     WebContentFilterStateKey: Number
@@ -40,7 +40,7 @@ class WebCore::ContentFilterUnblockHandler {
 #if HAVE(WEBCONTENTRESTRICTIONS)
     std::optional<URL> evaluatedURL();
 #endif
-#if HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
+#if !HAVE(WEBCONTENTRESTRICTIONS) && HAVE(PARENTAL_CONTROLS_WITH_UNBLOCK_HANDLER)
     RetainPtr<WebFilterEvaluator> webFilterEvaluator()
 #endif
     bool unblockedAfterRequest()
