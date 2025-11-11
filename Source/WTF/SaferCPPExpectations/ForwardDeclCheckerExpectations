@@ -6,6 +6,5 @@ wtf/ParkingLot.h
 wtf/PrintStream.h
 wtf/RetainPtr.h
 wtf/URLParser.cpp
-wtf/cocoa/FileSystemCocoa.mm
 wtf/text/StringView.cpp
 wtf/text/TextBreakIterator.cpp
