@@ -47,11 +47,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL skipNearlyTransparentContent;
 
 /*!
- Defaults to `YES`.
- */
-@property (nonatomic) BOOL shouldFilterText;
-
-/*!
  Iterates over all custom node attributes added via -addClientAttribute:value:forNode:.
  */
 - (void)forEachClientNodeAttribute:(void(^)(NSString *attribute, NSString *value, _WKJSHandle *))block;

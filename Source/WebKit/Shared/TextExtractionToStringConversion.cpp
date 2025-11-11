@@ -141,12 +141,19 @@ public:
         return m_options.flags.contains(TextExtractionOptionFlag::OnlyIncludeText);
     }
 
-    RefPtr<TextExtractionFilterPromise> filter(const String& text, std::optional<WebCore::NodeIdentifier>&& identifier) const
+    RefPtr<TextExtractionFilterPromise> filter(const String& text, const std::optional<WebCore::NodeIdentifier>& identifier) const
     {
-        if (!m_options.filterCallback)
+        if (m_options.filterCallbacks.isEmpty())
             return nullptr;
 
-        return m_options.filterCallback(text, WTFMove(identifier));
+        TextExtractionFilterPromise::Producer producer;
+        Ref promise = producer.promise();
+
+        filterRecursive(text, identifier, 0, [producer = WTFMove(producer)](auto&& result) mutable {
+            producer.settle(WTFMove(result));
+        });
+
+        return promise;
     }
 
     void applyReplacements(String& text)
@@ -156,6 +163,20 @@ public:
     }
 
 private:
+    void filterRecursive(const String& text, const std::optional<WebCore::NodeIdentifier>& identifier, size_t index, CompletionHandler<void(String&&)>&& completion) const
+    {
+        if (index >= m_options.filterCallbacks.size())
+            return completion(String { text });
+
+        Ref promise = m_options.filterCallbacks[index](text, std::optional { identifier });
+        promise->whenSettled(RunLoop::mainSingleton(), [completion = WTFMove(completion), protectedThis = Ref { *this }, identifier, index](auto&& result) mutable {
+            if (!result)
+                return completion({ });
+
+            protectedThis->filterRecursive(WTFMove(*result), identifier, index + 1, WTFMove(completion));
+        });
+    }
+
     void addLineForNativeMenuItemsIfNeeded()
     {
         if (onlyIncludeText())

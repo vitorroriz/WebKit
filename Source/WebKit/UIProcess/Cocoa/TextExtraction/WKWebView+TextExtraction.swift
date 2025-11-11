@@ -114,7 +114,7 @@ extension WKWebView {
             configuration.includeNodeIdentifiers = false
             configuration.includeEventListeners = false
             configuration.includeAccessibilityAttributes = false
-            configuration.shouldFilterText = false
+            configuration.filterOptions = []
             if let result = await _requestTextExtraction(configuration) {
                 collector.collect(createIntelligenceElement(item: result.rootItem))
             }

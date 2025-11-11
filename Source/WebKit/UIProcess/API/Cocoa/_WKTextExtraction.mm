@@ -53,7 +53,7 @@
     if (!(self = [super init]))
         return nil;
 
-    _shouldFilterText = YES;
+    _filterOptions = _WKTextExtractionFilterAll;
     _includeURLs = !onlyVisibleText;
     _includeRects = !onlyVisibleText;
     _includeNodeIdentifiers = !onlyVisibleText;

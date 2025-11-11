@@ -315,4 +315,40 @@ TEST(TextExtractionTests, VisibleTextOnly)
 #endif // ENABLE(TEXT_EXTRACTION_FILTER)
 }
 
+TEST(TextExtractionTests, FilterOptions)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:^{
+        RetainPtr configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+        [[configuration preferences] _setTextExtractionEnabled:YES];
+        return configuration.autorelease();
+    }()]);
+    [webView synchronouslyLoadTestPageNamed:@"debug-text-extraction"];
+
+    auto debugTextWithFilterOptions = [webView](_WKTextExtractionFilterOptions options) {
+        return [webView synchronouslyGetDebugText:^{
+            RetainPtr configuration = adoptNS([_WKTextExtractionConfiguration new]);
+            [configuration setFilterOptions:options];
+            return configuration.autorelease();
+        }()];
+    };
+
+    {
+        RetainPtr debugText = debugTextWithFilterOptions(_WKTextExtractionFilterNone);
+        EXPECT_TRUE([debugText containsString:@"“The quick brown fox jumped over the lazy dog”"]);
+        EXPECT_TRUE([debugText containsString:@"Here’s to the crazy ones"]);
+    }
+    {
+        RetainPtr debugText = debugTextWithFilterOptions(_WKTextExtractionFilterTextRecognition);
+        EXPECT_TRUE([debugText containsString:@"“The quick brown fox jumped over the lazy dog”"]);
+#if ENABLE(TEXT_EXTRACTION_FILTER)
+        EXPECT_FALSE([debugText containsString:@"Here’s to the crazy ones"]);
+#endif
+    }
+    {
+        RetainPtr debugText = debugTextWithFilterOptions(_WKTextExtractionFilterClassifier);
+        EXPECT_TRUE([debugText containsString:@"“The quick brown fox jumped over the lazy dog”"]);
+        EXPECT_TRUE([debugText containsString:@"Here’s to the crazy ones"]);
+    }
+}
+
 } // namespace TestWebKitAPI

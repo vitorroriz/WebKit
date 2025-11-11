@@ -6573,44 +6573,6 @@ static Vector<Ref<API::TargetedElementInfo>> elementsFromWKElements(NSArray<_WKT
 #endif
 }
 
-static String joinAndTruncateLinesToWordLimit(Vector<String>&& components, std::optional<uint64_t>&& wordLimit)
-{
-    if (!wordLimit)
-        return makeStringByJoining(WTFMove(components), "\n"_s);
-
-    auto truncatedComponents = components.map([wordLimit](auto&& component) {
-        if (component.isEmpty() || !wordLimit)
-            return emptyString();
-
-        auto* iterator = WTF::wordBreakIterator(component);
-        if (!iterator)
-            return component;
-
-        uint64_t wordCount = 0;
-        int position = 0;
-        int stringLength = component.length();
-
-        while (position < stringLength) {
-            position = ubrk_following(iterator, position);
-            if (position == UBRK_DONE)
-                break;
-
-            if (!position || !u_isalnum(component[position - 1]))
-                continue;
-
-            wordCount++;
-            if (wordCount != wordLimit)
-                continue;
-
-            return position < stringLength ? makeString(component.left(position), u"…") : component;
-        }
-
-        return component;
-    });
-
-    return makeStringByJoining(WTFMove(truncatedComponents), "\n"_s);
-}
-
 static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfiguration *configuration)
 {
     HashMap<String, String> result;
@@ -6626,10 +6588,12 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
 
 - (void)_debugTextWithConfiguration:(_WKTextExtractionConfiguration *)configuration completionHandler:(void(^)(NSString *))completionHandler
 {
-    bool shouldFilter = configuration.shouldFilterText && _page->protectedPreferences()->textExtractionFilterEnabled();
+    bool allowFiltering = _page->protectedPreferences()->textExtractionFilterEnabled();
+    bool filterUsingClassifier = allowFiltering && configuration.filterOptions & _WKTextExtractionFilterClassifier;
+    bool filterHiddenText = allowFiltering && configuration.filterOptions & _WKTextExtractionFilterTextRecognition;
 
 #if ENABLE(TEXT_EXTRACTION_FILTER)
-    if (shouldFilter)
+    if (filterUsingClassifier)
         WebKit::TextExtractionFilter::singleton().prewarm();
 #endif
 
@@ -6640,7 +6604,8 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
     [self _requestTextExtractionInternal:configuration completion:[
         completionHandler = makeBlockPtr(completionHandler),
         weakSelf = WeakObjCPtr<WKWebView>(self),
-        shouldFilter,
+        filterUsingClassifier,
+        filterHiddenText,
         includeURLs = configuration.includeURLs,
         includeRects = configuration.includeRects,
         onlyIncludeText = configuration.onlyIncludeVisibleText,
@@ -6654,57 +6619,92 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
         if (!item)
             return completionHandler(nil);
 
-        WebKit::TextExtractionFilterCallback filterCallback;
+        Vector<WebKit::TextExtractionFilterCallback> filterCallbacks;
 
-        if (shouldFilter) {
+        if (filterUsingClassifier) {
 #if ENABLE(TEXT_EXTRACTION_FILTER)
-            filterCallback = [strongSelf, maxWordsPerParagraph = WTFMove(maxWordsPerParagraph)](const String& text, auto&& enclosingNodeID) mutable {
+            filterCallbacks.append([](auto& text, auto&&) mutable {
                 WebKit::TextExtractionFilterPromise::Producer producer;
                 Ref promise = producer.promise();
 
-                WebKit::TextExtractionFilter::singleton().shouldFilter(text, [
-                    producer = WTFMove(producer),
-                    text,
-                    enclosingNodeID = WTFMove(enclosingNodeID),
-                    strongSelf,
-                    maxWordsPerParagraph = WTFMove(maxWordsPerParagraph)
-                ](bool shouldFilterOut) mutable {
-                    if (shouldFilterOut) {
+                WebKit::TextExtractionFilter::singleton().shouldFilter(text, [producer = WTFMove(producer), text](bool shouldFilterOut) mutable {
+                    if (shouldFilterOut)
                         producer.settle(emptyString());
-                        return;
-                    }
-
-                    auto lines = text.splitAllowingEmptyEntries('\n');
-                    auto components = Box<Vector<String>>::create();
-                    components->resizeToFit(lines.size());
-
-                    Ref aggregator = MainRunLoopCallbackAggregator::create([producer = WTFMove(producer), components, maxWordsPerParagraph = WTFMove(maxWordsPerParagraph)] mutable {
-                        producer.settle(joinAndTruncateLinesToWordLimit(WTFMove(*components), WTFMove(maxWordsPerParagraph)));
-                    });
-
-                    for (size_t index = 0; index < lines.size(); ++index) {
-                        static constexpr auto minimumLengthForTextDetection = 100;
-                        auto line = lines[index];
-                        if (line.length() < minimumLengthForTextDetection) {
-                            components->at(index) = WTFMove(line);
-                            continue;
-                        }
-
-                        [strongSelf _validateText:line inNode:WTFMove(enclosingNodeID) completionHandler:[aggregator, components, index](auto& result) mutable {
-                            components->at(index) = result;
-                        }];
-                    }
+                    else
+                        producer.settle(text);
                 });
                 return promise;
-            };
+            });
 #endif // ENABLE(TEXT_EXTRACTION_FILTER)
         }
 
-        if (!filterCallback && maxWordsPerParagraph) {
-            filterCallback = [maxWordsPerParagraph = WTFMove(maxWordsPerParagraph)](const String& text, auto&&) mutable {
-                auto truncatedString = joinAndTruncateLinesToWordLimit(text.splitAllowingEmptyEntries('\n'), WTFMove(maxWordsPerParagraph));
+        if (filterHiddenText) {
+#if ENABLE(TEXT_EXTRACTION_FILTER)
+            filterCallbacks.append([strongSelf](auto& text, auto&& enclosingNodeID) mutable {
+                WebKit::TextExtractionFilterPromise::Producer producer;
+                Ref promise = producer.promise();
+
+                auto lines = text.splitAllowingEmptyEntries('\n');
+                auto components = Box<Vector<String>>::create();
+                components->resizeToFit(lines.size());
+
+                Ref aggregator = MainRunLoopCallbackAggregator::create([producer = WTFMove(producer), components] mutable {
+                    producer.settle(makeStringByJoining(WTFMove(*components), "\n"_s));
+                });
+
+                for (size_t index = 0; index < lines.size(); ++index) {
+                    static constexpr auto minimumLengthForTextDetection = 100;
+                    auto line = lines[index];
+                    if (line.length() < minimumLengthForTextDetection) {
+                        components->at(index) = WTFMove(line);
+                        continue;
+                    }
+
+                    [strongSelf _validateText:line inNode:std::optional { enclosingNodeID } completionHandler:[aggregator, components, index](auto& result) mutable {
+                        components->at(index) = result;
+                    }];
+                }
+
+                return promise;
+            });
+#endif // ENABLE(TEXT_EXTRACTION_FILTER)
+        }
+
+        if (maxWordsPerParagraph) {
+            filterCallbacks.append([wordLimit = WTFMove(maxWordsPerParagraph)](auto& text, auto&&) mutable {
+                auto truncatedComponents = text.splitAllowingEmptyEntries('\n').map([wordLimit](auto&& component) {
+                    if (component.isEmpty())
+                        return emptyString();
+
+                    auto* iterator = WTF::wordBreakIterator(component);
+                    if (!iterator)
+                        return component;
+
+                    uint64_t wordCount = 0;
+                    int position = 0;
+                    int stringLength = component.length();
+
+                    while (position < stringLength) {
+                        position = ubrk_following(iterator, position);
+                        if (position == UBRK_DONE)
+                            break;
+
+                        if (!position || !u_isalnum(component[position - 1]))
+                            continue;
+
+                        wordCount++;
+                        if (wordCount != wordLimit)
+                            continue;
+
+                        return position < stringLength ? makeString(component.left(position), u"…") : component;
+                    }
+
+                    return component;
+                });
+
+                auto truncatedString = makeStringByJoining(WTFMove(truncatedComponents), "\n"_s);
                 return WebKit::TextExtractionFilterPromise::createAndResolve(WTFMove(truncatedString));
-            };
+            });
         }
 
         using enum WebKit::TextExtractionOptionFlag;
@@ -6715,7 +6715,7 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
             optionFlags.add(IncludeRects);
         if (onlyIncludeText)
             optionFlags.add(OnlyIncludeText);
-        WebKit::TextExtractionOptions options { WTFMove(filterCallback), [strongSelf _activeNativeMenuItemTitles], WTFMove(replacementStrings), optionFlags };
+        WebKit::TextExtractionOptions options { WTFMove(filterCallbacks), [strongSelf _activeNativeMenuItemTitles], WTFMove(replacementStrings), optionFlags };
         WebKit::convertToText(WTFMove(*item), WTFMove(options), [completionHandler = WTFMove(completionHandler)](auto&& string) {
             completionHandler(string.createNSString().get());
         });

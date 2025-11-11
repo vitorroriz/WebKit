@@ -58,22 +58,22 @@ using TextExtractionFilterCallback = Function<Ref<TextExtractionFilterPromise>(c
 
 struct TextExtractionOptions {
     TextExtractionOptions(TextExtractionOptions&& other)
-        : filterCallback(WTFMove(other.filterCallback))
+        : filterCallbacks(WTFMove(other.filterCallbacks))
         , nativeMenuItems(WTFMove(other.nativeMenuItems))
         , replacementStrings(WTFMove(other.replacementStrings))
         , flags(other.flags)
     {
     }
 
-    TextExtractionOptions(TextExtractionFilterCallback&& filter, Vector<String>&& items, HashMap<String, String>&& replacementStrings, TextExtractionOptionFlags flags)
-        : filterCallback(WTFMove(filter))
+    TextExtractionOptions(Vector<TextExtractionFilterCallback>&& filters, Vector<String>&& items, HashMap<String, String>&& replacementStrings, TextExtractionOptionFlags flags)
+        : filterCallbacks(WTFMove(filters))
         , nativeMenuItems(WTFMove(items))
         , replacementStrings(WTFMove(replacementStrings))
         , flags(flags)
     {
     }
 
-    TextExtractionFilterCallback filterCallback;
+    Vector<TextExtractionFilterCallback> filterCallbacks;
     Vector<String> nativeMenuItems;
     HashMap<String, String> replacementStrings;
     TextExtractionOptionFlags flags;
