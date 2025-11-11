@@ -88,6 +88,8 @@ enum class ViewStabilityFlag : uint8_t;
 - (void)didInterruptScrolling;
 - (void)didZoomToScale:(CGFloat)scale;
 - (void)willStartZoomOrScroll;
+
+- (CGFloat)intrinsicDeviceScaleFactor;
 - (BOOL)screenIsBeingCaptured;
 
 - (void)_webViewDestroyed;

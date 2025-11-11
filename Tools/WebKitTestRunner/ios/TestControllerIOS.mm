@@ -179,7 +179,6 @@ void TestController::platformInitialize(const Options& options)
     cocoaPlatformInitialize(options);
 
     [UIApplication sharedApplication].idleTimerDisabled = YES;
-    [[UIScreen mainScreen] _setScale:2.0];
 
     auto center = CFNotificationCenterGetLocalCenter();
     CFNotificationCenterAddObserver(center, this, handleKeyboardWillHideNotification, (CFStringRef)UIKeyboardWillHideNotification, nullptr, CFNotificationSuspensionBehaviorDeliverImmediately);
@@ -321,7 +320,6 @@ bool TestController::platformResetStateToConsistentValues(const TestOptions& opt
     [UIKeyboardImpl.activeInstance setCorrectionLearningAllowed:NO];
     [pasteboardConsistencyEnforcer() clearPasteboard];
     [[UIApplication sharedApplication] _cancelAllTouches];
-    [[UIScreen mainScreen] _setScale:2.0];
     [[HIDEventGenerator sharedHIDEventGenerator] resetActiveModifiers];
 
     restorePortraitOrientationIfNeeded();

@@ -131,6 +131,7 @@ IGNORE_WARNINGS_END
         self._inputDelegate = self;
         self.focusStartsInputSessionPolicy = _WKFocusStartsInputSessionPolicyAuto;
         self.supportedInterfaceOrientations = UIInterfaceOrientationMaskAll;
+        self.traitOverrides.displayScale = 2.0f;
 #endif
     }
     return self;
