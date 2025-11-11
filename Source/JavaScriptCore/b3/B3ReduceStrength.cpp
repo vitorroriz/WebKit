@@ -382,13 +382,13 @@ public:
     {
         if (couldOverflowMul<T>(other))
             return top<T>();
-        return IntRange(
-            std::min(
-                std::min(m_min * other.m_min, m_min * other.m_max),
-                std::min(m_max * other.m_min, m_max * other.m_max)),
-            std::max(
-                std::max(m_min * other.m_min, m_min * other.m_max),
-                std::max(m_max * other.m_min, m_max * other.m_max)));
+        auto [min, max] = std::minmax({
+            m_min * other.m_min,
+            m_min * other.m_max,
+            m_max * other.m_min,
+            m_max * other.m_max
+        });
+        return IntRange(min, max);
     }
 
     IntRange mul(const IntRange& other, Type type)
