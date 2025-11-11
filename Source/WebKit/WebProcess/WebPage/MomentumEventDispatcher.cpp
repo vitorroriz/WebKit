@@ -89,7 +89,7 @@ bool MomentumEventDispatcher::handleWheelEvent(WebCore::PageIdentifier pageIdent
 
         if (event.momentumPhase() == WebWheelEvent::Phase::Ended) {
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER_TEMPORARY_LOGGING)
-            RELEASE_LOG(ScrollAnimations, "MomentumEventDispatcher saw momentum ended phase, interrupted=%d", static_cast<int>(event.momentumEndType()));
+            RELEASE_LOG(ScrollAnimations, "MomentumEventDispatcher saw momentum ended phase, interrupted=%d", std::to_underlying(event.momentumEndType()));
 #endif
 
             // Ignore momentumPhase == PhaseEnded if it was due to the natural
@@ -132,7 +132,7 @@ bool MomentumEventDispatcher::handleWheelEvent(WebCore::PageIdentifier pageIdent
     if (shouldIgnoreIncomingPlatformEvent)
         m_currentGesture.accumulatedEventOffset += event.delta();
 
-    auto combinedPhase = (event.phase() << 8) | (event.momentumPhase());
+    LogEntry::Phases combinedPhase { .event = event.phase(), .momentum = event.momentumPhase() };
     m_currentLogState.totalEventOffset += event.delta().height();
     if (!shouldIgnoreIncomingPlatformEvent) {
         // Log events that we don't block to the generated offsets log as well,
@@ -140,8 +140,8 @@ bool MomentumEventDispatcher::handleWheelEvent(WebCore::PageIdentifier pageIdent
         m_currentLogState.totalGeneratedOffset += event.delta().height();
         pushLogEntry(combinedPhase, combinedPhase);
     } else
-        pushLogEntry(0, combinedPhase);
-    
+        pushLogEntry({ }, combinedPhase);
+
 #endif
 
     return shouldIgnoreIncomingPlatformEvent;
@@ -164,7 +164,7 @@ static float appKitScrollMultiplierForEvent(const WebWheelEvent& event)
 
 void MomentumEventDispatcher::dispatchSyntheticMomentumEvent(WebWheelEvent::Phase phase, WebCore::FloatSize delta)
 {
-    tracePoint(SyntheticMomentumEvent, static_cast<uint64_t>(phase), std::abs(delta.width()), std::abs(delta.height()));
+    tracePoint(SyntheticMomentumEvent, std::to_underlying(phase), std::abs(delta.width()), std::abs(delta.height()));
 
     ASSERT(m_currentGesture.active);
     ASSERT(m_currentGesture.initiatingEvent);
@@ -198,7 +198,7 @@ void MomentumEventDispatcher::dispatchSyntheticMomentumEvent(WebWheelEvent::Phas
 
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER_TEMPORARY_LOGGING)
     m_currentLogState.totalGeneratedOffset += appKitAcceleratedDelta.height();
-    pushLogEntry(phase, 0);
+    pushLogEntry({ .event = WebWheelEvent::Phase::None, .momentum = phase }, { });
 #endif
 }
 
@@ -495,7 +495,7 @@ void MomentumEventDispatcher::equalizeTailGaps()
     sortDeltas(Vertical);
 
     // GapSize is a count of contiguous frames with zero deltas.
-    typedef std::array<unsigned, 2> GapSize;
+    using GapSize = std::array<unsigned, 2>;
     GapSize minimumGap { 0, 0 };
     GapSize currentGap { 0, 0 };
     GapSize remainingGapToGenerate { 0, 0 };
@@ -652,11 +652,11 @@ std::pair<WebCore::FloatSize, WebCore::FloatSize> MomentumEventDispatcher::compu
 
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER_TEMPORARY_LOGGING)
 
-void MomentumEventDispatcher::pushLogEntry(uint32_t generatedPhase, uint32_t eventPhase)
+void MomentumEventDispatcher::pushLogEntry(LogEntry::Phases generatedPhases, LogEntry::Phases eventPhases)
 {
     m_currentLogState.time = MonotonicTime::now();
-    m_currentLogState.generatedPhase = generatedPhase;
-    m_currentLogState.eventPhase = eventPhase;
+    m_currentLogState.generatedPhases = generatedPhases;
+    m_currentLogState.eventPhases = eventPhases;
     m_log.append(m_currentLogState);
 }
 
@@ -669,9 +669,9 @@ void MomentumEventDispatcher::flushLog()
         return;
 
     auto startTime = m_log[0].time;
-    RELEASE_LOG(ScrollAnimations, "MomentumEventDispatcher event log: time,generatedOffset,generatedPhase,eventOffset,eventPhase");
+    RELEASE_LOG(ScrollAnimations, "MomentumEventDispatcher event log: time,generatedOffset,generatedPhase[wheel:momentum],eventOffset,eventPhase[wheel:momentum]");
     for (const auto& entry : m_log)
-        RELEASE_LOG(ScrollAnimations, "MomentumEventDispatcher event log: %f,%f,%d,%f,%d", (entry.time - startTime).seconds(), entry.totalGeneratedOffset, entry.generatedPhase, entry.totalEventOffset, entry.eventPhase);
+        RELEASE_LOG(ScrollAnimations, "MomentumEventDispatcher event log: %f,%f,%d:%d,%f,%d:%d", (entry.time - startTime).seconds(), entry.totalGeneratedOffset, std::to_underlying(entry.generatedPhases.event), std::to_underlying(entry.generatedPhases.momentum), entry.totalEventOffset, std::to_underlying(entry.eventPhases.event), std::to_underlying(entry.eventPhases.momentum));
 
     m_log.clear();
     m_currentLogState = { };
