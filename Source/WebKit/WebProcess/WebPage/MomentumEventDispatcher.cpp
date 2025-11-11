@@ -55,7 +55,7 @@ MomentumEventDispatcher::~MomentumEventDispatcher()
 
 bool MomentumEventDispatcher::eventShouldStartSyntheticMomentumPhase(WebCore::PageIdentifier pageIdentifier, const WebWheelEvent& event) const
 {
-    if (event.momentumPhase() != WebWheelEvent::PhaseBegan)
+    if (event.momentumPhase() != WebWheelEvent::Phase::Began)
         return false;
 
     auto curveIterator = scrollingAccelerationCurveForPage(pageIdentifier);
@@ -85,9 +85,9 @@ bool MomentumEventDispatcher::handleWheelEvent(WebCore::PageIdentifier pageIdent
         // Any incoming wheel event other than a changed event for the current gesture
         // should interrupt the animation; in the usual case, it will be
         // momentumPhase == PhaseEnded that interrupts.
-        bool eventShouldInterruptGesture = !isMomentumEvent || event.momentumPhase() != WebWheelEvent::PhaseChanged;
+        bool eventShouldInterruptGesture = !isMomentumEvent || event.momentumPhase() != WebWheelEvent::Phase::Changed;
 
-        if (event.momentumPhase() == WebWheelEvent::PhaseEnded) {
+        if (event.momentumPhase() == WebWheelEvent::Phase::Ended) {
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER_TEMPORARY_LOGGING)
             RELEASE_LOG(ScrollAnimations, "MomentumEventDispatcher saw momentum ended phase, interrupted=%d", static_cast<int>(event.momentumEndType()));
 #endif
@@ -106,7 +106,7 @@ bool MomentumEventDispatcher::handleWheelEvent(WebCore::PageIdentifier pageIdent
         }
     }
 
-    if (event.phase() == WebWheelEvent::PhaseBegan || event.phase() == WebWheelEvent::PhaseChanged) {
+    if (event.phase() == WebWheelEvent::Phase::Began || event.phase() == WebWheelEvent::Phase::Changed) {
         didReceiveScrollEvent(event);
 
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER_TEMPORARY_LOGGING)
@@ -125,7 +125,7 @@ bool MomentumEventDispatcher::handleWheelEvent(WebCore::PageIdentifier pageIdent
     // is still running after we finished the synthetic gesture.
     bool shouldIgnoreIncomingPlatformEvent = isMomentumEvent && (m_isInOverriddenPlatformMomentumGesture || m_currentGesture.active);
 
-    if (event.momentumPhase() == WebWheelEvent::PhaseEnded)
+    if (event.momentumPhase() == WebWheelEvent::Phase::Ended)
         m_isInOverriddenPlatformMomentumGesture = false;
 
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER_TEMPORARY_LOGGING)
@@ -185,7 +185,7 @@ void MomentumEventDispatcher::dispatchSyntheticMomentumEvent(WebWheelEvent::Phas
         wheelTicks,
         WebWheelEvent::Granularity::ScrollByPixelWheelEvent,
         initiatingEvent->directionInvertedFromDevice(),
-        WebWheelEvent::PhaseNone,
+        WebWheelEvent::Phase::None,
         phase,
         true,
         initiatingEvent->scrollCount(),
@@ -231,14 +231,14 @@ void MomentumEventDispatcher::didStartMomentumPhase(WebCore::PageIdentifier page
         consumedDelta.scale(-1);
     m_currentGesture.currentOffset += consumedDelta;
     
-    dispatchSyntheticMomentumEvent(WebWheelEvent::PhaseBegan, event.delta());
+    dispatchSyntheticMomentumEvent(WebWheelEvent::Phase::Began, event.delta());
 }
 
 void MomentumEventDispatcher::didEndMomentumPhase()
 {
     ASSERT(m_currentGesture.active);
 
-    dispatchSyntheticMomentumEvent(WebWheelEvent::PhaseEnded, { });
+    dispatchSyntheticMomentumEvent(WebWheelEvent::Phase::Ended, { });
 
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER_TEMPORARY_LOGGING)
     RELEASE_LOG(ScrollAnimations, "MomentumEventDispatcher ending synthetic momentum phase with total offset %.1f %.1f, duration %f (event offset would have been %.1f %.1f) (tail index %d of %zu)", m_currentGesture.currentOffset.width(), m_currentGesture.currentOffset.height(), (MonotonicTime::now() - m_currentGesture.startTime).seconds(), m_currentGesture.accumulatedEventOffset.width(), m_currentGesture.accumulatedEventOffset.height(), m_currentGesture.currentTailDeltaIndex, m_currentGesture.tailDeltaTable.size());
@@ -369,7 +369,7 @@ void MomentumEventDispatcher::displayDidRefresh(WebCore::PlatformDisplayID displ
         return;
     }
 
-    dispatchSyntheticMomentumEvent(WebWheelEvent::PhaseChanged, *delta);
+    dispatchSyntheticMomentumEvent(WebWheelEvent::Phase::Changed, *delta);
 }
 
 void MomentumEventDispatcher::didReceiveScrollEventWithInterval(WebCore::FloatSize size, Seconds frameInterval)

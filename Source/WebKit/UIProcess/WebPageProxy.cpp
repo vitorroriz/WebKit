@@ -4236,7 +4236,7 @@ void WebPageProxy::continueWheelEventHandling(const WebWheelEvent& wheelEvent, c
     LOG_WITH_STREAM(WheelEvents, stream << "WebPageProxy::continueWheelEventHandling - " << result);
 
     if (!result.needsMainThreadProcessing()) {
-        if (m_mainFrame && wheelEvent.phase() == WebWheelEvent::Phase::PhaseBegan) {
+        if (m_mainFrame && wheelEvent.phase() == WebWheelEvent::Phase::Began) {
             // When wheel events are handled entirely in the UI process, we still need to tell the web process where the mouse is for cursor updates.
             sendToProcessContainingFrame(m_mainFrame->frameID(), Messages::WebPage::SetLastKnownMousePosition(m_mainFrame->frameID(), wheelEvent.position(), wheelEvent.globalPosition()));
         }
@@ -4345,7 +4345,7 @@ void WebPageProxy::cacheWheelEventScrollingAccelerationCurve(const NativeWebWhee
 
     ASSERT(drawingArea()->shouldSendWheelEventsToEventDispatcher());
 
-    if (nativeWheelEvent.momentumPhase() != WebWheelEvent::PhaseBegan)
+    if (nativeWheelEvent.momentumPhase() != WebWheelEvent::Phase::Began)
         return;
 
     if (!protectedPreferences()->momentumScrollingAnimatorEnabled())
@@ -4360,7 +4360,7 @@ void WebPageProxy::sendWheelEventScrollingAccelerationCurveIfNecessary(WebCore::
 {
     ASSERT(drawingArea()->shouldSendWheelEventsToEventDispatcher());
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER)
-    if (event.momentumPhase() != WebWheelEvent::PhaseBegan)
+    if (event.momentumPhase() != WebWheelEvent::Phase::Began)
         return;
 
     if (internals().scrollingAccelerationCurve == internals().lastSentScrollingAccelerationCurve)

@@ -182,7 +182,7 @@ void RemoteLayerTreeEventDispatcher::cacheWheelEventScrollingAccelerationCurve(c
     ASSERT(isMainRunLoop());
 
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER)
-    if (wheelEvent.momentumPhase() != WebWheelEvent::PhaseBegan)
+    if (wheelEvent.momentumPhase() != WebWheelEvent::Phase::Began)
         return;
 
     auto curve = ScrollingAccelerationCurve::fromNativeWheelEvent(wheelEvent);
@@ -204,10 +204,10 @@ void RemoteLayerTreeEventDispatcher::handleWheelEvent(const WebWheelEvent& wheel
 
     auto scrollingTree = this->scrollingTree();
     if (scrollingTree && scrollingTree->scrollingPerformanceTestingEnabled()) {
-        if (wheelEvent.phase() == WebWheelEvent::PhaseBegan)
+        if (wheelEvent.phase() == WebWheelEvent::Phase::Began)
             startFingerDownSignpostInterval();
 
-        if (wheelEvent.phase() == WebWheelEvent::PhaseEnded)
+        if (wheelEvent.phase() == WebWheelEvent::Phase::Ended)
             endFingerDownSignpostInterval();
     }
 
@@ -764,10 +764,10 @@ void RemoteLayerTreeEventDispatcher::handleSyntheticWheelEvent(PageIdentifier pa
 
     auto scrollingTree = this->scrollingTree();
     if (scrollingTree && scrollingTree->scrollingPerformanceTestingEnabled()) {
-        if (event.momentumPhase() == WebWheelEvent::PhaseBegan)
+        if (event.momentumPhase() == WebWheelEvent::Phase::Began)
             startMomentumSignpostInterval();
 
-        if (m_momentumIntervalIsActive && (!std::abs(event.delta().height()) || event.momentumPhase() == WebWheelEvent::PhaseEnded))
+        if (m_momentumIntervalIsActive && (!std::abs(event.delta().height()) || event.momentumPhase() == WebWheelEvent::Phase::Ended))
             endMomentumSignpostInterval();
     }
 

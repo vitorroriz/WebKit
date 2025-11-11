@@ -2431,7 +2431,7 @@ static WebCore::FloatPoint constrainContentOffset(WebCore::FloatPoint contentOff
     // "Began" event in the WebCore sense (e.g. for deciding cancelability). Note that
     // this may not be a WKBEScrollViewScrollUpdatePhaseBegin event, nor even necessarily the first WKBEScrollViewScrollUpdatePhaseChanged event.
     if (!_wheelEventCountInCurrentScrollGesture)
-        overridePhase = WebKit::WebWheelEvent::PhaseBegan;
+        overridePhase = WebKit::WebWheelEvent::Phase::Began;
     auto event = WebKit::WebIOSEventFactory::createWebWheelEvent(update, _contentView.get(), overridePhase);
 
     _wheelEventCountInCurrentScrollGesture++;

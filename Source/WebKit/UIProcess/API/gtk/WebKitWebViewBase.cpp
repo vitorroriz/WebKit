@@ -1477,7 +1477,7 @@ static gboolean webkitWebViewBaseScrollEvent(GtkWidget* widget, GdkEventScroll* 
             return GDK_EVENT_STOP;
     }
 
-    auto phase = gdk_event_is_scroll_stop_event(event) ? WebWheelEvent::Phase::PhaseEnded : WebWheelEvent::Phase::PhaseChanged;
+    auto phase = gdk_event_is_scroll_stop_event(event) ? WebWheelEvent::Phase::Ended : WebWheelEvent::Phase::Changed;
     double x, y;
     gdk_event_get_coords(event, &x, &y);
     IntPoint position(clampToInteger(x), clampToInteger(y));
@@ -1530,7 +1530,7 @@ static gboolean webkitWebViewBaseScrollEvent(GtkWidget* widget, GdkEventScroll* 
 
     FloatSize delta = wheelTicks.scaled(stepX, stepY);
 
-    priv->pageProxy->handleNativeWheelEvent(NativeWebWheelEvent(event, position, globalPosition, delta, wheelTicks, phase, WebWheelEvent::Phase::PhaseNone, hasPreciseScrollingDeltas));
+    priv->pageProxy->handleNativeWheelEvent(NativeWebWheelEvent(event, position, globalPosition, delta, wheelTicks, phase, WebWheelEvent::Phase::None, hasPreciseScrollingDeltas));
 
     return GDK_EVENT_STOP;
 }
@@ -1570,7 +1570,7 @@ static gboolean handleScroll(WebKitWebViewBase* webViewBase, double deltaX, doub
     if (!event)
         return GDK_EVENT_PROPAGATE;
 
-    auto phase = gdk_event_get_event_type(event) != GDK_SCROLL || gdk_scroll_event_is_stop(event) ? WebWheelEvent::Phase::PhaseEnded : WebWheelEvent::Phase::PhaseChanged;
+    auto phase = gdk_event_get_event_type(event) != GDK_SCROLL || gdk_scroll_event_is_stop(event) ? WebWheelEvent::Phase::Ended : WebWheelEvent::Phase::Changed;
     IntPoint position;
     if (priv->lastMotionEvent)
         position = IntPoint(priv->lastMotionEvent->position);
@@ -1606,7 +1606,7 @@ static gboolean handleScroll(WebKitWebViewBase* webViewBase, double deltaX, doub
     delta = wheelTicks.scaled(stepX, stepY);
 #endif
 
-    priv->pageProxy->handleNativeWheelEvent(NativeWebWheelEvent(event, position, position, delta, wheelTicks, phase, WebWheelEvent::Phase::PhaseNone, hasPreciseScrollingDeltas));
+    priv->pageProxy->handleNativeWheelEvent(NativeWebWheelEvent(event, position, position, delta, wheelTicks, phase, WebWheelEvent::Phase::None, hasPreciseScrollingDeltas));
 
     return GDK_EVENT_STOP;
 }
@@ -3375,17 +3375,17 @@ static inline WebWheelEvent::Phase toWebKitWheelEventPhase(WheelEventPhase phase
 {
     switch (phase) {
     case WheelEventPhase::NoPhase:
-        return WebWheelEvent::Phase::PhaseNone;
+        return WebWheelEvent::Phase::None;
     case WheelEventPhase::Began:
-        return WebWheelEvent::Phase::PhaseBegan;
+        return WebWheelEvent::Phase::Began;
     case WheelEventPhase::Changed:
-        return WebWheelEvent::Phase::PhaseChanged;
+        return WebWheelEvent::Phase::Changed;
     case WheelEventPhase::Ended:
-        return WebWheelEvent::Phase::PhaseEnded;
+        return WebWheelEvent::Phase::Ended;
     case WheelEventPhase::Cancelled:
-        return WebWheelEvent::Phase::PhaseCancelled;
+        return WebWheelEvent::Phase::Cancelled;
     case WheelEventPhase::MayBegin:
-        return WebWheelEvent::Phase::PhaseMayBegin;
+        return WebWheelEvent::Phase::MayBegin;
     }
 
     RELEASE_ASSERT_NOT_REACHED();
