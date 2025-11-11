@@ -26,6 +26,8 @@
 #include "config.h"
 #include "WebKitImage.h"
 
+#if ENABLE(2022_GLIB_API)
+
 #include "WebKitImagePrivate.h"
 
 #if USE(SKIA)
@@ -436,3 +438,5 @@ static void webkit_image_gloadable_icon_interface_init(GLoadableIconIface* iface
     iface->load_async = webkitImageLoadAsync;
     iface->load_finish = webkitImageLoadFinish;
 }
+
+#endif // ENABLE(2022_GLIB_API)
