@@ -34,17 +34,31 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(WebXRTransientInputHitTestSource);
 
-Ref<WebXRTransientInputHitTestSource> WebXRTransientInputHitTestSource::create()
+Ref<WebXRTransientInputHitTestSource> WebXRTransientInputHitTestSource::create(WebXRSession& session, PlatformXR::TransientInputHitTestSource&& source)
 {
-    return adoptRef(*new WebXRTransientInputHitTestSource);
+    return adoptRef(*new WebXRTransientInputHitTestSource(session, WTFMove(source)));
 }
 
-WebXRTransientInputHitTestSource::WebXRTransientInputHitTestSource() = default;
+WebXRTransientInputHitTestSource::WebXRTransientInputHitTestSource(WebXRSession& session, PlatformXR::TransientInputHitTestSource&& source)
+    : m_session(session)
+    , m_source(WTFMove(source))
+{
+}
 
 WebXRTransientInputHitTestSource::~WebXRTransientInputHitTestSource() = default;
 
 ExceptionOr<void> WebXRTransientInputHitTestSource::cancel()
 {
+    if (!m_source)
+        return Exception { ExceptionCode::InvalidStateError };
+    RefPtr session = m_session.get();
+    if (!session)
+        return Exception { ExceptionCode::InvalidStateError };
+    RefPtr device = session->device();
+    if (!device)
+        return Exception { ExceptionCode::InvalidStateError };
+    device->deleteTransientInputHitTestSource(*m_source);
+    m_source = std::nullopt;
     return { };
 }
 

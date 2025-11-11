@@ -51,6 +51,7 @@
 #include "XRHitTestOptionsInit.h"
 #include "XRRenderStateInit.h"
 #include "XRSessionEvent.h"
+#include "XRTransientInputHitTestOptionsInit.h"
 #include <wtf/RefPtr.h>
 #include <wtf/SystemTracing.h>
 #include <wtf/TZoneMallocInlines.h>
@@ -783,9 +784,31 @@ void WebXRSession::requestHitTestSource(const XRHitTestOptionsInit& init, Reques
     });
 }
 
-void WebXRSession::requestHitTestSourceForTransientInput(const XRTransientInputHitTestOptionsInit&, RequestHitTestSourceForTransientInputPromise&& promise)
+// https://immersive-web.github.io/hit-test/#dom-xrsession-requesthittestsourcefortransientinput
+void WebXRSession::requestHitTestSourceForTransientInput(const XRTransientInputHitTestOptionsInit& init, RequestHitTestSourceForTransientInputPromise&& promise)
 {
-    promise.resolve(WebXRTransientInputHitTestSource::create());
+    if (m_ended) {
+        promise.reject(Exception { ExceptionCode::InvalidStateError, "The session was already ended"_s });
+        return;
+    }
+    RefPtr device = this->device();
+    if (!device) {
+        promise.reject(Exception { ExceptionCode::InvalidStateError });
+        return;
+    }
+    auto toFloatPoint3D = [](auto& point) {
+        return FloatPoint3D(point.x(), point.y(), point.z());
+    };
+    PlatformXR::Ray ray { { 0, 0, 0 }, { 0, 0, -1 } };
+    if (init.offsetRay)
+        ray = PlatformXR::Ray { toFloatPoint3D(init.offsetRay->origin()), toFloatPoint3D(init.offsetRay->direction()) };
+    PlatformXR::TransientInputHitTestOptions options = { init.profile, init.entityTypes, WTFMove(ray) };
+    device->requestTransientInputHitTestSource(options, [protectedThis = Ref { *this }, promise = WTFMove(promise)](ExceptionOr<PlatformXR::TransientInputHitTestSource> exceptionOrSource) mutable {
+        if (exceptionOrSource.hasException())
+            promise.reject(exceptionOrSource.releaseException());
+        else
+            promise.resolve(WebXRTransientInputHitTestSource::create(protectedThis, exceptionOrSource.releaseReturnValue()));
+    });
 }
 #endif
 

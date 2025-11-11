@@ -64,7 +64,9 @@ struct OpenXRCoordinator::RenderState {
     bool passthroughFullyObscured { false };
 #if ENABLE(WEBXR_HIT_TEST)
     PlatformXR::HitTestSource nextHitTestSource { 1 };
+    PlatformXR::TransientInputHitTestSource nextTransientInputHitTestSource { 1 };
     HashSet<PlatformXR::HitTestSource> hitTestSources;
+    HashSet<PlatformXR::TransientInputHitTestSource> transientInputHitTestSources;
 #endif
 };
 
@@ -407,6 +409,60 @@ void OpenXRCoordinator::deleteHitTestSource(WebPageProxy& page, PlatformXR::HitT
 
             active.renderQueue->dispatch([renderState = active.renderState, source]() mutable {
                 bool removed = renderState->hitTestSources.remove(source);
+                ASSERT_UNUSED(removed, removed);
+            });
+        });
+}
+
+void OpenXRCoordinator::requestTransientInputHitTestSource(WebPageProxy& page, const PlatformXR::TransientInputHitTestOptions&, CompletionHandler<void(WebCore::ExceptionOr<PlatformXR::TransientInputHitTestSource>)>&& completionHandler)
+{
+    ASSERT(RunLoop::isMain());
+    WTF::switchOn(m_state,
+        [&](Idle&) {
+            RELEASE_LOG(XR, "OpenXRCoordinator: trying to request a transient input hit test source for an inactive session");
+        },
+        [&](Active& active) {
+            if (active.pageIdentifier != page.webPageIDInMainFrameProcess()) {
+                RELEASE_LOG(XR, "OpenXRCoordinator: trying to request a transient input hit test source for session owned by another page");
+                return;
+            }
+
+            if (active.renderState->terminateRequested.load()) {
+                RELEASE_LOG(XR, "OpenXRCoordinator: trying to request a transient input hit test source for a terminating session");
+                return;
+            }
+
+            active.renderQueue->dispatch([this, renderState = active.renderState, completionHandler = WTFMove(completionHandler)]() mutable {
+                auto addResult = renderState->transientInputHitTestSources.add(renderState->nextTransientInputHitTestSource);
+                ASSERT_UNUSED(addResult.isNewEntry, addResult);
+                callOnMainRunLoop([source = renderState->nextTransientInputHitTestSource, completionHandler = WTFMove(completionHandler)] mutable {
+                    completionHandler(source);
+                });
+                renderState->nextTransientInputHitTestSource++;
+            });
+        });
+}
+
+void OpenXRCoordinator::deleteTransientInputHitTestSource(WebPageProxy& page, PlatformXR::TransientInputHitTestSource source)
+{
+    ASSERT(RunLoop::isMain());
+    WTF::switchOn(m_state,
+        [&](Idle&) {
+            RELEASE_LOG(XR, "OpenXRCoordinator: trying to delete a transient input hit test source for an inactive session");
+        },
+        [&](Active& active) {
+            if (active.pageIdentifier != page.webPageIDInMainFrameProcess()) {
+                RELEASE_LOG(XR, "OpenXRCoordinator: trying to delete a transient input hit test source for session owned by another page");
+                return;
+            }
+
+            if (active.renderState->terminateRequested.load()) {
+                RELEASE_LOG(XR, "OpenXRCoordinator: trying to delete a transient input hit test source for a terminating session");
+                return;
+            }
+
+            active.renderQueue->dispatch([this, renderState = active.renderState, source]() mutable {
+                bool removed = renderState->transientInputHitTestSources.remove(source);
                 ASSERT_UNUSED(removed, removed);
             });
         });
@@ -844,6 +900,8 @@ PlatformXR::FrameData OpenXRCoordinator::populateFrameData(Box<RenderState> rend
 #if ENABLE(WEBXR_HIT_TEST)
     for (auto source : renderState->hitTestSources)
         frameData.hitTestResults.add(source, Vector<PlatformXR::FrameData::HitTestResult> { });
+    for (auto source : renderState->transientInputHitTestSources)
+        frameData.transientInputHitTestResults.add(source, Vector<PlatformXR::FrameData::TransientInputHitTestResult> { });
 #endif
 
     return frameData;

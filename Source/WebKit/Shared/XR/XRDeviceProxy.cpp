@@ -162,6 +162,24 @@ void XRDeviceProxy::deleteHitTestSource(PlatformXR::HitTestSource source)
         return;
     xrSystem->deleteHitTestSource(source);
 }
+
+void XRDeviceProxy::requestTransientInputHitTestSource(const PlatformXR::TransientInputHitTestOptions& init, CompletionHandler<void(WebCore::ExceptionOr<PlatformXR::TransientInputHitTestSource>)>&& completionHandler)
+{
+    RefPtr xrSystem = m_xrSystem.get();
+    if (!xrSystem) {
+        completionHandler(WebCore::Exception { WebCore::ExceptionCode::InvalidStateError });
+        return;
+    }
+    xrSystem->requestTransientInputHitTestSource(init, WTFMove(completionHandler));
+}
+
+void XRDeviceProxy::deleteTransientInputHitTestSource(PlatformXR::TransientInputHitTestSource source)
+{
+    RefPtr xrSystem = m_xrSystem.get();
+    if (!xrSystem)
+        return;
+    xrSystem->deleteTransientInputHitTestSource(source);
+}
 #endif
 
 } // namespace WebKit
