@@ -616,6 +616,11 @@ std::optional<LineLayoutResult::InlineContentEnding> InlineFormattingUtils::inli
         if (run.isOpaque())
             continue;
 
+        if (run.isBlock()) {
+            ASSERT(lineContent.runs.size() == 1);
+            break;
+        }
+
         if (run.isLineBreak())
             return { LineLayoutResult::InlineContentEnding::LineBreak };
         if (auto& textContent = run.textContent(); textContent && textContent->needsHyphen)
