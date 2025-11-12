@@ -693,6 +693,8 @@ bool RenderBlock::canPerformSimplifiedLayout() const
         return false;
     if (layoutContext().isSkippedContentRootForLayout(*this) && (outOfFlowChildNeedsLayout() || canContainFixedPositionObjects()))
         return false;
+    if (isSkippedContentRoot(*this) && firstChild() && firstChild()->wasSkippedDuringLastLayoutDueToContentVisibility())
+        return false;
     return outOfFlowChildNeedsLayout() || needsSimplifiedNormalFlowLayout();
 }
 
