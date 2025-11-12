@@ -111,6 +111,8 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
             return;
 
         for (auto& floatingObject : *renderBlockFlow->floatingObjectSet()) {
+            if (!floatingObject->renderer())
+                continue;
             if (!floatingObject->isDescendant())
                 continue;
 
@@ -125,10 +127,10 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
             boxGeometry.setHorizontalMargin({ });
             boxGeometry.setVerticalMargin({ });
 
-            auto shapeOutsideInfo = floatingObject->renderer().shapeOutsideInfo();
+            auto shapeOutsideInfo = floatingObject->renderer()->shapeOutsideInfo();
             RefPtr shape = shapeOutsideInfo ? &shapeOutsideInfo->computedShape() : nullptr;
 
-            auto usedPosition = RenderStyle::usedFloat(floatingObject->renderer()) == UsedFloat::Left ? Layout::PlacedFloats::Item::Position::Start : Layout::PlacedFloats::Item::Position::End;
+            auto usedPosition = RenderStyle::usedFloat(*floatingObject->renderer()) == UsedFloat::Left ? Layout::PlacedFloats::Item::Position::Start : Layout::PlacedFloats::Item::Position::End;
             placedFloats.add({ usedPosition, boxGeometry, floatRect.location(), WTFMove(shape) });
         }
     };
