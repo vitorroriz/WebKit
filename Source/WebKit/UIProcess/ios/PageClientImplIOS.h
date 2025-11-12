@@ -95,6 +95,7 @@ private:
 #endif // ENABLE(MODEL_PROCESS)
 #if USE(EXTENSIONKIT)
     UIView *createVisibilityPropagationView() override;
+    void removeVisibilityPropagationView(UIView *) override;
 #endif
 #endif // HAVE(VISIBILITY_PROPAGATION_VIEW)
 

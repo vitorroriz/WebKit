@@ -436,6 +436,7 @@ public:
 #endif
 #if USE(EXTENSIONKIT)
     virtual UIView *createVisibilityPropagationView() { return nullptr; }
+    virtual void removeVisibilityPropagationView(UIView *) { }
 #endif
 #endif // HAVE(VISIBILITY_PROPAGATION_VIEW)
 

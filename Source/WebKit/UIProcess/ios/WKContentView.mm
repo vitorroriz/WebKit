@@ -224,7 +224,7 @@ typedef NS_ENUM(NSInteger, _WKPrintRenderingCallbackType) {
 #if USE(EXTENSIONKIT)
     RetainPtr<UIView> _visibilityPropagationViewForWebProcess;
     RetainPtr<UIView> _visibilityPropagationViewForGPUProcess;
-    RetainPtr<NSHashTable<WKVisibilityPropagationView *>> _visibilityPropagationViews;
+    RetainPtr<NSMutableSet<WKVisibilityPropagationView *>> _visibilityPropagationViews;
 #else
 #if HAVE(NON_HOSTING_VISIBILITY_PROPAGATION_VIEW)
     RetainPtr<_UINonHostingVisibilityPropagationView> _visibilityPropagationViewForWebProcess;
@@ -975,7 +975,7 @@ static void storeAccessibilityRemoteConnectionInformation(id element, pid_t pid,
 - (WKVisibilityPropagationView *)_createVisibilityPropagationView
 {
     if (!_visibilityPropagationViews)
-        _visibilityPropagationViews = [NSHashTable weakObjectsHashTable];
+        _visibilityPropagationViews = adoptNS([[NSMutableSet alloc] init]);
 
     RetainPtr visibilityPropagationView = adoptNS([[WKVisibilityPropagationView alloc] init]);
     [_visibilityPropagationViews addObject:visibilityPropagationView.get()];
@@ -989,6 +989,12 @@ static void storeAccessibilityRemoteConnectionInformation(id element, pid_t pid,
 #endif
 
     return visibilityPropagationView.autorelease();
+}
+
+- (void)_removeVisibilityPropagationView:(UIView *)view
+{
+    if (RetainPtr visibilityPropagationView = dynamic_objc_cast<WKVisibilityPropagationView>(view))
+        [_visibilityPropagationViews removeObject:visibilityPropagationView.get()];
 }
 #endif // USE(EXTENSIONKIT)
 #endif // HAVE(VISIBILITY_PROPAGATION_VIEW)
