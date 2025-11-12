@@ -10,7 +10,7 @@ root
     section
         button,'Click Me'
         '        \nThis button does nothing\n\n        '
-        textFormControl,'text',placeholder='Enter text here','Enter text here'
+        input,'text',placeholder='Enter text here'
         '        \nClickable Div\n\n    '
     section
         article,'            \n\n                \nArticle Title\n\n\n                January 1, 2024\n            \n\n            \nThis is some article content…\n\n\n        '

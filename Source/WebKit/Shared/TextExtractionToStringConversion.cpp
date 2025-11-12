@@ -26,6 +26,7 @@
 #include "config.h"
 #include "TextExtractionToStringConversion.h"
 
+#include <WebCore/HTMLNames.h>
 #include <WebCore/TextExtractionTypes.h>
 #include <wtf/text/MakeString.h>
 #include <wtf/text/StringBuilder.h>
@@ -388,10 +389,10 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
             aggregator.addResult(line, WTFMove(parts));
         },
         [&](const TextExtraction::TextFormControlData& controlData) {
-            parts.append("textFormControl"_s);
+            parts.append(item.nodeName.convertToASCIILowercase());
             parts.appendVector(partsForItem(item, aggregator));
 
-            if (!controlData.controlType.isEmpty())
+            if (!controlData.controlType.isEmpty() && !equalIgnoringASCIICase(controlData.controlType, item.nodeName))
                 parts.insert(1, makeString('\'', controlData.controlType, '\''));
 
             if (!controlData.autocomplete.isEmpty())
@@ -426,9 +427,6 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
 
             if (!linkData.completedURL.isEmpty() && aggregator.includeURLs())
                 parts.append(makeString("url='"_s, normalizedURLString(linkData.completedURL), '\''));
-
-            if (!linkData.target.isEmpty())
-                parts.append(makeString("target='"_s, escapeString(linkData.target), '\''));
 
             aggregator.addResult(line, WTFMove(parts));
         },
@@ -469,6 +467,27 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
     );
 }
 
+static bool childTextNodeIsRedundant(const TextExtraction::Item& parent, const String& childText)
+{
+    if (auto link = parent.dataAs<TextExtraction::LinkItemData>(); link && link->completedURL.string().containsIgnoringASCIICase(childText))
+        return true;
+
+    if (auto formControl = parent.dataAs<TextExtraction::TextFormControlData>()) {
+        auto& editable = formControl->editable;
+        if (editable.placeholder.containsIgnoringASCIICase(childText))
+            return true;
+
+        if (editable.label.containsIgnoringASCIICase(childText))
+            return true;
+
+        return std::ranges::any_of(parent.ariaAttributes, [&](auto& entry) {
+            return entry.value.containsIgnoringASCIICase(childText);
+        });
+    }
+
+    return false;
+}
+
 static void addTextRepresentationRecursive(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, unsigned depth, TextExtractionAggregator& aggregator)
 {
     auto identifier = item.nodeIdentifier;
@@ -486,10 +505,15 @@ static void addTextRepresentationRecursive(const TextExtraction::Item& item, std
     TextExtractionLine line { aggregator.advanceToNextLine(), depth };
     addPartsForItem(item, std::optional { identifier }, line, aggregator);
 
-    if (item.children.size() == 1 && std::holds_alternative<TextExtraction::TextItemData>(item.children[0].data)) {
-        // In the case of a single text child, we append that text to the same line.
-        addPartsForItem(item.children[0], WTFMove(identifier), line, aggregator);
-        return;
+    if (item.children.size() == 1) {
+        if (auto text = item.children[0].dataAs<TextExtraction::TextItemData>()) {
+            if (childTextNodeIsRedundant(item, text->content.trim(isASCIIWhitespace)))
+                return;
+
+            // In the case of a single text child, we append that text to the same line.
+            addPartsForItem(item.children[0], WTFMove(identifier), line, aggregator);
+            return;
+        }
     }
 
     for (auto& child : item.children)

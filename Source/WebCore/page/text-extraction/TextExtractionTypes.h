@@ -151,11 +151,19 @@ struct Item {
     ItemData data;
     FloatRect rectInRootView;
     Vector<Item> children;
+    String nodeName;
     std::optional<NodeIdentifier> nodeIdentifier;
     OptionSet<EventListenerCategory> eventListeners;
     HashMap<String, String> ariaAttributes;
     String accessibilityRole;
     HashMap<String, String> clientAttributes;
+
+    template<typename T> std::optional<T> dataAs() const
+    {
+        if (std::holds_alternative<T>(data))
+            return std::get<T>(data);
+        return std::nullopt;
+    }
 };
 
 } // namespace TextExtraction

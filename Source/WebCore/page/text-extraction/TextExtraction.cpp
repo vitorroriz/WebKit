@@ -634,6 +634,7 @@ static inline void extractRecursive(Node& node, Item& parentItem, TraversalConte
                 WTFMove(result),
                 WTFMove(bounds),
                 { },
+                node.nodeName(),
                 WTFMove(nodeIdentifier),
                 eventListeners,
                 WTFMove(ariaAttributes),
@@ -651,6 +652,7 @@ static inline void extractRecursive(Node& node, Item& parentItem, TraversalConte
             item = {
                 TextItemData { { }, { }, emptyString(), { } },
                 WTFMove(bounds),
+                { },
                 { },
                 { },
                 eventListeners,
@@ -757,7 +759,7 @@ static Node* nodeFromJSHandle(JSHandleIdentifier identifier)
 
 Item extractItem(Request&& request, Page& page)
 {
-    Item root { ContainerType::Root, { }, { }, { }, { }, { }, { }, { } };
+    Item root { ContainerType::Root, { }, { }, { }, { }, { }, { }, { }, { } };
     RefPtr mainFrame = dynamicDowncast<LocalFrame>(page.mainFrame());
     if (!mainFrame) {
         // FIXME: Propagate text extraction to RemoteFrames.

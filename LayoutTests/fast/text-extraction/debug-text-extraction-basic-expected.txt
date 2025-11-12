@@ -11,7 +11,7 @@ root
         section,aria-label='Interactive Elements'
             button,uid=…,events=[click],aria-label='Test button','Click Me',[…]
             '        \nThis button does nothing\n\n        ',[…]
-            textFormControl,'text',uid=…,placeholder='Enter text here','Enter text here',[…]
+            input,'text',uid=…,placeholder='Enter text here'
             uid=…,role='button',events=[click,keyboard],'Clickable Div',[…]
         section,aria-label='Content with Roles'
             article,role='article','            \n\n                \nArticle Title\n\n\n                January 1, 2024\n            \n\n            \nThis is some article content with highlighted text.\n\n\n        ',[…]
@@ -27,6 +27,8 @@ root
                 button,uid=…,events=[click],'Update Status',[…]
             aria-label='Figure 1'
                 canvas,uid=…,[…]
+            link,uid=…,url='https://webkit.org/'
+            textarea,uid=…,'This is a text box',[…]
     role='contentinfo'
         '    \nFooter content with ',[…]
         role='img',aria-label='copyright symbol','©',[…]
