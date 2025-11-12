@@ -30,6 +30,10 @@
 #include <WebCore/FloatSize.h>
 #include <WebCore/IntPoint.h>
 
+namespace WTF {
+class TextStream;
+}
+
 namespace WebKit {
 
 class WebWheelEvent : public WebEvent {
@@ -108,6 +112,11 @@ private:
     WebCore::FloatSize m_unacceleratedScrollingDelta;
 #endif
 };
+
+WTF::TextStream& operator<<(WTF::TextStream&, WebWheelEvent::Granularity);
+WTF::TextStream& operator<<(WTF::TextStream&, WebWheelEvent::Phase);
+WTF::TextStream& operator<<(WTF::TextStream&, WebWheelEvent::MomentumEndType);
+WTF::TextStream& operator<<(WTF::TextStream&, const WebWheelEvent&);
 
 } // namespace WebKit
 
