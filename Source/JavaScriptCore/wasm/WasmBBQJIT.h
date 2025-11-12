@@ -2220,8 +2220,6 @@ private:
     enum class RotI64HelperOp { Left, Right };
     void rotI64Helper(RotI64HelperOp op, Location lhsLocation, Location rhsLocation, Location resultLocation);
 
-    void compareI64Helper(RelationalCondition condition, Location lhsLocation, Location rhsLocation, Location resultLocation);
-
     bool canTierUpToOMG() const;
 
     void emitIncrementCallProfileCount(unsigned callProfileIndex);

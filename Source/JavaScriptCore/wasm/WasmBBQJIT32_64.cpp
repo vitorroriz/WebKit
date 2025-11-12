@@ -2071,26 +2071,12 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::addI64Mul(Value lhs, Value rhs, Value& 
         "I64Mul", TypeKind::I64,
         BLOCK(Value::fromI64(lhs.asI64() * rhs.asI64())),
         BLOCK(
-            ScratchScope<2, 0> scratches(*this, lhsLocation, rhsLocation, resultLocation);
-            Location tmpHiLo = Location::fromGPR(scratches.gpr(0));
-            Location tmpLoHi = Location::fromGPR(scratches.gpr(1));
-            m_jit.mul32(lhsLocation.asGPRhi(), rhsLocation.asGPRlo(), tmpHiLo.asGPR());
-            m_jit.mul32(lhsLocation.asGPRlo(), rhsLocation.asGPRhi(), tmpLoHi.asGPR());
-            m_jit.uMull32(lhsLocation.asGPRlo(), rhsLocation.asGPRlo(), resultLocation.asGPRhi(),  resultLocation.asGPRlo());
-            m_jit.add32(tmpHiLo.asGPR(), resultLocation.asGPRhi());
-            m_jit.add32(tmpLoHi.asGPR(), resultLocation.asGPRhi());
+            m_jit.mul64(lhsLocation.asGPRhi(), lhsLocation.asGPRlo(), rhsLocation.asGPRhi(), rhsLocation.asGPRlo(), resultLocation.asGPRhi(), resultLocation.asGPRlo());
         ),
         BLOCK(
-            ImmHelpers::immLocation(lhsLocation, rhsLocation) = Location::fromGPR2(wasmScratchGPR,  wasmScratchGPR2);
+            ImmHelpers::immLocation(lhsLocation, rhsLocation) = Location::fromGPR2(wasmScratchGPR, wasmScratchGPR2);
             emitMoveConst(ImmHelpers::imm(lhs, rhs), Location::fromGPR2(wasmScratchGPR, wasmScratchGPR2));
-            ScratchScope<2, 0> scratches(*this, lhsLocation, rhsLocation, resultLocation);
-            Location tmpHiLo = Location::fromGPR(scratches.gpr(0));
-            Location tmpLoHi = Location::fromGPR(scratches.gpr(1));
-            m_jit.mul32(lhsLocation.asGPRhi(), rhsLocation.asGPRlo(), tmpHiLo.asGPR());
-            m_jit.mul32(lhsLocation.asGPRlo(), rhsLocation.asGPRhi(), tmpLoHi.asGPR());
-            m_jit.uMull32(lhsLocation.asGPRlo(), rhsLocation.asGPRlo(), resultLocation.asGPRhi(),  resultLocation.asGPRlo());
-            m_jit.add32(tmpHiLo.asGPR(), resultLocation.asGPRhi());
-            m_jit.add32(tmpLoHi.asGPR(), resultLocation.asGPRhi());
+            m_jit.mul64(lhsLocation.asGPRhi(), lhsLocation.asGPRlo(), rhsLocation.asGPRhi(), rhsLocation.asGPRlo(), resultLocation.asGPRhi(), resultLocation.asGPRlo());
         )
     );
 }
@@ -2106,8 +2092,7 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::addI64And(Value lhs, Value rhs, Value& 
         "I64And", TypeKind::I64,
         BLOCK(Value::fromI64(lhs.asI64() & rhs.asI64())),
         BLOCK(
-            m_jit.and32(lhsLocation.asGPRhi(), rhsLocation.asGPRhi(), resultLocation.asGPRhi());
-            m_jit.and32(lhsLocation.asGPRlo(), rhsLocation.asGPRlo(), resultLocation.asGPRlo());
+            m_jit.and64(lhsLocation.asGPRhi(), lhsLocation.asGPRlo(), rhsLocation.asGPRhi(), rhsLocation.asGPRlo(), resultLocation.asGPRhi(), resultLocation.asGPRlo());
         ),
         BLOCK(
             m_jit.move(ImmHelpers::regLocation(lhsLocation, rhsLocation).asGPRhi(), resultLocation.asGPRhi());
@@ -2124,8 +2109,7 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::addI64Xor(Value lhs, Value rhs, Value& 
         "I64Xor", TypeKind::I64,
         BLOCK(Value::fromI64(lhs.asI64() ^ rhs.asI64())),
         BLOCK(
-            m_jit.xor32(lhsLocation.asGPRhi(), rhsLocation.asGPRhi(), resultLocation.asGPRhi());
-            m_jit.xor32(lhsLocation.asGPRlo(), rhsLocation.asGPRlo(), resultLocation.asGPRlo());
+            m_jit.xor64(lhsLocation.asGPRhi(), lhsLocation.asGPRlo(), rhsLocation.asGPRhi(), rhsLocation.asGPRlo(), resultLocation.asGPRhi(), resultLocation.asGPRlo());
         ),
         BLOCK(
             m_jit.move(ImmHelpers::regLocation(lhsLocation, rhsLocation).asGPRhi(), resultLocation.asGPRhi());
@@ -2357,13 +2341,7 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::addI64Clz(Value operand, Value& result)
         "I64Clz", TypeKind::I64,
         BLOCK(Value::fromI64(WTF::clz(operand.asI64()))),
         BLOCK(
-            m_jit.countLeadingZeros32(operandLocation.asGPRhi(), resultLocation.asGPRhi());
-            Jump done = m_jit.branch32(RelationalCondition::LessThan, resultLocation.asGPRhi(), TrustedImm32(32));
-            m_jit.countLeadingZeros32(operandLocation.asGPRlo(), resultLocation.asGPRhi());
-            m_jit.add32(TrustedImm32(32), resultLocation.asGPRhi());
-            done.link(&m_jit);
-            m_jit.move(resultLocation.asGPRhi(), resultLocation.asGPRlo());
-            m_jit.xor32(resultLocation.asGPRhi(), resultLocation.asGPRhi());
+            m_jit.countLeadingZeros64(operandLocation.asGPRhi(), operandLocation.asGPRlo(), resultLocation.asGPRhi(), resultLocation.asGPRlo());
         )
     );
 }
@@ -2374,12 +2352,7 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::addI64Ctz(Value operand, Value& result)
         "I64Ctz", TypeKind::I64,
         BLOCK(Value::fromI64(WTF::ctz(operand.asI64()))),
         BLOCK(
-            m_jit.countTrailingZeros32(operandLocation.asGPRlo(), resultLocation.asGPRlo());
-            Jump done = m_jit.branch32(RelationalCondition::LessThan, resultLocation.asGPRlo(), TrustedImm32(32));
-            m_jit.countTrailingZeros32(operandLocation.asGPRhi(), resultLocation.asGPRlo());
-            m_jit.add32(TrustedImm32(32), resultLocation.asGPRlo());
-            done.link(&m_jit);
-            m_jit.xor32(resultLocation.asGPRhi(), resultLocation.asGPRhi());
+            m_jit.countTrailingZeros64(operandLocation.asGPRhi(), operandLocation.asGPRlo(), resultLocation.asGPRhi(), resultLocation.asGPRlo());
         )
     );
 }
@@ -2390,52 +2363,14 @@ PartialResult BBQJIT::emitCompareI64(const char* opcode, Value& lhs, Value& rhs,
         opcode, TypeKind::I32,
         BLOCK(Value::fromI32(static_cast<int32_t>(comparator(lhs.asI64(), rhs.asI64())))),
         BLOCK(
-            compareI64Helper(condition, lhsLocation, rhsLocation, resultLocation);
+            m_jit.compare64(condition, lhsLocation.asGPRhi(), lhsLocation.asGPRlo(), rhsLocation.asGPRhi(), rhsLocation.asGPRlo(), resultLocation.asGPR());
         ),
         BLOCK(
             ImmHelpers::immLocation(lhsLocation, rhsLocation) = Location::fromGPR2(wasmScratchGPR, wasmScratchGPR2);
             emitMoveConst(ImmHelpers::imm(lhs, rhs), Location::fromGPR2(wasmScratchGPR, wasmScratchGPR2));
-            compareI64Helper(condition, lhsLocation, rhsLocation, resultLocation);
+            m_jit.compare64(condition, lhsLocation.asGPRhi(), lhsLocation.asGPRlo(), rhsLocation.asGPRhi(), rhsLocation.asGPRlo(), resultLocation.asGPR());
         )
     )
-}
-
-void BBQJIT::compareI64Helper(RelationalCondition condition, Location lhsLocation, Location rhsLocation, Location resultLocation)
-{
-    if (condition == MacroAssembler::Equal || condition == MacroAssembler::NotEqual) {
-        ScratchScope<1, 0> scratches(*this, lhsLocation, rhsLocation, resultLocation);
-        auto tmp = Location::fromGPR(scratches.gpr(0));
-        m_jit.move(TrustedImm32(condition == MacroAssembler::NotEqual), tmp.asGPR());
-        auto compareLo = m_jit.branch32(RelationalCondition::NotEqual, lhsLocation.asGPRhi(), rhsLocation.asGPRhi());
-        m_jit.compare32(condition, lhsLocation.asGPRlo(), rhsLocation.asGPRlo(), tmp.asGPR());
-        compareLo.link(&m_jit);
-        m_jit.move(tmp.asGPR(), resultLocation.asGPR());
-    } else {
-        auto compareLo = m_jit.branch32(RelationalCondition::Equal, lhsLocation.asGPRhi(), rhsLocation.asGPRhi());
-        m_jit.compare32(condition, lhsLocation.asGPRhi(), rhsLocation.asGPRhi(), resultLocation.asGPR());
-        auto done = m_jit.jump();
-        compareLo.link(&m_jit);
-        // Signed to unsigned, leave the rest alone
-        RelationalCondition loCond = condition;
-        switch (condition) {
-        case MacroAssembler::GreaterThan:
-            loCond = MacroAssembler::Above;
-            break;
-        case MacroAssembler::LessThan:
-            loCond = MacroAssembler::Below;
-            break;
-        case MacroAssembler::GreaterThanOrEqual:
-            loCond = MacroAssembler::AboveOrEqual;
-            break;
-        case MacroAssembler::LessThanOrEqual:
-            loCond = MacroAssembler::BelowOrEqual;
-            break;
-        default:
-            break;
-        }
-        m_jit.compare32(loCond, lhsLocation.asGPRlo(), rhsLocation.asGPRlo(), resultLocation.asGPR());
-        done.link(&m_jit);
-    }
 }
 
 PartialResult BBQJIT::addI32WrapI64(Value operand, Value& result)
