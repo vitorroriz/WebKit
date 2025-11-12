@@ -282,7 +282,7 @@ void AnchorPositionEvaluator::captureScrollSnapshots(RenderBox& anchored, bool i
         return clearAnchorScrollSnapshots(anchored);
 
     if (!anchored.style().positionTryFallbacks().isEmpty()
-        || anchored.style().positionVisibility().contains(PositionVisibility::NoOverflow))
+        || anchored.style().positionVisibility().contains(PositionVisibilityValue::NoOverflow))
         adjuster.setFallbackLimits(anchored);
 
     auto captureDiff = anchored.layoutContext().registerAnchorScrollAdjuster(WTFMove(adjuster));
@@ -319,10 +319,10 @@ void AnchorPositionEvaluator::updateScrollAdjustments(RenderView& renderView)
                     anchored->setNeedsLayout();
                     needsInvalidation = true;
                 } else
-                    shouldBeHidden = anchored->style().positionVisibility().contains(PositionVisibility::NoOverflow);
+                    shouldBeHidden = anchored->style().positionVisibility().contains(PositionVisibilityValue::NoOverflow);
             }
         }
-        if (!shouldBeHidden && anchored->style().positionVisibility().contains(PositionVisibility::AnchorsVisible))
+        if (!shouldBeHidden && anchored->style().positionVisibility().contains(PositionVisibilityValue::AnchorsVisible))
             shouldBeHidden = AnchorPositionEvaluator::isDefaultAnchorInvisibleOrClippedByInterveningBoxes(*anchored);
 
         if (needsInvalidation || shouldBeHidden != adjuster.isHidden()) {
@@ -1323,7 +1323,7 @@ void AnchorPositionEvaluator::updateAnchorPositionedStateForDefaultAnchorAndPosi
 
     // `position-visibility: no-overflow` should also work for non-anchor positioned out-of-flow boxes.
     // Create an empty anchor positioning state for it so we perform the required layout interleaving.
-    auto hasPositionVisibilityNoOverflow = generatesBox(style) && style.hasOutOfFlowPosition() && style.positionVisibility().contains(PositionVisibility::NoOverflow);
+    auto hasPositionVisibilityNoOverflow = generatesBox(style) && style.hasOutOfFlowPosition() && style.positionVisibility().contains(PositionVisibilityValue::NoOverflow);
 
     if (!shouldResolveDefaultAnchor && !hasPositionVisibilityNoOverflow)
         return;

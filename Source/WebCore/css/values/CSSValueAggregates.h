@@ -947,6 +947,11 @@ template<typename Derived, typename T, typename K> struct EnumSetOrKeywordBase {
     {
     }
 
+    constexpr EnumSetOrKeywordBase(value_type value)
+        : EnumSetOrKeywordBase { EnumSet { value } }
+    {
+    }
+
     constexpr EnumSetOrKeywordBase(std::initializer_list<value_type> initializerList)
         : EnumSetOrKeywordBase { EnumSet { initializerList } }
     {

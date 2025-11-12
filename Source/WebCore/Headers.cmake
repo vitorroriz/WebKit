@@ -3258,6 +3258,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/align/StyleOverflowPosition.h
 
     style/values/anchor-position/StyleAnchorName.h
+    style/values/anchor-position/StylePositionVisibility.h
 
     style/values/animations/StyleAnimation.h
     style/values/animations/StyleAnimations.h

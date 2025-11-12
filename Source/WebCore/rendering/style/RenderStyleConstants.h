@@ -1149,12 +1149,6 @@ enum class FieldSizing : bool {
     Content
 };
 
-enum class PositionVisibility : uint8_t {
-    AnchorsValid   = 1 << 0,
-    AnchorsVisible = 1 << 1,
-    NoOverflow     = 1 << 2
-};
-
 enum class NinePieceImageRule : uint8_t {
     Stretch,
     Round,
@@ -1333,7 +1327,6 @@ WTF::TextStream& operator<<(WTF::TextStream&, OverflowAlignment);
 WTF::TextStream& operator<<(WTF::TextStream&, OverflowWrap);
 WTF::TextStream& operator<<(WTF::TextStream&, PointerEvents);
 WTF::TextStream& operator<<(WTF::TextStream&, PositionType);
-WTF::TextStream& operator<<(WTF::TextStream&, PositionVisibility);
 WTF::TextStream& operator<<(WTF::TextStream&, PrintColorAdjust);
 WTF::TextStream& operator<<(WTF::TextStream&, PseudoElementType);
 WTF::TextStream& operator<<(WTF::TextStream&, QuoteType);

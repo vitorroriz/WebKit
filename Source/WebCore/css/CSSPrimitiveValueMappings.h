@@ -46,6 +46,7 @@
 #include "ScrollAxis.h"
 #include "ScrollTypes.h"
 #include "StyleImageOrientation.h"
+#include "StylePositionVisibility.h"
 #include "StyleScrollBehavior.h"
 #include "StyleTextDecorationLine.h"
 #include "StyleWebKitLineBoxContain.h"
@@ -2521,7 +2522,7 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH
 
-#define TYPE PositionVisibility
+#define TYPE Style::PositionVisibilityValue
 #define FOR_EACH(CASE) CASE(AnchorsValid) CASE(AnchorsVisible) CASE(NoOverflow)
 DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE

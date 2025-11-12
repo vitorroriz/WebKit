@@ -134,7 +134,6 @@ public:
 
     static std::optional<ScopedName> convertPositionAnchor(BuilderState&, const CSSValue&);
     static std::optional<PositionArea> convertPositionArea(BuilderState&, const CSSValue&);
-    static OptionSet<PositionVisibility> convertPositionVisibility(BuilderState&, const CSSValue&);
 
     static NameScope convertNameScope(BuilderState&, const CSSValue&);
 
@@ -804,23 +803,6 @@ inline std::optional<PositionArea> BuilderConverter::convertPositionArea(Builder
     }
 
     return area;
-}
-
-inline OptionSet<PositionVisibility> BuilderConverter::convertPositionVisibility(BuilderState& builderState, const CSSValue& value)
-{
-    if (value.valueID() == CSSValueAlways)
-        return { };
-
-    auto maybeList = requiredListDowncast<CSSValueList, CSSPrimitiveValue>(builderState, value);
-    if (!maybeList)
-        return { };
-    auto list = *maybeList;
-
-    OptionSet<PositionVisibility> result;
-    for (const auto& value : list)
-        result.add(fromCSSValue<PositionVisibility>(value));
-
-    return result;
 }
 
 inline NameScope BuilderConverter::convertNameScope(BuilderState& builderState, const CSSValue& value)

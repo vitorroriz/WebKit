@@ -12196,7 +12196,7 @@
             ],
             "codegen-properties": {
                 "settings-flag": "cssAnchorPositioningEnabled",
-                "style-converter": "PositionVisibility",
+                "style-converter": "StyleType<PositionVisibility>",
                 "parser-grammar": "always | [ anchors-valid || anchors-visible || no-overflow ]@(no-single-item-opt)"
             },
             "specification": {

@@ -165,7 +165,6 @@ enum class PaginationMode : uint8_t;
 enum class PaintBehavior : uint32_t;
 enum class PointerEvents : uint8_t;
 enum class PositionType : uint8_t;
-enum class PositionVisibility : uint8_t;
 enum class PrintColorAdjust : bool;
 enum class PseudoId : uint8_t;
 enum class Resize : uint8_t;
@@ -318,6 +317,7 @@ struct PaddingEdge;
 struct PageSize;
 struct Perspective;
 struct Position;
+struct PositionVisibility;
 struct PositionX;
 struct PositionY;
 struct PositionTryFallback;
@@ -2420,9 +2420,9 @@ public:
     std::optional<size_t> usedPositionOptionIndex() const;
     void setUsedPositionOptionIndex(std::optional<size_t>);
 
-    static constexpr OptionSet<PositionVisibility> initialPositionVisibility();
-    inline OptionSet<PositionVisibility> positionVisibility() const;
-    inline void setPositionVisibility(OptionSet<PositionVisibility>);
+    static constexpr Style::PositionVisibility initialPositionVisibility();
+    inline Style::PositionVisibility positionVisibility() const;
+    inline void setPositionVisibility(Style::PositionVisibility);
 
     inline AlignmentBaseline alignmentBaseline() const;
     inline void setAlignmentBaseline(AlignmentBaseline);

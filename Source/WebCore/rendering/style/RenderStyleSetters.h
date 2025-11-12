@@ -257,7 +257,7 @@ inline void RenderStyle::setPerspectiveOriginY(Style::PerspectiveOriginY&& origi
 inline void RenderStyle::setPositionAnchor(const std::optional<Style::ScopedName>& anchor) { SET_NESTED(m_nonInheritedData, rareData, positionAnchor, anchor); }
 inline void RenderStyle::setPositionArea(std::optional<PositionArea> value) { SET_NESTED(m_nonInheritedData, rareData, positionArea, value); }
 inline void RenderStyle::setPositionTryOrder(Style::PositionTryOrder order) { SET_NESTED(m_nonInheritedData, rareData, positionTryOrder, static_cast<unsigned>(order)); }
-inline void RenderStyle::setPositionVisibility(OptionSet<PositionVisibility> value) { SET_NESTED(m_nonInheritedData, rareData, positionVisibility, value.toRaw()); }
+inline void RenderStyle::setPositionVisibility(Style::PositionVisibility value) { SET_NESTED(m_nonInheritedData, rareData, positionVisibility, value.toRaw()); }
 inline void RenderStyle::setResize(Resize r) { SET_NESTED(m_nonInheritedData, miscData, resize, static_cast<unsigned>(r)); }
 inline void RenderStyle::setRight(Style::InsetEdge&& edge) { SET_NESTED(m_nonInheritedData, surroundData, inset.right(), WTFMove(edge)); }
 inline void RenderStyle::setRotate(Style::Rotate&& rotate) { SET_NESTED(m_nonInheritedData, rareData, rotate, WTFMove(rotate)); }

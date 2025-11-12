@@ -82,7 +82,6 @@ public:
     static void serializePositionAnchor(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const std::optional<ScopedName>&);
     static void serializePositionArea(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const std::optional<PositionArea>&);
     static void serializeNameScope(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const NameScope&);
-    static void serializePositionVisibility(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<PositionVisibility>);
 
     // MARK: MaskLayer property serializations
 
@@ -498,25 +497,6 @@ inline void ExtractorSerializer::serializeNameScope(ExtractorState& state, Strin
     }
 
     RELEASE_ASSERT_NOT_REACHED();
-}
-
-inline void ExtractorSerializer::serializePositionVisibility(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<PositionVisibility> positionVisibility)
-{
-    bool listEmpty = true;
-    auto appendOption = [&](PositionVisibility test, CSSValueID value) {
-        if (positionVisibility & test) {
-            if (!listEmpty)
-                builder.append(' ');
-            builder.append(nameLiteralForSerialization(value));
-            listEmpty = false;
-        }
-    };
-    appendOption(PositionVisibility::AnchorsValid, CSSValueAnchorsValid);
-    appendOption(PositionVisibility::AnchorsVisible, CSSValueAnchorsVisible);
-    appendOption(PositionVisibility::NoOverflow, CSSValueNoOverflow);
-
-    if (listEmpty)
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Always { });
 }
 
 // MARK: - MaskLayer property serializations

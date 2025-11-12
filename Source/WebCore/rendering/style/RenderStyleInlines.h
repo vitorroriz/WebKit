@@ -532,7 +532,7 @@ inline std::optional<Style::ScopedName> RenderStyle::initialPositionAnchor() { r
 inline std::optional<PositionArea> RenderStyle::initialPositionArea() { return { }; }
 inline FixedVector<Style::PositionTryFallback> RenderStyle::initialPositionTryFallbacks() { return { }; }
 constexpr Style::PositionTryOrder RenderStyle::initialPositionTryOrder() { return Style::PositionTryOrder::Normal; }
-constexpr OptionSet<PositionVisibility> RenderStyle::initialPositionVisibility() { return PositionVisibility::AnchorsVisible; }
+constexpr Style::PositionVisibility RenderStyle::initialPositionVisibility() { return Style::PositionVisibilityValue::AnchorsVisible; }
 constexpr PrintColorAdjust RenderStyle::initialPrintColorAdjust() { return PrintColorAdjust::Economy; }
 inline Style::Quotes RenderStyle::initialQuotes() { return CSS::Keyword::Auto { }; }
 constexpr Order RenderStyle::initialRTLOrdering() { return Order::Logical; }
@@ -759,7 +759,7 @@ inline const Style::PerspectiveOriginY& RenderStyle::perspectiveOriginY() const 
 inline const std::optional<Style::ScopedName>& RenderStyle::positionAnchor() const { return m_nonInheritedData->rareData->positionAnchor; }
 inline std::optional<PositionArea> RenderStyle::positionArea() const { return m_nonInheritedData->rareData->positionArea; }
 inline Style::PositionTryOrder RenderStyle::positionTryOrder() const { return static_cast<Style::PositionTryOrder>(m_nonInheritedData->rareData->positionTryOrder); }
-inline OptionSet<PositionVisibility> RenderStyle::positionVisibility() const { return OptionSet<PositionVisibility>::fromRaw(m_nonInheritedData->rareData->positionVisibility); }
+inline Style::PositionVisibility RenderStyle::positionVisibility() const { return Style::PositionVisibility::fromRaw(m_nonInheritedData->rareData->positionVisibility); }
 inline bool RenderStyle::preserveNewline() const { return preserveNewline(whiteSpaceCollapse()); }
 inline bool RenderStyle::preserves3D() const { return usedTransformStyle3D() == TransformStyle3D::Preserve3D; }
 inline const Style::Quotes& RenderStyle::quotes() const { return m_rareInheritedData->quotes; }

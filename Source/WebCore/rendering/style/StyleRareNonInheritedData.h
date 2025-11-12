@@ -50,6 +50,7 @@
 #include <WebCore/StylePageSize.h>
 #include <WebCore/StylePerspective.h>
 #include <WebCore/StylePerspectiveOrigin.h>
+#include <WebCore/StylePositionVisibility.h>
 #include <WebCore/StylePrimitiveNumericTypes.h>
 #include <WebCore/StyleProgressTimelineAxes.h>
 #include <WebCore/StyleProgressTimelineName.h>
@@ -258,7 +259,7 @@ public:
     PREFERRED_TYPE(TextBoxTrim) unsigned textBoxTrim : 2;
     PREFERRED_TYPE(OverflowAnchor) unsigned overflowAnchor : 1;
     PREFERRED_TYPE(Style::PositionTryOrder) unsigned positionTryOrder : 3;
-    PREFERRED_TYPE(OptionSet<PositionVisibility>) unsigned positionVisibility : 3;
+    PREFERRED_TYPE(Style::PositionVisibility) unsigned positionVisibility : 3;
     PREFERRED_TYPE(FieldSizing) unsigned fieldSizing : 1;
     PREFERRED_TYPE(bool) unsigned nativeAppearanceDisabled : 1;
 #if HAVE(CORE_MATERIAL)

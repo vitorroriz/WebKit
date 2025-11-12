@@ -1805,16 +1805,16 @@ void TreeResolver::updateForPositionVisibility(RenderStyle& style, const Styleab
         if (!anchored)
             return false;
 
-        if (style.positionVisibility().contains(PositionVisibility::AnchorsVisible)) {
+        if (style.positionVisibility().contains(PositionVisibilityValue::AnchorsVisible)) {
             // "If the box has a default anchor box but that anchor box is invisible or clipped by intervening boxes, the box’s visibility property computes to force-hidden."
             if (AnchorPositionEvaluator::isDefaultAnchorInvisibleOrClippedByInterveningBoxes(*anchored))
                 return true;
         }
-        if (style.positionVisibility().contains(PositionVisibility::NoOverflow)) {
+        if (style.positionVisibility().contains(PositionVisibilityValue::NoOverflow)) {
             if (AnchorPositionEvaluator::overflowsInsetModifiedContainingBlock(*anchored))
                 return true;
         }
-        if (style.positionVisibility().contains(PositionVisibility::AnchorsValid)) {
+        if (style.positionVisibility().contains(PositionVisibilityValue::AnchorsValid)) {
             auto* anchorPositionedState = m_treeResolutionState.anchorPositionedStates.get({ &styleable.element, styleable.pseudoElementIdentifier });
             if (anchorPositionedState) {
                 for (auto& anchorElement : anchorPositionedState->anchorElements.values()) {

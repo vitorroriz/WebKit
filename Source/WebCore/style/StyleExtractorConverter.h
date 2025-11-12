@@ -146,7 +146,6 @@ public:
     static Ref<CSSValue> convertPositionArea(ExtractorState&, const PositionArea&);
     static Ref<CSSValue> convertPositionArea(ExtractorState&, const std::optional<PositionArea>&);
     static Ref<CSSValue> convertNameScope(ExtractorState&, const NameScope&);
-    static Ref<CSSValue> convertPositionVisibility(ExtractorState&, OptionSet<PositionVisibility>);
 
     // MARK: MaskLayer property conversions
 
@@ -617,22 +616,6 @@ inline Ref<CSSValue> ExtractorConverter::convertNameScope(ExtractorState&, const
 
     ASSERT_NOT_REACHED();
     return CSSPrimitiveValue::create(CSSValueNone);
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertPositionVisibility(ExtractorState&, OptionSet<PositionVisibility> positionVisibility)
-{
-    CSSValueListBuilder list;
-    if (positionVisibility & PositionVisibility::AnchorsValid)
-        list.append(CSSPrimitiveValue::create(CSSValueAnchorsValid));
-    if (positionVisibility & PositionVisibility::AnchorsVisible)
-        list.append(CSSPrimitiveValue::create(CSSValueAnchorsVisible));
-    if (positionVisibility & PositionVisibility::NoOverflow)
-        list.append(CSSPrimitiveValue::create(CSSValueNoOverflow));
-
-    if (list.isEmpty())
-        return CSSPrimitiveValue::create(CSSValueAlways);
-
-    return CSSValueList::createSpaceSeparated(WTFMove(list));
 }
 
 // MARK: - MaskLayer property conversions
