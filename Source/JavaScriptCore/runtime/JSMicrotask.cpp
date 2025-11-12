@@ -149,7 +149,8 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
 
         switch (promise->status()) {
         case JSPromise::Status::Pending: {
-            auto* reaction = JSPromiseReaction::create(vm, promiseToResolve, jsUndefined(), jsUndefined(), jsUndefined(), jsDynamicCast<JSPromiseReaction*>(promise->reactionsOrResult()));
+            JSValue encodedTask = jsNumber(static_cast<int32_t>(InternalMicrotask::PromiseResolveWithoutHandlerJob));
+            auto* reaction = JSPromiseReaction::create(vm, promiseToResolve, encodedTask, encodedTask, jsUndefined(), jsDynamicCast<JSPromiseReaction*>(promise->reactionsOrResult()));
             promise->setReactionsOrResult(vm, reaction);
             break;
         }
@@ -212,6 +213,10 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
         RELEASE_AND_RETURN(scope, promiseResolveThenableJob(globalObject, promise, then, resolve, reject));
     }
 
+    case InternalMicrotask::PromiseFirstResolveWithoutHandlerJob:
+        if (jsCast<JSPromise*>(arguments[0])->status() != JSPromise::Status::Pending)
+            return;
+        [[fallthrough]];
     case InternalMicrotask::PromiseResolveWithoutHandlerJob: {
         auto* promise = jsCast<JSPromise*>(arguments[0]);
         JSValue resolution = arguments[1];

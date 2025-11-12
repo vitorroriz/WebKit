@@ -139,6 +139,8 @@ public:
     static void rejectWithoutPromise(JSGlobalObject*, JSValue argument, JSValue onFulfilled, JSValue onRejected, JSValue context);
     static void fulfillWithoutPromise(JSGlobalObject*, JSValue argument, JSValue onFulfilled, JSValue onRejected, JSValue context);
 
+    void performPromiseThenWithInternalMicrotask(VM&, JSGlobalObject*, InternalMicrotask, JSValue);
+
     bool isThenFastAndNonObservable();
 
     std::tuple<JSFunction*, JSFunction*> createResolvingFunctions(VM&, JSGlobalObject*);

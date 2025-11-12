@@ -240,7 +240,6 @@ JSC_DEFINE_HOST_FUNCTION(promiseConstructorFuncRace, (JSGlobalObject* globalObje
         RELEASE_AND_RETURN(scope, JSValue::encode(promiseRaceSlow(globalObject, callFrame, thisValue)));
 
     auto* promise = JSPromise::create(vm, globalObject->promiseStructure());
-    auto [resolve, reject] = promise->createFirstResolvingFunctions(vm, globalObject);
 
     auto callReject = [&]() -> void {
         Exception* exception = scope.exception();
@@ -251,6 +250,8 @@ JSC_DEFINE_HOST_FUNCTION(promiseConstructorFuncRace, (JSGlobalObject* globalObje
     };
 
     JSValue iterable = callFrame->argument(0);
+    JSFunction* resolve = nullptr;
+    JSFunction* reject = nullptr;
     forEachInIterable(globalObject, iterable, [&](VM& vm, JSGlobalObject* globalObject, JSValue value) {
         auto scope = DECLARE_THROW_SCOPE(vm);
 
@@ -259,8 +260,10 @@ JSC_DEFINE_HOST_FUNCTION(promiseConstructorFuncRace, (JSGlobalObject* globalObje
 
         if (nextPromise->isThenFastAndNonObservable()) [[likely]] {
             scope.release();
-            nextPromise->performPromiseThen(vm, globalObject, resolve, reject, jsUndefined(), promise);
+            nextPromise->performPromiseThenWithInternalMicrotask(vm, globalObject, InternalMicrotask::PromiseFirstResolveWithoutHandlerJob, promise);
         } else {
+            if (!resolve || !reject)
+                std::tie(resolve, reject) = promise->createFirstResolvingFunctions(vm, globalObject);
             JSValue then = nextPromise->get(globalObject, vm.propertyNames->then);
             RETURN_IF_EXCEPTION(scope, void());
             CallData thenCallData = getCallDataInline(then);

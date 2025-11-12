@@ -40,6 +40,7 @@ enum class InternalMicrotask : uint16_t {
     PromiseReactionJob,
     PromiseReactionJobWithoutPromise,
     InvokeFunctionJob,
+    PromiseFirstResolveWithoutHandlerJob,
     Opaque, // Dispatch must handle everything.
 };
 
