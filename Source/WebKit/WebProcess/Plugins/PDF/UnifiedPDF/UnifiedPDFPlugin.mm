@@ -3483,22 +3483,12 @@ Vector<WebCore::FloatRect> UnifiedPDFPlugin::visibleRectsForFindMatchRects(const
     if (!visibleRow)
         rectsInPluginCoordinates.reserveCapacity(findMatchRects.size());
 
-    auto clipRectInPluginSpace = [this, clipRect] -> std::optional<IntRect> {
-        RefPtr frame = m_frame.get();
-        if (!frame || !frame->coreLocalFrame())
-            return { };
-        RefPtr view = frame->coreLocalFrame()->view();
-        if (!view)
-            return { };
-        return convertFromRootViewToPlugin(clipRect);
-    }();
-
     for (auto& perPageInfo : findMatchRects) {
         if (visibleRow && !visibleRow->containsPage(perPageInfo.pageIndex))
             continue;
 
         auto pluginRect = convertUp(CoordinateSpace::PDFPage, CoordinateSpace::Plugin, perPageInfo.pageBounds, perPageInfo.pageIndex);
-        if (!clipRectInPluginSpace || pluginRect.intersects(clipRectInPluginSpace.value()))
+        if (pluginRect.intersects(clipRect))
             rectsInPluginCoordinates.append(pluginRect);
     }
 
