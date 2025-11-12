@@ -1758,10 +1758,10 @@ void WebChromeClient::handleAutoplayEvent(AutoplayEvent event, OptionSet<Autopla
         page->send(Messages::WebPageProxy::HandleAutoplayEvent(event, flags));
 }
 
-void WebChromeClient::setTextIndicator(const WebCore::TextIndicatorData& indicatorData) const
+void WebChromeClient::setTextIndicator(RefPtr<WebCore::TextIndicator>&& textIndicator) const
 {
     if (RefPtr page = m_page.get())
-        page->setTextIndicator(indicatorData);
+        page->setTextIndicator(WTFMove(textIndicator));
 }
 
 void WebChromeClient::updateTextIndicator(RefPtr<WebCore::TextIndicator>&& textIndicator) const

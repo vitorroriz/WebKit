@@ -738,7 +738,7 @@ RefPtr<DateTimeChooser> WebChromeClient::createDateTimeChooser(DateTimeChooserCl
     return nullptr;
 }
 
-void WebChromeClient::setTextIndicator(const WebCore::TextIndicatorData& indicatorData) const
+void WebChromeClient::setTextIndicator(RefPtr<TextIndicator>&& textIndicator) const
 {
 }
 

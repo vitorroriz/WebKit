@@ -405,7 +405,7 @@ private:
     void isPlayingMediaDidChange(WebCore::MediaProducerMediaStateFlags) final;
     void handleAutoplayEvent(WebCore::AutoplayEvent, OptionSet<WebCore::AutoplayEventFlags>) final;
 
-    void setTextIndicator(const WebCore::TextIndicatorData&) const final;
+    void setTextIndicator(RefPtr<WebCore::TextIndicator>&&) const final;
     void updateTextIndicator(RefPtr<WebCore::TextIndicator>&&) const final;
 
 #if ENABLE(TELEPHONE_NUMBER_DETECTION) && PLATFORM(MAC)

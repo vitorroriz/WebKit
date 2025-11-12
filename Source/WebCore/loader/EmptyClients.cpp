@@ -630,7 +630,7 @@ RefPtr<DateTimeChooser> EmptyChromeClient::createDateTimeChooser(DateTimeChooser
     return nullptr;
 }
 
-void EmptyChromeClient::setTextIndicator(const TextIndicatorData&) const
+void EmptyChromeClient::setTextIndicator(RefPtr<TextIndicator>&&) const
 {
 }
 
