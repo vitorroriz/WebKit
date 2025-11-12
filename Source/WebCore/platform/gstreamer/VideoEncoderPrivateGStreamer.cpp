@@ -323,27 +323,11 @@ static bool videoEncoderSetEncoder(WebKitVideoEncoder* self, EncoderId encoderId
     g_object_set(inputCapsFilter, "caps", inputCaps.get(), nullptr);
     gst_bin_add_many(bin, priv->encoder.get(), inputCapsFilter, nullptr);
 
-    // Keep videoconvertscale disabled for now due to some performance issues.
-    // https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3815
-    auto useVideoConvertScale = StringView::fromLatin1(std::getenv("WEBKIT_GST_USE_VIDEOCONVERT_SCALE"));
-    GRefPtr<GstElement> videoConvert, videoScale;
-    if (useVideoConvertScale == "1"_s) {
-        videoConvert = makeGStreamerElement("videoconvertscale"_s);
-        if (!videoConvert)
-            return false;
+    auto videoConvert = createVideoConvertScaleElement();
+    if (!videoConvert)
+        return false;
 
-        gst_bin_add(bin, videoConvert.get());
-    } else {
-        videoScale = makeGStreamerElement("videoscale"_s);
-        if (!videoScale)
-            return false;
-
-        videoConvert = makeGStreamerElement("videoconvert"_s);
-        if (!videoConvert)
-            return false;
-
-        gst_bin_add_many(bin, videoScale.get(), videoConvert.get(), nullptr);
-    }
+    gst_bin_add(bin, videoConvert.get());
 
     GRefPtr<GstElement> videoFlip;
     if (priv->enableVideoFlip) {
@@ -378,13 +362,8 @@ static bool videoEncoderSetEncoder(WebKitVideoEncoder* self, EncoderId encoderId
     encoderDefinition->setBitrateMode(priv->encoder.get(), priv->bitrateMode);
     encoderDefinition->setLatencyMode(priv->encoder.get(), priv->latencyMode);
 
-    if (useVideoConvertScale) {
-        if (!gst_element_link(videoConvert.get(), inputCapsFilter)) {
-            GST_WARNING_OBJECT(self, "Failed to link videoconvertscale and input capsfilter");
-            return false;
-        }
-    } else if (!gst_element_link_many(videoConvert.get(), videoScale.get(), inputCapsFilter, nullptr)) {
-        GST_WARNING_OBJECT(self, "Failed to link videoconvert, videoscale and input capsfilter");
+    if (!gst_element_link(videoConvert.get(), inputCapsFilter)) {
+        GST_WARNING_OBJECT(self, "Failed to link videoconvert and input capsfilter");
         return false;
     }
 

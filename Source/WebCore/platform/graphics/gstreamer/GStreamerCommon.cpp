@@ -2108,6 +2108,43 @@ GstStateChangeReturn gstElementLockAndSetState(GstElement* element, GstState sta
     return result;
 }
 
+GRefPtr<GstElement> createVideoConvertScaleElement(const String& name)
+{
+    // Keep videoconvertscale disabled for now due to some performance issues.
+    // https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3815
+    auto useVideoConvertScale = StringView::fromLatin1(std::getenv("WEBKIT_GST_USE_VIDEOCONVERT_SCALE"));
+    if (useVideoConvertScale == "1"_s && webkitGstCheckVersion(1, 22, 0)) {
+        GRefPtr videoConvertScale = makeGStreamerElement("videoconvertscale"_s, name);
+        if (!videoConvertScale)
+            return nullptr;
+
+        // Enable multi-threading in the converter.
+        g_object_set(videoConvertScale.get(), "n-threads", 0U, nullptr);
+        return videoConvertScale;
+    }
+
+    auto videoScale = makeGStreamerElement("videoscale"_s);
+    if (!videoScale)
+        return nullptr;
+
+    auto videoConvert = makeGStreamerElement("videoconvert"_s);
+    if (!videoConvert)
+        return nullptr;
+
+    // Enable multi-threading in the converter.
+    g_object_set(videoConvert, "n-threads", 0U, nullptr);
+
+    GRefPtr bin = gst_bin_new(name.utf8().data());
+    gst_bin_add_many(GST_BIN_CAST(bin.get()), videoScale, videoConvert, nullptr);
+    gst_element_link(videoScale, videoConvert);
+
+    auto pad = adoptGRef(gst_element_get_static_pad(videoScale, "sink"));
+    gst_element_add_pad(bin.get(), gst_ghost_pad_new("sink", pad.get()));
+    pad = adoptGRef(gst_element_get_static_pad(videoConvert, "src"));
+    gst_element_add_pad(bin.get(), gst_ghost_pad_new("src", pad.get()));
+    return bin;
+}
+
 #undef GST_CAT_DEFAULT
 
 } // namespace WebCore

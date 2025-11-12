@@ -369,6 +369,8 @@ bool setGstElementGLContext(GstElement*, ASCIILiteral contextType);
 
 GstStateChangeReturn gstElementLockAndSetState(GstElement*, GstState);
 
+GRefPtr<GstElement> createVideoConvertScaleElement(const String& name = emptyString());
+
 } // namespace WebCore
 
 #ifndef GST_BUFFER_DTS_OR_PTS
