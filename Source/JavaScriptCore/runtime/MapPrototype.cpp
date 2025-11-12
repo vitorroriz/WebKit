@@ -246,7 +246,7 @@ inline JSValue createMapIteratorObject(JSGlobalObject* globalObject, CallFrame* 
     JSMap* map = getMap(globalObject, thisValue);
     RETURN_IF_EXCEPTION(scope, jsUndefined());
 
-    RELEASE_AND_RETURN(scope, JSMapIterator::create(globalObject, globalObject->mapIteratorStructure(), map, kind));
+    RELEASE_AND_RETURN(scope, JSMapIterator::create(vm, globalObject->mapIteratorStructure(), map, kind));
 }
 
 JSC_DEFINE_HOST_FUNCTION(mapProtoFuncValues, (JSGlobalObject* globalObject, CallFrame* callFrame))

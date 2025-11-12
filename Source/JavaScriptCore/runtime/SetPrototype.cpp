@@ -1180,7 +1180,7 @@ inline JSValue createSetIteratorObject(JSGlobalObject* globalObject, CallFrame* 
     JSSet* set = getSet(globalObject, thisValue);
     RETURN_IF_EXCEPTION(scope, jsUndefined());
 
-    RELEASE_AND_RETURN(scope, JSSetIterator::create(globalObject, globalObject->setIteratorStructure(), set, kind));
+    RELEASE_AND_RETURN(scope, JSSetIterator::create(vm, globalObject->setIteratorStructure(), set, kind));
 }
 
 JSC_DEFINE_HOST_FUNCTION(setProtoFuncValues, (JSGlobalObject* globalObject, CallFrame* callFrame))

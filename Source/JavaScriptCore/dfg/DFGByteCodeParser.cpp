@@ -3736,10 +3736,9 @@ auto ByteCodeParser::handleIntrinsicCall(Node* callee, Operand resultOperand, Ca
 
             Node* base = get(virtualRegisterForArgumentIncludingThis(0, registerOffset));
             addToGraph(Check, Edge(base, useKind));
-            Node* storage = addToGraph(MapStorage, Edge(base, useKind));
 
+            Node* storage = jsConstant(JSValue());
             Node* kindNode = jsConstant(jsNumber(static_cast<uint32_t>(kind)));
-
             JSGlobalObject* globalObject = m_graph.globalObjectFor(currentNodeOrigin().semantic);
             Node* iterator = nullptr;
             if (useKind == MapObjectUse) {

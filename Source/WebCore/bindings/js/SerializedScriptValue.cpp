@@ -2912,9 +2912,7 @@ SerializationReturnCode CloneSerializer::serialize(JSValue in)
                 if (!addToObjectPoolIfNotDupe<MapObjectTag>(inMap))
                     break;
                 write(MapObjectTag);
-                JSMapIterator* iterator = JSMapIterator::create(m_lexicalGlobalObject, m_lexicalGlobalObject->mapIteratorStructure(), inMap, IterationKind::Entries);
-                if (scope.exception()) [[unlikely]]
-                    return SerializationReturnCode::ExistingExceptionError;
+                JSMapIterator* iterator = JSMapIterator::create(vm, m_lexicalGlobalObject->mapIteratorStructure(), inMap, IterationKind::Entries);
                 m_keepAliveBuffer.appendWithCrashOnOverflow(iterator);
                 mapIteratorStack.append(iterator);
                 inputObjectStack.append(inMap);
@@ -2960,9 +2958,7 @@ SerializationReturnCode CloneSerializer::serialize(JSValue in)
                 if (!addToObjectPoolIfNotDupe<SetObjectTag>(inSet))
                     break;
                 write(SetObjectTag);
-                JSSetIterator* iterator = JSSetIterator::create(m_lexicalGlobalObject, m_lexicalGlobalObject->setIteratorStructure(), inSet, IterationKind::Keys);
-                if (scope.exception()) [[unlikely]]
-                    return SerializationReturnCode::ExistingExceptionError;
+                JSSetIterator* iterator = JSSetIterator::create(vm, m_lexicalGlobalObject->setIteratorStructure(), inSet, IterationKind::Keys);
                 m_keepAliveBuffer.appendWithCrashOnOverflow(iterator);
                 setIteratorStack.append(iterator);
                 inputObjectStack.append(inSet);

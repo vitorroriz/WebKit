@@ -263,26 +263,25 @@ public:
 
         TableSize baseCapacity = capacity(base);
         TableSize baseAliveEntryCount = aliveEntryCount(base);
-        TableSize baseUsedCapacity = usedCapacity(base);
         ASSERT(!isObsolete(base));
         ASSERT_UNUSED(baseAliveEntryCount, newCapacity >= std::max(static_cast<TableSize>(InitialCapacity), baseAliveEntryCount));
-        ASSERT_UNUSED(baseCapacity, baseUsedCapacity <= baseCapacity);
+        ASSERT_UNUSED(baseCapacity, usedCapacity(base) <= baseCapacity);
 
         Storage* copy = tryCreate(globalObject, baseAliveEntryCount, 0, newCapacity);
         RETURN_IF_EXCEPTION(scope, nullptr);
 
-        TableIndex baseEntryKeyIndex = dataTableStartIndex(baseCapacity) - EntrySize;
+        TableIndex baseEntryKeyIndex = dataTableStartIndex(baseCapacity);
         TableIndex baseDeletedEntriesIndex = deletedEntriesStartIndex();
 
         Storage& copyRef = *copy;
-        TableIndex newEntryKeyIndex = dataTableStartIndex(newCapacity) - EntrySize;
+        TableIndex newEntryKeyIndex = dataTableStartIndex(newCapacity);
         TableIndex newHashTableStartIndex = hashTableStartIndex();
         TableIndex newBucketCount = bucketCount(newCapacity);
 
-        for (Entry baseEntry = 0; baseEntry < baseUsedCapacity; ++baseEntry) {
-            baseEntryKeyIndex += EntrySize;
+        for (Entry baseEntry = 0;; ++baseEntry, baseEntryKeyIndex += EntrySize) {
             JSValue baseKey = get(base, baseEntryKeyIndex);
-            ASSERT(!baseKey.isEmpty());
+            if (!baseKey)
+                break;
 
             // Step 1: Copy DataTable only for the alive entries.
             if (isDeleted(vm, baseKey)) {
@@ -292,7 +291,6 @@ public:
             }
 
             // Step 2: Copy the key and value from the base table to the new table.
-            newEntryKeyIndex += EntrySize;
             setKeyOrValueData(vm, copyRef, newEntryKeyIndex, baseKey);
             if constexpr (Traits::hasValueData) {
                 JSValue baseValue = get(base, baseEntryKeyIndex + 1);
@@ -305,6 +303,7 @@ public:
             RETURN_IF_EXCEPTION(scope, nullptr);
             TableIndex newBucketIndex = bucketIndex(newHashTableStartIndex, newBucketCount, hash);
             addToChain(copyRef, newBucketIndex, newEntryKeyIndex);
+            newEntryKeyIndex += EntrySize;
         }
 
         return copy;
@@ -571,11 +570,12 @@ public:
 
         ASSERT(!isObsolete(candidate));
         TableSize capacity = Helper::capacity(candidate);
-        TableSize usedCapacity = Helper::usedCapacity(candidate);
-        TableIndex entryKeyIndex = entryDataStartIndex(dataTableStartIndex(capacity), from) - EntrySize;
-        for (Entry entry = from; entry < usedCapacity; ++entry) {
-            entryKeyIndex += EntrySize;
+        TableIndex entryKeyIndex = entryDataStartIndex(dataTableStartIndex(capacity), from);
+        for (Entry entry = from;; ++entry, entryKeyIndex += EntrySize) {
             JSValue key = get(candidate, entryKeyIndex);
+            if (!key)
+                return { };
+
             if (isDeleted(vm, key))
                 continue;
 
@@ -584,7 +584,6 @@ public:
                 value = get(candidate, entryKeyIndex + 1);
             return { &candidate, entry, key, value };
         }
-        return { };
     }
 
     ALWAYS_INLINE static JSValue getKey(Storage& storage, Entry entry)

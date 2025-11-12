@@ -4980,7 +4980,7 @@ JSC_DEFINE_JIT_OPERATION(operationMapIteratorKey, EncodedJSValue, (JSGlobalObjec
     CallFrame* callFrame = DECLARE_CALL_FRAME(vm);
     JITOperationPrologueCallFrameTracer tracer(vm, callFrame);
     auto scope = DECLARE_THROW_SCOPE(vm);
-    OPERATION_RETURN(scope, JSValue::encode(jsCast<JSMapIterator*>(cell)->nextKey(vm)));
+    OPERATION_RETURN(scope, JSValue::encode(jsCast<JSMapIterator*>(cell)->peekKey(vm)));
 }
 JSC_DEFINE_JIT_OPERATION(operationMapIteratorValue, EncodedJSValue, (JSGlobalObject* globalObject, JSCell* cell))
 {
@@ -4988,7 +4988,7 @@ JSC_DEFINE_JIT_OPERATION(operationMapIteratorValue, EncodedJSValue, (JSGlobalObj
     CallFrame* callFrame = DECLARE_CALL_FRAME(vm);
     JITOperationPrologueCallFrameTracer tracer(vm, callFrame);
     auto scope = DECLARE_THROW_SCOPE(vm);
-    OPERATION_RETURN(scope, JSValue::encode(jsCast<JSMapIterator*>(cell)->nextValue(vm)));
+    OPERATION_RETURN(scope, JSValue::encode(jsCast<JSMapIterator*>(cell)->peekValue(vm)));
 }
 
 JSC_DEFINE_JIT_OPERATION(operationSetIteratorNext, EncodedJSValue, (JSGlobalObject* globalObject, JSCell* cell))
@@ -5005,7 +5005,7 @@ JSC_DEFINE_JIT_OPERATION(operationSetIteratorKey, EncodedJSValue, (JSGlobalObjec
     CallFrame* callFrame = DECLARE_CALL_FRAME(vm);
     JITOperationPrologueCallFrameTracer tracer(vm, callFrame);
     auto scope = DECLARE_THROW_SCOPE(vm);
-    OPERATION_RETURN(scope, JSValue::encode(jsCast<JSSetIterator*>(cell)->nextKey(vm)));
+    OPERATION_RETURN(scope, JSValue::encode(jsCast<JSSetIterator*>(cell)->peekKey(vm)));
 }
 
 JSC_DEFINE_JIT_OPERATION(operationSetAdd, void, (JSGlobalObject* globalObject, JSCell* set, EncodedJSValue key, int32_t hash))

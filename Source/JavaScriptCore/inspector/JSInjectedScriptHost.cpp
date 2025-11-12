@@ -681,22 +681,14 @@ static JSObject* cloneArrayIteratorObject(JSGlobalObject* globalObject, VM& vm, 
 
 static JSObject* cloneMapIteratorObject(JSGlobalObject* globalObject, VM& vm, JSMapIterator* iteratorObject)
 {
-    auto scope = DECLARE_THROW_SCOPE(vm);
-
-    JSMapIterator* clone = JSMapIterator::create(globalObject, globalObject->mapIteratorStructure(), jsCast<JSMap*>(iteratorObject->iteratedObject()), iteratorObject->kind());
-    RETURN_IF_EXCEPTION(scope, nullptr);
-
+    JSMapIterator* clone = JSMapIterator::create(vm, globalObject->mapIteratorStructure(), jsCast<JSMap*>(iteratorObject->iteratedObject()), iteratorObject->kind());
     clone->internalField(JSMapIterator::Field::Entry).set(vm, clone, iteratorObject->internalField(JSMapIterator::Field::Entry).get());
     return clone;
 }
 
 static JSObject* cloneSetIteratorObject(JSGlobalObject* globalObject, VM& vm, JSSetIterator* iteratorObject)
 {
-    auto scope = DECLARE_THROW_SCOPE(vm);
-
-    JSSetIterator* clone = JSSetIterator::create(globalObject, globalObject->setIteratorStructure(), jsCast<JSSet*>(iteratorObject->iteratedObject()), iteratorObject->kind());
-    RETURN_IF_EXCEPTION(scope, nullptr);
-
+    JSSetIterator* clone = JSSetIterator::create(vm, globalObject->setIteratorStructure(), jsCast<JSSet*>(iteratorObject->iteratedObject()), iteratorObject->kind());
     clone->internalField(JSSetIterator::Field::Entry).set(vm, clone, iteratorObject->internalField(JSSetIterator::Field::Entry).get());
     return clone;
 }
