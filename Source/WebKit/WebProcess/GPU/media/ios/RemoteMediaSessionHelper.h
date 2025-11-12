@@ -46,6 +46,7 @@ public:
     virtual ~RemoteMediaSessionHelper() = default;
 
     IPC::Connection& ensureConnection();
+    Ref<IPC::Connection> ensureProtectedConnection();
 
     using HasAvailableTargets = WebCore::MediaSessionHelperClient::HasAvailableTargets;
     using PlayingToAutomotiveHeadUnit = WebCore::MediaSessionHelperClient::PlayingToAutomotiveHeadUnit;

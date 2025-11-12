@@ -379,7 +379,7 @@ void AuxiliaryProcessProxy::didFinishLaunching(ProcessLauncher* launcher, IPC::C
     }
 
 #if USE(RUNNINGBOARD)
-    m_throttler.didConnectToProcess(*this);
+    protectedThrottler()->didConnectToProcess(*this);
 #if USE(EXTENSIONKIT)
     ASSERT(launcher);
     if (launcher)

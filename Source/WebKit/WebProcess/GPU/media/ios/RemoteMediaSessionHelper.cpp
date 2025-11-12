@@ -55,6 +55,11 @@ IPC::Connection& RemoteMediaSessionHelper::ensureConnection()
     return gpuProcessConnection->connection();
 }
 
+Ref<IPC::Connection> RemoteMediaSessionHelper::ensureProtectedConnection()
+{
+    return ensureConnection();
+}
+
 void RemoteMediaSessionHelper::gpuProcessConnectionDidClose(GPUProcessConnection& gpuProcessConnection)
 {
     gpuProcessConnection.messageReceiverMap().removeMessageReceiver(*this);
@@ -63,12 +68,12 @@ void RemoteMediaSessionHelper::gpuProcessConnectionDidClose(GPUProcessConnection
 
 void RemoteMediaSessionHelper::startMonitoringWirelessRoutesInternal()
 {
-    ensureConnection().send(Messages::RemoteMediaSessionHelperProxy::StartMonitoringWirelessRoutes(), { });
+    ensureProtectedConnection()->send(Messages::RemoteMediaSessionHelperProxy::StartMonitoringWirelessRoutes(), { });
 }
 
 void RemoteMediaSessionHelper::stopMonitoringWirelessRoutesInternal()
 {
-    ensureConnection().send(Messages::RemoteMediaSessionHelperProxy::StopMonitoringWirelessRoutes(), { });
+    ensureProtectedConnection()->send(Messages::RemoteMediaSessionHelperProxy::StopMonitoringWirelessRoutes(), { });
 }
 
 void RemoteMediaSessionHelper::activeVideoRouteDidChange(SupportsAirPlayVideo supportsAirPlayVideo, MediaPlaybackTargetContextSerialized&& targetContext)
@@ -88,4 +93,3 @@ void RemoteMediaSessionHelper::activeAudioRouteSupportsSpatialPlaybackDidChange(
 }
 
 #endif
-
