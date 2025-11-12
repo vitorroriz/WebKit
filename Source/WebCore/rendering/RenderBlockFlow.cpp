@@ -4480,6 +4480,11 @@ RenderObject* InlineMinMaxIterator::next()
         if (is<RenderInline>(*candidate) || candidate->isRenderTextOrLineBreak() || candidate->isFloating() || candidate->isBlockLevelReplacedOrAtomicInline())
             break;
 
+        if (candidate->style().isDisplayBlockLevel()) {
+            ASSERT(candidate->settings().blocksInInlineLayoutEnabled());
+            break;
+        }
+
         ASSERT_NOT_REACHED();
         m_current = candidate;
         candidate = nullptr;
@@ -4685,7 +4690,7 @@ void RenderBlockFlow::computeInlinePreferredLogicalWidths(LayoutUnit& minLogical
             continue;
         }
 
-        if (child->isBR()) {
+        auto resetLineForForcedLineBreak = [&] {
             if (styleToUse.collapseWhiteSpace())
                 stripTrailingSpace(inlineMax, inlineMin, trailingSpaceChild);
             minLogicalWidth = preferredWidth(minLogicalWidth, inlineMin);
@@ -4699,7 +4704,25 @@ void RenderBlockFlow::computeInlinePreferredLogicalWidths(LayoutUnit& minLogical
             remainingNegativeTextIndent = { };
             addedStartPunctuationHang = true;
             isPrevChildInlineFlow = false;
-            oldAutoWrap = child->style().autoWrap();
+            oldAutoWrap = child->parent()->style().autoWrap();
+        };
+
+        if (child->isBR()) {
+            resetLineForForcedLineBreak();
+            continue;
+        }
+
+        if (child->style().isDisplayBlockLevel() && !child->isFloating() && is<RenderBox>(*child)) {
+            ASSERT(settings().blocksInInlineLayoutEnabled());
+
+            resetLineForForcedLineBreak();
+
+            auto blockMinWidth = LayoutUnit { };
+            auto blocMaxWidth = LayoutUnit { };
+            computeChildPreferredLogicalWidths(downcast<RenderBox>(*child), blockMinWidth, blocMaxWidth);
+
+            minLogicalWidth = std::max(minLogicalWidth, blockMinWidth);
+            maxLogicalWidth = std::max(maxLogicalWidth, blocMaxWidth);
             continue;
         }
 
