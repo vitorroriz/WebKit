@@ -618,7 +618,6 @@ void IDBServer::closeAndDeleteDatabasesModifiedSince(WallTime modificationTime)
     if (modificationTime > WallTime::now())
         return;
 
-    HashSet<UniqueIDBDatabase*> openDatabases;
     for (auto& database : m_uniqueIDBDatabaseMap.values())
         database->immediateClose();
 
@@ -635,7 +634,7 @@ void IDBServer::closeDatabasesForOrigins(const Vector<SecurityOriginData>& targe
     ASSERT(!isMainThread());
     ASSERT(m_lock.isHeld());
 
-    HashSet<UniqueIDBDatabase*> openDatabases;
+    HashSet<CheckedPtr<UniqueIDBDatabase>> openDatabases;
     for (auto& database : m_uniqueIDBDatabaseMap.values()) {
         const auto& databaseOrigin = database->identifier().origin();
         bool filtered = std::ranges::any_of(targetOrigins, [&databaseOrigin, &filter](auto& targetOrigin) {
