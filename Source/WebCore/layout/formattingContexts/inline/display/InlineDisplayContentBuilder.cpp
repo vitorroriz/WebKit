@@ -609,9 +609,9 @@ struct AncestorStack {
     std::optional<size_t> unwind(const ElementBox& elementBox)
     {
         // Unwind the stack all the way to container box.
-        if (!m_set.contains(&elementBox))
+        if (!m_set.contains(elementBox))
             return { };
-        while (m_set.last() != &elementBox) {
+        while (m_set.last().ptr() != &elementBox) {
             m_stack.removeLast();
             m_set.removeLast();
         }
@@ -624,12 +624,12 @@ struct AncestorStack {
     {
         m_stack.append(displayBoxNodeIndexForContainer);
         ASSERT(!m_set.contains(&elementBox));
-        m_set.add(&elementBox);
+        m_set.add(elementBox);
     }
 
 private:
     Vector<size_t> m_stack;
-    ListHashSet<const ElementBox*> m_set;
+    ListHashSet<CheckedRef<const ElementBox>> m_set;
 };
 
 static inline size_t createDisplayBoxNodeForContainerAndPushToAncestorStack(const ElementBox& elementBox, size_t displayBoxIndex, size_t parentDisplayBoxNodeIndex, DisplayBoxTree& displayBoxTree, AncestorStack& ancestorStack)

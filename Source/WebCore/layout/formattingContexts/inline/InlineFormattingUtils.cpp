@@ -378,11 +378,11 @@ static inline const ElementBox& nearestCommonAncestor(const Box& first, const Bo
     if (&firstParent != &rootBox && &secondParent != &rootBox && &firstParent.parent() == &secondParent.parent())
         return firstParent.parent();
 
-    HashSet<const ElementBox*> descendantsSet;
+    HashSet<CheckedRef<const ElementBox>> descendantsSet;
     for (auto* descendant = &firstParent; descendant != &rootBox; descendant = &descendant->parent())
-        descendantsSet.add(descendant);
+        descendantsSet.add(*descendant);
     for (auto* descendant = &secondParent; descendant != &rootBox; descendant = &descendant->parent()) {
-        if (!descendantsSet.add(descendant).isNewEntry)
+        if (!descendantsSet.add(*descendant).isNewEntry)
             return *descendant;
     }
     return rootBox;
