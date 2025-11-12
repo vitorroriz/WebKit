@@ -1577,27 +1577,6 @@ static JSArray* concatAppendArray(JSGlobalObject* globalObject, VM& vm, JSArray*
     return JSArray::createWithButterfly(vm, nullptr, resultStructure, butterfly);
 }
 
-JSC_DEFINE_HOST_FUNCTION(arrayProtoPrivateFuncFromFastFillWithUndefined, (JSGlobalObject* globalObject, CallFrame* callFrame))
-{
-    VM& vm = globalObject->vm();
-    auto scope = DECLARE_THROW_SCOPE(vm);
-
-    JSValue constructor = callFrame->uncheckedArgument(0);
-    if (constructor != globalObject->arrayConstructor() && constructor.isObject()) [[unlikely]]
-        return JSValue::encode(jsUndefined());
-
-    JSValue arrayValue = callFrame->uncheckedArgument(1);
-    if (!isJSArray(arrayValue)) [[unlikely]]
-        return JSValue::encode(jsUndefined());
-
-    JSArray* array = tryCloneArrayFromFast<ArrayFillMode::Undefined>(globalObject, arrayValue);
-    RETURN_IF_EXCEPTION(scope, { });
-    if (array)
-        return JSValue::encode(array);
-
-    return JSValue::encode(jsUndefined());
-}
-
 JSC_DEFINE_HOST_FUNCTION(arrayProtoFuncConcat, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
     VM& vm = globalObject->vm();
