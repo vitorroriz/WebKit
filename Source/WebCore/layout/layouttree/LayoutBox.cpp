@@ -405,12 +405,20 @@ const Box* Box::previousOutOfFlowSibling() const
     return previousSibling;
 }
 
-bool Box::isDescendantOf(const ElementBox& ancestor) const
+bool Box::isDescendantOf(const Box& box) const
 {
-    if (ancestor.isInitialContainingBlock())
-        return true;
-    for (auto& containingBlock : containingBlockChain(*this)) {
-        if (&containingBlock == &ancestor)
+
+    for (auto* ancestor = &parent(); !ancestor->isInitialContainingBlock(); ancestor = &ancestor->parent()) {
+        if (ancestor == &box)
+            return true;
+    }
+    return false;
+}
+
+bool Box::isDescendantOfWithinFormattingContext(const Box& box) const
+{
+    for (auto* ancestor = &parent(); !ancestor->establishesFormattingContext(); ancestor = &ancestor->parent()) {
+        if (ancestor == &box)
             return true;
     }
     return false;

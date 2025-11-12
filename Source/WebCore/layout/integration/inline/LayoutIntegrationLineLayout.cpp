@@ -1079,7 +1079,9 @@ LayoutRect LineLayout::inkOverflowBoundingBoxRectFor(const RenderInline& renderI
     m_inlineContent->traverseNonRootInlineBoxes(layoutBox, [&](auto& inlineBox) {
         result.unite(Layout::toLayoutRect(inlineBox.inkOverflow()));
     });
-
+    m_inlineContent->traverseDescendantBlockLevelBoxes(layoutBox, [&](auto& inlineBox) {
+        result.unite(Layout::toLayoutRect(inlineBox.inkOverflow()));
+    });
     return result;
 }
 
@@ -1094,7 +1096,11 @@ Vector<FloatRect> LineLayout::collectInlineBoxRects(const RenderInline& renderIn
     m_inlineContent->traverseNonRootInlineBoxes(layoutBox, [&](auto& inlineBox) {
         result.append(inlineBox.visualRectIgnoringBlockDirection());
     });
-
+    m_inlineContent->traverseDescendantBlockLevelBoxes(layoutBox, [&](auto& inlineBox) {
+        auto rect = inlineBox.visualRectIgnoringBlockDirection();
+        if (!rect.isEmpty())
+            result.append(rect);
+    });
     return result;
 }
 
