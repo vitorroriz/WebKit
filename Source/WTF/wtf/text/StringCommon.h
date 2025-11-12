@@ -1202,6 +1202,55 @@ inline size_t countMatchedCharacters(std::span<const CharacterType> span, Charac
     return SIMD::count(span, vectorMatch, scalarMatch);
 }
 
+struct NewlinePosition {
+    size_t position { notFound };
+    size_t length { 0 };
+};
+
+template<typename CharacterType>
+inline NewlinePosition findNextNewline(std::span<const CharacterType> span, size_t startPosition = 0)
+{
+    // Find newlines matching the pattern \r\n?|\n
+    // This handles: LF (\n), CR (\r), and CRLF (\r\n)
+
+    if (startPosition >= span.size())
+        return { };
+
+    auto searchSpan = span.subspan(startPosition);
+    using UnsignedType = SameSizeUnsignedInteger<CharacterType>;
+
+    auto lfVector = SIMD::splat<UnsignedType>('\n');
+    auto crVector = SIMD::splat<UnsignedType>('\r');
+
+    auto vectorMatch = [&](auto value) ALWAYS_INLINE_LAMBDA {
+        auto lfMask = SIMD::equal(value, lfVector);
+        auto crMask = SIMD::equal(value, crVector);
+        auto combinedMask = SIMD::bitOr(lfMask, crMask);
+        return SIMD::findFirstNonZeroIndex(combinedMask);
+    };
+
+    auto scalarMatch = [&](auto current) ALWAYS_INLINE_LAMBDA {
+        return current == '\n' || current == '\r';
+    };
+
+    constexpr size_t threshold = 32;
+    auto* ptr = SIMD::find<CharacterType, threshold>(searchSpan, vectorMatch, scalarMatch);
+
+    if (ptr == searchSpan.data() + searchSpan.size())
+        return { };
+
+    CharacterType ch = *ptr;
+    size_t pos = ptr - searchSpan.data();
+
+    if (ch == '\r') {
+        if (pos + 1 < searchSpan.size() && searchSpan[pos + 1] == '\n')
+            return { startPosition + pos, 2 };
+        return { startPosition + pos, 1 };
+    }
+
+    return { startPosition + pos, 1 };
+}
+
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 
 }
