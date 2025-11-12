@@ -2343,8 +2343,9 @@ inline Value* OMGIRGenerator::emitCheckAndPreparePointer(Value* pointer, uint32_
         // We're not using signal handling only when the memory is not shared.
         // Regardless of signaling, we must check that no memory access exceeds the current memory size.
         static_assert(GPRInfo::wasmBoundsCheckingSizeRegister != InvalidGPRReg);
-        ASSERT(sizeOfOperation + offset > offset);
-        m_currentBlock->appendNew<WasmBoundsCheckValue>(m_proc, origin(), GPRInfo::wasmBoundsCheckingSizeRegister, pointer, sizeOfOperation + offset - 1);
+        uint64_t lastLoadedOffset = static_cast<uint64_t>(offset);
+        lastLoadedOffset += static_cast<uint64_t>(sizeOfOperation - 1);
+        m_currentBlock->appendNew<WasmBoundsCheckValue>(m_proc, origin(), GPRInfo::wasmBoundsCheckingSizeRegister, pointer, lastLoadedOffset);
         break;
     }
 
@@ -2361,7 +2362,9 @@ inline Value* OMGIRGenerator::emitCheckAndPreparePointer(Value* pointer, uint32_
         // any access equal to or greater than 4GiB will trap, no need to add the redzone.
         if (offset >= Memory::fastMappedRedzoneBytes()) {
             size_t maximum = m_info.memory.maximum() ? m_info.memory.maximum().bytes() : std::numeric_limits<uint32_t>::max();
-            m_currentBlock->appendNew<WasmBoundsCheckValue>(m_proc, origin(), pointer, sizeOfOperation + offset - 1, maximum);
+            uint64_t lastLoadedOffset = static_cast<uint64_t>(offset);
+            lastLoadedOffset += static_cast<uint64_t>(sizeOfOperation - 1);
+            m_currentBlock->appendNew<WasmBoundsCheckValue>(m_proc, origin(), pointer, lastLoadedOffset, maximum);
         }
         break;
     }
