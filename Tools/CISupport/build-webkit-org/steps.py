@@ -1022,6 +1022,7 @@ class RunDashboardTests(RunWebKitTests):
 
 
 class RunWorldLeaksTests(RunWebKitTests):
+    DO_REPORT = False
     name = "world-leaks-tests"
     description = ["world-leaks-tests running"]
     descriptionDone = ["world-leaks-tests"]
