@@ -4409,12 +4409,18 @@ int runJSC(const CommandLine& options, bool isWorker, const Func& func)
             func(vm, globalObject, success);
             vm.drainMicrotasks();
         }
-        vm.deferredWorkTimer->runRunLoop();
-        {
-            JSLockHolder locker(vm);
+        if (vm.hasPendingTerminationException()) {
+            vm.setExecutionForbidden();
+            if (!options.m_treatWatchdogExceptionAsSuccess)
+                success = false;
+        } else {
+            vm.deferredWorkTimer->runRunLoop();
+            {
+                JSLockHolder locker(vm);
 
-            if (!options.m_reprl && options.m_interactive && success)
-                runInteractive(globalObject);
+                if (!options.m_reprl && options.m_interactive && success)
+                    runInteractive(globalObject);
+            }
         }
 
         result = success && (asyncTestExpectedPasses == asyncTestPasses) ? 0 : 3;
