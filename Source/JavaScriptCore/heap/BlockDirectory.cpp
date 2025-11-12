@@ -296,7 +296,7 @@ void BlockDirectory::endMarking()
     
     // Sweeper is suspended so we don't need the lock here.
     emptyBits() = liveBits() & ~markingNotEmptyBits();
-    canAllocateBits() = (liveBits() & markingNotEmptyBits() & ~markingRetiredBits()) | emptyBits();
+    canAllocateBits() = liveBits() & ~markingRetiredBits();
 
     switch (m_attributes.destruction) {
     case NeedsDestruction: {
