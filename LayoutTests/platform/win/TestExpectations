@@ -4547,6 +4547,7 @@ imported/w3c/web-platform-tests/speculation-rules/speculation-tags/valid-tags.ht
 
 # Lockdown Mode does not apply
 dom/xsl/lockdown-mode [ Skip ]
+fast/speechsynthesis/lockdown-mode [ Skip ]
 http/tests/lockdown-mode [ Skip ]
 js/dom/lockdown-mode [ Skip ]
 

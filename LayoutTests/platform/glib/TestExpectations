@@ -3482,6 +3482,9 @@ webkit.org/b/98925 fast/viewport/viewport-legacy-xhtmlmp.html [ Skip ]
 # Expects a particular fixed size ofr layer tiles.
 fast/images/low-memory-decode.html [ Skip ]
 
+# Lockdown Mode does not apply
+fast/speechsynthesis/lockdown-mode [ Skip ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of UNSUPPORTED tests.
 #////////////////////////////////////////////////////////////////////////////////////////

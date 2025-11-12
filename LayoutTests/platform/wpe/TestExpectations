@@ -446,6 +446,7 @@ webkit.org/b/264660 imported/w3c/web-platform-tests/html/semantics/disabled-elem
 
 # Lockdown Mode does not apply
 dom/xsl/lockdown-mode [ Skip ]
+fast/speechsynthesis/lockdown-mode [ Skip ]
 http/tests/lockdown-mode [ Skip ]
 js/dom/lockdown-mode [ Skip ]
 
