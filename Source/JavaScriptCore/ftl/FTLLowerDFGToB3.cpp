@@ -1634,10 +1634,10 @@ private:
             compileMapIterationEntryValue();
             break;
         case MapStorage:
-            compileMapStorage(operationMapStorage, operationSetStorage);
+            compileMapStorage();
             break;
         case MapStorageOrSentinel:
-            compileMapStorage(operationMapStorageOrSentinel, operationSetStorageOrSentinel);
+            compileMapStorageOrSentinel();
             break;
         case MapIteratorNext:
             compileMapIteratorNext();
@@ -15410,22 +15410,74 @@ IGNORE_CLANG_WARNINGS_END
         setJSValue(result);
     }
 
-    template<typename Operation>
-    void compileMapStorage(Operation mapOperation, Operation setOperation)
+    void compileMapStorage()
     {
         JSGlobalObject* globalObject = m_graph.globalObjectFor(m_origin.semantic);
 
-        LValue map;
-        if (m_node->child1().useKind() == MapObjectUse)
-            map = lowMapObject(m_node->child1());
-        else if (m_node->child1().useKind() == SetObjectUse)
-            map = lowSetObject(m_node->child1());
-        else
-            RELEASE_ASSERT_NOT_REACHED();
+        switch (m_node->child1().useKind()) {
+        case MapObjectUse: {
+            LBasicBlock continuation = m_out.newBlock();
+            LBasicBlock slowCase = m_out.newBlock();
 
-        auto operation = m_node->child1().useKind() == MapObjectUse ? mapOperation : setOperation;
-        LValue result = vmCall(Int64, operation, weakPointer(globalObject), map);
-        setJSValue(result);
+            LValue map = lowMapObject(m_node->child1());
+            LValue storage = m_out.loadPtr(map, m_heaps.JSMap_storage);
+            ValueFromBlock fastResult = m_out.anchor(storage);
+            m_out.branch(m_out.isNull(storage), rarely(slowCase), usually(continuation));
+
+            LBasicBlock lastNext = m_out.appendTo(slowCase, continuation);
+            ValueFromBlock slowResult = m_out.anchor(vmCall(pointerType(), operationMapStorage, weakPointer(globalObject), map));
+            m_out.jump(continuation);
+
+            m_out.appendTo(continuation, lastNext);
+            setJSValue(m_out.phi(pointerType(), fastResult, slowResult));
+            break;
+        }
+        case SetObjectUse: {
+            LBasicBlock continuation = m_out.newBlock();
+            LBasicBlock slowCase = m_out.newBlock();
+
+            LValue set = lowSetObject(m_node->child1());
+            LValue storage = m_out.loadPtr(set, m_heaps.JSSet_storage);
+            ValueFromBlock fastResult = m_out.anchor(storage);
+            m_out.branch(m_out.isNull(storage), rarely(slowCase), usually(continuation));
+
+            LBasicBlock lastNext = m_out.appendTo(slowCase, continuation);
+            ValueFromBlock slowResult = m_out.anchor(vmCall(pointerType(), operationSetStorage, weakPointer(globalObject), set));
+            m_out.jump(continuation);
+
+            m_out.appendTo(continuation, lastNext);
+            setJSValue(m_out.phi(pointerType(), fastResult, slowResult));
+            break;
+        }
+        default:
+            DFG_CRASH(m_graph, m_node, "Bad use kind");
+            break;
+        }
+    }
+
+    void compileMapStorageOrSentinel()
+    {
+        switch (m_node->child1().useKind()) {
+        case MapObjectUse: {
+            LValue map = lowMapObject(m_node->child1());
+            LValue storage = m_out.loadPtr(map, m_heaps.JSMap_storage);
+            // Do not need to chain this to weak references since it is always alive via VM.
+            LValue result = m_out.select(m_out.isNull(storage), m_out.constIntPtr(std::bit_cast<void*>(vm().orderedHashTableSentinel())), storage);
+            setJSValue(result);
+            break;
+        }
+        case SetObjectUse: {
+            LValue set = lowSetObject(m_node->child1());
+            LValue storage = m_out.loadPtr(set, m_heaps.JSSet_storage);
+            // Do not need to chain this to weak references since it is always alive via VM.
+            LValue result = m_out.select(m_out.isNull(storage), m_out.constIntPtr(std::bit_cast<void*>(vm().orderedHashTableSentinel())), storage);
+            setJSValue(result);
+            break;
+        }
+        default:
+            DFG_CRASH(m_graph, m_node, "Bad use kind");
+            break;
+        }
     }
 
     void compileMapIteratorNext()

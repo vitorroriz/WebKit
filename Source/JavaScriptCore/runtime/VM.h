@@ -606,9 +606,7 @@ public:
 
     JSCell* orderedHashTableSentinel()
     {
-        if (m_orderedHashTableSentinel) [[likely]]
-            return m_orderedHashTableSentinel.get();
-        return orderedHashTableSentinelSlow();
+        return m_orderedHashTableSentinel.get();
     }
 
     JSPropertyNameEnumerator* emptyPropertyNameEnumerator()
@@ -1126,7 +1124,6 @@ private:
     void createNativeThunk();
 
     JS_EXPORT_PRIVATE JSCell* orderedHashTableDeletedValueSlow();
-    JS_EXPORT_PRIVATE JSCell* orderedHashTableSentinelSlow();
     JSPropertyNameEnumerator* emptyPropertyNameEnumeratorSlow();
     NativeExecutable* promiseResolvingFunctionResolveExecutableSlow();
     NativeExecutable* promiseResolvingFunctionRejectExecutableSlow();
