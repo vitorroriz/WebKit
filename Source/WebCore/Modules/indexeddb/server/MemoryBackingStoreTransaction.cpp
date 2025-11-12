@@ -86,6 +86,7 @@ void MemoryBackingStoreTransaction::removeNewIndex(MemoryIndex& index)
 
     ASSERT(isVersionChange());
 
+    m_originalIndexNames.remove(&index);
     m_versionChangeAddedIndexes.remove(&index);
     m_indexes.remove(&index);
 }
