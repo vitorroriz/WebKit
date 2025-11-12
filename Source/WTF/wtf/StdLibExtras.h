@@ -1554,8 +1554,6 @@ using SameSizeUnsignedInteger = SizedUnsignedTrait<sizeof(T)>::Type;
 template<typename T>
 inline T* addOpaqueZero(T* pointer, unsigned opaqueZero)
 {
-    ASSERT(!opaqueZero); // Use a debug ASSERT only so the RELEASE compiler doesn't optimize out this function.
-
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
     // This is bounds-safe because opaqueZero is always zero.
     return std::bit_cast<T*>(std::bit_cast<char*>(pointer) + opaqueZero);
