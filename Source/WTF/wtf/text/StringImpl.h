@@ -407,6 +407,7 @@ public:
         template<unsigned characterCount> explicit constexpr StaticStringImpl(const char (&characters)[characterCount], StringKind = StringNormal);
         template<unsigned characterCount> explicit constexpr StaticStringImpl(const char16_t (&characters)[characterCount], StringKind = StringNormal);
         operator StringImpl&();
+        operator const StringImpl&() const;
     };
 
     WTF_EXPORT_PRIVATE static StaticStringImpl s_emptyAtomString;
@@ -1306,6 +1307,11 @@ template<unsigned characterCount> constexpr StringImpl::StaticStringImpl::Static
 inline StringImpl::StaticStringImpl::operator StringImpl&()
 {
     SUPPRESS_MEMORY_UNSAFE_CAST return *reinterpret_cast<StringImpl*>(this);
+}
+
+inline StringImpl::StaticStringImpl::operator const StringImpl&() const
+{
+    SUPPRESS_MEMORY_UNSAFE_CAST return *reinterpret_cast<const StringImpl*>(this);
 }
 
 inline bool equalIgnoringASCIICase(const StringImpl& a, const StringImpl& b)

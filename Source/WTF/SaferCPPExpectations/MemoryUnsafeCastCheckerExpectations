@@ -1,3 +1,2 @@
 wtf/ThreadSpecific.h
-wtf/text/AtomStringImpl.cpp
 wtf/text/SymbolRegistry.cpp

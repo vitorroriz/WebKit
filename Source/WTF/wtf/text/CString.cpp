@@ -42,7 +42,7 @@ Ref<CStringBuffer> CStringBuffer::createUninitialized(size_t length)
 {
     // The +1 is for the terminating null character.
     size_t size = Checked<size_t>(sizeof(CStringBuffer)) + length + 1U;
-    auto* stringBuffer = static_cast<CStringBuffer*>(CStringBufferMalloc::malloc(size));
+    auto* stringBuffer = CStringBufferMalloc::malloc(size);
 
     Ref buffer = adoptRef(*new (NotNull, stringBuffer) CStringBuffer(length));
     buffer->mutableSpanIncludingNullTerminator()[length] = '\0';
