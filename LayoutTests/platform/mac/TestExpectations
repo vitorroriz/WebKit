@@ -2571,3 +2571,5 @@ webkit.org/b/301668 fast/repaint/iframe-avoid-redundant-repaint.html [ Pass Fail
 webkit.org/b/302273 accessibility/mac/focus-setting-selection-syncronizing-not-clearing.html [ Pass Timeout ]
 
 webkit.org/b/302331 imported/w3c/web-platform-tests/css/css-viewport/zoom/iframe-zoom-nested.html [ Pass Failure ]
+
+webkit.org/b/302364 http/tests/site-isolation/window-open-with-name-cross-site.html [ Pass Crash ]
