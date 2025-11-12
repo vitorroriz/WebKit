@@ -147,27 +147,8 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
         if (!promiseSpeciesWatchpointIsValid(vm, promise)) [[unlikely]]
             RELEASE_AND_RETURN(scope, promiseResolveThenableJobFastSlow(globalObject, promise, promiseToResolve));
 
-        switch (promise->status()) {
-        case JSPromise::Status::Pending: {
-            JSValue encodedTask = jsNumber(static_cast<int32_t>(InternalMicrotask::PromiseResolveWithoutHandlerJob));
-            auto* reaction = JSPromiseReaction::create(vm, promiseToResolve, encodedTask, encodedTask, jsUndefined(), jsDynamicCast<JSPromiseReaction*>(promise->reactionsOrResult()));
-            promise->setReactionsOrResult(vm, reaction);
-            break;
-        }
-        case JSPromise::Status::Rejected: {
-            if (!promise->isHandled())
-                globalObject->globalObjectMethodTable()->promiseRejectionTracker(globalObject, promise, JSPromiseRejectionOperation::Handle);
-            scope.release();
-            globalObject->queueMicrotask(InternalMicrotask::PromiseResolveWithoutHandlerJob, promiseToResolve, promise->reactionsOrResult(), jsNumber(static_cast<int32_t>(JSPromise::Status::Rejected)), jsUndefined());
-            break;
-        }
-        case JSPromise::Status::Fulfilled: {
-            scope.release();
-            globalObject->queueMicrotask(InternalMicrotask::PromiseResolveWithoutHandlerJob, promiseToResolve, promise->reactionsOrResult(), jsNumber(static_cast<int32_t>(JSPromise::Status::Fulfilled)), jsUndefined());
-            break;
-        }
-        }
-        promise->markAsHandled();
+        scope.release();
+        promise->performPromiseThenWithInternalMicrotask(vm, globalObject, InternalMicrotask::PromiseResolveWithoutHandlerJob, promiseToResolve, jsUndefined());
         return;
     }
 

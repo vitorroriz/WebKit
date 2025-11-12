@@ -260,7 +260,7 @@ JSC_DEFINE_HOST_FUNCTION(promiseConstructorFuncRace, (JSGlobalObject* globalObje
 
         if (nextPromise->isThenFastAndNonObservable()) [[likely]] {
             scope.release();
-            nextPromise->performPromiseThenWithInternalMicrotask(vm, globalObject, InternalMicrotask::PromiseFirstResolveWithoutHandlerJob, promise);
+            nextPromise->performPromiseThenWithInternalMicrotask(vm, globalObject, InternalMicrotask::PromiseFirstResolveWithoutHandlerJob, promise, promise);
         } else {
             if (!resolve || !reject)
                 std::tie(resolve, reject) = promise->createFirstResolvingFunctions(vm, globalObject);

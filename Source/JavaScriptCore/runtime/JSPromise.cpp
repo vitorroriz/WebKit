@@ -285,24 +285,24 @@ void JSPromise::performPromiseThen(VM& vm, JSGlobalObject* globalObject, JSValue
     markAsHandled();
 }
 
-void JSPromise::performPromiseThenWithInternalMicrotask(VM& vm, JSGlobalObject* globalObject, InternalMicrotask task, JSValue promise)
+void JSPromise::performPromiseThenWithInternalMicrotask(VM& vm, JSGlobalObject* globalObject, InternalMicrotask task, JSValue promise, JSValue context)
 {
     JSValue reactionsOrResult = this->reactionsOrResult();
     switch (status()) {
     case JSPromise::Status::Pending: {
         JSValue encodedTask = jsNumber(static_cast<int32_t>(task));
-        auto* reaction = JSPromiseReaction::create(vm, promise, encodedTask, encodedTask, promise, jsDynamicCast<JSPromiseReaction*>(reactionsOrResult));
+        auto* reaction = JSPromiseReaction::create(vm, promise, encodedTask, encodedTask, context, jsDynamicCast<JSPromiseReaction*>(reactionsOrResult));
         setReactionsOrResult(vm, reaction);
         break;
     }
     case JSPromise::Status::Rejected: {
         if (!isHandled())
             globalObject->globalObjectMethodTable()->promiseRejectionTracker(globalObject, this, JSPromiseRejectionOperation::Handle);
-        globalObject->queueMicrotask(task, promise, reactionsOrResult, jsNumber(static_cast<int32_t>(Status::Rejected)), jsUndefined());
+        globalObject->queueMicrotask(task, promise, reactionsOrResult, jsNumber(static_cast<int32_t>(Status::Rejected)), context);
         break;
     }
     case JSPromise::Status::Fulfilled: {
-        globalObject->queueMicrotask(task, promise, reactionsOrResult, jsNumber(static_cast<int32_t>(Status::Fulfilled)), jsUndefined());
+        globalObject->queueMicrotask(task, promise, reactionsOrResult, jsNumber(static_cast<int32_t>(Status::Fulfilled)), context);
         break;
     }
     }
@@ -564,7 +564,7 @@ void JSPromise::triggerPromiseReactions(VM& vm, JSGlobalObject* globalObject, St
         if (handler.isInt32()) {
             auto task = static_cast<InternalMicrotask>(handler.asInt32());
             ASSERT(task == InternalMicrotask::PromiseResolveWithoutHandlerJob || task == InternalMicrotask::PromiseFirstResolveWithoutHandlerJob);
-            globalObject->queueMicrotask(task, promise, argument, jsNumber(static_cast<int32_t>(status)), jsUndefined());
+            globalObject->queueMicrotask(task, promise, argument, jsNumber(static_cast<int32_t>(status)), context);
             continue;
         }
 
