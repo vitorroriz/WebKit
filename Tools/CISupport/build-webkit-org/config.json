@@ -361,8 +361,7 @@
                   "platform": "mac-sonoma", "configuration": "debug", "architectures": ["x86_64", "arm64"],
                   "triggers": [
                       "sonoma-debug-tests-test262", "sonoma-debug-tests-wk1", "sonoma-debug-tests-wk2",
-                      "sonoma-debug-applesilicon-tests-wk1", "sonoma-debug-applesilicon-tests-wk2",
-                      "sonoma-applesilicon-debug-tests-jsc"
+                      "sonoma-debug-applesilicon-tests-wk1", "sonoma-debug-applesilicon-tests-wk2"
                   ],
                   "workernames": ["bot247", "bot248"]
                   },
@@ -390,8 +389,8 @@
                     "platform": "mac-sonoma", "configuration": "debug", "architectures": ["x86_64", "arm64"],
                     "workernames": ["bot603"]
                   },
-                  { "name": "Apple-Sonoma-AppleSilicon-Debug-JSC-Tests", "factory": "TestJSCFactory",
-                    "platform": "mac-sonoma", "configuration": "debug", "architectures": ["x86_64", "arm64"],
+                  { "name": "Apple-Sonoma-AppleSilicon-O3-Debug-JSC-BuildAndTest", "factory": "BuildO3AndJSCTestsFactory",
+                    "platform": "mac-sonoma", "configuration": "debug", "architectures": ["arm64"],
                     "workernames": ["bot105"]
                   },
                   {
@@ -844,7 +843,7 @@
                   "builderNames": ["Apple-Sequoia-Debug-AppleSilicon-WK2-Tests"]
                   },
                   { "type": "PlatformSpecificScheduler", "platform": "mac-sonoma", "branch": "main", "treeStableTimer": 45.0,
-                  "builderNames": ["Apple-Sonoma-Release-Build", "Apple-Sonoma-Debug-Build"]
+                  "builderNames": ["Apple-Sonoma-Release-Build", "Apple-Sonoma-Debug-Build", "Apple-Sonoma-AppleSilicon-O3-Debug-JSC-BuildAndTest"]
                   },
                   { "type": "Triggerable", "name": "sonoma-release-tests-wk1",
                   "builderNames": ["Apple-Sonoma-Release-WK1-Tests"]
@@ -875,9 +874,6 @@
                   },
                   { "type": "Triggerable", "name": "sonoma-release-tests-test262",
                     "builderNames": ["Apple-Sonoma-Release-Test262-Tests"]
-                  },
-                  { "type": "Triggerable", "name": "sonoma-applesilicon-debug-tests-jsc",
-                    "builderNames": ["Apple-Sonoma-AppleSilicon-Debug-JSC-Tests"]
                   },
                   { "type": "Triggerable", "name": "sonoma-applesilicon-release-tests-jsc",
                     "builderNames": ["Apple-Sonoma-AppleSilicon-Release-JSC-Tests"]

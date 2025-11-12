@@ -852,7 +852,7 @@ class TestExpectedBuildSteps(unittest.TestCase):
             'extract-built-product',
             'test262-test'
         ],
-        'Apple-Sonoma-AppleSilicon-Debug-JSC-Tests': [
+        'Apple-Sonoma-AppleSilicon-O3-Debug-JSC-BuildAndTest': [
             'configure-build',
             'configuration',
             'clean-and-update-working-directory',
@@ -862,8 +862,8 @@ class TestExpectedBuildSteps(unittest.TestCase):
             'delete-WebKitBuild-directory',
             'delete-stale-build-files',
             'prune-coresymbolicationd-cache-if-too-large',
-            'download-built-product',
-            'extract-built-product',
+            'set-o3-optimization-level',
+            'compile-jsc',
             'jscore-test'
         ],
         'Apple-Sonoma-AppleSilicon-Release-JSC-Tests': [
