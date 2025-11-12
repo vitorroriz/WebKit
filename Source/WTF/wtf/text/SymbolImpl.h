@@ -218,6 +218,10 @@ ValueCheck<const SymbolImpl*> {
 
 } // namespace WTF
 
+SPECIALIZE_TYPE_TRAITS_BEGIN(WTF::SymbolImpl)
+    static bool isType(const WTF::StringImpl& impl) { return impl.isSymbol(); }
+SPECIALIZE_TYPE_TRAITS_END()
+
 using WTF::SymbolImpl;
 using WTF::PrivateSymbolImpl;
 using WTF::RegisteredSymbolImpl;

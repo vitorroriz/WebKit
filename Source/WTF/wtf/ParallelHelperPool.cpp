@@ -27,8 +27,11 @@
 #include <wtf/ParallelHelperPool.h>
 
 #include <wtf/AutomaticThread.h>
+#include <wtf/TZoneMallocInlines.h>
 
 namespace WTF {
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(ParallelHelperPool);
 
 ParallelHelperClient::ParallelHelperClient(RefPtr<ParallelHelperPool>&& pool)
     : m_pool(WTFMove(pool))
@@ -121,6 +124,11 @@ void ParallelHelperClient::runTask(const RefPtr<SharedTask<void ()>>& task)
     }
 }
 
+Ref<ParallelHelperPool> ParallelHelperPool::create(ASCIILiteral threadName)
+{
+    return adoptRef(*new ParallelHelperPool(threadName));
+}
+
 ParallelHelperPool::ParallelHelperPool(ASCIILiteral threadName)
     : m_lock(Box<Lock>::create())
     , m_workAvailableCondition(AutomaticThreadCondition::create())
@@ -178,16 +186,16 @@ public:
     
     ASCIILiteral name() const final
     {
-        return m_pool.m_threadName;
+        return m_pool->m_threadName;
     }
 
 private:
     PollResult poll(const AbstractLocker&) final
     {
-        if (m_pool.m_isDying)
+        if (m_pool->m_isDying)
             return PollResult::Stop;
-        assertIsHeld(*m_pool.m_lock);
-        m_client = m_pool.getClientWithTask();
+        assertIsHeld(*m_pool->m_lock);
+        m_client = m_pool->getClientWithTask();
         if (m_client) {
             assertIsHeld(*m_client->m_pool->m_lock);
             m_task = m_client->claimTask();
@@ -204,7 +212,7 @@ private:
         return WorkResult::Continue;
     }
 
-    ParallelHelperPool& m_pool;
+    const CheckedRef<ParallelHelperPool> m_pool;
     ParallelHelperClient* m_client { nullptr };
     RefPtr<SharedTask<void ()>> m_task;
 };

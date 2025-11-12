@@ -26,7 +26,11 @@
 #include "config.h"
 #include <wtf/WorkerPool.h>
 
+#include <wtf/TZoneMallocInlines.h>
+
 namespace WTF {
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(WorkerPool);
 
 class WorkerPool::Worker final : public AutomaticThread {
 public:
@@ -40,9 +44,9 @@ public:
 
     PollResult poll(const AbstractLocker&) final
     {
-        if (m_pool.m_tasks.isEmpty())
+        if (m_pool->m_tasks.isEmpty())
             return PollResult::Wait;
-        m_task = m_pool.m_tasks.takeFirst();
+        m_task = m_pool->m_tasks.takeFirst();
         if (!m_task)
             return PollResult::Stop;
         return PollResult::Work;
@@ -57,27 +61,27 @@ public:
 
     void threadDidStart() final
     {
-        Locker locker { *m_pool.m_lock };
-        m_pool.m_numberOfActiveWorkers++;
+        Locker locker { *m_pool->m_lock };
+        m_pool->m_numberOfActiveWorkers++;
     }
 
     void threadIsStopping(const AbstractLocker&) final
     {
-        m_pool.m_numberOfActiveWorkers--;
+        m_pool->m_numberOfActiveWorkers--;
     }
 
     bool shouldSleep(const AbstractLocker& locker) final
     {
-        return m_pool.shouldSleep(locker);
+        return m_pool->shouldSleep(locker);
     }
 
     ASCIILiteral name() const final
     {
-        return m_pool.name();
+        return m_pool->name();
     }
 
 private:
-    WorkerPool& m_pool;
+    const CheckedRef<WorkerPool> m_pool;
     Function<void()> m_task;
 };
 

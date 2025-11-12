@@ -34,7 +34,7 @@ namespace JSC {
 ParallelHelperPool& heapHelperPool()
 {
     static std::once_flag initializeHelperPoolOnceFlag;
-    static ParallelHelperPool* helperPool;
+    static LazyNeverDestroyed<Ref<ParallelHelperPool>> helperPool;
     std::call_once(
         initializeHelperPoolOnceFlag,
         [] {
@@ -43,10 +43,11 @@ ParallelHelperPool& heapHelperPool()
 #else
             constexpr auto threadName = "Heap Helper Thread"_s;
 #endif
-            helperPool = new ParallelHelperPool(threadName);
-            helperPool->ensureThreads(Options::numberOfGCMarkers() - 1);
+            Ref pool = ParallelHelperPool::create(threadName);
+            pool->ensureThreads(Options::numberOfGCMarkers() - 1);
+            helperPool.construct(WTFMove(pool));
         });
-    return *helperPool;
+    return helperPool.get().get();
 }
 
 } // namespace JSC

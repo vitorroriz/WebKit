@@ -1,4 +1,1 @@
 wtf/JSONValues.cpp
-wtf/ParallelHelperPool.cpp
-wtf/WorkerPool.cpp
-wtf/text/cf/StringCF.cpp
