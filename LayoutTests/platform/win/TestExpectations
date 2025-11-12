@@ -461,6 +461,7 @@ http/tests/referrer-policy/unsafe-url/cross-origin-http-http.html [ Skip ]
 compositing/repaint/copy-forward-dirty-region-purged-backbuffer.html [ Skip ]
 compositing/repaint/copy-forward-dirty-region-purged.html [ Skip ]
 compositing/repaint/copy-forward-dirty-region.html [ Skip ]
+fast/repaint/iframe-from-display-none-repaint.html [ Skip ]
 
 # testRunner.pathToLocalResource
 fast/loader/local-CSS-from-local.html [ Failure ]

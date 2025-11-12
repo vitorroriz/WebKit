@@ -584,8 +584,10 @@ void RenderView::flushAccumulatedRepaintRegion() const
     CheckedPtr<RenderBox> iframeOwnerRenderer;
     if (RefPtr ownerElement = protectedDocument()->ownerElement()) {
         iframeOwnerRenderer = ownerElement->renderBox();
-        if (!iframeOwnerRenderer)
+        if (!iframeOwnerRenderer) {
+            m_accumulatedRepaintRegion = nullptr;
             return;
+        }
 
         auto viewRect = this->viewRect();
         auto rectOffsetLayoutSize = toLayoutSize(-viewRect.location() + iframeOwnerRenderer->contentBoxRect().location());

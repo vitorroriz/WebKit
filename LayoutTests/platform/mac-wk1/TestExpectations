@@ -2970,7 +2970,7 @@ intersection-observer/root-element-deleted.html [ Skip ]
 webkit.org/b/270310 [ Sonoma+ ] imported/w3c/web-platform-tests/html/semantics/interactive-elements/the-dialog-element/removed-element-is-removed-from-top-layer.html [ ImageOnlyFailure ]
 webkit.org/b/270310 [ Sonoma+ ] imported/w3c/web-platform-tests/html/semantics/interactive-elements/the-dialog-element/top-layer-stacking-correct-order-remove-readd.html [ ImageOnlyFailure ]
 
-# webkit.org/b/270207 REGRESSION (Sonoma23B74 --> Sonoma23D56 ): [ macOS wk1 ] Multiple tests are failing with image diff (0.01%) in fast/ and composting/ tests
+# webkit.org/b/270207 REGRESSION (Sonoma23B74 --> Sonoma23D56 ): [ macOS wk1 ] Multiple tests are failing with image diff (0.01%) in fast/ and compositing/ tests
 [ Sonoma+ ] compositing/clipping/border-radius-with-composited-descendant.html [ ImageOnlyFailure ]
 [ Sonoma+ ] compositing/clipping/border-radius-with-composited-descendant-nested.html [ ImageOnlyFailure ]
 [ Sonoma+ ] fast/images/exif-orientation-composited.html [ ImageOnlyFailure ]
@@ -3057,6 +3057,9 @@ webkit.org/b/276145 http/tests/security/block-popup-to-all-zero-address.html [ S
 http/tests/xmlhttprequest/cross-origin-authorization.html [ Failure ]
 
 compositing/repaint/scroller-repaints-once.html [ Failure ]
+
+# No support for # testRunner.dontForceRepaint in WK1.
+fast/repaint/iframe-from-display-none-repaint.html [ Skip ]
 
 fast/scrolling/scroll-corner-update-on-direction-change.html [ Skip ]
 
