@@ -600,6 +600,14 @@ void SourceBufferPrivate::addTrackBuffer(TrackID trackId, RefPtr<MediaDescriptio
     trackBuffer->setLogger(protectedLogger(), logIdentifier());
 #endif
     m_trackBufferMap.try_emplace(trackId, WTFMove(trackBuffer));
+    if (RefPtr mediaSource = m_mediaSource.get()) {
+        MediaSourcePrivate::TracksType tracksType;
+        if (m_hasAudio)
+            tracksType |= TrackInfoTrackType::Audio;
+        if (m_hasVideo)
+            tracksType |= TrackInfoTrackType::Video;
+        mediaSource->tracksTypeChanged(*this, tracksType);
+    }
 }
 
 void SourceBufferPrivate::updateTrackIds(Vector<std::pair<TrackID, TrackID>>&& trackIdPairs)

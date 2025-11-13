@@ -34,6 +34,7 @@
 
 #include <WebCore/MediaPlayer.h>
 #include <WebCore/PlatformTimeRanges.h>
+#include <WebCore/TrackInfo.h>
 #include <wtf/Forward.h>
 #include <wtf/ThreadSafeWeakPtr.h>
 #include <wtf/Vector.h>
@@ -117,6 +118,9 @@ public:
     bool hasFutureTime(const MediaTime& currentTime, const MediaTime& threshold) const;
     bool hasAudio() const;
     bool hasVideo() const;
+    using TracksType = OptionSet<TrackInfoTrackType>;
+    void tracksTypeChanged(SourceBufferPrivate&, TracksType);
+    virtual bool supportsTracksTypeChanged() const { return false; }
 
     void setStreaming(bool value) { m_streaming = value; }
     bool streaming() const { return m_streaming; }
@@ -136,12 +140,16 @@ protected:
 
 private:
     mutable Lock m_lock;
+    void updateTracksType();
+
     MediaTime m_duration WTF_GUARDED_BY_LOCK(m_lock) { MediaTime::invalidTime() };
     PlatformTimeRanges m_buffered WTF_GUARDED_BY_LOCK(m_lock);
     PlatformTimeRanges m_liveSeekable WTF_GUARDED_BY_LOCK(m_lock);
     std::atomic<bool> m_streaming { false };
     std::atomic<bool> m_streamingAllowed { false };
     MediaTime m_timeFudgeFactor;
+    HashMap<SourceBufferPrivate*, TracksType> m_tracksTypes WTF_GUARDED_BY_CAPABILITY(m_dispatcher.get());
+    std::atomic<TracksType> m_tracksCombinedTypes;
     const ThreadSafeWeakPtr<MediaSourcePrivateClient> m_client;
 };
 

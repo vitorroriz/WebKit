@@ -133,8 +133,6 @@ public:
     WEBCORE_EXPORT Vector<PlatformTimeRanges> trackBuffersRanges() const;
 
     // Methods used by MediaSourcePrivate
-    bool hasAudio() const { return m_hasAudio; }
-    bool hasVideo() const { return m_hasVideo; }
     bool hasReceivedFirstInitializationSegment() const { return m_receivedFirstInitializationSegment; }
 
     virtual MediaTime timestampOffset() const { return m_timestampOffset; }
