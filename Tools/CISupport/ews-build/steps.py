@@ -685,7 +685,7 @@ class ConfigureBuild(buildstep.BuildStep, AddToLogMixin):
             self.setProperty('configuration', self.configuration, 'config.json')
         if self.architecture:
             self.setProperty('architecture', self.architecture, 'config.json')
-        self.setProperty('archForUpload', '-'.join(self.getProperty('architecture').split(' ')))
+        self.setProperty('archForUpload', '-'.join(self.getProperty('architecture', '').split(' ')))
         if self.buildOnly:
             self.setProperty('buildOnly', self.buildOnly, 'config.json')
         if self.triggers and not self.getProperty('triggers'):
