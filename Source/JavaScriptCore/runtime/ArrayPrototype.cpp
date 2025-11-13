@@ -27,7 +27,7 @@
 #include "ArrayConstructor.h"
 #include "ArrayPrototypeInlines.h"
 #include "BuiltinNames.h"
-#include "CachedCall.h"
+#include "CachedCallInlines.h"
 #include "IntegrityInlines.h"
 #include "InterpreterInlines.h"
 #include "JSArrayInlines.h"

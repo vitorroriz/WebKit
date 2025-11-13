@@ -27,7 +27,7 @@
 #include "MapPrototype.h"
 
 #include "BuiltinNames.h"
-#include "CachedCall.h"
+#include "CachedCallInlines.h"
 #include "GetterSetter.h"
 #include "InterpreterInlines.h"
 #include "JSCInlines.h"

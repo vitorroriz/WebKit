@@ -26,7 +26,7 @@
 #include "config.h"
 #include "SetPrototype.h"
 
-#include "CachedCall.h"
+#include "CachedCallInlines.h"
 #include "InterpreterInlines.h"
 #include "BuiltinNames.h"
 #include "GetterSetter.h"

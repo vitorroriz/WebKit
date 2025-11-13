@@ -903,6 +903,7 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     inspector/remote/RemoteInspector.h
 
     interpreter/CachedCall.h
+    interpreter/CachedCallInlines.h
     interpreter/CalleeBits.h
     interpreter/CallFrame.h
     interpreter/CallFrameInlines.h
@@ -1409,6 +1410,7 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     runtime/WriteBarrierInlines.h
 
     tools/Integrity.h
+    tools/IntegrityInlines.h
     tools/LLVMProfiling.h
     tools/SourceProfiler.h
 

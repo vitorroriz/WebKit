@@ -21,7 +21,7 @@
 #include "config.h"
 #include "RegExpPrototype.h"
 
-#include "CachedCall.h"
+#include "CachedCallInlines.h"
 #include "InterpreterInlines.h"
 #include "IntegrityInlines.h"
 #include "JSArray.h"

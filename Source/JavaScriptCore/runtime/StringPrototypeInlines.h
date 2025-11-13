@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "CachedCall.h"
+#include "CachedCallInlines.h"
 #include "ExceptionHelpers.h"
 #include "JSCellButterfly.h"
 #include "ObjectConstructor.h"
