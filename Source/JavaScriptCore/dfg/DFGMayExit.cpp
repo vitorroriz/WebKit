@@ -124,6 +124,10 @@ ExitMode mayExitImpl(Graph& graph, Node* node, StateType& state)
     case CompareBelow:
     case CompareBelowEq:
     case CompareEqPtr:
+    case MapIteratorNext:
+    case MapIteratorKey:
+    case MapIteratorValue:
+    case MapStorage:
         break;
 
     case Switch: {

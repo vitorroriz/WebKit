@@ -1140,6 +1140,9 @@ private:
             break;
 
         case MapStorage:
+            setPrediction(SpecCellOther | SpecEmpty);
+            break;
+
         case MapStorageOrSentinel:
         case MapIterationNext:
             setPrediction(SpecCellOther);

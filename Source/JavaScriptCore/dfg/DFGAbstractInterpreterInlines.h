@@ -1664,6 +1664,9 @@ bool AbstractInterpreter<AbstractStateType>::executeEffects(unsigned clobberLimi
         break;
 
     case MapStorage:
+        setTypeForNode(node, SpecCellOther | SpecEmpty);
+        break;
+
     case MapStorageOrSentinel:
     case MapIterationNext:
         setTypeForNode(node, SpecCellOther);

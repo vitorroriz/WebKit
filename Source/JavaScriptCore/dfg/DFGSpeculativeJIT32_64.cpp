@@ -3922,10 +3922,6 @@ void SpeculativeJIT::compile(Node* node)
         compileIsEmptyStorage(node);
         break;
 
-    case MapStorage:
-        compileMapStorage(node);
-        break;
-
     case MapStorageOrSentinel:
         compileMapStorageOrSentinel(node);
         break;
@@ -4484,6 +4480,7 @@ void SpeculativeJIT::compile(Node* node)
     case InByValMegamorphic:
     case MultiGetByVal:
     case MultiPutByVal:
+    case MapStorage:
         DFG_CRASH(m_graph, node, "unexpected node in DFG backend");
         break;
     }

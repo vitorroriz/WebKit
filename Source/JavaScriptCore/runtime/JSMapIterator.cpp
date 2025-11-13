@@ -46,7 +46,7 @@ void JSMapIterator::finishCreation(VM& vm, JSMap* iteratedObject, IterationKind 
     Base::finishCreation(vm);
     setEntry(vm, 0);
     setIteratedObject(vm, iteratedObject);
-    internalField(Field::Storage).setWithoutWriteBarrier(JSValue());
+    internalField(Field::Storage).set(vm, this, iteratedObject->storage());
     internalField(Field::Kind).setWithoutWriteBarrier(jsNumber(static_cast<int32_t>(kind)));
 }
 

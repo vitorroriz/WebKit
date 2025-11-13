@@ -2491,9 +2491,8 @@ void SpeculativeJIT::compileMapGetImpl(Node* node)
     loadPtr(Address(mapGPR, MapOrSet::offsetOfStorage()), mapStorageOrDataGPR);
     notPresentInTable.append(branchTestPtr(Zero, mapStorageOrDataGPR));
 
-    JIT_COMMENT(*this, "Compute the bucketCount = Capacity / LoadFactor and bucketIndex = hashTableStartIndex + (hash & bucketCount - 1).");
+    JIT_COMMENT(*this, "Compute the bucketCount = Capacity and bucketIndex = hashTableStartIndex + (hash & bucketCount - 1).");
     addPtr(TrustedImm32(JSCellButterfly::offsetOfData()), mapStorageOrDataGPR);
-    static_assert(MapOrSet::Helper::LoadFactor == 1);
     load32(Address(mapStorageOrDataGPR, MapOrSet::Helper::capacityIndex() * sizeof(uint64_t)), bucketCountGPR);
     sub32(bucketCountGPR, TrustedImm32(1), bucketIndexOrDeletedValueGPR);
     and32(hashGPR, bucketIndexOrDeletedValueGPR);
@@ -8519,6 +8518,26 @@ void SpeculativeJIT::boxDoubleAsDouble(FPRReg inputFPR, FPRReg resultFPR)
     ASSERT(inputFPR != resultFPR);
     move64ToDouble(TrustedImm64(std::bit_cast<uint64_t>(JSValue::DoubleEncodeOffset)), resultFPR);
     add64(inputFPR, resultFPR, resultFPR);
+}
+
+void SpeculativeJIT::compileMapStorage(Node* node)
+{
+    SpeculateCellOperand map(this, node->child1());
+    GPRTemporary result(this);
+
+    GPRReg mapGPR = map.gpr();
+    GPRReg resultGPR = result.gpr();
+
+    if (node->child1().useKind() == MapObjectUse) {
+        speculateMapObject(node->child1(), mapGPR);
+        loadPtr(Address(mapGPR, JSMap::offsetOfStorage()), resultGPR);
+    } else if (node->child1().useKind() == SetObjectUse) {
+        speculateSetObject(node->child1(), mapGPR);
+        loadPtr(Address(mapGPR, JSSet::offsetOfStorage()), resultGPR);
+    } else
+        RELEASE_ASSERT_NOT_REACHED();
+
+    jsValueResult(JSValueRegs { resultGPR }, node);
 }
 
 #endif
