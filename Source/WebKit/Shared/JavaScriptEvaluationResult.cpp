@@ -42,6 +42,7 @@
 #include <WebCore/JSWebKitSerializedNode.h>
 #include <WebCore/ScriptWrappableInlines.h>
 #include <WebCore/SerializedScriptValue.h>
+#include <wtf/StackCheck.h>
 
 #if PLATFORM(COCOA)
 #include <wtf/cocoa/RuntimeApplicationChecksCocoa.h>
@@ -53,11 +54,16 @@ class JavaScriptEvaluationResult::JSExtractor {
 public:
     Map takeMap() { return WTFMove(m_map); }
     std::optional<JSObjectID> addObjectToMap(JSGlobalContextRef, JSValueRef);
+
+    bool isSafeToRecurse();
+
 private:
     std::optional<Value> toValue(JSGlobalContextRef, JSValueRef);
 
     Map m_map;
     HashMap<Protected<JSValueRef>, JSObjectID> m_objectsInMap;
+    StackCheck m_stackCheck;
+    bool m_didStackOverflow { false };
 };
 
 class JavaScriptEvaluationResult::JSInserter {
@@ -246,8 +252,20 @@ RefPtr<API::Object> JavaScriptEvaluationResult::toAPI()
     return std::exchange(instantiatedObjects, { }).take(m_root);
 }
 
+bool JavaScriptEvaluationResult::JSExtractor::isSafeToRecurse()
+{
+    if (m_didStackOverflow)
+        return false;
+
+    m_didStackOverflow = !m_stackCheck.isSafeToRecurse();
+    return !m_didStackOverflow;
+}
+
 std::optional<JSObjectID> JavaScriptEvaluationResult::JSExtractor::addObjectToMap(JSGlobalContextRef context, JSValueRef object)
 {
+    if (!isSafeToRecurse())
+        return std::nullopt;
+
     ASSERT(context);
     ASSERT(object);
 
@@ -259,6 +277,11 @@ std::optional<JSObjectID> JavaScriptEvaluationResult::JSExtractor::addObjectToMa
     auto identifier = JSObjectID::generate();
     m_objectsInMap.set(WTFMove(jsValue), identifier);
     if (auto value = toValue(context, object)) {
+        // It is possible for toValue to return a valid object that is only partially extracted.
+        // We should consider that a "stack exhaustion failure".
+        if (m_didStackOverflow)
+            return std::nullopt;
+
         m_map.add(identifier, WTFMove(*value));
         return identifier;
     }
@@ -346,6 +369,9 @@ auto JavaScriptEvaluationResult::JSExtractor::toValue(JSGlobalContextRef context
         if (!vector.tryReserveInitialCapacity(length))
             return EmptyType::Undefined;
 
+        if (!isSafeToRecurse())
+            return std::nullopt;
+
         for (size_t i = 0; i < length; ++i) {
             JSValueRef exception { nullptr };
             JSValueRef element = JSObjectGetPropertyAtIndex(context, object, i, &exception);
@@ -369,6 +395,9 @@ auto JavaScriptEvaluationResult::JSExtractor::toValue(JSGlobalContextRef context
     case SerializedScriptValue::DeserializationBehavior::LegacyMapToEmptyObject:
         return { { ObjectMap { } } };
     }
+
+    if (!isSafeToRecurse())
+        return std::nullopt;
 
     JSPropertyNameArrayRef names = JSObjectCopyPropertyNames(context, object);
     size_t length = JSPropertyNameArrayGetCount(names);

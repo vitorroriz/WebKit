@@ -1162,3 +1162,43 @@ TEST(WKWebView, LegacySynchronousMessages)
     [webView loadHTMLString:@"<script>alert(window.webkit.messageHandlers.testHandler.postLegacySynchronousMessage('hello!'))</script>" baseURL:nil];
     EXPECT_WK_STREQ([webView _test_waitForAlert], "UI process received: hello!");
 }
+
+// Serialization of JavaScript objects using the old SerializedScriptValue code path
+// was iterative, and had a hard coded object depth limit of 40,000.
+// The new JSExtractor code path - when working recursively - blows out the stack well before 40,000.
+// This test validates that we abort early instead of crash the WebContent process.
+static constexpr auto deepObjectJS = R"SERIALIZEJS(
+window.deepObject = {
+    foo: "bar"
+};
+
+var currentObject = window.deepObject;
+
+for (var i = 0; i < 40000; ++i) {
+    currentObject.baz = {
+        foo: "bar"
+    }
+    currentObject = currentObject.baz
+}
+
+return window.deepObject;
+)SERIALIZEJS"_s;
+
+TEST(EvaluateJavaScript, Serialization)
+{
+    RetainPtr webView = adoptNS([TestWKWebView new]);
+
+    auto navigationDelegate = adoptNS([[TestNavigationDelegate alloc] init]);
+    __block bool didCrash = false;
+    navigationDelegate.get().webContentProcessDidTerminate = ^(WKWebView *view, _WKProcessTerminationReason) {
+        didCrash = true;
+    };
+
+    webView.get().navigationDelegate = navigationDelegate.get();
+
+    NSError *error = nil;
+    id result = [webView objectByCallingAsyncFunction:[NSString stringWithUTF8String:deepObjectJS] withArguments:nil error:&error];
+    EXPECT_FALSE(didCrash);
+    EXPECT_NULL(result);
+}
+
