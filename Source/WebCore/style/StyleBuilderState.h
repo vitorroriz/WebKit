@@ -38,7 +38,6 @@
 #include <WebCore/StyleForVisitedLink.h>
 #include <WebCore/TextFlags.h>
 #include <wtf/BitSet.h>
-#include <wtf/RefCountedFixedVector.h>
 
 namespace WebCore {
 
@@ -56,6 +55,7 @@ namespace Style {
 
 class BuilderState;
 struct Color;
+struct FontFamilies;
 struct FontFeatureSettings;
 struct FontPalette;
 struct FontSizeAdjust;
@@ -172,9 +172,7 @@ public:
     void setFontDescriptionKeywordSizeFromIdentifier(CSSValueID);
     void setFontDescriptionIsAbsoluteSize(bool);
     void setFontDescriptionFontSize(float);
-    void setFontDescriptionFamilies(RefCountedFixedVector<AtomString>&);
-    void setFontDescriptionFamilies(Vector<AtomString>&);
-    void setFontDescriptionIsSpecifiedFont(bool);
+    void setFontDescriptionFamilies(FontFamilies&&);
     void setFontDescriptionFeatureSettings(FontFeatureSettings&&);
     void setFontDescriptionFontPalette(FontPalette&&);
     void setFontDescriptionFontSizeAdjust(FontSizeAdjust);

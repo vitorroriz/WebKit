@@ -89,11 +89,6 @@ public:
     static void serializeSingleWebkitMaskComposite(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, CompositeOperator);
     static void serializeSingleMaskMode(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, MaskMode);
     static void serializeSingleWebkitMaskSourceType(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, MaskMode);
-
-    // MARK: Font serializations
-
-    static void serializeFontFamily(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const AtomString&);
-
 };
 
 // MARK: - Strong value serializations
@@ -542,36 +537,6 @@ inline void ExtractorSerializer::serializeSingleWebkitMaskSourceType(ExtractorSt
         return;
     }
     RELEASE_ASSERT_NOT_REACHED();
-}
-
-// MARK: - Font serializations
-
-inline void ExtractorSerializer::serializeFontFamily(ExtractorState&, StringBuilder& builder, const CSS::SerializationContext&, const AtomString& family)
-{
-    auto identifierForFamily = [](const auto& family) {
-        if (family == cursiveFamily)
-            return CSSValueCursive;
-        if (family == fantasyFamily)
-            return CSSValueFantasy;
-        if (family == monospaceFamily)
-            return CSSValueMonospace;
-        if (family == mathFamily)
-            return CSSValueMath;
-        if (family == pictographFamily)
-            return CSSValueWebkitPictograph;
-        if (family == sansSerifFamily)
-            return CSSValueSansSerif;
-        if (family == serifFamily)
-            return CSSValueSerif;
-        if (family == systemUiFamily)
-            return CSSValueSystemUi;
-        return CSSValueInvalid;
-    };
-
-    if (auto familyIdentifier = identifierForFamily(family))
-        builder.append(nameLiteralForSerialization(familyIdentifier));
-    else
-        builder.append(WebCore::serializeFontFamily(family));
 }
 
 } // namespace Style

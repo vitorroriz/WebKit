@@ -44,6 +44,7 @@
 #include <WebCore/StyleFilterData.h>
 #include <WebCore/StyleFlexibleBoxData.h>
 #include <WebCore/StyleFontData.h>
+#include <WebCore/StyleFontFamily.h>
 #include <WebCore/StyleFontFeatureSettings.h>
 #include <WebCore/StyleFontPalette.h>
 #include <WebCore/StyleFontSizeAdjust.h>
@@ -230,6 +231,7 @@ inline FlexDirection RenderStyle::flexDirection() const { return static_cast<Fle
 inline Style::FlexGrow RenderStyle::flexGrow() const { return m_nonInheritedData->miscData->flexibleBox->flexGrow; }
 inline Style::FlexShrink RenderStyle::flexShrink() const { return m_nonInheritedData->miscData->flexibleBox->flexShrink; }
 inline FlexWrap RenderStyle::flexWrap() const { return static_cast<FlexWrap>(m_nonInheritedData->miscData->flexibleBox->flexWrap); }
+inline Style::FontFamilies RenderStyle::fontFamily() const { return { fontDescription().families(), fontDescription().isSpecifiedFont() }; }
 inline Style::FontPalette RenderStyle::fontPalette() const { return fontDescription().fontPalette(); }
 inline Style::FontSizeAdjust RenderStyle::fontSizeAdjust() const { return fontDescription().fontSizeAdjust(); }
 inline Style::FontStyle RenderStyle::fontStyle() const { return { fontDescription().fontStyleSlope(), fontDescription().fontStyleAxis() }; }

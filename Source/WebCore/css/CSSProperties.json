@@ -591,10 +591,8 @@
                 }
             ],
             "codegen-properties": {
-                "animation-wrapper": "FontFamilyWrapper",
-                "animation-wrapper-requires-override-parameters": [],
-                "style-builder-custom": "All",
                 "style-extractor-custom": true,
+                "style-builder-custom": "All",
                 "high-priority": true,
                 "parser-function": "consumeFontFamily",
                 "parser-grammar-unused": "[ <family-name> | <generic-family> | <-webkit-generic-family> ]#",

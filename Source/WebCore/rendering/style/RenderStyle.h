@@ -264,6 +264,8 @@ struct Cursor;
 struct DynamicRangeLimit;
 struct Filter;
 struct FlexBasis;
+struct FontFamilies;
+struct FontFamiliesView;
 struct FontFeatureSettings;
 struct FontPalette;
 struct FontSizeAdjust;
@@ -728,6 +730,7 @@ public:
     float computedFontSize() const;
     std::pair<FontOrientation, NonCJKGlyphOrientation> fontAndGlyphOrientation();
 
+    inline Style::FontFamilies fontFamily() const;
     inline FontOpticalSizing fontOpticalSizing() const;
     inline Style::FontFeatureSettings fontFeatureSettings() const;
     inline Style::FontVariationSettings fontVariationSettings() const;
@@ -1377,6 +1380,7 @@ public:
     // Only used for blending font sizes when animating, for MathML anonymous blocks, and for text autosizing.
     void setFontSize(float);
     void setFontOpticalSizing(FontOpticalSizing);
+    void setFontFamily(Style::FontFamilies&&);
     void setFontFeatureSettings(Style::FontFeatureSettings&&);
     void setFontVariationSettings(Style::FontVariationSettings&&);
     void setFontPalette(Style::FontPalette&&);

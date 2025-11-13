@@ -686,6 +686,16 @@ template<> struct PropertyExtractorAdaptor<CSSPropertyLineHeight> {
     }
 };
 
+template<> struct PropertyExtractorAdaptor<CSSPropertyFontFamily> {
+    template<typename F> decltype(auto) computedValue(ExtractorState& state, F&& functor) const
+    {
+        auto fontFamily = state.style.fontFamily();
+        if (fontFamily.size() == 1)
+            return functor(fontFamily.first());
+        return functor(fontFamily);
+    }
+};
+
 template<> struct PropertyExtractorAdaptor<CSSPropertyFontSize> {
     template<typename F> decltype(auto) computedValue(ExtractorState& state, F&& functor) const
     {
@@ -1817,20 +1827,12 @@ inline void ExtractorCustom::extractLineHeightSerialization(ExtractorState& stat
 
 inline Ref<CSSValue> ExtractorCustom::extractFontFamily(ExtractorState& state)
 {
-    if (state.style.fontCascade().familyCount() == 1)
-        return ExtractorConverter::convertFontFamily(state, state.style.fontCascade().familyAt(0));
-
-    CSSValueListBuilder list;
-    for (unsigned i = 0; i < state.style.fontCascade().familyCount(); ++i)
-        list.append(ExtractorConverter::convertFontFamily(state, state.style.fontCascade().familyAt(i)));
-    return CSSValueList::createCommaSeparated(WTFMove(list));
+    return extractCSSValue<CSSPropertyFontFamily>(state);
 }
 
 inline void ExtractorCustom::extractFontFamilySerialization(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context)
 {
-    builder.append(interleave(state.style.fontCascade().fontDescription().families(), [&](auto& builder, auto& family) {
-        ExtractorSerializer::serializeFontFamily(state, builder, context, family);
-    }, ", "_s));
+    extractSerialization<CSSPropertyFontFamily>(state, builder, context);
 }
 
 inline Ref<CSSValue> ExtractorCustom::extractFontSize(ExtractorState& state)
@@ -2664,10 +2666,7 @@ inline RefPtr<CSSValue> ExtractorCustom::extractFontShorthand(ExtractorState& st
     if (*fontStyle != CSSValueNormal)
         computedFont->style = CSSPrimitiveValue::create(*fontStyle);
 
-    CSSValueListBuilder familyList;
-    for (unsigned i = 0; i < state.style.fontCascade().familyCount(); ++i)
-        familyList.append(ExtractorConverter::convertFontFamily(state, state.style.fontCascade().familyAt(i)));
-    computedFont->family = CSSValueList::createCommaSeparated(WTFMove(familyList));
+    computedFont->family = createCSSValue(state.pool, state.style, state.style.fontFamily());
 
     return computedFont;
 }

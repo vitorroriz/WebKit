@@ -88,6 +88,7 @@ inline WebCore::Color forwardInheritedValue(const WebCore::Color& value) { auto 
 inline Color forwardInheritedValue(const Color& value) { auto copy = value; return copy; }
 inline EasingFunction forwardInheritedValue(const EasingFunction& value) { auto copy = value; return copy; }
 inline GapGutter forwardInheritedValue(const GapGutter& value) { auto copy = value; return copy; }
+inline FontFamilies forwardInheritedValue(const FontFamilies& value) { auto copy = value; return copy; }
 inline FilterOperations forwardInheritedValue(const FilterOperations& value) { auto copy = value; return copy; }
 inline TransformOperations forwardInheritedValue(const TransformOperations& value) { auto copy = value; return copy; }
 inline ScrollMarginEdge forwardInheritedValue(const ScrollMarginEdge& value) { auto copy = value; return copy; }
@@ -734,67 +735,24 @@ inline void BuilderCustom::applyInitialFontFamily(BuilderState& builderState)
         if (CSSValueID sizeIdentifier = fontDescription.keywordSizeAsIdentifier())
             builderState.setFontDescriptionFontSize(Style::fontSizeForKeyword(sizeIdentifier, false, builderState.document()));
     }
+
     if (!initialDesc.firstFamily().isEmpty())
-        builderState.setFontDescriptionFamilies(initialDesc.families());
+        builderState.setFontDescriptionFamilies(FontFamilies { initialDesc.families(), fontDescription.isSpecifiedFont() });
 }
 
 inline void BuilderCustom::applyInheritFontFamily(BuilderState& builderState)
 {
-    auto& parentFontDescription = builderState.parentStyle().fontDescription();
-
-    builderState.setFontDescriptionFamilies(parentFontDescription.families());
-    builderState.setFontDescriptionIsSpecifiedFont(parentFontDescription.isSpecifiedFont());
+    builderState.setFontDescriptionFamilies(forwardInheritedValue(builderState.parentStyle().fontFamily()));
 }
 
 inline void BuilderCustom::applyValueFontFamily(BuilderState& builderState, CSSValue& value)
 {
     auto& fontDescription = builderState.fontDescription();
+
     // Before mapping in a new font-family property, we should reset the generic family.
     bool oldFamilyUsedFixedDefaultSize = fontDescription.useFixedDefaultSize();
 
-    Vector<AtomString> families;
-
-    if (is<CSSPrimitiveValue>(value)) {
-        auto valueID = value.valueID();
-        if (!CSSPropertyParserHelpers::isSystemFontShorthand(valueID)) {
-            // Early return if the invalid CSSValueID is set while using CSSOM API.
-            return;
-        }
-        AtomString family = SystemFontDatabase::singleton().systemFontShorthandFamily(CSSPropertyParserHelpers::lowerFontShorthand(valueID));
-        ASSERT(!family.isEmpty());
-        builderState.setFontDescriptionIsSpecifiedFont(false);
-        families = Vector<AtomString>::from(WTFMove(family));
-    } else {
-        auto valueList = requiredListDowncast<CSSValueList, CSSPrimitiveValue>(builderState, value);
-        if (!valueList)
-            return;
-
-        bool isFirstFont = true;
-        families = WTF::compactMap(*valueList, [&](auto& contentValue) -> std::optional<AtomString> {
-            AtomString family;
-            bool isGenericFamily = false;
-            if (contentValue.isFontFamily())
-                family = AtomString { contentValue.stringValue() };
-            else if (contentValue.valueID() == CSSValueWebkitBody)
-                family = AtomString { builderState.document().settings().standardFontFamily() };
-            else {
-                isGenericFamily = true;
-                family = CSSPropertyParserHelpers::genericFontFamily(contentValue.valueID());
-                ASSERT(!family.isEmpty());
-            }
-            if (family.isNull())
-                return std::nullopt;
-            if (isFirstFont) {
-                builderState.setFontDescriptionIsSpecifiedFont(!isGenericFamily);
-                isFirstFont = false;
-            }
-            return family;
-        });
-        if (families.isEmpty())
-            return;
-    }
-
-    builderState.setFontDescriptionFamilies(families);
+    builderState.setFontDescriptionFamilies(toStyleFromCSSValue<FontFamilies>(builderState, value));
 
     if (fontDescription.useFixedDefaultSize() != oldFamilyUsedFixedDefaultSize) {
         if (CSSValueID sizeIdentifier = fontDescription.keywordSizeAsIdentifier())

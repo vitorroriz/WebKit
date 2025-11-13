@@ -2538,6 +2538,13 @@ void RenderStyle::setFontOpticalSizing(FontOpticalSizing opticalSizing)
     setFontDescription(WTFMove(description));
 }
 
+void RenderStyle::setFontFamily(Style::FontFamilies&& families)
+{
+    auto description = fontDescription();
+    description.setFamilies(families.takePlatform());
+    setFontDescription(WTFMove(description));
+}
+
 void RenderStyle::setFontFeatureSettings(Style::FontFeatureSettings&& settings)
 {
     auto description = fontDescription();

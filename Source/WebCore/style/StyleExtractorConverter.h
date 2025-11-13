@@ -153,10 +153,6 @@ public:
     static Ref<CSSValue> convertSingleWebkitMaskComposite(ExtractorState&, CompositeOperator);
     static Ref<CSSValue> convertSingleMaskMode(ExtractorState&, MaskMode);
     static Ref<CSSValue> convertSingleWebkitMaskSourceType(ExtractorState&, MaskMode);
-
-    // MARK: Font conversions
-
-    static Ref<CSSValue> convertFontFamily(ExtractorState&, const AtomString&);
 };
 
 // MARK: - Strong value conversions
@@ -657,35 +653,6 @@ inline Ref<CSSValue> ExtractorConverter::convertSingleWebkitMaskSourceType(Extra
     }
     ASSERT_NOT_REACHED();
     return CSSPrimitiveValue::create(CSSValueAlpha);
-}
-
-// MARK: - Font conversions
-
-inline Ref<CSSValue> ExtractorConverter::convertFontFamily(ExtractorState& state, const AtomString& family)
-{
-    auto identifierForFamily = [](const auto& family) {
-        if (family == cursiveFamily)
-            return CSSValueCursive;
-        if (family == fantasyFamily)
-            return CSSValueFantasy;
-        if (family == monospaceFamily)
-            return CSSValueMonospace;
-        if (family == mathFamily)
-            return CSSValueMath;
-        if (family == pictographFamily)
-            return CSSValueWebkitPictograph;
-        if (family == sansSerifFamily)
-            return CSSValueSansSerif;
-        if (family == serifFamily)
-            return CSSValueSerif;
-        if (family == systemUiFamily)
-            return CSSValueSystemUi;
-        return CSSValueInvalid;
-    };
-
-    if (auto familyIdentifier = identifierForFamily(family))
-        return CSSPrimitiveValue::create(familyIdentifier);
-    return state.pool.createFontFamilyValue(family);
 }
 
 } // namespace Style

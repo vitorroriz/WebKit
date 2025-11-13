@@ -75,35 +75,16 @@ inline void BuilderState::setFontDescriptionFontSize(float fontSize)
     }
 }
 
-inline void BuilderState::setFontDescriptionFamilies(RefCountedFixedVector<AtomString>& families)
+inline void BuilderState::setFontDescriptionFamilies(FontFamilies&& families)
 {
-    if (m_style.fontDescription().families() == families)
+    if (m_style.fontDescription().families() == families.toPlatform() && m_style.fontDescription().isSpecifiedFont() == families.isSpecifiedFont())
         return;
 
     m_fontDirty = true;
     auto& fontCascade = m_style.mutableFontCascadeWithoutUpdate();
-    fontCascade.mutableFontDescription().setFamilies(families);
+    fontCascade.mutableFontDescription().setFamilies(families.takePlatform());
+    fontCascade.mutableFontDescription().setIsSpecifiedFont(families.isSpecifiedFont());
     fontCascade.updateUseBackslashAsYenSymbol();
-}
-
-inline void BuilderState::setFontDescriptionFamilies(Vector<AtomString>& families)
-{
-    if (m_style.fontDescription().families() == families)
-        return;
-
-    m_fontDirty = true;
-    auto& fontCascade = m_style.mutableFontCascadeWithoutUpdate();
-    fontCascade.mutableFontDescription().setFamilies(families);
-    fontCascade.updateUseBackslashAsYenSymbol();
-}
-
-inline void BuilderState::setFontDescriptionIsSpecifiedFont(bool isSpecifiedFont)
-{
-    if (m_style.fontDescription().isSpecifiedFont() == isSpecifiedFont)
-        return;
-
-    m_fontDirty = true;
-    m_style.mutableFontDescriptionWithoutUpdate().setIsSpecifiedFont(isSpecifiedFont);
 }
 
 inline void BuilderState::setFontDescriptionFeatureSettings(FontFeatureSettings&& featureSettings)
