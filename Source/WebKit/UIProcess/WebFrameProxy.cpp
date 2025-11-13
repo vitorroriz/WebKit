@@ -510,11 +510,11 @@ void WebFrameProxy::didCreateSubframe(WebCore::FrameIdentifier frameID, String&&
     child->m_parentFrame = *this;
     child->m_frameName = WTFMove(frameName);
     page->observeAndCreateRemoteSubframesInOtherProcesses(child, child->m_frameName);
-    m_childFrames.add(WTFMove(child));
+    m_childFrames.add(child.copyRef());
 
 #if ENABLE(WEBDRIVER_BIDI)
     if (RefPtr session = page->activeAutomationSession())
-        session->didCreateFrame(child.get());
+        session->didCreateFrame(child);
 #endif
 }
 
