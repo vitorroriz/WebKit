@@ -754,7 +754,10 @@ bool WebXRSession::isHandTrackingEnabled() const
 // https://immersive-web.github.io/hit-test/#dom-xrsession-requesthittestsource
 void WebXRSession::requestHitTestSource(const XRHitTestOptionsInit& init, RequestHitTestSourcePromise&& promise)
 {
-    // 3. If session’s ended value is true, throw an InvalidStateError and abort these steps.
+    if (!m_requestedFeatures.contains(PlatformXR::SessionFeature::HitTest)) {
+        promise.reject(Exception { ExceptionCode::NotSupportedError });
+        return;
+    }
     if (m_ended) {
         promise.reject(Exception { ExceptionCode::InvalidStateError, "The session was already ended"_s });
         return;
@@ -787,6 +790,10 @@ void WebXRSession::requestHitTestSource(const XRHitTestOptionsInit& init, Reques
 // https://immersive-web.github.io/hit-test/#dom-xrsession-requesthittestsourcefortransientinput
 void WebXRSession::requestHitTestSourceForTransientInput(const XRTransientInputHitTestOptionsInit& init, RequestHitTestSourceForTransientInputPromise&& promise)
 {
+    if (!m_requestedFeatures.contains(PlatformXR::SessionFeature::HitTest)) {
+        promise.reject(Exception { ExceptionCode::NotSupportedError });
+        return;
+    }
     if (m_ended) {
         promise.reject(Exception { ExceptionCode::InvalidStateError, "The session was already ended"_s });
         return;
