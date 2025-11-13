@@ -106,6 +106,7 @@ fast/forms/ios/inputmode-change-update-keyboard.html [ Skip ]
 # WebXR - Missing modules.
 imported/w3c/web-platform-tests/webxr/anchors [ Skip ]
 imported/w3c/web-platform-tests/webxr/ar-module [ Skip ]
+imported/w3c/web-platform-tests/webxr/camera-access [ Skip ]
 imported/w3c/web-platform-tests/webxr/depth-sensing [ Skip ]
 imported/w3c/web-platform-tests/webxr/dom-overlay [ Skip ]
 imported/w3c/web-platform-tests/webxr/gamepads-module [ Skip ]
@@ -144,6 +145,10 @@ fast/events/pointer/ios/drag-populates-pointer-events-with-movementxy-fields.htm
 fast/events/pointer/ios/tap-gives-pointerdown-pointerup.html [ Timeout ]
 
 webkit.org/b/275115 imported/w3c/web-platform-tests/webxr/getInputPose_pointer.https.html [ Skip ]
+
+webkit.org/b/302408 imported/w3c/web-platform-tests/webxr/xrSession_enabledFeatures.https.html [ Skip ]
+webkit.org/b/302410 imported/w3c/web-platform-tests/webxr/xrViewerPose_secondaryViews.https.html [ Skip ]
+webkit.org/b/302409 imported/w3c/web-platform-tests/webxr/xrView_visibility_mask_change.https.html [ Skip ]
 
 # webkit.org/b/288683 REGRESSION(291033@main): Broke visionOS layout tests
 interaction-region/guard-crash.html [ Failure ]

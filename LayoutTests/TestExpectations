@@ -5830,6 +5830,7 @@ webkit.org/b/222493 media/media-source/media-source-webm-vp8-malformed-header.ht
 # WebXR - Missing modules.
 imported/w3c/web-platform-tests/webxr/anchors [ Skip ]
 imported/w3c/web-platform-tests/webxr/ar-module [ Skip ]
+imported/w3c/web-platform-tests/webxr/camera-access [ Skip ]
 imported/w3c/web-platform-tests/webxr/depth-sensing [ Skip ]
 imported/w3c/web-platform-tests/webxr/dom-overlay [ Skip ]
 imported/w3c/web-platform-tests/webxr/gamepads-module [ Skip ]
@@ -5845,15 +5846,17 @@ webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/getInputPose_pointer.h
 webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/xrDevice_disconnect_ends.https.html [ Skip ]
 webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/xrFrame_getViewerPose_getPose_identities.https.html [ Skip ]
 webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/xr_viewport_scale.https.html [ Skip ]
+webkit.org/b/302408 imported/w3c/web-platform-tests/webxr/xrSession_enabledFeatures.https.html [ Skip ]
+webkit.org/b/302410 imported/w3c/web-platform-tests/webxr/xrViewerPose_secondaryViews.https.html
 
 # WebXR - Currently failing and needs more investigation.
 webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/exclusive_requestFrame_nolayer.https.html [ Skip ]
 webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/xrSession_requestReferenceSpace_features.https.html [ Skip ]
-webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/webxr_feature_policy.https.html [ Skip ]
 webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/xrDevice_requestSession_requiredFeatures_unknown.https.html [ Skip ]
 webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/xrSession_input_events_end.https.html [ Skip ]
 webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/xrWebGLLayer_framebuffer_draw.https.html [ Skip ]
 webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/xrWebGLLayer_framebuffer_scale.https.html [ Skip ]
+webkit.org/b/302409 imported/w3c/web-platform-tests/webxr/xrView_visibility_mask_change.https.html [ Skip ]
 
 # rdar://79306047
 webkit.org/b/227084 http/wpt/webxr/xrSession_ended_by_system.https.html [ Skip ]
