@@ -391,6 +391,11 @@ static void addParametersShared(const LocalFrame* frame, NetworkResourceLoadPara
 
     parameters.allowPrivacyProxy = policySourceDocumentLoader ? policySourceDocumentLoader->allowPrivacyProxy() : true;
 
+    if (RefPtr framePolicySourceDocumentLoader = frame->loader().loaderForWebsitePolicies(isMainFrameNavigation ? FrameLoader::CanIncludeCurrentDocumentLoader::No : FrameLoader::CanIncludeCurrentDocumentLoader::Yes)) {
+        if (String referrer = framePolicySourceDocumentLoader->preferences().overrideReferrerForAllRequests; !referrer.isNull())
+            parameters.request.setHTTPHeaderField(HTTPHeaderName::Referer, referrer);
+    }
+
     if (auto* document = frame->document()) {
         parameters.crossOriginEmbedderPolicy = document->crossOriginEmbedderPolicy();
         parameters.isClearSiteDataHeaderEnabled = document->settings().clearSiteDataHTTPHeaderEnabled();
@@ -402,8 +407,6 @@ static void addParametersShared(const LocalFrame* frame, NetworkResourceLoadPara
         page->logMediaDiagnosticMessage(parameters.request.httpBody());
 
         if (RefPtr webPage = WebPage::fromCorePage(*page)) {
-            if (!webPage->overrideReferrerForAllRequests().isNull())
-                parameters.request.setHTTPHeaderField(HTTPHeaderName::Referer, webPage->overrideReferrerForAllRequests());
 #if ENABLE(WK_WEB_EXTENSIONS) && PLATFORM(COCOA)
             if (RefPtr extensionControllerProxy = webPage->webExtensionControllerProxy())
                 parameters.pageHasLoadedWebExtensions = extensionControllerProxy->hasLoadedContexts();

@@ -417,11 +417,8 @@ public:
     void setInlineMediaPlaybackPolicy(InlineMediaPlaybackPolicy policy) { m_inlineMediaPlaybackPolicy = policy; }
 
     struct WebpagePreferences {
-        WEBCORE_EXPORT WebpagePreferences();
-        WEBCORE_EXPORT ~WebpagePreferences();
-        WebpagePreferences& operator=(WebpagePreferences&&);
-
         RefPtr<UserContentProvider> userContentProvider;
+        String overrideReferrerForAllRequests;
     };
     const WebpagePreferences& preferences() const { return m_preferences; }
     WEBCORE_EXPORT void setPreferences(WebpagePreferences&&);

@@ -505,6 +505,16 @@ static _WKWebsiteDeviceOrientationAndMotionAccessPolicy toWKWebsiteDeviceOrienta
     }
 }
 
+- (void)_setOverrideReferrerForAllRequests:(NSString *)referrer
+{
+    _websitePolicies->setOverrideReferrerForAllRequests(referrer);
+}
+
+- (NSString *)_overrideReferrerForAllRequests
+{
+    return _websitePolicies->overrideReferrerForAllRequests().createNSString().autorelease();
+}
+
 ALLOW_DEPRECATED_IMPLEMENTATIONS_BEGIN
 - (void)_setEnhancedSecurityEnabled:(BOOL)enhancedSecurityEnabled
 {

@@ -378,9 +378,6 @@ public:
     bool allowUniversalAccessFromFileURLs() const { return m_data.allowUniversalAccessFromFileURLs; }
     void setAllowUniversalAccessFromFileURLs(bool allow) { m_data.allowUniversalAccessFromFileURLs = allow; }
 
-    void setOverrideReferrerForAllRequests(WTF::String&& referrer) { m_data.overrideReferrerForAllRequests = WTFMove(referrer); }
-    const WTF::String& overrideReferrerForAllRequests() const { return m_data.overrideReferrerForAllRequests; }
-
     bool allowTopNavigationToDataURLs() const { return m_data.allowTopNavigationToDataURLs; }
     void setAllowTopNavigationToDataURLs(bool allow) { m_data.allowTopNavigationToDataURLs = allow; }
 
@@ -624,7 +621,6 @@ private:
 #endif
         WTF::String groupIdentifier;
         WTF::String mediaContentTypesRequiringHardwareSupport;
-        WTF::String overrideReferrerForAllRequests;
         std::optional<WTF::String> applicationNameForUserAgent;
         double sampledPageTopColorMaxDifference { DEFAULT_VALUE_FOR_SampledPageTopColorMaxDifference };
         double sampledPageTopColorMinHeight { DEFAULT_VALUE_FOR_SampledPageTopColorMinHeight };
