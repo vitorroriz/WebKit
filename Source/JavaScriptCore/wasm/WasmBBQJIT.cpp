@@ -3442,6 +3442,7 @@ B3::ValueRep BBQJIT::toB3Rep(Location location)
     return B3::ValueRep();
 }
 
+// This needs to be kept in sync with WasmIPIntSlowPaths.cpp buildEntryBufferForLoopOSR and OMGIRGenerator::addLoop.
 StackMap BBQJIT::makeStackMap(const ControlData& data, Stack& enclosingStack)
 {
     unsigned numElements = m_locals.size() + data.enclosedHeight() + data.argumentLocations().size();

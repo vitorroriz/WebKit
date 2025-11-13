@@ -903,7 +903,7 @@ private:
     void reloadMemoryRegistersFromInstance(const MemoryInformation&, Value* instance, BasicBlock*);
 
     Value* loadFromScratchBuffer(unsigned& indexInBuffer, Value* pointer, B3::Type);
-    void connectValuesAtEntrypoint(unsigned& indexInBuffer, Value* pointer, Stack& expressionStack, Variable* exceptionVariable);
+    void connectValuesAtEntrypoint(unsigned& indexInBuffer, Value* pointer, Stack& expressionStack);
     Value* emitCatchImpl(CatchKind, ControlType&, unsigned exceptionIndex = 0);
     void emitCatchTableImpl(ControlData& entryData, const ControlData::TryTableTarget&);
     RefPtr<PatchpointExceptionHandle> preparePatchpointForExceptions(BasicBlock*, PatchpointValue*);
@@ -4816,17 +4816,13 @@ Value* OMGIRGenerator::loadFromScratchBuffer(unsigned& indexInBuffer, Value* poi
     return m_currentBlock->appendNew<MemoryValue>(m_proc, Load, type, origin(), pointer, offset);
 }
 
-void OMGIRGenerator::connectValuesAtEntrypoint(unsigned& indexInBuffer, Value* pointer, Stack& expressionStack, Variable* exceptionVariable)
+void OMGIRGenerator::connectValuesAtEntrypoint(unsigned& indexInBuffer, Value* pointer, Stack& expressionStack)
 {
     TRACE_CF("Connect values at entrypoint");
     for (unsigned i = 0; i < expressionStack.size(); i++) {
         TypedExpression value = expressionStack[i];
         Value* load = loadFromScratchBuffer(indexInBuffer, pointer, value->type());
         m_currentBlock->appendNew<VariableValue>(m_proc, Set, origin(), value.value(), load);
-    }
-    if (!Options::useWasmIPInt() && exceptionVariable) {
-        Value* load = loadFromScratchBuffer(indexInBuffer, pointer, pointerType());
-        m_currentBlock->appendNew<VariableValue>(m_proc, Set, origin(), exceptionVariable, load);
     }
 };
 
@@ -4851,6 +4847,7 @@ auto OMGIRGenerator::addLoop(BlockSignature signature, Stack& enclosingStack, Co
 
     m_currentBlock->appendNewControlValue(m_proc, Jump, origin(), body);
     if (loopIndex == m_loopIndexForOSREntry) {
+        // This must be kept in sync with BBQJIT::makeStackMap.
         dataLogLnIf(WasmOMGIRGeneratorInternal::verbose, "Setting up for OSR entry");
 
         m_currentBlock = m_rootBlocks[0].block;
@@ -4861,25 +4858,21 @@ auto OMGIRGenerator::addLoop(BlockSignature signature, Stack& enclosingStack, Co
         for (auto& local : m_locals)
             m_currentBlock->appendNew<VariableValue>(m_proc, Set, Origin(), local, loadFromScratchBuffer(indexInBuffer, pointer, local->type()));
 
-        if (Options::useWasmIPInt()) {
-            for (unsigned controlIndex = 0; controlIndex < m_parser->controlStack().size(); ++controlIndex) {
-                auto& data = m_parser->controlStack()[controlIndex].controlData;
-                if (ControlType::isAnyCatch(data)) {
-                    auto* load = loadFromScratchBuffer(indexInBuffer, pointer, pointerType());
-                    m_currentBlock->appendNew<VariableValue>(m_proc, Set, origin(), data.exception(), load);
-                } else if (ControlType::isTry(data))
-                    ++indexInBuffer;
-            }
+        for (unsigned controlIndex = 0; controlIndex < m_parser->controlStack().size(); ++controlIndex) {
+            auto& data = m_parser->controlStack()[controlIndex].controlData;
+            if (ControlType::isAnyCatch(data)) {
+                auto* load = loadFromScratchBuffer(indexInBuffer, pointer, pointerType());
+                m_currentBlock->appendNew<VariableValue>(m_proc, Set, origin(), data.exception(), load);
+            } else if (ControlType::isTry(data))
+                ++indexInBuffer;
         }
 
         for (unsigned controlIndex = 0; controlIndex < m_parser->controlStack().size(); ++controlIndex) {
-            auto& data = m_parser->controlStack()[controlIndex].controlData;
             auto& expressionStack = m_parser->controlStack()[controlIndex].enclosedExpressionStack;
-            ASSERT(&data != &block);
-            Variable* exceptionVariable = ControlType::isAnyCatch(data) ? data.exception() : nullptr;
-            connectValuesAtEntrypoint(indexInBuffer, pointer, expressionStack, exceptionVariable);
+            ASSERT(&m_parser->controlStack()[controlIndex].controlData != &block);
+            connectValuesAtEntrypoint(indexInBuffer, pointer, expressionStack);
         }
-        connectValuesAtEntrypoint(indexInBuffer, pointer, enclosingStack, nullptr);
+        connectValuesAtEntrypoint(indexInBuffer, pointer, enclosingStack);
         // The loop's stack can be read by the loop body, so the restored values should join using the loop-back phi nodes.
         for (unsigned i = 0; i < newStack.size(); i++) {
             auto* load = loadFromScratchBuffer(indexInBuffer, pointer, newStack[i]->type());
@@ -5069,15 +5062,16 @@ void OMGIRGenerator::connectValuesForCatchEntrypoint(ControlData& catchData, Val
         for (unsigned controlIndex = 0; controlIndex < currentFrame->m_parser->controlStack().size(); ++controlIndex) {
             auto& controlData = currentFrame->m_parser->controlStack()[controlIndex].controlData;
             auto& expressionStack = currentFrame->m_parser->controlStack()[controlIndex].enclosedExpressionStack;
-            Variable* exceptionVariable = nullptr;
-            if (ControlType::isAnyCatch(controlData) && &controlData != &catchData)
-                exceptionVariable = controlData.exception();
-            connectValuesAtEntrypoint(indexInBuffer, pointer, expressionStack, exceptionVariable);
+            connectValuesAtEntrypoint(indexInBuffer, pointer, expressionStack);
+            if (ControlType::isAnyCatch(controlData) && &controlData != &catchData) {
+                auto* load = loadFromScratchBuffer(indexInBuffer, pointer, pointerType());
+                m_currentBlock->appendNew<VariableValue>(m_proc, Set, origin(), controlData.exception(), load);
+            }
         }
         // inlineParent frames only
         if (currentFrame != this) {
             auto& topExpressionStack = currentFrame->m_parser->expressionStack();
-            connectValuesAtEntrypoint(indexInBuffer, pointer, topExpressionStack, nullptr);
+            connectValuesAtEntrypoint(indexInBuffer, pointer, topExpressionStack);
         }
     }
 }
