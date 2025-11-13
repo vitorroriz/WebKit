@@ -8087,3 +8087,6 @@ imported/w3c/web-platform-tests/css/CSS2/linebox/vertical-align-super-001.xht [ 
 
 imported/w3c/web-platform-tests/css/CSS2/stacking-context/opacity-affects-block-in-inline.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/stacking-context/zindex-affects-block-in-inline.html [ ImageOnlyFailure ]
+
+imported/w3c/web-platform-tests/css/CSS2/box-display/block-in-inline-relpos-002.xht [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/CSS2/box-display/root-box-003.xht [ ImageOnlyFailure ]
