@@ -264,8 +264,6 @@ public:
 
     bool needsMozillaFileTypeForDataTransfer() const;
 
-    bool needsBingGestureEventQuirk(EventTarget*) const;
-
     WEBCORE_EXPORT bool shouldAvoidStartingSelectionOnMouseDownOverPointerCursor(const Node&) const;
 
     bool shouldReuseLiveRangeForSelectionUpdate() const;

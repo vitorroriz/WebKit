@@ -1840,23 +1840,6 @@ bool Quirks::needsMozillaFileTypeForDataTransfer() const
     return needsQuirks() && m_quirksData.needsMozillaFileTypeForDataTransferQuirk;
 }
 
-// bing.com rdar://126573838
-bool Quirks::needsBingGestureEventQuirk(EventTarget* target) const
-{
-    if (!needsQuirks())
-        return false;
-
-    if (!m_quirksData.needsBingGestureEventQuirk)
-        return false;
-
-    if (RefPtr element = dynamicDowncast<Element>(target)) {
-        static MainThreadNeverDestroyed<const AtomString> mapClass("atlas-map-canvas"_s);
-        return element->hasClassName(mapClass.get());
-    }
-
-    return false;
-}
-
 // spotify.com rdar://140707449
 bool Quirks::shouldAvoidStartingSelectionOnMouseDownOverPointerCursor(const Node& target) const
 {
@@ -2662,18 +2645,14 @@ static void handleBankOfAmericaQuirks(QuirksData& quirksData, const URL& quirksU
     quirksData.maybeBypassBackForwardCache = true;
 }
 
-static void handleBingQuirks(QuirksData& quirksData, const URL& quirksURL, const String& quirksDomainString, const URL& documentURL)
+static void handleBingQuirks(QuirksData& quirksData, const URL&, const String& quirksDomainString, const URL&)
 {
     if (quirksDomainString != "bing.com"_s)
         return;
 
-    UNUSED_PARAM(documentURL);
     quirksData.isBing = true;
     // bing.com rdar://133223599
     quirksData.maybeBypassBackForwardCache = true;
-    // bing.com rdar://126573838
-    auto topDocumentHost = quirksURL.host();
-    quirksData.needsBingGestureEventQuirk = topDocumentHost == "www.bing.com"_s && startsWithLettersIgnoringASCIICase(quirksURL.path(), "/maps"_s);
     quirksData.needsMediaRewriteRangeRequestQuirk = true;
 }
 

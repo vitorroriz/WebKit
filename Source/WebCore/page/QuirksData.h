@@ -54,7 +54,6 @@ struct WEBCORE_EXPORT QuirksData {
     bool implicitMuteWhenVolumeSetToZero : 1 { false };
     bool inputMethodUsesCorrectKeyEventOrder : 1 { false };
     bool maybeBypassBackForwardCache : 1 { false };
-    bool needsBingGestureEventQuirk : 1 { false };
     bool needsBodyScrollbarWidthNoneDisabledQuirk : 1 { false };
     bool needsCanPlayAfterSeekedQuirk : 1 { false };
     bool needsChromeMediaControlsPseudoElementQuirk : 1 { false };
