@@ -257,7 +257,7 @@ public:
             gst_sample_set_caps(sample.get(), writableCaps.get());
         }
 
-        auto gstVideoFrame = VideoFrameGStreamer::create(WTFMove(sample), options, colorSpace.value_or({ }));
+        auto gstVideoFrame = VideoFrameGStreamer::create(WTFMove(sample), options, colorSpace.value_or(PlatformVideoColorSpace { }));
         m_size = gstVideoFrame->presentationSize();
         WebCore::VideoEncoder::RawFrame rawFrame { WTFMove(gstVideoFrame), frame.render_time_ms(), { } };
         m_internalEncoder->encode(WTFMove(rawFrame), shouldGenerateKeyFrame);
