@@ -128,8 +128,7 @@ StringImpl::~StringImpl()
             AtomStringImpl::remove(static_cast<AtomStringImpl*>(this));
     } else if (isSymbol()) {
         auto& symbol = static_cast<SymbolImpl&>(*this);
-        auto* symbolRegistry = symbol.symbolRegistry();
-        if (symbolRegistry)
+        if (CheckedPtr symbolRegistry = symbol.symbolRegistry())
             SUPPRESS_UNCOUNTED_ARG symbolRegistry->remove(*symbol.asRegisteredSymbolImpl());
     }
 

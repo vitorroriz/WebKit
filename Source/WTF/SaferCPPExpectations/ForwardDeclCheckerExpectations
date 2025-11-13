@@ -1,4 +1,3 @@
-usr/local/include/wtf/text/SymbolImpl.h
 usr/local/include/wtf/unicode/Collator.h
 wtf/ParkingLot.h
 wtf/PrintStream.h

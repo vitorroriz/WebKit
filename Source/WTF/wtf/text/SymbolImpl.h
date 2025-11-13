@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <wtf/CheckedPtr.h>
+#include <wtf/text/SymbolRegistry.h>
 #include <wtf/text/UniquedStringImpl.h>
 
 namespace WTF {
@@ -151,7 +153,7 @@ private:
     friend class SymbolImpl;
     friend class SymbolRegistry;
 
-    SymbolRegistry* symbolRegistry() const { return m_symbolRegistry; }
+    SymbolRegistry* symbolRegistry() const { return m_symbolRegistry.get(); }
     void clearSymbolRegistry() { m_symbolRegistry = nullptr; }
 
     static Ref<RegisteredSymbolImpl> create(StringImpl& rep, SymbolRegistry&);
@@ -169,7 +171,7 @@ private:
     {
     }
 
-    SymbolRegistry* m_symbolRegistry;
+    CheckedPtr<SymbolRegistry> m_symbolRegistry;
 };
 
 inline unsigned StringImpl::symbolAwareHash() const
