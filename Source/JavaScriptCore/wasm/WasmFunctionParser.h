@@ -175,12 +175,16 @@ public:
             m_localInitFlags.quickSet(index);
         }
     }
+
     uint32_t getLocalInitStackHeight() const { return m_localInitStack.size(); }
+
     void resetLocalInitStackToHeight(uint32_t height)
     {
-        for (uint32_t i = height; i < m_localInitStack.size(); i++)
+        uint32_t limit = m_localInitStack.size();
+        for (uint32_t i = height; i < limit; ++i)
             m_localInitFlags.quickClear(m_localInitStack.takeLast());
     };
+
     bool localIsInitialized(uint32_t localIndex) { return m_localInitFlags.quickGet(localIndex); }
 
     uint32_t getStackHeightInValues() const
