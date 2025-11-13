@@ -4978,7 +4978,7 @@ IGNORE_WARNINGS_END
     initialized = YES;
 
     if (WTF::CocoaApplication::shouldOSFaultLogForAppleApplicationUsingWebKit1())
-        os_fault_with_payload(OS_REASON_WEBKIT, 0, nullptr, 0, "WebView initialized", 0);
+        RELEASE_LOG_FAULT_WITH_PAYLOAD(Threading, "WebView initialized");
 
     WebCore::initializeMainThreadIfNeeded();
 
