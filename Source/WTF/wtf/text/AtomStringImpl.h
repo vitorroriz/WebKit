@@ -162,6 +162,9 @@ template<> struct ValueCheck<const AtomStringImpl*> {
 
 #endif // ASSERT_ENABLED
 
+inline void printInternal(PrintStream& out, const AtomStringImpl* value) { printInternal(out, std::bit_cast<const StringImpl*>(value)); }
+inline void printInternal(PrintStream& out, AtomStringImpl* value) { printInternal(out, static_cast<const AtomStringImpl*>(value)); }
+
 } // namespace WTF
 
 SPECIALIZE_TYPE_TRAITS_BEGIN(WTF::AtomStringImpl) \
