@@ -172,6 +172,7 @@
 #include "MockLibWebRTCPeerConnection.h"
 #include "MockPageOverlay.h"
 #include "MockPageOverlayClient.h"
+#include "Navigation.h"
 #include "NavigatorBeacon.h"
 #include "NavigatorMediaDevices.h"
 #include "NetworkLoadInformation.h"
@@ -7293,6 +7294,18 @@ bool Internals::hasSandboxUnixSyscallAccess(const String& process, unsigned sysc
 String Internals::windowLocationHost(DOMWindow& window)
 {
     return window.location().host();
+}
+
+void Internals::setNavigationRateLimiterParameters(DOMWindow& window, unsigned maxNavigations, double windowDurationSeconds)
+{
+    if (RefPtr localWindow = dynamicDowncast<LocalDOMWindow>(window))
+        localWindow->navigation().rateLimiterForTesting().setParametersForTesting(maxNavigations, Seconds(windowDurationSeconds));
+}
+
+void Internals::resetNavigationRateLimiter(DOMWindow& window)
+{
+    if (RefPtr localWindow = dynamicDowncast<LocalDOMWindow>(window))
+        localWindow->navigation().rateLimiterForTesting().resetForTesting();
 }
 
 ExceptionOr<String> Internals::systemColorForCSSValue(const String& cssValue, bool useDarkModeAppearance, bool useElevatedUserInterfaceLevel)
