@@ -107,6 +107,114 @@ TEST(WTF_StringCommon, FindIgnoringASCIICaseWithoutLengthIdentical)
     EXPECT_EQ(WTF::findIgnoringASCIICaseWithoutLength("needley", "needle"), 0UL);
 }
 
+TEST(WTF_StringCommon, Equal)
+{
+    EXPECT_TRUE(WTF::equal(unsafeSpanChar8("Water🍉Melon"), unsafeSpanChar8("Water🍉Melon")));
+    EXPECT_FALSE(WTF::equal(unsafeSpanChar8("Water🍉Melon"), unsafeSpanChar8("🍉WaterMelon🍉")));
+    // EXPECT_TRUE(WTF::equal("test"_spanChar8, "test"_span8)); // This should not compile.
+    String string(unsafeSpanChar8("Water🍉Melon"));
+    EXPECT_FALSE(string.is8Bit());
+    EXPECT_TRUE(WTF::equal(string, unsafeSpanChar8("Water🍉Melon")));
+    EXPECT_FALSE(WTF::equal(string, unsafeSpanChar8("🍉WaterMelon🍉")));
+}
+
+TEST(WTF_StringCommon, EqualIgnoringASCIICase)
+{
+    EXPECT_TRUE(WTF::equalIgnoringASCIICase("Test"_spanChar8, "test"_spanChar8));
+    EXPECT_FALSE(WTF::equalIgnoringASCIICase("another test"_spanChar8, "test"_spanChar8));
+    // EXPECT_TRUE(WTF::equalIgnoringASCIICase("test"_spanChar8, "test"_span8)); // This should not compile.
+}
+
+TEST(WTF_StringCommon, StartsWith)
+{
+    EXPECT_TRUE(WTF::startsWith(unsafeSpanChar8("Water🍉Melon"), "Water"_s));
+    EXPECT_FALSE(WTF::startsWith(unsafeSpanChar8("Water🍉Melon"), "water"_s));
+    EXPECT_FALSE(WTF::startsWith(unsafeSpanChar8("🍉WaterMelon🍉"), "Water"_s));
+    EXPECT_TRUE(WTF::startsWith(unsafeSpanChar8("🍉WaterMelon🍉"), unsafeSpanChar8("🍉")));
+    EXPECT_FALSE(WTF::startsWith(unsafeSpanChar8("Water🍉Melon"), unsafeSpanChar8("🍉")));
+    // EXPECT_TRUE(WTF::startsWith("test"_spanChar8, "test"_span8)); // This should not compile.
+}
+
+TEST(WTF_StringCommon, EndsWith)
+{
+    EXPECT_TRUE(WTF::endsWith(unsafeSpanChar8("Water🍉Melon"), "Melon"_s));
+    EXPECT_FALSE(WTF::endsWith(unsafeSpanChar8("Water🍉Melon"), "melon"_s));
+    EXPECT_FALSE(WTF::endsWith(unsafeSpanChar8("🍉WaterMelon🍉"), "Melon"_s));
+    EXPECT_TRUE(WTF::endsWith(unsafeSpanChar8("🍉WaterMelon🍉"), unsafeSpanChar8("🍉")));
+    EXPECT_FALSE(WTF::endsWith(unsafeSpanChar8("Water🍉Melon"), unsafeSpanChar8("🍉")));
+    // EXPECT_TRUE(WTF::endsWith("test"_spanChar8, "test"_span8)); // This should not compile.
+}
+
+TEST(WTF_StringCommon, Find)
+{
+    EXPECT_EQ(WTF::find(unsafeSpanChar8("Water🍉Melon"), "ter"_s), 2UZ);
+    EXPECT_EQ(WTF::find(unsafeSpanChar8("🍉WaterMelon🍉"), "ter"_s), 6UZ);
+    EXPECT_EQ(WTF::find(unsafeSpanChar8("Water🍉Melon"), unsafeSpanChar8("🍉")), 5UZ);
+    EXPECT_EQ(WTF::find(unsafeSpanChar8("🍉WaterMelon🍉"), unsafeSpanChar8("🍉")), 0UZ);
+    // EXPECT_NEQ(WTF::find("test"_spanChar8, "test"_span8), notFound); // This should not compile.
+}
+
+TEST(WTF_StringCommon, ReverseFind)
+{
+    EXPECT_EQ(WTF::reverseFind(unsafeSpanChar8("Water🍉Melon"), "ter"_s), 2UZ);
+    EXPECT_EQ(WTF::reverseFind(unsafeSpanChar8("🍉WaterMelon🍉"), "ter"_s), 6UZ);
+    EXPECT_EQ(WTF::reverseFind(unsafeSpanChar8("Water🍉Melon"), unsafeSpanChar8("🍉")), 5UZ);
+    EXPECT_EQ(WTF::reverseFind(unsafeSpanChar8("🍉WaterMelon🍉"), unsafeSpanChar8("🍉")), 14UZ);
+    // EXPECT_NEQ(WTF::reverseFind("test"_spanChar8, "test"_span8), notFound); // This should not compile.
+}
+
+TEST(WTF_StringCommon, Contains)
+{
+    EXPECT_TRUE(WTF::contains(unsafeSpanChar8("Water🍉Melon"), "Water"_s));
+    EXPECT_TRUE(WTF::contains(unsafeSpanChar8("🍉WaterMelon🍉"), "Water"_s));
+    EXPECT_TRUE(WTF::contains(unsafeSpanChar8("Water🍉Melon"), unsafeSpanChar8("🍉")));
+    EXPECT_TRUE(WTF::contains(unsafeSpanChar8("🍉WaterMelon🍉"), unsafeSpanChar8("🍉")));
+    EXPECT_FALSE(WTF::contains(unsafeSpanChar8("Water🍉Melon"), "pear"_s));
+    EXPECT_FALSE(WTF::contains(unsafeSpanChar8("🍉WaterMelon🍉"), "pear"_s));
+    EXPECT_FALSE(WTF::contains(unsafeSpanChar8("Water🍉Melon"), unsafeSpanChar8("🍈")));
+    EXPECT_FALSE(WTF::contains(unsafeSpanChar8("🍉WaterMelon🍉"), unsafeSpanChar8("🍈")));
+    // EXPECT_TRUE(WTF::contains("test"_spanChar8, "test"_span8)); // This should not compile.
+}
+
+TEST(WTF_StringCommon, StartsWithLettersIgnoringASCIICase)
+{
+    EXPECT_TRUE(WTF::startsWithLettersIgnoringASCIICase(unsafeSpanChar8("Water🍉Melon"), "water"_s));
+    EXPECT_FALSE(WTF::startsWithLettersIgnoringASCIICase(unsafeSpanChar8("🍉WaterMelon🍉"), "water"_s));
+    // EXPECT_TRUE(WTF::startsWithLettersIgnoringASCIICase("test"_spanChar8, "test"_span8)); // This should not compile.
+}
+
+TEST(WTF_StringCommon, EndsWithLettersIgnoringASCIICase)
+{
+    EXPECT_TRUE(WTF::endsWithLettersIgnoringASCIICase(unsafeSpanChar8("Water🍉Melon"), "melon"_s));
+    EXPECT_FALSE(WTF::endsWithLettersIgnoringASCIICase(unsafeSpanChar8("🍉WaterMelon🍉"), "melon"_s));
+    // EXPECT_TRUE(WTF::endsWithLettersIgnoringASCIICase("test"_spanChar8, "test"_span8)); // This should not compile.
+}
+
+TEST(WTF_StringCommon, FindIgnoringASCIICase)
+{
+    EXPECT_EQ(WTF::findIgnoringASCIICase(unsafeSpanChar8("Water🍉Melon"), "water"_s), 0UZ);
+    EXPECT_EQ(WTF::findIgnoringASCIICase(unsafeSpanChar8("🍉WaterMelon🍉"), "water"_s), 4UZ);
+    EXPECT_EQ(WTF::findIgnoringASCIICase(unsafeSpanChar8("Water🍉Melon"), unsafeSpanChar8("🍉")), 5UZ);
+    EXPECT_EQ(WTF::findIgnoringASCIICase(unsafeSpanChar8("🍉WaterMelon🍉"), unsafeSpanChar8("🍉")), 0UZ);
+    // EXPECT_NEQ(WTF::findIgnoringASCIICase("test"_spanChar8, "test"_span8), notFound); // This should not compile.
+}
+
+TEST(WTF_StringCommon, ContainsIgnoringASCIICase)
+{
+    EXPECT_TRUE(WTF::containsIgnoringASCIICase(unsafeSpanChar8("Water🍉Melon"), "melon"_s));
+    EXPECT_TRUE(WTF::containsIgnoringASCIICase(unsafeSpanChar8("🍉WaterMelon🍉"), "melon"_s));
+    EXPECT_TRUE(WTF::containsIgnoringASCIICase(unsafeSpanChar8("Water🍉Melon"), unsafeSpanChar8("🍉")));
+    EXPECT_TRUE(WTF::containsIgnoringASCIICase(unsafeSpanChar8("🍉WaterMelon🍉"), unsafeSpanChar8("🍉")));
+    // EXPECT_TRUE(WTF::containsIgnoringASCIICase("test"_spanChar8, "test"_span8)); // This should not compile.
+}
+
+TEST(WTF_StringCommon, CharactersAreAllASCII)
+{
+    EXPECT_TRUE(WTF::charactersAreAllASCII("Test"_spanChar8));
+    EXPECT_TRUE(WTF::charactersAreAllASCII(std::span<const char8_t>()));
+    EXPECT_FALSE(WTF::charactersAreAllASCII(unsafeSpanChar8("🍉")));
+}
+
 TEST(WTF_StringCommon, CopyElements64To8)
 {
     Vector<uint8_t> destination;

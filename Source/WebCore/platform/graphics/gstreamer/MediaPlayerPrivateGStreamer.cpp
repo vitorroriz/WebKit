@@ -2271,7 +2271,7 @@ void MediaPlayerPrivateGStreamer::handleMessage(GstMessage* message)
         if (gst_structure_has_name(structure, "http-headers")) {
             GST_DEBUG_OBJECT(pipeline(), "Processing HTTP headers: %" GST_PTR_FORMAT, structure);
             if (auto uri = gstStructureGetString(structure, "uri"_s)) {
-                URL url { uri.toString() };
+                URL url { uri.span() };
 
                 if (url != m_url) {
                     GST_DEBUG_OBJECT(pipeline(), "Ignoring HTTP response headers for non-main URI.");
@@ -2296,7 +2296,7 @@ void MediaPlayerPrivateGStreamer::handleMessage(GstMessage* message)
                     // handle it here, until we remove the webkit+ protocol
                     // prefix from webkitwebsrc.
                     if (auto contentLengthValue = gstStructureGetString(responseHeaders.get(), contentLengthHeaderName)) {
-                        if (auto parsedContentLength = parseInteger<uint64_t>(contentLengthValue.toString()))
+                        if (auto parsedContentLength = parseInteger<uint64_t>(contentLengthValue.span()))
                             contentLength = *parsedContentLength;
                     }
                 } else
@@ -3084,9 +3084,8 @@ bool MediaPlayerPrivateGStreamer::loadNextLocation()
         // Found a candidate. new-location is not always an absolute url
         // though. We need to take the base of the current url and
         // append the value of new-location to it.
-        auto locationString = newLocation.toString();
-        URL baseURL = gst_uri_is_valid(locationString.utf8().data()) ? URL() : m_url;
-        URL newURL = URL(baseURL, WTFMove(locationString));
+        URL baseURL = gst_uri_is_valid(newLocation.utf8()) ? URL() : m_url;
+        URL newURL = URL(baseURL, newLocation.span());
 
         GUniqueOutPtr<gchar> playbinURLStr;
         g_object_get(m_pipeline.get(), "current-uri", &playbinURLStr.outPtr(), nullptr);

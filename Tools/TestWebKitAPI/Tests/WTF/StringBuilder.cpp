@@ -119,6 +119,12 @@ TEST(StringBuilderTest, Append)
         const char16_t resultArray[] = { U16_LEAD(frakturAChar), U16_TRAIL(frakturAChar), U16_LEAD(frakturAChar), U16_TRAIL(frakturAChar) };
         EXPECT_EQ(String({ resultArray, std::size(resultArray) }), builderContent(builder));
     }
+
+    {
+        StringBuilder builder;
+        builder.append(unsafeSpanChar8("Water🍉Melon"));
+        EXPECT_EQ(builder.toString(), unsafeSpanChar8("Water🍉Melon"));
+    }
 }
 
 TEST(StringBuilderTest, AppendIntMin)

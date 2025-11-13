@@ -96,14 +96,14 @@ static GType videoEncoderLatencyModeGetType()
     return latencyModeGType;
 }
 
-static ASCIILiteral annexBStreamFormatCapsFieldValue(StringView name)
+static ASCIILiteral annexBStreamFormatCapsFieldValue(CStringView name)
 {
     static HashMap<String, ASCIILiteral> map = {
         { "video/x-h264"_s, "byte-stream"_s },
         { "video/x-h265"_s, "byte-stream"_s },
         { "video/x-av1"_s, "annexb"_s }
     };
-    return map.get(name.toStringWithoutCopying());
+    return map.get(name.span());
 }
 
 using SetBitrateFunc = Function<void(GObject* encoder, ASCIILiteral propertyName, int bitrate)>;
@@ -389,7 +389,7 @@ static bool videoEncoderSetEncoder(WebKitVideoEncoder* self, EncoderId encoderId
         GST_DEBUG_OBJECT(self, "Enabling AnnexB stream format");
         auto structure = gst_caps_get_structure(finalEncodedCaps.get(), 0);
         auto name = gstStructureGetName(structure);
-        auto value = annexBStreamFormatCapsFieldValue(name.toString());
+        auto value = annexBStreamFormatCapsFieldValue(name);
         if (!value.isNull() && gst_structure_has_field_typed(structure, "stream-format", G_TYPE_STRING))
             gst_structure_set(structure, "stream-format", G_TYPE_STRING, value.characters(), nullptr);
         else
@@ -705,11 +705,11 @@ static void webkit_video_encoder_class_init(WebKitVideoEncoderClass* klass)
             const auto& encodedCaps = self->priv->encodedCaps;
             if (!gst_caps_is_any(encodedCaps.get()) && !gst_caps_is_empty(encodedCaps.get())) [[likely]] {
                 auto structure = gst_caps_get_structure(encodedCaps.get(), 0);
-                auto profile = gstStructureGetString(structure, "profile"_s).toString();
+                auto profile = gstStructureGetString(structure, "profile"_s);
 
-                if (profile.findIgnoringASCIICase("high"_s) != notFound)
+                if (containsIgnoringASCIICase(profile.span(), "high"_s))
                     gst_preset_load_preset(GST_PRESET(self->priv->encoder.get()), "Profile High");
-                else if (profile.findIgnoringASCIICase("main"_s) != notFound)
+                else if (containsIgnoringASCIICase(profile.span(), "main"_s))
                     gst_preset_load_preset(GST_PRESET(self->priv->encoder.get()), "Profile Main");
             }
         }, "bitrate"_s, setBitrateKbitPerSec, "key-int-max"_s, [](GstElement* encoder, BitrateMode mode) {

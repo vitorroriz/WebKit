@@ -381,7 +381,7 @@ bool doCapsHaveType(const GstCaps* caps, ASCIILiteral type)
         GST_WARNING("Failed to get MediaType");
         return false;
     }
-    return mediaType.toString().startsWith(type);
+    return startsWith(mediaType.span(), type);
 }
 
 bool areEncryptedCaps(const GstCaps* caps)

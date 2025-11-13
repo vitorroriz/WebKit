@@ -170,7 +170,7 @@ static inline RTCRtpEncodingParameters toRTCEncodingParameters(const GstStructur
         parameters.maxFramerate = *maxFramerate;
 
     if (auto rid = gstStructureGetString(rtcParameters, "rid"_s))
-        parameters.rid = rid.toString();
+        parameters.rid = rid.span();
 
     if (auto scaleResolutionDownBy = gstStructureGet<double>(rtcParameters, "scale-resolution-down-by"_s))
         parameters.scaleResolutionDownBy = *scaleResolutionDownBy;
@@ -192,7 +192,7 @@ static inline RTCRtpCodecParameters toRTCCodecParameters(const GstStructure* rtc
         parameters.payloadType = *pt;
 
     if (auto mimeType = gstStructureGetString(rtcParameters, "mime-type"_s))
-        parameters.mimeType = mimeType.toString();
+        parameters.mimeType = mimeType.span();
 
     if (auto clockRate = gstStructureGet<unsigned>(rtcParameters, "clock-rate"_s))
         parameters.clockRate = *clockRate;
@@ -201,7 +201,7 @@ static inline RTCRtpCodecParameters toRTCCodecParameters(const GstStructure* rtc
         parameters.channels = *channels;
 
     if (auto fmtpLine = gstStructureGetString(rtcParameters, "fmtp-line"_s))
-        parameters.sdpFmtpLine = fmtpLine.toString();
+        parameters.sdpFmtpLine = fmtpLine.span();
 
     return parameters;
 }
@@ -213,7 +213,7 @@ RTCRtpSendParameters toRTCRtpSendParameters(const GstStructure* rtcParameters)
 
     RTCRtpSendParameters parameters;
     if (auto transactionId = gstStructureGetString(rtcParameters, "transaction-id"_s))
-        parameters.transactionId = transactionId.toString();
+        parameters.transactionId = transactionId.span();
 
     auto encodings = gstStructureGetList<const GstStructure*>(rtcParameters, "encodings"_s);
     parameters.encodings.reserveInitialCapacity(encodings.size());
@@ -619,7 +619,7 @@ GRefPtr<GstCaps> capsFromRtpCapabilities(const RTCRtpCapabilities& capabilities,
             gst_structure_set(codecStructure, "encoding-params", G_TYPE_STRING, makeString(*codec.channels).ascii().data(), nullptr);
 
         if (auto encodingName = gstStructureGetString(codecStructure, "encoding-name"_s)) {
-            if (auto payloadType = payloadTypeForEncodingName(encodingName.toString()))
+            if (auto payloadType = payloadTypeForEncodingName(encodingName.span()))
                 gst_structure_set(codecStructure, "payload", G_TYPE_INT, *payloadType, nullptr);
         }
 
@@ -692,8 +692,8 @@ GRefPtr<GstCaps> capsFromSDPMedia(const GstSDPMedia* media)
                 "a-sendonly", "a-recvonly", "a-end-of-candidates", nullptr);
 
             if (auto name = gstStructureGetString(structure, "encoding-name"_s)) {
-                auto encodingName = name.toString().convertToASCIIUppercase();
-                gst_structure_set(structure, "encoding-name", G_TYPE_STRING, encodingName.ascii().data(), nullptr);
+                auto encodingName = convertToASCIIUppercase(name.span());
+                gst_structure_set(structure, "encoding-name", G_TYPE_STRING, encodingName.data(), nullptr);
             }
 
             // Remove ssrc- attributes that end up being accumulated in fmtp SDP media parameters.
@@ -1018,19 +1018,18 @@ GRefPtr<GstCaps> extractMidAndRidFromRTPBuffer(const GstMappedRtpBuffer& buffer,
         auto s = gst_caps_get_structure(mediaCaps.get(), 0);
         for (int ii = 0; ii < gst_structure_n_fields(s); ii++) {
             auto name = CStringView::unsafeFromUTF8(gst_structure_nth_field_name(s, ii));
-            auto nameAsString = name.toString();
-            if (!nameAsString.startsWith("extmap-"_s))
+            if (!startsWith(name.span(), "extmap-"_s))
                 continue;
 
             auto value = gstStructureGetString(s, name);
             if (value == GST_RTP_HDREXT_BASE "sdes:mid"_s) {
-                auto id = parseInteger<uint8_t>(nameAsString.substring(7));
+                auto id = parseInteger<uint8_t>(name.span().subspan(7));
                 if (!id) [[unlikely]]
                     continue;
                 if (*id && *id < 15)
                     midExtID = *id;
             } else if (value == GST_RTP_HDREXT_BASE "sdes:rtp-stream-id"_s) {
-                auto id = parseInteger<uint8_t>(nameAsString.substring(7));
+                auto id = parseInteger<uint8_t>(name.span().subspan(7));
                 if (!id) [[unlikely]]
                     continue;
                 if (*id && *id < 15)

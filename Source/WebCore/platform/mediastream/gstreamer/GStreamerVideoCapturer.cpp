@@ -373,10 +373,10 @@ void GStreamerVideoCapturer::reconfigure()
                 selector->maxWidth = *width;
                 selector->maxHeight = *height;
                 selector->maxFrameRate = *frameRate;
-                selector->mimeType = gstStructureGetName(structure).toString();
+                selector->mimeType = gstStructureGetName(structure).span();
                 if (gst_structure_has_name(structure, "video/x-raw")) {
                     if (gst_structure_has_field(structure, "format"))
-                        selector->format = gstStructureGetString(structure, "format"_s).toString();
+                        selector->format = gstStructureGetString(structure, "format"_s).span();
                     else
                         return TRUE;
                 }
@@ -387,10 +387,10 @@ void GStreamerVideoCapturer::reconfigure()
                 selector->maxWidth = *width;
                 selector->maxHeight = *height;
                 selector->maxFrameRate = *frameRate;
-                selector->mimeType = gstStructureGetName(structure).toString();
+                selector->mimeType = gstStructureGetName(structure).span();
                 if (gst_structure_has_name(structure, "video/x-raw")) {
                     if (gst_structure_has_field(structure, "format"))
-                        selector->format = gstStructureGetString(structure, "format"_s).toString();
+                        selector->format = gstStructureGetString(structure, "format"_s).span();
                     else
                         return TRUE;
                 }

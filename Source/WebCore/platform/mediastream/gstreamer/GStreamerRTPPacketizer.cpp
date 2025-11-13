@@ -177,7 +177,7 @@ String GStreamerRTPPacketizer::rtpStreamId() const
         return emptyString();
 
     if (auto rid = gstStructureGetString(m_encodingParameters.get(), "rid"_s))
-        return rid.toString();
+        return rid.span();
 
     return emptyString();
 }

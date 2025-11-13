@@ -43,7 +43,7 @@ namespace WebCore {
 
 RTCStatsReport::Stats::Stats(Type type, const GstStructure* structure)
     : type(type)
-    , id(gstStructureGetString(structure, "id"_s).toString())
+    , id(gstStructureGetString(structure, "id"_s).span())
 {
     if (auto value = gstStructureGet<double>(structure, "timestamp"_s))
         timestamp = Seconds::fromMicroseconds(*value).milliseconds();
@@ -51,9 +51,9 @@ RTCStatsReport::Stats::Stats(Type type, const GstStructure* structure)
 
 RTCStatsReport::RtpStreamStats::RtpStreamStats(Type type, const GstStructure* structure)
     : Stats(type, structure)
-    , kind(gstStructureGetString(structure, "kind"_s).toString())
-    , transportId(gstStructureGetString(structure, "transport-id"_s).toString())
-    , codecId(gstStructureGetString(structure, "codec-id"_s).toString())
+    , kind(gstStructureGetString(structure, "kind"_s).span())
+    , transportId(gstStructureGetString(structure, "transport-id"_s).span())
+    , codecId(gstStructureGetString(structure, "codec-id"_s).span())
 {
     if (auto value = gstStructureGet<unsigned>(structure, "ssrc"_s))
         ssrc = *value;
@@ -68,8 +68,8 @@ RTCStatsReport::SentRtpStreamStats::SentRtpStreamStats(Type type, const GstStruc
 
 RTCStatsReport::CodecStats::CodecStats(const GstStructure* structure)
     : Stats(Type::Codec, structure)
-    , mimeType(gstStructureGetString(structure, "mime-type"_s).toString())
-    , sdpFmtpLine(gstStructureGetString(structure, "sdp-fmtp-line"_s).toString())
+    , mimeType(gstStructureGetString(structure, "mime-type"_s).span())
+    , sdpFmtpLine(gstStructureGetString(structure, "sdp-fmtp-line"_s).span())
 {
     clockRate = gstStructureGet<unsigned>(structure, "clock-rate"_s);
     channels = gstStructureGet<unsigned>(structure, "channels"_s);
@@ -101,7 +101,7 @@ RTCStatsReport::ReceivedRtpStreamStats::ReceivedRtpStreamStats(Type type, const 
 
 RTCStatsReport::RemoteInboundRtpStreamStats::RemoteInboundRtpStreamStats(const GstStructure* structure)
     : ReceivedRtpStreamStats(Type::RemoteInboundRtp, structure)
-    , localId(gstStructureGetString(structure, "local-id"_s).toString())
+    , localId(gstStructureGetString(structure, "local-id"_s).span())
 {
     roundTripTime = gstStructureGet<double>(structure, "round-trip-time"_s);
     fractionLost = gstStructureGet<double>(structure, "fraction-lost"_s);
@@ -113,7 +113,7 @@ RTCStatsReport::RemoteInboundRtpStreamStats::RemoteInboundRtpStreamStats(const G
 
 RTCStatsReport::RemoteOutboundRtpStreamStats::RemoteOutboundRtpStreamStats(const GstStructure* structure)
     : SentRtpStreamStats(Type::RemoteOutboundRtp, structure)
-    , localId(gstStructureGetString(structure, "local-id"_s).toString())
+    , localId(gstStructureGetString(structure, "local-id"_s).span())
 {
     remoteTimestamp = gstStructureGet<double>(structure, "remote-timestamp"_s);
 
@@ -142,7 +142,7 @@ RTCStatsReport::InboundRtpStreamStats::InboundRtpStreamStats(const GstStructure*
     frameHeight = gstStructureGet<unsigned>(structure, "frame-height"_s);
 
     if (auto identifier = gstStructureGetString(structure, "track-identifier"_s))
-        trackIdentifier = identifier.toString();
+        trackIdentifier = identifier.span();
 
     // FIXME:
     // stats.fractionLost =
@@ -158,7 +158,7 @@ RTCStatsReport::InboundRtpStreamStats::InboundRtpStreamStats(const GstStructure*
 
 RTCStatsReport::OutboundRtpStreamStats::OutboundRtpStreamStats(const GstStructure* structure)
     : SentRtpStreamStats(Type::OutboundRtp, structure)
-    , remoteId(gstStructureGetString(structure, "remote-id"_s).toString())
+    , remoteId(gstStructureGetString(structure, "remote-id"_s).span())
 {
     firCount = gstStructureGet<unsigned>(structure, "fir-count"_s);
     pliCount = gstStructureGet<unsigned>(structure, "pli-count"_s);
@@ -172,9 +172,9 @@ RTCStatsReport::OutboundRtpStreamStats::OutboundRtpStreamStats(const GstStructur
     framesPerSecond = gstStructureGet<double>(structure, "frames-per-second"_s);
 
     if (auto midValue = gstStructureGetString(structure, "mid"_s))
-        mid = midValue.toString();
+        mid = midValue.span();
     if (auto ridValue = gstStructureGetString(structure, "rid"_s))
-        rid = ridValue.toString();
+        rid = ridValue.span();
 }
 
 RTCStatsReport::PeerConnectionStats::PeerConnectionStats(const GstStructure* structure)
@@ -186,7 +186,7 @@ RTCStatsReport::PeerConnectionStats::PeerConnectionStats(const GstStructure* str
 
 RTCStatsReport::TransportStats::TransportStats(const GstStructure* structure)
     : Stats(Type::Transport, structure)
-    , selectedCandidatePairId(gstStructureGetString(structure, "selected-candidate-pair-id"_s).toString())
+    , selectedCandidatePairId(gstStructureGetString(structure, "selected-candidate-pair-id"_s).span())
 {
     // https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/9e38ee7526ecbb12320d1aef29a0c74b815eb4ef
     if (gst_structure_has_field_typed(structure, "dtls-state", GST_TYPE_WEBRTC_DTLS_TRANSPORT_STATE)) {
@@ -243,10 +243,10 @@ static inline RTCIceCandidateType iceCandidateType(CStringView type)
 
 RTCStatsReport::IceCandidateStats::IceCandidateStats(GstWebRTCStatsType statsType, const GstStructure* structure)
     : Stats(statsType == GST_WEBRTC_STATS_REMOTE_CANDIDATE ? Type::RemoteCandidate : Type::LocalCandidate, structure)
-    , transportId(gstStructureGetString(structure, "transport-id"_s).toString())
-    , address(gstStructureGetString(structure, "address"_s).toString())
-    , protocol(gstStructureGetString(structure, "protocol"_s).toString())
-    , url(gstStructureGetString(structure, "url"_s).toString())
+    , transportId(gstStructureGetString(structure, "transport-id"_s).span())
+    , address(gstStructureGetString(structure, "address"_s).span())
+    , protocol(gstStructureGetString(structure, "protocol"_s).span())
+    , url(gstStructureGetString(structure, "url"_s).span())
 {
     port = gstStructureGet<unsigned>(structure, "port"_s);
     priority = gstStructureGet<unsigned>(structure, "priority"_s);
@@ -257,8 +257,8 @@ RTCStatsReport::IceCandidateStats::IceCandidateStats(GstWebRTCStatsType statsTyp
 
 RTCStatsReport::IceCandidatePairStats::IceCandidatePairStats(const GstStructure* structure)
     : Stats(Type::CandidatePair, structure)
-    , localCandidateId(gstStructureGetString(structure, "local-candidate-id"_s).toString())
-    , remoteCandidateId(gstStructureGetString(structure, "remote-candidate-id"_s).toString())
+    , localCandidateId(gstStructureGetString(structure, "local-candidate-id"_s).span())
+    , remoteCandidateId(gstStructureGetString(structure, "remote-candidate-id"_s).span())
 {
     // FIXME
     // stats.transportId =

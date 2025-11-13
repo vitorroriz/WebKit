@@ -433,7 +433,7 @@ void RealtimeOutgoingMediaSourceGStreamer::setParameters(GUniquePtr<GstStructure
         if (!rid)
             continue;
 
-        auto packetizer = getPacketizerForRid(rid.toString());
+        auto packetizer = getPacketizerForRid(rid.span());
         if (!packetizer)
             continue;
 
