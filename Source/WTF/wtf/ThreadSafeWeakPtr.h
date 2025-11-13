@@ -89,7 +89,7 @@ public:
             m_weakReferenceCount++;
         }
 
-        auto deleteObject = [this, object] SUPPRESS_UNCOUNTED_LAMBDA_CAPTURE {
+        SUPPRESS_UNCOUNTED_LAMBDA_CAPTURE auto deleteObject = [this, object] {
             delete static_cast<const T*>(object);
 
             bool hasOtherWeakRefs;
@@ -241,7 +241,7 @@ public:
         if (didDerefStrongOnly) {
             if (newStrongOnlyRefCount == strongOnlyFlag) {
                 ASSERT(m_bits.exchangeOr(destructionStartedFlag) == newStrongOnlyRefCount);
-                auto deleteObject = [this] SUPPRESS_UNCOUNTED_LAMBDA_CAPTURE {
+                SUPPRESS_UNCOUNTED_LAMBDA_CAPTURE auto deleteObject = [this] {
                     delete static_cast<const T*>(this);
                 };
                 switch (destructionThread) {
