@@ -83,6 +83,8 @@ typedef NS_ENUM(NSInteger, WKTextExtractionContainer) {
     WKTextExtractionContainerNav,
     WKTextExtractionContainerButton,
     WKTextExtractionContainerCanvas,
+    WKTextExtractionContainerSubscript,
+    WKTextExtractionContainerSuperscript,
     WKTextExtractionContainerGeneric
 };
 

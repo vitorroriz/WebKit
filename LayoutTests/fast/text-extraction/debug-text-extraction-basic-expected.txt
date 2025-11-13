@@ -27,8 +27,13 @@ root
                 button,uid=…,events=[click],'Update Status',[…]
             aria-label='Figure 1'
                 canvas,uid=…,[…]
-            link,uid=…,url='https://webkit.org/'
             textarea,uid=…,'This is a text box',[…]
+            '        Price: $11',[…]
+            superscript,'99',[…]
+            '        Link to ',[…]
+            subscript
+                'WebKit home page:',[…]
+                link,uid=…,url='https://webkit.org/'
     role='contentinfo'
         '    \nFooter content with ',[…]
         role='img',aria-label='copyright symbol','©',[…]

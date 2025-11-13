@@ -142,6 +142,8 @@ enum class ContainerType : uint8_t {
     Nav,
     Button,
     Canvas,
+    Subscript,
+    Superscript,
     Generic,
 };
 

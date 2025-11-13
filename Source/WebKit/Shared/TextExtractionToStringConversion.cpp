@@ -363,6 +363,12 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
             case TextExtraction::ContainerType::Canvas:
                 containerString = "canvas"_s;
                 break;
+            case TextExtraction::ContainerType::Subscript:
+                containerString = "subscript"_s;
+                break;
+            case TextExtraction::ContainerType::Superscript:
+                containerString = "superscript"_s;
+                break;
             case TextExtraction::ContainerType::Generic:
                 break;
             }

@@ -6816,6 +6816,8 @@ header: <WebCore/TextExtractionTypes.h>
     Nav,
     Button,
     Canvas,
+    Subscript,
+    Superscript,
     Generic
 };
 
