@@ -6440,6 +6440,7 @@ class TestRetrievePRDataFromLabel(BuildStepMixinAdditions, unittest.TestCase):
                         {'context': 'api-gtk', 'state': 'SUCCESS'},
                         {'context': 'api-ios', 'state': 'SUCCESS'},
                         {'context': 'api-mac', 'state': 'SUCCESS'},
+                        {'context': 'api-mac-debug', 'state': 'SUCCESS'},
                         {'context': 'bindings', 'state': 'SUCCESS'},
                         {'context': 'gtk', 'state': 'SUCCESS'},
                         {'context': 'gtk-wk2', 'state': 'SUCCESS'},
