@@ -93,9 +93,6 @@ enum class NSType : uint8_t {
     CNPhoneNumber,
     CNPostalAddress,
 #endif
-#if ENABLE(DATA_DETECTION) && HAVE(WK_SECURE_CODING_DATA_DETECTORS)
-    DDScannerResult,
-#endif
     NSDateComponents,
     Data,
     Date,

@@ -409,10 +409,6 @@ NSType typeFromObject(id object)
     SUPPRESS_UNRETAINED_ARG if ([object isKindOfClass:getClass<CNPostalAddress>()])
         return NSType::CNPostalAddress;
 #endif
-#if ENABLE(DATA_DETECTION) && HAVE(WK_SECURE_CODING_DATA_DETECTORS)
-    SUPPRESS_UNRETAINED_ARG if ([object isKindOfClass:getClass<DDScannerResult>()])
-        return NSType::DDScannerResult;
-#endif
     if ([object isKindOfClass:[NSDateComponents class]])
         return NSType::NSDateComponents;
     // Not all CF types are toll-free-bridged to NS types.
