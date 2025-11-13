@@ -1,3 +1,5 @@
+//@ skip if $memoryLimited
+
 function testMap() {
     const oomString = '\u1234'.padEnd(0x7fffffff, 'a');
     const map = new Map();

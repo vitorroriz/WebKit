@@ -1,3 +1,5 @@
+//@ skip if $memoryLimited
+
 function testSet() {
     const oomString = '\u1234'.padEnd(0x7fffffff, 'a');
     const set = new Set();
