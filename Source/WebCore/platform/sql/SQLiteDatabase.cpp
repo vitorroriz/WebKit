@@ -69,6 +69,8 @@ static void initializeSQLiteIfNecessary()
         // completely threadsafe. But in the past it was not safe, and the SQLite developers still
         // aren't confident that it really is, and we still support ancient versions of SQLite. So
         // std::call_once is used to stay on the safe side. See bug #143245.
+
+#if OS(DARWIN)
         int ret;
         callOnMainThreadAndWait([&] {
             // In the Network process, this function can be called on a background thread when
@@ -78,6 +80,14 @@ static void initializeSQLiteIfNecessary()
             // main thread.
             ret = sqlite3_initialize();
         });
+#else
+        // On non-Darwin systems confstr() is MT-safe and it does not try to fiddle with environment
+        // variables, and it is better initialize directly. This is true at least on Linux with the
+        // supported C libraries (glibc, Musl, uClibc), the "big" BSDs (FreeBSD, NetBSD, OpenBSD),
+        // and the Android C library (Bionic) does not even provide confstr().
+        int ret = sqlite3_initialize();
+#endif
+
         if (ret != SQLITE_OK) {
 #if SQLITE_VERSION_NUMBER >= 3007015
             WTFLogAlways("Failed to initialize SQLite: %s", sqlite3_errstr(ret));
