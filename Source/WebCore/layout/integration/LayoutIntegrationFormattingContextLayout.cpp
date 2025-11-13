@@ -74,8 +74,10 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
 {
     auto& placedFloats = parentBlockLayoutState.placedFloats();
 
+    auto& blockRenderer = downcast<RenderBox>(*block.rendererForIntegration());
+    auto& rootBlockContainer = downcast<RenderBlockFlow>(*rootLayoutBox(block).rendererForIntegration());
+
     auto populateRootRendererWithFloatsFromIFC = [&] {
-        auto& rootBlockContainer = downcast<RenderBlockFlow>(*rootLayoutBox(block).rendererForIntegration());
         for (auto& floatItem : placedFloats.list()) {
             auto* layoutBox = floatItem.layoutBox();
             if (!layoutBox) {
@@ -94,16 +96,30 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
     };
     populateRootRendererWithFloatsFromIFC();
 
-    // FIXME: We need to run this through the render tree code of "estimateLogicalTopPosition"
-    downcast<RenderBox>(*block.rendererForIntegration()).setLogicalTop(blockLogicalTopLeft.y());
+    // Render tree uses block height to track the child block layout position. Set it to the current position before calling layoutBlockChild.
+    rootBlockContainer.setLogicalHeight(blockLogicalTopLeft.y() - rootBlockContainer.marginBefore());
 
-    layoutWithFormattingContextForBox(block, { }, { }, layoutState);
-    ASSERT(!block.rendererForIntegration()->needsLayout());
+    auto beforeEdge = rootBlockContainer.borderAndPaddingBefore();
+    auto afterEdge = rootBlockContainer.borderAndPaddingAfter() + rootBlockContainer.scrollbarLogicalHeight();
+
+    RenderBlockFlow::MarginInfo marginInfo(rootBlockContainer, beforeEdge, afterEdge);
+    // FIXME: These are probably needed to make the container margin collapsing work.
+    marginInfo.setAtBeforeSideOfBlock(false);
+    marginInfo.setAtAfterSideOfBlock(false);
+
+    LayoutUnit previousFloatLogicalBottom;
+    LayoutUnit maxFloatLogicalBottom;
+    rootBlockContainer.layoutBlockChild(blockRenderer, marginInfo, previousFloatLogicalBottom, maxFloatLogicalBottom);
+
+    auto updater = BoxGeometryUpdater { layoutState, rootLayoutBox(block) };
+    updater.updateBoxGeometryAfterIntegrationLayout(block, rootBlockContainer.contentBoxLogicalWidth());
+
+    ASSERT(!blockRenderer.needsLayout());
     auto& blockGeometry = layoutState.ensureGeometryForBox(block);
     blockGeometry.setTopLeft(LayoutPoint { blockGeometry.marginStart(), blockGeometry.marginBefore() });
 
     auto populateIFCWithNewlyPlacedFloats = [&] {
-        auto* renderBlockFlow = dynamicDowncast<RenderBlockFlow>(*block.rendererForIntegration());
+        auto* renderBlockFlow = dynamicDowncast<RenderBlockFlow>(blockRenderer);
         if (!renderBlockFlow)
             return;
 
