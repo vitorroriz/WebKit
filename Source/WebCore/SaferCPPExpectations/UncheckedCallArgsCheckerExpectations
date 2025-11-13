@@ -201,23 +201,14 @@ html/FTPDirectoryDocument.cpp
 html/FormAssociatedCustomElement.cpp
 html/FormAssociatedElement.cpp
 [ iOS ] html/HTMLAnchorElement.cpp
-html/HTMLAttachmentElement.cpp
-html/HTMLFormControlElement.cpp
-html/HTMLFormControlsCollection.cpp
 html/HTMLFormElement.cpp
 html/HTMLInputElement.cpp
 html/HTMLLinkElement.cpp
-html/HTMLMediaElement.cpp
 html/HTMLMetaElement.cpp
 html/HTMLNameCollectionInlines.h
 html/HTMLOptionsCollection.cpp
 html/HTMLPlugInElement.cpp
-html/HTMLSelectElement.cpp
-html/HTMLStyleElement.cpp
-html/HTMLTableCellElement.cpp
-html/HTMLTableRowsCollection.cpp
 html/HTMLTextFormControlElement.cpp
-html/HTMLVideoElement.cpp
 html/ImageBitmap.cpp
 html/ImageDocument.cpp
 html/LazyLoadFrameObserver.cpp
@@ -236,7 +227,6 @@ html/canvas/OffscreenCanvasRenderingContext2D.cpp
 html/parser/HTMLConstructionSite.cpp
 html/parser/HTMLConstructionSite.h
 html/parser/HTMLDocumentParser.cpp
-html/parser/HTMLParserOptions.cpp
 html/parser/HTMLParserScheduler.cpp
 html/parser/HTMLScriptRunner.cpp
 html/parser/HTMLTreeBuilder.cpp

@@ -8627,7 +8627,7 @@ void HTMLMediaElement::mediaPlayerEngineFailedToLoad()
         m_networkErrorOccured = true;
 
     if (RefPtr page = protectedDocument()->page())
-        page->diagnosticLoggingClient().logDiagnosticMessageWithValue(DiagnosticLoggingKeys::engineFailedToLoadKey(), player->engineDescription(), player->platformErrorCode(), 4, ShouldSample::No);
+        page->checkedDiagnosticLoggingClient()->logDiagnosticMessageWithValue(DiagnosticLoggingKeys::engineFailedToLoadKey(), player->engineDescription(), player->platformErrorCode(), 4, ShouldSample::No);
 }
 
 double HTMLMediaElement::mediaPlayerRequestedPlaybackRate() const

@@ -132,14 +132,12 @@ html/FormAssociatedCustomElement.cpp
 html/FormListedElement.cpp
 [ iOS ] html/HTMLAnchorElement.cpp
 html/HTMLDocument.cpp
-html/HTMLFormControlElement.cpp
 html/HTMLFormElement.cpp
 [ iOS ] html/HTMLImageLoader.cpp
 html/HTMLInputElement.cpp
 html/HTMLSlotElement.cpp
 html/HTMLStyleElement.cpp
 html/HTMLTextFormControlElement.cpp
-html/HTMLVideoElement.cpp
 html/MediaElementSession.cpp
 html/ModelDocument.cpp
 html/PluginDocument.cpp

@@ -417,7 +417,6 @@ html/FormListedElement.cpp
 [ iOS ] html/HTMLAnchorElement.cpp
 html/HTMLAttachmentElement.cpp
 html/HTMLCanvasElement.cpp
-html/HTMLFormControlElement.cpp
 html/HTMLFormControlsCollection.cpp
 html/HTMLFormElement.cpp
 html/HTMLImageElement.cpp
@@ -426,11 +425,9 @@ html/HTMLLinkElement.cpp
 html/HTMLMapElement.cpp
 html/HTMLMaybeFormAssociatedCustomElement.cpp
 html/HTMLMediaElement.cpp
-html/HTMLMetaElement.cpp
 html/HTMLNameCollectionInlines.h
 html/HTMLOptionsCollection.cpp
 html/HTMLPlugInElement.cpp
-html/HTMLTableRowsCollection.cpp
 html/HTMLTextFormControlElement.cpp
 html/HTMLVideoElement.cpp
 html/ImageBitmap.cpp
