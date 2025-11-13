@@ -125,7 +125,6 @@ wasm/WasmOMGPlan.cpp
 wasm/WasmOSREntryPlan.cpp
 wasm/WasmOperations.cpp
 wasm/WasmOperationsInlines.h
-wasm/WasmParser.h
 wasm/WasmSectionParser.cpp
 wasm/WasmStreamingCompiler.cpp
 wasm/WasmTypeDefinition.cpp

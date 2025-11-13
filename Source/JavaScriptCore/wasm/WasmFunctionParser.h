@@ -219,6 +219,10 @@ private:
 
     PartialResult WARN_UNUSED_RETURN checkBranchTarget(const ControlType&, BranchConditionalityTag);
 
+    PartialResult WARN_UNUSED_RETURN parseImmLaneIdx(uint8_t laneCount, uint8_t&);
+    PartialResult WARN_UNUSED_RETURN parseBlockSignature(const ModuleInformation&, BlockSignature&);
+    PartialResult WARN_UNUSED_RETURN parseReftypeSignature(const ModuleInformation&, BlockSignature&);
+
     PartialResult WARN_UNUSED_RETURN parseNestedBlocksEagerly(bool&);
     void switchToBlock(ControlType&&, Stack&&);
 
@@ -1882,6 +1886,56 @@ ALWAYS_INLINE auto FunctionParser<Context>::parseNestedBlocksEagerly(bool& shoul
     } while (m_currentOpcode == OpType::Block && m_offset++);
 
     shouldContinue = false;
+    return { };
+}
+
+template<typename Context>
+ALWAYS_INLINE auto FunctionParser<Context>::parseImmLaneIdx(uint8_t laneCount, uint8_t& result) -> PartialResult
+{
+    RELEASE_ASSERT(laneCount == 2 || laneCount == 4 || laneCount == 8 || laneCount == 16 || laneCount == 32);
+    WASM_PARSER_FAIL_IF(!parseUInt8(result), "Could not parse the lane index immediate byte."_s);
+    WASM_PARSER_FAIL_IF(result >= laneCount, "Lane index immediate is too large, saw "_s, laneCount, ", expected an ImmLaneIdx"_s, laneCount);
+    return { };
+}
+
+template<typename Context>
+ALWAYS_INLINE auto FunctionParser<Context>::parseBlockSignature(const ModuleInformation& info, BlockSignature& result) -> PartialResult
+{
+    int8_t kindByte;
+    if (peekInt7(kindByte) && isValidTypeKind(kindByte)) {
+        TypeKind typeKind = static_cast<TypeKind>(kindByte);
+
+        if ((isValidHeapTypeKind(kindByte) || typeKind == TypeKind::Ref || typeKind == TypeKind::RefNull))
+            return parseReftypeSignature(info, result);
+
+        Type type = { typeKind, TypeDefinition::invalidIndex };
+        WASM_PARSER_FAIL_IF(!(isValueType(type) || type.isVoid()), "result type of block: "_s, makeString(type.kind), " is not a value type or Void"_s);
+        result = { m_typeInformation.thunkFor(type), nullptr };
+        m_offset++;
+        return { };
+    }
+
+    int64_t index;
+    WASM_PARSER_FAIL_IF(!parseVarInt64(index), "Block-like instruction doesn't return value type but can't decode type section index"_s);
+    WASM_PARSER_FAIL_IF(index < 0, "Block-like instruction signature index is negative"_s);
+    WASM_PARSER_FAIL_IF(static_cast<size_t>(index) >= info.typeCount(), "Block-like instruction signature index is out of bounds. Index: "_s, index, " type index space: "_s, info.typeCount());
+
+    const auto& signature = info.typeSignatures[index].get().expand();
+    WASM_PARSER_FAIL_IF(!signature.is<FunctionSignature>(), "Block-like instruction signature index does not refer to a function type definition"_s);
+
+    result = { signature.as<FunctionSignature>(), nullptr };
+    return { };
+}
+
+template<typename Context>
+inline auto FunctionParser<Context>::parseReftypeSignature(const ModuleInformation& info, BlockSignature& result) -> PartialResult
+{
+    Type resultType;
+    WASM_PARSER_FAIL_IF(!parseValueType(info, resultType), "result type of block is not a valid ref type"_s);
+    Vector<Type, 16> returnTypes { resultType };
+    auto typeDefinition = TypeInformation::typeDefinitionForFunction(returnTypes, { });
+    result = { &TypeInformation::getFunctionSignature(typeDefinition->index()), typeDefinition };
+
     return { };
 }
 
