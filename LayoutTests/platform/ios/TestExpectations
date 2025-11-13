@@ -8379,3 +8379,5 @@ imported/w3c/web-platform-tests/css/CSS2/box-display/display-008.xht [ ImageOnly
 imported/w3c/web-platform-tests/css/CSS2/box-display/display-009.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/box-display/display-012.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/box-display/display-013.xht [ ImageOnlyFailure ]
+
+webkit.org/b/302486 [ Release ] http/tests/site-isolation/history/add-iframes-and-navigate-mainframe.html [ Skip ]
