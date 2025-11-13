@@ -2,4 +2,3 @@ usr/local/include/wtf/unicode/Collator.h
 wtf/ParkingLot.h
 wtf/PrintStream.h
 wtf/RetainPtr.h
-wtf/text/StringView.cpp
