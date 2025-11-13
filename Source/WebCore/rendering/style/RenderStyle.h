@@ -115,7 +115,7 @@ enum class CursorVisibility : bool;
 enum class DisplayType : uint8_t;
 enum class DominantBaseline : uint8_t;
 enum class EmptyCell : bool;
-enum class EventListenerRegionType : uint32_t;
+enum class EventListenerRegionType : uint64_t;
 enum class FieldSizing : bool;
 enum class FillAttachment : uint8_t;
 enum class FillBox : uint8_t;

@@ -549,6 +549,12 @@ TextStream& operator<<(TextStream& ts, EventListenerRegionType listenerType)
     case EventListenerRegionType::NonPassiveMouseUp: ts << "active mouse up"_s; break;
     case EventListenerRegionType::MouseMove: ts << "mouse down"_s; break;
     case EventListenerRegionType::NonPassiveMouseMove: ts << "active mouse move"_s; break;
+    case EventListenerRegionType::GestureChange: ts << "gesture change"_s; break;
+    case EventListenerRegionType::NonPassiveGestureChange: ts << "active gesture change"_s; break;
+    case EventListenerRegionType::GestureEnd: ts << "gesture end"_s; break;
+    case EventListenerRegionType::NonPassiveGestureEnd: ts << "active gesture end"_s; break;
+    case EventListenerRegionType::GestureStart: ts << "gesture start"_s; break;
+    case EventListenerRegionType::NonPassiveGestureStart: ts << "active gesture start"_s; break;
     }
     return ts;
 }

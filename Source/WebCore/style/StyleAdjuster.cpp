@@ -371,6 +371,10 @@ OptionSet<EventListenerRegionType> Adjuster::computeEventListenerRegionTypes(con
             findListeners(eventNames().mouseupEvent, EventListenerRegionType::MouseUp, EventListenerRegionType::NonPassiveMouseUp);
             findListeners(eventNames().mousemoveEvent, EventListenerRegionType::MouseMove, EventListenerRegionType::NonPassiveMouseMove);
         }
+
+        findListeners(eventNames().gesturechangeEvent, EventListenerRegionType::GestureChange, EventListenerRegionType::NonPassiveGestureChange);
+        findListeners(eventNames().gestureendEvent, EventListenerRegionType::GestureEnd, EventListenerRegionType::NonPassiveGestureEnd);
+        findListeners(eventNames().gesturestartEvent, EventListenerRegionType::GestureStart, EventListenerRegionType::NonPassiveGestureStart);
     }
 #endif
 

@@ -4014,6 +4014,14 @@ static RefPtr<Pattern> patternForEventListenerRegionType(EventListenerRegionType
         case EventListenerRegionType::NonPassivePointerOver:
         case EventListenerRegionType::NonPassivePointerUp:
             return { "sync pointer"_s, { 0, 9 }, SRGBA<uint8_t> { 200, 200, 0, 128 } };
+        case EventListenerRegionType::GestureChange:
+        case EventListenerRegionType::GestureEnd:
+        case EventListenerRegionType::GestureStart:
+            return { "gesture"_s, { }, Color::lightGray.colorWithAlphaByte(128) };
+        case EventListenerRegionType::NonPassiveGestureChange:
+        case EventListenerRegionType::NonPassiveGestureEnd:
+        case EventListenerRegionType::NonPassiveGestureStart:
+            return { "sync gesture"_s, { 0, 9 }, SRGBA<uint8_t> { 200, 200, 0, 128 } };
         default:
             return { ""_s, { }, Color::black };
         }
