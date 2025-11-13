@@ -109,11 +109,6 @@ WK_LIBCPP_ASSERTIONS_CFLAGS[sdk=watch*10*] = -D_LIBCPP_ENABLE_ASSERTIONS=1;
 // Enable strict memory safety in Swift, and treat any such warnings as errors.
 // Enable for sufficiently recent Xcode only.
 WK_SWIFT_MEMORY_SAFETY_FLAGS = $(WK_SWIFT_MEMORY_SAFETY_FLAGS_$(WK_XCODE_BEFORE_17));
-// Temporarily disable strict memory safety on VisionOS due to rdar://164555610 and rdar://164559261
-WK_SWIFT_MEMORY_SAFETY_FLAGS[sdk=xr*] = ;
-WK_SWIFT_MEMORY_SAFETY_FLAGS_ = -Werror StrictMemorySafety -strict-memory-safety;
+WK_SWIFT_MEMORY_SAFETY_FLAGS_ = -Werror StrictMemorySafety -strict-memory-safety -enable-experimental-feature Lifetimes -enable-experimental-feature LifetimeDependence -enable-experimental-feature ImportNonPublicCxxMembers;
 
-WK_SWIFT_EXPERIMENTAL_FEATURE_FLAGS = $(WK_SWIFT_EXPERIMENTAL_FEATURE_FLAGS_$(WK_XCODE_BEFORE_17));
-WK_SWIFT_EXPERIMENTAL_FEATURE_FLAGS_ = -enable-experimental-feature Lifetimes -enable-experimental-feature LifetimeDependence -enable-experimental-feature ImportNonPublicCxxMembers;
-
-OTHER_SWIFT_FLAGS = $(inherited) $(WK_SWIFT_MEMORY_SAFETY_FLAGS) $(WK_SWIFT_EXPERIMENTAL_FEATURE_FLAGS);
+OTHER_SWIFT_FLAGS = $(inherited) $(WK_SWIFT_MEMORY_SAFETY_FLAGS);

@@ -38,8 +38,7 @@ final class WKURLSchemeHandlerAdapter: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, start urlSchemeTask: any WKURLSchemeTask) {
         let task = Task {
             do {
-                // Safety: this is actually safe; false positive is rdar://154775389
-                for try await unsafe result in wrapped.reply(for: urlSchemeTask.request) {
+                for try await result in wrapped.reply(for: urlSchemeTask.request) {
                     try Task.checkCancellation()
 
                     switch result {
