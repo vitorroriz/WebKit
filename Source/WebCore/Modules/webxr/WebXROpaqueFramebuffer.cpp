@@ -535,7 +535,12 @@ void WebXROpaqueFramebuffer::bindCompositorTexturesForDisplay(GraphicsContextGL&
             return;
 
         auto colorTextureSource = makeExternalImageSource(layerData.textureData->colorTexture, framebufferSize);
-        createAndBindCompositorBuffer(gl, m_displayAttachmentsSets[m_currentDisplayAttachmentIndex][layer].colorBuffer, GL::RGBA8, WTFMove(colorTextureSource), layer);
+#if PLATFORM(COCOA)
+        constexpr auto kColorFormat = GL::BGRA_EXT;
+#else
+        constexpr auto kColorFormat = GL::RGBA8;
+#endif
+        createAndBindCompositorBuffer(gl, m_displayAttachmentsSets[m_currentDisplayAttachmentIndex][layer].colorBuffer, kColorFormat, WTFMove(colorTextureSource), layer);
         ASSERT(m_displayAttachmentsSets[m_currentDisplayAttachmentIndex][layer].colorBuffer.image);
         if (!m_displayAttachmentsSets[m_currentDisplayAttachmentIndex][layer].colorBuffer.image)
             return;
