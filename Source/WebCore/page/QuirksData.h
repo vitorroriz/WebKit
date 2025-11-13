@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -107,6 +107,7 @@ struct WEBCORE_EXPORT QuirksData {
     bool needsScriptToEvaluateBeforeRunningScriptFromURLQuirk : 1 { false };
     bool needsYouTubeMouseOutQuirk : 1 { false };
     bool needsYouTubeOverflowScrollQuirk : 1 { false };
+    bool shouldAllowPopupFromMicrosoftOfficeToOneDrive : 1 { false };
     bool shouldDisablePointerEventsQuirk : 1 { false };
     bool shouldIgnoreAriaForFastPathContentObservationCheckQuirk : 1 { false };
     bool shouldNavigatorPluginsBeEmpty : 1 { false };

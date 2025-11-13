@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2018-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -1618,6 +1618,18 @@ bool Quirks::shouldUseEphemeralPartitionedStorageForDOMCookies(const URL& url) c
     return false;
 }
 
+#if PLATFORM(IOS_FAMILY)
+// m365.cloud.microsoft rdar://157794706
+// Allow popups from m365.cloud.microsoft to onedrive.live.com
+bool Quirks::needsPopupFromMicrosoftOfficeToOneDrive(const URL& targetURL) const
+{
+    if (!needsQuirks())
+        return false;
+
+    return targetURL.host().endsWithIgnoringASCIICase("onedrive.live.com"_s);
+}
+#endif
+
 // rdar://127398734
 bool Quirks::needsLaxSameSiteCookieQuirk(const URL& requestURL) const
 {
@@ -2856,6 +2868,17 @@ static void handleMediumQuirks(QuirksData& quirksData, const URL& quirksURL, con
     quirksData.shouldDispatchSyntheticMouseEventsWhenModifyingSelectionQuirk = true;
 }
 
+#if PLATFORM(IOS_FAMILY)
+static void handleMicrosoftCloudQuirks(QuirksData& quirksData, const URL& quirksURL, const String& quirksDomainString, const URL& documentURL)
+{
+    UNUSED_PARAM(quirksDomainString);
+    UNUSED_PARAM(documentURL);
+    auto topDocumentHost = quirksURL.host();
+    // m365.cloud.microsoft rdar://157794706
+    quirksData.shouldAllowPopupFromMicrosoftOfficeToOneDrive = topDocumentHost.endsWithIgnoringASCIICase("m365.cloud.microsoft"_s);
+}
+#endif
+
 static void handleMenloSecurityQuirks(QuirksData& quirksData, const URL& quirksURL, const String& quirksDomainString, const URL& documentURL)
 {
     UNUSED_PARAM(quirksDomainString);
@@ -3270,6 +3293,9 @@ void Quirks::determineRelevantQuirks()
         { "max"_s, &handleMaxQuirks },
 #endif
         { "medium"_s, &handleMediumQuirks },
+#if PLATFORM(IOS_FAMILY)
+        { "cloud"_s, &handleMicrosoftCloudQuirks },
+#endif
         { "menlosecurity"_s, &handleMenloSecurityQuirks },
         { "messenger"_s, &handleFacebookMessengerQuirks },
         { "netflix"_s, &handleNetflixQuirks },

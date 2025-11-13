@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2022 Apple Inc. All rights reserved.
+ * Copyright (C) 2018-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -239,6 +239,11 @@ public:
     bool shouldDisableElementFullscreenQuirk() const;
     bool shouldIgnorePlaysInlineRequirementQuirk() const;
     WEBCORE_EXPORT bool shouldUseEphemeralPartitionedStorageForDOMCookies(const URL&) const;
+
+#if PLATFORM(IOS_FAMILY)
+    bool shouldAllowPopupFromMicrosoftOfficeToOneDrive() const { return m_quirksData.shouldAllowPopupFromMicrosoftOfficeToOneDrive; }
+    bool needsPopupFromMicrosoftOfficeToOneDrive(const URL& targetURL) const;
+#endif
 
     bool needsLaxSameSiteCookieQuirk(const URL&) const;
     static String standardUserAgentWithApplicationNameIncludingCompatOverrides(const String&, const String&, UserAgentType);
