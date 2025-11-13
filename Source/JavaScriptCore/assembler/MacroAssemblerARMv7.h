@@ -1556,6 +1556,12 @@ public:
         store16(dataTempRegister, address);
     }
 
+    void store16(TrustedImm32 imm, Address address)
+    {
+        move(imm, dataTempRegister);
+        store16(dataTempRegister, address);
+    }
+
     void storeRel16(RegisterID src, Address address)
     {
         storeFence();
@@ -1576,6 +1582,14 @@ public:
 
     void storePair32(TrustedImm32 imm1, TrustedImm32 imm2, Address address)
     {
+        if (imm1.m_value == imm2.m_value) {
+            RegisterID scratch = getCachedDataTempRegisterIDAndInvalidate();
+            move(imm1, scratch);
+            store32(scratch, address);
+            store32(scratch, address.withOffset(4));
+            return;
+        }
+
         int32_t absOffset = address.offset;
         if (absOffset < 0)
             absOffset = -absOffset;
