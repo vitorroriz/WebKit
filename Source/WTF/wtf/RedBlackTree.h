@@ -29,8 +29,10 @@
 #pragma once
 
 #include <wtf/Assertions.h>
+#include <wtf/CheckedPtr.h>
 #include <wtf/Noncopyable.h>
 #include <wtf/Vector.h>
+#include <wtf/TZoneMallocInlines.h>
 
 namespace WTF {
 
@@ -54,16 +56,17 @@ private:
     };
     
 public:
-    class Node {
+    class Node : public CanMakeCheckedPtr<Node> {
+        WTF_MAKE_TZONE_ALLOCATED_INLINE(Node);
+        WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(Node);
         friend class RedBlackTree;
-        
     public:
         const NodeType* successor() const
         {
-            const Node* x = this;
+            CheckedPtr x = this;
             if (x->right())
                 return treeMinimum(x->right());
-            const NodeType* y = x->parent();
+            auto* y = x->parent();
             unsigned depth = 0;
             while (y && x == y->right()) {
                 RELEASE_ASSERT(++depth <= s_maximumTreeDepth);
@@ -75,10 +78,10 @@ public:
         
         const NodeType* predecessor() const
         {
-            const Node* x = this;
+            CheckedPtr x = this;
             if (x->left())
                 return treeMaximum(x->left());
-            const NodeType* y = x->parent();
+            auto* y = x->parent();
             unsigned depth = 0;
             while (y && x == y->left()) {
                 RELEASE_ASSERT(++depth <= s_maximumTreeDepth);
@@ -120,7 +123,7 @@ public:
         
         NodeType* left() const
         {
-            return m_left;
+            return m_left.get();
         }
         
         void setLeft(NodeType* node)
@@ -130,7 +133,7 @@ public:
         
         NodeType* right() const
         {
-            return m_right;
+            return m_right.get();
         }
         
         void setRight(NodeType* node)
@@ -153,15 +156,12 @@ public:
                 m_parentAndRed &= ~static_cast<uintptr_t>(1);
         }
         
-        NodeType* m_left;
-        NodeType* m_right;
+        CheckedPtr<NodeType> m_left;
+        CheckedPtr<NodeType> m_right;
         uintptr_t m_parentAndRed;
     };
 
-    RedBlackTree()
-        : m_root(nullptr)
-    {
-    }
+    RedBlackTree() = default;
     
     void insert(NodeType* x)
     {
@@ -292,7 +292,7 @@ public:
     NodeType* findExact(const KeyType& key) const
     {
         unsigned depth = 0;
-        for (NodeType* current = m_root; current;) {
+        for (NodeType* current = m_root.get(); current;) {
             RELEASE_ASSERT(++depth <= s_maximumTreeDepth);
             if (current->key() == key)
                 return current;
@@ -308,7 +308,7 @@ public:
     {
         NodeType* best = nullptr;
         unsigned depth = 0;
-        for (NodeType* current = m_root; current;) {
+        for (NodeType* current = m_root.get(); current;) {
             RELEASE_ASSERT(++depth <= s_maximumTreeDepth);
             if (current->key() == key)
                 return current;
@@ -326,7 +326,7 @@ public:
     {
         NodeType* best = nullptr;
         unsigned depth = 0;
-        for (NodeType* current = m_root; current;) {
+        for (NodeType* current = m_root.get(); current;) {
             RELEASE_ASSERT(++depth <= s_maximumTreeDepth);
             if (current->key() == key)
                 return current;
@@ -346,19 +346,19 @@ public:
         if (!m_root)
             return;
 
-        Vector<NodeType*, 16> toIterate;
+        Vector<CheckedPtr<NodeType>, 16> toIterate;
         unsigned size = 0;
         toIterate.append(m_root);
         while (toIterate.size()) {
             RELEASE_ASSERT(++size < std::numeric_limits<unsigned>::max());
-            NodeType& current = *toIterate.takeLast();
+            CheckedPtr current = toIterate.takeLast();
             bool iterateLeft = false;
             bool iterateRight = false;
-            function(current, iterateLeft, iterateRight);
-            if (iterateLeft && current.left())
-                toIterate.append(current.left());
-            if (iterateRight && current.right())
-                toIterate.append(current.right());
+            function(*current, iterateLeft, iterateRight);
+            if (iterateLeft && current->left())
+                toIterate.append(current->left());
+            if (iterateRight && current->right())
+                toIterate.append(current->right());
         }
     }
     
@@ -366,14 +366,14 @@ public:
     {
         if (!m_root)
             return nullptr;
-        return treeMinimum(m_root);
+        return treeMinimum(m_root.get());
     }
     
     NodeType* last() const
     {
         if (!m_root)
             return 0;
-        return treeMaximum(m_root);
+        return treeMaximum(m_root.get());
     }
     
     // This is an O(n) operation.
@@ -442,7 +442,7 @@ private:
         ASSERT(z->color() == Red);
         
         NodeType* y = nullptr;
-        NodeType* x = m_root;
+        NodeType* x = m_root.get();
         unsigned depth = 0;
         while (x) {
             RELEASE_ASSERT(++depth <= s_maximumTreeDepth);
@@ -569,7 +569,7 @@ private:
                     if (w->right())
                         w->right()->setColor(Black);
                     leftRotate(xParent);
-                    x = m_root;
+                    x = m_root.get();
                     xParent = x->parent();
                 }
             } else {
@@ -609,7 +609,7 @@ private:
                     if (w->left())
                         w->left()->setColor(Black);
                     rightRotate(xParent);
-                    x = m_root;
+                    x = m_root.get();
                     xParent = x->parent();
                 }
             }
@@ -618,7 +618,7 @@ private:
             x->setColor(Black);
     }
 
-    NodeType* m_root;
+    CheckedPtr<NodeType> m_root;
 };
 
 }

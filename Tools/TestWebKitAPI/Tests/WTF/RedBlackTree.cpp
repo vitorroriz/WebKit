@@ -29,13 +29,16 @@
 #include "config.h"
 #include <wtf/HashSet.h>
 #include <wtf/RedBlackTree.h>
+#include <wtf/TZoneMallocInlines.h>
 #include <wtf/Vector.h>
 
 namespace TestWebKitAPI {
 
 using namespace WTF;
 
-class TestNode : public RedBlackTree<TestNode, char>::Node {
+class TestNode final : public RedBlackTree<TestNode, char>::Node {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(TestNode);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(TestNode);
 public:
     TestNode(char key, unsigned value)
         : m_key(key)
@@ -320,14 +323,16 @@ TEST_F(RedBlackTreeTest, BiggerBestFitSearch)
     testDriver("+d+d+d+d+d+d+d+d+d+d+f+f+f+f+f+f+f+h+h+i+j+k+l+m+o+p+q+r+z@a@b@c@d@e@f@g@h@i@j@k@l@m@n@o@p@q@r@s@t@u@v@w@x@y@z");
 }
 
+class IterateTestNode final : public RedBlackTree<IterateTestNode, unsigned>::Node {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(IterateTestNode);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(IterateTestNode);
+public:
+    unsigned key() { return value; }
+    unsigned value;
+};
+
 TEST_F(RedBlackTreeTest, Iterate)
 {
-    class Node : public RedBlackTree<Node, unsigned>::Node {
-    public:
-        unsigned value;
-        unsigned key() { return value; }
-    };
-
     HashSet<unsigned> items;
     items.add(2);
     items.add(42);
@@ -339,16 +344,16 @@ TEST_F(RedBlackTreeTest, Iterate)
     items.add(250);
     items.add(300);
 
-    RedBlackTree<Node, unsigned> tree;
+    RedBlackTree<IterateTestNode, unsigned> tree;
     for (unsigned value : items) {
-        Node* node = new Node;
+        IterateTestNode* node = new IterateTestNode;
         node->value = value;
         tree.insert(node);
     }
 
     {
         HashSet<unsigned> testItems;
-        tree.iterate([&] (Node& node, bool& iterateLeft, bool& iterateRight) {
+        tree.iterate([&] (IterateTestNode& node, bool& iterateLeft, bool& iterateRight) {
             testItems.add(node.value);
             iterateLeft = true;
             iterateRight = true;
@@ -359,7 +364,7 @@ TEST_F(RedBlackTreeTest, Iterate)
 
     {
         HashSet<unsigned> lessThanOrEqual73;
-        tree.iterate([&] (Node& node, bool& iterateLeft, bool& iterateRight) {
+        tree.iterate([&] (IterateTestNode& node, bool& iterateLeft, bool& iterateRight) {
             if (node.value < 73) {
                 iterateRight = true;
                 iterateLeft = true;
@@ -380,7 +385,7 @@ TEST_F(RedBlackTreeTest, Iterate)
 
     {
         HashSet<unsigned> greaterThan55;
-        tree.iterate([&] (Node& node, bool& iterateLeft, bool& iterateRight) {
+        tree.iterate([&] (IterateTestNode& node, bool& iterateLeft, bool& iterateRight) {
             if (node.value <= 55)
                 iterateRight = true;
             else {
