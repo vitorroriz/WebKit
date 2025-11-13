@@ -385,6 +385,16 @@ TEST(PrivateClickMeasurement, Basic)
     });
 }
 
+#if PLATFORM(MAC)
+TEST(PrivateClickMeasurement, MeasureSafariIsDefault)
+{
+    runBasicPCMTest(nil, [](WKWebView *webView, const HTTPServer& server) {
+        // register an ad click (source)
+        [webView _storePrivateClickMeasurementWithSourceID:42 destinationURL:exampleURL() reportEndpoint:server.request().URL];
+    });
+}
+#endif
+
 TEST(PrivateClickMeasurement, EphemeralWithAttributedBundleIdentifier)
 {
     auto configuration = configurationWithoutUsingDaemon();
