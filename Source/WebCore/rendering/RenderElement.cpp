@@ -339,7 +339,10 @@ StyleDifference RenderElement::adjustStyleDifference(StyleDifference diff, Optio
         else
             diff = std::max(diff, StyleDifference::RecompositeLayer);
     }
-    
+
+    if (isHTMLMarquee())
+        diff = std::max(diff, StyleDifference::Layout);
+
     // The answer to requiresLayer() for plugins, iframes, and canvas can change without the actual
     // style changing, since it depends on whether we decide to composite these elements. When the
     // layer status of one of these elements changes, we need to force a layout.
