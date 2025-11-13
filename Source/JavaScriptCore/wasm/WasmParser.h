@@ -116,6 +116,11 @@ protected:
         return fail(__VA_ARGS__);                \
     } while (0)
 
+#define WASM_ALLOCATOR_FAIL_IF(condition, ...) do { \
+    if (condition) [[unlikely]]                     \
+        return fail(__VA_ARGS__);                \
+    } while (0)
+
 #define WASM_FAIL_IF_HELPER_FAILS(helper) do {                      \
         auto helperResult = helper;                                 \
         if (!helperResult) [[unlikely]]                             \
