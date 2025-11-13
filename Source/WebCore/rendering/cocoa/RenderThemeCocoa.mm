@@ -2971,14 +2971,10 @@ bool RenderThemeCocoa::paintListButtonForVectorBasedControls(const RenderElement
 
 #if PLATFORM(MAC)
     const auto effectiveCornerRadius = listButtonCornerRadius(controlSize) * usedZoom;
-
-    const auto isWindowActive = states.contains(ControlStyle::State::WindowActive);
-    auto indicatorColor = isWindowActive ? controlTintColorWithContrast(style, styleColorOptions) : systemColor(CSSValueAppleSystemSecondaryLabel, styleColorOptions);
-
     auto backgroundColor = systemColor(CSSValueAppleSystemQuaternaryLabel, styleColorOptions);
-#else
-    auto indicatorColor = controlTintColorWithContrast(style, styleColorOptions);
 #endif
+
+    auto indicatorColor = systemColor(CSSValueAppleSystemLabel, styleColorOptions);
 
     if (!isEnabled) {
         indicatorColor = indicatorColor.colorWithAlphaMultipliedBy(kDisabledControlAlpha);

@@ -1840,7 +1840,6 @@ fast/css/accent-color/button.html [ Skip ]
 fast/css/accent-color/date.html [ Skip ]
 fast/css/accent-color/submit.html [ Skip ]
 
-webkit.org/b/199350 fast/css/accent-color/datalist.html [ ImageOnlyFailure ]
 webkit.org/b/231463 fast/css/accent-color/range.html [ ImageOnlyFailure ]
 
 # display-p3 canvas and ImageData are Cocoa only for now.
@@ -2567,6 +2566,9 @@ webkit.org/b/300997 webrtc/filtering-ice-candidate-after-reload.html [ Pass Fail
 webkit.org/b/301655 fast/images/page-wide-animation-toggle.html [ Pass Timeout ]
 
 webkit.org/b/301668 fast/repaint/iframe-avoid-redundant-repaint.html [ Pass Failure ]
+
+# List buttons no longer have tint color after the form control refresh.
+fast/css/accent-color/datalist.html [ Skip ]
 
 webkit.org/b/302273 accessibility/mac/focus-setting-selection-syncronizing-not-clearing.html [ Pass Timeout ]
 
