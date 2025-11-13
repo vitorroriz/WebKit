@@ -4352,7 +4352,16 @@ void WebPageProxy::cacheWheelEventScrollingAccelerationCurve(const NativeWebWhee
         return;
 
     // FIXME: We should not have to fetch the curve repeatedly, but it can also change occasionally.
-    internals().scrollingAccelerationCurve = ScrollingAccelerationCurve::fromNativeWheelEvent(nativeWheelEvent);
+    internals().scrollingAccelerationCurve = ScrollingAccelerationCurve::fromNativeWheelEvent(nativeWheelEvent).or_else([identifier = identifier()] {
+        auto curve = ScrollingAccelerationCurve::fallbackCurve();
+        static std::once_flag onceFlag;
+        std::call_once(onceFlag, [&curve, identifier] {
+            UNUSED_VARIABLE(identifier);
+            if (curve)
+                LOG_WITH_STREAM(ScrollAnimations, stream << "WebPageProxy::cacheWheelEventScrollingAccelerationCurve - using fallback acceleration curve " << *curve << " for page " << identifier);
+        });
+        return curve;
+    });
 #endif
 }
 

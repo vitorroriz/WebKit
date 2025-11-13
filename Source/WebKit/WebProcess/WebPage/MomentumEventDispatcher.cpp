@@ -251,16 +251,16 @@ void MomentumEventDispatcher::didEndMomentumPhase()
     tracePoint(SyntheticMomentumEnd);
 }
 
-void MomentumEventDispatcher::setScrollingAccelerationCurve(WebCore::PageIdentifier pageIdentifier, std::optional<ScrollingAccelerationCurve> curve)
+void MomentumEventDispatcher::setScrollingAccelerationCurve(WebCore::PageIdentifier pageIdentifier, std::optional<ScrollingAccelerationCurve>&& curve)
 {
-    Locker locker { m_accelerationCurvesLock };
-    m_accelerationCurves.set(pageIdentifier, curve);
-
 #if ENABLE(MOMENTUM_EVENT_DISPATCHER_TEMPORARY_LOGGING)
     WTF::TextStream stream(WTF::TextStream::LineMode::SingleLine);
     stream << curve;
     RELEASE_LOG(ScrollAnimations, "MomentumEventDispatcher set curve %" PUBLIC_LOG_STRING, stream.release().utf8().data());
 #endif
+
+    Locker locker { m_accelerationCurvesLock };
+    m_accelerationCurves.set(pageIdentifier, WTFMove(curve));
 }
 
 std::optional<ScrollingAccelerationCurve> MomentumEventDispatcher::scrollingAccelerationCurveForPage(WebCore::PageIdentifier pageIdentifier) const

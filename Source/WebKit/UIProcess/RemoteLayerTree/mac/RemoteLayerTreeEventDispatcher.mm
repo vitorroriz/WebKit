@@ -185,8 +185,17 @@ void RemoteLayerTreeEventDispatcher::cacheWheelEventScrollingAccelerationCurve(c
     if (wheelEvent.momentumPhase() != WebWheelEvent::Phase::Began)
         return;
 
-    auto curve = ScrollingAccelerationCurve::fromNativeWheelEvent(wheelEvent);
-    m_momentumEventDispatcher->setScrollingAccelerationCurve(m_pageIdentifier, curve);
+    auto curve = ScrollingAccelerationCurve::fromNativeWheelEvent(wheelEvent).or_else([pageIdentifier = m_pageIdentifier] {
+        auto curve = ScrollingAccelerationCurve::fallbackCurve();
+        static std::once_flag onceFlag;
+        std::call_once(onceFlag, [&curve, pageIdentifier] {
+            UNUSED_VARIABLE(pageIdentifier);
+            if (curve)
+                LOG_WITH_STREAM(ScrollAnimations, stream << "RemoteLayerTreeEventDispatcher::cacheWheelEventScrollingAccelerationCurve - using fallback acceleration curve " << *curve << " for page " << pageIdentifier);
+        });
+        return curve;
+    });
+    m_momentumEventDispatcher->setScrollingAccelerationCurve(m_pageIdentifier, WTFMove(curve));
 #endif
 }
 
