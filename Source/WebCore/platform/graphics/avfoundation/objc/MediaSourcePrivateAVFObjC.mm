@@ -235,22 +235,6 @@ void MediaSourcePrivateAVFObjC::bufferedChanged(const PlatformTimeRanges& buffer
         player->bufferedChanged();
 }
 
-void MediaSourcePrivateAVFObjC::trackBufferedChanged(SourceBufferPrivate& sourceBuffer, Vector<PlatformTimeRanges>&& ranges)
-{
-    auto it = m_bufferedRanges.find(&sourceBuffer);
-    if (it == m_bufferedRanges.end())
-        m_bufferedRanges.add(&sourceBuffer, WTFMove(ranges));
-    else
-        it->value = WTFMove(ranges);
-
-    PlatformTimeRanges intersectionRange { MediaTime::zeroTime(), MediaTime::positiveInfiniteTime() };
-    for (auto& ranges : m_bufferedRanges.values()) {
-        for (auto& range : ranges)
-            intersectionRange.intersectWith(range);
-    }
-    bufferedChanged(intersectionRange);
-}
-
 }
 
 #endif // ENABLE(MEDIA_SOURCE) && USE(AVFOUNDATION)

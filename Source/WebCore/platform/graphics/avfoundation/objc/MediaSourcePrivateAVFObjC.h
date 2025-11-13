@@ -120,7 +120,6 @@ private:
     void setSourceBufferWithSelectedVideo(SourceBufferPrivateAVFObjC*);
 
     void bufferedChanged(const PlatformTimeRanges&) final;
-    void trackBufferedChanged(SourceBufferPrivate&, Vector<PlatformTimeRanges>&&) final;
 
     WeakPtr<MediaPlayerPrivateMediaSourceAVFObjC> m_player;
     SourceBufferPrivateAVFObjC* m_sourceBufferWithSelectedVideo { nullptr };

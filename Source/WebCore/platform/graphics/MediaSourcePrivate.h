@@ -85,7 +85,7 @@ public:
     virtual void notifyActiveSourceBuffersChanged() = 0;
     virtual void durationChanged(const MediaTime&); // Base class method must be called in overrides. Must be thread-safe
     virtual void bufferedChanged(const PlatformTimeRanges&); // Base class method must be called in overrides. Must be thread-safe.
-    virtual void trackBufferedChanged(SourceBufferPrivate&, Vector<PlatformTimeRanges>&&);
+    void trackBufferedChanged(SourceBufferPrivate&, Vector<PlatformTimeRanges>&&);
 
     virtual MediaPlayer::ReadyState mediaPlayerReadyState() const = 0;
     virtual void setMediaPlayerReadyState(MediaPlayer::ReadyState) = 0;
@@ -139,11 +139,13 @@ protected:
     const Ref<WorkQueue> m_dispatcher; // SerialFunctionDispatcher the SourceBufferPrivate/MediaSourcePrivate is running on.
 
 private:
-    mutable Lock m_lock;
+    void updateBufferedRanges();
     void updateTracksType();
 
+    mutable Lock m_lock;
     MediaTime m_duration WTF_GUARDED_BY_LOCK(m_lock) { MediaTime::invalidTime() };
     PlatformTimeRanges m_buffered WTF_GUARDED_BY_LOCK(m_lock);
+    HashMap<SourceBufferPrivate*, Vector<PlatformTimeRanges>> m_bufferedRanges;
     PlatformTimeRanges m_liveSeekable WTF_GUARDED_BY_LOCK(m_lock);
     std::atomic<bool> m_streaming { false };
     std::atomic<bool> m_streamingAllowed { false };
