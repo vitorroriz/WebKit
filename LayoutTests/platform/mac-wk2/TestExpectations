@@ -2415,3 +2415,5 @@ webkit.org/b/302169 [ Debug ] css3/filters/backdrop/effect-hw.html [ ImageOnlyFa
 webkit.org/b/302172 [ Debug ] imported/w3c/web-platform-tests/css/css-view-transitions/backdrop-filter-animated.html [ ImageOnlyFailure ]
 
 webkit.org/b/302174 [ Tahoe Debug arm64 ] platform/mac/media/encrypted-media/fps-generateRequest.html [ Timeout ]
+
+webkit.org/b/302505 imported/w3c/web-platform-tests/webvtt/rendering/cues-with-video/processing-model/evil/9_cues_overlapping_completely.html [ Skip ]
