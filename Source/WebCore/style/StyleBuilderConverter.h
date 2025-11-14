@@ -130,8 +130,6 @@ public:
 
     static OptionSet<Containment> convertContain(BuilderState&, const CSSValue&);
 
-    static OptionSet<MarginTrimType> convertMarginTrim(BuilderState&, const CSSValue&);
-
     static std::optional<ScopedName> convertPositionAnchor(BuilderState&, const CSSValue&);
     static std::optional<PositionArea> convertPositionArea(BuilderState&, const CSSValue&);
 
@@ -361,41 +359,6 @@ inline OptionSet<HangingPunctuation> BuilderConverter::convertHangingPunctuation
             result.add(fromCSSValue<HangingPunctuation>(currentValue));
     }
     return result;
-}
-
-inline OptionSet<MarginTrimType> BuilderConverter::convertMarginTrim(BuilderState&, const CSSValue& value)
-{
-    // See if value is "block" or "inline" before trying to parse a list
-    if (auto* primitiveValue = dynamicDowncast<CSSPrimitiveValue>(value)) {
-        if (primitiveValue->valueID() == CSSValueBlock)
-            return { MarginTrimType::BlockStart, MarginTrimType::BlockEnd };
-        if (primitiveValue->valueID() == CSSValueInline)
-            return { MarginTrimType::InlineStart, MarginTrimType::InlineEnd };
-    }
-    auto list = dynamicDowncast<CSSValueList>(value);
-    if (!list || !list->size())
-        return RenderStyle::initialMarginTrim();
-    OptionSet<MarginTrimType> marginTrim;
-    for (auto& item : *list) {
-        if (item.valueID() == CSSValueBlock)
-            marginTrim.add({ MarginTrimType::BlockStart, MarginTrimType::BlockEnd });
-        if (item.valueID() == CSSValueInline)
-            marginTrim.add({ MarginTrimType::InlineStart, MarginTrimType::InlineEnd });
-    }
-    if (!marginTrim.isEmpty())
-        return marginTrim;
-    for (auto& item : *list) {
-        if (item.valueID() == CSSValueBlockStart)
-            marginTrim.add(MarginTrimType::BlockStart);
-        if (item.valueID() == CSSValueBlockEnd)
-            marginTrim.add(MarginTrimType::BlockEnd);
-        if (item.valueID() == CSSValueInlineStart)
-            marginTrim.add(MarginTrimType::InlineStart);
-        if (item.valueID() == CSSValueInlineEnd)
-            marginTrim.add(MarginTrimType::InlineEnd);
-    }
-    ASSERT(list->size() <= 4);
-    return marginTrim;
 }
 
 inline OptionSet<Containment> BuilderConverter::convertContain(BuilderState& builderState, const CSSValue& value)

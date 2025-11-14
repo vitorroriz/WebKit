@@ -46,6 +46,7 @@
 #include "ScrollAxis.h"
 #include "ScrollTypes.h"
 #include "StyleImageOrientation.h"
+#include "StyleMarginTrim.h"
 #include "StylePositionVisibility.h"
 #include "StyleScrollBehavior.h"
 #include "StyleTextDecorationLine.h"
@@ -2602,6 +2603,12 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 
 #define TYPE Style::ImageOrientation
 #define FOR_EACH(CASE) CASE(FromImage) CASE(None)
+DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
+#undef TYPE
+#undef FOR_EACH
+
+#define TYPE Style::MarginTrimSide
+#define FOR_EACH(CASE) CASE(BlockStart) CASE(InlineStart) CASE(BlockEnd) CASE(InlineEnd)
 DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH

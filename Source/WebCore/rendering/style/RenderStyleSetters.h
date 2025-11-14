@@ -207,7 +207,7 @@ inline void RenderStyle::setMarginBox(Style::MarginBox&& box) { SET_NESTED(m_non
 inline void RenderStyle::setMarginLeft(Style::MarginEdge&& edge) { SET_NESTED(m_nonInheritedData, surroundData, margin.left(), WTFMove(edge)); }
 inline void RenderStyle::setMarginRight(Style::MarginEdge&& edge) { SET_NESTED(m_nonInheritedData, surroundData, margin.right(), WTFMove(edge)); }
 inline void RenderStyle::setMarginTop(Style::MarginEdge&& edge) { SET_NESTED(m_nonInheritedData, surroundData, margin.top(), WTFMove(edge)); }
-inline void RenderStyle::setMarginTrim(OptionSet<MarginTrimType> value) { SET_NESTED(m_nonInheritedData, rareData, marginTrim, value); }
+inline void RenderStyle::setMarginTrim(Style::MarginTrim value) { SET_NESTED(m_nonInheritedData, rareData, marginTrim, value.toRaw()); }
 inline void RenderStyle::setMarqueeBehavior(MarqueeBehavior b) { SET_DOUBLY_NESTED(m_nonInheritedData, rareData, marquee, behavior, static_cast<unsigned>(b)); }
 inline void RenderStyle::setMarqueeDirection(MarqueeDirection d) { SET_DOUBLY_NESTED(m_nonInheritedData, rareData, marquee, direction, static_cast<unsigned>(d)); }
 inline void RenderStyle::setMarqueeIncrement(Style::WebkitMarqueeIncrement&& increment) { SET_DOUBLY_NESTED(m_nonInheritedData, rareData, marquee, increment, WTFMove(increment)); }

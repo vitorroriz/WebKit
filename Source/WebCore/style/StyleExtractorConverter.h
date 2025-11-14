@@ -133,7 +133,6 @@ public:
 
     // MARK: Shared conversions
 
-    static Ref<CSSValue> convertMarginTrim(ExtractorState&, OptionSet<MarginTrimType>);
     static Ref<CSSValue> convertContain(ExtractorState&, OptionSet<Containment>);
     static Ref<CSSValue> convertPositionTryFallbacks(ExtractorState&, const FixedVector<PositionTryFallback>&);
     static Ref<CSSValue> convertTouchAction(ExtractorState&, OptionSet<TouchAction>);
@@ -250,31 +249,6 @@ inline Ref<CSSValue> ExtractorConverter::convertTransformationMatrix(const Rende
 }
 
 // MARK: - Shared conversions
-
-inline Ref<CSSValue> ExtractorConverter::convertMarginTrim(ExtractorState&, OptionSet<MarginTrimType> marginTrim)
-{
-    if (marginTrim.isEmpty())
-        return CSSPrimitiveValue::create(CSSValueNone);
-
-    // Try to serialize into one of the "block" or "inline" shorthands
-    if (marginTrim.containsAll({ MarginTrimType::BlockStart, MarginTrimType::BlockEnd }) && !marginTrim.containsAny({ MarginTrimType::InlineStart, MarginTrimType::InlineEnd }))
-        return CSSPrimitiveValue::create(CSSValueBlock);
-    if (marginTrim.containsAll({ MarginTrimType::InlineStart, MarginTrimType::InlineEnd }) && !marginTrim.containsAny({ MarginTrimType::BlockStart, MarginTrimType::BlockEnd }))
-        return CSSPrimitiveValue::create(CSSValueInline);
-    if (marginTrim.containsAll({ MarginTrimType::BlockStart, MarginTrimType::BlockEnd, MarginTrimType::InlineStart, MarginTrimType::InlineEnd }))
-        return CSSValueList::createSpaceSeparated(CSSPrimitiveValue::create(CSSValueBlock), CSSPrimitiveValue::create(CSSValueInline));
-
-    CSSValueListBuilder list;
-    if (marginTrim.contains(MarginTrimType::BlockStart))
-        list.append(CSSPrimitiveValue::create(CSSValueBlockStart));
-    if (marginTrim.contains(MarginTrimType::InlineStart))
-        list.append(CSSPrimitiveValue::create(CSSValueInlineStart));
-    if (marginTrim.contains(MarginTrimType::BlockEnd))
-        list.append(CSSPrimitiveValue::create(CSSValueBlockEnd));
-    if (marginTrim.contains(MarginTrimType::InlineEnd))
-        list.append(CSSPrimitiveValue::create(CSSValueInlineEnd));
-    return CSSValueList::createSpaceSeparated(WTFMove(list));
-}
 
 inline Ref<CSSValue> ExtractorConverter::convertContain(ExtractorState&, OptionSet<Containment> containment)
 {

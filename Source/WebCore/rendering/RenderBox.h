@@ -269,7 +269,7 @@ public:
     virtual LayoutUnit collapsedMarginBefore() const { return marginBefore(); }
     virtual LayoutUnit collapsedMarginAfter() const { return marginAfter(); }
 
-    LayoutUnit constrainBlockMarginInAvailableSpaceOrTrim(const RenderBox& containingBlock, LayoutUnit availableSpace, MarginTrimType marginSide) const;
+    LayoutUnit constrainBlockMarginInAvailableSpaceOrTrim(const RenderBox& containingBlock, LayoutUnit availableSpace, Style::MarginTrimSide marginSide) const;
 
     void boundingRects(Vector<LayoutRect>&, const LayoutPoint& accumulatedOffset) const override;
     void absoluteQuads(Vector<FloatQuad>&, bool* wasFixed) const override;
@@ -317,9 +317,9 @@ public:
     void clearOverridingLogicalHeightForFlexBasisComputation();
     void clearOverridingLogicalWidthForFlexBasisComputation();
 
-    void markMarginAsTrimmed(MarginTrimType);
+    void markMarginAsTrimmed(Style::MarginTrimSide);
     void clearTrimmedMarginsMarkings();
-    bool hasTrimmedMargin(std::optional<MarginTrimType>) const;
+    bool hasTrimmedMargin(std::optional<Style::MarginTrimSide>) const;
 
     LayoutSize offsetFromContainer(const RenderElement&, const LayoutPoint&, bool* offsetDependsOnPoint = nullptr) const override;
     
@@ -648,8 +648,8 @@ protected:
 
     void willBeDestroyed() override;
 
-    inline bool shouldTrimChildMargin(MarginTrimType, const RenderBox&) const;
-    virtual bool isChildEligibleForMarginTrim(MarginTrimType, const RenderBox&) const { return false; }
+    inline bool shouldTrimChildMargin(Style::MarginTrimSide, const RenderBox&) const;
+    virtual bool isChildEligibleForMarginTrim(Style::MarginTrimSide, const RenderBox&) const { return false; }
 
     virtual bool shouldResetLogicalHeightBeforeLayout() const;
     void resetLogicalHeightBeforeLayoutIfNeeded();
@@ -717,7 +717,7 @@ private:
 
     bool fixedElementLaysOutRelativeToFrame(const LocalFrameView&) const;
 
-    template<typename Function> LayoutUnit computeOrTrimInlineMargin(const RenderBlock& containingBlock, MarginTrimType marginSide, NOESCAPE const Function& computeInlineMargin) const;
+    template<typename Function> LayoutUnit computeOrTrimInlineMargin(const RenderBlock& containingBlock, Style::MarginTrimSide marginSide, NOESCAPE const Function& computeInlineMargin) const;
 
     bool isScrollableOrRubberbandableBox() const override;
 

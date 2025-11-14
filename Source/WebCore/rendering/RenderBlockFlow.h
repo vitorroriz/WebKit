@@ -240,7 +240,7 @@ public:
         LayoutUnit margin() const { return m_positiveMargin - m_negativeMargin; }
     };
 
-    bool shouldTrimChildMargin(MarginTrimType, const RenderBox&) const;
+    bool shouldTrimChildMargin(Style::MarginTrimSide, const RenderBox&) const;
     void performBlockStepSizing(RenderBox& child, LayoutUnit blockStepSizeForChild) const;
 
     void layoutBlockChild(RenderBox& child, MarginInfo&, LayoutUnit& previousFloatLogicalBottom, LayoutUnit& maxFloatLogicalBottom);
@@ -412,7 +412,7 @@ public:
     std::optional<LayoutUnit> lowestInitialLetterLogicalBottom() const;
 
 protected:
-    bool isChildEligibleForMarginTrim(MarginTrimType, const RenderBox&) const final;
+    bool isChildEligibleForMarginTrim(Style::MarginTrimSide, const RenderBox&) const final;
 
     bool shouldResetLogicalHeightBeforeLayout() const override { return true; }
 

@@ -782,17 +782,6 @@ TextStream& operator<<(TextStream& ts, ListStylePosition position)
     return ts;
 }
 
-TextStream& operator<<(TextStream& ts, MarginTrimType marginTrimType)
-{
-    switch (marginTrimType) {
-    case MarginTrimType::BlockStart: ts << "block-start"_s; break;
-    case MarginTrimType::BlockEnd: ts << "block-end"_s; break;
-    case MarginTrimType::InlineStart: ts << "inline-start"_s; break;
-    case MarginTrimType::InlineEnd: ts << "inline-end"_s; break;
-    }
-    return ts;
-}
-
 TextStream& operator<<(TextStream& ts, MarqueeBehavior marqueeBehavior)
 {
     switch (marqueeBehavior) {

@@ -48,7 +48,6 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
     , maxLines(RenderStyle::initialMaxLines())
     , overflowContinue(RenderStyle::initialOverflowContinue())
     , touchActions(RenderStyle::initialTouchActions())
-    , marginTrim(RenderStyle::initialMarginTrim())
     , contain(RenderStyle::initialContainment())
     , initialLetter(RenderStyle::initialInitialLetter())
     , marquee(StyleMarqueeData::create())
@@ -143,6 +142,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
     , anchorFunctionScrollCompensatedAxes(0)
     , isPopoverInvoker(false)
     , useSVGZoomRulesForLength(false)
+    , marginTrim(RenderStyle::initialMarginTrim().toRaw())
 {
 }
 
@@ -155,7 +155,6 @@ inline StyleRareNonInheritedData::StyleRareNonInheritedData(const StyleRareNonIn
     , maxLines(o.maxLines)
     , overflowContinue(o.overflowContinue)
     , touchActions(o.touchActions)
-    , marginTrim(o.marginTrim)
     , contain(o.contain)
     , initialLetter(o.initialLetter)
     , marquee(o.marquee)
@@ -250,6 +249,7 @@ inline StyleRareNonInheritedData::StyleRareNonInheritedData(const StyleRareNonIn
     , anchorFunctionScrollCompensatedAxes(o.anchorFunctionScrollCompensatedAxes)
     , isPopoverInvoker(o.isPopoverInvoker)
     , useSVGZoomRulesForLength(o.useSVGZoomRulesForLength)
+    , marginTrim(o.marginTrim)
 {
 }
 
@@ -269,7 +269,6 @@ bool StyleRareNonInheritedData::operator==(const StyleRareNonInheritedData& o) c
         && maxLines == o.maxLines
         && overflowContinue == o.overflowContinue
         && touchActions == o.touchActions
-        && marginTrim == o.marginTrim
         && contain == o.contain
         && initialLetter == o.initialLetter
         && marquee == o.marquee
@@ -363,7 +362,8 @@ bool StyleRareNonInheritedData::operator==(const StyleRareNonInheritedData& o) c
         && usesAnchorFunctions == o.usesAnchorFunctions
         && anchorFunctionScrollCompensatedAxes == o.anchorFunctionScrollCompensatedAxes
         && isPopoverInvoker == o.isPopoverInvoker
-        && useSVGZoomRulesForLength == o.useSVGZoomRulesForLength;
+        && useSVGZoomRulesForLength == o.useSVGZoomRulesForLength
+        && marginTrim == o.marginTrim;
 }
 
 OptionSet<Containment> StyleRareNonInheritedData::usedContain() const
@@ -408,7 +408,6 @@ void StyleRareNonInheritedData::dumpDifferences(TextStream& ts, const StyleRareN
     LOG_IF_DIFFERENT(overflowContinue);
 
     LOG_IF_DIFFERENT(touchActions);
-    LOG_IF_DIFFERENT(marginTrim);
     LOG_IF_DIFFERENT(contain);
 
     LOG_IF_DIFFERENT(initialLetter);
@@ -537,6 +536,8 @@ void StyleRareNonInheritedData::dumpDifferences(TextStream& ts, const StyleRareN
     LOG_IF_DIFFERENT_WITH_CAST(bool, anchorFunctionScrollCompensatedAxes);
     LOG_IF_DIFFERENT_WITH_CAST(bool, isPopoverInvoker);
     LOG_IF_DIFFERENT_WITH_CAST(bool, useSVGZoomRulesForLength);
+
+    LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::MarginTrim, marginTrim);
 }
 #endif // !LOG_DISABLED
 

@@ -347,24 +347,24 @@ template<CSSPropertyID propertyID> struct MarginEdgeSharedAdaptor {
     template<typename F> decltype(auto) computedValue(ExtractorState& state, const MarginEdge& value, F&& functor) const
     {
         auto rendererCanHaveTrimmedMargin = [](const RenderBox& renderer) {
-            auto marginTrimType = [] -> MarginTrimType {
+            auto marginTrimSide = [] -> Style::MarginTrimSide {
                 if constexpr (propertyID == CSSPropertyMarginTop)
-                    return MarginTrimType::BlockStart;
+                    return Style::MarginTrimSide::BlockStart;
                 else if constexpr (propertyID == CSSPropertyMarginRight)
-                    return MarginTrimType::InlineEnd;
+                    return Style::MarginTrimSide::InlineEnd;
                 else if constexpr (propertyID == CSSPropertyMarginBottom)
-                    return MarginTrimType::BlockEnd;
+                    return Style::MarginTrimSide::BlockEnd;
                 else if constexpr (propertyID == CSSPropertyMarginLeft)
-                    return MarginTrimType::InlineStart;
+                    return Style::MarginTrimSide::InlineStart;
             };
 
             // A renderer will have a specific margin marked as trimmed by setting its rare data bit if:
             // 1.) The layout system the box is in has this logic (setting the rare data bit for this
             // specific margin) implemented
             // 2.) The block container/flexbox/grid has this margin specified in its margin-trim style
-            // If marginTrimType is empty we will check if any of the supported margins are in the style
+            // If marginTrimSide is empty we will check if any of the supported margins are in the style
             if (renderer.isFlexItem() || renderer.isGridItem())
-                return renderer.parent()->style().marginTrim().contains(marginTrimType());
+                return renderer.parent()->style().marginTrim().contains(marginTrimSide());
 
             // Even though margin-trim is not inherited, it is possible for nested block level boxes
             // to get placed at the block-start of an containing block ancestor which does have margin-trim.
@@ -380,7 +380,7 @@ template<CSSPropertyID propertyID> struct MarginEdgeSharedAdaptor {
             return false;
         };
 
-        auto toMarginTrimType = [](const RenderBox& renderer) -> MarginTrimType {
+        auto toMarginTrimSide = [](const RenderBox& renderer) -> Style::MarginTrimSide {
             auto formattingContextRootStyle = [](const RenderBox& renderer) -> const RenderStyle& {
                 if (auto* ancestorToUse = (renderer.isFlexItem() || renderer.isGridItem()) ? renderer.parent() : renderer.containingBlock())
                     return ancestorToUse->style();
@@ -401,16 +401,16 @@ template<CSSPropertyID propertyID> struct MarginEdgeSharedAdaptor {
 
             switch (mapSidePhysicalToLogical(formattingContextRootStyle(renderer).writingMode(), boxSide())) {
             case LogicalBoxSide::BlockStart:
-                return MarginTrimType::BlockStart;
+                return Style::MarginTrimSide::BlockStart;
             case LogicalBoxSide::BlockEnd:
-                return MarginTrimType::BlockEnd;
+                return Style::MarginTrimSide::BlockEnd;
             case LogicalBoxSide::InlineStart:
-                return MarginTrimType::InlineStart;
+                return Style::MarginTrimSide::InlineStart;
             case LogicalBoxSide::InlineEnd:
-                return MarginTrimType::InlineEnd;
+                return Style::MarginTrimSide::InlineEnd;
             default:
                 ASSERT_NOT_REACHED();
-                return MarginTrimType::BlockStart;
+                return Style::MarginTrimSide::BlockStart;
             }
         };
 
@@ -430,7 +430,7 @@ template<CSSPropertyID propertyID> struct MarginEdgeSharedAdaptor {
             return functor(value);
 
         if constexpr (propertyID == CSSPropertyMarginRight) {
-            if (rendererCanHaveTrimmedMargin(*box) && box->hasTrimmedMargin(toMarginTrimType(*box)))
+            if (rendererCanHaveTrimmedMargin(*box) && box->hasTrimmedMargin(toMarginTrimSide(*box)))
                 return functor(usedValue(*box));
 
             if (value.isFixed())

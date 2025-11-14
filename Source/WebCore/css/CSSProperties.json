@@ -5337,7 +5337,7 @@
                 "inline-end"
             ],
             "codegen-properties": {
-                "style-converter": "MarginTrim",
+                "style-converter": "StyleType<MarginTrim>",
                 "parser-function": "consumeMarginTrim",
                 "parser-grammar-unused": "none | [ block || inline ] | [ block-start || inline-start || block-end || inline-end ]",
                 "parser-grammar-unused-reason": "Needs support for transforming parsed input to minimal form."

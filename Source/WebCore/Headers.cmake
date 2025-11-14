@@ -3289,6 +3289,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/borders/StyleShadow.h
 
     style/values/box/StyleMargin.h
+    style/values/box/StyleMarginTrim.h
     style/values/box/StylePadding.h
 
     style/values/break/StyleOrphans.h

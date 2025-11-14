@@ -32,6 +32,7 @@
 #include <WebCore/RenderStyleConstants.h>
 #include <WebCore/RepaintRectCalculation.h>
 #include <wtf/CheckedPtr.h>
+#include <wtf/EnumSet.h>
 #include <wtf/Platform.h>
 #include <wtf/TZoneMalloc.h>
 
@@ -99,6 +100,7 @@ class Box;
 
 namespace Style {
 class PseudoElementRequest;
+enum class MarginTrimSide : uint8_t;
 }
 
 enum class Affinity : bool;
@@ -1258,7 +1260,7 @@ private:
         // Dirty bit was set with MarkingBehavior::MarkOnlyThis
         bool preferredLogicalWidthsNeedUpdateIsMarkOnlyThis { false };
         bool isYouTubeReplacement { false };
-        OptionSet<MarginTrimType> trimmedMargins;
+        EnumSet<Style::MarginTrimSide> trimmedMargins;
 
         // From RenderElement
         std::unique_ptr<ReferencedSVGResources> referencedSVGResources;

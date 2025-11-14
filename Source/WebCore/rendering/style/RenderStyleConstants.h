@@ -666,13 +666,6 @@ enum class TextBoxTrim : uint8_t {
     TrimBoth
 };
 
-enum class MarginTrimType : uint8_t {
-    BlockStart = 1 << 0,
-    BlockEnd = 1 << 1,
-    InlineStart = 1 << 2,
-    InlineEnd = 1 << 3
-};
-
 enum class TextEdgeOver : uint8_t {
     Text,
     Ideographic,
@@ -1319,7 +1312,6 @@ WTF::TextStream& operator<<(WTF::TextStream&, LineAlign);
 WTF::TextStream& operator<<(WTF::TextStream&, LineBreak);
 WTF::TextStream& operator<<(WTF::TextStream&, LineSnap);
 WTF::TextStream& operator<<(WTF::TextStream&, ListStylePosition);
-WTF::TextStream& operator<<(WTF::TextStream&, MarginTrimType);
 WTF::TextStream& operator<<(WTF::TextStream&, MarqueeBehavior);
 WTF::TextStream& operator<<(WTF::TextStream&, MarqueeDirection);
 WTF::TextStream& operator<<(WTF::TextStream&, MaskMode);

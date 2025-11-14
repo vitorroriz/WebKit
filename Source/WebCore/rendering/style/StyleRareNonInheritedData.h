@@ -40,6 +40,7 @@
 #include <WebCore/StyleContainIntrinsicSize.h>
 #include <WebCore/StyleContainerName.h>
 #include <WebCore/StyleGapGutter.h>
+#include <WebCore/StyleMarginTrim.h>
 #include <WebCore/StyleMaskBorder.h>
 #include <WebCore/StyleMaximumLines.h>
 #include <WebCore/StyleOffsetAnchor.h>
@@ -143,7 +144,6 @@ public:
     OverflowContinue overflowContinue { OverflowContinue::Auto };
 
     OptionSet<TouchAction> touchActions;
-    OptionSet<MarginTrimType> marginTrim;
     OptionSet<Containment> contain;
 
     Style::WebkitInitialLetter initialLetter;
@@ -271,6 +271,7 @@ public:
     PREFERRED_TYPE(bool) unsigned usesTreeCountingFunctions : 1;
     PREFERRED_TYPE(bool) unsigned isPopoverInvoker : 1;
     PREFERRED_TYPE(bool) unsigned useSVGZoomRulesForLength : 1;
+    PREFERRED_TYPE(Style::MarginTrim) unsigned marginTrim : 4;
 
 private:
     StyleRareNonInheritedData();

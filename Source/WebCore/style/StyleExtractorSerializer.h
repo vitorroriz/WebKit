@@ -68,7 +68,6 @@ public:
 
     // MARK: Shared serializations
 
-    static void serializeMarginTrim(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<MarginTrimType>);
     static void serializeContain(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<Containment>);
     static void serializeSmoothScrolling(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, bool);
     static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
@@ -194,44 +193,6 @@ inline void ExtractorSerializer::serializeTransformationMatrix(const RenderStyle
 }
 
 // MARK: - Shared serializations
-
-inline void ExtractorSerializer::serializeMarginTrim(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<MarginTrimType> marginTrim)
-{
-    if (marginTrim.isEmpty()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::None { });
-        return;
-    }
-
-    // Try to serialize into one of the "block" or "inline" shorthands
-    if (marginTrim.containsAll({ MarginTrimType::BlockStart, MarginTrimType::BlockEnd }) && !marginTrim.containsAny({ MarginTrimType::InlineStart, MarginTrimType::InlineEnd })) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Block { });
-        return;
-    }
-    if (marginTrim.containsAll({ MarginTrimType::InlineStart, MarginTrimType::InlineEnd }) && !marginTrim.containsAny({ MarginTrimType::BlockStart, MarginTrimType::BlockEnd })) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Inline { });
-        return;
-    }
-    if (marginTrim.containsAll({ MarginTrimType::BlockStart, MarginTrimType::BlockEnd, MarginTrimType::InlineStart, MarginTrimType::InlineEnd })) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Block { });
-        builder.append(' ');
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Inline { });
-        return;
-    }
-
-    bool listEmpty = true;
-    auto appendOption = [&](MarginTrimType test, CSSValueID value) {
-        if (marginTrim.contains(test)) {
-            if (!listEmpty)
-                builder.append(' ');
-            builder.append(nameLiteralForSerialization(value));
-            listEmpty = false;
-        }
-    };
-    appendOption(MarginTrimType::BlockStart, CSSValueBlockStart);
-    appendOption(MarginTrimType::InlineStart, CSSValueInlineStart);
-    appendOption(MarginTrimType::BlockEnd, CSSValueBlockEnd);
-    appendOption(MarginTrimType::InlineEnd, CSSValueInlineEnd);
-}
 
 inline void ExtractorSerializer::serializeContain(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<Containment> containment)
 {

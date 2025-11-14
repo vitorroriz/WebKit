@@ -125,7 +125,7 @@ static OptionSet<GridAvoidanceReason> gridLayoutAvoidanceReason(const RenderGrid
     if (!renderGridStyle->writingMode().isHorizontal())
         ADD_REASON_AND_RETURN_IF_NEEDED(GridHasVerticalWritingMode, reasons, reasonCollectionMode);
 
-    if (!renderGridStyle->marginTrim().isEmpty())
+    if (!renderGridStyle->marginTrim().isNone())
         ADD_REASON_AND_RETURN_IF_NEEDED(GridHasMarginTrim, reasons, reasonCollectionMode);
 
     if (!renderGridStyle->isOverflowVisible())

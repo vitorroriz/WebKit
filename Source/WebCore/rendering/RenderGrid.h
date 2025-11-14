@@ -253,7 +253,7 @@ private:
     StyleSelfAlignmentData alignSelfForGridItem(const RenderBox&, StretchingMode = StretchingMode::Any, const RenderStyle* = nullptr) const;
     void applyStretchAlignmentToGridItemIfNeeded(RenderBox&, GridLayoutState&);
     void applySubgridStretchAlignmentToGridItemIfNeeded(RenderBox&);
-    bool isChildEligibleForMarginTrim(MarginTrimType, const RenderBox&) const final;
+    bool isChildEligibleForMarginTrim(Style::MarginTrimSide, const RenderBox&) const final;
 
     std::optional<LayoutUnit> firstLineBaseline() const final;
     std::optional<LayoutUnit> lastLineBaseline() const final;

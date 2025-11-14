@@ -485,7 +485,7 @@ inline Style::ImageOrNone RenderStyle::initialListStyleImage() { return CSS::Key
 constexpr ListStylePosition RenderStyle::initialListStylePosition() { return ListStylePosition::Outside; }
 inline Style::ListStyleType RenderStyle::initialListStyleType() { return CSS::Keyword::Disc { }; }
 inline Style::MarginEdge RenderStyle::initialMargin() { return 0_css_px; }
-constexpr OptionSet<MarginTrimType> RenderStyle::initialMarginTrim() { return { }; }
+constexpr Style::MarginTrim RenderStyle::initialMarginTrim() { return CSS::Keyword::None { }; }
 constexpr MarqueeBehavior RenderStyle::initialMarqueeBehavior() { return MarqueeBehavior::Scroll; }
 constexpr MarqueeDirection RenderStyle::initialMarqueeDirection() { return MarqueeDirection::Auto; }
 inline Style::WebkitMarqueeIncrement RenderStyle::initialMarqueeIncrement() { return 6_css_px; }
@@ -695,7 +695,7 @@ inline const Style::MarginEdge& RenderStyle::marginRight() const { return m_nonI
 inline const Style::MarginEdge& RenderStyle::marginStart() const { return marginStart(writingMode()); }
 inline const Style::MarginEdge& RenderStyle::marginStart(const WritingMode writingMode) const { return m_nonInheritedData->surroundData->margin.start(writingMode); }
 inline const Style::MarginEdge& RenderStyle::marginTop() const { return m_nonInheritedData->surroundData->margin.top(); }
-inline OptionSet<MarginTrimType> RenderStyle::marginTrim() const { return m_nonInheritedData->rareData->marginTrim; }
+inline Style::MarginTrim RenderStyle::marginTrim() const { return Style::MarginTrim::fromRaw(m_nonInheritedData->rareData->marginTrim); }
 inline MarqueeBehavior RenderStyle::marqueeBehavior() const { return static_cast<MarqueeBehavior>(m_nonInheritedData->rareData->marquee->behavior); }
 inline MarqueeDirection RenderStyle::marqueeDirection() const { return static_cast<MarqueeDirection>(m_nonInheritedData->rareData->marquee->direction); }
 inline const Style::WebkitMarqueeIncrement& RenderStyle::marqueeIncrement() const { return m_nonInheritedData->rareData->marquee->increment; }

@@ -781,9 +781,9 @@ LayoutUnit RenderBlock::marginIntrinsicLogicalWidthForChild(RenderBox& child) co
     auto& marginRight = child.style().marginEnd(writingMode());
     const auto& zoomFactor = child.style().usedZoomForLength();
     LayoutUnit margin;
-    if (auto fixedMarginLeft = marginLeft.tryFixed(); fixedMarginLeft && !shouldTrimChildMargin(MarginTrimType::InlineStart, child))
+    if (auto fixedMarginLeft = marginLeft.tryFixed(); fixedMarginLeft && !shouldTrimChildMargin(Style::MarginTrimSide::InlineStart, child))
         margin += fixedMarginLeft->resolveZoom(zoomFactor);
-    if (auto fixedMarginRight = marginRight.tryFixed(); fixedMarginRight && !shouldTrimChildMargin(MarginTrimType::InlineEnd, child))
+    if (auto fixedMarginRight = marginRight.tryFixed(); fixedMarginRight && !shouldTrimChildMargin(Style::MarginTrimSide::InlineEnd, child))
         margin += fixedMarginRight->resolveZoom(zoomFactor);
     return margin;
 }
@@ -2868,28 +2868,26 @@ bool RenderBlock::updateFragmentRangeForBoxChild(const RenderBox& box) const
     return false;
 }
 
-void RenderBlock::setTrimmedMarginForChild(RenderBox &child, MarginTrimType marginTrimType)
+void RenderBlock::setTrimmedMarginForChild(RenderBox& child, Style::MarginTrimSide side)
 {
-    switch (marginTrimType) {
-    case MarginTrimType::BlockStart:
+    switch (side) {
+    case Style::MarginTrimSide::BlockStart:
         setMarginBeforeForChild(child, 0_lu);
-        child.markMarginAsTrimmed(MarginTrimType::BlockStart);
         break;
-    case MarginTrimType::BlockEnd:
+    case Style::MarginTrimSide::BlockEnd:
         setMarginAfterForChild(child, 0_lu);
-        child.markMarginAsTrimmed(MarginTrimType::BlockEnd);
         break;
-    case MarginTrimType::InlineStart:
+    case Style::MarginTrimSide::InlineStart:
         setMarginStartForChild(child, 0_lu);
-        child.markMarginAsTrimmed(MarginTrimType::InlineStart);
         break;
-    case MarginTrimType::InlineEnd:
+    case Style::MarginTrimSide::InlineEnd:
         setMarginEndForChild(child, 0_lu);
-        child.markMarginAsTrimmed(MarginTrimType::InlineEnd);
         break;
     default:
         ASSERT_NOT_IMPLEMENTED_YET();
     }
+
+    child.markMarginAsTrimmed(side);
 }
 
 LayoutUnit RenderBlock::collapsedMarginBeforeForChild(const RenderBox& child) const

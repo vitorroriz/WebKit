@@ -144,7 +144,6 @@ enum class LineCap : uint8_t;
 enum class LineJoin : uint8_t;
 enum class LineSnap : uint8_t;
 enum class ListStylePosition : bool;
-enum class MarginTrimType : uint8_t;
 enum class MarqueeBehavior : uint8_t;
 enum class MarqueeDirection : uint8_t;
 enum class MaskType : uint8_t;
@@ -297,6 +296,7 @@ struct LineWidth;
 struct LineFitEdge;
 struct ListStyleType;
 struct MarginEdge;
+struct MarginTrim;
 struct MaskBorder;
 struct MaskBorderOutset;
 struct MaskBorderRepeat;
@@ -774,7 +774,7 @@ public:
     inline Style::TextBoxEdge textBoxEdge() const;
     inline Style::LineFitEdge lineFitEdge() const;
 
-    inline OptionSet<MarginTrimType> marginTrim() const;
+    inline Style::MarginTrim marginTrim() const;
 
     inline const Style::LetterSpacing& computedLetterSpacing() const;
     inline const Style::WordSpacing& computedWordSpacing() const;
@@ -1428,7 +1428,7 @@ public:
     inline void setTextBoxEdge(Style::TextBoxEdge);
     inline void setLineFitEdge(Style::LineFitEdge);
 
-    inline void setMarginTrim(OptionSet<MarginTrimType>);
+    inline void setMarginTrim(Style::MarginTrim);
 
     void setLineHeight(Style::LineHeight&&);
 #if ENABLE(TEXT_AUTOSIZING)
@@ -2076,7 +2076,7 @@ public:
     static inline Style::SVGRadiusComponent initialRx();
     static inline Style::SVGRadiusComponent initialRy();
     static inline Style::MarginEdge initialMargin();
-    static constexpr OptionSet<MarginTrimType> initialMarginTrim();
+    static constexpr Style::MarginTrim initialMarginTrim();
     static inline Style::PaddingEdge initialPadding();
     static inline Style::PageSize initialPageSize();
     static inline Style::TextIndent initialTextIndent();
