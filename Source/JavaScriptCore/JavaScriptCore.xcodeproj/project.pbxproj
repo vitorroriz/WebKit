@@ -55,8 +55,8 @@
 			buildConfigurationList = 65FB3F7709D11EBD00F49DEB /* Build configuration list for PBXAggregateTarget "Derived Sources" */;
 			buildPhases = (
 				DDE99311278D088800F60D26 /* Product Dependencies */,
-				65FB3F6509D11E9100F49DEB /* Generate Derived Sources */,
 				DD190BB72E1C480200BE3ECA /* Generate <wtf/Platform.h> args */,
+				65FB3F6509D11E9100F49DEB /* Generate Derived Sources */,
 			);
 			dependencies = (
 			);
@@ -5708,6 +5708,7 @@
 		DCF3D5681CD29468003D5C65 /* LazyPropertyInlines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LazyPropertyInlines.h; sourceTree = "<group>"; };
 		DCFDFBD71D1F5D9800FE3D72 /* B3BottomProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = B3BottomProvider.h; path = b3/B3BottomProvider.h; sourceTree = "<group>"; };
 		DCFDFBD81D1F5D9800FE3D72 /* B3TypeMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = B3TypeMap.h; path = b3/B3TypeMap.h; sourceTree = "<group>"; };
+		DD453DC62EC56E5900C1D6A8 /* generate-derived-sources.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "generate-derived-sources.sh"; sourceTree = "<group>"; };
 		DD4BEC0E29CB85AF00398E35 /* B3CanonicalizePrePostIncrements.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = B3CanonicalizePrePostIncrements.cpp; path = b3/B3CanonicalizePrePostIncrements.cpp; sourceTree = "<group>"; };
 		DD4BEC0F29CB85AF00398E35 /* B3CanonicalizePrePostIncrements.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = B3CanonicalizePrePostIncrements.h; path = b3/B3CanonicalizePrePostIncrements.h; sourceTree = "<group>"; };
 		DD5F74F8283EF4380027A8C6 /* copy-profiling-data.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "copy-profiling-data.sh"; sourceTree = "<group>"; };
@@ -10091,6 +10092,7 @@
 				DD5F74F8283EF4380027A8C6 /* copy-profiling-data.sh */,
 				9959E9271BD17FA0001AA413 /* cssmin.py */,
 				9959E92F1BD181F6001AA413 /* generate-combined-inspector-json.py */,
+				DD453DC62EC56E5900C1D6A8 /* generate-derived-sources.sh */,
 				99DA00AC1BD5993E00F4575C /* generate-js-builtins.py */,
 				9959E9301BD181F6001AA413 /* inline-and-minify-stylesheets-and-scripts.py */,
 				9959E9291BD17FA0001AA413 /* jsmin.py */,
@@ -13103,13 +13105,12 @@
 				"$(BUILT_PRODUCTS_DIR)/DerivedSources/JavaScriptCore/platform-enabled-swift-args.arm64_32.resp",
 				"$(BUILT_PRODUCTS_DIR)/DerivedSources/JavaScriptCore/platform-enabled-swift-args.arm64e.resp",
 				"$(BUILT_PRODUCTS_DIR)/DerivedSources/JavaScriptCore/platform-enabled-swift-args.armv7k.resp",
-				"$(BUILT_PRODUCTS_DIR)/DerivedSources/JavaScriptCore/platform-enabled-swift-args.i386.resp",
 				"$(BUILT_PRODUCTS_DIR)/DerivedSources/JavaScriptCore/platform-enabled-swift-args.x86_64.resp",
 				"$(BUILT_PRODUCTS_DIR)/DerivedSources/JavaScriptCore/rdar150228472.swift",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"${ACTION}\" = installhdrs ]\nthen touch \"${DERIVED_FILES_DIR}/generate-platform-args.d\"\nelse \"${SCRIPT_INPUT_FILE_0}\"\nfi\n";
+			shellScript = "\"${SCRIPT_INPUT_FILE_0}\"\n";
 		};
 		DD9C4CC52A05D4FB00D52E2E /* Fix up SDKROOT path in TAPI filelists (install only) */ = {
 			isa = PBXShellScriptBuildPhase;
