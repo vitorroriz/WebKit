@@ -82,7 +82,6 @@ namespace WebCore {
 struct SameSizeAsBorderValue {
     Style::Color m_color;
     float m_width;
-    bool m_isKeyword;
     int m_restBits;
 };
 

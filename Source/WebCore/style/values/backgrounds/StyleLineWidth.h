@@ -43,14 +43,9 @@ struct LineWidth {
     using Length = Style::Length<CSS::NonnegativeUnzoomed>;
 
     Length value;
-    bool isKeyword { false };
 
-    constexpr LineWidth(Length length) : value { length }, isKeyword { false } { }
+    constexpr LineWidth(Length length) : value { length } { }
     constexpr LineWidth(CSS::ValueLiteral<CSS::LengthUnit::Px> literal) : value { literal } { }
-
-    constexpr LineWidth(CSS::Keyword::Thin) : value { 1 }, isKeyword { true } { }
-    constexpr LineWidth(CSS::Keyword::Medium) : value { 3 }, isKeyword { true } { }
-    constexpr LineWidth(CSS::Keyword::Thick) : value { 5 }, isKeyword { true } { }
 
     constexpr bool isZero() const { return value.isZero(); }
     constexpr bool isPositive() const { return value.isPositive(); }
@@ -73,11 +68,7 @@ template<> struct CSSValueConversion<LineWidth> { auto operator()(BuilderState&,
 template<typename Result> struct Evaluation<LineWidth, Result> {
     constexpr auto operator()(const LineWidth& value, ZoomFactor zoom) -> Result
     {
-        if (value.isKeyword)
-            return Result(value.value.unresolvedValue());
-
         float result = value.value.resolveZoom(zoom);
-        float snappedResult = floorToDevicePixel(result, zoom.deviceScaleFactor);
 
         // Any original result that was >= 1 should not be allowed to fall below 1. This keeps border lines from vanishing.
         if (zoom.value < 1.0f && result < 1.0f && value.value.unresolvedValue() >= 1.0f)
@@ -86,7 +77,7 @@ template<typename Result> struct Evaluation<LineWidth, Result> {
         if (auto minimumLineWidth = 1.0f / zoom.deviceScaleFactor; result > 0.0f && result < minimumLineWidth)
             return Result(minimumLineWidth);
 
-        return Result(snappedResult);
+        return Result(floorToDevicePixel(result, zoom.deviceScaleFactor));
     }
 };
 

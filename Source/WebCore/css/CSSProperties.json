@@ -2728,6 +2728,7 @@
                 "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialBorderWidth",
                 "style-converter": "StyleType<LineWidth>",
+                "style-builder-custom": "Initial",
                 "disables-native-appearance": true,
                 "parser-grammar": "<line-width>"
             },
@@ -3259,6 +3260,7 @@
                 "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialBorderWidth",
                 "style-converter": "StyleType<LineWidth>",
+                "style-builder-custom": "Initial",
                 "disables-native-appearance": true,
                 "parser-grammar": "<line-width>"
             },
@@ -3366,6 +3368,7 @@
                 "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialBorderWidth",
                 "style-converter": "StyleType<LineWidth>",
+                "style-builder-custom": "Initial",
                 "disables-native-appearance": true,
                 "parser-grammar": "<line-width>"
             },
@@ -3572,6 +3575,7 @@
                 "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialBorderWidth",
                 "style-converter": "StyleType<LineWidth>",
+                "style-builder-custom": "Initial",
                 "disables-native-appearance": true,
                 "parser-grammar": "<line-width>"
             },
@@ -6622,6 +6626,7 @@
             "codegen-properties": {
                 "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<LineWidth>",
+                "style-builder-custom": "Initial",
                 "parser-grammar": "<line-width>"
             },
             "specification": {
@@ -9213,6 +9218,7 @@
                 ],
                 "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<LineWidth>",
+                "style-builder-custom": "Initial",
                 "parser-grammar": "<line-width>"
             },
             "specification":  {

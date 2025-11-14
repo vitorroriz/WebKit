@@ -53,7 +53,7 @@ public:
 
 protected:
     Style::Color m_color { Style::Color::currentColor() };
-    Style::LineWidth m_width { CSS::Keyword::Medium { } };
+    Style::LineWidth m_width { Style::LineWidth::Length { 3.0f } };
     PREFERRED_TYPE(BorderStyle) unsigned m_style : 4;
 };
 
