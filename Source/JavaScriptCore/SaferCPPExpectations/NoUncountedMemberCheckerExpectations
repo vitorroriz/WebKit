@@ -22,9 +22,7 @@ heap/JITStubRoutineSet.h
 inspector/InspectorAgentBase.h
 inspector/JSJavaScriptCallFrame.h
 jit/JIT.h
-jit/JITPlan.h
 jit/JITSafepoint.h
-jit/JITWorklistThread.cpp
 jit/OperationResult.h
 parser/Parser.h
 parser/SourceProvider.h

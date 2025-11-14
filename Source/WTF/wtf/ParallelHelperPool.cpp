@@ -177,6 +177,8 @@ void ParallelHelperPool::doSomeHelping()
 }
 
 class ParallelHelperPool::Thread final : public AutomaticThread {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(Thread);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(Thread);
 public:
     Thread(const AbstractLocker& locker, ParallelHelperPool& pool)
         : AutomaticThread(locker, pool.m_lock, pool.m_workAvailableCondition.copyRef())

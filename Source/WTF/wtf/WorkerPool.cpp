@@ -33,6 +33,8 @@ namespace WTF {
 WTF_MAKE_TZONE_ALLOCATED_IMPL(WorkerPool);
 
 class WorkerPool::Worker final : public AutomaticThread {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(Worker);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(Worker);
 public:
     friend class WorkerPool;
 

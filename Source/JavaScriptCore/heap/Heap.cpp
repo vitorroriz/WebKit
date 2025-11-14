@@ -95,6 +95,7 @@
 #include <wtf/Scope.h>
 #include <wtf/SimpleStats.h>
 #include <wtf/SystemTracing.h>
+#include <wtf/TZoneMallocInlines.h>
 #include <wtf/Threading.h>
 
 #if USE(BMALLOC_MEMORY_FOOTPRINT_API)
@@ -270,6 +271,8 @@ private:
 } // anonymous namespace
 
 class Heap::HeapThread final : public AutomaticThread {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(HeapThread);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(HeapThread);
 public:
     HeapThread(const AbstractLocker& locker, JSC::Heap& heap)
         : AutomaticThread(locker, heap.m_threadLock, heap.m_threadCondition.copyRef())
@@ -460,7 +463,7 @@ Heap::Heap(VM& vm, HeapType heapType)
     m_maxEdenSizeWhenCritical = memoryAboveCriticalThreshold / 4;
 
     Locker locker { *m_threadLock };
-    m_thread = adoptRef(new HeapThread(locker, *this));
+    lazyInitialize(m_thread, adoptRef(*new HeapThread(locker, *this)));
 }
 
 #undef INIT_SERVER_ISO_SUBSPACE

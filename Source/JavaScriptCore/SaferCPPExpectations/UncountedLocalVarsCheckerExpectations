@@ -69,7 +69,6 @@ interpreter/Interpreter.cpp
 interpreter/StackVisitor.cpp
 jit/JITOpcodes.cpp
 jit/JITOperations.cpp
-jit/JITSafepoint.cpp
 jit/JITWorklist.cpp
 jsc.cpp
 llint/LLIntEntrypoint.cpp
