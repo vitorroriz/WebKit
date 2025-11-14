@@ -833,8 +833,12 @@ void MediaPlayerPrivateWebM::setReadyState(MediaPlayer::ReadyState state)
     if (state == m_readyState)
         return;
 
-    ALWAYS_LOG(LOGIDENTIFIER, state);
     m_readyState = state;
+    bool waitingOnAvailableFrame = m_readyState >= MediaPlayer::ReadyState::HaveCurrentData && hasVideo() && !m_hasAvailableVideoFrame;
+    ALWAYS_LOG(LOGIDENTIFIER, state, " waitingOnAvailableVideoFrame: ", waitingOnAvailableFrame);
+
+    if (waitingOnAvailableFrame)
+        return;
 
     if (RefPtr player = m_player.get())
         player->readyStateChanged();
