@@ -1,3 +1,4 @@
 wtf/HashTable.h
 wtf/JSONValues.h
 wtf/RecursiveLockAdapter.h
+wtf/RedBlackTree.h

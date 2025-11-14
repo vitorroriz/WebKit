@@ -35,10 +35,10 @@ namespace WTF {
 
 static constexpr bool report = false;
 
-class RunLoop::TimerBase::ScheduledTask final : public ThreadSafeRefCounted<ScheduledTask>, public RedBlackTree<ScheduledTask, MonotonicTime>::Node {
-    WTF_DEPRECATED_MAKE_FAST_ALLOCATED(ScheduledTask);
+class RunLoop::TimerBase::ScheduledTask : public ThreadSafeRefCounted<ScheduledTask>, public RedBlackTree<ScheduledTask, MonotonicTime>::Node {
+    WTF_DEPRECATED_MAKE_FAST_ALLOCATED(RunLoop);
     WTF_MAKE_NONCOPYABLE(ScheduledTask);
-    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(ScheduledTask);
+
 public:
     static Ref<ScheduledTask> create(RunLoop::TimerBase& timer)
     {

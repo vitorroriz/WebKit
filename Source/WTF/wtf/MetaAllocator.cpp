@@ -30,7 +30,6 @@
 #include <wtf/MetaAllocator.h>
 
 #include <wtf/NeverDestroyed.h>
-#include <wtf/TZoneMallocInlines.h>
 #include <wtf/WTFConfig.h>
 
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
@@ -42,16 +41,13 @@ DEFINE_ALLOCATOR_WITH_HEAP_IDENTIFIER(MetaAllocatorHandle);
 DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER_AND_EXPORT(MetaAllocatorFreeSpace, WTF_INTERNAL);
 DEFINE_ALLOCATOR_WITH_HEAP_IDENTIFIER(MetaAllocatorFreeSpace);
 
-WTF_MAKE_TZONE_ALLOCATED_IMPL(MetaAllocator::FreeSpaceNode);
-
 MetaAllocator::~MetaAllocator()
 {
-    for (CheckedPtr node = m_freeSpaceSizeMap.first(); node;) {
-        CheckedPtr next = node->successor();
-        m_freeSpaceSizeMap.remove(node.get());
-        SUPPRESS_UNCHECKED_LOCAL auto* nodePtr = std::exchange(node, nullptr).unsafeGet(); // NOLINT
-        freeFreeSpaceNode(nodePtr);
-        node = WTFMove(next);
+    for (FreeSpaceNode* node = m_freeSpaceSizeMap.first(); node;) {
+        FreeSpaceNode* next = node->successor();
+        m_freeSpaceSizeMap.remove(node);
+        freeFreeSpaceNode(node);
+        node = next;
     }
 #ifndef NDEBUG
     ASSERT(!m_mallocBalance);
@@ -215,7 +211,7 @@ MetaAllocator::Statistics MetaAllocator::currentStatistics(const Locker<Lock>&)
 
 MetaAllocator::FreeSpacePtr MetaAllocator::findAndRemoveFreeSpace(size_t sizeInBytes)
 {
-    CheckedPtr node = m_freeSpaceSizeMap.findLeastGreaterThanOrEqual(sizeInBytes);
+    FreeSpaceNode* node = m_freeSpaceSizeMap.findLeastGreaterThanOrEqual(sizeInBytes);
     
     if (!node)
         return nullptr;
@@ -223,7 +219,7 @@ MetaAllocator::FreeSpacePtr MetaAllocator::findAndRemoveFreeSpace(size_t sizeInB
     size_t nodeSizeInBytes = node->sizeInBytes();
     RELEASE_ASSERT(nodeSizeInBytes >= sizeInBytes);
 
-    m_freeSpaceSizeMap.remove(node.get());
+    m_freeSpaceSizeMap.remove(node);
 
     FreeSpacePtr result;
 
@@ -233,8 +229,7 @@ MetaAllocator::FreeSpacePtr MetaAllocator::findAndRemoveFreeSpace(size_t sizeInB
         
         m_freeSpaceStartAddressMap.remove(node->m_start);
         m_freeSpaceEndAddressMap.remove(node->m_end);
-        SUPPRESS_UNCHECKED_LOCAL auto* nodePtr = std::exchange(node, nullptr).unsafeGet(); // NOLINT
-        freeFreeSpaceNode(nodePtr);
+        freeFreeSpaceNode(node);
     } else {
         // Try to be a good citizen and ensure that the returned chunk of memory
         // straddles as few pages as possible, but only insofar as doing so will
@@ -259,8 +254,8 @@ MetaAllocator::FreeSpacePtr MetaAllocator::findAndRemoveFreeSpace(size_t sizeInB
             node->m_start += sizeInBytes;
             RELEASE_ASSERT(nodeStartAsInt < node->m_start.untaggedPtr<uintptr_t>() && node->m_start.untaggedPtr<uintptr_t>() < node->m_end.untaggedPtr<uintptr_t>());
 
-            m_freeSpaceSizeMap.insert(node.get());
-            m_freeSpaceStartAddressMap.add(node->m_start, node.get());
+            m_freeSpaceSizeMap.insert(node);
+            m_freeSpaceStartAddressMap.add(node->m_start, node);
         } else {
             // Allocate in the right size of the returned chunk, and slide the node to the left;
 
@@ -270,8 +265,8 @@ MetaAllocator::FreeSpacePtr MetaAllocator::findAndRemoveFreeSpace(size_t sizeInB
 
             node->m_end = result;
 
-            m_freeSpaceSizeMap.insert(node.get());
-            m_freeSpaceEndAddressMap.add(result, node.get());
+            m_freeSpaceSizeMap.insert(node);
+            m_freeSpaceEndAddressMap.add(result, node);
         }
     }
     
@@ -304,7 +299,7 @@ size_t MetaAllocator::debugFreeSpaceSize()
 #ifndef NDEBUG
     Locker locker { m_lock };
     size_t result = 0;
-    for (CheckedPtr node = m_freeSpaceSizeMap.first(); node; node = node->successor())
+    for (FreeSpaceNode* node = m_freeSpaceSizeMap.first(); node; node = node->successor())
         result += node->sizeInBytes();
     return result;
 #else
@@ -317,8 +312,8 @@ void MetaAllocator::addFreeSpace(FreeSpacePtr start, size_t sizeInBytes)
 {
     FreeSpacePtr end = start + sizeInBytes;
 
-    auto leftNeighbor = m_freeSpaceEndAddressMap.find(start);
-    auto rightNeighbor = m_freeSpaceStartAddressMap.find(end);
+    UncheckedKeyHashMap<FreeSpacePtr, FreeSpaceNode*>::iterator leftNeighbor = m_freeSpaceEndAddressMap.find(start);
+    UncheckedKeyHashMap<FreeSpacePtr, FreeSpaceNode*>::iterator rightNeighbor = m_freeSpaceStartAddressMap.find(end);
 
     if (leftNeighbor != m_freeSpaceEndAddressMap.end()) {
         // We have something we can coalesce with on the left. Remove it from the tree, and
@@ -326,13 +321,13 @@ void MetaAllocator::addFreeSpace(FreeSpacePtr start, size_t sizeInBytes)
         
         ASSERT(leftNeighbor->value->m_end == leftNeighbor->key);
 
-        CheckedPtr leftNode = leftNeighbor->value;
+        FreeSpaceNode* leftNode = leftNeighbor->value;
 
         FreeSpacePtr leftEnd = leftNode->m_end;
 
         ASSERT(leftEnd == start);
         
-        m_freeSpaceSizeMap.remove(leftNode.get());
+        m_freeSpaceSizeMap.remove(leftNode);
         m_freeSpaceEndAddressMap.remove(leftEnd);
         
         // Now check if there is also something to coalesce with on the right.
@@ -342,7 +337,7 @@ void MetaAllocator::addFreeSpace(FreeSpacePtr start, size_t sizeInBytes)
             
             ASSERT(rightNeighbor->value->m_start == rightNeighbor->key);
             
-            CheckedPtr rightNode = rightNeighbor->value;
+            FreeSpaceNode* rightNode = rightNeighbor->value;
             FreeSpacePtr rightStart = rightNeighbor->key;
             size_t rightSize = rightNode->sizeInBytes();
             FreeSpacePtr rightEnd = rightNode->m_end;
@@ -350,50 +345,50 @@ void MetaAllocator::addFreeSpace(FreeSpacePtr start, size_t sizeInBytes)
             ASSERT(rightStart == end);
             ASSERT(leftNode->m_start + (leftNode->sizeInBytes() + sizeInBytes + rightSize) == rightEnd);
 
-            m_freeSpaceSizeMap.remove(rightNode.get());
+            m_freeSpaceSizeMap.remove(rightNode);
             m_freeSpaceStartAddressMap.remove(rightStart);
             m_freeSpaceEndAddressMap.remove(rightEnd);
             
-            freeFreeSpaceNode(rightNode.get());
+            freeFreeSpaceNode(rightNode);
 
             leftNode->m_end += (sizeInBytes + rightSize);
 
-            m_freeSpaceSizeMap.insert(leftNode.get());
-            m_freeSpaceEndAddressMap.add(rightEnd, leftNode.get());
+            m_freeSpaceSizeMap.insert(leftNode);
+            m_freeSpaceEndAddressMap.add(rightEnd, leftNode);
         } else {
             leftNode->m_end += sizeInBytes;
 
-            m_freeSpaceSizeMap.insert(leftNode.get());
-            m_freeSpaceEndAddressMap.add(end, leftNode.get());
+            m_freeSpaceSizeMap.insert(leftNode);
+            m_freeSpaceEndAddressMap.add(end, leftNode);
         }
     } else {
         // Cannot coalesce with left; try to see if we can coalesce with right.
         
         if (rightNeighbor != m_freeSpaceStartAddressMap.end()) {
-            CheckedPtr rightNode = rightNeighbor->value;
+            FreeSpaceNode* rightNode = rightNeighbor->value;
             FreeSpacePtr rightStart = rightNeighbor->key;
 
             ASSERT(rightStart == end);
             ASSERT(start + (sizeInBytes + rightNode->sizeInBytes()) == rightNode->m_end);
 
-            m_freeSpaceSizeMap.remove(rightNode.get());
+            m_freeSpaceSizeMap.remove(rightNode);
             m_freeSpaceStartAddressMap.remove(rightStart);
 
             rightNode->m_start = start;
 
-            m_freeSpaceSizeMap.insert(rightNode.get());
-            m_freeSpaceStartAddressMap.add(start, rightNode.get());
+            m_freeSpaceSizeMap.insert(rightNode);
+            m_freeSpaceStartAddressMap.add(start, rightNode);
         } else {
             // Nothing to coalesce with, so create a new free space node and add it.
             
-            CheckedPtr node = allocFreeSpaceNode();
+            FreeSpaceNode* node = allocFreeSpaceNode();
 
             node->m_start = start;
             node->m_end = start + sizeInBytes;
 
-            m_freeSpaceSizeMap.insert(node.get());
-            m_freeSpaceStartAddressMap.add(start, node.get());
-            m_freeSpaceEndAddressMap.add(end, node.get());
+            m_freeSpaceSizeMap.insert(node);
+            m_freeSpaceStartAddressMap.add(start, node);
+            m_freeSpaceEndAddressMap.add(end, node);
         }
     }
     

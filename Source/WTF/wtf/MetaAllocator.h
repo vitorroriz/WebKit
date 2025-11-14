@@ -36,7 +36,6 @@
 #include <wtf/PageBlock.h>
 #include <wtf/RedBlackTree.h>
 #include <wtf/RefPtr.h>
-#include <wtf/TZoneMalloc.h>
 
 namespace WTF {
 
@@ -140,9 +139,7 @@ private:
     
     friend class MetaAllocatorHandle;
     
-    class FreeSpaceNode final : public RedBlackTree<FreeSpaceNode, size_t>::Node {
-        WTF_MAKE_TZONE_ALLOCATED(FreeSpaceNode);
-        WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(FreeSpaceNode);
+    class FreeSpaceNode : public RedBlackTree<FreeSpaceNode, size_t>::Node {
     public:
         size_t sizeInBytes()
         {
@@ -190,8 +187,8 @@ private:
     unsigned m_logPageSize;
     
     Tree m_freeSpaceSizeMap;
-    UncheckedKeyHashMap<FreeSpacePtr, CheckedPtr<FreeSpaceNode>> m_freeSpaceStartAddressMap;
-    UncheckedKeyHashMap<FreeSpacePtr, CheckedPtr<FreeSpaceNode>> m_freeSpaceEndAddressMap;
+    UncheckedKeyHashMap<FreeSpacePtr, FreeSpaceNode*> m_freeSpaceStartAddressMap;
+    UncheckedKeyHashMap<FreeSpacePtr, FreeSpaceNode*> m_freeSpaceEndAddressMap;
     UncheckedKeyHashMap<uintptr_t, size_t> m_pageOccupancyMap;
     
     size_t m_bytesAllocated;
