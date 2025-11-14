@@ -1,4 +1,8 @@
 //@ runDefault
+function drain(msg) {
+}
+noInline(drain);
+
 function opt(object, arr, exitEarly) {
     if (exitEarly) {
         return;
@@ -49,7 +53,7 @@ function main() {
             convert = true;
             opt(object, arr, /* exitEarly */ false);
 
-            print(arr);
+            drain(arr);
         }, 1000);
     }, 500);
 }

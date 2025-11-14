@@ -1,4 +1,8 @@
 //@ runDefault
+function drain(msg) {
+}
+noInline(drain);
+
 function opt(objectA, exitEarly) {
     if (exitEarly) {
         return;
@@ -74,7 +78,7 @@ async function main() {
 
     opt(objectA, /* exitEarly */ false);
 
-    print(createClonedArguments[0]);
+    drain(createClonedArguments[0]);
 }
 
 main().catch(e => {
