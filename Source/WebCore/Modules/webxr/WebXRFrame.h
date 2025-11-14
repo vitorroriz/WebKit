@@ -85,7 +85,11 @@ public:
 
     static TransformationMatrix matrixFromPose(const PlatformXR::FrameData::Pose&);
 
-    struct PopulatedPose;
+    struct PopulatedPose {
+        TransformationMatrix transform;
+        bool emulatedPosition { false };
+    };
+
     ExceptionOr<std::optional<PopulatedPose>> populatePose(const Document&, const WebXRSpace&, const WebXRSpace&);
 
 private:

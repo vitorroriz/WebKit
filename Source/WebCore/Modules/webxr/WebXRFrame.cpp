@@ -32,6 +32,7 @@
 #include "ExceptionOr.h"
 #include "WebXRBoundedReferenceSpace.h"
 #include "WebXRHitTestSource.h"
+#include "WebXRInputSource.h"
 #include "WebXRJointPose.h"
 #include "WebXRJointSpace.h"
 #include "WebXRReferenceSpace.h"
@@ -102,11 +103,6 @@ bool WebXRFrame::mustPosesBeLimited(const WebXRSpace& space, const WebXRSpace& b
 
     return false;
 }
-
-struct WebXRFrame::PopulatedPose {
-    TransformationMatrix transform;
-    bool emulatedPosition { false };
-};
 
 // https://immersive-web.github.io/webxr/#populate-the-pose
 ExceptionOr<std::optional<WebXRFrame::PopulatedPose>> WebXRFrame::populatePose(const Document& document, const WebXRSpace& space, const WebXRSpace& baseSpace)
