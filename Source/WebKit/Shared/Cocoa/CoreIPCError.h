@@ -43,7 +43,11 @@ public:
     CoreIPCError& operator=(CoreIPCError&&) = default;
 
     CoreIPCError(NSError *);
-    CoreIPCError(String&& domain, int64_t code, std::unique_ptr<CoreIPCError>&& underlyingError, std::optional<Vector<RetainPtr<SecCertificateRef>>>&& clientCertificateChain, std::optional<Vector<RetainPtr<SecCertificateRef>>>&& peerCertificateChain, String&& localizedDescription, String&& localizedFailureReasonError, String&& localizedRecoverySuggestionError, std::optional<Vector<String>>&& localizedRecoveryOptionsError, String&& localizedFailureError, String&& helpAnchorError, String&& debugDescriptionError, RetainPtr<NSNumber>&& stringEncodingError, RetainPtr<SecTrustRef>&& failingURLPeerTrustError, RetainPtr<NSURL>&& urlError, RetainPtr<NSURL>&& failingURLError, String&& filePathError, String&& networkTaskDescription, String&& networkTaskMetricsPrivacyStance, String&& description)
+    CoreIPCError(String&& domain, int64_t code, std::unique_ptr<CoreIPCError>&& underlyingError, std::optional<Vector<RetainPtr<SecCertificateRef>>>&& clientCertificateChain, std::optional<Vector<RetainPtr<SecCertificateRef>>>&& peerCertificateChain, String&& localizedDescription, String&& localizedFailureReasonError, String&& localizedRecoverySuggestionError, std::optional<Vector<String>>&& localizedRecoveryOptionsError, String&& localizedFailureError, String&& helpAnchorError, String&& debugDescriptionError, RetainPtr<NSNumber>&& stringEncodingError, RetainPtr<SecTrustRef>&& failingURLPeerTrustError, RetainPtr<NSURL>&& urlError, RetainPtr<NSURL>&& failingURLError,
+#if USE(NSURL_ERROR_FAILING_URL_STRING_KEY)
+        String&& failingURLStringError,
+#endif
+        String&& filePathError, String&& networkTaskDescription, String&& networkTaskMetricsPrivacyStance, String&& description)
         : m_domain(WTFMove(domain))
         , m_code(WTFMove(code))
         , m_underlyingError(WTFMove(underlyingError))
@@ -60,6 +64,9 @@ public:
         , m_failingURLPeerTrustError(WTFMove(failingURLPeerTrustError))
         , m_urlError(WTFMove(urlError))
         , m_failingURLError(WTFMove(failingURLError))
+#if USE(NSURL_ERROR_FAILING_URL_STRING_KEY)
+        , m_failingURLStringError(WTFMove(failingURLStringError))
+#endif
         , m_filePathError(WTFMove(filePathError))
         , m_networkTaskDescription(WTFMove(networkTaskDescription))
         , m_networkTaskMetricsPrivacyStance(WTFMove(networkTaskMetricsPrivacyStance))
@@ -92,6 +99,9 @@ private:
     RetainPtr<SecTrustRef> m_failingURLPeerTrustError;
     RetainPtr<NSURL> m_urlError;
     RetainPtr<NSURL> m_failingURLError;
+#if USE(NSURL_ERROR_FAILING_URL_STRING_KEY)
+    String m_failingURLStringError;
+#endif
 
     String m_filePathError;
 

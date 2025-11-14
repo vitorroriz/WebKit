@@ -82,6 +82,9 @@ RetainPtr<id> CoreIPCError::toID() const
     INJECT_VALUE(NSURLErrorFailingURLPeerTrustErrorKey, m_failingURLPeerTrustError)
     INJECT_VALUE(NSURLErrorKey, m_urlError)
     INJECT_VALUE(NSURLErrorFailingURLErrorKey, m_failingURLError)
+#if USE(NSURL_ERROR_FAILING_URL_STRING_KEY)
+    INJECT_STRING_VALUE(NSURLErrorFailingURLStringErrorKey, m_failingURLStringError)
+#endif
 
     INJECT_STRING_VALUE(NSFilePathErrorKey, m_filePathError)
 
@@ -197,6 +200,9 @@ CoreIPCError::CoreIPCError(NSError *nsError)
 
     EXTRACT_TYPED_VALUE(NSURLErrorKey, NSURL, m_urlError)
     EXTRACT_TYPED_VALUE(NSURLErrorFailingURLErrorKey, NSURL, m_failingURLError)
+#if USE(NSURL_ERROR_FAILING_URL_STRING_KEY)
+    EXTRACT_STRING_VALUE(NSURLErrorFailingURLStringErrorKey, m_failingURLStringError)
+#endif
 
     EXTRACT_STRING_VALUE(NSFilePathErrorKey, m_filePathError)
 
