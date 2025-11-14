@@ -220,15 +220,7 @@ bool Styleable::mayHaveNonZeroOpacity() const
         return true;
 
     auto* effectStack = keyframeEffectStack();
-    if (!effectStack || !effectStack->hasEffects())
-        return false;
-
-    for (const auto& effect : effectStack->sortedEffects()) {
-        if (effect->animatesProperty(CSSPropertyOpacity))
-            return true;
-    }
-
-    return false;
+    return effectStack && effectStack->containsProperty(CSSPropertyOpacity);
 }
 
 bool Styleable::isRunningAcceleratedAnimationOfProperty(CSSPropertyID property) const
