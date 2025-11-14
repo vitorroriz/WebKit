@@ -319,11 +319,9 @@ bool KeyframeEffectStack::hasAcceleratedEffects(const Settings& settings) const
 #else
     UNUSED_PARAM(settings);
 #endif
-    for (auto& effect : m_effects) {
-        if (effect->isRunningAccelerated())
-            return true;
-    }
-    return false;
+    return hasMatchingEffect([](const auto& effect) {
+        return effect.isRunningAccelerated();
+    });
 }
 
 } // namespace WebCore
