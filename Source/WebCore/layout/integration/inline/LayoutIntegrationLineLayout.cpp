@@ -226,7 +226,7 @@ static const InlineDisplay::Line& lastLineWithInlineContent(const InlineDisplay:
     // account when computing content box height/baselines.
     for (auto& line : lines | std::views::reverse) {
         ASSERT(line.boxCount());
-        if (line.boxCount() > 1)
+        if (line.hasInflowContent())
             return line;
     }
     return lines.first();
@@ -807,7 +807,7 @@ bool LineLayout::hasEllipsisInBlockDirectionOnLastFormattedLine() const
         return false;
 
     for (auto& line : m_inlineContent->displayContent().lines | std::views::reverse) {
-        if (line.boxCount() == 1) {
+        if (!line.hasInflowContent()) {
             // Out-of-flow content could initiate a line with no inline content.
             continue;
         }
@@ -867,14 +867,14 @@ size_t LineLayout::lineCount() const
 {
     if (!m_inlineContent)
         return 0;
-    if (!m_inlineContent->hasContent())
+    if (!m_inlineContent->hasInflowContent())
         return 0;
 
     auto& lines = m_inlineContent->displayContent().lines;
     if (lines.isEmpty())
         return 0;
     // In some cases (trailing out-of-flow, non-contentful content after <br>) we produce last line with no content but root inline box only.
-    return lines.last().boxCount() > 1 ? lines.size() : lines.size() - 1;
+    return lines.last().hasInflowContent() ? lines.size() : lines.size() - 1;
 }
 
 bool LineLayout::hasInkOverflow() const
@@ -1009,7 +1009,7 @@ InlineIterator::InlineBoxIterator LineLayout::firstInlineBoxFor(const RenderInli
 
 InlineIterator::InlineBoxIterator LineLayout::firstRootInlineBox() const
 {
-    if (!m_inlineContent || !m_inlineContent->hasContent())
+    if (!m_inlineContent || !m_inlineContent->hasInflowContent())
         return { };
 
     return InlineIterator::inlineBoxFor(*m_inlineContent, m_inlineContent->displayContent().boxes[0]);
@@ -1017,7 +1017,7 @@ InlineIterator::InlineBoxIterator LineLayout::firstRootInlineBox() const
 
 InlineIterator::LineBoxIterator LineLayout::firstLineBox() const
 {
-    if (!m_inlineContent || !m_inlineContent->hasContent())
+    if (!m_inlineContent || !m_inlineContent->hasInflowContent())
         return { };
 
     return { InlineIterator::LineBoxIteratorModernPath(*m_inlineContent, 0) };
@@ -1025,7 +1025,7 @@ InlineIterator::LineBoxIterator LineLayout::firstLineBox() const
 
 InlineIterator::LineBoxIterator LineLayout::lastLineBox() const
 {
-    if (!m_inlineContent || !m_inlineContent->hasContent())
+    if (!m_inlineContent || !m_inlineContent->hasInflowContent())
         return { };
 
     return { InlineIterator::LineBoxIteratorModernPath(*m_inlineContent, m_inlineContent->displayContent().lines.isEmpty() ? 0 : m_inlineContent->displayContent().lines.size() - 1) };
@@ -1063,8 +1063,8 @@ LayoutRect LineLayout::enclosingBorderBoxRectFor(const RenderInline& renderInlin
     if (!m_inlineContent)
         return { };
 
-    // FIXME: This keeps the existing output.
-    if (!m_inlineContent->hasContent())
+    // FIXME: This preserves existing output.
+    if (!m_inlineContent->hasInflowContent())
         return { };
 
     auto borderBoxLogicalRect = LayoutRect { Layout::BoxGeometry::borderBoxRect(layoutState().geometryForBox(*renderInline.layoutBox())) };

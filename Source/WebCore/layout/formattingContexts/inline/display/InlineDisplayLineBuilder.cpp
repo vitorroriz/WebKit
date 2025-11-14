@@ -138,7 +138,8 @@ InlineDisplay::Line InlineDisplayLineBuilder::build(const LineLayoutResult& line
         : lineBoxLogicalRect.width() - lineLayoutResult.contentGeometry.logicalRightIncludingNegativeMargin; // Note that with hanging content lineLayoutResult.contentGeometry.logicalRight is not the same as rootLineBoxRect.right().
 
     auto writingMode = root().writingMode();
-    return InlineDisplay::Line { lineBoxLogicalRect
+    return InlineDisplay::Line { lineBox.hasContent()
+        , lineBoxLogicalRect
         , mapLineRectLogicalToVisual(lineBoxLogicalRect, constraints.formattingRootBorderBoxSize(), writingMode)
         , mapLineRectLogicalToVisual(enclosingLineGeometry.contentOverflowRect, constraints.formattingRootBorderBoxSize(), writingMode)
         , enclosingLineGeometry.enclosingTopAndBottom

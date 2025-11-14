@@ -40,10 +40,14 @@ InlineContent::InlineContent(const RenderBlockFlow& formattingContextRoot)
 {
 }
 
-bool InlineContent::hasContent() const
+bool InlineContent::hasInflowContent() const
 {
     ASSERT(m_displayContent.boxes.isEmpty() || m_displayContent.boxes[0].isRootInlineBox());
-    return m_displayContent.boxes.size() > 1;
+    for (auto& line : m_displayContent.lines) {
+        if (line.hasInflowContent())
+            return true;
+    }
+    return false;
 }
 
 IteratorRange<const InlineDisplay::Box*> InlineContent::boxesForRect(const LayoutRect& rect) const
