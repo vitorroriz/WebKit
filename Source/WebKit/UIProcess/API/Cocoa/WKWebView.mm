@@ -6597,6 +6597,10 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
         WebKit::TextExtractionFilter::singleton().prewarm();
 #endif
 
+    std::optional<WebKit::TextExtractionVersion> version;
+    if (RetainPtr overrideVersion = dynamic_objc_cast<NSNumber>([[NSUserDefaults standardUserDefaults] objectForKey:@"WebKit2TextExtractionOutputVersion"]))
+        version = [overrideVersion unsignedIntValue];
+
     std::optional<uint64_t> maxWordsPerParagraph;
     if (configuration.maxWordsPerParagraph < NSUIntegerMax)
         maxWordsPerParagraph = { static_cast<uint64_t>(configuration.maxWordsPerParagraph) };
@@ -6610,6 +6614,7 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
         includeRects = configuration.includeRects,
         onlyIncludeText = configuration.onlyIncludeVisibleText,
         maxWordsPerParagraph = WTFMove(maxWordsPerParagraph),
+        version,
         replacementStrings = extractReplacementStrings(configuration)
     ](auto&& item) mutable {
         RetainPtr strongSelf = weakSelf.get();
@@ -6715,7 +6720,13 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
             optionFlags.add(IncludeRects);
         if (onlyIncludeText)
             optionFlags.add(OnlyIncludeText);
-        WebKit::TextExtractionOptions options { WTFMove(filterCallbacks), [strongSelf _activeNativeMenuItemTitles], WTFMove(replacementStrings), optionFlags };
+        WebKit::TextExtractionOptions options {
+            WTFMove(filterCallbacks),
+            [strongSelf _activeNativeMenuItemTitles],
+            WTFMove(replacementStrings),
+            version,
+            optionFlags
+        };
         WebKit::convertToText(WTFMove(*item), WTFMove(options), [completionHandler = WTFMove(completionHandler)](auto&& string) {
             completionHandler(string.createNSString().get());
         });
