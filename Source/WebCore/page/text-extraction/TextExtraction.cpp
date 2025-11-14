@@ -168,7 +168,7 @@ struct TraversalContext {
     unsigned onlyCollectTextAndLinksCount { 0 };
     bool mergeParagraphs { false };
     bool skipNearlyTransparentContent { false };
-    bool includeNodeIdentifiers { false };
+    NodeIdentifierInclusion nodeIdentifierInclusion { NodeIdentifierInclusion::None };
     bool includeEventListeners { false };
     bool includeAccessibilityAttributes { false };
 
@@ -501,14 +501,21 @@ static inline Variant<SkipExtraction, ItemData, URL, Editable> extractItemData(N
     return { SkipExtraction::Self };
 }
 
-static inline bool shouldIncludeNodeIdentifier(OptionSet<EventListenerCategory> eventListeners, AccessibilityRole role, const ItemData& data)
+static inline bool shouldIncludeNodeIdentifier(NodeIdentifierInclusion inclusion, OptionSet<EventListenerCategory> eventListeners, AccessibilityRole role, const ItemData& data)
 {
+    using enum NodeIdentifierInclusion;
+    if (inclusion == None)
+        return false;
+
     return WTF::switchOn(data,
-        [eventListeners, role](ContainerType type) {
+        [inclusion, eventListeners, role](ContainerType type) {
+            if (inclusion != Interactive)
+                return false;
+
             switch (type) {
             case ContainerType::Root:
-            case ContainerType::Article:
                 return false;
+            case ContainerType::Article:
             case ContainerType::ViewportConstrained:
             case ContainerType::List:
             case ContainerType::ListItem:
@@ -529,8 +536,17 @@ static inline bool shouldIncludeNodeIdentifier(OptionSet<EventListenerCategory> 
         [](const TextItemData&) {
             return false;
         },
-        [](auto&) {
+        [](const TextFormControlData&) {
             return true;
+        },
+        [](const ContentEditableData&) {
+            return true;
+        },
+        [](const SelectData&) {
+            return true;
+        },
+        [inclusion](auto&) {
+            return inclusion == Interactive;
         });
 }
 
@@ -635,7 +651,7 @@ static inline void extractRecursive(Node& node, Item& parentItem, TraversalConte
                 return;
 
             std::optional<NodeIdentifier> nodeIdentifier;
-            if (context.includeNodeIdentifiers && shouldIncludeNodeIdentifier(eventListeners, AccessibilityObject::ariaRoleToWebCoreRole(role), result))
+            if (shouldIncludeNodeIdentifier(context.nodeIdentifierInclusion, eventListeners, AccessibilityObject::ariaRoleToWebCoreRole(role), result))
                 nodeIdentifier = node.nodeIdentifier();
 
             item = { {
@@ -818,7 +834,7 @@ Item extractItem(Request&& request, Page& page)
             .onlyCollectTextAndLinksCount = 0,
             .mergeParagraphs = request.mergeParagraphs,
             .skipNearlyTransparentContent = request.skipNearlyTransparentContent,
-            .includeNodeIdentifiers = request.includeNodeIdentifiers,
+            .nodeIdentifierInclusion = request.nodeIdentifierInclusion,
             .includeEventListeners = request.includeEventListeners,
             .includeAccessibilityAttributes = request.includeAccessibilityAttributes,
         };

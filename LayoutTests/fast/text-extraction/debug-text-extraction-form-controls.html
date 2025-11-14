@@ -40,7 +40,6 @@ body {
     </ul>
 </nav>
 <main role="main">
-    <p>Here’s to the crazy ones. The misfits. The rebels. The troublemakers. The round pegs in the square holes. The ones who see things differently. They’re not fond of rules. And they have no respect for the status quo.</p>
     <section id="section1" aria-label="Interactive Elements">
         <button class="clickable" onclick="console.log('clicked')" aria-label="Test button" aria-describedby="btn-help">Click Me</button>
         <div id="btn-help" aria-hidden="true">This button does nothing</div>
@@ -66,8 +65,11 @@ body {
             <div role="status" aria-live="polite" id="status-msg">Ready</div>
             <button onclick="document.getElementById('status-msg').textContent = 'Updated!'">Update Status</button>
         </div>
+        <textarea rows="15" cols="40">This is a text box</textarea>
+        <div contenteditable role="textbox">
+            <sub>WebKit home page:<a href="https://webkit.org">webkit.org</a></sub>
+        </div>
     </section>
-    <p>The quick brown fox jumped over the lazy dog.</p>
 </main>
 <footer role="contentinfo">
     <p>Footer content with <span role="img" aria-label="copyright symbol">©</span> 2024</p>
@@ -75,7 +77,6 @@ body {
 <div role="dialog" aria-hidden="true" style="display: none;">
     <p>This dialog is hidden and should not be extracted.</p>
 </div>
-
 <script>
 addEventListener("load", async () => {
     if (!window.testRunner)
@@ -88,10 +89,10 @@ addEventListener("load", async () => {
         normalize: true,
         includeRects: false,
         includeURLs: false,
-        nodeIdentifierInclusion: "none",
+        nodeIdentifierInclusion: "editableOnly",
         includeEventListeners: false,
-        includeAccessibilityAttributes: false,
-        wordLimit: 5
+        includeAccessibilityAttributes: true,
+        includeTextInAutoFilledControls: true,
     });
 
     testRunner.notifyDone();

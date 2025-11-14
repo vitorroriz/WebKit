@@ -6718,6 +6718,13 @@ header: <WebCore/TextExtractionTypes.h>
 };
 
 header: <WebCore/TextExtractionTypes.h>
+[CustomHeader] enum class WebCore::TextExtraction::NodeIdentifierInclusion : uint8_t {
+    None,
+    EditableOnly,
+    Interactive,
+};
+
+header: <WebCore/TextExtractionTypes.h>
 [CustomHeader] struct WebCore::TextExtraction::Interaction {
     WebCore::TextExtraction::Action action;
     String text;
@@ -6746,7 +6753,7 @@ header: <WebCore/TextExtractionTypes.h>
     std::optional<WebCore::JSHandleIdentifier> targetNodeHandleIdentifier;
     bool mergeParagraphs;
     bool skipNearlyTransparentContent;
-    bool includeNodeIdentifiers;
+    WebCore::TextExtraction::NodeIdentifierInclusion nodeIdentifierInclusion;
     bool includeEventListeners;
     bool includeAccessibilityAttributes;
     bool includeTextInAutoFilledControls;

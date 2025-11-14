@@ -6899,7 +6899,17 @@ static HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> extractClie
 
     auto rectInWebView = configuration.targetRect;
     bool mergeParagraphs = configuration.mergeParagraphs;
-    bool includeNodeIdentifiers = configuration.includeNodeIdentifiers;
+    auto nodeIdentifierInclusion = [&] {
+        switch (configuration.nodeIdentifierInclusion) {
+        case _WKTextExtractionNodeIdentifierInclusionNone:
+            return WebCore::TextExtraction::NodeIdentifierInclusion::None;
+        case _WKTextExtractionNodeIdentifierInclusionEditableOnly:
+            return WebCore::TextExtraction::NodeIdentifierInclusion::EditableOnly;
+        case _WKTextExtractionNodeIdentifierInclusionInteractive:
+            return WebCore::TextExtraction::NodeIdentifierInclusion::Interactive;
+        }
+        return WebCore::TextExtraction::NodeIdentifierInclusion::None;
+    }();
     bool skipNearlyTransparentContent = configuration.skipNearlyTransparentContent;
     auto rectInRootView = [&] -> std::optional<WebCore::FloatRect> {
         if (CGRectIsNull(rectInWebView))
@@ -6918,7 +6928,7 @@ static HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> extractClie
         .targetNodeHandleIdentifier = mainFrameJSHandleIdentifier(configuration.targetNode),
         .mergeParagraphs = mergeParagraphs,
         .skipNearlyTransparentContent = skipNearlyTransparentContent,
-        .includeNodeIdentifiers = includeNodeIdentifiers,
+        .nodeIdentifierInclusion = nodeIdentifierInclusion,
         .includeEventListeners = !!configuration.includeEventListeners,
         .includeAccessibilityAttributes = !!configuration.includeAccessibilityAttributes,
         .includeTextInAutoFilledControls = !!configuration.includeTextInAutoFilledControls,

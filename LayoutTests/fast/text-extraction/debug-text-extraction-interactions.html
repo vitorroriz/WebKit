@@ -35,7 +35,7 @@
             return;
 
         const debugText = await UIHelper.requestDebugText({
-            includeNodeIdentifiers: true,
+            nodeIdentifierInclusion: "interactive",
             includeEventListeners: true,
             includeAccessibilityAttributes: true,
         });

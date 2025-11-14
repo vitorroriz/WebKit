@@ -345,7 +345,19 @@ RetainPtr<_WKTextExtractionConfiguration> createTextExtractionConfiguration(WKWe
     RetainPtr configuration = adoptNS([_WKTextExtractionConfiguration new]);
     [configuration setIncludeRects:options && options->includeRects];
     [configuration setIncludeURLs:options && options->includeURLs];
-    [configuration setIncludeNodeIdentifiers:options && options->includeNodeIdentifiers];
+    [configuration setNodeIdentifierInclusion:^{
+        if (!options)
+            return _WKTextExtractionNodeIdentifierInclusionNone;
+
+        auto inclusion = toWTFString(options->nodeIdentifierInclusion.get());
+        if (equalLettersIgnoringASCIICase(inclusion, "interactive"_s))
+            return _WKTextExtractionNodeIdentifierInclusionInteractive;
+
+        if (equalLettersIgnoringASCIICase(inclusion, "editableonly"_s))
+            return _WKTextExtractionNodeIdentifierInclusionEditableOnly;
+
+        return _WKTextExtractionNodeIdentifierInclusionNone;
+    }()];
     [configuration setIncludeEventListeners:options && options->includeEventListeners];
     [configuration setIncludeAccessibilityAttributes:options && options->includeAccessibilityAttributes];
     [configuration setIncludeTextInAutoFilledControls:options && options->includeTextInAutoFilledControls];

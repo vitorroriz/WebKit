@@ -111,7 +111,7 @@ extension WKWebView {
             configuration.targetRect = visibleRect
             configuration.mergeParagraphs = true
             configuration.skipNearlyTransparentContent = true
-            configuration.includeNodeIdentifiers = false
+            configuration.nodeIdentifierInclusion = .none
             configuration.includeEventListeners = false
             configuration.includeAccessibilityAttributes = false
             configuration.filterOptions = []

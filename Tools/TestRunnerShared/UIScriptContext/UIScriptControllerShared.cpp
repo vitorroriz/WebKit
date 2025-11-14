@@ -80,7 +80,7 @@ TextExtractionTestOptions* toTextExtractionTestOptions(JSContextRef context, JSV
     options.wordLimit = static_cast<unsigned>(numericProperty(context, (JSObjectRef)argument, "wordLimit"));
     options.mergeParagraphs = booleanProperty(context, (JSObjectRef)argument, "mergeParagraphs", false);
     options.skipNearlyTransparentContent = booleanProperty(context, (JSObjectRef)argument, "skipNearlyTransparentContent", false);
-    options.includeNodeIdentifiers = booleanProperty(context, (JSObjectRef)argument, "includeNodeIdentifiers", false);
+    options.nodeIdentifierInclusion = stringProperty(context, (JSObjectRef)argument, "nodeIdentifierInclusion");
     return &options;
 }
 
