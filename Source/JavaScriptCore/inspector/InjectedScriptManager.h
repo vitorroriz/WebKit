@@ -60,6 +60,7 @@ public:
 
     InjectedScriptHost& injectedScriptHost();
     InspectorEnvironment& inspectorEnvironment() const { return m_environment; }
+    CheckedRef<InspectorEnvironment> checkedInspectorEnvironment() const { return m_environment; }
 
     JS_EXPORT_PRIVATE InjectedScript injectedScriptFor(JSC::JSGlobalObject*);
     JS_EXPORT_PRIVATE InjectedScript injectedScriptForId(int);
@@ -78,7 +79,7 @@ protected:
 private:
     Expected<JSC::JSObject*, NakedPtr<JSC::Exception>> createInjectedScript(JSC::JSGlobalObject*, int id);
 
-    InspectorEnvironment& m_environment;
+    CheckedRef<InspectorEnvironment> m_environment;
     const Ref<InjectedScriptHost> m_injectedScriptHost;
     int m_nextInjectedScriptId;
 };

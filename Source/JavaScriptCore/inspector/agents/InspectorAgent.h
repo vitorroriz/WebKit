@@ -63,7 +63,7 @@ public:
     void evaluateForTestInFrontend(const String& script);
 
 private:
-    InspectorEnvironment& m_environment;
+    CheckedRef<InspectorEnvironment> m_environment;
     const UniqueRef<InspectorFrontendDispatcher> m_frontendDispatcher;
     const Ref<InspectorBackendDispatcher> m_backendDispatcher;
 

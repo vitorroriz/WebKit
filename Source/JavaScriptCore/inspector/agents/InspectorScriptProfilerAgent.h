@@ -63,9 +63,11 @@ private:
     void trackingComplete();
     void stopSamplingWhenDisconnecting();
 
+    CheckedRef<InspectorEnvironment> checkedEnvironment() const { return m_environment; }
+
     const UniqueRef<ScriptProfilerFrontendDispatcher> m_frontendDispatcher;
     const Ref<ScriptProfilerBackendDispatcher> m_backendDispatcher;
-    InspectorEnvironment& m_environment;
+    CheckedRef<InspectorEnvironment> m_environment;
     bool m_tracking { false };
 #if ENABLE(SAMPLING_PROFILER)
     bool m_enabledSamplingProfiler { false };

@@ -161,7 +161,7 @@ FOR_EACH_INSPECTOR_AGENT(DECLARE_GETTER_SETTER_FOR_INSPECTOR_AGENT)
 private:
     InstrumentingAgents(Inspector::InspectorEnvironment&, InstrumentingAgents* fallbackAgents);
 
-    Inspector::InspectorEnvironment& m_environment;
+    CheckedRef<Inspector::InspectorEnvironment> m_environment;
     const WeakPtr<InstrumentingAgents> m_fallbackAgents;
 
 #define DECLARE_MEMBER_VARIABLE_FOR_INSPECTOR_AGENT(Class, Name, Getter, Setter) \

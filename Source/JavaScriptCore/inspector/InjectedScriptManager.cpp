@@ -173,7 +173,7 @@ InjectedScript InjectedScriptManager::injectedScriptFor(JSGlobalObject* globalOb
             return it1->value;
     }
 
-    if (!m_environment.canAccessInspectedScriptState(globalObject))
+    if (!checkedInspectorEnvironment()->canAccessInspectedScriptState(globalObject))
         return InjectedScript();
 
     int id = injectedScriptIdFor(globalObject);
@@ -197,7 +197,7 @@ InjectedScript InjectedScriptManager::injectedScriptFor(JSGlobalObject* globalOb
         RELEASE_ASSERT_NOT_REACHED();
     }
 
-    InjectedScript result(globalObject, createResult.value(), &m_environment);
+    InjectedScript result(globalObject, createResult.value(), m_environment.ptr());
     m_idToInjectedScript.set(id, result);
     didCreateInjectedScript(result);
     return result;
