@@ -1751,6 +1751,10 @@ NEVER_INLINE bool Heap::runEndPhase(GCConductor conn)
 
     auto endingCollectionScope = *m_collectionScope;
 
+    // updateAllocationLimits() updates this for us.
+    if (overCriticalMemoryThreshold())
+        sweepSynchronously();
+
     didFinishCollection();
     
     if (m_currentRequest.didFinishEndPhase)
@@ -2501,6 +2505,9 @@ void Heap::updateAllocationLimits()
 
     dataLogLnIf(verbose, "extraMemorySize() = ", computedExtraMemorySize, ", currentHeapSize = ", currentHeapSize);
 
+    // Get critical memory threshold for next cycle.
+    bool isCritical = overCriticalMemoryThreshold(MemoryThresholdCallType::Direct);
+
     if (m_collectionScope && m_collectionScope.value() == CollectionScope::Full) {
         // To avoid pathological GC churn in very small and very large heaps, we set
         // the new allocation limit based on the current size of the heap, with a
@@ -2508,7 +2515,7 @@ void Heap::updateAllocationLimits()
         size_t lastMaxHeapSize = m_maxHeapSize;
         m_maxHeapSize = std::max(m_minBytesPerCycle, proportionalHeapSize(currentHeapSize, m_growthMode, m_ramSize));
         m_maxEdenSize = m_maxHeapSize - currentHeapSize;
-        if (m_isInOpportunisticTask) {
+        if (m_isInOpportunisticTask && !isCritical) {
             // After an Opportunistic Full GC, we allow eden to occupy all the space we recovered.
             // In this case, m_maxHeapSize may be larger than currentHeapSize + m_maxEdenSize.
             // Note that m_maxEdenSize is still used when we increase m_maxHeapSize after an
@@ -2541,11 +2548,6 @@ void Heap::updateAllocationLimits()
             m_fullActivityCallback->didAllocate(*this, currentHeapSize - m_sizeAfterLastFullCollect);
         }
     }
-
-#if USE(BMALLOC_MEMORY_FOOTPRINT_API)
-    // Get critical memory threshold for next cycle.
-    overCriticalMemoryThreshold(MemoryThresholdCallType::Direct);
-#endif
 
     m_sizeAfterLastCollect = currentHeapSize;
     dataLogLnIf(verbose, "sizeAfterLastCollect = ", m_sizeAfterLastCollect);
@@ -2877,12 +2879,9 @@ void Heap::collectIfNecessaryOrDefer(GCDeferralContext* deferralContext)
         ASSERT(m_maxHeapSize > m_sizeAfterLastCollect);
         size_t bytesAllowedThisCycle = m_maxHeapSize - m_sizeAfterLastCollect;
 
-        bool isCritical = false;
-#if USE(BMALLOC_MEMORY_FOOTPRINT_API)
-        isCritical = overCriticalMemoryThreshold();
+        bool isCritical = overCriticalMemoryThreshold();
         if (isCritical)
             bytesAllowedThisCycle = std::min(m_maxEdenSizeWhenCritical, bytesAllowedThisCycle);
-#endif
 
         size_t bytesAllocatedThisCycle = totalBytesAllocatedThisCycle();
         if (bytesAllocatedThisCycle <= bytesAllowedThisCycle)
