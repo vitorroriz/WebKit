@@ -480,4 +480,13 @@ bool defaultScrollbarColorEnabled()
 #endif
 }
 
+bool defaultAllowMultipleCommitLayerTreePending()
+{
+#if ENABLE(ALLOW_MULTIPLE_COMMIT_LAYER_TREE_PENDING)
+    return true;
+#else
+    return false;
+#endif
+}
+
 } // namespace WebKit

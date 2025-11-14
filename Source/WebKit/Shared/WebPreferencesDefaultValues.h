@@ -206,4 +206,6 @@ bool defaultUnifiedPDFEnabled();
 
 bool defaultScrollbarColorEnabled();
 
+bool defaultAllowMultipleCommitLayerTreePending();
+
 } // namespace WebKit

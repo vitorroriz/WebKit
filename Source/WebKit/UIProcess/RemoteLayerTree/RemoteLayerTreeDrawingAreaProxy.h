@@ -107,6 +107,8 @@ public:
     struct NeedsDisplayDidRefresh { };
     struct Idle { };
 
+    bool allowMultipleCommitLayerTreePending();
+
 protected:
     RemoteLayerTreeDrawingAreaProxy(WebPageProxy&, WebProcessProxy&);
 
@@ -124,7 +126,7 @@ protected:
         ProcessState(ProcessState&&) = default;
         ProcessState& operator=(ProcessState&&) = default;
 
-        bool canSendDisplayDidRefresh();
+        bool canSendDisplayDidRefresh(RemoteLayerTreeDrawingAreaProxy&);
 
         Variant<Idle, CommitLayerTreePending, NeedsDisplayDidRefresh> commitLayerTreeMessageState;
         std::optional<TransactionID> pendingLayerTreeTransactionID;

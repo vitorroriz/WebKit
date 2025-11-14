@@ -278,6 +278,12 @@ void RemoteLayerTreeDrawingAreaProxy::notifyPendingCommitLayerTree(IPC::Connecti
         if (auto* commitLayerTreePending = std::get_if<CommitLayerTreePending>(&state.commitLayerTreeMessageState)) {
             MESSAGE_CHECK_BASE(commitLayerTreePending->requestedNotifyPendingCommitLayerTree, connection);
             commitLayerTreePending->requestedNotifyPendingCommitLayerTree--;
+
+            if (state.canSendDisplayDidRefresh(*this) && commitLayerTreePending->missedDisplayDidRefresh) {
+                LOG_WITH_STREAM(RemoteLayerTree, stream << "RemoteLayerTreeDrawingAreaProxy::notifyPendingCommitLayerTree - sending missed didRefreshDisplay");
+                commitLayerTreePending->missedDisplayDidRefresh = false;
+                didRefreshDisplay(&connection);
+            }
         } else
             state.commitLayerTreeMessageState = CommitLayerTreePending { 0, 1, false };
     } else {
@@ -417,14 +423,14 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTree(IPC::Connection& connectio
     {
         ProcessState& state = processStateForConnection(connection);
         auto& commitLayerTreePending = std::get<CommitLayerTreePending>(state.commitLayerTreeMessageState);
-        if (!--commitLayerTreePending.requestedCommitLayerTree) {
+        ASSERT(commitLayerTreePending.requestedCommitLayerTree);
+        commitLayerTreePending.requestedCommitLayerTree--;
+        if (state.canSendDisplayDidRefresh(*this) && commitLayerTreePending.missedDisplayDidRefresh) {
+            LOG_WITH_STREAM(RemoteLayerTree, stream << "RemoteLayerTreeDrawingAreaProxy::commitLayerTree - sending missed didRefreshDisplay");
+            didRefreshDisplay(&connection);
+        } else if (!commitLayerTreePending.requestedCommitLayerTree) {
             LOG_WITH_STREAM(RemoteLayerTree, stream << "RemoteLayerTreeDrawingAreaProxy::commitLayerTree all pending commits received, waiting for display did refresh");
-            bool missedDisplayDidRefresh = commitLayerTreePending.missedDisplayDidRefresh;
             state.commitLayerTreeMessageState = NeedsDisplayDidRefresh { };
-            if (missedDisplayDidRefresh) {
-                LOG_WITH_STREAM(RemoteLayerTree, stream << "RemoteLayerTreeDrawingAreaProxy::notifyPendingCommitLayerTree - sending missed didRefreshDisplay");
-                didRefreshDisplay(&connection);
-            }
         }
     }
 
@@ -748,13 +754,22 @@ TextStream& operator<<(TextStream& ts, const RemoteLayerTreeDrawingAreaProxy::Co
     return ts << "CommitLayerTreePending(" << commitLayerTreePending.requestedNotifyPendingCommitLayerTree << ", " << commitLayerTreePending.requestedCommitLayerTree << ", " << commitLayerTreePending.missedDisplayDidRefresh << ")";
 }
 
-bool RemoteLayerTreeDrawingAreaProxy::ProcessState::canSendDisplayDidRefresh()
+bool RemoteLayerTreeDrawingAreaProxy::allowMultipleCommitLayerTreePending()
+{
+    if (RefPtr page = this->page())
+        return page->protectedPreferences()->allowMultipleCommitLayerTreePending();
+    return false;
+}
+
+bool RemoteLayerTreeDrawingAreaProxy::ProcessState::canSendDisplayDidRefresh(RemoteLayerTreeDrawingAreaProxy& drawingArea)
 {
     return WTF::switchOn(commitLayerTreeMessageState,
-        [](const CommitLayerTreePending& commitLayerTreePending) {
-            if (!commitLayerTreePending.requestedNotifyPendingCommitLayerTree && !commitLayerTreePending.requestedCommitLayerTree)
-                return true;
-            return false;
+        [&](const CommitLayerTreePending& commitLayerTreePending) {
+            if (commitLayerTreePending.requestedNotifyPendingCommitLayerTree)
+                return false;
+            if (drawingArea.allowMultipleCommitLayerTreePending())
+                return commitLayerTreePending.requestedCommitLayerTree <= 1;
+            return !commitLayerTreePending.requestedCommitLayerTree;
         },
         [](const NeedsDisplayDidRefresh&) { return true; },
         [](const Idle&) { return false; }
@@ -763,7 +778,7 @@ bool RemoteLayerTreeDrawingAreaProxy::ProcessState::canSendDisplayDidRefresh()
 
 IPC::Error RemoteLayerTreeDrawingAreaProxy::didRefreshDisplay(ProcessState& state, IPC::Connection& connection)
 {
-    if (!state.canSendDisplayDidRefresh()) {
+    if (!state.canSendDisplayDidRefresh(*this)) {
         if (auto* commitLayerTreePending = std::get_if<CommitLayerTreePending>(&state.commitLayerTreeMessageState)) {
             LOG_WITH_STREAM(RemoteLayerTree, stream << "RemoteLayerTreeDrawingAreaProxy::didRefreshDisplay stil waiting on commit, marked as missed");
             commitLayerTreePending->missedDisplayDidRefresh = true;
