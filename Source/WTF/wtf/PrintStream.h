@@ -120,9 +120,12 @@ inline void printInternal(PrintStream& out, char* value) { printInternal(out, st
 inline void printInternal(PrintStream& out, CString& value) { printInternal(out, static_cast<const CString&>(value)); }
 inline void printInternal(PrintStream& out, String& value) { printInternal(out, static_cast<const String&>(value)); }
 inline void printInternal(PrintStream& out, StringImpl* value) { printInternal(out, static_cast<const StringImpl*>(value)); }
+
 WTF_EXPORT_PRIVATE void printInternal(PrintStream&, bool);
-WTF_EXPORT_PRIVATE void printInternal(PrintStream&, signed char); // NOTE: this prints as a number, not as a character; use CharacterDump if you want the character
-WTF_EXPORT_PRIVATE void printInternal(PrintStream&, unsigned char); // NOTE: see above.
+// These three overloads rely on the fact that in C++ `char`, `signed char` (e.g. int8_t) and `unsigned char` (e.g. uint8_t) are different types. So character literals will end up here rather than in one of the below overloads.
+WTF_EXPORT_PRIVATE void printInternal(PrintStream&, char);
+WTF_EXPORT_PRIVATE void printInternal(PrintStream&, signed char);
+WTF_EXPORT_PRIVATE void printInternal(PrintStream&, unsigned char);
 WTF_EXPORT_PRIVATE void printInternal(PrintStream&, char16_t);
 WTF_EXPORT_PRIVATE void printInternal(PrintStream&, char32_t);
 WTF_EXPORT_PRIVATE void printInternal(PrintStream&, short);
