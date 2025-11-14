@@ -92,17 +92,21 @@ public:
 
         if (!storage) {
             storage = iteratedObject()->storage();
-            if (!storage) {
-                setStorage(vm, sentinel);
+            if (!storage) [[likely]] {
+                markClosed(sentinel);
                 return { };
             }
+
+            // This path is very unlikely path. This happens only when
+            // the iterator is created with empty map and map gets a new
+            // entry before this iterator.next() is called.
             setStorage(vm, storage);
         }
 
         JSMap::Storage& storageRef = *jsCast<JSMap::Storage*>(storage);
         auto result = JSMap::Helper::transitAndNext(vm, storageRef, entry());
         if (!result.storage) {
-            setStorage(vm, sentinel);
+            markClosed(sentinel);
             return { };
         }
 
@@ -186,6 +190,11 @@ private:
     JSMapIterator(VM& vm, Structure* structure)
         : Base(vm, structure)
     {
+    }
+
+    void markClosed(JSCell* sentinel)
+    {
+        internalField(Field::Storage).setWithoutWriteBarrier(sentinel);
     }
 
     JS_EXPORT_PRIVATE void finishCreation(VM&, JSMap*, IterationKind);

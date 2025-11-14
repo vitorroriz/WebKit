@@ -5468,6 +5468,25 @@ void SpeculativeJIT::speculateInt32(Edge edge, JSValueRegs regs)
     speculationCheck(BadType, regs, edge, branchIfNotInt32(regs.tagGPR()));
 }
 
+void SpeculativeJIT::compileMapIteratorNext(Node* node)
+{
+    SpeculateCellOperand mapIterator(this, node->child1());
+    GPRReg mapIteratorGPR = mapIterator.gpr();
+
+    if (node->child1().useKind() == MapIteratorObjectUse)
+        speculateMapIteratorObject(node->child1(), mapIteratorGPR);
+    else if (node->child1().useKind() == SetIteratorObjectUse)
+        speculateSetIteratorObject(node->child1(), mapIteratorGPR);
+    else
+        RELEASE_ASSERT_NOT_REACHED();
+
+    flushRegisters();
+    JSValueRegsFlushedCallResult result(this);
+    JSValueRegs resultRegs = result.regs();
+    callOperationWithoutExceptionCheck(node->child1().useKind() == MapIteratorObjectUse ? operationMapIteratorNext : operationSetIteratorNext, resultRegs, TrustedImmPtr(&vm()), mapIteratorGPR);
+    jsValueResult(resultRegs, node);
+}
+
 #endif
 
 } } // namespace JSC::DFG

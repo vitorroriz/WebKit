@@ -4956,7 +4956,6 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationMapIteratorNext, EncodedJSValue, (VM*
     return JSValue::encode(jsCast<JSMapIterator*>(cell)->next(vm));
 }
 
-
 JSC_DEFINE_NOEXCEPT_JIT_OPERATION(operationSetIteratorNext, EncodedJSValue, (VM* vmPointer, JSCell* cell))
 {
     VM& vm = *vmPointer;

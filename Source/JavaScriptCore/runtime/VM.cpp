@@ -355,12 +355,11 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
     evalCodeBlockStructure.setWithoutWriteBarrier(EvalCodeBlock::createStructure(*this, nullptr, jsNull()));
     functionCodeBlockStructure.setWithoutWriteBarrier(FunctionCodeBlock::createStructure(*this, nullptr, jsNull()));
     bigIntStructure.setWithoutWriteBarrier(JSBigInt::createStructure(*this, nullptr, jsNull()));
+    m_orderedHashTableDeletedValue.setWithoutWriteBarrier(OrderedHashMap::createDeletedValue(*this));
     m_orderedHashTableSentinel.setWithoutWriteBarrier(OrderedHashMap::createSentinel(*this));
 
     // Eagerly initialize constant cells since the concurrent compiler can access them.
     if (Options::useJIT()) {
-        orderedHashTableDeletedValue();
-        orderedHashTableSentinel();
         emptyPropertyNameEnumerator();
         ensureMegamorphicCache();
     }
@@ -1504,14 +1503,6 @@ bool VM::isScratchBuffer(void* ptr)
 Ref<Waiter> VM::syncWaiter()
 {
     return m_syncWaiter;
-}
-
-JSCell* VM::orderedHashTableDeletedValueSlow()
-{
-    ASSERT(!m_orderedHashTableDeletedValue);
-    Symbol* deleted = OrderedHashMap::createDeletedValue(*this);
-    m_orderedHashTableDeletedValue.setWithoutWriteBarrier(deleted);
-    return deleted;
 }
 
 JSPropertyNameEnumerator* VM::emptyPropertyNameEnumeratorSlow()

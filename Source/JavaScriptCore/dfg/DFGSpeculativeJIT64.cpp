@@ -40,7 +40,9 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
 #include "DateInstance.h"
 #include "HasOwnPropertyCache.h"
 #include "JSMap.h"
+#include "JSMapIterator.h"
 #include "JSSet.h"
+#include "JSSetIterator.h"
 #include "MegamorphicCache.h"
 #include "SetupVarargsFrame.h"
 #include "SpillRegistersMode.h"
@@ -8538,6 +8540,97 @@ void SpeculativeJIT::compileMapStorage(Node* node)
         RELEASE_ASSERT_NOT_REACHED();
 
     jsValueResult(JSValueRegs { resultGPR }, node);
+}
+
+void SpeculativeJIT::compileMapIteratorNext(Node* node)
+{
+    bool isMapIterator = node->child1().useKind() == MapIteratorObjectUse;
+
+    SpeculateCellOperand iterator(this, node->child1());
+    GPRTemporary scratch1(this);
+    GPRTemporary scratch2(this);
+    GPRTemporary scratch3(this);
+    GPRTemporary scratch4(this);
+
+    GPRReg iteratorGPR = iterator.gpr();
+    GPRReg scratchGPR1 = scratch1.gpr();
+    GPRReg scratchGPR2 = scratch2.gpr();
+    GPRReg scratchGPR3 = scratch3.gpr();
+    GPRReg scratchGPR4 = scratch4.gpr();
+
+    if (isMapIterator)
+        speculateMapIteratorObject(node->child1(), iteratorGPR);
+    else
+        speculateSetIteratorObject(node->child1(), iteratorGPR);
+
+    unsigned storageFieldIndex;
+    unsigned iteratedObjectFieldIndex;
+    unsigned entryFieldIndex;
+    if (isMapIterator) {
+        storageFieldIndex = static_cast<unsigned>(JSMapIterator::Field::Storage);
+        iteratedObjectFieldIndex = static_cast<unsigned>(JSMapIterator::Field::IteratedObject);
+        entryFieldIndex = static_cast<unsigned>(JSMapIterator::Field::Entry);
+    } else {
+        storageFieldIndex = static_cast<unsigned>(JSSetIterator::Field::Storage);
+        iteratedObjectFieldIndex = static_cast<unsigned>(JSSetIterator::Field::IteratedObject);
+        entryFieldIndex = static_cast<unsigned>(JSSetIterator::Field::Entry);
+    }
+    uint8_t entrySize = isMapIterator ? JSMap::Helper::EntrySize : JSSet::Helper::EntrySize;
+    uint32_t capacityIndex = isMapIterator ? JSMap::Helper::capacityIndex() : JSSet::Helper::capacityIndex();
+    uint32_t hashTableStartIndex = isMapIterator ? JSMap::Helper::hashTableStartIndex() : JSSet::Helper::hashTableStartIndex();
+
+    JITCompiler::JumpList slowCases;
+    JITCompiler::JumpList doneCases;
+    JITCompiler::JumpList markClosed;
+
+    loadPtr(Address(iteratorGPR, JSInternalFieldObjectImpl<>::offsetOfInternalField(storageFieldIndex)), scratchGPR3);
+    auto storageEmpty = branchTestPtr(JITCompiler::Zero, scratchGPR3);
+    // Check if storage is sentinel
+    auto returnTrue = branchLinkableConstant(JITCompiler::Equal, scratchGPR3, LinkableConstant(*this, vm().orderedHashTableSentinel()));
+
+    // Check if storage is obsolete
+    load64(Address(scratchGPR3, JSCellButterfly::offsetOfData() + (isMapIterator ? JSMap::Helper::aliveEntryCountIndex() : JSSet::Helper::aliveEntryCountIndex()) * sizeof(uint64_t)), scratchGPR4);
+    slowCases.append(branchIfNotInt32(JSValueRegs { scratchGPR4 }));
+
+    // Fast path: iterate to find next non-deleted entry
+    load32(Address(iteratorGPR, JSInternalFieldObjectImpl<>::offsetOfInternalField(entryFieldIndex)), scratchGPR1);
+    load32(Address(scratchGPR3, JSCellButterfly::offsetOfData() + capacityIndex * sizeof(uint64_t)), scratchGPR2);
+    add32(TrustedImm32(hashTableStartIndex), scratchGPR2);
+    // Compute entryKeyIndex = dataTableStartIndex + entry * entrySize
+    if (entrySize == 3) {
+        lshift32(scratchGPR1, TrustedImm32(1), scratchGPR4);
+        add32(scratchGPR1, scratchGPR4);
+    } else if (entrySize == 2)
+        add32(scratchGPR1, scratchGPR1, scratchGPR4);
+    add32(scratchGPR4, scratchGPR2);
+
+    auto loopStart = label();
+    load64(BaseIndex(scratchGPR3, scratchGPR2, TimesEight, JSCellButterfly::offsetOfData()), scratchGPR4);
+    markClosed.append(branchTest64(JITCompiler::Zero, scratchGPR4));
+
+    add32(TrustedImm32(1), scratchGPR1);
+    add32(TrustedImm32(entrySize), scratchGPR2);
+    branchLinkableConstant(JITCompiler::Equal, scratchGPR4, LinkableConstant(*this, vm().orderedHashTableDeletedValue())).linkTo(loopStart, this);
+
+    store32(scratchGPR1, Address(iteratorGPR, JSInternalFieldObjectImpl<>::offsetOfInternalField(entryFieldIndex)));
+    move(TrustedImm64(JSValue::encode(jsBoolean(false))), scratchGPR4);
+    doneCases.append(jump());
+
+    storageEmpty.link(this);
+    loadPtr(Address(iteratorGPR, JSInternalFieldObjectImpl<>::offsetOfInternalField(iteratedObjectFieldIndex)), scratchGPR4);
+    loadPtr(Address(scratchGPR4, isMapIterator ? JSMap::offsetOfStorage() : JSSet::offsetOfStorage()), scratchGPR3);
+    slowCases.append(branchTest64(JITCompiler::NonZero, scratchGPR3));
+
+    markClosed.link(this);
+    loadLinkableConstant(LinkableConstant(*this, vm().orderedHashTableSentinel()), scratchGPR1);
+    storePtr(scratchGPR1, Address(iteratorGPR, JSInternalFieldObjectImpl<>::offsetOfInternalField(storageFieldIndex)));
+    returnTrue.link(this);
+    move(TrustedImm64(JSValue::encode(jsBoolean(true))), scratchGPR4);
+
+    addSlowPathGenerator(slowPathCall(slowCases, this, isMapIterator ? operationMapIteratorNext : operationSetIteratorNext, NeedToSpill, ExceptionCheckRequirement::CheckNotNeeded, scratchGPR4, TrustedImmPtr(&vm()), iteratorGPR));
+
+    doneCases.link(this);
+    jsValueResult(scratchGPR4, node);
 }
 
 #endif

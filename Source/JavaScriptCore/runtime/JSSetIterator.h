@@ -89,16 +89,20 @@ public:
         if (!storage) {
             storage = iteratedObject()->storage();
             if (!storage) {
-                setStorage(vm, sentinel);
+                markClosed(sentinel);
                 return { };
             }
+
+            // This path is very unlikely path. This happens only when
+            // the iterator is created with empty set and set gets a new
+            // entry before this iterator.next() is called.
             setStorage(vm, storage);
         }
 
         JSSet::Storage& storageRef = *jsCast<JSSet::Storage*>(storage);
         auto result = JSSet::Helper::transitAndNext(vm, storageRef, entry());
         if (!result.storage) {
-            setStorage(vm, sentinel);
+            markClosed(sentinel);
             return { };
         }
 
@@ -161,6 +165,11 @@ private:
     JSSetIterator(VM& vm, Structure* structure)
         : Base(vm, structure)
     {
+    }
+
+    void markClosed(JSCell* sentinel)
+    {
+        internalField(Field::Storage).setWithoutWriteBarrier(sentinel);
     }
 
     JS_EXPORT_PRIVATE void finishCreation(VM&, JSSet*, IterationKind);

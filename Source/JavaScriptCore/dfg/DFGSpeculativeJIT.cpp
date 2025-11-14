@@ -14104,25 +14104,6 @@ void SpeculativeJIT::compileMapStorageOrSentinel(Node* node)
     cellResult(resultGPR, node);
 }
 
-void SpeculativeJIT::compileMapIteratorNext(Node* node)
-{
-    SpeculateCellOperand mapIterator(this, node->child1());
-    GPRReg mapIteratorGPR = mapIterator.gpr();
-
-    if (node->child1().useKind() == MapIteratorObjectUse)
-        speculateMapIteratorObject(node->child1(), mapIteratorGPR);
-    else if (node->child1().useKind() == SetIteratorObjectUse)
-        speculateSetIteratorObject(node->child1(), mapIteratorGPR);
-    else
-        RELEASE_ASSERT_NOT_REACHED();
-
-    flushRegisters();
-    JSValueRegsFlushedCallResult result(this);
-    JSValueRegs resultRegs = result.regs();
-    callOperationWithoutExceptionCheck(node->child1().useKind() == MapIteratorObjectUse ? operationMapIteratorNext : operationSetIteratorNext, resultRegs, TrustedImmPtr(&vm()), mapIteratorGPR);
-    jsValueResult(resultRegs, node);
-}
-
 void SpeculativeJIT::compileMapIteratorKey(Node* node)
 {
     SpeculateCellOperand iterator(this, node->child1());
