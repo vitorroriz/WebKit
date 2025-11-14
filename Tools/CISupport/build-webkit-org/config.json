@@ -77,6 +77,8 @@
                   { "name": "bot653", "platform": "ios-simulator-26" },
                   { "name": "bot667", "platform": "ios-simulator-26"},
                   { "name": "bot664", "platform": "ios-simulator-26"},
+                  { "name": "bot2002", "platform": "ios-simulator-26"},
+                  { "name": "bot2003", "platform": "ios-simulator-26"},
 
                   { "name": "bot134", "platform": "visionos-simulator-26" },
                   { "name": "bot135", "platform": "visionos-simulator-26" },
@@ -401,7 +403,7 @@
                   {
                     "name": "Apple-iOS-26-Simulator-Release-Build", "factory": "BuildFactory",
                     "platform": "ios-simulator-26", "configuration": "release", "architectures": ["x86_64", "arm64"],
-                    "triggers": ["ios-simulator-26-release-tests-wk2", "ipados-simulator-26-release-tests-wk2"],
+                    "triggers": ["ios-simulator-26-release-tests-wk2", "ipados-simulator-26-release-tests-wk2", "ios-simulator-26-release-tests-wk2-site-isolation-tree"],
                     "workernames": ["bot305", "bot306"]
                   },
                   {
@@ -415,6 +417,11 @@
                     "platform": "ios-simulator-26", "configuration": "release", "architectures": ["x86_64", "arm64"], "device_model": "iphone",
                     "additionalArguments": ["--no-retry-failures", "--child-processes=6"],
                     "workernames": ["bot651", "bot652"]
+                  },
+                  { "name": "Apple-iOS-26-Simulator-Release-WK2-Site-Isolation-Tree-Tests", "factory": "TestLayoutAndAPIOnlyFactory",
+                  "platform": "ios-simulator-26", "configuration": "release", "architectures": ["x86_64", "arm64"], "device_model": "iphone",
+                  "additionalArguments": ["--no-retry-failures", "--site-isolation", "--child-processes=6"],
+                  "workernames": ["bot2002", "bot2003"]
                   },
                   {
                     "name": "Apple-iOS-26-Simulator-Debug-WK2-Tests", "factory": "TestAllButJSCFactory",
@@ -907,6 +914,9 @@
                   },
                   { "type": "Triggerable", "name": "ios-simulator-26-release-tests-wk2",
                     "builderNames": ["Apple-iOS-26-Simulator-Release-WK2-Tests"]
+                  },
+                  { "type": "Triggerable", "name": "ios-simulator-26-release-tests-wk2-site-isolation-tree",
+                    "builderNames": ["Apple-iOS-26-Simulator-Release-WK2-Site-Isolation-Tree-Tests"]
                   },
                   { "type": "Triggerable", "name": "ios-simulator-26-debug-tests-wk2",
                     "builderNames": ["Apple-iOS-26-Simulator-Debug-WK2-Tests"]

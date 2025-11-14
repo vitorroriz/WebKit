@@ -954,6 +954,25 @@ class TestExpectedBuildSteps(unittest.TestCase):
             'builtins-generator-tests',
             'trigger-crash-log-submission'
         ],
+        'Apple-iOS-26-Simulator-Release-WK2-Site-Isolation-Tree-Tests': [
+            'configure-build',
+            'configuration',
+            'clean-and-update-working-directory',
+            'checkout-specific-revision',
+            'show-identifier',
+            'kill-old-processes',
+            'delete-WebKitBuild-directory',
+            'delete-stale-build-files',
+            'download-built-product',
+            'extract-built-product',
+            'layout-test',
+            'dashboard-tests',
+            'archive-test-results',
+            'upload',
+            'extract-test-results',
+            'set-permissions',
+            'run-api-tests'
+        ],
         'Apple-iOS-26-Simulator-Debug-WK2-Tests': [
             'configure-build',
             'configuration',
