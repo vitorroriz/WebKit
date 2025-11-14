@@ -1697,7 +1697,7 @@ void NetworkConnectionToWebProcess::prioritizeResourceLoads(const Vector<WebCore
     if (!session)
         return;
 
-    Vector<NetworkLoad*> loads;
+    Vector<RefPtr<NetworkLoad>> loads;
     for (auto identifier : loadIdentifiers) {
         RefPtr loader = m_networkResourceLoaders.get(identifier);
         if (!loader || !loader->networkLoad())

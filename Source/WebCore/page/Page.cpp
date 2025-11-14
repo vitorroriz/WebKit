@@ -2603,7 +2603,7 @@ void Page::prioritizeVisibleResources()
         return;
 
     auto resourceLoaders = toPrioritize.map([](auto& resource) {
-        return resource->loader();
+        return RefPtr { resource->loader() };
     });
 
     platformStrategies()->loaderStrategy()->prioritizeResourceLoads(resourceLoaders);

@@ -1132,9 +1132,9 @@ void WebLoaderStrategy::setResourceLoadSchedulingMode(WebCore::Page& page, WebCo
     connection.send(Messages::NetworkConnectionToWebProcess::SetResourceLoadSchedulingMode(WebPage::fromCorePage(page)->identifier(), mode), 0);
 }
 
-void WebLoaderStrategy::prioritizeResourceLoads(const Vector<WebCore::SubresourceLoader*>& resources)
+void WebLoaderStrategy::prioritizeResourceLoads(const Vector<RefPtr<WebCore::SubresourceLoader>>& resources)
 {
-    auto identifiers = resources.map([](auto* loader) -> WebCore::ResourceLoaderIdentifier {
+    auto identifiers = resources.map([](auto& loader) -> WebCore::ResourceLoaderIdentifier {
         return *loader->identifier();
     });
 

@@ -815,18 +815,18 @@ void WebProcessPool::registerNotificationObservers()
         return notifyToken;
     });
 
-    const Vector<NSString*> nsNotificationMessages = {
+    const Vector<RetainPtr<NSString>> nsNotificationMessages = {
         NSProcessInfoPowerStateDidChangeNotification
     };
-    m_notificationObservers = WTF::compactMap(nsNotificationMessages, [weakThis = WeakPtr { *this }](NSString* message) -> RetainPtr<NSObject>  {
-        RetainPtr observer = [[NSNotificationCenter defaultCenter] addObserverForName:message object:nil queue:[NSOperationQueue currentQueue] usingBlock:[weakThis, message](NSNotification *notification) {
+    m_notificationObservers = WTF::compactMap(nsNotificationMessages, [weakThis = WeakPtr { *this }](const RetainPtr<NSString>& message) -> RetainPtr<NSObject>  {
+        RetainPtr observer = [[NSNotificationCenter defaultCenter] addObserverForName:message.get() object:nil queue:[NSOperationQueue currentQueue] usingBlock:[weakThis, message](NSNotification *notification) {
             RefPtr protectedThis = weakThis.get();
             if (!protectedThis)
                 return;
             if (!protectedThis->m_processes.isEmpty()) {
-                String messageString(message);
+                String messageString(message.get());
                 for (auto& process : protectedThis->m_processes)
-                    process->send(Messages::WebProcess::PostObserverNotification(message), 0);
+                    process->send(Messages::WebProcess::PostObserverNotification(messageString), 0);
             }
         }];
         return observer;
