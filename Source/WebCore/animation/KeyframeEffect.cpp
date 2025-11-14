@@ -1692,17 +1692,9 @@ bool KeyframeEffect::isRunningAcceleratedAnimationForProperty(CSSPropertyID prop
     return Style::Interpolation::isAccelerated(property, document()->settings()) && m_blendingKeyframes.properties().contains(property);
 }
 
-static bool propertiesContainTransformRelatedProperty(const HashSet<AnimatableCSSProperty>& properties)
-{
-    return properties.contains(CSSPropertyTranslate)
-        || properties.contains(CSSPropertyScale)
-        || properties.contains(CSSPropertyRotate)
-        || properties.contains(CSSPropertyTransform);
-}
-
 bool KeyframeEffect::isRunningAcceleratedTransformRelatedAnimation() const
 {
-    return isRunningAccelerated() && propertiesContainTransformRelatedProperty(m_blendingKeyframes.properties());
+    return isRunningAccelerated() && animatablePropertiesContainTransformRelatedProperty(m_blendingKeyframes.properties());
 }
 
 void KeyframeEffect::invalidate()
@@ -1999,6 +1991,15 @@ bool KeyframeEffect::canBeAccelerated() const
     return true;
 }
 
+bool KeyframeEffect::animatesMotionPath() const
+{
+    return animatesProperty(CSSPropertyOffsetAnchor)
+        || animatesProperty(CSSPropertyOffsetDistance)
+        || animatesProperty(CSSPropertyOffsetPath)
+        || animatesProperty(CSSPropertyOffsetPosition)
+        || animatesProperty(CSSPropertyOffsetRotate);
+}
+
 bool KeyframeEffect::preventsAcceleration() const
 {
 #if ENABLE(THREADED_ANIMATIONS)
@@ -2015,13 +2016,8 @@ bool KeyframeEffect::preventsAcceleration() const
         }
     }
 
-    if (animatesProperty(CSSPropertyOffsetAnchor)
-        || animatesProperty(CSSPropertyOffsetDistance)
-        || animatesProperty(CSSPropertyOffsetPath)
-        || animatesProperty(CSSPropertyOffsetPosition)
-        || animatesProperty(CSSPropertyOffsetRotate)) {
+    if (animatesMotionPath())
         return true;
-    }
 
     if (m_acceleratedPropertiesState == AcceleratedProperties::None)
         return false;
@@ -2158,7 +2154,7 @@ void KeyframeEffect::animationPlaybackRateDidChange()
 void KeyframeEffect::transformRelatedPropertyDidChange()
 {
     ASSERT(isRunningAcceleratedTransformRelatedAnimation());
-    auto hasTransformRelatedPropertyWithImplicitKeyframe = propertiesContainTransformRelatedProperty(m_acceleratedPropertiesWithImplicitKeyframe);
+    auto hasTransformRelatedPropertyWithImplicitKeyframe = animatablePropertiesContainTransformRelatedProperty(m_acceleratedPropertiesWithImplicitKeyframe);
     addPendingAcceleratedAction(hasTransformRelatedPropertyWithImplicitKeyframe ? AcceleratedAction::UpdateProperties : AcceleratedAction::TransformChange);
 }
 
@@ -2495,17 +2491,21 @@ const RenderStyle& KeyframeEffect::currentStyle() const
 
 bool KeyframeEffect::computeExtentOfTransformAnimation(LayoutRect& bounds) const
 {
-    ASSERT(m_blendingKeyframes.containsProperty(CSSPropertyTransform));
+    ASSERT(animatablePropertiesContainTransformRelatedProperty(m_blendingKeyframes.properties()));
 
     auto* box = dynamicDowncast<RenderBox>(renderer());
     if (!box)
         return true; // Non-boxes don't get transformed;
 
-    auto rendererBox = snapRectToDevicePixels(box->borderBoxRect(), box->document().deviceScaleFactor());
+    // FIXME: add extent computation for animated CSS Motion Path properties.
+    if (animatesMotionPath())
+        return true;
 
+    auto rendererBox = snapRectToDevicePixels(box->borderBoxRect(), box->document().deviceScaleFactor());
+    TransformOperationData transformOperationData(rendererBox, renderer());
     LayoutRect cumulativeBounds;
 
-    auto* implicitStyle = [&]() {
+    auto* unanimatedStyle = [&]() {
         if (auto target = targetStyleable()) {
             if (auto* lastStyleChangeEventStyle = target->lastStyleChangeEventStyle())
                 return lastStyleChangeEventStyle;
@@ -2513,100 +2513,59 @@ bool KeyframeEffect::computeExtentOfTransformAnimation(LayoutRect& bounds) const
         return &box->style();
     }();
 
-    auto addStyleToCumulativeBounds = [&](const RenderStyle* style) -> bool {
+    auto addStyleToCumulativeBounds = [&](const RenderStyle& style) {
         auto keyframeBounds = bounds;
 
-        bool canCompute;
-        if (transformFunctionListPrefix() > 0)
-            canCompute = computeTransformedExtentViaTransformList(rendererBox, *style, keyframeBounds);
-        else
-            canCompute = computeTransformedExtentViaMatrix(rendererBox, *style, keyframeBounds);
-
-        if (!canCompute)
+        TransformationMatrix transform;
+        style.applyTransform(transform, transformOperationData);
+        if (!transform.isAffine())
             return false;
 
-        cumulativeBounds.unite(keyframeBounds);
+        TransformationMatrix::Decomposed2Type fromDecomp;
+        if (!transform.decompose2(fromDecomp))
+            return false;
+
+        auto hasRotation = [&] {
+            if (fromDecomp.angle || style.rotate().affectedByTransformOrigin())
+                return true;
+            for (auto& operation : style.transform()) {
+                if (operation->type() == Style::TransformFunctionType::Rotate)
+                    return true;
+            }
+            return false;
+        }();
+
+        // FIXME: it may be better to find a way to replace all rotation angles
+        // in transforms with a 90deg angle.
+        if (hasRotation)
+            keyframeBounds = LayoutRect(boundsOfRotatingRect(keyframeBounds));
+
+        cumulativeBounds.unite(transform.mapRect(keyframeBounds));
         return true;
     };
 
     for (const auto& keyframe : m_blendingKeyframes) {
-        const auto* keyframeStyle = keyframe.style();
+        if (!animatablePropertiesContainTransformRelatedProperty(keyframe.properties()))
+            continue;
 
-        // FIXME: maybe for style-originated animations we always say it's true for the first and last keyframe.
-        if (!keyframe.animatesProperty(CSSPropertyTransform)) {
-            // If the first keyframe is missing transform style, use the current style.
-            if (!keyframe.offset())
-                keyframeStyle = implicitStyle;
-            else
-                continue;
-        }
+        auto blendedStyleForKeyframe = RenderStyle::clonePtr(*unanimatedStyle);
 
-        if (!addStyleToCumulativeBounds(keyframeStyle))
+        ComputedEffectTiming computedTiming;
+        computedTiming.currentIteration = 0;
+        computedTiming.progress = keyframe.offset();
+
+        setAnimatedPropertiesInStyle(*blendedStyleForKeyframe, computedTiming);
+
+        if (!addStyleToCumulativeBounds(*blendedStyleForKeyframe))
             return false;
     }
 
     if (m_blendingKeyframes.hasImplicitKeyframes()) {
-        if (!addStyleToCumulativeBounds(implicitStyle))
+        if (!addStyleToCumulativeBounds(*unanimatedStyle))
             return false;
     }
 
     bounds = cumulativeBounds;
-    return true;
-}
-
-bool KeyframeEffect::computeTransformedExtentViaTransformList(const FloatRect& rendererBox, const RenderStyle& style, LayoutRect& bounds) const
-{
-    FloatRect floatBounds = bounds;
-    FloatPoint transformOrigin;
-
-    bool applyTransformOrigin = style.transform().hasTransformOfType<Style::TransformFunctionType::Rotate>() || style.transform().affectedByTransformOrigin();
-    if (applyTransformOrigin) {
-        transformOrigin = style.computeTransformOrigin(rendererBox).xy();
-        // Ignore transformOriginZ because we'll bail if we encounter any 3D transforms.
-        floatBounds.moveBy(-transformOrigin);
-    }
-
-    for (const auto& operation : style.transform()) {
-        if (operation->type() == Style::TransformFunctionType::Rotate) {
-            // For now, just treat this as a full rotation. This could take angle into account to reduce inflation.
-            floatBounds = boundsOfRotatingRect(floatBounds);
-        } else {
-            TransformationMatrix transform;
-            operation->apply(transform, rendererBox.size());
-            if (!transform.isAffine())
-                return false;
-
-            if (operation->type() == Style::TransformFunctionType::Matrix || operation->type() == Style::TransformFunctionType::Matrix3D) {
-                TransformationMatrix::Decomposed2Type toDecomp;
-                // Any rotation prevents us from using a simple start/end rect union.
-                if (!transform.decompose2(toDecomp) || toDecomp.angle)
-                    return false;
-            }
-
-            floatBounds = transform.mapRect(floatBounds);
-        }
-    }
-
-    if (applyTransformOrigin)
-        floatBounds.moveBy(transformOrigin);
-
-    bounds = LayoutRect(floatBounds);
-    return true;
-}
-
-bool KeyframeEffect::computeTransformedExtentViaMatrix(const FloatRect& rendererBox, const RenderStyle& style, LayoutRect& bounds) const
-{
-    TransformationMatrix transform;
-    style.applyTransform(transform, TransformOperationData(rendererBox, renderer()));
-    if (!transform.isAffine())
-        return false;
-
-    TransformationMatrix::Decomposed2Type fromDecomp;
-    // Any rotation prevents us from using a simple start/end rect union.
-    if (!transform.decompose2(fromDecomp) || fromDecomp.angle)
-        return false;
-
-    bounds = LayoutRect(transform.mapRect(bounds));
     return true;
 }
 

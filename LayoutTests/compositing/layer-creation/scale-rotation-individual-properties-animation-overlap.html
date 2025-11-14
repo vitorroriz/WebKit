@@ -10,8 +10,7 @@
             margin: 270px 200px;
             position: relative;
             box-shadow: 0 0 10px black;
-            -webkit-transform-origin: 80% 20%;
-            transition: -webkit-transform 10s;
+            transform-origin: 80% 20%;
         }
         
         .dot {
@@ -29,19 +28,27 @@
 
         @keyframes move {
             from {
-                -webkit-transform: translateX(10px) scale(1) rotate(0);
+                translate: 10px;
+                scale: 1;
+                rotate: 0;
             }
             
             30% {
-                -webkit-transform: translateX(150px) scale(1.3) rotate(10deg);
+                translate: 150px;
+                scale: 1.3;
+                rotate: 10deg;
             }
 
             60% {
-                -webkit-transform: translateX(-20px) scale(0.5) rotate(0);
+                translate: -20px;
+                scale: 0.5;
+                rotate: 0;
             }
 
             to {
-                -webkit-transform: translateX(100px) scale(1.3) rotate(0);
+                translate: 100px;
+                scale: 1.3;
+                rotate: 0;
             }
         }
     </style>
