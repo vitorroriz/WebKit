@@ -5066,8 +5066,33 @@ void Element::requestFullscreen(FullscreenOptions&& options, RefPtr<DeferredProm
 #else
     bool optionsEnabled = document().settings().fullScreenKeyboardLock();
 #endif
-    if (optionsEnabled && document().page() && document().page()->hardwareKeyboardAttached())
+
+    if (optionsEnabled) {
+#if PLATFORM(IOS_FAMILY)
+        // Registers a callback to exit fullscreen mode
+        document().page()->addHardwareKeyboardAttachmentObserver([weakThis = WeakPtr { *this }](bool attached) {
+            RefPtr protectedThis = weakThis.get();
+            if (!protectedThis)
+                return;
+
+            if (attached)
+                return;
+
+            // Exit the fullscreen API when the hardware keyboard is detached.
+            protectedThis->protectedDocument()->postTask([weakThis](ScriptExecutionContext&) {
+                RefPtr protectedThis = weakThis.get();
+                if (!protectedThis)
+                    return;
+
+                Ref document = protectedThis->document();
+                if (document->fullscreen().fullscreenElement())
+                    document->fullscreen().fullyExitFullscreen();
+            });
+        });
+#endif
+        // Set the desired keyboard lock mode while entering fullscreen.
         protectedDocument()->fullscreen().setKeyboardLockMode(options.keyboardLock);
+    }
     else {
         if (options.keyboardLock != FullscreenOptions::KeyboardLock::None) {
             promise->reject(ExceptionCode::NotSupportedError, "options.keyboardLock is unavailable."_s);
