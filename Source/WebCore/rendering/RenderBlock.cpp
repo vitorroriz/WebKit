@@ -1303,7 +1303,7 @@ bool RenderBlock::establishesIndependentFormattingContextIgnoringDisplayType(con
     return style.isFloating()
         || style.hasOutOfFlowPosition()
         || isBlockBoxWithPotentiallyScrollableOverflow()
-        || style.containsLayout()
+        || style.usedContain().contains(Style::ContainValue::Layout)
         || style.containerType() != ContainerType::Normal
         || WebCore::shouldApplyPaintContainment(style, *protectedElement())
         || (style.isDisplayBlockLevel() && !style.blockStepSize().isNone());

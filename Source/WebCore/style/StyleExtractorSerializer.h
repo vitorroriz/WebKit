@@ -68,7 +68,6 @@ public:
 
     // MARK: Shared serializations
 
-    static void serializeContain(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<Containment>);
     static void serializeSmoothScrolling(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, bool);
     static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
     static void serializeTabSize(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const TabSize&);
@@ -193,37 +192,6 @@ inline void ExtractorSerializer::serializeTransformationMatrix(const RenderStyle
 }
 
 // MARK: - Shared serializations
-
-inline void ExtractorSerializer::serializeContain(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<Containment> containment)
-{
-    if (!containment) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::None { });
-        return;
-    }
-    if (containment == RenderStyle::strictContainment()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Strict { });
-        return;
-    }
-    if (containment == RenderStyle::contentContainment()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Content { });
-        return;
-    }
-
-    bool listEmpty = true;
-    auto appendOption = [&](Containment test, CSSValueID value) {
-        if (containment & test) {
-            if (!listEmpty)
-                builder.append(' ');
-            builder.append(nameLiteralForSerialization(value));
-            listEmpty = false;
-        }
-    };
-    appendOption(Containment::Size, CSSValueSize);
-    appendOption(Containment::InlineSize, CSSValueInlineSize);
-    appendOption(Containment::Layout, CSSValueLayout);
-    appendOption(Containment::Style, CSSValueStyle);
-    appendOption(Containment::Paint, CSSValuePaint);
-}
 
 inline void ExtractorSerializer::serializePositionTryFallbacks(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const FixedVector<PositionTryFallback>& fallbacks)
 {

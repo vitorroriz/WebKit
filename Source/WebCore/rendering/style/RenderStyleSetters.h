@@ -134,7 +134,7 @@ inline void RenderStyle::setColumnRuleStyle(BorderStyle b) { SET_DOUBLY_NESTED(m
 inline void RenderStyle::setColumnRuleWidth(Style::LineWidth width) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, multiCol, rule.m_width, width); }
 inline void RenderStyle::setColumnSpan(ColumnSpan span) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, multiCol, columnSpan, static_cast<unsigned>(span)); }
 inline void RenderStyle::setColumnWidth(Style::ColumnWidth width) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, multiCol, width, width); }
-inline void RenderStyle::setContain(OptionSet<Containment> containment) { SET_NESTED(m_nonInheritedData, rareData, contain, containment); }
+inline void RenderStyle::setContain(Style::Contain contain) { SET_NESTED(m_nonInheritedData, rareData, contain, contain.toRaw()); }
 inline void RenderStyle::setContainIntrinsicHeight(Style::ContainIntrinsicSize&& height) { SET_NESTED(m_nonInheritedData, rareData, containIntrinsicHeight, WTFMove(height)); }
 inline void RenderStyle::setContainIntrinsicWidth(Style::ContainIntrinsicSize&& width) { SET_NESTED(m_nonInheritedData, rareData, containIntrinsicWidth, WTFMove(width)); }
 inline void RenderStyle::setContainerNames(Style::ContainerNames&& names) { SET_NESTED(m_nonInheritedData, rareData, containerNames, WTFMove(names)); }

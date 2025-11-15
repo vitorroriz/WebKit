@@ -810,12 +810,12 @@ static bool rareDataChangeRequiresLayout(const StyleRareNonInheritedData& first,
     if (first.inputSecurity != second.inputSecurity)
         return true;
 
-    if (first.usedContain().contains(Containment::Size) != second.usedContain().contains(Containment::Size)
-        || first.usedContain().contains(Containment::InlineSize) != second.usedContain().contains(Containment::InlineSize)
-        || first.usedContain().contains(Containment::Layout) != second.usedContain().contains(Containment::Layout))
+    if (first.usedContain().contains(Style::ContainValue::Size) != second.usedContain().contains(Style::ContainValue::Size)
+        || first.usedContain().contains(Style::ContainValue::InlineSize) != second.usedContain().contains(Style::ContainValue::InlineSize)
+        || first.usedContain().contains(Style::ContainValue::Layout) != second.usedContain().contains(Style::ContainValue::Layout))
         return true;
 
-    // content-visibiliy:hidden turns on contain:size which requires relayout.
+    // content-visibility:hidden turns on contain:size which requires relayout.
     if ((static_cast<ContentVisibility>(first.contentVisibility) == ContentVisibility::Hidden) != (static_cast<ContentVisibility>(second.contentVisibility) == ContentVisibility::Hidden))
         return true;
 

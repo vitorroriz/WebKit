@@ -315,7 +315,7 @@ bool Box::isLayoutContainmentBox() const
             return isAtomicInlineBox();
         return true;
     };
-    return m_style.usedContain().contains(Containment::Layout) && supportsLayoutContainment();
+    return m_style.usedContain().contains(Style::ContainValue::Layout) && supportsLayoutContainment();
 }
 
 bool Box::isRubyAnnotationBox() const
@@ -347,7 +347,7 @@ bool Box::isSizeContainmentBox() const
             return isAtomicInlineBox();
         return true;
     };
-    return m_style.usedContain().contains(Containment::Size) && supportsSizeContainment();
+    return m_style.usedContain().contains(Style::ContainValue::Size) && supportsSizeContainment();
 }
 
 bool Box::isInternalTableBox() const

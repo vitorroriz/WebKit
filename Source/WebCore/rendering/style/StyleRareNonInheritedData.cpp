@@ -48,7 +48,6 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
     , maxLines(RenderStyle::initialMaxLines())
     , overflowContinue(RenderStyle::initialOverflowContinue())
     , touchActions(RenderStyle::initialTouchActions())
-    , contain(RenderStyle::initialContainment())
     , initialLetter(RenderStyle::initialInitialLetter())
     , marquee(StyleMarqueeData::create())
     , backdropFilter(StyleFilterData::create())
@@ -143,6 +142,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
     , isPopoverInvoker(false)
     , useSVGZoomRulesForLength(false)
     , marginTrim(RenderStyle::initialMarginTrim().toRaw())
+    , contain(RenderStyle::initialContain().toRaw())
 {
 }
 
@@ -155,7 +155,6 @@ inline StyleRareNonInheritedData::StyleRareNonInheritedData(const StyleRareNonIn
     , maxLines(o.maxLines)
     , overflowContinue(o.overflowContinue)
     , touchActions(o.touchActions)
-    , contain(o.contain)
     , initialLetter(o.initialLetter)
     , marquee(o.marquee)
     , backdropFilter(o.backdropFilter)
@@ -250,6 +249,7 @@ inline StyleRareNonInheritedData::StyleRareNonInheritedData(const StyleRareNonIn
     , isPopoverInvoker(o.isPopoverInvoker)
     , useSVGZoomRulesForLength(o.useSVGZoomRulesForLength)
     , marginTrim(o.marginTrim)
+    , contain(o.contain)
 {
 }
 
@@ -269,7 +269,6 @@ bool StyleRareNonInheritedData::operator==(const StyleRareNonInheritedData& o) c
         && maxLines == o.maxLines
         && overflowContinue == o.overflowContinue
         && touchActions == o.touchActions
-        && contain == o.contain
         && initialLetter == o.initialLetter
         && marquee == o.marquee
         && backdropFilter == o.backdropFilter
@@ -363,25 +362,26 @@ bool StyleRareNonInheritedData::operator==(const StyleRareNonInheritedData& o) c
         && anchorFunctionScrollCompensatedAxes == o.anchorFunctionScrollCompensatedAxes
         && isPopoverInvoker == o.isPopoverInvoker
         && useSVGZoomRulesForLength == o.useSVGZoomRulesForLength
-        && marginTrim == o.marginTrim;
+        && marginTrim == o.marginTrim
+        && contain == o.contain;
 }
 
-OptionSet<Containment> StyleRareNonInheritedData::usedContain() const
+Style::Contain StyleRareNonInheritedData::usedContain() const
 {
-    auto containment = contain;
+    auto result = Style::Contain::fromRaw(contain);
 
     switch (static_cast<ContainerType>(containerType)) {
     case ContainerType::Normal:
         break;
     case ContainerType::Size:
-        containment.add({ Containment::Style, Containment::Size });
+        result.add({ Style::ContainValue::Style, Style::ContainValue::Size });
         break;
     case ContainerType::InlineSize:
-        containment.add({ Containment::Style, Containment::InlineSize });
+        result.add({ Style::ContainValue::Style, Style::ContainValue::InlineSize });
         break;
     };
 
-    return containment;
+    return result;
 }
 
 bool StyleRareNonInheritedData::hasBackdropFilters() const
@@ -408,7 +408,6 @@ void StyleRareNonInheritedData::dumpDifferences(TextStream& ts, const StyleRareN
     LOG_IF_DIFFERENT(overflowContinue);
 
     LOG_IF_DIFFERENT(touchActions);
-    LOG_IF_DIFFERENT(contain);
 
     LOG_IF_DIFFERENT(initialLetter);
 
@@ -538,6 +537,7 @@ void StyleRareNonInheritedData::dumpDifferences(TextStream& ts, const StyleRareN
     LOG_IF_DIFFERENT_WITH_CAST(bool, useSVGZoomRulesForLength);
 
     LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::MarginTrim, marginTrim);
+    LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::Contain, contain);
 }
 #endif // !LOG_DISABLED
 

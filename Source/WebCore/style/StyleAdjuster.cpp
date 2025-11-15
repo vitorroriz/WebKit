@@ -981,7 +981,7 @@ void Adjuster::adjustThemeStyle(RenderStyle& style, const RenderStyle& parentSty
 
     RenderTheme::singleton().adjustStyle(style, parentStyle, m_element.get());
 
-    if (style.containsSize()) {
+    if (style.usedContain().contains(Style::ContainValue::Size)) {
         if (!style.containIntrinsicWidth().isNone()) {
             if (isOldWidthAuto)
                 style.setWidth(CSS::Keyword::Auto { });
@@ -1128,9 +1128,9 @@ void Adjuster::propagateToDocumentElementAndInitialContainingBlock(Update& updat
     // "Additionally, when any containments are active on either the HTML html or body elements, propagation of
     // properties from the body element to the initial containing block, the viewport, or the canvas background, is disabled."
     auto shouldPropagateFromBody = [&] {
-        if (bodyStyle && !bodyStyle->usedContain().isEmpty())
+        if (bodyStyle && !bodyStyle->usedContain().isNone())
             return false;
-        return documentElementStyle->usedContain().isEmpty();
+        return documentElementStyle->usedContain().isNone();
     }();
 
     auto writingMode = [&] {

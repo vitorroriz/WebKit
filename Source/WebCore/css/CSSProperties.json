@@ -8619,8 +8619,7 @@
             "animation-type": "not animatable",
             "initial": "none",
             "codegen-properties": {
-                "style-converter": "Contain",
-                "render-style-initial": "initialContainment",
+                "style-converter": "StyleType<Contain>",
                 "parser-grammar": "none | strict | content | [ [size | inline-size] || layout || style || paint ]@(no-single-item-opt)"
             },
             "specification": {

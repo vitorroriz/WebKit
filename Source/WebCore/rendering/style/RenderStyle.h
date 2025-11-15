@@ -106,7 +106,6 @@ enum class ColumnProgression : bool;
 enum class ColumnSpan : bool;
 enum class CompositeOperator : uint8_t;
 enum class ContainerType : uint8_t;
-enum class Containment : uint8_t;
 enum class ContentDistribution : uint8_t;
 enum class ContentPosition : uint8_t;
 enum class ContentVisibility : uint8_t;
@@ -255,6 +254,7 @@ struct Color;
 struct ColorScheme;
 struct ColumnCount;
 struct ColumnWidth;
+struct Contain;
 struct ContainIntrinsicSize;
 struct ContainerNames;
 struct Content;
@@ -907,15 +907,8 @@ public:
     inline double logicalAspectRatio() const;
     inline bool hasAspectRatio() const;
 
-    inline OptionSet<Containment> contain() const;
-    inline OptionSet<Containment> usedContain() const;
-    inline bool containsLayout() const;
-    inline bool containsSize() const;
-    inline bool containsInlineSize() const;
-    inline bool containsSizeOrInlineSize() const;
-    inline bool containsStyle() const;
-    inline bool containsPaint() const;
-    inline bool containsLayoutOrPaint() const;
+    inline Style::Contain contain() const;
+    inline Style::Contain usedContain() const;
     inline ContainerType containerType() const;
     inline const Style::ContainerNames& containerNames() const;
     inline bool containerTypeAndNamesEqual(const RenderStyle&) const;
@@ -1463,7 +1456,7 @@ public:
 
     inline void setAspectRatio(Style::AspectRatio&&);
 
-    inline void setContain(OptionSet<Containment>);
+    inline void setContain(Style::Contain);
     inline void setContainerType(ContainerType);
     inline void setContainerNames(Style::ContainerNames&&);
 
@@ -2149,9 +2142,7 @@ public:
     static constexpr Resize initialResize();
     static constexpr StyleAppearance initialAppearance();
     static inline Style::AspectRatio initialAspectRatio();
-    static constexpr OptionSet<Containment> initialContainment();
-    static constexpr OptionSet<Containment> strictContainment();
-    static constexpr OptionSet<Containment> contentContainment();
+    static constexpr Style::Contain initialContain();
     static constexpr ContainerType initialContainerType();
     static Style::ContainerNames initialContainerNames();
     static inline Style::Content initialContent();

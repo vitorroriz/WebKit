@@ -1097,14 +1097,6 @@ enum class MathStyle : bool {
     Compact,
 };
 
-enum class Containment : uint8_t {
-    Layout      = 1 << 0,
-    Paint       = 1 << 1,
-    Size        = 1 << 2,
-    InlineSize  = 1 << 3,
-    Style       = 1 << 4,
-};
-
 enum class ContainerType : uint8_t {
     Normal,
     Size,

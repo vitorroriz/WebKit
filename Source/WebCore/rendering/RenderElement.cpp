@@ -2365,8 +2365,8 @@ void RenderElement::adjustFragmentedFlowStateOnContainingBlockChangeIfNeeded(con
 #if HAVE(CORE_MATERIAL)
         || oldStyle.hasAppleVisualEffectRequiringBackdropFilter() != newStyle.hasAppleVisualEffectRequiringBackdropFilter()
 #endif
-        || oldStyle.containsLayout() != newStyle.containsLayout()
-        || oldStyle.containsSize() != newStyle.containsSize();
+        || oldStyle.usedContain().contains(Style::ContainValue::Layout) != newStyle.usedContain().contains(Style::ContainValue::Layout)
+        || oldStyle.usedContain().contains(Style::ContainValue::Size) != newStyle.usedContain().contains(Style::ContainValue::Size);
     if (!mayNotBeContainingBlockForDescendantsAnymore)
         return;
 

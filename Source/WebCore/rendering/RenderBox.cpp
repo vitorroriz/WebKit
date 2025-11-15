@@ -522,8 +522,8 @@ void RenderBox::updateFromStyle()
             if (is<HTMLHtmlElement>(documentElement)
                 && document().body() == element()
                 && documentElementRenderer.effectiveOverflowX() == Overflow::Visible
-                && !styleToUse.usedContain()
-                && !documentElementRenderer.style().usedContain()) {
+                && styleToUse.usedContain().isNone()
+                && documentElementRenderer.style().usedContain().isNone()) {
                 boxHasNonVisibleOverflow = false;
             }
         }
@@ -5251,7 +5251,7 @@ bool RenderBox::requiresLayer() const
     return RenderBoxModelObject::requiresLayer()
         || hasNonVisibleOverflow()
         || style().specifiesColumns()
-        || style().containsLayout()
+        || style().usedContain().contains(Style::ContainValue::Layout)
         || !style().usedZIndex().isAuto()
         || hasRunningAcceleratedAnimations();
 }

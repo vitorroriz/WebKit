@@ -128,8 +128,6 @@ public:
 
     static OptionSet<SpeakAs> convertSpeakAs(BuilderState&, const CSSValue&);
 
-    static OptionSet<Containment> convertContain(BuilderState&, const CSSValue&);
-
     static std::optional<ScopedName> convertPositionAnchor(BuilderState&, const CSSValue&);
     static std::optional<PositionArea> convertPositionArea(BuilderState&, const CSSValue&);
 
@@ -359,47 +357,6 @@ inline OptionSet<HangingPunctuation> BuilderConverter::convertHangingPunctuation
             result.add(fromCSSValue<HangingPunctuation>(currentValue));
     }
     return result;
-}
-
-inline OptionSet<Containment> BuilderConverter::convertContain(BuilderState& builderState, const CSSValue& value)
-{
-    if (is<CSSPrimitiveValue>(value)) {
-        if (value.valueID() == CSSValueNone)
-            return RenderStyle::initialContainment();
-        if (value.valueID() == CSSValueStrict)
-            return RenderStyle::strictContainment();
-        return RenderStyle::contentContainment();
-    }
-
-    OptionSet<Containment> containment;
-
-    auto list = requiredListDowncast<CSSValueList, CSSPrimitiveValue>(builderState, value);
-    if (!list)
-        return { };
-
-    for (auto& value : *list) {
-        switch (value.valueID()) {
-        case CSSValueSize:
-            containment.add(Containment::Size);
-            break;
-        case CSSValueInlineSize:
-            containment.add(Containment::InlineSize);
-            break;
-        case CSSValueLayout:
-            containment.add(Containment::Layout);
-            break;
-        case CSSValuePaint:
-            containment.add(Containment::Paint);
-            break;
-        case CSSValueStyle:
-            containment.add(Containment::Style);
-            break;
-        default:
-            ASSERT_NOT_REACHED();
-            break;
-        };
-    }
-    return containment;
 }
 
 inline std::optional<ScopedName> BuilderConverter::convertPositionAnchor(BuilderState& builderState, const CSSValue& value)

@@ -193,21 +193,13 @@ inline Style::ColumnWidth RenderStyle::columnWidth() const { return m_nonInherit
 inline const Style::LetterSpacing& RenderStyle::computedLetterSpacing() const { return m_inheritedData->fontData->letterSpacing; }
 inline const AtomString& RenderStyle::computedLocale() const { return fontDescription().computedLocale(); }
 inline const Style::WordSpacing& RenderStyle::computedWordSpacing() const { return m_inheritedData->fontData->wordSpacing; }
-inline OptionSet<Containment> RenderStyle::contain() const { return m_nonInheritedData->rareData->contain; }
+inline Style::Contain RenderStyle::contain() const { return Style::Contain::fromRaw(m_nonInheritedData->rareData->contain); }
 inline const Style::ContainIntrinsicSize& RenderStyle::containIntrinsicLogicalHeight() const { return writingMode().isHorizontal() ? containIntrinsicHeight() : containIntrinsicWidth(); }
 inline const Style::ContainIntrinsicSize& RenderStyle::containIntrinsicLogicalWidth() const { return writingMode().isHorizontal() ? containIntrinsicWidth() : containIntrinsicHeight(); }
 inline const Style::ContainIntrinsicSize& RenderStyle::containIntrinsicHeight() const { return m_nonInheritedData->rareData->containIntrinsicHeight; }
 inline const Style::ContainIntrinsicSize& RenderStyle::containIntrinsicWidth() const { return m_nonInheritedData->rareData->containIntrinsicWidth; }
 inline const Style::ContainerNames& RenderStyle::containerNames() const { return m_nonInheritedData->rareData->containerNames; }
 inline ContainerType RenderStyle::containerType() const { return static_cast<ContainerType>(m_nonInheritedData->rareData->containerType); }
-inline bool RenderStyle::containsInlineSize() const { return usedContain().contains(Containment::InlineSize); }
-inline bool RenderStyle::containsLayout() const { return usedContain().contains(Containment::Layout); }
-inline bool RenderStyle::containsLayoutOrPaint() const { return usedContain().containsAny({ Containment::Layout, Containment::Paint }); }
-inline bool RenderStyle::containsPaint() const { return usedContain().contains(Containment::Paint); }
-inline bool RenderStyle::containsSize() const { return usedContain().contains(Containment::Size); }
-inline bool RenderStyle::containsSizeOrInlineSize() const { return usedContain().containsAny({ Containment::Size, Containment::InlineSize }); }
-inline bool RenderStyle::containsStyle() const { return usedContain().contains(Containment::Style); }
-constexpr OptionSet<Containment> RenderStyle::contentContainment() { return { Containment::Layout, Containment::Paint, Containment::Style }; }
 inline const Style::Content& RenderStyle::content() const { return m_nonInheritedData->miscData->content; }
 inline ContentVisibility RenderStyle::contentVisibility() const { return static_cast<ContentVisibility>(m_nonInheritedData->rareData->contentVisibility); }
 inline Style::Cursor RenderStyle::cursor() const { return { m_rareInheritedData->cursorImages, cursorType() }; }
@@ -215,7 +207,7 @@ inline StyleAppearance RenderStyle::usedAppearance() const { return static_cast<
 #if HAVE(CORE_MATERIAL)
 inline AppleVisualEffect RenderStyle::usedAppleVisualEffectForSubtree() const { return static_cast<AppleVisualEffect>(m_rareInheritedData->usedAppleVisualEffectForSubtree); }
 #endif
-inline OptionSet<Containment> RenderStyle::usedContain() const { return m_nonInheritedData->rareData->usedContain(); }
+inline Style::Contain RenderStyle::usedContain() const { return m_nonInheritedData->rareData->usedContain(); }
 inline bool RenderStyle::effectiveInert() const { return m_rareInheritedData->effectiveInert; }
 inline bool RenderStyle::isEffectivelyTransparent() const { return m_rareInheritedData->effectivelyTransparent; }
 inline PointerEvents RenderStyle::usedPointerEvents() const { return effectiveInert() ? PointerEvents::None : pointerEvents(); }
@@ -406,7 +398,7 @@ inline Style::ContainIntrinsicSize RenderStyle::initialContainIntrinsicHeight() 
 inline Style::ContainIntrinsicSize RenderStyle::initialContainIntrinsicWidth() { return CSS::Keyword::None { }; }
 inline Style::ContainerNames RenderStyle::initialContainerNames() { return CSS::Keyword::None { }; }
 constexpr ContainerType RenderStyle::initialContainerType() { return ContainerType::Normal; }
-constexpr OptionSet<Containment> RenderStyle::initialContainment() { return { }; }
+constexpr Style::Contain RenderStyle::initialContain() { return CSS::Keyword::None { }; }
 inline Style::Content RenderStyle::initialContent() { return CSS::Keyword::Normal { }; }
 constexpr ContentVisibility RenderStyle::initialContentVisibility() { return ContentVisibility::Visible; }
 constexpr Style::CornerShapeValue RenderStyle::initialCornerShapeValue() { return Style::CornerShapeValue::round(); }
@@ -798,7 +790,6 @@ inline bool RenderStyle::isSkippedRootOrSkippedContent() const { return usedCont
 inline OptionSet<SpeakAs> RenderStyle::speakAs() const { return OptionSet<SpeakAs>::fromRaw(m_rareInheritedData->speakAs); }
 inline Style::ZIndex RenderStyle::specifiedZIndex() const { return m_nonInheritedData->boxData->specifiedZIndex(); }
 inline bool RenderStyle::specifiesColumns() const { return !columnCount().isAuto() || !columnWidth().isAuto() || !hasInlineColumnAxis(); }
-constexpr OptionSet<Containment> RenderStyle::strictContainment() { return { Containment::Size, Containment::Layout, Containment::Paint, Containment::Style }; }
 inline const Style::Color& RenderStyle::strokeColor() const { return m_rareInheritedData->strokeColor; }
 inline Style::StrokeMiterlimit RenderStyle::strokeMiterLimit() const { return m_rareInheritedData->miterLimit; }
 inline std::optional<PseudoElementType> RenderStyle::pseudoElementType() const
@@ -1309,7 +1300,9 @@ inline bool isVisibleToHitTesting(const RenderStyle& style, const HitTestRequest
 inline bool shouldApplyLayoutContainment(const RenderStyle& style, const Element& element)
 {
     // content-visibility hidden and auto turns on layout containment.
-    auto hasContainment = style.containsLayout() || style.contentVisibility() == ContentVisibility::Hidden || style.contentVisibility() == ContentVisibility::Auto;
+    auto hasContainment = style.usedContain().contains(Style::ContainValue::Layout)
+        || style.contentVisibility() == ContentVisibility::Hidden
+        || style.contentVisibility() == ContentVisibility::Auto;
     if (!hasContainment)
         return false;
     // Giving an element layout containment has no effect if any of the following are true:
@@ -1327,7 +1320,9 @@ inline bool shouldApplyLayoutContainment(const RenderStyle& style, const Element
 
 inline bool shouldApplySizeContainment(const RenderStyle& style, const Element& element)
 {
-    auto hasContainment = style.containsSize() || style.contentVisibility() == ContentVisibility::Hidden || (style.contentVisibility() == ContentVisibility::Auto && !element.isRelevantToUser());
+    auto hasContainment = style.usedContain().contains(Style::ContainValue::Size)
+        || style.contentVisibility() == ContentVisibility::Hidden
+        || (style.contentVisibility() == ContentVisibility::Auto && !element.isRelevantToUser());
     if (!hasContainment)
         return false;
     // Giving an element size containment has no effect if any of the following are true:
@@ -1348,7 +1343,7 @@ inline bool shouldApplySizeContainment(const RenderStyle& style, const Element& 
 
 inline bool shouldApplyInlineSizeContainment(const RenderStyle& style, const Element& element)
 {
-    if (!style.containsInlineSize())
+    if (!style.usedContain().contains(Style::ContainValue::InlineSize))
         return false;
     // Giving an element inline-size containment has no effect if any of the following are true:
     //   if the element does not generate a principal box (as is the case with display: contents or display: none)
@@ -1369,13 +1364,17 @@ inline bool shouldApplyInlineSizeContainment(const RenderStyle& style, const Ele
 inline bool shouldApplyStyleContainment(const RenderStyle& style, const Element&)
 {
     // content-visibility hidden and auto turns on style containment.
-    return style.containsStyle() || style.contentVisibility() == ContentVisibility::Hidden || style.contentVisibility() == ContentVisibility::Auto;
+    return style.usedContain().contains(Style::ContainValue::Style)
+        || style.contentVisibility() == ContentVisibility::Hidden
+        || style.contentVisibility() == ContentVisibility::Auto;
 }
 
 inline bool shouldApplyPaintContainment(const RenderStyle& style, const Element& element)
 {
     // content-visibility hidden and auto turns on paint containment.
-    auto hasContainment = style.containsPaint() || style.contentVisibility() == ContentVisibility::Hidden || style.contentVisibility() == ContentVisibility::Auto;
+    auto hasContainment = style.usedContain().contains(Style::ContainValue::Paint)
+        || style.contentVisibility() == ContentVisibility::Hidden
+        || style.contentVisibility() == ContentVisibility::Auto;
     if (!hasContainment)
         return false;
     // Giving an element paint containment has no effect if any of the following are true:

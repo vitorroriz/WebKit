@@ -45,6 +45,7 @@
 #include "SVGRenderStyleDefs.h"
 #include "ScrollAxis.h"
 #include "ScrollTypes.h"
+#include "StyleContain.h"
 #include "StyleImageOrientation.h"
 #include "StyleMarginTrim.h"
 #include "StylePositionVisibility.h"
@@ -2615,6 +2616,12 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 
 #define TYPE Style::WebkitLineBoxContainValue
 #define FOR_EACH(CASE) CASE(Block) CASE(Inline) CASE(Font) CASE(Glyphs) CASE(Replaced) CASE(InlineBox) CASE(InitialLetter)
+DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
+#undef TYPE
+#undef FOR_EACH
+
+#define TYPE Style::ContainValue
+#define FOR_EACH(CASE) CASE(Size) CASE(InlineSize) CASE(Layout) CASE(Style) CASE(Paint)
 DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH

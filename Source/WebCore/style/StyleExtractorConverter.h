@@ -133,7 +133,6 @@ public:
 
     // MARK: Shared conversions
 
-    static Ref<CSSValue> convertContain(ExtractorState&, OptionSet<Containment>);
     static Ref<CSSValue> convertPositionTryFallbacks(ExtractorState&, const FixedVector<PositionTryFallback>&);
     static Ref<CSSValue> convertTouchAction(ExtractorState&, OptionSet<TouchAction>);
     static Ref<CSSValue> convertTextTransform(ExtractorState&, OptionSet<TextTransform>);
@@ -249,28 +248,6 @@ inline Ref<CSSValue> ExtractorConverter::convertTransformationMatrix(const Rende
 }
 
 // MARK: - Shared conversions
-
-inline Ref<CSSValue> ExtractorConverter::convertContain(ExtractorState&, OptionSet<Containment> containment)
-{
-    if (!containment)
-        return CSSPrimitiveValue::create(CSSValueNone);
-    if (containment == RenderStyle::strictContainment())
-        return CSSPrimitiveValue::create(CSSValueStrict);
-    if (containment == RenderStyle::contentContainment())
-        return CSSPrimitiveValue::create(CSSValueContent);
-    CSSValueListBuilder list;
-    if (containment & Containment::Size)
-        list.append(CSSPrimitiveValue::create(CSSValueSize));
-    if (containment & Containment::InlineSize)
-        list.append(CSSPrimitiveValue::create(CSSValueInlineSize));
-    if (containment & Containment::Layout)
-        list.append(CSSPrimitiveValue::create(CSSValueLayout));
-    if (containment & Containment::Style)
-        list.append(CSSPrimitiveValue::create(CSSValueStyle));
-    if (containment & Containment::Paint)
-        list.append(CSSPrimitiveValue::create(CSSValuePaint));
-    return CSSValueList::createSpaceSeparated(WTFMove(list));
-}
 
 inline Ref<CSSValue> ExtractorConverter::convertPositionTryFallbacks(ExtractorState& state, const FixedVector<PositionTryFallback>& fallbacks)
 {

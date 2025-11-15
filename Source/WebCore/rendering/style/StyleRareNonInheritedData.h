@@ -37,6 +37,7 @@
 #include <WebCore/StyleClip.h>
 #include <WebCore/StyleClipPath.h>
 #include <WebCore/StyleColor.h>
+#include <WebCore/StyleContain.h>
 #include <WebCore/StyleContainIntrinsicSize.h>
 #include <WebCore/StyleContainerName.h>
 #include <WebCore/StyleGapGutter.h>
@@ -130,7 +131,7 @@ public:
     bool hasScrollTimelines() const { return !scrollTimelines.isEmpty() || !scrollTimelineNames.isNone(); }
     bool hasViewTimelines() const { return !viewTimelines.isEmpty() || !viewTimelineNames.isNone(); }
 
-    OptionSet<Containment> usedContain() const;
+    Style::Contain usedContain() const;
 
     Style::ContainIntrinsicSize containIntrinsicWidth;
     Style::ContainIntrinsicSize containIntrinsicHeight;
@@ -144,7 +145,6 @@ public:
     OverflowContinue overflowContinue { OverflowContinue::Auto };
 
     OptionSet<TouchAction> touchActions;
-    OptionSet<Containment> contain;
 
     Style::WebkitInitialLetter initialLetter;
 
@@ -272,6 +272,7 @@ public:
     PREFERRED_TYPE(bool) unsigned isPopoverInvoker : 1;
     PREFERRED_TYPE(bool) unsigned useSVGZoomRulesForLength : 1;
     PREFERRED_TYPE(Style::MarginTrim) unsigned marginTrim : 4;
+    PREFERRED_TYPE(Style::Contain) unsigned contain : 5;
 
 private:
     StyleRareNonInheritedData();

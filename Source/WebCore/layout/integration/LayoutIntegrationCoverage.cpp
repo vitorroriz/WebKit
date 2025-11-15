@@ -188,7 +188,7 @@ static OptionSet<FlexAvoidanceReason> canUseForFlexLayoutWithReason(const Render
         if (flexItemStyle.minHeight() != RenderStyle::initialMinSize() || flexItemStyle.maxHeight() != RenderStyle::initialMaxSize())
             ADD_REASON_AND_RETURN_IF_NEEDED(FlexWithNonInitialMinMaxHeight, reasons, includeReasons);
 
-        if (flexItemStyle.containsSize())
+        if (flexItemStyle.usedContain().contains(Style::ContainValue::Size))
             ADD_REASON_AND_RETURN_IF_NEEDED(FlexItemHasContainsSize, reasons, includeReasons);
 
         if (mayHaveScrollbarOrScrollableOverflow(flexItemStyle))

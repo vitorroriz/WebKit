@@ -3208,6 +3208,7 @@ style/values/color/StyleKeywordColor.cpp
 style/values/color/StyleLightDarkColor.cpp
 style/values/color/StyleOpacity.cpp
 style/values/color/StyleResolvedColor.cpp
+style/values/contain/StyleContain.cpp
 style/values/content/StyleContent.cpp
 style/values/content/StyleQuotes.cpp
 style/values/counter-styles/StyleCounterStyle.cpp

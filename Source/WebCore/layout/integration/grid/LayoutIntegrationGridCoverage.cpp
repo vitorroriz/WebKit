@@ -242,7 +242,7 @@ static OptionSet<GridAvoidanceReason> gridLayoutAvoidanceReason(const RenderGrid
         }
     }
 
-    if (renderGridStyle->containsSize())
+    if (renderGridStyle->usedContain().contains(Style::ContainValue::Size))
         ADD_REASON_AND_RETURN_IF_NEEDED(GridHasContainsSize, reasons, reasonCollectionMode);
 
     auto linesFromGridTemplateColumnsCount = gridTemplateColumns.sizes.size() + 1;
@@ -332,7 +332,7 @@ static OptionSet<GridAvoidanceReason> gridLayoutAvoidanceReason(const RenderGrid
         if (!gridItemStyle->isOverflowVisible())
             ADD_REASON_AND_RETURN_IF_NEEDED(GridItemHasNonVisibleOverflow, reasons, reasonCollectionMode);
 
-        if (gridItemStyle->containsSize())
+        if (gridItemStyle->usedContain().contains(Style::ContainValue::Size))
             ADD_REASON_AND_RETURN_IF_NEEDED(GridItemHasContainsSize, reasons, reasonCollectionMode);
     }
     return reasons;
