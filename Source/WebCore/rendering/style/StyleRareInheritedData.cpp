@@ -34,49 +34,6 @@
 
 namespace WebCore {
 
-struct GreaterThanOrSameSizeAsStyleRareInheritedData : public RefCounted<GreaterThanOrSameSizeAsStyleRareInheritedData> {
-    float firstFloat;
-    float secondFloat;
-    Style::ImageOrNone styleImage;
-    Style::WebkitTextStrokeWidth textStrokeWidth;
-    Style::Color firstColor;
-    Style::Color colors[10];
-    Style::ScrollbarColor scrollbarColor;
-    Style::DynamicRangeLimit dynamicRangeLimit;
-    void* ownPtrs[1];
-    AtomString atomStrings[5];
-    void* refPtrs[3];
-    float thirdFloat;
-    Style::TextEmphasisStyle textEmphasisStyle;
-    Style::TextIndent textIndent;
-    Style::TextUnderlineOffset offset;
-    Style::TextBoxEdge textBoxEdge;
-    Style::LineFitEdge lineFitEdge;
-    void* customPropertyDataRefs[1];
-    unsigned bitfields[7];
-    short pagedMediaShorts[2];
-    Style::TabSize tabSize;
-    short hyphenationShorts[3];
-
-#if ENABLE(TEXT_AUTOSIZING)
-    Style::TextSizeAdjust textSizeAdjust;
-#endif
-
-#if ENABLE(TOUCH_EVENTS)
-    Style::Color tapHighlightColor;
-#endif
-
-#if ENABLE(DARK_MODE_CSS)
-    Style::ColorScheme colorScheme;
-#endif
-    Style::ListStyleType listStyleType;
-    Style::BlockEllipsis blockEllipsis;
-    Style::MathDepth mathDepth;
-    uint64_t eventListenerRegionTypes;
-};
-
-static_assert(sizeof(StyleRareInheritedData) <= sizeof(GreaterThanOrSameSizeAsStyleRareInheritedData), "StyleRareInheritedData should bit pack");
-
 DEFINE_ALLOCATOR_WITH_HEAP_IDENTIFIER(StyleRareInheritedData);
 
 StyleRareInheritedData::StyleRareInheritedData()
