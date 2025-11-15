@@ -413,7 +413,7 @@ void LineLayout::updateOverflow()
 
 std::pair<LayoutUnit, LayoutUnit> LineLayout::computeIntrinsicWidthConstraints()
 {
-    auto parentBlockLayoutState = Layout::BlockLayoutState { m_blockFormattingState.placedFloats() };
+    auto parentBlockLayoutState = Layout::BlockLayoutState { m_blockFormattingState.placedFloats(), { } };
     auto inlineFormattingContext = Layout::InlineFormattingContext { rootLayoutBox(), layoutState(), parentBlockLayoutState };
     if (m_lineDamage)
         m_inlineContentCache.resetMinimumMaximumContentSizes();
@@ -483,6 +483,12 @@ static inline std::optional<Layout::BlockLayoutState::LineGrid> lineGrid(const R
     return { };
 }
 
+static inline Layout::BlockLayoutState::MarginState initialMarginState(const RenderBlockFlow& rootRenderer)
+{
+    auto marginInfo = RenderBlockFlow::MarginInfo { rootRenderer, RenderBlockFlow::MarginInfo::IgnoreScrollbarForAfterMargin::No };
+    return { marginInfo.canCollapseWithChildren(), marginInfo.canCollapseMarginBeforeWithChildren(), marginInfo.canCollapseMarginAfterWithChildren(), marginInfo.quirkContainer(), marginInfo.atBeforeSideOfBlock(), marginInfo.atAfterSideOfBlock(), marginInfo.hasMarginBeforeQuirk(), marginInfo.hasMarginAfterQuirk(), marginInfo.determinedMarginBeforeQuirk(), marginInfo.positiveMargin(), marginInfo.negativeMargin() };
+}
+
 std::optional<LayoutRect> LineLayout::layout(ForceFullLayout forcedFullLayout)
 {
     if (forcedFullLayout == ForceFullLayout::Yes && m_lineDamage)
@@ -518,6 +524,7 @@ std::optional<LayoutRect> LineLayout::layout(ForceFullLayout forcedFullLayout)
 
     auto parentBlockLayoutState = Layout::BlockLayoutState {
         m_blockFormattingState.placedFloats(),
+        initialMarginState(flow()),
         lineClamp(flow()),
         textBoxTrim(flow()),
         flow().style().textBoxEdge(),

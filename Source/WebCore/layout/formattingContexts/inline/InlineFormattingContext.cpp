@@ -318,7 +318,7 @@ InlineLayoutResult InlineFormattingContext::lineLayout(AbstractLineBuilder& line
         auto lineBox = LineBoxBuilder { *this, lineLayoutResult }.build(lineIndex);
         auto lineLogicalRect = createDisplayContentForInlineContent(lineBox, lineLayoutResult, constraints, layoutResult.displayContent, numberOfContentfulLines);
         updateBoxGeometryForPlacedFloats(lineLayoutResult.floatContent.placedFloats);
-        updateInlineLayoutStateWithLineLayoutResult(lineLayoutResult, lineLogicalRect, floatingContext);
+        updateLayoutStateWithLineLayoutResult(lineLayoutResult, lineLogicalRect, floatingContext);
 
         auto lineContentEnd = lineLayoutResult.inlineItemRange.end;
         leadingInlineItemPosition = InlineFormattingUtils::leadingInlineItemPositionForNextLine(lineContentEnd, previousLineEnd, !lineLayoutResult.floatContent.hasIntrusiveFloat.isEmpty() || !lineLayoutResult.floatContent.placedFloats.isEmpty(), needsLayoutRange.end);
@@ -379,7 +379,7 @@ void InlineFormattingContext::layoutFloatContentOnly(const ConstraintsForInlineC
     }
 }
 
-void InlineFormattingContext::updateInlineLayoutStateWithLineLayoutResult(const LineLayoutResult& lineLayoutResult, const InlineRect& lineLogicalRect, const FloatingContext& floatingContext)
+void InlineFormattingContext::updateLayoutStateWithLineLayoutResult(const LineLayoutResult& lineLayoutResult, const InlineRect& lineLogicalRect, const FloatingContext& floatingContext)
 {
     auto& layoutState = this->layoutState();
     if (auto firstLineGap = lineLayoutResult.lineGeometry.initialLetterClearGap) {
@@ -392,6 +392,8 @@ void InlineFormattingContext::updateInlineLayoutStateWithLineLayoutResult(const 
 
     lineLayoutResult.endsWithHyphen() ? layoutState.incrementSuccessiveHyphenatedLineCount() : layoutState.resetSuccessiveHyphenatedLineCount();
     layoutState.setFirstLineStartTrimForInitialLetter(lineLayoutResult.firstLineStartTrim);
+    if (lineLayoutResult.hasInflowContent())
+        layoutState.parentBlockLayoutState().marginState().atBeforeSideOfBlock = false;
 }
 
 void InlineFormattingContext::updateBoxGeometryForPlacedFloats(const LineLayoutResult::PlacedFloatList& placedFloats)
