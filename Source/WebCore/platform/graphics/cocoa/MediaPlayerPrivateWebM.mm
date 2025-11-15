@@ -446,7 +446,11 @@ bool MediaPlayerPrivateWebM::performTaskAtTime(Function<void(const MediaTime&)>&
 {
     ALWAYS_LOG(LOGIDENTIFIER, time);
 
-    m_renderer->performTaskAtTime(time, WTFMove(task));
+    m_renderer->performTaskAtTime(time, [task = WTFMove(task)](const MediaTime& time) mutable {
+        ensureOnMainThread([time, task = WTFMove(task)] {
+            task(time);
+        });
+    });
     return true;
 }
 
