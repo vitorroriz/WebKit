@@ -99,10 +99,7 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
     // Render tree uses block height to track the child block layout position. Set it to the current position before calling layoutBlockChild.
     rootBlockContainer.setLogicalHeight(blockLogicalTopLeft.y() - rootBlockContainer.marginBefore());
 
-    auto beforeEdge = rootBlockContainer.borderAndPaddingBefore();
-    auto afterEdge = rootBlockContainer.borderAndPaddingAfter() + rootBlockContainer.scrollbarLogicalHeight();
-
-    RenderBlockFlow::MarginInfo marginInfo(rootBlockContainer, beforeEdge, afterEdge);
+    auto marginInfo = RenderBlockFlow::MarginInfo { rootBlockContainer };
     // FIXME: These are probably needed to make the container margin collapsing work.
     marginInfo.setAtBeforeSideOfBlock(false);
     marginInfo.setAtAfterSideOfBlock(false);

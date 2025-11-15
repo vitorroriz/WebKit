@@ -108,24 +108,30 @@ RenderBlockFlowRareData::RenderBlockFlowRareData(const RenderBlockFlow& block)
 RenderBlockFlowRareData::~RenderBlockFlowRareData() = default;
 
 // Our MarginInfo state used when laying out block children.
-RenderBlockFlow::MarginInfo::MarginInfo(const RenderBlockFlow& block, LayoutUnit beforeBorderPadding, LayoutUnit afterBorderPadding)
-    : m_atBeforeSideOfBlock(true)
-    , m_atAfterSideOfBlock(false)
-    , m_hasMarginBeforeQuirk(false)
-    , m_hasMarginAfterQuirk(false)
-    , m_determinedMarginBeforeQuirk(false)
+RenderBlockFlow::MarginInfo::MarginInfo(const RenderBlockFlow& block, IgnoreScrollbarForAfterMargin ignoreScrollbarForAfterMargin)
 {
-    const RenderStyle& blockStyle = block.style();
+    auto& blockStyle = block.style();
     ASSERT(block.isRenderView() || block.parent());
+
     m_canCollapseWithChildren = !block.createsNewFormattingContext() && !block.isRenderView();
 
-    m_canCollapseMarginBeforeWithChildren = m_canCollapseWithChildren && !beforeBorderPadding;
+    m_canCollapseMarginBeforeWithChildren = m_canCollapseWithChildren && !block.borderAndPaddingBefore();
 
     // If any height other than auto is specified in CSS, then we don't collapse our bottom
     // margins with our children's margins. To do otherwise would be to risk odd visual
     // effects when the children overflow out of the parent block and yet still collapse
     // with it. We also don't collapse if we have any bottom border/padding.
-    m_canCollapseMarginAfterWithChildren = m_canCollapseWithChildren && !afterBorderPadding && blockStyle.logicalHeight().isAuto();
+    auto canCollapseMarginAfterWithChildren = [&]() -> bool {
+        if (!m_canCollapseWithChildren)
+            return false;
+        if (!blockStyle.logicalHeight().isAuto())
+            return false;
+        if (block.borderAndPaddingAfter())
+            return false;
+        // FIXME: Check if all callsites are supposed to take scrollbar into account here.
+        return ignoreScrollbarForAfterMargin == IgnoreScrollbarForAfterMargin::Yes ? true : !block.scrollbarLogicalHeight();
+    };
+    m_canCollapseMarginAfterWithChildren = canCollapseMarginAfterWithChildren();
 
     m_quirkContainer = block.isRenderTableCell() || block.isBody();
 
@@ -832,14 +838,11 @@ void RenderBlockFlow::layoutBlockChildren(RelayoutChildren relayoutChildren, Lay
 {
     ASSERT(firstChild());
 
-    LayoutUnit beforeEdge = borderAndPaddingBefore();
-    LayoutUnit afterEdge = borderAndPaddingAfter() + scrollbarLogicalHeight();
-
-    setLogicalHeight(beforeEdge);
+    setLogicalHeight(borderAndPaddingBefore());
     auto* layoutState = view().frameView().layoutContext().layoutState(); 
 
     // The margin struct caches all our current margin collapsing state.
-    MarginInfo marginInfo(*this, beforeEdge, afterEdge);
+    auto marginInfo = MarginInfo { *this, MarginInfo::IgnoreScrollbarForAfterMargin::No };
 
     bool marginTrimBlockStartFromContainingBlock = layoutState->marginTrimBlockStart();
     bool newMarginTrimBlockStartForSubtree = [&] {
@@ -920,9 +923,8 @@ void RenderBlockFlow::layoutBlockChildren(RelayoutChildren relayoutChildren, Lay
         trimBlockEndChildrenMargins();
     // Now do the handling of the bottom of the block, adding in our bottom border/padding and
     // determining the correct collapsed bottom margin information.
-    handleAfterSideOfBlock(beforeEdge, afterEdge, marginInfo);
+    handleAfterSideOfBlock(marginInfo);
 }
-
 
 void RenderBlockFlow::trimBlockEndChildrenMargins()
 {
@@ -958,10 +960,8 @@ void RenderBlockFlow::trimBlockEndChildrenMargins()
 
             child = child->previousSiblingBox();
         }  else if (auto* nestedBlock = dynamicDowncast<RenderBlockFlow>(child); nestedBlock && nestedBlock->isBlockContainer() && !nestedBlock->childrenInline() && !nestedBlock->style().marginTrim().contains(Style::MarginTrimSide::BlockEnd)) {
-            MarginInfo nestedBlockMarginInfo(*nestedBlock, nestedBlock->borderAndPaddingBefore(), nestedBlock->borderAndPaddingAfter());
-            // The margins *inside* this nested block are protected so we should not introspect and try to
-            // trim any of them.
-            if (!nestedBlockMarginInfo.canCollapseMarginAfterWithChildren())
+            // The margins *inside* this nested block are protected so we should not introspect and try to trim any of them.
+            if (!MarginInfo { *nestedBlock }.canCollapseMarginAfterWithChildren())
                 break;
 
             child = child->lastChildBox();
@@ -1661,8 +1661,7 @@ void RenderBlockFlow::marginBeforeEstimateForChild(RenderBox& child, LayoutUnit&
     if (childBlock->childrenInline() || childBlock->isWritingModeRoot())
         return;
 
-    MarginInfo childMarginInfo(*childBlock, childBlock->borderAndPaddingBefore(), childBlock->borderAndPaddingAfter());
-    if (!childMarginInfo.canCollapseMarginBeforeWithChildren())
+    if (!MarginInfo { *childBlock }.canCollapseMarginBeforeWithChildren())
         return;
 
     RenderBox* grandchildBox = childBlock->firstChildBox();
@@ -1764,29 +1763,31 @@ void RenderBlockFlow::setCollapsedBottomMargin(const MarginInfo& marginInfo)
     }
 }
 
-void RenderBlockFlow::handleAfterSideOfBlock(LayoutUnit beforeSide, LayoutUnit afterSide, MarginInfo& marginInfo)
+void RenderBlockFlow::handleAfterSideOfBlock(MarginInfo& marginInfo)
 {
     marginInfo.setAtAfterSideOfBlock(true);
 
     // If our last child was a self-collapsing block with clearance then our logical height is flush with the
     // bottom edge of the float that the child clears. The correct vertical position for the margin-collapsing we want
     // to perform now is at the child's margin-top - so adjust our height to that position.
-    if (auto value = selfCollapsingMarginBeforeWithClear(lastChild()))
-        setLogicalHeight(logicalHeight() - *value);
+    auto logicalHeight = this->logicalHeight();
+    if (auto selfCollapsingMarginBeforeWithClear = this->selfCollapsingMarginBeforeWithClear(lastChild()))
+        logicalHeight -= *selfCollapsingMarginBeforeWithClear;
 
     // If we can't collapse with children then add in the bottom margin.
     if (!marginInfo.canCollapseWithMarginAfter() && !marginInfo.canCollapseWithMarginBefore()
         && (!document().inQuirksMode() || !marginInfo.quirkContainer() || !marginInfo.hasMarginAfterQuirk())) {
-        setLogicalHeight(logicalHeight() + marginInfo.margin());
+        logicalHeight += marginInfo.margin();
     }
 
     // Now add in our bottom border/padding.
-    setLogicalHeight(logicalHeight() + afterSide);
+    logicalHeight += borderAndPaddingAfter() + scrollbarLogicalHeight();
 
     // Negative margins can cause our height to shrink below our minimal height (border/padding).
     // If this happens, ensure that the computed height is increased to the minimal height.
-    setLogicalHeight(std::max(logicalHeight(), beforeSide + afterSide));
+    logicalHeight = std::max(logicalHeight, borderAndPaddingBefore() + borderAndPaddingAfter() + scrollbarLogicalHeight());
 
+    setLogicalHeight(logicalHeight);
     // Update our bottom collapsed margin info.
     setCollapsedBottomMargin(marginInfo);
 }
