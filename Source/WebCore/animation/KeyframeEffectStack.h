@@ -67,7 +67,6 @@ public:
     bool isCurrentlyAffectingProperty(CSSPropertyID) const;
     bool requiresPseudoElement() const;
     OptionSet<AnimationImpact> applyKeyframeEffects(RenderStyle& targetStyle, HashSet<AnimatableCSSProperty>& affectedProperties, const RenderStyle* previousLastStyleChangeEventStyle, const Style::ResolutionContext&);
-    bool hasEffectWithImplicitKeyframes() const;
 
     void effectAbilityToBeAcceleratedDidChange(const KeyframeEffect&);
     bool allowsAcceleration() const;

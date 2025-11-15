@@ -110,13 +110,6 @@ bool KeyframeEffectStack::requiresPseudoElement() const
     });
 }
 
-bool KeyframeEffectStack::hasEffectWithImplicitKeyframes() const
-{
-    return hasMatchingEffect([] (const KeyframeEffect& effect) {
-        return effect.hasImplicitKeyframes();
-    });
-}
-
 bool KeyframeEffectStack::isCurrentlyAffectingProperty(CSSPropertyID property) const
 {
     return hasMatchingEffect([property] (const KeyframeEffect& effect) {

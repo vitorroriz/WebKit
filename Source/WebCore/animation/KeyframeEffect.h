@@ -174,7 +174,6 @@ public:
     bool isRunningAcceleratedTransformRelatedAnimation() const;
 
     bool requiresPseudoElement() const;
-    bool hasImplicitKeyframes() const;
 
     void customPropertyRegistrationDidChange(const AtomString&);
 
