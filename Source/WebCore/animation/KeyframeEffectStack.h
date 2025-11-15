@@ -67,6 +67,7 @@ public:
     bool isCurrentlyAffectingProperty(CSSPropertyID) const;
     bool requiresPseudoElement() const;
     OptionSet<AnimationImpact> applyKeyframeEffects(RenderStyle& targetStyle, HashSet<AnimatableCSSProperty>& affectedProperties, const RenderStyle* previousLastStyleChangeEventStyle, const Style::ResolutionContext&);
+    bool hasMatchingEffect(NOESCAPE const Function<bool(const KeyframeEffect&)>&) const;
 
     void effectAbilityToBeAcceleratedDidChange(const KeyframeEffect&);
     bool allowsAcceleration() const;
@@ -90,7 +91,6 @@ public:
 
 private:
     void ensureEffectsAreSorted();
-    bool hasMatchingEffect(NOESCAPE const Function<bool(const KeyframeEffect&)>&) const;
     void startAcceleratedAnimationsIfPossible();
     void stopAcceleratedAnimations();
 

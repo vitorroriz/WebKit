@@ -226,26 +226,17 @@ bool Styleable::mayHaveNonZeroOpacity() const
 bool Styleable::isRunningAcceleratedAnimationOfProperty(CSSPropertyID property) const
 {
     auto* effectStack = keyframeEffectStack();
-    if (!effectStack)
-        return false;
-
-    for (const auto& effect : effectStack->sortedEffects()) {
-        if (effect->isCurrentlyAffectingProperty(property, KeyframeEffect::Accelerated::Yes))
-            return true;
-    }
-
-    return false;
+    return effectStack && effectStack->hasMatchingEffect([property](auto& effect) {
+        return effect.isCurrentlyAffectingProperty(property, KeyframeEffect::Accelerated::Yes);
+    });
 }
 
 bool Styleable::isRunningAcceleratedTransformRelatedAnimation() const
 {
-    if (auto* effectStack = keyframeEffectStack()) {
-        for (const auto& effect : effectStack->sortedEffects()) {
-            if (effect->isRunningAcceleratedTransformRelatedAnimation())
-                return true;
-        }
-    }
-    return false;
+    auto* effectStack = keyframeEffectStack();
+    return effectStack && effectStack->hasMatchingEffect([](auto& effect) {
+        return effect.isRunningAcceleratedTransformRelatedAnimation();
+    });
 }
 
 bool Styleable::hasRunningAcceleratedAnimations() const
