@@ -62,7 +62,7 @@ LineBox LineBoxBuilder::build(size_t lineIndex)
     };
     auto lineBox = LineBox { rootBox(), lineLayoutResult.contentGeometry.logicalLeft, contentLogicalWidth(), lineIndex, isFirstFormattedLine(), lineLayoutResult.nonSpanningInlineLevelBoxCount };
     auto& runs = lineLayoutResult.runs;
-    if (!runs.isEmpty() && runs[0].isBlock()) {
+    if (lineLayoutResult.hasBlockContent()) {
         // Since we don't need to position and align block content inside the line, we don't need to create any boxes for this block content.
         auto lineBoxLogicalHeight = formattingContext().geometryForBox(runs[0].layoutBox()).marginBoxHeight();
         lineBox.setLogicalRect({ lineLayoutResult.lineGeometry.logicalTopLeft, lineLayoutResult.lineGeometry.logicalWidth, lineBoxLogicalHeight });

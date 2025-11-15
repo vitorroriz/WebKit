@@ -92,7 +92,19 @@ struct LineLayoutResult {
     // Misc
     enum InlineContentEnding : uint8_t { Generic, Hyphen, LineBreak };
     std::optional<InlineContentEnding> inlineContentEnding { }; // No value means line does not have any inline content (either float, out-of-flow or block inside inline)
-    bool hasInlineContent() const { return inlineContentEnding.has_value(); }
+
+    enum class InflowContentType : uint8_t { Inline, Block };
+    std::optional<InflowContentType> inflowContentType() const
+    {
+        if (inlineContentEnding.has_value())
+            return InflowContentType::Inline;
+        if (!runs.isEmpty() && runs[0].isBlock())
+            return InflowContentType::Block;
+        return { };
+    }
+    bool hasInlineContent() const { return inflowContentType().value_or(InflowContentType::Block) == InflowContentType::Inline; }
+    bool hasBlockContent() const { return inflowContentType().value_or(InflowContentType::Inline) == InflowContentType::Block; }
+    bool hasInflowContent() const { return inflowContentType().has_value(); }
     bool endsWithHyphen() const { return inlineContentEnding && *inlineContentEnding == InlineContentEnding::Hyphen; }
     bool endsWithLineBreak() const { return inlineContentEnding && *inlineContentEnding == InlineContentEnding::LineBreak; }
 

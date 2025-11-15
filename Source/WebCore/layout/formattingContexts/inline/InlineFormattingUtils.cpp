@@ -612,15 +612,15 @@ LineEndingTruncationPolicy InlineFormattingUtils::lineEndingTruncationPolicy(con
 
 std::optional<LineLayoutResult::InlineContentEnding> InlineFormattingUtils::inlineContentEnding(const Line::Result& lineContent)
 {
+    if (!lineContent.runs.isEmpty() && lineContent.runs[0].isBlock()) {
+        ASSERT(lineContent.runs.size() == 1);
+        return { };
+    }
+
     for (auto& run : lineContent.runs | std::views::reverse) {
+        ASSERT(!run.isBlock());
         if (run.isOpaque())
             continue;
-
-        if (run.isBlock()) {
-            ASSERT(lineContent.runs.size() == 1);
-            break;
-        }
-
         if (run.isLineBreak())
             return { LineLayoutResult::InlineContentEnding::LineBreak };
         if (auto& textContent = run.textContent(); textContent && textContent->needsHyphen)
