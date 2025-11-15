@@ -106,7 +106,7 @@ public:
     WTF_EXPORT_PRIVATE ~ThreadSuspendLocker();
 };
 
-class WTF_CAPABILITY("is current") Thread : public ThreadSafeRefCounted<Thread>, ThreadLike {
+class WTF_CAPABILITY("is current") Thread : public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<Thread>, ThreadLike {
 public:
     friend class ThreadGroup;
     friend WTF_EXPORT_PRIVATE void initialize();
@@ -155,8 +155,7 @@ public:
     static Thread& currentSingleton();
 
     // Set of all WTF::Thread created threads.
-    WTF_EXPORT_PRIVATE static HashSet<Thread*>& allThreads() WTF_REQUIRES_LOCK(allThreadsLock());
-    WTF_EXPORT_PRIVATE static Lock& allThreadsLock() WTF_RETURNS_LOCK(s_allThreadsLock);
+    WTF_EXPORT_PRIVATE static ThreadSafeWeakHashSet<Thread>& allThreads();
 
     WTF_EXPORT_PRIVATE unsigned numberOfThreadGroups();
 
@@ -314,12 +313,15 @@ public:
 #endif
 
 protected:
-    Thread() = default;
+    explicit Thread(SchedulingPolicy schedulingPolicy)
+        : m_isRealtime(schedulingPolicy == SchedulingPolicy::Realtime)
+    {
+    }
 
     void initializeInThread();
 
     // Internal platform-specific Thread establishment implementation.
-    bool establishHandle(NewThreadContext*, std::optional<size_t> stackSize, QOS, SchedulingPolicy);
+    bool establishHandle(NewThreadContext&, std::optional<size_t> stackSize, QOS, SchedulingPolicy);
 
 #if USE(PTHREADS)
     void establishPlatformSpecificHandle(PlatformThreadHandle);
@@ -381,14 +383,11 @@ protected:
     static Thread& initializeTLS(Ref<Thread>&&);
     WTF_EXPORT_PRIVATE static Thread& initializeCurrentTLS();
 
-    static Lock s_allThreadsLock;
-
     JoinableState m_joinableState { Joinable };
     bool m_isShuttingDown : 1 { false };
     bool m_didExit : 1 { false };
     bool m_isDestroyedOnce : 1 { false };
     bool m_isCompilationThread: 1 { false };
-    bool m_didUnregisterFromAllThreads : 1 { false };
     bool m_isJSThread : 1 { false };
     unsigned m_gcThreadType : 2 { static_cast<unsigned>(GCThreadType::None) };
 

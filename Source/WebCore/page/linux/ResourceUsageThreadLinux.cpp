@@ -251,9 +251,8 @@ void ResourceUsageThread::platformCollectCPUData(JSC::VM*, ResourceUsageData& da
 
     HashSet<pid_t> knownWebKitThreads;
     {
-        Locker locker { Thread::allThreadsLock() };
-        for (auto* thread : Thread::allThreads()) {
-            if (auto id = thread->id())
+        for (auto& thread : Thread::allThreads()) {
+            if (auto id = thread.id())
                 knownWebKitThreads.add(id);
         }
     }
