@@ -154,7 +154,7 @@ static Ref<Inspector::Protocol::Network::Headers> buildObjectForHeaders(const HT
 Ref<Inspector::Protocol::Network::ResourceTiming> InspectorNetworkAgent::buildObjectForTiming(const NetworkLoadMetrics& timing, ResourceLoader& resourceLoader)
 {
     auto elapsedTimeSince = [&] (const MonotonicTime& time) {
-        return m_environment->executionStopwatch().elapsedTimeSince(time).seconds();
+        return m_environment.executionStopwatch().elapsedTimeSince(time).seconds();
     };
     auto millisecondsSinceFetchStart = [&] (const MonotonicTime& time) {
         if (!time)
@@ -390,7 +390,7 @@ Ref<Inspector::Protocol::Network::CachedResource> InspectorNetworkAgent::buildOb
 
 double InspectorNetworkAgent::timestamp()
 {
-    return m_environment->executionStopwatch().elapsedTime().seconds();
+    return m_environment.executionStopwatch().elapsedTime().seconds();
 }
 
 void InspectorNetworkAgent::willSendRequest(ResourceLoaderIdentifier identifier, DocumentLoader* loader, ResourceRequest& request, const ResourceResponse& redirectResponse, Inspector::ResourceType type, ResourceLoader* resourceLoader)
@@ -580,7 +580,7 @@ void InspectorNetworkAgent::didFinishLoading(ResourceLoaderIdentifier identifier
 
     double elapsedFinishTime;
     if (networkLoadMetrics.responseEnd)
-        elapsedFinishTime = m_environment->executionStopwatch().elapsedTimeSince(networkLoadMetrics.responseEnd).seconds();
+        elapsedFinishTime = m_environment.executionStopwatch().elapsedTimeSince(networkLoadMetrics.responseEnd).seconds();
     else
         elapsedFinishTime = timestamp();
 

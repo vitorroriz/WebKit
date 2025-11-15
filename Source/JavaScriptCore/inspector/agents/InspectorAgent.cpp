@@ -84,7 +84,7 @@ Protocol::ErrorStringOr<void> InspectorAgent::disable()
 
 Protocol::ErrorStringOr<void> InspectorAgent::initialized()
 {
-    CheckedRef { m_environment }->frontendInitialized();
+    m_environment.frontendInitialized();
 
     return { };
 }

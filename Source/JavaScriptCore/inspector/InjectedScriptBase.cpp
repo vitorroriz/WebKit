@@ -126,9 +126,7 @@ InjectedScriptBase::~InjectedScriptBase() = default;
 
 bool InjectedScriptBase::hasAccessToInspectedScriptState() const
 {
-    if (CheckedPtr environment = m_environment)
-        return environment->canAccessInspectedScriptState(m_globalObject);
-    return false;
+    return m_environment && m_environment->canAccessInspectedScriptState(m_globalObject);
 }
 
 JSC::JSObject* InjectedScriptBase::injectedScriptObject() const

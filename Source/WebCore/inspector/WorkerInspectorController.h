@@ -29,7 +29,6 @@
 #include "WorkerOrWorkletGlobalScope.h"
 #include <JavaScriptCore/InspectorAgentRegistry.h>
 #include <JavaScriptCore/InspectorEnvironment.h>
-#include <wtf/CheckedRef.h>
 #include <wtf/Forward.h>
 #include <wtf/Noncopyable.h>
 #include <wtf/Stopwatch.h>
@@ -47,20 +46,12 @@ class WebInjectedScriptManager;
 class WorkerDebugger;
 struct WorkerAgentContext;
 
-class WorkerInspectorController final : public Inspector::InspectorEnvironment, public CanMakeCheckedPtr<WorkerInspectorController> {
+class WorkerInspectorController final : public Inspector::InspectorEnvironment {
     WTF_MAKE_NONCOPYABLE(WorkerInspectorController);
     WTF_MAKE_TZONE_ALLOCATED(WorkerInspectorController);
-    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(WorkerInspectorController);
 public:
     explicit WorkerInspectorController(WorkerOrWorkletGlobalScope&);
     ~WorkerInspectorController() override;
-
-    // AbstractCanMakeCheckedPtr overrides
-    uint32_t checkedPtrCount() const final { return CanMakeCheckedPtr::checkedPtrCount(); }
-    uint32_t checkedPtrCountWithoutThreadCheck() const final { return CanMakeCheckedPtr::checkedPtrCountWithoutThreadCheck(); }
-    void incrementCheckedPtrCount() const final { CanMakeCheckedPtr::incrementCheckedPtrCount(); }
-    void decrementCheckedPtrCount() const final { CanMakeCheckedPtr::decrementCheckedPtrCount(); }
-    void setDidBeginCheckedPtrDeletion() final { CanMakeCheckedPtr::setDidBeginCheckedPtrDeletion(); }
 
     void workerTerminating();
 

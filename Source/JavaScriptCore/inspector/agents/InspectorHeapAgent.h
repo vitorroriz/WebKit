@@ -80,12 +80,10 @@ protected:
 private:
     std::optional<JSC::HeapSnapshotNode> nodeForHeapObjectIdentifier(Protocol::ErrorString&, unsigned heapObjectIdentifier);
 
-    CheckedRef<InspectorEnvironment> checkedEnvironment() const { return m_environment; }
-
     InjectedScriptManager& m_injectedScriptManager;
     const UniqueRef<HeapFrontendDispatcher> m_frontendDispatcher;
     const Ref<HeapBackendDispatcher> m_backendDispatcher;
-    CheckedRef<InspectorEnvironment> m_environment;
+    InspectorEnvironment& m_environment;
 
     bool m_enabled { false };
     bool m_tracking { false };

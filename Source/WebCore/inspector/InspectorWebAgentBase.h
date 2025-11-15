@@ -82,15 +82,12 @@ protected:
     InspectorAgentBase(const String& name, WebAgentContext& context)
         : Inspector::InspectorAgentBase(name)
         , m_instrumentingAgents(context.instrumentingAgents)
-        , m_environment(context.environment.get())
+        , m_environment(context.environment)
     {
     }
 
-    CheckedRef<Inspector::InspectorEnvironment> checkedEnvironment() const { return m_environment; }
-
-
     WeakRef<InstrumentingAgents> m_instrumentingAgents;
-    CheckedRef<Inspector::InspectorEnvironment> m_environment;
+    Inspector::InspectorEnvironment& m_environment;
 };
     
 } // namespace WebCore
