@@ -3312,3 +3312,5 @@ imported/w3c/web-platform-tests/css/CSS2/stacking-context/composite-change-after
 
 imported/w3c/web-platform-tests/css/CSS2/abspos/abspos-containing-block-initial-004b.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/abspos/abspos-containing-block-initial-004d.xht [ ImageOnlyFailure ]
+
+webkit.org/b/302559 [ Release ] webaudio/audiobuffersource-not-gced-until-ended.html [ Skip ]
