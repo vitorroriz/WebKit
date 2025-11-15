@@ -648,7 +648,7 @@ Ref<RenderPassEncoder> CommandEncoder::beginRenderPass(const WGPURenderPassDescr
             textureToClear = mtlAttachment.texture;
 
         auto compositorTexture = texture;
-        if (attachment.resolveTarget) {
+        if (attachment.resolveTarget || attachment.resolveTexture) {
             auto resolveTarget = attachment.resolveTarget ? TextureOrTextureView(fromAPI(attachment.resolveTarget)) : TextureOrTextureView(fromAPI(attachment.resolveTexture));
             compositorTexture = resolveTarget;
 
@@ -675,8 +675,7 @@ Ref<RenderPassEncoder> CommandEncoder::beginRenderPass(const WGPURenderPassDescr
         if (textureToClear) {
             TextureAndClearColor *textureWithResolve = [[TextureAndClearColor alloc] initWithTexture:textureToClear];
             [attachmentsToClear setObject:textureWithResolve forKey:@(i)];
-            if (textureToClear)
-                texture.setPreviouslyCleared();
+            texture.setPreviouslyCleared();
             if (attachment.resolveTarget)
                 protectedFromAPI(attachment.resolveTarget)->setPreviouslyCleared();
             if (attachment.resolveTexture)
@@ -797,8 +796,10 @@ Ref<RenderPassEncoder> CommandEncoder::beginRenderPass(const WGPURenderPassDescr
     }
 
     if (attachmentsToClear.count || depthStencilAttachmentToClear) {
-        if (const auto* attachment = descriptor.depthStencilAttachment; depthStencilAttachmentToClear)
-            protectedFromAPI(attachment->view)->setPreviouslyCleared();
+        if (const auto* attachment = descriptor.depthStencilAttachment; depthStencilAttachmentToClear) {
+            auto textureView = attachment->view ? TextureOrTextureView(fromAPI(attachment->view)) : TextureOrTextureView(fromAPI(attachment->texture));
+            textureView.setPreviouslyCleared();
+        }
 
         runClearEncoder(attachmentsToClear, depthStencilAttachmentToClear, depthAttachmentToClear, stencilAttachmentToClear);
     }

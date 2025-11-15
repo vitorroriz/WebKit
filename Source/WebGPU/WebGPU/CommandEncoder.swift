@@ -94,6 +94,36 @@ public func CommandEncoder_finish_thunk(commandEncoder: WebGPU.CommandEncoder, d
     commandEncoder.finish(descriptor: descriptor)
 }
 
+extension WebGPU.TextureOrTextureView {
+    init(_ attachment: WGPURenderPassColorAttachment?) {
+        if let view = attachment?.view {
+            self.init(WebGPU.fromAPI(view))
+            return
+        }
+
+        if let texture = attachment?.texture {
+            self.init(WebGPU.fromAPI(texture))
+            return
+        }
+
+        fatalError()
+    }
+
+    init(_ attachment: WGPURenderPassDepthStencilAttachment?) {
+        if let view = attachment?.view {
+            self.init(WebGPU.fromAPI(view))
+            return
+        }
+
+        if let texture = attachment?.texture {
+            self.init(WebGPU.fromAPI(texture))
+            return
+        }
+
+        fatalError()
+    }
+}
+
 extension WebGPU.CommandEncoder {
     private func validateFinishError() -> String? {
         if !isValid() {
@@ -883,7 +913,7 @@ extension WebGPU.CommandEncoder {
             for i in 0..<attachments.count {
                 let attachment = attachments[i]
 
-                if attachment.view == nil {
+                if attachment.view == nil && attachment.texture == nil {
                     continue
                 }
 
@@ -895,13 +925,11 @@ extension WebGPU.CommandEncoder {
                     attachment.clearValue.b,
                     attachment.clearValue.a)
 
-                var texture =
-                    attachment.view != nil
-                    ? WebGPU.TextureOrTextureView(WebGPU.fromAPI(attachment.view))
-                    : WebGPU.TextureOrTextureView(WebGPU.fromAPI(attachment.texture))
+                var texture = WebGPU.TextureOrTextureView(attachment)
                 if !WebGPU_Internal.isValidToUseWith(texture, self) {
                     return WebGPU.RenderPassEncoder.createInvalid(self, m_device.ptr(), "device mismatch")
                 }
+
                 if textureWidth != 0 &&
                     (texture.width() != textureWidth || texture.height() != textureHeight || sampleCount != texture.sampleCount()) {
                     return WebGPU.RenderPassEncoder.createInvalid(self, m_device.ptr(), "texture size does not match")
@@ -987,11 +1015,8 @@ extension WebGPU.CommandEncoder {
                 }
 
                 var compositorTexture = texture
-                if attachment.resolveTarget != nil {
-                    var resolveTarget =
-                        attachment.resolveTarget != nil
-                        ? WebGPU.TextureOrTextureView(WebGPU.fromAPI(attachment.resolveTarget))
-                        : WebGPU.TextureOrTextureView(WebGPU.fromAPI(attachment.resolveTexture))
+                if attachment.resolveTarget != nil || attachment.resolveTexture != nil {
+                    var resolveTarget = WebGPU.TextureOrTextureView(attachment)
                     compositorTexture = resolveTarget
 
                     if !WebGPU_Internal.isValidToUseWith(resolveTarget, self) {
@@ -1030,9 +1055,7 @@ extension WebGPU.CommandEncoder {
                 if textureToClear != nil {
                     let textureWithResolve = TextureAndClearColor(texture: textureToClear!)
                     attachmentsToClear[i as NSNumber] = textureWithResolve
-                    if textureToClear != nil {
-                        texture.setPreviouslyCleared()
-                    }
+                    texture.setPreviouslyCleared()
                     if attachment.resolveTarget != nil {
                         // FIXME: rdar://138042799 remove default argument.
                         WebGPU.fromAPI(attachment.resolveTarget).setPreviouslyCleared(0, 0)
@@ -1050,10 +1073,7 @@ extension WebGPU.CommandEncoder {
         var depthStencilAttachmentToClear: MTLTexture? = nil
         var depthAttachmentToClear = false
         if let attachment = wgpuGetRenderPassDescriptorDepthStencilAttachment(descriptorSpan)?[0] {
-            let textureView =
-                attachment.view != nil
-                ? WebGPU.TextureOrTextureView(WebGPU.fromAPI(attachment.view))
-                : WebGPU.TextureOrTextureView(WebGPU.fromAPI(attachment.texture))
+            let textureView = WebGPU.TextureOrTextureView(attachment)
             if !WebGPU_Internal.isValidToUseWith(textureView, self) {
                 return WebGPU.RenderPassEncoder.createInvalid(self, m_device.ptr(), "depth stencil texture device mismatch")
             }
@@ -1134,10 +1154,7 @@ extension WebGPU.CommandEncoder {
         if let attachment = wgpuGetRenderPassDescriptorDepthStencilAttachment(descriptorSpan)?[0] {
             let mtlAttachment = mtlDescriptor.stencilAttachment
             stencilReadOnly = attachment.stencilReadOnly != 0
-            var textureView =
-                attachment.view != nil
-                ? WebGPU.TextureOrTextureView(WebGPU.fromAPI(attachment.view))
-                : WebGPU.TextureOrTextureView(WebGPU.fromAPI(attachment.texture))
+            var textureView = WebGPU.TextureOrTextureView(attachment)
             if hasStencilComponent {
                 mtlAttachment!.texture = textureView.texture()
             }
@@ -1183,9 +1200,10 @@ extension WebGPU.CommandEncoder {
         if attachmentsToClear.count != 0 || depthStencilAttachmentToClear != nil {
             let attachment = wgpuGetRenderPassDescriptorDepthStencilAttachment(descriptorSpan)?[0]
             if attachment != nil && depthStencilAttachmentToClear != nil {
-                // FIXME: rdar://138042799 remove default argument.
-                WebGPU.fromAPI(attachment!.view).setPreviouslyCleared(0, 0)
+                var texture = WebGPU.TextureOrTextureView(attachment)
+                texture.setPreviouslyCleared()
             }
+
             // FIXME: rdar://138042799 remove default argument.
             runClearEncoder(attachmentsToClear: attachmentsToClear, depthStencilAttachmentToClear: &depthStencilAttachmentToClear, depthAttachmentToClear: depthAttachmentToClear, stencilAttachmentToClear: stencilAttachmentToClear, depthClearValue: 0 ,stencilClearValue: 0 ,existingEncoder: nil)
         }
