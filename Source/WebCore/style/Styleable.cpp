@@ -457,7 +457,7 @@ void Styleable::updateCSSAnimations(const RenderStyle* currentStyle, const Rende
 static KeyframeEffect* keyframeEffectForElementAndProperty(const Styleable& styleable, const AnimatableCSSProperty& property)
 {
     if (auto* keyframeEffectStack = styleable.keyframeEffectStack()) {
-        auto effects = keyframeEffectStack->sortedEffects();
+        auto& effects = keyframeEffectStack->sortedEffects();
         for (const auto& effect : effects | std::views::reverse) {
             if (effect->animatesProperty(property))
                 return effect.get();

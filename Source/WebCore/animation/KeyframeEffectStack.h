@@ -60,7 +60,7 @@ public:
     bool addEffect(KeyframeEffect&);
     void removeEffect(KeyframeEffect&);
     bool hasEffects() const { return !m_effects.isEmpty(); }
-    Vector<WeakPtr<KeyframeEffect>> sortedEffects();
+    const Vector<WeakPtr<KeyframeEffect>>& sortedEffects();
     const std::optional<Style::Animations>& cssAnimationList() const { return m_cssAnimationList; }
     void setCSSAnimationList(std::optional<Style::Animations>&&);
     bool containsProperty(CSSPropertyID) const;
@@ -90,7 +90,6 @@ public:
 #endif
 
 private:
-    void ensureEffectsAreSorted();
     void startAcceleratedAnimationsIfPossible();
     void stopAcceleratedAnimations();
 
