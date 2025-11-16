@@ -61,6 +61,19 @@ public:
     };
 
     struct MarginState {
+        void resetBeforeSideOfBlock()
+        {
+            if (!atBeforeSideOfBlock) {
+                ASSERT_NOT_REACHED();
+                return;
+            }
+            atBeforeSideOfBlock = { };
+            positiveMargin = { };
+            negativeMargin = { };
+        }
+
+        LayoutUnit margin() const { return positiveMargin - negativeMargin; }
+
         // FIXME: This tracks RenderBlockFlow's MarginInfo for now.
         bool canCollapseWithChildren : 1 { false };
         bool canCollapseMarginBeforeWithChildren : 1 { false };

@@ -392,8 +392,13 @@ void InlineFormattingContext::updateLayoutStateWithLineLayoutResult(const LineLa
 
     lineLayoutResult.endsWithHyphen() ? layoutState.incrementSuccessiveHyphenatedLineCount() : layoutState.resetSuccessiveHyphenatedLineCount();
     layoutState.setFirstLineStartTrimForInitialLetter(lineLayoutResult.firstLineStartTrim);
-    if (lineLayoutResult.hasInflowContent())
-        layoutState.parentBlockLayoutState().marginState().atBeforeSideOfBlock = false;
+
+    auto updateBlockBeforeMargin = [&] {
+        auto& marginState = layoutState.parentBlockLayoutState().marginState();
+        if (marginState.atBeforeSideOfBlock && lineLayoutResult.hasInflowContent())
+            marginState.resetBeforeSideOfBlock();
+    };
+    updateBlockBeforeMargin();
 }
 
 void InlineFormattingContext::updateBoxGeometryForPlacedFloats(const LineLayoutResult::PlacedFloatList& placedFloats)
