@@ -9,14 +9,14 @@ root
                 link,'Section 2'
     role='main'
         section,aria-label='Interactive Elements'
-            button,aria-label='Test button','Click Me'
-            '        \nThis button does nothing\n\n        '
+            button,aria-describedby='This button does nothing',aria-label='Test button','Click Me'
+            'This button does nothing'
             input,'text',uid=…,placeholder='Enter text here'
             role='button','Clickable Div'
         section,aria-label='Content with Roles'
-            article,role='article','            \n\n                \nArticle Title\n\n\n                January 1, 2024\n            \n\n            \nThis is some article content with highlighted text.\n\n\n        '
+            article,role='article','Article Title\n\n\n                January 1, 2024\n            \n\n            \nThis is some article content with highlighted text.'
             role='complementary',aria-label='Related information'
-                '            \nRelated Links\n\n\n            '
+                'Related Links'
                 list
                     list-item
                         link,'Example Link'
@@ -31,7 +31,7 @@ root
                     'WebKit home page:'
                     link
     role='contentinfo'
-        '    \nFooter content with '
+        'Footer content with'
         role='img',aria-label='copyright symbol','©'
-        ' 2024'
+        '2024'
 version=2

@@ -296,12 +296,8 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
                 return;
             }
 
-            auto isNewline = [](UChar character) {
-                return character == '\n' || character == '\r';
-            };
-
             auto startIndex = filteredText.find([&](auto character) {
-                return !isNewline(character);
+                return !isASCIIWhitespace(character);
             });
 
             if (startIndex == notFound) {
@@ -310,7 +306,7 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
             } else {
                 size_t endIndex = filteredText.length() - 1;
                 for (size_t i = filteredText.length(); i > 0; --i) {
-                    if (!isNewline(filteredText.characterAt(i - 1))) {
+                    if (!isASCIIWhitespace(filteredText.characterAt(i - 1))) {
                         endIndex = i - 1;
                         break;
                     }

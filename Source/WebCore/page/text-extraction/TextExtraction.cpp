@@ -90,6 +90,19 @@
 namespace WebCore {
 namespace TextExtraction {
 
+static String normalizeText(const String& string, unsigned maxDescriptionLength = 512)
+{
+    auto result = foldQuoteMarks(string);
+    result = makeStringByReplacingAll(result, '"', "'"_s);
+    result = makeStringByReplacingAll(result, '\r', ""_s);
+    result = makeStringByReplacingAll(result, '\n', " "_s);
+    result = result.trim(isASCIIWhitespace<char16_t>);
+    if (result.length() <= maxDescriptionLength)
+        return result;
+
+    return makeString(result.left(maxDescriptionLength / 2 - 2), "..."_s, result.right(maxDescriptionLength / 2 - 1));
+}
+
 static constexpr auto minOpacityToConsiderVisible = 0.05;
 
 enum class IncludeTextInAutoFilledControls : bool { No, Yes };
@@ -609,6 +622,20 @@ static inline void extractRecursive(Node& node, Item& parentItem, TraversalConte
                 ariaAttributes.set(attributeName.toString(), WTFMove(value));
         }
         role = element->attributeWithoutSynchronization(HTMLNames::roleAttr);
+
+        auto elementAttributesToExtract = std::array { HTMLNames::aria_labeledbyAttr.get(), HTMLNames::aria_labelledbyAttr.get(), HTMLNames::aria_describedbyAttr.get() };
+        for (auto& attributeName : elementAttributesToExtract) {
+            RefPtr elementForAttribute = element->elementForAttributeInternal(attributeName);
+            if (!elementForAttribute)
+                continue;
+
+            static constexpr auto maximumLengthForAttributeText = 32;
+            auto elementText = normalizeText(plainText(makeRangeSelectingNodeContents(*elementForAttribute)).trim(isASCIIWhitespace<char16_t>), maximumLengthForAttributeText);
+            if (elementText.isEmpty())
+                continue;
+
+            ariaAttributes.set(attributeName.toString(), WTFMove(elementText));
+        }
     }
 
     auto policy = [&] {
@@ -1454,21 +1481,6 @@ void handleInteraction(Interaction&& interaction, Page& page, CompletionHandler<
         break;
     }
     completion(false, "Invalid action"_s);
-}
-
-static constexpr auto maxDescriptionLength = 512;
-
-static String normalizeText(const String& string)
-{
-    auto result = foldQuoteMarks(string);
-    result = makeStringByReplacingAll(result, '"', "'"_s);
-    result = makeStringByReplacingAll(result, '\r', ""_s);
-    result = makeStringByReplacingAll(result, '\n', " "_s);
-    result = result.trim(isASCIIWhitespace<char16_t>);
-    if (result.length() <= maxDescriptionLength)
-        return result;
-
-    return makeString(result.left(maxDescriptionLength / 2 - 2), "..."_s, result.right(maxDescriptionLength / 2 - 1));
 }
 
 static String normalizedLabelText(const Element& element)
