@@ -65,6 +65,7 @@
 #import "WKImmediateActionController.h"
 #import "WKNSURLExtras.h"
 #import "WKPDFHUDView.h"
+#import "WKPanGestureController.h"
 #import "WKPrintingView.h"
 #import "WKQuickLookPreviewController.h"
 #import "WKRevealItemPresenter.h"
@@ -1385,6 +1386,8 @@ WebViewImpl::WebViewImpl(WKWebView *view, WebProcessPool& processPool, Ref<API::
 #if HAVE(REDESIGNED_TEXT_CURSOR) && PLATFORM(MAC)
     m_textInputNotifications = subscribeToTextInputNotifications(this);
 #endif
+
+    configurePanGestureRecognizerIfNeeded();
 
     WebProcessPool::statistics().wkViewCount++;
 }
@@ -7310,6 +7313,16 @@ void WebViewImpl::showCaptionDisplaySettings(CompletionHandler<void(bool)>&& cal
     callback([menu popUpMenuPositioningItem:nil atLocation:NSMakePoint(0, 0) inView:[protectedWindow() contentView]]);
 }
 #endif
+
+void WebViewImpl::configurePanGestureRecognizerIfNeeded()
+{
+    Ref page = m_page.get();
+    if (!page->protectedPreferences()->useAppKitGestures())
+        return;
+
+    RetainPtr view = m_view.get();
+    m_panGestureController = adoptNS([[WKPanGestureController alloc] initWithPage:page viewImpl:*this]);
+}
 
 } // namespace WebKit
 

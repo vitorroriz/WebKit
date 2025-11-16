@@ -59,6 +59,7 @@ using _WKRectEdge = NSUInteger;
 
 OBJC_CLASS NSAccessibilityRemoteUIElement;
 OBJC_CLASS NSImmediateActionGestureRecognizer;
+OBJC_CLASS NSPanGestureRecognizer;
 OBJC_CLASS NSMenu;
 OBJC_CLASS NSPopover;
 OBJC_CLASS NSScrollPocket;
@@ -75,6 +76,7 @@ OBJC_CLASS WKFullScreenWindowController;
 OBJC_CLASS WKImageAnalysisOverlayViewDelegate;
 OBJC_CLASS WKImmediateActionController;
 OBJC_CLASS WKMouseTrackingObserver;
+OBJC_CLASS WKPanGestureController;
 OBJC_CLASS WKRevealItemPresenter;
 OBJC_CLASS _WKWarningView;
 OBJC_CLASS WKShareSheet;
@@ -922,6 +924,8 @@ private:
 
     std::optional<EditorState::PostLayoutData> postLayoutDataForContentEditable();
 
+    void configurePanGestureRecognizerIfNeeded();
+
     WeakObjCPtr<WKWebView> m_view;
     const UniqueRef<PageClient> m_pageClient;
     const Ref<WebPageProxy> m_page;
@@ -1108,6 +1112,8 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 #if HAVE(INLINE_PREDICTIONS)
     bool m_inlinePredictionsEnabled { false };
 #endif
+
+    RetainPtr<WKPanGestureController> m_panGestureController;
 };
 
 } // namespace WebKit

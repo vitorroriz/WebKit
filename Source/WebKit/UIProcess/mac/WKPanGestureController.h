@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,27 +23,24 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "config.h"
-#import "NativeWebWheelEvent.h"
+#pragma once
 
-#if USE(APPKIT)
+#if PLATFORM(MAC)
 
-#import "WebEventFactory.h"
+#import <AppKit/NSGestureRecognizer.h>
+#import <wtf/Forward.h>
 
 namespace WebKit {
-
-NativeWebWheelEvent::NativeWebWheelEvent(NSEvent *event, NSView *view)
-    : WebWheelEvent(WebEventFactory::createWebWheelEvent(event, view))
-    , m_nativeEvent(event)
-{
+class WebPageProxy;
+class WebViewImpl;
 }
 
-NativeWebWheelEvent::NativeWebWheelEvent(const WebWheelEvent& wheelEvent)
-    : WebWheelEvent(wheelEvent)
-    , m_nativeEvent(nil)
-{
-}
+OBJC_CLASS NSPanGestureRecognizer;
 
-} // namespace WebKit
+@interface WKPanGestureController : NSObject <NSGestureRecognizerDelegate>
 
-#endif // USE(APPKIT)
+- (instancetype)initWithPage:(std::reference_wrapper<WebKit::WebPageProxy>)page viewImpl:(std::reference_wrapper<WebKit::WebViewImpl>)viewImpl;
+
+@end
+
+#endif

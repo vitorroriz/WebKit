@@ -8383,6 +8383,20 @@ UseAVCaptureDeviceRotationCoordinatorAPI:
       default: false
   sharedPreferenceForWebProcess: true
 
+UseAppKitGestures:
+  type: bool
+  status: internal
+  humanReadableName: "AppKit Gestures"
+  humanReadableDescription: "Use AppKit Gestures"
+  condition: PLATFORM(MAC)
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+
 UseAsyncUIKitInteractions:
   type: bool
   status: internal
