@@ -69,8 +69,21 @@ LineBox LineBoxBuilder::build(size_t lineIndex)
         setVerticalPropertiesForInlineLevelBox(lineBox, lineBox.rootInlineBox());
     } else {
         constructInlineLevelBoxes(lineBox);
-        adjustIdeographicBaselineIfApplicable(lineBox);
-        adjustInlineBoxHeightsForLineBoxContainIfApplicable(lineBox);
+        if (lineBox.hasContent()) {
+            adjustIdeographicBaselineIfApplicable(lineBox);
+            adjustInlineBoxHeightsForLineBoxContainIfApplicable(lineBox);
+        } else {
+            // Collapse all inline boxes (they are supposed to be empty as well).
+            for (auto& inlineBox : lineBox.nonRootInlineLevelBoxes()) {
+                if (!inlineBox.isInlineBox()) {
+                    ASSERT(inlineBox.layoutBox().isWordBreakOpportunity());
+                    ASSERT(!inlineBox.logicalHeight());
+                    continue;
+                }
+                ASSERT(!inlineBox.hasContent());
+                inlineBox.setLogicalHeight({ });
+            }
+        }
         if (m_lineHasNonLineSpanningRubyContent)
             RubyFormattingContext::applyAnnotationContributionToLayoutBounds(lineBox, formattingContext());
         computeLineBoxGeometry(lineBox);

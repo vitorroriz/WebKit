@@ -530,6 +530,8 @@ void InlineDisplayContentBuilder::processNonBidiContent(const LineLayoutResult& 
                 appendHardLineBreakDisplayBox(lineRun, visualRectRelativeToRoot, boxes);
             else if (lineRun.isAtomicInlineBox() || lineRun.isListMarker())
                 appendAtomicInlineLevelDisplayBox(lineRun, visualRectRelativeToRoot, boxes);
+            else if (lineRun.isInlineBoxStart() || lineRun.isLineSpanningInlineBoxStart())
+                appendInlineBoxDisplayBox(lineRun, lineBox.inlineLevelBoxFor(lineRun), visualRectRelativeToRoot, boxes);
             else if (lineRun.isBlock()) {
                 // Block content should always be placed at the start of the content box even when floats shrink the line.
                 auto adjustedVisualRect = [&] {
@@ -539,11 +541,6 @@ void InlineDisplayContentBuilder::processNonBidiContent(const LineLayoutResult& 
                     return rect;
                 };
                 appendBlockLevelDisplayBox(lineRun, adjustedVisualRect(), boxes);
-            }
-            else if (lineRun.isInlineBoxStart() || lineRun.isLineSpanningInlineBoxStart()) {
-                // Do not generate display boxes for inline boxes on non-contentful lines (e.g. <span></span>)
-                if (lineBox.hasContent())
-                    appendInlineBoxDisplayBox(lineRun, lineBox.inlineLevelBoxFor(lineRun), visualRectRelativeToRoot, boxes);
             } else
                 ASSERT_NOT_REACHED();
         };

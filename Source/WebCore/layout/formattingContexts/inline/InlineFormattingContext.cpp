@@ -430,9 +430,8 @@ InlineRect InlineFormattingContext::createDisplayContentForInlineContent(const L
     displayLine.setBoxCount(boxes.size());
 
     // Non-contentful lines are produced by certain trailing content like <div>contentful line<br><span></span></div> where <span></span> creates a display line with nothing but the root inline box.
-    auto isCurrentLineContentful = boxes.size() > 1;
-    numberOfPreviousLContentfulLines += (isCurrentLineContentful ? 1 : 0);
-    auto truncationPolicy = InlineFormattingUtils::lineEndingTruncationPolicy(root().style(), numberOfPreviousLContentfulLines, numberOfVisibleLinesAllowed, isCurrentLineContentful);
+    numberOfPreviousLContentfulLines += (lineBox.hasContent() ? 1 : 0);
+    auto truncationPolicy = InlineFormattingUtils::lineEndingTruncationPolicy(root().style(), numberOfPreviousLContentfulLines, numberOfVisibleLinesAllowed, lineBox.hasContent());
     InlineDisplayLineBuilder::applyEllipsisIfNeeded(truncationPolicy, displayLine, boxes, isLegacyLineClamp);
     auto lineHasLegacyLineClamp = isLegacyLineClamp && displayLine.hasEllipsis() && truncationPolicy == LineEndingTruncationPolicy::WhenContentOverflowsInBlockDirection;
     if (lineHasLegacyLineClamp)
