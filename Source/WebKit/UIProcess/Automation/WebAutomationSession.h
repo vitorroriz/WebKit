@@ -308,6 +308,7 @@ public:
     void didDestroyFrame(WebCore::FrameIdentifier);
 
     RefPtr<WebPageProxy> webPageProxyForHandle(const String&);
+    String effectiveHandleForWebFrameProxy(const WebFrameProxy&);
     String handleForWebFrameID(std::optional<WebCore::FrameIdentifier>);
     String handleForWebPageProxy(const WebPageProxy&);
 
@@ -316,7 +317,6 @@ private:
     void getNextContext(Vector<Ref<WebPageProxy>>&&, Ref<JSON::ArrayOf<Inspector::Protocol::Automation::BrowsingContext>>, Inspector::CommandCallback<Ref<JSON::ArrayOf<Inspector::Protocol::Automation::BrowsingContext>>>&&);
 
     std::optional<WebCore::FrameIdentifier> webFrameIDForHandle(const String&, bool& frameNotFound);
-    String handleForWebFrameProxy(const WebFrameProxy&);
 
     void waitForNavigationToCompleteOnPage(WebPageProxy&, Inspector::Protocol::Automation::PageLoadStrategy, Seconds, Inspector::CommandCallback<void>&&);
     void waitForNavigationToCompleteOnFrame(WebFrameProxy&, Inspector::Protocol::Automation::PageLoadStrategy, Seconds, Inspector::CommandCallback<void>&&);

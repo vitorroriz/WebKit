@@ -342,8 +342,13 @@ String WebAutomationSession::handleForWebFrameID(std::optional<FrameIdentifier> 
     return handle;
 }
 
-String WebAutomationSession::handleForWebFrameProxy(const WebFrameProxy& webFrameProxy)
+String WebAutomationSession::effectiveHandleForWebFrameProxy(const WebFrameProxy& webFrameProxy)
 {
+    if (webFrameProxy.isMainFrame()) {
+        if (RefPtr page = webFrameProxy.page())
+            return handleForWebPageProxy(*page);
+    }
+
     return handleForWebFrameID(webFrameProxy.frameID());
 }
 
@@ -953,7 +958,7 @@ static String navigationIDToProtocolString(std::optional<WebCore::NavigationIden
 void WebAutomationSession::documentLoadedForFrame(const WebFrameProxy& frame, std::optional<WebCore::NavigationIdentifier> navigationID, WallTime timestamp)
 {
 #if ENABLE(WEBDRIVER_BIDI)
-    m_bidiProcessor->browsingContextDomainNotifier().domContentLoaded(handleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), std::trunc(timestamp.secondsSinceEpoch().milliseconds()), frame.url().string());
+    m_bidiProcessor->browsingContextDomainNotifier().domContentLoaded(effectiveHandleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), std::trunc(timestamp.secondsSinceEpoch().milliseconds()), frame.url().string());
 #endif
 
     if (frame.isMainFrame()) {
@@ -976,7 +981,7 @@ void WebAutomationSession::documentLoadedForFrame(const WebFrameProxy& frame, st
 void WebAutomationSession::loadCompletedForFrame(const WebFrameProxy& frame, std::optional<WebCore::NavigationIdentifier> navigationID, WallTime timestamp)
 {
 #if ENABLE(WEBDRIVER_BIDI)
-    m_bidiProcessor->browsingContextDomainNotifier().load(handleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), std::trunc(timestamp.secondsSinceEpoch().milliseconds()), frame.url().string());
+    m_bidiProcessor->browsingContextDomainNotifier().load(effectiveHandleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), std::trunc(timestamp.secondsSinceEpoch().milliseconds()), frame.url().string());
 #endif
 }
 
@@ -1025,27 +1030,27 @@ void WebAutomationSession::didCreatePage(WebPageProxy& page)
 
 void WebAutomationSession::navigationStartedForFrame(const WebFrameProxy& frame, std::optional<WebCore::NavigationIdentifier> navigationID)
 {
-    m_bidiProcessor->browsingContextDomainNotifier().navigationStarted(handleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), WallTime::now().secondsSinceEpoch().milliseconds(), frame.url().string());
+    m_bidiProcessor->browsingContextDomainNotifier().navigationStarted(effectiveHandleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), WallTime::now().secondsSinceEpoch().milliseconds(), frame.url().string());
 }
 
 void WebAutomationSession::navigationCommittedForFrame(const WebFrameProxy& frame, std::optional<WebCore::NavigationIdentifier> navigationID)
 {
-    m_bidiProcessor->browsingContextDomainNotifier().navigationCommitted(handleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), WallTime::now().secondsSinceEpoch().milliseconds(), frame.url().string());
+    m_bidiProcessor->browsingContextDomainNotifier().navigationCommitted(effectiveHandleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), WallTime::now().secondsSinceEpoch().milliseconds(), frame.url().string());
 }
 
 void WebAutomationSession::navigationFailedForFrame(const WebFrameProxy& frame, std::optional<WebCore::NavigationIdentifier> navigationID)
 {
-    m_bidiProcessor->browsingContextDomainNotifier().navigationFailed(handleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), WallTime::now().secondsSinceEpoch().milliseconds(), frame.url().string());
+    m_bidiProcessor->browsingContextDomainNotifier().navigationFailed(effectiveHandleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), WallTime::now().secondsSinceEpoch().milliseconds(), frame.url().string());
 }
 
 void WebAutomationSession::navigationAbortedForFrame(const WebFrameProxy& frame, std::optional<WebCore::NavigationIdentifier> navigationID)
 {
-    m_bidiProcessor->browsingContextDomainNotifier().navigationAborted(handleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), WallTime::now().secondsSinceEpoch().milliseconds(), frame.url().string());
+    m_bidiProcessor->browsingContextDomainNotifier().navigationAborted(effectiveHandleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), WallTime::now().secondsSinceEpoch().milliseconds(), frame.url().string());
 }
 
 void WebAutomationSession::fragmentNavigatedForFrame(const WebFrameProxy& frame, std::optional<WebCore::NavigationIdentifier> navigationID)
 {
-    m_bidiProcessor->browsingContextDomainNotifier().fragmentNavigated(handleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), WallTime::now().secondsSinceEpoch().milliseconds(), frame.url().string());
+    m_bidiProcessor->browsingContextDomainNotifier().fragmentNavigated(effectiveHandleForWebFrameProxy(frame), navigationIDToProtocolString(navigationID), WallTime::now().secondsSinceEpoch().milliseconds(), frame.url().string());
 }
 
 void WebAutomationSession::emitContextCreatedEvent(const WebPageProxy& page)
@@ -1081,7 +1086,7 @@ WebPageProxy* WebAutomationSession::getOpenerPage(const WebPageProxy& page)
 
 void WebAutomationSession::didCreateFrame(const WebFrameProxy& frame)
 {
-    handleForWebFrameProxy(frame);
+    effectiveHandleForWebFrameProxy(frame);
 #if ENABLE(WEBDRIVER_BIDI)
     contextCreatedForFrame(frame);
 #endif
@@ -1096,11 +1101,11 @@ void WebAutomationSession::willDestroyFrame(const WebFrameProxy& frame)
 
 void WebAutomationSession::contextCreatedForFrame(const WebFrameProxy& frame)
 {
-    auto contextHandle = handleForWebFrameProxy(frame);
+    auto contextHandle = effectiveHandleForWebFrameProxy(frame);
     auto url = frame.url().string();
     String parentHandle = "null"_s;
     if (RefPtr parentFrame = frame.parentFrame())
-        parentHandle = handleForWebFrameProxy(*parentFrame);
+        parentHandle = effectiveHandleForWebFrameProxy(*parentFrame);
 
     // FIXME: https://bugs.webkit.org/show_bug.cgi?id=281941 - Add support for reporting clientWindow for frames
     String clientWindow = "unknown-window"_s;
@@ -1155,7 +1160,7 @@ void WebAutomationSession::contextDestroyedForPage(const WebPageProxy& page)
     String parentContext = "null"_s;
     if (RefPtr mainFrame = page.mainFrame()) {
         if (RefPtr parentFrame = mainFrame->parentFrame())
-            parentContext = handleForWebFrameProxy(*parentFrame);
+            parentContext = effectiveHandleForWebFrameProxy(*parentFrame);
     }
 
     String originalOpenerHandle = "null"_s;
@@ -1172,11 +1177,11 @@ void WebAutomationSession::contextDestroyedForPage(const WebPageProxy& page)
 
 void WebAutomationSession::contextDestroyedForFrame(const WebFrameProxy& frame)
 {
-    auto contextHandle = handleForWebFrameProxy(frame);
+    auto contextHandle = effectiveHandleForWebFrameProxy(frame);
     auto url = frame.url().string();
     String parentHandle = "null"_s;
     if (RefPtr parentFrame = frame.parentFrame())
-        parentHandle = handleForWebFrameProxy(*parentFrame);
+        parentHandle = effectiveHandleForWebFrameProxy(*parentFrame);
 
     String clientWindow = "unknown-window"_s;
     String userContext = "default"_s;
