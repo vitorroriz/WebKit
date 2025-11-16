@@ -285,6 +285,7 @@ struct HyphenateLimitEdge;
 struct HyphenateLimitLines;
 struct ImageOrNone;
 struct InsetEdge;
+struct ItemTolerance;
 struct JustifyContent;
 struct JustifyItems;
 struct JustifySelf;
@@ -1019,6 +1020,7 @@ public:
     inline const Style::GapGutter& columnGap() const;
     inline const Style::GapGutter& rowGap() const;
     inline const Style::GapGutter& gap(Style::GridTrackSizingDirection) const;
+    inline const Style::ItemTolerance& itemTolerance() const;
 
     inline const Style::Transform& transform() const;
     inline bool hasTransform() const;
@@ -1598,6 +1600,7 @@ public:
     inline void setColumnFill(ColumnFill);
     inline void setColumnGap(Style::GapGutter&&);
     inline void setRowGap(Style::GapGutter&&);
+    inline void setItemTolerance(Style::ItemTolerance&&);
     inline void setColumnRuleColor(Style::Color&&);
     inline void setColumnRuleStyle(BorderStyle);
     inline void setColumnRuleWidth(Style::LineWidth);
@@ -2160,6 +2163,7 @@ public:
     static inline Style::GapGutter initialColumnGap();
     static constexpr Style::ColumnWidth initialColumnWidth();
     static inline Style::GapGutter initialRowGap();
+    static inline Style::ItemTolerance initialItemTolerance();
     static inline Style::Transform initialTransform();
     static inline Style::TransformOrigin initialTransformOrigin();
     static inline Style::TransformOriginX initialTransformOriginX();

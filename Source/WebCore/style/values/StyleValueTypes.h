@@ -725,12 +725,16 @@ template<typename Result> struct EvaluationInvoker {
     {
         if constexpr (HasTwoParameterEvaluate<StyleType, Result, T1>)
             return Evaluation<StyleType, Result> { }(value, std::forward<T1>(t1));
+        else
+            return operator()(value);
     }
 
     template<typename StyleType, typename T1, typename T2> Result operator()(const StyleType& value, T1&& t1, T2&& t2) const
     {
         if constexpr (HasThreeParameterEvaluate<StyleType, Result, T1, T2>)
             return Evaluation<StyleType, Result> { }(value, std::forward<T1>(t1), std::forward<T2>(t2));
+        else
+            return operator()(value, std::forward<T1>(t1));
     }
 };
 template<typename Result> inline constexpr EvaluationInvoker<Result> evaluate{};

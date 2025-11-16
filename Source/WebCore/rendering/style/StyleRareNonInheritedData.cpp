@@ -77,6 +77,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
     , viewTransitionName(RenderStyle::initialViewTransitionName())
     , columnGap(RenderStyle::initialColumnGap())
     , rowGap(RenderStyle::initialRowGap())
+    , itemTolerance(RenderStyle::initialItemTolerance())
     , offsetPath(RenderStyle::initialOffsetPath())
     , offsetDistance(RenderStyle::initialOffsetDistance())
     , offsetPosition(RenderStyle::initialOffsetPosition())
@@ -184,6 +185,7 @@ inline StyleRareNonInheritedData::StyleRareNonInheritedData(const StyleRareNonIn
     , viewTransitionName(o.viewTransitionName)
     , columnGap(o.columnGap)
     , rowGap(o.rowGap)
+    , itemTolerance(o.itemTolerance)
     , offsetPath(o.offsetPath)
     , offsetDistance(o.offsetDistance)
     , offsetPosition(o.offsetPosition)
@@ -297,6 +299,7 @@ bool StyleRareNonInheritedData::operator==(const StyleRareNonInheritedData& o) c
         && containerNames == o.containerNames
         && columnGap == o.columnGap
         && rowGap == o.rowGap
+        && itemTolerance == o.itemTolerance
         && offsetPath == o.offsetPath
         && offsetDistance == o.offsetDistance
         && offsetPosition == o.offsetPosition
@@ -448,6 +451,7 @@ void StyleRareNonInheritedData::dumpDifferences(TextStream& ts, const StyleRareN
 
     LOG_IF_DIFFERENT(columnGap);
     LOG_IF_DIFFERENT(rowGap);
+    LOG_IF_DIFFERENT(itemTolerance);
 
     LOG_IF_DIFFERENT(offsetPath);
     LOG_IF_DIFFERENT(offsetDistance);
