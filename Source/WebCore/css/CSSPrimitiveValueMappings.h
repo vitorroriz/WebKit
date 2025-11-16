@@ -51,13 +51,13 @@
 #include "StylePositionVisibility.h"
 #include "StyleScrollBehavior.h"
 #include "StyleTextDecorationLine.h"
+#include "StyleTouchAction.h"
 #include "StyleWebKitLineBoxContain.h"
 #include "StyleWebKitOverflowScrolling.h"
 #include "StyleWebKitTouchCallout.h"
 #include "TextFlags.h"
 #include "TextSpacing.h"
 #include "ThemeTypes.h"
-#include "TouchAction.h"
 #include "UnicodeBidi.h"
 #include "WritingMode.h"
 #include <wtf/MathExtras.h>
@@ -2237,8 +2237,8 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH
 
-#define TYPE TouchAction
-#define FOR_EACH(CASE) CASE(Auto) CASE(Manipulation) CASE(None) CASE(PanX) CASE(PanY) CASE(PinchZoom)
+#define TYPE Style::TouchActionValue
+#define FOR_EACH(CASE) CASE(PanX) CASE(PanY) CASE(PinchZoom)
 DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH

@@ -471,7 +471,7 @@ void EventRegion::unite(const Region& region, const RenderObject& renderer, cons
     m_region.unite(region);
 
 #if ENABLE(TOUCH_ACTION_REGIONS)
-    uniteTouchActions(region, style.usedTouchActions());
+    uniteTouchActions(region, Style::toPlatform(style.usedTouchAction()));
 #endif
 
     uniteEventListeners(region, style.eventListenerRegionTypes());

@@ -324,6 +324,21 @@ struct SpaceSeparatedEnumSet {
         return value.containsOnly(other);
     }
 
+    constexpr friend SpaceSeparatedEnumSet operator&(SpaceSeparatedEnumSet lhs, SpaceSeparatedEnumSet rhs)
+    {
+        return lhs.value & rhs.value;
+    }
+
+    constexpr friend SpaceSeparatedEnumSet operator-(SpaceSeparatedEnumSet lhs, SpaceSeparatedEnumSet rhs)
+    {
+        return lhs.value - rhs.value;
+    }
+
+    constexpr friend SpaceSeparatedEnumSet operator^(SpaceSeparatedEnumSet lhs, SpaceSeparatedEnumSet rhs)
+    {
+        return lhs.value ^ rhs.value;
+    }
+
     constexpr bool operator==(const SpaceSeparatedEnumSet&) const = default;
 
     Container value;
@@ -392,6 +407,21 @@ struct CommaSeparatedEnumSet {
     constexpr bool containsOnly(Container other) const
     {
         return value.containsOnly(other);
+    }
+
+    constexpr friend CommaSeparatedEnumSet operator&(CommaSeparatedEnumSet lhs, CommaSeparatedEnumSet rhs)
+    {
+        return lhs.value & rhs.value;
+    }
+
+    constexpr friend CommaSeparatedEnumSet operator-(CommaSeparatedEnumSet lhs, CommaSeparatedEnumSet rhs)
+    {
+        return lhs.value - rhs.value;
+    }
+
+    constexpr friend CommaSeparatedEnumSet operator^(CommaSeparatedEnumSet lhs, CommaSeparatedEnumSet rhs)
+    {
+        return lhs.value ^ rhs.value;
     }
 
     bool operator==(const CommaSeparatedEnumSet&) const = default;

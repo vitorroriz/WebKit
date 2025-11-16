@@ -87,7 +87,7 @@ StyleRareInheritedData::StyleRareInheritedData()
     , hyphenateLimitBefore(RenderStyle::initialHyphenateLimitBefore())
     , hyphenateLimitAfter(RenderStyle::initialHyphenateLimitAfter())
     , hyphenateLimitLines(RenderStyle::initialHyphenateLimitLines())
-    , usedTouchActions(RenderStyle::initialTouchActions())
+    , usedTouchAction(RenderStyle::initialTouchAction())
     , textSecurity(static_cast<unsigned>(RenderStyle::initialTextSecurity()))
     , userModify(static_cast<unsigned>(UserModify::ReadOnly))
     , wordBreak(static_cast<unsigned>(RenderStyle::initialWordBreak()))
@@ -194,7 +194,7 @@ inline StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedDa
     , hyphenateLimitBefore(o.hyphenateLimitBefore)
     , hyphenateLimitAfter(o.hyphenateLimitAfter)
     , hyphenateLimitLines(o.hyphenateLimitLines)
-    , usedTouchActions(o.usedTouchActions)
+    , usedTouchAction(o.usedTouchAction)
     , textSecurity(o.textSecurity)
     , userModify(o.userModify)
     , wordBreak(o.wordBreak)
@@ -343,7 +343,7 @@ bool StyleRareInheritedData::operator==(const StyleRareInheritedData& o) const
         && isInSubtreeWithBlendMode == o.isInSubtreeWithBlendMode
         && isForceHidden == o.isForceHidden
         && autoRevealsWhenFound == o.autoRevealsWhenFound
-        && usedTouchActions == o.usedTouchActions
+        && usedTouchAction == o.usedTouchAction
         && eventListenerRegionTypes == o.eventListenerRegionTypes
         && effectiveInert == o.effectiveInert
         && effectivelyTransparent == o.effectivelyTransparent
@@ -487,7 +487,7 @@ void StyleRareInheritedData::dumpDifferences(TextStream& ts, const StyleRareInhe
     LOG_IF_DIFFERENT_WITH_CAST(AppleVisualEffect, usedAppleVisualEffectForSubtree);
 #endif
 
-    LOG_IF_DIFFERENT(usedTouchActions);
+    LOG_IF_DIFFERENT(usedTouchAction);
     LOG_IF_DIFFERENT(eventListenerRegionTypes);
 
     LOG_IF_DIFFERENT(strokeWidth);

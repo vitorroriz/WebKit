@@ -2637,7 +2637,7 @@ void Element::setIsLink(bool flag)
 
 bool Element::allowsDoubleTapGesture() const
 {
-    if (renderStyle() && renderStyle()->touchActions() != TouchAction::Auto)
+    if (renderStyle() && !renderStyle()->touchAction().isAuto())
         return false;
 
     RefPtr parent = parentElement();

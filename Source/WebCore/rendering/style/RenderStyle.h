@@ -194,7 +194,6 @@ enum class TextUnderlinePosition : uint8_t;
 enum class TextWrapMode : bool;
 enum class TextWrapStyle : uint8_t;
 enum class TextZoom : bool;
-enum class TouchAction : uint8_t;
 enum class TransformBox : uint8_t;
 enum class TransformStyle3D : uint8_t;
 enum class UnicodeBidi : uint8_t;
@@ -364,6 +363,7 @@ struct TextShadow;
 struct TextSizeAdjust;
 struct TextSpacingTrim;
 struct TextUnderlineOffset;
+struct TouchAction;
 struct Transform;
 struct TransformOrigin;
 struct Transition;
@@ -1158,9 +1158,9 @@ public:
     inline OverflowContinue overflowContinue() const;
     inline const Style::WebkitInitialLetter& initialLetter() const;
 
-    inline OptionSet<TouchAction> touchActions() const;
+    inline Style::TouchAction touchAction() const;
     // 'touch-action' behavior depends on values in ancestors. We use an additional inherited property to implement that.
-    inline OptionSet<TouchAction> usedTouchActions() const;
+    inline Style::TouchAction usedTouchAction() const;
     inline OptionSet<EventListenerRegionType> eventListenerRegionTypes() const;
 
     inline bool effectiveInert() const;
@@ -1685,8 +1685,8 @@ public:
 
     inline void setInitialLetter(Style::WebkitInitialLetter&&);
 
-    inline void setTouchActions(OptionSet<TouchAction>);
-    inline void setUsedTouchActions(OptionSet<TouchAction>);
+    inline void setTouchAction(Style::TouchAction);
+    inline void setUsedTouchAction(Style::TouchAction);
     inline void setEventListenerRegionTypes(OptionSet<EventListenerRegionType>);
 
     inline void setEffectiveInert(bool);
@@ -2214,7 +2214,7 @@ public:
 
     static inline Style::WillChange initialWillChange();
 
-    static constexpr TouchAction initialTouchActions();
+    static constexpr Style::TouchAction initialTouchAction();
 
     static constexpr FieldSizing initialFieldSizing();
 

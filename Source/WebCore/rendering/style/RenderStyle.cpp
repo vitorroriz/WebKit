@@ -1878,7 +1878,7 @@ void RenderStyle::conservativelyCollectChangedAnimatableProperties(const RenderS
             changingProperties.m_properties.set(CSSPropertyOffsetRotate);
         if (first.textDecorationThickness != second.textDecorationThickness)
             changingProperties.m_properties.set(CSSPropertyTextDecorationThickness);
-        if (first.touchActions != second.touchActions)
+        if (first.touchAction != second.touchAction)
             changingProperties.m_properties.set(CSSPropertyTouchAction);
         if (first.marginTrim != second.marginTrim)
             changingProperties.m_properties.set(CSSPropertyMarginTrim);
@@ -2119,7 +2119,7 @@ void RenderStyle::conservativelyCollectChangedAnimatableProperties(const RenderS
         // textSizeAdjust
         // userSelect
         // isInSubtreeWithBlendMode
-        // usedTouchActions
+        // usedTouchAction
         // eventListenerRegionTypes
         // effectiveInert
         // usedContentVisibility

@@ -134,7 +134,6 @@ public:
     // MARK: Shared conversions
 
     static Ref<CSSValue> convertPositionTryFallbacks(ExtractorState&, const FixedVector<PositionTryFallback>&);
-    static Ref<CSSValue> convertTouchAction(ExtractorState&, OptionSet<TouchAction>);
     static Ref<CSSValue> convertTextTransform(ExtractorState&, OptionSet<TextTransform>);
     static Ref<CSSValue> convertTextUnderlinePosition(ExtractorState&, OptionSet<TextUnderlinePosition>);
     static Ref<CSSValue> convertTextEmphasisPosition(ExtractorState&, OptionSet<TextEmphasisPosition>);
@@ -272,27 +271,6 @@ inline Ref<CSSValue> ExtractorConverter::convertPositionTryFallbacks(ExtractorSt
     }
 
     return CSSValueList::createCommaSeparated(WTFMove(list));
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertTouchAction(ExtractorState&, OptionSet<TouchAction> touchActions)
-{
-    if (touchActions & TouchAction::Auto)
-        return CSSPrimitiveValue::create(CSSValueAuto);
-    if (touchActions & TouchAction::None)
-        return CSSPrimitiveValue::create(CSSValueNone);
-    if (touchActions & TouchAction::Manipulation)
-        return CSSPrimitiveValue::create(CSSValueManipulation);
-
-    CSSValueListBuilder list;
-    if (touchActions & TouchAction::PanX)
-        list.append(CSSPrimitiveValue::create(CSSValuePanX));
-    if (touchActions & TouchAction::PanY)
-        list.append(CSSPrimitiveValue::create(CSSValuePanY));
-    if (touchActions & TouchAction::PinchZoom)
-        list.append(CSSPrimitiveValue::create(CSSValuePinchZoom));
-    if (list.isEmpty())
-        return CSSPrimitiveValue::create(CSSValueAuto);
-    return CSSValueList::createSpaceSeparated(WTFMove(list));
 }
 
 inline Ref<CSSValue> ExtractorConverter::convertTextTransform(ExtractorState&, OptionSet<TextTransform> textTransform)

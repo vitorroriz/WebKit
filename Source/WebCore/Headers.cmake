@@ -3418,6 +3418,8 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     style/values/page/StylePageSize.h
 
+    style/values/pointerevents/StyleTouchAction.h
+
     style/values/position/StyleInset.h
 
     style/values/primitives/StyleCoordinatedValueList.h

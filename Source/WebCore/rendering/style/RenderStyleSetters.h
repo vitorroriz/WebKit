@@ -144,7 +144,7 @@ inline void RenderStyle::setContentVisibility(ContentVisibility value) { SET_NES
 inline void RenderStyle::setUsedAppearance(StyleAppearance a) { SET_NESTED(m_nonInheritedData, miscData, usedAppearance, static_cast<unsigned>(a)); }
 inline void RenderStyle::setEffectiveInert(bool effectiveInert) { SET(m_rareInheritedData, effectiveInert, effectiveInert); }
 inline void RenderStyle::setIsEffectivelyTransparent(bool effectivelyTransparent) { SET(m_rareInheritedData, effectivelyTransparent, effectivelyTransparent); }
-inline void RenderStyle::setUsedTouchActions(OptionSet<TouchAction> touchActions) { SET(m_rareInheritedData, usedTouchActions, touchActions); }
+inline void RenderStyle::setUsedTouchAction(Style::TouchAction touchAction) { SET(m_rareInheritedData, usedTouchAction, touchAction); }
 inline void RenderStyle::setEventListenerRegionTypes(OptionSet<EventListenerRegionType> eventListenerTypes) { SET(m_rareInheritedData, eventListenerRegionTypes, eventListenerTypes); }
 inline void RenderStyle::setFieldSizing(FieldSizing value) { SET_NESTED(m_nonInheritedData, rareData, fieldSizing, static_cast<unsigned>(value)); }
 inline void RenderStyle::setFilter(Style::Filter&& filter) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, filter, filter, WTFMove(filter)); }
@@ -320,7 +320,7 @@ inline void RenderStyle::setTextUnderlineOffset(Style::TextUnderlineOffset&& tex
 inline void RenderStyle::setTextUnderlinePosition(OptionSet<TextUnderlinePosition> position) { SET(m_rareInheritedData, textUnderlinePosition, static_cast<unsigned>(position.toRaw())); }
 inline void RenderStyle::setTextZoom(TextZoom zoom) { SET(m_rareInheritedData, textZoom, static_cast<unsigned>(zoom)); }
 inline void RenderStyle::setTop(Style::InsetEdge&& edge) { SET_NESTED(m_nonInheritedData, surroundData, inset.top(), WTFMove(edge)); }
-inline void RenderStyle::setTouchActions(OptionSet<TouchAction> actions) { SET_NESTED(m_nonInheritedData, rareData, touchActions, actions); }
+inline void RenderStyle::setTouchAction(Style::TouchAction touchAction) { SET_NESTED(m_nonInheritedData, rareData, touchAction, touchAction); }
 inline void RenderStyle::setTransform(Style::Transform&& transform) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, transform, transform, WTFMove(transform)); }
 inline void RenderStyle::setTransformBox(TransformBox box) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, transform, transformBox, box); }
 inline void RenderStyle::setTransformOrigin(Style::TransformOrigin&& origin) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, transform, origin, WTFMove(origin)); }

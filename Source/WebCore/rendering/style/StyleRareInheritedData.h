@@ -52,13 +52,13 @@
 #include <WebCore/StyleTextIndent.h>
 #include <WebCore/StyleTextShadow.h>
 #include <WebCore/StyleTextUnderlineOffset.h>
+#include <WebCore/StyleTouchAction.h>
 #include <WebCore/StyleWebKitLineBoxContain.h>
 #include <WebCore/StyleWebKitLineGrid.h>
 #include <WebCore/StyleWebKitOverflowScrolling.h>
 #include <WebCore/StyleWebKitTextStrokeWidth.h>
 #include <WebCore/StyleWebKitTouchCallout.h>
 #include <WebCore/StyleWidows.h>
-#include <WebCore/TouchAction.h>
 #include <wtf/DataRef.h>
 #include <wtf/FixedVector.h>
 #include <wtf/OptionSet.h>
@@ -173,7 +173,7 @@ public:
     Style::HyphenateLimitEdge hyphenateLimitAfter;
     Style::HyphenateLimitLines hyphenateLimitLines;
 
-    OptionSet<TouchAction> usedTouchActions;
+    Style::TouchAction usedTouchAction;
 
     PREFERRED_TYPE(TextSecurity) unsigned textSecurity : 2;
     PREFERRED_TYPE(UserModify) unsigned userModify : 2;

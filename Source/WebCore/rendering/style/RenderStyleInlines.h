@@ -212,7 +212,7 @@ inline bool RenderStyle::effectiveInert() const { return m_rareInheritedData->ef
 inline bool RenderStyle::isEffectivelyTransparent() const { return m_rareInheritedData->effectivelyTransparent; }
 inline PointerEvents RenderStyle::usedPointerEvents() const { return effectiveInert() ? PointerEvents::None : pointerEvents(); }
 inline CSSPropertyID RenderStyle::usedStrokeColorProperty() const { return hasExplicitlySetStrokeColor() ? CSSPropertyStrokeColor : CSSPropertyWebkitTextStrokeColor; }
-inline OptionSet<TouchAction> RenderStyle::usedTouchActions() const { return m_rareInheritedData->usedTouchActions; }
+inline Style::TouchAction RenderStyle::usedTouchAction() const { return m_rareInheritedData->usedTouchAction; }
 inline UserModify RenderStyle::usedUserModify() const { return effectiveInert() ? UserModify::ReadOnly : userModify(); }
 inline float RenderStyle::usedZoom() const { return m_rareInheritedData->usedZoom; }
 inline OptionSet<EventListenerRegionType> RenderStyle::eventListenerRegionTypes() const { return m_rareInheritedData->eventListenerRegionTypes; }
@@ -589,7 +589,7 @@ constexpr OptionSet<TextUnderlinePosition> RenderStyle::initialTextUnderlinePosi
 constexpr TextWrapMode RenderStyle::initialTextWrapMode() { return TextWrapMode::Wrap; }
 constexpr TextWrapStyle RenderStyle::initialTextWrapStyle() { return TextWrapStyle::Auto; }
 constexpr TextZoom RenderStyle::initialTextZoom() { return TextZoom::Normal; }
-constexpr TouchAction RenderStyle::initialTouchActions() { return TouchAction::Auto; }
+constexpr Style::TouchAction RenderStyle::initialTouchAction() { return CSS::Keyword::Auto { }; }
 inline Style::Transform RenderStyle::initialTransform() { return CSS::Keyword::None { }; }
 constexpr TransformBox RenderStyle::initialTransformBox() { return TransformBox::ViewBox; }
 inline Style::Transitions RenderStyle::initialTransitions() { return CSS::Keyword::All { }; }
@@ -832,7 +832,7 @@ inline const Style::TextUnderlineOffset& RenderStyle::textUnderlineOffset() cons
 inline OptionSet<TextUnderlinePosition> RenderStyle::textUnderlinePosition() const { return OptionSet<TextUnderlinePosition>::fromRaw(m_rareInheritedData->textUnderlinePosition); }
 inline TextZoom RenderStyle::textZoom() const { return static_cast<TextZoom>(m_rareInheritedData->textZoom); }
 inline const Style::InsetEdge& RenderStyle::top() const { return m_nonInheritedData->surroundData->inset.top(); }
-inline OptionSet<TouchAction> RenderStyle::touchActions() const { return m_nonInheritedData->rareData->touchActions; }
+inline Style::TouchAction RenderStyle::touchAction() const { return m_nonInheritedData->rareData->touchAction; }
 inline const Style::Transform& RenderStyle::transform() const { return m_nonInheritedData->miscData->transform->transform; }
 inline TransformBox RenderStyle::transformBox() const { return m_nonInheritedData->miscData->transform->transformBox; }
 inline const Style::TransformOrigin& RenderStyle::transformOrigin() const { return m_nonInheritedData->miscData->transform->origin; }

@@ -432,7 +432,7 @@ auto TreeResolver::resolveElement(Element& element, const RenderStyle* existingS
 
 #if ENABLE(TOUCH_ACTION_REGIONS)
     // FIXME: Track this exactly.
-    if (update.style->touchActions() != TouchAction::Auto && !m_document->quirks().shouldDisablePointerEventsQuirk())
+    if (!update.style->touchAction().isAuto() && !m_document->quirks().shouldDisablePointerEventsQuirk())
         m_document->setMayHaveElementsWithNonAutoTouchAction();
 #endif
 #if ENABLE(EDITABLE_REGION)

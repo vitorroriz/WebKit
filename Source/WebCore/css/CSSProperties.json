@@ -12262,11 +12262,13 @@
                     "status": "unimplemented",
                     "url": "https://w3c.github.io/pointerevents/#the-touch-action-css-property"
                 },
-                "pinch-zoom"
+                {
+                    "value": "pinch-zoom",
+                    "status": "non-standard"
+                }
             ],
             "codegen-properties": {
-                "render-style-name-for-methods": "TouchActions",
-                "style-converter": "TouchAction",
+                "style-converter": "StyleType<TouchAction>",
                 "parser-grammar": "auto | none | [ pan-x || pan-y || pinch-zoom ]@(no-single-item-opt) | manipulation",
                 "parser-grammar-comment": "Current spec grammar is 'auto | none | [ [ pan-x | pan-left | pan-right ] || [ pan-y | pan-up | pan-down ] ] | manipulation'"
             },
