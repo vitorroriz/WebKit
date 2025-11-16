@@ -2278,8 +2278,10 @@ void Element::notifyAttributeChanged(const QualifiedName& name, const AtomString
         CustomElementReactionQueue::enqueueAttributeChangedCallbackIfNeeded(*this, name, oldValue, newValue);
 
     if (oldValue != newValue) {
-        invalidateNodeListAndCollectionCachesInAncestorsForAttribute(name);
-
+        IsMutationBySetInnerHTML isMutationBySetInnerHTML = reason == AttributeModificationReason::ParserFastPath
+            ? IsMutationBySetInnerHTML::Yes
+            : IsMutationBySetInnerHTML::No;
+        invalidateNodeListCollectionAndInnerHTMLPrefixCachesInAncestorsForAttribute(name, isMutationBySetInnerHTML);
         if (CheckedPtr cache = document().existingAXObjectCache())
             cache->deferAttributeChangeIfNeeded(*this, name, oldValue, newValue);
 
@@ -2569,7 +2571,7 @@ void Element::classAttributeChanged(const AtomString& newClassString, AttributeM
             classList->associatedAttributeValueChanged();
     }
 
-    if (reason == AttributeModificationReason::Parser) {
+    if (reason == AttributeModificationReason::Parser || reason == AttributeModificationReason::ParserFastPath) {
         // If ElementData is ShareableElementData created in parserSetAttributes,
         // it is possible that SpaceSplitString is already created and set.
         // We also do not need to invalidate caches / styles since it is not inserted to the tree yet.
@@ -2824,7 +2826,7 @@ void Element::stripScriptingAttributes(Vector<Attribute>& attributeVector) const
     });
 }
 
-void Element::parserSetAttributes(std::span<const Attribute> attributes)
+void Element::parserSetAttributes(std::span<const Attribute> attributes, AttributeModificationReason reason)
 {
     ASSERT(!isConnected());
     ASSERT(!parentNode());
@@ -2844,7 +2846,7 @@ void Element::parserSetAttributes(std::span<const Attribute> attributes)
 
     // Use attributes instead of m_elementData because attributeChanged might modify m_elementData.
     for (const auto& attribute : attributes)
-        notifyAttributeChanged(attribute.name(), nullAtom(), attribute.value(), AttributeModificationReason::Parser);
+        notifyAttributeChanged(attribute.name(), nullAtom(), attribute.value(), reason);
 }
 
 void Element::didMoveToNewDocument(Document& oldDocument, Document& newDocument)
@@ -4350,7 +4352,11 @@ ExceptionOr<void> Element::replaceChildrenWithMarkup(const String& markup, Optio
     if (fragment.hasException())
         return fragment.releaseException();
 
-    return replaceChildrenWithFragment(container, fragment.releaseReturnValue());
+    bool usedFastPath = fragment.returnValue()->hasWasParsedWithFastPath();
+    auto result = replaceChildrenWithFragment(container, fragment.releaseReturnValue());
+    if (!result.hasException() && usedFastPath)
+        document().updateCachedSetInnerHTML(markup, container.get(), *this);
+    return result;
 }
 
 ExceptionOr<void> Element::setHTMLUnsafe(Variant<RefPtr<TrustedHTML>, String>&& html)

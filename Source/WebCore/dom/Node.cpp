@@ -1082,23 +1082,49 @@ void Node::invalidateNodeListAndCollectionCachesInAncestors()
     }
 }
 
-void Node::invalidateNodeListAndCollectionCachesInAncestorsForAttribute(const QualifiedName& attrName)
+void Node::invalidateNodeListCollectionAndInnerHTMLPrefixCachesInAncestorsForAttribute(const QualifiedName& attrName, const IsMutationBySetInnerHTML isMutationBySetInnerHTML)
 {
     ASSERT(is<Element>(*this));
 
-    if (!document().shouldInvalidateNodeListAndCollectionCachesForAttribute(attrName))
+    bool shouldInvalidate = document().shouldInvalidateNodeListAndCollectionCachesForAttribute(attrName);
+
+    WeakPtr cachedContainer = document().cachedSetInnerHTML().cachedContainer;
+    bool shouldSetMutationBit = isMutationBySetInnerHTML == IsMutationBySetInnerHTML::No && cachedContainer;
+
+    if (!shouldInvalidate && !shouldSetMutationBit)
         return;
 
-    document().invalidateNodeListAndCollectionCaches([&attrName](auto& list) {
-        list.invalidateCacheForAttribute(attrName);
-    });
+    if (shouldInvalidate) {
+        document().invalidateNodeListAndCollectionCaches([&attrName](auto& list) {
+            list.invalidateCacheForAttribute(attrName);
+        });
+    }
 
     for (auto* node = this; node; node = node->parentNode()) {
-        if (!node->hasRareData())
+        if (shouldSetMutationBit && !node->hasDidMutateSubtreeAfterSetInnerHTML()) {
+            node->setDidMutateSubtreeAfterSetInnerHTML();
+            if (node == cachedContainer.get())
+                shouldSetMutationBit = false;
+        }
+
+        if (!shouldInvalidate || !node->hasRareData())
             continue;
 
         if (auto* lists = node->rareData()->nodeLists())
             lists->invalidateCachesForAttribute(attrName);
+    }
+}
+
+void Node::setDidMutateSubtreeAfterSetInnerHTMLOnAncestors()
+{
+    WeakPtr cachedContainer = document().cachedSetInnerHTML().cachedContainer;
+    if (!cachedContainer)
+        return;
+
+    for (auto* node = this; node; node = node->parentNode()) {
+        node->setDidMutateSubtreeAfterSetInnerHTML();
+        if (node == cachedContainer.get())
+            break;
     }
 }
 
@@ -1764,7 +1790,7 @@ String Node::textContent(bool convertBRsToNewlines) const
 }
 
 ExceptionOr<void> Node::setTextContent(String&& text)
-{           
+{
     switch (nodeType()) {
     case ATTRIBUTE_NODE:
     case TEXT_NODE:

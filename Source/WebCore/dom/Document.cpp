@@ -12126,6 +12126,27 @@ void Document::ariaNotify(const String& announcement, const AriaNotifyOptions& o
         cache->postARIANotifyNotification(*this, announcement, options);
 }
 
+void Document::invalidateCachedSetInnerHTML()
+{
+    auto& cache = cachedSetInnerHTML();
+    if (cache.cachedContainer)
+        cache.cachedContainer->setDidMutateSubtreeAfterSetInnerHTML();
+    cache.source = String();
+}
+
+void Document::updateCachedSetInnerHTML(const String& sourceString, ContainerNode& container, Element& contextElement)
+{
+    auto& cache = cachedSetInnerHTML();
+
+    if (sourceString.length() < cache.source.length() || sourceString.length() > maxCachedSetInnerHTMLStringSize())
+        return;
+
+    cache.source = sourceString;
+    cache.cachedContainer = &container;
+    cache.contextElementName = contextElement.elementName();
+    container.clearDidMutateSubtreeAfterSetInnerHTML();
+}
+
 } // namespace WebCore
 
 #undef DOCUMENT_RELEASE_LOG
