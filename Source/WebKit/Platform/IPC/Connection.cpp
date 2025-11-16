@@ -68,9 +68,6 @@ constexpr Seconds largeOutgoingMessageQueueTimeThreshold { 20_s };
 
 std::atomic<unsigned> UnboundedSynchronousIPCScope::unboundedSynchronousIPCCount = 0;
 
-enum class MessageIdentifierType { };
-using MessageIdentifier = AtomicObjectIdentifier<MessageIdentifierType>;
-
 #if ENABLE(UNFAIR_LOCK)
 static UnfairLock s_connectionMapLock;
 #else
@@ -277,7 +274,7 @@ void Connection::SyncMessageState::dispatchMessagesUntil(MessageIdentifier lastM
         m_messagesBeingDispatched.takeFirst().dispatch();
 }
 
-std::optional<MessageIdentifier> Connection::SyncMessageState::identifierOfLastMessageToDispatchWhileWaitingForSyncReply()
+auto Connection::SyncMessageState::identifierOfLastMessageToDispatchWhileWaitingForSyncReply() -> std::optional<MessageIdentifier>
 {
     Locker locker { m_lock };
     if (m_messagesToDispatchWhileWaitingForSyncReply.isEmpty())
@@ -307,26 +304,16 @@ void Connection::SyncMessageState::dispatchMessagesAndResetDidScheduleDispatchMe
         m_messagesBeingDispatched.takeFirst().dispatch(); // This may cause the function to re-enter when there is a nested run loop.
 }
 
-// Represents a sync request for which we're waiting on a reply.
-struct Connection::PendingSyncReply {
-    // The request ID.
-    Markable<Connection::SyncRequestID> syncRequestID;
+Connection::PendingSyncReply::PendingSyncReply() = default;
 
-    // The reply decoder, will be null if there was an error processing the sync
-    // message on the other side.
-    std::unique_ptr<Decoder> replyDecoder;
+Connection::PendingSyncReply::PendingSyncReply(Connection::SyncRequestID syncRequestID)
+    : syncRequestID(syncRequestID)
+{
+}
 
-    // To make sure we maintain message ordering, we keep track of the last message (that returns true for shouldDispatchMessageWhenWaitingForSyncReply())
-    // and that was received *before* the sync reply. This is to make sure that we dispatch messages up until this one, before dispatching the sync reply.
-    std::optional<MessageIdentifier> identifierOfLastMessageToDispatchBeforeSyncReply;
+Connection::PendingSyncReply::PendingSyncReply(PendingSyncReply&&) = default;
 
-    PendingSyncReply() = default;
-
-    explicit PendingSyncReply(Connection::SyncRequestID syncRequestID)
-        : syncRequestID(syncRequestID)
-    {
-    }
-};
+Connection::PendingSyncReply::~PendingSyncReply() = default;
 
 Ref<Connection> Connection::createServerConnection(Identifier&& identifier, Thread::QOS receiveQueueQOS)
 {

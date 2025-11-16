@@ -660,6 +660,26 @@ private:
 
     static constexpr size_t largeOutgoingMessageQueueCountThreshold { 128 };
 
+    enum class MessageIdentifierType { };
+    using MessageIdentifier = AtomicObjectIdentifier<MessageIdentifierType>;
+
+    // Represents a sync request for which we're waiting on a reply.
+    struct PendingSyncReply {
+        PendingSyncReply();
+        explicit PendingSyncReply(Connection::SyncRequestID);
+        PendingSyncReply(PendingSyncReply&&);
+        ~PendingSyncReply();
+
+        // The request ID.
+        Markable<Connection::SyncRequestID> syncRequestID;
+        // The reply decoder, will be null if there was an error processing the sync
+        // message on the other side.
+        std::unique_ptr<Decoder> replyDecoder;
+        // To make sure we maintain message ordering, we keep track of the last message (that returns true for shouldDispatchMessageWhenWaitingForSyncReply())
+        // and that was received *before* the sync reply. This is to make sure that we dispatch messages up until this one, before dispatching the sync reply.
+        std::optional<MessageIdentifier> identifierOfLastMessageToDispatchBeforeSyncReply;
+    };
+
     CheckedPtr<Client> m_client;
     std::unique_ptr<SyncMessageState, SyncMessageStateRelease> m_syncState;
     UniqueID m_uniqueID;
@@ -725,7 +745,7 @@ private:
     Lock m_syncReplyStateLock;
     bool m_shouldWaitForSyncReplies WTF_GUARDED_BY_LOCK(m_syncReplyStateLock) { true };
     bool m_shouldWaitForMessages WTF_GUARDED_BY_LOCK(m_waitForMessageLock) { true };
-    struct PendingSyncReply;
+
     Vector<PendingSyncReply> m_pendingSyncReplies WTF_GUARDED_BY_LOCK(m_syncReplyStateLock);
 
     Lock m_incomingSyncMessageCallbackLock;
