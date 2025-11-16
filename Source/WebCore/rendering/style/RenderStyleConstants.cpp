@@ -1277,19 +1277,6 @@ TextStream& operator<<(TextStream& ts, TextSecurity textSecurity)
     return ts;
 }
 
-TextStream& operator<<(TextStream& ts, TextTransform textTransform)
-{
-    switch (textTransform) {
-    case TextTransform::Capitalize: ts << "capitalize"_s; break;
-    case TextTransform::Uppercase: ts << "uppercase"_s; break;
-    case TextTransform::Lowercase: ts << "lowercase"_s; break;
-    case TextTransform::FullSizeKana: ts << "full-size-kana"_s; break;
-    case TextTransform::FullWidth: ts << "full-width"_s; break;
-    case TextTransform::MathAuto: ts << "math-auto"_s; break;
-    }
-    return ts;
-}
-
 TextStream& operator<<(TextStream& ts, TextUnderlinePosition position)
 {
     switch (position) {

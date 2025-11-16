@@ -315,7 +315,7 @@ inline void RenderStyle::setTextSecurity(TextSecurity security) { SET(m_rareInhe
 inline void RenderStyle::setTextShadow(Style::TextShadows&& textShadow) { SET(m_rareInheritedData, textShadow, WTFMove(textShadow)); }
 inline void RenderStyle::setTextStrokeColor(Style::Color&& color) { SET(m_rareInheritedData, textStrokeColor, WTFMove(color)); }
 inline void RenderStyle::setTextStrokeWidth(Style::WebkitTextStrokeWidth width) { SET(m_rareInheritedData, textStrokeWidth, width); }
-inline void RenderStyle::setTextTransform(OptionSet<TextTransform> value) { m_inheritedFlags.textTransform = value.toRaw(); }
+inline void RenderStyle::setTextTransform(Style::TextTransform value) { m_inheritedFlags.textTransform = value.toRaw(); }
 inline void RenderStyle::setTextUnderlineOffset(Style::TextUnderlineOffset&& textUnderlineOffset) { SET(m_rareInheritedData, textUnderlineOffset, WTFMove(textUnderlineOffset)); }
 inline void RenderStyle::setTextUnderlinePosition(OptionSet<TextUnderlinePosition> position) { SET(m_rareInheritedData, textUnderlinePosition, static_cast<unsigned>(position.toRaw())); }
 inline void RenderStyle::setTextZoom(TextZoom zoom) { SET(m_rareInheritedData, textZoom, static_cast<unsigned>(zoom)); }

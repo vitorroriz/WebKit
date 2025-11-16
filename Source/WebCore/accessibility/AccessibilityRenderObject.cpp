@@ -1591,7 +1591,7 @@ AXTextRuns AccessibilityRenderObject::textRuns()
         if (text.isEmpty())
             return;
 
-        if (textBox->style().textTransform().contains(TextTransform::FullSizeKana)) {
+        if (textBox->style().textTransform().contains(Style::TextTransformValue::FullSizeKana)) {
             // We don't want to serve transformed kana text to AT since it is a visual affordance.
             // Using the original text from the renderer provides the untransformed string.
             text = textBox->renderer().originalText().substring(textBox->start(), textBox->length());

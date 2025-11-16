@@ -134,7 +134,6 @@ public:
     // MARK: Shared conversions
 
     static Ref<CSSValue> convertPositionTryFallbacks(ExtractorState&, const FixedVector<PositionTryFallback>&);
-    static Ref<CSSValue> convertTextTransform(ExtractorState&, OptionSet<TextTransform>);
     static Ref<CSSValue> convertTextUnderlinePosition(ExtractorState&, OptionSet<TextUnderlinePosition>);
     static Ref<CSSValue> convertTextEmphasisPosition(ExtractorState&, OptionSet<TextEmphasisPosition>);
     static Ref<CSSValue> convertSpeakAs(ExtractorState&, OptionSet<SpeakAs>);
@@ -271,32 +270,6 @@ inline Ref<CSSValue> ExtractorConverter::convertPositionTryFallbacks(ExtractorSt
     }
 
     return CSSValueList::createCommaSeparated(WTFMove(list));
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertTextTransform(ExtractorState&, OptionSet<TextTransform> textTransform)
-{
-    CSSValueListBuilder list;
-    if (textTransform.contains(TextTransform::Capitalize))
-        list.append(CSSPrimitiveValue::create(CSSValueCapitalize));
-    else if (textTransform.contains(TextTransform::Uppercase))
-        list.append(CSSPrimitiveValue::create(CSSValueUppercase));
-    else if (textTransform.contains(TextTransform::Lowercase))
-        list.append(CSSPrimitiveValue::create(CSSValueLowercase));
-
-    if (textTransform.contains(TextTransform::FullWidth))
-        list.append(CSSPrimitiveValue::create(CSSValueFullWidth));
-
-    if (textTransform.contains(TextTransform::FullSizeKana))
-        list.append(CSSPrimitiveValue::create(CSSValueFullSizeKana));
-
-    if (textTransform.contains(TextTransform::MathAuto)) {
-        ASSERT(list.isEmpty());
-        list.append(CSSPrimitiveValue::create(CSSValueMathAuto));
-    }
-
-    if (list.isEmpty())
-        return CSSPrimitiveValue::create(CSSValueNone);
-    return CSSValueList::createSpaceSeparated(WTFMove(list));
 }
 
 inline Ref<CSSValue> ExtractorConverter::convertTextUnderlinePosition(ExtractorState&, OptionSet<TextUnderlinePosition> textUnderlinePosition)

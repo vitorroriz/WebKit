@@ -609,16 +609,6 @@ enum class TextAlignMode : uint8_t {
     End,
 };
 
-enum class TextTransform : uint8_t {
-    Capitalize    = 1 << 0,
-    Uppercase     = 1 << 1,
-    Lowercase     = 1 << 2,
-    FullSizeKana  = 1 << 3,
-    FullWidth     = 1 << 4,
-    MathAuto      = 1 << 5,
-};
-constexpr auto maxTextTransformValue = TextTransform::FullWidth;
-
 enum class TextDecorationStyle : uint8_t {
     Solid,
     Double,
@@ -1346,7 +1336,6 @@ WTF::TextStream& operator<<(WTF::TextStream&, TextGroupAlign);
 WTF::TextStream& operator<<(WTF::TextStream&, TextJustify);
 WTF::TextStream& operator<<(WTF::TextStream&, TextOverflow);
 WTF::TextStream& operator<<(WTF::TextStream&, TextSecurity);
-WTF::TextStream& operator<<(WTF::TextStream&, TextTransform);
 WTF::TextStream& operator<<(WTF::TextStream&, TextUnderlinePosition);
 WTF::TextStream& operator<<(WTF::TextStream&, TextWrapMode);
 WTF::TextStream& operator<<(WTF::TextStream&, TextWrapStyle);

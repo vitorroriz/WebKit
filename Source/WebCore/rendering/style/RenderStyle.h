@@ -29,7 +29,6 @@
 #include <WebCore/BoxExtents.h>
 #include <WebCore/PseudoElementIdentifier.h>
 #include <WebCore/StylePrimitiveNumeric+Forward.h>
-#include <WebCore/StyleTextDecorationLine.h>
 #include <WebCore/WritingMode.h>
 #include <unicode/utypes.h>
 #include <wtf/CheckedRef.h>
@@ -357,11 +356,13 @@ struct TabSize;
 struct TextAutospace;
 struct TextBoxEdge;
 struct TextDecorationThickness;
+struct TextDecorationLine;
 struct TextEmphasisStyle;
 struct TextIndent;
 struct TextShadow;
 struct TextSizeAdjust;
 struct TextSpacingTrim;
+struct TextTransform;
 struct TextUnderlineOffset;
 struct TouchAction;
 struct Transform;
@@ -759,7 +760,7 @@ public:
     inline TextAlignMode textAlign() const { return static_cast<TextAlignMode>(m_inheritedFlags.textAlign); }
     inline TextAlignLast textAlignLast() const;
     inline TextGroupAlign textGroupAlign() const;
-    inline OptionSet<TextTransform> textTransform() const;
+    inline Style::TextTransform textTransform() const;
     inline Style::TextDecorationLine textDecorationLineInEffect() const;
     inline Style::TextDecorationLine textDecorationLine() const;
     inline TextDecorationStyle textDecorationStyle() const;
@@ -1410,7 +1411,7 @@ public:
     inline void setTextIndent(Style::TextIndent&&);
     inline void setTextUnderlinePosition(OptionSet<TextUnderlinePosition>);
     inline void setTextUnderlineOffset(Style::TextUnderlineOffset&&);
-    inline void setTextTransform(OptionSet<TextTransform>);
+    inline void setTextTransform(Style::TextTransform);
     bool setZoom(float);
     inline bool setUsedZoom(float);
     inline void setTextZoom(TextZoom);
@@ -2036,7 +2037,7 @@ public:
     static constexpr EmptyCell initialEmptyCells();
     static constexpr ListStylePosition initialListStylePosition();
     static inline Style::ListStyleType initialListStyleType();
-    static constexpr OptionSet<TextTransform> initialTextTransform();
+    static constexpr Style::TextTransform initialTextTransform();
     static inline Style::ViewTransitionClasses initialViewTransitionClasses();
     static inline Style::ViewTransitionName initialViewTransitionName();
     static constexpr Visibility initialVisibility();
@@ -2082,8 +2083,8 @@ public:
     static constexpr TextAlignMode initialTextAlign();
     static constexpr TextAlignLast initialTextAlignLast();
     static constexpr TextGroupAlign initialTextGroupAlign();
-    static inline Style::TextDecorationLine initialTextDecorationLine();
-    static inline Style::TextDecorationLine initialTextDecorationLineInEffect();
+    static constexpr Style::TextDecorationLine initialTextDecorationLine();
+    static constexpr Style::TextDecorationLine initialTextDecorationLineInEffect();
     static constexpr TextDecorationStyle initialTextDecorationStyle();
     static constexpr TextDecorationSkipInk initialTextDecorationSkipInk();
     static constexpr OptionSet<TextUnderlinePosition> initialTextUnderlinePosition();
@@ -2524,7 +2525,7 @@ private:
         PREFERRED_TYPE(bool) unsigned isLink : 1;
         PREFERRED_TYPE(PseudoElementType) unsigned pseudoElementType : PseudoElementTypeBits;
         unsigned pseudoBits : PublicPseudoIDBits;
-        PREFERRED_TYPE(Style::TextDecorationLine) unsigned textDecorationLine : TextDecorationLineBits; // Text decorations defined *only* by this element.
+        unsigned textDecorationLine : TextDecorationLineBits; // Text decorations defined *only* by this element. PREFERRED_TYPE elided to avoid header inclusion.
 
         // If you add more style bits here, you will also need to update RenderStyle::NonInheritedFlags::copyNonInheritedFrom().
     };
@@ -2544,9 +2545,9 @@ private:
         PREFERRED_TYPE(TextWrapMode) unsigned char textWrapMode : 1;
         PREFERRED_TYPE(TextAlignMode) unsigned char textAlign : 4;
         PREFERRED_TYPE(TextWrapStyle) unsigned char textWrapStyle : 2;
-        PREFERRED_TYPE(OptionSet<TextTransform>) unsigned char textTransform : TextTransformBits;
+        unsigned char textTransform : TextTransformBits; // PREFERRED_TYPE elided to avoid header inclusion.
         unsigned char : 1; // byte alignment
-        PREFERRED_TYPE(Style::TextDecorationLine) unsigned char textDecorationLineInEffect : TextDecorationLineBits;
+        unsigned char textDecorationLineInEffect : TextDecorationLineBits; // PREFERRED_TYPE elided to avoid header inclusion.
 
         // Cursors and Visibility = 13 bits aligned onto 4 bits + 1 byte + 1 bit
         PREFERRED_TYPE(PointerEvents) unsigned char pointerEvents : 4;

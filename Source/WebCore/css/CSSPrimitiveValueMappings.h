@@ -51,6 +51,7 @@
 #include "StylePositionVisibility.h"
 #include "StyleScrollBehavior.h"
 #include "StyleTextDecorationLine.h"
+#include "StyleTextTransform.h"
 #include "StyleTouchAction.h"
 #include "StyleWebKitLineBoxContain.h"
 #include "StyleWebKitOverflowScrolling.h"
@@ -1279,8 +1280,8 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH
 
-#define TYPE TextTransform
-#define FOR_EACH(CASE) CASE(Capitalize) CASE(Uppercase) CASE(Lowercase) CASE(FullSizeKana) CASE(FullWidth) CASE(MathAuto)
+#define TYPE Style::TextTransformValue
+#define FOR_EACH(CASE) CASE(Capitalize) CASE(Uppercase) CASE(Lowercase) CASE(FullWidth) CASE(FullSizeKana) CASE(MathAuto)
 DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH

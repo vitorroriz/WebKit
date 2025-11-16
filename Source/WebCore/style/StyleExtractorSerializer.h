@@ -71,7 +71,6 @@ public:
     static void serializeSmoothScrolling(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, bool);
     static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
     static void serializeTabSize(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const TabSize&);
-    static void serializeTextTransform(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TextTransform>);
     static void serializeTextUnderlinePosition(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TextUnderlinePosition>);
     static void serializeTextEmphasisPosition(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TextEmphasisPosition>);
     static void serializeSpeakAs(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<SpeakAs>);
@@ -217,43 +216,6 @@ inline void ExtractorSerializer::serializePositionTryFallbacks(ExtractorState& s
     }
 
     builder.append(CSSValueList::createCommaSeparated(WTFMove(list))->cssText(context));
-}
-
-inline void ExtractorSerializer::serializeTextTransform(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<TextTransform> textTransform)
-{
-    bool listEmpty = true;
-
-    if (textTransform.contains(TextTransform::Capitalize)) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Capitalize { });
-        listEmpty = false;
-    } else if (textTransform.contains(TextTransform::Uppercase)) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Uppercase { });
-        listEmpty = false;
-    } else if (textTransform.contains(TextTransform::Lowercase)) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Lowercase { });
-        listEmpty = false;
-    }
-
-    auto appendOption = [&](TextTransform test, CSSValueID value) {
-        if (textTransform.contains(test)) {
-            if (!listEmpty)
-                builder.append(' ');
-            builder.append(nameLiteralForSerialization(value));
-            listEmpty = false;
-        }
-    };
-    appendOption(TextTransform::FullWidth, CSSValueFullWidth);
-    appendOption(TextTransform::FullSizeKana, CSSValueFullSizeKana);
-
-    if (textTransform.contains(TextTransform::MathAuto)) {
-        // math-auto can't be used in combination with other values, the parser already makes sure that is the case.
-        ASSERT(listEmpty);
-        serializationForCSS(builder, context, state.style, CSS::Keyword::MathAuto { });
-        listEmpty = false;
-    }
-
-    if (listEmpty)
-        serializationForCSS(builder, context, state.style, CSS::Keyword::None { });
 }
 
 inline void ExtractorSerializer::serializeTextUnderlinePosition(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<TextUnderlinePosition> textUnderlinePosition)

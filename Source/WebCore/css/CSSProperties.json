@@ -7869,6 +7869,7 @@
             "inherited": true,
             "initial": "none",
             "values": [
+                "none",
                 "capitalize",
                 "uppercase",
                 "lowercase",
@@ -7876,15 +7877,15 @@
                 "full-width",
                 {
                     "value": "math-auto",
-                    "settings-flag": "cssTextTransformMathAutoEnabled"
-                },
-                "none"
+                    "settings-flag": "cssTextTransformMathAutoEnabled",
+                    "url": "https://w3c.github.io/mathml-core/#math-auto-transform"
+                }
             ],
             "codegen-properties": {
                 "aliases": [
                     "-epub-text-transform"
                 ],
-                "style-converter": "TextTransform",
+                "style-converter": "StyleType<TextTransform>",
                 "parser-grammar": "none | [ [ capitalize | uppercase | lowercase ] || full-width || full-size-kana ]@(no-single-item-opt) | math-auto@(settings-flag=cssTextTransformMathAutoEnabled)"
             },
             "specification": {

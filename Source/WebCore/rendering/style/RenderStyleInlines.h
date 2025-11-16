@@ -68,7 +68,9 @@
 #include <WebCore/StyleRareNonInheritedData.h>
 #include <WebCore/StyleSurroundData.h>
 #include <WebCore/StyleTextAutospace.h>
+#include <WebCore/StyleTextDecorationLine.h>
 #include <WebCore/StyleTextSpacingTrim.h>
+#include <WebCore/StyleTextTransform.h>
 #include <WebCore/StyleTransformData.h>
 #include <WebCore/StyleVisitedLinkColorData.h>
 #include <WebCore/UnicodeBidi.h>
@@ -564,8 +566,8 @@ constexpr Style::TextBoxEdge RenderStyle::initialTextBoxEdge() { return CSS::Key
 constexpr Style::LineFitEdge RenderStyle::initialLineFitEdge() { return CSS::Keyword::Leading { }; }
 constexpr TextCombine RenderStyle::initialTextCombine() { return TextCombine::None; }
 inline Style::Color RenderStyle::initialTextDecorationColor() { return CSS::Keyword::Currentcolor { }; }
-inline Style::TextDecorationLine RenderStyle::initialTextDecorationLine() { return CSS::Keyword::None { }; }
-inline Style::TextDecorationLine RenderStyle::initialTextDecorationLineInEffect() { return initialTextDecorationLine(); }
+constexpr Style::TextDecorationLine RenderStyle::initialTextDecorationLine() { return CSS::Keyword::None { }; }
+constexpr Style::TextDecorationLine RenderStyle::initialTextDecorationLineInEffect() { return initialTextDecorationLine(); }
 constexpr TextDecorationSkipInk RenderStyle::initialTextDecorationSkipInk() { return TextDecorationSkipInk::Auto; }
 constexpr TextDecorationStyle RenderStyle::initialTextDecorationStyle() { return TextDecorationStyle::Solid; }
 inline Style::TextDecorationThickness RenderStyle::initialTextDecorationThickness() { return CSS::Keyword::Auto { }; }
@@ -583,7 +585,7 @@ constexpr TextSecurity RenderStyle::initialTextSecurity() { return TextSecurity:
 inline Style::TextShadows RenderStyle::initialTextShadow() { return CSS::Keyword::None { }; }
 inline Style::Color RenderStyle::initialTextStrokeColor() { return CSS::Keyword::Currentcolor { }; }
 constexpr Style::WebkitTextStrokeWidth RenderStyle::initialTextStrokeWidth() { return 0_css_px; }
-constexpr OptionSet<TextTransform> RenderStyle::initialTextTransform() { return { }; }
+constexpr Style::TextTransform RenderStyle::initialTextTransform() { return CSS::Keyword::None { }; }
 inline Style::TextUnderlineOffset RenderStyle::initialTextUnderlineOffset() { return CSS::Keyword::Auto { }; }
 constexpr OptionSet<TextUnderlinePosition> RenderStyle::initialTextUnderlinePosition() { return { }; }
 constexpr TextWrapMode RenderStyle::initialTextWrapMode() { return TextWrapMode::Wrap; }
@@ -808,11 +810,11 @@ inline Style::TextBoxEdge RenderStyle::textBoxEdge() const { return m_rareInheri
 inline Style::LineFitEdge RenderStyle::lineFitEdge() const { return m_rareInheritedData->lineFitEdge; }
 inline TextCombine RenderStyle::textCombine() const { return static_cast<TextCombine>(m_rareInheritedData->textCombine); }
 inline const Style::Color& RenderStyle::textDecorationColor() const { return m_nonInheritedData->rareData->textDecorationColor; }
-inline Style::TextDecorationLine RenderStyle::textDecorationLine() const { return m_nonInheritedFlags.textDecorationLine; }
+inline Style::TextDecorationLine RenderStyle::textDecorationLine() const { return Style::TextDecorationLine::fromRaw(m_nonInheritedFlags.textDecorationLine); }
 inline TextDecorationSkipInk RenderStyle::textDecorationSkipInk() const { return static_cast<TextDecorationSkipInk>(m_rareInheritedData->textDecorationSkipInk); }
 inline TextDecorationStyle RenderStyle::textDecorationStyle() const { return static_cast<TextDecorationStyle>(m_nonInheritedData->rareData->textDecorationStyle); }
 inline const Style::TextDecorationThickness& RenderStyle::textDecorationThickness() const { return m_nonInheritedData->rareData->textDecorationThickness; }
-inline Style::TextDecorationLine RenderStyle::textDecorationLineInEffect() const { return m_inheritedFlags.textDecorationLineInEffect; }
+inline Style::TextDecorationLine RenderStyle::textDecorationLineInEffect() const { return Style::TextDecorationLine::fromRaw(m_inheritedFlags.textDecorationLineInEffect); }
 inline const Style::Color& RenderStyle::textEmphasisColor() const { return m_rareInheritedData->textEmphasisColor; }
 inline const Style::TextEmphasisStyle& RenderStyle::textEmphasisStyle() const { return m_rareInheritedData->textEmphasisStyle; }
 inline OptionSet<TextEmphasisPosition> RenderStyle::textEmphasisPosition() const { return OptionSet<TextEmphasisPosition>::fromRaw(m_rareInheritedData->textEmphasisPosition); }
@@ -827,7 +829,7 @@ inline bool RenderStyle::hasTextShadow() const { return !textShadow().isNone(); 
 inline Style::TextSpacingTrim RenderStyle::textSpacingTrim() const { return fontDescription().textSpacingTrim(); }
 inline const Style::Color& RenderStyle::textStrokeColor() const { return m_rareInheritedData->textStrokeColor; }
 inline Style::WebkitTextStrokeWidth RenderStyle::textStrokeWidth() const { return m_rareInheritedData->textStrokeWidth; }
-inline OptionSet<TextTransform> RenderStyle::textTransform() const { return OptionSet<TextTransform>::fromRaw(m_inheritedFlags.textTransform); }
+inline Style::TextTransform RenderStyle::textTransform() const { return Style::TextTransform::fromRaw(m_inheritedFlags.textTransform); }
 inline const Style::TextUnderlineOffset& RenderStyle::textUnderlineOffset() const { return m_rareInheritedData->textUnderlineOffset; }
 inline OptionSet<TextUnderlinePosition> RenderStyle::textUnderlinePosition() const { return OptionSet<TextUnderlinePosition>::fromRaw(m_rareInheritedData->textUnderlinePosition); }
 inline TextZoom RenderStyle::textZoom() const { return static_cast<TextZoom>(m_rareInheritedData->textZoom); }

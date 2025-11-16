@@ -113,7 +113,6 @@ class BuilderConverter {
 public:
     template<typename T, typename... Rest> static T convertStyleType(BuilderState&, const CSSValue&, Rest&&...);
 
-    static OptionSet<TextTransform> convertTextTransform(BuilderState&, const CSSValue&);
     template<CSSValueID> static AtomString convertCustomIdentAtomOrKeyword(BuilderState&, const CSSValue&);
 
     static OptionSet<TextEmphasisPosition> convertTextEmphasisPosition(BuilderState&, const CSSValue&);
@@ -139,19 +138,6 @@ public:
 template<typename T, typename... Rest> inline T BuilderConverter::convertStyleType(BuilderState& builderState, const CSSValue& value, Rest&&... rest)
 {
     return toStyleFromCSSValue<T>(builderState, value, std::forward<Rest>(rest)...);
-}
-
-inline OptionSet<TextTransform> BuilderConverter::convertTextTransform(BuilderState&, const CSSValue& value)
-{
-    auto result = RenderStyle::initialTextTransform();
-    if (auto* list = dynamicDowncast<CSSValueList>(value)) {
-        for (auto& currentValue : *list)
-            result.add(fromCSSValue<TextTransform>(currentValue));
-    } else if (auto* primitiveValue = dynamicDowncast<CSSPrimitiveValue>(value)) {
-        if (primitiveValue->valueID() == CSSValueMathAuto)
-            result.add(TextTransform::MathAuto);
-    }
-    return result;
 }
 
 template<CSSValueID keyword> inline AtomString BuilderConverter::convertCustomIdentAtomOrKeyword(BuilderState& builderState, const CSSValue& value)
