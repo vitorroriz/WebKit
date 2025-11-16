@@ -233,7 +233,7 @@ private:
                 return add(m_fallbackStackMap, location, node);
             auto addResult = m_abstractHeapStackMap.add(abstractHeap.payload().value(), nullptr);
             if (addResult.isNewEntry) {
-                addResult.iterator->value.reset(new ImpureDataSlot {location, node, 0});
+                addResult.iterator->value = makeUniqueWithoutFastMallocCheck<ImpureDataSlot>(location, node, 0);
                 return nullptr;
             }
             if (addResult.iterator->value->key == location)

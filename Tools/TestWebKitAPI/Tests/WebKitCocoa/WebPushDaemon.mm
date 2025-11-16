@@ -910,10 +910,10 @@ public:
             ready = true;
         }];
 
-        m_server.reset(new TestWebKitAPI::HTTPServer({
+        m_server = makeUnique<TestWebKitAPI::HTTPServer>(std::initializer_list<std::pair<String, TestWebKitAPI::HTTPResponse>> {
             { "/"_s, { html } },
             { "/sw.js"_s, { { { "Content-Type"_s, "application/javascript"_s } }, serviceWorkerScriptSource } }
-        }, TestWebKitAPI::HTTPServer::Protocol::HttpsProxy));
+        }, TestWebKitAPI::HTTPServer::Protocol::HttpsProxy);
 
         auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
         // This step is required early to make sure the first NetworkProcess access has the correct
