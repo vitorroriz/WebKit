@@ -63,7 +63,7 @@ static std::optional<Vector<RefPtr<KeyHandle>>> parseLicenseFormat(const JSON::O
         return std::nullopt;
 
     // Retrieve the keys array.
-    auto keysArray = it->value->asArray();
+    auto keysArray = Ref { it->value }->asArray();
     if (!keysArray)
         return std::nullopt;
 
@@ -111,7 +111,7 @@ static bool parseLicenseReleaseAcknowledgementFormat(const JSON::Object& root)
         return false;
 
     // Retrieve the kids array.
-    auto kidsArray = it->value->asArray();
+    auto kidsArray = Ref { it->value }->asArray();
     if (!kidsArray)
         return false;
 
