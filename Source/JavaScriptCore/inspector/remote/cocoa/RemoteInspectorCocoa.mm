@@ -337,7 +337,8 @@ void RemoteInspector::setupXPCConnectionIfNeeded()
         return;
     }
 
-    auto connection = adoptOSObject(xpc_connection_create_mach_service(WIRXPCMachPortName, m_xpcQueue.get(), 0));
+    // FIXME: This is a false positive. <rdar://164843889>
+    SUPPRESS_RETAINPTR_CTOR_ADOPT auto connection = adoptXPCObject(xpc_connection_create_mach_service(WIRXPCMachPortName, m_xpcQueue.get(), 0));
     if (!connection) {
         WTFLogAlways("RemoteInspector failed to create XPC connection.");
         return;

@@ -31,6 +31,7 @@
 #import <wtf/Lock.h>
 #import <wtf/OSObjectPtr.h>
 #import <wtf/ThreadSafeRefCounted.h>
+#import <wtf/darwin/XPCObjectPtr.h>
 #import <wtf/spi/darwin/XPCSPI.h>
 
 OBJC_CLASS NSDictionary;
@@ -64,7 +65,7 @@ private:
     // We make sure that m_client is thread safe and immediately cleared in close().
     Lock m_mutex;
 
-    OSObjectPtr<xpc_connection_t> m_connection;
+    XPCObjectPtr<xpc_connection_t> m_connection;
     OSObjectPtr<dispatch_queue_t> m_queue;
     Client* m_client;
     bool m_closed { false };

@@ -41,7 +41,7 @@
 
 namespace WebKit {
 
-XPCServiceInitializerDelegate::XPCServiceInitializerDelegate(OSObjectPtr<xpc_connection_t> connection, xpc_object_t initializerMessage)
+XPCServiceInitializerDelegate::XPCServiceInitializerDelegate(XPCObjectPtr<xpc_connection_t> connection, xpc_object_t initializerMessage)
     : m_connection(WTFMove(connection))
     , m_initializerMessage(initializerMessage)
 {

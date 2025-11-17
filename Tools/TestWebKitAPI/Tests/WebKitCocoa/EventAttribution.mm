@@ -58,6 +58,7 @@
 #include "CoreCryptoSPI.h"
 
 #include <WebCore/PrivateClickMeasurement.h>
+#include <wtf/darwin/XPCObjectPtr.h>
 #include <wtf/spi/cocoa/SecuritySPI.h>
 
 #endif // HAVE(RSA_BSSA)
@@ -507,13 +508,15 @@ static void attemptConnectionInProcessWithoutEntitlement()
 {
 #if USE(APPLE_INTERNAL_SDK)
     __block bool done = false;
-    auto connection = adoptNS(xpc_connection_create_mach_service("org.webkit.pcmtestdaemon.service", mainDispatchQueueSingleton(), 0));
+    // FIXME: This is a false positive. <rdar://164843889>
+    SUPPRESS_RETAINPTR_CTOR_ADOPT auto connection = adoptXPCObject(xpc_connection_create_mach_service("org.webkit.pcmtestdaemon.service", mainDispatchQueueSingleton(), 0));
     xpc_connection_set_event_handler(connection.get(), ^(xpc_object_t event) {
         EXPECT_EQ(event, XPC_ERROR_CONNECTION_INTERRUPTED);
         done = true;
     });
     xpc_connection_activate(connection.get());
-    auto dictionary = adoptNS(xpc_dictionary_create(nullptr, nullptr, 0));
+    // FIXME: This is a false positive. <rdar://164843889>
+    SUPPRESS_RETAINPTR_CTOR_ADOPT auto dictionary = adoptXPCObject(xpc_dictionary_create(nullptr, nullptr, 0));
     xpc_connection_send_message(connection.get(), dictionary.get());
     TestWebKitAPI::Util::run(&done);
 #endif

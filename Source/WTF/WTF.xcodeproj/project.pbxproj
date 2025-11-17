@@ -109,6 +109,7 @@
 		46A6D0DA2D8A168400FC76C8 /* MappedFileData.h in Headers */ = {isa = PBXBuildFile; fileRef = 46A6D0D72D8A168400FC76C8 /* MappedFileData.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		46B0FB5D2D24BFBA0012184C /* ParsingUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 46B0FB5C2D24BFBA0012184C /* ParsingUtilities.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		46B4C53C2D4F2D0A00BAA3FE /* NSStringExtras.h in Headers */ = {isa = PBXBuildFile; fileRef = 46B4C53B2D4F2D0A00BAA3FE /* NSStringExtras.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		46BD41CA2EC723B2002ED70B /* XPCObjectPtr.h in Headers */ = {isa = PBXBuildFile; fileRef = 46BD41C92EC723B2002ED70B /* XPCObjectPtr.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		46BEB6EB22FFE24900269867 /* RefCounted.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 46BEB6E922FFDDD500269867 /* RefCounted.cpp */; };
 		46BEB6EB22FFE24900269868 /* RefTrackerMixin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 46BEB6E922FFDDD500269868 /* RefTrackerMixin.cpp */; };
 		46CA183A2D83C17A00B68573 /* FileHandlePOSIX.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 46CA18392D83C17A00B68573 /* FileHandlePOSIX.cpp */; };
@@ -1318,6 +1319,7 @@
 		46B0FB5C2D24BFBA0012184C /* ParsingUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParsingUtilities.h; sourceTree = "<group>"; };
 		46B4C53B2D4F2D0A00BAA3FE /* NSStringExtras.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSStringExtras.h; sourceTree = "<group>"; };
 		46BA9EAB1F4CD61E009A2BBC /* CompletionHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompletionHandler.h; sourceTree = "<group>"; };
+		46BD41C92EC723B2002ED70B /* XPCObjectPtr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCObjectPtr.h; sourceTree = "<group>"; };
 		46BEB6E922FFDDD500269867 /* RefCounted.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RefCounted.cpp; sourceTree = "<group>"; };
 		46BEB6E922FFDDD500269868 /* RefTrackerMixin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RefTrackerMixin.cpp; sourceTree = "<group>"; };
 		46BEB6E922FFDDD50026DEAD /* RefTrackerMixin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RefTrackerMixin.h; sourceTree = "<group>"; };
@@ -2164,6 +2166,7 @@
 				53FC70CF23FB950C005B1990 /* OSLogPrintStream.mm */,
 				37C7CC291EA40A73007BD956 /* WeakLinking.h */,
 				44235FF62D76448F00F4A6CB /* XPCExtras.h */,
+				46BD41C92EC723B2002ED70B /* XPCObjectPtr.h */,
 			);
 			path = darwin;
 			sourceTree = "<group>";
@@ -3954,6 +3957,7 @@
 				FFE39CB02B1D7472004972B0 /* wuint.h in Headers */,
 				FF41AC672A79C9BA00AC0FA5 /* WYHash.h in Headers */,
 				44235FF72D76449300F4A6CB /* XPCExtras.h in Headers */,
+				46BD41CA2EC723B2002ED70B /* XPCObjectPtr.h in Headers */,
 				DDF306EA27C08654006A526F /* XPCSPI.h in Headers */,
 				E32B4F3D2E0C698F00BDA4FD /* XTSPI.h in Headers */,
 				145DE2882CE95CE700F9F1D2 /* ZippedRange.h in Headers */,

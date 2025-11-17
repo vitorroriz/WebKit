@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,36 +25,36 @@
 
 #pragma once
 
-#ifdef __cplusplus
+#include <wtf/OSObjectPtr.h>
+#include <wtf/spi/darwin/XPCSPI.h>
 
-#include <WebKit/WKBase.h>
-#include <wtf/darwin/XPCExtras.h>
-#include <wtf/darwin/XPCObjectPtr.h>
-#include <wtf/text/ASCIILiteral.h>
+namespace WTF {
 
-namespace WebKit {
-
-class XPCEndpoint {
-public:
-    WK_EXPORT XPCEndpoint();
-    virtual ~XPCEndpoint() = default;
-
-    WK_EXPORT void sendEndpointToConnection(xpc_connection_t);
-
-    WK_EXPORT XPCObjectPtr<xpc_endpoint_t> endpoint() const;
-
-    static constexpr auto xpcMessageNameKey = "message-name"_s;
-
-private:
-    virtual ASCIILiteral xpcEndpointMessageNameKey() const = 0;
-    virtual ASCIILiteral xpcEndpointMessageName() const = 0;
-    virtual ASCIILiteral xpcEndpointNameKey() const = 0;
-    virtual void handleEvent(xpc_connection_t, xpc_object_t) = 0;
-
-    XPCObjectPtr<xpc_connection_t> m_connection;
-    XPCObjectPtr<xpc_endpoint_t> m_endpoint;
+template<typename arcEnabled = ARCEnabled>
+struct XPCObjectRetainTraits {
+    static ALWAYS_INLINE void retain(xpc_object_t ptr)
+    {
+#if __has_feature(objc_arc)
+        UNUSED_PARAM(ptr);
+#else
+        xpc_retain(ptr);
+#endif
+    }
+    static ALWAYS_INLINE void release(xpc_object_t ptr)
+    {
+#if __has_feature(objc_arc)
+        UNUSED_PARAM(ptr);
+#else
+        xpc_release(ptr);
+#endif
+    }
 };
 
-}
+template<typename T> using XPCObjectPtr = OSObjectPtr<T, XPCObjectRetainTraits<ARCEnabled>>;
 
-#endif
+#define adoptXPCObject(x) adoptOSObject<decltype(x), XPCObjectRetainTraits<WTF::ARCEnabled>>(x)
+
+} // namespace WTF
+
+using WTF::XPCObjectPtr;
+using WTF::XPCObjectRetainTraits;

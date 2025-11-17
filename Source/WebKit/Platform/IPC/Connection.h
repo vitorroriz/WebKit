@@ -75,6 +75,7 @@
 #if OS(DARWIN)
 #include <mach/mach_port.h>
 #include <wtf/OSObjectPtr.h>
+#include <wtf/darwin/XPCObjectPtr.h>
 #include <wtf/spi/darwin/XPCSPI.h>
 #if HAVE(XPC_API)
 #include <xpc/xpc.h>
@@ -328,20 +329,20 @@ public:
             : port(port)
         {
         }
-        Identifier(mach_port_t port, OSObjectPtr<xpc_connection_t> xpcConnection)
+        Identifier(mach_port_t port, XPCObjectPtr<xpc_connection_t> xpcConnection)
             : port(port)
             , xpcConnection(WTFMove(xpcConnection))
         {
         }
         operator bool() const { return MACH_PORT_VALID(port); }
         mach_port_t port { MACH_PORT_NULL };
-        OSObjectPtr<xpc_connection_t> xpcConnection;
+        XPCObjectPtr<xpc_connection_t> xpcConnection;
 #endif
     };
 
 #if OS(DARWIN)
     xpc_connection_t xpcConnection() const { return m_xpcConnection.get(); }
-    OSObjectPtr<xpc_connection_t> protectedXPCConnection() const { return xpcConnection(); }
+    XPCObjectPtr<xpc_connection_t> protectedXPCConnection() const { return xpcConnection(); }
     std::optional<audit_token_t> getAuditToken();
     pid_t remoteProcessID() const;
 #endif
@@ -813,7 +814,7 @@ private:
 
     std::unique_ptr<MachMessage> m_pendingOutgoingMachMessage;
 
-    OSObjectPtr<xpc_connection_t> m_xpcConnection;
+    XPCObjectPtr<xpc_connection_t> m_xpcConnection;
     std::atomic<bool> m_didRequestProcessTermination { false };
     std::optional<audit_token_t> m_auditToken;
 #elif OS(WINDOWS)
