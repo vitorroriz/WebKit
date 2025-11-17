@@ -1102,7 +1102,7 @@ bool RenderGrid::isMasonry(Style::GridTrackSizingDirection direction) const
     auto& tracks = style().gridTemplateList(direction);
     if (auto* parentGrid = dynamicDowncast<RenderGrid>(parent()); parentGrid && tracks.subgrid)
         return parentGrid->isMasonry(direction);
-    if (style().display() != DisplayType::Masonry && style().display() != DisplayType::InlineMasonry)
+    if (style().display() != DisplayType::GridLanes && style().display() != DisplayType::InlineGridLanes)
         return false;
     return (direction == Style::GridTrackSizingDirection::Columns) == style().gridAutoFlow().isColumn();
 }

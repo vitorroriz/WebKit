@@ -634,7 +634,7 @@ constexpr bool RenderStyle::isDisplayDeprecatedFlexibleBox() const { return isDi
 constexpr bool RenderStyle::isDisplayFlexibleBoxIncludingDeprecatedOrGridBox() const { return isDisplayFlexibleOrGridBox() || isDisplayDeprecatedFlexibleBox(); }
 constexpr bool RenderStyle::isDisplayFlexibleOrGridBox() const { return isDisplayFlexibleOrGridBox(display()); }
 constexpr bool RenderStyle::isDisplayFlexibleOrGridBox(DisplayType display) { return isDisplayFlexibleBox(display) || isDisplayGridBox(display); }
-constexpr bool RenderStyle::isDisplayGridBox(DisplayType display) { return display == DisplayType::Grid || display == DisplayType::InlineGrid || display == DisplayType::Masonry || display == DisplayType::InlineMasonry; }
+constexpr bool RenderStyle::isDisplayGridBox(DisplayType display) { return display == DisplayType::Grid || display == DisplayType::InlineGrid || display == DisplayType::GridLanes || display == DisplayType::InlineGridLanes; }
 constexpr bool RenderStyle::isDisplayInlineType() const { return isDisplayInlineType(display()); }
 constexpr bool RenderStyle::isDisplayListItemType(DisplayType display) { return display == DisplayType::ListItem; }
 constexpr bool RenderStyle::isDisplayTableOrTablePart() const { return isDisplayTableOrTablePart(display()); }
@@ -1100,7 +1100,7 @@ constexpr bool RenderStyle::isDisplayBlockType(DisplayType display)
         || display == DisplayType::Flex
         || display == DisplayType::FlowRoot
         || display == DisplayType::Grid
-        || display == DisplayType::Masonry
+        || display == DisplayType::GridLanes
         || display == DisplayType::ListItem
         || display == DisplayType::Table
         || display == DisplayType::RubyBlock;
@@ -1113,7 +1113,7 @@ constexpr bool RenderStyle::isDisplayInlineType(DisplayType display)
         || display == DisplayType::InlineBox
         || display == DisplayType::InlineFlex
         || display == DisplayType::InlineGrid
-        || display == DisplayType::InlineMasonry
+        || display == DisplayType::InlineGridLanes
         || display == DisplayType::InlineTable
         || display == DisplayType::Ruby
         || display == DisplayType::RubyBase
