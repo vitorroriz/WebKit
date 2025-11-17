@@ -384,7 +384,7 @@ Modules/streams/ReadableStreamBYOBReader.cpp
 Modules/streams/ReadableStreamBYOBRequest.cpp
 Modules/streams/ReadableStreamDefaultReader.cpp
 Modules/streams/ReadableStreamReadRequest.cpp
-Modules/streams/ReadableStreamSink.cpp
+Modules/streams/ReadableStreamToSharedBufferSink.cpp
 Modules/streams/ReadableStreamSource.cpp
 Modules/streams/StreamPipeToUtilities.cpp @no-unify
 Modules/streams/StreamTeeUtilities.cpp
@@ -4701,7 +4701,6 @@ JSReadableStream.cpp
 JSReadableStreamDefaultController.cpp
 JSReadableStreamDefaultReader.cpp
 JSReadableStreamReadResult.cpp
-JSReadableStreamSink.cpp
 JSReadableStreamSource.cpp
 JSReadableStreamType.cpp
 JSRedEyeReduction.cpp

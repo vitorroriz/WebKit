@@ -274,13 +274,6 @@ void ReadableStream::cancel(Exception&& exception)
     cancel(*globalObject, jsException);
 }
 
-void ReadableStream::pipeTo(ReadableStreamSink& sink)
-{
-    // FIXME: support byte stream.
-    if (RefPtr internalReadableStream = m_internalReadableStream)
-        internalReadableStream->pipeTo(sink);
-}
-
 ReadableStream::State ReadableStream::state() const
 {
     if (RefPtr internalReadableStream = m_internalReadableStream)
@@ -302,10 +295,10 @@ ReadableStreamDefaultReader* ReadableStream::defaultReader()
 }
 
 // https://streams.spec.whatwg.org/#abstract-opdef-createreadablebytestream
-Ref<ReadableStream> ReadableStream::createReadableByteStream(JSDOMGlobalObject& globalObject, ReadableByteStreamController::PullAlgorithm&& pullAlgorithm, ReadableByteStreamController::CancelAlgorithm&& cancelAlgorithm, RefPtr<ReadableStream>&& relatedStreamForGC)
+Ref<ReadableStream> ReadableStream::createReadableByteStream(JSDOMGlobalObject& globalObject, ReadableByteStreamController::PullAlgorithm&& pullAlgorithm, ReadableByteStreamController::CancelAlgorithm&& cancelAlgorithm, RefPtr<ReadableStream>&& relatedStreamForGC, double highwaterMark, StartSynchronously startSynchronously)
 {
     Ref readableStream = adoptRef(*new ReadableStream(globalObject.protectedScriptExecutionContext().get(), { }, WTFMove(relatedStreamForGC)));
-    readableStream->setupReadableByteStreamController(globalObject, WTFMove(pullAlgorithm), WTFMove(cancelAlgorithm), 0);
+    readableStream->setupReadableByteStreamController(globalObject, WTFMove(pullAlgorithm), WTFMove(cancelAlgorithm), highwaterMark, startSynchronously);
     return readableStream;
 }
 
@@ -376,9 +369,13 @@ ExceptionOr<void> ReadableStream::setupReadableByteStreamControllerFromUnderlyin
     return m_controller->start(globalObject, underlyingSourceDict.start.get());
 }
 
-void ReadableStream::setupReadableByteStreamController(JSDOMGlobalObject& globalObject, ReadableByteStreamController::PullAlgorithm&& pullAlgorithm, ReadableByteStreamController::CancelAlgorithm&& cancelAlgorithm, double highWaterMark)
+void ReadableStream::setupReadableByteStreamController(JSDOMGlobalObject& globalObject, ReadableByteStreamController::PullAlgorithm&& pullAlgorithm, ReadableByteStreamController::CancelAlgorithm&& cancelAlgorithm, double highWaterMark, StartSynchronously startSynchronously)
 {
     lazyInitialize(m_controller, std::unique_ptr<ReadableByteStreamController>(new ReadableByteStreamController(*this, WTFMove(pullAlgorithm), WTFMove(cancelAlgorithm), highWaterMark, 0)));
+    if (startSynchronously == StartSynchronously::Yes) {
+        m_controller->didStart(globalObject);
+        return;
+    }
     m_controller->start(globalObject, nullptr);
 }
 

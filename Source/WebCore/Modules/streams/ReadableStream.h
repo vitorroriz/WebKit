@@ -91,8 +91,6 @@ public:
     void setDefaultReader(ReadableStreamDefaultReader*);
     ReadableStreamDefaultReader* defaultReader();
 
-    void pipeTo(ReadableStreamSink&);
-
     bool hasByteStreamController() { return !!m_controller; }
     ReadableByteStreamController* controller() { return m_controller.get(); }
     RefPtr<ReadableByteStreamController> protectedController() { return m_controller.get(); }
@@ -120,7 +118,8 @@ public:
 
     void visitAdditionalChildren(JSC::AbstractSlotVisitor&);
 
-    static Ref<ReadableStream> createReadableByteStream(JSDOMGlobalObject&, ReadableByteStreamController::PullAlgorithm&&, ReadableByteStreamController::CancelAlgorithm&&, RefPtr<ReadableStream>&& = { });
+    enum class StartSynchronously : bool { No, Yes };
+    static Ref<ReadableStream> createReadableByteStream(JSDOMGlobalObject&, ReadableByteStreamController::PullAlgorithm&&, ReadableByteStreamController::CancelAlgorithm&&, RefPtr<ReadableStream>&& = { }, double highwaterMark = 0, StartSynchronously = StartSynchronously::No);
 
     enum class Type : bool {
         Default,
@@ -137,7 +136,7 @@ protected:
 
 private:
     ExceptionOr<void> setupReadableByteStreamControllerFromUnderlyingSource(JSDOMGlobalObject&, JSC::JSValue, UnderlyingSource&&, double);
-    void setupReadableByteStreamController(JSDOMGlobalObject&, ReadableByteStreamController::PullAlgorithm&&, ReadableByteStreamController::CancelAlgorithm&&, double);
+    void setupReadableByteStreamController(JSDOMGlobalObject&, ReadableByteStreamController::PullAlgorithm&&, ReadableByteStreamController::CancelAlgorithm&&, double, StartSynchronously);
 
     bool m_disturbed { false };
     WeakPtr<ReadableStreamDefaultReader> m_defaultReader;

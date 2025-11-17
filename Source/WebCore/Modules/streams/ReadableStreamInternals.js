@@ -85,94 +85,6 @@ function createInternalReadableStreamFromUnderlyingSource(underlyingSource, stra
     return stream;
 }
 
-function readableStreamPipeThroughForBindings(thisStream, streams, options)
-{
-    "use strict";
-
-    @assert(@isReadableStream(thisStream));
-
-    const transforms = streams;
-
-    const readable = transforms["readable"];
-    const internalReadable = @getInternalReadableStream(readable);
-    if (!@isReadableStream(internalReadable))
-        throw @makeTypeError("readable should be ReadableStream");
-
-    const writable = transforms["writable"];
-    const internalWritable = @getInternalWritableStream(writable);
-    if (!@isWritableStream(internalWritable))
-        throw @makeTypeError("writable should be WritableStream");
-
-    let preventClose = false;
-    let preventAbort = false;
-    let preventCancel = false;
-    let signal;
-    if (!@isUndefinedOrNull(options)) {
-        if (!@isObject(options))
-            throw @makeTypeError("options must be an object");
-
-        preventAbort = !!options["preventAbort"];
-        preventCancel = !!options["preventCancel"];
-        preventClose = !!options["preventClose"];
-
-        signal = options["signal"];
-        if (signal !== @undefined && !@isAbortSignal(signal))
-            throw @makeTypeError("options.signal must be AbortSignal");
-    }
-
-    if (@isReadableStreamLocked(thisStream))
-        throw @makeTypeError("ReadableStream is locked");
-
-    if (@isWritableStreamLocked(internalWritable))
-        throw @makeTypeError("WritableStream is locked");
-
-    const promise = @readableStreamPipeToWritableStream(thisStream, internalWritable, preventClose, preventAbort, preventCancel, signal);
-    @markPromiseAsHandled(promise);
-
-    return readable;
-}
-
-function readableStreamPipeToForBindings(stream, destination, options)
-{
-    "use strict";
-
-    @assert(@isReadableStream(stream));
-
-    let preventClose = false;
-    let preventAbort = false;
-    let preventCancel = false;
-    let signal;
-    if (!@isUndefinedOrNull(options)) {
-        if (!@isObject(options))
-            return @promiseReject(@Promise, @makeTypeError("options must be an object"));
-
-        try {
-            preventAbort = !!options["preventAbort"];
-            preventCancel = !!options["preventCancel"];
-            preventClose = !!options["preventClose"];
-
-            signal = options["signal"];
-        } catch(e) {
-            return @promiseReject(@Promise, e);
-        }
-
-        if (signal !== @undefined && !@isAbortSignal(signal))
-            return @promiseReject(@Promise, @makeTypeError("options.signal must be AbortSignal"));
-    }
-
-    const internalDestination = @getInternalWritableStream(destination);
-    if (!@isWritableStream(internalDestination))
-        return @promiseReject(@Promise, @makeTypeError("ReadableStream pipeTo requires a WritableStream"));
-
-    if (@isReadableStreamLocked(stream))
-        return @promiseReject(@Promise, @makeTypeError("ReadableStream is locked"));
-
-    if (@isWritableStreamLocked(internalDestination))
-        return @promiseReject(@Promise, @makeTypeError("WritableStream is locked"));
-
-    return @readableStreamPipeToWritableStream(stream, internalDestination, preventClose, preventAbort, preventCancel, signal);
-}
-
 function createInternalReadableStreamDefaultReader(internalStream)
 {
     "use strict";
@@ -323,40 +235,12 @@ function readableStreamDefaultControllerError(controller, error)
     @readableStreamError(stream, error);
 }
 
-function readableStreamPipeTo(stream, sink)
-{
-    "use strict";
-    @assert(@isReadableStream(stream));
-
-    const reader = @acquireReadableStreamDefaultReader(stream);
-
-    @getByIdDirectPrivate(reader, "closedPromiseCapability").promise.@then(() => { }, (e) => { sink.error(e); });
-
-    function doPipe() {
-        @readableStreamDefaultReaderRead(reader).@then(function(result) {
-            if (result.done) {
-                sink.close();
-                return;
-            }
-            try {
-                sink.enqueue(result.value);
-            } catch (e) {
-                sink.error("ReadableStream chunk enqueueing in the sink failed");
-                return;
-            }
-            doPipe();
-        }, function(e) {
-            sink.error(e);
-        });
-    }
-    doPipe();
-}
-
 function acquireReadableStreamDefaultReader(stream)
 {
     return @createInternalReadableStreamDefaultReader(stream);
 }
 
+<<<<<<< HEAD
 // FIXME: Replace readableStreamPipeTo by below function.
 // This method implements the latest https://streams.spec.whatwg.org/#readable-stream-pipe-to.
 function readableStreamPipeToWritableStream(source, destination, preventClose, preventAbort, preventCancel, signal)
@@ -603,6 +487,8 @@ function pipeToFinalize(pipeState)
         pipeState.promiseCapability.resolve.@call();
 }
 
+=======
+>>>>>>> 1f470baff480 (Implement byte stream support for fetch responses)
 function readableStreamTee(stream, shouldClone)
 {
     "use strict";

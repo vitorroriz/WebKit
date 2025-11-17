@@ -283,20 +283,17 @@ void FetchBody::convertReadableStreamToArrayBuffer(FetchBodyOwner& owner, Comple
     ASSERT(hasReadableStream());
 
     checkedConsumer()->extract(*protectedReadableStream(), [owner = Ref { owner }, data = SharedBufferBuilder(), completionHandler = WTFMove(completionHandler)](auto&& result) mutable {
-        if (result.hasException()) {
-            completionHandler(result.releaseException());
-            return;
-        }
-
-        if (auto* chunk = result.returnValue()) {
-            data.append(*chunk);
-            return;
-        }
-
-        if (RefPtr arrayBuffer = data.takeAsArrayBuffer())
-            owner->body().m_data = *arrayBuffer;
-
-        completionHandler({ });
+        WTF::switchOn(WTFMove(result), [&](std::nullptr_t) {
+            if (RefPtr arrayBuffer = data.takeAsArrayBuffer())
+                owner->body().m_data = *arrayBuffer;
+            completionHandler({ });
+        }, [&](std::span<const uint8_t>&& chunk) {
+            data.append(chunk);
+        }, [&](JSC::JSValue) {
+            completionHandler(Exception { ExceptionCode::TypeError, "Load failed"_s });
+        }, [&](Exception&& error) {
+            completionHandler(WTFMove(error));
+        });
     });
 }
 

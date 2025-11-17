@@ -31,7 +31,7 @@
 #include "FetchBodySource.h"
 #include "FormDataConsumer.h"
 #include <WebCore/JSDOMPromiseDeferredForward.h>
-#include <WebCore/ReadableStreamSink.h>
+#include <WebCore/ReadableStreamToSharedBufferSink.h>
 #include <WebCore/ScriptExecutionContextIdentifier.h>
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/UserGestureIndicator.h>

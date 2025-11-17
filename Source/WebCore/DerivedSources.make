@@ -640,7 +640,6 @@ JS_BINDING_IDLS := \
     $(WebCore)/Modules/streams/ReadableStreamDefaultController.idl \
     $(WebCore)/Modules/streams/ReadableStreamDefaultReader.idl \
     $(WebCore)/Modules/streams/ReadableStreamReadResult.idl \
-    $(WebCore)/Modules/streams/ReadableStreamSink.idl \
     $(WebCore)/Modules/streams/ReadableStreamSource.idl \
     $(WebCore)/Modules/streams/ReadableStreamType.idl \
     $(WebCore)/Modules/streams/StreamPipeOptions.idl \

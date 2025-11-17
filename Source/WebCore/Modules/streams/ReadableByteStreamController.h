@@ -64,6 +64,8 @@ public:
 
     ExceptionOr<void> start(JSDOMGlobalObject&, UnderlyingSourceStartCallback*);
 
+    void respondPendingPullIntosOnClose(JSDOMGlobalObject&);
+
     ReadableStream& stream();
     Ref<ReadableStream> protectedStream();
 

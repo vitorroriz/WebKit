@@ -894,7 +894,6 @@ $(PROJECT_DIR)/Modules/streams/ReadableStreamDefaultReader.idl
 $(PROJECT_DIR)/Modules/streams/ReadableStreamDefaultReader.js
 $(PROJECT_DIR)/Modules/streams/ReadableStreamInternals.js
 $(PROJECT_DIR)/Modules/streams/ReadableStreamReadResult.idl
-$(PROJECT_DIR)/Modules/streams/ReadableStreamSink.idl
 $(PROJECT_DIR)/Modules/streams/ReadableStreamSource.idl
 $(PROJECT_DIR)/Modules/streams/ReadableStreamType.idl
 $(PROJECT_DIR)/Modules/streams/StreamInternals.js

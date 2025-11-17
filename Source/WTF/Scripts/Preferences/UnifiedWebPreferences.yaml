@@ -6418,6 +6418,20 @@ ReadableByteStreamAPIEnabled:
     WebKit:
       default: false
 
+ReadableByteStreamFetchSourceEnabled:
+  type: bool
+  status: unstable
+  category: dom
+  humanReadableName: "ReadableByteStream for fetch API"
+  humanReadableDescription: "Enable Readable Byte Streams for fetch API"
+  defaultValue:
+    WebCore:
+      default: false
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+
 RemoteMediaSessionManagerEnabled:
   type: bool
   status: unstable

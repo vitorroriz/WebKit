@@ -2574,8 +2574,6 @@ $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSReadableStreamDefaultReader.cpp
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSReadableStreamDefaultReader.h
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSReadableStreamReadResult.cpp
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSReadableStreamReadResult.h
-$(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSReadableStreamSink.cpp
-$(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSReadableStreamSink.h
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSReadableStreamSource.cpp
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSReadableStreamSource.h
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSReadableStreamType.cpp
