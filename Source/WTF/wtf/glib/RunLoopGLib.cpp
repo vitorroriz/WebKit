@@ -175,6 +175,7 @@ void RunLoop::observeActivity(const Ref<ActivityObserver>& observer)
         Locker locker { m_activityObserversLock };
         ASSERT(!m_activityObservers.contains(observer));
         m_activityObservers.append(observer);
+        m_activities.add(observer->activities());
 
         if (m_activityObservers.size() > 1) {
             // We use bubble sort here because the input is always sorted already. See BubbleSort.h.
@@ -192,6 +193,7 @@ void RunLoop::unobserveActivity(const Ref<ActivityObserver>& observer)
     Locker locker { m_activityObserversLock };
     ASSERT(m_activityObservers.contains(observer));
     m_activityObservers.removeFirst(observer);
+    m_activities.remove(observer->activities());
 }
 
 void RunLoop::notifyActivity(Activity activity)
@@ -201,6 +203,9 @@ void RunLoop::notifyActivity(Activity activity)
     {
         Locker locker { m_activityObserversLock };
         if (m_activityObservers.isEmpty())
+            return;
+
+        if (!m_activities.contains(activity))
             return;
 
         for (Ref observer : m_activityObservers) {

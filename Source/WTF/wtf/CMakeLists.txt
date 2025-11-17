@@ -207,6 +207,7 @@ set(WTF_PUBLIC_HEADERS
     ObjCRuntimeExtras.h
     ObjectIdentifier.h
     Observer.h
+    OptionCountedSet.h
     OptionSet.h
     OptionalOrReference.h
     OptionSetHash.h
