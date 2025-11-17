@@ -679,7 +679,7 @@ size_t ObjectBase::memoryCostImpl() const
 {
     size_t memoryCost = sizeof(*this);
     for (const auto& entry : m_map)
-        memoryCost += entry.key.sizeInBytes() + entry.value->memoryCost();
+        memoryCost += entry.key.sizeInBytes() + Ref { entry.value }->memoryCost();
     return memoryCost;
 }
 
@@ -755,7 +755,7 @@ void ObjectBase::writeJSONImpl(StringBuilder& output) const
             output.append(',');
         output.appendQuotedJSONString(findResult->key);
         output.append(':');
-        findResult->value->writeJSON(output);
+        Ref { findResult->value }->writeJSON(output);
     }
     output.append('}');
 }
