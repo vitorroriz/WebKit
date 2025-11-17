@@ -8400,6 +8400,7 @@ UseAVCaptureDeviceRotationCoordinatorAPI:
 UseAppKitGestures:
   type: bool
   status: internal
+  defaultsOverridable: true
   humanReadableName: "AppKit Gestures"
   humanReadableDescription: "Use AppKit Gestures"
   condition: PLATFORM(MAC)
