@@ -192,11 +192,12 @@ void CtapAuthenticator::continueMakeCredentialAfterCheckExcludedCredentials(bool
 {
     Vector<uint8_t> cborCmd;
     auto& options = std::get<PublicKeyCredentialCreationOptions>(requestData().options);
-    Vector<PublicKeyCredentialDescriptor> overrideExcludeCredentials;
+    std::optional<Vector<PublicKeyCredentialDescriptor>> overrideExcludeCredentials;
     if (includeCurrentBatch) {
         ASSERT(m_currentBatch < m_batches.size());
         overrideExcludeCredentials = m_batches[m_currentBatch];
-    }
+    } else if (!m_batches.isEmpty())
+        overrideExcludeCredentials = Vector<PublicKeyCredentialDescriptor> { };
     auto internalUVAvailability = m_info.options().userVerificationAvailability();
     auto residentKeyAvailability = m_info.options().residentKeyAvailability();
     if (options.authenticatorSelection && options.authenticatorSelection->userVerification() == UserVerificationRequirement::Required && !isUVSetup()) {
