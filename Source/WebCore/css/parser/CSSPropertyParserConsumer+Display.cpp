@@ -56,7 +56,7 @@ RefPtr<CSSValue> consumeDisplay(CSSParserTokenRange& range, CSS::PropertyParserS
 
     // Parse single keyword values
     auto singleKeyword = [&]() {
-        if (state.context.itemPackCollapseDisplayGridEnabled && range.peek().id() == CSSValueInlineMasonry)
+        if (state.context.gridLanesEnabled && range.peek().id() == CSSValueInlineMasonry)
             return consumeIdent(range);
         return consumeIdent<
             // <display-box>
@@ -124,7 +124,7 @@ RefPtr<CSSValue> consumeDisplay(CSSParserTokenRange& range, CSS::PropertyParserS
             break;
         // <display-inside>
         case CSSValueMasonry:
-            if (!state.context.itemPackCollapseDisplayGridEnabled)
+            if (!state.context.gridLanesEnabled)
                 return nullptr;
             [[fallthrough]];
         case CSSValueFlex:

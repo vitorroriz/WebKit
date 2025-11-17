@@ -89,7 +89,7 @@ CSSParserContext::CSSParserContext(const Document& document, const URL& sheetBas
 #if HAVE(CORE_ANIMATION_SEPARATED_LAYERS)
     , cssTransformStyleSeparatedEnabled { document.settings().cssTransformStyleSeparatedEnabled() }
 #endif
-    , itemPackCollapseDisplayGridEnabled { document.settings().itemPackCollapseDisplayGridEnabled() }
+    , gridLanesEnabled { document.settings().gridLanesEnabled() }
     , cssAppearanceBaseEnabled { document.settings().cssAppearanceBaseEnabled() }
     , cssPaintingAPIEnabled { document.settings().cssPaintingAPIEnabled() }
     , cssShapeFunctionEnabled { document.settings().cssShapeFunctionEnabled() }
@@ -132,7 +132,7 @@ void add(Hasher& hasher, const CSSParserContext& context)
 #if HAVE(CORE_ANIMATION_SEPARATED_LAYERS)
         | context.cssTransformStyleSeparatedEnabled         << 5
 #endif
-        | context.itemPackCollapseDisplayGridEnabled        << 6
+        | context.gridLanesEnabled                          << 6
         | context.cssAppearanceBaseEnabled                  << 7
         | context.cssPaintingAPIEnabled                     << 8
         | context.cssShapeFunctionEnabled                   << 9

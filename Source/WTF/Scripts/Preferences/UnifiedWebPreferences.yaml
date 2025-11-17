@@ -3459,6 +3459,20 @@ GridFormattingContextIntegrationEnabled:
     WebCore:
       default: true
 
+GridLanesEnabled:
+  type: bool
+  status: preview
+  category: css
+  humanReadableName: "CSS display: grid-lanes"
+  humanReadableDescription: "Enable CSS display: grid-lanes"
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+
 HTMLEnhancedSelectParsingEnabled:
    type: bool
    status: stable
@@ -4276,20 +4290,6 @@ IsThirdPartyCookieBlockingDisabled:
   category: privacy
   humanReadableName: "Disable Full 3rd-Party Cookie Blocking (ITP)"
   humanReadableDescription: "Disable full third-party cookie blocking when Intelligent Tracking Prevention is enabled"
-  defaultValue:
-    WebKitLegacy:
-      default: false
-    WebKit:
-      default: false
-    WebCore:
-      default: false
-
-ItemPackCollapseDisplayGridEnabled:
-  type: bool
-  status: preview
-  category: css
-  humanReadableName: "CSS Item Pack Collapse (display: grid)"
-  humanReadableDescription: "Enable CSS Item Pack Collapse for CSS Grid"
   defaultValue:
     WebKitLegacy:
       default: false
