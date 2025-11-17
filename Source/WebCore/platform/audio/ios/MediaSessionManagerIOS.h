@@ -45,7 +45,7 @@ extern NSString *WebUIApplicationDidEnterBackgroundNotification;
 
 namespace WebCore {
 
-class MediaSessionManageriOS
+class WEBCORE_EXPORT MediaSessionManageriOS
     : public MediaSessionManagerCocoa
     , public MediaSessionHelperClient
     , public AudioSessionInterruptionObserver {
@@ -82,9 +82,7 @@ private:
     void activeVideoRouteDidChange(SupportsAirPlayVideo, Ref<MediaPlaybackTarget>&&) final;
     void isPlayingToAutomotiveHeadUnitDidChange(PlayingToAutomotiveHeadUnit) final;
     void activeAudioRouteSupportsSpatialPlaybackDidChange(SupportsSpatialAudioPlayback) final;
-#if !RELEASE_LOG_DISABLED
-    ASCIILiteral logClassName() const final { return "MediaSessionManageriOS"_s; }
-#endif
+    ASCIILiteral logClassName() const override;
 
 #if !PLATFORM(WATCHOS)
     RefPtr<MediaPlaybackTarget> m_playbackTarget;
@@ -93,6 +91,8 @@ private:
 
     bool m_isMonitoringWirelessRoutes { false };
 };
+
+inline ASCIILiteral MediaSessionManageriOS::logClassName() const { return "MediaSessionManageriOS"_s; }
 
 } // namespace WebCore
 

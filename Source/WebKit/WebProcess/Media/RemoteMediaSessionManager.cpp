@@ -29,6 +29,7 @@
 #if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
 
 #include "Logging.h"
+#include "MessageSenderInlines.h"
 #include "RemoteMediaSessionManagerMessages.h"
 #include "RemoteMediaSessionManagerProxyMessages.h"
 #include "RemoteMediaSessionState.h"
@@ -44,37 +45,7 @@ namespace WebKit {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteMediaSessionManager);
 
-static RemoteMediaSessionState platformSessionState(const WebCore::PlatformMediaSessionInterface& session)
-{
-    return {
-        .sessionIdentifier = session.mediaSessionIdentifier(),
-#if !RELEASE_LOG_DISABLED
-        .logIdentifier = session.logIdentifier(),
-#endif
-        .mediaType = session.mediaType(),
-        .presentationType = session.presentationType(),
-        .displayType = session.displayType(),
-
-        .duration = session.duration(),
-
-        .groupIdentifier = session.mediaSessionGroupIdentifier(),
-        .nowPlayingInfo = session.nowPlayingInfo(),
-
-        .shouldOverrideBackgroundLoadingRestriction = session.shouldOverrideBackgroundLoadingRestriction(),
-        .isPlayingToWirelessPlaybackTarget = session.isPlayingToWirelessPlaybackTarget(),
-        .isPlayingOnSecondScreen = session.isPlayingOnSecondScreen(),
-        .hasMediaStreamSource = session.hasMediaStreamSource(),
-        .shouldOverridePauseDuringRouteChange = session.shouldOverridePauseDuringRouteChange(),
-        .isNowPlayingEligible = session.isNowPlayingEligible(),
-        .canProduceAudio = session.canProduceAudio(),
-        .isSuspended = session.isSuspended(),
-        .isPlaying = session.isPlaying(),
-        .isAudible = session.isAudible(),
-        .isEnded = session.isEnded(),
-        .canReceiveRemoteControlCommands = session.canReceiveRemoteControlCommands(),
-        .supportsSeeking = session.supportsSeeking(),
-    };
-}
+WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteMediaSessionState);
 
 RefPtr<RemoteMediaSessionManager> RemoteMediaSessionManager::create(WebPage& topPage, WebPage& localPage)
 {
@@ -101,27 +72,164 @@ RemoteMediaSessionManager::~RemoteMediaSessionManager()
 void RemoteMediaSessionManager::addSession(WebCore::PlatformMediaSessionInterface& session)
 {
     PlatformMediaSessionManager::addSession(session);
-    send(Messages::RemoteMediaSessionManagerProxy::AddSession(platformSessionState(session)));
+    send(Messages::RemoteMediaSessionManagerProxy::AddMediaSession(currentSessionState(session)));
 }
 
 void RemoteMediaSessionManager::removeSession(WebCore::PlatformMediaSessionInterface& session)
 {
     PlatformMediaSessionManager::removeSession(session);
-    send(Messages::RemoteMediaSessionManagerProxy::RemoveSession(platformSessionState(session)));
+
+    if (!m_cachedSessionState.contains(session.mediaSessionIdentifier()))
+        return;
+
+    m_cachedSessionState.remove(session.mediaSessionIdentifier());
+
+    send(Messages::RemoteMediaSessionManagerProxy::RemoveMediaSession(currentSessionState(session)));
 }
 
 void RemoteMediaSessionManager::setCurrentSession(WebCore::PlatformMediaSessionInterface& session)
 {
     ALWAYS_LOG(LOGIDENTIFIER, session.logIdentifier(), ", size = ", sessions().computeSize());
     PlatformMediaSessionManager::setCurrentSession(session);
-    send(Messages::RemoteMediaSessionManagerProxy::SetCurrentSession(platformSessionState(session)));
+
+    send(Messages::RemoteMediaSessionManagerProxy::SetCurrentMediaSession(currentSessionState(session)));
 }
 
 void RemoteMediaSessionManager::updateSessionState()
 {
-    send(Messages::RemoteMediaSessionManagerProxy::UpdateSessionState());
+    send(Messages::RemoteMediaSessionManagerProxy::UpdateMediaSessionState());
 }
 
+RefPtr<WebCore::PlatformMediaSessionInterface> RemoteMediaSessionManager::sessionWithIdentifier(WebCore::MediaSessionIdentifier identifier)
+{
+    return firstSessionMatching([identifier](auto& session) {
+        return session.mediaSessionIdentifier() == identifier;
+    }).get();
+}
+
+void RemoteMediaSessionManager::clientShouldResumeAutoplaying(WebCore::MediaSessionIdentifier identifier)
+{
+    if (RefPtr session = sessionWithIdentifier(identifier))
+        session->checkedClient()->resumeAutoplaying();
+}
+
+void RemoteMediaSessionManager::clientMayResumePlayback(WebCore::MediaSessionIdentifier identifier, bool shouldResume)
+{
+    if (RefPtr session = sessionWithIdentifier(identifier))
+        session->checkedClient()->mayResumePlayback(shouldResume);
+}
+
+void RemoteMediaSessionManager::clientShouldSuspendPlayback(WebCore::MediaSessionIdentifier identifier)
+{
+    if (RefPtr session = sessionWithIdentifier(identifier))
+        session->checkedClient()->suspendPlayback();
+}
+
+void RemoteMediaSessionManager::clientSetShouldPlayToPlaybackTarget(WebCore::MediaSessionIdentifier identifier, bool shouldPlay)
+{
+    if (RefPtr session = sessionWithIdentifier(identifier))
+        session->checkedClient()->setShouldPlayToPlaybackTarget(shouldPlay);
+}
+
+void RemoteMediaSessionManager::clientDidReceiveRemoteControlCommand(WebCore::MediaSessionIdentifier identifier, WebCore::PlatformMediaSessionRemoteControlCommandType command, WebCore::PlatformMediaSessionRemoteCommandArgument argument)
+{
+    if (RefPtr session = sessionWithIdentifier(identifier))
+        session->checkedClient()->didReceiveRemoteControlCommand(command, argument);
+}
+
+RemoteMediaSessionState& RemoteMediaSessionManager::currentSessionState(const WebCore::PlatformMediaSessionInterface& session)
+{
+    auto addResult = m_cachedSessionState.ensure(session.mediaSessionIdentifier(), [&] {
+        return makeUniqueRef<RemoteMediaSessionState>(fullSessionState(session));
+    });
+
+    if (!addResult.isNewEntry)
+        updateCachedSessionState(session, addResult.iterator->value);
+
+    return addResult.iterator->value;
+}
+
+void RemoteMediaSessionManager::updateCachedSessionState(const WebCore::PlatformMediaSessionInterface& session, RemoteMediaSessionState& state)
+{
+    state.state = session.state();
+    state.stateToRestore = session.stateToRestore();
+    state.interruptionType = session.interruptionType();
+
+    state.duration = session.duration();
+
+    state.nowPlayingInfo = session.nowPlayingInfo();
+
+    state.shouldOverrideBackgroundLoadingRestriction = session.shouldOverrideBackgroundLoadingRestriction();
+    state.isPlayingToWirelessPlaybackTarget = session.isPlayingToWirelessPlaybackTarget();
+    state.isPlayingOnSecondScreen = session.isPlayingOnSecondScreen();
+    state.hasMediaStreamSource = session.hasMediaStreamSource();
+    state.shouldOverridePauseDuringRouteChange = session.shouldOverridePauseDuringRouteChange();
+    state.isNowPlayingEligible = session.isNowPlayingEligible();
+    state.canProduceAudio = session.canProduceAudio();
+    state.isSuspended = session.isSuspended();
+    state.isPlaying = session.isPlaying();
+    state.isAudible = session.isAudible();
+    state.isEnded = session.isEnded();
+    state.canReceiveRemoteControlCommands = session.canReceiveRemoteControlCommands();
+    state.supportsSeeking = session.supportsSeeking();
+    state.hasPlayedAudiblySinceLastInterruption = session.hasPlayedAudiblySinceLastInterruption();
+    state.isLongEnoughForMainContent = session.isLongEnoughForMainContent();
+    state.blockedBySystemInterruption = session.blockedBySystemInterruption();
+    state.activeAudioSessionRequired = session.activeAudioSessionRequired();
+    state.preparingToPlay = session.preparingToPlay();
+    state.isActiveNowPlayingSession = session.isActiveNowPlayingSession();
+
+#if PLATFORM(IOS_FAMILY)
+    state.requiresPlaybackTargetRouteMonitoring = session.requiresPlaybackTargetRouteMonitoring();
+#endif
+}
+
+RemoteMediaSessionState RemoteMediaSessionManager::fullSessionState(const WebCore::PlatformMediaSessionInterface& session)
+{
+    return {
+        .pageIdentifier = m_localPageID,
+        .sessionIdentifier = session.mediaSessionIdentifier(),
+#if !RELEASE_LOG_DISABLED
+        .logIdentifier = session.logIdentifier(),
+#endif
+        .mediaType = session.mediaType(),
+        .presentationType = session.presentationType(),
+        .displayType = session.displayType(),
+
+        .state = session.state(),
+        .stateToRestore = session.stateToRestore(),
+        .interruptionType = session.interruptionType(),
+
+        .duration = session.duration(),
+
+        .groupIdentifier = session.mediaSessionGroupIdentifier(),
+        .nowPlayingInfo = session.nowPlayingInfo(),
+
+        .shouldOverrideBackgroundLoadingRestriction = session.shouldOverrideBackgroundLoadingRestriction(),
+        .isPlayingToWirelessPlaybackTarget = session.isPlayingToWirelessPlaybackTarget(),
+        .isPlayingOnSecondScreen = session.isPlayingOnSecondScreen(),
+        .hasMediaStreamSource = session.hasMediaStreamSource(),
+        .shouldOverridePauseDuringRouteChange = session.shouldOverridePauseDuringRouteChange(),
+        .isNowPlayingEligible = session.isNowPlayingEligible(),
+        .canProduceAudio = session.canProduceAudio(),
+        .isSuspended = session.isSuspended(),
+        .isPlaying = session.isPlaying(),
+        .isAudible = session.isAudible(),
+        .isEnded = session.isEnded(),
+        .canReceiveRemoteControlCommands = session.canReceiveRemoteControlCommands(),
+        .supportsSeeking = session.supportsSeeking(),
+        .hasPlayedAudiblySinceLastInterruption = session.hasPlayedAudiblySinceLastInterruption(),
+        .isLongEnoughForMainContent = session.isLongEnoughForMainContent(),
+        .blockedBySystemInterruption = session.blockedBySystemInterruption(),
+        .activeAudioSessionRequired = session.activeAudioSessionRequired(),
+        .preparingToPlay = session.preparingToPlay(),
+        .isActiveNowPlayingSession = session.isActiveNowPlayingSession(),
+
+#if PLATFORM(IOS_FAMILY)
+        .requiresPlaybackTargetRouteMonitoring = session.requiresPlaybackTargetRouteMonitoring(),
+#endif
+    };
+}
 IPC::Connection* RemoteMediaSessionManager::messageSenderConnection() const
 {
     return WebProcess::singleton().parentProcessConnection();
@@ -130,6 +238,11 @@ IPC::Connection* RemoteMediaSessionManager::messageSenderConnection() const
 uint64_t RemoteMediaSessionManager::messageSenderDestinationID() const
 {
     return m_topPageID.toUInt64();
+}
+
+std::optional<SharedPreferencesForWebProcess> RemoteMediaSessionManager::sharedPreferencesForWebProcess() const
+{
+    return WebProcess::singleton().sharedPreferencesForWebProcess();
 }
 
 } // namespace WebKit

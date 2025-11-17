@@ -30,6 +30,7 @@
 #include "MessageReceiver.h"
 #include "PlatformXRCoordinator.h"
 #include "ProcessThrottler.h"
+#include <WebCore/ExceptionData.h>
 #include <WebCore/PlatformXR.h>
 #include <WebCore/SecurityOriginData.h>
 #include <wtf/RefCounted.h>

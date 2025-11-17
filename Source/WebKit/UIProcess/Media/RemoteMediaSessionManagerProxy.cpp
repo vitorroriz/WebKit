@@ -28,11 +28,13 @@
 
 #if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
 
+#include "RemoteMediaSessionClientProxy.h"
 #include "RemoteMediaSessionManagerProxyMessages.h"
+#include "RemoteMediaSessionProxy.h"
 #include "RemoteMediaSessionState.h"
 #include "WebPage.h"
-#include "WebProcessProxy.h"
 #include <WebCore/NotImplemented.h>
+#include <WebCore/PlatformMediaSessionInterface.h>
 #include <WebCore/PlatformMediaSessionManager.h>
 #include <algorithm>
 #include <wtf/TZoneMallocInlines.h>
@@ -47,7 +49,8 @@ RefPtr<RemoteMediaSessionManagerProxy> RemoteMediaSessionManagerProxy::create(We
 }
 
 RemoteMediaSessionManagerProxy::RemoteMediaSessionManagerProxy(WebCore::PageIdentifier identifier, WebProcessProxy& process)
-    : m_process(process)
+    : REMOTE_MEDIA_SESSION_MANAGER_BASE_CLASS(identifier)
+    , m_process(process)
     , m_topPageID(identifier)
 {
     process.addMessageReceiver(Messages::RemoteMediaSessionManagerProxy::messageReceiverName(), m_topPageID, *this);
@@ -58,24 +61,41 @@ RemoteMediaSessionManagerProxy::~RemoteMediaSessionManagerProxy()
     m_process->removeMessageReceiver(Messages::RemoteMediaSessionManagerProxy::messageReceiverName(), m_topPageID);
 }
 
-void RemoteMediaSessionManagerProxy::addSession(RemoteMediaSessionState&&)
+void RemoteMediaSessionManagerProxy::addMediaSession(RemoteMediaSessionState&& state)
 {
-    notImplemented();
+    auto addResult = m_sessionProxies.ensure(state.sessionIdentifier, [&] {
+        return RemoteMediaSessionProxy::create(state, *this);
+    });
+
+    Ref session = addResult.iterator->value.get();
+    if (!addResult.isNewEntry)
+        session->updateState(state);
+
+    REMOTE_MEDIA_SESSION_MANAGER_BASE_CLASS::addSession(session);
 }
 
-void RemoteMediaSessionManagerProxy::removeSession(RemoteMediaSessionState&&)
+void RemoteMediaSessionManagerProxy::removeMediaSession(RemoteMediaSessionState&& state)
 {
-    notImplemented();
+    if (RefPtr session = findSession(state))
+        removeSession(*session);
 }
 
-void RemoteMediaSessionManagerProxy::setCurrentSession(RemoteMediaSessionState&&)
+void RemoteMediaSessionManagerProxy::setCurrentMediaSession(RemoteMediaSessionState&& state)
 {
-    notImplemented();
+    if (RefPtr session = findSession(state))
+        setCurrentSession(*session);
 }
 
-void RemoteMediaSessionManagerProxy::updateSessionState()
+void RemoteMediaSessionManagerProxy::updateMediaSessionState()
 {
-    notImplemented();
+    updateSessionState();
+}
+
+RefPtr<WebCore::PlatformMediaSessionInterface> RemoteMediaSessionManagerProxy::findSession(RemoteMediaSessionState& state)
+{
+    return firstSessionMatching([state](auto& session) {
+        return session.mediaSessionIdentifier() == state.sessionIdentifier;
+    }).get();
 }
 
 IPC::Connection* RemoteMediaSessionManagerProxy::messageSenderConnection() const
