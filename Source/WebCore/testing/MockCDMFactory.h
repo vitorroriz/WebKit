@@ -51,10 +51,13 @@ template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::MockCDM> : s
 
 namespace WebCore {
 
-class MockCDMFactory : public RefCountedAndCanMakeWeakPtr<MockCDMFactory>, private CDMFactory {
+class MockCDMFactory : public RefCounted<MockCDMFactory>, public CDMFactory {
 public:
     static Ref<MockCDMFactory> create() { return adoptRef(*new MockCDMFactory); }
     ~MockCDMFactory();
+
+    void ref() const final { RefCounted::ref(); }
+    void deref() const final { RefCounted::deref(); }
 
     const Vector<AtomString>& supportedDataTypes() const { return m_supportedDataTypes; }
     void setSupportedDataTypes(Vector<String>&&);

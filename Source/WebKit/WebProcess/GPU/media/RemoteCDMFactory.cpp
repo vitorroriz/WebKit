@@ -59,9 +59,9 @@ void RemoteCDMFactory::deref() const
     return m_webProcess->deref();
 }
 
-void RemoteCDMFactory::registerFactory(Vector<CDMFactory*>& factories)
+void RemoteCDMFactory::registerFactory(Vector<WeakRef<CDMFactory>>& factories)
 {
-    factories.append(this);
+    factories.append(*this);
 }
 
 ASCIILiteral RemoteCDMFactory::supplementName()

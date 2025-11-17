@@ -60,6 +60,10 @@ public:
 
     virtual ~CDMFactoryThunder() = default;
 
+    // Do nothing since this is a singleton object.
+    void ref() const final { }
+    void deref() const final { }
+
     std::unique_ptr<CDMPrivate> createCDM(const String& keySystem, const String& mediaKeysHashSalt, const CDMPrivateClient&) final;
     RefPtr<CDMProxy> createCDMProxy(const String&) final;
     bool supportsKeySystem(const String&) final;

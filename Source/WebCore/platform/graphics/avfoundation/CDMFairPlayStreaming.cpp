@@ -271,10 +271,10 @@ static const MemoryCompactLookupOnlyRobinHoodHashSet<AtomString>& validInitDataT
     return validTypes;
 }
 
-void CDMFactory::platformRegisterFactories(Vector<CDMFactory*>& factories)
+void CDMFactory::platformRegisterFactories(Vector<WeakRef<CDMFactory>>& factories)
 {
-    factories.append(&CDMFactoryClearKey::singleton());
-    factories.append(&CDMFactoryFairPlayStreaming::singleton());
+    factories.append(CDMFactoryClearKey::singleton());
+    factories.append(CDMFactoryFairPlayStreaming::singleton());
 
     static std::once_flag onceFlag;
     std::call_once(onceFlag, [] {
