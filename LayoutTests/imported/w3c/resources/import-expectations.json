@@ -98,6 +98,7 @@
     "web-platform-tests/css/css-lists": "import",
     "web-platform-tests/css/css-logical": "import",
     "web-platform-tests/css/css-masking": "import",
+    "web-platform-tests/css/css-masonry": "import",
     "web-platform-tests/css/css-mixins": "import",
     "web-platform-tests/css/css-multicol": "import",
     "web-platform-tests/css/css-namespaces": "import",
