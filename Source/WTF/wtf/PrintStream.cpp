@@ -35,7 +35,7 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
 
 namespace WTF {
 
-static constexpr size_t stringLengthThresholdToTriggerTruncation = 1000000;
+static constexpr size_t stringLengthThresholdToTriggerTruncation = 5000000;
 static constexpr size_t stringLengthToTruncateToForPrinting = 1000;
 
 PrintStream::PrintStream() = default;
