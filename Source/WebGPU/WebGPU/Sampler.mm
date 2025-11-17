@@ -176,7 +176,8 @@ static Sampler::UniqueSamplerIdentifier computeDescriptorHash(MTLSamplerDescript
     auto floatToUint32 = ^(float f) {
         return *reinterpret_cast<uint32_t*>(&f);
     };
-    return std::array<uint32_t, 4> { miscHash(descriptor), floatToUint32(descriptor.lodMinClamp), floatToUint32(descriptor.lodMaxClamp), floatToUint32(descriptor.maxAnisotropy) };
+    std::array<uint32_t, 4> uintData = { miscHash(descriptor), floatToUint32(descriptor.lodMinClamp), floatToUint32(descriptor.lodMaxClamp), floatToUint32(descriptor.maxAnisotropy) };
+    return base64EncodeToString(asByteSpan(std::span { uintData }));
 }
 
 static MTLSamplerDescriptor *createMetalDescriptorFromDescriptor(const WGPUSamplerDescriptor &descriptor)
@@ -240,7 +241,7 @@ Sampler::~Sampler()
 
     Locker locker { samplerStateLock };
     if (auto it = retainedSamplerStates->find(*m_samplerIdentifier); it != retainedSamplerStates->end()) {
-        it->value.apiSamplerList.remove(*m_samplerIdentifier);
+        it->value.apiSamplerList.remove(this);
         if (!it->value.apiSamplerList.size())
             retainedSamplerStates->remove(it);
     }
@@ -275,7 +276,7 @@ id<MTLSamplerState> Sampler::samplerState() const
     auto samplerIdentifier = *m_samplerIdentifier;
     if (auto it = retainedSamplerStates->find(samplerIdentifier); it != retainedSamplerStates->end()) {
         samplerState = it->value.samplerState.get();
-        it->value.apiSamplerList.add(samplerIdentifier);
+        it->value.apiSamplerList.add(this);
         lastAccessedKeys->appendOrMoveToLast(samplerIdentifier);
         if ((m_cachedSamplerState = samplerState))
             return samplerState;
@@ -306,7 +307,7 @@ id<MTLSamplerState> Sampler::samplerState() const
         .samplerState = samplerState,
         .apiSamplerList = { }
     });
-    addResult.iterator->value.apiSamplerList.add(samplerIdentifier);
+    addResult.iterator->value.apiSamplerList.add(this);
     lastAccessedKeys->appendOrMoveToLast(samplerIdentifier);
 
     m_cachedSamplerState = samplerState;
