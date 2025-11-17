@@ -870,7 +870,7 @@ class CheckOutSpecificRevision(shell.ShellCommand):
         return result
 
     def run(self):
-        self.command = ['git', 'checkout', self.getProperty('ews_revision')]
+        self.command = ['git', 'checkout', '--progress', self.getProperty('ews_revision')]
         return super().run()
 
 
@@ -1083,9 +1083,9 @@ class UpdateWorkingDirectory(steps.ShellSequence, ShellMixin):
         base = self.getProperty('github.base.ref', DEFAULT_BRANCH)
 
         commands = [
-            ['git', 'checkout', 'remotes/{}/{}'.format(remote, base), '-f'],
+            ['git', 'checkout', '--progress', 'remotes/{}/{}'.format(remote, base), '-f'],
             self.shell_command('git branch -D {} || {}'.format(base, self.shell_exit_0())),
-            ['git', 'checkout', '-b', base],
+            ['git', 'checkout', '--progress', '-b', base],
         ]
         if base != DEFAULT_BRANCH:
             commands.append(self.shell_command('git branch -D {} || {}'.format(DEFAULT_BRANCH, self.shell_exit_0())))
@@ -1199,7 +1199,7 @@ class CheckOutPullRequest(steps.ShellSequence, ShellMixin):
             self.shell_command(f'git remote add {remote} {GITHUB_URL}{project}.git || {self.shell_exit_0()}'),
             ['git', 'remote', 'set-url', remote, f'{GITHUB_URL}{project}.git'],
             ['git', 'fetch', remote, pr_branch],
-            ['git', 'checkout', '-b', pr_branch],
+            ['git', 'checkout', '--progress', '-b', pr_branch],
             ['git', 'cherry-pick', '--allow-empty', f'HEAD..remotes/{remote}/{pr_branch}'],
         ]
 
@@ -2905,7 +2905,7 @@ class RevertAppliedChanges(steps.ShellSequence):
             exclude_patterns.extend(('-e', pattern))
         for command in [
             ['git', 'clean', '-f', '-d'] + exclude_patterns,
-            ['git', 'checkout', self.getProperty('ews_revision') or self.getProperty('got_revision')],
+            ['git', 'checkout', '--progress', self.getProperty('ews_revision') or self.getProperty('got_revision')],
         ]:
             self.commands.append(util.ShellArg(command=command, logname='stdio'))
 
@@ -6208,7 +6208,7 @@ class CleanGitRepo(steps.ShellSequence, ShellMixin):
             self.shell_command('git am --abort || {}'.format(self.shell_exit_0())),
             self.shell_command('git cherry-pick --abort || {}'.format(self.shell_exit_0())),
             ['git', 'clean', '-f', '-d'],  # Remove any left-over layout test results, added files, etc.
-            ['git', 'checkout', '{}/{}'.format(self.git_remote, self.default_branch), '-f'],  # Checkout branch from specific remote
+            ['git', 'checkout', '--progress', '{}/{}'.format(self.git_remote, self.default_branch), '-f'],  # Checkout branch from specific remote
             ['git', 'branch', '-D', self.default_branch],  # Delete any local cache of the specified branch
             ['git', 'branch', self.default_branch],  # Create local instance of branch from remote, but don't track it
             self.shell_command("git branch | grep -v ' {}$' | grep -v 'HEAD detached at' | xargs git branch -D || {}".format(self.default_branch, self.shell_exit_0())),
@@ -6912,7 +6912,7 @@ class Canonicalize(steps.ShellSequence, ShellMixin, AddToLogMixin):
             commands += [['git', 'pull', remote, base_ref, '--rebase']]
             if head_ref:
                 commands += [['git', 'branch', '-f', base_ref, head_ref]]
-            commands += [['git', 'checkout', base_ref]]
+            commands += [['git', 'checkout', '--progress', base_ref]]
         commands.append(['python3', 'Tools/Scripts/git-webkit', 'canonicalize', '-n', str(self.number_commits_to_canonicalize())])
 
         if self.getProperty('github.number', ''):

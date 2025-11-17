@@ -287,7 +287,7 @@ class CheckOutSpecificRevision(shell.ShellCommand):
         return not self.doStepIf(step)
 
     def run(self):
-        self.command = ['git', 'checkout', self.getProperty('user_provided_git_hash')]
+        self.command = ['git', 'checkout', '--progress', self.getProperty('user_provided_git_hash')]
         return super().run()
 
 
