@@ -51,6 +51,7 @@
 #import "SampleMap.h"
 #import "SecurityOrigin.h"
 #import "TrackBuffer.h"
+#import "VP9UtilitiesCocoa.h"
 #import "VideoFrameCV.h"
 #import "VideoTrackPrivateWebM.h"
 #import "WebMResourceClient.h"
@@ -1189,7 +1190,7 @@ void MediaPlayerPrivateWebM::didParseInitializationData(InitializationSegment&& 
             // FIXME: Use downcast instead.
             auto track = unsafeRefPtrDowncast<VideoTrackPrivateWebM>(videoTrackInfo.track);
 #if PLATFORM(IOS_FAMILY)
-            if (shouldCheckHardwareSupport() && (videoTrackInfo.description->codec() == "vp8"_s || (videoTrackInfo.description->codec() == "vp9"_s && !(canLoad_VideoToolbox_VTIsHardwareDecodeSupported() && VTIsHardwareDecodeSupported(kCMVideoCodecType_VP9))))) {
+            if (shouldCheckHardwareSupport() && (videoTrackInfo.description->codec() == "vp8"_s || (videoTrackInfo.description->codec() == "vp9"_s && !vp9HardwareDecoderAvailable()))) {
                 m_errored = true;
                 return;
             }
