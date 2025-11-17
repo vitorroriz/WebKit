@@ -84,12 +84,12 @@ private:
     static BorderBoxPositions performInlineAxisSelfAlignment(const PlacedGridItems&, const Vector<UsedMargins>&);
     static BorderBoxPositions performBlockAxisSelfAlignment(const PlacedGridItems&, const Vector<UsedMargins>&);
 
-    const GridFormattingContext& formattingContext() const { return m_gridFormattingContext.get(); }
+    const GridFormattingContext& formattingContext() const { return m_gridFormattingContext; }
 
     const ElementBox& gridContainer() const;
     const RenderStyle& gridContainerStyle() const;
 
-    const CheckedRef<const GridFormattingContext> m_gridFormattingContext;
+    const GridFormattingContext& m_gridFormattingContext;
 };
 
 }

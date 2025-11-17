@@ -356,7 +356,7 @@ std::pair<GridLayout::UsedInlineSizes, GridLayout::UsedBlockSizes> GridLayout::l
 
 const ElementBox& GridLayout::gridContainer() const
 {
-    return m_gridFormattingContext->root();
+    return m_gridFormattingContext.root();
 }
 
 const RenderStyle& GridLayout::gridContainerStyle() const
