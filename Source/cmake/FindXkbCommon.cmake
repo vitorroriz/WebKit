@@ -1,11 +1,6 @@
 # - Try to find libxkbcommon.
-# Once done, this will define
 #
-#  LIBXKBCOMMON_FOUND - system has libxkbcommon.
-#  LIBXKBCOMMON_INCLUDE_DIRS - the libxkbcommon include directories
-#  LIBXKBCOMMON_LIBRARIES - link these to use libxkbcommon.
-#
-# Copyright (C) 2014 Igalia S.L.
+# Copyright (C) 2014, 2025 Igalia S.L.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -28,9 +23,44 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#[=======================================================================[.rst:
+FindXkbCommon
+-------------
+
+Find the libxkbcommon headers and library.
+
+
+Imported Targets
+^^^^^^^^^^^^^^^^
+
+``XkbCommon::XkbCommon``
+  The libxkbcommon library, if found.
+
+Result Variables
+^^^^^^^^^^^^^^^^
+
+``XkbCommon_FOUND``
+  the if (the requested version of) libxkbcommon is available.
+
+#]=======================================================================]
+
+if (DEFINED XkbCommon_FIND_VERSION)
+    set(XkbCommon_PKG_CONFIG_SPEC "xkbcommon>=${XkbCommon_FIND_VERSION}")
+else ()
+    set(XkbCommon_PKG_CONFIG_SPEC "xkbcommon")
+endif ()
+
 find_package(PkgConfig QUIET)
-pkg_check_modules(LIBXKBCOMMON xkbcommon)
+pkg_check_modules(XkbCommon QUIET IMPORTED_TARGET "${XkbCommon_PKG_CONFIG_SPEC}")
+
+if (TARGET PkgConfig::XkbCommon AND NOT TARGET XkbCommon::XkbCommon)
+    add_library(XkbCommon::XkbCommon INTERFACE IMPORTED GLOBAL)
+    set_property(TARGET XkbCommon::XkbCommon PROPERTY
+        INTERFACE_LINK_LIBRARIES PkgConfig::XkbCommon
+    )
+endif ()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Libxkbcommon REQUIRED_VARS LIBXKBCOMMON_FOUND
-                                  FOUND_VAR LIBXKBCOMMON_FOUND)
+find_package_handle_standard_args(XkbCommon
+    REQUIRED_VARS XkbCommon_VERSION
+)
