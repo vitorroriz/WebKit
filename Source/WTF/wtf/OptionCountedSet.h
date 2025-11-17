@@ -31,7 +31,6 @@
 namespace WTF {
 
 template<typename E> class OptionCountedSet {
-    static_assert(std::is_enum<E>::value, "T is not an enum type");
 public:
     constexpr bool isEmpty() const { return m_optionSet.isEmpty(); }
 
