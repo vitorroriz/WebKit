@@ -71,7 +71,6 @@ list(APPEND WebCore_LIBRARIES
     ${ENCHANT_LIBRARIES}
     ${LIBSECRET_LIBRARIES}
     ${LIBTASN1_LIBRARIES}
-    ${HYPHEN_LIBRARIES}
     ${UPOWERGLIB_LIBRARIES}
     ${X11_X11_LIB}
     Cairo::Cairo
@@ -188,4 +187,8 @@ if (USE_GBM)
     list(APPEND WebCore_LIBRARIES GBM::GBM)
 elseif (USE_LIBDRM)
     list(APPEND WebCore_LIBRARIES LibDRM::LibDRM)
+endif ()
+
+if (USE_LIBHYPHEN)
+    list(APPEND WebCore_PRIVATE_LIBRARIES Hyphen::Hyphen)
 endif ()

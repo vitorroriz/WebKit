@@ -375,7 +375,7 @@ endif ()
 
 if (USE_LIBHYPHEN)
     find_package(Hyphen)
-    if (NOT HYPHEN_FOUND)
+    if (NOT Hyphen_FOUND)
        message(FATAL_ERROR "libhyphen is needed for USE_LIBHYPHEN.")
     endif ()
 endif ()
