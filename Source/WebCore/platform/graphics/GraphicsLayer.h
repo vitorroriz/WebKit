@@ -52,6 +52,7 @@
 #include <wtf/CheckedRef.h>
 #include <wtf/Function.h>
 #include <wtf/Platform.h>
+#include <wtf/RefCountedAndCanMakeWeakPtr.h>
 #include <wtf/TZoneMalloc.h>
 #include <wtf/TypeCasts.h>
 
@@ -277,7 +278,7 @@ protected:
 // GraphicsLayer is an abstraction for a rendering surface with backing store,
 // which may have associated transformation and animations.
 
-class GraphicsLayer : public RefCounted<GraphicsLayer> {
+class GraphicsLayer : public RefCountedAndCanMakeWeakPtr<GraphicsLayer> {
     WTF_MAKE_TZONE_ALLOCATED_EXPORT(GraphicsLayer, WEBCORE_EXPORT);
 public:
     // Enums from GraphicsLayerEnums.h:

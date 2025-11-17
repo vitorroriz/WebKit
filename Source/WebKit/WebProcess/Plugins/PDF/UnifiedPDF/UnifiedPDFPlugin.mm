@@ -808,7 +808,7 @@ void UnifiedPDFPlugin::paint(GraphicsContext& context, const IntRect&)
     paintPDFContent(nullptr, context, clipRect, protectedPresentationController()->visibleRow());
 }
 
-void UnifiedPDFPlugin::paintContents(const GraphicsLayer* layer, GraphicsContext& context, const FloatRect& clipRect, OptionSet<GraphicsLayerPaintBehavior>)
+void UnifiedPDFPlugin::paintContents(const GraphicsLayer& layer, GraphicsContext& context, const FloatRect& clipRect, OptionSet<GraphicsLayerPaintBehavior>)
 {
     // This scrollbar painting code is used in the non-UI-side compositing configuration.
     auto paintScrollbar = [](Scrollbar* scrollbar, GraphicsContext& context) {
@@ -821,17 +821,17 @@ void UnifiedPDFPlugin::paintContents(const GraphicsLayer* layer, GraphicsContext
         scrollbar->paint(context, scrollbarRect);
     };
 
-    if (layer == layerForHorizontalScrollbar()) {
+    if (&layer == layerForHorizontalScrollbar()) {
         paintScrollbar(m_horizontalScrollbar.get(), context);
         return;
     }
 
-    if (layer == layerForVerticalScrollbar()) {
+    if (&layer == layerForVerticalScrollbar()) {
         paintScrollbar(m_verticalScrollbar.get(), context);
         return;
     }
 
-    if (layer == layerForScrollCorner()) {
+    if (&layer == layerForScrollCorner()) {
         auto cornerRect = viewRelativeScrollCornerRect();
 
         GraphicsContextStateSaver stateSaver(context);
@@ -4829,9 +4829,9 @@ bool UnifiedPDFPlugin::shouldUseInProcessBackingStore() const
     return false;
 }
 
-bool UnifiedPDFPlugin::layerNeedsPlatformContext(const GraphicsLayer* layer) const
+bool UnifiedPDFPlugin::layerNeedsPlatformContext(const GraphicsLayer& layer) const
 {
-    return shouldUseInProcessBackingStore() && (layer == layerForHorizontalScrollbar() || layer == layerForVerticalScrollbar() || layer == layerForScrollCorner());
+    return shouldUseInProcessBackingStore() && (&layer == layerForHorizontalScrollbar() || &layer == layerForVerticalScrollbar() || &layer == layerForScrollCorner());
 }
 
 bool UnifiedPDFPlugin::delegatesScrollingToMainFrame() const

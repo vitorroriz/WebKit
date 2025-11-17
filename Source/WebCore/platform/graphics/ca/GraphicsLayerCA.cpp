@@ -2130,7 +2130,7 @@ void GraphicsLayerCA::platformCALayerLayerDisplay(PlatformCALayer* layer)
 
 bool GraphicsLayerCA::platformCALayerNeedsPlatformContext(const PlatformCALayer*) const
 {
-    return client().layerNeedsPlatformContext(this);
+    return client().layerNeedsPlatformContext(*this);
 }
 
 void GraphicsLayerCA::commitLayerTypeChangesBeforeSublayers(CommitState&, float pageScaleFactor, bool& layerTypeChanged)
@@ -4395,7 +4395,7 @@ void GraphicsLayerCA::updateContentsScale(float pageScaleFactor)
         tiledBacking()->setZoomedOutContentsScale(zoomedOutScale);
     }
 
-    if (auto customScale = client().customContentsScale(this))
+    if (auto customScale = client().customContentsScale(*this))
         contentsScale = *customScale;
 
     RefPtr layer = m_layer;

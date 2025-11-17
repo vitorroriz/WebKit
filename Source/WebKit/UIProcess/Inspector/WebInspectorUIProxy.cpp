@@ -455,7 +455,7 @@ void WebInspectorUIProxy::createFrontendPage()
     if (!inspectorPage)
         return;
 
-    trackInspectorPage(inspectorPage.get(), protectedInspectedPage().get());
+    trackInspectorPage(*inspectorPage, protectedInspectedPage().get());
 
     // Make sure the inspected page has a running WebProcess so we can inspect it.
     protectedInspectedPage()->launchInitialProcessIfNecessary();
@@ -610,7 +610,7 @@ void WebInspectorUIProxy::closeFrontendPageAndWindow()
     m_ignoreFirstBringToFront = false;
 
     RefPtr inspectorPage = m_inspectorPage.get();
-    untrackInspectorPage(inspectorPage.get());
+    untrackInspectorPage(*inspectorPage);
 
     Ref inspectorPageProcess = inspectorPage->legacyMainFrameProcess();
     inspectorPageProcess->send(Messages::WebInspectorUI::SetIsVisible(m_isVisible), inspectorPage->webPageIDInMainFrameProcess());

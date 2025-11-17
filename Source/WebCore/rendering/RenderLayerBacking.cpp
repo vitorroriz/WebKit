@@ -4119,7 +4119,7 @@ void RenderLayerBacking::paintDebugOverlays(const GraphicsLayer* graphicsLayer, 
 }
 
 // Up-call from compositing layer drawing callback.
-void RenderLayerBacking::paintContents(const GraphicsLayer* graphicsLayer, GraphicsContext& context, const FloatRect& clip, OptionSet<GraphicsLayerPaintBehavior> layerPaintBehavior)
+void RenderLayerBacking::paintContents(const GraphicsLayer& graphicsLayer, GraphicsContext& context, const FloatRect& clip, OptionSet<GraphicsLayerPaintBehavior> layerPaintBehavior)
 {
 #ifndef NDEBUG
     renderer().page().setIsPainting(true);
@@ -4142,17 +4142,17 @@ void RenderLayerBacking::paintContents(const GraphicsLayer* graphicsLayer, Graph
     IntRect dirtyRect = enclosingIntRect(adjustedClipRect);
 
     if (!layerPaintBehavior.contains(GraphicsLayerPaintBehavior::ForceSynchronousImageDecode)) {
-        if (!graphicsLayer->repaintCount())
+        if (!graphicsLayer.repaintCount())
             layerPaintBehavior.add(GraphicsLayerPaintBehavior::DefaultAsynchronousImageDecode);
     }
 
-    if (graphicsLayer == m_graphicsLayer.get()
-        || graphicsLayer == m_foregroundLayer.get()
-        || graphicsLayer == m_backgroundLayer.get()
-        || graphicsLayer == m_maskLayer.get()
-        || graphicsLayer == m_scrolledContentsLayer.get()) {
+    if (&graphicsLayer == m_graphicsLayer.get()
+        || &graphicsLayer == m_foregroundLayer.get()
+        || &graphicsLayer == m_backgroundLayer.get()
+        || &graphicsLayer == m_maskLayer.get()
+        || &graphicsLayer == m_scrolledContentsLayer.get()) {
 
-        if (!graphicsLayer->paintingPhase().contains(GraphicsLayerPaintingPhase::OverflowContents))
+        if (!graphicsLayer.paintingPhase().contains(GraphicsLayerPaintingPhase::OverflowContents))
             dirtyRect.intersect(enclosingIntRect(compositedBoundsIncludingMargin()));
 
         // We have to use the same root as for hit testing, because both methods can compute and cache clipRects.
@@ -4163,31 +4163,31 @@ void RenderLayerBacking::paintContents(const GraphicsLayer* graphicsLayer, Graph
             behavior.add(PaintBehavior::DefaultAsynchronousImageDecode);
 
 #if HAVE(SUPPORT_HDR_DISPLAY)
-        if (graphicsLayer->drawsHDRContent())
+        if (graphicsLayer.drawsHDRContent())
             behavior.add(PaintBehavior::DrawsHDRContent);
 #endif
 
-        paintIntoLayer(graphicsLayer, context, dirtyRect, behavior);
+        paintIntoLayer(&graphicsLayer, context, dirtyRect, behavior);
 
         auto visibleDebugOverlayRegions = OptionSet<DebugOverlayRegions>::fromRaw(renderer().settings().visibleDebugOverlayRegions());
         if (visibleDebugOverlayRegions.containsAny({ DebugOverlayRegions::TouchActionRegion, DebugOverlayRegions::EditableElementRegion, DebugOverlayRegions::WheelEventHandlerRegion, DebugOverlayRegions::InteractionRegion }))
-            paintDebugOverlays(graphicsLayer, context);
+            paintDebugOverlays(&graphicsLayer, context);
 
-    } else if (graphicsLayer == layerForHorizontalScrollbar()) {
+    } else if (&graphicsLayer == layerForHorizontalScrollbar()) {
         if (m_owningLayer.hasVisibleContent()) {
             auto* scrollableArea = m_owningLayer.scrollableArea();
             ASSERT(scrollableArea);
 
             paintScrollbar(scrollableArea->horizontalScrollbar(), context, dirtyRect);
         }
-    } else if (graphicsLayer == layerForVerticalScrollbar()) {
+    } else if (&graphicsLayer == layerForVerticalScrollbar()) {
         if (m_owningLayer.hasVisibleContent()) {
             auto* scrollableArea = m_owningLayer.scrollableArea();
             ASSERT(scrollableArea);
 
             paintScrollbar(scrollableArea->verticalScrollbar(), context, dirtyRect);
         }
-    } else if (graphicsLayer == layerForScrollCorner()) {
+    } else if (&graphicsLayer == layerForScrollCorner()) {
         auto* scrollableArea = m_owningLayer.scrollableArea();
         ASSERT(scrollableArea);
 

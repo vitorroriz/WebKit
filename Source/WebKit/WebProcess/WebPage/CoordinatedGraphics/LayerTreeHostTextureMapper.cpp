@@ -278,7 +278,7 @@ bool LayerTreeHost::enabled()
     return window() && m_rootCompositingLayer;
 }
 
-void LayerTreeHost::paintContents(const GraphicsLayer*, GraphicsContext& context, const FloatRect& rectToPaint, OptionSet<GraphicsLayerPaintBehavior>)
+void LayerTreeHost::paintContents(const GraphicsLayer&, GraphicsContext& context, const FloatRect& rectToPaint, OptionSet<GraphicsLayerPaintBehavior>)
 {
     context.save();
     context.clip(rectToPaint);
