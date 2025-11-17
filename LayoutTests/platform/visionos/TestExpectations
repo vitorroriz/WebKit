@@ -170,13 +170,13 @@ platform/visionos/transforms/separated.html [ Failure ]
 fast/forms/form-control-refresh [ Pass ]
 
 # webkit.org/b/300918 REGRESSION(298517@main, 299088@main): Added tests broken on visionOS 26
-fast/forms/form-control-refresh/accent-color-contrast-does-not-affect-inactive-window-dark-mode.html [ Failure ]
-fast/forms/form-control-refresh/accent-color-contrast-does-not-affect-inactive-window-light-mode.html [ Failure ]
-fast/forms/form-control-refresh/autofilled-and-obscured-text-input-dark-mode.html [ Failure ]
-fast/forms/form-control-refresh/autofilled-and-obscured-text-input-light-mode.html [ Failure ]
-fast/forms/form-control-refresh/autofilled-text-input-dark-mode.html [ Failure ]
-fast/forms/form-control-refresh/autofilled-text-input-light-mode.html [ Failure ]
-fast/forms/form-control-refresh/submit-button-appearance-matches-button-window-inactive.html [ Failure ]
+fast/forms/form-control-refresh/accent-color-contrast-does-not-affect-inactive-window-dark-mode.html [ ImageOnlyFailure ]
+fast/forms/form-control-refresh/accent-color-contrast-does-not-affect-inactive-window-light-mode.html [ ImageOnlyFailure ]
+fast/forms/form-control-refresh/autofilled-and-obscured-text-input-dark-mode.html [ ImageOnlyFailure ]
+fast/forms/form-control-refresh/autofilled-and-obscured-text-input-light-mode.html [ ImageOnlyFailure ]
+fast/forms/form-control-refresh/autofilled-text-input-dark-mode.html [ ImageOnlyFailure ]
+fast/forms/form-control-refresh/autofilled-text-input-light-mode.html [ ImageOnlyFailure ]
+fast/forms/form-control-refresh/submit-button-appearance-matches-button-window-inactive.html [ ImageOnlyFailure ]
 
 # Window inactive appearance is only used on macOS.
 fast/forms/form-control-refresh/checkbox-radio-inactive-appearance-dark-bg-light-color-scheme.html [ Skip ]
