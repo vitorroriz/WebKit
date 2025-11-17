@@ -26,6 +26,8 @@
 #pragma once
 
 #import <wtf/FastMalloc.h>
+#import <wtf/GenericHashKey.h>
+#import <wtf/Hasher.h>
 #import <wtf/ListHashSet.h>
 #import <wtf/Lock.h>
 #import <wtf/Ref.h>
@@ -44,7 +46,13 @@ class Device;
 class Sampler : public WGPUSamplerImpl, public RefCounted<Sampler> {
     WTF_MAKE_TZONE_ALLOCATED(Sampler);
 public:
-    using UniqueSamplerIdentifier = String;
+    using UniqueSamplerIdentifier = std::array<uint32_t, 4>;
+
+    inline void add(Hasher& hasher, const UniqueSamplerIdentifier& input)
+    {
+        for (auto value : input)
+            WTF::add(hasher, value);
+    }
 
     static Ref<Sampler> create(UniqueSamplerIdentifier&& samplerIdentifier, const WGPUSamplerDescriptor& descriptor, Device& device)
     {
@@ -79,13 +87,13 @@ private:
     const Ref<Device> m_device;
     // static is intentional here as the limit is per process
     static Lock samplerStateLock;
-    using CachedSamplerStateContainer = HashMap<UniqueSamplerIdentifier, WeakObjCPtr<id<MTLSamplerState>>>;
+    using CachedSamplerStateContainer = HashMap<GenericHashKey<UniqueSamplerIdentifier>, WeakObjCPtr<id<MTLSamplerState>>>;
     struct SamplerStateWithReferences {
         RetainPtr<id<MTLSamplerState>> samplerState;
-        HashSet<const Sampler*> apiSamplerList;
+        HashSet<GenericHashKey<UniqueSamplerIdentifier>> apiSamplerList;
     };
-    using RetainedSamplerStateContainer = HashMap<UniqueSamplerIdentifier, SamplerStateWithReferences>;
-    using CachedKeyContainer = ListHashSet<UniqueSamplerIdentifier>;
+    using RetainedSamplerStateContainer = HashMap<GenericHashKey<UniqueSamplerIdentifier>, SamplerStateWithReferences>;
+    using CachedKeyContainer = ListHashSet<GenericHashKey<UniqueSamplerIdentifier>>;
     static std::unique_ptr<CachedSamplerStateContainer> cachedSamplerStates WTF_GUARDED_BY_LOCK(samplerStateLock);
     static std::unique_ptr<RetainedSamplerStateContainer> retainedSamplerStates WTF_GUARDED_BY_LOCK(samplerStateLock);
     static std::unique_ptr<CachedKeyContainer> lastAccessedKeys;
