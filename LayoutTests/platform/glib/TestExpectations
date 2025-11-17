@@ -2147,6 +2147,7 @@ imported/w3c/web-platform-tests/html/semantics/embedded-content/the-canvas-eleme
 imported/w3c/web-platform-tests/html/semantics/embedded-content/the-img-element/adopt-from-image-document.html [ Pass ImageOnlyFailure ]
 
 fast/mediastream/camera-powerEfficient-track.html [ Failure ]
+fast/mediastream/multi-microphone.html [ Skip ]
 
 webkit.org/b/208182 fast/repaint/backgroundSizeRepaint.html [ ImageOnlyFailure Pass ]
 

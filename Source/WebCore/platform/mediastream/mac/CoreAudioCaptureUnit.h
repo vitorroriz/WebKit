@@ -162,7 +162,7 @@ private:
 #endif
     void resetSampleRate();
 
-    void willChangeCaptureDevice() final;
+    void willChangeCaptureDeviceTo(const String&) final;
 
     OSStatus configureSpeakerProc(int sampleRate);
     OSStatus configureMicrophoneProc(int sampleRate);

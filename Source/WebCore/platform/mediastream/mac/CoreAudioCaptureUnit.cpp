@@ -273,7 +273,7 @@ CoreAudioCaptureUnit::~CoreAudioCaptureUnit()
 #if PLATFORM(MAC)
 void CoreAudioCaptureUnit::setStoredVPIOUnit(StoredAudioUnit&& unit)
 {
-    RELEASE_LOG(WebRTC, "CoreAudioCaptureUnit::setStoredVPIOUnit");
+    RELEASE_LOG(WebRTC, "CoreAudioCaptureUnit::setStoredVPIOUnit(%p)", this);
 
     static constexpr Seconds delayBeforeStoredVPIOUnitDeallocation = 3_s;
     m_storedVPIOUnit = WTFMove(unit);
@@ -282,7 +282,7 @@ void CoreAudioCaptureUnit::setStoredVPIOUnit(StoredAudioUnit&& unit)
 
 CoreAudioCaptureUnit::StoredAudioUnit CoreAudioCaptureUnit::takeStoredVPIOUnit()
 {
-    RELEASE_LOG(WebRTC, "CoreAudioCaptureUnit::takeStoredVPIOUnit");
+    RELEASE_LOG(WebRTC, "CoreAudioCaptureUnit::takeStoredVPIOUnit(%p)", this);
 
     m_storedVPIOUnitDeallocationTimer.stop();
     return std::exchange(m_storedVPIOUnit, nullptr);
@@ -520,7 +520,7 @@ OSStatus CoreAudioCaptureUnit::configureSpeakerProc(int sampleRate)
 void CoreAudioCaptureUnit::checkTimestamps(const AudioTimeStamp& timeStamp, double hostTime)
 {
     if (!timeStamp.mSampleTime || timeStamp.mSampleTime == m_latestMicTimeStamp || !hostTime)
-        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::checkTimestamps: unusual timestamps, sample time = %f, previous sample time = %f, hostTime %f", timeStamp.mSampleTime, m_latestMicTimeStamp, hostTime);
+        RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit::checkTimestamps(%p): unusual timestamps, sample time = %f, previous sample time = %f, hostTime %f", this, timeStamp.mSampleTime, m_latestMicTimeStamp, hostTime);
 }
 #endif
 
@@ -953,8 +953,18 @@ void CoreAudioCaptureUnit::handleMuteStatusChangedNotification(bool isMuting)
         m_muteStatusChangedCallback(isMuting);
 }
 
-void CoreAudioCaptureUnit::willChangeCaptureDevice()
+void CoreAudioCaptureUnit::willChangeCaptureDeviceTo(const String& persistentId)
 {
+#if PLATFORM(MAC)
+    if (m_shouldUseVPIO) {
+        forEachClient([&persistentId](auto& client) {
+            client.vpioUnitWillChangeCaptureDeviceTo(persistentId);
+        });
+    }
+#else
+    UNUSED_PARAM(persistentId);
+#endif
+
     if (!m_voiceActivityDetectionEnabled)
         return;
 
