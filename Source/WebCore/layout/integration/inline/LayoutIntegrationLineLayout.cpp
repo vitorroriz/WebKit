@@ -220,7 +220,7 @@ static inline std::pair<LayoutRect, LayoutRect> toMarginAndBorderBoxVisualRect(c
     return { marginBoxVisualRect, borderBoxVisualRect };
 }
 
-static const InlineDisplay::Line& lastLineWithInlineContent(const InlineDisplay::Lines& lines)
+static const InlineDisplay::Line& lastLineWithInflowContent(const InlineDisplay::Lines& lines)
 {
     // Out-of-flow/float content only don't produce lines with inline content. They should not be taken into
     // account when computing content box height/baselines.
@@ -865,7 +865,7 @@ LayoutUnit LineLayout::contentLogicalHeight() const
         return { };
     }
 
-    auto contentHeight = lastLineWithInlineContent(lines).lineBoxLogicalRect().maxY() - lines.first().lineBoxLogicalRect().y();
+    auto contentHeight = lastLineWithInflowContent(lines).lineBoxLogicalRect().maxY() - lines.first().lineBoxLogicalRect().y();
     auto offsetAndGaps = m_inlineContent->firstLinePaginationOffset() + m_inlineContent->clearBeforeAfterGaps();
     return LayoutUnit { contentHeight + offsetAndGaps };
 }
@@ -906,7 +906,7 @@ LayoutUnit LineLayout::lastLineBaseline() const
         ASSERT_NOT_REACHED();
         return { };
     }
-    return baselineForLine(lastLineWithInlineContent(m_inlineContent->displayContent().lines));
+    return baselineForLine(lastLineWithInflowContent(m_inlineContent->displayContent().lines));
 }
 
 LayoutUnit LineLayout::baselineForLine(const InlineDisplay::Line& line) const
