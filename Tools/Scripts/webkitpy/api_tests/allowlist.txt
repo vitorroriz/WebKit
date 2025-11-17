@@ -366,7 +366,6 @@ TestWebKitAPI.Navigation
 TestWebKitAPI.Notification
 TestWebKitAPI.NowPlayingControlsTests
 TestWebKitAPI.NowPlayingInfoArtwork
-TestWebKitAPI.ObscuredContentInsets
 TestWebKitAPI.OverflowScrollViewTests
 TestWebKitAPI.PAL
 TestWebKitAPI.PDFSnapshot
