@@ -294,7 +294,7 @@ void WebPushDaemon::incomingPushTransactionTimerFired()
 
 static void tryCloseRequestConnection(xpc_object_t request)
 {
-    if (RetainPtr connection = xpc_dictionary_get_remote_connection(request))
+    if (XPCObjectPtr<xpc_connection_t> connection = xpc_dictionary_get_remote_connection(request))
         xpc_connection_cancel(connection.get());
 }
 
@@ -324,7 +324,7 @@ void WebPushDaemon::connectionEventHandler(xpc_object_t request)
         return;
     }
 
-    auto xpcConnection = OSObjectPtr { xpc_dictionary_get_remote_connection(request) };
+    XPCObjectPtr<xpc_connection_t> xpcConnection = xpc_dictionary_get_remote_connection(request);
     if (!xpcConnection)
         return;
 
@@ -416,8 +416,8 @@ void WebPushDaemon::updateSubscriptionSetState()
             auto bundleIdentifier = pushClientConnection->hostAppCodeSigningIdentifier();
             auto pushPartition = pushClientConnection->pushPartitionIfExists();
             if (bundleIdentifier != allowedBundleIdentifier || (!pushPartition.isEmpty() && !visibleWebClipIdentifiers.contains(pushPartition))) {
-                RELEASE_LOG(Push, "WebPushDaemon::updateSubscriptionSetState: killing obsolete connection %p associated with bundleIdentifier = %{public}s and pushPartition = %{public}s", xpcConnection, bundleIdentifier.ascii().data(), pushPartition.ascii().data());
-                xpc_connection_cancel(xpcConnection);
+                RELEASE_LOG(Push, "WebPushDaemon::updateSubscriptionSetState: killing obsolete connection %p associated with bundleIdentifier = %{public}s and pushPartition = %{public}s", xpcConnection.get(), bundleIdentifier.ascii().data(), pushPartition.ascii().data());
+                xpc_connection_cancel(xpcConnection.get());
             }
         }
     });
