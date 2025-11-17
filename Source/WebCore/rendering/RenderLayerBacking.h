@@ -196,7 +196,7 @@ public:
     void resumeAnimations();
 
 #if ENABLE(THREADED_ANIMATIONS)
-    bool updateAcceleratedEffectsAndBaseValues(HashSet<Ref<AcceleratedTimeline>>&);
+    void updateAcceleratedEffectsAndBaseValues(HashSet<Ref<AcceleratedTimeline>>&);
 #endif
 
     WEBCORE_EXPORT LayoutRect compositedBounds() const;

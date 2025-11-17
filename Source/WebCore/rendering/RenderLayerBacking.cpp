@@ -4438,7 +4438,7 @@ bool RenderLayerBacking::startAnimation(double timeOffset, const GraphicsLayerAn
 }
 
 #if ENABLE(THREADED_ANIMATIONS)
-bool RenderLayerBacking::updateAcceleratedEffectsAndBaseValues(HashSet<Ref<AcceleratedTimeline>>& timelines)
+void RenderLayerBacking::updateAcceleratedEffectsAndBaseValues(HashSet<Ref<AcceleratedTimeline>>& timelines)
 {
     auto& renderer = this->renderer();
     OptionSet<AcceleratedEffectProperty> disallowedAcceleratedProperties;
@@ -4498,8 +4498,6 @@ bool RenderLayerBacking::updateAcceleratedEffectsAndBaseValues(HashSet<Ref<Accel
 
     m_owningLayer.setNeedsPostLayoutCompositingUpdate();
     m_owningLayer.setNeedsCompositingGeometryUpdate();
-
-    return hasInterpolatingEffect;
 }
 #endif
 
