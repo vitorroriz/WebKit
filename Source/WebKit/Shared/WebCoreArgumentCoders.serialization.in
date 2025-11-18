@@ -8840,8 +8840,7 @@ header: <WebCore/TrackInfo.h>
     WebCore::FloatSize displaySize;
     uint8_t bitDepth;
     WebCore::PlatformVideoColorSpace colorSpace;
-    WebCore::FourCC boxType;
-    RefPtr<WebCore::SharedBuffer> atomData;
+    Vector<std::pair<WebCore::FourCC, Ref<WebCore::SharedBuffer>>> extensionAtoms
 };
 
 [RefCounted, CreateUsing=fromVariant] struct WebCore::TrackInfo {
