@@ -3454,28 +3454,32 @@ StackMap BBQJIT::makeStackMap(const ControlData& data, Stack& enclosingStack)
     StackMap stackMap(numElements);
     unsigned stackMapIndex = 0;
     for (unsigned i = 0; i < m_locals.size(); i ++)
-        stackMap[stackMapIndex ++] = OSREntryValue(toB3Rep(m_locals[i]), toB3Type(m_localTypes[i]));
+        stackMap[stackMapIndex++] = OSREntryValue(toB3Rep(m_locals[i]), toB3Type(m_localTypes[i]));
 
     // Do rethrow slots first because IPInt has them in a shadow stack.
     for (const ControlEntry& entry : m_parser->controlStack()) {
-        unsigned numSlots = entry.controlData.implicitSlots();
-        if (BBQJIT::ControlData::isTry(entry.controlData))
-            ++numSlots;
-        for (unsigned i = 0; i < numSlots; i ++) {
+        if (BBQJIT::ControlData::isTry(entry.controlData)) {
             Value exception = this->exception(entry.controlData);
-            stackMap[stackMapIndex ++] = OSREntryValue(toB3Rep(locationOf(exception)), B3::Int64); // Exceptions are EncodedJSValues, so they are always Int64
+            // We don't actually have a real value here, so use Void to signify we shouldn't load it
+            stackMap[stackMapIndex++] = OSREntryValue(toB3Rep(locationOf(exception)), B3::Void);
+        }
+
+        unsigned numSlots = entry.controlData.implicitSlots();
+        for (unsigned i = 0; i < numSlots; i++) {
+            Value exception = this->exception(entry.controlData);
+            stackMap[stackMapIndex++] = OSREntryValue(toB3Rep(locationOf(exception)), B3::Int64); // Exceptions are EncodedJSValues, so they are always Int64
         }
     }
 
     for (const ControlEntry& entry : m_parser->controlStack()) {
         for (const TypedExpression& expr : entry.enclosedExpressionStack)
-            stackMap[stackMapIndex ++] = OSREntryValue(toB3Rep(locationOf(expr.value())), toB3Type(expr.type().kind));
+            stackMap[stackMapIndex++] = OSREntryValue(toB3Rep(locationOf(expr.value())), toB3Type(expr.type().kind));
     }
 
     for (const TypedExpression& expr : enclosingStack)
-        stackMap[stackMapIndex ++] = OSREntryValue(toB3Rep(locationOf(expr.value())), toB3Type(expr.type().kind));
-    for (unsigned i = 0; i < data.argumentLocations().size(); i ++)
-        stackMap[stackMapIndex ++] = OSREntryValue(toB3Rep(data.argumentLocations()[i]), toB3Type(data.argumentType(i).kind));
+        stackMap[stackMapIndex++] = OSREntryValue(toB3Rep(locationOf(expr.value())), toB3Type(expr.type().kind));
+    for (unsigned i = 0; i < data.argumentLocations().size(); i++)
+        stackMap[stackMapIndex++] = OSREntryValue(toB3Rep(data.argumentLocations()[i]), toB3Type(data.argumentType(i).kind));
 
     RELEASE_ASSERT(stackMapIndex == numElements);
     unsigned bufferSize = Context::scratchBufferSlotsPerValue(m_callee.savedFPWidth()) * (BBQCallee::extraOSRValuesForLoopIndex + numElements);
