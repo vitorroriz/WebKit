@@ -2460,7 +2460,7 @@ fast/webgpu/nocrash/fuzz-274289.html [ Pass Failure Timeout ]
 fast/webgpu/nocrash/fuzz-291181-reduced.html [ Pass Failure Timeout ]
 
 [ Debug ] fast/webgpu/nocrash/RenderBundle_WRITE.html [ Pass Timeout ]
-[ Debug ] fast/webgpu/nocrash/fuzz-279542.html [ Pass Timeout ]
+[ Debug ] fast/webgpu/nocrash/fuzz-279542.html [ Skip ]
 
 # FIXME: https://bugs.webkit.org/show_bug.cgi?id=292020
 [ Debug ] fast/webgpu/nocrash/fuzz-275294.html [ Pass Crash ]
