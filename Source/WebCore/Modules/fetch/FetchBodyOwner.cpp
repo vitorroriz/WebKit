@@ -403,7 +403,11 @@ ExceptionOr<void> FetchBodyOwner::createReadableStream(JSC::JSGlobalObject& stat
             return readableStreamSource->pull(globalObject, controller);
         }, [readableStreamSource](auto& globalObject, auto& controller, auto&& value) {
             return readableStreamSource->cancel(globalObject, controller, WTFMove(value));
-        }, { }, 1, ReadableStream::StartSynchronously::Yes);
+        }, {
+            .highwaterMark = 1,
+            .startSynchronously = ReadableStream::StartSynchronously::Yes,
+            .isReachableFromOpaqueRootIfPulling = ReadableStream::IsReachableFromOpaqueRootIfPulling::Yes
+        });
 
         m_readableStreamSource = readableStreamSource.ptr();
         readableStreamSource->setByteController(*readableStream->controller());

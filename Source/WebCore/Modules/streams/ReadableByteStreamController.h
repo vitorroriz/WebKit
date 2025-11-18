@@ -95,6 +95,8 @@ public:
     ExceptionOr<void> enqueue(JSDOMGlobalObject&, JSC::ArrayBufferView&);
     ExceptionOr<void> enqueue(JSDOMGlobalObject&, JSC::ArrayBuffer&);
 
+    bool isPulling() const { return m_pulling; }
+
     template<typename Visitor> void visitAdditionalChildren(Visitor&);
 
     JSValueInWrappedObject& underlyingSourceConcurrently() { return m_underlyingSource; }
