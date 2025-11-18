@@ -53,7 +53,12 @@ public:
 
     bool isEmpty() const { return !m_selectorArray; }
     const CSSSelector* first() const { return m_selectorArray.get(); }
-    const CSSSelector* selectorAt(size_t index) const { return &m_selectorArray[index]; }
+    const CSSSelector* selectorAt(size_t index) const
+    {
+WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
+        return &m_selectorArray[index];
+WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
+    }
 
     size_t indexOfNextSelectorAfter(size_t index) const
     {

@@ -520,7 +520,9 @@ inline CompiledSelector& StyleRule::compiledSelectorForListIndex(unsigned index)
         RELEASE_ASSERT_WITH_SECURITY_IMPLICATION(index < listSize);
         m_compiledSelectors = makeUniqueArray<CompiledSelector>(listSize);
     }
+WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
     return m_compiledSelectors[index];
+WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 }
 
 #endif
