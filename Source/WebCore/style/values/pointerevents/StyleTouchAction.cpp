@@ -104,7 +104,6 @@ auto ToPlatform<TouchAction>::operator()(const TouchAction& value) -> OptionSet<
                     result.add(WebCore::TouchAction::PinchZoom);
                     break;
                 }
-                RELEASE_ASSERT_NOT_REACHED();
             }
             return result;
         }
