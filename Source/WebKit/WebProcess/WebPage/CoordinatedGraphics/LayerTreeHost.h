@@ -159,7 +159,6 @@ private:
     const Ref<CoordinatedSceneState> m_sceneState;
     WebCore::GraphicsLayer* m_rootCompositingLayer { nullptr };
     WebCore::GraphicsLayer* m_overlayCompositingLayer { nullptr };
-    HashSet<Ref<WebCore::CoordinatedPlatformLayer>> m_layers;
     bool m_layerTreeStateIsFrozen { false };
     bool m_pendingResize { false };
     bool m_pendingForceRepaint { false };
