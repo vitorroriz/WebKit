@@ -461,11 +461,6 @@ html/parser/HTMLParserScheduler.cpp
 html/parser/HTMLScriptRunner.cpp
 html/parser/HTMLTreeBuilder.cpp
 html/shadow/MediaControlTextTrackContainerElement.cpp
-html/track/AudioTrack.cpp
-html/track/DataCue.cpp
-html/track/InbandDataTextTrack.cpp
-html/track/InbandGenericTextTrack.cpp
-html/track/InbandTextTrack.cpp
 html/track/InbandWebVTTTextTrack.cpp
 html/track/LoadableTextTrack.cpp
 html/track/TextTrack.cpp
