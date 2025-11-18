@@ -25,12 +25,14 @@
 
 #pragma once
 
+#include "UIProcess/Media/RemoteMediaSessionManagerProxy.h"
 #if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
 
 #include "RemoteMediaSessionState.h"
 #include <WebCore/PlatformMediaSession.h>
 
 namespace WebKit {
+class RemoteMediaSessionManagerProxy;
 
 class RemoteMediaSessionProxy final
     : public WebCore::PlatformMediaSession {

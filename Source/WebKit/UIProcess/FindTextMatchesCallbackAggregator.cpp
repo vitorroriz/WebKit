@@ -24,48 +24,31 @@
  */
 
 #include "config.h"
-#include "RemoteMediaSessionProxy.h"
+#include "FindTextMatchesCallbackAggregator.h"
 
-#if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
-
-#include "RemoteMediaSessionClientProxy.h"
-#include "RemoteMediaSessionManagerMessages.h"
-#include "RemoteMediaSessionManagerProxy.h"
-#include <WebCore/NotImplemented.h>
+#include "WebFoundTextRange.h"
 
 namespace WebKit {
 
-WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteMediaSessionProxy);
-
-RemoteMediaSessionProxy::RemoteMediaSessionProxy(const RemoteMediaSessionState& state, RemoteMediaSessionManagerProxy& manager)
-    : PlatformMediaSession(*new RemoteMediaSessionClientProxy(state, manager))
-    , m_manager(manager)
-    , m_state(state)
-#if !RELEASE_LOG_DISABLED
-    , m_logger(manager.process()->logger())
-#endif
+Ref<FindTextMatchCallbackAggregator> FindTextMatchCallbackAggregator::create(CompletionHandler<void(Vector<WebFoundTextRange>&&)>&& completionHandler)
 {
-    setMediaSessionIdentifier(state.sessionIdentifier);
+    return adoptRef(*new FindTextMatchCallbackAggregator(WTFMove(completionHandler)));
 }
 
-RemoteMediaSessionProxy::~RemoteMediaSessionProxy()
+void FindTextMatchCallbackAggregator::foundMatches(Vector<WebFoundTextRange>&& range)
 {
+    // FIXME: matches will be returned in amy order from frames. Matches need to be sorted in the order they appear in the frame tree.
+    m_range.appendVector(range);
 }
 
-void RemoteMediaSessionProxy::updateState(const RemoteMediaSessionState& state)
+FindTextMatchCallbackAggregator::~FindTextMatchCallbackAggregator()
 {
-    // FIXME: merge changes, notify as necessary
-    m_state = state;
+    m_completionHandler(WTFMove(m_range));
 }
 
-#if ENABLE(WIRELESS_PLAYBACK_TARGET)
-void RemoteMediaSessionProxy::setShouldPlayToPlaybackTarget(bool shouldPlay)
+FindTextMatchCallbackAggregator::FindTextMatchCallbackAggregator(CompletionHandler<void(Vector<WebFoundTextRange>&&)>&& completionHandler)
+    : m_completionHandler(WTFMove(completionHandler))
 {
-    if (RefPtr manager = m_manager.get())
-        manager->send(Messages::RemoteMediaSessionManager::ClientSetShouldPlayToPlaybackTarget(sessionIdentifier(), shouldPlay));
 }
-#endif
 
 } // namespace WebKit
-
-#endif // ENABLE(VIDEO) || ENABLE(WEB_AUDIO)

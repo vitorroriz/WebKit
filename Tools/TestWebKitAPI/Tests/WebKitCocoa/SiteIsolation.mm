@@ -25,6 +25,7 @@
 
 #import "config.h"
 #import "DragAndDropSimulator.h"
+#import "FindInPageUtilities.h"
 #import "FrameTreeChecks.h"
 #import "HTTPServer.h"
 #import "PlatformUtilities.h"
@@ -6997,5 +6998,67 @@ TEST(SiteIsolation, AccessibilityTokenAfterPageNavigation)
     }));
 }
 #endif // PLATFORM(MAC)
+
+#if HAVE(UIFINDINTERACTION)
+
+TEST(SiteIsolation, FindStringInFrameIOS)
+{
+    HTTPServer server({
+        { "/mainframe"_s, { "<iframe src='https://domain2.com/subframe'></iframe>"_s } },
+        { "/subframe"_s, { "<p>Hello world</p>"_s } }
+    }, HTTPServer::Protocol::HttpsProxy);
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://domain1.com/mainframe"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    RetainPtr searchOptions = adoptNS([[UITextSearchOptions alloc] init]);
+    testPerformTextSearchWithQueryStringInWebView(webView.get(), @"Hello world", searchOptions.get(), 1UL);
+    testPerformTextSearchWithQueryStringInWebView(webView.get(), @"Missing string", searchOptions.get(), 0UL);
+}
+
+TEST(SiteIsolation, FindStringInNestedFrameIOS)
+{
+    HTTPServer server({
+        { "/mainframe"_s, { "<iframe src='https://domain2.com/subframe'></iframe>"_s } },
+        { "/subframe"_s, { "<iframe src='https://domain3.com/nested_subframe'></iframe>"_s } },
+        { "/nested_subframe"_s, { "<p>Hello world</p>"_s } }
+    }, HTTPServer::Protocol::HttpsProxy);
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://domain1.com/mainframe"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    RetainPtr searchOptions = adoptNS([[UITextSearchOptions alloc] init]);
+    testPerformTextSearchWithQueryStringInWebView(webView.get(), @"Hello world", searchOptions.get(), 1UL);
+    testPerformTextSearchWithQueryStringInWebView(webView.get(), @"Missing string", searchOptions.get(), 0UL);
+}
+
+TEST(SiteIsolation, FindStringAcrossMultipleFramesIOS)
+{
+    const auto mainFrameSrc = "<iframe src='https://domain2.com/subframe'></iframe>"
+    "<iframe src='https://domain3.com/subframe2'></iframe>"
+    "<p>foobar</p>"
+    "<iframe src='https://domain4.com/subframe3'></iframe>"_s;
+
+    HTTPServer server({
+        { "/mainframe"_s, { mainFrameSrc } },
+        { "/subframe"_s, { "<iframe src='https://domain3.com/nested_subframe'></iframe>"_s } },
+        { "/nested_subframe"_s, { "<p>I am going to write a bunch of words and the word foobar will be somewhere in the middle.</p>"_s } },
+        { "/subframe2"_s, { "<iframe src='https://domain5.com/nested_subframe2'></iframe>"_s } },
+        { "/nested_subframe2"_s, { "<p>nested foobarfoobar</p>"_s } },
+        { "/subframe3"_s, { "<p>foobar</p>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://domain1.com/mainframe"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    RetainPtr searchOptions = adoptNS([[UITextSearchOptions alloc] init]);
+    testPerformTextSearchWithQueryStringInWebView(webView.get(), @"foobar", searchOptions.get(), 5UL);
+    testPerformTextSearchWithQueryStringInWebView(webView.get(), @"nothing", searchOptions.get(), 0UL);
+}
+
+#endif
 
 }

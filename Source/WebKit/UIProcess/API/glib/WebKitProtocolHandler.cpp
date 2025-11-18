@@ -678,7 +678,7 @@ void WebKitProtocolHandler::handleGPU(WebKitURISchemeRequest* request, RenderPro
     addTableRow(displayObject, "Device scale"_s, String::number(page->deviceScaleFactor()));
     addTableRow(displayObject, "Depth"_s, String::number(screenDepth(nullptr)));
     addTableRow(displayObject, "Bits per color component"_s, String::number(screenDepthPerComponent(nullptr)));
-    addTableRow(displayObject, "Font Scaling DPI"_s, String::number(fontDPI()));
+    addTableRow(displayObject, "Font Scaling DPI"_s, String::number(WebCore::fontDPI()));
 #if PLATFORM(GTK) || (PLATFORM(WPE) && ENABLE(WPE_PLATFORM))
     addTableRow(displayObject, "Screen DPI"_s, String::number(screenDPI(displayID.value_or(primaryScreenDisplayID()))));
 #endif

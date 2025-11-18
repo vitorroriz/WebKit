@@ -23,49 +23,27 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "RemoteMediaSessionProxy.h"
+#pragma once
 
-#if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
-
-#include "RemoteMediaSessionClientProxy.h"
-#include "RemoteMediaSessionManagerMessages.h"
-#include "RemoteMediaSessionManagerProxy.h"
-#include <WebCore/NotImplemented.h>
+#include <wtf/CompletionHandler.h>
+#include <wtf/RefCounted.h>
 
 namespace WebKit {
 
-WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteMediaSessionProxy);
+class WebPageProxy;
+struct WebFoundTextRange;
 
-RemoteMediaSessionProxy::RemoteMediaSessionProxy(const RemoteMediaSessionState& state, RemoteMediaSessionManagerProxy& manager)
-    : PlatformMediaSession(*new RemoteMediaSessionClientProxy(state, manager))
-    , m_manager(manager)
-    , m_state(state)
-#if !RELEASE_LOG_DISABLED
-    , m_logger(manager.process()->logger())
-#endif
-{
-    setMediaSessionIdentifier(state.sessionIdentifier);
-}
+enum class FindOptions : uint16_t;
 
-RemoteMediaSessionProxy::~RemoteMediaSessionProxy()
-{
-}
+class FindTextMatchCallbackAggregator : public RefCounted<FindTextMatchCallbackAggregator> {
+public:
+    static Ref<FindTextMatchCallbackAggregator> create(CompletionHandler<void(Vector<WebFoundTextRange>&&)>&&);
+    void foundMatches(Vector<WebFoundTextRange>&&);
+    ~FindTextMatchCallbackAggregator();
 
-void RemoteMediaSessionProxy::updateState(const RemoteMediaSessionState& state)
-{
-    // FIXME: merge changes, notify as necessary
-    m_state = state;
-}
-
-#if ENABLE(WIRELESS_PLAYBACK_TARGET)
-void RemoteMediaSessionProxy::setShouldPlayToPlaybackTarget(bool shouldPlay)
-{
-    if (RefPtr manager = m_manager.get())
-        manager->send(Messages::RemoteMediaSessionManager::ClientSetShouldPlayToPlaybackTarget(sessionIdentifier(), shouldPlay));
-}
-#endif
-
+private:
+    FindTextMatchCallbackAggregator(CompletionHandler<void(Vector<WebFoundTextRange>&&)>&&);
+    CompletionHandler<void(Vector<WebFoundTextRange>&&)> m_completionHandler;
+    Vector<WebFoundTextRange> m_range;
+};
 } // namespace WebKit
-
-#endif // ENABLE(VIDEO) || ENABLE(WEB_AUDIO)

@@ -410,6 +410,7 @@ UIProcess/DisplayLink.cpp
 UIProcess/DisplayLinkProcessProxyClient.cpp
 UIProcess/DrawingAreaProxy.cpp
 UIProcess/FindStringCallbackAggregator.cpp
+UIProcess/FindTextMatchesCallbackAggregator.cpp
 UIProcess/FrameLoadState.cpp
 UIProcess/FrameProcess.cpp
 UIProcess/GeolocationPermissionRequestManagerProxy.cpp

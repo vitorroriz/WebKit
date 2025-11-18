@@ -4065,6 +4065,8 @@
 		D2CC7CF32D9A8D6B00011B9E /* TestCocoaImageAndCocoaColor.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = TestCocoaImageAndCocoaColor.mm; path = cocoa/TestCocoaImageAndCocoaColor.mm; sourceTree = "<group>"; };
 		D2D9A6BD2D96B539004A2C92 /* icon-with-subresource.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "icon-with-subresource.svg"; sourceTree = "<group>"; };
 		D3BE5E341E4CE85E00FD563A /* WKWebViewGetContents.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WKWebViewGetContents.mm; sourceTree = "<group>"; };
+		D606F87F2EBC1C93002783D7 /* FindInPageUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindInPageUtilities.h; sourceTree = "<group>"; };
+		D606F8872EBC201D002783D7 /* FindInPageUtilities.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FindInPageUtilities.mm; sourceTree = "<group>"; };
 		D69D9E2F2E9041E800689F1D /* SiteIsolationUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SiteIsolationUtilities.h; sourceTree = "<group>"; };
 		D69D9E372E9041F400689F1D /* SiteIsolationUtilities.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SiteIsolationUtilities.mm; sourceTree = "<group>"; };
 		D84FAD9829FAC1D0008D338F /* RenderStyleChange.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RenderStyleChange.cpp; sourceTree = "<group>"; };
@@ -4859,6 +4861,8 @@
 				93468E6E2714B4F1009983E3 /* FileSystemAccess.mm */,
 				2D8104CB1BEC13E70020DA46 /* FindInPage.mm */,
 				51242CD42374E61E00EED9C1 /* FindInPageAPI.mm */,
+				D606F87F2EBC1C93002783D7 /* FindInPageUtilities.h */,
+				D606F8872EBC201D002783D7 /* FindInPageUtilities.mm */,
 				118153472208BADF00B2CCD2 /* FirstVisuallyNonEmptyMilestone.mm */,
 				2D1FE0AF1AD465C1006CD9E6 /* FixedLayoutSize.mm */,
 				2E92B8F8216490EA005B64F0 /* FontAttributes.mm */,

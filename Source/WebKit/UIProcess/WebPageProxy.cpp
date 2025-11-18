@@ -81,6 +81,7 @@
 #include "DrawingAreaProxyMessages.h"
 #include "EventDispatcherMessages.h"
 #include "FindStringCallbackAggregator.h"
+#include "FindTextMatchesCallbackAggregator.h"
 #include "FormDataReference.h"
 #include "FrameInfoData.h"
 #include "FrameProcess.h"
@@ -6348,7 +6349,18 @@ void WebPageProxy::findString(const String& string, OptionSet<FindOptions> optio
 
 void WebPageProxy::findTextRangesForStringMatches(const String& string, OptionSet<FindOptions> options, unsigned maxMatchCount, CompletionHandler<void(Vector<WebFoundTextRange>&&)>&& callbackFunction)
 {
-    sendWithAsyncReply(Messages::WebPage::FindTextRangesForStringMatches(string, options, maxMatchCount), WTFMove(callbackFunction));
+    if (!hasRunningProcess()) {
+        callbackFunction({ });
+        return;
+    }
+
+    Ref aggregator = FindTextMatchCallbackAggregator::create(WTFMove(callbackFunction));
+
+    forEachWebContentProcess([&](auto& webProcess, auto pageID) {
+        webProcess.sendWithAsyncReply(Messages::WebPage::FindTextRangesForStringMatches(string, options, maxMatchCount), [aggregator](Vector<WebFoundTextRange>&& vector) {
+            aggregator->foundMatches(WTFMove(vector));
+        }, pageID);
+    });
 }
 
 void WebPageProxy::replaceFoundTextRangeWithString(const WebFoundTextRange& range, const String& string)
