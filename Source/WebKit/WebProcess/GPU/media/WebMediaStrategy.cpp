@@ -122,6 +122,14 @@ void WebMediaStrategy::enableMockMediaSource()
     WebCore::DeprecatedGlobalSettings::setGStreamerEnabled(false);
 #endif
     m_mockMediaSourceEnabled = true;
+
+#if USE(AVFOUNDATION)
+    if (hasRemoteRendererFor(MediaPlayerMediaEngineIdentifier::AVFoundationMSE)) {
+        WebCore::MediaStrategy::addMockMediaSourceEngine();
+        return;
+    }
+#endif
+
 #if ENABLE(GPU_PROCESS)
     if (m_useGPUProcess) {
         Ref connection = WebProcess::singleton().ensureGPUProcessConnection().connection();
