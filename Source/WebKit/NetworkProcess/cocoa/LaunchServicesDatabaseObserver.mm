@@ -146,7 +146,7 @@ void LaunchServicesDatabaseObserver::handleEvent(xpc_connection_t connection, xp
 
 void LaunchServicesDatabaseObserver::initializeConnection(IPC::Connection* connection)
 {
-    sendEndpointToConnection(OSObjectPtr { connection->xpcConnection() }.get());
+    sendEndpointToConnection(connection->protectedXPCConnection().get());
 }
 
 }

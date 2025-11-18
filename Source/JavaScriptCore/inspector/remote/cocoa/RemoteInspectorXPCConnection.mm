@@ -105,7 +105,7 @@ RetainPtr<NSDictionary> RemoteInspectorXPCConnection::deserializeMessage(xpc_obj
     if (xpc_get_type(object) != XPC_TYPE_DICTIONARY)
         return nil;
 
-    OSObjectPtr xpcDictionary = xpc_dictionary_get_value(object, RemoteInspectorXPCConnectionSerializedMessageKey);
+    XPCObjectPtr<xpc_object_t> xpcDictionary = xpc_dictionary_get_value(object, RemoteInspectorXPCConnectionSerializedMessageKey);
     if (!xpcDictionary || xpc_get_type(xpcDictionary.get()) != XPC_TYPE_DICTIONARY) {
         Locker locker { m_mutex };
         if (m_client)

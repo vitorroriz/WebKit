@@ -181,7 +181,7 @@ void XPCServiceEventHandler(xpc_connection_t peer)
             bool disableLogging = xpc_dictionary_get_bool(event, "disable-logging");
             initializeLogd(disableLogging, retainedPeerConnection.get());
 
-            if (RetainPtr languages = xpc_dictionary_get_value(event, "OverrideLanguages")) {
+            if (XPCObjectPtr<xpc_object_t> languages = xpc_dictionary_get_value(event, "OverrideLanguages")) {
                 Vector<String> newLanguages;
                 @autoreleasepool {
                     xpc_array_apply(languages.get(), makeBlockPtr([&newLanguages](size_t index, xpc_object_t value) {
@@ -244,7 +244,7 @@ void XPCServiceEventHandler(xpc_connection_t peer)
             // FIXME: This is a false positive. <rdar://164843889>
             SUPPRESS_RETAINPTR_CTOR_ADOPT auto reply = adoptXPCObject(xpc_dictionary_create_reply(event));
             xpc_dictionary_set_string(reply.get(), "message-name", "process-finished-launching");
-            xpc_connection_send_message(OSObjectPtr { xpc_dictionary_get_remote_connection(event) }.get(), reply.get());
+            xpc_connection_send_message(XPCObjectPtr<xpc_connection_t> { xpc_dictionary_get_remote_connection(event) }.get(), reply.get());
 
             int fd = xpc_dictionary_dup_fd(event, "stdout");
             if (fd != -1)

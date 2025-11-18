@@ -125,7 +125,7 @@ bool XPCServiceInitializerDelegate::getClientProcessName(String& clientProcessNa
 
 bool XPCServiceInitializerDelegate::getExtraInitializationData(HashMap<String, String>& extraInitializationData)
 {
-    RetainPtr extraDataInitializationDataObject = xpc_dictionary_get_value(m_initializerMessage.get(), "extra-initialization-data");
+    XPCObjectPtr<xpc_object_t> extraDataInitializationDataObject = xpc_dictionary_get_value(m_initializerMessage.get(), "extra-initialization-data");
 
     auto inspectorProcess = xpcDictionaryGetString(extraDataInitializationDataObject.get(), "inspector-process"_s);
     if (!inspectorProcess.isEmpty())

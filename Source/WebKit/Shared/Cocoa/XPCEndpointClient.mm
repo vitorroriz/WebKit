@@ -58,7 +58,7 @@ void XPCEndpointClient::setEndpoint(xpc_endpoint_t endpoint)
             if (type != XPC_TYPE_DICTIONARY)
                 return;
 
-            RetainPtr connection = xpc_dictionary_get_remote_connection(message);
+            XPCObjectPtr<xpc_connection_t> connection = xpc_dictionary_get_remote_connection(message);
             if (!connection)
                 return;
 #if USE(APPLE_INTERNAL_SDK)

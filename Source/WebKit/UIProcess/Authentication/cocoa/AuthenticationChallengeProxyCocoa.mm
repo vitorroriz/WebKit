@@ -44,7 +44,7 @@ void AuthenticationChallengeProxy::sendClientCertificateCredentialOverXpc(IPC::C
     SUPPRESS_RETAINPTR_CTOR_ADOPT auto message = adoptXPCObject(xpc_dictionary_create(nullptr, nullptr, 0));
     xpc_dictionary_set_string(message.get(), ClientCertificateAuthentication::XPCMessageNameKey, ClientCertificateAuthentication::XPCMessageNameValue);
     xpc_dictionary_set_uint64(message.get(), ClientCertificateAuthentication::XPCChallengeIDKey, challengeID.toUInt64());
-    xpc_dictionary_set_value(message.get(), ClientCertificateAuthentication::XPCSecKeyProxyEndpointKey, retainPtr(RetainPtr { secKeyProxyStore.get() }.get().endpoint._endpoint).get());
+    xpc_dictionary_set_value(message.get(), ClientCertificateAuthentication::XPCSecKeyProxyEndpointKey, XPCObjectPtr<xpc_endpoint_t> { RetainPtr { secKeyProxyStore.get() }.get().endpoint._endpoint }.get());
     // FIXME: This is a false positive. <rdar://164843889>
     SUPPRESS_RETAINPTR_CTOR_ADOPT auto certificateDataArray = adoptXPCObject(xpc_array_create(nullptr, 0));
     RetainPtr nsCredential = credential.nsCredential();

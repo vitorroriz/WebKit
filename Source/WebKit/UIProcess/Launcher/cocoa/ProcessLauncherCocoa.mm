@@ -456,7 +456,7 @@ void ProcessLauncher::finishLaunchingProcess(ASCIILiteral name)
     Function<void(xpc_object_t)> eventHandler = [errorHandlerImpl = WTFMove(errorHandlerImpl), xpcEventHandler = client->xpcEventHandler()] (xpc_object_t event) mutable {
 
         if (!event || xpc_get_type(event) == XPC_TYPE_ERROR) {
-            RunLoop::mainSingleton().dispatch([errorHandlerImpl = std::exchange(errorHandlerImpl, nullptr), event = OSObjectPtr(event)] {
+            RunLoop::mainSingleton().dispatch([errorHandlerImpl = std::exchange(errorHandlerImpl, nullptr), event = XPCObjectPtr<xpc_object_t> { event }] {
                 if (errorHandlerImpl)
                     errorHandlerImpl(event.get());
                 else if (event.get() != XPC_ERROR_CONNECTION_INVALID)
@@ -466,7 +466,7 @@ void ProcessLauncher::finishLaunchingProcess(ASCIILiteral name)
         }
 
         if (xpcEventHandler) {
-            RunLoop::mainSingleton().dispatch([xpcEventHandler = xpcEventHandler, event = OSObjectPtr(event)] {
+            RunLoop::mainSingleton().dispatch([xpcEventHandler = xpcEventHandler, event = XPCObjectPtr<xpc_object_t> { event }] {
                 xpcEventHandler->handleXPCEvent(event.get());
             });
         }
