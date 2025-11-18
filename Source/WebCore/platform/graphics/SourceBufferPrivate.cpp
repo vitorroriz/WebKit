@@ -1293,13 +1293,13 @@ void SourceBufferPrivate::resetParserState()
 
 void SourceBufferPrivate::memoryPressure(const MediaTime& currentTime)
 {
-    ALWAYS_LOG(LOGIDENTIFIER, "isActive = ", isActive());
-
+    ALWAYS_LOG(LOGIDENTIFIER, "currentTime: ", currentTime);
     m_currentSourceBufferOperation = protectedCurrentSourceBufferOperation()->whenSettled(m_dispatcher, [weakThis = ThreadSafeWeakPtr { *this }, currentTime](auto result) mutable {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis)
             return OperationPromise::createAndReject(PlatformMediaError::BufferRemoved);
-        if (protectedThis->isActive())
+        ALWAYS_LOG_WITH_THIS(protectedThis, LOGIDENTIFIER_WITH_THIS(protectedThis), "isActive = ", protectedThis->m_isActive);
+        if (protectedThis->m_isActive)
             protectedThis->evictFrames(protectedThis->m_maximumBufferSize, currentTime);
         else {
             protectedThis->resetTrackBuffers();
@@ -1414,13 +1414,13 @@ bool SourceBufferPrivate::evictFrames(uint64_t newDataSize, const MediaTime& cur
 
 void SourceBufferPrivate::setActive(bool isActive)
 {
-    assertIsCurrent(m_dispatcher);
-
     ALWAYS_LOG(LOGIDENTIFIER, isActive);
 
-    m_isActive = isActive;
-    if (RefPtr mediaSource = m_mediaSource.get())
-        mediaSource->sourceBufferPrivateDidChangeActiveState(*this, isActive);
+    ensureOnDispatcher([protectedThis = Ref { *this }, isActive] {
+        protectedThis->m_isActive = isActive;
+        if (RefPtr mediaSource = protectedThis->m_mediaSource.get())
+            mediaSource->sourceBufferPrivateDidChangeActiveState(protectedThis, isActive);
+    });
 }
 
 void SourceBufferPrivate::iterateTrackBuffers(NOESCAPE const Function<void(TrackBuffer&)>& func)

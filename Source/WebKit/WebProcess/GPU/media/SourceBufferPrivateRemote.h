@@ -99,7 +99,6 @@ private:
 
     // SourceBufferPrivate overrides
     void setActive(bool) final;
-    bool isActive() const final;
     Ref<WebCore::MediaPromise> append(Ref<WebCore::SharedBuffer>&&) final;
     Ref<WebCore::MediaPromise> appendInternal(Ref<WebCore::SharedBuffer>&&) final;
     void resetParserStateInternal() final;
@@ -161,9 +160,6 @@ private:
 
     bool isGPURunning() const { return !m_removed; }
     std::atomic<bool> m_removed { false };
-
-    // We mirror some members from the base class, as we require them to be atomic.
-    std::atomic<bool> m_isActive { false };
 
 #if !RELEASE_LOG_DISABLED
     const Logger& logger() const final { return m_logger.get(); }

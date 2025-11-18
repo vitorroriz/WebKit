@@ -151,15 +151,9 @@ void SourceBufferPrivateRemote::removedFromMediaSource()
     });
 }
 
-bool SourceBufferPrivateRemote::isActive() const
-{
-    return m_isActive;
-}
-
 void SourceBufferPrivateRemote::setActive(bool active)
 {
     // Called from the SourceBuffer's dispatcher
-    m_isActive = true;
     ensureWeakOnDispatcher([active](auto& buffer) {
         auto mediaSource = buffer.m_mediaSource.get();
         if (!mediaSource)
