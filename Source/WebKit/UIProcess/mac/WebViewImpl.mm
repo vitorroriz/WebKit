@@ -7319,8 +7319,6 @@ void WebViewImpl::configurePanGestureRecognizerIfNeeded()
     Ref page = m_page.get();
     if (!page->protectedPreferences()->useAppKitGestures())
         return;
-
-    RetainPtr view = m_view.get();
     m_panGestureController = adoptNS([[WKPanGestureController alloc] initWithPage:page viewImpl:*this]);
 }
 
