@@ -725,7 +725,7 @@ void SourceBuffer::sourceBufferPrivateAppendComplete(MediaPromise::Result&& resu
     source->monitorSourceBuffers();
     m_private->reenqueueMediaIfNeeded(source->currentTime());
 
-    ALWAYS_LOG(LOGIDENTIFIER, "buffered = ", m_buffered->ranges(), ", totalBufferSize: ", m_private->totalTrackBufferSizeInBytes());
+    ALWAYS_LOG(LOGIDENTIFIER, "buffered = ", m_buffered->ranges(), ", totalBufferSize: ", m_private->contentSize());
 }
 
 void SourceBuffer::sourceBufferPrivateDidReceiveRenderingError(int64_t error)
@@ -1446,7 +1446,7 @@ void SourceBuffer::setShouldGenerateTimestamps(bool flag)
 
 Ref<MediaPromise> SourceBuffer::sourceBufferPrivateBufferedChanged(Vector<PlatformTimeRanges>&& trackBuffers)
 {
-    reportExtraMemoryAllocated(m_private->totalTrackBufferSizeInBytes());
+    reportExtraMemoryAllocated(m_private->contentSize());
     m_trackBuffers = WTFMove(trackBuffers);
 
     updateBuffered();

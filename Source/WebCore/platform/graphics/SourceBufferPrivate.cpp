@@ -110,6 +110,19 @@ void SourceBufferPrivate::resetTimestampOffsetInTrackBuffers()
     });
 }
 
+void SourceBufferPrivate::setTimestampOffset(const MediaTime& timestampOffset)
+{
+    // Called from the SourceBuffer's dispatcher
+    Locker locker { m_lock };
+    m_timestampOffset = timestampOffset;
+}
+
+MediaTime SourceBufferPrivate::timestampOffset() const
+{
+    Locker locker { m_lock };
+    return m_timestampOffset;
+}
+
 void SourceBufferPrivate::resetTrackBuffers()
 {
     iterateTrackBuffers([&](auto& trackBuffer) {
@@ -389,6 +402,8 @@ Ref<MediaPromise> SourceBufferPrivate::removeCodedFrames(const MediaTime& start,
 
 void SourceBufferPrivate::removeCodedFramesInternal(const MediaTime& start, const MediaTime& end, const MediaTime& currentTime)
 {
+    assertIsCurrent(m_dispatcher.get());
+
     ASSERT(start < end);
     if (start >= end)
         return;
@@ -400,13 +415,21 @@ void SourceBufferPrivate::removeCodedFramesInternal(const MediaTime& start, cons
     // 2. Let end be the end presentation timestamp for the removal range.
     // 3. For each track buffer in this source buffer, run the following steps:
 
+    size_t removedSize = 0;
     iterateTrackBuffers([&](auto& trackBuffer) {
-        m_evictionData.contentSize -= trackBuffer.removeCodedFrames(start, end, currentTime);
+        removedSize += trackBuffer.removeCodedFrames(start, end, currentTime);
         // 3.4 If this object is in activeSourceBuffers, the current playback position is greater than or equal to start
         // and less than the remove end timestamp, and HTMLMediaElement.readyState is greater than HAVE_METADATA, then set
         // the HTMLMediaElement.readyState attribute to HAVE_METADATA and stall playback.
         // This step will be performed in SourceBuffer::sourceBufferPrivateBufferedChanged
     });
+
+    {
+        Locker locker { m_lock };
+        ASSERT(m_evictionData.contentSize >= removedSize);
+        m_evictionData.contentSize -= removedSize;
+    }
+    ASSERT(contentSize() == totalTrackBufferSizeInBytes());
 
     reenqueueMediaIfNeeded(currentTime);
 
@@ -424,83 +447,98 @@ size_t SourceBufferPrivate::platformEvictionThreshold() const
 
 Ref<GenericPromise> SourceBufferPrivate::setMaximumBufferSize(size_t size)
 {
-    if (size != m_evictionData.maximumBufferSize) {
-        m_evictionData.maximumBufferSize = size;
-        computeEvictionData(ComputeEvictionDataRule::ForceNotification);
-    }
-    return GenericPromise::createAndResolve();
+    if (m_maximumBufferSize.exchange(size) == size)
+        return GenericPromise::createAndResolve();
+
+    return invokeAsync(m_dispatcher, [weakThis = ThreadSafeWeakPtr { *this }] {
+        if (RefPtr protectedThis = weakThis.get())
+            protectedThis->computeEvictionData(ComputeEvictionDataRule::ForceNotification);
+        return GenericPromise::createAndResolve();
+    });
 }
 
 void SourceBufferPrivate::computeEvictionData(ComputeEvictionDataRule rule)
 {
-    auto evictionData = m_evictionData;
-    m_evictionData.numMediaSamples = [&]() -> size_t {
-        const size_t evictionThreshold = platformEvictionThreshold();
-        if (!evictionThreshold)
-            return 0;
-        size_t currentSize = 0;
-        iterateTrackBuffers([&](auto& trackBuffer) {
-            currentSize += trackBuffer.samples().size();
-        });
-        return currentSize;
-    }();
-    m_evictionData.contentSize = totalTrackBufferSizeInBytes();
-    m_evictionData.evictableSize = [&]() -> int64_t {
-        RefPtr mediaSource = m_mediaSource.get();
-        if (!mediaSource)
-            return 0;
-        size_t evictableSize = 0;
-        auto currentTime = mediaSource->currentTime();
+    assertIsCurrent(m_dispatcher.get());
 
-        // We can evict everything from the beginning of the buffer to a maximum of timeChunk (3s) before currentTime (or the previous sync sample whichever comes first).
-        auto timeChunkAsMilliseconds = evictionAlgorithmTimeChunkLowThreshold;
-        const auto timeChunk = MediaTime(timeChunkAsMilliseconds, 1000);
+    SourceBufferEvictionData evictionData {
+        .contentSize = totalTrackBufferSizeInBytes(),
+        .evictableSize = [&]() -> int64_t {
+            RefPtr mediaSource = m_mediaSource.get();
+            if (!mediaSource)
+                return 0;
+            size_t evictableSize = 0;
+            auto currentTime = mediaSource->currentTime();
 
-        const auto rangeStartBeforeCurrentTime = minimumBufferedTime();
-        const auto rangeEndBeforeCurrentTime = std::min(currentTime - timeChunk, findPreviousSyncSamplePresentationTime(currentTime));
+            // We can evict everything from the beginning of the buffer to a maximum of timeChunk (3s) before currentTime (or the previous sync sample whichever comes first).
+            auto timeChunkAsMilliseconds = evictionAlgorithmTimeChunkLowThreshold;
+            const auto timeChunk = MediaTime(timeChunkAsMilliseconds, 1000);
 
-        if (rangeStartBeforeCurrentTime < rangeEndBeforeCurrentTime) {
-            iterateTrackBuffers([&](auto& trackBuffer) {
-                evictableSize += trackBuffer.codedFramesIntervalSize(rangeStartBeforeCurrentTime, rangeEndBeforeCurrentTime);
+            const auto rangeStartBeforeCurrentTime = minimumBufferedTime();
+            const auto rangeEndBeforeCurrentTime = std::min(currentTime - timeChunk, findPreviousSyncSamplePresentationTime(currentTime));
+
+            if (rangeStartBeforeCurrentTime < rangeEndBeforeCurrentTime) {
+                iterateTrackBuffers([&](auto& trackBuffer) {
+                    evictableSize += trackBuffer.codedFramesIntervalSize(rangeStartBeforeCurrentTime, rangeEndBeforeCurrentTime);
+                });
+            }
+
+            PlatformTimeRanges buffered { MediaTime::zeroTime(), MediaTime::positiveInfiniteTime() };
+            iterateTrackBuffers([&](const TrackBuffer& trackBuffer) {
+                buffered.intersectWith(trackBuffer.buffered());
             });
-        }
 
-        PlatformTimeRanges buffered { MediaTime::zeroTime(), MediaTime::positiveInfiniteTime() };
-        iterateTrackBuffers([&](const TrackBuffer& trackBuffer) {
-            buffered.intersectWith(trackBuffer.buffered());
-        });
+            // We can evict everything from currentTime+timeChunk (3s) to the end of the buffer, not contiguous in current range.
+            auto rangeStartAfterCurrentTime = currentTime + timeChunk;
+            const auto rangeEndAfterCurrentTime = buffered.maximumBufferedTime();
 
-        // We can evict everything from currentTime+timeChunk (3s) to the end of the buffer, not contiguous in current range.
-        auto rangeStartAfterCurrentTime = currentTime + timeChunk;
-        const auto rangeEndAfterCurrentTime = buffered.maximumBufferedTime();
-
-        if (rangeStartAfterCurrentTime >= rangeEndAfterCurrentTime)
-            return evictableSize;
-
-        // Do not evict data from the time range that contains currentTime.
-        size_t currentTimeRange = buffered.find(currentTime);
-        size_t startTimeRange = buffered.find(rangeStartAfterCurrentTime);
-        if (currentTimeRange != notFound && startTimeRange == currentTimeRange) {
-            currentTimeRange++;
-            if (currentTimeRange == buffered.length())
-                return evictableSize;
-            rangeStartAfterCurrentTime = buffered.start(currentTimeRange);
             if (rangeStartAfterCurrentTime >= rangeEndAfterCurrentTime)
                 return evictableSize;
-        }
 
-        iterateTrackBuffers([&](auto& trackBuffer) {
-            evictableSize += trackBuffer.codedFramesIntervalSize(rangeStartAfterCurrentTime, rangeEndAfterCurrentTime);
-        });
-        return evictableSize;
+            // Do not evict data from the time range that contains currentTime.
+            size_t currentTimeRange = buffered.find(currentTime);
+            size_t startTimeRange = buffered.find(rangeStartAfterCurrentTime);
+            if (currentTimeRange != notFound && startTimeRange == currentTimeRange) {
+                currentTimeRange++;
+                if (currentTimeRange == buffered.length())
+                    return evictableSize;
+                rangeStartAfterCurrentTime = buffered.start(currentTimeRange);
+                if (rangeStartAfterCurrentTime >= rangeEndAfterCurrentTime)
+                    return evictableSize;
+            }
+
+            iterateTrackBuffers([&](auto& trackBuffer) {
+                evictableSize += trackBuffer.codedFramesIntervalSize(rangeStartAfterCurrentTime, rangeEndAfterCurrentTime);
+            });
+            return evictableSize;
+        }(),
+        .maximumBufferSize = m_maximumBufferSize,
+        .numMediaSamples = [&]() -> size_t {
+            const size_t evictionThreshold = platformEvictionThreshold();
+            if (!evictionThreshold)
+                return 0;
+            size_t currentSize = 0;
+            iterateTrackBuffers([&](auto& trackBuffer) {
+                currentSize += trackBuffer.samples().size();
+            });
+            return currentSize;
+        }()
+    };
+
+    bool changed = [&] {
+        Locker locker { m_lock };
+        changed = m_evictionData != evictionData;
+        m_evictionData = evictionData;
+        return changed;
     }();
-    if (RefPtr client = this->client(); client && (rule == ComputeEvictionDataRule::ForceNotification || evictionData != m_evictionData))
-        client->sourceBufferPrivateEvictionDataChanged(m_evictionData);
+    if (RefPtr client = this->client(); client && (rule == ComputeEvictionDataRule::ForceNotification || changed))
+        client->sourceBufferPrivateEvictionDataChanged(evictionData);
 }
 
 bool SourceBufferPrivate::hasTooManySamples() const
 {
     size_t evictionThreshold = platformEvictionThreshold();
+    Locker locker { m_lock };
     return evictionThreshold && m_evictionData.numMediaSamples > evictionThreshold;
 }
 
@@ -510,7 +548,7 @@ void SourceBufferPrivate::asyncEvictCodedFrames(uint64_t newDataSize, const Medi
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis || !result)
             return OperationPromise::createAndReject(!result ? result.error() : PlatformMediaError::BufferRemoved);
-        protectedThis->evictCodedFrames(newDataSize, currentTime);
+        protectedThis->evictCodedFramesInternal(newDataSize, currentTime);
         return OperationPromise::createAndResolve();
     });
 }
@@ -524,6 +562,26 @@ bool SourceBufferPrivate::evictCodedFrames(uint64_t newDataSize, const MediaTime
     if (!client)
         return true;
 
+    if (canAppend(newDataSize)) {
+        if (!isBufferFullFor(newDataSize))
+            return false;
+        // The buffer is full, but we will be able to evict the content prior appending.
+        ensureWeakOnDispatcher([newDataSize, currentTime](auto& buffer) {
+            buffer.evictCodedFramesInternal(newDataSize, currentTime);
+        });
+        return false;
+    }
+
+    bool returnValue = false;
+    ensureOnDispatcherSync([this, newDataSize, currentTime, &returnValue] {
+        assertIsCurrent(m_dispatcher.get());
+        returnValue = evictCodedFramesInternal(newDataSize, currentTime);
+    });
+    return returnValue;
+}
+
+bool SourceBufferPrivate::evictCodedFramesInternal(uint64_t newDataSize, const MediaTime& currentTime)
+{
     // If the algorithm here is modified, computeEvictionData() must be updated accordingly.
 
     // This algorithm is run to free up space in this source buffer when new data is appended.
@@ -540,8 +598,8 @@ bool SourceBufferPrivate::evictCodedFrames(uint64_t newDataSize, const MediaTime
     // a time, up to timeChunk seconds before currentTime.
 
 #if !RELEASE_LOG_DISABLED
-    uint64_t initialBufferedSize = m_evictionData.contentSize;
-    DEBUG_LOG(LOGIDENTIFIER, "currentTime = ", currentTime, ", require ", initialBufferedSize + newDataSize, " bytes, maximum buffer size is ", m_evictionData.maximumBufferSize);
+    uint64_t initialBufferedSize = evictionData().contentSize;
+    DEBUG_LOG(LOGIDENTIFIER, "currentTime = ", currentTime, ", require ", initialBufferedSize + newDataSize, " bytes, maximum buffer size is ", m_maximumBufferSize.load());
 #endif
 
     isBufferFull = evictFrames(newDataSize, currentTime);
@@ -550,31 +608,36 @@ bool SourceBufferPrivate::evictCodedFrames(uint64_t newDataSize, const MediaTime
 
     if (!isBufferFull) {
 #if !RELEASE_LOG_DISABLED
-        DEBUG_LOG(LOGIDENTIFIER, "evicted ", initialBufferedSize - m_evictionData.contentSize);
+        DEBUG_LOG(LOGIDENTIFIER, "evicted ", initialBufferedSize - evictionData().contentSize);
 #endif
         return false;
     }
 
 #if !RELEASE_LOG_DISABLED
-    ERROR_LOG(LOGIDENTIFIER, "FAILED to free enough after evicting ", initialBufferedSize - m_evictionData.contentSize);
+    ERROR_LOG(LOGIDENTIFIER, "FAILED to free enough after evicting ", initialBufferedSize - evictionData().contentSize);
 #endif
     return true;
 }
 
 bool SourceBufferPrivate::isBufferFullFor(uint64_t requiredSize) const
 {
-    ASSERT(m_evictionData.contentSize == totalTrackBufferSizeInBytes());
-    auto totalRequired = checkedSum<uint64_t>(m_evictionData.contentSize, requiredSize);
+    auto totalRequired = checkedSum<uint64_t>(contentSize(), requiredSize);
     if (totalRequired.hasOverflowed())
         return true;
 
-    return totalRequired >= m_evictionData.maximumBufferSize;
+    return totalRequired >= m_maximumBufferSize.load();
 }
 
 bool SourceBufferPrivate::canAppend(uint64_t requiredSize) const
 {
-    ASSERT(m_evictionData.contentSize == totalTrackBufferSizeInBytes());
-    return m_evictionData.contentSize - m_evictionData.evictableSize + requiredSize <= m_evictionData.maximumBufferSize;
+    Locker locker { m_lock };
+    return m_evictionData.contentSize - m_evictionData.evictableSize + requiredSize <= m_maximumBufferSize.load();
+}
+
+SourceBufferEvictionData SourceBufferPrivate::evictionData() const
+{
+    Locker locker { m_lock };
+    return m_evictionData;
 }
 
 uint64_t SourceBufferPrivate::totalTrackBufferSizeInBytes() const
@@ -585,6 +648,12 @@ uint64_t SourceBufferPrivate::totalTrackBufferSizeInBytes() const
     });
 
     return totalSizeInBytes;
+}
+
+uint64_t SourceBufferPrivate::contentSize() const
+{
+    Locker locker { m_lock };
+    return m_evictionData.contentSize;
 }
 
 void SourceBufferPrivate::addTrackBuffer(TrackID trackId, RefPtr<MediaDescription>&& description)
@@ -871,7 +940,7 @@ bool SourceBufferPrivate::processMediaSample(SourceBufferPrivateClient& client, 
         // 1.3 If mode equals "sequence" and group start timestamp is set, then run the following steps:
         if (m_appendMode == SourceBufferAppendMode::Sequence && m_groupStartTimestamp.isValid()) {
             // 1.3.1 Set timestampOffset equal to group start timestamp - presentation timestamp.
-            m_timestampOffset = m_groupStartTimestamp - presentationTimestamp;
+            setTimestampOffset(m_groupStartTimestamp - presentationTimestamp);
 
             iterateTrackBuffers([&](auto& trackBuffer) {
                 trackBuffer.resetTimestampOffset();
@@ -904,12 +973,12 @@ bool SourceBufferPrivate::processMediaSample(SourceBufferPrivateClient& client, 
         MediaTime microsecond(1, 1000000);
 
         // 1.4 If timestampOffset is not 0, then run the following steps:
-        if (m_timestampOffset) {
+        if (auto timestampOffset = this->timestampOffset()) {
             if (!trackBuffer.roundedTimestampOffset().isValid())
-                trackBuffer.setRoundedTimestampOffset(m_timestampOffset);
+                trackBuffer.setRoundedTimestampOffset(timestampOffset);
             if (presentationTimestamp.isValid() && presentationTimestamp.timeScale() != trackBuffer.lastFrameTimescale()) {
                 trackBuffer.setLastFrameTimescale(presentationTimestamp.timeScale());
-                trackBuffer.setRoundedTimestampOffset(m_timestampOffset, trackBuffer.lastFrameTimescale(), microsecond);
+                trackBuffer.setRoundedTimestampOffset(timestampOffset, trackBuffer.lastFrameTimescale(), microsecond);
             }
 
             // 1.4.1 Add timestampOffset to the presentation timestamp.
@@ -1193,7 +1262,7 @@ bool SourceBufferPrivate::processMediaSample(SourceBufferPrivateClient& client, 
 
         // 1.21 If generate timestamps flag equals true, then set timestampOffset equal to frame end timestamp.
         if (m_shouldGenerateTimestamps) {
-            m_timestampOffset = frameEndTimestamp;
+            setTimestampOffset(frameEndTimestamp);
             resetTimestampOffsetInTrackBuffers();
         }
         break;
@@ -1231,7 +1300,7 @@ void SourceBufferPrivate::memoryPressure(const MediaTime& currentTime)
         if (!protectedThis)
             return OperationPromise::createAndReject(PlatformMediaError::BufferRemoved);
         if (protectedThis->isActive())
-            protectedThis->evictFrames(protectedThis->m_evictionData.maximumBufferSize, currentTime);
+            protectedThis->evictFrames(protectedThis->m_maximumBufferSize, currentTime);
         else {
             protectedThis->resetTrackBuffers();
             protectedThis->clearTrackBuffers(true);
@@ -1386,6 +1455,15 @@ void SourceBufferPrivate::ensureOnDispatcherSync(NOESCAPE Function<void()>&& fun
         function();
     else
         m_dispatcher->dispatchSync(WTFMove(function));
+}
+
+void SourceBufferPrivate::ensureWeakOnDispatcher(Function<void(SourceBufferPrivate&)>&& function)
+{
+    auto weakWrapper = [function = WTFMove(function), weakThis = ThreadSafeWeakPtr(*this)] mutable {
+        if (RefPtr protectedThis = weakThis.get())
+            function(*protectedThis);
+    };
+    ensureOnDispatcher(WTFMove(weakWrapper));
 }
 
 void SourceBufferPrivate::attach()

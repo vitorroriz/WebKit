@@ -111,10 +111,11 @@ public:
     WEBCORE_EXPORT virtual bool evictCodedFrames(uint64_t newDataSize, const MediaTime& currentTime);
     WEBCORE_EXPORT virtual void asyncEvictCodedFrames(uint64_t newDataSize, const MediaTime& currentTime);
     WEBCORE_EXPORT virtual size_t platformEvictionThreshold() const;
-    WEBCORE_EXPORT virtual uint64_t totalTrackBufferSizeInBytes() const;
+    WEBCORE_EXPORT uint64_t contentSize() const;
     WEBCORE_EXPORT virtual void resetTimestampOffsetInTrackBuffers();
+    WEBCORE_EXPORT virtual void setTimestampOffset(const MediaTime&);
+    WEBCORE_EXPORT MediaTime timestampOffset() const;
     virtual void startChangingType() { m_pendingInitializationSegmentForChangeType = true; }
-    virtual void setTimestampOffset(const MediaTime& timestampOffset) { m_timestampOffset = timestampOffset; }
     virtual void setAppendWindowStart(const MediaTime& appendWindowStart) { m_appendWindowStart = appendWindowStart;}
     virtual void setAppendWindowEnd(const MediaTime& appendWindowEnd) { m_appendWindowEnd = appendWindowEnd; }
 
@@ -127,15 +128,13 @@ public:
 
     void setMediaSourceDuration(const MediaTime& duration) { m_mediaSourceDuration = duration; }
 
-    WEBCORE_EXPORT virtual bool isBufferFullFor(uint64_t requiredSize) const;
-    WEBCORE_EXPORT virtual bool canAppend(uint64_t requiredSize) const;
-    SourceBufferEvictionData evictionData() const { return m_evictionData; }
+    WEBCORE_EXPORT bool isBufferFullFor(uint64_t requiredSize) const;
+    WEBCORE_EXPORT bool canAppend(uint64_t requiredSize) const;
+    WEBCORE_EXPORT SourceBufferEvictionData evictionData() const;
     WEBCORE_EXPORT Vector<PlatformTimeRanges> trackBuffersRanges() const;
 
     // Methods used by MediaSourcePrivate
     bool hasReceivedFirstInitializationSegment() const { return m_receivedFirstInitializationSegment; }
-
-    virtual MediaTime timestampOffset() const { return m_timestampOffset; }
 
     virtual size_t platformMaximumBufferSize() const { return 0; }
     virtual Ref<GenericPromise> setMaximumBufferSize(size_t);
@@ -213,7 +212,10 @@ protected:
     ThreadSafeWeakPtr<MediaSourcePrivate> m_mediaSource { nullptr };
     const Ref<WorkQueue> m_dispatcher; // SerialFunctionDispatcher the SourceBufferPrivate/MediaSourcePrivate
 
-    SourceBufferEvictionData m_evictionData;
+    mutable Lock m_lock;
+    SourceBufferEvictionData m_evictionData WTF_GUARDED_BY_LOCK(m_lock);
+    std::atomic<size_t> m_maximumBufferSize { 0 };
+    MediaTime m_timestampOffset WTF_GUARDED_BY_LOCK(m_lock);
 
 private:
     MediaTime minimumBufferedTime() const;
@@ -227,15 +229,19 @@ private:
     void setBufferedDirty(bool);
     void trySignalAllSamplesInTrackEnqueued(TrackBuffer&, TrackID);
     MediaTime findPreviousSyncSamplePresentationTime(const MediaTime&);
+    bool evictCodedFramesInternal(uint64_t newDataSize, const MediaTime& currentTime);
     void removeCodedFramesInternal(const MediaTime& start, const MediaTime& end, const MediaTime& currentMediaTime);
     bool evictFrames(uint64_t newDataSize, const MediaTime& currentTime);
     bool hasTooManySamples() const;
+    uint64_t totalTrackBufferSizeInBytes() const;
     void iterateTrackBuffers(NOESCAPE const Function<void(TrackBuffer&)>&);
     void iterateTrackBuffers(NOESCAPE const Function<void(const TrackBuffer&)>&) const;
 
     using OperationPromise = NativePromise<void, PlatformMediaError, WTF::PromiseOption::Default | WTF::PromiseOption::NonExclusive>;
     Ref<OperationPromise> protectedCurrentSourceBufferOperation() const;
     Ref<MediaPromise> protectedCurrentAppendProcessing() const;
+
+    void ensureWeakOnDispatcher(Function<void(SourceBufferPrivate&)>&&);
 
     bool m_hasAudio { false };
     bool m_hasVideo { false };
@@ -266,7 +272,6 @@ private:
     SamplesVector m_pendingSamples;
     Ref<MediaPromise> m_currentAppendProcessing { MediaPromise::createAndResolve() };
 
-    MediaTime m_timestampOffset;
     MediaTime m_appendWindowStart { MediaTime::zeroTime() };
     MediaTime m_appendWindowEnd { MediaTime::positiveInfiniteTime() };
     MediaTime m_highestPresentationTimestamp;
