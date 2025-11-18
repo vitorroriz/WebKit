@@ -102,9 +102,9 @@ using namespace Inspector;
 static std::atomic<CrossOriginMode> globalCrossOriginMode { CrossOriginMode::Shared };
 
 static Lock allScriptExecutionContextsMapLock;
-static HashMap<ScriptExecutionContextIdentifier, ScriptExecutionContext*>& allScriptExecutionContextsMap() WTF_REQUIRES_LOCK(allScriptExecutionContextsMapLock)
+static HashMap<ScriptExecutionContextIdentifier, WeakRef<ScriptExecutionContext>>& allScriptExecutionContextsMap() WTF_REQUIRES_LOCK(allScriptExecutionContextsMapLock)
 {
-    static NeverDestroyed<HashMap<ScriptExecutionContextIdentifier, ScriptExecutionContext*>> contexts;
+    static NeverDestroyed<HashMap<ScriptExecutionContextIdentifier, WeakRef<ScriptExecutionContext>>> contexts;
     ASSERT(allScriptExecutionContextsMapLock.isLocked());
     return contexts;
 }
@@ -153,14 +153,14 @@ void ScriptExecutionContext::regenerateIdentifier()
     m_identifier = ScriptExecutionContextIdentifier::generate();
 
     ASSERT(!allScriptExecutionContextsMap().contains(m_identifier));
-    allScriptExecutionContextsMap().add(m_identifier, this);
+    allScriptExecutionContextsMap().add(m_identifier, *this);
 }
 
 void ScriptExecutionContext::addToContextsMap()
 {
     Locker locker { allScriptExecutionContextsMapLock };
     ASSERT(!allScriptExecutionContextsMap().contains(m_identifier));
-    allScriptExecutionContextsMap().add(m_identifier, this);
+    allScriptExecutionContextsMap().add(m_identifier, *this);
 }
 
 void ScriptExecutionContext::removeFromContextsMap()
@@ -180,8 +180,8 @@ inline void ScriptExecutionContext::checkConsistency() const
 
 void ScriptExecutionContext::checkConsistency() const
 {
-    for (auto* messagePort : m_messagePorts)
-        ASSERT(messagePort->scriptExecutionContext() == this);
+    for (auto& messagePort : m_messagePorts)
+        ASSERT(messagePort.scriptExecutionContext() == this);
 
     for (auto* destructionObserver : m_destructionObservers)
         ASSERT(destructionObserver->scriptExecutionContext() == this);
@@ -253,14 +253,10 @@ void ScriptExecutionContext::dispatchMessagePortEvents()
 
     auto completionHandlers = std::exchange(m_processMessageWithMessagePortsSoonHandlers, Vector<CompletionHandler<void()>> { });
 
-    // Make a frozen copy of the ports so we can iterate while new ones might be added or destroyed.
-    for (RefPtr messagePort : copyToVectorOf<RefPtr<MessagePort>>(m_messagePorts)) {
-        // The port may be destroyed, and another one created at the same address,
-        // but this is harmless. The worst that can happen as a result is that
-        // dispatchMessages() will be called needlessly.
-        if (m_messagePorts.contains(messagePort.get()) && messagePort->started())
-            messagePort->dispatchMessages();
-    }
+    m_messagePorts.forEach([](auto& messagePort) {
+        if (messagePort.started())
+            messagePort.dispatchMessages();
+    });
 
     for (auto& completionHandler : completionHandlers)
         completionHandler();
@@ -270,14 +266,14 @@ void ScriptExecutionContext::createdMessagePort(MessagePort& messagePort)
 {
     ASSERT(isContextThread());
 
-    m_messagePorts.add(&messagePort);
+    m_messagePorts.add(messagePort);
 }
 
 void ScriptExecutionContext::destroyedMessagePort(MessagePort& messagePort)
 {
     ASSERT(isContextThread());
 
-    m_messagePorts.remove(&messagePort);
+    m_messagePorts.remove(messagePort);
 }
 
 void ScriptExecutionContext::didLoadResourceSynchronously(const URL&)
@@ -713,7 +709,7 @@ void ScriptExecutionContext::setActiveServiceWorker(RefPtr<ServiceWorker>&& serv
 
 void ScriptExecutionContext::registerServiceWorker(ServiceWorker& serviceWorker)
 {
-    auto addResult = m_serviceWorkers.add(serviceWorker.identifier(), &serviceWorker);
+    auto addResult = m_serviceWorkers.add(serviceWorker.identifier(), serviceWorker);
     ASSERT_UNUSED(addResult, addResult.isNewEntry);
 
     ensureOnMainThread([identifier = serviceWorker.identifier()] {

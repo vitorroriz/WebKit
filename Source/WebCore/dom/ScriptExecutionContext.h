@@ -99,6 +99,7 @@ class ResourceRequest;
 class ServiceWorker;
 class ServiceWorkerContainer;
 class SocketProvider;
+class WeakPtrImplWithEventTargetData;
 class WebCoreOpaqueRoot;
 enum class AdvancedPrivacyProtections : uint16_t;
 enum class CrossOriginMode : bool;
@@ -340,7 +341,7 @@ public:
 
     void registerServiceWorker(ServiceWorker&);
     void unregisterServiceWorker(ServiceWorker&);
-    inline ServiceWorker* serviceWorker(ServiceWorkerIdentifier); // Defined in ScriptExecutionContextInlines.h.
+    inline ServiceWorker* serviceWorker(ServiceWorkerIdentifier); // Defined in ServiceWorker.h.
 
     ServiceWorkerContainer* serviceWorkerContainer();
     ServiceWorkerContainer* ensureServiceWorkerContainer();
@@ -420,7 +421,7 @@ private:
     void checkConsistency() const;
     WEBCORE_EXPORT GuaranteedSerialFunctionDispatcher& nativePromiseDispatcher();
 
-    HashSet<MessagePort*> m_messagePorts;
+    WeakHashSet<MessagePort, WeakPtrImplWithEventTargetData> m_messagePorts;
     HashSet<ContextDestructionObserver*> m_destructionObservers;
     HashSet<ActiveDOMObject*> m_activeDOMObjects;
 
@@ -444,7 +445,7 @@ private:
 #endif
 
     RefPtr<ServiceWorker> m_activeServiceWorker;
-    HashMap<ServiceWorkerIdentifier, ServiceWorker*> m_serviceWorkers;
+    HashMap<ServiceWorkerIdentifier, WeakRef<ServiceWorker, WeakPtrImplWithEventTargetData>> m_serviceWorkers;
 
     String m_domainForCachePartition;
     mutable ScriptExecutionContextIdentifier m_identifier;

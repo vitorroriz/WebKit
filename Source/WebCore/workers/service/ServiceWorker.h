@@ -28,6 +28,7 @@
 #include "ActiveDOMObject.h"
 #include "ContextDestructionObserver.h"
 #include "EventTarget.h"
+#include "ScriptExecutionContext.h"
 #include "ServiceWorkerData.h"
 #include <JavaScriptCore/Strong.h>
 #include <wtf/RefCounted.h>
@@ -90,5 +91,10 @@ private:
     bool m_isStopped { false };
     RefPtr<PendingActivity<ServiceWorker>> m_pendingActivityForEventDispatch;
 };
+
+inline ServiceWorker* ScriptExecutionContext::serviceWorker(ServiceWorkerIdentifier identifier)
+{
+    return m_serviceWorkers.get(identifier);
+}
 
 } // namespace WebCore
