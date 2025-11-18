@@ -176,8 +176,7 @@ static Sampler::UniqueSamplerIdentifier computeDescriptorHash(MTLSamplerDescript
     auto floatToUint32 = ^(float f) {
         return *reinterpret_cast<uint32_t*>(&f);
     };
-    std::array<uint32_t, 4> uintData = { miscHash(descriptor), floatToUint32(descriptor.lodMinClamp), floatToUint32(descriptor.lodMaxClamp), floatToUint32(descriptor.maxAnisotropy) };
-    return base64EncodeToString(asByteSpan(std::span { uintData }));
+    return std::array<uint32_t, 4> { miscHash(descriptor), floatToUint32(descriptor.lodMinClamp), floatToUint32(descriptor.lodMaxClamp), floatToUint32(descriptor.maxAnisotropy) };
 }
 
 static MTLSamplerDescriptor *createMetalDescriptorFromDescriptor(const WGPUSamplerDescriptor &descriptor)
@@ -241,7 +240,7 @@ Sampler::~Sampler()
 
     Locker locker { samplerStateLock };
     if (auto it = retainedSamplerStates->find(*m_samplerIdentifier); it != retainedSamplerStates->end()) {
-        it->value.apiSamplerList.remove(this);
+        it->value.apiSamplerList.remove(reinterpret_cast<uintptr_t>(this));
         if (!it->value.apiSamplerList.size())
             retainedSamplerStates->remove(it);
     }
@@ -276,7 +275,7 @@ id<MTLSamplerState> Sampler::samplerState() const
     auto samplerIdentifier = *m_samplerIdentifier;
     if (auto it = retainedSamplerStates->find(samplerIdentifier); it != retainedSamplerStates->end()) {
         samplerState = it->value.samplerState.get();
-        it->value.apiSamplerList.add(this);
+        it->value.apiSamplerList.add(reinterpret_cast<uintptr_t>(this));
         lastAccessedKeys->appendOrMoveToLast(samplerIdentifier);
         if ((m_cachedSamplerState = samplerState))
             return samplerState;
@@ -307,7 +306,7 @@ id<MTLSamplerState> Sampler::samplerState() const
         .samplerState = samplerState,
         .apiSamplerList = { }
     });
-    addResult.iterator->value.apiSamplerList.add(this);
+    addResult.iterator->value.apiSamplerList.add(reinterpret_cast<uintptr_t>(this));
     lastAccessedKeys->appendOrMoveToLast(samplerIdentifier);
 
     m_cachedSamplerState = samplerState;
