@@ -53,7 +53,8 @@ struct MediaSourceConfiguration;
 enum class MediaSourcePrivateAddStatus : uint8_t {
     Ok,
     NotSupported,
-    ReachedIdLimit
+    ReachedIdLimit,
+    InvalidState
 };
 
 enum class MediaSourcePrivateEndOfStreamStatus : uint8_t {

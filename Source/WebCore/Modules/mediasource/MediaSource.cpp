@@ -1457,6 +1457,8 @@ ExceptionOr<Ref<SourceBufferPrivate>> MediaSource::createSourceBufferPrivate(con
         // Step 3: If the user agent can't handle any more SourceBuffer objects then throw
         // a QuotaExceededError exception and abort these steps.
         return Exception { ExceptionCode::QuotaExceededError };
+    case MediaSourcePrivate::AddStatus::InvalidState:
+        return Exception { ExceptionCode::InvalidStateError };
     }
 
     ASSERT_NOT_REACHED();

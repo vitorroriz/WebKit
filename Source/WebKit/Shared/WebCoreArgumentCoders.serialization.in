@@ -8001,7 +8001,8 @@ header: <WebCore/MediaSourcePrivate.h>
 enum class WebCore::MediaSourcePrivateAddStatus : uint8_t {
     Ok,
     NotSupported,
-    ReachedIdLimit
+    ReachedIdLimit,
+    InvalidState
 };
 
 header: <WebCore/MediaSourcePrivate.h>
