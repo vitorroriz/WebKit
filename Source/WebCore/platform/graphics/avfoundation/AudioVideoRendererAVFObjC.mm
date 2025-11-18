@@ -217,16 +217,17 @@ void AudioVideoRendererAVFObjC::enqueueSample(TrackIdentifier trackId, Ref<Media
     attachContentKeyToSampleIfNeeded(sample);
 #endif
 
+    RetainPtr cmSampleBuffer = sample->platformSample().cmSampleBuffer();
+    RetainPtr formatDescription = PAL::CMSampleBufferGetFormatDescription(cmSampleBuffer.get());
+    ASSERT(formatDescription);
+    if (!formatDescription) {
+        ERROR_LOG(LOGIDENTIFIER, "Received sample with a null formatDescription. Bailing.");
+        return;
+    }
+    auto mediaType = typeFromFormatDescription(formatDescription.get());
+
     switch (*type) {
-    case TrackType::Video: {
-        RetainPtr cmSampleBuffer = sample->platformSample().cmSampleBuffer();
-        RetainPtr formatDescription = PAL::CMSampleBufferGetFormatDescription(cmSampleBuffer.get());
-        ASSERT(formatDescription);
-        if (!formatDescription) {
-            ERROR_LOG(LOGIDENTIFIER, "Received sample with a null formatDescription. Bailing.");
-            return;
-        }
-        auto mediaType = typeFromFormatDescription(formatDescription.get());
+    case TrackType::Video:
         ASSERT(mediaType == TrackType::Video);
         if (mediaType != TrackType::Video) {
             ERROR_LOG(LOGIDENTIFIER, "Expected sample of type: video got: '", mediaType, "'. Bailing.");
@@ -248,10 +249,14 @@ void AudioVideoRendererAVFObjC::enqueueSample(TrackIdentifier trackId, Ref<Media
         if (RefPtr videoRenderer = m_videoRenderer; videoRenderer && isEnabledVideoTrackId(trackId))
             videoRenderer->enqueueSample(sample, minimumUpcomingTime.value_or(sample->presentationTime()));
         break;
-    }
+
     case TrackType::Audio:
+        ASSERT(mediaType == TrackType::Audio);
+        if (mediaType != TrackType::Audio) {
+            ERROR_LOG(LOGIDENTIFIER, "Expected sample of type: audio got: '", mediaType, "'. Bailing.");
+            return;
+        }
         if (RetainPtr audioRenderer = audioRendererFor(trackId)) {
-            RetainPtr cmSampleBuffer = sample->platformSample().cmSampleBuffer();
             [audioRenderer enqueueSampleBuffer:cmSampleBuffer.get()];
             if (!allRenderersHaveAvailableSamples() && !sample->isNonDisplaying())
                 setHasAvailableAudioSample(trackId, true);
