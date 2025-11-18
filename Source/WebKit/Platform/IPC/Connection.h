@@ -651,9 +651,7 @@ private:
     SerialFunctionDispatcher& dispatcher();
 
     class SyncMessageState;
-    struct SyncMessageStateRelease {
-        void operator()(SyncMessageState*) const;
-    };
+    RefPtr<SyncMessageState> protectedSyncState() const;
 
     void addAsyncReplyHandler(AsyncReplyHandler&&);
     void addAsyncReplyHandlerWithDispatcher(AsyncReplyHandlerWithDispatcher&&);
@@ -682,7 +680,7 @@ private:
     };
 
     CheckedPtr<Client> m_client;
-    std::unique_ptr<SyncMessageState, SyncMessageStateRelease> m_syncState;
+    RefPtr<SyncMessageState> m_syncState;
     UniqueID m_uniqueID;
     bool m_isServer;
     std::atomic<bool> m_isValid { true };
