@@ -95,8 +95,6 @@ class GtkPort(GLibPort):
             else:
                 _log.warning("Can't find Gallium llvmpipe driver. Try to run update-webkitgtk-libs")
 
-        # Gtk uses hybrid painting mode by default (preferring GPU) -- for deterministic tests we always want to use the GPU for Gtk.
-        environment['WEBKIT_SKIA_CPU_PAINTING_THREADS'] = '0'
         return environment
 
     def _generate_all_test_configurations(self):

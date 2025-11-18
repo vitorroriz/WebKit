@@ -373,13 +373,11 @@ static String threadedRenderingInfo(const RenderProcessInfo& info)
     if (!info.cpuPaintingThreadsCount && !info.gpuPaintingThreadsCount)
         return "Disabled"_s;
 
-    if (!info.gpuPaintingThreadsCount)
+    if (info.cpuPaintingThreadsCount)
         return makeString("CPU ("_s, info.cpuPaintingThreadsCount, " threads)"_s);
 
-    if (!info.cpuPaintingThreadsCount)
-        return makeString("GPU ("_s, info.gpuPaintingThreadsCount, " threads)"_s);
-
-    return makeString("GPU ("_s, info.gpuPaintingThreadsCount, " threads), CPU ("_s, info.cpuPaintingThreadsCount, " threads)"_s);
+    ASSERT(info.gpuPaintingThreadsCount);
+    return makeString("GPU ("_s, info.gpuPaintingThreadsCount, " threads)"_s);
 }
 #endif
 
