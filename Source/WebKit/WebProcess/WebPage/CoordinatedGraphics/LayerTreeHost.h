@@ -82,13 +82,12 @@ public:
     const LayerTreeContext& layerTreeContext() const { return m_layerTreeContext; }
     void setLayerTreeStateIsFrozen(bool);
 
-    void scheduleLayerFlush();
-    void cancelPendingLayerFlush();
     void setRootCompositingLayer(WebCore::GraphicsLayer*);
     void setViewOverlayRootLayer(WebCore::GraphicsLayer*);
 
-    void forceRepaint();
-    void forceRepaintAsync(CompletionHandler<void()>&&);
+    void scheduleRenderingUpdate();
+    void updateRenderingWithForcedRepaint();
+    void updateRenderingWithForcedRepaintAsync(CompletionHandler<void()>&&);
     void sizeDidChange();
 
     void pauseRendering();
@@ -123,8 +122,11 @@ public:
 private:
     void updateRootLayer();
     WebCore::FloatRect visibleContentsRect() const;
-    void layerFlushRunLoopObserverFired();
-    void flushLayers();
+
+    void scheduleRenderingUpdateRunLoopObserver();
+    void invalidateRenderingUpdateRunLoopObserver();
+    void renderingUpdateRunLoopObserverFired();
+    void updateRendering();
     void commitSceneState();
 
     // CoordinatedPlatformLayer::Client
@@ -161,7 +163,7 @@ private:
     bool m_layerTreeStateIsFrozen { false };
     bool m_pendingResize { false };
     bool m_pendingForceRepaint { false };
-    bool m_isFlushingLayers { false };
+    bool m_isUpdatingRendering { false };
     bool m_waitUntilPaintingComplete { false };
     bool m_isSuspended { false };
     bool m_isWaitingForRenderer { false };
@@ -176,7 +178,7 @@ private:
         CompletionHandler<void()> callback;
         std::optional<uint32_t> compositionRequestID;
     } m_forceRepaintAsync;
-    std::unique_ptr<WebCore::RunLoopObserver> m_layerFlushRunLoopObserver;
+    std::unique_ptr<WebCore::RunLoopObserver> m_renderingUpdateRunLoopObserver;
 #if USE(CAIRO)
     std::unique_ptr<WebCore::Cairo::PaintingEngine> m_paintingEngine;
 #elif USE(SKIA)

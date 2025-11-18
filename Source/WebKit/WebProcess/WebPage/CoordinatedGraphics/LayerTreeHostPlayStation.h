@@ -95,13 +95,13 @@ public:
     const LayerTreeContext& layerTreeContext() const { return m_layerTreeContext; }
     void setLayerTreeStateIsFrozen(bool);
 
-    void scheduleLayerFlush();
-    void cancelPendingLayerFlush();
+    void scheduleRenderingUpdate();
+    void cancelRenderingUpdate();
     void setRootCompositingLayer(WebCore::GraphicsLayer*);
     void setViewOverlayRootLayer(WebCore::GraphicsLayer*);
 
-    void forceRepaint();
-    void forceRepaintAsync(CompletionHandler<void()>&&);
+    void updateRenderingWithForcedRepaint();
+    void updateRenderingWithForcedRepaintAsync(CompletionHandler<void()>&&);
     void sizeDidChange();
 
     void pauseRendering();

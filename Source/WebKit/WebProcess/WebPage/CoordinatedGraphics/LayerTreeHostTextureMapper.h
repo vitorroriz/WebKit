@@ -62,14 +62,13 @@ public:
     const LayerTreeContext& layerTreeContext() const { return m_layerTreeContext; }
     void setLayerTreeStateIsFrozen(bool);
     void setShouldNotifyAfterNextScheduledLayerFlush(bool);
-    void scheduleLayerFlush();
-    void cancelPendingLayerFlush();
+    void scheduleRenderingUpdate();
     void setRootCompositingLayer(WebCore::GraphicsLayer*);
     void setViewOverlayRootLayer(WebCore::GraphicsLayer*);
     void setNonCompositedContentsNeedDisplay(const WebCore::IntRect&);
     void scrollNonCompositedContents(const WebCore::IntRect&);
-    void forceRepaint();
-    void forceRepaintAsync(CompletionHandler<void()>&&);
+    void updateRenderingWithForcedRepaint();
+    void updateRenderingWithForcedRepaintAsync(CompletionHandler<void()>&&);
     void sizeDidChange();
     void pauseRendering();
     void resumeRendering();
