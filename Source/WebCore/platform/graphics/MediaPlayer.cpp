@@ -569,6 +569,10 @@ bool MediaPlayer::load(const URL& url, const LoadOptions& options, MediaSourcePr
     m_mediaSource = mediaSource;
     m_url = url;
     m_loadOptions = options;
+#if USE(AVFOUNDATION)
+    if (DeprecatedGlobalSettings::isAVFoundationEnabled() && hasPlatformStrategies() && platformStrategies()->mediaStrategy()->hasRemoteRendererFor(MediaPlayerMediaEngineIdentifier::AVFoundationMSE))
+        m_activeEngineIdentifier = MediaPlayerMediaEngineIdentifier::AVFoundationMSE;
+#endif
     loadWithNextMediaEngine(nullptr);
     return m_currentMediaEngine;
 }
