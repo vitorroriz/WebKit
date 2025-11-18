@@ -3502,6 +3502,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/svg/StyleSVGStrokeDasharray.h
     style/values/svg/StyleSVGStrokeDashoffset.h
 
+    style/values/text/StyleHangingPunctuation.h
     style/values/text/StyleHyphenateCharacter.h
     style/values/text/StyleHyphenateLimitEdge.h
     style/values/text/StyleHyphenateLimitLines.h

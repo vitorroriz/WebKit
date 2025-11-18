@@ -697,13 +697,6 @@ enum class BreakInside : uint8_t {
     AvoidPage
 };
 
-enum class HangingPunctuation : uint8_t {
-    First     = 1 << 0,
-    Last      = 1 << 1,
-    AllowEnd  = 1 << 2,
-    ForceEnd  = 1 << 3
-};
-
 enum class EmptyCell : bool {
     Show,
     Hide
@@ -1283,7 +1276,6 @@ WTF::TextStream& operator<<(WTF::TextStream&, FlexDirection);
 WTF::TextStream& operator<<(WTF::TextStream&, FlexWrap);
 WTF::TextStream& operator<<(WTF::TextStream&, Float);
 WTF::TextStream& operator<<(WTF::TextStream&, UsedFloat);
-WTF::TextStream& operator<<(WTF::TextStream&, HangingPunctuation);
 WTF::TextStream& operator<<(WTF::TextStream&, Hyphens);
 WTF::TextStream& operator<<(WTF::TextStream&, ImageRendering);
 WTF::TextStream& operator<<(WTF::TextStream&, InsideLink);

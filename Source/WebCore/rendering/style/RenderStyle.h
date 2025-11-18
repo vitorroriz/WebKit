@@ -128,7 +128,6 @@ enum class FontSynthesisLonghandValue : bool;
 enum class FontVariantCaps : uint8_t;
 enum class FontVariantEmoji : uint8_t;
 enum class FontVariantPosition : uint8_t;
-enum class HangingPunctuation : uint8_t;
 enum class Hyphens : uint8_t;
 enum class ImageRendering : uint8_t;
 enum class InputSecurity : bool;
@@ -280,6 +279,7 @@ struct GridPosition;
 struct GridTemplateAreas;
 struct GridTemplateList;
 struct GridTrackSizes;
+struct HangingPunctuation;
 struct HyphenateCharacter;
 struct HyphenateLimitEdge;
 struct HyphenateLimitLines;
@@ -890,7 +890,7 @@ public:
     inline BreakBetween breakBefore() const;
     inline BreakBetween breakAfter() const;
 
-    OptionSet<HangingPunctuation> hangingPunctuation() const;
+    inline Style::HangingPunctuation hangingPunctuation() const;
 
     inline Style::WebkitTextStrokeWidth textStrokeWidth() const;
 
@@ -1650,7 +1650,7 @@ public:
     inline void setBreakAfter(BreakBetween);
     inline void setBreakInside(BreakInside);
     
-    inline void setHangingPunctuation(OptionSet<HangingPunctuation>);
+    inline void setHangingPunctuation(Style::HangingPunctuation);
 
     inline void setLineGrid(Style::WebkitLineGrid&&);
     inline void setLineSnap(LineSnap);
@@ -2022,7 +2022,7 @@ public:
     static constexpr Style::TextSpacingTrim initialTextSpacingTrim();
     static constexpr BreakBetween initialBreakBetween();
     static constexpr BreakInside initialBreakInside();
-    static constexpr OptionSet<HangingPunctuation> initialHangingPunctuation();
+    static constexpr Style::HangingPunctuation initialHangingPunctuation();
     static constexpr TableLayoutType initialTableLayout();
     static constexpr BorderCollapse initialBorderCollapse();
     static constexpr BorderStyle initialBorderStyle();

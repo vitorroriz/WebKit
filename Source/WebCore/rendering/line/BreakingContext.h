@@ -345,9 +345,9 @@ inline bool BreakingContext::handleText()
 
     const RenderStyle& style = lineStyle(renderer, m_lineInfo);
     const FontCascade& font = style.fontCascade();
-    bool canHangPunctuationAtStart = style.hangingPunctuation().contains(HangingPunctuation::First);
-    bool canHangPunctuationAtEnd = style.hangingPunctuation().contains(HangingPunctuation::Last);
-    bool canHangStopOrCommaAtLineEnd = style.hangingPunctuation().contains(HangingPunctuation::AllowEnd);
+    bool canHangPunctuationAtStart = style.hangingPunctuation().contains(Style::HangingPunctuationValue::First);
+    bool canHangPunctuationAtEnd = style.hangingPunctuation().contains(Style::HangingPunctuationValue::Last);
+    bool canHangStopOrCommaAtLineEnd = style.hangingPunctuation().contains(Style::HangingPunctuationValue::AllowEnd);
     int endPunctuationIndex = canHangPunctuationAtEnd && m_collapseWhiteSpace ? renderer.lastCharacterIndexStrippingSpaces() : renderer.text().length() - 1;
 
     float wrapWidthOffset = m_width.uncommittedWidth() + inlineLogicalWidth(renderer, !m_appliedStartWidth, true);

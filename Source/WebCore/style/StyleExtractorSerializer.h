@@ -74,7 +74,6 @@ public:
     static void serializeTextUnderlinePosition(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TextUnderlinePosition>);
     static void serializeTextEmphasisPosition(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TextEmphasisPosition>);
     static void serializeSpeakAs(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<SpeakAs>);
-    static void serializeHangingPunctuation(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<HangingPunctuation>);
     static void serializePositionAnchor(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const std::optional<ScopedName>&);
     static void serializePositionArea(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const std::optional<PositionArea>&);
     static void serializeNameScope(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const NameScope&);
@@ -285,26 +284,6 @@ inline void ExtractorSerializer::serializeSpeakAs(ExtractorState& state, StringB
 
     if (listEmpty)
         serializationForCSS(builder, context, state.style, CSS::Keyword::Normal { });
-}
-
-inline void ExtractorSerializer::serializeHangingPunctuation(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<HangingPunctuation> hangingPunctuation)
-{
-    bool listEmpty = true;
-    auto appendOption = [&](HangingPunctuation test, CSSValueID value) {
-        if (hangingPunctuation &  test) {
-            if (!listEmpty)
-                builder.append(' ');
-            builder.append(nameLiteralForSerialization(value));
-            listEmpty = false;
-        }
-    };
-    appendOption(HangingPunctuation::First, CSSValueFirst);
-    appendOption(HangingPunctuation::AllowEnd, CSSValueAllowEnd);
-    appendOption(HangingPunctuation::ForceEnd, CSSValueForceEnd);
-    appendOption(HangingPunctuation::Last, CSSValueLast);
-
-    if (listEmpty)
-        serializationForCSS(builder, context, state.style, CSS::Keyword::None { });
 }
 
 inline void ExtractorSerializer::serializePositionAnchor(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const std::optional<ScopedName>& positionAnchor)

@@ -137,7 +137,6 @@ public:
     static Ref<CSSValue> convertTextUnderlinePosition(ExtractorState&, OptionSet<TextUnderlinePosition>);
     static Ref<CSSValue> convertTextEmphasisPosition(ExtractorState&, OptionSet<TextEmphasisPosition>);
     static Ref<CSSValue> convertSpeakAs(ExtractorState&, OptionSet<SpeakAs>);
-    static Ref<CSSValue> convertHangingPunctuation(ExtractorState&, OptionSet<HangingPunctuation>);
     static Ref<CSSValue> convertPositionAnchor(ExtractorState&, const std::optional<ScopedName>&);
     static Ref<CSSValue> convertPositionArea(ExtractorState&, const PositionArea&);
     static Ref<CSSValue> convertPositionArea(ExtractorState&, const std::optional<PositionArea>&);
@@ -322,22 +321,6 @@ inline Ref<CSSValue> ExtractorConverter::convertSpeakAs(ExtractorState&, OptionS
         list.append(CSSPrimitiveValue::create(CSSValueNoPunctuation));
     if (list.isEmpty())
         return CSSPrimitiveValue::create(CSSValueNormal);
-    return CSSValueList::createSpaceSeparated(WTFMove(list));
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertHangingPunctuation(ExtractorState&, OptionSet<HangingPunctuation> hangingPunctuation)
-{
-    CSSValueListBuilder list;
-    if (hangingPunctuation & HangingPunctuation::First)
-        list.append(CSSPrimitiveValue::create(CSSValueFirst));
-    if (hangingPunctuation & HangingPunctuation::AllowEnd)
-        list.append(CSSPrimitiveValue::create(CSSValueAllowEnd));
-    if (hangingPunctuation & HangingPunctuation::ForceEnd)
-        list.append(CSSPrimitiveValue::create(CSSValueForceEnd));
-    if (hangingPunctuation & HangingPunctuation::Last)
-        list.append(CSSPrimitiveValue::create(CSSValueLast));
-    if (list.isEmpty())
-        return CSSPrimitiveValue::create(CSSValueNone);
     return CSSValueList::createSpaceSeparated(WTFMove(list));
 }
 

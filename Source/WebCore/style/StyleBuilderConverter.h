@@ -121,8 +121,6 @@ public:
     static Resize convertResize(BuilderState&, const CSSValue&);
     static OptionSet<TextUnderlinePosition> convertTextUnderlinePosition(BuilderState&, const CSSValue&);
 
-    static OptionSet<HangingPunctuation> convertHangingPunctuation(BuilderState&, const CSSValue&);
-
     static OptionSet<SpeakAs> convertSpeakAs(BuilderState&, const CSSValue&);
 
     static std::optional<ScopedName> convertPositionAnchor(BuilderState&, const CSSValue&);
@@ -310,16 +308,6 @@ inline OptionSet<SpeakAs> BuilderConverter::convertSpeakAs(BuilderState&, const 
             if (!isValueID(currentValue, CSSValueNormal))
                 result.add(fromCSSValue<SpeakAs>(currentValue));
         }
-    }
-    return result;
-}
-
-inline OptionSet<HangingPunctuation> BuilderConverter::convertHangingPunctuation(BuilderState&, const CSSValue& value)
-{
-    auto result = RenderStyle::initialHangingPunctuation();
-    if (auto* list = dynamicDowncast<CSSValueList>(value)) {
-        for (auto& currentValue : *list)
-            result.add(fromCSSValue<HangingPunctuation>(currentValue));
     }
     return result;
 }

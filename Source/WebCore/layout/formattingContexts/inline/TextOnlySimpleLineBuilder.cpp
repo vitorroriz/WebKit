@@ -509,7 +509,7 @@ bool TextOnlySimpleLineBuilder::isEligibleForSimplifiedInlineLayoutByStyle(const
             return false;
         if (style.boxDecorationBreak() == BoxDecorationBreak::Clone)
             return false;
-        if (!style.hangingPunctuation().isEmpty())
+        if (!style.hangingPunctuation().isNone())
             return false;
         if (!style.hyphenateLimitLines().isNoLimit())
             return false;

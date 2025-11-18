@@ -4709,8 +4709,8 @@ void RenderBlockFlow::computeInlinePreferredLogicalWidths(LayoutUnit& minLogical
     CheckedPtr<RenderBox> previousFloat;
     bool isPrevChildInlineFlow = false;
     bool shouldBreakLineAfterText = false;
-    bool canHangPunctuationAtStart = styleToUse.hangingPunctuation().contains(HangingPunctuation::First);
-    bool canHangPunctuationAtEnd = styleToUse.hangingPunctuation().contains(HangingPunctuation::Last);
+    bool canHangPunctuationAtStart = styleToUse.hangingPunctuation().contains(Style::HangingPunctuationValue::First);
+    bool canHangPunctuationAtEnd = styleToUse.hangingPunctuation().contains(Style::HangingPunctuationValue::Last);
     RenderText* lastText = nullptr;
     struct RubyBaseContent {
         float minimumWidth { 0.f };

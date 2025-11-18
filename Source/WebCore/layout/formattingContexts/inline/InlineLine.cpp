@@ -460,7 +460,7 @@ void Line::appendText(const InlineTextItem& inlineTextItem, const RenderStyle& s
             return;
         }
         if (TextUtil::hasHangableStopOrCommaEnd(inlineTextItem, style)) {
-            auto isConditionalHanging = style.hangingPunctuation().contains(HangingPunctuation::AllowEnd);
+            auto isConditionalHanging = style.hangingPunctuation().contains(Style::HangingPunctuationValue::AllowEnd);
             m_hangingContent.setTrailingStopOrComma(TextUtil::hangableStopOrCommaEndWidth(inlineTextItem, style), isConditionalHanging);
             return;
         }

@@ -46,6 +46,7 @@
 #include "ScrollAxis.h"
 #include "ScrollTypes.h"
 #include "StyleContain.h"
+#include "StyleHangingPunctuation.h"
 #include "StyleImageOrientation.h"
 #include "StyleMarginTrim.h"
 #include "StylePositionVisibility.h"
@@ -924,8 +925,8 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH
 
-#define TYPE HangingPunctuation
-#define FOR_EACH(CASE) CASE(First) CASE(Last) CASE(AllowEnd) CASE(ForceEnd)
+#define TYPE Style::HangingPunctuationValue
+#define FOR_EACH(CASE) CASE(First) CASE(ForceEnd) CASE(AllowEnd) CASE(Last)
 DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH

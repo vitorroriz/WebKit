@@ -657,17 +657,6 @@ TextStream& operator<<(TextStream& ts, UsedFloat floating)
     return ts;
 }
 
-TextStream& operator<<(TextStream& ts, HangingPunctuation punctuation)
-{
-    switch (punctuation) {
-    case HangingPunctuation::First: ts << "first"_s; break;
-    case HangingPunctuation::Last: ts << "last"_s; break;
-    case HangingPunctuation::AllowEnd: ts << "allow-end"_s; break;
-    case HangingPunctuation::ForceEnd: ts << "force-end"_s; break;
-    }
-    return ts;
-}
-
 TextStream& operator<<(TextStream& ts, Hyphens hyphens)
 {
     switch (hyphens) {

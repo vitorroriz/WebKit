@@ -4517,7 +4517,7 @@
                 "last"
             ],
             "codegen-properties": {
-                "style-converter": "HangingPunctuation",
+                "style-converter": "StyleType<HangingPunctuation>",
                 "parser-grammar": "none | [ first || [ force-end | allow-end ] || last ]@(preserve-order no-single-item-opt)"
             },
             "specification": {

@@ -457,7 +457,7 @@ void StyleRareInheritedData::dumpDifferences(TextStream& ts, const StyleRareInhe
     LOG_IF_DIFFERENT_WITH_CAST(Style::WebkitTouchCallout, webkitTouchCallout);
 #endif
 
-    LOG_IF_DIFFERENT_WITH_FROM_RAW(OptionSet<HangingPunctuation>, hangingPunctuation);
+    LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::HangingPunctuation, hangingPunctuation);
 
     LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::SVGPaintOrder, paintOrder);
     LOG_IF_DIFFERENT_WITH_CAST(LineCap, capStyle);

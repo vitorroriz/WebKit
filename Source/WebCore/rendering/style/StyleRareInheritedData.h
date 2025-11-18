@@ -32,6 +32,7 @@
 #include <WebCore/StyleCursor.h>
 #include <WebCore/StyleCustomPropertyData.h>
 #include <WebCore/StyleDynamicRangeLimit.h>
+#include <WebCore/StyleHangingPunctuation.h>
 #include <WebCore/StyleHyphenateCharacter.h>
 #include <WebCore/StyleHyphenateLimitEdge.h>
 #include <WebCore/StyleHyphenateLimitLines.h>
@@ -208,7 +209,7 @@ public:
 #if ENABLE(WEBKIT_TOUCH_CALLOUT_CSS_PROPERTY)
     PREFERRED_TYPE(Style::WebkitTouchCallout) unsigned webkitTouchCallout : 1;
 #endif
-    PREFERRED_TYPE(OptionSet<HangingPunctuation>) unsigned hangingPunctuation : 4;
+    PREFERRED_TYPE(Style::HangingPunctuation) unsigned hangingPunctuation : 4;
     PREFERRED_TYPE(Style::SVGPaintOrder::Type) unsigned paintOrder : 3;
     PREFERRED_TYPE(LineCap) unsigned capStyle : 2;
     PREFERRED_TYPE(LineJoin) unsigned joinStyle : 2;
