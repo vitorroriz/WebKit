@@ -4125,7 +4125,7 @@ void FrameLoader::continueLoadAfterNavigationPolicy(const ResourceRequest& reque
         return;
     }
 
-    if (auto pendingDispatchNavigateEvent = m_policyDocumentLoader->triggeringAction().takePendingDispatchNavigateEvent()) {
+    if (auto pendingDispatchNavigateEvent = m_policyDocumentLoader ? m_policyDocumentLoader->triggeringAction().takePendingDispatchNavigateEvent() : std::function<bool()> { }) {
         if (!pendingDispatchNavigateEvent())
             return;
     }
