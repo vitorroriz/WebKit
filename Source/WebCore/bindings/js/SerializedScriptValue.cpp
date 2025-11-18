@@ -6117,7 +6117,7 @@ static ExceptionOr<std::unique_ptr<ArrayBufferContentsArray>> transferArrayBuffe
 
     auto contents = makeUnique<ArrayBufferContentsArray>(arrayBuffers.size());
 
-    HashSet<JSC::ArrayBuffer*> visited;
+    HashSet<RefPtr<JSC::ArrayBuffer>> visited;
     for (size_t arrayBufferIndex = 0; arrayBufferIndex < arrayBuffers.size(); arrayBufferIndex++) {
         if (visited.contains(arrayBuffers[arrayBufferIndex].get()))
             continue;
@@ -6182,7 +6182,7 @@ static Exception exceptionForSerializationFailure(SerializationReturnCode code)
 
 static bool containsDuplicates(const Vector<RefPtr<ImageBitmap>>& imageBitmaps)
 {
-    HashSet<ImageBitmap*> visited;
+    HashSet<RefPtr<ImageBitmap>> visited;
     for (auto& imageBitmap : imageBitmaps) {
         if (!visited.add(imageBitmap.get()))
             return true;
@@ -6193,7 +6193,7 @@ static bool containsDuplicates(const Vector<RefPtr<ImageBitmap>>& imageBitmaps)
 #if ENABLE(OFFSCREEN_CANVAS_IN_WORKERS)
 static bool canOffscreenCanvasesDetach(const Vector<RefPtr<OffscreenCanvas>>& offscreenCanvases)
 {
-    HashSet<OffscreenCanvas*> visited;
+    HashSet<RefPtr<OffscreenCanvas>> visited;
     for (auto& offscreenCanvas : offscreenCanvases) {
         if (!offscreenCanvas->canDetach())
             return false;
@@ -6208,7 +6208,7 @@ static bool canOffscreenCanvasesDetach(const Vector<RefPtr<OffscreenCanvas>>& of
 #if ENABLE(WEB_RTC)
 static bool canDetachRTCDataChannels(const Vector<Ref<RTCDataChannel>>& channels)
 {
-    HashSet<RTCDataChannel*> visited;
+    HashSet<RefPtr<RTCDataChannel>> visited;
     for (auto& channel : channels) {
         if (!channel->canDetach())
             return false;
@@ -6223,7 +6223,7 @@ static bool canDetachRTCDataChannels(const Vector<Ref<RTCDataChannel>>& channels
 #if ENABLE(MEDIA_STREAM)
 static bool canDetachMediaStreamTracks(const Vector<Ref<MediaStreamTrack>>& tracks)
 {
-    HashSet<MediaStreamTrack*> visited;
+    HashSet<RefPtr<MediaStreamTrack>> visited;
     for (auto& track : tracks) {
         if (!visited.add(track.ptr()))
             return false;
@@ -6235,7 +6235,7 @@ static bool canDetachMediaStreamTracks(const Vector<Ref<MediaStreamTrack>>& trac
 #if ENABLE(MEDIA_SOURCE_IN_WORKERS)
 static bool canDetachMediaSourceHandles(const Vector<Ref<MediaSourceHandle>>& handles)
 {
-    HashSet<MediaSourceHandle*> visited;
+    HashSet<RefPtr<MediaSourceHandle>> visited;
     for (auto& handle : handles) {
         if (!handle->canDetach())
             return false;
@@ -6285,9 +6285,9 @@ ExceptionOr<Ref<SerializedScriptValue>> SerializedScriptValue::create(JSGlobalOb
     Vector<Ref<MediaStreamTrack>> transferredMediaStreamTracks;
 #endif
 
-    HashSet<JSC::JSObject*> uniqueTransferables;
+    HashSet<JSC::JSObject*> visited;
     for (auto& transferable : transferList) {
-        if (!uniqueTransferables.add(transferable.get()).isNewEntry)
+        if (!visited.add(transferable.get()).isNewEntry)
             return Exception { ExceptionCode::DataCloneError, "Duplicate transferable for structured clone"_s };
 
         if (RefPtr arrayBuffer = toPossiblySharedArrayBuffer(vm, transferable.get())) {
