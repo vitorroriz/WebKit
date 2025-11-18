@@ -405,7 +405,7 @@ public:
     bool keyboardScrollRecursively(std::optional<ScrollDirection>, std::optional<ScrollGranularity>, Node*, bool isKeyRepeat);
     WEBCORE_EXPORT bool shouldUseSmoothKeyboardScrollingForFocusedScrollableArea();
 
-    std::optional<RemoteUserInputEventData> userInputEventDataForRemoteFrame(const RemoteFrame*, const IntPoint&);
+    std::optional<RemoteUserInputEventData> userInputEventDataForRemoteFrame(const RemoteFrame*, const DoublePoint&);
 
     WEBCORE_EXPORT void updateMouseEventTargetAfterLayoutIfNeeded();
     WEBCORE_EXPORT void scheduleMouseEventTargetUpdateAfterLayout();

@@ -972,7 +972,7 @@ public:
     VisitedLinkState* visitedLinkStateIfExists() const { return m_visitedLinkState.get(); }
     inline VisitedLinkState& visitedLinkState() const;
 
-    MouseEventWithHitTestResults prepareMouseEvent(const HitTestRequest&, const LayoutPoint&, const PlatformMouseEvent&);
+    MouseEventWithHitTestResults prepareMouseEvent(const HitTestRequest&, const DoublePoint&, const PlatformMouseEvent&);
     // Returns whether focus was blocked. A true value does not necessarily mean the element was focused.
     // The element could have already been focused or may not be focusable (e.g. <input disabled>).
     WEBCORE_EXPORT bool setFocusedElement(Element*, BroadcastFocusedElement = BroadcastFocusedElement::Yes);

@@ -3866,7 +3866,7 @@ void WebPageProxy::performDragControllerAction(DragControllerAction action, Drag
             didPerformDragControllerAction(dragOperation, dragHandlingMethod, mouseIsOverFileInput, numberOfItemsToBeAccepted, insertionRect, editableElementRect);
             return;
         }
-        dragData.setClientPosition(remoteUserInputEventData->transformedPoint);
+        dragData.setClientPosition(roundedIntPoint(remoteUserInputEventData->transformedPoint));
         performDragControllerAction(action, dragData, remoteUserInputEventData->targetFrameID);
     };
 #if PLATFORM(GTK)
@@ -3928,7 +3928,7 @@ void WebPageProxy::dragEnded(const IntPoint& clientPosition, const IntPoint& glo
             resetCurrentDragInformation();
             return;
         }
-        dragEnded(remoteUserInputEventData->transformedPoint, globalPosition, dragOperationMask, remoteUserInputEventData->targetFrameID);
+        dragEnded(roundedIntPoint(remoteUserInputEventData->transformedPoint), globalPosition, dragOperationMask, remoteUserInputEventData->targetFrameID);
     };
 
     sendWithAsyncReplyToProcessContainingFrame(frameID, Messages::WebPage::DragEnded(frameID, clientPosition, globalPosition, dragOperationMask), WTFMove(completionHandler));
@@ -4304,7 +4304,7 @@ void WebPageProxy::sendWheelEvent(WebCore::FrameIdentifier frameID, const WebWhe
                 return;
 
             if (remoteWheelEventData) {
-                wheelEvent.setPosition(remoteWheelEventData->transformedPoint);
+                wheelEvent.setPosition(roundedIntPoint(remoteWheelEventData->transformedPoint));
                 protectedThis->sendWheelEvent(remoteWheelEventData->targetFrameID, wheelEvent, processingSteps, rubberBandableEdges, willStartSwipe, wasHandledForScrolling);
                 return;
             }
@@ -14495,7 +14495,7 @@ void WebPageProxy::didPerformImmediateActionHitTest(IPC::Connection& connection,
 {
     if (protectedPreferences()->siteIsolationEnabled()) {
         if (result.remoteUserInputEventData) {
-            performImmediateActionHitTestAtLocation(result.remoteUserInputEventData->targetFrameID, result.remoteUserInputEventData->transformedPoint);
+            performImmediateActionHitTestAtLocation(result.remoteUserInputEventData->targetFrameID, FloatPoint(result.remoteUserInputEventData->transformedPoint));
             return;
         }
         if (auto parentFrameID = result.frameInfo->parentFrameID) {

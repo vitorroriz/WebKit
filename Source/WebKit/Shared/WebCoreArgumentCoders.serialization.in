@@ -7275,7 +7275,7 @@ struct WebCore::PrewarmInformation {
 
 struct WebCore::RemoteUserInputEventData {
     WebCore::FrameIdentifier targetFrameID;
-    WebCore::IntPoint transformedPoint;
+    WebCore::DoublePoint transformedPoint;
 };
 
 struct WebCore::LinkDecorationFilteringData {

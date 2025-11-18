@@ -846,7 +846,7 @@ void WebPageProxy::potentialTapAtPosition(std::optional<WebCore::FrameIdentifier
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis)
             return;
-        protectedThis->potentialTapAtPosition(data->targetFrameID, data->transformedPoint, shouldRequestMagnificationInformation, requestID);
+        protectedThis->potentialTapAtPosition(data->targetFrameID, FloatPoint(data->transformedPoint), shouldRequestMagnificationInformation, requestID);
     } });
 }
 

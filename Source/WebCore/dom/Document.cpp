@@ -5521,10 +5521,10 @@ void Document::processApplicationManifest(const ApplicationManifest& application
 
 #endif // ENABLE(APPLICATION_MANIFEST)
 
-MouseEventWithHitTestResults Document::prepareMouseEvent(const HitTestRequest& request, const LayoutPoint& documentPoint, const PlatformMouseEvent& event)
+MouseEventWithHitTestResults Document::prepareMouseEvent(const HitTestRequest& request, const DoublePoint& documentPoint, const PlatformMouseEvent& event)
 {
     if (!hasLivingRenderTree())
-        return MouseEventWithHitTestResults(event, HitTestResult(LayoutPoint()));
+        return MouseEventWithHitTestResults(event, HitTestResult(DoublePoint()));
 
     HitTestResult result(documentPoint);
     hitTest(request, result);

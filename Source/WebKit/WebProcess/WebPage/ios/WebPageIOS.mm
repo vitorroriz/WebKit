@@ -1399,10 +1399,9 @@ Awaitable<std::optional<WebCore::RemoteUserInputEventData>> WebPage::potentialTa
         if (RefPtr frameView = localFrame ? localFrame->view() : nullptr) {
             if (RefPtr remoteFrameView = remoteFrame->view()) {
                 RemoteFrameGeometryTransformer transformer(remoteFrameView.releaseNonNull(), frameView.releaseNonNull(), remoteFrame->frameID());
-                // FIXME: Use a different type with a FloatPoint to avoid rounding to an int.
                 co_return WebCore::RemoteUserInputEventData {
                     remoteFrame->frameID(),
-                    transformer.transformToRemoteFrameCoordinates(roundedIntPoint(position))
+                    transformer.transformToRemoteFrameCoordinates(position)
                 };
             }
         }
