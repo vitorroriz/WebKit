@@ -332,7 +332,9 @@ void WebTransport::cleanup(Ref<DOMException>&& exception, std::optional<WebTrans
     // https://www.w3.org/TR/webtransport/#webtransport-cleanup
     for (auto& stream : std::exchange(m_sendStreams, { }))
         stream->closeIfPossible();
-
+    for (auto& stream : std::exchange(m_receiveStreams, { }))
+        stream->cancel(Exception { ExceptionCode::NetworkError });
+    m_datagrams->readable().cancel(Exception { ExceptionCode::NetworkError });
     m_datagrams->writable().closeIfPossible();
     m_incomingBidirectionalStreams->cancel(Exception { ExceptionCode::NetworkError });
     m_incomingUnidirectionalStreams->cancel(Exception { ExceptionCode::NetworkError });
