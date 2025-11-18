@@ -319,23 +319,6 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTree(IPC::Connection& connectio
         MESSAGE_CHECK_BASE(!state.committedLayerTreeTransactionID || bundle.transactions.first().first.transactionID() == state.committedLayerTreeTransactionID->next(), connection);
     }
 
-    bool hasMainFrameProcessTransaction { false };
-    for (const auto& [layerTreeTransaction, scrollingTreeTransaction] : bundle.transactions) {
-        if (layerTreeTransaction.isMainFrameProcessTransaction()) {
-            hasMainFrameProcessTransaction = true;
-            break;
-        }
-    }
-    if (bundle.mainFrameData || hasMainFrameProcessTransaction) {
-        RefPtr page = this->page();
-        if (!page)
-            return;
-        RefPtr mainFrame = page->mainFrame();
-        if (!mainFrame)
-            return;
-        MESSAGE_CHECK_BASE(mainFrame->process().hasConnection(connection), connection);
-    }
-
     // The `sendRights` vector must have __block scope to be captured by
     // the commit handler block below without the need to copy it.
     __block Vector<MachSendRight, 16> sendRights;
