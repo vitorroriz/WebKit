@@ -59,7 +59,7 @@ BEXPORT extern void pas_system_heap_free(void* ptr);
 
 #else /* PAS_BMALLOC -> so !PAS_BMALLOC */
 
-static inline bool pas_system_heap_is_enabled(pas_heap_config_kind)
+static inline bool pas_system_heap_is_enabled(pas_heap_config_kind kind)
 {
     PAS_UNUSED_PARAM(kind);
     return false;
