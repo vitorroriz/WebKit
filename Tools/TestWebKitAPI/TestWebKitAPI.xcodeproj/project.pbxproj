@@ -290,6 +290,8 @@
 		579651E7216BFDED006EBFE5 /* FidoHidMessageTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 579651E6216BFD53006EBFE5 /* FidoHidMessageTest.cpp */; };
 		57C3FA661F7C248F009D4B80 /* WeakPtr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CB9BC371A67482300FE5678 /* WeakPtr.cpp */; };
 		57F1C91125DDD51900E8F6EA /* PrivateClickMeasurementCocoa.mm in Sources */ = {isa = PBXBuildFile; fileRef = 57F1C91025DDD51900E8F6EA /* PrivateClickMeasurementCocoa.mm */; };
+		58EFB70F2E571EAA00D9F43E /* speechsynthesis_feature_test.html in Copy Resources */ = {isa = PBXBuildFile; fileRef = 58EFB70D2E571EAA00D9F43E /* speechsynthesis_feature_test.html */; };
+		58EFB7102E571EAA00D9F43E /* speechsynthesis_lockdown_test.html in Copy Resources */ = {isa = PBXBuildFile; fileRef = 58EFB70E2E571EAA00D9F43E /* speechsynthesis_lockdown_test.html */; };
 		5C0BF88D1DD5964D00B00328 /* MemoryPressureHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5C0BF88C1DD5957400B00328 /* MemoryPressureHandler.mm */; };
 		5C0BF8911DD599A900B00328 /* WebViewCanPasteZeroPng.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5C0BF88F1DD5999B00B00328 /* WebViewCanPasteZeroPng.mm */; };
 		5C0BF8921DD599B600B00328 /* EarlyKVOCrash.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A9FB6CC1CA34BE500966124 /* EarlyKVOCrash.mm */; };
@@ -2267,6 +2269,8 @@
 				CDEEC7D02DBC6B7200F5B8EB /* spatial-audio-experience-with-video.html in Copy Resources */,
 				A17C47FD2C98E5C20023F3C7 /* speechrecognition-basic.html in Copy Resources */,
 				A17C47FE2C98E5C20023F3C7 /* speechrecognition-user-permission-persistence.html in Copy Resources */,
+				58EFB70F2E571EAA00D9F43E /* speechsynthesis_feature_test.html in Copy Resources */,
+				58EFB7102E571EAA00D9F43E /* speechsynthesis_lockdown_test.html in Copy Resources */,
 				EEA52EAB2D69203B00D578B5 /* stagemode-model-page.html in Copy Resources */,
 				A17C47FF2C98E5C20023F3C7 /* start-offset.ts in Copy Resources */,
 				A17C46872C98E4D20023F3C7 /* StopLoadingFromDidReceiveResponse.html in Copy Resources */,
@@ -3156,6 +3160,8 @@
 		57F10D921C7E7B3800ECDF30 /* IsNavigationActionTrusted.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = IsNavigationActionTrusted.mm; sourceTree = "<group>"; };
 		57F1C91025DDD51900E8F6EA /* PrivateClickMeasurementCocoa.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PrivateClickMeasurementCocoa.mm; sourceTree = "<group>"; };
 		57F56A5B1C7F8A4000F31D7E /* IsNavigationActionTrusted.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = IsNavigationActionTrusted.html; sourceTree = "<group>"; };
+		58EFB70D2E571EAA00D9F43E /* speechsynthesis_feature_test.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = speechsynthesis_feature_test.html; sourceTree = "<group>"; };
+		58EFB70E2E571EAA00D9F43E /* speechsynthesis_lockdown_test.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = speechsynthesis_lockdown_test.html; sourceTree = "<group>"; };
 		5C0160C021A132320077FA32 /* JITEnabled.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = JITEnabled.mm; sourceTree = "<group>"; };
 		5C050D542A8ADBC7004A2BA4 /* FrameTreeChecks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FrameTreeChecks.h; sourceTree = "<group>"; };
 		5C0BF88C1DD5957400B00328 /* MemoryPressureHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MemoryPressureHandler.mm; sourceTree = "<group>"; };
@@ -5990,6 +5996,8 @@
 				CDEEC7CF2DBC6B7200F5B8EB /* spatial-audio-experience-with-video.html */,
 				9360270525A3B28E00367670 /* speechrecognition-basic.html */,
 				9342589D255B66A00059EEDD /* speechrecognition-user-permission-persistence.html */,
+				58EFB70D2E571EAA00D9F43E /* speechsynthesis_feature_test.html */,
+				58EFB70E2E571EAA00D9F43E /* speechsynthesis_lockdown_test.html */,
 				0721D4582838295400A95853 /* start-offset.ts */,
 				515BE16E1D4288FF00DD7C68 /* StoreBlobToBeDeleted.html */,
 				F42A9E6F2CC2FE84002280C0 /* subframes.html */,
