@@ -251,8 +251,6 @@ struct PerWebProcessState {
     BOOL hasScheduledVisibleRectUpdate { NO };
     BOOL commitDidRestoreScrollPosition { NO };
 
-    BOOL avoidsUnsafeArea { YES };
-
     BOOL viewportMetaTagWidthWasExplicit { NO };
     BOOL viewportMetaTagCameFromImageDocument { NO };
     BOOL lastTransactionWasInStableState { NO };
@@ -375,6 +373,7 @@ struct PerWebProcessState {
 #if PLATFORM(IOS_FAMILY)
     BOOL _forcesInitialScaleFactor;
     BOOL _automaticallyAdjustsViewLayoutSizesWithObscuredInset;
+    BOOL _avoidsUnsafeArea;
 #endif
     CGRect _inputViewBoundsInWindow;
 
