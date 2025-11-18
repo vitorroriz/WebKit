@@ -37,7 +37,8 @@
 #import "Texture.h"
 #import "TextureOrTextureView.h"
 #if ENABLE(WEBGPU_SWIFT)
-#import "WebGPUSwiftInternal.h"
+#import "CxxBridging.h"
+#import "WebGPUSwift-Generated.h"
 #endif
 #import <wtf/CheckedArithmetic.h>
 #import <wtf/IndexedRange.h>
