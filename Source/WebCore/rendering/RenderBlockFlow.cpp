@@ -2089,17 +2089,16 @@ RenderBlockFlow::LinePaginationAdjustment RenderBlockFlow::computeLineAdjustment
 
     LayoutUnit pageLogicalHeight = pageLogicalHeightForOffset(logicalOffset);
 
-    CheckedPtr fragmentedFlow = enclosingFragmentedFlow();
-    bool hasUniformPageLogicalHeight = !fragmentedFlow || fragmentedFlow->fragmentsHaveUniformLogicalHeight();
-    // If lineHeight is greater than pageLogicalHeight, but logicalVisualOverflow.height() still fits, we are
-    // still going to add a strut, so that the visible overflow fits on a single page.
-    if (!pageLogicalHeight || !hasNextPage(logicalOffset)) {
-        // FIXME: In case the line aligns with the top of the page (or it's slightly shifted downwards) it will not be marked as the first line in the page.
-        // From here, the fix is not straightforward because it's not easy to always determine when the current line is the first in the page.
-        // With no valid page height, we can't possibly accommodate the widow rules.
+    // In blocks-in-inline case the nested block has been adjusted already by the block layout code.
+    bool isBlockInInline = lineBox->lineLeftmostLeafBox() && lineBox->lineLeftmostLeafBox()->isBlockLevelBox();
+
+    if (!pageLogicalHeight || !hasNextPage(logicalOffset) || isBlockInInline) {
         clearShouldBreakAtLineToAvoidWidowIfNeeded(*this);
         return { };
     }
+
+    CheckedPtr fragmentedFlow = enclosingFragmentedFlow();
+    bool hasUniformPageLogicalHeight = !fragmentedFlow || fragmentedFlow->fragmentsHaveUniformLogicalHeight();
 
     if (hasUniformPageLogicalHeight && logicalOverflowHeight > pageLogicalHeight) {
         // We are so tall that we are bigger than a page. Before we give up and just leave the line where it is, try drilling into the
@@ -2117,7 +2116,7 @@ RenderBlockFlow::LinePaginationAdjustment RenderBlockFlow::computeLineAdjustment
         }
         pageLogicalHeight = pageLogicalHeightForOffset(logicalOffset);
     }
-    
+
     LayoutUnit remainingLogicalHeight = pageRemainingLogicalHeightForOffset(logicalOffset, ExcludePageBoundary);
 
     int lineNumber = lineBox->lineIndex() + 1;

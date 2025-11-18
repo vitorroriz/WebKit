@@ -3518,7 +3518,7 @@ RenderBox::LogicalExtentComputedValues RenderBox::computeLogicalHeight(LayoutUni
         auto visibleHeight = view().pageOrViewLogicalHeight();
         if (isDocumentElementRenderer())
             computedValues.m_extent = std::max(computedValues.m_extent, visibleHeight - margins);
-        else {
+        else if (parentBox()) {
             auto marginsBordersPadding = margins + parentBox()->marginBefore() + parentBox()->marginAfter() + parentBox()->borderAndPaddingLogicalHeight();
             computedValues.m_extent = std::max(computedValues.m_extent, visibleHeight - marginsBordersPadding);
         }

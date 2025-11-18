@@ -58,6 +58,7 @@ public:
     bool isInlineBox() const;
     bool isRootInlineBox() const;
     bool isLineBreak() const;
+    bool isBlockLevelBox() const;
 
     FloatRect visualRect() const;
     FloatRect visualRectIgnoringBlockDirection() const;
@@ -235,6 +236,13 @@ inline bool Box::isLineBreak() const
 {
     return WTF::switchOn(m_pathVariant, [](auto& path) {
         return path.isLineBreak();
+    });
+}
+
+inline bool Box::isBlockLevelBox() const
+{
+    return WTF::switchOn(m_pathVariant, [](auto& path) {
+        return path.isBlockLevelBox();
     });
 }
 

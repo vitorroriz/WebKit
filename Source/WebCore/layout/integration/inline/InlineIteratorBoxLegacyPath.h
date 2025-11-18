@@ -46,6 +46,7 @@ public:
     bool isText() const { return m_inlineBox->isInlineTextBox(); }
     bool isInlineBox() const { return m_inlineBox->isInlineFlowBox(); }
     bool isRootInlineBox() const { return m_inlineBox->isRootInlineBox(); }
+    bool isBlockLevelBox() const { return false; }
 
     FloatRect visualRectIgnoringBlockDirection() const { return m_inlineBox->frameRect(); }
 

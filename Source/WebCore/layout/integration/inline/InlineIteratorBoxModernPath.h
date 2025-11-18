@@ -50,6 +50,8 @@ public:
     bool isText() const { return box().isTextOrSoftLineBreak(); }
     bool isInlineBox() const { return box().isInlineBox(); }
     bool isRootInlineBox() const { return box().isRootInlineBox(); }
+    // Blocks-in-inline.
+    bool isBlockLevelBox() const { return box().isBlockLevelBox(); }
 
     FloatRect visualRectIgnoringBlockDirection() const { return box().visualRectIgnoringBlockDirection(); }
 
