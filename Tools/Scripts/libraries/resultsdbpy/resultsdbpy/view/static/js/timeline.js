@@ -829,10 +829,14 @@ class TimelineFromEndpoint {
                     return baseDotRenderer(data, context, x, y);
             }
             const a = Math.min(li, ri), b = Math.max(li, ri);
-            const anyFailInRange = seriesResults.slice(a, b + 1).some(r => {
+            const allPassesInRange = seriesResults.slice(a, b + 1).every(r => {
                 const {failureType} = this.getTestResultStatus(r, willFilterExpected);
-                return !!failureType && failureType !== 'success';
+                return !failureType || failureType === 'success';
             });
+
+            if (allPassesInRange) {
+                return baseDotRenderer(data, context, x, y)
+            }
 
             if (leftX !== null && rightX !== null) {
                 const lx = Math.min(leftX, rightX);
