@@ -310,7 +310,7 @@ protected:
 
     virtual bool isPointInOverflowControl(HitTestResult&, const LayoutPoint& locationInContainer, const LayoutPoint& accumulatedOffset);
 
-    virtual void computeOverflow(LayoutRect contentArea, OptionSet<ComputeOverflowOptions> = { });
+    virtual void computeOverflow(LayoutUnit oldClientAfterEdge, OptionSet<ComputeOverflowOptions> = { });
     void addOverflowFromOutOfFlowBoxes();
     void addVisualOverflowFromTheme();
 

@@ -608,12 +608,12 @@ void RenderBlockFlow::layoutBlock(RelayoutChildren relayoutChildren, LayoutUnit 
 
     // Calculate our new height.
     LayoutUnit oldHeight = logicalHeight();
-    auto afterPaddingEdge = clientLogicalBottom();
+    LayoutUnit oldClientAfterEdge = clientLogicalBottom();
 
     // Before updating the final size of the flow thread make sure a forced break is applied after the content.
     // This ensures the size information is correctly computed for the last auto-height fragment receiving content.
     if (CheckedPtr fragmentedFlow = dynamicDowncast<RenderFragmentedFlow>(*this))
-        fragmentedFlow->applyBreakAfterContent(afterPaddingEdge);
+        fragmentedFlow->applyBreakAfterContent(oldClientAfterEdge);
 
     updateLogicalHeight();
     LayoutUnit newHeight = logicalHeight();
@@ -630,7 +630,7 @@ void RenderBlockFlow::layoutBlock(RelayoutChildren relayoutChildren, LayoutUnit 
     };
     if (shouldApplyAlignContent()) {
         alignContentShift = shiftForAlignContent(oldHeight, repaintLogicalTop, repaintLogicalBottom);
-        afterPaddingEdge += alignContentShift;
+        oldClientAfterEdge += alignContentShift;
         if (alignContentShift < 0)
             ensureRareBlockFlowData().m_alignContentShift = alignContentShift;
     } else if (hasRareBlockFlowData())
@@ -665,12 +665,7 @@ void RenderBlockFlow::layoutBlock(RelayoutChildren relayoutChildren, LayoutUnit 
     updateDescendantTransformsAfterLayout();
 
     // Add overflow from children (unless we're multi-column, since in that case all our child overflow is clipped anyway).
-    auto contentArea = flippedContentBoxRect();
-    if (writingMode().isHorizontal())
-        contentArea.shiftMaxYEdgeTo(afterPaddingEdge - paddingAfter());
-    else
-        contentArea.shiftMaxXEdgeTo(afterPaddingEdge - paddingAfter());
-    computeOverflow(contentArea);
+    computeOverflow(oldClientAfterEdge);
 
     auto* state = view().frameView().layoutContext().layoutState();
     if (state && state->pageLogicalHeight())
@@ -2517,9 +2512,9 @@ void RenderBlockFlow::addFloatsToNewParent(RenderBlockFlow& toBlockFlow) const
     }
 }
 
-void RenderBlockFlow::computeOverflow(LayoutRect contentArea, OptionSet<ComputeOverflowOptions> options)
+void RenderBlockFlow::computeOverflow(LayoutUnit oldClientAfterEdge, OptionSet<ComputeOverflowOptions> options)
 {
-    RenderBlock::computeOverflow(contentArea, options);
+    RenderBlock::computeOverflow(oldClientAfterEdge, options);
 
     auto addOverflowFromFloatsIfApplicable = [&] {
 
