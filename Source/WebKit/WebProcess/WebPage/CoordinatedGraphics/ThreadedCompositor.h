@@ -26,7 +26,6 @@
 #pragma once
 
 #if USE(COORDINATED_GRAPHICS)
-#include "CompositingRunLoop.h"
 #include <WebCore/Damage.h>
 #include <WebCore/DisplayUpdate.h>
 #include <WebCore/GLContext.h>
@@ -41,6 +40,7 @@
 #include <wtf/OptionSet.h>
 #include <wtf/TZoneMalloc.h>
 #include <wtf/ThreadSafeRefCounted.h>
+#include <wtf/WorkQueue.h>
 
 namespace WebCore {
 class TextureMapper;
@@ -108,6 +108,7 @@ private:
     void initializeFPSCounter();
     void updateFPSCounter();
 
+    const Ref<WorkQueue> m_workQueue;
     CheckedPtr<LayerTreeHost> m_layerTreeHost;
     RefPtr<AcceleratedSurface> m_surface;
     RefPtr<CoordinatedSceneState> m_sceneState;
@@ -117,7 +118,17 @@ private:
     int m_maxTextureSize { 0 };
     std::atomic<unsigned> m_suspendedCount { 0 };
 
-    std::unique_ptr<CompositingRunLoop> m_compositingRunLoop;
+    enum class State {
+        Idle,
+        Scheduled,
+        InProgress,
+        ScheduledWhileInProgress
+    };
+
+    struct {
+        mutable Lock lock;
+        State state WTF_GUARDED_BY_LOCK(lock) { State::Idle };
+    } m_state;
 
     struct {
         Lock lock;
@@ -125,6 +136,7 @@ private:
         float deviceScaleFactor { 1 };
     } m_attributes;
 
+    RunLoop::Timer m_renderTimer;
     std::unique_ptr<WebCore::TextureMapper> m_textureMapper;
 
     struct {

@@ -57,9 +57,6 @@ enum RunLoopSourcePriority {
     // Used for timers that discard resources like backing store, buffers, etc.
     ReleaseUnusedResourcesTimer = 200,
 
-    // Rendering timer in the threaded compositor.
-    CompositingThreadUpdateTimer = 100,
-
     // Rendering timer in the main thread when accelerated compositing is not used.
     NonAcceleratedDrawingTimer = 100,
 
@@ -77,8 +74,6 @@ enum RunLoopSourcePriority {
 
     JavascriptTimer = 10,
     MainThreadSharedTimer = 10,
-
-    CompositingThreadUpdateTimer = 0,
 
     ReleaseUnusedResourcesTimer = 0,
 

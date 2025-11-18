@@ -28,7 +28,6 @@
 
 #if USE(COORDINATED_GRAPHICS)
 #include "AcceleratedSurface.h"
-#include "CompositingRunLoop.h"
 #include "CoordinatedSceneState.h"
 #include "LayerTreeHost.h"
 #include "RenderProcessInfo.h"
@@ -65,11 +64,12 @@ Ref<ThreadedCompositor> ThreadedCompositor::create(LayerTreeHost& layerTreeHost)
 }
 
 ThreadedCompositor::ThreadedCompositor(LayerTreeHost& layerTreeHost)
-    : m_layerTreeHost(&layerTreeHost)
+    : m_workQueue(WorkQueue::create("org.webkit.ThreadedCompositor"_s))
+    , m_layerTreeHost(&layerTreeHost)
     , m_surface(AcceleratedSurface::create(layerTreeHost.webPage(), [this] { frameComplete(); }))
     , m_sceneState(&m_layerTreeHost->sceneState())
     , m_flipY(m_surface->shouldPaintMirrored())
-    , m_compositingRunLoop(makeUnique<CompositingRunLoop>([this] { renderLayerTree(); }))
+    , m_renderTimer(m_workQueue->runLoop(), "ThreadedCompositor::RenderTimer"_s, this, &ThreadedCompositor::renderLayerTree)
 {
     ASSERT(RunLoop::isMain());
 
@@ -85,9 +85,9 @@ ThreadedCompositor::ThreadedCompositor(LayerTreeHost& layerTreeHost)
     const auto& webPage = m_layerTreeHost->webPage();
     updateSceneAttributes(webPage.size(), webPage.deviceScaleFactor());
 
-    m_surface->didCreateCompositingRunLoop(m_compositingRunLoop->runLoop());
+    m_surface->didCreateCompositingRunLoop(m_workQueue->runLoop());
 
-    m_compositingRunLoop->performTaskSync([this, protectedThis = Ref { *this }] {
+    m_workQueue->dispatchSync([this] {
         // GLNativeWindowType depends on the EGL implementation: reinterpret_cast works
         // for pointers (only if they are 64-bit wide and not for other cases), and static_cast for
         // numeric types (and when needed they get extended to 64-bit) but not for pointers. Using
@@ -114,9 +114,15 @@ uint64_t ThreadedCompositor::surfaceID() const
 void ThreadedCompositor::invalidate()
 {
     ASSERT(RunLoop::isMain());
-    m_compositingRunLoop->stopUpdates();
+
+    {
+        Locker locker { m_state.lock };
+        m_renderTimer.stop();
+        m_state.state = State::Idle;
+    }
+
     m_didCompositeRunLoopObserver->invalidate();
-    m_compositingRunLoop->performTaskSync([this, protectedThis = Ref { *this }] {
+    m_workQueue->dispatchSync([this] {
         if (!m_context || !m_context->makeContextCurrent())
             return;
 
@@ -131,7 +137,6 @@ void ThreadedCompositor::invalidate()
     m_sceneState = nullptr;
     m_layerTreeHost = nullptr;
     m_surface->willDestroyCompositingRunLoop();
-    m_compositingRunLoop = nullptr;
     m_surface = nullptr;
 }
 
@@ -143,7 +148,7 @@ void ThreadedCompositor::suspend()
     if (++m_suspendedCount > 1)
         return;
 
-    m_compositingRunLoop->suspend();
+    m_renderTimer.stop();
 }
 
 void ThreadedCompositor::resume()
@@ -155,12 +160,15 @@ void ThreadedCompositor::resume()
     if (--m_suspendedCount > 0)
         return;
 
-    m_compositingRunLoop->resume();
+    Locker locker { m_state.lock };
+    if (m_state.state == State::Scheduled)
+        m_renderTimer.startOneShot(0_s);
 }
 
 bool ThreadedCompositor::isActive() const
 {
-    return m_compositingRunLoop->isActive();
+    Locker locker { m_state.lock };
+    return m_state.state != State::Idle;
 }
 
 void ThreadedCompositor::backgroundColorDidChange()
@@ -281,13 +289,18 @@ void ThreadedCompositor::paintToCurrentGLContext(const TransformationMatrix& mat
 void ThreadedCompositor::renderLayerTree()
 {
     ASSERT(m_sceneState);
-    ASSERT(m_compositingRunLoop->isCurrent());
+    ASSERT(m_workQueue->runLoop().isCurrent());
 #if PLATFORM(GTK) || PLATFORM(WPE)
     TraceScope traceScope(RenderLayerTreeStart, RenderLayerTreeEnd);
 #endif
 
     if (m_suspendedCount > 0)
         return;
+
+    {
+        Locker locker { m_state.lock };
+        m_state.state = State::InProgress;
+    }
 
     if (!m_context || !m_context->makeContextCurrent())
         return;
@@ -350,24 +363,46 @@ uint32_t ThreadedCompositor::requestComposition()
 
 void ThreadedCompositor::scheduleUpdate()
 {
-    m_compositingRunLoop->scheduleUpdate();
-}
-
-RunLoop* ThreadedCompositor::runLoop()
-{
-    if (!m_compositingRunLoop)
-        return nullptr;
-
-    return &m_compositingRunLoop->runLoop();
+    Locker locker { m_state.lock };
+    switch (m_state.state) {
+    case State::Idle:
+        m_state.state = State::Scheduled;
+        if (!m_suspendedCount.load())
+            m_renderTimer.startOneShot(0_s);
+        break;
+    case State::Scheduled:
+    case State::ScheduledWhileInProgress:
+        break;
+    case State::InProgress:
+        m_state.state = State::ScheduledWhileInProgress;
+        break;
+    }
 }
 
 void ThreadedCompositor::frameComplete()
 {
+    ASSERT(m_workQueue->runLoop().isCurrent());
     WTFEmitSignpost(this, FrameComplete);
 
-    ASSERT(m_compositingRunLoop->isCurrent());
-    Locker stateLocker { m_compositingRunLoop->stateLock() };
-    m_compositingRunLoop->updateCompleted(stateLocker);
+    Locker locker { m_state.lock };
+    switch (m_state.state) {
+    case State::Idle:
+    case State::Scheduled:
+        break;
+    case State::InProgress:
+        m_state.state = State::Idle;
+        break;
+    case State::ScheduledWhileInProgress:
+        m_state.state = State::Scheduled;
+        if (!m_suspendedCount.load())
+            m_renderTimer.startOneShot(0_s);
+        break;
+    }
+}
+
+RunLoop* ThreadedCompositor::runLoop()
+{
+    return m_surface ? &m_workQueue->runLoop() : nullptr;
 }
 
 void ThreadedCompositor::didCompositeRunLoopObserverFired()
@@ -420,8 +455,7 @@ void ThreadedCompositor::updateFPSCounter()
 
 void ThreadedCompositor::fillGLInformation(RenderProcessInfo&& info, CompletionHandler<void(RenderProcessInfo&&)>&& completionHandler)
 {
-    ASSERT(m_compositingRunLoop);
-    m_compositingRunLoop->performTask([protectedThis = Ref { *this }, info = WTFMove(info), completionHandler = WTFMove(completionHandler)]() mutable {
+    m_workQueue->dispatchSync([protectedThis = Ref { *this }, info = WTFMove(info), completionHandler = WTFMove(completionHandler)]() mutable {
         info.glRenderer = String::fromUTF8(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
         info.glVendor = String::fromUTF8(reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
         info.glVersion = String::fromUTF8(reinterpret_cast<const char*>(glGetString(GL_VERSION)));
