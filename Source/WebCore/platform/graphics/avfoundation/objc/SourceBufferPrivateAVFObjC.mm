@@ -315,6 +315,7 @@ void SourceBufferPrivateAVFObjC::updateTrackIds(Vector<std::pair<TrackID, TrackI
         trackIdentifierNode.key() = newId;
         m_trackIdentifiers.insert(WTFMove(trackIdentifierNode));
     }
+    maybeUpdateNeedsVideoLayer();
     SourceBufferPrivate::updateTrackIds(WTFMove(trackIdPairs));
 }
 
@@ -347,6 +348,7 @@ void SourceBufferPrivateAVFObjC::didProvideContentKeyRequestInitializationDataFo
 
     m_protectedTrackID = trackID;
     m_initData = initData.copyRef();
+    maybeUpdateNeedsVideoLayer();
     player->keyNeeded(initData);
 #endif
 
@@ -396,7 +398,13 @@ bool SourceBufferPrivateAVFObjC::needsVideoLayer() const
     // the renderers, decoding content through decompression sessions
     // will fail. In this scenario, ask the player to create a layer
     // instead.
-    return m_protectedTrackID && isEnabledVideoTrackID(*m_protectedTrackID);
+    return m_needsVideoLayer;
+}
+
+void SourceBufferPrivateAVFObjC::maybeUpdateNeedsVideoLayer()
+{
+    assertIsCurrent(m_dispatcher.get());
+    m_needsVideoLayer = m_protectedTrackID && isEnabledVideoTrackID(*m_protectedTrackID);
 }
 
 Ref<MediaPromise> SourceBufferPrivateAVFObjC::appendInternal(Ref<SharedBuffer>&& data)
@@ -500,6 +508,7 @@ void SourceBufferPrivateAVFObjC::trackDidChangeSelected(VideoTrackPrivate& track
         m_enabledVideoTrackID.reset();
     }
 
+    maybeUpdateNeedsVideoLayer();
     if (RefPtr mediaSource = downcast<MediaSourcePrivateAVFObjC>(m_mediaSource.get()))
         mediaSource->hasSelectedVideoChanged(*this);
 }

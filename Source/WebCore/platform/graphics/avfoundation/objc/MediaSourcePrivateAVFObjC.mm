@@ -223,6 +223,7 @@ void MediaSourcePrivateAVFObjC::failedToCreateRenderer(RendererType type)
 
 bool MediaSourcePrivateAVFObjC::needsVideoLayer() const
 {
+    assertIsMainThread();
     return std::ranges::any_of(m_sourceBuffers, [](auto& sourceBuffer) {
         return downcast<SourceBufferPrivateAVFObjC>(sourceBuffer)->needsVideoLayer();
     });

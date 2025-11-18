@@ -177,6 +177,8 @@ private:
 
     void setTrackChangeCallbacks(const InitializationSegment&, bool initialized);
 
+    void maybeUpdateNeedsVideoLayer();
+
     StdUnorderedMap<TrackID, RefPtr<VideoTrackPrivate>> m_videoTracks;
     StdUnorderedMap<TrackID, RefPtr<AudioTrackPrivate>> m_audioTracks;
     StdUnorderedMap<TrackID, RefPtr<InbandTextTrackPrivate>> m_textTracks;
@@ -202,6 +204,7 @@ private:
     std::optional<TrackID> m_protectedTrackID;
     Ref<AudioVideoRenderer> m_renderer;
     bool m_isSelectedForVideo { false };
+    std::atomic<bool> m_needsVideoLayer { false };
 
 #if !RELEASE_LOG_DISABLED
     const Ref<const Logger> m_logger;
