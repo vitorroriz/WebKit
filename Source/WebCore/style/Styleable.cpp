@@ -589,14 +589,6 @@ static void updateCSSTransitionsForStyleableAndProperty(const Styleable& styleab
         hasMatchingTransitionProperty = true;
     }
 
-    auto effectTargetsProperty = [&property](KeyframeEffect& effect) {
-        if (effect.animatesProperty(property))
-            return true;
-        if (auto* transition = dynamicDowncast<CSSTransition>(effect.animation()))
-            return transition->property() == property;
-        return false;
-    };
-
     // https://drafts.csswg.org/css-transitions-1/#before-change-style
     // Define the before-change style as the computed values of all properties on the element as of the previous style change event, except with
     // any styles derived from declarative animations such as CSS Transitions, CSS Animations, and SMIL Animations updated to the current time.
@@ -605,8 +597,8 @@ static void updateCSSTransitionsForStyleableAndProperty(const Styleable& styleab
             auto style = RenderStyle::clone(*lastStyleChangeEventStyle);
             if (auto* keyframeEffectStack = styleable.keyframeEffectStack()) {
                 for (const auto& effect : keyframeEffectStack->sortedEffects()) {
-                    if (effectTargetsProperty(*effect))
-                        Ref { *effect->animation() }->resolve(style, { nullptr });
+                    if (effect->animatesProperty(property))
+                        Ref { *effect }->apply(style, { nullptr });
                 }
             }
             return style;
@@ -690,7 +682,15 @@ static void updateCSSTransitionsForStyleableAndProperty(const Styleable& styleab
     ASSERT(hasMatchingTransitionProperty);
     if (hasRunningTransition && !propertyInStyleMatchesValueForTransitionInMap(property, afterChangeStyle, styleable.ensureRunningTransitionsByProperty(), document)) {
         auto previouslyRunningTransition = styleable.ensureRunningTransitionsByProperty().take(property);
-        auto& previouslyRunningTransitionCurrentStyle = previouslyRunningTransition->currentStyle();
+        auto previouslyRunningTransitionCurrentStyle = [&] {
+            if (auto* lastStyleChangeEventStyle = styleable.lastStyleChangeEventStyle()) {
+                auto style = RenderStyle::clone(*lastStyleChangeEventStyle);
+                ASSERT(previouslyRunningTransition->keyframeEffect());
+                Ref { *previouslyRunningTransition->keyframeEffect() }->apply(style, { nullptr });
+                return style;
+            }
+            return RenderStyle::clone(currentStyle);
+        }();
         // 4. If the element has a running transition for the property, there is a matching transition-property value, and the end value of the running
         //    transition is not equal to the value of the property in the after-change style, then:
         if (Style::Interpolation::equals(property, previouslyRunningTransitionCurrentStyle, afterChangeStyle, document) || !propertyCanBeInterpolated(property, currentStyle, afterChangeStyle)) {
