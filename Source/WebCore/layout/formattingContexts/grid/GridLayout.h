@@ -59,16 +59,26 @@ struct GridAutoFlowOptions {
 struct UsedTrackSizes;
 struct UsedMargins;
 
+struct GridDimensions {
+    size_t rowOffset { 0 };
+    size_t columnOffset { 0 };
+    size_t totalColumns { 0 };
+    size_t totalRows { 0 };
+};
+
 class GridLayout {
 public:
     GridLayout(const GridFormattingContext&);
 
-    std::pair<UsedTrackSizes, GridItemRects> layout(GridFormattingContext::GridLayoutConstraints, const UnplacedGridItems&);
+    std::pair<UsedTrackSizes, GridItemRects> layout(GridFormattingContext::GridLayoutConstraints, UnplacedGridItems&);
 
 private:
 
-    auto placeGridItems(const UnplacedGridItems&, const Vector<Style::GridTrackSize>& gridTemplateColumnsTrackSizes,
+    auto placeGridItems(UnplacedGridItems&, const Vector<Style::GridTrackSize>& gridTemplateColumnsTrackSizes,
         const Vector<Style::GridTrackSize>& gridTemplateRowsTrackSizes, GridAutoFlowOptions);
+
+    GridDimensions calculateGridDimensions(const UnplacedGridItems&, size_t explicitColumnsCount, size_t explicitRowsCount);
+
     static TrackSizingFunctionsList trackSizingFunctions(size_t implicitGridTracksCount, const Vector<Style::GridTrackSize> gridTemplateTrackSizes);
 
     static UsedTrackSizes performGridSizingAlgorithm(const PlacedGridItems&, const TrackSizingFunctionsList& columnTrackSizingFunctionsList, const TrackSizingFunctionsList& rowTrackSizingFunctionsList);
