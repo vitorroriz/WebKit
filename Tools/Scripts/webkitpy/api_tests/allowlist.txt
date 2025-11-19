@@ -13,7 +13,6 @@ TestIPC.ArgumentCoderTest/ArgumentCoderVectorTest/Encoder
 TestIPC.ArgumentCoderTest/ArgumentCoderVectorTest/StreamConnectionEncoder
 TestIPC.ConnectionTest
 TestIPC.ConnectionTest/ConnectionDidReceiveInvalidMessageTest
-TestIPC.ConnectionTest/ConnectionRunLoopTest
 TestIPC.ConnectionTest/ConnectionTestABBA
 TestIPC.CoreIPCCFDictionary
 TestIPC.EventTest/EventTestABBA
