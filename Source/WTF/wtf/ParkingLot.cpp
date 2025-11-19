@@ -312,26 +312,32 @@ Vector<Bucket*> lockHashtable()
             }
         }
 
+IGNORE_CLANG_WARNINGS_BEGIN("thread-safety")
         // Now lock the buckets in the right order.
         std::ranges::sort(buckets);
         for (Bucket* bucket : buckets)
             bucket->lock.lock();
+IGNORE_CLANG_WARNINGS_END
 
         // If the hashtable didn't change (wasn't rehashed) while we were locking it, then we own it
         // now.
         if (hashtable.load() == currentHashtable)
             return buckets;
 
+IGNORE_CLANG_WARNINGS_BEGIN("thread-safety")
         // The hashtable rehashed. Unlock everything and try again.
         for (Bucket* bucket : buckets)
             bucket->lock.unlock();
+IGNORE_CLANG_WARNINGS_END
     }
 }
 
 void unlockHashtable(const Vector<Bucket*>& buckets)
 {
+IGNORE_CLANG_WARNINGS_BEGIN("thread-safety")
     for (Bucket* bucket : buckets)
         bucket->lock.unlock();
+IGNORE_CLANG_WARNINGS_END
 }
 
 // Rehash the hashtable to handle numThreads threads.

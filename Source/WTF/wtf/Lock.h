@@ -43,6 +43,8 @@ struct LockInspector;
 
 namespace WTF {
 
+class WTF_CAPABILITY_LOCK WordLock;
+
 typedef LockAlgorithm<uint8_t, 1, 2> DefaultLockAlgorithm;
 
 // This is a fully adaptive mutex that only requires 1 byte of storage. It has fast paths that are
@@ -189,14 +191,14 @@ private:
 inline void assertIsHeld(const UnfairLock& lock) WTF_ASSERTS_ACQUIRED_LOCK(lock) { lock.assertIsOwner(); }
 #endif // ENABLE(UNFAIR_LOCK)
 
-// Locker specialization to use with Lock and UnfairLock that integrates with thread safety analysis.
+// Locker specialization to use with Lock, WordLock, and UnfairLock that integrates with thread safety analysis.
 // Non-movable simple scoped lock holder.
 // Example: Locker locker { m_lock };
 template<typename T>
 #if ENABLE(UNFAIR_LOCK)
-    requires (std::same_as<T, Lock> || std::same_as<T, UnfairLock>)
+    requires (std::same_as<T, Lock> || std::same_as<T, WordLock> || std::same_as<T, UnfairLock>)
 #else
-    requires (std::same_as<T, Lock>)
+    requires (std::same_as<T, Lock> || std::same_as<T, WordLock>)
 #endif
 class WTF_CAPABILITY_SCOPED_LOCK Locker<T> : public AbstractLocker {
 public:
@@ -264,6 +266,9 @@ private:
 
 Locker(Lock&) -> Locker<Lock>;
 Locker(AdoptLockTag, Lock&) -> Locker<Lock>;
+
+Locker(WordLock&) -> Locker<WordLock>;
+Locker(AdoptLockTag, WordLock&) -> Locker<WordLock>;
 
 #if ENABLE(UNFAIR_LOCK)
 Locker(UnfairLock&) -> Locker<UnfairLock>;

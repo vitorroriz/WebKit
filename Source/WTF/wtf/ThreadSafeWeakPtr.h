@@ -31,6 +31,7 @@
 #include <wtf/RefPtr.h>
 #include <wtf/SwiftBridging.h>
 #include <wtf/TaggedPtr.h>
+#include <wtf/WordLock.h>
 
 namespace WTF {
 
@@ -178,7 +179,7 @@ private:
 
     void setStrongReferenceCountDuringInitialization(size_t count) WTF_IGNORES_THREAD_SAFETY_ANALYSIS { m_strongReferenceCount = count; }
 
-    mutable Lock m_lock;
+    mutable WordLock m_lock;
     mutable size_t m_strongReferenceCount WTF_GUARDED_BY_LOCK(m_lock) { 1 };
     mutable size_t m_weakReferenceCount WTF_GUARDED_BY_LOCK(m_lock) { 0 };
     mutable void* m_object WTF_GUARDED_BY_LOCK(m_lock) { nullptr };
