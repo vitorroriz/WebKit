@@ -1201,7 +1201,7 @@ bool LineLayout::hitTest(const HitTestRequest& request, HitTestResult& result, c
 
         auto& renderer = *box.layoutBox().rendererForIntegration();
 
-        if (box.isAtomicInlineBox()) {
+        if (box.isAtomicInlineBox() || box.isBlockLevelBox()) {
             if (renderer.hitTest(request, result, locationInContainer, flippedContentOffsetIfNeeded(flow(), downcast<RenderBox>(renderer), accumulatedOffset)))
                 return true;
             continue;
