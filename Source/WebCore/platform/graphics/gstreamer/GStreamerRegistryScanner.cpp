@@ -457,7 +457,7 @@ void GStreamerRegistryScanner::initializeDecoders(const GStreamerRegistryScanner
 
     bool matroskaSupported = factories.hasElementForMediaType(ElementFactories::Type::Demuxer, "video/x-matroska"_s);
     if (matroskaSupported) {
-        auto vp8DecoderAvailable = factories.hasElementForMediaType(ElementFactories::Type::VideoDecoder, "video/x-vp8"_s, ElementFactories::CheckHardwareClassifier::Yes, { { "vp8alphadecodebin"_s } });
+        auto vp8DecoderAvailable = factories.hasElementForMediaType(ElementFactories::Type::VideoDecoder, "video/x-vp8"_s, ElementFactories::CheckHardwareClassifier::Yes, { { "vp8alphadecodebin"_s, "vavp8alphadecodebin"_s } });
         auto vp9DecoderAvailable = factories.hasElementForMediaType(ElementFactories::Type::VideoDecoder, "video/x-vp9"_s, ElementFactories::CheckHardwareClassifier::Yes, { { "vp9alphadecodebin"_s, "vavp9alphadecodebin"_s } });
 
         if (vp8DecoderAvailable || vp9DecoderAvailable)

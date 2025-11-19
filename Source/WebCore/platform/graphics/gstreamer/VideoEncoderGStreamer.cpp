@@ -320,7 +320,19 @@ bool GStreamerInternalVideoEncoder::encode(VideoEncoder::RawFrame&& rawFrame, bo
     }
 
     auto& gstVideoFrame = downcast<VideoFrameGStreamer>(rawFrame.frame.get());
-    return m_harness->pushSample(gstVideoFrame.sample());
+    GRefPtr sample = gstVideoFrame.sample();
+
+    if (m_config.frameRate) {
+        int framerateNumerator, framerateDenominator;
+        gst_util_double_to_fraction(m_config.frameRate, &framerateNumerator, &framerateDenominator);
+
+        GRefPtr caps = gst_sample_get_caps(sample.get());
+        caps = adoptGRef(gst_caps_make_writable(caps.leakRef()));
+        sample = adoptGRef(gst_sample_make_writable(sample.leakRef()));
+        gst_caps_set_simple(caps.get(), "framerate", GST_TYPE_FRACTION, framerateNumerator, framerateDenominator, nullptr);
+        gst_sample_set_caps(sample.get(), caps.get());
+    }
+    return m_harness->pushSample(WTFMove(sample));
 }
 
 void GStreamerInternalVideoEncoder::setRates(uint64_t bitRate, double frameRate)
@@ -335,6 +347,8 @@ void GStreamerInternalVideoEncoder::setBitRateAllocation(RefPtr<WebKitVideoEncod
     auto encoder = WEBKIT_VIDEO_ENCODER(m_harness->element());
     if (frameRate)
         videoEncoderSetFrameRate(encoder, frameRate);
+    if (m_config.bitRate > 1000)
+        g_object_set(m_harness->element(), "bitrate", static_cast<uint32_t>(m_config.bitRate / 1000), nullptr);
 
     m_hasMultipleTemporalLayers = !!allocation->getBitRate(0, 1);
     videoEncoderSetBitRateAllocation(encoder, WTFMove(allocation));
@@ -342,13 +356,6 @@ void GStreamerInternalVideoEncoder::setBitRateAllocation(RefPtr<WebKitVideoEncod
 
 void GStreamerInternalVideoEncoder::applyRates()
 {
-    auto encoder = WEBKIT_VIDEO_ENCODER(m_harness->element());
-
-    if (m_config.frameRate)
-        videoEncoderSetFrameRate(encoder, m_config.frameRate);
-    if (m_config.bitRate > 1000)
-        g_object_set(m_harness->element(), "bitrate", static_cast<uint32_t>(m_config.bitRate / 1000), nullptr);
-
     auto bitRateAllocation = WebKitVideoEncoderBitRateAllocation::create(m_config.scalabilityMode);
     auto totalBitRate = m_config.bitRate ? m_config.bitRate : 3 * m_config.width * m_config.height;
     switch (m_config.scalabilityMode) {
@@ -356,18 +363,16 @@ void GStreamerInternalVideoEncoder::applyRates()
         bitRateAllocation->setBitRate(0, 0, totalBitRate);
         break;
     case VideoEncoder::ScalabilityMode::L1T2:
-        m_hasMultipleTemporalLayers = true;
         bitRateAllocation->setBitRate(0, 0, totalBitRate * 0.6);
         bitRateAllocation->setBitRate(0, 1, totalBitRate * 0.4);
         break;
     case VideoEncoder::ScalabilityMode::L1T3:
-        m_hasMultipleTemporalLayers = true;
         bitRateAllocation->setBitRate(0, 0, totalBitRate * 0.5);
         bitRateAllocation->setBitRate(0, 1, totalBitRate * 0.3);
         bitRateAllocation->setBitRate(0, 2, totalBitRate * 0.2);
         break;
     }
-    videoEncoderSetBitRateAllocation(encoder, WTFMove(bitRateAllocation));
+    setBitRateAllocation(WTFMove(bitRateAllocation), m_config.frameRate);
 }
 
 void GStreamerInternalVideoEncoder::flush()

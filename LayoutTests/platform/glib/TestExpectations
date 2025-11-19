@@ -1711,6 +1711,10 @@ webkit.org/b/298925 fast/mediacapturefromelement/CanvasCaptureMediaStream-offscr
 
 webkit.org/b/264665 http/wpt/webcodecs/videoFrame-webglCanvasImageSource.html [ Failure ]
 
+# This test doesn't look right. Encoding 6 frames, each at different framerates should only produce
+# key-frames. The test asserts because it expects at least one delta frame.
+http/wpt/webcodecs/encode-bitrate-change.html [ Failure ]
+
 webkit.org/b/264666 imported/w3c/web-platform-tests/encrypted-media/clearkey-generate-request-disallowed-input.https.html [ Failure ]
 
 webkit.org/b/264667 media/track/track-css-visible-stroke.html [ Timeout Pass ]
