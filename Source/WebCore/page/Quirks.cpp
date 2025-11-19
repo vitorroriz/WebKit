@@ -2647,6 +2647,15 @@ static void handleWeatherQuirks(QuirksData& quirksData, const URL& /* quirksURL 
     // weather.com rdar://139689157
     quirksData.enableQuirk(QuirksData::SiteSpecificQuirk::NeedsFormControlToBeMouseFocusableQuirk);
 }
+
+static void handleWPDevelopmentQuirks(QuirksData& quirksData, const URL& /* quirksURL */, const String& quirksDomainString, const URL&  /* documentURL */)
+{
+    if (quirksDomainString != "wpdevelopment.ca"_s) [[unlikely]]
+        return;
+
+    // wpdevelopment.ca rdar://156109518
+    quirksData.enableQuirk(QuirksData::SiteSpecificQuirk::NeedsFormControlToBeMouseFocusableQuirk);
+}
 #endif
 
 static void handleTikTokQuirks(QuirksData& quirksData, const URL& /* quirksURL */, const String& quirksDomainString, const URL&  /* documentURL */)
@@ -3574,6 +3583,9 @@ void Quirks::determineRelevantQuirks()
         { "webex"_s, &handleScriptToEvaluateBeforeRunningScriptFromURLQuirk },
 #endif
         { "weebly"_s, &handleWeeblyQuirks },
+#if PLATFORM(MAC)
+        { "wpdevelopment"_s, &handleWPDevelopmentQuirks },
+#endif
         { "x"_s, &handleTwitterXQuirks },
 #if ENABLE(TEXT_AUTOSIZING)
         { "ycombinator"_s, &handleYCombinatorQuirks },
