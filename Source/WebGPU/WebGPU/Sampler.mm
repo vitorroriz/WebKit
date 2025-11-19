@@ -308,8 +308,8 @@ Sampler::Sampler(Device& device)
 
 Sampler::~Sampler()
 {
-    if (m_cachedSamplerState)
-        uncacheSamplerState(*m_samplerIdentifier, m_cachedSamplerState);
+    if (id<MTLSamplerState> samplerState = m_cachedSamplerState)
+        uncacheSamplerState(*m_samplerIdentifier, samplerState);
 }
 
 void Sampler::setLabel(String&& label)
