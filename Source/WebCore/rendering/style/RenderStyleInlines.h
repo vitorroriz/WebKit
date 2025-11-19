@@ -575,7 +575,7 @@ constexpr TextDecorationStyle RenderStyle::initialTextDecorationStyle() { return
 inline Style::TextDecorationThickness RenderStyle::initialTextDecorationThickness() { return CSS::Keyword::Auto { }; }
 inline Style::Color RenderStyle::initialTextEmphasisColor() { return CSS::Keyword::Currentcolor { }; }
 inline Style::TextEmphasisStyle RenderStyle::initialTextEmphasisStyle() { return CSS::Keyword::None { }; }
-constexpr OptionSet<TextEmphasisPosition> RenderStyle::initialTextEmphasisPosition() { return { TextEmphasisPosition::Over, TextEmphasisPosition::Right }; }
+constexpr Style::TextEmphasisPosition RenderStyle::initialTextEmphasisPosition() { return { Style::TextEmphasisPositionValue::Over, Style::TextEmphasisPositionValue::Right }; }
 inline Style::Color RenderStyle::initialTextFillColor() { return CSS::Keyword::Currentcolor { }; }
 inline bool RenderStyle::hasExplicitlySetColor() const { return m_inheritedFlags.hasExplicitlySetColor; }
 constexpr TextGroupAlign RenderStyle::initialTextGroupAlign() { return TextGroupAlign::None; }
@@ -589,7 +589,7 @@ inline Style::Color RenderStyle::initialTextStrokeColor() { return CSS::Keyword:
 constexpr Style::WebkitTextStrokeWidth RenderStyle::initialTextStrokeWidth() { return 0_css_px; }
 constexpr Style::TextTransform RenderStyle::initialTextTransform() { return CSS::Keyword::None { }; }
 inline Style::TextUnderlineOffset RenderStyle::initialTextUnderlineOffset() { return CSS::Keyword::Auto { }; }
-constexpr OptionSet<TextUnderlinePosition> RenderStyle::initialTextUnderlinePosition() { return { }; }
+constexpr Style::TextUnderlinePosition RenderStyle::initialTextUnderlinePosition() { return CSS::Keyword::Auto { }; }
 constexpr TextWrapMode RenderStyle::initialTextWrapMode() { return TextWrapMode::Wrap; }
 constexpr TextWrapStyle RenderStyle::initialTextWrapStyle() { return TextWrapStyle::Auto; }
 constexpr TextZoom RenderStyle::initialTextZoom() { return TextZoom::Normal; }
@@ -821,7 +821,7 @@ inline const Style::TextDecorationThickness& RenderStyle::textDecorationThicknes
 inline Style::TextDecorationLine RenderStyle::textDecorationLineInEffect() const { return Style::TextDecorationLine::fromRaw(m_inheritedFlags.textDecorationLineInEffect); }
 inline const Style::Color& RenderStyle::textEmphasisColor() const { return m_rareInheritedData->textEmphasisColor; }
 inline const Style::TextEmphasisStyle& RenderStyle::textEmphasisStyle() const { return m_rareInheritedData->textEmphasisStyle; }
-inline OptionSet<TextEmphasisPosition> RenderStyle::textEmphasisPosition() const { return OptionSet<TextEmphasisPosition>::fromRaw(m_rareInheritedData->textEmphasisPosition); }
+inline Style::TextEmphasisPosition RenderStyle::textEmphasisPosition() const { return Style::TextEmphasisPosition::fromRaw(m_rareInheritedData->textEmphasisPosition); }
 inline const Style::Color& RenderStyle::textFillColor() const { return m_rareInheritedData->textFillColor; }
 inline TextGroupAlign RenderStyle::textGroupAlign() const { return static_cast<TextGroupAlign>(m_nonInheritedData->rareData->textGroupAlign); }
 inline const Style::TextIndent& RenderStyle::textIndent() const { return m_rareInheritedData->textIndent; }
@@ -835,7 +835,7 @@ inline const Style::Color& RenderStyle::textStrokeColor() const { return m_rareI
 inline Style::WebkitTextStrokeWidth RenderStyle::textStrokeWidth() const { return m_rareInheritedData->textStrokeWidth; }
 inline Style::TextTransform RenderStyle::textTransform() const { return Style::TextTransform::fromRaw(m_inheritedFlags.textTransform); }
 inline const Style::TextUnderlineOffset& RenderStyle::textUnderlineOffset() const { return m_rareInheritedData->textUnderlineOffset; }
-inline OptionSet<TextUnderlinePosition> RenderStyle::textUnderlinePosition() const { return OptionSet<TextUnderlinePosition>::fromRaw(m_rareInheritedData->textUnderlinePosition); }
+inline Style::TextUnderlinePosition RenderStyle::textUnderlinePosition() const { return Style::TextUnderlinePosition::fromRaw(m_rareInheritedData->textUnderlinePosition); }
 inline TextZoom RenderStyle::textZoom() const { return static_cast<TextZoom>(m_rareInheritedData->textZoom); }
 inline const Style::InsetEdge& RenderStyle::top() const { return m_nonInheritedData->surroundData->inset.top(); }
 inline Style::TouchAction RenderStyle::touchAction() const { return m_nonInheritedData->rareData->touchAction; }

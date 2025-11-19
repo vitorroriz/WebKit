@@ -10842,8 +10842,8 @@
                 "aliases": [
                     "-webkit-text-underline-position"
                 ],
-                "style-converter": "TextUnderlinePosition",
-                "parser-grammar": "auto | [ [ under | from-font ] || [ left | right ]@(settings-flag=cssTextUnderlinePositionLeftRightEnabled) ]@(type=CSSValuePair)"
+                "style-converter": "StyleType<TextUnderlinePosition>",
+                "parser-grammar": "auto | [ [ under | from-font ] || [ left | right ]@(settings-flag=cssTextUnderlinePositionLeftRightEnabled) ]@(no-single-item-opt)"
             },
             "specification": {
                 "category": "css-text-decor",
@@ -10951,7 +10951,7 @@
                 "aliases": [
                     "-webkit-text-emphasis-position"
                 ],
-                "style-converter": "TextEmphasisPosition",
+                "style-converter": "StyleType<TextEmphasisPosition>",
                 "parser-grammar": "[ [ over | under ] && [ right | left ]? ]@(no-single-item-opt)"
             },
             "specification": {

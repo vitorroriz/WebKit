@@ -134,8 +134,6 @@ public:
     // MARK: Shared conversions
 
     static Ref<CSSValue> convertPositionTryFallbacks(ExtractorState&, const FixedVector<PositionTryFallback>&);
-    static Ref<CSSValue> convertTextUnderlinePosition(ExtractorState&, OptionSet<TextUnderlinePosition>);
-    static Ref<CSSValue> convertTextEmphasisPosition(ExtractorState&, OptionSet<TextEmphasisPosition>);
     static Ref<CSSValue> convertSpeakAs(ExtractorState&, OptionSet<SpeakAs>);
     static Ref<CSSValue> convertPositionAnchor(ExtractorState&, const std::optional<ScopedName>&);
     static Ref<CSSValue> convertPositionArea(ExtractorState&, const PositionArea&);
@@ -269,43 +267,6 @@ inline Ref<CSSValue> ExtractorConverter::convertPositionTryFallbacks(ExtractorSt
     }
 
     return CSSValueList::createCommaSeparated(WTFMove(list));
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertTextUnderlinePosition(ExtractorState&, OptionSet<TextUnderlinePosition> textUnderlinePosition)
-{
-    ASSERT(!((textUnderlinePosition & TextUnderlinePosition::FromFont) && (textUnderlinePosition & TextUnderlinePosition::Under)));
-    ASSERT(!((textUnderlinePosition & TextUnderlinePosition::Left) && (textUnderlinePosition & TextUnderlinePosition::Right)));
-
-    if (textUnderlinePosition.isEmpty())
-        return CSSPrimitiveValue::create(CSSValueAuto);
-    bool isFromFont = textUnderlinePosition.contains(TextUnderlinePosition::FromFont);
-    bool isUnder = textUnderlinePosition.contains(TextUnderlinePosition::Under);
-    bool isLeft = textUnderlinePosition.contains(TextUnderlinePosition::Left);
-    bool isRight = textUnderlinePosition.contains(TextUnderlinePosition::Right);
-
-    auto metric = isUnder ? CSSValueUnder : CSSValueFromFont;
-    auto side = isLeft ? CSSValueLeft : CSSValueRight;
-    if (!isFromFont && !isUnder)
-        return CSSPrimitiveValue::create(side);
-    if (!isLeft && !isRight)
-        return CSSPrimitiveValue::create(metric);
-    return CSSValuePair::create(CSSPrimitiveValue::create(metric), CSSPrimitiveValue::create(side));
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertTextEmphasisPosition(ExtractorState&, OptionSet<TextEmphasisPosition> textEmphasisPosition)
-{
-    ASSERT(!((textEmphasisPosition & TextEmphasisPosition::Over) && (textEmphasisPosition & TextEmphasisPosition::Under)));
-    ASSERT(!((textEmphasisPosition & TextEmphasisPosition::Left) && (textEmphasisPosition & TextEmphasisPosition::Right)));
-    ASSERT((textEmphasisPosition & TextEmphasisPosition::Over) || (textEmphasisPosition & TextEmphasisPosition::Under));
-
-    CSSValueListBuilder list;
-    if (textEmphasisPosition & TextEmphasisPosition::Over)
-        list.append(CSSPrimitiveValue::create(CSSValueOver));
-    if (textEmphasisPosition & TextEmphasisPosition::Under)
-        list.append(CSSPrimitiveValue::create(CSSValueUnder));
-    if (textEmphasisPosition & TextEmphasisPosition::Left)
-        list.append(CSSPrimitiveValue::create(CSSValueLeft));
-    return CSSValueList::createSpaceSeparated(WTFMove(list));
 }
 
 inline Ref<CSSValue> ExtractorConverter::convertSpeakAs(ExtractorState&, OptionSet<SpeakAs> speakAs)

@@ -873,20 +873,6 @@ enum class TextEmphasisMark : uint8_t {
     Sesame
 };
 
-enum class TextEmphasisPosition : uint8_t {
-    Over  = 1 << 0,
-    Under = 1 << 1,
-    Left  = 1 << 2,
-    Right = 1 << 3
-};
-
-enum class TextUnderlinePosition : uint8_t {
-    Under    = 1 << 0,
-    FromFont = 1 << 1,
-    Left     = 1 << 2,
-    Right    = 1 << 3
-};
-
 enum class TextOverflow : bool {
     Clip,
     Ellipsis
@@ -1323,12 +1309,10 @@ WTF::TextStream& operator<<(WTF::TextStream&, TextDecorationSkipInk);
 WTF::TextStream& operator<<(WTF::TextStream&, TextDecorationStyle);
 WTF::TextStream& operator<<(WTF::TextStream&, TextEmphasisFill);
 WTF::TextStream& operator<<(WTF::TextStream&, TextEmphasisMark);
-WTF::TextStream& operator<<(WTF::TextStream&, TextEmphasisPosition);
 WTF::TextStream& operator<<(WTF::TextStream&, TextGroupAlign);
 WTF::TextStream& operator<<(WTF::TextStream&, TextJustify);
 WTF::TextStream& operator<<(WTF::TextStream&, TextOverflow);
 WTF::TextStream& operator<<(WTF::TextStream&, TextSecurity);
-WTF::TextStream& operator<<(WTF::TextStream&, TextUnderlinePosition);
 WTF::TextStream& operator<<(WTF::TextStream&, TextWrapMode);
 WTF::TextStream& operator<<(WTF::TextStream&, TextWrapStyle);
 WTF::TextStream& operator<<(WTF::TextStream&, TextBoxTrim);

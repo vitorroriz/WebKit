@@ -429,8 +429,8 @@ void StyleRareInheritedData::dumpDifferences(TextStream& ts, const StyleRareInhe
 
     LOG_IF_DIFFERENT_WITH_CAST(Hyphens, hyphens);
     LOG_IF_DIFFERENT_WITH_CAST(TextCombine, textCombine);
-    LOG_IF_DIFFERENT_WITH_CAST(TextEmphasisPosition, textEmphasisPosition);
-    LOG_IF_DIFFERENT_WITH_CAST(TextUnderlinePosition, textUnderlinePosition);
+    LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::TextEmphasisPosition, textEmphasisPosition);
+    LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::TextUnderlinePosition, textUnderlinePosition);
 
     LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::WebkitLineBoxContain, lineBoxContain);
 

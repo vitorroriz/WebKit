@@ -563,10 +563,10 @@ std::pair<InlineLayoutUnit, InlineLayoutUnit> InlineFormattingUtils::textEmphasi
     auto hasAboveTextEmphasis = false;
     auto hasUnderTextEmphasis = false;
     if (style.writingMode().isVerticalTypographic()) {
-        hasAboveTextEmphasis = !emphasisPosition.contains(TextEmphasisPosition::Left);
+        hasAboveTextEmphasis = !emphasisPosition.contains(Style::TextEmphasisPositionValue::Left);
         hasUnderTextEmphasis = !hasAboveTextEmphasis;
     } else {
-        hasAboveTextEmphasis = !emphasisPosition.contains(TextEmphasisPosition::Under);
+        hasAboveTextEmphasis = !emphasisPosition.contains(Style::TextEmphasisPositionValue::Under);
         hasUnderTextEmphasis = !hasAboveTextEmphasis;
     }
 

@@ -1209,17 +1209,6 @@ TextStream& operator<<(TextStream& ts, TextEmphasisMark mark)
     return ts;
 }
 
-TextStream& operator<<(TextStream& ts, TextEmphasisPosition position)
-{
-    switch (position) {
-    case TextEmphasisPosition::Over: ts << "Over"_s; break;
-    case TextEmphasisPosition::Under: ts << "Under"_s; break;
-    case TextEmphasisPosition::Left: ts << "Left"_s; break;
-    case TextEmphasisPosition::Right: ts << "Right"_s; break;
-    }
-    return ts;
-}
-
 TextStream& operator<<(TextStream& ts, TextGroupAlign textGroupAlign)
 {
     switch (textGroupAlign) {
@@ -1262,17 +1251,6 @@ TextStream& operator<<(TextStream& ts, TextSecurity textSecurity)
     case TextSecurity::Disc: ts << "disc"_s; break;
     case TextSecurity::Circle: ts << "circle"_s; break;
     case TextSecurity::Square: ts << "square"_s; break;
-    }
-    return ts;
-}
-
-TextStream& operator<<(TextStream& ts, TextUnderlinePosition position)
-{
-    switch (position) {
-    case TextUnderlinePosition::FromFont: ts << "from-font"_s; break;
-    case TextUnderlinePosition::Under: ts << "under"_s; break;
-    case TextUnderlinePosition::Left: ts << "left"_s; break;
-    case TextUnderlinePosition::Right: ts << "right"_s; break;
     }
     return ts;
 }

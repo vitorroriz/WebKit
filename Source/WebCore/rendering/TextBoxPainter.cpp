@@ -70,9 +70,9 @@ static std::optional<bool> emphasisMarkExistsAndIsAbove(const RenderText& render
         return { };
 
     auto emphasisPosition = style.textEmphasisPosition();
-    bool isAbove = !emphasisPosition.contains(TextEmphasisPosition::Under);
+    bool isAbove = !emphasisPosition.contains(Style::TextEmphasisPositionValue::Under);
     if (style.writingMode().isVerticalTypographic())
-        isAbove = !emphasisPosition.contains(TextEmphasisPosition::Left);
+        isAbove = !emphasisPosition.contains(Style::TextEmphasisPositionValue::Left);
 
     auto findRubyAnnotation = [&]() -> RenderBlockFlow* {
         for (auto* baseCandidate = renderer.parent(); baseCandidate; baseCandidate = baseCandidate->parent()) {

@@ -71,8 +71,6 @@ public:
     static void serializeSmoothScrolling(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, bool);
     static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
     static void serializeTabSize(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const TabSize&);
-    static void serializeTextUnderlinePosition(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TextUnderlinePosition>);
-    static void serializeTextEmphasisPosition(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<TextEmphasisPosition>);
     static void serializeSpeakAs(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<SpeakAs>);
     static void serializePositionAnchor(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const std::optional<ScopedName>&);
     static void serializePositionArea(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const std::optional<PositionArea>&);
@@ -215,55 +213,6 @@ inline void ExtractorSerializer::serializePositionTryFallbacks(ExtractorState& s
     }
 
     builder.append(CSSValueList::createCommaSeparated(WTFMove(list))->cssText(context));
-}
-
-inline void ExtractorSerializer::serializeTextUnderlinePosition(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<TextUnderlinePosition> textUnderlinePosition)
-{
-    ASSERT(!((textUnderlinePosition & TextUnderlinePosition::FromFont) && (textUnderlinePosition & TextUnderlinePosition::Under)));
-    ASSERT(!((textUnderlinePosition & TextUnderlinePosition::Left) && (textUnderlinePosition & TextUnderlinePosition::Right)));
-
-    if (textUnderlinePosition.isEmpty()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Auto { });
-        return;
-    }
-
-    bool isFromFont = textUnderlinePosition.contains(TextUnderlinePosition::FromFont);
-    bool isUnder = textUnderlinePosition.contains(TextUnderlinePosition::Under);
-    bool isLeft = textUnderlinePosition.contains(TextUnderlinePosition::Left);
-    bool isRight = textUnderlinePosition.contains(TextUnderlinePosition::Right);
-
-    auto metric = isUnder ? CSSValueUnder : CSSValueFromFont;
-    auto side = isLeft ? CSSValueLeft : CSSValueRight;
-    if (!isFromFont && !isUnder) {
-        builder.append(nameLiteralForSerialization(side));
-        return;
-    }
-    if (!isLeft && !isRight) {
-        builder.append(nameLiteralForSerialization(metric));
-        return;
-    }
-
-    builder.append(nameLiteralForSerialization(metric), ' ', nameLiteralForSerialization(side));
-}
-
-inline void ExtractorSerializer::serializeTextEmphasisPosition(ExtractorState&, StringBuilder& builder, const CSS::SerializationContext&, OptionSet<TextEmphasisPosition> textEmphasisPosition)
-{
-    ASSERT(!((textEmphasisPosition & TextEmphasisPosition::Over) && (textEmphasisPosition & TextEmphasisPosition::Under)));
-    ASSERT(!((textEmphasisPosition & TextEmphasisPosition::Left) && (textEmphasisPosition & TextEmphasisPosition::Right)));
-    ASSERT((textEmphasisPosition & TextEmphasisPosition::Over) || (textEmphasisPosition & TextEmphasisPosition::Under));
-
-    bool listEmpty = true;
-    auto appendOption = [&](TextEmphasisPosition test, CSSValueID value) {
-        if (textEmphasisPosition &  test) {
-            if (!listEmpty)
-                builder.append(' ');
-            builder.append(nameLiteralForSerialization(value));
-            listEmpty = false;
-        }
-    };
-    appendOption(TextEmphasisPosition::Over, CSSValueOver);
-    appendOption(TextEmphasisPosition::Under, CSSValueUnder);
-    appendOption(TextEmphasisPosition::Left, CSSValueLeft);
 }
 
 inline void ExtractorSerializer::serializeSpeakAs(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<SpeakAs> speakAs)

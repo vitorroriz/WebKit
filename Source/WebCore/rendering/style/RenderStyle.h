@@ -181,14 +181,12 @@ enum class TextBoxTrim : uint8_t;
 enum class TextCombine : bool;
 enum class TextDecorationSkipInk : uint8_t;
 enum class TextDecorationStyle : uint8_t;
-enum class TextEmphasisPosition : uint8_t;
 enum class TextGroupAlign : uint8_t;
 enum class TextJustify : uint8_t;
 enum class TextOverflow : bool;
 enum class TextRenderingMode : uint8_t;
 enum class TextSecurity : uint8_t;
 enum class TextTransform : uint8_t;
-enum class TextUnderlinePosition : uint8_t;
 enum class TextWrapMode : bool;
 enum class TextWrapStyle : uint8_t;
 enum class TextZoom : bool;
@@ -356,8 +354,9 @@ struct StrokeWidth;
 struct TabSize;
 struct TextAutospace;
 struct TextBoxEdge;
-struct TextDecorationThickness;
 struct TextDecorationLine;
+struct TextDecorationThickness;
+struct TextEmphasisPosition;
 struct TextEmphasisStyle;
 struct TextIndent;
 struct TextShadow;
@@ -365,6 +364,7 @@ struct TextSizeAdjust;
 struct TextSpacingTrim;
 struct TextTransform;
 struct TextUnderlineOffset;
+struct TextUnderlinePosition;
 struct TouchAction;
 struct Transform;
 struct TransformOrigin;
@@ -766,7 +766,7 @@ public:
     inline Style::TextDecorationLine textDecorationLine() const;
     inline TextDecorationStyle textDecorationStyle() const;
     inline TextDecorationSkipInk textDecorationSkipInk() const;
-    inline OptionSet<TextUnderlinePosition> textUnderlinePosition() const;
+    inline Style::TextUnderlinePosition textUnderlinePosition() const;
     inline const Style::TextUnderlineOffset& textUnderlineOffset() const;
     inline const Style::TextDecorationThickness& textDecorationThickness() const;
 
@@ -1041,7 +1041,7 @@ public:
     inline bool affectsTransform() const;
 
     inline const Style::TextEmphasisStyle& textEmphasisStyle() const;
-    inline OptionSet<TextEmphasisPosition> textEmphasisPosition() const;
+    inline Style::TextEmphasisPosition textEmphasisPosition() const;
 
     inline RubyPosition rubyPosition() const;
     inline bool isInterCharacterRubyPosition() const;
@@ -1411,7 +1411,7 @@ public:
     inline void setTextDecorationSkipInk(TextDecorationSkipInk);
     inline void setTextDecorationThickness(Style::TextDecorationThickness&&);
     inline void setTextIndent(Style::TextIndent&&);
-    inline void setTextUnderlinePosition(OptionSet<TextUnderlinePosition>);
+    inline void setTextUnderlinePosition(Style::TextUnderlinePosition);
     inline void setTextUnderlineOffset(Style::TextUnderlineOffset&&);
     inline void setTextTransform(Style::TextTransform);
     bool setZoom(float);
@@ -1623,7 +1623,7 @@ public:
     inline void setTextDecorationColor(Style::Color&&);
     inline void setTextEmphasisColor(Style::Color&&);
     inline void setTextEmphasisStyle(Style::TextEmphasisStyle&&);
-    inline void setTextEmphasisPosition(OptionSet<TextEmphasisPosition>);
+    inline void setTextEmphasisPosition(Style::TextEmphasisPosition);
 
     inline void setObjectFit(ObjectFit);
     inline void setObjectPosition(Style::ObjectPosition&&);
@@ -2090,7 +2090,7 @@ public:
     static constexpr Style::TextDecorationLine initialTextDecorationLineInEffect();
     static constexpr TextDecorationStyle initialTextDecorationStyle();
     static constexpr TextDecorationSkipInk initialTextDecorationSkipInk();
-    static constexpr OptionSet<TextUnderlinePosition> initialTextUnderlinePosition();
+    static constexpr Style::TextUnderlinePosition initialTextUnderlinePosition();
     static inline Style::TextUnderlineOffset initialTextUnderlineOffset();
     static inline Style::TextDecorationThickness initialTextDecorationThickness();
     static constexpr Style::ZIndex initialSpecifiedZIndex();
@@ -2183,7 +2183,7 @@ public:
     static inline Style::Color initialBackgroundColor();
     static inline Style::Color initialTextEmphasisColor();
     static inline Style::TextEmphasisStyle initialTextEmphasisStyle();
-    static constexpr OptionSet<TextEmphasisPosition> initialTextEmphasisPosition();
+    static constexpr Style::TextEmphasisPosition initialTextEmphasisPosition();
     static constexpr RubyPosition initialRubyPosition();
     static constexpr RubyAlign initialRubyAlign();
     static constexpr RubyOverhang initialRubyOverhang();
