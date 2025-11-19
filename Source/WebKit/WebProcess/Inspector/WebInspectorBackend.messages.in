@@ -24,7 +24,7 @@
     DispatchedFrom=UI,
     DispatchedTo=WebContent
 ]
-messages -> WebInspector {
+messages -> WebInspectorBackend {
     Show() -> () Async
     Close()
 

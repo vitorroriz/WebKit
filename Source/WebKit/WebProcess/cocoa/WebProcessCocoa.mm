@@ -46,7 +46,7 @@
 #import "WKFullKeyboardAccessWatcher.h"
 #import "WKWebProcessPlugInBrowserContextControllerInternal.h"
 #import "WebFrame.h"
-#import "WebInspectorInternal.h"
+#import "WebInspectorBackend.h"
 #import "WebPage.h"
 #import "WebPageGroupProxy.h"
 #import "WebPreferencesDefaultValues.h"

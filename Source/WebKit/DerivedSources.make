@@ -227,10 +227,10 @@ MESSAGE_RECEIVERS = \
 	WebProcess/WebStorage/StorageAreaMap \
 	WebProcess/UserContent/WebUserContentController \
 	WebProcess/Inspector/WasmDebuggerDispatcher \
+	WebProcess/Inspector/WebInspectorBackend \
 	WebProcess/Inspector/WebInspectorInterruptDispatcher \
 	WebProcess/Inspector/WebInspectorUI \
 	WebProcess/Inspector/WebInspectorUIExtensionController \
-	WebProcess/Inspector/WebInspector \
 	WebProcess/Inspector/RemoteWebInspectorUI \
 	WebProcess/MediaSession/RemoteMediaSessionCoordinator \
 	WebProcess/Model/ModelProcessConnection \

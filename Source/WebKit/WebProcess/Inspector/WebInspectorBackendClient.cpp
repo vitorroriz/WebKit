@@ -27,7 +27,7 @@
 #include "WebInspectorBackendClient.h"
 
 #include "DrawingArea.h"
-#include "WebInspectorInternal.h"
+#include "WebInspectorBackend.h"
 #include "WebPage.h"
 #include <WebCore/GraphicsLayer.h>
 #include <WebCore/GraphicsLayerAnimation.h>

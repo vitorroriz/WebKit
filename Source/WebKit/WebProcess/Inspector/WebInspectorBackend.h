@@ -37,12 +37,12 @@ namespace WebKit {
 
 class WebPage;
 
-class WebInspector : public ThreadSafeRefCounted<WebInspector>, private IPC::Connection::Client {
-    WTF_DEPRECATED_MAKE_FAST_ALLOCATED(WebInspector);
-    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(WebInspector);
+class WebInspectorBackend : public ThreadSafeRefCounted<WebInspectorBackend>, private IPC::Connection::Client {
+    WTF_DEPRECATED_MAKE_FAST_ALLOCATED(WebInspectorBackend);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(WebInspectorBackend);
 public:
-    static Ref<WebInspector> create(WebPage&);
-    ~WebInspector();
+    static Ref<WebInspectorBackend> create(WebPage&);
+    ~WebInspectorBackend();
 
     void ref() const final { ThreadSafeRefCounted::ref(); }
     void deref() const final { ThreadSafeRefCounted::deref(); }
@@ -51,7 +51,7 @@ public:
 
     void updateDockingAvailability();
 
-    // Implemented in generated WebInspectorMessageReceiver.cpp
+    // Implemented in generated WebInspectorBackendMessageReceiver.cpp
     void didReceiveMessage(IPC::Connection&, IPC::Decoder&) override;
 
     // IPC::Connection::Client
@@ -92,7 +92,7 @@ public:
 private:
     friend class WebInspectorBackendClient;
 
-    explicit WebInspector(WebPage&);
+    explicit WebInspectorBackend(WebPage&);
 
     bool canAttachWindow();
 

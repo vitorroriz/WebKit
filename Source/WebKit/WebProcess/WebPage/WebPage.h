@@ -441,7 +441,7 @@ class WebFrame;
 class WebFullScreenManager;
 class WebGestureEvent;
 class WebImage;
-class WebInspector;
+class WebInspectorBackend;
 class WebInspectorBackendClient;
 class WebInspectorUI;
 class WebKeyboardEvent;
@@ -662,8 +662,8 @@ public:
 
     enum class LazyCreationPolicy { UseExistingOnly, CreateIfNeeded };
 
-    WebInspector* inspector(LazyCreationPolicy = LazyCreationPolicy::CreateIfNeeded);
-    RefPtr<WebInspector> protectedInspector();
+    WebInspectorBackend* inspector(LazyCreationPolicy = LazyCreationPolicy::CreateIfNeeded);
+    RefPtr<WebInspectorBackend> protectedInspector();
     WebInspectorUI* inspectorUI();
     RemoteWebInspectorUI* remoteInspectorUI();
     bool isInspectorPage() { return !!m_inspectorUI || !!m_remoteInspectorUI; }
@@ -2797,7 +2797,7 @@ private:
 
     const UniqueRef<WebFoundTextRangeController> m_foundTextRangeController;
 
-    RefPtr<WebInspector> m_inspector;
+    RefPtr<WebInspectorBackend> m_inspector;
     RefPtr<WebInspectorUI> m_inspectorUI;
     RefPtr<RemoteWebInspectorUI> m_remoteInspectorUI;
     const UniqueRef<WebPageInspectorTargetController> m_inspectorTargetController;
