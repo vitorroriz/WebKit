@@ -202,10 +202,16 @@ static bool swiftCompilerSupportsWebGPU()
         return false;
 
     auto clangVersion = *maybeClangVersion;
-    if (clangVersion[0] == 1700 && clangVersion[1] >= 6 && clangVersion[2] >= 1 && clangVersion[3] >= 1)
+    if (clangVersion[0] == 1700
+        && clangVersion[1] >= 6
+        && (clangVersion[1] > 6 || clangVersion[2] >= 1)
+        && (clangVersion[1] > 6 || clangVersion[2] > 1 || clangVersion[3] >= 1))
         return true;
 
-    if (clangVersion[0] == 2100 && clangVersion[1] >= 0 && clangVersion[2] >= 101 && clangVersion[3] >= 15)
+    if (clangVersion[0] == 2100
+        && clangVersion[1] >= 0
+        && (clangVersion[1] > 0 || clangVersion[2] >= 101)
+        && (clangVersion[1] > 0 || clangVersion[2] > 101 || clangVersion[3] >= 15))
         return true;
 
     if (clangVersion[0] > 2100)
