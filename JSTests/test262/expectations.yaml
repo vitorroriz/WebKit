@@ -538,9 +538,6 @@ test/intl402/Intl/supportedValuesOf/calendars-required-by-intl-era-monthcode.js:
 test/intl402/Locale/extensions-grandfathered.js:
   default: 'Test262Error: Expected SameValue(«"fr-Cyrl-FR-gaulish-u-nu-latn"», «"fr-Cyrl-FR-u-nu-latn"») to be true'
   strict mode: 'Test262Error: Expected SameValue(«"fr-Cyrl-FR-gaulish-u-nu-latn"», «"fr-Cyrl-FR-u-nu-latn"») to be true'
-test/intl402/Locale/prototype/getWeekInfo/output-object-keys.js:
-  default: 'Test262Error: Actual [firstDay, weekend, minimalDays] and expected [firstDay, weekend] should have the same contents. '
-  strict mode: 'Test262Error: Actual [firstDay, weekend, minimalDays] and expected [firstDay, weekend] should have the same contents. '
 test/intl402/NumberFormat/currency-digits-nonstandard-notation.js:
   default: "Test262Error: Didn't get correct maximumFractionDigits for JPY in engineering notation. Expected SameValue(«0», «3») to be true"
   strict mode: "Test262Error: Didn't get correct maximumFractionDigits for JPY in engineering notation. Expected SameValue(«0», «3») to be true"
