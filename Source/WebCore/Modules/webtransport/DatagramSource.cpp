@@ -44,11 +44,13 @@ void DatagramSource::receiveDatagram(std::span<const uint8_t> datagram, bool wit
         clean();
         return;
     }
-    auto arrayBuffer = ArrayBuffer::tryCreateUninitialized(datagram.size(), 1);
-    if (arrayBuffer)
-        memcpySpan(arrayBuffer->mutableSpan(), datagram);
-    if (!controller().enqueue(WTFMove(arrayBuffer)))
-        doCancel();
+    if (datagram.size()) {
+        auto arrayBuffer = ArrayBuffer::tryCreateUninitialized(datagram.size(), 1);
+        if (arrayBuffer)
+            memcpySpan(arrayBuffer->mutableSpan(), datagram);
+        if (!controller().enqueue(WTFMove(arrayBuffer)))
+            doCancel();
+    }
     if (withFin) {
         m_isClosed = true;
         controller().close();

@@ -120,6 +120,7 @@ private:
     const RetainPtr<nw_connection_group_t> m_connectionGroup;
     const RetainPtr<nw_endpoint_t> m_endpoint;
     RetainPtr<nw_connection_t> m_datagramConnection;
+    RetainPtr<nw_protocol_metadata_t> m_sessionMetadata;
 #endif
 };
 

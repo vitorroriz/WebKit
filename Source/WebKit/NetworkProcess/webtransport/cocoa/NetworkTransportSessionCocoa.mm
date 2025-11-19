@@ -194,22 +194,31 @@ static RetainPtr<nw_parameters_t> createParameters(NetworkConnectionToWebProcess
     };
 
     auto configureTLS = [
-        connectionToWebProcess = Ref { connectionToWebProcess },
+        weakConnection = WeakPtr { connectionToWebProcess },
         url = WTFMove(url),
         pageID = WTFMove(pageID),
         hashes = WTFMove(hashes),
         clientOrigin = WTFMove(clientOrigin)
     ](nw_protocol_options_t options) mutable {
+        RefPtr connectionToWebProcess = weakConnection.get();
+        if (!connectionToWebProcess)
+            return;
+
         RetainPtr securityOptions = adoptNS(nw_tls_copy_sec_protocol_options(options));
         sec_protocol_options_set_peer_authentication_required(securityOptions.get(), true);
         sec_protocol_options_set_verify_block(securityOptions.get(), makeBlockPtr([
-            connectionToWebProcess = WTFMove(connectionToWebProcess),
+            weakConnection = WeakPtr { connectionToWebProcess },
             url = WTFMove(url),
             pageID = WTFMove(pageID),
             hashes = WTFMove(hashes),
             clientOrigin = WTFMove(clientOrigin)
         ] (sec_protocol_metadata_t metadata, sec_trust_t trust, sec_protocol_verify_complete_t completion) mutable {
-            didReceiveServerTrustChallenge(connectionToWebProcess, url, hashes, pageID, clientOrigin, trust, completion);
+            RefPtr connectionToWebProcess = weakConnection.get();
+            if (!connectionToWebProcess) {
+                completion(false);
+                return;
+            }
+            didReceiveServerTrustChallenge(*connectionToWebProcess, url, hashes, pageID, clientOrigin, trust, completion);
         }).get(), mainDispatchQueueSingleton());
         // FIXME: Pipe client cert auth into this too, probably.
     };
@@ -264,7 +273,7 @@ void NetworkTransportSession::initialize(CompletionHandler<void(bool)>&& complet
         if (!completionHandler)
             return;
         if (canLoad_Network_nw_webtransport_options_set_allow_joining_before_ready())
-            return completionHandler(true);
+            return completionHandler(success);
         if (!success)
             return completionHandler(false);
         RefPtr protectedThis = weakThis.get();
@@ -279,12 +288,24 @@ void NetworkTransportSession::initialize(CompletionHandler<void(bool)>&& complet
         case nw_connection_group_state_waiting:
             return; // We will get another callback with another state change.
         case nw_connection_group_state_ready:
+            if (RefPtr protectedThis = weakThis.get())
+                protectedThis->m_sessionMetadata = nw_connection_group_copy_protocol_metadata(protectedThis->m_connectionGroup.get(), adoptNS(nw_protocol_copy_webtransport_definition()).get());
             return creationCompletionHandler(true);
         case nw_connection_group_state_failed:
-            creationCompletionHandler(false);
-            if (RefPtr protectedThis = weakThis.get())
-                protectedThis->send(Messages::WebTransportSession::DidFail());
-            return;
+            if (RefPtr protectedThis = weakThis.get()) {
+                if (RetainPtr metadata = protectedThis->m_sessionMetadata) {
+                    std::optional<unsigned> sessionErrorCode = std::nullopt;
+                    String sessionErrorMessage;
+                    if (canLoad_Network_nw_webtransport_metadata_get_session_closed() && softLink_Network_nw_webtransport_metadata_get_session_closed(metadata.get())) {
+                        sessionErrorCode = nw_webtransport_metadata_get_session_error_code(metadata.get());
+                        if (const char* errorMessage = nw_webtransport_metadata_get_session_error_message(metadata.get()))
+                            sessionErrorMessage = String::fromUTF8(unsafeSpan(errorMessage));
+                    }
+                    protectedThis->send(Messages::WebTransportSession::DidFail(WTFMove(sessionErrorCode), WTFMove(sessionErrorMessage)));
+                    return;
+                }
+            }
+            return creationCompletionHandler(false);
         case nw_connection_group_state_cancelled:
             return;
         }
@@ -544,9 +565,9 @@ void NetworkTransportSession::receiveDatagramLoop()
 void NetworkTransportSession::terminate(WebCore::WebTransportSessionErrorCode code, CString&& message)
 {
 #if HAVE(WEB_TRANSPORT)
-    if (RetainPtr metadata = nw_connection_group_copy_protocol_metadata(m_connectionGroup.get(), adoptNS(nw_protocol_copy_webtransport_definition()).get())) {
-        nw_webtransport_metadata_set_session_error_code(metadata.get(), code);
-        nw_webtransport_metadata_set_session_error_message(metadata.get(), message.data());
+    if (m_sessionMetadata) {
+        nw_webtransport_metadata_set_session_error_code(m_sessionMetadata.get(), code);
+        nw_webtransport_metadata_set_session_error_message(m_sessionMetadata.get(), message.data());
     }
 
     if (m_datagramConnection)

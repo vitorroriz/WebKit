@@ -34,4 +34,6 @@ SOFT_LINK_FRAMEWORK_FOR_SOURCE(WebKit, Network)
 
 SOFT_LINK_FUNCTION_MAY_FAIL_FOR_SOURCE(WebKit, Network, nw_webtransport_options_set_allow_joining_before_ready, void, (nw_protocol_options_t options, bool allow), (options, allow))
 
+SOFT_LINK_FUNCTION_MAY_FAIL_FOR_SOURCE(WebKit, Network, nw_webtransport_metadata_get_session_closed, bool, (nw_protocol_metadata_t metadata), (metadata))
+
 #endif // HAVE(AVAUDIOAPPLICATION)

@@ -50,7 +50,7 @@ private:
     void receiveIncomingUnidirectionalStream(WebTransportStreamIdentifier) final;
     void receiveBidirectionalStream(Ref<WebTransportSendStreamSink>&&) final;
     void streamReceiveBytes(WebTransportStreamIdentifier, std::span<const uint8_t>, bool, std::optional<Exception>&&) final;
-    void didFail() final;
+    void didFail(std::optional<unsigned>&&, String&&) final;
 
     Ref<WebTransportSendPromise> sendDatagram(std::span<const uint8_t>) final;
     Ref<WritableStreamPromise> createOutgoingUnidirectionalStream() final;

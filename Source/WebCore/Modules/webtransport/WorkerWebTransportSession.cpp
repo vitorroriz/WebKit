@@ -68,14 +68,14 @@ void WorkerWebTransportSession::receiveDatagram(std::span<const uint8_t> span, b
     });
 }
 
-void WorkerWebTransportSession::didFail()
+void WorkerWebTransportSession::didFail(std::optional<unsigned>&& code, String&& message)
 {
     ASSERT(RunLoop::isMain());
-    ScriptExecutionContext::postTaskTo(m_contextID, [weakClient = m_client] (auto&) mutable {
+    ScriptExecutionContext::postTaskTo(m_contextID, [weakClient = m_client, code = WTFMove(code), message = WTFMove(message)] (auto&) mutable {
         RefPtr client = weakClient.get();
         if (!client)
             return;
-        client->didFail();
+        client->didFail(WTFMove(code), WTFMove(message));
     });
 }
 

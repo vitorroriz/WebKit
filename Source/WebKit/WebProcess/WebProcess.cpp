@@ -1485,7 +1485,7 @@ void WebProcess::networkProcessConnectionClosed(NetworkProcessConnection* connec
     }
     for (auto& weakSession : sessions) {
         if (RefPtr webtransportSession = weakSession.get())
-            webtransportSession->didFail();
+            webtransportSession->didFail(std::nullopt, String(emptyString()));
     }
 }
 

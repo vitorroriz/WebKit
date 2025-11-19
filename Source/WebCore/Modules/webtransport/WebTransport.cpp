@@ -124,10 +124,7 @@ void WebTransport::initializeOverHTTP(SocketProvider& provider, ScriptExecutionC
 
     context.enqueueTaskWhenSettled(WTFMove(promise), TaskSource::Networking, [this, protectedThis = Ref { *this }] (auto&& result) mutable {
         if (!result) {
-            m_state = State::Failed;
-            m_ready.second->reject();
-            m_closed.second->reject();
-            return;
+            return cleanupWithSessionError();
         }
         m_state = State::Connected;
         m_ready.second->resolve();
@@ -436,9 +433,19 @@ ReadableStream& WebTransport::incomingUnidirectionalStreams()
     return m_incomingUnidirectionalStreams.get();
 }
 
-void WebTransport::didFail()
+void WebTransport::didFail(std::optional<unsigned>&& code, String&& message)
 {
-    cleanup(DOMException::create(ExceptionCode::AbortError), std::nullopt);
+    if (code) {
+        WebTransportCloseInfo closeInfo {
+            .closeCode = code.value_or(0),
+            .reason = message
+        };
+        cleanup(WebTransportError::create(String(emptyString()), WebTransportErrorOptions {
+            WebTransportErrorSource::Session,
+            code
+        }), WTFMove(closeInfo));
+    } else
+        cleanupWithSessionError();
 }
 
 RefPtr<WebTransportSession> WebTransport::protectedSession()

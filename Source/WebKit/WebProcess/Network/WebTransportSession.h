@@ -71,7 +71,7 @@ public:
     void receiveIncomingUnidirectionalStream(WebCore::WebTransportStreamIdentifier);
     void receiveBidirectionalStream(WebCore::WebTransportStreamIdentifier);
     void streamReceiveBytes(WebCore::WebTransportStreamIdentifier, std::span<const uint8_t>, bool, std::optional<WebCore::Exception>&&);
-    void didFail();
+    void didFail(std::optional<unsigned>&&, String&&);
 
     WTF_ABSTRACT_THREAD_SAFE_REF_COUNTED_AND_CAN_MAKE_WEAK_PTR_IMPL;
 

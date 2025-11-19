@@ -117,11 +117,11 @@ void WebTransportSession::streamReceiveBytes(WebCore::WebTransportStreamIdentifi
         ASSERT_NOT_REACHED();
 }
 
-void WebTransportSession::didFail()
+void WebTransportSession::didFail(std::optional<unsigned>&& code, String&& message)
 {
     ASSERT(RunLoop::isMain());
     if (RefPtr strongClient = m_client.get())
-        strongClient->didFail();
+        strongClient->didFail(WTFMove(code), WTFMove(message));
     else
         ASSERT_NOT_REACHED();
 }

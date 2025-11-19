@@ -48,6 +48,9 @@
 SOFT_LINK_FRAMEWORK(Network)
 SOFT_LINK_MAY_FAIL(Network, nw_webtransport_options_set_allow_joining_before_ready, void, (nw_protocol_options_t options, bool allow), (options, allow))
 
+// FIXME: Replace this soft linking with a HAVE macro once rdar://164514830 is available on all tested OS builds.
+SOFT_LINK_MAY_FAIL(Network, nw_webtransport_metadata_get_session_closed, bool, (nw_protocol_metadata_t metadata), (metadata))
+
 namespace TestWebKitAPI {
 
 static void enableWebTransport(WKWebViewConfiguration *configuration)
@@ -756,13 +759,13 @@ TEST(WebTransport, ServerConnectionTermination)
         "    let c = await t.createUnidirectionalStream();"
         "    let w = c.getWriter();"
         "    await w.write(new TextEncoder().encode('abc'));"
-        "    await t.closed;"
-        "    alert('closed should have thrown');"
+        "    let closeInfo = await t.closed;"
+        "    alert('successfully read closeInfo (' + closeInfo.closeCode + ', ' + closeInfo.reason + ')');"
         "  } catch (e) { alert('caught ' + e); }"
         "}; test();"
         "</script>", echoServer.port()];
     [webView loadHTMLString:html baseURL:[NSURL URLWithString:@"https://webkit.org/"]];
-    EXPECT_WK_STREQ([webView _test_waitForAlert], "caught AbortError: The operation was aborted.");
+    EXPECT_WK_STREQ([webView _test_waitForAlert], canLoadnw_webtransport_metadata_get_session_closed() ? "successfully read closeInfo (0, )" : "caught WebTransportError");
 }
 
 } // namespace TestWebKitAPI

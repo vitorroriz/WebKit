@@ -26,6 +26,7 @@
 #pragma once
 
 #include "ActiveDOMObject.h"
+#include "WebTransportCongestionControl.h"
 #include "WebTransportReliabilityMode.h"
 #include "WebTransportSessionClient.h"
 #include <wtf/ListHashSet.h>
@@ -103,7 +104,7 @@ private:
     void receiveIncomingUnidirectionalStream(WebTransportStreamIdentifier) final;
     void receiveBidirectionalStream(Ref<WebTransportSendStreamSink>&&) final;
     void streamReceiveBytes(WebTransportStreamIdentifier, std::span<const uint8_t>, bool, std::optional<Exception>&&) final;
-    void didFail() final;
+    void didFail(std::optional<unsigned>&&, String&&) final;
 
     RefPtr<WebTransportSession> protectedSession();
 
@@ -125,7 +126,7 @@ private:
     using PromiseAndWrapper = const std::pair<const Ref<DOMPromise>, const Ref<DeferredPromise>>;
     const PromiseAndWrapper m_ready;
     WebTransportReliabilityMode m_reliability { WebTransportReliabilityMode::Pending };
-    WebTransportCongestionControl m_congestionControl;
+    WebTransportCongestionControl m_congestionControl { WebTransportCongestionControl::Default };
     const PromiseAndWrapper m_closed;
     const PromiseAndWrapper m_draining;
     const Ref<WebTransportDatagramDuplexStream> m_datagrams;

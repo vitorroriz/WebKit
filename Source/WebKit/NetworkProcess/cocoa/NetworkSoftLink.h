@@ -35,4 +35,7 @@ SOFT_LINK_FRAMEWORK_FOR_HEADER(WebKit, Network)
 // FIXME: Replace this soft linking with a HAVE macro once rdar://158191390 is available on all tested OS builds.
 SOFT_LINK_FUNCTION_MAY_FAIL_FOR_HEADER(WebKit, Network, nw_webtransport_options_set_allow_joining_before_ready, void, (nw_protocol_options_t options, bool allow), (options, allow))
 
+// FIXME: Replace this soft linking with a HAVE macro once rdar://164514830 is available on all tested OS builds.
+SOFT_LINK_FUNCTION_MAY_FAIL_FOR_HEADER(WebKit, Network, nw_webtransport_metadata_get_session_closed, bool, (nw_protocol_metadata_t metadata), (metadata))
+
 #endif // HAVE(WEB_TRANSPORT)
