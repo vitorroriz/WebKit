@@ -2034,7 +2034,7 @@ public:
 #endif
 
 #if PLATFORM(COCOA)
-    void createTextIndicatorForElementWithID(const String& elementID, CompletionHandler<void(std::optional<WebCore::TextIndicatorData>&&)>&&);
+    void createTextIndicatorForElementWithID(const String& elementID, CompletionHandler<void(RefPtr<WebCore::TextIndicator>&&)>&&);
 #endif
 
     void startObservingNowPlayingMetadata();

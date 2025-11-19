@@ -1504,10 +1504,10 @@ void WebPageProxy::proofreadingSessionUpdateStateForSuggestionWithID(IPC::Connec
 
 #endif // ENABLE(WRITING_TOOLS)
 
-void WebPageProxy::createTextIndicatorForElementWithID(const String& elementID, CompletionHandler<void(std::optional<WebCore::TextIndicatorData>&&)>&& completionHandler)
+void WebPageProxy::createTextIndicatorForElementWithID(const String& elementID, CompletionHandler<void(RefPtr<WebCore::TextIndicator>&&)>&& completionHandler)
 {
     if (!hasRunningProcess()) {
-        completionHandler(std::nullopt);
+        completionHandler(nil);
         return;
     }
 

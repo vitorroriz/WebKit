@@ -872,7 +872,7 @@ messages -> WebPage WantsAsyncDispatchMessage {
 #endif
 
 #if PLATFORM(COCOA)
-    CreateTextIndicatorForElementWithID(String elementID) -> (struct std::optional<WebCore::TextIndicatorData> textIndicator)
+    CreateTextIndicatorForElementWithID(String elementID) -> (RefPtr<WebCore::TextIndicator> textIndicator)
 #endif
 
     TakeSnapshotForTargetedElement(WebCore::NodeIdentifier nodeID, WebCore::ScriptExecutionContextIdentifier documentID) -> (std::optional<WebCore::ShareableBitmapHandle> image)

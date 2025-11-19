@@ -1182,33 +1182,33 @@ static std::optional<bool> elementHasHiddenVisibility(StyledElement* styledEleme
     return value->valueID() == CSSValueHidden;
 }
 
-void WebPage::createTextIndicatorForElementWithID(const String& elementID, CompletionHandler<void(std::optional<WebCore::TextIndicatorData>&&)>&& completionHandler)
+void WebPage::createTextIndicatorForElementWithID(const String& elementID, CompletionHandler<void(RefPtr<WebCore::TextIndicator>&&)>&& completionHandler)
 {
     RefPtr frame = corePage()->focusController().focusedOrMainFrame();
     if (!frame) {
         ASSERT_NOT_REACHED();
-        completionHandler(std::nullopt);
+        completionHandler(nil);
         return;
     }
 
     RefPtr document = frame->document();
     if (!document) {
         ASSERT_NOT_REACHED();
-        completionHandler(std::nullopt);
+        completionHandler(nil);
         return;
     }
 
     RefPtr element = document->getElementById(elementID);
     if (!element) {
         ASSERT_NOT_REACHED();
-        completionHandler(std::nullopt);
+        completionHandler(nil);
         return;
     }
 
     RefPtr styledElement = dynamicDowncast<StyledElement>(element.get());
     if (!styledElement) {
         ASSERT_NOT_REACHED();
-        completionHandler(std::nullopt);
+        completionHandler(nil);
         return;
     }
 
@@ -1233,7 +1233,7 @@ void WebPage::createTextIndicatorForElementWithID(const String& elementID, Compl
 
     RefPtr textIndicator = WebCore::TextIndicator::createWithRange(elementRange, textIndicatorOptions, WebCore::TextIndicatorPresentationTransition::None, { });
     if (!textIndicator) {
-        completionHandler(std::nullopt);
+        completionHandler(nil);
         return;
     }
 
@@ -1245,7 +1245,7 @@ void WebPage::createTextIndicatorForElementWithID(const String& elementID, Compl
     else
         styledElement->removeInlineStyleProperty(CSSPropertyVisibility);
 
-    completionHandler(textIndicator->data());
+    completionHandler(WTFMove(textIndicator));
 }
 
 void WebPage::createBitmapsFromImageData(Ref<WebCore::SharedBuffer>&& buffer, const Vector<unsigned>& lengths, CompletionHandler<void(Vector<Ref<WebCore::ShareableBitmap>>&&)>&& completionHandler)
