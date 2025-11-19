@@ -884,12 +884,16 @@ TEST(WKScrollViewTests, ContentInsetAdjustmentBehaviorChangeAfterViewportFitChan
     EXPECT_EQ([scrollView contentInsetAdjustmentBehavior], UIScrollViewContentInsetAdjustmentNever);
     EXPECT_EQ([scrollView adjustedContentInset], UIEdgeInsetsZero);
 
+    EXPECT_WK_STREQ([webView stringByEvaluatingJavaScript:@"document.body.clientWidth"], "400");
+
     [webView loadSimulatedRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://domain2.com"]] responseHTMLString:@"<html><head><meta name='viewport' content='width=device-width, initial-scale=1'></head></html>"];
     [navigationDelegate waitForDidFinishNavigation];
     [webView waitForNextPresentationUpdate];
 
     EXPECT_EQ([scrollView contentInsetAdjustmentBehavior], UIScrollViewContentInsetAdjustmentAlways);
     EXPECT_EQ([scrollView adjustedContentInset], insets);
+
+    EXPECT_WK_STREQ([webView stringByEvaluatingJavaScript:@"document.body.clientWidth"], "280");
 }
 
 } // namespace TestWebKitAPI

@@ -2542,6 +2542,11 @@ static WebCore::FloatPoint constrainContentOffset(WebCore::FloatPoint contentOff
 #if ENABLE(CONTENT_INSET_BACKGROUND_FILL)
     _shouldUpdateNeedsTopScrollPocketDueToVisibleContentInset = YES;
 #endif
+
+#if !PLATFORM(WATCHOS)
+    if (!self._shouldDeferGeometryUpdates && !_overriddenLayoutParameters)
+        [self _dispatchSetViewLayoutSize:[self activeViewLayoutSize:self.bounds]];
+#endif
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView

@@ -643,6 +643,20 @@ window.UIHelper = class UIHelper {
         });
     }
 
+    static async setSafeAreaInsets(top, right, bottom, left)
+    {
+        if (!this.isWebKit2() || !this.isIOSFamily())
+            return Promise.resolve();
+
+        return new Promise(resolve => {
+            testRunner.runUIScript(`
+                uiController.setSafeAreaInsets(${top}, ${right}, ${bottom}, ${left});
+                uiController.doAfterNextVisibleContentRectAndStablePresentationUpdate(function() {
+                    uiController.uiScriptComplete();
+                });`, resolve);
+        });
+    }
+
     static async setInlinePrediction(text, startIndex = 0)
     {
         if (!this.isWebKit2())
