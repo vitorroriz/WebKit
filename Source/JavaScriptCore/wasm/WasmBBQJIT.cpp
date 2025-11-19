@@ -1037,7 +1037,7 @@ Value BBQJIT::topValue(TypeKind type)
 
 Value BBQJIT::exception(const ControlData& control)
 {
-    ASSERT(ControlData::isTry(control) || ControlData::isAnyCatch(control));
+    ASSERT(ControlData::isAnyCatch(control));
     return Value::fromTemp(TypeKind::Externref, control.enclosedHeight());
 }
 
@@ -3458,17 +3458,18 @@ StackMap BBQJIT::makeStackMap(const ControlData& data, Stack& enclosingStack)
 
     // Do rethrow slots first because IPInt has them in a shadow stack.
     for (const ControlEntry& entry : m_parser->controlStack()) {
-        if (BBQJIT::ControlData::isTry(entry.controlData)) {
-            Value exception = this->exception(entry.controlData);
-            // We don't actually have a real value here, so use Void to signify we shouldn't load it
-            stackMap[stackMapIndex++] = OSREntryValue(toB3Rep(locationOf(exception)), B3::Void);
-        }
-
-        unsigned numSlots = entry.controlData.implicitSlots();
-        for (unsigned i = 0; i < numSlots; i++) {
+        if (ControlData::isAnyCatch(entry.controlData)) {
+            ASSERT(entry.controlData.implicitSlots() == 1);
             Value exception = this->exception(entry.controlData);
             stackMap[stackMapIndex++] = OSREntryValue(toB3Rep(locationOf(exception)), B3::Int64); // Exceptions are EncodedJSValues, so they are always Int64
-        }
+        } else if (BBQJIT::ControlData::isTry(entry.controlData)) {
+            // IPInt reserves rethrow slots based on Try blocks, but there is no exception to rethrow until Catch,
+            // and BBQ and OMG do not represent the implicit exception slot/variable except within the Catch, so
+            // use Void to signify we shouldn't load and constant 0 to zero fill this slot when storing.
+            ASSERT(!entry.controlData.implicitSlots());
+            stackMap[stackMapIndex++] = OSREntryValue(B3::ValueRep::constant(0), B3::Void);
+        } else
+            ASSERT(!entry.controlData.implicitSlots());
     }
 
     for (const ControlEntry& entry : m_parser->controlStack()) {
