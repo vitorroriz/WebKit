@@ -2657,7 +2657,7 @@ void MediaPlayerPrivateGStreamer::configureElement(GstElement* element)
     // might not auto-plug hardware decoders.
     bool isBlob = m_url.protocolIs("blob"_s);
     auto nameView = StringView::fromLatin1(elementName.get());
-    if (webkitGstCheckVersion(1, 22, 0) && nameView.startsWith("urisourcebin"_s) && (isBlob || isMediaSource() || isMediaStreamPlayer()))
+    if (gst_check_version(1, 22, 0) && nameView.startsWith("urisourcebin"_s) && (isBlob || isMediaSource() || isMediaStreamPlayer()))
         g_object_set(element, "use-buffering", FALSE, "parse-streams", !isMediaStreamPlayer(), nullptr);
 
     if (nameView.startsWith("parsebin"_s))
@@ -3459,7 +3459,7 @@ void MediaPlayerPrivateGStreamer::createGSTPlayBin(const URL& url)
     g_object_set(m_pipeline.get(), "mute", static_cast<gboolean>(player->muted()), nullptr);
 
     // From GStreamer 1.22.0, uridecodebin3 is created in playbin3's _init(), so "element-setup" isn't called with it.
-    if (!m_isLegacyPlaybin && webkitGstCheckVersion(1, 22, 0)) {
+    if (!m_isLegacyPlaybin && gst_check_version(1, 22, 0)) {
         if (auto uriDecodeBin3 = adoptGRef(gst_bin_get_by_name(GST_BIN_CAST(m_pipeline.get()), "uridecodebin3")))
             configureElement(uriDecodeBin3.get());
     }

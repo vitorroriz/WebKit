@@ -54,7 +54,8 @@ using TrackIDHashMap = HashMap<TrackID, MappedArg, WTF::IntHash<TrackID>, WTF::U
 #define GST_CHECK_VERSION_FULL(major, minor, micro, nano) \
     (GST_CHECK_VERSION(major, minor, micro) && (GST_VERSION_NANO >= nano))
 
-inline bool webkitGstCheckVersion(guint major, guint minor, guint micro)
+#if !GST_CHECK_VERSION(1, 28, 0)
+inline bool gst_check_version(guint major, guint minor, guint micro)
 {
     guint currentMajor, currentMinor, currentMicro, currentNano;
     gst_version(&currentMajor, &currentMinor, &currentMicro, &currentNano);
@@ -74,6 +75,7 @@ inline bool webkitGstCheckVersion(guint major, guint minor, guint micro)
 
     return true;
 }
+#endif
 
 #define GST_VIDEO_CAPS_TYPE_PREFIX  "video/"_s
 #define GST_AUDIO_CAPS_TYPE_PREFIX  "audio/"_s

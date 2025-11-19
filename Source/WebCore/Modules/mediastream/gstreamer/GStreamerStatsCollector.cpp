@@ -357,13 +357,13 @@ static gboolean fillReportCallback(const GValue* value, Ref<ReportHolder>& repor
         break;
     case GST_WEBRTC_STATS_LOCAL_CANDIDATE:
     case GST_WEBRTC_STATS_REMOTE_CANDIDATE:
-        if (webkitGstCheckVersion(1, 22, 0)) {
+        if (gst_check_version(1, 22, 0)) {
             RTCStatsReport::IceCandidateStats stats(statsType, structure);
             report.set<IDLDOMString, IDLDictionary<RTCStatsReport::IceCandidateStats>>(stats.id, WTFMove(stats));
         }
         break;
     case GST_WEBRTC_STATS_CANDIDATE_PAIR:
-        if (webkitGstCheckVersion(1, 22, 0)) {
+        if (gst_check_version(1, 22, 0)) {
             RTCStatsReport::IceCandidatePairStats stats(structure);
             report.set<IDLDOMString, IDLDictionary<RTCStatsReport::IceCandidatePairStats>>(stats.id, WTFMove(stats));
         }

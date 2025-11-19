@@ -961,7 +961,7 @@ static void webkit_video_encoder_class_init(WebKitVideoEncoderClass* klass)
         }
     });
 
-    if (webkitGstCheckVersion(1, 22, 0)) {
+    if (gst_check_version(1, 22, 0)) {
         Encoders::registerEncoder(Av1, "av1enc"_s, "av1parse"_s, "video/x-av1"_s, "video/x-av1,stream-format=obu-stream",
             [](WebKitVideoEncoder* self) {
                 g_object_set(self->priv->encoder.get(), "threads", NUMBER_OF_THREADS, nullptr);

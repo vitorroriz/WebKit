@@ -438,7 +438,7 @@ bool ensureGStreamerInitialized()
         // playbin3.
         // The USE_PLAYBIN3 environment variable is no longer supported.
         // https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/6255
-        if (!webkitGstCheckVersion(1, 24, 0) && g_getenv("USE_PLAYBIN3"))
+        if (!gst_check_version(1, 24, 0) && g_getenv("USE_PLAYBIN3"))
             WTFLogAlways("The USE_PLAYBIN3 variable was detected in the environment. Expect playback issues or please unset it.");
 
 #if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
@@ -558,7 +558,7 @@ void registerWebKitGStreamerElements()
         // The new demuxers based on adaptivedemux2 cannot be used in WebKit yet because this new
         // base class does not abstract away network access. They can't work in a sandboxed
         // media process, so demote their rank in order to prevent decodebin3 from auto-plugging them.
-        if (webkitGstCheckVersion(1, 22, 0)) {
+        if (gst_check_version(1, 22, 0)) {
             std::array<ASCIILiteral, 3> elementNames = { "dashdemux2"_s, "hlsdemux2"_s, "mssdemux2"_s };
             for (auto& elementName : elementNames) {
                 if (auto factory = adoptGRef(gst_element_factory_find(elementName)))
@@ -2113,7 +2113,7 @@ GRefPtr<GstElement> createVideoConvertScaleElement(const String& name)
     // Keep videoconvertscale disabled for now due to some performance issues.
     // https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3815
     auto useVideoConvertScale = StringView::fromLatin1(std::getenv("WEBKIT_GST_USE_VIDEOCONVERT_SCALE"));
-    if (useVideoConvertScale == "1"_s && webkitGstCheckVersion(1, 22, 0)) {
+    if (useVideoConvertScale == "1"_s && gst_check_version(1, 22, 0)) {
         GRefPtr videoConvertScale = makeGStreamerElement("videoconvertscale"_s, name);
         if (!videoConvertScale)
             return nullptr;

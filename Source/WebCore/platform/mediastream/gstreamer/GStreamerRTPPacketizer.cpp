@@ -73,7 +73,7 @@ GStreamerRTPPacketizer::~GStreamerRTPPacketizer() = default;
 
 void GStreamerRTPPacketizer::configureExtensions()
 {
-    if (!webkitGstCheckVersion(1, 24, 0)) {
+    if (!gst_check_version(1, 24, 0)) {
         GST_WARNING_OBJECT(m_bin.get(), "GStreamer 1.24 is required for configuring extensions on the RTP payloaders. Simulcast will not work.");
         return;
     }
@@ -118,7 +118,7 @@ void GStreamerRTPPacketizer::configureExtensions()
 
 void GStreamerRTPPacketizer::ensureMidExtension(const String& mid)
 {
-    if (!webkitGstCheckVersion(1, 24, 0)) {
+    if (!gst_check_version(1, 24, 0)) {
         GST_WARNING_OBJECT(m_bin.get(), "GStreamer 1.24 is required for ensuring mid extension on the RTP payloaders.");
         return;
     }
