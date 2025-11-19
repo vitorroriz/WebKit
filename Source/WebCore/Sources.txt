@@ -529,9 +529,11 @@ Modules/webtransport/WebTransport.cpp
 Modules/webtransport/WebTransportBidirectionalStream.cpp
 Modules/webtransport/WebTransportBidirectionalStreamSource.cpp
 Modules/webtransport/WebTransportDatagramDuplexStream.cpp
+Modules/webtransport/WebTransportDatagramsWritable.cpp
 Modules/webtransport/WebTransportError.cpp
 Modules/webtransport/WebTransportReceiveStream.cpp
 Modules/webtransport/WebTransportReceiveStreamSource.cpp
+Modules/webtransport/WebTransportSendGroup.cpp
 Modules/webtransport/WebTransportSendStream.cpp
 Modules/webtransport/WebTransportSendStreamSink.cpp
 Modules/webtransport/WebTransportSession.cpp
@@ -5113,6 +5115,7 @@ JSWebTransportCongestionControl.cpp
 JSWebTransportConnectionStats.cpp
 JSWebTransportDatagramDuplexStream.cpp
 JSWebTransportDatagramStats.cpp
+JSWebTransportDatagramsWritable.cpp
 JSWebTransportError.cpp
 JSWebTransportErrorOptions.cpp
 JSWebTransportErrorSource.cpp
@@ -5121,6 +5124,8 @@ JSWebTransportOptions.cpp
 JSWebTransportReceiveStream.cpp
 JSWebTransportReceiveStreamStats.cpp
 JSWebTransportReliabilityMode.cpp
+JSWebTransportSendGroup.cpp
+JSWebTransportSendOptions.cpp
 JSWebTransportSendStream.cpp
 JSWebTransportSendStreamOptions.cpp
 JSWebTransportSendStreamStats.cpp

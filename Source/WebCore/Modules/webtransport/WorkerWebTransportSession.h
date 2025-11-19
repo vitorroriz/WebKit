@@ -52,13 +52,14 @@ private:
     void streamReceiveBytes(WebTransportStreamIdentifier, std::span<const uint8_t>, bool, std::optional<Exception>&&) final;
     void didFail(std::optional<unsigned>&&, String&&) final;
 
-    Ref<WebTransportSendPromise> sendDatagram(std::span<const uint8_t>) final;
+    Ref<WebTransportSendPromise> sendDatagram(std::optional<WebTransportSendGroupIdentifier>, std::span<const uint8_t>) final;
     Ref<WritableStreamPromise> createOutgoingUnidirectionalStream() final;
     Ref<BidirectionalStreamPromise> createBidirectionalStream() final;
     Ref<WebTransportSendPromise> streamSendBytes(WebTransportStreamIdentifier, std::span<const uint8_t>, bool withFin) final;
     Ref<WebTransportConnectionStatsPromise> getStats() final;
     Ref<WebTransportSendStreamStatsPromise> getSendStreamStats(WebTransportStreamIdentifier) final;
     Ref<WebTransportReceiveStreamStatsPromise> getReceiveStreamStats(WebTransportStreamIdentifier) final;
+    Ref<WebTransportSendStreamStatsPromise> getSendGroupStats(WebTransportSendGroupIdentifier) final;
 
     void cancelReceiveStream(WebTransportStreamIdentifier, std::optional<WebTransportStreamErrorCode>) final;
     void cancelSendStream(WebTransportStreamIdentifier, std::optional<WebTransportStreamErrorCode>) final;

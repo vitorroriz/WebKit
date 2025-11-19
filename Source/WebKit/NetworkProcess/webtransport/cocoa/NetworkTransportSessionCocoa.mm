@@ -395,8 +395,13 @@ void NetworkTransportSession::setupDatagramConnection(CompletionHandler<void(boo
 #endif // HAVE(WEB_TRANSPORT)
 }
 
-void NetworkTransportSession::sendDatagram(std::span<const uint8_t> data, CompletionHandler<void(std::optional<WebCore::Exception>&&)>&& completionHandler)
+void NetworkTransportSession::sendDatagram(std::optional<WebCore::WebTransportSendGroupIdentifier> identifier, std::span<const uint8_t> data, CompletionHandler<void(std::optional<WebCore::Exception>&&)>&& completionHandler)
 {
+    if (identifier) {
+        m_datagramStats.ensure(*identifier, [] {
+            return uint64_t { };
+        }).iterator->value += data.size();
+    }
 #if HAVE(WEB_TRANSPORT)
     ASSERT(m_datagramConnection);
     nw_connection_send(m_datagramConnection.get(), makeDispatchData(Vector(data)).get(), NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, makeBlockPtr([completionHandler = WTFMove(completionHandler)] (nw_error_t error) mutable {

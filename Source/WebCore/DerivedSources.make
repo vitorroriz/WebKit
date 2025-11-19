@@ -837,6 +837,7 @@ JS_BINDING_IDLS := \
     $(WebCore)/Modules/webtransport/WebTransportCongestionControl.idl \
     $(WebCore)/Modules/webtransport/WebTransportConnectionStats.idl \
     $(WebCore)/Modules/webtransport/WebTransportDatagramDuplexStream.idl \
+	$(WebCore)/Modules/webtransport/WebTransportDatagramsWritable.idl \
     $(WebCore)/Modules/webtransport/WebTransportDatagramStats.idl \
     $(WebCore)/Modules/webtransport/WebTransportError.idl \
     $(WebCore)/Modules/webtransport/WebTransportErrorOptions.idl \
@@ -846,6 +847,8 @@ JS_BINDING_IDLS := \
     $(WebCore)/Modules/webtransport/WebTransportReceiveStream.idl \
     $(WebCore)/Modules/webtransport/WebTransportReceiveStreamStats.idl \
     $(WebCore)/Modules/webtransport/WebTransportReliabilityMode.idl \
+	$(WebCore)/Modules/webtransport/WebTransportSendGroup.idl \
+	$(WebCore)/Modules/webtransport/WebTransportSendOptions.idl \
     $(WebCore)/Modules/webtransport/WebTransportSendStream.idl \
     $(WebCore)/Modules/webtransport/WebTransportSendStreamOptions.idl \
     $(WebCore)/Modules/webtransport/WebTransportSendStreamStats.idl \

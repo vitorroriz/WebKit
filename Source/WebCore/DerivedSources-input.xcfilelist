@@ -1103,6 +1103,7 @@ $(PROJECT_DIR)/Modules/webtransport/WebTransportCongestionControl.idl
 $(PROJECT_DIR)/Modules/webtransport/WebTransportConnectionStats.idl
 $(PROJECT_DIR)/Modules/webtransport/WebTransportDatagramDuplexStream.idl
 $(PROJECT_DIR)/Modules/webtransport/WebTransportDatagramStats.idl
+$(PROJECT_DIR)/Modules/webtransport/WebTransportDatagramsWritable.idl
 $(PROJECT_DIR)/Modules/webtransport/WebTransportError.idl
 $(PROJECT_DIR)/Modules/webtransport/WebTransportErrorOptions.idl
 $(PROJECT_DIR)/Modules/webtransport/WebTransportErrorSource.idl
@@ -1111,6 +1112,8 @@ $(PROJECT_DIR)/Modules/webtransport/WebTransportOptions.idl
 $(PROJECT_DIR)/Modules/webtransport/WebTransportReceiveStream.idl
 $(PROJECT_DIR)/Modules/webtransport/WebTransportReceiveStreamStats.idl
 $(PROJECT_DIR)/Modules/webtransport/WebTransportReliabilityMode.idl
+$(PROJECT_DIR)/Modules/webtransport/WebTransportSendGroup.idl
+$(PROJECT_DIR)/Modules/webtransport/WebTransportSendOptions.idl
 $(PROJECT_DIR)/Modules/webtransport/WebTransportSendStream.idl
 $(PROJECT_DIR)/Modules/webtransport/WebTransportSendStreamOptions.idl
 $(PROJECT_DIR)/Modules/webtransport/WebTransportSendStreamStats.idl

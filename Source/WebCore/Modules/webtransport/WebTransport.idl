@@ -46,4 +46,5 @@
 
     [CallWith=CurrentScriptExecutionContext] Promise<WebTransportSendStream> createUnidirectionalStream(optional WebTransportSendStreamOptions options = {});
     readonly attribute ReadableStream incomingUnidirectionalStreams;
+    WebTransportSendGroup createSendGroup();
 };

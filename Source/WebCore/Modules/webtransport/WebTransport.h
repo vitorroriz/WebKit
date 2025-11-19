@@ -31,6 +31,7 @@
 #include "WebTransportSessionClient.h"
 #include <wtf/ListHashSet.h>
 #include <wtf/RefCounted.h>
+#include <wtf/WeakHashSet.h>
 
 namespace JSC {
 class JSGlobalObject;
@@ -52,8 +53,10 @@ class ScriptExecutionContext;
 class SocketProvider;
 class WebTransportBidirectionalStreamSource;
 class WebTransportDatagramDuplexStream;
+class WebTransportDatagramsWritable;
 class WebTransportError;
 class WebTransportReceiveStreamSource;
+class WebTransportSendGroup;
 class WebTransportSendStreamSink;
 class WebTransportSession;
 class WorkerWebTransportSession;
@@ -87,8 +90,11 @@ public:
     ReadableStream& incomingBidirectionalStreams();
     void createUnidirectionalStream(ScriptExecutionContext&, WebTransportSendStreamOptions&&, Ref<DeferredPromise>&&);
     ReadableStream& incomingUnidirectionalStreams();
+    Ref<WebTransportSendGroup> createSendGroup();
 
     RefPtr<WebTransportSession> session();
+
+    void datagramsWritableCreated(WebTransportDatagramsWritable&);
 
 private:
     WebTransport(ScriptExecutionContext&, JSDOMGlobalObject&, Ref<ReadableStream>&&, Ref<ReadableStream>&&, WebTransportCongestionControl, Ref<WebTransportDatagramDuplexStream>&&, Ref<DatagramSource>&&, Ref<WebTransportReceiveStreamSource>&&, Ref<WebTransportBidirectionalStreamSource>&&);
@@ -135,6 +141,7 @@ private:
     const Ref<WebTransportReceiveStreamSource> m_receiveStreamSource;
     const Ref<WebTransportBidirectionalStreamSource> m_bidirectionalStreamSource;
     HashMap<WebTransportStreamIdentifier, Ref<WebTransportReceiveStreamSource>> m_readStreamSources;
+    WeakHashSet<WebTransportDatagramsWritable> m_datagramsWritables;
 };
 
 }

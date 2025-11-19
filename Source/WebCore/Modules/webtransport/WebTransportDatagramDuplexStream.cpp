@@ -29,22 +29,34 @@
 #include "ExceptionOr.h"
 #include "JSDOMPromise.h"
 #include "ReadableStream.h"
+#include "WebTransportDatagramsWritable.h"
+#include "WebTransportSession.h"
 #include "WritableStream.h"
 
 namespace WebCore {
 
-Ref<WebTransportDatagramDuplexStream> WebTransportDatagramDuplexStream::create(Ref<ReadableStream>&& readable, Ref<WritableStream>&& writable)
+Ref<WebTransportDatagramDuplexStream> WebTransportDatagramDuplexStream::create(Ref<ReadableStream>&& readable)
 {
-    return adoptRef(*new WebTransportDatagramDuplexStream(WTFMove(readable), WTFMove(writable)));
+    return adoptRef(*new WebTransportDatagramDuplexStream(WTFMove(readable)));
 }
 
-WebTransportDatagramDuplexStream::WebTransportDatagramDuplexStream(Ref<ReadableStream>&& readable, Ref<WritableStream>&& writable)
+WebTransportDatagramDuplexStream::WebTransportDatagramDuplexStream(Ref<ReadableStream>&& readable)
     : m_readable(WTFMove(readable))
-    , m_writable(WTFMove(writable))
 {
 }
 
 WebTransportDatagramDuplexStream::~WebTransportDatagramDuplexStream() = default;
+
+void WebTransportDatagramDuplexStream::attachTo(WebTransport& transport)
+{
+    ASSERT(!m_transport.get());
+    m_transport = transport;
+}
+
+ExceptionOr<Ref<WritableStream>> WebTransportDatagramDuplexStream::createWritable(ScriptExecutionContext& context, WebTransportSendOptions&& options)
+{
+    return WebTransportDatagramsWritable::create(context, m_transport.get(), WTFMove(options));
+}
 
 ExceptionOr<void> WebTransportDatagramDuplexStream::setIncomingMaxAge(double maxAge)
 {

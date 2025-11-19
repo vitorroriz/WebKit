@@ -514,8 +514,10 @@ namespace WebCore {
     macro(WebTransport) \
     macro(WebTransportBidirectionalStream) \
     macro(WebTransportDatagramDuplexStream) \
+    macro(WebTransportDatagramsWritable) \
     macro(WebTransportError) \
     macro(WebTransportReceiveStream) \
+    macro(WebTransportSendGroup) \
     macro(WebTransportSendStream) \
     macro(WindowClient) \
     macro(Worklet) \

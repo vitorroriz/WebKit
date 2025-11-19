@@ -126,9 +126,9 @@ void WebTransportSession::didFail(std::optional<unsigned>&& code, String&& messa
         ASSERT_NOT_REACHED();
 }
 
-Ref<WebCore::WebTransportSendPromise> WebTransportSession::sendDatagram(std::span<const uint8_t> datagram)
+Ref<WebCore::WebTransportSendPromise> WebTransportSession::sendDatagram(std::optional<WebCore::WebTransportSendGroupIdentifier> identifier, std::span<const uint8_t> datagram)
 {
-    return sendWithPromisedReply(Messages::NetworkTransportSession::SendDatagram(datagram))->whenSettled(RunLoop::mainSingleton(), [] (auto&& exception) {
+    return sendWithPromisedReply(Messages::NetworkTransportSession::SendDatagram(identifier, datagram))->whenSettled(RunLoop::mainSingleton(), [] (auto&& exception) {
         ASSERT(RunLoop::isMain());
         if (!exception)
             return WebCore::WebTransportSendPromise::createAndReject();
@@ -185,6 +185,16 @@ Ref<WebCore::WebTransportReceiveStreamStatsPromise> WebTransportSession::getRece
         if (!stats || !*stats)
             return WebCore::WebTransportReceiveStreamStatsPromise::createAndReject();
         return WebCore::WebTransportReceiveStreamStatsPromise::createAndResolve(WTFMove(**stats));
+    });
+}
+
+Ref<WebCore::WebTransportSendStreamStatsPromise> WebTransportSession::getSendGroupStats(WebCore::WebTransportSendGroupIdentifier identifier)
+{
+    return sendWithPromisedReply(Messages::NetworkTransportSession::GetSendGroupStats(identifier))->whenSettled(RunLoop::mainSingleton(), [] (auto&& stats) mutable {
+        ASSERT(RunLoop::isMain());
+        if (!stats || !*stats)
+            return WebCore::WebTransportSendStreamStatsPromise::createAndReject();
+        return WebCore::WebTransportSendStreamStatsPromise::createAndResolve(WTFMove(**stats));
     });
 }
 

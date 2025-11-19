@@ -82,13 +82,14 @@ private:
     WebTransportSession(Ref<IPC::Connection>&&, ThreadSafeWeakPtr<WebCore::WebTransportSessionClient>&&, WebTransportSessionIdentifier);
 
     // WebTransportSession
-    Ref<WebCore::WebTransportSendPromise> sendDatagram(std::span<const uint8_t>) final;
+    Ref<WebCore::WebTransportSendPromise> sendDatagram(std::optional<WebCore::WebTransportSendGroupIdentifier>, std::span<const uint8_t>) final;
     Ref<WebCore::WritableStreamPromise> createOutgoingUnidirectionalStream() final;
     Ref<WebCore::BidirectionalStreamPromise> createBidirectionalStream() final;
     Ref<WebCore::WebTransportSendPromise> streamSendBytes(WebCore::WebTransportStreamIdentifier, std::span<const uint8_t>, bool withFin) final;
     Ref<WebCore::WebTransportConnectionStatsPromise> getStats() final;
     Ref<WebCore::WebTransportSendStreamStatsPromise> getSendStreamStats(WebCore::WebTransportStreamIdentifier) final;
     Ref<WebCore::WebTransportReceiveStreamStatsPromise> getReceiveStreamStats(WebCore::WebTransportStreamIdentifier) final;
+    Ref<WebCore::WebTransportSendStreamStatsPromise> getSendGroupStats(WebCore::WebTransportSendGroupIdentifier) final;
 
     void cancelReceiveStream(WebCore::WebTransportStreamIdentifier, std::optional<WebCore::WebTransportStreamErrorCode>);
     void cancelSendStream(WebCore::WebTransportStreamIdentifier, std::optional<WebCore::WebTransportStreamErrorCode>);

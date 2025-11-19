@@ -934,6 +934,7 @@ set(WebCore_NON_SVG_IDL_FILES
     Modules/webtransport/WebTransportConnectionStats.idl
     Modules/webtransport/WebTransportDatagramDuplexStream.idl
     Modules/webtransport/WebTransportDatagramStats.idl
+    Modules/webtransport/WebTransportDatagramsWritable.idl
     Modules/webtransport/WebTransportError.idl
     Modules/webtransport/WebTransportErrorOptions.idl
     Modules/webtransport/WebTransportErrorSource.idl
@@ -942,6 +943,8 @@ set(WebCore_NON_SVG_IDL_FILES
     Modules/webtransport/WebTransportReceiveStream.idl
     Modules/webtransport/WebTransportReceiveStreamStats.idl
     Modules/webtransport/WebTransportReliabilityMode.idl
+    Modules/webtransport/WebTransportSendGroup.idl
+    Modules/webtransport/WebTransportSendOptions.idl
     Modules/webtransport/WebTransportSendStream.idl
     Modules/webtransport/WebTransportSendStreamOptions.idl
     Modules/webtransport/WebTransportSendStreamStats.idl

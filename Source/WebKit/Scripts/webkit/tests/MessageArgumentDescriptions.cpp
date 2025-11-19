@@ -496,6 +496,7 @@ Vector<ASCIILiteral> serializedIdentifiers()
         "WebCore::WebLockIdentifierID"_s,
         "WebCore::WebProcessJSHandleIdentifier"_s,
         "WebCore::WebSocketIdentifier"_s,
+        "WebCore::WebTransportSendGroupIdentifier"_s,
         "WebCore::WebTransportStreamIdentifier"_s,
         "WebCore::WindowIdentifier"_s,
         "WebKit::AudioMediaStreamTrackRendererInternalUnitIdentifier"_s,

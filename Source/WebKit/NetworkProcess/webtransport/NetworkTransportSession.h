@@ -44,8 +44,10 @@ class Exception;
 struct ClientOrigin;
 struct WebTransportConnectionStats;
 struct WebTransportReceiveStreamStats;
+struct WebTransportSendGroupIdentifierType;
 struct WebTransportSendStreamStats;
 struct WebTransportStreamIdentifierType;
+using WebTransportSendGroupIdentifier = ObjectIdentifier<WebTransportSendGroupIdentifierType>;
 using WebTransportStreamIdentifier = ObjectIdentifier<WebTransportStreamIdentifierType>;
 using WebTransportSessionErrorCode = uint32_t;
 using WebTransportStreamErrorCode = uint64_t;
@@ -74,12 +76,13 @@ public:
 
     void initialize(CompletionHandler<void(bool)>&&);
 
-    void sendDatagram(std::span<const uint8_t>, CompletionHandler<void(std::optional<WebCore::Exception>&&)>&&);
+    void sendDatagram(std::optional<WebCore::WebTransportSendGroupIdentifier>, std::span<const uint8_t>, CompletionHandler<void(std::optional<WebCore::Exception>&&)>&&);
     void createOutgoingUnidirectionalStream(CompletionHandler<void(std::optional<WebCore::WebTransportStreamIdentifier>)>&&);
     void createBidirectionalStream(CompletionHandler<void(std::optional<WebCore::WebTransportStreamIdentifier>)>&&);
     void getStats(CompletionHandler<void(WebCore::WebTransportConnectionStats&&)>&&);
     void getSendStreamStats(WebCore::WebTransportStreamIdentifier, CompletionHandler<void(std::optional<WebCore::WebTransportSendStreamStats>&&)>&&);
     void getReceiveStreamStats(WebCore::WebTransportStreamIdentifier, CompletionHandler<void(std::optional<WebCore::WebTransportReceiveStreamStats>&&)>&&);
+    void getSendGroupStats(WebCore::WebTransportSendGroupIdentifier, CompletionHandler<void(std::optional<WebCore::WebTransportSendStreamStats>&&)>&&);
     void destroyOutgoingUnidirectionalStream(WebCore::WebTransportStreamIdentifier);
     void destroyBidirectionalStream(WebCore::WebTransportStreamIdentifier);
     void streamSendBytes(WebCore::WebTransportStreamIdentifier, std::span<const uint8_t>, bool withFin, CompletionHandler<void(std::optional<WebCore::Exception>&&)>&&);
@@ -115,6 +118,7 @@ private:
     WeakPtr<NetworkConnectionToWebProcess> m_connectionToWebProcess;
     const WebTransportSessionIdentifier m_identifier;
     const WebCore::WebTransportOptions m_options;
+    HashMap<WebCore::WebTransportSendGroupIdentifier, uint64_t> m_datagramStats;
 
 #if PLATFORM(COCOA)
     const RetainPtr<nw_connection_group_t> m_connectionGroup;

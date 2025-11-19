@@ -27,6 +27,7 @@
 
 #include <wtf/Deque.h>
 #include <wtf/RefCounted.h>
+#include <wtf/ThreadSafeWeakPtr.h>
 
 namespace JSC {
 class JSGlobalObject;
@@ -36,16 +37,19 @@ namespace WebCore {
 
 class DOMPromise;
 class ReadableStream;
+class ScriptExecutionContext;
+class WebTransport;
 class WritableStream;
+struct WebTransportSendOptions;
 template<typename> class ExceptionOr;
 
 class WebTransportDatagramDuplexStream : public RefCounted<WebTransportDatagramDuplexStream> {
 public:
-    static Ref<WebTransportDatagramDuplexStream> create(Ref<ReadableStream>&&, Ref<WritableStream>&&);
+    static Ref<WebTransportDatagramDuplexStream> create(Ref<ReadableStream>&&);
     ~WebTransportDatagramDuplexStream();
 
     ReadableStream& readable() { return m_readable; }
-    WritableStream& writable() { return m_writable; }
+    ExceptionOr<Ref<WritableStream>> createWritable(ScriptExecutionContext&, WebTransportSendOptions&&);
     unsigned maxDatagramSize() { return m_outgoingMaxDatagramSize; }
     double incomingMaxAge() { return m_incomingDatagramsExpirationDuration; }
     double outgoingMaxAge() { return m_outgoingDatagramsExpirationDuration; }
@@ -56,11 +60,12 @@ public:
     ExceptionOr<void> setIncomingHighWaterMark(double);
     ExceptionOr<void> setOutgoingHighWaterMark(double);
 
+    void attachTo(WebTransport&);
+
 private:
-    WebTransportDatagramDuplexStream(Ref<ReadableStream>&&, Ref<WritableStream>&&);
+    WebTransportDatagramDuplexStream(Ref<ReadableStream>&&);
 
     const Ref<ReadableStream> m_readable;
-    const Ref<WritableStream> m_writable;
     Deque<std::pair<Vector<uint8_t>, MonotonicTime>> m_incomingDatagramsQueue;
     RefPtr<DOMPromise> m_incomingDatagramsPullPromise;
     double m_incomingDatagramsHighWaterMark { 1 };
@@ -69,6 +74,7 @@ private:
     double m_outgoingDatagramsHighWaterMark { 1 };
     double m_outgoingDatagramsExpirationDuration { std::numeric_limits<double>::infinity() };
     size_t m_outgoingMaxDatagramSize { 1024 };
+    ThreadSafeWeakPtr<WebTransport> m_transport;
 };
 
 }

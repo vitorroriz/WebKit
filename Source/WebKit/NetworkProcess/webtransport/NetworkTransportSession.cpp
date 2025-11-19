@@ -123,6 +123,17 @@ void NetworkTransportSession::getReceiveStreamStats(WebCore::WebTransportStreamI
         completionHandler(std::nullopt);
 }
 
+void NetworkTransportSession::getSendGroupStats(WebCore::WebTransportSendGroupIdentifier identifier, CompletionHandler<void(std::optional<WebCore::WebTransportSendStreamStats>&&)>&& completionHandler)
+{
+    // FIXME: Get better data from the stream.
+    uint64_t bytesSent = m_datagramStats.get(identifier);
+    completionHandler(WebCore::WebTransportSendStreamStats {
+        bytesSent,
+        bytesSent,
+        bytesSent
+    });
+}
+
 #if !PLATFORM(COCOA)
 RefPtr<NetworkTransportSession> NetworkTransportSession::create(NetworkConnectionToWebProcess&, WebTransportSessionIdentifier, URL&&, WebCore::WebTransportOptions&&, WebKit::WebPageProxyIdentifier&&, WebCore::ClientOrigin&&)
 {
@@ -139,7 +150,7 @@ NetworkTransportSession::NetworkTransportSession()
 {
 }
 
-void NetworkTransportSession::sendDatagram(std::span<const uint8_t>, CompletionHandler<void(std::optional<WebCore::Exception>&&)>&& completionHandler)
+void NetworkTransportSession::sendDatagram(std::optional<WebCore::WebTransportSendGroupIdentifier>, std::span<const uint8_t>, CompletionHandler<void(std::optional<WebCore::Exception>&&)>&& completionHandler)
 {
     completionHandler(std::nullopt);
 }

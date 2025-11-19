@@ -3436,6 +3436,8 @@ $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportDatagramDuplexStream.
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportDatagramDuplexStream.h
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportDatagramStats.cpp
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportDatagramStats.h
+$(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportDatagramsWritable.cpp
+$(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportDatagramsWritable.h
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportError.cpp
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportError.h
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportErrorOptions.cpp
@@ -3452,6 +3454,10 @@ $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportReceiveStreamStats.cp
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportReceiveStreamStats.h
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportReliabilityMode.cpp
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportReliabilityMode.h
+$(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportSendGroup.cpp
+$(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportSendGroup.h
+$(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportSendOptions.cpp
+$(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportSendOptions.h
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportSendStream.cpp
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportSendStream.h
 $(BUILT_PRODUCTS_DIR)/DerivedSources/WebCore/JSWebTransportSendStreamOptions.cpp

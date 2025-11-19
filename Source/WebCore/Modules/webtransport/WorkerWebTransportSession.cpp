@@ -112,11 +112,11 @@ void WorkerWebTransportSession::streamReceiveBytes(WebTransportStreamIdentifier 
     });
 }
 
-Ref<WebTransportSendPromise> WorkerWebTransportSession::sendDatagram(std::span<const uint8_t> datagram)
+Ref<WebTransportSendPromise> WorkerWebTransportSession::sendDatagram(std::optional<WebTransportSendGroupIdentifier> identifier, std::span<const uint8_t> datagram)
 {
     ASSERT(!RunLoop::isMain());
     if (RefPtr session = m_session)
-        return session->sendDatagram(datagram);
+        return session->sendDatagram(identifier, datagram);
     return WebTransportSendPromise::createAndReject();
 }
 
@@ -172,6 +172,15 @@ Ref<WebTransportReceiveStreamStatsPromise> WorkerWebTransportSession::getReceive
         return session->getReceiveStreamStats(identifier);
     ASSERT_NOT_REACHED_WITH_MESSAGE("Session should be set up before use then never removed.");
     return WebTransportReceiveStreamStatsPromise::createAndReject();
+}
+
+Ref<WebTransportSendStreamStatsPromise> WorkerWebTransportSession::getSendGroupStats(WebTransportSendGroupIdentifier identifier)
+{
+    ASSERT(!RunLoop::isMain());
+    if (RefPtr session = m_session)
+        return session->getSendGroupStats(identifier);
+    ASSERT_NOT_REACHED_WITH_MESSAGE("Session should be set up before use then never removed.");
+    return WebTransportSendStreamStatsPromise::createAndReject();
 }
 
 void WorkerWebTransportSession::terminate(WebTransportSessionErrorCode code, CString&& reason)
