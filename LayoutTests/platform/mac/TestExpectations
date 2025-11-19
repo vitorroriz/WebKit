@@ -2553,8 +2553,6 @@ webkit.org/b/300997 webrtc/filtering-ice-candidate-after-reload.html [ Pass Fail
 # https://bugs.webkit.org/show_bug.cgi?id=301143# [ macOS Tahoe ] fast/html/text-field-input-types.html is a constant text failure 
 [ Tahoe Debug ] fast/html/text-field-input-types.html [ Failure ]
 
-webkit.org/b/301655 fast/images/page-wide-animation-toggle.html [ Pass Timeout ]
-
 webkit.org/b/301668 fast/repaint/iframe-avoid-redundant-repaint.html [ Pass Failure ]
 
 # List buttons no longer have tint color after the form control refresh.
@@ -2567,3 +2565,7 @@ webkit.org/b/302331 imported/w3c/web-platform-tests/css/css-viewport/zoom/iframe
 webkit.org/b/302364 http/tests/site-isolation/window-open-with-name-cross-site.html [ Pass Crash ]
 
 webkit.org/b/301013 http/tests/workers/service/registerServiceWorkerClient-after-network-process-crash.html [ Pass Failure ]
+
+# webkit.org/b/301655 Internals animation toggle causes the Image global preference to change, unpausing animations in tests
+fast/images/page-wide-animation-toggle.html [ Pass Timeout ]
+fast/images/individual-animation-toggle.html [ Pass Timeout ]
