@@ -39,6 +39,7 @@ class DOMPromise;
 class ReadableStream;
 class ScriptExecutionContext;
 class WebTransport;
+class WebTransportSession;
 class WritableStream;
 struct WebTransportSendOptions;
 template<typename> class ExceptionOr;
@@ -50,13 +51,13 @@ public:
 
     ReadableStream& readable() { return m_readable; }
     ExceptionOr<Ref<WritableStream>> createWritable(ScriptExecutionContext&, WebTransportSendOptions&&);
-    unsigned maxDatagramSize() { return m_outgoingMaxDatagramSize; }
-    double incomingMaxAge() { return m_incomingDatagramsExpirationDuration; }
-    double outgoingMaxAge() { return m_outgoingDatagramsExpirationDuration; }
-    double incomingHighWaterMark() { return m_incomingDatagramsHighWaterMark; }
-    double outgoingHighWaterMark() { return m_outgoingDatagramsHighWaterMark; }
-    ExceptionOr<void> setIncomingMaxAge(double);
-    ExceptionOr<void> setOutgoingMaxAge(double);
+    unsigned maxDatagramSize() const { return std::numeric_limits<uint16_t>::max(); }
+    std::optional<double> incomingMaxAge() const { return m_incomingMaxAge; }
+    std::optional<double> outgoingMaxAge() const { return m_outgoingMaxAge; }
+    double incomingHighWaterMark() const { return m_incomingHighWaterMark; }
+    double outgoingHighWaterMark() const { return m_outgoingHighWaterMark; }
+    ExceptionOr<void> setIncomingMaxAge(std::optional<double>);
+    ExceptionOr<void> setOutgoingMaxAge(std::optional<double>);
     ExceptionOr<void> setIncomingHighWaterMark(double);
     ExceptionOr<void> setOutgoingHighWaterMark(double);
 
@@ -65,15 +66,13 @@ public:
 private:
     WebTransportDatagramDuplexStream(Ref<ReadableStream>&&);
 
+    RefPtr<WebTransportSession> session();
+
     const Ref<ReadableStream> m_readable;
-    Deque<std::pair<Vector<uint8_t>, MonotonicTime>> m_incomingDatagramsQueue;
-    RefPtr<DOMPromise> m_incomingDatagramsPullPromise;
-    double m_incomingDatagramsHighWaterMark { 1 };
-    double m_incomingDatagramsExpirationDuration { std::numeric_limits<double>::infinity() };
-    Deque<std::tuple<Vector<uint8_t>, MonotonicTime, Ref<DOMPromise>>> m_outgoingDatagramsQueue;
-    double m_outgoingDatagramsHighWaterMark { 1 };
-    double m_outgoingDatagramsExpirationDuration { std::numeric_limits<double>::infinity() };
-    size_t m_outgoingMaxDatagramSize { 1024 };
+    double m_incomingHighWaterMark { 1 };
+    double m_outgoingHighWaterMark { 1 };
+    std::optional<double> m_incomingMaxAge;
+    std::optional<double> m_outgoingMaxAge;
     ThreadSafeWeakPtr<WebTransport> m_transport;
 };
 

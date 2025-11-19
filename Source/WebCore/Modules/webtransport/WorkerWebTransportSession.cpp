@@ -219,4 +219,40 @@ void WorkerWebTransportSession::destroyStream(WebTransportStreamIdentifier ident
         ASSERT_NOT_REACHED_WITH_MESSAGE("Session should be set up before use then never removed.");
 }
 
+void WorkerWebTransportSession::datagramIncomingMaxAgeUpdated(std::optional<double> maxAge)
+{
+    ASSERT(!RunLoop::isMain());
+    if (RefPtr session = m_session)
+        session->datagramIncomingMaxAgeUpdated(maxAge);
+    else
+        ASSERT_NOT_REACHED_WITH_MESSAGE("Session should be set up before use then never removed.");
+}
+
+void WorkerWebTransportSession::datagramOutgoingMaxAgeUpdated(std::optional<double> maxAge)
+{
+    ASSERT(!RunLoop::isMain());
+    if (RefPtr session = m_session)
+        session->datagramOutgoingMaxAgeUpdated(maxAge);
+    else
+        ASSERT_NOT_REACHED_WITH_MESSAGE("Session should be set up before use then never removed.");
+}
+
+void WorkerWebTransportSession::datagramIncomingHighWaterMarkUpdated(double watermark)
+{
+    ASSERT(!RunLoop::isMain());
+    if (RefPtr session = m_session)
+        session->datagramIncomingHighWaterMarkUpdated(watermark);
+    else
+        ASSERT_NOT_REACHED_WITH_MESSAGE("Session should be set up before use then never removed.");
+}
+
+void WorkerWebTransportSession::datagramOutgoingHighWaterMarkUpdated(double watermark)
+{
+    ASSERT(!RunLoop::isMain());
+    if (RefPtr session = m_session)
+        session->datagramOutgoingHighWaterMarkUpdated(watermark);
+    else
+        ASSERT_NOT_REACHED_WITH_MESSAGE("Session should be set up before use then never removed.");
+}
+
 }

@@ -75,6 +75,10 @@ public:
     virtual void cancelSendStream(WebTransportStreamIdentifier, std::optional<WebTransportStreamErrorCode>) = 0;
     virtual void destroyStream(WebTransportStreamIdentifier, std::optional<WebTransportStreamErrorCode>) = 0;
     virtual void terminate(WebTransportSessionErrorCode, CString&&) = 0;
+    virtual void datagramIncomingMaxAgeUpdated(std::optional<double>) = 0;
+    virtual void datagramOutgoingMaxAgeUpdated(std::optional<double>) = 0;
+    virtual void datagramIncomingHighWaterMarkUpdated(double) = 0;
+    virtual void datagramOutgoingHighWaterMarkUpdated(double) = 0;
 };
 
 }

@@ -95,6 +95,10 @@ private:
     void cancelSendStream(WebCore::WebTransportStreamIdentifier, std::optional<WebCore::WebTransportStreamErrorCode>);
     void destroyStream(WebCore::WebTransportStreamIdentifier, std::optional<WebCore::WebTransportStreamErrorCode>);
     void terminate(WebCore::WebTransportSessionErrorCode, CString&&) final;
+    void datagramIncomingMaxAgeUpdated(std::optional<double>) final;
+    void datagramOutgoingMaxAgeUpdated(std::optional<double>) final;
+    void datagramIncomingHighWaterMarkUpdated(double) final;
+    void datagramOutgoingHighWaterMarkUpdated(double) final;
 
     // MessageSender
     IPC::Connection* messageSenderConnection() const final;

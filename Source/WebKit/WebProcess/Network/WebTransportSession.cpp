@@ -227,4 +227,24 @@ void WebTransportSession::destroyStream(WebCore::WebTransportStreamIdentifier id
     send(Messages::NetworkTransportSession::DestroyStream(identifier, errorCode));
 }
 
+void WebTransportSession::datagramIncomingMaxAgeUpdated(std::optional<double> maxAge)
+{
+    send(Messages::NetworkTransportSession::DatagramIncomingMaxAgeUpdated(maxAge));
+}
+
+void WebTransportSession::datagramOutgoingMaxAgeUpdated(std::optional<double> maxAge)
+{
+    send(Messages::NetworkTransportSession::DatagramOutgoingMaxAgeUpdated(maxAge));
+}
+
+void WebTransportSession::datagramIncomingHighWaterMarkUpdated(double watermark)
+{
+    send(Messages::NetworkTransportSession::DatagramIncomingHighWaterMarkUpdated(watermark));
+}
+
+void WebTransportSession::datagramOutgoingHighWaterMarkUpdated(double watermark)
+{
+    send(Messages::NetworkTransportSession::DatagramOutgoingHighWaterMarkUpdated(watermark));
+}
+
 }

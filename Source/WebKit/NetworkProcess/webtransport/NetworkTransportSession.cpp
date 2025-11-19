@@ -134,6 +134,26 @@ void NetworkTransportSession::getSendGroupStats(WebCore::WebTransportSendGroupId
     });
 }
 
+void NetworkTransportSession::datagramIncomingMaxAgeUpdated(std::optional<double>)
+{
+    // FIXME: Use this value.
+}
+
+void NetworkTransportSession::datagramOutgoingMaxAgeUpdated(std::optional<double>)
+{
+    // FIXME: Use this value.
+}
+
+void NetworkTransportSession::datagramIncomingHighWaterMarkUpdated(double)
+{
+    // FIXME: Use this value.
+}
+
+void NetworkTransportSession::datagramOutgoingHighWaterMarkUpdated(double)
+{
+    // FIXME: Use this value.
+}
+
 #if !PLATFORM(COCOA)
 RefPtr<NetworkTransportSession> NetworkTransportSession::create(NetworkConnectionToWebProcess&, WebTransportSessionIdentifier, URL&&, WebCore::WebTransportOptions&&, WebKit::WebPageProxyIdentifier&&, WebCore::ClientOrigin&&)
 {

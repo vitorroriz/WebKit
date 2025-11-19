@@ -32,8 +32,8 @@
     readonly attribute ReadableStream readable;
 
     readonly attribute unsigned long maxDatagramSize;
-    attribute unrestricted double incomingMaxAge;
-    attribute unrestricted double outgoingMaxAge;
+    attribute unrestricted double? incomingMaxAge;
+    attribute unrestricted double? outgoingMaxAge;
     attribute unrestricted double incomingHighWaterMark;
     attribute unrestricted double outgoingHighWaterMark;
 };
