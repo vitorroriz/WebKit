@@ -374,11 +374,11 @@ void UIScriptControllerCocoa::requestTextExtraction(JSValueRef callback, TextExt
     unsigned callbackID = m_context->prepareForAsyncTask(callback, CallbackTypeNonPersistent);
     RetainPtr configuration = createTextExtractionConfiguration(webView(), options);
     auto includeRects = [configuration includeRects] ? IncludeRects::Yes : IncludeRects::No;
-    [webView() _requestTextExtraction:configuration.get() completionHandler:^(WKTextExtractionResult *result) {
+    [webView() _requestTextExtraction:configuration.get() completionHandler:^(WKTextExtractionItem *rootItem) {
         if (!m_context)
             return;
 
-        auto description = adopt(JSStringCreateWithCFString((__bridge CFStringRef)recursiveDescription([result rootItem], includeRects)));
+        auto description = adopt(JSStringCreateWithCFString((__bridge CFStringRef)recursiveDescription(rootItem, includeRects)));
         m_context->asyncTaskComplete(callbackID, { JSValueMakeString(m_context->jsContext(), description.get()) });
     }];
 }

@@ -60,6 +60,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface _WKTextExtractionResult ()
+
+- (instancetype)initWithTextContent:(NSString *)textContent filteredOutAnyText:(BOOL)filteredOutAnyText;
+
+@end
+
 @interface _WKTextExtractionInteraction ()
 
 @property (nonatomic, readonly) BOOL hasSetLocation;
@@ -178,11 +184,6 @@ typedef NS_ENUM(NSInteger, WKTextExtractionEditableType) {
 - (instancetype)initWithName:(NSString *)name altText:(NSString *)altText rectInWebView:(CGRect)rectInWebView children:(NSArray<WKTextExtractionItem *> *)children eventListeners:(WKTextExtractionEventListenerTypes)eventListeners ariaAttributes:(NSDictionary<NSString *, NSString *> *)ariaAttributes accessibilityRole:(NSString *)accessibilityRole nodeIdentifier:(nullable NSString *)nodeIdentifier;
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *altText;
-@end
-
-@interface WKTextExtractionResult : NSObject
-- (instancetype)initWithRootItem:(WKTextExtractionItem *)rootItem;
-@property (nonatomic, readonly) WKTextExtractionItem *rootItem;
 @end
 
 NS_ASSUME_NONNULL_END

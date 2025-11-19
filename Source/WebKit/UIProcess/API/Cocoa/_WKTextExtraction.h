@@ -130,6 +130,19 @@ WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
 
 @end
 
+WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
+@interface _WKTextExtractionResult : NSObject
+
+@property (nonatomic, readonly) NSString *textContent;
+
+/*!
+ Set to `YES` if and only if any output text was filtered out as a result
+ of `_WKTextExtractionFilterOptions` or the maximum paragraph word limit.
+ */
+@property (nonatomic, readonly) BOOL filteredOutAnyText;
+
+@end
+
 typedef NS_ENUM(NSInteger, _WKTextExtractionAction) {
     _WKTextExtractionActionClick,
     _WKTextExtractionActionSelectText,

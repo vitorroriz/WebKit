@@ -37,6 +37,7 @@
 
 @interface WKWebView (TextExtractionTests)
 - (NSString *)synchronouslyGetDebugText:(_WKTextExtractionConfiguration *)configuration;
+- (_WKTextExtractionResult *)synchronouslyExtractDebugTextResult:(_WKTextExtractionConfiguration *)configuration;
 - (_WKTextExtractionInteractionResult *)synchronouslyPerformInteraction:(_WKTextExtractionInteraction *)interaction;
 @end
 
@@ -48,14 +49,19 @@
 
 - (NSString *)synchronouslyGetDebugText:(_WKTextExtractionConfiguration *)configuration
 {
+    return [[self synchronouslyExtractDebugTextResult:configuration] textContent];
+}
+
+- (_WKTextExtractionResult *)synchronouslyExtractDebugTextResult:(_WKTextExtractionConfiguration *)configuration
+{
     RetainPtr configurationToUse = configuration;
     if (!configurationToUse)
         configurationToUse = adoptNS([_WKTextExtractionConfiguration new]);
 
     __block bool done = false;
-    __block RetainPtr<NSString> result;
-    [self _debugTextWithConfiguration:configurationToUse.get() completionHandler:^(NSString *text) {
-        result = text;
+    __block RetainPtr<_WKTextExtractionResult> result;
+    [self _extractDebugTextWithConfiguration:configurationToUse.get() completionHandler:^(_WKTextExtractionResult *extractionResult) {
+        result = extractionResult;
         done = true;
     }];
     TestWebKitAPI::Util::run(&done);
@@ -324,8 +330,8 @@ TEST(TextExtractionTests, FilterOptions)
     }()]);
     [webView synchronouslyLoadTestPageNamed:@"debug-text-extraction"];
 
-    auto debugTextWithFilterOptions = [webView](_WKTextExtractionFilterOptions options) {
-        return [webView synchronouslyGetDebugText:^{
+    auto extractTextWithFilterOptions = [webView](_WKTextExtractionFilterOptions options) {
+        return [webView synchronouslyExtractDebugTextResult:^{
             RetainPtr configuration = adoptNS([_WKTextExtractionConfiguration new]);
             [configuration setFilterOptions:options];
             return configuration.autorelease();
@@ -333,21 +339,24 @@ TEST(TextExtractionTests, FilterOptions)
     };
 
     {
-        RetainPtr debugText = debugTextWithFilterOptions(_WKTextExtractionFilterNone);
-        EXPECT_TRUE([debugText containsString:@"“The quick brown fox jumped over the lazy dog”"]);
-        EXPECT_TRUE([debugText containsString:@"Here’s to the crazy ones"]);
+        RetainPtr result = extractTextWithFilterOptions(_WKTextExtractionFilterNone);
+        EXPECT_TRUE([[result textContent] containsString:@"“The quick brown fox jumped over the lazy dog”"]);
+        EXPECT_TRUE([[result textContent] containsString:@"Here’s to the crazy ones"]);
+        EXPECT_FALSE([result filteredOutAnyText]);
     }
     {
-        RetainPtr debugText = debugTextWithFilterOptions(_WKTextExtractionFilterTextRecognition);
-        EXPECT_TRUE([debugText containsString:@"“The quick brown fox jumped over the lazy dog”"]);
+        RetainPtr result = extractTextWithFilterOptions(_WKTextExtractionFilterTextRecognition);
+        EXPECT_TRUE([[result textContent] containsString:@"“The quick brown fox jumped over the lazy dog”"]);
 #if ENABLE(TEXT_EXTRACTION_FILTER)
-        EXPECT_FALSE([debugText containsString:@"Here’s to the crazy ones"]);
+        EXPECT_FALSE([[result textContent] containsString:@"Here’s to the crazy ones"]);
+        EXPECT_TRUE([result filteredOutAnyText]);
 #endif
     }
     {
-        RetainPtr debugText = debugTextWithFilterOptions(_WKTextExtractionFilterClassifier);
-        EXPECT_TRUE([debugText containsString:@"“The quick brown fox jumped over the lazy dog”"]);
-        EXPECT_TRUE([debugText containsString:@"Here’s to the crazy ones"]);
+        RetainPtr result = extractTextWithFilterOptions(_WKTextExtractionFilterClassifier);
+        EXPECT_TRUE([[result textContent] containsString:@"“The quick brown fox jumped over the lazy dog”"]);
+        EXPECT_TRUE([[result textContent] containsString:@"Here’s to the crazy ones"]);
+        EXPECT_FALSE([result filteredOutAnyText]);
     }
 }
 

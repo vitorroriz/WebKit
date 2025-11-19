@@ -79,7 +79,7 @@ class TextExtractionAggregator : public RefCounted<TextExtractionAggregator> {
     WTF_MAKE_NONCOPYABLE(TextExtractionAggregator);
     WTF_MAKE_TZONE_ALLOCATED(TextExtractionAggregator);
 public:
-    TextExtractionAggregator(TextExtractionOptions&& options, CompletionHandler<void(String&&)>&& completion)
+    TextExtractionAggregator(TextExtractionOptions&& options, CompletionHandler<void(TextExtractionResult&&)>&& completion)
         : m_options(WTFMove(options))
         , m_completion(WTFMove(completion))
     {
@@ -92,10 +92,10 @@ public:
         addLineForNativeMenuItemsIfNeeded();
         addLineForVersionNumberIfNeeded();
 
-        m_completion(makeStringByJoining(WTFMove(m_lines), "\n"_s));
+        m_completion({ makeStringByJoining(WTFMove(m_lines), "\n"_s), m_filteredOutAnyText });
     }
 
-    static Ref<TextExtractionAggregator> create(TextExtractionOptions&& options, CompletionHandler<void(String&&)>&& completion)
+    static Ref<TextExtractionAggregator> create(TextExtractionOptions&& options, CompletionHandler<void(TextExtractionResult&&)>&& completion)
     {
         return adoptRef(*new TextExtractionAggregator(WTFMove(options), WTFMove(completion)));
     }
@@ -157,7 +157,7 @@ public:
         return m_options.flags.contains(TextExtractionOptionFlag::OnlyIncludeText);
     }
 
-    RefPtr<TextExtractionFilterPromise> filter(const String& text, const std::optional<WebCore::NodeIdentifier>& identifier) const
+    RefPtr<TextExtractionFilterPromise> filter(const String& text, const std::optional<WebCore::NodeIdentifier>& identifier)
     {
         if (m_options.filterCallbacks.isEmpty())
             return nullptr;
@@ -179,13 +179,16 @@ public:
     }
 
 private:
-    void filterRecursive(const String& text, const std::optional<WebCore::NodeIdentifier>& identifier, size_t index, CompletionHandler<void(String&&)>&& completion) const
+    void filterRecursive(const String& originalText, const std::optional<WebCore::NodeIdentifier>& identifier, size_t index, CompletionHandler<void(String&&)>&& completion)
     {
         if (index >= m_options.filterCallbacks.size())
-            return completion(String { text });
+            return completion(String { originalText });
 
-        Ref promise = m_options.filterCallbacks[index](text, std::optional { identifier });
-        promise->whenSettled(RunLoop::mainSingleton(), [completion = WTFMove(completion), protectedThis = Ref { *this }, identifier, index](auto&& result) mutable {
+        Ref promise = m_options.filterCallbacks[index](originalText, std::optional { identifier });
+        promise->whenSettled(RunLoop::mainSingleton(), [originalText, completion = WTFMove(completion), protectedThis = Ref { *this }, identifier, index](auto&& result) mutable {
+            if (originalText != result)
+                protectedThis->m_filteredOutAnyText = true;
+
             if (!result)
                 return completion({ });
 
@@ -222,8 +225,9 @@ private:
     const TextExtractionOptions m_options;
     Vector<String> m_lines;
     unsigned m_nextLineIndex { 0 };
-    CompletionHandler<void(String&&)> m_completion;
+    CompletionHandler<void(TextExtractionResult&&)> m_completion;
     TextExtractionVersionBehaviors m_versionBehaviors;
+    bool m_filteredOutAnyText { false };
 };
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(TextExtractionAggregator);
@@ -549,7 +553,7 @@ static void addTextRepresentationRecursive(const TextExtraction::Item& item, std
         addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, aggregator);
 }
 
-void convertToText(TextExtraction::Item&& item, TextExtractionOptions&& options, CompletionHandler<void(String&&)>&& completion)
+void convertToText(TextExtraction::Item&& item, TextExtractionOptions&& options, CompletionHandler<void(TextExtractionResult&&)>&& completion)
 {
     Ref aggregator = TextExtractionAggregator::create(WTFMove(options), WTFMove(completion));
 

@@ -84,6 +84,11 @@ struct TextExtractionOptions {
     TextExtractionOptionFlags flags;
 };
 
-void convertToText(WebCore::TextExtraction::Item&&, TextExtractionOptions&&, CompletionHandler<void(String&&)>&&);
+struct TextExtractionResult {
+    String textContent;
+    bool filteredOutAnyText { false };
+};
+
+void convertToText(WebCore::TextExtraction::Item&&, TextExtractionOptions&&, CompletionHandler<void(TextExtractionResult&&)>&&);
 
 } // namespace WebKit
