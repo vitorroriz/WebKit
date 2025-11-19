@@ -5733,6 +5733,7 @@ struct WebCore::PlatformVideoTrackConfiguration : WebCore::PlatformTrackConfigur
     uint64_t bitrate;
     std::optional<WebCore::SpatialVideoMetadata> spatialVideoMetadata;
     std::optional<WebCore::VideoProjectionMetadata> videoProjectionMetadata;
+    bool isProtected;
 };
 
 #endif

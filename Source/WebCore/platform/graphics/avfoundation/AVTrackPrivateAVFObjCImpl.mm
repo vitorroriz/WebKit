@@ -364,6 +364,7 @@ PlatformVideoTrackConfiguration AVTrackPrivateAVFObjCImpl::videoTrackConfigurati
         bitrate(),
         spatialVideoMetadata(),
         videoProjectionMetadata(),
+        isProtected(),
     };
 }
 
@@ -374,6 +375,7 @@ PlatformAudioTrackConfiguration AVTrackPrivateAVFObjCImpl::audioTrackConfigurati
         sampleRate(),
         numberOfChannels(),
         bitrate(),
+        isProtected(),
     };
 }
 
@@ -474,6 +476,11 @@ uint64_t AVTrackPrivateAVFObjCImpl::bitrate() const
     if (!std::isfinite(assetTrack.estimatedDataRate))
         return 0;
     return assetTrack.estimatedDataRate;
+}
+
+bool AVTrackPrivateAVFObjCImpl::isProtected() const
+{
+    return formatDescriptionIsProtected(formatDescriptionFor(*this).get());
 }
 
 std::optional<SpatialVideoMetadata> AVTrackPrivateAVFObjCImpl::spatialVideoMetadata() const

@@ -3284,6 +3284,8 @@ Inspector::Protocol::ErrorStringOr<Ref<Inspector::Protocol::DOM::MediaStats>> In
                 .release();
             videoJSON->setVideoProjectionMetadata(WTFMove(metadataJSON));
         }
+        if (configuration.isProtected())
+            videoJSON->setIsProtected(true);
         stats->setVideo(WTFMove(videoJSON));
     }
 
@@ -3296,6 +3298,8 @@ Inspector::Protocol::ErrorStringOr<Ref<Inspector::Protocol::DOM::MediaStats>> In
             .setNumberOfChannels(configuration.numberOfChannels())
             .setSampleRate(configuration.sampleRate())
             .release();
+        if (configuration.isProtected())
+            audioJSON->setIsProtected(true);
         stats->setAudio(WTFMove(audioJSON));
     }
 
