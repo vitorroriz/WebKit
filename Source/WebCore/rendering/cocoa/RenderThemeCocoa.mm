@@ -535,6 +535,17 @@ static const String& macOSInlineMediaControlsStyleSheet()
         "    border-radius: 8.5px;"
         "    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);"
         "    margin: -2px;"
+        "}"
+        ".media-controls.mac.inline.narrowviewer:not(.audio) .controls-bar.bottom {"
+        "    padding-inline: 8px;"
+        "    max-width: 100%;"
+        "}"
+        ".media-controls.mac.inline.narrowviewer:not(.audio) .volume-slider-container button[class*=\"mute\"],"
+        ".media-controls.mac.inline.narrowviewer:not(.audio) .volume-slider-container .button.mute {"
+        "    transform: scale(0.8) scaleX(-1);"
+        "}"
+        ".media-controls.mac.inline.narrowviewer:not(.audio) .controls-bar.top-left {"
+        "    left: var(--inline-controls-inside-margin);"
         "}"_s
     };
 
