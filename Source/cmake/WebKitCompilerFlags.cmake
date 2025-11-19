@@ -192,7 +192,8 @@ if (COMPILER_IS_GCC_OR_CLANG)
                                          -Wno-maybe-uninitialized
                                          -Wno-parentheses-equality
                                          -Wno-misleading-indentation
-                                         -Wno-psabi)
+                                         -Wno-psabi
+                                         -Wno-nullability-completeness)
 
     # GCC < 12.0 gives false warnings for mismatched-new-delete <https://webkit.org/b/241516>
     if ((CMAKE_CXX_COMPILER_ID MATCHES "GNU") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "12.0.0"))
