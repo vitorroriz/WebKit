@@ -29,6 +29,7 @@
 
 #include <WebCore/StylePrimitiveNumeric.h>
 #include <WebCore/StyleZoomPrimitives.h>
+#include <cmath>
 
 namespace WebCore {
 
@@ -77,7 +78,12 @@ template<typename Result> struct Evaluation<LineWidth, Result> {
         if (auto minimumLineWidth = 1.0f / zoom.deviceScaleFactor; result > 0.0f && result < minimumLineWidth)
             return Result(minimumLineWidth);
 
-        return Result(floorToDevicePixel(result, zoom.deviceScaleFactor));
+        float snapped = std::floor(result * zoom.deviceScaleFactor) / zoom.deviceScaleFactor;
+
+        if constexpr (std::is_same_v<Result, LayoutUnit>)
+            return LayoutUnit::fromRawValue(clampToInteger(snapped * kFixedPointDenominator));
+        else
+            return Result(snapped);
     }
 };
 

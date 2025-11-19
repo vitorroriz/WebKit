@@ -100,7 +100,7 @@ void Serialize<LineWidth>::operator()(StringBuilder& builder, const CSS::Seriali
     if (auto minimumLineWidth = 1.0f / deviceScaleFactor; result > 0.0f && result < minimumLineWidth)
         result = minimumLineWidth;
 
-    result = floorToDevicePixel(result, deviceScaleFactor);
+    result = std::floor(result * deviceScaleFactor) / deviceScaleFactor;
 
     CSS::serializationForCSS(builder, context, CSS::LengthRaw<> { CSS::LengthUnit::Px, result });
 }
