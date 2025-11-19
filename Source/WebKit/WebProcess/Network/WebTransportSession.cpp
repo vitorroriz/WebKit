@@ -126,6 +126,15 @@ void WebTransportSession::didFail(std::optional<unsigned>&& code, String&& messa
         ASSERT_NOT_REACHED();
 }
 
+void WebTransportSession::didDrain()
+{
+    ASSERT(RunLoop::isMain());
+    if (RefPtr strongClient = m_client.get())
+        strongClient->didDrain();
+    else
+        ASSERT_NOT_REACHED();
+}
+
 Ref<WebCore::WebTransportSendPromise> WebTransportSession::sendDatagram(std::optional<WebCore::WebTransportSendGroupIdentifier> identifier, std::span<const uint8_t> datagram)
 {
     return sendWithPromisedReply(Messages::NetworkTransportSession::SendDatagram(identifier, datagram))->whenSettled(RunLoop::mainSingleton(), [] (auto&& exception) {
