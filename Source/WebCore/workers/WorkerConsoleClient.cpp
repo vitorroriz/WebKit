@@ -143,6 +143,11 @@ void WorkerConsoleClient::timeStamp(JSC::JSGlobalObject*, Ref<ScriptArguments>&&
         InspectorInstrumentation::consoleTimeStamp(*worker, WTFMove(arguments));
 }
 
+static JSC::JSObject* objectArgumentAt(ScriptArguments& arguments, unsigned index)
+{
+    return arguments.argumentCount() > index ? arguments.argumentAt(index).getObject() : nullptr;
+}
+
 static CanvasRenderingContext* canvasRenderingContext(JSC::VM& vm, JSC::JSValue target)
 {
 #if ENABLE(OFFSCREEN_CANVAS)
@@ -162,9 +167,27 @@ static CanvasRenderingContext* canvasRenderingContext(JSC::VM& vm, JSC::JSValue 
     return nullptr;
 }
 
-// FIXME: <https://webkit.org/b/243362> Web Inspector: support starting/stopping recordings from the console in a Worker
-void WorkerConsoleClient::record(JSC::JSGlobalObject*, Ref<ScriptArguments>&&) { }
-void WorkerConsoleClient::recordEnd(JSC::JSGlobalObject*, Ref<ScriptArguments>&&) { }
+void WorkerConsoleClient::record(JSC::JSGlobalObject* lexicalGlobalObject, Ref<ScriptArguments>&& arguments)
+{
+    if (!InspectorInstrumentation::hasFrontends()) [[likely]]
+        return;
+
+    if (auto* target = objectArgumentAt(arguments, 0)) {
+        if (auto* context = canvasRenderingContext(lexicalGlobalObject->vm(), target))
+            InspectorInstrumentation::consoleStartRecordingCanvas(*context, *lexicalGlobalObject, objectArgumentAt(arguments, 1));
+    }
+}
+
+void WorkerConsoleClient::recordEnd(JSC::JSGlobalObject* lexicalGlobalObject, Ref<ScriptArguments>&& arguments)
+{
+    if (!InspectorInstrumentation::hasFrontends()) [[likely]]
+        return;
+
+    if (auto* target = objectArgumentAt(arguments, 0)) {
+        if (auto* context = canvasRenderingContext(lexicalGlobalObject->vm(), target))
+            InspectorInstrumentation::consoleStopRecordingCanvas(*context);
+    }
+}
 
 void WorkerConsoleClient::screenshot(JSC::JSGlobalObject* lexicalGlobalObject, Ref<ScriptArguments>&& arguments)
 {
