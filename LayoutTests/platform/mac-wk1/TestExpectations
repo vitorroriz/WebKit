@@ -3314,3 +3314,6 @@ imported/w3c/web-platform-tests/css/CSS2/abspos/abspos-containing-block-initial-
 imported/w3c/web-platform-tests/css/CSS2/abspos/abspos-containing-block-initial-004d.xht [ ImageOnlyFailure ]
 
 webkit.org/b/302559 [ Release ] webaudio/audiobuffersource-not-gced-until-ended.html [ Skip ]
+
+# List buttons no longer have tint color.
+fast/css/accent-color/datalist.html [ Skip ]
