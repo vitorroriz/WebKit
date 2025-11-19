@@ -79,17 +79,6 @@ void WorkerWebTransportSession::didFail(std::optional<unsigned>&& code, String&&
     });
 }
 
-void WorkerWebTransportSession::didDrain()
-{
-    ASSERT(RunLoop::isMain());
-    ScriptExecutionContext::postTaskTo(m_contextID, [weakClient = m_client] (auto&) mutable {
-        RefPtr client = weakClient.get();
-        if (!client)
-            return;
-        client->didDrain();
-    });
-}
-
 void WorkerWebTransportSession::receiveIncomingUnidirectionalStream(WebTransportStreamIdentifier identifier)
 {
     ASSERT(RunLoop::isMain());

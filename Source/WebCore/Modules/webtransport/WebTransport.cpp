@@ -454,12 +454,6 @@ void WebTransport::didFail(std::optional<unsigned>&& code, String&& message)
         cleanupWithSessionError();
 }
 
-void WebTransport::didDrain()
-{
-    m_state = State::Draining;
-    m_draining.second->resolve();
-}
-
 RefPtr<WebTransportSession> WebTransport::protectedSession()
 {
     return m_session;

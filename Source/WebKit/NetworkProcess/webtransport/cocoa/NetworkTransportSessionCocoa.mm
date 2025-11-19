@@ -288,19 +288,8 @@ void NetworkTransportSession::initialize(CompletionHandler<void(bool)>&& complet
         case nw_connection_group_state_waiting:
             return; // We will get another callback with another state change.
         case nw_connection_group_state_ready:
-            if (RefPtr protectedThis = weakThis.get()) {
+            if (RefPtr protectedThis = weakThis.get())
                 protectedThis->m_sessionMetadata = nw_connection_group_copy_protocol_metadata(protectedThis->m_connectionGroup.get(), adoptNS(nw_protocol_copy_webtransport_definition()).get());
-                if (RetainPtr metadata = protectedThis->m_sessionMetadata) {
-                    if (canLoad_Network_nw_webtransport_metadata_set_remote_drain_handler()) {
-                        softLink_Network_nw_webtransport_metadata_set_remote_drain_handler(metadata.get(), makeBlockPtr([weakThis = WeakPtr { *protectedThis }] () mutable {
-                            RefPtr protectedThis = weakThis.get();
-                            if (!protectedThis)
-                                return;
-                            protectedThis->send(Messages::WebTransportSession::DidDrain());
-                        }).get(), mainDispatchQueueSingleton());
-                    }
-                }
-            }
             return creationCompletionHandler(true);
         case nw_connection_group_state_failed:
             if (RefPtr protectedThis = weakThis.get()) {

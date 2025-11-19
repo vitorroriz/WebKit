@@ -77,7 +77,6 @@ public:
     Connection createWebTransportConnection(ConnectionType) const;
     ReceiveIncomingConnectionOperation receiveIncomingConnection() const;
     void cancel();
-    void drainWebTransportSession();
 
 private:
     friend class WebTransportServer;

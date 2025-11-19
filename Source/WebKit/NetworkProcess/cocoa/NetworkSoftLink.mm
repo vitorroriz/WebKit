@@ -36,6 +36,4 @@ SOFT_LINK_FUNCTION_MAY_FAIL_FOR_SOURCE(WebKit, Network, nw_webtransport_options_
 
 SOFT_LINK_FUNCTION_MAY_FAIL_FOR_SOURCE(WebKit, Network, nw_webtransport_metadata_get_session_closed, bool, (nw_protocol_metadata_t metadata), (metadata))
 
-SOFT_LINK_FUNCTION_MAY_FAIL_FOR_SOURCE(WebKit, Network, nw_webtransport_metadata_set_remote_drain_handler, void, (nw_protocol_metadata_t metadata, nw_webtransport_drain_handler_t handler, dispatch_queue_t queue), (metadata, handler, queue))
-
 #endif // HAVE(AVAUDIOAPPLICATION)

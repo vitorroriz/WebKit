@@ -83,9 +83,6 @@ const char* nw_webtransport_metadata_get_session_error_message(nw_protocol_metad
 void nw_webtransport_metadata_set_session_error_message(nw_protocol_metadata_t, const char*);
 bool nw_webtransport_metadata_get_session_closed(nw_protocol_metadata_t);
 void nw_webtransport_options_set_allow_joining_before_ready(nw_protocol_options_t, bool);
-typedef void (^nw_webtransport_drain_handler_t)(void);
-void nw_webtransport_metadata_set_remote_drain_handler(nw_protocol_metadata_t, nw_webtransport_drain_handler_t, dispatch_queue_t);
-void nw_webtransport_metadata_set_local_draining(nw_protocol_metadata_t);
 
 WTF_EXTERN_C_END
 
