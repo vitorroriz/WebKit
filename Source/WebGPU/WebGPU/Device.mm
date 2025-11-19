@@ -257,24 +257,12 @@ static uint32_t computeMaxCountForDevice(id<MTLDevice> device)
 {
 #if HAVE(METAL_FAMILY_9)
     if ([device supportsFamily:MTLGPUFamilyApple9])
-        return 300 * MB;
+        return 3 * GB;
 #endif
-#if HAVE(METAL_FAMILY_8)
-    if ([device supportsFamily:MTLGPUFamilyApple8])
-        return 275 * MB;
-#endif
-    if ([device supportsFamily:MTLGPUFamilyApple7])
-        return 250 * MB;
-    if ([device supportsFamily:MTLGPUFamilyApple6])
-        return 225 * MB;
-    if ([device supportsFamily:MTLGPUFamilyApple5])
-        return 200 * MB;
-    if ([device supportsFamily:MTLGPUFamilyApple4])
-        return 200 * MB;
     if ([device supportsFamily:MTLGPUFamilyMac2])
-        return 300 * MB;
+        return 3 * GB;
 
-    return 200 * MB;
+    return 2 * GB;
 }
 
 static uint32_t computeAppleGPUFamily(id<MTLDevice> device)
@@ -808,7 +796,7 @@ id<MTLRenderPipelineState> Device::indexedIndirectBufferClampPipeline(NSUInteger
     {
         device MTLDrawPrimitivesIndirectArguments& output = wkoutput.args;
         device MTLDrawIndexedPrimitivesIndirectArguments& indexedOutput = wkindexedOutput.args;
-        bool lostCondition = input.indexCount > %u || input.instanceCount > %u || input.indexCount * input.instanceCount > %u;
+        bool lostCondition = input.indexCount > %u || input.instanceCount > %u || madsat(input.indexCount, input.instanceCount, 0u) > %u;
         bool condition = lostCondition
             || input.indexCount + input.indexStart > indexBufferCount[0]
             || input.indexStart >= indexBufferCount[0]
@@ -877,7 +865,7 @@ id<MTLRenderPipelineState> Device::indirectBufferClampPipeline(NSUInteger raster
     [[vertex]] void vsIndirect(device const MTLDrawPrimitivesIndirectArguments& input [[buffer(0)]], device WebKitMTLDrawPrimitivesIndirectArguments& wkoutput [[buffer(1)]], const constant uint* minCounts [[buffer(2)]])
     {
         device MTLDrawPrimitivesIndirectArguments& output = wkoutput.args;
-        bool lostCondition = input.vertexCount > %u || input.instanceCount > %u || input.vertexCount * input.instanceCount > %u;
+        bool lostCondition = input.vertexCount > %u || input.instanceCount > %u || madsat(input.vertexCount, input.instanceCount, 0u) > %u;
         bool vertexCondition = lostCondition
             || input.vertexCount + input.vertexStart > minCounts[0]
             || input.vertexStart >= minCounts[0];
