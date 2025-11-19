@@ -3240,6 +3240,66 @@ private:
             LValue numerator = lowInt32(m_node->child1());
             LValue denominator = lowInt32(m_node->child2());
 
+            if (JSValue denominatorValue = provenValue(m_node->child2()); denominatorValue && denominatorValue.isInt32()) {
+                int32_t divisor = denominatorValue.asInt32();
+                if (divisor > 1 && hasOneBitSet(divisor)) {
+                    // This is what LLVM generates. It's pretty crazy. Here's my
+                    // attempt at understanding it.
+
+                    // First, compute either divisor - 1, or 0, depending on whether
+                    // the numerator is negative:
+                    //
+                    // If numerator < 0:  result = divisor - 1
+                    // If numerator >= 0: result = 0
+                    unsigned logarithm = WTF::ctz(static_cast<uint32_t>(divisor));
+                    auto result = m_out.lShr(m_out.aShr(numerator, m_out.constInt32(31)), m_out.constInt32(32 - logarithm));
+
+                    // Add in the numerator, so that:
+                    //
+                    // If numerator < 0:  result = numerator + divisor - 1
+                    // If numerator >= 0: result = numerator
+                    result = m_out.add(numerator, result);
+
+                    // Mask so as to only get the *high* bits. This rounds down
+                    // (towards negative infinity) result to the nearest multiple
+                    // of divisor, so that:
+                    //
+                    // If numerator < 0:  result = floor((numerator + divisor - 1) / divisor)
+                    // If numerator >= 0: result = floor(numerator / divisor)
+                    //
+                    // Note that this can be simplified to:
+                    //
+                    // If numerator < 0:  result = ceil(numerator / divisor)
+                    // If numerator >= 0: result = floor(numerator / divisor)
+                    //
+                    // Note that if the numerator is negative, result will also be negative.
+                    // Regardless of the sign of numerator, result will be rounded towards
+                    // zero, because of how things are conditionalized.
+                    result = m_out.bitAnd(result, m_out.constInt32(-divisor));
+
+                    // Subtract result from numerator, which yields the remainder:
+                    //
+                    // result = numerator - result
+                    result = m_out.sub(numerator, result);
+
+                    if (shouldCheckNegativeZero(m_node->arithMode())) {
+                        LBasicBlock negativeNumerator = m_out.newBlock();
+                        LBasicBlock continuation = m_out.newBlock();
+
+                        m_out.branch(m_out.lessThan(numerator, m_out.int32Zero), unsure(negativeNumerator), unsure(continuation));
+
+                        LBasicBlock lastNext = m_out.appendTo(negativeNumerator, continuation);
+                        speculate(NegativeZero, noValue(), nullptr, m_out.isZero32(result));
+                        m_out.jump(continuation);
+
+                        m_out.appendTo(continuation, lastNext);
+                    }
+
+                    setInt32(result);
+                    return;
+                }
+            }
+
             LValue remainder;
             if (shouldCheckOverflow(m_node->arithMode())) {
                 LBasicBlock unsafeDenominator = m_out.newBlock();
