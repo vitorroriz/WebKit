@@ -853,13 +853,6 @@ enum class Hyphens : uint8_t {
     Auto
 };
 
-enum class SpeakAs : uint8_t {
-    SpellOut           = 1 << 0,
-    Digits             = 1 << 1,
-    LiteralPunctuation = 1 << 2,
-    NoPunctuation      = 1 << 3
-};
-
 enum class TextEmphasisFill : bool {
     Filled,
     Open
@@ -1298,7 +1291,6 @@ WTF::TextStream& operator<<(WTF::TextStream&, ScrollSnapAxisAlignType);
 WTF::TextStream& operator<<(WTF::TextStream&, ScrollSnapStop);
 WTF::TextStream& operator<<(WTF::TextStream&, ScrollSnapStrictness);
 WTF::TextStream& operator<<(WTF::TextStream&, Scroller);
-WTF::TextStream& operator<<(WTF::TextStream&, SpeakAs);
 WTF::TextStream& operator<<(WTF::TextStream&, StyleDifference);
 WTF::TextStream& operator<<(WTF::TextStream&, StyleDifferenceContextSensitiveProperty);
 WTF::TextStream& operator<<(WTF::TextStream&, TableLayoutType);

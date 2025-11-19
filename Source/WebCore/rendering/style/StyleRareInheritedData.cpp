@@ -95,6 +95,7 @@ StyleRareInheritedData::StyleRareInheritedData()
     , nbspMode(static_cast<unsigned>(NBSPMode::Normal))
     , lineBreak(static_cast<unsigned>(LineBreak::Auto))
     , userSelect(static_cast<unsigned>(RenderStyle::initialUserSelect()))
+    , speakAs(RenderStyle::initialSpeakAs().toRaw())
     , hyphens(static_cast<unsigned>(Hyphens::Manual))
     , textCombine(static_cast<unsigned>(RenderStyle::initialTextCombine()))
     , textEmphasisPosition(static_cast<unsigned>(RenderStyle::initialTextEmphasisPosition().toRaw()))
@@ -425,7 +426,7 @@ void StyleRareInheritedData::dumpDifferences(TextStream& ts, const StyleRareInhe
     LOG_IF_DIFFERENT_WITH_CAST(UserSelect, userSelect);
     LOG_IF_DIFFERENT_WITH_CAST(ColorSpace, colorSpace);
 
-    LOG_IF_DIFFERENT_WITH_FROM_RAW(OptionSet<SpeakAs>, speakAs);
+    LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::SpeakAs, speakAs);
 
     LOG_IF_DIFFERENT_WITH_CAST(Hyphens, hyphens);
     LOG_IF_DIFFERENT_WITH_CAST(TextCombine, textCombine);

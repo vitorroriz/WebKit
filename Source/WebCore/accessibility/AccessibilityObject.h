@@ -781,7 +781,7 @@ public:
 #if PLATFORM(COCOA)
     bool preventKeyboardDOMEventDispatch() const final;
     void setPreventKeyboardDOMEventDispatch(bool) final;
-    OptionSet<SpeakAs> speakAs() const final;
+    Style::SpeakAs speakAs() const final;
     bool hasApplePDFAnnotationAttribute() const final { return hasAttribute(HTMLNames::x_apple_pdf_annotationAttr); }
 #endif
 

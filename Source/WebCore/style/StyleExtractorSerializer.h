@@ -68,10 +68,7 @@ public:
 
     // MARK: Shared serializations
 
-    static void serializeSmoothScrolling(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, bool);
     static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
-    static void serializeTabSize(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const TabSize&);
-    static void serializeSpeakAs(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, OptionSet<SpeakAs>);
     static void serializePositionAnchor(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const std::optional<ScopedName>&);
     static void serializePositionArea(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const std::optional<PositionArea>&);
     static void serializeNameScope(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const NameScope&);
@@ -213,26 +210,6 @@ inline void ExtractorSerializer::serializePositionTryFallbacks(ExtractorState& s
     }
 
     builder.append(CSSValueList::createCommaSeparated(WTFMove(list))->cssText(context));
-}
-
-inline void ExtractorSerializer::serializeSpeakAs(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, OptionSet<SpeakAs> speakAs)
-{
-    bool listEmpty = true;
-    auto appendOption = [&](SpeakAs test, CSSValueID value) {
-        if (speakAs &  test) {
-            if (!listEmpty)
-                builder.append(' ');
-            builder.append(nameLiteralForSerialization(value));
-            listEmpty = false;
-        }
-    };
-    appendOption(SpeakAs::SpellOut, CSSValueSpellOut);
-    appendOption(SpeakAs::Digits, CSSValueDigits);
-    appendOption(SpeakAs::LiteralPunctuation, CSSValueLiteralPunctuation);
-    appendOption(SpeakAs::NoPunctuation, CSSValueNoPunctuation);
-
-    if (listEmpty)
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Normal { });
 }
 
 inline void ExtractorSerializer::serializePositionAnchor(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const std::optional<ScopedName>& positionAnchor)

@@ -1089,17 +1089,6 @@ TextStream& operator<<(TextStream& ts, Scroller scroller)
     return ts;
 }
 
-TextStream& operator<<(TextStream& ts, SpeakAs speakAs)
-{
-    switch (speakAs) {
-    case SpeakAs::SpellOut: ts << "spell-out"_s; break;
-    case SpeakAs::Digits: ts << "digits"_s; break;
-    case SpeakAs::LiteralPunctuation: ts << "literal-punctuation"_s; break;
-    case SpeakAs::NoPunctuation: ts << "no-punctuation"_s; break;
-    }
-    return ts;
-}
-
 TextStream& operator<<(TextStream& ts, StyleDifference diff)
 {
     switch (diff) {

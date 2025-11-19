@@ -185,11 +185,11 @@ bool isDefaultValue(AXProperty property, AXPropertyValueVariant& value)
         [](FontOrientation typedValue) { return typedValue == FontOrientation::Horizontal; },
         [](AXTextRunLineID typedValue) { return !typedValue; },
 #endif // ENABLE(AX_THREAD_TEXT_APIS)
-        [] (WallTime& time) { return !time; },
-        [] (ElementName& name) { return name == ElementName::Unknown; },
-        [] (DateComponentsType& typedValue) { return typedValue == DateComponentsType::Invalid; },
-        [] (AccessibilityOrientation) { return false; },
-        [] (OptionSet<SpeakAs>& typedValue) { return typedValue.isEmpty(); },
+        [](WallTime& time) { return !time; },
+        [](ElementName& name) { return name == ElementName::Unknown; },
+        [](DateComponentsType& typedValue) { return typedValue == DateComponentsType::Invalid; },
+        [](AccessibilityOrientation) { return false; },
+        [](Style::SpeakAs& typedValue) { return typedValue.isNormal(); },
         [](auto&) {
             ASSERT_NOT_REACHED();
             return false;
@@ -643,16 +643,15 @@ Vector<T> AXIsolatedObject::vectorAttributeValue(AXProperty property) const
     );
 }
 
-template<typename T>
-OptionSet<T> AXIsolatedObject::optionSetAttributeValue(AXProperty property) const
+Style::SpeakAs AXIsolatedObject::speakAsAttributeValue(AXProperty property) const
 {
     size_t index = indexOfProperty(property);
     if (index == notFound)
-        return OptionSet<T>();
+        return CSS::Keyword::Normal { };
 
     return WTF::switchOn(m_properties[index].second,
-        [] (const OptionSet<T>& typedValue) -> OptionSet<T> { return typedValue; },
-        [] (auto&) { return OptionSet<T>(); }
+        [](const Style::SpeakAs& typedValue) -> Style::SpeakAs { return typedValue; },
+        [](auto&) -> Style::SpeakAs { return CSS::Keyword::Normal { }; }
     );
 }
 

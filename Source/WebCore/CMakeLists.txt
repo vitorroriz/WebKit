@@ -242,6 +242,7 @@ set(WebCore_PRIVATE_INCLUDE_DIRECTORIES
     "${WEBCORE_DIR}/style/values/shapes"
     "${WEBCORE_DIR}/style/values/size-adjust"
     "${WEBCORE_DIR}/style/values/sizing"
+    "${WEBCORE_DIR}/style/values/speech"
     "${WEBCORE_DIR}/style/values/svg"
     "${WEBCORE_DIR}/style/values/text"
     "${WEBCORE_DIR}/style/values/text-decoration"

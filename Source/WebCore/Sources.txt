@@ -3327,6 +3327,7 @@ style/values/size-adjust/StyleTextSizeAdjust.cpp
 style/values/sizing/StyleAspectRatio.cpp
 style/values/sizing/StyleContainIntrinsicSize.cpp
 style/values/sizing/StylePreferredSize.cpp
+style/values/speech/StyleSpeakAs.cpp
 style/values/svg/StyleSVGBaselineShift.cpp
 style/values/svg/StyleSVGGlyphOrientationHorizontal.cpp
 style/values/svg/StyleSVGGlyphOrientationVertical.cpp

@@ -169,7 +169,6 @@ enum class RubyAlign : uint8_t;
 enum class RubyOverhang : bool;
 enum class ScrollAxis : uint8_t;
 enum class ScrollSnapStop : bool;
-enum class SpeakAs : uint8_t;
 enum class StyleAppearance : uint8_t;
 enum class StyleColorOptions : uint8_t;
 enum class StyleDifference : uint8_t;
@@ -349,6 +348,7 @@ struct ScrollbarGutter;
 struct ScrollbarWidth;
 struct ShapeMargin;
 struct ShapeOutside;
+struct SpeakAs;
 struct StrokeMiterlimit;
 struct StrokeWidth;
 struct TabSize;
@@ -1220,7 +1220,7 @@ public:
     inline Style::ImageOrientation imageOrientation() const;
     inline ImageRendering imageRendering() const;
 
-    inline OptionSet<SpeakAs> speakAs() const;
+    inline Style::SpeakAs speakAs() const;
 
     inline const Style::Filter& filter() const;
     inline bool hasFilter() const;
@@ -1618,7 +1618,7 @@ public:
     inline void setScale(Style::Scale&&);
     inline void setTranslate(Style::Translate&&);
 
-    inline void setSpeakAs(OptionSet<SpeakAs>);
+    inline void setSpeakAs(Style::SpeakAs);
     inline void setTextCombine(TextCombine);
     inline void setTextDecorationColor(Style::Color&&);
     inline void setTextEmphasisColor(Style::Color&&);
@@ -2137,7 +2137,7 @@ public:
     static constexpr OverflowWrap initialOverflowWrap();
     static constexpr NBSPMode initialNBSPMode();
     static constexpr LineBreak initialLineBreak();
-    static constexpr OptionSet<SpeakAs> initialSpeakAs();
+    static constexpr Style::SpeakAs initialSpeakAs();
     static constexpr Hyphens initialHyphens();
     static constexpr Style::HyphenateLimitEdge initialHyphenateLimitBefore();
     static constexpr Style::HyphenateLimitEdge initialHyphenateLimitAfter();

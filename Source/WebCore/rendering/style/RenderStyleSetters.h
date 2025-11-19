@@ -285,7 +285,7 @@ inline void RenderStyle::setShapeImageThreshold(Style::ShapeImageThreshold shape
 inline void RenderStyle::setShapeMargin(Style::ShapeMargin&& shapeMargin) { SET_NESTED(m_nonInheritedData, rareData, shapeMargin, WTFMove(shapeMargin)); }
 inline void RenderStyle::setShapeOutside(Style::ShapeOutside&& shapeOutside) { SET_NESTED(m_nonInheritedData, rareData, shapeOutside, WTFMove(shapeOutside)); }
 inline void RenderStyle::setUsedContentVisibility(ContentVisibility usedContentVisibility) { SET(m_rareInheritedData, usedContentVisibility, static_cast<unsigned>(usedContentVisibility)); }
-inline void RenderStyle::setSpeakAs(OptionSet<SpeakAs> style) { SET(m_rareInheritedData, speakAs, style.toRaw()); }
+inline void RenderStyle::setSpeakAs(Style::SpeakAs speakAs) { SET(m_rareInheritedData, speakAs, speakAs.toRaw()); }
 inline void RenderStyle::setSpecifiedZIndex(Style::ZIndex index) { SET_NESTED_PAIR(m_nonInheritedData, boxData, m_hasAutoSpecifiedZIndex, static_cast<uint8_t>(index.m_isAuto), m_specifiedZIndexValue, index.m_value); }
 inline void RenderStyle::setStrokeColor(Style::Color&& color) { SET(m_rareInheritedData, strokeColor, WTFMove(color)); }
 inline void RenderStyle::setStrokeMiterLimit(Style::StrokeMiterlimit value) { SET(m_rareInheritedData, miterLimit, value); }

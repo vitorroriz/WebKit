@@ -554,7 +554,7 @@ constexpr Style::ShapeImageThreshold RenderStyle::initialShapeImageThreshold() {
 inline Style::ShapeMargin RenderStyle::initialShapeMargin() { return 0_css_px; }
 inline Style::ShapeOutside RenderStyle::initialShapeOutside() { return CSS::Keyword::None { }; }
 inline Style::PreferredSize RenderStyle::initialSize() { return CSS::Keyword::Auto { }; }
-constexpr OptionSet<SpeakAs> RenderStyle::initialSpeakAs() { return { }; }
+constexpr Style::SpeakAs RenderStyle::initialSpeakAs() { return CSS::Keyword::Normal { }; }
 constexpr Style::ZIndex RenderStyle::initialSpecifiedZIndex() { return CSS::Keyword::Auto { }; }
 inline Style::Color RenderStyle::initialStrokeColor() { return { Color::transparentBlack }; }
 constexpr Style::StrokeMiterlimit RenderStyle::initialStrokeMiterLimit() { return 4_css_number; }
@@ -793,7 +793,7 @@ inline const Style::ShapeMargin& RenderStyle::shapeMargin() const { return m_non
 inline const Style::ShapeOutside& RenderStyle::shapeOutside() const { return m_nonInheritedData->rareData->shapeOutside; }
 inline ContentVisibility RenderStyle::usedContentVisibility() const { return static_cast<ContentVisibility>(m_rareInheritedData->usedContentVisibility); }
 inline bool RenderStyle::isSkippedRootOrSkippedContent() const { return usedContentVisibility() != ContentVisibility::Visible; }
-inline OptionSet<SpeakAs> RenderStyle::speakAs() const { return OptionSet<SpeakAs>::fromRaw(m_rareInheritedData->speakAs); }
+inline Style::SpeakAs RenderStyle::speakAs() const { return Style::SpeakAs::fromRaw(m_rareInheritedData->speakAs); }
 inline Style::ZIndex RenderStyle::specifiedZIndex() const { return m_nonInheritedData->boxData->specifiedZIndex(); }
 inline bool RenderStyle::specifiesColumns() const { return !columnCount().isAuto() || !columnWidth().isAuto() || !hasInlineColumnAxis(); }
 inline const Style::Color& RenderStyle::strokeColor() const { return m_rareInheritedData->strokeColor; }

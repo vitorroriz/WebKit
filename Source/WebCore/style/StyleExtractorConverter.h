@@ -134,7 +134,6 @@ public:
     // MARK: Shared conversions
 
     static Ref<CSSValue> convertPositionTryFallbacks(ExtractorState&, const FixedVector<PositionTryFallback>&);
-    static Ref<CSSValue> convertSpeakAs(ExtractorState&, OptionSet<SpeakAs>);
     static Ref<CSSValue> convertPositionAnchor(ExtractorState&, const std::optional<ScopedName>&);
     static Ref<CSSValue> convertPositionArea(ExtractorState&, const PositionArea&);
     static Ref<CSSValue> convertPositionArea(ExtractorState&, const std::optional<PositionArea>&);
@@ -267,22 +266,6 @@ inline Ref<CSSValue> ExtractorConverter::convertPositionTryFallbacks(ExtractorSt
     }
 
     return CSSValueList::createCommaSeparated(WTFMove(list));
-}
-
-inline Ref<CSSValue> ExtractorConverter::convertSpeakAs(ExtractorState&, OptionSet<SpeakAs> speakAs)
-{
-    CSSValueListBuilder list;
-    if (speakAs & SpeakAs::SpellOut)
-        list.append(CSSPrimitiveValue::create(CSSValueSpellOut));
-    if (speakAs & SpeakAs::Digits)
-        list.append(CSSPrimitiveValue::create(CSSValueDigits));
-    if (speakAs & SpeakAs::LiteralPunctuation)
-        list.append(CSSPrimitiveValue::create(CSSValueLiteralPunctuation));
-    if (speakAs & SpeakAs::NoPunctuation)
-        list.append(CSSPrimitiveValue::create(CSSValueNoPunctuation));
-    if (list.isEmpty())
-        return CSSPrimitiveValue::create(CSSValueNormal);
-    return CSSValueList::createSpaceSeparated(WTFMove(list));
 }
 
 inline Ref<CSSValue> ExtractorConverter::convertPositionAnchor(ExtractorState& state, const std::optional<ScopedName>& positionAnchor)

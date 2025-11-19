@@ -7651,7 +7651,7 @@
                 }
             ],
             "codegen-properties": {
-                "style-converter": "SpeakAs",
+                "style-converter": "StyleType<SpeakAs>",
                 "parser-grammar": "none | [ [ normal | spell-out ] || digits || [ literal-punctuation | no-punctuation ] ]@(no-single-item-opt)",
                 "parser-grammar-comment": "Current spec grammar is 'normal | [ spell-out || digits || [ literal-punctuation | no-punctuation ] ]'."
             },

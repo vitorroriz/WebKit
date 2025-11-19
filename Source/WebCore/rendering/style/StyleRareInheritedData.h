@@ -45,6 +45,7 @@
 #include <WebCore/StyleQuotes.h>
 #include <WebCore/StyleSVGPaintOrder.h>
 #include <WebCore/StyleScrollbarColor.h>
+#include <WebCore/StyleSpeakAs.h>
 #include <WebCore/StyleStrokeMiterlimit.h>
 #include <WebCore/StyleStrokeWidth.h>
 #include <WebCore/StyleTabSize.h>
@@ -186,7 +187,7 @@ public:
     PREFERRED_TYPE(LineBreak) unsigned lineBreak : 3;
     PREFERRED_TYPE(UserSelect) unsigned userSelect : 2;
     PREFERRED_TYPE(ColorSpace) unsigned colorSpace : 1;
-    PREFERRED_TYPE(OptionSet<SpeakAs>) unsigned speakAs : 4 { 0 };
+    PREFERRED_TYPE(Style::SpeakAs) unsigned speakAs : 4;
     PREFERRED_TYPE(Hyphens) unsigned hyphens : 2;
     PREFERRED_TYPE(TextCombine) unsigned textCombine : 1;
     PREFERRED_TYPE(Style::TextEmphasisPosition) unsigned textEmphasisPosition : 4;

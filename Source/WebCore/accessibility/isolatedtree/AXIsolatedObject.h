@@ -184,10 +184,10 @@ private:
     URL urlAttributeValue(AXProperty) const;
     uint64_t uint64AttributeValue(AXProperty) const;
     Path pathAttributeValue(AXProperty) const;
+    Style::SpeakAs speakAsAttributeValue(AXProperty) const;
     std::pair<unsigned, unsigned> indexRangePairAttributeValue(AXProperty) const;
     template<typename T> T rectAttributeValue(AXProperty) const;
     template<typename T> Vector<T> vectorAttributeValue(AXProperty) const;
-    template<typename T> OptionSet<T> optionSetAttributeValue(AXProperty) const;
     template<typename T> std::optional<T> optionalAttributeValue(AXProperty) const;
     template<typename T> T propertyValue(AXProperty) const;
 
@@ -398,7 +398,7 @@ private:
     void mathPrescripts(AccessibilityMathMultiscriptPairs&) final;
     void mathPostscripts(AccessibilityMathMultiscriptPairs&) final;
 #if PLATFORM(COCOA)
-    OptionSet<SpeakAs> speakAs() const final { return optionSetAttributeValue<SpeakAs>(AXProperty::SpeakAs); }
+    Style::SpeakAs speakAs() const final { return speakAsAttributeValue(AXProperty::SpeakAs); }
 #endif
 #if PLATFORM(MAC)
     bool caretBrowsingEnabled() const final { return boolAttributeValue(AXProperty::CaretBrowsingEnabled); }

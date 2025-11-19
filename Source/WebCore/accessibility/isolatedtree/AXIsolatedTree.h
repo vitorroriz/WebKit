@@ -36,6 +36,7 @@
 #include <WebCore/ColorHash.h>
 #include <WebCore/FrameIdentifier.h>
 #include <WebCore/RenderStyleConstants.h>
+#include <WebCore/StyleSpeakAs.h>
 #include <wtf/HashMap.h>
 #include <wtf/Lock.h>
 #include <wtf/RefPtr.h>
@@ -328,7 +329,7 @@ using AXPropertyValueVariant = Variant<std::nullptr_t, Markable<AXID>, String, b
     , RetainPtr<NSAttributedString>
     , RetainPtr<NSView>
     , RetainPtr<id>
-    , OptionSet<SpeakAs>
+    , Style::SpeakAs
 #endif // PLATFORM(COCOA)
 #if ENABLE(AX_THREAD_TEXT_APIS)
     , RetainPtr<CTFontRef>

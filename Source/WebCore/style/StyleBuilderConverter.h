@@ -119,8 +119,6 @@ public:
     static TextAlignLast convertTextAlignLast(BuilderState&, const CSSValue&);
     static Resize convertResize(BuilderState&, const CSSValue&);
 
-    static OptionSet<SpeakAs> convertSpeakAs(BuilderState&, const CSSValue&);
-
     static std::optional<ScopedName> convertPositionAnchor(BuilderState&, const CSSValue&);
     static std::optional<PositionArea> convertPositionArea(BuilderState&, const CSSValue&);
 
@@ -223,18 +221,6 @@ inline float zoomWithTextZoomFactor(BuilderState& builderState)
         return usedZoom * textZoomFactor;
     }
     return builderState.cssToLengthConversionData().zoom();
-}
-
-inline OptionSet<SpeakAs> BuilderConverter::convertSpeakAs(BuilderState&, const CSSValue& value)
-{
-    auto result = RenderStyle::initialSpeakAs();
-    if (auto* list = dynamicDowncast<CSSValueList>(value)) {
-        for (auto& currentValue : *list) {
-            if (!isValueID(currentValue, CSSValueNormal))
-                result.add(fromCSSValue<SpeakAs>(currentValue));
-        }
-    }
-    return result;
 }
 
 inline std::optional<ScopedName> BuilderConverter::convertPositionAnchor(BuilderState& builderState, const CSSValue& value)

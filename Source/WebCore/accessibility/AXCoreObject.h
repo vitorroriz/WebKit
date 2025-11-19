@@ -112,6 +112,10 @@ struct ScrollRectToVisibleOptions;
 struct ModelPlayerAccessibilityChildren;
 #endif
 
+namespace Style {
+struct SpeakAs;
+}
+
 enum class ClickHandlerFilter : bool {
     ExcludeBody,
     IncludeBody,
@@ -1214,7 +1218,7 @@ public:
 #if PLATFORM(COCOA)
     virtual bool preventKeyboardDOMEventDispatch() const = 0;
     virtual void setPreventKeyboardDOMEventDispatch(bool) = 0;
-    virtual OptionSet<SpeakAs> speakAs() const = 0;
+    virtual Style::SpeakAs speakAs() const = 0;
     String speechHint() const;
     String descriptionAttributeValue() const;
     String helpTextAttributeValue() const;
