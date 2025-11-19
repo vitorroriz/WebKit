@@ -144,7 +144,9 @@ public:
     bool isInternalTableBox() const;
     bool isFlexBox() const { return style().display() == DisplayType::Flex || style().display() == DisplayType::InlineFlex || m_nodeType == NodeType::ImplicitFlexBox; }
     bool isFlexItem() const;
-    bool isGridBox() const { return style().display() == DisplayType::Grid || style().display() == DisplayType::InlineGrid || style().display() == DisplayType::GridLanes || style().display() == DisplayType::InlineGridLanes; }
+    bool isGridFormattingContext() const { return isGridBox() || isGridLanesBox(); }
+    bool isGridBox() const { return style().display() == DisplayType::Grid || style().display() == DisplayType::InlineGrid; }
+    bool isGridLanesBox() const { return style().display() == DisplayType::GridLanes || style().display() == DisplayType::InlineGridLanes; }
     bool isGridItem() const;
     bool isIFrame() const { return m_nodeType == NodeType::IFrame; }
     bool isImage() const { return m_nodeType == NodeType::Image; }

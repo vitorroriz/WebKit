@@ -631,10 +631,12 @@ constexpr bool RenderStyle::isDisplayBlockLevel() const { return isDisplayBlockT
 constexpr bool RenderStyle::isDisplayDeprecatedFlexibleBox(DisplayType display) { return display == DisplayType::Box || display == DisplayType::InlineBox; }
 constexpr bool RenderStyle::isDisplayFlexibleBox(DisplayType display) { return display == DisplayType::Flex || display == DisplayType::InlineFlex; }
 constexpr bool RenderStyle::isDisplayDeprecatedFlexibleBox() const { return isDisplayDeprecatedFlexibleBox(display()); }
-constexpr bool RenderStyle::isDisplayFlexibleBoxIncludingDeprecatedOrGridBox() const { return isDisplayFlexibleOrGridBox() || isDisplayDeprecatedFlexibleBox(); }
-constexpr bool RenderStyle::isDisplayFlexibleOrGridBox() const { return isDisplayFlexibleOrGridBox(display()); }
-constexpr bool RenderStyle::isDisplayFlexibleOrGridBox(DisplayType display) { return isDisplayFlexibleBox(display) || isDisplayGridBox(display); }
-constexpr bool RenderStyle::isDisplayGridBox(DisplayType display) { return display == DisplayType::Grid || display == DisplayType::InlineGrid || display == DisplayType::GridLanes || display == DisplayType::InlineGridLanes; }
+constexpr bool RenderStyle::isDisplayFlexibleBoxIncludingDeprecatedOrGridFormattingContextBox() const { return isDisplayFlexibleOrGridFormattingContextBox() || isDisplayDeprecatedFlexibleBox(); }
+constexpr bool RenderStyle::isDisplayFlexibleOrGridFormattingContextBox() const { return isDisplayFlexibleOrGridFormattingContextBox(display()); }
+constexpr bool RenderStyle::isDisplayFlexibleOrGridFormattingContextBox(DisplayType display) { return isDisplayFlexibleBox(display) || isDisplayGridFormattingContextBox(display); }
+constexpr bool RenderStyle::isDisplayGridFormattingContextBox(DisplayType display) { return isDisplayGridBox(display) || isDisplayGridLanesBox(display); }
+constexpr bool RenderStyle::isDisplayGridBox(DisplayType display) { return display == DisplayType::Grid || display == DisplayType::InlineGrid; }
+constexpr bool RenderStyle::isDisplayGridLanesBox(DisplayType display) { return display == DisplayType::GridLanes || display == DisplayType::InlineGridLanes; }
 constexpr bool RenderStyle::isDisplayInlineType() const { return isDisplayInlineType(display()); }
 constexpr bool RenderStyle::isDisplayListItemType(DisplayType display) { return display == DisplayType::ListItem; }
 constexpr bool RenderStyle::isDisplayTableOrTablePart() const { return isDisplayTableOrTablePart(display()); }

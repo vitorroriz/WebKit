@@ -1927,9 +1927,9 @@ public:
 
     constexpr bool isDisplayInlineType() const;
     constexpr bool isOriginalDisplayInlineType() const;
-    constexpr bool isDisplayFlexibleOrGridBox() const;
+    constexpr bool isDisplayFlexibleOrGridFormattingContextBox() const;
     constexpr bool isDisplayDeprecatedFlexibleBox() const;
-    constexpr bool isDisplayFlexibleBoxIncludingDeprecatedOrGridBox() const;
+    constexpr bool isDisplayFlexibleBoxIncludingDeprecatedOrGridFormattingContextBox() const;
     constexpr bool isDisplayRegionType() const;
     constexpr bool isDisplayBlockLevel() const;
     constexpr bool doesDisplayGenerateBlockContainer() const;
@@ -2595,8 +2595,10 @@ private:
     static constexpr bool isDisplayInlineType(DisplayType);
     static constexpr bool isDisplayBlockType(DisplayType);
     static constexpr bool isDisplayFlexibleBox(DisplayType);
+    static constexpr bool isDisplayGridFormattingContextBox(DisplayType);
     static constexpr bool isDisplayGridBox(DisplayType);
-    static constexpr bool isDisplayFlexibleOrGridBox(DisplayType);
+    static constexpr bool isDisplayGridLanesBox(DisplayType);
+    static constexpr bool isDisplayFlexibleOrGridFormattingContextBox(DisplayType);
     static constexpr bool isDisplayDeprecatedFlexibleBox(DisplayType);
     static constexpr bool isDisplayListItemType(DisplayType);
     static constexpr bool isDisplayTableOrTablePart(DisplayType);

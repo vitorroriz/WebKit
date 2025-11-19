@@ -169,7 +169,7 @@ bool Box::establishesFlexFormattingContext() const
 
 bool Box::establishesGridFormattingContext() const
 {
-    return isGridBox();
+    return isGridFormattingContext();
 }
 
 bool Box::establishesIndependentFormattingContext() const
@@ -286,7 +286,7 @@ bool Box::isFlexItem() const
 
 bool Box::isGridItem() const
 {
-    return isInFlow() && parent().isGridBox();
+    return isInFlow() && parent().isGridFormattingContext();
 }
 
 bool Box::isBlockContainer() const

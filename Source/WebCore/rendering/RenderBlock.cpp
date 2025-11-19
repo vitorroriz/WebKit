@@ -1345,7 +1345,7 @@ bool RenderBlock::createsNewFormattingContext() const
     if (isBlockContainer() && !style.alignContent().isNormal())
         return true;
     return isNonReplacedAtomicInlineLevelBox()
-        || style.isDisplayFlexibleBoxIncludingDeprecatedOrGridBox()
+        || style.isDisplayFlexibleBoxIncludingDeprecatedOrGridFormattingContextBox()
         || isFlexItemIncludingDeprecated()
         || isRenderTable()
         || isRenderTableCell()

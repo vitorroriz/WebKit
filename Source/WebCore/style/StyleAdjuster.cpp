@@ -573,7 +573,7 @@ void Adjuster::adjust(RenderStyle& style) const
 
         // https://www.w3.org/TR/css-display/#transformations
         // "A parent with a grid or flex display value blockifies the box’s display type."
-        if (m_parentBoxStyle.isDisplayFlexibleOrGridBox()) {
+        if (m_parentBoxStyle.isDisplayFlexibleOrGridFormattingContextBox()) {
             style.setFloating(Float::None);
             style.setEffectiveDisplay(equivalentBlockDisplay(style));
         }
@@ -601,7 +601,7 @@ void Adjuster::adjust(RenderStyle& style) const
         }
 
         // Make sure our z-index value is only applied if the object is positioned.
-        return style.position() == PositionType::Static && !parentBoxStyle.isDisplayFlexibleOrGridBox();
+        return style.position() == PositionType::Static && !parentBoxStyle.isDisplayFlexibleOrGridFormattingContextBox();
     };
 
     bool hasAutoSpecifiedZIndex = hasAutoZIndex(style, m_parentBoxStyle, m_element.get());
