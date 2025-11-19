@@ -636,7 +636,6 @@ platform/graphics/GraphicsLayer.h
 platform/graphics/ImageAdapter.cpp
 platform/graphics/ImageBackingStore.h
 platform/graphics/ImageBufferContextSwitcher.cpp
-platform/graphics/ImageFrame.h
 platform/graphics/ImageFrameWorkQueue.cpp
 platform/graphics/Path.cpp
 platform/graphics/TransparencyLayerContextSwitcher.cpp
@@ -652,7 +651,6 @@ platform/graphics/ca/GraphicsLayerCA.cpp
 platform/graphics/ca/TileController.cpp
 platform/graphics/ca/TileCoverageMap.cpp
 platform/graphics/ca/TileGrid.cpp
-platform/graphics/ca/cocoa/GraphicsLayerAsyncContentsDisplayDelegateCocoa.mm
 platform/graphics/ca/cocoa/PlatformCAAnimationCocoa.mm
 platform/graphics/ca/cocoa/PlatformCALayerCocoa.mm
 [ iOS ] platform/graphics/cg/PDFDocumentImage.cpp
