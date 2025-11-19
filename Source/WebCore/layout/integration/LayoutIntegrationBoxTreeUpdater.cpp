@@ -501,7 +501,9 @@ void showInlineContent(TextStream& stream, const InlineContent& inlineContent, s
         };
         addSpacing(stream);
         auto& line = lines[lineIndex];
-        stream << "line at (" << line.lineBoxLeft() << "," << line.lineBoxTop() << ") size (" << line.lineBoxRight() - line.lineBoxLeft() << "x" << line.lineBoxBottom() - line.lineBoxTop() << ") baseline (" << line.baseline() << ") enclosing top (" << line.enclosingContentLogicalTop() << ") bottom (" << line.enclosingContentLogicalBottom() << ")";
+        stream << "line at (" << line.lineBoxLeft() << "," << line.lineBoxTop() << ") size (" << line.lineBoxRight() - line.lineBoxLeft() << "x" << line.lineBoxBottom() - line.lineBoxTop() << ") baseline (" << line.baseline() << ") enclosing top (" << line.enclosingContentLogicalTop() << ") bottom (" << line.enclosingContentLogicalBottom() << ") ";
+        if (line.hasEllipsis())
+            stream << "truncated with ellipsis.";
         stream.nextLine();
 
         addSpacing(stream);

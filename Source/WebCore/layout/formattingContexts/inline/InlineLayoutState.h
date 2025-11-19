@@ -53,6 +53,9 @@ public:
     void setLegacyClampedLineIndex(size_t lineIndex) { m_legacyClampedLineIndex = lineIndex; }
     std::optional<size_t> legacyClampedLineIndex() const { return m_legacyClampedLineIndex; }
 
+    size_t lineCountForBlockDirectionClamp() const { return m_lineCountForBlockDirectionClamp; }
+    void setLineCountForBlockDirectionClamp(size_t lineCount) { m_lineCountForBlockDirectionClamp = lineCount; }
+
     void setHyphenationLimitLines(size_t hyphenateLimitLines) { m_hyphenateLimitLines = hyphenateLimitLines; }
     void incrementSuccessiveHyphenatedLineCount() { ++m_successiveHyphenatedLineCount; }
     void resetSuccessiveHyphenatedLineCount() { m_successiveHyphenatedLineCount = 0; }
@@ -81,6 +84,7 @@ private:
     std::optional<size_t> m_legacyClampedLineIndex { };
     std::optional<size_t> m_hyphenateLimitLines { };
     size_t m_successiveHyphenatedLineCount { 0 };
+    size_t m_lineCountForBlockDirectionClamp { 0 };
     // FIXME: This is required by the integaration codepath.
     HashMap<CheckedRef<const ElementBox>, LayoutUnit> m_nestedListMarkerOffsets;
     AvailableLineWidthOverride m_availableLineWidthOverride;

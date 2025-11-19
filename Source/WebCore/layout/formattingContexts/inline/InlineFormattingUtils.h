@@ -73,7 +73,7 @@ public:
 
     static std::optional<LineLayoutResult::InlineContentEnding> inlineContentEnding(const Line::Result&);
 
-    bool shouldDiscardRemainingContentInBlockDirection(size_t numberOfLinesWithInlineContent) const;
+    bool shouldDiscardRemainingContentInBlockDirection() const;
 
 private:
     InlineLayoutUnit contentLeftAfterLastLine(const ConstraintsForInFlowContent&, std::optional<InlineLayoutUnit> lastLineLogicalBottom, const FloatingContext&) const;
