@@ -27,7 +27,7 @@
 #include <wtf/FastMalloc.h>
 #include <wtf/Logging.h>
 #include <wtf/RunLoop.h>
-#include <wtf/StdLibExtras.h>
+#include <wtf/glib/GSpanExtras.h>
 
 namespace WTF {
 
@@ -109,6 +109,11 @@ enum {
 };
 typedef uint8_t MessageFlags;
 
+// The smallest possible message has no parameters, one character for the message
+// name (an empty name is invalid), and a null terminator at the end of the name.
+static auto constexpr MinimumMessageBodySize = 2;
+static auto constexpr MaximumMessageBodySize = 512 * MB;
+
 static inline bool messageIsByteSwapped(MessageFlags flags)
 {
 #if G_BYTE_ORDER == G_LITTLE_ENDIAN
@@ -132,12 +137,7 @@ bool SocketConnection::readMessage()
     auto messageData = m_readBuffer.span();
     const size_t bodySize = ntohl(consumeAndReinterpretCastTo<uint32_t>(messageData));
 
-    // The smallest possible message has no parameters, one character for the message
-    // name (an empty name is invalid), and a null terminator at the end of the name.
-    static auto constexpr MinimumMessageBodySize = 2;
     MESSAGE_CHECK(bodySize >= MinimumMessageBodySize, "message body too small");
-
-    static auto constexpr MaximumMessageBodySize = 512 * MB;
     MESSAGE_CHECK(bodySize <= MaximumMessageBodySize, "message body too big");
 
     // Ensure the whole message has been read from the socket.
@@ -188,45 +188,41 @@ bool SocketConnection::readMessage()
 
 #undef MESSAGE_CHECK
 
-IGNORE_CLANG_WARNINGS_BEGIN("unsafe-buffer-usage-in-libc-call")
-void SocketConnection::sendMessage(const char* messageName, GVariant* parameters)
+void SocketConnection::sendMessage(const CString& messageName, GVariant* parameters)
 {
+    ASSERT(!messageName.isEmpty());
+
     GRefPtr<GVariant> adoptedParameters = parameters;
     size_t parametersSize = parameters ? g_variant_get_size(parameters) : 0;
-    CheckedSize messageNameLength = strlen(messageName);
-    messageNameLength++;
-    if (messageNameLength.hasOverflowed()) [[unlikely]] {
-        g_warning("Trying to send message with invalid too long name");
+    const auto messageNameAndTerminator = messageName.spanIncludingNullTerminator();
+    CheckedUint32 bodySize = messageNameAndTerminator.size();
+    bodySize += parametersSize;
+    if (bodySize.hasOverflowed() || bodySize > MaximumMessageBodySize) [[unlikely]] {
+        g_warning("Trying to send message '%s' with invalid too long body", messageName.data());
         return;
     }
-    CheckedUint32 bodySize = messageNameLength + parametersSize;
-    if (bodySize.hasOverflowed()) [[unlikely]] {
-        g_warning("Trying to send message '%s' with invalid too long body", messageName);
-        return;
-    }
+    ASSERT(bodySize >= MinimumMessageBodySize);
+
     size_t previousBufferSize = m_writeBuffer.size();
     m_writeBuffer.grow(previousBufferSize + sizeof(uint32_t) + sizeof(MessageFlags) + bodySize.value());
 
-    WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN // GLib port.
-    auto* messageData = m_writeBuffer.mutableSpan().subspan(previousBufferSize).data();
-    WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
-    uint32_t bodySizeHeader = htonl(bodySize.value());
-    memcpy(messageData, &bodySizeHeader, sizeof(uint32_t));
-    messageData += sizeof(uint32_t);
-    MessageFlags flags = 0;
+    auto messageData = m_writeBuffer.mutableSpan().subspan(previousBufferSize);
+    consumeAndReinterpretCastTo<uint32_t>(messageData) = htonl(bodySize);
+
 #if G_BYTE_ORDER == G_LITTLE_ENDIAN
-    flags |= ByteOrderLittleEndian;
+    consumeAndReinterpretCastTo<MessageFlags>(messageData) = ByteOrderLittleEndian;
+#else
+    consumeAndReinterpretCastTo<MessageFlags>(messageData) = 0;
 #endif
-    memcpy(messageData, &flags, sizeof(MessageFlags));
-    messageData += sizeof(MessageFlags);
-    memcpy(messageData, messageName, messageNameLength);
-    messageData += messageNameLength.value();
+
+    memcpySpan(consumeSpan(messageData, messageNameAndTerminator.size()), messageNameAndTerminator);
+
+    ASSERT(parametersSize == messageData.size());
     if (parameters)
-        memcpy(messageData, g_variant_get_data(parameters), parametersSize);
+        memcpySpan(messageData, span(parameters));
 
     write();
 }
-IGNORE_CLANG_WARNINGS_END
 
 void SocketConnection::write()
 {

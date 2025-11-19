@@ -42,7 +42,7 @@ public:
     }
     WTF_EXPORT_PRIVATE ~SocketConnection();
 
-    WTF_EXPORT_PRIVATE void sendMessage(const char*, GVariant*);
+    WTF_EXPORT_PRIVATE void sendMessage(const CString&, GVariant*);
 
     bool isClosed() const { return !m_connection; }
     WTF_EXPORT_PRIVATE void close();
