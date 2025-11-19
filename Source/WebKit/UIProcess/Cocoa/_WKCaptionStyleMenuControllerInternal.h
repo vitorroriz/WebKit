@@ -25,38 +25,33 @@
 
 #pragma once
 
-#import <WebKit/WKFoundation.h>
+#import "_WKCaptionStyleMenuController.h"
 
-#if TARGET_OS_OSX
-@class NSMenu;
-typedef NSMenu PlatformMenu;
-#else
+#import <wtf/RetainPtr.h>
+#import <wtf/Vector.h>
+#import <wtf/text/WTFString.h>
+
+#if !TARGET_OS_OSX && !TARGET_OS_WATCH
 @class UIContextMenuInteraction;
-@class UIMenu;
-typedef UIMenu PlatformMenu;
+@class UIAction;
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol WKCaptionStyleMenuControllerDelegate <NSObject>
-- (void)captionStyleMenuWillOpen:(PlatformMenu *)menu;
-- (void)captionStyleMenuDidClose:(PlatformMenu *)menu;
-@end
-
-WK_EXTERN
-@interface WKCaptionStyleMenuController : NSObject
-
-#if TARGET_OS_IPHONE
-+ (instancetype)menuController;
-#endif
-
-@property (weak, nonatomic) id<WKCaptionStyleMenuControllerDelegate> delegate;
-@property (readonly, nonatomic) PlatformMenu *captionStyleMenu;
+@interface WKCaptionStyleMenuController ()
+{
+    WTF::RetainPtr<PlatformMenu> _menu;
 #if !TARGET_OS_OSX && !TARGET_OS_WATCH
-@property (readonly, nullable, nonatomic) UIContextMenuInteraction *contextMenuInteraction;
+    WTF::RetainPtr<UIContextMenuInteraction> _interaction;
+#endif
+}
+
+@property (nonatomic, copy, nullable) NSString *savedActiveProfileID;
+@property (nonatomic, strong) PlatformMenu *menu;
+#if !TARGET_OS_OSX && !TARGET_OS_WATCH
+@property (nonatomic, strong) UIContextMenuInteraction *interaction;
 #endif
 
-- (BOOL)isAncestorOf:(PlatformMenu*)menu;
 @end
 
 NS_ASSUME_NONNULL_END

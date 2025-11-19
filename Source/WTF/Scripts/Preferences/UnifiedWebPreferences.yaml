@@ -1785,7 +1785,7 @@ CanvasUsesAcceleratedDrawing:
 
 CaptionDisplaySettingsEnabled:
   type: bool
-  status: unstable
+  status: internal
   category: media
   humanReadableName: "Caption Display Settings API"
   humanReadableDescription: "Enable Caption Display Settings API"

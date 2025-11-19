@@ -893,7 +893,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
         return;
     }
 
-    _captionStyleMenuController = adoptNS([[WKCaptionStyleMenuController alloc] init]);
+    _captionStyleMenuController = adoptNS([WKCaptionStyleMenuController menuController]);
     [_captionStyleMenuController setDelegate:self];
 
     NSArray<UIMenuElement *> *menuItems = [self _uiMenuElementsForMediaControlContextMenuItems:WTFMove(itemsToPresent)];

@@ -230,3 +230,14 @@ selectors = [
     { name = "_verticalScrollIndicatorColor", class = "UIScrollView" },
 ]
 requires = ["HAVE_UIKIT_SCROLLBAR_COLOR_SPI"]
+
+[[temporary-usage]]
+request = "rdar://164431329"
+cleanup = "rdar://164667890"
+classes = [
+    "AVLegibleMediaOptionsMenuController",
+]
+selectors = [
+    { name = "buildMenuOfType:", class = "AVLegibleMediaOptionsMenuController" },
+]
+requires = ["HAVE_AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER"]

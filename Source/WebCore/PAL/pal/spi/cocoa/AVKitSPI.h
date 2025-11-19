@@ -408,8 +408,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) __kindof AVPictureInPictureContentViewController *activeContentViewController API_AVAILABLE(ios(16.0),tvos(16.0)) API_UNAVAILABLE(macos, watchos);
 @end
 
-NS_ASSUME_NONNULL_END
 
+NS_ASSUME_NONNULL_END
 #endif // PLATFORM(IOS_FAMILY)
 
 #endif // USE(APPLE_INTERNAL_SDK)
@@ -626,3 +626,54 @@ NS_ASSUME_NONNULL_END
 #endif // USE(APPLE_INTERNAL_SDK)
 
 #endif // HAVE(AVKIT_CONTENT_SOURCE)
+
+#if USE(APPLE_INTERNAL_SDK)
+
+#if !__has_include(<AVKit/AVLegibleMediaOptionsMenuController.h>)
+
+typedef NS_ENUM(NSInteger, AVLegibleMediaOptionsMenuType) {
+    AVLegibleMediaOptionsMenuTypeDefault,
+    AVLegibleMediaOptionsMenuTypeCaptionAppearance
+} SPI_AVAILABLE(ios(26.4), macos(26.4)) API_UNAVAILABLE(tvos, visionos, watchos);
+
+typedef NS_ENUM(NSInteger, AVLegibleMediaOptionEnablementState) {
+    AVLegibleMediaOptionEnablementStateOff,
+    AVLegibleMediaOptionEnablementStateOn
+} SPI_AVAILABLE(ios(26.4), macos(26.4)) API_UNAVAILABLE(tvos, visionos, watchos);
+
+typedef NS_ENUM(NSInteger, AVLegibleMediaOptionsPresentationState) {
+    AVLegibleMediaOptionsPresentationStateDismissed,
+    AVLegibleMediaOptionsPresentationStatePresented
+} SPI_AVAILABLE(macos(26.4)) API_UNAVAILABLE(ios, tvos, visionos, watchos);
+
+@protocol AVLegibleMediaOptionsMenuControllerDelegate;
+
+SPI_AVAILABLE(ios(26.4), macos(26.4)) API_UNAVAILABLE(tvos, visionos, watchos)
+@interface AVLegibleMediaOptionsMenuController : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithPlayer:(nullable AVPlayer *)player NS_DESIGNATED_INITIALIZER;
+
+#if TARGET_OS_OSX && !TARGET_OS_MACCATALYST
+- (void)presentMenuOfType:(AVLegibleMediaOptionsMenuType)type fromButton:(NSButton *)button presentationStateHandler:(nullable void (^)(AVLegibleMediaOptionsPresentationState state))handler;
+#else
+- (nullable UIMenu *)buildMenuOfType:(AVLegibleMediaOptionsMenuType)type;
+#endif
+
+@property (nonatomic, weak) id<AVLegibleMediaOptionsMenuControllerDelegate> delegate;
+@property (nonatomic, readonly) AVLegibleMediaOptionEnablementState currentEnablementState;
+
+@end
+
+SPI_AVAILABLE(ios(26.4), macos(26.4)) API_UNAVAILABLE(tvos, visionos, watchos)
+@protocol AVLegibleMediaOptionsMenuControllerDelegate <NSObject>
+@optional
+
+- (void)legibleMenuController:(AVLegibleMediaOptionsMenuController *)menuController didUpdateEnablementState:(AVLegibleMediaOptionEnablementState)enablementState;
+- (void)legibleMenuController:(AVLegibleMediaOptionsMenuController *)menuController didRequestCaptionPreviewForProfileID:(NSString *)profileID;
+- (void)legibleMenuControllerDidRequestStoppingSubtitleCaptionPreview:(AVLegibleMediaOptionsMenuController *)menuController;
+
+@end
+
+#endif
+#endif
