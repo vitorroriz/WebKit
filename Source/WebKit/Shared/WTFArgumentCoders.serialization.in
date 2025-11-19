@@ -195,7 +195,7 @@ template: enum class WebCore::MainThreadPermissionObserverIdentifierType
 template: enum class WebCore::OpaqueOriginIdentifierType
 template: enum class WebCore::PortIdentifierType
 template: enum class WebCore::RTCDataChannelLocalIdentifierType
-template: enum class WebCore::RTCRtpScriptTransformerIdentifierType
+template: enum class WebCore::RTCEncodedStreamProducerIdentifierType
 template: struct WebCore::RenderingResourceIdentifierType
 template: struct WebCore::ResourceLoaderIdentifierType
 template: struct WebCore::SamplesRendererTrackIdentifierType
