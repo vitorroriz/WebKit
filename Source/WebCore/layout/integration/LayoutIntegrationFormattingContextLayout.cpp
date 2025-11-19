@@ -102,6 +102,10 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
     };
 
     auto positionAndMargin = rootBlockContainer.layoutBlockChildFromInlineLayout(blockRenderer, blockLogicalTopLeft.y(), marginInfoForBlock());
+    if (blockRenderer.isSelfCollapsingBlock()) {
+        // FIXME: This gets replaced by "handling the after side of the block with margin".
+        positionAndMargin.marginInfo.setMargin({ }, { });
+    }
 
     auto updateMarginState = [&] {
         auto& marginInfo = positionAndMargin.marginInfo;

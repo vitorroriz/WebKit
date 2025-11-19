@@ -464,8 +464,8 @@ void RenderTreeBuilder::Inline::wrapRunsOfBlocksInAnonymousBlock(RenderInline& p
     SingleThreadWeakPtr<RenderBox> lastInRun;
 
     auto wrapRunInAnonymousBlockIfNeeded = [&] {
-        // Only wrap if there are multiple consecutive blocks.
-        if (firstInRun == lastInRun)
+        // FIXME: Removing wrapping requires changes how RenderBlockFlow handles block formatting state.
+        if (!firstInRun)
             return;
 
         auto newBlock = Block::createAnonymousBlockWithStyle(parent.protectedDocument(), parent.style());
