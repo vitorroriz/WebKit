@@ -206,14 +206,14 @@ static DDBridgeSemantic convert(WGPUDDSemantic semantic)
 {
     switch (semantic) {
     case WGPUDDSemantic::Color:
-        return DDBridgeSemantic::kColor;
+        return DDBridgeSemanticColor;
     case WGPUDDSemantic::Vector:
-        return DDBridgeSemantic::kVector;
+        return DDBridgeSemanticVector;
     case WGPUDDSemantic::Scalar:
-        return DDBridgeSemantic::kScalar;
+        return DDBridgeSemanticScalar;
     case WGPUDDSemantic::Unknown:
     default:
-        return DDBridgeSemantic::kUnknown;
+        return DDBridgeSemanticUnknown;
     }
 }
 
@@ -235,55 +235,55 @@ static DDBridgeDataType convert(WGPUDDDataType type)
 {
     switch (type) {
     case WGPUDDDataType::kBool:
-        return DDBridgeDataType::kBool;
+        return DDBridgeDataTypeBool;
     case WGPUDDDataType::kInt:
-        return DDBridgeDataType::kInt;
+        return DDBridgeDataTypeInt;
     case WGPUDDDataType::kInt2:
-        return DDBridgeDataType::kInt2;
+        return DDBridgeDataTypeInt2;
     case WGPUDDDataType::kInt3:
-        return DDBridgeDataType::kInt3;
+        return DDBridgeDataTypeInt3;
     case WGPUDDDataType::kInt4:
-        return DDBridgeDataType::kInt4;
+        return DDBridgeDataTypeInt4;
     case WGPUDDDataType::kFloat:
-        return DDBridgeDataType::kFloat;
+        return DDBridgeDataTypeFloat;
     case WGPUDDDataType::kColor3f:
-        return DDBridgeDataType::kColor3f;
+        return DDBridgeDataTypeColor3f;
     case WGPUDDDataType::kColor3h:
-        return DDBridgeDataType::kColor3h;
+        return DDBridgeDataTypeColor3h;
     case WGPUDDDataType::kColor4f:
-        return DDBridgeDataType::kColor4f;
+        return DDBridgeDataTypeColor4f;
     case WGPUDDDataType::kColor4h:
-        return DDBridgeDataType::kColor4h;
+        return DDBridgeDataTypeColor4h;
     case WGPUDDDataType::kFloat2:
-        return DDBridgeDataType::kFloat2;
+        return DDBridgeDataTypeFloat2;
     case WGPUDDDataType::kFloat3:
-        return DDBridgeDataType::kFloat3;
+        return DDBridgeDataTypeFloat3;
     case WGPUDDDataType::kFloat4:
-        return DDBridgeDataType::kFloat4;
+        return DDBridgeDataTypeFloat4;
     case WGPUDDDataType::kHalf:
-        return DDBridgeDataType::kHalf;
+        return DDBridgeDataTypeHalf;
     case WGPUDDDataType::kHalf2:
-        return DDBridgeDataType::kHalf2;
+        return DDBridgeDataTypeHalf2;
     case WGPUDDDataType::kHalf3:
-        return DDBridgeDataType::kHalf3;
+        return DDBridgeDataTypeHalf3;
     case WGPUDDDataType::kHalf4:
-        return DDBridgeDataType::kHalf4;
+        return DDBridgeDataTypeHalf4;
     case WGPUDDDataType::kMatrix2f:
-        return DDBridgeDataType::kMatrix2f;
+        return DDBridgeDataTypeMatrix2f;
     case WGPUDDDataType::kMatrix3f:
-        return DDBridgeDataType::kMatrix3f;
+        return DDBridgeDataTypeMatrix3f;
     case WGPUDDDataType::kMatrix4f:
-        return DDBridgeDataType::kMatrix4f;
+        return DDBridgeDataTypeMatrix4f;
     case WGPUDDDataType::kSurfaceShader:
-        return DDBridgeDataType::kSurfaceShader;
+        return DDBridgeDataTypeSurfaceShader;
     case WGPUDDDataType::kGeometryModifier:
-        return DDBridgeDataType::kGeometryModifier;
+        return DDBridgeDataTypeGeometryModifier;
     case WGPUDDDataType::kString:
-        return DDBridgeDataType::kString;
+        return DDBridgeDataTypeString;
     case WGPUDDDataType::kToken:
-        return DDBridgeDataType::kToken;
+        return DDBridgeDataTypeToken;
     case WGPUDDDataType::kAsset:
-        return DDBridgeDataType::kAsset;
+        return DDBridgeDataTypeAsset;
     }
 }
 
@@ -313,13 +313,13 @@ static DDBridgeNodeType convert(WGPUDDNodeType bridgeNodeType)
 {
     switch (bridgeNodeType) {
     case WGPUDDNodeType::Builtin:
-        return DDBridgeNodeType::kBuiltin;
+        return DDBridgeNodeTypeBuiltin;
     case WGPUDDNodeType::Constant:
-        return DDBridgeNodeType::kConstant;
+        return DDBridgeNodeTypeConstant;
     case WGPUDDNodeType::Arguments:
-        return DDBridgeNodeType::kArguments;
+        return DDBridgeNodeTypeArguments;
     case WGPUDDNodeType::Results:
-        return DDBridgeNodeType::kResults;
+        return DDBridgeNodeTypeResults;
     }
 }
 
@@ -327,83 +327,83 @@ static DDBridgeConstant convert(const WGPUDDConstant constant)
 {
     switch (constant) {
     case WGPUDDConstant::kBool:
-        return DDBridgeConstant::kBool;
+        return DDBridgeConstantBool;
     case WGPUDDConstant::kUchar:
-        return DDBridgeConstant::kUchar;
+        return DDBridgeConstantUchar;
     case WGPUDDConstant::kInt:
-        return DDBridgeConstant::kInt;
+        return DDBridgeConstantInt;
     case WGPUDDConstant::kUint:
-        return DDBridgeConstant::kUint;
+        return DDBridgeConstantUint;
     case WGPUDDConstant::kHalf:
-        return DDBridgeConstant::kHalf;
+        return DDBridgeConstantHalf;
     case WGPUDDConstant::kFloat:
-        return DDBridgeConstant::kFloat;
+        return DDBridgeConstantFloat;
     case WGPUDDConstant::kTimecode:
-        return DDBridgeConstant::kTimecode;
+        return DDBridgeConstantTimecode;
     case WGPUDDConstant::kString:
-        return DDBridgeConstant::kString;
+        return DDBridgeConstantString;
     case WGPUDDConstant::kToken:
-        return DDBridgeConstant::kToken;
+        return DDBridgeConstantToken;
     case WGPUDDConstant::kAsset:
-        return DDBridgeConstant::kAsset;
+        return DDBridgeConstantAsset;
     case WGPUDDConstant::kMatrix2f:
-        return DDBridgeConstant::kMatrix2f;
+        return DDBridgeConstantMatrix2f;
     case WGPUDDConstant::kMatrix3f:
-        return DDBridgeConstant::kMatrix3f;
+        return DDBridgeConstantMatrix3f;
     case WGPUDDConstant::kMatrix4f:
-        return DDBridgeConstant::kMatrix4f;
+        return DDBridgeConstantMatrix4f;
     case WGPUDDConstant::kQuatf:
-        return DDBridgeConstant::kQuatf;
+        return DDBridgeConstantQuatf;
     case WGPUDDConstant::kQuath:
-        return DDBridgeConstant::kQuath;
+        return DDBridgeConstantQuath;
     case WGPUDDConstant::kFloat2:
-        return DDBridgeConstant::kFloat2;
+        return DDBridgeConstantFloat2;
     case WGPUDDConstant::kHalf2:
-        return DDBridgeConstant::kHalf2;
+        return DDBridgeConstantHalf2;
     case WGPUDDConstant::kInt2:
-        return DDBridgeConstant::kInt2;
+        return DDBridgeConstantInt2;
     case WGPUDDConstant::kFloat3:
-        return DDBridgeConstant::kFloat3;
+        return DDBridgeConstantFloat3;
     case WGPUDDConstant::kHalf3:
-        return DDBridgeConstant::kHalf3;
+        return DDBridgeConstantHalf3;
     case WGPUDDConstant::kInt3:
-        return DDBridgeConstant::kInt3;
+        return DDBridgeConstantInt3;
     case WGPUDDConstant::kFloat4:
-        return DDBridgeConstant::kFloat4;
+        return DDBridgeConstantFloat4;
     case WGPUDDConstant::kHalf4:
-        return DDBridgeConstant::kHalf4;
+        return DDBridgeConstantHalf4;
     case WGPUDDConstant::kInt4:
-        return DDBridgeConstant::kInt4;
+        return DDBridgeConstantInt4;
 
     // semantic:
     case WGPUDDConstant::kPoint3f:
-        return DDBridgeConstant::kPoint3f;
+        return DDBridgeConstantPoint3f;
     case WGPUDDConstant::kPoint3h:
-        return DDBridgeConstant::kPoint3h;
+        return DDBridgeConstantPoint3h;
     case WGPUDDConstant::kNormal3f:
-        return DDBridgeConstant::kNormal3f;
+        return DDBridgeConstantNormal3f;
     case WGPUDDConstant::kNormal3h:
-        return DDBridgeConstant::kNormal3h;
+        return DDBridgeConstantNormal3h;
     case WGPUDDConstant::kVector3f:
-        return DDBridgeConstant::kVector3f;
+        return DDBridgeConstantVector3f;
     case WGPUDDConstant::kVector3h:
-        return DDBridgeConstant::kVector3h;
+        return DDBridgeConstantVector3h;
     case WGPUDDConstant::kColor3f:
-        return DDBridgeConstant::kColor3f;
+        return DDBridgeConstantColor3f;
     case WGPUDDConstant::kColor3h:
-        return DDBridgeConstant::kColor3h;
+        return DDBridgeConstantColor3h;
     case WGPUDDConstant::kColor4f:
-        return DDBridgeConstant::kColor4f;
+        return DDBridgeConstantColor4f;
     case WGPUDDConstant::kColor4h:
-        return DDBridgeConstant::kColor4h;
+        return DDBridgeConstantColor4h;
     case WGPUDDConstant::kTexCoord2h:
-        return DDBridgeConstant::kTexCoord2h;
+        return DDBridgeConstantTexCoord2h;
     case WGPUDDConstant::kTexCoord2f:
-        return DDBridgeConstant::kTexCoord2f;
+        return DDBridgeConstantTexCoord2f;
     case WGPUDDConstant::kTexCoord3h:
-        return DDBridgeConstant::kTexCoord3h;
+        return DDBridgeConstantTexCoord3h;
     case WGPUDDConstant::kTexCoord3f:
-        return DDBridgeConstant::kTexCoord3f;
+        return DDBridgeConstantTexCoord3f;
     }
 }
 

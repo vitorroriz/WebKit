@@ -158,24 +158,24 @@ NS_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @end
 
-enum class DDBridgeSemantic {
-    kColor,
-    kVector,
-    kScalar,
-    kUnknown
+typedef NS_ENUM(NSInteger, DDBridgeSemantic) {
+    DDBridgeSemanticColor,
+    DDBridgeSemanticVector,
+    DDBridgeSemanticScalar,
+    DDBridgeSemanticUnknown
 };
 
 @interface DDBridgeImageAsset : NSObject
 
 @property (nonatomic, nullable, strong, readonly) NSData *data;
-@property (nonatomic, readonly) NSUInteger width;
-@property (nonatomic, readonly) NSUInteger height;
-@property (nonatomic, readonly) NSUInteger bytesPerPixel;
+@property (nonatomic, readonly) unsigned long width;
+@property (nonatomic, readonly) unsigned long height;
+@property (nonatomic, readonly) unsigned long bytesPerPixel;
 @property (nonatomic, readonly) DDBridgeSemantic semantic;
 @property (nonatomic, readonly, strong) NSString *path;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithData:(nullable NSData *)data width:(NSUInteger)width height:(NSUInteger)height bytesPerPixel:(NSUInteger)bytesPerPixel semantic:(DDBridgeSemantic)semantic path:(NSString *)path NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithData:(nullable NSData *)data width:(unsigned long)width height:(unsigned long)height bytesPerPixel:(unsigned long)bytesPerPixel semantic:(DDBridgeSemantic)semantic path:(NSString *)path NS_DESIGNATED_INITIALIZER;
 
 @end
 
@@ -212,42 +212,42 @@ enum class DDBridgeSemantic {
 
 @end
 
-enum class DDBridgeDataType {
-    kBool,
-    kInt,
-    kInt2,
-    kInt3,
-    kInt4,
-    kFloat,
-    kColor3f,
-    kColor3h,
-    kColor4f,
-    kColor4h,
-    kFloat2,
-    kFloat3,
-    kFloat4,
-    kHalf,
-    kHalf2,
-    kHalf3,
-    kHalf4,
-    kMatrix2f,
-    kMatrix3f,
-    kMatrix4f,
-    kSurfaceShader,
-    kGeometryModifier,
-    kString,
-    kToken,
-    kAsset
+typedef NS_ENUM(NSInteger, DDBridgeDataType) {
+    DDBridgeDataTypeBool,
+    DDBridgeDataTypeInt,
+    DDBridgeDataTypeInt2,
+    DDBridgeDataTypeInt3,
+    DDBridgeDataTypeInt4,
+    DDBridgeDataTypeFloat,
+    DDBridgeDataTypeColor3f,
+    DDBridgeDataTypeColor3h,
+    DDBridgeDataTypeColor4f,
+    DDBridgeDataTypeColor4h,
+    DDBridgeDataTypeFloat2,
+    DDBridgeDataTypeFloat3,
+    DDBridgeDataTypeFloat4,
+    DDBridgeDataTypeHalf,
+    DDBridgeDataTypeHalf2,
+    DDBridgeDataTypeHalf3,
+    DDBridgeDataTypeHalf4,
+    DDBridgeDataTypeMatrix2f,
+    DDBridgeDataTypeMatrix3f,
+    DDBridgeDataTypeMatrix4f,
+    DDBridgeDataTypeSurfaceShader,
+    DDBridgeDataTypeGeometryModifier,
+    DDBridgeDataTypeString,
+    DDBridgeDataTypeToken,
+    DDBridgeDataTypeAsset
 };
 
 @interface DDBridgePrimvar : NSObject
 
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *referencedGeomPropName;
-@property (nonatomic, readonly) NSUInteger attributeFormat;
+@property (nonatomic, readonly) unsigned long attributeFormat;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithName:(NSString *)name referencedGeomPropName:(NSString *)referencedGeomPropName attributeFormat:(NSUInteger)attributeFormat NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(NSString *)name referencedGeomPropName:(NSString *)referencedGeomPropName attributeFormat:(unsigned long)attributeFormat NS_DESIGNATED_INITIALIZER;
 
 @end
 
@@ -261,54 +261,54 @@ enum class DDBridgeDataType {
 
 @end
 
-enum class DDBridgeConstant {
-    kBool,
-    kUchar,
-    kInt,
-    kUint,
-    kHalf,
-    kFloat,
-    kTimecode,
-    kString,
-    kToken,
-    kAsset,
-    kMatrix2f,
-    kMatrix3f,
-    kMatrix4f,
-    kQuatf,
-    kQuath,
-    kFloat2,
-    kHalf2,
-    kInt2,
-    kFloat3,
-    kHalf3,
-    kInt3,
-    kFloat4,
-    kHalf4,
-    kInt4,
+typedef NS_ENUM(NSInteger, DDBridgeConstant) {
+    DDBridgeConstantBool,
+    DDBridgeConstantUchar,
+    DDBridgeConstantInt,
+    DDBridgeConstantUint,
+    DDBridgeConstantHalf,
+    DDBridgeConstantFloat,
+    DDBridgeConstantTimecode,
+    DDBridgeConstantString,
+    DDBridgeConstantToken,
+    DDBridgeConstantAsset,
+    DDBridgeConstantMatrix2f,
+    DDBridgeConstantMatrix3f,
+    DDBridgeConstantMatrix4f,
+    DDBridgeConstantQuatf,
+    DDBridgeConstantQuath,
+    DDBridgeConstantFloat2,
+    DDBridgeConstantHalf2,
+    DDBridgeConstantInt2,
+    DDBridgeConstantFloat3,
+    DDBridgeConstantHalf3,
+    DDBridgeConstantInt3,
+    DDBridgeConstantFloat4,
+    DDBridgeConstantHalf4,
+    DDBridgeConstantInt4,
 
     // semantic types
-    kPoint3f,
-    kPoint3h,
-    kNormal3f,
-    kNormal3h,
-    kVector3f,
-    kVector3h,
-    kColor3f,
-    kColor3h,
-    kColor4f,
-    kColor4h,
-    kTexCoord2h,
-    kTexCoord2f,
-    kTexCoord3h,
-    kTexCoord3f
+    DDBridgeConstantPoint3f,
+    DDBridgeConstantPoint3h,
+    DDBridgeConstantNormal3f,
+    DDBridgeConstantNormal3h,
+    DDBridgeConstantVector3f,
+    DDBridgeConstantVector3h,
+    DDBridgeConstantColor3f,
+    DDBridgeConstantColor3h,
+    DDBridgeConstantColor4f,
+    DDBridgeConstantColor4h,
+    DDBridgeConstantTexCoord2h,
+    DDBridgeConstantTexCoord2f,
+    DDBridgeConstantTexCoord3h,
+    DDBridgeConstantTexCoord3f
 };
 
-enum class DDBridgeNodeType {
-    kBuiltin,
-    kConstant,
-    kArguments,
-    kResults
+typedef NS_ENUM(NSInteger, DDBridgeNodeType) {
+    DDBridgeNodeTypeBuiltin,
+    DDBridgeNodeTypeConstant,
+    DDBridgeNodeTypeArguments,
+    DDBridgeNodeTypeResults
 };
 
 @interface DDValueString : NSObject
