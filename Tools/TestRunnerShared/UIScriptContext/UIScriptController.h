@@ -76,6 +76,7 @@ struct TextExtractionInteractionOptions {
     JSRetainPtr<JSStringRef> nodeIdentifier;
     JSRetainPtr<JSStringRef> text;
     std::optional<std::pair<double, double>> location;
+    std::optional<std::pair<double, double>> scrollDelta;
     bool replaceAll { false };
     bool scrollToVisible { false };
 };

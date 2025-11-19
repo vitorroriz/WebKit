@@ -6759,6 +6759,8 @@ static inline std::optional<WebCore::NodeIdentifier> toNodeIdentifier(const Stri
             return WebCore::TextExtraction::Action::KeyPress;
         case _WKTextExtractionActionHighlightText:
             return WebCore::TextExtraction::Action::HighlightText;
+        case _WKTextExtractionActionScrollBy:
+            return WebCore::TextExtraction::Action::ScrollBy;
         default:
             ASSERT_NOT_REACHED();
             return WebCore::TextExtraction::Action::Click;
@@ -6776,6 +6778,7 @@ static inline std::optional<WebCore::NodeIdentifier> toNodeIdentifier(const Stri
     interaction.text = wkInteraction.text;
     interaction.replaceAll = wkInteraction.replaceAll;
     interaction.scrollToVisible = wkInteraction.scrollToVisible;
+    interaction.scrollDelta = WebCore::FloatSize { wkInteraction.scrollDelta };
     return interaction;
 }
 

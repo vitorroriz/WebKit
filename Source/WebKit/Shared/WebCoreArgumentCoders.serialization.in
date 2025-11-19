@@ -6714,7 +6714,8 @@ header: <WebCore/TextExtractionTypes.h>
     SelectMenuItem,
     TextInput,
     KeyPress,
-    HighlightText
+    HighlightText,
+    ScrollBy
 };
 
 header: <WebCore/TextExtractionTypes.h>
@@ -6730,6 +6731,7 @@ header: <WebCore/TextExtractionTypes.h>
     String text;
     std::optional<WebCore::FloatPoint> locationInRootView;
     std::optional<WebCore::NodeIdentifier> nodeIdentifier;
+    WebCore::FloatSize scrollDelta;
     bool replaceAll;
     bool scrollToVisible;
 };

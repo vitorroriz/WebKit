@@ -410,6 +410,8 @@ public:
     WEBCORE_EXPORT void updateMouseEventTargetAfterLayoutIfNeeded();
     WEBCORE_EXPORT void scheduleMouseEventTargetUpdateAfterLayout();
 
+    ScrollableArea* enclosingScrollableArea(Node*) const;
+
 private:
 #if ENABLE(DRAG_SUPPORT)
     static DragState& dragState();
@@ -480,7 +482,6 @@ private:
     enum class FireMouseOverOut : bool { No, Yes };
     void updateMouseEventTargetNode(const AtomString& eventType, Node*, const PlatformMouseEvent&, FireMouseOverOut);
 
-    ScrollableArea* enclosingScrollableArea(Node*) const;
     void notifyScrollableAreasOfMouseEvents(const AtomString& eventType, Element* lastElementUnderMouse, Element* elementUnderMouse);
 
     MouseEventWithHitTestResults prepareMouseEvent(const HitTestRequest&, const PlatformMouseEvent&);

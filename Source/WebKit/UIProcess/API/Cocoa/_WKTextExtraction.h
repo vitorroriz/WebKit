@@ -137,6 +137,7 @@ typedef NS_ENUM(NSInteger, _WKTextExtractionAction) {
     _WKTextExtractionActionTextInput,
     _WKTextExtractionActionKeyPress,
     _WKTextExtractionActionHighlightText,
+    _WKTextExtractionActionScrollBy
 } WK_API_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA));
 
 WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
@@ -154,6 +155,7 @@ NS_REQUIRES_PROPERTY_DEFINITIONS
 @property (nonatomic, copy, nullable) NSString *text;
 @property (nonatomic) BOOL replaceAll;
 @property (nonatomic) BOOL scrollToVisible;
+@property (nonatomic) CGSize scrollDelta;
 
 // Must be within the visible bounds of the web view.
 @property (nonatomic) CGPoint location;

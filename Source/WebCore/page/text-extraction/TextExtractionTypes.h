@@ -43,6 +43,7 @@ enum class Action : uint8_t {
     TextInput,
     KeyPress,
     HighlightText,
+    ScrollBy,
 };
 
 struct Interaction {
@@ -50,6 +51,7 @@ struct Interaction {
     String text;
     std::optional<FloatPoint> locationInRootView;
     std::optional<NodeIdentifier> nodeIdentifier;
+    FloatSize scrollDelta;
     bool replaceAll { false };
     bool scrollToVisible { false };
 };

@@ -103,6 +103,14 @@ TextExtractionInteractionOptions* toTextExtractionInteractionOptions(JSContextRe
     options.replaceAll = booleanProperty(context, (JSObjectRef)argument, "replaceAll");
     options.scrollToVisible = booleanProperty(context, (JSObjectRef)argument, "scrollToVisible");
 
+    if (auto deltaObject = objectProperty(context, (JSObjectRef)argument, "scrollDelta")) {
+        options.scrollDelta = {
+            numericProperty(context, deltaObject, "x"),
+            numericProperty(context, deltaObject, "y")
+        };
+    } else
+        options.scrollDelta = std::nullopt;
+
     if (auto locationObject = objectProperty(context, (JSObjectRef)argument, "location")) {
         options.location = {
             numericProperty(context, locationObject, "x"),

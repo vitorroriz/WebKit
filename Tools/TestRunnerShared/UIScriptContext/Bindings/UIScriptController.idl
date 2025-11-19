@@ -58,8 +58,8 @@ dictionary TextExtractionTestOptions {
 dictionary TextExtractionInteractionOptions {
     DOMString nodeIdentifier;
     DOMString text;
-    double x = -1;
-    double y = -1;
+    object location;
+    object scrollDelta;
     boolean replaceAll = false;
     boolean scrollToVisible = false;
 };

@@ -164,6 +164,7 @@
 @synthesize location = _location;
 @synthesize hasSetLocation = _hasSetLocation;
 @synthesize scrollToVisible = _scrollToVisible;
+@synthesize scrollDelta = _scrollDelta;
 
 - (instancetype)initWithAction:(_WKTextExtractionAction)action
 {

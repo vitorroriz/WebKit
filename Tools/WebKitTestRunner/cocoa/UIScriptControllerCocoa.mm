@@ -419,6 +419,8 @@ void UIScriptControllerCocoa::performTextExtractionInteraction(JSStringRef jsAct
         action = _WKTextExtractionActionKeyPress;
     if (equalLettersIgnoringASCIICase(actionName, "highlighttext"))
         action = _WKTextExtractionActionHighlightText;
+    if (equalLettersIgnoringASCIICase(actionName, "scrollby"))
+        action = _WKTextExtractionActionScrollBy;
 
     if (!action) {
         ASSERT_NOT_REACHED();
@@ -440,6 +442,9 @@ void UIScriptControllerCocoa::performTextExtractionInteraction(JSStringRef jsAct
         auto [x, y] = *location;
         [interaction setLocation:CGPointMake(x, y)];
     }
+
+    if (auto scrollDelta = options->scrollDelta)
+        [interaction setScrollDelta:std::apply(CGSizeMake, *scrollDelta)];
 
     [webView() _performInteraction:interaction.get() completionHandler:^(_WKTextExtractionInteractionResult *result) {
         if (!m_context)

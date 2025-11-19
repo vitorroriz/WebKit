@@ -1330,6 +1330,24 @@ static void highlightText(Page& page, std::optional<NodeIdentifier>&& identifier
     return completion(true, { });
 }
 
+static void scrollBy(Page& page, std::optional<NodeIdentifier>&& identifier, FloatSize scrollDelta, CompletionHandler<void(bool, String&&)>&& completion)
+{
+    RefPtr foundNode = resolveNodeWithBodyAsFallback(page, identifier);
+    if (!foundNode)
+        return completion(false, invalidNodeIdentifierDescription(WTFMove(identifier)));
+
+    RefPtr frame = foundNode->protectedDocument()->frame();
+    if (!frame)
+        return completion(false, nullFrameDescription);
+
+    WeakPtr scroller = CheckedRef { frame->eventHandler() }->enclosingScrollableArea(foundNode.get());
+    if (!scroller)
+        return completion(false, "No scrollable area found"_s);
+
+    scroller->scrollToOffsetWithoutAnimation(FloatPoint { scroller->scrollOffset() } + scrollDelta);
+    completion(true, { });
+}
+
 static bool simulateKeyPress(LocalFrame& frame, const String& key)
 {
     auto keyDown = PlatformKeyboardEvent::syntheticEventFromText(PlatformEvent::Type::KeyDown, key);
@@ -1476,6 +1494,11 @@ void handleInteraction(Interaction&& interaction, Page& page, CompletionHandler<
 
         return highlightText(page, WTFMove(interaction.nodeIdentifier), WTFMove(interaction.text), interaction.scrollToVisible, WTFMove(completion));
     }
+    case Action::ScrollBy:
+        if (interaction.scrollDelta.isZero())
+            return completion(false, "Scroll delta is zero"_s);
+
+        return scrollBy(page, WTFMove(interaction.nodeIdentifier), interaction.scrollDelta, WTFMove(completion));
     default:
         ASSERT_NOT_REACHED();
         break;
@@ -1658,6 +1681,8 @@ InteractionDescription interactionDescription(const Interaction& interaction, Pa
             return "Enter text"_s;
         case Action::HighlightText:
             return "Highlight text"_s;
+        case Action::ScrollBy:
+            return "Scroll"_s;
         }
         ASSERT_NOT_REACHED();
         return { };
@@ -1671,6 +1696,11 @@ InteractionDescription interactionDescription(const Interaction& interaction, Pa
             description.append(makeString(" "_s, wrapWithDoubleQuotes(String { escapedString })));
             stringsToValidate.append(WTFMove(escapedString));
         }
+    }
+
+    if (action == Action::ScrollBy) {
+        auto delta = roundedIntSize(interaction.scrollDelta);
+        description.append(makeString(" by ("_s, delta.width(), ", "_s, delta.height(), ')'));
     }
 
     auto appendElementString = [&]<typename... T>(T&&... args) {
@@ -1687,6 +1717,7 @@ InteractionDescription interactionDescription(const Interaction& interaction, Pa
             case Action::SelectMenuItem:
             case Action::KeyPress:
             case Action::HighlightText:
+            case Action::ScrollBy:
                 return " in "_s;
             case Action::TextInput:
                 return " into "_s;
