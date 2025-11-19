@@ -113,6 +113,7 @@ typedef NS_OPTIONS(NSUInteger, _WKXRSessionFeatureFlags) {
     _WKXRSessionFeatureFlagsReferenceSpaceTypeUnbounded = 1 << 4,
     _WKXRSessionFeatureFlagsHandTracking = 1 << 5,
     _WKXRSessionFeatureFlagsWebGPU = 1 << 6,
+    _WKXRSessionFeatureFlagsLayers = 1 << 7,
 } WK_API_AVAILABLE(macos(13.0), ios(16.0));
 
 typedef NS_ENUM(NSInteger, WKDisplayCapturePermissionDecision) {

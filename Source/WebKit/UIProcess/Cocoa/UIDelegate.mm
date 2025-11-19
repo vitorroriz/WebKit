@@ -2099,6 +2099,10 @@ static _WKXRSessionFeatureFlags toWKXRSessionFeatureFlags(PlatformXR::SessionFea
 #endif
     case PlatformXR::SessionFeature::WebGPU:
         return _WKXRSessionFeatureFlagsWebGPU;
+#if ENABLE(WEBXR_LAYERS)
+    case PlatformXR::SessionFeature::Layers:
+        return _WKXRSessionFeatureFlagsLayers;
+#endif
     }
 }
 
@@ -2132,6 +2136,10 @@ static std::optional<PlatformXR::Device::FeatureList> toPlatformXRFeatures(_WKXR
 #endif
     if (featureFlags & _WKXRSessionFeatureFlagsWebGPU)
         features.append(PlatformXR::SessionFeature::WebGPU);
+#if ENABLE(WEBXR_LAYERS)
+    if (featureFlags & _WKXRSessionFeatureFlagsLayers)
+        features.append(PlatformXR::SessionFeature::Layers);
+#endif
     return features;
 }
 

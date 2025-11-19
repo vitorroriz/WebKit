@@ -2860,6 +2860,7 @@ webkit.org/b/208988 [ Release ] imported/w3c/web-platform-tests/webxr/xrWebGLLay
 webkit.org/b/296681 imported/w3c/web-platform-tests/webxr/ar-module/xrDevice_isSessionSupported_immersive-ar.https.html [ Pass ]
 webkit.org/b/296681 imported/w3c/web-platform-tests/webxr/ar-module/idlharness.https.window.html [ Pass ]
 webkit.org/b/296681 imported/w3c/web-platform-tests/webxr/ar-module/xrDevice_requestSession_immersive-ar.https.html [ Pass ]
+imported/w3c/web-platform-tests/webxr/ar-module/xrSession_environmentBlendMode.https.html [ Pass ]
 
 webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/events_referenceSpace_reset_immersive.https.html [ Pass ]
 webkit.org/b/208988 imported/w3c/web-platform-tests/webxr/events_referenceSpace_reset_inline.https.html [ Pass ]
@@ -2880,7 +2881,7 @@ imported/w3c/web-platform-tests/webxr/hand-input/ [ Pass ]
 
 imported/w3c/web-platform-tests/webxr/hit-test [ Pass ]
 
-imported/w3c/web-platform-tests/webxr/ar-module/xrSession_environmentBlendMode.https.html [ Pass ]
+imported/w3c/web-platform-tests/webxr/layers/xrSession_updateRenderState.https.html [ Pass ]
 
 http/wpt/webxr [ Pass ]
 webxr [ Pass ]

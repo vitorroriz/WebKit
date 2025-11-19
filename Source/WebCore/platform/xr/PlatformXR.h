@@ -150,6 +150,9 @@ enum class SessionFeature : uint8_t {
     HitTest,
 #endif
     WebGPU,
+#if ENABLE(WEBXR_LAYERS)
+    Layers,
+#endif
 };
 
 inline SessionFeature sessionFeatureFromReferenceSpaceType(ReferenceSpaceType referenceSpaceType)
@@ -197,7 +200,10 @@ inline std::optional<SessionFeature> parseSessionFeatureDescriptor(StringView st
 #endif
     if (feature == "webgpu"_s)
         return SessionFeature::WebGPU;
-
+#if ENABLE(WEBXR_LAYERS)
+    if (feature == "layers"_s)
+        return SessionFeature::Layers;
+#endif
     return std::nullopt;
 }
 
@@ -224,6 +230,10 @@ inline String sessionFeatureDescriptor(SessionFeature sessionFeature)
 #endif
     case SessionFeature::WebGPU:
         return "webgpu"_s;
+#if ENABLE(WEBXR_LAYERS)
+    case SessionFeature::Layers:
+        return "layers"_s;
+#endif
     default:
         ASSERT_NOT_REACHED();
         return ""_s;

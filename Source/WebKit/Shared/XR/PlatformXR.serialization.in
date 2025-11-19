@@ -35,6 +35,9 @@ enum class PlatformXR::SessionFeature : uint8_t {
     HitTest,
 #endif
     WebGPU,
+#if ENABLE(WEBXR_LAYERS)
+    Layers,
+#endif
 };
 
 enum class PlatformXR::SessionMode : uint8_t {

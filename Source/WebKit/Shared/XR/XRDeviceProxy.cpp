@@ -53,6 +53,12 @@ XRDeviceProxy::XRDeviceProxy(XRDeviceInfo&& deviceInfo, PlatformXRSystemProxy& x
 
     if (!deviceInfo.vrFeatures.contains(SessionFeature::WebGPU))
         deviceInfo.vrFeatures.append(SessionFeature::WebGPU);
+#if ENABLE(WEBXR_LAYERS)
+    if (!deviceInfo.vrFeatures.contains(SessionFeature::Layers))
+        deviceInfo.vrFeatures.append(SessionFeature::Layers);
+    if (!deviceInfo.arFeatures.contains(SessionFeature::Layers))
+        deviceInfo.arFeatures.append(SessionFeature::Layers);
+#endif
     if (!deviceInfo.vrFeatures.isEmpty())
         setSupportedFeatures(SessionMode::ImmersiveVr, deviceInfo.vrFeatures);
     if (!deviceInfo.arFeatures.isEmpty())

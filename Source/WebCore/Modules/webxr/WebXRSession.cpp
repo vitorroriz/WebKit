@@ -156,6 +156,9 @@ ExceptionOr<void> WebXRSession::updateRenderState(const XRRenderStateInit& newSt
     if (newState.inlineVerticalFieldOfView && isImmersive(m_mode))
         return Exception { ExceptionCode::InvalidStateError };
 
+    if (newState.baseLayer.has_value() && newState.layers)
+        return Exception { ExceptionCode::NotSupportedError, "Cannot set both baseLayer and layers in the same call to updateRenderState."_s };
+
     // 5. If none of newState's depthNear, depthFar, inlineVerticalFieldOfView, baseLayer,
     //    layers are set, abort these steps.
     if (!newState.depthNear && !newState.depthFar && !newState.inlineVerticalFieldOfView && !newState.baseLayer && !newState.layers)
@@ -165,24 +168,6 @@ ExceptionOr<void> WebXRSession::updateRenderState(const XRRenderStateInit& newSt
     // 8. If session's pending render state is null, set it to a copy of activeState.
     if (!m_pendingRenderState)
         m_pendingRenderState = m_activeRenderState->clone();
-
-    // 6. Run update the pending layers state with session and newState.
-    // https://www.w3.org/TR/webxrlayers-1/#updaterenderstatechanges
-#if ENABLE(WEBXR_LAYERS)
-    if (newState.layers) {
-        /* If session was not created with "layers" enabled and newState’s layers contains more than 1 instance, throw a NotSupportedError and abort these steps.
-         If session’s pending render state is null, set it to a copy of activeState.
-         If newState’s layers contains duplicate instances, throw a TypeError and abort these steps.
-         For each layer in newState’s layers:
-
-         If layer is an XRCompositionLayer and layer’s session is different from session, throw a TypeError and abort these steps.
-         If layer is an XRWebGLLayer and layer’s session is different from session, throw a TypeError and abort these steps.
-         Set session’s pending render state's baseLayer to null.
-         Set session’s pending render state's layers to newState’s layers.
-         */
-        m_pendingRenderState->setLayers(*newState.layers);
-    }
-#endif
 
     if (newState.passthroughFullyObscured)
         m_pendingRenderState->setPassthroughFullyObscured(newState.passthroughFullyObscured.value());
@@ -203,6 +188,29 @@ ExceptionOr<void> WebXRSession::updateRenderState(const XRRenderStateInit& newSt
     // 12. If newState's baseLayer is set, set session's pending render state's baseLayer to newState's baseLayer.
     if (newState.baseLayer)
         m_pendingRenderState->setBaseLayer(newState.baseLayer->get());
+    // https://www.w3.org/TR/webxrlayers-1/#updaterenderstatechanges
+#if ENABLE(WEBXR_LAYERS)
+    else if (newState.layers) {
+        if (!m_requestedFeatures.contains(PlatformXR::SessionFeature::Layers) && newState.layers->size() > 1)
+            return Exception { ExceptionCode::NotSupportedError, "Cannot set layers when the Layers feature is not enabled for this session."_s };
+
+        if (!m_pendingRenderState)
+            m_pendingRenderState = m_activeRenderState->clone();
+
+        for (size_t i = 0; i < newState.layers->size(); ++i) {
+            auto& layer = newState.layers->at(i);
+
+            if (i != newState.layers->reverseFind(layer))
+                return Exception { ExceptionCode::TypeError, "Cannot set the same XRLayer instance multiple times in the layers array."_s };
+
+            if (layer->isWebXRWebGLLayer() && downcast<WebXRWebGLLayer>(layer.get()).session() != this)
+                return Exception { ExceptionCode::TypeError, "XRWebGLLayer's session does not match the XRSession."_s };
+        }
+
+        m_pendingRenderState->setBaseLayer(nullptr);
+        m_pendingRenderState->setLayers(*newState.layers);
+    }
+#endif
 
     return { };
 }
