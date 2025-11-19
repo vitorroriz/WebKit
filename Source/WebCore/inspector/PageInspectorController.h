@@ -64,12 +64,12 @@ class PageDebugger;
 class WebInjectedScriptManager;
 struct PageAgentContext;
 
-class InspectorController final : public Inspector::InspectorEnvironment, public CanMakeWeakPtr<InspectorController> {
-    WTF_MAKE_NONCOPYABLE(InspectorController);
-    WTF_MAKE_TZONE_ALLOCATED(InspectorController);
+class PageInspectorController final : public Inspector::InspectorEnvironment, public CanMakeWeakPtr<PageInspectorController> {
+    WTF_MAKE_NONCOPYABLE(PageInspectorController);
+    WTF_MAKE_TZONE_ALLOCATED(PageInspectorController);
 public:
-    InspectorController(Page&, std::unique_ptr<InspectorBackendClient>&&);
-    ~InspectorController() override;
+    PageInspectorController(Page&, std::unique_ptr<InspectorBackendClient>&&);
+    ~PageInspectorController() override;
 
     WEBCORE_EXPORT void ref() const;
     WEBCORE_EXPORT void deref() const;

@@ -35,10 +35,10 @@
 #include <WebCore/DOMWrapperWorld.h>
 #include <WebCore/ExceptionDetails.h>
 #include <WebCore/FloatRect.h>
-#include <WebCore/InspectorController.h>
 #include <WebCore/InspectorFrontendHost.h>
 #include <WebCore/NotImplemented.h>
 #include <WebCore/Page.h>
+#include <WebCore/PageInspectorController.h>
 #include <WebCore/Settings.h>
 
 #if ENABLE(INSPECTOR_EXTENSIONS)

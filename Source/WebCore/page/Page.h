@@ -141,7 +141,6 @@ class OpportunisticTaskScheduler;
 class ImageAnalysisQueue;
 class ImageOverlayController;
 class InspectorBackendClient;
-class InspectorController;
 class IntSize;
 class KeyboardScrollingAnimator;
 class LayoutRect;
@@ -156,6 +155,7 @@ class ModelPlayerProvider;
 class PageConfiguration;
 class PageDebuggable;
 class PageGroup;
+class PageInspectorController;
 class PageOverlayController;
 class PaymentCoordinator;
 class PerformanceLogging;
@@ -507,8 +507,8 @@ public:
     ContextMenuController& contextMenuController() { return m_contextMenuController.get(); }
     const ContextMenuController& contextMenuController() const { return m_contextMenuController.get(); }
 #endif
-    InspectorController& inspectorController() { return m_inspectorController.get(); }
-    WEBCORE_EXPORT Ref<InspectorController> protectedInspectorController();
+    PageInspectorController& inspectorController() { return m_inspectorController.get(); }
+    WEBCORE_EXPORT Ref<PageInspectorController> protectedInspectorController();
     PointerCaptureController& pointerCaptureController() { return m_pointerCaptureController.get(); }
 #if ENABLE(POINTER_LOCK)
     PointerLockController& pointerLockController() { return m_pointerLockController.get(); }
@@ -1489,7 +1489,7 @@ private:
 #if ENABLE(CONTEXT_MENUS)
     const UniqueRef<ContextMenuController> m_contextMenuController;
 #endif
-    const UniqueRef<InspectorController> m_inspectorController;
+    const UniqueRef<PageInspectorController> m_inspectorController;
     const UniqueRef<PointerCaptureController> m_pointerCaptureController;
 #if ENABLE(POINTER_LOCK)
     const UniqueRef<PointerLockController> m_pointerLockController;

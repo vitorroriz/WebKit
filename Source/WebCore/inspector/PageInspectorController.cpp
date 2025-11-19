@@ -30,7 +30,7 @@
  */
 
 #include "config.h"
-#include "InspectorController.h"
+#include "PageInspectorController.h"
 
 #include "CommandLineAPIHost.h"
 #include "CommonVM.h"
@@ -92,9 +92,9 @@ namespace WebCore {
 using namespace JSC;
 using namespace Inspector;
 
-WTF_MAKE_TZONE_ALLOCATED_IMPL(InspectorController);
+WTF_MAKE_TZONE_ALLOCATED_IMPL(PageInspectorController);
 
-InspectorController::InspectorController(Page& page, std::unique_ptr<InspectorBackendClient>&& inspectorBackendClient)
+PageInspectorController::PageInspectorController(Page& page, std::unique_ptr<InspectorBackendClient>&& inspectorBackendClient)
     : m_page(page)
     , m_instrumentingAgents(InstrumentingAgents::create(*this))
     , m_injectedScriptManager(makeUniqueRef<WebInjectedScriptManager>(*this, WebInjectedScriptHost::create()))
@@ -113,23 +113,23 @@ InspectorController::InspectorController(Page& page, std::unique_ptr<InspectorBa
     m_agents.append(WTFMove(consoleAgent));
 }
 
-InspectorController::~InspectorController()
+PageInspectorController::~PageInspectorController()
 {
     m_instrumentingAgents->reset();
     ASSERT(!m_inspectorBackendClient);
 }
 
-void InspectorController::ref() const
+void PageInspectorController::ref() const
 {
     m_page->ref();
 }
 
-void InspectorController::deref() const
+void PageInspectorController::deref() const
 {
     m_page->deref();
 }
 
-PageAgentContext InspectorController::pageAgentContext()
+PageAgentContext PageInspectorController::pageAgentContext()
 {
     AgentContext baseContext = {
         *this,
@@ -151,7 +151,7 @@ PageAgentContext InspectorController::pageAgentContext()
     return pageContext;
 }
 
-void InspectorController::createLazyAgents()
+void PageInspectorController::createLazyAgents()
 {
     if (m_didCreateLazyAgents)
         return;
@@ -200,7 +200,7 @@ void InspectorController::createLazyAgents()
         commandLineAPIHost->init(m_instrumentingAgents.copyRef());
 }
 
-void InspectorController::inspectedPageDestroyed()
+void PageInspectorController::inspectedPageDestroyed()
 {
     // Clean up resources and disconnect local and remote frontends.
     disconnectAllFrontends();
@@ -214,27 +214,27 @@ void InspectorController::inspectedPageDestroyed()
     m_debugger = nullptr;
 }
 
-void InspectorController::setInspectorFrontendClient(InspectorFrontendClient* inspectorFrontendClient)
+void PageInspectorController::setInspectorFrontendClient(InspectorFrontendClient* inspectorFrontendClient)
 {
     m_inspectorFrontendClient = inspectorFrontendClient;
 }
 
-bool InspectorController::hasLocalFrontend() const
+bool PageInspectorController::hasLocalFrontend() const
 {
     return m_frontendRouter->hasLocalFrontend();
 }
 
-bool InspectorController::hasRemoteFrontend() const
+bool PageInspectorController::hasRemoteFrontend() const
 {
     return m_frontendRouter->hasRemoteFrontend();
 }
 
-unsigned InspectorController::inspectionLevel() const
+unsigned PageInspectorController::inspectionLevel() const
 {
     return m_inspectorFrontendClient ? m_inspectorFrontendClient->inspectionLevel() : 0;
 }
 
-void InspectorController::didClearWindowObjectInWorld(LocalFrame& frame, DOMWrapperWorld& world)
+void PageInspectorController::didClearWindowObjectInWorld(LocalFrame& frame, DOMWrapperWorld& world)
 {
     if (&world != &mainThreadNormalWorldSingleton())
         return;
@@ -248,7 +248,7 @@ void InspectorController::didClearWindowObjectInWorld(LocalFrame& frame, DOMWrap
         m_inspectorFrontendClient->windowObjectCleared();
 }
 
-void InspectorController::connectFrontend(Inspector::FrontendChannel& frontendChannel, bool isAutomaticInspection, bool immediatelyPause)
+void PageInspectorController::connectFrontend(Inspector::FrontendChannel& frontendChannel, bool isAutomaticInspection, bool immediatelyPause)
 {
     ASSERT(m_inspectorBackendClient);
 
@@ -278,7 +278,7 @@ void InspectorController::connectFrontend(Inspector::FrontendChannel& frontendCh
 #endif
 }
 
-void InspectorController::disconnectFrontend(FrontendChannel& frontendChannel)
+void PageInspectorController::disconnectFrontend(FrontendChannel& frontendChannel)
 {
     m_frontendRouter->disconnectFrontend(frontendChannel);
 
@@ -307,7 +307,7 @@ void InspectorController::disconnectFrontend(FrontendChannel& frontendChannel)
 #endif
 }
 
-void InspectorController::disconnectAllFrontends()
+void PageInspectorController::disconnectAllFrontends()
 {
     // If the local frontend page was destroyed, close the window.
     if (m_inspectorFrontendClient)
@@ -343,7 +343,7 @@ void InspectorController::disconnectAllFrontends()
 #endif
 }
 
-void InspectorController::show()
+void PageInspectorController::show()
 {
     ASSERT(!hasRemoteFrontend());
 
@@ -356,32 +356,32 @@ void InspectorController::show()
         connectFrontend(*frontendChannel);
 }
 
-void InspectorController::evaluateForTestInFrontend(const String& script)
+void PageInspectorController::evaluateForTestInFrontend(const String& script)
 {
     ensureInspectorAgent().evaluateForTestInFrontend(script);
 }
 
-void InspectorController::drawHighlight(GraphicsContext& context) const
+void PageInspectorController::drawHighlight(GraphicsContext& context) const
 {
     m_overlay->paint(context);
 }
 
-void InspectorController::getHighlight(InspectorOverlay::Highlight& highlight, InspectorOverlay::CoordinateSystem coordinateSystem) const
+void PageInspectorController::getHighlight(InspectorOverlay::Highlight& highlight, InspectorOverlay::CoordinateSystem coordinateSystem) const
 {
     m_overlay->getHighlight(highlight, coordinateSystem);
 }
 
-unsigned InspectorController::gridOverlayCount() const
+unsigned PageInspectorController::gridOverlayCount() const
 {
     return m_overlay->gridOverlayCount();
 }
 
-unsigned InspectorController::flexOverlayCount() const
+unsigned PageInspectorController::flexOverlayCount() const
 {
     return m_overlay->flexOverlayCount();
 }
 
-unsigned InspectorController::paintRectCount() const
+unsigned PageInspectorController::paintRectCount() const
 {
     if (m_inspectorBackendClient->overridesShowPaintRects())
         return m_inspectorBackendClient->paintRectCount();
@@ -389,12 +389,12 @@ unsigned InspectorController::paintRectCount() const
     return m_overlay->paintRectCount();
 }
 
-bool InspectorController::shouldShowOverlay() const
+bool PageInspectorController::shouldShowOverlay() const
 {
     return m_overlay->shouldShowOverlay();
 }
 
-void InspectorController::inspect(Node* node)
+void PageInspectorController::inspect(Node* node)
 {
     if (!enabled())
         return;
@@ -405,38 +405,38 @@ void InspectorController::inspect(Node* node)
     ensureDOMAgent().inspect(node);
 }
 
-bool InspectorController::enabled() const
+bool PageInspectorController::enabled() const
 {
     // FIXME: <http://webkit.org/b/246237> Local inspection should be controlled by `inspectable` API.
     return developerExtrasEnabled();
 }
 
-Page& InspectorController::inspectedPage() const
+Page& PageInspectorController::inspectedPage() const
 {
     return m_page;
 }
 
-Ref<Page> InspectorController::protectedInspectedPage() const
+Ref<Page> PageInspectorController::protectedInspectedPage() const
 {
     return inspectedPage();
 }
 
-void InspectorController::dispatchMessageFromFrontend(const String& message)
+void PageInspectorController::dispatchMessageFromFrontend(const String& message)
 {
     m_backendDispatcher->dispatch(message);
 }
 
-void InspectorController::hideHighlight()
+void PageInspectorController::hideHighlight()
 {
     m_overlay->hideHighlight();
 }
 
-Node* InspectorController::highlightedNode() const
+Node* PageInspectorController::highlightedNode() const
 {
     return m_overlay->highlightedNode();
 }
 
-void InspectorController::setIndicating(bool indicating)
+void PageInspectorController::setIndicating(bool indicating)
 {
 #if !PLATFORM(IOS_FAMILY)
     m_overlay->setIndicating(indicating);
@@ -448,7 +448,7 @@ void InspectorController::setIndicating(bool indicating)
 #endif
 }
 
-InspectorAgent& InspectorController::ensureInspectorAgent()
+InspectorAgent& PageInspectorController::ensureInspectorAgent()
 {
     if (!m_inspectorAgent) {
         auto pageContext = pageAgentContext();
@@ -460,7 +460,7 @@ InspectorAgent& InspectorController::ensureInspectorAgent()
     return *m_inspectorAgent;
 }
 
-InspectorDOMAgent& InspectorController::ensureDOMAgent()
+InspectorDOMAgent& PageInspectorController::ensureDOMAgent()
 {
     if (!m_domAgent) {
         auto pageContext = pageAgentContext();
@@ -471,7 +471,7 @@ InspectorDOMAgent& InspectorController::ensureDOMAgent()
     return *m_domAgent;
 }
 
-InspectorPageAgent& InspectorController::ensurePageAgent()
+InspectorPageAgent& PageInspectorController::ensurePageAgent()
 {
     if (!m_pageAgent) {
         auto pageContext = pageAgentContext();
@@ -482,12 +482,12 @@ InspectorPageAgent& InspectorController::ensurePageAgent()
     return *m_pageAgent;
 }
 
-bool InspectorController::developerExtrasEnabled() const
+bool PageInspectorController::developerExtrasEnabled() const
 {
     return m_page->settings().developerExtrasEnabled();
 }
 
-bool InspectorController::canAccessInspectedScriptState(JSC::JSGlobalObject* lexicalGlobalObject) const
+bool PageInspectorController::canAccessInspectedScriptState(JSC::JSGlobalObject* lexicalGlobalObject) const
 {
     JSLockHolder lock(lexicalGlobalObject);
 
@@ -498,17 +498,17 @@ bool InspectorController::canAccessInspectedScriptState(JSC::JSGlobalObject* lex
     return BindingSecurity::shouldAllowAccessToDOMWindow(lexicalGlobalObject, inspectedWindow->wrapped(), DoNotReportSecurityError);
 }
 
-InspectorFunctionCallHandler InspectorController::functionCallHandler() const
+InspectorFunctionCallHandler PageInspectorController::functionCallHandler() const
 {
     return WebCore::functionCallHandlerFromAnyThread;
 }
 
-InspectorEvaluateHandler InspectorController::evaluateHandler() const
+InspectorEvaluateHandler PageInspectorController::evaluateHandler() const
 {
     return WebCore::evaluateHandlerFromAnyThread;
 }
 
-void InspectorController::frontendInitialized()
+void PageInspectorController::frontendInitialized()
 {
     if (m_pauseAfterInitialization) {
         m_pauseAfterInitialization = false;
@@ -522,28 +522,28 @@ void InspectorController::frontendInitialized()
 #endif
 }
 
-Stopwatch& InspectorController::executionStopwatch() const
+Stopwatch& PageInspectorController::executionStopwatch() const
 {
     return m_executionStopwatch;
 }
 
-JSC::Debugger* InspectorController::debugger()
+JSC::Debugger* PageInspectorController::debugger()
 {
     ASSERT_IMPLIES(m_didCreateLazyAgents, m_debugger);
     return m_debugger.get();
 }
 
-JSC::VM& InspectorController::vm()
+JSC::VM& PageInspectorController::vm()
 {
     return commonVM();
 }
 
-void InspectorController::willComposite(LocalFrame& frame)
+void PageInspectorController::willComposite(LocalFrame& frame)
 {
     InspectorInstrumentation::willComposite(frame);
 }
 
-void InspectorController::didComposite(LocalFrame& frame)
+void PageInspectorController::didComposite(LocalFrame& frame)
 {
     InspectorInstrumentation::didComposite(frame);
 }

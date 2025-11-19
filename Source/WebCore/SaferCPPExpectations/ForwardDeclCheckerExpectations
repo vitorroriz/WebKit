@@ -48,11 +48,11 @@ html/HTMLMediaElement.cpp
 html/canvas/PlaceholderRenderingContext.cpp
 html/shadow/DateTimeEditElement.h
 html/track/TrackBase.h
-inspector/InspectorController.h
 [ Mac ] inspector/InspectorFrontendHost.h
 inspector/InspectorInstrumentation.h
 inspector/InspectorStyleSheet.h
 inspector/InstrumentingAgents.h
+inspector/PageInspectorController.h
 inspector/UserGestureEmulationScope.h
 inspector/agents/InspectorNetworkAgent.h
 inspector/agents/InspectorPageAgent.h

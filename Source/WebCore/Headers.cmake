@@ -1778,7 +1778,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     inspector/FrameInspectorController.h
     inspector/InspectorBackendClient.h
-    inspector/InspectorController.h
     inspector/InspectorDebuggableType.h
     inspector/InspectorFrontendAPIDispatcher.h
     inspector/InspectorFrontendClient.h
@@ -1792,6 +1791,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     inspector/InspectorWebAgentBase.h
     inspector/LegacyWebSocketInspectorInstrumentation.h
     inspector/PageDebugger.h
+    inspector/PageInspectorController.h
 
     inspector/agents/InspectorPageAgent.h
 

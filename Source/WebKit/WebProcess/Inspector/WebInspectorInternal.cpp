@@ -36,7 +36,6 @@
 #include <WebCore/DocumentView.h>
 #include <WebCore/FrameLoadRequest.h>
 #include <WebCore/FrameLoader.h>
-#include <WebCore/InspectorController.h>
 #include <WebCore/InspectorFrontendClient.h>
 #include <WebCore/InspectorPageAgent.h>
 #include <WebCore/LocalFrame.h>
@@ -45,6 +44,7 @@
 #include <WebCore/NavigationAction.h>
 #include <WebCore/NotImplemented.h>
 #include <WebCore/Page.h>
+#include <WebCore/PageInspectorController.h>
 #include <WebCore/ScriptController.h>
 #include <WebCore/WindowFeatures.h>
 

@@ -435,7 +435,7 @@ private:
 class EmptyInspectorBackendClient final : public InspectorBackendClient {
     WTF_MAKE_TZONE_ALLOCATED(EmptyInspectorBackendClient);
     void inspectedPageDestroyed() final { }
-    Inspector::FrontendChannel* openLocalFrontend(InspectorController*) final { return nullptr; }
+    Inspector::FrontendChannel* openLocalFrontend(PageInspectorController*) final { return nullptr; }
     void bringFrontendToFront() final { }
     void highlight() final { }
     void hideHighlight() final { }

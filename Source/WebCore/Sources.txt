@@ -1841,7 +1841,6 @@ inspector/InspectorAuditResourcesObject.cpp
 inspector/InspectorCanvas.cpp
 inspector/InspectorCanvasArguments.cpp
 inspector/InspectorCanvasCallTracer.cpp
-inspector/InspectorController.cpp
 inspector/InspectorFrontendAPIDispatcher.cpp
 inspector/InspectorFrontendClientLocal.cpp
 inspector/InspectorFrontendHost.cpp
@@ -1860,6 +1859,7 @@ inspector/InspectorThreadableLoaderClient.cpp
 inspector/InstrumentingAgents.cpp
 inspector/NetworkResourcesData.cpp
 inspector/PageDebugger.cpp
+inspector/PageInspectorController.cpp
 inspector/TimelineRecordFactory.cpp
 inspector/UserGestureEmulationScope.cpp
 inspector/WebInjectedScriptHost.cpp

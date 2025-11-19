@@ -109,7 +109,6 @@
 #include "ImageOverlay.h"
 #include "ImageOverlayController.h"
 #include "InspectorBackendClient.h"
-#include "InspectorController.h"
 #include "InspectorInstrumentation.h"
 #include "IntelligenceTextEffectsSupport.h"
 #include "KeyboardScrollingAnimator.h"
@@ -134,6 +133,7 @@
 #include "PageConfiguration.h"
 #include "PageDebuggable.h"
 #include "PageGroup.h"
+#include "PageInspectorController.h"
 #include "PageOverlayController.h"
 #include "PaymentCoordinator.h"
 #include "PerformanceLogging.h"
@@ -382,7 +382,7 @@ Page::Page(PageConfiguration&& pageConfiguration)
 #if ENABLE(CONTEXT_MENUS)
     , m_contextMenuController(makeUniqueRef<ContextMenuController>(*this, WTFMove(pageConfiguration.contextMenuClient)))
 #endif
-    , m_inspectorController(makeUniqueRefWithoutRefCountedCheck<InspectorController>(*this, WTFMove(pageConfiguration.inspectorBackendClient)))
+    , m_inspectorController(makeUniqueRefWithoutRefCountedCheck<PageInspectorController>(*this, WTFMove(pageConfiguration.inspectorBackendClient)))
     , m_pointerCaptureController(makeUniqueRef<PointerCaptureController>(*this))
 #if ENABLE(POINTER_LOCK)
     , m_pointerLockController(makeUniqueRefWithoutRefCountedCheck<PointerLockController>(*this))
@@ -5933,7 +5933,7 @@ bool Page::isAlwaysOnLoggingAllowed() const
     return m_sessionID.isAlwaysOnLoggingAllowed() || settings().allowPrivacySensitiveOperationsInNonPersistentDataStores();
 }
 
-Ref<InspectorController> Page::protectedInspectorController()
+Ref<PageInspectorController> Page::protectedInspectorController()
 {
     return m_inspectorController.get();
 }
