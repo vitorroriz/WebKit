@@ -120,15 +120,15 @@ RefPtr<Element> JSCustomElementInterface::tryToConstructCustomElement(Document& 
     if (!m_constructor)
         return nullptr;
 
-    ASSERT(&document == scriptExecutionContext());
-    auto* lexicalGlobalObject = document.globalObject();
+    RefPtr contextDocument = downcast<Document>(scriptExecutionContext());
+    auto* lexicalGlobalObject = scriptExecutionContext()->globalObject();
     ASSERT(lexicalGlobalObject);
     if (!lexicalGlobalObject)
         return nullptr;
-    auto* oldRegistry = document.activeCustomElementRegistry();
-    document.setActiveCustomElementRegistry(&registry);
+    auto* oldRegistry = contextDocument->activeCustomElementRegistry();
+    contextDocument->setActiveCustomElementRegistry(&registry);
     auto element = constructCustomElementSynchronously(document, vm, *lexicalGlobalObject, m_constructor.get(), localName, parserConstructElementWithEmptyStack);
-    document.setActiveCustomElementRegistry(oldRegistry);
+    contextDocument->setActiveCustomElementRegistry(oldRegistry);
     EXCEPTION_ASSERT(!!scope.exception() == !element);
     if (!element) {
         auto* exception = scope.exception();

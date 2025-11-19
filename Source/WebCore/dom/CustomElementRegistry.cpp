@@ -219,11 +219,19 @@ ExceptionOr<void> CustomElementRegistry::initialize(Node& root)
         if (this != registryOfTreeScope)
             addToScopedCustomElementRegistryMap(element, *this);
     };
+    auto upgradeElementIfPossible = [&](Element& element) {
+        if (element.isCustomElementUpgradeCandidate() && CustomElementRegistry::registryForElement(element) == this)
+            CustomElementReactionQueue::tryToUpgradeElement(element);
+    };
 
-    if (RefPtr element = dynamicDowncast<Element>(*containerRoot))
+    if (RefPtr element = dynamicDowncast<Element>(*containerRoot)) {
         updateRegistryIfNeeded(*element);
-    for (Ref element : descendantsOfType<Element>(*containerRoot))
+        upgradeElementIfPossible(*element);
+    }
+    for (Ref element : descendantsOfType<Element>(*containerRoot)) {
         updateRegistryIfNeeded(element);
+        upgradeElementIfPossible(element);
+    }
     return { };
 }
 
