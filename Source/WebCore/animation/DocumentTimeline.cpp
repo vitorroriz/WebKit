@@ -179,6 +179,14 @@ void DocumentTimeline::clearTickScheduleTimer()
 
 bool DocumentTimeline::shouldRunUpdateAnimationsAndSendEventsIgnoringSuspensionState() const
 {
+#if ENABLE(THREADED_ANIMATIONS)
+    if (CheckedPtr controller = this->controller()) {
+        if (auto* acceleratedEffectStackUpdater = controller->existingAcceleratedEffectStackUpdater()) {
+            if (acceleratedEffectStackUpdater->hasTargetsPendingUpdate())
+                return true;
+        }
+    }
+#endif
     return !m_animations.isEmpty() || !m_pendingAnimationEvents.isEmpty() || !m_acceleratedAnimationsPendingRunningStateChange.isEmpty();
 }
 
@@ -404,6 +412,16 @@ void DocumentTimeline::scheduleNextTick()
     }
 }
 
+#if ENABLE(THREADED_ANIMATIONS)
+void DocumentTimeline::scheduleAcceleratedEffectStackUpdate()
+{
+    if (shouldRunUpdateAnimationsAndSendEventsIgnoringSuspensionState())
+        scheduleAnimationResolution();
+    else
+        clearTickScheduleTimer();
+}
+#endif
+
 void DocumentTimeline::animationAcceleratedRunningStateDidChange(WebAnimation& animation)
 {
     m_acceleratedAnimationsPendingRunningStateChange.add(&animation);
@@ -414,30 +432,8 @@ void DocumentTimeline::animationAcceleratedRunningStateDidChange(WebAnimation& a
         clearTickScheduleTimer();
 }
 
-void DocumentTimeline::runPostRenderingUpdateTasks()
-{
-#if ENABLE(THREADED_ANIMATIONS)
-    if (!m_document || m_acceleratedAnimationsPendingRunningStateChange.isEmpty())
-        return;
-    Ref settings = m_document->settings();
-    if (!settings->threadedScrollDrivenAnimationsEnabled() && !settings->threadedTimeBasedAnimationsEnabled())
-        return;
-    m_acceleratedAnimationsPendingRunningStateChange.clear();
-    if (CheckedPtr timelinesController = m_document->timelinesController())
-        timelinesController->updateAcceleratedEffectStacks();
-#endif
-}
-
 void DocumentTimeline::applyPendingAcceleratedAnimations()
 {
-#if ENABLE(THREADED_ANIMATIONS)
-    if (m_document) {
-        Ref settings = m_document->settings();
-        if (settings->threadedScrollDrivenAnimationsEnabled() || settings->threadedTimeBasedAnimationsEnabled())
-            return;
-    }
-#endif
-
     auto acceleratedAnimationsPendingRunningStateChange = std::exchange(m_acceleratedAnimationsPendingRunningStateChange, { });
 
     HashSet<KeyframeEffectStack*> keyframeEffectStacksToUpdate;

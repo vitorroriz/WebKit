@@ -10826,10 +10826,8 @@ void Document::updateAnimationsAndSendEvents()
 
 void Document::runPostRenderingUpdateAnimationTasks()
 {
-    if (m_timeline)
-        m_timeline->runPostRenderingUpdateTasks();
     if (CheckedPtr timelinesController = this->timelinesController())
-        timelinesController->updateStaleScrollTimelines();
+        timelinesController->runPostRenderingUpdateTasks();
 }
 
 DocumentTimeline& Document::timeline()

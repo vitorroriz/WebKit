@@ -266,7 +266,7 @@ private:
     };
 
     bool threadedAnimationsEnabled() const;
-    void updateAssociatedThreadedEffectStack(const std::optional<const Styleable>& = std::nullopt);
+    void scheduleAssociatedAcceleratedEffectStackUpdate(const std::optional<const Styleable>& = std::nullopt);
 #endif
 
     // AnimationEffect

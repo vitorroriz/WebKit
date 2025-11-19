@@ -91,7 +91,6 @@
 
 #if ENABLE(THREADED_ANIMATIONS)
 #include "AcceleratedEffect.h"
-#include "AcceleratedEffectStackUpdater.h"
 #endif
 
 namespace WebCore {
@@ -2103,7 +2102,7 @@ void KeyframeEffect::updateAcceleratedAnimationIfNecessary()
 #if ENABLE(THREADED_ANIMATIONS)
     if (threadedAnimationsEnabled()) {
         if (canBeAccelerated())
-            updateAssociatedThreadedEffectStack();
+            scheduleAssociatedAcceleratedEffectStackUpdate();
         return;
     }
 #endif
@@ -2259,7 +2258,7 @@ void KeyframeEffect::animationSuspensionStateDidChange(bool animationIsSuspended
 {
 #if ENABLE(THREADED_ANIMATIONS)
     if (threadedAnimationsEnabled()) {
-        updateAssociatedThreadedEffectStack();
+        scheduleAssociatedAcceleratedEffectStackUpdate();
         return;
     }
 #endif
@@ -2915,7 +2914,7 @@ void KeyframeEffect::abilityToBeAcceleratedDidChange()
 {
 #if ENABLE(THREADED_ANIMATIONS)
     if (threadedAnimationsEnabled()) {
-        updateAssociatedThreadedEffectStack();
+        scheduleAssociatedAcceleratedEffectStackUpdate();
         return;
     }
 #endif
@@ -3010,7 +3009,7 @@ void KeyframeEffect::lastStyleChangeEventStyleDidChange(const RenderStyle* previ
             return;
 
         if ((previousStyle && !currentStyle) || (!previousStyle && currentStyle)) {
-            updateAssociatedThreadedEffectStack();
+            scheduleAssociatedAcceleratedEffectStackUpdate();
             return;
         }
 
@@ -3020,7 +3019,7 @@ void KeyframeEffect::lastStyleChangeEventStyleDidChange(const RenderStyle* previ
         ASSERT(previousStyle && currentStyle);
         for (auto property : CSSProperty::allAcceleratedAnimationProperties(settings)) {
             if (acceleratedPropertyDidChange(property, *previousStyle, *currentStyle, settings)) {
-                updateAssociatedThreadedEffectStack();
+                scheduleAssociatedAcceleratedEffectStackUpdate();
                 return;
             }
         }
@@ -3066,8 +3065,8 @@ KeyframeEffect::StackMembershipMutationScope::~StackMembershipMutationScope()
     RefPtr effect = m_effect;
     if (effect->isRunningAccelerated()) {
         if (originalTargetStyleable != effect->targetStyleable())
-            effect->updateAssociatedThreadedEffectStack(originalTargetStyleable);
-        effect->updateAssociatedThreadedEffectStack();
+            effect->scheduleAssociatedAcceleratedEffectStackUpdate(originalTargetStyleable);
+        effect->scheduleAssociatedAcceleratedEffectStackUpdate();
     }
 }
 
@@ -3080,7 +3079,7 @@ bool KeyframeEffect::threadedAnimationsEnabled() const
     return false;
 }
 
-void KeyframeEffect::updateAssociatedThreadedEffectStack(const std::optional<const Styleable>& previousTarget)
+void KeyframeEffect::scheduleAssociatedAcceleratedEffectStackUpdate(const std::optional<const Styleable>& previousTarget)
 {
     if (!threadedAnimationsEnabled())
         return;
@@ -3089,15 +3088,12 @@ void KeyframeEffect::updateAssociatedThreadedEffectStack(const std::optional<con
     if (!document()->page())
         return;
 
-    ASSERT(document()->timelinesController());
-    auto& acceleratedEffectStackUpdater = CheckedPtr { document()->timelinesController() }->acceleratedEffectStackUpdater();
+    CheckedPtr timelinesController = document()->timelinesController();
+    ASSERT(timelinesController);
     if (previousTarget)
-        acceleratedEffectStackUpdater.updateEffectStackForTarget(*previousTarget);
+        timelinesController->scheduleAcceleratedEffectStackUpdateForTarget(*previousTarget);
     if (auto currentTarget = targetStyleable())
-        acceleratedEffectStackUpdater.updateEffectStackForTarget(*currentTarget);
-
-    if (RefPtr animation = this->animation())
-        animation->acceleratedStateDidChange();
+        timelinesController->scheduleAcceleratedEffectStackUpdateForTarget(*currentTarget);
 }
 #endif
 

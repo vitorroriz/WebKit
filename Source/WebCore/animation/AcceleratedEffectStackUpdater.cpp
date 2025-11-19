@@ -37,8 +37,11 @@
 
 namespace WebCore {
 
-void AcceleratedEffectStackUpdater::updateEffectStacks()
+void AcceleratedEffectStackUpdater::update()
 {
+    if (!hasTargetsPendingUpdate())
+        return;
+
     m_timelines.clear();
 
     auto targetsPendingUpdate = std::exchange(m_targetsPendingUpdate, { });
@@ -58,7 +61,7 @@ void AcceleratedEffectStackUpdater::updateEffectStacks()
     }
 }
 
-void AcceleratedEffectStackUpdater::updateEffectStackForTarget(const Styleable& target)
+void AcceleratedEffectStackUpdater::scheduleUpdateForTarget(const Styleable& target)
 {
     m_targetsPendingUpdate.add({ &target.element, target.pseudoElementIdentifier });
 }

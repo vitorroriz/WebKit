@@ -250,8 +250,15 @@ void AnimationTimelinesController::updateAnimationsAndSendEvents(ReducedResoluti
     }
 }
 
-void AnimationTimelinesController::updateStaleScrollTimelines()
+void AnimationTimelinesController::runPostRenderingUpdateTasks()
 {
+#if ENABLE(THREADED_ANIMATIONS)
+    if (m_acceleratedEffectStackUpdater) {
+        for (Ref timeline : m_timelines)
+            timeline->clearAcceleratedRepresentation();
+        m_acceleratedEffectStackUpdater->update();
+    }
+#endif
     // https://drafts.csswg.org/scroll-animations-1/#event-loop
     auto scrollTimelines = std::exchange(m_updatedScrollTimelines, { });
     for (auto scrollTimeline : scrollTimelines)
@@ -375,20 +382,14 @@ bool AnimationTimelinesController::isPendingTimelineAttachment(const WebAnimatio
 }
 
 #if ENABLE(THREADED_ANIMATIONS)
-AcceleratedEffectStackUpdater& AnimationTimelinesController::acceleratedEffectStackUpdater()
+void AnimationTimelinesController::scheduleAcceleratedEffectStackUpdateForTarget(const Styleable& target)
 {
     if (!m_acceleratedEffectStackUpdater)
         m_acceleratedEffectStackUpdater = makeUnique<AcceleratedEffectStackUpdater>();
-    return *m_acceleratedEffectStackUpdater;
-}
+    m_acceleratedEffectStackUpdater->scheduleUpdateForTarget(target);
 
-void AnimationTimelinesController::updateAcceleratedEffectStacks()
-{
-    if (!m_acceleratedEffectStackUpdater)
-        return;
-    for (Ref timeline : m_timelines)
-        timeline->clearAcceleratedRepresentation();
-    m_acceleratedEffectStackUpdater->updateEffectStacks();
+    if (RefPtr documentTimeline = m_document->existingTimeline())
+        documentTimeline->scheduleAcceleratedEffectStackUpdate();
 }
 #endif
 

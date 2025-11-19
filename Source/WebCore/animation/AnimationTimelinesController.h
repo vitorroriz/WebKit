@@ -43,6 +43,8 @@ class ScrollTimeline;
 class WeakPtrImplWithEventTargetData;
 class WebAnimation;
 
+struct Styleable;
+
 #if ENABLE(THREADED_ANIMATIONS)
 class AcceleratedEffectStackUpdater;
 #endif
@@ -59,7 +61,7 @@ public:
     void removeTimeline(AnimationTimeline&);
     void detachFromDocument();
     void updateAnimationsAndSendEvents(ReducedResolutionSeconds);
-    void updateStaleScrollTimelines();
+    void runPostRenderingUpdateTasks();
     void addPendingAnimation(WebAnimation&);
 
     std::optional<Seconds> currentTime(UseCachedCurrentTime = UseCachedCurrentTime::Yes);
@@ -71,9 +73,8 @@ public:
     bool animationsAreSuspended() const { return m_isSuspended; }
 
 #if ENABLE(THREADED_ANIMATIONS)
-    AcceleratedEffectStackUpdater& acceleratedEffectStackUpdater();
     AcceleratedEffectStackUpdater* existingAcceleratedEffectStackUpdater() const { return m_acceleratedEffectStackUpdater.get(); }
-    void updateAcceleratedEffectStacks();
+    void scheduleAcceleratedEffectStackUpdateForTarget(const Styleable&);
 #endif
 
 private:
