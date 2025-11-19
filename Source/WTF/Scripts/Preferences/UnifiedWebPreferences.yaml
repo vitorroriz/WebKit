@@ -6406,17 +6406,17 @@ RTCEncodedStreamsQuirkEnabled:
 
 ReadableByteStreamAPIEnabled:
   type: bool
-  status: testable
+  status: stable
   category: dom
   humanReadableName: "ReadableByteStream"
   humanReadableDescription: "Enable Readable Byte Streams"
   defaultValue:
     WebCore:
-      default: false
+      default: true
     WebKitLegacy:
-      default: false
+      default: true
     WebKit:
-      default: false
+      default: true
 
 ReadableByteStreamFetchSourceEnabled:
   type: bool
