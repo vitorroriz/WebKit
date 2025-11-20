@@ -59,8 +59,6 @@ public:
     template<typename T> static void serializeNumber(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, T);
     template<typename T> static void serializeNumberAsPixels(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, T);
 
-    template<CSSValueID> static void serializeCustomIdentAtomOrKeyword(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const AtomString&);
-
     // MARK: Transform serializations
 
     static void serializeTransformationMatrix(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const TransformationMatrix&);
@@ -142,16 +140,6 @@ template<typename T> void ExtractorSerializer::serializeNumber(ExtractorState& s
 template<typename T> void ExtractorSerializer::serializeNumberAsPixels(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, T number)
 {
     CSS::serializationForCSS(builder, context, CSS::LengthRaw<> { CSS::LengthUnit::Px, adjustFloatForAbsoluteZoom(number, state.style) });
-}
-
-template<CSSValueID keyword> void ExtractorSerializer::serializeCustomIdentAtomOrKeyword(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const AtomString& string)
-{
-    if (string.isNull()) {
-        serializationForCSS(builder, context, state.style, Constant<keyword> { });
-        return;
-    }
-
-    serializationForCSS(builder, context, state.style, CustomIdentifier { string });
 }
 
 // MARK: - Transform serializations

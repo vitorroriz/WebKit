@@ -124,8 +124,6 @@ public:
 
     template<typename T> static Ref<CSSPrimitiveValue> convertNumberAsPixels(ExtractorState&, T);
 
-    template<CSSValueID> static Ref<CSSPrimitiveValue> convertCustomIdentAtomOrKeyword(ExtractorState&, const AtomString&);
-
     // MARK: Transform conversions
 
     static Ref<CSSValue> convertTransformationMatrix(ExtractorState&, const TransformationMatrix&);
@@ -202,13 +200,6 @@ inline Ref<CSSPrimitiveValue> ExtractorConverter::convert(ExtractorState&, const
 template<typename T> Ref<CSSPrimitiveValue> ExtractorConverter::convertNumberAsPixels(ExtractorState& state, T number)
 {
     return CSSPrimitiveValue::create(adjustFloatForAbsoluteZoom(number, state.style), CSSUnitType::CSS_PX);
-}
-
-template<CSSValueID keyword> Ref<CSSPrimitiveValue> ExtractorConverter::convertCustomIdentAtomOrKeyword(ExtractorState&, const AtomString& string)
-{
-    if (string.isNull())
-        return CSSPrimitiveValue::create(keyword);
-    return CSSPrimitiveValue::createCustomIdent(string);
 }
 
 // MARK: - Transform conversions

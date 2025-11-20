@@ -58,6 +58,7 @@
 #include "StyleTextDecorationLine.h"
 #include "StyleTextTransform.h"
 #include "StyleTreeResolver.h"
+#include "StyleWebKitLocale.h"
 #include "TransformOperationData.h"
 #include <algorithm>
 #include <wtf/MathExtras.h>
@@ -2673,10 +2674,10 @@ void RenderStyle::setFontVariantPosition(FontVariantPosition value)
     setFontDescription(WTFMove(description));
 }
 
-void RenderStyle::setLocale(AtomString&& value)
+void RenderStyle::setLocale(Style::WebkitLocale&& value)
 {
     auto description = fontDescription();
-    description.setSpecifiedLocale(WTFMove(value));
+    description.setSpecifiedLocale(value.takePlatform());
     setFontDescription(WTFMove(description));
 }
 

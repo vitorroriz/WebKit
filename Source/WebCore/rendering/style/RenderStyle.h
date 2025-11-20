@@ -380,6 +380,7 @@ struct WebkitInitialLetter;
 struct WebkitLineBoxContain;
 struct WebkitLineClamp;
 struct WebkitLineGrid;
+struct WebkitLocale;
 struct WebkitMarqueeIncrement;
 struct WebkitMarqueeRepetition;
 struct WebkitMarqueeSpeed;
@@ -753,8 +754,8 @@ public:
     inline Style::FontVariantLigatures fontVariantLigatures() const;
     inline Style::FontVariantNumeric fontVariantNumeric() const;
     inline FontVariantPosition fontVariantPosition() const;
-    inline const AtomString& locale() const;
-    inline const AtomString& computedLocale() const;
+    inline Style::WebkitLocale locale() const;
+    inline Style::WebkitLocale computedLocale() const;
     inline TextRenderingMode textRendering() const;
 
     inline const Style::TextIndent& textIndent() const;
@@ -1396,7 +1397,7 @@ public:
     void setFontVariantLigatures(Style::FontVariantLigatures);
     void setFontVariantNumeric(Style::FontVariantNumeric);
     void setFontVariantPosition(FontVariantPosition);
-    void setLocale(AtomString&&);
+    void setLocale(Style::WebkitLocale&&);
     void setTextRendering(TextRenderingMode);
 
     void setColor(Color&&);
@@ -2016,7 +2017,7 @@ public:
     static constexpr Style::FontVariantLigatures initialFontVariantLigatures();
     static constexpr Style::FontVariantNumeric initialFontVariantNumeric();
     static constexpr FontVariantPosition initialFontVariantPosition();
-    static inline AtomString initialLocale();
+    static inline Style::WebkitLocale initialLocale();
     static constexpr Style::TextAutospace initialTextAutospace();
     static constexpr TextRenderingMode initialTextRendering();
     static constexpr Style::TextSpacingTrim initialTextSpacingTrim();

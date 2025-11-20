@@ -73,6 +73,7 @@
 #include <WebCore/StyleTextTransform.h>
 #include <WebCore/StyleTransformData.h>
 #include <WebCore/StyleVisitedLinkColorData.h>
+#include <WebCore/StyleWebKitLocale.h>
 #include <WebCore/UnicodeBidi.h>
 #include <WebCore/ViewTimeline.h>
 #include <WebCore/WebAnimationTypes.h>
@@ -194,7 +195,7 @@ inline Style::LineWidth RenderStyle::columnRuleWidth() const { return m_nonInher
 inline ColumnSpan RenderStyle::columnSpan() const { return static_cast<ColumnSpan>(m_nonInheritedData->miscData->multiCol->columnSpan); }
 inline Style::ColumnWidth RenderStyle::columnWidth() const { return m_nonInheritedData->miscData->multiCol->width; }
 inline const Style::LetterSpacing& RenderStyle::computedLetterSpacing() const { return m_inheritedData->fontData->letterSpacing; }
-inline const AtomString& RenderStyle::computedLocale() const { return fontDescription().computedLocale(); }
+inline Style::WebkitLocale RenderStyle::computedLocale() const { return fontDescription().computedLocale(); }
 inline const Style::WordSpacing& RenderStyle::computedWordSpacing() const { return m_inheritedData->fontData->wordSpacing; }
 inline Style::Contain RenderStyle::contain() const { return Style::Contain::fromRaw(m_nonInheritedData->rareData->contain); }
 inline const Style::ContainIntrinsicSize& RenderStyle::containIntrinsicLogicalHeight() const { return writingMode().isHorizontal() ? containIntrinsicHeight() : containIntrinsicWidth(); }
@@ -247,7 +248,7 @@ inline FontVariantEmoji RenderStyle::fontVariantEmoji() const { return fontDescr
 inline Style::FontVariantLigatures RenderStyle::fontVariantLigatures() const { return fontDescription().variantLigatures(); }
 inline Style::FontVariantNumeric RenderStyle::fontVariantNumeric() const { return fontDescription().variantNumeric(); }
 inline FontVariantPosition RenderStyle::fontVariantPosition() const { return fontDescription().variantPosition(); }
-inline const AtomString& RenderStyle::locale() const { return fontDescription().specifiedLocale(); }
+inline Style::WebkitLocale RenderStyle::locale() const { return fontDescription().specifiedLocale(); }
 inline TextRenderingMode RenderStyle::textRendering() const { return fontDescription().textRenderingMode(); }
 inline const Style::GapGutter& RenderStyle::gap(Style::GridTrackSizingDirection direction) const { return direction == Style::GridTrackSizingDirection::Columns ? columnGap() : rowGap(); }
 inline const Style::GridTrackSizes& RenderStyle::gridAutoColumns() const { return m_nonInheritedData->rareData->grid->m_gridAutoColumns; }
@@ -438,7 +439,7 @@ constexpr FontVariantEmoji RenderStyle::initialFontVariantEmoji() { return FontV
 constexpr Style::FontVariantLigatures RenderStyle::initialFontVariantLigatures() { return CSS::Keyword::Normal { }; }
 constexpr Style::FontVariantNumeric RenderStyle::initialFontVariantNumeric() { return CSS::Keyword::Normal { }; }
 constexpr FontVariantPosition RenderStyle::initialFontVariantPosition() { return FontVariantPosition::Normal; }
-inline AtomString RenderStyle::initialLocale() { return nullAtom(); }
+inline Style::WebkitLocale RenderStyle::initialLocale() { return CSS::Keyword::Auto { }; }
 constexpr Style::TextAutospace RenderStyle::initialTextAutospace() { return CSS::Keyword::NoAutospace { }; }
 constexpr TextRenderingMode RenderStyle::initialTextRendering() { return TextRenderingMode::AutoTextRendering; }
 constexpr Style::TextSpacingTrim RenderStyle::initialTextSpacingTrim() { return CSS::Keyword::SpaceAll { }; }

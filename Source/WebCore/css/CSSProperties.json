@@ -1273,8 +1273,7 @@
                 "auto"
             ],
             "codegen-properties": {
-                "style-converter": "CustomIdentAtomOrKeyword<CSSValueAuto>",
-                "style-converter-comment": "FIXME: This should probably be using StringAtomOrKeyword<CSSValueAuto>",
+                "style-converter": "StyleType<WebkitLocale>",
                 "font-description-name-for-methods": "SpecifiedLocale",
                 "font-property": true,
                 "high-priority": true,
