@@ -295,15 +295,10 @@ void ProvisionalPageProxy::initializeWebPage(RefPtr<API::WebsitePolicies>&& webs
             mainFrame->frameTreeCreationParameters(),
             websitePolicies ? std::optional(websitePolicies->dataForProcess(process)) : std::nullopt
         };
-        creationParameters.provisionalFrameCreationParameters = ProvisionalFrameCreationParameters {
-            m_mainFrame->frameID(),
+        creationParameters.provisionalFrameCreationParameters = mainFrame->provisionalFrameCreationParameters(
             page->mainFrame() && !m_isProcessSwappingForNewWindow ? std::optional(page->mainFrame()->frameID()) : std::nullopt,
-            std::nullopt,
-            mainFrame->effectiveSandboxFlags(),
-            mainFrame->effectiveReferrerPolicy(),
-            mainFrame->scrollingMode(),
-            mainFrame->remoteFrameSize()
-        };
+            CommitTiming::WaitForLoad
+        );
     }
     process->send(Messages::WebProcess::CreateWebPage(m_webPageID, WTFMove(creationParameters)), 0);
     if (!preferences->siteIsolationEnabled())

@@ -9045,3 +9045,5 @@ struct WebCore::FocusOptions {
     bool preventScroll;
     std::optional<bool> focusVisible;
 };
+
+enum class WebKit::CommitTiming : bool;

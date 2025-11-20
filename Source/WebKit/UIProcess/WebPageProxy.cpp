@@ -5447,7 +5447,10 @@ void WebPageProxy::continueNavigationInNewProcess(API::Navigation& navigation, W
         if (navigation.isInitialFrameSrcLoad())
             frame.setIsPendingInitialHistoryItem(true);
 
-        frame.prepareForProvisionalLoadInProcess(newProcess, navigation, browsingContextGroup, [
+        // about:blank frames should be in the same process as the frame which originated navigation
+        std::optional<SecurityOriginData> originator = navigation.currentRequest().url().isAboutBlank() && navigation.originatingFrameInfo() ? std::make_optional(navigation.originatingFrameInfo()->securityOrigin) : std::nullopt;
+
+        frame.prepareForProvisionalLoadInProcess(newProcess, navigation, browsingContextGroup, originator, [
             loadParameters = WTFMove(loadParameters),
             newProcess = newProcess.copyRef(),
             preventProcessShutdownScope = newProcess->shutdownPreventingScope()
