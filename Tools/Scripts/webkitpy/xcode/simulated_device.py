@@ -363,10 +363,14 @@ class SimulatedDeviceManager(object):
     @staticmethod
     def _wait_until_device_is_usable(device, deadline):
         _log.debug(u'Waiting until {} is usable'.format(device))
-        while not device.platform_device.is_usable(force_update=True):
+        state = device.platform_device.is_usable(force_update=True)
+        while not state:
+            if state is None:
+                raise RuntimeError(u'{} will never become healthy'.format(device))
             if time.time() > deadline:
                 raise RuntimeError(u'Timed out while waiting for {} to become usable'.format(device))
             time.sleep(1)
+            state = device.platform_device.is_usable(force_update=True)
 
     @staticmethod
     def _boot_device(device, host=None):
@@ -636,9 +640,18 @@ class SimulatedDevice(object):
             with Timeout(seconds=30, patch=False):
                 exit_code = self.executive.run_command([SimulatedDeviceManager.xcrun, 'simctl', 'launch', self.udid, service], return_exit_code=True)
         except Timeout.Exception:
-            _log.error("Exceeded timeout whileattempting to launch usability test")
+            _log.error("Exceeded timeout while attempting to launch usability test")
+            return False
+
         time.sleep(.7)
-        exit_code |= self.executive.run_command([SimulatedDeviceManager.xcrun, 'simctl', 'terminate', self.udid, service], return_exit_code=True)
+
+        try:
+            with Timeout(seconds=30, patch=False):
+                exit_code |= self.executive.run_command([SimulatedDeviceManager.xcrun, 'simctl', 'terminate', self.udid, service], return_exit_code=True)
+        except Timeout.Exception:
+            _log.error("Exceeded timeout while running simctl terminate, this simulator will never become healthy")
+            return None
+
         if exit_code == 0:
             return True
         return False
