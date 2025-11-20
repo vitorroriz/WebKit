@@ -2257,7 +2257,7 @@ public:
         case GetByValMegamorphic:
         case PutByValDirect:
         case PutByVal:
-        case PutByValAlias:
+        case PutByValDirectResolved:
         case PutByValMegamorphic:
         case AtomicsAdd:
         case AtomicsAnd:
@@ -2295,7 +2295,7 @@ public:
         case EnumeratorPutByVal:
         case PutByValDirect:
         case PutByVal:
-        case PutByValAlias:
+        case PutByValDirectResolved:
         case PutByValMegamorphic:
             return 3;
         case AtomicsAdd:
@@ -2651,7 +2651,7 @@ public:
         case InByValMegamorphic:
         case PutByValDirect:
         case PutByVal:
-        case PutByValAlias:
+        case PutByValDirectResolved:
         case PutByValMegamorphic:
         case EnumeratorPutByVal:
         case GetByVal:
@@ -2753,7 +2753,7 @@ public:
         case PutByIdMegamorphic:
         case PutByIdWithThis:
         case PutByVal:
-        case PutByValAlias:
+        case PutByValDirectResolved:
         case PutByValMegamorphic:
         case PutByValDirect:
         case PutByValWithThis:
@@ -2782,7 +2782,7 @@ public:
         case PutByIdMegamorphic:
         case PutByIdWithThis:
         case PutByVal:
-        case PutByValAlias:
+        case PutByValDirectResolved:
         case PutByValMegamorphic:
         case PutByValDirect:
         case EnumeratorPutByVal:

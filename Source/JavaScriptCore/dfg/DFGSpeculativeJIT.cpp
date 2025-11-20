@@ -2424,7 +2424,7 @@ void SpeculativeJIT::compileContiguousPutByVal(Node* node)
     GPRReg storageReg = storage.gpr();
 
     ArrayMode arrayMode = node->arrayMode();
-    if (node->op() == PutByValAlias) {
+    if (node->op() == PutByValDirectResolved) {
         ASSERT(arrayMode.isInBounds());
 #if ASSERT_ENABLED
         Jump inBounds = branch32(Below, propertyReg, Address(storageReg, Butterfly::offsetOfPublicLength()));
@@ -2502,7 +2502,7 @@ void SpeculativeJIT::compileDoublePutByVal(Node* node)
     StorageOperand storage(this, m_graph.varArgChild(node, 3));
     GPRReg storageReg = storage.gpr();
 
-    if (node->op() == PutByValAlias) {
+    if (node->op() == PutByValDirectResolved) {
         ASSERT(arrayMode.isInBounds());
 #if ASSERT_ENABLED
         Jump inBounds = branch32(Below, propertyReg, Address(storageReg, Butterfly::offsetOfPublicLength()));
@@ -3288,8 +3288,13 @@ static void compileClampDoubleToByte(JITCompiler& jit, GPRReg result, FPRReg sou
 JITCompiler::Jump SpeculativeJIT::jumpForTypedArrayOutOfBounds(Node* node, GPRReg baseGPR, GPRReg indexGPR, GPRReg scratchGPR, GPRReg scratch2GPR)
 {
     Edge& edge = m_graph.child(node, 0);
-    if (node->op() == PutByValAlias && m_graph.isNeverResizableOrGrowableSharedTypedArrayIncludingDataView(m_state.forNode(edge))) {
+    if (node->op() == PutByValDirectResolved && m_graph.isNeverResizableOrGrowableSharedTypedArrayIncludingDataView(m_state.forNode(edge))) {
         ASSERT(node->arrayMode().isInBounds());
+        // FIXME: This should work even when the TypedArray is resizable because either:
+        // 1) The TypedArray grows so the previous index is still valid.
+        // 2) The TypedArray shrinks thus is not a SharedArrayBuffer and local CSE wouldn't
+        //    have emitted an Aliased store because shrinking would `write(World)`.
+        // That said, we would need to clean up our clobberize/LocalCSE rules to remove these guards.
         ASSERT(!node->arrayMode().mayBeResizableOrGrowableSharedTypedArray());
 #if ASSERT_ENABLED
 #if USE(LARGE_TYPED_ARRAYS)

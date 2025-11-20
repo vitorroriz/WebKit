@@ -1366,7 +1366,7 @@ private:
 
         case PutByVal:
         case PutByValDirect:
-        case PutByValAlias:
+        case PutByValDirectResolved:
         case PutByValMegamorphic: {
             Edge& baseEdge = m_graph.child(m_node, 0);
             Edge& keyEdge = m_graph.child(m_node, 1);
@@ -1383,7 +1383,7 @@ private:
             case Array::Float16Array:
             case Array::Float32Array:
             case Array::Float64Array: {
-                if (m_node->op() == PutByVal || m_node->op() == PutByValDirect || m_node->op() == PutByValAlias) {
+                if (m_node->op() == PutByVal || m_node->op() == PutByValDirect || m_node->op() == PutByValDirectResolved) {
                     Edge& valueEdge = m_graph.child(m_node, 2);
                     if (valueEdge.useKind() == DoubleRepUse) {
                         if (foldPurifyNaN(valueEdge))
@@ -1396,7 +1396,7 @@ private:
             case Array::Uint8Array:
             case Array::Uint16Array:
             case Array::Uint32Array: {
-                if (m_node->op() == PutByVal || m_node->op() == PutByValDirect || m_node->op() == PutByValAlias) {
+                if (m_node->op() == PutByVal || m_node->op() == PutByValDirect || m_node->op() == PutByValDirectResolved) {
                     Edge& valueEdge = m_graph.child(m_node, 2);
                     if (valueEdge.useKind() == Int32Use) {
                         if (valueEdge->op() == UInt32ToNumber && valueEdge->child1().useKind() == Int32Use) {

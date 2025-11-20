@@ -1123,7 +1123,7 @@ private:
             compileGetByValWithThisMegamorphic();
             break;
         case PutByVal:
-        case PutByValAlias:
+        case PutByValDirectResolved:
         case PutByValDirect:
             compilePutByVal();
             break;
@@ -7267,7 +7267,7 @@ IGNORE_CLANG_WARNINGS_END
                 IndexedAbstractHeap& heap = arrayMode.type() == Array::Int32 ? m_heaps.indexedInt32Properties : m_heaps.indexedContiguousProperties;
                 TypedPointer elementPointer = baseIndexWithProvenValue(heap, storage, index, child2);
 
-                if (m_node->op() == PutByValAlias) {
+                if (m_node->op() == PutByValDirectResolved) {
                     m_out.store64(value, elementPointer);
                     break;
                 }
@@ -7291,7 +7291,7 @@ IGNORE_CLANG_WARNINGS_END
 
                 TypedPointer elementPointer = baseIndexWithProvenValue(m_heaps.indexedDoubleProperties, storage, index, child2);
 
-                if (m_node->op() == PutByValAlias) {
+                if (m_node->op() == PutByValDirectResolved) {
                     m_out.storeDouble(value, elementPointer);
                     break;
                 }
@@ -7321,7 +7321,7 @@ IGNORE_CLANG_WARNINGS_END
 
             TypedPointer elementPointer = baseIndexWithProvenValue(m_heaps.ArrayStorage_vector, storage, index, child2);
 
-            if (m_node->op() == PutByValAlias) {
+            if (m_node->op() == PutByValDirectResolved) {
                 m_out.store64(value, elementPointer);
                 return;
             }
@@ -7453,7 +7453,7 @@ IGNORE_CLANG_WARNINGS_END
                     }
                 };
 
-                if (arrayMode.isInBounds() || m_node->op() == PutByValAlias)
+                if (arrayMode.isInBounds() || m_node->op() == PutByValDirectResolved)
                     storeValue(value, pointer);
                 else {
                     LValue isOutOfBoundsCondition;

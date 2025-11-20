@@ -165,6 +165,19 @@ ExitMode mayExitImpl(Graph& graph, Node* node, StateType& state)
         break;
     }
 
+    case PutByValDirectResolved: {
+        // PutByValDirectResolved is only used when we know the slot we're storing to exists
+        // i.e. it would be a direct store and is within the PublicLength. Thus,
+        // it can only exit if and edge speculation fails.
+
+        // FIXME: Support making this non-exiting for TypedArrays, which is mostly
+        // blocked on cleaning up our clobberize/CSE rules for
+        // Resizeable/GrowableSharedArrayBuffers when a put aliases some other access.
+        if (node->arrayMode().isSomeTypedArrayView())
+            return Exits;
+        break;
+    }
+
     case EnumeratorNextUpdatePropertyName:
     case StrCat:
     case Call:
