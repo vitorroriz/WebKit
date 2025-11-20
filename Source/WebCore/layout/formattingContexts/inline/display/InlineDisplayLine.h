@@ -44,6 +44,9 @@ public:
     };
     Line(bool hasInflowContent, const FloatRect& lineBoxLogicalRect, const FloatRect& lineBoxRect, const FloatRect& contentOverflow, EnclosingTopAndBottom, float alignmentBaseline, FontBaseline baselineType, float contentLogicalLeft, float contentLogicalLeftIgnoringInlineDirection, float contentLogicalWidth, bool isLeftToRightDirection, bool isHorizontal, bool isTruncatedInBlockDirection);
 
+    // FIXME: We should consider having 2 APIs here where (webkit.org/b/302804)
+    // "hasInflowContent" returns true for all inflow content including non-contentful inflow content e.g. <span></span>
+    // "isContentful" returns true only if the inflow content is considered contentful.
     bool hasInflowContent() const { return m_hasInflowContent; }
 
     float left() const { return m_lineBoxRect.x(); }

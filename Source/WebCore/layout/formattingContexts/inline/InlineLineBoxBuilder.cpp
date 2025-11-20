@@ -68,7 +68,8 @@ LineBox LineBoxBuilder::build(size_t lineIndex)
         auto blockLineLogicalTopLeft = InlineLayoutPoint { lineLayoutResult.lineGeometry.initialLogicalLeft, lineLayoutResult.lineGeometry.logicalTopLeft.y() };
         lineBox.setLogicalRect({ blockLineLogicalTopLeft, lineLayoutResult.lineGeometry.logicalWidth, marginBoxHeight });
         setVerticalPropertiesForInlineLevelBox(lineBox, lineBox.rootInlineBox());
-        lineBox.setHasContent(!!marginBoxHeight);
+        // FIXME: Let's considered collapsed block boxes contentful for now (webkit.org/b/302804).
+        lineBox.setHasContent(true);
     } else {
         constructInlineLevelBoxes(lineBox);
         if (lineBox.hasContent()) {
