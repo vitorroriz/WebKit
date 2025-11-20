@@ -227,7 +227,7 @@ public:
 
     GstVideoFrame* get();
 
-    uint8_t* componentData(int) const;
+    std::span<uint8_t> componentData(int) const;
     int componentStride(int) const;
     int componentWidth(int) const;
 
@@ -237,7 +237,7 @@ public:
     int height() const;
 
     int format() const;
-    void* planeData(uint32_t) const;
+    std::span<uint8_t> planeData(uint32_t) const;
     int planeStride(uint32_t) const;
 
     bool isValid() const { return m_frame.buffer; }

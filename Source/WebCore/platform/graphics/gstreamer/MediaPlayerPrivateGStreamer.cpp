@@ -133,8 +133,6 @@ GST_DEBUG_CATEGORY(webkit_media_player_debug);
 
 namespace WebCore {
 
-IGNORE_CLANG_WARNINGS_BEGIN("unsafe-buffer-usage-in-libc-call")
-
 WTF_MAKE_TZONE_ALLOCATED_IMPL(MediaPlayerPrivateGStreamer);
 
 static const FloatSize s_holePunchDefaultFrameSize(1280, 720);
@@ -1186,21 +1184,21 @@ void MediaPlayerPrivateGStreamer::notifyPlayerOfTrack()
     using TrackType = TrackPrivateBaseGStreamer::TrackType;
     Variant<TrackIDHashMap<Ref<AudioTrackPrivateGStreamer>>*, TrackIDHashMap<Ref<VideoTrackPrivateGStreamer>>*, TrackIDHashMap<Ref<InbandTextTrackPrivateGStreamer>>*> variantTracks = static_cast<TrackIDHashMap<Ref<TrackPrivateType>>*>(0);
     auto type(static_cast<TrackType>(variantTracks.index()));
-    const char* typeName;
+    ASCIILiteral typeName;
     bool* hasType;
     switch (type) {
     case TrackType::Audio:
-        typeName = "audio";
+        typeName = "audio"_s;
         hasType = &m_hasAudio;
         variantTracks = &m_audioTracks;
         break;
     case TrackType::Video:
-        typeName = "video";
+        typeName = "video"_s;
         hasType = &m_hasVideo;
         variantTracks = &m_videoTracks;
         break;
     case TrackType::Text:
-        typeName = "text";
+        typeName = "text"_s;
         hasType = nullptr;
         variantTracks = &m_textTracks;
         break;
@@ -1214,11 +1212,10 @@ void MediaPlayerPrivateGStreamer::notifyPlayerOfTrack()
         return;
 
     unsigned numberOfTracks = 0;
-    StringPrintStream numberOfTracksProperty;
-    numberOfTracksProperty.printf("n-%s", typeName);
-    g_object_get(m_pipeline.get(), numberOfTracksProperty.toCString().data(), &numberOfTracks, nullptr);
+    auto numberOfTracksProperty = makeString("n-"_s, typeName);
+    g_object_get(m_pipeline.get(), numberOfTracksProperty.ascii().data(), &numberOfTracks, nullptr);
 
-    GST_INFO_OBJECT(pipeline(), "Media has %d %s tracks", numberOfTracks, typeName);
+    GST_INFO_OBJECT(pipeline(), "Media has %d %s tracks", numberOfTracks, typeName.characters());
 
     if (hasType) {
         bool oldHasType = *hasType;
@@ -1231,13 +1228,12 @@ void MediaPlayerPrivateGStreamer::notifyPlayerOfTrack()
     }
 
     Vector<TrackID> validStreams;
-    StringPrintStream getPadProperty;
-    getPadProperty.printf("get-%s-pad", typeName);
+    auto getPadProperty = makeString("get-"_s, typeName, "-pad"_s);
 
     bool changed = false;
     for (unsigned i = 0; i < numberOfTracks; ++i) {
         GRefPtr<GstPad> pad;
-        g_signal_emit_by_name(m_pipeline.get(), getPadProperty.toCString().data(), i, &pad.outPtr(), nullptr);
+        g_signal_emit_by_name(m_pipeline.get(), getPadProperty.ascii().data(), i, &pad.outPtr(), nullptr);
         ASSERT(pad);
         if (!pad)
             continue;
@@ -2191,8 +2187,8 @@ void MediaPlayerPrivateGStreamer::handleMessage(GstMessage* message)
                 // the videoSink based on its metadata.
                 GstElement* element = GST_ELEMENT(GST_MESSAGE_SRC(message));
                 if (GST_OBJECT_FLAG_IS_SET(element, GST_ELEMENT_FLAG_SINK)) {
-                    const gchar* klassStr = gst_element_get_metadata(element, "klass");
-                    if (strstr(klassStr, "Sink") && strstr(klassStr, "Video")) {
+                    auto klassStr = CStringView::unsafeFromUTF8(gst_element_get_metadata(element, "klass"));
+                    if (contains(klassStr.span(), "Sink"_s)  && contains(klassStr.span(), "Video"_s)) {
                         m_videoSink = element;
 
                         // Ensure that there's a buffer with the transparent rectangle available when playback is going to start.
@@ -3997,8 +3993,8 @@ void MediaPlayerPrivateGStreamer::setVisibleInViewport(bool isVisible)
 
     // Some layout tests (webgl) expect playback of invisible videos to not be suspended, so allow
     // this using an environment variable, set from the webkitpy glib port sub-classes.
-    const char* allowPlaybackOfInvisibleVideos = g_getenv("WEBKIT_GST_ALLOW_PLAYBACK_OF_INVISIBLE_VIDEOS");
-    if (!isVisible && allowPlaybackOfInvisibleVideos && !strcmp(allowPlaybackOfInvisibleVideos, "1"))
+    auto allowPlaybackOfInvisibleVideos = CStringView::unsafeFromUTF8(g_getenv("WEBKIT_GST_ALLOW_PLAYBACK_OF_INVISIBLE_VIDEOS"));
+    if (!isVisible && allowPlaybackOfInvisibleVideos == "1"_s)
         return;
 
     if (!m_pipeline)
@@ -4149,8 +4145,8 @@ MediaPlayer::MovieLoadType MediaPlayerPrivateGStreamer::movieLoadType() const
 #if USE(GSTREAMER_GL)
 GstElement* MediaPlayerPrivateGStreamer::createVideoSinkGL()
 {
-    const char* disableGLSink = g_getenv("WEBKIT_GST_DISABLE_GL_SINK");
-    if (disableGLSink && !strcmp(disableGLSink, "1")) {
+    auto disableGLSink = CStringView::unsafeFromUTF8(g_getenv("WEBKIT_GST_DISABLE_GL_SINK"));
+    if (disableGLSink == "1"_s) {
         GST_INFO("Disabling hardware-accelerated rendering per user request.");
         return nullptr;
     }
@@ -4723,8 +4719,6 @@ MediaTelemetryReport::DrmType MediaPlayerPrivateGStreamer::getDrm() const
 #endif // ENABLE(MEDIA_TELEMETRY)
 
 #undef GST_CAT_DEFAULT
-
-IGNORE_CLANG_WARNINGS_END
 
 } // namespace WebCore
 
