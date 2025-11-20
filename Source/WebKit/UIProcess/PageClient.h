@@ -138,6 +138,7 @@ struct DataDetectorElementInfo;
 struct DictionaryPopupInfo;
 struct ElementContext;
 struct FixedContainerEdges;
+struct LiveRegionAnnouncementData;
 struct ResolvedCaptionDisplaySettingsOptions;
 struct TextIndicatorData;
 struct ShareDataWithParsedURL;
@@ -417,6 +418,7 @@ public:
 #if PLATFORM(IOS_FAMILY)
     virtual void relayAccessibilityNotification(String&&, RetainPtr<NSData>&&) = 0;
     virtual void relayAriaNotifyNotification(const WebCore::AriaNotifyData&) = 0;
+    virtual void relayLiveRegionNotification(const WebCore::LiveRegionAnnouncementData&) = 0;
 #endif
 #if PLATFORM(MAC)
     virtual WebCore::IntRect rootViewToWindow(const WebCore::IntRect&) = 0;

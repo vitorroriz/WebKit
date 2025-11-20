@@ -8964,6 +8964,13 @@ header: <WebCore/AXObjectCache.h>
 };
 
 header: <WebCore/AXObjectCache.h>
+[CustomHeader] enum class WebCore::LiveRegionStatus : uint8_t {
+    Off,
+    Polite,
+    Assertive
+};
+
+header: <WebCore/AXObjectCache.h>
 [CustomHeader] struct WebCore::AXDebugInfo {
     bool isAccessibilityEnabled;
     bool isAccessibilityThreadInitialized;
@@ -8979,6 +8986,12 @@ header: <WebCore/AXObjectCache.h>
     WebCore::NotifyPriority priority;
     WebCore::InterruptBehavior interrupt;
     String language;
+};
+
+header: <WebCore/AXObjectCache.h>
+[CustomHeader] struct WebCore::LiveRegionAnnouncementData {
+    String message;
+    WebCore::LiveRegionStatus status;
 };
 
 header: <WebCore/ScriptTrackingPrivacyCategory.h>

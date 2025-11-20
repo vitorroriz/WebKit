@@ -258,6 +258,7 @@ enum class AccessibilityOrientation : uint8_t {
 
 enum class DidTimeout : bool { No, Yes };
 enum class IncludeListMarkerText : bool { No, Yes };
+enum class IncludeImageAltText : bool { No, Yes };
 enum class TrimWhitespace : bool { No, Yes };
 
 struct TextUnderElementMode {

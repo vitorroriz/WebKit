@@ -163,6 +163,7 @@ struct DataDetectorElementInfo;
 struct DateTimeChooserParameters;
 struct FocusOptions;
 struct GraphicsDeviceAdapter;
+struct LiveRegionAnnouncementData;
 struct MockWebAuthenticationConfiguration;
 struct ResolvedCaptionDisplaySettingsOptions;
 struct ShareDataWithParsedURL;
@@ -289,6 +290,7 @@ public:
 #if PLATFORM(IOS_FAMILY)
     virtual void relayAccessibilityNotification(String&&, RetainPtr<NSData>&&) const = 0;
     virtual void relayAriaNotifyNotification(AriaNotifyData&&) const = 0;
+    virtual void relayLiveRegionNotification(LiveRegionAnnouncementData&&) const = 0;
 #endif
 
     virtual void mainFrameDidChange() { };

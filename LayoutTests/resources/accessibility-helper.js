@@ -452,3 +452,12 @@ function formatAriaNotifyUserInfo(userInfo) {
     result += `AXAnnouncementLanguageKey: ${userInfo["AXAnnouncementLanguageKey"]}\n\n`
     return result;
 }
+
+function formatAnnouncementUserInfo(userInfo) {
+    var result = "";
+    result += `AnnouncementKey: ${userInfo["AXAnnouncementKey"]}\n`;
+    result += `AXPriorityKey: ${userInfo["AXPriorityKey"]}\n`;
+    result += `AXAnnouncementIsLiveRegionKey: ${userInfo["AXAnnouncementIsLiveRegionKey"]}\n`;
+    return result;
+}
+

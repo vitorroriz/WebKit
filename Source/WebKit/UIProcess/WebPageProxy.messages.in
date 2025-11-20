@@ -56,6 +56,7 @@ messages -> WebPageProxy {
 #if PLATFORM(IOS_FAMILY)
     RelayAccessibilityNotification(String notificationName, std::span<const uint8_t> notificationData)
     RelayAriaNotifyNotification(struct WebCore::AriaNotifyData notificationData)
+    RelayLiveRegionNotification(struct WebCore::LiveRegionAnnouncementData notificationData)
 #endif
     EnableAccessibilityForAllProcesses()
 

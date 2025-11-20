@@ -4223,6 +4223,19 @@ IsAccessibilityIsolatedTreeEnabled:
     WebCore:
       default: false
 
+IsAriaLiveRegionManagementEnabled:
+  type: bool
+  status: internal
+  humanReadableName: "ARIA Live Regions in WebKit"
+  humanReadableDescription: "Turn on ARIA live-region management within WebKit"
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+
 # FIXME: The 'Is' prefix is inconsistent with most other preferences and should be removed.
 IsFirstPartyWebsiteDataRemovalDisabled:
   type: bool

@@ -540,6 +540,28 @@ void PageClientImpl::relayAriaNotifyNotification(const WebCore::AriaNotifyData& 
     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, attributedString.get());
 }
 
+
+static NSString * const UIAccessibilityPriorityLow = @"UIAccessibilityPriorityLow";
+static NSString * const UIAccessibilityPriorityDefault = @"UIAccessibilityPriorityDefault";
+static NSString * const UIAccessibilitySpeechAttributeAnnouncementPriority = @"UIAccessibilitySpeechAttributeAnnouncementPriority";
+static NSString * const UIAccessibilitySpeechAttributeIsLiveRegion = @"UIAccessibilitySpeechAttributeIsLiveRegion";
+
+void PageClientImpl::relayLiveRegionNotification(const WebCore::LiveRegionAnnouncementData& notificationData)
+{
+    RetainPtr message = notificationData.message.createNSString();
+
+    // Assertive = UIAccessibilityPriorityDefault, Polite = UIAccessibilityPriorityLow
+    RetainPtr priority = (notificationData.status == WebCore::LiveRegionStatus::Assertive) ? UIAccessibilityPriorityDefault : UIAccessibilityPriorityLow;
+
+    RetainPtr attributes = adoptNS([[NSDictionary alloc] initWithObjectsAndKeys:
+        priority.get(), UIAccessibilitySpeechAttributeAnnouncementPriority, @(YES), UIAccessibilitySpeechAttributeIsLiveRegion,
+        nil]);
+
+    RetainPtr attributedString = adoptNS([[NSAttributedString alloc] initWithString:message.get() attributes:attributes.get()]);
+
+    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, attributedString.get());
+}
+
 IntRect PageClientImpl::rootViewToAccessibilityScreen(const IntRect& rect)
 {
     CGRect rootViewRect = rect;

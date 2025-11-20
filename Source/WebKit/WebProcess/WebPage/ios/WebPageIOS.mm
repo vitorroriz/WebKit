@@ -308,6 +308,11 @@ void WebPage::relayAriaNotifyNotification(WebCore::AriaNotifyData&& notification
     send(Messages::WebPageProxy::RelayAriaNotifyNotification(WTFMove(notificationData)));
 }
 
+void WebPage::relayLiveRegionNotification(WebCore::LiveRegionAnnouncementData&& notificationData)
+{
+    send(Messages::WebPageProxy::RelayLiveRegionNotification(WTFMove(notificationData)));
+}
+
 static void computeEditableRootHasContentAndPlainText(const VisibleSelection& selection, EditorState::PostLayoutData& data)
 {
     data.hasContent = false;

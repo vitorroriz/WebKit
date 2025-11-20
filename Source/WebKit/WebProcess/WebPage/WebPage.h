@@ -308,6 +308,7 @@ class HandleUserInputEventResult;
 #endif
 struct InteractionRegion;
 struct KeypressCommand;
+struct LiveRegionAnnouncementData;
 struct MarkupExclusionRule;
 struct MediaDeviceHashSalts;
 struct MediaPlayerClientIdentifierType;
@@ -992,6 +993,7 @@ public:
 #if PLATFORM(IOS_FAMILY)
     void relayAccessibilityNotification(String&&, RetainPtr<NSData>&&);
     void relayAriaNotifyNotification(WebCore::AriaNotifyData&&);
+    void relayLiveRegionNotification(WebCore::LiveRegionAnnouncementData&&);
 #endif
 
     RefPtr<WebImage> scaledSnapshotWithOptions(const WebCore::IntRect&, double additionalScaleFactor, SnapshotOptions);

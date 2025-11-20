@@ -504,3 +504,5 @@
 
 // User info key to specify an announcment's language.
 #define NSAccessibilityAnnouncementLanguageKey @"AXAnnouncementLanguageKey"
+
+#define NSAccessibilityAnnouncementIsLiveRegionKey @"AXAnnouncementIsLiveRegionKey"

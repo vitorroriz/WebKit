@@ -797,6 +797,12 @@ void WebPageProxy::relayAriaNotifyNotification(WebCore::AriaNotifyData&& notific
         pageClient->relayAriaNotifyNotification(notificationData);
 }
 
+void WebPageProxy::relayLiveRegionNotification(WebCore::LiveRegionAnnouncementData&& notificationData)
+{
+    if (RefPtr pageClient = this->pageClient())
+        pageClient->relayLiveRegionNotification(notificationData);
+}
+
 void WebPageProxy::assistiveTechnologyMakeFirstResponder()
 {
     if (RefPtr pageClient = this->pageClient())

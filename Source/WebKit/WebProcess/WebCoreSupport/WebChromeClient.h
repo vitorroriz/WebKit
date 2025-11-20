@@ -66,6 +66,7 @@ public:
 #if PLATFORM(IOS_FAMILY)
     void relayAccessibilityNotification(String&&, RetainPtr<NSData>&&) const final;
     void relayAriaNotifyNotification(WebCore::AriaNotifyData&&) const final;
+    void relayLiveRegionNotification(WebCore::LiveRegionAnnouncementData&&) const final;
 #endif
 
 private:
