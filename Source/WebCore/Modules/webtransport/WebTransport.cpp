@@ -28,6 +28,8 @@
 
 #include "ContextDestructionObserverInlines.h"
 #include "ContentSecurityPolicy.h"
+#include "DatagramByteSource.h"
+#include "DatagramSink.h"
 #include "DatagramSource.h"
 #include "ExceptionOr.h"
 #include "JSDOMException.h"
@@ -89,10 +91,34 @@ ExceptionOr<Ref<WebTransport>> WebTransport::create(ScriptExecutionContext& cont
     if (incomingUnidirectionalStreams.hasException())
         return incomingUnidirectionalStreams.releaseException();
 
-    auto datagramSource = DatagramSource::create();
-    auto incomingDatagrams = ReadableStream::create(domGlobalObject, datagramSource.copyRef());
-    if (incomingDatagrams.hasException())
-        return incomingDatagrams.releaseException();
+    RefPtr<DatagramSource> datagramSource;
+    RefPtr<ReadableStream> incomingDatagrams;
+    if (options.datagramsReadableMode) {
+        Ref datagramByteSource = DatagramByteSource::create();
+        ReadableByteStreamController::PullAlgorithm pullAlgorithm = [datagramByteSource](auto& globalObject, auto&& controller) {
+            auto [promise, deferred] = createPromiseAndWrapper(globalObject);
+            datagramByteSource->pull(globalObject, controller, WTFMove(deferred));
+            return promise;
+        };
+
+        ReadableByteStreamController::CancelAlgorithm cancelAlgorithm = [datagramByteSource](auto& globalObject, auto&&, auto&&) {
+            auto [promise, deferred] = createPromiseAndWrapper(globalObject);
+            datagramByteSource->cancel(WTFMove(deferred));
+            return promise;
+        };
+
+        incomingDatagrams = ReadableStream::createReadableByteStream(domGlobalObject, WTFMove(pullAlgorithm), WTFMove(cancelAlgorithm), {
+            .isReachableFromOpaqueRootIfPulling = ReadableStream::IsReachableFromOpaqueRootIfPulling::Yes
+        });
+        datagramSource = WTFMove(datagramByteSource);
+    } else {
+        Ref datagramDefaultSource = DatagramDefaultSource::create();
+        auto readableOrException = ReadableStream::create(domGlobalObject, datagramDefaultSource.copyRef());
+        if (readableOrException.hasException())
+            return readableOrException.releaseException();
+        incomingDatagrams = readableOrException.releaseReturnValue();
+        datagramSource = WTFMove(datagramDefaultSource);
+    }
 
     RefPtr socketProvider = context.socketProvider();
     if (!socketProvider) {
@@ -100,9 +126,9 @@ ExceptionOr<Ref<WebTransport>> WebTransport::create(ScriptExecutionContext& cont
         return Exception { ExceptionCode::InvalidStateError };
     }
 
-    auto datagrams = WebTransportDatagramDuplexStream::create(incomingDatagrams.releaseReturnValue());
+    auto datagrams = WebTransportDatagramDuplexStream::create(incomingDatagrams.releaseNonNull());
 
-    auto transport = adoptRef(*new WebTransport(context, domGlobalObject, incomingBidirectionalStreams.releaseReturnValue(), incomingUnidirectionalStreams.releaseReturnValue(), options.congestionControl, WTFMove(datagrams), WTFMove(datagramSource), WTFMove(receiveStreamSource), WTFMove(bidirectionalStreamSource)));
+    auto transport = adoptRef(*new WebTransport(context, domGlobalObject, incomingBidirectionalStreams.releaseReturnValue(), incomingUnidirectionalStreams.releaseReturnValue(), options.congestionControl, WTFMove(datagrams), datagramSource.releaseNonNull(), WTFMove(receiveStreamSource), WTFMove(bidirectionalStreamSource)));
     transport->suspendIfNeeded();
     transport->initializeOverHTTP(*socketProvider, context, WTFMove(parsedURL), WTFMove(options));
     return transport;

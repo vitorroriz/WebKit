@@ -30,4 +30,5 @@
     boolean requireUnreliable = false;
     sequence<WebTransportHash> serverCertificateHashes;
     WebTransportCongestionControl congestionControl = "default";
+    DatagramsReadableMode datagramsReadableMode;
 };

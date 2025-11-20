@@ -63,10 +63,15 @@ struct WebCore::WebTransportOptions {
     bool requireUnreliable
     Vector<WebCore::WebTransportHash> serverCertificateHashes
     WebCore::WebTransportCongestionControl congestionControl
+    std::optional<WebCore::DatagramsReadableMode> datagramsReadableMode;
 };
 
 enum class WebCore::WebTransportCongestionControl : uint8_t {
     Default,
     Throughput,
     LowLatency,
+};
+
+enum class WebCore::DatagramsReadableMode : uint8_t {
+    Bytes
 };
