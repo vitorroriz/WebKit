@@ -101,6 +101,7 @@ TemporalPlainMonthDay* TemporalPlainMonthDay::tryCreateIfValid(JSGlobalObject* g
     return TemporalPlainMonthDay::create(vm, structure, ISO8601::PlainMonthDay(WTFMove(plainDate)));
 }
 
+// https://tc39.es/proposal-temporal/#sec-temporal.plainmonthday.prototype.with
 String TemporalPlainMonthDay::toString(JSGlobalObject* globalObject, JSValue optionsValue) const
 {
     VM& vm = globalObject->vm();
@@ -116,6 +117,32 @@ String TemporalPlainMonthDay::toString(JSGlobalObject* globalObject, JSValue opt
     RETURN_IF_EXCEPTION(scope, { });
 
     return ISO8601::temporalMonthDayToString(m_plainMonthDay, calendarName);
+}
+
+// https://tc39.es/proposal-temporal/#sec-temporal.plainmonthday.prototype.with
+ISO8601::PlainDate TemporalPlainMonthDay::with(JSGlobalObject* globalObject, JSObject* temporalMonthDayLike, JSValue optionsValue)
+{
+    VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    rejectObjectWithCalendarOrTimeZone(globalObject, temporalMonthDayLike);
+    RETURN_IF_EXCEPTION(scope, { });
+
+    if (!calendar()->isISO8601()) [[unlikely]] {
+        throwRangeError(globalObject, scope, "unimplemented: with non-ISO8601 calendar"_s);
+        return { };
+    }
+
+    auto [y, m, d, optionalMonthCode, overflow, any] =
+        TemporalPlainDate::mergeDateFields(globalObject, temporalMonthDayLike, optionsValue,
+            1972, month(), day());
+    RETURN_IF_EXCEPTION(scope, { });
+    if (any == TemporalAnyProperties::None) [[unlikely]] {
+        throwTypeError(globalObject, scope, "Object must contain at least one Temporal date property"_s);
+        return { };
+    }
+
+    RELEASE_AND_RETURN(scope, TemporalCalendar::monthDayFromFields(globalObject, y, m, d, optionalMonthCode, overflow));
 }
 
 String TemporalPlainMonthDay::monthCode() const

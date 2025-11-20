@@ -142,6 +142,11 @@ enum class AddOrSubtract : bool {
     Subtract
 };
 
+struct ParsedMonthCode {
+    uint8_t monthNumber;
+    bool isLeapMonth;
+};
+
 WTF::String ellipsizeAt(unsigned maxLength, const WTF::String&);
 PropertyName temporalUnitPluralPropertyName(VM&, TemporalUnit);
 PropertyName temporalUnitSingularPropertyName(VM&, TemporalUnit);
@@ -163,7 +168,6 @@ Int128 roundNumberToIncrementInt128(Int128, Int128, RoundingMode);
 Int128 roundNumberToIncrementAsIfPositive(Int128, Int128, RoundingMode);
 double applyUnsignedRoundingMode(double, double, double, UnsignedRoundingMode);
 void rejectObjectWithCalendarOrTimeZone(JSGlobalObject*, JSObject*);
-
 
 constexpr Int128 lengthInNanoseconds(TemporalUnit unit)
 {
@@ -227,6 +231,17 @@ enum class TemporalDisambiguation : uint8_t {
     Earlier,
     Later,
     Reject,
+};
+
+enum class TemporalDateFormat : uint8_t {
+    Date,
+    YearMonth,
+    MonthDay
+};
+
+enum class TemporalAnyProperties : bool {
+    None,
+    Some,
 };
 
 } // namespace JSC

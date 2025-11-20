@@ -1518,19 +1518,20 @@ String monthCode(uint32_t month)
     return makeString('M', pad('0', 2, month));
 }
 
-// returns 0 for any invalid string
-uint8_t monthFromCode(StringView monthCode)
+// https://tc39.es/proposal-temporal/#sec-temporal-parsemonthcode
+std::optional<ParsedMonthCode> parseMonthCode(StringView monthCode)
 {
-    if (monthCode.length() != 3 || !monthCode.startsWith('M') || !isASCIIDigit(monthCode[2]))
-        return 0;
+    // Allow leap month marker (e.g. "M05L"), even though it doesn't apply to ISO8601 calendar
+    if (monthCode.length() < 3 || monthCode.length() > 4 || !monthCode.startsWith('M') || !isASCIIDigit(monthCode[2]))
+        return { };
 
-    uint8_t result = monthCode[2] - '0';
-    if (monthCode[1] == '1')
-        result += 10;
-    else if (monthCode[1] != '0')
-        return 0;
+    // 4th code unit must be 'L' because the month code is valid
+    auto isLeapMonth = monthCode.length() == 4;
 
-    return result;
+    uint8_t monthNumber = monthCode[2] - '0';
+    monthNumber += (monthCode[1] - '0') * 10;
+
+    return ParsedMonthCode { monthNumber, isLeapMonth };
 }
 
 ExactTime ExactTime::fromISOPartsAndOffset(int32_t year, uint8_t month, uint8_t day, unsigned hour, unsigned minute, unsigned second, unsigned millisecond, unsigned microsecond, unsigned nanosecond, int64_t offset)

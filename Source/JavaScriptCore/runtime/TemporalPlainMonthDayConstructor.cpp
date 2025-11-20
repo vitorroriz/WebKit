@@ -107,7 +107,7 @@ JSC_DEFINE_HOST_FUNCTION(constructTemporalPlainMonthDay, (JSGlobalObject* global
     if (argumentCount < 2)
         return throwVMRangeError(globalObject, scope, "Temporal.PlainMonthDay requires at least two arguments"_s);
 
-    // Argument 2 is calendar -- ignored for now. TODO
+    // Argument 2 is calendar -- ignored for now. FIXME
 
     double referenceYear = 1972; // First ISO leap year after the epoch
     if (argumentCount > 3) {

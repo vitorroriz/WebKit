@@ -379,13 +379,13 @@ String temporalDateToString(PlainDate);
 String temporalDateTimeToString(PlainDate, PlainTime, std::tuple<Precision, unsigned>);
 String temporalMonthDayToString(PlainMonthDay, StringView);
 String monthCode(uint32_t);
-uint8_t monthFromCode(StringView);
 
 bool isValidDuration(const Duration&);
 bool isValidISODate(double, double, double);
 PlainDate createISODateRecord(double, double, double);
 
 std::optional<ExactTime> parseInstant(StringView);
+std::optional<ParsedMonthCode> parseMonthCode(StringView);
 
 bool isDateTimeWithinLimits(int32_t year, uint8_t month, uint8_t day, unsigned hour, unsigned minute, unsigned second, unsigned millisecond, unsigned microsecond, unsigned nanosecond);
 
