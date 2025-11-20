@@ -85,7 +85,6 @@ class CachedResourceLoader;
 class ContentFilter;
 class SharedBuffer;
 struct CustomHeaderFields;
-class FormState;
 class FrameLoader;
 class IconLoader;
 class LocalFrame;
