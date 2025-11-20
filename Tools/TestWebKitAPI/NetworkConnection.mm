@@ -214,6 +214,7 @@ struct ConnectionGroup::Data : public ThreadSafeRefCounted<ConnectionGroup::Data
     RetainPtr<nw_connection_group_t> group;
     CompletionHandler<void(Connection)> connectionHandler;
     Vector<Connection> connections;
+    CompletionHandler<void()> failureCompletionHandler;
 };
 
 ConnectionGroup::ConnectionGroup(nw_connection_group_t group)
@@ -222,6 +223,18 @@ ConnectionGroup::ConnectionGroup(nw_connection_group_t group)
 ConnectionGroup::~ConnectionGroup() = default;
 
 ConnectionGroup::ConnectionGroup(const ConnectionGroup&) = default;
+
+void ConnectionGroup::markAsFailed()
+{
+    m_data->failureCompletionHandler();
+}
+
+Awaitable<void> ConnectionGroup::awaitableFailure()
+{
+    co_return co_await AwaitableFromCompletionHandler<void> { [data = m_data] (auto completionHandler) {
+        data->failureCompletionHandler = WTFMove(completionHandler);
+    } };
+}
 
 Connection ConnectionGroup::createWebTransportConnection(ConnectionType type) const
 {

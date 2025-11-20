@@ -140,6 +140,7 @@ WebTransport::WebTransport(ScriptExecutionContext& context, JSDOMGlobalObject& g
     , m_receiveStreamSource(WTFMove(receiveStreamSource))
     , m_bidirectionalStreamSource(WTFMove(bidirectionalStreamSource))
 {
+    context.createdWebTransport(*this);
 }
 
 WebTransport::~WebTransport() = default;
@@ -306,6 +307,21 @@ void WebTransport::cleanupWithSessionError()
         WebTransportErrorSource::Session,
         std::nullopt
     }), std::nullopt);
+}
+
+void WebTransport::cleanupContext(ScriptExecutionContext& context)
+{
+    // https://www.w3.org/TR/webtransport/#web-transport-context-cleanup-steps
+    if (m_state == State::Connected) {
+        m_state = State::Failed;
+        if (auto session = std::exchange(m_session, nullptr))
+            session->terminate(0, { });
+        context.postTask([protectedThis = Ref { *this }] (auto&) {
+            protectedThis->cleanupWithSessionError();
+        });
+    }
+    if (m_state == State::Connecting)
+        m_state = State::Failed;
 }
 
 void WebTransport::close(WebTransportCloseInfo&& closeInfo)

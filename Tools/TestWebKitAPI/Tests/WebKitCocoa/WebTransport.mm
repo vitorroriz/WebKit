@@ -770,6 +770,50 @@ TEST(WebTransport, ServerConnectionTermination)
     EXPECT_WK_STREQ([webView _test_waitForAlert], canLoadnw_webtransport_metadata_get_session_closed() ? "successfully read closeInfo (0, )" : "caught WebTransportError");
 }
 
+TEST(WebTransport, BackForwardCache)
+{
+    bool serverConnectionTerminatedByClient { false };
+    WebTransportServer echoServer([&](ConnectionGroup group) -> ConnectionTask {
+        auto datagramConnection = group.createWebTransportConnection(ConnectionGroup::ConnectionType::Datagram);
+        auto request = co_await datagramConnection.awaitableReceiveBytes();
+        co_await datagramConnection.awaitableSend(WTFMove(request));
+        co_await group.awaitableFailure();
+        serverConnectionTerminatedByClient = true;
+    });
+
+    NSString *mainHTML = [NSString stringWithFormat:@""
+        "<script>async function test() {"
+        "  try {"
+        "    let t = new WebTransport('https://127.0.0.1:%d/');"
+        "    await t.ready;"
+        "    let w = t.datagrams.createWritable().getWriter();"
+        "    await w.write(new TextEncoder().encode('abc'));"
+        "    let r = t.datagrams.readable.getReader();"
+        "    const { value, done } = await r.read();"
+        "    alert('successfully read ' + new TextDecoder().decode(value));"
+        "  } catch (e) { alert('caught ' + e); }"
+        "}; test();"
+        "</script>", echoServer.port()];
+
+    HTTPServer loadingServer({
+        { "/"_s, { mainHTML } },
+        { "/other"_s, { @"<script>alert('loaded')</script>" } }
+    });
+
+    auto configuration = adoptNS([WKWebViewConfiguration new]);
+    enableWebTransport(configuration.get());
+    auto webView = adoptNS([[WKWebView alloc] initWithFrame:CGRectZero configuration:configuration.get()]);
+    auto delegate = adoptNS([TestNavigationDelegate new]);
+    [delegate allowAnyTLSCertificate];
+    [webView setNavigationDelegate:delegate.get()];
+
+    [webView loadRequest:loadingServer.request()];
+    EXPECT_WK_STREQ([webView _test_waitForAlert], "successfully read abc");
+    [webView loadRequest:loadingServer.request("/other"_s)];
+    EXPECT_WK_STREQ([webView _test_waitForAlert], "loaded");
+    Util::run(&serverConnectionTerminatedByClient);
+}
+
 } // namespace TestWebKitAPI
 
 #endif // HAVE(WEB_TRANSPORT)

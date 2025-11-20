@@ -28,6 +28,7 @@
 #import "CoroutineUtilities.h"
 #import <Network/Network.h>
 #import <wtf/CompletionHandler.h>
+#import <wtf/CoroutineUtilities.h>
 
 namespace TestWebKitAPI {
 
@@ -77,6 +78,7 @@ public:
     Connection createWebTransportConnection(ConnectionType) const;
     ReceiveIncomingConnectionOperation receiveIncomingConnection() const;
     void cancel();
+    Awaitable<void> awaitableFailure();
 
 private:
     friend class WebTransportServer;
@@ -84,6 +86,7 @@ private:
     ConnectionGroup(nw_connection_group_t);
     void receiveIncomingConnection(Connection);
     void receiveIncomingConnection(CompletionHandler<void(Connection)>&&);
+    void markAsFailed();
 
     struct Data;
     Ref<Data> m_data;

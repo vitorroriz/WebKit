@@ -93,8 +93,8 @@ public:
     Ref<WebTransportSendGroup> createSendGroup();
 
     RefPtr<WebTransportSession> session();
-
     void datagramsWritableCreated(WebTransportDatagramsWritable&);
+    void cleanupContext(ScriptExecutionContext&);
 
 private:
     WebTransport(ScriptExecutionContext&, JSDOMGlobalObject&, Ref<ReadableStream>&&, Ref<ReadableStream>&&, WebTransportCongestionControl, Ref<WebTransportDatagramDuplexStream>&&, Ref<DatagramSource>&&, Ref<WebTransportReceiveStreamSource>&&, Ref<WebTransportBidirectionalStreamSource>&&);
