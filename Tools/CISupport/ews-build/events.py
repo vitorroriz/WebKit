@@ -190,8 +190,6 @@ class Events(service.BuildbotService):
     def buildFinished(self, key, build):
         if not build.get('properties'):
             build['properties'] = yield self.master.db.builds.getBuildProperties(build.get('buildid'))
-        if not build.get('steps'):
-            build['steps'] = yield self.master.db.steps.getSteps(build.get('buildid'))
 
         if self.getBuilderName(build) in self.QUEUES_TO_SKIP_REPORTING:
             return
