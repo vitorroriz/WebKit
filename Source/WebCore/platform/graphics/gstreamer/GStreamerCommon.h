@@ -54,7 +54,7 @@ using TrackIDHashMap = HashMap<TrackID, MappedArg, WTF::IntHash<TrackID>, WTF::U
 #define GST_CHECK_VERSION_FULL(major, minor, micro, nano) \
     (GST_CHECK_VERSION(major, minor, micro) && (GST_VERSION_NANO >= nano))
 
-#if !GST_CHECK_VERSION(1, 28, 0)
+#if !GST_CHECK_VERSION_FULL(1, 27, 2, 1)
 inline bool gst_check_version(guint major, guint minor, guint micro)
 {
     guint currentMajor, currentMinor, currentMicro, currentNano;
