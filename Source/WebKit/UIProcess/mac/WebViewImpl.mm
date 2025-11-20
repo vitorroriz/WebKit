@@ -123,6 +123,7 @@
 #import <WebCore/PlaybackSessionInterfaceMac.h>
 #import <WebCore/PromisedAttachmentInfo.h>
 #import <WebCore/ReferrerPolicy.h>
+#import <WebCore/ResolvedCaptionDisplaySettingsOptions.h>
 #import <WebCore/ShareableBitmap.h>
 #import <WebCore/Site.h>
 #import <WebCore/TextAlternativeWithRange.h>
@@ -7306,11 +7307,47 @@ void WebViewImpl::unregisterViewAboveScrollPocket(NSView *containerView)
 #endif // ENABLE(CONTENT_INSET_BACKGROUND_FILL)
 
 #if ENABLE(VIDEO)
-void WebViewImpl::showCaptionDisplaySettings(CompletionHandler<void(bool)>&& callback)
+void WebViewImpl::showCaptionDisplaySettings(HTMLMediaElementIdentifier, const WebCore::ResolvedCaptionDisplaySettingsOptions& options, CompletionHandler<void(Expected<void, WebCore::ExceptionData>&&)>&& completionHandler)
 {
     RetainPtr controller = adoptNS([[WKCaptionStyleMenuController alloc] init]);
     NSMenu *menu = [controller captionStyleMenu];
-    callback([menu popUpMenuPositioningItem:nil atLocation:NSMakePoint(0, 0) inView:[protectedWindow() contentView]]);
+    auto menuSize = FloatSize { [menu size] };
+
+    auto menuLocationFromOptions = [&] () -> NSPoint {
+        if (!options.anchorBounds)
+            return NSMakePoint(0, 0);
+
+        // Default to presenting the menu so that the bottom-center point is centered in the anchorBounds
+        if (!options.xPositionArea && !options.yPositionArea) {
+            FloatPoint centerPoint = options.anchorBounds->center();
+            centerPoint.move(-menuSize.width() / 2, -menuSize.height());
+            return centerPoint;
+        }
+
+        auto calculateXLocation = [] (auto& anchorBounds, auto& xPositionArea, const FloatSize& menuSize) {
+            using XPositionArea = WebCore::ResolvedCaptionDisplaySettingsOptions::XPositionArea;
+            if (!xPositionArea || *xPositionArea == XPositionArea::Center)
+                return anchorBounds.center().x() - menuSize.width() / 2;
+            if (*xPositionArea == XPositionArea::Left)
+                return anchorBounds.x() - menuSize.width();
+            return anchorBounds.maxX();
+        };
+
+        auto calculateYLocation = [] (auto& anchorBounds, auto& yPositionArea, const FloatSize& menuSize) {
+            using YPositionArea = WebCore::ResolvedCaptionDisplaySettingsOptions::YPositionArea;
+            if (!yPositionArea || *yPositionArea == YPositionArea::Center)
+                return anchorBounds.center().y() - menuSize.height() / 2;
+            if (*yPositionArea == YPositionArea::Top)
+                return anchorBounds.y() - menuSize.height();
+            return anchorBounds.maxY();
+        };
+
+        return NSMakePoint(calculateXLocation(*options.anchorBounds, options.xPositionArea, menuSize), calculateYLocation(*options.anchorBounds, options.yPositionArea, menuSize));
+
+    };
+    auto menuLocation = menuLocationFromOptions();
+    [menu popUpMenuPositioningItem:nil atLocation:menuLocation inView:m_view.get().get()];
+    completionHandler({ });
 }
 #endif
 

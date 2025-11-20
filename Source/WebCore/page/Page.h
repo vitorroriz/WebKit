@@ -109,6 +109,7 @@ class BackForwardController;
 class BadgeClient;
 class BroadcastChannelRegistry;
 class CacheStorageProvider;
+class CaptionDisplaySettingsClient;
 class Chrome;
 class CompositeEditCommand;
 class ContextMenuController;
@@ -231,6 +232,7 @@ struct ClientOrigin;
 struct DocumentSyncSerializationData;
 struct FixedContainerEdges;
 struct NavigationAPIMethodTracker;
+struct ResolvedCaptionDisplaySettingsOptions;
 struct SpatialBackdropSource;
 struct SystemPreviewInfo;
 struct TextRecognitionResult;
@@ -1398,6 +1400,13 @@ public:
 
     WEBCORE_EXPORT void clearIsShowingInputView();
 #endif
+
+#if ENABLE(VIDEO)
+    WEBCORE_EXPORT void setCaptionDisplaySettingsClientForTesting(Ref<CaptionDisplaySettingsClient>&&);
+    WEBCORE_EXPORT void clearCaptionDisplaySettingsClientForTesting();
+    void showCaptionDisplaySettings(HTMLMediaElement&, const ResolvedCaptionDisplaySettingsOptions&, CompletionHandler<void(ExceptionOr<void>)>&&);
+#endif
+
 private:
     explicit Page(PageConfiguration&&);
 
@@ -1878,6 +1887,9 @@ private:
     void flushHardwareKeyboardAttachmentObservers();
 #endif
 
+#if ENABLE(VIDEO)
+    RefPtr<CaptionDisplaySettingsClient> m_captionDisplaySettingsClientForTesting;
+#endif
 }; // class Page
 
 WTF::TextStream& operator<<(WTF::TextStream&, RenderingUpdateStep);

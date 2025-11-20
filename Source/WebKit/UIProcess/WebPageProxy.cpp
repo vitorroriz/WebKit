@@ -1488,14 +1488,14 @@ void WebPageProxy::setBrowsingContextGroup(BrowsingContextGroup& browsingContext
 }
 
 #if ENABLE(VIDEO)
-void WebPageProxy::showCaptionDisplaySettings(CompletionHandler<void(bool)>&& callback)
+void WebPageProxy::showCaptionDisplaySettings(WebCore::HTMLMediaElementIdentifier identifier, const WebCore::ResolvedCaptionDisplaySettingsOptions& options, CompletionHandler<void(Expected<void, WebCore::ExceptionData>&&)>&& completionHandler)
 {
     if (RefPtr pageClient = this->pageClient()) {
-        pageClient->showCaptionDisplaySettings(WTFMove(callback));
+        pageClient->showCaptionDisplaySettings(identifier, options, WTFMove(completionHandler));
         return;
     }
 
-    callback(false);
+    completionHandler(makeUnexpected<WebCore::ExceptionData>({ ExceptionCode::NotSupportedError, "Caption Display Settings are not supported."_s }));
 }
 
 void WebPageProxy::showCaptionDisplaySettingsPreview(const FrameInfoData& frameInfo, WebCore::HTMLMediaElementIdentifier identifier)

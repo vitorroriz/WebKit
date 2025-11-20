@@ -80,6 +80,7 @@
 #import <WebCore/NotImplemented.h>
 #import <WebCore/PlatformScreen.h>
 #import <WebCore/PromisedAttachmentInfo.h>
+#import <WebCore/ResolvedCaptionDisplaySettingsOptions.h>
 #import <WebCore/ScreenOrientationType.h>
 #import <WebCore/ShareData.h>
 #import <WebCore/SharedBuffer.h>
@@ -1392,6 +1393,15 @@ void PageClientImpl::removeAnyPDFPageNumberIndicator()
 }
 
 #endif
+
+void PageClientImpl::showCaptionDisplaySettings(WebCore::HTMLMediaElementIdentifier identifier, const WebCore::ResolvedCaptionDisplaySettingsOptions& options, CompletionHandler<void(Expected<void, WebCore::ExceptionData>&&)>&& completionHandler)
+{
+#if USE(UICONTEXTMENU)
+    [contentView() showCaptionDisplaySettingsMenu:identifier withOptions:options completionHandler:WTFMove(completionHandler)];
+#else
+    completionHandler(makeUnexpected<WebCore::ExceptionData>({ ExceptionCode::NotSupportedError, "Caption Display Settings are not supported."_s }));
+#endif
+}
 
 } // namespace WebKit
 

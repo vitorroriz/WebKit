@@ -104,6 +104,7 @@ static const UIMenuIdentifier WKCaptionStyleMenuSystemSettingsIdentifier = @"WKC
                 [strongSelf profileActionSelected:profileID];
         });
         UIAction *profileAction = [UIAction actionWithTitle:title.createNSString().get() image:nil identifier:profileID.createNSString().get() handler:profileSelectedHandler.get()];
+        profileAction.attributes = UIMenuElementAttributesKeepsMenuPresented;
 
         if ([profileID.createNSString().autorelease() isEqualToString:self.savedActiveProfileID])
             profileAction.state = UIMenuElementStateOn;
@@ -175,8 +176,22 @@ static const UIMenuIdentifier WKCaptionStyleMenuSystemSettingsIdentifier = @"WKC
 
 - (void)profileActionSelected:(const WTF::String&)profileID
 {
+    for (UIMenuElement *childMenu in [_menu children]) {
+        auto *childAction = dynamic_objc_cast<UIAction>(childMenu);
+        if (!childAction)
+            continue;
+
+        String childActionIdentifier = childAction.identifier;
+        childAction.state = profileID == childActionIdentifier ? UIMenuElementStateOn : UIMenuElementStateOff;
+    }
+
     self.savedActiveProfileID = profileID.createNSString().autorelease();
     CaptionUserPreferencesMediaAF::setActiveProfileID(WTF::String(self.savedActiveProfileID));
+
+    // UIMenu does not have the ability to notify clients when a submenu opens or closes.
+    // Provide a similar functionality for previewing subtitle changes by triggering the
+    // preview of subtitle styles when the first profile menu item is selected.
+    [self notifyMenuWillOpen];
 }
 
 - (void)systemCaptionStyleSettingsActionSelected:(UIAction *)action

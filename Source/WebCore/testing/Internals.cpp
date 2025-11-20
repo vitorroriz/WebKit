@@ -310,6 +310,7 @@
 #if ENABLE(VIDEO)
 #include "CaptionUserPreferences.h"
 #include "HTMLMediaElement.h"
+#include "MockCaptionDisplaySettingsClientCallback.h"
 #include "PageGroup.h"
 #include "TextTrack.h"
 #include "TextTrackCueGeneric.h"
@@ -4850,6 +4851,31 @@ void Internals::showCaptionDisplaySettingsPreviewForMediaElement(HTMLMediaElemen
 void Internals::hideCaptionDisplaySettingsPreviewForMediaElement(HTMLMediaElement& element)
 {
     element.hideCaptionDisplaySettingsPreview();
+}
+
+void Internals::setMockCaptionDisplaySettingsClientCallback(RefPtr<MockCaptionDisplaySettingsClientCallback>&& callback)
+{
+    if (m_mockCaptionDisplaySettingsClientCallback == callback)
+        return;
+
+    m_mockCaptionDisplaySettingsClientCallback = WTFMove(callback);
+
+    auto frame = this->frame();
+    if (!frame)
+        return;
+
+    auto page = frame->page();
+    if (!page)
+        return;
+
+    page->clearCaptionDisplaySettingsClientForTesting();
+    if (m_mockCaptionDisplaySettingsClientCallback)
+        page->setCaptionDisplaySettingsClientForTesting(*m_mockCaptionDisplaySettingsClientCallback);
+}
+
+MockCaptionDisplaySettingsClientCallback* Internals::mockCaptionDisplaySettingsClientCallback() const
+{
+    return m_mockCaptionDisplaySettingsClientCallback.get();
 }
 
 #endif

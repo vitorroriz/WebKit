@@ -9047,3 +9047,24 @@ struct WebCore::FocusOptions {
 };
 
 enum class WebKit::CommitTiming : bool;
+
+header: <WebCore/ResolvedCaptionDisplaySettingsOptions.h>
+[CustomHeader] enum class WebCore::ResolvedCaptionDisplaySettingsOptionsXPositionArea : uint8_t {
+    Center,
+    Left,
+    Right,
+};
+
+header: <WebCore/ResolvedCaptionDisplaySettingsOptions.h>
+[CustomHeader] enum class WebCore::ResolvedCaptionDisplaySettingsOptionsYPositionArea : uint8_t {
+    Center,
+    Top,
+    Bottom,
+};
+
+header: <WebCore/ResolvedCaptionDisplaySettingsOptions.h>
+[CustomHeader] struct WebCore::ResolvedCaptionDisplaySettingsOptions {
+    std::optional<WebCore::FloatRect> anchorBounds;
+    std::optional<WebCore::ResolvedCaptionDisplaySettingsOptionsXPositionArea> xPositionArea;
+    std::optional<WebCore::ResolvedCaptionDisplaySettingsOptionsYPositionArea> yPositionArea;
+};

@@ -1289,6 +1289,7 @@ JS_BINDING_IDLS := \
     $(WebCore)/fileapi/FileList.idl \
     $(WebCore)/fileapi/FileReader.idl \
     $(WebCore)/fileapi/FileReaderSync.idl \
+    $(WebCore)/html/CaptionDisplaySettingsOptions.idl \
     $(WebCore)/html/DOMFormData.idl \
     $(WebCore)/html/DOMTokenList.idl \
     $(WebCore)/html/DOMURL.idl \
@@ -1376,6 +1377,7 @@ JS_BINDING_IDLS := \
     $(WebCore)/html/HTMLUListElement.idl \
     $(WebCore)/html/HTMLUnknownElement.idl \
     $(WebCore)/html/HTMLVideoElement.idl \
+	$(WebCore)/html/HTMLVideoElement+CaptionDisplaySettings.idl \
     $(WebCore)/html/HTMLVideoElement+RequestVideoFrameCallback.idl \
     $(WebCore)/html/ImageBitmap.idl \
     $(WebCore)/html/ImageBitmapOptions.idl \
@@ -1388,6 +1390,7 @@ JS_BINDING_IDLS := \
     $(WebCore)/html/OffscreenCanvas.idl \
     $(WebCore)/html/PopoverInvokerElement.idl \
     $(WebCore)/html/RadioNodeList.idl \
+    $(WebCore)/html/ResolvedCaptionDisplaySettingsOptions.idl \
     $(WebCore)/html/SubmitEvent.idl \
     $(WebCore)/html/TextMetrics.idl \
     $(WebCore)/html/TimeRanges.idl \
@@ -1780,6 +1783,7 @@ JS_BINDING_IDLS := \
     $(WebCore)/testing/MallocStatistics.idl \
     $(WebCore)/testing/MemoryInfo.idl \
     $(WebCore)/testing/MockCDMFactory.idl \
+    $(WebCore)/testing/MockCaptionDisplaySettingsClientCallback.idl \
     $(WebCore)/testing/MockContentFilterSettings.idl \
     $(WebCore)/testing/MockPageOverlay.idl \
     $(WebCore)/testing/MockPaymentAddress.idl \

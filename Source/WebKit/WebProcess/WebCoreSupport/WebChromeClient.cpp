@@ -2383,15 +2383,20 @@ bool WebChromeClient::usePluginRendererScrollableArea(LocalFrame& frame) const
     return true;
 }
 
-void WebChromeClient::showCaptionDisplaySettings(CompletionHandler<void(bool)>&& callback)
+void WebChromeClient::showCaptionDisplaySettings(HTMLMediaElement& element, const ResolvedCaptionDisplaySettingsOptions& options, CompletionHandler<void(ExceptionOr<void>)>&& completionHandler)
 {
     RefPtr page = m_page.get();
     if (!page) {
-        callback(false);
+        completionHandler(Exception { ExceptionCode::NotSupportedError, "Caption Display Settings are not supported."_s });
         return;
     }
 
-    page->sendWithAsyncReply(Messages::WebPageProxy::ShowCaptionDisplaySettings(), WTFMove(callback));
+    page->sendWithAsyncReply(Messages::WebPageProxy::ShowCaptionDisplaySettings(element.identifier(), options), [completionHandler = WTFMove(completionHandler)] (auto&& expected) mutable {
+        if (expected)
+            completionHandler({ });
+        else
+            completionHandler(expected.error().toException());
+    });
 }
 
 } // namespace WebKit

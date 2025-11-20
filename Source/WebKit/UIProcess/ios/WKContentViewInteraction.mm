@@ -12281,6 +12281,13 @@ static WebKit::DocumentEditingContextRequest toWebRequest(id request)
 }
 #endif // ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
 
+#if ENABLE(VIDEO) && USE(UICONTEXTMENU)
+- (void)showCaptionDisplaySettingsMenu:(WebCore::HTMLMediaElementIdentifier)identifier withOptions:(const WebCore::ResolvedCaptionDisplaySettingsOptions&)options completionHandler:(CompletionHandler<void(Expected<void, WebCore::ExceptionData>)>&&)completionHandler
+{
+    [_actionSheetAssistant showCaptionDisplaySettingsMenu:identifier withOptions:options completionHandler:WTFMove(completionHandler)];
+}
+#endif
+
 #if HAVE(UI_POINTER_INTERACTION)
 
 - (void)setUpPointerInteraction

@@ -137,6 +137,7 @@ struct DataDetectorElementInfo;
 struct DictionaryPopupInfo;
 struct ElementContext;
 struct FixedContainerEdges;
+struct ResolvedCaptionDisplaySettingsOptions;
 struct TextIndicatorData;
 struct ShareDataWithParsedURL;
 
@@ -847,7 +848,7 @@ public:
 #endif
 
 #if ENABLE(VIDEO)
-    virtual void showCaptionDisplaySettings(CompletionHandler<void(bool)>&& callback) { callback(false); }
+    virtual void showCaptionDisplaySettings(WebCore::HTMLMediaElementIdentifier, const WebCore::ResolvedCaptionDisplaySettingsOptions&, CompletionHandler<void(Expected<void, WebCore::ExceptionData>&&)>&&);
 #endif
 };
 

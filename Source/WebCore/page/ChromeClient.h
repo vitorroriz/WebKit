@@ -164,6 +164,7 @@ struct DateTimeChooserParameters;
 struct FocusOptions;
 struct GraphicsDeviceAdapter;
 struct MockWebAuthenticationConfiguration;
+struct ResolvedCaptionDisplaySettingsOptions;
 struct ShareDataWithParsedURL;
 struct SimpleRange;
 struct StringWithDirection;
@@ -778,7 +779,7 @@ public:
     virtual bool usePluginRendererScrollableArea(LocalFrame&) const { return true; }
 
 #if ENABLE(VIDEO)
-    virtual void showCaptionDisplaySettings(CompletionHandler<void(bool)>&& callback) { callback(false); }
+    WEBCORE_EXPORT virtual void showCaptionDisplaySettings(HTMLMediaElement&, const ResolvedCaptionDisplaySettingsOptions&, CompletionHandler<void(ExceptionOr<void>)>&&);
 #endif
 
     WEBCORE_EXPORT virtual ~ChromeClient();

@@ -43,6 +43,7 @@
 #include "BroadcastChannelRegistry.h"
 #include "CacheStorageProvider.h"
 #include "CachedImage.h"
+#include "CaptionDisplaySettingsClient.h"
 #include "Chrome.h"
 #include "ChromeClient.h"
 #include "CommonAtomStrings.h"
@@ -6109,6 +6110,28 @@ void Page::didUpdateHardwareKeyboardAttachment(bool attached)
 
     m_hardwareKeyboardAttached = attached;
     flushHardwareKeyboardAttachmentObservers();
+}
+#endif
+
+#if ENABLE(VIDEO)
+void Page::setCaptionDisplaySettingsClientForTesting(Ref<CaptionDisplaySettingsClient>&& client)
+{
+    m_captionDisplaySettingsClientForTesting = WTFMove(client);
+}
+
+void Page::clearCaptionDisplaySettingsClientForTesting()
+{
+    m_captionDisplaySettingsClientForTesting = nullptr;
+}
+
+void Page::showCaptionDisplaySettings(HTMLMediaElement& element, const ResolvedCaptionDisplaySettingsOptions& options, CompletionHandler<void(ExceptionOr<void>)>&& callback)
+{
+    if (RefPtr client = m_captionDisplaySettingsClientForTesting) {
+        client->showCaptionDisplaySettings(element, options, WTFMove(callback));
+        return;
+    }
+
+    chrome().client().showCaptionDisplaySettings(element, options, WTFMove(callback));
 }
 #endif
 

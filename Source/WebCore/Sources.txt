@@ -1622,6 +1622,7 @@ html/HTMLTrackElement.cpp
 html/HTMLUListElement.cpp
 html/HTMLUnknownElement.cpp
 html/HTMLVideoElement.cpp
+html/HTMLVideoElementCaptionDisplaySettings.cpp
 html/HTMLWBRElement.cpp
 html/HiddenInputType.cpp
 html/ImageBitmap.cpp
@@ -3863,6 +3864,7 @@ JSCanvasTextBaseline.cpp
 JSCanvasTextDrawingStyles.cpp
 JSCanvasTransform.cpp
 JSCanvasUserInterface.cpp
+JSCaptionDisplaySettingsOptions.cpp
 JSCaretPosition.cpp
 JSCaretPositionFromPointOptions.cpp
 JSChannelCountMode.cpp

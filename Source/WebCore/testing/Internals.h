@@ -116,6 +116,7 @@ class MediaStreamTrack;
 class MemoryInfo;
 class MessagePort;
 class MockCDMFactory;
+class MockCaptionDisplaySettingsClientCallback;
 class MockContentFilterSettings;
 class MockPageOverlay;
 class MockPaymentCoordinator;
@@ -846,6 +847,8 @@ public:
     void showCaptionDisplaySettingsPreviewForMediaElement(HTMLMediaElement&);
     void hideCaptionDisplaySettingsPreviewForMediaElement(HTMLMediaElement&);
 
+    void setMockCaptionDisplaySettingsClientCallback(RefPtr<MockCaptionDisplaySettingsClientCallback>&&);
+    MockCaptionDisplaySettingsClientCallback* mockCaptionDisplaySettingsClientCallback() const;
 #endif
 
     ExceptionOr<Ref<DOMRect>> selectionBounds();
@@ -1720,6 +1723,7 @@ private:
 #endif
 #if ENABLE(VIDEO)
     std::unique_ptr<CaptionUserPreferencesTestingModeToken> m_testingModeToken;
+    RefPtr<MockCaptionDisplaySettingsClientCallback> m_mockCaptionDisplaySettingsClientCallback;
 #endif
 };
 

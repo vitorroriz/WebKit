@@ -271,6 +271,7 @@ struct DictionaryPopupInfo;
 struct DocumentSyncSerializationData;
 struct DragItem;
 struct ElementContext;
+struct ExceptionData;
 struct ExceptionDetails;
 struct FileChooserSettings;
 struct FocusOptions;
@@ -337,7 +338,6 @@ struct WrappedCryptoKey;
 struct MockWebAuthenticationConfiguration;
 struct DigitalCredentialsRequestData;
 struct DigitalCredentialsResponseData;
-struct ExceptionData;
 struct MobileDocumentRequest;
 struct OpenID4VPRequest;
 #endif
@@ -436,9 +436,10 @@ class ShareableBitmapHandle;
 class ShareableResourceHandle;
 class Site;
 class TransformationMatrix;
+struct NodeIdentifierType;
+struct ResolvedCaptionDisplaySettingsOptions;
 struct TextAnimationData;
 enum class ImageDecodingError : uint8_t;
-struct NodeIdentifierType;
 enum class ExceptionCode : uint8_t;
 
 using NodeIdentifier = ObjectIdentifier<NodeIdentifierType>;
@@ -3468,7 +3469,7 @@ private:
     void setBrowsingContextGroup(BrowsingContextGroup&);
 
 #if ENABLE(VIDEO)
-    void showCaptionDisplaySettings(CompletionHandler<void(bool)>&&);
+    void showCaptionDisplaySettings(WebCore::HTMLMediaElementIdentifier, const WebCore::ResolvedCaptionDisplaySettingsOptions&, CompletionHandler<void(Expected<void, WebCore::ExceptionData>&&)>&&);
 #endif
 
     struct Internals;

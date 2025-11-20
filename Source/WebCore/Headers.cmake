@@ -1618,6 +1618,8 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     html/CanvasBase.h
     html/CanvasNoiseInjection.h
     html/CanvasObserver.h
+    html/CaptionDisplaySettingsClient.h
+    html/CaptionDisplaySettingsOptions.h
     html/CollectionTraversal.h
     html/CollectionTraversalInlines.h
     html/CollectionType.h
@@ -1731,6 +1733,8 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     html/PDFDocument.h
     html/PermissionsPolicy.h
     html/PluginDocument.h
+    html/ResolvedCaptionDisplaySettingsOptions.h
+    html/ResolvedCaptionDisplaySettingsOptionsWrapper.h
     html/StepRange.h
     html/SwitchTrigger.h
     html/TimeRanges.h

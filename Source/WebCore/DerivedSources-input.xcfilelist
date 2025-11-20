@@ -1614,6 +1614,7 @@ $(PROJECT_DIR)/fileapi/File.idl
 $(PROJECT_DIR)/fileapi/FileList.idl
 $(PROJECT_DIR)/fileapi/FileReader.idl
 $(PROJECT_DIR)/fileapi/FileReaderSync.idl
+$(PROJECT_DIR)/html/CaptionDisplaySettingsOptions.idl
 $(PROJECT_DIR)/html/DOMFormData.idl
 $(PROJECT_DIR)/html/DOMTokenList.idl
 $(PROJECT_DIR)/html/DOMURL.idl
@@ -1703,6 +1704,7 @@ $(PROJECT_DIR)/html/HTMLTitleElement.idl
 $(PROJECT_DIR)/html/HTMLTrackElement.idl
 $(PROJECT_DIR)/html/HTMLUListElement.idl
 $(PROJECT_DIR)/html/HTMLUnknownElement.idl
+$(PROJECT_DIR)/html/HTMLVideoElement+CaptionDisplaySettings.idl
 $(PROJECT_DIR)/html/HTMLVideoElement+RequestVideoFrameCallback.idl
 $(PROJECT_DIR)/html/HTMLVideoElement.idl
 $(PROJECT_DIR)/html/ImageBitmap.idl
@@ -1716,6 +1718,7 @@ $(PROJECT_DIR)/html/MediaError.idl
 $(PROJECT_DIR)/html/OffscreenCanvas.idl
 $(PROJECT_DIR)/html/PopoverInvokerElement.idl
 $(PROJECT_DIR)/html/RadioNodeList.idl
+$(PROJECT_DIR)/html/ResolvedCaptionDisplaySettingsOptions.idl
 $(PROJECT_DIR)/html/SubmitEvent.idl
 $(PROJECT_DIR)/html/TextMetrics.idl
 $(PROJECT_DIR)/html/TimeRanges.idl
@@ -2140,6 +2143,7 @@ $(PROJECT_DIR)/testing/MallocStatistics.idl
 $(PROJECT_DIR)/testing/MemoryInfo.idl
 $(PROJECT_DIR)/testing/MockApplePaySetupFeature.idl
 $(PROJECT_DIR)/testing/MockCDMFactory.idl
+$(PROJECT_DIR)/testing/MockCaptionDisplaySettingsClientCallback.idl
 $(PROJECT_DIR)/testing/MockContentFilterSettings.idl
 $(PROJECT_DIR)/testing/MockPageOverlay.idl
 $(PROJECT_DIR)/testing/MockPaymentAddress.idl

@@ -1182,9 +1182,9 @@ void PageClientImpl::didChangeLocalInspectorAttachment()
 #endif
 }
 
-void PageClientImpl::showCaptionDisplaySettings(CompletionHandler<void(bool)>&& callback)
+void PageClientImpl::showCaptionDisplaySettings(WebCore::HTMLMediaElementIdentifier identifier, const WebCore::ResolvedCaptionDisplaySettingsOptions& options, CompletionHandler<void(Expected<void, WebCore::ExceptionData>&&)>&& completionHandler)
 {
-    checkedImpl()->showCaptionDisplaySettings(WTFMove(callback));
+    checkedImpl()->showCaptionDisplaySettings(identifier, options, WTFMove(completionHandler));
 }
 
 RetainPtr<NSView> PageClient::protectedViewForPresentingRevealPopover() const

@@ -578,7 +578,7 @@ private:
     bool usePluginRendererScrollableArea(WebCore::LocalFrame&) const final;
 
 #if ENABLE(VIDEO)
-    void showCaptionDisplaySettings(CompletionHandler<void(bool)>&&) final;
+    void showCaptionDisplaySettings(WebCore::HTMLMediaElement&, const WebCore::ResolvedCaptionDisplaySettingsOptions&, CompletionHandler<void(WebCore::ExceptionOr<void>)>&&) final;
 #endif
 
     mutable bool m_cachedMainFrameHasHorizontalScrollbar { false };

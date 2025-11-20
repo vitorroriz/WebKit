@@ -1326,6 +1326,7 @@ set(WebCore_NON_SVG_IDL_FILES
     fileapi/FileReader.idl
     fileapi/FileReaderSync.idl
 
+    html/CaptionDisplaySettingsOptions.idl
     html/DOMFormData.idl
     html/DOMTokenList.idl
     html/DOMURL.idl
@@ -1412,6 +1413,7 @@ set(WebCore_NON_SVG_IDL_FILES
     html/HTMLTrackElement.idl
     html/HTMLUListElement.idl
     html/HTMLUnknownElement.idl
+    html/HTMLVideoElement+CaptionDisplaySettings.idl
     html/HTMLVideoElement+RequestVideoFrameCallback.idl
     html/HTMLVideoElement.idl
     html/ImageBitmap.idl
@@ -1425,6 +1427,7 @@ set(WebCore_NON_SVG_IDL_FILES
     html/OffscreenCanvas.idl
     html/PopoverInvokerElement.idl
     html/RadioNodeList.idl
+    html/ResolvedCaptionDisplaySettingsOptions.idl
     html/SubmitEvent.idl
     html/TextMetrics.idl
     html/TimeRanges.idl
@@ -2483,6 +2486,7 @@ set(WebCoreTestSupport_IDL_FILES
     testing/MallocStatistics.idl
     testing/MemoryInfo.idl
     testing/MockCDMFactory.idl
+    testing/MockCaptionDisplaySettingsClientCallback.idl
     testing/MockContentFilterSettings.idl
     testing/MockPageOverlay.idl
     testing/MockWebAuthenticationConfiguration.idl
@@ -2498,6 +2502,7 @@ list(APPEND WebCoreTestSupport_SOURCES
     testing/InternalsMapLike.cpp
     testing/InternalsSetLike.cpp
     testing/MockCDMFactory.cpp
+    testing/MockCaptionDisplaySettingsClientCallback.cpp
     testing/MockGamepad.cpp
     testing/MockGamepadProvider.cpp
     testing/MockLibWebRTCPeerConnection.cpp
