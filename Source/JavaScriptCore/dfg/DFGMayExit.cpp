@@ -398,6 +398,32 @@ ExitMode mayExitImpl(Graph& graph, Node* node, StateType& state)
         return Exits;
     }
 
+    case PutByVal: {
+        if (graph.m_form != SSA)
+            return Exits;
+
+        ArrayMode arrayMode = node->arrayMode().modeForPut();
+        if (!arrayMode.isInBounds())
+            return Exits;
+
+        switch (arrayMode.type()) {
+        case Array::Int8Array:
+        case Array::Int16Array:
+        case Array::Int32Array:
+        case Array::Uint8Array:
+        case Array::Uint8ClampedArray:
+        case Array::Uint16Array:
+        case Array::Uint32Array:
+        case Array::Float16Array:
+        case Array::Float32Array:
+        case Array::Float64Array:
+            break;
+        default:
+            return Exits;
+        }
+        break;
+    }
+
     default:
         // If in doubt, return true.
         return Exits;
