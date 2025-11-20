@@ -119,6 +119,7 @@ class FloatRect;
 class FloatSize;
 class FontAttributeChanges;
 class FontChanges;
+class FrameTreeSyncData;
 class GraphicsLayer;
 class ImageBufferBackend;
 class InspectorOverlay;
@@ -275,6 +276,7 @@ struct FileChooserSettings;
 struct FocusOptions;
 struct FontAttributes;
 struct FrameIdentifierType;
+struct FrameTreeSyncSerializationData;
 struct GrammarDetail;
 struct HTMLModelElementCamera;
 struct ImageBufferParameters;
@@ -2538,6 +2540,9 @@ public:
     void observeAndCreateRemoteSubframesInOtherProcesses(WebFrameProxy&, const String& frameName);
     void broadcastDocumentSyncData(IPC::Connection&, const WebCore::DocumentSyncSerializationData&);
     void broadcastAllDocumentSyncData(IPC::Connection&, Ref<WebCore::DocumentSyncData>&&);
+
+    void broadcastFrameTreeSyncData(IPC::Connection&, WebCore::FrameIdentifier, const WebCore::FrameTreeSyncSerializationData&);
+    void broadcastAllFrameTreeSyncData(IPC::Connection&, WebCore::FrameIdentifier,  Ref<WebCore::FrameTreeSyncData>&&);
 
     void addOpenedPage(WebPageProxy&);
     bool hasOpenedPage() const;

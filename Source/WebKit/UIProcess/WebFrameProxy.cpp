@@ -676,7 +676,7 @@ void WebFrameProxy::broadcastFrameTreeSyncData(Ref<FrameTreeSyncData>&& data)
     RELEASE_ASSERT(webPage->protectedPreferences()->siteIsolationEnabled());
 
     webPage->forEachWebContentProcess([&](auto& webProcess, auto pageID) {
-        webProcess.send(Messages::WebPage::UpdateFrameTreeSyncData(m_frameID, data), pageID);
+        webProcess.send(Messages::WebPage::AllFrameTreeSyncDataChangedInAnotherProcess(m_frameID, data), pageID);
     });
 }
 

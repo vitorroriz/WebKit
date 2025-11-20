@@ -7718,6 +7718,31 @@ void WebPageProxy::broadcastAllDocumentSyncData(IPC::Connection& connection, Ref
     });
 }
 
+void WebPageProxy::broadcastFrameTreeSyncData(IPC::Connection& connection, FrameIdentifier frameID, const WebCore::FrameTreeSyncSerializationData& data)
+{
+    // FIXME: This only allows changes from the process that the frame currently lives in.
+    // We may want to also allow changes from the process that owns the parent frame, possibly
+    // filtered on a per-property basis.
+    Ref process = WebProcessProxy::fromConnection(connection);
+    MESSAGE_CHECK(process, &siteIsolatedProcess() == process.ptr());
+    forEachWebContentProcess([&](auto& webProcess, auto pageID) {
+        if (webProcess == process)
+            return;
+        webProcess.send(Messages::WebPage::FrameTreeSyncDataChangedInAnotherProcess(frameID, data), pageID);
+    });
+}
+
+void WebPageProxy::broadcastAllFrameTreeSyncData(IPC::Connection& connection, FrameIdentifier frameID, Ref<WebCore::FrameTreeSyncData>&& data)
+{
+    Ref process = WebProcessProxy::fromConnection(connection);
+    MESSAGE_CHECK(process, &siteIsolatedProcess() == process.ptr());
+    forEachWebContentProcess([&](auto& webProcess, auto pageID) {
+        if (webProcess == process)
+            return;
+        webProcess.send(Messages::WebPage::AllFrameTreeSyncDataChangedInAnotherProcess(frameID, data), pageID);
+    });
+}
+
 void WebPageProxy::didFinishLoadForFrame(IPC::Connection& connection, FrameIdentifier frameID, FrameInfoData&& frameInfo, ResourceRequest&& request, std::optional<WebCore::NavigationIdentifier> navigationID, const UserData& userData, WallTime timestamp)
 {
     LOG(Loading, "WebPageProxy::didFinishLoadForFrame - WebPageProxy %p with navigationID %" PRIu64 " didFinishLoad", this, navigationID ? navigationID->toUInt64() : 0);

@@ -639,6 +639,9 @@ messages -> WebPageProxy {
     [EnabledBy=SiteIsolationEnabled] BroadcastDocumentSyncData(struct WebCore::DocumentSyncSerializationData processSyncData)
     [EnabledBy=SiteIsolationEnabled] BroadcastAllDocumentSyncData(Ref<WebCore::DocumentSyncData> documentSyncData)
 
+    [EnabledBy=SiteIsolationEnabled] BroadcastFrameTreeSyncData(WebCore::FrameIdentifier frameID, struct WebCore::FrameTreeSyncSerializationData frameTreeSyncData)
+    [EnabledBy=SiteIsolationEnabled] BroadcastAllFrameTreeSyncData(WebCore::FrameIdentifier frameID, Ref<WebCore::FrameTreeSyncData> frameTreeSyncData)
+
     [EnabledBy=SiteIsolationEnabled] DispatchLoadEventToFrameOwnerElement(WebCore::FrameIdentifier frameID)
 
     [EnabledBy=SiteIsolationEnabled] FocusRemoteFrame(WebCore::FrameIdentifier frameID)

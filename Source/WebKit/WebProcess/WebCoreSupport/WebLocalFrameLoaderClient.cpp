@@ -1080,6 +1080,16 @@ void WebLocalFrameLoaderClient::setPrinting(bool printing, FloatSize pageSize, F
     WebFrameLoaderClient::setPrinting(printing, pageSize, originalPageSize, maximumShrinkRatio, adjustViewSize);
 }
 
+void WebLocalFrameLoaderClient::broadcastAllFrameTreeSyncDataToOtherProcesses(FrameTreeSyncData& data)
+{
+    WebFrameLoaderClient::broadcastAllFrameTreeSyncDataToOtherProcesses(data);
+}
+
+void WebLocalFrameLoaderClient::broadcastFrameTreeSyncDataToOtherProcesses(const FrameTreeSyncSerializationData& data)
+{
+    WebFrameLoaderClient::broadcastFrameTreeSyncDataToOtherProcesses(data);
+}
+
 void WebLocalFrameLoaderClient::cancelPolicyCheck()
 {
     m_frame->invalidatePolicyListeners();

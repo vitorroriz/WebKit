@@ -1275,7 +1275,34 @@ void WebPage::frameWasRemovedInAnotherProcess(WebCore::FrameIdentifier frameID)
     frame->removeFromTree();
 }
 
-void WebPage::updateFrameTreeSyncData(WebCore::FrameIdentifier frameID, Ref<WebCore::FrameTreeSyncData>&& data)
+void WebPage::topDocumentSyncDataChangedInAnotherProcess(const WebCore::DocumentSyncSerializationData& data)
+{
+    if (RefPtr page = corePage())
+        page->updateTopDocumentSyncData(data);
+}
+
+void WebPage::allTopDocumentSyncDataChangedInAnotherProcess(Ref<WebCore::DocumentSyncData>&& data)
+{
+    if (RefPtr page = corePage())
+        page->updateTopDocumentSyncData(WTFMove(data));
+}
+
+void WebPage::frameTreeSyncDataChangedInAnotherProcess(FrameIdentifier frameID, const WebCore::FrameTreeSyncSerializationData& data)
+{
+    ASSERT(m_page->settings().siteIsolationEnabled());
+
+    RefPtr frame = WebProcess::singleton().webFrame(frameID);
+    if (!frame)
+        return;
+
+    ASSERT(frame->page() == this);
+
+    RefPtr coreFrame = frame->coreFrame();
+    if (coreFrame)
+        coreFrame->updateFrameTreeSyncData(data);
+}
+
+void WebPage::allFrameTreeSyncDataChangedInAnotherProcess(FrameIdentifier frameID, Ref<WebCore::FrameTreeSyncData>&& data)
 {
     ASSERT(m_page->settings().siteIsolationEnabled());
 
@@ -1288,18 +1315,6 @@ void WebPage::updateFrameTreeSyncData(WebCore::FrameIdentifier frameID, Ref<WebC
     RefPtr coreFrame = frame->coreFrame();
     if (coreFrame)
         coreFrame->updateFrameTreeSyncData(WTFMove(data));
-}
-
-void WebPage::topDocumentSyncDataChangedInAnotherProcess(const WebCore::DocumentSyncSerializationData& data)
-{
-    if (RefPtr page = corePage())
-        page->updateTopDocumentSyncData(data);
-}
-
-void WebPage::allTopDocumentSyncDataChangedInAnotherProcess(Ref<WebCore::DocumentSyncData>&& data)
-{
-    if (RefPtr page = corePage())
-        page->updateTopDocumentSyncData(WTFMove(data));
 }
 
 #if ENABLE(GPU_PROCESS)

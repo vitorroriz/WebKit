@@ -253,4 +253,16 @@ void WebFrameLoaderClient::setPrinting(bool printing, FloatSize pageSize, FloatS
         webPage->send(Messages::WebPageProxy::SetFramePrinting(m_frame->frameID(), printing, pageSize, originalPageSize, maximumShrinkRatio, adjustViewSize));
 }
 
+void WebFrameLoaderClient::broadcastAllFrameTreeSyncDataToOtherProcesses(FrameTreeSyncData& data)
+{
+    if (RefPtr webPage = m_frame->page())
+        webPage->send(Messages::WebPageProxy::BroadcastAllFrameTreeSyncData(m_frame->frameID(), data));
+}
+
+void WebFrameLoaderClient::broadcastFrameTreeSyncDataToOtherProcesses(const FrameTreeSyncSerializationData& data)
+{
+    if (RefPtr webPage = m_frame->page())
+        webPage->send(Messages::WebPageProxy::BroadcastFrameTreeSyncData(m_frame->frameID(), data));
+}
+
 }

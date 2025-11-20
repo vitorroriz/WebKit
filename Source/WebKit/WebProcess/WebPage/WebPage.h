@@ -183,6 +183,7 @@ class FontChanges;
 class Frame;
 class FrameView;
 class FrameSelection;
+class FrameTreeSyncData;
 class GraphicsContext;
 class HTMLElement;
 class HTMLImageElement;
@@ -296,6 +297,7 @@ struct ExceptionData;
 struct ExceptionDetails;
 struct FocusOptions;
 struct FontAttributes;
+struct FrameTreeSyncSerializationData;
 struct GlobalFrameIdentifier;
 struct GlobalWindowIdentifier;
 #if ENABLE(ATTACHMENT_ELEMENT)
@@ -811,10 +813,12 @@ public:
     Awaitable<std::optional<FrameTreeNodeData>> getFrameTree();
     void didFinishLoadInAnotherProcess(WebCore::FrameIdentifier);
     void frameWasRemovedInAnotherProcess(WebCore::FrameIdentifier);
-    void updateFrameTreeSyncData(WebCore::FrameIdentifier, Ref<WebCore::FrameTreeSyncData>&&);
 
     void topDocumentSyncDataChangedInAnotherProcess(const WebCore::DocumentSyncSerializationData&);
     void allTopDocumentSyncDataChangedInAnotherProcess(Ref<WebCore::DocumentSyncData>&&);
+
+    void frameTreeSyncDataChangedInAnotherProcess(WebCore::FrameIdentifier, const WebCore::FrameTreeSyncSerializationData&);
+    void allFrameTreeSyncDataChangedInAnotherProcess(WebCore::FrameIdentifier, Ref<WebCore::FrameTreeSyncData>&&);
 
     std::optional<WebCore::SimpleRange> currentSelectionAsRange();
 
