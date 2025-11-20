@@ -47,6 +47,7 @@
 // FIXME: Replace this soft linking with a HAVE macro once rdar://158191390 is available on all tested OS builds.
 SOFT_LINK_FRAMEWORK(Network)
 SOFT_LINK_MAY_FAIL(Network, nw_webtransport_options_set_allow_joining_before_ready, void, (nw_protocol_options_t options, bool allow), (options, allow))
+SOFT_LINK_MAY_FAIL(Network, nw_webtransport_metadata_set_local_draining, void, (nw_protocol_metadata_t metadata), (metadata))
 
 // FIXME: Replace this soft linking with a HAVE macro once rdar://164514830 is available on all tested OS builds.
 SOFT_LINK_MAY_FAIL(Network, nw_webtransport_metadata_get_session_closed, bool, (nw_protocol_metadata_t metadata), (metadata))
@@ -812,6 +813,42 @@ TEST(WebTransport, BackForwardCache)
     [webView loadRequest:loadingServer.request("/other"_s)];
     EXPECT_WK_STREQ([webView _test_waitForAlert], "loaded");
     Util::run(&serverConnectionTerminatedByClient);
+}
+
+TEST(WebTransport, ServerDrain)
+{
+    if (!canLoadnw_webtransport_metadata_set_local_draining())
+        return;
+
+    WebTransportServer echoServer([](ConnectionGroup group) -> ConnectionTask {
+        auto connection = co_await group.receiveIncomingConnection();
+        auto request = co_await connection.awaitableReceiveBytes();
+        EXPECT_EQ(request.size(), 3u);
+        group.drainWebTransportSession();
+    });
+
+    auto configuration = adoptNS([WKWebViewConfiguration new]);
+    enableWebTransport(configuration.get());
+    auto webView = adoptNS([[WKWebView alloc] initWithFrame:CGRectZero configuration:configuration.get()]);
+    auto delegate = adoptNS([TestNavigationDelegate new]);
+    [delegate allowAnyTLSCertificate];
+    [webView setNavigationDelegate:delegate.get()];
+
+    NSString *html = [NSString stringWithFormat:@""
+        "<script>async function test() {"
+        "  try {"
+        "    let t = new WebTransport('https://127.0.0.1:%d/');"
+        "    await t.ready;"
+        "    let c = await t.createUnidirectionalStream();"
+        "    let w = c.getWriter();"
+        "    await w.write(new TextEncoder().encode('abc'));"
+        "    await t.draining;"
+        "    alert('successfully receieved draining');"
+        "  } catch (e) { alert('caught ' + e); }"
+        "}; test();"
+        "</script>", echoServer.port()];
+    [webView loadHTMLString:html baseURL:[NSURL URLWithString:@"https://webkit.org/"]];
+    EXPECT_WK_STREQ([webView _test_waitForAlert], "successfully receieved draining");
 }
 
 } // namespace TestWebKitAPI

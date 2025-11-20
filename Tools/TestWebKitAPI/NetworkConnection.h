@@ -79,6 +79,7 @@ public:
     ReceiveIncomingConnectionOperation receiveIncomingConnection() const;
     void cancel();
     Awaitable<void> awaitableFailure();
+    void drainWebTransportSession();
 
 private:
     friend class WebTransportServer;
