@@ -51,6 +51,7 @@
 #import "RemoteLayerTreeCommitBundle.h"
 #import "RemoteLayerTreeTransaction.h"
 #import "SafeBrowsingSPI.h"
+#import "SafeBrowsingSoftLink.h"
 #import "SharedBufferReference.h"
 #import "SynapseSPI.h"
 #import "VideoPresentationManagerProxy.h"
@@ -266,7 +267,7 @@ std::optional<IPC::AsyncReplyID> WebPageProxy::grantAccessToCurrentPasteboardDat
 void WebPageProxy::beginSafeBrowsingCheck(const URL& url, API::Navigation& navigation, bool forMainFrameNavigation)
 {
 #if HAVE(SAFE_BROWSING)
-    RetainPtr context = [SSBLookupContext sharedLookupContext];
+    RetainPtr context = [getSSBLookupContextClassSingleton() sharedLookupContext];
     if (!url.isValid() || !context)
         return;
     size_t redirectChainIndex = navigation.redirectChainIndex(url);
