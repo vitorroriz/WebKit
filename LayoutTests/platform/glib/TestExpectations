@@ -4838,6 +4838,8 @@ webkit.org/b/299333 http/wpt/navigation-api/ [ Failure Pass ]
 webkit.org/b/302326 animations/animation-welcome-safari.html [ Failure Pass ]
 webkit.org/b/302326 fast/dom/rtl-scroll-to-leftmost-and-resize.html [ Failure Timeout Pass ]
 
+webkit.org/b/298463 accessibility/crash-deleting-dynamically-updated-text-input.html [ Skip ]
+
 # End: Common failures between GTK and WPE.
 
 #////////////////////////////////////////////////////////////////////////////////////////
