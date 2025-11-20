@@ -183,7 +183,7 @@ public:
     WEBCORE_EXPORT virtual void restore(GraphicsContextState::Purpose = GraphicsContextState::Purpose::SaveRestore);
 
     void unwindStateStack(unsigned count);
-    void unwindStateStack() { unwindStateStack(stackSize()); }
+    WEBCORE_EXPORT void unwindStateStack();
 
     unsigned stackSize() const { return m_stack.size(); }
 

@@ -107,6 +107,11 @@ void GraphicsContext::unwindStateStack(unsigned count)
     }
 }
 
+void GraphicsContext::unwindStateStack()
+{
+    unwindStateStack(stackSize());
+}
+
 FloatSize GraphicsContext::platformShadowOffset(const FloatSize& shadowOffset) const
 {
 #if USE(CG)
