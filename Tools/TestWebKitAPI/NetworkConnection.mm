@@ -226,7 +226,8 @@ ConnectionGroup::ConnectionGroup(const ConnectionGroup&) = default;
 
 void ConnectionGroup::markAsFailed()
 {
-    m_data->failureCompletionHandler();
+    if (auto handler = std::exchange(m_data->failureCompletionHandler, nullptr))
+        handler();
 }
 
 Awaitable<void> ConnectionGroup::awaitableFailure()
