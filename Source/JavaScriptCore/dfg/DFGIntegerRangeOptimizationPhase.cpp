@@ -1039,6 +1039,34 @@ public:
         return std::tuple { minValue, maxValue };
     }
 
+    // Be careful: do not use this to infer a relationship that will not be pruned later,
+    // otherwise it might break the inductive reasoning around phis/upsilons.
+    // For example, if lhs > 0 => node(lhs) > 0, you can't add that relationship. Pruning
+    // relationships involving lhs won't prune this new relationship.
+    bool provablyGreaterThan(Node* lhs, Node* rhs, int32_t minOffset = 0)
+    {
+        auto iter = m_relationships.find(lhs);
+        if (iter != m_relationships.end()) {
+            for (Relationship relationship : iter->value) {
+                if (relationship.right() == rhs
+                    && relationship.offset() >= minOffset
+                    && relationship.kind() == Relationship::GreaterThan)
+                        return true;
+            }
+        }
+        return false;
+    }
+
+    bool provablyGreaterThanOrEqual(Node* lhs, Node* rhs)
+    {
+        return provablyGreaterThan(lhs, rhs, -1);
+    }
+
+    bool provablyNonNegative(Node* lhs)
+    {
+        return provablyGreaterThanOrEqual(lhs, m_zero);
+    }
+
     bool run()
     {
         ASSERT(m_graph.m_form == SSA);
@@ -1641,6 +1669,19 @@ private:
             break;
         }
 
+        case ToLength: {
+            if (node->child1().useKind() == UntypedUse)
+                break;
+            // Consider b = ToLength(a)
+            // If a < 0, then b == 0; b >= a
+            // If a >= 0, then b = a; b >= a still
+            setRelationship(Relationship(node, node->child1().node(), Relationship::GreaterThan, -1));
+            // Note that we cannot conclude that b == 0 because it won't get pruned.
+            if (provablyNonNegative(node->child1().node()))
+                setRelationship(Relationship(node, node->child1().node(), Relationship::Equal));
+            break;
+        }
+
         case GetVectorLength: {
             setRelationship(Relationship(node, m_zero, Relationship::GreaterThan, -1));
             setRelationship(Relationship(node, m_zero, Relationship::LessThan, (MAX_STORAGE_VECTOR_LENGTH + 1)));
@@ -2090,4 +2131,3 @@ bool performIntegerRangeOptimization(Graph& graph)
 } } // namespace JSC::DFG
 
 #endif // ENABLE(DFG_JIT)
-
