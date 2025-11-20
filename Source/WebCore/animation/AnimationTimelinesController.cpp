@@ -399,7 +399,7 @@ void AnimationTimelinesController::scheduleAcceleratedEffectStackUpdateForTarget
 }
 #endif
 
-Vector<std::tuple<String, double, bool>> AnimationTimelinesController::acceleratedAnimationsForElement(const Element& element) const
+Vector<GraphicsLayer::AcceleratedAnimationForTesting> AnimationTimelinesController::acceleratedAnimationsForElement(const Element& element) const
 {
     CheckedPtr renderer = element.renderer();
     if (renderer && renderer->isComposited()) {

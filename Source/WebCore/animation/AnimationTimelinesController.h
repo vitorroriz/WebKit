@@ -26,6 +26,7 @@
 #pragma once
 
 #include <WebCore/FrameRateAligner.h>
+#include <WebCore/GraphicsLayer.h>
 #include <WebCore/ReducedResolutionSeconds.h>
 #include <WebCore/Timer.h>
 #include <WebCore/WebAnimationTypes.h>
@@ -77,7 +78,7 @@ public:
     void scheduleAcceleratedEffectStackUpdateForTarget(const Styleable&);
 #endif
 
-    WEBCORE_EXPORT Vector<std::tuple<String, double, bool>> acceleratedAnimationsForElement(const Element&) const;
+    WEBCORE_EXPORT Vector<GraphicsLayer::AcceleratedAnimationForTesting> acceleratedAnimationsForElement(const Element&) const;
 
 private:
 

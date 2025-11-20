@@ -1443,8 +1443,8 @@ Vector<Internals::AcceleratedAnimation> Internals::acceleratedAnimationsForEleme
         return { };
 
     Vector<Internals::AcceleratedAnimation> animations;
-    for (const auto& [property, speed, isThreaded] : timelinesController->acceleratedAnimationsForElement(element))
-        animations.append({ property, speed, isThreaded });
+    for (const auto& acceleratedAnimation : timelinesController->acceleratedAnimationsForElement(element))
+        animations.append({ acceleratedAnimation.property, acceleratedAnimation.speed, acceleratedAnimation.isThreaded });
     return animations;
 }
 

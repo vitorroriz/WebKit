@@ -545,7 +545,12 @@ public:
     WEBCORE_EXPORT virtual void suspendAnimations(MonotonicTime);
     WEBCORE_EXPORT virtual void resumeAnimations();
 
-    virtual Vector<std::tuple<String, double, bool>> acceleratedAnimationsForTesting() const { return { }; }
+    struct AcceleratedAnimationForTesting {
+        String property;
+        double speed;
+        bool isThreaded;
+    };
+    virtual Vector<AcceleratedAnimationForTesting> acceleratedAnimationsForTesting() const { return { }; }
 
     // Layer contents
     virtual void setContentsToImage(Image*) { }
