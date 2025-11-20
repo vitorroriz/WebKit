@@ -493,6 +493,11 @@ WI.SettingsTabContentView = class SettingsTabContentView extends WI.TabContentVi
 
         let engineeringSettingsView = new WI.SettingsView("engineering", WI.unlocalizedString("Engineering"));
 
+        if (WI.isEngineeringBuild) {
+            engineeringSettingsView.addSetting(WI.unlocalizedString("Debug UI:"), WI.showDebugUISetting, WI.unlocalizedString("Show Debug UI"));
+            engineeringSettingsView.addSeparator();
+        }
+
         let elementsGroup = engineeringSettingsView.addGroup(WI.unlocalizedString("Elements:"));
         elementsGroup.addSetting(WI.settings.engineeringAllowEditingUserAgentShadowTrees, WI.unlocalizedString("Allow editing UserAgent shadow trees"));
 
