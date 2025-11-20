@@ -44,6 +44,7 @@
 #include <WebCore/LocalFrameView.h>
 #include <WebCore/NativeImage.h>
 #include <WebCore/PageOverlayController.h>
+#include <WebCore/PlatformDisplay.h>
 #include <WebCore/ProcessCapabilities.h>
 #include <WebCore/RenderLayerBacking.h>
 #include <WebCore/RenderView.h>
@@ -627,7 +628,7 @@ void LayerTreeHost::foreachRegionInDamageHistoryForTesting(Function<void(const R
 void LayerTreeHost::fillGLInformation(RenderProcessInfo&& info, CompletionHandler<void(RenderProcessInfo&&)>&& completionHandler)
 {
 #if USE(SKIA)
-    if (ProcessCapabilities::canUseAcceleratedBuffers())
+    if (ProcessCapabilities::canUseAcceleratedBuffers() && PlatformDisplay::sharedDisplay().skiaGLContext())
         info.gpuPaintingThreadsCount = SkiaPaintingEngine::numberOfGPUPaintingThreads();
     else
         info.cpuPaintingThreadsCount = SkiaPaintingEngine::numberOfCPUPaintingThreads();

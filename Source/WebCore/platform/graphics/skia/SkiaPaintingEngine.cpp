@@ -51,15 +51,20 @@ namespace WebCore {
 WTF_MAKE_TZONE_ALLOCATED_IMPL(SkiaPaintingEngine);
 
 // Note:
-// If WEBKIT_SKIA_ENABLE_CPU_RENDERING is unset, we will allocate a GPU-only worker pool with WEBKIT_SKIA_GPU_PAINTING_THREADS threads (default: 1).
+// If WEBKIT_SKIA_ENABLE_CPU_RENDERING is unset, we will allocate a GPU-only worker pool with WEBKIT_SKIA_GPU_PAINTING_THREADS threads.
 // If WEBKIT_SKIA_ENABLE_CPU_RENDERING is unset, and WEBKIT_SKIA_GPU_PAINTING_THREADS is set to 0, we will use GPU rendering on main thread.
 //
-// If WEBKIT_SKIA_ENABLE_CPU_RENDERING=1 is set, we will allocate a CPU-only worker pool with WEBKIT_SKIA_CPU_PAINTING_THREADS threads (default: nCores/2).
+// If WEBKIT_SKIA_ENABLE_CPU_RENDERING=1 is set, we will allocate a CPU-only worker pool with WEBKIT_SKIA_CPU_PAINTING_THREADS threads.
 // if WEBKIT_SKIA_ENABLE_CPU_RENDERING=1 is set, and WEBKIT_SKIA_CPU_PAINTING_THREADS is set to 0, we will use CPU rendering on main thread.
+
+static bool canPerformAcceleratedRendering()
+{
+    return ProcessCapabilities::canUseAcceleratedBuffers() && PlatformDisplay::sharedDisplay().skiaGLContext();
+}
 
 SkiaPaintingEngine::SkiaPaintingEngine()
 {
-    if (ProcessCapabilities::canUseAcceleratedBuffers()) {
+    if (canPerformAcceleratedRendering()) {
         m_texturePool = makeUnique<BitmapTexturePool>();
 
         if (auto numberOfGPUThreads = numberOfGPUPaintingThreads())
@@ -77,11 +82,6 @@ SkiaPaintingEngine::~SkiaPaintingEngine() = default;
 std::unique_ptr<SkiaPaintingEngine> SkiaPaintingEngine::create()
 {
     return makeUnique<SkiaPaintingEngine>();
-}
-
-static bool canPerformAcceleratedRendering()
-{
-    return ProcessCapabilities::canUseAcceleratedBuffers() && PlatformDisplay::sharedDisplay().skiaGLContext();
 }
 
 void SkiaPaintingEngine::paintIntoGraphicsContext(const GraphicsLayer& layer, GraphicsContext& context, const IntRect& dirtyRect, bool contentsOpaque, float contentsScale) const
@@ -233,10 +233,6 @@ unsigned SkiaPaintingEngine::numberOfGPUPaintingThreads()
     static unsigned numberOfThreads = 0;
 
     std::call_once(onceFlag, [] {
-        // If WEBKIT_SKIA_ENABLE_CPU_RENDERING=1 is set in the environment, no GPU painting is used.
-        if (!ProcessCapabilities::canUseAcceleratedBuffers())
-            return;
-
         // By default, use 2 GPU worker threads if there are four or more CPU cores, otherwise use 1 thread only.
         numberOfThreads = WTF::numberOfProcessorCores() >= 4 ? 2 : 1;
 
