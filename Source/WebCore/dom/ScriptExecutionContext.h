@@ -426,8 +426,8 @@ private:
     WEBCORE_EXPORT GuaranteedSerialFunctionDispatcher& nativePromiseDispatcher();
 
     WeakHashSet<MessagePort, WeakPtrImplWithEventTargetData> m_messagePorts;
-    HashSet<ContextDestructionObserver*> m_destructionObservers;
-    HashSet<ActiveDOMObject*> m_activeDOMObjects;
+    WeakHashSet<ContextDestructionObserver> m_destructionObservers;
+    WeakHashSet<ActiveDOMObject> m_activeDOMObjects;
 
     HashMap<int, RefPtr<DOMTimer>> m_timeouts;
 
