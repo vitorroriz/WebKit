@@ -8382,3 +8382,5 @@ fast/images/page-wide-animation-toggle.html [ Pass Timeout ]
 fast/images/individual-animation-toggle.html [ Pass Timeout ]
 
 webkit.org/b/301175 editing/selection/ios/become-first-responder-after-relinquishing-focus.html [ Pass Timeout ]
+
+webkit.org/b/302893 imported/w3c/web-platform-tests/html/interaction/focus/focus-input-type-switch.html [ Failure ]
