@@ -326,6 +326,7 @@ public:
     struct AcceleratedAnimation {
         String property;
         double speed;
+        bool isThreaded;
     };
     Vector<AcceleratedAnimation> acceleratedAnimationsForElement(Element&);
     unsigned numberOfAnimationTimelineInvalidations() const;

@@ -29,6 +29,7 @@
 #include "AnimationEventBase.h"
 #include "CSSAnimation.h"
 #include "CSSTransition.h"
+#include "ContainerNodeInlines.h"
 #include "DocumentEventLoop.h"
 #include "DocumentPage.h"
 #include "DocumentTimeline.h"
@@ -36,9 +37,14 @@
 #include "ElementInlines.h"
 #include "EventLoop.h"
 #include "EventTargetInlines.h"
+#include "GraphicsLayer.h"
 #include "KeyframeEffect.h"
 #include "LocalDOMWindow.h"
 #include "Logging.h"
+#include "RenderBoxModelObject.h"
+#include "RenderLayer.h"
+#include "RenderLayerBacking.h"
+#include "RenderObject.h"
 #include "ScrollTimeline.h"
 #include "Settings.h"
 #include "StyleOriginatedTimelinesController.h"
@@ -392,6 +398,17 @@ void AnimationTimelinesController::scheduleAcceleratedEffectStackUpdateForTarget
         documentTimeline->scheduleAcceleratedEffectStackUpdate();
 }
 #endif
+
+Vector<std::tuple<String, double, bool>> AnimationTimelinesController::acceleratedAnimationsForElement(const Element& element) const
+{
+    CheckedPtr renderer = element.renderer();
+    if (renderer && renderer->isComposited()) {
+        CheckedPtr compositedRenderer = downcast<RenderBoxModelObject>(renderer.get());
+        if (RefPtr graphicsLayer = compositedRenderer->layer()->backing()->graphicsLayer())
+            return graphicsLayer->acceleratedAnimationsForTesting();
+    }
+    return { };
+}
 
 } // namespace WebCore
 

@@ -333,6 +333,7 @@ enum AV1ConfigurationRange {
 ] dictionary AcceleratedAnimation {
     DOMString property;
     double speed;
+    boolean isThreaded;
 };
 
 [

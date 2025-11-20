@@ -4465,7 +4465,7 @@ void RenderLayerBacking::updateAcceleratedEffectsAndBaseValues(HashSet<Ref<Accel
         auto animatesWidth = effectStack->containsProperty(CSSPropertyWidth);
         auto animatesHeight = effectStack->containsProperty(CSSPropertyHeight);
         for (const auto& effect : effectStack->sortedEffects()) {
-            if (!effect || !effect->canBeAccelerated())
+            if (!effect || !effect->canHaveAcceleratedRepresentation() || !effect->canBeAccelerated())
                 continue;
             if (animatesWidth || animatesHeight) {
                 auto& blendingKeyframes = effect->blendingKeyframes();

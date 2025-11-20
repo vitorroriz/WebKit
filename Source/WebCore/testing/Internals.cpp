@@ -1438,9 +1438,13 @@ ExceptionOr<void> Internals::resumeAnimations() const
 
 Vector<Internals::AcceleratedAnimation> Internals::acceleratedAnimationsForElement(Element& element)
 {
+    CheckedPtr timelinesController = element.document().timelinesController();
+    if (!timelinesController)
+        return { };
+
     Vector<Internals::AcceleratedAnimation> animations;
-    for (const auto& animationAsPair : element.document().timeline().acceleratedAnimationsForElement(element))
-        animations.append({ animationAsPair.first, animationAsPair.second });
+    for (const auto& [property, speed, isThreaded] : timelinesController->acceleratedAnimationsForElement(element))
+        animations.append({ property, speed, isThreaded });
     return animations;
 }
 

@@ -77,6 +77,8 @@ public:
     void scheduleAcceleratedEffectStackUpdateForTarget(const Styleable&);
 #endif
 
+    WEBCORE_EXPORT Vector<std::tuple<String, double, bool>> acceleratedAnimationsForElement(const Element&) const;
+
 private:
 
     ReducedResolutionSeconds liveCurrentTime() const;
