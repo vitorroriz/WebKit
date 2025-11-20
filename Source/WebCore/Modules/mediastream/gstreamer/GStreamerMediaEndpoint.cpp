@@ -1458,7 +1458,7 @@ void GStreamerMediaEndpoint::connectIncomingTrack(WebRTCTrackData& data)
     // NOTE: Here ideally we should match WebKit-side transceivers with data.transceiver but we
     // cannot because in some situations (simulcast, mostly), we can end-up with multiple webrtcbin
     // src pads associated to the same transceiver.
-    auto transceiver = peerConnectionBackend->existingTransceiver([&](auto& backend) -> bool {
+    RefPtr<RTCRtpTransceiver> transceiver = peerConnectionBackend->existingTransceiver([&](auto& backend) -> bool {
         GUniqueOutPtr<char> mid;
         g_object_get(backend.rtcTransceiver(), "mid", &mid.outPtr(), nullptr);
         GST_DEBUG_OBJECT(m_pipeline.get(), "Checking if transceiver with mid %s matches the track mid", mid.get());
@@ -2301,7 +2301,7 @@ void GStreamerMediaEndpoint::collectTransceivers()
 
     GST_DEBUG_OBJECT(m_pipeline.get(), "Collecting transceivers");
     forEachTransceiver(m_webrtcBin, [&](auto&& transceiver) -> bool {
-        auto* existingTransceiver = peerConnectionBackend->existingTransceiver([&](auto& transceiverBackend) {
+        RefPtr existingTransceiver = peerConnectionBackend->existingTransceiver([&](auto& transceiverBackend) {
             return transceiver.get() == transceiverBackend.rtcTransceiver();
         });
         if (existingTransceiver)
@@ -2319,7 +2319,7 @@ void GStreamerMediaEndpoint::collectTransceivers()
             return false;
         }
 
-        peerConnectionBackend->newRemoteTransceiver(WTF::makeUnique<GStreamerRtpTransceiverBackend>(WTFMove(transceiver)), m_mediaForMid.get(String::fromUTF8(mid.get())), trackIdFromSDPMedia(*media));
+        existingTransceiver = peerConnectionBackend->newRemoteTransceiver(WTF::makeUnique<GStreamerRtpTransceiverBackend>(WTFMove(transceiver)), m_mediaForMid.get(String::fromUTF8(mid.get())), trackIdFromSDPMedia(*media));
         return false;
     });
 }
