@@ -6693,6 +6693,7 @@
 		6BE969C81E54D4CF008B7483 /* ResourceLoadStatisticsClassifierCocoa.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ResourceLoadStatisticsClassifierCocoa.cpp; sourceTree = "<group>"; };
 		6BE969C91E54D4CF008B7483 /* ResourceLoadStatisticsClassifierCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResourceLoadStatisticsClassifierCocoa.h; sourceTree = "<group>"; };
 		6BE969CC1E54E054008B7483 /* ResourceLoadStatisticsClassifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResourceLoadStatisticsClassifier.h; sourceTree = "<group>"; };
+		6C34CFE92ECBCF1C00DB2185 /* RemoteLayerTreeCommitBundle.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RemoteLayerTreeCommitBundle.mm; sourceTree = "<group>"; };
 		6D77DBC22D80D3D6008ED0DD /* ScreenTimeWebsiteDataSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScreenTimeWebsiteDataSupport.h; sourceTree = "<group>"; };
 		6D77DBC32D80D3EC008ED0DD /* ScreenTimeWebsiteDataSupport.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ScreenTimeWebsiteDataSupport.mm; sourceTree = "<group>"; };
 		6D8A91A511F0EFD100DD01FE /* com.apple.WebProcess.sb.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = com.apple.WebProcess.sb.in; path = WebProcess/com.apple.WebProcess.sb.in; sourceTree = "<group>"; };
@@ -11568,6 +11569,7 @@
 				2DDF731418E95060004F5A66 /* RemoteLayerBackingStoreCollection.mm */,
 				5CE77801297BA396000BA9CF /* RemoteLayerTree.serialization.in */,
 				A6EB76B251B844C7BCAAAF04 /* RemoteLayerTreeCommitBundle.h */,
+				6C34CFE92ECBCF1C00DB2185 /* RemoteLayerTreeCommitBundle.mm */,
 				2DDE0AF818298CC900F97EAA /* RemoteLayerTreePropertyApplier.h */,
 				2DDE0AF918298CC900F97EAA /* RemoteLayerTreePropertyApplier.mm */,
 				1AF1AC6A1651759E00C17D7F /* RemoteLayerTreeTransaction.h */,

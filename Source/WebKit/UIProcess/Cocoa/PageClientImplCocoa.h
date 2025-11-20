@@ -102,7 +102,8 @@ public:
     void storeAppHighlight(const WebCore::AppHighlight&) final;
 #endif
 
-    void didCommitLayerTree(const RemoteLayerTreeTransaction&, const std::optional<MainFrameData>&) override;
+    void didCommitLayerTree(const RemoteLayerTreeTransaction&, const std::optional<MainFrameData>&, const PageData&, const TransactionID&) override;
+    void didCommitMainFrameData(const MainFrameData&) override;
 
     void microphoneCaptureWillChange() final;
     void cameraCaptureWillChange() final;

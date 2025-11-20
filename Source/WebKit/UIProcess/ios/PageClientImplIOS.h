@@ -179,7 +179,8 @@ private:
     void commitPotentialTapFailed() override;
     void didGetTapHighlightGeometries(WebKit::TapIdentifier requestID, const WebCore::Color&, const Vector<WebCore::FloatQuad>& highlightedQuads, const WebCore::IntSize& topLeftRadius, const WebCore::IntSize& topRightRadius, const WebCore::IntSize& bottomLeftRadius, const WebCore::IntSize& bottomRightRadius, bool nodeHasBuiltInClickHandling) override;
 
-    void didCommitLayerTree(const RemoteLayerTreeTransaction&, const std::optional<MainFrameData>&) final;
+    void didCommitLayerTree(const RemoteLayerTreeTransaction&, const std::optional<MainFrameData>&, const PageData&, const TransactionID&) final;
+    void didCommitMainFrameData(const MainFrameData&) final;
     void layerTreeCommitComplete() override;
         
     void didPerformDictionaryLookup(const WebCore::DictionaryPopupInfo&) override;

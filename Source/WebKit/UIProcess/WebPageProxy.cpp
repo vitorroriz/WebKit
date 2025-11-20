@@ -3735,7 +3735,11 @@ void WebPageProxy::activateMediaStreamCaptureInPage()
 }
 
 #if !PLATFORM(COCOA)
-void WebPageProxy::didCommitLayerTree(const RemoteLayerTreeTransaction&, const std::optional<MainFrameData>&)
+void WebPageProxy::didCommitLayerTree(const RemoteLayerTreeTransaction&, const std::optional<MainFrameData>&, const PageData&, const TransactionID&)
+{
+}
+
+void WebPageProxy::didCommitMainFrameData(const MainFrameData&, const TransactionID&)
 {
 }
 

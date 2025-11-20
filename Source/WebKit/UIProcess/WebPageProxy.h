@@ -575,6 +575,7 @@ struct JSHandleInfo;
 struct KeyEventInterpretationContext;
 struct LoadParameters;
 struct MainFrameData;
+struct PageData;
 struct ModelIdentifier;
 struct NavigationActionData;
 struct NetworkResourceLoadIdentifierType;
@@ -1274,11 +1275,11 @@ public:
     void setDataDetectionResult(DataDetectionResult&&);
     void handleClickForDataDetectionResult(const WebCore::DataDetectorElementInfo&, const WebCore::IntPoint&);
 #endif
-    void didCommitLayerTree(const RemoteLayerTreeTransaction&, const std::optional<MainFrameData>&);
-    void didCommitMainFrameData(const MainFrameData&);
+    void didCommitLayerTree(const RemoteLayerTreeTransaction&, const std::optional<MainFrameData>&, const PageData&, const TransactionID&);
+    void didCommitMainFrameData(const MainFrameData&, const TransactionID&);
     void layerTreeCommitComplete();
 
-    bool updateLayoutViewportParameters(const RemoteLayerTreeTransaction&);
+    bool updateLayoutViewportParameters(const MainFrameData&);
 
 #if PLATFORM(GTK) || PLATFORM(WPE)
     void cancelComposition(const String& compositionString);

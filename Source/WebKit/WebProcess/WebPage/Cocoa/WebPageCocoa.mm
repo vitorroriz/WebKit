@@ -1991,33 +1991,6 @@ void WebPage::willCommitLayerTree(RemoteLayerTreeTransaction& layerTransaction, 
     layerTransaction.setContentsSize(frameView->contentsSize());
     layerTransaction.setScrollGeometryContentSize(frameView->scrollGeometryContentSize());
     layerTransaction.setScrollOrigin(frameView->scrollOrigin());
-    layerTransaction.setPageScaleFactor(page->pageScaleFactor());
-    layerTransaction.setRenderTreeSize(page->renderTreeSize());
-    layerTransaction.setBaseLayoutViewportSize(frameView->baseLayoutViewportSize());
-    layerTransaction.setMinStableLayoutViewportOrigin(frameView->minStableLayoutViewportOrigin());
-    layerTransaction.setMaxStableLayoutViewportOrigin(frameView->maxStableLayoutViewportOrigin());
-
-#if PLATFORM(IOS_FAMILY)
-    layerTransaction.setScaleWasSetByUIProcess(scaleWasSetByUIProcess());
-    layerTransaction.setMinimumScaleFactor(m_viewportConfiguration.minimumScale());
-    layerTransaction.setMaximumScaleFactor(m_viewportConfiguration.maximumScale());
-    layerTransaction.setInitialScaleFactor(m_viewportConfiguration.initialScale());
-    layerTransaction.setViewportMetaTagInteractiveWidget(m_viewportConfiguration.viewportArguments().interactiveWidget);
-    layerTransaction.setViewportMetaTagWidth(m_viewportConfiguration.viewportArguments().width);
-    layerTransaction.setViewportMetaTagWidthWasExplicit(m_viewportConfiguration.viewportArguments().widthWasExplicit);
-    layerTransaction.setViewportMetaTagCameFromImageDocument(m_viewportConfiguration.viewportArguments().type == ViewportArguments::Type::ImageDocument);
-    layerTransaction.setAvoidsUnsafeArea(m_viewportConfiguration.avoidsUnsafeArea());
-    layerTransaction.setAllowsUserScaling(allowsUserScaling());
-    if (m_pendingDynamicViewportSizeUpdateID) {
-        layerTransaction.setDynamicViewportSizeUpdateID(*m_pendingDynamicViewportSizeUpdateID);
-        m_pendingDynamicViewportSizeUpdateID = std::nullopt;
-    }
-    if (m_lastTransactionPageScaleFactor != layerTransaction.pageScaleFactor()) {
-        m_lastTransactionPageScaleFactor = layerTransaction.pageScaleFactor();
-        m_internals->lastTransactionIDWithScaleChange = layerTransaction.transactionID();
-    }
-#endif
-
     layerTransaction.setScrollPosition(frameView->scrollPosition());
 
     m_pendingThemeColorChange = false;
@@ -2025,9 +1998,14 @@ void WebPage::willCommitLayerTree(RemoteLayerTreeTransaction& layerTransaction, 
     m_pendingSampledPageTopColorChange = false;
 }
 
-void WebPage::willCommitMainFrameData(MainFrameData& data)
+void WebPage::willCommitMainFrameData(MainFrameData& data, const TransactionID& transactionID)
 {
+    RefPtr mainFrameView = localMainFrameView();
+    if (!mainFrameView)
+        return;
+
     Ref page = *corePage();
+    data.pageScaleFactor = page->pageScaleFactor();
     data.themeColor = page->themeColor();
     data.pageExtendedBackgroundColor = page->pageExtendedBackgroundColor();
     data.sampledPageTopColor = page->sampledPageTopColor();
@@ -2037,8 +2015,30 @@ void WebPage::willCommitMainFrameData(MainFrameData& data)
         data.fixedContainerEdges = page->fixedContainerEdges();
     }
 
+    data.baseLayoutViewportSize = mainFrameView->baseLayoutViewportSize();
+    data.minStableLayoutViewportOrigin = mainFrameView->minStableLayoutViewportOrigin();
+    data.maxStableLayoutViewportOrigin = mainFrameView->maxStableLayoutViewportOrigin();
+
 #if PLATFORM(IOS_FAMILY)
+    data.scaleWasSetByUIProcess = scaleWasSetByUIProcess();
+    data.minimumScaleFactor = m_viewportConfiguration.minimumScale();
+    data.maximumScaleFactor = m_viewportConfiguration.maximumScale();
+    data.initialScaleFactor = m_viewportConfiguration.initialScale();
+    data.viewportMetaTagInteractiveWidget = m_viewportConfiguration.viewportArguments().interactiveWidget;
+    data.viewportMetaTagWidth = m_viewportConfiguration.viewportArguments().width;
+    data.viewportMetaTagWidthWasExplicit = m_viewportConfiguration.viewportArguments().widthWasExplicit;
+    data.viewportMetaTagCameFromImageDocument = m_viewportConfiguration.viewportArguments().type == ViewportArguments::Type::ImageDocument;
+    data.avoidsUnsafeArea = m_viewportConfiguration.avoidsUnsafeArea();
     data.isInStableState = m_isInStableState;
+    data.allowsUserScaling = allowsUserScaling();
+    if (m_pendingDynamicViewportSizeUpdateID) {
+        data.dynamicViewportSizeUpdateID = *m_pendingDynamicViewportSizeUpdateID;
+        m_pendingDynamicViewportSizeUpdateID = std::nullopt;
+    }
+    if (m_lastTransactionPageScaleFactor != data.pageScaleFactor) {
+        m_lastTransactionPageScaleFactor = data.pageScaleFactor;
+        m_internals->lastTransactionIDWithScaleChange = transactionID;
+    }
 #endif
 
     if (hasPendingEditorStateUpdate() || m_needsEditorStateVisualDataUpdate) {

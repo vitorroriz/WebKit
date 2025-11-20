@@ -641,7 +641,7 @@ public:
 
 #if PLATFORM(COCOA)
     void willCommitLayerTree(RemoteLayerTreeTransaction&, WebCore::FrameIdentifier);
-    void willCommitMainFrameData(MainFrameData&);
+    void willCommitMainFrameData(MainFrameData&, const TransactionID&);
     void didFlushLayerTreeAtTime(MonotonicTime, bool flushSucceeded);
 #endif
 

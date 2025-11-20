@@ -30,6 +30,7 @@
 #include "PDFPluginIdentifier.h"
 #include "PasteboardAccessIntent.h"
 #include "SameDocumentNavigationType.h"
+#include "TransactionID.h"
 #include "WebPopupMenuProxy.h"
 #include "WindowKind.h"
 #include <WebCore/ActivityState.h>
@@ -212,6 +213,7 @@ struct FrameInfoData;
 struct InteractionInformationAtPosition;
 struct KeyEventInterpretationContext;
 struct MainFrameData;
+struct PageData;
 struct WebAutocorrectionContext;
 struct WebHitTestResultData;
 
@@ -545,7 +547,8 @@ public:
 #endif // PLATFORM(MAC)
 
 #if PLATFORM(COCOA)
-    virtual void didCommitLayerTree(const RemoteLayerTreeTransaction&, const std::optional<MainFrameData>&) = 0;
+    virtual void didCommitLayerTree(const RemoteLayerTreeTransaction&, const std::optional<MainFrameData>&, const PageData&, const TransactionID&) = 0;
+    virtual void didCommitMainFrameData(const MainFrameData&) = 0;
     virtual void layerTreeCommitComplete() { }
 
     virtual void scrollingNodeScrollViewDidScroll(WebCore::ScrollingNodeID) = 0;

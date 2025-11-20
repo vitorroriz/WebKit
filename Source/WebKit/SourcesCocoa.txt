@@ -241,6 +241,7 @@ Shared/RemoteLayerTree/RemoteLayerBackingStoreCollection.mm @nonARC
 Shared/RemoteLayerTree/RemoteLayerWithInProcessRenderingBackingStore.mm @nonARC
 Shared/RemoteLayerTree/RemoteLayerWithRemoteRenderingBackingStore.mm @nonARC
 Shared/RemoteLayerTree/RemoteLayerTreePropertyApplier.mm @nonARC
+Shared/RemoteLayerTree/RemoteLayerTreeCommitBundle.mm @nonARC
 Shared/RemoteLayerTree/RemoteLayerTreeTransaction.mm @nonARC
 Shared/RemoteLayerTree/RemoteScrollingCoordinatorTransaction.cpp
 Shared/RemoteLayerTree/RemoteScrollingUIState.cpp

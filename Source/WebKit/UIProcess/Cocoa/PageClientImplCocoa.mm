@@ -451,11 +451,15 @@ void PageClientImplCocoa::setFullScreenClientForTesting(std::unique_ptr<WebFullS
 }
 #endif
 
-void PageClientImplCocoa::didCommitLayerTree(const RemoteLayerTreeTransaction& transaction, const std::optional<MainFrameData>& mainFrameData)
+void PageClientImplCocoa::didCommitLayerTree(const RemoteLayerTreeTransaction& transaction, const std::optional<MainFrameData>&, const PageData&, const TransactionID&)
 {
-    if (mainFrameData && mainFrameData->fixedContainerEdges)
-        [webView() _updateFixedContainerEdges:*mainFrameData->fixedContainerEdges];
     [webView() _updateScrollGeometryWithContentOffset:transaction.scrollPosition() contentSize:transaction.scrollGeometryContentSize()];
+}
+
+void PageClientImplCocoa::didCommitMainFrameData(const MainFrameData& mainFrameData)
+{
+    if (mainFrameData.fixedContainerEdges)
+        [webView() _updateFixedContainerEdges:*mainFrameData.fixedContainerEdges];
 }
 
 } // namespace WebKit
