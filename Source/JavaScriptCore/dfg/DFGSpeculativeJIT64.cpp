@@ -2452,7 +2452,7 @@ void SpeculativeJIT::emitBranch(Node* node)
 template<typename MapOrSet>
 void SpeculativeJIT::compileMapGetImpl(Node* node)
 {
-    constexpr bool isMapObjectUse = std::is_same<MapOrSet, JSMap>::value;
+    constexpr bool isMapObjectUse = std::same_as<MapOrSet, JSMap>;
 
     SpeculateCellOperand map(this, node->child1());
     JSValueOperand key(this, node->child2(), ManualOperandSpeculation);
@@ -2614,7 +2614,7 @@ void SpeculativeJIT::compileMapGetImpl(Node* node)
     if (!slowPathCases.empty()) {
         JIT_COMMENT(*this, "The slow path should call the operation.");
         slowPathCases.link(this);
-        auto operation = std::is_same<MapOrSet, JSMap>::value ? operationMapGet : operationSetGet;
+        auto operation = std::same_as<MapOrSet, JSMap> ? operationMapGet : operationSetGet;
         callOperationWithSilentSpill(operation, entryKeySlotGPR, LinkableConstant::globalObject(*this, node), mapGPR, keyGPR, hashGPR);
         done.append(jump());
     }
