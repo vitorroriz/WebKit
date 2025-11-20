@@ -1,12 +1,5 @@
-# - Try to find libsecret
-# Once done, this will define
-#
-#  LIBSECRET_FOUND - system has libsecret
-#  LIBSECRET_INCLUDE_DIRS - the libsecret include directories
-#  LIBSECRET_LIBRARIES - link these to use libsecret
-#
+# Copyright (C) 2014, 2025 Igalia S.L.
 # Copyright (C) 2012 Raphael Kubo da Costa <rakuco@webkit.org>
-# Copyright (C) 2014 Igalia S.L.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -29,22 +22,40 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-find_package(PkgConfig QUIET)
-pkg_check_modules(LIBSECRET libsecret-1)
+#[=======================================================================[.rst:
+FindSecret
+----------
 
-set(VERSION_OK TRUE)
-if (LIBSECRET_VERSION)
-    if (LIBSECRET_FIND_VERSION_EXACT)
-        if (NOT("${LIBSECRET_FIND_VERSION}" VERSION_EQUAL "${LIBSECRET_VERSION}"))
-            set(VERSION_OK FALSE)
-        endif ()
-    else ()
-        if ("${LIBSECRET_VERSION}" VERSION_LESS "${LIBSECRET_FIND_VERSION}")
-            set(VERSION_OK FALSE)
-        endif ()
-    endif ()
-endif ()
+Find the libsecret headers and library.
+
+Imported Targets
+^^^^^^^^^^^^^^^^
+
+``Secret::Secret``
+  The libsecret library, if found.
+
+Result Variables
+^^^^^^^^^^^^^^^^
+
+``Secret_FOUND``
+  true if (the requested version of) libsecret is available.
+``Secret_VERSION``
+  Version of the found libsecret library.
+
+#]=======================================================================]
+
+find_package(PkgConfig QUIET)
+pkg_check_modules(Secret QUIET IMPORTED_TARGET libsecret-1)
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Libsecret REQUIRED_VARS LIBSECRET_INCLUDE_DIRS LIBSECRET_LIBRARIES VERSION_OK
-                                  FOUND_VAR LIBSECRET_FOUND)
+find_package_handle_standard_args(Secret
+    REQUIRED_VARS Secret_VERSION Secret_FOUND
+    VERSION_VAR Secret_VERSION
+)
+
+if (Secret_FOUND AND NOT TARGET Secret::Secret)
+    add_library(Secret::Secret INTERFACE IMPORTED GLOBAL)
+    set_property(TARGET Secret::Secret PROPERTY
+        INTERFACE_LINK_LIBRARIES PkgConfig::Secret
+    )
+endif ()
