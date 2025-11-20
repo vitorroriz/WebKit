@@ -215,6 +215,8 @@ RefPtr<AXCoreObject> AXTextMarker::object() const
     if (isNull())
         return nullptr;
 
+    // FIXME: The isNull() check should allow us to deref *treeID() and *objectID() safely
+    // in this function for a bit more performance.
 #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
     if (!isMainThread()) {
         auto tree = std::get<RefPtr<AXIsolatedTree>>(axTreeForID(treeID()));

@@ -321,10 +321,19 @@ WTF::TextStream& operator<<(WTF::TextStream&, AXProperty);
 
 using AXPropertySet = HashSet<AXProperty, IntHash<AXProperty>, WTF::StrongEnumHashTraits<AXProperty>>;
 
-using AXIDAndCharacterRange = std::pair<Markable<AXID>, CharacterRange>;
+struct AXIDAndCharacterRange {
+    WTF_MAKE_TZONE_ALLOCATED(AXIDAndCharacterRange);
+public:
+    Markable<AXID> first;
+    CharacterRange second;
+
+    AXIDAndCharacterRange() = default;
+    AXIDAndCharacterRange(Markable<AXID> axID, CharacterRange range)
+        : first(axID), second(range) { }
+};
 
 // If this type is modified, the switchOn statment in AXIsolatedObject::setProperty must be updated as well.
-using AXPropertyValueVariant = Variant<std::nullptr_t, Markable<AXID>, String, bool, int, unsigned, double, float, uint64_t, WallTime, DateComponentsType, AccessibilityButtonState, Color, std::shared_ptr<URL>, LayoutRect, FloatPoint, FloatRect, InputType::Type, IntPoint, IntRect, std::pair<unsigned, unsigned>, Vector<AccessibilityText>, Vector<AXID>, Vector<std::pair<Markable<AXID>, Markable<AXID>>>, Vector<String>, std::shared_ptr<Path>, OptionSet<AXAncestorFlag>, Vector<Vector<Markable<AXID>>>, CharacterRange, std::shared_ptr<AXIDAndCharacterRange>, ElementName, AccessibilityOrientation
+using AXPropertyValueVariant = Variant<std::nullptr_t, Markable<AXID>, String, bool, int, unsigned, double, float, uint64_t, WallTime, DateComponentsType, AccessibilityButtonState, Color, std::unique_ptr<URL>, LayoutRect, FloatPoint, FloatRect, InputType::Type, IntPoint, IntRect, std::pair<unsigned, unsigned>, Vector<AccessibilityText>, Vector<AXID>, Vector<std::pair<Markable<AXID>, Markable<AXID>>>, Vector<String>, std::unique_ptr<Path>, OptionSet<AXAncestorFlag>, Vector<Vector<Markable<AXID>>>, CharacterRange, std::unique_ptr<AXIDAndCharacterRange>, ElementName, AccessibilityOrientation
 #if PLATFORM(COCOA)
     , RetainPtr<NSAttributedString>
     , RetainPtr<NSView>
@@ -334,7 +343,7 @@ using AXPropertyValueVariant = Variant<std::nullptr_t, Markable<AXID>, String, b
 #if ENABLE(AX_THREAD_TEXT_APIS)
     , RetainPtr<CTFontRef>
     , FontOrientation
-    , std::shared_ptr<AXTextRuns>
+    , std::unique_ptr<AXTextRuns>
     , AXTextRunLineID
     , FrameIdentifier
 #endif // ENABLE(AX_THREAD_TEXT_APIS)
@@ -401,6 +410,9 @@ struct IsolatedObjectData {
         , propertyFlags(propertyFlags)
         , getsGeometryFromChildren(getsGeometryFromChildren)
     { }
+
+    IsolatedObjectData(const IsolatedObjectData&) = delete;
+    IsolatedObjectData(IsolatedObjectData&&) = default;
 
     void setProperty(AXProperty property, AXPropertyValueVariant&& value)
     {
@@ -598,6 +610,9 @@ private:
             : data(WTFMove(isolatedData))
             , wrapper(WTFMove(wrapper))
         { }
+
+        NodeChange(const NodeChange&) = delete;
+        NodeChange(NodeChange&&) = default;
     };
 
     void updateChildren(AccessibilityObject&, ResolveNodeChanges = ResolveNodeChanges::Yes);
@@ -607,7 +622,7 @@ private:
     std::optional<NodeChange> nodeChangeForObject(Ref<AccessibilityObject>);
     void collectNodeChangesForSubtree(AccessibilityObject&);
     bool isCollectingNodeChanges() const { return m_isCollectingNodeChanges; }
-    void queueChange(const NodeChange&) WTF_REQUIRES_LOCK(m_changeLogLock);
+    void queueChange(NodeChange&&) WTF_REQUIRES_LOCK(m_changeLogLock);
     void queueRemovals(Vector<AXID>&&);
     void queueRemovalsLocked(Vector<AXID>&&) WTF_REQUIRES_LOCK(m_changeLogLock);
     void queueRemovalsAndUnresolvedChanges();

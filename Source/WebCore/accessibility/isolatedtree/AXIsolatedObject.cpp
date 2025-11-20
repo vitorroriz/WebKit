@@ -152,7 +152,7 @@ bool isDefaultValue(AXProperty property, AXPropertyValueVariant& value)
                 return false;
             return typedValue.toColorTypeLossy<SRGBA<uint8_t>>() == Accessibility::defaultColor();
         },
-        [](std::shared_ptr<URL>& typedValue) { return !typedValue || *typedValue == URL(); },
+        [](std::unique_ptr<URL>& typedValue) { return !typedValue || *typedValue == URL(); },
         [](LayoutRect& typedValue) { return typedValue == LayoutRect(); },
         [](IntPoint& typedValue) { return typedValue == IntPoint(); },
         [](IntRect& typedValue) { return typedValue == IntRect(); },
@@ -166,7 +166,7 @@ bool isDefaultValue(AXProperty property, AXPropertyValueVariant& value)
         [](Vector<AXID>& typedValue) { return typedValue.isEmpty(); },
         [](Vector<std::pair<Markable<AXID>, Markable<AXID>>>& typedValue) { return typedValue.isEmpty(); },
         [](Vector<String>& typedValue) { return typedValue.isEmpty(); },
-        [](std::shared_ptr<Path>& typedValue) { return !typedValue || typedValue->isEmpty(); },
+        [](std::unique_ptr<Path>& typedValue) { return !typedValue || typedValue->isEmpty(); },
         [](OptionSet<AXAncestorFlag>& typedValue) { return typedValue.isEmpty(); },
 #if PLATFORM(COCOA)
         [](RetainPtr<NSAttributedString>& typedValue) { return !typedValue; },
@@ -176,11 +176,11 @@ bool isDefaultValue(AXProperty property, AXPropertyValueVariant& value)
         [](InputType::Type&) { return false; },
         [](Vector<Vector<Markable<AXID>>>& typedValue) { return typedValue.isEmpty(); },
         [](CharacterRange& typedValue) { return !typedValue.location && !typedValue.length; },
-        [](std::shared_ptr<AXIDAndCharacterRange>& typedValue) {
+        [](std::unique_ptr<AXIDAndCharacterRange>& typedValue) {
             return !typedValue || (!typedValue->first && !typedValue->second.location && !typedValue->second.length);
         },
 #if ENABLE(AX_THREAD_TEXT_APIS)
-        [](std::shared_ptr<AXTextRuns> typedValue) { return !typedValue || !typedValue->size(); },
+        [](std::unique_ptr<AXTextRuns>& typedValue) { return !typedValue || !typedValue->size(); },
         [](RetainPtr<CTFontRef>& typedValue) { return !typedValue; },
         [](FontOrientation typedValue) { return typedValue == FontOrientation::Horizontal; },
         [](AXTextRunLineID typedValue) { return !typedValue; },
@@ -702,7 +702,7 @@ URL AXIsolatedObject::urlAttributeValue(AXProperty property) const
         return URL();
 
     return WTF::switchOn(m_properties[index].second,
-        [] (const std::shared_ptr<URL>& typedValue) -> URL {
+        [] (const std::unique_ptr<URL>& typedValue) -> URL {
             ASSERT(typedValue.get());
             return *typedValue.get();
         },
@@ -717,7 +717,7 @@ Path AXIsolatedObject::pathAttributeValue(AXProperty property) const
         return Path();
 
     return WTF::switchOn(m_properties[index].second,
-        [] (const std::shared_ptr<Path>& typedValue) -> Path {
+        [] (const std::unique_ptr<Path>& typedValue) -> Path {
             ASSERT(typedValue.get());
             return *typedValue.get();
         },
@@ -889,7 +889,7 @@ const AXTextRuns* AXIsolatedObject::textRuns() const
         return nullptr;
 
     return WTF::switchOn(m_properties[index].second,
-        [] (const std::shared_ptr<AXTextRuns>& typedValue) -> const AXTextRuns* { return typedValue.get(); },
+        [] (const std::unique_ptr<AXTextRuns>& typedValue) -> const AXTextRuns* { return typedValue.get(); },
         [] (auto&) -> const AXTextRuns* { return nullptr; }
     );
 }
@@ -1596,7 +1596,7 @@ AXTextMarkerRange AXIsolatedObject::textInputMarkedTextMarkerRange() const
         return nullptr;
 
     return WTF::switchOn(m_properties[index].second,
-        [&] (const std::shared_ptr<AXIDAndCharacterRange>& typedValue) -> AXTextMarkerRange {
+        [&] (const std::unique_ptr<AXIDAndCharacterRange>& typedValue) -> AXTextMarkerRange {
             auto start = static_cast<unsigned>(typedValue->second.location);
             auto end = start + static_cast<unsigned>(typedValue->second.length);
             return { tree()->treeID(), typedValue->first, start, end };
