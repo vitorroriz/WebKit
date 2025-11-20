@@ -35,7 +35,7 @@ namespace WebCore {
 namespace Layout {
 
 class ElementBox;
-class BlockLayoutState;
+class InlineLayoutState;
 class LayoutState;
 
 class IntegrationUtils {
@@ -46,7 +46,7 @@ public:
     LayoutUnit maxContentWidth(const ElementBox&) const;
     LayoutUnit minContentWidth(const ElementBox&) const;
     LayoutUnit minContentHeight(const ElementBox&) const;
-    void layoutWithFormattingContextForBlockInInline(const ElementBox& block, LayoutPoint blockLogicalTopLeft, const BlockLayoutState& parentBlockLayoutState) const;
+    void layoutWithFormattingContextForBlockInInline(const ElementBox& block, LayoutPoint blockLogicalTopLeft, const InlineLayoutState&) const;
 
 private:
     const CheckedRef<const LayoutState> m_globalLayoutState;

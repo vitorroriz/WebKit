@@ -27,10 +27,12 @@
 #include "LayoutIntegrationFormattingContextLayout.h"
 
 #include "BlockLayoutState.h"
+#include "InlineLayoutState.h"
 #include "LayoutIntegrationBoxGeometryUpdater.h"
 #include "RenderBlock.h"
 #include "RenderBoxInlines.h"
 #include "RenderFlexibleBox.h"
+#include "RenderLayoutState.h"
 #include "RenderObjectInlines.h"
 
 namespace WebCore {
@@ -70,12 +72,14 @@ void layoutWithFormattingContextForBox(const Layout::ElementBox& box, std::optio
     updater.updateBoxGeometryAfterIntegrationLayout(box, widthConstraint.value_or(renderer.containingBlock()->contentBoxLogicalWidth()));
 }
 
-void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block, LayoutPoint blockLogicalTopLeft, Layout::BlockLayoutState& parentBlockLayoutState, Layout::LayoutState& layoutState)
+void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block, LayoutPoint blockLogicalTopLeft, Layout::InlineLayoutState& inlineLayoutState, Layout::LayoutState& layoutState)
 {
+    auto& parentBlockLayoutState = inlineLayoutState.parentBlockLayoutState();
     auto& placedFloats = parentBlockLayoutState.placedFloats();
 
     auto& blockRenderer = downcast<RenderBox>(*block.rendererForIntegration());
     auto& rootBlockContainer = downcast<RenderBlockFlow>(*rootLayoutBox(block).rendererForIntegration());
+    auto& renderTreeLayoutState = *rootBlockContainer.view().frameView().layoutContext().layoutState();
 
     auto populateRootRendererWithFloatsFromIFC = [&] {
         for (auto& floatItem : placedFloats.list()) {
@@ -95,6 +99,17 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
         }
     };
     populateRootRendererWithFloatsFromIFC();
+
+    auto updateRenderTreeLegacyLineClamp = [&] {
+        if (!parentBlockLayoutState.lineClamp())
+            return;
+        auto legacyLineClamp = renderTreeLayoutState.legacyLineClamp();
+        if (!legacyLineClamp)
+            return;
+        legacyLineClamp->currentLineCount += inlineLayoutState.lineCountForBlockDirectionClamp();
+        renderTreeLayoutState.setLegacyLineClamp(legacyLineClamp);
+    };
+    updateRenderTreeLegacyLineClamp();
 
     auto marginInfoForBlock = [&] {
         auto& marginState = parentBlockLayoutState.marginState();
@@ -121,6 +136,17 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
     blockGeometry.setTopLeft(LayoutPoint { blockGeometry.marginStart(), positionAndMargin.logicalTop });
     // FIXME: This is only valid under the assumption that the block is immediately followed by an inline (i.e. no margin collapsing).
     blockGeometry.setVerticalMargin({ positionAndMargin.logicalTop, positionAndMargin.marginInfo.margin() });
+
+    auto udpdateIFCLineClamp = [&] {
+        if (!parentBlockLayoutState.lineClamp())
+            return;
+        auto legacyLineClamp = renderTreeLayoutState.legacyLineClamp();
+        if (!legacyLineClamp)
+            return;
+        auto newlyConstructedLineCount = legacyLineClamp->currentLineCount - inlineLayoutState.lineCountForBlockDirectionClamp();
+        inlineLayoutState.setLineCountForBlockDirectionClamp(inlineLayoutState.lineCountForBlockDirectionClamp() + newlyConstructedLineCount);
+    };
+    udpdateIFCLineClamp();
 
     auto populateIFCWithNewlyPlacedFloats = [&] {
         auto* renderBlockFlow = dynamicDowncast<RenderBlockFlow>(blockRenderer);

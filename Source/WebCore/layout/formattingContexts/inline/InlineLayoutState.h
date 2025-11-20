@@ -84,7 +84,7 @@ private:
     std::optional<size_t> m_legacyClampedLineIndex { };
     std::optional<size_t> m_hyphenateLimitLines { };
     size_t m_successiveHyphenatedLineCount { 0 };
-    size_t m_lineCountForBlockDirectionClamp { 0 };
+    size_t m_lineCountForBlockDirectionClamp { 0 }; // Note that lines from nested block level boxes are included here too.
     // FIXME: This is required by the integaration codepath.
     HashMap<CheckedRef<const ElementBox>, LayoutUnit> m_nestedListMarkerOffsets;
     AvailableLineWidthOverride m_availableLineWidthOverride;

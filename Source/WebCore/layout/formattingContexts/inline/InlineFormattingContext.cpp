@@ -425,7 +425,8 @@ InlineRect InlineFormattingContext::createDisplayContentForInlineContent(const L
 
     auto lineClamp = inlineLayoutState.parentBlockLayoutState().lineClamp();
     auto isLegacyLineClamp = lineClamp && lineClamp->isLegacy;
-    auto numberOfLinesEligibleForLineClamp = inlineLayoutState.lineCountForBlockDirectionClamp() + (lineBox.hasContent() ? 1 : 0);
+    // Eligible lines from nested block containers are already included (see layoutWithFormattingContextForBlockInInline).
+    auto numberOfLinesEligibleForLineClamp = inlineLayoutState.lineCountForBlockDirectionClamp() + (lineLayoutResult.hasInlineContent() ? 1 : 0);
     auto numberOfVisibleLinesAllowed = lineClamp ? std::make_optional(lineClamp->maximumLines) : std::nullopt;
 
     auto lineIsFullyTruncatedInBlockDirection = numberOfVisibleLinesAllowed ? numberOfLinesEligibleForLineClamp > *numberOfVisibleLinesAllowed : false;

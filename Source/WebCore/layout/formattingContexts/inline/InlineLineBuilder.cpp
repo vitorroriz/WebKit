@@ -1349,7 +1349,7 @@ void LineBuilder::handleBlockContent(const InlineItem& blockItem)
     // Blocks are always the only content on the line.
     ASSERT(!m_line.hasContentOrListMarker());
     if (!isInIntrinsicWidthMode())
-        formattingContext().integrationUtils().layoutWithFormattingContextForBlockInInline(downcast<ElementBox>(blockItem.layoutBox()), LayoutPoint { m_lineLogicalRect.topLeft() }, blockLayoutState());
+        formattingContext().integrationUtils().layoutWithFormattingContextForBlockInInline(downcast<ElementBox>(blockItem.layoutBox()), LayoutPoint { m_lineLogicalRect.topLeft() }, layoutState());
     auto marginBoxLogicalWidth = formattingContext().formattingUtils().inlineItemWidth(blockItem, { }, false);
     m_line.appendBlock(blockItem, marginBoxLogicalWidth);
     if (rootStyle().writingMode().isBidiRTL())
