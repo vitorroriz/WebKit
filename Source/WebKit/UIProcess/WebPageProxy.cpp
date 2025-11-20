@@ -15465,12 +15465,22 @@ void WebPageProxy::setPrivateClickMeasurement(std::nullopt_t)
     internals().privateClickMeasurement = std::nullopt;
 }
 
+void WebPageProxy::setPrivateClickMeasurementImmediately(PrivateClickMeasurement&& measurement)
+{
+    protectedWebsiteDataStore()->storePrivateClickMeasurement(WTFMove(measurement));
+}
+
 auto WebPageProxy::privateClickMeasurementEventAttribution() const -> std::optional<EventAttribution>
 {
     auto& pcm = internals().privateClickMeasurement;
     if (!pcm)
         return std::nullopt;
     return { { pcm->pcm.sourceID(), pcm->pcm.destinationSite().registrableDomain.string(), pcm->sourceDescription, pcm->purchaser } };
+}
+
+void WebPageProxy::simulatePrivateClickMeasurementConversion(int priority, int triggerData, const URL& sourceURL, const URL& destinationURL)
+{
+    protectedWebsiteDataStore()->simulatePrivateClickMeasurementConversion(priority, triggerData, sourceURL, destinationURL);
 }
 
 #if ENABLE(APPLE_PAY)

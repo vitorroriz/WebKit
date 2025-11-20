@@ -2848,6 +2848,12 @@ void NetworkProcess::storePrivateClickMeasurement(PAL::SessionID sessionID, WebC
         session->storePrivateClickMeasurement(WTFMove(privateClickMeasurement));
 }
 
+void NetworkProcess::simulatePrivateClickMeasurementConversion(PAL::SessionID sessionID, int priority, int triggerData, const URL& sourceURL, const URL& destinationURL)
+{
+    if (CheckedPtr session = networkSession(sessionID))
+        session->simulatePrivateClickMeasurementConversion(priority, triggerData, sourceURL, destinationURL);
+}
+
 void NetworkProcess::dumpPrivateClickMeasurement(PAL::SessionID sessionID, CompletionHandler<void(String)>&& completionHandler)
 {
     if (CheckedPtr session = networkSession(sessionID))
