@@ -30,6 +30,7 @@
 #include <wtf/MainThread.h>
 #include <wtf/Noncopyable.h>
 #include <wtf/RefCounted.h>
+#include <wtf/SwiftBridging.h>
 
 namespace WTF {
 
@@ -152,7 +153,7 @@ public:
 
 protected:
     ThreadSafeRefCounted() = default;
-};
+} SWIFT_RETURNED_AS_UNRETAINED_BY_DEFAULT;
 
 } // namespace WTF
 

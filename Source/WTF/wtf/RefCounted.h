@@ -25,6 +25,7 @@
 #include <wtf/FastMalloc.h>
 #include <wtf/MainThread.h>
 #include <wtf/Noncopyable.h>
+#include <wtf/SwiftBridging.h>
 
 namespace WTF {
 
@@ -205,7 +206,7 @@ protected:
     ~RefCounted()
     {
     }
-};
+} SWIFT_RETURNED_AS_UNRETAINED_BY_DEFAULT;
 
 template<typename T>
 inline void ref(T* obj)
