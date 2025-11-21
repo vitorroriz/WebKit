@@ -123,6 +123,7 @@ pdf [ Skip ]
 ipc/mac [ Skip ]
 ipc/restrictedendpoints/mac [ Skip ]
 webanimations/threaded-animations [ Skip ]
+webkitlegacy [ Skip ]
 
 # Requires async overflow scrolling
 compositing/shared-backing/overflow-scroll [ Skip ]
