@@ -27,6 +27,7 @@
 #include "AudioBus.h"
 #include "AudioNode.h"
 #include "AudioSummingJunction.h"
+#include <wtf/CheckedPtr.h>
 #include <wtf/HashSet.h>
 #include <wtf/TZoneMalloc.h>
 #include <wtf/WeakPtr.h>
@@ -52,6 +53,7 @@ public:
 
     // Can be called from any thread.
     AudioNode* node() const { return m_node.get(); }
+    CheckedPtr<AudioNode> checkedNode() const { return m_node.get(); }
 
     // Must be called with the context's graph lock.
     void connect(AudioNodeOutput*);

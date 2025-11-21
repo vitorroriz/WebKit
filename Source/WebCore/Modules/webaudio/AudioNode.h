@@ -29,6 +29,7 @@
 #include "ChannelInterpretation.h"
 #include "EventTarget.h"
 #include "ExceptionOr.h"
+#include <wtf/CheckedRef.h>
 #include <wtf/Forward.h>
 #include <wtf/LoggerHelper.h>
 
@@ -53,12 +54,14 @@ enum class NoiseInjectionPolicy : uint8_t;
 
 class AudioNode
     : public EventTarget
+    , public CanMakeThreadSafeCheckedPtr<AudioNode>
 #if !RELEASE_LOG_DISABLED
     , private LoggerHelper
 #endif
 {
     WTF_MAKE_NONCOPYABLE(AudioNode);
     WTF_MAKE_TZONE_OR_ISO_ALLOCATED(AudioNode);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(AudioNode);
 public:
     enum NodeType {
         NodeTypeDestination,

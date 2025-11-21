@@ -20,7 +20,6 @@ Modules/webaudio/AudioNodeOutput.cpp
 Modules/webaudio/AudioParam.cpp
 Modules/webaudio/AudioWorkletGlobalScope.cpp
 Modules/webaudio/AudioWorkletNode.cpp
-Modules/webaudio/BaseAudioContext.cpp
 Modules/webaudio/ChannelSplitterNode.cpp
 Modules/webaudio/ConstantSourceNode.cpp
 Modules/webaudio/ConvolverNode.cpp

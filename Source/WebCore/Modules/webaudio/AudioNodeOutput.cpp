@@ -101,10 +101,8 @@ void AudioNodeOutput::propagateChannelCount()
     
     if (isChannelCountKnown()) {
         // Announce to any nodes we're connected to that we changed our channel count for its input.
-        for (auto& input : m_inputs.keys()) {
-            AudioNode* connectionNode = input->node();
-            connectionNode->checkNumberOfChannelsForInput(input);
-        }
+        for (auto& input : m_inputs.keys())
+            input->checkedNode()->checkNumberOfChannelsForInput(input);
     }
 }
 
@@ -123,7 +121,7 @@ AudioBus& AudioNodeOutput::pull(AudioBus* inPlaceBus, size_t framesToProcess)
 
     m_inPlaceBus = isInPlace ? inPlaceBus : nullptr;
 
-    node()->processIfNecessary(framesToProcess);
+    checkedNode()->processIfNecessary(framesToProcess);
     return bus();
 }
 
