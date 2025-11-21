@@ -218,4 +218,22 @@ void TextBoxTrimmer::handleTextBoxTrimNoneBeforeLayout()
     }
 }
 
+TextBoxTrimStartDisabler::TextBoxTrimStartDisabler(const RenderBox& renderBox)
+    : m_renderBox(renderBox)
+{
+    auto& layoutContext = m_renderBox->view().frameView().layoutContext();
+    m_previousTextBoxTrimStatus = layoutContext.textBoxTrim();
+    if (m_previousTextBoxTrimStatus)
+        layoutContext.setTextBoxTrim(LocalFrameViewLayoutContext::TextBoxTrim { false, m_previousTextBoxTrimStatus->lastFormattedLineRoot });
+}
+
+TextBoxTrimStartDisabler::~TextBoxTrimStartDisabler()
+{
+    if (!m_renderBox) {
+        ASSERT_NOT_REACHED();
+        return;
+    }
+    m_renderBox->view().frameView().layoutContext().setTextBoxTrim(m_previousTextBoxTrimStatus);
+}
+
 } // namespace WebCore
