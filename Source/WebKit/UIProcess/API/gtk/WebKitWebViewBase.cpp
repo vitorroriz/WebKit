@@ -517,8 +517,8 @@ static void webkitWebViewBaseUpdateVisibility(WebKitWebViewBase* webViewBase)
 
 void webkitWebViewBaseToplevelWindowStateChanged(WebKitWebViewBase* webViewBase, uint32_t changedMask, uint32_t state)
 {
-    WebKitWebViewBasePrivate* priv = webViewBase->priv;
 #if ENABLE(FULLSCREEN_API)
+    WebKitWebViewBasePrivate* priv = webViewBase->priv;
 #if USE(GTK4)
     bool changedFullscreen = changedMask & GDK_TOPLEVEL_STATE_FULLSCREEN;
     bool fullscreen = state & GDK_TOPLEVEL_STATE_FULLSCREEN;
