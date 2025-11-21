@@ -86,7 +86,9 @@ public:
     virtual RefPtr<VideoFrame> currentVideoFrame() const = 0;
     virtual void paintCurrentVideoFrameInContext(GraphicsContext&, const FloatRect&) { }
     virtual RefPtr<NativeImage> currentNativeImage() const { return nullptr; }
+#if ENABLE(VIDEO)
     virtual std::optional<VideoPlaybackQualityMetrics> videoPlaybackQualityMetrics() = 0;
+#endif
     virtual PlatformLayer* platformVideoLayer() const { return nullptr; }
 
     using LayerHostingContextCallback = CompletionHandler<void(HostingContext)>;
