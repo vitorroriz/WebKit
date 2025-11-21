@@ -425,9 +425,7 @@ void InlineFormattingContext::updateBoxGeometryForPlacedFloats(const LineLayoutR
 InlineRect InlineFormattingContext::createDisplayContentForInlineContent(const LineBox& lineBox, const LineLayoutResult& lineLayoutResult, const ConstraintsForInlineContent& constraints, InlineDisplay::Content& displayContent)
 {
     auto& inlineLayoutState = layoutState();
-
     auto lineClamp = inlineLayoutState.parentBlockLayoutState().lineClamp();
-    auto isLegacyLineClamp = lineClamp && lineClamp->isLegacy;
     // Eligible lines from nested block containers are already included (see layoutWithFormattingContextForBlockInInline).
     auto numberOfLinesWithInlineContent = inlineLayoutState.lineCountWithInlineContentIncludingNestedBlocks() + (lineLayoutResult.hasInlineContent() ? 1 : 0);
     auto numberOfVisibleLinesAllowed = lineClamp ? std::make_optional(lineClamp->maximumLines) : std::nullopt;
@@ -437,11 +435,19 @@ InlineRect InlineFormattingContext::createDisplayContentForInlineContent(const L
     auto boxes = InlineDisplayContentBuilder { *this, constraints, lineBox, displayLine }.build(lineLayoutResult);
     displayLine.setBoxCount(boxes.size());
 
-    auto truncationPolicy = InlineFormattingUtils::lineEndingTruncationPolicy(root().style(), numberOfLinesWithInlineContent, numberOfVisibleLinesAllowed, lineBox.hasContent());
-    InlineDisplayLineBuilder::applyEllipsisIfNeeded(truncationPolicy, displayLine, boxes, isLegacyLineClamp);
-    auto lineHasLegacyLineClamp = isLegacyLineClamp && displayLine.hasEllipsis() && truncationPolicy == LineEndingTruncationPolicy::WhenContentOverflowsInBlockDirection;
-    if (lineHasLegacyLineClamp)
-        inlineLayoutState.setLegacyClampedLineIndex(lineBox.lineIndex());
+    auto addTrailingEllipsisIfApplicable = [&] {
+        if (lineLayoutResult.hasBlockContent()) {
+            // When a block line is clamped, its content gets clamped and not this line itself.
+            return;
+        }
+        auto isLegacyLineClamp = lineClamp && lineClamp->isLegacy;
+        auto truncationPolicy = InlineFormattingUtils::lineEndingTruncationPolicy(root().style(), numberOfLinesWithInlineContent, numberOfVisibleLinesAllowed, lineBox.hasContent());
+        InlineDisplayLineBuilder::applyEllipsisIfNeeded(truncationPolicy, displayLine, boxes, isLegacyLineClamp);
+        auto lineHasLegacyLineClamp = isLegacyLineClamp && displayLine.hasEllipsis() && truncationPolicy == LineEndingTruncationPolicy::WhenContentOverflowsInBlockDirection;
+        if (lineHasLegacyLineClamp)
+            inlineLayoutState.setLegacyClampedLineIndex(lineBox.lineIndex());
+    };
+    addTrailingEllipsisIfApplicable();
 
     displayContent.boxes.appendVector(WTFMove(boxes));
     displayContent.lines.append(displayLine);
