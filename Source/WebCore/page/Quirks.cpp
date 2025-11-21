@@ -1772,12 +1772,15 @@ std::optional<String> Quirks::needsCustomUserAgentOverride(const URL& url, const
     if (hostDomain.string() == "app.aktiv.com")
         return firefoxUserAgent;
 
-#if PLATFORM(IOS)
     auto chromeUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"_s;
+#if PLATFORM(IOS)
     // amazon.com rdar://117771731
     if (PublicSuffixStore::singleton().topPrivatelyControlledDomain(hostDomain.string()).startsWith("amazon."_s) && url.path() == "/gp/video/"_s)
         return chromeUserAgent;
 #endif
+
+    if ((hostDomain.string() == "messenger.com" || hostDomain.string() == "facebook.com") && url.path().startsWith("/groupcall/ROOM:"_s))
+        return chromeUserAgent;
 
 #if PLATFORM(COCOA)
     // FIXME(rdar://148759791): Remove this once TikTok removes the outdated error message.
