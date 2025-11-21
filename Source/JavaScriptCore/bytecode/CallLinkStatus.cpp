@@ -182,11 +182,9 @@ CallLinkStatus CallLinkStatus::computeFromCallLinkInfo(
         
         RELEASE_ASSERT(edges.size());
         
-        std::sort(
-            edges.begin(), edges.end(),
-            [] (CallEdge a, CallEdge b) {
-                return a.count() > b.count();
-            });
+        std::ranges::sort(edges, [](auto a, auto b) {
+            return a.count() > b.count();
+        });
         RELEASE_ASSERT(edges.first().count() >= edges.last().count());
         
         double totalCallsToKnown = 0;

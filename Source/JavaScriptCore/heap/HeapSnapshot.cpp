@@ -113,7 +113,7 @@ void HeapSnapshot::finalize()
         m_lastObjectIdentifier = m_nodes.last().identifier;
     }
 
-    std::sort(m_nodes.begin(), m_nodes.end(), [] (const HeapSnapshotNode& a, const HeapSnapshotNode& b) {
+    std::ranges::sort(m_nodes, [](const auto& a, const auto& b) {
         return a.cell < b.cell;
     });
 

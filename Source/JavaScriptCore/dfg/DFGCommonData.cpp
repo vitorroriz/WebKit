@@ -152,8 +152,9 @@ void CommonData::validateReferences(const TrackedReferences& trackedReferences)
 
 void CommonData::finalizeCatchEntrypoints(Vector<CatchEntrypointData>&& catchEntrypoints)
 {
-    std::sort(catchEntrypoints.begin(), catchEntrypoints.end(),
-        [] (const CatchEntrypointData& a, const CatchEntrypointData& b) { return a.bytecodeIndex < b.bytecodeIndex; });
+    std::ranges::sort(catchEntrypoints, [](const auto& a, const auto& b) {
+        return a.bytecodeIndex < b.bytecodeIndex;
+    });
     ASSERT(m_catchEntrypoints.isEmpty());
     m_catchEntrypoints = WTFMove(catchEntrypoints);
 

@@ -426,7 +426,7 @@ void JITCode::finalizeOSREntrypoints(Vector<OSREntryData>&& osrEntry)
     auto comparator = [] (const auto& a, const auto& b) {
         return a.m_bytecodeIndex < b.m_bytecodeIndex;
     };
-    std::sort(osrEntry.begin(), osrEntry.end(), comparator);
+    std::ranges::sort(osrEntry, comparator);
 
 #if ASSERT_ENABLED
     auto verifyIsSorted = [&] (auto& osrVector) {

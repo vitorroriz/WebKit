@@ -770,7 +770,7 @@ static void logOutcomeImpl(String&& outcome)
         Vector<KeyValuePair<String, unsigned>> vector;
         for (auto& pair : set.get())
             vector.append(pair);
-        std::sort(vector.begin(), vector.end(), [](auto& a, auto &b) {
+        std::ranges::sort(vector, [](auto& a, auto &b) {
             return a.value != b.value ? a.value > b.value : codePointCompareLessThan(a.key, b.key);
         });
         dataLogLn("fastStringify outcomes");

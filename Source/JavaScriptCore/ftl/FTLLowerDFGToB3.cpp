@@ -17744,7 +17744,7 @@ IGNORE_CLANG_WARNINGS_END
                 }
 
                 if (!indices.isEmpty()) {
-                    std::sort(indices.begin(), indices.end());
+                    std::ranges::sort(indices);
 
                     Vector<LBasicBlock> blocksWithStores(indices.size());
                     Vector<LBasicBlock> blocksWithChecks(indices.size());
@@ -20373,11 +20373,9 @@ IGNORE_CLANG_WARNINGS_END
         }
 
         if (structuresChecked) {
-            std::sort(
-                cases.begin(), cases.end(),
-                [&] (const SwitchCase& a, const SwitchCase& b) -> bool {
-                    return a.value()->asInt() < b.value()->asInt();
-                });
+            std::ranges::sort(cases, [&](const auto& a, const auto& b) {
+                return a.value()->asInt() < b.value()->asInt();
+            });
             SwitchCase last = cases.takeLast();
             m_out.switchInstruction(
                 m_out.load32(base, m_heaps.JSCell_structureID), cases, last.target(), Weight(0));

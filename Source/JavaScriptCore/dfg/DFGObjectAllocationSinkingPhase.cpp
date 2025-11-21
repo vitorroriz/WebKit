@@ -2804,12 +2804,9 @@ escapeChildren:
             if (structures.isEmpty())
                 return m_graph.addNode(ForceOSRExit, origin.takeValidExit(canExit));
 
-            std::sort(
-                structures.begin(),
-                structures.end(),
-                [uid] (RegisteredStructure a, RegisteredStructure b) -> bool {
-                    return a->getConcurrently(uid) < b->getConcurrently(uid);
-                });
+            std::ranges::sort(structures, [uid](auto a, auto b) {
+                return a->getConcurrently(uid) < b->getConcurrently(uid);
+            });
 
             RELEASE_ASSERT(structures.size());
             PropertyOffset firstOffset = structures[0]->getConcurrently(uid);
