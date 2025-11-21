@@ -322,6 +322,9 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTree(IPC::Connection& connectio
         MESSAGE_CHECK_BASE(!state.committedLayerTreeTransactionID || bundle.transactionID == state.committedLayerTreeTransactionID->next(), connection);
     }
 
+    if (bundle.mainFrameData)
+        MESSAGE_CHECK_BASE(webProcessProxy().hasConnection(connection), connection);
+
     // The `sendRights` vector must have __block scope to be captured by
     // the commit handler block below without the need to copy it.
     __block Vector<MachSendRight, 16> sendRights;
