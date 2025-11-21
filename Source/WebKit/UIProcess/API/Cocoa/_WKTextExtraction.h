@@ -45,10 +45,22 @@ typedef NS_ENUM(NSInteger, _WKTextExtractionNodeIdentifierInclusion) {
     _WKTextExtractionNodeIdentifierInclusionInteractive
 } WK_API_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA));
 
+typedef NS_ENUM(NSInteger, _WKTextExtractionOutputFormat) {
+    _WKTextExtractionOutputFormatTextTree = 0,
+    _WKTextExtractionOutputFormatHTML,
+} WK_API_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA));
+
 WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
 @interface _WKTextExtractionConfiguration : NSObject
 
 @property (nonatomic, class, copy, readonly) _WKTextExtractionConfiguration *configurationForVisibleTextOnly NS_SWIFT_NAME(visibleTextOnly);
+
+/*!
+ Output format to use when collating extracted elements into the final text output.
+ The default value is `.textTree`, which produces at most 1 element and text node per line,
+ and uses indentation to represent DOM hierarchy.
+ */
+@property (nonatomic) _WKTextExtractionOutputFormat outputFormat;
 
 /*!
  Element extraction is constrained to this rect (in the web view's coordinate space).

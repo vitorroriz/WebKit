@@ -53,6 +53,7 @@ dictionary TextExtractionTestOptions {
     boolean includeTextInAutoFilledControls = false;
     boolean mergeParagraphs = false;
     boolean skipNearlyTransparentContent = false;
+    DOMString outputFormat;
 };
 
 dictionary TextExtractionInteractionOptions {

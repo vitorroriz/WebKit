@@ -361,6 +361,23 @@ RetainPtr<_WKTextExtractionConfiguration> createTextExtractionConfiguration(WKWe
     [configuration setIncludeEventListeners:options && options->includeEventListeners];
     [configuration setIncludeAccessibilityAttributes:options && options->includeAccessibilityAttributes];
     [configuration setIncludeTextInAutoFilledControls:options && options->includeTextInAutoFilledControls];
+
+    auto outputFormat = [&] -> std::optional<_WKTextExtractionOutputFormat> {
+        if (!options)
+            return std::nullopt;
+
+        auto outputFormat = toWTFString(options->outputFormat.get());
+        if (equalLettersIgnoringASCIICase(outputFormat, "html"_s))
+            return _WKTextExtractionOutputFormatHTML;
+
+        if (equalLettersIgnoringASCIICase(outputFormat, "texttree"_s))
+            return _WKTextExtractionOutputFormatTextTree;
+
+        return std::nullopt;
+    }();
+    if (outputFormat)
+        [configuration setOutputFormat:*outputFormat];
+
     if (auto wordLimit = options ? options->wordLimit : 0)
         [configuration setMaxWordsPerParagraph:static_cast<NSUInteger>(wordLimit)];
     [configuration setTargetRect:extractionRect];

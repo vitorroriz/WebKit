@@ -64,6 +64,24 @@ static String escapeString(const String& string)
     return result;
 }
 
+static String escapeStringForHTML(const String& string)
+{
+    auto result = string;
+    result = makeStringByReplacingAll(result, '&', "&amp;"_s);
+    result = makeStringByReplacingAll(result, '\\', "\\\\"_s);
+    result = makeStringByReplacingAll(result, '<', "&lt;"_s);
+    result = makeStringByReplacingAll(result, '>', "&gt;"_s);
+    // FIXME: Consider representing hard line breaks using <br>.
+    result = makeStringByReplacingAll(result, '\n', " "_s);
+    result = makeStringByReplacingAll(result, '\'', "&#39;"_s);
+    result = makeStringByReplacingAll(result, '"', "&quot;"_s);
+    result = makeStringByReplacingAll(result, '\0', "\\0"_s);
+    result = makeStringByReplacingAll(result, '\b', "\\b"_s);
+    result = makeStringByReplacingAll(result, '\f', "\\f"_s);
+    result = makeStringByReplacingAll(result, '\v', "\\v"_s);
+    return result;
+}
+
 static String normalizedURLString(const URL& url)
 {
     static constexpr auto maxURLStringLength = 150;
@@ -111,10 +129,12 @@ public:
             return;
         }
 
-        auto text = makeStringByJoining(WTFMove(components), ","_s);
+        auto separator = useHTMLOutput() ? " "_s : ","_s;
+        auto text = makeStringByJoining(WTFMove(components), separator);
 
         if (!m_lines[lineIndex].isEmpty()) {
-            m_lines[lineIndex] = makeString(m_lines[lineIndex], ',', WTFMove(text));
+            auto joiner = useHTMLOutput() ? ' ' : ',';
+            m_lines[lineIndex] = makeString(m_lines[lineIndex], joiner, WTFMove(text));
             return;
         }
 
@@ -157,6 +177,11 @@ public:
         return m_options.flags.contains(TextExtractionOptionFlag::OnlyIncludeText);
     }
 
+    bool useHTMLOutput() const
+    {
+        return m_options.outputFormat == TextExtractionOutputFormat::HTMLMarkup;
+    }
+
     RefPtr<TextExtractionFilterPromise> filter(const String& text, const std::optional<WebCore::NodeIdentifier>& identifier)
     {
         if (m_options.filterCallbacks.isEmpty())
@@ -176,6 +201,15 @@ public:
     {
         for (auto& [original, replacement] : m_options.replacementStrings)
             text = makeStringByReplacingAll(text, original, replacement);
+    }
+
+    void appendToLine(unsigned lineIndex, const String& text)
+    {
+        if (lineIndex >= m_lines.size()) {
+            ASSERT_NOT_REACHED();
+            return;
+        }
+        m_lines[lineIndex] = makeString(m_lines[lineIndex], text);
     }
 
 private:
@@ -213,8 +247,11 @@ private:
 
     void addLineForVersionNumberIfNeeded()
     {
-        if (!onlyIncludeText())
-            addResult({ advanceToNextLine(), 0 }, { makeString("version="_s, version()) });
+        if (onlyIncludeText())
+            return;
+
+        auto versionText = useHTMLOutput() ? makeString("<!-- version="_s, version(), " -->"_s) : makeString("version="_s, version());
+        addResult({ advanceToNextLine(), 0 }, { WTFMove(versionText) });
     }
 
     uint32_t version() const
@@ -262,7 +299,7 @@ static Vector<String> partsForItem(const TextExtraction::Item& item, const TextE
     if (item.nodeIdentifier)
         parts.append(makeString("uid="_s, item.nodeIdentifier->toUInt64()));
 
-    if (item.children.isEmpty() && aggregator.includeRects()) {
+    if (item.children.isEmpty() && aggregator.includeRects() && !aggregator.useHTMLOutput()) {
         auto origin = item.rectInRootView.location();
         auto size = item.rectInRootView.size();
         parts.append(makeString("["_s,
@@ -274,7 +311,7 @@ static Vector<String> partsForItem(const TextExtraction::Item& item, const TextE
         parts.append(makeString("role='"_s, escapeString(item.accessibilityRole), '\''));
 
     auto listeners = eventListenerTypesToStringArray(item.eventListeners);
-    if (!listeners.isEmpty())
+    if (!listeners.isEmpty() && !aggregator.useHTMLOutput())
         parts.append(makeString("events=["_s, commaSeparatedString(listeners), ']'));
 
     for (auto& key : sortedKeys(item.ariaAttributes))
@@ -286,17 +323,18 @@ static Vector<String> partsForItem(const TextExtraction::Item& item, const TextE
     return parts;
 }
 
-static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector<String>&& itemParts, std::optional<NodeIdentifier>&& enclosingNode, const TextExtractionLine& line, Ref<TextExtractionAggregator>&& aggregator)
+static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector<String>&& itemParts, std::optional<NodeIdentifier>&& enclosingNode, const TextExtractionLine& line, Ref<TextExtractionAggregator>&& aggregator, const String& closingTag = { })
 {
-    auto completion = [itemParts = WTFMove(itemParts), selectedRange = textItem.selectedRange, aggregator, line](String&& filteredText) mutable {
+    auto completion = [itemParts = WTFMove(itemParts), selectedRange = textItem.selectedRange, aggregator, line, closingTag](String&& filteredText) mutable {
         Vector<String> textParts;
+        auto currentLine = line;
         if (!filteredText.isEmpty()) {
             // Apply replacements only after filtering, so any filtering steps that rely on comparing DOM text against
             // visual data (e.g. recognized text) won't result in false positives.
             aggregator->applyReplacements(filteredText);
 
             if (aggregator->onlyIncludeText()) {
-                aggregator->addResult(line, { escapeString(filteredText.trim(isASCIIWhitespace).simplifyWhiteSpace(isASCIIWhitespace)) });
+                aggregator->addResult(currentLine, { escapeString(filteredText.trim(isASCIIWhitespace).simplifyWhiteSpace(isASCIIWhitespace)) });
                 return;
             }
 
@@ -305,8 +343,10 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
             });
 
             if (startIndex == notFound) {
-                textParts.append("''"_s);
-                textParts.append("selected=[0,0]"_s);
+                if (!aggregator->useHTMLOutput()) {
+                    textParts.append("''"_s);
+                    textParts.append("selected=[0,0]"_s);
+                }
             } else {
                 size_t endIndex = filteredText.length() - 1;
                 for (size_t i = filteredText.length(); i > 0; --i) {
@@ -317,9 +357,16 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
                 }
 
                 auto trimmedContent = filteredText.substring(startIndex, endIndex - startIndex + 1);
-                textParts.append(makeString('\'', escapeString(trimmedContent), '\''));
+                if (aggregator->useHTMLOutput()) {
+                    if (!closingTag.isEmpty()) {
+                        aggregator->appendToLine(currentLine.lineIndex, makeString(escapeStringForHTML(trimmedContent), closingTag));
+                        return;
+                    }
+                    textParts.append(escapeStringForHTML(trimmedContent));
+                } else
+                    textParts.append(makeString('\'', escapeString(trimmedContent), '\''));
 
-                if (selectedRange && selectedRange->length > 0) {
+                if (!aggregator->useHTMLOutput() && selectedRange && selectedRange->length > 0) {
                     if (!trimmedContent.isEmpty()) {
                         int newLocation = std::max(0, static_cast<int>(selectedRange->location) - static_cast<int>(startIndex));
                         int maxLength = static_cast<int>(trimmedContent.length()) - newLocation;
@@ -332,11 +379,11 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
                         textParts.append("selected=[0,0]"_s);
                 }
             }
-        } else if (selectedRange)
+        } else if (!aggregator->useHTMLOutput() && selectedRange)
             textParts.append("selected=[0,0]"_s);
 
         textParts.appendVector(WTFMove(itemParts));
-        aggregator->addResult(line, WTFMove(textParts));
+        aggregator->addResult(currentLine, WTFMove(textParts));
     };
 
     RefPtr filterPromise = aggregator->filter(textItem.content, WTFMove(enclosingNode));
@@ -400,100 +447,203 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
                 break;
             }
 
-            if (!containerString.isEmpty())
-                parts.append(WTFMove(containerString));
+            if (aggregator.useHTMLOutput()) {
+                String tagName;
+                if (containerType == TextExtraction::ContainerType::Root)
+                    tagName = "body"_s;
+                else if (!item.nodeName.isEmpty())
+                    tagName = item.nodeName.convertToASCIILowercase();
 
-            parts.appendVector(partsForItem(item, aggregator));
+                if (!tagName.isEmpty()) {
+                    auto attributes = partsForItem(item, aggregator);
+                    if (attributes.isEmpty())
+                        parts.append(makeString('<', tagName, '>'));
+                    else
+                        parts.append(makeString('<', tagName, ' ', makeStringByJoining(attributes, " "_s), '>'));
+                }
+            } else {
+                if (!containerString.isEmpty())
+                    parts.append(WTFMove(containerString));
+
+                parts.appendVector(partsForItem(item, aggregator));
+            }
             aggregator.addResult(line, WTFMove(parts));
         },
         [&](const TextExtraction::TextItemData& textData) {
             addPartsForText(textData, partsForItem(item, aggregator), WTFMove(enclosingNode), line, aggregator);
         },
         [&](const TextExtraction::ContentEditableData& editableData) {
-            parts.append("contentEditable"_s);
-            parts.appendVector(partsForItem(item, aggregator));
+            if (aggregator.useHTMLOutput()) {
+                auto attributes = partsForItem(item, aggregator);
+                if (attributes.isEmpty())
+                    parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), '>'));
+                else
+                    parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), ' ', makeStringByJoining(attributes, " "_s), '>'));
 
-            if (editableData.isFocused)
-                parts.append("focused"_s);
+                if (editableData.isPlainTextOnly)
+                    parts.append("contenteditable='plaintext-only'"_s);
+                else
+                    parts.append("contenteditable"_s);
+            } else {
+                parts.append("contentEditable"_s);
+                parts.appendVector(partsForItem(item, aggregator));
 
-            if (editableData.isPlainTextOnly)
-                parts.append("plaintext"_s);
+                if (editableData.isFocused)
+                    parts.append("focused"_s);
+
+                if (editableData.isPlainTextOnly)
+                    parts.append("plaintext"_s);
+            }
 
             aggregator.addResult(line, WTFMove(parts));
         },
         [&](const TextExtraction::TextFormControlData& controlData) {
-            parts.append(aggregator.useTagNameForTextFormControls() ? item.nodeName.convertToASCIILowercase() : String { "textFormControl"_s });
-            parts.appendVector(partsForItem(item, aggregator));
+            auto tagName = aggregator.useTagNameForTextFormControls() ? item.nodeName.convertToASCIILowercase() : String { "textFormControl"_s };
 
-            if (!controlData.controlType.isEmpty() && !equalIgnoringASCIICase(controlData.controlType, item.nodeName))
-                parts.insert(1, makeString('\'', controlData.controlType, '\''));
+            if (aggregator.useHTMLOutput()) {
+                auto attributes = partsForItem(item, aggregator);
 
-            if (!controlData.autocomplete.isEmpty())
-                parts.append(makeString("autocomplete='"_s, controlData.autocomplete, '\''));
+                if (!controlData.controlType.isEmpty() && !equalIgnoringASCIICase(controlData.controlType, item.nodeName))
+                    attributes.insert(0, makeString("type='"_s, controlData.controlType, '\''));
 
-            if (controlData.isReadonly)
-                parts.append("readonly"_s);
+                if (!controlData.autocomplete.isEmpty())
+                    attributes.append(makeString("autocomplete='"_s, controlData.autocomplete, '\''));
 
-            if (controlData.isDisabled)
-                parts.append("disabled"_s);
+                if (!controlData.editable.label.isEmpty())
+                    attributes.append(makeString("label='"_s, escapeString(controlData.editable.label), '\''));
 
-            if (controlData.isChecked)
-                parts.append("checked"_s);
+                if (!controlData.editable.placeholder.isEmpty())
+                    attributes.append(makeString("placeholder='"_s, escapeString(controlData.editable.placeholder), '\''));
 
-            if (!controlData.editable.label.isEmpty())
-                parts.append(makeString("label='"_s, escapeString(controlData.editable.label), '\''));
+                if (attributes.isEmpty())
+                    parts.append(makeString('<', tagName, '>'));
+                else
+                    parts.append(makeString('<', tagName, ' ', makeStringByJoining(attributes, " "_s), '>'));
+            } else {
+                parts.append(WTFMove(tagName));
+                parts.appendVector(partsForItem(item, aggregator));
 
-            if (!controlData.editable.placeholder.isEmpty())
-                parts.append(makeString("placeholder='"_s, escapeString(controlData.editable.placeholder), '\''));
+                if (!controlData.controlType.isEmpty() && !equalIgnoringASCIICase(controlData.controlType, item.nodeName))
+                    parts.insert(1, makeString('\'', controlData.controlType, '\''));
 
-            if (controlData.editable.isSecure)
-                parts.append("secure"_s);
+                if (!controlData.autocomplete.isEmpty())
+                    parts.append(makeString("autocomplete='"_s, controlData.autocomplete, '\''));
 
-            if (controlData.editable.isFocused)
-                parts.append("focused"_s);
+                if (controlData.isReadonly)
+                    parts.append("readonly"_s);
+
+                if (controlData.isDisabled)
+                    parts.append("disabled"_s);
+
+                if (controlData.isChecked)
+                    parts.append("checked"_s);
+
+                if (!controlData.editable.label.isEmpty())
+                    parts.append(makeString("label='"_s, escapeString(controlData.editable.label), '\''));
+
+                if (!controlData.editable.placeholder.isEmpty())
+                    parts.append(makeString("placeholder='"_s, escapeString(controlData.editable.placeholder), '\''));
+
+                if (controlData.editable.isSecure)
+                    parts.append("secure"_s);
+
+                if (controlData.editable.isFocused)
+                    parts.append("focused"_s);
+            }
 
             aggregator.addResult(line, WTFMove(parts));
         },
         [&](const TextExtraction::LinkItemData& linkData) {
-            parts.append("link"_s);
-            parts.appendVector(partsForItem(item, aggregator));
+            if (aggregator.useHTMLOutput()) {
+                auto attributes = partsForItem(item, aggregator);
 
-            if (!linkData.completedURL.isEmpty() && aggregator.includeURLs())
-                parts.append(makeString("url='"_s, normalizedURLString(linkData.completedURL), '\''));
+                if (!linkData.completedURL.isEmpty() && aggregator.includeURLs())
+                    attributes.append(makeString("href='"_s, normalizedURLString(linkData.completedURL), '\''));
+
+                if (attributes.isEmpty())
+                    parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), '>'));
+                else
+                    parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), ' ', makeStringByJoining(attributes, " "_s), '>'));
+            } else {
+                parts.append("link"_s);
+                parts.appendVector(partsForItem(item, aggregator));
+
+                if (!linkData.completedURL.isEmpty() && aggregator.includeURLs())
+                    parts.append(makeString("url='"_s, normalizedURLString(linkData.completedURL), '\''));
+            }
 
             aggregator.addResult(line, WTFMove(parts));
         },
         [&](const TextExtraction::ScrollableItemData& scrollableData) {
-            parts.append("scrollable"_s);
-            parts.appendVector(partsForItem(item, aggregator));
-            parts.append(makeString("contentSize=["_s, scrollableData.contentSize.width(), 'x', scrollableData.contentSize.height(), ']'));
+            if (aggregator.useHTMLOutput()) {
+                auto attributes = partsForItem(item, aggregator);
+                if (attributes.isEmpty())
+                    parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), '>'));
+                else
+                    parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), ' ', makeStringByJoining(attributes, " "_s), '>'));
+            } else {
+                parts.append("scrollable"_s);
+                parts.appendVector(partsForItem(item, aggregator));
+                parts.append(makeString("contentSize=["_s, scrollableData.contentSize.width(), 'x', scrollableData.contentSize.height(), ']'));
+            }
             aggregator.addResult(line, WTFMove(parts));
         },
         [&](const TextExtraction::SelectData& selectData) {
-            parts.append("select"_s);
-            parts.appendVector(partsForItem(item, aggregator));
+            if (aggregator.useHTMLOutput()) {
+                auto attributes = partsForItem(item, aggregator);
 
-            if (!selectData.selectedValues.isEmpty()) {
-                auto escapedValues = selectData.selectedValues.map([](auto& value) {
-                    return makeString('\'', escapeString(value), '\'');
-                });
-                parts.append(makeString("selected=["_s, commaSeparatedString(escapedValues), ']'));
+                if (!selectData.selectedValues.isEmpty()) {
+                    auto escapedValues = selectData.selectedValues.map([](auto& value) {
+                        return makeString('\'', escapeString(value), '\'');
+                    });
+                    attributes.append(makeString("selected=["_s, commaSeparatedString(escapedValues), ']'));
+                }
+
+                if (attributes.isEmpty())
+                    parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), '>'));
+                else
+                    parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), ' ', makeStringByJoining(attributes, " "_s), '>'));
+            } else {
+                parts.append("select"_s);
+                parts.appendVector(partsForItem(item, aggregator));
+
+                if (!selectData.selectedValues.isEmpty()) {
+                    auto escapedValues = selectData.selectedValues.map([](auto& value) {
+                        return makeString('\'', escapeString(value), '\'');
+                    });
+                    parts.append(makeString("selected=["_s, commaSeparatedString(escapedValues), ']'));
+                }
+
+                if (selectData.isMultiple)
+                    parts.append("multiple"_s);
             }
-
-            if (selectData.isMultiple)
-                parts.append("multiple"_s);
 
             aggregator.addResult(line, WTFMove(parts));
         },
         [&](const TextExtraction::ImageItemData& imageData) {
-            parts.append("image"_s);
-            parts.appendVector(partsForItem(item, aggregator));
+            if (aggregator.useHTMLOutput()) {
+                auto attributes = partsForItem(item, aggregator);
 
-            if (!imageData.completedSource.isEmpty() && aggregator.includeURLs())
-                parts.append(makeString("src='"_s, normalizedURLString(imageData.completedSource), '\''));
+                if (!imageData.completedSource.isEmpty() && aggregator.includeURLs())
+                    attributes.append(makeString("src='"_s, normalizedURLString(imageData.completedSource), '\''));
 
-            if (!imageData.altText.isEmpty())
-                parts.append(makeString("alt='"_s, escapeString(imageData.altText), '\''));
+                if (!imageData.altText.isEmpty())
+                    attributes.append(makeString("alt='"_s, escapeString(imageData.altText), '\''));
+
+                if (attributes.isEmpty())
+                    parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), '>'));
+                else
+                    parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), ' ', makeStringByJoining(attributes, " "_s), '>'));
+            } else {
+                parts.append("image"_s);
+                parts.appendVector(partsForItem(item, aggregator));
+
+                if (!imageData.completedSource.isEmpty() && aggregator.includeURLs())
+                    parts.append(makeString("src='"_s, normalizedURLString(imageData.completedSource), '\''));
+
+                if (!imageData.altText.isEmpty())
+                    parts.append(makeString("alt='"_s, escapeString(imageData.altText), '\''));
+            }
 
             aggregator.addResult(line, WTFMove(parts));
         }
@@ -538,10 +688,25 @@ static void addTextRepresentationRecursive(const TextExtraction::Item& item, std
     TextExtractionLine line { aggregator.advanceToNextLine(), depth };
     addPartsForItem(item, std::optional { identifier }, line, aggregator);
 
+    auto closingTagName = [&] -> String {
+        if (!aggregator.useHTMLOutput())
+            return { };
+
+        if (item.dataAs<TextExtraction::ContainerType>() == TextExtraction::ContainerType::Root)
+            return "body"_s;
+
+        return item.nodeName.convertToASCIILowercase();
+    }();
+
     if (item.children.size() == 1) {
         if (auto text = item.children[0].dataAs<TextExtraction::TextItemData>()) {
             if (childTextNodeIsRedundant(item, text->content.trim(isASCIIWhitespace)))
                 return;
+
+            if (aggregator.useHTMLOutput()) {
+                addPartsForText(*text, partsForItem(item.children[0], aggregator), std::optional { identifier }, line, aggregator, makeString("</"_s, closingTagName, '>'));
+                return;
+            }
 
             // In the case of a single text child, we append that text to the same line.
             addPartsForItem(item.children[0], WTFMove(identifier), line, aggregator);
@@ -551,6 +716,9 @@ static void addTextRepresentationRecursive(const TextExtraction::Item& item, std
 
     for (auto& child : item.children)
         addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, aggregator);
+
+    if (aggregator.useHTMLOutput() && !item.children.isEmpty())
+        aggregator.addResult({ aggregator.advanceToNextLine(), depth }, { makeString("</"_s, closingTagName, '>') });
 }
 
 void convertToText(TextExtraction::Item&& item, TextExtractionOptions&& options, CompletionHandler<void(TextExtractionResult&&)>&& completion)

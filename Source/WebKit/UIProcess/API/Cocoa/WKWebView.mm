@@ -6613,6 +6613,19 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
     }).get()];
 }
 
+static WebKit::TextExtractionOutputFormat textExtractionOutputFormat(_WKTextExtractionConfiguration *configuration)
+{
+    switch (configuration.outputFormat) {
+    case _WKTextExtractionOutputFormatTextTree:
+        return WebKit::TextExtractionOutputFormat::TextTree;
+    case _WKTextExtractionOutputFormatHTML:
+        return WebKit::TextExtractionOutputFormat::HTMLMarkup;
+    default:
+        ASSERT_NOT_REACHED();
+        return WebKit::TextExtractionOutputFormat::TextTree;
+    }
+}
+
 - (void)_extractDebugTextWithConfiguration:(_WKTextExtractionConfiguration *)configuration completionHandler:(void(^)(_WKTextExtractionResult *))completionHandler
 {
     bool allowFiltering = _page->protectedPreferences()->textExtractionFilterEnabled();
@@ -6642,7 +6655,8 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
         onlyIncludeText = configuration.onlyIncludeVisibleText,
         maxWordsPerParagraph = WTFMove(maxWordsPerParagraph),
         version,
-        replacementStrings = extractReplacementStrings(configuration)
+        replacementStrings = extractReplacementStrings(configuration),
+        outputFormat = textExtractionOutputFormat(configuration)
     ](auto&& item) mutable {
         RetainPtr strongSelf = weakSelf.get();
         if (!strongSelf)
@@ -6752,7 +6766,8 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
             [strongSelf _activeNativeMenuItemTitles],
             WTFMove(replacementStrings),
             version,
-            optionFlags
+            optionFlags,
+            outputFormat
         };
         WebKit::convertToText(WTFMove(*item), WTFMove(options), [completionHandler = WTFMove(completionHandler)](auto&& result) {
             auto [text, filteredOutAnyText] = result;

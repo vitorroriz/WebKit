@@ -150,6 +150,13 @@
     _includeTextInAutoFilledControls = value;
 }
 
+- (void)setOutputFormat:(_WKTextExtractionOutputFormat)outputFormat
+{
+    ENSURE_VALID_TEXT_ONLY_CONFIGURATION(outputFormat != _WKTextExtractionOutputFormatTextTree);
+
+    _outputFormat = outputFormat;
+}
+
 #undef ENSURE_VALID_TEXT_ONLY_CONFIGURATION
 
 @end

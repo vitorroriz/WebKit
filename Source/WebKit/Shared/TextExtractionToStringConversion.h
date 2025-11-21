@@ -54,6 +54,11 @@ enum class TextExtractionOptionFlag : uint8_t {
     OnlyIncludeText = 1 << 2,
 };
 
+enum class TextExtractionOutputFormat : uint8_t {
+    TextTree,
+    HTMLMarkup
+};
+
 using TextExtractionOptionFlags = OptionSet<TextExtractionOptionFlag>;
 using TextExtractionFilterPromise = NativePromise<String, void>;
 using TextExtractionFilterCallback = Function<Ref<TextExtractionFilterPromise>(const String&, std::optional<WebCore::NodeIdentifier>&&)>;
@@ -65,15 +70,17 @@ struct TextExtractionOptions {
         , replacementStrings(WTFMove(other.replacementStrings))
         , version(other.version)
         , flags(other.flags)
+        , outputFormat(other.outputFormat)
     {
     }
 
-    TextExtractionOptions(Vector<TextExtractionFilterCallback>&& filters, Vector<String>&& items, HashMap<String, String>&& replacementStrings, std::optional<TextExtractionVersion> version, TextExtractionOptionFlags flags)
+    TextExtractionOptions(Vector<TextExtractionFilterCallback>&& filters, Vector<String>&& items, HashMap<String, String>&& replacementStrings, std::optional<TextExtractionVersion> version, TextExtractionOptionFlags flags, TextExtractionOutputFormat outputFormat)
         : filterCallbacks(WTFMove(filters))
         , nativeMenuItems(WTFMove(items))
         , replacementStrings(WTFMove(replacementStrings))
         , version(version)
         , flags(flags)
+        , outputFormat(outputFormat)
     {
     }
 
@@ -82,6 +89,7 @@ struct TextExtractionOptions {
     HashMap<String, String> replacementStrings;
     std::optional<TextExtractionVersion> version;
     TextExtractionOptionFlags flags;
+    TextExtractionOutputFormat outputFormat { TextExtractionOutputFormat::TextTree };
 };
 
 struct TextExtractionResult {

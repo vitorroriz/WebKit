@@ -68,6 +68,7 @@ struct TextExtractionTestOptions {
     bool includeTextInAutoFilledControls { false };
     bool mergeParagraphs { false };
     bool skipNearlyTransparentContent { false };
+    JSRetainPtr<JSStringRef> outputFormat;
 };
 
 TextExtractionTestOptions* toTextExtractionTestOptions(JSContextRef, JSValueRef);
