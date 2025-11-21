@@ -3766,7 +3766,7 @@ void RenderLayer::paintLayerContents(GraphicsContext& context, const LayerPainti
             CheckedPtr subtreeRootLayer = paintingInfo.subtreePaintRoot->enclosingLayer();
             bool isLayerInSubtree = (this == subtreeRootLayer) || isDescendantOf(*subtreeRootLayer);
 
-            if (isLayerInSubtree && (paintingInfo.subtreePaintRoot != &renderer() && shouldExcludeBasedOnContainingBlock()))
+            if (!isLayerInSubtree || (paintingInfo.subtreePaintRoot != &renderer() && shouldExcludeBasedOnContainingBlock()))
                 shouldPaintContent = false;
         } else if (renderer().isAbsolutelyPositioned() && paintingInfo.subtreePaintRoot != &renderer() && shouldExcludeBasedOnContainingBlock()) {
             shouldPaintContent = false;
