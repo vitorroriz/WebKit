@@ -637,7 +637,7 @@ bool InlineFormattingUtils::shouldDiscardRemainingContentInBlockDirection() cons
     if (!lineClamp || !lineClamp->shouldDiscardOverflow)
         return false;
     ASSERT(!lineClamp->isLegacy);
-    return lineClamp->maximumLines == inlineLayoutState.lineCountForBlockDirectionClamp();
+    return lineClamp->maximumLines == inlineLayoutState.lineCountWithInlineContentIncludingNestedBlocks();
 }
 
 }

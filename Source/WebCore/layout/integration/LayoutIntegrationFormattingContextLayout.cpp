@@ -106,7 +106,7 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
         auto legacyLineClamp = renderTreeLayoutState.legacyLineClamp();
         if (!legacyLineClamp)
             return;
-        legacyLineClamp->currentLineCount += inlineLayoutState.lineCountForBlockDirectionClamp();
+        legacyLineClamp->currentLineCount += inlineLayoutState.lineCountWithInlineContentIncludingNestedBlocks();
         renderTreeLayoutState.setLegacyLineClamp(legacyLineClamp);
     };
     updateRenderTreeLegacyLineClamp();
@@ -143,8 +143,8 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
         auto legacyLineClamp = renderTreeLayoutState.legacyLineClamp();
         if (!legacyLineClamp)
             return;
-        auto newlyConstructedLineCount = legacyLineClamp->currentLineCount - inlineLayoutState.lineCountForBlockDirectionClamp();
-        inlineLayoutState.setLineCountForBlockDirectionClamp(inlineLayoutState.lineCountForBlockDirectionClamp() + newlyConstructedLineCount);
+        auto newlyConstructedLineCount = legacyLineClamp->currentLineCount - inlineLayoutState.lineCountWithInlineContentIncludingNestedBlocks();
+        inlineLayoutState.setLineCountWithInlineContentIncludingNestedBlocks(inlineLayoutState.lineCountWithInlineContentIncludingNestedBlocks() + newlyConstructedLineCount);
     };
     udpdateIFCLineClamp();
 
