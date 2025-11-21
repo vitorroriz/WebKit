@@ -44,11 +44,13 @@ struct JSHandleIdentifierType;
 using WebProcessJSHandleIdentifier = ObjectIdentifier<JSHandleIdentifierType>;
 using JSHandleIdentifier = ProcessQualified<WebProcessJSHandleIdentifier>;
 
-class WebKitJSHandle : public RefCountedAndCanMakeWeakPtr<WebKitJSHandle> {
+class WEBCORE_EXPORT WebKitJSHandle : public RefCountedAndCanMakeWeakPtr<WebKitJSHandle> {
 public:
-    WEBCORE_EXPORT static Ref<WebKitJSHandle> create(JSC::JSGlobalObject&, JSC::JSObject*);
-    WEBCORE_EXPORT static std::pair<JSC::JSGlobalObject*, JSC::JSObject*> objectForIdentifier(JSHandleIdentifier);
-    WEBCORE_EXPORT static void jsHandleDestroyed(JSHandleIdentifier);
+    static Ref<WebKitJSHandle> create(JSC::JSGlobalObject&, JSC::JSObject*);
+    static std::pair<JSC::JSGlobalObject*, JSC::JSObject*> objectForIdentifier(JSHandleIdentifier);
+    static void jsHandleDestroyed(JSHandleIdentifier);
+    static void jsHandleSentToAnotherProcess(JSHandleIdentifier);
+    ~WebKitJSHandle();
 
     JSHandleIdentifier identifier() const { return m_identifier; }
     Markable<FrameIdentifier> windowFrameIdentifier() const { return m_windowFrameIdentifier; }

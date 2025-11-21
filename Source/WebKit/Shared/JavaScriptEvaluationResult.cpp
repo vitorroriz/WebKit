@@ -410,6 +410,7 @@ auto JavaScriptEvaluationResult::JSExtractor::jsValueToExtractedValue(JSGlobalCo
         RefPtr frame = WebFrame::webFrame(document->frameID());
         RefPtr world = InjectedBundleScriptWorld::get(domGlobalObject->world());
         Ref ref { info->wrapped() };
+        WebCore::WebKitJSHandle::jsHandleSentToAnotherProcess(ref->identifier());
         return makeUniqueRef<JSHandleInfo>(ref->identifier(), world->identifier(), frame->info(), ref->windowFrameIdentifier());
     }
 

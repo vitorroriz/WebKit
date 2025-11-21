@@ -9852,6 +9852,7 @@ void WebPage::hitTestAtPoint(WebCore::FrameIdentifier frameID, WebCore::FloatPoi
         JSLockHolder locker(lexicalGlobalObject);
         return WebCore::WebKitJSHandle::create(*lexicalGlobalObject, WebCore::toJS(lexicalGlobalObject, domGlobalObject, *node).toObject(lexicalGlobalObject));
     }();
+    WebCore::WebKitJSHandle::jsHandleSentToAnotherProcess(nodeHandle->identifier());
     completionHandler({ JSHandleInfo { nodeHandle->identifier(), pageContentWorldIdentifier(), nodeWebFrame->info(), nodeHandle->windowFrameIdentifier() } });
 }
 
