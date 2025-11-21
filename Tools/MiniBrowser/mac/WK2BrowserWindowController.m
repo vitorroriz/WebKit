@@ -655,6 +655,9 @@ static BOOL areEssentiallyEqual(double a, double b)
     if (_webView._editable)
         [subtitle appendString:@" ✏️"];
 
+    if (_webView.configuration.preferences._siteIsolationEnabled)
+        [subtitle appendString:@" (Site Isolated)"];
+
     self.window.subtitle = subtitle;
 }
 
