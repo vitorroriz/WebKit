@@ -160,9 +160,9 @@ RefPtr<NetworkTransportSession> NetworkTransportSession::create(NetworkConnectio
     return nullptr;
 }
 
-void NetworkTransportSession::initialize(CompletionHandler<void(bool)>&& completionHandler)
+void NetworkTransportSession::initialize(CompletionHandler<void(std::optional<WebCore::WebTransportConnectionInfo>&&)>&& completionHandler)
 {
-    completionHandler(false);
+    completionHandler(std::nullopt);
 }
 
 NetworkTransportSession::NetworkTransportSession()

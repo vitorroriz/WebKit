@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,21 +25,17 @@
 
 #pragma once
 
-#include <WebCore/DatagramsReadableMode.h>
-#include <WebCore/WebTransportCongestionControl.h>
-#include <WebCore/WebTransportHash.h>
+#include <WebCore/WebTransportReliabilityMode.h>
+#include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
-struct WebTransportOptions {
-    bool allowPooling { false };
-    bool requireUnreliable { false };
-    Vector<WebTransportHash> serverCertificateHashes;
-    WebTransportCongestionControl congestionControl { WebTransportCongestionControl::Default };
-    std::optional<uint16_t> anticipatedConcurrentIncomingUnidirectionalStreams;
-    std::optional<uint16_t> anticipatedConcurrentIncomingBidirectionalStreams;
-    Vector<String> protocols { };
-    std::optional<DatagramsReadableMode> datagramsReadableMode;
+struct WebTransportConnectionInfo {
+    String protocol;
+    WebTransportReliabilityMode reliabilityMode;
+
+    WebTransportConnectionInfo isolatedCopy() const & { return { protocol.isolatedCopy(), reliabilityMode }; }
+    WebTransportConnectionInfo isolatedCopy() && { return { WTFMove(protocol).isolatedCopy(), reliabilityMode }; }
 };
 
 }

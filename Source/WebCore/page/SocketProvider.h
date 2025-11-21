@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <WebCore/WebTransportConnectionInfo.h>
 #include <wtf/NativePromise.h>
 #include <wtf/Ref.h>
 #include <wtf/ThreadSafeRefCounted.h>
@@ -40,7 +41,7 @@ class WebTransportSessionClient;
 
 struct WebTransportOptions;
 
-using WebTransportSessionPromise = GenericPromise;
+using WebTransportSessionPromise = NativePromise<WebTransportConnectionInfo, void>;
 
 class WEBCORE_EXPORT SocketProvider : public ThreadSafeRefCounted<SocketProvider> {
 public:

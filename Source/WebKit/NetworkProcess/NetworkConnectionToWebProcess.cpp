@@ -1785,17 +1785,17 @@ void NetworkConnectionToWebProcess::navigatorGetPushPermissionState(URL&& scopeU
 }
 #endif // ENABLE(DECLARATIVE_WEB_PUSH)
 
-void NetworkConnectionToWebProcess::initializeWebTransportSession(WebTransportSessionIdentifier identifier, URL&& url, WebCore::WebTransportOptions&& options, WebPageProxyIdentifier&& pageID, WebCore::ClientOrigin&& clientOrigin, CompletionHandler<void(bool)>&& completionHandler)
+void NetworkConnectionToWebProcess::initializeWebTransportSession(WebTransportSessionIdentifier identifier, URL&& url, WebCore::WebTransportOptions&& options, WebPageProxyIdentifier&& pageID, WebCore::ClientOrigin&& clientOrigin, CompletionHandler<void(std::optional<WebCore::WebTransportConnectionInfo>&&)>&& completionHandler)
 {
     if (!url.isValid()
         || !portAllowed(url)
         || isIPAddressDisallowed(url)
         || m_networkTransportSessions.contains(identifier))
-        return completionHandler(false);
+        return completionHandler(std::nullopt);
 
     RefPtr session = NetworkTransportSession::create(*this, identifier, WTFMove(url), WTFMove(options), WTFMove(pageID), WTFMove(clientOrigin));
     if (!session)
-        return completionHandler(false);
+        return completionHandler(std::nullopt);
     session->initialize(WTFMove(completionHandler));
     m_networkTransportSessions.set(identifier, session.releaseNonNull());
 }

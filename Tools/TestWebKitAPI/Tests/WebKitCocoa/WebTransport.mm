@@ -182,13 +182,13 @@ TEST(WebTransport, Datagram)
         "    const groupStats = await g.getStats();"
         "    t.close();"
         "    await w.closed;"
-        "    alert('successfully read ' + new TextDecoder().decode(value) + ', group sent ' + groupStats.bytesWritten + ' bytes, maxDatagramSize ' + t.datagrams.maxDatagramSize);"
+        "    alert('successfully read ' + new TextDecoder().decode(value) + ', group sent ' + groupStats.bytesWritten + ' bytes, maxDatagramSize ' + t.datagrams.maxDatagramSize + ', reliability ' + t.reliability);"
         "  } catch (e) { alert('caught ' + e); }"
         "}; test();"
         "</script>",
         port];
     [webView loadHTMLString:html baseURL:[NSURL URLWithString:@"https://webkit.org/"]];
-    EXPECT_WK_STREQ([webView _test_waitForAlert], "successfully read abc, group sent 3 bytes, maxDatagramSize 65535");
+    EXPECT_WK_STREQ([webView _test_waitForAlert], "successfully read abc, group sent 3 bytes, maxDatagramSize 65535, reliability supports-unreliable");
     EXPECT_TRUE(challenged);
 }
 

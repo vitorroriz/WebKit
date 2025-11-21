@@ -32,6 +32,7 @@
 #include "DatagramSink.h"
 #include "DatagramSource.h"
 #include "ExceptionOr.h"
+#include "HTTPParsers.h"
 #include "JSDOMException.h"
 #include "JSDOMPromise.h"
 #include "JSDOMPromiseDeferred.h"
@@ -73,6 +74,19 @@ ExceptionOr<Ref<WebTransport>> WebTransport::create(ScriptExecutionContext& cont
     bool dedicated = !options.allowPooling;
     if (!dedicated && !options.serverCertificateHashes.isEmpty())
         return Exception { ExceptionCode::NotSupportedError };
+
+    HashSet<String> uniqueProtocols;
+    for (auto& protocol : options.protocols) {
+        if (!isValidHTTPToken(protocol))
+            return Exception { ExceptionCode::SyntaxError };
+
+        auto utf8 = protocol.utf8();
+        if (utf8.isEmpty() || utf8.length() > 512)
+            return Exception { ExceptionCode::SyntaxError };
+
+        if (!uniqueProtocols.add(protocol).isNewEntry)
+            return Exception { ExceptionCode::SyntaxError };
+    }
 
     auto* globalObject = context.globalObject();
     if (!globalObject) {
@@ -128,7 +142,7 @@ ExceptionOr<Ref<WebTransport>> WebTransport::create(ScriptExecutionContext& cont
 
     auto datagrams = WebTransportDatagramDuplexStream::create(incomingDatagrams.releaseNonNull());
 
-    auto transport = adoptRef(*new WebTransport(context, domGlobalObject, incomingBidirectionalStreams.releaseReturnValue(), incomingUnidirectionalStreams.releaseReturnValue(), options.congestionControl, WTFMove(datagrams), datagramSource.releaseNonNull(), WTFMove(receiveStreamSource), WTFMove(bidirectionalStreamSource)));
+    auto transport = adoptRef(*new WebTransport(context, domGlobalObject, incomingBidirectionalStreams.releaseReturnValue(), incomingUnidirectionalStreams.releaseReturnValue(), options, WTFMove(datagrams), datagramSource.releaseNonNull(), WTFMove(receiveStreamSource), WTFMove(bidirectionalStreamSource)));
     transport->suspendIfNeeded();
     transport->initializeOverHTTP(*socketProvider, context, WTFMove(parsedURL), WTFMove(options));
     return transport;
@@ -148,17 +162,22 @@ void WebTransport::initializeOverHTTP(SocketProvider& provider, ScriptExecutionC
         if (!result) {
             return cleanupWithSessionError();
         }
+        auto& connectionInfo = result.value();
+        m_protocol = WTFMove(connectionInfo.protocol);
+        m_reliability = connectionInfo.reliabilityMode;
         m_state = State::Connected;
         m_ready.second->resolve();
     });
 }
 
-WebTransport::WebTransport(ScriptExecutionContext& context, JSDOMGlobalObject& globalObject, Ref<ReadableStream>&& incomingBidirectionalStreams, Ref<ReadableStream>&& incomingUnidirectionalStreams, WebTransportCongestionControl congestionControl, Ref<WebTransportDatagramDuplexStream>&& datagrams, Ref<DatagramSource>&& datagramSource, Ref<WebTransportReceiveStreamSource>&& receiveStreamSource, Ref<WebTransportBidirectionalStreamSource>&& bidirectionalStreamSource)
+WebTransport::WebTransport(ScriptExecutionContext& context, JSDOMGlobalObject& globalObject, Ref<ReadableStream>&& incomingBidirectionalStreams, Ref<ReadableStream>&& incomingUnidirectionalStreams, const WebTransportOptions& options, Ref<WebTransportDatagramDuplexStream>&& datagrams, Ref<DatagramSource>&& datagramSource, Ref<WebTransportReceiveStreamSource>&& receiveStreamSource, Ref<WebTransportBidirectionalStreamSource>&& bidirectionalStreamSource)
     : ActiveDOMObject(&context)
     , m_incomingBidirectionalStreams(WTFMove(incomingBidirectionalStreams))
     , m_incomingUnidirectionalStreams(WTFMove(incomingUnidirectionalStreams))
     , m_ready(createPromiseAndWrapper(globalObject))
-    , m_congestionControl(congestionControl)
+    , m_congestionControl(options.congestionControl)
+    , m_anticipatedConcurrentIncomingUnidirectionalStreams(options.anticipatedConcurrentIncomingUnidirectionalStreams)
+    , m_anticipatedConcurrentIncomingBidirectionalStreams(options.anticipatedConcurrentIncomingBidirectionalStreams)
     , m_closed(createPromiseAndWrapper(globalObject))
     , m_draining(createPromiseAndWrapper(globalObject))
     , m_datagrams(WTFMove(datagrams))
@@ -297,6 +316,36 @@ WebTransportReliabilityMode WebTransport::reliability()
 WebTransportCongestionControl WebTransport::congestionControl()
 {
     return m_congestionControl;
+}
+
+std::optional<uint16_t> WebTransport::anticipatedConcurrentIncomingUnidirectionalStreams()
+{
+    return m_anticipatedConcurrentIncomingUnidirectionalStreams;
+}
+
+void WebTransport::setAnticipatedConcurrentIncomingUnidirectionalStreams(std::optional<uint16_t> value)
+{
+    m_anticipatedConcurrentIncomingUnidirectionalStreams = value;
+}
+
+std::optional<uint16_t> WebTransport::anticipatedConcurrentIncomingBidirectionalStreams()
+{
+    return m_anticipatedConcurrentIncomingBidirectionalStreams;
+}
+
+void WebTransport::setAnticipatedConcurrentIncomingBidirectionalStreams(std::optional<uint16_t> value)
+{
+    m_anticipatedConcurrentIncomingBidirectionalStreams = value;
+}
+
+String& WebTransport::protocol()
+{
+    return m_protocol;
+}
+
+bool WebTransport::supportsReliableOnly()
+{
+    return true;
 }
 
 DOMPromise& WebTransport::closed()

@@ -63,6 +63,9 @@ struct WebCore::WebTransportOptions {
     bool requireUnreliable
     Vector<WebCore::WebTransportHash> serverCertificateHashes
     WebCore::WebTransportCongestionControl congestionControl
+    std::optional<uint16_t> anticipatedConcurrentIncomingUnidirectionalStreams
+    std::optional<uint16_t> anticipatedConcurrentIncomingBidirectionalStreams
+    Vector<String> protocols
     std::optional<WebCore::DatagramsReadableMode> datagramsReadableMode;
 };
 
@@ -72,6 +75,17 @@ enum class WebCore::WebTransportCongestionControl : uint8_t {
     LowLatency,
 };
 
+enum class WebCore::WebTransportReliabilityMode : uint8_t {
+    Pending,
+    ReliableOnly,
+    SupportsUnreliable
+};
+
 enum class WebCore::DatagramsReadableMode : uint8_t {
     Bytes
+};
+
+struct WebCore::WebTransportConnectionInfo {
+    String protocol
+    WebCore::WebTransportReliabilityMode reliabilityMode
 };

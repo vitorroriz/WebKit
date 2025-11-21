@@ -849,11 +849,13 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     Modules/webtransport/DatagramsReadableMode.h
     Modules/webtransport/WebTransportCongestionControl.h
+    Modules/webtransport/WebTransportConnectionInfo.h
     Modules/webtransport/WebTransportConnectionStats.h
     Modules/webtransport/WebTransportDatagramStats.h
     Modules/webtransport/WebTransportHash.h
     Modules/webtransport/WebTransportOptions.h
     Modules/webtransport/WebTransportReceiveStreamStats.h
+    Modules/webtransport/WebTransportReliabilityMode.h
     Modules/webtransport/WebTransportSendGroup.h
     Modules/webtransport/WebTransportSendStreamSink.h
     Modules/webtransport/WebTransportSendStreamStats.h
