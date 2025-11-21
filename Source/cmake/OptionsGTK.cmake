@@ -338,7 +338,7 @@ endif ()
 
 if (ENABLE_SPELLCHECK)
     find_package(Enchant)
-    if (NOT PC_ENCHANT_FOUND)
+    if (NOT Enchant_FOUND)
         message(FATAL_ERROR "Enchant is needed for ENABLE_SPELLCHECK")
     endif ()
 endif ()

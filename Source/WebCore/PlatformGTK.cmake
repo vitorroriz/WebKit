@@ -72,7 +72,6 @@ list(APPEND WebCore_PRIVATE_LIBRARIES
 )
 
 list(APPEND WebCore_LIBRARIES
-    ${ENCHANT_LIBRARIES}
     ${UPOWERGLIB_LIBRARIES}
     ${X11_X11_LIB}
     Cairo::Cairo
@@ -80,7 +79,6 @@ list(APPEND WebCore_LIBRARIES
 )
 
 list(APPEND WebCore_SYSTEM_INCLUDE_DIRECTORIES
-    ${ENCHANT_INCLUDE_DIRS}
     ${UPOWERGLIB_INCLUDE_DIRS}
 )
 
@@ -143,6 +141,10 @@ if (ENABLE_SMOOTH_SCROLLING)
     list(APPEND WebCore_SOURCES
         platform/ScrollAnimationSmooth.cpp
     )
+endif ()
+
+if (ENABLE_SPELLCHECK)
+    list(APPEND WebCore_LIBRARIES Enchant::Enchant)
 endif ()
 
 if (USE_ATSPI)
