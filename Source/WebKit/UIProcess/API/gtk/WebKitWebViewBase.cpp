@@ -1404,12 +1404,15 @@ static void webkitWebViewBaseButtonPressed(WebKitWebViewBase* webViewBase, int c
     auto* sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(gesture));
     gtk_gesture_set_sequence_state(gesture, sequence, GTK_EVENT_SEQUENCE_CLAIMED);
 
-    auto button = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
     auto* event = gtk_gesture_get_last_event(gesture, sequence);
+
+#if ENABLE(CONTEXT_MENUS)
+    auto button = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
 
     // If it's a right click event save it as a possible context menu event.
     if (button == GDK_BUTTON_SECONDARY)
         priv->contextMenuEvent = event;
+#endif
 
     priv->pageProxy->handleMouseEvent(NativeWebMouseEvent(event, DoublePoint(x, y), clickCount, std::nullopt));
 }
