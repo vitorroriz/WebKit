@@ -7177,4 +7177,22 @@ TEST(SiteIsolation, ChildIframeNavigatesCrossOriginGrandchildIframeToAboutBlank)
     });
 }
 
+TEST(SiteIsolation, BrowsingContextGroupSwitchForIncompatibleCrossOriginOpenerPolicy)
+{
+    HTTPServer server({
+        { "/coop-unsafe-none"_s, { { { "Cross-Origin-Opener-Policy"_s, "unsafe-none"_s } }, "<script>w = window.open('https://webkit.org/coop-same-origin-allow-popups')</script>"_s } },
+        { "/coop-same-origin-allow-popups"_s, { { { "Cross-Origin-Opener-Policy"_s, "same-origin-allow-popups"_s } }, "child"_s } }
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto [opener, opened] = openerAndOpenedViews(server, @"https://example.com/coop-unsafe-none");
+
+    EXPECT_WK_STREQ(opened.webView.get().URL.host, "webkit.org");
+    checkFrameTreesInProcesses(opener.webView.get(), {
+        { "https://example.com"_s },
+    });
+    checkFrameTreesInProcesses(opened.webView.get(), {
+        { "https://webkit.org"_s },
+    });
+}
+
 }
