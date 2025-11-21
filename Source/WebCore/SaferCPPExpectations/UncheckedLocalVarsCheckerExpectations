@@ -91,6 +91,7 @@ dom/Position.cpp
 dom/PositionIterator.cpp
 dom/RadioButtonGroups.cpp
 dom/Range.cpp
+dom/ScriptExecutionContext.cpp
 dom/SelectorQuery.cpp
 dom/ShadowRoot.cpp
 dom/SimpleRange.cpp
@@ -531,5 +532,6 @@ testing/Internals.cpp
 [ Mac ] testing/Internals.mm
 testing/ServiceWorkerInternals.cpp
 testing/js/WebCoreTestSupport.cpp
+workers/WorkerConsoleClient.cpp
 workers/WorkerGlobalScope.cpp
 workers/WorkerOrWorkletThread.cpp
