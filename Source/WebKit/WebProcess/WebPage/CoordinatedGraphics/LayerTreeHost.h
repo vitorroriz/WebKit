@@ -99,7 +99,6 @@ public:
 
     void willRenderFrame();
     void didRenderFrame();
-    void didComposite(uint32_t);
 
 #if PLATFORM(GTK)
     void adjustTransientZoom(double, WebCore::FloatPoint);
@@ -190,8 +189,6 @@ private:
     double m_transientZoomScale { 1 };
     WebCore::FloatPoint m_transientZoomOrigin;
 #endif
-
-    uint32_t m_compositionRequestID { 0 };
 
 #if ENABLE(DAMAGE_TRACKING)
     Lock m_frameDamageHistoryForTestingLock;

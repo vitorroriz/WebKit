@@ -327,10 +327,6 @@ void LayerTreeHost::updateRenderingWithForcedRepaintAsync(CompletionHandler<void
     ASSERT(!m_forceRepaintAsync.callback);
     m_forceRepaintAsync.callback = WTFMove(callback);
     updateRenderingWithForcedRepaint();
-    if (m_pendingForceRepaint)
-        m_forceRepaintAsync.compositionRequestID = std::nullopt;
-    else
-        m_forceRepaintAsync.compositionRequestID = m_compositionRequestID;
 }
 
 void LayerTreeHost::ensureDrawing()
@@ -471,42 +467,30 @@ void LayerTreeHost::didRenderFrame()
     }
 }
 
-void LayerTreeHost::didComposite(uint32_t compositionResponseID)
+void LayerTreeHost::commitSceneState()
 {
-    WTFBeginSignpost(this, DidComposite, "compositionRequestID %i, compositionResponseID %i", m_compositionRequestID, compositionResponseID);
+    m_isWaitingForRenderer = true;
+    m_compositor->requestCompositionForRenderingUpdate([this] {
+        WTFBeginSignpost(this, DidComposite);
 
-    if (m_forceRepaintAsync.callback && m_forceRepaintAsync.compositionRequestID && compositionResponseID >= *m_forceRepaintAsync.compositionRequestID) {
-        m_forceRepaintAsync.callback();
-        m_forceRepaintAsync.compositionRequestID = std::nullopt;
-    }
+        if (!m_pendingForceRepaint && m_forceRepaintAsync.callback)
+            m_forceRepaintAsync.callback();
 
-    if (!m_isWaitingForRenderer || m_compositionRequestID == compositionResponseID) {
         m_isWaitingForRenderer = false;
         bool scheduledWhileWaitingForRenderer = std::exchange(m_scheduledWhileWaitingForRenderer, false);
         if (m_pendingForceRepaint) {
-            if (m_layerTreeStateIsFrozen) {
-                if (m_forceRepaintAsync.callback) {
-                    m_forceRepaintAsync.callback();
-                    m_forceRepaintAsync.compositionRequestID = std::nullopt;
-                }
-            } else {
+            if (!m_layerTreeStateIsFrozen)
                 updateRenderingWithForcedRepaint();
-                if (m_forceRepaintAsync.callback)
-                    m_forceRepaintAsync.compositionRequestID = m_compositionRequestID;
-            }
+            else if (m_forceRepaintAsync.callback)
+                m_forceRepaintAsync.callback();
         } else if (!m_isSuspended && !m_layerTreeStateIsFrozen && (scheduledWhileWaitingForRenderer || m_renderingUpdateRunLoopObserver->isScheduled())) {
             invalidateRenderingUpdateRunLoopObserver();
             updateRendering();
         }
-    }
-    WTFEndSignpost(this, DidComposite);
-}
 
-void LayerTreeHost::commitSceneState()
-{
-    m_isWaitingForRenderer = true;
-    m_compositionRequestID = m_compositor->requestComposition();
-    WTFEmitSignpost(this, CommitSceneState, "compositionRequestID %i", m_compositionRequestID);
+        WTFEndSignpost(this, DidComposite);
+    });
+    WTFEmitSignpost(this, CommitSceneState);
 }
 
 #if PLATFORM(GTK)

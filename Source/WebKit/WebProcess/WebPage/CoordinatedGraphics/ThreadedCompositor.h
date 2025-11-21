@@ -70,7 +70,7 @@ public:
 #endif
 
     void setSize(const WebCore::IntSize&, float);
-    uint32_t requestComposition();
+    void requestCompositionForRenderingUpdate(Function<void()>&&);
     void scheduleUpdate();
     RunLoop* runLoop();
 
@@ -96,6 +96,7 @@ public:
 private:
     explicit ThreadedCompositor(LayerTreeHost&);
 
+    void scheduleUpdateLocked();
     void updateSceneState();
     void renderLayerTree();
     void paintToCurrentGLContext(const WebCore::TransformationMatrix&, const WebCore::IntSize&);
@@ -128,6 +129,7 @@ private:
     struct {
         mutable Lock lock;
         State state WTF_GUARDED_BY_LOCK(lock) { State::Idle };
+        Function<void()> didCompositeRenderinUpdateFunction WTF_GUARDED_BY_LOCK(lock);
     } m_state;
 
     struct {
@@ -155,8 +157,6 @@ private:
     } m_damage;
 #endif
 
-    std::atomic<uint32_t> m_compositionRequestID { 0 };
-    std::atomic<uint32_t> m_compositionResponseID { 0 };
     std::unique_ptr<WebCore::RunLoopObserver> m_didCompositeRunLoopObserver;
 };
 

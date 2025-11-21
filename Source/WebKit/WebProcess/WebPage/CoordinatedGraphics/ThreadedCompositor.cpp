@@ -118,6 +118,7 @@ void ThreadedCompositor::invalidate()
     {
         Locker locker { m_state.lock };
         m_renderTimer.stop();
+        m_state.didCompositeRenderinUpdateFunction = nullptr;
         m_state.state = State::Idle;
     }
 
@@ -297,8 +298,10 @@ void ThreadedCompositor::renderLayerTree()
     if (m_suspendedCount > 0)
         return;
 
+    bool shouldNotifiyDidComposite = false;
     {
         Locker locker { m_state.lock };
+        shouldNotifiyDidComposite = !!m_state.didCompositeRenderinUpdateFunction;
         m_state.state = State::InProgress;
     }
 
@@ -333,15 +336,10 @@ void ThreadedCompositor::renderLayerTree()
 
     updateFPSCounter();
 
-    uint32_t compositionRequestID = m_compositionRequestID.load();
-    m_compositionResponseID = compositionRequestID;
-#if !HAVE(OS_SIGNPOST) && !USE(SYSPROF_CAPTURE)
-    UNUSED_VARIABLE(compositionRequestID);
-#endif
+    if (shouldNotifiyDidComposite)
+        m_didCompositeRunLoopObserver->schedule(&RunLoop::mainSingleton());
 
-    m_didCompositeRunLoopObserver->schedule(&RunLoop::mainSingleton());
-
-    WTFEmitSignpost(this, DidRenderFrame, "compositionResponseID %i", compositionRequestID);
+    WTFEmitSignpost(this, DidRenderFrame);
 
     m_context->swapBuffers();
 
@@ -353,17 +351,23 @@ void ThreadedCompositor::renderLayerTree()
     });
 }
 
-uint32_t ThreadedCompositor::requestComposition()
+void ThreadedCompositor::requestCompositionForRenderingUpdate(Function<void()>&& didCompositeFunction)
 {
     ASSERT(RunLoop::isMain());
-    uint32_t compositionRequestID = ++m_compositionRequestID;
-    scheduleUpdate();
-    return compositionRequestID;
+    Locker locker { m_state.lock };
+    ASSERT(!m_state.didCompositeRenderinUpdateFunction);
+    m_state.didCompositeRenderinUpdateFunction = WTFMove(didCompositeFunction);
+    scheduleUpdateLocked();
 }
 
 void ThreadedCompositor::scheduleUpdate()
 {
     Locker locker { m_state.lock };
+    scheduleUpdateLocked();
+}
+
+void ThreadedCompositor::scheduleUpdateLocked()
+{
     switch (m_state.state) {
     case State::Idle:
         m_state.state = State::Scheduled;
@@ -408,8 +412,13 @@ RunLoop* ThreadedCompositor::runLoop()
 void ThreadedCompositor::didCompositeRunLoopObserverFired()
 {
     m_didCompositeRunLoopObserver->invalidate();
-    if (m_layerTreeHost)
-        m_layerTreeHost->didComposite(m_compositionResponseID);
+    Function<void()> didCompositeFunction;
+    {
+        Locker locker { m_state.lock };
+        didCompositeFunction = std::exchange(m_state.didCompositeRenderinUpdateFunction, nullptr);
+    }
+    if (didCompositeFunction)
+        didCompositeFunction();
 }
 
 void ThreadedCompositor::updateSceneAttributes(const IntSize& size, float deviceScaleFactor)
