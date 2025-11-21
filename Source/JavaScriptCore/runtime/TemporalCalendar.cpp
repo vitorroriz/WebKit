@@ -182,13 +182,7 @@ ISO8601::PlainDate TemporalCalendar::isoDateFromFields(JSGlobalObject* globalObj
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
-    if (std::holds_alternative<TemporalOverflow>(optionsOrOverflow))
-        overflow = std::get<TemporalOverflow>(optionsOrOverflow);
-    else {
-        overflow = toTemporalOverflow(globalObject, std::get<JSObject*>(optionsOrOverflow));
-        RETURN_IF_EXCEPTION(scope, { });
-    }
-
+    // Access and convert day property
     double day = 1;
     if (format != TemporalDateFormat::YearMonth) {
         JSValue dayProperty = temporalDateLike->get(globalObject, vm.propertyNames->day);
@@ -207,6 +201,7 @@ ISO8601::PlainDate TemporalCalendar::isoDateFromFields(JSGlobalObject* globalObj
         }
     }
 
+    // Access and convert month property
     JSValue monthProperty = temporalDateLike->get(globalObject, vm.propertyNames->month);
     RETURN_IF_EXCEPTION(scope, { });
     double month = 0;
@@ -215,6 +210,7 @@ ISO8601::PlainDate TemporalCalendar::isoDateFromFields(JSGlobalObject* globalObj
         RETURN_IF_EXCEPTION(scope, { });
     }
 
+    // Access and convert monthCode property
     JSValue monthCodeProperty = temporalDateLike->get(globalObject, vm.propertyNames->monthCode);
     RETURN_IF_EXCEPTION(scope, { });
     std::optional<ParsedMonthCode> otherMonth;
@@ -242,6 +238,7 @@ ISO8601::PlainDate TemporalCalendar::isoDateFromFields(JSGlobalObject* globalObj
         }
     }
 
+    // Access and convert year property
     double year = 1972; // Default reference year for MonthDay
     JSValue yearProperty = temporalDateLike->get(globalObject, vm.propertyNames->year);
     RETURN_IF_EXCEPTION(scope, { });
@@ -260,6 +257,13 @@ ISO8601::PlainDate TemporalCalendar::isoDateFromFields(JSGlobalObject* globalObj
             throwRangeError(globalObject, scope, "year property must be finite"_s);
             return { };
         }
+    }
+
+    if (std::holds_alternative<TemporalOverflow>(optionsOrOverflow))
+        overflow = std::get<TemporalOverflow>(optionsOrOverflow);
+    else {
+        overflow = toTemporalOverflow(globalObject, std::get<JSObject*>(optionsOrOverflow));
+        RETURN_IF_EXCEPTION(scope, { });
     }
 
     // Check month code if applicable
@@ -350,7 +354,7 @@ ISO8601::PlainDate TemporalCalendar::monthDayFromFields(JSGlobalObject* globalOb
         throwRangeError(globalObject, scope, "monthDayFromFields: date is out of range of ECMAScript representation"_s);
         return { };
     }
-    return *result;
+    return ISO8601::PlainDate(1972, result->month(), result->day());
 }
 
 // https://tc39.es/proposal-temporal/#sec-temporal-balanceisodate
