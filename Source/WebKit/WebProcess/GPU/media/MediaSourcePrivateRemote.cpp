@@ -213,11 +213,6 @@ void MediaSourcePrivateRemote::unmarkEndOfStream()
     });
 }
 
-MediaPlayer::ReadyState MediaSourcePrivateRemote::mediaPlayerReadyState() const
-{
-    return m_mediaPlayerReadyState;
-}
-
 void MediaSourcePrivateRemote::setMediaPlayerReadyState(MediaPlayer::ReadyState readyState)
 {
     // Call from MediaSource's dispatcher.

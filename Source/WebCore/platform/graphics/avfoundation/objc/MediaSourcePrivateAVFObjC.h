@@ -74,11 +74,6 @@ public:
     void durationChanged(const MediaTime&) final;
     void markEndOfStream(EndOfStreamStatus) final;
 
-    MediaPlayer::ReadyState mediaPlayerReadyState() const final;
-    void setMediaPlayerReadyState(MediaPlayer::ReadyState) final;
-
-    bool hasSelectedVideo() const;
-
     FloatSize naturalSize() const;
 
     void hasSelectedVideoChanged(SourceBufferPrivateAVFObjC&);
