@@ -889,8 +889,23 @@ LayoutUnit LineLayout::firstLineBaseline() const
         return { };
     }
 
-    auto& firstLine = m_inlineContent->displayContent().lines.first();
-    return baselineForLine(firstLine);
+    auto baselineForLineOrBlock = [&](auto& line) -> std::optional<LayoutUnit> {
+        if (!line.hasInflowContent())
+            return { };
+
+        if (auto* blockLevelBox = m_inlineContent->blockLevelBoxForLine(line)) {
+            // For block-in-inline look for the baseline of the child box.
+            CheckedRef blockRenderer = downcast<RenderBox>(*blockLevelBox->layoutBox().rendererForIntegration());
+            return blockRenderer->firstLineBaseline();
+        }
+        return baselineForLine(line);
+    };
+
+    for (auto& line : m_inlineContent->displayContent().lines) {
+        if (auto baseline = baselineForLineOrBlock(line))
+            return *baseline;
+    }
+    return baselineForLine(m_inlineContent->displayContent().lines.first());
 }
 
 LayoutUnit LineLayout::lastLineBaseline() const
@@ -899,7 +914,24 @@ LayoutUnit LineLayout::lastLineBaseline() const
         ASSERT_NOT_REACHED();
         return { };
     }
-    return baselineForLine(lastLineWithInflowContent(m_inlineContent->displayContent().lines));
+
+    auto baselineForLineOrBlock = [&](auto& line) -> std::optional<LayoutUnit> {
+        if (!line.hasInflowContent())
+            return { };
+
+        if (auto* blockLevelBox = m_inlineContent->blockLevelBoxForLine(line)) {
+            // For block-in-inline look for the baseline of the child box.
+            CheckedRef blockRenderer = downcast<RenderBox>(*blockLevelBox->layoutBox().rendererForIntegration());
+            return blockRenderer->lastLineBaseline();
+        }
+        return baselineForLine(line);
+    };
+
+    for (auto& line : m_inlineContent->displayContent().lines | std::views::reverse) {
+        if (auto baseline = baselineForLineOrBlock(line))
+            return *baseline;
+    }
+    return baselineForLine(m_inlineContent->displayContent().lines.first());
 }
 
 LayoutUnit LineLayout::baselineForLine(const InlineDisplay::Line& line) const

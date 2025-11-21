@@ -88,6 +88,9 @@ public:
     const InlineDisplay::Box* firstBoxForLayoutBox(const Layout::Box&) const;
     std::optional<size_t> firstBoxIndexForLayoutBox(const Layout::Box&) const;
 
+    // Returns a block level box if the line is for block-in-inline.
+    const InlineDisplay::Box* blockLevelBoxForLine(const InlineDisplay::Line&) const;
+
     template<typename Function> void traverseNonRootInlineBoxes(const Layout::Box&, Function&&);
     template<typename Function> void traverseDescendantBlockLevelBoxes(const Layout::Box&, Function&&);
 
