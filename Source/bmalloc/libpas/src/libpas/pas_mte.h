@@ -929,6 +929,8 @@ void* pas_mte_system_heap_realloc_zero_tagged(malloc_zone_t* zone, void* ptr, si
         (void)page_config; \
         (void)ptr; \
         (void)size; \
+        if (PAS_USE_MTE && PAS_MTE_SHOULD_TAG_PAGE(page_config)) \
+            ptr = pas_mte_retag_freed_region_if_tagged((uintptr_t)ptr, (size_t)size, page_config.base, pas_mte_nonhomogeneous_allocator); \
     } while (false)
 
 // Used to tag the memory left behind by objects freed from segregated heaps.
@@ -936,10 +938,8 @@ void* pas_mte_system_heap_realloc_zero_tagged(malloc_zone_t* zone, void* ptr, si
         (void)page_config; \
         (void)ptr; \
         (void)size; \
-        if (PAS_USE_MTE) { \
-            if (PAS_MTE_SHOULD_TAG_PAGE(page_config)) \
-                ptr = pas_mte_retag_freed_region_if_tagged((uintptr_t)ptr, (size_t)size, page_config.base, pas_mte_homogeneous_allocator); \
-        } \
+        if (PAS_USE_MTE && PAS_MTE_SHOULD_TAG_PAGE(page_config)) \
+            ptr = pas_mte_retag_freed_region_if_tagged((uintptr_t)ptr, (size_t)size, page_config.base, pas_mte_homogeneous_allocator); \
     } while (false)
 
 #define PAS_MTE_HANDLE_SCAVENGER_THREAD_MAIN(data) do { \
