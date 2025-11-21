@@ -25,6 +25,7 @@
 #include "DocumentPage.h"
 #include "Element.h"
 #include "FloatQuad.h"
+#include "FrameInlines.h"
 #include "GraphicsContext.h"
 #include "GraphicsLayerEnums.h"
 #include "HTMLBodyElement.h"
