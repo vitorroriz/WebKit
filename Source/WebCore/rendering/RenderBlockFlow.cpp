@@ -2068,7 +2068,7 @@ RenderBlockFlow::LinePaginationAdjustment RenderBlockFlow::computeLineAdjustment
 
     LayoutUnit pageLogicalHeight = pageLogicalHeightForOffset(logicalOffset);
 
-    if (!hasNextPage(logicalOffset) || isBlockInInline) {
+    if (!pageLogicalHeight || !hasNextPage(logicalOffset)) {
         clearShouldBreakAtLineToAvoidWidowIfNeeded(*this);
         return { };
     }
