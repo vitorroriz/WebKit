@@ -71,6 +71,7 @@ public:
         Source(Ref<MediaStreamTrackPrivate>&&, MediaStreamTrackProcessor&);
         ~Source();
 
+        bool isEnabled() const { return m_privateTrack->enabled(); }
         bool isWaiting() const { return m_isWaiting; }
         bool isCancelled() const { return m_isCancelled; }
         void close();
