@@ -165,6 +165,7 @@ class WebTransportSession;
 struct AccessibilityPreferences;
 struct AdditionalFonts;
 struct ContentWorldIdentifierType;
+struct RemoteAudioSessionConfiguration;
 struct RemoteWorkerInitializationData;
 struct UserMessage;
 struct WebProcessCreationParameters;
@@ -544,6 +545,10 @@ public:
 #if ENABLE(INITIALIZE_ACCESSIBILITY_ON_DEMAND)
     void initializeAccessibility(Vector<SandboxExtension::Handle>&&);
     bool shouldInitializeAccessibility() const { return m_shouldInitializeAccessibility; }
+#endif
+
+#if USE(AUDIO_SESSION)
+    void remoteAudioSessionConfigurationChanged(const RemoteAudioSessionConfiguration&);
 #endif
 
 private:

@@ -462,6 +462,7 @@
 #endif
 
 #if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
+#include "RemoteAudioSessionConfiguration.h"
 #include "RemoteMediaSessionManagerProxy.h"
 #endif
 

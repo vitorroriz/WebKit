@@ -45,6 +45,7 @@
 #include "RemoteAudioSession.h"
 #include "RemoteLegacyCDMFactory.h"
 #include "RemoteMediaEngineConfigurationFactory.h"
+#include "RemoteMediaSessionManagerProxyMessages.h"
 #include "RemoteRemoteCommandListener.h"
 #include "RemoteWebLockRegistry.h"
 #include "RemoteWorkerType.h"
@@ -814,6 +815,19 @@ void WebProcess::updateIsBroadcastChannelEnabled()
         }
     }
 }
+
+#if USE(AUDIO_SESSION)
+void WebProcess::remoteAudioSessionConfigurationChanged(const RemoteAudioSessionConfiguration& configuration)
+{
+    for (auto& page : m_pageMap.values()) {
+        RefPtr manager = page->mediaSessionManagerIfExists();
+        if (!manager)
+            continue;
+
+        send(Messages::RemoteMediaSessionManagerProxy::RemoteAudioConfigurationChanged(configuration), page->identifier().toUInt64());
+    }
+}
+#endif
 
 void WebProcess::setHasSuspendedPageProxy(bool hasSuspendedPageProxy)
 {
@@ -2480,7 +2494,7 @@ void WebProcess::setUseGPUProcessForMedia(bool useGPUProcessForMedia)
 
 #if USE(AUDIO_SESSION)
     if (useGPUProcessForMedia)
-        AudioSession::setSharedSession(RemoteAudioSession::create());
+        AudioSession::setSharedSession(RemoteAudioSession::create(*this));
     else
         AudioSession::setSharedSession(AudioSession::create());
 #endif
