@@ -817,30 +817,26 @@ void RenderBlockFlow::layoutInFlowChildren(RelayoutChildren relayoutChildren, La
         return;
     }
 
-    if (childrenInline()) {
+    {
         auto textBoxTrimmer = TextBoxTrimmer { *this };
         auto lineClampUpdater = LineClampUpdater { *this };
-        return layoutInlineChildren(relayoutChildren, repaintLogicalTop, repaintLogicalBottom);
+        childrenInline() ? layoutInlineChildren(relayoutChildren, repaintLogicalTop, repaintLogicalBottom) : layoutBlockChildren(relayoutChildren, maxFloatLogicalBottom);
     }
-
     {
-        {
-            // With block children, there's no way to tell what the last formatted line is until after we finished laying out the subtree.
-            auto textBoxTrimmer = TextBoxTrimmer { *this };
-            auto lineClampUpdater = LineClampUpdater { *this };
-            layoutBlockChildren(relayoutChildren, maxFloatLogicalBottom);
-        }
+        auto applyTextBoxTrimEndIfNeeded = [&] {
+            // With block children and blocks-inside-inline, there's no way to tell what the last formatted line is until after we finished laying out the subtree.
+            // Dirty the last formatted line (in the last IFC) and issue relayout with forcing trimming the last line if applicable.
+            if (auto* rootForLastFormattedLine = TextBoxTrimmer::lastInlineFormattingContextRootForTrimEnd(*this)) {
+                ASSERT(rootForLastFormattedLine != this);
+                // FIXME: We should be able to damage the last line only.
+                for (RenderBlock* ancestor = rootForLastFormattedLine; ancestor && ancestor != this; ancestor = ancestor->containingBlock())
+                    ancestor->setNeedsLayout(MarkOnlyThis);
 
-        // Dirty the last formatted line (in the last IFC) and issue relayout with forcing trimming the last line if applicable.
-        if (auto* rootForLastFormattedLine = TextBoxTrimmer::lastInlineFormattingContextRootForTrimEnd(*this)) {
-            ASSERT(rootForLastFormattedLine != this);
-            // FIXME: We should be able to damage the last line only.
-            for (RenderBlock* ancestor = rootForLastFormattedLine; ancestor && ancestor != this; ancestor = ancestor->containingBlock())
-                ancestor->setNeedsLayout(MarkOnlyThis);
-
-            auto textBoxTrimmer = TextBoxTrimmer { *this, *rootForLastFormattedLine };
-            layoutBlockChildren(RelayoutChildren::No, maxFloatLogicalBottom);
-        }
+                auto textBoxTrimmer = TextBoxTrimmer { *this, *rootForLastFormattedLine };
+                childrenInline() ? layoutInlineChildren(RelayoutChildren::No, repaintLogicalTop, repaintLogicalBottom) : layoutBlockChildren(RelayoutChildren::No, maxFloatLogicalBottom);
+            }
+        };
+        applyTextBoxTrimEndIfNeeded();
     }
 }
 

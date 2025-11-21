@@ -113,6 +113,7 @@ public:
     LineBoxIterator(const LineBox&);
 
     LineBoxIterator& operator++() { return traverseNext(); }
+    LineBoxIterator& operator--() { return traversePrevious(); }
     WEBCORE_EXPORT LineBoxIterator& traverseNext();
     LineBoxIterator& traversePrevious();
 
