@@ -2569,3 +2569,9 @@ webkit.org/b/301013 http/tests/workers/service/registerServiceWorkerClient-after
 # webkit.org/b/301655 Internals animation toggle causes the Image global preference to change, unpausing animations in tests
 fast/images/page-wide-animation-toggle.html [ Pass Timeout ]
 fast/images/individual-animation-toggle.html [ Pass Timeout ]
+
+# webkit.org/b/302887 REGRESSION(303218@main)[macOS] ASSERTION FAILED: it != samplerStates.end() /Volumes/Data/worker/macOS-Tahoe-Debug-Build-EWS/build/Source/WebGPU/WebGPU/Sampler.mm
+http/tests/webgpu/webgpu/api/operation/sampling/sampler_texture.html [ Skip ]
+http/tests/webgpu/webgpu/api/operation/labels.html [ Skip ]
+http/tests/webgpu/webgpu/api/operation/sampling/filter_mode.html [ Skip ]
+http/tests/webgpu/webgpu/shader/execution/expression/call/builtin/texture_utils.html [ Skip ]
