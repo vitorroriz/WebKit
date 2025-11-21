@@ -295,6 +295,15 @@ bool defaultPeerConnectionEnabledAvailable()
 }
 #endif
 
+bool defaultWebRTCSocketsServiceClassEnabled()
+{
+#if ENABLE(WEBRTC_SOCKETS_SERVICECLASS_ENABLED)
+    return true;
+#else
+    return false;
+#endif
+}
+
 bool defaultPopoverAttributeEnabled()
 {
 #if PLATFORM(COCOA)

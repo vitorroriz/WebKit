@@ -155,6 +155,7 @@ bool defaultUseGPUProcessForDOMRenderingEnabled();
 #if USE(LIBWEBRTC)
 bool defaultPeerConnectionEnabledAvailable();
 #endif
+bool defaultWebRTCSocketsServiceClassEnabled();
 
 #if ENABLE(WEB_PUSH_NOTIFICATIONS)
 bool defaultBuiltInNotificationsEnabled();

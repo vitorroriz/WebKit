@@ -9650,7 +9650,7 @@ WebRTCSocketsServiceClassEnabled:
     WebKitLegacy:
       default: false
     WebKit:
-      default: false
+      default: WebKit::defaultWebRTCSocketsServiceClassEnabled()
     WebCore:
       default: false
 
