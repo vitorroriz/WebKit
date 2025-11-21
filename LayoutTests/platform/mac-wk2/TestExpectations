@@ -2416,9 +2416,3 @@ webkit.org/b/302174 [ Tahoe Debug arm64 ] platform/mac/media/encrypted-media/fps
 # webkit.org/b/302674 fast/webgpu/nocrash/fuzz-279542.html appears to cause other tests to timeout
 [ Tahoe Debug arm64 ] fast/webgpu/nocrash/ [ Skip ]
 [ Tahoe Debug arm64 ] fast/selectors/is-backtracking.html [ Skip ]
-
-# webkit.org/b/302889 REGRESSION(302690@main): [macOS wk2 ] imported/w3c/web-platform-tests/webvtt/rendering/cues-with-video tests are flaky failure with image diff
-imported/w3c/web-platform-tests/webvtt/rendering/cues-with-video/processing-model/align_center_position_gt_50.html [ Pass ImageOnlyFailure ]
-imported/w3c/web-platform-tests/webvtt/rendering/cues-with-video/processing-model/align_center_position_lt_50.html [ Pass ImageOnlyFailure ]
-imported/w3c/web-platform-tests/webvtt/rendering/cues-with-video/processing-model/align_end.html [ Pass ImageOnlyFailure ]
-imported/w3c/web-platform-tests/webvtt/rendering/cues-with-video/processing-model/selectors/cue/white-space_pre.html [ Pass ImageOnlyFailure ]
