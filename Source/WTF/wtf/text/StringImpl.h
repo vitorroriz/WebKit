@@ -207,6 +207,9 @@ class StringImpl : private StringImplShape, public NoVirtualDestructorBase {
 public:
     enum BufferOwnership { BufferInternal, BufferOwned, BufferSubstring, BufferExternal };
 
+    // Prefer using isValidLength over MaxLength when the character type is known.
+    template<typename> static constexpr bool isValidLength(size_t);
+
     static constexpr unsigned MaxLength = StringImplShape::MaxLength;
 
     // The bottom 6 bits in the hash are flags, but reserve 8 bits since StringHash only has 24 bits anyway.
@@ -542,7 +545,6 @@ protected:
 
 private:
     template<typename> static size_t allocationSize(Checked<size_t> tailElementCount);
-    template<typename> static size_t maxInternalLength();
     template<typename> static constexpr size_t tailOffset();
 
     WTF_EXPORT_PRIVATE size_t find(std::span<const Latin1Character>, size_t start);
@@ -1089,7 +1091,7 @@ template<typename CharacterType> ALWAYS_INLINE RefPtr<StringImpl> StringImpl::tr
         return empty();
     }
 
-    if (length > maxInternalLength<CharacterType>()) {
+    if (!isValidLength<CharacterType>(length)) {
         output = { };
         return nullptr;
     }
@@ -1240,10 +1242,11 @@ template<typename T> inline size_t StringImpl::allocationSize(Checked<size_t> ta
 }
 
 template<typename CharacterType>
-inline size_t StringImpl::maxInternalLength()
+inline constexpr bool StringImpl::isValidLength(size_t length)
 {
     // In order to not overflow the unsigned length, the check for (std::numeric_limits<unsigned>::max() - sizeof(StringImpl)) is needed when sizeof(CharacterType) == 2.
-    return std::min(static_cast<size_t>(MaxLength), (std::numeric_limits<unsigned>::max() - sizeof(StringImpl)) / sizeof(CharacterType));
+    constexpr size_t max = std::min(static_cast<size_t>(MaxLength), (std::numeric_limits<unsigned>::max() - sizeof(StringImpl)) / sizeof(CharacterType));
+    return length <= max;
 }
 
 template<typename T> constexpr size_t StringImpl::tailOffset()
