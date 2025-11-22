@@ -3178,7 +3178,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     rendering/style/GridSpan.h
     rendering/style/NameScope.h
     rendering/style/OutlineValue.h
-    rendering/style/PositionArea.h
     rendering/style/PositionTryFallback.h
     rendering/style/PositionTryOrder.h
     rendering/style/RenderStyle.h
@@ -3266,6 +3265,11 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/align/StyleOverflowPosition.h
 
     style/values/anchor-position/StyleAnchorName.h
+    style/values/anchor-position/StylePositionArea.h
+    style/values/anchor-position/StylePositionAreaAxis.h
+    style/values/anchor-position/StylePositionAreaSelf.h
+    style/values/anchor-position/StylePositionAreaSpan.h
+    style/values/anchor-position/StylePositionAreaTrack.h
     style/values/anchor-position/StylePositionVisibility.h
 
     style/values/animations/StyleAnimation.h

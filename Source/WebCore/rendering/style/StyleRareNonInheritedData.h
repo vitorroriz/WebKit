@@ -28,7 +28,6 @@
 #include <WebCore/CSSPropertyNames.h>
 #include <WebCore/CounterDirectives.h>
 #include <WebCore/NameScope.h>
-#include <WebCore/PositionArea.h>
 #include <WebCore/PositionTryFallback.h>
 #include <WebCore/ScopedName.h>
 #include <WebCore/ScrollTypes.h>
@@ -53,6 +52,7 @@
 #include <WebCore/StylePageSize.h>
 #include <WebCore/StylePerspective.h>
 #include <WebCore/StylePerspectiveOrigin.h>
+#include <WebCore/StylePositionArea.h>
 #include <WebCore/StylePositionVisibility.h>
 #include <WebCore/StylePrimitiveNumericTypes.h>
 #include <WebCore/StyleProgressTimelineAxes.h>
@@ -228,7 +228,7 @@ public:
     Style::AnchorNames anchorNames;
     NameScope anchorScope;
     std::optional<Style::ScopedName> positionAnchor;
-    std::optional<PositionArea> positionArea;
+    Style::PositionArea positionArea;
     FixedVector<Style::PositionTryFallback> positionTryFallbacks;
     std::optional<size_t> usedPositionOptionIndex;
 

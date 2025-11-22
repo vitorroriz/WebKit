@@ -62,7 +62,6 @@ class LayoutRect;
 class LayoutSize;
 class LayoutUnit;
 class OutlineValue;
-class PositionArea;
 class RenderElement;
 class RenderStyle;
 class SVGRenderStyle;
@@ -315,6 +314,7 @@ struct PaddingEdge;
 struct PageSize;
 struct Perspective;
 struct Position;
+struct PositionArea;
 struct PositionVisibility;
 struct PositionX;
 struct PositionY;
@@ -2406,9 +2406,9 @@ public:
     inline const std::optional<Style::ScopedName>& positionAnchor() const;
     inline void setPositionAnchor(const std::optional<Style::ScopedName>&);
 
-    static inline std::optional<PositionArea> initialPositionArea();
-    inline std::optional<PositionArea> positionArea() const;
-    inline void setPositionArea(std::optional<PositionArea>);
+    static inline Style::PositionArea initialPositionArea();
+    inline Style::PositionArea positionArea() const;
+    inline void setPositionArea(Style::PositionArea);
 
     static constexpr Style::PositionTryOrder initialPositionTryOrder();
     inline Style::PositionTryOrder positionTryOrder() const;

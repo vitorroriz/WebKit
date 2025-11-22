@@ -30,7 +30,6 @@
 #include <WebCore/FontCascadeDescription.h>
 #include <WebCore/GraphicsTypes.h>
 #include <WebCore/HitTestRequest.h>
-#include <WebCore/PositionArea.h>
 #include <WebCore/PositionTryOrder.h>
 #include <WebCore/RenderStyle.h>
 #include <WebCore/SVGRenderStyle.h>
@@ -528,7 +527,7 @@ inline Style::PerspectiveOriginY RenderStyle::initialPerspectiveOriginY() { retu
 constexpr PointerEvents RenderStyle::initialPointerEvents() { return PointerEvents::Auto; }
 constexpr PositionType RenderStyle::initialPosition() { return PositionType::Static; }
 inline std::optional<Style::ScopedName> RenderStyle::initialPositionAnchor() { return { }; }
-inline std::optional<PositionArea> RenderStyle::initialPositionArea() { return { }; }
+inline Style::PositionArea RenderStyle::initialPositionArea() { return CSS::Keyword::None { }; }
 inline FixedVector<Style::PositionTryFallback> RenderStyle::initialPositionTryFallbacks() { return { }; }
 constexpr Style::PositionTryOrder RenderStyle::initialPositionTryOrder() { return Style::PositionTryOrder::Normal; }
 constexpr Style::PositionVisibility RenderStyle::initialPositionVisibility() { return Style::PositionVisibilityValue::AnchorsVisible; }
@@ -758,7 +757,7 @@ inline const Style::PerspectiveOrigin& RenderStyle::perspectiveOrigin() const { 
 inline const Style::PerspectiveOriginX& RenderStyle::perspectiveOriginX() const { return m_nonInheritedData->rareData->perspectiveOrigin.x; }
 inline const Style::PerspectiveOriginY& RenderStyle::perspectiveOriginY() const { return m_nonInheritedData->rareData->perspectiveOrigin.y; }
 inline const std::optional<Style::ScopedName>& RenderStyle::positionAnchor() const { return m_nonInheritedData->rareData->positionAnchor; }
-inline std::optional<PositionArea> RenderStyle::positionArea() const { return m_nonInheritedData->rareData->positionArea; }
+inline Style::PositionArea RenderStyle::positionArea() const { return m_nonInheritedData->rareData->positionArea; }
 inline Style::PositionTryOrder RenderStyle::positionTryOrder() const { return static_cast<Style::PositionTryOrder>(m_nonInheritedData->rareData->positionTryOrder); }
 inline Style::PositionVisibility RenderStyle::positionVisibility() const { return Style::PositionVisibility::fromRaw(m_nonInheritedData->rareData->positionVisibility); }
 inline bool RenderStyle::preserveNewline() const { return preserveNewline(whiteSpaceCollapse()); }

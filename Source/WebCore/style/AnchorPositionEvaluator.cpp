@@ -86,8 +86,8 @@ AnchorScrollAdjuster::AnchorScrollAdjuster(RenderBox& anchored, const RenderBoxM
     m_needsYAdjustment = compensatedAxes.contains(BoxAxis::Vertical);
 
     auto containingWritingMode = anchored.container()->style().writingMode();
-    if (auto positionArea = style.positionArea()) {
-        if (positionArea->coordMatchedTrackForAxis(BoxAxis::Horizontal, containingWritingMode, style.writingMode()) != PositionAreaTrack::SpanAll)
+    if (auto positionAreaValue = style.positionArea().tryValue()) {
+        if (positionAreaValue->coordMatchedTrackForAxis(BoxAxis::Horizontal, containingWritingMode, style.writingMode()) != Style::PositionAreaTrack::SpanAll)
             m_needsXAdjustment |= true;
         else {
             if (containingWritingMode.isHorizontal()) {
@@ -98,7 +98,7 @@ AnchorScrollAdjuster::AnchorScrollAdjuster(RenderBox& anchored, const RenderBoxM
                 m_needsXAdjustment |= alignment.isAuto() || alignment.isNormal() || alignment.isAnchorCenter();
             }
         }
-        if (positionArea->coordMatchedTrackForAxis(BoxAxis::Vertical, containingWritingMode, style.writingMode()) != PositionAreaTrack::SpanAll)
+        if (positionAreaValue->coordMatchedTrackForAxis(BoxAxis::Vertical, containingWritingMode, style.writingMode()) != Style::PositionAreaTrack::SpanAll)
             m_needsYAdjustment |= true;
         else {
             if (containingWritingMode.isHorizontal()) {
@@ -1378,7 +1378,7 @@ bool AnchorPositionEvaluator::isLayoutTimeAnchorPositioned(const RenderStyle& st
     if (!generatesBox(style) || !style.hasOutOfFlowPosition())
         return false;
 
-    if (style.positionArea())
+    if (!style.positionArea().isNone())
         return true;
 
     return style.justifySelf().isAnchorCenter() || style.alignSelf().isAnchorCenter();

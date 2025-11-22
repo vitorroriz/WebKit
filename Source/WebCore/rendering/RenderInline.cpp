@@ -863,11 +863,11 @@ LayoutSize RenderInline::offsetForInFlowPositionedInline(const RenderBox* child)
     // should locate itself as though it is a normal flow box in relation to its containing block.
     LayoutSize logicalOffset;
     if (!child->style().hasStaticInlinePosition(writingMode().isHorizontal())
-        || child->style().positionArea() || child->style().justifySelf().isAnchorCenter())
+        || !child->style().positionArea().isNone() || child->style().justifySelf().isAnchorCenter())
         logicalOffset.setWidth(inlinePosition);
 
     if (!child->style().hasStaticBlockPosition(writingMode().isHorizontal())
-        || child->style().positionArea() || child->style().alignSelf().isAnchorCenter())
+        || !child->style().positionArea().isNone() || child->style().alignSelf().isAnchorCenter())
         logicalOffset.setHeight(blockPosition);
 
     return writingMode().isHorizontal() ? logicalOffset : logicalOffset.transposedSize();

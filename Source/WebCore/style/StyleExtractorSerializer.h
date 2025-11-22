@@ -68,7 +68,6 @@ public:
 
     static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
     static void serializePositionAnchor(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const std::optional<ScopedName>&);
-    static void serializePositionArea(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const std::optional<PositionArea>&);
     static void serializeNameScope(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const NameScope&);
 
     // MARK: MaskLayer property serializations
@@ -208,17 +207,6 @@ inline void ExtractorSerializer::serializePositionAnchor(ExtractorState& state, 
     }
 
     serialize(state, builder, context, *positionAnchor);
-}
-
-inline void ExtractorSerializer::serializePositionArea(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const std::optional<PositionArea>& positionArea)
-{
-    if (!positionArea) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::None { });
-        return;
-    }
-
-    // FIXME: Do this more efficiently without creating and destroying a CSSValue object.
-    builder.append(ExtractorConverter::convertPositionArea(state, *positionArea)->cssText(context));
 }
 
 inline void ExtractorSerializer::serializeNameScope(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const NameScope& scope)

@@ -12142,7 +12142,7 @@
             ],
             "codegen-properties": {
                 "settings-flag": "cssAnchorPositioningEnabled",
-                "style-converter": "PositionArea",
+                "style-converter": "StyleType<PositionArea>",
                 "parser-function": "consumePositionArea",
                 "parser-grammar-unused": "none | <position-area>",
                 "parser-grammar-unused-reason": "Needs support for transforming parsed input to minimal form."

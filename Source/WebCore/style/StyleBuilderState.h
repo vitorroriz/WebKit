@@ -33,7 +33,6 @@
 #include <WebCore/CSSToLengthConversionData.h>
 #include <WebCore/Document.h>
 #include <WebCore/FontTaggedSettings.h>
-#include <WebCore/PositionArea.h>
 #include <WebCore/PositionTryFallback.h>
 #include <WebCore/StyleForVisitedLink.h>
 #include <WebCore/TextFlags.h>
