@@ -10877,9 +10877,9 @@ Vector<RefPtr<WebAnimation>> Document::matchingAnimations(NOESCAPE const Functio
         return false;
     };
 
-    for (auto* animation : WebAnimation::instances()) {
+    for (auto& animation : WebAnimation::instances()) {
         if (animation->isRelevant() && effectCanBeListed(animation->effect()))
-            animations.append(animation);
+            animations.append(animation.get());
     }
 
     std::ranges::stable_sort(animations, [](auto& lhs, auto& rhs) {
@@ -10891,7 +10891,7 @@ Vector<RefPtr<WebAnimation>> Document::matchingAnimations(NOESCAPE const Functio
 
 void Document::keyframesRuleDidChange(const String& name)
 {
-    for (RefPtr animation : WebAnimation::instances()) {
+    for (auto& animation : WebAnimation::instances()) {
         auto cssAnimation = dynamicDowncast<CSSAnimation>(*animation);
         if (!cssAnimation || !cssAnimation->isRelevant())
             continue;

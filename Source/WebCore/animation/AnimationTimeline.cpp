@@ -96,7 +96,7 @@ void AnimationTimeline::detachFromDocument()
 
     auto& animationsToRemove = m_animations;
     while (!animationsToRemove.isEmpty())
-        animationsToRemove.first()->remove();
+        Ref { animationsToRemove.first() }->remove();
 }
 
 void AnimationTimeline::suspendAnimations()
