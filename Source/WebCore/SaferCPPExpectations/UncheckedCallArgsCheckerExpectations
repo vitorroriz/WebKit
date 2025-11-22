@@ -499,7 +499,6 @@ rendering/RenderFrameSet.cpp
 rendering/RenderGeometryMap.cpp
 rendering/RenderGrid.cpp
 rendering/RenderHTMLCanvas.cpp
-rendering/RenderHighlight.cpp
 rendering/RenderImage.cpp
 rendering/RenderImage.h
 rendering/RenderImageResource.cpp
@@ -529,7 +528,6 @@ rendering/RenderReplaced.cpp
 rendering/RenderReplica.cpp
 rendering/RenderScrollbar.cpp
 rendering/RenderSearchField.cpp
-rendering/RenderSelection.cpp
 rendering/RenderSelectionGeometry.cpp
 rendering/RenderTable.cpp
 rendering/RenderTableCaption.cpp

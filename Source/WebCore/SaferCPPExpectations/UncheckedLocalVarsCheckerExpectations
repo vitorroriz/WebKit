@@ -336,7 +336,6 @@ rendering/RenderFragmentedFlow.cpp
 rendering/RenderFrameSet.cpp
 rendering/RenderGeometryMap.cpp
 rendering/RenderGrid.cpp
-rendering/RenderHighlight.cpp
 rendering/RenderImage.cpp
 rendering/RenderImageResourceStyleImage.cpp
 rendering/RenderInline.cpp
@@ -364,7 +363,6 @@ rendering/RenderReplaced.cpp
 rendering/RenderReplica.cpp
 rendering/RenderScrollbar.cpp
 rendering/RenderSearchField.cpp
-rendering/RenderSelection.cpp
 rendering/RenderTable.cpp
 rendering/RenderTableCaption.cpp
 rendering/RenderTableCell.cpp

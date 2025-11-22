@@ -395,7 +395,6 @@ rendering/RenderTextControlSingleLine.cpp
 rendering/RenderTheme.cpp
 rendering/RenderTreeAsText.cpp
 rendering/RenderWidget.cpp
-rendering/TextBoxPainter.cpp
 [ iOS ] rendering/ios/RenderThemeIOS.mm
 rendering/mathml/MathMLStyle.cpp
 rendering/style/RenderStyle.cpp
