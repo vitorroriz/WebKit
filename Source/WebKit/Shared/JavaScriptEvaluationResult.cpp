@@ -542,11 +542,11 @@ JSValueRef JavaScriptEvaluationResult::JSInserter::toJS(JSGlobalContextRef conte
         ASSERT_NOT_REACHED();
         return JSValueMakeUndefined(context);
     }, [&] (UniqueRef<JSHandleInfo>&& info) -> JSValueRef {
-        auto [originalGlobalObject, object] = WebCore::WebKitJSHandle::objectForIdentifier(info.get().identifier);
+        auto* object = WebCore::WebKitJSHandle::objectForIdentifier(info.get().identifier);
         if (!object)
             return JSValueMakeUndefined(context);
         auto [lexicalGlobalObject, domGlobalObject, document] = globalObjectTuple(context);
-        if (lexicalGlobalObject != originalGlobalObject)
+        if (lexicalGlobalObject != object->globalObject())
             return JSValueMakeUndefined(context);
         return ::toRef(object);
     }, [&] (UniqueRef<WebCore::SerializedNode>&& serializedNode) -> JSValueRef {

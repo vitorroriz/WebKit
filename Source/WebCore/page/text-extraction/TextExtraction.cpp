@@ -798,8 +798,8 @@ static void pruneEmptyContainersRecursive(Item& item)
 
 static Node* nodeFromJSHandle(JSHandleIdentifier identifier)
 {
-    auto [globalObject, object] = WebKitJSHandle::objectForIdentifier(identifier);
-    if (!globalObject || !object)
+    auto* object = WebKitJSHandle::objectForIdentifier(identifier);
+    if (!object)
         return nullptr;
 
     if (auto* jsNode = jsDynamicCast<JSNode*>(object))

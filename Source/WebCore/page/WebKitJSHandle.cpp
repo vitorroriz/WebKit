@@ -31,12 +31,12 @@
 #include "JSWindowProxy.h"
 #include <JavaScriptCore/JSCellInlines.h>
 #include <JavaScriptCore/JSObject.h>
+#include <JavaScriptCore/Weak.h>
 
 namespace WebCore {
 
 struct JSHandleData {
     JSC::Strong<JSC::JSObject> strongReference;
-    JSC::JSGlobalObject* globalObject;
     size_t refCount { 0 };
 };
 using HandleMap = HashMap<JSHandleIdentifier, JSHandleData>;
@@ -78,14 +78,14 @@ void WebKitJSHandle::jsHandleDestroyed(JSHandleIdentifier identifier)
         handleMap().remove(identifier);
 }
 
-std::pair<JSC::JSGlobalObject*, JSC::JSObject*> WebKitJSHandle::objectForIdentifier(JSHandleIdentifier identifier)
+JSC::JSObject* WebKitJSHandle::objectForIdentifier(JSHandleIdentifier identifier)
 {
     auto it = handleMap().find(identifier);
     if (it == handleMap().end()) {
         ASSERT_NOT_REACHED();
-        return { nullptr, nullptr };
+        return nullptr;
     }
-    return { it->value.globalObject, it->value.strongReference.get() };
+    return it->value.strongReference.get();
 }
 
 static Markable<FrameIdentifier> windowFrameIdentifier(JSC::JSObject* object)
@@ -104,14 +104,12 @@ WebKitJSHandle::WebKitJSHandle(JSC::JSGlobalObject& globalObject, JSC::JSObject*
     auto addResult = handleMap().ensure(m_identifier, [&] {
         return JSHandleData {
             JSC::Strong<JSC::JSObject> { globalObject.vm(), object },
-            nullptr,
             0 // Immediately incremented.
         };
     });
     auto& data = addResult.iterator->value;
     data.refCount++;
-    ASSERT(!data.globalObject || data.globalObject == &globalObject);
-    data.globalObject = &globalObject;
+    ASSERT(data.strongReference->globalObject() == &globalObject);
 }
 
 }

@@ -1574,8 +1574,8 @@ void WebFrame::takeSnapshotOfNode(JSHandleIdentifier identifier, CompletionHandl
     if (!page)
         return completion({ });
 
-    auto [globalObject, object] = WebKitJSHandle::objectForIdentifier(identifier);
-    if (!globalObject || !object)
+    auto* object = WebKitJSHandle::objectForIdentifier(identifier);
+    if (!object)
         return completion({ });
 
     auto* jsNode = jsDynamicCast<JSNode*>(object);

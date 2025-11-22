@@ -47,7 +47,7 @@ using JSHandleIdentifier = ProcessQualified<WebProcessJSHandleIdentifier>;
 class WEBCORE_EXPORT WebKitJSHandle : public RefCountedAndCanMakeWeakPtr<WebKitJSHandle> {
 public:
     static Ref<WebKitJSHandle> create(JSC::JSGlobalObject&, JSC::JSObject*);
-    static std::pair<JSC::JSGlobalObject*, JSC::JSObject*> objectForIdentifier(JSHandleIdentifier);
+    static JSC::JSObject* objectForIdentifier(JSHandleIdentifier);
     static void jsHandleDestroyed(JSHandleIdentifier);
     static void jsHandleSentToAnotherProcess(JSHandleIdentifier);
     ~WebKitJSHandle();
