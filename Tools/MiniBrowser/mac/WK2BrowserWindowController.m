@@ -880,17 +880,20 @@ static BOOL isJavaScriptURL(NSURL *url)
     }
 
     decisionHandler(WKNavigationActionPolicyCancel, preferences);
+    [self validateToolbar];
 }
 
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
 {
     LOG(@"decidePolicyForNavigationResponse");
     decisionHandler(WKNavigationResponsePolicyAllow);
+    [self validateToolbar];
 }
 
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation
 {
     LOG(@"didStartProvisionalNavigation: %@", navigation);
+    [self validateToolbar];
 }
 
 - (void)webView:(WKWebView *)webView didReceiveServerRedirectForProvisionalNavigation:(WKNavigation *)navigation

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,13 +23,6 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <WebKit/WebKit.h>
-#import "BrowserWindowController.h"
-
-@interface WK2BrowserWindowController : BrowserWindowController
-
-@property (readonly) WKWebView *webView;
-
-- (instancetype)initWithConfiguration:(WKWebViewConfiguration *)configuration;
-
+@interface HistoryButton : NSButton
 @end
+

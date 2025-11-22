@@ -99,9 +99,7 @@ public:
 
     void setWasRestoredFromSession();
 
-#if !LOG_DISABLED
     String loggingString();
-#endif
 
 private:
     WebBackForwardListItem(Ref<FrameState>&&, WebPageProxyIdentifier, std::optional<WebCore::FrameIdentifier>, BrowsingContextGroup*);
