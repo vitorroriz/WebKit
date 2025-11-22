@@ -166,6 +166,7 @@ dom/Position.cpp
 dom/QualifiedNameCache.cpp
 dom/RadioButtonGroups.cpp
 dom/Range.cpp
+dom/ScriptExecutionContext.cpp
 dom/SelectorQuery.cpp
 dom/ShadowRoot.cpp
 dom/SimpleRange.cpp
@@ -480,3 +481,4 @@ testing/LegacyMockCDM.cpp
 testing/MockCDMFactory.cpp
 testing/MockPageOverlayClient.cpp
 testing/ServiceWorkerInternals.cpp
+workers/WorkerConsoleClient.cpp
