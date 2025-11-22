@@ -500,6 +500,38 @@ void InlineDisplayLineBuilder::applyEllipsisIfNeeded(LineEndingTruncationPolicy 
         displayLine.setEllipsis({ truncationPolicy == LineEndingTruncationPolicy::WhenContentOverflowsInInlineDirection ? InlineDisplay::Line::Ellipsis::Type::Inline : InlineDisplay::Line::Ellipsis::Type::Block, *ellipsisRect, ellipsisText });
 }
 
+void InlineDisplayLineBuilder::adjustLineBlockAfterSideWithCollapsedMargin(const BlockLayoutState::MarginState& marginState, InlineDisplay::Lines& displayLines, InlineDisplay::Boxes& displayBoxes)
+{
+    if (!marginState.canCollapseMarginAfterWithChildren || !marginState.margin())
+        return;
+
+    auto afterSideBlockLevelDisplayBox = [&]() -> InlineDisplay::Box* {
+        for (auto& displayBox : displayBoxes | std::views::reverse) {
+            if (displayBox.isRootInlineBox() || displayBox.isInlineBox()) {
+                // Skip "empty" trailing lines constructed for </span> (e.g. <span><block></block></span> initiates 3 lines where the first and last lines are empty and they only contain the inline box start/end)
+                continue;
+            }
+            if (displayBox.isBlockLevelBox())
+                return &displayBox;
+            return { };
+        }
+        return { };
+    };
+
+    auto* displayBox = afterSideBlockLevelDisplayBox();
+    if (!displayBox)
+        return;
+    if (displayBox->lineIndex() >= displayLines.size()) {
+        ASSERT_NOT_REACHED();
+        return;
+    }
+    auto& lastLineWithBlockContent = displayLines[displayBox->lineIndex()];
+    ASSERT(lastLineWithBlockContent.hasInflowContent());
+    lastLineWithBlockContent.shrinkInBlockDirection(marginState.margin());
+    for (auto lineIndex = displayBox->lineIndex() + 1; lineIndex < displayLines.size(); ++lineIndex)
+        displayLines[lineIndex].moveInBlockDirection(-marginState.margin());
+}
+
 }
 }
 

@@ -1268,7 +1268,7 @@ void LineLayout::shiftLinesBy(LayoutUnit blockShift)
     bool isHorizontalWritingMode = flow().writingMode().isHorizontal();
 
     for (auto& line : m_inlineContent->displayContent().lines)
-        line.moveInBlockDirection(blockShift, isHorizontalWritingMode);
+        line.moveInBlockDirection(blockShift);
 
     auto deltaX = isHorizontalWritingMode ? 0_lu : blockShift;
     auto deltaY = isHorizontalWritingMode ? blockShift : 0_lu;

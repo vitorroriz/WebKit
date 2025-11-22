@@ -351,6 +351,7 @@ InlineLayoutResult InlineFormattingContext::lineLayout(AbstractLineBuilder& line
         lineLogicalTop = formattingUtils().logicalTopForNextLine(lineLayoutResult, lineLogicalRect, floatingContext);
     }
     InlineDisplayLineBuilder::addLegacyLineClampTrailingLinkBoxIfApplicable(*this, inlineLayoutState, layoutResult.displayContent);
+    InlineDisplayLineBuilder::adjustLineBlockAfterSideWithCollapsedMargin(inlineLayoutState.parentBlockLayoutState().marginState(), layoutResult.displayContent.lines, layoutResult.displayContent.boxes);
     return layoutResult;
 }
 
@@ -402,6 +403,11 @@ void InlineFormattingContext::updateLayoutStateWithLineLayoutResult(const LineLa
         auto& marginState = layoutState.parentBlockLayoutState().marginState();
         if (marginState.atBeforeSideOfBlock && lineLayoutResult.hasInflowContent())
             marginState.resetBeforeSideOfBlock();
+        if (lineLayoutResult.hasInlineContent()) {
+            // FIXME: This works as long as blocks are wrapped in anonymous blocks so
+            // that a block can never be followed by another block here.
+            marginState.resetMarginValues();
+        }
     };
     updateBlockBeforeMargin();
 }

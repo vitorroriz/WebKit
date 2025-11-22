@@ -90,7 +90,8 @@ public:
     size_t boxCount() const { return m_boxCount; }
     bool isFirstAfterPageBreak() const { return m_isFirstAfterPageBreak; }
 
-    void moveInBlockDirection(float offset, bool isHorizontalWritingMode);
+    void moveInBlockDirection(float offset);
+    void shrinkInBlockDirection(float delta);
     struct Ellipsis {
         enum class Type : uint8_t { Inline, Block };
         Type type { Type::Inline };
@@ -163,14 +164,12 @@ inline Line::Line(bool hasInflowContent, const FloatRect& lineBoxLogicalRect, co
 {
 }
 
-inline void Line::moveInBlockDirection(float offset, bool isHorizontalWritingMode)
+inline void Line::moveInBlockDirection(float offset)
 {
-    ASSERT(isHorizontalWritingMode == m_isHorizontal);
-
     if (!offset)
         return;
 
-    auto physicalOffset = isHorizontalWritingMode ? FloatSize { { }, offset } : FloatSize { offset, { } };
+    auto physicalOffset = isHorizontal() ? FloatSize { { }, offset } : FloatSize { offset, { } };
 
     m_lineBoxRect.move(physicalOffset);
     m_scrollableOverflow.move(physicalOffset);
@@ -182,6 +181,24 @@ inline void Line::moveInBlockDirection(float offset, bool isHorizontalWritingMod
     m_lineBoxLogicalRect.move({ { }, offset });
     m_enclosingLogicalTopAndBottom.top += offset;
     m_enclosingLogicalTopAndBottom.bottom += offset;
+}
+
+inline void Line::shrinkInBlockDirection(float delta)
+{
+    if (!delta)
+        return;
+
+    auto physicalDelta = isHorizontal() ? FloatSize { { }, delta } : FloatSize { delta, { } };
+
+    m_lineBoxRect.contract(physicalDelta);
+    m_scrollableOverflow.contract(physicalDelta);
+    m_contentOverflow.contract(physicalDelta);
+    m_inkOverflow.contract(physicalDelta);
+    if (m_ellipsis)
+        m_ellipsis->visualRect.contract(physicalDelta);
+
+    m_lineBoxLogicalRect.contract({ { }, delta });
+    m_enclosingLogicalTopAndBottom.bottom -= delta;
 }
 
 inline FloatRect Line::visibleRectIgnoringBlockDirection() const
