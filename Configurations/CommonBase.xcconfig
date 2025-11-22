@@ -121,3 +121,5 @@ WK_SWIFT_MEMORY_SAFETY_FLAGS_[sdk=iphone*26.1*] = -Werror StrictMemorySafety $(i
 WK_SWIFT_MEMORY_SAFETY_FLAGS_[sdk=iphone*26.2*] = -Werror StrictMemorySafety $(inherited);
 
 OTHER_SWIFT_FLAGS = $(inherited) $(WK_SWIFT_MEMORY_SAFETY_FLAGS);
+
+OTHER_LIBTOOLFLAGS = -no_warning_for_no_symbols;
