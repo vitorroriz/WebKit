@@ -78,11 +78,14 @@ void RemoteMediaSessionHelper::stopMonitoringWirelessRoutesInternal()
 
 void RemoteMediaSessionHelper::activeVideoRouteDidChange(SupportsAirPlayVideo supportsAirPlayVideo, MediaPlaybackTargetContextSerialized&& targetContext)
 {
-    WTF::switchOn(targetContext.platformContext(), [](WebCore::MediaPlaybackTargetContextMock&&) {
-        return;
-    }, [&](WebCore::MediaPlaybackTargetContextCocoa&& context) {
-        WebCore::MediaSessionHelper::activeVideoRouteDidChange(supportsAirPlayVideo, WebCore::MediaPlaybackTargetCocoa::create(WTFMove(context)));
-    });
+    switch (targetContext.targetType()) {
+    case WebCore::MediaPlaybackTargetContextType::AVOutputContext:
+        WebCore::MediaSessionHelper::activeVideoRouteDidChange(supportsAirPlayVideo, MediaPlaybackTargetSerialized::create(WTFMove(targetContext)));
+        break;
+    case WebCore::MediaPlaybackTargetContextType::Mock:
+    case WebCore::MediaPlaybackTargetContextType::Serialized:
+        break;
+    }
 }
 
 void RemoteMediaSessionHelper::activeAudioRouteSupportsSpatialPlaybackDidChange(SupportsSpatialAudioPlayback supportsSpatialAudioPlayback)
