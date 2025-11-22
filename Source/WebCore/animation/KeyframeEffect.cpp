@@ -2894,7 +2894,15 @@ void KeyframeEffect::effectStackNoLongerAllowsAccelerationDuringAcceleratedActio
 {
 #if ENABLE(THREADED_ANIMATIONS)
     if (canHaveAcceleratedRepresentation()) {
-        ASSERT_NOT_REACHED();
+        ASSERT([&] {
+            if (RefPtr document = this->document()) {
+                Ref settings = document->settings();
+                if (settings->threadedScrollDrivenAnimationsEnabled() && settings->threadedTimeBasedAnimationsEnabled())
+                    return false;
+            }
+            return true;
+        }());
+        scheduleAssociatedAcceleratedEffectStackUpdate();
         return;
     }
 #endif

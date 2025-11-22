@@ -16,18 +16,17 @@ html {
 <script>
 
 promise_test(async t => { 
-    const scrollTarget = createDiv(t);
-    const monotonicTarget = createDiv(t);
+    const target = createDiv(t);
     
     const timeline = new ScrollTimeline({ source : document.documentElement });
-    scrollTarget.animate({ opacity: [0, 1] }, { timeline });
-    monotonicTarget.animate({ opacity: [0, 1] }, 1000 * 1000);
+    target.animate({ scale: [0, 1] }, { timeline });
+    target.animate({ translate: '0 100px' }, 1000 * 1000);
 
     await legacyAnimationCommit();
 
-    assert_true(window.internals?.acceleratedAnimationsForElement(scrollTarget)[0].isThreaded);
-    assert_false(window.internals?.acceleratedAnimationsForElement(monotonicTarget)[0].isThreaded);
-}, "Scroll-driven animations can be threaded while monotonic animations can be accelerated but not threaded.");
+    const animations = window.internals?.acceleratedAnimationsForElement(target);
+    assert_equals(animations.length, 0);
+}, "Scroll-driven and monotonic animations on the same element cannot be accelerated if they affect the same underlying property.");
 
 </script>
 </body>

@@ -4460,30 +4460,32 @@ void RenderLayerBacking::updateAcceleratedEffectsAndBaseValues(HashSet<Ref<Accel
     }();
 
     AcceleratedEffects acceleratedEffects;
-    WeakListHashSet<AcceleratedEffect> weakAcceleratedEffects;
     if (auto* effectStack = target->keyframeEffectStack()) {
-        auto animatesWidth = effectStack->containsProperty(CSSPropertyWidth);
-        auto animatesHeight = effectStack->containsProperty(CSSPropertyHeight);
-        for (const auto& effect : effectStack->sortedEffects()) {
-            if (!effect || !effect->canHaveAcceleratedRepresentation() || !effect->canBeAccelerated())
-                continue;
-            if (animatesWidth || animatesHeight) {
-                auto& blendingKeyframes = effect->blendingKeyframes();
-                if ((animatesWidth && blendingKeyframes.hasWidthDependentTransform()) || (animatesHeight && blendingKeyframes.hasHeightDependentTransform()))
-                    disallowedAcceleratedProperties.add(transformRelatedAcceleratedProperties);
+        WeakListHashSet<AcceleratedEffect> weakAcceleratedEffects;
+        if (effectStack->allowsAcceleration()) {
+            auto animatesWidth = effectStack->containsProperty(CSSPropertyWidth);
+            auto animatesHeight = effectStack->containsProperty(CSSPropertyHeight);
+            for (const auto& effect : effectStack->sortedEffects()) {
+                if (!effect || !effect->canHaveAcceleratedRepresentation() || !effect->canBeAccelerated())
+                    continue;
+                if (animatesWidth || animatesHeight) {
+                    auto& blendingKeyframes = effect->blendingKeyframes();
+                    if ((animatesWidth && blendingKeyframes.hasWidthDependentTransform()) || (animatesHeight && blendingKeyframes.hasHeightDependentTransform()))
+                        disallowedAcceleratedProperties.add(transformRelatedAcceleratedProperties);
+                }
+                ASSERT(effect->animation());
+                ASSERT(effect->animation()->timeline());
+                Ref acceleratedTimeline = Ref { *effect->animation()->timeline() }->acceleratedRepresentation();
+                auto acceleratedEffect = AcceleratedEffect::create(*effect, acceleratedTimeline->identifier(), borderBoxRect, baseValues, disallowedAcceleratedProperties);
+                if (!acceleratedEffect)
+                    continue;
+                if (!hasInterpolatingEffect && effect->isRunningAccelerated())
+                    hasInterpolatingEffect = true;
+                effect->setAcceleratedRepresentation(acceleratedEffect.get());
+                weakAcceleratedEffects.add(*acceleratedEffect);
+                acceleratedEffects.append(acceleratedEffect.releaseNonNull());
+                timelines.add(WTFMove(acceleratedTimeline));
             }
-            ASSERT(effect->animation());
-            ASSERT(effect->animation()->timeline());
-            Ref acceleratedTimeline = Ref { *effect->animation()->timeline() }->acceleratedRepresentation();
-            auto acceleratedEffect = AcceleratedEffect::create(*effect, acceleratedTimeline->identifier(), borderBoxRect, baseValues, disallowedAcceleratedProperties);
-            if (!acceleratedEffect)
-                continue;
-            if (!hasInterpolatingEffect && effect->isRunningAccelerated())
-                hasInterpolatingEffect = true;
-            effect->setAcceleratedRepresentation(acceleratedEffect.get());
-            weakAcceleratedEffects.add(*acceleratedEffect);
-            acceleratedEffects.append(acceleratedEffect.releaseNonNull());
-            timelines.add(WTFMove(acceleratedTimeline));
         }
         effectStack->setAcceleratedEffects(WTFMove(weakAcceleratedEffects));
     }
