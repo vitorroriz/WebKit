@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,52 +23,10 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef BlobDataFileReference_h
-#define BlobDataFileReference_h
+#pragma once
 
-#include <optional>
-#include <wtf/Markable.h>
-#include <wtf/RefCounted.h>
-#include <wtf/WallTime.h>
-#include <wtf/text/WTFString.h>
-
-namespace WebCore {
-
-class WEBCORE_EXPORT BlobDataFileReference : public RefCounted<BlobDataFileReference> {
-public:
-    static Ref<BlobDataFileReference> create(const String& path, const String& replacementPath = { })
-    {
-        return adoptRef(*new BlobDataFileReference(path, replacementPath));
-    }
-
-    virtual ~BlobDataFileReference();
-
-    void startTrackingModifications();
-
-    const String& path();
-    unsigned long long size();
-    std::optional<WallTime> expectedModificationTime();
-
-    virtual void prepareForFileAccess();
-    virtual void revokeFileAccess();
-
-protected:
-    BlobDataFileReference(const String& path, const String& replacementPath);
-
-private:
-#if ENABLE(FILE_REPLACEMENT)
-    void generateReplacementFile();
+#ifdef __OBJC__
+typedef Class ClassStructPtr;
+#else
+typedef struct objc_class* ClassStructPtr;
 #endif
-
-    String m_path;
-    String m_replacementPath;
-#if ENABLE(FILE_REPLACEMENT)
-    bool m_replacementShouldBeGenerated { false };
-#endif
-    unsigned long long m_size { 0 };
-    Markable<WallTime> m_expectedModificationTime;
-};
-
-}
-
-#endif // BlobDataFileReference_h

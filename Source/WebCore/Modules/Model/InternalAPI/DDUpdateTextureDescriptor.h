@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "DDImageAsset.h"
+#include <WebCore/DDImageAsset.h>
 
 namespace WebCore::DDModel {
 

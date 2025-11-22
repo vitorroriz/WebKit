@@ -32,8 +32,8 @@
 #include <wtf/WeakPtr.h>
 
 #if ENABLE(THREADED_ANIMATIONS)
-#include "AcceleratedTimeline.h"
-#include "TimelineIdentifier.h"
+#include <WebCore/AcceleratedTimeline.h>
+#include <WebCore/TimelineIdentifier.h>
 #endif
 
 namespace WebCore {
