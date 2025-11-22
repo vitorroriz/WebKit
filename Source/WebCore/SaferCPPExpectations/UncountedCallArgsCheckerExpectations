@@ -306,7 +306,6 @@ dom/ContainerNodeAlgorithms.cpp
 dom/ContentVisibilityDocumentState.cpp
 dom/CurrentScriptIncrementer.h
 dom/CustomElementDefaultARIA.cpp
-dom/CustomElementReactionQueue.cpp
 dom/CustomElementRegistry.cpp
 dom/DOMImplementation.cpp
 dom/DataTransfer.cpp
@@ -323,7 +322,6 @@ dom/ExtensionStyleSheets.cpp
 dom/FragmentDirectiveRangeFinder.cpp
 dom/GCReachableRef.h
 dom/IdleCallbackController.cpp
-dom/IdleDeadline.cpp
 dom/ImageOverlay.cpp
 dom/InlineStyleSheetOwner.cpp
 dom/KeyboardEvent.cpp
