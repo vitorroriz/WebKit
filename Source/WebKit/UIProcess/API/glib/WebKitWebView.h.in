@@ -797,7 +797,7 @@ webkit_web_view_get_snapshot_finish                  (WebKitWebView             
                                                       GAsyncResult              *result,
                                                       GError                   **error);
 #endif
-#else
+#elif ENABLE(2022_GLIB_API)
 WEBKIT_API WebKitImage *
 webkit_web_view_get_snapshot_finish                  (WebKitWebView             *web_view,
                                                       GAsyncResult              *result,
