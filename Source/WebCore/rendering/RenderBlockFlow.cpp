@@ -3953,10 +3953,8 @@ std::pair<float, float> RenderBlockFlow::inlineContentTopAndBottomIncludingInkOv
     return { logicalTop, logicalBottom };
 }
 
-void RenderBlockFlow::layoutInlineContent(RelayoutChildren relayoutChildren, LayoutUnit& repaintLogicalTop, LayoutUnit& repaintLogicalBottom)
+bool RenderBlockFlow::markInlineContentDirtyForLayout(RelayoutChildren relayoutChildren)
 {
-    auto& layoutState = *view().frameView().layoutContext().layoutState();
-
     auto hasSimpleOutOfFlowContentOnly = !hasLineIfEmpty();
     auto hasSimpleStaticPositionForInlineLevelOutOfFlowContentByStyle = hasSimpleStaticPositionForInlineLevelOutOfFlowChildrenByStyle(style());
 
@@ -4015,6 +4013,80 @@ void RenderBlockFlow::layoutInlineContent(RelayoutChildren relayoutChildren, Lay
             continue;
         }
     }
+    return hasSimpleOutOfFlowContentOnly;
+}
+
+std::optional<LayoutUnit> RenderBlockFlow::updateLineClampStateAndLogicalHeightAfterLayout()
+{
+    auto& layoutState = *view().frameView().layoutContext().layoutState();
+    auto& inlineLayout = *this->inlineLayout();
+
+    auto legacyLineClamp = layoutState.legacyLineClamp();
+    if (!legacyLineClamp || isFloatingOrOutOfFlowPositioned())
+        return { };
+
+    legacyLineClamp->currentLineCount += inlineLayout.lineCount();
+    if (legacyLineClamp->clampedRenderer) {
+        // We've already clamped this flex container at a previous flex item.
+        layoutState.setLegacyLineClamp(*legacyLineClamp);
+        return { };
+    }
+
+    auto clampedContentHeight = [&]() -> std::optional<LayoutUnit> {
+        if (auto clampedHeight = inlineLayout.clampedContentLogicalHeight())
+            return clampedHeight;
+        if (legacyLineClamp->currentLineCount == legacyLineClamp->maximumLineCount) {
+            // Even if we did not truncate the content, this might be our clamping position.
+            return LayoutUnit { inlineLayout.contentLogicalHeight() };
+        }
+        return { };
+    };
+    if (auto logicalHeight = clampedContentHeight()) {
+        legacyLineClamp->clampedContentLogicalHeight = logicalHeight;
+        legacyLineClamp->clampedRenderer = this;
+        layoutState.setLegacyLineClamp(*legacyLineClamp);
+        return logicalHeight;
+    }
+    layoutState.setLegacyLineClamp(*legacyLineClamp);
+    return { };
+}
+
+void RenderBlockFlow::updateRepaintTopAndBottomAfterLayout(RelayoutChildren relayoutChildren, std::optional<LayoutRect> partialRepaintRect, std::pair<float, float> oldContentTopAndBottomIncludingInkOverflow, LayoutUnit& repaintLogicalTop, LayoutUnit& repaintLogicalBottom)
+{
+    auto isFullLayout = selfNeedsLayout() || relayoutChildren == RelayoutChildren::Yes;
+    if (isFullLayout) {
+        if (!selfNeedsLayout()) {
+            // In order to really trigger full repaint, the block container has to have the self layout flag set (see LegacyLineLayout::layoutRunsAndFloats).
+            // Without having it set, repaint after layout logic (see RenderElement::repaintAfterLayoutIfNeeded) only issues repaint on the diff of
+            // before/after repaint bounds. It results in incorrect repaint when the inline content changes (new text) and expands the same time.
+            // (it only affects shrink-to-fit type of containers).
+            // FIXME: We have the exact damaged rect here, should be able to issue repaint on both inline and block directions.
+            setNeedsLayout(MarkOnlyThis);
+        }
+        // Let's trigger full repaint instead for now (matching legacy line layout).
+        // FIXME: We should revisit this behavior and run repaints strictly on visual overflow.
+        repaintLogicalTop = { };
+        repaintLogicalBottom = { };
+        return;
+    }
+
+    if (partialRepaintRect) {
+        repaintLogicalTop = partialRepaintRect->y();
+        repaintLogicalBottom = partialRepaintRect->maxY();
+        return;
+    }
+
+    auto contentTopAndBottomIncludingInkOverflow = inlineContentTopAndBottomIncludingInkOverflow();
+    auto damageTopIncludingInkOverflow = std::min(oldContentTopAndBottomIncludingInkOverflow.first, contentTopAndBottomIncludingInkOverflow.first);
+    auto damageBottomIncludingInkOverflow = std::max(oldContentTopAndBottomIncludingInkOverflow.second, contentTopAndBottomIncludingInkOverflow.second);
+
+    repaintLogicalTop = std::min(LayoutUnit::fromFloatFloor(damageTopIncludingInkOverflow), borderAndPaddingBefore());
+    repaintLogicalBottom = std::max(LayoutUnit::fromFloatCeil(damageBottomIncludingInkOverflow), logicalHeight());
+}
+
+void RenderBlockFlow::layoutInlineContent(RelayoutChildren relayoutChildren, LayoutUnit& repaintLogicalTop, LayoutUnit& repaintLogicalBottom)
+{
+    auto hasSimpleOutOfFlowContentOnly = markInlineContentDirtyForLayout(relayoutChildren);
 
     if (hasSimpleOutOfFlowContentOnly) {
         // Shortcut the layout.
@@ -4030,81 +4102,19 @@ void RenderBlockFlow::layoutInlineContent(RelayoutChildren relayoutChildren, Lay
 
     if (!inlineLayout())
         m_lineLayout = makeUnique<LayoutIntegration::LineLayout>(*this);
-
-    auto& layoutFormattingContextLineLayout = *this->inlineLayout();
+    auto& inlineLayout = *this->inlineLayout();
 
     ASSERT(containingBlock() || is<RenderView>(*this));
-    layoutFormattingContextLineLayout.updateFormattingContexGeometries(containingBlock() ? containingBlockLogicalWidthForContent() : LayoutUnit());
-    auto partialRepaintRect = layoutFormattingContextLineLayout.layout(relayoutChildren == RelayoutChildren::Yes ? LayoutIntegration::LineLayout::ForceFullLayout::Yes : LayoutIntegration::LineLayout::ForceFullLayout::No);
+    inlineLayout.updateFormattingContexGeometries(containingBlock() ? containingBlockLogicalWidthForContent() : LayoutUnit());
+    auto partialRepaintRect = inlineLayout.layout(relayoutChildren == RelayoutChildren::Yes ? LayoutIntegration::LineLayout::ForceFullLayout::Yes : LayoutIntegration::LineLayout::ForceFullLayout::No);
 
-    auto borderBoxBottom = [&] {
-        auto contentHeight = !hasLines() && hasLineIfEmpty() ? lineHeight() : layoutFormattingContextLineLayout.contentLogicalHeight();
-        return borderAndPaddingBefore() + contentHeight + borderAndPaddingAfter() + scrollbarLogicalHeight();
+    auto clampedContentHeight = updateLineClampStateAndLogicalHeightAfterLayout();
+    auto borderBoxLogicalHeight = [&] {
+        auto contentHeight = clampedContentHeight.value_or(!hasLines() && hasLineIfEmpty() ? lineHeight() : inlineLayout.contentLogicalHeight());
+        return borderAndPaddingLogicalHeight() + contentHeight + scrollbarLogicalHeight();
     };
-    auto newBorderBoxBottom = borderBoxBottom();
-
-    auto updateRepaintTopAndBottomIfNeeded = [&] {
-        auto isFullLayout = selfNeedsLayout() || relayoutChildren == RelayoutChildren::Yes;
-        if (isFullLayout) {
-            if (!selfNeedsLayout()) {
-                // In order to really trigger full repaint, the block container has to have the self layout flag set (see LegacyLineLayout::layoutRunsAndFloats).
-                // Without having it set, repaint after layout logic (see RenderElement::repaintAfterLayoutIfNeeded) only issues repaint on the diff of
-                // before/after repaint bounds. It results in incorrect repaint when the inline content changes (new text) and expands the same time.
-                // (it only affects shrink-to-fit type of containers).
-                // FIXME: We have the exact damaged rect here, should be able to issue repaint on both inline and block directions.
-                setNeedsLayout(MarkOnlyThis);
-            }
-            // Let's trigger full repaint instead for now (matching legacy line layout).
-            // FIXME: We should revisit this behavior and run repaints strictly on visual overflow.
-            repaintLogicalTop = { };
-            repaintLogicalBottom = { };
-            return;
-        }
-
-        if (partialRepaintRect) {
-            repaintLogicalTop = partialRepaintRect->y();
-            repaintLogicalBottom = partialRepaintRect->maxY();
-            return;
-        }
-
-        auto contentTopAndBottomIncludingInkOverflow = inlineContentTopAndBottomIncludingInkOverflow();
-        auto damageTopIncludingInkOverflow = std::min(oldContentTopAndBottomIncludingInkOverflow.first, contentTopAndBottomIncludingInkOverflow.first);
-        auto damageBottomIncludingInkOverflow = std::max(oldContentTopAndBottomIncludingInkOverflow.second, contentTopAndBottomIncludingInkOverflow.second);
-
-        repaintLogicalTop = std::min(LayoutUnit::fromFloatFloor(damageTopIncludingInkOverflow), borderAndPaddingBefore());
-        repaintLogicalBottom = std::max(LayoutUnit::fromFloatCeil(damageBottomIncludingInkOverflow), newBorderBoxBottom);
-    };
-    updateRepaintTopAndBottomIfNeeded();
-
-    setLogicalHeight(newBorderBoxBottom);
-
-    auto updateLineClampStateAndLogicalHeightIfApplicable = [&] {
-        auto legacyLineClamp = layoutState.legacyLineClamp();
-        if (!legacyLineClamp || isFloatingOrOutOfFlowPositioned())
-            return;
-        legacyLineClamp->currentLineCount += layoutFormattingContextLineLayout.lineCount();
-        if (legacyLineClamp->clampedRenderer) {
-            // We've already clamped this flex container at a previous flex item.
-            layoutState.setLegacyLineClamp(*legacyLineClamp);
-            return;
-        }
-        auto clampedContentHeight = [&]() -> std::optional<LayoutUnit> {
-            if (auto clampedHeight = layoutFormattingContextLineLayout.clampedContentLogicalHeight())
-                return clampedHeight;
-            if (legacyLineClamp->currentLineCount == legacyLineClamp->maximumLineCount) {
-                // Even if we did not truncate the content, this might be our clamping position.
-                return LayoutUnit { layoutFormattingContextLineLayout.contentLogicalHeight() };
-            }
-            return { };
-        };
-        if (auto logicalHeight = clampedContentHeight()) {
-            legacyLineClamp->clampedContentLogicalHeight = logicalHeight;
-            legacyLineClamp->clampedRenderer = this;
-            setLogicalHeight(borderAndPaddingBefore() + *logicalHeight + borderAndPaddingAfter() + scrollbarLogicalHeight());
-        }
-        layoutState.setLegacyLineClamp(*legacyLineClamp);
-    };
-    updateLineClampStateAndLogicalHeightIfApplicable();
+    setLogicalHeight(borderBoxLogicalHeight());
+    updateRepaintTopAndBottomAfterLayout(relayoutChildren, partialRepaintRect, oldContentTopAndBottomIncludingInkOverflow, repaintLogicalTop, repaintLogicalBottom);
 }
 
 void RenderBlockFlow::setStaticPositionsForSimpleOutOfFlowContent()
