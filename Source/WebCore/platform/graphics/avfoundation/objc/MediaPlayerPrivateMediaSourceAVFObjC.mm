@@ -205,7 +205,7 @@ void MediaPlayerPrivateMediaSourceAVFObjC::load(const String&)
     assertIsMainThread();
     // This media engine only supports MediaSource URLs.
     m_networkState = MediaPlayer::NetworkState::FormatError;
-    if (auto player = m_player.get())
+    if (RefPtr player = m_player.get())
         player->networkStateChanged();
 }
 
@@ -629,6 +629,7 @@ MediaPlayer::ReadyState MediaPlayerPrivateMediaSourceAVFObjC::readyState() const
 {
     if (RefPtr mediaSourcePrivate = m_mediaSourcePrivate)
         return mediaSourcePrivate->mediaPlayerReadyState();
+    assertIsMainThread();
     return m_readyState;
 }
 
@@ -650,7 +651,6 @@ MediaTime MediaPlayerPrivateMediaSourceAVFObjC::minTimeSeekable() const
 
 const PlatformTimeRanges& MediaPlayerPrivateMediaSourceAVFObjC::buffered() const
 {
-    ASSERT_NOT_REACHED();
     return PlatformTimeRanges::emptyRanges();
 }
 
