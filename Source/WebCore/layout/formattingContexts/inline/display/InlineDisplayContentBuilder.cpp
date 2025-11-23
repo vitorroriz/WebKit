@@ -504,8 +504,12 @@ void InlineDisplayContentBuilder::processNonBidiContent(const LineLayoutResult& 
                     adjustLogicalRectForTextSpacing(rect);
                 return rect;
             }
-            if (lineRun.isLineSpanningInlineBoxStart())
+            if (lineRun.isLineSpanningInlineBoxStart()) {
+                // Ideally spanning inline boxes on block lines would not have borders and padding.
+                if (lineLayoutResult.hasBlockContent())
+                    return lineBox.logicalContentBoxForInlineBox(layoutBox);
                 return lineBox.logicalBorderBoxForInlineBox(layoutBox, boxGeometry);
+            }
             if (lineRun.isBlock()) {
                 auto borderBoxRect = BoxGeometry::borderBoxRect(boxGeometry);
                 return { borderBoxRect.top(), borderBoxRect.left(), borderBoxRect.width(), borderBoxRect.height() };
