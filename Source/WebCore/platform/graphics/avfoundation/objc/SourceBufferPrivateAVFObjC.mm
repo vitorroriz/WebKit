@@ -666,11 +666,6 @@ void SourceBufferPrivateAVFObjC::didBecomeReadyForMoreSamples(TrackID trackId)
 {
     INFO_LOG(LOGIDENTIFIER, trackId);
 
-    if (auto trackIdentifier = trackIdentifierFor(trackId))
-        protectedRenderer()->stopRequestingMediaData(*trackIdentifier);
-    else
-        return;
-
     provideMediaData(trackId);
 }
 

@@ -1050,7 +1050,6 @@ void MediaPlayerPrivateWebM::didBecomeReadyForMoreSamples(TrackID trackId)
     INFO_LOG(LOGIDENTIFIER, trackId);
 
     m_requestReadyForMoreSamplesSetMap[trackId] = false;
-    m_renderer->stopRequestingMediaData(trackIdentifierFor(trackId));
 
     provideMediaData(trackId);
 }

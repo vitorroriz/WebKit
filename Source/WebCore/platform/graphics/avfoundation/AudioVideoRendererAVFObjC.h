@@ -158,6 +158,8 @@ private:
     void updateAllRenderersHaveAvailableSamples();
     void setHasAvailableVideoFrame(bool);
     void setHasAvailableAudioSample(TrackIdentifier, bool);
+    void setHasRequestedAudioDataWhenReady(TrackIdentifier, bool);
+    bool hasRequestedAudioDataWhenReady(TrackIdentifier);
 
     std::optional<TrackType> typeOf(TrackIdentifier) const;
 
@@ -300,9 +302,11 @@ private:
 
     struct AudioTrackProperties {
         bool hasAudibleSample { false };
+        bool hasRequestedAudioDataWhenReady { false };
         Function<void(TrackIdentifier, const MediaTime&)> callbackForReenqueuing;
     };
     HashMap<TrackIdentifier, AudioTrackProperties> m_audioTracksMap;
+    bool m_hasRequestedVideoDataWhenReady { false };
     bool m_readyToRequestVideoData { true };
     bool m_readyToRequestAudioData { true };
 

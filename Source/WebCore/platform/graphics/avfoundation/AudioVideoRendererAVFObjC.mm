@@ -301,24 +301,36 @@ void AudioVideoRendererAVFObjC::requestMediaDataWhenReady(TrackIdentifier trackI
     case TrackType::Video:
         ASSERT(m_videoRenderer);
         if (RefPtr videoRenderer = m_videoRenderer) {
+            m_hasRequestedVideoDataWhenReady = true;
             videoRenderer->requestMediaDataWhenReady([trackId, weakThis = WeakPtr { *this }, callback = WTFMove(callback)]() mutable {
                 if (RefPtr protectedThis = weakThis.get()) {
-                    if (protectedThis->m_readyToRequestVideoData)
-                        callback(trackId);
-                    else
+                    if (!protectedThis->m_readyToRequestVideoData) {
                         DEBUG_LOG_WITH_THIS(protectedThis, LOGIDENTIFIER_WITH_THIS(protectedThis), "Not ready to request video data, ignoring");
+                        return;
+                    }
+                    protectedThis->m_hasRequestedVideoDataWhenReady = false;
+                    callback(trackId);
+                    // If the callback did a re-entrant call into requestMediaDataWhenReady, do not reset it.
+                    if (RefPtr videoRenderer = protectedThis->m_videoRenderer; videoRenderer && !protectedThis->m_hasRequestedVideoDataWhenReady)
+                        videoRenderer->stopRequestingMediaData();
                 }
             });
         }
         break;
     case TrackType::Audio:
         if (RetainPtr audioRenderer = audioRendererFor(trackId)) {
+            setHasRequestedAudioDataWhenReady(trackId, true);
             auto handler = makeBlockPtr([trackId, weakThis = WeakPtr { *this }, callback = WTFMove(callback)]() mutable {
                 if (RefPtr protectedThis = weakThis.get()) {
-                    if (protectedThis->m_readyToRequestAudioData)
-                        callback(trackId);
-                    else
+                    if (!protectedThis->m_readyToRequestAudioData) {
                         DEBUG_LOG_WITH_THIS(protectedThis, LOGIDENTIFIER_WITH_THIS(protectedThis), "Not ready to request audio data, ignoring");
+                        return;
+                    }
+                    protectedThis->setHasRequestedAudioDataWhenReady(trackId, false);
+                    callback(trackId);
+                    // If the callback did a re-entrant call into requestMediaDataWhenReady, do not reset it.
+                    if (RetainPtr audioRenderer = protectedThis->audioRendererFor(trackId); audioRenderer && !protectedThis->hasRequestedAudioDataWhenReady(trackId))
+                        [audioRenderer stopRequestingMediaData];
                 }
             });
             [audioRenderer requestMediaDataWhenReadyOnQueue:mainDispatchQueueSingleton() usingBlock:handler.get()];
@@ -332,6 +344,7 @@ void AudioVideoRendererAVFObjC::requestMediaDataWhenReady(TrackIdentifier trackI
 
 void AudioVideoRendererAVFObjC::stopRequestingMediaData(TrackIdentifier trackId)
 {
+    DEBUG_LOG(LOGIDENTIFIER);
     auto type = typeOf(trackId);
     if (!type)
         return;
@@ -1036,6 +1049,28 @@ void AudioVideoRendererAVFObjC::setHasAvailableAudioSample(TrackIdentifier track
     properties.hasAudibleSample = flag;
 
     updateAllRenderersHaveAvailableSamples();
+}
+
+void AudioVideoRendererAVFObjC::setHasRequestedAudioDataWhenReady(TrackIdentifier trackId, bool flag)
+{
+    DEBUG_LOG(LOGIDENTIFIER, "trackId", toString(trackId));
+    auto it = m_audioTracksMap.find(trackId);
+    if (it == m_audioTracksMap.end())
+        return;
+    auto& properties = it->value;
+    if (properties.hasRequestedAudioDataWhenReady == flag)
+        return;
+    DEBUG_LOG(LOGIDENTIFIER, flag);
+    properties.hasRequestedAudioDataWhenReady = flag;
+}
+
+bool AudioVideoRendererAVFObjC::hasRequestedAudioDataWhenReady(TrackIdentifier trackId)
+{
+    DEBUG_LOG(LOGIDENTIFIER, "trackId", toString(trackId));
+    auto it = m_audioTracksMap.find(trackId);
+    if (it == m_audioTracksMap.end())
+        return false;
+    return it->value.hasRequestedAudioDataWhenReady;
 }
 
 void AudioVideoRendererAVFObjC::updateAllRenderersHaveAvailableSamples()
