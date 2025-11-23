@@ -126,7 +126,9 @@ public:
     unsigned numberOfOutputs() const { return m_outputs.size(); }
 
     AudioNodeInput* input(unsigned);
+    CheckedPtr<AudioNodeInput> checkedInput(unsigned);
     AudioNodeOutput* output(unsigned);
+    CheckedPtr<AudioNodeOutput> checkedOutput(unsigned);
 
     // Called from main thread by corresponding JavaScript methods.
     ExceptionOr<void> connect(AudioNode&, unsigned outputIndex, unsigned inputIndex);
@@ -254,7 +256,7 @@ private:
 
     WeakOrStrongContext m_context;
 
-    Vector<std::unique_ptr<AudioNodeInput>> m_inputs;
+    Vector<Ref<AudioNodeInput>> m_inputs;
     Vector<std::unique_ptr<AudioNodeOutput>> m_outputs;
 
     double m_lastProcessingTime { -1 };

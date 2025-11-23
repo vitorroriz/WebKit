@@ -787,12 +787,12 @@ void BaseAudioContext::deleteMarkedNodes()
         // Before deleting the node, clear out any AudioNodeInputs from m_dirtySummingJunctions.
         unsigned numberOfInputs = node->numberOfInputs();
         for (unsigned i = 0; i < numberOfInputs; ++i)
-            m_dirtySummingJunctions.remove(node->input(i));
+            m_dirtySummingJunctions.remove(node->checkedInput(i).get());
 
         // Before deleting the node, clear out any AudioNodeOutputs from m_dirtyAudioNodeOutputs.
         unsigned numberOfOutputs = node->numberOfOutputs();
         for (unsigned i = 0; i < numberOfOutputs; ++i)
-            m_dirtyAudioNodeOutputs.remove(node->output(i));
+            m_dirtyAudioNodeOutputs.remove(node->checkedOutput(i).get());
 
         ASSERT_WITH_MESSAGE(node->nodeType() != AudioNode::NodeTypeDestination, "Destination node is owned by the BaseAudioContext");
 

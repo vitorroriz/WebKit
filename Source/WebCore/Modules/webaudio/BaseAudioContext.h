@@ -190,8 +190,8 @@ public:
     // Thread Safety and Graph Locking:
     //
     
-    void setAudioThread(Thread& thread) { m_audioThread = &thread; } // FIXME: check either not initialized or the same
-    bool isAudioThread() const { return m_audioThread == &Thread::currentSingleton(); }
+    void setAudioThread(Thread& thread) { m_audioThreadUID = thread.uid(); } // FIXME: check either not initialized or the same
+    bool isAudioThread() const { return m_audioThreadUID == Thread::currentSingleton().uid(); }
 
     // Returns true only after the audio thread has been started and then shutdown.
     bool isAudioThreadFinished() const { return m_isAudioThreadFinished; }
@@ -354,8 +354,8 @@ private:
     Vector<CheckedPtr<AudioNode>> m_nodesToDelete;
 
     // Only accessed when the graph lock is held.
-    HashSet<AudioSummingJunction*> m_dirtySummingJunctions;
-    HashSet<AudioNodeOutput*> m_dirtyAudioNodeOutputs;
+    HashSet<CheckedPtr<AudioSummingJunction>> m_dirtySummingJunctions;
+    HashSet<CheckedPtr<AudioNodeOutput>> m_dirtyAudioNodeOutputs;
 
     // For the sake of thread safety, we maintain a seperate Vector of automatic pull nodes for rendering in m_renderingAutomaticPullNodes.
     // It will be copied from m_automaticPullNodes by updateAutomaticPullNodes() at the very start or end of the rendering quantum.
@@ -367,7 +367,7 @@ private:
 
     const Ref<AudioListener> m_listener;
 
-    std::atomic<Thread*> m_audioThread;
+    std::atomic<uint32_t> m_audioThreadUID { 0 };
 
     mutable RecursiveLock m_graphLock;
 
