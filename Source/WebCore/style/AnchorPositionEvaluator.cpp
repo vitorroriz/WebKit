@@ -1663,7 +1663,7 @@ bool AnchorPositionEvaluator::isImplicitAnchor(const RenderStyle& style)
         if (!pseudoElementStyle)
             return false;
         // If we have an explicit anchor name then there is no need for an implicit anchor.
-        if (pseudoElementStyle->positionAnchor())
+        if (!pseudoElementStyle->positionAnchor().isAuto())
             return false;
 
         return pseudoElementStyle->usesAnchorFunctions() || isLayoutTimeAnchorPositioned(*pseudoElementStyle);
@@ -1673,8 +1673,8 @@ bool AnchorPositionEvaluator::isImplicitAnchor(const RenderStyle& style)
 
 ScopedName AnchorPositionEvaluator::defaultAnchorName(const RenderStyle& style)
 {
-    if (style.positionAnchor())
-        return *style.positionAnchor();
+    if (auto name = style.positionAnchor().tryName())
+        return *name;
     return implicitAnchorElementName();
 }
 

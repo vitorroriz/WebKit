@@ -314,6 +314,7 @@ struct PaddingEdge;
 struct PageSize;
 struct Perspective;
 struct Position;
+struct PositionAnchor;
 struct PositionArea;
 struct PositionVisibility;
 struct PositionX;
@@ -2402,9 +2403,9 @@ public:
     inline const NameScope& anchorScope() const;
     inline void setAnchorScope(const NameScope&);
 
-    static inline std::optional<Style::ScopedName> initialPositionAnchor();
-    inline const std::optional<Style::ScopedName>& positionAnchor() const;
-    inline void setPositionAnchor(const std::optional<Style::ScopedName>&);
+    static inline Style::PositionAnchor initialPositionAnchor();
+    inline const Style::PositionAnchor& positionAnchor() const;
+    inline void setPositionAnchor(Style::PositionAnchor&&);
 
     static inline Style::PositionArea initialPositionArea();
     inline Style::PositionArea positionArea() const;

@@ -12125,7 +12125,7 @@
             ],
             "codegen-properties": {
                 "settings-flag": "cssAnchorPositioningEnabled",
-                "style-converter": "PositionAnchor",
+                "style-converter": "StyleType<PositionAnchor>",
                 "parser-grammar": "auto | <dashed-ident>"
             },
             "specification": {

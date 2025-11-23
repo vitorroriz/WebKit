@@ -52,6 +52,7 @@
 #include <WebCore/StylePageSize.h>
 #include <WebCore/StylePerspective.h>
 #include <WebCore/StylePerspectiveOrigin.h>
+#include <WebCore/StylePositionAnchor.h>
 #include <WebCore/StylePositionArea.h>
 #include <WebCore/StylePositionVisibility.h>
 #include <WebCore/StylePrimitiveNumericTypes.h>
@@ -227,7 +228,7 @@ public:
 
     Style::AnchorNames anchorNames;
     NameScope anchorScope;
-    std::optional<Style::ScopedName> positionAnchor;
+    Style::PositionAnchor positionAnchor;
     Style::PositionArea positionArea;
     FixedVector<Style::PositionTryFallback> positionTryFallbacks;
     std::optional<size_t> usedPositionOptionIndex;

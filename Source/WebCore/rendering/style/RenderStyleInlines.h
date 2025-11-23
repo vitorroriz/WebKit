@@ -526,7 +526,7 @@ inline Style::PerspectiveOriginX RenderStyle::initialPerspectiveOriginX() { retu
 inline Style::PerspectiveOriginY RenderStyle::initialPerspectiveOriginY() { return 50_css_percentage; }
 constexpr PointerEvents RenderStyle::initialPointerEvents() { return PointerEvents::Auto; }
 constexpr PositionType RenderStyle::initialPosition() { return PositionType::Static; }
-inline std::optional<Style::ScopedName> RenderStyle::initialPositionAnchor() { return { }; }
+inline Style::PositionAnchor RenderStyle::initialPositionAnchor() { return CSS::Keyword::Auto { }; }
 inline Style::PositionArea RenderStyle::initialPositionArea() { return CSS::Keyword::None { }; }
 inline FixedVector<Style::PositionTryFallback> RenderStyle::initialPositionTryFallbacks() { return { }; }
 constexpr Style::PositionTryOrder RenderStyle::initialPositionTryOrder() { return Style::PositionTryOrder::Normal; }
@@ -756,7 +756,7 @@ inline const Style::Perspective& RenderStyle::perspective() const { return m_non
 inline const Style::PerspectiveOrigin& RenderStyle::perspectiveOrigin() const { return m_nonInheritedData->rareData->perspectiveOrigin; }
 inline const Style::PerspectiveOriginX& RenderStyle::perspectiveOriginX() const { return m_nonInheritedData->rareData->perspectiveOrigin.x; }
 inline const Style::PerspectiveOriginY& RenderStyle::perspectiveOriginY() const { return m_nonInheritedData->rareData->perspectiveOrigin.y; }
-inline const std::optional<Style::ScopedName>& RenderStyle::positionAnchor() const { return m_nonInheritedData->rareData->positionAnchor; }
+inline const Style::PositionAnchor& RenderStyle::positionAnchor() const { return m_nonInheritedData->rareData->positionAnchor; }
 inline Style::PositionArea RenderStyle::positionArea() const { return m_nonInheritedData->rareData->positionArea; }
 inline Style::PositionTryOrder RenderStyle::positionTryOrder() const { return static_cast<Style::PositionTryOrder>(m_nonInheritedData->rareData->positionTryOrder); }
 inline Style::PositionVisibility RenderStyle::positionVisibility() const { return Style::PositionVisibility::fromRaw(m_nonInheritedData->rareData->positionVisibility); }
