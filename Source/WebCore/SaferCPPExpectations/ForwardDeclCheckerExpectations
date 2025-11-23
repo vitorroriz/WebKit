@@ -87,7 +87,6 @@ rendering/RenderLayerBacking.cpp
 rendering/RenderLayerCompositor.cpp
 rendering/RenderTableCellInlines.h
 rendering/RenderTextLineBoxes.h
-rendering/TableLayout.h
 rendering/style/StyleCachedImage.cpp
 rendering/svg/SVGRenderingContext.h
 style/StyleExtractorState.h

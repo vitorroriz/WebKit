@@ -63,7 +63,6 @@ rendering/RenderLayoutState.h
 rendering/RenderSelectionGeometry.h
 rendering/RenderTableSection.h
 rendering/RenderText.cpp
-rendering/TableLayout.h
 rendering/TextDecorationPainter.h
 [ iOS ] rendering/ios/RenderThemeIOS.mm
 rendering/line/BreakingContext.h
