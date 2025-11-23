@@ -122,6 +122,7 @@ inline ItemTolerance forwardInheritedValue(const ItemTolerance& value) { auto co
 inline LetterSpacing forwardInheritedValue(const LetterSpacing& value) { auto copy = value; return copy; }
 inline LineHeight forwardInheritedValue(const LineHeight& value) { auto copy = value; return copy; }
 inline ListStyleType forwardInheritedValue(const ListStyleType& value) { auto copy = value; return copy; }
+inline NameScope forwardInheritedValue(const NameScope& value) { auto copy = value; return copy; }
 inline OffsetAnchor forwardInheritedValue(const OffsetAnchor& value) { auto copy = value; return copy; }
 inline OffsetDistance forwardInheritedValue(const OffsetDistance& value) { auto copy = value; return copy; }
 inline OffsetPath forwardInheritedValue(const OffsetPath& value) { auto copy = value; return copy; }

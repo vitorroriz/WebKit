@@ -72,7 +72,7 @@ inline void RenderStyle::setAlignContent(Style::AlignContent alignContent) { SET
 inline void RenderStyle::setAlignItems(Style::AlignItems alignItems) { SET_NESTED(m_nonInheritedData, miscData, alignItems, alignItems); }
 inline void RenderStyle::setAlignSelf(Style::AlignSelf alignSelf) { SET_NESTED(m_nonInheritedData, miscData, alignSelf, alignSelf); }
 inline void RenderStyle::setAnchorNames(Style::AnchorNames&& names) { SET_NESTED(m_nonInheritedData, rareData, anchorNames, WTFMove(names)); }
-inline void RenderStyle::setAnchorScope(const NameScope& scope) { SET_NESTED(m_nonInheritedData, rareData, anchorScope, scope); }
+inline void RenderStyle::setAnchorScope(Style::NameScope&& scope) { SET_NESTED(m_nonInheritedData, rareData, anchorScope, WTFMove(scope)); }
 inline void RenderStyle::setAppearance(StyleAppearance appearance) { SET_NESTED_PAIR(m_nonInheritedData, miscData, appearance, static_cast<unsigned>(appearance), usedAppearance, static_cast<unsigned>(appearance)); }
 inline void RenderStyle::setAppleColorFilter(Style::AppleColorFilter&& appleColorFilter) { SET_NESTED(m_rareInheritedData, appleColorFilter, appleColorFilter, WTFMove(appleColorFilter)); }
 #if HAVE(CORE_MATERIAL)
@@ -277,7 +277,7 @@ inline void RenderStyle::setVerticalAlign(Style::VerticalAlign&& align) { SET_NE
 inline void RenderStyle::setViewTimelineAxes(Style::ProgressTimelineAxes&& axes) { SET_NESTED(m_nonInheritedData, rareData, viewTimelineAxes, WTFMove(axes)); }
 inline void RenderStyle::setViewTimelineInsets(Style::ViewTimelineInsets&& insets) { SET_NESTED(m_nonInheritedData, rareData, viewTimelineInsets, WTFMove(insets)); }
 inline void RenderStyle::setViewTimelineNames(Style::ProgressTimelineNames&& names) { SET_NESTED(m_nonInheritedData, rareData, viewTimelineNames, WTFMove(names)); }
-inline void RenderStyle::setTimelineScope(const NameScope& scope) { SET_NESTED(m_nonInheritedData, rareData, timelineScope, scope); }
+inline void RenderStyle::setTimelineScope(Style::NameScope&& scope) { SET_NESTED(m_nonInheritedData, rareData, timelineScope, WTFMove(scope)); }
 inline void RenderStyle::setScrollbarColor(Style::ScrollbarColor&& color) { SET(m_rareInheritedData, scrollbarColor, WTFMove(color)); }
 inline void RenderStyle::setScrollbarGutter(Style::ScrollbarGutter&& gutter) { SET_NESTED(m_nonInheritedData, rareData, scrollbarGutter, WTFMove(gutter)); }
 inline void RenderStyle::setScrollbarWidth(Style::ScrollbarWidth width) { SET_NESTED(m_nonInheritedData, rareData, scrollbarWidth, static_cast<unsigned>(width.value)); }

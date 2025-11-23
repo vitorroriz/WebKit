@@ -1068,7 +1068,7 @@ static CheckedPtr<const Element> anchorScopeForAnchorName(const RenderBoxModelOb
             continue;
         const auto& currentAncestorAnchorScope = currentAncestorStyle->anchorScope();
 
-        if (NameScope::Type::None == currentAncestorAnchorScope.type)
+        if (Style::NameScope::Type::None == currentAncestorAnchorScope.type)
             continue;
 
         auto styleScope = Scope::forOrdinal(*currentAncestor, currentAncestorAnchorScope.scopeOrdinal);
@@ -1076,8 +1076,8 @@ static CheckedPtr<const Element> anchorScopeForAnchorName(const RenderBoxModelOb
         if (anchorName.scopeIdentifier() != styleScope->identifier())
             continue;
 
-        if (NameScope::Type::All == currentAncestorAnchorScope.type
-            || currentAncestorAnchorScope.names.contains(anchorName.name()))
+        if (Style::NameScope::Type::All == currentAncestorAnchorScope.type
+            || currentAncestorAnchorScope.names.contains(CustomIdentifier { anchorName.name() }))
             return currentAncestor;
     }
 

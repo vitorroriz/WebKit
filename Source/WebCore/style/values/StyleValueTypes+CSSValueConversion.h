@@ -142,6 +142,32 @@ template<typename T> struct CSSValueConversion<CommaSeparatedEnumSet<T>> {
     }
 };
 
+// Specialization for `SpaceSeparatedListHashSet`.
+template<typename T> struct CSSValueConversion<SpaceSeparatedListHashSet<T>> {
+    SpaceSeparatedListHashSet<T> operator()(BuilderState& state, const CSSValue& value)
+    {
+        if (auto list = dynamicDowncast<CSSValueList>(value)) {
+            return SpaceSeparatedListHashSet<T>::map(*list, [&](const CSSValue& element) {
+                return toStyleFromCSSValue<T>(state, element);
+            });
+        }
+        return { toStyleFromCSSValue<T>(state, value) };
+    }
+};
+
+// Specialization for `CommaSeparatedListHashSet`.
+template<typename T> struct CSSValueConversion<CommaSeparatedListHashSet<T>> {
+    CommaSeparatedListHashSet<T> operator()(BuilderState& state, const CSSValue& value)
+    {
+        if (auto list = dynamicDowncast<CSSValueList>(value)) {
+            return CommaSeparatedListHashSet<T>::map(*list, [&](const CSSValue& element) {
+                return toStyleFromCSSValue<T>(state, element);
+            });
+        }
+        return { toStyleFromCSSValue<T>(state, value) };
+    }
+};
+
 // Specialization for `SpaceSeparatedFixedVector`.
 template<typename StyleType> struct CSSValueConversion<SpaceSeparatedFixedVector<StyleType>> {
     SpaceSeparatedFixedVector<StyleType> operator()(BuilderState& state, const CSSValue& value)

@@ -3176,7 +3176,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     rendering/style/CounterDirectives.h
     rendering/style/GridArea.h
     rendering/style/GridSpan.h
-    rendering/style/NameScope.h
     rendering/style/OutlineValue.h
     rendering/style/PositionTryFallback.h
     rendering/style/PositionTryOrder.h
@@ -3240,6 +3239,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/StyleForVisitedLink.h
     style/StyleInterpolationClient.h
     style/StyleInterpolationContext.h
+    style/StyleNameScope.h
     style/StyleScope.h
     style/StyleScopeIdentifier.h
     style/StyleScopeOrdinal.h

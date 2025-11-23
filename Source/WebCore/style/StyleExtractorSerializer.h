@@ -67,7 +67,6 @@ public:
     // MARK: Shared serializations
 
     static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
-    static void serializeNameScope(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const NameScope&);
 
     // MARK: MaskLayer property serializations
 
@@ -196,30 +195,6 @@ inline void ExtractorSerializer::serializePositionTryFallbacks(ExtractorState& s
     }
 
     builder.append(CSSValueList::createCommaSeparated(WTFMove(list))->cssText(context));
-}
-
-inline void ExtractorSerializer::serializeNameScope(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const NameScope& scope)
-{
-    switch (scope.type) {
-    case NameScope::Type::None:
-        serializationForCSS(builder, context, state.style, CSS::Keyword::None { });
-        return;
-    case NameScope::Type::All:
-        serializationForCSS(builder, context, state.style, CSS::Keyword::All { });
-        return;
-    case NameScope::Type::Ident:
-        if (scope.names.isEmpty()) {
-            serializationForCSS(builder, context, state.style, CSS::Keyword::None { });
-            return;
-        }
-
-        builder.append(interleave(scope.names, [&](auto& builder, auto& name) {
-            serializationForCSS(builder, context, state.style, CustomIdentifier { name });
-        }, ", "_s));
-        return;
-    }
-
-    RELEASE_ASSERT_NOT_REACHED();
 }
 
 // MARK: - MaskLayer property serializations

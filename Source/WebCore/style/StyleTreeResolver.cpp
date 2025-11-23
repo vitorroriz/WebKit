@@ -1904,7 +1904,7 @@ void TreeResolver::collectChangedAnchorNames(const RenderStyle& newStyle, const 
             case NameScope::Type::Ident:
                 // A scope change changes interpretation of these names.
                 for (auto& name : style.anchorScope().names)
-                    m_changedAnchorNames.add(name);
+                    m_changedAnchorNames.add(name.value);
                 break;
             }
         };

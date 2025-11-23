@@ -27,7 +27,6 @@
 
 #include <WebCore/CSSPropertyNames.h>
 #include <WebCore/CounterDirectives.h>
-#include <WebCore/NameScope.h>
 #include <WebCore/PositionTryFallback.h>
 #include <WebCore/ScopedName.h>
 #include <WebCore/ScrollTypes.h>
@@ -44,6 +43,7 @@
 #include <WebCore/StyleMarginTrim.h>
 #include <WebCore/StyleMaskBorder.h>
 #include <WebCore/StyleMaximumLines.h>
+#include <WebCore/StyleNameScope.h>
 #include <WebCore/StyleOffsetAnchor.h>
 #include <WebCore/StyleOffsetDistance.h>
 #include <WebCore/StyleOffsetPath.h>
@@ -216,7 +216,7 @@ public:
     Style::ProgressTimelineAxes viewTimelineAxes;
     Style::ProgressTimelineNames viewTimelineNames;
 
-    NameScope timelineScope;
+    Style::NameScope timelineScope;
 
     Style::ScrollbarGutter scrollbarGutter;
 
@@ -227,7 +227,7 @@ public:
     AtomString pseudoElementNameArgument;
 
     Style::AnchorNames anchorNames;
-    NameScope anchorScope;
+    Style::NameScope anchorScope;
     Style::PositionAnchor positionAnchor;
     Style::PositionArea positionArea;
     FixedVector<Style::PositionTryFallback> positionTryFallbacks;

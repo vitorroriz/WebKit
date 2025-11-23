@@ -34,6 +34,7 @@
 #include <utility>
 #include <wtf/EnumSet.h>
 #include <wtf/FixedVector.h>
+#include <wtf/ListHashSet.h>
 #include <wtf/Markable.h>
 #include <wtf/RefCountedFixedVector.h>
 #include <wtf/StdLibExtras.h>
@@ -355,14 +356,14 @@ struct CommaSeparatedEnumSet {
     using const_iterator = typename Container::iterator;
     using value_type = T;
 
-    CommaSeparatedEnumSet() = default;
+    constexpr CommaSeparatedEnumSet() = default;
 
-    CommaSeparatedEnumSet(std::initializer_list<T> initializerList)
+    constexpr CommaSeparatedEnumSet(std::initializer_list<T> initializerList)
         : value { initializerList }
     {
     }
 
-    CommaSeparatedEnumSet(Container&& value)
+    constexpr CommaSeparatedEnumSet(Container&& value)
         : value { WTFMove(value) }
     {
     }
@@ -383,11 +384,11 @@ struct CommaSeparatedEnumSet {
 
     constexpr StorageType toRaw() const { return value.toRaw(); }
 
-    const_iterator begin() const { return value.begin(); }
-    const_iterator end() const { return value.end(); }
+    constexpr const_iterator begin() const { return value.begin(); }
+    constexpr const_iterator end() const { return value.end(); }
 
-    bool isEmpty() const { return value.isEmpty(); }
-    size_t size() const { return value.size(); }
+    constexpr bool isEmpty() const { return value.isEmpty(); }
+    constexpr size_t size() const { return value.size(); }
 
     constexpr bool contains(T e) const
     {
@@ -430,6 +431,92 @@ struct CommaSeparatedEnumSet {
 };
 template<typename T> inline constexpr auto TreatAsRangeLike<CommaSeparatedEnumSet<T>> = true;
 template<typename T> inline constexpr auto SerializationSeparator<CommaSeparatedEnumSet<T>> = SerializationSeparatorType::Comma;
+
+// Wraps a ListHashSet, semantically marking it as serializing as "space separated".
+template<typename T>
+struct SpaceSeparatedListHashSet {
+    using Container = ListHashSet<T>;
+    using const_iterator = typename Container::const_iterator;
+    using value_type = T;
+
+    constexpr SpaceSeparatedListHashSet() = default;
+
+    constexpr SpaceSeparatedListHashSet(std::initializer_list<T> initializerList)
+        : value { initializerList }
+    {
+    }
+
+    constexpr SpaceSeparatedListHashSet(Container&& value)
+        : value { WTFMove(value) }
+    {
+    }
+
+    template<typename SizedRange, typename Mapper>
+    static SpaceSeparatedListHashSet map(SizedRange&& range, NOESCAPE Mapper&& mapper)
+    {
+        Container result;
+        for (auto&& value : range)
+            result.add(mapper(value));
+        return result;
+    }
+
+    constexpr const_iterator begin() const { return value.begin(); }
+    constexpr const_iterator end() const { return value.end(); }
+
+    constexpr bool isEmpty() const { return value.isEmpty(); }
+    constexpr size_t size() const { return value.size(); }
+
+    constexpr bool contains(const T& item) const { return value.contains(item); }
+
+    constexpr bool operator==(const SpaceSeparatedListHashSet&) const = default;
+
+    Container value;
+};
+template<typename T> inline constexpr auto TreatAsRangeLike<SpaceSeparatedListHashSet<T>> = true;
+template<typename T> inline constexpr auto SerializationSeparator<SpaceSeparatedListHashSet<T>> = SerializationSeparatorType::Space;
+
+// Wraps a ListHashSet, semantically marking it as serializing as "comma separated".
+template<typename T>
+struct CommaSeparatedListHashSet {
+    using Container = ListHashSet<T>;
+    using const_iterator = typename Container::const_iterator;
+    using value_type = T;
+
+    constexpr CommaSeparatedListHashSet() = default;
+
+    constexpr CommaSeparatedListHashSet(std::initializer_list<T> initializerList)
+        : value { initializerList }
+    {
+    }
+
+    constexpr CommaSeparatedListHashSet(Container&& value)
+        : value { WTFMove(value) }
+    {
+    }
+
+    template<typename SizedRange, typename Mapper>
+    static CommaSeparatedListHashSet map(SizedRange&& range, NOESCAPE Mapper&& mapper)
+    {
+        Container result;
+        for (auto&& value : range)
+            result.add(mapper(value));
+        return result;
+    }
+
+    constexpr const_iterator begin() const { return value.begin(); }
+    constexpr const_iterator end() const { return value.end(); }
+
+    constexpr bool isEmpty() const { return value.isEmpty(); }
+    constexpr size_t size() const { return value.size(); }
+
+    constexpr bool contains(const T& item) const { return value.contains(item); }
+
+    constexpr bool operator==(const CommaSeparatedListHashSet&) const = default;
+
+    Container value;
+};
+template<typename T> inline constexpr auto TreatAsRangeLike<CommaSeparatedListHashSet<T>> = true;
+template<typename T> inline constexpr auto SerializationSeparator<CommaSeparatedListHashSet<T>> = SerializationSeparatorType::Comma;
 
 // Wraps a variable number of elements of a single type, semantically marking them as serializing as "space separated".
 template<typename T, size_t inlineCapacity = 0> struct SpaceSeparatedVector {
@@ -1551,6 +1638,18 @@ template<typename T> TextStream& operator<<(TextStream& ts, const CommaSeparated
     return ts;
 }
 
+template<typename T> TextStream& operator<<(TextStream& ts, const SpaceSeparatedListHashSet<T>& value)
+{
+    logForCSSOnRangeLike(ts, value, SerializationSeparatorString<SpaceSeparatedListHashSet<T>>);
+    return ts;
+}
+
+template<typename T> TextStream& operator<<(TextStream& ts, const CommaSeparatedListHashSet<T>& value)
+{
+    logForCSSOnRangeLike(ts, value, SerializationSeparatorString<CommaSeparatedListHashSet<T>>);
+    return ts;
+}
+
 template<typename T, size_t inlineCapacity> TextStream& operator<<(TextStream& ts, const SpaceSeparatedVector<T, inlineCapacity>& value)
 {
     logForCSSOnRangeLike(ts, value, SerializationSeparatorString<SpaceSeparatedVector<T, inlineCapacity>>);
@@ -1751,6 +1850,12 @@ struct supports_text_stream_insertion<WebCore::SpaceSeparatedEnumSet<T>> : suppo
 
 template<typename T>
 struct supports_text_stream_insertion<WebCore::CommaSeparatedEnumSet<T>> : supports_text_stream_insertion<T> { };
+
+template<typename T>
+struct supports_text_stream_insertion<WebCore::SpaceSeparatedListHashSet<T>> : supports_text_stream_insertion<T> { };
+
+template<typename T>
+struct supports_text_stream_insertion<WebCore::CommaSeparatedListHashSet<T>> : supports_text_stream_insertion<T> { };
 
 template<typename T, size_t inlineCapacity>
 struct supports_text_stream_insertion<WebCore::SpaceSeparatedVector<T, inlineCapacity>> : supports_text_stream_insertion<T> { };

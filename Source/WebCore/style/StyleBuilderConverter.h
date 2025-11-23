@@ -117,8 +117,6 @@ public:
     static TextAlignLast convertTextAlignLast(BuilderState&, const CSSValue&);
     static Resize convertResize(BuilderState&, const CSSValue&);
 
-    static NameScope convertNameScope(BuilderState&, const CSSValue&);
-
     static FixedVector<PositionTryFallback> convertPositionTryFallbacks(BuilderState&, const CSSValue&);
 
     static MaskMode convertSingleMaskMode(BuilderState&, const CSSValue&);
@@ -205,30 +203,6 @@ inline float zoomWithTextZoomFactor(BuilderState& builderState)
         return usedZoom * textZoomFactor;
     }
     return builderState.cssToLengthConversionData().zoom();
-}
-
-inline NameScope BuilderConverter::convertNameScope(BuilderState& builderState, const CSSValue& value)
-{
-    if (auto* primitiveValue = dynamicDowncast<CSSPrimitiveValue>(value)) {
-        switch (primitiveValue->valueID()) {
-        case CSSValueNone:
-            return { };
-        case CSSValueAll:
-            return { NameScope::Type::All, { }, builderState.styleScopeOrdinal() };
-        default:
-            return { NameScope::Type::Ident, { AtomString { primitiveValue->stringValue() } }, builderState.styleScopeOrdinal() };
-        }
-    }
-
-    auto list = requiredListDowncast<CSSValueList, CSSPrimitiveValue>(builderState, value);
-    if (!list)
-        return { };
-
-    ListHashSet<AtomString> nameHashSet;
-    for (auto& name : *list)
-        nameHashSet.add(AtomString { name.stringValue() });
-
-    return { NameScope::Type::Ident, WTFMove(nameHashSet), builderState.styleScopeOrdinal() };
 }
 
 inline FixedVector<PositionTryFallback> BuilderConverter::convertPositionTryFallbacks(BuilderState& builderState, const CSSValue& value)

@@ -3152,6 +3152,7 @@ style/StyleExtractor.cpp
 style/StyleFontSizeFunctions.cpp
 style/StyleInterpolation.cpp
 style/StyleInvalidator.cpp
+style/StyleNameScope.cpp
 style/StylePendingResources.cpp
 style/StyleRelations.cpp
 style/StyleResolveForDocument.cpp

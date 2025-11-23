@@ -92,7 +92,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
     , viewTimelineInsets(RenderStyle::initialViewTimelineInsets())
     , viewTimelineAxes(RenderStyle::initialViewTimelineAxes())
     , viewTimelineNames(RenderStyle::initialViewTimelineNames())
-    // timelineScope
+    , timelineScope(RenderStyle::initialTimelineScope())
     , scrollbarGutter(RenderStyle::initialScrollbarGutter())
     , scrollSnapType(RenderStyle::initialScrollSnapType())
     , scrollSnapAlign(RenderStyle::initialScrollSnapAlign())
