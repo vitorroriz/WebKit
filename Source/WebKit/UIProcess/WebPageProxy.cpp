@@ -11174,7 +11174,18 @@ void WebPageProxy::mouseEventHandlingCompleted(std::optional<WebEventType> event
 {
     if (remoteUserInputEventData) {
         CheckedRef event = internals().mouseEventQueue.first();
-        event->setPosition(remoteUserInputEventData->transformedPoint);
+        const auto originalPosition = event->position();
+        const auto transformedPosition = remoteUserInputEventData->transformedPoint;
+        event->setPosition(transformedPosition);
+
+        const auto offset = originalPosition - transformedPosition;
+        auto coalescedEvents = event->coalescedEvents();
+        for (CheckedRef coalescedEvent : coalescedEvents) {
+            const auto adjustedPosition = coalescedEvent->position() - offset;
+            coalescedEvent->setPosition(adjustedPosition);
+        }
+        event->setCoalescedEvents(coalescedEvents);
+
         // FIXME: If these sandbox extensions are important, find a way to get them to the iframe process.
         sendMouseEvent(remoteUserInputEventData->targetFrameID, event, { });
         return;
