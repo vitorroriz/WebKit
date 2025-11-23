@@ -572,8 +572,7 @@ void Line::appendBlock(const InlineItem& blockItem, InlineLayoutUnit marginBoxLo
     for (auto& run : m_runs)
         ASSERT(run.isLineSpanningInlineBoxStart());
 #endif
-    // Let's remove any spanning inline boxes. Lines with block content should only contain the block content itself.
-    m_runs.clear();
+    // Cloned decoration should not show up on block lines. Make the line hug the block level element.
     m_contentLogicalWidth = marginBoxLogicalWidth;
     m_runs.append({ blockItem, blockItem.style(), { }, marginBoxLogicalWidth });
 }

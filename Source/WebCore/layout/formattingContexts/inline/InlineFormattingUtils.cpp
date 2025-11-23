@@ -612,8 +612,11 @@ LineEndingTruncationPolicy InlineFormattingUtils::lineEndingTruncationPolicy(con
 
 std::optional<LineLayoutResult::InlineContentEnding> InlineFormattingUtils::inlineContentEnding(const Line::Result& lineContent)
 {
-    if (!lineContent.runs.isEmpty() && lineContent.runs[0].isBlock()) {
-        ASSERT(lineContent.runs.size() == 1);
+    if (!lineContent.runs.isEmpty() && lineContent.runs.last().isBlock()) {
+#if ASSERT_ENABLED
+    for (auto& run : lineContent.runs)
+        ASSERT(run.isLineSpanningInlineBoxStart() || run.isBlock());
+#endif
         return { };
     }
 
