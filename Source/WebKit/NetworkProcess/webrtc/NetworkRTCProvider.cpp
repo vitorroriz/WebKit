@@ -317,7 +317,7 @@ webrtc::Thread& NetworkRTCProvider::rtcNetworkThread()
         auto result = networkThread->Start();
         ASSERT_UNUSED(result, result);
         return networkThread;
-    });
+    }();
     return *networkThread.get();
 }
 
