@@ -1031,11 +1031,9 @@ void MediaPlayerPrivateWebM::notifyClientWhenReadyForMoreSamples(TrackID trackId
     auto trackIdentifier = maybeTrackIdentifierFor(trackId);
     if (!trackIdentifier)
         return; // track hasn't been enabled yet.
-    m_renderer->requestMediaDataWhenReady(*trackIdentifier, [weakThis = ThreadSafeWeakPtr { *this }, trackId](AudioVideoRenderer::TrackIdentifier) {
-        ensureOnMainThread([weakThis, trackId] {
-            if (RefPtr protectedThis = weakThis.get())
-                protectedThis->didBecomeReadyForMoreSamples(trackId);
-        });
+    m_renderer->requestMediaDataWhenReady(*trackIdentifier)->whenSettled(RunLoop::mainSingleton(), [weakThis = ThreadSafeWeakPtr { *this }, trackId](auto&& result) {
+        if (RefPtr protectedThis = weakThis.get(); protectedThis && result)
+            protectedThis->didBecomeReadyForMoreSamples(trackId);
     });
 }
 

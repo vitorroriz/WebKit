@@ -42,7 +42,6 @@ messages -> RemoteAudioVideoRendererProxyManager {
 
     EnqueueSample(WebKit::RemoteAudioVideoRendererIdentifier identifier, WebCore::SamplesRendererTrackIdentifier trackIdentifier, WebCore::MediaSamplesBlock block, std::optional<MediaTime> upcomingMinimumTime) -> (bool readyForMoreData);
     RequestMediaDataWhenReady(WebKit::RemoteAudioVideoRendererIdentifier identifier, WebCore::SamplesRendererTrackIdentifier trackIdentifier)
-    StopRequestingMediaData(WebKit::RemoteAudioVideoRendererIdentifier identifier, WebCore::SamplesRendererTrackIdentifier trackIdentifier)
 
     NotifyTimeReachedAndStall(WebKit::RemoteAudioVideoRendererIdentifier identifier, MediaTime time)
     CancelTimeReachedAction(WebKit::RemoteAudioVideoRendererIdentifier identifier)

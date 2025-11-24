@@ -96,7 +96,6 @@ private:
 
     void enqueueSample(RemoteAudioVideoRendererIdentifier, TrackIdentifier, WebCore::MediaSamplesBlock&&, std::optional<MediaTime>, CompletionHandler<void(bool)>&&);
     void requestMediaDataWhenReady(RemoteAudioVideoRendererIdentifier, TrackIdentifier);
-    void stopRequestingMediaData(RemoteAudioVideoRendererIdentifier, TrackIdentifier);
 
     void notifyTimeReachedAndStall(RemoteAudioVideoRendererIdentifier, const MediaTime&);
     void cancelTimeReachedAction(RemoteAudioVideoRendererIdentifier);

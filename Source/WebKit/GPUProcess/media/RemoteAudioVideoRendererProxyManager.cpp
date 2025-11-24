@@ -242,9 +242,11 @@ void RemoteAudioVideoRendererProxyManager::requestMediaDataWhenReady(RemoteAudio
     RefPtr renderer = rendererFor(identifier);
     if (!renderer)
         return;
-    renderer->requestMediaDataWhenReady(trackIdentifier, [identifier, weakThis = WeakPtr { *this }](auto trackIdentifier) {
-        if (RefPtr protectedThis = weakThis.get(); protectedThis && protectedThis->m_renderers.contains(identifier))
-            protectedThis->m_gpuConnectionToWebProcess.get()->connection().send(Messages::AudioVideoRendererRemoteMessageReceiver::ReadyForMoreMediaData(trackIdentifier), identifier);
+    renderer->requestMediaDataWhenReady(trackIdentifier)->whenSettled(RunLoop::mainSingleton(), [identifier, trackIdentifier, weakThis = WeakPtr { *this }](auto result) {
+        RefPtr protectedThis = weakThis.get();
+        if (!protectedThis || !result)
+            return;
+        protectedThis->m_gpuConnectionToWebProcess.get()->connection().send(Messages::AudioVideoRendererRemoteMessageReceiver::ReadyForMoreMediaData(trackIdentifier), identifier);
     });
 }
 
@@ -261,12 +263,6 @@ void RemoteAudioVideoRendererProxyManager::enqueueSample(RemoteAudioVideoRendere
         return;
     }
     completionHandler(false);
-}
-
-void RemoteAudioVideoRendererProxyManager::stopRequestingMediaData(RemoteAudioVideoRendererIdentifier identifier, TrackIdentifier trackIdentifier)
-{
-    if (RefPtr renderer = rendererFor(identifier))
-        renderer->stopRequestingMediaData(trackIdentifier);
 }
 
 void RemoteAudioVideoRendererProxyManager::notifyTimeReachedAndStall(RemoteAudioVideoRendererIdentifier identifier, const MediaTime& time)

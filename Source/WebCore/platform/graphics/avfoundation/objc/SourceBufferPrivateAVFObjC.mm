@@ -739,13 +739,9 @@ void SourceBufferPrivateAVFObjC::didBecomeReadyForMoreSamples(TrackID trackId)
 void SourceBufferPrivateAVFObjC::notifyClientWhenReadyForMoreSamples(TrackID trackId)
 {
     if (auto trackIdentifier = trackIdentifierFor(trackId)) {
-        protectedRenderer()->requestMediaDataWhenReady(*trackIdentifier, [weakThis = ThreadSafeWeakPtr { *this }, trackId](auto) {
-            RefPtr protectedThis = weakThis.get();
-            if (!protectedThis)
-                return;
-            protectedThis->ensureWeakOnDispatcher<SourceBufferPrivateAVFObjC>([trackId](auto& buffer) {
-                buffer.didBecomeReadyForMoreSamples(trackId);
-            });
+        protectedRenderer()->requestMediaDataWhenReady(*trackIdentifier)->whenSettled(m_dispatcher, [weakThis = ThreadSafeWeakPtr { *this }, trackId](auto&& result) {
+            if (RefPtr protectedThis = weakThis.get(); protectedThis && result)
+                protectedThis->didBecomeReadyForMoreSamples(trackId);
         });
     }
 }

@@ -514,24 +514,17 @@ bool AudioVideoRendererRemote::isReadyForMoreSamples(TrackIdentifier trackIdenti
     return readyForMoreDataState(trackIdentifier).isReadyForMoreData();
 }
 
-void AudioVideoRendererRemote::requestMediaDataWhenReady(TrackIdentifier trackIdentifier, Function<void(TrackIdentifier)>&& callback)
+Ref<AudioVideoRenderer::RequestPromise> AudioVideoRendererRemote::requestMediaDataWhenReady(TrackIdentifier trackIdentifier)
 {
-    ensureOnDispatcherWithConnection([trackIdentifier, callback = WTFMove(callback)](auto& renderer, auto& connection) mutable {
+    return invokeAsync(queueSingleton(), [weakThis = ThreadSafeWeakPtr { *this }, trackIdentifier] {
         assertIsCurrent(queueSingleton());
-        if (renderer.isReadyForMoreSamples(trackIdentifier)) {
-            callback(trackIdentifier);
-            return;
-        }
-        auto addResult = renderer.m_requestMediaDataWhenReadyDataCallbacks.add(trackIdentifier, nullptr);
-        addResult.iterator->value = WTFMove(callback);
-    });
-}
-
-void AudioVideoRendererRemote::stopRequestingMediaData(TrackIdentifier trackIdentifier)
-{
-    ensureOnDispatcherWithConnection([trackIdentifier](auto& renderer, auto& connection) {
-        assertIsCurrent(queueSingleton());
-        renderer.m_requestMediaDataWhenReadyDataCallbacks.remove(trackIdentifier);
+        RefPtr protectedThis = weakThis.get();
+        if (!protectedThis)
+            return RequestPromise::createAndReject(PlatformMediaError::Cancelled);
+        if (protectedThis->isReadyForMoreSamples(trackIdentifier))
+            return RequestPromise::createAndResolve(trackIdentifier);
+        auto addResult = protectedThis->m_requestMediaDataWhenReadyDataPromises.set(trackIdentifier, makeUnique<RequestPromise::AutoRejectProducer>(PlatformMediaError::Cancelled));
+        return addResult.iterator->value->promise();
     });
 }
 
@@ -687,10 +680,10 @@ void AudioVideoRendererRemote::resolveRequestMediaDataWhenReadyIfNeeded(TrackIde
 
     if (!isReadyForMoreSamples(trackIdentifier))
         return;
-    auto iterator = m_requestMediaDataWhenReadyDataCallbacks.find(trackIdentifier);
-    if (iterator == m_requestMediaDataWhenReadyDataCallbacks.end() || !iterator->value)
+    auto iterator = m_requestMediaDataWhenReadyDataPromises.find(trackIdentifier);
+    if (iterator == m_requestMediaDataWhenReadyDataPromises.end())
         return;
-    iterator->value(trackIdentifier);
+    m_requestMediaDataWhenReadyDataPromises.take(iterator)->resolve(trackIdentifier);
 }
 
 void AudioVideoRendererRemote::requestHostingContext(LayerHostingContextCallback&& completionHandler)

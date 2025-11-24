@@ -157,8 +157,7 @@ private:
 
     void enqueueSample(TrackIdentifier, Ref<WebCore::MediaSample>&&, std::optional<MediaTime>) final;
     bool isReadyForMoreSamples(TrackIdentifier) final;
-    void requestMediaDataWhenReady(TrackIdentifier, Function<void(TrackIdentifier)>&&) final;
-    void stopRequestingMediaData(TrackIdentifier) final;
+    Ref<RequestPromise> requestMediaDataWhenReady(TrackIdentifier) final;
     void notifyTrackNeedsReenqueuing(TrackIdentifier, Function<void(TrackIdentifier, const MediaTime&)>&&) final;
 
     bool timeIsProgressing() const final;
@@ -257,7 +256,7 @@ private:
     Function<void(const MediaTime&, WebCore::FloatSize)> m_videoLayerSizeChangedCallback WTF_GUARDED_BY_CAPABILITY(queueSingleton());
 
     HashMap<TrackIdentifier, ReadyForMoreDataState> m_readyForMoreDataStates WTF_GUARDED_BY_LOCK(m_lock);
-    HashMap<TrackIdentifier, Function<void(TrackIdentifier)>> m_requestMediaDataWhenReadyDataCallbacks WTF_GUARDED_BY_CAPABILITY(queueSingleton());
+    HashMap<TrackIdentifier, std::unique_ptr<RequestPromise::AutoRejectProducer>> m_requestMediaDataWhenReadyDataPromises WTF_GUARDED_BY_CAPABILITY(queueSingleton());
     HashMap<TrackIdentifier, Function<void(TrackIdentifier, const MediaTime&)>> m_trackNeedsReenqueuingCallbacks WTF_GUARDED_BY_CAPABILITY(queueSingleton());
 
     Vector<LayerHostingContextCallback> m_layerHostingContextRequests WTF_GUARDED_BY_CAPABILITY(queueSingleton());
