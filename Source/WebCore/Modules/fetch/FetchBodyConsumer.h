@@ -62,6 +62,7 @@ public:
 
     bool hasData() const { return !!m_buffer; }
     const FragmentedSharedBuffer* data() const LIFETIME_BOUND { return m_buffer.get().unsafeGet(); }
+    RefPtr<JSC::ArrayBuffer> asArrayBuffer();
     void setData(Ref<FragmentedSharedBuffer>&&);
 
     RefPtr<FragmentedSharedBuffer> takeData();

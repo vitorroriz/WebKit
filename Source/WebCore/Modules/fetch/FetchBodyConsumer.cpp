@@ -437,6 +437,11 @@ RefPtr<JSC::ArrayBuffer> FetchBodyConsumer::takeAsArrayBuffer()
     return m_buffer.takeAsArrayBuffer();
 }
 
+RefPtr<JSC::ArrayBuffer> FetchBodyConsumer::asArrayBuffer()
+{
+    return m_buffer.tryCreateArrayBuffer();
+}
+
 Ref<Blob> FetchBodyConsumer::takeAsBlob(ScriptExecutionContext* context, const String& contentType)
 {
     String normalizedContentType = Blob::normalizedContentType(extractMIMETypeFromMediaType(contentType));
