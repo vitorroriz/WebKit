@@ -810,10 +810,10 @@ bool CoordinatedPlatformLayer::isCompositionRequiredOrOngoing() const
     return m_client ? m_client->isCompositionRequiredOrOngoing() : false;
 }
 
-void CoordinatedPlatformLayer::requestComposition()
+void CoordinatedPlatformLayer::requestComposition(CompositionReason reason)
 {
     if (m_client)
-        m_client->requestComposition();
+        m_client->requestComposition(reason);
 }
 
 RunLoop* CoordinatedPlatformLayer::compositingRunLoop() const

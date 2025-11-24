@@ -226,7 +226,7 @@ void LayerTreeHost::updateRendering()
 
     bool didChangeSceneState = m_sceneState->flush();
     if (m_compositionRequired || m_pendingResize || m_forceFrameSync || didChangeSceneState)
-        commitSceneState();
+        requestCompositionForRenderingUpdate();
 
     m_compositionRequired = false;
     m_pendingResize = false;
@@ -407,7 +407,7 @@ bool LayerTreeHost::isCompositionRequiredOrOngoing() const
     return m_compositionRequired || m_forceFrameSync || m_compositor->isActive();
 }
 
-void LayerTreeHost::requestComposition()
+void LayerTreeHost::requestComposition(CompositionReason reason)
 {
 #if ENABLE(SCROLLING_THREAD)
     if (ScrollingThread::isCurrentThread()) {
@@ -417,7 +417,7 @@ void LayerTreeHost::requestComposition()
     }
 #endif
 
-    m_compositor->scheduleUpdate();
+    m_compositor->requestComposition(reason);
 }
 
 RunLoop* LayerTreeHost::compositingRunLoop() const
@@ -467,7 +467,7 @@ void LayerTreeHost::didRenderFrame()
     }
 }
 
-void LayerTreeHost::commitSceneState()
+void LayerTreeHost::requestCompositionForRenderingUpdate()
 {
     m_isWaitingForRenderer = true;
     m_compositor->requestCompositionForRenderingUpdate([this] {
@@ -490,7 +490,7 @@ void LayerTreeHost::commitSceneState()
 
         WTFEndSignpost(this, DidComposite);
     });
-    WTFEmitSignpost(this, CommitSceneState);
+    WTFEmitSignpost(this, RequestCompositionForRenderingUpdate);
 }
 
 #if PLATFORM(GTK)

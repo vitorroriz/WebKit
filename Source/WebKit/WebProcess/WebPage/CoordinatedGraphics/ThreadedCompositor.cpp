@@ -284,7 +284,18 @@ void ThreadedCompositor::paintToCurrentGLContext(const TransformationMatrix& mat
     m_textureMapper->endPainting();
 
     if (sceneHasRunningAnimations)
-        scheduleUpdate();
+        requestComposition(CompositionReason::Animation);
+}
+
+static String reasonsToString(const OptionSet<CompositionReason>& reasons)
+{
+    StringBuilder builder;
+    for (auto reason : reasons) {
+        if (!builder.isEmpty())
+            builder.append(", "_s);
+        builder.append(enumName(reason));
+    }
+    return builder.toString();
 }
 
 void ThreadedCompositor::renderLayerTree()
@@ -298,9 +309,11 @@ void ThreadedCompositor::renderLayerTree()
     if (m_suspendedCount > 0)
         return;
 
+    OptionSet<CompositionReason> reasons;
     bool shouldNotifiyDidComposite = false;
     {
         Locker locker { m_state.lock };
+        reasons = std::exchange(m_state.reasons, { });
         shouldNotifiyDidComposite = !!m_state.didCompositeRenderinUpdateFunction;
         m_state.state = State::InProgress;
     }
@@ -339,7 +352,7 @@ void ThreadedCompositor::renderLayerTree()
     if (shouldNotifiyDidComposite)
         m_didCompositeRunLoopObserver->schedule(&RunLoop::mainSingleton());
 
-    WTFEmitSignpost(this, DidRenderFrame);
+    WTFEmitSignpost(this, DidRenderFrame, "reasons: %s", reasonsToString(reasons).ascii().data());
 
     m_context->swapBuffers();
 
@@ -355,14 +368,16 @@ void ThreadedCompositor::requestCompositionForRenderingUpdate(Function<void()>&&
 {
     ASSERT(RunLoop::isMain());
     Locker locker { m_state.lock };
+    m_state.reasons.add(CompositionReason::RenderingUpdate);
     ASSERT(!m_state.didCompositeRenderinUpdateFunction);
     m_state.didCompositeRenderinUpdateFunction = WTFMove(didCompositeFunction);
     scheduleUpdateLocked();
 }
 
-void ThreadedCompositor::scheduleUpdate()
+void ThreadedCompositor::requestComposition(CompositionReason reason)
 {
     Locker locker { m_state.lock };
+    m_state.reasons.add(reason);
     scheduleUpdateLocked();
 }
 

@@ -26,6 +26,7 @@
 #pragma once
 
 #if USE(COORDINATED_GRAPHICS)
+#include <WebCore/CoordinatedCompositionReason.h>
 #include <WebCore/Damage.h>
 #include <WebCore/DisplayUpdate.h>
 #include <WebCore/GLContext.h>
@@ -71,7 +72,7 @@ public:
 
     void setSize(const WebCore::IntSize&, float);
     void requestCompositionForRenderingUpdate(Function<void()>&&);
-    void scheduleUpdate();
+    void requestComposition(CompositionReason);
     RunLoop* runLoop();
 
     void invalidate();
@@ -129,6 +130,7 @@ private:
     struct {
         mutable Lock lock;
         State state WTF_GUARDED_BY_LOCK(lock) { State::Idle };
+        OptionSet<WebCore::CompositionReason> reasons WTF_GUARDED_BY_LOCK(lock);
         Function<void()> didCompositeRenderinUpdateFunction WTF_GUARDED_BY_LOCK(lock);
     } m_state;
 

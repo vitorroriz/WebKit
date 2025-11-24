@@ -26,6 +26,7 @@
 #pragma once
 
 #if USE(COORDINATED_GRAPHICS)
+#include "CoordinatedCompositionReason.h"
 #include "Damage.h"
 #include "FloatPoint.h"
 #include "FloatPoint3D.h"
@@ -74,7 +75,7 @@ public:
         virtual Ref<CoordinatedImageBackingStore> imageBackingStore(Ref<NativeImage>&&) = 0;
         virtual void notifyCompositionRequired() = 0;
         virtual bool isCompositionRequiredOrOngoing() const = 0;
-        virtual void requestComposition() = 0;
+        virtual void requestComposition(CompositionReason) = 0;
         virtual RunLoop* compositingRunLoop() const = 0;
         virtual int maxTextureSize() const = 0;
     };
@@ -181,7 +182,7 @@ public:
 
     bool hasPendingTilesCreation() const { return m_pendingTilesCreation; }
     bool isCompositionRequiredOrOngoing() const;
-    void requestComposition();
+    void requestComposition(CompositionReason);
     RunLoop* compositingRunLoop() const;
     int maxTextureSize() const;
 
