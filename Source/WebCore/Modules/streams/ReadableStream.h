@@ -30,6 +30,7 @@
 #include "JSValueInWrappedObject.h"
 #include "ReadableByteStreamController.h"
 #include <JavaScriptCore/Strong.h>
+#include <wtf/AbstractRefCounted.h>
 #include <wtf/RefCountedAndCanMakeWeakPtr.h>
 #include <wtf/WeakPtr.h>
 
@@ -123,10 +124,15 @@ public:
     bool isReachableFromOpaqueRoots() const { return m_isReachableFromOpaqueRootIfPulling && isPulling(); }
     void visitAdditionalChildren(JSC::AbstractSlotVisitor&);
 
+    class DependencyToVisit : public AbstractRefCounted {
+    public:
+        virtual ~DependencyToVisit() = default;
+        virtual void visit(JSC::AbstractSlotVisitor&) = 0;
+    };
     enum class StartSynchronously : bool { No, Yes };
     enum class IsReachableFromOpaqueRootIfPulling : bool { No, Yes };
     struct ByteStreamOptions {
-        RefPtr<ReadableStream> relatedStreamForGC { };
+        RefPtr<DependencyToVisit> dependencyToVisit { };
         double highwaterMark { 0 };
         StartSynchronously startSynchronously { StartSynchronously::No };
         IsReachableFromOpaqueRootIfPulling isReachableFromOpaqueRootIfPulling { IsReachableFromOpaqueRootIfPulling::No };
@@ -144,7 +150,7 @@ public:
 protected:
     static ExceptionOr<Ref<ReadableStream>> createFromJSValues(JSC::JSGlobalObject&, JSC::JSValue, JSC::JSValue);
     static ExceptionOr<Ref<InternalReadableStream>> createInternalReadableStream(JSDOMGlobalObject&, Ref<ReadableStreamSource>&&);
-    explicit ReadableStream(ScriptExecutionContext*, RefPtr<InternalReadableStream>&& = { }, RefPtr<ReadableStream>&& = { }, IsReachableFromOpaqueRootIfPulling = IsReachableFromOpaqueRootIfPulling::No);
+    explicit ReadableStream(ScriptExecutionContext*, RefPtr<InternalReadableStream>&& = { }, RefPtr<DependencyToVisit>&& = { }, IsReachableFromOpaqueRootIfPulling = IsReachableFromOpaqueRootIfPulling::No);
 
 private:
     ExceptionOr<void> setupReadableByteStreamControllerFromUnderlyingSource(JSDOMGlobalObject&, JSC::JSValue, UnderlyingSource&&, double);
@@ -161,7 +167,7 @@ private:
     const std::unique_ptr<ReadableByteStreamController> m_controller;
     const RefPtr<InternalReadableStream> m_internalReadableStream;
 
-    const RefPtr<ReadableStream> m_relatedStreamForGC;
+    const RefPtr<DependencyToVisit> m_dependencyToVisit;
 };
 
 } // namespace WebCore

@@ -164,11 +164,11 @@ Ref<ReadableStream> ReadableStream::create(Ref<InternalReadableStream>&& interna
     return adoptRef(*new ReadableStream(globalObject->protectedScriptExecutionContext().get(), WTFMove(internalReadableStream)));
 }
 
-ReadableStream::ReadableStream(ScriptExecutionContext* context, RefPtr<InternalReadableStream>&& internalReadableStream, RefPtr<ReadableStream>&& relatedStreamForGC, IsReachableFromOpaqueRootIfPulling isReachableFromOpaqueRootIfPulling)
+ReadableStream::ReadableStream(ScriptExecutionContext* context, RefPtr<InternalReadableStream>&& internalReadableStream, RefPtr<DependencyToVisit>&& dependencyToVisit, IsReachableFromOpaqueRootIfPulling isReachableFromOpaqueRootIfPulling)
     : ContextDestructionObserver(context)
     , m_isReachableFromOpaqueRootIfPulling(isReachableFromOpaqueRootIfPulling == IsReachableFromOpaqueRootIfPulling::Yes)
     , m_internalReadableStream(WTFMove(internalReadableStream))
-    , m_relatedStreamForGC(WTFMove(relatedStreamForGC))
+    , m_dependencyToVisit(WTFMove(dependencyToVisit))
 {
 }
 
@@ -298,7 +298,7 @@ ReadableStreamDefaultReader* ReadableStream::defaultReader()
 // https://streams.spec.whatwg.org/#abstract-opdef-createreadablebytestream
 Ref<ReadableStream> ReadableStream::createReadableByteStream(JSDOMGlobalObject& globalObject, ReadableByteStreamController::PullAlgorithm&& pullAlgorithm, ReadableByteStreamController::CancelAlgorithm&& cancelAlgorithm, ByteStreamOptions&& options)
 {
-    Ref readableStream = adoptRef(*new ReadableStream(globalObject.protectedScriptExecutionContext().get(), { }, WTFMove(options.relatedStreamForGC), options.isReachableFromOpaqueRootIfPulling));
+    Ref readableStream = adoptRef(*new ReadableStream(globalObject.protectedScriptExecutionContext().get(), { }, WTFMove(options.dependencyToVisit), options.isReachableFromOpaqueRootIfPulling));
     readableStream->setupReadableByteStreamController(globalObject, WTFMove(pullAlgorithm), WTFMove(cancelAlgorithm), options.highwaterMark, options.startSynchronously);
     return readableStream;
 }
@@ -555,8 +555,8 @@ void ReadableStream::visitAdditionalChildren(JSC::AbstractSlotVisitor& visitor)
     SUPPRESS_UNCOUNTED_ARG addWebCoreOpaqueRoot(visitor, m_byobReader.get());
     SUPPRESS_UNCOUNTED_ARG addWebCoreOpaqueRoot(visitor, m_defaultReader.get());
 
-    if (m_relatedStreamForGC)
-        m_relatedStreamForGC->visitAdditionalChildren(visitor);
+    if (m_dependencyToVisit)
+        m_dependencyToVisit->visit(visitor);
 
     if (m_controller) {
         m_controller->underlyingSourceConcurrently().visit(visitor);
