@@ -46,7 +46,7 @@ using JSHandleIdentifier = ProcessQualified<WebProcessJSHandleIdentifier>;
 
 class WEBCORE_EXPORT WebKitJSHandle : public RefCountedAndCanMakeWeakPtr<WebKitJSHandle> {
 public:
-    static Ref<WebKitJSHandle> create(JSC::JSGlobalObject&, JSC::JSObject*);
+    static Ref<WebKitJSHandle> create(JSC::JSObject*);
     static JSC::JSObject* objectForIdentifier(JSHandleIdentifier);
     static void jsHandleDestroyed(JSHandleIdentifier);
     static void jsHandleSentToAnotherProcess(JSHandleIdentifier);
@@ -56,7 +56,7 @@ public:
     Markable<FrameIdentifier> windowFrameIdentifier() const { return m_windowFrameIdentifier; }
 
 private:
-    WebKitJSHandle(JSC::JSGlobalObject&, JSC::JSObject*);
+    WebKitJSHandle(JSC::JSObject*);
 
     const JSHandleIdentifier m_identifier;
     const Markable<FrameIdentifier> m_windowFrameIdentifier;

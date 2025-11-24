@@ -46,9 +46,9 @@ static HandleMap& handleMap()
     return map.get();
 }
 
-Ref<WebKitJSHandle> WebKitJSHandle::create(JSC::JSGlobalObject& globalObject, JSC::JSObject* object)
+Ref<WebKitJSHandle> WebKitJSHandle::create(JSC::JSObject* object)
 {
-    return adoptRef(*new WebKitJSHandle(globalObject, object));
+    return adoptRef(*new WebKitJSHandle(object));
 }
 
 WebKitJSHandle::~WebKitJSHandle()
@@ -97,19 +97,18 @@ static Markable<FrameIdentifier> windowFrameIdentifier(JSC::JSObject* object)
     return std::nullopt;
 }
 
-WebKitJSHandle::WebKitJSHandle(JSC::JSGlobalObject& globalObject, JSC::JSObject* object)
+WebKitJSHandle::WebKitJSHandle(JSC::JSObject* object)
     : m_identifier(JSHandleIdentifier(WebProcessJSHandleIdentifier(reinterpret_cast<uintptr_t>(object)), Process::identifier()))
     , m_windowFrameIdentifier(WebCore::windowFrameIdentifier(object))
 {
     auto addResult = handleMap().ensure(m_identifier, [&] {
         return JSHandleData {
-            JSC::Strong<JSC::JSObject> { globalObject.vm(), object },
+            JSC::Strong<JSC::JSObject> { object->globalObject()->vm(), object },
             0 // Immediately incremented.
         };
     });
     auto& data = addResult.iterator->value;
     data.refCount++;
-    ASSERT(data.strongReference->globalObject() == &globalObject);
 }
 
 }
