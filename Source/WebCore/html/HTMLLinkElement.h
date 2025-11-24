@@ -104,6 +104,13 @@ public:
     // Otherwise checks if any Element in the tree does.
     void processInternalResourceLink(Element* = nullptr);
 
+    // AbstractCanMakeCheckedPtr.
+    uint32_t checkedPtrCount() const final { return HTMLElement::checkedPtrCount(); }
+    uint32_t checkedPtrCountWithoutThreadCheck() const final { return HTMLElement::checkedPtrCountWithoutThreadCheck(); }
+    void incrementCheckedPtrCount() const final { HTMLElement::incrementCheckedPtrCount(); }
+    void decrementCheckedPtrCount() const final { HTMLElement::decrementCheckedPtrCount(); }
+    void setDidBeginCheckedPtrDeletion() final { HTMLElement::setDidBeginCheckedPtrDeletion(); }
+
 private:
     void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) final;
 

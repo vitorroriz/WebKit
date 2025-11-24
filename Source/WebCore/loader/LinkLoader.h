@@ -89,7 +89,7 @@ private:
     static std::unique_ptr<LinkPreloadResourceClient> preloadIfNeeded(const LinkLoadParameters&, Document&, LinkLoader*);
     void prefetchIfNeeded(const LinkLoadParameters&, Document&);
 
-    WeakRef<LinkLoaderClient> m_client;
+    const CheckedRef<LinkLoaderClient> m_client;
     CachedResourceHandle<CachedResource> m_cachedLinkResource;
     std::unique_ptr<LinkPreloadResourceClient> m_preloadResourceClient;
 };
