@@ -56,12 +56,12 @@ static Vector<uint8_t> vectorFromData(dispatch_data_t content)
     return request;
 }
 
-static RetainPtr<dispatch_data_t> dataFromString(String&& s)
+static OSObjectPtr<dispatch_data_t> dataFromString(String&& s)
 {
     auto impl = s.releaseImpl();
     ASSERT(impl->is8Bit());
     auto characters = impl->span8();
-    return adoptNS(dispatch_data_create(characters.data(), characters.size(), mainDispatchQueueSingleton(), ^{
+    return adoptOSObject(dispatch_data_create(characters.data(), characters.size(), mainDispatchQueueSingleton(), ^{
         (void)impl;
     }));
 }
@@ -135,7 +135,7 @@ SendOperation Connection::awaitableSend(String&& message)
     return { dataFromString(WTFMove(message)), *this };
 }
 
-SendOperation Connection::awaitableSend(RetainPtr<dispatch_data_t>&& data)
+SendOperation Connection::awaitableSend(OSObjectPtr<dispatch_data_t>&& data)
 {
     return { WTFMove(data), *this };
 }
@@ -161,7 +161,7 @@ void Connection::sendAndReportError(Vector<uint8_t>&& message, CompletionHandler
     send(makeDispatchData(WTFMove(message)), WTFMove(completionHandler));
 }
 
-void Connection::send(RetainPtr<dispatch_data_t>&& message, CompletionHandler<void(bool)>&& completionHandler) const
+void Connection::send(OSObjectPtr<dispatch_data_t>&& message, CompletionHandler<void(bool)>&& completionHandler) const
 {
     nw_connection_send(m_connection.get(), message.get(), NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, makeBlockPtr([completionHandler = WTFMove(completionHandler)](nw_error_t error) mutable {
         if (completionHandler)
