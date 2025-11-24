@@ -2060,6 +2060,8 @@ void GStreamerMediaEndpoint::prepareForClose()
     if (!m_pipeline || GST_STATE(m_pipeline.get()) <= GST_STATE_READY)
         return;
     gst_element_call_async(m_pipeline.get(), reinterpret_cast<GstElementCallAsyncFunc>(+[](GstElement* element, gpointer) {
+        if (GST_STATE(element) <= GST_STATE_READY)
+            return;
         gst_element_set_state(element, GST_STATE_READY);
     }), nullptr, nullptr);
 }

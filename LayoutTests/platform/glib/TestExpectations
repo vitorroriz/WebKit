@@ -2510,6 +2510,9 @@ webkit.org/b/292951 webgl/2.0.y/conformance/textures/video/tex-2d-rgba-rgba-unsi
 # Fails when using two textures.
 webkit.org/b/258296 webrtc/canvas-to-peer-connection.html [ Failure Timeout ]
 
+# Skia crash in GrResourceCache::notifyARefCntReachedZero
+webrtc/video-vp8-videorange.html [ Crash Pass ]
+
 # The MediaStream implementation is not completed yet
 webkit.org/b/79203 fast/mediastream/RTCPeerConnection-ice.html [ Failure Timeout Crash ]
 webkit.org/b/79203 fast/mediastream/RTCPeerConnection-inspect-offer-bundlePolicy-bundle-only.html [ Failure Crash ]

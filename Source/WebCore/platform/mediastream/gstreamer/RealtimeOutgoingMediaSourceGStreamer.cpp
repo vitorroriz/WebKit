@@ -198,8 +198,6 @@ void RealtimeOutgoingMediaSourceGStreamer::stopOutgoingSource(StoppedCallback&& 
                 return;
             }
             self->removeOutgoingSource();
-            if (self->m_track)
-                self->m_track->removeObserver(*self);
             data->callback();
         }), callData, reinterpret_cast<GDestroyNotify>(destroyProbeData));
         return GST_PAD_PROBE_OK;

@@ -1052,12 +1052,6 @@ static GstStateChangeReturn webkitMediaStreamSrcChangeState(GstElement* element,
     bool noPreroll = false;
 
     switch (transition) {
-    case GST_STATE_CHANGE_NULL_TO_READY: {
-        auto locker = GstObjectLocker(self);
-        for (auto& item : self->priv->sources.values())
-            item->startObserving();
-        break;
-    }
     case GST_STATE_CHANGE_READY_TO_PAUSED: {
         noPreroll = true;
         break;
@@ -1076,12 +1070,6 @@ static GstStateChangeReturn webkitMediaStreamSrcChangeState(GstElement* element,
     case GST_STATE_CHANGE_PAUSED_TO_READY: {
         auto locker = GstObjectLocker(self);
         gst_flow_combiner_reset(self->priv->flowCombiner.get());
-        break;
-    }
-    case GST_STATE_CHANGE_READY_TO_NULL: {
-        // Explicitely NOT stopping internal sources observation here because the state transition
-        // can be triggered from a non-main thread, specially when mediastreamsrc is used by
-        // GstTranscoder.
         break;
     }
     default:
