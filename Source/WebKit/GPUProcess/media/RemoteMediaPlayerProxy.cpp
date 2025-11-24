@@ -872,13 +872,7 @@ void RemoteMediaPlayerProxy::setShouldPlayToPlaybackTarget(bool shouldPlay)
 
 void RemoteMediaPlayerProxy::setWirelessPlaybackTarget(MediaPlaybackTargetContextSerialized&& targetContext)
 {
-    RefPtr player = m_player;
-
-    WTF::switchOn(targetContext.platformContext(), [&](WebCore::MediaPlaybackTargetContextMock&& context) {
-        player->setWirelessPlaybackTarget(MediaPlaybackTargetMock::create(WTFMove(context)));
-    }, [&](WebCore::MediaPlaybackTargetContextCocoa&& context) {
-        player->setWirelessPlaybackTarget(MediaPlaybackTargetCocoa::create(WTFMove(context)));
-    });
+    Ref { *m_player }->setWirelessPlaybackTarget(targetContext.playbackTarget());
 }
 #endif // ENABLE(WIRELESS_PLAYBACK_TARGET)
 

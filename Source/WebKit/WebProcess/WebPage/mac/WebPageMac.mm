@@ -118,6 +118,7 @@
 
 #if ENABLE(WIRELESS_PLAYBACK_TARGET)
 #import "MediaPlaybackTargetContextSerialized.h"
+#import "MediaPlaybackTargetSerialized.h"
 #endif
 
 #import "PDFKitSoftLink.h"
