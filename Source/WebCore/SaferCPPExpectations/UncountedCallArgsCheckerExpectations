@@ -984,10 +984,4 @@ workers/shared/SharedWorker.cpp
 worklets/PaintWorkletGlobalScope.cpp
 worklets/WorkletGlobalScope.cpp
 worklets/WorkletPendingTasks.cpp
-xml/XMLHttpRequest.cpp
-xml/XPathEvaluator.cpp
-xml/XPathFunctions.cpp
-xml/XSLImportRule.cpp
-xml/XSLStyleSheetLibxslt.cpp
-xml/XSLTProcessorLibxslt.cpp
 xml/parser/XMLDocumentParserLibxml2.cpp

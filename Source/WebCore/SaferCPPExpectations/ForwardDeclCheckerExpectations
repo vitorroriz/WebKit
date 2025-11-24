@@ -93,5 +93,4 @@ style/StyleExtractorState.h
 style/StyleScope.h
 style/values/will-change/StyleWillChange.cpp
 testing/Internals.cpp
-xml/XSLStyleSheetLibxslt.cpp
 xml/parser/XMLDocumentParserLibxml2.cpp

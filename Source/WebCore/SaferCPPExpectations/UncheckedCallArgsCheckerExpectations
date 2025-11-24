@@ -721,8 +721,4 @@ workers/WorkerThread.cpp
 workers/shared/context/SharedWorkerThreadProxy.cpp
 worklets/PaintWorkletGlobalScope.cpp
 worklets/WorkletGlobalScope.cpp
-xml/XPathFunctions.cpp
-xml/XSLImportRule.cpp
-xml/XSLStyleSheetLibxslt.cpp
-xml/XSLTProcessorLibxslt.cpp
 xml/parser/XMLDocumentParserLibxml2.cpp
