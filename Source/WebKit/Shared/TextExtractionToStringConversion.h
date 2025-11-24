@@ -56,7 +56,8 @@ enum class TextExtractionOptionFlag : uint8_t {
 
 enum class TextExtractionOutputFormat : uint8_t {
     TextTree,
-    HTMLMarkup
+    HTMLMarkup,
+    Markdown
 };
 
 using TextExtractionOptionFlags = OptionSet<TextExtractionOptionFlag>;

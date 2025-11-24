@@ -6620,6 +6620,8 @@ static WebKit::TextExtractionOutputFormat textExtractionOutputFormat(_WKTextExtr
         return WebKit::TextExtractionOutputFormat::TextTree;
     case _WKTextExtractionOutputFormatHTML:
         return WebKit::TextExtractionOutputFormat::HTMLMarkup;
+    case _WKTextExtractionOutputFormatMarkdown:
+        return WebKit::TextExtractionOutputFormat::Markdown;
     default:
         ASSERT_NOT_REACHED();
         return WebKit::TextExtractionOutputFormat::TextTree;

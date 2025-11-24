@@ -29,6 +29,7 @@
 #include <WebCore/HTMLNames.h>
 #include <WebCore/TextExtractionTypes.h>
 #include <wtf/EnumSet.h>
+#include <wtf/Scope.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/text/MakeString.h>
 #include <wtf/text/StringBuilder.h>
@@ -82,6 +83,17 @@ static String escapeStringForHTML(const String& string)
     return result;
 }
 
+static String escapeStringForMarkdown(const String& string)
+{
+    auto result = string;
+    result = makeStringByReplacingAll(result, '\\', "\\\\"_s);
+    result = makeStringByReplacingAll(result, '[', "\\["_s);
+    result = makeStringByReplacingAll(result, ']', "\\]"_s);
+    result = makeStringByReplacingAll(result, '(', "\\("_s);
+    result = makeStringByReplacingAll(result, ')', "\\)"_s);
+    return result;
+}
+
 static String normalizedURLString(const URL& url)
 {
     static constexpr auto maxURLStringLength = 150;
@@ -109,7 +121,9 @@ public:
     {
         addLineForNativeMenuItemsIfNeeded();
         addLineForVersionNumberIfNeeded();
-
+        m_lines.removeAllMatching([](auto& line) {
+            return line.isEmpty();
+        });
         m_completion({ makeStringByJoining(WTFMove(m_lines), "\n"_s), m_filteredOutAnyText });
     }
 
@@ -129,12 +143,11 @@ public:
             return;
         }
 
-        auto separator = useHTMLOutput() ? " "_s : ","_s;
+        auto separator = (useMarkdownOutput() || useHTMLOutput()) ? " "_s : ","_s;
         auto text = makeStringByJoining(WTFMove(components), separator);
 
         if (!m_lines[lineIndex].isEmpty()) {
-            auto joiner = useHTMLOutput() ? ' ' : ',';
-            m_lines[lineIndex] = makeString(m_lines[lineIndex], joiner, WTFMove(text));
+            m_lines[lineIndex] = makeString(m_lines[lineIndex], separator, WTFMove(text));
             return;
         }
 
@@ -144,9 +157,13 @@ public:
         }
 
         StringBuilder indentation;
-        indentation.reserveCapacity(indentLevel);
-        for (unsigned i = 0; i < indentLevel; ++i)
-            indentation.append('\t');
+
+        if (!useMarkdownOutput()) {
+            indentation.reserveCapacity(indentLevel);
+            for (unsigned i = 0; i < indentLevel; ++i)
+                indentation.append('\t');
+        }
+
         m_lines[lineIndex] = makeString(indentation.toString(), WTFMove(text));
     }
 
@@ -182,6 +199,11 @@ public:
         return m_options.outputFormat == TextExtractionOutputFormat::HTMLMarkup;
     }
 
+    bool useMarkdownOutput() const
+    {
+        return m_options.outputFormat == TextExtractionOutputFormat::Markdown;
+    }
+
     RefPtr<TextExtractionFilterPromise> filter(const String& text, const std::optional<WebCore::NodeIdentifier>& identifier)
     {
         if (m_options.filterCallbacks.isEmpty())
@@ -210,6 +232,29 @@ public:
             return;
         }
         m_lines[lineIndex] = makeString(m_lines[lineIndex], text);
+    }
+
+    void pushURLString(String&& urlString)
+    {
+        m_urlStringStack.append(WTFMove(urlString));
+    }
+
+    std::optional<String> currentURLString() const
+    {
+        if (m_urlStringStack.isEmpty())
+            return std::nullopt;
+
+        return { m_urlStringStack.last() };
+    }
+
+    void popURLString()
+    {
+        if (m_urlStringStack.isEmpty()) {
+            ASSERT_NOT_REACHED();
+            return;
+        }
+
+        m_urlStringStack.removeLast();
     }
 
 private:
@@ -250,7 +295,7 @@ private:
         if (onlyIncludeText())
             return;
 
-        auto versionText = useHTMLOutput() ? makeString("<!-- version="_s, version(), " -->"_s) : makeString("version="_s, version());
+        auto versionText = (useHTMLOutput() || useMarkdownOutput()) ? makeString("<!-- version="_s, version(), " -->"_s) : makeString("version="_s, version());
         addResult({ advanceToNextLine(), 0 }, { WTFMove(versionText) });
     }
 
@@ -261,6 +306,7 @@ private:
 
     const TextExtractionOptions m_options;
     Vector<String> m_lines;
+    Vector<String, 1> m_urlStringStack;
     unsigned m_nextLineIndex { 0 };
     CompletionHandler<void(TextExtractionResult&&)> m_completion;
     TextExtractionVersionBehaviors m_versionBehaviors;
@@ -325,9 +371,10 @@ static Vector<String> partsForItem(const TextExtraction::Item& item, const TextE
 
 static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector<String>&& itemParts, std::optional<NodeIdentifier>&& enclosingNode, const TextExtractionLine& line, Ref<TextExtractionAggregator>&& aggregator, const String& closingTag = { })
 {
-    auto completion = [itemParts = WTFMove(itemParts), selectedRange = textItem.selectedRange, aggregator, line, closingTag](String&& filteredText) mutable {
+    auto completion = [itemParts = WTFMove(itemParts), selectedRange = textItem.selectedRange, aggregator, line, closingTag, urlString = aggregator->currentURLString()](String&& filteredText) mutable {
         Vector<String> textParts;
         auto currentLine = line;
+        bool includeSelectionAsAttribute = !aggregator->useHTMLOutput() && !aggregator->useMarkdownOutput();
         if (!filteredText.isEmpty()) {
             // Apply replacements only after filtering, so any filtering steps that rely on comparing DOM text against
             // visual data (e.g. recognized text) won't result in false positives.
@@ -343,7 +390,7 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
             });
 
             if (startIndex == notFound) {
-                if (!aggregator->useHTMLOutput()) {
+                if (includeSelectionAsAttribute) {
                     textParts.append("''"_s);
                     textParts.append("selected=[0,0]"_s);
                 }
@@ -363,10 +410,15 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
                         return;
                     }
                     textParts.append(escapeStringForHTML(trimmedContent));
+                } else if (aggregator->useMarkdownOutput()) {
+                    if (urlString)
+                        textParts.append(makeString('[', escapeStringForMarkdown(trimmedContent), "]("_s, WTFMove(*urlString), ')'));
+                    else
+                        textParts.append(trimmedContent);
                 } else
                     textParts.append(makeString('\'', escapeString(trimmedContent), '\''));
 
-                if (!aggregator->useHTMLOutput() && selectedRange && selectedRange->length > 0) {
+                if (includeSelectionAsAttribute && selectedRange && selectedRange->length > 0) {
                     if (!trimmedContent.isEmpty()) {
                         int newLocation = std::max(0, static_cast<int>(selectedRange->location) - static_cast<int>(startIndex));
                         int maxLength = static_cast<int>(trimmedContent.length()) - newLocation;
@@ -379,7 +431,7 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
                         textParts.append("selected=[0,0]"_s);
                 }
             }
-        } else if (!aggregator->useHTMLOutput() && selectedRange)
+        } else if (includeSelectionAsAttribute && selectedRange)
             textParts.append("selected=[0,0]"_s);
 
         textParts.appendVector(WTFMove(itemParts));
@@ -461,6 +513,13 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
                     else
                         parts.append(makeString('<', tagName, ' ', makeStringByJoining(attributes, " "_s), '>'));
                 }
+            } else if (aggregator.useMarkdownOutput()) {
+                if (containerType == TextExtraction::ContainerType::BlockQuote)
+                    parts.append(">"_s);
+                else if (containerType == TextExtraction::ContainerType::ListItem) {
+                    // FIXME: Convert ordered lists into 1., 2., 3. etc.
+                    parts.append("-"_s);
+                }
             } else {
                 if (!containerString.isEmpty())
                     parts.append(WTFMove(containerString));
@@ -484,7 +543,7 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
                     parts.append("contenteditable='plaintext-only'"_s);
                 else
                     parts.append("contenteditable"_s);
-            } else {
+            } else if (!aggregator.useMarkdownOutput()) {
                 parts.append("contentEditable"_s);
                 parts.appendVector(partsForItem(item, aggregator));
 
@@ -519,7 +578,7 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
                     parts.append(makeString('<', tagName, '>'));
                 else
                     parts.append(makeString('<', tagName, ' ', makeStringByJoining(attributes, " "_s), '>'));
-            } else {
+            } else if (!aggregator.useMarkdownOutput()) {
                 parts.append(WTFMove(tagName));
                 parts.appendVector(partsForItem(item, aggregator));
 
@@ -564,7 +623,7 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
                     parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), '>'));
                 else
                     parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), ' ', makeStringByJoining(attributes, " "_s), '>'));
-            } else {
+            } else if (!aggregator.useMarkdownOutput()) {
                 parts.append("link"_s);
                 parts.appendVector(partsForItem(item, aggregator));
 
@@ -581,7 +640,7 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
                     parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), '>'));
                 else
                     parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), ' ', makeStringByJoining(attributes, " "_s), '>'));
-            } else {
+            } else if (!aggregator.useMarkdownOutput()) {
                 parts.append("scrollable"_s);
                 parts.appendVector(partsForItem(item, aggregator));
                 parts.append(makeString("contentSize=["_s, scrollableData.contentSize.width(), 'x', scrollableData.contentSize.height(), ']'));
@@ -603,7 +662,7 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
                     parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), '>'));
                 else
                     parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), ' ', makeStringByJoining(attributes, " "_s), '>'));
-            } else {
+            } else if (!aggregator.useMarkdownOutput()) {
                 parts.append("select"_s);
                 parts.appendVector(partsForItem(item, aggregator));
 
@@ -634,6 +693,13 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
                     parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), '>'));
                 else
                     parts.append(makeString('<', item.nodeName.convertToASCIILowercase(), ' ', makeStringByJoining(attributes, " "_s), '>'));
+            } else if (aggregator.useMarkdownOutput()) {
+                String imageSource;
+                if (auto attributeFromClient = item.clientAttributes.get("src"_s); !attributeFromClient.isEmpty())
+                    imageSource = WTFMove(attributeFromClient);
+                else
+                    imageSource = normalizedURLString(imageData.completedSource);
+                parts.append(makeString("!["_s, escapeStringForMarkdown(imageData.altText), "]("_s, WTFMove(imageSource), ')'));
             } else {
                 parts.append("image"_s);
                 parts.appendVector(partsForItem(item, aggregator));
@@ -684,6 +750,22 @@ static void addTextRepresentationRecursive(const TextExtraction::Item& item, std
             addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, aggregator);
         return;
     }
+
+    bool isLink = false;
+    if (auto link = item.dataAs<TextExtraction::LinkItemData>()) {
+        String linkURLString;
+        if (auto attributeFromClient = item.clientAttributes.get("href"_s); !attributeFromClient.isEmpty())
+            linkURLString = WTFMove(attributeFromClient);
+        else
+            linkURLString = normalizedURLString(link->completedURL);
+        aggregator.pushURLString(WTFMove(linkURLString));
+        isLink = true;
+    }
+
+    auto popURLScope = makeScopeExit([isLink, &aggregator] {
+        if (isLink)
+            aggregator.popURLString();
+    });
 
     TextExtractionLine line { aggregator.advanceToNextLine(), depth };
     addPartsForItem(item, std::optional { identifier }, line, aggregator);

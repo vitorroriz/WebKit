@@ -370,6 +370,9 @@ RetainPtr<_WKTextExtractionConfiguration> createTextExtractionConfiguration(WKWe
         if (equalLettersIgnoringASCIICase(outputFormat, "html"_s))
             return _WKTextExtractionOutputFormatHTML;
 
+        if (equalLettersIgnoringASCIICase(outputFormat, "markdown"_s))
+            return _WKTextExtractionOutputFormatMarkdown;
+
         if (equalLettersIgnoringASCIICase(outputFormat, "texttree"_s))
             return _WKTextExtractionOutputFormatTextTree;
 
