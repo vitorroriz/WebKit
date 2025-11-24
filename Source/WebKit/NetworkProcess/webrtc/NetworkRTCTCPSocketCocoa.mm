@@ -97,8 +97,10 @@ static RetainPtr<nw_connection_t> createNWConnection(NetworkRTCProvider& rtcProv
     setNWParametersApplicationIdentifiers(tcpTLS.get(), rtcProvider.applicationBundleIdentifier(), rtcProvider.sourceApplicationAuditToken(), attributedBundleIdentifier);
     setNWParametersTrackerOptions(tcpTLS.get(), flags.isRelayDisabled, flags.isFirstParty, isKnownTracker(domain));
 
-    if (flags.enableServiceClass)
+    if (flags.enableServiceClass) {
+        RELEASE_LOG_INFO(WebRTC, "NetworkRTCTCPSocketCocoa: serviceClass is set to interactive video\n");
         nw_parameters_set_service_class(tcpTLS.get(), nw_service_class_interactive_video);
+    }
 
     return adoptNS(nw_connection_create(host.get(), tcpTLS.get()));
 }

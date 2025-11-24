@@ -305,7 +305,7 @@ void NetworkRTCUDPSocketCocoaConnections::configureParameters(nw_parameters_t pa
     nw_parameters_set_reuse_local_address(parameters, true);
 
     if (m_enableServiceClass) {
-        fprintf(stderr, "m_enableServiceClass\n");
+        RELEASE_LOG_INFO(WebRTC, "NetworkRTCUDPSocketCocoaConnections: serviceClass is set to interactive video\n");
         nw_parameters_set_service_class(parameters, nw_service_class_interactive_video);
     }
 }
