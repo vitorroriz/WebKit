@@ -44,6 +44,7 @@
 #include "LayoutIntegrationInlineContentBuilder.h"
 #include "LayoutIntegrationInlineContentPainter.h"
 #include "LayoutIntegrationPagination.h"
+#include "LayoutIntegrationUtils.h"
 #include "LayoutTreeBuilder.h"
 #include "PaintInfo.h"
 #include "PlacedFloats.h"
@@ -483,13 +484,7 @@ static inline std::optional<Layout::BlockLayoutState::LineGrid> lineGrid(const R
     return { };
 }
 
-static inline Layout::BlockLayoutState::MarginState initialMarginState(const RenderBlockFlow& rootRenderer)
-{
-    auto marginInfo = RenderBlockFlow::MarginInfo { rootRenderer, RenderBlockFlow::MarginInfo::IgnoreScrollbarForAfterMargin::No };
-    return { marginInfo.canCollapseWithChildren(), marginInfo.canCollapseMarginBeforeWithChildren(), marginInfo.canCollapseMarginAfterWithChildren(), marginInfo.quirkContainer(), marginInfo.atBeforeSideOfBlock(), marginInfo.atAfterSideOfBlock(), marginInfo.hasMarginBeforeQuirk(), marginInfo.hasMarginAfterQuirk(), marginInfo.determinedMarginBeforeQuirk(), marginInfo.positiveMargin(), marginInfo.negativeMargin() };
-}
-
-std::optional<LayoutRect> LineLayout::layout(ForceFullLayout forcedFullLayout)
+std::optional<LayoutRect> LineLayout::layout(RenderBlockFlow::MarginInfo& marginInfo, ForceFullLayout forcedFullLayout)
 {
     if (forcedFullLayout == ForceFullLayout::Yes && m_lineDamage)
         Layout::InlineInvalidation::resetInlineDamage(*m_lineDamage);
@@ -524,7 +519,7 @@ std::optional<LayoutRect> LineLayout::layout(ForceFullLayout forcedFullLayout)
 
     auto parentBlockLayoutState = Layout::BlockLayoutState {
         m_blockFormattingState.placedFloats(),
-        initialMarginState(flow()),
+        Layout::IntegrationUtils::toMarginState(marginInfo),
         lineClamp(flow()),
         textBoxTrim(flow()),
         flow().style().textBoxEdge(),
@@ -546,11 +541,12 @@ std::optional<LayoutRect> LineLayout::layout(ForceFullLayout forcedFullLayout)
 
     if (m_lineDamage) {
         // Pagination may require another layout pass.
-        layout();
+        layout(marginInfo);
 
         ASSERT(!m_lineDamage);
     }
 
+    marginInfo = Layout::IntegrationUtils::toMarginInfo(parentBlockLayoutState.marginState());
     return isPartialLayout ? std::make_optional(repaintRect) : std::nullopt;
 }
 

@@ -521,7 +521,7 @@ void InlineDisplayLineBuilder::adjustLineBlockAfterSideWithCollapsedMargin(const
         return;
     }
 
-    if (!marginState.canCollapseMarginAfterWithChildren || !marginState.margin())
+    if (!marginState.margin())
         return;
 
     auto& lastLineWithBlockContent = displayLines[lineIndexWithBlockLevelBox];
