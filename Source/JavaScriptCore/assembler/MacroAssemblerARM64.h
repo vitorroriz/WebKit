@@ -1408,6 +1408,25 @@ public:
         m_assembler.ror<32>(dest, src, shiftAmmount);
     }
 
+    void rotateLeft32(RegisterID src, TrustedImm32 imm, RegisterID dest)
+    {
+        if (!imm.m_value) [[unlikely]]
+            return move(src, dest);
+        rotateRight32(src, TrustedImm32(-(imm.m_value & 31)), dest);
+    }
+
+    void rotateLeft32(TrustedImm32 imm, RegisterID srcDst)
+    {
+        rotateLeft32(srcDst, imm, srcDst);
+    }
+
+    void rotateLeft32(RegisterID src, RegisterID shiftAmount, RegisterID dest)
+    {
+        RegisterID scratch = getCachedDataTempRegisterIDAndInvalidate();
+        neg32(shiftAmount, scratch);
+        rotateRight32(src, scratch, dest);
+    }
+
     void rotateRight64(RegisterID src, TrustedImm32 imm, RegisterID dest)
     {
         if (!imm.m_value) [[unlikely]]
@@ -1423,6 +1442,25 @@ public:
     void rotateRight64(RegisterID src, RegisterID shiftAmmount, RegisterID dest)
     {
         m_assembler.ror<64>(dest, src, shiftAmmount);
+    }
+
+    void rotateLeft64(RegisterID src, TrustedImm32 imm, RegisterID dest)
+    {
+        if (!imm.m_value) [[unlikely]]
+            return move(src, dest);
+        rotateRight64(src, TrustedImm32(-(imm.m_value & 63)), dest);
+    }
+
+    void rotateLeft64(TrustedImm32 imm, RegisterID srcDst)
+    {
+        rotateLeft64(srcDst, imm, srcDst);
+    }
+
+    void rotateLeft64(RegisterID src, RegisterID shiftAmount, RegisterID dest)
+    {
+        RegisterID scratch = getCachedDataTempRegisterIDAndInvalidate();
+        neg64(shiftAmount, scratch);
+        rotateRight64(src, scratch, dest);
     }
 
     void rshift32(RegisterID src, RegisterID shiftAmount, RegisterID dest)
