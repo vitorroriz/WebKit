@@ -119,6 +119,8 @@
 [Legacy] StructureParam WebCore::FragmentedSharedBuffer.toIPCData() Variant<std::optional<WebCore::SharedMemoryHandle>, Vector<std::span<const uint8_t>>>
 [Legacy] StructureParam WebKit::RemoteLayerTreeTransaction::LayerCreationProperties::CustomData.sendRightAnnotated std::optional<WTF::MachSendRightAnnotated>
 [Legacy] StructureParam WebKit::NetworkSessionCreationParameters.proxyConfigData std::optional<Vector<std::pair<Vector<uint8_t>, std::optional<WTF::UUID>>>>
+[Legacy] StructureParam WebKit::ICCData.data Vector<uint8_t>
+[Legacy] StructureParam WebKit::IndexedColorSpace.table Vector<uint8_t>
 
 [UnsafeWrapper] std::optional<std::span<const uint8_t>> {
     [Legacy] StructureParam WebKit::CoreIPCData.dataReference() 

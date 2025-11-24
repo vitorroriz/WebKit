@@ -1714,6 +1714,7 @@
 		86D5C7232EB2810B006F06CD /* DataDetectionResult.mm in Sources */ = {isa = PBXBuildFile; fileRef = 86D5C7222EB2810B006F06CD /* DataDetectionResult.mm */; };
 		86DD519028EF28E800DF2A58 /* WebEventModifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 86DD518F28EF28E800DF2A58 /* WebEventModifier.h */; };
 		86E67A251910B9D100004AB7 /* ProcessThrottler.h in Headers */ = {isa = PBXBuildFile; fileRef = 86E67A21190F411800004AB7 /* ProcessThrottler.h */; };
+		86E9F1292EC4D44500BCC96D /* CoreIPCCGColorSpace.mm in Sources */ = {isa = PBXBuildFile; fileRef = 86E9F1282EC4D44500BCC96D /* CoreIPCCGColorSpace.mm */; };
 		86EB7204298D310A00C1DC77 /* SecItemShim.h in Headers */ = {isa = PBXBuildFile; fileRef = 86EB7202298D310900C1DC77 /* SecItemShim.h */; };
 		86F9536518FF58F5001DB2EF /* ProcessAssertion.h in Headers */ = {isa = PBXBuildFile; fileRef = 86F9536018FF4FD4001DB2EF /* ProcessAssertion.h */; };
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
@@ -7134,6 +7135,7 @@
 		86E67A21190F411800004AB7 /* ProcessThrottler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProcessThrottler.h; sourceTree = "<group>"; };
 		86E67A22190F411800004AB7 /* ProcessThrottler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProcessThrottler.cpp; sourceTree = "<group>"; };
 		86E6E357291959C3006C25CA /* SecItemRequestData.serialization.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = SecItemRequestData.serialization.in; sourceTree = "<group>"; };
+		86E9F1282EC4D44500BCC96D /* CoreIPCCGColorSpace.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CoreIPCCGColorSpace.mm; sourceTree = "<group>"; };
 		86EB7201298D310900C1DC77 /* SecItemShim.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SecItemShim.mm; sourceTree = "<group>"; };
 		86EB7202298D310900C1DC77 /* SecItemShim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecItemShim.h; sourceTree = "<group>"; };
 		86EFFA3F2B03A6B900ABE77D /* IPCStreamTester.messages.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = IPCStreamTester.messages.in; sourceTree = "<group>"; };
@@ -10324,6 +10326,7 @@
 				5CFC9C7F2B717EFA00F8D289 /* CoreIPCCFDictionary.mm */,
 				5CFC9C7E2B717EFA00F8D289 /* CoreIPCCFDictionary.serialization.in */,
 				52FB15422B646156000933CC /* CoreIPCCGColorSpace.h */,
+				86E9F1282EC4D44500BCC96D /* CoreIPCCGColorSpace.mm */,
 				52FB15432B64680B000933CC /* CoreIPCCGColorSpace.serialization.in */,
 				F4EFF36B2AF0267200479AB8 /* CoreIPCNumber.h */,
 				FAC7C0C12D712AAF00E7297E /* CoreIPCNumber.mm */,
@@ -21284,6 +21287,7 @@
 				5CFC9C812B71809600F8D289 /* CoreIPCCFDictionary.mm in Sources */,
 				FA1ED3F42B76B93700C90F3B /* CoreIPCCFType.mm in Sources */,
 				519F6F7F2B2D7A4500559CB3 /* CoreIPCCFURL.mm in Sources */,
+				86E9F1292EC4D44500BCC96D /* CoreIPCCGColorSpace.mm in Sources */,
 				5157AE032B23C34700C0E095 /* CoreIPCContacts.mm in Sources */,
 				52B060F92B745E4D009B1666 /* CoreIPCCVPixelBufferRef.mm in Sources */,
 				518198912B7585F80084E292 /* CoreIPCDateComponents.mm in Sources */,
