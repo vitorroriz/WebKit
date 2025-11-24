@@ -1351,6 +1351,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     dom/DocumentFontLoader.h
     dom/DocumentFragment.h
     dom/DocumentFullscreen.h
+    dom/DocumentImmersive.h
     dom/DocumentInlines.h
     dom/DocumentMarker.h
     dom/DocumentMarkerController.h
