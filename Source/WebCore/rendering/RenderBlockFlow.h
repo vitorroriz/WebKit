@@ -267,7 +267,7 @@ public:
     LayoutUnit clearFloatsIfNeeded(RenderBox& child, MarginInfo&, LayoutUnit oldTopPosMargin, LayoutUnit oldTopNegMargin, LayoutUnit yPos);
     LayoutUnit estimateLogicalTopPosition(RenderBox& child, const MarginInfo&, LayoutUnit& estimateWithoutPagination);
     void marginBeforeEstimateForChild(RenderBox&, LayoutUnit&, LayoutUnit&) const;
-    void handleAfterSideOfBlock(MarginInfo&);
+    LayoutUnit handleAfterSideOfBlock(MarginInfo&, LayoutUnit contentBoxLogicalHeight);
     void setCollapsedBottomMargin(const MarginInfo&);
 
     bool childrenPreventSelfCollapsing() const final;

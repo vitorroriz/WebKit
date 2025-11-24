@@ -929,7 +929,8 @@ void RenderBlockFlow::layoutBlockChildren(RelayoutChildren relayoutChildren, Lay
         trimBlockEndChildrenMargins();
     // Now do the handling of the bottom of the block, adding in our bottom border/padding and
     // determining the correct collapsed bottom margin information.
-    handleAfterSideOfBlock(marginInfo);
+    auto borderBoxLogicalHeight = handleAfterSideOfBlock(marginInfo, logicalHeight() - borderAndPaddingBefore());
+    setLogicalHeight(borderBoxLogicalHeight);
 }
 
 RenderBlockFlow::BlockPositionAndMargin RenderBlockFlow::layoutBlockChildFromInlineLayout(RenderBox& child, LayoutUnit contentHeight, MarginInfo marginInfo)
@@ -1027,10 +1028,8 @@ void RenderBlockFlow::layoutInlineChildren(RelayoutChildren relayoutChildren, La
 {
     computeAndSetLineLayoutPath();
 
-    if (lineLayoutPath() == InlinePath) {
-        layoutInlineContent(relayoutChildren, repaintLogicalTop, repaintLogicalBottom);
-        return;
-    }
+    if (lineLayoutPath() == InlinePath)
+        return layoutInlineContent(relayoutChildren, repaintLogicalTop, repaintLogicalBottom);
 
     if (!svgTextLayout())
         m_lineLayout = makeUnique<LegacyLineLayout>(*this);
@@ -1780,33 +1779,34 @@ void RenderBlockFlow::setCollapsedBottomMargin(const MarginInfo& marginInfo)
     }
 }
 
-void RenderBlockFlow::handleAfterSideOfBlock(MarginInfo& marginInfo)
+LayoutUnit RenderBlockFlow::handleAfterSideOfBlock(MarginInfo& marginInfo, LayoutUnit contentBoxLogicalHeight)
 {
     marginInfo.setAtAfterSideOfBlock(true);
 
     // If our last child was a self-collapsing block with clearance then our logical height is flush with the
     // bottom edge of the float that the child clears. The correct vertical position for the margin-collapsing we want
     // to perform now is at the child's margin-top - so adjust our height to that position.
-    auto logicalHeight = this->logicalHeight();
+    auto borderBoxLogicalHeight = borderAndPaddingBefore() + contentBoxLogicalHeight;
     if (auto selfCollapsingMarginBeforeWithClear = this->selfCollapsingMarginBeforeWithClear(lastChild()))
-        logicalHeight -= *selfCollapsingMarginBeforeWithClear;
+        borderBoxLogicalHeight -= *selfCollapsingMarginBeforeWithClear;
 
     // If we can't collapse with children then add in the bottom margin.
     if (!marginInfo.canCollapseWithMarginAfter() && !marginInfo.canCollapseWithMarginBefore()
         && (!document().inQuirksMode() || !marginInfo.quirkContainer() || !marginInfo.hasMarginAfterQuirk())) {
-        logicalHeight += marginInfo.margin();
+        borderBoxLogicalHeight += marginInfo.margin();
     }
 
     // Now add in our bottom border/padding.
-    logicalHeight += borderAndPaddingAfter() + scrollbarLogicalHeight();
+    borderBoxLogicalHeight += borderAndPaddingAfter() + scrollbarLogicalHeight();
 
     // Negative margins can cause our height to shrink below our minimal height (border/padding).
     // If this happens, ensure that the computed height is increased to the minimal height.
-    logicalHeight = std::max(logicalHeight, borderAndPaddingBefore() + borderAndPaddingAfter() + scrollbarLogicalHeight());
+    borderBoxLogicalHeight = std::max(borderBoxLogicalHeight, borderAndPaddingLogicalHeight() + scrollbarLogicalHeight());
 
-    setLogicalHeight(logicalHeight);
     // Update our bottom collapsed margin info.
     setCollapsedBottomMargin(marginInfo);
+
+    return borderBoxLogicalHeight;
 }
 
 void RenderBlockFlow::setMaxMarginBeforeValues(LayoutUnit pos, LayoutUnit neg)

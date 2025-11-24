@@ -25,8 +25,11 @@
 
 #pragma once
 
+#include "BlockLayoutState.h"
+
 #include <WebCore/LayoutPoint.h>
 #include <WebCore/LayoutUnit.h>
+#include <WebCore/RenderBlockFlow.h>
 
 #include <optional>
 #include <wtf/CheckedRef.h>
@@ -47,6 +50,9 @@ public:
     LayoutUnit minContentWidth(const ElementBox&) const;
     LayoutUnit minContentHeight(const ElementBox&) const;
     void layoutWithFormattingContextForBlockInInline(const ElementBox& block, LayoutPoint blockLogicalTopLeft, const InlineLayoutState&) const;
+
+    static BlockLayoutState::MarginState toMarginState(const RenderBlockFlow::MarginInfo&);
+    static RenderBlockFlow::MarginInfo toMarginInfo(const Layout::BlockLayoutState::MarginState&);
 
 private:
     const CheckedRef<const LayoutState> m_globalLayoutState;
