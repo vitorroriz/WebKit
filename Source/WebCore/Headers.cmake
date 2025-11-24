@@ -3401,6 +3401,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/masking/StyleMaskBorderWidth.h
     style/values/masking/StyleMaskLayer.h
     style/values/masking/StyleMaskLayers.h
+    style/values/masking/StyleMaskMode.h
 
     style/values/math/StyleMathDepth.h
 
@@ -3524,6 +3525,8 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/values/text/StyleHyphenateLimitLines.h
     style/values/text/StyleLetterSpacing.h
     style/values/text/StyleTabSize.h
+    style/values/text/StyleTextAlign.h
+    style/values/text/StyleTextAlignLast.h
     style/values/text/StyleTextAutospace.h
     style/values/text/StyleTextIndent.h
     style/values/text/StyleTextSpacingTrim.h
@@ -3567,6 +3570,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     style/values/ui/StyleAccentColor.h
     style/values/ui/StyleCursor.h
+    style/values/ui/StyleResize.h
 
     style/values/view-transitions/StyleViewTransitionClass.h
     style/values/view-transitions/StyleViewTransitionName.h

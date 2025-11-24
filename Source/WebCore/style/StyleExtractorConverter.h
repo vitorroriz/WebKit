@@ -137,7 +137,6 @@ public:
 
     static Ref<CSSValue> convertSingleMaskComposite(ExtractorState&, CompositeOperator);
     static Ref<CSSValue> convertSingleWebkitMaskComposite(ExtractorState&, CompositeOperator);
-    static Ref<CSSValue> convertSingleMaskMode(ExtractorState&, MaskMode);
     static Ref<CSSValue> convertSingleWebkitMaskSourceType(ExtractorState&, MaskMode);
 };
 
@@ -267,28 +266,14 @@ inline Ref<CSSValue> ExtractorConverter::convertSingleWebkitMaskComposite(Extrac
     return CSSPrimitiveValue::create(toCSSValueID(composite, CSSPropertyWebkitMaskComposite));
 }
 
-inline Ref<CSSValue> ExtractorConverter::convertSingleMaskMode(ExtractorState&, MaskMode maskMode)
-{
-    switch (maskMode) {
-    case MaskMode::Alpha:
-        return CSSPrimitiveValue::create(CSSValueAlpha);
-    case MaskMode::Luminance:
-        return CSSPrimitiveValue::create(CSSValueLuminance);
-    case MaskMode::MatchSource:
-        return CSSPrimitiveValue::create(CSSValueMatchSource);
-    }
-    ASSERT_NOT_REACHED();
-    return CSSPrimitiveValue::create(CSSValueMatchSource);
-}
-
 inline Ref<CSSValue> ExtractorConverter::convertSingleWebkitMaskSourceType(ExtractorState&, MaskMode maskMode)
 {
     switch (maskMode) {
-    case MaskMode::Alpha:
+    case Style::MaskMode::Alpha:
         return CSSPrimitiveValue::create(CSSValueAlpha);
-    case MaskMode::Luminance:
+    case Style::MaskMode::Luminance:
         return CSSPrimitiveValue::create(CSSValueLuminance);
-    case MaskMode::MatchSource:
+    case Style::MaskMode::MatchSource:
         // MatchSource is only available in the mask-mode property.
         return CSSPrimitiveValue::create(CSSValueAlpha);
     }

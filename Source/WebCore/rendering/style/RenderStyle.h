@@ -162,7 +162,6 @@ enum class PointerEvents : uint8_t;
 enum class PositionType : uint8_t;
 enum class PrintColorAdjust : bool;
 enum class PseudoId : uint8_t;
-enum class Resize : uint8_t;
 enum class RubyPosition : uint8_t;
 enum class RubyAlign : uint8_t;
 enum class RubyOverhang : bool;
@@ -173,8 +172,6 @@ enum class StyleColorOptions : uint8_t;
 enum class StyleDifference : uint8_t;
 enum class StyleDifferenceContextSensitiveProperty : uint8_t;
 enum class TableLayoutType : bool;
-enum class TextAlignLast : uint8_t;
-enum class TextAlignMode : uint8_t;
 enum class TextBoxTrim : uint8_t;
 enum class TextCombine : bool;
 enum class TextDecorationSkipInk : uint8_t;
@@ -396,9 +393,12 @@ enum class Change : uint8_t;
 enum class GridTrackSizingDirection : bool;
 enum class ImageOrientation : bool;
 enum class PositionTryOrder : uint8_t;
+enum class Resize : uint8_t;
 enum class SVGGlyphOrientationHorizontal : uint8_t;
 enum class SVGGlyphOrientationVertical : uint8_t;
 enum class ScrollBehavior : bool;
+enum class TextAlignLast : uint8_t;
+enum class TextAlign : uint8_t;
 enum class WebkitOverflowScrolling : bool;
 enum class WebkitTouchCallout : bool;
 
@@ -760,8 +760,8 @@ public:
     inline TextRenderingMode textRendering() const;
 
     inline const Style::TextIndent& textIndent() const;
-    inline TextAlignMode textAlign() const { return static_cast<TextAlignMode>(m_inheritedFlags.textAlign); }
-    inline TextAlignLast textAlignLast() const;
+    inline Style::TextAlign textAlign() const { return static_cast<Style::TextAlign>(m_inheritedFlags.textAlign); }
+    inline Style::TextAlignLast textAlignLast() const;
     inline TextGroupAlign textGroupAlign() const;
     inline Style::TextTransform textTransform() const;
     inline Style::TextDecorationLine textDecorationLineInEffect() const;
@@ -1005,7 +1005,7 @@ public:
     inline Style::HyphenateLimitEdge hyphenateLimitAfter() const;
     inline Style::HyphenateLimitLines hyphenateLimitLines() const;
     inline const Style::HyphenateCharacter& hyphenateCharacter() const;
-    inline Resize resize() const;
+    inline Style::Resize resize() const;
     inline ColumnAxis columnAxis() const;
     inline bool hasInlineColumnAxis() const;
     inline ColumnProgression columnProgression() const;
@@ -1403,8 +1403,8 @@ public:
 
     void setColor(Color&&);
 
-    void setTextAlign(TextAlignMode v) { m_inheritedFlags.textAlign = static_cast<unsigned>(v); }
-    inline void setTextAlignLast(TextAlignLast);
+    void setTextAlign(Style::TextAlign v) { m_inheritedFlags.textAlign = static_cast<unsigned>(v); }
+    inline void setTextAlignLast(Style::TextAlignLast);
     inline void setTextGroupAlign(TextGroupAlign);
     inline void addToTextDecorationLineInEffect(const Style::TextDecorationLine&);
     inline void setTextDecorationLineInEffect(Style::TextDecorationLine&&);
@@ -1594,7 +1594,7 @@ public:
     inline void setHyphenateLimitAfter(Style::HyphenateLimitEdge);
     inline void setHyphenateLimitLines(Style::HyphenateLimitLines);
     inline void setHyphenateCharacter(Style::HyphenateCharacter&&);
-    inline void setResize(Resize);
+    inline void setResize(Style::Resize);
     inline void setColumnAxis(ColumnAxis);
     inline void setColumnProgression(ColumnProgression);
     inline void setColumnWidth(Style::ColumnWidth);
@@ -2085,8 +2085,8 @@ public:
     static constexpr Style::Widows initialWidows();
     static constexpr Style::Orphans initialOrphans();
     static inline Style::LineHeight initialLineHeight();
-    static constexpr TextAlignMode initialTextAlign();
-    static constexpr TextAlignLast initialTextAlignLast();
+    static constexpr Style::TextAlign initialTextAlign();
+    static constexpr Style::TextAlignLast initialTextAlignLast();
     static constexpr TextGroupAlign initialTextGroupAlign();
     static constexpr Style::TextDecorationLine initialTextDecorationLine();
     static constexpr Style::TextDecorationLine initialTextDecorationLineInEffect();
@@ -2145,7 +2145,7 @@ public:
     static constexpr Style::HyphenateLimitEdge initialHyphenateLimitAfter();
     static constexpr Style::HyphenateLimitLines initialHyphenateLimitLines();
     static inline Style::HyphenateCharacter initialHyphenateCharacter();
-    static constexpr Resize initialResize();
+    static constexpr Style::Resize initialResize();
     static constexpr StyleAppearance initialAppearance();
     static inline Style::AspectRatio initialAspectRatio();
     static constexpr Style::Contain initialContain();
@@ -2549,7 +2549,7 @@ private:
         // Text Formatting = 19 bits aligned onto 2 bytes + 4 trailing bits
         PREFERRED_TYPE(WhiteSpaceCollapse) unsigned char whiteSpaceCollapse : 3;
         PREFERRED_TYPE(TextWrapMode) unsigned char textWrapMode : 1;
-        PREFERRED_TYPE(TextAlignMode) unsigned char textAlign : 4;
+        PREFERRED_TYPE(Style::TextAlign) unsigned char textAlign : 4;
         PREFERRED_TYPE(TextWrapStyle) unsigned char textWrapStyle : 2;
         unsigned char textTransform : TextTransformBits; // PREFERRED_TYPE elided to avoid header inclusion.
         unsigned char : 1; // byte alignment

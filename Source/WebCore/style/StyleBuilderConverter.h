@@ -113,86 +113,12 @@ class BuilderConverter {
 public:
     template<typename T, typename... Rest> static T convertStyleType(BuilderState&, const CSSValue&, Rest&&...);
 
-    static TextAlignMode convertTextAlign(BuilderState&, const CSSValue&);
-    static TextAlignLast convertTextAlignLast(BuilderState&, const CSSValue&);
-    static Resize convertResize(BuilderState&, const CSSValue&);
-
     static FixedVector<PositionTryFallback> convertPositionTryFallbacks(BuilderState&, const CSSValue&);
-
-    static MaskMode convertSingleMaskMode(BuilderState&, const CSSValue&);
 };
 
 template<typename T, typename... Rest> inline T BuilderConverter::convertStyleType(BuilderState& builderState, const CSSValue& value, Rest&&... rest)
 {
     return toStyleFromCSSValue<T>(builderState, value, std::forward<Rest>(rest)...);
-}
-
-inline TextAlignMode BuilderConverter::convertTextAlign(BuilderState& builderState, const CSSValue& value)
-{
-    auto* primitiveValue = requiredDowncast<CSSPrimitiveValue>(builderState, value);
-    if (!primitiveValue)
-        return { };
-    ASSERT(primitiveValue->isValueID());
-
-    const auto& parentStyle = builderState.parentStyle();
-
-    // User agents are expected to have a rule in their user agent stylesheet that matches th elements that have a parent
-    // node whose computed value for the 'text-align' property is its initial value, whose declaration block consists of
-    // just a single declaration that sets the 'text-align' property to the value 'center'.
-    // https://html.spec.whatwg.org/multipage/rendering.html#rendering
-    if (primitiveValue->valueID() == CSSValueInternalThCenter) {
-        if (parentStyle.textAlign() == RenderStyle::initialTextAlign())
-            return TextAlignMode::Center;
-        return parentStyle.textAlign();
-    }
-
-    if (primitiveValue->valueID() == CSSValueWebkitMatchParent || primitiveValue->valueID() == CSSValueMatchParent) {
-        const auto* element = builderState.element();
-
-        if (element && element == builderState.document().documentElement())
-            return TextAlignMode::Start;
-        if (parentStyle.textAlign() == TextAlignMode::Start)
-            return parentStyle.writingMode().isBidiLTR() ? TextAlignMode::Left : TextAlignMode::Right;
-        if (parentStyle.textAlign() == TextAlignMode::End)
-            return parentStyle.writingMode().isBidiLTR() ? TextAlignMode::Right : TextAlignMode::Left;
-
-        return parentStyle.textAlign();
-    }
-
-    return fromCSSValue<TextAlignMode>(value);
-}
-
-inline TextAlignLast BuilderConverter::convertTextAlignLast(BuilderState& builderState, const CSSValue& value)
-{
-    auto* primitiveValue = requiredDowncast<CSSPrimitiveValue>(builderState, value);
-    if (!primitiveValue)
-        return { };
-    ASSERT(primitiveValue->isValueID());
-
-    if (primitiveValue->valueID() != CSSValueMatchParent)
-        return fromCSSValue<TextAlignLast>(value);
-
-    auto& parentStyle = builderState.parentStyle();
-    if (parentStyle.textAlignLast() == TextAlignLast::Start)
-        return parentStyle.writingMode().isBidiLTR() ? TextAlignLast::Left : TextAlignLast::Right;
-    if (parentStyle.textAlignLast() == TextAlignLast::End)
-        return parentStyle.writingMode().isBidiLTR() ? TextAlignLast::Right : TextAlignLast::Left;
-    return parentStyle.textAlignLast();
-}
-
-inline Resize BuilderConverter::convertResize(BuilderState& builderState, const CSSValue& value)
-{
-    auto* primitiveValue = requiredDowncast<CSSPrimitiveValue>(builderState, value);
-    if (!primitiveValue)
-        return { };
-
-    auto resize = Resize::None;
-    if (primitiveValue->valueID() == CSSValueInternalTextareaAuto)
-        resize = builderState.document().settings().textAreasAreResizable() ? Resize::Both : Resize::None;
-    else
-        resize = fromCSSValue<Resize>(value);
-
-    return resize;
 }
 
 inline float zoomWithTextZoomFactor(BuilderState& builderState)
@@ -253,23 +179,6 @@ inline FixedVector<PositionTryFallback> BuilderConverter::convertPositionTryFall
         auto fallback = convertFallback(item);
         return fallback ? *fallback : PositionTryFallback { };
     });
-}
-
-inline MaskMode BuilderConverter::convertSingleMaskMode(BuilderState& builderState, const CSSValue& value)
-{
-    switch (value.valueID()) {
-    case CSSValueAlpha:
-        return MaskMode::Alpha;
-    case CSSValueLuminance:
-        return MaskMode::Luminance;
-    case CSSValueMatchSource:
-        return MaskMode::MatchSource;
-    case CSSValueAuto: // -webkit-mask-source-type
-        return MaskMode::MatchSource;
-    default:
-        builderState.setCurrentPropertyInvalidAtComputedValueTime();
-        return MaskMode::MatchSource;
-    }
 }
 
 } // namespace Style

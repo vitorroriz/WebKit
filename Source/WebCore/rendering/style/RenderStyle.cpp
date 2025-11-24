@@ -3638,7 +3638,7 @@ void RenderStyle::InheritedFlags::dumpDifferences(TextStream& ts, const Inherite
 
     LOG_IF_DIFFERENT_WITH_CAST(WhiteSpaceCollapse, whiteSpaceCollapse);
     LOG_IF_DIFFERENT_WITH_CAST(TextWrapMode, textWrapMode);
-    LOG_IF_DIFFERENT_WITH_CAST(TextAlignMode, textAlign);
+    LOG_IF_DIFFERENT_WITH_CAST(Style::TextAlign, textAlign);
     LOG_IF_DIFFERENT_WITH_CAST(TextWrapStyle, textWrapStyle);
 
     LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::TextTransform, textTransform);

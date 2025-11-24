@@ -5668,7 +5668,7 @@
                 "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "MaskMode",
                 "coordinated-value-list-property": true,
-                "style-converter": "SingleMaskMode",
+                "style-converter": "StyleType<MaskMode>",
                 "parser-grammar": "<single-mask-mode>#"
             },
             "specification": {
@@ -7306,7 +7306,7 @@
                 }
             ],
             "codegen-properties": {
-                "style-builder-converter": "Resize",
+                "style-builder-converter": "StyleType<Resize>",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -7730,7 +7730,7 @@
                 }
             ],
             "codegen-properties": {
-                "style-builder-converter": "TextAlign",
+                "style-builder-converter": "StyleType<TextAlign>",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -7753,7 +7753,7 @@
                 "match-parent"
             ],
             "codegen-properties": {
-                "style-builder-converter": "TextAlignLast",
+                "style-builder-converter": "StyleType<TextAlignLast>",
                 "parser-grammar": "<<values>>"
             },
             "specification": {

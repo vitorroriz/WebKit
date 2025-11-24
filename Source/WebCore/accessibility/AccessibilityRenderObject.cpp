@@ -1607,7 +1607,7 @@ AXTextRuns AccessibilityRenderObject::textRuns()
         lineHeight = LineSelection::logicalRect(*lineBox).height();
 
         CheckedPtr renderStyle = style();
-        if (renderStyle && renderStyle->textAlign() != TextAlignMode::Left) {
+        if (renderStyle && renderStyle->textAlign() != Style::TextAlign::Left) {
             // To serve the appropriate bounds for text, we need to offset them by a text run's position within its associated RenderText.
             // Computing this requires the following:
             //     1. Get the run's logical offset within the containing block (see note below).

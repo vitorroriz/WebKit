@@ -49,6 +49,7 @@
 #include <WebCore/StyleStrokeMiterlimit.h>
 #include <WebCore/StyleStrokeWidth.h>
 #include <WebCore/StyleTabSize.h>
+#include <WebCore/StyleTextAlignLast.h>
 #include <WebCore/StyleTextBoxEdge.h>
 #include <WebCore/StyleTextEmphasisPosition.h>
 #include <WebCore/StyleTextEmphasisStyle.h>
@@ -200,7 +201,7 @@ public:
 #if ENABLE(WEBKIT_OVERFLOW_SCROLLING_CSS_PROPERTY)
     PREFERRED_TYPE(Style::WebkitOverflowScrolling) unsigned webkitOverflowScrolling: 1;
 #endif
-    PREFERRED_TYPE(TextAlignLast) unsigned textAlignLast : 3;
+    PREFERRED_TYPE(Style::TextAlignLast) unsigned textAlignLast : 3;
     PREFERRED_TYPE(TextJustify) unsigned textJustify : 2;
     PREFERRED_TYPE(TextDecorationSkipInk) unsigned textDecorationSkipInk : 2;
     PREFERRED_TYPE(MathShift) unsigned mathShift : 1;

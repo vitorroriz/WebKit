@@ -229,48 +229,48 @@ InlineLayoutUnit InlineFormattingUtils::horizontalAlignmentOffset(const RenderSt
             return textAlign;
         // The last line before a forced break or the end of the block is aligned according to text-align-last.
         switch (rootStyle.textAlignLast()) {
-        case TextAlignLast::Auto:
-            if (textAlign == TextAlignMode::Justify)
-                return TextAlignMode::Start;
+        case Style::TextAlignLast::Auto:
+            if (textAlign == Style::TextAlign::Justify)
+                return Style::TextAlign::Start;
             return textAlign;
-        case TextAlignLast::Start:
-            return TextAlignMode::Start;
-        case TextAlignLast::End:
-            return TextAlignMode::End;
-        case TextAlignLast::Left:
-            return TextAlignMode::Left;
-        case TextAlignLast::Right:
-            return TextAlignMode::Right;
-        case TextAlignLast::Center:
-            return TextAlignMode::Center;
-        case TextAlignLast::Justify:
-            return TextAlignMode::Justify;
+        case Style::TextAlignLast::Start:
+            return Style::TextAlign::Start;
+        case Style::TextAlignLast::End:
+            return Style::TextAlign::End;
+        case Style::TextAlignLast::Left:
+            return Style::TextAlign::Left;
+        case Style::TextAlignLast::Right:
+            return Style::TextAlign::Right;
+        case Style::TextAlignLast::Center:
+            return Style::TextAlign::Center;
+        case Style::TextAlignLast::Justify:
+            return Style::TextAlign::Justify;
         default:
             ASSERT_NOT_REACHED();
-            return TextAlignMode::Start;
+            return Style::TextAlign::Start;
         }
     };
 
     switch (computedHorizontalAlignment()) {
-    case TextAlignMode::Left:
-    case TextAlignMode::WebKitLeft:
+    case Style::TextAlign::Left:
+    case Style::TextAlign::WebKitLeft:
         if (!isLeftToRightDirection)
             return horizontalAvailableSpace;
         [[fallthrough]];
-    case TextAlignMode::Start:
+    case Style::TextAlign::Start:
         return { };
-    case TextAlignMode::Right:
-    case TextAlignMode::WebKitRight:
+    case Style::TextAlign::Right:
+    case Style::TextAlign::WebKitRight:
         if (!isLeftToRightDirection)
             return { };
         [[fallthrough]];
-    case TextAlignMode::End:
+    case Style::TextAlign::End:
         return horizontalAvailableSpace;
-    case TextAlignMode::Center:
-    case TextAlignMode::WebKitCenter:
+    case Style::TextAlign::Center:
+    case Style::TextAlign::WebKitCenter:
         return horizontalAvailableSpace / 2;
-    case TextAlignMode::Justify:
-        // TextAlignMode::Justify is a run alignment (and we only do inline box alignment here)
+    case Style::TextAlign::Justify:
+        // Style::TextAlign::Justify is a run alignment (and we only do inline box alignment here)
         return { };
     default:
         ASSERT_NOT_IMPLEMENTED_YET();

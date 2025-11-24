@@ -720,7 +720,7 @@ RenderLayer::OverflowControlRects RenderLayerScrollableArea::overflowControlsRec
     bool haveNonOverlayHorizontalScrollbar = isNonOverlayScrollbar(hBar.get());
     bool haveNonOverlayVerticalScrollbar = isNonOverlayScrollbar(vBar.get());
     bool placeVerticalScrollbarOnTheLeft = shouldPlaceVerticalScrollbarOnLeft();
-    bool haveResizer = renderBox.style().resize() != Resize::None && !renderBox.style().pseudoElementType();
+    bool haveResizer = renderBox.style().resize() != Style::Resize::None && !renderBox.style().pseudoElementType();
     bool scrollbarsAvoidCorner = ((haveNonOverlayHorizontalScrollbar && haveNonOverlayVerticalScrollbar) || (haveResizer && (haveNonOverlayHorizontalScrollbar || haveNonOverlayVerticalScrollbar))) && !renderBox.style().scrollbarWidth().isNone();
 
     IntSize cornerSize;
@@ -1081,7 +1081,7 @@ std::optional<ScrollbarColor> RenderLayerScrollableArea::scrollbarColorStyle() c
 
 bool RenderLayerScrollableArea::hasOverflowControls() const
 {
-    return m_hBar || m_vBar || m_scrollCorner || m_layer.renderer().style().resize() != Resize::None;
+    return m_hBar || m_vBar || m_scrollCorner || m_layer.renderer().style().resize() != Style::Resize::None;
 }
 
 bool RenderLayerScrollableArea::positionOverflowControls(const IntSize& offsetFromRoot)
@@ -1551,7 +1551,7 @@ void RenderLayerScrollableArea::paintScrollCorner(GraphicsContext& context, cons
 void RenderLayerScrollableArea::paintResizer(GraphicsContext& context, const LayoutPoint& paintOffset, const LayoutRect& damageRect)
 {
     auto& renderer = m_layer.renderer();
-    if (renderer.style().resize() == Resize::None)
+    if (renderer.style().resize() == Style::Resize::None)
         return;
 
     auto rects = overflowControlsRects();
@@ -1586,7 +1586,7 @@ bool RenderLayerScrollableArea::hitTestOverflowControls(HitTestResult& result, c
     auto rects = overflowControlsRects();
 
     auto& renderer = m_layer.renderer();
-    if (renderer.style().resize() != Resize::None) {
+    if (renderer.style().resize() != Style::Resize::None) {
         if (rects.resizer.contains(localPoint))
             return true;
     }

@@ -444,7 +444,7 @@ void StyleRareInheritedData::dumpDifferences(TextStream& ts, const StyleRareInhe
     LOG_IF_DIFFERENT_WITH_CAST(Style::WebkitOverflowScrolling, webkitOverflowScrolling);
 #endif
 
-    LOG_IF_DIFFERENT_WITH_CAST(TextAlignLast, textAlignLast);
+    LOG_IF_DIFFERENT_WITH_CAST(Style::TextAlignLast, textAlignLast);
     LOG_IF_DIFFERENT_WITH_CAST(TextJustify, textJustify);
     LOG_IF_DIFFERENT_WITH_CAST(TextDecorationSkipInk, textDecorationSkipInk);
 

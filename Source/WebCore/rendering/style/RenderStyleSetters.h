@@ -259,7 +259,7 @@ inline void RenderStyle::setPositionAnchor(Style::PositionAnchor&& anchor) { SET
 inline void RenderStyle::setPositionArea(Style::PositionArea positionArea) { SET_NESTED(m_nonInheritedData, rareData, positionArea, positionArea); }
 inline void RenderStyle::setPositionTryOrder(Style::PositionTryOrder order) { SET_NESTED(m_nonInheritedData, rareData, positionTryOrder, static_cast<unsigned>(order)); }
 inline void RenderStyle::setPositionVisibility(Style::PositionVisibility value) { SET_NESTED(m_nonInheritedData, rareData, positionVisibility, value.toRaw()); }
-inline void RenderStyle::setResize(Resize r) { SET_NESTED(m_nonInheritedData, miscData, resize, static_cast<unsigned>(r)); }
+inline void RenderStyle::setResize(Style::Resize resize) { SET_NESTED(m_nonInheritedData, miscData, resize, static_cast<unsigned>(resize)); }
 inline void RenderStyle::setRight(Style::InsetEdge&& edge) { SET_NESTED(m_nonInheritedData, surroundData, inset.right(), WTFMove(edge)); }
 inline void RenderStyle::setRotate(Style::Rotate&& rotate) { SET_NESTED(m_nonInheritedData, rareData, rotate, WTFMove(rotate)); }
 inline void RenderStyle::setRowGap(Style::GapGutter&& gap) { SET_NESTED(m_nonInheritedData, rareData, rowGap, WTFMove(gap)); }
@@ -291,7 +291,7 @@ inline void RenderStyle::setStrokeColor(Style::Color&& color) { SET(m_rareInheri
 inline void RenderStyle::setStrokeMiterLimit(Style::StrokeMiterlimit value) { SET(m_rareInheritedData, miterLimit, value); }
 inline void RenderStyle::setStrokeWidth(Style::StrokeWidth&& width) { SET(m_rareInheritedData, strokeWidth, WTFMove(width)); }
 inline void RenderStyle::setTabSize(Style::TabSize&& size) { SET(m_rareInheritedData, tabSize, WTFMove(size)); }
-inline void RenderStyle::setTextAlignLast(TextAlignLast value) { SET(m_rareInheritedData, textAlignLast, static_cast<unsigned>(value)); }
+inline void RenderStyle::setTextAlignLast(Style::TextAlignLast value) { SET(m_rareInheritedData, textAlignLast, static_cast<unsigned>(value)); }
 inline void RenderStyle::setTextBoxTrim(TextBoxTrim value) { SET_NESTED(m_nonInheritedData, rareData, textBoxTrim, static_cast<unsigned>(value)); }
 inline void RenderStyle::setTextBoxEdge(Style::TextBoxEdge value) { SET(m_rareInheritedData, textBoxEdge, value); }
 inline void RenderStyle::setLineFitEdge(Style::LineFitEdge value) { SET(m_rareInheritedData, lineFitEdge, value); }

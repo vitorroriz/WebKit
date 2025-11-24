@@ -3159,10 +3159,10 @@ void RenderBlock::layoutExcludedChildren(RelayoutChildren relayoutChildren)
     LayoutUnit logicalLeft;
     if (writingMode().isBidiLTR()) {
         switch (legend.style().textAlign()) {
-        case TextAlignMode::Center:
+        case Style::TextAlign::Center:
             logicalLeft = (logicalWidth() - logicalWidthForChild(legend)) / 2;
             break;
-        case TextAlignMode::Right:
+        case Style::TextAlign::Right:
             logicalLeft = logicalWidth() - borderAndPaddingEnd() - logicalWidthForChild(legend);
             break;
         default:
@@ -3171,10 +3171,10 @@ void RenderBlock::layoutExcludedChildren(RelayoutChildren relayoutChildren)
         }
     } else {
         switch (legend.style().textAlign()) {
-        case TextAlignMode::Left:
+        case Style::TextAlign::Left:
             logicalLeft = borderAndPaddingStart();
             break;
-        case TextAlignMode::Center: {
+        case Style::TextAlign::Center: {
             // Make sure that the extra pixel goes to the end side in RTL (since it went to the end side
             // in LTR).
             LayoutUnit centeredWidth = logicalWidth() - logicalWidthForChild(legend);

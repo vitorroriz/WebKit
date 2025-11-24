@@ -66,6 +66,7 @@
 #include <WebCore/StyleRareInheritedData.h>
 #include <WebCore/StyleRareNonInheritedData.h>
 #include <WebCore/StyleSurroundData.h>
+#include <WebCore/StyleTextAlign.h>
 #include <WebCore/StyleTextAutospace.h>
 #include <WebCore/StyleTextDecorationLine.h>
 #include <WebCore/StyleTextSpacingTrim.h>
@@ -534,7 +535,7 @@ constexpr Style::PositionVisibility RenderStyle::initialPositionVisibility() { r
 constexpr PrintColorAdjust RenderStyle::initialPrintColorAdjust() { return PrintColorAdjust::Economy; }
 inline Style::Quotes RenderStyle::initialQuotes() { return CSS::Keyword::Auto { }; }
 constexpr Order RenderStyle::initialRTLOrdering() { return Order::Logical; }
-constexpr Resize RenderStyle::initialResize() { return Resize::None; }
+constexpr Style::Resize RenderStyle::initialResize() { return Style::Resize::None; }
 inline Style::GapGutter RenderStyle::initialRowGap() { return CSS::Keyword::Normal { }; }
 constexpr RubyPosition RenderStyle::initialRubyPosition() { return RubyPosition::Over; }
 constexpr RubyAlign RenderStyle::initialRubyAlign() { return RubyAlign::SpaceAround; }
@@ -561,8 +562,8 @@ constexpr Style::StrokeMiterlimit RenderStyle::initialStrokeMiterLimit() { retur
 inline Style::StrokeWidth RenderStyle::initialStrokeWidth() { return 1_css_px; }
 constexpr Style::TabSize RenderStyle::initialTabSize() { return 8_css_number; }
 constexpr TableLayoutType RenderStyle::initialTableLayout() { return TableLayoutType::Auto; }
-constexpr TextAlignMode RenderStyle::initialTextAlign() { return TextAlignMode::Start; }
-constexpr TextAlignLast RenderStyle::initialTextAlignLast() { return TextAlignLast::Auto; }
+constexpr Style::TextAlign RenderStyle::initialTextAlign() { return Style::TextAlign::Start; }
+constexpr Style::TextAlignLast RenderStyle::initialTextAlignLast() { return Style::TextAlignLast::Auto; }
 constexpr TextBoxTrim RenderStyle::initialTextBoxTrim() { return TextBoxTrim::None; }
 constexpr Style::TextBoxEdge RenderStyle::initialTextBoxEdge() { return CSS::Keyword::Auto { }; }
 constexpr Style::LineFitEdge RenderStyle::initialLineFitEdge() { return CSS::Keyword::Leading { }; }
@@ -763,7 +764,7 @@ inline Style::PositionVisibility RenderStyle::positionVisibility() const { retur
 inline bool RenderStyle::preserveNewline() const { return preserveNewline(whiteSpaceCollapse()); }
 inline bool RenderStyle::preserves3D() const { return usedTransformStyle3D() == TransformStyle3D::Preserve3D; }
 inline const Style::Quotes& RenderStyle::quotes() const { return m_rareInheritedData->quotes; }
-inline Resize RenderStyle::resize() const { return static_cast<Resize>(m_nonInheritedData->miscData->resize); }
+inline Style::Resize RenderStyle::resize() const { return static_cast<Style::Resize>(m_nonInheritedData->miscData->resize); }
 inline const Style::InsetEdge& RenderStyle::right() const { return m_nonInheritedData->surroundData->inset.right(); }
 inline const Style::Rotate& RenderStyle::rotate() const { return m_nonInheritedData->rareData->rotate; }
 inline const Style::GapGutter& RenderStyle::rowGap() const { return m_nonInheritedData->rareData->rowGap; }
@@ -807,7 +808,7 @@ inline std::optional<PseudoElementType> RenderStyle::pseudoElementType() const
 inline const AtomString& RenderStyle::pseudoElementNameArgument() const { return m_nonInheritedData->rareData->pseudoElementNameArgument; }
 inline const Style::TabSize& RenderStyle::tabSize() const { return m_rareInheritedData->tabSize; }
 inline TableLayoutType RenderStyle::tableLayout() const { return static_cast<TableLayoutType>(m_nonInheritedData->miscData->tableLayout); }
-inline TextAlignLast RenderStyle::textAlignLast() const { return static_cast<TextAlignLast>(m_rareInheritedData->textAlignLast); }
+inline Style::TextAlignLast RenderStyle::textAlignLast() const { return static_cast<Style::TextAlignLast>(m_rareInheritedData->textAlignLast); }
 inline Style::TextAutospace RenderStyle::textAutospace() const { return fontDescription().textAutospace(); }
 inline TextBoxTrim RenderStyle::textBoxTrim() const { return static_cast<TextBoxTrim>(m_nonInheritedData->rareData->textBoxTrim); }
 inline Style::TextBoxEdge RenderStyle::textBoxEdge() const { return m_rareInheritedData->textBoxEdge; }

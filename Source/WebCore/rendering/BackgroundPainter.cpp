@@ -514,7 +514,7 @@ template<typename Layer> void BackgroundPainter::paintFillLayerImpl(const Color&
         RefPtr<Image> image;
         bool isFirstLine = inlineBoxIterator && inlineBoxIterator->lineBox()->isFirst();
         if (!geometry.destinationRect.isEmpty() && (image = bgImage->image(backgroundObject ? backgroundObject : &m_renderer, geometry.tileSize, context, isFirstLine))) {
-            context.setDrawLuminanceMask(layer.layer.maskMode() == MaskMode::Luminance);
+            context.setDrawLuminanceMask(layer.layer.maskMode() == Style::MaskMode::Luminance);
 
             ImagePaintingOptions options = {
                 op == CompositeOperator::SourceOver ? layer.layer.compositeForPainting(layer.isLast) : op,

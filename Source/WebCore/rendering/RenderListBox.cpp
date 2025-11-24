@@ -455,21 +455,21 @@ void RenderListBox::paintScrollbar(PaintInfo& paintInfo, const LayoutPoint& pain
 
 static LayoutSize itemOffsetForAlignment(TextRun textRun, const RenderStyle& elementStyle, const RenderStyle* itemStyle, FontCascade itemFont, LayoutRect itemBoundingBox)
 {
-    TextAlignMode actualAlignment = itemStyle->textAlign();
-    // FIXME: Firefox doesn't respect TextAlignMode::Justify. Should we?
-    // FIXME: Handle TextAlignMode::End here
-    if (actualAlignment == TextAlignMode::Start || actualAlignment == TextAlignMode::Justify)
-        actualAlignment = itemStyle->writingMode().isLogicalLeftInlineStart() ? TextAlignMode::Left : TextAlignMode::Right;
+    Style::TextAlign actualAlignment = itemStyle->textAlign();
+    // FIXME: Firefox doesn't respect Style::TextAlign::Justify. Should we?
+    // FIXME: Handle Style::TextAlign::End here
+    if (actualAlignment == Style::TextAlign::Start || actualAlignment == Style::TextAlign::Justify)
+        actualAlignment = itemStyle->writingMode().isLogicalLeftInlineStart() ? Style::TextAlign::Left : Style::TextAlign::Right;
 
     bool isHorizontalWritingMode = elementStyle.writingMode().isHorizontal();
 
     auto itemBoundingBoxLogicalWidth = isHorizontalWritingMode ? itemBoundingBox.width() : itemBoundingBox.height();
     auto itemBoundingBoxLogicalHeight = isHorizontalWritingMode ? itemBoundingBox.height() : itemBoundingBox.width();
     auto offset = LayoutSize(0, itemFont.metricsOfPrimaryFont().intAscent());
-    if (actualAlignment == TextAlignMode::Right || actualAlignment == TextAlignMode::WebKitRight) {
+    if (actualAlignment == Style::TextAlign::Right || actualAlignment == Style::TextAlign::WebKitRight) {
         float textWidth = itemFont.width(textRun);
         offset.setWidth(itemBoundingBoxLogicalWidth - textWidth - optionsSpacingInlineStart);
-    } else if (actualAlignment == TextAlignMode::Center || actualAlignment == TextAlignMode::WebKitCenter) {
+    } else if (actualAlignment == Style::TextAlign::Center || actualAlignment == Style::TextAlign::WebKitCenter) {
         float textWidth = itemFont.width(textRun);
         offset.setWidth((itemBoundingBoxLogicalWidth - textWidth) / 2);
     } else
