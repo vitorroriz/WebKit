@@ -98,7 +98,7 @@ private:
     explicit ThreadedCompositor(LayerTreeHost&);
 
     void scheduleUpdateLocked();
-    void updateSceneState();
+    void flushCompositingState(const OptionSet<WebCore::CompositionReason>&);
     void renderLayerTree();
     void paintToCurrentGLContext(const WebCore::TransformationMatrix&, const WebCore::IntSize&);
     void frameComplete();

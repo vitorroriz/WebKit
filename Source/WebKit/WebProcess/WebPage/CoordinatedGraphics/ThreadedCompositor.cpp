@@ -99,6 +99,8 @@ ThreadedCompositor::ThreadedCompositor(LayerTreeHost& layerTreeHost)
             if (!nativeSurfaceHandle)
                 m_flipY = !m_flipY;
             glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
+
+            m_textureMapper = TextureMapper::create();
         }
     });
 }
@@ -128,7 +130,7 @@ void ThreadedCompositor::invalidate()
             return;
 
         // Update the scene at this point ensures the layers state are correctly propagated.
-        updateSceneState();
+        flushCompositingState(CompositionReason::RenderingUpdate);
 
         m_sceneState->invalidateCommittedLayers();
         m_textureMapper = nullptr;
@@ -210,20 +212,18 @@ void ThreadedCompositor::enableFrameDamageNotificationForTesting()
 }
 #endif
 
-void ThreadedCompositor::updateSceneState()
+void ThreadedCompositor::flushCompositingState(const OptionSet<CompositionReason>& reasons)
 {
-    if (!m_textureMapper)
-        m_textureMapper = TextureMapper::create();
+    if (reasons.hasExactlyOneBitSet() && reasons.contains(CompositionReason::Animation))
+        return;
 
-    m_sceneState->rootLayer().flushCompositingState(*m_textureMapper);
+    m_sceneState->rootLayer().flushCompositingState(reasons, *m_textureMapper);
     for (auto& layer : m_sceneState->committedLayers())
-        layer->flushCompositingState(*m_textureMapper);
+        layer->flushCompositingState(reasons, *m_textureMapper);
 }
 
 void ThreadedCompositor::paintToCurrentGLContext(const TransformationMatrix& matrix, const IntSize& size)
 {
-    updateSceneState();
-
     FloatRect clipRect(FloatPoint { }, size);
     TextureMapperLayer& currentRootLayer = m_sceneState->rootLayer().ensureTarget();
     if (currentRootLayer.transform() != matrix)
@@ -342,6 +342,10 @@ void ThreadedCompositor::renderLayerTree()
         if (m_layerTreeHost)
             m_layerTreeHost->willRenderFrame();
     });
+
+    WTFBeginSignpost(this, FlushCompositingState);
+    flushCompositingState(reasons);
+    WTFEndSignpost(this, FlushCompositingState);
 
     WTFBeginSignpost(this, PaintToGLContext);
     paintToCurrentGLContext(viewportTransform, viewportSize);

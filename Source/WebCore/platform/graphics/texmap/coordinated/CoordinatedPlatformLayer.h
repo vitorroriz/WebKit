@@ -178,7 +178,7 @@ public:
     void updateContents(bool affectedByTransformAnimation);
     void updateBackingStore();
 
-    void flushCompositingState(TextureMapper&);
+    void flushCompositingState(const OptionSet<CompositionReason>&, TextureMapper&);
 
     bool hasPendingTilesCreation() const { return m_pendingTilesCreation; }
     bool isCompositionRequiredOrOngoing() const;
