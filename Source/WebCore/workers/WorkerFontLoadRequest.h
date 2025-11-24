@@ -74,7 +74,7 @@ private:
     bool m_isLoading { false };
     bool m_notifyOnClientSet { false };
     bool m_errorOccurred { false };
-    FontLoadRequestClient* m_fontLoadRequestClient { nullptr };
+    WeakPtr<FontLoadRequestClient> m_fontLoadRequestClient;
 
     WeakPtr<ScriptExecutionContext> m_context;
     SharedBufferBuilder m_data;

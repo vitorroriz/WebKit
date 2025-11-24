@@ -82,9 +82,7 @@ private:
 
     void setClient(FontLoadRequestClient* client) final
     {
-        WeakPtr oldClient = m_fontLoadRequestClient;
-        m_fontLoadRequestClient = client;
-
+        WeakPtr oldClient = std::exchange(m_fontLoadRequestClient, client);
         if (!client && oldClient)
             protectedCachedFont()->removeClient(*this);
         else if (client && !oldClient)
@@ -100,8 +98,8 @@ private:
 
         m_fontLoadedProcessed = true;
         ASSERT_UNUSED(font, &font == m_font.get());
-        if (m_fontLoadRequestClient)
-            m_fontLoadRequestClient->fontLoaded(*this); // fontLoaded() might destroy this object. Don't deref its members after it.
+        if (CheckedPtr client = m_fontLoadRequestClient.get())
+            client->fontLoaded(*this); // fontLoaded() might destroy this object. Don't deref its members after it.
     }
 
     CachedResourceHandle<CachedFont> m_font;

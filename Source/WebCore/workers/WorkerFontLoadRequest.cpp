@@ -110,7 +110,7 @@ void WorkerFontLoadRequest::setClient(FontLoadRequestClient* client)
 
     if (m_notifyOnClientSet) {
         m_notifyOnClientSet = false;
-        m_fontLoadRequestClient->fontLoaded(*this);
+        client->fontLoaded(*this);
     }
 }
 
@@ -133,8 +133,8 @@ void WorkerFontLoadRequest::didFinishLoading(ScriptExecutionContextIdentifier, s
     m_isLoading = false;
 
     if (!m_errorOccurred) {
-        if (m_fontLoadRequestClient)
-            m_fontLoadRequestClient->fontLoaded(*this);
+        if (CheckedPtr client = m_fontLoadRequestClient.get())
+            client->fontLoaded(*this);
         else
             m_notifyOnClientSet = true;
     }
@@ -143,8 +143,8 @@ void WorkerFontLoadRequest::didFinishLoading(ScriptExecutionContextIdentifier, s
 void WorkerFontLoadRequest::didFail(std::optional<ScriptExecutionContextIdentifier>, const ResourceError&)
 {
     m_errorOccurred = true;
-    if (m_fontLoadRequestClient)
-        m_fontLoadRequestClient->fontLoaded(*this);
+    if (CheckedPtr client = m_fontLoadRequestClient.get())
+        client->fontLoaded(*this);
 }
 
 } // namespace WebCore
