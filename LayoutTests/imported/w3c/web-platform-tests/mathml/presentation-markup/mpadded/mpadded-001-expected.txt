@@ -1,5 +1,5 @@
 
-PASS Empty mspace
+PASS mpadded (no attributes)
 PASS Different widths
 PASS Different heights
 PASS Different depths
