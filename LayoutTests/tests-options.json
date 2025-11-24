@@ -4649,6 +4649,15 @@
     "imported/w3c/web-platform-tests/mediacapture-record/MediaRecorder-peerconnection.https.html": [
         "slow"
     ],
+    "imported/w3c/web-platform-tests/mediacapture-streams/GUM-echoCancellation-all.https.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/mediacapture-streams/GUM-echoCancellation-boolean.https.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/mediacapture-streams/GUM-echoCancellation-remote-only.https.html": [
+        "slow"
+    ],
     "imported/w3c/web-platform-tests/mediacapture-streams/MediaStreamTrack-getSettings.https.html": [
         "slow"
     ],
