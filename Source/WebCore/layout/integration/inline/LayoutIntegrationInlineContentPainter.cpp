@@ -85,7 +85,7 @@ void InlineContentPainter::paintDisplayBox(const InlineDisplay::Box& box)
     }
 
     if (box.isInlineBox()) {
-        if (!box.isVisible() || !hasDamage(box))
+        if (!box.isVisible() || box.suppressesPaintingForBlockInInline() || !hasDamage(box))
             return;
 
         auto canSkipInlineBoxPainting = [&]() {

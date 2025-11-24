@@ -372,7 +372,7 @@ static inline bool isNestedInlineBoxWithDifferentFontCascadeFromParent(const Box
     return style.fontCascade() != parentStyle.fontCascade();
 }
 
-void InlineDisplayContentBuilder::appendInlineBoxDisplayBox(const Line::Run& lineRun, const InlineLevelBox& inlineBox, const InlineRect& inlineBoxBorderBox, InlineDisplay::Boxes& boxes)
+void InlineDisplayContentBuilder::appendInlineBoxDisplayBox(const Line::Run& lineRun, const InlineLevelBox& inlineBox, const InlineRect& inlineBoxBorderBox, bool lineHasBlockContent, InlineDisplay::Boxes& boxes)
 {
     ASSERT(lineRun.layoutBox().isInlineBox());
     ASSERT(inlineBox.isInlineBox());
@@ -402,6 +402,9 @@ void InlineDisplayContentBuilder::appendInlineBoxDisplayBox(const Line::Run& lin
         , isLineFullyTruncatedInBlockDirection()
         , isFirstLastBox(inlineBox)
     });
+
+    if (lineHasBlockContent)
+        boxes.last().setSuppressesPaintingForBlockInInline();
 }
 
 void InlineDisplayContentBuilder::appendInlineDisplayBoxAtBidiBoundary(const Box& layoutBox, InlineDisplay::Boxes& boxes)
@@ -451,6 +454,7 @@ void InlineDisplayContentBuilder::processNonBidiContent(const LineLayoutResult& 
     auto writingMode = root().style().writingMode();
     auto lineBoxLogicalRect = lineBox.logicalRect();
     auto lineBoxVisualOffset = m_displayLine.topLeft();
+    auto lineHasBlockContent = lineLayoutResult.hasBlockContent();
 
     auto rootLogicalRect = lineBox.logicalRectForRootInlineBox();
     auto rootVisualRect = mapInlineRectLogicalToVisual(rootLogicalRect, lineBoxLogicalRect, writingMode);
@@ -506,11 +510,12 @@ void InlineDisplayContentBuilder::processNonBidiContent(const LineLayoutResult& 
             }
             if (lineRun.isLineSpanningInlineBoxStart()) {
                 // Ideally spanning inline boxes on block lines would not have borders and padding.
-                if (lineLayoutResult.hasBlockContent())
+                if (lineHasBlockContent)
                     return lineBox.logicalContentBoxForInlineBox(layoutBox);
                 return lineBox.logicalBorderBoxForInlineBox(layoutBox, boxGeometry);
             }
             if (lineRun.isBlock()) {
+                ASSERT(lineHasBlockContent);
                 auto borderBoxRect = BoxGeometry::borderBoxRect(boxGeometry);
                 return { borderBoxRect.top(), borderBoxRect.left(), borderBoxRect.width(), borderBoxRect.height() };
             }
@@ -535,7 +540,7 @@ void InlineDisplayContentBuilder::processNonBidiContent(const LineLayoutResult& 
             else if (lineRun.isAtomicInlineBox() || lineRun.isListMarker())
                 appendAtomicInlineLevelDisplayBox(lineRun, visualRectRelativeToRoot, boxes);
             else if (lineRun.isInlineBoxStart() || lineRun.isLineSpanningInlineBoxStart())
-                appendInlineBoxDisplayBox(lineRun, lineBox.inlineLevelBoxFor(lineRun), visualRectRelativeToRoot, boxes);
+                appendInlineBoxDisplayBox(lineRun, lineBox.inlineLevelBoxFor(lineRun), visualRectRelativeToRoot, lineHasBlockContent, boxes);
             else if (lineRun.isBlock()) {
                 // Block content should always be placed at the start of the content box even when floats shrink the line.
                 auto adjustedVisualRect = [&] {
@@ -979,7 +984,7 @@ void InlineDisplayContentBuilder::processBidiContent(const LineLayoutResult& lin
             // Non-empty inline boxes are normally get their display boxes generated when we process their content runs, but
             // these trailing runs have their content on the subsequent line(s).
             auto& inlineBox = lineBox.inlineLevelBoxFor(lineRun);
-            appendInlineBoxDisplayBox(lineRun, inlineBox, { { }, m_displayLine.right(), { }, { } }, boxes);
+            appendInlineBoxDisplayBox(lineRun, inlineBox, { { }, m_displayLine.right(), { }, { } }, { }, boxes);
             setInlineBoxGeometry(lineRun.layoutBox(), formattingContext().geometryForBox(lineRun.layoutBox()), { { }, lineBox.logicalRect().right(), { }, { } }, inlineBox.isFirstBox());
         }
     };
