@@ -72,7 +72,7 @@ public:
 
     void setSize(const WebCore::IntSize&, float);
     void requestCompositionForRenderingUpdate(Function<void()>&&);
-    void requestComposition(CompositionReason);
+    void requestComposition(WebCore::CompositionReason);
     RunLoop* runLoop();
 
     void invalidate();

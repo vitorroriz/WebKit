@@ -184,6 +184,10 @@
 #include <WebCore/Damage.h>
 #endif
 
+#if ENABLE(VIDEO)
+#include <WebCore/HTMLMediaElement.h>
+#endif
+
 namespace WebKit {
 using namespace WebCore;
 using namespace HTMLNames;
