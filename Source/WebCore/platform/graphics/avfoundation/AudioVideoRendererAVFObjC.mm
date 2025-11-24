@@ -1639,12 +1639,9 @@ Ref<MediaPromise> AudioVideoRendererAVFObjC::setInitData(Ref<SharedBuffer> initD
     }
 #endif
     auto keyIDs = CDMPrivateFairPlayStreaming::extractKeyIDsSinf(initData);
-    AtomString initDataType = CDMPrivateFairPlayStreaming::sinfName();
 #if HAVE(FAIRPLAYSTREAMING_MTPS_INITDATA)
-    if (!keyIDs) {
+    if (!keyIDs)
         keyIDs = CDMPrivateFairPlayStreaming::extractKeyIDsMpts(initData);
-        initDataType = CDMPrivateFairPlayStreaming::mptsName();
-    }
 #endif
     if (!keyIDs)
         return MediaPromise::createAndResolve();

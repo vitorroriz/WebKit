@@ -81,7 +81,7 @@ public:
     CDMPrivateThunder(const String& keySystem);
     virtual ~CDMPrivateThunder() = default;
 
-    Vector<AtomString> supportedInitDataTypes() const final;
+    Vector<String> supportedInitDataTypes() const final;
     bool supportsConfiguration(const CDMKeySystemConfiguration&) const final;
     bool supportsConfigurationWithRestrictions(const CDMKeySystemConfiguration& configuration, const CDMRestrictions&) const final
     {
@@ -91,7 +91,7 @@ public:
     {
         return supportsConfiguration(configuration);
     }
-    Vector<AtomString> supportedRobustnesses() const final;
+    Vector<String> supportedRobustnesses() const final;
     CDMRequirement distinctiveIdentifiersRequirement(const CDMKeySystemConfiguration&, const CDMRestrictions&) const final;
     CDMRequirement persistentStateRequirement(const CDMKeySystemConfiguration&, const CDMRestrictions&) const final;
     bool distinctiveIdentifiersAreUniquePerOriginAndClearable(const CDMKeySystemConfiguration&) const final;
@@ -99,7 +99,7 @@ public:
     void loadAndInitialize() final;
     bool supportsServerCertificates() const final;
     bool supportsSessions() const final;
-    bool supportsInitData(const AtomString&, const SharedBuffer&) const final;
+    bool supportsInitData(const String&, const SharedBuffer&) const final;
     RefPtr<SharedBuffer> sanitizeResponse(const SharedBuffer&) const final;
     std::optional<String> sanitizeSessionId(const String&) const final;
 
@@ -132,7 +132,7 @@ class CDMInstanceSessionThunder final : public CDMInstanceSessionProxy {
 public:
     CDMInstanceSessionThunder(CDMInstanceThunder&);
 
-    void requestLicense(LicenseType, KeyGroupingStrategy, const AtomString& initDataType, Ref<SharedBuffer>&& initData, LicenseCallback&&) final;
+    void requestLicense(LicenseType, KeyGroupingStrategy, const String& initDataType, Ref<SharedBuffer>&& initData, LicenseCallback&&) final;
     void updateLicense(const String&, LicenseType, Ref<SharedBuffer>&&, LicenseUpdateCallback&&) final;
     void loadSession(LicenseType, const String&, const String&, LoadSessionCallback&&) final;
     void closeSession(const String&, CloseSessionCallback&&) final;
