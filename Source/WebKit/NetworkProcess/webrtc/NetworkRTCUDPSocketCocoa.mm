@@ -40,6 +40,7 @@
 #include <webrtc/rtc_base/async_packet_socket.h>
 #include <webrtc/rtc_base/time_utils.h>
 #include <wtf/BlockPtr.h>
+#include <wtf/OSObjectPtr.h>
 #include <wtf/SoftLinking.h>
 #include <wtf/SystemFree.h>
 #include <wtf/TZoneMallocInlines.h>
@@ -105,11 +106,7 @@ private:
 
 static dispatch_queue_t udpSocketQueueSingleton()
 {
-    static LazyNeverDestroyed<RetainPtr<dispatch_queue_t>> queue;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        queue.construct(adoptNS(dispatch_queue_create("WebRTC UDP socket queue", RetainPtr { DISPATCH_QUEUE_CONCURRENT }.get())));
-    });
+    static NeverDestroyed<OSObjectPtr<dispatch_queue_t>> queue = adoptOSObject(dispatch_queue_create("WebRTC UDP socket queue", RetainPtr { DISPATCH_QUEUE_CONCURRENT }.get()));
     return queue.get().get();
 }
 

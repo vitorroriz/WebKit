@@ -1511,11 +1511,7 @@ void WebPageProxy::Internals::getWindowSceneAndBundleIdentifierForPaymentPresent
 
 static bool desktopClassBrowsingSupported()
 {
-    static bool supportsDesktopClassBrowsing = false;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        supportsDesktopClassBrowsing = !PAL::currentUserInterfaceIdiomIsSmallScreen();
-    });
+    static bool supportsDesktopClassBrowsing = !PAL::currentUserInterfaceIdiomIsSmallScreen();
     return supportsDesktopClassBrowsing;
 }
 
@@ -1560,9 +1556,8 @@ bool WebPageProxy::isDesktopClassBrowsingRecommended(const WebCore::ResourceRequ
         return false;
 #endif
 
-    static bool shouldRecommendDesktopClassBrowsing = false;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
+    static bool shouldRecommendDesktopClassBrowsing = [&] {
+        bool shouldRecommendDesktopClassBrowsing = false;
 #if PLATFORM(MACCATALYST)
         shouldRecommendDesktopClassBrowsing = desktopClassBrowsingSupported();
 #else
@@ -1575,7 +1570,8 @@ bool WebPageProxy::isDesktopClassBrowsingRecommended(const WebCore::ResourceRequ
             // WKWebView on appropriately-sized iPad models.
             shouldRecommendDesktopClassBrowsing = false;
         }
-    });
+        return shouldRecommendDesktopClassBrowsing;
+    }();
     return shouldRecommendDesktopClassBrowsing;
 }
 

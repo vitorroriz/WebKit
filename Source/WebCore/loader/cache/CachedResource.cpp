@@ -940,11 +940,7 @@ ResourceResponse& CachedResource::mutableResponse()
 const ResourceResponse& CachedResource::response() const
 {
     if (!m_response) {
-        static LazyNeverDestroyed<ResourceResponse> staticEmptyResponse;
-        static std::once_flag onceFlag;
-        std::call_once(onceFlag, [&] {
-            staticEmptyResponse.construct();
-        });
+        static NeverDestroyed<ResourceResponse> staticEmptyResponse;
         return staticEmptyResponse;
     }
     return m_response->m_response;
@@ -965,11 +961,7 @@ void CachedResource::restartDecodedDataDeletionTimer()
 const ResourceError& CachedResource::resourceError() const
 {
     if (!m_response) {
-        static LazyNeverDestroyed<ResourceError> emptyError;
-        static std::once_flag onceFlag;
-        std::call_once(onceFlag, [&] {
-            emptyError.construct();
-        });
+        static NeverDestroyed<ResourceError> emptyError;
         return emptyError;
     }
     return m_response->m_error;

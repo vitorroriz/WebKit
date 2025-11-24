@@ -135,12 +135,10 @@ String NavigatorUAData::platform() const
         return platformOverride;
 
 #if OS(LINUX)
-    static LazyNeverDestroyed<String> platformName;
-    static std::once_flag onceKey;
-    std::call_once(onceKey, [] {
+    static NeverDestroyed<String> platformName = [] {
         struct utsname osname;
-        platformName.construct(uname(&osname) >= 0 ? makeString(unsafeSpan(osname.sysname)) : emptyString());
-    });
+        return uname(&osname) >= 0 ? makeString(unsafeSpan(osname.sysname)) : emptyString();
+    }();
     return platformName->isolatedCopy();
 #elif PLATFORM(IOS_FAMILY)
     return (PAL::currentUserInterfaceIdiomIsDesktop() || PAL::currentUserInterfaceIdiomIsVision()) ? "macOS"_s : "iOS"_s;

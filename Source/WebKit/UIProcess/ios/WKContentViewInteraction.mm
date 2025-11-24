@@ -2979,23 +2979,14 @@ static inline WebCore::FloatSize tapHighlightBorderRadius(WebCore::FloatSize bor
 
 static BOOL isBuiltInScrollViewPanGestureRecognizer(UIGestureRecognizer *recognizer)
 {
-    static Class scrollViewPanGestureClass;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        scrollViewPanGestureClass = NSClassFromString(@"UIScrollViewPanGestureRecognizer");
-    });
+    static Class scrollViewPanGestureClass = NSClassFromString(@"UIScrollViewPanGestureRecognizer");
     return [recognizer isKindOfClass:scrollViewPanGestureClass];
 }
 
 static BOOL isBuiltInScrollViewGestureRecognizer(UIGestureRecognizer *recognizer)
 {
-    static Class scrollViewPinchGestureClass;
-    static Class scrollViewKnobLongPressGestureRecognizerClass;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        scrollViewPinchGestureClass = NSClassFromString(@"UIScrollViewPinchGestureRecognizer");
-        scrollViewKnobLongPressGestureRecognizerClass = NSClassFromString(@"UIScrollViewKnobLongPressGestureRecognizer");
-    });
+    static Class scrollViewPinchGestureClass = NSClassFromString(@"UIScrollViewPinchGestureRecognizer");
+    static Class scrollViewKnobLongPressGestureRecognizerClass = NSClassFromString(@"UIScrollViewKnobLongPressGestureRecognizer");
     return isBuiltInScrollViewPanGestureRecognizer(recognizer)
         || [recognizer isKindOfClass:scrollViewPinchGestureClass]
         || [recognizer isKindOfClass:scrollViewKnobLongPressGestureRecognizerClass];

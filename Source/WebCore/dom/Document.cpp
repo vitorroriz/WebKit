@@ -7583,12 +7583,8 @@ const URL& Document::maskedURLForBindings()
 {
     // This function can be called from GC heap thread, thus we need to use StaticStringImpl as a source of URL.
     // StaticStringImpl is never converted to AtomString, and it is safe to be used in any threads.
-    static LazyNeverDestroyed<URL> url;
-    static std::once_flag onceFlag;
-    std::call_once(onceFlag, [&] {
-        url.construct(maskedURLStringForBindings());
-        ASSERT(url->string().impl() == &static_cast<StringImpl&>(maskedURLStringForBindings()));
-    });
+    static NeverDestroyed<URL> url { maskedURLStringForBindings() };
+    ASSERT(url->string().impl() == &static_cast<StringImpl&>(maskedURLStringForBindings()));
     return url;
 }
 

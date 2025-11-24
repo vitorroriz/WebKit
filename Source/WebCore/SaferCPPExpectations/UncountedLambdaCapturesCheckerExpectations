@@ -33,7 +33,6 @@ dom/CustomElementDefaultARIA.cpp
 dom/RejectedPromiseTracker.cpp
 [ Mac ] editing/Editor.cpp
 html/FormAssociatedCustomElement.cpp
-html/track/TrackBase.cpp
 inspector/InspectorOverlay.cpp
 inspector/agents/page/PageDOMDebuggerAgent.cpp
 loader/NetscapePlugInStreamLoader.cpp

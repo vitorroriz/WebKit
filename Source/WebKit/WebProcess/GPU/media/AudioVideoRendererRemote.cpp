@@ -68,11 +68,7 @@ using namespace WebCore;
 
 WorkQueue& AudioVideoRendererRemote::queueSingleton()
 {
-    static std::once_flag onceKey;
-    static LazyNeverDestroyed<Ref<WorkQueue>> workQueue;
-    std::call_once(onceKey, [] {
-        workQueue.construct(WorkQueue::create("AudioVideoRendererRemote"_s));
-    });
+    static NeverDestroyed<Ref<WorkQueue>> workQueue = WorkQueue::create("AudioVideoRendererRemote"_s);
     return workQueue.get();
 }
 

@@ -320,11 +320,7 @@ static WebGLRenderingContextBaseSet& activeContexts()
         static NeverDestroyed<WebGLRenderingContextBaseSet> s_mainThreadActiveContexts;
         return s_mainThreadActiveContexts.get();
     }
-    static LazyNeverDestroyed<ThreadSpecific<WebGLRenderingContextBaseSet>> s_activeContexts;
-    static std::once_flag s_onceFlag;
-    std::call_once(s_onceFlag, [] {
-        s_activeContexts.construct();
-    });
+    static NeverDestroyed<ThreadSpecific<WebGLRenderingContextBaseSet>> s_activeContexts;
     return *s_activeContexts.get();
 }
 

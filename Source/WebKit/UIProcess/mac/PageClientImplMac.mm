@@ -1108,18 +1108,18 @@ WebCore::Color PageClientImpl::accentColor()
 
 bool PageClientImpl::appUsesCustomAccentColor()
 {
-    static dispatch_once_t once;
-    static BOOL usesCustomAppAccentColor = NO;
-    dispatch_once(&once, ^{
+    static BOOL usesCustomAppAccentColor = [] {
         RetainPtr bundleForAccentColor = [NSBundle mainBundle];
         RetainPtr info = [bundleForAccentColor infoDictionary];
         RetainPtr<NSString> accentColorName = info.get()[@"NSAccentColorName"];
+        BOOL usesCustomAppAccentColor = NO;
         if ([accentColorName length])
             usesCustomAppAccentColor = !![NSColor colorNamed:accentColorName.get() bundle:bundleForAccentColor.get()];
 
         if (!usesCustomAppAccentColor && [(accentColorName = info.get()[@"NSAppAccentColorName"]) length])
             usesCustomAppAccentColor = !![NSColor colorNamed:accentColorName.get() bundle:bundleForAccentColor.get()];
-    });
+        return usesCustomAppAccentColor;
+    }();
 
     return usesCustomAppAccentColor;
 }

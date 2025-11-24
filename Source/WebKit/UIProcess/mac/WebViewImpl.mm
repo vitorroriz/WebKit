@@ -3990,12 +3990,7 @@ RetainPtr<id> WebViewImpl::toolTipOwnerForSendingMouseEvents() const
         return owner;
 
     for (NSTrackingArea *trackingArea in protectedView().get().trackingAreas) {
-        static Class managerClass;
-        static std::once_flag onceFlag;
-        std::call_once(onceFlag, [] {
-            managerClass = NSClassFromString(@"NSToolTipManager");
-        });
-
+        static Class managerClass = NSClassFromString(@"NSToolTipManager");
         RetainPtr<id> owner = trackingArea.owner;
         if ([owner class] == managerClass)
             return owner;

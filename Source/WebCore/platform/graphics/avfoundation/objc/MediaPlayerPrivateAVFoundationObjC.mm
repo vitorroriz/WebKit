@@ -255,12 +255,8 @@ static NSArray *playerKVOProperties();
 
 static dispatch_queue_t globalLoaderDelegateQueue()
 {
-    static dispatch_queue_t globalQueue;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        globalQueue = dispatch_queue_create("WebCoreAVFLoaderDelegate queue", DISPATCH_QUEUE_SERIAL);
-    });
-    return globalQueue;
+    static NeverDestroyed<OSObjectPtr<dispatch_queue_t>> globalQueue = adoptOSObject(dispatch_queue_create("WebCoreAVFLoaderDelegate queue", DISPATCH_QUEUE_SERIAL));
+    return globalQueue.get().get();
 }
 
 class MediaPlayerPrivateAVFoundationObjC::Factory final : public MediaPlayerFactory {
@@ -3949,11 +3945,7 @@ auto MediaPlayerPrivateAVFoundationObjC::asyncVideoPlaybackQualityMetrics() -> R
 {
     assertIsMainThread();
 
-    static std::once_flag onceKey;
-    static LazyNeverDestroyed<Ref<WorkQueue>> metricsWorkQueue;
-    std::call_once(onceKey, [] {
-        metricsWorkQueue.construct(WorkQueue::create("VideoPlaybackQualityMetrics"_s, WorkQueue::QOS::Background));
-    });
+    static NeverDestroyed<Ref<WorkQueue>> metricsWorkQueue = WorkQueue::create("VideoPlaybackQualityMetrics"_s, WorkQueue::QOS::Background);
 
     if (!m_videoLayer)
         return VideoPlaybackQualityMetricsPromise::createAndReject(PlatformMediaError::NotSupportedError);

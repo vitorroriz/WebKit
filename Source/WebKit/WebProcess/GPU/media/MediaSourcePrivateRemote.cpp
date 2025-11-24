@@ -53,11 +53,7 @@ using namespace WebCore;
 
 WorkQueue& MediaSourcePrivateRemote::queueSingleton()
 {
-    static std::once_flag onceKey;
-    static LazyNeverDestroyed<Ref<WorkQueue>> workQueue;
-    std::call_once(onceKey, [] {
-        workQueue.construct(WorkQueue::create("MediaSourceRemote"_s));
-    });
+    static NeverDestroyed<Ref<WorkQueue>> workQueue = WorkQueue::create("MediaSourceRemote"_s);
     return workQueue.get();
 }
 

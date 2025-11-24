@@ -395,13 +395,7 @@ bool isOpusDecoderAvailable()
 bool registerOpusDecoderIfNeeded()
 {
 #if ENABLE(OPUS)
-    static bool available;
-
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        available = registerDecoderFactory("ACOpusDecoderFactory"_s, kAudioFormatOpus);
-    });
-
+    static bool available = registerDecoderFactory("ACOpusDecoderFactory"_s, kAudioFormatOpus);
     return available;
 #else
     return false;
