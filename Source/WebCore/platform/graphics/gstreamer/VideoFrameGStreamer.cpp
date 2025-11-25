@@ -30,6 +30,7 @@
 #include "GStreamerCommon.h"
 #include "GStreamerVideoFrameConverter.h"
 #include "GraphicsContext.h"
+#include "ImageBuffer.h"
 #include "ImageGStreamer.h"
 #include "ImageOrientation.h"
 #include "PixelBuffer.h"
@@ -468,6 +469,8 @@ VideoFrameGStreamer::VideoFrameGStreamer(const GRefPtr<GstSample>& sample, const
     initializeCharacteristics(options.presentationTime, isMirrored, videoRotationFromMeta);
 }
 
+VideoFrameGStreamer::~VideoFrameGStreamer() = default;
+
 void VideoFrameGStreamer::setFrameRate(double frameRate)
 {
     auto caps = adoptGRef(gst_caps_copy(gst_sample_get_caps(m_sample.get())));
@@ -624,21 +627,13 @@ void VideoFrame::copyTo(std::span<uint8_t> destination, VideoPixelFormat pixelFo
     callback({ });
 }
 
-void VideoFrame::draw(GraphicsContext& context, const FloatRect& destination, ImageOrientation destinationImageOrientation, bool shouldDiscardAlpha)
+RefPtr<NativeImage> VideoFrameGStreamer::copyNativeImage() const
 {
     auto& gstFrame = downcast<VideoFrameGStreamer>(*this);
     auto image = convertSampleToImage(gstFrame.sample(), gstFrame.info());
     if (!image)
-        return;
-
-    auto imageRect = image->rect();
-    auto source = destinationImageOrientation.usesWidthAsHeight() ? FloatRect(imageRect.location(), imageRect.size().transposedSize()) : imageRect;
-    auto compositeOperator = !shouldDiscardAlpha && image->hasAlpha() ? CompositeOperator::SourceOver : CompositeOperator::Copy;
-    auto platformImage = image->image();
-    auto bitmapImage = BitmapImage::create(WTFMove(platformImage));
-    if (!bitmapImage)
-        return;
-    context.drawImage(*bitmapImage.get(), destination, source, { compositeOperator, destinationImageOrientation });
+        return nullptr;
+    return NativeImage::create(image->image());
 }
 
 GRefPtr<GstSample> VideoFrameGStreamer::resizedSample(const IntSize& destinationSize)

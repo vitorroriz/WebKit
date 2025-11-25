@@ -47,6 +47,7 @@
 #include "RemoteMediaEngineConfigurationFactory.h"
 #include "RemoteMediaSessionManagerProxyMessages.h"
 #include "RemoteRemoteCommandListener.h"
+#include "RemoteSharedResourceCacheProxy.h"
 #include "RemoteWebLockRegistry.h"
 #include "RemoteWorkerType.h"
 #include "SpeechRecognitionRealtimeMediaSourceManager.h"
@@ -1543,10 +1544,13 @@ GPUProcessConnection& WebProcess::ensureGPUProcessConnection()
         if (gpuConnection->ignoreInvalidMessageForTesting())
             gpuConnection->setIgnoreInvalidMessageForTesting();
 #endif
-        m_gpuProcessConnection = GPUProcessConnection::create(WTFMove(gpuConnection));
+        Ref gpuProcessConnection = GPUProcessConnection::create(WTFMove(gpuConnection));
+        m_gpuProcessConnection = gpuProcessConnection.ptr();
         protectedParentProcessConnection()->send(Messages::WebProcessProxy::CreateGPUProcessConnection(m_gpuProcessConnection->identifier(),  WTFMove(connectionIdentifiers->client)), 0, IPC::SendOption::DispatchMessageEvenWhenWaitingForSyncReply);
         for (auto& page : m_pageMap.values())
-            page->gpuProcessConnectionDidBecomeAvailable(Ref { *m_gpuProcessConnection });
+            page->gpuProcessConnectionDidBecomeAvailable(gpuProcessConnection);
+        if (m_sharedResourceCache)
+            Ref { *m_sharedResourceCache }->gpuProcessConnectionDidBecomeAvailable(gpuProcessConnection);
     }
     return *m_gpuProcessConnection;
 }
@@ -1605,6 +1609,15 @@ AudioMediaStreamTrackRendererInternalUnitManager& WebProcess::audioMediaStreamTr
 }
 #endif
 
+RemoteSharedResourceCacheProxy& WebProcess::gpuProcessSharedResourceCache()
+{
+    if (!m_sharedResourceCache) {
+        m_sharedResourceCache = RemoteSharedResourceCacheProxy::create();
+        if (m_gpuProcessConnection)
+            Ref { *m_sharedResourceCache }->gpuProcessConnectionDidBecomeAvailable(Ref { *m_gpuProcessConnection });
+    }
+    return *m_sharedResourceCache;
+}
 #endif // ENABLE(GPU_PROCESS)
 
 #if ENABLE(MODEL_PROCESS)
