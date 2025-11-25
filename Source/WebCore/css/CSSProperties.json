@@ -255,6 +255,9 @@
                 "settings-flag": "accentColorEnabled",
                 "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<AccentColor>",
+                "render-style-storage-path": ["m_rareInheritedData"],
+                "render-style-storage-kind": "reference",
+                "render-style-type": "Style::AccentColor",
                 "color-property": true,
                 "parser-grammar": "auto | <color>"
             },
@@ -8722,6 +8725,9 @@
                 "aliases": [
                     "-webkit-backface-visibility"
                 ],
+                "render-style-storage-path": ["m_nonInheritedData", "rareData"],
+                "render-style-storage-kind": "enum",
+                "render-style-type": "BackfaceVisibility",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -9428,6 +9434,9 @@
                     "-webkit-align-content"
                 ],
                 "style-converter": "StyleType<AlignContent>",
+                "render-style-storage-path": ["m_nonInheritedData", "miscData"],
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::AlignContent",
                 "parser-function": "consumeAlignContent",
                 "parser-grammar-unused": "normal | <baseline-position> | <content-distribution> | [ <overflow-position>? <content-position> ]",
                 "parser-grammar-unused-reason": "Needs support for default values on optionals.",

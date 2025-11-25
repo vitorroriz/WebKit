@@ -28,6 +28,10 @@
 #include "PathOperation.h"
 #include "RenderStyleInlines.h"
 
+#define RENDER_STYLE_SETTERS_GENERATED_INCLUDE_TRAP 1
+#include "RenderStyleSettersGenerated.h"
+#undef RENDER_STYLE_SETTERS_GENERATED_INCLUDE_TRAP
+
 namespace WebCore {
 
 #define SET_STYLE_PROPERTY_BASE(read, value, write) do { if (!compareEqual(read, value)) write; } while (0)
@@ -67,8 +71,6 @@ inline void RenderStyle::resetColumnRule() { SET_DOUBLY_NESTED(m_nonInheritedDat
 inline void RenderStyle::resetMargin() { SET_NESTED(m_nonInheritedData, surroundData, margin, Style::MarginBox { 0_css_px }); }
 inline void RenderStyle::resetPadding() { SET_NESTED(m_nonInheritedData, surroundData, padding, Style::PaddingBox { 0_css_px }); }
 inline void RenderStyle::resetPageSize() { SET_NESTED(m_nonInheritedData, rareData, pageSize, Style::PageSize { CSS::Keyword::Auto { } }); }
-inline void RenderStyle::setAccentColor(Style::AccentColor&& color) { SET(m_rareInheritedData, accentColor, WTFMove(color)); }
-inline void RenderStyle::setAlignContent(Style::AlignContent alignContent) { SET_NESTED(m_nonInheritedData, miscData, alignContent, alignContent); }
 inline void RenderStyle::setAlignItems(Style::AlignItems alignItems) { SET_NESTED(m_nonInheritedData, miscData, alignItems, alignItems); }
 inline void RenderStyle::setAlignSelf(Style::AlignSelf alignSelf) { SET_NESTED(m_nonInheritedData, miscData, alignSelf, alignSelf); }
 inline void RenderStyle::setAnchorNames(Style::AnchorNames&& names) { SET_NESTED(m_nonInheritedData, rareData, anchorNames, WTFMove(names)); }
@@ -80,7 +82,6 @@ inline void RenderStyle::setAppleVisualEffect(AppleVisualEffect effect) { SET_NE
 inline void RenderStyle::setUsedAppleVisualEffectForSubtree(AppleVisualEffect effect) { SET(m_rareInheritedData, usedAppleVisualEffectForSubtree, static_cast<unsigned>(effect)); }
 #endif
 inline void RenderStyle::setAspectRatio(Style::AspectRatio&& ratio) { SET_NESTED(m_nonInheritedData, miscData, aspectRatio, WTFMove(ratio)); }
-inline void RenderStyle::setBackfaceVisibility(BackfaceVisibility b) { SET_NESTED(m_nonInheritedData, rareData, backfaceVisibility, static_cast<unsigned>(b)); }
 inline void RenderStyle::setBackgroundColor(Style::Color&& value) { SET_NESTED(m_nonInheritedData, backgroundData, color, WTFMove(value)); }
 inline void RenderStyle::setBackgroundLayers(Style::BackgroundLayers&& layers) { SET_NESTED(m_nonInheritedData, backgroundData, background, WTFMove(layers)); }
 inline void RenderStyle::setBlockEllipsis(Style::BlockEllipsis&& value) { SET(m_rareInheritedData, blockEllipsis, WTFMove(value)); }

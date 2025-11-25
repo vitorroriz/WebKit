@@ -142,6 +142,8 @@ _AUTO_GENERATED_FILES = [
     'Source/WebCore/css/scripts/test/TestCSSPropertiesResults/CSSPropertyNames.h',
     'Source/WebCore/css/scripts/test/TestCSSPropertiesResults/CSSPropertyParsing.cpp',
     'Source/WebCore/css/scripts/test/TestCSSPropertiesResults/CSSPropertyParsing.h',
+    'Source/WebCore/css/scripts/test/TestCSSPropertiesResults/RenderStyleInlinesGenerated.h',
+    'Source/WebCore/css/scripts/test/TestCSSPropertiesResults/RenderStyleSettersGenerated.h',
     'Source/WebCore/css/scripts/test/TestCSSPropertiesResults/StyleBuilderGenerated.cpp',
     'Source/WebCore/css/scripts/test/TestCSSPropertiesResults/StyleInterpolationWrapperMap.cpp',
     'Source/WebCore/css/scripts/test/TestCSSPropertiesResults/StyleInterpolationWrapperMap.h',

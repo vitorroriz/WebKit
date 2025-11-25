@@ -84,6 +84,28 @@ static bool isKeywordValidForTestMatchOneWithReferenceWithSettingsFlag(CSSValueI
     }
 }
 
+static bool isKeywordValidForTestRenderStyleStorageOneLevelEnum(CSSValueID keyword)
+{
+    switch (keyword) {
+    case CSSValueID::CSSValueBar:
+    case CSSValueID::CSSValueFoo:
+        return true;
+    default:
+        return false;
+    }
+}
+
+static bool isKeywordValidForTestRenderStyleStorageTwoLevelEnum(CSSValueID keyword)
+{
+    switch (keyword) {
+    case CSSValueID::CSSValueBar:
+    case CSSValueID::CSSValueFoo:
+        return true;
+    default:
+        return false;
+    }
+}
+
 static bool isKeywordValidForTestUrlWithModifiers(CSSValueID keyword)
 {
     switch (keyword) {
@@ -3186,6 +3208,10 @@ RefPtr<CSSValue> CSSPropertyParsing::parseStylePropertyLonghand(CSSParserTokenRa
     case CSSPropertyID::CSSPropertyTestCustomExtractor:
     case CSSPropertyID::CSSPropertyTestExtractorConverter:
     case CSSPropertyID::CSSPropertyTestProperty:
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageOneLevelReference:
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageOneLevelValue:
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageTwoLevelReference:
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageTwoLevelValue:
     case CSSPropertyID::CSSPropertyTestSettingsOne:
     case CSSPropertyID::CSSPropertyTestSharedBuilderExtractorConverter:
     case CSSPropertyID::CSSPropertyTestSinkPriority:
@@ -3344,6 +3370,10 @@ RefPtr<CSSValue> CSSPropertyParsing::parseStylePropertyLonghand(CSSParserTokenRa
         return consumeTestMatchOneWithSettingsFlag(range, state);
     case CSSPropertyID::CSSPropertyTestNumericValueRange:
         return consumeTestNumericValueRange(range, state);
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageOneLevelEnum:
+        return consumeIdent(range, isKeywordValidForTestRenderStyleStorageOneLevelEnum);
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageTwoLevelEnum:
+        return consumeIdent(range, isKeywordValidForTestRenderStyleStorageTwoLevelEnum);
     case CSSPropertyID::CSSPropertyTestUnboundedRepetitionWithCommasWithMin:
         return consumeTestUnboundedRepetitionWithCommasWithMin(range, state);
     case CSSPropertyID::CSSPropertyTestUnboundedRepetitionWithCommasWithMinNoSingleItemOpt:
@@ -3410,6 +3440,10 @@ bool CSSPropertyParsing::isKeywordValidForStyleProperty(CSSPropertyID id, CSSVal
         return isKeywordValidForTestMatchOneWithMultipleKeywords(keyword);
     case CSSPropertyID::CSSPropertyTestMatchOneWithReferenceWithSettingsFlag:
         return isKeywordValidForTestMatchOneWithReferenceWithSettingsFlag(keyword);
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageOneLevelEnum:
+        return isKeywordValidForTestRenderStyleStorageOneLevelEnum(keyword);
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageTwoLevelEnum:
+        return isKeywordValidForTestRenderStyleStorageTwoLevelEnum(keyword);
     case CSSPropertyID::CSSPropertyTestUrlWithModifiers:
         return isKeywordValidForTestUrlWithModifiers(keyword);
     case CSSPropertyID::CSSPropertyTestUrlWithNoModifiers:
@@ -3434,6 +3468,8 @@ bool CSSPropertyParsing::isKeywordFastPathEligibleStyleProperty(CSSPropertyID id
     case CSSPropertyID::CSSPropertyTestMatchOneWithKeywordWithSettingsFlag:
     case CSSPropertyID::CSSPropertyTestMatchOneWithMultipleKeywords:
     case CSSPropertyID::CSSPropertyTestMatchOneWithReferenceWithSettingsFlag:
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageOneLevelEnum:
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageTwoLevelEnum:
     case CSSPropertyID::CSSPropertyTestUrlWithModifiers:
     case CSSPropertyID::CSSPropertyTestUrlWithNoModifiers:
     case CSSPropertyID::CSSPropertyTestUsingSharedRule:

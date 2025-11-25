@@ -32,17 +32,9 @@
 #include <WebCore/HitTestRequest.h>
 #include <WebCore/PositionTryOrder.h>
 #include <WebCore/RenderStyle.h>
-#include <WebCore/SVGRenderStyle.h>
 #include <WebCore/ScrollTypes.h>
 #include <WebCore/StyleAppearance.h>
-#include <WebCore/StyleAppleColorFilterData.h>
-#include <WebCore/StyleBackgroundData.h>
-#include <WebCore/StyleBoxData.h>
-#include <WebCore/StyleDeprecatedFlexibleBoxData.h>
 #include <WebCore/StyleFillLayers.h>
-#include <WebCore/StyleFilterData.h>
-#include <WebCore/StyleFlexibleBoxData.h>
-#include <WebCore/StyleFontData.h>
 #include <WebCore/StyleFontFamily.h>
 #include <WebCore/StyleFontFeatureSettings.h>
 #include <WebCore/StyleFontPalette.h>
@@ -55,24 +47,12 @@
 #include <WebCore/StyleFontVariationSettings.h>
 #include <WebCore/StyleFontWeight.h>
 #include <WebCore/StyleFontWidth.h>
-#include <WebCore/StyleGridData.h>
-#include <WebCore/StyleGridItemData.h>
 #include <WebCore/StyleGridTrackSizingDirection.h>
-#include <WebCore/StyleInheritedData.h>
-#include <WebCore/StyleMarqueeData.h>
-#include <WebCore/StyleMiscNonInheritedData.h>
-#include <WebCore/StyleMultiColData.h>
-#include <WebCore/StyleNonInheritedData.h>
-#include <WebCore/StyleRareInheritedData.h>
-#include <WebCore/StyleRareNonInheritedData.h>
-#include <WebCore/StyleSurroundData.h>
 #include <WebCore/StyleTextAlign.h>
 #include <WebCore/StyleTextAutospace.h>
 #include <WebCore/StyleTextDecorationLine.h>
 #include <WebCore/StyleTextSpacingTrim.h>
 #include <WebCore/StyleTextTransform.h>
-#include <WebCore/StyleTransformData.h>
-#include <WebCore/StyleVisitedLinkColorData.h>
 #include <WebCore/StyleWebKitLocale.h>
 #include <WebCore/UnicodeBidi.h>
 #include <WebCore/ViewTimeline.h>
@@ -86,13 +66,15 @@
 #include <WebCore/AppleVisualEffect.h>
 #endif
 
+#define RENDER_STYLE_INLINES_GENERATED_INCLUDE_TRAP 1
+#include <WebCore/RenderStyleInlinesGenerated.h>
+#undef RENDER_STYLE_INLINES_GENERATED_INCLUDE_TRAP
+
 namespace WebCore {
 
 using namespace CSS::Literals;
 
-inline const Style::AccentColor& RenderStyle::accentColor() const { return m_rareInheritedData->accentColor; }
 inline bool RenderStyle::affectsTransform() const { return hasTransform() || hasOffsetPath() || hasRotate() || hasScale() || hasTranslate(); }
-inline Style::AlignContent RenderStyle::alignContent() const { return m_nonInheritedData->miscData->alignContent; }
 inline Style::AlignItems RenderStyle::alignItems() const { return m_nonInheritedData->miscData->alignItems; }
 inline Style::AlignSelf RenderStyle::alignSelf() const { return m_nonInheritedData->miscData->alignSelf; }
 constexpr auto RenderStyle::allTransformOperations() -> OptionSet<TransformOperationOption> { return { TransformOperationOption::TransformOrigin, TransformOperationOption::Translate, TransformOperationOption::Rotate, TransformOperationOption::Scale, TransformOperationOption::Offset }; }
@@ -110,7 +92,6 @@ inline Style::Number<CSS::Nonnegative> RenderStyle::aspectRatioLogicalHeight() c
 inline Style::Number<CSS::Nonnegative> RenderStyle::aspectRatioLogicalWidth() const { return writingMode().isHorizontal() ? aspectRatioWidth() : aspectRatioHeight(); }
 inline Style::Number<CSS::Nonnegative> RenderStyle::aspectRatioWidth() const { return aspectRatio().width(); }
 inline bool RenderStyle::autoWrap() const { return textWrapMode() != TextWrapMode::NoWrap; }
-inline BackfaceVisibility RenderStyle::backfaceVisibility() const { return static_cast<BackfaceVisibility>(m_nonInheritedData->rareData->backfaceVisibility); }
 inline const Style::Color& RenderStyle::backgroundColor() const { return m_nonInheritedData->backgroundData->color; }
 inline const Style::BackgroundLayers& RenderStyle::backgroundLayers() const { return m_nonInheritedData->backgroundData->background; }
 inline const Style::BlockEllipsis& RenderStyle::blockEllipsis() const { return m_rareInheritedData->blockEllipsis; }
