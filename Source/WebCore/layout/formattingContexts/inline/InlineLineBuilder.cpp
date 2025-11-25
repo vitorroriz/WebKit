@@ -53,6 +53,11 @@ struct LineContent {
     std::optional<InlineLayoutUnit> overflowLogicalWidth { };
     HashMap<const Box*, InlineLayoutUnit> rubyBaseAlignmentOffsetList { };
     InlineLayoutUnit rubyAnnotationOffset { 0.f };
+    enum class LineBreakReason : uint8_t {
+        ForcedLineBreakByBlockContent,
+        Other
+    };
+    LineBreakReason lineBreakReason { LineBreakReason::Other };
 };
 
 static bool isContentfulOrHasDecoration(const InlineItem& inlineItem, const InlineFormattingContext& formattingContext)
@@ -324,7 +329,7 @@ LineLayoutResult LineBuilder::layoutInlineContent(const LineInput& lineInput, co
     // Both the inline content ('last line') and the trailing out-of-flow box are supposed to be center aligned.
     auto shouldTreatAsLastLine = isLastInlineContent || lineContent->range.endIndex() == lineInput.needsLayoutRange.endIndex();
     auto inlineBaseDirection = !result.runs.isEmpty() ? inlineBaseDirectionForLineContent(result.runs, rootStyle(), m_previousLine) : TextDirection::LTR;
-    auto lineEndsWithForcedLineBreak = Line::hasTrailingForcedLineBreak(result.runs);
+    auto lineEndsWithForcedLineBreak = lineContent->lineBreakReason == LineContent::LineBreakReason::ForcedLineBreakByBlockContent || Line::hasTrailingForcedLineBreak(result.runs);
     auto isLastLineOrLineEndsWithForcedLineBreak = shouldTreatAsLastLine || lineEndsWithForcedLineBreak;
     auto contentLogicalLeft = !result.runs.isEmpty() ? InlineFormattingUtils::horizontalAlignmentOffset(rootStyle(), result.contentLogicalRight, m_lineLogicalRect.width(), result.hangingTrailingContentWidth, isLastLineOrLineEndsWithForcedLineBreak, inlineBaseDirection) : 0.f;
     Vector<int32_t> visualOrderList;
@@ -504,8 +509,10 @@ UniqueRef<LineContent> LineBuilder::placeInlineAndFloatContent(const InlineItemR
             } else if (auto* blockItem = lineCandidate->blockItem) {
                 // We need to break whenever we come across a block level block to ensure it's the only item on the line.
                 // This is unlike hard line break as in case of 'text<br>', hard line break stays on the current line.
-                if (placedInlineItemCount)
+                if (placedInlineItemCount) {
+                    lineContent->lineBreakReason = LineContent::LineBreakReason::ForcedLineBreakByBlockContent;
                     return;
+                }
 
                 ASSERT(lineCandidate->inlineContent.isEmpty());
                 handleBlockContent(*blockItem);
