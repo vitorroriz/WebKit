@@ -990,15 +990,19 @@ void CoreAudioCaptureUnit::setIsInBackground(bool isInBackground)
     if (m_statusBarManager)
         return;
 
-    m_statusBarManager = makeUnique<MediaCaptureStatusBarManager>([this](CompletionHandler<void()>&& completionHandler) {
-        if (m_statusBarWasTappedCallback)
-            m_statusBarWasTappedCallback(WTFMove(completionHandler));
-    }, [this] {
+    m_statusBarManager = MediaCaptureStatusBarManager::create([weakThis = WeakPtr { *this }](CompletionHandler<void()>&& completionHandler) {
+        RefPtr protectedThis = weakThis.get();
+        if (protectedThis && protectedThis->m_statusBarWasTappedCallback)
+            protectedThis->m_statusBarWasTappedCallback(WTFMove(completionHandler));
+    }, [weakThis = WeakPtr { *this }] {
         RELEASE_LOG_ERROR(WebRTC, "CoreAudioCaptureUnit status bar failed");
-        auto statusBarManager = std::exchange(m_statusBarManager, { });
+        RefPtr protectedThis = weakThis.get();
+        if (!protectedThis)
+            return;
+        auto statusBarManager = std::exchange(protectedThis->m_statusBarManager, { });
         statusBarManager->stop();
-        if (isRunning())
-            captureFailed();
+        if (protectedThis->isRunning())
+            protectedThis->captureFailed();
     });
     m_statusBarManager->start();
 }
