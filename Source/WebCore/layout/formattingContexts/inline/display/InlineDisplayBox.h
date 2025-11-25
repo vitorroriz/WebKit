@@ -115,7 +115,6 @@ struct Box {
     bool hasContent() const { return m_hasContent; }
     inline bool isVisible() const;
     // Inline boxes around blocks are visible to hit testing but don't paint.
-    bool suppressesPaintingForBlockInInline() const { return m_suppressesPaintingForBlockInInline; }
     bool isVisibleIgnoringUsedVisibility() const { return !isFullyTruncated() && style().visibility() == Visibility::Visible; }
     bool isFullyTruncated() const { return m_isFullyTruncated; } 
 
@@ -144,7 +143,6 @@ struct Box {
     void setRect(const FloatRect&, const FloatRect& inkOverflow);
     void setHasContent() { m_hasContent = true; }
     void setIsFullyTruncated() { m_isFullyTruncated = true; }
-    void setSuppressesPaintingForBlockInInline() { m_suppressesPaintingForBlockInInline = true; }
 
     Text& text() { ASSERT(isTextOrSoftLineBreak()); return m_text; }
     const Text& text() const { ASSERT(isTextOrSoftLineBreak()); return m_text; }
@@ -194,7 +192,6 @@ private:
     bool m_isFullyTruncated : 1 { false };
     bool m_isInGlyphDisplayListCache : 1 { false };
     bool m_isFirstFormattedLine : 1 { false };
-    bool m_suppressesPaintingForBlockInInline : 1 { false };
 
     Text m_text;
 };

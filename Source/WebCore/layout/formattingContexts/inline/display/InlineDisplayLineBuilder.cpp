@@ -151,6 +151,7 @@ InlineDisplay::Line InlineDisplayLineBuilder::build(const LineLayoutResult& line
         , isLeftToRightDirection
         , rootInlineBox.layoutBox().writingMode().isHorizontal()
         , lineIsFullyTruncatedInBlockDirection
+        , lineLayoutResult.hasBlockContent()
     };
 }
 

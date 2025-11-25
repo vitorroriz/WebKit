@@ -58,7 +58,7 @@ private:
     void appendAtomicInlineLevelDisplayBox(const Line::Run&, const InlineRect&, InlineDisplay::Boxes&);
     void appendBlockLevelDisplayBox(const Line::Run&, const InlineRect&, InlineDisplay::Boxes&);
     void appendRootInlineBoxDisplayBox(const InlineRect&, bool lineHasContent, InlineDisplay::Boxes&);
-    void appendInlineBoxDisplayBox(const Line::Run&, const InlineLevelBox&, const InlineRect&, bool lineHasBlockContent, InlineDisplay::Boxes&);
+    void appendInlineBoxDisplayBox(const Line::Run&, const InlineLevelBox&, const InlineRect&, InlineDisplay::Boxes&);
     void appendInlineDisplayBoxAtBidiBoundary(const Box&, InlineDisplay::Boxes&);
     void insertRubyAnnotationBox(const Box& annotationBox, size_t insertionPosition, const InlineRect&, InlineDisplay::Boxes&);
 

@@ -90,6 +90,7 @@ public:
 
     // Returns a block level box if the line is for block-in-inline.
     const InlineDisplay::Box* blockLevelBoxForLine(const InlineDisplay::Line&) const;
+    bool isInlineBoxWrapperForBlockLevelBox(const InlineDisplay::Box&) const;
 
     template<typename Function> void traverseNonRootInlineBoxes(const Layout::Box&, Function&&);
 

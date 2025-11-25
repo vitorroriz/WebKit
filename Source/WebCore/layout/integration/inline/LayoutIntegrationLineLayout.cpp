@@ -1196,10 +1196,13 @@ void LineLayout::paint(PaintInfo& paintInfo, const LayoutPoint& paintOffset, con
 
 bool LineLayout::hitTest(const HitTestRequest& request, HitTestResult& result, const HitTestLocation& locationInContainer, const LayoutPoint& accumulatedOffset, HitTestAction hitTestAction, const RenderInline* layerRenderer)
 {
-    if (hitTestAction != HitTestForeground)
+    if (!m_inlineContent)
         return false;
 
-    if (!m_inlineContent)
+    // All real inline content is foreground.
+    if (hitTestAction != HitTestForeground && !m_inlineContent->hasBlockLevelBoxes())
+        return false;
+    if (hitTestAction == HitTestBlockBackground)
         return false;
 
     if (isContentConsideredStale()) {
@@ -1221,9 +1224,38 @@ bool LineLayout::hitTest(const HitTestRequest& request, HitTestResult& result, c
         if (!visibleForHitTesting)
             continue;
 
+        auto shouldHitTestForPhase = [&] {
+            switch (hitTestAction) {
+            case HitTestForeground:
+                // Inline boxes around block-in-inline are hit tested in block background phase.
+                return !m_inlineContent->isInlineBoxWrapperForBlockLevelBox(box);
+            case HitTestChildBlockBackground:
+                return box.isBlockLevelBox() || m_inlineContent->isInlineBoxWrapperForBlockLevelBox(box);
+            case HitTestChildBlockBackgrounds:
+            case HitTestFloat:
+                return box.isBlockLevelBox();
+            case HitTestBlockBackground:
+                break;
+            }
+            ASSERT_NOT_REACHED();
+            return false;
+        };
+
+        if (!shouldHitTestForPhase())
+            continue;
+
         auto& renderer = *box.layoutBox().rendererForIntegration();
 
-        if (box.isAtomicInlineBox() || box.isBlockLevelBox()) {
+        if (box.isBlockLevelBox()) {
+            auto& renderBox = downcast<RenderBox>(renderer);
+            auto childHitTest = hitTestAction == HitTestChildBlockBackgrounds ? HitTestChildBlockBackground : hitTestAction;
+            LayoutPoint childPoint = flippedContentOffsetIfNeeded(flow(), renderBox, accumulatedOffset);
+            if (!renderBox.hasSelfPaintingLayer() && renderBox.nodeAtPoint(request, result, locationInContainer, childPoint, childHitTest))
+                return true;
+            continue;
+        }
+
+        if (box.isAtomicInlineBox()) {
             if (renderer.hitTest(request, result, locationInContainer, flippedContentOffsetIfNeeded(flow(), downcast<RenderBox>(renderer), accumulatedOffset)))
                 return true;
             continue;
