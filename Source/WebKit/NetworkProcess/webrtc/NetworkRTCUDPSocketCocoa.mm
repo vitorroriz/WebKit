@@ -330,7 +330,7 @@ void NetworkRTCUDPSocketCocoaConnections::setOption(int option, int value)
     if (option != webrtc::Socket::OPT_DSCP)
         return;
 
-    auto trafficClass = trafficClassFromDSCP(static_cast<webrtc::DiffServCodePoint>(value));
+    auto trafficClass = trafficClassFromDSCP(static_cast<webrtc::DiffServCodePoint>(value), m_enableServiceClass);
     if (!trafficClass) {
         RELEASE_LOG_ERROR(WebRTC, "NetworkRTCUDPSocketCocoaConnections has an unexpected DSCP value %d", value);
         return;

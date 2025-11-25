@@ -110,6 +110,7 @@ NetworkRTCTCPSocketCocoa::NetworkRTCTCPSocketCocoa(LibWebRTCSocketIdentifier ide
     , m_rtcProvider(rtcProvider)
     , m_connection(WTFMove(connection))
     , m_isSTUN(options & webrtc::PacketSocketFactory::OPT_STUN)
+    , m_enableServiceClass(flags.enableServiceClass)
 {
     auto hostName = remoteAddress.hostname();
     if (hostName.empty())
@@ -176,7 +177,7 @@ void NetworkRTCTCPSocketCocoa::setOption(int option, int value)
     if (option != webrtc::Socket::OPT_DSCP)
         return;
 
-    auto trafficClass = trafficClassFromDSCP(static_cast<webrtc::DiffServCodePoint>(value));
+    auto trafficClass = trafficClassFromDSCP(static_cast<webrtc::DiffServCodePoint>(value), m_enableServiceClass);
     if (!trafficClass) {
         RELEASE_LOG_ERROR(WebRTC, "NetworkRTCTCPSocketCocoa has an unexpected DSCP value %d", value);
         return;
