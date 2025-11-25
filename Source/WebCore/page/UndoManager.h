@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "EventTarget.h"
+#include <WebCore/EventTarget.h>
 
 #include <wtf/Ref.h>
 #include <wtf/RefCountedAndCanMakeWeakPtr.h>
