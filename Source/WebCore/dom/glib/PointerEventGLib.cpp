@@ -25,6 +25,7 @@
 
 #include "config.h"
 #include "PointerEvent.h"
+
 #include "PlatformMouseEvent.h"
 
 #if ENABLE(TOUCH_EVENTS)
