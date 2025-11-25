@@ -663,13 +663,15 @@ WebCore::CocoaColor *sampledFixedPositionContentColor(const WebCore::FixedContai
 
 @class WKTextExtractionItem;
 
+NS_HEADER_AUDIT_BEGIN(nullability, sendability)
+
 @interface WKWebView (NonCpp)
 
 #if PLATFORM(MAC)
 @property (nonatomic, setter=_setAlwaysBounceVertical:) BOOL _alwaysBounceVertical;
 @property (nonatomic, setter=_setAlwaysBounceHorizontal:) BOOL _alwaysBounceHorizontal;
 
-- (void)_setContentOffsetX:(NSNumber *)x y:(NSNumber *)y animated:(BOOL)animated NS_SWIFT_NAME(_setContentOffset(x:y:animated:));
+- (void)_setContentOffsetX:(nullable NSNumber *)x y:(nullable NSNumber *)y animated:(BOOL)animated NS_SWIFT_NAME(_setContentOffset(x:y:animated:));
 #endif
 
 #if PLATFORM(IOS_FAMILY)
@@ -682,7 +684,10 @@ WebCore::CocoaColor *sampledFixedPositionContentColor(const WebCore::FixedContai
 
 - (void)_scrollToEdge:(_WKRectEdge)edge animated:(BOOL)animated;
 
-- (void)_requestTextExtraction:(_WKTextExtractionConfiguration *)configuration completionHandler:(void (^)(WKTextExtractionItem *))completionHandler;
-- (void)_describeInteraction:(_WKTextExtractionInteraction *)interaction completionHandler:(void (^)(NSString *, NSError *))completionHandler;
+- (void)_requestTextExtraction:(_WKTextExtractionConfiguration *)configuration completionHandler:(NS_SWIFT_UI_ACTOR void (^)(WKTextExtractionItem * _Nullable))completionHandler;
+
+- (void)_describeInteraction:(_WKTextExtractionInteraction *)interaction completionHandler:(NS_SWIFT_UI_ACTOR void (^)(NSString * NS_NULLABLE_RESULT, NSError * _Nullable))completionHandler WK_SWIFT_ASYNC_NAME(_describe(interaction:));
 
 @end
+
+NS_HEADER_AUDIT_END(nullability, sendability)
