@@ -5130,8 +5130,18 @@ class GenerateStyleInterpolationWrapperMap:
         # Compute animation wrapper type.
         if property.codegen_properties.animation_wrapper is not None:
             property_wrapper_type = property.codegen_properties.animation_wrapper
+        elif property.animation_type == 'by computed value' or property.animation_type == 'repeatable list' or property.animation_type == 'see prose':
+            if property.codegen_properties.coordinated_value_list_property:
+                property_wrapper_type = 'CoordinatedValueListPropertyStyleTypeWrapper'
+            elif property.codegen_properties.visited_link_color_support:
+                property_wrapper_type = 'VisitedAffectedStyleTypeWrapper'
+            else:
+                property_wrapper_type = 'StyleTypeWrapper'
         elif property.animation_type == 'discrete':
-            property_wrapper_type = 'DiscreteWrapper'
+            if property.codegen_properties.coordinated_value_list_property:
+                property_wrapper_type = 'DiscreteCoordinatedValueListPropertyWrapper'
+            else:
+                property_wrapper_type = 'DiscreteWrapper'
         else:
             raise Exception(f"'{property.name}' animation wrapper type is not defined")
 
@@ -5148,7 +5158,7 @@ class GenerateStyleInterpolationWrapperMap:
             getter = property.codegen_properties.render_style_getter
             setter = property.codegen_properties.render_style_setter
 
-            if property.codegen_properties.coordinated_value_list_property and property.codegen_properties.animation_wrapper is not None:
+            if property.codegen_properties.coordinated_value_list_property and property_wrapper_type is not None:
                 property_wrapper_parameters += [f"&{style_type}::{property.method_name_for_get_coordinated_value_list}", f"&{style_type}::{property.method_name_for_ensure_coordinated_value_list}", f"&{style_type}::{property.method_name_for_set_coordinated_value_list}", f"{property_wrapper_type}({property.id}, &{property.type_name_for_coordinated_value_list}::value_type::{property.codegen_properties.coordinated_value_list_property_getter}, &{property.type_name_for_coordinated_value_list}::value_type::{property.codegen_properties.coordinated_value_list_property_setter})"]
                 property_wrapper_type = "CoordinatedValueListPropertyWrapper"
             else:

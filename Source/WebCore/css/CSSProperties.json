@@ -253,7 +253,6 @@
             ],
             "codegen-properties": {
                 "settings-flag": "accentColorEnabled",
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<AccentColor>",
                 "render-style-storage-path": ["m_rareInheritedData"],
                 "render-style-storage-kind": "reference",
@@ -348,7 +347,6 @@
             "initial": "none",
             "codegen-properties": {
                 "settings-flag": "cssRhythmicSizingEnabled",
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<BlockStepSize>",
                 "parser-grammar": "none | <length [0,inf]>",
                 "parser-exported": true
@@ -659,7 +657,6 @@
                 "from-font"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<FontSizeAdjust>",
                 "font-property": true,
                 "high-priority": true,
@@ -685,7 +682,6 @@
                 "oblique"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<FontStyle>",
                 "font-property": true,
                 "high-priority": true,
@@ -709,7 +705,6 @@
                 "lighter"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "font-description-name-for-methods": "Weight",
                 "font-property": true,
                 "high-priority": true,
@@ -741,7 +736,6 @@
                 {
                     "enable-if": "ENABLE_VARIATION_FONTS",
                     "aliases": ["font-stretch"],
-                    "animation-wrapper": "StyleTypeWrapper",
                     "font-description-name-for-methods": "Width",
                     "font-property": true,
                     "high-priority": true,
@@ -751,7 +745,6 @@
                 {
                     "enable-if": "!ENABLE_VARIATION_FONTS",
                     "aliases": ["font-stretch"],
-                    "animation-wrapper": "StyleTypeWrapper",
                     "font-description-name-for-methods": "Width",
                     "font-property": true,
                     "high-priority": true,
@@ -877,7 +870,6 @@
                 "normal"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<FontVariationSettings>",
                 "font-description-name-for-methods": "VariationSettings",
                 "font-property": true,
@@ -1974,7 +1966,6 @@
                 "local"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "Attachment",
                 "coordinated-value-list-property": true,
                 "disables-native-appearance": true,
@@ -2016,7 +2007,6 @@
                 }
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "BlendMode",
                 "coordinated-value-list-property": true,
                 "separator": ",",
@@ -2055,7 +2045,6 @@
                 }
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "Clip",
                 "coordinated-value-list-property": true,
                 "separator": " ",
@@ -2072,7 +2061,6 @@
             "initial": "transparent",
             "codegen-properties": {
                 "accepts-quirky-color": true,
-                "animation-wrapper": "VisitedAffectedStyleTypeWrapper",
                 "visited-link-color-support": true,
                 "color-property": true,
                 "disables-native-appearance": true,
@@ -2091,6 +2079,7 @@
             ],
             "codegen-properties": {
                 "animation-wrapper": "CoordinatedValueListPropertyStyleTypeWrapper",
+                "animation-wrapper-comment": "Explicitly set to CoordinatedValueListPropertyStyleTypeWrapper to override 'discrete' animation-type.",
                 "coordinated-value-list-property-name-for-methods": "Image",
                 "coordinated-value-list-property": true,
                 "style-converter": "StyleType<ImageOrNone>",
@@ -2114,7 +2103,6 @@
                 "content-box"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "Origin",
                 "coordinated-value-list-property": true,
                 "disables-native-appearance": true,
@@ -2148,7 +2136,6 @@
             "animation-type": "repeatable list",
             "initial": "0%",
             "codegen-properties": {
-                "animation-wrapper": "CoordinatedValueListPropertyStyleTypeWrapper",
                 "coordinated-value-list-property-name-for-methods": "PositionX",
                 "coordinated-value-list-property": true,
                 "style-converter": "StyleType<PositionX>",
@@ -2164,7 +2151,6 @@
             "animation-type": "repeatable list",
             "initial": "0%",
             "codegen-properties": {
-                "animation-wrapper": "CoordinatedValueListPropertyStyleTypeWrapper",
                 "coordinated-value-list-property-name-for-methods": "PositionY",
                 "coordinated-value-list-property": true,
                 "style-converter": "StyleType<PositionY>",
@@ -2188,7 +2174,6 @@
                 "no-repeat"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "Repeat",
                 "coordinated-value-list-property": true,
                 "style-converter": "StyleType<RepeatStyle>",
@@ -2208,7 +2193,6 @@
                 "contain"
             ],
             "codegen-properties": {
-                "animation-wrapper": "CoordinatedValueListPropertyStyleTypeWrapper",
                 "coordinated-value-list-property-name-for-methods": "Size",
                 "coordinated-value-list-property": true,
                 "style-converter": "StyleType<BackgroundSize>",
@@ -2230,7 +2214,6 @@
                 "super"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<SVGBaselineShift>",
                 "parser-grammar": "baseline | sub | super | <length-percentage>"
             },
@@ -2629,7 +2612,6 @@
                     "resolver": "bottom"
                 },
                 "accepts-quirky-color": true,
-                "animation-wrapper": "VisitedAffectedStyleTypeWrapper",
                 "visited-link-color-support": true,
                 "color-property": true,
                 "disables-native-appearance": true,
@@ -2651,7 +2633,6 @@
                     "name": "border-radius",
                     "resolver": "bottom-left"
                 },
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-custom": "All",
                 "style-extractor-converter": "StyleType<BorderRadiusValue>",
                 "disables-native-appearance": true,
@@ -2673,7 +2654,6 @@
                     "name": "border-radius",
                     "resolver": "bottom-right"
                 },
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-custom": "All",
                 "style-extractor-converter": "StyleType<BorderRadiusValue>",
                 "disables-native-appearance": true,
@@ -2727,7 +2707,6 @@
                     "resolver": "bottom"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialBorderWidth",
                 "style-converter": "StyleType<LineWidth>",
                 "style-builder-custom": "Initial",
@@ -2829,7 +2808,6 @@
             "animation-type": "by computed value",
             "initial": "0",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-custom": "All",
                 "style-extractor-converter": "StyleType<BorderImageOutset>",
                 "disables-native-appearance": true,
@@ -2869,7 +2847,6 @@
                 "fill"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-custom": "All",
                 "style-extractor-converter": "StyleType<BorderImageSlice>",
                 "disables-native-appearance": true,
@@ -2891,7 +2868,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<BorderImageSource>",
                 "disables-native-appearance": true,
                 "parser-grammar": "none | <image>"
@@ -2908,7 +2884,6 @@
                 "auto"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-custom": "All",
                 "style-extractor-custom": true,
                 "disables-native-appearance": true,
@@ -3205,7 +3180,6 @@
                     "resolver": "left"
                 },
                 "accepts-quirky-color": true,
-                "animation-wrapper": "VisitedAffectedStyleTypeWrapper",
                 "visited-link-color-support": true,
                 "color-property": true,
                 "disables-native-appearance": true,
@@ -3259,7 +3233,6 @@
                     "resolver": "left"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialBorderWidth",
                 "style-converter": "StyleType<LineWidth>",
                 "style-builder-custom": "Initial",
@@ -3313,7 +3286,6 @@
                     "resolver": "right"
                 },
                 "accepts-quirky-color": true,
-                "animation-wrapper": "VisitedAffectedStyleTypeWrapper",
                 "visited-link-color-support": true,
                 "color-property": true,
                 "disables-native-appearance": true,
@@ -3367,7 +3339,6 @@
                     "resolver": "right"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialBorderWidth",
                 "style-converter": "StyleType<LineWidth>",
                 "style-builder-custom": "Initial",
@@ -3476,7 +3447,6 @@
                     "resolver": "top"
                 },
                 "accepts-quirky-color": true,
-                "animation-wrapper": "VisitedAffectedStyleTypeWrapper",
                 "visited-link-color-support": true,
                 "color-property": true,
                 "disables-native-appearance": true,
@@ -3498,7 +3468,6 @@
                     "name": "border-radius",
                     "resolver": "top-left"
                 },
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-custom": "All",
                 "style-extractor-converter": "StyleType<BorderRadiusValue>",
                 "disables-native-appearance": true,
@@ -3520,7 +3489,6 @@
                     "name": "border-radius",
                     "resolver": "top-right"
                 },
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-custom": "All",
                 "style-extractor-converter": "StyleType<BorderRadiusValue>",
                 "disables-native-appearance": true,
@@ -3574,7 +3542,6 @@
                     "resolver": "top"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialBorderWidth",
                 "style-converter": "StyleType<LineWidth>",
                 "style-builder-custom": "Initial",
@@ -3616,7 +3583,6 @@
                     "resolver": "bottom"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialInset",
                 "style-builder-converter": "StyleType<InsetEdge>",
                 "style-extractor-custom": true,
@@ -3635,7 +3601,6 @@
                 "inset"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<BoxShadows>",
                 "parser-function": "consumeBoxShadow",
                 "parser-grammar-unused": "none | <shadow>#",
@@ -3831,7 +3796,6 @@
             ],
             "codegen-properties": {
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<Clip>",
                 "parser-grammar": "<rect()> | auto"
             },
@@ -3859,7 +3823,6 @@
                 "aliases": [
                     "-webkit-clip-path"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<ClipPath>",
                 "parser-function": "consumeClipPath",
                 "parser-grammar-unused": "<clip-source> | [ <basic-shape> || <geometry-box> ] | none",
@@ -3968,7 +3931,6 @@
                     "name": "corner-shape",
                     "resolver": "top-left"
                 },
-                "animation-wrapper": "StyleTypeWrapper",
                 "disables-native-appearance": true,
                 "parser-grammar": "<corner-shape-value>",
                 "render-style-initial": "initialCornerShapeValue",
@@ -3988,7 +3950,6 @@
                     "name": "corner-shape",
                     "resolver": "top-right"
                 },
-                "animation-wrapper": "StyleTypeWrapper",
                 "disables-native-appearance": true,
                 "parser-grammar": "<corner-shape-value>",
                 "render-style-initial": "initialCornerShapeValue",
@@ -4008,7 +3969,6 @@
                     "name": "corner-shape",
                     "resolver": "bottom-left"
                 },
-                "animation-wrapper": "StyleTypeWrapper",
                 "disables-native-appearance": true,
                 "parser-grammar": "<corner-shape-value>",
                 "render-style-initial": "initialCornerShapeValue",
@@ -4028,7 +3988,6 @@
                     "name": "corner-shape",
                     "resolver": "bottom-right"
                 },
-                "animation-wrapper": "StyleTypeWrapper",
                 "disables-native-appearance": true,
                 "parser-grammar": "<corner-shape-value>",
                 "render-style-initial": "initialCornerShapeValue",
@@ -4261,7 +4220,6 @@
             "animation-type": "by computed value",
             "initial": "0",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<SVGCenterCoordinateComponent>",
                 "parser-grammar": "<length-percentage>"
             },
@@ -4274,7 +4232,6 @@
             "animation-type": "by computed value",
             "initial": "0",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<SVGCenterCoordinateComponent>",
                 "parser-grammar": "<length-percentage>"
             },
@@ -4290,7 +4247,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<SVGPathData>",
                 "parser-grammar": "none | <path()>",
                 "settings-flag": "cssDPropertyEnabled"
@@ -4399,7 +4355,6 @@
             "inherited": true,
             "initial": "1",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<Opacity>",
                 "parser-grammar": "<opacity-value>"
             },
@@ -4454,7 +4409,6 @@
             "animation-type": "by computed value",
             "initial": "black",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "color-property": true,
                 "parser-grammar": "<color>"
             },
@@ -4467,7 +4421,6 @@
             "animation-type": "by computed value",
             "initial": "1",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<Opacity>",
                 "parser-grammar": "<opacity-value>"
             },
@@ -4574,7 +4527,6 @@
                     "resolver": "vertical"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialSize",
                 "style-builder-converter": "StyleType<PreferredSize>",
                 "style-extractor-custom": true,
@@ -4833,7 +4785,6 @@
                 "infinite"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<ItemTolerance>",
                 "parser-grammar": "normal | <length-percentage> | infinite"
             },
@@ -4854,7 +4805,6 @@
                     "resolver": "left"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialInset",
                 "style-builder-converter": "StyleType<InsetEdge>",
                 "style-extractor-custom": true,
@@ -4874,7 +4824,6 @@
             ],
             "codegen-properties": {
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-requires-getter": "computedLetterSpacing",
                 "style-builder-custom": "All",
                 "style-builder-converter": "StyleType<LetterSpacing>",
@@ -4893,7 +4842,6 @@
             "animation-type": "by computed value",
             "initial": "white",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "color-property": true,
                 "parser-grammar": "<color>"
             },
@@ -4937,7 +4885,6 @@
             ],
             "codegen-properties": [
                 {
-                    "animation-wrapper": "StyleTypeWrapper",
                     "animation-wrapper-requires-getter": "specifiedLineHeight",
                     "style-builder-custom": "All",
                     "style-extractor-custom": true,
@@ -4946,7 +4893,6 @@
                     "parser-exported": true
                 },
                 {
-                    "animation-wrapper": "StyleTypeWrapper",
                     "render-style-getter": "specifiedLineHeight",
                     "style-builder-converter": "StyleType<LineHeight>",
                     "style-extractor-custom": true,
@@ -4986,7 +4932,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<ImageOrNone>",
                 "parser-grammar": "<image> | none"
             },
@@ -5208,7 +5153,6 @@
                     "resolver": "bottom"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialMargin",
                 "style-builder-converter": "StyleType<MarginEdge>",
                 "style-extractor-custom": true,
@@ -5290,7 +5234,6 @@
                     "resolver": "left"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialMargin",
                 "style-builder-converter": "StyleType<MarginEdge>",
                 "style-extractor-custom": true,
@@ -5313,7 +5256,6 @@
                     "resolver": "right"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialMargin",
                 "style-builder-converter": "StyleType<MarginEdge>",
                 "style-extractor-custom": true,
@@ -5336,7 +5278,6 @@
                     "resolver": "top"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialMargin",
                 "style-builder-converter": "StyleType<MarginEdge>",
                 "style-extractor-custom": true,
@@ -5487,7 +5428,6 @@
                 "aliases": [
                     "-webkit-mask-box-image-outset"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-custom": "All",
                 "style-extractor-converter": "StyleType<MaskBorderOutset>",
                 "parser-grammar": "[ <number [0,inf]> | <length [0,inf]> ]{1,4}@(type=CSSQuadValue no-single-item-opt)"
@@ -5530,7 +5470,6 @@
                 "aliases": [
                     "-webkit-mask-box-image-slice"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-custom": "All",
                 "style-extractor-converter": "StyleType<MaskBorderSlice>",
                 "parser-function": "consumeBorderImageSlice",
@@ -5553,7 +5492,6 @@
                 "aliases": [
                     "-webkit-mask-box-image-source"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<MaskBorderSource>",
                 "parser-grammar": "none | <image>"
             },
@@ -5572,7 +5510,6 @@
                 "aliases": [
                     "-webkit-mask-box-image-width"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-custom": "All",
                 "style-extractor-converter": "StyleType<MaskBorderWidth>",
                 "parser-function": "consumeBorderImageWidth",
@@ -5606,7 +5543,6 @@
                 "no-clip"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "Clip",
                 "coordinated-value-list-property": true,
                 "parser-grammar": "<single-mask-clip>#"
@@ -5626,7 +5562,6 @@
                 "exclude"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "Composite",
                 "coordinated-value-list-property": true,
                 "parser-grammar": "<single-mask-composite>#"
@@ -5646,7 +5581,6 @@
                 "aliases": [
                     "-webkit-mask-image"
                 ],
-                "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "Image",
                 "coordinated-value-list-property": true,
                 "style-converter": "StyleType<ImageOrNone>",
@@ -5667,7 +5601,6 @@
                 "match-source"
             ],
             "codegen-properties": {
-                "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "MaskMode",
                 "coordinated-value-list-property": true,
                 "style-converter": "StyleType<MaskMode>",
@@ -5718,7 +5651,6 @@
                 "aliases": [
                     "-webkit-mask-origin"
                 ],
-                "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "Origin",
                 "coordinated-value-list-property": true,
                 "parser-grammar": "<single-mask-origin>#"
@@ -5763,7 +5695,6 @@
             "animation-type": "repeatable list",
             "initial": "0%",
             "codegen-properties": {
-                "animation-wrapper": "CoordinatedValueListPropertyStyleTypeWrapper",
                 "coordinated-value-list-property-name-for-methods": "PositionX",
                 "coordinated-value-list-property": true,
                 "style-converter": "StyleType<PositionX>",
@@ -5782,7 +5713,6 @@
             "animation-type": "repeatable list",
             "initial": "0%",
             "codegen-properties": {
-                "animation-wrapper": "CoordinatedValueListPropertyStyleTypeWrapper",
                 "coordinated-value-list-property-name-for-methods": "PositionY",
                 "coordinated-value-list-property": true,
                 "style-converter": "StyleType<PositionY>",
@@ -5812,7 +5742,6 @@
                 "aliases":[
                     "-webkit-mask-repeat"
                 ],
-                "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "Repeat",
                 "coordinated-value-list-property": true,
                 "style-converter": "StyleType<RepeatStyle>",
@@ -5835,7 +5764,6 @@
                 "aliases":[
                     "-webkit-mask-size"
                 ],
-                "animation-wrapper": "CoordinatedValueListPropertyStyleTypeWrapper",
                 "coordinated-value-list-property-name-for-methods": "Size",
                 "coordinated-value-list-property": true,
                 "style-converter": "StyleType<BackgroundSize>",
@@ -5869,7 +5797,6 @@
                 "auto-add"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "settings-flag": "cssMathDepthEnabled",
                 "style-converter": "StyleType<MathDepth>",
                 "top-priority": true,
@@ -6017,7 +5944,6 @@
                     "resolver": "vertical"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialMaxSize",
                 "style-builder-converter": "StyleType<MaximumSize>",
                 "style-extractor-custom": true,
@@ -6151,7 +6077,6 @@
                     "resolver": "horizontal"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialMaxSize",
                 "style-builder-converter": "StyleType<MaximumSize>",
                 "style-extractor-custom": true,
@@ -6266,7 +6191,6 @@
                     "resolver": "vertical"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialMinSize",
                 "style-builder-converter": "StyleType<MinimumSize>",
                 "style-extractor-custom": true,
@@ -6381,7 +6305,6 @@
                     "resolver": "horizontal"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialMinSize",
                 "style-builder-converter": "StyleType<MinimumSize>",
                 "style-extractor-custom": true,
@@ -6414,7 +6337,6 @@
             "animation-type": "by computed value",
             "initial": "50% 50%",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<ObjectPosition>",
                 "parser-grammar": "<position>"
             },
@@ -6430,7 +6352,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-acceleration": "threaded-only",
                 "style-converter": "StyleType<OffsetPath>",
                 "parser-function": "consumeOffsetPath",
@@ -6446,7 +6367,6 @@
             "animation-type": "by computed value",
             "initial": "0",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-acceleration": "threaded-only",
                 "style-converter": "StyleType<OffsetDistance>",
                 "parser-grammar": "<length-percentage>"
@@ -6464,7 +6384,6 @@
                 "auto"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-acceleration": "threaded-only",
                 "style-converter": "StyleType<OffsetPosition>",
                 "parser-grammar": "normal | auto | <position>"
@@ -6481,7 +6400,6 @@
                 "auto"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-acceleration": "threaded-only",
                 "style-converter": "StyleType<OffsetAnchor>",
                 "parser-grammar": "auto | <position>"
@@ -6499,7 +6417,6 @@
                 "reverse"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-acceleration": "threaded-only",
                 "style-converter": "StyleType<OffsetRotate>",
                 "parser-grammar": "[ [ auto | reverse ] || <angle> ]@(type=CSSOffsetRotateValue)"
@@ -6534,7 +6451,6 @@
                 "aliases": [
                     "-webkit-opacity"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-acceleration": "always",
                 "style-converter": "StyleType<Opacity>",
                 "parser-grammar": "<opacity-value>"
@@ -6552,7 +6468,6 @@
             "inherited": true,
             "initial": "2",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<Orphans>",
                 "style-extractor-custom": true,
                 "parser-grammar": "<integer [1,inf]>"
@@ -6585,7 +6500,6 @@
             "initial": "currentColor",
             "initial-comment": "Current spec initial value is 'auto'",
             "codegen-properties": {
-                "animation-wrapper": "VisitedAffectedStyleTypeWrapper",
                 "visited-link-color-support": true,
                 "color-property": true,
                 "parser-grammar": "-webkit-focus-ring-color | <color>",
@@ -6600,7 +6514,6 @@
             "animation-type": "by computed value",
             "initial": "0",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<Length<>>",
                 "parser-grammar": "<length>"
             },
@@ -6642,7 +6555,6 @@
                 "thick"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<LineWidth>",
                 "style-builder-custom": "Initial",
                 "parser-grammar": "<line-width>"
@@ -6995,7 +6907,6 @@
                     "resolver": "bottom"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialPadding",
                 "style-builder-converter": "StyleType<PaddingEdge>",
                 "style-builder-custom": "All",
@@ -7069,7 +6980,6 @@
                     "resolver": "left"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialPadding",
                 "style-builder-converter": "StyleType<PaddingEdge>",
                 "style-builder-custom": "All",
@@ -7090,7 +7000,6 @@
                     "resolver": "right"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialPadding",
                 "style-builder-converter": "StyleType<PaddingEdge>",
                 "style-builder-custom": "All",
@@ -7111,7 +7020,6 @@
                     "resolver": "top"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialPadding",
                 "style-builder-converter": "StyleType<PaddingEdge>",
                 "style-builder-custom": "All",
@@ -7283,7 +7191,6 @@
             "animation-type": "by computed value",
             "initial": "0",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<SVGRadius>",
                 "parser-grammar": "<length-percentage [0,inf]>"
             },
@@ -7328,7 +7235,6 @@
                     "resolver": "right"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialInset",
                 "style-builder-converter": "StyleType<InsetEdge>",
                 "style-extractor-custom": true,
@@ -7386,7 +7292,6 @@
                 "auto"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<SVGRadiusComponent>",
                 "parser-grammar": "auto | <length-percentage [0,inf]>"
             },
@@ -7402,7 +7307,6 @@
                 "auto"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<SVGRadiusComponent>",
                 "parser-grammar": "auto | <length-percentage [0,inf]>"
             },
@@ -7433,7 +7337,6 @@
             "animation-type": "by computed value",
             "initial": "black",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "color-property": true,
                 "parser-grammar": "<color>"
             },
@@ -7446,7 +7349,6 @@
             "animation-type": "by computed value",
             "initial": "1",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<Opacity>",
                 "parser-grammar": "<opacity-value>"
             },
@@ -7493,7 +7395,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-requires-non-additive-or-cumulative-interpolation": true,
                 "render-style-name-for-methods": "StrokeDashArray",
                 "style-converter": "StyleType<SVGStrokeDasharray>",
@@ -7513,7 +7414,6 @@
             "inherited": true,
             "initial": "0",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-name-for-methods": "StrokeDashOffset",
                 "style-converter": "StyleType<SVGStrokeDashoffset>",
                 "parser-grammar": "<length-percentage> | <number>"
@@ -7571,7 +7471,6 @@
             "inherited": true,
             "initial": "4",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<StrokeMiterlimit>",
                 "render-style-name-for-methods": "StrokeMiterLimit",
                 "parser-grammar": "<number [0,inf]>",
@@ -7590,7 +7489,6 @@
             "inherited": true,
             "initial": "1",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<Opacity>",
                 "parser-grammar": "<opacity-value>"
             },
@@ -7623,7 +7521,6 @@
             "inherited": true,
             "initial": "1px",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-custom": "Value",
                 "style-converter": "StyleType<StrokeWidth>",
                 "parser-grammar": "<length-percentage [0,inf]> | <number [0,inf]>"
@@ -7681,7 +7578,6 @@
             "inherited": true,
             "initial": "8",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<TabSize>",
                 "parser-grammar": "<number [0,inf]> | <length [0,inf]>"
             },
@@ -7811,7 +7707,6 @@
             ],
             "codegen-properties": {
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<TextIndent>",
                 "parser-grammar": "<length-percentage> && hanging? && each-line?"
             },
@@ -7870,7 +7765,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<TextShadows>",
                 "parser-function": "consumeTextShadow",
                 "parser-grammar-unused": "none | [ <color>? && <length>{2,3} ]#",
@@ -7983,7 +7877,6 @@
                     "resolver": "top"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialInset",
                 "style-builder-converter": "StyleType<InsetEdge>",
                 "style-extractor-custom": true,
@@ -8194,7 +8087,6 @@
             ],
             "codegen-properties": {
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<VerticalAlign>",
                 "parser-grammar": "<<values>> | <length-percentage>",
                 "parser-grammar-comment": "Current spec has 'vertical-align' specified as a shorthand with grammar '[ first | last] || <<'alignment-baseline'>> || <<'baseline-shift'>>'"
@@ -8274,7 +8166,6 @@
             "inherited": true,
             "initial": "2",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<Widows>",
                 "style-extractor-custom": true,
                 "parser-grammar": "<integer [1,inf]>"
@@ -8333,7 +8224,6 @@
                     "resolver": "horizontal"
                 },
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-initial": "initialSize",
                 "style-builder-converter": "StyleType<PreferredSize>",
                 "style-extractor-custom": true,
@@ -8401,7 +8291,6 @@
             ],
             "codegen-properties": {
                 "accepts-quirky-length": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-requires-getter": "computedWordSpacing",
                 "style-builder-custom": "All",
                 "style-builder-converter": "StyleType<WordSpacing>",
@@ -8420,7 +8309,6 @@
             "animation-type": "by computed value",
             "initial": "0",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<SVGCoordinateComponent>",
                 "parser-grammar": "<length-percentage>"
             },
@@ -8433,7 +8321,6 @@
             "animation-type": "by computed value",
             "initial": "0",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<SVGCoordinateComponent>",
                 "parser-grammar": "<length-percentage>"
             },
@@ -8449,7 +8336,6 @@
                 "auto"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "render-style-name-for-methods": "SpecifiedZIndex",
                 "style-converter": "StyleType<ZIndex>",
                 "parser-grammar": "auto | <integer>"
@@ -8524,7 +8410,6 @@
                 "auto"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<AspectRatio>",
                 "parser-grammar": "auto || <ratio>"
             },
@@ -8562,7 +8447,6 @@
                     "name": "contain-intrinsic-size",
                     "resolver": "vertical"
                 },
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<ContainIntrinsicSize>",
                 "parser-grammar": "[ auto? [ none | <length [0,inf]> ] ]@(type=CSSValuePair)",
                 "parser-exported": true
@@ -8584,7 +8468,6 @@
                     "name": "contain-intrinsic-size",
                     "resolver": "horizontal"
                 },
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<ContainIntrinsicSize>",
                 "parser-grammar": "[ auto? [ none | <length [0,inf]> ] ]@(type=CSSValuePair)",
                 "parser-exported": true
@@ -8774,7 +8657,6 @@
             "inherited": true,
             "initial": "0px",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<WebkitBorderSpacing>",
                 "parser-grammar": "<length [0,inf]>"
             },
@@ -8818,7 +8700,6 @@
             "inherited": true,
             "initial": "0px",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<WebkitBorderSpacing>",
                 "parser-grammar": "<length [0,inf]>"
             },
@@ -8969,7 +8850,6 @@
                 "cascade-alias": "box-shadow",
                 "skip-style-builder": true,
                 "style-extractor-converter": "StyleType<BoxShadows>",
-                "animation-wrapper": "StyleTypeWrapper",
                 "parser-function": "consumeWebkitBoxShadow",
                 "parser-grammar-unused": "none | <shadow>#",
                 "parser-grammar-unused-reason": "Needs support for the strong value representation.",
@@ -9065,7 +8945,6 @@
                 "aliases": [
                     "-webkit-column-count"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<ColumnCount>",
                 "parser-grammar": "auto | <integer [1,inf]>",
                 "parser-exported": true
@@ -9101,7 +8980,6 @@
                     "grid-column-gap",
                     "-webkit-column-gap"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<GapGutter>",
                 "parser-grammar": "<gap-gutter>",
                 "parser-exported": true
@@ -9118,7 +8996,6 @@
                 "aliases": [
                     "grid-row-gap"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<GapGutter>",
                 "parser-grammar": "<gap-gutter>",
                 "parser-exported": true
@@ -9188,7 +9065,6 @@
                 "aliases": [
                     "-webkit-column-rule-color"
                 ],
-                "animation-wrapper": "VisitedAffectedStyleTypeWrapper",
                 "visited-link-color-support": true,
                 "color-property": true,
                 "parser-grammar": "<color>"
@@ -9237,7 +9113,6 @@
                 "aliases": [
                     "-webkit-column-rule-width"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<LineWidth>",
                 "style-builder-custom": "Initial",
                 "parser-grammar": "<line-width>"
@@ -9275,7 +9150,6 @@
                 "aliases": [
                     "-webkit-column-width"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<ColumnWidth>",
                 "parser-grammar": "auto | <length [0,inf]>",
                 "parser-exported": true
@@ -9378,7 +9252,6 @@
                 "aliases": [
                     "-webkit-filter"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-acceleration": "always",
                 "style-converter": "StyleType<Filter>",
                 "parser-function": "consumeFilter",
@@ -9398,7 +9271,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "settings-flag": "colorFilterEnabled",
                 "style-converter": "StyleType<AppleColorFilter>",
                 "parser-function": "consumeAppleColorFilter",
@@ -9583,7 +9455,6 @@
                 "aliases": [
                     "-webkit-flex-basis"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<FlexBasis>",
                 "parser-grammar": "auto | content | <width-or-height-keyword> | <length-percentage [0,inf]>"
             },
@@ -9637,7 +9508,6 @@
                 "aliases": [
                     "-webkit-flex-grow"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<FlexGrow>",
                 "parser-grammar": "<number [0,inf]>"
             },
@@ -9653,7 +9523,6 @@
                 "aliases": [
                     "-webkit-flex-shrink"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<FlexShrink>",
                 "parser-grammar": "<number [0,inf]>"
             },
@@ -9720,7 +9589,6 @@
             "codegen-properties": {
                 "cascade-alias": "backdrop-filter",
                 "skip-style-builder": true,
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-extractor-converter": "StyleType<Filter>",
                 "parser-function": "consumeFilter",
                 "parser-grammar-unused": "none | <filter-value-list>",
@@ -9738,7 +9606,6 @@
             "animation-type": "see prose",
             "initial": "none",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-acceleration": "always",
                 "style-converter": "StyleType<Filter>",
                 "parser-function": "consumeFilter",
@@ -9964,7 +9831,6 @@
             "animation-type": "see prose",
             "initial": "none",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-converter": "StyleType<GridTemplateList>",
                 "style-extractor-custom": true,
                 "parser-function": "consumeGridTemplatesRowsOrColumns",
@@ -9980,7 +9846,6 @@
             "animation-type": "see prose",
             "initial": "none",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-builder-converter": "StyleType<GridTemplateList>",
                 "style-extractor-custom": true,
                 "parser-function": "consumeGridTemplatesRowsOrColumns",
@@ -10540,7 +10405,6 @@
                 "aliases": [
                     "-webkit-order"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<Order>",
                 "parser-grammar": "<integer>"
             },
@@ -10556,7 +10420,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<Perspective>",
                 "parser-grammar": "none | <length [0,inf]>",
                 "parser-exported": true
@@ -10609,7 +10472,6 @@
                 "aliases": [
                     "-webkit-perspective-origin-x"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "skip-style-extractor": true,
                 "style-builder-converter": "StyleType<PerspectiveOriginX>",
                 "parser-grammar": "<position-x>"
@@ -10626,7 +10488,6 @@
                 "aliases": [
                     "-webkit-perspective-origin-y"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "skip-style-extractor": true,
                 "style-builder-converter": "StyleType<PerspectiveOriginY>",
                 "parser-grammar": "<position-y>"
@@ -10789,7 +10650,6 @@
                 "aliases": [
                     "-webkit-text-decoration-color"
                 ],
-                "animation-wrapper": "VisitedAffectedStyleTypeWrapper",
                 "visited-link-color-support": true,
                 "color-property": true,
                 "parser-grammar": "<color>"
@@ -10862,7 +10722,6 @@
             "inherited": true,
             "initial": "auto",
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<TextUnderlineOffset>",
                 "parser-grammar": "auto | <length-percentage>"
             },
@@ -10879,7 +10738,6 @@
                 "from-font"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<TextDecorationThickness>",
                 "parser-grammar": "auto | from-font | <length-percentage>"
             },
@@ -10940,7 +10798,6 @@
                     "-epub-text-emphasis-color",
                     "-webkit-text-emphasis-color"
                 ],
-                "animation-wrapper": "VisitedAffectedStyleTypeWrapper",
                 "visited-link-color-support": true,
                 "color-property": true,
                 "parser-grammar": "<color>"
@@ -10988,7 +10845,6 @@
             "inherited": true,
             "initial": "currentColor",
             "codegen-properties": {
-                "animation-wrapper": "VisitedAffectedStyleTypeWrapper",
                 "visited-link-color-support": true,
                 "color-property": true,
                 "parser-grammar": "<color>"
@@ -11033,7 +10889,6 @@
             "inherited": true,
             "initial": "currentColor",
             "codegen-properties": {
-                "animation-wrapper": "VisitedAffectedStyleTypeWrapper",
                 "visited-link-color-support": true,
                 "color-property": true,
                 "parser-grammar": "<color>"
@@ -11068,7 +10923,6 @@
                 "aliases": [
                     "-webkit-transform"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-acceleration": "always",
                 "style-converter": "StyleType<Transform>",
                 "style-extractor-custom": true,
@@ -11124,7 +10978,6 @@
                 "aliases": [
                     "-webkit-transform-origin-x"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "skip-style-extractor": true,
                 "style-builder-converter": "StyleType<TransformOriginX>",
                 "parser-grammar": "<position-x>"
@@ -11141,7 +10994,6 @@
                 "aliases": [
                     "-webkit-transform-origin-y"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "skip-style-extractor": true,
                 "style-builder-converter": "StyleType<TransformOriginY>",
                 "parser-grammar": "<position-y>"
@@ -11158,7 +11010,6 @@
                 "aliases": [
                     "-webkit-transform-origin-z"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "skip-style-extractor": true,
                 "style-builder-converter": "StyleType<TransformOriginZ>",
                 "parser-grammar": "<length>"
@@ -11200,7 +11051,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-acceleration": "always",
                 "style-builder-converter": "StyleType<Translate>",
                 "style-extractor-custom": true,
@@ -11220,7 +11070,6 @@
                 "none"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-acceleration": "always",
                 "style-builder-converter": "StyleType<Scale>",
                 "style-extractor-custom": true,
@@ -11244,7 +11093,6 @@
                 "z"
             ],
             "codegen-properties": {
-                "animation-wrapper": "StyleTypeWrapper",
                 "animation-wrapper-acceleration": "always",
                 "style-builder-converter": "StyleType<Rotate>",
                 "style-extractor-custom": true,
@@ -11861,7 +11709,6 @@
             ],
             "codegen-properties": {
                 "settings-flag": "cssScrollbarColorEnabled",
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<ScrollbarColor>",
                 "parser-function": "consumeScrollbarColor",
                 "parser-grammar-unused": "auto | <color>{2}",
@@ -11925,7 +11772,6 @@
                 "aliases": [
                     "-webkit-shape-outside"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<ShapeOutside>",
                 "parser-function": "consumeShapeOutside",
                 "parser-grammar-unused": "none | [ <basic-shape> || <shape-box> ] | <image>",
@@ -11943,7 +11789,6 @@
                 "aliases": [
                     "-webkit-shape-margin"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<ShapeMargin>",
                 "parser-grammar": "<length-percentage [0,inf]>"
             },
@@ -11959,7 +11804,6 @@
                 "aliases": [
                     "-webkit-shape-image-threshold"
                 ],
-                "animation-wrapper": "StyleTypeWrapper",
                 "style-converter": "StyleType<ShapeImageThreshold>",
                 "parser-grammar": "<number>",
                 "parser-grammar-comment": "Current spec grammar is '<opacity-value>'"
