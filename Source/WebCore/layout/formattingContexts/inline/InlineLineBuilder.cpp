@@ -96,11 +96,11 @@ static inline Vector<int32_t> computedVisualOrder(const Line::RunList& lineRuns,
 
     Vector<size_t> runIndexOffsetMap;
     runIndexOffsetMap.reserveInitialCapacity(lineRuns.size());
-    auto hasOpaqueRun = false;
+    size_t numberOfOpaqueRuns = 0;
     for (size_t i = 0, accumulatedOffset = 0; i < lineRuns.size(); ++i) {
         if (lineRuns[i].bidiLevel() == InlineItem::opaqueBidiLevel) {
             ++accumulatedOffset;
-            hasOpaqueRun = true;
+            ++numberOfOpaqueRuns;
             continue;
         }
 
@@ -115,9 +115,21 @@ static inline Vector<int32_t> computedVisualOrder(const Line::RunList& lineRuns,
         runIndexOffsetMap.append(accumulatedOffset);
     }
 
+    auto forceBiDiOnOpaqueLine = [&] {
+        if (lineRuns.isEmpty() || numberOfOpaqueRuns != lineRuns.size())
+            return;
+        // When an RTL line has only opaque items (e.g. [spanning inline box start][inline box end] on <span><div></div></span>)
+        // we need to set the bidi level on the spanning inline box as if it was contentful to initiate bidi processing (mainly just RTL direction align).
+        if (!lineRuns.first().isLineSpanningInlineBoxStart())
+            return;
+        runLevels.append(lineRuns.first().layoutBox().parent().writingMode().isBidiLTR() ? UBIDI_LTR : UBIDI_RTL);
+        runIndexOffsetMap.append(0);
+    };
+    forceBiDiOnOpaqueLine();
+
     visualOrderList.resizeToFit(runLevels.size());
     ubidi_reorderVisual(runLevels.span().data(), runLevels.size(), visualOrderList.mutableSpan().data());
-    if (hasOpaqueRun) {
+    if (numberOfOpaqueRuns) {
         ASSERT(visualOrderList.size() == runIndexOffsetMap.size());
         for (size_t i = 0; i < runIndexOffsetMap.size(); ++i)
             visualOrderList[i] += runIndexOffsetMap[visualOrderList[i]];

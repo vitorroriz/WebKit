@@ -786,7 +786,7 @@ void InlineDisplayContentBuilder::processBidiContent(const LineLayoutResult& lin
         auto& inlineContent = lineLayoutResult.runs;
         for (size_t index = 0; index < lineLayoutResult.directionality.visualOrderList.size(); ++index) {
             auto logicalIndex = lineLayoutResult.directionality.visualOrderList[index];
-            ASSERT(inlineContent[logicalIndex].bidiLevel() != InlineItem::opaqueBidiLevel);
+            ASSERT(inlineContent[logicalIndex].bidiLevel() != InlineItem::opaqueBidiLevel || inlineContent[logicalIndex].isLineSpanningInlineBoxStart());
 
             auto& lineRun = inlineContent[logicalIndex];
             auto needsDisplayBoxOrGeometrySetting = !lineRun.isWordBreakOpportunity() && !lineRun.isInlineBoxEnd();
