@@ -446,8 +446,10 @@ void DocumentLoader::notifyFinished(CachedResource& resource, const NetworkLoadM
 
     Box<NetworkLoadMetrics> metrics;
     if (RefPtr frameLoader = this->frameLoader()) {
-        if (auto prefetchedMetrics = frameLoader->documentPrefetcher().takePrefetchedNetworkLoadMetrics(url()))
+        if (auto prefetchedMetrics = frameLoader->documentPrefetcher().takePrefetchedNetworkLoadMetrics(url())) {
             metrics = WTFMove(prefetchedMetrics);
+            metrics->fromPrefetch = true;
+        }
     }
     if (!metrics)
         metrics = Box<NetworkLoadMetrics>::create(fetchMetrics);
@@ -1336,7 +1338,10 @@ void DocumentLoader::commitData(const SharedBuffer& data)
 
             if (m_mainResource) {
                 auto* metrics = m_response.deprecatedNetworkLoadMetricsOrNull();
-                window->protectedPerformance()->addNavigationTiming(*this, document, *m_mainResource, timing(), metrics ? *metrics : NetworkLoadMetrics::emptyMetrics());
+                NetworkLoadMetrics finalMetrics = metrics ? *metrics : NetworkLoadMetrics::emptyMetrics();
+                if (RefPtr frameLoader = this->frameLoader())
+                    finalMetrics.fromPrefetch = frameLoader->documentPrefetcher().wasPrefetched(url());
+                window->protectedPerformance()->addNavigationTiming(*this, document, *m_mainResource, timing(), finalMetrics);
             }
         }
 

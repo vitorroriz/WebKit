@@ -55,6 +55,7 @@ public:
     ~DocumentPrefetcher();
 
     void prefetch(const URL&, const Vector<String>& tags, std::optional<ReferrerPolicy>, bool lowPriority = false);
+    bool wasPrefetched(const URL&) const;
     Box<NetworkLoadMetrics> takePrefetchedNetworkLoadMetrics(const URL&);
 
     // CachedRawResourceClient

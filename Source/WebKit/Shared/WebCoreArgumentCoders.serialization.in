@@ -7380,14 +7380,15 @@ class WebCore::NetworkLoadMetrics {
 
     uint16_t redirectCount;
 
-    bool isComplete();
-    bool isCellular();
-    bool isExpensive();
-    bool isConstrained();
-    bool isMultipath();
-    bool reusedConnection();
-    bool doesFailTAOCheck();
-    bool crossOriginRedirect();
+    [BitField] bool complete;
+    [BitField] bool cellular;
+    [BitField] bool expensive;
+    [BitField] bool constrained;
+    [BitField] bool multipath;
+    [BitField] bool isReusedConnection;
+    [BitField] bool failsTAOCheck;
+    [BitField] bool hasCrossOriginRedirect;
+    [BitField] bool fromPrefetch;
 
     WebCore::PrivacyStance privacyStance;
 
