@@ -36,6 +36,7 @@
 #include "ScriptController.h"
 #include "ScriptSourceCode.h"
 #include <JavaScriptCore/CatchScope.h>
+#include <JavaScriptCore/JSCInlines.h>
 #include <JavaScriptCore/JSLock.h>
 #include <wtf/TZoneMallocInlines.h>
 
