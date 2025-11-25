@@ -92,6 +92,8 @@ public:
     static Ref<CSSValue> extractOrphans(ExtractorState&);
     static Ref<CSSValue> extractWebkitTextCombine(ExtractorState&);
     static Ref<CSSValue> extractWebkitRubyPosition(ExtractorState&);
+    static Ref<CSSValue> extractWebkitMaskComposite(ExtractorState&);
+    static Ref<CSSValue> extractWebkitMaskSourceType(ExtractorState&);
 
     // MARK: Shorthands
 
@@ -184,6 +186,8 @@ public:
     static void extractOrphansSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractWebkitTextCombineSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractWebkitRubyPositionSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
+    static void extractWebkitMaskCompositeSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
+    static void extractWebkitMaskSourceTypeSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
 
     static void extractAnimationShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractAnimationRangeShorthandSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
@@ -2251,6 +2255,38 @@ inline Ref<CSSValue> ExtractorCustom::extractWebkitRubyPosition(ExtractorState& 
 inline void ExtractorCustom::extractWebkitRubyPositionSerialization(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context)
 {
     extractSerialization<CSSPropertyWebkitRubyPosition>(state, builder, context);
+}
+
+inline Ref<CSSValue> ExtractorCustom::extractWebkitMaskComposite(ExtractorState& extractorState)
+{
+    auto mapper = [](auto&, const auto& value, const std::optional<MaskLayers::value_type>&, const auto&) -> Ref<CSSValue> {
+        return CSSPrimitiveValue::create(toCSSValueIDForWebkitMaskComposite(value));
+    };
+    return extractCoordinatedValueListValue<CSSPropertyID::CSSPropertyMaskComposite>(extractorState, extractorState.style.maskLayers(), mapper);
+}
+
+inline void ExtractorCustom::extractWebkitMaskCompositeSerialization(ExtractorState& extractorState, StringBuilder& builder, const CSS::SerializationContext& context)
+{
+    auto mapper = [](auto&, auto& builder, const auto&, const auto& value, const std::optional<MaskLayers::value_type>&, const auto&) {
+        builder.append(nameLiteralForSerialization(toCSSValueIDForWebkitMaskComposite(value)));
+    };
+    extractCoordinatedValueListSerialization<CSSPropertyID::CSSPropertyMaskComposite>(extractorState, builder, context, extractorState.style.maskLayers(), mapper);
+}
+
+inline Ref<CSSValue> ExtractorCustom::extractWebkitMaskSourceType(ExtractorState& extractorState)
+{
+    auto mapper = [](auto&, const auto& value, const std::optional<MaskLayers::value_type>&, const auto&) -> Ref<CSSValue> {
+        return CSSPrimitiveValue::create(toCSSValueIDForWebkitMaskSourceType(value));
+    };
+    return extractCoordinatedValueListValue<CSSPropertyID::CSSPropertyMaskMode>(extractorState, extractorState.style.maskLayers(), mapper);
+}
+
+inline void ExtractorCustom::extractWebkitMaskSourceTypeSerialization(ExtractorState& extractorState, StringBuilder& builder, const CSS::SerializationContext& context)
+{
+    auto mapper = [](auto&, auto& builder, const auto&, const auto& value, const std::optional<MaskLayers::value_type>&, const auto&) {
+        builder.append(nameLiteralForSerialization(toCSSValueIDForWebkitMaskSourceType(value)));
+    };
+    extractCoordinatedValueListSerialization<CSSPropertyID::CSSPropertyMaskMode>(extractorState, builder, context, extractorState.style.maskLayers(), mapper);
 }
 
 // MARK: - Shorthands

@@ -67,12 +67,6 @@ public:
     // MARK: Shared serializations
 
     static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
-
-    // MARK: MaskLayer property serializations
-
-    static void serializeSingleMaskComposite(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, CompositeOperator);
-    static void serializeSingleWebkitMaskComposite(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, CompositeOperator);
-    static void serializeSingleWebkitMaskSourceType(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, MaskMode);
 };
 
 // MARK: - Strong value serializations
@@ -194,35 +188,6 @@ inline void ExtractorSerializer::serializePositionTryFallbacks(ExtractorState& s
     }
 
     builder.append(CSSValueList::createCommaSeparated(WTFMove(list))->cssText(context));
-}
-
-// MARK: - MaskLayer property serializations
-
-inline void ExtractorSerializer::serializeSingleMaskComposite(ExtractorState&, StringBuilder& builder, const CSS::SerializationContext&, CompositeOperator composite)
-{
-    builder.append(nameLiteralForSerialization(toCSSValueID(composite, CSSPropertyMaskComposite)));
-}
-
-inline void ExtractorSerializer::serializeSingleWebkitMaskComposite(ExtractorState&, StringBuilder& builder, const CSS::SerializationContext&, CompositeOperator composite)
-{
-    builder.append(nameLiteralForSerialization(toCSSValueID(composite, CSSPropertyWebkitMaskComposite)));
-}
-
-inline void ExtractorSerializer::serializeSingleWebkitMaskSourceType(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, MaskMode maskMode)
-{
-    switch (maskMode) {
-    case Style::MaskMode::Alpha:
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Alpha { });
-        return;
-    case Style::MaskMode::Luminance:
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Luminance { });
-        return;
-    case Style::MaskMode::MatchSource:
-        // MatchSource is only available in the mask-mode property.
-        serializationForCSS(builder, context, state.style, CSS::Keyword::Alpha { });
-        return;
-    }
-    RELEASE_ASSERT_NOT_REACHED();
 }
 
 } // namespace Style

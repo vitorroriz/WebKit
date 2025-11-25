@@ -5626,7 +5626,6 @@
                 "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property-name-for-methods": "Composite",
                 "coordinated-value-list-property": true,
-                "style-extractor-converter": "SingleMaskComposite",
                 "parser-grammar": "<single-mask-composite>#"
             },
             "specification": {
@@ -10447,9 +10446,9 @@
             "codegen-properties": {
                 "cascade-alias": "mask-composite",
                 "skip-style-builder": true,
+                "style-extractor-custom": true,
                 "coordinated-value-list-property-name-for-methods": "Composite",
                 "coordinated-value-list-property": true,
-                "style-extractor-converter": "SingleWebkitMaskComposite",
                 "parser-grammar": "<single-webkit-mask-composite>#"
             },
             "status": {
@@ -10465,9 +10464,9 @@
             "codegen-properties": {
                 "cascade-alias": "mask-mode",
                 "skip-style-builder": true,
+                "style-extractor-custom": true,
                 "coordinated-value-list-property-name-for-methods": "MaskMode",
                 "coordinated-value-list-property": true,
-                "style-converter": "SingleWebkitMaskSourceType",
                 "parser-grammar": "<single-webkit-mask-source-type>#"
             },
             "status": {

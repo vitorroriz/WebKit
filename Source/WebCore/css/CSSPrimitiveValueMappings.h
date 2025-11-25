@@ -274,52 +274,55 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH
 
-constexpr CSSValueID toCSSValueID(CompositeOperator e, CSSPropertyID propertyID)
+constexpr CSSValueID toCSSValueID(CompositeOperator e)
 {
-    if (propertyID == CSSPropertyMaskComposite) {
-        switch (e) {
-        case CompositeOperator::SourceOver:
-            return CSSValueAdd;
-        case CompositeOperator::SourceIn:
-            return CSSValueIntersect;
-        case CompositeOperator::SourceOut:
-            return CSSValueSubtract;
-        case CompositeOperator::XOR:
-            return CSSValueExclude;
-        default:
-            break;
-        }
-    } else {
-        switch (e) {
-        case CompositeOperator::Clear:
-            return CSSValueClear;
-        case CompositeOperator::Copy:
-            return CSSValueCopy;
-        case CompositeOperator::SourceOver:
-            return CSSValueSourceOver;
-        case CompositeOperator::SourceIn:
-            return CSSValueSourceIn;
-        case CompositeOperator::SourceOut:
-            return CSSValueSourceOut;
-        case CompositeOperator::SourceAtop:
-            return CSSValueSourceAtop;
-        case CompositeOperator::DestinationOver:
-            return CSSValueDestinationOver;
-        case CompositeOperator::DestinationIn:
-            return CSSValueDestinationIn;
-        case CompositeOperator::DestinationOut:
-            return CSSValueDestinationOut;
-        case CompositeOperator::DestinationAtop:
-            return CSSValueDestinationAtop;
-        case CompositeOperator::XOR:
-            return CSSValueXor;
-        case CompositeOperator::PlusDarker:
-            return CSSValuePlusDarker;
-        case CompositeOperator::PlusLighter:
-            return CSSValuePlusLighter;
-        case CompositeOperator::Difference:
-            break;
-        }
+    switch (e) {
+    case CompositeOperator::SourceOver:
+        return CSSValueAdd;
+    case CompositeOperator::SourceIn:
+        return CSSValueIntersect;
+    case CompositeOperator::SourceOut:
+        return CSSValueSubtract;
+    case CompositeOperator::XOR:
+        return CSSValueExclude;
+    default:
+        break;
+    }
+    ASSERT_NOT_REACHED_UNDER_CONSTEXPR_CONTEXT();
+    return CSSValueInvalid;
+}
+
+constexpr CSSValueID toCSSValueIDForWebkitMaskComposite(CompositeOperator e)
+{
+    switch (e) {
+    case CompositeOperator::Clear:
+        return CSSValueClear;
+    case CompositeOperator::Copy:
+        return CSSValueCopy;
+    case CompositeOperator::SourceOver:
+        return CSSValueSourceOver;
+    case CompositeOperator::SourceIn:
+        return CSSValueSourceIn;
+    case CompositeOperator::SourceOut:
+        return CSSValueSourceOut;
+    case CompositeOperator::SourceAtop:
+        return CSSValueSourceAtop;
+    case CompositeOperator::DestinationOver:
+        return CSSValueDestinationOver;
+    case CompositeOperator::DestinationIn:
+        return CSSValueDestinationIn;
+    case CompositeOperator::DestinationOut:
+        return CSSValueDestinationOut;
+    case CompositeOperator::DestinationAtop:
+        return CSSValueDestinationAtop;
+    case CompositeOperator::XOR:
+        return CSSValueXor;
+    case CompositeOperator::PlusDarker:
+        return CSSValuePlusDarker;
+    case CompositeOperator::PlusLighter:
+        return CSSValuePlusLighter;
+    case CompositeOperator::Difference:
+        break;
     }
     ASSERT_NOT_REACHED_UNDER_CONSTEXPR_CONTEXT();
     return CSSValueInvalid;
@@ -2680,6 +2683,20 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH
+
+constexpr CSSValueID toCSSValueIDForWebkitMaskSourceType(Style::MaskMode e)
+{
+    switch (e) {
+    case Style::MaskMode::Alpha:
+        return CSSValueAlpha;
+    case Style::MaskMode::Luminance:
+        return CSSValueLuminance;
+    case Style::MaskMode::MatchSource:
+        return CSSValueAlpha;
+    }
+    ASSERT_NOT_REACHED_UNDER_CONSTEXPR_CONTEXT();
+    return CSSValueInvalid;
+}
 
 #if ENABLE(WEBKIT_OVERFLOW_SCROLLING_CSS_PROPERTY)
 
