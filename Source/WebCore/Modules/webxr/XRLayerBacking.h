@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Apple, Inc. All rights reserved.
+ * Copyright (C) 2025 Igalia S.L. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,31 +23,35 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "XRCompositionLayer.h"
+#pragma once
 
-#if ENABLE(WEBXR_LAYERS)
+#include <wtf/Ref.h>
+#include <wtf/RefCountedAndCanMakeWeakPtr.h>
+#include <wtf/TZoneMalloc.h>
+#include <wtf/WeakPtr.h>
 
-#include "XRLayerBacking.h"
-#include <wtf/TZoneMallocInlines.h>
+namespace PlatformXR {
+struct FrameData;
+struct RateMapDescription;
+}
 
 namespace WebCore {
 
-WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(XRCompositionLayer);
+class XRLayerBacking : public RefCountedAndCanMakeWeakPtr<XRLayerBacking> {
+    WTF_MAKE_TZONE_OR_ISO_ALLOCATED(XRLayerBacking);
+public:
+    virtual uint32_t textureWidth() const = 0;
+    virtual uint32_t textureHeight() const = 0;
+    virtual uint32_t textureArrayLength() const = 0;
 
-XRCompositionLayer::XRCompositionLayer(ScriptExecutionContext* scriptExecutionContext, Ref<XRLayerBacking>&& backing)
-    : WebXRLayer(scriptExecutionContext)
-    , m_backing(WTFMove(backing))
-{
-}
-
-XRCompositionLayer::~XRCompositionLayer() = default;
-
-XRLayerBacking& XRCompositionLayer::backing()
-{
-    return m_backing;
-}
-
-}
-
+#if PLATFORM(COCOA)
+    virtual void startFrame(size_t frameIndex, MachSendRight&& colorBuffer, MachSendRight&& depthBuffer, MachSendRight&& completionSyncEvent, size_t reusableTextureIndex, PlatformXR::RateMapDescription&&) = 0;
+#else
+    virtual void startFrame(PlatformXR::FrameData&) { RELEASE_ASSERT_NOT_REACHED(); };
 #endif
+    virtual void endFrame() = 0;
+
+    virtual ~XRLayerBacking() = default;
+};
+
+} // namespace WebCore

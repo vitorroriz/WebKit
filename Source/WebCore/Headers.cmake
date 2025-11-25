@@ -331,6 +331,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     Modules/WebGPU/InternalAPI/WebGPUVertexStepMode.h
     Modules/WebGPU/InternalAPI/WebGPUXRBinding.h
     Modules/WebGPU/InternalAPI/WebGPUXREye.h
+    Modules/WebGPU/InternalAPI/WebGPUXRLayerBacking.h
     Modules/WebGPU/InternalAPI/WebGPUXRProjectionLayer.h
     Modules/WebGPU/InternalAPI/WebGPUXRSubImage.h
     Modules/WebGPU/InternalAPI/WebGPUXRView.h
@@ -865,6 +866,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     Modules/webxr/XRCanvasConfiguration.h
     Modules/webxr/XRGPUProjectionLayerInit.h
+    Modules/webxr/XRLayerBacking.h
     Modules/webxr/XRHitTestTrackableType.h
 
     Scripts/generate-log-declarations.py
