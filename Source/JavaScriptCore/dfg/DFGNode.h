@@ -2995,7 +2995,7 @@ public:
     
     bool isBinaryUseKind(UseKind left, UseKind right)
     {
-        return child1().useKind() == left && child2().useKind() == right;
+        return !hasVarArgs() && child1() && child1().useKind() == left && child2() && child2().useKind() == right;
     }
     
     bool isBinaryUseKind(UseKind useKind)
