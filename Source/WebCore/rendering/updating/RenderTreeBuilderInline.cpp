@@ -468,7 +468,7 @@ void RenderTreeBuilder::Inline::wrapRunsOfBlocksInAnonymousBlock(RenderInline& p
         if (!firstInRun)
             return;
 
-        auto newBlock = Block::createAnonymousBlockWithStyle(parent.protectedDocument(), parent.style());
+        auto newBlock = Block::createAnonymousBlockWithStyle(parent.protectedDocument(), parent.containingBlock()->style());
         newBlock->setChildrenInline(false);
         CheckedRef block = *newBlock;
         m_builder.attachToRenderElementInternal(parent, WTFMove(newBlock), firstInRun.get());
