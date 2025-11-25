@@ -585,7 +585,7 @@ void AudioVideoRendererAVFObjC::prepareToSeek()
 
 Ref<MediaTimePromise> AudioVideoRendererAVFObjC::seekTo(const MediaTime& seekTime)
 {
-    ALWAYS_LOG(LOGIDENTIFIER, seekTime, "state: ", toString(m_seekState), " m_isSynchronizerSeeking: ", m_isSynchronizerSeeking, " hasAvailableVideoFrame: ", m_hasAvailableVideoFrame);
+    ALWAYS_LOG(LOGIDENTIFIER, seekTime, "state: ", toString(m_seekState), " m_isSynchronizerSeeking: ", m_isSynchronizerSeeking, " hasAvailableVideoFrame: ", m_videoRenderer && allRenderersHaveAvailableSamples());
 
     cancelSeekingPromiseIfNeeded();
     if (m_seekState == RequiresFlush)
@@ -597,7 +597,7 @@ Ref<MediaTimePromise> AudioVideoRendererAVFObjC::seekTo(const MediaTime& seekTim
 
     bool isSynchronizerSeeking = m_isSynchronizerSeeking || std::abs((synchronizerTime - seekTime).toMicroseconds()) > 1000;
 
-    if (!isSynchronizerSeeking) {
+    if (!isSynchronizerSeeking && allRenderersHaveAvailableSamples()) {
         ALWAYS_LOG(LOGIDENTIFIER, "Synchroniser doesn't require seeking current: ", synchronizerTime, " seeking: ", seekTime);
         // In cases where the destination seek time matches too closely the synchronizer's existing time
         // no time jumped notification will be issued. In this case, just notify the MediaPlayer that
