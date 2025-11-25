@@ -1808,11 +1808,7 @@ static BOOL isQuickLookEvent(NSEvent *event)
         return owner;
 
     for (NSTrackingArea *trackingArea in self.trackingAreas) {
-        static Class managerClass;
-        static std::once_flag onceFlag;
-        std::call_once(onceFlag, [] {
-            managerClass = NSClassFromString(@"NSToolTipManager");
-        });
+        static Class managerClass = NSClassFromString(@"NSToolTipManager");
 
         id owner = trackingArea.owner;
         if ([owner class] == managerClass)

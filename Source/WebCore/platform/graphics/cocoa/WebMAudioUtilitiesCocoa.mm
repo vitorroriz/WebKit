@@ -516,13 +516,7 @@ bool isVorbisDecoderAvailable()
 bool registerVorbisDecoderIfNeeded()
 {
 #if ENABLE(VORBIS)
-    static bool available;
-
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        available = registerDecoderFactory("ACVorbisDecoderFactory"_s, kAudioFormatVorbis);
-    });
-
+    static bool available = registerDecoderFactory("ACVorbisDecoderFactory"_s, kAudioFormatVorbis);
     return available;
 #else
     return false;

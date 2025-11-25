@@ -5965,12 +5965,7 @@ void AXObjectCache::onWidgetVisibilityChanged(RenderWidget& widget)
 #if PLATFORM(MAC)
 bool AXObjectCache::isAppleInternalInstall()
 {
-    static bool isInternal = false;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        isInternal = os_variant_allows_internal_security_policies("com.apple.Accessibility");
-    });
-
+    static bool isInternal = os_variant_allows_internal_security_policies("com.apple.Accessibility");
     return isInternal;
 }
 #endif // PLATFORM(COCOA)

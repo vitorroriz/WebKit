@@ -95,9 +95,7 @@ const Vector<NavigatorUABrandVersion>& NavigatorUAData::brands() const
     if (overrideFromUserAgentString)
         return NavigatorUAData::m_brands;
 
-    static LazyNeverDestroyed<Vector<NavigatorUABrandVersion>> brandVersion;
-    static std::once_flag onceKey;
-    std::call_once(onceKey, [] {
+    static NeverDestroyed<Vector<NavigatorUABrandVersion>> brandVersion = [] {
         Vector<NavigatorUABrandVersion> temp = {
             NavigatorUABrandVersion {
                 .brand = "AppleWebKit"_s,
@@ -109,8 +107,8 @@ const Vector<NavigatorUABrandVersion>& NavigatorUAData::brands() const
 
         auto rng = std::default_random_engine { };
         std::ranges::shuffle(temp, rng);
-        brandVersion.construct(temp);
-    });
+        return temp;
+    }();
 
     return brandVersion;
 }

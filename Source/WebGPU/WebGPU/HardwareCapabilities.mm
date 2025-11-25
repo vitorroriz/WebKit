@@ -228,10 +228,9 @@ bool isWebGPUSwiftEnabled()
 #elif !ENABLE(WEBGPU_SWIFT)
     return false;
 #else
-    static std::once_flag onceFlag;
-    static bool isWebGPUSwiftEnabled;
-    std::call_once(onceFlag, [&] {
+    static bool isWebGPUSwiftEnabled = [&] {
         NSNumber* object = [[NSUserDefaults standardUserDefaults] objectForKey:@"WebKitWebGPUSwiftEnabled"];
+        bool isWebGPUSwiftEnabled;
         if (object)
             isWebGPUSwiftEnabled = object.boolValue;
         else
@@ -241,7 +240,8 @@ bool isWebGPUSwiftEnabled()
             WTFLogAlways("WebGPU: using SWIFT backend"); // NOLINT
         else
             WTFLogAlways("WebGPU: using C++ backend"); // NOLINT
-    });
+        return isWebGPUSwiftEnabled;
+    }();
     return isWebGPUSwiftEnabled;
 #endif
 }

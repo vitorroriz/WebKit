@@ -2301,23 +2301,9 @@ std::optional<Quirks::TikTokOverflowingContentQuirkType> Quirks::needsTikTokOver
     if (!element.elementData() || !element.hasClass())
         return { };
 
-    static LazyNeverDestroyed<AtomString> contentContainerSubstring;
-    static std::once_flag contentContainerSubstringOnceKey;
-    std::call_once(contentContainerSubstringOnceKey, [&] {
-        contentContainerSubstring.construct("DivContentContainer"_s);
-    });
-
-    static LazyNeverDestroyed<AtomString> videoContainerSubstring;
-    static std::once_flag videoContainerSubstringOnceKey;
-    std::call_once(videoContainerSubstringOnceKey, [&] {
-        videoContainerSubstring.construct("DivVideoContainer"_s);
-    });
-
-    static LazyNeverDestroyed<AtomString> browserModeContainerSubstring;
-    static std::once_flag browserModeContainerSubstringOnceKey;
-    std::call_once(browserModeContainerSubstringOnceKey, [&] {
-        browserModeContainerSubstring.construct("DivBrowserModeContainer"_s);
-    });
+    static NeverDestroyed<AtomString> contentContainerSubstring { "DivContentContainer"_s };
+    static NeverDestroyed<AtomString> videoContainerSubstring { "DivVideoContainer"_s };
+    static NeverDestroyed<AtomString> browserModeContainerSubstring { "DivBrowserModeContainer"_s };
 
     auto parentElementClassNamesContainsBrowserModeContainerSubstring = [&] {
         RefPtr parentElement = element.parentElement();
