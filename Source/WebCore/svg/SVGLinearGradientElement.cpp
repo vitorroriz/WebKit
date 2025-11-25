@@ -51,13 +51,14 @@ inline SVGLinearGradientElement::SVGLinearGradientElement(const QualifiedName& t
     // Spec: If the x2 attribute is not specified, the effect is as if a value of "100%" were specified.
     ASSERT(hasTagName(SVGNames::linearGradientTag));
 
-    static std::once_flag onceFlag;
-    std::call_once(onceFlag, [] {
+    static bool didRegistration = false;
+    if (!didRegistration) [[unlikely]] {
+        didRegistration = true;
         PropertyRegistry::registerProperty<SVGNames::x1Attr, &SVGLinearGradientElement::m_x1>();
         PropertyRegistry::registerProperty<SVGNames::y1Attr, &SVGLinearGradientElement::m_y1>();
         PropertyRegistry::registerProperty<SVGNames::x2Attr, &SVGLinearGradientElement::m_x2>();
         PropertyRegistry::registerProperty<SVGNames::y2Attr, &SVGLinearGradientElement::m_y2>();
-    });
+    }
 }
 
 Ref<SVGLinearGradientElement> SVGLinearGradientElement::create(const QualifiedName& tagName, Document& document)

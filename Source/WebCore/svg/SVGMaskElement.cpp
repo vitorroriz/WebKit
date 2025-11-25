@@ -56,15 +56,16 @@ inline SVGMaskElement::SVGMaskElement(const QualifiedName& tagName, Document& do
     // Spec: If the width/height attribute is not specified, the effect is as if a value of "120%" were specified.
     ASSERT(hasTagName(SVGNames::maskTag));
 
-    static std::once_flag onceFlag;
-    std::call_once(onceFlag, [] {
+    static bool didRegistration = false;
+    if (!didRegistration) [[unlikely]] {
+        didRegistration = true;
         PropertyRegistry::registerProperty<SVGNames::xAttr, &SVGMaskElement::m_x>();
         PropertyRegistry::registerProperty<SVGNames::yAttr, &SVGMaskElement::m_y>();
         PropertyRegistry::registerProperty<SVGNames::widthAttr, &SVGMaskElement::m_width>();
         PropertyRegistry::registerProperty<SVGNames::heightAttr, &SVGMaskElement::m_height>();
         PropertyRegistry::registerProperty<SVGNames::maskUnitsAttr, SVGUnitTypes::SVGUnitType, &SVGMaskElement::m_maskUnits>();
         PropertyRegistry::registerProperty<SVGNames::maskContentUnitsAttr, SVGUnitTypes::SVGUnitType, &SVGMaskElement::m_maskContentUnits>();
-    });
+    }
 }
 
 Ref<SVGMaskElement> SVGMaskElement::create(const QualifiedName& tagName, Document& document)

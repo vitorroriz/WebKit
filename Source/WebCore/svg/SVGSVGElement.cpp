@@ -74,13 +74,14 @@ inline SVGSVGElement::SVGSVGElement(const QualifiedName& tagName, Document& docu
     ASSERT(hasTagName(SVGNames::svgTag));
     document.registerForDocumentSuspensionCallbacks(*this);
 
-    static std::once_flag onceFlag;
-    std::call_once(onceFlag, [] {
+    static bool didRegistration = false;
+    if (!didRegistration) [[unlikely]] {
+        didRegistration = true;
         PropertyRegistry::registerProperty<SVGNames::xAttr, &SVGSVGElement::m_x>();
         PropertyRegistry::registerProperty<SVGNames::yAttr, &SVGSVGElement::m_y>();
         PropertyRegistry::registerProperty<SVGNames::widthAttr, &SVGSVGElement::m_width>();
         PropertyRegistry::registerProperty<SVGNames::heightAttr, &SVGSVGElement::m_height>();
-    });
+    }
 }
 
 Ref<SVGSVGElement> SVGSVGElement::create(const QualifiedName& tagName, Document& document)

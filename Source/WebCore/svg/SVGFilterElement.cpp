@@ -51,15 +51,16 @@ inline SVGFilterElement::SVGFilterElement(const QualifiedName& tagName, Document
     // Spec: If the width/height attribute is not specified, the effect is as if a value of "120%" were specified.
     ASSERT(hasTagName(SVGNames::filterTag));
 
-    static std::once_flag onceFlag;
-    std::call_once(onceFlag, [] {
+    static bool didRegistration = false;
+    if (!didRegistration) [[unlikely]] {
+        didRegistration = true;
         PropertyRegistry::registerProperty<SVGNames::filterUnitsAttr, SVGUnitTypes::SVGUnitType, &SVGFilterElement::m_filterUnits>();
         PropertyRegistry::registerProperty<SVGNames::primitiveUnitsAttr, SVGUnitTypes::SVGUnitType, &SVGFilterElement::m_primitiveUnits>();
         PropertyRegistry::registerProperty<SVGNames::xAttr, &SVGFilterElement::m_x>();
         PropertyRegistry::registerProperty<SVGNames::yAttr, &SVGFilterElement::m_y>();
         PropertyRegistry::registerProperty<SVGNames::widthAttr, &SVGFilterElement::m_width>();
         PropertyRegistry::registerProperty<SVGNames::heightAttr, &SVGFilterElement::m_height>();
-    });
+    }
 }
 
 Ref<SVGFilterElement> SVGFilterElement::create(const QualifiedName& tagName, Document& document)

@@ -51,15 +51,16 @@ inline SVGRadialGradientElement::SVGRadialGradientElement(const QualifiedName& t
     // Spec: If the cx/cy/r/fr attribute is not specified, the effect is as if a value of "50%" were specified.
     ASSERT(hasTagName(SVGNames::radialGradientTag));
 
-    static std::once_flag onceFlag;
-    std::call_once(onceFlag, [] {
+    static bool didRegistration = false;
+    if (!didRegistration) [[unlikely]] {
+        didRegistration = true;
         PropertyRegistry::registerProperty<SVGNames::cxAttr, &SVGRadialGradientElement::m_cx>();
         PropertyRegistry::registerProperty<SVGNames::cyAttr, &SVGRadialGradientElement::m_cy>();
         PropertyRegistry::registerProperty<SVGNames::rAttr, &SVGRadialGradientElement::m_r>();
         PropertyRegistry::registerProperty<SVGNames::fxAttr, &SVGRadialGradientElement::m_fx>();
         PropertyRegistry::registerProperty<SVGNames::fyAttr, &SVGRadialGradientElement::m_fy>();
         PropertyRegistry::registerProperty<SVGNames::frAttr, &SVGRadialGradientElement::m_fr>();
-    });
+    }
 }
 
 Ref<SVGRadialGradientElement> SVGRadialGradientElement::create(const QualifiedName& tagName, Document& document)
