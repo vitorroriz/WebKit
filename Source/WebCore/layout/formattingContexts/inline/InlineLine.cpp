@@ -683,6 +683,11 @@ bool Line::restoreTrimmedTrailingWhitespace(InlineLayoutUnit trimmedTrailingWhit
     return false;
 }
 
+bool Line::hasTrailingForcedLineBreak(const RunList& runs)
+{
+    return !runs.isEmpty() && runs.last().isLineBreak();
+}
+
 const InlineFormattingContext& Line::formattingContext() const
 {
     return m_inlineFormattingContext;

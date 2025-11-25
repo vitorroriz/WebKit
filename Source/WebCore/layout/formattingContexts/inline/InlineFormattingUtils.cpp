@@ -199,14 +199,14 @@ FloatingContext::Constraints InlineFormattingUtils::floatConstraintsForLine(Inli
     return floatingContext.constraints(logicalTopCandidate, logicalBottomCandidate, FloatingContext::MayBeAboveLastFloat::Yes);
 }
 
-InlineLayoutUnit InlineFormattingUtils::horizontalAlignmentOffset(const RenderStyle& rootStyle, InlineLayoutUnit contentLogicalRight, InlineLayoutUnit lineLogicalWidth, InlineLayoutUnit hangingTrailingWidth, const Line::RunList& runs, bool isLastLine, std::optional<TextDirection> inlineBaseDirectionOverride)
+InlineLayoutUnit InlineFormattingUtils::horizontalAlignmentOffset(const RenderStyle& rootStyle, InlineLayoutUnit contentLogicalRight, InlineLayoutUnit lineLogicalWidth, InlineLayoutUnit hangingTrailingWidth, bool isLastLineOrLineEndsWithForcedLineBreak, std::optional<TextDirection> inlineBaseDirectionOverride)
 {
     // Depending on the line's alignment/justification, the hanging glyph can be placed outside the line box.
     if (hangingTrailingWidth) {
         // If white-space is set to pre-wrap, the UA must (unconditionally) hang this sequence, unless the sequence is followed
         // by a forced line break, in which case it must conditionally hang the sequence is instead.
         // Note that end of last line in a paragraph is considered a forced break.
-        auto isConditionalHanging = runs.last().isLineBreak() || isLastLine;
+        auto isConditionalHanging = isLastLineOrLineEndsWithForcedLineBreak;
         // In some cases, a glyph at the end of a line can conditionally hang: it hangs only if it does not otherwise fit in the line prior to justification.
         if (isConditionalHanging) {
             // FIXME: Conditional hanging needs partial overflow trimming at glyph boundary, one by one until they fit.
@@ -215,7 +215,6 @@ InlineLayoutUnit InlineFormattingUtils::horizontalAlignmentOffset(const RenderSt
             contentLogicalRight -= hangingTrailingWidth;
     }
 
-    auto isLastLineOrAfterLineBreak = isLastLine || (!runs.isEmpty() && runs.last().isLineBreak());
     auto horizontalAvailableSpace = lineLogicalWidth - contentLogicalRight;
 
     if (horizontalAvailableSpace <= 0)
@@ -225,7 +224,7 @@ InlineLayoutUnit InlineFormattingUtils::horizontalAlignmentOffset(const RenderSt
 
     auto computedHorizontalAlignment = [&] {
         auto textAlign = rootStyle.textAlign();
-        if (!isLastLineOrAfterLineBreak)
+        if (!isLastLineOrLineEndsWithForcedLineBreak)
             return textAlign;
         // The last line before a forced break or the end of the block is aligned according to text-align-last.
         switch (rootStyle.textAlignLast()) {

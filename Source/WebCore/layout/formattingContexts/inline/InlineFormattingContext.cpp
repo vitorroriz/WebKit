@@ -529,7 +529,7 @@ bool InlineFormattingContext::createDisplayContentForLineFromCachedContent(const
 
     lineContent.lineGeometry.logicalTopLeft = { constraints.horizontal().logicalLeft, constraints.logicalTop() };
     lineContent.lineGeometry.logicalWidth = constraints.horizontal().logicalWidth;
-    lineContent.contentGeometry.logicalLeft = InlineFormattingUtils::horizontalAlignmentOffset(root().style(), lineContent.contentGeometry.logicalWidth, lineContent.lineGeometry.logicalWidth, lineContent.hangingContent.logicalWidth, lineContent.runs, true);
+    lineContent.contentGeometry.logicalLeft = InlineFormattingUtils::horizontalAlignmentOffset(root().style(), lineContent.contentGeometry.logicalWidth, lineContent.lineGeometry.logicalWidth, lineContent.hangingContent.logicalWidth, true);
     auto lineBox = LineBoxBuilder { *this, lineContent }.build({ });
     createDisplayContentForInlineContent(lineBox, lineContent, constraints, layoutResult.displayContent);
     return true;
