@@ -5086,8 +5086,13 @@ WTF::TextStream& operator<<(WTF::TextStream& ts, RenderingUpdateStep step)
 ImageOverlayController& Page::imageOverlayController()
 {
     if (!m_imageOverlayController)
-        m_imageOverlayController = makeUnique<ImageOverlayController>(*this);
+        lazyInitialize(m_imageOverlayController, makeUniqueWithoutRefCountedCheck<ImageOverlayController>(*this));
     return *m_imageOverlayController;
+}
+
+Ref<ImageOverlayController> Page::protectedImageOverlayController()
+{
+    return imageOverlayController();
 }
 
 Page* Page::serviceWorkerPage(ScriptExecutionContextIdentifier serviceWorkerPageIdentifier)
