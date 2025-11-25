@@ -259,7 +259,6 @@ page/DebugPageOverlays.cpp
 page/ElementTargetingController.cpp
 page/EventHandler.cpp
 page/FocusController.cpp
-page/FrameConsoleClient.cpp
 page/FrameSnapshotting.cpp
 page/FrameView.cpp
 page/ImageAnalysisQueue.cpp
@@ -479,4 +478,3 @@ testing/LegacyMockCDM.cpp
 testing/MockCDMFactory.cpp
 testing/MockPageOverlayClient.cpp
 testing/ServiceWorkerInternals.cpp
-workers/WorkerConsoleClient.cpp

@@ -365,7 +365,6 @@ page/DragController.cpp
 page/ElementTargetingController.cpp
 page/EventHandler.cpp
 page/FocusController.cpp
-page/FrameConsoleClient.cpp
 page/FrameSnapshotting.cpp
 page/ImageOverlayController.cpp
 page/IntelligenceTextEffectsSupport.cpp
