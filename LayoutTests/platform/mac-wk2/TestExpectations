@@ -2414,3 +2414,5 @@ webkit.org/b/302174 [ Tahoe Debug arm64 ] platform/mac/media/encrypted-media/fps
 # webkit.org/b/302674 fast/webgpu/nocrash/fuzz-279542.html appears to cause other tests to timeout
 [ Tahoe Debug arm64 ] fast/webgpu/nocrash/ [ Skip ]
 [ Tahoe Debug arm64 ] fast/selectors/is-backtracking.html [ Skip ]
+
+webkit.org/b/302935 [ Sonoma ] media/media-source/media-source-allowed-codecs.html [ Failure ]
