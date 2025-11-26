@@ -40,7 +40,6 @@
 #include "CompositeOperation.h"
 #include "FontSizeAdjust.h"
 #include "GraphicsTypes.h"
-#include "PositionTryFallback.h"
 #include "RenderStyleConstants.h"
 #include "SVGRenderStyleDefs.h"
 #include "ScrollAxis.h"
@@ -50,6 +49,7 @@
 #include "StyleImageOrientation.h"
 #include "StyleMarginTrim.h"
 #include "StyleMaskMode.h"
+#include "StylePositionTryFallbackTactic.h"
 #include "StylePositionVisibility.h"
 #include "StyleResize.h"
 #include "StyleScrollBehavior.h"
@@ -2582,7 +2582,7 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH
 
-#define TYPE Style::PositionTryFallback::Tactic
+#define TYPE Style::PositionTryFallbackTactic
 #define FOR_EACH(CASE) CASE(FlipBlock) CASE(FlipInline) CASE(FlipStart) CASE(FlipX) CASE(FlipY)
 DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE

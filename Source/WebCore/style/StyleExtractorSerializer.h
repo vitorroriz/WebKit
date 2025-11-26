@@ -63,10 +63,6 @@ public:
 
     static void serializeTransformationMatrix(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const TransformationMatrix&);
     static void serializeTransformationMatrix(const RenderStyle&, StringBuilder&, const CSS::SerializationContext&, const TransformationMatrix&);
-
-    // MARK: Shared serializations
-
-    static void serializePositionTryFallbacks(ExtractorState&, StringBuilder&, const CSS::SerializationContext&, const FixedVector<PositionTryFallback>&);
 };
 
 // MARK: - Strong value serializations
@@ -159,35 +155,6 @@ inline void ExtractorSerializer::serializeTransformationMatrix(const RenderStyle
     builder.append(nameLiteral(CSSValueMatrix3d), '(', interleave(values, [&](auto& builder, auto& value) {
         CSS::serializationForCSS(builder, context, CSS::NumberRaw<> { value });
     }, ", "_s), ')');
-}
-
-// MARK: - Shared serializations
-
-inline void ExtractorSerializer::serializePositionTryFallbacks(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context, const FixedVector<PositionTryFallback>& fallbacks)
-{
-    if (fallbacks.isEmpty()) {
-        serializationForCSS(builder, context, state.style, CSS::Keyword::None { });
-        return;
-    }
-
-    CSSValueListBuilder list;
-    for (auto& fallback : fallbacks) {
-        if (RefPtr positionAreaProperties = fallback.positionAreaProperties) {
-            auto areaValue = positionAreaProperties->getPropertyCSSValue(CSSPropertyPositionArea);
-            if (areaValue)
-                list.append(*areaValue);
-            continue;
-        }
-
-        CSSValueListBuilder singleFallbackList;
-        if (fallback.positionTryRuleName)
-            singleFallbackList.append(ExtractorConverter::convert(state, *fallback.positionTryRuleName));
-        for (auto& tactic : fallback.tactics)
-            singleFallbackList.append(ExtractorConverter::convert(state, tactic));
-        list.append(CSSValueList::createSpaceSeparated(singleFallbackList));
-    }
-
-    builder.append(CSSValueList::createCommaSeparated(WTFMove(list))->cssText(context));
 }
 
 } // namespace Style

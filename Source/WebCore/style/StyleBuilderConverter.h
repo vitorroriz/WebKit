@@ -112,8 +112,6 @@ namespace Style {
 class BuilderConverter {
 public:
     template<typename T, typename... Rest> static T convertStyleType(BuilderState&, const CSSValue&, Rest&&...);
-
-    static FixedVector<PositionTryFallback> convertPositionTryFallbacks(BuilderState&, const CSSValue&);
 };
 
 template<typename T, typename... Rest> inline T BuilderConverter::convertStyleType(BuilderState& builderState, const CSSValue& value, Rest&&... rest)
@@ -129,56 +127,6 @@ inline float zoomWithTextZoomFactor(BuilderState& builderState)
         return usedZoom * textZoomFactor;
     }
     return builderState.cssToLengthConversionData().zoom();
-}
-
-inline FixedVector<PositionTryFallback> BuilderConverter::convertPositionTryFallbacks(BuilderState& builderState, const CSSValue& value)
-{
-    // FIXME: SaferCPP analysis reports that 'builderState' is an unsafe capture, even though this lambda does not escape.
-    SUPPRESS_UNCOUNTED_LAMBDA_CAPTURE auto convertFallback = [&](const CSSValue& fallbackValue) -> std::optional<PositionTryFallback> {
-        auto* valueList = dynamicDowncast<CSSValueList>(fallbackValue);
-        if (!valueList) {
-            // Turn the inlined position-area fallback into properties object that can be applied similarly to @position-try declarations.
-            auto property = CSSProperty { CSSPropertyPositionArea, Ref { const_cast<CSSValue&>(fallbackValue) } };
-            return PositionTryFallback {
-                .positionAreaProperties = ImmutableStyleProperties::createDeduplicating(std::span { &property, 1 }, HTMLStandardMode)
-            };
-        }
-
-        if (valueList->separator() != CSSValueList::SpaceSeparator)
-            return { };
-
-        auto fallback = PositionTryFallback { };
-
-        for (auto& item : *valueList) {
-            if (item.isCustomIdent())
-                fallback.positionTryRuleName = ScopedName { AtomString { item.customIdent() }, builderState.styleScopeOrdinal() };
-            else {
-                auto tacticValue = fromCSSValueID<PositionTryFallback::Tactic>(item.valueID());
-                if (fallback.tactics.contains(tacticValue)) {
-                    ASSERT_NOT_REACHED();
-                    return { };
-                }
-
-                fallback.tactics.append(tacticValue);
-            }
-        }
-        return fallback;
-    };
-
-    if (value.valueID() == CSSValueNone)
-        return { };
-
-    if (auto fallback = convertFallback(value))
-        return { *fallback };
-
-    auto* list = dynamicDowncast<CSSValueList>(value);
-    if (!list)
-        return { };
-
-    return FixedVector<PositionTryFallback>::map(*list, [&](auto& item) {
-        auto fallback = convertFallback(item);
-        return fallback ? *fallback : PositionTryFallback { };
-    });
 }
 
 } // namespace Style

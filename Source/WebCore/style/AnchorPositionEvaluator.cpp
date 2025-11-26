@@ -281,7 +281,7 @@ void AnchorPositionEvaluator::captureScrollSnapshots(RenderBox& anchored, bool i
     if (adjuster.isEmpty())
         return clearAnchorScrollSnapshots(anchored);
 
-    if (!anchored.style().positionTryFallbacks().isEmpty()
+    if (!anchored.style().positionTryFallbacks().isNone()
         || anchored.style().positionVisibility().contains(PositionVisibilityValue::NoOverflow))
         adjuster.setFallbackLimits(anchored);
 
@@ -315,7 +315,7 @@ void AnchorPositionEvaluator::updateScrollAdjustments(RenderView& renderView)
         bool needsInvalidation = false;
         if (adjuster.hasFallbackLimits()) {
             if (adjuster.exceedsFallbackLimits(scrollOffset)) {
-                if (!anchored->style().positionTryFallbacks().isEmpty()) {
+                if (!anchored->style().positionTryFallbacks().isNone()) {
                     anchored->setNeedsLayout();
                     needsInvalidation = true;
                 } else

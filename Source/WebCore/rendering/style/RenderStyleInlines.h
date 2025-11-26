@@ -510,7 +510,7 @@ constexpr PointerEvents RenderStyle::initialPointerEvents() { return PointerEven
 constexpr PositionType RenderStyle::initialPosition() { return PositionType::Static; }
 inline Style::PositionAnchor RenderStyle::initialPositionAnchor() { return CSS::Keyword::Auto { }; }
 inline Style::PositionArea RenderStyle::initialPositionArea() { return CSS::Keyword::None { }; }
-inline FixedVector<Style::PositionTryFallback> RenderStyle::initialPositionTryFallbacks() { return { }; }
+inline Style::PositionTryFallbacks RenderStyle::initialPositionTryFallbacks() { return CSS::Keyword::None { }; }
 constexpr Style::PositionTryOrder RenderStyle::initialPositionTryOrder() { return Style::PositionTryOrder::Normal; }
 constexpr Style::PositionVisibility RenderStyle::initialPositionVisibility() { return Style::PositionVisibilityValue::AnchorsVisible; }
 constexpr PrintColorAdjust RenderStyle::initialPrintColorAdjust() { return PrintColorAdjust::Economy; }
@@ -740,6 +740,7 @@ inline const Style::PerspectiveOriginX& RenderStyle::perspectiveOriginX() const 
 inline const Style::PerspectiveOriginY& RenderStyle::perspectiveOriginY() const { return m_nonInheritedData->rareData->perspectiveOrigin.y; }
 inline const Style::PositionAnchor& RenderStyle::positionAnchor() const { return m_nonInheritedData->rareData->positionAnchor; }
 inline Style::PositionArea RenderStyle::positionArea() const { return m_nonInheritedData->rareData->positionArea; }
+inline const Style::PositionTryFallbacks& RenderStyle::positionTryFallbacks() const { return m_nonInheritedData->rareData->positionTryFallbacks; }
 inline Style::PositionTryOrder RenderStyle::positionTryOrder() const { return static_cast<Style::PositionTryOrder>(m_nonInheritedData->rareData->positionTryOrder); }
 inline Style::PositionVisibility RenderStyle::positionVisibility() const { return Style::PositionVisibility::fromRaw(m_nonInheritedData->rareData->positionVisibility); }
 inline bool RenderStyle::preserveNewline() const { return preserveNewline(whiteSpaceCollapse()); }

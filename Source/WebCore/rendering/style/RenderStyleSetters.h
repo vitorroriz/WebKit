@@ -258,6 +258,7 @@ inline void RenderStyle::setPerspectiveOriginX(Style::PerspectiveOriginX&& origi
 inline void RenderStyle::setPerspectiveOriginY(Style::PerspectiveOriginY&& originY) { SET_NESTED(m_nonInheritedData, rareData, perspectiveOrigin.y, WTFMove(originY)); }
 inline void RenderStyle::setPositionAnchor(Style::PositionAnchor&& anchor) { SET_NESTED(m_nonInheritedData, rareData, positionAnchor, WTFMove(anchor)); }
 inline void RenderStyle::setPositionArea(Style::PositionArea positionArea) { SET_NESTED(m_nonInheritedData, rareData, positionArea, positionArea); }
+inline void RenderStyle::setPositionTryFallbacks(Style::PositionTryFallbacks&& fallbacks) { SET_NESTED(m_nonInheritedData, rareData, positionTryFallbacks, WTFMove(fallbacks)); }
 inline void RenderStyle::setPositionTryOrder(Style::PositionTryOrder order) { SET_NESTED(m_nonInheritedData, rareData, positionTryOrder, static_cast<unsigned>(order)); }
 inline void RenderStyle::setPositionVisibility(Style::PositionVisibility value) { SET_NESTED(m_nonInheritedData, rareData, positionVisibility, value.toRaw()); }
 inline void RenderStyle::setResize(Style::Resize resize) { SET_NESTED(m_nonInheritedData, miscData, resize, static_cast<unsigned>(resize)); }

@@ -3535,16 +3535,6 @@ UserSelect RenderStyle::usedUserSelect() const
     return value;
 }
 
-const FixedVector<Style::PositionTryFallback>& RenderStyle::positionTryFallbacks() const
-{
-    return m_nonInheritedData->rareData->positionTryFallbacks;
-}
-
-void RenderStyle::setPositionTryFallbacks(FixedVector<Style::PositionTryFallback>&& fallbacks)
-{
-    SET_NESTED_VAR(m_nonInheritedData, rareData, positionTryFallbacks, WTFMove(fallbacks));
-}
-
 std::optional<size_t> RenderStyle::usedPositionOptionIndex() const
 {
     return m_nonInheritedData->rareData->usedPositionOptionIndex;

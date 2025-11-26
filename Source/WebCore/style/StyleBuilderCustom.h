@@ -130,6 +130,7 @@ inline OffsetPosition forwardInheritedValue(const OffsetPosition& value) { auto 
 inline OffsetRotate forwardInheritedValue(const OffsetRotate& value) { auto copy = value; return copy; }
 inline Position forwardInheritedValue(const Position& value) { auto copy = value; return copy; }
 inline PositionAnchor forwardInheritedValue(const PositionAnchor& value) { auto copy = value; return copy; }
+inline PositionTryFallbacks forwardInheritedValue(const PositionTryFallbacks& value) { auto copy = value; return copy; }
 inline PositionX forwardInheritedValue(const PositionX& value) { auto copy = value; return copy; }
 inline PositionY forwardInheritedValue(const PositionY& value) { auto copy = value; return copy; }
 inline RepeatStyle forwardInheritedValue(const RepeatStyle& value) { auto copy = value; return copy; }

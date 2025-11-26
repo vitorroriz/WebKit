@@ -128,10 +128,6 @@ public:
 
     static Ref<CSSValue> convertTransformationMatrix(ExtractorState&, const TransformationMatrix&);
     static Ref<CSSValue> convertTransformationMatrix(const RenderStyle&, const TransformationMatrix&);
-
-    // MARK: Shared conversions
-
-    static Ref<CSSValue> convertPositionTryFallbacks(ExtractorState&, const FixedVector<PositionTryFallback>&);
 };
 
 // MARK: - Strong value conversions
@@ -219,33 +215,6 @@ inline Ref<CSSValue> ExtractorConverter::convertTransformationMatrix(const Rende
     for (auto value : values)
         arguments.append(CSSPrimitiveValue::create(value));
     return CSSFunctionValue::create(CSSValueMatrix3d, WTFMove(arguments));
-}
-
-// MARK: - Shared conversions
-
-inline Ref<CSSValue> ExtractorConverter::convertPositionTryFallbacks(ExtractorState& state, const FixedVector<PositionTryFallback>& fallbacks)
-{
-    if (fallbacks.isEmpty())
-        return CSSPrimitiveValue::create(CSSValueNone);
-
-    CSSValueListBuilder list;
-    for (auto& fallback : fallbacks) {
-        if (RefPtr positionAreaProperties = fallback.positionAreaProperties) {
-            auto areaValue = positionAreaProperties->getPropertyCSSValue(CSSPropertyPositionArea);
-            if (areaValue)
-                list.append(*areaValue);
-            continue;
-        }
-
-        CSSValueListBuilder singleFallbackList;
-        if (fallback.positionTryRuleName)
-            singleFallbackList.append(convert(state, *fallback.positionTryRuleName));
-        for (auto& tactic : fallback.tactics)
-            singleFallbackList.append(convert(state, tactic));
-        list.append(CSSValueList::createSpaceSeparated(singleFallbackList));
-    }
-
-    return CSSValueList::createCommaSeparated(WTFMove(list));
 }
 
 } // namespace Style

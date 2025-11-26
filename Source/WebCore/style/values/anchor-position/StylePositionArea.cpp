@@ -29,6 +29,7 @@
 #include "CSSPropertyParserConsumer+Anchor.h"
 #include "RenderStyle.h"
 #include "StyleBuilderChecking.h"
+#include "StylePositionTryFallbackTactic.h"
 #include "StyleSelfAlignmentData.h"
 #include "WritingMode.h"
 
@@ -504,19 +505,19 @@ auto CSSValueConversion<PositionArea>::operator()(BuilderState& state, const CSS
         auto writingMode = state.style().writingMode();
         for (auto tactic : positionTryFallback->tactics) {
             switch (tactic) {
-            case PositionTryFallback::Tactic::FlipBlock:
+            case PositionTryFallbackTactic::FlipBlock:
                 area = flipPositionAreaByLogicalAxis(LogicalBoxAxis::Block, area, writingMode);
                 break;
-            case PositionTryFallback::Tactic::FlipInline:
+            case PositionTryFallbackTactic::FlipInline:
                 area = flipPositionAreaByLogicalAxis(LogicalBoxAxis::Inline, area, writingMode);
                 break;
-            case PositionTryFallback::Tactic::FlipX:
+            case PositionTryFallbackTactic::FlipX:
                 area = flipPositionAreaByPhysicalAxis(BoxAxis::Horizontal, area, writingMode);
                 break;
-            case PositionTryFallback::Tactic::FlipY:
+            case PositionTryFallbackTactic::FlipY:
                 area = flipPositionAreaByPhysicalAxis(BoxAxis::Vertical, area, writingMode);
                 break;
-            case PositionTryFallback::Tactic::FlipStart:
+            case PositionTryFallbackTactic::FlipStart:
                 area = mirrorPositionAreaAcrossDiagonal(area);
                 break;
             }

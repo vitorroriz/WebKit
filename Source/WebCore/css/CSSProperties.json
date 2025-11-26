@@ -12047,7 +12047,7 @@
             ],
             "codegen-properties": {
                 "settings-flag": "cssAnchorPositioningEnabled",
-                "style-converter": "PositionTryFallbacks",
+                "style-converter": "StyleType<PositionTryFallbacks>",
                 "parser-function": "consumePositionTryFallbacks",
                 "parser-grammar-unused": "none | [ [<dashed-ident> || <try-tactic>] | <position-area> ]#",
                 "parser-grammar-unused-reason": "Needs support for transforming parsed input to minimal form."

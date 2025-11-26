@@ -2982,7 +2982,6 @@ rendering/style/BorderValue.cpp
 rendering/style/DropShadowFilterOperationWithStyleColor.cpp
 rendering/style/GridSpan.cpp
 rendering/style/OutlineValue.cpp
-rendering/style/PositionTryFallback.cpp
 rendering/style/PositionTryOrder.cpp
 rendering/style/ReferenceFilterOperation.cpp
 rendering/style/RenderStyle.cpp
@@ -3185,6 +3184,7 @@ style/values/anchor-position/StylePositionAreaSelf.cpp
 style/values/anchor-position/StylePositionAreaSpan.cpp
 style/values/anchor-position/StylePositionAreaTrack.cpp
 style/values/anchor-position/StylePositionArea.cpp
+style/values/anchor-position/StylePositionTryFallback.cpp
 style/values/animations/StyleAnimation.cpp
 style/values/animations/StyleSingleAnimationName.cpp
 style/values/animations/StyleSingleAnimationRangeName.cpp

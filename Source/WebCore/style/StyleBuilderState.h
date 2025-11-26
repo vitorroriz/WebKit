@@ -33,7 +33,6 @@
 #include <WebCore/CSSToLengthConversionData.h>
 #include <WebCore/Document.h>
 #include <WebCore/FontTaggedSettings.h>
-#include <WebCore/PositionTryFallback.h>
 #include <WebCore/StyleForVisitedLink.h>
 #include <WebCore/TextFlags.h>
 #include <wtf/BitSet.h>
@@ -70,13 +69,15 @@ struct TextAutospace;
 struct TextSpacingTrim;
 struct WebkitLocale;
 
+enum class PositionTryFallbackTactic : uint8_t;
+
 void maybeUpdateFontForLetterSpacingOrWordSpacing(BuilderState&, CSSValue&);
 
 enum class ApplyValueType : uint8_t { Value, Initial, Inherit };
 
 struct BuilderPositionTryFallback {
     RefPtr<const StyleProperties> properties;
-    Vector<PositionTryFallback::Tactic> tactics;
+    Vector<PositionTryFallbackTactic> tactics;
 };
 
 struct BuilderContext {

@@ -316,7 +316,7 @@ struct PositionArea;
 struct PositionVisibility;
 struct PositionX;
 struct PositionY;
-struct PositionTryFallback;
+struct PositionTryFallbacks;
 struct PreferredSize;
 struct ProgressTimelineAxes;
 struct ProgressTimelineNames;
@@ -2415,9 +2415,9 @@ public:
     inline Style::PositionTryOrder positionTryOrder() const;
     inline void setPositionTryOrder(Style::PositionTryOrder);
 
-    static FixedVector<Style::PositionTryFallback> initialPositionTryFallbacks();
-    const FixedVector<Style::PositionTryFallback>& positionTryFallbacks() const;
-    void setPositionTryFallbacks(FixedVector<Style::PositionTryFallback>&&);
+    static Style::PositionTryFallbacks initialPositionTryFallbacks();
+    inline const Style::PositionTryFallbacks& positionTryFallbacks() const;
+    inline void setPositionTryFallbacks(Style::PositionTryFallbacks&&);
 
     std::optional<size_t> usedPositionOptionIndex() const;
     void setUsedPositionOptionIndex(std::optional<size_t>);
