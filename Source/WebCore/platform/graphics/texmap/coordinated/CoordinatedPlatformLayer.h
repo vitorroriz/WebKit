@@ -78,6 +78,8 @@ public:
         virtual void requestComposition(CompositionReason) = 0;
         virtual RunLoop* compositingRunLoop() const = 0;
         virtual int maxTextureSize() const = 0;
+        virtual void willPaintTile() = 0;
+        virtual void didPaintTile() = 0;
     };
 
     static Ref<CoordinatedPlatformLayer> create();
@@ -191,6 +193,8 @@ public:
     Ref<SkiaRecordingResult> record(const IntRect&);
     Ref<CoordinatedTileBuffer> replay(const RefPtr<SkiaRecordingResult>&, const IntRect&);
 #endif
+    void willPaintTile();
+    void didPaintTile();
     void waitUntilPaintingComplete();
 
 private:

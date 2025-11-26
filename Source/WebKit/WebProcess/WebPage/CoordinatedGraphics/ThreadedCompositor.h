@@ -69,6 +69,7 @@ public:
 #if PLATFORM(WPE) && USE(GBM) && ENABLE(WPE_PLATFORM)
     void preferredBufferFormatsDidChange();
 #endif
+    void pendingTilesDidChange();
 
     void setSize(const WebCore::IntSize&, float);
     void requestCompositionForRenderingUpdate(Function<void()>&&);
@@ -124,7 +125,8 @@ private:
         Idle,
         Scheduled,
         InProgress,
-        ScheduledWhileInProgress
+        ScheduledWhileInProgress,
+        WaitingForTiles
     };
 
     struct {

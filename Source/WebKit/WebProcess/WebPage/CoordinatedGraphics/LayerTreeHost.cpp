@@ -430,6 +430,17 @@ int LayerTreeHost::maxTextureSize() const
     return m_compositor->maxTextureSize();
 }
 
+void LayerTreeHost::willPaintTile()
+{
+    m_sceneState->willPaintTile();
+}
+
+void LayerTreeHost::didPaintTile()
+{
+    m_sceneState->didPaintTile();
+    m_compositor->pendingTilesDidChange();
+}
+
 #if USE(CAIRO)
 Cairo::PaintingEngine& LayerTreeHost::paintingEngine()
 {

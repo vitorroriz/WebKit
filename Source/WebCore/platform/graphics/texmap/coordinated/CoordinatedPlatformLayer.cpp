@@ -826,6 +826,20 @@ int CoordinatedPlatformLayer::maxTextureSize() const
     return m_client ? m_client->maxTextureSize() : 0;
 }
 
+void CoordinatedPlatformLayer::willPaintTile()
+{
+    ASSERT(isMainThread());
+    ASSERT(m_client);
+    m_client->willPaintTile();
+}
+
+void CoordinatedPlatformLayer::didPaintTile()
+{
+    // Could be called from painting threads.
+    if (m_client)
+        m_client->didPaintTile();
+}
+
 Ref<CoordinatedTileBuffer> CoordinatedPlatformLayer::paint(const IntRect& dirtyRect)
 {
     ASSERT(m_lock.isHeld());
@@ -848,6 +862,9 @@ Ref<CoordinatedTileBuffer> CoordinatedPlatformLayer::paint(const IntRect& dirtyR
 #if USE(SKIA)
 Ref<SkiaRecordingResult> CoordinatedPlatformLayer::record(const IntRect& recordRect)
 {
+    ASSERT(m_lock.isHeld());
+    ASSERT(m_client);
+    ASSERT(m_owner);
     auto& paintingEngine = m_client->paintingEngine();
     ASSERT(paintingEngine.useThreadedRendering());
     return paintingEngine.record(*m_owner, recordRect, m_contentsOpaque, m_contentsScale);
@@ -855,10 +872,13 @@ Ref<SkiaRecordingResult> CoordinatedPlatformLayer::record(const IntRect& recordR
 
 Ref<CoordinatedTileBuffer> CoordinatedPlatformLayer::replay(const RefPtr<SkiaRecordingResult>& recording, const IntRect& dirtyRect)
 {
+    ASSERT(m_lock.isHeld());
+    ASSERT(m_client);
+    ASSERT(m_owner);
     ASSERT(recording);
     auto& paintingEngine = m_client->paintingEngine();
     ASSERT(paintingEngine.useThreadedRendering());
-    return paintingEngine.replay(recording, dirtyRect);
+    return paintingEngine.replay(*m_owner, recording, dirtyRect);
 }
 #endif
 

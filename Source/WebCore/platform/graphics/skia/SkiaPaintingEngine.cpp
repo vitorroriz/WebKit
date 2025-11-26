@@ -29,9 +29,10 @@
 #if USE(COORDINATED_GRAPHICS) && USE(SKIA)
 #include "BitmapTexturePool.h"
 #include "CoordinatedBackingStoreProxy.h"
+#include "CoordinatedPlatformLayer.h"
 #include "CoordinatedTileBuffer.h"
 #include "GLContext.h"
-#include "GraphicsLayer.h"
+#include "GraphicsLayerCoordinated.h"
 #include "PlatformDisplay.h"
 #include "ProcessCapabilities.h"
 #include "RenderingMode.h"
@@ -119,13 +120,15 @@ Ref<CoordinatedTileBuffer> SkiaPaintingEngine::createBuffer(RenderingMode render
     return CoordinatedUnacceleratedTileBuffer::create(size, contentsOpaque ? CoordinatedTileBuffer::NoFlags : CoordinatedTileBuffer::SupportsAlpha);
 }
 
-Ref<CoordinatedTileBuffer> SkiaPaintingEngine::paint(const GraphicsLayer& layer, const IntRect& dirtyRect, bool contentsOpaque, float contentsScale)
+Ref<CoordinatedTileBuffer> SkiaPaintingEngine::paint(const GraphicsLayerCoordinated& layer, const IntRect& dirtyRect, bool contentsOpaque, float contentsScale)
 {
     // ### Synchronous rendering on main thread ###
     ASSERT(!useThreadedRendering());
 
-    auto renderingMode = canPerformAcceleratedRendering() ? RenderingMode::Accelerated : RenderingMode::Unaccelerated;
+    Ref platformLayer = layer.coordinatedPlatformLayer();
+    platformLayer->willPaintTile();
 
+    auto renderingMode = canPerformAcceleratedRendering() ? RenderingMode::Accelerated : RenderingMode::Unaccelerated;
     auto buffer = createBuffer(renderingMode, dirtyRect.size(), contentsOpaque);
     buffer->beginPainting();
 
@@ -142,10 +145,12 @@ Ref<CoordinatedTileBuffer> SkiaPaintingEngine::paint(const GraphicsLayer& layer,
     }
 
     buffer->completePainting();
+    platformLayer->didPaintTile();
+
     return buffer;
 }
 
-Ref<SkiaRecordingResult> SkiaPaintingEngine::record(const GraphicsLayer& layer, const IntRect& recordRect, bool contentsOpaque, float contentsScale)
+Ref<SkiaRecordingResult> SkiaPaintingEngine::record(const GraphicsLayerCoordinated& layer, const IntRect& recordRect, bool contentsOpaque, float contentsScale)
 {
     // ### Asynchronous rendering on worker threads ###
     ASSERT(useThreadedRendering());
@@ -166,42 +171,42 @@ Ref<SkiaRecordingResult> SkiaPaintingEngine::record(const GraphicsLayer& layer, 
     return SkiaRecordingResult::create(WTFMove(picture), WTFMove(imageToFenceMap), recordRect, renderingMode, contentsOpaque, contentsScale);
 }
 
-Ref<CoordinatedTileBuffer> SkiaPaintingEngine::replay(const RefPtr<SkiaRecordingResult>& recording, const IntRect& dirtyRect)
+Ref<CoordinatedTileBuffer> SkiaPaintingEngine::replay(const GraphicsLayerCoordinated& layer, const RefPtr<SkiaRecordingResult>& recording, const IntRect& dirtyRect)
 {
     // ### Asynchronous rendering on worker threads ###
     ASSERT(useThreadedRendering());
+
+    Ref platformLayer = layer.coordinatedPlatformLayer();
+    platformLayer->willPaintTile();
 
     auto renderingMode = recording->renderingMode();
     auto buffer = createBuffer(renderingMode, dirtyRect.size(), recording->contentsOpaque());
     buffer->beginPainting();
 
-    m_workerPool->postTask([buffer = Ref { buffer }, dirtyRect, recording = RefPtr { recording }]() mutable {
-        auto* canvas = buffer->canvas();
-        if (!canvas) {
-            buffer->completePainting();
-            return;
+    m_workerPool->postTask([platformLayer = WTFMove(platformLayer), buffer = Ref { buffer }, dirtyRect, recording = RefPtr { recording }]() mutable {
+        if (auto* canvas = buffer->canvas()) {
+            auto replayPicture = [](const sk_sp<SkPicture>& picture, SkCanvas* canvas, const IntRect& recordRect, const IntRect& paintRect) {
+                canvas->save();
+                canvas->clear(SkColors::kTransparent);
+                canvas->clipRect(SkRect::MakeXYWH(0, 0, paintRect.width(), paintRect.height()));
+                canvas->translate(recordRect.x() - paintRect.x(), recordRect.y() - paintRect.y());
+                picture->playback(canvas);
+                canvas->restore();
+            };
+
+            WTFBeginSignpost(canvas, PaintTile, "Skia/%s threaded, dirty region %ix%i+%i+%i", buffer->isBackedByOpenGL() ? "GPU" : "CPU", dirtyRect.x(), dirtyRect.y(), dirtyRect.width(), dirtyRect.height());
+            if (recording->hasFences()) {
+                auto replayCanvas = SkiaReplayCanvas::create(dirtyRect.size(), recording);
+                replayCanvas->addCanvas(canvas);
+                replayPicture(replayCanvas->picture(), &replayCanvas.get(), recording->recordRect(), dirtyRect);
+                replayCanvas->removeCanvas(canvas);
+            } else
+                replayPicture(recording->picture(), canvas, recording->recordRect(), dirtyRect);
+            WTFEndSignpost(canvas, PaintTile);
         }
 
-        auto replayPicture = [](const sk_sp<SkPicture>& picture, SkCanvas* canvas, const IntRect& recordRect, const IntRect& paintRect) {
-            canvas->save();
-            canvas->clear(SkColors::kTransparent);
-            canvas->clipRect(SkRect::MakeXYWH(0, 0, paintRect.width(), paintRect.height()));
-            canvas->translate(recordRect.x() - paintRect.x(), recordRect.y() - paintRect.y());
-            picture->playback(canvas);
-            canvas->restore();
-        };
-
-        WTFBeginSignpost(canvas, PaintTile, "Skia/%s threaded, dirty region %ix%i+%i+%i", buffer->isBackedByOpenGL() ? "GPU" : "CPU", dirtyRect.x(), dirtyRect.y(), dirtyRect.width(), dirtyRect.height());
-        if (recording->hasFences()) {
-            auto replayCanvas = SkiaReplayCanvas::create(dirtyRect.size(), recording);
-            replayCanvas->addCanvas(canvas);
-            replayPicture(replayCanvas->picture(), &replayCanvas.get(), recording->recordRect(), dirtyRect);
-            replayCanvas->removeCanvas(canvas);
-        } else
-            replayPicture(recording->picture(), canvas, recording->recordRect(), dirtyRect);
-        WTFEndSignpost(canvas, PaintTile);
-
         buffer->completePainting();
+        platformLayer->didPaintTile();
     });
 
     return buffer;
