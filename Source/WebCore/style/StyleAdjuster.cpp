@@ -378,6 +378,17 @@ OptionSet<EventListenerRegionType> Adjuster::computeEventListenerRegionTypes(con
         findListeners(eventNames().gestureendEvent, EventListenerRegionType::GestureEnd, EventListenerRegionType::NonPassiveGestureEnd);
         findListeners(eventNames().gesturestartEvent, EventListenerRegionType::GestureStart, EventListenerRegionType::NonPassiveGestureStart);
     }
+
+    if (eventTarget.hasInternalTouchEventHandling()) {
+        types.add(EventListenerRegionType::TouchCancel);
+        types.add(EventListenerRegionType::TouchEnd);
+        types.add(EventListenerRegionType::TouchMove);
+        types.add(EventListenerRegionType::TouchStart);
+        types.add(EventListenerRegionType::NonPassiveTouchCancel);
+        types.add(EventListenerRegionType::NonPassiveTouchEnd);
+        types.add(EventListenerRegionType::NonPassiveTouchMove);
+        types.add(EventListenerRegionType::NonPassiveTouchStart);
+    }
 #endif
 
 #if ENABLE(INTERACTION_REGIONS_IN_EVENT_REGION)
