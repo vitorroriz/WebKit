@@ -406,6 +406,11 @@ media/video-element-fullscreen-not-in-dom-accelerated-iphone.html [ Skip ]
 # Per specification, if the scripts are identical, we do not install the new script and return the existing registration.
 imported/w3c/web-platform-tests/service-workers/service-worker/import-scripts-redirect.https.html [ Skip ]
 
+imported/w3c/web-platform-tests/service-workers/service-worker/resource-timing-cross-origin.https.html [ Failure ]
+imported/w3c/web-platform-tests/service-workers/service-worker/svg-target-reftest.https.html [ ImageOnlyFailure ]
+
+imported/w3c/web-platform-tests/service-workers/service-worker/partitioned-cookies.tentative.https.html [ Pass Failure ]
+
 # This test is timing out in all browsers.
 imported/w3c/web-platform-tests/service-workers/service-worker/clients-matchall-frozen.https.html [ Skip ]
 
@@ -3721,9 +3726,6 @@ webkit.org/b/158205 applicationmanifest/ [ Skip ]
 webkit.org/b/178785 perf/object-keys.html [ Pass Failure ]
 
 webkit.org/b/183390 http/wpt/html/browsers/history/the-location-interface/location-protocol-setter-non-broken-async-delegate.html [ Pass Failure ]
-
-# This fails with Legacy WebKit, and the symptom is a hang so we need to skip it. Skipped here and un-skipped in platform/wk2/TestExpectations.
-imported/w3c/web-platform-tests/service-workers/service-worker/svg-target-reftest.https.html [ Skip ]
 
 webkit.org/b/90980 fast/forms/textarea/textarea-state-restore.html [ Pass Timeout ]
 

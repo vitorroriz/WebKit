@@ -753,6 +753,10 @@ imported/w3c/web-platform-tests/css/css-fonts/font-variant-emoji-005.html [ Pass
 
 imported/w3c/web-platform-tests/service-workers/service-worker/fetch-audio-tainting.https.html [ Pass ]
 
+# Needs rebasing and testing
+imported/w3c/web-platform-tests/service-workers/service-worker/fetch-canvas-tainting-video.https.html [ Failure ]
+imported/w3c/web-platform-tests/service-workers/service-worker/registration-script-module.https.html [ Failure ]
+
 jquery/event.html [ Pass Slow ]
 jquery/offset.html [ Pass Slow ]
 jquery/traversing.html [ Pass Slow ]
