@@ -151,7 +151,6 @@ NS_ASSUME_NONNULL_END
 @end
 #else
 #import <AppKit/NSResponder.h>
-@protocol NSUserInterfaceValidations;
 @interface AVPlayerController : NSResponder <NSUserInterfaceValidations>
 @end
 #endif
