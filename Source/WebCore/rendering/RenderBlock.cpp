@@ -2739,23 +2739,27 @@ void RenderBlock::addFocusRingRects(Vector<LayoutRect>& rects, const LayoutPoint
     if (!hasNonVisibleOverflow() && !hasControlClip()) {
         if (childrenInline())
             addFocusRingRectsForInlineChildren(rects, additionalOffset, paintContainer);
-    
-        for (auto& box : childrenOfType<RenderBox>(*this)) {
-            if (is<RenderListMarker>(box) || box.isOutOfFlowPositioned())
-                continue;
 
-            FloatPoint pos;
-            // FIXME: This doesn't work correctly with transforms.
-            if (box.layer())
-                pos = box.localToContainerPoint(FloatPoint(), paintContainer);
-            else
-                pos = FloatPoint(additionalOffset.x() + box.x(), additionalOffset.y() + box.y());
-            box.addFocusRingRects(rects, flooredLayoutPoint(pos), paintContainer);
-        }
+        for (auto& box : childrenOfType<RenderBox>(*this))
+            addFocusRingRectsForBlockChild(box, rects, additionalOffset, paintContainer);
     }
 
     if (inlineContinuation)
         inlineContinuation->addFocusRingRects(rects, flooredLayoutPoint(LayoutPoint(additionalOffset + inlineContinuation->containingBlock()->location() - location())), paintContainer);
+}
+
+void RenderBlock::addFocusRingRectsForBlockChild(const RenderBox& box, Vector<LayoutRect>& rects, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer) const
+{
+    if (is<RenderListMarker>(box) || box.isOutOfFlowPositioned())
+        return;
+
+    FloatPoint pos;
+    // FIXME: This doesn't work correctly with transforms.
+    if (box.layer())
+        pos = box.localToContainerPoint(FloatPoint(), paintContainer);
+    else
+        pos = FloatPoint(additionalOffset.x() + box.x(), additionalOffset.y() + box.y());
+    box.addFocusRingRects(rects, flooredLayoutPoint(pos), paintContainer);
 }
 
 LayoutUnit RenderBlock::offsetFromLogicalTopOfFirstPage() const
