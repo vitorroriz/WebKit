@@ -536,14 +536,13 @@ void LineBoxBuilder::constructBlockContent(LineBox& lineBox)
     }
 
     // Since we don't need to position and align block content inside the line, we don't need to create any boxes for this block content.
-    auto blockMarginBoxHeight = formattingContext().geometryForBox(runs.last().layoutBox()).marginBoxHeight();
+    auto& blockGeometry = formattingContext().geometryForBox(runs.last().layoutBox());
     for (size_t index = 0;  index < runs.size() - 1; ++index) {
         auto& run = runs[index];
         if (run.isLineSpanningInlineBoxStart()) {
             auto lineSpanningInlineBox = InlineLevelBox::createInlineBox(run.layoutBox(), run.layoutBox().style(), lineLayoutResult.contentGeometry.logicalLeft, lineLayoutResult.contentGeometry.logicalWidth, InlineLevelBox::LineSpanningInlineBox::Yes);
             setVerticalPropertiesForInlineLevelBox(lineBox, lineSpanningInlineBox);
-            // FIXME: Check if vertical border and padding should be removed from final visual rect (see LineBox::logicalBorderBoxForInlineBox).
-            lineSpanningInlineBox.setLogicalHeight(std::min(InlineLayoutUnit(blockMarginBoxHeight), lineSpanningInlineBox.logicalHeight()));
+            lineSpanningInlineBox.setLogicalHeight(InlineLayoutUnit(blockGeometry.borderBoxHeight()));
             lineBox.addInlineLevelBox(WTFMove(lineSpanningInlineBox));
             continue;
         }
@@ -551,7 +550,7 @@ void LineBoxBuilder::constructBlockContent(LineBox& lineBox)
     }
 
     auto blockLineLogicalTopLeft = InlineLayoutPoint { lineLayoutResult.lineGeometry.initialLogicalLeft, lineLayoutResult.lineGeometry.logicalTopLeft.y() };
-    lineBox.setLogicalRect({ blockLineLogicalTopLeft, lineLayoutResult.lineGeometry.logicalWidth, blockMarginBoxHeight });
+    lineBox.setLogicalRect({ blockLineLogicalTopLeft, lineLayoutResult.lineGeometry.logicalWidth, blockGeometry.marginBoxHeight() });
     setVerticalPropertiesForInlineLevelBox(lineBox, lineBox.rootInlineBox());
     // FIXME: Let's considered collapsed block boxes contentful for now (webkit.org/b/302804).
     lineBox.setHasContent(true);
