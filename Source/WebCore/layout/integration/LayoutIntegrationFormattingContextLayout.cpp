@@ -76,6 +76,7 @@ void layoutWithFormattingContextForBox(const Layout::ElementBox& box, std::optio
 
 static inline void populateRootRendererWithFloatsFromIFC(auto& rootBlockContainer, auto& placedFloats)
 {
+    auto blockFormattingContextRootWritingMode = placedFloats.blockFormattingContextRoot().style().writingMode();
     for (auto& floatItem : placedFloats.list()) {
         auto* layoutBox = floatItem.layoutBox();
         if (!layoutBox) {
@@ -88,7 +89,9 @@ static inline void populateRootRendererWithFloatsFromIFC(auto& rootBlockContaine
             continue;
         }
 
-        floatingObject.setFrameRect(Layout::BoxGeometry::marginBoxRect(floatItem.boxGeometry()));
+        auto [marginBoxVisualRect, borderBoxVisualRect] = Layout::IntegrationUtils::toMarginAndBorderBoxVisualRect(floatItem.boxGeometry(), rootBlockContainer.size(), blockFormattingContextRootWritingMode);
+        floatingObject.setFrameRect(marginBoxVisualRect);
+        floatingObject.setMarginOffset({ borderBoxVisualRect.x() - marginBoxVisualRect.x(), borderBoxVisualRect.y() - marginBoxVisualRect.y() });
         floatingObject.setIsPlaced(true);
     }
 }
