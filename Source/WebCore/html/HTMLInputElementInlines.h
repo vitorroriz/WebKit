@@ -25,9 +25,9 @@
 
 #pragma once
 
-#include "Document.h"
-#include "HTMLInputElement.h"
-#include "InputType.h"
+#include <WebCore/Document.h>
+#include <WebCore/HTMLInputElement.h>
+#include <WebCore/InputType.h>
 
 namespace WebCore {
 
