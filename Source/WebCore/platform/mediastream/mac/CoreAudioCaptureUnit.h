@@ -186,6 +186,9 @@ private:
     enum class SyncUpdate : bool { No, Yes };
     void updateMutedState(SyncUpdate = SyncUpdate::No);
 
+    static bool isAnyUnitCapturingExceptFor(CoreAudioCaptureUnit*);
+    static bool isAnyUnitCapturing();
+
     CreationCallback m_creationCallback;
     GetSampleRateCallback m_getSampleRateCallback;
     std::unique_ptr<InternalUnit> m_ioUnit;

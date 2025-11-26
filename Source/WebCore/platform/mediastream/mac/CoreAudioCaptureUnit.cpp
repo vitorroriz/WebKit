@@ -232,6 +232,18 @@ static WeakHashSet<CoreAudioCaptureUnit>& allCoreAudioCaptureUnits()
     return units;
 }
 
+bool CoreAudioCaptureUnit::isAnyUnitCapturingExceptFor(CoreAudioCaptureUnit* unitToNotTest)
+{
+    return std::ranges::any_of(allCoreAudioCaptureUnits(), [unitToNotTest = WeakPtr { unitToNotTest }](auto& unit) {
+        return unit.isProducingMicrophoneSamples() && &unit != unitToNotTest.get();
+    });
+}
+
+bool CoreAudioCaptureUnit::isAnyUnitCapturing()
+{
+    return isAnyUnitCapturingExceptFor(nullptr);
+}
+
 void CoreAudioCaptureUnit::forEach(NOESCAPE Function<void(CoreAudioCaptureUnit&)>&& callback)
 {
     allCoreAudioCaptureUnits().forEach(WTFMove(callback));
@@ -755,12 +767,13 @@ void CoreAudioCaptureUnit::updateMutedState(SyncUpdate syncUpdate)
         RELEASE_LOG_ERROR_IF(error, WebRTC, "CoreAudioCaptureUnit::updateMutedState(%p) unable to set kAUVoiceIOProperty_MuteOutput, error %d (%.4s)", this, (int)error, (char*)&error);
     }
 
-    auto isAnyUnitCapturing = [] {
-        return std::ranges::any_of(allCoreAudioCaptureUnits(), [](auto& unit) {
-            return unit.isProducingData();
-        });
-    };
-    setMutedState(muteUplinkOutput && !isAnyUnitCapturing());
+    bool isAnyOtherUnitCapturing = isAnyUnitCapturingExceptFor(this);
+    RELEASE_LOG_INFO(WebRTC, "CoreAudioCaptureUnit::updateMutedState muteUplinkOutput=%d isAnyOtherUnitCapturing=%d", muteUplinkOutput, isAnyOtherUnitCapturing);
+
+    if (isAnyOtherUnitCapturing)
+        return;
+
+    setMutedState(muteUplinkOutput);
 }
 
 void CoreAudioCaptureUnit::updateMutedStateTimerFired()
@@ -949,7 +962,9 @@ void CoreAudioCaptureUnit::disableMutedSpeechActivityEventListener()
 
 void CoreAudioCaptureUnit::handleMuteStatusChangedNotification(bool isMuting)
 {
-    if (m_muteStatusChangedCallback && isMuting == isProducingMicrophoneSamples())
+    RELEASE_LOG_INFO(WebRTC, "CoreAudioCaptureUnit::handleMuteStatusChangedNotification isMuting=%d isAnyUnitCapturing=%d", isMuting, isAnyUnitCapturing());
+
+    if (m_muteStatusChangedCallback && isMuting == isAnyUnitCapturing())
         m_muteStatusChangedCallback(isMuting);
 }
 
