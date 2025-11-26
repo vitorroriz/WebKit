@@ -127,6 +127,14 @@ RemoteMediaPlayerProxy::~RemoteMediaPlayerProxy()
     setShouldEnableAudioSourceProvider(false);
 }
 
+void RemoteMediaPlayerProxy::connectionToWebProcessClosed()
+{
+#if ENABLE(MEDIA_SOURCE)
+    if (RefPtr mediaSource = m_mediaSourceProxy)
+        mediaSource->connectionToWebProcessClosed();
+#endif
+}
+
 void RemoteMediaPlayerProxy::invalidate()
 {
     m_updateCachedStateMessageTimer.stop();

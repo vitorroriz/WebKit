@@ -417,6 +417,12 @@ std::optional<SharedPreferencesForWebProcess> RemoteSourceBufferProxy::sharedPre
     return std::nullopt;
 }
 
+void RemoteSourceBufferProxy::connectionToWebProcessClosed()
+{
+    ASSERT(isMainRunLoop());
+    disconnect();
+}
+
 #undef MESSAGE_CHECK
 
 } // namespace WebKit
