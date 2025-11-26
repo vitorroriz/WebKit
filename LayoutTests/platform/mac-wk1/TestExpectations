@@ -2040,16 +2040,6 @@ fast/html/details-remove-summary-6-and-click.html [ Pass Failure ]
 # Event timing has been disabled in WK1. Tests are skipped to avoid timeouts
 imported/w3c/web-platform-tests/event-timing/ [ Skip ]
 
-# rdar://92765314 ([ Ventura wk1 Release x86_64 ] 8X fast/forms/number/number- (Layout-Tests) are flaky text failures)
-[ Release ] fast/forms/number/number-change-type-on-focus.html [ Pass Failure ]
-[ Release ] fast/forms/number/number-large-padding.html [ Pass Failure ]
-[ Release ] fast/forms/number/number-spinbutton-capturing.html [ Pass Failure ]
-[ Release ] fast/forms/number/number-spinbutton-change-and-input-events.html [ Pass Failure ]
-[ Release ] fast/forms/number/number-spinbutton-click-in-iframe.html [ Pass Failure ]
-[ Release ] fast/forms/number/number-spinbutton-gets-disabled-or-readonly.html [ Pass Failure ]
-[ Release ] fast/forms/number/number-spinbutton-in-multi-column.html [ Pass Failure ]
-[ Release ] fast/forms/number/number-spinbutton-state.html [ Pass Failure ]
-
 webkit.org/b/165541 compositing/layer-creation/fixed-overlap-extent-rtl.html [ Failure ]
 webkit.org/b/165541 compositing/rtl/rtl-fixed-overflow.html [ Failure ]
 
