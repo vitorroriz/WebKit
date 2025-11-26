@@ -184,6 +184,20 @@ AccessHandleEnabled:
       "PLATFORM(COCOA)" : true
       default: false
 
+AccessibilityTextStitchingEnabled:
+  type: bool
+  status: embedder
+  humanReadableName: "Enable Accessibility Text Stitching"
+  humanReadableDescription: "Stitch adjacent text elements into one in the accessibility tree"
+  webcoreBinding: DeprecatedGlobalSettings
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+
 AccessibilityThreadTextApisEnabled:
   type: bool
   status: embedder

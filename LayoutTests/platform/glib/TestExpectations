@@ -780,6 +780,7 @@ accessibility/dynamic-expanded-text.html [ Failure ]
 
 accessibility/dynamic-content-visibility.html [ Skip ]
 accessibility/dynamic-selected-radio-button.html [ Skip ]
+accessibility/dynamic-text-stitching.html [ Skip ]
 accessibility/password-notifications-timing.html [ Skip ]
 
 # Timed out since it was introduced.

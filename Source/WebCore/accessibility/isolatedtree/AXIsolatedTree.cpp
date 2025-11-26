@@ -39,6 +39,7 @@
 #include "AXTreeStoreInlines.h"
 #include "AXUtilities.h"
 #include "AccessibilityObjectInlines.h"
+#include "AccessibilityNodeObject.h"
 #include "DocumentPage.h"
 #include "DocumentView.h"
 #include "FrameSelection.h"
@@ -776,6 +777,9 @@ void AXIsolatedTree::updateNodeProperties(AccessibilityObject& axObject, const A
             break;
         case AXProperty::RemoteFramePlatformElement:
             properties.append({ AXProperty::RemoteFramePlatformElement, axObject.remoteFramePlatformElement() });
+            break;
+        case AXProperty::StitchGroups:
+            properties.append({ AXProperty::StitchGroups, axObject.stitchGroups() });
             break;
         case AXProperty::StringValue:
             properties.append({ AXProperty::StringValue, axObject.stringValue().isolatedCopy() });
@@ -1728,6 +1732,8 @@ std::optional<AXPropertyFlag> convertToPropertyFlag(AXProperty property)
         return AXPropertyFlag::HasPlainText;
     case AXProperty::HasPointerEventsNone:
         return AXPropertyFlag::HasPointerEventsNone;
+    case AXProperty::IsBlockFlow:
+        return AXPropertyFlag::IsBlockFlow;
     case AXProperty::IsEnabled:
         return AXPropertyFlag::IsEnabled;
     case AXProperty::IsExposedTableCell:
@@ -1914,6 +1920,10 @@ IsolatedObjectData createIsolatedObjectData(const Ref<AccessibilityObject>& axOb
             setProperty(AXProperty::Language, WTFMove(language).isolatedCopy());
         setProperty(AXProperty::IsEnabled, object.isEnabled());
         setProperty(AXProperty::IsHiddenUntilFoundContainer, object.isHiddenUntilFoundContainer());
+        if (object.isBlockFlow()) {
+            setProperty(AXProperty::IsBlockFlow, true);
+            setProperty(AXProperty::StitchGroups, object.stitchGroups());
+        }
         appendBasePlatformProperties(properties, propertyFlags, axObject);
 
 #if ENABLE_ACCESSIBILITY_LOCAL_FRAME

@@ -595,6 +595,7 @@ accessibility/AXObjectCache.cpp
 accessibility/AXObjectRareData.cpp
 accessibility/AXRemoteFrame.cpp
 accessibility/AXSearchManager.cpp
+accessibility/AXStitchUtilities.cpp
 accessibility/AXTableHelpers.cpp
 accessibility/AXTextMarker.cpp
 accessibility/AXTextRun.cpp

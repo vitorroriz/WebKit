@@ -70,6 +70,15 @@ function dumpAXSearchTraversal(axElement, options = { }) {
     return output;
 }
 
+function platformStaticTextValue(axElement) {
+    if (!axElement)
+        return "";
+
+    if (!axElement.role.toLowerCase().includes("statictext"))
+        return "FAIL: platformStaticTextValue called on a non-text object.\n";
+    return accessibilityController.platformName === "ios" ? axElement.description : axElement.stringValue;
+}
+
 // Dumps the accessibility tree hierarchy for the given accessibilityObject into
 // an element with id="tree", e.g., <pre id="tree"></pre>. In addition, it
 // returns a two element array with the first element [0] being false if the

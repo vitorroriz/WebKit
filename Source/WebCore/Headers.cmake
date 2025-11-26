@@ -875,6 +875,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     accessibility/AXComputedObjectAttributeCache.h
     accessibility/AXCoreObject.h
     accessibility/AXGeometryManager.h
+    accessibility/AXID.h
     accessibility/AXListHelpers.h
     accessibility/AXLogger.h
     accessibility/AXLoggerBase.h
@@ -883,6 +884,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     accessibility/AXObjectCacheInlines.h
     accessibility/AXObjectRareData.h
     accessibility/AXSearchManager.h
+    accessibility/AXStitchUtilities.h
     accessibility/AXTextMarker.h
     accessibility/AXTextRun.h
     accessibility/AXTextStateChangeIntent.h

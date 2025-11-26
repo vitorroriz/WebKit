@@ -175,6 +175,7 @@ bool isDefaultValue(AXProperty property, AXPropertyValueVariant& value)
 #endif
         [](InputType::Type&) { return false; },
         [](Vector<Vector<Markable<AXID>>>& typedValue) { return typedValue.isEmpty(); },
+        [](Vector<Vector<AXID>>& typedValue) { return typedValue.isEmpty(); },
         [](CharacterRange& typedValue) { return !typedValue.location && !typedValue.length; },
         [](std::unique_ptr<AXIDAndCharacterRange>& typedValue) {
             return !typedValue || (!typedValue->first && !typedValue->second.location && !typedValue->second.length);
@@ -365,6 +366,30 @@ AXIsolatedObject* AXIsolatedObject::cellForColumnAndRow(unsigned columnIndex, un
 void AXIsolatedObject::accessibilityText(Vector<AccessibilityText>& texts) const
 {
     texts = vectorAttributeValue<AccessibilityText>(AXProperty::AccessibilityText);
+}
+
+const Vector<Vector<AXID>>* AXIsolatedObject::stitchGroupsView() const
+{
+    size_t index = indexOfProperty(AXProperty::StitchGroups);
+    if (index == notFound)
+        return nullptr;
+
+    return WTF::switchOn(m_properties[index].second,
+        [] (const Vector<Vector<AXID>>& typedValue) -> const Vector<Vector<AXID>>* { return &typedValue; },
+        [] (auto&) -> const Vector<Vector<AXID>>* { return nullptr; }
+    );
+}
+
+AXIsolatedObject::StitchState AXIsolatedObject::stitchState(IncludeStitchGroup includeStitchGroup) const
+{
+    if (!AXObjectCache::isAXTextStitchingEnabled())
+        return { };
+
+    RefPtr blockFlowAncestor = downcast<AXIsolatedObject>(blockFlowAncestorForStitchable());
+    if (!blockFlowAncestor)
+        return { };
+
+    return stitchStateFromGroups(blockFlowAncestor->stitchGroupsView(), includeStitchGroup);
 }
 
 void AXIsolatedObject::insertMathPairs(Vector<std::pair<Markable<AXID>, Markable<AXID>>>& isolatedPairs, AccessibilityMathMultiscriptPairs& pairs)
@@ -1072,6 +1097,24 @@ FloatRect AXIsolatedObject::relativeFrame() const
         // We should not have cached a relative frame for elements that get their geometry from their children.
         ASSERT(!m_getsGeometryFromChildren);
         relativeFrame = *cachedRelativeFrame;
+
+        if (isStaticText()) {
+            auto stitchState = this->stitchState();
+            if (stitchState.stitchedIntoID && *stitchState.stitchedIntoID == objectID() && stitchState.group.size()) {
+                // |this| is a stitching of multiple objects, so we need to combine all of their frames.
+
+                RefPtr tree = this->tree();
+                for (AXID axID : stitchState.group) {
+                    if (axID == objectID())
+                        continue;
+
+                    if (RefPtr object = tree->objectForID(axID)) {
+                        if (std::optional otherCachedFrame = object->cachedRelativeFrame())
+                            relativeFrame = unionRect(relativeFrame, *otherCachedFrame);
+                    }
+                }
+            }
+        }
     } else if (m_getsGeometryFromChildren) {
         auto frame = enclosingIntRect(relativeFrameFromChildren());
         if (!frame.isEmpty())
@@ -1760,10 +1803,42 @@ String AXIsolatedObject::stringValue() const
 #if ENABLE(AX_THREAD_TEXT_APIS)
     size_t index = indexOfProperty(AXProperty::StringValue);
     if (index == notFound) {
-        if (isStaticText()) {
-            // We can compute the stringValue of rendered text on-demand using AXProperty::TextRuns.
+        if (hasStitchableRole()) {
+            auto stitchState = this->stitchState();
+            if (!stitchState.stitchedIntoID)
+                return textMarkerRange().toString(IncludeListMarkerText::No);
+
+            AXID thisID = objectID();
+            if (*stitchState.stitchedIntoID != thisID) {
+                // |this| is stitched into another object, so don't return any string value.
+                return emptyString();
+            }
+
+            // |this| is the sum of several stitched text-like objects. Our string value should
+            // include all of them.
+            //
+            // We can compute the stringValue of rendered text using AXProperty::TextRuns.
             // See AccessibilityObject::shouldCacheStringValue.
-            return textMarkerRange().toString(IncludeListMarkerText::No);
+            auto startMarker = AXTextMarker { *this, 0 };
+            AXTextMarker endMarker;
+
+            RefPtr tree = std::get<RefPtr<AXIsolatedTree>>(axTreeForID(treeID()));
+            if (!tree || stitchState.group.isEmpty())
+                return textMarkerRange().toString(IncludeListMarkerText::No);
+
+            for (auto axID = stitchState.group.rbegin(); axID != stitchState.group.rend() && *axID != thisID; ++axID) {
+                if (RefPtr object = tree->objectForID(*axID)) {
+                    if (const auto* runs = object->textRuns()) {
+                        endMarker = AXTextMarker { *object, runs->totalLength() };
+                        break;
+                    }
+                }
+            }
+
+            if (!endMarker.isValid())
+                return textMarkerRange().toString(IncludeListMarkerText::No);
+
+            return AXTextMarkerRange { WTFMove(startMarker), WTFMove(endMarker) }.toString(IncludeListMarkerText::No);
         }
         return emptyString();
     }

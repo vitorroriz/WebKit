@@ -212,6 +212,7 @@ std::atomic<bool> AXObjectCache::gForceDeferredSpellChecking = false;
 #if ENABLE(AX_THREAD_TEXT_APIS)
 std::atomic<bool> AXObjectCache::gAccessibilityThreadTextApisEnabled = false;
 #endif
+std::atomic<bool> AXObjectCache::gAccessibilityTextStitchingEnabled = false;
 std::atomic<bool> AXObjectCache::gForceInitialFrameCaching = false;
 #if PLATFORM(COCOA)
 std::atomic<bool> AXObjectCache::gAccessibilityDOMIdentifiersEnabled = false;
@@ -281,6 +282,7 @@ AXObjectCache::AXObjectCache(LocalFrame& localFrame, Document* document)
 #if ENABLE(AX_THREAD_TEXT_APIS)
     gAccessibilityThreadTextApisEnabled = DeprecatedGlobalSettings::accessibilityThreadTextApisEnabled();
 #endif
+    gAccessibilityTextStitchingEnabled = DeprecatedGlobalSettings::accessibilityTextStitchingEnabled();
 
 #if PLATFORM(COCOA)
     initializeUserDefaultValues();
@@ -1416,6 +1418,33 @@ void AXObjectCache::handleRowspanChanged(AccessibilityNodeObject& axCell)
     updateIsolatedTree(axCell, AXNotification::RowSpanChanged);
 }
 #endif
+
+const Vector<Vector<AXID>>* AXObjectCache::stitchGroupsOwnedBy(AccessibilityObject& object)
+{
+    CheckedPtr renderBlockFlow = dynamicDowncast<RenderBlockFlow>(object.renderer());
+    if (!renderBlockFlow || renderBlockFlow->beingDestroyed())
+        return nullptr;
+
+    const auto& groups = m_stitchGroups.ensure(*renderBlockFlow, [&] {
+        return object.stitchGroups();
+    }).iterator->value;
+
+    return groups.isEmpty() ? nullptr : &groups;
+}
+
+void AXObjectCache::onLaidOutInlineContent(const RenderBlockFlow& renderer)
+{
+    if (std::optional groups = m_stitchGroups.takeOptional(renderer)) {
+        UNUSED_PARAM(groups);
+
+#if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
+        if (std::optional axID = getAXID(const_cast<RenderBlockFlow&>(renderer))) {
+            if (RefPtr tree = AXIsolatedTree::treeForFrameID(m_frameID))
+                tree->queueNodeUpdate(*axID, { AXProperty::StitchGroups });
+        }
+#endif
+    }
+}
 
 #if ENABLE(AX_THREAD_TEXT_APIS)
 void AXObjectCache::onTextRunsChanged(const RenderObject& renderer)

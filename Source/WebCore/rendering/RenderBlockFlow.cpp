@@ -4132,6 +4132,9 @@ void RenderBlockFlow::layoutInlineContent(RelayoutChildren relayoutChildren, Lay
     auto borderBoxLogicalHeight = handleAfterSideOfBlock(marginInfo, contentBoxHeight);
     setLogicalHeight(borderBoxLogicalHeight);
     updateRepaintTopAndBottomAfterLayout(relayoutChildren, partialRepaintRect, oldContentTopAndBottomIncludingInkOverflow, repaintLogicalTop, repaintLogicalBottom);
+
+    if (CheckedPtr cache = protectedDocument()->existingAXObjectCache())
+        cache->onLaidOutInlineContent(*this);
 }
 
 void RenderBlockFlow::setStaticPositionsForSimpleOutOfFlowContent()

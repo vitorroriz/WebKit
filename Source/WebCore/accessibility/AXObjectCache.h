@@ -72,6 +72,7 @@ class HTMLTextFormControlElement;
 class Node;
 class Page;
 class RenderBlock;
+class RenderBlockFlow;
 class RenderImage;
 class RenderObject;
 class RenderStyle;
@@ -368,6 +369,10 @@ public:
 #if ENABLE(AX_THREAD_TEXT_APIS)
     void onTextRunsChanged(const RenderObject&);
 #endif
+
+    void onLaidOutInlineContent(const RenderBlockFlow&);
+    const Vector<Vector<AXID>>* stitchGroupsOwnedBy(AccessibilityObject&);
+
     void updateLoadingProgress(double);
     void loadingFinished() { updateLoadingProgress(1); }
     double loadingProgress() const { return m_loadingProgress; }
@@ -439,6 +444,7 @@ public:
     static bool useAXThreadTextApis() { return gAccessibilityThreadTextApisEnabled && !isMainThread(); }
     static bool shouldCreateAXThreadCompatibleMarkers() { return gAccessibilityThreadTextApisEnabled && isIsolatedTreeEnabled(); }
 #endif
+    static bool isAXTextStitchingEnabled() { return gAccessibilityTextStitchingEnabled; }
 
 #if PLATFORM(COCOA)
     static bool shouldRepostNotificationsForTests() { return gShouldRepostNotificationsForTests; }
@@ -827,6 +833,8 @@ private:
     // Accessed on and off the main thread.
     static std::atomic<bool> gAccessibilityThreadTextApisEnabled;
 #endif
+    // Accessed on and off the main thread.
+    static std::atomic<bool> gAccessibilityTextStitchingEnabled;
 
 #if PLATFORM(COCOA)
     static std::atomic<bool> gAccessibilityDOMIdentifiersEnabled;
@@ -923,6 +931,8 @@ private:
     Markable<AXID> m_lastTextFieldAXID;
     VisibleSelection m_lastSelection;
 #endif
+
+    WeakHashMap<RenderObject, Vector<Vector<AXID>>, SingleThreadWeakPtrImpl> m_stitchGroups;
 };
 
 inline bool AXObjectCache::accessibilityEnabled()
