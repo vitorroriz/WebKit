@@ -30,7 +30,6 @@
 #include "CSSFontSelector.h"
 #include "Chrome.h"
 #include "ColorBlending.h"
-#include "DocumentInlines.h"
 #include "DocumentPage.h"
 #include "ElementInlines.h"
 #include "HTMLNames.h"

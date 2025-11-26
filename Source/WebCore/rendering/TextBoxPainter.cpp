@@ -48,7 +48,6 @@
 #include "RenderTheme.h"
 #include "RenderView.h"
 #include "RenderedDocumentMarker.h"
-#include "Settings.h"
 #include "StyleTextDecorationLine.h"
 #include "StyleTextDecorationThickness.h"
 #include "StyledMarkedText.h"

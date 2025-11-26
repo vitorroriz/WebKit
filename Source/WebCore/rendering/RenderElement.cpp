@@ -27,6 +27,7 @@
 
 #include "AXObjectCache.h"
 #include "AnchorPositionEvaluator.h"
+#include "BorderPainter.h"
 #include "BorderShape.h"
 #include "ContainerNodeInlines.h"
 #include "ContentVisibilityDocumentState.h"
@@ -51,7 +52,6 @@
 #include "LayoutIntegrationLineLayout.h"
 #include "LocalFrame.h"
 #include "Logging.h"
-#include "OutlinePainter.h"
 #include "Page.h"
 #include "PathUtilities.h"
 #include "ReferencedSVGResources.h"
@@ -2170,7 +2170,7 @@ void RenderElement::paintOutline(PaintInfo& paintInfo, const LayoutRect& paintRe
     if (!hasOutline())
         return;
 
-    OutlinePainter { *this, paintInfo }.paintOutline(paintRect);
+    BorderPainter { *this, paintInfo }.paintOutline(paintRect);
 }
 
 void RenderElement::issueRepaintForOutlineAuto(float outlineSize)
