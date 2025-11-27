@@ -51,7 +51,7 @@ public:
     static ISO8601::PlainDate toPlainDate(JSGlobalObject*, const ISO8601::Duration&);
     static std::tuple<int32_t, unsigned, unsigned, std::optional<ParsedMonthCode>, TemporalOverflow, TemporalAnyProperties>
     mergeDateFields(JSGlobalObject*, JSObject*, JSValue, int32_t, unsigned, unsigned);
-
+    static std::optional<int32_t> toYear(JSGlobalObject*, JSObject*);
     static TemporalPlainDate* from(JSGlobalObject*, JSValue, Variant<JSObject*, TemporalOverflow>);
 
     TemporalCalendar* calendar() { return m_calendar.get(this); }

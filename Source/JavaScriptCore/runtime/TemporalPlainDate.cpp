@@ -325,6 +325,31 @@ TemporalPlainDate::mergeDateFields(JSGlobalObject* globalObject, JSObject* tempo
     return { yearToUse, monthToUse, dayToUse, otherMonth, overflow, any };
 }
 
+std::optional<int32_t> TemporalPlainDate::toYear(JSGlobalObject* globalObject, JSObject* temporalDateLike)
+{
+    VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    std::optional<int32_t> year;
+    JSValue yearProperty = temporalDateLike->get(globalObject, vm.propertyNames->year);
+    RETURN_IF_EXCEPTION(scope, { });
+    if (!yearProperty.isUndefined()) {
+        double doubleYear = yearProperty.toIntegerOrInfinity(globalObject);
+        RETURN_IF_EXCEPTION(scope, { });
+
+        if (!std::isfinite(doubleYear)) [[unlikely]] {
+            throwRangeError(globalObject, scope, "year property must be finite"_s);
+            return { };
+        }
+
+        if (!ISO8601::isYearWithinLimits(doubleYear)) [[unlikely]]
+            year = ISO8601::outOfRangeYear;
+        else
+            year = static_cast<int32_t>(doubleYear);
+    }
+    return year;
+}
+
 ISO8601::PlainDate TemporalPlainDate::with(JSGlobalObject* globalObject, JSObject* temporalDateLike, JSValue optionsValue)
 {
     VM& vm = globalObject->vm();
