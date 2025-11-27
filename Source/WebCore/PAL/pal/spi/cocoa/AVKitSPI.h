@@ -151,6 +151,7 @@ NS_ASSUME_NONNULL_END
 @end
 #else
 #import <AppKit/NSResponder.h>
+@protocol NSUserInterfaceValidations;
 @interface AVPlayerController : NSResponder <NSUserInterfaceValidations>
 @end
 #endif
@@ -362,23 +363,17 @@ NS_ASSUME_NONNULL_END
 #import <AVKit/AVRoutePickerView_Private.h>
 #import <AVKit/AVRoutePickerView_WebKitOnly.h>
 #else
+
+#import <AVKit/AVRoutePickerView.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol AVRoutePickerViewDelegate;
+@interface AVRoutePickerView (SPI)
 
-@interface AVRoutePickerView : NSView
+- (void)showRoutePickingControlsForOutputContext:(AVOutputContext *)outputContext relativeToRect:(CGRect)positioningRect ofView:(NSView *)positioningView;
 
-- (void)showRoutePickingControlsForOutputContext:(AVOutputContext *)outputContext relativeToRect:(NSRect)positioningRect ofView:(NSView *)positioningView;
-
-@property (nonatomic, nullable, weak) id<AVRoutePickerViewDelegate> delegate;
 @property (nonatomic) BOOL routeListAlwaysHasDarkAppearance;
 
-@end
-
-@protocol AVRoutePickerViewDelegate <NSObject>
-@optional
-- (void)routePickerViewWillBeginPresentingRoutes:(AVRoutePickerView *)routePickerView;
-- (void)routePickerViewDidEndPresentingRoutes:(AVRoutePickerView *)routePickerView;
 @end
 
 NS_ASSUME_NONNULL_END
