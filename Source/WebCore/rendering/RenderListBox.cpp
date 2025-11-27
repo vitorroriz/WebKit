@@ -416,30 +416,6 @@ void RenderListBox::paintObject(PaintInfo& paintInfo, const LayoutPoint& paintOf
     }
 }
 
-void RenderListBox::addFocusRingRects(Vector<LayoutRect>& rects, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer) const
-{
-    if (!selectElement().allowsNonContiguousSelection())
-        return RenderBlockFlow::addFocusRingRects(rects, additionalOffset, paintContainer);
-
-    // Focus the last selected item.
-    int selectedItem = selectElement().activeSelectionEndListIndex();
-    if (selectedItem >= 0) {
-        rects.append(snappedIntRect(itemBoundingBoxRect(additionalOffset, selectedItem)));
-        return;
-    }
-
-    // No selected items, find the first non-disabled item.
-    int indexOfFirstEnabledOption = 0;
-    for (auto& item : selectElement().listItems()) {
-        if (is<HTMLOptionElement>(item.get()) && !item->isDisabledFormControl()) {
-            selectElement().setActiveSelectionEndIndex(indexOfFirstEnabledOption);
-            rects.append(itemBoundingBoxRect(additionalOffset, indexOfFirstEnabledOption));
-            return;
-        }
-        indexOfFirstEnabledOption++;
-    }
-}
-
 bool RenderListBox::useDarkAppearance() const
 {
     return RenderBlockFlow::useDarkAppearance();

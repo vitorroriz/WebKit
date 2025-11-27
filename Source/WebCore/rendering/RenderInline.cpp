@@ -903,29 +903,10 @@ namespace {
     };
 } // unnamed namespace
 
-void RenderInline::addFocusRingRects(Vector<LayoutRect>& rects, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer) const
+void RenderInline::collectLineBoxRects(Vector<LayoutRect>& rects, const LayoutPoint& additionalOffset) const
 {
     AbsoluteRectsIgnoringEmptyGeneratorContext context(rects, additionalOffset);
     generateLineBoxRects(context);
-
-    for (auto& child : childrenOfType<RenderElement>(*this)) {
-        if (is<RenderListMarker>(child))
-            continue;
-        FloatPoint pos(additionalOffset);
-        // FIXME: This doesn't work correctly with transforms.
-        if (child.hasLayer())
-            pos = child.localToContainerPoint(FloatPoint(), paintContainer);
-        else if (auto* box = dynamicDowncast<RenderBox>(child))
-            pos.move(box->locationOffset());
-        child.addFocusRingRects(rects, flooredIntPoint(pos), paintContainer);
-    }
-
-    if (RenderBoxModelObject* continuation = this->continuation()) {
-        if (continuation->isInline())
-            continuation->addFocusRingRects(rects, flooredLayoutPoint(LayoutPoint(additionalOffset + continuation->containingBlock()->location() - containingBlock()->location())), paintContainer);
-        else
-            continuation->addFocusRingRects(rects, flooredLayoutPoint(LayoutPoint(additionalOffset + downcast<RenderBox>(*continuation).location() - containingBlock()->location())), paintContainer);
-    }
 }
 
 void RenderInline::paintOutline(PaintInfo& paintInfo, const LayoutPoint& paintOffset) const
@@ -933,12 +914,14 @@ void RenderInline::paintOutline(PaintInfo& paintInfo, const LayoutPoint& paintOf
     if (!hasOutline())
         return;
 
+    auto outlinePainter = OutlinePainter { *this, paintInfo };
+
     auto& styleToUse = style();
     // Only paint the focus ring by hand if the theme isn't able to draw it.
     if (styleToUse.outlineStyle() == OutlineStyle::Auto && !theme().supportsFocusRing(*this, styleToUse)) {
         Vector<LayoutRect> focusRingRects;
-        addFocusRingRects(focusRingRects, paintOffset, paintInfo.paintContainer);
-        paintFocusRing(paintInfo, styleToUse, focusRingRects);
+        OutlinePainter::collectFocusRingRects(*this, focusRingRects, paintOffset, paintInfo.paintContainer);
+        outlinePainter.paintFocusRing(focusRingRects);
     }
 
     if (hasOutlineAnnotation() && styleToUse.outlineStyle() != OutlineStyle::Auto && !theme().supportsFocusRing(*this, styleToUse))
@@ -974,7 +957,7 @@ void RenderInline::paintOutline(PaintInfo& paintInfo, const LayoutPoint& paintOf
 
         rects.append(LayoutRect { enclosingVisualRect });
     }
-    OutlinePainter { *this, paintInfo }.paintOutline(paintOffset, rects);
+    outlinePainter.paintOutline(paintOffset, rects);
 }
 
 bool isEmptyInline(const RenderInline& renderer)

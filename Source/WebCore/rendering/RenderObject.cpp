@@ -50,6 +50,7 @@
 #include "LocalFrame.h"
 #include "LocalFrameView.h"
 #include "NodeInlines.h"
+#include "OutlinePainter.h"
 #include "Page.h"
 #include "PseudoElement.h"
 #include "ReferencedSVGResources.h"
@@ -798,8 +799,12 @@ CheckedPtr<RenderBlock> RenderObject::checkedContainingBlock() const
 
 void RenderObject::addPDFURLRect(const PaintInfo& paintInfo, const LayoutPoint& paintOffset) const
 {
+    CheckedPtr elementRenderer = dynamicDowncast<RenderElement>(*this);
+    if (!elementRenderer)
+        return;
+
     Vector<LayoutRect> focusRingRects;
-    addFocusRingRects(focusRingRects, paintOffset, paintInfo.paintContainer);
+    OutlinePainter::collectFocusRingRects(*elementRenderer, focusRingRects, paintOffset, paintInfo.paintContainer);
     LayoutRect urlRect = unionRect(focusRingRects);
 
     if (urlRect.isEmpty())
@@ -877,13 +882,17 @@ IntRect RenderObject::absoluteBoundingBoxRect(bool useTransforms, bool* wasFixed
 
 void RenderObject::absoluteFocusRingQuads(Vector<FloatQuad>& quads)
 {
+    CheckedPtr elementRenderer = dynamicDowncast<RenderElement>(*this);
+    if (!elementRenderer)
+        return;
+
     Vector<LayoutRect> rects;
-    // FIXME: addFocusRingRects() needs to be passed this transform-unaware
-    // localToAbsolute() offset here because RenderInline::addFocusRingRects()
+    // FIXME: collectFocusRingRects() needs to be passed this transform-unaware
+    // localToAbsolute() offset here because OutlinePainter::collectFocusRingRects()
     // implicitly assumes that. This doesn't work correctly with transformed
     // descendants.
     FloatPoint absolutePoint = localToAbsolute();
-    addFocusRingRects(rects, flooredLayoutPoint(absolutePoint));
+    OutlinePainter::collectFocusRingRects(*elementRenderer, rects, flooredLayoutPoint(absolutePoint), nullptr);
     float deviceScaleFactor = document().deviceScaleFactor();
     for (auto rect : rects) {
         rect.moveBy(LayoutPoint(-absolutePoint));

@@ -3773,41 +3773,6 @@ PositionWithAffinity RenderBlockFlow::positionForPoint(const LayoutPoint& point,
     return RenderBlock::positionForPoint(point, source, nullptr);
 }
 
-void RenderBlockFlow::addFocusRingRectsForInlineChildren(Vector<LayoutRect>& rects, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer) const
-{
-    ASSERT(childrenInline());
-
-    bool hasBlockLevelContent = false;
-
-    for (auto box = InlineIterator::firstRootInlineBoxFor(*this); box; box.traverseInlineBoxLineRightward()) {
-        auto lineBox = box->lineBox();
-        if (lineBox->hasBlockLevelContent()) {
-            hasBlockLevelContent = true;
-            continue;
-        }
-        // FIXME: This is mixing physical and logical coordinates.
-        auto unflippedVisualRect = box->visualRectIgnoringBlockDirection();
-        auto top = std::max(lineBox->contentLogicalTop(), unflippedVisualRect.y());
-        auto bottom = std::min(lineBox->contentLogicalBottom(), unflippedVisualRect.maxY());
-        auto rect = LayoutRect { LayoutUnit { additionalOffset.x() + unflippedVisualRect.x() }
-            , additionalOffset.y() + top
-            , LayoutUnit { unflippedVisualRect.width() }
-            , bottom - top };
-        if (!rect.isEmpty())
-            rects.append(rect);
-    }
-
-    if (hasBlockLevelContent) {
-        for (auto line = InlineIterator::firstLineBoxFor(*this); line; line.traverseNext()) {
-            auto blockLevelBox = line->blockLevelBox();
-            if (!blockLevelBox)
-                continue;
-            auto& renderBox = downcast<RenderBox>(blockLevelBox->renderer());
-            addFocusRingRectsForBlockChild(renderBox, rects, additionalOffset, paintContainer);
-        }
-    }
-}
-
 void RenderBlockFlow::paintInlineChildren(PaintInfo& paintInfo, const LayoutPoint& paintOffset)
 {
     ASSERT(childrenInline());
