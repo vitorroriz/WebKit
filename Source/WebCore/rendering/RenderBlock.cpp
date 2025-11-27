@@ -2010,7 +2010,13 @@ Node* RenderBlock::nodeForHitTest() const
     // If we are in the margins of block elements that are part of a
     // continuation we're actually still inside the enclosing element
     // that was split. Use the appropriate inner node.
-    return continuation() ? continuation()->element() : element();
+    if (auto* continuation = this->continuation())
+        return continuation->element();
+    if (auto inlineBox = dynamicDowncast<RenderInline>(parent()); inlineBox && isAnonymousBlock()) {
+        ASSERT(settings().blocksInInlineLayoutEnabled());
+        return inlineBox->element();
+    }
+    return element();
 }
 
 bool RenderBlock::hitTestChildren(const HitTestRequest& request, HitTestResult& result, const HitTestLocation& locationInContainer, const LayoutPoint& adjustedLocation, HitTestAction hitTestAction)
