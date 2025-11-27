@@ -1,3 +1,4 @@
+//@ skip if $memoryLimited
 function g10(f) {
     function t() {
         try {

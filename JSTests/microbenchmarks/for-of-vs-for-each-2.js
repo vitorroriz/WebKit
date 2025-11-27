@@ -1,4 +1,4 @@
-//@ $skipModes << :lockdown
+//@ skip
 "use strict"
 const consoleStub = console || {
   log: print
