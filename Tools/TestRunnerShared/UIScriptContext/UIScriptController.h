@@ -201,7 +201,9 @@ public:
     virtual JSRetainPtr<JSStringRef> scrollingTreeAsText() const { notImplemented(); return nullptr; }
     virtual JSRetainPtr<JSStringRef> uiViewTreeAsText() const { notImplemented(); return nullptr; }
     virtual JSRetainPtr<JSStringRef> caLayerTreeAsText() const { notImplemented(); return nullptr; }
-    
+    virtual JSRetainPtr<JSStringRef> caLayerTreeAsTextForLayerWithID(unsigned long long) const { notImplemented(); return nullptr; }
+    virtual JSRetainPtr<JSStringRef> uiViewTreeAsTextForViewWithLayerID(unsigned long long) const { notImplemented(); return nullptr; }
+
     virtual JSRetainPtr<JSStringRef> scrollbarStateForScrollingNodeID(unsigned long long, unsigned long long, bool) const { notImplemented(); return nullptr; }
 
     virtual void setAlwaysBounceVertical(bool) { notImplemented(); }
