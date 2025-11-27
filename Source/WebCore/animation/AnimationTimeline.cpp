@@ -138,6 +138,20 @@ Ref<AcceleratedTimeline> AnimationTimeline::createAcceleratedRepresentation()
     ASSERT_NOT_REACHED();
     return AcceleratedTimeline::create(m_acceleratedTimelineIdentifier, 0_s);
 }
+
+void AnimationTimeline::runPostRenderingUpdateTasks()
+{
+    m_acceleratedRepresentation = nullptr;
+
+    bool previousCanBeAccelerated = std::exchange(m_canBeAccelerated, computeCanBeAccelerated());
+    if (m_canBeAccelerated == previousCanBeAccelerated)
+        return;
+
+    for (const auto& animation : m_animations) {
+        if (RefPtr keyframeEffect = animation->keyframeEffect())
+            keyframeEffect->timelineAccelerationAbilityDidChange();
+    }
+}
 #endif
 
 } // namespace WebCore

@@ -197,6 +197,7 @@ public:
     bool canHaveAcceleratedRepresentation() const;
     const AcceleratedEffect* acceleratedRepresentation() const { return m_acceleratedRepresentation.get(); }
     void setAcceleratedRepresentation(const AcceleratedEffect* acceleratedRepresentation) { m_acceleratedRepresentation = acceleratedRepresentation; }
+    void timelineAccelerationAbilityDidChange();
 #endif
 
 private:

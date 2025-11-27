@@ -1922,7 +1922,7 @@ const TimingFunction* KeyframeEffect::timingFunctionForKeyframeAtIndex(size_t in
 
 bool KeyframeEffect::canBeAccelerated() const
 {
-    if (!animation())
+    if (!animation() || !animation()->timeline())
         return false;
 
     if (m_acceleratedPropertiesState == AcceleratedProperties::None)
@@ -1947,7 +1947,7 @@ bool KeyframeEffect::canBeAccelerated() const
 
 #if ENABLE(THREADED_ANIMATIONS)
     if (canHaveAcceleratedRepresentation())
-        return !animation()->pending();
+        return !animation()->pending() && animation()->timeline()->canBeAccelerated();
 #endif
 
     if (m_isAssociatedWithProgressBasedTimeline)
@@ -3105,6 +3105,12 @@ void KeyframeEffect::scheduleAssociatedAcceleratedEffectStackUpdate(const std::o
     if (auto currentTarget = targetStyleable())
         timelinesController->scheduleAcceleratedEffectStackUpdateForTarget(*currentTarget);
 }
+
+void KeyframeEffect::timelineAccelerationAbilityDidChange()
+{
+    scheduleAssociatedAcceleratedEffectStackUpdate();
+}
+
 #endif
 
 const KeyframeInterpolation::Keyframe& KeyframeEffect::keyframeAtIndex(size_t index) const

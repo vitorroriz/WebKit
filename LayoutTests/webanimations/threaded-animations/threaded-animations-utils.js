@@ -19,3 +19,8 @@ const legacyAnimationCommit = async () => {
     await new Promise(requestAnimationFrame);
     await new Promise(requestAnimationFrame);
 };
+
+const threadedAnimationsCommit = async () => {
+    await new Promise(requestAnimationFrame);
+    await new Promise(setTimeout);
+};

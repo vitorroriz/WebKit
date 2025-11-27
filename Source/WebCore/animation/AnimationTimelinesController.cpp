@@ -259,10 +259,11 @@ void AnimationTimelinesController::updateAnimationsAndSendEvents(ReducedResoluti
 void AnimationTimelinesController::runPostRenderingUpdateTasks()
 {
 #if ENABLE(THREADED_ANIMATIONS)
-    if (m_acceleratedEffectStackUpdater) {
+    if (m_document->settings().threadedScrollDrivenAnimationsEnabled()) {
         for (Ref timeline : m_timelines)
-            timeline->clearAcceleratedRepresentation();
-        m_acceleratedEffectStackUpdater->update();
+            timeline->runPostRenderingUpdateTasks();
+        if (m_acceleratedEffectStackUpdater)
+            m_acceleratedEffectStackUpdater->update();
     }
 #endif
     // https://drafts.csswg.org/scroll-animations-1/#event-loop
