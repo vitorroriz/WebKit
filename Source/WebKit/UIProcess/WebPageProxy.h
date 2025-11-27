@@ -3052,9 +3052,15 @@ private:
     void themeColorChanged(const WebCore::Color&);
     void pageExtendedBackgroundColorDidChange(const WebCore::Color&);
     void sampledPageTopColorChanged(const WebCore::Color&);
+
 #if ENABLE(WEB_PAGE_SPATIAL_BACKDROP)
     void spatialBackdropSourceChanged(std::optional<WebCore::SpatialBackdropSource>&&);
 #endif
+
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    void canEnterImmersiveElementFromURL(const URL&, CompletionHandler<void(bool)>&&);
+#endif
+
     WebCore::Color platformUnderPageBackgroundColor() const;
     void setCanShortCircuitHorizontalWheelEvents(bool canShortCircuitHorizontalWheelEvents) { m_canShortCircuitHorizontalWheelEvents = canShortCircuitHorizontalWheelEvents; }
 

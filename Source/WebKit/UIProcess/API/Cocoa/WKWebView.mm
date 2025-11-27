@@ -137,6 +137,7 @@
 #import "_WKFrameTreeNodeInternal.h"
 #import "_WKFullscreenDelegate.h"
 #import "_WKHitTestResultInternal.h"
+#import "_WKImmersiveEnvironmentDelegate.h"
 #import "_WKInputDelegate.h"
 #import "_WKInspectorInternal.h"
 #import "_WKJSHandleInternal.h"
@@ -2090,6 +2091,40 @@ inline OptionSet<WebKit::FindOptions> toFindOptions(WKFindConfiguration *configu
         _cachedSpatialBackdropSource = adoptNS([[_WKSpatialBackdropSource alloc] initWithSpatialBackdropSource:spatialBackdropSource.value()]);
     else
         _cachedSpatialBackdropSource = nil;
+}
+#endif
+
+- (id<_WKImmersiveEnvironmentDelegate>)_immersiveEnvironmentDelegate
+{
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    return _immersiveEnvironmentDelegate.getAutoreleased();
+#else
+    return nil;
+#endif
+}
+
+- (void)_setImmersiveEnvironmentDelegate:(id<_WKImmersiveEnvironmentDelegate>)delegate
+{
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    _immersiveEnvironmentDelegate = delegate;
+#endif
+}
+
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+- (void)_canEnterImmersiveElementFromURL:(const URL&)url completion:(CompletionHandler<void(bool)>&&)completion
+{
+    id<_WKImmersiveEnvironmentDelegate> immersiveEnvironmentDelegate = self._immersiveEnvironmentDelegate;
+    if (!immersiveEnvironmentDelegate) {
+        completion(false);
+        return;
+    }
+
+    auto completionBlock = makeBlockPtr(WTFMove(completion));
+    auto nsURL = url.createNSURL();
+
+    [immersiveEnvironmentDelegate webView:self canPresentImmersiveEnvironmentFromURL:nsURL.get() completion:^(bool canPresentImmersive) {
+        completionBlock(canPresentImmersive);
+    }];
 }
 #endif
 

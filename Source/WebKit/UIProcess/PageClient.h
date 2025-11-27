@@ -855,6 +855,10 @@ public:
 #if ENABLE(VIDEO)
     virtual void showCaptionDisplaySettings(WebCore::HTMLMediaElementIdentifier, const WebCore::ResolvedCaptionDisplaySettingsOptions&, CompletionHandler<void(Expected<void, WebCore::ExceptionData>&&)>&&);
 #endif
+
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    virtual void canEnterImmersiveElementFromURL(const URL&, CompletionHandler<void(bool)>&& completion) { completion(false); }
+#endif
 };
 
 } // namespace WebKit

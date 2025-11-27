@@ -168,6 +168,7 @@ typedef NS_ENUM(NSInteger, _WKImmediateActionType) {
 @protocol _WKFindDelegate;
 @protocol _WKFullscreenDelegate;
 @protocol _WKIconLoadingDelegate;
+@protocol _WKImmersiveEnvironmentDelegate;
 @protocol _WKInputDelegate;
 @protocol _WKResourceLoadDelegate;
 @protocol _WKTextManipulationDelegate;
@@ -490,6 +491,8 @@ for this property.
 #endif
 
 @property (nonatomic, readonly) _WKSpatialBackdropSource *_spatialBackdropSource WK_API_AVAILABLE(visionos(26.0));
+
+@property (nonatomic, weak, setter=_setImmersiveEnvironmentDelegate:) id <_WKImmersiveEnvironmentDelegate> _immersiveEnvironmentDelegate WK_API_AVAILABLE(visionos(WK_XROS_TBA));
 
 - (void)_grantAccessToAssetServices WK_API_AVAILABLE(macos(12.0), ios(14.0));
 - (void)_revokeAccessToAssetServices WK_API_AVAILABLE(macos(12.0), ios(14.0));

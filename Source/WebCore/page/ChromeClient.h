@@ -340,6 +340,10 @@ public:
     virtual void spatialBackdropSourceChanged() const { }
 #endif
 
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    virtual void canEnterImmersiveElement(const Element&, CompletionHandler<void(bool)>&& completion) const { completion(false); }
+#endif
+
 #if ENABLE(APP_HIGHLIGHTS)
     virtual WebCore::HighlightVisibility appHighlightsVisiblility() const { return HighlightVisibility::Hidden; };
 #endif

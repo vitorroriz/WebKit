@@ -13402,6 +13402,16 @@ void WebPageProxy::spatialBackdropSourceChanged(std::optional<WebCore::SpatialBa
 }
 #endif
 
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+void WebPageProxy::canEnterImmersiveElementFromURL(const URL& url, CompletionHandler<void(bool)>&& completion)
+{
+    if (RefPtr pageClient = this->pageClient())
+        pageClient->canEnterImmersiveElementFromURL(url, WTFMove(completion));
+    else
+        completion(false);
+}
+#endif
+
 void WebPageProxy::copyLinkWithHighlight()
 {
     send(Messages::WebPage::CopyLinkWithHighlight());

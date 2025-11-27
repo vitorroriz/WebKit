@@ -1,12 +1,12 @@
-<!DOCTYPE html> <!-- webkit-test-runner [ ModelElementEnabled=true ModelProcessEnabled=true ModelElementImmersiveEnabled=true ] -->
+<!DOCTYPE html> <!-- webkit-test-runner [ ModelElementEnabled=true ModelProcessEnabled=true ModelElementImmersiveEnabled=true shouldAcceptImmersiveEnvironmentRequests=true ] -->
 <meta charset="utf-8">
 <title>&lt;model> immersive</title>
-<script src="../imported/w3c/web-platform-tests/resources/testdriver.js"></script>
-<script src="../resources/testdriver-vendor.js"></script>
-<script src="../resources/testharness.js"></script>
-<script src="../resources/testharnessreport.js"></script>
-<script src="resources/model-element-test-utils.js"></script>
-<script src="resources/model-utils.js"></script>
+<script src="../../imported/w3c/web-platform-tests/resources/testdriver.js"></script>
+<script src="../../resources/testdriver-vendor.js"></script>
+<script src="../../resources/testharness.js"></script>
+<script src="../../resources/testharnessreport.js"></script>
+<script src="../resources/model-element-test-utils.js"></script>
+<script src="../resources/model-utils.js"></script>
 <body>
 <script>
 
@@ -23,11 +23,10 @@ promise_test(async t => {
 
 }, 'Immersive API exists on model and document');
 
-
 promise_test(async t => {
     const [model, source] = createModelAndSource(t, "resources/cube.usdz");
     
-    await promise_rejects_dom(t, 'NotAllowedError', 
+    await promise_rejects_js(t, TypeError, 
         model.requestImmersive(),
         'Should reject without user activation'
     );
@@ -152,16 +151,19 @@ promise_test(async t => {
 }, 'Model is complete once presented as immersive');
 
 promise_test(async t => {
-    const [model, source] = createModelAndSource(t, "resources/cube.usdz");
+    const [model1, source1] = createModelAndSource(t, "resources/cube.usdz");
+    const [model2, source2] = createModelAndSource(t, "resources/sphere.usdz");
     
     await test_driver.bless("immersive");
-    
-    const promise1 = model.requestImmersive();
-    const promise2 = model.requestImmersive();
+    const promise1 = model1.requestImmersive();
+    const promise2 = promise_rejects_js(t, TypeError, 
+        model2.requestImmersive(),
+        'Should reject without user activation'
+    );
     
     await Promise.all([promise1, promise2]);
     
-    assert_equals(document.immersiveElement, model, 'Model should be immersive after multiple requests');
+    assert_equals(document.immersiveElement, model1, 'Model should be immersive after multiple requests');
 }, 'Multiple concurrent requestImmersive calls are handled correctly');
 
 </script>

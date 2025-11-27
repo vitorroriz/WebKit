@@ -112,6 +112,13 @@ void PageClientImplCocoa::spatialBackdropSourceDidChange()
 }
 #endif
 
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+void PageClientImplCocoa::canEnterImmersiveElementFromURL(const URL& url, CompletionHandler<void(bool)>&& completion)
+{
+    [m_webView _canEnterImmersiveElementFromURL:url completion:WTFMove(completion)];
+}
+#endif
+
 void PageClientImplCocoa::isPlayingAudioWillChange()
 {
     [webView() willChangeValueForKey:RetainPtr { NSStringFromSelector(@selector(_isPlayingAudio)) }.get()];

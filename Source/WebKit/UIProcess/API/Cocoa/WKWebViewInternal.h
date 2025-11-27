@@ -201,6 +201,10 @@ enum class PreferSolidColorHardPocketReason : uint8_t {
 @protocol _WKInputDelegate;
 @protocol _WKAppHighlightDelegate;
 
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+@protocol _WKImmersiveEnvironmentDelegate;
+#endif
+
 enum class SimilarToOriginalTextTag : uint8_t { Value };
 using TextValidationMapValue = Variant<String, SimilarToOriginalTextTag>;
 
@@ -292,6 +296,10 @@ struct PerWebProcessState {
     WeakObjCPtr<id <_WKTextManipulationDelegate>> _textManipulationDelegate;
     WeakObjCPtr<id <_WKInputDelegate>> _inputDelegate;
     WeakObjCPtr<id <_WKAppHighlightDelegate>> _appHighlightDelegate;
+
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    WeakObjCPtr<id <_WKImmersiveEnvironmentDelegate>> _immersiveEnvironmentDelegate;
+#endif
 
     RetainPtr<_WKWarningView> _warningView;
 
@@ -512,6 +520,10 @@ struct PerWebProcessState {
 
 #if ENABLE(WEB_PAGE_SPATIAL_BACKDROP)
 - (void)_spatialBackdropSourceDidChange;
+#endif
+
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+- (void)_canEnterImmersiveElementFromURL:(const URL&)url completion:(CompletionHandler<void(bool)>&&)completion;
 #endif
 
 #if ENABLE(ATTACHMENT_ELEMENT)

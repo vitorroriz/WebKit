@@ -97,6 +97,10 @@ messages -> WebPageProxy {
     SampledPageTopColorChanged(WebCore::Color sampledPageTopColor)
     SetCanShortCircuitHorizontalWheelEvents(bool canShortCircuitHorizontalWheelEvents)
 
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    [EnabledBy=ModelElementImmersiveEnabled] CanEnterImmersiveElementFromURL(URL url) -> (bool canEnterImmersive)
+#endif
+
     DidChangeContentSize(WebCore::IntSize newSize)
     DidChangeIntrinsicContentSize(WebCore::IntSize newIntrinsicContentSize)
 

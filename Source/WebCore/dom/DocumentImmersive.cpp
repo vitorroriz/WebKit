@@ -81,9 +81,36 @@ void DocumentImmersive::exitImmersive(Document& document, RefPtr<DeferredPromise
 
 void DocumentImmersive::requestImmersive(HTMLModelElement* element, CompletionHandler<void(ExceptionOr<void>)>&& completionHandler)
 {
-    queueImmersiveEventForElement(DocumentImmersive::EventType::Error, *element);
-    document().scheduleRenderingUpdate(RenderingUpdateStep::Immersive);
-    completionHandler(Exception { ExceptionCode::AbortError, "Not implemented"_s });
+    enum class EmitErrorEvent : bool { No, Yes };
+    auto handleError = [weakElement = WeakPtr { *element }, weakThis = WeakPtr { *this }](ASCIILiteral message, EmitErrorEvent emitErrorEvent, CompletionHandler<void(ExceptionOr<void>)>&& completionHandler) mutable {
+        RefPtr protectedThis = weakThis.get();
+        RefPtr protectedElement = weakElement.get();
+        if (!protectedThis || !protectedElement)
+            return completionHandler(Exception { ExceptionCode::TypeError, message });
+        RELEASE_LOG_ERROR(Immersive, "%p - DocumentImmersive: %s", protectedThis.get(), message.characters());
+        if (emitErrorEvent == EmitErrorEvent::Yes) {
+            protectedThis->queueImmersiveEventForElement(DocumentImmersive::EventType::Error, *protectedElement);
+            protectedThis->protectedDocument()->scheduleRenderingUpdate(RenderingUpdateStep::Immersive);
+        }
+        completionHandler(Exception { ExceptionCode::TypeError, message });
+    };
+
+    if (!protectedDocument()->isFullyActive())
+        return handleError("Cannot request immersive on a document that is not fully active."_s, EmitErrorEvent::No, WTFMove(completionHandler));
+
+    if (RefPtr window = document().window(); !window || !window->consumeTransientActivation())
+        return handleError("Cannot request immersive without transient activation."_s, EmitErrorEvent::Yes, WTFMove(completionHandler));
+
+    RefPtr protectedPage = document().page();
+    if (!protectedPage || !protectedPage->settings().modelElementImmersiveEnabled())
+        return handleError("Immersive API is disabled."_s, EmitErrorEvent::Yes, WTFMove(completionHandler));
+
+    protectedPage->chrome().client().canEnterImmersiveElement(*element, [handleError, completionHandler = WTFMove(completionHandler)](auto canEnterImmersive) mutable {
+        if (!canEnterImmersive)
+            return handleError("Immersive request was denied."_s, EmitErrorEvent::Yes, WTFMove(completionHandler));
+
+        handleError("Not implemented"_s, EmitErrorEvent::Yes, WTFMove(completionHandler));
+    });
 }
 
 void DocumentImmersive::exitImmersive(CompletionHandler<void(ExceptionOr<void>)>&& completionHandler)

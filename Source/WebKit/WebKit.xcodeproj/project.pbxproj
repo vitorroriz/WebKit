@@ -2216,6 +2216,7 @@
 		C6A4CA0B2252899800169289 /* WKBundlePageMac.h in Headers */ = {isa = PBXBuildFile; fileRef = C6A4CA092252899800169289 /* WKBundlePageMac.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		C6A4CA0C2252899800169289 /* WKBundlePageMac.mm in Sources */ = {isa = PBXBuildFile; fileRef = C6A4CA0A2252899800169289 /* WKBundlePageMac.mm */; };
 		CA05397923EE324400A553DC /* ContentAsStringIncludesChildFrames.h in Headers */ = {isa = PBXBuildFile; fileRef = CA05397823EE324400A553DC /* ContentAsStringIncludesChildFrames.h */; };
+		CA272BF72ED5BB24003AABF9 /* _WKImmersiveEnvironmentDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = CA272BF62ED5BB1B003AABF9 /* _WKImmersiveEnvironmentDelegate.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CA33440C2D1673FC007473A1 /* _WKSpatialBackdropSource.h in Headers */ = {isa = PBXBuildFile; fileRef = CA33440B2D1673FB007473A1 /* _WKSpatialBackdropSource.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CA33440F2D1680F9007473A1 /* _WKSpatialBackdropSourceInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = CA33440E2D1680F9007473A1 /* _WKSpatialBackdropSourceInternal.h */; };
 		CD003A5319D49B5D005ABCE0 /* WebMediaKeyStorageManager.h in Headers */ = {isa = PBXBuildFile; fileRef = CD003A5119D49B5D005ABCE0 /* WebMediaKeyStorageManager.h */; };
@@ -8085,6 +8086,7 @@
 		C6A4CA092252899800169289 /* WKBundlePageMac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKBundlePageMac.h; sourceTree = "<group>"; };
 		C6A4CA0A2252899800169289 /* WKBundlePageMac.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = WKBundlePageMac.mm; sourceTree = "<group>"; };
 		CA05397823EE324400A553DC /* ContentAsStringIncludesChildFrames.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ContentAsStringIncludesChildFrames.h; sourceTree = "<group>"; };
+		CA272BF62ED5BB1B003AABF9 /* _WKImmersiveEnvironmentDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _WKImmersiveEnvironmentDelegate.h; sourceTree = "<group>"; };
 		CA33440B2D1673FB007473A1 /* _WKSpatialBackdropSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _WKSpatialBackdropSource.h; sourceTree = "<group>"; };
 		CA33440D2D16748F007473A1 /* _WKSpatialBackdropSource.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = _WKSpatialBackdropSource.mm; sourceTree = "<group>"; };
 		CA33440E2D1680F9007473A1 /* _WKSpatialBackdropSourceInternal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _WKSpatialBackdropSourceInternal.h; sourceTree = "<group>"; };
@@ -12478,6 +12480,7 @@
 				63C32C231E9810D900699BD0 /* _WKGeolocationPosition.mm */,
 				63C32C271E98119000699BD0 /* _WKGeolocationPositionInternal.h */,
 				5143B25E1DDCDFD10014FAC6 /* _WKIconLoadingDelegate.h */,
+				CA272BF62ED5BB1B003AABF9 /* _WKImmersiveEnvironmentDelegate.h */,
 				37A64E5418F38E3C00EB30F1 /* _WKInputDelegate.h */,
 				5CAFDE422130843500B1F7E1 /* _WKInspector.h */,
 				5CAFDE432130843600B1F7E1 /* _WKInspector.mm */,
@@ -17374,6 +17377,7 @@
 				93E6A4EE1BC5DD3900F8A0E7 /* _WKHitTestResult.h in Headers */,
 				93A88B3B1BC710D900ABA5C2 /* _WKHitTestResultInternal.h in Headers */,
 				510F59101DDE296900412FF5 /* _WKIconLoadingDelegate.h in Headers */,
+				CA272BF72ED5BB24003AABF9 /* _WKImmersiveEnvironmentDelegate.h in Headers */,
 				37A64E5518F38E3C00EB30F1 /* _WKInputDelegate.h in Headers */,
 				5CAFDE452130846300B1F7E1 /* _WKInspector.h in Headers */,
 				994C6042253CA54400BDF060 /* _WKInspectorConfiguration.h in Headers */,

@@ -1687,6 +1687,10 @@ public:
     void spatialBackdropSourceChanged();
 #endif
 
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    void canEnterImmersiveElement(const WebCore::Element&, CompletionHandler<void(bool)>&&);
+#endif
+
     void flushPendingEditorStateUpdate();
 
     void loadAndDecodeImage(WebCore::ResourceRequest&&, std::optional<WebCore::FloatSize> sizeConstraint, uint64_t, CompletionHandler<void(Expected<Ref<WebCore::ShareableBitmap>, WebCore::ResourceError>&&)>&&);

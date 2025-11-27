@@ -7882,6 +7882,14 @@ void WebPage::spatialBackdropSourceChanged()
 }
 #endif
 
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+void WebPage::canEnterImmersiveElement(const Element& element, CompletionHandler<void(bool)>&& completion)
+{
+    auto url = element.document().url();
+    sendWithAsyncReply(Messages::WebPageProxy::CanEnterImmersiveElementFromURL(url), WTFMove(completion));
+}
+#endif
+
 void WebPage::flushPendingEditorStateUpdate()
 {
     if (!hasPendingEditorStateUpdate())
