@@ -2114,7 +2114,7 @@ void RenderElement::paintOutline(PaintInfo& paintInfo, const LayoutRect& paintRe
     if (!hasOutline())
         return;
 
-    OutlinePainter { *this, paintInfo }.paintOutline(paintRect);
+    OutlinePainter { paintInfo }.paintOutline(*this, paintRect);
 }
 
 void RenderElement::issueRepaintForOutlineAuto(float outlineSize)

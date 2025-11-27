@@ -1256,8 +1256,10 @@ void RenderBlock::paintObject(PaintInfo& paintInfo, const LayoutPoint& paintOffs
             // in the same layer. 
             if (!inlineEnclosedInSelfPaintingLayer && !hasLayer())
                 containingBlock->addContinuationWithOutline(inlineRenderer);
-            else if (!InlineIterator::lineLeftmostInlineBoxFor(*inlineRenderer) || (!inlineEnclosedInSelfPaintingLayer && hasLayer()))
-                inlineRenderer->paintOutline(paintInfo, paintOffset - locationOffset() + inlineRenderer->containingBlock()->location());
+            else if (!InlineIterator::lineLeftmostInlineBoxFor(*inlineRenderer) || (!inlineEnclosedInSelfPaintingLayer && hasLayer())) {
+                auto outlineOffset = paintOffset - locationOffset() + inlineRenderer->containingBlock()->location();
+                OutlinePainter { paintInfo }.paintOutline(*inlineRenderer, outlineOffset);
+            }
         }
         paintContinuationOutlines(paintInfo, paintOffset);
     }
@@ -1378,13 +1380,14 @@ void RenderBlock::paintContinuationOutlines(PaintInfo& info, const LayoutPoint& 
 
     LayoutPoint accumulatedPaintOffset = paintOffset;
     // Paint each continuation outline.
+    OutlinePainter outlinePainter { info };
     for (auto& renderInline : *continuations) {
         // Need to add in the coordinates of the intervening blocks.
         auto* block = renderInline.containingBlock();
         for ( ; block && block != this; block = block->containingBlock())
             accumulatedPaintOffset.moveBy(block->location());
         ASSERT(block);
-        renderInline.paintOutline(info, accumulatedPaintOffset);
+        outlinePainter.paintOutline(renderInline, accumulatedPaintOffset);
     }
 }
 

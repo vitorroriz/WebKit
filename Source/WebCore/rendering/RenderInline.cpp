@@ -909,57 +909,6 @@ void RenderInline::collectLineBoxRects(Vector<LayoutRect>& rects, const LayoutPo
     generateLineBoxRects(context);
 }
 
-void RenderInline::paintOutline(PaintInfo& paintInfo, const LayoutPoint& paintOffset) const
-{
-    if (!hasOutline())
-        return;
-
-    auto outlinePainter = OutlinePainter { *this, paintInfo };
-
-    auto& styleToUse = style();
-    // Only paint the focus ring by hand if the theme isn't able to draw it.
-    if (styleToUse.outlineStyle() == OutlineStyle::Auto && !theme().supportsFocusRing(*this, styleToUse)) {
-        Vector<LayoutRect> focusRingRects;
-        OutlinePainter::collectFocusRingRects(*this, focusRingRects, paintOffset, paintInfo.paintContainer);
-        outlinePainter.paintFocusRing(focusRingRects);
-    }
-
-    if (hasOutlineAnnotation() && styleToUse.outlineStyle() != OutlineStyle::Auto && !theme().supportsFocusRing(*this, styleToUse))
-        addPDFURLRect(paintInfo, paintOffset);
-
-    GraphicsContext& graphicsContext = paintInfo.context();
-    if (graphicsContext.paintingDisabled())
-        return;
-
-    if (styleToUse.outlineStyle() == OutlineStyle::Auto || !styleToUse.hasOutline())
-        return;
-
-    if (!containingBlock()) {
-        ASSERT_NOT_REACHED();
-        return;
-    }
-
-    auto isHorizontalWritingMode = this->isHorizontalWritingMode();
-    auto& containingBlock = *this->containingBlock();
-    auto isFlipped = containingBlock.writingMode().isBlockFlipped();
-    Vector<LayoutRect> rects;
-    for (auto box = InlineIterator::lineLeftmostInlineBoxFor(*this); box; box.traverseInlineBoxLineRightward()) {
-        auto lineBox = box->lineBox();
-        auto logicalTop = std::max(lineBox->contentLogicalTop(), box->logicalTop());
-        auto logicalBottom = std::min(lineBox->contentLogicalBottom(), box->logicalBottom());
-        auto enclosingVisualRect = FloatRect { box->logicalLeftIgnoringInlineDirection(), logicalTop, box->logicalWidth(), logicalBottom - logicalTop };
-
-        if (!isHorizontalWritingMode)
-            enclosingVisualRect = enclosingVisualRect.transposedRect();
-
-        if (isFlipped)
-            containingBlock.flipForWritingMode(enclosingVisualRect);
-
-        rects.append(LayoutRect { enclosingVisualRect });
-    }
-    outlinePainter.paintOutline(paintOffset, rects);
-}
-
 bool isEmptyInline(const RenderInline& renderer)
 {
     for (auto& current : childrenOfType<RenderObject>(renderer)) {

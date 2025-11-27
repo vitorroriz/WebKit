@@ -33,25 +33,23 @@ struct PaintInfo;
 
 class OutlinePainter {
 public:
-    OutlinePainter(const RenderElement&, const PaintInfo&);
+    OutlinePainter(const PaintInfo&);
 
-    void paintOutline(const LayoutRect&) const;
-    void paintOutline(const LayoutPoint& paintOffset, const Vector<LayoutRect>& lineRects) const;
-
-    void paintFocusRing(const Vector<LayoutRect>&) const;
+    void paintOutline(const RenderElement&, const LayoutRect& paintRect) const;
+    void paintOutline(const RenderInline&, const LayoutPoint& paintOffset) const;
 
     static void collectFocusRingRects(const RenderElement&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
 
 private:
+    void paintOutlineWithLineRects(const RenderInline&, const LayoutPoint& paintOffset, const Vector<LayoutRect>& lineRects) const;
+    void paintFocusRing(const RenderElement&, const Vector<LayoutRect>&) const;
+
     static void collectFocusRingRectsForInline(const RenderInline&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
     static void collectFocusRingRectsForListBox(const RenderListBox&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
     static void collectFocusRingRectsForBlock(const RenderBlock&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
     static void collectFocusRingRectsForInlineChildren(const RenderBlockFlow&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
     static void collectFocusRingRectsForChildBox(const RenderBox&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
 
-    float deviceScaleFactor() const;
-
-    CheckedRef<const RenderElement> m_renderer;
     const PaintInfo& m_paintInfo;
 };
 
