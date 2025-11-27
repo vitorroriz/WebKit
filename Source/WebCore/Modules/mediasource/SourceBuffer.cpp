@@ -1099,49 +1099,9 @@ bool SourceBuffer::validateInitializationSegment(const SourceBufferPrivateClient
 
     // Note: those are checks from step 3.1
     //   * The number of audio, video, and text tracks match what was in the first initialization segment.
-    if (segment.audioTracks.size() != protectedAudioTracks()->length()
-        || segment.videoTracks.size() != protectedVideoTracks()->length()
-        || segment.textTracks.size() != protectedTextTracks()->length())
-        return false;
-
-    //   * The codecs for each track, match what was specified in the first initialization segment.
-    // (Note: Issue #155 strikes out this check. For broad compatibility when this experimental feature
-    // is not enabled, only perform this check if the "pending initialization segment for changeType flag"
-    // is not set.)
-    for (auto& audioTrackInfo : segment.audioTracks) {
-        auto audioCodec = RefPtr { audioTrackInfo.description }->codec().toAtomString();
-        if (m_audioCodecs.contains(audioCodec))
-            continue;
-
-        if (!m_pendingInitializationSegmentForChangeType)
-            return false;
-
-        m_audioCodecs.append(WTFMove(audioCodec));
-    }
-
-    for (auto& videoTrackInfo : segment.videoTracks) {
-        auto videoCodec = RefPtr { videoTrackInfo.description }->codec().toAtomString();
-        if (m_videoCodecs.contains(videoCodec))
-            continue;
-
-        if (!m_pendingInitializationSegmentForChangeType)
-            return false;
-
-        m_videoCodecs.append(WTFMove(videoCodec));
-    }
-
-    for (auto& textTrackInfo : segment.textTracks) {
-        auto textCodec = RefPtr { textTrackInfo.description }->codec().toAtomString();
-        if (m_textCodecs.contains(textCodec))
-            continue;
-
-        if (!m_pendingInitializationSegmentForChangeType)
-            return false;
-
-        m_textCodecs.append(WTFMove(textCodec));
-    }
-
-    return true;
+    return segment.audioTracks.size() == protectedAudioTracks()->length()
+        && segment.videoTracks.size() == protectedVideoTracks()->length()
+        && segment.textTracks.size() == protectedTextTracks()->length();
 }
 
 void SourceBuffer::appendError(bool decodeError)
