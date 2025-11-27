@@ -296,7 +296,6 @@ rendering/AccessibilityRegionContext.cpp
 rendering/AncestorSubgridIterator.cpp
 rendering/AutoTableLayout.cpp
 rendering/BackgroundPainter.cpp
-rendering/BorderPainter.cpp
 rendering/CaretRectComputation.cpp
 rendering/CounterNode.cpp
 rendering/EllipsisBoxPainter.cpp

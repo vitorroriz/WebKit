@@ -83,9 +83,9 @@ platform/graphics/ca/TileController.cpp
 [ iOS ] platform/ios/LegacyTileCache.h
 platform/mediastream/libwebrtc/LibWebRTCDav1dDecoder.cpp
 [ iOS ] platform/text/TextBoundaries.cpp
+rendering/MarkedText.h
 rendering/RenderLayerBacking.cpp
 rendering/RenderLayerCompositor.cpp
-rendering/RenderTableCellInlines.h
 rendering/RenderTextLineBoxes.h
 rendering/style/StyleCachedImage.cpp
 rendering/svg/SVGRenderingContext.h
