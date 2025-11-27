@@ -423,10 +423,7 @@ std::optional<CodeOrigin> JITCode::findPC(CodeBlock* codeBlock, void* pc)
 
 void JITCode::finalizeOSREntrypoints(Vector<OSREntryData>&& osrEntry)
 {
-    auto comparator = [] (const auto& a, const auto& b) {
-        return a.m_bytecodeIndex < b.m_bytecodeIndex;
-    };
-    std::ranges::sort(osrEntry, comparator);
+    std::ranges::sort(osrEntry, { }, &OSREntryData::m_bytecodeIndex);
 
 #if ASSERT_ENABLED
     auto verifyIsSorted = [&] (auto& osrVector) {

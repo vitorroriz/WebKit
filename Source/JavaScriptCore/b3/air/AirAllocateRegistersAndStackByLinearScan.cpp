@@ -300,9 +300,7 @@ private:
             }
         }
 
-        std::ranges::sort(m_clobbers, [](auto& a, auto& b) {
-            return a.index < b.index;
-        });
+        std::ranges::sort(m_clobbers, { }, &Clobber::index);
 
         if (verbose()) {
             dataLog("Intervals:\n");

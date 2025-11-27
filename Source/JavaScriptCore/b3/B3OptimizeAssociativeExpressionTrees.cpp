@@ -191,9 +191,7 @@ bool OptimizeAssociativeExpressionTrees::optimizeRootedTree(Value* root, Inserti
         return false;
     }
 
-    std::ranges::sort(leaves, [](auto* x, auto* y) {
-        return x->index() < y->index();
-    });
+    std::ranges::sort(leaves, { }, &Value::index);
     Vector<Value*, 4> optLeaves;
     Value* lastValue = nullptr;
     unsigned numSeen = 0;

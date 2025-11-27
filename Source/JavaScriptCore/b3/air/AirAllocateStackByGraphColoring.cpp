@@ -246,9 +246,7 @@ public:
         }
 
         // Now try to coalesce some moves.
-        std::ranges::sort(m_coalescableMoves, [&](auto& a, auto& b) {
-            return a.frequency > b.frequency;
-        });
+        std::ranges::sort(m_coalescableMoves, std::ranges::greater { }, &CoalescableMove::frequency);
 
         for (const CoalescableMove& move : m_coalescableMoves) {
             IndexType slotToKill = remap(move.src);
