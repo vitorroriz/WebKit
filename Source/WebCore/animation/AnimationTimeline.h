@@ -90,7 +90,7 @@ protected:
     AnimationTimeline(std::optional<WebAnimationTime> = std::nullopt);
 
 #if ENABLE(THREADED_ANIMATIONS)
-    virtual Ref<AcceleratedTimeline> createAcceleratedRepresentation();
+    virtual Ref<AcceleratedTimeline> createAcceleratedRepresentation() const;
 #endif
 
     AnimationCollection m_animations;

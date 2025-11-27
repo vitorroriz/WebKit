@@ -403,7 +403,7 @@ bool ScrollTimeline::computeCanBeAccelerated() const
     return sourceScrollableArea && !!sourceScrollableArea->scrollingNodeID();
 }
 
-Ref<AcceleratedTimeline> ScrollTimeline::createAcceleratedRepresentation()
+Ref<AcceleratedTimeline> ScrollTimeline::createAcceleratedRepresentation() const
 {
     ASSERT(this->source());
     ASSERT(this->source()->document().settings().threadedScrollDrivenAnimationsEnabled());

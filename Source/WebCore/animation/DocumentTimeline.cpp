@@ -536,7 +536,7 @@ Seconds DocumentTimeline::convertTimelineTimeToOriginRelativeTime(Seconds timeli
 }
 
 #if ENABLE(THREADED_ANIMATIONS)
-Ref<AcceleratedTimeline> DocumentTimeline::createAcceleratedRepresentation()
+Ref<AcceleratedTimeline> DocumentTimeline::createAcceleratedRepresentation() const
 {
     // The origin time of a document timeline is relative to the time origin
     // of the document's associated performance object. We must convert this

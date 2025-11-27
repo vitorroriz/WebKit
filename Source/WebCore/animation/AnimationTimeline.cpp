@@ -133,7 +133,7 @@ AcceleratedTimeline& AnimationTimeline::acceleratedRepresentation()
     return *m_acceleratedRepresentation;
 }
 
-Ref<AcceleratedTimeline> AnimationTimeline::createAcceleratedRepresentation()
+Ref<AcceleratedTimeline> AnimationTimeline::createAcceleratedRepresentation() const
 {
     ASSERT_NOT_REACHED();
     return AcceleratedTimeline::create(m_acceleratedTimelineIdentifier, 0_s);

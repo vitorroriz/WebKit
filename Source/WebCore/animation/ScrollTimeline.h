@@ -105,7 +105,7 @@ private:
     bool isScrollTimeline() const final { return true; }
 #if ENABLE(THREADED_ANIMATIONS)
     bool computeCanBeAccelerated() const final;
-    Ref<AcceleratedTimeline> createAcceleratedRepresentation() override;
+    Ref<AcceleratedTimeline> createAcceleratedRepresentation() const final;
 #endif
 
     void animationTimingDidChange(WebAnimation&) override;
