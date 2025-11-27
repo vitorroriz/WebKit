@@ -325,7 +325,7 @@ ExceptionOr<void> SVGLengthValue::setValue(const SVGLengthContext& context, floa
 ExceptionOr<void> SVGLengthValue::setValueAsString(StringView string)
 {
     if (string.isEmpty())
-        return { };
+        return Exception { ExceptionCode::SyntaxError };
 
     // CSS::Range only clamps to boundaries, but we historically handled
     // overflow values like "-45e58" to 0 instead of FLT_MAX.
