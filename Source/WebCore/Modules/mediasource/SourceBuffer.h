@@ -170,7 +170,6 @@ private:
     void sourceBufferPrivateHighestPresentationTimestampChanged(const MediaTime&);
     Ref<MediaPromise> sourceBufferPrivateDurationChanged(const MediaTime& duration);
     void sourceBufferPrivateDidDropSample();
-    void sourceBufferPrivateDidReceiveRenderingError(int64_t errorCode);
     Ref<MediaPromise> sourceBufferPrivateDidAttach(SourceBufferPrivateClient::InitializationSegment&&);
 
     // AudioTrackClient

@@ -128,13 +128,6 @@ public:
         });
     }
 
-    void sourceBufferPrivateDidReceiveRenderingError(int64_t errorCode) final
-    {
-        ensureWeakOnDispatcher([errorCode](SourceBuffer& parent) {
-            parent.sourceBufferPrivateDidReceiveRenderingError(errorCode);
-        });
-    }
-
     void ensureWeakOnDispatcher(Function<void(SourceBuffer&)>&& function, bool forceAsync = false) const
     {
         auto weakWrapper = [function = WTFMove(function), weakParent = m_parent] {
@@ -726,18 +719,6 @@ void SourceBuffer::sourceBufferPrivateAppendComplete(MediaPromise::Result&& resu
     m_private->reenqueueMediaIfNeeded(source->currentTime());
 
     ALWAYS_LOG(LOGIDENTIFIER, "buffered = ", m_buffered->ranges(), ", totalBufferSize: ", m_private->contentSize());
-}
-
-void SourceBuffer::sourceBufferPrivateDidReceiveRenderingError(int64_t error)
-{
-#if RELEASE_LOG_DISABLED
-    UNUSED_PARAM(error);
-#endif
-
-    ERROR_LOG(LOGIDENTIFIER, error);
-
-    if (!isRemoved())
-        protectedSource()->streamEndedWithError(MediaSource::EndOfStreamError::Decode);
 }
 
 uint64_t SourceBuffer::maximumBufferSize() const
