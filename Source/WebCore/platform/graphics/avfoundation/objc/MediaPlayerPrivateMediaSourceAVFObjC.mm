@@ -671,38 +671,40 @@ void MediaPlayerPrivateMediaSourceAVFObjC::bufferedChanged()
         stall();
     }
 
+    auto stallAtTime = duration();
     size_t index = ranges.find(currentTime);
-    if (index == notFound)
-        return;
-    // Find the next gap (or end of media)
-    for (; index < ranges.length(); index++) {
-        if ((index < ranges.length() - 1 && ranges.start(index + 1) - ranges.end(index) > m_mediaSourcePrivate->timeFudgeFactor())
-            || (index == ranges.length() - 1 && ranges.end(index) > currentTime)) {
-            auto gapStart = ranges.end(index);
-
-            auto logSiteIdentifier = LOGIDENTIFIER;
-            UNUSED_PARAM(logSiteIdentifier);
-            m_renderer->notifyTimeReachedAndStall(gapStart, [weakThis = WeakPtr { *this }, logSiteIdentifier](const MediaTime& stallTime) {
-                ensureOnMainThread([weakThis, logSiteIdentifier, stallTime] {
-                    RefPtr protectedThis = weakThis.get();
-                    if (!protectedThis)
-                        return;
-                    if (protectedThis->protectedMediaSourcePrivate()->hasFutureTime(stallTime) && protectedThis->shouldBePlaying()) {
-                        ALWAYS_LOG_WITH_THIS(protectedThis, logSiteIdentifier, "Data now available at ", stallTime, " resuming");
-                        protectedThis->m_renderer->play(); // New data was added, resume. Can't happen in practice, action would have been cancelled once buffered changed.
-                        return;
-                    }
-                    MediaTime now = protectedThis->currentTime();
-                    ALWAYS_LOG_WITH_THIS(protectedThis, logSiteIdentifier, "boundary time observer called, now = ", now);
-
-                    if (stallTime == protectedThis->duration())
-                        protectedThis->pause();
-                    protectedThis->timeChanged();
-                });
-            });
-            return;
+    if (index != notFound) {
+        // Find the next gap (or end of media)
+        for (; index < ranges.length(); index++) {
+            if ((index < ranges.length() - 1 && ranges.start(index + 1) - ranges.end(index) > m_mediaSourcePrivate->timeFudgeFactor())
+                || (index == ranges.length() - 1 && ranges.end(index) > currentTime)) {
+                stallAtTime = ranges.end(index);
+                break;
+            }
         }
     }
+
+    ALWAYS_LOG(LOGIDENTIFIER, "will stall playback at time: ", stallAtTime);
+    auto logSiteIdentifier = LOGIDENTIFIER;
+    UNUSED_PARAM(logSiteIdentifier);
+    m_renderer->notifyTimeReachedAndStall(stallAtTime, [weakThis = WeakPtr { *this }, logSiteIdentifier](const MediaTime& stallTime) {
+        ensureOnMainThread([weakThis, logSiteIdentifier, stallTime] {
+            RefPtr protectedThis = weakThis.get();
+            if (!protectedThis)
+                return;
+            if (protectedThis->protectedMediaSourcePrivate()->hasFutureTime(stallTime) && protectedThis->shouldBePlaying()) {
+                ALWAYS_LOG_WITH_THIS(protectedThis, logSiteIdentifier, "Data now available at ", stallTime, " resuming");
+                protectedThis->m_renderer->play(); // New data was added, resume. Can't happen in practice, action would have been cancelled once buffered changed.
+                return;
+            }
+            MediaTime now = protectedThis->currentTime();
+            ALWAYS_LOG_WITH_THIS(protectedThis, logSiteIdentifier, "boundary time observer called, now = ", now);
+
+            if (stallTime == protectedThis->duration())
+                protectedThis->pause();
+            protectedThis->timeChanged();
+        });
+    });
 }
 
 void MediaPlayerPrivateMediaSourceAVFObjC::setLayerRequiresFlush()
@@ -929,13 +931,14 @@ void MediaPlayerPrivateMediaSourceAVFObjC::durationChanged()
         return;
 
     MediaTime duration = mediaSourcePrivate->duration();
-    // Avoid emiting durationchanged in the case where the previous duration was unkniwn as that case is already handled
+    // Avoid emiting durationchanged in the case where the previous duration was unknown as that case is already handled
     // by the HTMLMediaElement.
     if (m_duration != duration && m_duration.isValid()) {
         if (auto player = m_player.get())
             player->durationChanged();
     }
     m_duration = duration;
+    bufferedChanged();
 }
 
 void MediaPlayerPrivateMediaSourceAVFObjC::effectiveRateChanged()

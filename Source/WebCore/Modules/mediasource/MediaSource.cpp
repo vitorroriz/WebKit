@@ -712,6 +712,9 @@ ExceptionOr<void> MediaSource::setDurationInternal(const MediaTime& newDuration)
     // 6. Update the media duration to new duration and run the HTMLMediaElement duration change algorithm.
     protectedPrivate()->durationChanged(duration);
 
+    // Changing the duration may affect the buffered range.
+    updateBufferedIfNeeded(true);
+
     // Changing the duration affects the buffered range.
     monitorSourceBuffers();
 

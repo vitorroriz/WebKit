@@ -1302,6 +1302,7 @@ media/video-webm-seek-singlekeyframe.html [ Skip ]
 media/video-webm-canvas-drawing.html [ Skip ]
 media/media-source/media-source-changetype-vp8-vp9.html [ Skip ]
 media/media-source/media-source-webm-seek-singlekeyframe.html [ Skip ]
+media/media-source/media-source-ended.html [ Skip ]
 
 # Managed MediaSource isn't enabled on WK1
 media/media-source/media-managedmse-append.html [ Skip ]
