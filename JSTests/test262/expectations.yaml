@@ -729,8 +729,8 @@ test/staging/sm/Date/to-temporal-instant.js:
   default: "TypeError: min.toZonedDateTimeISO is not a function. (In 'min.toZonedDateTimeISO('UTC')', 'min.toZonedDateTimeISO' is undefined)"
   strict mode: "TypeError: min.toZonedDateTimeISO is not a function. (In 'min.toZonedDateTimeISO('UTC')', 'min.toZonedDateTimeISO' is undefined)"
 test/staging/sm/Date/two-digit-years.js:
-  default: 'Test262Error: Expected SameValue(«923641200000», «NaN») to be true'
-  strict mode: 'Test262Error: Expected SameValue(«923641200000», «NaN») to be true'
+  default: 'Test262Error: Expected SameValue(«NaN», «957164400000») to be true'
+  strict mode: 'Test262Error: Expected SameValue(«NaN», «957164400000») to be true'
 test/staging/sm/Function/arguments-parameter-shadowing.js:
   default: 'Test262Error: Expected SameValue(«true», «false») to be true'
 test/staging/sm/Function/function-name-assignment.js:
