@@ -82,12 +82,8 @@ void RemoteQueueProxy::writeBuffer(
 
     size_t actualSourceSize = static_cast<size_t>(size.value_or(source.size() - dataOffset));
     if (actualSourceSize > maxCrossProcessResourceCopySize) {
-        auto sharedMemory = WebCore::SharedMemory::copySpan(source.subspan(dataOffset, actualSourceSize));
-        std::optional<WebCore::SharedMemoryHandle> handle;
-        if (sharedMemory)
-            handle = sharedMemory->createHandle(WebCore::SharedMemory::Protection::ReadOnly);
-        auto sendResult = sendWithAsyncReply(Messages::RemoteQueue::WriteBuffer(convertedBuffer, bufferOffset, WTFMove(handle)), [sharedMemory = sharedMemory.copyRef(), handleHasValue = handle.has_value()](auto) mutable {
-            RELEASE_ASSERT(sharedMemory.get() || !handleHasValue);
+        auto handle = WebCore::SharedMemoryHandle::createCopy(source.subspan(dataOffset, actualSourceSize), WebCore::SharedMemoryProtection::ReadOnly);
+        auto sendResult = sendWithAsyncReply(Messages::RemoteQueue::WriteBuffer(convertedBuffer, bufferOffset, WTFMove(handle)), [](auto) mutable {
         });
         UNUSED_VARIABLE(sendResult);
     } else {
@@ -112,12 +108,8 @@ void RemoteQueueProxy::writeTexture(
         return;
 
     if (source.size() > maxCrossProcessResourceCopySize) {
-        auto sharedMemory = WebCore::SharedMemory::copySpan(source);
-        std::optional<WebCore::SharedMemoryHandle> handle;
-        if (sharedMemory)
-            handle = sharedMemory->createHandle(WebCore::SharedMemory::Protection::ReadOnly);
-        auto sendResult = sendWithAsyncReply(Messages::RemoteQueue::WriteTexture(*convertedDestination, WTFMove(handle), *convertedDataLayout, *convertedSize), [sharedMemory = sharedMemory.copyRef(), handleHasValue = handle.has_value()](auto) mutable {
-            RELEASE_ASSERT(sharedMemory.get() || !handleHasValue);
+        auto handle = WebCore::SharedMemoryHandle::createCopy(source, WebCore::SharedMemoryProtection::ReadOnly);
+        auto sendResult = sendWithAsyncReply(Messages::RemoteQueue::WriteTexture(*convertedDestination, WTFMove(handle), *convertedDataLayout, *convertedSize), [](auto) mutable {
         });
         UNUSED_VARIABLE(sendResult);
     } else {
