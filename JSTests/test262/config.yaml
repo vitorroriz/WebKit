@@ -17,6 +17,7 @@ skip:
     - decorators
     - source-phase-imports
     - import-defer
+    - joint-iteration
   paths:
     - test/built-ins/Temporal/Instant/prototype/toZonedDateTimeISO
     - test/built-ins/Temporal/Now/plainDateISO
