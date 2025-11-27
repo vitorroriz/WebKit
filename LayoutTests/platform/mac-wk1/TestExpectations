@@ -3308,3 +3308,6 @@ imported/w3c/web-platform-tests/css/CSS2/abspos/abspos-containing-block-initial-
 
 # List buttons no longer have tint color.
 fast/css/accent-color/datalist.html [ Skip ]
+
+# Flaky test on WK1
+css3/images/cross-fade-svg-fragments.html [ Skip ]
