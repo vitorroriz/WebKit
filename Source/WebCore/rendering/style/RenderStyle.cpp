@@ -897,7 +897,7 @@ static bool rareInheritedDataChangeRequiresLayout(const StyleRareInheritedData& 
         || first.hangingPunctuation != second.hangingPunctuation
         || first.usedContentVisibility != second.usedContentVisibility
 #if ENABLE(WEBKIT_OVERFLOW_SCROLLING_CSS_PROPERTY)
-        || first.webkitOverflowScrolling != second.webkitOverflowScrolling
+        || first.overflowScrolling != second.overflowScrolling
 #endif
         || first.listStyleType != second.listStyleType
         || first.listStyleImage != second.listStyleImage
@@ -911,7 +911,7 @@ static bool rareInheritedDataChangeRequiresLayout(const StyleRareInheritedData& 
     if (first.capStyle != second.capStyle
         || first.joinStyle != second.joinStyle
         || first.strokeWidth != second.strokeWidth
-        || first.miterLimit != second.miterLimit)
+        || first.strokeMiterLimit != second.strokeMiterLimit)
         return true;
 
     if (first.quotes != second.quotes)
@@ -927,21 +927,21 @@ bool RenderStyle::changeRequiresLayout(const RenderStyle& other, OptionSet<Style
 
     if (m_nonInheritedData.ptr() != other.m_nonInheritedData.ptr()) {
         if (m_nonInheritedData->boxData.ptr() != other.m_nonInheritedData->boxData.ptr()) {
-            if (m_nonInheritedData->boxData->width() != other.m_nonInheritedData->boxData->width()
-                || m_nonInheritedData->boxData->minWidth() != other.m_nonInheritedData->boxData->minWidth()
-                || m_nonInheritedData->boxData->maxWidth() != other.m_nonInheritedData->boxData->maxWidth()
-                || m_nonInheritedData->boxData->height() != other.m_nonInheritedData->boxData->height()
-                || m_nonInheritedData->boxData->minHeight() != other.m_nonInheritedData->boxData->minHeight()
-                || m_nonInheritedData->boxData->maxHeight() != other.m_nonInheritedData->boxData->maxHeight())
+            if (m_nonInheritedData->boxData->width != other.m_nonInheritedData->boxData->width
+                || m_nonInheritedData->boxData->minWidth != other.m_nonInheritedData->boxData->minWidth
+                || m_nonInheritedData->boxData->maxWidth != other.m_nonInheritedData->boxData->maxWidth
+                || m_nonInheritedData->boxData->height != other.m_nonInheritedData->boxData->height
+                || m_nonInheritedData->boxData->minHeight != other.m_nonInheritedData->boxData->minHeight
+                || m_nonInheritedData->boxData->maxHeight != other.m_nonInheritedData->boxData->maxHeight)
                 return true;
 
-            if (m_nonInheritedData->boxData->verticalAlign() != other.m_nonInheritedData->boxData->verticalAlign())
+            if (m_nonInheritedData->boxData->verticalAlign != other.m_nonInheritedData->boxData->verticalAlign)
                 return true;
 
-            if (m_nonInheritedData->boxData->boxSizing() != other.m_nonInheritedData->boxData->boxSizing())
+            if (m_nonInheritedData->boxData->boxSizing != other.m_nonInheritedData->boxData->boxSizing)
                 return true;
 
-            if (m_nonInheritedData->boxData->usedZIndex().isAuto() != other.m_nonInheritedData->boxData->usedZIndex().isAuto())
+            if (m_nonInheritedData->boxData->hasAutoUsedZIndex != other.m_nonInheritedData->boxData->hasAutoUsedZIndex)
                 return true;
         }
 
@@ -968,7 +968,7 @@ bool RenderStyle::changeRequiresLayout(const RenderStyle& other, OptionSet<Style
                         return true;
 
                     // Optimize for the case where a positioned layer is moving but not changing size.
-                    if (!positionChangeIsMovementOnly(m_nonInheritedData->surroundData->inset, other.m_nonInheritedData->surroundData->inset, m_nonInheritedData->boxData->width()))
+                    if (!positionChangeIsMovementOnly(m_nonInheritedData->surroundData->inset, other.m_nonInheritedData->surroundData->inset, m_nonInheritedData->boxData->width))
                         return true;
                 }
             }
@@ -1084,7 +1084,7 @@ bool RenderStyle::changeRequiresOutOfFlowMovementLayoutOnly(const RenderStyle& o
         return false;
 
     // Optimize for the case where a out-of-flow box is moving but not changing size.
-    return (m_nonInheritedData->surroundData->inset != other.m_nonInheritedData->surroundData->inset) && positionChangeIsMovementOnly(m_nonInheritedData->surroundData->inset, other.m_nonInheritedData->surroundData->inset, m_nonInheritedData->boxData->width());
+    return (m_nonInheritedData->surroundData->inset != other.m_nonInheritedData->surroundData->inset) && positionChangeIsMovementOnly(m_nonInheritedData->surroundData->inset, other.m_nonInheritedData->surroundData->inset, m_nonInheritedData->boxData->width);
 }
 
 static bool miscDataChangeRequiresLayerRepaint(const StyleMiscNonInheritedData& first, const StyleMiscNonInheritedData& second, OptionSet<StyleDifferenceContextSensitiveProperty>& changedContextSensitiveProperties)
@@ -1368,12 +1368,12 @@ bool RenderStyle::scrollAnchoringSuppressionStyleDidChange(const RenderStyle* ot
         return false;
 
     if (m_nonInheritedData->boxData.ptr() != other->m_nonInheritedData->boxData.ptr()) {
-        if (m_nonInheritedData->boxData->width() != other->m_nonInheritedData->boxData->width()
-            || m_nonInheritedData->boxData->minWidth() != other->m_nonInheritedData->boxData->minWidth()
-            || m_nonInheritedData->boxData->maxWidth() != other->m_nonInheritedData->boxData->maxWidth()
-            || m_nonInheritedData->boxData->height() != other->m_nonInheritedData->boxData->height()
-            || m_nonInheritedData->boxData->minHeight() != other->m_nonInheritedData->boxData->minHeight()
-            || m_nonInheritedData->boxData->maxHeight() != other->m_nonInheritedData->boxData->maxHeight())
+        if (m_nonInheritedData->boxData->width != other->m_nonInheritedData->boxData->width
+            || m_nonInheritedData->boxData->minWidth != other->m_nonInheritedData->boxData->minWidth
+            || m_nonInheritedData->boxData->maxWidth != other->m_nonInheritedData->boxData->maxWidth
+            || m_nonInheritedData->boxData->height != other->m_nonInheritedData->boxData->height
+            || m_nonInheritedData->boxData->minHeight != other->m_nonInheritedData->boxData->minHeight
+            || m_nonInheritedData->boxData->maxHeight != other->m_nonInheritedData->boxData->maxHeight)
             return true;
     }
 
@@ -1555,32 +1555,32 @@ void RenderStyle::conservativelyCollectChangedAnimatableProperties(const RenderS
             changingProperties.m_properties.set(CSSPropertyTransformOriginY);
         if (first.origin.z != second.origin.z)
             changingProperties.m_properties.set(CSSPropertyTransformOriginZ);
-        if (first.transformBox != second.transformBox)
+        if (static_cast<TransformBox>(first.transformBox) != static_cast<TransformBox>(second.transformBox))
             changingProperties.m_properties.set(CSSPropertyTransformBox);
         if (first.transform != second.transform)
             changingProperties.m_properties.set(CSSPropertyTransform);
     };
 
     auto conservativelyCollectChangedAnimatablePropertiesViaNonInheritedBoxData = [&](auto& first, auto& second) {
-        if (first.width() != second.width())
+        if (first.width != second.width)
             changingProperties.m_properties.set(CSSPropertyWidth);
-        if (first.height() != second.height())
+        if (first.height != second.height)
             changingProperties.m_properties.set(CSSPropertyHeight);
-        if (first.minWidth() != second.minWidth())
+        if (first.minWidth != second.minWidth)
             changingProperties.m_properties.set(CSSPropertyMinWidth);
-        if (first.maxWidth() != second.maxWidth())
+        if (first.maxWidth != second.maxWidth)
             changingProperties.m_properties.set(CSSPropertyMaxWidth);
-        if (first.minHeight() != second.minHeight())
+        if (first.minHeight != second.minHeight)
             changingProperties.m_properties.set(CSSPropertyMinHeight);
-        if (first.maxHeight() != second.maxHeight())
+        if (first.maxHeight != second.maxHeight)
             changingProperties.m_properties.set(CSSPropertyMaxHeight);
-        if (first.verticalAlign() != second.verticalAlign())
+        if (first.verticalAlign != second.verticalAlign)
             changingProperties.m_properties.set(CSSPropertyVerticalAlign);
         if (first.specifiedZIndex() != second.specifiedZIndex())
             changingProperties.m_properties.set(CSSPropertyZIndex);
-        if (first.boxSizing() != second.boxSizing())
+        if (static_cast<BoxSizing>(first.boxSizing) != static_cast<BoxSizing>(second.boxSizing))
             changingProperties.m_properties.set(CSSPropertyBoxSizing);
-        if (first.boxDecorationBreak() != second.boxDecorationBreak())
+        if (static_cast<BoxDecorationBreak>(first.boxDecorationBreak) != static_cast<BoxDecorationBreak>(second.boxDecorationBreak))
             changingProperties.m_properties.set(CSSPropertyWebkitBoxDecorationBreak);
         // Non animated styles are followings.
         // usedZIndex
@@ -1599,7 +1599,7 @@ void RenderStyle::conservativelyCollectChangedAnimatableProperties(const RenderS
             changingProperties.m_properties.set(CSSPropertyBackgroundRepeat);
             changingProperties.m_properties.set(CSSPropertyBackgroundBlendMode);
         }
-        if (first.color != second.color)
+        if (first.backgroundColor != second.backgroundColor)
             changingProperties.m_properties.set(CSSPropertyBackgroundColor);
         if (first.outline != second.outline) {
             changingProperties.m_properties.set(CSSPropertyOutlineColor);
@@ -2033,7 +2033,7 @@ void RenderStyle::conservativelyCollectChangedAnimatableProperties(const RenderS
             changingProperties.m_properties.set(CSSPropertyTextIndent);
         if (first.textUnderlineOffset != second.textUnderlineOffset)
             changingProperties.m_properties.set(CSSPropertyTextUnderlineOffset);
-        if (first.miterLimit != second.miterLimit)
+        if (first.strokeMiterLimit != second.strokeMiterLimit)
             changingProperties.m_properties.set(CSSPropertyStrokeMiterlimit);
         if (first.widows != second.widows)
             changingProperties.m_properties.set(CSSPropertyWidows);
@@ -2175,12 +2175,6 @@ void RenderStyle::conservativelyCollectChangedAnimatableProperties(const RenderS
 
     if (m_svgStyle.ptr() != other.m_svgStyle.ptr())
         m_svgStyle->conservativelyCollectChangedAnimatableProperties(*other.m_svgStyle, changingProperties);
-}
-
-void RenderStyle::setQuotes(Style::Quotes&& quotes)
-{
-    if (m_rareInheritedData->quotes != quotes)
-        m_rareInheritedData.access().quotes = WTFMove(quotes);
 }
 
 bool RenderStyle::affectedByTransformOrigin() const

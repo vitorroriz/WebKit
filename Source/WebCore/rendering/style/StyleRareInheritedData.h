@@ -161,7 +161,7 @@ public:
     Style::WebkitLineGrid lineGrid;
     Style::TabSize tabSize;
 
-    Style::StrokeMiterlimit miterLimit;
+    Style::StrokeMiterlimit strokeMiterLimit;
 
 #if ENABLE(TEXT_AUTOSIZING)
     Style::TextSizeAdjust textSizeAdjust;
@@ -199,7 +199,7 @@ public:
     PREFERRED_TYPE(LineSnap) unsigned lineSnap : 2;
     PREFERRED_TYPE(LineAlign) unsigned lineAlign : 1;
 #if ENABLE(WEBKIT_OVERFLOW_SCROLLING_CSS_PROPERTY)
-    PREFERRED_TYPE(Style::WebkitOverflowScrolling) unsigned webkitOverflowScrolling: 1;
+    PREFERRED_TYPE(Style::WebkitOverflowScrolling) unsigned overflowScrolling: 1;
 #endif
     PREFERRED_TYPE(Style::TextAlignLast) unsigned textAlignLast : 3;
     PREFERRED_TYPE(TextJustify) unsigned textJustify : 2;
@@ -211,7 +211,7 @@ public:
     PREFERRED_TYPE(RubyOverhang) unsigned rubyOverhang : 1;
     PREFERRED_TYPE(TextZoom) unsigned textZoom: 1;
 #if ENABLE(WEBKIT_TOUCH_CALLOUT_CSS_PROPERTY)
-    PREFERRED_TYPE(Style::WebkitTouchCallout) unsigned webkitTouchCallout : 1;
+    PREFERRED_TYPE(Style::WebkitTouchCallout) unsigned touchCallout : 1;
 #endif
     PREFERRED_TYPE(Style::HangingPunctuation) unsigned hangingPunctuation : 4;
     PREFERRED_TYPE(Style::SVGPaintOrder::Type) unsigned paintOrder : 3;

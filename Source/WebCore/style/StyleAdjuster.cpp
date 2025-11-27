@@ -1021,8 +1021,8 @@ void Adjuster::adjustForSiteSpecificQuirks(RenderStyle& style) const
         return;
 
     if (documentQuirks.needsBodyScrollbarWidthNoneDisabledQuirk() && is<HTMLBodyElement>(*m_element)) {
-        if (style.scrollbarWidth().isNone())
-            style.setScrollbarWidth(CSS::Keyword::Auto { });
+        if (style.scrollbarWidth() == ScrollbarWidth::None)
+            style.setScrollbarWidth(ScrollbarWidth::Auto);
     }
 
     if (documentQuirks.needsYouTubeOverflowScrollQuirk()) {

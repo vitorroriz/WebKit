@@ -3190,6 +3190,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     rendering/style/SVGRenderStyle.h
     rendering/style/SVGRenderStyleDefs.h
     rendering/style/StyleAppleColorFilterData.h
+    rendering/style/StyleBackdropFilterData.h
     rendering/style/StyleBackgroundData.h
     rendering/style/StyleBoxData.h
     rendering/style/StyleCachedImage.h

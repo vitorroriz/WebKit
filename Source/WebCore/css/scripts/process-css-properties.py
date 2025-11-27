@@ -5342,6 +5342,7 @@ class GenerateRenderStyleGenerated:
                 system_headers=[
                     "<WebCore/SVGRenderStyle.h>",
                     "<WebCore/StyleAppleColorFilterData.h>",
+                    "<WebCore/StyleBackdropFilterData.h>",
                     "<WebCore/StyleBackgroundData.h>",
                     "<WebCore/StyleBoxData.h>",
                     "<WebCore/StyleDeprecatedFlexibleBoxData.h>",

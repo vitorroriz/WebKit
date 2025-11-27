@@ -721,7 +721,7 @@ RenderLayer::OverflowControlRects RenderLayerScrollableArea::overflowControlsRec
     bool haveNonOverlayVerticalScrollbar = isNonOverlayScrollbar(vBar.get());
     bool placeVerticalScrollbarOnTheLeft = shouldPlaceVerticalScrollbarOnLeft();
     bool haveResizer = renderBox.style().resize() != Style::Resize::None && !renderBox.style().pseudoElementType();
-    bool scrollbarsAvoidCorner = ((haveNonOverlayHorizontalScrollbar && haveNonOverlayVerticalScrollbar) || (haveResizer && (haveNonOverlayHorizontalScrollbar || haveNonOverlayVerticalScrollbar))) && !renderBox.style().scrollbarWidth().isNone();
+    bool scrollbarsAvoidCorner = ((haveNonOverlayHorizontalScrollbar && haveNonOverlayVerticalScrollbar) || (haveResizer && (haveNonOverlayHorizontalScrollbar || haveNonOverlayVerticalScrollbar))) && renderBox.style().scrollbarWidth() != Style::ScrollbarWidth::None;
 
     IntSize cornerSize;
     if (scrollbarsAvoidCorner) {
@@ -1061,7 +1061,7 @@ Style::ScrollbarGutter RenderLayerScrollableArea::scrollbarGutterStyle()  const
 ScrollbarWidth RenderLayerScrollableArea::scrollbarWidthStyle()  const
 {
     if (m_layer.renderBox())
-        return m_layer.renderer().style().scrollbarWidth().platform();
+        return Style::toPlatform(m_layer.renderer().style().scrollbarWidth());
     return ScrollbarWidth::Auto;
 }
 
@@ -1574,7 +1574,7 @@ void RenderLayerScrollableArea::paintResizer(GraphicsContext& context, const Lay
     renderer.theme().paintPlatformResizer(renderer, context, resizerAbsRect);
 
     // Draw a frame around the resizer if there are any scrollbars present.
-    if (!hasOverlayScrollbars() && (m_vBar || m_hBar) && !renderer.style().scrollbarWidth().isNone())
+    if (!hasOverlayScrollbars() && (m_vBar || m_hBar) && renderer.style().scrollbarWidth() != Style::ScrollbarWidth::None)
         renderer.theme().paintPlatformResizerFrame(renderer, context, resizerAbsRect);
 }
 

@@ -53,6 +53,7 @@
 #include "StylePositionVisibility.h"
 #include "StyleResize.h"
 #include "StyleScrollBehavior.h"
+#include "StyleScrollbarWidth.h"
 #include "StyleSpeakAs.h"
 #include "StyleTextAlign.h"
 #include "StyleTextAlignLast.h"
@@ -2351,7 +2352,7 @@ DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE
 #undef FOR_EACH
 
-#define TYPE ScrollbarWidth
+#define TYPE Style::ScrollbarWidth
 #define FOR_EACH(CASE) CASE(Auto) CASE(Thin) CASE(None)
 DEFINE_TO_FROM_CSS_VALUE_ID_FUNCTIONS
 #undef TYPE

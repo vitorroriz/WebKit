@@ -369,9 +369,9 @@ void RenderBox::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle
 
     if (layer() && oldStyle && oldStyle->scrollbarWidth() != newStyle.scrollbarWidth()) {
         if (isDocElementRenderer)
-            view().frameView().scrollbarWidthChanged(newStyle.scrollbarWidth().platform());
+            view().frameView().scrollbarWidthChanged(Style::toPlatform(newStyle.scrollbarWidth()));
         else if (CheckedPtr scrollableArea = layer()->scrollableArea())
-            scrollableArea->scrollbarWidthChanged(newStyle.scrollbarWidth().platform());
+            scrollableArea->scrollbarWidthChanged(Style::toPlatform(newStyle.scrollbarWidth()));
     }
 
     if (layer() && oldStyle && oldStyle->scrollbarColor() != newStyle.scrollbarColor()) {

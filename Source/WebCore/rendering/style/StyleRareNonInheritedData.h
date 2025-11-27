@@ -96,9 +96,9 @@ namespace WebCore {
 using namespace CSS::Literals;
 
 class PathOperation;
+class StyleBackdropFilterData;
 class StyleCustomPropertyData;
 class StyleDeprecatedFlexibleBoxData;
-class StyleFilterData;
 class StyleFlexibleBoxData;
 class StyleGridData;
 class StyleGridItemData;
@@ -152,7 +152,7 @@ public:
 
     DataRef<StyleMarqueeData> marquee; // Marquee properties
 
-    DataRef<StyleFilterData> backdropFilter; // Filter operations (url, sepia, blur, etc.)
+    DataRef<StyleBackdropFilterData> backdropFilter; // Filter operations (url, sepia, blur, etc.)
 
     DataRef<StyleGridData> grid;
     DataRef<StyleGridItemData> gridItem;

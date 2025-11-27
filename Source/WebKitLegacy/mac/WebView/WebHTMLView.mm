@@ -6262,7 +6262,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     if (!frame || !frame->document() || !frame->document()->documentElement() || !frame->document()->documentElement()->renderer())
         return WebCore::ScrollbarWidth::Auto;
 
-    return frame->document()->documentElement()->renderer()->style().scrollbarWidth().platform();
+    return WebCore::Style::toPlatform(frame->document()->documentElement()->renderer()->style().scrollbarWidth());
 }
 
 @end

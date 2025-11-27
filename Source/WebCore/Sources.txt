@@ -2989,6 +2989,7 @@ rendering/style/RenderStyleConstants.cpp
 rendering/style/SVGRenderStyle.cpp
 rendering/style/SVGRenderStyleDefs.cpp
 rendering/style/StyleAppleColorFilterData.cpp
+rendering/style/StyleBackdropFilterData.cpp
 rendering/style/StyleBackgroundData.cpp
 rendering/style/StyleBoxData.cpp
 rendering/style/StyleCachedImage.cpp

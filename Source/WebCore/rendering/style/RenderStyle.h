@@ -343,7 +343,6 @@ struct ScrollSnapType;
 struct ScrollTimelines;
 struct ScrollbarColor;
 struct ScrollbarGutter;
-struct ScrollbarWidth;
 struct ShapeMargin;
 struct ShapeOutside;
 struct SpeakAs;
@@ -397,6 +396,7 @@ enum class Resize : uint8_t;
 enum class SVGGlyphOrientationHorizontal : uint8_t;
 enum class SVGGlyphOrientationVertical : uint8_t;
 enum class ScrollBehavior : bool;
+enum class ScrollbarWidth : uint8_t;
 enum class TextAlignLast : uint8_t;
 enum class TextAlign : uint8_t;
 enum class WebkitOverflowScrolling : bool;
@@ -904,8 +904,6 @@ public:
     inline StyleAppearance usedAppearance() const;
 
     inline const Style::AspectRatio& aspectRatio() const;
-    inline Style::Number<CSS::Nonnegative> aspectRatioWidth() const;
-    inline Style::Number<CSS::Nonnegative> aspectRatioHeight() const;
     inline Style::Number<CSS::Nonnegative> aspectRatioLogicalWidth() const;
     inline Style::Number<CSS::Nonnegative> aspectRatioLogicalHeight() const;
     inline double logicalAspectRatio() const;
@@ -1196,7 +1194,7 @@ public:
     inline Style::ScrollbarWidth scrollbarWidth() const;
 
 #if ENABLE(TOUCH_EVENTS)
-    inline Style::Color tapHighlightColor() const;
+    inline const Style::Color& tapHighlightColor() const;
 #endif
 
 #if ENABLE(WEBKIT_TOUCH_CALLOUT_CSS_PROPERTY)
@@ -1660,9 +1658,6 @@ public:
 
     void setPointerEvents(PointerEvents p) { m_inheritedFlags.pointerEvents = static_cast<unsigned>(p); }
 
-    inline void clearAnimations();
-    inline void clearTransitions();
-
     void adjustAnimations();
     void adjustTransitions();
     void adjustBackgroundLayers();
@@ -1975,8 +1970,8 @@ public:
     void setDisallowsFastPathInheritance() { m_nonInheritedFlags.disallowsFastPathInheritance = true; }
 
     inline void setMathDepth(Style::MathDepth);
-    inline void setMathShift(const MathShift&);
-    inline void setMathStyle(const MathStyle&);
+    inline void setMathShift(MathShift);
+    inline void setMathStyle(MathStyle);
 
     void setTextSpacingTrim(Style::TextSpacingTrim);
     void setTextAutospace(Style::TextAutospace);

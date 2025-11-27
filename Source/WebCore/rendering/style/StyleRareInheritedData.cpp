@@ -75,7 +75,7 @@ StyleRareInheritedData::StyleRareInheritedData()
     , appleColorFilter(StyleAppleColorFilterData::create())
     , lineGrid(RenderStyle::initialLineGrid())
     , tabSize(RenderStyle::initialTabSize())
-    , miterLimit(RenderStyle::initialStrokeMiterLimit())
+    , strokeMiterLimit(RenderStyle::initialStrokeMiterLimit())
 #if ENABLE(TEXT_AUTOSIZING)
     , textSizeAdjust(RenderStyle::initialTextSizeAdjust())
 #endif
@@ -106,7 +106,7 @@ StyleRareInheritedData::StyleRareInheritedData()
     , lineSnap(static_cast<unsigned>(RenderStyle::initialLineSnap()))
     , lineAlign(static_cast<unsigned>(RenderStyle::initialLineAlign()))
 #if ENABLE(WEBKIT_OVERFLOW_SCROLLING_CSS_PROPERTY)
-    , webkitOverflowScrolling(static_cast<unsigned>(RenderStyle::initialOverflowScrolling()))
+    , overflowScrolling(static_cast<unsigned>(RenderStyle::initialOverflowScrolling()))
 #endif
     , textAlignLast(static_cast<unsigned>(RenderStyle::initialTextAlignLast()))
     , textJustify(static_cast<unsigned>(RenderStyle::initialTextJustify()))
@@ -118,7 +118,7 @@ StyleRareInheritedData::StyleRareInheritedData()
     , rubyOverhang(static_cast<unsigned>(RenderStyle::initialRubyOverhang()))
     , textZoom(static_cast<unsigned>(RenderStyle::initialTextZoom()))
 #if ENABLE(WEBKIT_TOUCH_CALLOUT_CSS_PROPERTY)
-    , webkitTouchCallout(static_cast<unsigned>(RenderStyle::initialTouchCallout()))
+    , touchCallout(static_cast<unsigned>(RenderStyle::initialTouchCallout()))
 #endif
     , hangingPunctuation(RenderStyle::initialHangingPunctuation().toRaw())
     , paintOrder(static_cast<unsigned>(RenderStyle::initialPaintOrder().type()))
@@ -183,7 +183,7 @@ inline StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedDa
     , appleColorFilter(o.appleColorFilter)
     , lineGrid(o.lineGrid)
     , tabSize(o.tabSize)
-    , miterLimit(o.miterLimit)
+    , strokeMiterLimit(o.strokeMiterLimit)
 #if ENABLE(TEXT_AUTOSIZING)
     , textSizeAdjust(o.textSizeAdjust)
 #endif
@@ -214,7 +214,7 @@ inline StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedDa
     , lineSnap(o.lineSnap)
     , lineAlign(o.lineAlign)
 #if ENABLE(WEBKIT_OVERFLOW_SCROLLING_CSS_PROPERTY)
-    , webkitOverflowScrolling(o.webkitOverflowScrolling)
+    , overflowScrolling(o.overflowScrolling)
 #endif
     , textAlignLast(o.textAlignLast)
     , textJustify(o.textJustify)
@@ -226,7 +226,7 @@ inline StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedDa
     , rubyOverhang(o.rubyOverhang)
     , textZoom(o.textZoom)
 #if ENABLE(WEBKIT_TOUCH_CALLOUT_CSS_PROPERTY)
-    , webkitTouchCallout(o.webkitTouchCallout)
+    , touchCallout(o.touchCallout)
 #endif
     , hangingPunctuation(o.hangingPunctuation)
     , paintOrder(o.paintOrder)
@@ -284,7 +284,7 @@ bool StyleRareInheritedData::operator==(const StyleRareInheritedData& o) const
         && textUnderlineOffset == o.textUnderlineOffset
         && textBoxEdge == o.textBoxEdge
         && lineFitEdge == o.lineFitEdge
-        && miterLimit == o.miterLimit
+        && strokeMiterLimit == o.strokeMiterLimit
         && widows == o.widows
         && orphans == o.orphans
         && textSecurity == o.textSecurity
@@ -294,7 +294,7 @@ bool StyleRareInheritedData::operator==(const StyleRareInheritedData& o) const
         && nbspMode == o.nbspMode
         && lineBreak == o.lineBreak
 #if ENABLE(WEBKIT_OVERFLOW_SCROLLING_CSS_PROPERTY)
-        && webkitOverflowScrolling == o.webkitOverflowScrolling
+        && overflowScrolling == o.overflowScrolling
 #endif
 #if ENABLE(TEXT_AUTOSIZING)
         && textSizeAdjust == o.textSizeAdjust
@@ -312,7 +312,7 @@ bool StyleRareInheritedData::operator==(const StyleRareInheritedData& o) const
         && textEmphasisPosition == o.textEmphasisPosition
         && lineBoxContain == o.lineBoxContain
 #if ENABLE(WEBKIT_TOUCH_CALLOUT_CSS_PROPERTY)
-        && webkitTouchCallout == o.webkitTouchCallout
+        && touchCallout == o.touchCallout
 #endif
         && hyphenateCharacter == o.hyphenateCharacter
         && quotes == o.quotes
@@ -411,7 +411,7 @@ void StyleRareInheritedData::dumpDifferences(TextStream& ts, const StyleRareInhe
     LOG_IF_DIFFERENT(textBoxEdge);
     LOG_IF_DIFFERENT(lineFitEdge);
 
-    LOG_IF_DIFFERENT(miterLimit);
+    LOG_IF_DIFFERENT(strokeMiterLimit);
 
     LOG_IF_DIFFERENT(widows);
     LOG_IF_DIFFERENT(orphans);
@@ -441,7 +441,7 @@ void StyleRareInheritedData::dumpDifferences(TextStream& ts, const StyleRareInhe
     LOG_IF_DIFFERENT_WITH_CAST(LineAlign, lineAlign);
 
 #if ENABLE(WEBKIT_OVERFLOW_SCROLLING_CSS_PROPERTY)
-    LOG_IF_DIFFERENT_WITH_CAST(Style::WebkitOverflowScrolling, webkitOverflowScrolling);
+    LOG_IF_DIFFERENT_WITH_CAST(Style::WebkitOverflowScrolling, overflowScrolling);
 #endif
 
     LOG_IF_DIFFERENT_WITH_CAST(Style::TextAlignLast, textAlignLast);
@@ -455,7 +455,7 @@ void StyleRareInheritedData::dumpDifferences(TextStream& ts, const StyleRareInhe
     LOG_IF_DIFFERENT_WITH_CAST(TextZoom, textZoom);
 
 #if ENABLE(WEBKIT_TOUCH_CALLOUT_CSS_PROPERTY)
-    LOG_IF_DIFFERENT_WITH_CAST(Style::WebkitTouchCallout, webkitTouchCallout);
+    LOG_IF_DIFFERENT_WITH_CAST(Style::WebkitTouchCallout, touchCallout);
 #endif
 
     LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::HangingPunctuation, hangingPunctuation);
