@@ -4851,6 +4851,8 @@ webkit.org/b/298463 accessibility/crash-deleting-dynamically-updated-text-input.
 webkit.org/b/303124 media/media-source/media-source-changetype-vp8-vp9.html [ Failure ]
 webkit.org/b/303130 media/media-source/media-source-ended.html [ Failure ]
 
+webkit.org/b/303208 imported/blink/fast/pagination/viewport-y-horizontal-bt-rtl.html [ Pass ImageOnlyFailure ]
+
 # End: Common failures between GTK and WPE.
 
 #////////////////////////////////////////////////////////////////////////////////////////
