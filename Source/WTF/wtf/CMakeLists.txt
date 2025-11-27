@@ -7,6 +7,7 @@ set(WTF_PUBLIC_HEADERS
     AbstractRefCounted.h
     AbstractRefCountedAndCanMakeWeakPtr.h
     AbstractThreadSafeRefCountedAndCanMakeWeakPtr.h
+    AllocSpanMixin.h
     ASCIICType.h
     AccessibleAddress.h
     AggregateLogger.h
@@ -188,7 +189,7 @@ set(WTF_PUBLIC_HEADERS
     MessageQueue.h
     MetaAllocator.h
     MetaAllocatorHandle.h
-    Mmap.h
+    MmapSpan.h
     MonotonicTime.h
     NakedPtr.h
     NativePromise.h

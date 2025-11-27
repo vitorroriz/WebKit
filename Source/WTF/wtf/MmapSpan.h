@@ -28,29 +28,59 @@
 #if HAVE(MMAP)
 
 #include <sys/mman.h>
-#include <wtf/StdLibExtras.h>
+#include <wtf/AllocSpanMixin.h>
 
 namespace WTF {
 
-struct Mmap {
-    static void* mmap(void* addr, size_t size, int pageProtection, int options, int fileDescriptor)
+// RAII class for allocating and holding mmap memory with std::span access.
+template<typename T> class MmapSpan : public AllocSpanMixin<T> {
+public:
+    static MmapSpan tryAlloc(size_t sizeInBytes)
+    {
+        return mmap(nullptr, sizeInBytes, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1);
+    }
+
+    static MmapSpan mmap(void* addr, size_t size, int pageProtection, int options, int fileDescriptor)
     {
         auto* data = ::mmap(addr, size, pageProtection, options, fileDescriptor, 0);
         if (data == MAP_FAILED)
-            return nullptr;
+            return { };
         RELEASE_ASSERT((pageProtection & PROT_EXEC) || WTF_DATA_ADDRESS_IS_SANE(data));
-        return data;
+        return MmapSpan { data, size };
     }
 
-    static void free(void* data, size_t size)
+    MmapSpan() = default;
+    MmapSpan(MmapSpan&& other)
+        : AllocSpanMixin<T>(WTFMove(other))
     {
-        if (data)
-            munmap(data, size);
     }
+
+    template<typename U>
+    MmapSpan(MmapSpan<U>&& other) requires (std::is_same_v<T, uint8_t>)
+        : AllocSpanMixin<T>(asWritableBytes(other.leakSpan()))
+    {
+    }
+
+    ~MmapSpan()
+    {
+        auto data = this->mutableSpan();
+        if (data.data())
+            ::munmap(data.data(), data.size());
+    }
+
+    MmapSpan& operator=(MmapSpan&& other)
+    {
+        MmapSpan ptr { WTFMove(other) };
+        this->swap(ptr);
+        return *this;
+    }
+
+private:
+    using AllocSpanMixin<T>::AllocSpanMixin;
 };
 
 } // namespace WTF
 
-using WTF::Mmap;
+using WTF::MmapSpan;
 
 #endif // HAVE(MMAP)
