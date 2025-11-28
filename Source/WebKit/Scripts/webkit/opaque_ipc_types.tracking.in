@@ -266,12 +266,6 @@
     [NotSentFromWebContent] MessageParamReply NetworkConnectionToWebProcess.PerformSynchronousLoad data
 }
 
-[UnsafeWrapper] Vector<char> {
-    [Legacy] StructureParam WebKit::RTCNetwork.description
-    [Legacy] StructureParam WebKit::RTCNetwork.name
-    [Legacy] StructureParam WebKit::WebRTCNetwork::SocketAddress.hostname
-}
-
 [UnsafeWrapper] Vector<unsigned char> {
     [Legacy] StructureParam WebCore::SVGPathByteStream.bytes()
 }
