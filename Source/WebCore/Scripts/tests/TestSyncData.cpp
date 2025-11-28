@@ -24,44 +24,53 @@
 
 
 #include "config.h"
-#include "DocumentSyncData.h"
+#include "TestSyncData.h"
 
-#include "ProcessSyncData.h"
 #include <wtf/EnumTraits.h>
 
 namespace WebCore {
 
-void DocumentSyncData::update(const ProcessSyncData& data)
+void TestSyncData::update(const TestSyncSerializationData& data)
 {
     switch (data.type) {
-    case ProcessSyncDataType::IsAutofocusProcessed:
-        isAutofocusProcessed = std::get<enumToUnderlyingType(ProcessSyncDataType::IsAutofocusProcessed)>(data.value);
+    case TestSyncDataType::MainFrameURLChange:
+        mainFrameURLChange = std::get<enumToUnderlyingType(TestSyncDataType::MainFrameURLChange)>(data.value);
+        break;
+    case TestSyncDataType::IsAutofocusProcessed:
+        isAutofocusProcessed = std::get<enumToUnderlyingType(TestSyncDataType::IsAutofocusProcessed)>(data.value);
+        break;
+    case TestSyncDataType::UserDidInteractWithPage:
+        userDidInteractWithPage = std::get<enumToUnderlyingType(TestSyncDataType::UserDidInteractWithPage)>(data.value);
         break;
 #if ENABLE(DOM_AUDIO_SESSION)
-    case ProcessSyncDataType::AudioSessionType:
-        audioSessionType = std::get<enumToUnderlyingType(ProcessSyncDataType::AudioSessionType)>(data.value);
+    case TestSyncDataType::AudioSessionType:
+        audioSessionType = std::get<enumToUnderlyingType(TestSyncDataType::AudioSessionType)>(data.value);
         break;
 #endif
-    case ProcessSyncDataType::UserDidInteractWithPage:
-        userDidInteractWithPage = std::get<enumToUnderlyingType(ProcessSyncDataType::UserDidInteractWithPage)>(data.value);
+    case TestSyncDataType::AnotherOne:
+        anotherOne = std::get<enumToUnderlyingType(TestSyncDataType::AnotherOne)>(data.value);
         break;
     default:
         RELEASE_ASSERT_NOT_REACHED();
     }
 }
 
-DocumentSyncData::DocumentSyncData(
-      bool isAutofocusProcessed
+TestSyncData::TestSyncData(
+      URL mainFrameURLChange
+    , bool isAutofocusProcessed
+    , bool userDidInteractWithPage
 #if ENABLE(DOM_AUDIO_SESSION)
     , WebCore::DOMAudioSessionType audioSessionType
 #endif
-    , bool userDidInteractWithPage
+    , StringifyThis anotherOne
 )
-    : isAutofocusProcessed(isAutofocusProcessed)
+    : mainFrameURLChange(mainFrameURLChange)
+    , isAutofocusProcessed(isAutofocusProcessed)
+    , userDidInteractWithPage(userDidInteractWithPage)
 #if ENABLE(DOM_AUDIO_SESSION)
     , audioSessionType(audioSessionType)
 #endif
-    , userDidInteractWithPage(userDidInteractWithPage)
+    , anotherOne(anotherOne)
 {
 }
 

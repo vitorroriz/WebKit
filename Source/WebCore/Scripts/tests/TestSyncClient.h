@@ -22,31 +22,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
 
-#include "config.h"
-#include "FrameTreeSyncData.h"
-
-#include "ProcessSyncData.h"
-#include <wtf/EnumTraits.h>
+#include "DOMAudioSession.h"
+#include <wtf/URL.h>
+#include "StringifyThis"
+#include <wtf/TZoneMallocInlines.h>
 
 namespace WebCore {
 
-void FrameTreeSyncData::update(const ProcessSyncData& data)
-{
-    switch (data.type) {
-    case ProcessSyncDataType::AnotherOne:
-        anotherOne = std::get<enumToUnderlyingType(ProcessSyncDataType::AnotherOne)>(data.value);
-        break;
-    default:
-        RELEASE_ASSERT_NOT_REACHED();
-    }
-}
+class TestSyncData;
+struct TestSyncSerializationData;
 
-FrameTreeSyncData::FrameTreeSyncData(
-      StringifyThis anotherOne
-)
-    : anotherOne(anotherOne)
-{
-}
+class TestSyncClient {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(TestSyncClient);
+
+public:
+    TestSyncClient() = default;
+    virtual ~TestSyncClient() = default;
+
+    virtual void broadcastAllTestSyncDataToOtherProcesses(TestSyncData&) { }
+
+#if ENABLE(DOM_AUDIO_SESSION)
+    void broadcastAudioSessionTypeToOtherProcesses(const WebCore::DOMAudioSessionType&);
+#endif
+    void broadcastMainFrameURLChangeToOtherProcesses(const URL&);
+    void broadcastIsAutofocusProcessedToOtherProcesses(const bool&);
+    void broadcastUserDidInteractWithPageToOtherProcesses(const bool&);
+    void broadcastAnotherOneToOtherProcesses(const StringifyThis&);
+
+protected:
+    virtual void broadcastTestSyncDataToOtherProcesses(const TestSyncSerializationData&) { }
+};
 
 } // namespace WebCore

@@ -24,13 +24,50 @@
 
 #pragma once
 
-#include <WebCore/DOMAudioSession.h>
+#include <wtf/TZoneMallocInlines.h>
+#include <wtf/Ref.h>
+#include <wtf/RefCounted.h>
 #include <wtf/URL.h>
+#include "DOMAudioSession.h"
 #include "StringifyThis"
 
 namespace WebCore {
 
-enum class ProcessSyncDataType : uint8_t {
+struct TestSyncSerializationData;
+
+class TestSyncData : public RefCounted<TestSyncData> {
+WTF_MAKE_TZONE_ALLOCATED_INLINE(TestSyncData);
+public:
+    template<typename... Args>
+    static Ref<TestSyncData> create(Args&&... args)
+    {
+        return adoptRef(*new TestSyncData(std::forward<Args>(args)...));
+    }
+    static Ref<TestSyncData> create() { return adoptRef(*new TestSyncData); }
+    void update(const TestSyncSerializationData&);
+
+    URL mainFrameURLChange = { };
+    bool isAutofocusProcessed = { };
+    bool userDidInteractWithPage = { };
+#if ENABLE(DOM_AUDIO_SESSION)
+    WebCore::DOMAudioSessionType audioSessionType = { };
+#endif
+    StringifyThis anotherOne = { };
+
+private:
+    TestSyncData() = default;
+    WEBCORE_EXPORT TestSyncData(
+        URL
+      , bool
+      , bool
+#if ENABLE(DOM_AUDIO_SESSION)
+      , WebCore::DOMAudioSessionType
+#endif
+      , StringifyThis
+    );
+};
+
+enum class TestSyncDataType : uint8_t {
 #if ENABLE(DOM_AUDIO_SESSION)
     AudioSessionType = 0,
 #endif
@@ -40,23 +77,21 @@ enum class ProcessSyncDataType : uint8_t {
     AnotherOne = 4,
 };
 
-static const ProcessSyncDataType allDocumentSyncDataTypes[] = {
-    ProcessSyncDataType::IsAutofocusProcessed
+static const TestSyncDataType allTestSyncDataTypes[] = {
+    TestSyncDataType::MainFrameURLChange
+    , TestSyncDataType::IsAutofocusProcessed
+    , TestSyncDataType::UserDidInteractWithPage
 #if ENABLE(DOM_AUDIO_SESSION)
-    , ProcessSyncDataType::AudioSessionType
+    , TestSyncDataType::AudioSessionType
 #endif
-    , ProcessSyncDataType::UserDidInteractWithPage
-};
-
-static const ProcessSyncDataType allFrameTreeSyncDataTypes[] = {
-    ProcessSyncDataType::AnotherOne
+    , TestSyncDataType::AnotherOne
 };
 
 #if !ENABLE(DOM_AUDIO_SESSION)
 using DOMAudioSessionType = bool;
 #endif
 
-using ProcessSyncDataVariant = Variant<
+using TestSyncDataVariant = Variant<
     WebCore::DOMAudioSessionType,
     URL,
     bool,
@@ -64,9 +99,10 @@ using ProcessSyncDataVariant = Variant<
     StringifyThis
 >;
 
-struct ProcessSyncData {
-    ProcessSyncDataType type;
-    ProcessSyncDataVariant value;
+struct TestSyncSerializationData {
+    TestSyncDataType type;
+    TestSyncDataVariant value;
 };
 
-}; // namespace WebCore
+
+} // namespace WebCore

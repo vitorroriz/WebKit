@@ -1,4 +1,5 @@
-# Copyright (C) 2024 Apple Inc. All rights reserved.
+#
+# Copyright (C) 2025 Apple Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -19,9 +20,38 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
-MainFrameURLChange : URL [Header=<wtf/URL.h>]
-AudioSessionType : WebCore::DOMAudioSessionType [DocumentSyncData Conditional=ENABLE(DOM_AUDIO_SESSION) Header="DOMAudioSession.h"]
-IsAutofocusProcessed : bool [DocumentSyncData]
-UserDidInteractWithPage : bool [DocumentSyncData]
-AnotherOne : StringifyThis [FrameTreeSyncData Header="StringifyThis"]
+
+header: <WebCore/TestSyncData.h>
+
+[RefCounted] class WebCore::TestSyncData {
+    URL mainFrameURLChange;
+    bool isAutofocusProcessed;
+    bool userDidInteractWithPage;
+#if ENABLE(DOM_AUDIO_SESSION)
+    WebCore::DOMAudioSessionType audioSessionType;
+#endif
+    StringifyThis anotherOne;
+};
+
+enum class WebCore::TestSyncDataType : uint8_t {
+#if ENABLE(DOM_AUDIO_SESSION)
+    AudioSessionType,
+#endif
+    MainFrameURLChange,
+    IsAutofocusProcessed,
+    UserDidInteractWithPage,
+    AnotherOne,
+};
+ 
+#if !ENABLE(DOM_AUDIO_SESSION)
+using WebCore::DOMAudioSessionType = bool;
+#endif
+
+using WebCore::TestSyncDataVariant = Variant<WebCore::DOMAudioSessionType, URL, bool, bool, StringifyThis>;
+
+[CustomHeader] struct WebCore::TestSyncSerializationData {
+    WebCore::TestSyncDataType type;
+    WebCore::TestSyncDataVariant value;
+};
