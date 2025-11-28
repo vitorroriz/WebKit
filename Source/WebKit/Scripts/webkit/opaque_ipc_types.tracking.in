@@ -482,3 +482,5 @@
 [Legacy] StructureParam sk_sp<SkData>.dataReference() std::span<const uint8_t>
 [Legacy] StructureParam SkString.data() std::span<const char>
 [Legacy] StructureParam WebCore::CertificateInfo.certificateChain() Vector<Vector<uint8_t>>
+[Legacy] MessageParam RiceBackend.SendData data WebCore::SharedMemory::Handle
+[Legacy] MessageParam RiceBackendProxy.NotifyIncomingData data WebCore::SharedMemory::Handle

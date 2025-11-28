@@ -430,6 +430,10 @@ if (USE_LIBBACKTRACE)
     endif ()
 endif ()
 
+if (USE_GSTREAMER_WEBRTC)
+    set(USE_LIBRICE TRUE)
+endif ()
+
 # Override the cached variable, gtk-doc does not really work when building on Mac.
 if (APPLE)
     set(ENABLE_GTKDOC OFF)

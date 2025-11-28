@@ -261,6 +261,10 @@
 #import <pal/cocoa/EnhancedSecurityCocoa.h>
 #endif
 
+#if USE(LIBRICE)
+#include "RiceBackendProxy.h"
+#endif
+
 #if PLATFORM(MAC)
 #import <wtf/spi/darwin/SandboxSPI.h>
 #endif
@@ -2670,6 +2674,28 @@ void WebProcess::removeWebTransportSession(WebTransportSessionIdentifier identif
     ASSERT(m_webTransportSessions.contains(identifier));
     m_webTransportSessions.remove(identifier);
 }
+
+#if USE(LIBRICE)
+RefPtr<RiceBackendProxy> WebProcess::gstreamerIceBackend(RiceBackendIdentifier identifier)
+{
+    ASSERT(RunLoop::isMain());
+    return m_gstreamerIceBackends.get(identifier).get();
+}
+
+void WebProcess::addRiceBackend(RiceBackendIdentifier identifier, RiceBackendProxy& backend)
+{
+    ASSERT(RunLoop::isMain());
+    ASSERT(!m_gstreamerIceBackends.contains(identifier));
+    m_gstreamerIceBackends.set(identifier, backend);
+}
+
+void WebProcess::removeRiceBackend(RiceBackendIdentifier identifier)
+{
+    ASSERT(RunLoop::isMain());
+    ASSERT(m_gstreamerIceBackends.contains(identifier));
+    m_gstreamerIceBackends.remove(identifier);
+}
+#endif // USE(LIBRICE)
 
 void WebProcess::updateCachedCookiesEnabled()
 {
