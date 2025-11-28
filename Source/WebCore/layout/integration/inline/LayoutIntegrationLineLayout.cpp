@@ -884,7 +884,7 @@ LayoutUnit LineLayout::lastLineBaseline() const
         if (auto baseline = baselineForLineOrBlock(line))
             return *baseline;
     }
-    return baselineForLine(m_inlineContent->displayContent().lines.first());
+    return baselineForLine(m_inlineContent->displayContent().lines.last());
 }
 
 LayoutUnit LineLayout::baselineForLine(const InlineDisplay::Line& line) const
