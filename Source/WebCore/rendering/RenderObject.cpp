@@ -797,39 +797,6 @@ CheckedPtr<RenderBlock> RenderObject::checkedContainingBlock() const
     return containingBlock();
 }
 
-void RenderObject::addPDFURLRect(const PaintInfo& paintInfo, const LayoutPoint& paintOffset) const
-{
-    CheckedPtr elementRenderer = dynamicDowncast<RenderElement>(*this);
-    if (!elementRenderer)
-        return;
-
-    Vector<LayoutRect> focusRingRects;
-    OutlinePainter::collectFocusRingRects(*elementRenderer, focusRingRects, paintOffset, paintInfo.paintContainer);
-    LayoutRect urlRect = unionRect(focusRingRects);
-
-    if (urlRect.isEmpty())
-        return;
-
-    RefPtr element = dynamicDowncast<Element>(node());
-    if (!element || !element->isLink())
-        return;
-
-    const AtomString& href = element->getAttribute(hrefAttr);
-    if (href.isNull())
-        return;
-
-    if (paintInfo.context().supportsInternalLinks()) {
-        String outAnchorName;
-        RefPtr linkTarget = element->findAnchorElementForLink(outAnchorName);
-        if (linkTarget) {
-            paintInfo.context().setDestinationForRect(outAnchorName, urlRect);
-            return;
-        }
-    }
-
-    paintInfo.context().setURLForRect(element->protectedDocument()->completeURL(href), urlRect);
-}
-
 #if PLATFORM(IOS_FAMILY)
 // This function is similar in spirit to RenderText::absoluteRectsForRange, but returns rectangles
 // which are annotated with additional state which helps iOS draw selections in its unique way.
@@ -886,13 +853,12 @@ void RenderObject::absoluteFocusRingQuads(Vector<FloatQuad>& quads)
     if (!elementRenderer)
         return;
 
-    Vector<LayoutRect> rects;
     // FIXME: collectFocusRingRects() needs to be passed this transform-unaware
     // localToAbsolute() offset here because OutlinePainter::collectFocusRingRects()
     // implicitly assumes that. This doesn't work correctly with transformed
     // descendants.
     FloatPoint absolutePoint = localToAbsolute();
-    OutlinePainter::collectFocusRingRects(*elementRenderer, rects, flooredLayoutPoint(absolutePoint), nullptr);
+    auto rects = OutlinePainter::collectFocusRingRects(*elementRenderer, flooredLayoutPoint(absolutePoint), nullptr);
     float deviceScaleFactor = document().deviceScaleFactor();
     for (auto rect : rects) {
         rect.moveBy(LayoutPoint(-absolutePoint));

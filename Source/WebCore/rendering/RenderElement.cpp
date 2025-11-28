@@ -2119,9 +2119,9 @@ void RenderElement::paintOutline(PaintInfo& paintInfo, const LayoutRect& paintRe
 
 void RenderElement::issueRepaintForOutlineAuto(float outlineSize)
 {
+    auto focusRingRects = OutlinePainter::collectFocusRingRects(*this, LayoutPoint(), containerForRepaint().renderer.get());
+
     LayoutRect repaintRect;
-    Vector<LayoutRect> focusRingRects;
-    OutlinePainter::collectFocusRingRects(*this, focusRingRects, LayoutPoint(), containerForRepaint().renderer.get());
     for (auto rect : focusRingRects) {
         rect.inflate(outlineSize);
         repaintRect.unite(rect);

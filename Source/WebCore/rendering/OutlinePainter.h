@@ -38,17 +38,20 @@ public:
     void paintOutline(const RenderElement&, const LayoutRect& paintRect) const;
     void paintOutline(const RenderInline&, const LayoutPoint& paintOffset) const;
 
-    static void collectFocusRingRects(const RenderElement&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
+    static Vector<LayoutRect> collectFocusRingRects(const RenderElement&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
 
 private:
     void paintOutlineWithLineRects(const RenderInline&, const LayoutPoint& paintOffset, const Vector<LayoutRect>& lineRects) const;
     void paintFocusRing(const RenderElement&, const Vector<LayoutRect>&) const;
 
-    static void collectFocusRingRectsForInline(const RenderInline&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
-    static void collectFocusRingRectsForListBox(const RenderListBox&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
-    static void collectFocusRingRectsForBlock(const RenderBlock&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
-    static void collectFocusRingRectsForInlineChildren(const RenderBlockFlow&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
-    static void collectFocusRingRectsForChildBox(const RenderBox&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
+    static void collectFocusRingRects(const RenderElement&, Vector<LayoutRect>&, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer);
+    static void collectFocusRingRectsForInline(const RenderInline&, Vector<LayoutRect>&, const LayoutPoint&, const RenderLayerModelObject*);
+    static bool collectFocusRingRectsForListBox(const RenderListBox&, Vector<LayoutRect>&, const LayoutPoint&, const RenderLayerModelObject*);
+    static bool collectFocusRingRectsForBlock(const RenderBlock&, Vector<LayoutRect>&, const LayoutPoint&, const RenderLayerModelObject*);
+    static void collectFocusRingRectsForInlineChildren(const RenderBlockFlow&, Vector<LayoutRect>&, const LayoutPoint&, const RenderLayerModelObject*);
+    static void collectFocusRingRectsForChildBox(const RenderBox&, Vector<LayoutRect>&, const LayoutPoint&, const RenderLayerModelObject*);
+
+    void addPDFURLAnnotationForLink(const RenderElement&, const LayoutPoint& paintOffset) const;
 
     const PaintInfo& m_paintInfo;
 };

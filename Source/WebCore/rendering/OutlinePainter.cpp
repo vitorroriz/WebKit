@@ -33,6 +33,7 @@
 #include "FloatRoundedRect.h"
 #include "GeometryUtilities.h"
 #include "GraphicsContext.h"
+#include "HTMLNames.h"
 #include "HTMLSelectElement.h"
 #include "InlineIteratorInlineBox.h"
 #include "InlineIteratorLineBox.h"
@@ -64,21 +65,22 @@ static float deviceScaleFactor(const RenderElement& renderer)
 void OutlinePainter::paintOutline(const RenderElement& renderer, const LayoutRect& paintRect) const
 {
     CheckedRef styleToUse = renderer.style();
+    auto hasThemedFocusRing = renderer.theme().supportsFocusRing(renderer, styleToUse.get());
 
     // Only paint the focus ring by hand if the theme isn't able to draw it.
-    if (styleToUse->outlineStyle() == OutlineStyle::Auto && !renderer.theme().supportsFocusRing(renderer, styleToUse.get())) {
-        Vector<LayoutRect> focusRingRects;
+    if (styleToUse->outlineStyle() == OutlineStyle::Auto && !hasThemedFocusRing) {
         LayoutRect paintRectToUse { paintRect };
         if (CheckedPtr box = dynamicDowncast<RenderBox>(renderer))
             paintRectToUse = renderer.theme().adjustedPaintRect(*box, paintRectToUse);
         CheckedPtr paintContainer = m_paintInfo.paintContainer;
-        collectFocusRingRects(renderer, focusRingRects, paintRectToUse.location(), paintContainer.get());
+        auto focusRingRects = collectFocusRingRects(renderer, paintRectToUse.location(), paintContainer.get());
 
         paintFocusRing(renderer, focusRingRects);
+        return;
     }
 
-    if (renderer.hasOutlineAnnotation() && styleToUse->outlineStyle() != OutlineStyle::Auto && !renderer.theme().supportsFocusRing(renderer, styleToUse.get()))
-        renderer.addPDFURLRect(m_paintInfo, paintRect.location());
+    if (renderer.hasOutlineAnnotation() && !hasThemedFocusRing)
+        addPDFURLAnnotationForLink(renderer, paintRect.location());
 
     auto borderStyle = toBorderStyle(styleToUse->outlineStyle());
     if (!borderStyle || *borderStyle == BorderStyle::None)
@@ -123,18 +125,16 @@ void OutlinePainter::paintOutline(const RenderInline& renderer, const LayoutPoin
     if (!styleToUse->hasOutline())
         return;
 
-    // Only paint the focus ring by hand if the theme isn't able to draw it.
     if (styleToUse->outlineStyle() == OutlineStyle::Auto) {
-        Vector<LayoutRect> focusRingRects;
         CheckedPtr paintContainer = m_paintInfo.paintContainer;
-        collectFocusRingRects(renderer, focusRingRects, paintOffset, paintContainer.get());
+        auto focusRingRects = collectFocusRingRects(renderer, paintOffset, paintContainer.get());
 
         paintFocusRing(renderer, focusRingRects);
         return;
     }
 
     if (renderer.hasOutlineAnnotation())
-        renderer.addPDFURLRect(m_paintInfo, paintOffset);
+        addPDFURLAnnotationForLink(renderer, paintOffset);
 
     if (m_paintInfo.context().paintingDisabled())
         return;
@@ -276,6 +276,13 @@ void OutlinePainter::paintFocusRing(const RenderElement& renderer, const Vector<
         drawFocusRing(m_paintInfo.context(), pixelSnappedFocusRingRects, style.get(), focusRingColor);
 }
 
+Vector<LayoutRect> OutlinePainter::collectFocusRingRects(const RenderElement& renderer, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer)
+{
+    Vector<LayoutRect> rects;
+    collectFocusRingRects(renderer, rects, additionalOffset, paintContainer);
+    return rects;
+}
+
 static void appendIfNotEmpty(Vector<LayoutRect>& rects, LayoutRect&& rect)
 {
     if (rect.isEmpty())
@@ -298,26 +305,21 @@ void OutlinePainter::collectFocusRingRects(const RenderElement& renderer, Vector
         return;
     }
     if (CheckedPtr listBox = dynamicDowncast<RenderListBox>(renderer)) {
-        if (listBox->selectElement().allowsNonContiguousSelection()) {
-            collectFocusRingRectsForListBox(*listBox, rects, additionalOffset, paintContainer);
+        if (collectFocusRingRectsForListBox(*listBox, rects, additionalOffset, paintContainer))
             return;
-        }
     }
     if (CheckedPtr block = dynamicDowncast<RenderBlock>(renderer)) {
-        if (!block->isRenderTextControl()) {
-            collectFocusRingRectsForBlock(*block, rects, additionalOffset, paintContainer);
+        if (collectFocusRingRectsForBlock(*block, rects, additionalOffset, paintContainer))
             return;
-        }
     }
-    if (CheckedPtr box = dynamicDowncast<RenderBox>(renderer)) {
+    if (CheckedPtr box = dynamicDowncast<RenderBox>(renderer))
         appendIfNotEmpty(rects, { additionalOffset, box->size() });
-        return;
-    }
 }
 
-void OutlinePainter::collectFocusRingRectsForListBox(const RenderListBox& renderer, Vector<LayoutRect>& rects, const LayoutPoint& additionalOffset, const RenderLayerModelObject*)
+bool OutlinePainter::collectFocusRingRectsForListBox(const RenderListBox& renderer, Vector<LayoutRect>& rects, const LayoutPoint& additionalOffset, const RenderLayerModelObject*)
 {
-    ASSERT(renderer.selectElement().allowsNonContiguousSelection());
+    if (!renderer.selectElement().allowsNonContiguousSelection())
+        return false;
 
     CheckedRef selectElement = renderer.selectElement();
 
@@ -325,7 +327,7 @@ void OutlinePainter::collectFocusRingRectsForListBox(const RenderListBox& render
     int selectedItem = selectElement->activeSelectionEndListIndex();
     if (selectedItem >= 0) {
         rects.append(snappedIntRect(renderer.itemBoundingBoxRect(additionalOffset, selectedItem)));
-        return;
+        return true;
     }
 
     // No selected items, find the first non-disabled item.
@@ -334,10 +336,11 @@ void OutlinePainter::collectFocusRingRectsForListBox(const RenderListBox& render
         if (is<HTMLOptionElement>(item.get()) && !item->isDisabledFormControl()) {
             selectElement->setActiveSelectionEndIndex(indexOfFirstEnabledOption);
             rects.append(renderer.itemBoundingBoxRect(additionalOffset, indexOfFirstEnabledOption));
-            return;
+            return true;
         }
         indexOfFirstEnabledOption++;
     }
+    return true;
 }
 
 void OutlinePainter::collectFocusRingRectsForInline(const RenderInline& renderer, Vector<LayoutRect>& rects, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer)
@@ -364,8 +367,11 @@ void OutlinePainter::collectFocusRingRectsForInline(const RenderInline& renderer
     }
 }
 
-void OutlinePainter::collectFocusRingRectsForBlock(const RenderBlock& renderer, Vector<LayoutRect>& rects, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer)
+bool OutlinePainter::collectFocusRingRectsForBlock(const RenderBlock& renderer, Vector<LayoutRect>& rects, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer)
 {
+    if (renderer.isRenderTextControl())
+        return false;
+
     // For blocks inside inlines, we include margins so that we run right up to the inline boxes
     // above and below us (thus getting merged with them to form a single irregular shape).
     CheckedPtr inlineContinuation = renderer.inlineContinuation();
@@ -393,6 +399,7 @@ void OutlinePainter::collectFocusRingRectsForBlock(const RenderBlock& renderer, 
 
     if (inlineContinuation)
         collectFocusRingRects(*inlineContinuation, rects, flooredLayoutPoint(LayoutPoint(additionalOffset + inlineContinuation->containingBlock()->location() - renderer.location())), paintContainer);
+    return true;
 }
 
 void OutlinePainter::collectFocusRingRectsForChildBox(const RenderBox& box, Vector<LayoutRect>& rects, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer)
@@ -441,6 +448,34 @@ void OutlinePainter::collectFocusRingRectsForInlineChildren(const RenderBlockFlo
             collectFocusRingRectsForChildBox(renderBox, rects, additionalOffset, paintContainer);
         }
     }
+}
+
+void OutlinePainter::addPDFURLAnnotationForLink(const RenderElement& renderer, const LayoutPoint& paintOffset) const
+{
+    RefPtr element = renderer.element();
+    if (!element || !element->isLink())
+        return;
+
+    CheckedPtr paintContainer = m_paintInfo.paintContainer;
+    auto focusRingRects = collectFocusRingRects(renderer, paintOffset, paintContainer.get());
+    LayoutRect urlRect = unionRect(focusRingRects);
+
+    if (urlRect.isEmpty())
+        return;
+
+    auto href = element->getAttribute(HTMLNames::hrefAttr);
+    if (href.isNull())
+        return;
+
+    if (m_paintInfo.context().supportsInternalLinks()) {
+        String outAnchorName;
+        RefPtr linkTarget = element->findAnchorElementForLink(outAnchorName);
+        if (linkTarget) {
+            m_paintInfo.context().setDestinationForRect(outAnchorName, urlRect);
+            return;
+        }
+    }
+    m_paintInfo.context().setURLForRect(element->protectedDocument()->completeURL(href), urlRect);
 }
 
 }

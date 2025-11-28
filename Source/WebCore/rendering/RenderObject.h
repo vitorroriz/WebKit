@@ -1084,8 +1084,6 @@ public:
     virtual String description() const;
     virtual String debugDescription() const;
 
-    void addPDFURLRect(const PaintInfo&, const LayoutPoint&) const;
-
     bool isSkippedContent() const;
 
     PointerEvents usedPointerEvents() const;
