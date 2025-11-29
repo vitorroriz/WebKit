@@ -108,6 +108,7 @@ public:
     bool hasContentAfterEllipsisBox() const { return m_hasContentAfterEllipsisBox; }
     void setHasContentAfterEllipsisBox() { m_hasContentAfterEllipsisBox = true; }
 
+    bool hasInlineContent() const { return hasInflowContent() && !hasBlockLevelContent(); }
     bool hasBlockLevelContent() const { return m_hasBlockLevelContent; }
 
     void setFirstBoxIndex(size_t firstBoxIndex) { m_firstBoxIndex = firstBoxIndex; }

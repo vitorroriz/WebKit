@@ -816,6 +816,31 @@ LayoutUnit LineLayout::contentLogicalHeight() const
     return LayoutUnit { contentHeight + offsetAndGaps };
 }
 
+bool LineLayout::isSelfCollapsingContent() const
+{
+    if (!m_inlineContent || !m_inlineContent->hasInflowContent())
+        return true;
+
+    auto& displayContent = m_inlineContent->displayContent();
+    for (auto& line : displayContent.lines) {
+        if (line.hasInlineContent())
+            return false;
+        if (line.hasBlockLevelContent()) {
+            auto blockLevelBox = [&]() -> RenderBox* {
+                for (auto index = line.firstBoxIndex(); index < line.lastBoxIndex(); ++index) {
+                    if (displayContent.boxes[index].isBlockLevelBox())
+                        return dynamicDowncast<RenderBox>(displayContent.boxes[index].layoutBox().rendererForIntegration());
+                    ASSERT(displayContent.boxes[index].isInlineBox());
+                }
+                return { };
+            };
+            if (auto* renderBox = blockLevelBox(); renderBox && !renderBox->isSelfCollapsingBlock())
+                return false;
+        }
+    }
+    return true;
+}
+
 size_t LineLayout::lineCount() const
 {
     if (!m_inlineContent)

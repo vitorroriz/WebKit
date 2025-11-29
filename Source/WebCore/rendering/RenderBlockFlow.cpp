@@ -1405,7 +1405,14 @@ bool RenderBlockFlow::childrenPreventSelfCollapsing() const
     if (!childrenInline())
         return RenderBlock::childrenPreventSelfCollapsing();
 
-    return hasLines();
+    if (inlineLayout())
+        return !inlineLayout()->isSelfCollapsingContent();
+
+    if (svgTextLayout())
+        return svgTextLayout()->lineCount();
+
+    // Containers with no children.
+    return false;
 }
 
 LayoutUnit RenderBlockFlow::collapseMargins(RenderBox& child, MarginInfo& marginInfo)
