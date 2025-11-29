@@ -825,7 +825,7 @@ bool LineLayout::isSelfCollapsingContent() const
     for (auto& line : displayContent.lines) {
         if (line.hasInlineContent())
             return false;
-        if (line.hasBlockLevelContent()) {
+        if (line.hasBlockContent()) {
             auto blockLevelBox = [&]() -> RenderBox* {
                 for (auto index = line.firstBoxIndex(); index < line.lastBoxIndex(); ++index) {
                     if (displayContent.boxes[index].isBlockLevelBox())

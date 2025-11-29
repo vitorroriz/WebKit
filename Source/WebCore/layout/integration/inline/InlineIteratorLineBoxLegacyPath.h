@@ -77,7 +77,7 @@ public:
     const RenderBlockFlow& formattingContextRoot() const { return m_rootInlineBox->blockFlow(); }
 
     bool isFirstAfterPageBreak() const { return false; }
-    bool hasBlockLevelContent() const { return false; }
+    bool hasBlockContent() const { return false; }
 
     size_t lineIndex() const
     {

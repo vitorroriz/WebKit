@@ -183,7 +183,7 @@ RenderObject::HighlightState LineBox::ellipsisSelectionState() const
 
 LeafBoxIterator LineBox::blockLevelBox() const
 {
-    if (!hasBlockLevelContent())
+    if (!hasBlockContent())
         return { };
     auto blockBox = lineRightmostLeafBox();
     if (!blockBox || !blockBox->isBlockLevelBox()) {

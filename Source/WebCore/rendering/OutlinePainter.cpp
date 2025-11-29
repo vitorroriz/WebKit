@@ -420,12 +420,12 @@ void OutlinePainter::collectFocusRingRectsForInlineChildren(const RenderBlockFlo
 {
     ASSERT(renderer.childrenInline());
 
-    bool hasBlockLevelContent = false;
+    bool hasBlockContent = false;
 
     for (auto box = InlineIterator::firstRootInlineBoxFor(renderer); box; box.traverseInlineBoxLineRightward()) {
         auto lineBox = box->lineBox();
-        if (lineBox->hasBlockLevelContent()) {
-            hasBlockLevelContent = true;
+        if (lineBox->hasBlockContent()) {
+            hasBlockContent = true;
             continue;
         }
         // FIXME: This is mixing physical and logical coordinates.
@@ -439,7 +439,7 @@ void OutlinePainter::collectFocusRingRectsForInlineChildren(const RenderBlockFlo
         appendIfNotEmpty(rects, WTFMove(rect));
     }
 
-    if (hasBlockLevelContent) {
+    if (hasBlockContent) {
         for (auto line = InlineIterator::firstLineBoxFor(renderer); line; line.traverseNext()) {
             auto blockLevelBox = line->blockLevelBox();
             if (!blockLevelBox)

@@ -42,7 +42,7 @@ public:
         float top { 0 };
         float bottom { 0 };
     };
-    Line(bool hasInflowContent, const FloatRect& lineBoxLogicalRect, const FloatRect& lineBoxRect, const FloatRect& contentOverflow, EnclosingTopAndBottom, float alignmentBaseline, FontBaseline baselineType, float contentLogicalLeft, float contentLogicalLeftIgnoringInlineDirection, float contentLogicalWidth, bool isLeftToRightDirection, bool isHorizontal, bool isTruncatedInBlockDirection, bool hasBlockLevelContent);
+    Line(bool hasInflowContent, const FloatRect& lineBoxLogicalRect, const FloatRect& lineBoxRect, const FloatRect& contentOverflow, EnclosingTopAndBottom, float alignmentBaseline, FontBaseline baselineType, float contentLogicalLeft, float contentLogicalLeftIgnoringInlineDirection, float contentLogicalWidth, bool isLeftToRightDirection, bool isHorizontal, bool isTruncatedInBlockDirection, bool hasBlockContent);
 
     // FIXME: We should consider having 2 APIs here where (webkit.org/b/302804)
     // "hasInflowContent" returns true for all inflow content including non-contentful inflow content e.g. <span></span>
@@ -108,8 +108,8 @@ public:
     bool hasContentAfterEllipsisBox() const { return m_hasContentAfterEllipsisBox; }
     void setHasContentAfterEllipsisBox() { m_hasContentAfterEllipsisBox = true; }
 
-    bool hasInlineContent() const { return hasInflowContent() && !hasBlockLevelContent(); }
-    bool hasBlockLevelContent() const { return m_hasBlockLevelContent; }
+    bool hasInlineContent() const { return hasInflowContent() && !hasBlockContent(); }
+    bool hasBlockContent() const { return m_hasBlockContent; }
 
     void setFirstBoxIndex(size_t firstBoxIndex) { m_firstBoxIndex = firstBoxIndex; }
     void setBoxCount(size_t boxCount) { m_boxCount = boxCount; }
@@ -147,11 +147,11 @@ private:
     bool m_isFullyTruncatedInBlockDirection : 1 { false };
     bool m_hasContentAfterEllipsisBox : 1 { false };
     bool m_hasInflowContent : 1 { false };
-    bool m_hasBlockLevelContent : 1 { false };
+    bool m_hasBlockContent : 1 { false };
     std::optional<Ellipsis> m_ellipsis { };
 };
 
-inline Line::Line(bool hasInflowContent, const FloatRect& lineBoxLogicalRect, const FloatRect& lineBoxRect, const FloatRect& contentOverflow, EnclosingTopAndBottom enclosingLogicalTopAndBottom, float alignmentBaseline, FontBaseline baselineType, float contentLogicalLeft, float contentLogicalLeftIgnoringInlineDirection, float contentLogicalWidth, bool isLeftToRightDirection, bool isHorizontal, bool isTruncatedInBlockDirection, bool hasBlockLevelContent)
+inline Line::Line(bool hasInflowContent, const FloatRect& lineBoxLogicalRect, const FloatRect& lineBoxRect, const FloatRect& contentOverflow, EnclosingTopAndBottom enclosingLogicalTopAndBottom, float alignmentBaseline, FontBaseline baselineType, float contentLogicalLeft, float contentLogicalLeftIgnoringInlineDirection, float contentLogicalWidth, bool isLeftToRightDirection, bool isHorizontal, bool isTruncatedInBlockDirection, bool hasBlockContent)
     : m_lineBoxRect(lineBoxRect)
     , m_lineBoxLogicalRect(lineBoxLogicalRect)
     , m_contentOverflow(contentOverflow)
@@ -165,7 +165,7 @@ inline Line::Line(bool hasInflowContent, const FloatRect& lineBoxLogicalRect, co
     , m_isHorizontal(isHorizontal)
     , m_isFullyTruncatedInBlockDirection(isTruncatedInBlockDirection)
     , m_hasInflowContent(hasInflowContent)
-    , m_hasBlockLevelContent(hasBlockLevelContent)
+    , m_hasBlockContent(hasBlockContent)
 {
 }
 

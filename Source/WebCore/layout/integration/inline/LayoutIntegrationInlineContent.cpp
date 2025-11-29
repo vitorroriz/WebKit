@@ -148,7 +148,7 @@ std::optional<size_t> InlineContent::firstBoxIndexForLayoutBox(const Layout::Box
 // Returns a block level box if the line is for block-in-inline.
 const InlineDisplay::Box* InlineContent::blockLevelBoxForLine(const InlineDisplay::Line& line) const
 {
-    if (!line.hasBlockLevelContent())
+    if (!line.hasBlockContent())
         return nullptr;
     auto& lastBox = displayContent().boxes[line.lastBoxIndex()];
     ASSERT(lastBox.isBlockLevelBox());
@@ -159,7 +159,7 @@ bool InlineContent::isInlineBoxWrapperForBlockLevelBox(const InlineDisplay::Box&
 {
     if (!box.isInlineBox() || !m_hasBlockLevelBoxes)
         return false;
-    return lineForBox(box).hasBlockLevelContent();
+    return lineForBox(box).hasBlockContent();
 }
 
 const Vector<size_t>& InlineContent::nonRootInlineBoxIndexesForLayoutBox(const Layout::Box& layoutBox) const
