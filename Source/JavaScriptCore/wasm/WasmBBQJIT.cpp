@@ -2467,6 +2467,7 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::addI32Rotl(Value lhs, Value rhs, Value&
     EMIT_BINARY(
         "I32Rotl", TypeKind::I32,
         BLOCK(Value::fromI32(B3::rotateLeft(lhs.asI32(), rhs.asI32()))),
+#if CPU(X86_64)
         BLOCK(
             moveShiftAmountIfNecessary(rhsLocation);
             m_jit.rotateLeft32(lhsLocation.asGPR(), rhsLocation.asGPR(), resultLocation.asGPR());
@@ -2480,6 +2481,23 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::addI32Rotl(Value lhs, Value rhs, Value&
                 m_jit.rotateLeft32(resultLocation.asGPR(), rhsLocation.asGPR(), resultLocation.asGPR());
             }
         )
+#else
+        BLOCK(
+            moveShiftAmountIfNecessary(rhsLocation);
+            m_jit.neg32(rhsLocation.asGPR(), wasmScratchGPR);
+            m_jit.rotateRight32(lhsLocation.asGPR(), wasmScratchGPR, resultLocation.asGPR());
+        ),
+        BLOCK(
+            if (rhs.isConst())
+                m_jit.rotateRight32(lhsLocation.asGPR(), m_jit.trustedImm32ForShift(Imm32(-rhs.asI32())), resultLocation.asGPR());
+            else {
+                moveShiftAmountIfNecessary(rhsLocation);
+                m_jit.neg32(rhsLocation.asGPR(), wasmScratchGPR);
+                emitMoveConst(lhs, resultLocation);
+                m_jit.rotateRight32(resultLocation.asGPR(), wasmScratchGPR, resultLocation.asGPR());
+            }
+        )
+#endif
     );
 }
 

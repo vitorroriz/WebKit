@@ -2575,6 +2575,7 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::addI64Rotl(Value lhs, Value rhs, Value&
     EMIT_BINARY(
         "I64Rotl", TypeKind::I64,
         BLOCK(Value::fromI64(B3::rotateLeft(lhs.asI64(), rhs.asI64()))),
+#if CPU(X86_64)
         BLOCK(
             moveShiftAmountIfNecessary(rhsLocation);
             m_jit.rotateLeft64(lhsLocation.asGPR(), rhsLocation.asGPR(), resultLocation.asGPR());
@@ -2588,6 +2589,23 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::addI64Rotl(Value lhs, Value rhs, Value&
                 m_jit.rotateLeft64(resultLocation.asGPR(), rhsLocation.asGPR(), resultLocation.asGPR());
             }
         )
+#else
+        BLOCK(
+            moveShiftAmountIfNecessary(rhsLocation);
+            m_jit.neg64(rhsLocation.asGPR(), wasmScratchGPR);
+            m_jit.rotateRight64(lhsLocation.asGPR(), wasmScratchGPR, resultLocation.asGPR());
+        ),
+        BLOCK(
+            if (rhs.isConst())
+                m_jit.rotateRight64(lhsLocation.asGPR(), TrustedImm32(-rhs.asI64()), resultLocation.asGPR());
+            else {
+                moveShiftAmountIfNecessary(rhsLocation);
+                m_jit.neg64(rhsLocation.asGPR(), wasmScratchGPR);
+                emitMoveConst(lhs, resultLocation);
+                m_jit.rotateRight64(resultLocation.asGPR(), wasmScratchGPR, resultLocation.asGPR());
+            }
+        )
+#endif
     );
 }
 
