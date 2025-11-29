@@ -834,7 +834,7 @@ constexpr Style::TextAutospace RenderStyle::initialTextAutospace() { return CSS:
 constexpr TextRenderingMode RenderStyle::initialTextRendering() { return TextRenderingMode::AutoTextRendering; }
 constexpr Style::TextSpacingTrim RenderStyle::initialTextSpacingTrim() { return CSS::Keyword::SpaceAll { }; }
 inline Style::GridTrackSizes RenderStyle::initialGridAutoColumns() { return CSS::Keyword::Auto { }; }
-constexpr Style::GridAutoFlow RenderStyle::initialGridAutoFlow() { return CSS::Keyword::Row { }; }
+constexpr Style::GridAutoFlow RenderStyle::initialGridAutoFlow() { return CSS::Keyword::Normal { }; }
 inline Style::GridTrackSizes RenderStyle::initialGridAutoRows() { return CSS::Keyword::Auto { }; }
 inline Style::GridPosition RenderStyle::initialGridItemColumnEnd() { return CSS::Keyword::Auto { }; }
 inline Style::GridPosition RenderStyle::initialGridItemColumnStart() { return CSS::Keyword::Auto { }; }

@@ -28,6 +28,7 @@
 
 #include <WebCore/BoxExtents.h>
 #include <WebCore/PseudoElementIdentifier.h>
+#include <WebCore/StyleGridAutoFlow.h>
 #include <WebCore/StylePrimitiveNumeric+Forward.h>
 #include <WebCore/WritingMode.h>
 #include <unicode/utypes.h>
@@ -266,7 +267,6 @@ struct FontVariationSettings;
 struct FontWeight;
 struct FontWidth;
 struct GapGutter;
-struct GridAutoFlow;
 struct GridPosition;
 struct GridTemplateAreas;
 struct GridTemplateList;
@@ -1565,6 +1565,7 @@ public:
     inline void setBoxDecorationBreak(BoxDecorationBreak);
 
     inline void setGridAutoFlow(Style::GridAutoFlow);
+    inline void setGridAutoFlowDirection(Style::GridAutoFlow::Direction);
     inline void setGridAutoColumns(Style::GridTrackSizes&&);
     inline void setGridAutoRows(Style::GridTrackSizes&&);
     inline void setGridTemplateAreas(Style::GridTemplateAreas&&);

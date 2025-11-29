@@ -134,7 +134,7 @@ static OptionSet<GridAvoidanceReason> gridLayoutAvoidanceReason(const RenderGrid
     if (!renderGrid.firstInFlowChild())
         ADD_REASON_AND_RETURN_IF_NEEDED(GridIsEmpty, reasons, reasonCollectionMode);
 
-    if (renderGridStyle->gridAutoFlow() != RenderStyle::initialGridAutoFlow())
+    if (!renderGridStyle->gridAutoFlow().isRow() || !renderGridStyle->gridAutoFlow().isSparse())
         ADD_REASON_AND_RETURN_IF_NEEDED(GridHasNonInitialGridAutoFlow, reasons, reasonCollectionMode);
 
     // Check for non-fixed gaps. GFC currently only supports fixed-length gaps.

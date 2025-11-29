@@ -10661,12 +10661,13 @@
             "animation-type": "discrete",
             "initial": "row",
             "codegen-properties": {
+                "style-extractor-custom": true,
                 "style-converter": "StyleType<GridAutoFlow>",
                 "render-style-storage-path": ["m_nonInheritedData", "rareData", "grid"],
                 "render-style-storage-kind": "value",
                 "render-style-type": "Style::GridAutoFlow",
                 "parser-function": "consumeGridAutoFlow",
-                "parser-grammar-unused": "[ row | column ] || dense",
+                "parser-grammar-unused": "normal | [ [ row | column ] || dense ]",
                 "parser-grammar-unused-reason": "Needs support for transforming parsed input to minimal form."
             },
             "specification": {

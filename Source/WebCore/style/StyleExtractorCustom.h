@@ -85,6 +85,7 @@ public:
     static Ref<CSSValue> extractTranslate(ExtractorState&);
     static Ref<CSSValue> extractScale(ExtractorState&);
     static Ref<CSSValue> extractRotate(ExtractorState&);
+    static Ref<CSSValue> extractGridAutoFlow(ExtractorState&);
     static Ref<CSSValue> extractGridTemplateColumns(ExtractorState&);
     static Ref<CSSValue> extractGridTemplateRows(ExtractorState&);
     static Ref<CSSValue> extractAnimationDuration(ExtractorState&);
@@ -179,6 +180,7 @@ public:
     static void extractTranslateSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractScaleSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractRotateSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
+    static void extractGridAutoFlowSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractGridTemplateColumnsSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractGridTemplateRowsSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
     static void extractAnimationDurationSerialization(ExtractorState&, StringBuilder&, const CSS::SerializationContext&);
@@ -830,6 +832,43 @@ template<> struct PropertyExtractorAdaptor<CSSPropertyMinWidth> {
     template<typename F> decltype(auto) computedValue(ExtractorState& state, F&& functor) const
     {
         return MinimumSizeSharedAdaptor<CSSPropertyMinWidth> { }.computedValue(state, state.style.minWidth(), std::forward<F>(functor));
+    }
+};
+
+template<> struct PropertyExtractorAdaptor<CSSPropertyGridAutoFlow> {
+    template<typename F> decltype(auto) computedValue(ExtractorState& state, F&& functor) const
+    {
+        // FIXME: Adjust this once CSSWG clarifies exactly how the initial value should compute.
+        // For now, this gives the most backwards-compatible behavior.
+        auto gridFlow = state.style.gridAutoFlow();
+        switch (gridFlow.direction()) {
+        case GridAutoFlow::Direction::Column:
+            switch (gridFlow.packing()) {
+            case GridAutoFlow::Packing::Dense:
+                return functor(SpaceSeparatedTuple { CSS::Keyword::Column { }, CSS::Keyword::Dense { } });
+            case GridAutoFlow::Packing::Sparse:
+                return functor(CSS::Keyword::Column { });
+            }
+        case GridAutoFlow::Direction::Row:
+            switch (gridFlow.packing()) {
+            case GridAutoFlow::Packing::Dense:
+                if (!state.style.gridTemplateRows().isNone() && state.style.gridTemplateColumns().isNone()
+                    && (state.style.display() == DisplayType::GridLanes || state.style.display() == DisplayType::InlineGridLanes))
+                    return functor(SpaceSeparatedTuple { CSS::Keyword::Row { }, CSS::Keyword::Dense { } });
+                return functor(CSS::Keyword::Dense { });
+            case GridAutoFlow::Packing::Sparse:
+                return functor(CSS::Keyword::Row { });
+            }
+        default:
+            ASSERT(state.style.display() != DisplayType::GridLanes && state.style.display() != DisplayType::InlineGridLanes
+                && state.style.display() != DisplayType::Grid && state.style.display() != DisplayType::InlineGrid);
+            switch (gridFlow.packing()) {
+            case GridAutoFlow::Packing::Dense:
+                return functor(CSS::Keyword::Dense { });
+            case GridAutoFlow::Packing::Sparse:
+                return functor(CSS::Keyword::Normal { });
+            }
+        }
     }
 };
 
@@ -2027,6 +2066,16 @@ inline Ref<CSSValue> ExtractorCustom::extractMinWidth(ExtractorState& state)
 inline void ExtractorCustom::extractMinWidthSerialization(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context)
 {
     extractSerialization<CSSPropertyMinWidth>(state, builder, context);
+}
+
+inline Ref<CSSValue> ExtractorCustom::extractGridAutoFlow(ExtractorState& state)
+{
+    return extractCSSValue<CSSPropertyGridAutoFlow>(state);
+}
+
+inline void ExtractorCustom::extractGridAutoFlowSerialization(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context)
+{
+    extractSerialization<CSSPropertyGridAutoFlow>(state, builder, context);
 }
 
 inline Ref<CSSValue> ExtractorCustom::extractCounterIncrement(ExtractorState& state)

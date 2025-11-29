@@ -228,6 +228,12 @@ inline void RenderStyle::setLogicalMaxHeight(Style::MaximumSize&& height)
 
 // FIXME: - Below are property setters that are not yet generated
 
+inline void RenderStyle::setGridAutoFlowDirection(Style::GridAutoFlow::Direction direction)
+{
+    if (!compareEqual(m_nonInheritedData->rareData->grid->gridAutoFlow.direction(), direction))
+        m_nonInheritedData.access().rareData.access().grid.access().gridAutoFlow.setDirection(direction);
+}
+
 // FIXME: Support setters that need to return a `bool` value to indicate if the property changed.
 inline bool RenderStyle::setDirection(TextDirection bidiDirection)
 {
