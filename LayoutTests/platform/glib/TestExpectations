@@ -2089,9 +2089,6 @@ webkit.org/b/273396 fast/inline/hidpi-outline-inline-box-writing-modes.html [ Im
 webkit.org/b/273396 fast/masking/clip-path-inset-large-radii.html [ ImageOnlyFailure ]
 webkit.org/b/273396 fast/multicol/clipped-video-in-second-column.html [ ImageOnlyFailure ]
 webkit.org/b/273396 fast/multicol/fixed-stack.html [ ImageOnlyFailure ]
-webkit.org/b/273396 fast/multicol/float-paginate.html [ ImageOnlyFailure ]
-webkit.org/b/273396 fast/multicol/vertical-lr/float-paginate.html [ ImageOnlyFailure ]
-webkit.org/b/273396 fast/multicol/vertical-rl/float-paginate.html [ ImageOnlyFailure ]
 webkit.org/b/273396 fast/text/canvas-color-fonts/stroke-gradient-COLR.html [ ImageOnlyFailure ]
 webkit.org/b/273396 fast/text/international/kana-voiced-sound-marks-1.html [ ImageOnlyFailure ]
 webkit.org/b/273396 fast/text/international/kana-voiced-sound-marks-2.html [ ImageOnlyFailure ]
@@ -2274,17 +2271,6 @@ webkit.org/b/298636 fast/repaint/fixed-move-after-keyboard-scroll.html [ Skip ] 
 #////////////////////////////////////////////////////////////////////////////////////////
 
 #////////////////////////////////////////////////////////////////////////////////////////
-# Streams-related bugs
-#////////////////////////////////////////////////////////////////////////////////////////
-
-webkit.org/b/151949 streams/pipe-to.html [ Failure ]
-
-#////////////////////////////////////////////////////////////////////////////////////////
-# End of Streams-related bugs
-#////////////////////////////////////////////////////////////////////////////////////////
-
-
-#////////////////////////////////////////////////////////////////////////////////////////
 # SVG-related bugs
 #////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2437,7 +2423,6 @@ webkit.org/b/172812 webgl/max-active-contexts-webglcontextlost-prevent-default.h
 webkit.org/b/210239 fast/canvas/webgl/out-of-bounds-simulated-vertexAttrib0-drawArrays.html [ Slow ]
 
 webkit.org/b/251195 webgl/1.0.x/conformance/extensions/ext-color-buffer-half-float.html [ Failure ]
-webkit.org/b/195714 fast/canvas/webgl/texImage2D-video-flipY-true.html [ Timeout ]
 
 # No colorspaces in non-Cocoa WebGL.
 
@@ -3609,7 +3594,6 @@ Bug(GLIB) http/tests/contentextensions/filters-with-quantifiers-combined.html [ 
 Bug(GLIB) http/tests/contentextensions/injected-script-callback.html [ Failure ]
 Bug(GLIB) http/tests/contentextensions/media-filtered.html [ Failure ]
 Bug(GLIB) http/tests/contentextensions/subresource-redirect-blocked.html [ Failure ]
-Bug(GLIB) http/tests/contentextensions/text-track-blocked.html [ Failure ]
 Bug(GLIB) http/tests/contentextensions/top-url.html [ Failure ]
 Bug(GLIB) http/tests/contentextensions/allowlist.html [ Failure ]
 
@@ -3899,7 +3883,6 @@ webkit.org/b/207574 [ Debug ] imported/w3c/web-platform-tests/css/css-background
 webkit.org/b/207574 [ Debug ] imported/w3c/web-platform-tests/css/css-backgrounds/background-size/vector/tall--auto-32px--nonpercent-width-percent-height-viewbox.html [ Crash ]
 webkit.org/b/207711 [ Debug ] fast/selectors/slow-style-sharing-with-long-cousin-list.html [ Timeout ]
 webkit.org/b/208368 imported/w3c/web-platform-tests/wasm/jsapi/constructor/instantiate-bad-imports.any.worker.html [ Failure Pass ]
-webkit.org/b/209720 fast/css-generated-content/initial-letter-pagination-raised-rl.html [ ImageOnlyFailure ]
 webkit.org/b/209720 fast/css-grid-layout/grid-align-baseline-vertical.html [ Failure ]
 webkit.org/b/302127 imported/w3c/web-platform-tests/css/css-grid/grid-lanes/tentative/alignment/column-justify-items-end-justify-self-start-001.html [ ImageOnlyFailure ]
 webkit.org/b/211614 imported/w3c/web-platform-tests/wasm/jsapi/constructor/instantiate.any.worker.html [ Failure Pass ]
@@ -4029,7 +4012,6 @@ css2.1/20110323/height-applies-to-010a.htm [ ImageOnlyFailure ]
 fast/hidpi/hidpi-nested-layers-missing-content.html [ ImageOnlyFailure ]
 fast/inline/list-marker-inside-container-with-margin.html [ ImageOnlyFailure ]
 fast/inline/overflowing-content-with-hypens.html [ ImageOnlyFailure ]
-fast/multicol/columns-on-body.html [ ImageOnlyFailure ]
 fast/ruby/annotation-with-line-gap.html [ ImageOnlyFailure ]
 fast/scrolling/rtl-scrollbars-alternate-body-dir-attr-does-not-update-scrollbar-placement-2.html [ ImageOnlyFailure Pass ]
 imported/blink/fast/backgrounds/root-background-with-page-scaled-out.html [ ImageOnlyFailure ]
@@ -4101,7 +4083,6 @@ webkit.org/b/143153 imported/w3c/web-platform-tests/css/css-text/text-transform/
 
 webgl/1.0.x/conformance/context/premultiplyalpha-test.html [ Failure ]
 webgl/2.0.y/conformance/context/premultiplyalpha-test.html [ Failure ]
-webgl/2.0.y/conformance/extensions/ext-color-buffer-half-float.html [ Failure ]
 
 imported/w3c/web-platform-tests/css/css-backgrounds/background-size/vector/tall--contain--height.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-backgrounds/background-size/vector/tall--contain--width.html [ ImageOnlyFailure ]
@@ -4119,9 +4100,6 @@ webkit.org/b/258162 fast/images/image-alt-text-vertical.html [ ImageOnlyFailure 
 fast/scrolling/keyboard-scrolling-distance-downArrow.html [ Skip ] # Timeout
 
 webgl/2.0.y/conformance/textures/misc/texture-corner-case-videos.html [ Skip ] # Timeout
-
-# Path with marker failures
-svg/W3C-SVG-1.1/painting-marker-03-f.svg [ Failure ]
 
 # Tests crashing in Debug only.
 [ Debug ] editing/pasteboard/copy-paste-across-shadow-boundaries-with-style-2.html [ Crash ]
@@ -4278,7 +4256,6 @@ webkit.org/b/169918 compositing/rtl/rtl-iframe-absolute-overflow-scrolled.html [
 webkit.org/b/169918 compositing/rtl/rtl-iframe-absolute-overflow.html [ Failure ]
 webkit.org/b/169918 compositing/rtl/rtl-iframe-fixed-overflow-scrolled.html [ Failure ]
 webkit.org/b/169918 compositing/rtl/rtl-iframe-fixed-overflow.html [ Failure ]
-webkit.org/b/169918 compositing/rtl/rtl-iframe-fixed.html [ Failure ]
 webkit.org/b/169918 compositing/text-on-scaled-layer.html [ ImageOnlyFailure ]
 webkit.org/b/169918 compositing/text-on-scaled-surface.html [ ImageOnlyFailure ]
 webkit.org/b/169918 compositing/tiling/backface-preserve-3d-tiled.html [ Failure ]

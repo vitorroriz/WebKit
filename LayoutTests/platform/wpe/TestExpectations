@@ -963,7 +963,6 @@ fast/canvas/toDataURL-alpha-permutation.html [ ImageOnlyFailure ]
 
 webgl/1.0.x/conformance/extensions/oes-texture-float-with-video.html [ Timeout ]
 webgl/1.0.x/conformance/extensions/oes-texture-half-float-with-video.html [ Timeout ]
-webgl/2.0.y/conformance/extensions/ext-color-buffer-half-float.html [ Pass ]
 
 webkit.org/b/280603 webgl/2.0.0/conformance2/textures/video/tex-2d-r16f-red-float.html [ Failure Timeout Pass ]
 webkit.org/b/280603 webgl/2.0.0/conformance2/textures/video/tex-2d-rgb8ui-rgb_integer-unsigned_byte.html [ Timeout Pass ]
@@ -1071,8 +1070,6 @@ compositing/layer-creation/scroll-partial-update.html [ Failure ]
 compositing/overflow/content-gains-scrollbars.html [ Failure ]
 compositing/overflow/overflow-scrollbar-layer-positions.html [ Failure ]
 compositing/overflow/overflow-scrollbar-layers.html [ Failure ]
-compositing/rtl/rtl-iframe-absolute.html [ Failure ]
-compositing/rtl/rtl-iframe-relative.html [ Failure ]
 compositing/rtl/rtl-overflow-scrolling.html [ Failure ]
 compositing/tile-coverage-subpixel-empty-rect.html [ Failure ]
 compositing/tiling/tiled-layers-limit-contents-scale.html [ Failure ]
@@ -1293,6 +1290,9 @@ webkit.org/b/287572 svg/compositing/outermost-svg-with-border-padding-margin.htm
 webkit.org/b/287572 svg/compositing/svg-poster-circle.html [ ImageOnlyFailure ]
 webkit.org/b/287572 svg/filters/filter-on-root-tile-boundary.html [ ImageOnlyFailure ]
 webkit.org/b/287572 svg/W3C-SVG-1.2-Tiny/struct-use-recursion-01-t.svg [ ImageOnlyFailure ]
+
+# Path with marker failures
+svg/W3C-SVG-1.1/painting-marker-03-f.svg [ Failure ]
 
 imported/w3c/web-platform-tests/css/css-position/hypothetical-box-scroll-parent.html [ ImageOnlyFailure ]
 

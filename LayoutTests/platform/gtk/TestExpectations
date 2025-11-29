@@ -87,11 +87,9 @@ webkit.org/b/254733 inspector/canvas/recording-offscreen-bitmaprenderer-memoryLi
 webkit.org/b/254733 inspector/canvas/recording-offscreen-webgl2-frameCount.html [ Failure Pass ]
 webkit.org/b/254733 inspector/canvas/recording-offscreen-webgl2-full.html [ Failure ]
 webkit.org/b/254733 inspector/canvas/recording-offscreen-webgl2-memoryLimit.html [ Failure Pass ]
-webkit.org/b/254733 inspector/canvas/recording-offscreen-webgl2-snapshots.html [ Failure ]
 webkit.org/b/254733 inspector/canvas/recording-offscreen-webgl-frameCount.html [ Failure Pass ]
 webkit.org/b/254733 inspector/canvas/recording-offscreen-webgl-full.html [ Failure ]
 webkit.org/b/254733 inspector/canvas/recording-offscreen-webgl-memoryLimit.html [ Failure Pass ]
-webkit.org/b/254733 inspector/canvas/recording-offscreen-webgl-snapshots.html [ Failure ]
 webkit.org/b/254733 inspector/canvas/shaderProgram-add-remove-webgl2.html [ Failure ]
 webkit.org/b/254733 inspector/canvas/shaderProgram-add-remove-webgl.html [ Failure ]
 
@@ -189,8 +187,6 @@ webkit.org/b/98942 fast/workers/worker-storagequota-query-usage.html [ Failure ]
 webkit.org/b/61661 editing/pasteboard/drag-drop-list.html [ Failure ]
 
 # CSS filters related failures
-webkit.org/b/99026 css3/filters/effect-blur.html [ ImageOnlyFailure ]
-webkit.org/b/99026 css3/filters/effect-combined.html [ ImageOnlyFailure ]
 webkit.org/b/99026 css3/filters/effect-drop-shadow-clip-abspos.html [ ImageOnlyFailure ]
 webkit.org/b/99026 css3/filters/effect-drop-shadow.html [ ImageOnlyFailure ]
 webkit.org/b/99026 css3/filters/effect-drop-shadow-hw.html [ ImageOnlyFailure ]
@@ -217,7 +213,6 @@ webkit.org/b/251107 inspector/canvas/recording-webgl2-snapshots.html [ Failure ]
 webkit.org/b/251107 webgl/2.0.y/conformance/context/premultiplyalpha-test.html [ Failure ]
 webkit.org/b/251107 webgl/2.0.y/conformance/rendering/gl-scissor-test.html [ Failure ]
 webkit.org/b/251107 webgl/2.0.y/conformance2/reading/read-pixels-from-fbo-test.html [ Failure ]
-webkit.org/b/251107 webgl/2.0.y/conformance2/rendering/fs-color-type-mismatch-color-buffer-type.html [ Failure ]
 
 # WEBGL flakies
 webkit.org/b/251107 fast/canvas/webgl/webgl2-texture-upload-enums.html [ Failure ]
@@ -1328,11 +1323,8 @@ fullscreen/full-screen-enter-while-exiting-multiple-elements.html [ Skip ]
 
 webkit.org/b/187994 compositing/backing/backing-store-attachment-fill-forwards-animation.html [ Failure ]
 
-webkit.org/b/188436 svg/custom/href-svg-namespace-static.svg [ ImageOnlyFailure ]
-
 webkit.org/b/189564 http/tests/xmlhttprequest/url-with-credentials.html [ Failure ]
 
-webkit.org/b/189739 imported/mozilla/svg/linearGradient-basic-03.svg [ ImageOnlyFailure ]
 webkit.org/b/189739 imported/mozilla/svg/marker-viewBox-01.svg [ ImageOnlyFailure ]
 
 webkit.org/b/190709 editing/pasteboard/emacs-ctrl-a-k-y.html [ Failure ]
@@ -1350,8 +1342,6 @@ webkit.org/b/191882 fast/forms/auto-fill-button/input-credit-card-auto-fill-butt
 webkit.org/b/192434 fast/inline/inline-content-with-float-and-margin.html [ Failure ]
 
 webkit.org/b/193627 editing/spelling/spelling-dots-position.html [ ImageOnlyFailure ]
-
-webkit.org/b/193628 imported/mozilla/svg/tspan-rotate-07.svg [ ImageOnlyFailure ]
 
 webkit.org/b/196061 editing/pasteboard/smart-paste-paragraph-001.html [ Failure ]
 webkit.org/b/196061 editing/pasteboard/smart-paste-paragraph-002.html [ Failure ]
@@ -1395,10 +1385,7 @@ webkit.org/b/273396 css3/masking/clip-path-border-radius-border-box-000.html [ I
 webkit.org/b/273396 css3/masking/clip-path-border-radius-stroke-box-000.html [ ImageOnlyFailure ]
 webkit.org/b/273396 css3/masking/clip-path-border-radius-view-box-000.html [ ImageOnlyFailure ]
 webkit.org/b/273396 css3/masking/clip-path-inset-corners.html [ ImageOnlyFailure ]
-webkit.org/b/273396 fast/borders/border-painting-correctness-dashed.html [ ImageOnlyFailure ]
-webkit.org/b/273396 fast/borders/border-painting-correctness-dotted.html [ ImageOnlyFailure ]
 webkit.org/b/273396 fast/canvas/canvas-filter-drawing.html [ ImageOnlyFailure ]
-webkit.org/b/273396 fast/filter-image/filter-image-blur.html [ ImageOnlyFailure ]
 webkit.org/b/273396 imported/w3c/web-platform-tests/css/css-backgrounds/css-border-radius-001.html [ ImageOnlyFailure ]
 webkit.org/b/273396 imported/w3c/web-platform-tests/css/css-fonts/font-size-adjust-012.html [ ImageOnlyFailure ]
 webkit.org/b/273396 imported/w3c/web-platform-tests/css/css-fonts/font-size-adjust-013.html [ ImageOnlyFailure ]
