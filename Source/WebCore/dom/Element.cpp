@@ -1610,8 +1610,11 @@ int Element::clientWidth()
         // Currently, WebKit doesn't have table wrapper box, and we are supposed to
         // retrieve clientWidth/Height from table wrapper box, not table grid box. So
         // when we retrieve clientWidth/Height, it includes table's border size.
-        if (renderer->isRenderTable())
+        if (renderer->isRenderTable()) {
+            if (renderer->style().boxSizing() == BoxSizing::ContentBox)
+                clientWidth += renderer->paddingLeft() + renderer->paddingRight();
             clientWidth += renderer->borderLeft() + renderer->borderRight();
+        }
         return convertToNonSubpixelValue(adjustLayoutUnitForAbsoluteZoom(clientWidth, *renderer).toDouble());
     }
     return 0;
@@ -1644,8 +1647,11 @@ int Element::clientHeight()
         // Currently, WebKit doesn't have table wrapper box, and we are supposed to
         // retrieve clientWidth/Height from table wrapper box, not table grid box. So
         // when we retrieve clientWidth/Height, it includes table's border size.
-        if (renderer->isRenderTable())
+        if (renderer->isRenderTable()) {
+            if (renderer->style().boxSizing() == BoxSizing::ContentBox)
+                clientHeight += renderer->paddingTop() + renderer->paddingBottom();
             clientHeight += renderer->borderTop() + renderer->borderBottom();
+        }
         return convertToNonSubpixelValue(adjustLayoutUnitForAbsoluteZoom(clientHeight, *renderer).toDouble());
     }
     return 0;
