@@ -3026,6 +3026,120 @@ static RefPtr<CSSValue> consumeTestNumericValueRange(CSSParserTokenRange& range,
     return CSSPrimitiveValueResolver<CSS::Percentage<CSS::Range{1, 100}>>::consumeAndResolve(range, state);
 }
 
+static RefPtr<CSSValue> consumeTestRenderStyleStorageOneLevelRaw(CSSParserTokenRange& range)
+{
+    // [ foo || bar ]
+    auto consumeMatchOneOrMoreAnyOrder = [](CSSParserTokenRange& range) -> RefPtr<CSSValue> {
+        RefPtr<CSSValue> value0; // foo
+        auto tryConsumeTerm0 = [&value0](CSSParserTokenRange& range) -> bool {
+            auto consumeTerm0 = [](CSSParserTokenRange& range) -> RefPtr<CSSValue> {
+                // foo
+                switch (auto keyword = range.peek().id(); keyword) {
+                case CSSValueID::CSSValueFoo:
+                    range.consumeIncludingWhitespace();
+                    return CSSPrimitiveValue::create(keyword);
+                default:
+                    return nullptr;
+                }
+            };
+            if (value0)
+                return false;
+            value0 = consumeTerm0(range);
+            return !!value0;
+        };
+        RefPtr<CSSValue> value1; // bar
+        auto tryConsumeTerm1 = [&value1](CSSParserTokenRange& range) -> bool {
+            auto consumeTerm1 = [](CSSParserTokenRange& range) -> RefPtr<CSSValue> {
+                // bar
+                switch (auto keyword = range.peek().id(); keyword) {
+                case CSSValueID::CSSValueBar:
+                    range.consumeIncludingWhitespace();
+                    return CSSPrimitiveValue::create(keyword);
+                default:
+                    return nullptr;
+                }
+            };
+            if (value1)
+                return false;
+            value1 = consumeTerm1(range);
+            return !!value1;
+        };
+        for (size_t i = 0; i < 2 && !range.atEnd(); ++i) {
+            if (tryConsumeTerm0(range) || tryConsumeTerm1(range))
+                continue;
+            break;
+        }
+        CSSValueListBuilder list;
+        if (value0) // foo
+            list.append(value0.releaseNonNull());
+        if (value1) // bar
+            list.append(value1.releaseNonNull());
+        if (list.isEmpty())
+            return { };
+        if (list.size() == 1)
+            return WTFMove(list[0]); // single item optimization
+        return CSSValueList::createSpaceSeparated(WTFMove(list));
+    };
+    return consumeMatchOneOrMoreAnyOrder(range);
+}
+
+static RefPtr<CSSValue> consumeTestRenderStyleStorageTwoLevelRaw(CSSParserTokenRange& range)
+{
+    // [ foo || bar ]
+    auto consumeMatchOneOrMoreAnyOrder = [](CSSParserTokenRange& range) -> RefPtr<CSSValue> {
+        RefPtr<CSSValue> value0; // foo
+        auto tryConsumeTerm0 = [&value0](CSSParserTokenRange& range) -> bool {
+            auto consumeTerm0 = [](CSSParserTokenRange& range) -> RefPtr<CSSValue> {
+                // foo
+                switch (auto keyword = range.peek().id(); keyword) {
+                case CSSValueID::CSSValueFoo:
+                    range.consumeIncludingWhitespace();
+                    return CSSPrimitiveValue::create(keyword);
+                default:
+                    return nullptr;
+                }
+            };
+            if (value0)
+                return false;
+            value0 = consumeTerm0(range);
+            return !!value0;
+        };
+        RefPtr<CSSValue> value1; // bar
+        auto tryConsumeTerm1 = [&value1](CSSParserTokenRange& range) -> bool {
+            auto consumeTerm1 = [](CSSParserTokenRange& range) -> RefPtr<CSSValue> {
+                // bar
+                switch (auto keyword = range.peek().id(); keyword) {
+                case CSSValueID::CSSValueBar:
+                    range.consumeIncludingWhitespace();
+                    return CSSPrimitiveValue::create(keyword);
+                default:
+                    return nullptr;
+                }
+            };
+            if (value1)
+                return false;
+            value1 = consumeTerm1(range);
+            return !!value1;
+        };
+        for (size_t i = 0; i < 2 && !range.atEnd(); ++i) {
+            if (tryConsumeTerm0(range) || tryConsumeTerm1(range))
+                continue;
+            break;
+        }
+        CSSValueListBuilder list;
+        if (value0) // foo
+            list.append(value0.releaseNonNull());
+        if (value1) // bar
+            list.append(value1.releaseNonNull());
+        if (list.isEmpty())
+            return { };
+        if (list.size() == 1)
+            return WTFMove(list[0]); // single item optimization
+        return CSSValueList::createSpaceSeparated(WTFMove(list));
+    };
+    return consumeMatchOneOrMoreAnyOrder(range);
+}
+
 static RefPtr<CSSValue> consumeTestUnboundedRepetitionWithCommasWithMin(CSSParserTokenRange& range, CSS::PropertyParserState& state)
 {
     // <number>#{2,}
@@ -3372,8 +3486,12 @@ RefPtr<CSSValue> CSSPropertyParsing::parseStylePropertyLonghand(CSSParserTokenRa
         return consumeTestNumericValueRange(range, state);
     case CSSPropertyID::CSSPropertyTestRenderStyleStorageOneLevelEnum:
         return consumeIdent(range, isKeywordValidForTestRenderStyleStorageOneLevelEnum);
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageOneLevelRaw:
+        return consumeTestRenderStyleStorageOneLevelRaw(range);
     case CSSPropertyID::CSSPropertyTestRenderStyleStorageTwoLevelEnum:
         return consumeIdent(range, isKeywordValidForTestRenderStyleStorageTwoLevelEnum);
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageTwoLevelRaw:
+        return consumeTestRenderStyleStorageTwoLevelRaw(range);
     case CSSPropertyID::CSSPropertyTestUnboundedRepetitionWithCommasWithMin:
         return consumeTestUnboundedRepetitionWithCommasWithMin(range, state);
     case CSSPropertyID::CSSPropertyTestUnboundedRepetitionWithCommasWithMinNoSingleItemOpt:

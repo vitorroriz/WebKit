@@ -491,9 +491,14 @@ class StylePropertyCodeGenProperties:
         Schema.Entry("parser-grammar-unused-reason", allowed_types=[str]),
         Schema.Entry("parser-shorthand", allowed_types=[str]),
         Schema.Entry("render-style-getter", allowed_types=[str]),
+        Schema.Entry("render-style-getter-custom", allowed_types=[bool], default_value=False),
         Schema.Entry("render-style-initial", allowed_types=[str]),
+        Schema.Entry("render-style-initial-custom", allowed_types=[bool], default_value=False),
         Schema.Entry("render-style-name-for-methods", allowed_types=[str]),
         Schema.Entry("render-style-setter", allowed_types=[str]),
+        Schema.Entry("render-style-setter-custom", allowed_types=[bool], default_value=False),
+        Schema.Entry("render-style-storage-container", allowed_types=[str], default_value='data'),
+        Schema.Entry("render-style-storage-name", allowed_types=[str]),
         Schema.Entry("render-style-storage-kind", allowed_types=[str]),
         Schema.Entry("render-style-storage-path", allowed_types=[list]),
         Schema.Entry("render-style-type", allowed_types=[str]),
@@ -567,9 +572,19 @@ class StylePropertyCodeGenProperties:
             if json_value["animation-wrapper-acceleration"] == 'threaded-only' and not parsing_context.is_enabled(conditional="ENABLE_THREADED_ANIMATIONS"):
                 json_value["animation-wrapper-acceleration"] = None
 
+        if "render-style-storage-container" in json_value:
+            if json_value["render-style-storage-container"] not in ['data', 'struct', 'rect-edges', 'rect-corners']:
+                raise Exception(f"{key_path} must be either 'data', 'struct', 'rect-edges' or 'rect-corners'.")
+
         if "render-style-storage-kind" in json_value:
-            if json_value["render-style-storage-kind"] not in ['reference', 'value', 'enum']:
-                raise Exception(f"{key_path} must be either 'reference', 'value' or 'enum'.")
+            if json_value["render-style-storage-kind"] not in ['reference', 'value', 'enum', 'raw']:
+                raise Exception(f"{key_path} must be either 'reference', 'value', 'enum' or 'raw'.")
+
+        if "render-style-storage-name" not in json_value:
+            json_value["render-style-storage-name"] = json_value["render-style-getter"]
+
+        if "render-style-storage-name" not in json_value:
+            json_value["render-style-storage-name"] = json_value["render-style-getter"]
 
         if "style-builder-custom" not in json_value:
             json_value["style-builder-custom"] = ""
@@ -5287,36 +5302,81 @@ class GenerateRenderStyleGenerated:
         self.generate_render_style_inlines_generated_h()
         self.generate_render_style_setters_generated_h()
 
+    # Computes the return type of the getter.
+    def _compute_getter_return_type(self, property):
+        if property.codegen_properties.render_style_storage_kind == 'reference':
+            return f"const {property.codegen_properties.render_style_type}&"
+        return f"{property.codegen_properties.render_style_type}"
+
+    # Computes the argument type of the setter.
+    def _compute_setter_argument_type(self, property):
+        if property.codegen_properties.render_style_storage_kind == 'reference':
+            return f"{property.codegen_properties.render_style_type}&&"
+        return f"{property.codegen_properties.render_style_type}"
+
+    # Computes the name of the member variable or member function used to access the property.
+    def _compute_storage_leaf_accessor(self, property):
+        if property.codegen_properties.render_style_storage_container == 'rect-edges' or property.codegen_properties.render_style_storage_container == 'rect-corners':
+            return Name(property.codegen_properties.logical_property_group.resolver).id_without_prefix_with_lowercase_first_letter + "()"
+        return property.codegen_properties.render_style_storage_name
+
+    # Computes the expression of loads needed to get the member variable used to store the property.
+    def _compute_get_expression(self, property):
+        leaf_accessor = self._compute_storage_leaf_accessor(property)
+
+        # Compute the base set of loads.
+        get_expression = "->".join(property.codegen_properties.render_style_storage_path)
+        if property.codegen_properties.render_style_storage_container == 'data':
+            get_expression = f"{get_expression}->{leaf_accessor}"
+        else:
+            get_expression = f"{get_expression}.{leaf_accessor}"
+
+        # If necessary, wrap the load in a cast or conversion.
+        if property.codegen_properties.render_style_storage_kind == 'enum':
+            get_expression = f"static_cast<{property.codegen_properties.render_style_type}>({get_expression})"
+        elif property.codegen_properties.render_style_storage_kind == 'raw':
+            get_expression = f"{property.codegen_properties.render_style_type}::fromRaw({get_expression})"
+
+        return get_expression
+
+    # Computes the expression of loads and assignments needed to set the member variable used to store the property.
+    def _compute_set_expression(self, property, argument_name):
+        leaf_accessor = self._compute_storage_leaf_accessor(property)
+
+        # Compute the base set of loads for the left side of the assignment expression for the setter expression.
+        lhs = ".access().".join(property.codegen_properties.render_style_storage_path)
+        if property.codegen_properties.render_style_storage_container == 'data':
+            lhs = f"{lhs}.access().{leaf_accessor}"
+        else:
+            lhs = f"{lhs}.{leaf_accessor}"
+
+        # Compute the right side of the assignment expression for the setter expression.
+        if property.codegen_properties.render_style_storage_kind == 'reference':
+            rhs = f"WTFMove({argument_name})"
+        elif property.codegen_properties.render_style_storage_kind == 'enum':
+            rhs = f"static_cast<unsigned>({argument_name})"
+        elif property.codegen_properties.render_style_storage_kind == 'raw':
+            rhs = f"{argument_name}.toRaw()"
+        else:
+            rhs = f"{argument_name}"
+
+        return f"{lhs} = {rhs}"
+
     def _generate_render_style_inlines_generated_h_function_implementations(self, *, to):
         for property in self.style_properties.all:
-            if property.codegen_properties.longhands:
-                continue
-            if property.codegen_properties.skip_style_builder:
-                continue
             if property.codegen_properties.render_style_storage_path is None:
                 continue
+            if property.codegen_properties.render_style_getter_custom:
+                continue
 
-            # Compute the name of the getter function.
             function_name = property.codegen_properties.render_style_getter
-
-            # Compute the name of the member variable.
-            member_variable = property.codegen_properties.render_style_getter
-
-            # Compute the return type of the function.
-            if property.codegen_properties.render_style_storage_kind == "reference":
-                return_type = f"const {property.codegen_properties.render_style_type}&"
-            else:
-                return_type = f"{property.codegen_properties.render_style_type}"
-
-            # Compute the expression of loads needed to access the member variable for getting .
-            getter_expression = "->".join(property.codegen_properties.render_style_storage_path + [member_variable])
-            if property.codegen_properties.render_style_storage_kind == "enum":
-                getter_expression = f"static_cast<{property.codegen_properties.render_style_type}>({getter_expression})"
+            return_type = self._compute_getter_return_type(property)
+            get_expression = self._compute_get_expression(property)
 
             to.write(f"inline {return_type} RenderStyle::{function_name}() const")
             to.write(f"{{")
             with to.indent():
-                to.write(f"return {getter_expression};")
+                to.write(f"return {get_expression};")
             to.write(f"}}")
             to.newline()
 
@@ -5371,47 +5431,23 @@ class GenerateRenderStyleGenerated:
 
     def _generate_render_style_setters_generated_h_function_implementations(self, *, to):
         for property in self.style_properties.all:
-            if property.codegen_properties.longhands:
-                continue
-            if property.codegen_properties.skip_style_builder:
-                continue
             if property.codegen_properties.render_style_storage_path is None:
                 continue
+            if property.codegen_properties.render_style_setter_custom:
+                continue
 
-            # Compute the name of the setter function.
             function_name = property.codegen_properties.render_style_setter
-
-            # Set a name for the argument.
             argument_name = f"value"
+            argument_type = self._compute_setter_argument_type(property)
+            get_expression = self._compute_get_expression(property)
+            set_expression = self._compute_set_expression(property, argument_name)
 
-            # Compute the name of the member variable.
-            member_variable = property.codegen_properties.render_style_getter
-
-            # Compute the argument type for the setter function.
-            if property.codegen_properties.render_style_storage_kind == "reference":
-                argument_type = f"{property.codegen_properties.render_style_type}&&"
-                argument_assignment = f"WTFMove({argument_name})"
-            elif property.codegen_properties.render_style_storage_kind == "enum":
-                argument_type = f"{property.codegen_properties.render_style_type}"
-                argument_assignment = f"static_cast<unsigned>({argument_name})"
-            else:
-                argument_type = f"{property.codegen_properties.render_style_type}"
-                argument_assignment = f"{argument_name}"
-
-            # Compute the expression of loads needed to access the member variable for getting.
-            getter_expression = "->".join(property.codegen_properties.render_style_storage_path + [member_variable])
-            if property.codegen_properties.render_style_storage_kind == "enum":
-                getter_expression = f"static_cast<{property.codegen_properties.render_style_type}>({getter_expression})"
-
-            # Compute the expression of loads needed to access the member variable for setting.
-            setter_expression = ".access().".join(property.codegen_properties.render_style_storage_path + [member_variable])
-
-            to.write(f"inline void RenderStyle::{function_name}({argument_type} value)")
+            to.write(f"inline void RenderStyle::{function_name}({argument_type} {argument_name})")
             to.write(f"{{")
             with to.indent():
-                to.write(f"if (value != {getter_expression})")
+                to.write(f"if ({argument_name} != {get_expression})")
                 with to.indent():
-                    to.write(f"{setter_expression} = {argument_assignment};")
+                    to.write(f"{set_expression};")
             to.write(f"}}")
             to.newline()
 

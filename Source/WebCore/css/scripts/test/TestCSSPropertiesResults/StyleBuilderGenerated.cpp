@@ -1061,6 +1061,18 @@ public:
     {
         builderState.style().setTestRenderStyleStorageOneLevelEnum(fromCSSValueDeducingType(builderState, value));
     }
+    static void applyInitialTestRenderStyleStorageOneLevelRaw(BuilderState& builderState)
+    {
+        builderState.style().setTestRenderStyleStorageOneLevelRaw(RenderStyle::initialTestRenderStyleStorageOneLevelRaw());
+    }
+    static void applyInheritTestRenderStyleStorageOneLevelRaw(BuilderState& builderState)
+    {
+        builderState.style().setTestRenderStyleStorageOneLevelRaw(forwardInheritedValue(builderState.parentStyle().testRenderStyleStorageOneLevelRaw()));
+    }
+    static void applyValueTestRenderStyleStorageOneLevelRaw(BuilderState& builderState, CSSValue& value)
+    {
+        builderState.style().setTestRenderStyleStorageOneLevelRaw(fromCSSValueDeducingType(builderState, value));
+    }
     static void applyInitialTestRenderStyleStorageOneLevelReference(BuilderState& builderState)
     {
         builderState.style().setTestRenderStyleStorageOneLevelReference(RenderStyle::initialTestRenderStyleStorageOneLevelReference());
@@ -1096,6 +1108,18 @@ public:
     static void applyValueTestRenderStyleStorageTwoLevelEnum(BuilderState& builderState, CSSValue& value)
     {
         builderState.style().setTestRenderStyleStorageTwoLevelEnum(fromCSSValueDeducingType(builderState, value));
+    }
+    static void applyInitialTestRenderStyleStorageTwoLevelRaw(BuilderState& builderState)
+    {
+        builderState.style().setTestRenderStyleStorageTwoLevelRaw(RenderStyle::initialTestRenderStyleStorageTwoLevelRaw());
+    }
+    static void applyInheritTestRenderStyleStorageTwoLevelRaw(BuilderState& builderState)
+    {
+        builderState.style().setTestRenderStyleStorageTwoLevelRaw(forwardInheritedValue(builderState.parentStyle().testRenderStyleStorageTwoLevelRaw()));
+    }
+    static void applyValueTestRenderStyleStorageTwoLevelRaw(BuilderState& builderState, CSSValue& value)
+    {
+        builderState.style().setTestRenderStyleStorageTwoLevelRaw(fromCSSValueDeducingType(builderState, value));
     }
     static void applyInitialTestRenderStyleStorageTwoLevelReference(BuilderState& builderState)
     {
@@ -2473,6 +2497,19 @@ void BuilderGenerated::applyProperty(CSSPropertyID id, BuilderState& builderStat
             break;
         }
         break;
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageOneLevelRaw:
+        switch (valueType) {
+        case ApplyValueType::Initial:
+            BuilderFunctions::applyInitialTestRenderStyleStorageOneLevelRaw(builderState);
+            break;
+        case ApplyValueType::Inherit:
+            BuilderFunctions::applyInheritTestRenderStyleStorageOneLevelRaw(builderState);
+            break;
+        case ApplyValueType::Value:
+            BuilderFunctions::applyValueTestRenderStyleStorageOneLevelRaw(builderState, value);
+            break;
+        }
+        break;
     case CSSPropertyID::CSSPropertyTestRenderStyleStorageOneLevelReference:
         switch (valueType) {
         case ApplyValueType::Initial:
@@ -2509,6 +2546,19 @@ void BuilderGenerated::applyProperty(CSSPropertyID id, BuilderState& builderStat
             break;
         case ApplyValueType::Value:
             BuilderFunctions::applyValueTestRenderStyleStorageTwoLevelEnum(builderState, value);
+            break;
+        }
+        break;
+    case CSSPropertyID::CSSPropertyTestRenderStyleStorageTwoLevelRaw:
+        switch (valueType) {
+        case ApplyValueType::Initial:
+            BuilderFunctions::applyInitialTestRenderStyleStorageTwoLevelRaw(builderState);
+            break;
+        case ApplyValueType::Inherit:
+            BuilderFunctions::applyInheritTestRenderStyleStorageTwoLevelRaw(builderState);
+            break;
+        case ApplyValueType::Value:
+            BuilderFunctions::applyValueTestRenderStyleStorageTwoLevelRaw(builderState, value);
             break;
         }
         break;

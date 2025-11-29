@@ -16,6 +16,12 @@ inline void RenderStyle::setTestRenderStyleStorageOneLevelEnum(Style::TestEnumer
         level1.access().testRenderStyleStorageOneLevelEnum = static_cast<unsigned>(value);
 }
 
+inline void RenderStyle::setTestRenderStyleStorageOneLevelRaw(Style::TestRaw value)
+{
+    if (value != Style::TestRaw::fromRaw(level1->testRenderStyleStorageOneLevelRaw))
+        level1.access().testRenderStyleStorageOneLevelRaw = value.toRaw();
+}
+
 inline void RenderStyle::setTestRenderStyleStorageOneLevelReference(Style::Number<>&& value)
 {
     if (value != level1->testRenderStyleStorageOneLevelReference)
@@ -32,6 +38,12 @@ inline void RenderStyle::setTestRenderStyleStorageTwoLevelEnum(Style::TestEnumer
 {
     if (value != static_cast<Style::TestEnumeration>(level1->level2->testRenderStyleStorageTwoLevelEnum))
         level1.access().level2.access().testRenderStyleStorageTwoLevelEnum = static_cast<unsigned>(value);
+}
+
+inline void RenderStyle::setTestRenderStyleStorageTwoLevelRaw(Style::TestRaw value)
+{
+    if (value != Style::TestRaw::fromRaw(level1->level2->testRenderStyleStorageTwoLevelRaw))
+        level1.access().level2.access().testRenderStyleStorageTwoLevelRaw = value.toRaw();
 }
 
 inline void RenderStyle::setTestRenderStyleStorageTwoLevelReference(Style::Number<>&& value)

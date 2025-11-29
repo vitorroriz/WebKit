@@ -91,6 +91,7 @@ inline OptionSet<EventListenerRegionType> RenderStyle::eventListenerRegionTypes(
 inline std::optional<PseudoElementType> RenderStyle::pseudoElementType() const { return m_nonInheritedFlags.pseudoElementType ? std::make_optional(static_cast<PseudoElementType>(m_nonInheritedFlags.pseudoElementType - 1)) : std::nullopt; }
 inline const AtomString& RenderStyle::pseudoElementNameArgument() const { return m_nonInheritedData->rareData->pseudoElementNameArgument; }
 inline bool RenderStyle::hasAnyPublicPseudoStyles() const { return m_nonInheritedFlags.hasAnyPublicPseudoStyles(); }
+inline bool RenderStyle::hasAttrContent() const { return m_nonInheritedData->miscData->hasAttrContent; }
 
 // MARK: transform constants
 
@@ -114,7 +115,6 @@ inline CSSPropertyID RenderStyle::usedStrokeColorProperty() const { return hasEx
 inline bool RenderStyle::usesStandardScrollbarStyle() const { return scrollbarWidth() != Style::ScrollbarWidth::Auto || !scrollbarColor().isAuto(); }
 inline bool RenderStyle::usesLegacyScrollbarStyle() const { return hasPseudoStyle(PseudoElementType::WebKitScrollbar) && !usesStandardScrollbarStyle(); }
 inline bool RenderStyle::specifiesColumns() const { return !columnCount().isAuto() || !columnWidth().isAuto() || !hasInlineColumnAxis(); }
-inline bool RenderStyle::columnRuleIsTransparent() const { return m_nonInheritedData->miscData->multiCol->columnRule.isTransparent(); }
 inline LayoutBoxExtent RenderStyle::borderImageOutsets() const { return imageOutsets(borderImage()); }
 inline LayoutBoxExtent RenderStyle::maskBorderOutsets() const { return imageOutsets(maskBorder()); }
 inline bool RenderStyle::autoWrap() const { return textWrapMode() != TextWrapMode::NoWrap; }
@@ -122,6 +122,7 @@ inline bool RenderStyle::borderBottomIsTransparent() const { return border().bot
 inline bool RenderStyle::borderLeftIsTransparent() const { return border().left().isTransparent(); }
 inline bool RenderStyle::borderRightIsTransparent() const { return border().right().isTransparent(); }
 inline bool RenderStyle::borderTopIsTransparent() const { return border().top().isTransparent(); }
+inline bool RenderStyle::columnRuleIsTransparent() const { return columnRule().isTransparent(); }
 
 // MARK: Cached used values
 
@@ -134,6 +135,8 @@ inline Style::TouchAction RenderStyle::usedTouchAction() const { return m_rareIn
 #if HAVE(CORE_MATERIAL)
 inline AppleVisualEffect RenderStyle::usedAppleVisualEffectForSubtree() const { return static_cast<AppleVisualEffect>(m_rareInheritedData->usedAppleVisualEffectForSubtree); }
 #endif
+inline float RenderStyle::usedLetterSpacing() const { return fontCascade().letterSpacing(); }
+inline float RenderStyle::usedWordSpacing() const { return fontCascade().wordSpacing(); }
 
 // MARK: Derived used values
 
@@ -548,7 +551,6 @@ inline bool RenderStyle::hasAppleVisualEffect() const { return appleVisualEffect
 inline bool RenderStyle::hasAppleVisualEffectRequiringBackdropFilter() const { return appleVisualEffectNeedsBackdrop(appleVisualEffect()); }
 #endif
 inline bool RenderStyle::hasAspectRatio() const { return aspectRatio().hasRatio(); }
-inline bool RenderStyle::hasAttrContent() const { return m_nonInheritedData->miscData->hasAttrContent; }
 inline bool RenderStyle::hasAutoLeftAndRight() const { return left().isAuto() && right().isAuto(); }
 inline bool RenderStyle::hasAutoLengthContainIntrinsicSize() const { return containIntrinsicWidth().hasAuto() || containIntrinsicHeight().hasAuto(); }
 inline bool RenderStyle::hasAutoTopAndBottom() const { return top().isAuto() && bottom().isAuto(); }
@@ -572,7 +574,7 @@ inline bool RenderStyle::hasInFlowPosition() const { return position() == Positi
 inline bool RenderStyle::hasIsolation() const { return isolation() != Isolation::Auto; }
 inline bool RenderStyle::hasMarkers() const { return !markerStart().isNone() || !markerMid().isNone() || !markerEnd().isNone(); }
 inline bool RenderStyle::hasMask() const { return Style::hasImageInAnyLayer(maskLayers()) || maskBorder().hasSource(); }
-inline bool RenderStyle::hasOffsetPath() const { return !WTF::holdsAlternative<CSS::Keyword::None>(m_nonInheritedData->rareData->offsetPath); }
+inline bool RenderStyle::hasOffsetPath() const { return !WTF::holdsAlternative<CSS::Keyword::None>(offsetPath()); }
 inline bool RenderStyle::hasOpacity() const { return !opacity().isOpaque(); }
 inline bool RenderStyle::hasOutline() const { return outlineStyle() != OutlineStyle::None && outlineWidth().isPositive(); }
 inline bool RenderStyle::hasOutlineInVisualOverflow() const { return hasOutline() && outlineSize() > 0; }
@@ -645,20 +647,20 @@ inline const Style::PreferredSize& RenderStyle::logicalWidth() const { return lo
 inline const Style::PreferredSize& RenderStyle::logicalWidth(const WritingMode writingMode) const { return writingMode.isHorizontal() ? width() : height(); }
 
 // MARK: inset logical
-inline const Style::InsetEdge& RenderStyle::logicalTop() const { return m_nonInheritedData->surroundData->inset.before(writingMode()); }
-inline const Style::InsetEdge& RenderStyle::logicalRight() const { return m_nonInheritedData->surroundData->inset.logicalRight(writingMode()); }
-inline const Style::InsetEdge& RenderStyle::logicalBottom() const { return m_nonInheritedData->surroundData->inset.after(writingMode()); }
-inline const Style::InsetEdge& RenderStyle::logicalLeft() const { return m_nonInheritedData->surroundData->inset.logicalLeft(writingMode()); }
+inline const Style::InsetEdge& RenderStyle::logicalTop() const { return insetBox().before(writingMode()); }
+inline const Style::InsetEdge& RenderStyle::logicalRight() const { return insetBox().logicalRight(writingMode()); }
+inline const Style::InsetEdge& RenderStyle::logicalBottom() const { return insetBox().after(writingMode()); }
+inline const Style::InsetEdge& RenderStyle::logicalLeft() const { return insetBox().logicalLeft(writingMode()); }
 
 // MARK: margin logical
 inline const Style::MarginEdge& RenderStyle::marginAfter() const { return marginAfter(writingMode()); }
-inline const Style::MarginEdge& RenderStyle::marginAfter(const WritingMode writingMode) const { return m_nonInheritedData->surroundData->margin.after(writingMode); }
+inline const Style::MarginEdge& RenderStyle::marginAfter(const WritingMode writingMode) const { return marginBox().after(writingMode); }
 inline const Style::MarginEdge& RenderStyle::marginBefore() const { return marginBefore(writingMode()); }
-inline const Style::MarginEdge& RenderStyle::marginBefore(const WritingMode writingMode) const { return m_nonInheritedData->surroundData->margin.before(writingMode); }
+inline const Style::MarginEdge& RenderStyle::marginBefore(const WritingMode writingMode) const { return marginBox().before(writingMode); }
 inline const Style::MarginEdge& RenderStyle::marginEnd() const { return marginEnd(writingMode()); }
-inline const Style::MarginEdge& RenderStyle::marginEnd(const WritingMode writingMode) const { return m_nonInheritedData->surroundData->margin.end(writingMode); }
+inline const Style::MarginEdge& RenderStyle::marginEnd(const WritingMode writingMode) const { return marginBox().end(writingMode); }
 inline const Style::MarginEdge& RenderStyle::marginStart() const { return marginStart(writingMode()); }
-inline const Style::MarginEdge& RenderStyle::marginStart(const WritingMode writingMode) const { return m_nonInheritedData->surroundData->margin.start(writingMode); }
+inline const Style::MarginEdge& RenderStyle::marginStart(const WritingMode writingMode) const { return marginBox().start(writingMode); }
 
 // MARK: padding logical
 inline const Style::PaddingEdge& RenderStyle::paddingAfter() const { return paddingAfter(writingMode()); }
@@ -705,6 +707,8 @@ inline Style::LineWidth RenderStyle::borderStartWidth() const { return borderSta
 inline const Style::InsetBox& RenderStyle::insetBox() const { return m_nonInheritedData->surroundData->inset; }
 inline const Style::MarginBox& RenderStyle::marginBox() const { return m_nonInheritedData->surroundData->margin; }
 inline const Style::PaddingBox& RenderStyle::paddingBox() const { return m_nonInheritedData->surroundData->padding; }
+inline const Style::ScrollMarginBox& RenderStyle::scrollMarginBox() const { return m_nonInheritedData->rareData->scrollMargin; }
+inline const Style::ScrollPaddingBox& RenderStyle::scrollPaddingBox() const { return m_nonInheritedData->rareData->scrollPadding; }
 inline const Style::ScrollTimelines& RenderStyle::scrollTimelines() const { return m_nonInheritedData->rareData->scrollTimelines; }
 inline const Style::ViewTimelines& RenderStyle::viewTimelines() const { return m_nonInheritedData->rareData->viewTimelines; }
 inline const Style::Animations& RenderStyle::animations() const { return m_nonInheritedData->miscData->animations; }
@@ -717,7 +721,14 @@ inline const Style::TransformOrigin& RenderStyle::transformOrigin() const { retu
 inline const Style::PerspectiveOrigin& RenderStyle::perspectiveOrigin() const { return m_nonInheritedData->rareData->perspectiveOrigin; }
 inline const OutlineValue& RenderStyle::outline() const { return m_nonInheritedData->backgroundData->outline; }
 inline const BorderData& RenderStyle::border() const { return m_nonInheritedData->surroundData->border; }
+inline Style::LineWidthBox RenderStyle::borderWidth() const { return border().borderWidth(); }
 inline const Style::BorderRadius& RenderStyle::borderRadii() const { return border().radii(); }
+inline const BorderValue& RenderStyle::borderBottom() const { return border().bottom(); }
+inline const BorderValue& RenderStyle::borderLeft() const { return border().left(); }
+inline const BorderValue& RenderStyle::borderRight() const { return border().right(); }
+inline const BorderValue& RenderStyle::borderTop() const { return border().top(); }
+inline const BorderValue& RenderStyle::columnRule() const { return m_nonInheritedData->miscData->multiCol->columnRule; }
+inline const FontCascade& RenderStyle::fontCascade() const { return m_inheritedData->fontData->fontCascade; }
 
 // MARK: - Property initial values
 
@@ -1071,21 +1082,13 @@ constexpr Style::TextSizeAdjust RenderStyle::initialTextSizeAdjust() { return CS
 
 // MARK: - Property getters
 
-// FIXME: - Below are property getters that are not yet generated
+inline Style::LineWidth RenderStyle::borderBottomWidth() const { return border().borderBottomWidth(); }
+inline Style::LineWidth RenderStyle::borderLeftWidth() const { return border().borderLeftWidth(); }
+inline Style::LineWidth RenderStyle::borderRightWidth() const { return border().borderRightWidth(); }
+inline Style::LineWidth RenderStyle::borderTopWidth() const { return border().borderTopWidth(); }
+inline Style::LineWidth RenderStyle::columnRuleWidth() const { return m_nonInheritedData->miscData->multiCol->columnRuleWidth(); }
 
-// MARK: FIXME - Support generated properties that use "fromRaw/toRaw" conversions.
-inline Style::HangingPunctuation RenderStyle::hangingPunctuation() const { return Style::HangingPunctuation::fromRaw(m_rareInheritedData->hangingPunctuation); }
-inline Style::WebkitLineBoxContain RenderStyle::lineBoxContain() const { return Style::WebkitLineBoxContain::fromRaw(m_rareInheritedData->lineBoxContain); }
-inline Style::MarginTrim RenderStyle::marginTrim() const { return Style::MarginTrim::fromRaw(m_nonInheritedData->rareData->marginTrim); }
-inline Style::SVGPaintOrder RenderStyle::paintOrder() const { return Style::SVGPaintOrder::fromRaw(m_rareInheritedData->paintOrder); }
-inline Style::PositionVisibility RenderStyle::positionVisibility() const { return Style::PositionVisibility::fromRaw(m_nonInheritedData->rareData->positionVisibility); }
-inline Style::SpeakAs RenderStyle::speakAs() const { return Style::SpeakAs::fromRaw(m_rareInheritedData->speakAs); }
-inline Style::TextDecorationLine RenderStyle::textDecorationLine() const { return Style::TextDecorationLine::fromRaw(m_nonInheritedFlags.textDecorationLine); }
-inline Style::TextDecorationLine RenderStyle::textDecorationLineInEffect() const { return Style::TextDecorationLine::fromRaw(m_inheritedFlags.textDecorationLineInEffect); }
-inline Style::TextEmphasisPosition RenderStyle::textEmphasisPosition() const { return Style::TextEmphasisPosition::fromRaw(m_rareInheritedData->textEmphasisPosition); }
-inline Style::TextTransform RenderStyle::textTransform() const { return Style::TextTransform::fromRaw(m_inheritedFlags.textTransform); }
-inline Style::TextUnderlinePosition RenderStyle::textUnderlinePosition() const { return Style::TextUnderlinePosition::fromRaw(m_rareInheritedData->textUnderlinePosition); }
-inline Style::Contain RenderStyle::contain() const { return Style::Contain::fromRaw(m_nonInheritedData->rareData->contain); }
+// FIXME: - Below are property getters that are not yet generated
 
 // FIXME: Support properties that set more than one value when set.
 inline StyleAppearance RenderStyle::appearance() const { return static_cast<StyleAppearance>(m_nonInheritedData->miscData->appearance); }
@@ -1107,84 +1110,6 @@ inline const Style::PageSize& RenderStyle::pageSize() const { return m_nonInheri
 // FIXME: Support generating getter and setter with different names (or rename computedLetterSpacing() to letterSpacing() and computedWordSpacing() to wordSpacing())
 inline const Style::LetterSpacing& RenderStyle::computedLetterSpacing() const { return m_inheritedData->fontData->letterSpacing; }
 inline const Style::WordSpacing& RenderStyle::computedWordSpacing() const { return m_inheritedData->fontData->wordSpacing; }
-
-// FIXME: Support properties stored in structs
-inline NinePieceImageRule RenderStyle::maskBorderHorizontalRule() const { return maskBorderRepeat().horizontalRule(); }
-inline const Style::MaskBorderOutset& RenderStyle::maskBorderOutset() const { return maskBorder().outset(); }
-inline const Style::MaskBorderRepeat& RenderStyle::maskBorderRepeat() const { return maskBorder().repeat(); }
-inline const Style::MaskBorderSlice& RenderStyle::maskBorderSlice() const { return maskBorder().slice(); }
-inline const Style::MaskBorderSource& RenderStyle::maskBorderSource() const { return maskBorder().source(); }
-inline NinePieceImageRule RenderStyle::maskBorderVerticalRule() const { return maskBorderRepeat().verticalRule(); }
-inline const Style::MaskBorderWidth& RenderStyle::maskBorderWidth() const { return maskBorder().width(); }
-inline const Style::BorderImageOutset& RenderStyle::borderImageOutset() const { return borderImage().outset(); }
-inline const Style::BorderImageRepeat& RenderStyle::borderImageRepeat() const { return borderImage().repeat(); }
-inline const Style::BorderImageSlice& RenderStyle::borderImageSlice() const { return borderImage().slice(); }
-inline const Style::BorderImageSource& RenderStyle::borderImageSource() const { return borderImage().source(); }
-inline const Style::BorderImageWidth& RenderStyle::borderImageWidth() const { return borderImage().width(); }
-inline const Style::TransformOriginX& RenderStyle::transformOriginX() const { return transformOrigin().x; }
-inline const Style::TransformOriginY& RenderStyle::transformOriginY() const { return transformOrigin().y; }
-inline const Style::TransformOriginZ& RenderStyle::transformOriginZ() const { return transformOrigin().z; }
-inline const Style::PerspectiveOriginX& RenderStyle::perspectiveOriginX() const { return m_nonInheritedData->rareData->perspectiveOrigin.x; }
-inline const Style::PerspectiveOriginY& RenderStyle::perspectiveOriginY() const { return m_nonInheritedData->rareData->perspectiveOrigin.y; }
-inline const Style::Color& RenderStyle::columnRuleColor() const { return m_nonInheritedData->miscData->multiCol->columnRule.color(); }
-inline BorderStyle RenderStyle::columnRuleStyle() const { return m_nonInheritedData->miscData->multiCol->columnRule.style(); }
-inline Style::LineWidth RenderStyle::columnRuleWidth() const { return m_nonInheritedData->miscData->multiCol->columnRuleWidth(); }
-inline const Style::Color& RenderStyle::outlineColor() const { return outline().color(); }
-inline OutlineStyle RenderStyle::outlineStyle() const { return outline().style(); }
-inline Style::LineWidthBox RenderStyle::borderWidth() const { return border().borderWidth(); }
-inline BorderStyle RenderStyle::borderBottomStyle() const { return border().bottom().style(); }
-inline BorderStyle RenderStyle::borderLeftStyle() const { return border().left().style(); }
-inline BorderStyle RenderStyle::borderRightStyle() const { return border().right().style(); }
-inline BorderStyle RenderStyle::borderTopStyle() const { return border().top().style(); }
-inline const BorderValue& RenderStyle::borderBottom() const { return border().bottom(); }
-inline const BorderValue& RenderStyle::borderLeft() const { return border().left(); }
-inline const BorderValue& RenderStyle::borderRight() const { return border().right(); }
-inline const BorderValue& RenderStyle::borderTop() const { return border().top(); }
-inline const Style::BorderRadiusValue& RenderStyle::borderBottomLeftRadius() const { return border().bottomLeftRadius(); }
-inline const Style::BorderRadiusValue& RenderStyle::borderBottomRightRadius() const { return border().bottomRightRadius(); }
-inline const Style::BorderRadiusValue& RenderStyle::borderTopLeftRadius() const { return border().topLeftRadius(); }
-inline const Style::BorderRadiusValue& RenderStyle::borderTopRightRadius() const { return border().topRightRadius(); }
-inline const Style::Color& RenderStyle::borderBottomColor() const { return border().bottom().color(); }
-inline const Style::Color& RenderStyle::borderLeftColor() const { return border().left().color(); }
-inline const Style::Color& RenderStyle::borderRightColor() const { return border().right().color(); }
-inline const Style::Color& RenderStyle::borderTopColor() const { return border().top().color(); }
-inline const Style::CornerShapeValue& RenderStyle::cornerBottomLeftShape() const { return border().bottomLeftCornerShape(); }
-inline const Style::CornerShapeValue& RenderStyle::cornerBottomRightShape() const { return border().bottomRightCornerShape(); }
-inline const Style::CornerShapeValue& RenderStyle::cornerTopLeftShape() const { return border().topLeftCornerShape(); }
-inline const Style::CornerShapeValue& RenderStyle::cornerTopRightShape() const { return border().topRightCornerShape(); }
-inline NinePieceImageRule RenderStyle::borderImageHorizontalRule() const { return borderImageRepeat().horizontalRule(); }
-inline NinePieceImageRule RenderStyle::borderImageVerticalRule() const { return borderImageRepeat().verticalRule(); }
-inline Style::LineWidth RenderStyle::borderBottomWidth() const { return border().borderBottomWidth(); }
-inline Style::LineWidth RenderStyle::borderLeftWidth() const { return border().borderLeftWidth(); }
-inline Style::LineWidth RenderStyle::borderRightWidth() const { return border().borderRightWidth(); }
-inline Style::LineWidth RenderStyle::borderTopWidth() const { return border().borderTopWidth(); }
-inline MaskType RenderStyle::maskType() const { return static_cast<MaskType>(m_svgStyle->nonInheritedFlags.maskType); }
-inline AlignmentBaseline RenderStyle::alignmentBaseline() const { return static_cast<AlignmentBaseline>(m_svgStyle->nonInheritedFlags.alignmentBaseline); }
-inline DominantBaseline RenderStyle::dominantBaseline() const { return static_cast<DominantBaseline>(m_svgStyle->nonInheritedFlags.dominantBaseline); }
-inline VectorEffect RenderStyle::vectorEffect() const { return static_cast<VectorEffect>(m_svgStyle->nonInheritedFlags.vectorEffect); }
-inline BufferedRendering RenderStyle::bufferedRendering() const { return static_cast<BufferedRendering>(m_svgStyle->nonInheritedFlags.bufferedRendering); }
-inline WindRule RenderStyle::clipRule() const { return static_cast<WindRule>(m_svgStyle->inheritedFlags.clipRule); }
-inline ColorInterpolation RenderStyle::colorInterpolation() const { return static_cast<ColorInterpolation>(m_svgStyle->inheritedFlags.colorInterpolation); }
-inline ColorInterpolation RenderStyle::colorInterpolationFilters() const { return static_cast<ColorInterpolation>(m_svgStyle->inheritedFlags.colorInterpolationFilters); }
-inline WindRule RenderStyle::fillRule() const { return static_cast<WindRule>(m_svgStyle->inheritedFlags.fillRule); }
-inline ShapeRendering RenderStyle::shapeRendering() const { return static_cast<ShapeRendering>(m_svgStyle->inheritedFlags.shapeRendering); }
-inline TextAnchor RenderStyle::textAnchor() const { return static_cast<TextAnchor>(m_svgStyle->inheritedFlags.textAnchor); }
-inline Style::SVGGlyphOrientationHorizontal RenderStyle::glyphOrientationHorizontal() const { return static_cast<Style::SVGGlyphOrientationHorizontal>(m_svgStyle->inheritedFlags.glyphOrientationHorizontal); }
-inline Style::SVGGlyphOrientationVertical RenderStyle::glyphOrientationVertical() const { return static_cast<Style::SVGGlyphOrientationVertical>(m_svgStyle->inheritedFlags.glyphOrientationVertical); }
-
-// FIXME: Support properties stored in RectEdge<>.
-inline const Style::InsetEdge& RenderStyle::top() const { return m_nonInheritedData->surroundData->inset.top(); }
-inline const Style::InsetEdge& RenderStyle::right() const { return m_nonInheritedData->surroundData->inset.right(); }
-inline const Style::InsetEdge& RenderStyle::bottom() const { return m_nonInheritedData->surroundData->inset.bottom(); }
-inline const Style::InsetEdge& RenderStyle::left() const { return m_nonInheritedData->surroundData->inset.left(); }
-inline const Style::MarginEdge& RenderStyle::marginTop() const { return m_nonInheritedData->surroundData->margin.top(); }
-inline const Style::MarginEdge& RenderStyle::marginBottom() const { return m_nonInheritedData->surroundData->margin.bottom(); }
-inline const Style::MarginEdge& RenderStyle::marginLeft() const { return m_nonInheritedData->surroundData->margin.left(); }
-inline const Style::MarginEdge& RenderStyle::marginRight() const { return m_nonInheritedData->surroundData->margin.right(); }
-inline const Style::PaddingEdge& RenderStyle::paddingTop() const { return paddingBox().top(); }
-inline const Style::PaddingEdge& RenderStyle::paddingRight() const { return paddingBox().right(); }
-inline const Style::PaddingEdge& RenderStyle::paddingBottom() const { return paddingBox().bottom(); }
-inline const Style::PaddingEdge& RenderStyle::paddingLeft() const { return paddingBox().left(); }
 
 // FIXME: Support generated font-property getters
 inline Style::FontFamilies RenderStyle::fontFamily() const { return { fontDescription().families(), fontDescription().isSpecifiedFont() }; }
@@ -1208,14 +1133,11 @@ inline FontVariantEmoji RenderStyle::fontVariantEmoji() const { return fontDescr
 inline Style::FontVariantLigatures RenderStyle::fontVariantLigatures() const { return fontDescription().variantLigatures(); }
 inline Style::FontVariantNumeric RenderStyle::fontVariantNumeric() const { return fontDescription().variantNumeric(); }
 inline FontVariantPosition RenderStyle::fontVariantPosition() const { return fontDescription().variantPosition(); }
-inline Style::WebkitLocale RenderStyle::locale() const { return fontDescription().specifiedLocale(); }
 inline TextRenderingMode RenderStyle::textRendering() const { return fontDescription().textRenderingMode(); }
 inline Style::TextAutospace RenderStyle::textAutospace() const { return fontDescription().textAutospace(); }
 inline Style::TextSpacingTrim RenderStyle::textSpacingTrim() const { return fontDescription().textSpacingTrim(); }
-inline float RenderStyle::usedLetterSpacing() const { return m_inheritedData->fontData->fontCascade.letterSpacing(); }
-inline const FontCascade& RenderStyle::fontCascade() const { return m_inheritedData->fontData->fontCascade; }
+inline Style::WebkitLocale RenderStyle::locale() const { return fontDescription().specifiedLocale(); }
 inline Style::WebkitLocale RenderStyle::computedLocale() const { return fontDescription().computedLocale(); }
-inline float RenderStyle::usedWordSpacing() const { return m_inheritedData->fontData->fontCascade.wordSpacing(); }
 
 // FIXME: Support generating visited link variants
 inline const Style::Color& RenderStyle::visitedLinkBackgroundColor() const { return m_nonInheritedData->miscData->visitedLinkColor->background; }

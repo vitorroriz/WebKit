@@ -1011,11 +1011,13 @@ public:
     inline Style::ColumnCount columnCount() const;
     inline bool specifiesColumns() const;
     inline ColumnFill columnFill() const;
+    inline ColumnSpan columnSpan() const;
+    inline bool columnSpanEqual(const RenderStyle&) const;
+
+    const BorderValue& columnRule() const;
     inline BorderStyle columnRuleStyle() const;
     inline Style::LineWidth columnRuleWidth() const;
     inline bool columnRuleIsTransparent() const;
-    inline ColumnSpan columnSpan() const;
-    inline bool columnSpanEqual(const RenderStyle&) const;
 
     inline const Style::GapGutter& columnGap() const;
     inline const Style::GapGutter& rowGap() const;
@@ -1168,17 +1170,17 @@ public:
 
     inline bool effectiveInert() const;
 
-    const Style::ScrollMarginBox& scrollMarginBox() const;
-    const Style::ScrollMarginEdge& scrollMarginTop() const;
-    const Style::ScrollMarginEdge& scrollMarginBottom() const;
-    const Style::ScrollMarginEdge& scrollMarginLeft() const;
-    const Style::ScrollMarginEdge& scrollMarginRight() const;
+    inline const Style::ScrollMarginBox& scrollMarginBox() const;
+    inline const Style::ScrollMarginEdge& scrollMarginTop() const;
+    inline const Style::ScrollMarginEdge& scrollMarginBottom() const;
+    inline const Style::ScrollMarginEdge& scrollMarginLeft() const;
+    inline const Style::ScrollMarginEdge& scrollMarginRight() const;
 
-    const Style::ScrollPaddingBox& scrollPaddingBox() const;
-    const Style::ScrollPaddingEdge& scrollPaddingTop() const;
-    const Style::ScrollPaddingEdge& scrollPaddingBottom() const;
-    const Style::ScrollPaddingEdge& scrollPaddingLeft() const;
-    const Style::ScrollPaddingEdge& scrollPaddingRight() const;
+    inline const Style::ScrollPaddingBox& scrollPaddingBox() const;
+    inline const Style::ScrollPaddingEdge& scrollPaddingTop() const;
+    inline const Style::ScrollPaddingEdge& scrollPaddingBottom() const;
+    inline const Style::ScrollPaddingEdge& scrollPaddingLeft() const;
+    inline const Style::ScrollPaddingEdge& scrollPaddingRight() const;
     inline bool scrollPaddingEqual(const RenderStyle&) const;
 
     bool hasSnapPosition() const;
@@ -1321,11 +1323,11 @@ public:
     inline void setBackgroundLayers(Style::BackgroundLayers&&);
 
     inline void setBorderImage(Style::BorderImage&&);
-    void setBorderImageSource(Style::BorderImageSource&&);
-    void setBorderImageSlice(Style::BorderImageSlice&&);
-    void setBorderImageWidth(Style::BorderImageWidth&&);
-    void setBorderImageOutset(Style::BorderImageOutset&&);
-    void setBorderImageRepeat(Style::BorderImageRepeat&&);
+    inline void setBorderImageSource(Style::BorderImageSource&&);
+    inline void setBorderImageSlice(Style::BorderImageSlice&&);
+    inline void setBorderImageWidth(Style::BorderImageWidth&&);
+    inline void setBorderImageOutset(Style::BorderImageOutset&&);
+    inline void setBorderImageRepeat(Style::BorderImageRepeat&&);
 
     inline void setBorderTopLeftRadius(Style::BorderRadiusValue&&);
     inline void setBorderTopRightRadius(Style::BorderRadiusValue&&);
@@ -1404,9 +1406,9 @@ public:
     void setTextAlign(Style::TextAlign v) { m_inheritedFlags.textAlign = static_cast<unsigned>(v); }
     inline void setTextAlignLast(Style::TextAlignLast);
     inline void setTextGroupAlign(TextGroupAlign);
-    inline void addToTextDecorationLineInEffect(const Style::TextDecorationLine&);
-    inline void setTextDecorationLineInEffect(Style::TextDecorationLine&&);
-    inline void setTextDecorationLine(Style::TextDecorationLine&&);
+    inline void addToTextDecorationLineInEffect(Style::TextDecorationLine);
+    inline void setTextDecorationLineInEffect(Style::TextDecorationLine);
+    inline void setTextDecorationLine(Style::TextDecorationLine);
     inline void setTextDecorationStyle(TextDecorationStyle);
     inline void setTextDecorationSkipInk(TextDecorationSkipInk);
     inline void setTextDecorationThickness(Style::TextDecorationThickness&&);
@@ -1445,11 +1447,11 @@ public:
     inline void setMaskLayers(Style::MaskLayers&&);
 
     inline void setMaskBorder(Style::MaskBorder&&);
-    void setMaskBorderSource(Style::MaskBorderSource&&);
-    void setMaskBorderSlice(Style::MaskBorderSlice&&);
-    void setMaskBorderWidth(Style::MaskBorderWidth&&);
-    void setMaskBorderOutset(Style::MaskBorderOutset&&);
-    void setMaskBorderRepeat(Style::MaskBorderRepeat&&);
+    inline void setMaskBorderSource(Style::MaskBorderSource&&);
+    inline void setMaskBorderSlice(Style::MaskBorderSlice&&);
+    inline void setMaskBorderWidth(Style::MaskBorderWidth&&);
+    inline void setMaskBorderOutset(Style::MaskBorderOutset&&);
+    inline void setMaskBorderRepeat(Style::MaskBorderRepeat&&);
 
     void setBorderCollapse(BorderCollapse collapse) { m_inheritedFlags.borderCollapse = static_cast<unsigned>(collapse); }
     inline void setBorderHorizontalSpacing(Style::WebkitBorderSpacing);

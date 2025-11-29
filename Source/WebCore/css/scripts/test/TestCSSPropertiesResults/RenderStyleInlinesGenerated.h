@@ -8,6 +8,7 @@
 
 #include <WebCore/SVGRenderStyle.h>
 #include <WebCore/StyleAppleColorFilterData.h>
+#include <WebCore/StyleBackdropFilterData.h>
 #include <WebCore/StyleBackgroundData.h>
 #include <WebCore/StyleBoxData.h>
 #include <WebCore/StyleDeprecatedFlexibleBoxData.h>
@@ -34,6 +35,11 @@ inline Style::TestEnumeration RenderStyle::testRenderStyleStorageOneLevelEnum() 
     return static_cast<Style::TestEnumeration>(level1->testRenderStyleStorageOneLevelEnum);
 }
 
+inline Style::TestRaw RenderStyle::testRenderStyleStorageOneLevelRaw() const
+{
+    return Style::TestRaw::fromRaw(level1->testRenderStyleStorageOneLevelRaw);
+}
+
 inline const Style::Number<>& RenderStyle::testRenderStyleStorageOneLevelReference() const
 {
     return level1->testRenderStyleStorageOneLevelReference;
@@ -47,6 +53,11 @@ inline Style::Number<> RenderStyle::testRenderStyleStorageOneLevelValue() const
 inline Style::TestEnumeration RenderStyle::testRenderStyleStorageTwoLevelEnum() const
 {
     return static_cast<Style::TestEnumeration>(level1->level2->testRenderStyleStorageTwoLevelEnum);
+}
+
+inline Style::TestRaw RenderStyle::testRenderStyleStorageTwoLevelRaw() const
+{
+    return Style::TestRaw::fromRaw(level1->level2->testRenderStyleStorageTwoLevelRaw);
 }
 
 inline const Style::Number<>& RenderStyle::testRenderStyleStorageTwoLevelReference() const
