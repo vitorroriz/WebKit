@@ -2054,6 +2054,9 @@ void KeyframeEffect::addPendingAcceleratedAction(AcceleratedAction action)
         return;
 #endif
 
+    if (!animation())
+        return;
+
     if (m_runningAccelerated == RunningAccelerated::Prevented || m_runningAccelerated == RunningAccelerated::Failed)
         return;
 
