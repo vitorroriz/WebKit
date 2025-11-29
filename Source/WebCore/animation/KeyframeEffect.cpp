@@ -3075,9 +3075,6 @@ KeyframeEffect::StackMembershipMutationScope::~StackMembershipMutationScope()
 
 bool KeyframeEffect::canHaveAcceleratedRepresentation() const
 {
-    if (m_acceleratedRepresentation)
-        return true;
-
     if (RefPtr document = this->document()) {
         Ref settings = document->settings();
         if (m_isAssociatedWithProgressBasedTimeline && settings->threadedScrollDrivenAnimationsEnabled())
