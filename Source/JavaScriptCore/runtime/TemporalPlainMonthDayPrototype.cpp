@@ -43,6 +43,7 @@ static JSC_DECLARE_HOST_FUNCTION(temporalPlainMonthDayPrototypeFuncToJSON);
 static JSC_DECLARE_HOST_FUNCTION(temporalPlainMonthDayPrototypeFuncToLocaleString);
 static JSC_DECLARE_HOST_FUNCTION(temporalPlainMonthDayPrototypeFuncWith);
 static JSC_DECLARE_HOST_FUNCTION(temporalPlainMonthDayPrototypeFuncEquals);
+static JSC_DECLARE_HOST_FUNCTION(temporalPlainMonthDayPrototypeFuncValueOf);
 static JSC_DECLARE_CUSTOM_GETTER(temporalPlainMonthDayPrototypeGetterCalendarId);
 static JSC_DECLARE_CUSTOM_GETTER(temporalPlainMonthDayPrototypeGetterDay);
 static JSC_DECLARE_CUSTOM_GETTER(temporalPlainMonthDayPrototypeGetterMonthCode);
@@ -63,6 +64,7 @@ const ClassInfo TemporalPlainMonthDayPrototype::s_info = { "Temporal.PlainMonthD
   toLocaleString   temporalPlainMonthDayPrototypeFuncToLocaleString     DontEnum|Function 0
   with             temporalPlainMonthDayPrototypeFuncWith               DontEnum|Function 1
   equals           temporalPlainMonthDayPrototypeFuncEquals             DontEnum|Function 1
+  valueOf          temporalPlainMonthDayPrototypeFuncValueOf            DontEnum|Function 0
   calendarId       temporalPlainMonthDayPrototypeGetterCalendarId       DontEnum|ReadOnly|CustomAccessor
   day              temporalPlainMonthDayPrototypeGetterDay              DontEnum|ReadOnly|CustomAccessor
   monthCode        temporalPlainMonthDayPrototypeGetterMonthCode        DontEnum|ReadOnly|CustomAccessor
@@ -205,6 +207,15 @@ JSC_DEFINE_HOST_FUNCTION(temporalPlainMonthDayPrototypeFuncToPlainDate, (JSGloba
     }
 
     RELEASE_AND_RETURN(scope, JSValue::encode(TemporalPlainDate::tryCreateIfValid(globalObject, globalObject->plainDateStructure(), WTFMove(plainDateOptional.value()))));
+}
+
+// https://tc39.es/proposal-temporal/#sec-temporal.plainmonthday.prototype.valueof
+JSC_DEFINE_HOST_FUNCTION(temporalPlainMonthDayPrototypeFuncValueOf, (JSGlobalObject* globalObject, CallFrame*))
+{
+    VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    return throwVMTypeError(globalObject, scope, "Temporal.PlainMonthDay.prototype.valueOf must not be called. To compare PlainMonthDay values, use Temporal.PlainDate.compare on the corresponding PlainDate objects."_s);
 }
 
 // https://tc39.es/proposal-temporal/#sec-get-temporal.plainmonthday.prototype.calendarid

@@ -376,9 +376,6 @@ test/built-ins/Temporal/PlainDateTime/prototype/yearOfWeek/branding.js:
 test/built-ins/Temporal/PlainDateTime/prototype/yearOfWeek/prop-desc.js:
   default: "TypeError: undefined is not an object (evaluating 'descriptor.get')"
   strict mode: "TypeError: undefined is not an object (evaluating 'descriptor.get')"
-test/built-ins/Temporal/PlainMonthDay/prototype/toPlainDate/order-of-operations.js:
-  default: "TypeError: pmd.toPlainDate is not a function. (In 'pmd.toPlainDate(fields)', 'pmd.toPlainDate' is undefined)"
-  strict mode: "TypeError: pmd.toPlainDate is not a function. (In 'pmd.toPlainDate(fields)', 'pmd.toPlainDate' is undefined)"
 test/built-ins/Temporal/PlainTime/from/observable-get-overflow-argument-string-invalid.js:
   default: 'Test262Error: Actual [get overflow, get overflow.toString, call overflow.toString] and expected [] should have the same contents. options read after ISO string parsing'
   strict mode: 'Test262Error: Actual [get overflow, get overflow.toString, call overflow.toString] and expected [] should have the same contents. options read after ISO string parsing'
