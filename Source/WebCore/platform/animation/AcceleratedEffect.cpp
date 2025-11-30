@@ -250,6 +250,7 @@ AcceleratedEffect::AcceleratedEffect(const KeyframeEffect& effect, const Timelin
             return { };
         }();
 
+        ASSERT(!std::isnan(srcKeyframe.offset()));
         m_keyframes.append({ srcKeyframe.offset(), WTFMove(values), srcKeyframe.timingFunction(), srcKeyframe.compositeOperation(), WTFMove(animatedProperties) });
     }
 

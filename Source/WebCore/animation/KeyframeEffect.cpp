@@ -3111,6 +3111,14 @@ void KeyframeEffect::timelineAccelerationAbilityDidChange()
     scheduleAssociatedAcceleratedEffectStackUpdate();
 }
 
+RefPtr<AcceleratedEffect> KeyframeEffect::updatedAcceleratedRepresentation(const TimelineIdentifier& timelineIdentifier, const IntRect& borderBoxRect, const AcceleratedEffectValues& baseValues, OptionSet<AcceleratedEffectProperty>& disallowedProperties)
+{
+    updateComputedKeyframeOffsetsIfNeeded();
+    RefPtr acceleratedEffect = AcceleratedEffect::create(*this, timelineIdentifier, borderBoxRect, baseValues, disallowedProperties);
+    m_acceleratedRepresentation = acceleratedEffect.get();
+    return acceleratedEffect;
+}
+
 #endif
 
 const KeyframeInterpolation::Keyframe& KeyframeEffect::keyframeAtIndex(size_t index) const

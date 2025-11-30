@@ -4527,12 +4527,11 @@ void RenderLayerBacking::updateAcceleratedEffectsAndBaseValues(HashSet<Ref<Accel
                 ASSERT(effect->animation());
                 ASSERT(effect->animation()->timeline());
                 Ref acceleratedTimeline = Ref { *effect->animation()->timeline() }->acceleratedRepresentation();
-                auto acceleratedEffect = AcceleratedEffect::create(*effect, acceleratedTimeline->identifier(), borderBoxRect, baseValues, disallowedAcceleratedProperties);
+                RefPtr acceleratedEffect = effect->updatedAcceleratedRepresentation(acceleratedTimeline->identifier(), borderBoxRect, baseValues, disallowedAcceleratedProperties);
                 if (!acceleratedEffect)
                     continue;
                 if (!hasInterpolatingEffect && effect->isRunningAccelerated())
                     hasInterpolatingEffect = true;
-                effect->setAcceleratedRepresentation(acceleratedEffect.get());
                 weakAcceleratedEffects.add(*acceleratedEffect);
                 acceleratedEffects.append(acceleratedEffect.releaseNonNull());
                 timelines.add(WTFMove(acceleratedTimeline));

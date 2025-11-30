@@ -196,7 +196,7 @@ public:
 #if ENABLE(THREADED_ANIMATIONS)
     bool canHaveAcceleratedRepresentation() const;
     const AcceleratedEffect* acceleratedRepresentation() const { return m_acceleratedRepresentation.get(); }
-    void setAcceleratedRepresentation(const AcceleratedEffect* acceleratedRepresentation) { m_acceleratedRepresentation = acceleratedRepresentation; }
+    RefPtr<AcceleratedEffect> updatedAcceleratedRepresentation(const TimelineIdentifier&, const IntRect&, const AcceleratedEffectValues&, OptionSet<AcceleratedEffectProperty>&);
     void timelineAccelerationAbilityDidChange();
 #endif
 
