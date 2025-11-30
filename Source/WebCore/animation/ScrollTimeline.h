@@ -92,7 +92,7 @@ protected:
         float rangeStart { 0 };
         float rangeEnd { 0 };
     };
-    virtual Data computeTimelineData() const;
+    virtual Data computeTimelineData(UseCachedCurrentTime = UseCachedCurrentTime::Yes) const;
 
     static ScrollableArea* scrollableAreaForSourceRenderer(const RenderElement*, Document&);
 
@@ -115,6 +115,7 @@ private:
         float maxScrollOffset { 0 };
     };
 
+    CurrentTimeData computeCurrentTimeData() const;
     void cacheCurrentTime();
 
     WeakStyleable m_source;
