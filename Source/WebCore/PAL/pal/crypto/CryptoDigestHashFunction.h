@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,36 +25,14 @@
 
 #pragma once
 
-#if HAVE(SWIFT_CPP_INTEROP)
-#include "PALSwift.h"
+namespace PAL {
 
-namespace WebCore {
-inline PAL::HashFunction toCKHashFunction(CryptoAlgorithmIdentifier hash)
-{
-    switch (hash) {
-    case CryptoAlgorithmIdentifier::SHA_256:
-        return PAL::HashFunction::sha256();
-        break;
-    case CryptoAlgorithmIdentifier::SHA_384:
-        return PAL::HashFunction::sha384();
-        break;
-    case CryptoAlgorithmIdentifier::SHA_512:
-        return PAL::HashFunction::sha512();
-        break;
-    case CryptoAlgorithmIdentifier::SHA_1:
-        return PAL::HashFunction::sha1();
-        break;
-    default:
-        break;
-    }
-    ASSERT_NOT_REACHED();
-    return PAL::HashFunction::sha512();
-}
+enum class CryptoDigestHashFunction : int {
+    SHA_1,
+    DEPRECATED_SHA_224,
+    SHA_256,
+    SHA_384,
+    SHA_512,
+};
 
-inline bool isValidHashParameter(CryptoAlgorithmIdentifier hash)
-{
-    return hash == CryptoAlgorithmIdentifier::SHA_1 || hash == CryptoAlgorithmIdentifier::SHA_256 || hash == CryptoAlgorithmIdentifier::SHA_512 || hash == CryptoAlgorithmIdentifier::SHA_384;
-}
-
-} // WebCore
-#endif
+} // namespace PAL
