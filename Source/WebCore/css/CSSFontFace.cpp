@@ -73,7 +73,7 @@ void CSSFontFace::appendSources(CSSFontFace& fontFace, CSSValueList& srcList, Sc
         } else {
             if (allowDownloading) {
                 if (auto request = downcast<CSSFontFaceSrcResourceValue>(const_cast<CSSValue&>(src)).fontLoadRequest(*context, isInitiatingElementInUserAgentShadowTree))
-                    fontFace.adoptSource(makeUnique<CSSFontFaceSource>(fontFace, *context->cssFontSelector(), makeUniqueRefFromNonNullUniquePtr(WTFMove(request))));
+                    fontFace.adoptSource(makeUnique<CSSFontFaceSource>(fontFace, *context->cssFontSelector(), request.releaseNonNull()));
             }
         }
     }

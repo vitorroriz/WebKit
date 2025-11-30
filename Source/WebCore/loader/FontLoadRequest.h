@@ -27,6 +27,7 @@
 #pragma once
 
 #include <WebCore/FontTaggedSettings.h>
+#include <wtf/AbstractRefCounted.h>
 #include <wtf/CheckedRef.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/WeakPtr.h>
@@ -48,7 +49,7 @@ public:
     virtual void fontLoaded(FontLoadRequest&) { }
 };
 
-class FontLoadRequest {
+class FontLoadRequest : public AbstractRefCounted {
 public:
     virtual ~FontLoadRequest() = default;
 

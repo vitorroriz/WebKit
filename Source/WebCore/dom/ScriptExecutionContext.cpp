@@ -286,7 +286,7 @@ CSSValuePool& ScriptExecutionContext::cssValuePool()
     return CSSValuePool::singleton();
 }
 
-std::unique_ptr<FontLoadRequest> ScriptExecutionContext::fontLoadRequest(const String&, bool, bool, LoadedFromOpaqueSource)
+RefPtr<FontLoadRequest> ScriptExecutionContext::fontLoadRequest(const String&, bool, bool, LoadedFromOpaqueSource)
 {
     return nullptr;
 }

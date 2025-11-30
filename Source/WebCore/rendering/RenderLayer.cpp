@@ -6367,14 +6367,15 @@ RenderLayerFilters& RenderLayer::ensureLayerFilters()
     if (m_filters)
         return *m_filters;
     
-    m_filters = makeUnique<RenderLayerFilters>(*this);
+    m_filters = RenderLayerFilters::create(*this);
     m_filters->setFilterScale({ page().deviceScaleFactor(), page().deviceScaleFactor() });
     return *m_filters;
 }
 
 void RenderLayer::clearLayerFilters()
 {
-    m_filters = nullptr;
+    if (RefPtr filters = std::exchange(m_filters, nullptr))
+        filters->detachFromLayer();
 }
 
 RenderLayerScrollableArea* RenderLayer::ensureLayerScrollableArea()

@@ -7594,7 +7594,7 @@ void Internals::loadArtworkImage(String&& url, ArtworkImagePromise&& promise)
         return;
     }
     m_artworkImagePromise = makeUnique<ArtworkImagePromise>(WTFMove(promise));
-    m_artworkLoader = makeUnique<ArtworkImageLoader>(*contextDocument(), url, [weakThis = WeakPtr { *this }](Image* image) {
+    m_artworkLoader = ArtworkImageLoader::create(*contextDocument(), url, [weakThis = WeakPtr { *this }](Image* image) {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis)
             return;

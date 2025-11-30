@@ -1622,9 +1622,10 @@ void DocumentLoader::loadApplicationManifest(CompletionHandler<void(const std::o
     if (manifestURL.isEmpty() || !manifestURL.isValid())
         return;
 
-    m_applicationManifestLoader = makeUnique<ApplicationManifestLoader>(*this, manifestURL, useCredentials);
+    Ref applicationManifestLoader = ApplicationManifestLoader::create(*this, manifestURL, useCredentials);
+    m_applicationManifestLoader = applicationManifestLoader.copyRef();
 
-    isLoading = m_applicationManifestLoader->startLoading();
+    isLoading = applicationManifestLoader->startLoading();
     if (!isLoading)
         m_finishedLoadingApplicationManifest = true;
 }
@@ -1644,7 +1645,7 @@ void DocumentLoader::finishedLoadingApplicationManifest(ApplicationManifestLoade
 
 void DocumentLoader::notifyFinishedLoadingApplicationManifest()
 {
-    std::optional<ApplicationManifest> manifest = m_applicationManifestLoader ? m_applicationManifestLoader->processManifest() : std::nullopt;
+    std::optional<ApplicationManifest> manifest = m_applicationManifestLoader ? Ref { *m_applicationManifestLoader }->processManifest() : std::nullopt;
     ASSERT_IMPLIES(manifest, m_finishedLoadingApplicationManifest);
 
     for (auto& callback : std::exchange(m_loadApplicationManifestCallbacks, { }))
@@ -2463,11 +2464,10 @@ void DocumentLoader::didGetLoadDecisionForIcon(bool decision, uint64_t loadIdent
     if (icon.url.isEmpty())
         return completionHandler(nullptr);
 
-    auto iconLoader = makeUnique<IconLoader>(*this, icon.url);
-    auto* rawIconLoader = iconLoader.get();
-    m_iconLoaders.add(WTFMove(iconLoader), WTFMove(completionHandler));
+    Ref iconLoader = IconLoader::create(*this, icon.url);
+    m_iconLoaders.add(iconLoader.copyRef(), WTFMove(completionHandler));
 
-    rawIconLoader->startLoading();
+    iconLoader->startLoading();
 }
 
 void DocumentLoader::finishedLoadingIcon(IconLoader& loader, FragmentedSharedBuffer* buffer)

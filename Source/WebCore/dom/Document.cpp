@@ -4195,10 +4195,12 @@ void Document::implicitOpen()
     setReadyState(ReadyState::Loading);
 }
 
-std::unique_ptr<FontLoadRequest> Document::fontLoadRequest(const String& url, bool isSVG, bool isInitiatingElementInUserAgentShadowTree, LoadedFromOpaqueSource loadedFromOpaqueSource)
+RefPtr<FontLoadRequest> Document::fontLoadRequest(const String& url, bool isSVG, bool isInitiatingElementInUserAgentShadowTree, LoadedFromOpaqueSource loadedFromOpaqueSource)
 {
     CachedResourceHandle cachedFont = protectedFontLoader()->cachedFont(completeURL(url), isSVG, isInitiatingElementInUserAgentShadowTree, loadedFromOpaqueSource);
-    return cachedFont ? makeUnique<CachedFontLoadRequest>(*cachedFont, *this) : nullptr;
+    if (!cachedFont)
+        return nullptr;
+    return CachedFontLoadRequest::create(*cachedFont, *this);
 }
 
 void Document::beginLoadingFontSoon(FontLoadRequest& request)

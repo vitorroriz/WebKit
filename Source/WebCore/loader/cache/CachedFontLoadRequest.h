@@ -39,13 +39,12 @@ namespace WebCore {
 
 class FontCreationContext;
 
-class CachedFontLoadRequest final : public FontLoadRequest, public CachedFontClient {
+class CachedFontLoadRequest final : public FontLoadRequest, public CachedFontClient, public RefCounted<CachedFontLoadRequest> {
     WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(CachedFontLoadRequest, Loader);
 public:
-    CachedFontLoadRequest(CachedFont& font, ScriptExecutionContext& context)
-        : m_font(&font)
-        , m_context(context)
+    static Ref<CachedFontLoadRequest> create(CachedFont& font, ScriptExecutionContext& context)
     {
+        return adoptRef(*new CachedFontLoadRequest(font, context));
     }
 
     ~CachedFontLoadRequest()
@@ -54,10 +53,20 @@ public:
             protectedCachedFont()->removeClient(*this);
     }
 
+    // CachedResourceClient.
+    void ref() const final { RefCounted::ref(); }
+    void deref() const final { RefCounted::deref(); }
+
     CachedFont& cachedFont() const { return *m_font; }
     CachedResourceHandle<CachedFont> protectedCachedFont() const { return m_font; }
 
 private:
+    CachedFontLoadRequest(CachedFont& font, ScriptExecutionContext& context)
+        : m_font(&font)
+        , m_context(context)
+    {
+    }
+
     const URL& url() const final { return m_font->url(); }
     bool isPending() const final { return m_font->status() == CachedResource::Status::Pending; }
     bool isLoading() const final { return m_font->isLoading(); }

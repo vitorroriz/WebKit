@@ -34,6 +34,11 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(XSLImportRule);
 
+Ref<XSLImportRule> XSLImportRule::create(XSLStyleSheet& parentSheet, const String& href)
+{
+    return adoptRef(*new XSLImportRule(parentSheet, href));
+}
+
 XSLImportRule::XSLImportRule(XSLStyleSheet& parent, const String& href)
     : m_parentStyleSheet(parent)
     , m_strHref(href)

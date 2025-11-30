@@ -55,6 +55,10 @@ public:
     static Ref<HTMLLinkElement> create(const QualifiedName&, Document&, bool createdByParser);
     virtual ~HTMLLinkElement();
 
+    // CachedResourceClient.
+    void ref() const final { HTMLElement::ref(); }
+    void deref() const final { HTMLElement::deref(); }
+
     URL href() const;
     WEBCORE_EXPORT const AtomString& rel() const;
 
@@ -104,13 +108,6 @@ public:
     // Otherwise checks if any Element in the tree does.
     void processInternalResourceLink(Element* = nullptr);
 
-    // AbstractCanMakeCheckedPtr.
-    uint32_t checkedPtrCount() const final { return HTMLElement::checkedPtrCount(); }
-    uint32_t checkedPtrCountWithoutThreadCheck() const final { return HTMLElement::checkedPtrCountWithoutThreadCheck(); }
-    void incrementCheckedPtrCount() const final { HTMLElement::incrementCheckedPtrCount(); }
-    void decrementCheckedPtrCount() const final { HTMLElement::decrementCheckedPtrCount(); }
-    void setDidBeginCheckedPtrDeletion() final { HTMLElement::setDidBeginCheckedPtrDeletion(); }
-
 private:
     void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) final;
 
@@ -159,7 +156,7 @@ private:
 
     CheckedPtr<Style::Scope> checkedStyleScope();
 
-    LinkLoader m_linkLoader;
+    const Ref<LinkLoader> m_linkLoader;
     CheckedPtr<Style::Scope> m_styleScope;
     CachedResourceHandle<CachedCSSStyleSheet> m_cachedSheet;
     RefPtr<CSSStyleSheet> m_sheet;

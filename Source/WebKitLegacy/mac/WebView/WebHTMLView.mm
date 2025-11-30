@@ -160,6 +160,7 @@
 #import <wtf/RunLoop.h>
 #import <wtf/RuntimeApplicationChecks.h>
 #import <wtf/SystemTracing.h>
+#import <wtf/TZoneMallocInlines.h>
 #import <wtf/WeakObjCPtr.h>
 #import <wtf/cocoa/TypeCastsCocoa.h>
 #import <wtf/cocoa/VectorCocoa.h>
@@ -829,10 +830,23 @@ const float _WebHTMLViewPrintingMaximumShrinkFactor = WebCore::PrintContext::max
 @implementation WebCoreScrollView
 @end
 
+class EmptyCachedImageClient : public WebCore::CachedImageClient, public RefCounted<EmptyCachedImageClient> {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(EmptyCachedImageClient);
+public:
+    static Ref<EmptyCachedImageClient> create() { return adoptRef(*new EmptyCachedImageClient); }
+
+    // CachedResourceClient.
+    void ref() const final { RefCounted::ref(); }
+    void deref() const final { RefCounted::deref(); }
+
+private:
+    EmptyCachedImageClient() = default;
+};
+
 // We need this to be able to safely reference the CachedImage for the promised drag data
 static WebCore::CachedImageClient& promisedDataClient()
 {
-    static NeverDestroyed<WebCore::CachedImageClient> staticCachedResourceClient;
+    static NeverDestroyed<Ref<EmptyCachedImageClient>> staticCachedResourceClient = EmptyCachedImageClient::create();
     return staticCachedResourceClient.get();
 }
 

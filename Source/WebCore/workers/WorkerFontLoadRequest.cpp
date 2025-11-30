@@ -43,6 +43,11 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(WorkerFontLoadRequest);
 
+Ref<WorkerFontLoadRequest> WorkerFontLoadRequest::create(URL&& url, LoadedFromOpaqueSource loadedFromOpaqueSource)
+{
+    return adoptRef(*new WorkerFontLoadRequest(WTFMove(url), loadedFromOpaqueSource));
+}
+
 WorkerFontLoadRequest::WorkerFontLoadRequest(URL&& url, LoadedFromOpaqueSource loadedFromOpaqueSource)
     : m_url(WTFMove(url))
     , m_loadedFromOpaqueSource(loadedFromOpaqueSource)

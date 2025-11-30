@@ -316,7 +316,7 @@ void CachedResource::checkNotify(const NetworkLoadMetrics& metrics, LoadWillCont
         return;
 
     CachedResourceClientWalker<CachedResourceClient> walker(*this);
-    while (CachedResourceClient* client = walker.next())
+    while (RefPtr client = walker.next())
         client->notifyFinished(*this, metrics, loadWillContinueInAnotherProcess);
 }
 
@@ -782,10 +782,10 @@ void CachedResource::switchClientsToRevalidatedResource()
 
     Vector<SingleThreadWeakPtr<CachedResourceClient>> clientsToMove;
     for (auto entry : m_clients) {
-        auto& client = entry.key;
+        Ref client = entry.key;
         unsigned count = entry.value;
         while (count) {
-            clientsToMove.append(client);
+            clientsToMove.append(client.get());
             --count;
         }
     }

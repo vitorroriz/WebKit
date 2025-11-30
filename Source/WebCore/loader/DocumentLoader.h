@@ -187,11 +187,6 @@ class DocumentLoader
     WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(DocumentLoader, DocumentLoader);
     friend class ContentFilter;
 public:
-#if ENABLE(CONTENT_FILTERING)
-    void ref() const final { RefCounted::ref(); }
-    void deref() const final { RefCounted::deref(); }
-#endif
-
     static Ref<DocumentLoader> create(ResourceRequest&& request, SubstituteData&& data)
     {
         return adoptRef(*new DocumentLoader(WTFMove(request), WTFMove(data)));
@@ -202,6 +197,10 @@ public:
     WEBCORE_EXPORT static DocumentLoader* fromScriptExecutionContextIdentifier(ScriptExecutionContextIdentifier);
 
     WEBCORE_EXPORT virtual ~DocumentLoader();
+
+    // CachedResourceClient, ContentFilterClient.
+    void ref() const final { RefCounted::ref(); }
+    void deref() const final { RefCounted::deref(); }
 
     void attachToFrame(LocalFrame&);
 
@@ -712,11 +711,11 @@ private:
     Markable<ResourceLoaderIdentifier> m_identifierForLoadWithoutResourceLoader;
 
     HashMap<uint64_t, LinkIcon> m_iconsPendingLoadDecision;
-    HashMap<std::unique_ptr<IconLoader>, CompletionHandler<void(FragmentedSharedBuffer*)>> m_iconLoaders;
+    HashMap<RefPtr<IconLoader>, CompletionHandler<void(FragmentedSharedBuffer*)>> m_iconLoaders;
     Vector<LinkIcon> m_linkIcons;
 
 #if ENABLE(APPLICATION_MANIFEST)
-    std::unique_ptr<ApplicationManifestLoader> m_applicationManifestLoader;
+    RefPtr<ApplicationManifestLoader> m_applicationManifestLoader;
     Vector<CompletionHandler<void(const std::optional<ApplicationManifest>&)>> m_loadApplicationManifestCallbacks;
 #endif
 

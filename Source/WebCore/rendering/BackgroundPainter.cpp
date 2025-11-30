@@ -231,7 +231,7 @@ template<typename Layer> void BackgroundPainter::paintFillLayerImpl(const Color&
     }
 
     if (context.invalidatingImagesWithAsyncDecodes()) {
-        if (shouldPaintBackgroundImage && bgImage->cachedImage()->isClientWaitingForAsyncDecoding(m_renderer))
+        if (shouldPaintBackgroundImage && bgImage->cachedImage()->isClientWaitingForAsyncDecoding(m_renderer.cachedImageClient()))
             bgImage->cachedImage()->removeAllClientsWaitingForAsyncDecoding();
         return;
     }
@@ -531,7 +531,7 @@ template<typename Layer> void BackgroundPainter::paintFillLayerImpl(const Color&
             auto drawResult = context.drawTiledImage(*image, geometry.destinationRect, toLayoutPoint(geometry.relativePhase()), geometry.tileSize, geometry.spaceSize, options);
             if (drawResult == ImageDrawResult::DidRequestDecoding) {
                 ASSERT(bgImage->hasCachedImage());
-                bgImage->cachedImage()->addClientWaitingForAsyncDecoding(m_renderer);
+                bgImage->cachedImage()->addClientWaitingForAsyncDecoding(m_renderer.cachedImageClient());
             }
 
             if (!context.paintingDisabled()) {

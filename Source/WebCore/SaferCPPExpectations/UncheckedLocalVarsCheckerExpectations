@@ -231,7 +231,6 @@ loader/DocumentLoader.cpp
 loader/EmptyClients.cpp
 loader/FrameLoader.cpp
 loader/archive/cf/LegacyWebArchive.cpp
-loader/cache/CachedImage.cpp
 loader/cache/MemoryCache.cpp
 mathml/MathMLSelectElement.cpp
 page/AutoscrollController.cpp
