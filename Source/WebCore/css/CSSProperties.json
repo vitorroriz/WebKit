@@ -2661,9 +2661,8 @@
                 "visited-link-color-support": true,
                 "color-property": true,
                 "disables-native-appearance": true,
-                "render-style-storage-name": "m_color",
-                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_edges.bottom()"],
-                "render-style-storage-container": "struct",
+                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.colors()"],
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
                 "parser-grammar": "<color>"
@@ -2688,7 +2687,7 @@
                 "style-extractor-converter": "StyleType<BorderRadiusValue>",
                 "disables-native-appearance": true,
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_radii"],
-                "render-style-storage-container": "rect-corners",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::BorderRadiusValue",
                 "parser-grammar": "<length-percentage [0,inf]>{1,2}@(type=CSSValuePair default=previous)"
@@ -2713,7 +2712,7 @@
                 "style-extractor-converter": "StyleType<BorderRadiusValue>",
                 "disables-native-appearance": true,
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_radii"],
-                "render-style-storage-container": "rect-corners",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::BorderRadiusValue",
                 "parser-grammar": "<length-percentage [0,inf]>{1,2}@(type=CSSValuePair default=previous)"
@@ -2745,9 +2744,8 @@
                 },
                 "disables-native-appearance": true,
                 "render-style-initial": "initialBorderStyle",
-                "render-style-storage-name": "m_style",
-                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_edges.bottom()"],
-                "render-style-storage-container": "struct",
+                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.styles()"],
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "enum",
                 "render-style-type": "BorderStyle",
                 "parser-grammar": "<line-style>"
@@ -3273,9 +3271,8 @@
                 "visited-link-color-support": true,
                 "color-property": true,
                 "disables-native-appearance": true,
-                "render-style-storage-name": "m_color",
-                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_edges.left()"],
-                "render-style-storage-container": "struct",
+                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.colors()"],
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
                 "parser-grammar": "<color>"
@@ -3307,9 +3304,8 @@
                 },
                 "disables-native-appearance": true,
                 "render-style-initial": "initialBorderStyle",
-                "render-style-storage-name": "m_style",
-                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_edges.left()"],
-                "render-style-storage-container": "struct",
+                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.styles()"],
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "enum",
                 "render-style-type": "BorderStyle",
                 "parser-grammar": "<line-style>"
@@ -3395,9 +3391,8 @@
                 "visited-link-color-support": true,
                 "color-property": true,
                 "disables-native-appearance": true,
-                "render-style-storage-name": "m_color",
-                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_edges.right()"],
-                "render-style-storage-container": "struct",
+                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.colors()"],
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
                 "parser-grammar": "<color>"
@@ -3429,9 +3424,8 @@
                 },
                 "disables-native-appearance": true,
                 "render-style-initial": "initialBorderStyle",
-                "render-style-storage-name": "m_style",
-                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_edges.right()"],
-                "render-style-storage-container": "struct",
+                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.styles()"],
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "enum",
                 "render-style-type": "BorderStyle",
                 "parser-grammar": "<line-style>"
@@ -3572,9 +3566,8 @@
                 "visited-link-color-support": true,
                 "color-property": true,
                 "disables-native-appearance": true,
-                "render-style-storage-name": "m_color",
-                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_edges.top()"],
-                "render-style-storage-container": "struct",
+                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.colors()"],
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
                 "parser-grammar": "<color>"
@@ -3599,7 +3592,7 @@
                 "style-extractor-converter": "StyleType<BorderRadiusValue>",
                 "disables-native-appearance": true,
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_radii"],
-                "render-style-storage-container": "rect-corners",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::BorderRadiusValue",
                 "parser-grammar": "<length-percentage [0,inf]>{1,2}@(type=CSSValuePair default=previous)"
@@ -3624,7 +3617,7 @@
                 "style-extractor-converter": "StyleType<BorderRadiusValue>",
                 "disables-native-appearance": true,
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_radii"],
-                "render-style-storage-container": "rect-corners",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::BorderRadiusValue",
                 "parser-grammar": "<length-percentage [0,inf]>{1,2}@(type=CSSValuePair default=previous)"
@@ -3656,9 +3649,8 @@
                 },
                 "disables-native-appearance": true,
                 "render-style-initial": "initialBorderStyle",
-                "render-style-storage-name": "m_style",
-                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_edges.top()"],
-                "render-style-storage-container": "struct",
+                "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.styles()"],
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "enum",
                 "render-style-type": "BorderStyle",
                 "parser-grammar": "<line-style>"
@@ -3733,7 +3725,7 @@
                 "style-extractor-custom": true,
                 "render-style-initial": "initialInset",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "inset"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::InsetEdge",
                 "parser-grammar": "auto | <length-percentage anchor=allowed anchor-size=allowed>"
@@ -4126,7 +4118,7 @@
                 "style-converter": "StyleType<CornerShapeValue>",
                 "render-style-initial": "initialCornerShapeValue",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_cornerShapes"],
-                "render-style-storage-container": "rect-corners",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::CornerShapeValue",
                 "parser-grammar": "<corner-shape-value>"
@@ -4149,7 +4141,7 @@
                 "style-converter": "StyleType<CornerShapeValue>",
                 "render-style-initial": "initialCornerShapeValue",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_cornerShapes"],
-                "render-style-storage-container": "rect-corners",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::CornerShapeValue",
                 "parser-grammar": "<corner-shape-value>"
@@ -4172,7 +4164,7 @@
                 "style-converter": "StyleType<CornerShapeValue>",
                 "render-style-initial": "initialCornerShapeValue",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_cornerShapes"],
-                "render-style-storage-container": "rect-corners",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::CornerShapeValue",
                 "parser-grammar": "<corner-shape-value>"
@@ -4195,7 +4187,7 @@
                 "style-converter": "StyleType<CornerShapeValue>",
                 "render-style-initial": "initialCornerShapeValue",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "border.m_cornerShapes"],
-                "render-style-storage-container": "rect-corners",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::CornerShapeValue",
                 "parser-grammar": "<corner-shape-value>"
@@ -5072,7 +5064,7 @@
                 "style-extractor-custom": true,
                 "render-style-initial": "initialInset",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "inset"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::InsetEdge",
                 "parser-grammar": "auto | <length-percentage anchor=allowed anchor-size=allowed>"
@@ -5436,7 +5428,7 @@
                 "style-extractor-custom": true,
                 "render-style-initial": "initialMargin",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "margin"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::MarginEdge",
                 "parser-grammar": "<length-percentage anchor-size=allowed> | auto"
@@ -5521,7 +5513,7 @@
                 "style-extractor-custom": true,
                 "render-style-initial": "initialMargin",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "margin"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::MarginEdge",
                 "parser-grammar": "<length-percentage anchor-size=allowed> | auto"
@@ -5547,7 +5539,7 @@
                 "style-extractor-custom": true,
                 "render-style-initial": "initialMargin",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "margin"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::MarginEdge",
                 "parser-grammar": "<length-percentage anchor-size=allowed> | auto"
@@ -5573,7 +5565,7 @@
                 "style-extractor-custom": true,
                 "render-style-initial": "initialMargin",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "margin"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::MarginEdge",
                 "parser-grammar": "<length-percentage anchor-size=allowed> | auto"
@@ -7328,7 +7320,7 @@
                 "style-extractor-custom": true,
                 "render-style-initial": "initialPadding",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "padding"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::PaddingEdge",
                 "parser-grammar": "<length-percentage [0,inf]>"
@@ -7405,7 +7397,7 @@
                 "style-extractor-custom": true,
                 "render-style-initial": "initialPadding",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "padding"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::PaddingEdge",
                 "parser-grammar": "<length-percentage [0,inf]>"
@@ -7429,7 +7421,7 @@
                 "style-extractor-custom": true,
                 "render-style-initial": "initialPadding",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "padding"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::PaddingEdge",
                 "parser-grammar": "<length-percentage [0,inf]>"
@@ -7453,7 +7445,7 @@
                 "style-extractor-custom": true,
                 "render-style-initial": "initialPadding",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "padding"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::PaddingEdge",
                 "parser-grammar": "<length-percentage [0,inf]>"
@@ -7683,7 +7675,7 @@
                 "style-extractor-custom": true,
                 "render-style-initial": "initialInset",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "inset"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::InsetEdge",
                 "parser-grammar": "auto | <length-percentage anchor=allowed anchor-size=allowed>"
@@ -8413,7 +8405,7 @@
                 "style-extractor-custom": true,
                 "render-style-initial": "initialInset",
                 "render-style-storage-path": ["m_nonInheritedData", "surroundData", "inset"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::InsetEdge",
                 "parser-grammar": "auto | <length-percentage anchor=allowed anchor-size=allowed>"
@@ -12106,7 +12098,7 @@
                 "style-converter": "StyleType<ScrollMarginEdge>",
                 "render-style-initial": "initialScrollMargin",
                 "render-style-storage-path": ["m_nonInheritedData", "rareData", "scrollMargin"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::ScrollMarginEdge",
                 "parser-grammar": "<length>"
@@ -12131,7 +12123,7 @@
                 "style-converter": "StyleType<ScrollMarginEdge>",
                 "render-style-initial": "initialScrollMargin",
                 "render-style-storage-path": ["m_nonInheritedData", "rareData", "scrollMargin"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::ScrollMarginEdge",
                 "parser-grammar": "<length>"
@@ -12156,7 +12148,7 @@
                 "style-converter": "StyleType<ScrollMarginEdge>",
                 "render-style-initial": "initialScrollMargin",
                 "render-style-storage-path": ["m_nonInheritedData", "rareData", "scrollMargin"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::ScrollMarginEdge",
                 "parser-grammar": "<length>"
@@ -12181,7 +12173,7 @@
                 "style-converter": "StyleType<ScrollMarginEdge>",
                 "render-style-initial": "initialScrollMargin",
                 "render-style-storage-path": ["m_nonInheritedData", "rareData", "scrollMargin"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::ScrollMarginEdge",
                 "parser-grammar": "<length>"
@@ -12321,7 +12313,7 @@
                 "style-converter": "StyleType<ScrollPaddingEdge>",
                 "render-style-initial": "initialScrollPadding",
                 "render-style-storage-path": ["m_nonInheritedData", "rareData", "scrollPadding"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::ScrollPaddingEdge",
                 "parser-grammar": "auto | <length-percentage [0,inf]>"
@@ -12346,7 +12338,7 @@
                 "style-converter": "StyleType<ScrollPaddingEdge>",
                 "render-style-initial": "initialScrollPadding",
                 "render-style-storage-path": ["m_nonInheritedData", "rareData", "scrollPadding"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::ScrollPaddingEdge",
                 "parser-grammar": "auto | <length-percentage [0,inf]>"
@@ -12371,7 +12363,7 @@
                 "style-converter": "StyleType<ScrollPaddingEdge>",
                 "render-style-initial": "initialScrollPadding",
                 "render-style-storage-path": ["m_nonInheritedData", "rareData", "scrollPadding"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::ScrollPaddingEdge",
                 "parser-grammar": "auto | <length-percentage [0,inf]>"
@@ -12396,7 +12388,7 @@
                 "style-converter": "StyleType<ScrollPaddingEdge>",
                 "render-style-initial": "initialScrollPadding",
                 "render-style-storage-path": ["m_nonInheritedData", "rareData", "scrollPadding"],
-                "render-style-storage-container": "rect-edges",
+                "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::ScrollPaddingEdge",
                 "parser-grammar": "auto | <length-percentage [0,inf]>"

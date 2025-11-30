@@ -573,8 +573,8 @@ class StylePropertyCodeGenProperties:
                 json_value["animation-wrapper-acceleration"] = None
 
         if "render-style-storage-container" in json_value:
-            if json_value["render-style-storage-container"] not in ['data', 'struct', 'rect-edges', 'rect-corners']:
-                raise Exception(f"{key_path} must be either 'data', 'struct', 'rect-edges' or 'rect-corners'.")
+            if json_value["render-style-storage-container"] not in ['data', 'struct', 'physical-group']:
+                raise Exception(f"{key_path} must be either 'data', 'struct' or 'physical-group'.")
 
         if "render-style-storage-kind" in json_value:
             if json_value["render-style-storage-kind"] not in ['reference', 'value', 'enum', 'raw']:
@@ -5314,42 +5314,27 @@ class GenerateRenderStyleGenerated:
             return f"{property.codegen_properties.render_style_type}&&"
         return f"{property.codegen_properties.render_style_type}"
 
-    # Computes the name of the member variable or member function used to access the property.
-    def _compute_storage_leaf_accessor(self, property):
-        if property.codegen_properties.render_style_storage_container == 'rect-edges' or property.codegen_properties.render_style_storage_container == 'rect-corners':
-            return Name(property.codegen_properties.logical_property_group.resolver).id_without_prefix_with_lowercase_first_letter + "()"
-        return property.codegen_properties.render_style_storage_name
-
     # Computes the expression of loads needed to get the member variable used to store the property.
-    def _compute_get_expression(self, property):
-        leaf_accessor = self._compute_storage_leaf_accessor(property)
+    def _compute_get_expression(self, property, container_kind, container_path, name):
+        # Compute getter expression, starting with the base set of loads to access the storage container.
+        container = "->".join(container_path)
 
-        # Compute the base set of loads.
-        get_expression = "->".join(property.codegen_properties.render_style_storage_path)
-        if property.codegen_properties.render_style_storage_container == 'data':
-            get_expression = f"{get_expression}->{leaf_accessor}"
-        else:
-            get_expression = f"{get_expression}.{leaf_accessor}"
+        if container_kind == 'data':
+            expression = f"{container}->{name}"
+        elif container_kind == 'struct':
+            expression = f"{container}.{name}"
+        elif container_kind == 'physical-group':
+            expression = f"{container}.{Name(property.codegen_properties.logical_property_group.resolver).id_without_prefix_with_lowercase_first_letter}()"
 
         # If necessary, wrap the load in a cast or conversion.
         if property.codegen_properties.render_style_storage_kind == 'enum':
-            get_expression = f"static_cast<{property.codegen_properties.render_style_type}>({get_expression})"
+            return f"static_cast<{property.codegen_properties.render_style_type}>({expression})"
         elif property.codegen_properties.render_style_storage_kind == 'raw':
-            get_expression = f"{property.codegen_properties.render_style_type}::fromRaw({get_expression})"
-
-        return get_expression
+            return f"{property.codegen_properties.render_style_type}::fromRaw({expression})"
+        return expression
 
     # Computes the expression of loads and assignments needed to set the member variable used to store the property.
-    def _compute_set_expression(self, property, argument_name):
-        leaf_accessor = self._compute_storage_leaf_accessor(property)
-
-        # Compute the base set of loads for the left side of the assignment expression for the setter expression.
-        lhs = ".access().".join(property.codegen_properties.render_style_storage_path)
-        if property.codegen_properties.render_style_storage_container == 'data':
-            lhs = f"{lhs}.access().{leaf_accessor}"
-        else:
-            lhs = f"{lhs}.{leaf_accessor}"
-
+    def _compute_set_expression(self, property, container_kind, container_path, name, argument_name):
         # Compute the right side of the assignment expression for the setter expression.
         if property.codegen_properties.render_style_storage_kind == 'reference':
             rhs = f"WTFMove({argument_name})"
@@ -5360,7 +5345,25 @@ class GenerateRenderStyleGenerated:
         else:
             rhs = f"{argument_name}"
 
-        return f"{lhs} = {rhs}"
+        # Compute setter expression, starting with the base set of loads to access the storage container.
+        container = ".access().".join(container_path)
+
+        if container_kind == 'data':
+            expression = f"{container}.access().{name} = {rhs}"
+        elif container_kind == 'struct':
+            expression = f"{container}.{name} = {rhs}"
+        elif container_kind == 'physical-group':
+            expression = f"{container}.set{Name(property.codegen_properties.logical_property_group.resolver).id_without_prefix}({rhs})"
+
+        return expression
+
+    def _generate_render_style_inlines_generated_h_function_implementation(self, *, to, function_name, return_type, get_expression):
+        to.write(f"inline {return_type} RenderStyle::{function_name}() const")
+        to.write(f"{{")
+        with to.indent():
+            to.write(f"return {get_expression};")
+        to.write(f"}}")
+        to.newline()
 
     def _generate_render_style_inlines_generated_h_function_implementations(self, *, to):
         for property in self.style_properties.all:
@@ -5369,16 +5372,19 @@ class GenerateRenderStyleGenerated:
             if property.codegen_properties.render_style_getter_custom:
                 continue
 
-            function_name = property.codegen_properties.render_style_getter
             return_type = self._compute_getter_return_type(property)
-            get_expression = self._compute_get_expression(property)
 
-            to.write(f"inline {return_type} RenderStyle::{function_name}() const")
-            to.write(f"{{")
-            with to.indent():
-                to.write(f"return {get_expression};")
-            to.write(f"}}")
-            to.newline()
+            function_name = property.codegen_properties.render_style_getter
+            storage_name = property.codegen_properties.render_style_storage_name
+            container_path = property.codegen_properties.render_style_storage_path
+            container_kind = property.codegen_properties.render_style_storage_container
+
+            self._generate_render_style_inlines_generated_h_function_implementation(
+                to=to,
+                function_name=function_name,
+                return_type=return_type,
+                get_expression=self._compute_get_expression(property, container_kind, container_path, storage_name)
+            )
 
     def generate_render_style_inlines_generated_h(self):
         with open('RenderStyleInlinesGenerated.h', 'w') as output_file:
@@ -5429,6 +5435,16 @@ class GenerateRenderStyleGenerated:
                     to=writer
                 )
 
+    def _generate_render_style_setters_generated_h_function_implementation(self, *, to, function_name, argument_type, argument_name, get_expression, set_expression):
+        to.write(f"inline void RenderStyle::{function_name}({argument_type} {argument_name})")
+        to.write(f"{{")
+        with to.indent():
+            to.write(f"if ({argument_name} != {get_expression})")
+            with to.indent():
+                to.write(f"{set_expression};")
+        to.write(f"}}")
+        to.newline()
+
     def _generate_render_style_setters_generated_h_function_implementations(self, *, to):
         for property in self.style_properties.all:
             if property.codegen_properties.render_style_storage_path is None:
@@ -5436,20 +5452,22 @@ class GenerateRenderStyleGenerated:
             if property.codegen_properties.render_style_setter_custom:
                 continue
 
-            function_name = property.codegen_properties.render_style_setter
             argument_name = f"value"
             argument_type = self._compute_setter_argument_type(property)
-            get_expression = self._compute_get_expression(property)
-            set_expression = self._compute_set_expression(property, argument_name)
 
-            to.write(f"inline void RenderStyle::{function_name}({argument_type} {argument_name})")
-            to.write(f"{{")
-            with to.indent():
-                to.write(f"if ({argument_name} != {get_expression})")
-                with to.indent():
-                    to.write(f"{set_expression};")
-            to.write(f"}}")
-            to.newline()
+            function_name = property.codegen_properties.render_style_setter
+            storage_name = property.codegen_properties.render_style_storage_name
+            container_path = property.codegen_properties.render_style_storage_path
+            container_kind = property.codegen_properties.render_style_storage_container
+
+            self._generate_render_style_setters_generated_h_function_implementation(
+                to=to,
+                function_name=function_name,
+                argument_type=argument_type,
+                argument_name=argument_name,
+                get_expression=self._compute_get_expression(property, container_kind, container_path, storage_name),
+                set_expression=self._compute_set_expression(property, container_kind, container_path, storage_name, argument_name)
+            )
 
     def generate_render_style_setters_generated_h(self):
         with open('RenderStyleSettersGenerated.h', 'w') as output_file:
