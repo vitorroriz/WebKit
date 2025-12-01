@@ -359,6 +359,8 @@ using UserMediaRequestIdentifier = ObjectIdentifier<UserMediaRequestIdentifierTy
 
 namespace TextExtraction {
 struct ExtractedText;
+struct FilterRuleData;
+struct FilterRule;
 struct InteractionDescription;
 struct Interaction;
 struct Item;
@@ -2652,6 +2654,8 @@ private:
     void handleTextExtractionInteraction(WebCore::TextExtraction::Interaction&&, CompletionHandler<void(bool, String&&)>&&);
     void describeTextExtractionInteraction(WebCore::TextExtraction::Interaction&&, CompletionHandler<void(WebCore::TextExtraction::InteractionDescription&&)>&&);
     void takeSnapshotOfExtractedText(WebCore::TextExtraction::ExtractedText&&, CompletionHandler<void(RefPtr<WebCore::TextIndicator>&&)>&&);
+    void updateTextExtractionFilterRules(Vector<WebCore::TextExtraction::FilterRuleData>&&);
+    void applyTextExtractionFilter(const String& input, std::optional<WebCore::NodeIdentifier>&& containerNode, CompletionHandler<void(const String&)>&&);
 
 #if HAVE(SANDBOX_STATE_FLAGS)
     static void setHasLaunchedWebContentProcess();
@@ -3217,6 +3221,8 @@ private:
 #if ENABLE(WRITING_TOOLS)
     const UniqueRef<TextAnimationController> m_textAnimationController;
 #endif
+
+    Vector<WebCore::TextExtraction::FilterRule> m_textExtractionFilterRules;
 
     RefPtr<WebCore::NowPlayingMetadataObserver> m_nowPlayingMetadataObserver;
     std::unique_ptr<FrameInfoData> m_mainFrameNavigationInitiator;

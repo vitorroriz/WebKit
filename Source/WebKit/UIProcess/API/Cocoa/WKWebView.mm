@@ -6673,6 +6673,7 @@ static WebKit::TextExtractionOutputFormat textExtractionOutputFormat(_WKTextExtr
     bool allowFiltering = _page->protectedPreferences()->textExtractionFilterEnabled();
     bool filterUsingClassifier = allowFiltering && configuration.filterOptions & _WKTextExtractionFilterClassifier;
     bool filterHiddenText = allowFiltering && configuration.filterOptions & _WKTextExtractionFilterTextRecognition;
+    bool filterUsingRules = allowFiltering && configuration.filterOptions & _WKTextExtractionFilterRules;
 
 #if ENABLE(TEXT_EXTRACTION_FILTER)
     if (filterUsingClassifier)
@@ -6692,6 +6693,7 @@ static WebKit::TextExtractionOutputFormat textExtractionOutputFormat(_WKTextExtr
         weakSelf = WeakObjCPtr<WKWebView>(self),
         filterUsingClassifier,
         filterHiddenText,
+        filterUsingRules,
         includeURLs = configuration.includeURLs,
         includeRects = configuration.includeRects,
         onlyIncludeText = configuration.onlyIncludeVisibleText,
@@ -6752,6 +6754,21 @@ static WebKit::TextExtractionOutputFormat textExtractionOutputFormat(_WKTextExtr
                         components->at(index) = result;
                     }];
                 }
+
+                return promise;
+            });
+#endif // ENABLE(TEXT_EXTRACTION_FILTER)
+        }
+
+        if (filterUsingRules) {
+#if ENABLE(TEXT_EXTRACTION_FILTER)
+            filterCallbacks.append([page = strongSelf->_page](auto& text, auto&& enclosingNodeID) mutable {
+                WebKit::TextExtractionFilterPromise::Producer producer;
+                Ref promise = producer.promise();
+
+                page->applyTextExtractionFilter(text, WTFMove(enclosingNodeID), [producer = WTFMove(producer)](auto&& output) mutable {
+                    producer.settle(WTFMove(output));
+                });
 
                 return promise;
             });

@@ -9745,6 +9745,16 @@ void WebPage::handleTextExtractionInteraction(TextExtraction::Interaction&& inte
     TextExtraction::handleInteraction(WTFMove(interaction), Ref { *corePage() }, WTFMove(completion));
 }
 
+void WebPage::updateTextExtractionFilterRules(Vector<WebCore::TextExtraction::FilterRuleData>&& ruleData)
+{
+    m_textExtractionFilterRules = TextExtraction::extractRules(WTFMove(ruleData));
+}
+
+void WebPage::applyTextExtractionFilter(const String& input, std::optional<NodeIdentifier>&& containerNodeID, CompletionHandler<void(const String&)>&& completion)
+{
+    TextExtraction::applyRules(input, WTFMove(containerNodeID), m_textExtractionFilterRules, Ref { *corePage() }, WTFMove(completion));
+}
+
 template<typename T> T WebPage::contentsToRootView(WebCore::FrameIdentifier frameID, T geometry)
 {
     RefPtr webFrame = WebProcess::singleton().webFrame(frameID);

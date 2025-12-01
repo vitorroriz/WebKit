@@ -6871,6 +6871,13 @@ header: <WebCore/TextExtractionTypes.h>
     HashMap<String, String> clientAttributes;
 };
 
+header: <WebCore/TextExtractionTypes.h>
+[CustomHeader] struct WebCore::TextExtraction::FilterRuleData {
+    String name;
+    String urlPatternString;
+    String scriptSource;
+};
+
 #if ENABLE(WRITING_TOOLS)
 header: <WebCore/WritingToolsTypes.h>
 [CustomHeader] enum class WebCore::WritingTools::Behavior : uint8_t {

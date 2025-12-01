@@ -16926,6 +16926,16 @@ void WebPageProxy::describeTextExtractionInteraction(TextExtraction::Interaction
     sendWithAsyncReply(Messages::WebPage::DescribeTextExtractionInteraction(WTFMove(interaction)), WTFMove(completion));
 }
 
+void WebPageProxy::updateTextExtractionFilterRules(Vector<WebCore::TextExtraction::FilterRuleData>&& rules)
+{
+    send(Messages::WebPage::UpdateTextExtractionFilterRules(WTFMove(rules)));
+}
+
+void WebPageProxy::applyTextExtractionFilter(const String& input, std::optional<NodeIdentifier>&& containerNodeID, CompletionHandler<void(String&&)>&& completion)
+{
+    sendWithAsyncReply(Messages::WebPage::ApplyTextExtractionFilter(input, WTFMove(containerNodeID)), WTFMove(completion));
+}
+
 void WebPageProxy::addConsoleMessage(FrameIdentifier frameID, MessageSource messageSource, MessageLevel messageLevel, const String& message, std::optional<ResourceLoaderIdentifier> coreIdentifier)
 {
     sendToProcessContainingFrame(frameID, Messages::WebPage::AddConsoleMessage { frameID, messageSource, messageLevel, message, coreIdentifier });

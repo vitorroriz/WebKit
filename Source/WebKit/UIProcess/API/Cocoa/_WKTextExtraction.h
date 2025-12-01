@@ -36,7 +36,8 @@ typedef NS_OPTIONS(NSUInteger, _WKTextExtractionFilterOptions) {
     _WKTextExtractionFilterNone = 0,
     _WKTextExtractionFilterTextRecognition = 1 << 0,
     _WKTextExtractionFilterClassifier = 1 << 1,
-    _WKTextExtractionFilterAll = _WKTextExtractionFilterTextRecognition | _WKTextExtractionFilterClassifier,
+    _WKTextExtractionFilterRules = 1 << 2,
+    _WKTextExtractionFilterAll = NSUIntegerMax,
 } WK_API_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA));
 
 typedef NS_ENUM(NSInteger, _WKTextExtractionNodeIdentifierInclusion) {
