@@ -59,6 +59,7 @@ static void applyUASheetBehaviorsToContext(CSSParserContext& context)
     context.propertySettings.useSystemAppearance = true;
 #endif
     context.thumbAndTrackPseudoElementsEnabled = true;
+    context.cssInternalAutoBaseParsingEnabled = true;
 }
 
 CSSParserContext::CSSParserContext(CSSParserMode mode, const URL& baseURL)
@@ -115,6 +116,7 @@ CSSParserContext::CSSParserContext(const Document& document, const URL& sheetBas
     , cssDynamicRangeLimitMixEnabled { document.settings().cssDynamicRangeLimitMixEnabled() }
     , cssConstrainedDynamicRangeLimitEnabled { document.settings().cssConstrainedDynamicRangeLimitEnabled() }
     , cssTextTransformMathAutoEnabled { document.settings().cssTextTransformMathAutoEnabled() }
+    , cssInternalAutoBaseParsingEnabled { document.settings().cssInternalAutoBaseParsingEnabled() }
     , webkitMediaTextTrackDisplayQuirkEnabled { document.quirks().needsWebKitMediaTextTrackDisplayQuirk() }
     , propertySettings { CSSPropertySettings { document.settings() } }
 {
@@ -156,7 +158,8 @@ void add(Hasher& hasher, const CSSParserContext& context)
         | context.cssDynamicRangeLimitMixEnabled            << 27
         | context.cssConstrainedDynamicRangeLimitEnabled    << 28
         | context.cssTextDecorationLineErrorValues          << 29
-        | context.cssTextTransformMathAutoEnabled           << 30;
+        | context.cssTextTransformMathAutoEnabled           << 30
+        | context.cssInternalAutoBaseParsingEnabled         << 31;
     add(hasher, context.baseURL, context.charset, context.propertySettings, context.mode, bits);
 }
 

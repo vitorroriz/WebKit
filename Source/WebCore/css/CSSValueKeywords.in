@@ -929,6 +929,7 @@ attachment enable-if=ENABLE_ATTACHMENT_ELEMENT
 borderless-attachment enable-if=ENABLE_ATTACHMENT_ELEMENT
 textarea
 textfield
+-internal-auto-base
 
 //
 // CSS_PROP_BORDER_IMAGE
