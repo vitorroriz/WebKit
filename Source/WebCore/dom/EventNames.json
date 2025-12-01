@@ -325,6 +325,7 @@
     "webkitsourceclose": { },
     "webkitsourceended": { },
     "webkitsourceopen": { },
+    "webkitusertextinput": { },
     "wheel": { "categories": ["Wheel"], "defaultEventHandler": true },
     "write": { },
     "writeend": { },
