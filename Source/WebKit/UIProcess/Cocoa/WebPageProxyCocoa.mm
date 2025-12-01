@@ -51,11 +51,11 @@
 #import "RemoteLayerTreeCommitBundle.h"
 #import "RemoteLayerTreeTransaction.h"
 #import "SafeBrowsingSPI.h"
-#import "SafeBrowsingSoftLink.h"
 #import "SharedBufferReference.h"
 #import "SynapseSPI.h"
 #import "VideoPresentationManagerProxy.h"
 #import "WKErrorInternal.h"
+#import "WKHistoryDelegatePrivate.h"
 #import "WKWebView.h"
 #import "WebContextMenuProxy.h"
 #import "WebFrameProxy.h"
@@ -132,6 +132,8 @@ SOFT_LINK_CLASS_OPTIONAL(Synapse, SYNotesActivationObserver)
 #if HAVE(SCREEN_CAPTURE_KIT)
 #import <WebCore/ScreenCaptureKitSharingSessionManager.h>
 #endif
+
+#import "SafeBrowsingSoftLink.h"
 
 #if ENABLE(APPLE_PAY_AMS_UI)
 SOFT_LINK_PRIVATE_FRAMEWORK_OPTIONAL(AppleMediaServices)
@@ -275,30 +277,58 @@ void WebPageProxy::beginSafeBrowsingCheck(const URL& url, API::Navigation& navig
 
     navigation.setSafeBrowsingCheckOngoing(redirectChainIndex, true);
 
-    auto completionHandler = makeBlockPtr([weakThis = WeakPtr { *this }, navigation = Ref { navigation }, forMainFrameNavigation, url = url.isolatedCopy(), redirectChainIndex] (SSBLookupResult *result, NSError *error) mutable {
-        RunLoop::mainSingleton().dispatch([weakThis = WTFMove(weakThis), navigation = WTFMove(navigation), result = retainPtr(result), error = retainPtr(error), forMainFrameNavigation, url = WTFMove(url).isolatedCopy(), redirectChainIndex] {
-            RefPtr protectedThis = weakThis.get();
-            if (!protectedThis)
-                return;
-            navigation->setSafeBrowsingCheckOngoing(redirectChainIndex, false);
-            if (error)
-                return;
+    auto performLookup = [weakThis = WeakPtr { *this }, navigation = Ref { navigation }, forMainFrameNavigation, url = url.isolatedCopy(), redirectChainIndex, context](RetainPtr<SSBLookupResult> cachedResult) mutable {
+        RefPtr protectedThis = weakThis.get();
+        if (!protectedThis)
+            return;
 
-            for (SSBServiceLookupResult *lookupResult in [result serviceLookupResults]) {
-                if (lookupResult.isPhishing || lookupResult.isMalware || lookupResult.isUnwantedSoftware) {
-                    navigation->setSafeBrowsingWarning(BrowsingWarning::create(url, forMainFrameNavigation, BrowsingWarning::SafeBrowsingWarningData { lookupResult }));
-                    break;
+        auto completionHandler = makeBlockPtr([weakThis = WTFMove(weakThis), navigation = WTFMove(navigation), forMainFrameNavigation, url = url.isolatedCopy(), redirectChainIndex] (SSBLookupResult *result, NSError *error) mutable {
+            RunLoop::mainSingleton().dispatch([weakThis = WTFMove(weakThis), navigation = WTFMove(navigation), result = retainPtr(result), error = retainPtr(error), forMainFrameNavigation, url = WTFMove(url).isolatedCopy(), redirectChainIndex] {
+                RefPtr protectedThis = weakThis.get();
+                if (!protectedThis)
+                    return;
+                navigation->setSafeBrowsingCheckOngoing(redirectChainIndex, false);
+                if (error)
+                    return;
+
+                RefPtr navigationState = NavigationState::fromWebPage(*protectedThis);
+                auto historyDelegate = navigationState ? navigationState->historyDelegate() : nullptr;
+                if (historyDelegate && [historyDelegate respondsToSelector:@selector(_webView:didReceiveSafeBrowsingResult:forURL:)]) {
+                    if (auto webView = protectedThis->cocoaView())
+                        [historyDelegate _webView:webView.get() didReceiveSafeBrowsingResult:result.get() forURL:url.createNSURL().get()];
                 }
-            }
-            if (!navigation->safeBrowsingCheckOngoing() && navigation->safeBrowsingWarning() && navigation->safeBrowsingCheckTimedOut())
-                protectedThis->showBrowsingWarning(navigation->safeBrowsingWarning());
-        });
-    });
 
-    if ([context respondsToSelector:@selector(lookUpURL:isMainFrame:hasHighConfidenceOfSafety:completionHandler:)])
-        [context lookUpURL:url.createNSURL().get() isMainFrame:forMainFrameNavigation hasHighConfidenceOfSafety:NO completionHandler:completionHandler.get()];
-    else
-        [context lookUpURL:url.createNSURL().get() completionHandler:completionHandler.get()];
+                for (SSBServiceLookupResult *lookupResult in [result serviceLookupResults]) {
+                    if (lookupResult.isPhishing || lookupResult.isMalware || lookupResult.isUnwantedSoftware) {
+                        navigation->setSafeBrowsingWarning(BrowsingWarning::create(url, forMainFrameNavigation, BrowsingWarning::SafeBrowsingWarningData { lookupResult }));
+                        break;
+                    }
+                }
+                if (!navigation->safeBrowsingCheckOngoing() && navigation->safeBrowsingWarning() && navigation->safeBrowsingCheckTimedOut())
+                    protectedThis->showBrowsingWarning(navigation->safeBrowsingWarning());
+            });
+        });
+
+        if ([context respondsToSelector:@selector(lookUpURL:isMainFrame:hasHighConfidenceOfSafety:cachedResult:completionHandler:)])
+            [context lookUpURL:url.createNSURL().get() isMainFrame:forMainFrameNavigation hasHighConfidenceOfSafety:NO cachedResult:cachedResult.get() completionHandler:completionHandler.get()];
+        else if ([context respondsToSelector:@selector(lookUpURL:isMainFrame:hasHighConfidenceOfSafety:completionHandler:)])
+            [context lookUpURL:url.createNSURL().get() isMainFrame:forMainFrameNavigation hasHighConfidenceOfSafety:NO completionHandler:completionHandler.get()];
+        else
+            [context lookUpURL:url.createNSURL().get() completionHandler:completionHandler.get()];
+    };
+
+    RefPtr navigationState = NavigationState::fromWebPage(*this);
+    auto historyDelegate = navigationState ? navigationState->historyDelegate() : nullptr;
+    if (!historyDelegate || ![historyDelegate respondsToSelector:@selector(_webView:cachedSafeBrowsingResultForURL:completionHandler:)]) {
+        performLookup(nullptr);
+        return;
+    }
+
+    auto webView = cocoaView();
+    auto cacheCompletionHandler = makeBlockPtr([performLookup = WTFMove(performLookup)] (SSBLookupResult *cachedResult, NSError *error) mutable {
+        performLookup(retainPtr(cachedResult));
+    });
+    [historyDelegate _webView:webView.get() cachedSafeBrowsingResultForURL:url.createNSURL().get() completionHandler:cacheCompletionHandler.get()];
 #endif
 }
 
