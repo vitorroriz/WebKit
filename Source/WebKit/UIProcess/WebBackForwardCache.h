@@ -53,7 +53,7 @@ public:
 
     void setCapacity(WebProcessPool&, unsigned);
     unsigned capacity() const { return m_capacity; }
-    unsigned size() const { return m_itemsWithCachedPage.computeSize(); }
+    unsigned size() const;
 
     void clear();
     void pruneToSize(unsigned);

@@ -255,7 +255,7 @@ LocalFrame::~LocalFrame()
 
     disconnectOwnerElement();
 
-    while (auto* destructionObserver = m_destructionObservers.takeAny())
+    while (auto destructionObserver = m_destructionObservers.takeAny())
         destructionObserver->frameDestroyed();
 
     RefPtr localMainFrame = this->localMainFrame();

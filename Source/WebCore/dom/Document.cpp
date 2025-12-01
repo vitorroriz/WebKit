@@ -1248,7 +1248,7 @@ Element* Document::elementForAccessKey(const String& key)
         return nullptr;
     if (!m_accessKeyCache)
         buildAccessKeyCache();
-    return m_accessKeyCache->get(key).get();
+    return m_accessKeyCache->get(key);
 }
 
 void Document::buildAccessKeyCache()

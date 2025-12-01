@@ -1220,7 +1220,7 @@ void RenderView::removeViewTransitionGroup(const AtomString& name)
 
 RenderBox* RenderView::viewTransitionGroupForName(const AtomString& name)
 {
-    return m_viewTransitionGroups.get(name).get();
+    return m_viewTransitionGroups.get(name);
 }
 
 } // namespace WebCore

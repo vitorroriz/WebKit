@@ -800,7 +800,7 @@ static HashMap<WebPageProxyIdentifier, WeakPtr<WebPageProxy>>& webPageProxyMap()
 
 RefPtr<WebPageProxy> WebPageProxy::fromIdentifier(std::optional<WebPageProxyIdentifier> identifier)
 {
-    return identifier ? webPageProxyMap().get(*identifier).get() : nullptr;
+    return identifier ? webPageProxyMap().get(*identifier) : nullptr;
 }
 
 static bool windowFeature(auto getter, const API::PageConfiguration& configuration)

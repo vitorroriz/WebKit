@@ -176,7 +176,7 @@ static HashMap<ScriptExecutionContextIdentifier, SingleThreadWeakPtr<DocumentLoa
 
 DocumentLoader* DocumentLoader::fromScriptExecutionContextIdentifier(ScriptExecutionContextIdentifier identifier)
 {
-    return scriptExecutionContextIdentifierToLoaderMap().get(identifier).get();
+    return scriptExecutionContextIdentifierToLoaderMap().get(identifier);
 }
 
 DEFINE_ALLOCATOR_WITH_HEAP_IDENTIFIER(DocumentLoader);

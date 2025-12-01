@@ -139,7 +139,7 @@ NavigationState::~NavigationState()
 {
     if (auto webView = this->webView()) {
         RefPtr page = webView->_page;
-        ASSERT(navigationStates().get(*page).get() == this);
+        ASSERT(navigationStates().get(*page) == this);
 
         navigationStates().remove(*page);
         page->protectedPageLoadState()->removeObserver(*this);
@@ -160,7 +160,7 @@ NavigationState* NavigationState::fromWebPage(WebPageProxy& webPageProxy)
 {
     ASSERT(navigationStates().contains(webPageProxy));
 
-    return navigationStates().get(webPageProxy).get();
+    return navigationStates().get(webPageProxy);
 }
 
 UniqueRef<API::NavigationClient> NavigationState::createNavigationClient()

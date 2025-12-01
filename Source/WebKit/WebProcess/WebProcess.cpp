@@ -1152,7 +1152,7 @@ void WebProcess::didClose(IPC::Connection& connection)
 
 WebFrame* WebProcess::webFrame(std::optional<FrameIdentifier> frameID) const
 {
-    return frameID ? m_frameMap.get(*frameID).get() : nullptr;
+    return frameID ? m_frameMap.get(*frameID) : nullptr;
 }
 
 void WebProcess::addWebFrame(FrameIdentifier frameID, WebFrame* frame)
@@ -1449,7 +1449,7 @@ void WebProcess::networkProcessConnectionClosed(NetworkProcessConnection* connec
     ASSERT_UNUSED(connection, m_networkProcessConnection == connection);
 
     for (auto key : copyToVector(m_storageAreaMaps.keys())) {
-        if (RefPtr map = m_storageAreaMaps.get(key).get())
+        if (RefPtr map = m_storageAreaMaps.get(key))
             map->disconnect();
     }
 
@@ -2062,7 +2062,7 @@ void WebProcess::unregisterStorageAreaMap(StorageAreaMap& storageAreaMap)
 {
     auto identifier = storageAreaMap.identifier();
     ASSERT(m_storageAreaMaps.contains(identifier));
-    ASSERT(m_storageAreaMaps.get(identifier).get() == &storageAreaMap);
+    ASSERT(m_storageAreaMaps.get(identifier) == &storageAreaMap);
     m_storageAreaMaps.remove(identifier);
 }
 

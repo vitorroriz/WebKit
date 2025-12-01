@@ -802,7 +802,7 @@ CheckedPtr<RenderBoxModelObject> AnchorPositionEvaluator::findAnchorForAnchorFun
 
     // Anchor value may now be resolved using layout information
 
-    RefPtr anchorElement = anchorPositionedState.anchorElements.get(resolvedAnchorName).get();
+    RefPtr anchorElement = anchorPositionedState.anchorElements.get(resolvedAnchorName);
     if (!anchorElement) {
         // See: https://drafts.csswg.org/css-anchor-position-1/#valid-anchor-function
         anchorPositionedState.stage = AnchorPositionResolutionStage::Resolved;

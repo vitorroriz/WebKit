@@ -201,7 +201,7 @@ public:
 
     void initializeWebProcess(WebProcessCreationParameters&&);
 
-    unsigned suspendedPageCount() const { return m_suspendedPages.computeSize(); }
+    unsigned suspendedPageCount() const;
     void addSuspendedPageProxy(SuspendedPageProxy&);
     void removeSuspendedPageProxy(SuspendedPageProxy&);
 
@@ -269,7 +269,7 @@ public:
     Vector<Ref<WebPageProxy>> pages() const;
     Vector<Ref<WebPageProxy>> mainPages() const;
     unsigned pageCount() const { return m_pageMap.size(); }
-    unsigned provisionalPageCount() const { return m_provisionalPages.computeSize(); }
+    unsigned provisionalPageCount() const;
     unsigned visiblePageCount() const { return m_visiblePageCounter.value(); }
 
     Vector<WeakPtr<RemotePageProxy>> remotePages() const;

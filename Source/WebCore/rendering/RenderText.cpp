@@ -2155,7 +2155,7 @@ RenderInline* RenderText::inlineWrapperForDisplayContents()
 
     if (!m_hasInlineWrapperForDisplayContents)
         return nullptr;
-    return inlineWrapperForDisplayContentsMap().get(this).get();
+    return inlineWrapperForDisplayContentsMap().get(this);
 }
 
 void RenderText::setInlineWrapperForDisplayContents(RenderInline* wrapper)

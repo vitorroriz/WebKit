@@ -880,7 +880,7 @@ private:
     WeakHashSet<AccessibilityObject> m_deferredRendererChangedList;
     WeakHashSet<AccessibilityObject> m_deferredRecomputeActiveSummaryList;
     WeakHashSet<Element, WeakPtrImplWithEventTargetData> m_deferredRecomputeIsIgnoredList;
-    WeakHashSet<HTMLTableElement, WeakPtrImplWithEventTargetData> m_deferredRecomputeTableIsExposedList;
+    WeakHashSet<Element, WeakPtrImplWithEventTargetData> m_deferredRecomputeTableIsExposedList;
     WeakHashSet<AccessibilityNodeObject> m_deferredRecomputeTableCellSlotsList;
     WeakHashSet<AccessibilityNodeObject> m_deferredRowspanChanges;
     WeakListHashSet<Node, WeakPtrImplWithEventTargetData> m_deferredTextChangedList;

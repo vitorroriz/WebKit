@@ -257,6 +257,11 @@ Vector<Ref<WebPageProxy>> WebProcessProxy::mainPages() const
     });
 }
 
+unsigned WebProcessProxy::provisionalPageCount() const
+{
+    return m_provisionalPages.computeSize();
+}
+
 Vector<WeakPtr<RemotePageProxy>> WebProcessProxy::remotePages() const
 {
     return WTF::copyToVector(m_remotePages);
@@ -2266,6 +2271,11 @@ void WebProcessProxy::didStartUsingProcessForSiteIsolation(const std::optional<W
     }
     ASSERT(m_site ? (m_site.value().isEmpty() || m_site.value() == *site) : (m_site.error() == SiteState::NotYetSpecified || m_site.error() == SiteState::MultipleSites));
     m_site = *site;
+}
+
+unsigned WebProcessProxy::suspendedPageCount() const
+{
+    return m_suspendedPages.computeSize();
 }
 
 void WebProcessProxy::addSuspendedPageProxy(SuspendedPageProxy& suspendedPage)

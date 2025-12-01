@@ -3211,7 +3211,7 @@ private:
     const Ref<WebHistoryItemClient> m_historyItemClient;
 
 #if ENABLE(IMAGE_ANALYSIS_ENHANCEMENTS)
-    WeakHashSet<WebCore::HTMLImageElement, WebCore::WeakPtrImplWithEventTargetData> m_elementsToExcludeFromRemoveBackground;
+    WeakHashSet<WebCore::Element, WebCore::WeakPtrImplWithEventTargetData> m_elementsToExcludeFromRemoveBackground;
 #endif
 
 #if ENABLE(EXTENSION_CAPABILITIES)

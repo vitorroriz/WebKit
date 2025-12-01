@@ -160,7 +160,7 @@ public:
         // Protect against double insert where a descendant would end up with multiple containing blocks.
         auto previousContainingBlock = m_containerMap.get(outOfFlowDescendant);
         if (previousContainingBlock && previousContainingBlock != &containingBlock) {
-            if (auto* descendants = m_descendantsMap.get(*previousContainingBlock.get()))
+            if (auto* descendants = m_descendantsMap.get(*previousContainingBlock))
                 descendants->remove(outOfFlowDescendant);
         }
 
