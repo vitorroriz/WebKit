@@ -39,18 +39,25 @@
 #import <WebKit/WKPreferencesPrivate.h>
 #import <WebKit/WKWebsiteDataStorePrivate.h>
 #import <WebKit/_WKInternalDebugFeature.h>
+#import <pal/spi/cocoa/NetworkSPI.h>
 #import <wtf/SoftLinking.h>
 #import <wtf/spi/cocoa/SecuritySPI.h>
 #import <wtf/text/MakeString.h>
 #import <wtf/text/StringBuilder.h>
 
-// FIXME: Replace this soft linking with a HAVE macro once rdar://158191390 is available on all tested OS builds.
 SOFT_LINK_FRAMEWORK(Network)
+
+// FIXME: Replace this soft linking with a HAVE macro once rdar://158191390 is available on all tested OS builds.
 SOFT_LINK_MAY_FAIL(Network, nw_webtransport_options_set_allow_joining_before_ready, void, (nw_protocol_options_t options, bool allow), (options, allow))
+
+// FIXME: Replace this soft linking with a HAVE macro once rdar://164265337 is available on all tested OS builds.
 SOFT_LINK_MAY_FAIL(Network, nw_webtransport_metadata_set_local_draining, void, (nw_protocol_metadata_t metadata), (metadata))
 
 // FIXME: Replace this soft linking with a HAVE macro once rdar://164514830 is available on all tested OS builds.
 SOFT_LINK_MAY_FAIL(Network, nw_webtransport_metadata_get_session_closed, bool, (nw_protocol_metadata_t metadata), (metadata))
+
+// FIXME: Replace this soft linking with a HAVE macro once rdar://164917448 is available on all tested OS builds.
+SOFT_LINK_MAY_FAIL(Network, nw_webtransport_metadata_get_transport_mode, nw_webtransport_transport_mode_t, (nw_protocol_metadata_t metadata), (metadata))
 
 namespace TestWebKitAPI {
 
@@ -188,7 +195,10 @@ TEST(WebTransport, Datagram)
         "</script>",
         port];
     [webView loadHTMLString:html baseURL:[NSURL URLWithString:@"https://webkit.org/"]];
-    EXPECT_WK_STREQ([webView _test_waitForAlert], "successfully read abc, group sent 3 bytes, maxDatagramSize 65535, reliability supports-unreliable");
+    if (!canLoadnw_webtransport_metadata_get_transport_mode())
+        EXPECT_WK_STREQ([webView _test_waitForAlert], "successfully read abc, group sent 3 bytes, maxDatagramSize 65535, reliability pending");
+    else
+        EXPECT_WK_STREQ([webView _test_waitForAlert], "successfully read abc, group sent 3 bytes, maxDatagramSize 65535, reliability supports-unreliable");
     EXPECT_TRUE(challenged);
 }
 
