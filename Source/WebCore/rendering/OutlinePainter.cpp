@@ -64,6 +64,8 @@ static float deviceScaleFactor(const RenderElement& renderer)
 
 void OutlinePainter::paintOutline(const RenderElement& renderer, const LayoutRect& paintRect) const
 {
+    ASSERT(renderer.hasOutline());
+
     CheckedRef styleToUse = renderer.style();
     auto hasThemedFocusRing = renderer.theme().supportsFocusRing(renderer, styleToUse.get());
 
@@ -120,10 +122,9 @@ void OutlinePainter::paintOutline(const RenderElement& renderer, const LayoutRec
 
 void OutlinePainter::paintOutline(const RenderInline& renderer, const LayoutPoint& paintOffset) const
 {
-    CheckedRef styleToUse = renderer.style();
+    ASSERT(renderer.hasOutline());
 
-    if (!styleToUse->hasOutline())
-        return;
+    CheckedRef styleToUse = renderer.style();
 
     if (styleToUse->outlineStyle() == OutlineStyle::Auto) {
         CheckedPtr paintContainer = m_paintInfo.paintContainer;
@@ -136,7 +137,7 @@ void OutlinePainter::paintOutline(const RenderInline& renderer, const LayoutPoin
     if (renderer.hasOutlineAnnotation())
         addPDFURLAnnotationForLink(renderer, paintOffset);
 
-    if (m_paintInfo.context().paintingDisabled())
+    if (m_paintInfo.context().paintingDisabled() || !styleToUse->hasOutline())
         return;
 
     if (!renderer.containingBlock()) {
@@ -452,9 +453,8 @@ void OutlinePainter::collectFocusRingRectsForInlineChildren(const RenderBlockFlo
 
 void OutlinePainter::addPDFURLAnnotationForLink(const RenderElement& renderer, const LayoutPoint& paintOffset) const
 {
-    RefPtr element = renderer.element();
-    if (!element || !element->isLink())
-        return;
+    Ref element = *renderer.element();
+    ASSERT(element->isLink());
 
     CheckedPtr paintContainer = m_paintInfo.paintContainer;
     auto focusRingRects = collectFocusRingRects(renderer, paintOffset, paintContainer.get());
