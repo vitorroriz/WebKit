@@ -431,7 +431,7 @@ void CDMInstanceFairPlayStreamingAVFObjC::setStorageDirectory(const String& stor
 
 RefPtr<CDMInstanceSession> CDMInstanceFairPlayStreamingAVFObjC::createSession()
 {
-    auto session = adoptRef(*new CDMInstanceSessionFairPlayStreamingAVFObjC(*this));
+    Ref session = CDMInstanceSessionFairPlayStreamingAVFObjC::create(*this);
     m_sessions.append(session);
     return session;
 }
@@ -716,6 +716,11 @@ void CDMInstanceFairPlayStreamingAVFObjC::sessionKeyStatusesChanged(const CDMIns
     m_keyStatusChangedObservers.forEach([] (auto& observer) {
         observer();
     });
+}
+
+Ref<CDMInstanceSessionFairPlayStreamingAVFObjC> CDMInstanceSessionFairPlayStreamingAVFObjC::create(Ref<CDMInstanceFairPlayStreamingAVFObjC>&& instance)
+{
+    return adoptRef(*new CDMInstanceSessionFairPlayStreamingAVFObjC(WTFMove(instance)));
 }
 
 CDMInstanceSessionFairPlayStreamingAVFObjC::CDMInstanceSessionFairPlayStreamingAVFObjC(Ref<CDMInstanceFairPlayStreamingAVFObjC>&& instance)

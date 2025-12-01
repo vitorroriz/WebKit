@@ -187,8 +187,12 @@ class CDMInstanceSessionFairPlayStreamingAVFObjC final
 public:
     USING_CAN_MAKE_WEAKPTR(AVContentKeySessionDelegateClient);
 
-    CDMInstanceSessionFairPlayStreamingAVFObjC(Ref<CDMInstanceFairPlayStreamingAVFObjC>&&);
+    static Ref<CDMInstanceSessionFairPlayStreamingAVFObjC> create(Ref<CDMInstanceFairPlayStreamingAVFObjC>&&);
     virtual ~CDMInstanceSessionFairPlayStreamingAVFObjC();
+
+    // ContentKeyGroupDataSource.
+    void ref() const final { CDMInstanceSession::ref(); }
+    void deref() const final { CDMInstanceSession::deref(); }
 
     // CDMInstanceSession
     void requestLicense(LicenseType, KeyGroupingStrategy, const String& initDataType, Ref<SharedBuffer>&& initData, LicenseCallback&&) final;
@@ -238,6 +242,8 @@ public:
     static RetainPtr<NSDictionary> optionsForKeyRequestWithHashSalt(const String&);
 
 private:
+    explicit CDMInstanceSessionFairPlayStreamingAVFObjC(Ref<CDMInstanceFairPlayStreamingAVFObjC>&&);
+
     bool ensureSessionOrGroup(KeyGroupingStrategy);
     bool isLicenseTypeSupported(LicenseType) const;
 
