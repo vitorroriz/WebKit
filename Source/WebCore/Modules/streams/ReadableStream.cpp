@@ -575,6 +575,11 @@ bool ReadableStream::isPulling() const
     return m_controller && m_controller->isPulling();
 }
 
+void ReadableStream::Iterator::next(Callback&& callback)
+{
+    callback({ std::nullopt });
+}
+
 template<typename Visitor>
 void JSReadableStream::visitAdditionalChildren(Visitor& visitor)
 {
