@@ -5206,7 +5206,8 @@ void webkit_web_view_get_snapshot(WebKitWebView* webView, WebKitSnapshotRegion r
  * @result: a #GAsyncResult
  * @error: return location for error or %NULL to ignore
  *
- * Finishes an asynchronous operation started with webkit_web_view_get_snapshot().
+ * Finishes an asynchronous operation started with webkit_web_view_get_snapshot(), producing
+ * an image of the snapshot using the BGRA8888 pixel format.
  *
  * Returns: (transfer full): an image with the retrieved snapshot, or %NULL in case of error.
  */
