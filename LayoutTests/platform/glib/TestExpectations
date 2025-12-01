@@ -87,6 +87,8 @@ scrollingcoordinator/ [ Pass ]
 scrollingcoordinator/mac/ [ Skip ]
 scrollingcoordinator/ios/ [ Skip ]
 
+imported/w3c/web-platform-tests/css/CSS2/linebox/vertical-align-baseline-003.xht [ Pass ]
+imported/w3c/web-platform-tests/css/CSS2/linebox/vertical-align-baseline-009.xht [ Pass ]
 imported/w3c/web-platform-tests/css/CSS2/tables/table-anonymous-objects-079.xht [ Pass ]
 imported/w3c/web-platform-tests/css/CSS2/tables/table-anonymous-objects-080.xht [ Pass ]
 imported/w3c/web-platform-tests/css/CSS2/tables/table-anonymous-objects-155.xht [ Pass ]
@@ -96,11 +98,16 @@ imported/w3c/web-platform-tests/css/css-fonts/font-palette-23b.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-fonts/size-adjust-unicode-range-system-fallback.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-grid/grid-lanes/tentative/alignment/column-justify-items-center-001.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-grid/grid-lanes/tentative/alignment/grid-lanes-align-content-004.html [ Pass ]
+imported/w3c/web-platform-tests/css/css-images/out-of-range-color-stop-conic.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-lists/content-property/marker-text-matches-georgian.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-lists/list-with-image-display-changed-001.html [ Pass ]
+imported/w3c/web-platform-tests/css/css-multicol/subpixel-column-rule-width.tentative.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-position/sticky/position-sticky-stacking-context-002.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-position/sticky/position-sticky-table-pixel-rounding.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-pseudo/marker-line-height.html [ Pass ]
+imported/w3c/web-platform-tests/css/css-pseudo/svg-text-selection-fill-only.html [ Pass ]
+imported/w3c/web-platform-tests/css/css-pseudo/svg-text-selection-stroke-only.html [ Pass ]
+imported/w3c/web-platform-tests/css/css-pseudo/svg-text-selection-transparent-background.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-sizing/intrinsic-percent-non-replaced-004.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-sizing/intrinsic-percent-replaced-023.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-transforms/preserve3d-and-flattening-001.html [ Pass ]
@@ -307,6 +314,7 @@ imported/w3c/web-platform-tests/css/css-masking/clip-path/clip-path-fillBox-1a.h
 imported/w3c/web-platform-tests/css/css-masking/clip-path/animations/clip-path-animation-three-keyframes2.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-masking/clip-path-svg-content/clip-path-shape-circle-001.svg [ Pass ]
 imported/w3c/web-platform-tests/css/css-masking/clip-path-svg-content/clip-path-shape-circle-002.svg [ Pass ]
+imported/w3c/web-platform-tests/css/css-masking/clip-path-svg-content/clip-path-shape-circle-003.svg [ Pass ]
 imported/w3c/web-platform-tests/css/css-masking/clip-path-svg-content/clip-path-shape-circle-005.svg [ Pass ]
 imported/w3c/web-platform-tests/css/css-masking/clip-path/animations/clip-path-animation-fixed-position-rounding-error.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-masking/mask-svg-content/mask-with-filter.svg [ Pass ]
@@ -1258,8 +1266,6 @@ imported/w3c/web-platform-tests/css/css-text-decor/text-emphasis-style-property-
 imported/w3c/web-platform-tests/css/css-text-decor/text-emphasis-style-property-013a.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-text-decor/text-emphasis-style-property-013b.html [ Pass ]
 
-imported/w3c/web-platform-tests/css/css-mixins/function-attr.html [ Failure ]
-
 imported/w3c/web-platform-tests/content-security-policy/generic/src-trailing-dot.sub.any.html [ Failure ]
 imported/w3c/web-platform-tests/content-security-policy/generic/src-trailing-dot.sub.any.worker.html [ Failure ]
 imported/w3c/web-platform-tests/fetch/h1-parsing/lone-cr.window.html [ Failure ]
@@ -2058,9 +2064,6 @@ webkit.org/b/273766 fast/canvas/canvas-scale-shadowBlur.html [ Failure ]
 # Minor reftest image differences introduced with skia.
 imported/blink/svg/custom/focus-ring-text.svg [ ImageOnlyFailure ]
 imported/mozilla/svg/text/text-shadow.svg [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-masking/clip-path-svg-content/mask-objectboundingbox-content-clip-transform.svg [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-masking/clip-path-svg-content/mask-objectboundingbox-content-clip.svg [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-masking/clip-path-svg-content/mask-userspaceonuse-content-clip-transform.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/painting/marker-005.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/painting/marker-006.svg [ ImageOnlyFailure ]
 svg/animations/animateMotion-additive-2a.svg [ Pass ImageOnlyFailure ]
@@ -2132,9 +2135,7 @@ webkit.org/b/273396 imported/w3c/web-platform-tests/css/css-text/hyphens/hyphens
 webkit.org/b/273396 imported/w3c/web-platform-tests/css/css-text/line-break/line-break-anywhere-overrides-uax-behavior-011.html [ ImageOnlyFailure ]
 webkit.org/b/273396 imported/w3c/web-platform-tests/css/css-text/line-break/line-break-anywhere-overrides-uax-behavior-012.html [ ImageOnlyFailure ]
 webkit.org/b/273396 imported/w3c/web-platform-tests/css/css-view-transitions/backdrop-filter-animated.html [ ImageOnlyFailure ]
-webkit.org/b/273396 imported/w3c/web-platform-tests/css/css-view-transitions/new-content-captures-spans.html [ ImageOnlyFailure ]
 webkit.org/b/273396 imported/w3c/web-platform-tests/css/css-view-transitions/rotated-cat-off-top-edge.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-view-transitions/table-caption.html [ ImageOnlyFailure ]
 webkit.org/b/273396 mathml/presentation/mo-stacked-glyphs.html [ ImageOnlyFailure ]
 
 webkit.org/b/273476 fast/text/thai-joiner.html [ Failure ]
@@ -2170,8 +2171,6 @@ webkit.org/b/208182 fast/repaint/backgroundSizeRepaint.html [ ImageOnlyFailure P
 #////////////////////////////////////////////////////////////////////////////////////////
 
 webkit.org/b/261024 imported/w3c/web-platform-tests/fetch/metadata/generated/css-font-face.https.sub.tentative.html [ Failure Pass ]
-
-imported/w3c/web-platform-tests/fetch/local-network-access/navigate.tentative.window.html [ Failure ]
 
 # These tests allocate > 8 GB of RAM and cause OOM in test runner bots. Need to investigate as that shouldn't happen.
 webkit.org/b/282428 imported/w3c/web-platform-tests/fetch/api/crashtests/ [ Skip ]
@@ -2304,7 +2303,6 @@ imported/w3c/web-platform-tests/svg/text/reftests/dominant-baseline-hanging-smal
 # SVG Animations Failures on WPT Import
 imported/w3c/web-platform-tests/svg/animations/reinserting-svg-into-document.html [ Pass Failure ]
 
-imported/w3c/web-platform-tests/css/filter-effects/css-filters-animation-opacity.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/filter-effects/backdrop-filter-backdrop-root-backdrop-filter.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/filter-effects/backdrop-filter-backdrop-root-clip-path.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/filter-effects/backdrop-filter-backdrop-root-mix-blend-mode.html [ ImageOnlyFailure ]
@@ -2897,9 +2895,6 @@ webkit.org/b/172099 imported/w3c/web-platform-tests/FileAPI/url/url_xmlhttpreque
 
 imported/w3c/web-platform-tests/WebCryptoAPI/ [ Slow ]
 
-# Needs rebasing.
-imported/w3c/web-platform-tests/WebCryptoAPI/historical.any.sharedworker.html [ Failure ]
-
 webkit.org/b/280672 imported/w3c/web-platform-tests/WebCryptoAPI/sign_verify/eddsa_small_order_points.https.any.html [ Crash ]
 webkit.org/b/280672 imported/w3c/web-platform-tests/WebCryptoAPI/sign_verify/eddsa_small_order_points.https.any.worker.html [ Crash ]
 
@@ -2929,7 +2924,6 @@ webkit.org/b/214155 imported/w3c/web-platform-tests/html/cross-origin-embedder-p
 webkit.org/b/211692 imported/w3c/web-platform-tests/xhr/event-timeout-order.any.worker.html [ Failure Pass ]
 webkit.org/b/212217 imported/w3c/web-platform-tests/fetch/api/redirect/redirect-location-escape.tentative.any.html [ Failure ]
 webkit.org/b/212217 imported/w3c/web-platform-tests/fetch/api/redirect/redirect-location-escape.tentative.any.worker.html [ Failure ]
-webkit.org/b/212806 imported/w3c/web-platform-tests/fetch/h1-parsing/resources-with-0x00-in-header.window.html [ Failure ]
 webkit.org/b/212807 imported/w3c/web-platform-tests/fetch/api/basic/header-value-null-byte.any.html [ Failure Pass ]
 webkit.org/b/212807 imported/w3c/web-platform-tests/fetch/api/basic/header-value-null-byte.any.worker.html [ Failure Pass ]
 webkit.org/b/212807 imported/w3c/web-platform-tests/xhr/headers-normalize-response.htm [ Failure ]
@@ -3853,8 +3847,6 @@ webkit.org/b/201981 http/wpt/resource-timing/rt-resources-per-worker.html [ Fail
 # ch units should be ignored in these tests.
 webkit.org/b/206001 imported/w3c/web-platform-tests/css/css-values/ch-unit-017.html [ ImageOnlyFailure ]
 
-imported/w3c/web-platform-tests/css/css-values/attr-security.html [ Failure ]
-
 webkit.org/b/206002 imported/w3c/web-platform-tests/css/css-highlight-api/highlight-text.html [ ImageOnlyFailure ]
 webkit.org/b/206002 imported/w3c/web-platform-tests/css/css-highlight-api/highlight-text-replace.html [ ImageOnlyFailure ]
 
@@ -4019,14 +4011,11 @@ fast/scrolling/rtl-scrollbars-alternate-body-dir-attr-does-not-update-scrollbar-
 imported/blink/fast/backgrounds/root-background-with-page-scaled-out.html [ ImageOnlyFailure ]
 imported/blink/svg/text/selection-partial-gradient.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/content-security-policy/generic/image-document-ignores-csp.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-masking/clip-path-svg-content/mask-userspaceonuse-content-clip.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-text-decor/text-shadow/basic-opacity.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-text-decor/text-shadow/basic.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-text/hyphens/hyphens-vs-float-clearance-002.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-transforms/animation/transform-non-invertible-discrete-interpolation.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-view-transitions/content-with-transparent-background.html [ ImageOnlyFailure Pass ]
-imported/w3c/web-platform-tests/css/css-view-transitions/massive-element-left-of-viewport-offscreen-new.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-view-transitions/massive-element-on-top-of-viewport-offscreen-new.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-view-transitions/pseudo-with-classes-exit.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-writing-modes/inline-block-alignment-005.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-writing-modes/inline-table-alignment-005.xht [ ImageOnlyFailure ]
@@ -4327,7 +4316,6 @@ imported/w3c/web-platform-tests/css/css-view-transitions/navigation/with-types/a
 imported/w3c/web-platform-tests/css/css-view-transitions/navigation/custom-scrollbar.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-view-transitions/navigation/auto-name-from-id.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-view-transitions/start-skip-start.html [ Pass ImageOnlyFailure ]
-http/wpt/css/css-view-transitions/navigation/old_vt_promises_bfcache.html [ Failure ]
 
 imported/w3c/web-platform-tests/svg/text/reftests/transform-dynamic-change.html [ ImageOnlyFailure ]
 

@@ -25,8 +25,6 @@ imported/w3c/web-platform-tests/css/css-flexbox/grid-flex-item-007.html [ Pass ]
 
 imported/w3c/web-platform-tests/css/compositing/mix-blend-mode/mix-blend-mode-intermediate-element-overflow-hidden-and-border-radius.html [ Pass ]
 
-imported/w3c/web-platform-tests/css/css-images/out-of-range-color-stop-conic.html [ Pass ]
-
 imported/w3c/web-platform-tests/css/css-view-transitions/navigation/skip-outbound-vt-before-reveal.html [ Pass ]
 
 imported/w3c/web-platform-tests/css/css-ui/text-overflow-005.html [ Pass ]
@@ -70,7 +68,6 @@ imported/w3c/web-platform-tests/css/css-text/text-align/text-align-start-017.htm
 imported/w3c/web-platform-tests/svg/shapes/rect-04.svg [ Pass ]
 
 imported/w3c/web-platform-tests/css/css-view-transitions/new-content-captures-different-size.html [ Pass ]
-imported/w3c/web-platform-tests/css/css-view-transitions/new-content-captures-spans.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-writing-modes/overconstrained-rel-pos-rtl-left-right-vlr-009.xht [ Pass ]
 
 imported/w3c/web-platform-tests/css/filter-effects/svg-unknown-input-001.html [ Pass ]
@@ -1302,6 +1299,7 @@ imported/w3c/web-platform-tests/css/css-pseudo/highlight-custom-properties-dynam
 
 imported/w3c/web-platform-tests/css/css-view-transitions/start-skip-start.html [ Failure ]
 imported/w3c/web-platform-tests/css/css-view-transitions/start-view-transtion-skips-active.html [ Failure ]
+imported/w3c/web-platform-tests/css/css-view-transitions/table-caption.html [ ImageOnlyFailure ]
 
 webkit.org/b/298727 css3/text-decoration/text-decoration-line-spelling-error-1.html [ Skip ]
 webkit.org/b/298727 css3/text-decoration/text-decoration-line-spelling-error-2.html [ Skip ]
