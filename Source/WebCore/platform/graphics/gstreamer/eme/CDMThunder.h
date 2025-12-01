@@ -77,6 +77,7 @@ private:
 
 class CDMPrivateThunder final : public CDMPrivate {
     WTF_MAKE_TZONE_ALLOCATED(CDMPrivateThunder);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(CDMPrivateThunder);
 public:
     CDMPrivateThunder(const String& keySystem);
     virtual ~CDMPrivateThunder() = default;
