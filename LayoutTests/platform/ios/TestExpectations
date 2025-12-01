@@ -7403,7 +7403,7 @@ webkit.org/b/226600 imported/w3c/web-platform-tests/navigation-timing/test_navig
 # These failures are happening only in iOS simulator on an arm64 host
 webkit.org/b/236928 imported/w3c/web-platform-tests/xhr/event-timeout-order.any.worker.html [ Failure Pass ]
 webkit.org/b/236926 imported/w3c/web-platform-tests/webaudio/the-audio-api/the-biquadfilternode-interface/no-dezippering.html [ Failure Pass ]
-webkit.org/b/236926 webrtc/vp9-profile2.html [ Timeout Pass ]
+
 # This passes only on the arm64 host
 imported/w3c/web-platform-tests/html/semantics/embedded-content/the-img-element/adopt-from-image-document.html [ Pass ImageOnlyFailure ]
 
@@ -8396,3 +8396,7 @@ imported/w3c/web-platform-tests/css/CSS2/normal-flow/block-formatting-contexts-0
 imported/w3c/web-platform-tests/css/CSS2/normal-flow/max-width-014.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/normal-flow/min-width-014.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/normal-flow/width-014.xht [ ImageOnlyFailure ]
+
+# webkit.org/b/303325 REGRESSION(303533@main): Caused webrtc/vp9-profile2.html to time out
+webrtc/vp9-profile2.html [ Pass Timeout ]
+fast/mediastream/captureStream/canvas3d.html [ Pass Crash ]

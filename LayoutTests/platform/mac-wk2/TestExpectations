@@ -2410,3 +2410,7 @@ webkit.org/b/302174 [ Tahoe Debug arm64 ] platform/mac/media/encrypted-media/fps
 [ Tahoe Debug arm64 ] fast/selectors/is-backtracking.html [ Skip ]
 
 webkit.org/b/302935 [ Sonoma ] media/media-source/media-source-allowed-codecs.html [ Failure ]
+
+# webkit.org/b/303325 REGRESSION(303533@main): Caused webrtc/vp9-profile2.html to time out
+webrtc/vp9-profile2.html [ Pass Timeout ]
+fast/mediastream/captureStream/canvas3d.html [ Pass Crash ]
