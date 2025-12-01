@@ -27,6 +27,7 @@
 
 #import "AppDelegate.h"
 #import "SettingsController.h"
+#import <PDFKit/PDFDocument.h>
 #import <QuartzCore/CATextLayer.h>
 #import <SecurityInterface/SFCertificateTrustPanel.h>
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
@@ -1036,7 +1037,8 @@ static BOOL isJavaScriptURL(NSURL *url)
         if (result != NSModalResponseOK)
             return;
         [self->_webView createPDFWithConfiguration:nil completionHandler:^(NSData *pdfSnapshotData, NSError *error) {
-            [pdfSnapshotData writeToURL:[panel URL] options:0 error:nil];
+            PDFDocument *pdfDocument = [[PDFDocument alloc] initWithData:pdfSnapshotData];
+            [pdfDocument writeToURL:[panel URL]];
         }];
     }];
 }
