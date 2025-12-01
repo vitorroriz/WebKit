@@ -122,11 +122,22 @@ static WebCore::FloatSize toRawPlatformDelta(WebCore::FloatSize delta)
     _panGestureRecognizer = adoptNS([[NSPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureRecognized:)]);
     [self configureForScrolling:_panGestureRecognizer.get()];
     [_panGestureRecognizer setDelegate:self];
+    [self enablePanGestureIfNeeded];
 
     CheckedPtr checkedViewImpl = _viewImpl.get();
     [checkedViewImpl->protectedView() addGestureRecognizer:_panGestureRecognizer.get()];
 
     return self;
+}
+
+- (void)enablePanGestureIfNeeded
+{
+    RefPtr page = _page.get();
+    if (!page)
+        return;
+    bool panGestureEnabled = page->protectedPreferences()->useAppKitGestures();
+    WK_PAN_GESTURE_CONTROLLER_RELEASE_LOG(page->identifier().toUInt64(), "%@ setEnabled:%d", _panGestureRecognizer.get(), static_cast<int>(panGestureEnabled));
+    [_panGestureRecognizer setEnabled:panGestureEnabled];
 }
 
 #pragma mark - Gesture Recognition

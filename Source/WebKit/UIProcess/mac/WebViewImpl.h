@@ -480,6 +480,8 @@ public:
 
     void preferencesDidChange();
 
+    void updateNeedsViewFrameInWindowCoordinatesIfNeeded();
+
     void teardownTextIndicatorLayer();
     void startTextIndicatorFadeOut();
     CALayer *textIndicatorInstallationLayer();
@@ -927,8 +929,6 @@ private:
 #endif
 
     std::optional<EditorState::PostLayoutData> postLayoutDataForContentEditable();
-
-    void configurePanGestureRecognizerIfNeeded();
 
     WeakObjCPtr<WKWebView> m_view;
     const UniqueRef<PageClient> m_pageClient;

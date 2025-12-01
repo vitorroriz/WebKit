@@ -1388,7 +1388,7 @@ WebViewImpl::WebViewImpl(WKWebView *view, WebProcessPool& processPool, Ref<API::
     m_textInputNotifications = subscribeToTextInputNotifications(this);
 #endif
 
-    configurePanGestureRecognizerIfNeeded();
+    m_panGestureController = adoptNS([[WKPanGestureController alloc] initWithPage:m_page viewImpl:*this]);
 
     WebProcessPool::statistics().wkViewCount++;
 }
@@ -3557,7 +3557,7 @@ void WebViewImpl::handleAcceptedCandidate(NSTextCheckingResult *acceptedCandidat
     });
 }
 
-void WebViewImpl::preferencesDidChange()
+void WebViewImpl::updateNeedsViewFrameInWindowCoordinatesIfNeeded()
 {
     BOOL needsViewFrameInWindowCoordinates = false;
 
@@ -3567,6 +3567,14 @@ void WebViewImpl::preferencesDidChange()
     m_needsViewFrameInWindowCoordinates = needsViewFrameInWindowCoordinates;
     if ([m_view.get() window])
         updateWindowAndViewFrames();
+}
+
+void WebViewImpl::preferencesDidChange()
+{
+    updateNeedsViewFrameInWindowCoordinatesIfNeeded();
+
+    if (RetainPtr panGestureController = m_panGestureController)
+        [panGestureController enablePanGestureIfNeeded];
 }
 
 CALayer* WebViewImpl::textIndicatorInstallationLayer()
@@ -7333,14 +7341,6 @@ void WebViewImpl::showCaptionDisplaySettings(HTMLMediaElementIdentifier, const W
     completionHandler({ });
 }
 #endif
-
-void WebViewImpl::configurePanGestureRecognizerIfNeeded()
-{
-    Ref page = m_page.get();
-    if (!page->protectedPreferences()->useAppKitGestures())
-        return;
-    m_panGestureController = adoptNS([[WKPanGestureController alloc] initWithPage:page viewImpl:*this]);
-}
 
 } // namespace WebKit
 
