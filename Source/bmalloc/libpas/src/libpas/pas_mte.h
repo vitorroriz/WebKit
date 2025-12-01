@@ -511,6 +511,30 @@ PAS_IGNORE_WARNINGS_END
         } \
     } while (0)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+PAS_ALWAYS_INLINE uintptr_t
+pas_mte_maybe_tag_allocated_region(
+    uintptr_t begin,
+    size_t size,
+    pas_allocation_mode mode,
+    pas_allocator_homogeneity homogeneity,
+    pas_allocation_initiality initiality,
+    bool is_known_medium);
+
+PAS_ALWAYS_INLINE uintptr_t
+pas_mte_retag_freed_region_if_tagged(
+    uintptr_t begin,
+    size_t size,
+    pas_page_base_config page_config,
+    pas_allocator_homogeneity homogeneity);
+
+#ifdef __cplusplus
+}
+#endif
+
 /*
  * MTE can be used to protect against both spatial (e.g. out-of-bounds) and
  * temporal (e.g. use-after-free) memory safety violations.
