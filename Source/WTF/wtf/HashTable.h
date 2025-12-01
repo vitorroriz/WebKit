@@ -1442,6 +1442,12 @@ DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(HashTable);
             }
 
             auto& key = Extractor::extract(*entry);
+            // A weak key can become null without being eagerly removed from the table.
+            if (!key) {
+                ++count;
+                continue;
+            }
+
             const_iterator it = find<ShouldValidateKey::No>(key);
             ASSERT(entry == it.m_position);
             ++count;
