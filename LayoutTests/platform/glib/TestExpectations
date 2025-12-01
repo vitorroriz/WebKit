@@ -94,6 +94,8 @@ imported/w3c/web-platform-tests/css/CSS2/tables/table-anonymous-objects-156.xht 
 imported/w3c/web-platform-tests/css/css-backgrounds/background-size/vector/tall--cover--height.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-fonts/font-palette-23b.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-fonts/size-adjust-unicode-range-system-fallback.html [ Pass ]
+imported/w3c/web-platform-tests/css/css-grid/grid-lanes/tentative/alignment/column-justify-items-center-001.html [ Pass ]
+imported/w3c/web-platform-tests/css/css-grid/grid-lanes/tentative/alignment/grid-lanes-align-content-004.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-lists/content-property/marker-text-matches-georgian.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-lists/list-with-image-display-changed-001.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-position/sticky/position-sticky-stacking-context-002.html [ Pass ]
@@ -287,6 +289,7 @@ imported/w3c/web-platform-tests/css/css-images/gradient/gradient-eval-004.html [
 imported/w3c/web-platform-tests/css/css-images/gradient/gradient-eval-005.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-images/gradient/gradient-eval-007.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-images/gradient/gradient-eval-009.html [ Pass ]
+imported/w3c/web-platform-tests/css/css-images/gradient/gradient-eval-predefined-color-spaces.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-images/gradient/gradient-infinity-001.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-images/gradient/gradient-infinity-002.html [ Pass ]
 imported/w3c/web-platform-tests/css/css-images/gradient/oklab-gradient.html [ Pass ]
@@ -2909,7 +2912,6 @@ webkit.org/b/203240 imported/w3c/web-platform-tests/css/css-shapes/shape-outside
 # newly imported CSP tests failing on GTK and/or WPE.
 imported/w3c/web-platform-tests/content-security-policy/frame-ancestors/frame-ancestors-nested-cross-in-same-self-block.html [ Failure ]
 imported/w3c/web-platform-tests/content-security-policy/generic/src-trailing-dot.sub.any.sharedworker.html [ Failure ]
-imported/w3c/web-platform-tests/content-security-policy/generic/wildcard-host-part.sub.window.html [ Failure ]
 imported/w3c/web-platform-tests/content-security-policy/img-src/img-src-port-wildcard-allowed.sub.html [ Failure ]
 imported/w3c/web-platform-tests/content-security-policy/reporting/report-original-url-on-mixed-content-frame.https.sub.html [ Failure ]
 
@@ -3507,8 +3509,6 @@ webkit.org/b/264700 imported/w3c/web-platform-tests/css/css-color/filters-under-
 webkit.org/b/214455 imported/w3c/web-platform-tests/css/css-color-adjust/rendering/dark-color-scheme/color-scheme-iframe-background-mismatch-opaque-cross-origin.sub.html [ Pass ImageOnlyFailure ]
 
 webkit.org/b/264570 imported/w3c/web-platform-tests/css/css-flexbox/intrinsic-size/row-use-cases-001.html [ Failure ]
-
-webkit.org/b/264571 imported/w3c/web-platform-tests/css/css-lists/parsing/list-style-computed.sub.html [ Failure ]
 
 webkit.org/b/264573 imported/w3c/web-platform-tests/css/css-position/sticky/position-sticky-fixed-ancestor.html [ Pass ImageOnlyFailure ]
 
