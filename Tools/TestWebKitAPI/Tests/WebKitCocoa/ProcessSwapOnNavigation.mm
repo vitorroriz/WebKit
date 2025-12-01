@@ -381,7 +381,7 @@ static RetainPtr<WKWebView> createdWebView;
     }, 0.1);
 
     doAsynchronouslyIfNecessary([self, finalURL](id <WKURLSchemeTask> task) {
-        if (auto data = _dataMappings.get([finalURL absoluteString]))
+        if (RetainPtr data = _dataMappings.get([finalURL absoluteString]))
             [task didReceiveData:data.get()];
         else if (_bytes)
             [task didReceiveData:toNSData(_bytes.span8()).get()];

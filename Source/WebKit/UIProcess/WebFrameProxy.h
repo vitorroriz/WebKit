@@ -286,7 +286,7 @@ private:
 
     std::optional<WebCore::PageIdentifier> pageIdentifier() const;
 
-    WebFrameProxy* deepLastChild();
+    RefPtr<WebFrameProxy> deepLastChild();
     WebFrameProxy* firstChild() const;
     WebFrameProxy* lastChild() const;
     WebFrameProxy* nextSibling() const;

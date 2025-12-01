@@ -798,7 +798,7 @@ static HashMap<WebPageProxyIdentifier, WeakPtr<WebPageProxy>>& webPageProxyMap()
     return map.get();
 }
 
-RefPtr<WebPageProxy> WebPageProxy::fromIdentifier(std::optional<WebPageProxyIdentifier> identifier)
+WebPageProxy* WebPageProxy::fromIdentifier(std::optional<WebPageProxyIdentifier> identifier)
 {
     return identifier ? webPageProxyMap().get(*identifier) : nullptr;
 }

@@ -746,21 +746,21 @@ auto WebFrameProxy::traverseNext(CanWrap canWrap) const -> TraversalResult
 auto WebFrameProxy::traversePrevious(CanWrap canWrap) -> TraversalResult
 {
     if (RefPtr previousSibling = this->previousSibling())
-        return { RefPtr { previousSibling->deepLastChild() }, DidWrap::No };
+        return { previousSibling->deepLastChild(), DidWrap::No };
     if (RefPtr parent = parentFrame())
         return { WTFMove(parent), DidWrap::No };
 
     if (canWrap == CanWrap::Yes)
-        return { RefPtr { deepLastChild() }, DidWrap::Yes };
+        return { deepLastChild(), DidWrap::Yes };
     return { };
 }
 
-WebFrameProxy* WebFrameProxy::deepLastChild()
+RefPtr<WebFrameProxy> WebFrameProxy::deepLastChild()
 {
     RefPtr result = this;
     for (RefPtr last = lastChild(); last; last = last->lastChild())
         result = last;
-    return result.unsafeGet();
+    return result;
 }
 
 WebFrameProxy* WebFrameProxy::firstChild() const

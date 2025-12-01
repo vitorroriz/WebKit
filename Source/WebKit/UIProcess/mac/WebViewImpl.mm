@@ -1703,20 +1703,20 @@ void WebViewImpl::viewDidEndLiveResize()
 void WebViewImpl::createPDFHUD(PDFPluginIdentifier identifier, WebCore::FrameIdentifier frameID, const WebCore::IntRect& rect)
 {
     removePDFHUD(identifier);
-    auto hud = adoptNS([[WKPDFHUDView alloc] initWithFrame:rect pluginIdentifier:identifier frameIdentifier:frameID page:m_page.get()]);
+    RetainPtr hud = adoptNS([[WKPDFHUDView alloc] initWithFrame:rect pluginIdentifier:identifier frameIdentifier:frameID page:m_page.get()]);
     [m_view.get() addSubview:hud.get()];
     _pdfHUDViews.add(identifier, WTFMove(hud));
 }
 
 void WebViewImpl::updatePDFHUDLocation(PDFPluginIdentifier identifier, const WebCore::IntRect& rect)
 {
-    if (auto hud = _pdfHUDViews.get(identifier))
+    if (RetainPtr hud = _pdfHUDViews.get(identifier))
         [hud setFrame:rect];
 }
 
 void WebViewImpl::removePDFHUD(PDFPluginIdentifier identifier)
 {
-    if (auto hud = _pdfHUDViews.take(identifier))
+    if (RetainPtr hud = _pdfHUDViews.take(identifier))
         [hud removeFromSuperview];
 }
 
