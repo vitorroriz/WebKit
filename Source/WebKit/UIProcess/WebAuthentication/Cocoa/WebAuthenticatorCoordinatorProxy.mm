@@ -29,6 +29,7 @@
 #import "config.h"
 #import "WebAuthenticatorCoordinatorProxy.h"
 
+#import "APIUIClient.h"
 #import "ArgumentCoders.h"
 #import "LocalService.h"
 #import "Logging.h"
@@ -799,8 +800,12 @@ void WebAuthenticatorCoordinatorProxy::performRequest(WebAuthenticationRequestDa
     m_controller.get().delegate = (id<ASAuthorizationControllerDelegate>)m_delegate.get();
     if (requestData.mediation && *requestData.mediation == MediationRequirement::Conditional && std::holds_alternative<PublicKeyCredentialRequestOptions>(requestData.options))
         [m_controller performAutoFillAssistedRequests];
-    else
+    else {
+#if PLATFORM(VISION)
+        webPageProxy->uiClient().willPresentModalUI(*webPageProxy);
+#endif
         [m_controller performRequests];
+    }
 #endif
 }
 
