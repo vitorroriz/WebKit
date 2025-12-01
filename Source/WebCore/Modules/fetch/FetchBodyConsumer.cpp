@@ -422,7 +422,8 @@ void FetchBodyConsumer::append(const SharedBuffer& buffer)
 
 void FetchBodyConsumer::setData(Ref<FragmentedSharedBuffer>&& data)
 {
-    m_buffer = WTFMove(data);
+    m_buffer.reset();
+    m_buffer.append(WTFMove(data));
 }
 
 RefPtr<FragmentedSharedBuffer> FetchBodyConsumer::takeData()

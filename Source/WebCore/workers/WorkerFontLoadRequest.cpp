@@ -90,7 +90,7 @@ bool WorkerFontLoadRequest::ensureCustomFontData()
         convertWOFFToSfntIfNecessary(contiguousData);
         if (contiguousData) {
             RefPtr fontCustomPlatformData = FontCustomPlatformData::create(*contiguousData, m_url.fragmentIdentifier().toString());
-            m_data = WTFMove(contiguousData);
+            m_data.append(*contiguousData);
             if (!fontCustomPlatformData) {
                 m_errorOccurred = true;
                 return false;

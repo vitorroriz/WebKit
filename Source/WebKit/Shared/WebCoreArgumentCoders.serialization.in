@@ -6088,17 +6088,9 @@ struct WebCore::ServiceWorkerImportedScript {
     String mimeType;
 };
 
-#if ENABLE(SHAREABLE_RESOURCE) && PLATFORM(COCOA)
-[CreateUsing=fromIPCData] class WebCore::ScriptBuffer {
-    Variant<WebCore::ShareableResourceHandle, RefPtr<WebCore::FragmentedSharedBuffer>> ipcData();
+class WebCore::ScriptBuffer {
+    RefPtr<const WebCore::FragmentedSharedBuffer> buffer();
 };
-#endif
-
-#if !ENABLE(SHAREABLE_RESOURCE) || !PLATFORM(COCOA)
-[CreateUsing=fromIPCData] class WebCore::ScriptBuffer {
-    RefPtr<WebCore::FragmentedSharedBuffer> ipcData();
-};
-#endif
 
 header: <wtf/RobinHoodHashTable.h>
 struct WebCore::ServiceWorkerContextData {
