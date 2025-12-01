@@ -117,9 +117,9 @@ static gboolean agentSourcePrepare(GSource* base, gint* timeout)
         if (transmit.from && transmit.to) {
             auto from = riceAddressToString(transmit.from);
             auto to = riceAddressToString(transmit.to);
+            auto protocol = riceTransmitTransportToIceProtocol(transmit);
             if (auto handle = riceTransmitToSharedMemoryHandle(&transmit)) {
-                auto data = WTFMove(*handle);
-                webkitGstWebRTCIceAgentSend(iceAgent.get(), transmit.stream_id, RTCIceProtocol::Udp, WTFMove(from), WTFMove(to), WTFMove(data));
+                webkitGstWebRTCIceAgentSend(iceAgent.get(), transmit.stream_id, protocol, WTFMove(from), WTFMove(to), WTFMove(*handle));
                 result = TRUE;
             }
         } else

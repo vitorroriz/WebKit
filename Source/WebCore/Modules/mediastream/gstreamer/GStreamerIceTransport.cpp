@@ -112,6 +112,7 @@ static GstFlowReturn iceTransportHandleSample(WebKitGstIceTransport* self, GstAp
 
     auto from = riceAddressToString(transmit.from);
     auto to = riceAddressToString(transmit.to);
+    auto protocol = riceTransmitTransportToIceProtocol(transmit);
     auto handle = riceTransmitToSharedMemoryHandle(&transmit);
     if (!handle) [[unlikely]] {
         GST_ERROR_OBJECT(self, "Failed to create shared memory handle");
@@ -119,7 +120,7 @@ static GstFlowReturn iceTransportHandleSample(WebKitGstIceTransport* self, GstAp
     }
 
     auto data = WTFMove(*handle);
-    webkitGstWebRTCIceAgentSend(agent.get(), rice_stream_get_id(riceStream.get()), RTCIceProtocol::Udp, WTFMove(from), WTFMove(to), WTFMove(data));
+    webkitGstWebRTCIceAgentSend(agent.get(), rice_stream_get_id(riceStream.get()), protocol, WTFMove(from), WTFMove(to), WTFMove(data));
     return GST_FLOW_OK;
 }
 

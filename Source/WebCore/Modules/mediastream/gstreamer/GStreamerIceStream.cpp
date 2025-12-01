@@ -159,7 +159,7 @@ static gboolean webkitGstWebRTCIceStreamGatherCandidates(GstWebRTCICEStream* ice
 
         riceAddresses.append(WTFMove(addr));
         riceTransports.append(RICE_TRANSPORT_TYPE_UDP);
-        // TODO: TCP
+        riceTransports.append(RICE_TRANSPORT_TYPE_TCP);
     }
     Vector<const RiceAddress*> riceAddressValues;
     for (const auto& addr : riceAddresses)

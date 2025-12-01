@@ -103,6 +103,7 @@ private:
     HashMap<unsigned, SocketData, WTF::IntHash<unsigned>, WTF::UnsignedWithZeroKeyHashTraits<unsigned>> m_sockets;
 
     HashMap<unsigned, Vector<GUniquePtr<RiceAddress>>, WTF::IntHash<unsigned>, WTF::UnsignedWithZeroKeyHashTraits<unsigned>> m_udpAddresses;
+    Vector<GRefPtr<RiceTcpListener>> m_tcpListeners;
 
     HashMap<String, GUniquePtr<RiceAddress>> m_addressCache;
     HashMap<unsigned, Vector<String>, WTF::IntHash<unsigned>, WTF::UnsignedWithZeroKeyHashTraits<unsigned>> m_udpSocketAddressesCache;

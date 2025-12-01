@@ -295,7 +295,16 @@ void RiceBackend::gatherSocketAddresses(unsigned streamId, CompletionHandler<voi
             udpAddresses.append(WTFMove(localAddress));
             rice_sockets_add_udp(sockets.get(), socket);
         }
-        // TODO: TCP
+
+        auto recvData = createRecvSourceData();
+        recvData->backend = this;
+        recvData->streamId = streamId;
+        auto tcpListener = adoptGRef(rice_tcp_listen(interfaceAddresses[i], [](RiceTcpSocket* socket, void* userData) {
+            auto recvData = reinterpret_cast<RecvSourceData*>(userData);
+            auto sockets = recvData->backend->getSocketsForStream(recvData->streamId);
+            rice_sockets_add_tcp(sockets.get(), socket);
+        }, recvData, reinterpret_cast<RiceIoDestroy>(destroyRecvSourceData)));
+        m_tcpListeners.append(WTFMove(tcpListener));
     }
 
     rice_addresses_free(interfaces, totalInterfaces);
