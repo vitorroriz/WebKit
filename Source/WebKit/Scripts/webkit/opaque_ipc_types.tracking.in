@@ -233,8 +233,6 @@
     [Legacy] MessageParam RemoteQueue.WriteTextureWithCopy data
     [Legacy] MessageParam WebPageProxy.BindRemoteAccessibilityFrames dataToken
     [Legacy] MessageParam WebSWServerConnection.SubscribeToPushService applicationServerKey
-    [Legacy] StructureParam WebKit::DDModel::DDReplaceVertices.buffer
-    [Legacy] StructureParam WebKit::DDModel::DDUpdateMeshDescriptor.indices
     [Legacy] StructureParam WebKit::CoreIPCPKSecureElementPass.ipcData()
     [Legacy] StructureParam WebKit::CoreIPCCFURL.toVector()
     [Legacy] StructureParam WebKit::NetworkProcessCreationParameters.uiProcessCookieStorageIdentifier
@@ -254,9 +252,10 @@
     [Legacy] StructureParam WebCore::WrappedCryptoKey.encryptedKey
     [Legacy] StructureParam JSC::ArrayBuffer.toVector()
     [Legacy] StructureParam WebCore::MockWebAuthenticationConfiguration::HidConfiguration.pinProtocols
-    [Legacy] StructureParam WebCore::DDModel::DDReplaceVertices.buffer
-    [Legacy] StructureParam WebCore::DDModel::DDUpdateMeshDescriptor.indices
     [Legacy] StructureParam WebCore::DDModel::DDImageAsset.data
+    [Legacy] StructureParam WebCore::DDModel::DDMaterialDescriptor.materialGraph
+    [Legacy] StructureParam WebCore::DDModel::DDUpdateMaterialDescriptor.materialGraph
+    [Legacy] StructureParam WebCore::DDModel::DDUpdateMeshDescriptor.indexData
     [Legacy] StructureParam WebCore::CustomFontCreationData.fontFaceData
 
     [NotSentFromWebContent] MessageParam WebPage.GetInformationFromImageData imageData
@@ -470,6 +469,8 @@
     [NotSentFromWebContent] MessageParam SourceBufferPrivateRemoteMessageReceiver.TakeOwnershipOfMemory remoteData
     [DebugOnly] MessageParam WebPasteboardProxy.TestIPCSharedMemory handle
 }
+
+[Legacy] StructureParam WebCore::DDModel::DDUpdateMeshDescriptor.vertexData Vector<Vector<uint8_t>>
 
 # GTK Specific
 [Legacy] StructureParam sk_sp<SkColorSpace>.dataReference() std::span<const uint8_t>
