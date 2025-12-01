@@ -11522,7 +11522,7 @@
                 "render-style-storage-path": ["m_rareInheritedData"],
                 "render-style-storage-kind": "raw",
                 "render-style-type": "Style::TextUnderlinePosition",
-                "parser-grammar": "auto | [ [ under | from-font ] || [ left | right ]@(settings-flag=cssTextUnderlinePositionLeftRightEnabled) ]@(no-single-item-opt)"
+                "parser-grammar": "auto | [ [ under | from-font ] || [ left | right ] ]@(no-single-item-opt)"
             },
             "specification": {
                 "category": "css-text-decor",

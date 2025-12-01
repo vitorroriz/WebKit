@@ -1563,20 +1563,6 @@ CSSTextTransformMathAutoEnabled:
     WebCore:
       default: false
 
-CSSTextUnderlinePositionLeftRightEnabled:
-  type: bool
-  status: stable
-  category: css
-  humanReadableName: "CSS text-underline-position: left right"
-  humanReadableDescription: "Enable the property text-underline-position left and right value support"
-  defaultValue:
-    WebKitLegacy:
-      default: true
-    WebKit:
-      default: true
-    WebCore:
-      default: true
-
 CSSTextWrapPrettyEnabled:
    type: bool
    status: stable

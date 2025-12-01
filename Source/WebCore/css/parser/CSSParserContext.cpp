@@ -49,7 +49,6 @@ static void applyUASheetBehaviorsToContext(CSSParserContext& context)
     // FIXME: We should turn all of the features on from their WebCore Settings defaults.
     context.cssAppearanceBaseEnabled = true;
     context.cssTextTransformMathAutoEnabled = true;
-    context.cssTextUnderlinePositionLeftRightEnabled = true;
     context.popoverAttributeEnabled = true;
     context.propertySettings.cssInputSecurityEnabled = true;
     context.propertySettings.supportHDRDisplayEnabled = true;
@@ -93,7 +92,6 @@ CSSParserContext::CSSParserContext(const Document& document, const URL& sheetBas
     , cssAppearanceBaseEnabled { document.settings().cssAppearanceBaseEnabled() }
     , cssPaintingAPIEnabled { document.settings().cssPaintingAPIEnabled() }
     , cssShapeFunctionEnabled { document.settings().cssShapeFunctionEnabled() }
-    , cssTextUnderlinePositionLeftRightEnabled { document.settings().cssTextUnderlinePositionLeftRightEnabled() }
     , cssTextDecorationLineErrorValues { document.settings().cssTextDecorationLineErrorValues() }
     , cssBackgroundClipBorderAreaEnabled  { document.settings().cssBackgroundClipBorderAreaEnabled() }
     , cssWordBreakAutoPhraseEnabled { document.settings().cssWordBreakAutoPhraseEnabled() }
@@ -136,30 +134,29 @@ void add(Hasher& hasher, const CSSParserContext& context)
         | context.cssAppearanceBaseEnabled                  << 7
         | context.cssPaintingAPIEnabled                     << 8
         | context.cssShapeFunctionEnabled                   << 9
-        | context.cssTextUnderlinePositionLeftRightEnabled  << 10
-        | context.cssBackgroundClipBorderAreaEnabled        << 11
-        | context.cssWordBreakAutoPhraseEnabled             << 12
-        | context.popoverAttributeEnabled                   << 13
-        | context.sidewaysWritingModesEnabled               << 14
-        | context.cssTextWrapPrettyEnabled                  << 15
-        | context.thumbAndTrackPseudoElementsEnabled        << 16
+        | context.cssBackgroundClipBorderAreaEnabled        << 10
+        | context.cssWordBreakAutoPhraseEnabled             << 11
+        | context.popoverAttributeEnabled                   << 12
+        | context.sidewaysWritingModesEnabled               << 13
+        | context.cssTextWrapPrettyEnabled                  << 14
+        | context.thumbAndTrackPseudoElementsEnabled        << 15
 #if ENABLE(SERVICE_CONTROLS)
-        | context.imageControlsEnabled                      << 17
+        | context.imageControlsEnabled                      << 16
 #endif
-        | context.colorLayersEnabled                        << 18
-        | context.contrastColorEnabled                      << 19
-        | context.targetTextPseudoElementEnabled            << 20
-        | context.viewTransitionTypesEnabled                << 21
-        | context.cssProgressFunctionEnabled                << 22
-        | context.cssRandomFunctionEnabled                  << 23
-        | context.cssTreeCountingFunctionsEnabled           << 24
-        | context.cssURLModifiersEnabled                    << 25
-        | context.cssURLIntegrityModifierEnabled            << 26
-        | context.cssAxisRelativePositionKeywordsEnabled    << 27
-        | context.cssDynamicRangeLimitMixEnabled            << 28
-        | context.cssConstrainedDynamicRangeLimitEnabled    << 29
-        | context.cssTextDecorationLineErrorValues          << 30
-        | context.cssTextTransformMathAutoEnabled           << 31;
+        | context.colorLayersEnabled                        << 17
+        | context.contrastColorEnabled                      << 18
+        | context.targetTextPseudoElementEnabled            << 19
+        | context.viewTransitionTypesEnabled                << 20
+        | context.cssProgressFunctionEnabled                << 21
+        | context.cssRandomFunctionEnabled                  << 22
+        | context.cssTreeCountingFunctionsEnabled           << 23
+        | context.cssURLModifiersEnabled                    << 24
+        | context.cssURLIntegrityModifierEnabled            << 25
+        | context.cssAxisRelativePositionKeywordsEnabled    << 26
+        | context.cssDynamicRangeLimitMixEnabled            << 27
+        | context.cssConstrainedDynamicRangeLimitEnabled    << 28
+        | context.cssTextDecorationLineErrorValues          << 29
+        | context.cssTextTransformMathAutoEnabled           << 30;
     add(hasher, context.baseURL, context.charset, context.propertySettings, context.mode, bits);
 }
 
