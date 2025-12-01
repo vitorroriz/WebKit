@@ -1651,6 +1651,22 @@ ExceptionOr<GStreamerMediaEndpoint::Backends> GStreamerMediaEndpoint::createTran
     Vector<RTCRtpCodecCapability> codecs;
 
     auto rtpExtensions = kind == "video"_s ? registryScanner.videoRtpExtensions() : registryScanner.audioRtpExtensions();
+    for (auto& extension : rtpExtensions) {
+        if (m_rtpHeaderExtensions.contains(extension.uri))
+            continue;
+
+        // https://datatracker.ietf.org/doc/html/rfc8285#section-4.2
+        // The 4-bit ID is the local identifier of this element in the range 1-14 inclusive. In the
+        // signaling section, this is referred to as the valid range.
+        auto identifier = m_rtpHeaderExtensions.size() + 1;
+        if (identifier > 14) {
+            ASSERT_NOT_REACHED_WITH_MESSAGE("Attempting to use too many RTP header extensions");
+            gst_printerrln("Attempting to use too many RTP header extensions, bailing out.");
+            return Exception { ExceptionCode::NotSupportedError, "Attempting to use too many RTP header extensions"_s };
+        }
+
+        m_rtpHeaderExtensions.add(extension.uri, identifier);
+    }
 
     if (direction == GST_WEBRTC_RTP_TRANSCEIVER_DIRECTION_SENDRECV) {
         auto mergeCodecs = [&codecs](auto& additionalCodecs) {
@@ -1691,20 +1707,22 @@ ExceptionOr<GStreamerMediaEndpoint::Backends> GStreamerMediaEndpoint::createTran
         }, [](std::nullptr_t&) { });
     }
     StringBuilder msidBuilder;
-    switchOn(source, [&](Ref<RealtimeOutgoingAudioSourceGStreamer>& source) {
+    switchOn(source, [&, rtpHeaderExtensionMapping = m_rtpHeaderExtensions](Ref<RealtimeOutgoingAudioSourceGStreamer>& source) {
         msidBuilder.append(source->mediaStreamID());
         if (auto track = source->track())
             msidBuilder.append(' ', track->id());
-    }, [&](Ref<RealtimeOutgoingVideoSourceGStreamer>& source) {
+        source->setRtpHeaderExtensionMapping(rtpHeaderExtensionMapping);
+    }, [&, rtpHeaderExtensionMapping = m_rtpHeaderExtensions](Ref<RealtimeOutgoingVideoSourceGStreamer>& source) {
         msidBuilder.append(source->mediaStreamID());
         if (auto track = source->track())
             msidBuilder.append(' ', track->id());
+        source->setRtpHeaderExtensionMapping(rtpHeaderExtensionMapping);
     }, [](std::nullptr_t&) { });
 
     int payloadType = pickAvailablePayloadType();
     auto msid = msidBuilder.toString();
     bool msidSet = false;
-    auto caps = capsFromRtpCapabilities({ .codecs = codecs, .headerExtensions = rtpExtensions }, [&payloadType, &msid, &msidSet](GstStructure* structure) {
+    auto caps = capsFromRtpCapabilities(m_rtpHeaderExtensions, { .codecs = codecs, .headerExtensions = rtpExtensions }, [&payloadType, &msid, &msidSet](GstStructure* structure) {
         if (!gst_structure_has_field(structure, "payload"))
             gst_structure_set(structure, "payload", G_TYPE_INT, payloadType++, nullptr);
         if (msidSet)
