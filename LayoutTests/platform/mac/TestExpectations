@@ -1296,8 +1296,6 @@ webkit.org/b/190724 [ Debug ] http/tests/misc/large-js-program.py [ Pass Timeout
 
 webkit.org/b/239405 fast/css/counters/element-removal-crash.xhtml [ Pass Failure ]
 
-webkit.org/b/190976 imported/w3c/web-platform-tests/media-source/mediasource-changetype-play.html [ Pass Failure ]
-
 webkit.org/b/189680 platform/mac/media/audio-session-category-video-paused.html [ Pass Timeout ]
 
 webkit.org/b/195466 imported/w3c/web-platform-tests/html/semantics/embedded-content/media-elements/ready-states/autoplay.html [ Pass Failure ]
@@ -1565,8 +1563,6 @@ webkit.org/b/209353 [ Release ] media/video-background-tab-playback.html [ Pass 
 
 webkit.org/b/215110 [ Release ] imported/w3c/web-platform-tests/css/css-animations/webkit-writing-mode-crash.html [ Pass Failure ]
 
-webkit.org/b/215450 imported/w3c/web-platform-tests/media-source/mediasource-changetype-play-negative.html [ Pass Failure ]
-
 # <rdar://problem/31017631> Stress GC bot failing LayoutTest step with timeout while running WebCryptoAPI/derive_bits_keys tests
 [ Debug ] imported/w3c/web-platform-tests/WebCryptoAPI/derive_bits_keys [ Skip ]
 
@@ -1593,9 +1589,6 @@ imported/w3c/web-platform-tests/css/css-sizing/percentage-height-in-flexbox.html
 
 # <rdar://problem/62860846> REGRESSION [ Mac Debug ] accessibility/roles-exposed.html is flaky timing out.
 [ Debug ] accessibility/roles-exposed.html [ Pass Timeout ]
-
-# rdar://66910555 ([ Layout Tests ] REGRESSION (r264345): [ macOS ] 2 media-source/mediasource-changetype-play are a flaky failure)
-imported/w3c/web-platform-tests/media-source/mediasource-changetype-play-without-codecs-parameter.html [ Crash Pass Failure ]
 
 # WebP images
 fast/images/webp-as-image.html [ Pass ]

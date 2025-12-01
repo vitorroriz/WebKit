@@ -28,6 +28,7 @@
 #if ENABLE(MEDIA_SOURCE) && USE(AVFOUNDATION)
 
 #include "AudioVideoRenderer.h"
+#include "MediaSourceConfiguration.h"
 #include "ProcessIdentity.h"
 #include "SourceBufferParser.h"
 #include "SourceBufferPrivate.h"
@@ -80,7 +81,7 @@ class SourceBufferPrivateAVFObjC final
     : public SourceBufferPrivate
 {
 public:
-    static Ref<SourceBufferPrivateAVFObjC> create(MediaSourcePrivateAVFObjC&, Ref<SourceBufferParser>&&, Ref<AudioVideoRenderer>&&);
+    static Ref<SourceBufferPrivateAVFObjC> create(MediaSourcePrivateAVFObjC&, const MediaSourceConfiguration&, Ref<SourceBufferParser>&&, Ref<AudioVideoRenderer>&&);
     virtual ~SourceBufferPrivateAVFObjC();
 
     constexpr MediaPlatformType platformType() const final { return MediaPlatformType::AVFObjC; }
@@ -126,7 +127,7 @@ public:
     void setAudioVideoRenderer(AudioVideoRenderer&);
 
 private:
-    explicit SourceBufferPrivateAVFObjC(MediaSourcePrivateAVFObjC&, Ref<SourceBufferParser>&&, Ref<AudioVideoRenderer>&&);
+    SourceBufferPrivateAVFObjC(MediaSourcePrivateAVFObjC&, const MediaSourceConfiguration&, Ref<SourceBufferParser>&&, Ref<AudioVideoRenderer>&&);
 
     void didProvideMediaDataForTrackId(Ref<MediaSampleAVFObjC>&&, TrackID, const String& mediaType);
     bool isMediaSampleAllowed(const MediaSample&) const final;
@@ -144,6 +145,7 @@ private:
     void setMinimumUpcomingPresentationTime(TrackID, const MediaTime&) override;
     bool canSwitchToType(const ContentType&) final;
 
+    void configureParser(SourceBufferParser&);
     bool precheckInitializationSegment(const InitializationSegment&) final;
     void processInitializationSegment(std::optional<InitializationSegment>&&) final;
     void processFormatDescriptionForTrackId(Ref<TrackInfo>&&, TrackID) final;
@@ -174,9 +176,6 @@ private:
     void maybeUpdateNeedsVideoLayer();
 
     RefPtr<AudioVideoRenderer> protectedRenderer() const;
-    template <typename T>
-    void ensureWeakOnDispatcher(Function<void(T&)>&&);
-    template <>
     void ensureWeakOnDispatcher(Function<void(SourceBufferPrivateAVFObjC&)>&&);
     void callOnMainThreadWithPlayer(Function<void(MediaPlayerPrivateMediaSourceAVFObjC&)>&&);
 
@@ -190,9 +189,10 @@ private:
     StdUnorderedMap<TrackID, bool> m_trackSelectedValues WTF_GUARDED_BY_CAPABILITY(m_dispatcher.get());
     bool m_isDetached WTF_GUARDED_BY_CAPABILITY(m_dispatcher.get()) { false };
 
-    const Ref<SourceBufferParser> m_parser;
+    Ref<SourceBufferParser> m_parser WTF_GUARDED_BY_CAPABILITY(m_dispatcher.get());
     Vector<Function<void()>> m_pendingTrackChangeTasks WTF_GUARDED_BY_CAPABILITY(m_dispatcher.get());
     const Ref<WTF::WorkQueue> m_appendQueue;
+    const MediaSourceConfiguration m_configuration;
 
     std::optional<FloatSize> m_cachedSize WTF_GUARDED_BY_CAPABILITY(m_dispatcher.get());
     FloatSize m_currentSize WTF_GUARDED_BY_CAPABILITY(m_dispatcher.get());

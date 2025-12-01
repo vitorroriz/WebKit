@@ -134,7 +134,7 @@ MediaSourcePrivate::AddStatus MediaSourcePrivateAVFObjC::addSourceBuffer(const C
     parser->setLogger(m_logger, m_logIdentifier);
 #endif
 
-    Ref newSourceBuffer = SourceBufferPrivateAVFObjC::create(*this, parser.releaseNonNull(), *renderer);
+    Ref newSourceBuffer = SourceBufferPrivateAVFObjC::create(*this, configuration, parser.releaseNonNull(), *renderer);
     newSourceBuffer->setResourceOwner(m_resourceOwner);
     outPrivate = newSourceBuffer.copyRef();
     newSourceBuffer->setMediaSourceDuration(duration());

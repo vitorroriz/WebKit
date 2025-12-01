@@ -1304,6 +1304,10 @@ media/media-source/media-source-changetype-vp8-vp9.html [ Skip ]
 media/media-source/media-source-webm-seek-singlekeyframe.html [ Skip ]
 media/media-source/media-source-ended.html [ Skip ]
 
+imported/w3c/web-platform-tests/media-source/mediasource-changetype-play-implicit.html [ Skip ]
+imported/w3c/web-platform-tests/media-source/mediasource-changetype-play-without-codecs-parameter.html [ Skip ]
+imported/w3c/web-platform-tests/media-source/mediasource-changetype-play.html [ Skip ]
+
 # Managed MediaSource isn't enabled on WK1
 media/media-source/media-managedmse-append.html [ Skip ]
 media/media-source/media-managedmse-multipletracks-bufferedchange.html [ Skip ]

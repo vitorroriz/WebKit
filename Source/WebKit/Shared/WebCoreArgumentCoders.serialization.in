@@ -8057,6 +8057,9 @@ using WebCore::SourceBufferPrivate::SamplesPromise::Result = Expected<Vector<Str
 header: <WebCore/MediaSourceConfiguration.h>
 struct WebCore::MediaSourceConfiguration {
     bool textTracksEnabled;
+#if ENABLE(MEDIA_RECORDER_WEBM)
+    bool supportsLimitedMatroska;
+#endif
 };
 
 #endif
