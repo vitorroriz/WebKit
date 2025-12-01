@@ -279,6 +279,7 @@ inline void RenderStyle::setBlendMode(BlendMode mode)
 // FIXME: Add a type that encapsulates both caretColor() and hasAutoCaretColor().
 inline void RenderStyle::setCaretColor(Style::Color&& color) { SET_PAIR(m_rareInheritedData, caretColor, WTFMove(color), hasAutoCaretColor, false); }
 inline void RenderStyle::setHasAutoCaretColor() { SET_PAIR(m_rareInheritedData, hasAutoCaretColor, true, caretColor, Style::Color::currentColor()); }
+inline void RenderStyle::setVisitedLinkCaretColor(Style::Color&& value) { SET_PAIR(m_rareInheritedData, visitedLinkCaretColor, WTFMove(value), hasVisitedLinkAutoCaretColor, false); }
 inline void RenderStyle::setHasVisitedLinkAutoCaretColor() { SET_PAIR(m_rareInheritedData, hasVisitedLinkAutoCaretColor, true, visitedLinkCaretColor, Style::Color::currentColor()); }
 
 // FIXME: Support generating properties that have their storage spread out
@@ -291,23 +292,6 @@ inline void RenderStyle::setPageSize(Style::PageSize&& pageSize) { SET_NESTED(m_
 // FIXME: Support generating getter and setter with different names (or rename computedLetterSpacing() to letterSpacing() and computedWordSpacing() to wordSpacing())
 inline void RenderStyle::setWordSpacing(Style::WordSpacing&& wordSpacing) { SET_NESTED(m_inheritedData, fontData, wordSpacing, WTFMove(wordSpacing)); }
 inline void RenderStyle::setLetterSpacing(Style::LetterSpacing&& letterSpacing) { SET_NESTED(m_inheritedData, fontData, letterSpacing, WTFMove(letterSpacing)); }
-
-// FIXME: Support generating visited link variants
-inline void RenderStyle::setVisitedLinkBackgroundColor(Style::Color&& value) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, visitedLinkColor, background, WTFMove(value)); }
-inline void RenderStyle::setVisitedLinkBorderBottomColor(Style::Color&& value) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, visitedLinkColor, borderBottom, WTFMove(value)); }
-inline void RenderStyle::setVisitedLinkBorderLeftColor(Style::Color&& value) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, visitedLinkColor, borderLeft, WTFMove(value)); }
-inline void RenderStyle::setVisitedLinkBorderRightColor(Style::Color&& value) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, visitedLinkColor, borderRight, WTFMove(value)); }
-inline void RenderStyle::setVisitedLinkBorderTopColor(Style::Color&& value) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, visitedLinkColor, borderTop, WTFMove(value)); }
-inline void RenderStyle::setVisitedLinkCaretColor(Style::Color&& value) { SET_PAIR(m_rareInheritedData, visitedLinkCaretColor, WTFMove(value), hasVisitedLinkAutoCaretColor, false); }
-inline void RenderStyle::setVisitedLinkColumnRuleColor(Style::Color&& value) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, multiCol, visitedLinkColumnRuleColor, WTFMove(value)); }
-inline void RenderStyle::setVisitedLinkFill(Style::SVGPaint&& paint) { SET_NESTED(m_svgStyle, fillData, visitedLinkFill, WTFMove(paint)); }
-inline void RenderStyle::setVisitedLinkOutlineColor(Style::Color&& value) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, visitedLinkColor, outline, WTFMove(value)); }
-inline void RenderStyle::setVisitedLinkStroke(Style::SVGPaint&& paint) { SET_NESTED(m_svgStyle, strokeData, visitedLinkStroke, WTFMove(paint)); }
-inline void RenderStyle::setVisitedLinkStrokeColor(Style::Color&& value) { SET(m_rareInheritedData, visitedLinkStrokeColor, WTFMove(value)); }
-inline void RenderStyle::setVisitedLinkTextDecorationColor(Style::Color&& value) { SET_DOUBLY_NESTED(m_nonInheritedData, miscData, visitedLinkColor, textDecoration, WTFMove(value)); }
-inline void RenderStyle::setVisitedLinkTextEmphasisColor(Style::Color&& value) { SET(m_rareInheritedData, visitedLinkTextEmphasisColor, WTFMove(value)); }
-inline void RenderStyle::setVisitedLinkTextFillColor(Style::Color&& value) { SET(m_rareInheritedData, visitedLinkTextFillColor, WTFMove(value)); }
-inline void RenderStyle::setVisitedLinkTextStrokeColor(Style::Color&& value) { SET(m_rareInheritedData, visitedLinkTextStrokeColor, WTFMove(value)); }
 
 // FIXME: Support generating "ExplicitlySet" setters
 inline void RenderStyle::setHasExplicitlySetBorderBottomLeftRadius(bool value) { SET_NESTED(m_nonInheritedData, surroundData, hasExplicitlySetBorderBottomLeftRadius, value); }

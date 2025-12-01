@@ -1729,19 +1729,19 @@ void RenderStyle::conservativelyCollectChangedAnimatableProperties(const RenderS
         }
 
         if (first.visitedLinkColor.ptr() != second.visitedLinkColor.ptr()) {
-            if (first.visitedLinkColor->background != second.visitedLinkColor->background)
+            if (first.visitedLinkColor->visitedLinkBackgroundColor != second.visitedLinkColor->visitedLinkBackgroundColor)
                 changingProperties.m_properties.set(CSSPropertyBackgroundColor);
-            if (first.visitedLinkColor->borderLeft != second.visitedLinkColor->borderLeft)
+            if (first.visitedLinkColor->visitedLinkBorderColors.left() != second.visitedLinkColor->visitedLinkBorderColors.left())
                 changingProperties.m_properties.set(CSSPropertyBorderLeftColor);
-            if (first.visitedLinkColor->borderRight != second.visitedLinkColor->borderRight)
+            if (first.visitedLinkColor->visitedLinkBorderColors.right() != second.visitedLinkColor->visitedLinkBorderColors.right())
                 changingProperties.m_properties.set(CSSPropertyBorderRightColor);
-            if (first.visitedLinkColor->borderTop != second.visitedLinkColor->borderTop)
+            if (first.visitedLinkColor->visitedLinkBorderColors.top() != second.visitedLinkColor->visitedLinkBorderColors.top())
                 changingProperties.m_properties.set(CSSPropertyBorderTopColor);
-            if (first.visitedLinkColor->borderBottom != second.visitedLinkColor->borderBottom)
+            if (first.visitedLinkColor->visitedLinkBorderColors.bottom() != second.visitedLinkColor->visitedLinkBorderColors.bottom())
                 changingProperties.m_properties.set(CSSPropertyBorderBottomColor);
-            if (first.visitedLinkColor->textDecoration != second.visitedLinkColor->textDecoration)
+            if (first.visitedLinkColor->visitedLinkTextDecorationColor != second.visitedLinkColor->visitedLinkTextDecorationColor)
                 changingProperties.m_properties.set(CSSPropertyTextDecorationColor);
-            if (first.visitedLinkColor->outline != second.visitedLinkColor->outline)
+            if (first.visitedLinkColor->visitedLinkOutlineColor != second.visitedLinkColor->visitedLinkOutlineColor)
                 changingProperties.m_properties.set(CSSPropertyOutlineColor);
         }
 

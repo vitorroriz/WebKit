@@ -2104,6 +2104,7 @@
                 "render-style-storage-path": ["m_nonInheritedData", "backgroundData"],
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
+                "render-style-visited-link-storage-path": ["m_nonInheritedData", "miscData", "visitedLinkColor"],
                 "parser-grammar": "<color>"
             },
             "specification": {
@@ -2665,6 +2666,8 @@
                 "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
+                "render-style-visited-link-storage-path": ["m_nonInheritedData", "miscData", "visitedLinkColor", "visitedLinkBorderColors"],
+                "render-style-visited-link-storage-container": "physical-group",
                 "parser-grammar": "<color>"
             },
             "specification": {
@@ -3275,6 +3278,8 @@
                 "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
+                "render-style-visited-link-storage-path": ["m_nonInheritedData", "miscData", "visitedLinkColor", "visitedLinkBorderColors"],
+                "render-style-visited-link-storage-container": "physical-group",
                 "parser-grammar": "<color>"
             },
             "specification": {
@@ -3395,6 +3400,8 @@
                 "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
+                "render-style-visited-link-storage-path": ["m_nonInheritedData", "miscData", "visitedLinkColor", "visitedLinkBorderColors"],
+                "render-style-visited-link-storage-container": "physical-group",
                 "parser-grammar": "<color>"
             },
             "specification": {
@@ -3570,6 +3577,8 @@
                 "render-style-storage-container": "physical-group",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
+                "render-style-visited-link-storage-path": ["m_nonInheritedData", "miscData", "visitedLinkColor", "visitedLinkBorderColors"],
+                "render-style-visited-link-storage-container": "physical-group",
                 "parser-grammar": "<color>"
             },
             "specification": {
@@ -4556,6 +4565,7 @@
                 "render-style-storage-path": ["m_svgStyle", "fillData"],
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::SVGPaint",
+                "render-style-visited-link-storage-path": ["m_svgStyle", "fillData"],
                 "color-property": true,
                 "parser-grammar": "none | <color> | [ <url> [ none | <color> ]? ]",
                 "parser-grammar-comment": "Current spec grammar is 'none | <color> | [ <url> [ none | <color> ]? ] | context-fill | context-stroke'",
@@ -6881,6 +6891,7 @@
                 "render-style-storage-container": "struct",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
+                "render-style-visited-link-storage-path": ["m_nonInheritedData", "miscData", "visitedLinkColor"],
                 "parser-grammar": "-webkit-focus-ring-color | <color>",
                 "parser-grammar-comment": "Current spec grammar is 'auto | <color> | <image-1D>'"
             },
@@ -7842,6 +7853,7 @@
                 "render-style-storage-path": ["m_svgStyle", "strokeData"],
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::SVGPaint",
+                "render-style-visited-link-storage-path": ["m_svgStyle", "strokeData"],
                 "color-property": true,
                 "parser-grammar": "none | <color> | [ <url> [ none | <color> ]? ]",
                 "parser-grammar-comment": "Current spec grammar is 'none | <color> | [ <url> [ none | <color> ]? ] | context-fill | context-stroke'",
@@ -7992,6 +8004,7 @@
                 "render-style-storage-path": ["m_rareInheritedData"],
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
+                "render-style-visited-link-storage-path": ["m_rareInheritedData"],
                 "visited-link-color-support": true,
                 "color-property": true,
                 "parser-grammar": "<color>"
@@ -9694,6 +9707,7 @@
                 "render-style-storage-container": "struct",
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
+                "render-style-visited-link-storage-path": ["m_nonInheritedData", "miscData", "multiCol"],
                 "parser-grammar": "<color>"
             },
             "specification":  {
@@ -11458,6 +11472,7 @@
                 "render-style-storage-path": ["m_nonInheritedData", "rareData"],
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
+                "render-style-visited-link-storage-path": ["m_nonInheritedData", "miscData", "visitedLinkColor"],
                 "parser-grammar": "<color>"
             },
             "specification": {
@@ -11625,6 +11640,7 @@
                 "render-style-storage-path": ["m_rareInheritedData"],
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
+                "render-style-visited-link-storage-path": ["m_rareInheritedData"],
                 "parser-grammar": "<color>"
             },
             "specification": {
@@ -11681,6 +11697,7 @@
                 "render-style-storage-path": ["m_rareInheritedData"],
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
+                "render-style-visited-link-storage-path": ["m_rareInheritedData"],
                 "parser-grammar": "<color>"
             },
             "status": {
@@ -11731,6 +11748,7 @@
                 "render-style-storage-path": ["m_rareInheritedData"],
                 "render-style-storage-kind": "reference",
                 "render-style-type": "Style::Color",
+                "render-style-visited-link-storage-path": ["m_rareInheritedData"],
                 "parser-grammar": "<color>"
             },
             "status": {
