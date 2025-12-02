@@ -1711,19 +1711,6 @@ bool Quirks::shouldFlipScreenDimensions() const
 #endif
 }
 
-// Firefox and Firefox Focus (rdar://159977164)
-bool Quirks::requirePageVisibilityToPlayAudioQuirk() const
-{
-#if PLATFORM(IOS_FAMILY)
-    if (!needsQuirks()) [[unlikely]]
-        return false;
-
-    return m_quirksData.quirkIsEnabled(QuirksData::SiteSpecificQuirk::RequirePageVisibilityToPlayAudioQuirk);
-#else
-    return false;
-#endif
-}
-
 // This section is dedicated to UA override for iPad. iPads (but iPad Mini) are sending a desktop user agent
 // to websites. In some cases, the website breaks in some ways, not expecting a touch interface for the website.
 // Controls not active or too small, form factor, etc. In this case it is better to send the iPad Mini UA.
@@ -3425,14 +3412,11 @@ void Quirks::determineRelevantQuirks()
 #if PLATFORM(IOS_FAMILY)
     static const bool shouldDisableLazyIframeLoadingQuirk = !linkedOnOrAfterSDKWithBehavior(SDKAlignedBehavior::NoUNIQLOLazyIframeLoadingQuirk) && WTF::IOSApplication::isUNIQLOApp();
     static const bool needsResettingTransitionCancelsRunningTransitionQuirk = !linkedOnOrAfterSDKWithBehavior(SDKAlignedBehavior::ResettingTransitionCancelsRunningTransitionQuirk) && WTF::IOSApplication::isDOFUSTouch();
-    static const bool requirePageVisibilityToPlayAudioQuirk = (WTF::IOSApplication::isFirefox() || WTF::IOSApplication::isFirefoxFocus()) && !linkedOnOrAfterSDKWithBehavior(SDKAlignedBehavior::AllowBackgroundAudioPlayback);
 
     m_quirksData.setQuirkState(QuirksData::SiteSpecificQuirk::ShouldDisableLazyIframeLoadingQuirk, shouldDisableLazyIframeLoadingQuirk);
 
     // DOFUS Touch app (rdar://112679186)
     m_quirksData.setQuirkState(QuirksData::SiteSpecificQuirk::NeedsResettingTransitionCancelsRunningTransitionQuirk, needsResettingTransitionCancelsRunningTransitionQuirk);
-
-    m_quirksData.setQuirkState(QuirksData::SiteSpecificQuirk::RequirePageVisibilityToPlayAudioQuirk, requirePageVisibilityToPlayAudioQuirk);
 #endif
 
 #if PLATFORM(MAC)
