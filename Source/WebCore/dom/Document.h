@@ -470,6 +470,10 @@ public:
 
     virtual ~Document();
 
+    // FrameDestructionObserver.
+    void ref() const final { ContainerNode::ref(); }
+    void deref() const final { ContainerNode::deref(); }
+
     // Nodes belonging to this document increase referencingNodeCount -
     // these are enough to keep the document from being destroyed, but
     // not enough to keep it from removing its children. This allows a

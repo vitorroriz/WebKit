@@ -255,7 +255,7 @@ LocalFrame::~LocalFrame()
 
     disconnectOwnerElement();
 
-    while (auto destructionObserver = m_destructionObservers.takeAny())
+    while (RefPtr destructionObserver = m_destructionObservers.takeAny())
         destructionObserver->frameDestroyed();
 
     RefPtr localMainFrame = this->localMainFrame();
@@ -893,8 +893,8 @@ void LocalFrame::willDetachPage()
     if (RefPtr parent = dynamicDowncast<LocalFrame>(tree().parent()))
         parent->loader().checkLoadComplete();
 
-    for (auto& observer : m_destructionObservers)
-        observer.willDetachPage();
+    for (Ref observer : m_destructionObservers)
+        observer->willDetachPage();
 
     // FIXME: It's unclear as to why this is called more than once, but it is,
     // so page() could be NULL.

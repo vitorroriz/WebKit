@@ -55,7 +55,7 @@ public:
     UserMessageHandler* namedItem(DOMWrapperWorld&, const AtomString&);
     bool isSupportedPropertyName(const AtomString&);
 
-    // UserContentProviderInvalidationClient.
+    // UserContentProviderInvalidationClient, FrameDestructionObserver.
     void ref() const final { RefCounted::ref(); }
     void deref() const final { RefCounted::deref(); }
 

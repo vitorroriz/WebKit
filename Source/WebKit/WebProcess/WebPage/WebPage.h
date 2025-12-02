@@ -2866,7 +2866,7 @@ private:
     const UniqueRef<MediaKeySystemPermissionRequestManager> m_mediaKeySystemPermissionRequestManager;
 #endif
 
-    std::unique_ptr<WebCore::PrintContext> m_printContext;
+    RefPtr<WebCore::PrintContext> m_printContext;
     bool m_inActivePrintContextAccessScope { false };
     bool m_shouldEndPrintingImmediately { false };
 

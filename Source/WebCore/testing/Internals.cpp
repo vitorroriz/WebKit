@@ -569,9 +569,9 @@ static bool markerTypesFrom(const String& markerType, OptionSet<DocumentMarkerTy
     return true;
 }
 
-static std::unique_ptr<PrintContext>& printContextForTesting()
+static RefPtr<PrintContext>& printContextForTesting()
 {
-    static NeverDestroyed<std::unique_ptr<PrintContext>> context;
+    static NeverDestroyed<RefPtr<PrintContext>> context;
     return context;
 }
 
@@ -4022,7 +4022,7 @@ ExceptionOr<void> Internals::setViewExposedRect(float x, float y, float width, f
 
 void Internals::setPrinting(int width, int height)
 {
-    printContextForTesting() = makeUnique<PrintContext>(frame());
+    printContextForTesting() = PrintContext::create(frame());
     printContextForTesting()->begin(width, height);
 }
 

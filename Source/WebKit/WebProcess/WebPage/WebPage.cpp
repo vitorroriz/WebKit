@@ -6419,26 +6419,28 @@ void WebPage::beginPrinting(FrameIdentifier frameID, const PrintInfo& printInfo)
 #endif
 
     if (!m_printContext) {
-        m_printContext = makeUnique<PrintContext>(coreFrame.get());
+        m_printContext = PrintContext::create(coreFrame.get());
         protectedCorePage()->dispatchBeforePrintEvent();
     }
+    RefPtr printContext = m_printContext;
 
     freezeLayerTree(LayerTreeFreezeReason::Printing);
 
-    auto computedPageSize = m_printContext->computedPageSize(FloatSize(printInfo.availablePaperWidth, printInfo.availablePaperHeight), printInfo.margin);
+    auto computedPageSize = printContext->computedPageSize(FloatSize(printInfo.availablePaperWidth, printInfo.availablePaperHeight), printInfo.margin);
 
-    m_printContext->begin(computedPageSize.width(), computedPageSize.height());
+    printContext->begin(computedPageSize.width(), computedPageSize.height());
 
     // PrintContext::begin() performed a synchronous layout which might have executed a
     // script that closed the WebPage, clearing m_printContext.
     // See <rdar://problem/49731211> for cases of this happening.
-    if (!m_printContext) {
+    printContext = m_printContext;
+    if (!printContext) {
         unfreezeLayerTree(LayerTreeFreezeReason::Printing);
         return;
     }
 
     float fullPageHeight;
-    m_printContext->computePageRects(FloatRect(0, 0, computedPageSize.width(), computedPageSize.height()), 0, 0, printInfo.pageSetupScaleFactor, fullPageHeight, true);
+    printContext->computePageRects(FloatRect(0, 0, computedPageSize.width(), computedPageSize.height()), 0, 0, printInfo.pageSetupScaleFactor, fullPageHeight, true);
 
 #if PLATFORM(GTK)
     if (!m_printOperation)
@@ -6488,12 +6490,12 @@ void WebPage::computePagesForPrintingImpl(FrameIdentifier frameID, const PrintIn
 
     beginPrinting(frameID, printInfo);
 
-    if (m_printContext) {
+    if (RefPtr printContext = m_printContext) {
         PrintContextAccessScope scope { *this };
-        resultPageRects = m_printContext->pageRects();
-        computedPageMargin = m_printContext->computedPageMargin(printInfo.margin);
-        auto computedPageSize = m_printContext->computedPageSize(FloatSize(printInfo.availablePaperWidth, printInfo.availablePaperHeight), printInfo.margin);
-        resultTotalScaleFactorForPrinting = m_printContext->computeAutomaticScaleFactor(computedPageSize) * printInfo.pageSetupScaleFactor;
+        resultPageRects = printContext->pageRects();
+        computedPageMargin = printContext->computedPageMargin(printInfo.margin);
+        auto computedPageSize = printContext->computedPageSize(FloatSize(printInfo.availablePaperWidth, printInfo.availablePaperHeight), printInfo.margin);
+        resultTotalScaleFactorForPrinting = printContext->computeAutomaticScaleFactor(computedPageSize) * printInfo.pageSetupScaleFactor;
     }
 #if PLATFORM(COCOA)
     else
@@ -6663,8 +6665,8 @@ void WebPage::pdfSnapshotAtSize(LocalFrame& localMainFrame, GraphicsContext& con
 void WebPage::drawPagesForPrinting(FrameIdentifier frameID, const PrintInfo& printInfo, CompletionHandler<void(std::optional<SharedMemory::Handle>&&, WebCore::ResourceError&&)>&& completionHandler)
 {
     beginPrinting(frameID, printInfo);
-    if (m_printContext && m_printOperation) {
-        m_printOperation->startPrint(m_printContext.get(), [this, protectedThis = Ref { *this }, completionHandler = WTFMove(completionHandler)] (RefPtr<WebCore::FragmentedSharedBuffer>&& data, WebCore::ResourceError&& error) mutable {
+    if (RefPtr printContext = m_printContext; printContext && m_printOperation) {
+        m_printOperation->startPrint(printContext.get(), [this, protectedThis = Ref { *this }, completionHandler = WTFMove(completionHandler)] (RefPtr<WebCore::FragmentedSharedBuffer>&& data, WebCore::ResourceError&& error) mutable {
             m_printOperation = nullptr;
             std::optional<SharedMemory::Handle> ipcHandle;
             if (error.isNull()) {
