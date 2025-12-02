@@ -357,11 +357,7 @@
     [Legacy] StructureParam WebCore::FontPlatformDataAttributes.m_attributes
 }
 
-[UnsafeWrapper] std::optional<RetainPtr<CFArrayRef>> {
-    [Legacy] StructureParam WebCore::FontPlatformSerializedAttributes.featureSettings
-}
-
-[UnsafeWrapper] std::optional<RetainPtr<CFDataRef>> {
+[UnsafeWrapper] RetainPtr<CFDataRef> {
     [Legacy] StructureParam WebCore::FontPlatformSerializedAttributes.matrix
 }
 

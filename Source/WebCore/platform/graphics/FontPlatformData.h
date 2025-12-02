@@ -164,18 +164,15 @@ struct FontPlatformDataAttributes {
 
 #if USE(CORE_TEXT)
 
-// FIXME: Some of these structures have std::optional<RetainPtr<>> which seems weird,
-// but generated encode/decode of RetainPtrs doesn't currently handle null values very well.
-// Once it does, remove the std::optional redirect.
 struct FontPlatformSerializedTraits {
     static std::optional<FontPlatformSerializedTraits> fromCF(CFDictionaryRef);
     RetainPtr<CFDictionaryRef> toCFDictionary() const;
 
     String uiFontDesign;
-    std::optional<RetainPtr<CFNumberRef>> weight;
-    std::optional<RetainPtr<CFNumberRef>> width;
-    std::optional<RetainPtr<CFNumberRef>> symbolic;
-    std::optional<RetainPtr<CFNumberRef>> grade;
+    RetainPtr<CFNumberRef> weight;
+    RetainPtr<CFNumberRef> width;
+    RetainPtr<CFNumberRef> symbolic;
+    RetainPtr<CFNumberRef> grade;
 };
 
 struct FontPlatformOpticalSize {
@@ -185,10 +182,10 @@ struct FontPlatformOpticalSize {
 };
 
 struct FontPlatformFeatureSetting {
-    std::optional<RetainPtr<CFNumberRef>> type;
-    std::optional<RetainPtr<CFNumberRef>> selector;
-    std::optional<RetainPtr<CFStringRef>> tag;
-    std::optional<RetainPtr<CFNumberRef>> value;
+    RetainPtr<CFNumberRef> type;
+    RetainPtr<CFNumberRef> selector;
+    RetainPtr<CFStringRef> tag;
+    RetainPtr<CFNumberRef> value;
 };
 
 struct FontPlatformSerializedAttributes {
@@ -199,19 +196,19 @@ struct FontPlatformSerializedAttributes {
     String descriptorLanguage;
     String descriptorTextStyle;
 
-    std::optional<RetainPtr<CFDataRef>> matrix;
+    RetainPtr<CFDataRef> matrix;
 
-    std::optional<RetainPtr<CFBooleanRef>> ignoreLegibilityWeight;
+    RetainPtr<CFBooleanRef> ignoreLegibilityWeight;
 
-    std::optional<RetainPtr<CFNumberRef>> baselineAdjust;
-    std::optional<RetainPtr<CFNumberRef>> fallbackOption;
-    std::optional<RetainPtr<CFNumberRef>> fixedAdvance;
-    std::optional<RetainPtr<CFNumberRef>> orientation;
-    std::optional<RetainPtr<CFNumberRef>> palette;
-    std::optional<RetainPtr<CFNumberRef>> size;
-    std::optional<RetainPtr<CFNumberRef>> sizeCategory;
-    std::optional<RetainPtr<CFNumberRef>> track;
-    std::optional<RetainPtr<CFNumberRef>> unscaledTracking;
+    RetainPtr<CFNumberRef> baselineAdjust;
+    RetainPtr<CFNumberRef> fallbackOption;
+    RetainPtr<CFNumberRef> fixedAdvance;
+    RetainPtr<CFNumberRef> orientation;
+    RetainPtr<CFNumberRef> palette;
+    RetainPtr<CFNumberRef> size;
+    RetainPtr<CFNumberRef> sizeCategory;
+    RetainPtr<CFNumberRef> track;
+    RetainPtr<CFNumberRef> unscaledTracking;
 
     std::optional<Vector<std::pair<RetainPtr<CFNumberRef>, RetainPtr<CGColorRef>>>> paletteColors;
     std::optional<Vector<std::pair<RetainPtr<CFNumberRef>, RetainPtr<CFNumberRef>>>> variations;
@@ -222,7 +219,7 @@ struct FontPlatformSerializedAttributes {
     std::optional<Vector<FontPlatformFeatureSetting>> featureSettings;
 
 #if HAVE(ADDITIONAL_FONT_PLATFORM_SERIALIZED_ATTRIBUTES)
-    std::optional<RetainPtr<CFNumberRef>> additionalNumber;
+    RetainPtr<CFNumberRef> additionalNumber;
     static CFStringRef additionalFontPlatformSerializedAttributesNumberDictionaryKey();
 #endif
 };
