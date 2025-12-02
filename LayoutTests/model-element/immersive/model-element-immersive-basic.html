@@ -11,7 +11,7 @@
 <script>
 
 promise_test(async t => {
-    const [model, source] = createModelAndSource(t, "resources/cube.usdz");
+    const [model, source] = createModelAndSource(t, "../resources/cube.usdz");
     
     assert_true('requestImmersive' in model, 'requestImmersive should exist');
     assert_equals(typeof model.requestImmersive, 'function', 'requestImmersive should be a function');
@@ -24,7 +24,7 @@ promise_test(async t => {
 }, 'Immersive API exists on model and document');
 
 promise_test(async t => {
-    const [model, source] = createModelAndSource(t, "resources/cube.usdz");
+    const [model, source] = createModelAndSource(t, "../resources/cube.usdz");
     
     await promise_rejects_js(t, TypeError, 
         model.requestImmersive(),
@@ -35,17 +35,16 @@ promise_test(async t => {
 }, 'Model immersive request fails without user activation');
 
 promise_test(async t => {
-    const [model, source] = createModelAndSource(t, "resources/cube.usdz");
+    const [model, source] = createModelAndSource(t, "../resources/cube.usdz");
 
     await test_driver.bless("immersive");
-    
     await model.requestImmersive();
     
     assert_equals(document.immersiveElement, model, 'Document should reference immersive model');
 }, 'Model enters immersive mode with user activation');
 
 promise_test(async t => {
-    const [model, source] = createModelAndSource(t, "resources/cube.usdz");
+    const [model, source] = createModelAndSource(t, "../resources/cube.usdz");
     
     await test_driver.bless("immersive");
     await model.requestImmersive();
@@ -58,7 +57,7 @@ promise_test(async t => {
 }, 'Document.exitImmersive() exits immersive model');
 
 promise_test(async t => {
-    const [model, source] = createModelAndSource(t, "resources/cube.usdz");
+    const [model, source] = createModelAndSource(t, "../resources/cube.usdz");
     
     let modelChangeEvents = [];
     let documentChangeEvents = [];
@@ -84,8 +83,8 @@ promise_test(async t => {
 }, 'Immersivechange events fire when entering immersive');
 
 promise_test(async t => {
-    const [model1, source1] = createModelAndSource(t, "resources/cube.usdz");
-    const [model2, source2] = createModelAndSource(t, "resources/sphere.usdz");
+    const [model1, source1] = createModelAndSource(t, "../resources/cube.usdz");
+    const [model2, source2] = createModelAndSource(t, "../resources/sphere.usdz");
     
     await test_driver.bless("immersive");
     await model1.requestImmersive();
@@ -99,7 +98,7 @@ promise_test(async t => {
 }, 'Only one model can be immersive at a time');
 
 promise_test(async t => {
-    const [model, source] = createModelAndSource(t, "resources/cube.usdz");
+    const [model, source] = createModelAndSource(t, "../resources/cube.usdz");
     
     await test_driver.bless("immersive");
     await model.requestImmersive();
@@ -112,7 +111,7 @@ promise_test(async t => {
 }, 'Removing immersive model from DOM exits immersive mode');
 
 promise_test(async t => {
-    const [model, source] = createModelAndSource(t, "resources/cube.usdz");
+    const [model, source] = createModelAndSource(t, "../resources/cube.usdz");
     
     let errorFired = false;
     model.addEventListener('immersiveerror', () => {
@@ -127,7 +126,7 @@ promise_test(async t => {
 }, 'Immersiveerror event fires when request fails');
 
 promise_test(async t => {
-    const [model, source] = createModelAndSource(t, "resources/cube.usdz");
+    const [model, source] = createModelAndSource(t, "../resources/cube.usdz");
     
     assert_false(model.matches(':immersive'), 'Should not match :immersive initially');
     
@@ -142,7 +141,7 @@ promise_test(async t => {
 }, 'CSS :immersive pseudo-class matches correctly');
 
 promise_test(async t => {
-    const [model, source] = createModelAndSource(t, "resources/cube.usdz");
+    const [model, source] = createModelAndSource(t, "../resources/cube.usdz");
     
     await test_driver.bless("immersive");
     await model.requestImmersive();
@@ -151,8 +150,8 @@ promise_test(async t => {
 }, 'Model is complete once presented as immersive');
 
 promise_test(async t => {
-    const [model1, source1] = createModelAndSource(t, "resources/cube.usdz");
-    const [model2, source2] = createModelAndSource(t, "resources/sphere.usdz");
+    const [model1, source1] = createModelAndSource(t, "../resources/cube.usdz");
+    const [model2, source2] = createModelAndSource(t, "../resources/sphere.usdz");
     
     await test_driver.bless("immersive");
     const promise1 = model1.requestImmersive();

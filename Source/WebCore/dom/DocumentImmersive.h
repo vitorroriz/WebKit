@@ -59,7 +59,7 @@ public:
     RefPtr<HTMLModelElement> protectedImmersiveElement() const { return immersiveElement(); }
 
     void requestImmersive(HTMLModelElement*, CompletionHandler<void(ExceptionOr<void>)>&&);
-    void exitImmersive(CompletionHandler<void(ExceptionOr<void>)>&&);
+    void exitImmersive(HTMLModelElement*, CompletionHandler<void(ExceptionOr<void>)>&&);
     void exitRemovedImmersiveElement(HTMLModelElement*);
 
     enum class EventType : bool { Change, Error };
