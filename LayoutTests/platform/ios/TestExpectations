@@ -8403,3 +8403,5 @@ imported/w3c/web-platform-tests/css/CSS2/normal-flow/width-014.xht [ ImageOnlyFa
 # webkit.org/b/303325 REGRESSION(303533@main): Caused webrtc/vp9-profile2.html to time out
 webrtc/vp9-profile2.html [ Pass Timeout ]
 fast/mediastream/captureStream/canvas3d.html [ Pass Crash ]
+
+webkit.org/b/303341 imported/w3c/web-platform-tests/css/css-contain/content-visibility/content-visibility-intrinsic-size-001.html [ Pass ImageOnlyFailure ]
