@@ -35,6 +35,7 @@
 #include <wtf/Scope.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/text/CString.h>
+#include <wtf/text/MakeString.h>
 #include <wtf/text/ParsingUtilities.h>
 #include <wtf/text/StringBuilder.h>
 
@@ -47,6 +48,12 @@
 
 #if HAVE(STD_FILESYSTEM) || HAVE(STD_EXPERIMENTAL_FILESYSTEM)
 #include <wtf/StdFilesystem.h>
+#endif
+
+#if OS(WINDOWS)
+    constexpr char pathSeparator = '\\';
+#else
+    constexpr char pathSeparator = '/';
 #endif
 
 namespace WTF::FileSystemImpl {
@@ -236,12 +243,6 @@ String decodeFromFilename(const String& inputString)
 
 String lastComponentOfPathIgnoringTrailingSlash(const String& path)
 {
-#if OS(WINDOWS)
-    char pathSeparator = '\\';
-#else
-    char pathSeparator = '/';
-#endif
-
     auto position = path.reverseFind(pathSeparator);
     if (position == notFound)
         return path;
@@ -711,6 +712,15 @@ String createTemporaryFile(StringView prefix, StringView suffix)
 {
     auto [path, handle] = openTemporaryFile(prefix, suffix);
     return path;
+}
+
+FileHandle createDumpFile(StringView filename, StringView path)
+{
+    if (path.isEmpty()) {
+        auto [p, handle] = openTemporaryFile(nullString(), filename);
+        return WTFMove(handle);
+    }
+    return openFile(makeString(path, pathSeparator, filename), FileOpenMode::Truncate);
 }
 
 #if !PLATFORM(PLAYSTATION)
