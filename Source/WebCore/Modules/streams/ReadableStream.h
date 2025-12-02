@@ -151,20 +151,22 @@ public:
 
     JSDOMGlobalObject* globalObject();
 
-    class Iterator : public RefCountedAndCanMakeWeakPtr<Iterator> {
+    class Iterator : public RefCounted<Iterator> {
     public:
-        static Ref<Iterator> create() { return adoptRef(*new Iterator()); }
-        ~Iterator() = default;
+        static Ref<Iterator> create(Ref<ReadableStreamDefaultReader>&&, bool preventCancel);
+        ~Iterator();
 
         using Result = std::optional<JSC::JSValue>;
         using Callback = CompletionHandler<void(ExceptionOr<Result>&&)>;
         void next(Callback&&);
 
     private:
-        Iterator() = default;
+        Iterator(Ref<ReadableStreamDefaultReader>&&, bool preventCancel);
+
+        const Ref<ReadableStreamDefaultReader> m_reader;
     };
 
-    Ref<Iterator> createIterator(ScriptExecutionContext*) { return Iterator::create(); }
+    ExceptionOr<Ref<Iterator>> createIterator(ScriptExecutionContext*, IteratorOptions&&);
 
 protected:
     static ExceptionOr<Ref<ReadableStream>> createFromJSValues(JSC::JSGlobalObject&, JSC::JSValue, JSC::JSValue);
