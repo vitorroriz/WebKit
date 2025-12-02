@@ -5575,6 +5575,38 @@ TEST(SiteIsolation, CreateWebArchiveNestedFrameForCopy)
     validateWebArchiveMainResource([actualNestedFrameArchives.firstObject objectForKey:@"WebMainResource"], expectedNestedFrameResource);
 }
 
+TEST(SiteIsolation, LoadWebArchive)
+{
+    RetainPtr<NSURL> archiveURL = [NSBundle.test_resourcesBundle URLForResource:@"SiteIsolationLoadWebArchive" withExtension:@"webarchive"];
+    RetainPtr configuration = adoptNS([WKWebViewConfiguration new]);
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(configuration.get(), CGRectZero, true);
+    [webView loadRequest:[NSURLRequest requestWithURL:archiveURL.get()]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    checkFrameTreesInProcesses(webView.get(), {
+        {
+            "https://example.com"_s,
+            { { "https://apple.com"_s } }
+        },
+    });
+}
+
+TEST(SiteIsolation, LoadWebArchiveNestedFrame)
+{
+    RetainPtr<NSURL> archiveURL = [NSBundle.test_resourcesBundle URLForResource:@"SiteIsolationLoadWebArchiveNestedFrame" withExtension:@"webarchive"];
+    RetainPtr configuration = adoptNS([WKWebViewConfiguration new]);
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(configuration.get(), CGRectZero, true);
+    [webView loadRequest:[NSURLRequest requestWithURL:archiveURL.get()]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    checkFrameTreesInProcesses(webView.get(), {
+        {
+            "https://domain1.com"_s,
+            { { "https://domain2.com"_s, { { "https://domain3.com"_s } } } }
+        },
+    });
+}
+
 // FIXME: Re-enable this once the extra resize events are gone.
 // https://bugs.webkit.org/show_bug.cgi?id=292311 might do it.
 TEST(SiteIsolation, DISABLED_Events)

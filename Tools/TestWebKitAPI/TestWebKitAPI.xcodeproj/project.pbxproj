@@ -186,6 +186,8 @@
 		3A7AA56028E28E99009E09C2 /* ConstLiteralTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A7AA55F28E28E99009E09C2 /* ConstLiteralTests.cpp */; };
 		3A9C438828E3E057002F7294 /* ASTStringDumperTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A9C438028E3E057002F7294 /* ASTStringDumperTests.cpp */; };
 		3A9C438B28E3E240002F7294 /* TestWGSLAPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A9C438928E3E240002F7294 /* TestWGSLAPI.cpp */; };
+		3AB1F1CA2ED0D81400114FBF /* SiteIsolationLoadWebArchive.webarchive in Copy Resources */ = {isa = PBXBuildFile; fileRef = 3AB1F1C92ED0D81400114FBF /* SiteIsolationLoadWebArchive.webarchive */; };
+		3AB1F1D52ED11FCC00114FBF /* SiteIsolationLoadWebArchiveNestedFrame.webarchive in Copy Resources */ = {isa = PBXBuildFile; fileRef = 3AB1F1D42ED11FCC00114FBF /* SiteIsolationLoadWebArchiveNestedFrame.webarchive */; };
 		3ADD8988299F192F005DCE4E /* MetalGenerationTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3ADD897E299F1400005DCE4E /* MetalGenerationTests.cpp */; };
 		3AF4A0952D9DEE0B00B3FF5E /* icon-svg-16.tiff in Copy Resources */ = {isa = PBXBuildFile; fileRef = 3AF4A0932D9DEE0B00B3FF5E /* icon-svg-16.tiff */; };
 		3AF4A0962D9DEE0B00B3FF5E /* icon-svg-256.tiff in Copy Resources */ = {isa = PBXBuildFile; fileRef = 3AF4A0942D9DEE0B00B3FF5E /* icon-svg-256.tiff */; };
@@ -2264,6 +2266,8 @@
 				A17C46EF2C98E54B0023F3C7 /* simple.html in Copy Resources */,
 				A17C46F02C98E54B0023F3C7 /* simple2.html in Copy Resources */,
 				A17C46F12C98E54B0023F3C7 /* simple3.html in Copy Resources */,
+				3AB1F1CA2ED0D81400114FBF /* SiteIsolationLoadWebArchive.webarchive in Copy Resources */,
+				3AB1F1D52ED11FCC00114FBF /* SiteIsolationLoadWebArchiveNestedFrame.webarchive in Copy Resources */,
 				A17C47FB2C98E5C20023F3C7 /* skinny-autoplaying-video-with-audio.html in Copy Resources */,
 				1FEF15102D7A2AA900D29B57 /* SkipAdInPictureInPicture.html in Copy Resources */,
 				A17C46F22C98E54B0023F3C7 /* spacebar-scrolling.html in Copy Resources */,
@@ -2840,6 +2844,8 @@
 		3A9C438928E3E240002F7294 /* TestWGSLAPI.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TestWGSLAPI.cpp; sourceTree = "<group>"; };
 		3A9C438A28E3E240002F7294 /* TestWGSLAPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestWGSLAPI.h; sourceTree = "<group>"; };
 		3AA7856029B6C8AA00C4374A /* TestWebKitAPIPrefix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestWebKitAPIPrefix.h; sourceTree = "<group>"; };
+		3AB1F1C92ED0D81400114FBF /* SiteIsolationLoadWebArchive.webarchive */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = SiteIsolationLoadWebArchive.webarchive; sourceTree = "<group>"; };
+		3AB1F1D42ED11FCC00114FBF /* SiteIsolationLoadWebArchiveNestedFrame.webarchive */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = SiteIsolationLoadWebArchiveNestedFrame.webarchive; sourceTree = "<group>"; };
 		3ADD897E299F1400005DCE4E /* MetalGenerationTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MetalGenerationTests.cpp; sourceTree = "<group>"; };
 		3AEA55B22CB0897200A9ECAA /* WKPreferences.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = WKPreferences.mm; sourceTree = "<group>"; };
 		3AF4A0932D9DEE0B00B3FF5E /* icon-svg-16.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "icon-svg-16.tiff"; sourceTree = "<group>"; };
@@ -6003,6 +6009,8 @@
 				F4FC077620F0108100CA043C /* significant-text-milestone.html */,
 				C9B4AD291ECA6EA500F5FEA0 /* silence-long.m4a */,
 				F4D060072734A08C008FA67A /* simple-editor.html */,
+				3AB1F1C92ED0D81400114FBF /* SiteIsolationLoadWebArchive.webarchive */,
+				3AB1F1D42ED11FCC00114FBF /* SiteIsolationLoadWebArchiveNestedFrame.webarchive */,
 				F4F405BB1D4C0CF8007A9707 /* skinny-autoplaying-video-with-audio.html */,
 				F4CFCDD8249FC9D900527482 /* SpaceOnly.otf */,
 				CDDFA89D2DBD6BFF00312417 /* spatial-audio-experience-with-audio.html */,

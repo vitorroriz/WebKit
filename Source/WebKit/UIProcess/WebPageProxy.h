@@ -200,6 +200,7 @@ enum class MediaProducerMutedState : uint8_t;
 enum class ModalContainerControlType : uint8_t;
 enum class ModalContainerDecision : uint8_t;
 enum class MouseEventPolicy : uint8_t;
+enum class NavigationType : uint8_t;
 enum class PermissionName : uint8_t;
 enum class PermissionState : uint8_t;
 enum class PlatformEventModifier : uint8_t;
@@ -3519,6 +3520,11 @@ private:
 
     void setCustomUserAgentInternal();
     HashSet<Ref<WebProcessProxy>> webContentProcessesWithFrame();
+
+#if ENABLE(WEB_ARCHIVE)
+    using DataStoreUpdateResult = std::pair<RefPtr<WebsiteDataStore>, LoadedWebArchive>;
+    Expected<DataStoreUpdateResult, WebCore::ResourceError> updateDataStoreForWebArchiveLoad(WebFrameProxy&, WebCore::PolicyAction, WebCore::NavigationType, API::Navigation&);
+#endif
 
     const UniqueRef<Internals> m_internals;
     Identifier m_identifier;

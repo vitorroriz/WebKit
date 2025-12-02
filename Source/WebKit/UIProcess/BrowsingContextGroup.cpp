@@ -82,7 +82,7 @@ void BrowsingContextGroup::sharedProcessForSite(WebsiteDataStore& websiteDataSto
 
         Ref process = pageConfiguration->protectedProcessPool()->processForSite(websiteDataStore.get(), WebProcessPool::IsSharedProcess::Yes, site, mainFrameSite, domainsWithUserInteraction, lockdownMode, enhancedSecurity, pageConfiguration.get(), ProcessSwapDisposition::Other);
         ASSERT(!process->isInProcessCache());
-        Ref frameProcess = FrameProcess::create(process, protectedThis, std::nullopt, mainFrameSite, preferences, InjectBrowsingContextIntoProcess::Yes);
+        Ref frameProcess = FrameProcess::create(process, protectedThis, std::nullopt, mainFrameSite, preferences, LoadedWebArchive::No, InjectBrowsingContextIntoProcess::Yes);
         ASSERT(frameProcess->isSharedProcess());
         ASSERT(frameProcess->process().isSharedProcess());
         frameProcess->process().addSharedProcessDomain(site.domain());
@@ -91,7 +91,7 @@ void BrowsingContextGroup::sharedProcessForSite(WebsiteDataStore& websiteDataSto
     });
 }
 
-Ref<FrameProcess> BrowsingContextGroup::ensureProcessForSite(const Site& site, const Site& mainFrameSite, WebProcessProxy& process, const WebPreferences& preferences, InjectBrowsingContextIntoProcess injectBrowsingContextIntoProcess)
+Ref<FrameProcess> BrowsingContextGroup::ensureProcessForSite(const Site& site, const Site& mainFrameSite, WebProcessProxy& process, const WebPreferences& preferences, LoadedWebArchive loadedWebArchive, InjectBrowsingContextIntoProcess injectBrowsingContextIntoProcess)
 {
     if (preferences.siteIsolationEnabled()) {
         if ((m_sharedProcess && m_sharedProcessSites.contains(site)) || process.isSharedProcess()) {
@@ -104,7 +104,7 @@ Ref<FrameProcess> BrowsingContextGroup::ensureProcessForSite(const Site& site, c
         }
     }
 
-    return FrameProcess::create(process, *this, site, mainFrameSite, preferences, injectBrowsingContextIntoProcess);
+    return FrameProcess::create(process, *this, site, mainFrameSite, preferences, loadedWebArchive, injectBrowsingContextIntoProcess);
 }
 
 RefPtr<FrameProcess> BrowsingContextGroup::processForSite(const Site& site)
