@@ -741,9 +741,6 @@ webkit.org/b/127742 fast/spatial-navigation/snav-unit-overflow-and-scroll-in-dir
 
 webkit.org/b/143985 editing/pasteboard/drop-text-events.html [ Failure ]
 
-
-webkit.org/b/218320 imported/w3c/web-platform-tests/webaudio/the-audio-api/the-destinationnode-interface/destination.html [ Failure ]
-
 webkit.org/b/156436 fast/harness/sample-fail-mismatch-reftest.html [ ImageOnlyFailure ]
 
 webkit.org/b/158472 fast/text/international/system-language/han-quotes.html [ ImageOnlyFailure ]
@@ -1603,8 +1600,6 @@ imported/w3c/web-platform-tests/svg/fonts/font-size-adjust-scale-text.svg [ Imag
 media/adopt-node-after-showing-picker-crash.html [ Skip ]
 
 webkit.org/b/267992 [ Debug ] imported/w3c/web-platform-tests/html/anonymous-iframe/initial-empty-document.tentative.https.window.html [ Crash Pass ]
-
-imported/w3c/web-platform-tests/svg/shapes/rect-04.svg [ ImageOnlyFailure ]
 
 imported/w3c/web-platform-tests/css/css-view-transitions/navigation/skip-outbound-vt-before-reveal.html [ Failure Pass ]
 
