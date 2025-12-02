@@ -720,8 +720,6 @@ webkit.org/b/127676 imported/w3c/web-platform-tests/xhr/send-redirect-bogus.htm 
 webkit.org/b/127676 imported/w3c/web-platform-tests/xhr/send-redirect-to-cors.htm [ Skip ]
 webkit.org/b/127676 imported/w3c/web-platform-tests/xhr/send-redirect-to-non-cors.htm [ Skip ]
 
-Bug(WPE) fast/css-grid-layout/flex-content-sized-columns-resize.html [ Timeout ]
-
 Bug(WPE) fast/dynamic/window-resize-scrollbars-test.html [ Timeout ]
 
 # The tests below need gardening after the EventSenderWPE has been added.

@@ -99,6 +99,8 @@ webkit.org/b/254733 inspector/canvas/shaderProgram-add-remove-webgl.html [ Failu
 # Crash on EWS bot.
 webrtc/vp8-then-h264-gpu-process-crash.html [ Skip ]
 
+webkit.org/b/303366 webrtc/datachannel/multiple-connections.html [ Crash Pass ]
+
 #//////////////////////////////////////////////////////////////////////////////////////////
 # End of Triaged Expectations
 # Legacy Expectations sections below
