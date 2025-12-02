@@ -143,6 +143,8 @@ public:
 
     FloatRect applySVGTextFragments(SVGTextFragmentMap&&);
 
+    bool hasBlocks() const;
+
 private:
     void preparePlacedFloats();
     FloatRect constructContent(const Layout::InlineLayoutState&, Layout::InlineLayoutResult&&);

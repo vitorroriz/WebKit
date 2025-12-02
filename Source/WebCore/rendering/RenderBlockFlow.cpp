@@ -3839,6 +3839,12 @@ bool RenderBlockFlow::hasLines() const
     return childrenInline() ? lineCount() : false;
 }
 
+bool RenderBlockFlow::hasBlocksInInlineLayout() const
+{
+    auto* inlineLayout = this->inlineLayout();
+    return inlineLayout && inlineLayout->hasBlocks();
+}
+
 void RenderBlockFlow::invalidateLineLayout(InvalidationReason invalidationReason)
 {
     if (lineLayoutPath() == UndeterminedPath)

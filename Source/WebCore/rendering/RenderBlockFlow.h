@@ -355,6 +355,7 @@ public:
     void setChildrenInline(bool) final;
 
     bool hasLines() const;
+    bool hasBlocksInInlineLayout() const;
 
     enum InvalidationReason : uint8_t {
         InternalMove,       // (anon) block is moved or collapsed

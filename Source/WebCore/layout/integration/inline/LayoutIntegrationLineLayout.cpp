@@ -1417,6 +1417,11 @@ bool LineLayout::contentNeedsVisualReordering() const
     return m_inlineContentCache.inlineItems().requiresVisualReordering();
 }
 
+bool LineLayout::hasBlocks() const
+{
+    return m_inlineContent && m_inlineContent->hasBlockLevelBoxes();
+}
+
 #if ENABLE(TREE_DEBUGGING)
 void LineLayout::outputLineTree(WTF::TextStream& stream, size_t depth) const
 {
