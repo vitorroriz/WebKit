@@ -1055,6 +1055,9 @@ accessibility/mac/iframe-hit-testing.html [ Skip ]
 accessibility/mac/aria-notify-with-options.html [ Skip ]
 accessibility/mac/aria-notify.html [ Skip ]
 
+# Skipping because announcement notifications don't work in the WK1 testrunner.
+accessibility/mac/live-regions/ [ Skip ]
+
 # DOM paste access requests are not implemented in WebKit1.
 editing/async-clipboard/clipboard-change-data-while-reading.html [ Skip ]
 editing/async-clipboard/clipboard-do-not-read-text-from-platform-if-text-changes.html [ Skip ]

@@ -29,6 +29,8 @@
 #include "config.h"
 #include "AXLiveRegionManager.h"
 
+#if PLATFORM(COCOA)
+
 #include "AXNotifications.h"
 #include "AXObjectCache.h"
 #include "AccessibilityObject.h"
@@ -38,6 +40,17 @@
 namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(AXLiveRegionManager);
+
+#if PLATFORM(MAC)
+static constexpr ASCIILiteral accessibilityLanguageAttributeKey = "AXLanguage"_s;
+#else
+static constexpr ASCIILiteral accessibilityLanguageAttributeKey = "UIAccessibilitySpeechAttributeLanguage"_s;
+#endif
+
+struct StringLanguagePair {
+    String text;
+    String language;
+};
 
 AXLiveRegionManager::AXLiveRegionManager(AXObjectCache& cache)
     : m_cache(cache)
@@ -173,12 +186,12 @@ LiveRegionSnapshot AXLiveRegionManager::buildLiveRegionSnapshot(AccessibilityObj
     std::function<void(AccessibilityObject&)> buildObjectList = [this, &buildObjectList, &snapshot] (AccessibilityObject& object) {
         // Treat atomic objects as one object, so when they change the entire subtree is announced.
         if (object.liveRegionAtomic()) {
-            snapshot.objects.append({ object.objectID(), textForObject(object) });
+            snapshot.objects.append({ object.objectID(), textForObject(object), object.languageIncludingAncestors() });
             return;
         }
 
         if (shouldIncludeInSnapshot(object))
-            snapshot.objects.append({ object.objectID(), textForObject(object) });
+            snapshot.objects.append({ object.objectID(), textForObject(object), object.languageIncludingAncestors() });
 
         for (auto& child : object.unignoredChildren())
             buildObjectList(downcast<AccessibilityObject>(child.get()));
@@ -227,18 +240,18 @@ AXLiveRegionManager::LiveRegionDiff AXLiveRegionManager::computeChanges(const Ve
 
     // Build a map of old objects for lookup. As we match them with new objects, we'll remove them.
     // Whatever remains unmatched at the end represents removals.
-    HashMap<AXID, String> unmatchedOldObjects;
+    HashMap<AXID, StringLanguagePair> unmatchedOldObjects;
     unmatchedOldObjects.reserveInitialCapacity(oldObjects.size());
 
     for (auto& object : oldObjects)
-        unmatchedOldObjects.set(object.objectID, object.text);
+        unmatchedOldObjects.set(object.objectID, StringLanguagePair { object.text, object.language });
 
     for (auto& newObject : newObjects) {
         auto iterator = unmatchedOldObjects.find(newObject.objectID);
         if (iterator == unmatchedOldObjects.end())
             diff.added.append(newObject);
         else {
-            if (iterator->value != newObject.text)
+            if (iterator->value.text != newObject.text)
                 diff.changed.append(newObject);
             unmatchedOldObjects.remove(iterator);
         }
@@ -246,31 +259,54 @@ AXLiveRegionManager::LiveRegionDiff AXLiveRegionManager::computeChanges(const Ve
 
     // Anything left in unmatchedOldObjects is a removal.
     for (auto& entry : unmatchedOldObjects)
-        diff.removed.append({ entry.key, entry.value });
+        diff.removed.append({ entry.key, entry.value.text, entry.value.language });
 
     return diff;
 }
 
 static const size_t maximumAnnouncementLength = 2500;
 
-String AXLiveRegionManager::computeAnnouncement(const LiveRegionSnapshot& newSnapshot, const LiveRegionDiff& diff) const
+AttributedString AXLiveRegionManager::computeAnnouncement(const LiveRegionSnapshot& newSnapshot, const LiveRegionDiff& diff) const
 {
     bool hasAll = newSnapshot.liveRegionRelevant.contains(LiveRegionRelevant::All);
     bool hasAdditions = hasAll || newSnapshot.liveRegionRelevant.contains(LiveRegionRelevant::Additions);
     bool hasRemovals = hasAll || newSnapshot.liveRegionRelevant.contains(LiveRegionRelevant::Removals);
     bool hasText = hasAll || newSnapshot.liveRegionRelevant.contains(LiveRegionRelevant::Text);
 
-    Vector<String> strings;
+    StringBuilder stringBuilder;
+    Vector<std::pair<AttributedString::Range, HashMap<String, AttributedString::AttributeValue>>> attributes;
 
     bool reachedCharacterLimit = false;
     size_t characterCount = 0;
 
+    // Determines whether we should add a space before adding the next object. Should only be false the first call.
+    bool needsSpace = false;
+
+    auto appendStringAndLanguage = [&](const LiveRegionObject& object) {
+        if (object.text.isEmpty())
+            return;
+
+        if (needsSpace) {
+            stringBuilder.append(' ');
+            characterCount++;
+        }
+
+        uint64_t startLocation = stringBuilder.length();
+        stringBuilder.append(object.text);
+        characterCount += object.text.length();
+
+        if (!object.language.isEmpty()) {
+            HashMap<String, AttributedString::AttributeValue> languageAttribute;
+            languageAttribute.set(accessibilityLanguageAttributeKey, AttributedString::AttributeValue { object.language });
+            attributes.append({ { startLocation, object.text.length() }, WTFMove(languageAttribute) });
+        }
+
+        needsSpace = true;
+    };
+
     if (hasAdditions && !diff.added.isEmpty()) {
         for (auto& object : diff.added) {
-            if (!object.text.isEmpty()) {
-                strings.append(object.text);
-                characterCount += object.text.length();
-            }
+            appendStringAndLanguage(object);
 
             if (characterCount > maximumAnnouncementLength) {
                 reachedCharacterLimit = true;
@@ -280,29 +316,29 @@ String AXLiveRegionManager::computeAnnouncement(const LiveRegionSnapshot& newSna
     }
 
     if (!reachedCharacterLimit && hasRemovals && !diff.removed.isEmpty()) {
-        StringBuilder removalString;
-        removalString.append(AXRemovedText());
+        if (needsSpace) {
+            stringBuilder.append(' ');
+            characterCount++;
+        }
+
+        String removalPrefix = AXRemovedText();
+        characterCount += removalPrefix.length();
+        stringBuilder.append(WTFMove(removalPrefix));
+        needsSpace = true;
+
         for (auto& object : diff.removed) {
-            if (!object.text.isEmpty()) {
-                removalString.append(' ');
-                removalString.append(object.text);
-                characterCount += object.text.length() + 1; // Add an extra character for the space above.
-            }
+            appendStringAndLanguage(object);
 
             if (characterCount > maximumAnnouncementLength) {
                 reachedCharacterLimit = true;
                 break;
             }
         }
-        strings.append(removalString.toString());
     }
 
     if (!reachedCharacterLimit && hasText && !diff.changed.isEmpty()) {
         for (auto& object : diff.changed) {
-            if (!object.text.isEmpty()) {
-                strings.append(object.text);
-                characterCount += object.text.length();
-            }
+            appendStringAndLanguage(object);
 
             if (characterCount > maximumAnnouncementLength) {
                 reachedCharacterLimit = true;
@@ -311,7 +347,8 @@ String AXLiveRegionManager::computeAnnouncement(const LiveRegionSnapshot& newSna
         }
     }
 
-    return makeStringByJoining(strings, " "_s);
+    auto string = stringBuilder.toString();
+    return AttributedString { WTFMove(string), WTFMove(attributes), std::nullopt };
 }
 
 void AXLiveRegionManager::postAnnouncementForChange(AccessibilityObject& object, const LiveRegionSnapshot& oldSnapshot, const LiveRegionSnapshot& newSnapshot)
@@ -320,13 +357,14 @@ void AXLiveRegionManager::postAnnouncementForChange(AccessibilityObject& object,
     if (diff.added.isEmpty() && diff.removed.isEmpty() && diff.changed.isEmpty())
         return;
 
-    String announcementText = computeAnnouncement(newSnapshot, diff);
-    if (announcementText.isEmpty())
+    AttributedString announcement = computeAnnouncement(newSnapshot, diff);
+    if (announcement.isNull())
         return;
 
     if (CheckedPtr cache = m_cache)
-        cache->postLiveRegionNotification(object, newSnapshot.liveRegionStatus, announcementText);
+        cache->postLiveRegionNotification(object, newSnapshot.liveRegionStatus, announcement);
 }
 
 } // namespace WebCore
 
+#endif // PLATFORM(COCOA)
