@@ -32,6 +32,7 @@
 #include "APIUIClient.h"
 #include "AuthenticatorManager.h"
 #include "DownloadProxyMap.h"
+#include "DrawingAreaProxy.h"
 #include "GPUProcessConnectionParameters.h"
 #include "GoToBackForwardItemParameters.h"
 #include "JavaScriptEvaluationResult.h"
@@ -1853,6 +1854,15 @@ void WebProcessProxy::sendPrepareToSuspend(IsSuspensionImminent isSuspensionImmi
 {
     WEBPROCESSPROXY_RELEASE_LOG(ProcessSuspension, "sendPrepareToSuspend: isSuspensionImminent=%d", isSuspensionImminent == IsSuspensionImminent::Yes);
     sendWithAsyncReply(Messages::WebProcess::PrepareToSuspend(isSuspensionImminent == IsSuspensionImminent::Yes, MonotonicTime::now() + Seconds(remainingRunTime)), WTFMove(completionHandler), 0, { }, ShouldStartProcessThrottlerActivity::No);
+
+    for (Ref page : pages()) {
+        if (RefPtr drawingArea = page->drawingArea())
+            drawingArea->hideContentUntilPendingUpdate();
+    }
+    for (Ref provisionalPage : m_provisionalPages) {
+        if (RefPtr drawingArea = provisionalPage->drawingArea())
+            drawingArea->hideContentUntilPendingUpdate();
+    }
 }
 
 void WebProcessProxy::sendProcessDidResume(ResumeReason)

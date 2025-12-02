@@ -3298,7 +3298,7 @@ void WebPageProxy::dispatchActivityStateChange()
 #endif
 
     if (isNowInWindow)
-        protectedDrawingArea()->hideContentUntilDidUpdateActivityState(activityStateChangeID);
+        protectedDrawingArea()->hideContentUntilPendingUpdate();
 
     updateBackingStoreDiscardableState();
 
