@@ -1310,6 +1310,15 @@ media/media-source/media-source-ended.html [ Skip ]
 imported/w3c/web-platform-tests/media-source/mediasource-changetype-play-implicit.html [ Skip ]
 imported/w3c/web-platform-tests/media-source/mediasource-changetype-play-without-codecs-parameter.html [ Skip ]
 imported/w3c/web-platform-tests/media-source/mediasource-changetype-play.html [ Skip ]
+imported/w3c/web-platform-tests/media-source/mediasource-video-is-visible.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/media-source/mediasource-getvideoplaybackquality.html [ Skip ]
+imported/w3c/web-platform-tests/media-source/mediasource-endofstream.html [ Skip ]
+
+# Requires WebM
+imported/w3c/web-platform-tests/media-source/mediasource-config-change-webm-a-bitrate.html [ Skip ]
+imported/w3c/web-platform-tests/media-source/mediasource-config-change-webm-av-audio-bitrate.html [ Skip ]
+imported/w3c/web-platform-tests/media-source/mediasource-config-change-webm-av-framesize.html [ Skip ]
+imported/w3c/web-platform-tests/media-source/mediasource-config-change-webm-av-video-bitrate.html [ Skip ]
 
 # Managed MediaSource isn't enabled on WK1
 media/media-source/media-managedmse-append.html [ Skip ]

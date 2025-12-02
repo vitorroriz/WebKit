@@ -179,6 +179,10 @@ public:
     virtual MediaPlayer::NetworkState networkState() const = 0;
     virtual MediaPlayer::ReadyState readyState() const = 0;
 
+#if ENABLE(MEDIA_SOURCE)
+    virtual void mediaSourceHasRetrievedAllData() { };
+#endif
+
     WEBCORE_EXPORT virtual const PlatformTimeRanges& seekable() const;
     virtual MediaTime maxTimeSeekable() const { return MediaTime::zeroTime(); }
     virtual MediaTime minTimeSeekable() const { return MediaTime::zeroTime(); }

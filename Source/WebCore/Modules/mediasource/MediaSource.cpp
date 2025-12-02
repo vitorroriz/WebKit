@@ -787,6 +787,8 @@ void MediaSource::streamEndedWithError(std::optional<EndOfStreamError> error)
         setDurationInternal(maxEndTime);
 
         // 2. Notify the media element that it now has all of the media data.
+        // Once the entire media resource has been fetched (but potentially before any of it has been decoded)
+        // Fire an event named progress at the media element.
         msp->markEndOfStream(MediaSourcePrivate::EndOfStreamStatus::NoError);
         return;
     }

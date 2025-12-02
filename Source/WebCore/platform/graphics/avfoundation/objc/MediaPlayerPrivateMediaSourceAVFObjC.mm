@@ -1089,6 +1089,12 @@ void MediaPlayerPrivateMediaSourceAVFObjC::setNetworkState(MediaPlayer::NetworkS
         player->networkStateChanged();
 }
 
+void MediaPlayerPrivateMediaSourceAVFObjC::mediaSourceHasRetrievedAllData()
+{
+    assertIsMainThread();
+    setNetworkState(MediaPlayer::NetworkState::Loaded);
+}
+
 ALLOW_NEW_API_WITHOUT_GUARDS_BEGIN
 void MediaPlayerPrivateMediaSourceAVFObjC::addAudioTrack(TrackIdentifier audioTrack)
 ALLOW_NEW_API_WITHOUT_GUARDS_END

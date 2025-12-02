@@ -188,6 +188,11 @@ void MockMediaPlayerMediaSource::readyStateFromMediaSourceChanged()
         player->readyStateChanged();
 }
 
+void MockMediaPlayerMediaSource::mediaSourceHasRetrievedAllData()
+{
+    setNetworkState(MediaPlayer::NetworkState::Loaded);
+}
+
 MediaTime MockMediaPlayerMediaSource::maxTimeSeekable() const
 {
     return m_duration;

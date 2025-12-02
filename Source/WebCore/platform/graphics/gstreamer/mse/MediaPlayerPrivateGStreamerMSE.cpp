@@ -412,6 +412,11 @@ void MediaPlayerPrivateGStreamerMSE::propagateReadyStateToPlayer()
         player->timeChanged();
 }
 
+void MediaPlayerPrivateGStreamerMSE::mediaSourceHasRetrievedAllData()
+{
+    setNetworkState(MediaPlayer::NetworkState::Loaded);
+}
+
 void MediaPlayerPrivateGStreamerMSE::didPreroll()
 {
     ASSERT(GST_STATE(m_pipeline.get()) >= GST_STATE_PAUSED);
