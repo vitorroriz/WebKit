@@ -63,4 +63,9 @@ void DatagramDefaultSource::doCancel()
     m_isCancelled = true;
 }
 
+void DatagramDefaultSource::error(JSC::JSGlobalObject& globalObject, JSC::JSValue value)
+{
+    ReadableStreamSource::error(globalObject, value);
+}
+
 }

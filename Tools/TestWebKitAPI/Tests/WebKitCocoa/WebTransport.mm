@@ -422,27 +422,33 @@ TEST(WebTransport, NetworkProcessCrash)
 
     obj = [webView objectByCallingAsyncFunction:@"return await getIncomingBidiStream()" withArguments:@{ } error:&error];
     EXPECT_EQ(obj, nil);
-    EXPECT_NULL(error);
+    EXPECT_NOT_NULL(error);
+    error = nil;
 
     obj = [webView objectByCallingAsyncFunction:@"return await getIncomingUniStream()" withArguments:@{ } error:&error];
     EXPECT_EQ(obj, nil);
-    EXPECT_NULL(error);
+    EXPECT_NOT_NULL(error);
+    error = nil;
 
     obj = [webView objectByCallingAsyncFunction:@"return await readFromBidiStream()" withArguments:@{ } error:&error];
     EXPECT_EQ(obj, nil);
-    EXPECT_NULL(error);
+    EXPECT_NOT_NULL(error);
+    error = nil;
 
     obj = [webView objectByCallingAsyncFunction:@"return await readFromIncomingBidiStream()" withArguments:@{ } error:&error];
     EXPECT_EQ(obj, nil);
-    EXPECT_NULL(error);
+    EXPECT_NOT_NULL(error);
+    error = nil;
 
     obj = [webView objectByCallingAsyncFunction:@"return await readFromIncomingUniStream()" withArguments:@{ } error:&error];
     EXPECT_EQ(obj, nil);
-    EXPECT_NULL(error);
+    EXPECT_NOT_NULL(error);
+    error = nil;
 
     obj = [webView objectByCallingAsyncFunction:@"return await readDatagram()" withArguments:@{ } error:&error];
     EXPECT_EQ(obj, nil);
-    EXPECT_NULL(error);
+    EXPECT_NOT_NULL(error);
+    error = nil;
 
     obj = [webView objectByCallingAsyncFunction:@"return await writeOnBidiStream()" withArguments:@{ } error:&error];
     EXPECT_EQ(obj, nil);

@@ -43,6 +43,7 @@ public:
     static Ref<WebTransportReceiveStreamSource> createIncomingDataSource(WebTransport& transport, WebTransportStreamIdentifier identifier) { return adoptRef(*new WebTransportReceiveStreamSource(transport, identifier)); }
     bool receiveIncomingStream(JSC::JSGlobalObject&, Ref<WebTransportReceiveStream>&);
     void receiveBytes(std::span<const uint8_t>, bool, std::optional<WebCore::Exception>&&);
+    void receiveError(JSC::JSGlobalObject&, uint64_t errorCode);
 private:
     WebTransportReceiveStreamSource();
     WebTransportReceiveStreamSource(WebTransport&, WebTransportStreamIdentifier);

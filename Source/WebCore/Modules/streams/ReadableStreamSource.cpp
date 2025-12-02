@@ -77,6 +77,12 @@ void ReadableStreamSource::cancel(JSC::JSValue value)
     doCancel(value);
 }
 
+void ReadableStreamSource::error(JSC::JSGlobalObject& globalObject, JSC::JSValue value)
+{
+    if (m_controller)
+        m_controller->error(globalObject, value);
+}
+
 void ReadableStreamSource::clean()
 {
     if (m_promise) {

@@ -30,6 +30,8 @@ DECLARE_SYSTEM_HEADER
 #import <Network/Network.h>
 
 typedef void (^nw_webtransport_drain_handler_t)(void);
+typedef void (^nw_webtransport_receive_error_handler_t)(uint64_t receive_error_code);
+typedef void (^nw_webtransport_send_error_handler_t)(uint64_t send_error_code);
 typedef void (^nw_http_optional_string_accessor_t)(const char * _Nullable string);
 
 #if OS_OBJECT_USE_OBJC
@@ -120,6 +122,11 @@ void nw_webtransport_metadata_set_remote_drain_handler(nw_protocol_metadata_t, n
 void nw_webtransport_metadata_set_local_draining(nw_protocol_metadata_t);
 OS_OBJECT_RETURNS_RETAINED nw_http_response_t nw_webtransport_metadata_copy_connect_response(nw_protocol_metadata_t);
 nw_webtransport_transport_mode_t nw_webtransport_metadata_get_transport_mode(nw_protocol_metadata_t);
+void nw_webtransport_metadata_set_remote_receive_error_handler(nw_protocol_metadata_t, nw_webtransport_receive_error_handler_t, dispatch_queue_t);
+void nw_webtransport_metadata_set_remote_send_error_handler(nw_protocol_metadata_t, nw_webtransport_send_error_handler_t, dispatch_queue_t);
+
+void nw_connection_abort_reads(nw_connection_t, uint64_t);
+void nw_connection_abort_writes(nw_connection_t, uint64_t);
 
 void nw_http_fields_access_value_by_name(nw_http_fields_t, const char*, nw_http_optional_string_accessor_t);
 
