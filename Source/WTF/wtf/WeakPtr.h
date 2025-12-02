@@ -173,7 +173,6 @@ public:
     }
 
 private:
-    template<typename, typename, typename> friend class WeakHashMap;
     template<typename, typename, typename> friend class WeakPtr;
     template<typename, typename> friend class WeakPtrFactory;
     template<typename, typename> friend class WeakPtrFactoryWithBitField;
