@@ -48,9 +48,6 @@
 #include "ExceptionOr.h"
 #include "WebAuthenticationConstants.h"
 #include "WebAuthenticationUtils.h"
-#if HAVE(SWIFT_CPP_INTEROP)
-#include <pal/PALSwift.h>
-#endif
 #include <pal/crypto/CryptoDigest.h>
 #include <wtf/CryptographicallyRandomNumber.h>
 
