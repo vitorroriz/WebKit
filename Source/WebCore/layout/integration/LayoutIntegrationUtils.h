@@ -48,6 +48,8 @@ public:
     LayoutUnit maxContentWidth(const ElementBox&) const;
     LayoutUnit minContentWidth(const ElementBox&) const;
     LayoutUnit minContentHeight(const ElementBox&) const;
+    LayoutUnit preferredMinWidth(const ElementBox&) const;
+    LayoutUnit preferredMaxWidth(const ElementBox&) const;
     void layoutWithFormattingContextForBlockInInline(const ElementBox& block, LayoutPoint blockLogicalTopLeft, const InlineLayoutState&) const;
 
     static BlockLayoutState::MarginState toMarginState(const RenderBlockFlow::MarginInfo&);
