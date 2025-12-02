@@ -423,6 +423,11 @@ Ref<DOMPromise> ReadableStream::cancel(JSDOMGlobalObject& globalObject, JSC::JSV
 
     if (RefPtr internalStream = m_internalReadableStream) {
         auto result = internalStream->cancel(globalObject, reason);
+        if (!result) {
+            deferred->reject(Exception { ExceptionCode::ExistingExceptionError });
+            return promise;
+        }
+
         auto* jsPromise = jsCast<JSC::JSPromise*>(result);
         if (!jsPromise)
             return promise;
