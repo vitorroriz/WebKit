@@ -12894,7 +12894,7 @@
                 "none"
             ],
             "codegen-properties": {
-                "settings-flag": "viewTransitionClassesEnabled",
+                "settings-flag": "viewTransitionsEnabled",
                 "style-converter": "StyleType<ViewTransitionClasses>",
                 "render-style-name-for-methods": "ViewTransitionClasses",
                 "render-style-storage-path": ["m_nonInheritedData", "rareData"],

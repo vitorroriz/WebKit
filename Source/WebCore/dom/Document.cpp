@@ -11958,10 +11958,8 @@ RefPtr<ViewTransition> Document::startViewTransition(StartViewTransitionCallback
         }, [&](StartViewTransitionOptions& options) {
             updateCallback = WTFMove(options.update);
 
-            if (options.types) {
-                ASSERT(settings().viewTransitionTypesEnabled());
+            if (options.types)
                 activeTypes = WTFMove(*options.types);
-            }
         });
     }
 
