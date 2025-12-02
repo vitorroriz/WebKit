@@ -49,7 +49,7 @@ void DatagramDefaultSource::receiveDatagram(std::span<const uint8_t> datagram, b
         if (arrayBuffer)
             memcpySpan(arrayBuffer->mutableSpan(), datagram);
         if (!controller().enqueue(WTFMove(arrayBuffer)))
-            doCancel();
+            doCancel({ });
     }
     if (withFin) {
         m_isClosed = true;

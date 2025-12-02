@@ -50,7 +50,9 @@ private:
     void setInactive() final { }
     void doStart() final { }
     void doPull() final { }
-    void doCancel() final;
+    void doCancel(JSC::JSValue) final { doCancel(); }
+
+    void doCancel();
 
     bool m_isCancelled { false };
     bool m_isClosed { false };

@@ -89,6 +89,7 @@ class EventListener;
 class ExtendableEvent;
 class FetchRequest;
 class FetchResponse;
+class FileSystemHandle;
 class File;
 class GCObservation;
 class HTMLAnchorElement;
@@ -1649,6 +1650,8 @@ public:
 #endif
 
     bool hasMediaSessionManager() const;
+
+    size_t fileConnectionHandleCount(const FileSystemHandle&) const;
 
 private:
     explicit Internals(Document&);

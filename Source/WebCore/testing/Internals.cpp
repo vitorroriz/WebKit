@@ -95,6 +95,7 @@
 #include "FetchRequest.h"
 #include "FetchResponse.h"
 #include "File.h"
+#include "FileSystemHandle.h"
 #include "FloatQuad.h"
 #include "FontCache.h"
 #include "FormController.h"
@@ -8136,6 +8137,11 @@ bool Internals::hasMediaSessionManager() const
         return false;
 
     return !!page->mediaSessionManagerIfExists();
+}
+
+size_t Internals::fileConnectionHandleCount(const FileSystemHandle& handle) const
+{
+    return handle.connectionHandleCount();
 }
 
 #if ENABLE(MODEL_ELEMENT)
