@@ -786,7 +786,7 @@ if (USE_LIBWEBRTC)
     list(APPEND WebKit_LIBRARIES webrtc)
 endif ()
 
-if (USE_LIBRICE)
+if (USE_GSTREAMER_WEBRTC AND USE_LIBRICE)
     list(APPEND WebKit_LIBRARIES Rice::Io)
     list(APPEND WebKit_PRIVATE_INCLUDE_DIRECTORIES "${WEBKIT_DIR}/NetworkProcess/webrtc/rice")
 endif ()
