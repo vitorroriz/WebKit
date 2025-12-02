@@ -775,50 +775,32 @@ inline void BuilderCustom::applyValueFontFamily(BuilderState& builderState, CSSV
 
 inline void BuilderCustom::applyInitialBorderTopWidth(BuilderState& builderState)
 {
-    if (evaluationTimeZoomEnabled(builderState))
-        builderState.style().setBorderTopWidth(RenderStyle::initialBorderWidth());
-    else
-        builderState.style().setBorderTopWidth(Style::LineWidth { RenderStyle::initialBorderWidth().value.unresolvedValue() * builderState.style().usedZoom() });
+    builderState.style().setBorderTopWidth(Style::LineWidth { RenderStyle::initialBorderWidth().value.unresolvedValue() * builderState.style().usedZoom() });
 }
 
 inline void BuilderCustom::applyInitialBorderRightWidth(BuilderState& builderState)
 {
-    if (evaluationTimeZoomEnabled(builderState))
-        builderState.style().setBorderRightWidth(RenderStyle::initialBorderWidth());
-    else
-        builderState.style().setBorderRightWidth(Style::LineWidth { RenderStyle::initialBorderWidth().value.unresolvedValue() * builderState.style().usedZoom() });
+    builderState.style().setBorderRightWidth(Style::LineWidth { RenderStyle::initialBorderWidth().value.unresolvedValue() * builderState.style().usedZoom() });
 }
 
 inline void BuilderCustom::applyInitialBorderBottomWidth(BuilderState& builderState)
 {
-    if (evaluationTimeZoomEnabled(builderState))
-        builderState.style().setBorderBottomWidth(RenderStyle::initialBorderWidth());
-    else
-        builderState.style().setBorderBottomWidth(Style::LineWidth { RenderStyle::initialBorderWidth().value.unresolvedValue() * builderState.style().usedZoom() });
+    builderState.style().setBorderBottomWidth(Style::LineWidth { RenderStyle::initialBorderWidth().value.unresolvedValue() * builderState.style().usedZoom() });
 }
 
 inline void BuilderCustom::applyInitialBorderLeftWidth(BuilderState& builderState)
 {
-    if (evaluationTimeZoomEnabled(builderState))
-        builderState.style().setBorderLeftWidth(RenderStyle::initialBorderWidth());
-    else
-        builderState.style().setBorderLeftWidth(Style::LineWidth { RenderStyle::initialBorderWidth().value.unresolvedValue() * builderState.style().usedZoom() });
+    builderState.style().setBorderLeftWidth(Style::LineWidth { RenderStyle::initialBorderWidth().value.unresolvedValue() * builderState.style().usedZoom() });
 }
 
 inline void BuilderCustom::applyInitialOutlineWidth(BuilderState& builderState)
 {
-    if (evaluationTimeZoomEnabled(builderState))
-        builderState.style().setOutlineWidth(RenderStyle::initialOutlineWidth());
-    else
-        builderState.style().setOutlineWidth(Style::LineWidth { RenderStyle::initialOutlineWidth().value.unresolvedValue() * builderState.style().usedZoom() });
+    builderState.style().setOutlineWidth(Style::LineWidth { RenderStyle::initialOutlineWidth().value.unresolvedValue() * builderState.style().usedZoom() });
 }
 
 inline void BuilderCustom::applyInitialColumnRuleWidth(BuilderState& builderState)
 {
-    if (evaluationTimeZoomEnabled(builderState))
-        builderState.style().setColumnRuleWidth(RenderStyle::initialColumnRuleWidth());
-    else
-        builderState.style().setColumnRuleWidth(Style::LineWidth { RenderStyle::initialColumnRuleWidth().value.unresolvedValue() * builderState.style().usedZoom() });
+    builderState.style().setColumnRuleWidth(Style::LineWidth { RenderStyle::initialColumnRuleWidth().value.unresolvedValue() * builderState.style().usedZoom() });
 }
 
 inline void BuilderCustom::applyInitialBorderBottomLeftRadius(BuilderState& builderState)

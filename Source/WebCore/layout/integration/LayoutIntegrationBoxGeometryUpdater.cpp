@@ -242,7 +242,7 @@ Layout::BoxGeometry::Edges BoxGeometryUpdater::logicalBorder(const RenderBoxMode
     auto& style = renderer.style();
 
     auto borderWidths = RectEdges<LayoutUnit>::map(style.borderWidth(), [&](auto width) {
-        return Style::evaluate<LayoutUnit>(width, style.usedZoomForLength());
+        return Style::evaluate<LayoutUnit>(width, Style::ZoomNeeded { });
     });
 
     if (!isIntrinsicWidthMode)
