@@ -35,6 +35,8 @@ class PlacedGridItem;
 
 namespace GridLayoutUtils {
 
+LayoutUnit computeGapValue(const Style::GapGutter&);
+
 LayoutUnit usedInlineSizeForGridItem(const PlacedGridItem&);
 LayoutUnit usedBlockSizeForGridItem(const PlacedGridItem&);
 
