@@ -3758,6 +3758,10 @@ PositionWithAffinity RenderBlockFlow::positionForPointWithInlineChildren(const L
 
     if (lastLineBoxWithChildren) {
         // We hit this case for Mac behavior when the Y coordinate is below the last box.
+        if (auto blockBox = lastLineBoxWithChildren->blockLevelBox()) {
+            auto& childBlockRenderer = const_cast<RenderBox&>(downcast<RenderBox>(blockBox->renderer()));
+            return positionForPointRespectingEditingBoundaries(*this, childBlockRenderer, pointInLogicalContents, source);
+        }
         ASSERT(moveCaretToBoundary);
         InlineIterator::LineLogicalOrderCache orderCache;
         if (auto logicallyLastBox = InlineIterator::lastLeafOnLineInLogicalOrderWithNode(lastLineBoxWithChildren, orderCache))
