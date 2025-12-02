@@ -4491,24 +4491,12 @@ void Page::enableICECandidateFiltering()
 #endif
 }
 
-RefPtr<LocalFrame> Page::localMainFrame()
+LocalFrame* Page::localMainFrame() const
 {
     return dynamicDowncast<LocalFrame>(mainFrame());
 }
 
-RefPtr<const LocalFrame> Page::localMainFrame() const
-{
-    return dynamicDowncast<LocalFrame>(mainFrame());
-}
-
-RefPtr<Document> Page::localTopDocument()
-{
-    if (RefPtr localMainFrame = this->localMainFrame())
-        return localMainFrame->document();
-    return nullptr;
-}
-
-RefPtr<Document> Page::localTopDocument() const
+Document* Page::localTopDocument() const
 {
     if (RefPtr localMainFrame = this->localMainFrame())
         return localMainFrame->document();

@@ -101,7 +101,6 @@ css/CSSFontFaceSet.cpp
 css/CSSGroupingRule.cpp
 css/CSSImageSetValue.cpp
 css/CSSImageValue.cpp
-css/CSSKeyframeRule.cpp
 css/CSSLayerBlockRule.cpp
 css/CSSStyleProperties.cpp
 css/CSSStyleRule.cpp
@@ -120,7 +119,6 @@ css/SelectorChecker.cpp
 css/SelectorFilter.cpp
 css/ShorthandSerializer.cpp
 css/StyleProperties.cpp
-css/StyleRule.cpp
 css/StyleRuleImport.cpp
 css/StyleSheetContents.cpp
 css/query/ContainerQueryFeatures.cpp

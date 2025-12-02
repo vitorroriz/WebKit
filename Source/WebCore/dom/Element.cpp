@@ -3498,8 +3498,8 @@ RefPtr<ShadowRoot> Element::protectedUserAgentShadowRoot() const
 
 ShadowRoot& Element::ensureUserAgentShadowRoot()
 {
-    if (RefPtr shadow = userAgentShadowRoot())
-        return *shadow.unsafeGet();
+    if (auto* shadow = userAgentShadowRoot())
+        return *shadow;
     return createUserAgentShadowRoot();
 }
 

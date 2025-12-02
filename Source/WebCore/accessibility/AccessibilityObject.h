@@ -273,7 +273,7 @@ public:
     Element* element() const final;
     Node* node() const override { return nullptr; }
     RenderObject* renderer() const override { return nullptr; }
-    RenderObject* rendererOrNearestAncestor() const;
+    CheckedPtr<RenderObject> rendererOrNearestAncestor() const;
     // Resolves the computed style if necessary (and safe to do so).
     const RenderStyle* style() const;
 

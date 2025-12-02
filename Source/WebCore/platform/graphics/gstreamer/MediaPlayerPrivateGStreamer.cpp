@@ -4475,7 +4475,7 @@ InitData MediaPlayerPrivateGStreamer::parseInitDataFromProtectionMessage(GstMess
         m_handledProtectionEvents.add(GST_EVENT_SEQNUM(event.get()));
     }
 
-    return { systemId, payloadBuilder.takeAsContiguous() };
+    return { systemId, payloadBuilder.takeBufferAsContiguous() };
 }
 
 bool MediaPlayerPrivateGStreamer::waitForCDMAttachment()

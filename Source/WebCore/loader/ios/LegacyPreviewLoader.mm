@@ -252,7 +252,7 @@ void LegacyPreviewLoader::providePasswordForPreviewConverter(PreviewConverter& c
 void LegacyPreviewLoader::provideMainResourceForPreviewConverter(PreviewConverter& converter, CompletionHandler<void(Ref<FragmentedSharedBuffer>&&)>&& completionHandler)
 {
     ASSERT_UNUSED(converter, &converter == m_converter);
-    completionHandler(m_originalData.copy());
+    completionHandler(m_originalData.copyBuffer());
 }
 
 bool LegacyPreviewLoader::didReceiveResponse(const ResourceResponse&)

@@ -48,15 +48,15 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-ContainerNode* composedParentIgnoringDocumentFragments(const Node& node)
+RefPtr<ContainerNode> composedParentIgnoringDocumentFragments(const Node& node)
 {
     RefPtr ancestor = node.parentInComposedTree();
     while (is<DocumentFragment>(ancestor.get()))
         ancestor = ancestor->parentInComposedTree();
-    return ancestor.unsafeGet();
+    return ancestor;
 }
 
-ContainerNode* composedParentIgnoringDocumentFragments(const Node* node)
+RefPtr<ContainerNode> composedParentIgnoringDocumentFragments(const Node* node)
 {
     return node ? composedParentIgnoringDocumentFragments(*node) : nullptr;
 }

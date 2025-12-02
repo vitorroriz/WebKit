@@ -51,8 +51,8 @@ bool hasPresentationRole(Element&);
 bool hasTableRole(Element&);
 bool isRowGroup(Element&);
 bool isRowGroup(Node*);
-ContainerNode* composedParentIgnoringDocumentFragments(const Node&);
-ContainerNode* composedParentIgnoringDocumentFragments(const Node*);
+RefPtr<ContainerNode> composedParentIgnoringDocumentFragments(const Node&);
+RefPtr<ContainerNode> composedParentIgnoringDocumentFragments(const Node*);
 
 // Returns NodeName and not ElementName because it's impossible to forward declare ElementName.
 NodeName elementName(Node*);

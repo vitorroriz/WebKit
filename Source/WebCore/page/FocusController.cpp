@@ -516,8 +516,8 @@ LocalFrame* FocusController::focusedOrMainFrame() const
 {
     if (auto* frame = focusedLocalFrame())
         return frame;
-    if (RefPtr localMainFrame = m_page->localMainFrame())
-        return localMainFrame.unsafeGet();
+    if (auto* localMainFrame = m_page->localMainFrame())
+        return localMainFrame;
     ASSERT(m_page->settings().siteIsolationEnabled());
     return nullptr;
 }

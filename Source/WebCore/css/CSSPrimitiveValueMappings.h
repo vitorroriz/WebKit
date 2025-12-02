@@ -100,9 +100,9 @@ public:
         return fromCSSValue<TargetType>(m_value);
     }
 
-    operator const CSSPrimitiveValue&() const
+    operator const CSSPrimitiveValue&() const LIFETIME_BOUND
     {
-        return downcast<CSSPrimitiveValue>(m_value).unsafeGet();
+        return downcast<CSSPrimitiveValue>(m_value.get());
     }
 
     operator const CSSValue&() const

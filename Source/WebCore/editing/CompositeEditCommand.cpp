@@ -453,9 +453,9 @@ RefPtr<DataTransfer> CompositeEditCommand::inputEventDataTransfer() const
 EditCommandComposition* CompositeEditCommand::composition() const
 {
     for (RefPtr command = this; command; command = command->parent()) {
-        if (auto composition = command->m_composition) {
+        if (auto* composition = command->m_composition.get()) {
             ASSERT(!command->parent());
-            return composition.unsafeGet();
+            return composition;
         }
     }
     return nullptr;

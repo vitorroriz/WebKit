@@ -2129,7 +2129,7 @@ void NetworkSessionCocoa::loadImageForDecoding(WebCore::ResourceRequest&& reques
         void didCompleteWithError(const WebCore::ResourceError& error, const WebCore::NetworkLoadMetrics&) final
         {
             if (error.isNull())
-                m_completionHandler(m_buffer.take());
+                m_completionHandler(m_buffer.takeBuffer());
             else
                 m_completionHandler(makeUnexpected(error));
             m_selfReference = nullptr;

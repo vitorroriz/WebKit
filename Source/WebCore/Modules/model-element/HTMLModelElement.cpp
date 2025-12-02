@@ -533,7 +533,7 @@ void HTMLModelElement::createModelPlayer()
 
 #if ENABLE(MODEL_ELEMENT_ENVIRONMENT_MAP)
     if (m_environmentMapData)
-        m_modelPlayer->setEnvironmentMap(m_environmentMapData.takeAsContiguous().get());
+        m_modelPlayer->setEnvironmentMap(m_environmentMapData.takeBufferAsContiguous().get());
     else if (!m_environmentMapURL.isEmpty())
         environmentMapRequestResource();
 #endif
@@ -612,7 +612,7 @@ void HTMLModelElement::reloadModelPlayer()
 
 #if ENABLE(MODEL_ELEMENT_ENVIRONMENT_MAP)
     if (m_environmentMapData)
-        m_modelPlayer->setEnvironmentMap(m_environmentMapData.takeAsContiguous().get());
+        m_modelPlayer->setEnvironmentMap(m_environmentMapData.takeBufferAsContiguous().get());
     else if (!m_environmentMapURL.isEmpty())
         environmentMapRequestResource();
 #endif
@@ -1163,7 +1163,7 @@ void HTMLModelElement::environmentMapResourceFinished()
     }
     if (m_modelPlayer) {
         m_environmentMapDataMemoryCost.store(m_environmentMapData.size(), std::memory_order_relaxed);
-        m_modelPlayer->setEnvironmentMap(m_environmentMapData.takeAsContiguous().get());
+        m_modelPlayer->setEnvironmentMap(m_environmentMapData.takeBufferAsContiguous().get());
     }
 
     m_environmentMapResource->removeClient(*this);
@@ -1205,7 +1205,7 @@ void HTMLModelElement::modelResourceFinished()
 
     m_dataComplete = true;
     m_dataMemoryCost.store(m_data.size(), std::memory_order_relaxed);
-    m_model = Model::create(m_data.takeAsContiguous().get(), m_resource->mimeType(), m_resource->url());
+    m_model = Model::create(m_data.takeBufferAsContiguous().get(), m_resource->mimeType(), m_resource->url());
 
     ActiveDOMObject::queueTaskToDispatchEvent(*this, TaskSource::DOMManipulation, Event::create(eventNames().loadEvent, Event::CanBubble::No, Event::IsCancelable::No));
 
