@@ -1422,6 +1422,9 @@ ExceptionOr<Ref<SourceBufferPrivate>> MediaSource::createSourceBufferPrivate(con
     RefPtr<SourceBufferPrivate> sourceBufferPrivate;
     MediaSourceConfiguration configuration = {
         .textTracksEnabled = protectedScriptExecutionContext()->settingsValues().textTracksInMSEEnabled,
+#if USE(MEDIAPARSERD)
+        .demuxInProcess = protectedScriptExecutionContext()->settingsValues().mediaSourceUseRemoteAudioVideoRenderer,
+#endif
 #if ENABLE(MEDIA_RECORDER_WEBM)
         .supportsLimitedMatroska = (document && document->quirks().needsLimitedMatroskaSupport()) || protectedScriptExecutionContext()->settingsValues().limitedMatroskaSupportEnabled
 #endif
