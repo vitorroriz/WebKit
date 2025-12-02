@@ -35,6 +35,10 @@
 #import <wtf/cocoa/TypeCastsCocoa.h>
 #import <wtf/darwin/DispatchExtras.h>
 
+#if PLATFORM(MAC)
+#import <AppKit/AppKit.h>
+#endif
+
 #if PLATFORM(IOS_FAMILY)
 #import <UIKit/UIAction.h>
 #if HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
@@ -70,6 +74,13 @@
 #endif
 
 #if PLATFORM(MAC)
+// Test category to access internal methods for macOS
+@interface WKCaptionStyleMenuController (MacTesting)
+- (void)rebuildMenu;
+@end
+#endif
+
+#if PLATFORM(MAC)
 @interface NSMenu (PrivateHighlightItem)
 - (void)highlightItem:(NSMenuItem *)item;
 @end
@@ -101,7 +112,7 @@ static NSString *s_lastPreviewProfileID = nil;
 }
 @end
 
-#if HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
+#if HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER) && PLATFORM(IOS_FAMILY)
 @interface TestAVKitDelegate : NSObject<AVLegibleMediaOptionsMenuControllerDelegate>
 @end
 
@@ -212,11 +223,7 @@ public:
     {
         if (!m_styleMenuController) {
             m_delegate = adoptNS([[CaptionPreferenceTestMenuControllerDelegate alloc] init]);
-#if PLATFORM(IOS_FAMILY)
             m_styleMenuController = adoptNS([WKCaptionStyleMenuController menuController]);
-#else
-            m_styleMenuController = adoptNS([[WKCaptionStyleMenuController alloc] init]);
-#endif
             [m_styleMenuController setDelegate:m_delegate.get()];
         }
         return m_styleMenuController.get();
@@ -511,7 +518,7 @@ TEST_F(CaptionPreferenceTests, CaptionStyleMenuDelegate)
     });
 }
 
-#if HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
+#if HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER) && PLATFORM(IOS_FAMILY)
 TEST_F(CaptionPreferenceTests, AVKitMenuControllerIntegration)
 {
     if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
@@ -539,16 +546,26 @@ TEST_F(CaptionPreferenceTests, ProfileIDSavingAndRestoration)
 
     WKCaptionStyleMenuController *controller = ensureController();
 
+#if PLATFORM(IOS_FAMILY)
     [controller notifyMenuWillOpen];
+#endif
 
     CaptionUserPreferencesMediaAF::setActiveProfileID("Profile 2"_s);
     EXPECT_WK_STREQ("Profile 2", CaptionUserPreferencesMediaAF::platformActiveProfileID());
 
+#if PLATFORM(IOS_FAMILY)
     [controller notifyMenuDidClose];
+#endif
 
+#if PLATFORM(IOS_FAMILY)
     EXPECT_WK_STREQ("Profile 1", CaptionUserPreferencesMediaAF::platformActiveProfileID());
+#else
+    // On macOS, the profile change persists
+    EXPECT_WK_STREQ("Profile 2", CaptionUserPreferencesMediaAF::platformActiveProfileID());
+#endif
 }
 
+#if PLATFORM(IOS_FAMILY)
 TEST_F(CaptionPreferenceTests, ContextMenuDismissalSearch)
 {
     if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
@@ -570,10 +587,13 @@ TEST_F(CaptionPreferenceTests, ContextMenuDismissalSearch)
 
     WKCaptionStyleMenuController *controller = ensureController();
 
+#if HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
     [controller findAndDismissContextMenus];
+#endif
 
     EXPECT_TRUE(true);
 }
+#endif
 
 TEST_F(CaptionPreferenceTests, MenuRebuildingWithAVKit)
 {
@@ -591,7 +611,11 @@ TEST_F(CaptionPreferenceTests, MenuRebuildingWithAVKit)
     PlatformMenu *rebuiltMenu = controller.captionStyleMenu;
     EXPECT_TRUE(rebuiltMenu != nil);
 
+#if PLATFORM(IOS_FAMILY)
     EXPECT_EQ(rebuiltMenu.children.count, 2UL);
+#elif PLATFORM(MAC)
+    EXPECT_EQ(rebuiltMenu.numberOfItems, 5);
+#endif
 }
 
 TEST_F(CaptionPreferenceTests, MenuAncestryCheck)
@@ -606,8 +630,13 @@ TEST_F(CaptionPreferenceTests, MenuAncestryCheck)
 
     EXPECT_TRUE([controller isAncestorOf:menu]);
 
+#if PLATFORM(IOS_FAMILY)
     RetainPtr otherMenu = adoptNS([UIMenu menuWithTitle:@"Other" children:@[]]);
     EXPECT_FALSE([controller isAncestorOf:otherMenu.get()]);
+#elif PLATFORM(MAC)
+    RetainPtr otherMenu = adoptNS([[NSMenu alloc] initWithTitle:@"Other"]);
+    EXPECT_FALSE([controller isAncestorOf:otherMenu.get()]);
+#endif
 }
 #endif
 

@@ -936,7 +936,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 #if ENABLE(VIDEO) && USE(UICONTEXTMENU)
 - (void)showCaptionDisplaySettingsMenu:(WebCore::HTMLMediaElementIdentifier)identifier withOptions:(const WebCore::ResolvedCaptionDisplaySettingsOptions&)options completionHandler:(CompletionHandler<void(Expected<void, WebCore::ExceptionData>)>&&)completionHandler
 {
-    _captionStyleMenuController = adoptNS([[WKCaptionStyleMenuController alloc] init]);
+    _captionStyleMenuController = adoptNS([WKCaptionStyleMenuController menuController]);
     [_captionStyleMenuController setDelegate:self];
 
     _mediaControlsContextMenu = [_captionStyleMenuController captionStyleMenu];

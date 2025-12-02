@@ -25,36 +25,15 @@
 
 #pragma once
 
-#import <WebKit/WKFoundation.h>
+#if PLATFORM(MAC) && HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
 
-#if TARGET_OS_OSX
-@class NSMenu;
-typedef NSMenu PlatformMenu;
-#else
-@class UIContextMenuInteraction;
-@class UIMenu;
-typedef UIMenu PlatformMenu;
-#endif
+#import "_WKCaptionStyleMenuController.h"
 
-NS_ASSUME_NONNULL_BEGIN
+#import <AppKit/AppKit.h>
+#import <wtf/RetainPtr.h>
 
-@protocol WKCaptionStyleMenuControllerDelegate <NSObject>
-- (void)captionStyleMenuWillOpen:(PlatformMenu *)menu;
-- (void)captionStyleMenuDidClose:(PlatformMenu *)menu;
+@interface _WKCaptionStyleMenuControllerAVKitMac : WKCaptionStyleMenuController <NSMenuDelegate>
+
 @end
 
-WK_EXTERN
-@interface WKCaptionStyleMenuController : NSObject
-
-+ (instancetype)menuController;
-
-@property (weak, nonatomic) id<WKCaptionStyleMenuControllerDelegate> delegate;
-@property (readonly, nonatomic) PlatformMenu *captionStyleMenu;
-#if !TARGET_OS_OSX && !TARGET_OS_WATCH
-@property (readonly, nullable, nonatomic) UIContextMenuInteraction *contextMenuInteraction;
 #endif
-
-- (BOOL)isAncestorOf:(PlatformMenu*)menu;
-@end
-
-NS_ASSUME_NONNULL_END

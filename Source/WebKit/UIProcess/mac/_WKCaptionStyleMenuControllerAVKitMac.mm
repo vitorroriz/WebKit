@@ -24,9 +24,9 @@
  */
 
 #import "config.h"
-#import "_WKCaptionStyleMenuControllerAVKit.h"
+#import "_WKCaptionStyleMenuControllerAVKitMac.h"
 
-#if PLATFORM(IOS_FAMILY) && HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
+#if PLATFORM(MAC) && HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
 
 #import "_WKCaptionStyleMenuControllerInternal.h"
 
@@ -34,7 +34,7 @@
 #import <AVKit/AVLegibleMediaOptionsMenuController.h>
 #endif
 
-#import <UIKit/UIKit.h>
+#import <AppKit/AppKit.h>
 #import <WebCore/CaptionUserPreferencesMediaAF.h>
 #import <pal/spi/cocoa/AVKitSPI.h>
 #import <wtf/BlockPtr.h>
@@ -48,15 +48,21 @@
 SOFTLINK_AVKIT_FRAMEWORK()
 SOFT_LINK_CLASS_OPTIONAL(AVKit, AVLegibleMediaOptionsMenuController)
 
+// Forward declare the method we need from AVKit SPI
+@interface AVLegibleMediaOptionsMenuController (WebKitSPI)
+- (nullable NSMenu *)buildMenuOfType:(NSInteger)type;
+
+@end
+
 using namespace WebCore;
 using namespace WTF;
 
-@interface _WKCaptionStyleMenuControllerAVKit () <AVLegibleMediaOptionsMenuControllerDelegate> {
+@interface _WKCaptionStyleMenuControllerAVKitMac () <AVLegibleMediaOptionsMenuControllerDelegate> {
     RetainPtr<AVLegibleMediaOptionsMenuController> _menuController;
 }
 @end
 
-@implementation _WKCaptionStyleMenuControllerAVKit
+@implementation _WKCaptionStyleMenuControllerAVKitMac
 
 - (instancetype)init
 {
@@ -76,13 +82,26 @@ using namespace WTF;
 - (void)rebuildMenu
 {
     self.menu = [_menuController buildMenuOfType:AVLegibleMediaOptionsMenuTypeCaptionAppearance];
+    [self.menu setDelegate:self];
 }
 
-- (BOOL)isAncestorOf:(PlatformMenu*)menu
+- (BOOL)isAncestorOf:(NSMenu *)menu
 {
     if (!self.menu)
         return NO;
-    return [menu isEqual:self.menu];
+
+    do {
+        if (self.menu == menu)
+            return YES;
+        menu = menu.supermenu;
+    } while (menu);
+
+    return NO;
+}
+
+- (NSMenu *)captionStyleMenu
+{
+    return self.menu;
 }
 
 #pragma mark - AVLegibleMediaOptionsMenuControllerDelegate
@@ -90,38 +109,39 @@ using namespace WTF;
 - (void)legibleMenuController:(AVLegibleMediaOptionsMenuController *)menuController didRequestCaptionPreviewForProfileID:(NSString *)profileID
 {
     dispatch_async(mainDispatchQueueSingleton(), ^{
-        [self findAndDismissContextMenus];
+        [self findAndDismissPopoverMenus];
     });
 }
 
-- (void)findAndDismissContextMenus
+- (void)findAndDismissPopoverMenus
 {
-    UIApplication *app = [UIApplication sharedApplication];
+    NSApplication *app = [NSApplication sharedApplication];
 
-    for (UIScene *scene in app.connectedScenes) {
-        if ([scene isKindOfClass:[UIWindowScene class]]) {
-            UIWindowScene *windowScene = (UIWindowScene *)scene;
-            for (UIWindow *window in windowScene.windows)
-                [self searchForContextMenuInteractionsInView:window];
-        }
-    }
+    for (NSWindow *window in app.windows)
+        [self searchForMenuInteractionsInWindow:window];
 }
 
-- (void)searchForContextMenuInteractionsInView:(UIView *)view
+- (void)searchForMenuInteractionsInWindow:(NSWindow *)window
 {
-    for (id<UIInteraction> interaction in view.interactions) {
-        if ([interaction isKindOfClass:[UIContextMenuInteraction class]]) {
-            RetainPtr<UIContextMenuInteraction> contextInteraction = interaction;
-            [contextInteraction dismissMenu];
-            break;
-        }
-    }
+    NSMenu *mainMenu = [NSApp mainMenu];
+    if (mainMenu)
+        [mainMenu cancelTracking];
+}
 
-    for (UIView *subview in view.subviews)
-        [self searchForContextMenuInteractionsInView:subview];
+#pragma mark - NSMenuDelegate
+
+- (void)menuWillOpen:(NSMenu *)menu
+{
+    if (auto delegate = self.delegate)
+        [delegate captionStyleMenuWillOpen:menu];
+}
+
+- (void)menuDidClose:(NSMenu *)menu
+{
+    if (auto delegate = self.delegate)
+        [delegate captionStyleMenuDidClose:menu];
 }
 
 @end
 
 #endif
-

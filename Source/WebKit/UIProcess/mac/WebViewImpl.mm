@@ -7300,7 +7300,7 @@ void WebViewImpl::unregisterViewAboveScrollPocket(NSView *containerView)
 #if ENABLE(VIDEO)
 void WebViewImpl::showCaptionDisplaySettings(HTMLMediaElementIdentifier, const WebCore::ResolvedCaptionDisplaySettingsOptions& options, CompletionHandler<void(Expected<void, WebCore::ExceptionData>&&)>&& completionHandler)
 {
-    RetainPtr controller = adoptNS([[WKCaptionStyleMenuController alloc] init]);
+    RetainPtr controller = [WKCaptionStyleMenuController menuController];
     NSMenu *menu = [controller captionStyleMenu];
     auto menuSize = FloatSize { [menu size] };
 
