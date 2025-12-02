@@ -957,9 +957,7 @@ webkit.org/b/98382 accessibility/visible-elements.html [ Failure ]
 
 webkit.org/b/215405 accessibility/roles-computedRoleString.html [ Failure ]
 webkit.org/b/215405 [ Release ] accessibility/roles-exposed.html [ Failure ]
-webkit.org/b/215405 [ Debug ] accessibility/canvas-accessibilitynodeobject.html [ Crash ]
 webkit.org/b/215405 [ Debug ] accessibility/canvas-fallback-content-2.html [ Crash ]
-webkit.org/b/215405 [ Debug ] accessibility/canvas-fallback-content.html [ Crash ]
 
 webkit.org/b/207711 [ Debug ] accessibility/roles-exposed.html [ Timeout ]
 
@@ -2411,7 +2409,6 @@ webkit.org/b/218010 imported/w3c/web-platform-tests/webaudio/the-audio-api/the-a
 # WebGL-related bugs
 #////////////////////////////////////////////////////////////////////////////////////////
 
-webkit.org/b/211887 [ Debug ] fast/canvas/webgl/tex-sub-image-2d-bad-args.html [ Crash ]
 webkit.org/b/211887 [ Debug ] webgl/1.0.x/conformance/textures/misc/tex-sub-image-2d-bad-args.html [ Crash ]
 
 webkit.org/b/216071 fast/canvas/webgl/move-canvas-in-document-while-clean.html [ ImageOnlyFailure ]
