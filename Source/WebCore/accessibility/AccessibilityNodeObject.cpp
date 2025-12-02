@@ -3948,7 +3948,7 @@ Vector<Vector<AXID>> AccessibilityNodeObject::stitchGroups() const
         return { };
 
     bool shouldStop = false;
-    StitchingContext context;
+    StitchingContext context { *this };
     Vector<Vector<AXID>> stitchGroups;
     Vector<AXID> currentGroup;
     for (auto lineBox = inlineLayout->firstLineBox(); lineBox && !shouldStop; lineBox.traverseNext()) {
@@ -3967,7 +3967,7 @@ Vector<Vector<AXID>> AccessibilityNodeObject::stitchGroups() const
                     continue;
                 AXID axID = object->objectID();
 
-                if (shouldStopStitchingAt(renderer, context)) {
+                if (shouldStopStitchingAt(renderer, *object, context)) {
                     if (currentGroup.size() > 1)
                         stitchGroups.append(std::exchange(currentGroup, { }));
                     else

@@ -371,7 +371,7 @@ public:
     void onTextRunsChanged(const RenderObject&);
 #endif
 
-    void onLaidOutInlineContent(const RenderBlockFlow&);
+    void onLaidOutInlineContent(const RenderBlockFlow& renderBlock) { setDirtyStitchGroups(renderBlock); }
     const Vector<Vector<AXID>>* stitchGroupsOwnedBy(AccessibilityObject&);
 
     void updateLoadingProgress(double);
@@ -766,6 +766,8 @@ private:
     void updateCurrentModalNode();
     bool isNodeVisible(const Node*) const;
     bool modalElementHasAccessibleContent(Element&);
+
+    void setDirtyStitchGroups(const RenderBlock&);
 
     // Relationships between objects.
     static Vector<QualifiedName>& relationAttributes();

@@ -27,6 +27,7 @@
 #include "AXStitchUtilities.h"
 
 #include "AXUtilities.h"
+#include "AccessibilityNodeObject.h"
 #include "Element.h"
 #include "HTMLLabelElement.h"
 #include "HTMLTableCellElement.h"
@@ -34,6 +35,10 @@
 #include "RenderStyle.h"
 
 namespace WebCore {
+
+StitchingContext::StitchingContext(const AccessibilityNodeObject& containingBlockFlowObject)
+    : containingBlockFlowObject(containingBlockFlowObject)
+{ }
 
 static bool hasEnclosingInputElement(Node* node)
 {
@@ -69,7 +74,7 @@ static bool isStitchBreakingElement(Element& element)
     || hasStitchBreakingTag(element);
 }
 
-bool shouldStopStitchingAt(const RenderObject& renderer, StitchingContext& context)
+bool shouldStopStitchingAt(const RenderObject& renderer, const AccessibilityObject& object, StitchingContext& context)
 {
     if (renderer.style().insideLink() != InsideLink::NotInside) {
         // Stop stitching when encountering a link.
@@ -111,6 +116,20 @@ bool shouldStopStitchingAt(const RenderObject& renderer, StitchingContext& conte
             }
         }
         node = WTFMove(ancestor);
+    }
+
+    RefPtr currentAncestor = object.parentObject();
+    while (currentAncestor) {
+        if (currentAncestor->owners().size()) {
+            stitchBreakingAncestor = nullptr;
+            return true;
+        }
+
+        if (currentAncestor == context.containingBlockFlowObject) {
+            // There are no re-ownerships on the way to our block flow, so we can stop.
+            break;
+        }
+        currentAncestor = currentAncestor->parentObject();
     }
 
     auto updateContext = makeScopeExit([&] {

@@ -791,8 +791,11 @@ accessibility/dynamic-expanded-text.html [ Failure ]
 
 accessibility/dynamic-content-visibility.html [ Skip ]
 accessibility/dynamic-selected-radio-button.html [ Skip ]
-accessibility/dynamic-text-stitching.html [ Skip ]
 accessibility/password-notifications-timing.html [ Skip ]
+
+# AccessibilityTextStitchingEnabled feature is not implemented.
+accessibility/dynamic-text-stitching.html [ Skip ]
+accessibility/aria-owns-text-stitching.html [ Skip ]
 
 # Timed out since it was introduced.
 accessibility/css-content-alt-text.html [ Skip ]

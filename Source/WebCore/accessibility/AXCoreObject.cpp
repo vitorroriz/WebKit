@@ -406,6 +406,9 @@ AXCoreObject::StitchState AXCoreObject::stitchStateFromGroups(const Vector<Vecto
                 // If the caller doesn't need the group we belong to, don't bother doing the copy.
                 return { group[0], { } };
             }
+
+            // Stitching zero or one elements doesn't make sense, so ensure our group is two or larger.
+            ASSERT(group.size() >= 2);
             return { group[0], group };
         }
     }

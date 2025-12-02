@@ -1037,10 +1037,7 @@ public:
         StitchState(std::optional<AXID> stitchedIntoID, const Vector<AXID>& group)
             : stitchedIntoID(stitchedIntoID)
             , group(group)
-        {
-            // If there is an object being stitched into, there _must_ be an associated group.
-            ASSERT(!stitchedIntoID || group.size());
-        }
+        { }
     };
     enum class IncludeStitchGroup : bool { No, Yes };
     virtual StitchState stitchState(IncludeStitchGroup = IncludeStitchGroup::Yes) const { return { }; }

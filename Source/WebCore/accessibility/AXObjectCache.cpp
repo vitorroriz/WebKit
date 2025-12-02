@@ -1436,13 +1436,13 @@ const Vector<Vector<AXID>>* AXObjectCache::stitchGroupsOwnedBy(AccessibilityObje
     return groups.isEmpty() ? nullptr : &groups;
 }
 
-void AXObjectCache::onLaidOutInlineContent(const RenderBlockFlow& renderer)
+void AXObjectCache::setDirtyStitchGroups(const RenderBlock& renderBlock)
 {
-    if (std::optional groups = m_stitchGroups.takeOptional(renderer)) {
+    if (std::optional groups = m_stitchGroups.takeOptional(renderBlock)) {
         UNUSED_PARAM(groups);
 
 #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
-        if (std::optional axID = getAXID(const_cast<RenderBlockFlow&>(renderer))) {
+        if (std::optional axID = getAXID(const_cast<RenderBlock&>(renderBlock))) {
             if (RefPtr tree = AXIsolatedTree::treeForFrameID(m_frameID))
                 tree->queueNodeUpdate(*axID, { AXProperty::StitchGroups });
         }
@@ -3308,11 +3308,31 @@ void AXObjectCache::handleAttributeChange(Element* element, const QualifiedName&
         recomputeParentTableProperties(element, { TableProperty::CellSlots, TableProperty::Exposed });
     } else if (attrName == aria_sortAttr)
         postNotification(element, AXNotification::SortDirectionChanged);
-#if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
     else if (attrName == aria_ownsAttr) {
+#if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
         if (oldValue.isEmpty() || newValue.isEmpty())
             updateIsolatedTree(get(*element), AXProperty::SupportsARIAOwns);
-    } else if (attrName == aria_braillelabelAttr)
+#endif
+        auto updateStitchGroups = [&] (const AtomString& ariaOwnsValue) {
+            // Stitch groups are computed by the containing block-flow, so loop over the owned DOM id's
+            // to find the associated element's containing-block flow and mark it dirty.
+            SpaceSplitString ids(ariaOwnsValue, SpaceSplitString::ShouldFoldCase::No);
+            for (auto& id : ids) {
+                if (RefPtr ownsTarget = element->treeScope().elementByIdResolvingReferenceTarget(id)) {
+                    CheckedPtr renderer = ownsTarget->renderer();
+                    if (auto* containingBlock = renderer ? renderer->containingBlock() : nullptr)
+                        setDirtyStitchGroups(*containingBlock);
+                }
+            }
+        };
+
+        // FIXME: aria-owns relationships can also change when an object's ID changes. We should update
+        // stitch groups in that case too.
+        updateStitchGroups(oldValue);
+        updateStitchGroups(newValue);
+    }
+#if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
+    else if (attrName == aria_braillelabelAttr)
         postNotification(element, AXNotification::BrailleLabelChanged);
     else if (attrName == aria_brailleroledescriptionAttr)
         postNotification(element, AXNotification::BrailleRoleDescriptionChanged);
@@ -5737,8 +5757,15 @@ bool AXObjectCache::removeRelation(Element& origin, AXRelation relation)
             removeRelationByID(targetID, object->objectID(), symmetric);
     }
 
-    if (removedRelation && relation == AXRelation::OwnerFor)
+    if (removedRelation && relation == AXRelation::OwnerFor) {
         childrenChanged(object.get());
+        // We also need to notify the object's natural parent it has changed children.
+        RefPtr node = object->node();
+        if (RefPtr parentNode = node ? composedParentIgnoringDocumentFragments(*node) : nullptr)
+            childrenChanged(get(*parentNode));
+        else if (CheckedPtr renderer = object->renderer())
+            childrenChanged(get(renderer->parent()));
+    }
 
     return removedRelation;
 }
