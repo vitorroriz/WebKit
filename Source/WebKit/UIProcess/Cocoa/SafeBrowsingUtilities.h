@@ -23,16 +23,26 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
+#pragma once
 
 #if HAVE(SAFE_BROWSING)
 
-#import <wtf/SoftLinking.h>
+#import <wtf/CompletionHandler.h>
+#import <wtf/URL.h>
 
-SOFT_LINK_PRIVATE_FRAMEWORK_FOR_SOURCE(WebKit, SafariSafeBrowsing);
+OBJC_CLASS SSBLookupResult;
+OBJC_CLASS NSError;
 
-SOFT_LINK_CLASS_FOR_SOURCE(WebKit, SafariSafeBrowsing, SSBLookupContext);
-SOFT_LINK_CLASS_FOR_SOURCE(WebKit, SafariSafeBrowsing, SSBLookupResult);
-SOFT_LINK_CLASS_FOR_SOURCE(WebKit, SafariSafeBrowsing, SSBServiceLookupResult);
+namespace WebKit::SafeBrowsingUtilities {
 
-#endif
+bool canLookUp(const URL&);
+
+enum class NavigationType : bool { MainFrame, SubFrame };
+void lookUp(const URL&, NavigationType, SSBLookupResult *cachedResult, CompletionHandler<void(SSBLookupResult *, NSError *)>&&);
+
+using NamespacedLists = NSDictionary<NSString *, NSArray<NSString *> *>;
+void listsForNamespace(const String& listNamespace, CompletionHandler<void(NamespacedLists *, NSError *)>&&);
+
+} // namespace WebKit::SafeBrowsingUtilities
+
+#endif // HAVE(SAFE_BROWSING)
