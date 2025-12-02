@@ -898,6 +898,16 @@ public:
     BumpPointerAllocator m_regExpAllocator;
     ConcurrentJSLock m_regExpAllocatorLock;
 
+#if ENABLE(YARR_JIT_ALL_PARENS_EXPRESSIONS)
+    static constexpr size_t patternContextBufferSize = 8192; // Space allocated to save nested parenthesis context
+    Lock m_regExpPatternContextLock;
+    UniqueArray<char> m_regExpPatternContexBuffer;
+    char* acquireRegExpPatternContexBuffer() WTF_ACQUIRES_LOCK(m_regExpPatternContextLock);
+    void releaseRegExpPatternContexBuffer() WTF_RELEASES_LOCK(m_regExpPatternContextLock);
+#else
+    static constexpr size_t patternContextBufferSize = 0; // Space allocated to save nested parenthesis context
+#endif
+
     const Ref<CompactTDZEnvironmentMap> m_compactVariableMap;
 
     LazyUniqueRef<VM, HasOwnPropertyCache> m_hasOwnPropertyCache;

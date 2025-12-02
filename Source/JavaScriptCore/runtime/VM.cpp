@@ -1170,6 +1170,26 @@ static void logSanitizeStack(VM& vm)
     }
 }
 
+#if ENABLE(YARR_JIT_ALL_PARENS_EXPRESSIONS)
+
+char* VM::acquireRegExpPatternContexBuffer()
+{
+    m_regExpPatternContextLock.lock();
+    ASSERT(m_regExpPatternContextLock.isLocked());
+    if (!m_regExpPatternContexBuffer)
+        m_regExpPatternContexBuffer = makeUniqueArray<char>(VM::patternContextBufferSize);
+    return m_regExpPatternContexBuffer.get();
+}
+
+void VM::releaseRegExpPatternContexBuffer()
+{
+    ASSERT(m_regExpPatternContextLock.isLocked());
+
+    m_regExpPatternContextLock.unlock();
+}
+
+#endif
+
 #if ENABLE(REGEXP_TRACING)
 
 void VM::addRegExpToTrace(RegExp* regExp)
