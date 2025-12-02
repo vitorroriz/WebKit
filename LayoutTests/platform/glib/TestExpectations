@@ -2544,8 +2544,6 @@ http/tests/webrtc/audioSessionInFrames.html [ Failure ]
 
 webrtc/clone-audio-track.html [ Pass Failure ]
 
-fast/mediastream/stream-switch.html [ Skip ] # Timeout
-
 webkit.org/b/194611 http/wpt/webrtc/getUserMedia-processSwapping.html [ Failure ]
 
 # These tests are macOS-specific. In Linux changing the PipeWire capture source on the fly is not supported.
