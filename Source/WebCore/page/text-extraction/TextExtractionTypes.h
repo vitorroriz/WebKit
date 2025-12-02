@@ -169,9 +169,14 @@ struct Item {
     String accessibilityRole;
     HashMap<String, String> clientAttributes;
 
+    template<typename T> bool hasData() const
+    {
+        return std::holds_alternative<T>(data);
+    }
+
     template<typename T> std::optional<T> dataAs() const
     {
-        if (std::holds_alternative<T>(data))
+        if (hasData<T>())
             return std::get<T>(data);
         return std::nullopt;
     }
