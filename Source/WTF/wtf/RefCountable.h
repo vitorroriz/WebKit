@@ -49,27 +49,15 @@ public:
     {
     }
 
-    T* WTF_NONNULL operator*()
+    T& operator*()
     {
-        return &m_value;
+        return m_value;
     }
 
-    const T* WTF_NONNULL operator*() const
+    const T& operator*() const
     {
-        return &m_value;
+        return m_value;
     }
-
-#ifdef __swift__
-    void swiftRef()
-    {
-        WTF::ref(this);
-    }
-
-    void swiftDeref()
-    {
-        WTF::deref(this);
-    }
-#endif
 
 private:
     template<typename... Arguments>
@@ -80,6 +68,6 @@ private:
     }
 
     T m_value;
-} SWIFT_SHARED_REFERENCE(.swiftRef, .swiftDeref);
+} SWIFT_SHARED_REFERENCE(.ref, .deref);
 
 } // namespace WTF

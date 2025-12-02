@@ -62,11 +62,11 @@ public:
     {
         if (!isValid())
             return nullptr;
-        return **m_data;
+        return &**m_data;
     }
 
-    T& operator*() const { RELEASE_ASSERT(isValid()); return ***m_data; }
-    T* operator->() const { RELEASE_ASSERT(isValid()); return **m_data; }
+    T& operator*() const { RELEASE_ASSERT(isValid()); return **m_data; }
+    T* operator->() const { RELEASE_ASSERT(isValid()); return &**m_data; }
 
     explicit operator bool() const { return isValid(); }
 
