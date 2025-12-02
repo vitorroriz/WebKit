@@ -2414,3 +2414,5 @@ webkit.org/b/302935 [ Sonoma ] media/media-source/media-source-allowed-codecs.ht
 # webkit.org/b/303325 REGRESSION(303533@main): Caused webrtc/vp9-profile2.html to time out
 webrtc/vp9-profile2.html [ Pass Timeout ]
 fast/mediastream/captureStream/canvas3d.html [ Pass Crash ]
+
+webkit.org/b/302725 [ Sequoia Sonoma ] fast/css/accent-color/datalist.html [ Pass ]
