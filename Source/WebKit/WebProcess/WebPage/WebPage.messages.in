@@ -156,9 +156,9 @@ messages -> WebPage WantsAsyncDispatchMessage {
 
     SetControlledByAutomation(bool controlled)
 
-    ConnectInspector(String targetId, Inspector::FrontendChannel::ConnectionType connectionType)
-    DisconnectInspector(String targetId)
-    SendMessageToTargetBackend(String targetId, String message)
+    ConnectInspector(Inspector::FrontendChannel::ConnectionType connectionType)
+    DisconnectInspector()
+    SendMessageToTargetBackend(String message)
 
 #if ENABLE(REMOTE_INSPECTOR)
     SetIndicating(bool indicating);

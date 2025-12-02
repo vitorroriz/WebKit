@@ -141,7 +141,7 @@
 #include "WebPageCreationParameters.h"
 #include "WebPageGroupProxy.h"
 #include "WebPageInlines.h"
-#include "WebPageInspectorTargetController.h"
+#include "WebPageInspectorTarget.h"
 #include "WebPageInternals.h"
 #include "WebPageMessages.h"
 #include "WebPageOverlay.h"
@@ -614,7 +614,7 @@ WebPage::WebPage(PageIdentifier pageID, WebPageCreationParameters&& parameters)
     , m_shouldRenderDOMInGPUProcess { parameters.shouldRenderDOMInGPUProcess }
     , m_shouldPlayMediaInGPUProcess { parameters.shouldPlayMediaInGPUProcess }
 #if ENABLE(WEBGL)
-    , m_shouldRenderWebGLInGPUProcess { parameters.shouldRenderWebGLInGPUProcess}
+    , m_shouldRenderWebGLInGPUProcess { parameters.shouldRenderWebGLInGPUProcess }
 #endif
     , m_shouldSendConsoleLogsToUIProcessForTesting(parameters.shouldSendConsoleLogsToUIProcessForTesting)
 #if ENABLE(PLATFORM_DRIVEN_TEXT_CHECKING)
@@ -639,7 +639,6 @@ WebPage::WebPage(PageIdentifier pageID, WebPageCreationParameters&& parameters)
     , m_uiClient(makeUnique<API::InjectedBundle::PageUIClient>())
     , m_findController(makeUniqueRef<FindController>(this))
     , m_foundTextRangeController(makeUniqueRef<WebFoundTextRangeController>(*this))
-    , m_inspectorTargetController(makeUniqueRef<WebPageInspectorTargetController>(*this))
     , m_userContentController(WebUserContentController::getOrCreate(WTFMove(parameters.userContentControllerParameters)))
     , m_screenOrientationManager(makeUniqueRefWithoutRefCountedCheck<WebScreenOrientationManager>(*this))
 #if ENABLE(GEOLOCATION)
@@ -4078,19 +4077,26 @@ void WebPage::setControlledByAutomation(bool controlled)
     m_page->setControlledByAutomation(controlled);
 }
 
-void WebPage::connectInspector(const String& targetId, Inspector::FrontendChannel::ConnectionType connectionType)
+WebPageInspectorTarget& WebPage::ensureInspectorTarget()
 {
-    m_inspectorTargetController->connectInspector(targetId, connectionType);
+    if (!m_inspectorTarget)
+        m_inspectorTarget = makeUnique<WebPageInspectorTarget>(*this);
+    return *m_inspectorTarget;
 }
 
-void WebPage::disconnectInspector(const String& targetId)
+void WebPage::connectInspector(Inspector::FrontendChannel::ConnectionType connectionType)
 {
-    m_inspectorTargetController->disconnectInspector(targetId);
+    ensureInspectorTarget().connect(connectionType);
 }
 
-void WebPage::sendMessageToTargetBackend(const String& targetId, const String& message)
+void WebPage::disconnectInspector()
 {
-    m_inspectorTargetController->sendMessageToTargetBackend(targetId, message);
+    ensureInspectorTarget().disconnect();
+}
+
+void WebPage::sendMessageToTargetBackend(const String& message)
+{
+    ensureInspectorTarget().sendMessageToTargetBackend(message);
 }
 
 void WebPage::insertNewlineInQuotedContent()

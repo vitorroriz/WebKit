@@ -454,7 +454,7 @@ class WebMouseEvent;
 class WebNotificationClient;
 class WebOpenPanelResultListener;
 class WebPageGroupProxy;
-class WebPageInspectorTargetController;
+class WebPageInspectorTarget;
 class WebPageOverlay;
 class WebPageTesting;
 class WebPaymentCoordinator;
@@ -1626,9 +1626,9 @@ public:
     bool isControlledByAutomation() const;
     void setControlledByAutomation(bool);
 
-    void connectInspector(const String& targetId, Inspector::FrontendChannel::ConnectionType);
-    void disconnectInspector(const String& targetId);
-    void sendMessageToTargetBackend(const String& targetId, const String& message);
+    void connectInspector(Inspector::FrontendChannel::ConnectionType);
+    void disconnectInspector();
+    void sendMessageToTargetBackend(const String& message);
 
     void insertNewlineInQuotedContent();
 
@@ -2683,6 +2683,8 @@ private:
 
     void frameNameWasChangedInAnotherProcess(WebCore::FrameIdentifier, const String& frameName);
 
+    WebPageInspectorTarget& ensureInspectorTarget();
+
     struct Internals;
     const UniqueRef<Internals> m_internals;
 
@@ -2814,7 +2816,7 @@ private:
     RefPtr<WebInspectorBackend> m_inspector;
     RefPtr<WebInspectorUI> m_inspectorUI;
     RefPtr<RemoteWebInspectorUI> m_remoteInspectorUI;
-    const UniqueRef<WebPageInspectorTargetController> m_inspectorTargetController;
+    std::unique_ptr<WebPageInspectorTarget> m_inspectorTarget;
 
 #if ENABLE(VIDEO_PRESENTATION_MODE)
     RefPtr<PlaybackSessionManager> m_playbackSessionManager;

@@ -75,8 +75,8 @@
 #include "WebProcessProxyMessages.h"
 #include "WebSearchPopupMenu.h"
 #include "WebWorkerClient.h"
-#include <WebCore/AppHighlight.h>
 #include <WebCore/AXObjectCache.h>
+#include <WebCore/AppHighlight.h>
 #include <WebCore/BarcodeDetectorInterface.h>
 #include <WebCore/ColorChooser.h>
 #include <WebCore/ColorChooserClient.h>
@@ -101,6 +101,7 @@
 #include <WebCore/FrameDestructionObserverInlines.h>
 #include <WebCore/FrameLoader.h>
 #include <WebCore/HTMLInputElement.h>
+#include <WebCore/HTMLMediaElement.h>
 #include <WebCore/HTMLNames.h>
 #include <WebCore/HTMLParserIdioms.h>
 #include <WebCore/HTMLPlugInElement.h>
