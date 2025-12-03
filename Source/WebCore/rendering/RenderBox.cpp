@@ -4154,8 +4154,10 @@ void RenderBox::computeOutOfFlowPositionedLogicalWidth(LogicalExtentComputedValu
     if (usedWidth < usedMinWidth)
         usedWidth = usedMinWidth;
 
+    bool hasWidthBorderBoxAspectRatio = style().hasAspectRatio() && style().boxSizingForAspectRatio() == BoxSizing::BorderBox && style().logicalWidth().isAuto();
+
     // Set the final width value.
-    computedValues.m_extent = usedWidth + inlineConstraints.bordersPlusPadding();
+    computedValues.m_extent = hasWidthBorderBoxAspectRatio ? usedWidth : usedWidth + inlineConstraints.bordersPlusPadding();
 
     // Calculate the position.
     inlineConstraints.resolvePosition(computedValues);
