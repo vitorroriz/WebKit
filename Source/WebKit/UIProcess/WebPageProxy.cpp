@@ -6410,7 +6410,14 @@ void WebPageProxy::findTextRangesForStringMatches(const String& string, OptionSe
 
 void WebPageProxy::replaceFoundTextRangeWithString(const WebFoundTextRange& range, const String& string)
 {
-    send(Messages::WebPage::ReplaceFoundTextRangeWithString(range, string));
+    RefPtr current = m_mainFrame;
+    for (size_t i = 0; i < range.pathToFrame.size() && current; i++)
+        current = current->childFrame(range.pathToFrame[i]);
+
+    if (!current)
+        return;
+
+    sendToProcessContainingFrame(current->frameID(), Messages::WebPage::ReplaceFoundTextRangeWithString(range, string));
 }
 
 void WebPageProxy::decorateTextRangeWithStyle(const WebFoundTextRange& range, FindDecorationStyle style)
@@ -6420,22 +6427,42 @@ void WebPageProxy::decorateTextRangeWithStyle(const WebFoundTextRange& range, Fi
 
 void WebPageProxy::scrollTextRangeToVisible(const WebFoundTextRange& range)
 {
-    send(Messages::WebPage::ScrollTextRangeToVisible(range));
+    RefPtr current = m_mainFrame;
+    for (size_t i = 0; i < range.pathToFrame.size() && current; i++)
+        current = current->childFrame(range.pathToFrame[i]);
+
+    if (!current)
+        return;
+
+    sendToProcessContainingFrame(current->frameID(), Messages::WebPage::ScrollTextRangeToVisible(range));
 }
 
 void WebPageProxy::clearAllDecoratedFoundText()
 {
-    send(Messages::WebPage::ClearAllDecoratedFoundText());
+    forEachWebContentProcess([&](auto& process, auto pageID) {
+        process.send(Messages::WebPage::ClearAllDecoratedFoundText(), pageID);
+    });
 }
 
 void WebPageProxy::didBeginTextSearchOperation()
 {
-    send(Messages::WebPage::DidBeginTextSearchOperation());
+    forEachWebContentProcess([&](auto& process, auto pageID) {
+        process.send(Messages::WebPage::DidBeginTextSearchOperation(), pageID);
+    });
 }
 
 void WebPageProxy::requestRectForFoundTextRange(const WebFoundTextRange& range, CompletionHandler<void(WebCore::FloatRect)>&& callbackFunction)
 {
-    sendWithAsyncReply(Messages::WebPage::RequestRectForFoundTextRange(range), WTFMove(callbackFunction));
+    RefPtr current = m_mainFrame;
+    for (size_t i = 0; i < range.pathToFrame.size() && current; i++)
+        current = current->childFrame(range.pathToFrame[i]);
+
+    if (!current) {
+        callbackFunction({ });
+        return;
+    }
+
+    sendWithAsyncReplyToProcessContainingFrame(current->frameID(), Messages::WebPage::RequestRectForFoundTextRange(range), WTFMove(callbackFunction));
 }
 
 void WebPageProxy::addLayerForFindOverlay(CompletionHandler<void(std::optional<WebCore::PlatformLayerIdentifier>)>&& callbackFunction)

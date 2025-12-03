@@ -73,6 +73,7 @@
 #endif
 
 #if PLATFORM(IOS_FAMILY)
+#import "UIKitSPIForTesting.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #endif
 
@@ -80,6 +81,14 @@
 - (void)copy:(id)sender;
 - (void)paste:(id)sender;
 @end
+
+#if HAVE(UIFINDINTERACTION)
+// Forward declare UITextSearching methods
+@interface WKWebView () <UITextSearching>
+- (void)didBeginTextSearchOperation;
+- (void)didEndTextSearchOperation;
+@end
+#endif
 
 @interface SiteIsolationTextManipulationDelegate : NSObject <_WKTextManipulationDelegate>
 - (void)_webView:(WKWebView *)webView didFindTextManipulationItems:(NSArray<_WKTextManipulationItem *> *)items;
@@ -7158,6 +7167,206 @@ TEST(SiteIsolation, FindStringAcrossMultipleFramesIOS)
     RetainPtr searchOptions = adoptNS([[UITextSearchOptions alloc] init]);
     testPerformTextSearchWithQueryStringInWebView(webView.get(), @"foobar", searchOptions.get(), 5UL);
     testPerformTextSearchWithQueryStringInWebView(webView.get(), @"nothing", searchOptions.get(), 0UL);
+}
+
+TEST(SiteIsolation, FindStringInFrameAndReplaceIOS)
+{
+    HTTPServer server({
+        { "/mainframe"_s, { "<iframe src='https://domain2.com/subframe'></iframe>"_s } },
+        { "/subframe"_s, { "<body contenteditable><p>foobar</p><p>shoebar foobar</p></body>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://domain1.com/mainframe"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    auto ranges = textRangesForQueryString(webView.get(), @"foobar");
+
+    EXPECT_EQ([ranges count], (NSUInteger)2);
+
+    [webView _setEditable:YES];
+
+    // replace first instance of "foobar" with "here"
+    auto range = [ranges firstObject];
+    [webView replaceFoundTextInRange:range inDocument:nil withText:@"here"];
+
+    [webView waitForNextPresentationUpdate];
+
+    RetainPtr searchOptions = adoptNS([[UITextSearchOptions alloc] init]);
+    testPerformTextSearchWithQueryStringInWebView(webView.get(), @"here", searchOptions.get(), 1UL);
+    testPerformTextSearchWithQueryStringInWebView(webView.get(), @"foobar", searchOptions.get(), 1UL);
+}
+
+TEST(SiteIsolation, DecorateFoundTextRangeIOS)
+{
+    HTTPServer server({
+        { "/mainframe"_s, { "<iframe src='https://domain2.com/subframe'></iframe>"_s } },
+        { "/subframe"_s, { "<p>Hello world</p>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+
+    auto findDelegate = adoptNS([[TestFindDelegate alloc] init]);
+    [webView _setFindDelegate:findDelegate.get()];
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://domain1.com/mainframe"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    auto ranges = textRangesForQueryString(webView.get(), @"world");
+
+    EXPECT_EQ([ranges count], (NSUInteger)1);
+    UITextRange *range = [ranges objectAtIndex:0];
+
+    // Start text search operation to create find overlay
+    __block bool didAddOverlay = false;
+    [findDelegate setDidAddLayerForFindOverlayHandler:^{
+        didAddOverlay = true;
+    }];
+
+    [webView didBeginTextSearchOperation];
+
+    TestWebKitAPI::Util::run(&didAddOverlay);
+    EXPECT_NOT_NULL([webView _layerForFindOverlay]);
+
+    // Test all decoration styles - Normal, Found, and Highlighted
+    [webView decorateFoundTextRange:range inDocument:nil usingStyle:(UITextSearchFoundTextStyle)_UIFoundTextStyleNormal];
+    [webView decorateFoundTextRange:range inDocument:nil usingStyle:(UITextSearchFoundTextStyle)_UIFoundTextStyleFound];
+
+    // Verify we can still get a rect for the decorated range
+    __block bool didReceiveRect = false;
+    __block CGRect receivedRect = CGRectZero;
+    [webView _requestRectForFoundTextRange:range completionHandler:^(CGRect rect) {
+        receivedRect = rect;
+        didReceiveRect = true;
+    }];
+    TestWebKitAPI::Util::run(&didReceiveRect);
+    EXPECT_FALSE(CGRectIsEmpty(receivedRect));
+
+    [webView decorateFoundTextRange:range inDocument:nil usingStyle:(UITextSearchFoundTextStyle)_UIFoundTextStyleHighlighted];
+
+    // Verify the range is still valid after highlighting and overlay still exists
+    didReceiveRect = false;
+    receivedRect = CGRectZero;
+    [webView _requestRectForFoundTextRange:range completionHandler:^(CGRect rect) {
+        receivedRect = rect;
+        didReceiveRect = true;
+    }];
+    TestWebKitAPI::Util::run(&didReceiveRect);
+    EXPECT_FALSE(CGRectIsEmpty(receivedRect));
+    EXPECT_NOT_NULL([webView _layerForFindOverlay]);
+}
+
+TEST(SiteIsolation, ScrollTextRangeToVisibleIOS)
+{
+    // Position the iframe far down the page so the main frame needs to scroll
+    const auto mainframeSrc = "<div style='height: 2000px;'>Spacer content at top</div>"
+    "<iframe src='https://domain2.com/subframe' style='width: 100%; height: 400px;'></iframe>"_s;
+
+    const auto subframeSrc = "<p>Target text in iframe</p>"_s;
+
+    HTTPServer server({
+        { "/mainframe"_s, { mainframeSrc } },
+        { "/subframe"_s, { subframeSrc } },
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    // Create webView with explicit size so it can scroll
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server, CGRectMake(0, 0, 400, 600));
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://domain1.com/mainframe"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    auto ranges = textRangesForQueryString(webView.get(), @"Target text");
+
+    EXPECT_EQ([ranges count], (NSUInteger)1);
+    UITextRange *range = [ranges firstObject];
+
+    // Scroll the found text range into view
+    // This primarily tests that scrollTextRangeToVisible works with FrameIdentifier
+    // tracking and doesn't crash with site-isolated iframes
+    [webView scrollRangeToVisible:range inDocument:nil];
+}
+
+TEST(SiteIsolation, ClearAllDecoratedFoundTextIOS)
+{
+    HTTPServer server({
+        { "/mainframe"_s, { "<iframe src='https://domain2.com/subframe'></iframe><iframe src='https://domain3.com/subframe2'></iframe>"_s } },
+        { "/subframe"_s, { "<p>foobar</p>"_s } },
+        { "/subframe2"_s, { "<p>foobar</p>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+
+    auto findDelegate = adoptNS([[TestFindDelegate alloc] init]);
+    [webView _setFindDelegate:findDelegate.get()];
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://domain1.com/mainframe"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    auto ranges = textRangesForQueryString(webView.get(), @"foobar");
+    EXPECT_EQ([ranges count], (NSUInteger)2);
+
+    __block bool didAddOverlay = false;
+    [findDelegate setDidAddLayerForFindOverlayHandler:^{
+        didAddOverlay = true;
+    }];
+
+    [webView didBeginTextSearchOperation];
+    TestWebKitAPI::Util::run(&didAddOverlay);
+    EXPECT_NOT_NULL([webView _layerForFindOverlay]);
+
+    // Decorate ranges across multiple site-isolated iframes
+    for (UITextRange *range in ranges.get())
+        [webView decorateFoundTextRange:range inDocument:nil usingStyle:(UITextSearchFoundTextStyle)_UIFoundTextStyleHighlighted];
+
+    [webView clearAllDecoratedFoundText];
+
+    // Verify we can still find and decorate text after clearing
+    auto rangesAfterClear = textRangesForQueryString(webView.get(), @"foobar");
+    EXPECT_EQ([rangesAfterClear count], (NSUInteger)2);
+
+    for (UITextRange *range in rangesAfterClear.get())
+        [webView decorateFoundTextRange:range inDocument:nil usingStyle:(UITextSearchFoundTextStyle)_UIFoundTextStyleFound];
+
+    // Verify ranges work after re-decoration
+    for (UITextRange *range in rangesAfterClear.get()) {
+        __block bool didReceiveRect = false;
+        __block CGRect receivedRect = CGRectZero;
+        [webView _requestRectForFoundTextRange:range completionHandler:^(CGRect rect) {
+            receivedRect = rect;
+            didReceiveRect = true;
+        }];
+        TestWebKitAPI::Util::run(&didReceiveRect);
+        EXPECT_FALSE(CGRectIsEmpty(receivedRect));
+    }
+}
+
+TEST(SiteIsolation, RequestRectForFoundTextRangeIOS)
+{
+    HTTPServer server({
+        { "/mainframe"_s, { "<iframe src='https://domain2.com/subframe'></iframe>"_s } },
+        { "/subframe"_s, { "<p>Hello world</p>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://domain1.com/mainframe"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    auto ranges = textRangesForQueryString(webView.get(), @"world");
+
+    EXPECT_EQ([ranges count], (NSUInteger)1);
+    UITextRange *range = [ranges objectAtIndex:0];
+
+    __block bool didReceiveRect = false;
+    __block CGRect receivedRect = CGRectZero;
+    [webView _requestRectForFoundTextRange:range completionHandler:^(CGRect rect) {
+        receivedRect = rect;
+        didReceiveRect = true;
+    }];
+
+    TestWebKitAPI::Util::run(&didReceiveRect);
+
+    // Verify we got a non-zero rect
+    EXPECT_FALSE(CGRectIsEmpty(receivedRect));
+    EXPECT_GT(CGRectGetWidth(receivedRect), 0);
+    EXPECT_GT(CGRectGetHeight(receivedRect), 0);
 }
 
 #endif

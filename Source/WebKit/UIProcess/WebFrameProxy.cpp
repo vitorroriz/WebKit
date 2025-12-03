@@ -809,6 +809,14 @@ WebFrameProxy* WebFrameProxy::previousSibling() const
     return (--it)->ptr();
 }
 
+RefPtr<WebFrameProxy> WebFrameProxy::childFrame(size_t index) const
+{
+    RefPtr child = firstChild();
+    for (size_t i = 0; i < index && child; i++)
+        child = child->nextSibling();
+    return child;
+}
+
 void WebFrameProxy::updateOpener(WebCore::FrameIdentifier newOpener)
 {
     m_opener = WebFrameProxy::webFrame(newOpener);

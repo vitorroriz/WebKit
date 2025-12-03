@@ -608,6 +608,15 @@ typedef NS_ENUM(NSInteger, NSTextBlockLayer) {
 @property (nonatomic, readwrite) NSStringCompareOptions stringCompareOptions;
 @end
 
+#if !__has_include(<UIKit/_UITextSearching.h>)
+// Define SPI type when private header is not available (older SDKs)
+typedef NS_ENUM(NSUInteger, _UIFoundTextStyle) {
+    _UIFoundTextStyleNormal,
+    _UIFoundTextStyleFound,
+    _UIFoundTextStyleHighlighted,
+};
+#endif
+
 #endif
 
 #if HAVE(AUTOCORRECTION_ENHANCEMENTS)

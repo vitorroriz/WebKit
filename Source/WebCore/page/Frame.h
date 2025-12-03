@@ -80,6 +80,8 @@ public:
     DOMWindow* window() const { return virtualWindow(); }
     RefPtr<DOMWindow> protectedWindow() const;
     FrameTree& tree() const { return m_treeNode; }
+    WEBCORE_EXPORT std::optional<size_t> indexInFrameTreeSiblings() const;
+    WEBCORE_EXPORT Vector<size_t> pathToFrame() const;
     FrameIdentifier frameID() const { return m_frameID; }
     inline Page* page() const; // Defined in DocumentPage.h.
     inline RefPtr<Page> protectedPage() const; // Defined in DocumentPage.h.
