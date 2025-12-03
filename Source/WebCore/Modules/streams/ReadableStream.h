@@ -160,10 +160,13 @@ public:
         using Callback = CompletionHandler<void(ExceptionOr<Result>&&)>;
         void next(Callback&&);
 
+        Ref<DOMPromise> returnSteps(JSDOMGlobalObject&, JSC::JSValue);
+
     private:
         Iterator(Ref<ReadableStreamDefaultReader>&&, bool preventCancel);
 
         const Ref<ReadableStreamDefaultReader> m_reader;
+        bool m_preventCancel { false };
     };
 
     ExceptionOr<Ref<Iterator>> createIterator(ScriptExecutionContext*, IteratorOptions&&);

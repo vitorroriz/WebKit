@@ -1,7 +1,5 @@
 
-Harness Error (FAIL), message = Unhandled rejection: Type error
-
-FAIL Async iterator instances should have the correct list of properties assert_array_equals: should have all the correct methods lengths differ, expected array ["next", "return"] length 2, got ["next"] length 1
+PASS Async iterator instances should have the correct list of properties
 PASS Async-iterating a push source
 PASS Async-iterating a pull source
 FAIL Async-iterating a push source with undefined values assert_array_equals: lengths differ, expected array [undefined, undefined, undefined] length 3, got [] length 0
@@ -11,35 +9,35 @@ FAIL Async-iterating an errored stream throws assert_equals: expected (string) "
 PASS Async-iterating a closed stream never executes the loop body, but works fine
 PASS Async-iterating an empty but not closed/errored stream never executes the loop body and stalls the async function
 PASS Async-iterating a partially consumed stream
-FAIL Cancellation behavior when throwing inside loop body; preventCancel = false assert_array_equals: cancel() should be called lengths differ, expected array ["pull", "cancel", undefined] length 3, got ["pull"] length 1
-PASS Cancellation behavior when throwing inside loop body; preventCancel = true
-FAIL Cancellation behavior when breaking inside loop body; preventCancel = false assert_array_equals: cancel() should be called lengths differ, expected array ["pull", "cancel", undefined] length 3, got ["pull"] length 1
-PASS Cancellation behavior when breaking inside loop body; preventCancel = true
-FAIL Cancellation behavior when returning inside loop body; preventCancel = false assert_array_equals: cancel() should be called lengths differ, expected array ["pull", "cancel", undefined] length 3, got ["pull"] length 1
-PASS Cancellation behavior when returning inside loop body; preventCancel = true
-FAIL Cancellation behavior when manually calling return(); preventCancel = false promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return()', 'it.return' is undefined)"
-FAIL Cancellation behavior when manually calling return(); preventCancel = true promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return()', 'it.return' is undefined)"
+PASS Cancellation behavior when throwing inside loop body; preventCancel = false
+FAIL Cancellation behavior when throwing inside loop body; preventCancel = true assert_array_equals: cancel() should not be called lengths differ, expected array ["pull"] length 1, got ["pull", "cancel", undefined] length 3
+PASS Cancellation behavior when breaking inside loop body; preventCancel = false
+FAIL Cancellation behavior when breaking inside loop body; preventCancel = true assert_array_equals: cancel() should not be called lengths differ, expected array ["pull"] length 1, got ["pull", "cancel", undefined] length 3
+PASS Cancellation behavior when returning inside loop body; preventCancel = false
+FAIL Cancellation behavior when returning inside loop body; preventCancel = true assert_array_equals: cancel() should not be called lengths differ, expected array ["pull"] length 1, got ["pull", "cancel", undefined] length 3
+PASS Cancellation behavior when manually calling return(); preventCancel = false
+FAIL Cancellation behavior when manually calling return(); preventCancel = true assert_array_equals: cancel() should not be called lengths differ, expected array [] length 0, got ["cancel", undefined] length 2
 FAIL next() rejects if the stream errors promise_rejects_exactly: 2nd next() function "function() { throw e; }" threw object "TypeError: Type error" but we expected it to throw object "Error: error1"
-FAIL return() does not rejects if the stream has not errored yet promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return('return value')', 'it.return' is undefined)"
-FAIL return() rejects if the stream has errored promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return('return value')', 'it.return' is undefined)"
+FAIL return() does not rejects if the stream has not errored yet assert_equals: done expected true but got false
+PASS return() rejects if the stream has errored
 FAIL next() that succeeds; next() that reports an error; next() promise_rejects_exactly: 2nd next() function "function() { throw e; }" threw object "TypeError: Type error" but we expected it to throw object "Error: error1"
 FAIL next() that succeeds; next() that reports an error(); next() [no awaiting] assert_equals: 2nd next() rejection reason expected object "Error: error1" but got object "TypeError: Type error"
 FAIL next() that succeeds; next() that reports an error(); return() promise_rejects_exactly: 2nd next() function "function() { throw e; }" threw object "TypeError: Type error" but we expected it to throw object "Error: error1"
-FAIL next() that succeeds; next() that reports an error(); return() [no awaiting] promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return('return value')', 'it.return' is undefined)"
-FAIL next() that succeeds; return() promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return('return value')', 'it.return' is undefined)"
-FAIL next() that succeeds; return() [no awaiting] promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return('return value')', 'it.return' is undefined)"
-FAIL return(); next() promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return('return value')', 'it.return' is undefined)"
-FAIL return(); next() [no awaiting] promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return('return value')', 'it.return' is undefined)"
-FAIL return(); next() with delayed cancel() promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return('return value')', 'it.return' is undefined)"
-FAIL return(); next() with delayed cancel() [no awaiting] promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return('return value')', 'it.return' is undefined)"
-FAIL return(); return() promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return('return value 1')', 'it.return' is undefined)"
-FAIL return(); return() [no awaiting] promise_test: Unhandled rejection with value: object "TypeError: it.return is not a function. (In 'it.return('return value 1')', 'it.return' is undefined)"
+FAIL next() that succeeds; next() that reports an error(); return() [no awaiting] assert_equals: 2nd next() rejection reason expected object "Error: error1" but got object "TypeError: Type error"
+FAIL next() that succeeds; return() assert_equals: return() done expected true but got false
+FAIL next() that succeeds; return() [no awaiting] assert_equals: return() done expected true but got false
+FAIL return(); next() assert_equals: return() done expected true but got false
+FAIL return(); next() [no awaiting] assert_equals: return() done expected true but got false
+FAIL return(); next() with delayed cancel() assert_equals: return() done expected true but got false
+FAIL return(); next() with delayed cancel() [no awaiting] assert_equals: return() should resolve with original reason done expected true but got false
+FAIL return(); return() assert_equals: 1st return() done expected true but got false
+FAIL return(); return() [no awaiting] assert_equals: 1st return() done expected true but got false
 PASS values() throws if there's already a lock
 PASS Acquiring a reader after exhaustively async-iterating a stream
 FAIL Acquiring a reader after return()ing from a stream that errors promise_rejects_exactly: 2nd next() function "function() { throw e; }" threw object "TypeError: Type error" but we expected it to throw object "Error: error1"
-FAIL Acquiring a reader after partially async-iterating a stream promise_test: Unhandled rejection with value: object "TypeError: ReadableStream is locked"
-FAIL Acquiring a reader and reading the remaining chunks after partially async-iterating a stream with preventCancel = true promise_test: Unhandled rejection with value: object "TypeError: ReadableStream is locked"
-FAIL return() should unlock the stream synchronously when preventCancel = false rs.values({ preventCancel }).return is not a function. (In 'rs.values({ preventCancel }).return()', 'rs.values({ preventCancel }).return' is undefined)
-FAIL return() should unlock the stream synchronously when preventCancel = true rs.values({ preventCancel }).return is not a function. (In 'rs.values({ preventCancel }).return()', 'rs.values({ preventCancel }).return' is undefined)
+PASS Acquiring a reader after partially async-iterating a stream
+FAIL Acquiring a reader and reading the remaining chunks after partially async-iterating a stream with preventCancel = true assert_equals: value expected (number) 3 but got (undefined) undefined
+PASS return() should unlock the stream synchronously when preventCancel = false
+PASS return() should unlock the stream synchronously when preventCancel = true
 PASS close() while next() is pending
 

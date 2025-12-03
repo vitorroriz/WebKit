@@ -38,6 +38,11 @@
 #include <wtf/CompletionHandler.h>
 
 namespace WebCore {
+template<typename Iterator>
+concept HasAsyncIteratorReturn = requires(Iterator iterator, JSDOMGlobalObject& globalObject)
+{
+    { iterator.returnSteps(globalObject, JSC::JSValue { }) } -> std::same_as<Ref<DOMPromise>>;
+};
 
 // https://webidl.spec.whatwg.org/#es-asynchronous-iterator-prototype-object
 template<typename JSWrapper, typename IteratorTraits> class JSDOMAsyncIteratorPrototype final : public JSC::JSNonFinalObject {
@@ -68,6 +73,7 @@ public:
     }
 
     static JSC::EncodedJSValue JSC_HOST_CALL_ATTRIBUTES next(JSC::JSGlobalObject*, JSC::CallFrame*);
+    static JSC::EncodedJSValue JSC_HOST_CALL_ATTRIBUTES returnMethod(JSC::JSGlobalObject*, JSC::CallFrame*);
 
 private:
     JSDOMAsyncIteratorPrototype(JSC::VM& vm, JSC::Structure* structure)
@@ -76,6 +82,8 @@ private:
     }
 
     void finishCreation(JSC::VM&, JSC::JSGlobalObject*);
+    template<typename Iterator> void addReturnMethodIfNeeded(JSC::VM&, JSC::JSGlobalObject*) { }
+    template<HasAsyncIteratorReturn Iterator> void addReturnMethodIfNeeded(JSC::VM&, JSC::JSGlobalObject*);
 };
 
 template<typename JSWrapper, typename IteratorTraits> class JSDOMAsyncIteratorBase : public JSDOMObject {
@@ -104,6 +112,10 @@ public:
     JSC::JSPromise* runNextSteps(JSC::JSGlobalObject&);
     JSC::JSPromise* getNextIterationResult(JSC::JSGlobalObject&);
 
+    JSC::JSValue returnMethod(JSC::JSGlobalObject&, JSC::JSValue);
+    JSC::JSPromise* runReturnSteps(JSC::JSGlobalObject&, JSC::JSValue);
+    JSC::JSPromise* getReturnResult(JSC::JSGlobalObject&, JSC::JSValue);
+
 protected:
     JSDOMAsyncIteratorBase(JSC::Structure* structure, JSWrapper& iteratedObject, IterationKind kind, InternalIterator&& iterator)
         : Base(structure, *iteratedObject.globalObject())
@@ -112,9 +124,10 @@ protected:
     {
     }
 
-    JSC::EncodedJSValue settle(JSC::JSGlobalObject*);
+    template<typename Iterator> JSC::JSValue settle(JSC::JSGlobalObject&, JSC::CallFrame&);
+    template<HasAsyncIteratorReturn Iterator> JSC::JSValue settle(JSC::JSGlobalObject&, JSC::CallFrame&);
     static JSC::EncodedJSValue JSC_HOST_CALL_ATTRIBUTES onPromiseSettled(JSC::JSGlobalObject*, JSC::CallFrame*);
-    JSC::JSBoundFunction* createOnSettledFunction(JSC::JSGlobalObject*);
+    JSC::JSBoundFunction* createOnSettledFunction(JSC::JSGlobalObject*, JSC::EncodedJSValue* = nullptr);
 
     JSC::EncodedJSValue fulfill(JSC::JSGlobalObject*, JSC::JSValue);
     static JSC::EncodedJSValue JSC_HOST_CALL_ATTRIBUTES onPromiseFulFilled(JSC::JSGlobalObject*, JSC::CallFrame*);
@@ -268,9 +281,20 @@ JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::getNextIterat
 }
 
 template<typename JSWrapper, typename IteratorTraits>
-JSC::EncodedJSValue JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::settle(JSC::JSGlobalObject* globalObject)
+template<typename Iterator> JSC::JSValue JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::settle(JSC::JSGlobalObject& globalObject, JSC::CallFrame&)
 {
-    return JSC::JSValue::encode(runNextSteps(*globalObject));
+    return runNextSteps(globalObject);
+}
+
+template<typename JSWrapper, typename IteratorTraits>
+template<HasAsyncIteratorReturn Iterator> JSC::JSValue JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::settle(JSC::JSGlobalObject& globalObject, JSC::CallFrame& callFrame)
+{
+    if (callFrame.argumentCount() > 1) {
+        ASSERT(callFrame.argumentCount() == 2);
+        return runReturnSteps(globalObject, callFrame.argument(1));
+    }
+
+    return runNextSteps(globalObject);
 }
 
 template<typename JSWrapper, typename IteratorTraits>
@@ -282,15 +306,20 @@ JSC::EncodedJSValue JSC_HOST_CALL_ATTRIBUTES JSDOMAsyncIteratorBase<JSWrapper, I
     if (!castedThis)
         return throwThisTypeError(*globalObject, scope, JSWrapper::info()->className, "onPromiseSettled");
 
-    return castedThis->settle(globalObject);
+    return JSC::JSValue::encode(castedThis->template settle<typename DOMWrapped::Iterator>(*globalObject, *callFrame));
 }
 
 template<typename JSWrapper, typename IteratorTraits>
-JSC::JSBoundFunction* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::createOnSettledFunction(JSC::JSGlobalObject* globalObject)
+JSC::JSBoundFunction* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::createOnSettledFunction(JSC::JSGlobalObject* globalObject, JSC::EncodedJSValue* returnStepsValue)
 {
     JSC::VM& vm = globalObject->vm();
+
+    JSC::ArgList boundArgs;
+    if (returnStepsValue)
+        boundArgs = { returnStepsValue, 1 };
+
     auto onSettled = JSC::JSFunction::create(vm, globalObject, 0, String(), onPromiseSettled, JSC::ImplementationVisibility::Public);
-    return JSC::JSBoundFunction::create(vm, globalObject, onSettled, this, { }, 1, jsEmptyString(vm), JSC::makeSource("createOnSettledFunction"_s, JSC::SourceOrigin(), JSC::SourceTaintedOrigin::Untainted));
+    return JSC::JSBoundFunction::create(vm, globalObject, onSettled, this, WTFMove(boundArgs), 1, jsEmptyString(vm), JSC::makeSource("createOnSettledFunction"_s, JSC::SourceOrigin(), JSC::SourceTaintedOrigin::Untainted));
 }
 
 template<typename JSWrapper, typename IteratorTraits>
@@ -321,8 +350,8 @@ template<typename JSWrapper, typename IteratorTraits>
 JSC::JSBoundFunction* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::createOnFulfilledFunction(JSC::JSGlobalObject* globalObject)
 {
     JSC::VM& vm = globalObject->vm();
-    auto onFulFilled = JSC::JSFunction::create(vm, globalObject, 0, String(), onPromiseFulFilled, JSC::ImplementationVisibility::Public);
-    return JSC::JSBoundFunction::create(vm, globalObject, onFulFilled, this, { }, 1, jsEmptyString(vm), JSC::makeSource("createOnFulfilledFunction"_s, JSC::SourceOrigin(), JSC::SourceTaintedOrigin::Untainted));
+    auto onFulfilled = JSC::JSFunction::create(vm, globalObject, 0, String(), onPromiseFulFilled, JSC::ImplementationVisibility::Public);
+    return JSC::JSBoundFunction::create(vm, globalObject, onFulfilled, this, { }, 1, jsEmptyString(vm), JSC::makeSource("createOnFulfilledFunction"_s, JSC::SourceOrigin(), JSC::SourceTaintedOrigin::Untainted));
 }
 
 template<typename JSWrapper, typename IteratorTraits>
@@ -370,13 +399,129 @@ JSC::EncodedJSValue JSC_HOST_CALL_ATTRIBUTES JSDOMAsyncIteratorPrototype<JSWrapp
 }
 
 template<typename JSWrapper, typename IteratorTraits>
+JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::runReturnSteps(JSC::JSGlobalObject& globalObject, JSC::JSValue value)
+{
+    JSC::VM& vm = globalObject.vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    auto returnPromiseCapability = JSC::JSPromise::createNewPromiseCapability(&globalObject, globalObject.promiseConstructor());
+    RETURN_IF_EXCEPTION(scope, nullptr);
+
+    auto* returnPromise = jsDynamicCast<JSC::JSPromise*>(returnPromiseCapability.get(&globalObject, vm.propertyNames->promise));
+    RETURN_IF_EXCEPTION(scope, nullptr);
+
+    if (!m_iterator) {
+        returnPromise->resolve(&globalObject, JSC::createIteratorResultObject(&globalObject, JSC::jsUndefined(), true));
+        RETURN_IF_EXCEPTION(scope, nullptr);
+
+        return returnPromise;
+    }
+
+    auto returnResultPromise = getReturnResult(globalObject, value);
+    RETURN_IF_EXCEPTION(scope, nullptr);
+
+    auto encodedValue = JSC::JSValue::encode(value);
+    JSC::ArgList boundArgs { &encodedValue, 1 };
+    auto onFulfilled = JSC::JSFunction::create(vm, &globalObject, 0, String(), onPromiseFulFilled, JSC::ImplementationVisibility::Public);
+    auto onFulfilledFunction = JSC::JSBoundFunction::create(vm, &globalObject, onFulfilled, this, WTFMove(boundArgs), 1, jsEmptyString(vm), JSC::makeSource("createOnReturnFulfilledFunction"_s, JSC::SourceOrigin(), JSC::SourceTaintedOrigin::Untainted));
+    RETURN_IF_EXCEPTION(scope, nullptr);
+
+    returnResultPromise->performPromiseThenExported(vm, &globalObject, onFulfilledFunction, JSC::jsUndefined(), returnPromiseCapability);
+
+    return returnPromise;
+}
+
+template<typename JSWrapper, typename IteratorTraits>
+JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::getReturnResult(JSC::JSGlobalObject& globalObject, JSC::JSValue value)
+{
+    ASSERT(m_iterator);
+    auto iterator = std::exchange(m_iterator, { });
+    return iterator->returnSteps(*JSC::jsCast<JSDOMGlobalObject*>(&globalObject), value)->promise();
+}
+
+template<typename JSWrapper, typename IteratorTraits>
+JSC::JSValue JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::returnMethod(JSC::JSGlobalObject& lexicalGlobalObject, JSC::JSValue value)
+{
+    JSC::VM& vm = lexicalGlobalObject.vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    auto returnPromiseCapability = JSC::JSPromise::createNewPromiseCapability(&lexicalGlobalObject, lexicalGlobalObject.promiseConstructor());
+    RETURN_IF_EXCEPTION(scope, { });
+
+    auto* returnPromise = jsDynamicCast<JSC::JSPromise*>(returnPromiseCapability.get(&lexicalGlobalObject, vm.propertyNames->promise));
+    RETURN_IF_EXCEPTION(scope, { });
+
+    if (m_ongoingPromise) {
+        auto afterOngoingPromiseCapability = JSC::JSPromise::createNewPromiseCapability(&lexicalGlobalObject, lexicalGlobalObject.promiseConstructor());
+        RETURN_IF_EXCEPTION(scope, { });
+
+        auto* promise = jsDynamicCast<JSC::JSPromise*>(afterOngoingPromiseCapability.get(&lexicalGlobalObject, vm.propertyNames->promise));
+        RETURN_IF_EXCEPTION(scope, { });
+
+        auto returnStepsValue = JSC::JSValue::encode(value);
+        auto onSettled = createOnSettledFunction(&lexicalGlobalObject, &returnStepsValue);
+        RETURN_IF_EXCEPTION(scope, { });
+
+        auto* ongoingPromise = m_ongoingPromise->promise();
+        ongoingPromise->performPromiseThenExported(vm, &lexicalGlobalObject, onSettled, onSettled, afterOngoingPromiseCapability);
+
+        m_ongoingPromise = DOMPromise::create(*this->globalObject(), *promise);
+    } else {
+        auto* promise = runReturnSteps(lexicalGlobalObject, value);
+        RETURN_IF_EXCEPTION(scope, { });
+
+        m_ongoingPromise = DOMPromise::create(*this->globalObject(), *promise);
+        return m_ongoingPromise->promise();
+    }
+
+    auto encodedValue = JSC::JSValue::encode(value);
+    JSC::ArgList boundArgs { &encodedValue, 1 };
+    auto onFulfilled = JSC::JSFunction::create(vm, &lexicalGlobalObject, 0, String(), onPromiseFulFilled, JSC::ImplementationVisibility::Public);
+    auto onFulfilledFunction = JSC::JSBoundFunction::create(vm, &lexicalGlobalObject, onFulfilled, this, WTFMove(boundArgs), 1, jsEmptyString(vm), JSC::makeSource("createOnReturnFulfilledFunction"_s, JSC::SourceOrigin(), JSC::SourceTaintedOrigin::Untainted));
+
+    m_ongoingPromise->promise()->performPromiseThenExported(vm, &lexicalGlobalObject, onFulfilledFunction, JSC::jsUndefined(), returnPromiseCapability);
+
+    return returnPromise;
+}
+
+template<typename JSWrapper, typename IteratorTraits>
+JSC::EncodedJSValue JSDOMAsyncIteratorPrototype<JSWrapper, IteratorTraits>::returnMethod(JSC::JSGlobalObject* globalObject, JSC::CallFrame* callFrame)
+{
+    JSC::VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    auto iterator = JSC::jsDynamicCast<JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>*>(callFrame->thisValue());
+    if (!iterator) {
+        auto returnPromiseCapability = JSC::JSPromise::createNewPromiseCapability(globalObject, globalObject->promiseConstructor());
+        RETURN_IF_EXCEPTION(scope, { });
+
+        auto* promise = jsDynamicCast<JSC::JSPromise*>(returnPromiseCapability.get(globalObject, vm.propertyNames->promise));
+        RETURN_IF_EXCEPTION(scope, { });
+
+        auto deferred = DeferredPromise::create(*JSC::jsCast<JSDOMGlobalObject*>(globalObject), *promise);
+        rejectPromiseWithThisTypeError(deferred, JSWrapper::info()->className, "return");
+        return JSC::JSValue::encode(promise);
+    }
+
+    return JSC::JSValue::encode(iterator->returnMethod(*globalObject, callFrame->argument(0)));
+}
+
+template<typename JSWrapper, typename IteratorTraits>
 void JSDOMAsyncIteratorPrototype<JSWrapper, IteratorTraits>::finishCreation(JSC::VM& vm, JSC::JSGlobalObject* globalObject)
 {
     Base::finishCreation(vm);
     ASSERT(inherits(info()));
 
     JSC_NATIVE_FUNCTION_WITHOUT_TRANSITION(vm.propertyNames->next, next, 0, 0, JSC::ImplementationVisibility::Public);
+    addReturnMethodIfNeeded<typename DOMWrapped::Iterator>(vm, globalObject);
     JSC_TO_STRING_TAG_WITHOUT_TRANSITION();
+}
+
+template<typename JSWrapper, typename IteratorTraits>
+template<HasAsyncIteratorReturn Iterator>
+void JSDOMAsyncIteratorPrototype<JSWrapper, IteratorTraits>::addReturnMethodIfNeeded(JSC::VM& vm, JSC::JSGlobalObject* globalObject)
+{
+    JSC_NATIVE_FUNCTION_WITHOUT_TRANSITION(vm.propertyNames->returnKeyword, returnMethod, 0, 1, JSC::ImplementationVisibility::Public);
 }
 
 }

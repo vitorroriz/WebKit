@@ -587,8 +587,8 @@ Ref<ReadableStream::Iterator> ReadableStream::Iterator::create(Ref<ReadableStrea
 
 ReadableStream::Iterator::Iterator(Ref<ReadableStreamDefaultReader>&& reader, bool preventCancel)
     : m_reader(WTFMove(reader))
+    , m_preventCancel(preventCancel)
 {
-    UNUSED_PARAM(preventCancel);
 }
 
 ReadableStream::Iterator::~Iterator() = default;
@@ -668,6 +668,25 @@ void ReadableStream::Iterator::next(Callback&& callback)
     }
 
     m_reader->read(*globalObject, ReadableStreamIteratorReadRequest::create(*context, m_reader.get(), WTFMove(callback)));
+}
+
+Ref<DOMPromise> ReadableStream::Iterator::returnSteps(JSDOMGlobalObject& globalObject, JSC::JSValue value)
+{
+    RefPtr stream = m_reader->stream();
+    ASSERT(stream);
+
+    ASSERT(!m_reader->getNumReadRequests());
+
+    if (!m_preventCancel) {
+        Ref domPromise = m_reader->genericCancel(globalObject, value);
+        m_reader->releaseLock(globalObject);
+        return domPromise;
+    }
+
+    m_reader->releaseLock(globalObject);
+    auto [promise, deferred] = createPromiseAndWrapper(globalObject);
+    deferred->resolve();
+    return promise;
 }
 
 // https://streams.spec.whatwg.org/#rs-asynciterator
