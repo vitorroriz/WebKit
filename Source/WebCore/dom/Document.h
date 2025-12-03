@@ -886,6 +886,7 @@ public:
 
     // https://wicg.github.io/nav-speculation/speculation-rules.html#consider-speculation
     void considerSpeculationRules();
+    void processSpeculationRules();
     Ref<const SpeculationRules> speculationRules() const;
     Ref<SpeculationRules> speculationRules();
 
@@ -2274,6 +2275,7 @@ private:
     const std::unique_ptr<Quirks> m_quirks;
 
     const Ref<SpeculationRules> m_speculationRules;
+    bool m_speculationRulesConsiderationScheduled { false };
 
     RefPtr<LocalDOMWindow> m_domWindow;
     WeakPtr<Document, WeakPtrImplWithEventTargetData> m_contextDocument;
