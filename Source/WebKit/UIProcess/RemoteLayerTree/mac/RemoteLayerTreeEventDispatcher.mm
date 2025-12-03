@@ -619,6 +619,10 @@ void RemoteLayerTreeEventDispatcher::renderingUpdateComplete()
 
     Locker locker { m_scrollingTreeLock };
 
+#if ENABLE(THREADED_ANIMATIONS)
+    updateAnimations();
+#endif
+
     if (m_state == SynchronizationState::InRenderingUpdate)
         m_stateCondition.notifyOne();
 
@@ -682,7 +686,7 @@ RefPtr<const RemoteAnimationTimeline> RemoteLayerTreeEventDispatcher::timeline(c
 
 void RemoteLayerTreeEventDispatcher::updateAnimations()
 {
-    ASSERT(!isMainRunLoop());
+    ASSERT(isMainRunLoop() || ScrollingThread::isCurrentThread());
     Locker lock { m_animationLock };
 
     // FIXME: Rather than using 'now' at the point this is called, we
@@ -694,7 +698,7 @@ void RemoteLayerTreeEventDispatcher::updateAnimations()
     auto animationStacks = std::exchange(m_animationStacks, { });
     for (auto [layerID, currentAnimationStack] : animationStacks) {
         Ref animationStack = currentAnimationStack;
-        animationStack->applyEffectsFromScrollingThread();
+        animationStack->applyEffects();
 
         // We can clear the effect stack if it's empty, but the previous
         // call to applyEffects() is important so that the base values
