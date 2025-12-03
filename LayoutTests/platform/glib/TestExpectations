@@ -1700,11 +1700,6 @@ imported/w3c/web-platform-tests/webcodecs/videoDecoder-codec-specific.https.any.
 imported/w3c/web-platform-tests/webcodecs/videoDecoder-codec-specific.https.any.worker.html?h265_annexb [ Failure ]
 imported/w3c/web-platform-tests/webcodecs/videoDecoder-codec-specific.https.any.worker.html?h265_hevc [ Pass ]
 
-webkit.org/b/303365 imported/w3c/web-platform-tests/webcodecs/video-encoder-rescaling.https.any.html?h264_annexb [ Crash ]
-webkit.org/b/303365 imported/w3c/web-platform-tests/webcodecs/video-encoder-rescaling.https.any.html?h264_avc [ Crash ]
-webkit.org/b/303365 imported/w3c/web-platform-tests/webcodecs/video-encoder-rescaling.https.any.worker.html?h264_annexb [ Crash ]
-webkit.org/b/303365 imported/w3c/web-platform-tests/webcodecs/video-encoder-rescaling.https.any.worker.html?h264_avc [ Crash ]
-
 imported/w3c/web-platform-tests/webcodecs/videoFrame-createImageBitmap.any.worker.html [ Pass ]
 imported/w3c/web-platform-tests/webcodecs/full-cycle-test.https.any.html?av1_444_high [ Pass ]
 imported/w3c/web-platform-tests/webcodecs/full-cycle-test.https.any.worker.html?av1_444_high [ Pass ]
