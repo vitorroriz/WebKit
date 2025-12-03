@@ -3669,7 +3669,7 @@ webkit.org/b/160246 fast/text/multiple-feature-properties.html [ ImageOnlyFailur
 webkit.org/b/160248 fast/text/combining-mark-paint.html [ ImageOnlyFailure ]
 webkit.org/b/160248 fast/text/synthetic-bold-transformed.html [ ImageOnlyFailure ]
 webkit.org/b/160249 fast/shrink-wrap/rect-shrink-wrap.html [ ImageOnlyFailure ]
-webkit.org/b/161583 accessibility/auto-fill-types.html [ Timeout ]
+webkit.org/b/161583 accessibility/auto-fill-types.html [ Failure ]
 webkit.org/b/162815 fast/text/variations/font-face-clamp.html [ ImageOnlyFailure ]
 webkit.org/b/162815 fast/text/variations/font-selection-properties.html [ ImageOnlyFailure ]
 webkit.org/b/162815 fast/text/variations/skia-postscript-name.html [ ImageOnlyFailure ]
