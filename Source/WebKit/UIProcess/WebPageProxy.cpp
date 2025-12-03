@@ -5434,10 +5434,10 @@ bool WebPageProxy::shouldClosePreviousPage(const ProvisionalPageProxy& provision
 {
     if (!protectedPreferences()->siteIsolationEnabled())
         return true;
-    RefPtr mainFrame = provisionalPage.mainFrame();
-    if (!mainFrame)
-        return true;
-    return !mainFrame->opener();
+
+    // Ownership has been transferred to RemotePageProxy.
+    Ref provisionalBrowsingContextGroup = provisionalPage.browsingContextGroup();
+    return !provisionalBrowsingContextGroup->remotePageInProcess(*this, protectedLegacyMainFrameProcess().get());
 }
 
 void WebPageProxy::destroyProvisionalPage()
@@ -9179,6 +9179,21 @@ void WebPageProxy::showPage()
 bool WebPageProxy::hasOpenedPage() const
 {
     return !internals().m_openedPages.isEmptyIgnoringNullReferences();
+}
+
+bool WebPageProxy::hasPageOpenedByMainFrame() const
+{
+    ASSERT(mainFrame());
+
+    for (Ref page : internals().m_openedPages) {
+        RefPtr openedFrame = page->mainFrame();
+        if (!openedFrame)
+            continue;
+        if (openedFrame->opener() == mainFrame())
+            return true;
+    }
+
+    return false;
 }
 
 void WebPageProxy::addOpenedPage(WebPageProxy& page)

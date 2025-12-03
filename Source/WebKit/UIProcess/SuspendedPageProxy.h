@@ -72,7 +72,7 @@ public:
     WebProcessProxy& process() const { return m_process.get(); }
     Ref<WebProcessProxy> protectedProcess() const { return process(); }
     WebFrameProxy& mainFrame() { return m_mainFrame.get(); }
-    BrowsingContextGroup& browsingContextGroup() { return m_browsingContextGroup.get(); }
+    const BrowsingContextGroup& browsingContextGroup() { return m_browsingContextGroup.get(); }
 
     WebBackForwardCache& backForwardCache() const;
     Ref<WebBackForwardCache> protectedBackForwardCache() const;
