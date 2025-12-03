@@ -129,8 +129,6 @@ set(JavaScriptCore_OBJECT_LUT_SOURCES
     runtime/TemporalPlainMonthDayPrototype.cpp
     runtime/TemporalPlainTimeConstructor.cpp
     runtime/TemporalPlainTimePrototype.cpp
-    runtime/TemporalPlainYearMonthConstructor.cpp
-    runtime/TemporalPlainYearMonthPrototype.cpp
     runtime/TemporalTimeZoneConstructor.cpp
     runtime/TemporalTimeZonePrototype.cpp
 

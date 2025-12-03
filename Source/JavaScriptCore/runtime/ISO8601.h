@@ -253,23 +253,6 @@ constexpr bool isYearWithinLimits(double year)
     return year >= minYear && year <= maxYear;
 }
 
-constexpr bool isYearWithinLimits(int32_t year)
-{
-    return year >= minYear && year <= maxYear;
-}
-
-// https://tc39.es/proposal-temporal/#sec-temporal-isoyearmonthwithinlimits
-constexpr bool isYearMonthWithinLimits(int32_t year, int32_t month)
-{
-    if (!isYearWithinLimits(year))
-        return false;
-    if (year == minYear && month < 4)
-        return false;
-    if (year == maxYear && month > 9)
-        return false;
-    return true;
-}
-
 // Note that PlainDate does not include week unit.
 // year can be negative. And month and day starts with 1.
 class PlainDate {
@@ -314,33 +297,17 @@ static_assert(sizeof(PlainDate) == sizeof(int32_t));
 using TimeZone = Variant<TimeZoneID, int64_t>;
 
 class PlainYearMonth final {
-    WTF_MAKE_TZONE_ALLOCATED(PlainYearMonth);
 public:
-    constexpr PlainYearMonth()
-        : m_isoPlainDate(0, 1, 1)
+    // Out-of-range years represented by outOfRangeYear, as with PlainDate
+    int32_t year : 21;
+    int32_t month : 5;
+    PlainYearMonth(int32_t y, int32_t m)
+        : year(y), month(m)
     {
+        ASSERT(isYearWithinLimits(year) || year == outOfRangeYear);
     }
-
-    constexpr PlainYearMonth(int32_t year, unsigned month)
-        : m_isoPlainDate(year, month, 1)
-    {
-    }
-
-    constexpr PlainYearMonth(PlainDate&& d)
-        : m_isoPlainDate(d)
-    {
-    }
-
-    friend bool operator==(const PlainYearMonth&, const PlainYearMonth&) = default;
-
-    int32_t year() const { return m_isoPlainDate.year(); }
-    uint8_t month() const { return m_isoPlainDate.month(); }
-
-    const PlainDate& isoPlainDate() const { return m_isoPlainDate; }
-private:
-    PlainDate m_isoPlainDate;
 };
-static_assert(sizeof(PlainYearMonth) == sizeof(PlainDate));
+static_assert(sizeof(PlainYearMonth) <= sizeof(int32_t));
 
 class PlainMonthDay {
     WTF_MAKE_TZONE_ALLOCATED(PlainMonthDay);
@@ -369,7 +336,6 @@ public:
 private:
     PlainDate m_isoPlainDate;
 };
-static_assert(sizeof(PlainYearMonth) == sizeof(PlainDate));
 
 // https://tc39.es/proposal-temporal/#sec-temporal-parsetemporaltimezonestring
 // Record { [[Z]], [[OffsetString]], [[Name]] }
