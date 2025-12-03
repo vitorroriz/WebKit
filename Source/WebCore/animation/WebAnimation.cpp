@@ -1523,12 +1523,13 @@ void WebAnimation::autoAlignStartTime()
     auto endOffset = interval.second;
 
     // 7. Set start time to start offset if effective playback rate ≥ 0, and end offset otherwise.
-    m_startTime = effectivePlaybackRate() >= 0 ? startOffset : endOffset;
+    auto previousStartTime = std::exchange(m_startTime, effectivePlaybackRate() >= 0 ? startOffset : endOffset);
 
     // 8. Clear hold time.
     m_holdTime = std::nullopt;
 
-    progressBasedTimelineSourceDidChangeMetrics();
+    if (previousStartTime != m_startTime)
+        progressBasedTimelineSourceDidChangeMetrics();
 }
 
 bool WebAnimation::needsTick() const

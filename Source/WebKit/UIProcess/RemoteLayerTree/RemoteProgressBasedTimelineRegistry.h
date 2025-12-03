@@ -33,13 +33,15 @@
 
 namespace WebKit {
 
+class RemoteScrollingTree;
+
 class RemoteProgressBasedTimelineRegistry {
     WTF_MAKE_TZONE_ALLOCATED(RemoteProgressBasedTimelineRegistry);
 public:
     RemoteProgressBasedTimelineRegistry() = default;
 
     bool isEmpty() const { return m_timelines.isEmpty(); }
-    void update(WebCore::ProcessIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>&);
+    void update(const RemoteScrollingTree&, WebCore::ProcessIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>&);
     RemoteProgressBasedTimeline* get(const TimelineID&) const;
     void updateTimelinesForNode(const WebCore::ScrollingTreeScrollingNode&);
     bool hasTimelineForNode(const WebCore::ScrollingTreeScrollingNode&) const;

@@ -28,6 +28,7 @@
 
 #if ENABLE(THREADED_ANIMATIONS)
 
+#import "RemoteScrollingTree.h"
 #import <WebCore/ScrollingTreeScrollingNode.h>
 #import <wtf/TZoneMallocInlines.h>
 
@@ -35,7 +36,7 @@ namespace WebKit {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteProgressBasedTimelineRegistry);
 
-void RemoteProgressBasedTimelineRegistry::update(WebCore::ProcessIdentifier processIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>& timelineRepresentations)
+void RemoteProgressBasedTimelineRegistry::update(const RemoteScrollingTree& scrollingTree, WebCore::ProcessIdentifier processIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>& timelineRepresentations)
 {
     // If there are no active timelines for this process identifier, simply remove that entry.
     if (timelineRepresentations.isEmpty()) {
@@ -55,6 +56,10 @@ void RemoteProgressBasedTimelineRegistry::update(WebCore::ProcessIdentifier proc
         ASSERT(timelineRepresentation->progressResolutionData());
         auto resolutionData = *timelineRepresentation->progressResolutionData();
 
+        // FIXME: we should make it so by the time this function is called we're
+        // guaranteed to have a matching source node and turn this into a Ref.
+        RefPtr sourceNode = dynamicDowncast<WebCore::ScrollingTreeScrollingNode>(Ref { scrollingTree }->nodeForID(resolutionData.source));
+
         auto done = false;
 
         auto sourceIterator = processTimelines.find(resolutionData.source);
@@ -62,7 +67,7 @@ void RemoteProgressBasedTimelineRegistry::update(WebCore::ProcessIdentifier proc
             auto& existingTimelines = sourceIterator->value;
             for (auto& existingTimeline : existingTimelines) {
                 if (existingTimeline->identifier() == timelineID) {
-                    existingTimeline->setResolutionData(resolutionData);
+                    existingTimeline->setResolutionData(sourceNode.get(), resolutionData);
                     done = true;
                     break;
                 }
@@ -88,7 +93,7 @@ void RemoteProgressBasedTimelineRegistry::update(WebCore::ProcessIdentifier proc
 
             ASSERT(matchingTimelines.size() == 1);
             auto& existingTimeline = matchingTimelines[0];
-            existingTimeline->setResolutionData(resolutionData);
+            existingTimeline->setResolutionData(sourceNode.get(), resolutionData);
             // Move it to the right source.
             processTimelines.ensure(existingTimeline->source(), [] {
                 return HashSet<Ref<RemoteProgressBasedTimeline>> { };

@@ -49,6 +49,15 @@ RemoteProgressBasedTimeline::RemoteProgressBasedTimeline(TimelineID identifier, 
     updateCurrentTime();
 }
 
+void RemoteProgressBasedTimeline::setResolutionData(const WebCore::ScrollingTreeScrollingNode* node, WebCore::ProgressResolutionData resolutionData)
+{
+    m_resolutionData = resolutionData;
+    if (node)
+        updateCurrentTime(*node);
+    else
+        updateCurrentTime();
+}
+
 void RemoteProgressBasedTimeline::updateCurrentTime(const WebCore::ScrollingTreeScrollingNode& node)
 {
     auto unconstrainedScrollOffset = m_resolutionData.isVertical ? node.currentScrollOffset().y() : node.currentScrollOffset().x();

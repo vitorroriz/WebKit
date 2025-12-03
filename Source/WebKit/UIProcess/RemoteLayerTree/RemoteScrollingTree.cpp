@@ -304,7 +304,7 @@ void RemoteScrollingTree::updateTimelineRegistration(WebCore::ProcessIdentifier 
 {
     if (!m_progressBasedTimelineRegistry)
         m_progressBasedTimelineRegistry = makeUnique<RemoteProgressBasedTimelineRegistry>();
-    m_progressBasedTimelineRegistry->update(processIdentifier, timelineRepresentations);
+    m_progressBasedTimelineRegistry->update(*this, processIdentifier, timelineRepresentations);
     if (m_progressBasedTimelineRegistry->isEmpty())
         m_progressBasedTimelineRegistry = nullptr;
 }
