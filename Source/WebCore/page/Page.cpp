@@ -4927,8 +4927,6 @@ OptionSet<FilterRenderingMode> Page::preferredFilterRenderingModes(const Graphic
 #endif
         if (settings().graphicsContextFiltersEnabled())
             modes.add(FilterRenderingMode::GraphicsContext);
-        if (settings().graphicsContextBlurFilterEnabled())
-            modes.add(FilterRenderingMode::GraphicsContextBlur);
 #if !HAVE(FIX_FOR_RADAR_104392017)
     }
 #endif
