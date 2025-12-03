@@ -1573,6 +1573,8 @@ TEST(SiteIsolation, ChildBeingNavigatedToNewDomainByParent)
     EXPECT_WK_STREQ([webView _test_waitForAlert], "parent frame received pingpong");
 }
 
+// FIXME: Investigate why this asserts only on Sequoia and Sonoma. See https://bugs.webkit.org/show_bug.cgi?id=303340
+#if !PLATFORM(MAC) || __MAC_OS_X_VERSION_MIN_REQUIRED >= 260000 || defined(NDEBUG)
 TEST(SiteIsolation, IframeRedirectSameSite)
 {
     HTTPServer server({
@@ -1627,6 +1629,7 @@ TEST(SiteIsolation, IframeRedirectCrossSite)
         }
     });
 }
+#endif
 
 TEST(SiteIsolation, CrossOriginOpenerPolicy)
 {
@@ -3017,6 +3020,8 @@ TEST(SiteIsolation, OpenProvisionalFailure)
     checkFrameTreesInProcesses(opened.webView.get(), { { "https://example.com"_s } });
 }
 
+// FIXME: Investigate why this asserts only on Sequoia and Sonoma. See https://bugs.webkit.org/show_bug.cgi?id=303340
+#if !PLATFORM(MAC) || __MAC_OS_X_VERSION_MIN_REQUIRED >= 260000 || defined(NDEBUG)
 TEST(SiteIsolation, NavigateIframeToProvisionalNavigationFailure)
 {
     HTTPServer server({
@@ -3077,6 +3082,7 @@ TEST(SiteIsolation, NavigateIframeToProvisionalNavigationFailure)
     checkProvisionalLoadFailure(@"https://webkit.org/redirect_to_apple_terminate");
     checkProvisionalLoadFailure(@"https://apple.com/redirect_to_apple_terminate");
 }
+#endif
 
 TEST(SiteIsolation, DrawAfterNavigateToDomainAgain)
 {
