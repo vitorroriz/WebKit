@@ -6845,6 +6845,8 @@ imported/w3c/web-platform-tests/webtransport/idlharness.https.any.html [ Failure
 imported/w3c/web-platform-tests/webtransport/idlharness.https.any.serviceworker.html [ Failure ]
 imported/w3c/web-platform-tests/webtransport/idlharness.https.any.sharedworker.html [ Failure ]
 imported/w3c/web-platform-tests/webtransport/idlharness.https.any.worker.html [ Failure ]
+imported/w3c/web-platform-tests/webtransport/datagram-cancel-crash.https.window.html [ Skip ]
+imported/w3c/web-platform-tests/webtransport/in-removed-iframe.https.html [ Skip ]
 
 # Some of Canvas Layer API features are not supported yet.
 imported/w3c/web-platform-tests/html/canvas/element/layers/2d.layer.anisotropic-blur.isotropic.html [ ImageOnlyFailure ]

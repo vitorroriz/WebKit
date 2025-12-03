@@ -72,6 +72,12 @@
 #define Modelelement_feature_status Testable
 #endif
 
+#if HAVE(COMPLETE_WEB_TRANSPORT)
+#define Web_transport_status Stable
+#else
+#define Web_transport_status Testable
+#endif
+
 namespace WebKit {
 
 #if HAVE(LIQUID_GLASS)
