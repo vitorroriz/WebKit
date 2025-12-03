@@ -2017,7 +2017,7 @@ void HTMLConverter::_exitElement(Element& element, NSInteger depth, NSUInteger s
         NSTextTableBlock *block;
         NSMutableArray *rowArray = [_textTableRowArrays lastObject], *previousRowArray;
         NSUInteger i, count;
-        NSInteger numberOfColumns = [table numberOfColumns];
+        auto numberOfColumns = [table numberOfColumns];
         NSInteger openColumn;
         NSInteger rowNumber = [[_textTableRows lastObject] integerValue];
         do {
@@ -2027,8 +2027,11 @@ void HTMLConverter::_exitElement(Element& element, NSInteger depth, NSUInteger s
             count = [previousRowArray count];
             for (i = 0; i < count; i++) {
                 block = [previousRowArray objectAtIndex:i];
-                if ([block startingColumn] + [block columnSpan] > numberOfColumns) numberOfColumns = [block startingColumn] + [block columnSpan];
-                if ([block startingRow] + [block rowSpan] > rowNumber) [rowArray addObject:block];
+                if ([block startingColumn] + [block columnSpan] > static_cast<NSInteger>(numberOfColumns))
+                    numberOfColumns = [block startingColumn] + [block columnSpan];
+
+                if ([block startingRow] + [block rowSpan] > rowNumber)
+                    [rowArray addObject:block];
             }
             count = [rowArray count];
             openColumn = 0;
@@ -2036,8 +2039,8 @@ void HTMLConverter::_exitElement(Element& element, NSInteger depth, NSUInteger s
                 block = [rowArray objectAtIndex:i];
                 if (openColumn >= [block startingColumn] && openColumn < [block startingColumn] + [block columnSpan]) openColumn = [block startingColumn] + [block columnSpan];
             }
-        } while (openColumn >= numberOfColumns);
-        if ((NSUInteger)numberOfColumns > [table numberOfColumns])
+        } while (openColumn >= static_cast<NSInteger>(numberOfColumns));
+        if (numberOfColumns > [table numberOfColumns])
             [table setNumberOfColumns:numberOfColumns];
         [_textTableRows removeLastObject];
         [_textTableRows addObject:[NSNumber numberWithInteger:rowNumber]];

@@ -619,7 +619,7 @@ inline static ParagraphStyle extractParagraphStyle(NSParagraphStyle *style, Tabl
                     [nsTable borderColorForEdge:NSRectEdgeMaxY]
                 },
                 tableID,
-                [nsTable numberOfColumns],
+                static_cast<uint64_t>([nsTable numberOfColumns]),
                 extractTextTableLayoutAlgorithm([nsTable layoutAlgorithm]),
                 !![nsTable collapsesBorders],
                 !![nsTable hidesEmptyCells],
