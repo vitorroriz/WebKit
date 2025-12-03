@@ -1463,8 +1463,18 @@ void WebProcessProxy::didFinishLaunching(ProcessLauncher* launcher, IPC::Connect
 
 #if USE(RUNNINGBOARD) && PLATFORM(MAC)
     for (Ref page : mainPages()) {
-        if (page->preferences().backgroundWebContentRunningBoardThrottlingEnabled())
+        if (page->preferences().backgroundWebContentRunningBoardThrottlingEnabled()) {
             setRunningBoardThrottlingEnabled();
+            break;
+        }
+    }
+    for (auto& weakRemotePage : remotePages()) {
+        if (RefPtr remotePage = weakRemotePage.get()) {
+            if (remotePage->protectedPage()->preferences().backgroundWebContentRunningBoardThrottlingEnabled()) {
+                setRunningBoardThrottlingEnabled();
+                break;
+            }
+        }
     }
 #endif // USE(RUNNINGBOARD) && PLATFORM(MAC)
 

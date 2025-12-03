@@ -99,6 +99,11 @@ void RemotePageProxy::injectPageIntoNewProcess()
         return;
     }
 
+#if PLATFORM(MAC) && USE(RUNNINGBOARD)
+    if (page->preferences().backgroundWebContentRunningBoardThrottlingEnabled())
+        m_process->setRunningBoardThrottlingEnabled();
+#endif
+
     Ref drawingArea = *page->drawingArea();
     m_drawingArea = RemotePageDrawingAreaProxy::create(drawingArea.get(), m_process);
 #if ENABLE(FULLSCREEN_API)
