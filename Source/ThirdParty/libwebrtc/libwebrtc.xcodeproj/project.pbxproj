@@ -2362,6 +2362,8 @@
 		4197E3BF2B6AA1E10005C4B8 /* h265_inline.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4197E3BB2B6AA1E00005C4B8 /* h265_inline.cc */; };
 		4197E3C02B6AA1E10005C4B8 /* h265_bitstream_parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4197E3BC2B6AA1E00005C4B8 /* h265_bitstream_parser.cc */; };
 		4197E3C12B6AA1E10005C4B8 /* h265_inline.h in Headers */ = {isa = PBXBuildFile; fileRef = 4197E3BD2B6AA1E00005C4B8 /* h265_inline.h */; };
+		4198F2E72EDF260400D66067 /* resize_and_overwrite.h in Headers */ = {isa = PBXBuildFile; fileRef = 4198F2E62EDF260400D66067 /* resize_and_overwrite.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4198F2E82EDF261D00D66067 /* nullability_traits.h in Headers */ = {isa = PBXBuildFile; fileRef = 4198F2E52EDF25E100D66067 /* nullability_traits.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		419BA9AD2B15EEF600E0D825 /* vpx_config.h in Headers */ = {isa = PBXBuildFile; fileRef = 419BA9A62B15EEF400E0D825 /* vpx_config.h */; };
 		419BA9AF2B15EEF600E0D825 /* vp8_rtcd.h in Headers */ = {isa = PBXBuildFile; fileRef = 419BA9A82B15EEF500E0D825 /* vp8_rtcd.h */; };
 		419BA9B02B15EEF600E0D825 /* vpx_dsp_rtcd.h in Headers */ = {isa = PBXBuildFile; fileRef = 419BA9A92B15EEF500E0D825 /* vpx_dsp_rtcd.h */; };
@@ -4643,7 +4645,6 @@
 		DD2E767C27C6B61400F2A74C /* exception_safety_testing.h in Headers */ = {isa = PBXBuildFile; fileRef = DDF3090427C56D26006A526F /* exception_safety_testing.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DD2E767D27C6B61400F2A74C /* exception_testing.h in Headers */ = {isa = PBXBuildFile; fileRef = DDF3090727C56D26006A526F /* exception_testing.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DD2E768027C6B61400F2A74C /* hide_ptr.h in Headers */ = {isa = PBXBuildFile; fileRef = DDF3090227C56D25006A526F /* hide_ptr.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DD2E768127C6B61400F2A74C /* identity.h in Headers */ = {isa = PBXBuildFile; fileRef = DDF3090627C56D26006A526F /* identity.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DD2E768527C6B61400F2A74C /* low_level_alloc.h in Headers */ = {isa = PBXBuildFile; fileRef = DDF3090E27C56D27006A526F /* low_level_alloc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DD2E768627C6B61400F2A74C /* low_level_scheduling.h in Headers */ = {isa = PBXBuildFile; fileRef = DDF3090127C56D25006A526F /* low_level_scheduling.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DD2E768727C6B61400F2A74C /* per_thread_tls.h in Headers */ = {isa = PBXBuildFile; fileRef = DDF308FC27C56D25006A526F /* per_thread_tls.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -8482,6 +8483,8 @@
 		4197E3BB2B6AA1E00005C4B8 /* h265_inline.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = h265_inline.cc; sourceTree = "<group>"; };
 		4197E3BC2B6AA1E00005C4B8 /* h265_bitstream_parser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = h265_bitstream_parser.cc; sourceTree = "<group>"; };
 		4197E3BD2B6AA1E00005C4B8 /* h265_inline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = h265_inline.h; sourceTree = "<group>"; };
+		4198F2E52EDF25E100D66067 /* nullability_traits.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nullability_traits.h; sourceTree = "<group>"; };
+		4198F2E62EDF260400D66067 /* resize_and_overwrite.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = resize_and_overwrite.h; sourceTree = "<group>"; };
 		419BA9A52B15EEF400E0D825 /* vpx_config.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = vpx_config.asm; sourceTree = "<group>"; };
 		419BA9A62B15EEF400E0D825 /* vpx_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vpx_config.h; sourceTree = "<group>"; };
 		419BA9A72B15EEF500E0D825 /* vpx_config.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vpx_config.c; sourceTree = "<group>"; };
@@ -11139,7 +11142,6 @@
 		DDF3090327C56D25006A526F /* atomic_hook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = atomic_hook.h; sourceTree = "<group>"; };
 		DDF3090427C56D26006A526F /* exception_safety_testing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exception_safety_testing.h; sourceTree = "<group>"; };
 		DDF3090527C56D26006A526F /* tsan_mutex_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tsan_mutex_interface.h; sourceTree = "<group>"; };
-		DDF3090627C56D26006A526F /* identity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = identity.h; sourceTree = "<group>"; };
 		DDF3090727C56D26006A526F /* exception_testing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exception_testing.h; sourceTree = "<group>"; };
 		DDF3090827C56D26006A526F /* errno_saver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = errno_saver.h; sourceTree = "<group>"; };
 		DDF3090927C56D26006A526F /* pretty_function.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pretty_function.h; sourceTree = "<group>"; };
@@ -12176,6 +12178,7 @@
 				41FCBB3B21B1FD3F00A5DF27 /* match.h */,
 				419F6DCE2D0AF2670078433D /* numbers.cc */,
 				DDF3097C27C593CC006A526F /* numbers.h */,
+				4198F2E62EDF260400D66067 /* resize_and_overwrite.h */,
 				41BDE3E92E013D6B00142A13 /* str_cat.cc */,
 				DDF3097727C593CB006A526F /* str_cat.h */,
 				DDF3097527C593CB006A526F /* str_format.h */,
@@ -17067,11 +17070,11 @@
 				DDF3090427C56D26006A526F /* exception_safety_testing.h */,
 				DDF3090727C56D26006A526F /* exception_testing.h */,
 				DDF3090227C56D25006A526F /* hide_ptr.h */,
-				DDF3090627C56D26006A526F /* identity.h */,
 				417E07762E71CB7200CFBD88 /* iterator_traits.h */,
 				41BDE42E2E0140E200142A13 /* low_level_alloc.cc */,
 				DDF3090E27C56D27006A526F /* low_level_alloc.h */,
 				DDF3090127C56D25006A526F /* low_level_scheduling.h */,
+				4198F2E52EDF25E100D66067 /* nullability_traits.h */,
 				DDF308FC27C56D25006A526F /* per_thread_tls.h */,
 				DDF3090927C56D26006A526F /* pretty_function.h */,
 				41A08BCA2126961F001D5D7B /* raw_logging.cc */,
@@ -21880,7 +21883,6 @@
 				DD77E19D27F75D8F00DC90C0 /* hashtable_debug.h in Headers */,
 				DD77E1AF27F75D8F00DC90C0 /* hashtable_debug_hooks.h in Headers */,
 				DD2E768027C6B61400F2A74C /* hide_ptr.h in Headers */,
-				DD2E768127C6B61400F2A74C /* identity.h in Headers */,
 				DD77E19F27F75D8F00DC90C0 /* inlined_vector.h in Headers */,
 				DD2E76AB27C6B61400F2A74C /* inlined_vector.h in Headers */,
 				DD77DFD927F6731400DC90C0 /* int128.h in Headers */,
@@ -21904,6 +21906,7 @@
 				DD2E76AD27C6B61400F2A74C /* node_hash_set.h in Headers */,
 				DD77DFF727F6731400DC90C0 /* notification.h in Headers */,
 				41D012602B1E09C700B05388 /* nullability.h in Headers */,
+				4198F2E82EDF261D00D66067 /* nullability_traits.h in Headers */,
 				DD2E76D327C6B61400F2A74C /* numbers.h in Headers */,
 				DD2E769E27C6B61400F2A74C /* optimization.h in Headers */,
 				DD2E76E427C6B61400F2A74C /* optional.h in Headers */,
@@ -21923,6 +21926,7 @@
 				DD2E76A327C6B61400F2A74C /* raw_logging.h in Headers */,
 				DD77E07D27F6731500DC90C0 /* reflection.h in Headers */,
 				419F6DF92D0B1D520078433D /* representation.h in Headers */,
+				4198F2E72EDF260400D66067 /* resize_and_overwrite.h in Headers */,
 				DD2E76C427C6B61400F2A74C /* resize_uninitialized.h in Headers */,
 				DD2E768A27C6B61400F2A74C /* scheduling_mode.h in Headers */,
 				DD2E768B27C6B61400F2A74C /* scoped_set_env.h in Headers */,
