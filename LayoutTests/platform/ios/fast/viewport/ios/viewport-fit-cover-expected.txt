@@ -1,4 +1,6 @@
-Viewport: width=device-width, shrink-to-fit=no
+Viewport: initial-scale=1, viewport-fit=cover
+
+Window Size: 768 x 1004
 
 scale	1.00000
 maxScale	5.00000

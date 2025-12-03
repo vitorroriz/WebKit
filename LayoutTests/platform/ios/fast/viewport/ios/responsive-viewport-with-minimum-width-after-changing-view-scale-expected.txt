@@ -1,17 +1,16 @@
 setViewScale(1.00)
-window size: [390, 797]
+window size: [768, 1004]
 zoom scale: 1.00
 
 setViewScale(2.00)
-window size: [195, 399]
+window size: [384, 502]
 zoom scale: 2.00
 
 setViewScale(2.50)
-window size: [156, 319]
+window size: [307, 401]
 zoom scale: 2.50
 
 setViewScale(1.00)
-window size: [390, 797]
+window size: [768, 1004]
 zoom scale: 1.00
-
 
