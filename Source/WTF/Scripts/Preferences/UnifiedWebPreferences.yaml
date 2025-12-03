@@ -9800,10 +9800,13 @@ WebTransportEnabled:
   humanReadableDescription: "Enable WebTransport"
   defaultValue:
     WebKitLegacy:
+      "HAVE(COMPLETE_WEB_TRANSPORT)": true
       default: false
     WebKit:
+      "HAVE(COMPLETE_WEB_TRANSPORT)": true
       default: false
     WebCore:
+      "HAVE(COMPLETE_WEB_TRANSPORT)": true
       default: false
   sharedPreferenceForWebProcess: true
   richJavaScript: true
