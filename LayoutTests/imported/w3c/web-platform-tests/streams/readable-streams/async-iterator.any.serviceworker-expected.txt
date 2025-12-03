@@ -5,7 +5,7 @@ PASS Async-iterating a pull source
 PASS Async-iterating a push source with undefined values
 PASS Async-iterating a pull source with undefined values
 PASS Async-iterating a pull source manually
-FAIL Async-iterating an errored stream throws assert_equals: expected (string) "e" but got (object) object "TypeError: Type error"
+PASS Async-iterating an errored stream throws
 PASS Async-iterating a closed stream never executes the loop body, but works fine
 PASS Async-iterating an empty but not closed/errored stream never executes the loop body and stalls the async function
 PASS Async-iterating a partially consumed stream
@@ -17,13 +17,13 @@ PASS Cancellation behavior when returning inside loop body; preventCancel = fals
 PASS Cancellation behavior when returning inside loop body; preventCancel = true
 PASS Cancellation behavior when manually calling return(); preventCancel = false
 PASS Cancellation behavior when manually calling return(); preventCancel = true
-FAIL next() rejects if the stream errors promise_rejects_exactly: 2nd next() function "function() { throw e; }" threw object "TypeError: Type error" but we expected it to throw object "Error: error1"
+PASS next() rejects if the stream errors
 PASS return() does not rejects if the stream has not errored yet
 PASS return() rejects if the stream has errored
-FAIL next() that succeeds; next() that reports an error; next() promise_rejects_exactly: 2nd next() function "function() { throw e; }" threw object "TypeError: Type error" but we expected it to throw object "Error: error1"
-FAIL next() that succeeds; next() that reports an error(); next() [no awaiting] assert_equals: 2nd next() rejection reason expected object "Error: error1" but got object "TypeError: Type error"
-FAIL next() that succeeds; next() that reports an error(); return() promise_rejects_exactly: 2nd next() function "function() { throw e; }" threw object "TypeError: Type error" but we expected it to throw object "Error: error1"
-FAIL next() that succeeds; next() that reports an error(); return() [no awaiting] assert_equals: 2nd next() rejection reason expected object "Error: error1" but got object "TypeError: Type error"
+PASS next() that succeeds; next() that reports an error; next()
+PASS next() that succeeds; next() that reports an error(); next() [no awaiting]
+PASS next() that succeeds; next() that reports an error(); return()
+PASS next() that succeeds; next() that reports an error(); return() [no awaiting]
 PASS next() that succeeds; return()
 PASS next() that succeeds; return() [no awaiting]
 PASS return(); next()
@@ -34,7 +34,7 @@ PASS return(); return()
 PASS return(); return() [no awaiting]
 PASS values() throws if there's already a lock
 PASS Acquiring a reader after exhaustively async-iterating a stream
-FAIL Acquiring a reader after return()ing from a stream that errors promise_rejects_exactly: 2nd next() function "function() { throw e; }" threw object "TypeError: Type error" but we expected it to throw object "Error: error1"
+PASS Acquiring a reader after return()ing from a stream that errors
 PASS Acquiring a reader after partially async-iterating a stream
 PASS Acquiring a reader and reading the remaining chunks after partially async-iterating a stream with preventCancel = true
 PASS return() should unlock the stream synchronously when preventCancel = false

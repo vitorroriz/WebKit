@@ -44,6 +44,12 @@ concept HasAsyncIteratorReturn = requires(Iterator iterator, JSDOMGlobalObject& 
     { iterator.returnSteps(globalObject, JSC::JSValue { }) } -> std::same_as<Ref<DOMPromise>>;
 };
 
+template<typename Iterator>
+concept IsAsyncIteratorNextReturningPromise = requires(Iterator iterator, JSDOMGlobalObject& globalObject)
+{
+    { iterator.next(globalObject) } -> std::same_as<Ref<DOMPromise>>;
+};
+
 // https://webidl.spec.whatwg.org/#es-asynchronous-iterator-prototype-object
 template<typename JSWrapper, typename IteratorTraits> class JSDOMAsyncIteratorPrototype final : public JSC::JSNonFinalObject {
 public:
@@ -110,6 +116,10 @@ public:
     
     JSC::JSValue next(JSC::JSGlobalObject&);
     JSC::JSPromise* runNextSteps(JSC::JSGlobalObject&);
+
+    template<typename Iterator>
+    JSC::JSPromise* getNextIterationResult(JSC::JSGlobalObject&);
+    template<IsAsyncIteratorNextReturningPromise Iterator>
     JSC::JSPromise* getNextIterationResult(JSC::JSGlobalObject&);
 
     JSC::JSValue returnMethod(JSC::JSGlobalObject&, JSC::JSValue);
@@ -253,7 +263,7 @@ JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::runNextSteps(
         return promise;
     }
 
-    auto nextPromise = getNextIterationResult(globalObject);
+    auto nextPromise = getNextIterationResult<typename DOMWrapped::Iterator>(globalObject);
     RETURN_IF_EXCEPTION(scope, nullptr);
 
     auto onFulfilled = createOnFulfilledFunction(&globalObject);
@@ -266,6 +276,7 @@ JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::runNextSteps(
 }
 
 template<typename JSWrapper, typename IteratorTraits>
+template<typename Iterator>
 JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::getNextIterationResult(JSC::JSGlobalObject& globalObject)
 {
     JSC::VM& vm = JSC::getVM(&globalObject);
@@ -297,6 +308,22 @@ JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::getNextIterat
     });
 
     return promise;
+}
+
+template<typename JSWrapper, typename IteratorTraits>
+template<IsAsyncIteratorNextReturningPromise Iterator>
+JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::getNextIterationResult(JSC::JSGlobalObject& globalObject)
+{
+    Ref promise = Ref { *m_iterator }->next(*JSC::jsCast<JSDOMGlobalObject*>(&globalObject));
+    promise->whenSettled([weakIterator = WeakPtr { *m_iterator }, weakIsFinished = WeakPtr(m_isFinished)] {
+        RefPtr isFinished = weakIsFinished.get();
+        if (!isFinished)
+            return;
+        RefPtr iterator = weakIterator.get();
+        if (iterator && iterator->isFinished())
+            isFinished->markAsFinished();
+    });
+    return promise->promise();
 }
 
 template<typename JSWrapper, typename IteratorTraits>

@@ -595,26 +595,20 @@ ReadableStream::Iterator::~Iterator() = default;
 
 class ReadableStreamIteratorReadRequest : public ReadableStreamReadRequest {
 public:
-    using Callback = ReadableStream::Iterator::Callback;
-    static Ref<ReadableStreamIteratorReadRequest> create(ScriptExecutionContext& context, ReadableStreamDefaultReader& reader, Callback&& callback) { return adoptRef(*new ReadableStreamIteratorReadRequest(context, reader,  WTFMove(callback))); }
+    static Ref<ReadableStreamIteratorReadRequest> create(ReadableStreamDefaultReader& reader, Ref<DeferredPromise>&& promise) { return adoptRef(*new ReadableStreamIteratorReadRequest(reader,  WTFMove(promise))); }
 
-    ~ReadableStreamIteratorReadRequest()
-    {
-        if (auto callback = std::exchange(m_callback, { }))
-            callback({ std::nullopt });
-    }
+    ~ReadableStreamIteratorReadRequest() = default;
 
 private:
-    ReadableStreamIteratorReadRequest(ScriptExecutionContext& context, ReadableStreamDefaultReader& reader, Callback&& callback)
-        : m_context(context)
-        , m_reader(reader)
-        , m_callback(WTFMove(callback))
+    ReadableStreamIteratorReadRequest(ReadableStreamDefaultReader& reader, Ref<DeferredPromise>&& promise)
+        : m_reader(reader)
+        , m_promise(WTFMove(promise))
     {
     }
 
     void runChunkSteps(JSC::JSValue value) final
     {
-        m_callback({ value });
+        m_promise->resolveWithJSValue(value);
     }
 
     void runCloseSteps() final
@@ -623,16 +617,16 @@ private:
             if (auto* globalObject = this->globalObject())
                 reader->releaseLock(*globalObject);
         }
-        m_callback({ std::nullopt });
+        m_promise->resolve();
     }
 
-    void runErrorSteps(JSC::JSValue) final
+    void runErrorSteps(JSC::JSValue value) final
     {
         if (RefPtr reader = m_reader.get()) {
             if (auto* globalObject = this->globalObject())
                 reader->releaseLock(*globalObject);
         }
-        m_callback(Exception { ExceptionCode::TypeError });
+        m_promise->rejectWithCallback([&value](auto&) { return value; });
     }
 
     void runErrorSteps(Exception&& exception) final
@@ -641,33 +635,30 @@ private:
             if (auto* globalObject = this->globalObject())
                 reader->releaseLock(*globalObject);
         }
-        m_callback(WTFMove(exception));
+        m_promise->reject(WTFMove(exception));
     }
 
     JSDOMGlobalObject* globalObject() final
     {
-        RefPtr context = m_context.get();
-        return context ? JSC::jsCast<JSDOMGlobalObject*>(context->globalObject()) : nullptr;
+        return m_promise->globalObject();
     }
 
-    WeakPtr<ScriptExecutionContext> m_context;
     WeakPtr<ReadableStreamDefaultReader> m_reader;
-    Callback m_callback;
+    const Ref<DeferredPromise> m_promise;
 };
 
-void ReadableStream::Iterator::next(Callback&& callback)
+Ref<DOMPromise> ReadableStream::Iterator::next(JSDOMGlobalObject& globalObject)
 {
-    RefPtr stream = m_reader->stream();
-    ASSERT(stream);
+    ASSERT(m_reader->stream());
 
-    RefPtr context = stream->scriptExecutionContext();
-    auto* globalObject = context ? JSC::jsCast<JSDOMGlobalObject*>(context->globalObject()) : nullptr;
-    if (!globalObject) {
-        callback(Exception { ExceptionCode::InvalidStateError, "No context available"_s });
-        return;
-    }
+    auto [promise, deferred] = createPromiseAndWrapper(globalObject);
+    m_reader->read(globalObject, ReadableStreamIteratorReadRequest::create(m_reader.get(), WTFMove(deferred)));
+    return promise;
+}
 
-    m_reader->read(*globalObject, ReadableStreamIteratorReadRequest::create(*context, m_reader.get(), WTFMove(callback)));
+bool ReadableStream::Iterator::isFinished() const
+{
+    return !m_reader->stream();
 }
 
 Ref<DOMPromise> ReadableStream::Iterator::returnSteps(JSDOMGlobalObject& globalObject, JSC::JSValue value)

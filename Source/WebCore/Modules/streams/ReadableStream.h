@@ -151,15 +151,13 @@ public:
 
     JSDOMGlobalObject* globalObject();
 
-    class Iterator : public RefCounted<Iterator> {
+    class Iterator : public RefCountedAndCanMakeWeakPtr<Iterator> {
     public:
         static Ref<Iterator> create(Ref<ReadableStreamDefaultReader>&&, bool preventCancel);
         ~Iterator();
 
-        using Result = std::optional<JSC::JSValue>;
-        using Callback = CompletionHandler<void(ExceptionOr<Result>&&)>;
-        void next(Callback&&);
-
+        Ref<DOMPromise> next(JSDOMGlobalObject&);
+        bool isFinished() const;
         Ref<DOMPromise> returnSteps(JSDOMGlobalObject&, JSC::JSValue);
 
     private:
