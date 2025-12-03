@@ -283,12 +283,15 @@ ExceptionOr<Vector<Ref<ReadableStream>>> byteStreamTee(JSDOMGlobalObject& global
         return Ref { state->cancelPromise() };
     };
 
+    auto isSourceReachableFromOpaqueRoot = stream.isReachableFromOpaqueRoots() ? ReadableStream::IsSourceReachableFromOpaqueRoot::Yes : ReadableStream::IsSourceReachableFromOpaqueRoot::No;
     Vector<Ref<ReadableStream>> branches;
     Ref branch0 = ReadableStream::createReadableByteStream(globalObject, WTFMove(pull1Algorithm), WTFMove(cancel1Algorithm), {
-        .dependencyToVisit = state.ptr()
+        .dependencyToVisit = state.ptr(),
+        .isSourceReachableFromOpaqueRoot = isSourceReachableFromOpaqueRoot
     });
     Ref branch1 = ReadableStream::createReadableByteStream(globalObject, WTFMove(pull2Algorithm), WTFMove(cancel2Algorithm), {
-        .dependencyToVisit = state.ptr()
+        .dependencyToVisit = state.ptr(),
+        .isSourceReachableFromOpaqueRoot = isSourceReachableFromOpaqueRoot
     });
 
     state->setBranch1(branch0);

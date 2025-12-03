@@ -164,9 +164,9 @@ Ref<ReadableStream> ReadableStream::create(Ref<InternalReadableStream>&& interna
     return adoptRef(*new ReadableStream(globalObject->protectedScriptExecutionContext().get(), WTFMove(internalReadableStream)));
 }
 
-ReadableStream::ReadableStream(ScriptExecutionContext* context, RefPtr<InternalReadableStream>&& internalReadableStream, RefPtr<DependencyToVisit>&& dependencyToVisit, IsReachableFromOpaqueRootIfPulling isReachableFromOpaqueRootIfPulling)
+ReadableStream::ReadableStream(ScriptExecutionContext* context, RefPtr<InternalReadableStream>&& internalReadableStream, RefPtr<DependencyToVisit>&& dependencyToVisit, IsSourceReachableFromOpaqueRoot isSourceReachableFromOpaqueRoot)
     : ContextDestructionObserver(context)
-    , m_isReachableFromOpaqueRootIfPulling(isReachableFromOpaqueRootIfPulling == IsReachableFromOpaqueRootIfPulling::Yes)
+    , m_isSourceReachableFromOpaqueRoot(isSourceReachableFromOpaqueRoot == IsSourceReachableFromOpaqueRoot::Yes)
     , m_internalReadableStream(WTFMove(internalReadableStream))
     , m_dependencyToVisit(WTFMove(dependencyToVisit))
 {
@@ -298,7 +298,7 @@ ReadableStreamDefaultReader* ReadableStream::defaultReader()
 // https://streams.spec.whatwg.org/#abstract-opdef-createreadablebytestream
 Ref<ReadableStream> ReadableStream::createReadableByteStream(JSDOMGlobalObject& globalObject, ReadableByteStreamController::PullAlgorithm&& pullAlgorithm, ReadableByteStreamController::CancelAlgorithm&& cancelAlgorithm, ByteStreamOptions&& options)
 {
-    Ref readableStream = adoptRef(*new ReadableStream(globalObject.protectedScriptExecutionContext().get(), { }, WTFMove(options.dependencyToVisit), options.isReachableFromOpaqueRootIfPulling));
+    Ref readableStream = adoptRef(*new ReadableStream(globalObject.protectedScriptExecutionContext().get(), { }, WTFMove(options.dependencyToVisit), options.isSourceReachableFromOpaqueRoot));
     readableStream->setupReadableByteStreamController(globalObject, WTFMove(pullAlgorithm), WTFMove(cancelAlgorithm), options.highwaterMark, options.startSynchronously);
     return readableStream;
 }
