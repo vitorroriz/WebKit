@@ -261,7 +261,8 @@ public:
 
         [ensureController().contextMenuInteraction _presentMenuAtLocation:CGPointMake(0, 0)];
 
-        function(ensureMenu());
+        RetainPtr menu = ensureMenu();
+        function(menu.get());
 
         [ensureController().contextMenuInteraction dismissMenu];
 #else

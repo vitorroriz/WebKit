@@ -71,7 +71,7 @@ static const UIMenuIdentifier WKCaptionStyleMenuSystemSettingsIdentifier = @"WKC
     if (AVKitLibrary() && getAVLegibleMediaOptionsMenuControllerClassSingleton())
         return [[_WKCaptionStyleMenuControllerAVKit alloc] init];
 #endif
-    return [[super alloc] init];
+    return [[[super alloc] init] autorelease];
 }
 
 - (instancetype)init
@@ -238,6 +238,18 @@ static const UIMenuIdentifier WKCaptionStyleMenuSystemSettingsIdentifier = @"WKC
     [self notifyMenuDidClose];
 }
 #endif // USE(UICONTEXTMENU)
+
+#pragma mark - Internal
+- (void)setPreviewProfileID:(NSString *)profileID
+{
+    if (profileID) {
+        CaptionUserPreferencesMediaAF::setActiveProfileID(WTF::String(profileID));
+        return;
+    }
+
+    if (self.savedActiveProfileID && self.savedActiveProfileID.length > 0)
+        CaptionUserPreferencesMediaAF::setActiveProfileID(WTF::String(self.savedActiveProfileID));
+}
 @end
 
 #endif

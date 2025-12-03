@@ -46,6 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 }
 
+- (void)setPreviewProfileID:(nullable NSString *)profileID;
+
 @property (nonatomic, copy, nullable) NSString *savedActiveProfileID;
 @property (nonatomic, strong) PlatformMenu *menu;
 #if !TARGET_OS_OSX && !TARGET_OS_WATCH

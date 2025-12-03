@@ -89,38 +89,13 @@ using namespace WTF;
 
 - (void)legibleMenuController:(AVLegibleMediaOptionsMenuController *)menuController didRequestCaptionPreviewForProfileID:(NSString *)profileID
 {
-    dispatch_async(mainDispatchQueueSingleton(), ^{
-        [self findAndDismissContextMenus];
-    });
+    [self setPreviewProfileID:profileID];
 }
 
-- (void)findAndDismissContextMenus
+- (void)legibleMenuControllerDidRequestStoppingSubtitleCaptionPreview:(AVLegibleMediaOptionsMenuController *)menuController
 {
-    UIApplication *app = [UIApplication sharedApplication];
-
-    for (UIScene *scene in app.connectedScenes) {
-        if ([scene isKindOfClass:[UIWindowScene class]]) {
-            UIWindowScene *windowScene = (UIWindowScene *)scene;
-            for (UIWindow *window in windowScene.windows)
-                [self searchForContextMenuInteractionsInView:window];
-        }
-    }
+    [self setPreviewProfileID:nil];
 }
-
-- (void)searchForContextMenuInteractionsInView:(UIView *)view
-{
-    for (id<UIInteraction> interaction in view.interactions) {
-        if ([interaction isKindOfClass:[UIContextMenuInteraction class]]) {
-            RetainPtr<UIContextMenuInteraction> contextInteraction = interaction;
-            [contextInteraction dismissMenu];
-            break;
-        }
-    }
-
-    for (UIView *subview in view.subviews)
-        [self searchForContextMenuInteractionsInView:subview];
-}
-
 @end
 
 #endif

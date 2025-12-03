@@ -82,7 +82,6 @@ using namespace WTF;
 - (void)rebuildMenu
 {
     self.menu = [_menuController buildMenuOfType:AVLegibleMediaOptionsMenuTypeCaptionAppearance];
-    [self.menu setDelegate:self];
 }
 
 - (BOOL)isAncestorOf:(NSMenu *)menu
@@ -108,24 +107,12 @@ using namespace WTF;
 
 - (void)legibleMenuController:(AVLegibleMediaOptionsMenuController *)menuController didRequestCaptionPreviewForProfileID:(NSString *)profileID
 {
-    dispatch_async(mainDispatchQueueSingleton(), ^{
-        [self findAndDismissPopoverMenus];
-    });
+    [self setPreviewProfileID:profileID];
 }
 
-- (void)findAndDismissPopoverMenus
+- (void)legibleMenuControllerDidRequestStoppingSubtitleCaptionPreview:(AVLegibleMediaOptionsMenuController *)menuController
 {
-    NSApplication *app = [NSApplication sharedApplication];
-
-    for (NSWindow *window in app.windows)
-        [self searchForMenuInteractionsInWindow:window];
-}
-
-- (void)searchForMenuInteractionsInWindow:(NSWindow *)window
-{
-    NSMenu *mainMenu = [NSApp mainMenu];
-    if (mainMenu)
-        [mainMenu cancelTracking];
+    [self setPreviewProfileID:nil];
 }
 
 #pragma mark - NSMenuDelegate

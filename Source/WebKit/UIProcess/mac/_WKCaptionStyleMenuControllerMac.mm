@@ -152,8 +152,16 @@ using namespace WTF;
 - (void)profileMenuItemHighlighted:(NSMenuItem *)item
 {
     NSString *nsProfileID = (NSString *)item.representedObject;
-    if ([nsProfileID isKindOfClass:NSString.class]) {
-        CaptionUserPreferencesMediaAF::setActiveProfileID(WTF::String(nsProfileID));
+    if (nsProfileID && ![nsProfileID isKindOfClass:NSString.class])
+        return;
+
+    [self setPreviewProfileID:nsProfileID];
+}
+
+- (void)setPreviewProfileID:(NSString *)profileID
+{
+    if (profileID) {
+        CaptionUserPreferencesMediaAF::setActiveProfileID(WTF::String(profileID));
         return;
     }
 
