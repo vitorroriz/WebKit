@@ -34,7 +34,9 @@ String::String(CFStringRef str)
     if (!str)
         return;
 
-    CFIndex size = CFStringGetLength(str);
+    // We cannot use CFIndex here since CFStringGetLength can return values larger than
+    // CFIndex can hold.  (<rdar://problem/6806478>)
+    size_t size = CFStringGetLength(str);
     if (!size) {
         m_impl = StringImpl::empty();
         return;
@@ -44,7 +46,7 @@ String::String(CFStringRef str)
         StringBuffer<Latin1Character> buffer(size);
         CFIndex usedBufLen;
         CFIndex convertedSize = CFStringGetBytes(str, CFRangeMake(0, size), kCFStringEncodingISOLatin1, 0, false, byteCast<UInt8>(buffer.characters()), size, &usedBufLen);
-        if (convertedSize == size && usedBufLen == size) {
+        if (static_cast<size_t>(convertedSize) == size && static_cast<size_t>(usedBufLen) == size) {
             m_impl = StringImpl::adopt(WTFMove(buffer));
             return;
         }
