@@ -1,6 +1,17 @@
-<!-- webkit-test-runner [ BlocksInInlineLayoutEnabled=true ] -->
-<span id=t><div>foo</div></span>
+<style>
+.container {
+  width: 400px;
+  font-family: Ahem;
+  font-size: 10px;
+}
+</style>
+<div class=container>
+  <span id=target>
+    <div>text content</div>
+  </span>
+</div>
 <pre id=log></pre>
 <script>
-log.textContent = `span offsetWidth: ${t.offsetWidth} offsetHeight:${t.offsetHeight}`;
+window.testRunner?.dumpAsText();
+log.textContent = `span offsetWidth: ${target.offsetWidth} offsetHeight:${target.offsetHeight}`;
 </script>
