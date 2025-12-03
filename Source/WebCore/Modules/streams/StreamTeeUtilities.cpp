@@ -554,11 +554,16 @@ private:
         m_state->setReading(false);
         bool byobCanceled = m_forBranch2 ? m_state->canceled2() : m_state->canceled1();
         bool otherCanceled = m_forBranch2 ? m_state->canceled1() : m_state->canceled2();
+
+        bool shouldStopSteps = false;
         if (!byobCanceled && branch1)
-            branch1->controller()->close(*globalObject);
+            shouldStopSteps = !branch1->controller()->close(*globalObject, ReadableByteStreamController::ShouldThrowOnError::No);
 
         if (!otherCanceled && branch2)
-            branch2->controller()->close(*globalObject);
+            shouldStopSteps |= !branch2->controller()->close(*globalObject, ReadableByteStreamController::ShouldThrowOnError::No);
+
+        if (shouldStopSteps)
+            return;
 
         if (!value.isUndefined()) {
             auto scope = DECLARE_CATCH_SCOPE(globalObject->vm());
