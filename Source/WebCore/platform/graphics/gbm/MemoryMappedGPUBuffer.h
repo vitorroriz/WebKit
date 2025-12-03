@@ -55,6 +55,10 @@ public:
     // Will only return a MemoryMappedGPUBuffer, if gbm_bo allocation + mapping to userland + EGLImage creation succeeded.
     static std::unique_ptr<MemoryMappedGPUBuffer> create(const IntSize&, OptionSet<BufferFlag>);
 
+    // Returns the actual allocated buffer size, which may be larger than size()
+    // due to GPU alignment requirements (e.g. tiled formats).
+    IntSize allocatedSize() const;
+
     const IntSize& size() const { return m_size; }
     const OptionSet<BufferFlag>& flags() const { return m_flags; }
 

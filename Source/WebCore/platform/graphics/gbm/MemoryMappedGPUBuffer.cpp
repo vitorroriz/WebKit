@@ -145,6 +145,12 @@ bool MemoryMappedGPUBuffer::isLinear() const
     return gbm_bo_get_plane_count(m_bo) == 1 && (m_modifier == DRM_FORMAT_MOD_INVALID || m_modifier == DRM_FORMAT_MOD_LINEAR);
 }
 
+IntSize MemoryMappedGPUBuffer::allocatedSize() const
+{
+    ASSERT(m_bo);
+    return IntSize(gbm_bo_get_width(m_bo), gbm_bo_get_height(m_bo));
+}
+
 bool MemoryMappedGPUBuffer::createDMABufFromGBMBufferObject()
 {
     ASSERT(m_eglAttributes.isEmpty());

@@ -129,6 +129,11 @@ void BitmapTexture::allocateTexture()
 }
 
 #if USE(GBM)
+IntSize BitmapTexture::allocatedSize() const
+{
+    return m_memoryMappedGPUBuffer ? m_memoryMappedGPUBuffer->allocatedSize() : m_size;
+}
+
 bool BitmapTexture::allocateTextureFromMemoryMappedGPUBuffer()
 {
     if (!m_memoryMappedGPUBuffer)

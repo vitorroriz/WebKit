@@ -104,6 +104,9 @@ public:
 
 #if USE(GBM)
     MemoryMappedGPUBuffer* memoryMappedGPUBuffer() const { return m_memoryMappedGPUBuffer.get(); }
+    IntSize allocatedSize() const;
+#else
+    IntSize allocatedSize() const { return m_size; }
 #endif
 
 private:
