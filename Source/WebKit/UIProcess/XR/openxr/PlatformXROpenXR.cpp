@@ -208,14 +208,18 @@ void OpenXRCoordinator::createLayerProjection(uint32_t width, uint32_t height, b
             active.renderQueue->dispatch([this, width, height, alpha, completionHandler = WTFMove(reply)] mutable {
                 if (!collectSwapchainFormatsIfNeeded()) {
                     RELEASE_LOG(XR, "OpenXRCoordinator: no supported swapchain formats");
-                    completionHandler(std::nullopt);
+                    callOnMainRunLoop([completion = WTFMove(completionHandler)] mutable {
+                        completion(std::nullopt);
+                    });
                     return;
                 }
 
                 auto swapchain = createSwapchain(width, height, alpha);
                 if (!swapchain) {
                     RELEASE_LOG(XR, "OpenXRCoordinator: failed to create swapchain");
-                    completionHandler(std::nullopt);
+                    callOnMainRunLoop([completion = WTFMove(completionHandler)] mutable {
+                        completion(std::nullopt);
+                    });
                     return;
                 }
 
@@ -226,7 +230,9 @@ void OpenXRCoordinator::createLayerProjection(uint32_t width, uint32_t height, b
 #endif
                     auto layerHandle = m_nextLayerHandle++;
                     m_layers.add(layerHandle, WTFMove(layer));
-                    completionHandler(layerHandle);
+                    callOnMainRunLoop([completion = WTFMove(completionHandler), handle = layerHandle] mutable {
+                        completion(handle);
+                    });
                 }
             });
         });
