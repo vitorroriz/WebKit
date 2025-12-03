@@ -101,6 +101,47 @@ enum class GridAvoidanceReason : uint64_t {
     }
 #endif
 
+
+static std::optional<GridAvoidanceReason> hasValidColumnEnd(const Style::GridPositionExplicit&, const Style::GridPosition columnEnd, size_t linesFromGridTemplateColumnsCount)
+{
+    return WTF::switchOn(columnEnd,
+        [&](const CSS::Keyword::Auto&) -> std::optional<GridAvoidanceReason> {
+            return GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement;
+        },
+        [&](const Style::GridPositionExplicit&) -> std::optional<GridAvoidanceReason> {
+            if (!columnEnd.namedGridLine().isEmpty() || columnEnd.explicitPosition() < 0 || columnEnd.explicitPosition() > static_cast<int>(linesFromGridTemplateColumnsCount))
+                return GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement;
+            return { };
+        },
+        [&](const Style::GridPositionSpan&) -> std::optional<GridAvoidanceReason> {
+            return GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement;
+        },
+        [&](const CustomIdentifier&) -> std::optional<GridAvoidanceReason> {
+            return GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement;
+        }
+    );
+}
+
+static std::optional<GridAvoidanceReason> hasValidRowEnd(const Style::GridPositionExplicit&, const Style::GridPosition rowEnd, size_t linesFromGridTemplateRowsCount)
+{
+    return WTF::switchOn(rowEnd,
+        [&](const CSS::Keyword::Auto&) -> std::optional<GridAvoidanceReason> {
+            return GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement;
+        },
+        [&](const Style::GridPositionExplicit&) -> std::optional<GridAvoidanceReason> {
+            if (!rowEnd.namedGridLine().isEmpty() || rowEnd.explicitPosition() < 0 || rowEnd.explicitPosition() > static_cast<int>(linesFromGridTemplateRowsCount))
+                return GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement;
+            return { };
+        },
+        [&](const Style::GridPositionSpan&) -> std::optional<GridAvoidanceReason> {
+            return GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement;
+        },
+        [&](const CustomIdentifier&) -> std::optional<GridAvoidanceReason> {
+            return GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement;
+        }
+    );
+}
+
 static OptionSet<GridAvoidanceReason> gridLayoutAvoidanceReason(const RenderGrid& renderGrid, ReasonCollectionMode reasonCollectionMode)
 {
     auto reasons = OptionSet<GridAvoidanceReason> { };
@@ -296,24 +337,50 @@ static OptionSet<GridAvoidanceReason> gridLayoutAvoidanceReason(const RenderGrid
             ADD_REASON_AND_RETURN_IF_NEEDED(GridItemHasUnsupportedBlockAxisAlignment, reasons, reasonCollectionMode);
 
         auto& columnStart = gridItemStyle->gridItemColumnStart();
-        if (!columnStart.isExplicit() || !columnStart.namedGridLine().isEmpty() || columnStart.explicitPosition() < 0
-            || columnStart.explicitPosition() > static_cast<int>(linesFromGridTemplateColumnsCount))
-            ADD_REASON_AND_RETURN_IF_NEEDED(GridItemHasUnsupportedColumnPlacement, reasons, reasonCollectionMode);
+        auto columnPositioningAvoidanceReason = WTF::switchOn(columnStart,
+            [&](const CSS::Keyword::Auto&) -> std::optional<GridAvoidanceReason> {
+                return GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement;
+            },
+            [&](const Style::GridPositionExplicit& explicitPosition) -> std::optional<GridAvoidanceReason> {
+                if (!columnStart.namedGridLine().isEmpty() || columnStart.explicitPosition() < 0 || columnStart.explicitPosition() > static_cast<int>(linesFromGridTemplateColumnsCount))
+                    return GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement;
+                return hasValidColumnEnd(explicitPosition, gridItemStyle->gridItemColumnEnd(), linesFromGridTemplateColumnsCount);
+            },
+            [&](const Style::GridPositionSpan&) -> std::optional<GridAvoidanceReason> {
+                return GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement;
+            },
+            [&](const CustomIdentifier&) -> std::optional<GridAvoidanceReason> {
+                return GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement;
+            }
+        );
 
-        auto& columnEnd = gridItemStyle->gridItemColumnEnd();
-        if (!columnEnd.isExplicit() || !columnEnd.namedGridLine().isEmpty() || columnEnd.explicitPosition() < 0
-            || columnEnd.explicitPosition() > static_cast<int>(linesFromGridTemplateColumnsCount))
+        if (columnPositioningAvoidanceReason) {
+            ASSERT(columnPositioningAvoidanceReason == GridAvoidanceReason::GridItemHasUnsupportedColumnPlacement);
             ADD_REASON_AND_RETURN_IF_NEEDED(GridItemHasUnsupportedColumnPlacement, reasons, reasonCollectionMode);
+        }
 
         auto& rowStart = gridItemStyle->gridItemRowStart();
-        if (!rowStart.isExplicit() || !rowStart.namedGridLine().isEmpty() || rowStart.explicitPosition() < 0
-            || rowStart.explicitPosition() > static_cast<int>(linesFromGridTemplateRowsCount))
-            ADD_REASON_AND_RETURN_IF_NEEDED(GridItemHasUnsupportedRowPlacement, reasons, reasonCollectionMode);
+        auto rowPositioningAvoidanceReason = WTF::switchOn(rowStart,
+            [&](const CSS::Keyword::Auto&) -> std::optional<GridAvoidanceReason> {
+                return GridAvoidanceReason::GridItemHasUnsupportedRowPlacement;
+            },
+            [&](const Style::GridPositionExplicit& explicitPosition) -> std::optional<GridAvoidanceReason> {
+                if (!rowStart.namedGridLine().isEmpty() || rowStart.explicitPosition() < 0 || rowStart.explicitPosition() > static_cast<int>(linesFromGridTemplateRowsCount))
+                    return GridAvoidanceReason::GridItemHasUnsupportedRowPlacement;
+                return hasValidRowEnd(explicitPosition, gridItemStyle->gridItemRowEnd(), linesFromGridTemplateRowsCount);
+            },
+            [&](const Style::GridPositionSpan&) -> std::optional<GridAvoidanceReason> {
+                return GridAvoidanceReason::GridItemHasUnsupportedRowPlacement;
+            },
+            [&](const CustomIdentifier&) -> std::optional<GridAvoidanceReason> {
+                return GridAvoidanceReason::GridItemHasUnsupportedRowPlacement;
+            }
+        );
 
-        auto& rowEnd = gridItemStyle->gridItemRowEnd();
-        if (!rowEnd.isExplicit() || !rowEnd.namedGridLine().isEmpty() || rowEnd.explicitPosition() < 0
-            || rowEnd.explicitPosition() > static_cast<int>(linesFromGridTemplateRowsCount))
+        if (rowPositioningAvoidanceReason) {
+            ASSERT(rowPositioningAvoidanceReason == GridAvoidanceReason::GridItemHasUnsupportedRowPlacement);
             ADD_REASON_AND_RETURN_IF_NEEDED(GridItemHasUnsupportedRowPlacement, reasons, reasonCollectionMode);
+        }
 
         if (gridItemStyle->writingMode().isVertical())
             ADD_REASON_AND_RETURN_IF_NEEDED(GridItemHasVerticalWritingMode, reasons, reasonCollectionMode);
