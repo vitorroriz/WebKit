@@ -37,7 +37,8 @@ namespace GridLayoutUtils {
 
 LayoutUnit computeGapValue(const Style::GapGutter&);
 
-LayoutUnit usedInlineSizeForGridItem(const PlacedGridItem&);
+LayoutUnit usedInlineSizeForGridItem(const PlacedGridItem&, LayoutUnit borderAndPadding, const TrackSizes& usedColumnSizes,
+    LayoutUnit columnsGap);
 LayoutUnit usedBlockSizeForGridItem(const PlacedGridItem&);
 
 LayoutUnit computeGridLinePosition(size_t gridLineIndex, const TrackSizes&, LayoutUnit gap);
