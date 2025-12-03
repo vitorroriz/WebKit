@@ -57,6 +57,9 @@ public:
 
     String monthCode() const;
 
+    String toString(JSGlobalObject*, JSValue options) const;
+    String toString() const;
+
     DECLARE_VISIT_CHILDREN;
 
 private:

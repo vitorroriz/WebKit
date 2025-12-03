@@ -502,6 +502,9 @@ test/intl402/DateTimeFormat/prototype/format/temporal-zoneddatetime-not-supporte
 test/intl402/DateTimeFormat/prototype/formatRange/temporal-objects-format-with-era.js:
   default: 'TypeError: Temporal.PlainDate.prototype.valueOf must not be called. To compare PlainDate values, use Temporal.PlainDate.compare'
   strict mode: 'TypeError: Temporal.PlainDate.prototype.valueOf must not be called. To compare PlainDate values, use Temporal.PlainDate.compare'
+test/intl402/DateTimeFormat/prototype/formatRange/fails-on-distinct-temporal-types.js:
+  default: "TypeError: undefined is not a constructor (evaluating 'new Temporal.ZonedDateTime(0n, 'America/Kentucky/Louisville')')"
+  strict mode: "TypeError: undefined is not a constructor (evaluating 'new Temporal.ZonedDateTime(0n, 'America/Kentucky/Louisville')')"
 test/intl402/DateTimeFormat/prototype/formatRange/temporal-objects-not-overlapping-options.js:
   default: "TypeError: Temporal.PlainDateTime.prototype.valueOf must not be called. To compare PlainDateTime values, use Temporal.PlainDateTime.compare"
   strict mode: "TypeError: Temporal.PlainDateTime.prototype.valueOf must not be called. To compare PlainDateTime values, use Temporal.PlainDateTime.compare"
@@ -514,6 +517,9 @@ test/intl402/DateTimeFormat/prototype/formatRange/to-datetime-formattable-with-d
 test/intl402/DateTimeFormat/prototype/formatRangeToParts/temporal-objects-format-with-era.js:
   default: 'TypeError: Temporal.PlainDate.prototype.valueOf must not be called. To compare PlainDate values, use Temporal.PlainDate.compare'
   strict mode: 'TypeError: Temporal.PlainDate.prototype.valueOf must not be called. To compare PlainDate values, use Temporal.PlainDate.compare'
+test/intl402/DateTimeFormat/prototype/formatRangeToParts/fails-on-distinct-temporal-types.js:
+  default: "TypeError: undefined is not a constructor (evaluating 'new Temporal.ZonedDateTime(0n, 'America/Kentucky/Louisville')')"
+  strict mode: "TypeError: undefined is not a constructor (evaluating 'new Temporal.ZonedDateTime(0n, 'America/Kentucky/Louisville')')"
 test/intl402/DateTimeFormat/prototype/formatRangeToParts/temporal-objects-not-overlapping-options.js:
   default: "TypeError: Temporal.PlainDateTime.prototype.valueOf must not be called. To compare PlainDateTime values, use Temporal.PlainDateTime.compare"
   strict mode: "TypeError: Temporal.PlainDateTime.prototype.valueOf must not be called. To compare PlainDateTime values, use Temporal.PlainDateTime.compare"
