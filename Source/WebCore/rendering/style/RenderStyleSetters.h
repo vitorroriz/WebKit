@@ -88,6 +88,20 @@ inline void RenderStyle::setPseudoElementIdentifier(std::optional<Style::PseudoE
     }
 }
 
+inline void RenderStyle::setEffectiveDisplay(DisplayType effectiveDisplay)
+{
+    m_nonInheritedFlags.effectiveDisplay = static_cast<unsigned>(effectiveDisplay);
+}
+
+#if ENABLE(TEXT_AUTOSIZING)
+
+inline void RenderStyle::setSpecifiedLineHeight(Style::LineHeight&& lineHeight)
+{
+    SET(m_inheritedData, specifiedLineHeight, WTFMove(lineHeight));
+}
+
+#endif
+
 // MARK: - Style adjustment utilities
 
 inline void RenderStyle::containIntrinsicWidthAddAuto() { setContainIntrinsicWidth(containIntrinsicWidth().addingAuto()); }
@@ -276,6 +290,12 @@ inline void RenderStyle::setBlendMode(BlendMode mode)
     SET(m_rareInheritedData, isInSubtreeWithBlendMode, mode != BlendMode::Normal);
 }
 
+inline void RenderStyle::setDisplay(DisplayType value)
+{
+    m_nonInheritedFlags.originalDisplay = static_cast<unsigned>(value);
+    m_nonInheritedFlags.effectiveDisplay = m_nonInheritedFlags.originalDisplay;
+}
+
 // FIXME: Add a type that encapsulates both caretColor() and hasAutoCaretColor().
 inline void RenderStyle::setCaretColor(Style::Color&& color) { SET_PAIR(m_rareInheritedData, caretColor, WTFMove(color), hasAutoCaretColor, false); }
 inline void RenderStyle::setHasAutoCaretColor() { SET_PAIR(m_rareInheritedData, hasAutoCaretColor, true, caretColor, Style::Color::currentColor()); }
@@ -288,10 +308,6 @@ inline void RenderStyle::setCursor(Style::Cursor&& cursor) { m_inheritedFlags.cu
 
 // FIXME: Support descriptors
 inline void RenderStyle::setPageSize(Style::PageSize&& pageSize) { SET_NESTED(m_nonInheritedData, rareData, pageSize, WTFMove(pageSize)); }
-
-// FIXME: Support generating getter and setter with different names (or rename computedLetterSpacing() to letterSpacing() and computedWordSpacing() to wordSpacing())
-inline void RenderStyle::setWordSpacing(Style::WordSpacing&& wordSpacing) { SET_NESTED(m_inheritedData, fontData, wordSpacing, WTFMove(wordSpacing)); }
-inline void RenderStyle::setLetterSpacing(Style::LetterSpacing&& letterSpacing) { SET_NESTED(m_inheritedData, fontData, letterSpacing, WTFMove(letterSpacing)); }
 
 #undef SET
 #undef SET_DOUBLY_NESTED

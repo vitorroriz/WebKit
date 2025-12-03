@@ -382,6 +382,8 @@
                 "visited-link-color-support": true,
                 "color-property": true,
                 "style-builder-custom": "All",
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
                 "parser-grammar": "auto | <color>"
             },
             "specification": {
@@ -454,6 +456,7 @@
                 "render-style-getter-custom": true,
                 "render-style-setter-custom": true,
                 "render-style-has-explicitly-set-storage-path": ["m_nonInheritedData", "miscData"],
+                "render-style-storage-kind": "enum",
                 "render-style-type": "TextDirection",
                 "high-priority": true,
                 "parser-grammar": "<<values>>"
@@ -546,6 +549,12 @@
                 "animation-wrapper": "NonNormalizedDiscreteWrapper<DisplayType>",
                 "animation-wrapper-requires-non-normalized-discrete-interpolation": true,
                 "high-priority": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-name": "effectiveDisplay",
+                "render-style-storage-path": ["m_nonInheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "DisplayType",
                 "parser-function": "consumeDisplay",
                 "parser-grammar-unused": "[ <display-outside> || <display-inside> ] | <display-listitem> | <display-internal> | <display-box> | <display-legacy> | <-webkit-display>",
                 "parser-grammar-unused-reason": "Needs support for transforming parsed input to minimal form."
@@ -624,6 +633,9 @@
                 "style-extractor-custom": true,
                 "style-builder-custom": "All",
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-type": "Style::FontFamilies",
                 "parser-function": "consumeFontFamily",
                 "parser-grammar-unused": "[ <family-name> | <generic-family> | <-webkit-generic-family> ]#",
                 "parser-grammar-unused-reason": "Needs support for primitive <family-name>."
@@ -664,6 +676,9 @@
                 "style-builder-custom": "All",
                 "style-extractor-custom": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-type": "float",
                 "parser-grammar": "<absolute-size> | <relative-size> | <length-percentage [0,inf]> | <-webkit-absolute-size> | <-webkit-relative-size>",
                 "parser-exported": true
             },
@@ -690,6 +705,10 @@
                 "font-property": true,
                 "high-priority": true,
                 "separator": " ",
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::FontSizeAdjust",
                 "parser-function": "consumeFontSizeAdjust",
                 "parser-function-allows-number-or-integer-input": true,
                 "parser-grammar-unused": "none | [ [ ex-height | cap-height | ch-width | ic-width | ic-height ]? [ from-font | <number [0,inf]> ] ]",
@@ -714,6 +733,10 @@
                 "style-converter": "StyleType<FontStyle>",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::FontStyle",
                 "parser-function": "consumeFontStyle",
                 "parser-grammar-unused": "normal | italic | [ oblique <angle>? ]",
                 "parser-grammar-unused-reason": "Needs support for ordered groups with a keyword/literal first term differentiator."
@@ -738,6 +761,10 @@
                 "font-property": true,
                 "high-priority": true,
                 "style-converter": "StyleType<FontWeight>",
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::FontWeight",
                 "parser-grammar": "<font-weight-absolute> | bolder | lighter",
                 "parser-exported": true
             },
@@ -769,6 +796,10 @@
                     "font-property": true,
                     "high-priority": true,
                     "style-converter": "StyleType<FontWidth>",
+                    "render-style-getter-custom": true,
+                    "render-style-setter-custom": true,
+                    "render-style-storage-kind": "value",
+                    "render-style-type": "Style::FontWidth",
                     "parser-grammar": "<font-width-absolute> | <percentage [0,inf]>"
                 },
                 {
@@ -778,6 +809,10 @@
                     "font-property": true,
                     "high-priority": true,
                     "style-converter": "StyleType<FontWidth>",
+                    "render-style-getter-custom": true,
+                    "render-style-setter-custom": true,
+                    "render-style-storage-kind": "value",
+                    "render-style-type": "Style::FontWidth",
                     "parser-grammar": "<font-width-absolute>"
                 }
             ],
@@ -870,6 +905,10 @@
                 "font-description-name-for-methods": "TextRenderingMode",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "enum",
+                "render-style-type": "TextRenderingMode",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -889,6 +928,10 @@
                 "font-description-name-for-methods": "FeatureSettings",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::FontFeatureSettings",
                 "parser-grammar": "normal | <feature-tag-value>#@(no-single-item-opt)",
                 "parser-exported": true
             },
@@ -905,11 +948,15 @@
                 "normal"
             ],
             "codegen-properties": {
+                "enable-if": "ENABLE_VARIATION_FONTS",
                 "style-converter": "StyleType<FontVariationSettings>",
                 "font-description-name-for-methods": "VariationSettings",
                 "font-property": true,
                 "high-priority": true,
-                "enable-if": "ENABLE_VARIATION_FONTS",
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::FontVariationSettings",
                 "parser-grammar": "normal | <variation-tag-value>#@(no-single-item-opt)"
             },
             "specification": {
@@ -933,6 +980,10 @@
                 "font-description-name-for-methods": "Kerning",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "enum",
+                "render-style-type": "Kerning",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -949,6 +1000,10 @@
                 "style-converter": "StyleType<FontPalette>",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::FontPalette",
                 "parser-grammar": "normal | light | dark | <palette-identifier>"
             },
             "specification": {
@@ -969,6 +1024,10 @@
             "codegen-properties": {
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "enum",
+                "render-style-type": "FontSmoothingMode",
                 "parser-grammar": "<<values>>"
             },
             "status": "non-standard"
@@ -994,6 +1053,10 @@
                 "font-description-name-for-methods": "VariantLigatures",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::FontVariantLigatures",
                 "parser-grammar": "normal | none | [ <common-lig-values> || <discretionary-lig-values> || <historical-lig-values> || <contextual-alt-values> ]@(no-single-item-opt)"
             },
             "specification": {
@@ -1014,6 +1077,10 @@
                 "font-description-name-for-methods": "VariantPosition",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "enum",
+                "render-style-type": "FontVariantPosition",
                 "parser-grammar": "<<values>>",
                 "parser-exported": true
             },
@@ -1039,6 +1106,10 @@
                 "font-description-name-for-methods": "VariantCaps",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "enum",
+                "render-style-type": "VariantCaps",
                 "parser-grammar": "<<values>>",
                 "parser-exported": true
             },
@@ -1067,6 +1138,10 @@
                 "font-description-name-for-methods": "VariantNumeric",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::FontVariantNumeric",
                 "parser-grammar": "normal | [ <numeric-figure-values> || <numeric-spacing-values> || <numeric-fraction-values> || ordinal || slashed-zero ]@(no-single-item-opt)"
             },
             "specification": {
@@ -1083,6 +1158,10 @@
                 "font-description-name-for-methods": "VariantAlternates",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::VariantAlternates",
                 "parser-grammar": "normal | [ stylistic(<feature-value-name>) || historical-forms || styleset(<feature-value-name>#) || character-variant(<feature-value-name>#) || swash(<feature-value-name>) || ornaments(<feature-value-name>) || annotation(<feature-value-name>) ]@(no-single-item-opt)",
                 "parser-exported": true
             },
@@ -1112,6 +1191,10 @@
                 "font-description-name-for-methods": "VariantEastAsian",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::VariantEastAsian",
                 "parser-grammar": "normal | [ <east-asian-variant-values> || <east-asian-width-values> || ruby ]@(no-single-item-opt)",
                 "parser-exported": true
             },
@@ -1132,10 +1215,14 @@
             ],
             "codegen-properties": {
                 "settings-flag": "cssFontVariantEmojiEnabled",
-                "parser-grammar": "<<values>>",
                 "font-description-name-for-methods": "VariantEmoji",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "enum",
+                "render-style-type": "VariantEmoji",
+                "parser-grammar": "<<values>>",
                 "parser-exported": true
             },
             "specification": {
@@ -1171,6 +1258,10 @@
             "codegen-properties": {
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "enum",
+                "render-style-type": "FontSynthesisLonghandValue",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -1189,6 +1280,10 @@
             "codegen-properties": {
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "enum",
+                "render-style-type": "FontSynthesisLonghandValue",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -1207,6 +1302,10 @@
             "codegen-properties": {
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "enum",
+                "render-style-type": "FontSynthesisLonghandValue",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -1223,10 +1322,14 @@
                 "none"
             ],
             "codegen-properties": {
+                "enable-if": "ENABLE_VARIATION_FONTS",
                 "font-description-name-for-methods": "OpticalSizing",
                 "font-property": true,
                 "high-priority": true,
-                "enable-if": "ENABLE_VARIATION_FONTS",
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "enum",
+                "render-style-type": "FontOpticalSizing",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -1307,6 +1410,10 @@
                 "font-description-name-for-methods": "SpecifiedLocale",
                 "font-property": true,
                 "high-priority": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::WebkitLocale",
                 "parser-grammar": "auto | <string>"
             },
             "status": "non-standard"
@@ -1322,7 +1429,11 @@
             ],
             "codegen-properties": {
                 "style-builder-custom": "Value",
-                "render-style-getter": "writingMode().computedTextOrientation",
+                "render-style-getter": "computedTextOrientation",
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "enum",
+                "render-style-type": "TextOrientation",
                 "high-priority": true,
                 "parser-grammar": "<<values>>"
             },
@@ -1418,6 +1529,10 @@
                 "high-priority": true,
                 "sink-priority": true,
                 "style-converter": "StyleType<TextSpacingTrim>",
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::TextSpacingTrim",
                 "parser-grammar": "<<values>>",
                 "parser-grammar-comment": "Current spec grammar is 'space-all | normal | space-first | trim-start | trim-both | trim-all | auto'"
             },
@@ -1445,6 +1560,10 @@
                 "high-priority": true,
                 "sink-priority": true,
                 "style-converter": "StyleType<TextAutospace>",
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::TextAutospace",
                 "parser-grammar": "normal | auto | no-autospace | [ ideograph-alpha || ideograph-numeric ]@(no-single-item-opt)",
                 "parser-grammar-comment": "Current spec grammar is 'normal | auto | no-autospace | [ [ ideograph-alpha || ideograph-numeric || punctuation ] || [ insert | replace ] ]'"
             },
@@ -1510,6 +1629,7 @@
                 "render-style-getter-custom": true,
                 "render-style-setter-custom": true,
                 "render-style-has-explicitly-set-storage-path": ["m_nonInheritedData", "miscData"],
+                "render-style-storage-kind": "enum",
                 "render-style-type": "StyleWritingMode",
                 "top-priority": true,
                 "top-priority-reason": "This is top priority because vi/vb units (depending on writing-mode) may be used by other properties",
@@ -1554,6 +1674,10 @@
             "codegen-properties": {
                 "style-builder-custom": "All",
                 "high-priority": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-path": ["m_nonInheritedData", "rareData"],
+                "render-style-storage-kind": "value",
+                "render-style-type": "float",
                 "parser-grammar": "normal | <percentage [0,inf]> | <number [0,inf]>",
                 "parser-grammar-comment": "Current spec grammar is '<number [0,inf]> || <percentage [0,inf]>'"
             },
@@ -2815,6 +2939,10 @@
                 "separate"
             ],
             "codegen-properties": {
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "BorderCollapse",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -3945,6 +4073,10 @@
                 "aliases": [
                     "-epub-caption-side"
                 ],
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "CaptionSide",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -3970,6 +4102,10 @@
                 }
             ],
             "codegen-properties": {
+                "render-style-storage-path": ["m_nonInheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "Clear",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -4309,6 +4445,8 @@
                 "animation-wrapper-requires-override-parameters": ["CSSPropertyCounterIncrement"],
                 "style-builder-custom": "All",
                 "style-extractor-custom": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
                 "parser-function": "consumeCounterIncrement",
                 "parser-grammar-unused": "[ <counter-name> <integer>? ]+ | none",
                 "parser-grammar-unused-reason": "Needs support for default values on optionals."
@@ -4329,6 +4467,8 @@
                 "animation-wrapper-requires-override-parameters": ["CSSPropertyCounterReset"],
                 "style-builder-custom": "All",
                 "style-extractor-custom": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
                 "parser-function": "consumeCounterReset",
                 "parser-grammar-unused": "[ <counter-name> <integer>? ]+ | none",
                 "parser-grammar-unused-reason": "Needs support for default values on optionals.",
@@ -4350,6 +4490,8 @@
                 "animation-wrapper-requires-override-parameters": ["CSSPropertyCounterSet"],
                 "style-builder-custom": "All",
                 "style-extractor-custom": true,
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
                 "parser-function": "consumeCounterSet",
                 "parser-grammar-unused": "[ <counter-name> <integer>? ]+ | none",
                 "parser-grammar-unused-reason": "Needs support for default values on optionals."
@@ -4419,6 +4561,9 @@
             ],
             "codegen-properties": {
                 "style-converter": "StyleType<Cursor>",
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-type": "Style::Cursor",
                 "parser-function": "consumeCursor",
                 "parser-grammar-unused": "[ [ <url> [ <x> <y> ]? ]#{0,} [ <<values>> ] ]",
                 "parser-grammar-unused-reason": "Needs support for different parsing based on the current mode."
@@ -4438,6 +4583,10 @@
             ],
             "codegen-properties": {
                 "enable-if": "ENABLE_CURSOR_VISIBILITY",
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "CursorVisibility",
                 "parser-grammar": "<<values>>"
             },
             "status": "non-standard"
@@ -4554,6 +4703,10 @@
                 "hide"
             ],
             "codegen-properties": {
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "EmptyCell",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -4650,6 +4803,11 @@
             "codegen-properties": {
                 "render-style-name-for-methods": "Floating",
                 "style-extractor-custom": true,
+                "render-style-storage-name": "floating",
+                "render-style-storage-path": ["m_nonInheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "Float",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -5119,6 +5277,11 @@
                 "font-property": true,
                 "high-priority": true,
                 "sink-priority": true,
+                "render-style-getter": "computedLetterSpacing",
+                "render-style-storage-name": "letterSpacing",
+                "render-style-storage-path": ["m_inheritedData", "fontData"],
+                "render-style-storage-kind": "reference",
+                "render-style-type": "Style::LetterSpacing",
                 "parser-grammar": "normal | <length-percentage>"
             },
             "specification": {
@@ -5179,18 +5342,25 @@
             ],
             "codegen-properties": [
                 {
+                    "enable-if": "ENABLE_TEXT_AUTOSIZING",
                     "animation-wrapper-requires-getter": "specifiedLineHeight",
                     "style-builder-custom": "All",
                     "style-extractor-custom": true,
-                    "enable-if": "ENABLE_TEXT_AUTOSIZING",
+                    "render-style-getter-custom": true,
+                    "render-style-storage-path": ["m_inheritedData"],
+                    "render-style-storage-kind": "reference",
+                    "render-style-type": "Style::LineHeight",
                     "parser-grammar": "normal | <number [0,inf]> | <length-percentage [0,inf]>",
                     "parser-exported": true
                 },
                 {
-                    "render-style-getter": "specifiedLineHeight",
+                    "enable-if": "!ENABLE_TEXT_AUTOSIZING",
                     "style-builder-converter": "StyleType<LineHeight>",
                     "style-extractor-custom": true,
-                    "enable-if": "!ENABLE_TEXT_AUTOSIZING",
+                    "render-style-getter-custom": true,
+                    "render-style-storage-path": ["m_inheritedData"],
+                    "render-style-storage-kind": "reference",
+                    "render-style-type": "Style::LineHeight",
                     "parser-grammar": "normal | <number [0,inf]> | <length-percentage [0,inf]>",
                     "parser-exported": true
                 }
@@ -5246,6 +5416,10 @@
                 "outside"
             ],
             "codegen-properties": {
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "ListStylePosition",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -7064,11 +7238,15 @@
                 }
             ],
             "codegen-properties": {
-                "parser-grammar": "<<values>>",
                 "logical-property-group": {
                     "name": "overflow",
                     "resolver": "horizontal"
-                }
+                },
+                "render-style-storage-path": ["m_nonInheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "Overflow",
+                "parser-grammar": "<<values>>"
             },
             "specification": {
                 "category": "css-overflow",
@@ -7098,11 +7276,15 @@
                 }
             ],
             "codegen-properties": {
-                "parser-grammar": "<<values>>",
                 "logical-property-group": {
                     "name": "overflow",
                     "resolver": "vertical"
-                }
+                },
+                "render-style-storage-path": ["m_nonInheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "Overflow",
+                "parser-grammar": "<<values>>"
             },
             "specification": {
                 "category": "css-overflow",
@@ -7499,6 +7681,7 @@
             "codegen-properties": {
                 "skip-style-builder": true,
                 "skip-style-extractor": true,
+                "skip-render-style": true,
                 "parser-grammar": "auto | <custom-ident>"
             },
             "specification": {
@@ -7598,6 +7781,10 @@
                 "none"
             ],
             "codegen-properties": {
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "PointerEvents",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -7620,6 +7807,10 @@
                 }
             ],
             "codegen-properties": {
+                "render-style-storage-path": ["m_nonInheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "PositionType",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -8165,6 +8356,10 @@
             ],
             "codegen-properties": {
                 "style-builder-converter": "StyleType<TextAlign>",
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "Style::TextAlign",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -8392,6 +8587,10 @@
                 "nowrap"
             ],
             "codegen-properties": {
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "TextWrapMode",
                 "parser-grammar": "<<values>>",
                 "parser-exported": true
             },
@@ -8418,6 +8617,10 @@
                 }
             ],
             "codegen-properties": {
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "TextWrapStyle",
                 "parser-grammar": "<<values>>",
                 "parser-exported": true
             },
@@ -8600,6 +8803,10 @@
                 }
             ],
             "codegen-properties": {
+                "render-style-storage-path": ["m_nonInheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "UnicodeBidi",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -8683,6 +8890,10 @@
             "codegen-properties": {
                 "animation-wrapper": "VisibilityWrapper",
                 "animation-wrapper-requires-override-parameters": [],
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "Visibility",
                 "parser-grammar": "<<values>>",
                 "fast-path-inherited": true
             },
@@ -8726,6 +8937,10 @@
                 "break-spaces"
             ],
             "codegen-properties": {
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "WhiteSpaceCollapse",
                 "parser-grammar": "<<values>>",
                 "parser-exported": true
             },
@@ -8883,6 +9098,11 @@
                 "font-property": true,
                 "high-priority": true,
                 "sink-priority": true,
+                "render-style-getter": "computedWordSpacing",
+                "render-style-storage-name": "wordSpacing",
+                "render-style-storage-path": ["m_inheritedData", "fontData"],
+                "render-style-storage-kind": "reference",
+                "render-style-type": "Style::WordSpacing",
                 "parser-grammar": "normal | <length-percentage>"
             },
             "specification": {
@@ -8927,8 +9147,12 @@
                 "auto"
             ],
             "codegen-properties": {
-                "render-style-name-for-methods": "SpecifiedZIndex",
                 "style-converter": "StyleType<ZIndex>",
+                "render-style-name-for-methods": "SpecifiedZIndex",
+                "render-style-getter-custom": true,
+                "render-style-setter-custom": true,
+                "render-style-storage-kind": "value",
+                "render-style-type": "Style::ZIndex",
                 "parser-grammar": "auto | <integer>"
             },
             "specification": {
@@ -8987,6 +9211,10 @@
                 "aliases": [
                     "-webkit-appearance"
                 ],
+                "render-style-setter-custom": true,
+                "render-style-storage-path": ["m_nonInheritedData", "miscData"],
+                "render-style-storage-kind": "enum",
+                "render-style-type": "StyleAppearance",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -9354,6 +9582,10 @@
                 "reverse"
             ],
             "codegen-properties": {
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "BoxDirection",
                 "parser-grammar": "<<values>>"
             },
             "status": "obsolete",
@@ -9906,6 +10138,11 @@
             ],
             "codegen-properties": {
                 "render-style-name-for-methods": "BlendMode",
+                "render-style-setter-custom": true,
+                "render-style-storage-name": "effectiveBlendMode",
+                "render-style-storage-path": ["m_nonInheritedData", "rareData"],
+                "render-style-storage-kind": "enum",
+                "render-style-type": "BlendMode",
                 "parser-grammar": "<<values>>"
             },
             "specification":  {
@@ -10348,6 +10585,7 @@
             "codegen-properties": {
                 "accepts-quirky-length": true,
                 "skip-style-builder": true,
+                "skip-render-style": true,
                 "internal-only": true,
                 "parser-grammar": "<length>"
             },
@@ -11343,6 +11581,10 @@
                     "-webkit-print-color-adjust",
                     "color-adjust"
                 ],
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "PrintColorAdjust",
                 "parser-grammar": "<<values>>"
             },
             "specification": {
@@ -11361,6 +11603,10 @@
             "codegen-properties": {
                 "render-style-initial": "initialRTLOrdering",
                 "render-style-setter": "setRTLOrdering",
+                "render-style-storage-path": ["m_inheritedFlags"],
+                "render-style-storage-container": "struct",
+                "render-style-storage-kind": "enum",
+                "render-style-type": "Order",
                 "parser-grammar": "<<values>>"
             },
             "status": "non-standard"
@@ -11625,9 +11871,10 @@
             "animation-type": "not animatable (internal)",
             "inherited": true,
             "codegen-properties": {
+                "enable-if": "ENABLE_TEXT_AUTOSIZING",
                 "skip-style-builder": true,
                 "skip-parser": true,
-                "enable-if": "ENABLE_TEXT_AUTOSIZING",
+                "skip-render-style": true,
                 "internal-only": true
             },
             "status": "non-standard"

@@ -558,8 +558,8 @@ public:
     inline LayoutBoxExtent borderImageOutsets() const;
     inline LayoutBoxExtent maskBorderOutsets() const;
 
-    Order rtlOrdering() const { return static_cast<Order>(m_inheritedFlags.rtlOrdering); }
-    void setRTLOrdering(Order ordering) { m_inheritedFlags.rtlOrdering = static_cast<unsigned>(ordering); }
+    inline Order rtlOrdering() const;
+    inline void setRTLOrdering(Order);
 
     bool isStyleAvailable() const;
 
@@ -572,7 +572,7 @@ public:
 
     // attribute getter methods
 
-    constexpr DisplayType display() const { return static_cast<DisplayType>(m_nonInheritedFlags.effectiveDisplay); }
+    inline DisplayType display() const;
     constexpr WritingMode writingMode() const { return m_inheritedFlags.writingMode; }
     bool isLeftToRightDirection() const { return writingMode().isBidiLTR(); } // deprecated, because of confusion between physical inline directions and bidi / line-relative directions
 
@@ -592,13 +592,13 @@ public:
     inline bool hasStaticInlinePosition(bool horizontal) const;
     inline bool hasStaticBlockPosition(bool horizontal) const;
 
-    PositionType position() const { return static_cast<PositionType>(m_nonInheritedFlags.position); }
+    inline PositionType position() const;
     inline bool hasOutOfFlowPosition() const;
     inline bool hasInFlowPosition() const;
     inline bool hasViewportConstrainedPosition() const;
-    Float floating() const { return static_cast<Float>(m_nonInheritedFlags.floating); }
+    inline Float floating() const;
     static UsedFloat usedFloat(const RenderElement&); // Returns logical left/right (block-relative).
-    Clear clear() const { return static_cast<Clear>(m_nonInheritedFlags.clear); }
+    inline Clear clear() const;
     static UsedClear usedClear(const RenderElement&); // Returns logical left/right (block-relative).
 
     inline const Style::PreferredSize& width() const;
@@ -701,14 +701,14 @@ public:
     inline OutlineStyle outlineStyle() const;
     inline bool hasOutlineInVisualOverflow() const;
     
-    Overflow overflowX() const { return static_cast<Overflow>(m_nonInheritedFlags.overflowX); }
-    Overflow overflowY() const { return static_cast<Overflow>(m_nonInheritedFlags.overflowY); }
+    inline Overflow overflowX() const;
+    inline Overflow overflowY() const;
     inline bool isOverflowVisible() const;
 
     inline OverscrollBehavior overscrollBehaviorX() const;
     inline OverscrollBehavior overscrollBehaviorY() const;
     
-    Visibility visibility() const { return static_cast<Visibility>(m_inheritedFlags.visibility); }
+    inline Visibility visibility() const;
     inline Visibility usedVisibility() const;
 
     const Style::VerticalAlign& verticalAlign() const;
@@ -716,7 +716,7 @@ public:
     inline const Style::Clip& clip() const;
     inline bool hasClip() const;
 
-    UnicodeBidi unicodeBidi() const { return static_cast<UnicodeBidi>(m_nonInheritedFlags.unicodeBidi); }
+    inline UnicodeBidi unicodeBidi() const;
 
     inline FieldSizing fieldSizing() const;
 
@@ -760,7 +760,7 @@ public:
     inline TextRenderingMode textRendering() const;
 
     inline const Style::TextIndent& textIndent() const;
-    inline Style::TextAlign textAlign() const { return static_cast<Style::TextAlign>(m_inheritedFlags.textAlign); }
+    inline Style::TextAlign textAlign() const;
     inline Style::TextAlignLast textAlignLast() const;
     inline TextGroupAlign textGroupAlign() const;
     inline Style::TextTransform textTransform() const;
@@ -808,9 +808,9 @@ public:
     inline bool breakOnlyAfterWhiteSpace() const;
     inline bool breakWords() const;
 
-    WhiteSpaceCollapse whiteSpaceCollapse() const { return static_cast<WhiteSpaceCollapse>(m_inheritedFlags.whiteSpaceCollapse); }
-    TextWrapMode textWrapMode() const { return static_cast<TextWrapMode>(m_inheritedFlags.textWrapMode); }
-    TextWrapStyle textWrapStyle() const { return static_cast<TextWrapStyle>(m_inheritedFlags.textWrapStyle); }
+    inline WhiteSpaceCollapse whiteSpaceCollapse() const;
+    inline TextWrapMode textWrapMode() const;
+    inline TextWrapStyle textWrapStyle() const;
 
     inline Style::BackgroundLayers& ensureBackgroundLayers();
     inline const Style::BackgroundLayers& backgroundLayers() const;
@@ -830,15 +830,15 @@ public:
     inline NinePieceImageRule maskBorderVerticalRule() const;
     static inline Style::MaskBorder initialMaskBorder();
 
-    BorderCollapse borderCollapse() const { return static_cast<BorderCollapse>(m_inheritedFlags.borderCollapse); }
+    inline BorderCollapse borderCollapse() const;
     inline Style::WebkitBorderSpacing borderHorizontalSpacing() const;
     inline Style::WebkitBorderSpacing borderVerticalSpacing() const;
-    EmptyCell emptyCells() const { return static_cast<EmptyCell>(m_inheritedFlags.emptyCells); }
-    CaptionSide captionSide() const { return static_cast<CaptionSide>(m_inheritedFlags.captionSide); }
+    inline EmptyCell emptyCells() const;
+    inline CaptionSide captionSide() const;
 
     inline const Style::ListStyleType& listStyleType() const;
     inline const Style::ImageOrNone& listStyleImage() const;
-    ListStylePosition listStylePosition() const { return static_cast<ListStylePosition>(m_inheritedFlags.listStylePosition); }
+    inline ListStylePosition listStylePosition() const;
     inline bool isFixedTableLayout() const;
 
     inline const Style::MarginBox& marginBox() const;
@@ -879,7 +879,7 @@ public:
     Style::Cursor cursor() const;
 
 #if ENABLE(CURSOR_VISIBILITY)
-    CursorVisibility cursorVisibility() const { return static_cast<CursorVisibility>(m_inheritedFlags.cursorVisibility); }
+    inline CursorVisibility cursorVisibility() const;
 #endif
 
     InsideLink insideLink() const { return static_cast<InsideLink>(m_inheritedFlags.insideLink); }
@@ -930,7 +930,7 @@ public:
     inline bool hasAutoLengthContainIntrinsicSize() const;
 
     inline BoxAlignment boxAlign() const;
-    BoxDirection boxDirection() const { return static_cast<BoxDirection>(m_inheritedFlags.boxDirection); }
+    inline BoxDirection boxDirection() const;
     inline Style::WebkitBoxFlex boxFlex() const;
     inline Style::WebkitBoxFlexGroup boxFlexGroup() const;
     inline BoxLines boxLines() const;
@@ -1107,7 +1107,7 @@ public:
     inline LineSnap lineSnap() const;
     inline LineAlign lineAlign() const;
 
-    PointerEvents pointerEvents() const { return static_cast<PointerEvents>(m_inheritedFlags.pointerEvents); }
+    inline PointerEvents pointerEvents() const;
     inline PointerEvents usedPointerEvents() const;
 
     inline const Style::ScrollTimelines& scrollTimelines() const;
@@ -1275,14 +1275,10 @@ public:
     inline const Style::ViewTransitionClasses& viewTransitionClasses() const;
     inline const Style::ViewTransitionName& viewTransitionName() const;
 
-    void setDisplay(DisplayType value)
-    {
-        m_nonInheritedFlags.originalDisplay = static_cast<unsigned>(value);
-        m_nonInheritedFlags.effectiveDisplay = m_nonInheritedFlags.originalDisplay;
-    }
-    void setEffectiveDisplay(DisplayType v) { m_nonInheritedFlags.effectiveDisplay = static_cast<unsigned>(v); }
-    void setPosition(PositionType v) { m_nonInheritedFlags.position = static_cast<unsigned>(v); }
-    void setFloating(Float v) { m_nonInheritedFlags.floating = static_cast<unsigned>(v); }
+    inline void setDisplay(DisplayType);
+    inline void setEffectiveDisplay(DisplayType);
+    inline void setPosition(PositionType);
+    inline void setFloating(Float);
 
     inline void setInsetBox(Style::InsetBox&&);
     inline void setLeft(Style::InsetEdge&&);
@@ -1356,18 +1352,18 @@ public:
     inline void setOutlineStyle(OutlineStyle);
     inline void setOutlineColor(Style::Color&&);
 
-    void setOverflowX(Overflow v) { m_nonInheritedFlags.overflowX =  static_cast<unsigned>(v); }
-    void setOverflowY(Overflow v) { m_nonInheritedFlags.overflowY = static_cast<unsigned>(v); }
+    inline void setOverflowX(Overflow);
+    inline void setOverflowY(Overflow);
     inline void setOverscrollBehaviorX(OverscrollBehavior);
     inline void setOverscrollBehaviorY(OverscrollBehavior);
-    void setVisibility(Visibility v) { m_inheritedFlags.visibility = static_cast<unsigned>(v); }
+    inline void setVisibility(Visibility);
     void setVerticalAlign(Style::VerticalAlign&&);
 
     inline void setClip(Style::Clip&&);
 
-    void setUnicodeBidi(UnicodeBidi v) { m_nonInheritedFlags.unicodeBidi = static_cast<unsigned>(v); }
+    inline void setUnicodeBidi(UnicodeBidi);
 
-    void setClear(Clear v) { m_nonInheritedFlags.clear = static_cast<unsigned>(v); }
+    inline void setClear(Clear);
 
     inline void setFieldSizing(FieldSizing);
 
@@ -1403,7 +1399,7 @@ public:
 
     inline void setColor(Color&&);
 
-    void setTextAlign(Style::TextAlign v) { m_inheritedFlags.textAlign = static_cast<unsigned>(v); }
+    inline void setTextAlign(Style::TextAlign);
     inline void setTextAlignLast(Style::TextAlignLast);
     inline void setTextGroupAlign(TextGroupAlign);
     inline void addToTextDecorationLineInEffect(Style::TextDecorationLine);
@@ -1428,18 +1424,18 @@ public:
 
     inline void setMarginTrim(Style::MarginTrim);
 
-    void setLineHeight(Style::LineHeight&&);
+    inline void setLineHeight(Style::LineHeight&&);
 #if ENABLE(TEXT_AUTOSIZING)
-    void setSpecifiedLineHeight(Style::LineHeight&&);
+    inline void setSpecifiedLineHeight(Style::LineHeight&&);
 #endif
 
     inline void setImageOrientation(Style::ImageOrientation);
     inline void setImageRendering(ImageRendering);
 
-    void setWhiteSpaceCollapse(WhiteSpaceCollapse v) { m_inheritedFlags.whiteSpaceCollapse = static_cast<unsigned>(v); }
+    inline void setWhiteSpaceCollapse(WhiteSpaceCollapse);
 
-    void setTextWrapMode(TextWrapMode v) { m_inheritedFlags.textWrapMode = static_cast<unsigned>(v); }
-    void setTextWrapStyle(TextWrapStyle v) { m_inheritedFlags.textWrapStyle = static_cast<unsigned>(v); }
+    inline void setTextWrapMode(TextWrapMode);
+    inline void setTextWrapStyle(TextWrapStyle);
 
     inline void setLetterSpacing(Style::LetterSpacing&&);
     inline void setWordSpacing(Style::WordSpacing&&);
@@ -1453,11 +1449,11 @@ public:
     inline void setMaskBorderOutset(Style::MaskBorderOutset&&);
     inline void setMaskBorderRepeat(Style::MaskBorderRepeat&&);
 
-    void setBorderCollapse(BorderCollapse collapse) { m_inheritedFlags.borderCollapse = static_cast<unsigned>(collapse); }
+    inline void setBorderCollapse(BorderCollapse);
     inline void setBorderHorizontalSpacing(Style::WebkitBorderSpacing);
     inline void setBorderVerticalSpacing(Style::WebkitBorderSpacing);
-    void setEmptyCells(EmptyCell v) { m_inheritedFlags.emptyCells = static_cast<unsigned>(v); }
-    void setCaptionSide(CaptionSide v) { m_inheritedFlags.captionSide = static_cast<unsigned>(v); }
+    inline void setEmptyCells(EmptyCell);
+    inline void setCaptionSide(CaptionSide);
 
     inline void setAspectRatio(Style::AspectRatio&&);
 
@@ -1475,8 +1471,8 @@ public:
     inline void setUsedContentVisibility(ContentVisibility);
 
     inline void setListStyleType(Style::ListStyleType&&);
-    void setListStyleImage(Style::ImageOrNone&&);
-    void setListStylePosition(ListStylePosition v) { m_inheritedFlags.listStylePosition = static_cast<unsigned>(v); }
+    inline void setListStyleImage(Style::ImageOrNone&&);
+    inline void setListStylePosition(ListStylePosition);
 
     inline void resetMargin();
     inline void setMarginBox(Style::MarginBox&&);
@@ -1508,14 +1504,14 @@ public:
     inline void setCursor(Style::Cursor&&);
 
 #if ENABLE(CURSOR_VISIBILITY)
-    void setCursorVisibility(CursorVisibility c) { m_inheritedFlags.cursorVisibility = static_cast<unsigned>(c); }
+    inline void setCursorVisibility(CursorVisibility);
 #endif
 
     void setInsideLink(InsideLink insideLink) { m_inheritedFlags.insideLink = static_cast<unsigned>(insideLink); }
     void setIsLink(bool v) { m_nonInheritedFlags.isLink = v; }
 
-    PrintColorAdjust printColorAdjust() const { return static_cast<PrintColorAdjust>(m_inheritedFlags.printColorAdjust); }
-    void setPrintColorAdjust(PrintColorAdjust value) { m_inheritedFlags.printColorAdjust = static_cast<unsigned>(value); }
+    inline PrintColorAdjust printColorAdjust() const;
+    inline void setPrintColorAdjust(PrintColorAdjust);
 
     inline Style::ZIndex specifiedZIndex() const;
     inline void setSpecifiedZIndex(Style::ZIndex);
@@ -1538,7 +1534,7 @@ public:
     inline void setAppearance(StyleAppearance);
     inline void setUsedAppearance(StyleAppearance);
     inline void setBoxAlign(BoxAlignment);
-    void setBoxDirection(BoxDirection d) { m_inheritedFlags.boxDirection = static_cast<unsigned>(d); }
+    inline void setBoxDirection(BoxDirection);
     inline void setBoxFlex(Style::WebkitBoxFlex);
     inline void setBoxFlexGroup(Style::WebkitBoxFlexGroup);
     inline void setBoxLines(BoxLines);
@@ -1659,7 +1655,7 @@ public:
     inline void setLineSnap(LineSnap);
     inline void setLineAlign(LineAlign);
 
-    void setPointerEvents(PointerEvents p) { m_inheritedFlags.pointerEvents = static_cast<unsigned>(p); }
+    inline void setPointerEvents(PointerEvents);
 
     void adjustAnimations();
     void adjustTransitions();
@@ -1949,6 +1945,7 @@ public:
     inline bool hasExplicitlySetWritingMode() const;
     inline void setHasExplicitlySetWritingMode(bool);
 
+    inline TextOrientation computedTextOrientation() const;
     inline bool setTextOrientation(TextOrientation);
 
     bool emptyState() const { return m_nonInheritedFlags.emptyState; }

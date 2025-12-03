@@ -1086,6 +1086,8 @@ constexpr Style::TextSizeAdjust RenderStyle::initialTextSizeAdjust() { return CS
 
 inline TextDirection RenderStyle::computedDirection() const { return writingMode().computedTextDirection(); }
 inline StyleWritingMode RenderStyle::computedWritingMode() const { return writingMode().computedWritingMode(); }
+inline TextOrientation RenderStyle::computedTextOrientation() const { return writingMode().computedTextOrientation(); }
+
 inline Style::LineWidth RenderStyle::borderBottomWidth() const { return border().borderBottomWidth(); }
 inline Style::LineWidth RenderStyle::borderLeftWidth() const { return border().borderLeftWidth(); }
 inline Style::LineWidth RenderStyle::borderRightWidth() const { return border().borderRightWidth(); }
@@ -1093,11 +1095,6 @@ inline Style::LineWidth RenderStyle::borderTopWidth() const { return border().bo
 inline Style::LineWidth RenderStyle::columnRuleWidth() const { return m_nonInheritedData->miscData->multiCol->columnRuleWidth(); }
 
 // FIXME: - Below are property getters that are not yet generated
-
-// FIXME: Support properties that set more than one value when set.
-inline StyleAppearance RenderStyle::appearance() const { return static_cast<StyleAppearance>(m_nonInheritedData->miscData->appearance); }
-inline BlendMode RenderStyle::blendMode() const { return static_cast<BlendMode>(m_nonInheritedData->rareData->effectiveBlendMode); }
-inline float RenderStyle::zoom() const { return m_nonInheritedData->rareData->zoom; }
 
 // FIXME: Add a type that encapsulates both caretColor() and hasAutoCaretColor().
 inline const Style::Color& RenderStyle::caretColor() const { return m_rareInheritedData->caretColor; }
@@ -1111,10 +1108,6 @@ inline Style::ZIndex RenderStyle::specifiedZIndex() const { return m_nonInherite
 
 // FIXME: Support descriptors
 inline const Style::PageSize& RenderStyle::pageSize() const { return m_nonInheritedData->rareData->pageSize; }
-
-// FIXME: Support generating getter and setter with different names (or rename computedLetterSpacing() to letterSpacing() and computedWordSpacing() to wordSpacing())
-inline const Style::LetterSpacing& RenderStyle::computedLetterSpacing() const { return m_inheritedData->fontData->letterSpacing; }
-inline const Style::WordSpacing& RenderStyle::computedWordSpacing() const { return m_inheritedData->fontData->wordSpacing; }
 
 // FIXME: Support generated font-property getters
 inline Style::FontFamilies RenderStyle::fontFamily() const { return { fontDescription().families(), fontDescription().isSpecifiedFont() }; }

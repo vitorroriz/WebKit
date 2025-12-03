@@ -456,7 +456,6 @@ rendering/ImageQualityController.cpp
 rendering/InlineBoxPainter.cpp
 rendering/LayoutRepainter.cpp
 rendering/LegacyInlineBox.cpp
-rendering/LegacyInlineBox.h
 rendering/LegacyInlineFlowBox.cpp
 rendering/LegacyInlineFlowBox.h
 rendering/LegacyInlineIterator.h

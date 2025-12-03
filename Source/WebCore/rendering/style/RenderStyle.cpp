@@ -2432,23 +2432,9 @@ const Style::LineHeight& RenderStyle::specifiedLineHeight() const
 #endif
 }
 
-#if ENABLE(TEXT_AUTOSIZING)
-
-void RenderStyle::setSpecifiedLineHeight(Style::LineHeight&& lineHeight)
-{
-    SET_VAR(m_inheritedData, specifiedLineHeight, WTFMove(lineHeight));
-}
-
-#endif
-
 const Style::LineHeight& RenderStyle::lineHeight() const
 {
     return m_inheritedData->lineHeight;
-}
-
-void RenderStyle::setLineHeight(Style::LineHeight&& lineHeight)
-{
-    SET_VAR(m_inheritedData, lineHeight, WTFMove(lineHeight));
 }
 
 float RenderStyle::computedLineHeight() const

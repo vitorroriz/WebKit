@@ -516,6 +516,7 @@ class StylePropertyCodeGenProperties:
         Schema.Entry("shorthand-style-extractor-pattern", allowed_types=[str]),
         Schema.Entry("skip-codegen", allowed_types=[bool], default_value=False),
         Schema.Entry("skip-parser", allowed_types=[bool], default_value=False),
+        Schema.Entry("skip-render-style", allowed_types=[bool], default_value=False),
         Schema.Entry("skip-style-builder", allowed_types=[bool], default_value=False),
         Schema.Entry("skip-style-extractor", allowed_types=[bool], default_value=False),
         Schema.Entry("status", allowed_types=[str]),
@@ -5384,6 +5385,17 @@ class GenerateRenderStyleGenerated:
 
     def _generate_render_style_inlines_generated_h_function_implementations(self, *, to):
         for property in self.style_properties.all:
+            if property.codegen_properties.skip_render_style:
+                continue
+            if property.codegen_properties.is_logical:
+                continue
+            if property.codegen_properties.longhands:
+                continue
+            if property.codegen_properties.cascade_alias:
+                continue
+            if property.codegen_properties.coordinated_value_list_property:
+                continue
+
             if property.codegen_properties.render_style_storage_path and not property.codegen_properties.render_style_getter_custom:
                 function_name = property.codegen_properties.render_style_getter
                 return_type = self._compute_getter_return_type(property)
@@ -5399,6 +5411,8 @@ class GenerateRenderStyleGenerated:
                     return_type=return_type,
                     get_expression=self._compute_get_expression(property, container_kind, container_path, storage_type, storage_name, storage_kind)
                 )
+            elif not property.codegen_properties.render_style_getter_custom:
+                raise Exception(f"Missing RenderStyle getter for property {property.id}.")
 
             if property.codegen_properties.render_style_visited_link_storage_path:
                 function_name = f"visitedLink{property.codegen_properties.render_style_name_for_methods}"
@@ -5493,6 +5507,17 @@ class GenerateRenderStyleGenerated:
 
     def _generate_render_style_setters_generated_h_function_implementations(self, *, to):
         for property in self.style_properties.all:
+            if property.codegen_properties.skip_render_style:
+                continue
+            if property.codegen_properties.is_logical:
+                continue
+            if property.codegen_properties.longhands:
+                continue
+            if property.codegen_properties.cascade_alias:
+                continue
+            if property.codegen_properties.coordinated_value_list_property:
+                continue
+
             if property.codegen_properties.render_style_storage_path and not property.codegen_properties.render_style_setter_custom:
                 function_name = property.codegen_properties.render_style_setter
                 argument_name = f"value"
@@ -5511,6 +5536,8 @@ class GenerateRenderStyleGenerated:
                     get_expression=self._compute_get_expression(property, container_kind, container_path, storage_type, storage_name, storage_kind),
                     set_expression=self._compute_set_expression(property, container_kind, container_path, storage_type, storage_name, storage_kind, argument_name)
                 )
+            elif not property.codegen_properties.render_style_setter_custom:
+                raise Exception(f"Missing RenderStyle setter for property {property.id}.")
 
             if property.codegen_properties.render_style_visited_link_storage_path:
                 function_name = f"setVisitedLink{property.codegen_properties.render_style_name_for_methods}"

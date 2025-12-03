@@ -444,6 +444,7 @@ class JSONCSSPropertiesChecker(JSONChecker):
             'shorthand-style-extractor-pattern': self.validate_string,
             'skip-codegen': self.validate_boolean,
             'skip-parser': self.validate_boolean,
+            'skip-render-style': self.validate_boolean,
             'skip-style-builder': self.validate_boolean,
             'skip-style-extractor': self.validate_boolean,
             'skip-style-extractor-comment': self.validate_comment,
