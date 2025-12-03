@@ -193,8 +193,9 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
 
         auto& blockGeometry = layoutState.ensureGeometryForBox(block);
         blockGeometry.setTopLeft(LayoutPoint { blockGeometry.marginStart(), positionAndMargin.logicalTop });
-        // FIXME: This is only valid under the assumption that the block is immediately followed by an inline (i.e. no margin collapsing).
-        blockGeometry.setVerticalMargin({ positionAndMargin.logicalTop, positionAndMargin.marginInfo.margin() });
+        // We don't know what the before margin here is (or if there's any at all) before processing the content after.
+        // FIXME: Check if blockGeometry needs the adjusted margin before value at all.
+        blockGeometry.setVerticalMargin({ positionAndMargin.logicalTop, { } });
 
         udpdateIFCLineClamp(inlineLayoutState, renderTreeLayoutState);
         populateIFCWithNewlyPlacedFloats(blockRenderer, placedFloats, blockLogicalTopLeft);

@@ -287,13 +287,10 @@ static bool mayExitFromPartialLayout(const InlineDamage& lineDamage, size_t line
     return trailingContentFromPreviousLayout ? (!newContent.isEmpty() && *trailingContentFromPreviousLayout == newContent.last()) : false;
 }
 
-static inline void handleAfterSideMargin(BlockLayoutState::MarginState& marginState, InlineDisplay::Content& displayContent, size_t partialContentLineOffset)
+static inline void handleAfterSideMargin(BlockLayoutState::MarginState& marginState, InlineDisplay::Content& displayContent)
 {
-    if (auto lineIndex = InlineDisplayLineBuilder::trailingLineWithBlockLevelBox(displayContent.boxes)) {
-        InlineDisplayLineBuilder::adjustLineBlockAfterSideWithCollapsedMargin(marginState, *lineIndex - partialContentLineOffset, displayContent.lines);
-        return;
-    }
-    marginState.canCollapseMarginAfterWithChildren = false;
+    if (!InlineDisplayLineBuilder::hasTrailingLineWithBlockContent(displayContent.lines))
+        marginState.canCollapseMarginAfterWithChildren = false;
 }
 
 InlineLayoutResult InlineFormattingContext::lineLayout(AbstractLineBuilder& lineBuilder, const InlineItemList& inlineItemList, InlineItemRange needsLayoutRange, std::optional<PreviousLine> previousLine, const ConstraintsForInlineContent& constraints, const InlineDamage* lineDamage)
@@ -307,7 +304,7 @@ InlineLayoutResult InlineFormattingContext::lineLayout(AbstractLineBuilder& line
 
     if (!isPartialLayout && (createDisplayContentForLineFromCachedContent(constraints, layoutResult) || createDisplayContentForEmptyInlineContent(constraints, inlineItemList, layoutResult))) {
         layoutResult.range = InlineLayoutResult::Range::Full;
-        handleAfterSideMargin(inlineLayoutState.parentBlockLayoutState().marginState(), layoutResult.displayContent, { });
+        handleAfterSideMargin(inlineLayoutState.parentBlockLayoutState().marginState(), layoutResult.displayContent);
         return layoutResult;
     }
 
@@ -318,7 +315,6 @@ InlineLayoutResult InlineFormattingContext::lineLayout(AbstractLineBuilder& line
     auto lineLogicalTop = InlineLayoutUnit { constraints.logicalTop() };
     auto previousLineEnd = std::optional<InlineItemPosition> { };
     auto leadingInlineItemPosition = needsLayoutRange.start;
-    auto partialContentLineCount = previousLine ? (previousLine->lineIndex + 1) : 0lu;
     auto isFirstFormattedLineCandidate = !previousLine || !previousLine->lineIndex;
     while (true) {
 
@@ -359,7 +355,7 @@ InlineLayoutResult InlineFormattingContext::lineLayout(AbstractLineBuilder& line
         lineLogicalTop = formattingUtils().logicalTopForNextLine(lineLayoutResult, lineLogicalRect, floatingContext);
     }
     InlineDisplayLineBuilder::addLegacyLineClampTrailingLinkBoxIfApplicable(*this, inlineLayoutState, layoutResult.displayContent);
-    handleAfterSideMargin(inlineLayoutState.parentBlockLayoutState().marginState(), layoutResult.displayContent, partialContentLineCount);
+    handleAfterSideMargin(inlineLayoutState.parentBlockLayoutState().marginState(), layoutResult.displayContent);
 
     return layoutResult;
 }
@@ -407,18 +403,6 @@ void InlineFormattingContext::updateLayoutStateWithLineLayoutResult(const LineLa
 
     lineLayoutResult.endsWithHyphen() ? layoutState.incrementSuccessiveHyphenatedLineCount() : layoutState.resetSuccessiveHyphenatedLineCount();
     layoutState.setFirstLineStartTrimForInitialLetter(lineLayoutResult.firstLineStartTrim);
-
-    auto updateBlockBeforeMargin = [&] {
-        auto& marginState = layoutState.parentBlockLayoutState().marginState();
-        if (marginState.atBeforeSideOfBlock && lineLayoutResult.hasInflowContent())
-            marginState.resetBeforeSideOfBlock();
-        if (lineLayoutResult.hasInlineContent()) {
-            // FIXME: This works as long as blocks are wrapped in anonymous blocks so
-            // that a block can never be followed by another block here.
-            marginState.resetMarginValues();
-        }
-    };
-    updateBlockBeforeMargin();
 }
 
 void InlineFormattingContext::updateBoxGeometryForPlacedFloats(const LineLayoutResult::PlacedFloatList& placedFloats)

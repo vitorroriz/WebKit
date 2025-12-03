@@ -533,6 +533,27 @@ UniqueRef<LineContent> LineBuilder::placeInlineAndFloatContent(const InlineItemR
                 return;
             } else {
                 auto result = handleInlineContent(needsLayoutRange, lineCandidate);
+
+                auto adjustLineWithMarginBefore = [&] {
+                    // We don't know if margin coming from previous content should be applied or not
+                    // until after we managed to put some inline content on the line.
+                    // e.g.
+                    // <span>text<div style="margin-bottom: 100px;"></div>more text</span> v.s
+                    // <span>text<div style="margin-bottom: 100px;"></div> <div></div></span>
+                    // where in the first example, the 100px gap is between the block container's edge and "more text"
+                    // while in the second case, it is somewhere after the second block container (can't tell).
+                    // FIXME: Moving the line is not sufficient when floats are present. We have to re-layout this line with the adjusted vertical position.
+                    if (!m_line.hasContentOrListMarker())
+                        return;
+                    auto& marginState = blockLayoutState().marginState();
+                    if (!marginState.atBeforeSideOfBlock)
+                        m_lineLogicalRect.moveVertically(marginState.margin());
+                    else
+                        marginState.resetBeforeSideOfBlock();
+                    marginState.resetMarginValues();
+                };
+                adjustLineWithMarginBefore();
+
                 auto isEndOfLine = result.isEndOfLine == InlineContentBreaker::IsEndOfLine::Yes;
                 if (!result.committedCount.isRevert) {
                     placedInlineItemCount += result.committedCount.value;

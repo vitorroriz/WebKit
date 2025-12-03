@@ -63,13 +63,8 @@ public:
     struct MarginState {
         void resetBeforeSideOfBlock()
         {
-            if (!atBeforeSideOfBlock) {
-                ASSERT_NOT_REACHED();
-                return;
-            }
+            ASSERT(atBeforeSideOfBlock);
             atBeforeSideOfBlock = { };
-            positiveMargin = { };
-            negativeMargin = { };
         }
 
         void resetMarginValues()
