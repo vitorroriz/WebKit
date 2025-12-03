@@ -3212,7 +3212,7 @@ void RenderBox::computeInlineDirectionMargins(const RenderBlock& containingBlock
             marginEndLength = 0_css_px;
     }
 
-    if (isGridItem() && downcast<RenderGrid>(containingBlock).isComputingTrackSizes()) {
+    if (auto* grid = dynamicDowncast<RenderGrid>(containingBlock); grid && grid->isComputingTrackSizes()) {
         if (marginStartLength.isAuto())
             marginStartLength = 0_css_px;
         if (marginEndLength.isAuto())

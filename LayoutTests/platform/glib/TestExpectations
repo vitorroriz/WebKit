@@ -4820,6 +4820,9 @@ webkit.org/b/303130 media/media-source/media-source-ended.html [ Failure ]
 
 webkit.org/b/303208 imported/blink/fast/pagination/viewport-y-horizontal-bt-rtl.html [ Pass ImageOnlyFailure ]
 
+# Hits assert in Debug, but since GTK/WPE bots run release with assertions enabled, skip. Tracked by https://bugs.webkit.org/show_bug.cgi?id=303414
+fullscreen/fullscreen-grid-item-container-type-crash.html [ Skip ]
+
 # End: Common failures between GTK and WPE.
 
 #////////////////////////////////////////////////////////////////////////////////////////

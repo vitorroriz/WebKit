@@ -8161,3 +8161,6 @@ imported/w3c/web-platform-tests/intersection-observer/cross-origin-tall-iframe-r
 imported/w3c/web-platform-tests/css/css-viewport/zoom/border-spacing.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/border-width.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/border.html [ ImageOnlyFailure ]
+
+# Hits assert in debug, tracked by https://bugs.webkit.org/show_bug.cgi?id=303414
+[ Debug ] fullscreen/fullscreen-grid-item-container-type-crash.html [ Skip ]
