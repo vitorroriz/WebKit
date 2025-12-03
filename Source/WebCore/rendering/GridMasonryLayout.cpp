@@ -182,7 +182,7 @@ void GridMasonryLayout::updateRunningPositions(const RenderBox& gridItem, const 
     m_gridContentSize = std::max(m_gridContentSize, newRunningPosition - m_masonryAxisGridGap);
 
     for (auto span : gridAxisSpan)
-        m_runningPositions[span] = std::max(m_runningPositions[span], newRunningPosition);
+        m_runningPositions[span] = newRunningPosition;
 
     updateItemOffset(gridItem, previousRunningPosition);
 }
