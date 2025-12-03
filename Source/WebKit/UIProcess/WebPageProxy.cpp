@@ -7792,11 +7792,14 @@ void WebPageProxy::broadcastAllDocumentSyncData(IPC::Connection& connection, Ref
 
 void WebPageProxy::broadcastFrameTreeSyncData(IPC::Connection& connection, FrameIdentifier frameID, const WebCore::FrameTreeSyncSerializationData& data)
 {
+    Ref process = WebProcessProxy::fromConnection(connection);
+
     // FIXME: This only allows changes from the process that the frame currently lives in.
     // We may want to also allow changes from the process that owns the parent frame, possibly
     // filtered on a per-property basis.
-    Ref process = WebProcessProxy::fromConnection(connection);
-    MESSAGE_CHECK(process, &siteIsolatedProcess() == process.ptr());
+    RefPtr webFrameProxy = WebFrameProxy::webFrame(frameID);
+    MESSAGE_CHECK(process, webFrameProxy && &webFrameProxy->process() == &process.get());
+
     forEachWebContentProcess([&](auto& webProcess, auto pageID) {
         if (webProcess == process)
             return;
@@ -7807,7 +7810,13 @@ void WebPageProxy::broadcastFrameTreeSyncData(IPC::Connection& connection, Frame
 void WebPageProxy::broadcastAllFrameTreeSyncData(IPC::Connection& connection, FrameIdentifier frameID, Ref<WebCore::FrameTreeSyncData>&& data)
 {
     Ref process = WebProcessProxy::fromConnection(connection);
-    MESSAGE_CHECK(process, &siteIsolatedProcess() == process.ptr());
+
+    // FIXME: This only allows changes from the process that the frame currently lives in.
+    // We may want to also allow changes from the process that owns the parent frame, possibly
+    // filtered on a per-property basis.
+    RefPtr webFrameProxy = WebFrameProxy::webFrame(frameID);
+    MESSAGE_CHECK(process, webFrameProxy && &webFrameProxy->process() == &process.get());
+
     forEachWebContentProcess([&](auto& webProcess, auto pageID) {
         if (webProcess == process)
             return;
