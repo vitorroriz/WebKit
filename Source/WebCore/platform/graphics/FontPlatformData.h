@@ -87,6 +87,9 @@ struct FontSizeAdjust;
 #if USE(SKIA)
 class SkiaHarfBuzzFont;
 #endif
+#if USE(CORE_TEXT)
+struct FontPlatformSerializedAttributes;
+#endif
 
 struct FontPlatformDataAttributes {
     FontPlatformDataAttributes(float size, FontOrientation orientation, FontWidthVariant widthVariant, TextRenderingMode textRenderingMode, bool syntheticBold, bool syntheticOblique)
@@ -111,6 +114,10 @@ struct FontPlatformDataAttributes {
         , m_url(url)
         , m_psName(psName)
         { }
+
+    WEBCORE_EXPORT FontPlatformDataAttributes(float size, FontOrientation, FontWidthVariant, TextRenderingMode, bool syntheticBold, bool syntheticOblique, std::optional<FontPlatformSerializedAttributes>, CTFontDescriptorOptions, RetainPtr<CFStringRef> url, RetainPtr<CFStringRef> psName);
+
+    WEBCORE_EXPORT std::optional<FontPlatformSerializedAttributes> serializableAttributes() const;
 #endif
 
 #if PLATFORM(WIN) && USE(CAIRO)

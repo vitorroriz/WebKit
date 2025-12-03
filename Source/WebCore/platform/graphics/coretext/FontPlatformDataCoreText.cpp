@@ -55,6 +55,24 @@ inline int mapFontWidthVariantToCTFeatureSelector(FontWidthVariant variant)
     return kProportionalTextSelector;
 }
 
+std::optional<FontPlatformSerializedAttributes> FontPlatformDataAttributes::serializableAttributes() const
+{
+    return FontPlatformSerializedAttributes::fromCF(m_attributes.get());
+}
+
+FontPlatformDataAttributes::FontPlatformDataAttributes(float size, FontOrientation orientation, FontWidthVariant widthVariant, TextRenderingMode textRenderingMode, bool syntheticBold, bool syntheticOblique, std::optional<FontPlatformSerializedAttributes> attributes, CTFontDescriptorOptions options, RetainPtr<CFStringRef> url, RetainPtr<CFStringRef> psName)
+    : m_size(size)
+    , m_orientation(orientation)
+    , m_widthVariant(widthVariant)
+    , m_textRenderingMode(textRenderingMode)
+    , m_syntheticBold(syntheticBold)
+    , m_syntheticOblique(syntheticOblique)
+    , m_attributes(attributes ? attributes->toCFDictionary() : nullptr)
+    , m_options(options)
+    , m_url(url)
+    , m_psName(psName)
+    { }
+
 FontPlatformData::FontPlatformData(RetainPtr<CTFontRef>&& font, float size, bool syntheticBold, bool syntheticOblique, FontOrientation orientation, FontWidthVariant widthVariant, TextRenderingMode textRenderingMode, const FontCustomPlatformData* customPlatformData)
     : FontPlatformData(size, syntheticBold, syntheticOblique, orientation, widthVariant, textRenderingMode, customPlatformData)
 {

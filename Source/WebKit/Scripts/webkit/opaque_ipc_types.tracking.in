@@ -239,7 +239,6 @@
     [Legacy] StructureParam WebKit::WebPushD::WebPushDaemonConnectionConfiguration.hostAppAuditTokenData
     [Legacy] StructureParam WebKit::WebsiteDataStoreParameters.uiProcessCookieStorageIdentifier
     [Legacy] StructureParam WebCore::ContentFilterUnblockHandler.webFilterEvaluatorData()
-    [Legacy] StructureParam WebCore::FontPlatformSerializedCreationData.fontFaceData
     [Legacy] StructureParam WebCore::FormData.m_boundary
     [Legacy] StructureParam WebCore::NotificationData.data
     [Legacy] StructureParam WebCore::PushSubscriptionData.clientECDHPublicKey
@@ -354,7 +353,6 @@
     [Legacy] StructureParam WebKit::NetworkSessionCreationParameters.proxyConfiguration
     [Legacy] StructureParam WebKit::SecItemRequestData.m_attributesToMatch
     [Legacy] StructureParam WebKit::SecItemRequestData.m_queryDictionary
-    [Legacy] StructureParam WebCore::FontPlatformDataAttributes.m_attributes
 }
 
 [UnsafeWrapper] RetainPtr<CFDataRef> {
