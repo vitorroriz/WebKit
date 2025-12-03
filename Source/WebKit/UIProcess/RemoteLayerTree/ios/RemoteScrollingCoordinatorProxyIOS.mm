@@ -179,7 +179,7 @@ void RemoteScrollingCoordinatorProxyIOS::connectStateNodeLayers(ScrollingStateTr
 
         switch (currNode->nodeType()) {
         case ScrollingNodeType::Overflow: {
-            ScrollingStateOverflowScrollingNode& scrollingStateNode = downcast<ScrollingStateOverflowScrollingNode>(currNode).unsafeGet();
+            auto& scrollingStateNode = downcast<ScrollingStateOverflowScrollingNode>(currNode.get());
 
             if (scrollingStateNode.hasChangedProperty(ScrollingStateNode::Property::ScrollContainerLayer)) {
                 auto platformLayerID = scrollingStateNode.scrollContainerLayer().layerID();
@@ -194,7 +194,7 @@ void RemoteScrollingCoordinatorProxyIOS::connectStateNodeLayers(ScrollingStateTr
         };
         case ScrollingNodeType::MainFrame:
         case ScrollingNodeType::Subframe: {
-            ScrollingStateFrameScrollingNode& scrollingStateNode = downcast<ScrollingStateFrameScrollingNode>(currNode).unsafeGet();
+            auto& scrollingStateNode = downcast<ScrollingStateFrameScrollingNode>(currNode.get());
 
             if (scrollingStateNode.hasChangedProperty(ScrollingStateNode::Property::ScrollContainerLayer)) {
                 auto platformLayerID = scrollingStateNode.scrollContainerLayer().layerID();
@@ -218,7 +218,7 @@ void RemoteScrollingCoordinatorProxyIOS::connectStateNodeLayers(ScrollingStateTr
             break;
         }
         case ScrollingNodeType::PluginScrolling: {
-            ScrollingStatePluginScrollingNode& scrollingStateNode = downcast<ScrollingStatePluginScrollingNode>(currNode).unsafeGet();
+            auto& scrollingStateNode = downcast<ScrollingStatePluginScrollingNode>(currNode.get());
 
             if (scrollingStateNode.hasChangedProperty(ScrollingStateNode::Property::ScrollContainerLayer)) {
                 auto platformLayerID = scrollingStateNode.scrollContainerLayer().layerID();

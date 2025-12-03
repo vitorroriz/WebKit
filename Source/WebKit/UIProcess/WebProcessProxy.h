@@ -247,11 +247,11 @@ public:
 
     static RefPtr<WebProcessProxy> processForIdentifier(WebCore::ProcessIdentifier);
     static Ref<WebProcessProxy> fromConnection(const IPC::Connection&);
-    static RefPtr<WebPageProxy> webPage(WebPageProxyIdentifier);
-    static RefPtr<WebPageProxy> webPage(WebCore::PageIdentifier);
-    static RefPtr<WebPageProxy> audioCapturingWebPage();
+    static WebPageProxy* webPage(WebPageProxyIdentifier);
+    static WebPageProxy* webPage(WebCore::PageIdentifier);
+    static WebPageProxy* audioCapturingWebPage();
 #if ENABLE(WEBXR)
-    static RefPtr<WebPageProxy> webPageWithActiveXRSession();
+    static WebPageProxy* webPageWithActiveXRSession();
 #endif
     Ref<WebPageProxy> createWebPage(PageClient&, Ref<API::PageConfiguration>&&);
 
