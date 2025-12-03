@@ -35,7 +35,7 @@
 
 - (id<_UIClickInteractionDriverDelegate>)delegate
 {
-    return _delegate.getAutoreleased();
+    return _delegate.get().unsafeGet();
 }
 
 - (void)setDelegate:(id<_UIClickInteractionDriverDelegate>)delegate

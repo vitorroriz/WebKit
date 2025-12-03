@@ -219,7 +219,7 @@ WebsiteDataStore::~WebsiteDataStore()
 }
 
 // FIXME: Remove this when rdar://95786441 is resolved.
-static RefPtr<WebsiteDataStore>& protectedGlobalDefaultDataStore()
+static RefPtr<WebsiteDataStore>& protectedDefaultDataStore()
 {
     static NeverDestroyed<RefPtr<WebsiteDataStore>> globalDefaultDataStore;
     return globalDefaultDataStore.get();
@@ -245,27 +245,24 @@ static IsPersistent defaultDataStoreIsPersistent()
 #endif
 }
 
-WebsiteDataStore& WebsiteDataStore::defaultDataStore()
+Ref<WebsiteDataStore> WebsiteDataStore::defaultDataStore()
 {
     InitializeWebKit2();
     auto& globalDatasStore = globalDefaultDataStore();
     if (globalDatasStore)
-        return *globalDatasStore;
+        return Ref { *globalDatasStore };
 
     auto isPersistent = defaultDataStoreIsPersistent();
-    protectedGlobalDefaultDataStore() = WebsiteDataStore::create(WebsiteDataStoreConfiguration::create(isPersistent), isPersistent == IsPersistent::Yes ? PAL::SessionID::defaultSessionID() : PAL::SessionID::generateEphemeralSessionID());
-    globalDatasStore = protectedGlobalDefaultDataStore().get();
-    return *protectedGlobalDefaultDataStore();
-}
+    Ref newDataStore = WebsiteDataStore::create(WebsiteDataStoreConfiguration::create(isPersistent), isPersistent == IsPersistent::Yes ? PAL::SessionID::defaultSessionID() : PAL::SessionID::generateEphemeralSessionID());
+    globalDatasStore = newDataStore.ptr();
+    protectedDefaultDataStore() = newDataStore.ptr();
 
-Ref<WebsiteDataStore> WebsiteDataStore::protectedDefaultDataStore()
-{
-    return defaultDataStore();
+    return newDataStore;
 }
 
 void WebsiteDataStore::deleteDefaultDataStoreForTesting()
 {
-    protectedGlobalDefaultDataStore() = nullptr;
+    protectedDefaultDataStore() = nullptr;
 }
 
 bool WebsiteDataStore::defaultDataStoreExists()
@@ -2563,7 +2560,7 @@ void WebsiteDataStore::forwardAppBoundDomainsToITPIfInitialized(CompletionHandle
         store->setAppBoundDomainsForITP(domains, [callbackAggregator] { });
     };
 
-    propagateAppBoundDomains(protectedGlobalDefaultDataStore().get(), *appBoundDomains);
+    propagateAppBoundDomains(protectedDefaultDataStore().get(), *appBoundDomains);
 
     for (auto& store : allDataStores().values())
         propagateAppBoundDomains(Ref { store.get() }.ptr(), *appBoundDomains);
@@ -2592,7 +2589,7 @@ void WebsiteDataStore::forwardManagedDomainsToITPIfInitialized(CompletionHandler
         store->setManagedDomainsForITP(domains, [callbackAggregator] { });
     };
 
-    propagateManagedDomains(protectedGlobalDefaultDataStore().get(), *managedDomains);
+    propagateManagedDomains(protectedDefaultDataStore().get(), *managedDomains);
 
     for (auto& store : allDataStores().values())
         propagateManagedDomains(Ref { store.get() }.ptr(), *managedDomains);

@@ -370,10 +370,8 @@ WebCore::AccessibilityObject* WebAutomationSessionProxy::getAccessibilityObjectF
         // the accessibility object for this element will not be created (because it doesn't yet have its renderer).
         axObjectCache->performDeferredCacheUpdate(ForceLayout::Yes);
 
-        // FIXME: This is a safer cpp false positive. We should not need to ref the variable here
-        // as we merely return it right away (rdar://165602290).
-        SUPPRESS_UNCOUNTED_LOCAL if (auto* axObject = axObjectCache->exportedGetOrCreate(*coreElement))
-            return axObject;
+        if (RefPtr<WebCore::AccessibilityObject> axObject = axObjectCache->exportedGetOrCreate(*coreElement))
+            return axObject.unsafeGet();
     }
 
     errorType = Inspector::Protocol::AutomationHelpers::getEnumConstantValue(Inspector::Protocol::Automation::ErrorMessage::InternalError);
@@ -668,21 +666,17 @@ static WebCore::Element* containerElementForElement(WebCore::Element& element)
     // §13. Element State.
     // https://w3c.github.io/webdriver/webdriver-spec.html#dfn-container.
     if (is<WebCore::HTMLOptionElement>(element)) {
-        if (auto* parentElement = WebCore::ancestorsOfType<WebCore::HTMLDataListElement>(element).first())
-            return parentElement;
-        // FIXME: This is a safer cpp false positive. We should not need to ref the variable here
-        // as we merely return it right away (rdar://165602290).
-        SUPPRESS_UNCOUNTED_LOCAL if (auto* parentElement = downcast<WebCore::HTMLOptionElement>(element).ownerSelectElement())
-            return parentElement;
+        if (RefPtr parentElement = WebCore::ancestorsOfType<WebCore::HTMLDataListElement>(element).first())
+            return parentElement.unsafeGet();
+        if (RefPtr parentElement = downcast<WebCore::HTMLOptionElement>(element).ownerSelectElement())
+            return parentElement.unsafeGet();
 
         return nullptr;
     }
 
     if (RefPtr optgroup = dynamicDowncast<WebCore::HTMLOptGroupElement>(element)) {
-        // FIXME: This is a safer cpp false positive. We should not need to ref the variable here
-        // as we merely return it right away (rdar://165602290).
-        SUPPRESS_UNCOUNTED_LOCAL if (auto* parentElement = optgroup->ownerSelectElement())
-            return parentElement;
+        if (RefPtr parentElement = optgroup->ownerSelectElement())
+            return parentElement.unsafeGet();
 
         return nullptr;
     }

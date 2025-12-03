@@ -59,15 +59,15 @@ RemoteRemoteCommandListener::~RemoteRemoteCommandListener()
 
 GPUProcessConnection& RemoteRemoteCommandListener::ensureGPUProcessConnection()
 {
-    if (!m_gpuProcessConnection.get()) {
-        Ref gpuProcessConnection = WebProcess::singleton().ensureGPUProcessConnection();
-        m_gpuProcessConnection = gpuProcessConnection.get();
+    RefPtr gpuProcessConnection = m_gpuProcessConnection.get();
+    if (!gpuProcessConnection) {
+        gpuProcessConnection = WebProcess::singleton().ensureGPUProcessConnection();
+        m_gpuProcessConnection = gpuProcessConnection;
         gpuProcessConnection->addClient(*this);
         gpuProcessConnection->messageReceiverMap().addMessageReceiver(Messages::RemoteRemoteCommandListener::messageReceiverName(), identifier().toUInt64(), *this);
         gpuProcessConnection->connection().send(Messages::GPUConnectionToWebProcess::CreateRemoteCommandListener(identifier()), { });
     }
-    ASSERT(m_gpuProcessConnection.get() == &WebProcess::singleton().ensureGPUProcessConnection());
-    return WebProcess::singleton().ensureGPUProcessConnection();
+    return *gpuProcessConnection.unsafeGet();
 }
 
 void RemoteRemoteCommandListener::gpuProcessConnectionDidClose(GPUProcessConnection& gpuProcessConnection)

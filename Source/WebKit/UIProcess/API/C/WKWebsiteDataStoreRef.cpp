@@ -56,7 +56,7 @@ WKTypeID WKWebsiteDataStoreGetTypeID()
 
 WKWebsiteDataStoreRef WKWebsiteDataStoreGetDefaultDataStore()
 {
-    return WebKit::toAPI(WebKit::WebsiteDataStore::protectedDefaultDataStore().get());
+    return WebKit::toAPI(WebKit::WebsiteDataStore::defaultDataStore().ptr());
 }
 
 WKWebsiteDataStoreRef WKWebsiteDataStoreCreateNonPersistentDataStore()

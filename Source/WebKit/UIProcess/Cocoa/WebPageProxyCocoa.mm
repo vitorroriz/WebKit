@@ -1549,7 +1549,7 @@ void WebPageProxy::setTextIndicatorFromFrame(FrameIdentifier frameID, const RefP
         return;
 
     auto rect = textIndicator->textBoundingRectInRootViewCoordinates();
-    convertRectToMainFrameCoordinates(rect, frame->rootFrame()->frameID(), [weakThis = WeakPtr { *this }, textIndicator = WTFMove(textIndicator), lifetime] (std::optional<FloatRect> convertedRect) mutable {
+    convertRectToMainFrameCoordinates(rect, frame->rootFrame().frameID(), [weakThis = WeakPtr { *this }, textIndicator = WTFMove(textIndicator), lifetime] (std::optional<FloatRect> convertedRect) mutable {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis || !convertedRect)
             return;
@@ -1594,7 +1594,7 @@ void WebPageProxy::updateTextIndicatorFromFrame(FrameIdentifier frameID, RefPtr<
         return;
 
     auto rect = textIndicator->textBoundingRectInRootViewCoordinates();
-    convertRectToMainFrameCoordinates(rect, frame->rootFrame()->frameID(), [weakThis = WeakPtr { *this }, textIndicator = WTFMove(textIndicator)] (std::optional<FloatRect> convertedRect) mutable {
+    convertRectToMainFrameCoordinates(rect, frame->rootFrame().frameID(), [weakThis = WeakPtr { *this }, textIndicator = WTFMove(textIndicator)] (std::optional<FloatRect> convertedRect) mutable {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis || !convertedRect)
             return;
@@ -1677,7 +1677,7 @@ bool WebPageProxy::tryToSendCommandToActiveControlledVideo(PlatformMediaSession:
     if (!hasActiveVideoForControlsManager())
         return false;
 
-    WeakPtr model = protectedPlaybackSessionManager()->protectedControlsManagerInterface()->playbackSessionModel();
+    WeakPtr model = protectedPlaybackSessionManager()->controlsManagerInterface()->playbackSessionModel();
     if (!model)
         return false;
 

@@ -814,12 +814,12 @@ void WebFrameProxy::updateOpener(WebCore::FrameIdentifier newOpener)
     m_opener = WebFrameProxy::webFrame(newOpener);
 }
 
-Ref<WebFrameProxy> WebFrameProxy::rootFrame()
+WebFrameProxy& WebFrameProxy::rootFrame()
 {
     Ref rootFrame = *this;
     while (rootFrame->m_parentFrame && rootFrame->m_parentFrame->process().coreProcessIdentifier() == process().coreProcessIdentifier())
         rootFrame = *rootFrame->m_parentFrame;
-    return rootFrame;
+    return rootFrame.unsafeGet();
 }
 
 bool WebFrameProxy::isMainFrame() const

@@ -275,13 +275,15 @@ void RemoteMediaPlayerManager::setUseGPUProcess(bool useGPUProcess)
 
 GPUProcessConnection& RemoteMediaPlayerManager::gpuProcessConnection()
 {
-    if (!m_gpuProcessConnection.get()) {
-        Ref gpuProcessConnection = WebProcess::singleton().ensureGPUProcessConnection();
-        m_gpuProcessConnection = gpuProcessConnection.get();
+    RefPtr gpuProcessConnection = m_gpuProcessConnection.get();
+    if (!gpuProcessConnection) {
+        gpuProcessConnection = WebProcess::singleton().ensureGPUProcessConnection();
+        m_gpuProcessConnection = gpuProcessConnection;
+        gpuProcessConnection = WebProcess::singleton().ensureGPUProcessConnection();
         gpuProcessConnection->addClient(*this);
     }
-    ASSERT(m_gpuProcessConnection.get() == &WebProcess::singleton().ensureGPUProcessConnection());
-    return WebProcess::singleton().ensureGPUProcessConnection();
+
+    return *gpuProcessConnection.unsafeGet();
 }
 
 Ref<GPUProcessConnection> RemoteMediaPlayerManager::protectedGPUProcessConnection()

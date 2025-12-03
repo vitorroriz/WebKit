@@ -147,21 +147,17 @@ IntSize PageClientImpl::viewSize()
 
 NSView *PageClientImpl::activeView() const
 {
-    if (CheckedPtr impl = m_impl.get()) {
-        if (RetainPtr thumbnailView = impl->thumbnailView())
-            return thumbnailView.autorelease();
-    }
-    return m_view.getAutoreleased();
+    CheckedPtr impl = m_impl.get();
+    return (impl && impl->thumbnailView()) ? impl->thumbnailView().unsafeGet() : m_view.getAutoreleased();
 }
 
 NSWindow *PageClientImpl::activeWindow() const
 {
-    if (CheckedPtr impl = m_impl.get()) {
-        if (RetainPtr thumbnailView = impl->thumbnailView())
-            return [thumbnailView window];
-        if (impl->targetWindowForMovePreparation())
-            return impl->targetWindowForMovePreparation();
-    }
+    CheckedPtr impl = m_impl.get();
+    if (impl && impl->thumbnailView())
+        return [impl->thumbnailView() window];
+    if (impl && impl->targetWindowForMovePreparation())
+        return impl->targetWindowForMovePreparation();
     return [m_view.get() window];
 }
 

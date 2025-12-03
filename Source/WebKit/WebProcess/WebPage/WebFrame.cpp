@@ -1338,14 +1338,14 @@ inline DocumentLoader* WebFrame::policySourceDocumentLoader() const
         return nullptr;
     }
 
-    WeakPtr mainFrameDocumentLoader = mainFrameDocument->loader();
-    if (!mainFrameDocumentLoader)
+    RefPtr policySourceDocumentLoader = mainFrameDocument->loader();
+    if (!policySourceDocumentLoader)
         return nullptr;
 
-    if (Ref { *mainFrameDocumentLoader }->request().url().hasSpecialScheme() && document->url().protocolIsInHTTPFamily())
-        return document->loader();
+    if (!policySourceDocumentLoader->request().url().hasSpecialScheme() && document->url().protocolIsInHTTPFamily())
+        policySourceDocumentLoader = document->loader();
 
-    return mainFrameDocumentLoader.get();
+    return policySourceDocumentLoader.unsafeGet();
 }
 
 OptionSet<WebCore::AdvancedPrivacyProtections> WebFrame::advancedPrivacyProtections() const

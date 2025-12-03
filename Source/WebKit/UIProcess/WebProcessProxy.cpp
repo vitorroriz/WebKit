@@ -746,36 +746,36 @@ void WebProcessProxy::shutDown()
     Ref<WebProcessPool> { processPool() }->disconnectProcess(*this);
 }
 
-WebPageProxy* WebProcessProxy::webPage(WebPageProxyIdentifier pageID)
+RefPtr<WebPageProxy> WebProcessProxy::webPage(WebPageProxyIdentifier pageID)
 {
     return globalPageMap().get(pageID);
 }
 
-WebPageProxy* WebProcessProxy::webPage(PageIdentifier pageID)
+RefPtr<WebPageProxy> WebProcessProxy::webPage(PageIdentifier pageID)
 {
-    for (WeakRef page : globalPageMap().values()) {
+    for (Ref page : globalPages()) {
         if (page->webPageIDInMainFrameProcess() == pageID)
-            return page.ptr();
+            return page;
     }
+
     return nullptr;
 }
 
-WebPageProxy* WebProcessProxy::audioCapturingWebPage()
+RefPtr<WebPageProxy> WebProcessProxy::audioCapturingWebPage()
 {
-    for (WeakRef page : globalPageMap().values()) {
-        if (Ref { page.get() }->hasActiveAudioStream())
+    for (Ref page : globalPages()) {
+        if (page->hasActiveAudioStream())
             return page.ptr();
     }
     return nullptr;
 }
 
 #if ENABLE(WEBXR)
-WebPageProxy* WebProcessProxy::webPageWithActiveXRSession()
+RefPtr<WebPageProxy> WebProcessProxy::webPageWithActiveXRSession()
 {
-    for (WeakRef weakPage : globalPageMap().values()) {
-        Ref page = weakPage.get();
+    for (Ref page : globalPages()) {
         if (page->xrSystem() && page->xrSystem()->hasActiveSession())
-            return weakPage.ptr();
+            return page;
     }
     return nullptr;
 }

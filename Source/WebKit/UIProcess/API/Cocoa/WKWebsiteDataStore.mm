@@ -412,7 +412,7 @@ WK_OBJECT_DISABLE_DISABLE_KVC_IVAR_ACCESS;
 
 + (WKWebsiteDataStore *)defaultDataStore
 {
-    return wrapper(WebKit::WebsiteDataStore::defaultDataStore());
+    return wrapper(WebKit::WebsiteDataStore::defaultDataStore()).autorelease();
 }
 
 + (WKWebsiteDataStore *)nonPersistentDataStore
@@ -1130,7 +1130,7 @@ struct WKWebsiteData {
 
 - (id <_WKWebsiteDataStoreDelegate>)_delegate
 {
-    return _delegate.getAutoreleased();
+    return _delegate.get().unsafeGet();
 }
 
 - (void)set_delegate:(id <_WKWebsiteDataStoreDelegate>)delegate

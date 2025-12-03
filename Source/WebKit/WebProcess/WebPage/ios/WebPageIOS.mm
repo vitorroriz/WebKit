@@ -1336,15 +1336,14 @@ void WebPage::sendTapHighlightForNodeIfNecessary(WebKit::TapIdentifier requestID
         localMainFrame->loader().prefetchDNSIfNeeded(element->absoluteLinkURL());
     }
 
-    RefPtr updatedNode = node;
     if (RefPtr area = dynamicDowncast<HTMLAreaElement>(*node)) {
-        updatedNode = area->imageElement();
-        if (!updatedNode)
+        node = area->imageElement().unsafeGet();
+        if (!node)
             return;
     }
 
 #if ENABLE(PDF_PLUGIN)
-    if (RefPtr pluginView = pluginViewForFrame(updatedNode->document().frame())) {
+    if (RefPtr pluginView = pluginViewForFrame(node->document().frame())) {
         if (auto rect = pluginView->highlightRectForTapAtPoint(point)) {
             auto highlightColor = RenderThemeIOS::singleton().platformTapHighlightColor();
             auto highlightQuads = Vector { FloatQuad { WTFMove(*rect) } };
@@ -1355,12 +1354,12 @@ void WebPage::sendTapHighlightForNodeIfNecessary(WebKit::TapIdentifier requestID
 #endif // ENABLE(PDF_PLUGIN)
 
     Vector<FloatQuad> quads;
-    if (RenderObject *renderer = updatedNode->renderer()) {
+    if (RenderObject *renderer = node->renderer()) {
         renderer->absoluteQuads(quads);
         auto& style = renderer->style();
         auto highlightColor = style.colorResolvingCurrentColor(style.tapHighlightColor());
-        if (!updatedNode->document().frame()->isMainFrame()) {
-            auto* view = updatedNode->document().frame()->view();
+        if (!node->document().frame()->isMainFrame()) {
+            auto* view = node->document().frame()->view();
             for (auto& quad : quads)
                 quad = view->contentsToRootView(quad);
         }
@@ -1369,7 +1368,7 @@ void WebPage::sendTapHighlightForNodeIfNecessary(WebKit::TapIdentifier requestID
         if (CheckedPtr renderBox = dynamicDowncast<RenderBox>(*renderer))
             borderRadii = renderBox->borderRadii();
 
-        RefPtr element = dynamicDowncast<Element>(*updatedNode);
+        RefPtr element = dynamicDowncast<Element>(*node);
         bool nodeHasBuiltInClickHandling = element && (is<HTMLFormControlElement>(*element) || is<HTMLAnchorElement>(*element) || is<HTMLLabelElement>(*element) || is<HTMLSummaryElement>(*element) || element->isLink());
         send(Messages::WebPageProxy::DidGetTapHighlightGeometries(requestID, highlightColor, quads, roundedIntSize(borderRadii.topLeft()), roundedIntSize(borderRadii.topRight()), roundedIntSize(borderRadii.bottomLeft()), roundedIntSize(borderRadii.bottomRight()), nodeHasBuiltInClickHandling));
     }

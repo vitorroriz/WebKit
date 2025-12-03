@@ -28,14 +28,13 @@
 #include <QuartzCore/CALayer.h>
 #include <WebCore/FloatSize.h>
 #include <WebCore/MediaPlayerEnums.h>
-#include <wtf/RefPtr.h>
 
 namespace WebKit {
 class VideoLayerRemoteParent;
 }
 
 @interface WKVideoLayerRemote : CALayer
-@property (nonatomic) RefPtr<WebKit::VideoLayerRemoteParent> parent;
+@property (nonatomic) WebKit::VideoLayerRemoteParent* parent;
 @property (nonatomic) CGRect videoLayerFrame;
 @property (nonatomic) WebCore::MediaPlayerEnums::VideoGravity videoGravity;
 @end

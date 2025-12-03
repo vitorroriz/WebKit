@@ -559,20 +559,20 @@ void NetworkProcessProxy::negotiatedLegacyTLS(WebPageProxyIdentifier pageID)
 
 void NetworkProcessProxy::didNegotiateModernTLS(WebPageProxyIdentifier pageID, const URL& url)
 {
-    if (RefPtr page = WebProcessProxy::webPage(pageID))
+    if (auto page = WebProcessProxy::webPage(pageID))
         page->didNegotiateModernTLS(url);
 }
 
 void NetworkProcessProxy::didBlockLoadToKnownTracker(WebPageProxyIdentifier pageID, const URL& url)
 {
-    if (RefPtr page = WebProcessProxy::webPage(pageID))
+    if (auto page = WebProcessProxy::webPage(pageID))
         page->didBlockLoadToKnownTracker(url);
 }
 
 void NetworkProcessProxy::triggerBrowsingContextGroupSwitchForNavigation(WebPageProxyIdentifier pageID, WebCore::NavigationIdentifier navigationID, BrowsingContextGroupSwitchDecision browsingContextGroupSwitchDecision, const WebCore::Site& responseSite, NetworkResourceLoadIdentifier existingNetworkResourceLoadIdentifierToResume, CompletionHandler<void(bool success)>&& completionHandler)
 {
     RELEASE_LOG(ProcessSwapping, "%p - NetworkProcessProxy::triggerBrowsingContextGroupSwitchForNavigation: pageID=%" PRIu64 ", navigationID=%" PRIu64 ", browsingContextGroupSwitchDecision=%u, existingNetworkResourceLoadIdentifierToResume=%" PRIu64, this, pageID.toUInt64(), navigationID.toUInt64(), (unsigned)browsingContextGroupSwitchDecision, existingNetworkResourceLoadIdentifierToResume.toUInt64());
-    if (RefPtr page = WebProcessProxy::webPage(pageID))
+    if (auto page = WebProcessProxy::webPage(pageID))
         page->triggerBrowsingContextGroupSwitchForNavigation(navigationID, browsingContextGroupSwitchDecision, responseSite, existingNetworkResourceLoadIdentifierToResume, WTFMove(completionHandler));
     else
         completionHandler(false);
@@ -592,10 +592,13 @@ void NetworkProcessProxy::didFinishLaunching(ProcessLauncher* launcher, IPC::Con
 
 void NetworkProcessProxy::logDiagnosticMessage(WebPageProxyIdentifier pageID, const String& message, const String& description, WebCore::ShouldSample shouldSample)
 {
+    auto page = WebProcessProxy::webPage(pageID);
     // FIXME: We do this null-check because by the time the decision to log is made, the page may be gone. We should refactor to avoid this,
     // but for now we simply drop the message in the rare case this happens.
-    if (RefPtr page = WebProcessProxy::webPage(pageID))
-        page->logDiagnosticMessage(message, description, shouldSample);
+    if (!page)
+        return;
+
+    page->logDiagnosticMessage(message, description, shouldSample);
 }
 
 void NetworkProcessProxy::terminateWebProcess(WebCore::ProcessIdentifier webProcessIdentifier)
@@ -619,23 +622,29 @@ void NetworkProcessProxy::terminateIdleServiceWorkers(WebCore::ProcessIdentifier
 
 void NetworkProcessProxy::logDiagnosticMessageWithResult(WebPageProxyIdentifier pageID, const String& message, const String& description, uint32_t result, WebCore::ShouldSample shouldSample)
 {
+    auto page = WebProcessProxy::webPage(pageID);
     // FIXME: We do this null-check because by the time the decision to log is made, the page may be gone. We should refactor to avoid this,
     // but for now we simply drop the message in the rare case this happens.
-    if (RefPtr page = WebProcessProxy::webPage(pageID))
-        page->logDiagnosticMessageWithResult(message, description, result, shouldSample);
+    if (!page)
+        return;
+
+    page->logDiagnosticMessageWithResult(message, description, result, shouldSample);
 }
 
 void NetworkProcessProxy::logDiagnosticMessageWithValue(WebPageProxyIdentifier pageID, const String& message, const String& description, double value, unsigned significantFigures, WebCore::ShouldSample shouldSample)
 {
+    auto page = WebProcessProxy::webPage(pageID);
     // FIXME: We do this null-check because by the time the decision to log is made, the page may be gone. We should refactor to avoid this,
     // but for now we simply drop the message in the rare case this happens.
-    if (RefPtr page = WebProcessProxy::webPage(pageID))
-        page->logDiagnosticMessageWithValue(message, description, value, significantFigures, shouldSample);
+    if (!page)
+        return;
+
+    page->logDiagnosticMessageWithValue(message, description, value, significantFigures, shouldSample);
 }
 
 void NetworkProcessProxy::resourceLoadDidSendRequest(WebPageProxyIdentifier pageID, ResourceLoadInfo&& loadInfo, WebCore::ResourceRequest&& request, std::optional<IPC::FormDataReference>&& httpBody)
 {
-    RefPtr page = WebProcessProxy::webPage(pageID);
+    auto page = WebProcessProxy::webPage(pageID);
     if (!page)
         return;
 
@@ -649,7 +658,7 @@ void NetworkProcessProxy::resourceLoadDidSendRequest(WebPageProxyIdentifier page
 
 void NetworkProcessProxy::resourceLoadDidPerformHTTPRedirection(WebPageProxyIdentifier pageID, ResourceLoadInfo&& loadInfo, WebCore::ResourceResponse&& response, WebCore::ResourceRequest&& request)
 {
-    RefPtr page = WebProcessProxy::webPage(pageID);
+    auto page = WebProcessProxy::webPage(pageID);
     if (!page)
         return;
 
@@ -658,7 +667,7 @@ void NetworkProcessProxy::resourceLoadDidPerformHTTPRedirection(WebPageProxyIden
 
 void NetworkProcessProxy::resourceLoadDidReceiveChallenge(WebPageProxyIdentifier pageID, ResourceLoadInfo&& loadInfo, WebCore::AuthenticationChallenge&& challenge)
 {
-    RefPtr page = WebProcessProxy::webPage(pageID);
+    auto page = WebProcessProxy::webPage(pageID);
     if (!page)
         return;
 
@@ -667,7 +676,7 @@ void NetworkProcessProxy::resourceLoadDidReceiveChallenge(WebPageProxyIdentifier
 
 void NetworkProcessProxy::resourceLoadDidReceiveResponse(WebPageProxyIdentifier pageID, ResourceLoadInfo&& loadInfo, WebCore::ResourceResponse&& response)
 {
-    RefPtr page = WebProcessProxy::webPage(pageID);
+    auto page = WebProcessProxy::webPage(pageID);
     if (!page)
         return;
 
@@ -676,7 +685,7 @@ void NetworkProcessProxy::resourceLoadDidReceiveResponse(WebPageProxyIdentifier 
 
 void NetworkProcessProxy::resourceLoadDidCompleteWithError(WebPageProxyIdentifier pageID, ResourceLoadInfo&& loadInfo, WebCore::ResourceResponse&& response, WebCore::ResourceError&& error)
 {
-    RefPtr page = WebProcessProxy::webPage(pageID);
+    auto page = WebProcessProxy::webPage(pageID);
     if (!page)
         return;
 
@@ -1025,7 +1034,7 @@ void NetworkProcessProxy::setGrandfathered(PAL::SessionID sessionID, const Regis
 
 void NetworkProcessProxy::requestStorageAccessConfirm(WebPageProxyIdentifier pageID, FrameIdentifier frameID, const RegistrableDomain& subFrameDomain, const RegistrableDomain& topFrameDomain, std::optional<WebCore::OrganizationStorageAccessPromptQuirk>&& organizationStorageAccessPromptQuirk, CompletionHandler<void(bool)>&& completionHandler)
 {
-    RefPtr page = WebProcessProxy::webPage(pageID);
+    auto page = WebProcessProxy::webPage(pageID);
     if (!page) {
         completionHandler(false);
         return;
@@ -1199,8 +1208,11 @@ void NetworkProcessProxy::didCommitCrossSiteLoadWithDataTransferFromPrevalentRes
     if (!canSendMessage())
         return;
 
-    if (RefPtr page = WebProcessProxy::webPage(pageID))
-        page->didCommitCrossSiteLoadWithDataTransferFromPrevalentResource();
+    auto page = WebProcessProxy::webPage(pageID);
+    if (!page)
+        return;
+
+    page->didCommitCrossSiteLoadWithDataTransferFromPrevalentResource();
 }
 
 void NetworkProcessProxy::setCrossSiteLoadWithLinkDecorationForTesting(PAL::SessionID sessionID, const RegistrableDomain& fromDomain, const RegistrableDomain& toDomain, bool wasFiltered, CompletionHandler<void()>&& completionHandler)
@@ -1655,7 +1667,7 @@ void NetworkProcessProxy::setWebProcessHasUploads(WebCore::ProcessIdentifier pro
 
 void NetworkProcessProxy::testProcessIncomingSyncMessagesWhenWaitingForSyncReply(WebPageProxyIdentifier pageID, CompletionHandler<void(bool)>&& reply)
 {
-    RefPtr page = WebProcessProxy::webPage(pageID);
+    auto page = WebProcessProxy::webPage(pageID);
     if (!page)
         return reply(false);
 
@@ -1947,7 +1959,7 @@ void NetworkProcessProxy::deleteWebsiteDataInWebProcessesForOrigin(OptionSet<Web
 #endif
         // Since this navigation requested that we clear existing navigation snapshots, we shouldn't
         // create a snapshot for this navigation either if it is same-origin.
-        if (RefPtr page = WebProcessProxy::webPage(webPageProxyID)) {
+        if (auto page = WebProcessProxy::webPage(webPageProxyID)) {
             bool isSameOriginNavigation = SecurityOriginData::fromURL(URL(page->pageLoadState().url())) == origin.topOrigin;
             if (isSameOriginNavigation)
                 page->suppressNextAutomaticNavigationSnapshot();
@@ -2002,7 +2014,7 @@ void NetworkProcessProxy::wakeUpWebProcessForIPC(WebCore::ProcessIdentifier proc
 
 void NetworkProcessProxy::reportNetworkIssue(WebPageProxyIdentifier pageIdentifier, const URL& requestURL)
 {
-    if (RefPtr page = WebProcessProxy::webPage(pageIdentifier))
+    if (auto page = WebProcessProxy::webPage(pageIdentifier))
         page->reportNetworkIssue(requestURL);
 }
 

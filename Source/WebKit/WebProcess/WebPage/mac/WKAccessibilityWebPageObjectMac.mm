@@ -203,16 +203,16 @@ ALLOW_DEPRECATED_IMPLEMENTATIONS_END
     }
 
     if ([attribute isEqualToString:NSAccessibilityParentAttribute])
-        return [self accessibilityAttributeParentValue].autorelease();
+        return [self accessibilityAttributeParentValue].unsafeGet();
 
     if ([attribute isEqualToString:NSAccessibilityPrimaryScreenHeightAttribute])
         return @(screenHeight.load());
 
     if ([attribute isEqualToString:NSAccessibilityWindowAttribute])
-        return [self accessibilityAttributeWindowValue].autorelease();
+        return [self accessibilityAttributeWindowValue].unsafeGet();
 
     if ([attribute isEqualToString:NSAccessibilityTopLevelUIElementAttribute])
-        return [self accessibilityAttributeTopLevelUIElementValue].autorelease();
+        return [self accessibilityAttributeTopLevelUIElementValue].unsafeGet();
 
     return nil;
 }

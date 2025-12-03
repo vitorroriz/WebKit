@@ -661,14 +661,9 @@ Ref<PlaybackSessionModelContext> PlaybackSessionManagerProxy::ensureModel(Playba
     return std::get<0>(ensureModelAndInterface(contextId));
 }
 
-PlatformPlaybackSessionInterface& PlaybackSessionManagerProxy::ensureInterface(PlaybackSessionContextIdentifier contextId)
+Ref<PlatformPlaybackSessionInterface> PlaybackSessionManagerProxy::ensureInterface(PlaybackSessionContextIdentifier contextId)
 {
-    return std::get<1>(ensureModelAndInterface(contextId)).get();
-}
-
-Ref<PlatformPlaybackSessionInterface> PlaybackSessionManagerProxy::ensureProtectedInterface(PlaybackSessionContextIdentifier contextId)
-{
-    return ensureInterface(contextId);
+    return std::get<1>(ensureModelAndInterface(contextId));
 }
 
 void PlaybackSessionManagerProxy::addClientForContext(PlaybackSessionContextIdentifier contextId)
@@ -681,7 +676,7 @@ void PlaybackSessionManagerProxy::removeClientForContext(PlaybackSessionContextI
     if (!m_clientCounts.remove(contextId))
         return;
 
-    ensureProtectedInterface(contextId)->invalidate();
+    ensureInterface(contextId)->invalidate();
     m_contextMap.remove(contextId);
 }
 
@@ -697,7 +692,7 @@ void PlaybackSessionManagerProxy::setUpPlaybackControlsManagerWithID(PlaybackSes
 
     m_controlsManagerContextId = contextId;
     m_controlsManagerContextIsVideo = isVideo;
-    ensureProtectedInterface(*m_controlsManagerContextId)->ensureControlsManager();
+    ensureInterface(*m_controlsManagerContextId)->ensureControlsManager();
     addClientForContext(*m_controlsManagerContextId);
 
     if (RefPtr page = m_page.get())
@@ -1182,17 +1177,12 @@ void PlaybackSessionManagerProxy::requestControlledElementID()
         page->protectedLegacyMainFrameProcess()->send(Messages::PlaybackSessionManager::HandleControlledElementIDRequest(m_controlsManagerContextId->object()), page->webPageIDInMainFrameProcess());
 }
 
-PlatformPlaybackSessionInterface* PlaybackSessionManagerProxy::controlsManagerInterface()
+RefPtr<PlatformPlaybackSessionInterface> PlaybackSessionManagerProxy::controlsManagerInterface()
 {
     if (!m_controlsManagerContextId)
         return nullptr;
 
-    return &ensureInterface(*m_controlsManagerContextId);
-}
-
-RefPtr<WebCore::PlatformPlaybackSessionInterface> PlaybackSessionManagerProxy::protectedControlsManagerInterface()
-{
-    return controlsManagerInterface();
+    return ensureInterface(*m_controlsManagerContextId);
 }
 
 bool PlaybackSessionManagerProxy::isPaused(PlaybackSessionContextIdentifier identifier) const

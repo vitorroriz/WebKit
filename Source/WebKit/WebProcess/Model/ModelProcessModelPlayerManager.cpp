@@ -53,13 +53,15 @@ ModelProcessModelPlayerManager::~ModelProcessModelPlayerManager() = default;
 
 ModelProcessConnection& ModelProcessModelPlayerManager::modelProcessConnection()
 {
-    if (!m_modelProcessConnection.get()) {
-        Ref modelProcessConnection = WebProcess::singleton().ensureModelProcessConnection();
-        m_modelProcessConnection = modelProcessConnection.get();
+    RefPtr modelProcessConnection = m_modelProcessConnection.get();
+    if (!modelProcessConnection) {
+        modelProcessConnection = WebProcess::singleton().ensureModelProcessConnection();
+        m_modelProcessConnection = modelProcessConnection;
+        modelProcessConnection = WebProcess::singleton().ensureModelProcessConnection();
         modelProcessConnection->addClient(*this);
     }
-    ASSERT(m_modelProcessConnection.get() == &WebProcess::singleton().ensureModelProcessConnection());
-    return WebProcess::singleton().ensureModelProcessConnection();
+
+    return *modelProcessConnection.unsafeGet();
 }
 
 Ref<ModelProcessModelPlayer> ModelProcessModelPlayerManager::createModelProcessModelPlayer(WebPage& page, WebCore::ModelPlayerClient& client)
