@@ -29,6 +29,7 @@
 #include "JSDOMBinding.h"
 #include "JSDOMConstructorNotConstructable.h"
 #include "JSDOMConvertInterface.h"
+#include "JSDOMConvertOptional.h"
 #include "JSDOMExceptionHandling.h"
 #include "JSDOMGlobalObjectInlines.h"
 #include "JSDOMOperation.h"
@@ -230,7 +231,11 @@ static inline EncodedJSValue jsTestAsyncIterablePrototypeFunction_valuesCaller(J
     UNUSED_PARAM(callFrame);
     SUPPRESS_UNCOUNTED_LOCAL auto& vm = JSC::getVM(lexicalGlobalObject);
     auto throwScope = DECLARE_THROW_SCOPE(vm);
-    RELEASE_AND_RETURN(throwScope, JSValue::encode(iteratorCreate<TestAsyncIterableIterator>(*thisObject, *lexicalGlobalObject, throwScope, IterationKind::Values, IDLInterface<TestNode>::ImplementationType { })));
+    EnsureStillAliveScope argument0 = callFrame->argument(0);
+    auto optionConversionResult = convert<IDLOptional<IDLInterface<TestNode>>>(*lexicalGlobalObject, argument0.value(), [](JSC::JSGlobalObject& lexicalGlobalObject, JSC::ThrowScope& scope) { throwArgumentTypeError(lexicalGlobalObject, scope, 0, "option"_s, "TestAsyncIterable"_s, "jsTestAsyncIterablePrototypeFunction_values"_s, "TestNode"_s); });
+    if (optionConversionResult.hasException(throwScope)) [[unlikely]]
+       return encodedJSValue();
+    RELEASE_AND_RETURN(throwScope, JSValue::encode(iteratorCreate<TestAsyncIterableIterator>(*thisObject, *lexicalGlobalObject, throwScope, IterationKind::Values, optionConversionResult.releaseReturnValue())));
 }
 
 JSC_DEFINE_HOST_FUNCTION(jsTestAsyncIterablePrototypeFunction_values, (JSC::JSGlobalObject* lexicalGlobalObject, JSC::CallFrame* callFrame))

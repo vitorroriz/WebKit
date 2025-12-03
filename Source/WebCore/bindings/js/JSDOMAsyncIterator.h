@@ -121,6 +121,7 @@ protected:
         : Base(structure, *iteratedObject.globalObject())
         , m_iterator(WTFMove(iterator))
         , m_kind(kind)
+        , m_isFinished(IsFinished::create())
     {
     }
 
@@ -139,9 +140,23 @@ protected:
 
     static void destroy(JSC::JSCell*);
 
+    class IsFinished : public RefCountedAndCanMakeWeakPtr<IsFinished> {
+    public:
+        static Ref<IsFinished> create() { return adoptRef(*new IsFinished); }
+
+        operator bool() { return m_value; }
+        void markAsFinished() { m_value = true; }
+
+    private:
+        IsFinished() = default;
+
+        bool m_value { false };
+    };
+
     RefPtr<typename DOMWrapped::Iterator> m_iterator;
     IterationKind m_kind;
     RefPtr<DOMPromise> m_ongoingPromise;
+    const Ref<IsFinished> m_isFinished;
 };
 
 template<typename IteratorValue, typename IteratorTraits>
@@ -149,7 +164,7 @@ inline EnableIfMap<IteratorTraits, JSC::JSValue> convertToJS(JSC::JSGlobalObject
 {
     JSC::VM& vm = globalObject.vm();
     Locker<JSC::JSLock> locker(vm.apiLock());
-    
+
     switch (kind) {
     case IterationKind::Keys:
         return toJS<typename IteratorTraits::KeyType>(globalObject, domGlobalObject, value.key);
@@ -231,7 +246,7 @@ JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::runNextSteps(
     auto* promise = jsDynamicCast<JSC::JSPromise*>(nextPromiseCapability.get(&globalObject, vm.propertyNames->promise));
     RETURN_IF_EXCEPTION(scope, { });
 
-    if (!m_iterator) {
+    if (m_isFinished.get()) {
         promise->resolve(&globalObject, JSC::createIteratorResultObject(&globalObject, JSC::jsUndefined(), true));
         RETURN_IF_EXCEPTION(scope, nullptr);
 
@@ -262,7 +277,7 @@ JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::getNextIterat
         return promise;
     }
 
-    m_iterator->next([deferred = WTFMove(deferred), traits = IteratorTraits { }, kind = m_kind](auto result) mutable {
+    Ref { *m_iterator }->next([deferred = WTFMove(deferred), traits = IteratorTraits { }, kind = m_kind, weakIsFinished = WeakPtr(m_isFinished)](auto result) mutable {
         auto* globalObject = deferred->globalObject();
         if (!globalObject)
             return;
@@ -271,8 +286,12 @@ JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::getNextIterat
             return deferred->reject(result.releaseException());
 
         auto resultValue = result.releaseReturnValue();
-        if (!resultValue)
+        if (!resultValue) {
+            if (RefPtr isFinished = weakIsFinished.get())
+                isFinished->markAsFinished();
+
             return deferred->resolve();
+        }
 
         deferred->resolveWithJSValue(convertToJS(*globalObject, *globalObject, *resultValue, traits, kind));
     });
@@ -326,12 +345,10 @@ template<typename JSWrapper, typename IteratorTraits>
 JSC::EncodedJSValue JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::fulfill(JSC::JSGlobalObject* globalObject, JSC::JSValue result)
 {
     m_ongoingPromise = nullptr;
-    if (result.isUndefined()) {
+    if (m_isFinished.get())
         m_iterator = nullptr;
-        return JSC::JSValue::encode(JSC::createIteratorResultObject(globalObject, result, true));
-    }
 
-    return JSC::JSValue::encode(JSC::createIteratorResultObject(globalObject, result, false));
+    return JSC::JSValue::encode(JSC::createIteratorResultObject(globalObject, result, m_isFinished.get()));
 }
 
 template<typename JSWrapper, typename IteratorTraits>
@@ -359,6 +376,7 @@ JSC::EncodedJSValue JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::reject(JS
 {
     m_ongoingPromise = nullptr;
     m_iterator = nullptr;
+    m_isFinished->markAsFinished();
 
     JSC::VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
@@ -410,12 +428,14 @@ JSC::JSPromise* JSDOMAsyncIteratorBase<JSWrapper, IteratorTraits>::runReturnStep
     auto* returnPromise = jsDynamicCast<JSC::JSPromise*>(returnPromiseCapability.get(&globalObject, vm.propertyNames->promise));
     RETURN_IF_EXCEPTION(scope, nullptr);
 
-    if (!m_iterator) {
-        returnPromise->resolve(&globalObject, JSC::createIteratorResultObject(&globalObject, JSC::jsUndefined(), true));
+    if (m_isFinished.get()) {
+        returnPromise->resolve(&globalObject, JSC::createIteratorResultObject(&globalObject, value, true));
         RETURN_IF_EXCEPTION(scope, nullptr);
 
         return returnPromise;
     }
+
+    m_isFinished->markAsFinished();
 
     auto returnResultPromise = getReturnResult(globalObject, value);
     RETURN_IF_EXCEPTION(scope, nullptr);

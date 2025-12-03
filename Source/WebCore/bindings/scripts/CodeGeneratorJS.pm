@@ -7504,22 +7504,42 @@ END
 static inline EncodedJSValue ${functionName}Caller(JSGlobalObject* lexicalGlobalObject, CallFrame* callFrame, JS$interfaceName* thisObject)
 {
     UNUSED_PARAM(callFrame);
+    SUPPRESS_UNCOUNTED_LOCAL auto& vm = JSC::getVM(lexicalGlobalObject);
+    auto throwScope = DECLARE_THROW_SCOPE(vm);
 END
 
             my @creationArgumentList = ($iterationKind);
             if ($interface->asyncIterable) {
+                my $argumentIndex = 0;
+                my $quotedFunctionName = "\"$functionName\"_s";
+                my $conditional = $codeGenerator->GenerateConditionalString($operation);
                 foreach my $argument (@{$interface->asyncIterable->arguments}) {
-                    # FIXME: Convert parameters: https://bugs.webkit.org/show_bug.cgi?id=303305
+                    my $name = $argument->name;
+                    my $type = $argument->type;
+                    AddToImplIncludesForIDLType($type, $conditional);
+
+                    my $globalObjectReference = "*castedThis->globalObject()";
+                    my $argumentExceptionThrowerFunctor = GetArgumentExceptionThrowerFunctor($interface, $argument, $argumentIndex, $quotedFunctionName);
+                    my $argumentDefaultValueFunctor = GetArgumentDefaultValueFunctor($interface, $argument);
+                    my $optional = 1;
+                    my $argumentLookupForConversion = "argument${argumentIndex}.value()";
+                    my $nativeValue = JSValueToNative($interface, $argument, $argumentLookupForConversion, $conditional, "lexicalGlobalObject", "*lexicalGlobalObject", "*castedThis", $globalObjectReference, $argumentExceptionThrowerFunctor, $functionName, $optional, $argumentDefaultValueFunctor);
+
+                    push(@implContent, <<END);
+    EnsureStillAliveScope argument${argumentIndex} = callFrame->argument($argumentIndex);
+    auto ${name}ConversionResult = ${nativeValue};
+    if (${name}ConversionResult.hasException(throwScope)) [[unlikely]]
+       return encodedJSValue();
+END
                     push(@creationArgumentList, ", ");
-                    push(@creationArgumentList, GetIDLType($interface, $argument->type));
-                    push(@creationArgumentList, "::ImplementationType { }");
+                    push(@creationArgumentList, PassArgumentExpression("${name}ConversionResult.releaseReturnValue()", $argument));
+
+                    $argumentIndex++;
                 }
             }
             my $iteratorCreateParameters = join("", @creationArgumentList);
 
             push(@implContent,  <<END);
-    SUPPRESS_UNCOUNTED_LOCAL auto& vm = JSC::getVM(lexicalGlobalObject);
-    auto throwScope = DECLARE_THROW_SCOPE(vm);
     RELEASE_AND_RETURN(throwScope, JSValue::encode(iteratorCreate<${iteratorName}>(*thisObject, *lexicalGlobalObject, throwScope, IterationKind::${iteratorCreateParameters})));
 }
 
