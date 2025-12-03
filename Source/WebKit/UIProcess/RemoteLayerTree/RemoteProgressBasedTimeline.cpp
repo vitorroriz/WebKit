@@ -60,8 +60,7 @@ void RemoteProgressBasedTimeline::setResolutionData(const WebCore::ScrollingTree
 
 void RemoteProgressBasedTimeline::updateCurrentTime(const WebCore::ScrollingTreeScrollingNode& node)
 {
-    auto unconstrainedScrollOffset = m_resolutionData.isVertical ? node.currentScrollOffset().y() : node.currentScrollOffset().x();
-    m_resolutionData.scrollOffset = std::clamp(unconstrainedScrollOffset, m_resolutionData.rangeStart, m_resolutionData.rangeEnd);
+    m_resolutionData.scrollOffset = m_resolutionData.isVertical ? node.clampedCurrentScrollOffset().y() : node.clampedCurrentScrollOffset().x();
     updateCurrentTime();
 }
 
