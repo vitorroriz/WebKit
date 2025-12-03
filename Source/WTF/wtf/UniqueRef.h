@@ -35,20 +35,20 @@ namespace WTF {
 template<typename T> class UniqueRef;
 
 template<typename T, class... Args>
-UniqueRef<T> makeUniqueRefWithoutFastMallocCheck(Args&&... args)
+[[nodiscard]] UniqueRef<T> makeUniqueRefWithoutFastMallocCheck(Args&&... args)
 {
     return UniqueRef<T>(*new T(std::forward<Args>(args)...));
 }
 
 template<class T, class... Args>
-UniqueRef<T> makeUniqueRefWithoutRefCountedCheck(Args&&... args)
+[[nodiscard]] UniqueRef<T> makeUniqueRefWithoutRefCountedCheck(Args&&... args)
 {
     static_assert(std::is_same<typename T::WTFIsFastMallocAllocated, int>::value, "T should use FastMalloc (WTF_DEPRECATED_MAKE_FAST_ALLOCATED)");
     return makeUniqueRefWithoutFastMallocCheck<T>(std::forward<Args>(args)...);
 }
 
 template<typename T, class... Args>
-UniqueRef<T> makeUniqueRef(Args&&... args)
+[[nodiscard]] UniqueRef<T> makeUniqueRef(Args&&... args)
 {
     static_assert(std::is_same<typename T::WTFIsFastMallocAllocated, int>::value, "T should use FastMalloc (WTF_DEPRECATED_MAKE_FAST_ALLOCATED)");
     static_assert(!HasRefPtrMemberFunctions<T>::value, "T should not be RefCounted");
