@@ -9794,7 +9794,7 @@ WebSocketEnabled:
 
 WebTransportEnabled:
   type: bool
-  status: stable
+  status: WebTransport_status
   category: networking
   humanReadableName: "WebTransport"
   humanReadableDescription: "Enable WebTransport"
