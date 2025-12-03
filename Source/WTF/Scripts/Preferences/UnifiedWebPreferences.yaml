@@ -9794,19 +9794,16 @@ WebSocketEnabled:
 
 WebTransportEnabled:
   type: bool
-  status: WebTransport_status
+  status: testable
   category: networking
   humanReadableName: "WebTransport"
   humanReadableDescription: "Enable WebTransport"
   defaultValue:
     WebKitLegacy:
-      "HAVE(COMPLETE_WEB_TRANSPORT)": true
       default: false
     WebKit:
-      "HAVE(COMPLETE_WEB_TRANSPORT)": true
       default: false
     WebCore:
-      "HAVE(COMPLETE_WEB_TRANSPORT)": true
       default: false
   sharedPreferenceForWebProcess: true
   richJavaScript: true
