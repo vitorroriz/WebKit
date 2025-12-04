@@ -58,6 +58,7 @@ public:
 #if USE(GBM)
         BackedByDMABuf = 1 << 2,
         ForceLinearBuffer = 1 << 3,
+        ForceVivanteSuperTiledBuffer = 1 << 4,
 #endif
     };
 

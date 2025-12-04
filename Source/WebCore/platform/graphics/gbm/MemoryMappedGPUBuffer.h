@@ -49,7 +49,8 @@ public:
     ~MemoryMappedGPUBuffer();
 
     enum class BufferFlag : uint8_t {
-        ForceLinear = 1 << 0
+        ForceLinear = 1 << 0,
+        ForceVivanteSuperTiled = 1 << 1
     };
 
     // Will only return a MemoryMappedGPUBuffer, if gbm_bo allocation + mapping to userland + EGLImage creation succeeded.
@@ -73,7 +74,6 @@ public:
     // You need to obtain an AccessScope, fencing the write operation.
     class AccessScope;
     void updateContents(AccessScope&, const void* srcData, const IntRect& targetRect, unsigned bytesPerLine);
-    void updateContents(AccessScope&, const MemoryMappedGPUBuffer& srcBuffer, const IntRect& targetRect);
 
     // You need to obtain an AccessScope, fencing the read operation.
     std::span<uint32_t> mappedDataSpan(AccessScope&) const;
@@ -103,6 +103,7 @@ public:
 
     bool isMapped() const { return !!m_mappedData; }
     bool isLinear() const;
+    bool isVivanteSuperTiled() const;
 
 private:
     MemoryMappedGPUBuffer(const IntSize&, OptionSet<BufferFlag>);
@@ -118,6 +119,9 @@ private:
     bool allocate(struct gbm_device*, const GLDisplay::BufferFormat&);
     bool createDMABufFromGBMBufferObject();
     UnixFileDescriptor exportGBMBufferObjectAsDMABuf(unsigned planeIndex);
+
+    void updateContentsInLinearFormat(const void* srcData, const IntRect& targetRect, unsigned bytesPerLine);
+    void updateContentsInVivanteSuperTiledFormat(const void* srcData, const IntRect& targetRect, unsigned bytesPerLine);
 
     int primaryPlaneDmaBufFD() const;
     uint32_t primaryPlaneDmaBufStride() const;
