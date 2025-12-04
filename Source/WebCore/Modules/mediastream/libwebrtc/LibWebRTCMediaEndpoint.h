@@ -107,7 +107,7 @@ public:
     void removeTrack(LibWebRTCRtpSenderBackend&);
 
     struct Backends {
-        std::unique_ptr<LibWebRTCRtpSenderBackend> senderBackend;
+        RefPtr<LibWebRTCRtpSenderBackend> senderBackend;
         std::unique_ptr<LibWebRTCRtpReceiverBackend> receiverBackend;
         std::unique_ptr<LibWebRTCRtpTransceiverBackend> transceiverBackend;
     };
