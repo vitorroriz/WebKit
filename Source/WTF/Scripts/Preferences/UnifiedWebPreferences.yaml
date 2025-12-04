@@ -3489,17 +3489,17 @@ GridFormattingContextIntegrationEnabled:
 
 GridLanesEnabled:
   type: bool
-  status: preview
+  status: stable
   category: css
   humanReadableName: "CSS display: grid-lanes"
   humanReadableDescription: "Enable CSS display: grid-lanes"
   defaultValue:
     WebKitLegacy:
-      default: false
+      default: true
     WebKit:
-      default: false
+      default: true
     WebCore:
-      default: false
+      default: true
 
 HTMLEnhancedSelectParsingEnabled:
    type: bool
