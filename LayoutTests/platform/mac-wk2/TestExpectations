@@ -2423,3 +2423,13 @@ webkit.org/b/303464 [ Sequoia+ ] imported/w3c/web-platform-tests/scroll-animatio
 webkit.org/b/303464 [ Sequoia+ ] imported/w3c/web-platform-tests/scroll-animations/css/scroll-timeline-inline-orientation.html [ ImageOnlyFailure Pass ]
 
 webkit.org/b/302725 [ Sequoia Sonoma ] fast/css/accent-color/datalist.html [ Pass ]
+
+webkit.org/b/303507 [ Sonoma+ Debug ] http/tests/ipc/ipc-fetch-task-message-crash.html [ Timeout ]
+webkit.org/b/303507 [ Sonoma+ Debug ] http/tests/xmlhttprequest/origin-exact-matching.html [ Timeout ]
+webkit.org/b/303507 [ Sonoma+ Debug ] inspector/animation/nameChanged.html [ Timeout ]
+webkit.org/b/303507 [ Sonoma+ Debug ] inspector/audit/basic-error.html [ Timeout ]
+webkit.org/b/303507 [ Sonoma+ Debug ] inspector/canvas/console-record-offscreen-webgl.html [ Timeout ]
+webkit.org/b/303507 [ Sonoma+ Debug ] inspector/dom/customElementState.html [ Timeout ]
+webkit.org/b/303507 [ Sonoma+ Debug ] inspector/injected-script/observable.html [ Timeout ]
+webkit.org/b/303507 [ Sonoma+ Debug ] inspector/network/intercept-aborted-request.html [ Timeout ]
+webkit.org/b/303507 [ Sonoma+ Debug ] inspector/page/filter-cookies-for-domain.html [ Timeout ]
