@@ -542,17 +542,26 @@ UniqueRef<LineContent> LineBuilder::placeInlineAndFloatContent(const InlineItemR
                     // <span>text<div style="margin-bottom: 100px;"></div> <div></div></span>
                     // where in the first example, the 100px gap is between the block container's edge and "more text"
                     // while in the second case, it is somewhere after the second block container (can't tell).
-                    // FIXME: Moving the line is not sufficient when floats are present. We have to re-layout this line with the adjusted vertical position.
                     if (!m_line.hasContentOrListMarker())
-                        return;
+                        return false;
                     auto& marginState = blockLayoutState().marginState();
-                    if (!marginState.atBeforeSideOfBlock)
-                        m_lineLogicalRect.moveVertically(marginState.margin());
-                    else
-                        marginState.resetBeforeSideOfBlock();
+                    auto marginValue = marginState.margin();
                     marginState.resetMarginValues();
+                    if (marginState.atBeforeSideOfBlock) {
+                        marginState.resetBeforeSideOfBlock();
+                        return false;
+                    }
+                    if (!marginValue)
+                        return false;
+                    m_lineLogicalRect = { m_lineLogicalRect.top() + marginValue, m_lineInitialLogicalRect.left(), m_lineInitialLogicalRect.width(), m_lineInitialLogicalRect.height() };
+                    return true;
                 };
-                adjustLineWithMarginBefore();
+                if (adjustLineWithMarginBefore() && !floatingContext().isEmpty()) {
+                    // This is similar to what we do in block layout when the estimated top position turns out to be incorrect
+                    // and now we have to relayout the content with the adjusted vertical position to make sure we avoid floats properly.
+                    m_line.initialize(m_lineSpanningInlineBoxes, isFirstFormattedLineCandidate());
+                    result = handleInlineContent(needsLayoutRange, lineCandidate);
+                }
 
                 auto isEndOfLine = result.isEndOfLine == InlineContentBreaker::IsEndOfLine::Yes;
                 if (!result.committedCount.isRevert) {
