@@ -39,6 +39,9 @@
 #import "RemoteScrollingCoordinatorProxy.h"
 #import "RemoteScrollingCoordinatorTransaction.h"
 #import "RemoteScrollingTreeCocoa.h"
+#if PLATFORM(IOS_FAMILY) && ENABLE(OVERLAY_REGIONS_IN_EVENT_REGION)
+#import "RemoteScrollingCoordinatorProxyIOS.h"
+#endif
 #import "WebFrameProxy.h"
 #import "WebPageMessages.h"
 #import "WebPageProxy.h"
@@ -493,6 +496,11 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTreeTransaction(IPC::Connection
             page->requestScroll(requestedScroll->destinationPosition(currentScrollPosition), layerTreeTransaction.scrollOrigin(), requestedScroll->animated);
         }
 #endif // ENABLE(ASYNC_SCROLLING)
+
+#if ENABLE(OVERLAY_REGIONS_IN_EVENT_REGION)
+        if (layerTreeTransaction.changedLayerProperties().size() || layerTreeTransaction.destroyedLayers().size())
+            scrollingCoordinatorProxy->updateOverlayRegions(layerTreeTransaction.destroyedLayers());
+#endif
 
         if (m_debugIndicatorLayerTreeHost && mainFrameData) {
             float scale = indicatorScale(layerTreeTransaction.contentsSize());

@@ -94,6 +94,10 @@
 #import <WebCore/DigitalCredentialsRequestData.h>
 #endif
 
+#if ENABLE(OVERLAY_REGIONS_IN_EVENT_REGION)
+#import "RemoteScrollingCoordinatorProxyIOS.h"
+#endif
+
 @interface UIWindow ()
 - (BOOL)_isHostedInAnotherProcess;
 @end
@@ -294,8 +298,14 @@ void PageClientImpl::modelProcessDidExit()
 void PageClientImpl::preferencesDidChange()
 {
 #if ENABLE(OVERLAY_REGIONS_IN_EVENT_REGION)
-    if (RetainPtr webView = this->webView())
-        [webView _updateOverlayRegions];
+    RetainPtr webView = this->webView();
+    if (!webView)
+        return;
+
+    if (auto page = webView->_page) {
+        if (CheckedPtr scrollingCoordinator = page->scrollingCoordinatorProxy())
+            scrollingCoordinator->overlayRegionsEnabledChanged();
+    }
 #else
     notImplemented();
 #endif

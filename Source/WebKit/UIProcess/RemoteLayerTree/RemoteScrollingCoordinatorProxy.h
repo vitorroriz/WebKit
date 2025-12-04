@@ -143,6 +143,11 @@ public:
     virtual void willCommitLayerAndScrollingTrees() { }
     virtual void didCommitLayerAndScrollingTrees() { }
 
+#if ENABLE(OVERLAY_REGIONS_IN_EVENT_REGION)
+    virtual void updateOverlayRegions(const Vector<WebCore::PlatformLayerIdentifier>& destroyedLayers = { }) { }
+    virtual void overlayRegionsEnabledChanged() { }
+#endif
+
 #if ENABLE(THREADED_ANIMATIONS)
     virtual void animationsWereAddedToNode(RemoteLayerTreeNode&) { }
     virtual void animationsWereRemovedFromNode(RemoteLayerTreeNode&) { }

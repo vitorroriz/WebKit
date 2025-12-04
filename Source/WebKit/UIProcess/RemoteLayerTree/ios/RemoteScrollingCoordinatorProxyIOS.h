@@ -66,10 +66,8 @@ public:
     CGPoint nearestActiveContentInsetAdjustedSnapOffset(CGFloat topInset, const CGPoint&) const;
 
 #if ENABLE(OVERLAY_REGIONS_IN_EVENT_REGION)
-    void removeDestroyedLayerIDs(const Vector<WebCore::PlatformLayerIdentifier>&);
-    HashSet<WebCore::PlatformLayerIdentifier> fixedScrollingNodeLayerIDs() const;
-    using OverlayRegionCandidatesMap = HashMap<RetainPtr<WKBaseScrollView>, HashSet<WebCore::PlatformLayerIdentifier>>;
-    OverlayRegionCandidatesMap overlayRegionCandidates() const;
+    void updateOverlayRegions(const Vector<WebCore::PlatformLayerIdentifier>& destroyedLayers = { }) override;
+    void overlayRegionsEnabledChanged() override;
 #endif
 
 #if ENABLE(THREADED_ANIMATIONS)
@@ -93,6 +91,11 @@ private:
     void connectStateNodeLayers(WebCore::ScrollingStateTree&, const RemoteLayerTreeHost&) override;
     void establishLayerTreeScrollingRelations(const RemoteLayerTreeHost&) override;
 
+#if ENABLE(OVERLAY_REGIONS_IN_EVENT_REGION)
+    void selectOverlayRegionScrollViewIfNeeded();
+    void updateOverlayRegionLayers();
+#endif
+
     WebCore::FloatRect currentLayoutViewport() const;
 
     bool shouldSnapForMainFrameScrolling(WebCore::ScrollEventAxis) const;
@@ -103,6 +106,10 @@ private:
 #if ENABLE(OVERLAY_REGIONS_IN_EVENT_REGION)
     HashMap<WebCore::PlatformLayerIdentifier, WebCore::ScrollingNodeID> m_fixedScrollingNodesByLayerID;
     HashMap<WebCore::PlatformLayerIdentifier, WebCore::ScrollingNodeID> m_scrollingNodesByLayerID;
+
+    bool m_needsOverlayRegionScrollViewSelection { false };
+    HashSet<WebCore::IntRect> m_lastOverlayRegionRects;
+    RetainPtr<WKBaseScrollView> m_selectedOverlayRegionScrollView;
 #endif
 
 #if ENABLE(THREADED_ANIMATIONS)

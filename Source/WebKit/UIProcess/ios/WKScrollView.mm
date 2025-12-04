@@ -455,12 +455,18 @@ static inline bool valuesAreWithinOnePixel(CGFloat a, CGFloat b)
 
 - (void)setScrollEnabled:(BOOL)value
 {
+    if (value == _scrollEnabledByClient)
+        return;
+
     _scrollEnabledByClient = value;
     [self _updateScrollability];
 }
 
 - (void)_setScrollEnabledInternal:(BOOL)value
 {
+    if (value == _scrollEnabledInternal)
+        return;
+
     _scrollEnabledInternal = value;
     [self _updateScrollability];
 }
