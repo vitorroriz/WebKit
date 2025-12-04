@@ -50,7 +50,7 @@ public:
     LayoutUnit minContentHeight(const ElementBox&) const;
     LayoutUnit preferredMinWidth(const ElementBox&) const;
     LayoutUnit preferredMaxWidth(const ElementBox&) const;
-    void layoutWithFormattingContextForBlockInInline(const ElementBox& block, LayoutPoint blockLogicalTopLeft, const InlineLayoutState&) const;
+    void layoutWithFormattingContextForBlockInInline(const ElementBox& block, LayoutPoint blockLineLogicalTopLeft, const InlineLayoutState&) const;
 
     static BlockLayoutState::MarginState toMarginState(const RenderBlockFlow::MarginInfo&);
     static RenderBlockFlow::MarginInfo toMarginInfo(const Layout::BlockLayoutState::MarginState&);

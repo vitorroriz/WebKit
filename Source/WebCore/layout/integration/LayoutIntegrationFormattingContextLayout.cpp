@@ -156,7 +156,7 @@ static inline void udpdateIFCLineClamp(auto& inlineLayoutState, auto& renderTree
     inlineLayoutState.setLineCountWithInlineContentIncludingNestedBlocks(inlineLayoutState.lineCountWithInlineContentIncludingNestedBlocks() + newlyConstructedLineCount);
 }
 
-void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block, LayoutPoint blockLogicalTopLeft, Layout::InlineLayoutState& inlineLayoutState, Layout::LayoutState& layoutState)
+void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block, LayoutPoint blockLineLogicalTopLeft, Layout::InlineLayoutState& inlineLayoutState, Layout::LayoutState& layoutState)
 {
     auto& parentBlockLayoutState = inlineLayoutState.parentBlockLayoutState();
     auto& placedFloats = parentBlockLayoutState.placedFloats();
@@ -174,10 +174,10 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
     auto layoutBlockRenderer = [&] {
         if (inlineLayoutState.lineCount()) {
             auto textBoxTrimStartDisabler = TextBoxTrimStartDisabler { blockRenderer };
-            positionAndMargin = rootBlockContainer.layoutBlockChildFromInlineLayout(blockRenderer, blockLogicalTopLeft.y(), Layout::IntegrationUtils::toMarginInfo(parentBlockLayoutState.marginState()));
+            positionAndMargin = rootBlockContainer.layoutBlockChildFromInlineLayout(blockRenderer, blockLineLogicalTopLeft.y(), Layout::IntegrationUtils::toMarginInfo(parentBlockLayoutState.marginState()));
             return;
         }
-        positionAndMargin = rootBlockContainer.layoutBlockChildFromInlineLayout(blockRenderer, blockLogicalTopLeft.y(), Layout::IntegrationUtils::toMarginInfo(parentBlockLayoutState.marginState()));
+        positionAndMargin = rootBlockContainer.layoutBlockChildFromInlineLayout(blockRenderer, blockLineLogicalTopLeft.y(), Layout::IntegrationUtils::toMarginInfo(parentBlockLayoutState.marginState()));
     };
     layoutBlockRenderer();
     ASSERT(!blockRenderer.needsLayout());
@@ -192,13 +192,14 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
         updater.updateBoxGeometryAfterIntegrationLayout(block, rootBlockContainer.contentBoxLogicalWidth());
 
         auto& blockGeometry = layoutState.ensureGeometryForBox(block);
-        blockGeometry.setTopLeft(LayoutPoint { blockGeometry.marginStart(), positionAndMargin.logicalTop });
-        // We don't know what the before margin here is (or if there's any at all) before processing the content after.
-        // FIXME: Check if blockGeometry needs the adjusted margin before value at all.
-        blockGeometry.setVerticalMargin({ positionAndMargin.logicalTop, { } });
+        auto resolvedMarginBefore = positionAndMargin.logicalTop - blockLineLogicalTopLeft.y();
+        blockGeometry.setTopLeft(LayoutPoint { blockGeometry.marginStart(), resolvedMarginBefore });
+        // We don't know what the after margin here is (or if there's any at all) before processing the content after.
+        // FIXME: Check if blockGeometry needs the adjusted margin after value at all.
+        blockGeometry.setVerticalMargin({ resolvedMarginBefore, { } });
 
         udpdateIFCLineClamp(inlineLayoutState, renderTreeLayoutState);
-        populateIFCWithNewlyPlacedFloats(blockRenderer, placedFloats, blockLogicalTopLeft);
+        populateIFCWithNewlyPlacedFloats(blockRenderer, placedFloats, blockLineLogicalTopLeft);
         parentBlockLayoutState.marginState() = Layout::IntegrationUtils::toMarginState(positionAndMargin.marginInfo);
     };
     updateIFCAfterLayout();
