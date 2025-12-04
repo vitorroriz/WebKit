@@ -359,9 +359,9 @@ ISO8601::PlainDate TemporalCalendar::monthDayFromFields(JSGlobalObject* globalOb
 
     calendarResolveFields(globalObject, referenceYear, month, monthCode, TemporalDateFormat::MonthDay);
     RETURN_IF_EXCEPTION(scope, { });
-    double year = referenceYear.value_or(1972);
+    int32_t year = referenceYear.value_or(1972);
     auto result = TemporalDuration::regulateISODate(year, month, day, overflow);
-    if (!result || !ISO8601::isValidISODate(result->year(), result->month(), result->day())) [[unlikely]] {
+    if (!result || !ISO8601::isDateTimeWithinLimits(result->year(), result->month(), result->day(), 12, 0, 0, 0, 0, 0)) [[unlikely]] {
         throwRangeError(globalObject, scope, "monthDayFromFields: date is out of range of ECMAScript representation"_s);
         return { };
     }
