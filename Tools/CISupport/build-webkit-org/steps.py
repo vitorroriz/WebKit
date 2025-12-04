@@ -1037,7 +1037,7 @@ class RunWorldLeaksTests(RunWebKitTests):
 
 class RunAPITests(TestWithFailureCount, CustomFlagsMixin, ShellMixin):
     name = "run-api-tests"
-    VALID_ADDITIONAL_ARGUMENTS_LIST = ["--remote-layer-tree", "--use-gpu-process", "--child-processes", "--site-isolation",]
+    VALID_ADDITIONAL_ARGUMENTS_LIST = ["--remote-layer-tree", "--use-gpu-process", "--child-processes", "--site-isolation", "--wpe-legacy-api"]
     description = ["api tests running"]
     descriptionDone = ["api-tests"]
     jsonFileName = "api_test_results.json"
@@ -1063,7 +1063,6 @@ class RunAPITests(TestWithFailureCount, CustomFlagsMixin, ShellMixin):
 
     def __init__(self, *args, **kwargs):
         kwargs['logEnviron'] = False
-        kwargs['timeout'] = 3 * 60 * 60
         super().__init__(*args, **kwargs)
 
     def _is_valid_additional_argument(self, argument):
@@ -1084,7 +1083,13 @@ class RunAPITests(TestWithFailureCount, CustomFlagsMixin, ShellMixin):
         self.log_observer = ParseByLineLogObserver(self.parseOutputLine)
         self.addLogObserver('stdio', self.log_observer)
         self.failedTestCount = 0
-        self.appendCustomTestingFlags(self.getProperty('platform'), self.getProperty('device_model'))
+        platform = self.getProperty('platform')
+        if platform in ['gtk', 'wpe']:
+            self.command = ['python3', f'Tools/Scripts/run-{platform}-tests',
+                            f'--{self.getProperty("configuration")}',
+                            f'--json-output={self.jsonFileName}']
+        else:
+            self.appendCustomTestingFlags(platform, self.getProperty('device_model'))
         additionalArguments = self.getProperty("additionalArguments")
         for additionalArgument in additionalArguments or []:
             if self._is_valid_additional_argument(additionalArgument):
@@ -1332,77 +1337,6 @@ class RunMVTTests(shell.Test):
             s = "s" if self.totalUnexpectedFailures > 1 else ""
             return {'step': f"MVT Tests: {self.totalUnexpectedFailures} unexpected failure{s}"}
         return super().getResultSummary()
-
-
-class RunGLibAPITests(shell.Test):
-    name = "API-tests"
-    description = ["API tests running"]
-    descriptionDone = ["API tests"]
-
-    @defer.inlineCallbacks
-    def run(self):
-        additionalArguments = self.getProperty("additionalArguments")
-        if additionalArguments:
-            self.command += additionalArguments
-
-        self.log_observer = logobserver.BufferLogObserver()
-        self.addLogObserver('stdio', self.log_observer)
-
-        rc = yield super().run()
-
-        logText = self.log_observer.getStdout()
-
-        failedTests = 0
-        crashedTests = 0
-        timedOutTests = 0
-        messages = []
-        self.statusLine = []
-
-        foundItems = re.findall(r"Unexpected failures \((\d+)\)", logText)
-        if foundItems:
-            failedTests = int(foundItems[0])
-            messages.append("%d failures" % failedTests)
-
-        foundItems = re.findall(r"Unexpected crashes \((\d+)\)", logText)
-        if foundItems:
-            crashedTests = int(foundItems[0])
-            messages.append("%d crashes" % crashedTests)
-
-        foundItems = re.findall(r"Unexpected timeouts \((\d+)\)", logText)
-        if foundItems:
-            timedOutTests = int(foundItems[0])
-            messages.append("%d timeouts" % timedOutTests)
-
-        foundItems = re.findall(r"Unexpected passes \((\d+)\)", logText)
-        if foundItems:
-            newPassTests = int(foundItems[0])
-            messages.append("%d new passes" % newPassTests)
-
-        self.totalFailedTests = failedTests + crashedTests + timedOutTests
-        if messages:
-            self.statusLine = ["API tests: %s" % ", ".join(messages)]
-
-        if self.totalFailedTests > 0:
-            defer.returnValue(FAILURE)
-        else:
-            defer.returnValue(SUCCESS if rc == 0 else FAILURE)
-
-    def getText(self, cmd, results):
-        return self.getText2(cmd, results)
-
-    def getText2(self, cmd, results):
-        if results != SUCCESS and self.totalFailedTests > 0:
-            return self.statusLine
-
-        return [self.name]
-
-
-class RunGtkAPITests(RunGLibAPITests):
-    command = ["python3", "Tools/Scripts/run-gtk-tests", WithProperties("--%(configuration)s")]
-
-
-class RunWPEAPITests(RunGLibAPITests):
-    command = ["python3", "Tools/Scripts/run-wpe-tests", WithProperties("--%(configuration)s")]
 
 
 class RunWebDriverTests(shell.Test, CustomFlagsMixin, ShellMixin):
