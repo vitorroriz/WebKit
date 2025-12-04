@@ -418,12 +418,13 @@ TEST_F(CaptionPreferenceTests, TextEdge)
     EXPECT_STREQ(preferences->captionsTextEdgeCSS().utf8().data(), "stroke-color:black;paint-order:stroke;stroke-linejoin:round;stroke-linecap:round;");
 }
 
+#if !HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
 TEST_F(CaptionPreferenceTests, CaptionStyleMenu)
 {
+    MediaAccessibilityShim shim;
+
     if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
         return;
-
-    MediaAccessibilityShim shim;
 
     PlatformMenu *menu = ensureMenu();
 
@@ -462,13 +463,15 @@ TEST_F(CaptionPreferenceTests, CaptionStyleMenu)
     EXPECT_WK_STREQ("Profile 3", CaptionUserPreferencesMediaAF::platformActiveProfileID());
 #endif
 }
+#endif
 
+#if !HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
 TEST_F(CaptionPreferenceTests, CaptionStyleMenuHighlight)
 {
+    MediaAccessibilityShim shim;
+
     if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
         return;
-
-    MediaAccessibilityShim shim;
 
     showMenuAndThen([&] (PlatformMenu *menu) {
         // TODO: Menu highlighting is currently not supported on IOS_FAMILY
@@ -485,13 +488,15 @@ TEST_F(CaptionPreferenceTests, CaptionStyleMenuHighlight)
     // to its previous state.
     EXPECT_WK_STREQ("Profile 1", CaptionUserPreferencesMediaAF::platformActiveProfileID());
 }
+#endif
 
+#if !HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
 TEST_F(CaptionPreferenceTests, CaptionStyleMenuSelect)
 {
+    MediaAccessibilityShim shim;
+
     if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
         return;
-
-    MediaAccessibilityShim shim;
 
     showMenuAndThen([&] (PlatformMenu *menu) {
         selectProfileAtIndex(1);
@@ -503,13 +508,15 @@ TEST_F(CaptionPreferenceTests, CaptionStyleMenuSelect)
 
     EXPECT_WK_STREQ("Profile 3", CaptionUserPreferencesMediaAF::platformActiveProfileID());
 }
+#endif
 
+#if !HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
 TEST_F(CaptionPreferenceTests, CaptionStyleMenuDelegate)
 {
+    MediaAccessibilityShim shim;
+
     if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
         return;
-
-    MediaAccessibilityShim shim;
 
     runAndWaitForCaptionStyleMenuWillOpenCalled([&] {
         runAndWaitForCaptionStyleMenuDidCloseCalled([&] {
@@ -518,6 +525,7 @@ TEST_F(CaptionPreferenceTests, CaptionStyleMenuDelegate)
         });
     });
 }
+#endif
 
 #if HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER) && PLATFORM(IOS_FAMILY)
 TEST_F(CaptionPreferenceTests, AVKitMenuControllerIntegration)
