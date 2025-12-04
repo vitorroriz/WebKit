@@ -423,6 +423,7 @@ private:
     StyleDifference adjustStyleDifference(StyleDifference, OptionSet<StyleDifferenceContextSensitiveProperty>) const;
 
     bool canDestroyDecodedData() const final { return !isVisibleInViewport(); }
+    bool useSystemDarkAppearance() const final;
     VisibleInViewportState imageFrameAvailable(CachedImage&, ImageAnimatingState, const IntRect* changeRect) final;
     VisibleInViewportState imageVisibleInViewport(const Document&) const final;
     void didRemoveCachedImageClient(CachedImage&) final;
