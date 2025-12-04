@@ -149,7 +149,7 @@ public:
 #if ENABLE(MODEL_ELEMENT_IMMERSIVE)
     bool immersive() const;
     void requestImmersive(DOMPromiseDeferred<void>&&);
-    void ensureImmersivePresentation(CompletionHandler<void(ExceptionOr<const LayerHostingContextIdentifier>)>&&);
+    void ensureImmersivePresentation(CompletionHandler<void(ExceptionOr<LayerHostingContextIdentifier>)>&&);
     void exitImmersivePresentation(CompletionHandler<void()>&&);
 #endif
 

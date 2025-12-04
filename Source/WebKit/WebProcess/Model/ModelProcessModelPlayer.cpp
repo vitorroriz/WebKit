@@ -483,6 +483,20 @@ void ModelProcessModelPlayer::disableUnloadDelayForTesting()
     send(Messages::ModelProcessModelPlayerProxy::DisableUnloadDelayForTesting());
 }
 
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+
+void ModelProcessModelPlayer::ensureImmersivePresentation(CompletionHandler<void(std::optional<WebCore::LayerHostingContextIdentifier>)>&& completion)
+{
+    sendWithAsyncReply(Messages::ModelProcessModelPlayerProxy::EnsureImmersivePresentation(), WTFMove(completion));
+}
+
+void ModelProcessModelPlayer::exitImmersivePresentation(CompletionHandler<void()>&& completion)
+{
+    sendWithAsyncReply(Messages::ModelProcessModelPlayerProxy::ExitImmersivePresentation(), WTFMove(completion));
+}
+
+#endif
+
 }
 
 #endif // ENABLE(MODEL_PROCESS)

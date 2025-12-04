@@ -1395,21 +1395,60 @@ void HTMLModelElement::requestImmersive(DOMPromiseDeferred<void>&& promise)
     });
 }
 
-void HTMLModelElement::ensureImmersivePresentation(CompletionHandler<void(ExceptionOr<const LayerHostingContextIdentifier>)>&& completion)
+void HTMLModelElement::ensureImmersivePresentation(CompletionHandler<void(ExceptionOr<LayerHostingContextIdentifier>)>&& completion)
 {
     setDetachedForImmersive(true);
-    ensureModelPlayer([completion = WTFMove(completion)] (auto result) mutable {
-        if (result.hasException())
-            return completion(result.releaseException());
+    ensureModelPlayer([weakThis = WeakPtr { *this }, completion = WTFMove(completion)] (auto result) mutable {
+        RefPtr protectedThis = weakThis.get();
+        if (!protectedThis)
+            return completion(Exception { ExceptionCode::AbortError });
 
-        completion(Exception { ExceptionCode::TypeError, "Model Player created, but next steps are not implemented"_s });
+        if (result.hasException()) {
+            protectedThis->setDetachedForImmersive(false);
+            completion(result.releaseException());
+            return;
+        }
+
+        RefPtr protectedModelPlayer = result.releaseReturnValue();
+        if (!protectedModelPlayer) {
+            protectedThis->setDetachedForImmersive(false);
+            completion(Exception { ExceptionCode::AbortError });
+            return;
+        }
+
+        protectedModelPlayer->ensureImmersivePresentation([weakThis, completion = WTFMove(completion)] (auto contextID) mutable {
+            RefPtr protectedThis = weakThis.get();
+            if (!protectedThis)
+                return completion(Exception { ExceptionCode::AbortError });
+
+            if (!contextID.has_value()) {
+                protectedThis->setDetachedForImmersive(false);
+                completion(Exception { ExceptionCode::TypeError, "Failed to decode model"_s });
+                return;
+            }
+
+            completion(WTFMove(contextID.value()));
+        });
     });
 }
 
 void HTMLModelElement::exitImmersivePresentation(CompletionHandler<void()>&& completion)
 {
-    setDetachedForImmersive(false);
-    completion();
+    RefPtr protectedModelPlayer = m_modelPlayer;
+    if (!protectedModelPlayer) {
+        setDetachedForImmersive(false);
+        completion();
+        return;
+    }
+
+    protectedModelPlayer->exitImmersivePresentation([weakThis = WeakPtr { *this }, completion = WTFMove(completion)] () mutable {
+        RefPtr protectedThis = weakThis.get();
+        if (!protectedThis)
+            return completion();
+
+        protectedThis->setDetachedForImmersive(false);
+        completion();
+    });
 }
 
 void HTMLModelElement::setDetachedForImmersive(bool detachedForImmersive)
