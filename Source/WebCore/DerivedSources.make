@@ -1801,6 +1801,7 @@ JS_BINDING_IDLS := \
     $(WebCore)/testing/FakeXRJointStateInit.idl \
     $(WebCore)/testing/FakeXRRigidTransformInit.idl \
     $(WebCore)/testing/FakeXRViewInit.idl \
+    $(WebCore)/testing/FakeXRWorldInit.idl \
     $(WebCore)/testing/WebFakeXRDevice.idl \
     $(WebCore)/testing/WebFakeXRInputController.idl \
     $(WebCore)/testing/WebXRTest.idl \

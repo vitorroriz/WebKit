@@ -2522,6 +2522,7 @@ if (ENABLE_WEBXR)
         testing/FakeXRInputSourceInit.idl
         testing/FakeXRRigidTransformInit.idl
         testing/FakeXRViewInit.idl
+        testing/FakeXRWorldInit.idl
         testing/WebFakeXRDevice.idl
         testing/WebFakeXRInputController.idl
         testing/WebXRTest.idl
