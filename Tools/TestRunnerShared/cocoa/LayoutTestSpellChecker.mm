@@ -29,6 +29,7 @@
 #import "InstanceMethodSwizzler.h"
 #import "JSBasics.h"
 #import <objc/runtime.h>
+#import <pal/spi/mac/NSSpellCheckerSPI.h>
 #import <wtf/Assertions.h>
 #import <wtf/BlockPtr.h>
 
@@ -303,6 +304,16 @@ static const char *stringForCorrectionResponse(NSCorrectionResponse correctionRe
 
         completion(sequenceNumber, result, orthography, wordCount);
     }];
+}
+
+- (NSInteger)requestGrammarCheckingOfString:(NSString *)stringToCheck range:(NSRange)range language:(NSString *)language options:(NSDictionary<NSString *, id> *)options completionHandler:(void (^)(NSInteger sequenceNumber, NSArray<NSTextCheckingResult *> *results))completionHandler
+{
+    RetainPtr overrideResult = retainPtr([_results objectForKey:stringToCheck]);
+    if (overrideResult) {
+        completionHandler(0, overrideResult.get());
+        return 0; // Not currently used, so return value doesn't matter. Should be the sequence number.
+    }
+    return [super requestGrammarCheckingOfString:stringToCheck range:range language:language options:options completionHandler:completionHandler];
 }
 
 #endif // PLATFORM(MAC)

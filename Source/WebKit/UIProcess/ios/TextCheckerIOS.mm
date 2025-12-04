@@ -366,6 +366,11 @@ void TextChecker::requestCheckingOfString(Ref<TextCheckerCompletion>&&, int32_t)
     notImplemented();
 }
 
+void TextChecker::requestExtendedCheckingOfString(Ref<TextCheckerCompletion>&&, int32_t)
+{
+    notImplemented();
+}
+
 } // namespace WebKit
 
 #endif // PLATFORM(IOS_FAMILY)

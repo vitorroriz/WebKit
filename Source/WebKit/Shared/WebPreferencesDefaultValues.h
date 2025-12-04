@@ -148,6 +148,10 @@ bool defaultVisuallyContiguousBidiTextSelectionEnabled();
 bool defaultBidiContentAwarePasteEnabled();
 #endif
 
+#if PLATFORM(COCOA)
+bool defaultExtendedProofreadingEnabled();
+#endif
+
 bool defaultRunningBoardThrottlingEnabled();
 bool defaultShouldDropNearSuspendedAssertionAfterDelay();
 bool defaultShouldTakeNearSuspendedAssertion();

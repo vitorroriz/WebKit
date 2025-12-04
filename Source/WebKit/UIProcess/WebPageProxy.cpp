@@ -11176,6 +11176,15 @@ void WebPageProxy::requestCheckingOfString(TextCheckerRequestID requestID, const
     TextChecker::requestCheckingOfString(TextCheckerCompletion::create(requestID, request, *this), insertionPoint);
 }
 
+
+void WebPageProxy::requestExtendedCheckingOfString(TextCheckerRequestID requestID, const TextCheckingRequestData& request, int32_t insertionPoint)
+{
+#if PLATFORM(COCOA)
+    TextChecker::requestExtendedCheckingOfString(TextCheckerCompletion::create(requestID, request, *this), insertionPoint);
+#endif
+}
+
+
 void WebPageProxy::didFinishCheckingText(TextCheckerRequestID requestID, const Vector<WebCore::TextCheckingResult>& result)
 {
     send(Messages::WebPage::DidFinishCheckingText(requestID, result));

@@ -3179,6 +3179,7 @@ private:
     void learnWord(IPC::Connection&, const String& word);
     void ignoreWord(IPC::Connection&, const String& word);
     void requestCheckingOfString(TextCheckerRequestID, const WebCore::TextCheckingRequestData&, int32_t insertionPoint);
+    void requestExtendedCheckingOfString(TextCheckerRequestID, const WebCore::TextCheckingRequestData&, int32_t insertionPoint);
 
     void takeFocus(WebCore::FocusDirection);
     void setToolTip(const String&);

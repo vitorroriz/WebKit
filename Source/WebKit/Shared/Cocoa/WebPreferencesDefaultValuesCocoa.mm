@@ -78,6 +78,11 @@ bool defaultScrollAnimatorEnabled()
 }
 #endif
 
+bool defaultExtendedProofreadingEnabled()
+{
+    return os_feature_enabled(TextComposer, PostEditingProofreadingReview);
+}
+
 #if ENABLE(IMAGE_ANALYSIS)
 
 bool defaultTextRecognitionInVideosEnabled()

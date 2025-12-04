@@ -2952,6 +2952,21 @@ ExtendedAudioDescriptionsEnabled:
     WebCore:
       default: false
 
+ExtendedProofreadingEnabled:
+  type: bool
+  status: internal
+  humanReadableName: "Extended Proofreading"
+  humanReadableDescription: "Enable Extended Proofreading"
+  condition: PLATFORM(COCOA)
+  defaultValue:
+    WebCore:
+      default: false
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: WebKit::defaultExtendedProofreadingEnabled()
+  sharedPreferenceForWebProcess: true
+
 ExtensibleSSOEnabled:
   type: bool
   status: embedder

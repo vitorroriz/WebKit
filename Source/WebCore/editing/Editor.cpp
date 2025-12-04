@@ -3208,6 +3208,16 @@ void Editor::markAllMisspellingsAndBadGrammarInRanges(OptionSet<TextCheckingType
     Vector<TextCheckingResult> results;
     checkTextOfParagraph(*textChecker(), paragraphToCheck.text(), resolvedOptions, results, document().selection().selection());
     markAndReplaceFor(request.releaseNonNull(), results);
+
+#if PLATFORM(COCOA)
+    bool extendedProofreadingEnabled = document().settings().extendedProofreadingEnabled();
+
+    if (shouldMarkGrammar && extendedProofreadingEnabled) {
+        RefPtr extendedRequest = SpellCheckRequest::create(resolvedOptions, TextCheckingProcessType::TextCheckingProcessIncremental, checkingRange, textReplacementRange, paragraphRange);
+        if (extendedRequest)
+            m_spellChecker->requestExtendedCheckingFor(extendedRequest.releaseNonNull(), results);
+    }
+#endif
 }
 
 static bool isAutomaticTextReplacementType(TextCheckingType type)

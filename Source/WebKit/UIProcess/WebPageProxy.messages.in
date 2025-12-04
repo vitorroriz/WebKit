@@ -323,6 +323,7 @@ messages -> WebPageProxy {
     LearnWord(String word)
     IgnoreWord(String word)
     RequestCheckingOfString(WebKit::TextCheckerRequestID requestID, WebCore::TextCheckingRequestData request, int32_t insertionPoint)
+    RequestExtendedCheckingOfString(WebKit::TextCheckerRequestID requestID, WebCore::TextCheckingRequestData request, int32_t insertionPoint)
 
     # Drag and drop messages
 #if PLATFORM(COCOA) && ENABLE(DRAG_SUPPORT)
