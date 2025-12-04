@@ -11046,8 +11046,10 @@ void Document::addTopLayerElement(Element& element)
 #endif
         auto result = m_autoPopoverList.add(*candidatePopover);
 #if PLATFORM(IOS_FAMILY) && ENABLE(TOUCH_EVENTS)
-        if (!neededEventHandling)
+        if (!neededEventHandling) {
             invalidateRenderingDependentRegions();
+            invalidateEventListenerRegions();
+        }
 #endif
         RELEASE_ASSERT(result.isNewEntry);
     }
@@ -11061,8 +11063,10 @@ void Document::removeTopLayerElement(Element& element)
     if (auto* candidatePopover = dynamicDowncast<HTMLElement>(element); candidatePopover && candidatePopover->isPopoverShowing() && candidatePopover->popoverState() == PopoverState::Auto) {
         m_autoPopoverList.remove(*candidatePopover);
 #if PLATFORM(IOS_FAMILY) && ENABLE(TOUCH_EVENTS)
-        if (!needsPointerEventHandlingForPopover())
+        if (!needsPointerEventHandlingForPopover()) {
             invalidateRenderingDependentRegions();
+            invalidateEventListenerRegions();
+        }
 #endif
     }
 }
