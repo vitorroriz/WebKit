@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include "EnhancedSecurity.h"
 #include "LoadedWebArchive.h"
 #include "WebProcessProxy.h"
 #include <WebCore/Site.h>
@@ -60,7 +61,7 @@ public:
     static Ref<BrowsingContextGroup> create() { return adoptRef(*new BrowsingContextGroup()); }
     ~BrowsingContextGroup();
 
-    void sharedProcessForSite(WebsiteDataStore&, API::WebsitePolicies*, const WebPreferences&, const WebCore::Site&, const WebCore::Site& mainFrameSite, WebProcessProxy::LockdownMode, WebProcessProxy::EnhancedSecurity, API::PageConfiguration&, IsMainFrame, CompletionHandler<void(FrameProcess*)>&&);
+    void sharedProcessForSite(WebsiteDataStore&, API::WebsitePolicies*, const WebPreferences&, const WebCore::Site&, const WebCore::Site& mainFrameSite, WebProcessProxy::LockdownMode, EnhancedSecurity, API::PageConfiguration&, IsMainFrame, CompletionHandler<void(FrameProcess*)>&&);
     Ref<FrameProcess> ensureProcessForSite(const WebCore::Site&, const WebCore::Site& mainFrameSite, WebProcessProxy&, const WebPreferences&, LoadedWebArchive = LoadedWebArchive::No, InjectBrowsingContextIntoProcess = InjectBrowsingContextIntoProcess::Yes);
     RefPtr<FrameProcess> processForSite(const WebCore::Site&);
     void addFrameProcess(FrameProcess&);

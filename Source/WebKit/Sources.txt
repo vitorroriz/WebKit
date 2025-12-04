@@ -409,6 +409,7 @@ UIProcess/DeviceIdHashSaltStorage.cpp
 UIProcess/DisplayLink.cpp
 UIProcess/DisplayLinkProcessProxyClient.cpp
 UIProcess/DrawingAreaProxy.cpp
+UIProcess/EnhancedSecurityTracking.cpp
 UIProcess/FindStringCallbackAggregator.cpp
 UIProcess/FindTextMatchesCallbackAggregator.cpp
 UIProcess/FrameLoadState.cpp
