@@ -1531,18 +1531,14 @@ list(APPEND webrtc_SOURCES
     Source/third_party/boringssl/src/crypto/evp/evp.cc
     Source/third_party/boringssl/src/crypto/evp/evp_ctx.cc
     Source/third_party/boringssl/src/crypto/evp/pbkdf.cc
-    Source/third_party/boringssl/src/crypto/evp/p_dh_asn1.cc
     Source/third_party/boringssl/src/crypto/evp/p_dh.cc
-    Source/third_party/boringssl/src/crypto/evp/p_dsa_asn1.cc
-    Source/third_party/boringssl/src/crypto/evp/p_ec_asn1.cc
+    Source/third_party/boringssl/src/crypto/evp/p_dsa.cc
     Source/third_party/boringssl/src/crypto/evp/p_ec.cc
-    Source/third_party/boringssl/src/crypto/evp/p_ed25519_asn1.cc
     Source/third_party/boringssl/src/crypto/evp/p_ed25519.cc
     Source/third_party/boringssl/src/crypto/evp/p_hkdf.cc
+    Source/third_party/boringssl/src/crypto/evp/p_mldsa.cc
     Source/third_party/boringssl/src/crypto/evp/print.cc
-    Source/third_party/boringssl/src/crypto/evp/p_rsa_asn1.cc
     Source/third_party/boringssl/src/crypto/evp/p_rsa.cc
-    Source/third_party/boringssl/src/crypto/evp/p_x25519_asn1.cc
     Source/third_party/boringssl/src/crypto/evp/p_x25519.cc
     Source/third_party/boringssl/src/crypto/evp/scrypt.cc
     Source/third_party/boringssl/src/crypto/evp/sign.cc
@@ -1674,7 +1670,6 @@ list(APPEND webrtc_SOURCES
     Source/third_party/boringssl/src/crypto/x509/x_req.cc
     Source/third_party/boringssl/src/crypto/x509/x_sig.cc
     Source/third_party/boringssl/src/crypto/x509/x_spki.cc
-    Source/third_party/boringssl/src/crypto/x509/x_val.cc
     Source/third_party/boringssl/src/crypto/x509/x_x509a.cc
     Source/third_party/boringssl/src/crypto/x509/x_x509.cc
     Source/third_party/boringssl/src/crypto/xwing/xwing.cc
@@ -1790,6 +1785,7 @@ list(APPEND webrtc_SOURCES
     Source/third_party/boringssl/src/util/bazel-example/example.cc
     Source/third_party/boringssl/src/util/fipstools/acvp/modulewrapper/main.cc
     Source/third_party/boringssl/src/util/fipstools/acvp/modulewrapper/modulewrapper.cc
+    Source/third_party/boringssl/src/util/fipstools/acvp/modulewrapper/proto.cc
 )
 
 if (WTF_CPU_X86_64 OR WTF_CPU_X86)
