@@ -6,6 +6,8 @@
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>"
             }
         },
@@ -15,6 +17,8 @@
             "values": [ "auto" ],
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "auto | <shared-rule-one>"
             }
         },
@@ -24,6 +28,8 @@
             "values": [ "auto" ],
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "auto | <shared-rule-exported>"
             }
         },
@@ -33,6 +39,8 @@
             "values": [ "auto" ],
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "auto | <shared-rule-with-override-function>"
             }
         },
@@ -41,6 +49,8 @@
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "sink-priority": true,
                 "parser-grammar": "<number>"
             }
@@ -50,6 +60,8 @@
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "high-priority": true,
                 "parser-grammar": "<number>"
             }
@@ -59,6 +71,8 @@
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "top-priority": true,
                 "top-priority-reason": "justification string",
                 "parser-grammar": "<number>"
@@ -69,6 +83,8 @@
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "medium-priority": true,
                 "parser-grammar": "<number>"
             }
@@ -77,9 +93,9 @@
             "animation-type": "discrete",
             "initial": "0",
             "codegen-properties": {
-                "skip-render-style": true,
                 "animation-wrapper": "DiscreteCoordinatedValueListPropertyWrapper",
                 "coordinated-value-list-property": true,
+                "coordinated-value-list-property-item-type": "Style::Number<>",
                 "parser-grammar": "<number>#"
             }
         },
@@ -87,18 +103,8 @@
             "animation-type": "discrete",
             "initial": "0",
             "codegen-properties": {
-                "skip-render-style": true,
                 "coordinated-value-list-property": true,
-                "parser-grammar": "<number>#"
-            }
-        },
-        "background-coordinated-value-list-property-test-three-with-converter": {
-            "animation-type": "discrete",
-            "initial": "0",
-            "codegen-properties": {
-                "skip-render-style": true,
-                "coordinated-value-list-property": true,
-                "style-converter": "FillTestConverter",
+                "coordinated-value-list-property-item-type": "Style::Number<>",
                 "parser-grammar": "<number>#"
             }
         },
@@ -107,6 +113,8 @@
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number [-inf, -10]> | <length [0, inf]> | <angle [-90,90]> | <percentage [1,100]>"
             }
         },
@@ -116,6 +124,7 @@
             "codegen-properties": {
                 "skip-render-style": true,
                 "settings-flag": "cssSettingsOneEnabled",
+                "render-style-type": "Style::Number<>",
                 "parser-grammar": "<number>"
             }
         },
@@ -126,6 +135,7 @@
             "codegen-properties": {
                 "skip-render-style": true,
                 "animation-wrapper": "Wrapper<float>",
+                "render-style-type": "Style::Number<>",
                 "parser-grammar": "<number>"
             }
         },
@@ -136,6 +146,7 @@
                 "skip-render-style": true,
                 "animation-wrapper": "Wrapper<float>",
                 "animation-wrapper-acceleration": "always",
+                "render-style-type": "Style::Number<>",
                 "parser-grammar": "<number>"
             }
         },
@@ -146,6 +157,7 @@
                 "skip-render-style": true,
                 "animation-wrapper": "Wrapper<float>",
                 "animation-wrapper-acceleration": "threaded-only",
+                "render-style-type": "Style::Number<>",
                 "parser-grammar": "<number>"
             }
         },
@@ -155,6 +167,8 @@
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "logical-property-group": {
                     "name": "test-group",
                     "resolver": "horizontal"
@@ -171,6 +185,7 @@
                     "name": "test-group",
                     "resolver": "vertical"
                 },
+                "render-style-type": "Style::Number<>",
                 "parser-grammar": "<number>"
             }
         },
@@ -182,6 +197,7 @@
                     "name": "test-group",
                     "resolver": "block"
                 },
+                "render-style-type": "Style::Number<>",
                 "parser-grammar": "<number>"
             }
         },
@@ -189,6 +205,7 @@
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "logical-property-group": {
                     "name": "test-group",
                     "resolver": "inline"
@@ -200,6 +217,8 @@
         "test-shorthand-one": {
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "longhands": [
                     "test-logical-property-group-physical-horizontal",
                     "test-logical-property-group-physical-vertical"
@@ -213,6 +232,8 @@
         "test-shorthand-two": {
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "longhands": [
                     "test-logical-property-group-logical-block",
                     "test-logical-property-group-logical-inline"
@@ -226,6 +247,8 @@
         "font": {
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "longhands": [
                     "test-sink-priority",
                     "test-high-priority"
@@ -238,6 +261,8 @@
         "all": {
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "longhands": [
                     "all"
                 ],
@@ -251,6 +276,8 @@
             "initial": "0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>*"
             }
         },
@@ -259,6 +286,8 @@
             "initial": "0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>*@(no-single-item-opt)"
             }
         },
@@ -267,6 +296,8 @@
             "initial": "0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>{2,}"
             }
         },
@@ -275,6 +306,8 @@
             "initial": "0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>{1,}"
             }
         },
@@ -283,6 +316,8 @@
             "initial": "0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>{1,}@(no-single-item-opt)"
             }
         },
@@ -292,6 +327,8 @@
             "initial": "0, 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>#{2,}"
             }
         },
@@ -300,6 +337,8 @@
             "initial": "0, 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>#{1,}"
             }
         },
@@ -308,6 +347,8 @@
             "initial": "0, 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>#{1,}@(no-single-item-opt)"
             }
         },
@@ -317,6 +358,8 @@
             "initial": "0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>{2,3}"
             }
         },
@@ -325,6 +368,8 @@
             "initial": "0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>{1,3}"
             }
         },
@@ -333,6 +378,8 @@
             "initial": "0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>{1,3}@(no-single-item-opt)"
             }
         },
@@ -341,6 +388,8 @@
             "initial": "0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>{2}"
             }
         },
@@ -349,6 +398,8 @@
             "initial": "0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>{1,2}@(type=CSSValuePair)"
             }
         },
@@ -357,6 +408,8 @@
             "initial": "0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>{1,2}@(type=CSSValuePair no-single-item-opt)"
             }
         },
@@ -365,6 +418,8 @@
             "initial": "0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>{1,2}@(type=CSSValuePair default=previous)"
             }
         },
@@ -373,6 +428,8 @@
             "initial": "0 0 0 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>{1,4}@(type=CSSValuePair default=previous)"
             }
         },
@@ -382,6 +439,8 @@
             "initial": "0, 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>#{2,3}"
             }
         },
@@ -390,6 +449,8 @@
             "initial": "0, 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>#{1,3}"
             }
         },
@@ -398,6 +459,8 @@
             "initial": "0, 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>#{1,3}@(no-single-item-opt)"
             }
         },
@@ -406,6 +469,8 @@
             "initial": "0, 0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<number>#{2}"
             }
         },
@@ -415,6 +480,8 @@
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> | <custom-ident> | <length> ]"
             }
         },
@@ -423,6 +490,8 @@
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> | foo | bar | baz | [ <custom-ident> && <dashed-ident> ] ]"
             }
         },
@@ -431,6 +500,8 @@
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> | foo@(settings-flag=cssSettingsFooDisabled) | bar | baz | [ <custom-ident> && <dashed-ident> ] ]"
             }
         },
@@ -439,6 +510,8 @@
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number>@(settings-flag=cssSettingsReferenceDisabled) | foo | bar | baz | [ <custom-ident> && <dashed-ident> ] ]"
             }
         },
@@ -447,6 +520,8 @@
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> | foo | bar | baz | [ <custom-ident> && <dashed-ident> ]@(settings-flag=cssSettingsGroupDisabled) ]"
             }
         },
@@ -455,6 +530,8 @@
             "initial": "none",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "none || [ foo | bar ]@(settings-flag=cssSettingsGroupDisabled)"
             }
         },
@@ -463,6 +540,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> <custom-ident> <length> ]"
             }
         },
@@ -471,6 +550,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> <custom-ident>? <length> ]"
             }
         },
@@ -479,6 +560,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> <custom-ident>? <length>? ]"
             }
         },
@@ -487,6 +570,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> <custom-ident>? <length>? ]@(no-single-item-opt)"
             }
         },
@@ -495,6 +580,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> <custom-ident> <length>? ]"
             }
         },
@@ -503,6 +590,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> <custom-ident> <length> ]@(type=CSSCustomType)"
             }
         },
@@ -511,6 +600,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> <custom-ident>? <length>? ]@(type=CSSCustomType)"
             }
         },
@@ -519,6 +610,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> <custom-ident>? <length>? ]@(type=CSSCustomType no-single-item-opt)"
             }
         },
@@ -527,6 +620,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> <custom-ident> <length>? ]@(type=CSSCustomType)"
             }
         },
@@ -535,6 +630,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident> && <length> ]"
             }
         },
@@ -543,6 +640,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident>? && <length> ]"
             }
         },
@@ -551,6 +650,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident>? && <length>? ]"
             }
         },
@@ -559,6 +660,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident>? && <length>? ]@(no-single-item-opt)"
             }
         },
@@ -567,6 +670,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident> && <length> ]@(preserve-order)"
             }
         },
@@ -575,6 +680,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident> && <length> ]@(preserve-order no-single-item-opt)"
             }
         },
@@ -583,6 +690,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident>? && <length>? ]@(preserve-order)"
             }
         },
@@ -591,6 +700,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident>? && <length>? ]@(preserve-order no-single-item-opt)"
             }
         },
@@ -599,6 +710,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident> && <length> ]@(type=CSSCustomType)"
             }
         },
@@ -607,6 +720,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident> && <length> ]@(preserve-order type=CSSCustomType)"
             }
         },
@@ -615,6 +730,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident>? && <length>? ]@(type=CSSCustomType)"
             }
         },
@@ -623,6 +740,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident>? && <length>? ]@(preserve-order type=CSSCustomType)"
             }
         },
@@ -631,6 +750,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident> && <length>? ]@(type=CSSCustomType)"
             }
         },
@@ -639,6 +760,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident> && <length>? ]@(type=CSSCustomType no-single-item-opt)"
             }
         },
@@ -647,6 +770,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident> && <length>? ]@(preserve-order type=CSSCustomType)"
             }
         },
@@ -655,6 +780,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> && <custom-ident> && <length>? ]@(preserve-order type=CSSCustomType no-single-item-opt)"
             }
         },
@@ -663,6 +790,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> || <custom-ident> || <length> ]"
             }
         },
@@ -671,6 +800,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> || <custom-ident> || <length> ]@(no-single-item-opt)"
             }
         },
@@ -679,6 +810,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> || <custom-ident> || <length> ]@(preserve-order)"
             }
         },
@@ -687,6 +820,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> || <custom-ident> || <length> ]@(preserve-order no-single-item-opt)"
             }
         },
@@ -695,6 +830,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> || <custom-ident> || <length> ]@(type=CSSCustomType)"
             }
         },
@@ -703,6 +840,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> || <custom-ident> || <length> ]@(type=CSSCustomType no-single-item-opt)"
             }
         },
@@ -711,6 +850,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> || <custom-ident> || <length> ]@(preserve-order type=CSSCustomType)"
             }
         },
@@ -719,6 +860,8 @@
             "initial": "0 foo 1px",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "[ <number> || <custom-ident> || <length> ]@(preserve-order type=CSSCustomType no-single-item-opt)"
             }
         },
@@ -727,6 +870,8 @@
             "initial": "foo()",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo()"
             }
         },
@@ -735,6 +880,8 @@
             "initial": "foo(1)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo( <number> )"
             }
         },
@@ -743,6 +890,8 @@
             "initial": "foo(1)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo( <number> | <string> | bar | baz )"
             }
         },
@@ -751,6 +900,8 @@
             "initial": "foo()",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo( <number>? )"
             }
         },
@@ -759,6 +910,8 @@
             "initial": "foo(1, 2)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo( <number>#{1,4} )"
             }
         },
@@ -767,6 +920,8 @@
             "initial": "foo(1, 2, 3)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo( <number>#{3} )"
             }
         },
@@ -775,6 +930,8 @@
             "initial": "foo(1, 2)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo( <number># )"
             }
         },
@@ -783,6 +940,8 @@
             "initial": "foo(1, 2)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo( <number>#{2,} )"
             }
         },
@@ -791,6 +950,8 @@
             "initial": "foo(1, 2)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo( <number> <string> )"
             }
         },
@@ -799,6 +960,8 @@
             "initial": "foo(1, 2)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo( <number> <string>? )"
             }
         },
@@ -807,6 +970,8 @@
             "initial": "foo(1, 2)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo( <number> && <string> )"
             }
         },
@@ -815,6 +980,8 @@
             "initial": "foo(1, 2)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo( <number> && <string>? )"
             }
         },
@@ -823,6 +990,8 @@
             "initial": "foo(1, 2)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo( <number> || <string> )"
             }
         },
@@ -831,6 +1000,8 @@
             "initial": "currentColor",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "color-property": true,
                 "parser-grammar": "<color>"
             }
@@ -840,6 +1011,8 @@
             "initial": "currentColor",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "color-property": true,
                 "parser-grammar": "<color allowed-types=absolute>"
             }
@@ -849,6 +1022,8 @@
             "initial": "url(about:blank)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<image>"
             }
         },
@@ -857,6 +1032,8 @@
             "initial": "url(about:blank)",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "<image allowed-types=url,generated>"
             }
         },
@@ -865,6 +1042,8 @@
             "initial": "foo",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo | bar"
             }
         },
@@ -873,6 +1052,8 @@
             "initial": "foo",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "foo@(aliased-to=baz) | bar"
             }
         },
@@ -881,6 +1062,8 @@
             "initial": "none",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "none | <url>"
             }
         },
@@ -889,33 +1072,18 @@
             "initial": "none",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "parser-grammar": "none | <url allowed-modifiers=crossorigin,integrity,referrerpolicy>"
             }
         },
 
-        "test-extractor-converter": {
-            "animation-type": "discrete",
-            "initial": "0",
-            "codegen-properties": {
-                "skip-render-style": true,
-                "style-extractor-converter": "TestExtractorOnlyConversion",
-                "parser-grammar": "<number>"
-            }
-        },
-        "test-shared-builder-extractor-converter": {
-            "animation-type": "discrete",
-            "initial": "0",
-            "codegen-properties": {
-                "skip-render-style": true,
-                "style-converter": "TestSharedBuilderExtractorConversion",
-                "parser-grammar": "<number>"
-            }
-        },
         "test-custom-extractor": {
             "animation-type": "discrete",
             "initial": "0",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
                 "style-extractor-custom": true,
                 "parser-grammar": "<number>"
             }
@@ -925,6 +1093,8 @@
             "initial": "currentColor",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "color-property": true,
                 "parser-grammar": "<color>"
             }
@@ -934,6 +1104,8 @@
             "initial": "currentColor",
             "codegen-properties": {
                 "skip-render-style": true,
+                "skip-style-builder": true,
+                "skip-style-extractor": true,
                 "visited-link-color-support": true,
                 "color-property": true,
                 "parser-grammar": "<color>"

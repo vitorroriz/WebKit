@@ -26,7 +26,6 @@
 
 #pragma once
 
-#include "RenderStyle.h"
 #include "RenderStyleSetters.h"
 #include "StyleBuilderState.h"
 #include "StyleFontSizeFunctions.h"

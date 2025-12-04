@@ -26,15 +26,15 @@
 
 #pragma once
 
+#include "CSSToLengthConversionData.h"
+#include "Document.h"
+#include "FontTaggedSettings.h"
 #include "PropertyCascade.h"
 #include "RuleSet.h"
 #include "SelectorChecker.h"
+#include "StyleForVisitedLink.h"
+#include "TextFlags.h"
 #include "TreeResolutionState.h"
-#include <WebCore/CSSToLengthConversionData.h>
-#include <WebCore/Document.h>
-#include <WebCore/FontTaggedSettings.h>
-#include <WebCore/StyleForVisitedLink.h>
-#include <WebCore/TextFlags.h>
 #include <wtf/BitSet.h>
 
 namespace WebCore {
@@ -130,8 +130,11 @@ public:
     bool applyPropertyToRegularStyle() const { return m_linkMatch != SelectorChecker::MatchVisited; }
     bool applyPropertyToVisitedLinkStyle() const { return m_linkMatch != SelectorChecker::MatchLink; }
 
+    float zoomWithTextZoomFactor();
+
     bool useSVGZoomRules() const;
     bool useSVGZoomRulesForLength() const;
+
     ScopeOrdinal styleScopeOrdinal() const { return m_currentProperty->styleScopeOrdinal; }
 
     RefPtr<StyleImage> createStyleImage(const CSSValue&) const;

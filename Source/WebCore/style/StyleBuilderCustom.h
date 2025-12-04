@@ -27,40 +27,39 @@
 
 #pragma once
 
-#include "CSSBoxShadowPropertyValue.h"
-#include "CSSCalcSymbolTable.h"
-#include "CSSColorValue.h"
+#include "AnchorPositionEvaluator.h"
 #include "CSSCounterStyleRegistry.h"
 #include "CSSCounterStyleRule.h"
 #include "CSSCounterValue.h"
-#include "CSSCursorImageValue.h"
-#include "CSSFontValue.h"
-#include "CSSGradientValue.h"
+#include "CSSPrimitiveValueMappings.h"
 #include "CSSPropertyParserConsumer+Font.h"
-#include "CSSRatioValue.h"
-#include "CSSRectValue.h"
 #include "CSSRegisteredCustomProperty.h"
-#include "CSSTextShadowPropertyValue.h"
-#include "CSSURLValue.h"
+#include "CSSValuePair.h"
+#include "DocumentQuirks.h"
+#include "DocumentView.h"
 #include "ElementAncestorIteratorInlines.h"
+#include "FontSelectionValueInlines.h"
+#include "FrameDestructionObserverInlines.h"
 #include "HTMLElement.h"
 #include "LocalFrame.h"
 #include "SVGElement.h"
-#include "StyleBoxShadow.h"
-#include "StyleBuilderConverter.h"
+#include "SVGElementTypeHelpers.h"
+#include "SVGPathElement.h"
+#include "Settings.h"
+#include "StyleBuilderChecking.h"
 #include "StyleBuilderStateInlines.h"
-#include "StyleCachedImage.h"
-#include "StyleCursorImage.h"
-#include "StyleCustomPropertyData.h"
 #include "StyleFontSizeFunctions.h"
-#include "StyleGeneratedImage.h"
-#include "StyleImageSet.h"
-#include "StyleLineWidth.h"
-#include "StyleRatio.h"
+#include "StyleLengthWrapper+CSSValueConversion.h"
+#include "StylePrimitiveKeyword+CSSValueConversion.h"
+#include "StylePrimitiveNumericTypes+CSSValueConversion.h"
+#include "StylePrimitiveNumericTypes+Conversions.h"
+#include "StyleResolveForFont.h"
 #include "StyleResolver.h"
-#include "StyleScope.h"
-#include "StyleTextShadow.h"
-#include "TransformOperations.h"
+#include "StyleTextEdge+CSSValueConversion.h"
+#include "StyleValueTypes+CSSValueConversion.h"
+#include "TextSpacing.h"
+#include "ViewTimeline.h"
+#include <ranges>
 
 namespace WebCore {
 namespace Style {
@@ -91,7 +90,6 @@ inline EasingFunction forwardInheritedValue(const EasingFunction& value) { auto 
 inline GapGutter forwardInheritedValue(const GapGutter& value) { auto copy = value; return copy; }
 inline FontFamilies forwardInheritedValue(const FontFamilies& value) { auto copy = value; return copy; }
 inline FilterOperations forwardInheritedValue(const FilterOperations& value) { auto copy = value; return copy; }
-inline TransformOperations forwardInheritedValue(const TransformOperations& value) { auto copy = value; return copy; }
 inline ScrollMarginEdge forwardInheritedValue(const ScrollMarginEdge& value) { auto copy = value; return copy; }
 inline ScrollPaddingEdge forwardInheritedValue(const ScrollPaddingEdge& value) { auto copy = value; return copy; }
 inline MaskBorderSource forwardInheritedValue(const MaskBorderSource& value) { auto copy = value; return copy; }
@@ -298,7 +296,7 @@ void applyInheritCoordinatedValueListProperty(BuilderState& builderState)
         PropertyAccessor { list[i] }.clear();
 }
 
-template<auto propertyID, auto listMutableGetter, auto converter, typename ListType>
+template<auto propertyID, auto listMutableGetter, typename ItemType, typename ListType>
 void applyValueCoordinatedValueListProperty(BuilderState& builderState, CSSValue& value)
 {
     using PropertyAccessor = CoordinatedValueListPropertyAccessor<propertyID>;
@@ -309,7 +307,7 @@ void applyValueCoordinatedValueListProperty(BuilderState& builderState, CSSValue
         if (item.valueID() == CSSValueInitial)
             PropertyAccessor { list[i] }.set(PropertyAccessor::initial());
         else
-            PropertyAccessor { list[i] }.set(converter(builderState, item));
+            PropertyAccessor { list[i] }.set(toStyleFromCSSValue<ItemType>(builderState, item));
     };
 
     size_t i = 0;

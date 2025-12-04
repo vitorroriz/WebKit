@@ -27,8 +27,10 @@
 #include "StyleLineHeight.h"
 
 #include "AnimationUtilities.h"
+
+#include "CSSPropertyParserConsumer+Font.h"
+#include "RenderStyleInlines.h"
 #include "StyleBuilderChecking.h"
-#include "StyleBuilderConverter.h"
 #include "StyleLengthWrapper+Blending.h"
 #include "StyleLengthWrapper+CSSValueConversion.h"
 #include "StylePrimitiveNumericTypes+CSSValueConversion.h"
@@ -53,7 +55,7 @@ auto CSSValueConversion<LineHeight>::operator()(BuilderState& state, const CSSPr
 
     auto conversionData = state
         .cssToLengthConversionData()
-        .copyForLineHeight(zoomWithTextZoomFactor(state));
+        .copyForLineHeight(state.zoomWithTextZoomFactor());
 
     // If EvaluationTimeZoom is not enabled then we will scale the lengths in the
     // calc values when we create the CalculationValue below by using the zoom from conversionData.

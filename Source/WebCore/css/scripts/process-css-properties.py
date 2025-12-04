@@ -457,6 +457,7 @@ class StylePropertyCodeGenProperties:
         Schema.Entry("aliases", allowed_types=[list], default_value=[]),
         Schema.Entry("coordinated-value-list-property-getter", allowed_types=[str]),
         Schema.Entry("coordinated-value-list-property-initial", allowed_types=[str]),
+        Schema.Entry("coordinated-value-list-property-item-type", allowed_types=[str]),
         Schema.Entry("coordinated-value-list-property-name-for-methods", allowed_types=[str]),
         Schema.Entry("coordinated-value-list-property-setter", allowed_types=[str]),
         Schema.Entry("coordinated-value-list-property", allowed_types=[bool], default_value=False),
@@ -520,10 +521,8 @@ class StylePropertyCodeGenProperties:
         Schema.Entry("skip-style-builder", allowed_types=[bool], default_value=False),
         Schema.Entry("skip-style-extractor", allowed_types=[bool], default_value=False),
         Schema.Entry("status", allowed_types=[str]),
-        Schema.Entry("style-builder-converter", allowed_types=[str]),
         Schema.Entry("style-builder-custom", allowed_types=[str]),
-        Schema.Entry("style-converter", allowed_types=[str]),
-        Schema.Entry("style-extractor-converter", allowed_types=[str]),
+        Schema.Entry("style-builder-needs-system-font-shorthand-check", allowed_types=[bool], default_value=False),
         Schema.Entry("style-extractor-custom", allowed_types=[bool], default_value=False),
         Schema.Entry("top-priority", allowed_types=[bool], default_value=False),
         Schema.Entry("top-priority-reason", allowed_types=[str]),
@@ -609,14 +608,6 @@ class StylePropertyCodeGenProperties:
         elif json_value["style-builder-custom"] == "All":
             json_value["style-builder-custom"] = "Initial|Inherit|Value"
         json_value["style-builder-custom"] = frozenset(json_value["style-builder-custom"].split("|"))
-
-        if "style-converter" in json_value:
-            if "style-builder-converter" in json_value:
-                raise Exception(f"{key_path} can't specify both 'style-converter' and 'style-builder-converter'.")
-            if "style-extractor-converter" in json_value:
-                raise Exception(f"{key_path} can't specify both 'style-converter' and 'style-extractor-converter'.")
-            json_value["style-builder-converter"] = json_value["style-converter"]
-            json_value["style-extractor-converter"] = json_value["style-converter"]
 
         if "shorthand-pattern" in json_value:
             if "shorthand-parser-pattern" in json_value:
@@ -4019,14 +4010,7 @@ class GenerateStyleBuilderGenerated:
 
     def _converted_value(self, property, additional_parameters=[]):
         parameters = ['builderState', 'value'] + additional_parameters
-        if property.codegen_properties.style_builder_converter:
-            return f"BuilderConverter::convert{property.codegen_properties.style_builder_converter}({', '.join(parameters)})"
-        elif property.codegen_properties.color_property:
-            if not property.codegen_properties.visited_link_color_support:
-                parameters = parameters + ['ForVisitedLink::No']
-            return f"BuilderConverter::convertStyleType<Color>({', '.join(parameters)})"
-        else:
-            return f"fromCSSValueDeducingType({', '.join(parameters)})"
+        return f"toStyleFromCSSValue<WebCore::{property.codegen_properties.render_style_type}>({', '.join(parameters)})"
 
     # Color property setters.
 
@@ -4058,13 +4042,7 @@ class GenerateStyleBuilderGenerated:
         to.write(f"applyInheritCoordinatedValueListProperty<{property.id_or_cascade_alias_id}, &RenderStyle::{property.method_name_for_ensure_coordinated_value_list}, &RenderStyle::{property.method_name_for_get_coordinated_value_list}, {property.type_name_for_coordinated_value_list}>(builderState);")
 
     def _generate_coordinated_value_list_property_value_setter(self, to, property):
-        def converter(property):
-            if property.codegen_properties.style_builder_converter:
-                return f"&BuilderConverter::convert{property.codegen_properties.style_builder_converter}"
-            else:
-                return "&fromCSSValueDeducingType"
-
-        to.write(f"applyValueCoordinatedValueListProperty<{property.id_or_cascade_alias_id}, &RenderStyle::{property.method_name_for_ensure_coordinated_value_list}, {converter(property)}, {property.type_name_for_coordinated_value_list}>(builderState, value);")
+        to.write(f"applyValueCoordinatedValueListProperty<{property.id_or_cascade_alias_id}, &RenderStyle::{property.method_name_for_ensure_coordinated_value_list}, WebCore::{property.codegen_properties.coordinated_value_list_property_item_type}, {property.type_name_for_coordinated_value_list}>(builderState, value);")
 
     # Font property setters.
 
@@ -4134,7 +4112,7 @@ class GenerateStyleBuilderGenerated:
         to.write(f"{{")
 
         with to.indent():
-            if property in self.style_properties.all_by_name["font"].codegen_properties.longhands and "Initial" not in property.codegen_properties.style_builder_custom and not property.codegen_properties.style_builder_converter:
+            if property in self.style_properties.all_by_name["font"].codegen_properties.longhands and "Initial" not in property.codegen_properties.style_builder_custom and property.codegen_properties.style_builder_needs_system_font_shorthand_check:
                 to.write(f"if (CSSPropertyParserHelpers::isSystemFontShorthand(value.valueID())) {{")
                 with to.indent():
                     to.write(f"applyInitial{property.id_without_prefix}(builderState);")
@@ -4253,7 +4231,6 @@ class GenerateStyleBuilderGenerated:
                     "CSSPrimitiveValueMappings.h",
                     "CSSProperty.h",
                     "RenderStyleSetters.h",
-                    "StyleBuilderConverter.h",
                     "StyleBuilderCustom.h",
                     "StyleBuilderState.h",
                     "StylePropertyShorthand.h",
@@ -4290,21 +4267,11 @@ class GenerateStyleExtractorGenerated:
 
     @staticmethod
     def wrap_in_converter(property, value):
-        if property.codegen_properties.style_extractor_converter:
-            return f"ExtractorConverter::convert{property.codegen_properties.style_extractor_converter}(extractorState, {value})"
-        elif property.codegen_properties.color_property:
-            return f"ExtractorConverter::convertStyleType<Color>(extractorState, {value})"
-        else:
-            return f"ExtractorConverter::convert(extractorState, {value})"
+        return f"createCSSValue(extractorState.pool, extractorState.style, {value})"
 
     @staticmethod
     def wrap_in_serializer(property, value):
-        if property.codegen_properties.style_extractor_converter:
-            return f"ExtractorSerializer::serialize{property.codegen_properties.style_extractor_converter}(extractorState, builder, context, {value})"
-        elif property.codegen_properties.color_property:
-            return f"ExtractorSerializer::serializeStyleType<Color>(extractorState, builder, context, {value})"
-        else:
-            return f"ExtractorSerializer::serialize(extractorState, builder, context, {value})"
+        return f"serializationForCSS(builder, context, extractorState.style, {value})"
 
     # Color property getters.
 
@@ -4538,7 +4505,6 @@ class GenerateStyleExtractorGenerated:
                     "CSSProperty.h",
                     "ColorSerialization.h",
                     "RenderStyle.h",
-                    "StyleExtractorConverter.h",
                     "StyleExtractorCustom.h",
                     "StyleExtractorState.h",
                     "StylePropertyShorthand.h",
