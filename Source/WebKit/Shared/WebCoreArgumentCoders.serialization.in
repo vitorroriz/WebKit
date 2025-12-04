@@ -7569,6 +7569,13 @@ class WebCore::FilterOperations {
 }
 #endif // !USE(COORDINATED_GRAPHICS)
 
+header: <WebCore/Filter.h>
+[CustomHeader, AdditionalEncoder=StreamConnectionEncoder] struct WebCore::FilterGeometry {
+    WebCore::FloatRect referenceBox;
+    WebCore::FloatRect filterRegion;
+    WebCore::FloatSize scale;
+}
+
 [AdditionalEncoder=StreamConnectionEncoder, RefCounted] class WebCore::Filter subclasses {
     WebCore::CSSFilterRenderer
     WebCore::SVGFilterRenderer
@@ -7576,22 +7583,17 @@ class WebCore::FilterOperations {
 
 [AdditionalEncoder=StreamConnectionEncoder, RefCounted] class WebCore::CSSFilterRenderer {
     Vector<Ref<WebCore::FilterFunction>> functions();
-
+    WebCore::FilterGeometry geometry();
     OptionSet<WebCore::FilterRenderingMode> filterRenderingModes();
-    WebCore::FloatSize filterScale();
-    WebCore::FloatRect filterRegion();
 }
 
 [AdditionalEncoder=StreamConnectionEncoder, RefCounted] class WebCore::SVGFilterRenderer {
-    WebCore::FloatRect targetBoundingBox();
     WebCore::SVGUnitTypes::SVGUnitType primitiveUnits();
     WebCore::SVGFilterExpression expression();
     [Validator='WebCore::SVGFilterRenderer::isValidSVGFilterExpression(*expression, *effects)'] Vector<Ref<WebCore::FilterEffect>> effects();
-    std::optional<WebCore::RenderingResourceIdentifier> renderingResourceIdentifierIfExists();
-
+    WebCore::FilterGeometry geometry();
     OptionSet<WebCore::FilterRenderingMode> filterRenderingModes();
-    WebCore::FloatSize filterScale();
-    WebCore::FloatRect filterRegion();
+    std::optional<WebCore::RenderingResourceIdentifier> renderingResourceIdentifierIfExists();
 }
 
 [Nested] enum class WebCore::UserStyleLevel : bool;
