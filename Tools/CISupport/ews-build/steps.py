@@ -5563,11 +5563,6 @@ class TransferToS3(master.MasterShellCommand):
 
 
 class DownloadBuiltProduct(shell.ShellCommand):
-    command = [
-        'python3', 'Tools/CISupport/download-built-product',
-        WithProperties('--%(configuration)s'),
-        WithProperties(S3URL + S3_BUCKET + '/%(fullPlatform)s-%(archForUpload)s-%(configuration)s/%(change_id)s.zip'),
-    ]
     name = 'download-built-product'
     description = ['downloading built product']
     descriptionDone = ['Downloaded built product']
@@ -5579,7 +5574,9 @@ class DownloadBuiltProduct(shell.ShellCommand):
             return {'step': 'Failed to download built product from S3'}
         return super().getResultSummary()
 
-    def __init__(self, **kwargs):
+    def __init__(self, suffix='', **kwargs):
+        self.suffix = suffix
+        self.name += suffix
         super().__init__(logEnviron=False, **kwargs)
 
     @defer.inlineCallbacks
@@ -5588,6 +5585,14 @@ class DownloadBuiltProduct(shell.ShellCommand):
         if CURRENT_HOSTNAME not in (EWS_BUILD_HOSTNAMES + TESTING_ENVIRONMENT_HOSTNAMES):
             self.build.addStepsAfterCurrentStep([DownloadBuiltProductFromMaster()])
             return defer.returnValue(SKIPPED)
+
+        full_platform = self.getProperty('fullPlatform')
+        arch_for_upload = self.getProperty('archForUpload')
+        configuration = self.getProperty('configuration')
+        change_id = self.getProperty('change_id')
+        url = f'{S3URL}{S3_BUCKET}/{full_platform}-{arch_for_upload}-{configuration}{self.suffix}/{change_id}.zip'
+
+        self.command = ['python3', 'Tools/CISupport/download-built-product', f'--{configuration}', url]
 
         rc = yield super().run()
         if rc == FAILURE:
