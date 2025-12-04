@@ -40,11 +40,11 @@ InlineContent::InlineContent(const RenderBlockFlow& formattingContextRoot)
 {
 }
 
-bool InlineContent::hasInflowContent() const
+bool InlineContent::isInFlowContentful() const
 {
     ASSERT(m_displayContent.boxes.isEmpty() || m_displayContent.boxes[0].isRootInlineBox());
     for (auto& line : m_displayContent.lines) {
-        if (line.hasInflowContent())
+        if (line.isInFlowContentful())
             return true;
     }
     return false;

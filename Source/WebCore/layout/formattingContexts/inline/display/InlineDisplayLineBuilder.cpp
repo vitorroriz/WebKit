@@ -504,7 +504,7 @@ void InlineDisplayLineBuilder::applyEllipsisIfNeeded(LineEndingTruncationPolicy 
 bool InlineDisplayLineBuilder::hasTrailingLineWithBlockContent(const InlineDisplay::Lines& displayLines)
 {
     for (auto& line : displayLines | std::views::reverse) {
-        if (!line.hasInflowContent())
+        if (!line.isInFlowContentful())
             continue;
         return line.hasBlockContent();
     }

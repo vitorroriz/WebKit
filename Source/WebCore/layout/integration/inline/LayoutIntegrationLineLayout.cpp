@@ -184,7 +184,7 @@ static const InlineDisplay::Line& lastLineWithInflowContent(const InlineDisplay:
     // account when computing content box height/baselines.
     for (auto& line : lines | std::views::reverse) {
         ASSERT(line.boxCount());
-        if (line.hasInflowContent())
+        if (line.isInFlowContentful())
             return line;
     }
     return lines.first();
@@ -760,7 +760,7 @@ bool LineLayout::hasEllipsisInBlockDirectionOnLastFormattedLine() const
         return false;
 
     for (auto& line : m_inlineContent->displayContent().lines | std::views::reverse) {
-        if (!line.hasInflowContent()) {
+        if (!line.isInFlowContentful()) {
             // Out-of-flow content could initiate a line with no inline content.
             continue;
         }
@@ -818,7 +818,7 @@ LayoutUnit LineLayout::contentLogicalHeight() const
 
 bool LineLayout::isSelfCollapsingContent() const
 {
-    if (!m_inlineContent || !m_inlineContent->hasInflowContent())
+    if (!m_inlineContent || !m_inlineContent->isInFlowContentful())
         return true;
 
     auto& displayContent = m_inlineContent->displayContent();
@@ -845,14 +845,14 @@ size_t LineLayout::lineCount() const
 {
     if (!m_inlineContent)
         return 0;
-    if (!m_inlineContent->hasInflowContent())
+    if (!m_inlineContent->isInFlowContentful())
         return 0;
 
     auto& lines = m_inlineContent->displayContent().lines;
     if (lines.isEmpty())
         return 0;
     // In some cases (trailing out-of-flow, non-contentful content after <br>) we produce last line with no content but root inline box only.
-    return lines.last().hasInflowContent() ? lines.size() : lines.size() - 1;
+    return lines.last().isInFlowContentful() ? lines.size() : lines.size() - 1;
 }
 
 bool LineLayout::hasInkOverflow() const
@@ -868,7 +868,7 @@ LayoutUnit LineLayout::firstLineBaseline() const
     }
 
     auto baselineForLineOrBlock = [&](auto& line) -> std::optional<LayoutUnit> {
-        if (!line.hasInflowContent())
+        if (!line.isInFlowContentful())
             return { };
 
         if (auto* blockLevelBox = m_inlineContent->blockLevelBoxForLine(line)) {
@@ -894,7 +894,7 @@ LayoutUnit LineLayout::lastLineBaseline() const
     }
 
     auto baselineForLineOrBlock = [&](auto& line) -> std::optional<LayoutUnit> {
-        if (!line.hasInflowContent())
+        if (!line.isInFlowContentful())
             return { };
 
         if (auto* blockLevelBox = m_inlineContent->blockLevelBoxForLine(line)) {
@@ -1019,7 +1019,7 @@ InlineIterator::InlineBoxIterator LineLayout::firstInlineBoxFor(const RenderInli
 
 InlineIterator::InlineBoxIterator LineLayout::firstRootInlineBox() const
 {
-    if (!m_inlineContent || !m_inlineContent->hasInflowContent())
+    if (!m_inlineContent || !m_inlineContent->isInFlowContentful())
         return { };
 
     return InlineIterator::inlineBoxFor(*m_inlineContent, m_inlineContent->displayContent().boxes[0]);
@@ -1027,7 +1027,7 @@ InlineIterator::InlineBoxIterator LineLayout::firstRootInlineBox() const
 
 InlineIterator::LineBoxIterator LineLayout::firstLineBox() const
 {
-    if (!m_inlineContent || !m_inlineContent->hasInflowContent())
+    if (!m_inlineContent || !m_inlineContent->isInFlowContentful())
         return { };
 
     return { InlineIterator::LineBoxIteratorModernPath(*m_inlineContent, 0) };
@@ -1035,7 +1035,7 @@ InlineIterator::LineBoxIterator LineLayout::firstLineBox() const
 
 InlineIterator::LineBoxIterator LineLayout::lastLineBox() const
 {
-    if (!m_inlineContent || !m_inlineContent->hasInflowContent())
+    if (!m_inlineContent || !m_inlineContent->isInFlowContentful())
         return { };
 
     return { InlineIterator::LineBoxIteratorModernPath(*m_inlineContent, m_inlineContent->displayContent().lines.isEmpty() ? 0 : m_inlineContent->displayContent().lines.size() - 1) };
@@ -1074,7 +1074,7 @@ LayoutRect LineLayout::enclosingBorderBoxRectFor(const RenderInline& renderInlin
         return { };
 
     // FIXME: This preserves existing output.
-    if (!m_inlineContent->hasInflowContent())
+    if (!m_inlineContent->isInFlowContentful())
         return { };
 
     auto borderBoxLogicalRect = LayoutRect { Layout::BoxGeometry::borderBoxRect(layoutState().geometryForBox(*renderInline.layoutBox())) };
