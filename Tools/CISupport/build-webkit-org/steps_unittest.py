@@ -1737,7 +1737,7 @@ class TestGenerateUploadBundleSteps(BuildStepMixinAdditions, unittest.TestCase):
             ExpectShell(workdir='wkdir',
                         command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'Tools/Scripts/test-bundle --platform=gtk --bundle-type=universal WebKitBuild/MiniBrowser_gtk_release.tar.xz 2>&1 | python3 Tools/Scripts/filter-test-logs minibrowser'],
                         log_environ=True,
-                        timeout=10800,
+                        timeout=1200,
                         )
             .exit(0),
         )
@@ -1756,7 +1756,7 @@ class TestGenerateUploadBundleSteps(BuildStepMixinAdditions, unittest.TestCase):
             ExpectShell(workdir='wkdir',
                         command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'Tools/Scripts/test-bundle --platform=gtk --bundle-type=universal WebKitBuild/MiniBrowser_gtk_release.tar.xz 2>&1 | python3 Tools/Scripts/filter-test-logs minibrowser'],
                         log_environ=True,
-                        timeout=10800,
+                        timeout=1200,
                         )
             .exit(2),
         )
@@ -2437,7 +2437,7 @@ class TestRunTest262Tests(BuildStepMixinAdditions, unittest.TestCase):
         self.setProperty('configuration', 'release')
         self.expectRemoteCommands(
             ExpectShell(workdir='wkdir',
-                        timeout=7200,
+                        timeout=1200,
                         log_environ=True,
                         command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'perl Tools/Scripts/test262-runner --verbose --release 2>&1 | python3 Tools/Scripts/filter-test-logs test262'],
                         )
@@ -2452,7 +2452,7 @@ class TestRunTest262Tests(BuildStepMixinAdditions, unittest.TestCase):
         self.setProperty('configuration', 'debug')
         self.expectRemoteCommands(
             ExpectShell(workdir='wkdir',
-                        timeout=7200,
+                        timeout=1200,
                         log_environ=True,
                         command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'perl Tools/Scripts/test262-runner --verbose --debug 2>&1 | python3 Tools/Scripts/filter-test-logs test262'],
                         )
@@ -2471,7 +2471,7 @@ class TestRunTest262Tests(BuildStepMixinAdditions, unittest.TestCase):
         self.setProperty('configuration', 'release')
         self.expectRemoteCommands(
             ExpectShell(workdir='wkdir',
-                        timeout=7200,
+                        timeout=1200,
                         log_environ=True,
                         command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'perl Tools/Scripts/test262-runner --verbose --release --gtk 2>&1 | python3 Tools/Scripts/filter-test-logs test262'],
                         )
