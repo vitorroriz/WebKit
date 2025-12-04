@@ -161,6 +161,10 @@ void RemotePageProxy::didReceiveMessage(IPC::Connection& connection, IPC::Decode
         IPC::handleMessage<Messages::WebPageProxy::IsPlayingMediaDidChange>(connection, decoder, this, &RemotePageProxy::isPlayingMediaDidChange);
         return;
     }
+    if (decoder.messageName() == Messages::WebPageProxy::SetNetworkRequestsInProgress::name()) {
+        IPC::handleMessage<Messages::WebPageProxy::SetNetworkRequestsInProgress>(connection, decoder, this, &RemotePageProxy::setNetworkRequestsInProgress);
+        return;
+    }
 
     if (RefPtr page = m_page.get()) {
         if (decoder.messageReceiverName() == Messages::WebBackForwardList::messageReceiverName())
@@ -214,6 +218,17 @@ void RemotePageProxy::isPlayingMediaDidChange(WebCore::MediaProducerMediaStateFl
     if (didStopAudioCapture || didStopVideoCapture)
         UserMediaProcessManager::singleton().revokeSandboxExtensionsIfNeeded(m_process);
 #endif
+}
+
+void RemotePageProxy::setNetworkRequestsInProgress(bool hasNetworkRequestsInProgress)
+{
+    m_hasNetworkRequestsInProgress = hasNetworkRequestsInProgress;
+
+    RefPtr page = m_page.get();
+    if (!page || page->isClosed())
+        return;
+
+    page->networkRequestsInProgressDidChange();
 }
 
 void RemotePageProxy::setDrawingArea(DrawingAreaProxy* drawingArea)

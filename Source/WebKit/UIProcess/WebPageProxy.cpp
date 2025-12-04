@@ -6900,8 +6900,14 @@ void WebPageProxy::didFinishProgress()
 
 void WebPageProxy::setNetworkRequestsInProgress(bool networkRequestsInProgress)
 {
+    m_hasNetworkRequestsInProgress = networkRequestsInProgress;
+
     Ref pageLoadState = internals().pageLoadState;
     auto transaction = pageLoadState->transaction();
+    protectedBrowsingContextGroup()->forEachRemotePage(*this, [&] (auto& remotePageProxy) {
+        networkRequestsInProgress |= remotePageProxy.hasNetworkRequestsInProgress();
+    });
+
     pageLoadState->setNetworkRequestsInProgress(transaction, networkRequestsInProgress);
 }
 
@@ -17309,6 +17315,18 @@ bool WebPageProxy::isRemoteFrameNavigation(Ref<WebProcessProxy> process)
 {
     RefPtr provisionalPage = m_provisionalPage;
     return m_legacyMainFrameProcess != process && (!provisionalPage || provisionalPage->process() != process);
+}
+
+void WebPageProxy::networkRequestsInProgressDidChange()
+{
+    bool hasNetworkRequestsInProgress = m_hasNetworkRequestsInProgress;
+    protectedBrowsingContextGroup()->forEachRemotePage(*this, [&] (auto& remotePageProxy) {
+        hasNetworkRequestsInProgress |= remotePageProxy.hasNetworkRequestsInProgress();
+    });
+
+    Ref pageLoadState = internals().pageLoadState;
+    auto transaction = pageLoadState->transaction();
+    pageLoadState->setNetworkRequestsInProgress(transaction, hasNetworkRequestsInProgress);
 }
 
 // See SwiftDemoLogo.swift for the rationale here
