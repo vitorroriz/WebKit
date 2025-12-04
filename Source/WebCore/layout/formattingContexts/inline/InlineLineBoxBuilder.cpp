@@ -61,7 +61,7 @@ LineBox LineBoxBuilder::build(size_t lineIndex)
         return lineLayoutResult.contentGeometry.logicalWidth;
     };
     auto lineBox = LineBox { rootBox(), lineLayoutResult.contentGeometry.logicalLeft, contentLogicalWidth(), lineIndex, isFirstFormattedLine(), lineLayoutResult.nonSpanningInlineLevelBoxCount };
-    if (lineLayoutResult.hasBlockContent())
+    if (lineLayoutResult.isBlockContent())
         constructBlockContent(lineBox);
     else {
         constructInlineLevelBoxes(lineBox);

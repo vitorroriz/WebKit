@@ -69,7 +69,7 @@ public:
 
     InlineDisplay::Content& displayContent() { return m_displayContent; }
     const InlineDisplay::Content& displayContent() const { return m_displayContent; }
-    bool isInFlowContentful() const;
+    bool hasContentfulInFlowBox() const;
 
     FloatRect scrollableOverflow() const { return m_scrollableOverflow; }
     FloatRect inkOverflow() const { return m_inkOverflow; }

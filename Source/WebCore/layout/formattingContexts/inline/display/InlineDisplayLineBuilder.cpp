@@ -137,8 +137,19 @@ InlineDisplay::Line InlineDisplayLineBuilder::build(const LineLayoutResult& line
         ? rootInlineBoxRect.left()
         : lineBoxLogicalRect.width() - lineLayoutResult.contentGeometry.logicalRightIncludingNegativeMargin; // Note that with hanging content lineLayoutResult.contentGeometry.logicalRight is not the same as rootLineBoxRect.right().
 
+    auto hasInflowContent = [&] {
+        if (lineLayoutResult.hasContentfulInFlowContent())
+            return true;
+        for (auto& run : lineLayoutResult.runs) {
+            if (!run.isOpaque())
+                return true;
+        }
+        return false;
+    };
     auto writingMode = root().writingMode();
-    return InlineDisplay::Line { lineBox.hasContent()
+    return InlineDisplay::Line { hasInflowContent()
+        , lineBox.hasContent()
+        , lineLayoutResult.isBlockContent()
         , lineBoxLogicalRect
         , mapLineRectLogicalToVisual(lineBoxLogicalRect, constraints.formattingRootBorderBoxSize(), writingMode)
         , mapLineRectLogicalToVisual(enclosingLineGeometry.contentOverflowRect, constraints.formattingRootBorderBoxSize(), writingMode)
@@ -151,7 +162,6 @@ InlineDisplay::Line InlineDisplayLineBuilder::build(const LineLayoutResult& line
         , isLeftToRightDirection
         , rootInlineBox.layoutBox().writingMode().isHorizontal()
         , lineIsFullyTruncatedInBlockDirection
-        , lineLayoutResult.hasBlockContent()
     };
 }
 
@@ -504,9 +514,9 @@ void InlineDisplayLineBuilder::applyEllipsisIfNeeded(LineEndingTruncationPolicy 
 bool InlineDisplayLineBuilder::hasTrailingLineWithBlockContent(const InlineDisplay::Lines& displayLines)
 {
     for (auto& line : displayLines | std::views::reverse) {
-        if (!line.isInFlowContentful())
+        if (!line.hasContentfulInFlowBox())
             continue;
-        return line.hasBlockContent();
+        return line.hasBlockLevelBox();
     }
     return false;
 }
