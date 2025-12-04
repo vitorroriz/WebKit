@@ -330,13 +330,6 @@ void NetworkTransportSession::initialize(CompletionHandler<void(std::optional<We
                             protocol = String::fromUTF8(unsafeSpan(value));
                         });
                     }
-                    if (canLoad_Network_nw_webtransport_metadata_get_transport_mode()) {
-                        nw_webtransport_transport_mode_t transportMode = softLink_Network_nw_webtransport_metadata_get_transport_mode(metadata.get());
-                        if (transportMode == nw_webtransport_transport_mode_http3)
-                            reliabilityMode = WebCore::WebTransportReliabilityMode::SupportsUnreliable;
-                        else if (transportMode == nw_webtransport_transport_mode_http2)
-                            reliabilityMode = WebCore::WebTransportReliabilityMode::ReliableOnly;
-                    }
                 }
             }
             return creationCompletionHandler(WebCore::WebTransportConnectionInfo { WTFMove(protocol), reliabilityMode });

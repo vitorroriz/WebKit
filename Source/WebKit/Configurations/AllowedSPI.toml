@@ -99,7 +99,6 @@ symbols = [
     "nw_webtransport_metadata_set_remote_receive_error_handler",
     "nw_webtransport_metadata_set_remote_send_error_handler",
     "nw_webtransport_metadata_copy_connect_response",
-    "nw_webtransport_metadata_get_transport_mode",
     "nw_webtransport_options_add_connect_request_header",
     "nw_webtransport_options_set_allow_joining_before_ready",
     "nw_webtransport_options_set_is_datagram",

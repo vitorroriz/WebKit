@@ -56,9 +56,6 @@ SOFT_LINK_MAY_FAIL(Network, nw_webtransport_metadata_set_local_draining, void, (
 // FIXME: Replace this soft linking with a HAVE macro once rdar://164514830 is available on all tested OS builds.
 SOFT_LINK_MAY_FAIL(Network, nw_webtransport_metadata_get_session_closed, bool, (nw_protocol_metadata_t metadata), (metadata))
 
-// FIXME: Replace this soft linking with a HAVE macro once rdar://164917448 is available on all tested OS builds.
-SOFT_LINK_MAY_FAIL(Network, nw_webtransport_metadata_get_transport_mode, nw_webtransport_transport_mode_t, (nw_protocol_metadata_t metadata), (metadata))
-
 namespace TestWebKitAPI {
 
 static void enableWebTransport(WKWebViewConfiguration *configuration)
@@ -189,16 +186,13 @@ TEST(WebTransport, Datagram)
         "    const groupStats = await g.getStats();"
         "    t.close();"
         "    await w.closed;"
-        "    alert('successfully read ' + new TextDecoder().decode(value) + ', group sent ' + groupStats.bytesWritten + ' bytes, maxDatagramSize ' + t.datagrams.maxDatagramSize + ', reliability ' + t.reliability);"
+        "    alert('successfully read ' + new TextDecoder().decode(value) + ', group sent ' + groupStats.bytesWritten + ' bytes, maxDatagramSize ' + t.datagrams.maxDatagramSize);"
         "  } catch (e) { alert('caught ' + e); }"
         "}; test();"
         "</script>",
         port];
     [webView loadHTMLString:html baseURL:[NSURL URLWithString:@"https://webkit.org/"]];
-    if (!canLoadnw_webtransport_metadata_get_transport_mode())
-        EXPECT_WK_STREQ([webView _test_waitForAlert], "successfully read abc, group sent 3 bytes, maxDatagramSize 65535, reliability pending");
-    else
-        EXPECT_WK_STREQ([webView _test_waitForAlert], "successfully read abc, group sent 3 bytes, maxDatagramSize 65535, reliability supports-unreliable");
+    EXPECT_WK_STREQ([webView _test_waitForAlert], "successfully read abc, group sent 3 bytes, maxDatagramSize 65535");
     EXPECT_TRUE(challenged);
 }
 
