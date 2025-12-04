@@ -252,10 +252,30 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
         RELEASE_AND_RETURN(scope, promiseResolveThenableJob(globalObject, promise, then, resolve, reject));
     }
 
-    case InternalMicrotask::PromiseFirstResolveWithoutHandlerJob:
+    case InternalMicrotask::PromiseFirstResolveWithoutHandlerJob: {
         if (jsCast<JSPromise*>(arguments[0])->status() != JSPromise::Status::Pending)
             return;
-        [[fallthrough]];
+        auto* promise = jsCast<JSPromise*>(arguments[0]);
+        JSValue resolution = arguments[1];
+        switch (static_cast<JSPromise::Status>(arguments[2].asInt32())) {
+        case JSPromise::Status::Pending: {
+            RELEASE_ASSERT_NOT_REACHED();
+            break;
+        }
+        case JSPromise::Status::Fulfilled: {
+            scope.release();
+            promise->resolve(globalObject, resolution);
+            break;
+        }
+        case JSPromise::Status::Rejected: {
+            scope.release();
+            promise->reject(vm, globalObject, resolution);
+            break;
+        }
+        }
+        return;
+    }
+
     case InternalMicrotask::PromiseResolveWithoutHandlerJob: {
         auto* promise = jsCast<JSPromise*>(arguments[0]);
         JSValue resolution = arguments[1];
