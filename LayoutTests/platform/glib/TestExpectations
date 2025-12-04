@@ -4825,6 +4825,8 @@ webkit.org/b/303208 imported/blink/fast/pagination/viewport-y-horizontal-bt-rtl.
 fullscreen/fullscreen-grid-item-container-type-crash.html [ Skip ]
 
 webkit.org/b/303539 imported/w3c/web-platform-tests/service-workers/service-worker/multipart-image.https.html [ Crash Failure ]
+webkit.org/b/303547 fullscreen/full-screen-keyboard-lock-option-enabled.html [ Pass Timeout ]
+
 
 # End: Common failures between GTK and WPE.
 
