@@ -5342,7 +5342,10 @@ class GenerateRenderStyleGenerated:
         return expression
 
     def _generate_render_style_inlines_generated_h_function_implementation(self, *, to, function_name, return_type, get_expression):
-        to.write(f"inline {return_type} RenderStyle::{function_name}() const")
+        if (function_name == "display"):
+            to.write(f"inline constexpr {return_type} RenderStyle::{function_name}() const")
+        else:
+            to.write(f"inline {return_type} RenderStyle::{function_name}() const")
         to.write(f"{{")
         with to.indent():
             to.write(f"return {get_expression};")

@@ -572,7 +572,7 @@ public:
 
     // attribute getter methods
 
-    inline DisplayType display() const;
+    inline constexpr DisplayType display() const;
     constexpr WritingMode writingMode() const { return m_inheritedFlags.writingMode; }
     bool isLeftToRightDirection() const { return writingMode().isBidiLTR(); } // deprecated, because of confusion between physical inline directions and bidi / line-relative directions
 
