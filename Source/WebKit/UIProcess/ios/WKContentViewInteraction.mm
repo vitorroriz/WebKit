@@ -6802,19 +6802,22 @@ static Vector<WebCore::CompositionHighlight> compositionHighlights(NSAttributedS
         WKFoundDOMTextPosition *fromPosition = (WKFoundDOMTextPosition *)from;
         WKFoundDOMTextPosition *toPosition = (WKFoundDOMTextPosition *)to;
 
-        if (fromPosition.order == toPosition.order)
-            return fromPosition.offset - toPosition.offset;
+        if (fromPosition.order != toPosition.order)
+            return fromPosition.order - toPosition.order;
+
+        return fromPosition.offset - toPosition.offset;
     }
 
     if ([from isKindOfClass:[WKFoundPDFTextPosition class]] && [to isKindOfClass:[WKFoundPDFTextPosition class]]) {
         WKFoundPDFTextPosition *fromPosition = (WKFoundPDFTextPosition *)from;
         WKFoundPDFTextPosition *toPosition = (WKFoundPDFTextPosition *)to;
 
-        if (fromPosition.order == toPosition.order) {
-            if (fromPosition.page == toPosition.page)
-                return fromPosition.offset - toPosition.offset;
-            return fromPosition.page - toPosition.page;
-        }
+        if (fromPosition.order != toPosition.order)
+            return fromPosition.order - toPosition.order;
+
+        if (fromPosition.page == toPosition.page)
+            return fromPosition.offset - toPosition.offset;
+        return fromPosition.page - toPosition.page;
     }
 
     if ([from isKindOfClass:[WKFoundTextPosition class]] && [to isKindOfClass:[WKFoundTextPosition class]]) {

@@ -7203,6 +7203,59 @@ TEST(SiteIsolation, FindStringInFrameAndReplaceIOS)
     testPerformTextSearchWithQueryStringInWebView(webView.get(), @"foobar", searchOptions.get(), 1UL);
 }
 
+TEST(SiteIsolation, FindStringAcrossMultipleFramesOrderIOS)
+{
+    const auto mainFrameSrc = "<p>match1</p>"
+    "<iframe src='https://domain2.com/frame1'></iframe>"
+    "<p>match2</p>"
+    "<iframe src='https://domain3.com/frame2'></iframe>"
+    "<p>match3</p>"_s;
+
+    HTTPServer server({
+        { "/mainframe"_s, { mainFrameSrc } },
+        { "/frame1"_s, { "<p>match4</p><p>match5</p>"_s } },
+        { "/frame2"_s, { "<p>match6</p>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://domain1.com/mainframe"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    RetainPtr foundRanges = textRangesForQueryString(webView.get(), @"match");
+
+    EXPECT_EQ([foundRanges count], 6UL);
+
+    for (NSUInteger i = 0; i < [foundRanges count] - 1; i++) {
+        UITextRange *current = foundRanges.get()[i];
+        UITextRange *next = foundRanges.get()[i + 1];
+
+        NSComparisonResult result = [webView compareFoundRange:current toRange:next inDocument:nil];
+        EXPECT_EQ(result, NSOrderedAscending); // current < next
+    }
+}
+
+TEST(SiteIsolation, FindStringNestedFramesOrderIOS)
+{
+    HTTPServer server({
+        { "/main"_s, { "<p>resultA</p><iframe src='https://d2.com/f1'></iframe><p>resultB</p>"_s } },
+        { "/f1"_s, { "<p>resultC</p><iframe src='https://d3.com/f2'></iframe><p>resultD</p>"_s } },
+        { "/f2"_s, { "<p>resultE</p>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://d1.com/main"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    RetainPtr foundRanges = textRangesForQueryString(webView.get(), @"result");
+
+    EXPECT_EQ([foundRanges count], 5UL);
+
+    for (NSUInteger i = 0; i < [foundRanges count] - 1; i++) {
+        NSComparisonResult result = [webView compareFoundRange:foundRanges.get()[i] toRange:foundRanges.get()[i + 1] inDocument:nil];
+        EXPECT_EQ(result, NSOrderedAscending);
+    }
+}
+
 TEST(SiteIsolation, DecorateFoundTextRangeIOS)
 {
     HTTPServer server({

@@ -6397,11 +6397,11 @@ void WebPageProxy::findTextRangesForStringMatches(const String& string, OptionSe
         return;
     }
 
-    Ref aggregator = FindTextMatchCallbackAggregator::create(WTFMove(callbackFunction));
+    Ref aggregator = FindTextMatchCallbackAggregator::create(*this, WTFMove(callbackFunction));
 
     forEachWebContentProcess([&](auto& webProcess, auto pageID) {
-        webProcess.sendWithAsyncReply(Messages::WebPage::FindTextRangesForStringMatches(string, options, maxMatchCount), [aggregator](Vector<WebFoundTextRange>&& vector) {
-            aggregator->foundMatches(WTFMove(vector));
+        webProcess.sendWithAsyncReply(Messages::WebPage::FindTextRangesForStringMatches(string, options, maxMatchCount), [aggregator](HashMap<WebCore::FrameIdentifier, Vector<WebFoundTextRange>>&& frameMatches) {
+            aggregator->foundMatches(WTFMove(frameMatches));
         }, pageID);
     });
 }

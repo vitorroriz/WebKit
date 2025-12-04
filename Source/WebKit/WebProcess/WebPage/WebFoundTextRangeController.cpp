@@ -69,7 +69,7 @@ WebFoundTextRangeController::WebFoundTextRangeController(WebPage& webPage)
 {
 }
 
-void WebFoundTextRangeController::findTextRangesForStringMatches(const String& string, OptionSet<FindOptions> options, uint32_t maxMatchCount, CompletionHandler<void(Vector<WebFoundTextRange>&&)>&& completionHandler)
+void WebFoundTextRangeController::findTextRangesForStringMatches(const String& string, OptionSet<FindOptions> options, uint32_t maxMatchCount, CompletionHandler<void(HashMap<WebCore::FrameIdentifier, Vector<WebFoundTextRange>>&&)>&& completionHandler)
 {
     auto result = protectedWebPage()->protectedCorePage()->findTextMatches(string, core(options), maxMatchCount, false);
     Vector<WebCore::SimpleRange> findMatches = WTFMove(result.ranges);
@@ -77,9 +77,7 @@ void WebFoundTextRangeController::findTextRangesForStringMatches(const String& s
     if (!findMatches.isEmpty())
         m_cachedFoundRanges.clear();
 
-    auto frameID = protectedWebPage()->protectedCorePage()->protectedMainFrame()->frameID();
-    uint64_t order = 0;
-    Vector<WebFoundTextRange> foundTextRanges;
+    HashMap<WebCore::FrameIdentifier, Vector<WebFoundTextRange>> frameMatches;
     for (auto& simpleRange : findMatches) {
         Ref document = simpleRange.startContainer().document();
 
@@ -87,19 +85,23 @@ void WebFoundTextRangeController::findTextRangesForStringMatches(const String& s
         if (!element)
             continue;
 
-        const auto currentFrameID = document->frame()->frameID();
-        if (frameID != currentFrameID) {
-            frameID = currentFrameID;
-            order++;
-        }
+        RefPtr frame = document->frame();
+        if (!frame)
+            continue;
 
         // FIXME: We should get the character ranges at the same time as the SimpleRanges to avoid additional traversals.
         auto range = characterRange(makeBoundaryPointBeforeNodeContents(*element), simpleRange, WebCore::findIteratorOptions());
         auto domData = WebFoundTextRange::DOMData { range.location, range.length };
-        auto foundTextRange = WebFoundTextRange { domData, document->protectedFrame()->pathToFrame(), order };
-
+        // order set by UI process
+        auto foundTextRange = WebFoundTextRange { domData, frame->pathToFrame(), 0 };
         m_cachedFoundRanges.add(foundTextRange, simpleRange.makeWeakSimpleRange());
-        foundTextRanges.append(foundTextRange);
+
+        const auto frameID = frame->frameID();
+        auto& matches = frameMatches.ensure(frameID, [] {
+            return Vector<WebFoundTextRange> { };
+        }).iterator->value;
+
+        matches.append(foundTextRange);
     }
 
 #if ENABLE(PDF_PLUGIN)
@@ -108,17 +110,25 @@ void WebFoundTextRangeController::findTextRangesForStringMatches(const String& s
         if (!localFrame)
             continue;
 
-        if (RefPtr pluginView = WebPage::pluginViewForFrame(localFrame.get())) {
-            order++;
+        RefPtr pluginView = WebPage::pluginViewForFrame(localFrame.get());
+        if (!pluginView)
+            continue;
 
-            Vector<WebFoundTextRange::PDFData> pdfMatches = pluginView->findTextMatches(string, core(options));
-            for (auto& pdfMatch : pdfMatches)
-                foundTextRanges.append(WebFoundTextRange { pdfMatch, frame->pathToFrame(), order });
+        Vector<WebFoundTextRange::PDFData> pdfMatches = pluginView->findTextMatches(string, core(options));
+        const auto frameID = frame->frameID();
+        for (auto& pdfMatch : pdfMatches) {
+            // order set by UI process
+            const auto foundTextRange = WebFoundTextRange { pdfMatch, frame->pathToFrame(), 0 };
+            auto& matches = frameMatches.ensure(frameID, [] {
+                return Vector<WebFoundTextRange> { };
+            }).iterator->value;
+
+            matches.append(foundTextRange);
         }
     }
 #endif
 
-    completionHandler(WTFMove(foundTextRanges));
+    completionHandler(WTFMove(frameMatches));
 }
 
 void WebFoundTextRangeController::replaceFoundTextRangeWithString(const WebFoundTextRange& range, const String& string)
