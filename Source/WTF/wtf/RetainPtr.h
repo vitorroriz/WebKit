@@ -118,6 +118,7 @@ public:
     }
 
     PtrType autorelease();
+    PtrType getAutoreleased();
 
 #ifdef __OBJC__
     id bridgingAutorelease();
@@ -221,6 +222,12 @@ template<typename T> inline auto RetainPtr<T>::autorelease() -> PtrType
     if (ptr)
         autoreleaseFoundationPtr(ptr);
     return ptr;
+}
+
+template<typename T> inline auto RetainPtr<T>::getAutoreleased() -> PtrType
+{
+    RetainPtr copy { *this };
+    return copy.autorelease();
 }
 
 #ifdef __OBJC__

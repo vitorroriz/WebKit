@@ -3850,7 +3850,7 @@ void WebViewImpl::accessibilityRegisterUIProcessTokens()
 id WebViewImpl::accessibilityFocusedUIElement()
 {
     enableAccessibilityIfNecessary();
-    return remoteAccessibilityChildIfNotSuspended().unsafeGet();
+    return remoteAccessibilityChildIfNotSuspended().autorelease();
 }
 
 id WebViewImpl::accessibilityHitTest(CGPoint)
@@ -6635,7 +6635,7 @@ void WebViewImpl::togglePictureInPicture()
 PlatformPlaybackSessionInterface* WebViewImpl::playbackSessionInterface() const
 {
     if (RefPtr manager = m_page->playbackSessionManager())
-        return manager->controlsManagerInterface().unsafeGet();
+        return manager->controlsManagerInterface();
 
     return nullptr;
 }

@@ -10612,7 +10612,7 @@ void WebPageProxy::showPopupMenuFromFrame(IPC::Connection& connection, FrameIden
     if (!frame)
         return;
 
-    convertRectToMainFrameCoordinates(rect, frame->rootFrame().frameID(), [weakThis = WeakPtr { *this }, textDirection, selectedIndex, data, items = WTFMove(items), connection = Ref { connection }] (std::optional<FloatRect> convertedRect) {
+    convertRectToMainFrameCoordinates(rect, frame->rootFrame()->frameID(), [weakThis = WeakPtr { *this }, textDirection, selectedIndex, data, items = WTFMove(items), connection = Ref { connection }] (std::optional<FloatRect> convertedRect) {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis || !convertedRect)
             return;
@@ -10670,7 +10670,7 @@ void WebPageProxy::showContextMenuFromFrame(FrameInfoData&& frameInfo, ContextMe
         return;
 
     auto menuLocation = contextMenuContextData.menuLocation();
-    convertPointToMainFrameCoordinates(menuLocation, frame->rootFrame().frameID(), [weakThis = WeakPtr { *this }, contextMenuContextData = WTFMove(contextMenuContextData), userData = WTFMove(userData), frameInfo = WTFMove(frameInfo)] (std::optional<FloatPoint> result) mutable {
+    convertPointToMainFrameCoordinates(menuLocation, frame->rootFrame()->frameID(), [weakThis = WeakPtr { *this }, contextMenuContextData = WTFMove(contextMenuContextData), userData = WTFMove(userData), frameInfo = WTFMove(frameInfo)] (std::optional<FloatPoint> result) mutable {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis)
             return;
@@ -13529,7 +13529,7 @@ void WebPageProxy::convertPointToMainFrameCoordinates(WebCore::FloatPoint point,
     if (!parent)
         return completionHandler(point);
 
-    sendWithAsyncReplyToProcessContainingFrame(parent->frameID(), Messages::WebPage::ContentsToRootViewPoint(frame->frameID(), point), [weakThis = WeakPtr { *this }, completionHandler = WTFMove(completionHandler), nextFrameID = parent->rootFrame().frameID()](FloatPoint convertedPoint) mutable {
+    sendWithAsyncReplyToProcessContainingFrame(parent->frameID(), Messages::WebPage::ContentsToRootViewPoint(frame->frameID(), point), [weakThis = WeakPtr { *this }, completionHandler = WTFMove(completionHandler), nextFrameID = parent->rootFrame()->frameID()](FloatPoint convertedPoint) mutable {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis)
             return completionHandler(std::nullopt);
@@ -13547,7 +13547,7 @@ void WebPageProxy::convertRectToMainFrameCoordinates(WebCore::FloatRect rect, st
     if (!parent)
         return completionHandler(rect);
 
-    sendWithAsyncReplyToProcessContainingFrame(parent->frameID(), Messages::WebPage::ContentsToRootViewRect(frame->frameID(), rect), [weakThis = WeakPtr { *this }, completionHandler = WTFMove(completionHandler), nextFrameID = parent->rootFrame().frameID()](FloatRect convertedRect) mutable {
+    sendWithAsyncReplyToProcessContainingFrame(parent->frameID(), Messages::WebPage::ContentsToRootViewRect(frame->frameID(), rect), [weakThis = WeakPtr { *this }, completionHandler = WTFMove(completionHandler), nextFrameID = parent->rootFrame()->frameID()](FloatRect convertedRect) mutable {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis)
             return completionHandler(std::nullopt);

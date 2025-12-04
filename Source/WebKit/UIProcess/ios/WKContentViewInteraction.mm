@@ -12817,12 +12817,12 @@ static RetainPtr<NSItemProvider> createItemProvider(const WebKit::WebPageProxy& 
 
 - (CGImageRef)copySubjectResultForImageContextMenu
 {
-    return valueOrDefault(_imageAnalysisContextMenuActionData).copySubjectResult.unsafeGet();
+    return valueOrDefault(_imageAnalysisContextMenuActionData).copySubjectResult.getAutoreleased();
 }
 
 - (UIMenu *)machineReadableCodeSubMenuForImageContextMenu
 {
-    return valueOrDefault(_imageAnalysisContextMenuActionData).machineReadableCodeMenu.unsafeGet();
+    return valueOrDefault(_imageAnalysisContextMenuActionData).machineReadableCodeMenu.getAutoreleased();
 }
 
 #if USE(QUICK_LOOK)
@@ -14258,7 +14258,7 @@ static inline WKTextAnimationType toWKTextAnimationType(WebCore::TextAnimationTy
             if (enclosingView != selectedView && ![enclosingView _wk_isAncestorOf:selectedView])
                 return self;
         }
-        return enclosingView.unsafeGet();
+        return enclosingView.autorelease();
     }();
 
     ASSERT(_cachedSelectionContainerView);

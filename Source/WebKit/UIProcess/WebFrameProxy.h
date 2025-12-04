@@ -209,7 +209,7 @@ public:
     FrameTreeCreationParameters frameTreeCreationParameters() const;
 
     WebFrameProxy* parentFrame() const { return m_parentFrame.get(); }
-    WebFrameProxy& rootFrame();
+    Ref<WebFrameProxy> rootFrame();
     RefPtr<WebFrameProxy> childFrame(size_t index) const;
 
     WebProcessProxy& process() const;

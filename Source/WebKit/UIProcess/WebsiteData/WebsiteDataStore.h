@@ -125,7 +125,8 @@ using RemoveDataTaskCounter = RefCounter<RemoveDataTaskCounterType>;
 
 class WebsiteDataStore : public API::ObjectImpl<API::Object::Type::WebsiteDataStore>, public CanMakeWeakPtr<WebsiteDataStore> {
 public:
-    static Ref<WebsiteDataStore> defaultDataStore();
+    static WebsiteDataStore& defaultDataStore();
+    static Ref<WebsiteDataStore> protectedDefaultDataStore();
     static bool defaultDataStoreExists();
     static void deleteDefaultDataStoreForTesting();
     static RefPtr<WebsiteDataStore> existingDataStoreForIdentifier(const WTF::UUID&);
