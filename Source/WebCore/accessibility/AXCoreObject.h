@@ -786,6 +786,7 @@ public:
     bool crossFrameIsDescendantOfObject(const AXCoreObject&) const;
     // TODO: this name is not consistent with the others
     AXCoreObject* parentObjectIncludingCrossFrame() const;
+    AXCoreObject* parentObjectUnignoredIncludingCrossFrame() const;
 
     virtual AccessibilityChildrenVector findMatchingObjects(AccessibilitySearchCriteria&&) = 0;
     virtual bool isDescendantOfRole(AccessibilityRole) const = 0;

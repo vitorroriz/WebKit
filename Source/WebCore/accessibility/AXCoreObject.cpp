@@ -436,16 +436,12 @@ AXCoreObject::AccessibilityChildrenVector AXCoreObject::crossFrameUnignoredChild
 
 AXCoreObject* AXCoreObject::crossFrameParentObjectUnignored() const
 {
-    RefPtr result = parentObjectUnignored();
-
+    if (SUPPRESS_UNCOUNTED_LOCAL auto* result = parentObjectUnignored())
+        return result;
 #if ENABLE_ACCESSIBILITY_LOCAL_FRAME
-    if (!result) {
-        if (auto* crossFrameParent = crossFrameParentObject())
-            result = crossFrameParent;
-    }
+    return crossFrameParentObject();
 #endif
-
-    return result.unsafeGet();
+    return nullptr;
 }
 
 AXCoreObject::AccessibilityChildrenVector AXCoreObject::crossFrameChildrenIncludingIgnored(bool updateChildrenIfNeeded)
@@ -477,18 +473,14 @@ bool AXCoreObject::crossFrameIsDescendantOfObject(const AXCoreObject& axObject) 
 
 AXCoreObject* AXCoreObject::parentObjectIncludingCrossFrame() const
 {
-    RefPtr result = parentObject();
-
+    if (SUPPRESS_UNCOUNTED_LOCAL auto* parent = parentObject())
+        return parent;
 #if ENABLE_ACCESSIBILITY_LOCAL_FRAME
-    if (!result) {
-        if (auto* crossFrameParent = crossFrameParentObject())
-            result = crossFrameParent;
-    }
+    return crossFrameParentObject();
+#else
+    return nullptr;
 #endif
-
-    return result.unsafeGet();
 }
-
 
 #ifndef NDEBUG
 void AXCoreObject::verifyChildrenIndexInParent(const AccessibilityChildrenVector& children) const
@@ -530,7 +522,11 @@ AXCoreObject* AXCoreObject::nextInPreOrder(bool updateChildrenIfNeeded , AXCoreO
     RefPtr current = this;
     RefPtr next = nextSiblingIncludingIgnored(updateChildrenIfNeeded, includeCrossFrame);
     for (; !next; next = current->nextSiblingIncludingIgnored(updateChildrenIfNeeded, includeCrossFrame)) {
+#if ENABLE(INCLUDE_IGNORED_IN_CORE_AX_TREE)
         current = includeCrossFrame ? current->parentObjectIncludingCrossFrame() : current->parentObject();
+#else
+        current = includeCrossFrame ? current->crossFrameParentObjectUnignored() : current->parentObjectUnignored();
+#endif
 
         if (!current || stayWithin == current)
             return nullptr;
@@ -589,7 +585,11 @@ AXCoreObject* AXCoreObject::nextSiblingIncludingIgnored(bool updateChildrenIfNee
 
 AXCoreObject* AXCoreObject::nextSiblingIncludingIgnored(bool updateChildrenIfNeeded, bool includeCrossFrame) const
 {
+#if ENABLE(INCLUDE_IGNORED_IN_CORE_AX_TREE)
     RefPtr parent = parentObject();
+#else
+    RefPtr parent = parentObjectUnignored();
+#endif
     if (!parent)
         return nullptr;
 
