@@ -472,9 +472,6 @@ void WebFrame::createProvisionalFrame(ProvisionalFrameCreationParameters&& param
         setLayerHostingContextIdentifier(*parameters.layerHostingContextIdentifier);
     if (parameters.initialSize)
         updateLocalFrameSize(localFrame, *parameters.initialSize);
-
-    if (parameters.commitTiming == CommitTiming::Immediately)
-        commitProvisionalFrame();
 }
 
 void WebFrame::destroyProvisionalFrame()
