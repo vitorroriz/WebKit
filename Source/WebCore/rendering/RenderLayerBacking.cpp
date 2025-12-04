@@ -3990,12 +3990,13 @@ static RefPtr<Pattern> patternForEventListenerRegionType(EventListenerRegionType
         case EventListenerRegionType::TouchStart:
         case EventListenerRegionType::TouchMove:
         case EventListenerRegionType::TouchEnd:
+        case EventListenerRegionType::TouchForceChange:
         case EventListenerRegionType::TouchCancel:
             return { "touch"_s, { }, Color::gray.colorWithAlphaByte(128) };
         case EventListenerRegionType::NonPassiveTouchStart:
         case EventListenerRegionType::NonPassiveTouchEnd:
-        case EventListenerRegionType::NonPassiveTouchCancel:
         case EventListenerRegionType::NonPassiveTouchMove:
+        case EventListenerRegionType::NonPassiveTouchForceChange:
             return { "sync touch"_s, { 0, 9 }, SRGBA<uint8_t> { 200, 200, 0, 128 } };
         case EventListenerRegionType::PointerDown:
         case EventListenerRegionType::PointerEnter:
@@ -4126,7 +4127,7 @@ void RenderLayerBacking::paintDebugOverlays(const GraphicsLayer* graphicsLayer, 
                 regionType = EventListenerRegionType::NonPassiveTouchMove;
                 break;
             case EventTrackingRegionsEventType::Touchforcechange:
-                regionType = EventListenerRegionType::NonPassiveTouchCancel;
+                regionType = EventListenerRegionType::NonPassiveTouchForceChange;
                 break;
             default:
                 continue;
