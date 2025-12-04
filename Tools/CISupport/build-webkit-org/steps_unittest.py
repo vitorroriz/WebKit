@@ -2479,3 +2479,46 @@ class TestRunTest262Tests(BuildStepMixinAdditions, unittest.TestCase):
         )
         self.expect_outcome(result=SUCCESS, state_string='test262-test')
         return self.run_step()
+
+
+class TestRunBenchmarkTests(BuildStepMixinAdditions, unittest.TestCase):
+    def setUp(self):
+        self.longMessage = True
+        return self.setup_test_build_step()
+
+    def tearDown(self):
+        return self.tear_down_test_build_step()
+
+    def test_success(self):
+        self.setup_step(RunBenchmarkTests())
+        self.setProperty('platform', 'wpe')
+        self.setProperty('configuration', 'release')
+        self.setProperty('archive_revision', '12345@main')
+        self.expectRemoteCommands(
+            ExpectShell(workdir='wkdir',
+                        timeout=2000,
+                        log_environ=True,
+                        command=['python3', 'Tools/Scripts/browserperfdash-benchmark', '--plans-from-config', '--config-file', '../../browserperfdash-benchmark-config.txt',
+                                 '--browser-version', '12345@main', '--timestamp-from-repo', '.', '--build-log-url', 'http://localhost:8080/#/builders/1/builds/13'],
+                        )
+            .exit(0),
+        )
+        self.expect_outcome(result=SUCCESS, state_string='benchmark tests')
+        return self.run_step()
+
+    def test_failure(self):
+        self.setup_step(RunBenchmarkTests())
+        self.setProperty('platform', 'wpe')
+        self.setProperty('configuration', 'release')
+        self.setProperty('archive_revision', '12345@main')
+        self.expectRemoteCommands(
+            ExpectShell(workdir='wkdir',
+                        timeout=2000,
+                        log_environ=True,
+                        command=['python3', 'Tools/Scripts/browserperfdash-benchmark', '--plans-from-config', '--config-file', '../../browserperfdash-benchmark-config.txt',
+                                 '--browser-version', '12345@main', '--timestamp-from-repo', '.', '--build-log-url', 'http://localhost:8080/#/builders/1/builds/13'],
+                        )
+            .exit(7),
+        )
+        self.expect_outcome(result=FAILURE, state_string='Benchmark Tests: 7 unexpected failures')
+        return self.run_step()

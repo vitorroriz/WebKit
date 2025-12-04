@@ -1557,19 +1557,26 @@ class RunBenchmarkTests(shell.Test):
                "--browser-version", WithProperties("%(archive_revision)s"),
                "--timestamp-from-repo", "."]
 
+    def __init__(self, *args, **kwargs):
+        kwargs['timeout'] = 2000
+        super().__init__(*args, **kwargs)
+
     def run(self):
-        platform = self.getProperty("platform")
-        if platform == "gtk":
-            self.command += ["--browser", "minibrowser-gtk"]
+        self.command += ['--build-log-url', f'{self.master.config.buildbotURL}#/builders/{self.build._builderid}/builds/{self.build.number}']
         return super().run()
 
-    def getText(self, cmd, results):
-        return self.getText2(cmd, results)
+    def evaluateCommand(self, cmd):
+        self.totalUnexpectedFailures = cmd.rc
+        if self.totalUnexpectedFailures != 0:
+            self.commandFailed = True
+            return FAILURE
+        return SUCCESS
 
-    def getText2(self, cmd, results):
-        if results != SUCCESS:
-            return ["%d benchmark tests failed" % cmd.rc]
-        return [self.name]
+    def getResultSummary(self):
+        if self.results != SUCCESS and self.totalUnexpectedFailures > 0:
+            s = "s" if self.totalUnexpectedFailures > 1 else ""
+            return {'step': f"Benchmark Tests: {self.totalUnexpectedFailures} unexpected failure{s}"}
+        return super().getResultSummary()
 
 
 class ArchiveTestResults(shell.ShellCommand):
