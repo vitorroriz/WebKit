@@ -167,7 +167,10 @@ static BOOL swizzledIsEmbeddedScreen(id, SEL, UIScreen *)
 
 @end
 
-void testPerformTextSearchWithQueryStringInWebView(WKWebView *webView, NSString *query, UITextSearchOptions * searchOptions, NSUInteger expectedMatches)
+@interface WKWebView () <UITextSearching>
+@end
+
+void testPerformTextSearchWithQueryStringInWebView(WKWebView *webView, NSString *query, UITextSearchOptions *searchOptions, NSUInteger expectedMatches)
 {
     __block bool finishedSearching = false;
     RetainPtr aggregator = adoptNS([[TestSearchAggregator alloc] initWithCompletionHandler:^{
@@ -188,7 +191,7 @@ RetainPtr<NSOrderedSet<UITextRange *>> textRangesForQueryString(WKWebView *webVi
         finishedSearching = true;
     }]);
 
-    auto options = adoptNS([[UITextSearchOptions alloc] init]);
+    RetainPtr options = adoptNS([[UITextSearchOptions alloc] init]);
     [webView performTextSearchWithQueryString:query usingOptions:options.get() resultAggregator:aggregator.get()];
 
     TestWebKitAPI::Util::run(&finishedSearching);
