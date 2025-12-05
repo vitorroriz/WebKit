@@ -222,6 +222,7 @@ static BOOL areEssentiallyEqual(double a, double b)
 - (void)windowWillClose:(NSNotification *)notification
 {
     [[[NSApplication sharedApplication] browserAppDelegate] browserWindowWillClose:self.window];
+    [_webView close];
 }
 
 - (double)currentZoomFactor
