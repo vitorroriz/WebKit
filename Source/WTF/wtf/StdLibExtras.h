@@ -1073,10 +1073,10 @@ template<typename T, std::size_t TExtent, typename U, std::size_t UExtent>
     requires(TriviallyComparableOneByteCodeUnits<T, U>)
 size_t find(std::span<T, TExtent> haystack, std::span<U, UExtent> needle)
 {
-#if !HAVE(MEMMEM)
     if (needle.empty())
         return 0;
 
+#if !HAVE(MEMMEM)
     if (haystack.size() < needle.size())
         return notFound;
 
