@@ -25,8 +25,6 @@
 
 #import "config.h"
 
-#if ENABLE(TEXT_EXTRACTION)
-
 #import "PlatformUtilities.h"
 #import "Test.h"
 #import "TestWKWebView.h"
@@ -398,5 +396,3 @@ TEST(TextExtractionTests, FilterRedundantTextInLinks)
 }
 
 } // namespace TestWebKitAPI
-
-#endif // ENABLE(TEXT_EXTRACTION)

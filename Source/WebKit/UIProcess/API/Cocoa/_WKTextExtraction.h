@@ -26,11 +26,11 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <Foundation/Foundation.h>
 #import <WebKit/WKFoundation.h>
-#import <WebKit/_WKJSHandle.h>
 
 NS_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @class WKWebView;
+@class _WKJSHandle;
 
 typedef NS_OPTIONS(NSUInteger, _WKTextExtractionFilterOptions) {
     _WKTextExtractionFilterNone = 0,
@@ -51,9 +51,6 @@ typedef NS_ENUM(NSInteger, _WKTextExtractionOutputFormat) {
     _WKTextExtractionOutputFormatHTML,
     _WKTextExtractionOutputFormatMarkdown,
 } WK_API_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA));
-
-// This is equivalent to USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCH) && !PLATFORM(APPLETV)
-#if (defined __has_include && __has_include(<CoreFoundation/CFPriv.h>)) || (!TARGET_OS_WATCH && !TARGET_OS_TV)
 
 WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
 @interface _WKTextExtractionConfiguration : NSObject
@@ -200,7 +197,5 @@ NS_REQUIRES_PROPERTY_DEFINITIONS
 @property (nonatomic, readonly, nullable) NSError *error;
 
 @end
-
-#endif // (defined __has_include && __has_include(<CoreFoundation/CFPriv.h>)) || (!TARGET_OS_WATCH && !TARGET_OS_TV)
 
 NS_HEADER_AUDIT_END(nullability, sendability)

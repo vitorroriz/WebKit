@@ -6672,16 +6672,6 @@ static Vector<Ref<API::TargetedElementInfo>> elementsFromWKElements(NSArray<_WKT
 #endif
 }
 
-- (void)_debugTextWithConfiguration:(_WKTextExtractionConfiguration *)configuration completionHandler:(void(^)(NSString *))completionHandler
-{
-#if ENABLE(TEXT_EXTRACTION)
-    [self _extractDebugTextWithConfiguration:configuration completionHandler:makeBlockPtr([completionHandler = makeBlockPtr(completionHandler)](_WKTextExtractionResult *result) {
-        completionHandler(result.textContent);
-    }).get()];
-#endif
-}
-
-#if ENABLE(TEXT_EXTRACTION)
 static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfiguration *configuration)
 {
     HashMap<String, String> result;
@@ -6693,6 +6683,13 @@ static HashMap<String, String> extractReplacementStrings(_WKTextExtractionConfig
         result.set(String { replacement }, String { [replacementStrings objectForKey:replacement] });
     }
     return result;
+}
+
+- (void)_debugTextWithConfiguration:(_WKTextExtractionConfiguration *)configuration completionHandler:(void(^)(NSString *))completionHandler
+{
+    [self _extractDebugTextWithConfiguration:configuration completionHandler:makeBlockPtr([completionHandler = makeBlockPtr(completionHandler)](_WKTextExtractionResult *result) {
+        completionHandler(result.textContent);
+    }).get()];
 }
 
 static WebKit::TextExtractionOutputFormat textExtractionOutputFormat(_WKTextExtractionConfiguration *configuration)
@@ -6709,11 +6706,9 @@ static WebKit::TextExtractionOutputFormat textExtractionOutputFormat(_WKTextExtr
         return WebKit::TextExtractionOutputFormat::TextTree;
     }
 }
-#endif // ENABLE(TEXT_EXTRACTION)
 
 - (void)_extractDebugTextWithConfiguration:(_WKTextExtractionConfiguration *)configuration completionHandler:(void(^)(_WKTextExtractionResult *))completionHandler
 {
-#if ENABLE(TEXT_EXTRACTION)
     bool allowFiltering = _page->protectedPreferences()->textExtractionFilterEnabled();
     bool filterUsingClassifier = allowFiltering && configuration.filterOptions & _WKTextExtractionFilterClassifier;
     bool filterHiddenText = allowFiltering && configuration.filterOptions & _WKTextExtractionFilterTextRecognition;
@@ -6877,7 +6872,6 @@ static WebKit::TextExtractionOutputFormat textExtractionOutputFormat(_WKTextExtr
             completionHandler(adoptNS([[_WKTextExtractionResult alloc] initWithTextContent:text.createNSString().get() filteredOutAnyText:filteredOutAnyText]).get());
         });
     }];
-#endif // ENABLE(TEXT_EXTRACTION)
 }
 
 static inline std::optional<WebCore::NodeIdentifier> toNodeIdentifier(const String& nodeIdentifier)
@@ -6888,7 +6882,6 @@ static inline std::optional<WebCore::NodeIdentifier> toNodeIdentifier(const Stri
     return WebCore::NodeIdentifier { *rawValue };
 }
 
-#if ENABLE(TEXT_EXTRACTION)
 - (WebCore::TextExtraction::Interaction)_convertToWebCoreInteraction:(_WKTextExtractionInteraction *)wkInteraction
 {
     WebCore::TextExtraction::Interaction interaction;
@@ -6928,11 +6921,10 @@ static inline std::optional<WebCore::NodeIdentifier> toNodeIdentifier(const Stri
     interaction.scrollDelta = WebCore::FloatSize { wkInteraction.scrollDelta };
     return interaction;
 }
-#endif // ENABLE(TEXT_EXTRACTION)
 
 - (void)_performInteraction:(_WKTextExtractionInteraction *)wkInteraction completionHandler:(void(^)(_WKTextExtractionInteractionResult *))completionHandler
 {
-#if ENABLE(TEXT_EXTRACTION)
+#if USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
     if (!self._isValid)
         return completionHandler(adoptNS([[_WKTextExtractionInteractionResult alloc] initWithErrorDescription:@"Web view is invalid"]).get());
 
@@ -6977,7 +6969,7 @@ static inline std::optional<WebCore::NodeIdentifier> toNodeIdentifier(const Stri
             completionHandler(result.get());
         });
     });
-#endif // ENABLE(TEXT_EXTRACTION)
+#endif // USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
 }
 
 @end
@@ -7007,7 +6999,7 @@ static inline std::optional<WebCore::NodeIdentifier> toNodeIdentifier(const Stri
 
 @implementation WKWebView (WKTextExtraction)
 
-#if ENABLE(TEXT_EXTRACTION)
+#if USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
 
 static std::optional<WebCore::JSHandleIdentifier> mainFrameJSHandleIdentifier(_WKJSHandle *nodeHandle)
 {
@@ -7040,11 +7032,11 @@ static HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> extractClie
     return result;
 }
 
-#endif // ENABLE(TEXT_EXTRACTION)
+#endif // USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
 
 - (void)_requestTextExtractionInternal:(_WKTextExtractionConfiguration *)configuration completion:(CompletionHandler<void(std::optional<WebCore::TextExtraction::Item>&&)>&&)completion
 {
-#if ENABLE(TEXT_EXTRACTION)
+#if USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
     Ref preferences = _page->preferences();
     if (!self._isValid || !preferences->textExtractionEnabled())
         return completion({ });
@@ -7087,12 +7079,12 @@ static HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> extractClie
     };
 
     _page->requestTextExtraction(WTFMove(request), WTFMove(completion));
-#endif // ENABLE(TEXT_EXTRACTION)
+#endif // USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
 }
 
 - (void)_requestTextExtraction:(_WKTextExtractionConfiguration *)configuration completionHandler:(void(^)(WKTextExtractionItem *))completionHandler
 {
-#if ENABLE(TEXT_EXTRACTION)
+#if USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
     [self _requestTextExtractionInternal:configuration completion:[completionHandler = makeBlockPtr(completionHandler), weakSelf = WeakObjCPtr<WKWebView>(self)](auto&& item) {
         RetainPtr strongSelf = weakSelf.get();
         if (!strongSelf)
@@ -7110,12 +7102,12 @@ static HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> extractClie
         });
         completionHandler(rootItem.get());
     }];
-#endif // ENABLE(TEXT_EXTRACTION)
+#endif // USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
 }
 
 - (void)_describeInteraction:(_WKTextExtractionInteraction *)wkInteraction completionHandler:(void (^)(NSString *, NSError *))completionHandler
 {
-#if ENABLE(TEXT_EXTRACTION)
+#if USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
     if (!self._isValid)
         return completionHandler(nil, [NSError errorWithDomain:WKErrorDomain code:WKErrorWebViewInvalidated userInfo:nil]);
 
@@ -7156,14 +7148,13 @@ static HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> extractClie
         }
 #endif // ENABLE(TEXT_EXTRACTION_FILTER)
     });
-#endif // ENABLE(TEXT_EXTRACTION)
+#endif // USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
 }
 
 #if ENABLE(TEXT_EXTRACTION_FILTER)
 
 - (void)_validateText:(const String&)text inNode:(std::optional<WebCore::NodeIdentifier>&&)nodeIdentifier completionHandler:(CompletionHandler<void(const String&)>&&)completionHandler
 {
-#if ENABLE(TEXT_EXTRACTION)
     if (text.isEmpty())
         return completionHandler(text);
 
@@ -7212,7 +7203,6 @@ static HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> extractClie
             }
         });
     });
-#endif // ENABLE(TEXT_EXTRACTION)
 }
 
 - (void)_clearTextExtractionFilterCache

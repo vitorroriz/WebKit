@@ -8679,6 +8679,7 @@
 		F454C12B2BA3AC8C00871551 /* _WKTargetedElementInfoInternal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _WKTargetedElementInfoInternal.h; sourceTree = "<group>"; };
 		F454C12D2BA3AFFD00871551 /* APITargetedElementInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APITargetedElementInfo.h; sourceTree = "<group>"; };
 		F454C12E2BA3AFFD00871551 /* APITargetedElementInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = APITargetedElementInfo.cpp; sourceTree = "<group>"; };
+		F457FD572E40FF92003F3B28 /* _WKTextExtraction.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = _WKTextExtraction.mm; sourceTree = "<group>"; };
 		F458B8E72E8F46E100948328 /* CoreIPCPKDateComponentsRange.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoreIPCPKDateComponentsRange.h; sourceTree = "<group>"; };
 		F458B8E82E8F46E100948328 /* CoreIPCPKDateComponentsRange.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CoreIPCPKDateComponentsRange.mm; sourceTree = "<group>"; };
 		F458B8E92E8F46E100948328 /* CoreIPCPKDateComponentsRange.serialization.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = CoreIPCPKDateComponentsRange.serialization.in; sourceTree = "<group>"; };
@@ -12618,6 +12619,7 @@
 				F443CDF22BA5307600688F60 /* _WKTargetedElementRequest.mm */,
 				F4500D8B2BE02FC90081A5F1 /* _WKTargetedElementRequestInternal.h */,
 				F4FE87B42E2F25030065A3F5 /* _WKTextExtraction.h */,
+				F457FD572E40FF92003F3B28 /* _WKTextExtraction.mm */,
 				F4FE87B52E2F25030065A3F5 /* _WKTextExtraction.swift */,
 				F4FE87B62E2F25030065A3F5 /* _WKTextExtractionInternal.h */,
 				2DE9B1382231F61C005287B7 /* _WKTextInputContext.h */,
