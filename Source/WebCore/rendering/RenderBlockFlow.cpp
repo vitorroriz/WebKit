@@ -3113,13 +3113,17 @@ void RenderBlockFlow::markAllDescendantsWithFloatsForLayout(RenderBox* floatToRe
         return;
 
     // Iterate over our block children and mark them as needed.
-    for (auto& block : childrenOfType<RenderBlock>(*this)) {
-        if (!floatToRemove && block.isFloatingOrOutOfFlowPositioned())
+    for (auto walker = InlineWalker(*this); !walker.atEnd(); walker.advance()) {
+        auto* block = dynamicDowncast<RenderBlock>(walker.current());
+        if (!block)
             continue;
-        CheckedPtr blockFlow = dynamicDowncast<RenderBlockFlow>(block);
+
+        if (!floatToRemove && block->isFloatingOrOutOfFlowPositioned())
+            continue;
+        CheckedPtr blockFlow = dynamicDowncast<RenderBlockFlow>(*block);
         if (!blockFlow) {
-            if (block.shrinkToAvoidFloats() && block.everHadLayout())
-                block.setChildNeedsLayout(markParents);
+            if (block->shrinkToAvoidFloats() && block->everHadLayout())
+                block->setChildNeedsLayout(markParents);
             continue;
         }
         if ((floatToRemove ? blockFlow->subtreeContainsFloat(*floatToRemove) : blockFlow->subtreeContainsFloats()) || blockFlow->shrinkToAvoidFloats())
