@@ -50,6 +50,8 @@ class SctpTransportInternal {
   // and create a new association? Not clear if this is something we need to
   // support though. See: https://github.com/w3c/webrtc-pc/issues/979
   [[deprecated("Call with SctpOptions")]]
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-designated-field-initializers"
   virtual bool Start(int local_sctp_port,
                      int remote_sctp_port,
                      int max_message_size) {
@@ -59,6 +61,7 @@ class SctpTransportInternal {
         .max_message_size = max_message_size,
     });
   }
+#pragma clang diagnostic pop
 
   // NOTE: Initially there was a "Stop" method here, but it was never used, so
   // it was removed.

@@ -130,6 +130,8 @@ class PeerConnectionSdpMethods {
   // `sctp_mid()` if set. Called as part of setting the local description.
   virtual RTCError StartSctpTransport(const SctpOptions& options) = 0;
   [[deprecated("Call with SctpOptions")]]
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-designated-field-initializers"
   virtual void StartSctpTransport(int local_port,
                                   int remote_port,
                                   int max_message_size) {
@@ -137,6 +139,7 @@ class PeerConnectionSdpMethods {
                         .remote_port = remote_port,
                         .max_message_size = max_message_size});
   }
+#pragma clang diagnostic pop
 
   // Asynchronously adds a remote candidate on the network thread.
   virtual void AddRemoteCandidate(absl::string_view mid,
