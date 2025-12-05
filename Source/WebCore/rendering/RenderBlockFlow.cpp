@@ -941,7 +941,7 @@ RenderBlockFlow::BlockPositionAndMargin RenderBlockFlow::layoutBlockChildFromInl
     auto previousFloatLogicalBottom = LayoutUnit { };
     auto maxFloatLogicalBottom = LayoutUnit { };
     layoutBlockChild(child, marginInfo, previousFloatLogicalBottom, maxFloatLogicalBottom);
-    return { child.logicalTop(), marginInfo };
+    return { child.logicalTop(), logicalHeight(), marginInfo };
 }
 
 void RenderBlockFlow::trimBlockEndChildrenMargins()

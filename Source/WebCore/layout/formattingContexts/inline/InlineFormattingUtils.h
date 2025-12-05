@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include "BlockLayoutState.h"
 #include "InlineLine.h"
 #include "InlineLineBuilder.h"
 #include <WebCore/InlineLineTypes.h>
@@ -40,7 +41,7 @@ class InlineFormattingUtils {
 public:
     InlineFormattingUtils(const InlineFormattingContext&);
 
-    InlineLayoutUnit logicalTopForNextLine(const LineLayoutResult&, const InlineRect& lineLogicalRect, const FloatingContext&) const;
+    InlineLayoutUnit logicalTopForNextLine(const LineLayoutResult&, const InlineRect& lineLogicalRect, const FloatingContext&, const BlockLayoutState::MarginState&) const;
 
     ContentHeightAndMargin inlineBlockContentHeightAndMargin(const Box&, const HorizontalConstraints&, const OverriddenVerticalValues&) const;
     ContentWidthAndMargin inlineBlockContentWidthAndMargin(const Box&, const HorizontalConstraints&, const OverriddenHorizontalValues&) const;

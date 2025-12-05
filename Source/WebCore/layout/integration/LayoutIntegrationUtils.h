@@ -52,7 +52,7 @@ public:
     LayoutUnit preferredMaxWidth(const ElementBox&) const;
     void layoutWithFormattingContextForBlockInInline(const ElementBox& block, LayoutPoint blockLineLogicalTopLeft, const InlineLayoutState&) const;
 
-    static BlockLayoutState::MarginState toMarginState(const RenderBlockFlow::MarginInfo&);
+    static BlockLayoutState::MarginState toMarginState(const RenderBlockFlow::MarginInfo&, LayoutUnit contentOffsetAfterSelfCollapsingBlock);
     static RenderBlockFlow::MarginInfo toMarginInfo(const Layout::BlockLayoutState::MarginState&);
     static std::pair<LayoutRect, LayoutRect> toMarginAndBorderBoxVisualRect(const BoxGeometry& logicalGeometry, const LayoutSize& containerSize, WritingMode);
 

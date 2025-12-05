@@ -182,17 +182,12 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
     layoutBlockRenderer();
     ASSERT(!blockRenderer.needsLayout());
 
-    if (blockRenderer.isSelfCollapsingBlock()) {
-        // FIXME: This gets replaced by "handling the after side of the block with margin".
-        positionAndMargin.marginInfo.setMargin({ }, { });
-    }
-
     auto updateIFCAfterLayout = [&] {
         auto updater = BoxGeometryUpdater { layoutState, rootLayoutBox(block) };
         updater.updateBoxGeometryAfterIntegrationLayout(block, rootBlockContainer.contentBoxLogicalWidth());
 
         auto& blockGeometry = layoutState.ensureGeometryForBox(block);
-        auto resolvedMarginBefore = positionAndMargin.logicalTop - blockLineLogicalTopLeft.y();
+        auto resolvedMarginBefore = positionAndMargin.childLogicalTop - blockLineLogicalTopLeft.y();
         blockGeometry.setTopLeft(LayoutPoint { blockGeometry.marginStart(), resolvedMarginBefore });
         // We don't know what the after margin here is (or if there's any at all) before processing the content after.
         // FIXME: Check if blockGeometry needs the adjusted margin after value at all.
@@ -200,7 +195,8 @@ void layoutWithFormattingContextForBlockInInline(const Layout::ElementBox& block
 
         udpdateIFCLineClamp(inlineLayoutState, renderTreeLayoutState);
         populateIFCWithNewlyPlacedFloats(blockRenderer, placedFloats, blockLineLogicalTopLeft);
-        parentBlockLayoutState.marginState() = Layout::IntegrationUtils::toMarginState(positionAndMargin.marginInfo);
+        auto contentOffsetAfterSelfCollapsingBlock = blockRenderer.isSelfCollapsingBlock() ? positionAndMargin.containerLogicalBottom - positionAndMargin.childLogicalTop : 0_lu;
+        parentBlockLayoutState.marginState() = Layout::IntegrationUtils::toMarginState(positionAndMargin.marginInfo, contentOffsetAfterSelfCollapsingBlock);
     };
     updateIFCAfterLayout();
 }

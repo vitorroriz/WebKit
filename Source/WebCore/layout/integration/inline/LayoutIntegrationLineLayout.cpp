@@ -482,7 +482,7 @@ std::optional<LayoutRect> LineLayout::layout(RenderBlockFlow::MarginInfo& margin
 
     auto parentBlockLayoutState = Layout::BlockLayoutState {
         m_blockFormattingState.placedFloats(),
-        Layout::IntegrationUtils::toMarginState(marginInfo),
+        Layout::IntegrationUtils::toMarginState(marginInfo, { }),
         lineClamp(flow()),
         textBoxTrim(flow()),
         flow().style().textBoxEdge(),

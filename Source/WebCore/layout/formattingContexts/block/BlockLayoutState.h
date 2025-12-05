@@ -71,6 +71,7 @@ public:
         {
             positiveMargin = { };
             negativeMargin = { };
+            contentOffsetAfterSelfCollapsingBlock = { };
         }
 
         LayoutUnit margin() const { return positiveMargin - negativeMargin; }
@@ -87,6 +88,9 @@ public:
         bool determinedMarginBeforeQuirk : 1 { false };
         LayoutUnit positiveMargin;
         LayoutUnit negativeMargin;
+        // This tracks the offset initiated by a self collapsing block when "next line top position" diverges from "current line's bottom".
+        // See the last paragraph at https://www.w3.org/TR/CSS22/box.html#collapsing-margins
+        LayoutUnit contentOffsetAfterSelfCollapsingBlock;
     };
 
     BlockLayoutState(PlacedFloats&, MarginState, std::optional<LineClamp> = { }, TextBoxTrim = { }, Style::TextBoxEdge = CSS::Keyword::Auto { }, std::optional<LayoutUnit> intrusiveInitialLetterLogicalBottom = { }, std::optional<LineGrid> lineGrid = { });
