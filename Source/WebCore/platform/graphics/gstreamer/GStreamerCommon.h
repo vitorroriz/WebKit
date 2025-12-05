@@ -101,6 +101,7 @@ bool doCapsHaveType(const GstCaps*, ASCIILiteral);
 bool areEncryptedCaps(const GstCaps*);
 Vector<String> extractGStreamerOptionsFromCommandLine();
 void setGStreamerOptionsFromUIProcess(Vector<String>&&);
+bool ensureGStreamerInitializedNonWebProcess();
 bool ensureGStreamerInitialized();
 void registerWebKitGStreamerElements();
 void registerWebKitGStreamerVideoEncoder();
