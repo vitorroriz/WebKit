@@ -606,6 +606,14 @@ void WebPageProxy::takeMutedCaptureAssertion()
     });
 }
 
+void WebPageProxy::takeNetworkActivity()
+{
+    m_mainFrameProcessActivityState->takeNetworkActivity();
+    protectedBrowsingContextGroup()->forEachRemotePage(*this, [](auto& remotePageProxy) {
+        remotePageProxy.processActivityState().takeNetworkActivity();
+    });
+}
+
 #if ENABLE(WEB_PROCESS_SUSPENSION_DELAY)
 void WebPageProxy::takeAccessibilityActivityWhenInWindow()
 {
@@ -669,6 +677,14 @@ void WebPageProxy::dropMutedCaptureAssertion()
     });
 }
 
+void WebPageProxy::dropNetworkActivity()
+{
+    m_mainFrameProcessActivityState->dropNetworkActivity();
+    protectedBrowsingContextGroup()->forEachRemotePage(*this, [](auto& remotePageProxy) {
+        remotePageProxy.processActivityState().dropNetworkActivity();
+    });
+}
+
 bool WebPageProxy::hasValidVisibleActivity() const
 {
     bool hasValidVisibleActivity = m_mainFrameProcessActivityState->hasValidVisibleActivity();
@@ -703,6 +719,15 @@ bool WebPageProxy::hasValidMutedCaptureAssertion() const
         hasValidMutedCaptureAssertion &= remotePageProxy.processActivityState().hasValidMutedCaptureAssertion();
     });
     return hasValidMutedCaptureAssertion;
+}
+
+bool WebPageProxy::hasValidNetworkActivity() const
+{
+    bool hasValidNetworkActivity = m_mainFrameProcessActivityState->hasValidNetworkActivity();
+    protectedBrowsingContextGroup()->forEachRemotePage(*this, [&](auto& remotePageProxy) {
+        hasValidNetworkActivity &= remotePageProxy.processActivityState().hasValidNetworkActivity();
+    });
+    return hasValidNetworkActivity;
 }
 
 #if PLATFORM(IOS_FAMILY)

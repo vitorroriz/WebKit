@@ -104,6 +104,9 @@ void RemotePageProxy::injectPageIntoNewProcess()
         m_process->setRunningBoardThrottlingEnabled();
 #endif
 
+    if (page->hasValidNetworkActivity())
+        m_processActivityState->takeNetworkActivity();
+
     Ref drawingArea = *page->drawingArea();
     m_drawingArea = RemotePageDrawingAreaProxy::create(drawingArea.get(), m_process);
 #if ENABLE(FULLSCREEN_API)
