@@ -992,10 +992,10 @@ class TestRunWebKitTests(BuildStepMixinAdditions, unittest.TestCase):
         self.expectRemoteCommands(
             ExpectShell(
                 workdir='wkdir',
-                timeout=36000,
+                timeout=10800,
                 log_environ=False,
                 command=['/bin/bash', '--posix', '-o', 'pipefail', '-c',
-                         f'python3 Tools/Scripts/run-webkit-tests --no-build --no-show-results --no-new-test-results --clobber-old-results --builder-name iOS-14-Simulator-WK2-Tests-EWS --build-number 101 --buildbot-worker ews100 --buildbot-master {CURRENT_HOSTNAME} --exit-after-n-crashes-or-timeouts 50 --exit-after-n-failures 500 --debug --report {RESULTS_WEBKIT_URL} --results-directory layout-test-results --debug-rwt-logging --site-isolation 2>&1 | python3 Tools/Scripts/filter-test-logs layout'],
+                         f'python3 Tools/Scripts/run-webkit-tests --no-build --no-show-results --no-new-test-results --clobber-old-results --builder-name iOS-14-Simulator-WK2-Tests-EWS --build-number 101 --buildbot-worker ews100 --buildbot-master {CURRENT_HOSTNAME} --exit-after-n-crashes-or-timeouts 300 --exit-after-n-failures 500 --debug --report {RESULTS_WEBKIT_URL} --results-directory layout-test-results --debug-rwt-logging --site-isolation 2>&1 | python3 Tools/Scripts/filter-test-logs layout'],
                 env={'RESULTS_SERVER_API_KEY': 'test-api-key'}
             ).exit(0)
         )

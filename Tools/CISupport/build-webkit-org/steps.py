@@ -914,10 +914,12 @@ class RunWebKitTests(shell.Test, CustomFlagsMixin, ShellMixin):
 
         if additionalArguments:
             self.command += additionalArguments
-            # Double the timeout for site isolation queues.
-            # FIXME: We should remove the need for these timeouts altogether. (webkit.org/b/290867)
-            if '--site-isolation' in additionalArguments:
-                self.timeout = 10 * 60 * 60
+
+        # Up the timeout limit for site isolation queues to 300
+        # FIXME: We should remove the need for these timeouts altogether. (webkit.org/b/303404)
+        if additionalArguments and '--site-isolation' in additionalArguments:
+            idx = self.command.index('--exit-after-n-crashes-or-timeouts')
+            self.command[idx + 1] = '300'
 
         filter_command = ' '.join(self.command) + ' 2>&1 | python3 Tools/Scripts/filter-test-logs layout'
         self.command = self.shell_command(filter_command)
