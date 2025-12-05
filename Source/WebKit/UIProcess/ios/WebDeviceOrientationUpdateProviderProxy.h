@@ -29,6 +29,7 @@
 
 #include "MessageReceiver.h"
 #include <WebCore/MotionManagerClient.h>
+#include <WebCore/PageIdentifier.h>
 #include <wtf/CheckedRef.h>
 #include <wtf/TZoneMalloc.h>
 
@@ -38,6 +39,7 @@ class SecurityOriginData;
 namespace WebKit {
 
 class WebPageProxy;
+class WebProcessProxy;
 struct SharedPreferencesForWebProcess;
 
 class WebDeviceOrientationUpdateProviderProxy final : public WebCore::MotionManagerClient, private IPC::MessageReceiver, public RefCounted<WebDeviceOrientationUpdateProviderProxy>, public CanMakeCheckedPtr<WebDeviceOrientationUpdateProviderProxy> {
@@ -64,6 +66,9 @@ public:
     void incrementCheckedPtrCount() const final { CanMakeCheckedPtr::incrementCheckedPtrCount(); }
     void decrementCheckedPtrCount() const final { CanMakeCheckedPtr::decrementCheckedPtrCount(); }
     void setDidBeginCheckedPtrDeletion() final { CanMakeCheckedPtr::setDidBeginCheckedPtrDeletion(); }
+
+    void addAsMessageReceiverForProcess(WebProcessProxy&, WebCore::PageIdentifier);
+    void removeAsMessageReceiverForProcess(WebProcessProxy&, WebCore::PageIdentifier);
 
 private:
     explicit WebDeviceOrientationUpdateProviderProxy(WebPageProxy&);

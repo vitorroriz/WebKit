@@ -7448,4 +7448,58 @@ TEST(SiteIsolation, BrowsingContextGroupSwitchForIncompatibleCrossOriginOpenerPo
     });
 }
 
+#if ENABLE(DEVICE_ORIENTATION) && PLATFORM(IOS_FAMILY)
+
+TEST(SiteIsolation, CrossSiteIFrameCanReceiveDeviceOrientationEvents)
+{
+    auto mainframeHTML = "<iframe src='https://examplesubframe.com/subframe' allow='accelerometer;gyroscope;magnetometer'></iframe>"_s;
+
+    auto subframeHTML = "<script>"
+        "    window.addEventListener('deviceorientation', function(event) {"
+        "        alert('deviceOrientationEvent received');"
+        "    });"
+        "    "
+        "    window.addEventListener('message', function(event) {"
+        "        if (event.data === 'requestPermission') {"
+        "            DeviceOrientationEvent.requestPermission().then(function(result) {"
+        "                alert('permission granted');"
+        "            }).catch(function(error) {"
+        "                alert('error getting permission');"
+        "            });"
+        "        }"
+        "    });"
+        "    "
+        "    "
+        "    alert('iframe loaded');"
+        "</script>"_s;
+
+    HTTPServer server({
+        { "/mainframe"_s, { mainframeHTML } },
+        { "/subframe"_s, { subframeHTML } }
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+
+    __block bool askedClientForPermission = false;
+
+    RetainPtr uiDelegate = adoptNS([TestUIDelegate new]);
+    [uiDelegate setRequestDeviceOrientationAndMotionPermissionForOrigin:^(WKSecurityOrigin *, WKFrameInfo *, void (^completion)(WKPermissionDecision)) {
+        askedClientForPermission = true;
+        completion(WKPermissionDecisionGrant);
+    }];
+    [webView setUIDelegate:uiDelegate.get()];
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://examplemainframe.com/mainframe"]]];
+    EXPECT_WK_STREQ([uiDelegate waitForAlert], "iframe loaded");
+
+    [webView evaluateJavaScript:@"DeviceOrientationEvent.requestPermission()" inFrame:[webView firstChildFrame] completionHandler:nil];
+    TestWebKitAPI::Util::run(&askedClientForPermission);
+    askedClientForPermission = false;
+
+    [webView _simulateDeviceOrientationChangeWithAlpha:45.0 beta:90.0 gamma:180.0];
+    EXPECT_WK_STREQ([uiDelegate waitForAlert], "deviceOrientationEvent received");
+}
+
+#endif // ENABLE(DEVICE_ORIENTATION) && PLATFORM(IOS_FAMILY)
+
 }

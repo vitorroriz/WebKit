@@ -15596,7 +15596,9 @@ void WebPageProxy::willAcquireUniversalFileReadSandboxExtension(WebProcessProxy&
 
 void WebPageProxy::simulateDeviceOrientationChange(double alpha, double beta, double gamma)
 {
-    send(Messages::WebPage::SimulateDeviceOrientationChange(alpha, beta, gamma));
+    forEachWebContentProcess([&](auto& webProcess, auto pageID) {
+        webProcess.send(Messages::WebPage::SimulateDeviceOrientationChange(alpha, beta, gamma), pageID);
+    });
 }
 
 #if ENABLE(DATA_DETECTION)
@@ -17401,6 +17403,13 @@ bool shouldShowSwiftDemoLogo()
     RELEASE_ASSERT_NOT_REACHED();
 #endif
 }
+
+#if PLATFORM(IOS_FAMILY) && ENABLE(DEVICE_ORIENTATION)
+RefPtr<WebDeviceOrientationUpdateProviderProxy> WebPageProxy::webDeviceOrientationUpdateProviderProxy()
+{
+    return m_webDeviceOrientationUpdateProviderProxy;
+}
+#endif
 
 } // namespace WebKit
 
