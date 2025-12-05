@@ -1614,6 +1614,7 @@ TEST(WKUserContentController, LastChangeWasUserEditNonAutofillWorld)
     EXPECT_WK_STREQ(@"undefined", resultValue.get());
 }
 
+#if PLATFORM(MAC)
 
 TEST(WKUserContentController, AllowAccessToClosedShadowRoots)
 {
@@ -1628,7 +1629,7 @@ TEST(WKUserContentController, AllowAccessToClosedShadowRoots)
     RetainPtr world = [WKContentWorld _worldWithConfiguration:contentWorldConfiguration.get()];
     RetainPtr configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
 
-    RetainPtr webView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:configuration.get()]);
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:configuration.get()]);
 
     RetainPtr delegate = adoptNS([[SimpleNavigationDelegate alloc] init]);
     [webView setNavigationDelegate:delegate.get()];
@@ -1643,7 +1644,7 @@ TEST(WKUserContentController, AllowAccessToClosedShadowRoots)
     __block RetainPtr resultValue = @"";
     [webView evaluateJavaScript:@"host = document.createElement('div');"
         "document.body.appendChild(host);"
-        "host.innerHTML = '<span id=target></span>';"
+        "host.innerHTML = '<span><input id=target></span>';"
         "host.attachShadow({mode: 'closed'}).innerHTML = 'PASS<slot></slot>';" completionHandler:^(id value, NSError *error) {
         resultValue = value;
         isDoneEvaluatingScript = true;
@@ -1660,18 +1661,26 @@ TEST(WKUserContentController, AllowAccessToClosedShadowRoots)
     isDoneEvaluatingScript = false;
     EXPECT_WK_STREQ(@"PASS", resultValue.get());
 
-    [webView evaluateJavaScript:@"let path = '';"
-        "target.addEventListener('custom-event', (event) => { path = Array.from(event.composedPath()).map((target) => target.localName || target.__proto__.constructor.name).join(','); });"
-        "target.dispatchEvent(new CustomEvent('custom-event'));"
-        "path" inFrame:nil inContentWorld:world.get() completionHandler:^(id value, NSError *error) {
-        resultValue = value;
+    [webView evaluateJavaScript:@"let path = [];"
+        "target.addEventListener('mousedown', (event) => path = Array.from(event.composedPath()));"
+        "target.focus();" inFrame:nil inContentWorld:world.get() completionHandler:^(id value, NSError *error) {
         isDoneEvaluatingScript = true;
     }];
-
     TestWebKitAPI::Util::run(&isDoneEvaluatingScript);
     isDoneEvaluatingScript = false;
-    EXPECT_WK_STREQ(@"span,slot,ShadowRoot,div,body,html,HTMLDocument,Window", resultValue.get());
+
+    auto inputLeft = [webView stringByEvaluatingJavaScript:@"target.getBoundingClientRect().left"].floatValue;
+    auto inputTop = [webView stringByEvaluatingJavaScript:@"target.getBoundingClientRect().top"].floatValue;
+    auto inputWidth = [webView stringByEvaluatingJavaScript:@"target.getBoundingClientRect().width"].floatValue;
+    auto inputHeight = [webView stringByEvaluatingJavaScript:@"target.getBoundingClientRect().height"].floatValue;
+
+    [webView sendClickAtPoint:NSMakePoint(inputLeft + inputWidth - inputHeight / 2, 600 - (inputTop + inputHeight / 2))];
+
+    NSString *path = [webView objectByEvaluatingJavaScript:@"path.map((target) => target.localName || target.__proto__.constructor.name).join(',')" inFrame:nil inContentWorld:world.get()];
+    EXPECT_WK_STREQ(@"input,span,slot,ShadowRoot,div,body,html,HTMLDocument,Window", path);
 }
+
+#endif
 
 TEST(WKUserContentController, DisableLegacyBuiltinOverrides)
 {
