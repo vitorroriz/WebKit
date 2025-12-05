@@ -399,7 +399,7 @@ bool defaultPreferSpatialAudioExperience()
 bool defaultRTCEncodedStreamsQuirkEnabled()
 {
 #if PLATFORM(MAC)
-    return WTF::MacApplication::isSafariTechnologyPreview();
+    return true;
 #else
     return false;
 #endif
