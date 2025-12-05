@@ -1326,9 +1326,9 @@ void MediaPlayer::currentPlaybackTargetIsWirelessChanged(bool isCurrentPlaybackT
     protectedClient()->mediaPlayerCurrentPlaybackTargetIsWirelessChanged(isCurrentPlaybackTargetWireless);
 }
 
-bool MediaPlayer::canPlayToWirelessPlaybackTarget() const
+OptionSet<MediaPlaybackTargetType> MediaPlayer::supportedPlaybackTargetTypes() const
 {
-    return protectedPrivate()->canPlayToWirelessPlaybackTarget();
+    return protectedPrivate()->supportedPlaybackTargetTypes();
 }
 
 void MediaPlayer::setWirelessPlaybackTarget(Ref<MediaPlaybackTarget>&& device)

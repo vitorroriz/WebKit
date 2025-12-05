@@ -106,6 +106,8 @@ public:
     bool isPlayingToWirelessPlaybackTarget() const override;
 
     void mediaStateDidChange(MediaProducerMediaStateFlags);
+
+    MediaPlaybackTargetType playbackTargetType() const;
 #endif
 
     bool requiresFullscreenForVideoPlayback() const;
