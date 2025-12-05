@@ -722,10 +722,6 @@ test/language/identifiers/start-unicode-17.0.0-escaped.js:
 test/language/identifiers/start-unicode-17.0.0.js:
   default: "SyntaxError: Invalid character '\\u088f'"
   strict mode: "SyntaxError: Invalid character '\\u088f'"
-test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from-and-import-star-as-and-export.js:
-  module: "SyntaxError: Importing binding name 'foo' cannot be resolved due to ambiguous multiple bindings."
-test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-import-star-as-and-export.js:
-  module: "SyntaxError: Importing binding name 'foo' cannot be resolved due to ambiguous multiple bindings."
 test/language/module-code/top-level-await/async-module-does-not-block-sibling-modules.js:
   module: 'Test262Error: Expected SameValue(«true», «false») to be true'
 test/language/module-code/top-level-await/dynamic-import-of-waiting-module.js:
