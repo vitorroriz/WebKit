@@ -791,6 +791,12 @@ Ref<SharedBuffer> GstMappedOwnedBuffer::createSharedBuffer()
     return SharedBuffer::create(*this);
 }
 
+GstMappedFrame::GstMappedFrame(GstMappedFrame&& other)
+{
+    std::swap(m_frame, other.m_frame);
+    other.m_frame.buffer = nullptr;
+}
+
 GstMappedFrame::GstMappedFrame(GstBuffer* buffer, const GstVideoInfo* info, GstMapFlags flags)
 {
     // This cast can be removed once the GStreamer minimum version is raised to 1.20
@@ -880,6 +886,27 @@ int GstMappedFrame::planeStride(uint32_t planeIndex) const
 {
     RELEASE_ASSERT(isValid());
     return GST_VIDEO_FRAME_PLANE_STRIDE(&m_frame, planeIndex);
+}
+
+#if USE(GSTREAMER_GL)
+GLuint GstMappedFrame::textureID(int planeIndex) const
+{
+    RELEASE_ASSERT(isValid());
+    RELEASE_ASSERT(m_frame.map->flags & GST_MAP_GL);
+    return *reinterpret_cast<GLuint*>(m_frame.data[planeIndex]);
+}
+#endif
+
+unsigned GstMappedFrame::componentPlane(int planeIndex) const
+{
+    RELEASE_ASSERT(isValid());
+    return GST_VIDEO_INFO_COMP_PLANE(&m_frame.info, planeIndex);
+}
+
+unsigned GstMappedFrame::componentPlaneOffset(int planeIndex) const
+{
+    RELEASE_ASSERT(isValid());
+    return GST_VIDEO_INFO_COMP_POFFSET(&m_frame.info, planeIndex);
 }
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_END;
 
