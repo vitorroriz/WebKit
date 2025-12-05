@@ -512,7 +512,9 @@ private:
     template <typename BigIntImpl>
     static void internalMultiplyAdd(BigIntImpl source, Digit factor, Digit summand, unsigned, JSBigInt* result);
     template <typename BigIntImpl>
-    static void multiplyAccumulate(BigIntImpl multiplicand, Digit multiplier, JSBigInt* accumulator, unsigned accumulatorIndex);
+    static void multiplySingle(BigIntImpl multiplicand, Digit multiplier, JSBigInt* result);
+    template <typename BigIntImpl1, typename BigIntImpl2>
+    static void multiplyTextbook(BigIntImpl1 x, BigIntImpl2 y, JSBigInt* result);
     template <typename BigIntImpl1>
     static void absoluteDivWithBigIntDivisor(JSGlobalObject*, BigIntImpl1 dividend, JSBigInt* divisor, JSBigInt** quotient, JSBigInt** remainder);
     
@@ -566,8 +568,10 @@ private:
 
     // Digit arithmetic helpers.
     static Digit digitAdd(Digit a, Digit b, Digit& carry);
+    static Digit digitAdd3(Digit a, Digit b, Digit c, Digit& carry);
     static Digit digitSub(Digit a, Digit b, Digit& borrow);
-    static Digit digitMul(Digit a, Digit b, Digit& high);
+    static Digit digitSub2(Digit a, Digit b, Digit borrowIn, Digit& borrowOut);
+    static std::tuple<Digit, Digit> digitMul(Digit a, Digit b);
     static Digit digitDiv(Digit high, Digit low, Digit divisor, Digit& remainder);
     static Digit digitPow(Digit base, Digit exponent);
 
