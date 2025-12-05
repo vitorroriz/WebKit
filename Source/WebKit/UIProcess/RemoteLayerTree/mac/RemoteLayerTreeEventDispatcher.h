@@ -66,6 +66,7 @@ class DisplayLink;
 class NativeWebWheelEvent;
 #if ENABLE(THREADED_ANIMATIONS)
 class RemoteAnimationTimeline;
+class RemoteProgressBasedTimeline;
 #endif
 class RemoteScrollingCoordinatorProxyMac;
 class RemoteLayerTreeDrawingAreaProxyMac;
@@ -115,6 +116,7 @@ public:
     RefPtr<const RemoteAnimationTimeline> timeline(const TimelineID&);
     void updateAnimations();
     RefPtr<const RemoteAnimationStack> animationStackForNodeWithIDForTesting(WebCore::PlatformLayerIdentifier) const;
+    HashSet<Ref<RemoteProgressBasedTimeline>> timelinesForScrollingNodeIDForTesting(WebCore::ScrollingNodeID);
 #endif
 
 private:

@@ -84,6 +84,10 @@ public:
         bool isReversed;
     };
 
+#if ENABLE(THREADED_ANIMATIONS)
+    WEBCORE_EXPORT std::optional<ScrollingNodeID> scrollingNodeIDForTesting() const;
+#endif
+
 protected:
     explicit ScrollTimeline(const AtomString&, ScrollAxis);
 

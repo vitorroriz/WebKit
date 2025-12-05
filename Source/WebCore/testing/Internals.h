@@ -129,6 +129,7 @@ class ReadableStream;
 class Range;
 class RenderedDocumentMarker;
 class SVGSVGElement;
+class ScrollTimeline;
 class ScrollableArea;
 class SerializedScriptValue;
 class ServiceWorker;
@@ -331,6 +332,8 @@ public:
         bool isThreaded;
     };
     Vector<AcceleratedAnimation> acceleratedAnimationsForElement(Element&);
+    uint64_t identifierForTimeline(AnimationTimeline&) const;
+    Vector<uint64_t> scrollingNodeIDForTimeline(AnimationTimeline&) const;
     unsigned numberOfAnimationTimelineInvalidations() const;
     double timeToNextAnimationTick(WebAnimation&) const;
 

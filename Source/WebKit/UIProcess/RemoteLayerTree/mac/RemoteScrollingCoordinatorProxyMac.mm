@@ -302,6 +302,11 @@ RefPtr<const RemoteAnimationStack> RemoteScrollingCoordinatorProxyMac::animation
     m_eventDispatcher->unlockForAnimationChanges();
     return animationStack;
 }
+
+HashSet<Ref<RemoteProgressBasedTimeline>> RemoteScrollingCoordinatorProxyMac::timelinesForScrollingNodeIDForTesting(WebCore::ScrollingNodeID scrollingNodeID) const
+{
+    return m_eventDispatcher->timelinesForScrollingNodeIDForTesting(scrollingNodeID);
+}
 #endif
 
 } // namespace WebKit
