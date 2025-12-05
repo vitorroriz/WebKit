@@ -85,7 +85,6 @@ using LayerHostingContextID = uint32_t;
 
 enum class AudioSessionCategory : uint8_t;
 enum class DynamicRangeMode : uint8_t;
-enum class MediaPlaybackTargetType : uint8_t;
 
 class AudioSourceProvider;
 class AudioTrackPrivate;
@@ -591,7 +590,7 @@ public:
     void playbackTargetAvailabilityChanged();
 
     bool isCurrentPlaybackTargetWireless() const;
-    OptionSet<MediaPlaybackTargetType> supportedPlaybackTargetTypes() const;
+    bool canPlayToWirelessPlaybackTarget() const;
     void setWirelessPlaybackTarget(Ref<MediaPlaybackTarget>&&);
 
     void setShouldPlayToPlaybackTarget(bool);

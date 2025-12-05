@@ -29,10 +29,7 @@
 #if PLATFORM(IOS_FAMILY)
 
 #import "Logging.h"
-#import "MediaDeviceRoute.h"
-#import "MediaDeviceRouteController.h"
 #import "MediaPlaybackTargetCocoa.h"
-#import "MediaPlaybackTargetWirelessPlayback.h"
 #import "PlatformMediaSessionManager.h"
 #import "WebCoreThreadRun.h"
 #import <AVFoundation/AVAudioSession.h>
@@ -88,18 +85,9 @@ class MediaSessionHelperIOS;
 
 @end
 
-class MediaSessionHelperIOS final
-    : public MediaSessionHelper
-#if HAVE(AVROUTING_FRAMEWORK)
-    , private MediaDeviceRouteControllerClient
-#endif
-{
+class MediaSessionHelperIOS final : public MediaSessionHelper {
 public:
     MediaSessionHelperIOS();
-
-#if HAVE(AVROUTING_FRAMEWORK)
-    WTF_ABSTRACT_THREAD_SAFE_REF_COUNTED_AND_CAN_MAKE_WEAK_PTR_IMPL;
-#endif
 
     void externalOutputDeviceAvailableDidChange();
     void updateCarPlayIsConnected();
@@ -118,10 +106,6 @@ private:
     void providePresentingApplicationPID(ProcessID) final;
     void startMonitoringWirelessRoutesInternal() final;
     void stopMonitoringWirelessRoutesInternal() final;
-
-#if HAVE(AVROUTING_FRAMEWORK)
-    void activeRoutesDidChange(MediaDeviceRouteController&) final;
-#endif
 
     const RetainPtr<WebMediaSessionHelper> m_objcObserver;
 #if HAVE(MEDIAEXPERIENCE_AVSYSTEMCONTROLLER)
@@ -294,11 +278,6 @@ MediaSessionHelperIOS::MediaSessionHelperIOS()
     END_BLOCK_OBJC_EXCEPTIONS
 
     updateCarPlayIsConnected();
-
-#if HAVE(AVROUTING_FRAMEWORK)
-    ASSERT(MediaDeviceRouteController::singleton().client() == nullptr);
-    MediaDeviceRouteController::singleton().setClient(this);
-#endif
 }
 
 std::optional<ProcessID> MediaSessionHelperIOS::presentedApplicationPID() const
@@ -402,18 +381,6 @@ void MediaSessionHelperIOS::externalOutputDeviceAvailableDidChange()
 
     MediaSessionHelper::externalOutputDeviceAvailableDidChange(hasAvailableTargets);
 }
-
-#if HAVE(AVROUTING_FRAMEWORK)
-void MediaSessionHelperIOS::activeRoutesDidChange(MediaDeviceRouteController& routeController)
-{
-    if (RefPtr mostRecentActiveRoute = routeController.mostRecentActiveRoute()) {
-        MediaSessionHelper::activeVideoRouteDidChange(SupportsAirPlayVideo::Yes, MediaPlaybackTargetWirelessPlayback::create(*mostRecentActiveRoute));
-        return;
-    }
-
-    activeVideoRouteDidChange();
-}
-#endif // HAVE(AVROUTING_FRAMEWORK)
 
 @implementation WebMediaSessionHelper
 

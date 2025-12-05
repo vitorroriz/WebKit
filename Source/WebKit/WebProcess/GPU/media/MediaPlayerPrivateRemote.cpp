@@ -658,9 +658,9 @@ void MediaPlayerPrivateRemote::updateConfiguration(RemoteMediaPlayerConfiguratio
 }
 
 #if ENABLE(WIRELESS_PLAYBACK_TARGET)
-OptionSet<WebCore::MediaPlaybackTargetType> MediaPlayerPrivateRemote::supportedPlaybackTargetTypes() const
+bool MediaPlayerPrivateRemote::canPlayToWirelessPlaybackTarget() const
 {
-    return m_configuration.supportedPlaybackTargetTypes;
+    return m_configuration.canPlayToWirelessPlaybackTarget;
 }
 #endif
 

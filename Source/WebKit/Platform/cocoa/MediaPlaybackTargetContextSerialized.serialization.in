@@ -30,12 +30,10 @@ header: <WebCore/MediaPlaybackTargetMock.h>
 };
 
 header: <WebCore/MediaPlaybackTarget.h>
-[CustomHeader, OptionSet] enum class WebCore::MediaPlaybackTargetType : uint8_t {
-    None,
+[CustomHeader] enum class WebCore::MediaPlaybackTargetType : uint8_t {
     AVOutputContext,
     Mock,
-    WirelessPlayback,
-    Serialized,
+    Serialized
 };
 
 header: "MediaPlaybackTargetContextSerialized.h"
@@ -51,7 +49,6 @@ header: "MediaPlaybackTargetContextSerialized.h"
     String contextID();
     String contextType();
 #endif
-    std::optional<WTF::UUID> identifier();
 };
 
 #endif // ENABLE(WIRELESS_PLAYBACK_TARGET)

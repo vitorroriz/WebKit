@@ -3450,11 +3450,6 @@ void MediaPlayerPrivateAVFoundationObjC::setWirelessVideoPlaybackDisabled(bool d
     [m_avPlayer setAllowsExternalPlayback:!disabled];
 }
 
-OptionSet<MediaPlaybackTargetType> MediaPlayerPrivateAVFoundationObjC::supportedPlaybackTargetTypes() const
-{
-    return { MediaPlaybackTargetType::AVOutputContext, MediaPlaybackTargetType::Mock };
-}
-
 #if !PLATFORM(IOS_FAMILY)
 
 void MediaPlayerPrivateAVFoundationObjC::setWirelessPlaybackTarget(Ref<MediaPlaybackTarget>&& target)

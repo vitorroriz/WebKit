@@ -170,7 +170,7 @@ void RemoteMediaPlayerProxy::getConfiguration(RemoteMediaPlayerConfiguration& co
     configuration.supportsPauseAtHostTime = player->supportsPauseAtHostTime();
 
 #if ENABLE(WIRELESS_PLAYBACK_TARGET)
-    configuration.supportedPlaybackTargetTypes = player->supportedPlaybackTargetTypes();
+    configuration.canPlayToWirelessPlaybackTarget = player->canPlayToWirelessPlaybackTarget();
 #endif
     configuration.shouldIgnoreIntrinsicSize = player->shouldIgnoreIntrinsicSize();
 
