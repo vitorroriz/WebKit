@@ -3242,6 +3242,8 @@
 		41D14AEC2EE084CC005F25F0 /* congestion_controller_feedback_stats.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D14AEB2EE084CC005F25F0 /* congestion_controller_feedback_stats.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		41D14AEE2EE09301005F25F0 /* create_modular_peer_connection_factory.cc in Sources */ = {isa = PBXBuildFile; fileRef = 41D14AED2EE09301005F25F0 /* create_modular_peer_connection_factory.cc */; };
 		41D14AF02EE09C7D005F25F0 /* p_dsa.cc in Sources */ = {isa = PBXBuildFile; fileRef = 41D14AEF2EE09C7D005F25F0 /* p_dsa.cc */; };
+		41D14AF92EE2C7DA005F25F0 /* av1_ext_ratectrl.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D14AF72EE2C7DA005F25F0 /* av1_ext_ratectrl.h */; };
+		41D14AFA2EE2C7DA005F25F0 /* av1_ext_ratectrl.c in Sources */ = {isa = PBXBuildFile; fileRef = 41D14AF82EE2C7DA005F25F0 /* av1_ext_ratectrl.c */; };
 		41D6B45321273159008F9353 /* call_config.cc in Sources */ = {isa = PBXBuildFile; fileRef = 415F1FD72127313F00064CBF /* call_config.cc */; };
 		41D6B45421273159008F9353 /* call_config.h in Headers */ = {isa = PBXBuildFile; fileRef = 415F1FDA2127313F00064CBF /* call_config.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		41D6B45721273159008F9353 /* receive_time_calculator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 415F1FD02127313D00064CBF /* receive_time_calculator.cc */; };
@@ -9511,6 +9513,8 @@
 		41D14AEB2EE084CC005F25F0 /* congestion_controller_feedback_stats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = congestion_controller_feedback_stats.h; sourceTree = "<group>"; };
 		41D14AED2EE09301005F25F0 /* create_modular_peer_connection_factory.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = create_modular_peer_connection_factory.cc; sourceTree = "<group>"; };
 		41D14AEF2EE09C7D005F25F0 /* p_dsa.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = p_dsa.cc; sourceTree = "<group>"; };
+		41D14AF72EE2C7DA005F25F0 /* av1_ext_ratectrl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = av1_ext_ratectrl.h; sourceTree = "<group>"; };
+		41D14AF82EE2C7DA005F25F0 /* av1_ext_ratectrl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = av1_ext_ratectrl.c; sourceTree = "<group>"; };
 		41D6B45E212731A0008F9353 /* biquad_filter.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = biquad_filter.cc; sourceTree = "<group>"; };
 		41D6B461212731A1008F9353 /* noise_level_estimator.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = noise_level_estimator.cc; sourceTree = "<group>"; };
 		41D6B463212731A2008F9353 /* biquad_filter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = biquad_filter.h; sourceTree = "<group>"; };
@@ -12545,6 +12549,8 @@
 				410B364C292B6FDB0003E515 /* aq_cyclicrefresh.h */,
 				410B3631292B6FC60003E515 /* aq_variance.c */,
 				410B369D292B70080003E515 /* aq_variance.h */,
+				41D14AF82EE2C7DA005F25F0 /* av1_ext_ratectrl.c */,
+				41D14AF72EE2C7DA005F25F0 /* av1_ext_ratectrl.h */,
 				410B3699292B70060003E515 /* av1_fwd_txfm1d.c */,
 				410B3637292B6FCB0003E515 /* av1_fwd_txfm1d.h */,
 				410B3645292B6FD90003E515 /* av1_fwd_txfm1d_cfg.h */,
@@ -21647,6 +21653,7 @@
 				410B3809292B71080003E515 /* av1_common_int.h in Headers */,
 				410B3860292B81270003E515 /* av1_config.h in Headers */,
 				410B3848292B803D0003E515 /* av1_cx_iface.h in Headers */,
+				41D14AF92EE2C7DA005F25F0 /* av1_ext_ratectrl.h in Headers */,
 				410B3705292B706A0003E515 /* av1_fwd_txfm1d.h in Headers */,
 				410B3713292B706A0003E515 /* av1_fwd_txfm1d_cfg.h in Headers */,
 				410B3845292B803D0003E515 /* av1_iface_common.h in Headers */,
@@ -25885,6 +25892,7 @@
 				410B3847292B803D0003E515 /* av1_cx_iface.c in Sources */,
 				410B3843292B803D0003E515 /* av1_dx_iface.c in Sources */,
 				41ABB19A2BFE2BFE0035D075 /* av1_error_neon.c in Sources */,
+				41D14AFA2EE2C7DA005F25F0 /* av1_ext_ratectrl.c in Sources */,
 				410B373F292B706B0003E515 /* av1_fwd_txfm1d.c in Sources */,
 				410B36FD292B706A0003E515 /* av1_fwd_txfm2d.c in Sources */,
 				41ABB1952BFE2BFE0035D075 /* av1_fwd_txfm2d_neon.c in Sources */,
