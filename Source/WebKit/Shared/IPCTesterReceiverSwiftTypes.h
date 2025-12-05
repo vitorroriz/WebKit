@@ -23,8 +23,10 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Add project-level C++ header files here to be able to access them from within Swift sources.
+#pragma once
 
-#import "IPCTesterReceiverSwiftMessages.h"
-#import "IPCTesterReceiverSwiftTypes.h"
-#import "UIProcess/SwiftDemoLogoConfirmation.h"
+#include <cstdint>
+#include <wtf/CompletionHandler.h>
+#include <wtf/RefCountable.h>
+
+using AsyncMessageCompletionHandler = WTF::RefCountable<WTF::CompletionHandler<void(uint32_t)>>;
