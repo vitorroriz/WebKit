@@ -218,20 +218,23 @@ bool InlineQuirks::shouldCollapseLineBoxHeight(const Line::RunList& lineContent,
         return false;
     }
 
-    if (lineContent.size() == 2 && lineContent[0].isListMarkerOutside() && lineContent[1].isInlineBoxStart()) {
-        // This is to handle non-contentful lines introduced by block boxes. They are supposed to be collapsed so that
-        // the block content can be placed next to the list marker.
-        // Regular inline content would never produced a line with these 2 runs. Also in inline content like <li><span><br>
-        // is not supposed to produce a collapsed line box.
-        // The underlying issue is the assumption that we shouldn’t collapse when rootBox is a list item (see below).
-        return true;
-    }
-
+    size_t emptyInlineBoxCount = 0;
     for (auto& run : lineContent) {
         if (run.isListMarkerOutside())
             continue;
         if (Line::Run::isContentfulOrHasDecoration(run, formattingContext()))
             return false;
+        if (run.isInlineBoxStart())
+            ++emptyInlineBoxCount;
+    }
+
+    if (lineContent[0].isListMarkerOutside() && emptyInlineBoxCount && emptyInlineBoxCount == lineContent.size() - 1) {
+        // This is to handle non-contentful lines introduced by block boxes. They are supposed to be collapsed so that
+        // the block content can be placed next to the list marker.
+        // Regular inline content would never produced a line with inline box only runs. Also inline content like <li><span><br>
+        // is not supposed to produce a collapsed line box.
+        // The underlying issue is the assumption that we shouldn’t collapse when rootBox is a list item (see below).
+        return true;
     }
 
     auto& rootBox = formattingContext().root();
