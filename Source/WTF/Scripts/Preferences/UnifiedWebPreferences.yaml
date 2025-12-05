@@ -6479,17 +6479,17 @@ ReadableByteStreamAPIEnabled:
 
 ReadableByteStreamFetchSourceEnabled:
   type: bool
-  status: preview
+  status: stable
   category: dom
   humanReadableName: "ReadableByteStream for fetch API"
   humanReadableDescription: "Enable Readable Byte Streams for fetch API"
   defaultValue:
     WebCore:
-      default: false
+      default: true
     WebKitLegacy:
-      default: false
+      default: true
     WebKit:
-      default: false
+      default: true
 
 ReadableStreamIterableEnabled:
   type: bool
