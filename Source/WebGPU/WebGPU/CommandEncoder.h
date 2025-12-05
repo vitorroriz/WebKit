@@ -189,7 +189,7 @@ private:
     HashSet<RefPtr<const Sampler>> m_retainedSamplers;
     NSMutableSet<id<MTLCounterSampleBuffer>> * _Nullable m_retainedTimestampBuffers { nil };
     Vector<Function<bool(CommandBuffer&, CommandEncoder&)>> m_onCommitHandlers;
-    HashMap<uint64_t, Vector<DrawIndexCacheContainerValue>, DefaultHash<uint64_t>, WTF::UnsignedWithZeroKeyHashTraits<uint64_t>> m_skippedDrawIndexedValidationKeys;
+    HashMap<uint64_t, Vector<std::pair<DrawIndexCacheContainerValue, uint32_t>>, DefaultHash<uint64_t>, WTF::UnsignedWithZeroKeyHashTraits<uint64_t>> m_skippedDrawIndexedValidationKeys;
     Vector<RefPtr<const BindGroup>> m_bindGroups;
     int m_bufferMapCount { 0 };
     bool m_makeSubmitInvalid { false };

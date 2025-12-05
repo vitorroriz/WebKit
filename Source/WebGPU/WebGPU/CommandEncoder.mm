@@ -145,8 +145,10 @@ CommandEncoder::CommandEncoder(id<MTLCommandBuffer> commandBuffer, Device& devic
                 continue;
             apiBuffer->removeSkippedValidationCommandEncoder(commandEncoder.uniqueId());
             if (apiBuffer->mustTakeSlowIndexValidationPath()) {
-                for (DrawIndexCacheContainerValue& key : skippedDrawIndexedValidationKeys) {
-                    apiBuffer->takeSlowIndexValidationPath(commandBuffer, key.firstIndex, key.indexCount, key.vertexCount, key.instanceCount, key.indexType(), key.firstInstance, key.baseVertex, key.minInstanceCount, key.primitiveOffset());
+                for (auto& keyValuePair : skippedDrawIndexedValidationKeys) {
+                    auto& key = keyValuePair.first;
+                    auto& value = keyValuePair.second;
+                    apiBuffer->takeSlowIndexValidationPath(commandBuffer, key.firstIndex, key.indexCount, key.indexType(), key.primitiveOffset(), value);
                     commandBuffer.addPostCommitHandler([bufferIdentifier, device = Ref { commandBuffer.device() }](id<MTLCommandBuffer>) {
                         if (RefPtr apiBuffer = device->lookupBuffer(bufferIdentifier))
                             apiBuffer->clearMustTakeSlowIndexValidationPath();
@@ -2353,7 +2355,7 @@ bool CommandEncoder::useResidencySet(id<MTLResidencySet> residencySet)
 
 void CommandEncoder::skippedDrawIndexedValidation(uint64_t bufferIdentifier, DrawIndexCacheContainerIterator it)
 {
-    m_skippedDrawIndexedValidationKeys.add(bufferIdentifier, Vector<DrawIndexCacheContainerValue> { }).iterator->value.append(DrawIndexCacheContainerValue(it->key));
+    m_skippedDrawIndexedValidationKeys.add(bufferIdentifier, Vector<std::pair<DrawIndexCacheContainerValue, uint32_t>> { }).iterator->value.append(std::make_pair(DrawIndexCacheContainerValue(it->key.key()), it->value));
 }
 
 void CommandEncoder::rebindSamplersPreCommit(const BindGroup* group)
