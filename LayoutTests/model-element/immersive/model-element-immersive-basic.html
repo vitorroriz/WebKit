@@ -61,23 +61,23 @@ promise_test(async t => {
     
     let modelChangeEvents = [];
     let documentChangeEvents = [];
-    
-    model.addEventListener('immersivechange', () => {
-        modelChangeEvents.push(document.immersiveElement);
-    });
-    
-    document.addEventListener('immersivechange', () => {
-        documentChangeEvents.push(document.immersiveElement);
-    });
+    const modelHandler = () => { modelChangeEvents.push(document.immersiveElement); };
+    const documentHandler = () => { documentChangeEvents.push(document.immersiveElement); };
     
     await test_driver.bless("immersive");
+
+    model.addEventListener('immersivechange', modelHandler);
+    document.addEventListener('immersivechange', documentHandler);
+
     await model.requestImmersive();
-    
     await new Promise(resolve => setTimeout(resolve, 100));
+
+    model.removeEventListener('immersivechange', modelHandler);
+    document.removeEventListener('immersivechange', documentHandler);
     
     assert_equals(modelChangeEvents.length, 1, 'Model should fire one immersivechange event');
     assert_equals(modelChangeEvents[0], model, 'Model event should occur when model is immersive');
-    
+
     assert_equals(documentChangeEvents.length, 1, 'Document should fire one immersivechange event');
     assert_equals(documentChangeEvents[0], model, 'Document event should reference model');
 }, 'Immersivechange events fire when entering immersive');
@@ -134,9 +134,8 @@ promise_test(async t => {
     const [model, source] = createModelAndSource(t, "../resources/cube.usdz");
     
     let errorFired = false;
-    model.addEventListener('immersiveerror', () => {
-        errorFired = true;
-    });
+    const errorHandler = () => { errorFired = true; };
+    model.addEventListener('immersiveerror', errorHandler);
     
     await promise_rejects_js(t, TypeError, 
         model.requestImmersive(),
@@ -144,6 +143,7 @@ promise_test(async t => {
     );
     
     await new Promise(resolve => setTimeout(resolve, 100));
+    model.removeEventListener('immersiveerror', errorHandler);
     
     assert_true(errorFired, 'immersiveerror event should fire on failed request');
 }, 'Immersiveerror event fires when request fails');

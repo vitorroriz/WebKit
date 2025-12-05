@@ -523,7 +523,9 @@ struct PerWebProcessState {
 #endif
 
 #if ENABLE(MODEL_ELEMENT_IMMERSIVE)
-- (void)_canEnterImmersiveElementFromURL:(const URL&)url completion:(CompletionHandler<void(bool)>&&)completion;
+- (void)_allowImmersiveElementFromURL:(const URL&)url completion:(CompletionHandler<void(bool)>&&)completion;
+- (void)_presentImmersiveElement:(const WebCore::LayerHostingContextIdentifier)contextID completion:(CompletionHandler<void(bool)>&&)completion;
+- (void)_dismissImmersiveElement:(CompletionHandler<void()>&&)completion;
 #endif
 
 #if ENABLE(ATTACHMENT_ELEMENT)

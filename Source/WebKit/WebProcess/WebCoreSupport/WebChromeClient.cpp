@@ -1664,12 +1664,28 @@ void WebChromeClient::spatialBackdropSourceChanged() const
 #endif
 
 #if ENABLE(MODEL_ELEMENT_IMMERSIVE)
-void WebChromeClient::canEnterImmersiveElement(const Element& element, CompletionHandler<void(bool)>&& completion) const
+void WebChromeClient::allowImmersiveElement(const Element& element, CompletionHandler<void(bool)>&& completion) const
 {
     if (RefPtr page = m_page.get())
-        page->canEnterImmersiveElement(element, WTFMove(completion));
+        page->allowImmersiveElement(element, WTFMove(completion));
     else
         completion(false);
+}
+
+void WebChromeClient::presentImmersiveElement(const Element& element, const LayerHostingContextIdentifier contextID, CompletionHandler<void(bool)>&& completion) const
+{
+    if (RefPtr page = m_page.get())
+        page->presentImmersiveElement(element, contextID, WTFMove(completion));
+    else
+        completion(false);
+}
+
+void WebChromeClient::dismissImmersiveElement(const Element& element, CompletionHandler<void()>&& completion) const
+{
+    if (RefPtr page = m_page.get())
+        page->dismissImmersiveElement(element, WTFMove(completion));
+    else
+        completion();
 }
 #endif
 

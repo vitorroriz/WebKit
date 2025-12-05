@@ -21,6 +21,7 @@ promise_test(async t => {
     await model.requestImmersive();
 
     assert_equals(document.immersiveElement, model, 'Hidden model became document\'s immersive element');
+    assert_equals(model.complete, true, 'Model should be complete when immersive');
 }, 'Hidden inline model should successfully enter immersive');
 
 </script>
