@@ -971,7 +971,8 @@ BlockWebInspectorInWebContentSandbox:
 
 BlocksInInlineLayoutEnabled:
   type: bool
-  status: unstable
+  status: testable
+  category: css
   humanReadableName: "Blocks in inline layout (disable continuations)"
   humanReadableDescription: "Enable blocks in inline layout (disable continuations)"
   defaultValue:

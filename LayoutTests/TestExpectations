@@ -8156,6 +8156,9 @@ imported/w3c/web-platform-tests/css/CSS2/normal-flow/width-applies-to-015.xht [ 
 # progression with blocks-in-inline
 webkit.org/b/303415 fast/inline/blocks-in-inline-offsetwidth.html [ Failure ]
 
+# List marker placement issue with blocks-in-inline
+fast/lists/marker-before-empty-inline.html [ Failure ]
+
 imported/w3c/web-platform-tests/intersection-observer/animating.html [ Pass Failure ]
 imported/w3c/web-platform-tests/intersection-observer/cross-origin-tall-iframe-rendering.sub.html [ Pass ImageOnlyFailure ]
 
@@ -8163,6 +8166,7 @@ imported/w3c/web-platform-tests/intersection-observer/cross-origin-tall-iframe-r
 imported/w3c/web-platform-tests/css/css-viewport/zoom/border-spacing.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/border-width.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/border.html [ ImageOnlyFailure ]
+
 
 # Hits assert in debug, tracked by https://bugs.webkit.org/show_bug.cgi?id=303414
 [ Debug ] fullscreen/fullscreen-grid-item-container-type-crash.html [ Skip ]
