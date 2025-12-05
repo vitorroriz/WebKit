@@ -83,7 +83,6 @@ String roleToString(AccessibilityRole);
 
 std::optional<CursorType> cursorTypeFrom(const StyleProperties&);
 
-RefPtr<Node> lastNode(const Vector<AXID>&, AXObjectCache&);
-RefPtr<AccessibilityObject> lastObject(const Vector<AXID>&, AXObjectCache&);
+RefPtr<Node> lastNode(const FixedVector<AXID>&, AXObjectCache&);
 
 } // WebCore

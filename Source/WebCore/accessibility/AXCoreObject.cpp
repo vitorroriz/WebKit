@@ -394,22 +394,22 @@ AXCoreObject* AXCoreObject::blockFlowAncestor() const
     });
 }
 
-AXCoreObject::StitchState AXCoreObject::stitchStateFromGroups(const Vector<Vector<AXID>>* groups, IncludeStitchGroup includeStitchGroup) const
+std::optional<AXStitchGroup> AXCoreObject::stitchGroupFromGroups(const Vector<AXStitchGroup>* groups, IncludeGroupMembers includeGroupMembers) const
 {
     if (!groups)
         return { };
 
     AXID thisAXID = objectID();
     for (const auto& group : *groups) {
-        if (group.contains(thisAXID)) {
-            if (includeStitchGroup == IncludeStitchGroup::No) {
-                // If the caller doesn't need the group we belong to, don't bother doing the copy.
-                return { group[0], { } };
-            }
+        // Stitching zero or one elements doesn't make sense, so ensure our group is two or larger.
+        ASSERT(group.members().size() >= 2);
 
-            // Stitching zero or one elements doesn't make sense, so ensure our group is two or larger.
-            ASSERT(group.size() >= 2);
-            return { group[0], group };
+        if (group.members().contains(thisAXID)) {
+            if (includeGroupMembers == IncludeGroupMembers::No) {
+                // If the caller doesn't need the group we belong to, don't bother doing the copy.
+                return std::optional(AXStitchGroup { { }, group.representativeID() });
+            }
+            return std::optional(group);
         }
     }
     return { };

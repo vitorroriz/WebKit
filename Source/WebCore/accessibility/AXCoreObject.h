@@ -26,6 +26,7 @@
 #pragma once
 
 #include <WebCore/AXID.h>
+#include <WebCore/AXStitchGroup.h>
 #include <WebCore/AXTextRun.h>
 #include <WebCore/AccessibilityRole.h>
 #include <WebCore/CharacterRange.h>
@@ -1016,35 +1017,21 @@ public:
     virtual bool isBlockFlow() const { return false; }
     bool hasStitchableRole() const
     {
-        // FIXME: We probably want to stitch list markers too.
-        return role() == AccessibilityRole::StaticText;
+        return role() == AccessibilityRole::StaticText || role() == AccessibilityRole::ListMarker;
     }
     AXCoreObject* blockFlowAncestor() const;
     AXCoreObject* blockFlowAncestorForStitchable() const
     {
         return hasStitchableRole() ? blockFlowAncestor() : nullptr;
     }
-    struct StitchState {
-        // Given object |A| that produced this StitchState, |stitchedIntoID| represents
-        // the ID of the object that |A| is stitched into. This can be |A|'s own ID if
-        // it is the first member of its stitch group (and is thus what is stitched into).
-        // If std::nullopt, |A| is not stitched into any other object, nor is any other object
-        // stitched into it.
-        const std::optional<AXID> stitchedIntoID { std::nullopt };
-        // The stitch group that |A| belongs to, if any.
-        Vector<AXID> group;
 
-        StitchState() = default;
-        StitchState(std::optional<AXID> stitchedIntoID, const Vector<AXID>& group)
-            : stitchedIntoID(stitchedIntoID)
-            , group(group)
-        { }
-    };
-    enum class IncludeStitchGroup : bool { No, Yes };
-    virtual StitchState stitchState(IncludeStitchGroup = IncludeStitchGroup::Yes) const { return { }; }
+    enum class IncludeGroupMembers : bool { No, Yes };
+    virtual std::optional<AXStitchGroup> stitchGroup(IncludeGroupMembers = IncludeGroupMembers::Yes) const { return { }; }
     std::optional<AXID> stitchedIntoID() const
     {
-        return stitchState(IncludeStitchGroup::No).stitchedIntoID;
+        if (std::optional stitchGroup = this->stitchGroup(IncludeGroupMembers::No))
+            return stitchGroup->representativeID();
+        return std::nullopt;
     }
 
     // When ENABLE(INCLUDE_IGNORED_IN_CORE_AX_TREE) is true, this returns IDs of ignored children.
@@ -1316,7 +1303,7 @@ protected:
         , m_id(axID)
     { }
 
-    StitchState stitchStateFromGroups(const Vector<Vector<AXID>>*, IncludeStitchGroup) const;
+    std::optional<AXStitchGroup> stitchGroupFromGroups(const Vector<AXStitchGroup>*, IncludeGroupMembers) const;
 
 private:
     virtual String debugDescriptionInternal(bool, std::optional<OptionSet<AXDebugStringOption>> = std::nullopt) const = 0;

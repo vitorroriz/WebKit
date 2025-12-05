@@ -1423,7 +1423,7 @@ void AXObjectCache::handleRowspanChanged(AccessibilityNodeObject& axCell)
 }
 #endif
 
-const Vector<Vector<AXID>>* AXObjectCache::stitchGroupsOwnedBy(AccessibilityObject& object)
+const Vector<AXStitchGroup>* AXObjectCache::stitchGroupsOwnedBy(AccessibilityObject& object)
 {
     CheckedPtr renderBlockFlow = dynamicDowncast<RenderBlockFlow>(object.renderer());
     if (!renderBlockFlow || renderBlockFlow->beingDestroyed())

@@ -27,6 +27,9 @@
 
 namespace WebCore {
 
+class AccessibilityObject;
+class AccessibilityNodeObject;
+class ContainerNode;
 class RenderObject;
 
 struct StitchingContext {

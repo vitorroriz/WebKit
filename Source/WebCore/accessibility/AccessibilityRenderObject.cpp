@@ -895,18 +895,31 @@ LayoutRect AccessibilityRenderObject::boundingBoxRect() const
         isSVGRoot = true;
 
     if (auto* renderText = dynamicDowncast<RenderText>(*renderer)) {
-        auto stitchState = this->stitchState();
-        if (!stitchState.stitchedIntoID || *stitchState.stitchedIntoID != objectID() || stitchState.group.isEmpty())
+        std::optional stitchGroup  = this->stitchGroup();
+        if (!stitchGroup || stitchGroup->representativeID() != objectID() || stitchGroup->isEmpty())
             quads = renderText->absoluteQuadsClippedToEllipsis();
         else {
             // |this| is a stitching of multiple objects, so we need to combine all of their bounding boxes.
 
             CheckedPtr cache = axObjectCache();
-            RefPtr endNode = !stitchState.group.isEmpty() && cache ? lastNode(stitchState.group, *cache) : nullptr;
-            if (endNode && endNode != node) {
-                if (std::optional range = makeSimpleRange(positionBeforeNode(node.get()), positionAfterNode(endNode.get())))
+            RefPtr endNode = cache ? lastNode(stitchGroup->members(), *cache) : nullptr;
+            if (endNode) {
+                if (std::optional range = makeSimpleRange(positionBeforeNode(node.get()), positionAfterNode(endNode.get()))) {
                     quads = RenderObject::absoluteTextQuads(*range);
+
+                    if (CheckedPtr cache = axObjectCache()) {
+                        for (AXID axID : stitchGroup->members()) {
+                            if (axID == stitchGroup->representativeID())
+                                break;
+                            if (RefPtr object = cache->objectForID(axID)) {
+                                if (CheckedPtr renderListMarker = dynamicDowncast<RenderListMarker>(object->renderer()))
+                                    renderListMarker->absoluteFocusRingQuads(quads);
+                            }
+                        }
+                    }
+                }
             }
+
             if (quads.isEmpty())
                 quads = renderText->absoluteQuadsClippedToEllipsis();
         }
