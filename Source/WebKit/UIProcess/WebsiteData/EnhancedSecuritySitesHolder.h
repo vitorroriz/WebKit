@@ -25,48 +25,39 @@
 
 #pragma once
 
-
-#include "APINavigation.h"
 #include "EnhancedSecurity.h"
-
 #include <WebCore/RegistrableDomain.h>
-#include <wtf/CanMakeWeakPtr.h>
-#include <wtf/MonotonicTime.h>
-#include <wtf/Seconds.h>
+#include <wtf/CompletionHandler.h>
+#include <wtf/ContinuousApproximateTime.h>
+#include <wtf/ThreadSafeWeakPtr.h>
+#include <wtf/WorkQueue.h>
+#include <wtf/text/WTFString.h>
 
 namespace WebKit {
 
-class EnhancedSecurityTracking final : public CanMakeWeakPtr<EnhancedSecurityTracking> {
+class EnhancedSecuritySitesPersistence;
+
+class EnhancedSecuritySitesHolder final : public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<EnhancedSecuritySitesHolder, WTF::DestructionThread::MainRunLoop> {
 public:
-    void initializeWithWebsiteDataStore(WebsiteDataStore&);
+    static Ref<EnhancedSecuritySitesHolder> create(const String& databaseDirectoryPath);
 
-    void trackNavigation(const API::Navigation&);
+    ~EnhancedSecuritySitesHolder();
 
-    bool isEnhancedSecurityEnabled() const { return isEnhancedSecurityEnabledForState(enhancedSecurityState()); }
-    EnhancedSecurity enhancedSecurityState() const;
-    EnhancedSecurityReason enhancedSecurityReason() const { return m_activeReason; }
+    void fetchEnhancedSecurityOnlyDomains(CompletionHandler<void(HashSet<WebCore::RegistrableDomain>&&)>&&);
+    void fetchAllEnhancedSecuritySites(CompletionHandler<void(HashSet<WebCore::RegistrableDomain>&&)>&&);
 
-    void initializeFrom(const EnhancedSecurityTracking&);
+    void trackEnhancedSecurityForDomain(WebCore::RegistrableDomain&&, EnhancedSecurity);
+
+    void deleteSites(Vector<WebCore::RegistrableDomain>&&, CompletionHandler<void()>&&);
+    void deleteAllSites(CompletionHandler<void()>&&);
 
 private:
-    enum class ActivationState : uint8_t { None, Dormant, Active };
+    // Shared WorkQueue is used to prevent race condition when delete and create Persistence for same database file.
+    static WorkQueue& sharedWorkQueueSingleton();
 
-    void reset();
-    void makeDormant();
-    void makeActive();
+    explicit EnhancedSecuritySitesHolder(const String& databasePath);
 
-    void handleBackForwardNavigation(const API::Navigation&);
-
-    void enableFor(EnhancedSecurityReason, const API::Navigation&);
-    bool enableIfRequired(const API::Navigation&);
-
-    void trackSameSiteNavigation(const API::Navigation&);
-    void trackChangingSiteNavigation();
-
-    ActivationState m_activeState;
-    EnhancedSecurityReason m_activeReason;
-
-    WebCore::RegistrableDomain m_initialProtectedDomain;
+    std::unique_ptr<EnhancedSecuritySitesPersistence> m_enhancedSecurityPersistence WTF_GUARDED_BY_CAPABILITY(sharedWorkQueueSingleton());
 };
 
-} // namespace WebKit
+}

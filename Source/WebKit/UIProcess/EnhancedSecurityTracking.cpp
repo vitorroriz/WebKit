@@ -35,6 +35,37 @@ namespace WebKit {
 
 using namespace WebCore;
 
+using EnhancedSecuritySitesMap = HashMap<WebCore::RegistrableDomain, EnhancedSecurityReason>;
+
+static EnhancedSecuritySitesMap& enabledSitesMap()
+{
+    static MainRunLoopNeverDestroyed<EnhancedSecuritySitesMap> staticEnabledSites;
+    return staticEnabledSites;
+}
+
+static bool didSitePreviouslyUseEnhancedSecurity(const API::Navigation& navigation)
+{
+    return enabledSitesMap().contains(RegistrableDomain { navigation.currentRequest().url() });
+}
+
+static void trackSiteSeenOutsideEnhancedSecurity(const API::Navigation& navigation)
+{
+    enabledSitesMap().remove(RegistrableDomain { navigation.currentRequest().url() });
+}
+
+static void updateEnhancedSecurityDomains(HashSet<RegistrableDomain>&& domains)
+{
+    for (const auto& domain : domains)
+        enabledSitesMap().add(domain, EnhancedSecurityReason::InsecureLoad);
+}
+
+void EnhancedSecurityTracking::initializeWithWebsiteDataStore(WebsiteDataStore& websiteDataStore)
+{
+    websiteDataStore.fetchEnhancedSecurityOnlyDomains([](HashSet<RegistrableDomain>&& domains) {
+        updateEnhancedSecurityDomains(WTFMove(domains));
+    });
+}
+
 void EnhancedSecurityTracking::initializeFrom(const EnhancedSecurityTracking& other)
 {
     m_activeState = other.m_activeState;
@@ -101,20 +132,35 @@ void EnhancedSecurityTracking::enableFor(EnhancedSecurityReason reason, const AP
     m_activeState = ActivationState::Active;
     m_activeReason = reason;
     m_initialProtectedDomain = RegistrableDomain(navigation.currentRequest().url());
+
+    enabledSitesMap().set(m_initialProtectedDomain, m_activeReason);
 }
 
 void EnhancedSecurityTracking::trackChangingSiteNavigation()
 {
-    if (enhancedSecurityReason() == EnhancedSecurityReason::InsecureProvisional)
+    if (enhancedSecurityReason() == EnhancedSecurityReason::InsecureProvisional) {
         m_activeReason = EnhancedSecurityReason::InsecureLoad;
+
+        if (auto it = enabledSitesMap().find(m_initialProtectedDomain); it != enabledSitesMap().end()) {
+            if (it->value == EnhancedSecurityReason::InsecureProvisional)
+                it->value = EnhancedSecurityReason::InsecureLoad;
+        }
+    }
 }
 
 void EnhancedSecurityTracking::trackSameSiteNavigation(const API::Navigation& navigation)
 {
     bool isHTTPS = navigation.currentRequest().url().protocolIs("https"_s);
 
-    if (enhancedSecurityReason() == EnhancedSecurityReason::InsecureProvisional && isHTTPS)
+    if (enhancedSecurityReason() == EnhancedSecurityReason::InsecureProvisional && isHTTPS) {
         reset();
+
+        RegistrableDomain domain { navigation.currentRequest().url() };
+        if (auto it = enabledSitesMap().find(domain); it != enabledSitesMap().end()) {
+            if (it->value == EnhancedSecurityReason::InsecureProvisional)
+                enabledSitesMap().remove(it);
+        }
+    }
 }
 
 bool EnhancedSecurityTracking::enableIfRequired(const API::Navigation& navigation)
@@ -167,11 +213,30 @@ void EnhancedSecurityTracking::trackNavigation(const API::Navigation& navigation
             trackSameSiteNavigation(navigation);
     }
 
-    if (m_activeState == ActivationState::None)
+    if (m_activeState == ActivationState::None) {
+        trackSiteSeenOutsideEnhancedSecurity(navigation);
         return;
+    }
 
-    if (m_activeState == ActivationState::Dormant)
+    if (didSitePreviouslyUseEnhancedSecurity(navigation)) {
+        if (m_activeState == ActivationState::Dormant)
+            makeActive();
+
+        ASSERT(m_activeState == ActivationState::Active);
+        return;
+    }
+
+    bool doesSiteHaveStorage = navigation.hasStorageForCurrentSite();
+
+    if (m_activeState == ActivationState::Dormant && !doesSiteHaveStorage)
         makeActive();
+
+    if (m_activeState == ActivationState::Active) {
+        if (doesSiteHaveStorage)
+            makeDormant();
+        else
+            enabledSitesMap().set(RegistrableDomain { navigation.currentRequest().url() }, m_activeReason);
+    }
 }
 
 } // namespace WebKit

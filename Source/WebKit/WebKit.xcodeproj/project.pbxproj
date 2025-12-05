@@ -1342,6 +1342,8 @@
 		561A54532B61E49E00073A72 /* CoreIPCSecCertificate.h in Headers */ = {isa = PBXBuildFile; fileRef = 561A54512B61E49E00073A72 /* CoreIPCSecCertificate.h */; };
 		561A54612B6438C000073A72 /* CoreIPCSecKeychainItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 561A54602B6438C000073A72 /* CoreIPCSecKeychainItem.h */; };
 		562674F52B69B4C8008BB425 /* CoreIPCSecTrust.h in Headers */ = {isa = PBXBuildFile; fileRef = 562674F32B69B4C7008BB425 /* CoreIPCSecTrust.h */; };
+		562844102ED9E5DD0080DD29 /* EnhancedSecuritySitesHolder.h in Headers */ = {isa = PBXBuildFile; fileRef = 5628440E2ED9E5440080DD29 /* EnhancedSecuritySitesHolder.h */; };
+		562844112ED9E5E30080DD29 /* EnhancedSecuritySitesPersistence.h in Headers */ = {isa = PBXBuildFile; fileRef = 5628440C2ED9E50D0080DD29 /* EnhancedSecuritySitesPersistence.h */; };
 		564599972B71C3B700BC59E6 /* CoreIPCPresentationIntent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 564599952B71BBC300BC59E6 /* CoreIPCPresentationIntent.mm */; };
 		564599992B71C3D100BC59E6 /* CoreIPCPresentationIntent.h in Headers */ = {isa = PBXBuildFile; fileRef = 564599942B71BBB200BC59E6 /* CoreIPCPresentationIntent.h */; };
 		56487A242E951686009CB259 /* EnhancedSecurity.h in Headers */ = {isa = PBXBuildFile; fileRef = 56487A232E951667009CB259 /* EnhancedSecurity.h */; };
@@ -6221,6 +6223,10 @@
 		561A54602B6438C000073A72 /* CoreIPCSecKeychainItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreIPCSecKeychainItem.h; sourceTree = "<group>"; };
 		562674F32B69B4C7008BB425 /* CoreIPCSecTrust.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreIPCSecTrust.h; sourceTree = "<group>"; };
 		562674F42B69B4C8008BB425 /* CoreIPCSecTrust.serialization.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CoreIPCSecTrust.serialization.in; sourceTree = "<group>"; };
+		5628440C2ED9E50D0080DD29 /* EnhancedSecuritySitesPersistence.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnhancedSecuritySitesPersistence.h; sourceTree = "<group>"; };
+		5628440D2ED9E5250080DD29 /* EnhancedSecuritySitesPersistence.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EnhancedSecuritySitesPersistence.cpp; sourceTree = "<group>"; };
+		5628440E2ED9E5440080DD29 /* EnhancedSecuritySitesHolder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnhancedSecuritySitesHolder.h; sourceTree = "<group>"; };
+		5628440F2ED9E5580080DD29 /* EnhancedSecuritySitesHolder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = EnhancedSecuritySitesHolder.cpp; sourceTree = "<group>"; };
 		564599932B71BBA000BC59E6 /* CoreIPCPresentationIntent.serialization.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = CoreIPCPresentationIntent.serialization.in; sourceTree = "<group>"; };
 		564599942B71BBB200BC59E6 /* CoreIPCPresentationIntent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoreIPCPresentationIntent.h; sourceTree = "<group>"; };
 		564599952B71BBC300BC59E6 /* CoreIPCPresentationIntent.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CoreIPCPresentationIntent.mm; sourceTree = "<group>"; };
@@ -9865,6 +9871,10 @@
 			isa = PBXGroup;
 			children = (
 				1A4832C01A965A33008B4DFE /* Cocoa */,
+				5628440F2ED9E5580080DD29 /* EnhancedSecuritySitesHolder.cpp */,
+				5628440E2ED9E5440080DD29 /* EnhancedSecuritySitesHolder.h */,
+				5628440D2ED9E5250080DD29 /* EnhancedSecuritySitesPersistence.cpp */,
+				5628440C2ED9E50D0080DD29 /* EnhancedSecuritySitesPersistence.h */,
 				46B0524522668D2400265B97 /* WebDeviceOrientationAndMotionAccessController.cpp */,
 				46B0524422668D2300265B97 /* WebDeviceOrientationAndMotionAccessController.h */,
 				1A4832D81A9D1FD2008B4DFE /* WebsiteDataRecord.cpp */,
@@ -17802,6 +17812,8 @@
 				BC032DA810F437D10058C15A /* Encoder.h in Headers */,
 				CDCDC99D248FE8DA00A69522 /* EndowmentStateTracker.h in Headers */,
 				56487A242E951686009CB259 /* EnhancedSecurity.h in Headers */,
+				562844102ED9E5DD0080DD29 /* EnhancedSecuritySitesHolder.h in Headers */,
+				562844112ED9E5E30080DD29 /* EnhancedSecuritySitesPersistence.h in Headers */,
 				56487A8D2EAFACEB009CB259 /* EnhancedSecurityTracking.h in Headers */,
 				DD4DB788280F9471001700D4 /* EnterFullscreen.js in Headers */,
 				51B15A8513843A3900321AD8 /* EnvironmentUtilities.h in Headers */,

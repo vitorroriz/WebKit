@@ -3534,6 +3534,8 @@ private:
     Expected<DataStoreUpdateResult, WebCore::ResourceError> updateDataStoreForWebArchiveLoad(WebFrameProxy&, WebCore::PolicyAction, WebCore::NavigationType, API::Navigation&);
 #endif
 
+    void beginSiteHasStorageCheck(const URL&, API::Navigation&, WebFramePolicyListenerProxy&);
+
     const UniqueRef<Internals> m_internals;
     Identifier m_identifier;
     WebCore::PageIdentifier m_webPageID;
