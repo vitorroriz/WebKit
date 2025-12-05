@@ -75,6 +75,7 @@ public:
     void animationsWereRemovedFromNode(RemoteLayerTreeNode&) override;
     void updateTimelineRegistration(WebCore::ProcessIdentifier, const HashSet<Ref<WebCore::AcceleratedTimeline>>&, MonotonicTime) override;
     RefPtr<const RemoteAnimationTimeline> timeline(const TimelineID&) const override;
+    HashSet<Ref<RemoteProgressBasedTimeline>> timelinesForScrollingNodeIDForTesting(WebCore::ScrollingNodeID) const override;
     void progressBasedTimelinesWereUpdatedForNode(const WebCore::ScrollingTreeScrollingNode&) override;
     void updateAnimations();
 #endif

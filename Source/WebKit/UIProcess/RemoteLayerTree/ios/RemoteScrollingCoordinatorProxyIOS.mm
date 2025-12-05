@@ -703,6 +703,11 @@ RefPtr<const RemoteAnimationTimeline> RemoteScrollingCoordinatorProxyIOS::timeli
     return scrollingTree().timeline(timelineID);
 }
 
+HashSet<Ref<RemoteProgressBasedTimeline>> RemoteScrollingCoordinatorProxyIOS::timelinesForScrollingNodeIDForTesting(WebCore::ScrollingNodeID scrollingNodeID) const
+{
+    return scrollingTree().timelinesForScrollingNodeIDForTesting(scrollingNodeID);
+}
+
 void RemoteScrollingCoordinatorProxyIOS::updateAnimations()
 {
     // FIXME: Rather than using 'now' at the point this is called, we
