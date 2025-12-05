@@ -256,3 +256,10 @@ selectors = [
     { name = "buildMenuOfType:", class = "AVLegibleMediaOptionsMenuController" },
 ]
 requires = ["HAVE_AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER"]
+
+[[temporary-usage]]
+request = "rdar://165789536"
+cleanup = "rdar://165842824"
+selectors = [
+    { name = "requestProofreadingReviewOfString:range:language:options:completionHandler:", class = "UITextChecker" },
+]

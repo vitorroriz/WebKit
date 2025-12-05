@@ -33,6 +33,7 @@
 #import <pal/spi/cocoa/FoundationSPI.h>
 #import <pal/spi/mac/NSSpellCheckerSPI.h>
 #import <wtf/CheckedArithmetic.h>
+#import <wtf/CrossThreadCopier.h>
 #import <wtf/NeverDestroyed.h>
 #import <wtf/RetainPtr.h>
 #import <wtf/cocoa/VectorCocoa.h>
@@ -583,9 +584,9 @@ void TextChecker::requestExtendedCheckingOfString(Ref<TextCheckerCompletion>&& t
 {
     RetainPtr textString = textCheckerCompletion->textCheckingRequestData().text().createNSString();
     NSRange range = NSMakeRange(0, textCheckerCompletion->textCheckingRequestData().text().length());
-    [[NSSpellChecker sharedSpellChecker] requestGrammarCheckingOfString:textString.get() range:range language:nil options:@{ NSTextCheckingInsertionPointKey : @(insertionPoint), @"ProofreadingReview": @1 } completionHandler:makeBlockPtr([textCompletion = WTFMove(textCheckerCompletion)](NSInteger sequenceNumber, NSArray<NSTextCheckingResult *> *incomingResults) {
+    [[NSSpellChecker sharedSpellChecker] requestGrammarCheckingOfString:textString.get() range:range language:nil options:@{ NSTextCheckingInsertionPointKey : @(insertionPoint), @"ProofreadingReview": @1 } completionHandler:makeBlockPtr([textCompletion = WTFMove(textCheckerCompletion)](NSInteger sequenceNumber, NSArray<NSTextCheckingResult *> *incomingResults) mutable {
         auto results = convertExtendedCheckingResults(incomingResults);
-        callOnMainRunLoop([textCompletion, results] {
+        callOnMainRunLoop([textCompletion = WTFMove(textCompletion), results = crossThreadCopy(WTFMove(results))] {
             textCompletion->didFinishCheckingText(results);
         });
     }).get()];

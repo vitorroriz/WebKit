@@ -517,6 +517,10 @@ typedef NS_ENUM(NSUInteger, _UIClickInteractionShouldBeginResult) {
 
 // Start of UIKit IPI
 
+@interface UITextChecker (TestingSupport2)
+- (void)requestProofreadingReviewOfString:(NSString *)stringToCheck range:(NSRange)range language:(NSString *)language options:(NSDictionary<NSString *, id> *)options completionHandler:(void (^)(NSArray<NSTextCheckingResult *> *results))completionHandler;
+@end
+
 @class UITextInputArrowKeyHistory;
 
 @interface UITextAutofillSuggestion ()

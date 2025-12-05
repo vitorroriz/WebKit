@@ -308,8 +308,7 @@ static const char *stringForCorrectionResponse(NSCorrectionResponse correctionRe
 
 - (NSInteger)requestGrammarCheckingOfString:(NSString *)stringToCheck range:(NSRange)range language:(NSString *)language options:(NSDictionary<NSString *, id> *)options completionHandler:(void (^)(NSInteger sequenceNumber, NSArray<NSTextCheckingResult *> *results))completionHandler
 {
-    RetainPtr overrideResult = retainPtr([_results objectForKey:stringToCheck]);
-    if (overrideResult) {
+    if (RetainPtr overrideResult = [_results objectForKey:stringToCheck]) {
         completionHandler(0, overrideResult.get());
         return 0; // Not currently used, so return value doesn't matter. Should be the sequence number.
     }
@@ -319,6 +318,13 @@ static const char *stringForCorrectionResponse(NSCorrectionResponse correctionRe
 #endif // PLATFORM(MAC)
 
 #if PLATFORM(IOS_FAMILY) && ENABLE(POST_EDITING_GRAMMAR_CHECKING)
+
+- (void)requestProofreadingReviewOfString:(NSString *)stringToCheck range:(NSRange)range language:(NSString *)language options:(NSDictionary<NSString *, id> *)options completionHandler:(void (^)(NSArray<NSTextCheckingResult *> *results))completionHandler
+{
+    if (RetainPtr overrideResult = [_results objectForKey:stringToCheck])
+        completionHandler(overrideResult.get());
+    return [super requestProofreadingReviewOfString:stringToCheck range:range language:language options:options completionHandler:completionHandler];
+}
 
 static NSDictionary *swizzledGrammarDetailsForString(id, SEL, NSString *stringToCheck, NSRange range, NSString *language)
 {
