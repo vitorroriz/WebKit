@@ -90,6 +90,10 @@ using namespace WTF;
 - (void)legibleMenuController:(AVLegibleMediaOptionsMenuController *)menuController didRequestCaptionPreviewForProfileID:(NSString *)profileID
 {
     [self setPreviewProfileID:profileID];
+    [self rebuildMenu];
+
+    if (auto delegate = self.delegate; delegate && [delegate respondsToSelector:@selector(captionStyleMenu:didSelectProfile:)])
+        [delegate captionStyleMenu:self.menu didSelectProfile:profileID];
 }
 
 - (void)legibleMenuControllerDidRequestStoppingSubtitleCaptionPreview:(AVLegibleMediaOptionsMenuController *)menuController

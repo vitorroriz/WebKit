@@ -41,6 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol WKCaptionStyleMenuControllerDelegate <NSObject>
 - (void)captionStyleMenuWillOpen:(PlatformMenu *)menu;
 - (void)captionStyleMenuDidClose:(PlatformMenu *)menu;
+@optional
+- (void)captionStyleMenu:(PlatformMenu *)menu didSelectProfile:(NSString *)profileID;
 @end
 
 WK_EXTERN
