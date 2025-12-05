@@ -393,8 +393,10 @@ void OpenXRCoordinator::requestHitTestSource(WebPageProxy& page, const PlatformX
 
             auto copiedOptions = makeUniqueRef<PlatformXR::HitTestOptions>(options);
             active.renderQueue->dispatch([this, renderState = active.renderState, options = WTFMove(copiedOptions), completionHandler = WTFMove(completionHandler)]() mutable {
+#if ENABLE(WEBXR_HIT_TEST)
                 if (!renderState->hitTestManager)
                     renderState->hitTestManager = makeUnique<OpenXRHitTestManager>(m_session);
+#endif
                 auto addResult = renderState->hitTestSources.add(renderState->nextHitTestSource, WTFMove(options));
                 ASSERT_UNUSED(addResult.isNewEntry, addResult);
                 callOnMainRunLoop([source = renderState->nextHitTestSource, completionHandler = WTFMove(completionHandler)] mutable {
@@ -450,8 +452,10 @@ void OpenXRCoordinator::requestTransientInputHitTestSource(WebPageProxy& page, c
 
             auto copiedOptions = makeUniqueRef<PlatformXR::TransientInputHitTestOptions>(options);
             active.renderQueue->dispatch([this, renderState = active.renderState, options = WTFMove(copiedOptions), completionHandler = WTFMove(completionHandler)]() mutable {
+#if ENABLE(WEBXR_HIT_TEST)
                 if (!renderState->hitTestManager)
                     renderState->hitTestManager = makeUnique<OpenXRHitTestManager>(m_session);
+#endif
                 auto addResult = renderState->transientInputHitTestSources.add(renderState->nextTransientInputHitTestSource, WTFMove(options));
                 ASSERT_UNUSED(addResult.isNewEntry, addResult);
                 callOnMainRunLoop([source = renderState->nextTransientInputHitTestSource, completionHandler = WTFMove(completionHandler)] mutable {
