@@ -125,6 +125,7 @@ static EnhancedSecurityReason reasonForEnhancedSecurity(EnhancedSecurity state)
     }
 
     ASSERT_NOT_REACHED();
+    return EnhancedSecurityReason::None;
 }
 
 void EnhancedSecurityTracking::enableFor(EnhancedSecurityReason reason, const API::Navigation& navigation)
