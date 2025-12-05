@@ -273,6 +273,11 @@ RetainPtr<NSMutableAttributedString> AXCoreObject::createAttributedString(String
 
         if (ancestor->role() == AccessibilityRole::Blockquote)
             ++blockquoteLevel;
+
+        if (ancestor->isExposableTable()) {
+            if (id wrapper = ancestor->wrapper())
+                [string.get() addAttribute:NSAccessibilityTableAttribute value:(__bridge id)adoptCF(NSAccessibilityCreateAXUIElementRef(wrapper)).get() range:range];
+        }
     }
     if (blockquoteLevel)
         [string.get() addAttribute:NSAccessibilityBlockQuoteLevelAttribute value:@(blockquoteLevel) range:range];
