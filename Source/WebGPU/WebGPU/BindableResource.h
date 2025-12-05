@@ -138,4 +138,13 @@ struct DrawIndexCacheContainerValue {
 using DrawIndexCacheContainer = HashMap<GenericHashKey<DrawIndexCacheContainerKey>, uint32_t>;
 using DrawIndexCacheContainerIterator = DrawIndexCacheContainer::const_iterator;
 
+using TrackedResourceContainer = HashSet<uint64_t, DefaultHash<uint64_t>, WTF::UnsignedWithZeroKeyHashTraits<uint64_t>>;
+struct TrackedResource {
+    mutable TrackedResourceContainer m_commandEncoders;
+    void removeEncoder(uint64_t identifier) const
+    {
+        m_commandEncoders.remove(identifier);
+    }
+};
+
 } // namespace WebGPU

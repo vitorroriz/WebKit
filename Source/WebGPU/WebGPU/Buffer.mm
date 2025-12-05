@@ -225,7 +225,7 @@ void Buffer::decrementBufferMapCount()
 void Buffer::setCommandEncoder(CommandEncoder& commandEncoder, bool mayModifyBuffer) const
 {
     UNUSED_PARAM(mayModifyBuffer);
-    CommandEncoder::trackEncoder(commandEncoder, m_commandEncoders);
+    commandEncoder.trackEncoderForBuffer(*this, m_commandEncoders);
 #if !CPU(X86_64)
     if (m_device->isShaderValidationEnabled())
 #endif
@@ -247,12 +247,7 @@ void Buffer::destroy()
     }
 
     setState(State::Destroyed);
-    for (auto commandEncoder : m_commandEncoders) {
-        if (RefPtr ptr = m_device->commandEncoderFromIdentifier(commandEncoder))
-            ptr->makeSubmitInvalid();
-    }
-
-    m_commandEncoders.clear();
+    m_device->makeSubmitInvalidClearingEncoders(m_commandEncoders);
     m_device->removeBufferFromCache(m_buffer.gpuAddress);
     m_buffer = protectedDevice()->placeholderBuffer();
 }
