@@ -73,19 +73,19 @@ static inline CheckedPtr<RenderBlockFlow> firstFormattedLineRoot(const RenderBlo
         CheckedPtr blockContainer = dynamicDowncast<RenderBlockFlow>(*child);
         if (!blockContainer || blockContainer->createsNewFormattingContext() || blockContainer->isFirstLetter())
             continue;
-        if (blockContainer->hasLines())
+        if (blockContainer->hasContentfulInlineOrBlockLine())
             return blockContainer;
         if (CheckedPtr descendantRoot = firstFormattedLineRoot(*blockContainer))
             return descendantRoot;
         if (!shouldIgnoreAsFirstLastFormattedLineContainer(*blockContainer))
-            return nullptr;
+            return { };
     }
-    return nullptr;
+    return { };
 }
 
 static CheckedPtr<RenderBlockFlow> lastFormattedLineRoot(const RenderBlockFlow& enclosingBlockContainer)
 {
-    if (enclosingBlockContainer.hasLines()) {
+    if (enclosingBlockContainer.hasContentfulInlineOrBlockLine()) {
         // With blocks-in-inline, the last formatted line may be a block sitting on the last line.
         auto firstBoxOnLastFormattedLineWithContent = [&]() -> InlineIterator::LeafBoxIterator {
             for (auto lineBox = InlineIterator::lastLineBoxFor(enclosingBlockContainer); lineBox; --lineBox) {
@@ -108,7 +108,7 @@ static CheckedPtr<RenderBlockFlow> lastFormattedLineRoot(const RenderBlockFlow& 
         CheckedPtr blockContainer = dynamicDowncast<RenderBlockFlow>(*child);
         if (!blockContainer || blockContainer->createsNewFormattingContext() || blockContainer->isFirstLetter())
             continue;
-        if (blockContainer->hasLines()) {
+        if (blockContainer->hasContentfulInlineOrBlockLine()) {
             if (CheckedPtr candidate = lastFormattedLineRoot(*blockContainer))
                 return candidate;
             return blockContainer;
@@ -116,9 +116,9 @@ static CheckedPtr<RenderBlockFlow> lastFormattedLineRoot(const RenderBlockFlow& 
         if (CheckedPtr descendantRoot = lastFormattedLineRoot(*blockContainer))
             return descendantRoot;
         if (!shouldIgnoreAsFirstLastFormattedLineContainer(*blockContainer))
-            return nullptr;
+            return { };
     }
-    return nullptr;
+    return { };
 }
 
 TextBoxTrimmer::TextBoxTrimmer(const RenderBlockFlow& blockContainer)

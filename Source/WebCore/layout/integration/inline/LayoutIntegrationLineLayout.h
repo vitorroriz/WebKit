@@ -110,6 +110,7 @@ public:
 
     bool isPaginated() const;
     size_t lineCount() const;
+    bool hasContentfulInlineOrBlockLine() const;
     bool isSelfCollapsingContent() const;
     bool hasInkOverflow() const;
     LayoutUnit firstLineBaseline() const;

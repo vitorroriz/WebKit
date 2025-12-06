@@ -356,6 +356,7 @@ public:
     void setChildrenInline(bool) final;
 
     bool hasLines() const;
+    bool hasContentfulInlineOrBlockLine() const;
     bool hasBlocksInInlineLayout() const;
 
     enum InvalidationReason : uint8_t {

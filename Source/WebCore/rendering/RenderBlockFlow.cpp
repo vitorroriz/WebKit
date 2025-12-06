@@ -3850,6 +3850,11 @@ bool RenderBlockFlow::hasLines() const
     return childrenInline() ? lineCount() : false;
 }
 
+bool RenderBlockFlow::hasContentfulInlineOrBlockLine() const
+{
+    return inlineLayout() ? inlineLayout()->hasContentfulInlineOrBlockLine() : hasLines();
+}
+
 bool RenderBlockFlow::hasBlocksInInlineLayout() const
 {
     auto* inlineLayout = this->inlineLayout();

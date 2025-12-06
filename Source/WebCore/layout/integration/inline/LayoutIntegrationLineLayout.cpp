@@ -847,6 +847,11 @@ bool LineLayout::isSelfCollapsingContent() const
     return true;
 }
 
+bool LineLayout::hasContentfulInlineOrBlockLine() const
+{
+    return m_inlineContent && m_inlineContent->hasContentfulInFlowBox();
+}
+
 size_t LineLayout::lineCount() const
 {
     if (!m_inlineContent)
