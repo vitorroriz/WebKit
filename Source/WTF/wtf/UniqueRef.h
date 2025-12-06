@@ -77,13 +77,13 @@ public:
         ASSERT(m_ref);
     }
 
-    T* ptr() const RETURNS_NONNULL { ASSERT(m_ref); return m_ref.get(); }
-    T& get() const { ASSERT(m_ref); return *m_ref; }
+    T* ptr() const LIFETIME_BOUND RETURNS_NONNULL { ASSERT(m_ref); return m_ref.get(); }
+    T& get() const LIFETIME_BOUND { ASSERT(m_ref); return *m_ref; }
 
-    T* operator&() const { ASSERT(m_ref); return m_ref.get(); }
-    T* operator->() const { ASSERT(m_ref); return m_ref.get(); }
+    T* operator&() const LIFETIME_BOUND { ASSERT(m_ref); return m_ref.get(); }
+    T* operator->() const LIFETIME_BOUND { ASSERT(m_ref); return m_ref.get(); }
 
-    operator T&() const { ASSERT(m_ref); return *m_ref; }
+    operator T&() const LIFETIME_BOUND { ASSERT(m_ref); return *m_ref; }
 
     std::unique_ptr<T> moveToUniquePtr() { return WTFMove(m_ref); }
 
@@ -108,7 +108,7 @@ template<typename T>
 struct GetPtrHelper<UniqueRef<T>> {
     using PtrType = T*;
     using UnderlyingType = T;
-    static T* getPtr(const UniqueRef<T>& p) { return const_cast<T*>(p.ptr()); }
+    static T* getPtr(const UniqueRef<T>& p LIFETIME_BOUND) { return const_cast<T*>(p.ptr()); }
 };
 
 template<typename T>
