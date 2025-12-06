@@ -36,6 +36,7 @@
     RetainPtr<_WKJSHandle> _targetNode;
     HashMap<RetainPtr<NSString>, HashMap<RetainPtr<_WKJSHandle>, RetainPtr<NSString>>> _clientNodeAttributes;
     RetainPtr<NSDictionary<NSString *, NSString *>> _replacementStrings;
+    RetainPtr<NSArray<_WKJSHandle *>> _nodesToSkip;
 }
 
 - (instancetype)init
@@ -74,6 +75,16 @@
 - (void)setTargetNode:(_WKJSHandle *)targetNode
 {
     _targetNode = adoptNS([targetNode copy]);
+}
+
+- (NSArray<_WKJSHandle *> *)nodesToSkip
+{
+    return _nodesToSkip.get();
+}
+
+- (void)setNodesToSkip:(NSArray<_WKJSHandle *> *)nodesToSkip
+{
+    _nodesToSkip = adoptNS([nodesToSkip copy]);
 }
 
 - (void)addClientAttribute:(NSString *)attributeName value:(NSString *)attributeValue forNode:(_WKJSHandle *)node

@@ -85,6 +85,7 @@ struct Request {
     HashMap<String, HashMap<JSHandleIdentifier, String>> clientNodeAttributes;
     std::optional<FloatRect> collectionRectInRootView;
     std::optional<JSHandleIdentifier> targetNodeHandleIdentifier;
+    Vector<JSHandleIdentifier> handleIdentifiersOfNodesToSkip;
     bool mergeParagraphs { false };
     bool skipNearlyTransparentContent { false };
     NodeIdentifierInclusion nodeIdentifierInclusion { NodeIdentifierInclusion::None };

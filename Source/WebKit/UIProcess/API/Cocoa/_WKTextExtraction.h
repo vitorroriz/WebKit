@@ -123,6 +123,12 @@ WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
 @property (nonatomic, copy, nullable) _WKJSHandle *targetNode;
 
 /*!
+ If specified, these DOM nodes and their subtrees will be skipped during extraction.
+ The default value is an empty array.
+ */
+@property (nonatomic, copy) NSArray<_WKJSHandle *> *nodesToSkip;
+
+/*!
  Client-specified attributes and values to add when extracting DOM nodes.
  Will appear as "attribute=value" in text extraction output.
  */

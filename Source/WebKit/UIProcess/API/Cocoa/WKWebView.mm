@@ -7015,6 +7015,18 @@ static std::optional<WebCore::JSHandleIdentifier> mainFrameJSHandleIdentifier(_W
     return info.identifier;
 }
 
+static Vector<WebCore::JSHandleIdentifier> extractHandleIdentifiersOfNodesToSkip(_WKTextExtractionConfiguration *configuration)
+{
+    Vector<WebCore::JSHandleIdentifier> nodes;
+    RetainPtr nodesToSkip = [configuration nodesToSkip];
+    nodes.reserveInitialCapacity([nodesToSkip count]);
+    for (_WKJSHandle *handle in nodesToSkip.get()) {
+        if (auto identifier = mainFrameJSHandleIdentifier(handle))
+            nodes.append(WTFMove(*identifier));
+    }
+    return nodes;
+}
+
 static HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> extractClientNodeAttributes(_WKTextExtractionConfiguration *configuration)
 {
     __block HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> result;
@@ -7070,6 +7082,7 @@ static HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> extractClie
         .clientNodeAttributes = extractClientNodeAttributes(configuration),
         .collectionRectInRootView = WTFMove(rectInRootView),
         .targetNodeHandleIdentifier = mainFrameJSHandleIdentifier(configuration.targetNode),
+        .handleIdentifiersOfNodesToSkip = extractHandleIdentifiersOfNodesToSkip(configuration),
         .mergeParagraphs = mergeParagraphs,
         .skipNearlyTransparentContent = skipNearlyTransparentContent,
         .nodeIdentifierInclusion = nodeIdentifierInclusion,

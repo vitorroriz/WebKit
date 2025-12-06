@@ -6751,6 +6751,7 @@ header: <WebCore/TextExtractionTypes.h>
     HashMap<String, HashMap<WebCore::JSHandleIdentifier, String>> clientNodeAttributes;
     std::optional<WebCore::FloatRect> collectionRectInRootView;
     std::optional<WebCore::JSHandleIdentifier> targetNodeHandleIdentifier;
+    Vector<WebCore::JSHandleIdentifier> handleIdentifiersOfNodesToSkip;
     bool mergeParagraphs;
     bool skipNearlyTransparentContent;
     WebCore::TextExtraction::NodeIdentifierInclusion nodeIdentifierInclusion;
