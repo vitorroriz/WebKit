@@ -2663,7 +2663,8 @@ webkit.org/b/235885 webrtc/video-maxFramerate.html [ Pass Timeout ]
 webkit.org/b/235885 webrtc/video-mute.html [ Skip ]
 webkit.org/b/235885 webrtc/video-mute-vp8.html [ Skip ]
 webkit.org/b/235885 webrtc/video-replace-muted-track.html [ Skip ]
-webkit.org/b/235885 webrtc/video-stats.html [ Failure ]
+# webkit.org/b/235885 webrtc/video-stats.html [ Failure ]
+webkit.org/b/303673 webrtc/video-stats.html [ Timeout ]
 webkit.org/b/235885 webrtc/video-unmute.html [ Pass Timeout ]
 http/tests/webrtc/muted-video-mediastream-invisible-autoplay.html [ Failure Timeout Pass ]
 
@@ -4827,6 +4828,10 @@ fullscreen/fullscreen-grid-item-container-type-crash.html [ Skip ]
 
 webkit.org/b/303539 imported/w3c/web-platform-tests/service-workers/service-worker/multipart-image.https.html [ Crash Failure ]
 webkit.org/b/303547 fullscreen/full-screen-keyboard-lock-option-enabled.html [ Pass Timeout ]
+
+# Flaky soup_session_get_feature crash
+webkit.org/b/303677 imported/w3c/web-platform-tests/workers/constructors/SharedWorker/empty-name.html [ Pass Crash ]
+webkit.org/b/303677 imported/w3c/web-platform-tests/fetch/data-urls/base64.any.html [ Pass Crash ]
 
 
 # End: Common failures between GTK and WPE.
