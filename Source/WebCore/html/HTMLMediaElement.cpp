@@ -1354,7 +1354,7 @@ void HTMLMediaElement::checkPlaybackTargetCompatibility()
         return;
 
     Ref player = *m_player;
-    if (player->canPlayToWirelessPlaybackTarget())
+    if (player->supportedPlaybackTargetTypes().contains(protectedMediaSession()->playbackTargetType()))
         return;
 
     auto tryToSwitchEngines = !m_remotePlaybackConfiguration && m_loadState == LoadingFromSourceElement;
