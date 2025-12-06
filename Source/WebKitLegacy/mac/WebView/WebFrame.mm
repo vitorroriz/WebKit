@@ -2567,7 +2567,7 @@ static NSURL *createUniqueWebDataURL()
     auto coreFrame = _private->coreFrame;
     if (!coreFrame)
         return nil;
-    return kit(dynamicDowncast<WebCore::LocalFrame>(coreFrame->tree().findByUniqueName(name, *coreFrame)));
+    return kit(dynamicDowncast<WebCore::LocalFrame>(coreFrame->tree().findByUniqueName(name, *coreFrame).get()));
 }
 
 - (WebFrame *)parentFrame

@@ -1738,10 +1738,10 @@ void Internals::setCanShowPlaceholder(Element& element, bool canShowPlaceholder)
         textFormControlElement->setCanShowPlaceholder(canShowPlaceholder);
 }
 
-Element* Internals::insertTextPlaceholder(int width, int height)
+RefPtr<Element> Internals::insertTextPlaceholder(int width, int height)
 {
     RefPtr localFrame = frame();
-    return localFrame ? localFrame->editor().insertTextPlaceholder(IntSize { width, height }).unsafeGet() : nullptr;
+    return localFrame ? localFrame->editor().insertTextPlaceholder(IntSize { width, height }) : nullptr;
 }
 
 void Internals::removeTextPlaceholder(Element& element)

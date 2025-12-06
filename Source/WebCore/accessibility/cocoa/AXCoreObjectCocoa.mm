@@ -454,7 +454,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
         // descendants. These anonymous renderers are the only accessible objects
         // containing the operator.
         role = AccessibilityRole::StaticText;
-    } else if (role == AccessibilityRole::Canvas && firstUnignoredChild() && !containsOnlyStaticText()) {
+    } else if (role == AccessibilityRole::Canvas && hasUnignoredChild() && !containsOnlyStaticText()) {
         // If this is a canvas with fallback content (one or more non-text thing), re-map to group.
         role = AccessibilityRole::Group;
     } else {
@@ -487,7 +487,7 @@ bool AXCoreObject::isEmptyGroup()
         return false;
 
     return [rolePlatformString().createNSString() isEqual:NSAccessibilityGroupRole]
-        && !firstUnignoredChild()
+        && !hasUnignoredChild()
         && ![renderWidgetChildren(*this) count];
 }
 

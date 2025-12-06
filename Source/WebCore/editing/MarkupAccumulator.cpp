@@ -382,7 +382,7 @@ std::pair<String, MarkupAccumulator::IsCreatedByURLReplacement> MarkupAccumulato
     return { element.resolveURLStringIfNeeded(urlString, m_resolveURLs), IsCreatedByURLReplacement::No };
 }
 
-const ShadowRoot* MarkupAccumulator::suitableShadowRoot(const Node& node)
+RefPtr<const ShadowRoot> MarkupAccumulator::suitableShadowRoot(const Node& node)
 {
     if (!shouldIncludeShadowRoots())
         return nullptr;
@@ -390,7 +390,7 @@ const ShadowRoot* MarkupAccumulator::suitableShadowRoot(const Node& node)
     RefPtr shadowRoot = dynamicDowncast<ShadowRoot>(node);
     if (!shadowRoot || !includeShadowRoot(*shadowRoot))
         return nullptr;
-    return shadowRoot.unsafeGet();
+    return shadowRoot;
 }
 
 void MarkupAccumulator::startAppendingNode(const Node& node, Namespaces* namespaces)

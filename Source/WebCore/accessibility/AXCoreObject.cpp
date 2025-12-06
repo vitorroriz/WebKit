@@ -341,21 +341,21 @@ AXCoreObject::AccessibilityChildrenVector AXCoreObject::unignoredChildren(bool u
     return unignoredChildren;
 }
 
-AXCoreObject* AXCoreObject::firstUnignoredChild()
+bool AXCoreObject::hasUnignoredChild()
 {
     const auto& children = childrenIncludingIgnored(/* updateChildrenIfNeeded */ true);
     RefPtr descendant = children.size() ? children[0].ptr() : nullptr;
     if (onlyAddsUnignoredChildren())
-        return descendant.unsafeGet();
+        return descendant;
 
     bool isExposedTable = isExposableTable();
     while (descendant && descendant != this) {
         bool childIsValid = !isExposedTable || isValidChildForTable(*descendant);
         if (childIsValid && !descendant->isIgnored())
-            return descendant.unsafeGet();
+            return true;
         descendant = descendant->nextInPreOrder(/* updateChildrenIfNeeded */ true, /* stayWithin */ this);
     }
-    return nullptr;
+    return false;
 }
 
 #endif // ENABLE(INCLUDE_IGNORED_IN_CORE_AX_TREE)
@@ -498,12 +498,12 @@ void AXCoreObject::verifyChildrenIndexInParent(const AccessibilityChildrenVector
 }
 #endif
 
-AXCoreObject* AXCoreObject::nextInPreOrder(bool updateChildrenIfNeeded, AXCoreObject* stayWithin)
+RefPtr<AXCoreObject> AXCoreObject::nextInPreOrder(bool updateChildrenIfNeeded, AXCoreObject* stayWithin)
 {
     return nextInPreOrder(updateChildrenIfNeeded, stayWithin, false);
 }
 
-AXCoreObject* AXCoreObject::nextInPreOrder(bool updateChildrenIfNeeded , AXCoreObject* stayWithin, bool includeCrossFrame)
+RefPtr<AXCoreObject> AXCoreObject::nextInPreOrder(bool updateChildrenIfNeeded , AXCoreObject* stayWithin, bool includeCrossFrame)
 {
     const auto& children = includeCrossFrame ? crossFrameChildrenIncludingIgnored(updateChildrenIfNeeded) : childrenIncludingIgnored(updateChildrenIfNeeded);
 
@@ -512,7 +512,7 @@ AXCoreObject* AXCoreObject::nextInPreOrder(bool updateChildrenIfNeeded , AXCoreO
         if (role != AccessibilityRole::Column && role != AccessibilityRole::TableHeaderContainer) {
             // Table columns and header containers add cells despite not being their "true" parent (which are the rows).
             // Don't allow a pre-order traversal of these object types to return cells to avoid an infinite loop.
-            return children[0].unsafePtr();
+            return children[0].copyRef();
         }
     }
 
@@ -531,10 +531,10 @@ AXCoreObject* AXCoreObject::nextInPreOrder(bool updateChildrenIfNeeded , AXCoreO
         if (!current || stayWithin == current)
             return nullptr;
     }
-    return next.unsafeGet();
+    return next;
 }
 
-AXCoreObject* AXCoreObject::previousInPreOrder(bool updateChildrenIfNeeded, AXCoreObject* stayWithin)
+RefPtr<AXCoreObject> AXCoreObject::previousInPreOrder(bool updateChildrenIfNeeded, AXCoreObject* stayWithin)
 {
     if (stayWithin == this)
         return nullptr;
@@ -543,7 +543,7 @@ AXCoreObject* AXCoreObject::previousInPreOrder(bool updateChildrenIfNeeded, AXCo
         const auto& children = sibling->childrenIncludingIgnored(updateChildrenIfNeeded);
         if (children.size())
             return sibling->deepestLastChildIncludingIgnored(updateChildrenIfNeeded);
-        return sibling.unsafeGet();
+        return sibling;
     }
     return parentObject();
 }
@@ -636,10 +636,11 @@ AXCoreObject* AXCoreObject::nextUnignoredSibling(bool updateChildrenIfNeeded, AX
 
 AXCoreObject* AXCoreObject::nextSiblingIncludingIgnoredOrParent() const
 {
-    RefPtr parent = parentObject();
-    if (RefPtr nextSibling = nextSiblingIncludingIgnored(/* updateChildrenIfNeeded */ true))
-        return nextSibling.unsafeGet();
-    return parent.unsafeGet();
+    // FIXME: This is a safer cpp false positive. We should not need to ref the variable here
+    // as we merely return it right away (rdar://165602290).
+    SUPPRESS_UNCOUNTED_LOCAL if (auto* nextSibling = nextSiblingIncludingIgnored(/* updateChildrenIfNeeded */ true))
+        return nextSibling;
+    return parentObject();
 }
 
 String AXCoreObject::autoCompleteValue() const
@@ -1849,8 +1850,10 @@ void AXCoreObject::appendRadioButtonGroupMembers(AccessibilityChildrenVector& li
 AXCoreObject* AXCoreObject::parentObjectUnignored() const
 {
     if (role() == AccessibilityRole::Row) {
-        if (RefPtr table = exposedTableAncestor())
-            return table.unsafeGet();
+        // FIXME: This is a safer cpp false positive. We should not need to ref the variable here
+        // as we merely return it right away (rdar://165602290).
+        SUPPRESS_UNCOUNTED_LOCAL if (auto* table = exposedTableAncestor())
+            return table;
     }
 
     return Accessibility::findAncestor<AXCoreObject>(*this, false, [&] (const AXCoreObject& object) {

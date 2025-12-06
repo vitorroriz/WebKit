@@ -433,14 +433,14 @@ Style::SingleAnimationRange ViewTimeline::defaultRange() const
     return Style::SingleAnimationRange::defaultForViewTimeline();
 }
 
-Element* ViewTimeline::bindingsSource() const
+RefPtr<Element> ViewTimeline::bindingsSource() const
 {
     if (auto subject = m_subject.styleable())
         subject->element.protectedDocument()->updateStyleIfNeeded();
     return ScrollTimeline::bindingsSource();
 }
 
-Element* ViewTimeline::source() const
+RefPtr<Element> ViewTimeline::source() const
 {
     if (CheckedPtr sourceRender = sourceScrollerRenderer())
         return sourceRender->element();

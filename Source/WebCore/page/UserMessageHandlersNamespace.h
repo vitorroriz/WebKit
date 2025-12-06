@@ -52,7 +52,7 @@ public:
     virtual ~UserMessageHandlersNamespace();
 
     Vector<AtomString> supportedPropertyNames() const;
-    UserMessageHandler* namedItem(DOMWrapperWorld&, const AtomString&);
+    RefPtr<UserMessageHandler> namedItem(DOMWrapperWorld&, const AtomString&);
     bool isSupportedPropertyName(const AtomString&);
 
     // UserContentProviderInvalidationClient, FrameDestructionObserver.

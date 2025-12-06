@@ -221,7 +221,7 @@ bool AXLiveRegionManager::shouldIncludeInSnapshot(AccessibilityObject& object) c
         return true;
 
     // If an object has unignored children, there isn't a need to include it in the snapshot since the children will return YES.
-    if (object.firstUnignoredChild())
+    if (object.hasUnignoredChild())
         return false;
 
     // For leaf objects, include if they have a value (e.g., form controls).

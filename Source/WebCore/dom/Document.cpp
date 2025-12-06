@@ -2434,14 +2434,14 @@ bool Document::isBodyPotentiallyScrollable(HTMLBodyElement& body)
         && !body.computedStyle()->isOverflowVisible();
 }
 
-Element* Document::scrollingElementForAPI()
+RefPtr<Element> Document::scrollingElementForAPI()
 {
     if (inQuirksMode())
         updateLayoutIgnorePendingStylesheets();
     return scrollingElement();
 }
 
-Element* Document::scrollingElement()
+RefPtr<Element> Document::scrollingElement()
 {
     // See https://drafts.csswg.org/cssom-view/#dom-document-scrollingelement.
     // The scrollingElement attribute, on getting, must run these steps:
@@ -2450,7 +2450,7 @@ Element* Document::scrollingElement()
         // 1. If the HTML body element exists, and it is not potentially scrollable, return the
         // HTML body element and abort these steps.
         if (RefPtr firstBody = body(); firstBody && !isBodyPotentiallyScrollable(*firstBody))
-            return firstBody.unsafeGet();
+            return firstBody;
 
         // 2. Return null and abort these steps.
         return nullptr;

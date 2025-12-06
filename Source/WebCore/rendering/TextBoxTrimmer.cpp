@@ -67,15 +67,15 @@ static bool shouldIgnoreAsFirstLastFormattedLineContainer(const RenderBlockFlow&
     return false;
 }
 
-static inline RenderBlockFlow* firstFormattedLineRoot(const RenderBlockFlow& enclosingBlockContainer)
+static inline CheckedPtr<RenderBlockFlow> firstFormattedLineRoot(const RenderBlockFlow& enclosingBlockContainer)
 {
     for (auto* child = enclosingBlockContainer.firstChild(); child; child = child->nextSibling()) {
         CheckedPtr blockContainer = dynamicDowncast<RenderBlockFlow>(*child);
         if (!blockContainer || blockContainer->createsNewFormattingContext() || blockContainer->isFirstLetter())
             continue;
         if (blockContainer->hasLines())
-            return blockContainer.unsafeGet();
-        if (auto* descendantRoot = firstFormattedLineRoot(*blockContainer))
+            return blockContainer;
+        if (CheckedPtr descendantRoot = firstFormattedLineRoot(*blockContainer))
             return descendantRoot;
         if (!shouldIgnoreAsFirstLastFormattedLineContainer(*blockContainer))
             return nullptr;
@@ -83,7 +83,7 @@ static inline RenderBlockFlow* firstFormattedLineRoot(const RenderBlockFlow& enc
     return nullptr;
 }
 
-static RenderBlockFlow* lastFormattedLineRoot(const RenderBlockFlow& enclosingBlockContainer)
+static CheckedPtr<RenderBlockFlow> lastFormattedLineRoot(const RenderBlockFlow& enclosingBlockContainer)
 {
     if (enclosingBlockContainer.hasLines()) {
         // With blocks-in-inline, the last formatted line may be a block sitting on the last line.
@@ -98,7 +98,7 @@ static RenderBlockFlow* lastFormattedLineRoot(const RenderBlockFlow& enclosingBl
             ASSERT(box->renderer().settings().blocksInInlineLayoutEnabled());
             ASSERT(is<RenderBlockFlow>(box->renderer()));
             if (auto* blockFlow = dynamicDowncast<RenderBlockFlow>(box->renderer())) {
-                if (auto* candidate = lastFormattedLineRoot(*blockFlow))
+                if (CheckedPtr candidate = lastFormattedLineRoot(*blockFlow))
                     return candidate;
             }
         }
@@ -109,11 +109,11 @@ static RenderBlockFlow* lastFormattedLineRoot(const RenderBlockFlow& enclosingBl
         if (!blockContainer || blockContainer->createsNewFormattingContext() || blockContainer->isFirstLetter())
             continue;
         if (blockContainer->hasLines()) {
-            if (auto* candidate = lastFormattedLineRoot(*blockContainer))
+            if (CheckedPtr candidate = lastFormattedLineRoot(*blockContainer))
                 return candidate;
-            return blockContainer.unsafeGet();
+            return blockContainer;
         }
-        if (auto* descendantRoot = lastFormattedLineRoot(*blockContainer))
+        if (CheckedPtr descendantRoot = lastFormattedLineRoot(*blockContainer))
             return descendantRoot;
         if (!shouldIgnoreAsFirstLastFormattedLineContainer(*blockContainer))
             return nullptr;
@@ -138,13 +138,13 @@ TextBoxTrimmer::~TextBoxTrimmer()
     adjustTextBoxTrimStatusAfterLayout();
 }
 
-RenderBlockFlow* TextBoxTrimmer::lastInlineFormattingContextRootForTrimEnd(const RenderBlockFlow& blockContainer)
+CheckedPtr<RenderBlockFlow> TextBoxTrimmer::lastInlineFormattingContextRootForTrimEnd(const RenderBlockFlow& blockContainer)
 {
     auto textBoxTrimValue = textBoxTrim(blockContainer);
     auto hasTextBoxTrimEnd = textBoxTrimValue == TextBoxTrim::TrimEnd || textBoxTrimValue == TextBoxTrim::TrimBoth;
     if (!hasTextBoxTrimEnd)
         return { };
-    auto* candidateForLastBlockContainer = lastFormattedLineRoot(blockContainer);
+    CheckedPtr candidateForLastBlockContainer = lastFormattedLineRoot(blockContainer);
     if (!candidateForLastBlockContainer || candidateForLastBlockContainer == &blockContainer)
         return { };
     // If the nested (last) block container has border/padding end, trimming should not happen.

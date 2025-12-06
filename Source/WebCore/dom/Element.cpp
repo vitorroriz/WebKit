@@ -6387,7 +6387,7 @@ TextStream& operator<<(TextStream& ts, ContentRelevancy relevancy)
 // https://html.spec.whatwg.org/#topmost-popover-ancestor
 // Consider both DOM ancestors and popovers where the given popover was invoked from as ancestors.
 // Use top layer positions to disambiguate the topmost one when both exist.
-HTMLElement* Element::topmostPopoverAncestor(TopLayerElementType topLayerType)
+RefPtr<HTMLElement> Element::topmostPopoverAncestor(TopLayerElementType topLayerType)
 {
     // Store positions to avoid having to do O(n) search for every popover invoker.
     HashMap<Ref<const Element>, size_t> topLayerPositions;
@@ -6429,7 +6429,7 @@ HTMLElement* Element::topmostPopoverAncestor(TopLayerElementType topLayerType)
     if (topLayerType == TopLayerElementType::Popover)
         checkAncestor(popoverData()->invoker());
 
-    return topmostAncestor.unsafeGet();
+    return topmostAncestor;
 }
 
 double Element::lookupCSSRandomBaseValue(const std::optional<Style::PseudoElementIdentifier>& pseudoElementIdentifier, const CSSCalc::RandomCachingKey& key) const
