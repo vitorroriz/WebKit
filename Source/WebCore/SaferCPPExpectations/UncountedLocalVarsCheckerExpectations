@@ -394,6 +394,8 @@ rendering/RenderWidget.cpp
 [ iOS ] rendering/ios/RenderThemeIOS.mm
 rendering/mathml/MathMLStyle.cpp
 rendering/style/RenderStyle.cpp
+rendering/style/RenderStyleBaseSetters.h
+rendering/style/RenderStylePropertiesSettersCustom.h
 rendering/style/RenderStyleSetters.h
 rendering/style/StyleCachedImage.cpp
 rendering/style/StyleCanvasImage.cpp

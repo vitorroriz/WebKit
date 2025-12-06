@@ -75,6 +75,14 @@ inline LayoutUnit RenderBoxModelObject::paddingStart() const { return computedCS
 inline LayoutUnit RenderBoxModelObject::paddingTop() const { return computedCSSPaddingTop(); }
 inline LayoutUnit RenderBoxModelObject::verticalBorderAndPaddingExtent() const { return borderTop() + borderBottom() + paddingTop() + paddingBottom(); }
 inline LayoutUnit RenderBoxModelObject::verticalBorderExtent() const { return borderTop() + borderBottom(); }
+inline LayoutUnit RenderBoxModelObject::marginBefore() const { return marginBefore(writingMode()); }
+inline LayoutUnit RenderBoxModelObject::marginAfter() const { return marginAfter(writingMode()); }
+inline LayoutUnit RenderBoxModelObject::marginStart() const { return marginStart(writingMode()); }
+inline LayoutUnit RenderBoxModelObject::marginEnd() const { return marginEnd(writingMode()); }
+inline LayoutUnit RenderBoxModelObject::verticalMarginExtent() const { return marginTop() + marginBottom(); }
+inline LayoutUnit RenderBoxModelObject::horizontalMarginExtent() const { return marginLeft() + marginRight(); }
+inline LayoutUnit RenderBoxModelObject::marginLogicalHeight() const { return marginBefore() + marginAfter(); }
+inline LayoutUnit RenderBoxModelObject::marginLogicalWidth() const { return marginStart() + marginEnd(); }
 
 inline RectEdges<LayoutUnit> RenderBoxModelObject::borderWidths() const
 {

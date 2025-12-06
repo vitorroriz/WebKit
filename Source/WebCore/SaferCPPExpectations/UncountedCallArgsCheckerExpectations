@@ -779,6 +779,7 @@ rendering/shapes/ShapeOutsideInfo.cpp
 rendering/shapes/ShapeOutsideInfo.h
 rendering/style/RenderStyle.cpp
 rendering/style/RenderStyleInlines.h
+rendering/style/RenderStylePropertiesGettersCustom.h
 rendering/style/SVGRenderStyle.cpp
 rendering/style/StyleCachedImage.cpp
 rendering/style/StyleCanvasImage.cpp
