@@ -57,6 +57,9 @@ public:
     bool hasWirelessTargetsAvailable() final;
     bool isMonitoringWirelessTargets() const final;
 
+    void ref() const override { MediaSessionManagerCocoa::ref(); }
+    void deref() const override { MediaSessionManagerCocoa::deref(); }
+
     USING_CAN_MAKE_WEAKPTR(MediaSessionHelperClient);
 
 protected:
