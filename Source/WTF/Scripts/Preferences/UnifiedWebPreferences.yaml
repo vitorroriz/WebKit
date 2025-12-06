@@ -1808,7 +1808,7 @@ CaptionDisplaySettingsEnabled:
   condition: ENABLE(VIDEO)
   defaultValue:
     WebKit:
-      default: false
+      default: WebKit::defaultCaptionDisplaySettingsEnabled()
     WebKitLegacy:
       default: false
     WebCore:

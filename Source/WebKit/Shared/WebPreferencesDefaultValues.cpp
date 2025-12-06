@@ -493,4 +493,11 @@ bool defaultAllowMultipleCommitLayerTreePending()
 #endif
 }
 
+#if !PLATFORM(COCOA) && ENABLE(VIDEO)
+bool defaultCaptionDisplaySettingsEnabled()
+{
+    return false;
+}
+#endif
+
 } // namespace WebKit

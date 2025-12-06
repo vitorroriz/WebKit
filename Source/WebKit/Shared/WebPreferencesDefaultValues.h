@@ -219,4 +219,8 @@ bool defaultScrollbarColorEnabled();
 
 bool defaultAllowMultipleCommitLayerTreePending();
 
+#if ENABLE(VIDEO)
+bool defaultCaptionDisplaySettingsEnabled();
+#endif
+
 } // namespace WebKit
