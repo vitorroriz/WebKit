@@ -1032,7 +1032,11 @@ ALLOW_DEPRECATED_DECLARATIONS_END
         return completionHandler(false);
 
 #if ENABLE(QUICKLOOK_FULLSCREEN)
+#if ENABLE(UNENTITLED_QUICKLOOK_FULLSCREEN)
+    _isUsingQuickLook = manager->isImageElement();
+#else
     _isUsingQuickLook = manager->isImageElement() && WTF::processHasEntitlement("com.apple.surfboard.chrome-customization"_s);
+#endif // ENABLE(UNENTITLED_QUICKLOOK_FULLSCREEN)
 
     if (_isUsingQuickLook) {
         _imageDimensions = mediaDimensions;
