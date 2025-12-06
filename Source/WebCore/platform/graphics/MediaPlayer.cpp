@@ -466,10 +466,10 @@ static const MediaPlayerFactory* bestMediaEngineForSupportParameters(const Media
     return foundEngine;
 }
 
-const MediaPlayerFactory* MediaPlayer::nextMediaEngine(const MediaPlayerFactory* current)
+CheckedPtr<const MediaPlayerFactory> MediaPlayer::nextMediaEngine(const MediaPlayerFactory* current)
 {
     if (m_activeEngineIdentifier) {
-        auto* engine = mediaEngine(m_activeEngineIdentifier.value());
+        CheckedPtr engine = mediaEngine(m_activeEngineIdentifier.value());
         return current != engine ? engine : nullptr;
     }
 
@@ -491,10 +491,10 @@ const MediaPlayerFactory* MediaPlayer::nextMediaEngine(const MediaPlayerFactory*
     if (currentIndex + 1 >= engines.size())
         return nullptr;
 
-    auto* nextEngine = engines[currentIndex + 1].get();
+    CheckedPtr nextEngine = engines[currentIndex + 1].get();
     
     if (m_attemptedEngines.contains(*nextEngine))
-        return nextMediaEngine(nextEngine);
+        return nextMediaEngine(nextEngine.get());
     
     return nextEngine;
 }
@@ -558,7 +558,7 @@ bool MediaPlayer::load(const URL& url, const LoadOptions& options)
 #endif
 
     loadWithNextMediaEngine(nullptr);
-    return m_currentMediaEngine;
+    return static_cast<bool>(m_currentMediaEngine);
 }
 
 #if ENABLE(MEDIA_SOURCE)
@@ -574,7 +574,7 @@ bool MediaPlayer::load(const URL& url, const LoadOptions& options, MediaSourcePr
         m_activeEngineIdentifier = MediaPlayerMediaEngineIdentifier::AVFoundationMSE;
 #endif
     loadWithNextMediaEngine(nullptr);
-    return m_currentMediaEngine;
+    return static_cast<bool>(m_currentMediaEngine);
 }
 #endif // ENABLE(MEDIA_SOURCE)
 
@@ -586,11 +586,11 @@ bool MediaPlayer::load(MediaStreamPrivate& mediaStream)
     m_mediaStream = mediaStream;
     m_loadOptions = { };
     loadWithNextMediaEngine(nullptr);
-    return m_currentMediaEngine;
+    return static_cast<bool>(m_currentMediaEngine);
 }
 #endif
 
-const MediaPlayerFactory* MediaPlayer::nextBestMediaEngine(const MediaPlayerFactory* current)
+CheckedPtr<const MediaPlayerFactory> MediaPlayer::nextBestMediaEngine(const MediaPlayerFactory* current)
 {
     MediaEngineSupportParameters parameters;
     parameters.type = m_loadOptions.contentType;
@@ -612,7 +612,7 @@ const MediaPlayerFactory* MediaPlayer::nextBestMediaEngine(const MediaPlayerFact
         if (current)
             return nullptr;
 
-        auto* engine = mediaEngine(m_activeEngineIdentifier.value());
+        CheckedPtr engine = mediaEngine(m_activeEngineIdentifier.value());
         if (engine && engine->supportsTypeAndCodecs(parameters) != SupportsType::IsNotSupported)
             return engine;
 
@@ -646,7 +646,7 @@ void MediaPlayer::loadWithNextMediaEngine(const MediaPlayerFactory* current)
     m_initializingMediaEngine = true;
     protectedClient()->mediaPlayerWillInitializeMediaEngine();
 
-    const MediaPlayerFactory* engine = nullptr;
+    CheckedPtr<const MediaPlayerFactory> engine;
 
     if (!contentType().isEmpty() || MEDIASTREAM || MEDIASOURCE)
         engine = nextBestMediaEngine(current);
@@ -658,10 +658,10 @@ void MediaPlayer::loadWithNextMediaEngine(const MediaPlayerFactory* current)
     // Don't delete and recreate the player unless it comes from a different engine.
     if (!engine) {
         LOG(Media, "MediaPlayer::loadWithNextMediaEngine - no media engine found for type \"%s\"", contentType().raw().utf8().data());
-        m_currentMediaEngine = engine;
+        m_currentMediaEngine = engine.get();
         m_private = nullptr;
-    } else if (m_currentMediaEngine != engine) {
-        m_currentMediaEngine = engine;
+    } else if (m_currentMediaEngine.get() != engine.get()) {
+        m_currentMediaEngine = engine.get();
         m_attemptedEngines.add(*engine);
         RefPtr playerPrivate = engine->createMediaEnginePlayer(*this);
         m_private = playerPrivate;
@@ -706,9 +706,10 @@ void MediaPlayer::loadWithNextMediaEngine(const MediaPlayerFactory* current)
         playerPrivate->load(m_url, m_loadOptions);
     } else {
         m_private = NullMediaPlayerPrivate::create(*this);
+        CheckedPtr currentMediaEngine = m_currentMediaEngine.get();
         if (!m_activeEngineIdentifier
             && installedMediaEngines().size() > 1
-            && (nextBestMediaEngine(m_currentMediaEngine) || nextMediaEngine(m_currentMediaEngine)))
+            && (nextBestMediaEngine(currentMediaEngine.get()) || nextMediaEngine(currentMediaEngine.get())))
             m_reloadTimer.startOneShot(0_s);
         else {
             client->mediaPlayerEngineUpdated();
@@ -1264,7 +1265,7 @@ MediaPlayer::SupportsType MediaPlayer::supportsType(const MediaEngineSupportPara
     if (!startsWithLettersIgnoringASCIICase(containerType, "video/"_s) && !startsWithLettersIgnoringASCIICase(containerType, "audio/"_s) && !startsWithLettersIgnoringASCIICase(containerType, "application/"_s))
         return SupportsType::IsNotSupported;
 
-    const MediaPlayerFactory* engine = bestMediaEngineForSupportParameters(parameters);
+    CheckedPtr engine = bestMediaEngineForSupportParameters(parameters);
     if (!engine)
         return SupportsType::IsNotSupported;
 
@@ -1427,7 +1428,7 @@ unsigned MediaPlayer::videoDecodedByteCount() const
 void MediaPlayer::reloadTimerFired()
 {
     protectedPrivate()->cancelLoad();
-    loadWithNextMediaEngine(m_currentMediaEngine);
+    loadWithNextMediaEngine(CheckedPtr { m_currentMediaEngine.get() }.get());
 }
 
 template<typename T>
@@ -1487,9 +1488,10 @@ void MediaPlayer::networkStateChanged()
     // let the next engine try.
     if (playerPrivate->networkState() >= MediaPlayer::NetworkState::FormatError && playerPrivate->readyState() < MediaPlayer::ReadyState::HaveMetadata) {
         client->mediaPlayerEngineFailedToLoad();
+        CheckedPtr currentMediaEngine = m_currentMediaEngine.get();
         if (!m_activeEngineIdentifier
             && installedMediaEngines().size() > 1
-            && (nextBestMediaEngine(m_currentMediaEngine) || nextMediaEngine(m_currentMediaEngine))) {
+            && (nextBestMediaEngine(currentMediaEngine.get()) || nextMediaEngine(currentMediaEngine.get()))) {
             m_reloadTimer.startOneShot(0_s);
             return;
         }

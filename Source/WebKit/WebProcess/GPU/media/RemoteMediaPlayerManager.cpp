@@ -54,6 +54,7 @@ using namespace WebCore;
 
 class MediaPlayerRemoteFactory final : public MediaPlayerFactory {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(MediaPlayerRemoteFactory);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(MediaPlayerRemoteFactory);
 public:
     MediaPlayerRemoteFactory(MediaPlayerEnums::MediaEngineIdentifier remoteEngineIdentifier, RemoteMediaPlayerManager& manager)
         : m_remoteEngineIdentifier(remoteEngineIdentifier)

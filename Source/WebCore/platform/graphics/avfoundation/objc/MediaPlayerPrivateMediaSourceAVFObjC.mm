@@ -133,6 +133,7 @@ MediaPlayerPrivateMediaSourceAVFObjC::~MediaPlayerPrivateMediaSourceAVFObjC()
 
 class MediaPlayerFactoryMediaSourceAVFObjC final : public MediaPlayerFactory {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(MediaPlayerFactoryMediaSourceAVFObjC);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(MediaPlayerFactoryMediaSourceAVFObjC);
 private:
     MediaPlayerEnums::MediaEngineIdentifier identifier() const final { return MediaPlayerEnums::MediaEngineIdentifier::AVFoundationMSE; };
 

@@ -62,15 +62,6 @@
 OBJC_CLASS AVPlayer;
 OBJC_CLASS NSArray;
 
-namespace WebCore {
-class MediaPlayerFactory;
-}
-
-namespace WTF {
-template<typename T> struct IsDeprecatedWeakRefSmartPointerException;
-template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::MediaPlayerFactory> : std::true_type { };
-}
-
 #if USE(AVFOUNDATION)
 typedef struct CF_BRIDGED_TYPE(id) __CVBuffer* CVPixelBufferRef;
 #endif
@@ -825,15 +816,15 @@ private:
 
     RefPtr<MediaPlayerPrivateInterface> protectedPrivate() const;
 
-    const MediaPlayerFactory* nextBestMediaEngine(const MediaPlayerFactory*);
+    CheckedPtr<const MediaPlayerFactory> nextBestMediaEngine(const MediaPlayerFactory*);
     void loadWithNextMediaEngine(const MediaPlayerFactory*);
-    const MediaPlayerFactory* nextMediaEngine(const MediaPlayerFactory*);
+    CheckedPtr<const MediaPlayerFactory> nextMediaEngine(const MediaPlayerFactory*);
     void reloadTimerFired();
 
     WeakPtr<MediaPlayerClient> m_client;
     Timer m_reloadTimer;
     RefPtr<MediaPlayerPrivateInterface> m_private;
-    const MediaPlayerFactory* m_currentMediaEngine { nullptr };
+    WeakPtr<const MediaPlayerFactory> m_currentMediaEngine;
     WeakHashSet<const MediaPlayerFactory> m_attemptedEngines;
     URL m_url;
     LoadOptions m_loadOptions;
@@ -888,8 +879,9 @@ private:
     WeakPtr<MessageClientForTesting> m_internalMessageClient;
 };
 
-class MediaPlayerFactory : public CanMakeWeakPtr<MediaPlayerFactory> {
+class MediaPlayerFactory : public CanMakeWeakPtr<MediaPlayerFactory>, public CanMakeCheckedPtr<MediaPlayerFactory> {
     WTF_MAKE_TZONE_ALLOCATED_EXPORT(MediaPlayerFactory, WEBCORE_EXPORT);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(MediaPlayerFactory);
 public:
     MediaPlayerFactory() = default;
     virtual ~MediaPlayerFactory() = default;
@@ -933,7 +925,7 @@ inline String MediaPlayer::audioOutputDeviceIdOverride() const
 
 inline bool MediaPlayer::hasMediaEngine() const
 {
-    return m_currentMediaEngine;
+    return static_cast<bool>(m_currentMediaEngine);
 }
 
 } // namespace WebCore

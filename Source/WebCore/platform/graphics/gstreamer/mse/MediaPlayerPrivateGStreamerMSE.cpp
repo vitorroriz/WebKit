@@ -79,6 +79,8 @@ GST_DEBUG_CATEGORY_STATIC(webkit_mse_player_debug);
 namespace WebCore {
 
 class MediaPlayerFactoryGStreamerMSE final : public MediaPlayerFactory {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(MediaPlayerFactoryGStreamerMSE);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(MediaPlayerFactoryGStreamerMSE);
 private:
     MediaPlayerEnums::MediaEngineIdentifier identifier() const final { return MediaPlayerEnums::MediaEngineIdentifier::GStreamerMSE; };
 

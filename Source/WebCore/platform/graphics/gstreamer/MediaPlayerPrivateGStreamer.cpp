@@ -298,6 +298,8 @@ bool MediaPlayerPrivateGStreamer::isAvailable()
 }
 
 class MediaPlayerFactoryGStreamer final : public MediaPlayerFactory {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(MediaPlayerFactoryGStreamer);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(MediaPlayerFactoryGStreamer);
 private:
     MediaPlayerEnums::MediaEngineIdentifier identifier() const final { return MediaPlayerEnums::MediaEngineIdentifier::GStreamer; };
 
