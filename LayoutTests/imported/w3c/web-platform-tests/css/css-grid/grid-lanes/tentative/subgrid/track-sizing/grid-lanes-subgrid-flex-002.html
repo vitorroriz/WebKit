@@ -9,7 +9,7 @@
   <title>Verify correct sizing of flex tracks when using subgrid in CSS Grid Lanes</title>
   <link rel="author" title="Brandon Stewart" href="mailto:brandonstewart@apple.com">
   <link rel="help" href="https://drafts.csswg.org/css-grid-3/#subgrids">
-  <link rel="match" href="grid-lanes-subgrid-flex-ref.html">
+  <link rel="match" href="grid-lanes-subgrid-flex-002-ref.html">
   <style>
     grid {
       display: inline-grid-lanes;
@@ -21,7 +21,7 @@
     subgrid {
       display: grid;
       grid-template-columns: subgrid;
-      grid-column: 2 / span 2;
+      grid-column: span 2;
       background: lightblue;
     }
   </style>
@@ -29,6 +29,7 @@
 
 <body>
 <!-- Verify basic subgrid -->
+<!-- Track Sizes: 1ch 2ch 3ch -->
 <grid>
   <item>1</item>
   <subgrid>
@@ -40,6 +41,7 @@
 </grid>
 
 <!-- Verify subgrid with first item in subgrid set to 2ch -->
+<!-- Track Sizes: 2ch 4ch 6ch -->
 <grid>
   <item>1</item>
   <subgrid>
@@ -51,6 +53,7 @@
 </grid>
 
 <!-- Verify subgrid with second item in subgrid set to 3ch -->
+<!-- Track Sizes: 3ch 6ch 9ch -->
 <grid>
   <item>1</item>
   <subgrid>
@@ -62,6 +65,7 @@
 </grid>
 
 <!-- Verify subgrid with final item in subgrid set to 4ch -->
+<!-- Track Sizes: 4ch 8ch 12ch -->
 <grid>
   <item>1</item>
   <subgrid>
@@ -73,6 +77,7 @@
 </grid>
 
 <!-- Verify behavior when subgrid is set to grid-lanes too -->
+<!-- Track Sizes: 3ch 6ch 9ch -->
 <grid>
   <item>1</item>
   <subgrid style="display: grid-lanes;">
