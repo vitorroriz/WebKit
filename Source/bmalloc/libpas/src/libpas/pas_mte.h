@@ -66,7 +66,7 @@ PAS_IGNORE_WARNINGS_BEGIN("unsafe-buffer-usage")
  * pas_utils.h is too high up in the include hierarchy.
  */
 #define PAS_MTE_SMALL_PAGE_DEFAULT_SHIFT (14)
-#define PAS_MTE_SMALL_PAGE_NO_MASK (0x0000ffffffffffffull & ~((1 << PAS_MTE_SMALL_PAGE_DEFAULT_SHIFT) - 1))
+#define PAS_MTE_SMALL_PAGE_NO_MASK (0x0000ffffffffffffull & ~((1ull << PAS_MTE_SMALL_PAGE_DEFAULT_SHIFT) - 1ull))
 #define PAS_MTE_SMALL_PAGE_NO(ptr) (((uintptr_t)ptr) & PAS_MTE_SMALL_PAGE_NO_MASK)
 
 #define PAS_MTE_GET_MTAG(ptr) do { \
@@ -282,8 +282,8 @@ inline __attribute__((always_inline)) void pas_mte_tag_dc_gva_loop(uint8_t* begi
 
     if (size > 128) {
         /* Next, we align our begin and end, in preparation for doing a DC GVA loop. */
-        begin = (uint8_t*)((uintptr_t)begin + DC_GVA_GRANULE_SIZE - 1 & (intptr_t)-DC_GVA_GRANULE_SIZE);
-        uint8_t* end_aligned = (uint8_t*)((uintptr_t)end & (intptr_t)-DC_GVA_GRANULE_SIZE);
+        begin = (uint8_t*)((uintptr_t)begin + DC_GVA_GRANULE_SIZE - 1 & (uintptr_t)-DC_GVA_GRANULE_SIZE);
+        uint8_t* end_aligned = (uint8_t*)((uintptr_t)end & (uintptr_t)-DC_GVA_GRANULE_SIZE);
 
         if (PAS_MTE_FEATURE_ENABLED(PAS_MTE_FEATURE_LOG_ON_TAG))
             printf("[MTE]\t    Doing aligned DC GVA loop from %p to %p\n", begin, end_aligned);
@@ -343,8 +343,8 @@ inline __attribute__((always_inline)) void pas_mte_tag_dc_gva_switching(uint8_t*
 
     if (size > 128) {
         /* Next, we align our begin and end, in preparation for doing a DC GVA loop. */
-        begin = (uint8_t*)((uintptr_t)begin + 63 & (intptr_t)-64);
-        uint8_t* end_aligned = (uint8_t*)((uintptr_t)end & (intptr_t)-64);
+        begin = (uint8_t*)((uintptr_t)begin + 63 & (uintptr_t)-64);
+        uint8_t* end_aligned = (uint8_t*)((uintptr_t)end & (uintptr_t)-64);
 
         if (PAS_MTE_FEATURE_ENABLED(PAS_MTE_FEATURE_LOG_ON_TAG))
             printf("[MTE]\t    Doing aligned DC GVA loop from %p to %p\n", begin, end_aligned);
