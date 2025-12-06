@@ -646,6 +646,19 @@ bool InlineFormattingUtils::shouldDiscardRemainingContentInBlockDirection() cons
     return lineClamp->maximumLines == inlineLayoutState.lineCountWithInlineContentIncludingNestedBlocks();
 }
 
+InlineLayoutUnit InlineFormattingUtils::snapToInt(InlineLayoutUnit value, SnapDirection direction)
+{
+    switch (direction) {
+    case SnapDirection::Floor:
+        return floorf(value);
+    case SnapDirection::Ceil:
+        return ceilf(value);
+    case SnapDirection::Round:
+        return roundf(value);
+    }
+    ASSERT_NOT_REACHED();
+}
+
 }
 }
 

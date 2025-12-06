@@ -67,9 +67,24 @@
 #include "RenderTextControlSingleLine.h"
 #include "RenderTheme.h"
 #include "RenderViewTransitionCapture.h"
+#include "Settings.h"
 
 namespace WebCore {
 namespace LayoutIntegration {
+
+enum class SnapDirection : uint8_t { Floor, Ceil, Round };
+static LayoutUnit snapToInt(LayoutUnit value, SnapDirection direction = SnapDirection::Round)
+{
+    switch (direction) {
+    case SnapDirection::Floor:
+        return LayoutUnit { floorf(value) };
+    case SnapDirection::Ceil:
+        return LayoutUnit { ceilf(value) };
+    case SnapDirection::Round:
+        return LayoutUnit { roundf(value) };
+    }
+    ASSERT_NOT_REACHED();
+}
 
 static LayoutUnit usedValueOrZero(const Style::MarginEdge& marginEdge, std::optional<LayoutUnit> availableWidth, const Style::ZoomFactor& zoomFactor)
 {
@@ -350,14 +365,18 @@ static std::optional<LayoutUnit> lastInflowBoxBaseline(const RenderBlock& blockC
         }
 
         if (is<RenderFlexibleBox>(*inflowBox) || is<RenderGrid>(*inflowBox) || is<RenderBlockFlow>(*inflowBox) || is<RenderTextControlInnerContainer>(*inflowBox) || is<RenderMenuList>(*inflowBox)) {
-            if (auto baseline = baselineForBox(*inflowBox))
-                return LayoutUnit { (inflowBox->logicalTop() + *baseline).toInt() };
+            if (auto baseline = baselineForBox(*inflowBox)) {
+                auto baselineValue = inflowBox->logicalTop() + *baseline;
+                return LayoutUnit { snapToInt(baselineValue, SnapDirection::Floor) };
+            }
             continue;
         }
     }
 
-    if (!lastInFlowChild && blockContainer.hasLineIfEmpty())
-        return (fontMetricsBasedBaseline(blockContainer) + (blockContainer.containingBlock()->writingMode().isHorizontal() ? blockContainer.borderTop() + blockContainer.paddingTop() : blockContainer.borderRight() + blockContainer.paddingRight())).toInt();
+    if (!lastInFlowChild && blockContainer.hasLineIfEmpty()) {
+        auto baselineValue = fontMetricsBasedBaseline(blockContainer) + (blockContainer.containingBlock()->writingMode().isHorizontal() ? blockContainer.borderTop() + blockContainer.paddingTop() : blockContainer.borderRight() + blockContainer.paddingRight());
+        return snapToInt(baselineValue, SnapDirection::Floor);
+    }
 
     return { };
 }
@@ -389,7 +408,7 @@ static std::optional<LayoutUnit> baselineForBox(const RenderBox& renderBox)
     if (CheckedPtr renderImage = dynamicDowncast<RenderImage>(renderBox)) {
 #if ENABLE(MULTI_REPRESENTATION_HEIC)
         if (renderImage->isMultiRepresentationHEIC())
-            return roundToInt(marginBoxBottom) - LayoutUnit::fromFloatRound(renderImage->style().fontCascade().primaryFont()->metricsForMultiRepresentationHEIC().descent);
+            return snapToInt(marginBoxBottom) - LayoutUnit::fromFloatRound(renderImage->style().fontCascade().primaryFont()->metricsForMultiRepresentationHEIC().descent);
 #endif
         return { };
     }
@@ -420,19 +439,21 @@ static std::optional<LayoutUnit> baselineForBox(const RenderBox& renderBox)
         // FIXME: This hardcoded baselineAdjustment is what we used to do for the old
         // widget, but I'm not sure this is right for the new control.
         const int baselineAdjustment = 7;
-        return roundToInt(marginBoxBottom) - baselineAdjustment;
+        return snapToInt(marginBoxBottom) - baselineAdjustment;
     }
 
     if (CheckedPtr textControl = dynamicDowncast<RenderTextControlSingleLine>(renderBox)) {
         if (auto* innerTextRenderer = textControl->innerTextRenderer()) {
             auto baseline = LayoutUnit { };
-            if (innerTextRenderer->inlineLayout())
-                baseline = std::min<LayoutUnit>(innerTextRenderer->marginBoxLogicalHeight(writingMode), floorToInt(innerTextRenderer->inlineLayout()->lastLineBaseline()));
-            else
+            if (innerTextRenderer->inlineLayout()) {
+                auto marginBoxLogicalHeight = innerTextRenderer->marginBoxLogicalHeight(writingMode);
+                auto lastLineBaseline = snapToInt(innerTextRenderer->inlineLayout()->lastLineBaseline(), SnapDirection::Floor);
+                baseline = std::min<LayoutUnit>(marginBoxLogicalHeight, lastLineBaseline);
+            } else
                 baseline = fontMetricsBasedBaseline(*innerTextRenderer);
-            baseline = floorToInt(innerTextRenderer->logicalTop() + baseline);
+            baseline = snapToInt(innerTextRenderer->logicalTop() + baseline, SnapDirection::Floor);
             for (auto* ancestor = innerTextRenderer->containingBlock(); ancestor && ancestor != textControl; ancestor = ancestor->containingBlock())
-                baseline = floorToInt(ancestor->logicalTop() + baseline);
+                baseline = snapToInt(ancestor->logicalTop() + baseline, SnapDirection::Floor);
             return baseline;
         }
         // input::-webkit-textfield-decoration-container { display: none }
@@ -441,7 +462,7 @@ static std::optional<LayoutUnit> baselineForBox(const RenderBox& renderBox)
 
     if (CheckedPtr fileUpload = dynamicDowncast<RenderFileUploadControl>(renderBox)) {
         if (auto* inlineLayout = fileUpload->inlineLayout())
-            return std::min<LayoutUnit>(marginBoxBottom, floorToInt(inlineLayout->lastLineBaseline()));
+            return std::min<LayoutUnit>(marginBoxBottom, snapToInt(inlineLayout->lastLineBaseline(), SnapDirection::Floor));
         return { };
     }
 
@@ -469,7 +490,7 @@ static std::optional<LayoutUnit> baselineForBox(const RenderBox& renderBox)
         if (CheckedPtr blockFlow = dynamicDowncast<RenderBlockFlow>(renderBox)) {
             // <fieldset> with no legend.
             if (CheckedPtr inlineLayout = blockFlow->inlineLayout())
-                return floorToInt(inlineLayout->lastLineBaseline());
+                return snapToInt(inlineLayout->lastLineBaseline(), SnapDirection::Floor);
             return lastInflowBoxBaseline(*blockFlow);
         }
         return { };
@@ -494,10 +515,10 @@ static std::optional<LayoutUnit> baselineForBox(const RenderBox& renderBox)
         auto lastBaseline = std::optional<LayoutUnit> { };
         if (CheckedPtr blockFlow = dynamicDowncast<RenderBlockFlow>(renderBox)) {
             if (auto* inlineLayout = blockFlow->inlineLayout())
-                lastBaseline = floorToInt(inlineLayout->lastLineBaseline());
+                lastBaseline = snapToInt(inlineLayout->lastLineBaseline(), SnapDirection::Floor);
         }
         if (!lastBaseline)
-            lastBaseline = (fontMetricsBasedBaseline(renderBox) + (writingMode.isHorizontal() ? renderBox.borderTop() + renderBox.paddingTop() : renderBox.borderRight() + renderBox.paddingRight())).toInt();
+            lastBaseline = snapToInt(fontMetricsBasedBaseline(renderBox) + (writingMode.isHorizontal() ? renderBox.borderTop() + renderBox.paddingTop() : renderBox.borderRight() + renderBox.paddingRight()), SnapDirection::Floor);
         return std::min(marginBoxBottom, *lastBaseline);
     }
 
@@ -516,7 +537,7 @@ static std::optional<LayoutUnit> baselineForBox(const RenderBox& renderBox)
 
     if (CheckedPtr listMarker = dynamicDowncast<RenderListMarker>(renderBox)) {
         if (CheckedPtr listItem = listMarker->listItem(); listItem && !listMarker->isImage())
-            return fontMetricsBasedBaseline(*listMarker).toInt();
+            return snapToInt(fontMetricsBasedBaseline(*listMarker), SnapDirection::Floor);
         return { };
     }
 
@@ -530,11 +551,11 @@ static std::optional<LayoutUnit> baselineForBox(const RenderBox& renderBox)
 
         if (!blockFlow->hasLines()) {
             ASSERT(blockFlow->hasLineIfEmpty());
-            return (fontMetricsBasedBaseline(*blockFlow) + (writingMode.isHorizontal() ? blockFlow->borderTop() + blockFlow->paddingTop() : blockFlow->borderRight() + blockFlow->paddingRight())).toInt();
+            return snapToInt(fontMetricsBasedBaseline(*blockFlow) + (writingMode.isHorizontal() ? blockFlow->borderTop() + blockFlow->paddingTop() : blockFlow->borderRight() + blockFlow->paddingRight()), SnapDirection::Floor);
         }
 
         if (auto* inlineLayout = blockFlow->inlineLayout())
-            return floorToInt(inlineLayout->lastLineBaseline());
+            return snapToInt(inlineLayout->lastLineBaseline(), SnapDirection::Floor);
 
         if (blockFlow->svgTextLayout()) {
             auto& style = blockFlow->firstLineStyle();
@@ -600,15 +621,15 @@ static inline void setIntegrationBaseline(const RenderBox& renderBox)
             if (renderBox.isFieldset()) {
                 if (isWritingModeRoot || renderBox.shouldApplyLayoutContainment())
                     return marginBoxLogicalHeight;
-                return roundToInt(marginBoxLogicalHeight);
+                return snapToInt(marginBoxLogicalHeight);
             }
 
             if (is<RenderButton>(renderBox)) {
                 auto contentBoxBottom = rootWritingMode.isHorizontal() ? renderBox.borderTop() + renderBox.paddingTop() + renderBox.contentBoxHeight() : renderBox.borderRight() + renderBox.paddingRight() + renderBox.contentBoxWidth();
-                return marginBefore + roundToInt(contentBoxBottom);
+                return marginBefore + snapToInt(contentBoxBottom);
             }
 
-            return roundToInt(marginBoxLogicalHeight);
+            return snapToInt(marginBoxLogicalHeight);
         };
         const_cast<Layout::ElementBox&>(*renderBox.layoutBox()).setBaselineForIntegration(baselinePosition());
     }
