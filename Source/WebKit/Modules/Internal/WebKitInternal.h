@@ -27,7 +27,6 @@
 
 #import <wtf/Platform.h>
 
-#import "UIWindowScene+Extras.h"
 #import "WKMaterialHostingSupport.h"
 #import "WKMouseDeviceObserver.h"
 #import "WKPreferencesInternal.h"

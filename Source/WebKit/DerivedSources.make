@@ -1044,7 +1044,6 @@ ifeq ($(USE_INTERNAL_SDK),YES)
 WEBKIT_ADDITIONS_SWIFT_FILES = \
 	WKSeparatedImageView.swift \
 	CredentialUpdaterShim.swift \
-	UIWindowScene+Extras.swift \
 #
 
 $(WEBKIT_ADDITIONS_SWIFT_FILES): %.swift : %.swift.in
