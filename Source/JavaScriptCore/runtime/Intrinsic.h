@@ -199,8 +199,6 @@ namespace JSC {
     macro(IteratorHelperCreateIntrinsic) \
     macro(WrapForValidIteratorCreateIntrinsic) \
     macro(AsyncFromSyncIteratorCreateIntrinsic) \
-    macro(PromiseAllContextCreateIntrinsic) \
-    macro(PromiseAllGlobalContextCreateIntrinsic) \
     macro(RegExpStringIteratorCreateIntrinsic) \
     macro(ResolvePromiseWithFirstResolvingFunctionCallCheckIntrinsic) \
     macro(RejectPromiseWithFirstResolvingFunctionCallCheckIntrinsic) \

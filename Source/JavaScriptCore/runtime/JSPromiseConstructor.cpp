@@ -33,8 +33,13 @@
 #include "InterpreterInlines.h"
 #include "JSCBuiltins.h"
 #include "JSCInlines.h"
+#include "JSFunctionWithFields.h"
+#include "JSMicrotask.h"
 #include "JSPromise.h"
+#include "JSPromiseAllContext.h"
+#include "JSPromiseAllGlobalContext.h"
 #include "JSPromisePrototype.h"
+#include "Microtask.h"
 
 namespace JSC {
 
@@ -43,6 +48,7 @@ static JSC_DECLARE_HOST_FUNCTION(promiseConstructorFuncResolve);
 static JSC_DECLARE_HOST_FUNCTION(promiseConstructorFuncReject);
 static JSC_DECLARE_HOST_FUNCTION(promiseConstructorFuncWithResolvers);
 static JSC_DECLARE_HOST_FUNCTION(promiseConstructorFuncRace);
+static JSC_DECLARE_HOST_FUNCTION(promiseConstructorFuncAll);
 
 }
 
@@ -57,7 +63,7 @@ const ClassInfo JSPromiseConstructor::s_info = { "Function"_s, &Base::s_info, &p
   resolve         promiseConstructorFuncResolve        DontEnum|Function 1 PromiseConstructorResolveIntrinsic
   reject          promiseConstructorFuncReject         DontEnum|Function 1 PromiseConstructorRejectIntrinsic
   race            promiseConstructorFuncRace           DontEnum|Function 1
-  all             JSBuiltin                            DontEnum|Function 1
+  all             promiseConstructorFuncAll            DontEnum|Function 1
   allSettled      JSBuiltin                            DontEnum|Function 1
   any             JSBuiltin                            DontEnum|Function 1
   withResolvers   promiseConstructorFuncWithResolvers  DontEnum|Function 0
@@ -262,31 +268,357 @@ JSC_DEFINE_HOST_FUNCTION(promiseConstructorFuncRace, (JSGlobalObject* globalObje
         RETURN_IF_EXCEPTION(scope, void());
 
         if (nextPromise->isThenFastAndNonObservable()) [[likely]] {
-            scope.release();
-            nextPromise->performPromiseThenWithInternalMicrotask(vm, globalObject, InternalMicrotask::PromiseFirstResolveWithoutHandlerJob, promise, promise);
-        } else {
-            if (!resolve || !reject)
-                std::tie(resolve, reject) = promise->createFirstResolvingFunctions(vm, globalObject);
-            JSValue then = nextPromise->get(globalObject, vm.propertyNames->then);
+            auto* constructor = promiseSpeciesConstructor(globalObject, nextPromise);
             RETURN_IF_EXCEPTION(scope, void());
-            CallData thenCallData = getCallDataInline(then);
-            if (thenCallData.type == CallData::Type::None) [[unlikely]] {
-                throwTypeError(globalObject, scope, "then is not a function"_s);
+            if (constructor == globalObject->promiseConstructor()) [[likely]] {
+                scope.release();
+                nextPromise->performPromiseThenWithInternalMicrotask(vm, globalObject, InternalMicrotask::PromiseFirstResolveWithoutHandlerJob, promise, promise);
                 return;
             }
-            MarkedArgumentBuffer thenArguments;
-            thenArguments.append(resolve);
-            thenArguments.append(reject);
-            ASSERT(!thenArguments.hasOverflowed());
-            scope.release();
-            call(globalObject, then, thenCallData, nextPromise, thenArguments);
         }
+
+        if (!resolve || !reject)
+            std::tie(resolve, reject) = promise->createFirstResolvingFunctions(vm, globalObject);
+        JSValue then = nextPromise->get(globalObject, vm.propertyNames->then);
+        RETURN_IF_EXCEPTION(scope, void());
+        CallData thenCallData = getCallDataInline(then);
+        if (thenCallData.type == CallData::Type::None) [[unlikely]] {
+            throwTypeError(globalObject, scope, "then is not a function"_s);
+            return;
+        }
+        MarkedArgumentBuffer thenArguments;
+        thenArguments.append(resolve);
+        thenArguments.append(reject);
+        ASSERT(!thenArguments.hasOverflowed());
+        scope.release();
+        call(globalObject, then, thenCallData, nextPromise, thenArguments);
     });
 
     if (scope.exception()) [[unlikely]]
         callReject();
 
     return JSValue::encode(promise);
+}
+
+static JSObject* promiseAllSlow(JSGlobalObject* globalObject, CallFrame* callFrame, JSValue thisValue)
+{
+    VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    auto [promise, resolve, reject] = JSPromise::newPromiseCapability(globalObject, thisValue);
+    RETURN_IF_EXCEPTION(scope, { });
+
+    auto callReject = [&](JSValue exception) -> void {
+        MarkedArgumentBuffer rejectArguments;
+        rejectArguments.append(exception);
+        ASSERT(!rejectArguments.hasOverflowed());
+        auto rejectCallData = getCallDataInline(reject);
+        scope.release();
+        call(globalObject, reject, rejectCallData, jsUndefined(), rejectArguments);
+    };
+    auto callRejectWithScopeException = [&]() -> void {
+        Exception* exception = scope.exception();
+        ASSERT(exception);
+        scope.clearException();
+        callReject(exception->value());
+    };
+
+    JSValue promiseResolveValue = thisValue.get(globalObject, vm.propertyNames->resolve);
+    if (scope.exception()) [[unlikely]] {
+        callRejectWithScopeException();
+        return promise;
+    }
+
+    if (!promiseResolveValue.isCallable()) [[unlikely]] {
+        callReject(createTypeError(globalObject, "Promise resolve is not a function"_s));
+        return promise;
+    }
+    CallData promiseResolveCallData = getCallDataInline(promiseResolveValue);
+    ASSERT(promiseResolveCallData.type != CallData::Type::None);
+
+    std::optional<CachedCall> cachedCallHolder;
+    CachedCall* cachedCall = nullptr;
+    if (promiseResolveCallData.type == CallData::Type::JS) [[likely]] {
+        cachedCallHolder.emplace(globalObject, jsCast<JSFunction*>(promiseResolveValue), 1);
+        if (scope.exception()) [[unlikely]] {
+            callRejectWithScopeException();
+            return promise;
+        }
+        cachedCall = &cachedCallHolder.value();
+    }
+
+    JSArray* values = JSArray::tryCreate(vm, globalObject->arrayStructureForIndexingTypeDuringAllocation(ArrayWithUndecided), 0);
+    if (!values) [[unlikely]] {
+        callReject(createOutOfMemoryError(globalObject));
+        return promise;
+    }
+
+    JSPromiseAllGlobalContext* globalContext = JSPromiseAllGlobalContext::create(vm, promise, values, jsNumber(1));
+
+    uint64_t index = 0;
+
+    JSValue iterable = callFrame->argument(0);
+    forEachInIterable(globalObject, iterable, [&](VM& vm, JSGlobalObject* globalObject, JSValue value) {
+        auto scope = DECLARE_THROW_SCOPE(vm);
+
+        values->putDirectIndex(globalObject, index, jsUndefined());
+        RETURN_IF_EXCEPTION(scope, void());
+
+        JSValue nextPromise;
+        if (cachedCall) [[likely]] {
+            nextPromise = cachedCall->callWithArguments(globalObject, thisValue, value);
+            RETURN_IF_EXCEPTION(scope, void());
+        } else {
+            MarkedArgumentBuffer arguments;
+            arguments.append(value);
+            ASSERT(!arguments.hasOverflowed());
+            nextPromise = call(globalObject, promiseResolveValue, promiseResolveCallData, thisValue, arguments);
+            RETURN_IF_EXCEPTION(scope, void());
+        }
+        ASSERT(nextPromise);
+
+        uint64_t count = globalContext->remainingElementsCount().toIndex(globalObject, "count exceeds size"_s);
+        RETURN_IF_EXCEPTION(scope, void());
+        globalContext->setRemainingElementsCount(vm, jsNumber(count + 1));
+
+        uint64_t currentIndex = index++;
+
+        JSPromiseAllContext* context = JSPromiseAllContext::create(vm, globalContext, currentIndex);
+
+        auto* onFulfilled = JSFunctionWithFields::create(vm, globalObject, vm.promiseAllSlowFulfillFunctionExecutable(), 1, emptyString());
+        onFulfilled->setField(vm, JSFunctionWithFields::Field::PromiseAllContext, context);
+        onFulfilled->setField(vm, JSFunctionWithFields::Field::PromiseAllResolve, resolve);
+
+        JSValue then = nextPromise.get(globalObject, vm.propertyNames->then);
+        RETURN_IF_EXCEPTION(scope, void());
+        CallData thenCallData = getCallDataInline(then);
+        if (thenCallData.type == CallData::Type::None) [[unlikely]] {
+            throwTypeError(globalObject, scope, "then is not a function"_s);
+            return;
+        }
+
+        MarkedArgumentBuffer thenArguments;
+        thenArguments.append(onFulfilled);
+        thenArguments.append(reject);
+        ASSERT(!thenArguments.hasOverflowed());
+        scope.release();
+        call(globalObject, then, thenCallData, nextPromise, thenArguments);
+    });
+
+    if (scope.exception()) [[unlikely]] {
+        callRejectWithScopeException();
+        return promise;
+    }
+
+    uint64_t count = globalContext->remainingElementsCount().toIndex(globalObject, "count exceeds size"_s);
+    if (scope.exception()) [[unlikely]] {
+        callRejectWithScopeException();
+        return promise;
+    }
+
+    --count;
+    globalContext->setRemainingElementsCount(vm, jsNumber(count));
+    if (!count) {
+        MarkedArgumentBuffer resolveArguments;
+        resolveArguments.append(values);
+        ASSERT(!resolveArguments.hasOverflowed());
+        auto resolveCallData = getCallDataInline(resolve);
+        scope.release();
+        call(globalObject, resolve, resolveCallData, jsUndefined(), resolveArguments);
+        if (scope.exception()) [[unlikely]] {
+            callRejectWithScopeException();
+            return promise;
+        }
+    }
+
+    return promise;
+}
+
+JSC_DEFINE_HOST_FUNCTION(promiseConstructorFuncAll, (JSGlobalObject* globalObject, CallFrame* callFrame))
+{
+    VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    JSValue thisValue = callFrame->thisValue().toThis(globalObject, ECMAMode::strict());
+
+    if (!thisValue.isObject()) [[unlikely]]
+        return throwVMTypeError(globalObject, scope, "|this| is not an object"_s);
+
+    if (!isFastPromiseConstructor(globalObject, thisValue)) [[unlikely]]
+        RELEASE_AND_RETURN(scope, JSValue::encode(promiseAllSlow(globalObject, callFrame, thisValue)));
+
+    auto* promise = JSPromise::create(vm, globalObject->promiseStructure());
+
+    auto callReject = [&]() -> void {
+        Exception* exception = scope.exception();
+        ASSERT(exception);
+        scope.clearException();
+        scope.release();
+        promise->reject(vm, globalObject, exception);
+    };
+
+    JSArray* values = JSArray::tryCreate(vm, globalObject->arrayStructureForIndexingTypeDuringAllocation(ArrayWithUndecided), 0);
+    if (!values) [[unlikely]] {
+        throwOutOfMemoryError(globalObject, scope);
+        callReject();
+        return JSValue::encode(promise);
+    }
+
+    JSPromiseAllGlobalContext* globalContext = JSPromiseAllGlobalContext::create(vm, promise, values, jsNumber(1));
+
+    uint64_t index = 0;
+    JSFunction* onRejected = nullptr;
+
+    JSValue iterable = callFrame->argument(0);
+    forEachInIterable(globalObject, iterable, [&](VM& vm, JSGlobalObject* globalObject, JSValue value) {
+        auto scope = DECLARE_THROW_SCOPE(vm);
+
+        values->putDirectIndex(globalObject, index, jsUndefined());
+        RETURN_IF_EXCEPTION(scope, void());
+
+        JSPromise* nextPromise = JSPromise::resolvedPromise(globalObject, value);
+        RETURN_IF_EXCEPTION(scope, void());
+
+        uint64_t count = globalContext->remainingElementsCount().toIndex(globalObject, "count exceeds size"_s);
+        RETURN_IF_EXCEPTION(scope, void());
+        globalContext->setRemainingElementsCount(vm, jsNumber(count + 1));
+
+        JSPromiseAllContext* context = JSPromiseAllContext::create(vm, globalContext, index);
+
+        if (nextPromise->isThenFastAndNonObservable()) [[likely]] {
+            auto* constructor = promiseSpeciesConstructor(globalObject, nextPromise);
+            RETURN_IF_EXCEPTION(scope, void());
+            if (constructor == globalObject->promiseConstructor()) [[likely]] {
+                scope.release();
+                nextPromise->performPromiseThenWithInternalMicrotask(vm, globalObject, InternalMicrotask::PromiseAllResolveJob, promise, context);
+                ++index;
+                return;
+            }
+        }
+
+        if (!onRejected) {
+            auto [resolve, reject] = promise->createFirstResolvingFunctions(vm, globalObject);
+            onRejected = reject;
+        }
+        JSValue then = nextPromise->get(globalObject, vm.propertyNames->then);
+        RETURN_IF_EXCEPTION(scope, void());
+        CallData thenCallData = getCallDataInline(then);
+        if (thenCallData.type == CallData::Type::None) [[unlikely]] {
+            throwTypeError(globalObject, scope, "then is not a function"_s);
+            return;
+        }
+
+        auto* onFulfilled = JSFunctionWithFields::create(vm, globalObject, vm.promiseAllFulfillFunctionExecutable(), 1, emptyString());
+        onFulfilled->setField(vm, JSFunctionWithFields::Field::PromiseAllContext, context);
+
+        MarkedArgumentBuffer thenArguments;
+        thenArguments.append(onFulfilled);
+        thenArguments.append(onRejected);
+        ASSERT(!thenArguments.hasOverflowed());
+        scope.release();
+        call(globalObject, then, thenCallData, nextPromise, thenArguments);
+        ++index;
+    });
+
+    if (scope.exception()) [[unlikely]] {
+        callReject();
+        return JSValue::encode(promise);
+    }
+
+    uint64_t count = globalContext->remainingElementsCount().toIndex(globalObject, "count exceeds size"_s);
+    if (scope.exception()) [[unlikely]] {
+        callReject();
+        return JSValue::encode(promise);
+    }
+
+    --count;
+    globalContext->setRemainingElementsCount(vm, jsNumber(count));
+    if (!count) {
+        scope.release();
+        promise->resolve(globalObject, values);
+        if (scope.exception()) [[unlikely]] {
+            callReject();
+            return JSValue::encode(promise);
+        }
+    }
+
+    return JSValue::encode(promise);
+}
+
+JSC_DEFINE_HOST_FUNCTION(promiseAllFulfillFunction, (JSGlobalObject* globalObject, CallFrame* callFrame))
+{
+    VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    auto* callee = jsCast<JSFunctionWithFields*>(callFrame->jsCallee());
+    auto* context = jsDynamicCast<JSPromiseAllContext*>(callee->getField(JSFunctionWithFields::Field::PromiseAllContext));
+    if (!context) [[unlikely]]
+        return JSValue::encode(jsUndefined());
+
+    callee->setField(vm, JSFunctionWithFields::Field::PromiseAllContext, jsNull());
+
+    auto* globalContext = jsCast<JSPromiseAllGlobalContext*>(context->globalContext());
+    auto* promise = jsCast<JSPromise*>(globalContext->promise());
+    auto* values = jsCast<JSArray*>(globalContext->values());
+
+    JSValue value = callFrame->argument(0);
+    uint64_t index = context->index();
+
+    values->putDirectIndex(globalObject, index, value);
+    RETURN_IF_EXCEPTION(scope, { });
+
+    uint64_t count = globalContext->remainingElementsCount().toIndex(globalObject, "count exceeds size"_s);
+    RETURN_IF_EXCEPTION(scope, { });
+
+    --count;
+    globalContext->setRemainingElementsCount(vm, jsNumber(count));
+    if (!count) {
+        scope.release();
+        promise->resolve(globalObject, values);
+    }
+
+    return JSValue::encode(jsUndefined());
+}
+
+JSC_DEFINE_HOST_FUNCTION(promiseAllSlowFulfillFunction, (JSGlobalObject* globalObject, CallFrame* callFrame))
+{
+    VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    auto* callee = jsCast<JSFunctionWithFields*>(callFrame->jsCallee());
+    auto* context = jsDynamicCast<JSPromiseAllContext*>(callee->getField(JSFunctionWithFields::Field::PromiseAllContext));
+    if (!context) [[unlikely]]
+        return JSValue::encode(jsUndefined());
+
+    JSValue resolve = callee->getField(JSFunctionWithFields::Field::PromiseAllResolve);
+
+    callee->setField(vm, JSFunctionWithFields::Field::PromiseAllContext, jsNull());
+    callee->setField(vm, JSFunctionWithFields::Field::PromiseAllResolve, jsNull());
+
+    auto* globalContext = jsCast<JSPromiseAllGlobalContext*>(context->globalContext());
+    auto* values = jsCast<JSArray*>(globalContext->values());
+
+    JSValue value = callFrame->argument(0);
+    uint64_t index = context->index();
+
+    values->putDirectIndex(globalObject, index, value);
+    RETURN_IF_EXCEPTION(scope, { });
+
+    uint64_t count = globalContext->remainingElementsCount().toIndex(globalObject, "count exceeds size"_s);
+    RETURN_IF_EXCEPTION(scope, { });
+
+    --count;
+    globalContext->setRemainingElementsCount(vm, jsNumber(count));
+    if (!count) {
+        MarkedArgumentBuffer resolveArguments;
+        resolveArguments.append(values);
+        ASSERT(!resolveArguments.hasOverflowed());
+        auto resolveCallData = getCallDataInline(resolve);
+        scope.release();
+        call(globalObject, resolve, resolveCallData, jsUndefined(), resolveArguments);
+    }
+
+    return JSValue::encode(jsUndefined());
 }
 
 } // namespace JSC

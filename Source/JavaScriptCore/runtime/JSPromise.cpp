@@ -537,7 +537,7 @@ std::tuple<JSFunction*, JSFunction*> JSPromise::createResolvingFunctionsWithoutP
     auto* resolve = JSFunctionWithFields::create(vm, globalObject, vm.promiseResolvingFunctionResolveWithoutPromiseExecutable(), 1, nullString());
     auto* reject = JSFunctionWithFields::create(vm, globalObject, vm.promiseResolvingFunctionRejectWithoutPromiseExecutable(), 1, nullString());
 
-    auto* all = JSPromiseAllGlobalContext::create(vm, globalObject->promiseAllGlobalContextStructure(), onFulfilled, onRejected, context);
+    auto* all = JSPromiseAllGlobalContext::create(vm, onFulfilled, onRejected, context);
 
     resolve->setField(vm, JSFunctionWithFields::Field::ResolvingWithoutPromiseContext, all);
     resolve->setField(vm, JSFunctionWithFields::Field::ResolvingWithoutPromiseOther, reject);

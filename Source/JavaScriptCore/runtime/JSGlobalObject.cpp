@@ -358,8 +358,6 @@ static JSC_DECLARE_HOST_FUNCTION(resolveWithoutPromiseForAsyncAwait);
 static JSC_DECLARE_HOST_FUNCTION(driveAsyncFunction);
 static JSC_DECLARE_HOST_FUNCTION(awaitValue);
 static JSC_DECLARE_HOST_FUNCTION(newHandledRejectedPromise);
-static JSC_DECLARE_HOST_FUNCTION(promiseOnRejectedWithContext);
-static JSC_DECLARE_HOST_FUNCTION(promiseAllOnFulfilled);
 static JSC_DECLARE_HOST_FUNCTION(promiseEmptyOnFulfilled);
 static JSC_DECLARE_HOST_FUNCTION(promiseEmptyOnRejected);
 static JSC_DECLARE_HOST_FUNCTION(promiseResolve);
@@ -834,45 +832,6 @@ JSC_DEFINE_HOST_FUNCTION(newHandledRejectedPromise, (JSGlobalObject* globalObjec
     auto* promise = JSPromise::rejectedPromise(globalObject, argument);
     promise->markAsHandled();
     return JSValue::encode(promise);
-}
-
-JSC_DEFINE_HOST_FUNCTION(promiseOnRejectedWithContext, (JSGlobalObject* globalObject, CallFrame* callFrame))
-{
-    JSValue argument = callFrame->uncheckedArgument(0);
-    auto* context = jsCast<JSPromiseAllContext*>(callFrame->uncheckedArgument(1));
-    auto* globalContext = jsCast<JSPromiseAllGlobalContext*>(context->globalContext());
-    auto* promise = jsCast<JSPromise*>(globalContext->promise());
-    promise->reject(globalObject->vm(), globalObject, argument);
-    return encodedJSUndefined();
-}
-
-JSC_DEFINE_HOST_FUNCTION(promiseAllOnFulfilled, (JSGlobalObject* globalObject, CallFrame* callFrame))
-{
-    VM& vm = globalObject->vm();
-    auto scope = DECLARE_THROW_SCOPE(vm);
-
-    JSValue argument = callFrame->uncheckedArgument(0);
-    auto* context = jsCast<JSPromiseAllContext*>(callFrame->uncheckedArgument(1));
-    auto* globalContext = jsCast<JSPromiseAllGlobalContext*>(context->globalContext());
-
-    auto* values = jsCast<JSArray*>(globalContext->values());
-    uint64_t index = context->index().toIndex(globalObject, "exceeding index size"_s);
-    RETURN_IF_EXCEPTION(scope, { });
-
-    values->putByIndexInline(globalObject, index, argument, true);
-    RETURN_IF_EXCEPTION(scope, { });
-
-    uint64_t count = globalContext->remainingElementsCount().toIndex(globalObject, "count exceeds size"_s);
-    RETURN_IF_EXCEPTION(scope, { });
-
-    --count;
-    globalContext->setRemainingElementsCount(vm, jsNumber(count));
-    if (!count) {
-        auto* promise = jsCast<JSPromise*>(globalContext->promise());
-        scope.release();
-        promise->resolve(globalObject, values);
-    }
-    return encodedJSUndefined();
 }
 
 JSC_DEFINE_HOST_FUNCTION(promiseEmptyOnFulfilled, (JSGlobalObject*, CallFrame* callFrame))
@@ -1390,10 +1349,6 @@ void JSGlobalObject::init(VM& vm)
     auto* wrapForValidIteratorPrototype = WrapForValidIteratorPrototype::create(vm, this, WrapForValidIteratorPrototype::createStructure(vm, this, m_iteratorPrototype.get()));
     m_wrapForValidIteratorStructure.set(vm, this, JSWrapForValidIterator::createStructure(vm, this, wrapForValidIteratorPrototype));
 
-    m_promiseAllContextStructure.set(vm, this, JSPromiseAllContext::createStructure(vm, this, jsNull()));
-
-    m_promiseAllGlobalContextStructure.set(vm, this, JSPromiseAllGlobalContext::createStructure(vm, this, jsNull()));
-
     auto* asyncFromSyncIteratorPrototype = AsyncFromSyncIteratorPrototype::create(vm, this, AsyncFromSyncIteratorPrototype::createStructure(vm, this, m_iteratorPrototype.get()));
     m_asyncFromSyncIteratorStructure.set(vm, this, JSAsyncFromSyncIterator::createStructure(vm, this, asyncFromSyncIteratorPrototype));
 
@@ -1815,16 +1770,6 @@ capitalName ## Constructor* lowerName ## Constructor = featureFlag ? capitalName
         init.set(JSFunction::create(init.vm, jsCast<JSGlobalObject*>(init.owner), 2, "asyncFromSyncIteratorCreate"_s, asyncFromSyncIteratorPrivateFuncCreate, ImplementationVisibility::Private, AsyncFromSyncIteratorCreateIntrinsic));
     });
 
-    // PromiseAllContext Helpers
-    m_linkTimeConstants[static_cast<unsigned>(LinkTimeConstant::promiseAllContextCreate)].initLater([](const Initializer<JSCell>& init) {
-        init.set(JSFunction::create(init.vm, jsCast<JSGlobalObject*>(init.owner), 2, "promiseAllContextCreate"_s, promiseAllContextPrivateFuncCreate, ImplementationVisibility::Private, PromiseAllContextCreateIntrinsic));
-    });
-
-    // PromiseAllGlobalContext Helpers
-    m_linkTimeConstants[static_cast<unsigned>(LinkTimeConstant::promiseAllGlobalContextCreate)].initLater([](const Initializer<JSCell>& init) {
-        init.set(JSFunction::create(init.vm, jsCast<JSGlobalObject*>(init.owner), 3, "promiseAllGlobalContextCreate"_s, promiseAllGlobalContextPrivateFuncCreate, ImplementationVisibility::Private, PromiseAllGlobalContextCreateIntrinsic));
-    });
-
     // RegExpStringIteratorHelpers
     m_linkTimeConstants[static_cast<unsigned>(LinkTimeConstant::regExpStringIteratorCreate)].initLater([](const Initializer<JSCell>& init) {
         init.set(JSFunction::create(init.vm, jsCast<JSGlobalObject*>(init.owner), 4, "regExpStringIteratorCreate"_s, regExpStringIteratorPrivateFuncCreate, ImplementationVisibility::Private, RegExpStringIteratorCreateIntrinsic));
@@ -1944,12 +1889,6 @@ capitalName ## Constructor* lowerName ## Constructor = featureFlag ? capitalName
         });
     m_linkTimeConstants[static_cast<unsigned>(LinkTimeConstant::newHandledRejectedPromise)].initLater([] (const Initializer<JSCell>& init) {
             init.set(JSFunction::create(init.vm, jsCast<JSGlobalObject*>(init.owner), 1, "newHandledRejectedPromise"_s, newHandledRejectedPromise, ImplementationVisibility::Private));
-        });
-    m_linkTimeConstants[static_cast<unsigned>(LinkTimeConstant::promiseOnRejectedWithContext)].initLater([] (const Initializer<JSCell>& init) {
-            init.set(JSFunction::create(init.vm, jsCast<JSGlobalObject*>(init.owner), 2, "promiseOnRejectedWithContext"_s, promiseOnRejectedWithContext, ImplementationVisibility::Private));
-        });
-    m_linkTimeConstants[static_cast<unsigned>(LinkTimeConstant::promiseAllOnFulfilled)].initLater([] (const Initializer<JSCell>& init) {
-            init.set(JSFunction::create(init.vm, jsCast<JSGlobalObject*>(init.owner), 2, "promiseAllOnFulfilled"_s, promiseAllOnFulfilled, ImplementationVisibility::Private));
         });
     m_linkTimeConstants[static_cast<unsigned>(LinkTimeConstant::promiseEmptyOnFulfilled)].initLater([] (const Initializer<JSCell>& init) {
             init.set(JSFunction::create(init.vm, jsCast<JSGlobalObject*>(init.owner), 1, "promiseEmptyOnFulfilled"_s, promiseEmptyOnFulfilled, ImplementationVisibility::Private));
@@ -2996,8 +2935,6 @@ void JSGlobalObject::visitChildrenImpl(JSCell* cell, Visitor& visitor)
     visitor.append(thisObject->m_mapIteratorStructure);
     visitor.append(thisObject->m_setIteratorStructure);
     visitor.append(thisObject->m_wrapForValidIteratorStructure);
-    visitor.append(thisObject->m_promiseAllContextStructure);
-    visitor.append(thisObject->m_promiseAllGlobalContextStructure);
     visitor.append(thisObject->m_asyncFromSyncIteratorStructure);
     visitor.append(thisObject->m_regExpStringIteratorStructure);
     thisObject->m_iteratorResultObjectStructure.visit(visitor);

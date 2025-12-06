@@ -520,6 +520,8 @@ public:
 #endif
     WriteBarrier<Structure> moduleProgramExecutableStructure;
     WriteBarrier<Structure> promiseReactionStructure;
+    WriteBarrier<Structure> promiseAllContextStructure;
+    WriteBarrier<Structure> promiseAllGlobalContextStructure;
     WriteBarrier<Structure> regExpStructure;
     WriteBarrier<Structure> symbolStructure;
     WriteBarrier<Structure> symbolTableStructure;
@@ -555,6 +557,8 @@ public:
     WriteBarrier<NativeExecutable> m_promiseResolvingFunctionResolveWithoutPromiseExecutable;
     WriteBarrier<NativeExecutable> m_promiseResolvingFunctionRejectWithoutPromiseExecutable;
     WriteBarrier<NativeExecutable> m_promiseCapabilityExecutorExecutable;
+    WriteBarrier<NativeExecutable> m_promiseAllFulfillFunctionExecutable;
+    WriteBarrier<NativeExecutable> m_promiseAllSlowFulfillFunctionExecutable;
 
     WriteBarrier<JSCell> m_orderedHashTableDeletedValue;
     WriteBarrier<JSCell> m_orderedHashTableSentinel;
@@ -663,6 +667,20 @@ public:
         if (m_promiseCapabilityExecutorExecutable) [[likely]]
             return m_promiseCapabilityExecutorExecutable.get();
         return promiseCapabilityExecutorExecutableSlow();
+    }
+
+    NativeExecutable* promiseAllFulfillFunctionExecutable()
+    {
+        if (m_promiseAllFulfillFunctionExecutable) [[likely]]
+            return m_promiseAllFulfillFunctionExecutable.get();
+        return promiseAllFulfillFunctionExecutableSlow();
+    }
+
+    NativeExecutable* promiseAllSlowFulfillFunctionExecutable()
+    {
+        if (m_promiseAllSlowFulfillFunctionExecutable) [[likely]]
+            return m_promiseAllSlowFulfillFunctionExecutable.get();
+        return promiseAllSlowFulfillFunctionExecutableSlow();
     }
 
     WeakGCMap<SymbolImpl*, Symbol, PtrHash<SymbolImpl*>> symbolImplToSymbolMap;
@@ -1121,6 +1139,8 @@ private:
     NativeExecutable* promiseResolvingFunctionResolveWithoutPromiseExecutableSlow();
     NativeExecutable* promiseResolvingFunctionRejectWithoutPromiseExecutableSlow();
     NativeExecutable* promiseCapabilityExecutorExecutableSlow();
+    NativeExecutable* promiseAllFulfillFunctionExecutableSlow();
+    NativeExecutable* promiseAllSlowFulfillFunctionExecutableSlow();
 
     void updateStackLimits();
 

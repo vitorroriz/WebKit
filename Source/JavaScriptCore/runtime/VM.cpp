@@ -76,6 +76,9 @@
 #include "JSMap.h"
 #include "JSMicrotask.h"
 #include "JSPromise.h"
+#include "JSPromiseAllContextInlines.h"
+#include "JSPromiseAllGlobalContext.h"
+#include "JSPromiseConstructor.h"
 #include "JSPromiseReaction.h"
 #include "JSPropertyNameEnumeratorInlines.h"
 #include "JSScriptFetchParametersInlines.h"
@@ -322,6 +325,8 @@ VM::VM(VMType vmType, HeapType heapType, WTF::RunLoop* runLoop, bool* success)
     functionExecutableStructure.setWithoutWriteBarrier(FunctionExecutable::createStructure(*this, nullptr, jsNull()));
     moduleProgramExecutableStructure.setWithoutWriteBarrier(ModuleProgramExecutable::createStructure(*this, nullptr, jsNull()));
     promiseReactionStructure.setWithoutWriteBarrier(JSPromiseReaction::createStructure(*this, nullptr, jsNull()));
+    promiseAllContextStructure.setWithoutWriteBarrier(JSPromiseAllContext::createStructure(*this, nullptr, jsNull()));
+    promiseAllGlobalContextStructure.setWithoutWriteBarrier(JSPromiseAllGlobalContext::createStructure(*this, nullptr, jsNull()));
     regExpStructure.setWithoutWriteBarrier(RegExp::createStructure(*this, nullptr, jsNull()));
     symbolStructure.setWithoutWriteBarrier(Symbol::createStructure(*this, nullptr, jsNull()));
     symbolTableStructure.setWithoutWriteBarrier(SymbolTable::createStructure(*this, nullptr, jsNull()));
@@ -1550,6 +1555,22 @@ NativeExecutable* VM::promiseCapabilityExecutorExecutableSlow()
     return executable;
 }
 
+NativeExecutable* VM::promiseAllFulfillFunctionExecutableSlow()
+{
+    ASSERT(!m_promiseAllFulfillFunctionExecutable);
+    auto* executable = getHostFunction(promiseAllFulfillFunction, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseAllFulfillFunctionExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
+NativeExecutable* VM::promiseAllSlowFulfillFunctionExecutableSlow()
+{
+    ASSERT(!m_promiseAllSlowFulfillFunctionExecutable);
+    auto* executable = getHostFunction(promiseAllSlowFulfillFunction, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseAllSlowFulfillFunctionExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
 void VM::executeEntryScopeServicesOnEntry()
 {
     if (hasEntryScopeServiceRequest(EntryScopeService::FirePrimitiveGigacageEnabled)) [[unlikely]] {
@@ -1694,6 +1715,8 @@ void VM::visitAggregateImpl(Visitor& visitor)
 #endif
     visitor.append(moduleProgramExecutableStructure);
     visitor.append(promiseReactionStructure);
+    visitor.append(promiseAllContextStructure);
+    visitor.append(promiseAllGlobalContextStructure);
     visitor.append(regExpStructure);
     visitor.append(symbolStructure);
     visitor.append(symbolTableStructure);
@@ -1737,6 +1760,8 @@ void VM::visitAggregateImpl(Visitor& visitor)
     visitor.append(m_promiseResolvingFunctionResolveWithoutPromiseExecutable);
     visitor.append(m_promiseResolvingFunctionRejectWithoutPromiseExecutable);
     visitor.append(m_promiseCapabilityExecutorExecutable);
+    visitor.append(m_promiseAllFulfillFunctionExecutable);
+    visitor.append(m_promiseAllSlowFulfillFunctionExecutable);
 }
 DEFINE_VISIT_AGGREGATE(VM);
 

@@ -25,37 +25,16 @@
 
 #pragma once
 
-#include "JSInternalFieldObjectImpl.h"
+#include "JSCell.h"
 
 namespace JSC {
 
-const static uint8_t JSPromiseAllGlobalContextNumberOfInternalFields = 3;
-
-class JSPromiseAllGlobalContext final : public JSInternalFieldObjectImpl<JSPromiseAllGlobalContextNumberOfInternalFields> {
+class JSPromiseAllGlobalContext final : public JSCell {
 public:
-    using Base = JSInternalFieldObjectImpl<JSPromiseAllGlobalContextNumberOfInternalFields>;
+    using Base = JSCell;
 
     DECLARE_EXPORT_INFO;
     DECLARE_VISIT_CHILDREN;
-
-    enum class Field : uint8_t {
-        Promise = 0,
-        Values,
-        RemainingElementsCount,
-    };
-    static_assert(numberOfInternalFields == JSPromiseAllGlobalContextNumberOfInternalFields);
-
-    static std::array<JSValue, numberOfInternalFields> initialValues()
-    {
-        return { {
-            jsNull(),
-            jsNull(),
-            jsNumber(0),
-        } };
-    }
-
-    const WriteBarrier<Unknown>& internalField(Field field) const { return Base::internalField(static_cast<uint32_t>(field)); }
-    WriteBarrier<Unknown>& internalField(Field field) { return Base::internalField(static_cast<uint32_t>(field)); }
 
     template<typename CellType, SubspaceAccess mode>
     static GCClient::IsoSubspace* subspaceFor(VM& vm)
@@ -65,28 +44,30 @@ public:
 
     static Structure* createStructure(VM&, JSGlobalObject*, JSValue);
 
-    static JSPromiseAllGlobalContext* createWithInitialValues(VM&, Structure*);
-    static JSPromiseAllGlobalContext* create(VM&, Structure*, JSValue promise, JSValue values, JSValue remainingElementsCount);
+    static JSPromiseAllGlobalContext* create(VM&, JSValue promise, JSValue values, JSValue remainingElementsCount);
 
-    JSValue promise() const { return internalField(Field::Promise).get(); }
-    JSValue values() const { return internalField(Field::Values).get(); }
-    JSValue remainingElementsCount() const { return internalField(Field::RemainingElementsCount).get(); }
+    JSValue promise() const { return m_promise.get(); }
+    JSValue values() const { return m_values.get(); }
+    JSValue remainingElementsCount() const { return m_remainingElementsCount.get(); }
 
-    void setPromise(VM& vm, JSValue promise) { internalField(Field::Promise).set(vm, this, promise); }
-    void setValues(VM& vm, JSValue values) { internalField(Field::Values).set(vm, this, values); }
-    void setRemainingElementsCount(VM& vm, JSValue remainingElementsCount) { internalField(Field::RemainingElementsCount).set(vm, this, remainingElementsCount); }
+    void setPromise(VM& vm, JSValue promise) { m_promise.set(vm, this, promise); }
+    void setValues(VM& vm, JSValue values) { m_values.set(vm, this, values); }
+    void setRemainingElementsCount(VM& vm, JSValue remainingElementsCount) { m_remainingElementsCount.set(vm, this, remainingElementsCount); }
 
 private:
-    JSPromiseAllGlobalContext(VM& vm, Structure* structure)
+    JSPromiseAllGlobalContext(VM& vm, Structure* structure, JSValue promise, JSValue values, JSValue remainingElementsCount)
         : Base(vm, structure)
+        , m_promise(promise, WriteBarrierEarlyInit)
+        , m_values(values, WriteBarrierEarlyInit)
+        , m_remainingElementsCount(remainingElementsCount, WriteBarrierEarlyInit)
     {
     }
 
-    void finishCreation(VM&, JSValue promise, JSValue values, JSValue remainingElementsCount);
+    WriteBarrier<Unknown> m_promise;
+    WriteBarrier<Unknown> m_values;
+    WriteBarrier<Unknown> m_remainingElementsCount;
 };
 
 STATIC_ASSERT_IS_TRIVIALLY_DESTRUCTIBLE(JSPromiseAllGlobalContext);
-
-JSC_DECLARE_HOST_FUNCTION(promiseAllGlobalContextPrivateFuncCreate);
 
 } // namespace JSC

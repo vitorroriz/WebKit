@@ -49,4 +49,7 @@ protected:
 };
 static_assert(sizeof(JSPromiseConstructor) == sizeof(JSFunction), "Allocate JSPromiseConstructor in JSFunction IsoSubspace");
 
+JSC_DECLARE_HOST_FUNCTION(promiseAllFulfillFunction);
+JSC_DECLARE_HOST_FUNCTION(promiseAllSlowFulfillFunction);
+
 } // namespace JSC
