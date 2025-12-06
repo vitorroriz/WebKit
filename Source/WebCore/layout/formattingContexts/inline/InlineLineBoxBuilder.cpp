@@ -148,7 +148,7 @@ static InlineLevelBox::AscentAndDescent layoutBoundstWithEdgeAdjustmentForInline
                 case TextEdgeOver::Text:
                     return fontMetrics.intAscent(fontBaseline);
                 case TextEdgeOver::Cap:
-                    return fontMetrics.intCapHeight();
+                    return InlineFormattingUtils::snapToInt(fontMetrics.capHeight().value_or(0.f));
                 case TextEdgeOver::Ex:
                     return InlineFormattingUtils::snapToInt(fontMetrics.xHeight().value_or(0.f));
                 case TextEdgeOver::Ideographic:
@@ -203,7 +203,7 @@ static InlineLevelBox::AscentAndDescent textBoxAdjustedInlineBoxHeight(const Inl
         case TextEdgeOver::Text:
             return fontMetrics.intAscent(fontBaseline);
         case TextEdgeOver::Cap:
-            return fontMetrics.intCapHeight();
+            return InlineFormattingUtils::snapToInt(fontMetrics.capHeight().value_or(0.f));
         case TextEdgeOver::Ex:
             return InlineFormattingUtils::snapToInt(fontMetrics.xHeight().value_or(0.f));
         case TextEdgeOver::Ideographic:
@@ -252,7 +252,7 @@ InlineLevelBox::AscentAndDescent LineBoxBuilder::enclosingAscentDescentWithFallb
         auto& fontMetrics = font.fontMetrics();
         auto [ascent, descent] = textBoxAdjustedInlineBoxHeight(inlineBox, fontMetrics, fontBaseline);
         if (shouldUseLineGapToAdjustAscentDescent) {
-            auto halfLeading = (fontMetrics.intLineSpacing() - (ascent + descent)) / 2;
+            auto halfLeading = (InlineFormattingUtils::snapToInt(fontMetrics.lineSpacing()) - (ascent + descent)) / 2;
             ascent += halfLeading;
             descent += halfLeading;
         }
@@ -292,7 +292,7 @@ void LineBoxBuilder::setLayoutBoundsForInlineBox(InlineLevelBox& inlineBox, Font
             // the font’s line gap metric may also be incorporated into A and D by adding half to each side as half-leading.
             auto shouldIncorporateHalfLeading = inlineBox.isRootInlineBox() || isLineFitEdgeLeading(inlineBox);
             if (shouldIncorporateHalfLeading) {
-                InlineLayoutUnit lineGap = inlineBox.primarymetricsOfPrimaryFont().intLineSpacing();
+                auto lineGap = InlineFormattingUtils::snapToInt(inlineBox.primarymetricsOfPrimaryFont().lineSpacing());
                 auto halfLeading = (lineGap - (ascent + descent)) / 2;
                 ascent += halfLeading;
                 descent += halfLeading;
@@ -581,7 +581,7 @@ void LineBoxBuilder::adjustInlineBoxHeightsForLineBoxContainIfApplicable(LineBox
         auto ensureFontMetricsBasedHeight = [&] (auto& inlineBox) {
             ASSERT(inlineBox.isInlineBox());
             auto [ascent, descent] = primaryFontMetricsForInlineBox(inlineBox, lineBox.baselineType());
-            InlineLayoutUnit lineGap = inlineBox.primarymetricsOfPrimaryFont().intLineSpacing();
+            auto lineGap = InlineFormattingUtils::snapToInt(inlineBox.primarymetricsOfPrimaryFont().lineSpacing());
             auto halfLeading = !rootBox().isRubyAnnotationBox() ? (lineGap - (ascent + descent)) / 2 : 0.f;
             ascent += halfLeading;
             descent += halfLeading;
@@ -625,7 +625,7 @@ void LineBoxBuilder::adjustInlineBoxHeightsForLineBoxContainIfApplicable(LineBox
         // Initial letter contain is based on the font metrics cap geometry and we hug descent.
         auto& rootInlineBox = lineBox.rootInlineBox();
         auto& fontMetrics = rootInlineBox.primarymetricsOfPrimaryFont();
-        InlineLayoutUnit initialLetterAscent = fontMetrics.intCapHeight();
+        auto initialLetterAscent = InlineFormattingUtils::snapToInt(fontMetrics.capHeight().value_or(0.f));
         auto initialLetterDescent = InlineLayoutUnit { };
 
         for (auto run : lineLayoutResult().runs) {
@@ -790,7 +790,7 @@ InlineLayoutUnit LineBoxBuilder::applyTextBoxTrimOnLineBoxIfNeeded(InlineLayoutU
             case TextEdgeOver::Text:
                 return 0.f;
             case TextEdgeOver::Cap:
-                return primaryFontMetrics.intAscent() - primaryFontMetrics.intCapHeight();
+                return primaryFontMetrics.intAscent() - InlineFormattingUtils::snapToInt(primaryFontMetrics.capHeight().value_or(0.f));
             case TextEdgeOver::Ex:
                 return primaryFontMetrics.intAscent() - InlineFormattingUtils::snapToInt(primaryFontMetrics.xHeight().value_or(0.f));
             case TextEdgeOver::Ideographic:

@@ -312,7 +312,8 @@ static inline LayoutSize scrollbarLogicalSize(const RenderBox& renderer)
 static LayoutUnit fontMetricsBasedBaseline(const RenderBox& renderBox)
 {
     auto& fontMetrics = renderBox.firstLineStyle().metricsOfPrimaryFont();
-    return fontMetrics.intAscent() + (renderBox.lineHeight() - fontMetrics.intHeight()) / 2;
+    auto fontHeight = Layout::InlineFormattingUtils::snapToInt(fontMetrics.ascent()) + Layout::InlineFormattingUtils::snapToInt(fontMetrics.descent());
+    return fontMetrics.intAscent() + (renderBox.lineHeight() - LayoutUnit { fontHeight }) / 2;
 }
 
 static bool shouldUseMarginBoxAsBaseline(const RenderBox& renderBox)
