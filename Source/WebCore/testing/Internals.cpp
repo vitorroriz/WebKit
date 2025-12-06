@@ -1449,12 +1449,12 @@ uint64_t Internals::identifierForTimeline(AnimationTimeline& timeline) const
 #endif
 }
 
-Vector<uint64_t> Internals::scrollingNodeIDForTimeline(AnimationTimeline& timeline) const
+Internals::ScrollingNodeID Internals::scrollingNodeIDForTimeline(AnimationTimeline& timeline) const
 {
 #if ENABLE(THREADED_ANIMATIONS)
     if (RefPtr scrollTimeline = dynamicDowncast<ScrollTimeline>(timeline)) {
         if (auto scrollingNodeID = scrollTimeline->scrollingNodeIDForTesting())
-            return Vector({ scrollingNodeID->object().toUInt64(), scrollingNodeID->processIdentifier().toUInt64() });
+            return { scrollingNodeID->object().toUInt64(), scrollingNodeID->processIdentifier().toUInt64() };
     }
 #else
     UNUSED_PARAM(timeline);
@@ -3497,7 +3497,7 @@ ExceptionOr<uint64_t> Internals::verticalScrollbarLayerID(Node* node) const
     return getLayerID(areaOrException.returnValue()->layerForVerticalScrollbar());
 }
 
-ExceptionOr<Vector<uint64_t>> Internals::scrollingNodeIDForNode(Node* node)
+ExceptionOr<Internals::ScrollingNodeID> Internals::scrollingNodeIDForNode(Node* node)
 {
     auto areaOrException = scrollableAreaForNode(node);
     if (areaOrException.hasException())
@@ -3505,8 +3505,8 @@ ExceptionOr<Vector<uint64_t>> Internals::scrollingNodeIDForNode(Node* node)
 
     auto scrollingNodeID = areaOrException.returnValue()->scrollingNodeID();
     if (!scrollingNodeID)
-        return Vector<uint64_t>({ 0, 0 });
-    return Vector({ scrollingNodeID->object().toUInt64(), scrollingNodeID->processIdentifier().toUInt64() });
+        return { { 0, 0 } };
+    return { { scrollingNodeID->object().toUInt64(), scrollingNodeID->processIdentifier().toUInt64() } };
 }
 
 ExceptionOr<unsigned> Internals::scrollableAreaWidth(Node& node)

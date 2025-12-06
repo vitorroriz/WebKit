@@ -331,9 +331,13 @@ public:
         double speed;
         bool isThreaded;
     };
+    struct ScrollingNodeID {
+        uint64_t nodeIdentifier;
+        uint64_t processIdentifier;
+    };
     Vector<AcceleratedAnimation> acceleratedAnimationsForElement(Element&);
     uint64_t identifierForTimeline(AnimationTimeline&) const;
-    Vector<uint64_t> scrollingNodeIDForTimeline(AnimationTimeline&) const;
+    ScrollingNodeID scrollingNodeIDForTimeline(AnimationTimeline&) const;
     unsigned numberOfAnimationTimelineInvalidations() const;
     double timeToNextAnimationTick(WebAnimation&) const;
 
@@ -547,8 +551,8 @@ public:
     ExceptionOr<String> layerTreeAsText(Document&, unsigned short flags) const;
     ExceptionOr<uint64_t> layerIDForElement(Element&);
     ExceptionOr<String> repaintRectsAsText() const;
-        
-    ExceptionOr<Vector<uint64_t>> scrollingNodeIDForNode(Node*);
+
+    ExceptionOr<ScrollingNodeID> scrollingNodeIDForNode(Node*);
 
     enum {
         // Values need to be kept in sync with Internals.idl.
