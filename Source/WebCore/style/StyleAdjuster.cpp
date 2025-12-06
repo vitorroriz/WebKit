@@ -69,6 +69,7 @@
 #include "Settings.h"
 #include "ShadowRoot.h"
 #include "StylableInlines.h"
+#include "StylePrimitiveNumericTypes+Evaluation.h"
 #include "StyleSelfAlignmentData.h"
 #include "StyleTextDecorationLine.h"
 #include "StyleUpdate.h"
@@ -987,7 +988,7 @@ void Adjuster::adjustSVGElementStyle(RenderStyle& style, const SVGElement& svgEl
     // (Legacy)RenderSVGRoot handles zooming for the whole SVG subtree, so foreignObject content should
     // not be scaled again.
     if (svgElement.hasTagName(SVGNames::foreignObjectTag))
-        style.setUsedZoom(RenderStyle::initialZoom());
+        style.setUsedZoom(Style::evaluate<float>(RenderStyle::initialZoom()));
 
     // SVG text layout code expects us to be a block-level style element.
     // While in theory any block level element would work (flex, grid etc), since we construct RenderBlockFlow for both foreign object and svg text,

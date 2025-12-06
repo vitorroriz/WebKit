@@ -68,6 +68,7 @@ struct FontWidth;
 struct TextAutospace;
 struct TextSpacingTrim;
 struct WebkitLocale;
+struct Zoom;
 
 enum class PositionTryFallbackTactic : uint8_t;
 
@@ -116,7 +117,7 @@ public:
     Ref<const Document> protectedDocument() const { return *m_context.document; }
     const Element* element() const { return m_context.element.get(); }
 
-    inline void setZoom(float);
+    inline void setZoom(Zoom);
     inline void setUsedZoom(float);
     inline void setWritingMode(StyleWritingMode);
     inline void setTextOrientation(TextOrientation);

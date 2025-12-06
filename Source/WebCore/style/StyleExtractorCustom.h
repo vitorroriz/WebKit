@@ -1239,13 +1239,6 @@ template<> struct PropertyExtractorAdaptor<CSSPropertyColor> {
     }
 };
 
-template<> struct PropertyExtractorAdaptor<CSSPropertyZoom> {
-    template<typename F> decltype(auto) computedValue(ExtractorState& state, F&& functor) const
-    {
-        return functor(Style::Number<> { state.style.zoom() });
-    }
-};
-
 // MARK: - Adaptor Invokers
 
 template<CSSPropertyID propertyID> Ref<CSSValue> extractCSSValue(ExtractorState& state)
@@ -2400,16 +2393,6 @@ inline void ExtractorCustom::extractColorSerialization(ExtractorState& state, St
         return;
     }
     extractSerialization<CSSPropertyColor>(state, builder, context);
-}
-
-inline Ref<CSSValue> ExtractorCustom::extractZoom(ExtractorState& state)
-{
-    return extractCSSValue<CSSPropertyZoom>(state);
-}
-
-inline void ExtractorCustom::extractZoomSerialization(ExtractorState& state, StringBuilder& builder, const CSS::SerializationContext& context)
-{
-    extractSerialization<CSSPropertyZoom>(state, builder, context);
 }
 
 // MARK: - Shorthands

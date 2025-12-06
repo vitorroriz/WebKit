@@ -66,16 +66,17 @@ inline bool RenderStyleProperties::setWritingMode(StyleWritingMode mode)
     return true;
 }
 
-inline bool RenderStyleProperties::setZoom(float zoomLevel)
+inline bool RenderStyleProperties::setZoom(Style::Zoom zoom)
 {
     // Clamp the effective zoom value to avoid overflow in derived computations.
     // This matches other engines values for compatibility.
     constexpr float minEffectiveZoom = 1e-6f;
     constexpr float maxEffectiveZoom = 1e6f;
-    setUsedZoom(clampTo<float>(usedZoom() * zoomLevel, minEffectiveZoom, maxEffectiveZoom));
-    if (compareEqual(m_nonInheritedData->rareData->zoom, zoomLevel))
+    setUsedZoom(clampTo<float>(usedZoom() * Style::evaluate<float>(zoom), minEffectiveZoom, maxEffectiveZoom));
+
+    if (compareEqual(m_nonInheritedData->rareData->zoom, zoom))
         return false;
-    m_nonInheritedData.access().rareData.access().zoom = zoomLevel;
+    m_nonInheritedData.access().rareData.access().zoom = zoom;
     return true;
 }
 

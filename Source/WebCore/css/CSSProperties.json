@@ -1658,15 +1658,14 @@
             ],
             "codegen-properties": {
                 "style-builder-custom": "All",
-                "style-extractor-custom": true,
                 "high-priority": true,
                 "render-style-setter-custom": true,
                 "render-style-setter-returns-if-changed": true,
                 "render-style-storage-path": ["m_nonInheritedData", "rareData"],
                 "render-style-storage-kind": "value",
-                "render-style-type": "float",
+                "render-style-type": "Style::Zoom",
                 "parser-grammar": "normal | <percentage [0,inf]> | <number [0,inf]>",
-                "parser-grammar-comment": "Current spec grammar is '<number [0,inf]> || <percentage [0,inf]>'"
+                "parser-grammar-comment": "Current spec grammar is '<number [0,inf]> | <percentage [0,inf]>'"
             },
             "specification": {
                 "category": "css-viewport",

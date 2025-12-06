@@ -386,6 +386,7 @@ struct Widows;
 struct WillChange;
 struct WordSpacing;
 struct ZIndex;
+struct Zoom;
 struct ZoomFactor;
 
 enum class Change : uint8_t;

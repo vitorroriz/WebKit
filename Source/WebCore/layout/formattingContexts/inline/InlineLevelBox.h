@@ -35,7 +35,6 @@
 #include <WebCore/StylePrimitiveNumericTypes+Evaluation.h>
 #include <WebCore/StyleTextBoxEdge.h>
 #include <WebCore/StyleWebKitLineBoxContain.h>
-#include <WebCore/StyleZoomPrimitives.h>
 #include <wtf/OptionSet.h>
 
 namespace WebCore {

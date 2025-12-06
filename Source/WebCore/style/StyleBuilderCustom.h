@@ -364,14 +364,13 @@ inline void BuilderCustom::applyValueZoom(BuilderState& builderState, CSSValue& 
     if (primitiveValue->valueID() == CSSValueNormal) {
         resetUsedZoom(builderState);
         builderState.setZoom(RenderStyle::initialZoom());
-    } else if (primitiveValue->isPercentage()) {
+    } else {
         resetUsedZoom(builderState);
-        if (float percent = primitiveValue->resolveAsPercentage<float>(builderState.cssToLengthConversionData()))
-            builderState.setZoom(percent / 100.0f);
-    } else if (primitiveValue->isNumber()) {
-        resetUsedZoom(builderState);
-        if (float number = primitiveValue->resolveAsNumber<float>(builderState.cssToLengthConversionData()))
-            builderState.setZoom(number);
+
+        auto zoom = toStyleFromCSSValue<Zoom>(builderState, *primitiveValue);
+        // FIXME: The spec says that zoom values of 0 should be treated as 1, not ignored entirely. https://drafts.csswg.org/css-viewport/#valdef-zoom-number
+        if (!isZero(zoom))
+            builderState.setZoom(zoom);
     }
 }
 

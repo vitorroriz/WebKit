@@ -29,6 +29,7 @@
 #include "StyleAppleColorFilterData.h"
 #include "StyleImage.h"
 #include "StylePrimitiveKeyword+Logging.h"
+#include "StylePrimitiveNumericTypes+Evaluation.h"
 #include "StylePrimitiveNumericTypes+Logging.h"
 #include <wtf/PointerComparison.h>
 
@@ -37,7 +38,7 @@ namespace WebCore {
 DEFINE_ALLOCATOR_WITH_HEAP_IDENTIFIER(StyleRareInheritedData);
 
 StyleRareInheritedData::StyleRareInheritedData()
-    : usedZoom(RenderStyle::initialZoom())
+    : usedZoom(Style::evaluate<float>(RenderStyle::initialZoom()))
     , deviceScaleFactor(1.0f)
     , textStrokeWidth(RenderStyle::initialTextStrokeWidth())
     , textStrokeColor(RenderStyle::initialTextStrokeColor())

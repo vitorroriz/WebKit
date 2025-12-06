@@ -630,7 +630,7 @@ public:
     static inline Style::TextDecorationThickness initialTextDecorationThickness();
     static constexpr Style::ZIndex initialSpecifiedZIndex();
     static constexpr Style::ZIndex initialUsedZIndex();
-    static constexpr float initialZoom() { return 1.0f; }
+    static constexpr Style::Zoom initialZoom();
     static constexpr TextZoom initialTextZoom();
     static constexpr Style::Length<> initialOutlineOffset();
     static constexpr Style::Opacity initialOpacity();

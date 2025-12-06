@@ -1799,7 +1799,7 @@ bool RenderThemeCocoa::paintColorWellDecorationsForVectorBasedControls(const Ren
     GraphicsContextStateSaver stateSaver(context);
     context.clip(rect);
 
-    const auto zoomFactor = box.style().zoom();
+    const auto zoomFactor = Style::evaluate<float>(box.style().zoom());
     const auto strokeThickness = 3.f * zoomFactor;
 
     constexpr std::array colorStops {

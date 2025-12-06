@@ -26,6 +26,7 @@
 #pragma once
 
 #include "RenderStyleInlines.h"
+#include "StylePrimitiveNumericTypes+Evaluation.h"
 
 #define RENDER_STYLE_PROPERTIES_SETTERS_INLINES_INCLUDE_TRAP 1
 #include "RenderStylePropertiesSettersInlines.h"

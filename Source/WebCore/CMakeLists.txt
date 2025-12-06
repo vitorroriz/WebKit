@@ -251,6 +251,7 @@ set(WebCore_PRIVATE_INCLUDE_DIRECTORIES
     "${WEBCORE_DIR}/style/values/transitions"
     "${WEBCORE_DIR}/style/values/ui"
     "${WEBCORE_DIR}/style/values/view-transitions"
+    "${WEBCORE_DIR}/style/values/viewport"
     "${WEBCORE_DIR}/style/values/will-change"
     "${WEBCORE_DIR}/svg"
     "${WEBCORE_DIR}/svg/animation"

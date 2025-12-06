@@ -26,9 +26,7 @@
 #pragma once
 
 #include <WebCore/LayoutUnit.h>
-
 #include <WebCore/StylePrimitiveNumeric.h>
-#include <WebCore/StyleZoomPrimitives.h>
 #include <cmath>
 
 namespace WebCore {
