@@ -59,13 +59,17 @@ public:
 
     USING_CAN_MAKE_WEAKPTR(MediaSessionHelperClient);
 
-private:
+protected:
+
 #if !PLATFORM(MACCATALYST)
-    void resetRestrictions() final;
+    void resetRestrictions() override;
 #endif
 
+    void sessionWillBeginPlayback(PlatformMediaSessionInterface&, CompletionHandler<void(bool)>&&) override;
+
+private:
+
     void configureWirelessTargetMonitoring() final;
-    bool sessionWillBeginPlayback(PlatformMediaSessionInterface&) final;
     void sessionWillEndPlayback(PlatformMediaSessionInterface&, DelayCallingUpdateNowPlaying) final;
 
     // AudioSessionInterruptionObserver

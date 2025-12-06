@@ -841,7 +841,8 @@ public:
     WebScreenOrientationManagerProxy* screenOrientationManager() { return m_screenOrientationManager.get(); }
 
 #if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
-    void ensureRemoteMediaSessionManagerProxy();
+    void addRemoteMediaSessionManager(WebCore::PageIdentifier);
+    void removeRemoteMediaSessionManager(WebCore::PageIdentifier);
 #endif
 
 #if PLATFORM(IOS_FAMILY)

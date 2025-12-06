@@ -675,7 +675,8 @@ messages -> WebPageProxy {
 #endif
 
 #if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
-    EnsureRemoteMediaSessionManagerProxy()
+    AddRemoteMediaSessionManager(WebCore::PageIdentifier pageIdentifier)
+    RemoveRemoteMediaSessionManager(WebCore::PageIdentifier pageIdentifier)
 #endif
 
     HasActiveNowPlayingSessionChanged(bool hasActiveNowPlayingSessionChanged)

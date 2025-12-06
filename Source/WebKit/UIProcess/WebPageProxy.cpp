@@ -10352,11 +10352,20 @@ void WebPageProxy::setMockVideoPresentationModeEnabled(bool enabled)
 #endif
 
 #if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
-void WebPageProxy::ensureRemoteMediaSessionManagerProxy()
+void WebPageProxy::addRemoteMediaSessionManager(WebCore::PageIdentifier localPageIdentifier)
 {
     if (!m_mediaSessionManagerProxy)
         m_mediaSessionManagerProxy = RemoteMediaSessionManagerProxy::create(webPageIDInMainFrameProcess(), Ref { siteIsolatedProcess() });
+
+    Ref { *m_mediaSessionManagerProxy }->addRemoteMediaSessionManager(localPageIdentifier);
 }
+
+void WebPageProxy::removeRemoteMediaSessionManager(WebCore::PageIdentifier pageIdentifier)
+{
+    if (m_mediaSessionManagerProxy)
+        Ref { *m_mediaSessionManagerProxy }->removeRemoteMediaSessionManager(pageIdentifier);
+}
+
 #endif
 
 #if PLATFORM(IOS_FAMILY)

@@ -116,6 +116,17 @@ struct PlatformMediaSessionRemoteCommandArgument {
 
 using PlatformMediaSessionRemoteCommandsSet = HashSet<PlatformMediaSessionRemoteControlCommandType, IntHash<PlatformMediaSessionRemoteControlCommandType>, WTF::StrongEnumHashTraits<PlatformMediaSessionRemoteControlCommandType>>;
 
+enum class MediaSessionRestriction : uint8_t {
+    NoRestrictions = 0,
+    ConcurrentPlaybackNotPermitted = 1 << 0,
+    BackgroundProcessPlaybackRestricted = 1 << 1,
+    BackgroundTabPlaybackRestricted = 1 << 2,
+    InterruptedPlaybackNotPermitted = 1 << 3,
+    InactiveProcessPlaybackRestricted = 1 << 4,
+    SuspendedUnderLockPlaybackRestricted = 1 << 5,
+};
+using MediaSessionRestrictions = OptionSet<MediaSessionRestriction>;
+
 class AudioCaptureSource : public CanMakeWeakPtr<AudioCaptureSource> {
 public:
     virtual ~AudioCaptureSource() = default;

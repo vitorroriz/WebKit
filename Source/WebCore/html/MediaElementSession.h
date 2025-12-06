@@ -78,7 +78,7 @@ public:
     void unregisterWithDocument(Document&);
 
     void clientWillBeginAutoplaying() final;
-    bool clientWillBeginPlayback() final;
+    void clientWillBeginPlayback(CompletionHandler<void(bool)>&&) final;
     bool clientWillPausePlayback() final;
     void clientCharacteristicsChanged(bool) final;
 
