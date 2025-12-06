@@ -42,7 +42,6 @@ struct pas_large_map_entry {
     uintptr_t begin;
     uintptr_t end;
     pas_large_heap* heap;
-    bool delegated_to_system_malloc;
 };
 
 static inline pas_large_map_entry pas_large_map_entry_create_empty(void)
@@ -51,7 +50,6 @@ static inline pas_large_map_entry pas_large_map_entry_create_empty(void)
     result.begin = 0;
     result.end = 0;
     result.heap = NULL;
-    result.delegated_to_system_malloc = false;
     return result;
 }
 
@@ -61,7 +59,6 @@ static inline pas_large_map_entry pas_large_map_entry_create_deleted(void)
     result.begin = 1;
     result.end = 0;
     result.heap = NULL;
-    result.delegated_to_system_malloc = false;
     return result;
 }
 

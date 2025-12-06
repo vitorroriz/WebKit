@@ -92,7 +92,6 @@ extern Slot g_config[];
 #define PAS_MTE_MEDIUM_TAGGING_ENABLED (PAS_MTE_CONFIG_BYTE(PAS_MTE_MEDIUM_TAGGING_ENABLE_FLAG))
 #define PAS_MTE_IS_LOCKDOWN_MODE (PAS_MTE_CONFIG_BYTE(PAS_MTE_LOCKDOWN_MODE_FLAG))
 #define PAS_MTE_IS_HARDENED (PAS_MTE_CONFIG_BYTE(PAS_MTE_HARDENED_FLAG))
-#define PAS_MTE_ENABLE_LARGE_OBJECT_DELEGATION (PAS_USE_MTE && PAS_MTE_IS_HARDENED)
 
 #define PAS_VM_MTE 0x2000
 #define PAS_MTE_PROC_FLAG_SEC_ENABLED 0x4000000
@@ -181,7 +180,6 @@ extern Slot g_config[];
 #define PAS_USE_MTE (0)
 #define PAS_USE_MTE_IN_WEBCONTENT (0)
 #define PAS_MTE_FEATURE_ENABLED(feature) (0)
-#define PAS_MTE_ENABLE_LARGE_OBJECT_DELEGATION (0)
 #define PAS_MTE_CHECK_TAG_AND_SET_TCO(ptr) do { (void)ptr; } while (0)
 #define PAS_MTE_SET_TCO_UNCHECKED do { } while (0)
 #define PAS_MTE_CLEAR_TCO do { } while (0)
@@ -191,7 +189,6 @@ extern Slot g_config[];
 extern "C" {
 #endif
 void pas_mte_ensure_initialized(void);
-void pas_mte_force_nontaggable_user_allocations_into_large_heap(void);
 #ifdef __cplusplus
 }
 #endif
