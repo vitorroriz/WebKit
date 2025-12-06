@@ -8214,7 +8214,7 @@ TextTracksInMSEEnabled:
 
 ThreadedScrollDrivenAnimationsEnabled:
   type: bool
-  status: preview
+  status: stable
   category: animation
   humanReadableName: "Threaded Scroll-driven Animations"
   humanReadableDescription: "Run qualifying scroll-driven animations on a separate thread"
@@ -8223,9 +8223,9 @@ ThreadedScrollDrivenAnimationsEnabled:
     WebKitLegacy:
       default: false
     WebKit:
-      default: false
+      default: true
     WebCore:
-      default: false
+      default: true
 
 ThreadedScrollingEnabled:
   type: bool
