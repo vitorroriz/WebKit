@@ -544,6 +544,8 @@ void WebProcessProxy::addRemotePageProxy(RemotePageProxy& remotePage)
 
 void WebProcessProxy::removeRemotePageProxy(RemotePageProxy& remotePage)
 {
+    if (RefPtr page = remotePage.page(); page && m_isResponsive == NoOrMaybe::No)
+        page->processDidBecomeResponsive(*this);
     WEBPROCESSPROXY_RELEASE_LOG(Loading, "removeRemotePageProxy: remotePage=%p", &remotePage);
     m_remotePages.remove(remotePage);
     if (m_remotePages.isEmptyIgnoringNullReferences())
@@ -889,6 +891,9 @@ void WebProcessProxy::markIsNoLongerInPrewarmedPool()
 
 void WebProcessProxy::removeWebPage(WebPageProxy& webPage, EndsUsingDataStore endsUsingDataStore)
 {
+    if (m_isResponsive == NoOrMaybe::No)
+        webPage.processDidBecomeResponsive(*this);
+
     WEBPROCESSPROXY_RELEASE_LOG(Process, "removeWebPage: webPage=%p, pageProxyID=%" PRIu64 ", webPageID=%" PRIu64, &webPage, webPage.identifier().toUInt64(), webPage.webPageIDInMainFrameProcess().toUInt64());
     RefPtr removedPage = m_pageMap.take(webPage.identifier()).get();
     ASSERT_UNUSED(removedPage, removedPage == &webPage);
@@ -1384,7 +1389,7 @@ void WebProcessProxy::didBecomeUnresponsive()
     auto isResponsiveCallbacks = WTFMove(m_isResponsiveCallbacks);
 
     for (Ref page : pages())
-        page->processDidBecomeUnresponsive();
+        page->processDidBecomeUnresponsive(*this);
 
     bool isWebProcessResponsive = false;
     for (auto& callback : isResponsiveCallbacks)
@@ -1404,7 +1409,7 @@ void WebProcessProxy::didBecomeResponsive()
     m_isResponsive = NoOrMaybe::Maybe;
 
     for (Ref page : pages())
-        page->processDidBecomeResponsive();
+        page->processDidBecomeResponsive(*this);
 }
 
 void WebProcessProxy::willChangeIsResponsive()

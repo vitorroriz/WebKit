@@ -141,6 +141,49 @@
 }
 @end
 
+@interface NavigationDelegateWithUnresponsiveCallback : NSObject<WKNavigationDelegate>
+@property (nonatomic, readonly) BOOL didBecomeUnresponsive;
+@property (nonatomic, readonly) BOOL didBecomeResponsive;
+- (void)waitForDidFinishNavigation;
+@end
+
+@implementation NavigationDelegateWithUnresponsiveCallback {
+    bool _finishedNavigation;
+    bool _didBecomeUnresponsive;
+    bool _didBecomeResponsive;
+}
+- (void)webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential *))completionHandler
+{
+    EXPECT_WK_STREQ(challenge.protectionSpace.authenticationMethod, NSURLAuthenticationMethodServerTrust);
+    completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+}
+- (void)waitForDidFinishNavigation
+{
+    _finishedNavigation = false;
+    TestWebKitAPI::Util::run(&_finishedNavigation);
+}
+- (BOOL)didBecomeUnresponsive
+{
+    return _didBecomeUnresponsive;
+}
+- (BOOL)didBecomeResponsive
+{
+    return _didBecomeResponsive;
+}
+- (void)_webViewWebProcessDidBecomeUnresponsive:(WKWebView *)webView
+{
+    _didBecomeUnresponsive = true;
+}
+- (void)_webViewWebProcessDidBecomeResponsive:(WKWebView *)webView
+{
+    _didBecomeResponsive = true;
+}
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation
+{
+    _finishedNavigation = true;
+}
+@end
+
 @interface TestObserver : NSObject
 
 @property (nonatomic, copy) void (^observeValueForKeyPath)(NSString *, id);
@@ -4496,6 +4539,119 @@ TEST(SiteIsolation, ProcessTerminationReason)
     [navigationDelegate waitForDidFinishNavigation];
     EXPECT_EQ(server.totalRequests(), 5u);
 }
+
+#if defined(NDEBUG) && PLATFORM(MAC)
+TEST(SiteIsolation, UnresponsiveProcessKeydown)
+{
+    HTTPServer server({
+        { "/parent"_s, { "<!DOCTYPE html><body onload='iframe1.focus()'><div contenteditable style='width: 100px; height: 100px; border: solid 1px blue;'></div><iframe id='iframe1' src='https://webkit.org/unresponsive-page'></iframe></body>"_s } },
+        { "/unresponsive-page"_s, { "<!DOCTYPE html><html><body onload='window.addEventListener(`keydown`, () => { while (true) { } });'>unresponsive</body></html>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    RetainPtr configuration = server.httpsProxyConfiguration();
+    RetainPtr navigationDelegate = adoptNS([NavigationDelegateWithUnresponsiveCallback new]);
+    enableSiteIsolation(configuration.get());
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:configuration.get()]);
+    webView.get().navigationDelegate = navigationDelegate.get();
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/parent"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+    EXPECT_NE([webView mainFrame].info._processIdentifier, [webView firstChildFrame]._processIdentifier);
+
+    [webView objectByEvaluatingJavaScript:@"iframe1.focus()" inFrame:[webView mainFrame].info];
+    [webView typeCharacter:' '];
+
+    Util::runFor(4_s);
+
+    [webView sendClicksAtPoint:NSMakePoint(50, 50) numberOfClicks:1];
+
+    Util::runFor(1_s);
+
+    EXPECT_TRUE(navigationDelegate.get().didBecomeUnresponsive);
+    EXPECT_FALSE(navigationDelegate.get().didBecomeResponsive);
+}
+
+TEST(SiteIsolation, ResponsiveProcessAfterMousedown)
+{
+    HTTPServer server({
+        { "/parent"_s, { "<!DOCTYPE html><body><iframe src='https://webkit.org/unresponsive-page'></iframe></body>"_s } },
+        { "/unresponsive-page"_s, { "<!DOCTYPE html><html><body>unresponsive</body></html>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    RetainPtr configuration = server.httpsProxyConfiguration();
+    RetainPtr navigationDelegate = adoptNS([NavigationDelegateWithUnresponsiveCallback new]);
+    enableSiteIsolation(configuration.get());
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:configuration.get()]);
+    webView.get().navigationDelegate = navigationDelegate.get();
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/parent"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+    EXPECT_NE([webView mainFrame].info._processIdentifier, [webView firstChildFrame]._processIdentifier);
+
+    CGPoint eventLocationInWindow = [webView convertPoint:CGPointMake(50, 50) toView:nil];
+    [webView sendClicksAtPoint:eventLocationInWindow numberOfClicks:1];
+    Util::runFor(4_s);
+
+    EXPECT_FALSE(navigationDelegate.get().didBecomeUnresponsive);
+}
+
+TEST(SiteIsolation, UnresponsiveProcessMousedown)
+{
+    HTTPServer server({
+        { "/parent"_s, { "<!DOCTYPE html><head><style>iframe { width: 100px; height: 100px; }</style></head><body><iframe src='https://webkit.org/unresponsive-page'></iframe><br><iframe id='iframe1' src='https://w3.org/eventually-responsive-page'></iframe></body>"_s } },
+        { "/unresponsive-page"_s, { "<!DOCTYPE html><html><body onload='window.addEventListener(`mousedown`, () => { while (true) { } });'>unresponsive</body></html>"_s } },
+        { "/eventually-responsive-page"_s, { "<!DOCTYPE html><html><body>eventually responsive<script>addEventListener(`keydown`, () => { const start = performance.now(); while (start + 3500 > performance.now()) { }; document.body.textContent = `responsive now`; });</script></body></html>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    RetainPtr configuration = server.httpsProxyConfiguration();
+    RetainPtr navigationDelegate = adoptNS([NavigationDelegateWithUnresponsiveCallback new]);
+    enableSiteIsolation(configuration.get());
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:configuration.get()]);
+    webView.get().navigationDelegate = navigationDelegate.get();
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/parent"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+    EXPECT_NE([webView mainFrame].info._processIdentifier, [webView firstChildFrame]._processIdentifier);
+    EXPECT_NE([webView firstChildFrame]._processIdentifier, [webView secondChildFrame]._processIdentifier);
+
+    [webView objectByEvaluatingJavaScript:@"iframe1.focus()" inFrame:[webView mainFrame].info];
+    [webView typeCharacter:' '];
+
+    [webView sendClicksAtPoint:[webView convertPoint:CGPointMake(50, 50) toView:nil] numberOfClicks:1];
+    Util::runFor(4_s);
+
+    EXPECT_TRUE(navigationDelegate.get().didBecomeUnresponsive);
+    EXPECT_FALSE(navigationDelegate.get().didBecomeResponsive);
+}
+
+TEST(SiteIsolation, UnresponsiveProcessDies)
+{
+    HTTPServer server({
+        { "/parent"_s, { "<!DOCTYPE html><body><iframe src='https://webkit.org/unresponsive-page'></iframe></body>"_s } },
+        { "/unresponsive-page"_s, { "<!DOCTYPE html><html><body onload='window.addEventListener(`mousedown`, () => { while (true) { } });'>unresponsive</body></html>"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    RetainPtr configuration = server.httpsProxyConfiguration();
+    RetainPtr navigationDelegate = adoptNS([NavigationDelegateWithUnresponsiveCallback new]);
+    enableSiteIsolation(configuration.get());
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:configuration.get()]);
+    webView.get().navigationDelegate = navigationDelegate.get();
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/parent"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+    pid_t childFramePID = [webView firstChildFrame]._processIdentifier;
+    EXPECT_NE([webView mainFrame].info._processIdentifier, childFramePID);
+
+    [webView sendClicksAtPoint:[webView convertPoint:CGPointMake(50, 50) toView:nil] numberOfClicks:1];
+    Util::runFor(3500_ms);
+
+    EXPECT_TRUE(navigationDelegate.get().didBecomeUnresponsive);
+    kill(childFramePID, 9);
+
+    Util::runFor(100_ms);
+    EXPECT_TRUE(navigationDelegate.get().didBecomeResponsive);
+}
+#endif
 
 TEST(SiteIsolation, FormSubmit)
 {
