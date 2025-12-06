@@ -2876,6 +2876,8 @@ public:
     void dropNetworkActivity();
     bool hasValidNetworkActivity() const;
 
+    void takeActivitiesOnRemotePage(RemotePageProxy&);
+
 #if PLATFORM(IOS_FAMILY) && ENABLE(DEVICE_ORIENTATION)
     RefPtr<WebDeviceOrientationUpdateProviderProxy> webDeviceOrientationUpdateProviderProxy();
 #endif

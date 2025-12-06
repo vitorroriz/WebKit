@@ -112,8 +112,7 @@ void RemotePageProxy::injectPageIntoNewProcess()
         m_process->setRunningBoardThrottlingEnabled();
 #endif
 
-    if (page->hasValidNetworkActivity())
-        m_processActivityState->takeNetworkActivity();
+    page->takeActivitiesOnRemotePage(*this);
 
     Ref drawingArea = *page->drawingArea();
     m_drawingArea = RemotePageDrawingAreaProxy::create(drawingArea.get(), m_process);

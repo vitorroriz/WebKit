@@ -17425,6 +17425,15 @@ void WebPageProxy::networkRequestsInProgressDidChange()
     pageLoadState->setNetworkRequestsInProgress(transaction, hasNetworkRequestsInProgress);
 }
 
+void WebPageProxy::takeActivitiesOnRemotePage(RemotePageProxy& remotePage)
+{
+    if (hasValidVisibleActivity())
+        remotePage.processActivityState().takeVisibleActivity();
+
+    if (hasValidNetworkActivity())
+        remotePage.processActivityState().takeNetworkActivity();
+}
+
 // See SwiftDemoLogo.swift for the rationale here
 bool shouldShowSwiftDemoLogo()
 {
