@@ -108,6 +108,7 @@ namespace JSC {
     macro(ObjectGetOwnPropertyNamesIntrinsic) \
     macro(ObjectGetOwnPropertySymbolsIntrinsic) \
     macro(ObjectGetPrototypeOfIntrinsic) \
+    macro(ObjectHasOwnIntrinsic) \
     macro(ObjectIsIntrinsic) \
     macro(ObjectKeysIntrinsic) \
     macro(ObjectToStringIntrinsic) \

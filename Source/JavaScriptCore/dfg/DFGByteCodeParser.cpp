@@ -4213,8 +4213,11 @@ auto ByteCodeParser::handleIntrinsicCall(Node* callee, Operand resultOperand, Ca
             return CallOptimizationResult::Inlined;
         }
 
+        case ObjectHasOwnIntrinsic:
         case HasOwnPropertyIntrinsic: {
-            if (argumentCountIncludingThis < 2)
+            bool isObjectHasOwn = intrinsic == ObjectHasOwnIntrinsic;
+
+            if (argumentCountIncludingThis < (isObjectHasOwn ? 3 : 2))
                 return CallOptimizationResult::DidNothing;
 
             // This can be racy, that's fine. We know that once we observe that this is created,
@@ -4226,8 +4229,8 @@ auto ByteCodeParser::handleIntrinsicCall(Node* callee, Operand resultOperand, Ca
                 return CallOptimizationResult::DidNothing;
 
             insertChecks();
-            Node* object = get(virtualRegisterForArgumentIncludingThis(0, registerOffset));
-            Node* key = get(virtualRegisterForArgumentIncludingThis(1, registerOffset));
+            Node* object = get(virtualRegisterForArgumentIncludingThis(isObjectHasOwn ? 1 : 0, registerOffset));
+            Node* key = get(virtualRegisterForArgumentIncludingThis(isObjectHasOwn ? 2 : 1, registerOffset));
             Node* resultNode = addToGraph(HasOwnProperty, object, key);
             setResult(resultNode);
             return CallOptimizationResult::Inlined;
