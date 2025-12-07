@@ -666,7 +666,8 @@ void NetworkTransportSession::terminate(WebCore::WebTransportSessionErrorCode co
     if (m_datagramConnection)
         nw_connection_cancel(m_datagramConnection.get());
 
-    for (auto& stream : std::exchange(m_streams, { }).values())
+    auto streams = std::exchange(m_streams, { });
+    for (auto& stream : streams.values())
         stream->cancel(code);
 
     nw_connection_group_cancel(m_connectionGroup.get());

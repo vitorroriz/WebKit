@@ -55,8 +55,8 @@ public:
 
     unsigned existingHash() const { return isNull() ? 0 : impl()->existingHash(); }
 
-    operator const String&() const { return m_string; }
-    const String& string() const { return m_string; }
+    operator const String&() const LIFETIME_BOUND { return m_string; }
+    const String& string() const LIFETIME_BOUND { return m_string; }
     String releaseString() { return WTFMove(m_string); }
 
     // FIXME: What guarantees this isn't a SymbolImpl rather than an AtomStringImpl?

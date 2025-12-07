@@ -65,12 +65,12 @@ public:
     }
 #endif
 
-    T& operator*()
+    T& operator*() LIFETIME_BOUND
     {
         return m_value;
     }
 
-    const T& operator*() const
+    const T& operator*() const LIFETIME_BOUND
     {
         return m_value;
     }
