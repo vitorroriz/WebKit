@@ -336,7 +336,7 @@ static bool shouldUseMarginBoxAsBaseline(const RenderBox& renderBox)
         if (blockFlow->style().display() == DisplayType::InlineBlock && !blockFlow->style().isOverflowVisible())
             return true;
 
-        if (blockFlow->childrenInline() && !blockFlow->hasLines() && !blockFlow->hasLineIfEmpty())
+        if (blockFlow->childrenInline() && !blockFlow->hasContentfulInlineOrBlockLine() && !blockFlow->hasLineIfEmpty())
             return true;
 
         // CSS2.1 states that the baseline of an inline block is the baseline of the last line box in
@@ -559,7 +559,7 @@ static std::optional<LayoutUnit> baselineForBox(const RenderBox& renderBox)
         if (!blockFlow->childrenInline())
             return lastInflowBoxBaseline(*blockFlow);
 
-        if (!blockFlow->hasLines()) {
+        if (!blockFlow->hasContentfulInlineOrBlockLine()) {
             ASSERT(blockFlow->hasLineIfEmpty());
             return snapToInt(fontMetricsBasedBaseline(*blockFlow) + (writingMode.isHorizontal() ? blockFlow->borderTop() + blockFlow->paddingTop() : blockFlow->borderRight() + blockFlow->paddingRight()), *blockFlow, SnapDirection::Floor);
         }
@@ -612,7 +612,7 @@ static inline void setIntegrationBaseline(const RenderBox& renderBox)
         if (!blockFlow)
             return false;
         auto hasAppareance = blockFlow->style().hasUsedAppearance() && !blockFlow->theme().isControlContainer(blockFlow->style().usedAppearance());
-        return hasAppareance || !blockFlow->childrenInline() || blockFlow->hasLines() || blockFlow->hasLineIfEmpty();
+        return hasAppareance || !blockFlow->childrenInline() || blockFlow->hasContentfulInlineOrBlockLine() || blockFlow->hasLineIfEmpty();
     };
 
     if (hasNonSyntheticBaseline()) {
