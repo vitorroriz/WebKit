@@ -105,15 +105,25 @@ using namespace WTF;
     [_menu addItem:systemCaptionSettingsItem.get()];
 }
 
-- (BOOL)isAncestorOf:(PlatformMenu *)menu
+static bool menuHasMenuAncestor(NSMenu *childMenu, NSMenu *ancestorMenu)
 {
-    do {
-        if (_menu.get() == menu)
+    while (childMenu) {
+        if (childMenu == ancestorMenu)
             return true;
-        menu = menu.supermenu;
-    } while (menu);
+        childMenu = childMenu.supermenu;
+    }
 
     return false;
+}
+
+- (BOOL)isAncestorOf:(PlatformMenu *)menu
+{
+    return menuHasMenuAncestor(menu, _menu.get());
+}
+
+- (BOOL)hasAncestor:(PlatformMenu *)menu
+{
+    return menuHasMenuAncestor([_menu supermenu], menu);
 }
 
 - (NSMenu *)captionStyleMenu
@@ -147,6 +157,9 @@ using namespace WTF;
     self.savedActiveProfileID = nsProfileID;
     CaptionUserPreferencesMediaAF::setActiveProfileID(WTF::String(self.savedActiveProfileID));
     [self rebuildMenu];
+
+    if (auto delegate = self.delegate; delegate && [delegate respondsToSelector:@selector(captionStyleMenu:didSelectProfile:)])
+        [delegate captionStyleMenu:self.menu didSelectProfile:nsProfileID];
 }
 
 - (void)profileMenuItemHighlighted:(NSMenuItem *)item
@@ -162,6 +175,10 @@ using namespace WTF;
 {
     if (profileID) {
         CaptionUserPreferencesMediaAF::setActiveProfileID(WTF::String(profileID));
+
+        if (auto delegate = self.delegate)
+            [delegate captionStyleMenuWillOpen:_menu.get()];
+
         return;
     }
 

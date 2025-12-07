@@ -78,19 +78,17 @@ using namespace WTF;
     self.menu = [_menuController buildMenuOfType:AVLegibleMediaOptionsMenuTypeCaptionAppearance];
 }
 
-- (BOOL)isAncestorOf:(PlatformMenu*)menu
-{
-    if (!self.menu)
-        return NO;
-    return [menu isEqual:self.menu];
-}
-
 #pragma mark - AVLegibleMediaOptionsMenuControllerDelegate
 
 - (void)legibleMenuController:(AVLegibleMediaOptionsMenuController *)menuController didRequestCaptionPreviewForProfileID:(NSString *)profileID
 {
     [self setPreviewProfileID:profileID];
     [self rebuildMenu];
+
+    // UIMenu does not have the ability to notify clients when a submenu opens or closes.
+    // Provide a similar functionality for previewing subtitle changes by triggering the
+    // preview of subtitle styles when the first profile menu item is selected.
+    [self notifyMenuWillOpen];
 
     if (auto delegate = self.delegate; delegate && [delegate respondsToSelector:@selector(captionStyleMenu:didSelectProfile:)])
         [delegate captionStyleMenu:self.menu didSelectProfile:profileID];

@@ -84,20 +84,6 @@ using namespace WTF;
     self.menu = [_menuController buildMenuOfType:AVLegibleMediaOptionsMenuTypeCaptionAppearance];
 }
 
-- (BOOL)isAncestorOf:(NSMenu *)menu
-{
-    if (!self.menu)
-        return NO;
-
-    do {
-        if (self.menu == menu)
-            return YES;
-        menu = menu.supermenu;
-    } while (menu);
-
-    return NO;
-}
-
 - (NSMenu *)captionStyleMenu
 {
     return self.menu;
@@ -113,20 +99,6 @@ using namespace WTF;
 - (void)legibleMenuControllerDidRequestStoppingSubtitleCaptionPreview:(AVLegibleMediaOptionsMenuController *)menuController
 {
     [self setPreviewProfileID:nil];
-}
-
-#pragma mark - NSMenuDelegate
-
-- (void)menuWillOpen:(NSMenu *)menu
-{
-    if (auto delegate = self.delegate)
-        [delegate captionStyleMenuWillOpen:menu];
-}
-
-- (void)menuDidClose:(NSMenu *)menu
-{
-    if (auto delegate = self.delegate)
-        [delegate captionStyleMenuDidClose:menu];
 }
 
 @end

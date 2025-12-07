@@ -92,9 +92,10 @@
 
 static bool s_captionStyleMenuWillOpenCalled = false;
 static bool s_captionStyleMenuDidCloseCalled = false;
+static RetainPtr<NSString> s_lastSelectedProfileID;
 #if HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
 static bool s_captionPreviewRequestedCalled = false;
-static NSString *s_lastPreviewProfileID = nil;
+static RetainPtr<NSString> s_lastPreviewProfileID;
 #endif
 
 @interface CaptionPreferenceTestMenuControllerDelegate : NSObject<WKCaptionStyleMenuControllerDelegate>
@@ -109,6 +110,11 @@ static NSString *s_lastPreviewProfileID = nil;
 - (void)captionStyleMenuDidClose:(PlatformMenu *)menu
 {
     s_captionStyleMenuDidCloseCalled = true;
+}
+
+- (void)captionStyleMenu:(PlatformMenu *)menu didSelectProfile:(NSString *)profileID
+{
+    s_lastSelectedProfileID = profileID;
 }
 @end
 
@@ -223,7 +229,7 @@ public:
     {
         if (!m_styleMenuController) {
             m_delegate = adoptNS([[CaptionPreferenceTestMenuControllerDelegate alloc] init]);
-            m_styleMenuController = adoptNS([WKCaptionStyleMenuController menuController]);
+            m_styleMenuController = [WKCaptionStyleMenuController menuController];
             [m_styleMenuController setDelegate:m_delegate.get()];
         }
         return m_styleMenuController.get();
@@ -294,13 +300,30 @@ public:
     }
 #endif
 
+    void runAndWaitForLastSelectedProfileToChange(Function<void()>&& function)
+    {
+        s_lastSelectedProfileID = nil;
+        function();
+        Util::waitFor([&] () -> bool {
+            return !!s_lastSelectedProfileID;
+        });
+    }
+
     void selectProfileAtIndex(NSUInteger index)
     {
 #if PLATFORM(MAC)
         [ensureMenu() performActionForItemAtIndex:index];
 #elif PLATFORM(IOS_FAMILY)
-        PlatformMenu *profileMenu = dynamic_objc_cast<PlatformMenu>(ensureMenu().children.firstObject);
-        [dynamic_objc_cast<UIAction>(profileMenu.children[index]) performWithSender:nil target:nil];
+        [dynamic_objc_cast<UIAction>(ensureMenu().children[index]) performWithSender:nil target:nil];
+#endif
+    }
+
+    void highlightProfileAtIndex(NSUInteger index)
+    {
+#if PLATFORM(MAC)
+        [ensureMenu() performSelector:@selector(highlightItem:) withObject:[ensureMenu() itemAtIndex:index]];
+#elif PLATFORM(IOS_FAMILY)
+        ASSERT_NOT_REACHED("Highlighting is not supported on iOS");
 #endif
     }
 private:
@@ -533,14 +556,12 @@ TEST_F(CaptionPreferenceTests, AVKitMenuControllerIntegration)
     if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
         return;
 
-    MediaAccessibilityShim shim;
-
     WKCaptionStyleMenuController *controller = ensureController();
     EXPECT_TRUE(controller != nil);
     EXPECT_TRUE(controller.captionStyleMenu != nil);
 
     PlatformMenu *menu = controller.captionStyleMenu;
-    EXPECT_EQ(menu.children.count, 2UL);
+    EXPECT_EQ(menu.children.count, CaptionUserPreferencesMediaAF::platformProfileIDs().size() + 1);
 }
 
 TEST_F(CaptionPreferenceTests, ProfileIDSavingAndRestoration)
@@ -574,36 +595,6 @@ TEST_F(CaptionPreferenceTests, ProfileIDSavingAndRestoration)
 #endif
 }
 
-#if PLATFORM(IOS_FAMILY)
-TEST_F(CaptionPreferenceTests, ContextMenuDismissalSearch)
-{
-    if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
-        return;
-
-    MediaAccessibilityShim shim;
-
-    RetainPtr window = adoptNS([[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 300, 300)]);
-    RetainPtr viewController = adoptNS([[UIViewController alloc] init]);
-    RetainPtr testView = adoptNS([[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 300)]);
-
-    RetainPtr contextMenuDelegate = adoptNS([[TestContextMenuDelegate alloc] init]);
-    RetainPtr contextMenuInteraction = adoptNS([[UIContextMenuInteraction alloc] initWithDelegate:contextMenuDelegate.get()]);
-    [testView addInteraction:contextMenuInteraction.get()];
-
-    [viewController setView:testView.get()];
-    [window setRootViewController:viewController.get()];
-    [window makeKeyAndVisible];
-
-    WKCaptionStyleMenuController *controller = ensureController();
-
-#if HAVE(AVLEGIBLEMEDIAOPTIONSMENUCONTROLLER)
-    [controller findAndDismissContextMenus];
-#endif
-
-    EXPECT_TRUE(true);
-}
-#endif
-
 TEST_F(CaptionPreferenceTests, MenuRebuildingWithAVKit)
 {
     if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
@@ -620,33 +611,96 @@ TEST_F(CaptionPreferenceTests, MenuRebuildingWithAVKit)
     PlatformMenu *rebuiltMenu = controller.captionStyleMenu;
     EXPECT_TRUE(rebuiltMenu != nil);
 
+    auto profileCount = CaptionUserPreferencesMediaAF::platformProfileIDs().size();
+
 #if PLATFORM(IOS_FAMILY)
-    EXPECT_EQ(rebuiltMenu.children.count, 2UL);
+    EXPECT_EQ(rebuiltMenu.children.count, profileCount + 1);
 #elif PLATFORM(MAC)
-    EXPECT_EQ(rebuiltMenu.numberOfItems, 5);
+    EXPECT_EQ(rebuiltMenu.numberOfItems, profileCount + 1);
 #endif
 }
+#endif
 
 TEST_F(CaptionPreferenceTests, MenuAncestryCheck)
 {
     if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
         return;
 
-    MediaAccessibilityShim shim;
-
     WKCaptionStyleMenuController *controller = ensureController();
-    PlatformMenu *menu = controller.captionStyleMenu;
-
-    EXPECT_TRUE([controller isAncestorOf:menu]);
+    PlatformMenu *captionStyleMenu = controller.captionStyleMenu;
 
 #if PLATFORM(IOS_FAMILY)
-    RetainPtr otherMenu = adoptNS([UIMenu menuWithTitle:@"Other" children:@[]]);
-    EXPECT_FALSE([controller isAncestorOf:otherMenu.get()]);
+    RetainPtr otherMenu = [UIMenu menuWithTitle:@"Other" children:@[]];
+    RetainPtr parentMenu = [UIMenu menuWithTitle:@"Parent" children:@[captionStyleMenu]];
 #elif PLATFORM(MAC)
     RetainPtr otherMenu = adoptNS([[NSMenu alloc] initWithTitle:@"Other"]);
-    EXPECT_FALSE([controller isAncestorOf:otherMenu.get()]);
+    RetainPtr parentMenu = adoptNS([[NSMenu alloc] initWithTitle:@"Parent"]);
+    RetainPtr parentItem = adoptNS([[NSMenuItem alloc] initWithTitle:@"Parent Item" action:nil keyEquivalent:@""]);
+    [parentItem setSubmenu:captionStyleMenu];
+    [parentMenu addItem:parentItem.get()];
 #endif
+
+    EXPECT_FALSE([controller hasAncestor:captionStyleMenu]);
+    EXPECT_TRUE([controller isAncestorOf:captionStyleMenu]);
+    EXPECT_FALSE([controller isAncestorOf:otherMenu.get()]);
+
+    EXPECT_FALSE([controller hasAncestor:otherMenu.get()]);
+    EXPECT_TRUE([controller hasAncestor:parentMenu.get()]);
+}
+
+TEST_F(CaptionPreferenceTests, MenuItemChangesAfterSelection)
+{
+    if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
+        return;
+
+    MediaAccessibilityShim shim;
+
+    showMenuAndThen([&] (PlatformMenu *menu) {
+        runAndWaitForLastSelectedProfileToChange([&] {
+            selectProfileAtIndex(1);
+        });
+#if PLATFORM(IOS_FAMILY)
+        Util::waitFor([&] {
+            return dynamic_objc_cast<UIAction>(ensureMenu().children[1]).state == UIMenuElementStateOn;
+        });
+        EXPECT_EQ(dynamic_objc_cast<UIAction>(ensureMenu().children[1]).state, UIMenuElementStateOn);
+#elif PLATFORM(MAC)
+        Util::waitFor([&] {
+            return [ensureMenu() itemAtIndex:1].state == NSControlStateValueOn;
+        });
+        EXPECT_EQ([ensureMenu() itemAtIndex:1].state, NSControlStateValueOn);
+#endif
+    });
+}
+
+#if PLATFORM(IOS_FAMILY)
+TEST_F(CaptionPreferenceTests, ReceievedDidOpenWhenSelected)
+{
+    if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
+        return;
+
+    showMenuAndThen([&] (PlatformMenu *menu) {
+        runAndWaitForCaptionStyleMenuWillOpenCalled([&] {
+            selectProfileAtIndex(1);
+        });
+    });
 }
 #endif
+
+#if PLATFORM(MAC)
+TEST_F(CaptionPreferenceTests, ReceievedDidOpenWhenHighlighted)
+{
+    if (!CaptionUserPreferencesMediaAF::canSetActiveProfileID())
+        return;
+
+    showMenuAndThen([&] (PlatformMenu *menu) {
+        // TODO: Menu highlighting is currently not supported on IOS_FAMILY
+        runAndWaitForCaptionStyleMenuWillOpenCalled([&] {
+            highlightProfileAtIndex(1);
+        });
+    });
+}
+#endif
+
 
 }

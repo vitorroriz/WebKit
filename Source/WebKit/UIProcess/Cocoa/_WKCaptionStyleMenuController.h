@@ -57,6 +57,7 @@ WK_EXTERN
 #endif
 
 - (BOOL)isAncestorOf:(PlatformMenu*)menu;
+- (BOOL)hasAncestor:(PlatformMenu*)menu;
 @end
 
 NS_ASSUME_NONNULL_END
