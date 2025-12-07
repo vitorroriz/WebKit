@@ -309,13 +309,6 @@ template<typename P, typename WeakPtrImpl> struct WeakPtrHashTraits : SimpleClas
     static constexpr bool hasIsEmptyValueFunction = true;
     static bool isEmptyValue(const WeakPtr<P, WeakPtrImpl>& value) { return value.isHashTableEmptyValue(); }
 
-    // FIXME: HashTable::checkHashTableKey() defeats the "lookup using P* without converting to smart pointer" optimization.
-    // These helper functions preserve the optimization at the expense of some encapsulation. We should either change how
-    // checkHashTableKey() works, or change all smart pointer HashTraits to add this workaround.
-    static bool isEmptyValue(const P* value) { return !value; }
-    static bool isDeletedValue(const P* value) { return value == reinterpret_cast<const P*>(-1); }
-    using SimpleClassHashTraits<WeakPtr<P, WeakPtrImpl>>::isDeletedValue;
-
     using PeekType = P*;
     static PeekType peek(const WeakPtr<P, WeakPtrImpl>& value) { return const_cast<PeekType>(value.ptrAllowingHashTableEmptyValue()); }
     static PeekType peek(P* value) { return value; }
