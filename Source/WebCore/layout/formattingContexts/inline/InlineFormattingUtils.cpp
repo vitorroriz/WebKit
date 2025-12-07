@@ -646,6 +646,16 @@ bool InlineFormattingUtils::shouldDiscardRemainingContentInBlockDirection() cons
     return lineClamp->maximumLines == inlineLayoutState.lineCountWithInlineContentIncludingNestedBlocks();
 }
 
+InlineLayoutUnit InlineFormattingUtils::ascent(const FontMetrics& fontMetrics, FontBaseline fontBaseline)
+{
+    return fontMetrics.intAscent(fontBaseline);
+}
+
+InlineLayoutUnit InlineFormattingUtils::descent(const FontMetrics& fontMetrics, FontBaseline fontBaseline)
+{
+    return fontMetrics.intDescent(fontBaseline);
+}
+
 InlineLayoutUnit InlineFormattingUtils::snapToInt(InlineLayoutUnit value, SnapDirection direction)
 {
     switch (direction) {

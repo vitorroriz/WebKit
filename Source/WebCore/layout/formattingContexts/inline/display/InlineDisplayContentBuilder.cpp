@@ -205,8 +205,8 @@ void InlineDisplayContentBuilder::appendTextDisplayBox(const Line::Run& lineRun,
             auto enclosingAscentAndDescent = TextUtil::enclosingGlyphBoundsForText(StringView(content).substring(text->start, text->length), style, inlineTextBox.shouldUseSimpleGlyphOverflowCodePath() ? TextUtil::ShouldUseSimpleGlyphOverflowCodePath::Yes : TextUtil::ShouldUseSimpleGlyphOverflowCodePath::No);
             // FIXME: Take fallback fonts into account.
             auto& fontMetrics = style.metricsOfPrimaryFont();
-            auto topOverflow = std::max(0, static_cast<int>(InlineFormattingUtils::snapToInt(-enclosingAscentAndDescent.ascent)) - fontMetrics.intAscent());
-            auto bottomOverflow = std::max(0, static_cast<int>(InlineFormattingUtils::snapToInt(enclosingAscentAndDescent.descent)) - fontMetrics.intDescent());
+            auto topOverflow = std::max(0.f, InlineFormattingUtils::snapToInt(-enclosingAscentAndDescent.ascent) - InlineFormattingUtils::ascent(fontMetrics, FontBaseline::Alphabetic));
+            auto bottomOverflow = std::max(0.f, InlineFormattingUtils::snapToInt(enclosingAscentAndDescent.descent) - InlineFormattingUtils::descent(fontMetrics, FontBaseline::Alphabetic));
             inkOverflow.inflate(topOverflow, { }, bottomOverflow, { });
         };
         addGlyphOverflow();

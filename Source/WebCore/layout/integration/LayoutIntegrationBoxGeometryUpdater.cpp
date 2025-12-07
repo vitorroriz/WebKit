@@ -313,7 +313,7 @@ static LayoutUnit fontMetricsBasedBaseline(const RenderBox& renderBox)
 {
     auto& fontMetrics = renderBox.firstLineStyle().metricsOfPrimaryFont();
     auto fontHeight = Layout::InlineFormattingUtils::snapToInt(fontMetrics.ascent()) + Layout::InlineFormattingUtils::snapToInt(fontMetrics.descent());
-    return fontMetrics.intAscent() + (renderBox.lineHeight() - LayoutUnit { fontHeight }) / 2;
+    return LayoutUnit { Layout::InlineFormattingUtils::ascent(fontMetrics, FontBaseline::Alphabetic) + (renderBox.lineHeight() - fontHeight ) / 2 };
 }
 
 static bool shouldUseMarginBoxAsBaseline(const RenderBox& renderBox)

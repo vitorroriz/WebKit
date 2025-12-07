@@ -109,12 +109,12 @@ std::optional<LayoutUnit> InlineQuirks::initialLetterAlignmentOffset(const Box& 
     auto& primaryFontMetrics = lineBoxStyle.fontCascade().metricsOfPrimaryFont();
     auto lineHeight = [&]() -> InlineLayoutUnit {
         if (lineBoxStyle.lineHeight().isNormal())
-            return primaryFontMetrics.intAscent() + primaryFontMetrics.intDescent();
+            return InlineFormattingUtils::ascent(primaryFontMetrics, FontBaseline::Alphabetic) + InlineFormattingUtils::descent(primaryFontMetrics, FontBaseline::Alphabetic);
         return lineBoxStyle.computedLineHeight();
     };
     auto& floatBoxGeometry = formattingContext().geometryForBox(floatBox);
     auto fontHeight = InlineFormattingUtils::snapToInt(primaryFontMetrics.ascent()) + InlineFormattingUtils::snapToInt(primaryFontMetrics.descent());
-    return LayoutUnit { primaryFontMetrics.intAscent() + (lineHeight() - fontHeight) / 2 - InlineFormattingUtils::snapToInt(primaryFontMetrics.capHeight().value_or(0.f)) - floatBoxGeometry.marginBorderAndPaddingBefore() };
+    return LayoutUnit { InlineFormattingUtils::ascent(primaryFontMetrics, FontBaseline::Alphabetic) + (lineHeight() - fontHeight) / 2 - InlineFormattingUtils::snapToInt(primaryFontMetrics.capHeight().value_or(0.f)) - floatBoxGeometry.marginBorderAndPaddingBefore() };
 }
 
 std::optional<InlineRect> InlineQuirks::adjustedRectForLineGridLineAlign(const InlineRect& rect) const
