@@ -272,6 +272,7 @@ BorderBoxPositions GridLayout::performBlockAxisSelfAlignment(const PlacedGridIte
 
 TrackSizingFunctionsList GridLayout::trackSizingFunctions(size_t implicitGridTracksCount, const Vector<Style::GridTrackSize> gridTemplateTrackSizes)
 {
+    // FIXME: Support implicit tracks (both before and after the explicit grid)
     ASSERT(implicitGridTracksCount == gridTemplateTrackSizes.size(), "Currently only support mapping track sizes from explicit grid from grid-template-{columns, rows}");
     UNUSED_VARIABLE(implicitGridTracksCount);
 

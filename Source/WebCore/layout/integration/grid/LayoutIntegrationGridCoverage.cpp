@@ -61,7 +61,7 @@ enum class GridAvoidanceReason : uint64_t {
     GridHasNonInitialMaxHeight                  = 1LLU << 13,
     GridHasNonZeroMinWidth                      = 1LLU << 14,
     GridHasGridTemplateAreas                    = 1LLU << 15,
-    GridHasNonInitialGridAutoFlow               = 1LLU << 16,
+    GridHasColumnAutoFlow                       = 1LLU << 16,
     GridHasNonFixedGaps                         = 1LLU << 17,
     GridIsOutOfFlow                             = 1LLU << 18,
     GridHasContainsSize                         = 1LLU << 19,
@@ -175,8 +175,11 @@ static OptionSet<GridAvoidanceReason> gridLayoutAvoidanceReason(const RenderGrid
     if (!renderGrid.firstInFlowChild())
         ADD_REASON_AND_RETURN_IF_NEEDED(GridIsEmpty, reasons, reasonCollectionMode);
 
-    if (!renderGridStyle->gridAutoFlow().isRow() || !renderGridStyle->gridAutoFlow().isSparse())
-        ADD_REASON_AND_RETURN_IF_NEEDED(GridHasNonInitialGridAutoFlow, reasons, reasonCollectionMode);
+    // GFC currently supports grid-auto-flow: row and row dense
+    // Column auto-flow is not yet supported
+    auto gridAutoFlow = renderGridStyle->gridAutoFlow();
+    if (gridAutoFlow.isColumn())
+        ADD_REASON_AND_RETURN_IF_NEEDED(GridHasColumnAutoFlow, reasons, reasonCollectionMode);
 
     // Check for non-fixed gaps. GFC currently only supports fixed-length gaps.
     if (!renderGridStyle->rowGap().isNormal()) {
@@ -281,8 +284,6 @@ static OptionSet<GridAvoidanceReason> gridLayoutAvoidanceReason(const RenderGrid
     if (renderGridStyle->usedContain().contains(Style::ContainValue::Size))
         ADD_REASON_AND_RETURN_IF_NEEDED(GridHasContainsSize, reasons, reasonCollectionMode);
 
-    auto linesFromGridTemplateColumnsCount = gridTemplateColumns.sizes.size() + 1;
-    auto linesFromGridTemplateRowsCount = gridTemplateRows.sizes.size() + 1;
     for (CheckedRef gridItem : childrenOfType<RenderBox>(renderGrid)) {
         if (!gridItem->isRenderBlockFlow())
             ADD_REASON_AND_RETURN_IF_NEEDED(GridHasUnsupportedRenderer, reasons, reasonCollectionMode);
@@ -336,6 +337,8 @@ static OptionSet<GridAvoidanceReason> gridLayoutAvoidanceReason(const RenderGrid
             && alignSelf.positionType() != ItemPositionType::NonLegacy)
             ADD_REASON_AND_RETURN_IF_NEEDED(GridItemHasUnsupportedBlockAxisAlignment, reasons, reasonCollectionMode);
 
+        auto linesFromGridTemplateColumnsCount = gridTemplateColumns.sizes.size() + 1;
+        auto linesFromGridTemplateRowsCount = gridTemplateRows.sizes.size() + 1;
         auto& columnStart = gridItemStyle->gridItemColumnStart();
         auto columnPositioningAvoidanceReason = WTF::switchOn(columnStart,
             [&](const CSS::Keyword::Auto&) -> std::optional<GridAvoidanceReason> {
@@ -481,8 +484,8 @@ static void printReason(GridAvoidanceReason reason, TextStream& stream)
     case GridAvoidanceReason::GridHasGridTemplateAreas:
         stream << "grid has grid-template-areas";
         break;
-    case GridAvoidanceReason::GridHasNonInitialGridAutoFlow:
-        stream << "grid has non-initial grid-auto-flow";
+    case GridAvoidanceReason::GridHasColumnAutoFlow:
+        stream << "grid has column auto-flow";
         break;
     case GridAvoidanceReason::GridHasNonFixedGaps:
         stream << "grid has non-fixed gaps";
