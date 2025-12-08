@@ -3316,18 +3316,14 @@ std::optional<LayoutUnit> RenderBlockFlow::firstLineBaseline() const
     if (!childrenInline())
         return RenderBlock::firstLineBaseline();
 
-    if (!hasLines()) {
-        if (hasLineIfEmpty()) {
-            auto& fontMetrics = firstLineStyle().metricsOfPrimaryFont();
-            return { LayoutUnit(borderAndPaddingBefore() + fontMetrics.intAscent() + (firstLineStyle().computedLineHeight() - fontMetrics.intHeight()) / 2) };
-        }
-        return { };
-    }
-
-    if (auto* lineLayout = this->inlineLayout())
+    if (auto* lineLayout = this->inlineLayout(); lineLayout && lineLayout->hasContentfulInlineLine())
         return LayoutUnit { floorToInt(lineLayout->firstLineBaseline()) };
 
-    ASSERT_NOT_REACHED();
+    if (hasLineIfEmpty()) {
+        auto& fontMetrics = firstLineStyle().metricsOfPrimaryFont();
+        return { LayoutUnit(borderAndPaddingBefore() + fontMetrics.intAscent() + (firstLineStyle().computedLineHeight() - fontMetrics.intHeight()) / 2) };
+    }
+
     return { };
 }
 
@@ -3342,18 +3338,14 @@ std::optional<LayoutUnit> RenderBlockFlow::lastLineBaseline() const
     if (!childrenInline())
         return RenderBlock::lastLineBaseline();
 
-    if (!hasLines()) {
-        if (hasLineIfEmpty()) {
-            auto& fontMetrics = style().metricsOfPrimaryFont();
-            return { LayoutUnit(borderAndPaddingBefore() + fontMetrics.intAscent() + (style().computedLineHeight() - fontMetrics.intHeight()) / 2) };
-        }
-        return { };
-    }
-
-    if (auto* lineLayout = inlineLayout())
+    if (auto* lineLayout = this->inlineLayout(); lineLayout && lineLayout->hasContentfulInlineLine())
         return LayoutUnit { floorToInt(lineLayout->lastLineBaseline()) };
 
-    ASSERT_NOT_REACHED();
+    if (hasLineIfEmpty()) {
+        auto& fontMetrics = style().metricsOfPrimaryFont();
+        return { LayoutUnit(borderAndPaddingBefore() + fontMetrics.intAscent() + (style().computedLineHeight() - fontMetrics.intHeight()) / 2) };
+    }
+
     return { };
 }
 
@@ -3853,6 +3845,11 @@ bool RenderBlockFlow::hasLines() const
 bool RenderBlockFlow::hasContentfulInlineOrBlockLine() const
 {
     return inlineLayout() ? inlineLayout()->hasContentfulInlineOrBlockLine() : hasLines();
+}
+
+bool RenderBlockFlow::hasContentfulInlineLine() const
+{
+    return inlineLayout() ? inlineLayout()->hasContentfulInlineLine() : false;
 }
 
 bool RenderBlockFlow::hasBlocksInInlineLayout() const

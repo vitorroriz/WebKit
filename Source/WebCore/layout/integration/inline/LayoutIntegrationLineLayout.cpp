@@ -852,6 +852,11 @@ bool LineLayout::hasContentfulInlineOrBlockLine() const
     return m_inlineContent && m_inlineContent->hasContentfulInFlowBox();
 }
 
+bool LineLayout::hasContentfulInlineLine() const
+{
+    return m_inlineContent && m_inlineContent->hasContentfulInlineLevelBox();
+}
+
 size_t LineLayout::lineCount() const
 {
     if (!m_inlineContent)

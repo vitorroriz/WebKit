@@ -50,6 +50,15 @@ bool InlineContent::hasContentfulInFlowBox() const
     return false;
 }
 
+bool InlineContent::hasContentfulInlineLevelBox() const
+{
+    for (auto& line : m_displayContent.lines) {
+        if (line.hasContentfulInlineLevelBox())
+            return true;
+    }
+    return false;
+}
+
 IteratorRange<const InlineDisplay::Box*> InlineContent::boxesForRect(const LayoutRect& rect) const
 {
     if (m_displayContent.boxes.isEmpty())

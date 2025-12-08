@@ -357,6 +357,7 @@ public:
 
     bool hasLines() const;
     bool hasContentfulInlineOrBlockLine() const;
+    bool hasContentfulInlineLine() const;
     bool hasBlocksInInlineLayout() const;
 
     enum InvalidationReason : uint8_t {
