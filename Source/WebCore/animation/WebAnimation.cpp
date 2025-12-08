@@ -381,7 +381,7 @@ void WebAnimation::setTimelineInternal(RefPtr<AnimationTimeline>&& timeline)
     m_timeline = WTFMove(timeline);
 
     if (m_effect)
-        m_effect->animationTimelineDidChange(m_timeline.get());
+        m_effect->animationTimelineDidChange();
 
     m_pendingStartTime = std::nullopt;
 }

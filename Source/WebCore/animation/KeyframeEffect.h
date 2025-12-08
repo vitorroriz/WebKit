@@ -276,7 +276,7 @@ private:
     void animationDidChangeTimingProperties() final;
     void animationWasCanceled() final;
     void animationSuspensionStateDidChange(bool) final;
-    void animationTimelineDidChange(const AnimationTimeline*) final;
+    void animationTimelineDidChange() final;
     void animationDidFinish() final;
     void animationPlaybackRateDidChange() final;
     void setAnimation(WebAnimation*) final;

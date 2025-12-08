@@ -1497,9 +1497,9 @@ void KeyframeEffect::updateIsAssociatedWithProgressBasedTimeline()
         updateAcceleratedAnimationIfNecessary();
 }
 
-void KeyframeEffect::animationTimelineDidChange(const AnimationTimeline* timeline)
+void KeyframeEffect::animationTimelineDidChange()
 {
-    AnimationEffect::animationTimelineDidChange(timeline);
+    AnimationEffect::animationTimelineDidChange();
 
     updateIsAssociatedWithProgressBasedTimeline();
 
