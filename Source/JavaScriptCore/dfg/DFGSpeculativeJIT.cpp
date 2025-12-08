@@ -12308,9 +12308,24 @@ void SpeculativeJIT::speculateOther(Edge edge)
 {
     if (!needsTypeCheck(edge, SpecOther))
         return;
-    
+
     JSValueOperand operand(this, edge, ManualOperandSpeculation);
     speculateOther(edge, operand.jsValueRegs());
+}
+
+void SpeculativeJIT::speculateNotOther(Edge edge, JSValueRegs regs, GPRReg tempGPR)
+{
+    DFG_TYPE_CHECK(regs, edge, ~SpecOther, branchIfOther(regs, tempGPR));
+}
+
+void SpeculativeJIT::speculateNotOther(Edge edge)
+{
+    if (!needsTypeCheck(edge, ~SpecOther))
+        return;
+
+    JSValueOperand operand(this, edge, ManualOperandSpeculation);
+    GPRTemporary temp(this);
+    speculateNotOther(edge, operand.jsValueRegs(), temp.gpr());
 }
 
 void SpeculativeJIT::speculateMisc(Edge edge, JSValueRegs regs)
@@ -12480,6 +12495,9 @@ void SpeculativeJIT::speculate(Node*, Edge edge)
         break;
     case NotDoubleUse:
         speculateNotDouble(edge);
+        break;
+    case NotOtherUse:
+        speculateNotOther(edge);
         break;
     case NeitherDoubleNorHeapBigIntUse:
         speculateNeitherDoubleNorHeapBigInt(edge);
