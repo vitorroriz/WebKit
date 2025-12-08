@@ -167,6 +167,13 @@ header: <WebCore/FontPlatformData.h>
     bool syntheticOblique;
 }
 
+using WebCore::SystemUIFontType = uint32_t;
+
+[CustomHeader, Nested] struct WebCore::InstalledFont::SystemUIFont {
+    WebCore::SystemUIFontType systemUIFontType;
+    String language;
+}
+
 [CustomHeader, Nested] struct WebCore::InstalledFont::PostScriptFont {
     String postScriptName;
     CTFontDescriptorOptions fontDescriptorOptions;
@@ -174,7 +181,7 @@ header: <WebCore/FontPlatformData.h>
 }
 
 [CustomHeader] struct WebCore::InstalledFont {
-    Variant<WebCore::InstalledFont::PostScriptFont> font;
+    Variant<WebCore::InstalledFont::SystemUIFont, WebCore::InstalledFont::PostScriptFont> font;
     WebCore::FontMetadata metadata;
 }
 

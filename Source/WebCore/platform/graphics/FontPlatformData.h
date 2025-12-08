@@ -171,6 +171,9 @@ struct FontPlatformDataAttributes {
 
 #if USE(CORE_TEXT)
 
+using SystemUIFontType = uint32_t;
+#define SystemUIFontTypeNone UINT32_MAX
+
 struct FontPlatformSerializedTraits {
     static std::optional<FontPlatformSerializedTraits> fromCF(CFDictionaryRef);
     RetainPtr<CFDictionaryRef> toCFDictionary() const;
@@ -248,6 +251,12 @@ struct FontMetadata {
 };
 
 struct InstalledFont {
+    struct SystemUIFont {
+        SystemUIFontType systemUIFontType { SystemUIFontTypeNone };
+        String language;
+        RetainPtr<CTFontRef> toCTFont(double pointSize) const;
+    };
+
     struct PostScriptFont {
         String postScriptName;
         CTFontDescriptorOptions fontDescriptorOptions;
@@ -255,7 +264,7 @@ struct InstalledFont {
         RetainPtr<CTFontRef> toCTFont(double pointSize) const;
     };
 
-    Variant<PostScriptFont> font;
+    Variant<SystemUIFont, PostScriptFont> font;
     FontMetadata metadata;
     WEBCORE_EXPORT RetainPtr<CTFontRef> toCTFont() const;
     Ref<Font> toFont() const;
