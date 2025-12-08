@@ -215,7 +215,7 @@ inline std::optional<size_t> RenderStyleBase::usedPositionOptionIndex() const
     return m_nonInheritedData->rareData->usedPositionOptionIndex;
 }
 
-inline DisplayType RenderStyleBase::originalDisplay() const
+inline constexpr DisplayType RenderStyleBase::originalDisplay() const
 {
     return static_cast<DisplayType>(m_nonInheritedFlags.originalDisplay);
 }

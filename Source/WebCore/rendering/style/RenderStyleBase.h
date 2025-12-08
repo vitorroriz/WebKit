@@ -546,7 +546,7 @@ public:
 #endif
 
     // No setter. Set via `RenderStyleProperties::setDisplay()`.
-    inline DisplayType originalDisplay() const;
+    inline constexpr DisplayType originalDisplay() const;
 
     // `effectiveDisplay()` getter is an alias of `RenderStyleProperties::display()`.
     inline DisplayType effectiveDisplay() const;
