@@ -146,7 +146,7 @@ bool MediaSessionManagerInterface::activeAudioSessionRequired() const
         return true;
 
     return std::ranges::any_of(m_audioCaptureSources, [](auto& source) {
-        return source.isCapturingAudio();
+        return Ref { source }->isCapturingAudio();
     });
 #else
     return false;
@@ -570,8 +570,8 @@ void MediaSessionManagerInterface::removeAudioCaptureSource(AudioCaptureSource& 
 int MediaSessionManagerInterface::countActiveAudioCaptureSources()
 {
     int count = 0;
-    for (const auto& source : m_audioCaptureSources) {
-        if (source.wantsToCaptureAudio())
+    for (Ref source : m_audioCaptureSources) {
+        if (source->wantsToCaptureAudio())
             ++count;
     }
     return count;
