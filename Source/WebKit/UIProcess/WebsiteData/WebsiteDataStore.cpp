@@ -105,10 +105,6 @@
 #include "VirtualAuthenticatorManager.h"
 #endif // ENABLE(WEB_AUTHN)
 
-#if HAVE(MODERN_DOWNLOADPROGRESS)
-#include <WebKitAdditions/DownloadProgressAdditions.h>
-#endif
-
 namespace WebKit {
 
 static bool allowsWebsiteDataRecordsForAllOrigins;
@@ -2777,7 +2773,7 @@ void WebsiteDataStore::resumeDownload(const DownloadProxy& downloadProxy, const 
 
     Vector<uint8_t> downloadProgressAccessToken;
 #if HAVE(MODERN_DOWNLOADPROGRESS)
-    downloadProgressAccessToken = activityAccessToken();
+    downloadProgressAccessToken = downloadProxy.activityAccessToken();
 #endif
 
     protectedNetworkProcess()->send(Messages::NetworkProcess::ResumeDownload(m_sessionID, downloadProxy.downloadID(), resumeData.span(), path, WTFMove(sandboxExtensionHandle), callDownloadDidStart, downloadProgressAccessToken.span()), 0);
