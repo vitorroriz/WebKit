@@ -179,7 +179,7 @@ void GPUProcessConnection::didClose(IPC::Connection&)
 
 #if ENABLE(ROUTING_ARBITRATION)
     if (auto* arbitrator = webProcess->audioSessionRoutingArbitrator())
-        arbitrator->leaveRoutingAbritration();
+        arbitrator->leaveRoutingArbitration();
 #endif
 
     m_clients.forEach([protectedThis = Ref { *this }] (auto& client) {
@@ -387,7 +387,7 @@ void GPUProcessConnection::beginRoutingArbitrationWithCategory(AudioSession::Cat
 void GPUProcessConnection::endRoutingArbitration()
 {
     if (auto* arbitrator = WebProcess::singleton().audioSessionRoutingArbitrator()) {
-        arbitrator->leaveRoutingAbritration();
+        arbitrator->leaveRoutingArbitration();
         return;
     }
 

@@ -43,7 +43,7 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(AudioSessionRoutingArbitrator);
 AudioSessionRoutingArbitrator::AudioSessionRoutingArbitrator(WebProcess& process)
     : m_observer(WebCore::AudioSession::ChangedObserver::create([weakThis = WeakPtr { *this }] (AudioSession& session) {
         if (RefPtr protectedThis = weakThis.get())
-            session.setRoutingArbitrationClient(protectedThis.get());
+            session.setRoutingArbitrationClient(*protectedThis);
     }))
     , m_logIdentifier(LoggerHelper::uniqueLogIdentifier())
 {
@@ -69,7 +69,7 @@ void AudioSessionRoutingArbitrator::beginRoutingArbitrationWithCategory(AudioSes
     WebProcess::singleton().protectedParentProcessConnection()->sendWithAsyncReply(Messages::AudioSessionRoutingArbitratorProxy::BeginRoutingArbitrationWithCategory(category), WTFMove(callback), AudioSessionRoutingArbitratorProxy::destinationId());
 }
 
-void AudioSessionRoutingArbitrator::leaveRoutingAbritration()
+void AudioSessionRoutingArbitrator::leaveRoutingArbitration()
 {
     WebProcess::singleton().protectedParentProcessConnection()->send(Messages::AudioSessionRoutingArbitratorProxy::EndRoutingArbitration(), AudioSessionRoutingArbitratorProxy::destinationId());
 }

@@ -40,15 +40,6 @@
 #include <wtf/WeakHashSet.h>
 #include <wtf/text/WTFString.h>
 
-namespace WebCore {
-class AudioSessionRoutingArbitrationClient;
-}
-
-namespace WTF {
-template<typename T> struct IsDeprecatedWeakRefSmartPointerException;
-template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::AudioSessionRoutingArbitrationClient> : std::true_type { };
-}
-
 namespace WTF {
 class Logger;
 }
@@ -163,7 +154,7 @@ public:
 
     virtual bool isActive() const { return m_active; }
 
-    virtual void setRoutingArbitrationClient(WeakPtr<AudioSessionRoutingArbitrationClient>&& client) { m_routingArbitrationClient = client; }
+    void setRoutingArbitrationClient(AudioSessionRoutingArbitrationClient& client) { m_routingArbitrationClient = client; }
 
     static bool shouldManageAudioSessionCategory();
     static void setShouldManageAudioSessionCategory(bool);
@@ -211,7 +202,7 @@ public:
 
 enum class AudioSessionRoutingArbitrationError : uint8_t { None, Failed, Cancelled };
 
-class WEBCORE_EXPORT AudioSessionRoutingArbitrationClient : public CanMakeWeakPtr<AudioSessionRoutingArbitrationClient> {
+class WEBCORE_EXPORT AudioSessionRoutingArbitrationClient : public AbstractRefCountedAndCanMakeWeakPtr<AudioSessionRoutingArbitrationClient> {
 public:
     USING_CAN_MAKE_WEAKPTR(CanMakeWeakPtr<AudioSessionRoutingArbitrationClient>);
 
@@ -223,7 +214,7 @@ public:
     using ArbitrationCallback = CompletionHandler<void(RoutingArbitrationError, DefaultRouteChanged)>;
 
     virtual void beginRoutingArbitrationWithCategory(AudioSession::CategoryType, ArbitrationCallback&&) = 0;
-    virtual void leaveRoutingAbritration() = 0;
+    virtual void leaveRoutingArbitration() = 0;
 
     virtual uint64_t logIdentifier() const = 0;
     virtual bool canLog() const = 0;

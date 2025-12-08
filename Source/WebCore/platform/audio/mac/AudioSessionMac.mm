@@ -263,12 +263,13 @@ void AudioSessionMac::setCategory(CategoryType category, Mode mode, RouteSharing
         return;
     }
 
-    if (!m_routingArbitrationClient)
+    RefPtr routingArbitrationClient = m_routingArbitrationClient.get();
+    if (!routingArbitrationClient)
         return;
 
     if (m_inRoutingArbitration) {
         m_inRoutingArbitration = false;
-        m_routingArbitrationClient->leaveRoutingAbritration();
+        routingArbitrationClient->leaveRoutingArbitration();
     }
 
     if (category == CategoryType::AmbientSound || category == CategoryType::SoloAmbientSound || category == CategoryType::AudioProcessing || category == CategoryType::None)
@@ -279,7 +280,8 @@ void AudioSessionMac::setCategory(CategoryType category, Mode mode, RouteSharing
 
     m_playingToBluetooth = playingToBluetooth;
     m_setupArbitrationOngoing = true;
-    m_routingArbitrationClient->beginRoutingArbitrationWithCategory(m_category, [weakThis = ThreadSafeWeakPtr { *this }] (RoutingArbitrationError error, DefaultRouteChanged defaultRouteChanged) {
+    routingArbitrationClient = m_routingArbitrationClient.get();
+    routingArbitrationClient->beginRoutingArbitrationWithCategory(m_category, [weakThis = ThreadSafeWeakPtr { *this }] (RoutingArbitrationError error, DefaultRouteChanged defaultRouteChanged) {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis)
             return;
@@ -563,8 +565,8 @@ WTFLogChannel& AudioSessionMac::logChannel() const
 uint64_t AudioSessionMac::logIdentifier() const
 {
 #if ENABLE(ROUTING_ARBITRATION)
-    if (m_routingArbitrationClient)
-        return m_routingArbitrationClient->logIdentifier();
+    if (RefPtr client = m_routingArbitrationClient.get())
+        return client->logIdentifier();
 #endif
 
     return 0;
