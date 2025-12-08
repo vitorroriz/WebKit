@@ -442,7 +442,8 @@ void RenderSVGText::layout()
 
 void RenderSVGText::computePerCharacterLayoutInformation()
 {
-    if (!hasLines())
+    auto hasSVGContent = legacyRootBox() || (inlineLayout() && inlineLayout()->hasContentfulInlineLine());
+    if (!hasSVGContent)
         return;
 
     if (m_layoutAttributes.isEmpty())

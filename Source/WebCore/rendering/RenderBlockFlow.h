@@ -355,7 +355,6 @@ public:
 
     void setChildrenInline(bool) final;
 
-    bool hasLines() const;
     bool hasContentfulInlineOrBlockLine() const;
     bool hasContentfulInlineLine() const;
     bool hasBlocksInInlineLayout() const;

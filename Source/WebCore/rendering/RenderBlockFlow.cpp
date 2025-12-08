@@ -3429,7 +3429,9 @@ GapRects RenderBlockFlow::inlineSelectionGaps(RenderBlock& rootBlock, const Layo
         return { };
     }
 
-    if (!hasLines()) {
+    // FIXME: Do we really need to check for SVG content here?
+    auto hasInlineOrSVGContent = hasContentfulInlineLine() || (svgTextLayout() && svgTextLayout()->lineCount());
+    if (!hasInlineOrSVGContent) {
         // Update our lastLogicalTop to be the bottom of the block. <hr>s or empty blocks with height can trip this case.
         if (containsStart)
             updateLastLogicalValues(blockDirectionOffset(rootBlock, offsetFromRootBlock) + logicalHeight(), logicalLeftSelectionOffset(rootBlock, logicalHeight(), cache), logicalRightSelectionOffset(rootBlock, logicalHeight(), cache));
@@ -3837,14 +3839,9 @@ bool RenderBlockFlow::relayoutForPagination()
     return neededRelayout;
 }
 
-bool RenderBlockFlow::hasLines() const
-{
-    return childrenInline() ? lineCount() : false;
-}
-
 bool RenderBlockFlow::hasContentfulInlineOrBlockLine() const
 {
-    return inlineLayout() ? inlineLayout()->hasContentfulInlineOrBlockLine() : hasLines();
+    return inlineLayout() ? inlineLayout()->hasContentfulInlineOrBlockLine() : false;
 }
 
 bool RenderBlockFlow::hasContentfulInlineLine() const
