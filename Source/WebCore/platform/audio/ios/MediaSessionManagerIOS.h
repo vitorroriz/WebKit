@@ -57,6 +57,7 @@ public:
     bool hasWirelessTargetsAvailable() final;
     bool isMonitoringWirelessTargets() const final;
 
+    // MediaSessionHelperClient, AudioSessionInterruptionObserver.
     void ref() const override { MediaSessionManagerCocoa::ref(); }
     void deref() const override { MediaSessionManagerCocoa::deref(); }
 

@@ -174,39 +174,45 @@ void MediaSessionHelper::removeClient(MediaSessionHelperClient& client)
 
 void MediaSessionHelper::activeAudioRouteDidChange(ShouldPause shouldPause)
 {
-    for (auto& client : m_clients)
+    m_clients.forEach([&](auto& client) {
         client.activeAudioRouteDidChange(shouldPause);
+    });
 }
 
 void MediaSessionHelper::applicationWillEnterForeground(SuspendedUnderLock suspendedUnderLock)
 {
-    for (auto& client : m_clients)
+    m_clients.forEach([&](auto& client) {
         client.uiApplicationWillEnterForeground(suspendedUnderLock);
+    });
 }
 
 void MediaSessionHelper::applicationDidEnterBackground(SuspendedUnderLock suspendedUnderLock)
 {
-    for (auto& client : m_clients)
+    m_clients.forEach([&](auto& client) {
         client.uiApplicationDidEnterBackground(suspendedUnderLock);
+    });
 }
 
 void MediaSessionHelper::applicationWillBecomeInactive()
 {
-    for (auto& client : m_clients)
+    m_clients.forEach([](auto& client) {
         client.uiApplicationWillBecomeInactive();
+    });
 }
 
 void MediaSessionHelper::applicationDidBecomeActive()
 {
-    for (auto& client : m_clients)
+    m_clients.forEach([](auto& client) {
         client.uiApplicationDidBecomeActive();
+    });
 }
 
 void MediaSessionHelper::externalOutputDeviceAvailableDidChange(HasAvailableTargets hasAvailableTargets)
 {
     m_isExternalOutputDeviceAvailable = hasAvailableTargets == HasAvailableTargets::Yes;
-    for (auto& client : m_clients)
+    m_clients.forEach([&](auto& client) {
         client.externalOutputDeviceAvailableDidChange(hasAvailableTargets);
+    });
 }
 
 void MediaSessionHelper::isPlayingToAutomotiveHeadUnitDidChange(PlayingToAutomotiveHeadUnit playingToAutomotiveHeadUnit)
@@ -216,16 +222,18 @@ void MediaSessionHelper::isPlayingToAutomotiveHeadUnitDidChange(PlayingToAutomot
         return;
 
     m_isPlayingToAutomotiveHeadUnit = newValue;
-    for (auto& client : m_clients)
+    m_clients.forEach([&](auto& client) {
         client.isPlayingToAutomotiveHeadUnitDidChange(playingToAutomotiveHeadUnit);
+    });
 }
 
 void MediaSessionHelper::activeVideoRouteDidChange(SupportsAirPlayVideo supportsAirPlayVideo, Ref<MediaPlaybackTarget>&& playbackTarget)
 {
     m_playbackTarget = WTFMove(playbackTarget);
     m_activeVideoRouteSupportsAirPlayVideo = supportsAirPlayVideo == SupportsAirPlayVideo::Yes;
-    for (auto& client : m_clients)
+    m_clients.forEach([&](auto& client) {
         client.activeVideoRouteDidChange(supportsAirPlayVideo, *m_playbackTarget);
+    });
 }
 
 void MediaSessionHelper::activeAudioRouteSupportsSpatialPlaybackDidChange(SupportsSpatialAudioPlayback supportsSpatialPlayback)
@@ -234,8 +242,9 @@ void MediaSessionHelper::activeAudioRouteSupportsSpatialPlaybackDidChange(Suppor
         return;
 
     m_activeAudioRouteSupportsSpatialPlayback = supportsSpatialPlayback;
-    for (auto& client : m_clients)
+    m_clients.forEach([&](auto& client) {
         client.activeAudioRouteSupportsSpatialPlaybackDidChange(supportsSpatialPlayback);
+    });
 }
 
 void MediaSessionHelper::startMonitoringWirelessRoutes()
