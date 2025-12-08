@@ -525,6 +525,15 @@ void Adjuster::adjustFirstLetterStyle(RenderStyle& style)
     style.setEffectiveDisplay(style.isFloating() ? DisplayType::Block : DisplayType::Inline);
 }
 
+void Adjuster::adjustFirstLineStyle(RenderStyle& style)
+{
+    if (style.pseudoElementType() != PseudoElementType::FirstLine)
+        return;
+
+    // Force inline display.
+    style.setEffectiveDisplay(DisplayType::Inline);
+}
+
 void Adjuster::adjust(RenderStyle& style) const
 {
     if (style.display() == DisplayType::Contents)
@@ -566,6 +575,7 @@ void Adjuster::adjust(RenderStyle& style) const
             style.setEffectiveDisplay(equivalentBlockDisplay(style));
 
         adjustFirstLetterStyle(style);
+        adjustFirstLineStyle(style);
 
         // FIXME: Don't support this mutation for pseudo styles like first-letter or first-line, since it's not completely
         // clear how that should work.
