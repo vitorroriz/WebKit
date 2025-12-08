@@ -161,8 +161,8 @@ NEVER_INLINE static void crashDueToApplicationCallingMainThreadOnlyWebKitAPIFrom
         if (!didLog) {
             didLog = true;
             RELEASE_LOG_FAULT(API, "Detected usage of WebKit APIs off the main thread. This is a misuse of the API that can lead to corruption of WebKit's internal data, and will cause a crash when using newer SDKs.");
-            return;
         }
+        return;
     }
 
     RELEASE_ASSERT_NOT_REACHED("Terminating process due to improper usage of WebKit APIs off the main thread.");
