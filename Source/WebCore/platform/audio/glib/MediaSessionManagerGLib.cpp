@@ -123,7 +123,12 @@ RefPtr<PlatformMediaSessionManager> PlatformMediaSessionManager::create(PageIden
         g_warning("Failed at parsing XML Interface definition: %s", error->message);
         return nullptr;
     }
-    return adoptRef(new MediaSessionManagerGLib(WTFMove(mprisInterface), pageIdentifier));
+    return MediaSessionManagerGLib::create(WTFMove(mprisInterface), pageIdentifier);
+}
+
+Ref<MediaSessionManagerGLib> MediaSessionManagerGLib::create(GRefPtr<GDBusNodeInfo>&& mprisInterface, PageIdentifier pageIdentifier)
+{
+    return adoptRef(*new MediaSessionManagerGLib(WTFMove(mprisInterface), pageIdentifier));
 }
 
 MediaSessionManagerGLib::MediaSessionManagerGLib(GRefPtr<GDBusNodeInfo>&& mprisInterface, PageIdentifier pageIdentifier)

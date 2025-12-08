@@ -47,9 +47,14 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(MediaSessionManageriOS);
 
 RefPtr<PlatformMediaSessionManager> PlatformMediaSessionManager::create(PageIdentifier pageIdentifier)
 {
-    auto manager = adoptRef(new MediaSessionManageriOS(pageIdentifier));
-    MediaSessionHelper::sharedHelper().addClient(*manager);
+    Ref manager = MediaSessionManageriOS::create(pageIdentifier);
+    MediaSessionHelper::sharedHelper().addClient(manager);
     return manager;
+}
+
+Ref<MediaSessionManageriOS> MediaSessionManageriOS::create(PageIdentifier pageIdentifier)
+{
+    return adoptRef(*new MediaSessionManageriOS(pageIdentifier));
 }
 
 MediaSessionManageriOS::MediaSessionManageriOS(PageIdentifier pageIdentifier)

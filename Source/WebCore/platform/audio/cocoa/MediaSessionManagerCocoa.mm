@@ -79,7 +79,12 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(MediaSessionManagerCocoa);
 #if PLATFORM(MAC)
 RefPtr<PlatformMediaSessionManager> PlatformMediaSessionManager::create(PageIdentifier pageIdentifier)
 {
-    return adoptRef(new MediaSessionManagerCocoa(pageIdentifier));
+    return MediaSessionManagerCocoa::create(pageIdentifier);
+}
+
+Ref<MediaSessionManagerCocoa> MediaSessionManagerCocoa::create(PageIdentifier pageIdentifier)
+{
+    return adoptRef(*new MediaSessionManagerCocoa(pageIdentifier));
 }
 #endif // !PLATFORM(MAC)
 

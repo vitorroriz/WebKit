@@ -51,7 +51,7 @@ class WEBCORE_EXPORT MediaSessionManageriOS
     , public AudioSessionInterruptionObserver {
     WTF_MAKE_TZONE_ALLOCATED(MediaSessionManageriOS);
 public:
-    MediaSessionManageriOS(PageIdentifier);
+    static Ref<MediaSessionManageriOS> create(PageIdentifier);
     virtual ~MediaSessionManageriOS();
 
     bool hasWirelessTargetsAvailable() final;
@@ -64,6 +64,7 @@ public:
     USING_CAN_MAKE_WEAKPTR(MediaSessionHelperClient);
 
 protected:
+    explicit MediaSessionManageriOS(PageIdentifier);
 
 #if !PLATFORM(MACCATALYST)
     void resetRestrictions() override;
@@ -72,7 +73,6 @@ protected:
     void sessionWillBeginPlayback(PlatformMediaSessionInterface&, CompletionHandler<void(bool)>&&) override;
 
 private:
-
     void configureWirelessTargetMonitoring() final;
     void sessionWillEndPlayback(PlatformMediaSessionInterface&, DelayCallingUpdateNowPlaying) final;
 
