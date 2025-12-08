@@ -24,31 +24,31 @@
  */
 
 #include "config.h"
-#include "JSPromiseAllGlobalContext.h"
+#include "JSPromiseCombinatorsGlobalContext.h"
 
 #include "JSCInlines.h"
 
 namespace JSC {
 
-const ClassInfo JSPromiseAllGlobalContext::s_info = { "PromiseAllGlobalContext"_s, nullptr, nullptr, nullptr, CREATE_METHOD_TABLE(JSPromiseAllGlobalContext) };
+const ClassInfo JSPromiseCombinatorsGlobalContext::s_info = { "PromiseCombinatorsGlobalContext"_s, nullptr, nullptr, nullptr, CREATE_METHOD_TABLE(JSPromiseCombinatorsGlobalContext) };
 
-JSPromiseAllGlobalContext* JSPromiseAllGlobalContext::create(VM& vm, JSValue promise, JSValue values, JSValue remainingElementsCount)
+JSPromiseCombinatorsGlobalContext* JSPromiseCombinatorsGlobalContext::create(VM& vm, JSValue promise, JSValue values, JSValue remainingElementsCount)
 {
-    auto* structure = vm.promiseAllGlobalContextStructure.get();
-    JSPromiseAllGlobalContext* result = new (NotNull, allocateCell<JSPromiseAllGlobalContext>(vm)) JSPromiseAllGlobalContext(vm, structure, promise, values, remainingElementsCount);
+    auto* structure = vm.promiseCombinatorsGlobalContextStructure.get();
+    JSPromiseCombinatorsGlobalContext* result = new (NotNull, allocateCell<JSPromiseCombinatorsGlobalContext>(vm)) JSPromiseCombinatorsGlobalContext(vm, structure, promise, values, remainingElementsCount);
     result->finishCreation(vm);
     return result;
 }
 
-Structure* JSPromiseAllGlobalContext::createStructure(VM& vm, JSGlobalObject* globalObject, JSValue prototype)
+Structure* JSPromiseCombinatorsGlobalContext::createStructure(VM& vm, JSGlobalObject* globalObject, JSValue prototype)
 {
-    return Structure::create(vm, globalObject, prototype, TypeInfo(JSPromiseAllGlobalContextType, StructureFlags), info());
+    return Structure::create(vm, globalObject, prototype, TypeInfo(JSPromiseCombinatorsGlobalContextType, StructureFlags), info());
 }
 
 template<typename Visitor>
-void JSPromiseAllGlobalContext::visitChildrenImpl(JSCell* cell, Visitor& visitor)
+void JSPromiseCombinatorsGlobalContext::visitChildrenImpl(JSCell* cell, Visitor& visitor)
 {
-    auto* thisObject = jsCast<JSPromiseAllGlobalContext*>(cell);
+    auto* thisObject = jsCast<JSPromiseCombinatorsGlobalContext*>(cell);
     ASSERT_GC_OBJECT_INHERITS(thisObject, info());
     Base::visitChildren(thisObject, visitor);
     visitor.append(thisObject->m_promise);
@@ -56,6 +56,6 @@ void JSPromiseAllGlobalContext::visitChildrenImpl(JSCell* cell, Visitor& visitor
     visitor.append(thisObject->m_remainingElementsCount);
 }
 
-DEFINE_VISIT_CHILDREN(JSPromiseAllGlobalContext);
+DEFINE_VISIT_CHILDREN(JSPromiseCombinatorsGlobalContext);
 
 } // namespace JSC

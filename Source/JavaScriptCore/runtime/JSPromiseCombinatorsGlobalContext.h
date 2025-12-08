@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2025 Codeblog CORP.
  * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,9 +29,7 @@
 
 namespace JSC {
 
-class JSPromiseAllGlobalContext;
-
-class JSPromiseAllContext final : public JSCell {
+class JSPromiseCombinatorsGlobalContext final : public JSCell {
 public:
     using Base = JSCell;
 
@@ -42,28 +39,35 @@ public:
     template<typename CellType, SubspaceAccess mode>
     static GCClient::IsoSubspace* subspaceFor(VM& vm)
     {
-        return vm.promiseAllContextSpace<mode>();
+        return vm.promiseCombinatorsGlobalContextSpace<mode>();
     }
 
     static Structure* createStructure(VM&, JSGlobalObject*, JSValue);
 
-    static JSPromiseAllContext* create(VM&, JSPromiseAllGlobalContext*, uint64_t index);
+    static JSPromiseCombinatorsGlobalContext* create(VM&, JSValue promise, JSValue values, JSValue remainingElementsCount);
 
-    JSPromiseAllGlobalContext* globalContext() const { return m_globalContext.get(); }
-    uint64_t index() const { return m_index; }
+    JSValue promise() const { return m_promise.get(); }
+    JSValue values() const { return m_values.get(); }
+    JSValue remainingElementsCount() const { return m_remainingElementsCount.get(); }
+
+    void setPromise(VM& vm, JSValue promise) { m_promise.set(vm, this, promise); }
+    void setValues(VM& vm, JSValue values) { m_values.set(vm, this, values); }
+    void setRemainingElementsCount(VM& vm, JSValue remainingElementsCount) { m_remainingElementsCount.set(vm, this, remainingElementsCount); }
 
 private:
-    JSPromiseAllContext(VM& vm, Structure* structure, JSPromiseAllGlobalContext* globalContext, uint64_t index)
+    JSPromiseCombinatorsGlobalContext(VM& vm, Structure* structure, JSValue promise, JSValue values, JSValue remainingElementsCount)
         : Base(vm, structure)
-        , m_globalContext(globalContext, WriteBarrierEarlyInit)
-        , m_index(index)
+        , m_promise(promise, WriteBarrierEarlyInit)
+        , m_values(values, WriteBarrierEarlyInit)
+        , m_remainingElementsCount(remainingElementsCount, WriteBarrierEarlyInit)
     {
     }
 
-    WriteBarrier<JSPromiseAllGlobalContext> m_globalContext;
-    uint64_t m_index { };
+    WriteBarrier<Unknown> m_promise;
+    WriteBarrier<Unknown> m_values;
+    WriteBarrier<Unknown> m_remainingElementsCount;
 };
 
-STATIC_ASSERT_IS_TRIVIALLY_DESTRUCTIBLE(JSPromiseAllContext);
+STATIC_ASSERT_IS_TRIVIALLY_DESTRUCTIBLE(JSPromiseCombinatorsGlobalContext);
 
 } // namespace JSC

@@ -55,6 +55,8 @@ JSC_DECLARE_HOST_FUNCTION(promiseAllSettledFulfillFunction);
 JSC_DECLARE_HOST_FUNCTION(promiseAllSettledRejectFunction);
 JSC_DECLARE_HOST_FUNCTION(promiseAllSettledSlowFulfillFunction);
 JSC_DECLARE_HOST_FUNCTION(promiseAllSettledSlowRejectFunction);
+JSC_DECLARE_HOST_FUNCTION(promiseAnyRejectFunction);
+JSC_DECLARE_HOST_FUNCTION(promiseAnySlowRejectFunction);
 
 Structure* createPromiseAllSettledFulfilledResultStructure(VM&, JSGlobalObject&);
 Structure* createPromiseAllSettledRejectedResultStructure(VM&, JSGlobalObject&);

@@ -26,6 +26,7 @@
 #include "config.h"
 #include "JSMicrotask.h"
 
+#include "AggregateError.h"
 #include "CatchScope.h"
 #include "Debugger.h"
 #include "DeferTermination.h"
@@ -34,8 +35,8 @@
 #include "JSGlobalObject.h"
 #include "JSObjectInlines.h"
 #include "JSPromise.h"
-#include "JSPromiseAllContext.h"
-#include "JSPromiseAllGlobalContext.h"
+#include "JSPromiseCombinatorsContext.h"
+#include "JSPromiseCombinatorsGlobalContext.h"
 #include "JSPromiseConstructor.h"
 #include "JSPromisePrototype.h"
 #include "JSPromiseReaction.h"
@@ -304,8 +305,8 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
     case InternalMicrotask::PromiseAllResolveJob: {
         auto* promise = jsCast<JSPromise*>(arguments[0]);
         JSValue resolution = arguments[1];
-        auto* context = jsCast<JSPromiseAllContext*>(arguments[3]);
-        auto* globalContext = jsCast<JSPromiseAllGlobalContext*>(context->globalContext());
+        auto* context = jsCast<JSPromiseCombinatorsContext*>(arguments[3]);
+        auto* globalContext = jsCast<JSPromiseCombinatorsGlobalContext*>(context->globalContext());
 
         switch (static_cast<JSPromise::Status>(arguments[2].asInt32())) {
         case JSPromise::Status::Pending: {
@@ -342,8 +343,8 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
     case InternalMicrotask::PromiseAllSettledResolveJob: {
         auto* promise = jsCast<JSPromise*>(arguments[0]);
         JSValue resolution = arguments[1];
-        auto* context = jsCast<JSPromiseAllContext*>(arguments[3]);
-        auto* globalContext = jsCast<JSPromiseAllGlobalContext*>(context->globalContext());
+        auto* context = jsCast<JSPromiseCombinatorsContext*>(arguments[3]);
+        auto* globalContext = jsCast<JSPromiseCombinatorsGlobalContext*>(context->globalContext());
         auto* values = jsCast<JSArray*>(globalContext->values());
         uint64_t index = context->index();
 
@@ -374,6 +375,45 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
         if (!count) {
             scope.release();
             promise->resolve(globalObject, values);
+        }
+        return;
+    }
+
+    case InternalMicrotask::PromiseAnyResolveJob: {
+        auto* promise = jsCast<JSPromise*>(arguments[0]);
+        JSValue resolution = arguments[1];
+        auto* context = jsCast<JSPromiseCombinatorsContext*>(arguments[3]);
+        auto* globalContext = jsCast<JSPromiseCombinatorsGlobalContext*>(context->globalContext());
+
+        switch (static_cast<JSPromise::Status>(arguments[2].asInt32())) {
+        case JSPromise::Status::Pending: {
+            RELEASE_ASSERT_NOT_REACHED();
+            break;
+        }
+        case JSPromise::Status::Fulfilled: {
+            scope.release();
+            promise->resolve(globalObject, resolution);
+            break;
+        }
+        case JSPromise::Status::Rejected: {
+            auto* errors = jsCast<JSArray*>(globalContext->values());
+            uint64_t index = context->index();
+
+            errors->putDirectIndex(globalObject, index, resolution);
+            RETURN_IF_EXCEPTION(scope, void());
+
+            uint64_t count = globalContext->remainingElementsCount().toIndex(globalObject, "count exceeds size"_s);
+            RETURN_IF_EXCEPTION(scope, void());
+
+            --count;
+            globalContext->setRemainingElementsCount(vm, jsNumber(count));
+            if (!count) {
+                auto* aggregateError = createAggregateError(globalObject, vm, globalObject->errorStructure(ErrorType::AggregateError), errors, jsUndefined(), jsUndefined());
+                scope.release();
+                promise->reject(vm, globalObject, aggregateError);
+            }
+            break;
+        }
         }
         return;
     }

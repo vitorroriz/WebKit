@@ -23,63 +23,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-function any(iterable)
-{
-    "use strict";
-
-    if (!@isObject(this))
-        @throwTypeError("|this| is not an object");
-
-    var promiseCapability = @newPromiseCapability(this);
-    var resolve = promiseCapability.resolve;
-    var reject = promiseCapability.reject;
-    var promise = promiseCapability.promise;
-
-    var errors = [];
-    var remainingElementsCount = 1;
-    var index = 0;
-
-    try {
-        var promiseResolve = this.resolve;
-        if (!@isCallable(promiseResolve))
-            @throwTypeError("Promise resolve is not a function");
-
-        for (var value of iterable) {
-            @putByValDirect(errors, index, @undefined);
-            var nextPromise = promiseResolve.@call(this, value);
-            var then = nextPromise.then;
-            let currentIndex = index++;
-            ++remainingElementsCount;
-
-            // Use comma expr for avoiding unnecessary Function.prototype.name
-            var onRejected = (0, (reason) => {
-              if (currentIndex < 0)
-                return @undefined;
-
-              @putByValDirect(errors, currentIndex, reason);
-              currentIndex = -1;
-
-              if (!--remainingElementsCount)
-                reject.@call(@undefined, new @AggregateError(errors));
-
-              return @undefined;
-            });
-            if (@isPromise(nextPromise) && then === @defaultPromiseThen)
-                @performPromiseThen(nextPromise, resolve, onRejected, @undefined, /* context */ promise);
-            else
-                then.@call(nextPromise, resolve, onRejected);
-        }
-
-        --remainingElementsCount;
-        if (remainingElementsCount === 0)
-            throw new @AggregateError(errors);
-    } catch (error) {
-        reject.@call(@undefined, error);
-    }
-
-    return promise;
-}
-
 function try(callback /*, ...args */)
 {
     "use strict";
