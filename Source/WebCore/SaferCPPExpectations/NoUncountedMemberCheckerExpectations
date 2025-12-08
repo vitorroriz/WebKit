@@ -43,7 +43,6 @@ page/scrolling/ScrollingCoordinator.h
 page/scrolling/ScrollingTreeGestureState.h
 platform/PODInterval.h
 [ iOS ] platform/audio/ios/AudioSessionIOS.mm
-platform/encryptedmedia/CDMProxy.h
 platform/graphics/GraphicsLayer.h
 platform/graphics/avfoundation/objc/MediaSourcePrivateAVFObjC.h
 platform/graphics/avfoundation/objc/WebCoreAVFResourceLoader.mm

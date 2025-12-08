@@ -306,7 +306,6 @@ page/scrolling/ScrollingTreeStickyNode.cpp
 page/text-extraction/TextExtraction.cpp
 platform/DictationCaretAnimator.cpp
 platform/KeyboardScrollingAnimator.cpp
-platform/ScrollAnimator.cpp
 platform/ScrollView.cpp
 platform/ScrollableArea.cpp
 platform/ScrollbarsController.cpp

@@ -80,6 +80,7 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(CDMFactoryThunder);
 WTF_MAKE_TZONE_ALLOCATED_IMPL(CDMPrivateThunder);
+WTF_MAKE_TZONE_ALLOCATED_IMPL(CDMInstanceThunder);
 
 static CDMInstanceSession::SessionLoadFailure sessionLoadFailureFromThunder(const StringView& loadStatus)
 {

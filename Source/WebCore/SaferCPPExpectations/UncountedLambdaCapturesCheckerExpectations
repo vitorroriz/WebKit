@@ -42,7 +42,6 @@ page/writing-tools/WritingToolsController.mm
 [ iOS ] platform/PreviewConverter.cpp
 platform/ScrollableArea.cpp
 platform/cocoa/NetworkExtensionContentFilter.mm
-platform/encryptedmedia/CDMProxy.cpp
 platform/graphics/ShadowBlur.cpp
 platform/graphics/avfoundation/InbandTextTrackPrivateAVF.cpp
 platform/graphics/avfoundation/objc/CDMInstanceFairPlayStreamingAVFObjC.mm

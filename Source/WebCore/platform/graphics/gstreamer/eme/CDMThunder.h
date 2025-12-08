@@ -110,6 +110,8 @@ private:
 };
 
 class CDMInstanceThunder final : public CDMInstanceProxy {
+    WTF_MAKE_TZONE_ALLOCATED(CDMInstanceThunder);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(CDMInstanceThunder);
 public:
     CDMInstanceThunder(const String& keySystem);
     virtual ~CDMInstanceThunder() = default;
