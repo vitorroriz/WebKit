@@ -224,7 +224,7 @@ void CDMSessionAVContentKeySession::releaseKeys()
             if (m_sessionId == String(playbackSessionIdValue.get())) {
                 ALWAYS_LOG(LOGIDENTIFIER, "found session, sending expiration message");
                 m_expiredSession = expiredSessionData;
-                m_client->sendMessage(Uint8Array::create(span(m_expiredSession.get())).ptr(), emptyString());
+                Ref { *m_client }->sendMessage(Uint8Array::create(span(m_expiredSession.get())).ptr(), emptyString());
                 break;
             }
         }
@@ -311,7 +311,7 @@ bool CDMSessionAVContentKeySession::update(Uint8Array* key, RefPtr<Uint8Array>& 
         ASSERT(contentKeyRequest);
         RetainPtr certificateData = toNSData(m_certificate->span());
 
-        RetainPtr options = CDMInstanceSessionFairPlayStreamingAVFObjC::optionsForKeyRequestWithHashSalt(m_client->mediaKeysHashSalt());
+        RetainPtr options = CDMInstanceSessionFairPlayStreamingAVFObjC::optionsForKeyRequestWithHashSalt(Ref { *m_client }->mediaKeysHashSalt());
 
         if (!m_protocolVersions.isEmpty() && PAL::canLoad_AVFoundation_AVContentKeyRequestProtocolVersionsKey()) {
             RetainPtr mutableOptions = adoptNS([[NSMutableDictionary alloc] init]);
@@ -491,10 +491,11 @@ void CDMSessionAVContentKeySession::setInitData(SharedBuffer& initData)
 
 String CDMSessionAVContentKeySession::storagePath() const
 {
-    if (!m_client)
+    RefPtr client = m_client.get();
+    if (!client)
         return emptyString();
 
-    String storageDirectory = m_client->mediaKeysStorageDirectory();
+    String storageDirectory = client->mediaKeysStorageDirectory();
     if (storageDirectory.isEmpty())
         return emptyString();
 
