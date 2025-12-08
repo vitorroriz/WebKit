@@ -109,7 +109,6 @@ css/CSSStyleSheetObservableArray.cpp
 css/CSSValue.cpp
 css/CSSValueList.cpp
 css/CSSValueList.h
-css/CSSVariableReferenceValue.cpp
 css/DeprecatedCSSOMPrimitiveValue.cpp
 css/FontFaceSet.cpp
 css/ImmutableStyleProperties.cpp

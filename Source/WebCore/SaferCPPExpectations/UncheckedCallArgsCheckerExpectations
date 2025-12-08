@@ -91,7 +91,6 @@ css/CSSStyleProperties.cpp
 css/CSSStyleSheet.cpp
 css/CSSStyleSheetObservableArray.cpp
 css/CSSToLengthConversionData.cpp
-css/CSSVariableReferenceValue.cpp
 css/MediaQueryList.cpp
 css/MediaQueryMatcher.cpp
 css/SelectorChecker.cpp

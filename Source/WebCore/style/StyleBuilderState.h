@@ -30,6 +30,7 @@
 #include "Document.h"
 #include "FontTaggedSettings.h"
 #include "PropertyCascade.h"
+#include "RenderStyle.h"
 #include "RuleSet.h"
 #include "SelectorChecker.h"
 #include "StyleForVisitedLink.h"
@@ -109,6 +110,7 @@ public:
 
     RenderStyle& style() { return m_style; }
     const RenderStyle& style() const { return m_style; }
+    CheckedRef<const RenderStyle> checkedStyle() const { return style(); }
 
     const RenderStyle& parentStyle() const { return *m_context.parentStyle; }
     const RenderStyle* rootElementStyle() const { return m_context.rootElementStyle; }
