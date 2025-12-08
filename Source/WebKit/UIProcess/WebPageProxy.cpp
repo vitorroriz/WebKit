@@ -17437,6 +17437,15 @@ void WebPageProxy::takeActivitiesOnRemotePage(RemotePageProxy& remotePage)
     if (hasValidVisibleActivity())
         remotePage.processActivityState().takeVisibleActivity();
 
+    if (hasValidAudibleActivity())
+        remotePage.processActivityState().takeAudibleActivity();
+
+    if (hasValidCapturingActivity())
+        remotePage.processActivityState().takeCapturingActivity();
+
+    if (hasValidMutedCaptureAssertion())
+        remotePage.processActivityState().takeMutedCaptureAssertion();
+
     if (hasValidNetworkActivity())
         remotePage.processActivityState().takeNetworkActivity();
 }
