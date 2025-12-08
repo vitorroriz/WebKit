@@ -92,7 +92,7 @@ static_assert(sizeof(BorderValue) == sizeof(SameSizeAsBorderValue), "BorderValue
 struct SameSizeAsRenderStyle : CanMakeCheckedPtr<SameSizeAsRenderStyle> {
     void* nonInheritedDataRefs[1];
     struct NonInheritedFlags {
-        unsigned m_bitfields[2];
+        unsigned m_bitfields[3];
     } m_nonInheritedFlags;
     void* inheritedDataRefs[2];
     struct InheritedFlags {
@@ -164,7 +164,7 @@ inline RenderStyleBase::RenderStyleBase(CreateDefaultStyleTag)
     m_nonInheritedFlags.pseudoBits = 0;
 
     static_assert((sizeof(InheritedFlags) <= 8), "InheritedFlags does not grow");
-    static_assert((sizeof(NonInheritedFlags) <= 8), "NonInheritedFlags does not grow");
+    static_assert((sizeof(NonInheritedFlags) <= 12), "NonInheritedFlags does not grow");
 }
 
 inline RenderStyleBase::RenderStyleBase(const RenderStyleBase& other, CloneTag)
