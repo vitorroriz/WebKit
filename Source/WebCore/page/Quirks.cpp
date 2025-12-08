@@ -721,6 +721,16 @@ bool Quirks::needsGoogleTranslateScrollingQuirk() const
 #endif
 }
 
+// play.geforcenow.com https://webkit.org/b/303622
+// FIXME: Remove as soon as nvidia adjusts the site for Safari. https://webkit.org/b/303718
+bool Quirks::needsGeforcenowWarningDisplayNoneQuirk() const
+{
+    if (!needsQuirks()) [[unlikely]]
+        return false;
+
+    return m_quirksData.quirkIsEnabled(QuirksData::SiteSpecificQuirk::NeedsGeforcenowWarningDisplayNoneQuirk);
+}
+
 // Kugou Music rdar://74602294
 bool Quirks::shouldOmitHTMLDocumentSupportedPropertyNames()
 {
@@ -2905,6 +2915,14 @@ static void handleEAQuirks(QuirksData& quirksData, const URL& /* quirksURL */, c
     quirksData.isEA = true;
 }
 
+static void handleGeforcenowQuirks(QuirksData& quirksData, const URL& /* quirksURL */, const String& quirksDomainString, const URL&  /* documentURL */)
+{
+    if (quirksDomainString != "play.geforcenow.com"_s) [[unlikely]]
+        return;
+
+    quirksData.enableQuirk(QuirksData::SiteSpecificQuirk::NeedsGeforcenowWarningDisplayNoneQuirk);
+}
+
 static void handleGoogleQuirks(QuirksData& quirksData, const URL& quirksURL, const String& /* quirksDomainString */, const URL& /* documentURL */)
 {
     quirksData.isGoogleProperty = true;
@@ -3472,6 +3490,7 @@ void Quirks::determineRelevantQuirks()
 #if PLATFORM(IOS_FAMILY)
         { "gizmodo"_s, &handleGizmodoQuirks },
 #endif
+        { "geforcenow"_s, &handleGeforcenowQuirks },
         { "google"_s, &handleGoogleQuirks },
         { "hbomax"_s, &handleHBOMaxQuirks },
         { "hotels"_s, &handleHotelsQuirks },

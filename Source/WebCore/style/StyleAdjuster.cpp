@@ -1066,6 +1066,13 @@ void Adjuster::adjustForSiteSpecificQuirks(RenderStyle& style) const
             style.setOverflowY(Overflow::Auto);
     }
 
+    if (documentQuirks.needsGeforcenowWarningDisplayNoneQuirk()) {
+        static MainThreadNeverDestroyed<const AtomString> overlayClassName("cdk-overlay-container"_s);
+        static MainThreadNeverDestroyed<const AtomString> unsupportedClassName("unsupported-scenario-container"_s);
+        if (is<HTMLDivElement>(*m_element) && (m_element->hasClassName(overlayClassName) || m_element->hasClassName(unsupportedClassName)))
+            style.setEffectiveDisplay(DisplayType::None);
+    }
+
 #if PLATFORM(IOS_FAMILY)
     if (documentQuirks.needsGoogleMapsScrollingQuirk()) {
         static MainThreadNeverDestroyed<const AtomString> className("PUtLdf"_s);

@@ -129,6 +129,7 @@ public:
     bool needsZomatoEmailLoginLabelQuirk() const;
     bool needsGoogleMapsScrollingQuirk() const;
     bool needsGoogleTranslateScrollingQuirk() const;
+    bool needsGeforcenowWarningDisplayNoneQuirk() const;
 
     bool needsPrimeVideoUserSelectNoneQuirk() const;
 
