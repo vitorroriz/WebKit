@@ -607,11 +607,9 @@ static CGSize roundScrollViewContentSize(const WebKit::WebPageProxy& page, CGSiz
 - (void)_didFinishLoadingDataForCustomContentProviderWithSuggestedFilename:(const String&)suggestedFilename data:(NSData *)data
 {
     ASSERT(_customContentView);
-    [_customContentView web_setContentProviderData:data suggestedFilename:suggestedFilename.createNSString().get()];
-
-    // FIXME: It may make more sense for custom content providers to invoke this when they're ready,
-    // because there's no guarantee that all custom content providers will lay out synchronously.
-    _page->didLayoutForCustomContentProvider();
+    [_customContentView web_setContentProviderData:data suggestedFilename:suggestedFilename.createNSString().get() completionHandler:^{
+        _page->didLayoutForCustomContentProvider();
+    }];
 }
 
 - (void)_willInvokeUIScrollViewDelegateCallback
