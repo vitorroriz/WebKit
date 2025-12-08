@@ -30,7 +30,7 @@ try {
 }
 
 try {
-    let b = a / a;
+    let b = a * 2n / a;
     assert(false, "Should throw OutOfMemoryError, but executed without exception");
 } catch(e) {
     assert(e.message == "Out of memory: BigInt generated from this operation is too big", "Expected OutOfMemoryError, but got: " + e);
