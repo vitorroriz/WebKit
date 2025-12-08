@@ -1065,6 +1065,7 @@ class RunAPITests(TestWithFailureCount, CustomFlagsMixin, ShellMixin):
 
     def __init__(self, *args, **kwargs):
         kwargs['logEnviron'] = False
+        kwargs['timeout'] = 3 * 60 * 60
         super().__init__(*args, **kwargs)
 
     def _is_valid_additional_argument(self, argument):

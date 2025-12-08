@@ -1260,7 +1260,7 @@ class TestRunAPITests(BuildStepMixinAdditions, unittest.TestCase):
                         command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', base_command + ' > logs.txt 2>&1 ; ret=$? ; grep "Ran " logs.txt ; exit $ret'],
                         logfiles={'json': self.jsonFileName},
                         env={'RESULTS_SERVER_API_KEY': 'test-api-key'},
-                        timeout=1200,
+                        timeout=10800,
                         )
             .exit(0),
         )
@@ -1277,7 +1277,7 @@ class TestRunAPITests(BuildStepMixinAdditions, unittest.TestCase):
                         command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', base_command + ' > logs.txt 2>&1 ; ret=$? ; grep "Ran " logs.txt ; exit $ret'],
                         logfiles={'json': self.jsonFileName},
                         env={'RESULTS_SERVER_API_KEY': 'test-api-key'},
-                        timeout=1200,
+                        timeout=10800,
                         )
             .log('stdio', stderr=stderr_output)
             .exit(1),
