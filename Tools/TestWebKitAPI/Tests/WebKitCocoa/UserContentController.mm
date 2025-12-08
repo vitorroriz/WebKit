@@ -28,6 +28,7 @@
 #import "DeprecatedGlobalValues.h"
 #import "PlatformUtilities.h"
 #import "Test.h"
+#import "TestInputDelegate.h"
 #import "TestNavigationDelegate.h"
 #import "TestUIDelegate.h"
 #import "TestWKWebView.h"
@@ -1330,6 +1331,63 @@ TEST(WKUserContentController, DidAssociateFormControlsFromShadowTree)
     EXPECT_WK_STREQ([webView _test_waitForAlert], "pass [object HTMLFormElement]");
     [webView evaluateJavaScript:@"addPasswordFieldToForm()" completionHandler:nil];
     EXPECT_WK_STREQ([webView _test_waitForAlert], "pass [object HTMLInputElement]");
+}
+
+#if PLATFORM(MAC)
+
+TEST(WKUserContentController, BeforeFocusEvent)
+{
+    RetainPtr webView = adoptNS([TestWKWebView new]);
+    RetainPtr configuration = adoptNS([_WKContentWorldConfiguration new]);
+    configuration.get().allowAutofill = YES;
+    RetainPtr autofillWorld = [WKContentWorld _worldWithConfiguration:configuration.get()];
+    NSString *pageWorldJS = @"window.addEventListener('webkitbeforefocus', () => alert('focus-fail') )";
+    NSString *autofillWorldJS = @"window.addEventListener('webkitbeforefocus', () => { setTimeout(() => alert('focus-pass'), 50); })";
+    RetainPtr pageWorldScript = adoptNS([[WKUserScript alloc] initWithSource:pageWorldJS injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES]);
+    RetainPtr autofillWorldScript = adoptNS([[WKUserScript alloc] initWithSource:autofillWorldJS injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES inContentWorld:autofillWorld.get()]);
+    RetainPtr<WKUserContentController> userContentController = [webView configuration].userContentController;
+    [userContentController addUserScript:pageWorldScript.get()];
+    [userContentController addUserScript:autofillWorldScript.get()];
+
+    [webView synchronouslyLoadHTMLString:@"<!DOCTYPE html>"
+        "<div id='host'></div>"
+        "<script>"
+        "shadowRoot = host.attachShadow({mode: 'closed'});"
+        "shadowRoot.innerHTML = `<input id='text1' type='text'><input id='text2' type='text'>`;"
+        "shadowRoot.querySelector('#text1').focus();"
+        "</script>"];
+
+    EXPECT_WK_STREQ([webView _test_waitForAlert], "focus-pass");
+    [webView evaluateJavaScript:@"shadowRoot.querySelector('#text2').focus()" completionHandler:nil];
+    EXPECT_WK_STREQ([webView _test_waitForAlert], "focus-pass");
+}
+
+#endif // PLATFORM(MAC)
+
+TEST(WKUserContentController, BeforeBlurEvent)
+{
+    RetainPtr webView = adoptNS([TestWKWebView new]);
+    RetainPtr configuration = adoptNS([_WKContentWorldConfiguration new]);
+    configuration.get().allowAutofill = YES;
+    RetainPtr autofillWorld = [WKContentWorld _worldWithConfiguration:configuration.get()];
+    NSString *pageWorldJS = @"window.addEventListener('webkitbeforeblur', () => alert('blur-fail') )";
+    NSString *autofillWorldJS = @"window.addEventListener('webkitbeforeblur', () => { setTimeout(() => alert('blur-pass'), 50); })";
+    RetainPtr pageWorldScript = adoptNS([[WKUserScript alloc] initWithSource:pageWorldJS injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES]);
+    RetainPtr autofillWorldScript = adoptNS([[WKUserScript alloc] initWithSource:autofillWorldJS injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES inContentWorld:autofillWorld.get()]);
+    RetainPtr<WKUserContentController> userContentController = [webView configuration].userContentController;
+    [userContentController addUserScript:pageWorldScript.get()];
+    [userContentController addUserScript:autofillWorldScript.get()];
+
+    [webView synchronouslyLoadHTMLString:@"<!DOCTYPE html>"
+        "<div id='host'></div>"
+        "<script>"
+        "shadowRoot = host.attachShadow({mode: 'closed'});"
+        "shadowRoot.innerHTML = `<input id='text1' type='text'><input id='text2' type='text'>`;"
+        "shadowRoot.querySelector('#text1').focus();"
+        "</script>"];
+
+    [webView evaluateJavaScript:@"shadowRoot.querySelector('#text2').focus()" completionHandler:nil];
+    EXPECT_WK_STREQ([webView _test_waitForAlert], "blur-pass");
 }
 
 TEST(WKUserContentController, ShadowRootAttachedEvent)
