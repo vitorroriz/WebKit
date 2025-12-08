@@ -686,6 +686,7 @@ InlineLayoutUnit InlineFormattingUtils::snapToInt(InlineLayoutUnit value, const 
         return roundf(value);
     }
     ASSERT_NOT_REACHED();
+    return { };
 }
 
 }

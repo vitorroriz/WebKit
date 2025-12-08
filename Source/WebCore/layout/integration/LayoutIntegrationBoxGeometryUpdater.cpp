@@ -87,6 +87,7 @@ static LayoutUnit snapToInt(LayoutUnit value, const RenderObject& renderer, Snap
         return LayoutUnit { roundf(value) };
     }
     ASSERT_NOT_REACHED();
+    return { };
 }
 
 static float ascent(const RenderObject& renderer)
