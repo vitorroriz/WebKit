@@ -559,6 +559,10 @@ public:
     WriteBarrier<NativeExecutable> m_promiseCapabilityExecutorExecutable;
     WriteBarrier<NativeExecutable> m_promiseAllFulfillFunctionExecutable;
     WriteBarrier<NativeExecutable> m_promiseAllSlowFulfillFunctionExecutable;
+    WriteBarrier<NativeExecutable> m_promiseAllSettledFulfillFunctionExecutable;
+    WriteBarrier<NativeExecutable> m_promiseAllSettledRejectFunctionExecutable;
+    WriteBarrier<NativeExecutable> m_promiseAllSettledSlowFulfillFunctionExecutable;
+    WriteBarrier<NativeExecutable> m_promiseAllSettledSlowRejectFunctionExecutable;
 
     WriteBarrier<JSCell> m_orderedHashTableDeletedValue;
     WriteBarrier<JSCell> m_orderedHashTableSentinel;
@@ -681,6 +685,34 @@ public:
         if (m_promiseAllSlowFulfillFunctionExecutable) [[likely]]
             return m_promiseAllSlowFulfillFunctionExecutable.get();
         return promiseAllSlowFulfillFunctionExecutableSlow();
+    }
+
+    NativeExecutable* promiseAllSettledFulfillFunctionExecutable()
+    {
+        if (m_promiseAllSettledFulfillFunctionExecutable) [[likely]]
+            return m_promiseAllSettledFulfillFunctionExecutable.get();
+        return promiseAllSettledFulfillFunctionExecutableSlow();
+    }
+
+    NativeExecutable* promiseAllSettledRejectFunctionExecutable()
+    {
+        if (m_promiseAllSettledRejectFunctionExecutable) [[likely]]
+            return m_promiseAllSettledRejectFunctionExecutable.get();
+        return promiseAllSettledRejectFunctionExecutableSlow();
+    }
+
+    NativeExecutable* promiseAllSettledSlowFulfillFunctionExecutable()
+    {
+        if (m_promiseAllSettledSlowFulfillFunctionExecutable) [[likely]]
+            return m_promiseAllSettledSlowFulfillFunctionExecutable.get();
+        return promiseAllSettledSlowFulfillFunctionExecutableSlow();
+    }
+
+    NativeExecutable* promiseAllSettledSlowRejectFunctionExecutable()
+    {
+        if (m_promiseAllSettledSlowRejectFunctionExecutable) [[likely]]
+            return m_promiseAllSettledSlowRejectFunctionExecutable.get();
+        return promiseAllSettledSlowRejectFunctionExecutableSlow();
     }
 
     WeakGCMap<SymbolImpl*, Symbol, PtrHash<SymbolImpl*>> symbolImplToSymbolMap;
@@ -1141,6 +1173,10 @@ private:
     NativeExecutable* promiseCapabilityExecutorExecutableSlow();
     NativeExecutable* promiseAllFulfillFunctionExecutableSlow();
     NativeExecutable* promiseAllSlowFulfillFunctionExecutableSlow();
+    NativeExecutable* promiseAllSettledFulfillFunctionExecutableSlow();
+    NativeExecutable* promiseAllSettledRejectFunctionExecutableSlow();
+    NativeExecutable* promiseAllSettledSlowFulfillFunctionExecutableSlow();
+    NativeExecutable* promiseAllSettledSlowRejectFunctionExecutableSlow();
 
     void updateStackLimits();
 

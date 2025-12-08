@@ -1531,6 +1531,14 @@ capitalName ## Constructor* lowerName ## Constructor = featureFlag ? capitalName
         [] (const Initializer<Structure>& init) {
             init.set(createPromiseCapabilityObjectStructure(init.vm, *init.owner));
         });
+    m_promiseAllSettledFulfilledResultStructure.initLater(
+        [] (const Initializer<Structure>& init) {
+            init.set(createPromiseAllSettledFulfilledResultStructure(init.vm, *init.owner));
+        });
+    m_promiseAllSettledRejectedResultStructure.initLater(
+        [] (const Initializer<Structure>& init) {
+            init.set(createPromiseAllSettledRejectedResultStructure(init.vm, *init.owner));
+        });
 
     m_collatorStructure.initLater(
         [] (const Initializer<Structure>& init) {
@@ -2941,6 +2949,8 @@ void JSGlobalObject::visitChildrenImpl(JSCell* cell, Visitor& visitor)
     thisObject->m_dataPropertyDescriptorObjectStructure.visit(visitor);
     thisObject->m_accessorPropertyDescriptorObjectStructure.visit(visitor);
     thisObject->m_promiseCapabilityObjectStructure.visit(visitor);
+    thisObject->m_promiseAllSettledFulfilledResultStructure.visit(visitor);
+    thisObject->m_promiseAllSettledRejectedResultStructure.visit(visitor);
     visitor.append(thisObject->m_regExpMatchesArrayStructure);
     visitor.append(thisObject->m_regExpMatchesArrayWithIndicesStructure);
     visitor.append(thisObject->m_regExpMatchesIndicesArrayStructure);

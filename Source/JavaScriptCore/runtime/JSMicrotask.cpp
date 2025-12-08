@@ -36,6 +36,7 @@
 #include "JSPromise.h"
 #include "JSPromiseAllContext.h"
 #include "JSPromiseAllGlobalContext.h"
+#include "JSPromiseConstructor.h"
 #include "JSPromisePrototype.h"
 #include "JSPromiseReaction.h"
 #include "Microtask.h"
@@ -334,6 +335,45 @@ void runInternalMicrotask(JSGlobalObject* globalObject, InternalMicrotask task, 
             promise->reject(vm, globalObject, resolution);
             break;
         }
+        }
+        return;
+    }
+
+    case InternalMicrotask::PromiseAllSettledResolveJob: {
+        auto* promise = jsCast<JSPromise*>(arguments[0]);
+        JSValue resolution = arguments[1];
+        auto* context = jsCast<JSPromiseAllContext*>(arguments[3]);
+        auto* globalContext = jsCast<JSPromiseAllGlobalContext*>(context->globalContext());
+        auto* values = jsCast<JSArray*>(globalContext->values());
+        uint64_t index = context->index();
+
+        JSObject* resultObject = nullptr;
+        switch (static_cast<JSPromise::Status>(arguments[2].asInt32())) {
+        case JSPromise::Status::Pending: {
+            RELEASE_ASSERT_NOT_REACHED();
+            break;
+        }
+        case JSPromise::Status::Fulfilled: {
+            resultObject = createPromiseAllSettledFulfilledResult(globalObject, resolution);
+            break;
+        }
+        case JSPromise::Status::Rejected: {
+            resultObject = createPromiseAllSettledRejectedResult(globalObject, resolution);
+            break;
+        }
+        }
+
+        values->putDirectIndex(globalObject, index, resultObject);
+        RETURN_IF_EXCEPTION(scope, void());
+
+        uint64_t count = globalContext->remainingElementsCount().toIndex(globalObject, "count exceeds size"_s);
+        RETURN_IF_EXCEPTION(scope, void());
+
+        --count;
+        globalContext->setRemainingElementsCount(vm, jsNumber(count));
+        if (!count) {
+            scope.release();
+            promise->resolve(globalObject, values);
         }
         return;
     }

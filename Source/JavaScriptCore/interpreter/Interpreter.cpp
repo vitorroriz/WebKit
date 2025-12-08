@@ -486,7 +486,7 @@ void Interpreter::getAsyncStackTrace(JSCell* owner, Vector<StackFrame>& results,
         if (auto* generator = jsDynamicCast<JSGenerator*>(promiseContext))
             return generator;
 
-        // handle `Promise.all`
+        // handle `Promise.all` and `Promise.allSettled`
         if (auto* promiseAllContext = jsDynamicCast<JSPromiseAllContext*>(promiseContext)) {
             if (auto* globalContext = jsDynamicCast<JSPromiseAllGlobalContext*>(promiseAllContext->globalContext())) {
                 JSValue promiseValue = globalContext->promise();
@@ -500,7 +500,7 @@ void Interpreter::getAsyncStackTrace(JSCell* owner, Vector<StackFrame>& results,
             }
         }
 
-        // handle `Promise.any`, `Promise.race` and `Promise.allSettled`
+        // handle `Promise.any` and `Promise.race`
         if (auto* contextPromise = jsDynamicCast<JSPromise*>(promiseContext)) {
             if (JSValue parentContext = getContextValueFromPromise(contextPromise)) {
                 if (auto* generator = jsDynamicCast<JSGenerator*>(parentContext))

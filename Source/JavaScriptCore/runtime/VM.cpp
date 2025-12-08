@@ -1571,6 +1571,38 @@ NativeExecutable* VM::promiseAllSlowFulfillFunctionExecutableSlow()
     return executable;
 }
 
+NativeExecutable* VM::promiseAllSettledFulfillFunctionExecutableSlow()
+{
+    ASSERT(!m_promiseAllSettledFulfillFunctionExecutable);
+    auto* executable = getHostFunction(promiseAllSettledFulfillFunction, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseAllSettledFulfillFunctionExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
+NativeExecutable* VM::promiseAllSettledRejectFunctionExecutableSlow()
+{
+    ASSERT(!m_promiseAllSettledRejectFunctionExecutable);
+    auto* executable = getHostFunction(promiseAllSettledRejectFunction, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseAllSettledRejectFunctionExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
+NativeExecutable* VM::promiseAllSettledSlowFulfillFunctionExecutableSlow()
+{
+    ASSERT(!m_promiseAllSettledSlowFulfillFunctionExecutable);
+    auto* executable = getHostFunction(promiseAllSettledSlowFulfillFunction, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseAllSettledSlowFulfillFunctionExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
+NativeExecutable* VM::promiseAllSettledSlowRejectFunctionExecutableSlow()
+{
+    ASSERT(!m_promiseAllSettledSlowRejectFunctionExecutable);
+    auto* executable = getHostFunction(promiseAllSettledSlowRejectFunction, ImplementationVisibility::Public, callHostFunctionAsConstructor, emptyString());
+    m_promiseAllSettledSlowRejectFunctionExecutable.setWithoutWriteBarrier(executable);
+    return executable;
+}
+
 void VM::executeEntryScopeServicesOnEntry()
 {
     if (hasEntryScopeServiceRequest(EntryScopeService::FirePrimitiveGigacageEnabled)) [[unlikely]] {
@@ -1762,6 +1794,10 @@ void VM::visitAggregateImpl(Visitor& visitor)
     visitor.append(m_promiseCapabilityExecutorExecutable);
     visitor.append(m_promiseAllFulfillFunctionExecutable);
     visitor.append(m_promiseAllSlowFulfillFunctionExecutable);
+    visitor.append(m_promiseAllSettledFulfillFunctionExecutable);
+    visitor.append(m_promiseAllSettledRejectFunctionExecutable);
+    visitor.append(m_promiseAllSettledSlowFulfillFunctionExecutable);
+    visitor.append(m_promiseAllSettledSlowRejectFunctionExecutable);
 }
 DEFINE_VISIT_AGGREGATE(VM);
 

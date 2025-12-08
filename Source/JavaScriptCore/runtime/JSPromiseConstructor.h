@@ -51,5 +51,14 @@ static_assert(sizeof(JSPromiseConstructor) == sizeof(JSFunction), "Allocate JSPr
 
 JSC_DECLARE_HOST_FUNCTION(promiseAllFulfillFunction);
 JSC_DECLARE_HOST_FUNCTION(promiseAllSlowFulfillFunction);
+JSC_DECLARE_HOST_FUNCTION(promiseAllSettledFulfillFunction);
+JSC_DECLARE_HOST_FUNCTION(promiseAllSettledRejectFunction);
+JSC_DECLARE_HOST_FUNCTION(promiseAllSettledSlowFulfillFunction);
+JSC_DECLARE_HOST_FUNCTION(promiseAllSettledSlowRejectFunction);
+
+Structure* createPromiseAllSettledFulfilledResultStructure(VM&, JSGlobalObject&);
+Structure* createPromiseAllSettledRejectedResultStructure(VM&, JSGlobalObject&);
+JSObject* createPromiseAllSettledFulfilledResult(JSGlobalObject*, JSValue);
+JSObject* createPromiseAllSettledRejectedResult(JSGlobalObject*, JSValue);
 
 } // namespace JSC

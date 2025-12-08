@@ -53,6 +53,9 @@ public:
 
         PromiseAllContext = 0,
         PromiseAllResolve = 1,
+
+        PromiseAllSettledContext = 0,
+        PromiseAllSettledOther = 1,
     };
 
     DECLARE_INFO;
