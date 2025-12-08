@@ -36,9 +36,9 @@
 
 SOFT_LINK_PRIVATE_FRAMEWORK_FOR_SOURCE(WebKit, SafariSafeBrowsing);
 
-SOFT_LINK_CLASS_FOR_SOURCE(WebKit, SafariSafeBrowsing, SSBLookupContext);
-SOFT_LINK_CLASS_FOR_SOURCE(WebKit, SafariSafeBrowsing, SSBLookupResult);
-SOFT_LINK_CLASS_FOR_SOURCE(WebKit, SafariSafeBrowsing, SSBServiceLookupResult);
+SOFT_LINK_CLASS_FOR_SOURCE_OPTIONAL(WebKit, SafariSafeBrowsing, SSBLookupContext);
+SOFT_LINK_CLASS_FOR_SOURCE_OPTIONAL(WebKit, SafariSafeBrowsing, SSBLookupResult);
+SOFT_LINK_CLASS_FOR_SOURCE_OPTIONAL(WebKit, SafariSafeBrowsing, SSBServiceLookupResult);
 
 namespace WebKit::SafeBrowsingUtilities {
 
