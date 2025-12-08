@@ -41,6 +41,7 @@
 #include "JSPromiseCombinatorsGlobalContext.h"
 #include "JSPromisePrototype.h"
 #include "Microtask.h"
+#include "ObjectConstructor.h"
 
 namespace JSC {
 
