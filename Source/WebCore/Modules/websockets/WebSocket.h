@@ -137,6 +137,7 @@ private:
 
     State m_state { CONNECTING };
     URL m_url;
+    const RefPtr<SecurityOrigin> m_origin;
     unsigned m_bufferedAmount { 0 };
     unsigned m_bufferedAmountAfterClose { 0 };
     BinaryType m_binaryType { BinaryType::Blob };

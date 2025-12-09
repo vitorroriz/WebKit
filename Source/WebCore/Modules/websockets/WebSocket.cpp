@@ -342,6 +342,8 @@ ExceptionOr<void> WebSocket::connect(const String& url, const Vector<String>& pr
     else if (CheckedPtr workerLoaderProxy = downcast<WorkerGlobalScope>(context)->thread()->workerLoaderProxy())
         workerLoaderProxy->postTaskToLoader(WTFMove(reportRegistrableDomain));
 
+    if (!m_origin)
+        lazyInitialize(m_origin, SecurityOrigin::create(m_url));
     m_pendingActivity = makePendingActivity(*this);
 
     return { };
@@ -561,7 +563,7 @@ void WebSocket::didReceiveMessage(String&& message)
             }
         }
         ASSERT(socket.scriptExecutionContext());
-        socket.dispatchEvent(MessageEvent::create(WTFMove(message), SecurityOrigin::create(socket.m_url)->toString()));
+        socket.dispatchEvent(MessageEvent::create(WTFMove(message), socket.m_origin.copyRef()));
     });
 }
 
@@ -580,10 +582,10 @@ void WebSocket::didReceiveBinaryData(Vector<uint8_t>&& binaryData)
         switch (socket.m_binaryType) {
         case BinaryType::Blob:
             // FIXME: We just received the data from NetworkProcess, and are sending it back. This is inefficient.
-            socket.dispatchEvent(MessageEvent::create(Blob::create(socket.protectedScriptExecutionContext().get(), WTFMove(binaryData), emptyString()), SecurityOrigin::create(socket.m_url)->toString()));
+            socket.dispatchEvent(MessageEvent::create(Blob::create(socket.protectedScriptExecutionContext().get(), WTFMove(binaryData), emptyString()), socket.m_origin.copyRef()));
             break;
         case BinaryType::Arraybuffer:
-            socket.dispatchEvent(MessageEvent::create(ArrayBuffer::create(binaryData), SecurityOrigin::create(socket.m_url)->toString()));
+            socket.dispatchEvent(MessageEvent::create(ArrayBuffer::create(binaryData), socket.m_origin.copyRef()));
             break;
         }
     });

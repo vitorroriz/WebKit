@@ -32,6 +32,7 @@
 
 namespace WebCore {
 
+class SecurityOrigin;
 class SharedWorkerThread;
 struct WorkerParameters;
 
@@ -46,7 +47,7 @@ public:
     const String& name() const { return m_name; }
     Ref<SharedWorkerThread> thread();
 
-    void postConnectEvent(TransferredMessagePort&&, const String& sourceOrigin);
+    void postConnectEvent(TransferredMessagePort&&, const SecurityOriginData&);
 
 private:
     SharedWorkerGlobalScope(const String& name, const WorkerParameters&, Ref<SecurityOrigin>&&, SharedWorkerThread&, Ref<SecurityOrigin>&& topOrigin, IDBClient::IDBConnectionProxy*, SocketProvider*, std::unique_ptr<WorkerClient>&&);

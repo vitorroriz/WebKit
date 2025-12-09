@@ -69,13 +69,13 @@ Ref<SharedWorkerThread> SharedWorkerGlobalScope::thread()
 }
 
 // https://html.spec.whatwg.org/multipage/workers.html#dom-sharedworker step 11.5
-void SharedWorkerGlobalScope::postConnectEvent(TransferredMessagePort&& transferredPort, const String& sourceOrigin)
+void SharedWorkerGlobalScope::postConnectEvent(TransferredMessagePort&& transferredPort, const SecurityOriginData& sourceOriginData)
 {
     SCOPE_RELEASE_LOG("postConnectEvent:");
     auto ports = MessagePort::entanglePorts(*this, { WTFMove(transferredPort) });
     ASSERT(ports.size() == 1);
     RefPtr port = ports[0].ptr();
-    auto event = MessageEvent::create(emptyString(), sourceOrigin, { }, port, WTFMove(ports));
+    auto event = MessageEvent::create(emptyString(), sourceOriginData.securityOrigin(), { }, port, WTFMove(ports));
     event->initEvent(eventNames().connectEvent, false, false);
 
     dispatchEvent(WTFMove(event));

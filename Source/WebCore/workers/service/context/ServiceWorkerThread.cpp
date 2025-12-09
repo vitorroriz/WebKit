@@ -186,7 +186,7 @@ static void fireMessageEvent(ServiceWorkerGlobalScope& scope, MessageWithMessage
         return;
 
     auto ports = MessagePort::entanglePorts(scope, WTFMove(message.transferredPorts));
-    auto messageEvent = ExtendableMessageEvent::create(*globalObject, WTFMove(ports), message.message.releaseNonNull(), SecurityOriginData::fromURL(sourceURL).toString(), { }, source);
+    auto messageEvent = ExtendableMessageEvent::create(*globalObject, WTFMove(ports), message.message.releaseNonNull(), SecurityOrigin::create(sourceURL), { }, source);
     scope.dispatchEvent(messageEvent.event);
     scope.updateExtendedEventsSet(messageEvent.event.ptr());
 }
