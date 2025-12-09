@@ -703,6 +703,81 @@ JSValue JSBigInt::exponentiate(JSGlobalObject* globalObject, int32_t base, int32
 }
 #endif
 
+#if USE(JSVALUE32_64)
+using TwoDigit = uint64_t;
+#else
+using TwoDigit = UInt128;
+#endif
+
+template<size_t N>
+class CombaAccumulator {
+    using Digit = JSBigInt::Digit;
+public:
+    ALWAYS_INLINE void mac(Digit a, Digit b)
+    {
+        TwoDigit prod = static_cast<TwoDigit>(a) * b;
+        TwoDigit sum0 = static_cast<TwoDigit>(t0) + static_cast<Digit>(prod);
+        t0 = static_cast<Digit>(sum0);
+        TwoDigit sum1 = static_cast<TwoDigit>(t1) + static_cast<Digit>(prod >> JSBigInt::digitBits) + static_cast<Digit>(sum0 >> JSBigInt::digitBits);
+        t1 = static_cast<Digit>(sum1);
+        t2 += static_cast<Digit>(sum1 >> JSBigInt::digitBits);
+    }
+
+    ALWAYS_INLINE Digit storeAndShift()
+    {
+        Digit result = t0;
+        t0 = t1;
+        t1 = t2;
+        t2 = 0;
+        return result;
+    }
+
+    template<size_t K, size_t I = 0>
+    ALWAYS_INLINE void computeColumn(std::span<const Digit, N> a, std::span<const Digit, N> b)
+    {
+        if constexpr (I < N) {
+            constexpr int J = static_cast<int>(K) - static_cast<int>(I);
+            if constexpr (J >= 0 && J < static_cast<int>(N))
+                mac(a[I], b[J]);
+            computeColumn<K, I + 1>(a, b);
+        }
+    }
+
+    template<size_t K = 0>
+    ALWAYS_INLINE void pass(std::span<Digit, N * 2> r, std::span<const Digit, N> a, std::span<const Digit, N> b)
+    {
+        if constexpr (K < 2 * N - 1) {
+            computeColumn<K>(a, b);
+            r[K] = storeAndShift();
+            pass<K + 1>(r, a, b);
+        } else
+            r[N * 2 - 1] = t0;
+    }
+
+private:
+    Digit t0 { 0 };
+    Digit t1 { 0 };
+    Digit t2 { 0 };
+};
+
+template<size_t N>
+std::span<JSBigInt::Digit, N * 2> JSBigInt::multiplyComba(std::span<const Digit, N> x, std::span<const Digit, N> y, std::span<Digit, N * 2> result)
+{
+    static_assert(N == 1 || N == 2 || N == 4 || N == 8 || N == 16);
+    std::array<Digit, N> a;
+    std::array<Digit, N> b;
+
+    // Ensure that all loads are done before entering to computation. This allows compiler to use registers for all elements.
+    for (size_t i = 0; i < N; ++i)
+        a[i] = x[i];
+    for (size_t i = 0; i < N; ++i)
+        b[i] = y[i];
+
+    CombaAccumulator<N> acc;
+    acc.template pass<>(result, a, b);
+    return result;
+}
+
 std::span<JSBigInt::Digit> JSBigInt::multiplySingle(std::span<const Digit> multiplicand, Digit multiplier, std::span<Digit> result)
 {
     RELEASE_ASSERT(result.size() > multiplicand.size());
@@ -818,13 +893,27 @@ JSBigInt::ImplResult JSBigInt::multiplyImpl(JSGlobalObject* globalObject, BigInt
         }
     }
 
-    Vector<Digit, 16> digits(resultLength);
+    Vector<Digit, 32> digits(resultLength);
     auto span = digits.mutableSpan();
-    std::span<Digit> result;
-    if (y.length() == 1)
-        result = multiplySingle(x.digits(), y.digit(0), span);
-    else
-        result = multiplyTextbook(x.digits(), y.digits(), span);
+    std::span<Digit> result = ([](std::span<const Digit> x, std::span<const Digit> y, std::span<Digit> span) -> std::span<Digit> {
+        if (x.size() == y.size()) {
+            switch (y.size()) {
+            case 1:
+                return multiplyComba<1>(x.template first<1>(), y.template first<1>(), span.first<2>());
+            case 2:
+                return multiplyComba<2>(x.template first<2>(), y.template first<2>(), span.first<4>());
+            case 4:
+                return multiplyComba<4>(x.template first<4>(), y.template first<4>(), span.first<8>());
+            case 8:
+                return multiplyComba<8>(x.template first<8>(), y.template first<8>(), span.first<16>());
+            case 16:
+                return multiplyComba<16>(x.template first<16>(), y.template first<16>(), span.first<32>());
+            }
+        }
+        if (y.size() == 1)
+            return multiplySingle(x, y[0], span);
+        return multiplyTextbook(x, y, span);
+    }(x.digits(), y.digits(), span));
     RELEASE_AND_RETURN(scope, createFrom(globalObject, resultSign, result));
 }
 
@@ -1593,12 +1682,6 @@ JSValue JSBigInt::bitwiseNot(JSGlobalObject* globalObject, JSBigInt* x)
 {
     return tryConvertToBigInt32(bitwiseNotImpl(globalObject, HeapBigIntImpl { x }));
 }
-
-#if USE(JSVALUE32_64)
-using TwoDigit = uint64_t;
-#else
-using TwoDigit = UInt128;
-#endif
 
 // {carry} must point to an initialized Digit and will either be incremented
 // by one or left alone.

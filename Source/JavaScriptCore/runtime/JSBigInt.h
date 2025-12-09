@@ -480,6 +480,11 @@ public:
         return !length();
     }
 
+    static constexpr unsigned bitsPerByte = 8;
+    static constexpr unsigned digitBits = sizeof(Digit) * bitsPerByte;
+    static constexpr unsigned halfDigitBits = digitBits / 2;
+    static constexpr Digit halfDigitMask = (1ull << halfDigitBits) - 1;
+
 private:
     JSBigInt(VM&, Structure*, Digit*, unsigned length);
 
@@ -494,10 +499,6 @@ private:
 
     static JSBigInt* createFromImpl(JSGlobalObject*, uint64_t value, bool sign);
 
-    static constexpr unsigned bitsPerByte = 8;
-    static constexpr unsigned digitBits = sizeof(Digit) * bitsPerByte;
-    static constexpr unsigned halfDigitBits = digitBits / 2;
-    static constexpr Digit halfDigitMask = (1ull << halfDigitBits) - 1;
     static constexpr int maxInt = 0x7FFFFFFF;
 
     static constexpr unsigned doubleMantissaSize = 53;
@@ -521,6 +522,8 @@ private:
     static void internalMultiplyAdd(BigIntImpl source, Digit factor, Digit summand, unsigned, JSBigInt* result);
     static std::span<Digit> multiplySingle(std::span<const Digit> multiplicand, Digit multiplier, std::span<Digit> result);
     static std::span<Digit> multiplyTextbook(std::span<const Digit> x, std::span<const Digit> y, std::span<Digit> result);
+    template<size_t N>
+    static std::span<Digit, N * 2> multiplyComba(std::span<const Digit, N> x, std::span<const Digit, N> y, std::span<Digit, N * 2> result);
 
     static std::span<Digit> divideSingle(std::span<Digit> q, Digit& remainder, std::span<const Digit> a, Digit b);
     static std::tuple<std::span<Digit>, std::span<Digit>> divideTextbook(std::span<Digit> q, std::span<Digit> r, std::span<const Digit> a, std::span<const Digit> b);
