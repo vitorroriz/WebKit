@@ -431,7 +431,6 @@ html/MediaElementSession.cpp
 html/ModelDocument.cpp
 html/OffscreenCanvas.cpp
 html/PluginDocument.cpp
-html/RadioNodeList.cpp
 [ iOS ] html/TextFieldInputType.cpp
 html/ValidatedFormListedElement.cpp
 html/ValidationMessage.cpp
@@ -506,7 +505,6 @@ layout/integration/inline/LayoutIntegrationLineLayout.cpp
 loader/ApplicationManifestLoader.cpp
 loader/CrossOriginPreflightChecker.cpp
 loader/DocumentThreadableLoader.cpp
-loader/DocumentWriter.cpp
 loader/FrameLoadRequest.cpp
 [ iOS ] loader/FrameLoader.cpp
 loader/MediaResourceLoader.cpp

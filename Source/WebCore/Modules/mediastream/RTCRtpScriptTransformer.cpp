@@ -34,6 +34,7 @@
 #include "JSDOMPromiseDeferred.h"
 #include "MessageWithMessagePorts.h"
 #include "RTCEncodedStreamProducer.h"
+#include "ScriptExecutionContextInlines.h"
 #include "WorkerThread.h"
 
 namespace WebCore {
@@ -138,7 +139,7 @@ void RTCRtpScriptTransformer::sendKeyFrameRequest(Ref<DeferredPromise>&& promise
     m_streamProducer->sendKeyFrameRequest();
 
     // FIXME: We should be able to know when the FIR request is sent to resolve the promise at this exact time.
-    context->eventLoop().queueTask(TaskSource::Networking, [promise = WTFMove(promise)]() mutable {
+    context->checkedEventLoop()->queueTask(TaskSource::Networking, [promise = WTFMove(promise)]() mutable {
         promise->resolve();
     });
 }

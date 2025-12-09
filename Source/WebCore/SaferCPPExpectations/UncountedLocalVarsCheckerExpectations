@@ -418,7 +418,6 @@ rendering/updating/RenderTreeUpdaterGeneratedContent.cpp
 style/AttributeChangeInvalidation.cpp
 style/ClassChangeInvalidation.cpp
 style/ElementRuleCollector.cpp
-style/HasSelectorFilter.cpp
 style/IdChangeInvalidation.cpp
 style/InspectorCSSOMWrappers.cpp
 style/MatchResultCache.cpp

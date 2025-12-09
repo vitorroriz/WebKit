@@ -63,9 +63,10 @@ namespace WebCore {
 
 static inline bool canReferToParentFrameEncoding(const LocalFrame* frame, const LocalFrame* parentFrame) 
 {
-    if (is<XMLDocument>(frame->document()))
+    RefPtr document = frame->document();
+    if (is<XMLDocument>(document))
         return false;
-    return parentFrame && parentFrame->document()->protectedSecurityOrigin()->isSameOriginDomain(frame->document()->securityOrigin());
+    return parentFrame && parentFrame->protectedDocument()->protectedSecurityOrigin()->isSameOriginDomain(document->protectedSecurityOrigin());
 }
     
 // This is only called by ScriptController::executeIfJavaScriptURL
@@ -234,7 +235,7 @@ bool DocumentWriter::begin(const URL& urlReference, bool dispatch, Document* own
             RefPtr parentFrame = dynamicDowncast<LocalFrame>(frame->tree().parent());
             if (parentFrame && parentFrame->document()) {
                 document->inheritPolicyContainerFrom(parentFrame->document()->policyContainer());
-                document->checkedContentSecurityPolicy()->updateSourceSelf(parentFrame->document()->securityOrigin());
+                document->checkedContentSecurityPolicy()->updateSourceSelf(parentFrame->protectedDocument()->protectedSecurityOrigin());
             }
         } else if (triggeringAction && triggeringAction->requester() && !isLoadingBrowserControlledHTML()) {
             document->inheritPolicyContainerFrom(triggeringAction->requester()->policyContainer);

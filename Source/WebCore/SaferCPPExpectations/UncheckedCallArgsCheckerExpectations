@@ -4,7 +4,6 @@ Modules/mediacontrols/MediaControlsHost.cpp
 Modules/mediarecorder/MediaRecorder.cpp
 Modules/mediastream/RTCController.cpp
 Modules/mediastream/RTCPeerConnection.cpp
-Modules/mediastream/RTCRtpScriptTransformer.cpp
 Modules/model-element/HTMLModelElement.cpp
 Modules/pictureinpicture/HTMLVideoElementPictureInPicture.cpp
 Modules/push-api/PushDatabase.cpp
@@ -214,7 +213,6 @@ html/MediaDocument.cpp
 html/MediaElementSession.cpp
 html/ModelDocument.cpp
 html/PluginDocument.cpp
-html/RadioNodeList.cpp
 html/ValidatedFormListedElement.cpp
 html/ValidationMessage.cpp
 html/canvas/CanvasRenderingContext2D.cpp
@@ -331,7 +329,6 @@ loader/ApplicationManifestLoader.cpp
 loader/CrossOriginPreflightChecker.cpp
 loader/DocumentLoader.cpp
 loader/DocumentThreadableLoader.cpp
-loader/DocumentWriter.cpp
 loader/FrameLoadRequest.cpp
 loader/FrameLoader.cpp
 loader/ImageLoader.cpp
