@@ -535,7 +535,7 @@ void RenderBlockFlow::layoutBlock(RelayoutChildren relayoutChildren, LayoutUnit 
         return false;
     }();
 
-    if (!firstChild() && !isPaginated && !is<RenderMultiColumnSet>(*this))
+    if (!firstChild() && !isPaginated && !is<RenderMultiColumnSet>(*this) && (parent() && parent()->isBlockContainer()))
         return layoutBlockWithNoChildren();
 
     LayoutRepainter repainter(*this);
