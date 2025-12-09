@@ -261,7 +261,9 @@ void RiceBackend::finalizeStream(unsigned streamId)
 
         return true;
     });
-    m_sockets.remove(streamId);
+    auto data = m_sockets.take(streamId);
+    if (data.source)
+        g_source_destroy(data.source.get());
 }
 
 void RiceBackend::gatherSocketAddresses(unsigned streamId, CompletionHandler<void(Vector<String>&&)>&& completionHandler)

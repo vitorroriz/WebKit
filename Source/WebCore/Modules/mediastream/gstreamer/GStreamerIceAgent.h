@@ -115,6 +115,5 @@ void webkitGstWebRTCIceAgentLocalCandidateGatheredForStream(WebKitGstIceAgent*, 
 void webkitGstWebRTCIceAgentComponentStateChangedForStream(WebKitGstIceAgent*, unsigned, RiceAgentComponentStateChange&);
 void webkitGstWebRTCIceAgentNewSelectedPairForStream(WebKitGstIceAgent*, unsigned, RiceAgentSelectedPair&);
 void webkitGstWebRTCIceAgentClosed(WebKitGstIceAgent*);
-void webkitGstWebRTCIceAgentFinalizeStream(WebKitGstIceAgent*, unsigned);
 
 #endif // USE(GSTREAMER_WEBRTC) && USE(LIBRICE)

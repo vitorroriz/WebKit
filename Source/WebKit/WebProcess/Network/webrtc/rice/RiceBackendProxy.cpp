@@ -32,11 +32,17 @@
 namespace WebKit {
 using namespace WebCore;
 
-Ref<RiceBackendProxy> RiceBackendProxy::create(WebPageProxyIdentifier webPageProxyID, WebCore::RiceBackendClient& client)
+RefPtr<RiceBackendProxy> RiceBackendProxy::create(WebPageProxyIdentifier webPageProxyID, WebCore::RiceBackendClient& client)
 {
     Ref connection = WebProcess::singleton().ensureNetworkProcessConnection().connection();
     auto sendResult = connection->sendSync(Messages::NetworkConnectionToWebProcess::InitializeRiceBackend(webPageProxyID), 0);
+    if (!sendResult.succeeded())
+        return nullptr;
+
     auto [identifier] = sendResult.takeReply();
+    if (!identifier)
+        return nullptr;
+
     return adoptRef(*new RiceBackendProxy(WTFMove(connection), webPageProxyID, *identifier, client));
 }
 

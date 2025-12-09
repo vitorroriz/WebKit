@@ -64,13 +64,27 @@ using WebKitGstRiceStream = struct _WebKitGstRiceStream {
     GRefPtr<GstWebRTCICEStream> stream;
 };
 
+using StreamHashMap = HashMap<unsigned, std::unique_ptr<WebKitGstRiceStream>, WTF::IntHash<unsigned>, WTF::UnsignedWithZeroKeyHashTraits<unsigned>>;
+
 typedef struct _WebKitGstIceAgentPrivate {
+    ~_WebKitGstIceAgentPrivate()
+    {
+        if (onCandidateNotify)
+            onCandidateNotify(onCandidateData);
+
+        if (recvSource)
+            g_source_destroy(recvSource.get());
+
+        for (const auto& [sessionId, stream] : streams)
+            iceBackend->finalizeStream(stream->stream->stream_id);
+    }
+
     RefPtr<RiceBackendClient> backendClient;
     Markable<ScriptExecutionContextIdentifier> identifier;
     RefPtr<SocketProvider> socketProvider;
     GRefPtr<RiceAgent> agent;
 
-    Vector<std::unique_ptr<WebKitGstRiceStream>> streams;
+    StreamHashMap streams;
 
     RefPtr<RunLoop> runLoop;
 
@@ -88,6 +102,8 @@ typedef struct _WebKitGstIceAgentPrivate {
 
     HashSet<URL> turnServers;
     Vector<GRefPtr<RiceTurnConfig>> turnConfigs;
+
+    GRefPtr<GSource> recvSource;
 } WebKitGstIceAgentPrivate;
 
 typedef struct _WebKitGstIceAgent {
@@ -309,19 +325,30 @@ static gchar* webkitGstWebRTCIceAgentGetTurnServer(GstWebRTCICE* ice)
     return g_strdup(backend->priv->turnServer.utf8().data());
 }
 
-static GstWebRTCICEStream* webkitGstWebRTCIceAgentAddStream(GstWebRTCICE* ice, guint)
+static GstWebRTCICEStream* webkitGstWebRTCIceAgentAddStream(GstWebRTCICE* ice, guint sessionId)
 {
     auto backend = WEBKIT_GST_WEBRTC_ICE_BACKEND(ice);
     if (!backend->priv->iceBackend)
         return nullptr;
 
+    if (backend->priv->streams.contains(sessionId)) {
+        GST_ERROR_OBJECT(ice, "Stream already added for session %u", sessionId);
+        return nullptr;
+    }
+
     auto riceStream = adoptGRef(rice_agent_add_stream(backend->priv->agent.get()));
     auto streamId = static_cast<unsigned>(rice_stream_get_id(riceStream.get()));
     [[maybe_unused]] auto component = adoptGRef(rice_stream_add_component(riceStream.get()));
 
-    auto stream = GST_WEBRTC_ICE_STREAM(webkitGstWebRTCCreateIceStream(backend, WTFMove(riceStream)));
-    backend->priv->streams.append(WTF::makeUnique<WebKitGstRiceStream>(streamId, GRefPtr(stream)));
-    return stream;
+    auto stream = adoptGRef(GST_WEBRTC_ICE_STREAM(webkitGstWebRTCCreateIceStream(backend, WTFMove(riceStream))));
+    backend->priv->streams.add(sessionId, WTF::makeUnique<WebKitGstRiceStream>(streamId, WTFMove(stream)));
+    auto item = backend->priv->streams.find(sessionId);
+
+    // Until GStreamer 1.26.10 the GstWebRTC transport stream wasn't complying with the transfer full annotation for this function.
+    // https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/10312
+    if (gst_check_version(1, 26, 10))
+        return item->value->stream.ref();
+    return item->value->stream.get();
 }
 
 static gboolean webkitGstWebRTCIceAgentGetIsController(GstWebRTCICE* ice)
@@ -563,15 +590,6 @@ static void webkitGstWebRTCIceAgentClose(GstWebRTCICE* ice, GstPromise* promise)
 }
 #endif
 
-static void webkitGstWebRTCIceAgentFinalize(GObject* object)
-{
-    auto backend = WEBKIT_GST_WEBRTC_ICE_BACKEND(object);
-
-    if (backend->priv->onCandidateNotify)
-        backend->priv->onCandidateNotify(backend->priv->onCandidateData);
-    G_OBJECT_CLASS(webkit_gst_webrtc_ice_backend_parent_class)->finalize(object);
-}
-
 static void webkitGstWebRTCIceAgentConstructed(GObject* object)
 {
     G_OBJECT_CLASS(webkit_gst_webrtc_ice_backend_parent_class)->constructed(object);
@@ -596,23 +614,27 @@ static void webkitGstWebRTCIceAgentConstructed(GObject* object)
     priv->agent = adoptGRef(rice_agent_new(true, true));
 }
 
-static void findStreamAndApply(const Vector<std::unique_ptr<WebKitGstRiceStream>>& streams, unsigned streamId, Function<void(const WebKitGstIceStream*)> callback)
+static void findStreamAndApply(const StreamHashMap& streams, unsigned streamId, Function<void(const WebKitGstIceStream*)> callback)
 {
-    auto index = streams.findIf([streamId](const auto& item) {
-        return item->riceStreamId == streamId;
-    });
-    if (index == notFound) [[unlikely]]
+    for (auto& riceStream : streams.values()) {
+        if (riceStream->riceStreamId != streamId)
+            continue;
+
+        callback(WEBKIT_GST_WEBRTC_ICE_STREAM(riceStream->stream.get()));
         return;
-    callback(WEBKIT_GST_WEBRTC_ICE_STREAM(streams[index]->stream.get()));
+    }
 }
 
-static void webkitGstWebRTCIceAgentConfigure(WebKitGstIceAgent* backend, RefPtr<SocketProvider>&& socketProvider, ScriptExecutionContextIdentifier identifier)
+static bool webkitGstWebRTCIceAgentConfigure(WebKitGstIceAgent* backend, RefPtr<SocketProvider>&& socketProvider, ScriptExecutionContextIdentifier identifier)
 {
     auto priv = backend->priv;
     priv->socketProvider = WTFMove(socketProvider);
     priv->identifier = identifier;
     priv->backendClient = RiceBackendClient::create();
     priv->iceBackend = priv->socketProvider->createRiceBackend(*priv->backendClient);
+    if (!priv->iceBackend)
+        return false;
+
     priv->backendClient->setIncomingDataCallback([weakThis = GThreadSafeWeakPtr(backend)](unsigned streamId, RTCIceProtocol protocol, String&& from, String&& to, SharedMemory::Handle&& data) mutable {
         auto self = weakThis.get();
         if (!self)
@@ -622,15 +644,15 @@ static void webkitGstWebRTCIceAgentConfigure(WebKitGstIceAgent* backend, RefPtr<
         });
     });
 
-    auto source = agentSourceNew(GThreadSafeWeakPtr(backend));
-    g_source_attach(source.get(), priv->runLoop->mainContext());
+    priv->recvSource = agentSourceNew(GThreadSafeWeakPtr(backend));
+    g_source_attach(priv->recvSource.get(), priv->runLoop->mainContext());
+    return true;
 }
 
 static void webkit_gst_webrtc_ice_backend_class_init(WebKitGstIceAgentClass* klass)
 {
     auto gobjectClass = G_OBJECT_CLASS(klass);
     gobjectClass->constructed = webkitGstWebRTCIceAgentConstructed;
-    gobjectClass->finalize = webkitGstWebRTCIceAgentFinalize;
 
     auto iceClass = GST_WEBRTC_ICE_CLASS(klass);
     iceClass->set_on_ice_candidate = webkitGstWebRTCIceAgentSetOnIceCandidate;
@@ -671,7 +693,10 @@ WebKitGstIceAgent* webkitGstWebRTCCreateIceAgent(const String& name, ScriptExecu
 
     auto agent = reinterpret_cast<WebKitGstIceAgent*>(g_object_new(WEBKIT_TYPE_GST_WEBRTC_ICE_BACKEND, "name", name.ascii().data(), nullptr));
     gst_object_ref_sink(agent);
-    webkitGstWebRTCIceAgentConfigure(agent, WTFMove(socketProvider), context->identifier());
+    if (!webkitGstWebRTCIceAgentConfigure(agent, WTFMove(socketProvider), context->identifier())) {
+        gst_object_unref(agent);
+        return nullptr;
+    }
     return agent;
 }
 
@@ -729,19 +754,6 @@ void webkitGstWebRTCIceAgentSend(WebKitGstIceAgent* agent, unsigned streamId, RT
 void webkitGstWebRTCIceAgentWakeup(WebKitGstIceAgent* agent)
 {
     g_main_context_wakeup(agent->priv->runLoop->mainContext());
-}
-
-void webkitGstWebRTCIceAgentFinalizeStream(WebKitGstIceAgent* agent, unsigned streamId)
-{
-    auto backend = agent->priv->iceBackend;
-    if (!backend)
-        return;
-
-    backend->finalizeStream(streamId);
-
-    agent->priv->streams.removeAllMatching([streamId](const auto& item) {
-        return item->riceStreamId == streamId;
-    });
 }
 
 void webkitGstWebRTCIceAgentGatheringDoneForStream(WebKitGstIceAgent* agent, unsigned streamId)
