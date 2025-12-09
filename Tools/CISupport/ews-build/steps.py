@@ -20,7 +20,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from base64 import b64encode
 from buildbot.plugins import steps, util
 from buildbot.process import buildstep, logobserver, properties, remotecommand
 from buildbot.process.results import Results, SUCCESS, FAILURE, CANCELLED, WARNINGS, SKIPPED, EXCEPTION, RETRY
@@ -239,7 +238,6 @@ class GitHubMixin(object):
         graphql_url = 'https://api.github.com/graphql'
         username, access_token = GitHub.credentials(user=GitHub.user_for_queue(self.getProperty('buildername', '')))
         if username and access_token:
-            auth_header = b64encode('{}:{}'.format(username, access_token).encode('utf-8')).decode('utf-8')
             headers['Authorization'] = ['bearer {}'.format(access_token)]
 
         response = yield TwistedAdditions.request(
