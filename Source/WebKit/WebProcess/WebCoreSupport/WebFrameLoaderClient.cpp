@@ -240,10 +240,10 @@ void WebFrameLoaderClient::updateReferrerPolicy(ReferrerPolicy referrerPolicy)
         webPage->send(Messages::WebPageProxy::UpdateReferrerPolicy(m_frame->frameID(), referrerPolicy));
 }
 
-void WebFrameLoaderClient::updateOpener(const WebCore::Frame& newOpener)
+void WebFrameLoaderClient::updateOpener(std::optional<WebCore::FrameIdentifier> newFrameOpenerIdentifier)
 {
     if (RefPtr webPage = m_frame->page())
-        webPage->send(Messages::WebPageProxy::UpdateOpener(m_frame->frameID(), newOpener.frameID()));
+        webPage->send(Messages::WebPageProxy::UpdateOpener(m_frame->frameID(), newFrameOpenerIdentifier));
 }
 
 void WebFrameLoaderClient::setPrinting(bool printing, FloatSize pageSize, FloatSize originalPageSize, float maximumShrinkRatio, AdjustViewSize adjustViewSize)

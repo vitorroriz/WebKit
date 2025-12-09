@@ -2069,7 +2069,7 @@ public:
 
     void setObscuredContentInsets(const WebCore::FloatBoxExtent&);
 
-    void updateOpener(WebCore::FrameIdentifier, WebCore::FrameIdentifier);
+    void updateOpener(WebCore::FrameIdentifier, std::optional<WebCore::FrameIdentifier>);
     void setFramePrinting(WebCore::FrameIdentifier, bool printing, WebCore::FloatSize pageSize, WebCore::FloatSize originalPageSize, float maximumShrinkRatio, WebCore::AdjustViewSize shouldAdjustViewSize);
 
     WebHistoryItemClient& historyItemClient() const { return m_historyItemClient.get(); }

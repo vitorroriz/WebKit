@@ -680,7 +680,7 @@ void EmptyFrameLoaderClient::updateSandboxFlags(SandboxFlags)
 {
 }
 
-void EmptyFrameLoaderClient::updateOpener(const Frame&)
+void EmptyFrameLoaderClient::updateOpener(std::optional<FrameIdentifier>)
 {
 }
 

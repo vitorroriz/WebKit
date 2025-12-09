@@ -264,9 +264,10 @@ public:
     WebCore::ScrollbarMode scrollingMode() const { return m_scrollingMode; }
     void updateScrollingMode(WebCore::ScrollbarMode);
 
-    void updateOpener(WebCore::FrameIdentifier);
-    WebFrameProxy* opener() { return m_opener.get(); }
+    void updateOpener(std::optional<WebCore::FrameIdentifier>);
+    WebFrameProxy* opener() const { return m_opener.get(); }
     void disownOpener() { m_opener = nullptr; }
+    WebFrameProxy* disownedOpener() const { return m_disownedOpener.get(); }
 
     std::optional<WebCore::IntSize> remoteFrameSize() const { return m_remoteFrameSize; }
 
@@ -295,6 +296,7 @@ private:
     WeakPtr<WebPageProxy> m_page;
     Ref<FrameProcess> m_frameProcess;
     WeakPtr<WebFrameProxy> m_opener;
+    WeakPtr<WebFrameProxy> m_disownedOpener;
 
     FrameLoadState m_frameLoadState;
 

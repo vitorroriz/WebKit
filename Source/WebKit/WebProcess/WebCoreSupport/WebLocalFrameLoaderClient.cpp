@@ -1069,7 +1069,7 @@ void WebLocalFrameLoaderClient::updateSandboxFlags(WebCore::SandboxFlags sandbox
     WebFrameLoaderClient::updateSandboxFlags(sandboxFlags);
 }
 
-void WebLocalFrameLoaderClient::updateOpener(const WebCore::Frame& newOpener)
+void WebLocalFrameLoaderClient::updateOpener(std::optional<WebCore::FrameIdentifier> newOpener)
 {
     WebFrameLoaderClient::updateOpener(newOpener);
 }

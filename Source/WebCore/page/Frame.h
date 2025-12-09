@@ -92,7 +92,7 @@ public:
     Ref<Frame> protectedMainFrame() { return mainFrame(); }
     Ref<const Frame> protectedMainFrame() const { return mainFrame(); }
     bool isMainFrame() const { return this == m_mainFrame.get(); }
-    WEBCORE_EXPORT void disownOpener();
+    WEBCORE_EXPORT void disownOpener(NotifyUIProcess = NotifyUIProcess::No);
     WEBCORE_EXPORT void updateOpener(Frame&, NotifyUIProcess = NotifyUIProcess::Yes);
     WEBCORE_EXPORT void setOpenerForWebKitLegacy(Frame*);
     const Frame* opener() const { return m_opener.get(); }

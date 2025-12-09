@@ -812,9 +812,14 @@ RefPtr<WebFrameProxy> WebFrameProxy::childFrame(size_t index) const
     return child;
 }
 
-void WebFrameProxy::updateOpener(WebCore::FrameIdentifier newOpener)
+void WebFrameProxy::updateOpener(std::optional<WebCore::FrameIdentifier> newOpener)
 {
+    RefPtr previousOpener = m_opener.get();
     m_opener = WebFrameProxy::webFrame(newOpener);
+
+    RefPtr webPage = page();
+    if (!m_opener && webPage && !webPage->protectedPreferences()->siteIsolationEnabled())
+        m_disownedOpener = previousOpener.get();
 }
 
 Ref<WebFrameProxy> WebFrameProxy::rootFrame()

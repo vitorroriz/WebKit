@@ -204,7 +204,7 @@ void WebRemoteFrameClient::updateSandboxFlags(WebCore::SandboxFlags sandboxFlags
     WebFrameLoaderClient::updateSandboxFlags(sandboxFlags);
 }
 
-void WebRemoteFrameClient::updateOpener(const WebCore::Frame& newOpener)
+void WebRemoteFrameClient::updateOpener(std::optional<WebCore::FrameIdentifier> newOpener)
 {
     WebFrameLoaderClient::updateOpener(newOpener);
 }

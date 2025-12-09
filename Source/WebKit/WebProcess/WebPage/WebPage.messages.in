@@ -914,7 +914,7 @@ messages -> WebPage WantsAsyncDispatchMessage {
     CloseCurrentTypingCommand()
 
     SimulateClickOverFirstMatchingTextInViewportWithUserInteraction(String targetText) -> (bool success)
-    UpdateOpener(WebCore::FrameIdentifier frameID, WebCore::FrameIdentifier newOpener)
+    UpdateOpener(WebCore::FrameIdentifier frameID, std::optional<WebCore::FrameIdentifier> newOpener)
     SetFramePrinting(WebCore::FrameIdentifier frameID, bool printing, WebCore::FloatSize pageSize, WebCore::FloatSize originalPageSize, float maximumShrinkRatio, enum:bool WebCore::AdjustViewSize shouldAdjustViewSize);
 
 #if HAVE(AUDIT_TOKEN)

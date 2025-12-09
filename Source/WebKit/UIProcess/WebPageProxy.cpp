@@ -7092,7 +7092,7 @@ void WebPageProxy::updateSandboxFlags(IPC::Connection& connection, WebCore::Fram
     }
 }
 
-void WebPageProxy::updateOpener(IPC::Connection& connection, WebCore::FrameIdentifier frameID, WebCore::FrameIdentifier newOpener)
+void WebPageProxy::updateOpener(IPC::Connection& connection, WebCore::FrameIdentifier frameID, std::optional<WebCore::FrameIdentifier> newOpener)
 {
     if (RefPtr frame = WebFrameProxy::webFrame(frameID))
         frame->updateOpener(newOpener);

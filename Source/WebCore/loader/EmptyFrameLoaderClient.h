@@ -103,7 +103,7 @@ private:
     void dispatchDecidePolicyForNewWindowAction(const NavigationAction&, const ResourceRequest&, FormState*, const String&, std::optional<HitTestResult>&&, FramePolicyFunction&&) final;
     void dispatchDecidePolicyForNavigationAction(const NavigationAction&, const ResourceRequest&, const ResourceResponse& redirectResponse, FormState*, const String&, std::optional<NavigationIdentifier>, std::optional<HitTestResult>&&, bool, IsPerformingHTTPFallback, SandboxFlags, PolicyDecisionMode, FramePolicyFunction&&) final;
     void updateSandboxFlags(SandboxFlags) final;
-    void updateOpener(const Frame&) final;
+    void updateOpener(std::optional<FrameIdentifier>) final;
     void setPrinting(bool, FloatSize, FloatSize, float, AdjustViewSize) final;
     void cancelPolicyCheck() final;
 

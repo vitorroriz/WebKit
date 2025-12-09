@@ -10237,7 +10237,7 @@ RefPtr<DrawingArea> WebPage::protectedDrawingArea() const
     return m_drawingArea;
 }
 
-void WebPage::updateOpener(WebCore::FrameIdentifier frameID, WebCore::FrameIdentifier newOpenerIdentifier)
+void WebPage::updateOpener(WebCore::FrameIdentifier frameID, std::optional<WebCore::FrameIdentifier> newOpenerIdentifier)
 {
     RefPtr frame = WebProcess::singleton().webFrame(frameID);
     if (!frame)
@@ -10245,6 +10245,13 @@ void WebPage::updateOpener(WebCore::FrameIdentifier frameID, WebCore::FrameIdent
     RefPtr coreFrame = frame->coreFrame();
     if (!coreFrame)
         return;
+
+    if (!newOpenerIdentifier) {
+        coreFrame->disownOpener(WebCore::Frame::NotifyUIProcess::No);
+        if (RefPtr provisionalFrame = frame->provisionalFrame())
+            provisionalFrame->disownOpener(WebCore::Frame::NotifyUIProcess::No);
+        return;
+    }
 
     RefPtr newOpener = WebProcess::singleton().webFrame(newOpenerIdentifier);
     if (!newOpener)

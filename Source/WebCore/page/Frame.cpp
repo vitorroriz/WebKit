@@ -266,7 +266,7 @@ bool Frame::isRootFrameIdentifier(FrameIdentifier identifier)
 void Frame::updateOpener(Frame& newOpener, NotifyUIProcess notifyUIProcess)
 {
     if (notifyUIProcess == NotifyUIProcess::Yes)
-        loaderClient().updateOpener(newOpener);
+        loaderClient().updateOpener(newOpener.frameID());
     if (m_opener)
         m_opener->m_openedFrames.remove(*this);
     newOpener.m_openedFrames.add(*this);
@@ -277,10 +277,14 @@ void Frame::updateOpener(Frame& newOpener, NotifyUIProcess notifyUIProcess)
     reinitializeDocumentSecurityContext();
 }
 
-void Frame::disownOpener()
+void Frame::disownOpener(NotifyUIProcess notifyUIProcess)
 {
-    if (m_opener)
+    if (m_opener) {
+        if (notifyUIProcess == NotifyUIProcess::Yes)
+            loaderClient().updateOpener(std::nullopt);
         m_opener->m_openedFrames.remove(*this);
+    }
+
     m_opener = nullptr;
 
     reinitializeDocumentSecurityContext();
