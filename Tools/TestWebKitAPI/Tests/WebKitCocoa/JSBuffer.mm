@@ -65,3 +65,40 @@ TEST(JSBuffer, IDLExposed)
     EXPECT_FALSE([[webView objectByEvaluatingJavaScript:@"!!window.WebKitBuffer"] boolValue]);
     EXPECT_FALSE([[webView objectByEvaluatingJavaScript:@"!!window.WebKitBufferNamespace"] boolValue]);
 }
+
+TEST(JSBuffer, EvaluateJavaScriptFromBuffer)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectZero]);
+    {
+        RetainPtr jsString8 = adoptNS([[_WKJSBuffer alloc] initWithData:[NSData dataWithBytesNoCopy:const_cast<char*>("1+2+3+4") length:7 freeWhenDone:NO]]);
+        RetainPtr<NSString> evalResult;
+        bool callbackComplete = false;
+        [webView _evaluateJavaScriptFromBuffer:jsString8.get() withEncoding:_WKJSBufferStringEncodingLatin1 withSourceURL:nil inFrame:nil inContentWorld:WKContentWorld.pageWorld withUserGesture:YES completionHandler:[&] (id result, NSError *error) {
+            evalResult = [NSString stringWithFormat:@"%@", result];
+            callbackComplete = true;
+        }];
+        TestWebKitAPI::Util::run(&callbackComplete);
+        EXPECT_WK_STREQ(evalResult.get(), "10");
+    }
+    {
+        RetainPtr jsString16 = adoptNS([[_WKJSBuffer alloc] initWithData:[NSData dataWithBytesNoCopy:const_cast<char16_t*>(u"22+33") length:10 freeWhenDone:NO]]);
+        RetainPtr<NSString> evalResult;
+        bool callbackComplete = false;
+        [webView _evaluateJavaScriptFromBuffer:jsString16.get() withEncoding:_WKJSBufferStringEncodingUniChar withSourceURL:nil inFrame:nil inContentWorld:WKContentWorld.pageWorld withUserGesture:YES completionHandler:[&] (id result, NSError *error) {
+            evalResult = [NSString stringWithFormat:@"%@", result];
+            callbackComplete = true;
+        }];
+        TestWebKitAPI::Util::run(&callbackComplete);
+        EXPECT_WK_STREQ(evalResult.get(), "55");
+    }
+    {
+        bool hadError = false;
+        bool callbackComplete = false;
+        [webView _evaluateJavaScriptFromBuffer:nil withEncoding:_WKJSBufferStringEncodingUniChar withSourceURL:nil inFrame:nil inContentWorld:WKContentWorld.pageWorld withUserGesture:YES completionHandler:[&] (id result, NSError *error) {
+            hadError = !!error;
+            callbackComplete = true;
+        }];
+        TestWebKitAPI::Util::run(&callbackComplete);
+        EXPECT_TRUE(hadError);
+    }
+}
