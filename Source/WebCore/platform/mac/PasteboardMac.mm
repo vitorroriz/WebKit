@@ -78,7 +78,6 @@ static Vector<String> writableTypesForImage()
 {
     Vector<String> types;
     types.append(String(legacyTIFFPasteboardTypeSingleton()));
-    types.appendVector(writableTypesForURL());
     types.append(String(legacyRTFDPasteboardTypeSingleton()));
     return types;
 }

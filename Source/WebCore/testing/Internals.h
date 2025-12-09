@@ -1656,6 +1656,8 @@ public:
     bool isModelElementIntersectingViewport(HTMLModelElement&);
 #endif
 
+    ExceptionOr<void> copyImageAtLocation(int x, int y);
+
     bool hasMediaSessionManager() const;
 
     size_t fileConnectionHandleCount(const FileSystemHandle&) const;

@@ -8189,4 +8189,28 @@ bool Internals::isModelElementIntersectingViewport(HTMLModelElement& element)
 }
 #endif
 
+// FIXME: Implement this method for iOS.
+ExceptionOr<void> Internals::copyImageAtLocation(int x, int y)
+{
+#if !PLATFORM(IOS_FAMILY)
+    RefPtr document = contextDocument();
+    if (!document || !document->frame())
+        return Exception { ExceptionCode::InvalidAccessError };
+
+    document->updateLayout(LayoutOptions::IgnorePendingStylesheets);
+
+    constexpr OptionSet<HitTestRequest::Type> hitType { HitTestRequest::Type::ReadOnly, HitTestRequest::Type::Active, HitTestRequest::Type::DisallowUserAgentShadowContent, HitTestRequest::Type::AllowChildFrameContent };
+
+    RefPtr localFrame = dynamicDowncast<LocalFrame>(document->frame()->mainFrame());
+    if (!localFrame)
+        return Exception { ExceptionCode::InvalidAccessError };
+
+    auto hitTestResult = localFrame->eventHandler().hitTestResultAtPoint(IntPoint(x, y), hitType);
+    localFrame->protectedEditor()->copyImage(hitTestResult);
+#endif
+    UNUSED_PARAM(x);
+    UNUSED_PARAM(y);
+    return { };
+}
+
 } // namespace WebCore
