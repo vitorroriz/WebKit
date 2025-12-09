@@ -148,7 +148,7 @@ String GStreamerIncomingTrackProcessor::mediaStreamIdFromPad()
     }
 
     GUniquePtr<gchar> name(gst_pad_get_name(m_pad.get()));
-    mediaStreamId = String::fromLatin1(name.get());
+    mediaStreamId = String(byteCast<char8_t>(unsafeSpan(name.get())));
     GST_DEBUG_OBJECT(m_bin.get(), "msid set from webrtcbin src pad name: %s", mediaStreamId.utf8().data());
     return mediaStreamId;
 }
@@ -168,12 +168,12 @@ void GStreamerIncomingTrackProcessor::retrieveMediaStreamAndTrackIdFromSDP()
     if (!media) [[unlikely]]
         return;
 
-    const char* msidAttribute = gst_sdp_media_get_attribute_val(media, "msid");
+    auto msidAttribute = CStringView::unsafeFromUTF8(gst_sdp_media_get_attribute_val(media, "msid"));
     if (!msidAttribute)
         return;
 
-    GST_LOG_OBJECT(m_bin.get(), "SDP media msid attribute value: %s", msidAttribute);
-    auto components = String::fromUTF8(msidAttribute).split(' ');
+    GST_LOG_OBJECT(m_bin.get(), "SDP media msid attribute value: %s", msidAttribute.utf8());
+    auto components = String(msidAttribute.span()).split(' ');
     if (components.size() != 2)
         return;
 

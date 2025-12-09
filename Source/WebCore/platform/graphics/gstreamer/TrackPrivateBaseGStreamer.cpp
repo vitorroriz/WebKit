@@ -201,8 +201,8 @@ void TrackPrivateBaseGStreamer::tagsChanged()
                 GstTagList* tagsFromEvent = nullptr;
                 gst_event_parse_tag(tagEvent.get(), &tagsFromEvent);
                 tags = adoptGRef(gst_tag_list_copy(tagsFromEvent));
-                String language;
-                if (getTag(tags.get(), GST_TAG_LANGUAGE_CODE, language))
+                auto language = getTag(tags.get(), ASCIILiteral::fromLiteralUnsafe(GST_TAG_LANGUAGE_CODE));
+                if (language)
                     break;
             }
             i++;
@@ -224,30 +224,25 @@ void TrackPrivateBaseGStreamer::tagsChanged()
     });
 }
 
-bool TrackPrivateBaseGStreamer::getLanguageCode(GstTagList* tags, String& value)
+std::optional<String> TrackPrivateBaseGStreamer::getLanguageCode(GstTagList* tags)
 {
-    String language;
-    if (getTag(tags, GST_TAG_LANGUAGE_CODE, language)) {
-        String convertedLanguage = byteCast<Latin1Character>(unsafeSpan(gst_tag_get_language_code_iso_639_1(language.utf8().data())));
-        GST_DEBUG("Converted track %" PRIu64 "'s language code to %s.", m_id, convertedLanguage.utf8().data());
-        if (convertedLanguage != value) {
-            value = WTFMove(convertedLanguage);
-            return true;
-        }
+    auto language = getTag(tags, ASCIILiteral::fromLiteralUnsafe(GST_TAG_LANGUAGE_CODE));
+    if (language) {
+        auto convertedLanguage = CStringView::unsafeFromUTF8(gst_tag_get_language_code_iso_639_1(language->utf8().data()));
+        GST_DEBUG("Converted track %" PRIu64 "'s language code to %s.", m_id, convertedLanguage.utf8());
+        return String(convertedLanguage.span());
     }
-    return false;
+    return std::nullopt;
 }
 
-template<class StringType>
-bool TrackPrivateBaseGStreamer::getTag(GstTagList* tags, const gchar* tagName, StringType& value)
+std::optional<String> TrackPrivateBaseGStreamer::getTag(GstTagList* tags, ASCIILiteral tagName)
 {
     GUniqueOutPtr<gchar> tagValue;
-    if (gst_tag_list_get_string(tags, tagName, &tagValue.outPtr())) {
-        GST_DEBUG("Track %" PRIu64 " got %s %s.", m_id, tagName, tagValue.get());
-        value = StringType { String::fromLatin1(tagValue.get()) };
-        return true;
+    if (gst_tag_list_get_string(tags, tagName.characters(), &tagValue.outPtr())) {
+        GST_DEBUG("Track %" PRIu64 " got %s %s.", m_id, tagName.characters(), tagValue.get());
+        return String(byteCast<char8_t>(unsafeSpan(tagValue.get())));
     }
-    return false;
+    return std::nullopt;
 }
 
 void TrackPrivateBaseGStreamer::notifyTrackOfTagsChanged()
@@ -264,20 +259,22 @@ void TrackPrivateBaseGStreamer::notifyTrackOfTagsChanged()
 
     tagsChanged(GRefPtr<GstTagList>(tags));
 
-    if (getTag(tags.get(), GST_TAG_TITLE, m_label)) {
+    auto label = getTag(tags.get(), ASCIILiteral::fromLiteralUnsafe(GST_TAG_TITLE));
+    if (label) {
+        m_label = *label;
         m_owner->notifyMainThreadClient([&](auto& client) {
             client.labelChanged(m_label);
         });
     }
 
-    String language;
-    if (!getLanguageCode(tags.get(), language))
+    auto language = getLanguageCode(tags.get());
+    if (!language)
         return;
 
-    if (language == m_language)
+    if (*language == m_language)
         return;
 
-    m_language = language;
+    m_language = *language;
     m_owner->notifyMainThreadClient([&](auto& client) {
         client.languageChanged(m_language);
     });

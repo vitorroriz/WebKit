@@ -434,7 +434,7 @@ static String x509Serialize(X509* x509)
     if (length <= 0)
         return { };
 
-    return String::fromUTF8(unsafeMakeSpan(data, length));
+    return String(byteCast<Latin1Character>(unsafeMakeSpan(data, length)));
 }
 
 static String privateKeySerialize(EVP_PKEY* privateKey)
@@ -451,7 +451,7 @@ static String privateKeySerialize(EVP_PKEY* privateKey)
     if (length <= 0)
         return { };
 
-    return String::fromUTF8(unsafeMakeSpan(data, length));
+    return String(byteCast<Latin1Character>(unsafeMakeSpan(data, length)));
 }
 
 std::optional<Ref<RTCCertificate>> generateCertificate(Ref<SecurityOrigin>&& origin, const PeerConnectionBackend::CertificateInformation& info)
@@ -559,12 +559,12 @@ std::optional<Ref<RTCCertificate>> generateCertificate(Ref<SecurityOrigin>&& ori
     return RTCCertificate::create(WTFMove(origin), expirationTime.milliseconds(), WTFMove(fingerprints), WTFMove(pem), WTFMove(serializedPrivateKey));
 }
 
-bool sdpMediaHasAttributeKey(const GstSDPMedia* media, const char* key)
+bool sdpMediaHasAttributeKey(const GstSDPMedia* media, ASCIILiteral key)
 {
     unsigned len = gst_sdp_media_attributes_len(media);
     for (unsigned i = 0; i < len; i++) {
         const auto* attribute = gst_sdp_media_get_attribute(media, i);
-        if (!g_strcmp0(attribute->key, key))
+        if (equal(unsafeSpan(attribute->key), key))
             return true;
     }
 
@@ -644,13 +644,14 @@ GstWebRTCRTPTransceiverDirection getDirectionFromSDPMedia(const GstSDPMedia* med
     for (unsigned i = 0; i < gst_sdp_media_attributes_len(media); i++) {
         const auto* attribute = gst_sdp_media_get_attribute(media, i);
 
-        if (!g_strcmp0(attribute->key, "sendonly"))
+        auto key = CStringView::unsafeFromUTF8(attribute->key);
+        if (key == "sendonly"_s)
             return GST_WEBRTC_RTP_TRANSCEIVER_DIRECTION_SENDONLY;
-        if (!g_strcmp0(attribute->key, "sendrecv"))
+        if (key == "sendrecv"_s)
             return GST_WEBRTC_RTP_TRANSCEIVER_DIRECTION_SENDRECV;
-        if (!g_strcmp0(attribute->key, "recvonly"))
+        if (key == "recvonly"_s)
             return GST_WEBRTC_RTP_TRANSCEIVER_DIRECTION_RECVONLY;
-        if (!g_strcmp0(attribute->key, "inactive"))
+        if (key == "inactive"_s)
             return GST_WEBRTC_RTP_TRANSCEIVER_DIRECTION_INACTIVE;
     }
 
@@ -663,16 +664,15 @@ GRefPtr<GstCaps> capsFromSDPMedia(const GstSDPMedia* media)
     unsigned numberOfFormats = gst_sdp_media_formats_len(media);
     auto caps = adoptGRef(gst_caps_new_empty());
     for (unsigned i = 0; i < numberOfFormats; i++) {
-        const char* rtpMapValue = gst_sdp_media_get_attribute_val_n(media, "rtpmap", i);
-        if (!rtpMapValue) {
+        auto rtpMap = CStringView::unsafeFromUTF8(gst_sdp_media_get_attribute_val_n(media, "rtpmap", i));
+        if (!rtpMap) {
             GST_DEBUG("Skipping media format without rtpmap");
             continue;
         }
-        auto rtpMap = StringView::fromLatin1(rtpMapValue);
-        auto components = rtpMap.split(' ');
+        auto components = String(rtpMap.span()).split(' ');
         auto payloadType = parseInteger<int>(*components.begin());
         if (!payloadType) {
-            GST_WARNING("Invalid payload type in rtpmap %s", rtpMap.utf8().data());
+            GST_WARNING("Invalid payload type in rtpmap %s", rtpMap.utf8());
             continue;
         }
 
@@ -711,18 +711,18 @@ GRefPtr<GstCaps> capsFromSDPMedia(const GstSDPMedia* media)
                 if (!fieldId.startsWith("extmap-"_s))
                     return true;
 
-                StringView uri;
+                CStringView uri;
                 if (G_VALUE_HOLDS_STRING(value))
-                    uri = StringView::fromLatin1(g_value_get_string(value));
+                    uri = CStringView::unsafeFromUTF8(g_value_get_string(value));
                 else if (GST_VALUE_HOLDS_ARRAY(value) && gst_value_array_get_size(value) >= 2) {
                     // Handle the case where the extension is declared as an array (direction, uri, parameters).
                     const auto uriValue = gst_value_array_get_value(value, 1);
-                    uri = StringView::fromLatin1(g_value_get_string(uriValue));
+                    uri = CStringView::unsafeFromUTF8(g_value_get_string(uriValue));
                 }
                 if (uri.isEmpty()) [[unlikely]]
                     return true;
 
-                return GStreamerRegistryScanner::singleton().isRtpHeaderExtensionSupported(uri);
+                return GStreamerRegistryScanner::singleton().isRtpHeaderExtensionSupported(uri.span());
             });
 
             // Align with caps from RealtimeOutgoingAudioSourceGStreamer
@@ -738,11 +738,11 @@ void setSsrcAudioLevelVadOn(GstStructure* structure)
 {
     unsigned totalFields = gst_structure_n_fields(structure);
     for (unsigned i = 0; i < totalFields; i++) {
-        String fieldName = unsafeSpan(gst_structure_nth_field_name(structure, i));
-        if (!fieldName.startsWith("extmap-"_s))
+        auto fieldName = CStringView::unsafeFromUTF8(gst_structure_nth_field_name(structure, i));
+        if (!startsWith(fieldName.span(), "extmap-"_s))
             continue;
 
-        const auto value = gst_structure_get_value(structure, fieldName.ascii().data());
+        const auto value = gst_structure_get_value(structure, fieldName.utf8());
         if (!G_VALUE_HOLDS_STRING(value))
             continue;
 
@@ -765,8 +765,9 @@ void setSsrcAudioLevelVadOn(GstStructure* structure)
         g_value_set_static_string(&stringValue, "vad=on");
         gst_value_array_append_and_take_value(&arrayValue, &stringValue);
 
-        gst_structure_remove_field(structure, fieldName.ascii().data());
-        gst_structure_take_value(structure, fieldName.ascii().data(), &arrayValue);
+        GUniquePtr<char> fieldNamePtr(g_strdup(fieldName.utf8()));
+        gst_structure_remove_field(structure, fieldNamePtr.get());
+        gst_structure_take_value(structure, fieldNamePtr.get(), &arrayValue);
     }
 }
 
@@ -845,7 +846,8 @@ void SDPStringBuilder::appendConnection(const GstSDPConnection* connection)
     if (!connection->nettype || !connection->addrtype || !connection->address)
         return;
 
-    m_stringBuilder.append("c="_s, unsafeSpan(connection->nettype), ' ', unsafeSpan(connection->addrtype), ' ', unsafeSpan(connection->address));
+    m_stringBuilder.append("c="_s, unsafeSpan(connection->nettype), ' ', unsafeSpan(connection->addrtype),
+        ' ', byteCast<char8_t>(unsafeSpan(connection->address)));
     if (gst_sdp_address_is_multicast(connection->nettype, connection->addrtype, connection->address)) {
         StringView addrType = unsafeSpan(connection->addrtype);
         if (addrType == "IP4"_s)
@@ -888,8 +890,8 @@ void SDPStringBuilder::appendMedia(const GstSDPMedia* media)
         m_stringBuilder.append(' ', unsafeSpan(gst_sdp_media_get_format(media, i)));
     m_stringBuilder.append(CRLF);
 
-    if (const char* info = gst_sdp_media_get_information(media))
-        m_stringBuilder.append("i="_s, unsafeSpan(info), CRLF);
+    if (auto info = CStringView::unsafeFromUTF8(gst_sdp_media_get_information(media)))
+        m_stringBuilder.append("i="_s, info.span(), CRLF);
 
     unsigned totalConnections = gst_sdp_media_connections_len(media);
     for (unsigned i = 0; i < totalConnections; i++)
@@ -918,23 +920,24 @@ SDPStringBuilder::SDPStringBuilder(const GstSDPMessage* sdp)
 
     const auto origin = gst_sdp_message_get_origin(sdp);
     if (origin->sess_id && origin->sess_version && origin->nettype && origin->addrtype && origin->addr) {
-        m_stringBuilder.append("o="_s, unsafeSpan(origin->username ? origin->username : "-"), ' ', unsafeSpan(origin->sess_id),
-            ' ', unsafeSpan(origin->sess_version), ' ', unsafeSpan(origin->nettype),
-            ' ', unsafeSpan(origin->addrtype), ' ', unsafeSpan(origin->addr), CRLF);
+        m_stringBuilder.append("o="_s, byteCast<char8_t>(unsafeSpan(origin->username ? origin->username : "-")), ' ',
+            unsafeSpan(origin->sess_id), ' ', unsafeSpan(origin->sess_version), ' ',
+            unsafeSpan(origin->nettype), ' ', unsafeSpan(origin->addrtype), ' ',
+            byteCast<char8_t>(unsafeSpan(origin->addr)), CRLF);
     }
 
-    if (const char* name = gst_sdp_message_get_session_name(sdp))
-        m_stringBuilder.append("s="_s, unsafeSpan(name), CRLF);
+    if (auto name = CStringView::unsafeFromUTF8(gst_sdp_message_get_session_name(sdp)))
+        m_stringBuilder.append("s="_s, name.span(), CRLF);
 
-    if (const char* info = gst_sdp_message_get_information(sdp))
-        m_stringBuilder.append("i="_s, unsafeSpan(info), CRLF);
+    if (auto info = CStringView::unsafeFromUTF8(gst_sdp_message_get_information(sdp)))
+        m_stringBuilder.append("i="_s, info.span(), CRLF);
 
-    if (const char* uri = gst_sdp_message_get_uri(sdp))
-        m_stringBuilder.append("u="_s, unsafeSpan(uri), CRLF);
+    if (auto uri = CStringView::unsafeFromUTF8(gst_sdp_message_get_uri(sdp)))
+        m_stringBuilder.append("u="_s, uri.span(), CRLF);
 
     unsigned totalEmails = gst_sdp_message_emails_len(sdp);
     for (unsigned i = 0; i < totalEmails; i++)
-        m_stringBuilder.append("e="_s, unsafeSpan(gst_sdp_message_get_email(sdp, i)), CRLF);
+        m_stringBuilder.append("e="_s, byteCast<char8_t>(unsafeSpan(gst_sdp_message_get_email(sdp, i))), CRLF);
 
     unsigned totalPhones = gst_sdp_message_phones_len(sdp);
     for (unsigned i = 0; i < totalPhones; i++)

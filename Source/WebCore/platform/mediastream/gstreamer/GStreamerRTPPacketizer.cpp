@@ -143,7 +143,7 @@ void GStreamerRTPPacketizer::ensureMidExtension(const String& mid)
 
         m_midExtension = extension;
         GST_DEBUG_OBJECT(m_bin.get(), "Using mid extension %" GST_PTR_FORMAT, m_midExtension.get());
-        g_object_set(extension, "mid", mid.utf8().data(), nullptr);
+        g_object_set(extension, "mid", mid.ascii().data(), nullptr);
         GST_DEBUG_OBJECT(m_bin.get(), "Existing mid extension updated with mid %s", mid.utf8().data());
         break;
     }

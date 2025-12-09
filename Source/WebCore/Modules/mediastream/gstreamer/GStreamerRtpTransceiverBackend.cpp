@@ -167,7 +167,7 @@ ExceptionOr<void> GStreamerRtpTransceiverBackend::setCodecPreferences(const Vect
             if (!key.startsWith("extmap-"_s))
                 return true;
 
-            extensions.add(key.toString(), String::fromLatin1(g_value_get_string(value)));
+            extensions.add(key, byteCast<char8_t>(unsafeSpan(g_value_get_string(value))));
             return true;
         });
     }

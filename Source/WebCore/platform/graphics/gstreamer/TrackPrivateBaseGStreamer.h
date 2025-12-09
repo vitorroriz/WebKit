@@ -114,11 +114,10 @@ protected:
     bool updateTrackIDFromTags(const GRefPtr<GstTagList>&);
 
 private:
-    bool getLanguageCode(GstTagList* tags, String& value);
+    std::optional<String> getLanguageCode(GstTagList*);
     static String generateUniquePlaybin2StreamID(TrackType, unsigned index);
     static char prefixForType(TrackType);
-    template<class StringType>
-    bool getTag(GstTagList* tags, const gchar* tagName, StringType& value);
+    std::optional<String> getTag(GstTagList* tags, ASCIILiteral tagName);
 
     void streamChanged();
     void tagsChanged();

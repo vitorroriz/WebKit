@@ -82,7 +82,7 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(CDMFactoryThunder);
 WTF_MAKE_TZONE_ALLOCATED_IMPL(CDMPrivateThunder);
 WTF_MAKE_TZONE_ALLOCATED_IMPL(CDMInstanceThunder);
 
-static CDMInstanceSession::SessionLoadFailure sessionLoadFailureFromThunder(const StringView& loadStatus)
+static CDMInstanceSession::SessionLoadFailure sessionLoadFailureFromThunder(const String& loadStatus)
 {
     if (loadStatus == "None"_s)
         return CDMInstanceSession::SessionLoadFailure::None;
@@ -388,26 +388,26 @@ void CDMInstanceSessionThunder::challengeGeneratedCallback(RefPtr<SharedBuffer>&
 }
 
 #if !defined(GST_DISABLE_GST_DEBUG) || !GST_DISABLE_GST_DEBUG
-static const char* toString(CDMInstanceSession::KeyStatus status)
+static ASCIILiteral toString(CDMInstanceSession::KeyStatus status)
 {
     switch (status) {
     case CDMInstanceSession::KeyStatus::Usable:
-        return "Usable";
+        return "Usable"_s;
     case CDMInstanceSession::KeyStatus::Expired:
-        return "Expired";
+        return "Expired"_s;
     case CDMInstanceSession::KeyStatus::Released:
-        return "Released";
+        return "Released"_s;
     case CDMInstanceSession::KeyStatus::OutputRestricted:
-        return "OutputRestricted";
+        return "OutputRestricted"_s;
     case CDMInstanceSession::KeyStatus::OutputDownscaled:
-        return "OutputDownscaled";
+        return "OutputDownscaled"_s;
     case CDMInstanceSession::KeyStatus::StatusPending:
-        return "StatusPending";
+        return "StatusPending"_s;
     case CDMInstanceSession::KeyStatus::InternalError:
-        return "InternalError";
+        return "InternalError"_s;
     default:
         ASSERT_NOT_REACHED();
-        return "unknown";
+        return "unknown"_s;
     }
 }
 #endif
@@ -442,7 +442,7 @@ void CDMInstanceSessionThunder::keyUpdatedCallback(KeyIDType&& keyID)
     GST_MEMDUMP("updated key", keyID.span().data(), keyID.size());
 
     auto keyStatus = status(keyID);
-    GST_DEBUG("updated with with key status %s", toString(keyStatus));
+    GST_DEBUG("updated with with key status %s", toString(keyStatus).characters());
 
     auto instance = cdmInstanceThunder();
     if (instance && GStreamerEMEUtilities::isPlayReadyKeySystem(instance->keySystem())) {
@@ -632,7 +632,7 @@ void CDMInstanceSessionThunder::loadSession(LicenseType, const String& sessionID
                 callback(std::nullopt, std::nullopt, std::nullopt, SuccessValue::Failed, sessionLoadFailureFromThunder({ }));
             else {
                 auto responseData = responseMessage->extractData();
-                StringView response(byteCast<Latin1Character>(responseData.span()));
+                auto response = String(byteCast<char8_t>(responseData.span()));
                 GST_DEBUG("Error message: %s", response.utf8().data());
                 callback(std::nullopt, std::nullopt, std::nullopt, SuccessValue::Failed, sessionLoadFailureFromThunder(response));
             }

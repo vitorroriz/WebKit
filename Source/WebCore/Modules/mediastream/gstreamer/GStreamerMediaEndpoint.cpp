@@ -125,8 +125,8 @@ void GStreamerMediaEndpoint::maybeInsertNetSimForElement(GstBin* bin, GstElement
         return;
 
     // Unlink the element, add a netsim element in bin and link it to the element to simulate varying network conditions.
-    const char* padName = isSource ? "src" : "sink";
-    auto pad = adoptGRef(gst_element_get_static_pad(element, padName));
+    ASCIILiteral padName = isSource ? "src"_s : "sink"_s;
+    auto pad = adoptGRef(gst_element_get_static_pad(element, padName.characters()));
     auto peer = adoptGRef(gst_pad_get_peer(pad.get()));
     if (!peer) [[unlikely]]
         return;
@@ -140,7 +140,7 @@ void GStreamerMediaEndpoint::maybeInsertNetSimForElement(GstBin* bin, GstElement
     for (const auto& [key, value] : options)
         gst_util_set_object_arg(G_OBJECT(netsim), key.ascii().data(), value.ascii().data());
 
-    pad = adoptGRef(gst_element_get_static_pad(netsim, padName));
+    pad = adoptGRef(gst_element_get_static_pad(netsim, padName.characters()));
     if (isSource) {
         gst_element_link(element, netsim);
         gst_pad_link(pad.get(), peer.get());
@@ -474,7 +474,7 @@ static std::optional<std::pair<RTCSdpType, String>> fetchDescription(GstElement*
     unsigned totalAttributesNumber = gst_sdp_message_attributes_len(description->sdp);
     for (unsigned i = 0; i < totalAttributesNumber; i++) {
         const auto attribute = gst_sdp_message_get_attribute(description->sdp, i);
-        if (!g_strcmp0(attribute->key, "end-of-candidates")) {
+        if (equal(unsafeSpan(attribute->key), "end-of-candidates"_s)) {
             gst_sdp_message_remove_attribute(description->sdp, i);
             i--;
         }
@@ -556,15 +556,16 @@ Vector<String> getMediaStreamIdsFromSDPMedia(const GstSDPMedia& media)
     HashSet<String> mediaStreamIdsSet;
     for (guint i = 0; i < gst_sdp_media_attributes_len(&media); ++i) {
         const auto attribute = gst_sdp_media_get_attribute(&media, i);
-        if (!g_strcmp0(attribute->key, "msid")) {
-            auto components = String::fromUTF8(attribute->value).split(' ');
+        auto key = CStringView::unsafeFromUTF8(attribute->key);
+        if (key == "msid"_s) {
+            auto components = String(byteCast<char8_t>(unsafeSpan(attribute->value))).split(' ');
             if (components.size() < 2)
                 continue;
             mediaStreamIdsSet.add(components[0]);
         }
         // MSID may also come in ssrc attributes, specially if they're in an SDP answer. They look like:
         // a=ssrc:3612593434 msid:e1019f4a-0983-4863-b923-b75903cced2c webrtctransceiver1
-        if (!g_strcmp0(attribute->key, "ssrc")) {
+        if (key == "ssrc"_s) {
             auto outerComponents = String::fromUTF8(attribute->value).split(' ');
             for (auto& outer : outerComponents) {
                 auto innerComponents = outer.split(':');
@@ -686,10 +687,10 @@ void GStreamerMediaEndpoint::linkOutgoingSources(GstSDPMessage* sdpMessage)
             continue;
         }
 
-        auto msid = String::fromUTF8(gst_sdp_media_get_attribute_val(media, "msid"));
+        auto msid = CStringView::unsafeFromUTF8(gst_sdp_media_get_attribute_val(media, "msid"));
 
-        GST_DEBUG_OBJECT(m_pipeline.get(), "Looking-up outgoing source with msid %s in %zu unlinked sources", msid.utf8().data(), m_unlinkedOutgoingSources.size());
-        m_unlinkedOutgoingSources.removeFirstMatching([&](auto& source) -> bool {
+        GST_DEBUG_OBJECT(m_pipeline.get(), "Looking-up outgoing source with msid %s in %zu unlinked sources", msid.utf8(), m_unlinkedOutgoingSources.size());
+        m_unlinkedOutgoingSources.removeFirstMatching([&, msid = String(msid.span())](auto& source) -> bool {
             if (source->type() != sourceType)
                 return false;
 
@@ -929,12 +930,12 @@ void GStreamerMediaEndpoint::doSetRemoteDescription(const RTCSessionDescription&
         auto peerConnectionBackend = this->peerConnectionBackend();
         if (!peerConnectionBackend)
             return;
-        processSDPMessage(&message, [this](unsigned, StringView mid, const auto* media) {
+        processSDPMessage(&message, [this](unsigned, CStringView mid, const auto* media) {
             auto mediaType = CStringView::unsafeFromUTF8(gst_sdp_media_get_media(media));
-            m_mediaForMid.set(mid.toString(), mediaType == "audio"_s ? RealtimeMediaSource::Type::Audio : RealtimeMediaSource::Type::Video);
+            m_mediaForMid.set(mid.span(), mediaType == "audio"_s ? RealtimeMediaSource::Type::Audio : RealtimeMediaSource::Type::Video);
 
             // https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/merge_requests/1907
-            if (sdpMediaHasAttributeKey(media, "ice-lite")) {
+            if (sdpMediaHasAttributeKey(media, "ice-lite"_s)) {
                 GRefPtr<GstWebRTCICE> ice;
                 g_object_get(m_webrtcBin.get(), "ice-agent", &ice.outPtr(), nullptr);
                 g_object_set(ice.get(), "ice-lite", TRUE, nullptr);
@@ -961,7 +962,7 @@ void GStreamerMediaEndpoint::doSetRemoteDescription(const RTCSessionDescription&
 
 #ifndef GST_DISABLE_GST_DEBUG
         auto dotFileName = makeString(unsafeSpan(GST_OBJECT_NAME(m_pipeline.get())), ".setRemoteDescription"_s);
-        GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(GST_BIN(m_pipeline.get()), GST_DEBUG_GRAPH_SHOW_ALL, dotFileName.utf8().data());
+        GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(GST_BIN(m_pipeline.get()), GST_DEBUG_GRAPH_SHOW_ALL, dotFileName.ascii().data());
 #endif
 
         auto rtcTransceiverStates = transceiverStatesFromWebRTCBin(m_webrtcBin);
@@ -1096,7 +1097,7 @@ void GStreamerMediaEndpoint::setDescription(const RTCSessionDescription* descrip
     }, data, reinterpret_cast<GDestroyNotify>(destroySetDescriptionCallData)));
 }
 
-void GStreamerMediaEndpoint::processSDPMessage(const GstSDPMessage* message, Function<void(unsigned, StringView, const GstSDPMedia*)> mediaCallback)
+void GStreamerMediaEndpoint::processSDPMessage(const GstSDPMessage* message, Function<void(unsigned, CStringView, const GstSDPMedia*)> mediaCallback)
 {
     unsigned totalMedias = gst_sdp_message_medias_len(message);
     for (unsigned mediaIndex = 0; mediaIndex < totalMedias; mediaIndex++) {
@@ -1109,7 +1110,7 @@ void GStreamerMediaEndpoint::processSDPMessage(const GstSDPMessage* message, Fun
         GUniquePtr<char> mediaRepresentation(gst_sdp_media_as_text(media));
         GST_LOG_OBJECT(m_pipeline.get(), "Processing media:\n%s", mediaRepresentation.get());
 #endif
-        const char* mid = gst_sdp_media_get_attribute_val(media, "mid");
+        auto mid = CStringView::unsafeFromUTF8(gst_sdp_media_get_attribute_val(media, "mid"));
         if (!mid)
             continue;
 
@@ -1117,7 +1118,7 @@ void GStreamerMediaEndpoint::processSDPMessage(const GstSDPMessage* message, Fun
         unsigned totalAttributes = gst_sdp_media_attributes_len(media);
         for (unsigned attributeIndex = 0; attributeIndex < totalAttributes; attributeIndex++) {
             const auto* attribute = gst_sdp_media_get_attribute(media, attributeIndex);
-            if (!g_strcmp0(attribute->key, "inactive")) {
+            if (CStringView::unsafeFromUTF8(attribute->key) == "inactive"_s) {
                 isInactive = true;
                 break;
             }
@@ -1127,7 +1128,7 @@ void GStreamerMediaEndpoint::processSDPMessage(const GstSDPMessage* message, Fun
             continue;
         }
 
-        mediaCallback(mediaIndex, StringView::fromLatin1(mid), media);
+        mediaCallback(mediaIndex, mid, media);
     }
 }
 
@@ -1226,8 +1227,7 @@ std::optional<bool> GStreamerMediaEndpoint::isIceGatheringComplete(const String&
     unsigned numberOfMedias = gst_sdp_message_medias_len(message.get());
     for (unsigned i = 0; i < numberOfMedias; i++) {
         const auto* media = gst_sdp_message_get_media(message.get(), i);
-        const char* value = gst_sdp_media_get_attribute_val_n(media, "end-of-candidates", 0);
-        if (!value)
+        if (!gst_sdp_media_get_attribute_val_n(media, "end-of-candidates", 0))
             return false;
     }
 
@@ -1372,8 +1372,7 @@ void GStreamerMediaEndpoint::initiate(bool isInitiator, GstStructure* rawOptions
         }
 
         GUniqueOutPtr<GstWebRTCSessionDescription> sessionDescription;
-        const char* sdpTypeString = holder->sdpType == RTCSdpType::Offer ? "offer" : "answer";
-        gst_structure_get(reply, sdpTypeString, GST_TYPE_WEBRTC_SESSION_DESCRIPTION, &sessionDescription.outPtr(), nullptr);
+        gst_structure_get(reply, holder->sdpType == RTCSdpType::Offer ? "offer" : "answer", GST_TYPE_WEBRTC_SESSION_DESCRIPTION, &sessionDescription.outPtr(), nullptr);
 
         GUniquePtr<GstWebRTCSessionDescription> description;
         if (holder->sdpType == RTCSdpType::Answer) {
@@ -1453,12 +1452,12 @@ MediaStream& GStreamerMediaEndpoint::mediaStreamFromRTCStream(String mediaStream
 
 String GStreamerMediaEndpoint::trackIdFromSDPMedia(const GstSDPMedia& media)
 {
-    const char* msidAttribute = gst_sdp_media_get_attribute_val(&media, "msid");
+    auto msidAttribute = CStringView::unsafeFromUTF8(gst_sdp_media_get_attribute_val(&media, "msid"));
     if (!msidAttribute)
         return emptyString();
 
-    GST_LOG_OBJECT(m_pipeline.get(), "SDP media msid attribute value: %s", msidAttribute);
-    auto components = String::fromUTF8(msidAttribute).split(' ');
+    GST_LOG_OBJECT(m_pipeline.get(), "SDP media msid attribute value: %s", msidAttribute.utf8());
+    auto components = String(msidAttribute.span()).split(' ');
     if (components.size() < 2)
         return emptyString();
 
@@ -1589,7 +1588,7 @@ void GStreamerMediaEndpoint::connectPad(GstPad* pad)
 
 #ifndef GST_DISABLE_GST_DEBUG
     auto dotFileName = makeString(unsafeSpan(GST_OBJECT_NAME(m_pipeline.get())), ".pending-"_s, unsafeSpan(GST_OBJECT_NAME(pad)));
-    GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(GST_BIN(m_pipeline.get()), GST_DEBUG_GRAPH_SHOW_ALL, dotFileName.utf8().data());
+    GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(GST_BIN(m_pipeline.get()), GST_DEBUG_GRAPH_SHOW_ALL, dotFileName.ascii().data());
 #endif
 }
 
@@ -2712,7 +2711,7 @@ std::optional<bool> GStreamerMediaEndpoint::canTrickleIceCandidates() const
 
     for (unsigned i = 0; i < gst_sdp_message_attributes_len(description->sdp); i++) {
         const auto attribute = gst_sdp_message_get_attribute(description->sdp, i);
-        if (g_strcmp0(attribute->key, "ice-options"))
+        if (!equal(unsafeSpan(attribute->key), "ice-options"_s))
             continue;
 
         auto values = makeString(unsafeSpan(attribute->value)).split(' ');
@@ -2721,7 +2720,6 @@ std::optional<bool> GStreamerMediaEndpoint::canTrickleIceCandidates() const
     }
     return false;
 }
-
 
 void GStreamerMediaEndpoint::updatePtDemuxSrcPadCaps(GstElement* ptDemux, GstPad* pad)
 {
@@ -2825,8 +2823,8 @@ GUniquePtr<GstSDPMessage> GStreamerMediaEndpoint::completeSDPAnswer(const String
             if (key != "extmap"_s)
                 continue;
 
-            auto value = StringView::fromLatin1(attribute->value);
-            Vector<String> tokens = value.toStringWithoutCopying().split(' ');
+            String value(byteCast<char8_t>(unsafeSpan(attribute->value)));
+            Vector<String> tokens = value.split(' ');
             if (tokens.size() < 2) [[unlikely]]
                 continue;
 

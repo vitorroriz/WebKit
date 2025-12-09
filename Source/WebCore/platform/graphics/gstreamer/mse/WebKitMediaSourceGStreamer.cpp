@@ -218,18 +218,18 @@ static GstStreamType gstStreamType(TrackPrivateBaseGStreamer::TrackType type)
 }
 
 #ifndef GST_DISABLE_GST_DEBUG
-static const char* streamTypeToString(TrackPrivateBaseGStreamer::TrackType type)
+static ASCIILiteral streamTypeToString(TrackPrivateBaseGStreamer::TrackType type)
 {
     switch (type) {
     case TrackPrivateBaseGStreamer::TrackType::Audio:
-        return "Audio";
+        return "Audio"_s;
     case TrackPrivateBaseGStreamer::TrackType::Video:
-        return "Video";
+        return "Video"_s;
     case TrackPrivateBaseGStreamer::TrackType::Text:
-        return "Text";
+        return "Text"_s;
     default:
     case TrackPrivateBaseGStreamer::TrackType::Unknown:
-        return "Unknown";
+        return "Unknown"_s;
     }
 }
 #endif // GST_DISABLE_GST_DEBUG
@@ -309,7 +309,8 @@ void webKitMediaSrcEmitStreams(WebKitMediaSrc* source, const Vector<RefPtr<Media
     source->priv->collection = adoptGRef(gst_stream_collection_new("WebKitMediaSrc"));
     for (const auto& track : tracks) {
 #ifndef GST_DISABLE_GST_DEBUG
-        GST_DEBUG_OBJECT(source, "Adding stream with trackId '%" PRIu64 "' of type %s with caps %" GST_PTR_FORMAT, track->id(), streamTypeToString(track->type()), track->initialCaps().get());
+        GST_DEBUG_OBJECT(source, "Adding stream with trackId '%" PRIu64 "' of type %s with caps %" GST_PTR_FORMAT,
+            track->id(), streamTypeToString(track->type()).characters(), track->initialCaps().get());
 #endif // GST_DISABLE_GST_DEBUG
         if (source->priv->streams.contains(track->id())) {
             GST_ERROR_OBJECT(source, "stream with trackId '%" PRIu64 "' already exists", track->id());

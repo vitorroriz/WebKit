@@ -270,7 +270,7 @@ ExceptionOr<GUniquePtr<GstStructure>>fromRTCSendParameters(const RTCRtpSendParam
 
 std::optional<Ref<RTCCertificate>> generateCertificate(Ref<SecurityOrigin>&&, const PeerConnectionBackend::CertificateInformation&);
 
-bool sdpMediaHasAttributeKey(const GstSDPMedia*, const char* key);
+bool sdpMediaHasAttributeKey(const GstSDPMedia*, ASCIILiteral key);
 
 class UniqueSSRCGenerator : public ThreadSafeRefCounted<UniqueSSRCGenerator> {
     WTF_MAKE_TZONE_ALLOCATED(UniqueSSRCGenerator);

@@ -125,37 +125,37 @@ TEST_F(GStreamerTest, hevcProfileParsing)
 {
     using namespace GStreamerCodecUtilities;
 
-    ASSERT_STREQ(parseHEVCProfile("hev1.1.6.L93.B0"_s), "main");
-    ASSERT_STREQ(parseHEVCProfile("hev1.2.4.L93.B0"_s), "main-10");
-    ASSERT_STREQ(parseHEVCProfile("hev1.3.E.L93.B0"_s), "main-still-picture");
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L186.BF.C8"_s), "monochrome");
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L30.BD.C8"_s), "monochrome-10");
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L30.B9.C8"_s), "monochrome-12");
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L30.B1.C8"_s), "monochrome-16");
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L30.B9.88"_s), "main-12");
+    ASSERT_EQ(parseHEVCProfile("hev1.1.6.L93.B0"_s), "main"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.2.4.L93.B0"_s), "main-10"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.3.E.L93.B0"_s), "main-still-picture"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L186.BF.C8"_s), "monochrome"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L30.BD.C8"_s), "monochrome-10"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L30.B9.C8"_s), "monochrome-12"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L30.B1.C8"_s), "monochrome-16"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L30.B9.88"_s), "main-12"_s);
 
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L30.BE.08"_s), "main-444");
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L30.BC.08"_s), "main-444-10");
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L30.B8.08"_s), "main-444-12");
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L30.BE.08"_s), "main-444"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L30.BC.08"_s), "main-444-10"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L30.B8.08"_s), "main-444-12"_s);
 
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L30.BF.A8"_s), "main-intra");
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L30.BD.A8"_s), "main-10-intra");
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L30.B9.A8"_s), "main-12-intra");
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L30.BF.A8"_s), "main-intra"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L30.BD.A8"_s), "main-10-intra"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L30.B9.A8"_s), "main-12-intra"_s);
 
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L30.BE.28"_s), "main-444-intra");
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L60.BC.28"_s), "main-444-10-intra");
-    ASSERT_STREQ(parseHEVCProfile("hev1.4.10.L30.B0.20"_s), "main-444-16-intra");
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L30.BE.28"_s), "main-444-intra"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L60.BC.28"_s), "main-444-10-intra"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.4.10.L30.B0.20"_s), "main-444-16-intra"_s);
 
-    ASSERT_STREQ(parseHEVCProfile("hev1.5.20.L30.BE.0C"_s), "high-throughput-444");
-    ASSERT_STREQ(parseHEVCProfile("hev1.5.20.L30.BC.0C"_s), "high-throughput-444-10");
-    ASSERT_STREQ(parseHEVCProfile("hev1.5.20.L30.B0.0C"_s), "high-throughput-444-14");
-    ASSERT_STREQ(parseHEVCProfile("hev1.5.20.L30.B0.24"_s), "high-throughput-444-16-intra");
+    ASSERT_EQ(parseHEVCProfile("hev1.5.20.L30.BE.0C"_s), "high-throughput-444"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.5.20.L30.BC.0C"_s), "high-throughput-444-10"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.5.20.L30.B0.0C"_s), "high-throughput-444-14"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.5.20.L30.B0.24"_s), "high-throughput-444-16-intra"_s);
 
-    ASSERT_STREQ(parseHEVCProfile("hev1.9.200.L30.BF.8C"_s), "screen-extended-main");
-    ASSERT_STREQ(parseHEVCProfile("hev1.9.200.L30.BD.8C"_s), "screen-extended-main-10");
-    ASSERT_STREQ(parseHEVCProfile("hev1.9.200.L30.BE.0C"_s), "screen-extended-main-444");
-    ASSERT_STREQ(parseHEVCProfile("hev1.9.200.L30.BC.0C"_s), "screen-extended-main-444-10");
-    ASSERT_STREQ(parseHEVCProfile("hev1.9.200.L30.B0.0C"_s), "screen-extended-high-throughput-444-14");
+    ASSERT_EQ(parseHEVCProfile("hev1.9.200.L30.BF.8C"_s), "screen-extended-main"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.9.200.L30.BD.8C"_s), "screen-extended-main-10"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.9.200.L30.BE.0C"_s), "screen-extended-main-444"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.9.200.L30.BC.0C"_s), "screen-extended-main-444-10"_s);
+    ASSERT_EQ(parseHEVCProfile("hev1.9.200.L30.B0.0C"_s), "screen-extended-high-throughput-444-14"_s);
 }
 
 TEST_F(GStreamerTest, capsFromCodecString)
