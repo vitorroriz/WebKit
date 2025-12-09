@@ -1575,7 +1575,7 @@ editing/spelling/spelling-marker-includes-hyphen.html [ ImageOnlyFailure ]
 
 imported/w3c/web-platform-tests/css/css-view-transitions/element-is-grouping-during-animation.html [ ImageOnlyFailure Pass ]
 
-webkit.org/b/213782 webanimations/accelerated-animation-with-easing.html [ Failure Pass ]
+webkit.org/b/213782 svg/custom/object-sizing-explicit-width.xhtml [ Failure Pass ]
 
 imported/w3c/web-platform-tests/css/css-position/sticky/position-sticky-escape-scroller-004.html [ ImageOnlyFailure ]
 
