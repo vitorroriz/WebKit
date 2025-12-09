@@ -301,6 +301,7 @@ void ThreadedCompositor::paintToCurrentGLContext(const TransformationMatrix& mat
         requestComposition(CompositionReason::Animation);
 }
 
+#if HAVE(OS_SIGNPOST) || USE(SYSPROF_CAPTURE)
 static String reasonsToString(const OptionSet<CompositionReason>& reasons)
 {
     StringBuilder builder;
@@ -311,6 +312,7 @@ static String reasonsToString(const OptionSet<CompositionReason>& reasons)
     }
     return builder.toString();
 }
+#endif
 
 void ThreadedCompositor::renderLayerTree()
 {
