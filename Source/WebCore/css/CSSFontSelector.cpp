@@ -293,8 +293,15 @@ void CSSFontSelector::opportunisticallyStartFontDataURLLoading(const FontCascade
     const auto& segmentedFontFace = m_cssFontFaceSet->fontFace(description.fontSelectionRequest(), familyName);
     if (!segmentedFontFace)
         return;
+
+    RefPtr context = m_context.get();
+    if (!context)
+        return;
+
+    auto trustedType = context->settingsValues().downloadableBinaryFontTrustedTypes;
+
     for (auto& face : segmentedFontFace->constituentFaces())
-        face->opportunisticallyStartFontDataURLLoading();
+        face->opportunisticallyStartFontDataURLLoading(trustedType);
 }
 
 void CSSFontSelector::fontLoaded(CSSFontFace&)

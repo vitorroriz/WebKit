@@ -276,6 +276,8 @@
 		53FCDE6B229EFFB900598ECF /* IsoHeap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53FCDE6A229EFFB900598ECF /* IsoHeap.cpp */; };
 		5597F8361D9596C80066BC21 /* SynchronizedFixedQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5597F8341D9596C80066BC21 /* SynchronizedFixedQueue.cpp */; };
 		55F9D2E52205031800A9AB38 /* AdditionalSupportedImageTypes.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55F9D2E42205031800A9AB38 /* AdditionalSupportedImageTypes.mm */; };
+		562C003E2E82F4AC009D428B /* SafeFontParser-Worker.html in Copy Resources */ = {isa = PBXBuildFile; fileRef = 562C00362E82F4A7009D428B /* SafeFontParser-Worker.html */; };
+		56DBCC7E2E82A8A800F30138 /* SafeFontParser-Invalid.ttf in Copy Resources */ = {isa = PBXBuildFile; fileRef = 56DBCC7D2E82A8A800F30138 /* SafeFontParser-Invalid.ttf */; };
 		56EEE4782D8D6B85003D4FB1 /* coreipc.js in Copy Resources */ = {isa = PBXBuildFile; fileRef = 56EEE4772D8D6B85003D4FB1 /* coreipc.js */; };
 		56EEE4832D8D706F003D4FB1 /* RemoteObjectRegistry-BadReplyBlock.html in Copy Resources */ = {isa = PBXBuildFile; fileRef = 56EEE4822D8D706F003D4FB1 /* RemoteObjectRegistry-BadReplyBlock.html */; };
 		56EEE48F2D8DB402003D4FB1 /* coreipc-helpers.js in Copy Resources */ = {isa = PBXBuildFile; fileRef = 56EEE48E2D8DB402003D4FB1 /* coreipc-helpers.js */; };
@@ -2244,6 +2246,8 @@
 				F470A9772D41DAB200F2A137 /* rtl-bidi-text.html in Copy Resources */,
 				07C02FD22D6D6FBC0004ED97 /* rtl-sideways-scrolling.html in Copy Resources */,
 				F40A0AF42E9F3E4600DDAA54 /* safe-area-env.html in Copy Resources */,
+				56DBCC7E2E82A8A800F30138 /* SafeFontParser-Invalid.ttf in Copy Resources */,
+				562C003E2E82F4AC009D428B /* SafeFontParser-Worker.html in Copy Resources */,
 				A17C46E62C98E54B0023F3C7 /* scroll-to-anchor.html in Copy Resources */,
 				A17C46652C98E4BB0023F3C7 /* scrollable-page.html in Copy Resources */,
 				A17C47F42C98E5C20023F3C7 /* selected-text-and-textarea.html in Copy Resources */,
@@ -3102,6 +3106,8 @@
 		55A817FE218101DF0004A39A /* 100x100-red.tga */ = {isa = PBXFileReference; lastKnownFileType = file; path = "100x100-red.tga"; sourceTree = "<group>"; };
 		55F9D2E42205031800A9AB38 /* AdditionalSupportedImageTypes.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = AdditionalSupportedImageTypes.mm; sourceTree = "<group>"; };
 		562C00702E86DDC2009D428B /* EnhancedSecurityPolicies.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EnhancedSecurityPolicies.mm; sourceTree = "<group>"; };
+		562C00362E82F4A7009D428B /* SafeFontParser-Worker.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "SafeFontParser-Worker.html"; sourceTree = "<group>"; };
+		56DBCC7D2E82A8A800F30138 /* SafeFontParser-Invalid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SafeFontParser-Invalid.ttf"; sourceTree = "<group>"; };
 		56EEE4772D8D6B85003D4FB1 /* coreipc.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = coreipc.js; sourceTree = "<group>"; };
 		56EEE4822D8D706F003D4FB1 /* RemoteObjectRegistry-BadReplyBlock.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "RemoteObjectRegistry-BadReplyBlock.html"; sourceTree = "<group>"; };
 		56EEE48E2D8DB402003D4FB1 /* coreipc-helpers.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "coreipc-helpers.js"; sourceTree = "<group>"; };
@@ -6008,6 +6014,8 @@
 				2E92B8F6216490C3005B64F0 /* rich-text-attributes.html */,
 				07C02FD12D6D6FBC0004ED97 /* rtl-sideways-scrolling.html */,
 				F40A0AF32E9F3E4600DDAA54 /* safe-area-env.html */,
+				56DBCC7D2E82A8A800F30138 /* SafeFontParser-Invalid.ttf */,
+				562C00362E82F4A7009D428B /* SafeFontParser-Worker.html */,
 				F4E0A295211FC5A300AF7C7F /* selected-text-and-textarea.html */,
 				F4D65DA71F5E46C0009D8C27 /* selected-text-image-link-and-editable.html */,
 				467C565221B5ECDF0057516D /* SetSessionCookie.html */,
