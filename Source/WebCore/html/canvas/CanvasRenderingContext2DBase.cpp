@@ -2533,10 +2533,11 @@ RefPtr<ByteArrayPixelBuffer> CanvasRenderingContext2DBase::cacheImageDataIfPossi
     auto cachedBuffer = ByteArrayPixelBuffer::tryCreate(cachedFormat, size);
     if (!cachedBuffer)
         return nullptr;
+    RefPtr dataAsUint8ClampedArray = imageData.data().asUint8ClampedArray();
     ConstPixelBufferConversionView source {
         .format = { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, colorSpace },
         .bytesPerRow = bytesPerRow,
-        .rows = imageData.data().asUint8ClampedArray()->span(),
+        .rows = dataAsUint8ClampedArray->span(),
     };
     PixelBufferConversionView destination {
         .format = cachedFormat,

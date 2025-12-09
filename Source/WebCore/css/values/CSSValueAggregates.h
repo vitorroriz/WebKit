@@ -299,8 +299,8 @@ struct SpaceSeparatedEnumSet {
 
     constexpr StorageType toRaw() const { return value.toRaw(); }
 
-    constexpr const_iterator begin() const { return value.begin(); }
-    constexpr const_iterator end() const { return value.end(); }
+    constexpr const_iterator begin() const LIFETIME_BOUND { return value.begin(); }
+    constexpr const_iterator end() const LIFETIME_BOUND { return value.end(); }
 
     constexpr bool isEmpty() const { return value.isEmpty(); }
     constexpr size_t size() const { return value.size(); }
@@ -384,8 +384,8 @@ struct CommaSeparatedEnumSet {
 
     constexpr StorageType toRaw() const { return value.toRaw(); }
 
-    constexpr const_iterator begin() const { return value.begin(); }
-    constexpr const_iterator end() const { return value.end(); }
+    constexpr const_iterator begin() const LIFETIME_BOUND { return value.begin(); }
+    constexpr const_iterator end() const LIFETIME_BOUND { return value.end(); }
 
     constexpr bool isEmpty() const { return value.isEmpty(); }
     constexpr size_t size() const { return value.size(); }
@@ -460,8 +460,8 @@ struct SpaceSeparatedListHashSet {
         return result;
     }
 
-    constexpr const_iterator begin() const { return value.begin(); }
-    constexpr const_iterator end() const { return value.end(); }
+    constexpr const_iterator begin() const LIFETIME_BOUND { return value.begin(); }
+    constexpr const_iterator end() const LIFETIME_BOUND { return value.end(); }
 
     constexpr bool isEmpty() const { return value.isEmpty(); }
     constexpr size_t size() const { return value.size(); }
@@ -503,8 +503,8 @@ struct CommaSeparatedListHashSet {
         return result;
     }
 
-    constexpr const_iterator begin() const { return value.begin(); }
-    constexpr const_iterator end() const { return value.end(); }
+    constexpr const_iterator begin() const LIFETIME_BOUND { return value.begin(); }
+    constexpr const_iterator end() const LIFETIME_BOUND { return value.end(); }
 
     constexpr bool isEmpty() const { return value.isEmpty(); }
     constexpr size_t size() const { return value.size(); }
@@ -543,14 +543,14 @@ template<typename T, size_t inlineCapacity = 0> struct SpaceSeparatedVector {
         return WTF::map<inlineCapacity>(std::forward<SizedRange>(range), std::forward<Mapper>(mapper));
     }
 
-    const_iterator begin() const { return value.begin(); }
-    const_iterator end() const { return value.end(); }
-    const_reverse_iterator rbegin() const { return value.rbegin(); }
-    const_reverse_iterator rend() const { return value.rend(); }
+    const_iterator begin() const LIFETIME_BOUND { return value.begin(); }
+    const_iterator end() const LIFETIME_BOUND { return value.end(); }
+    const_reverse_iterator rbegin() const LIFETIME_BOUND { return value.rbegin(); }
+    const_reverse_iterator rend() const LIFETIME_BOUND { return value.rend(); }
 
     bool isEmpty() const { return value.isEmpty(); }
     size_t size() const { return value.size(); }
-    const T& operator[](size_t i) const { return value[i]; }
+    const T& operator[](size_t i) const LIFETIME_BOUND { return value[i]; }
 
     bool contains(const auto& x) const { return value.contains(x); }
     bool containsIf(NOESCAPE const Invocable<bool(const value_type&)> auto& f) const { return value.containsIf(f); }
@@ -590,14 +590,14 @@ template<typename T, size_t inlineCapacity = 0> struct CommaSeparatedVector {
         return WTF::map<inlineCapacity>(std::forward<SizedRange>(range), std::forward<Mapper>(mapper));
     }
 
-    const_iterator begin() const { return value.begin(); }
-    const_iterator end() const { return value.end(); }
-    const_reverse_iterator rbegin() const { return value.rbegin(); }
-    const_reverse_iterator rend() const { return value.rend(); }
+    const_iterator begin() const LIFETIME_BOUND { return value.begin(); }
+    const_iterator end() const LIFETIME_BOUND { return value.end(); }
+    const_reverse_iterator rbegin() const LIFETIME_BOUND { return value.rbegin(); }
+    const_reverse_iterator rend() const LIFETIME_BOUND { return value.rend(); }
 
     bool isEmpty() const { return value.isEmpty(); }
     size_t size() const { return value.size(); }
-    const T& operator[](size_t i) const { return value[i]; }
+    const T& operator[](size_t i) const LIFETIME_BOUND { return value[i]; }
 
     bool contains(const auto& x) const { return value.contains(x); }
     bool containsIf(NOESCAPE const Invocable<bool(const value_type&)> auto& f) const { return value.containsIf(f); }
@@ -648,14 +648,14 @@ template<typename T> struct SpaceSeparatedFixedVector {
         return Container::createWithSizeFromGenerator(size, std::forward<Generator>(generator));
     }
 
-    const_iterator begin() const { return value.begin(); }
-    const_iterator end() const { return value.end(); }
-    const_reverse_iterator rbegin() const { return value.rbegin(); }
-    const_reverse_iterator rend() const { return value.rend(); }
+    const_iterator begin() const LIFETIME_BOUND { return value.begin(); }
+    const_iterator end() const LIFETIME_BOUND { return value.end(); }
+    const_reverse_iterator rbegin() const LIFETIME_BOUND { return value.rbegin(); }
+    const_reverse_iterator rend() const LIFETIME_BOUND { return value.rend(); }
 
     bool isEmpty() const { return value.isEmpty(); }
     size_t size() const { return value.size(); }
-    const T& operator[](size_t i) const { return value[i]; }
+    const T& operator[](size_t i) const LIFETIME_BOUND { return value[i]; }
 
     const T& first() const LIFETIME_BOUND { return value.first(); }
     const T& last() const LIFETIME_BOUND { return value.last(); }
@@ -709,14 +709,14 @@ template<typename T> struct CommaSeparatedFixedVector {
         return Container::createWithSizeFromGenerator(size, std::forward<Generator>(generator));
     }
 
-    const_iterator begin() const { return value.begin(); }
-    const_iterator end() const { return value.end(); }
-    const_reverse_iterator rbegin() const { return value.rbegin(); }
-    const_reverse_iterator rend() const { return value.rend(); }
+    const_iterator begin() const LIFETIME_BOUND { return value.begin(); }
+    const_iterator end() const LIFETIME_BOUND { return value.end(); }
+    const_reverse_iterator rbegin() const LIFETIME_BOUND { return value.rbegin(); }
+    const_reverse_iterator rend() const LIFETIME_BOUND { return value.rend(); }
 
     bool isEmpty() const { return value.isEmpty(); }
     size_t size() const { return value.size(); }
-    const T& operator[](size_t i) const { return value[i]; }
+    const T& operator[](size_t i) const LIFETIME_BOUND { return value[i]; }
 
     const T& first() const LIFETIME_BOUND { return value.first(); }
     const T& last() const LIFETIME_BOUND { return value.last(); }
@@ -769,14 +769,14 @@ template<typename T> struct SpaceSeparatedRefCountedFixedVector {
         return Container::createWithSizeFromGenerator(size, std::forward<Generator>(generator));
     }
 
-    const_iterator begin() const { return value->begin(); }
-    const_iterator end() const { return value->end(); }
-    const_reverse_iterator rbegin() const { return value->rbegin(); }
-    const_reverse_iterator rend() const { return value->rend(); }
+    const_iterator begin() const LIFETIME_BOUND { return value->begin(); }
+    const_iterator end() const LIFETIME_BOUND { return value->end(); }
+    const_reverse_iterator rbegin() const LIFETIME_BOUND { return value->rbegin(); }
+    const_reverse_iterator rend() const LIFETIME_BOUND { return value->rend(); }
 
     bool isEmpty() const { return value->isEmpty(); }
     size_t size() const { return value->size(); }
-    const T& operator[](size_t i) const { return value.get()[i]; }
+    const T& operator[](size_t i) const LIFETIME_BOUND { return value.get()[i]; }
 
     const T& first() const LIFETIME_BOUND { return value->first(); }
     const T& last() const LIFETIME_BOUND { return value->last(); }
@@ -827,14 +827,14 @@ template<typename T> struct CommaSeparatedRefCountedFixedVector {
         return Container::createWithSizeFromGenerator(size, std::forward<Generator>(generator));
     }
 
-    const_iterator begin() const { return value->begin(); }
-    const_iterator end() const { return value->end(); }
-    const_reverse_iterator rbegin() const { return value->rbegin(); }
-    const_reverse_iterator rend() const { return value->rend(); }
+    const_iterator begin() const LIFETIME_BOUND { return value->begin(); }
+    const_iterator end() const LIFETIME_BOUND { return value->end(); }
+    const_reverse_iterator rbegin() const LIFETIME_BOUND { return value->rbegin(); }
+    const_reverse_iterator rend() const LIFETIME_BOUND { return value->rend(); }
 
     bool isEmpty() const { return value->isEmpty(); }
     size_t size() const { return value->size(); }
-    const T& operator[](size_t i) const { return value.get()[i]; }
+    const T& operator[](size_t i) const LIFETIME_BOUND { return value.get()[i]; }
 
     const T& first() const LIFETIME_BOUND { return value->first(); }
     const T& last() const LIFETIME_BOUND { return value->last(); }
@@ -1020,11 +1020,11 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
     {
     }
 
-    const_iterator begin() const { return { .it = value.begin(), .atEndForDefault = !isDefault(), .owner = this }; }
-    const_iterator end() const { return { .it = value.end(), .atEndForDefault = true, .owner = this }; }
+    const_iterator begin() const LIFETIME_BOUND { return { .it = value.begin(), .atEndForDefault = !isDefault(), .owner = this }; }
+    const_iterator end() const LIFETIME_BOUND { return { .it = value.end(), .atEndForDefault = true, .owner = this }; }
 
     size_t size() const { return isDefault() ? 1 : value.size(); }
-    const value_type& operator[](size_t i) const { return isDefault() ? defaulter() : value[i]; }
+    const value_type& operator[](size_t i) const LIFETIME_BOUND { return isDefault() ? defaulter() : value[i]; }
 
     bool contains(const auto& x) const { return isDefault() ? (x == defaulter()) : value.contains(x); }
     bool containsIf(NOESCAPE const Invocable<bool(const value_type&)> auto& f) const { return isDefault() ? f(defaulter()) : value.containsIf(f); }

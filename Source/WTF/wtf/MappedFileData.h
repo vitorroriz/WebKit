@@ -69,8 +69,8 @@ public:
     const Win32Handle& fileMapping() const { return m_fileMapping; }
     explicit operator bool() const { return !!m_fileData.data(); }
     size_t size() const { return m_fileData.size(); }
-    std::span<const uint8_t> span() const { return m_fileData; }
-    std::span<uint8_t> mutableSpan() { return m_fileData; }
+    std::span<const uint8_t> span() const LIFETIME_BOUND { return m_fileData; }
+    std::span<uint8_t> mutableSpan() LIFETIME_BOUND { return m_fileData; }
 #endif
 
 private:

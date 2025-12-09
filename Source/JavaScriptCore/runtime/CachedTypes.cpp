@@ -783,8 +783,8 @@ public:
         return m_is8Bit ? create(span8()) : create(span16());
     }
 
-    std::span<const Latin1Character> span8() const { return { this->template buffer<Latin1Character>(), m_length }; }
-    std::span<const char16_t> span16() const { return { this->template buffer<char16_t>(), m_length }; }
+    std::span<const Latin1Character> span8() const LIFETIME_BOUND { return { this->template buffer<Latin1Character>(), m_length }; }
+    std::span<const char16_t> span16() const LIFETIME_BOUND { return { this->template buffer<char16_t>(), m_length }; }
 
 private:
     bool m_is8Bit : 1;

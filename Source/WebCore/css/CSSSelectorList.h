@@ -52,8 +52,8 @@ public:
     static CSSSelectorList makeJoining(const Vector<const CSSSelectorList*>&);
 
     bool isEmpty() const { return !m_selectorArray; }
-    const CSSSelector* first() const { return m_selectorArray.get(); }
-    const CSSSelector* selectorAt(size_t index) const
+    const CSSSelector* first() const LIFETIME_BOUND { return m_selectorArray.get(); }
+    const CSSSelector* selectorAt(size_t index) const LIFETIME_BOUND
     {
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
         return &m_selectorArray[index];

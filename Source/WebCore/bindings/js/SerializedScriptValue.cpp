@@ -1991,7 +1991,7 @@ private:
                     return true;
                 }
                 write(dataLength);
-                write(data->data().span());
+                write(data->data().protectedArrayBufferView()->span());
                 write(data->colorSpace());
                 return true;
             }
