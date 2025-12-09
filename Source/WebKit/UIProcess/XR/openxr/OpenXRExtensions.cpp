@@ -94,12 +94,16 @@ bool OpenXRExtensions::loadMethods(XrInstance instance)
         RELEASE_ASSERT(m_methods->xrLocateHandJointsEXT);
     }
 #endif
+#if defined(XR_ANDROID_trackables)
+    if (isExtensionSupported(XR_ANDROID_TRACKABLES_EXTENSION_NAME ""_span)) {
+        xrGetInstanceProcAddr(instance, "xrCreateTrackableTrackerANDROID", reinterpret_cast<PFN_xrVoidFunction*>(&m_methods->xrCreateTrackableTrackerANDROID));
+        RELEASE_ASSERT(m_methods->xrCreateTrackableTrackerANDROID);
+    }
+#endif
 #if defined(XR_ANDROID_raycast)
     if (isExtensionSupported(XR_ANDROID_RAYCAST_EXTENSION_NAME ""_span)) {
         xrGetInstanceProcAddr(instance, "xrRaycastANDROID", reinterpret_cast<PFN_xrVoidFunction*>(&m_methods->xrRaycastANDROID));
-        xrGetInstanceProcAddr(instance, "xrCreateTrackableTrackerANDROID", reinterpret_cast<PFN_xrVoidFunction*>(&m_methods->xrCreateTrackableTrackerANDROID));
         RELEASE_ASSERT(m_methods->xrRaycastANDROID);
-        RELEASE_ASSERT(m_methods->xrCreateTrackableTrackerANDROID);
     }
 #endif
     return true;

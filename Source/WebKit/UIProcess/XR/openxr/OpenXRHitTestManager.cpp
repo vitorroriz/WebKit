@@ -30,7 +30,7 @@ namespace WebKit {
 OpenXRHitTestManager::OpenXRHitTestManager(XrSession session)
     : m_session(session)
 {
-#if defined(XR_ANDROID_raycast)
+#if defined(XR_ANDROID_trackables)
     auto createInfo = createOpenXRStruct<XrTrackableTrackerCreateInfoANDROID, XR_TYPE_TRACKABLE_TRACKER_CREATE_INFO_ANDROID>();
     createInfo.trackableType = XR_TRACKABLE_TYPE_PLANE_ANDROID;
     CHECK_XRCMD(OpenXRExtensions::singleton().methods().xrCreateTrackableTrackerANDROID(session, &createInfo, &m_trackableTracker));
