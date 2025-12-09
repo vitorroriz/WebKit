@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,11 +25,13 @@
 
 #pragma once
 
-#include <CoreAudio/CoreAudioTypes.h>
-#include <span>
+#include <pal/spi/cf/CoreAudioSPI.h>
+#include <wtf/CheckedArithmetic.h>
 #include <wtf/StdLibExtras.h>
+#include <wtf/SystemFree.h>
+#include <wtf/SystemMalloc.h>
 
-namespace WebCore {
+namespace PAL {
 
 template<typename T>
 inline std::span<const T> span(const AudioBuffer& buffer)
@@ -53,4 +55,27 @@ inline std::span<const AudioBuffer> span(const AudioBufferList& list)
     return unsafeMakeSpan(list.mBuffers, list.mNumberBuffers);
 }
 
-} // namespace WebCore
+inline size_t allocationSize(const AudioBufferList& list)
+{
+    return offsetof(AudioBufferList, mBuffers) + sizeof(AudioBuffer) * std::max<uint32_t>(1U, list.mNumberBuffers);
+}
+
+// AudioBufferList is a variable-length struct, so create on the heap with a generic new() operator
+// with a custom size, and initialize the struct manually.
+enum class ShouldZeroMemory : bool { No, Yes };
+inline std::unique_ptr<AudioBufferList, WTF::SystemFree<AudioBufferList>> createAudioBufferList(uint32_t bufferCount, ShouldZeroMemory shouldZeroMemory)
+{
+    CheckedSize bufferListSize = offsetof(AudioBufferList, mBuffers);
+    bufferListSize += CheckedSize { sizeof(AudioBuffer) } * std::max<uint32_t>(1, bufferCount);
+    auto bufferList = adoptSystemMalloc(shouldZeroMemory == ShouldZeroMemory::Yes
+        ? SystemMallocBase<AudioBufferList>::zeroedMalloc(bufferListSize.value())
+        : SystemMallocBase<AudioBufferList>::malloc(bufferListSize.value()));
+    bufferList->mNumberBuffers = bufferCount;
+    ASSERT(allocationSize(*bufferList) == bufferListSize.value());
+    return bufferList;
+}
+
+} // namespace PAL
+
+using PAL::mutableSpan;
+using PAL::span;

@@ -33,12 +33,12 @@
 #include "CoreAudioCaptureInternalUnit.h"
 #include "CoreAudioCaptureSource.h"
 #include "Logging.h"
-#include "SpanCoreAudio.h"
 #include <AudioToolbox/AudioConverter.h>
 #include <AudioUnit/AudioUnit.h>
 #include <CoreMedia/CMSync.h>
 #include <mach/mach_time.h>
 #include <pal/avfoundation/MediaTimeAVFoundation.h>
+#include <pal/cf/CoreAudioExtras.h>
 #include <pal/spi/cf/CoreAudioSPI.h>
 #include <sys/time.h>
 #include <wtf/Lock.h>

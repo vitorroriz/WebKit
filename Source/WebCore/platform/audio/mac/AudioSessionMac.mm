@@ -31,8 +31,8 @@
 #import "FloatConversion.h"
 #import "Logging.h"
 #import "NotImplemented.h"
-#import "SpanCoreAudio.h"
 #import <CoreAudio/AudioHardware.h>
+#import <pal/cf/CoreAudioExtras.h>
 #import <wtf/LoggerHelper.h>
 #import <wtf/MainThread.h>
 #import <wtf/TZoneMallocInlines.h>

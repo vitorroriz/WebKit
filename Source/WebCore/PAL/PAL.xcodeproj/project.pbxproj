@@ -66,6 +66,7 @@
 		44B1A8682A7C5BAD00DC80A6 /* Device.h in Headers */ = {isa = PBXBuildFile; fileRef = 44B1A8622A7C334D00DC80A6 /* Device.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		44B1A8692A7C606000DC80A6 /* UserInterfaceIdiom.h in Headers */ = {isa = PBXBuildFile; fileRef = 44B1A8662A7C339300DC80A6 /* UserInterfaceIdiom.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		44E1A8B021FA54EB00C3048E /* LookupSoftLink.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44E1A8AE21FA54DA00C3048E /* LookupSoftLink.mm */; };
+		46EF05202EE6A96E00238BB9 /* CoreAudioExtras.h in Headers */ = {isa = PBXBuildFile; fileRef = 46EF051F2EE6A96E00238BB9 /* CoreAudioExtras.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		46FF911929196C73006005B5 /* SleepDisablerIOS.mm in Sources */ = {isa = PBXBuildFile; fileRef = 46FF911829196C73006005B5 /* SleepDisablerIOS.mm */; };
 		5157ADFD2B23B9F300C0E095 /* ContactsSoftLink.h in Headers */ = {isa = PBXBuildFile; fileRef = 5157ADFB2B23B9F300C0E095 /* ContactsSoftLink.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		5157ADFE2B23B9F300C0E095 /* ContactsSoftLink.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5157ADFC2B23B9F300C0E095 /* ContactsSoftLink.mm */; };
@@ -634,6 +635,7 @@
 		44E1A8AD21FA54DA00C3048E /* LookupSoftLink.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LookupSoftLink.h; sourceTree = "<group>"; };
 		44E1A8AE21FA54DA00C3048E /* LookupSoftLink.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LookupSoftLink.mm; sourceTree = "<group>"; };
 		44EEA0FE2747438900594A83 /* NSServicesRolloverButtonCellSPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSServicesRolloverButtonCellSPI.h; sourceTree = "<group>"; };
+		46EF051F2EE6A96E00238BB9 /* CoreAudioExtras.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoreAudioExtras.h; sourceTree = "<group>"; };
 		46FF911829196C73006005B5 /* SleepDisablerIOS.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SleepDisablerIOS.mm; sourceTree = "<group>"; };
 		4996C0F22717642B002C125D /* TCCSPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TCCSPI.h; sourceTree = "<group>"; };
 		5157ADFB2B23B9F300C0E095 /* ContactsSoftLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactsSoftLink.h; sourceTree = "<group>"; };
@@ -1015,6 +1017,7 @@
 			children = (
 				416E995123DAE6BD00E871CB /* AudioToolboxSoftLink.cpp */,
 				416E995223DAE6BE00E871CB /* AudioToolboxSoftLink.h */,
+				46EF051F2EE6A96E00238BB9 /* CoreAudioExtras.h */,
 				0CF99CA61F738436007EE793 /* CoreMediaSoftLink.cpp */,
 				0CF99CA71F738437007EE793 /* CoreMediaSoftLink.h */,
 				1C77C8C725D7972000635E0C /* CoreTextSoftLink.cpp */,
@@ -1434,6 +1437,7 @@
 				DD20DE6527BC90F90093D175 /* config.h in Headers */,
 				5157ADFD2B23B9F300C0E095 /* ContactsSoftLink.h in Headers */,
 				5157AE072B23CD8100C0E095 /* ContactsSPI.h in Headers */,
+				46EF05202EE6A96E00238BB9 /* CoreAudioExtras.h in Headers */,
 				DD20DDCE27BC90D70093D175 /* CoreAudioSPI.h in Headers */,
 				4177B3DA296CB8C3009711F0 /* CoreCryptoSPI.h in Headers */,
 				7B47F2A328587B9700E793C8 /* CoreGraphicsSoftLink.h in Headers */,
