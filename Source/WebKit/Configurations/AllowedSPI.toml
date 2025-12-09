@@ -263,3 +263,11 @@ cleanup = "rdar://165842824"
 selectors = [
     { name = "requestProofreadingReviewOfString:range:language:options:completionHandler:", class = "UITextChecker" },
 ]
+
+[[staging]]
+request = "rdar://163791929"
+cleanup = "rdar://165836164"
+selectors = [
+ { name = "setIsDelegatedRequest:", class = "PKPaymentRequest" },
+]
+requires = ["HAVE_PASSKIT_DELEGATED_REQUEST"]
