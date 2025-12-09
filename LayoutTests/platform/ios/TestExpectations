@@ -6902,6 +6902,7 @@ webkit.org/b/214463 imported/w3c/web-platform-tests/css/css-sizing/contain-intri
 imported/w3c/web-platform-tests/html/canvas/element/manual/imagebitmap/createImageBitmap-drawImage.html [ Failure ]
 imported/w3c/web-platform-tests/html/canvas/element/manual/imagebitmap/createImageBitmap-flipY.html [ Failure ]
 
+
 webkit.org/b/245588 mathml/presentation/mathvariant-inheritance.html [ ImageOnlyFailure ]
 webkit.org/b/245588 mathml/non-core/fenced-mi.html [ ImageOnlyFailure ]
 
