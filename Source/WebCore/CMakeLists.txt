@@ -1428,6 +1428,7 @@ set(WebCore_NON_SVG_IDL_FILES
     html/MediaEncryptedEvent.idl
     html/MediaError.idl
     html/OffscreenCanvas.idl
+    html/Origin.idl
     html/PopoverInvokerElement.idl
     html/RadioNodeList.idl
     html/ResolvedCaptionDisplaySettingsOptions.idl

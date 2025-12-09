@@ -5924,6 +5924,20 @@ OptInPartitionedCookiesEnabled:
     WebCore:
       default: true
 
+OriginAPIEnabled:
+  type: bool
+  status: testable
+  category: dom
+  humanReadableName: "Origin API"
+  humanReadableDescription: "Enable the Origin API"
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+
 OverlappingBackingStoreProvidersEnabled:
   type: bool
   status: stable

@@ -1736,6 +1736,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     html/MediaEncryptedEventInit.h
     html/MediaError.h
     html/OffscreenCanvas.h
+    html/Origin.h
     html/OwnerPermissionsPolicyData.h
     html/PDFDocument.h
     html/PermissionsPolicy.h
