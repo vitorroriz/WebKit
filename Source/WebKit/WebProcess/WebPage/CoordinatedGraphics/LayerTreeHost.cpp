@@ -494,10 +494,8 @@ void LayerTreeHost::requestCompositionForRenderingUpdate()
                 updateRenderingWithForcedRepaint();
             else if (m_forceRepaintAsync.callback)
                 m_forceRepaintAsync.callback();
-        } else if (!m_isSuspended && !m_layerTreeStateIsFrozen && (scheduledWhileWaitingForRenderer || m_renderingUpdateRunLoopObserver->isScheduled())) {
-            invalidateRenderingUpdateRunLoopObserver();
-            updateRendering();
-        }
+        } else if (!m_isSuspended && !m_layerTreeStateIsFrozen && scheduledWhileWaitingForRenderer)
+            scheduleRenderingUpdateRunLoopObserver();
 
         WTFEndSignpost(this, DidComposite);
     });
