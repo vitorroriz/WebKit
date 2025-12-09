@@ -39,20 +39,12 @@
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
 #include <wtf/Lock.h>
+#include <wtf/TZoneMalloc.h>
 #include <wtf/WeakPtr.h>
 
 #if ENABLE(THUNDER)
 #include "CDMOpenCDMTypes.h"
 #endif
-
-namespace WebCore {
-class CDMProxyDecryptionClient;
-}
-
-namespace WTF {
-template<typename T> struct IsDeprecatedWeakRefSmartPointerException;
-template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::CDMProxyDecryptionClient> : std::true_type { };
-}
 
 namespace WebCore {
 
@@ -353,7 +345,9 @@ private:
     std::atomic<int> m_numDecryptorsWaitingForKey { 0 };
 };
 
-class CDMProxyDecryptionClient : public CanMakeWeakPtr<CDMProxyDecryptionClient, WeakPtrFactoryInitialization::Eager> {
+class CDMProxyDecryptionClient : public CanMakeWeakPtr<CDMProxyDecryptionClient, WeakPtrFactoryInitialization::Eager>, public CanMakeCheckedPtr<CDMProxyDecryptionClient> {
+    WTF_MAKE_TZONE_ALLOCATED(CDMProxyDecryptionClient);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(CDMProxyDecryptionClient);
 public:
     virtual bool isAborting() = 0;
     virtual ~CDMProxyDecryptionClient() = default;

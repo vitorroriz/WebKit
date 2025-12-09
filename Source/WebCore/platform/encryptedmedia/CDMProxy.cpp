@@ -38,12 +38,14 @@
 #include <wtf/NeverDestroyed.h>
 #include <wtf/Scope.h>
 #include <wtf/StringPrintStream.h>
+#include <wtf/TZoneMallocInlines.h>
 #include <wtf/text/MakeString.h>
 #include <wtf/text/StringBuilder.h>
 
 namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(CDMInstanceProxy);
+WTF_MAKE_TZONE_ALLOCATED_IMPL(CDMProxyDecryptionClient);
 
 Vector<CDMProxyFactory*>& CDMProxyFactory::registeredFactories()
 {
@@ -217,8 +219,9 @@ std::optional<Ref<KeyHandle>> CDMProxy::tryWaitForKeyHandle(const KeyIDType& key
     {
         Locker locker { m_keysLock };
 
-        m_keysCondition.waitFor(m_keysLock, CDMProxy::MaxKeyWaitTimeSeconds, [this, protectedThis = Ref { *this }, keyID, client = WTFMove(client), &wasKeyAvailable]() {
+        m_keysCondition.waitFor(m_keysLock, CDMProxy::MaxKeyWaitTimeSeconds, [this, protectedThis = Ref { *this }, keyID, weakClient = WTFMove(client), &wasKeyAvailable]() {
             assertIsHeld(m_keysLock);
+            CheckedPtr client = weakClient.get();
             if (!client || client->isAborting())
                 return true;
             wasKeyAvailable = isKeyAvailableUnlocked(keyID);

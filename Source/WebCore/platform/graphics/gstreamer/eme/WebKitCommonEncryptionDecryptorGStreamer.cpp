@@ -39,8 +39,9 @@
 using WebCore::CDMProxy;
 
 // Instances of this class are tied to the decryptor lifecycle. They can't be alive after the decryptor has been destroyed.
-class CDMProxyDecryptionClientImplementation : public WebCore::CDMProxyDecryptionClient {
+class CDMProxyDecryptionClientImplementation final : public WebCore::CDMProxyDecryptionClient {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(CDMProxyDecryptionClientImplementation);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(CDMProxyDecryptionClientImplementation);
 public:
     CDMProxyDecryptionClientImplementation(WebKitMediaCommonEncryptionDecrypt* decryptor)
         : m_decryptor(decryptor) { }
