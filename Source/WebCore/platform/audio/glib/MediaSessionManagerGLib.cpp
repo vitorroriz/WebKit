@@ -189,6 +189,7 @@ void MediaSessionManagerGLib::addSession(PlatformMediaSessionInterface& platform
     if (!session)
         return;
 
+    session->setMprisRegistrationEligibility(MediaSessionGLib::MprisRegistrationEligiblilty::Eligible);
     m_sessions.add(identifier, WTFMove(session));
     m_nowPlayingManager->addClient(*this);
 
@@ -281,12 +282,8 @@ void MediaSessionManagerGLib::setPrimarySessionIfNeeded(PlatformMediaSessionInte
     if (PlatformMediaSessionManager::currentSession().get() != &platformSession)
         return;
 
-    auto session = m_sessions.get(platformSession.mediaSessionIdentifier());
-    ASSERT(session);
-    if (!session)
-        return;
-
-    session->setMprisRegistrationEligibility(MediaSessionGLib::MprisRegistrationEligiblilty::Eligible);
+    if (auto session = m_sessions.get(platformSession.mediaSessionIdentifier()))
+        session->setMprisRegistrationEligibility(MediaSessionGLib::MprisRegistrationEligiblilty::Eligible);
     unregisterAllOtherSessions(platformSession);
 }
 
