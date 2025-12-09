@@ -336,10 +336,12 @@ WI.SpreadsheetStyleProperty = class SpreadsheetStyleProperty extends WI.Object
 
     applyFilter(filterText)
     {
-        let matchesName = this._nameElement.textContent.includes(filterText);
+        let lowerCaseFilterText = filterText.toLowerCase();
+
+        let matchesName = this._nameElement.textContent.toLowerCase().includes(lowerCaseFilterText);
         this._nameElement.classList.toggle(WI.GeneralStyleDetailsSidebarPanel.FilterMatchSectionClassName, !!matchesName);
 
-        let matchesValue = this._valueElement.textContent.includes(filterText);
+        let matchesValue = this._valueElement.textContent.toLowerCase().includes(lowerCaseFilterText);
         this._valueElement.classList.toggle(WI.GeneralStyleDetailsSidebarPanel.FilterMatchSectionClassName, !!matchesValue);
 
         let matches = matchesName || matchesValue;
