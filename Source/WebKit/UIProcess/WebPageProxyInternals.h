@@ -222,7 +222,6 @@ struct WebPageProxy::Internals final : WebPopupMenuProxy::Client
     , EndowmentStateTrackerClient
 #endif
 #if ENABLE(SPEECH_SYNTHESIS)
-    , WebCore::PlatformSpeechSynthesisUtteranceClient
     , WebCore::PlatformSpeechSynthesizerClient
 #endif
 #if ENABLE(WIRELESS_PLAYBACK_TARGET) && !PLATFORM(IOS_FAMILY)

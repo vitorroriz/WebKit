@@ -15758,7 +15758,7 @@ void WebPageProxy::speechSynthesisSetFinishedCallback(CompletionHandler<void()>&
 void WebPageProxy::speechSynthesisSpeak(const String& text, const String& lang, float volume, float rate, float pitch, MonotonicTime, const String& voiceURI, const String& voiceName, const String& voiceLang, bool localService, bool defaultVoice, CompletionHandler<void()>&& completionHandler)
 {
     auto voice = WebCore::PlatformSpeechSynthesisVoice::create(voiceURI, voiceName, voiceLang, localService, defaultVoice);
-    auto utterance = WebCore::PlatformSpeechSynthesisUtterance::create(internals());
+    auto utterance = WebCore::PlatformSpeechSynthesisUtterance::create(nullptr);
     utterance->setText(text);
     utterance->setLang(lang);
     utterance->setVolume(volume);
