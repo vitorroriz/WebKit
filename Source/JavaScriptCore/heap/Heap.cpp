@@ -1220,8 +1220,6 @@ void Heap::addToRememberedSet(const JSCell* constCell)
 
 void Heap::sweepSynchronously()
 {
-    RELEASE_ASSERT(vm().currentThreadIsHoldingAPILock());
-
     if (!Options::useGC()) [[unlikely]]
         return;
 
