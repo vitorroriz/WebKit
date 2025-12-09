@@ -3357,6 +3357,7 @@ JSBigInt* JSBigInt::createFrom(JSGlobalObject* globalObject, bool sign, std::spa
         RELEASE_AND_RETURN(scope, createZero(globalObject, vm));
 
     JSBigInt* result = createWithLength(globalObject, vm, digits.size());
+    RETURN_IF_EXCEPTION(scope, nullptr);
     if (!result) [[unlikely]]
         return nullptr;
     memcpySpan(result->digits(), digits);
