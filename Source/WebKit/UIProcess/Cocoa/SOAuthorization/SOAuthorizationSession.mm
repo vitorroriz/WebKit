@@ -236,13 +236,18 @@ void SOAuthorizationSession::continueStartAfterDecidePolicy(const SOAuthorizatio
     auto initiatorOrigin = emptyString();
     if (RefPtr sourceOrigin = m_navigationAction->sourceFrame() ? m_navigationAction->sourceFrame()->securityOrigin().securityOrigin().ptr() : nullptr; sourceOrigin && !sourceOrigin->isOpaque())
         initiatorOrigin = sourceOrigin->toString();
-    if (m_action == InitiatingAction::SubFrame && m_page->mainFrame())
-        initiatorOrigin = WebCore::SecurityOrigin::create(m_page->mainFrame()->url())->toString();
+    String initiatingPath = emptyString();
+    if (m_page->mainFrame()) {
+        if (m_action == InitiatingAction::SubFrame)
+            initiatorOrigin = WebCore::SecurityOrigin::create(m_page->mainFrame()->url())->toString();
+        initiatingPath = m_page->mainFrame()->url().path().toString();
+    }
+
     RetainPtr<NSDictionary> authorizationOptions = @{
         SOAuthorizationOptionUserActionInitiated: @(m_navigationAction->isProcessingUserGesture()),
         SOAuthorizationOptionInitiatorOrigin: initiatorOrigin.createNSString().get(),
         SOAuthorizationOptionInitiatingAction: @(static_cast<NSInteger>(m_action)),
-        kSOAuthorizationOptionInitiatingPath: m_page->mainFrame()->url().path().createNSString().get()
+        kSOAuthorizationOptionInitiatingPath: initiatingPath.createNSString().get()
     };
 #if PLATFORM(IOS_FAMILY)
     RetainPtr<WKWebView> webView = m_page->cocoaView();
