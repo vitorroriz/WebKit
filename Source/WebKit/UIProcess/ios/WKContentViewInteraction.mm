@@ -9579,6 +9579,11 @@ static bool canUseQuickboardControllerFor(UITextContentType type)
         [_textInteractionWrapper activateSelection];
 }
 
+- (BOOL)_isSuppressingSelectionAssistant
+{
+    return !!_suppressSelectionAssistantReasons;
+}
+
 - (UIView <WKFormControl> *)dataListTextSuggestionsInputView
 {
     return _dataListTextSuggestionsInputView.get();
