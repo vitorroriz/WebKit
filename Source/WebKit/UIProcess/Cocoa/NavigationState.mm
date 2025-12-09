@@ -1747,7 +1747,7 @@ void NavigationState::didSwapWebProcesses()
 #if USE(RUNNINGBOARD)
     // Transfer our background assertion from the old process to the new one.
     auto webView = this->webView();
-    if (webView && webView->_page->hasValidNetworkActivity())
+    if (webView && webView->_page->pageLoadState().isLoading())
         webView->_page->takeNetworkActivity();
 #endif
 }
