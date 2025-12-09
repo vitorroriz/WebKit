@@ -160,7 +160,7 @@ def generate_process_sync_client_header(prefix, synched_datas):
     for data in synched_datas:
         if data.conditional is not None:
             result.append('#if %s' % data.conditional)
-        result.append('    void broadcast%sToOtherProcesses(const %s&);' % (data.name, data.fully_qualified_type))
+        result.append('    WEBCORE_EXPORT void broadcast%sToOtherProcesses(const %s&);' % (data.name, data.fully_qualified_type))
         if data.conditional is not None:
             result.append('#endif')
 
