@@ -73,3 +73,10 @@ cleanup = "rdar://161241477"
 symbols = [
     "CTFontGetUIFontType",
 ]
+
+[[temporary-usage]]
+request = "rdar://161402565"
+cleanup = "rdar://161402756"
+symbols = [
+    "FPFontCreateMemorySafeFontsFromData",
+]
