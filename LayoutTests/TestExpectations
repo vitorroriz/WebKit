@@ -5831,9 +5831,6 @@ http/tests/webshare/navigator-share-files-fail-access-control-checks-crash.html 
 # "Opacity on an inline element should apply on float child".
 webkit.org/b/234690 imported/w3c/web-platform-tests/css/css-color/inline-opacity-float-child.html [ ImageOnlyFailure ]
 
-# 1 difference in color (rounding error)
-webkit.org/b/256888 imported/w3c/web-platform-tests/css/css-color/color-mix-basic-001.html [ ImageOnlyFailure ]
-
 # display-p3 canvas and ImageData are Cocoa only for now.
 fast/canvas/canvas-color-space-display-p3-ImageData.html [ Failure ]
 fast/canvas/gradient-into-p3-canvas.html [ Failure ]
