@@ -1712,6 +1712,7 @@
 		DD4901ED27B474D900D7E50D /* NullTextBreakIterator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NullTextBreakIterator.h; sourceTree = "<group>"; };
 		DD725EC92D8A442900E72544 /* audit-spi-if-needed.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "audit-spi-if-needed.sh"; sourceTree = "<group>"; };
 		DD9C67FB2D70243000D4BEC7 /* generate-platform-args */ = {isa = PBXFileReference; explicitFileType = text.script.python; path = "generate-platform-args"; sourceTree = "<group>"; };
+		DDBF3D852EE23C2400F32872 /* check-ccache-compilation-caching.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "check-ccache-compilation-caching.sh"; sourceTree = "<group>"; };
 		DDD8BAC227B347C400C109E0 /* translit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = translit.h; sourceTree = "<group>"; };
 		DDD8BAC327B347C400C109E0 /* ustdio.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ustdio.h; sourceTree = "<group>"; };
 		DDD8BAC427B347C400C109E0 /* utf_old.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utf_old.h; sourceTree = "<group>"; };
@@ -2972,6 +2973,7 @@
 				DD9C67FB2D70243000D4BEC7 /* generate-platform-args */,
 				DD3DCA0027A4E176007E5B61 /* Preferences */,
 				DD725EC92D8A442900E72544 /* audit-spi-if-needed.sh */,
+				DDBF3D852EE23C2400F32872 /* check-ccache-compilation-caching.sh */,
 				DD28DF2329D368BD00BBB459 /* generate-tapi-filelist.py */,
 				DD3DCA0527A4E176007E5B61 /* generate-unified-source-bundles.rb */,
 				DD3DCA0627A4E176007E5B61 /* GeneratePreferences.rb */,
@@ -4192,6 +4194,7 @@
 			buildPhases = (
 				520CF9492BDA9B4800C27FD2 /* Generate clangd configuration file */,
 				DDE99316278D08B900F60D26 /* Product Dependencies */,
+				DDBF3D842EE23BEE00F32872 /* Diagnose ccache used with compilation caching */,
 				DD07DF4C2A7DB6640091EACE /* Symlink public SDK headers */,
 				DD3DC85D27A4BF87007E5B61 /* Headers */,
 				DDA35E4929CA74D4006C1018 /* Generate TAPI filelist */,
@@ -4329,6 +4332,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ ${DEPLOYMENT_LOCATION} != YES ]; then\n    \"${SCRIPT_INPUT_FILE_0}\" --from=\"${WK_HEADERS_VFS_FILE}\" --install-dir=\"${BUILT_PRODUCTS_DIR}${PRIVATE_HEADERS_FOLDER_PATH}\" --relative-to=\"${SRCROOT}/wtf\" > \"${SCRIPT_OUTPUT_FILE_0}\"\nelse\n    \"${SRCROOT}/Scripts/generate-tapi-filelist.py\" --from=\"${DSTROOT}${PRIVATE_HEADERS_FOLDER_PATH}\" --install-dir=\"<SDKROOT>${PRIVATE_HEADERS_FOLDER_PATH}\" --relative-to=\"${DSTROOT}${PRIVATE_HEADERS_FOLDER_PATH}\" > \"${SCRIPT_OUTPUT_FILE_1}\"\nfi\n";
+		};
+		DDBF3D842EE23BEE00F32872 /* Diagnose ccache used with compilation caching */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Scripts/check-ccache-compilation-caching.sh",
+			);
+			name = "Diagnose ccache used with compilation caching";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/check-ccache-compilation-caching.timestamp",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SCRIPT_INPUT_FILE_0}\"\n";
 		};
 		DDC9D68C2DEBE87000E175C0 /* Generate modulemap */ = {
 			isa = PBXShellScriptBuildPhase;
