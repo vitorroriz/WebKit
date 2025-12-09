@@ -188,6 +188,7 @@ bool Quirks::isEmbedDomain(const String& domainString) const
 
 // ceac.state.gov https://bugs.webkit.org/show_bug.cgi?id=193478
 // weather.com rdar://139689157
+// madisoncity.k12.al.us https://bugs.webkit.org/show_bug.cgi?id=296989
 bool Quirks::needsFormControlToBeMouseFocusable() const
 {
 #if PLATFORM(MAC)
@@ -2616,6 +2617,15 @@ static void handleCEACStateGovQuirks(QuirksData& quirksData, const URL& quirksUR
     }
 }
 
+static void handleMadisonCityK12Quirks(QuirksData& quirksData, const URL& /* quirksURL */, const String& quirksDomainString, const URL& /* documentURL */)
+{
+    if (quirksDomainString != "madisoncity.k12.al.us"_s)
+        return;
+
+    // madisoncity.k12.al.us https://bugs.webkit.org/show_bug.cgi?id=296989
+    quirksData.enableQuirk(QuirksData::SiteSpecificQuirk::NeedsFormControlToBeMouseFocusableQuirk);
+}
+
 static void handleTrixEditorQuirks(QuirksData& quirksData, const URL& /* quirksURL */, const String& quirksDomainString, const URL&  /* documentURL */)
 {
     if (quirksDomainString != "trix-editor.org"_s) [[unlikely]]
@@ -3503,6 +3513,9 @@ void Quirks::determineRelevantQuirks()
         { "instagram"_s, &handleInstagramQuirks },
 #endif
         { "live"_s, &handleLiveQuirks },
+#if PLATFORM(MAC)
+        { "madisoncityk12"_s, &handleMadisonCityK12Quirks },
+#endif
 #if PLATFORM(IOS_FAMILY)
         { "mailchimp"_s, &handleMailChimpQuirks },
 #endif
