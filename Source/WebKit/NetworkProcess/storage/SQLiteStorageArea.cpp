@@ -334,7 +334,7 @@ HashMap<String, String> SQLiteStorageArea::allItems()
             if (result.has_value())
                 items.add(key, result.value());
             else {
-                RELEASE_LOG_ERROR(Storage, "SQLiteStorageArea::allItems failed during read from cache (%hhu)" PUBLIC_LOG_STRING, result.error());
+                RELEASE_LOG_ERROR(Storage, "SQLiteStorageArea::allItems failed during read from cache (%hhu)" PUBLIC_LOG_STRING, static_cast<uint8_t>(result.error()));
                 return { };
             }
         }

@@ -115,6 +115,10 @@ LibWebRTCMediaEndpoint::LibWebRTCMediaEndpoint(RTCPeerConnection& peerConnection
     ASSERT(isMainThread());
     ASSERT(client.factory());
 
+#if RELEASE_LOG_DISABLED
+    UNUSED_PARAM(peerConnection);
+#endif
+
     client.setUseL4S(document.settings().webRTCL4SEnabled());
 }
 
