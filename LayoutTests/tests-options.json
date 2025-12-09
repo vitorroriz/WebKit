@@ -3704,6 +3704,9 @@
     "imported/w3c/web-platform-tests/html/select/options-length-too-large.html": [
         "slow"
     ],
+    "imported/w3c/web-platform-tests/html/semantics/disabled-elements/disabled-event-dispatch-additional.tentative.html": [
+        "slow"
+    ],
     "imported/w3c/web-platform-tests/html/semantics/disabled-elements/disabled-event-dispatch.tentative.html": [
         "slow"
     ],
