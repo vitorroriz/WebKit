@@ -1,4 +1,31 @@
 =================
+WPE WebKit 2.51.3
+=================
+
+What's new in WPE WebKit 2.51.3?
+
+  - Add API to take image snapshots of web views, using webkit_web_view_get_snapshot()
+    and webkit_web_view_get_snapshot_finish().
+  - Add WPEPlatform API to obtain the contents of the clipboard, using
+    wpe_clipboard_content_get_text() and wpe_clipboard_content_get_bytes().
+  - Improve composition scheduling to avoid blocking waiting for tile painting.
+  - Moved WebRTC network access to the NetworkProcess, when using GstWebRTC.
+    This requires librice, and building with the CMake USE_LIBRICE option. When
+    enabled, it is still possible to choose the older libnice-based implementation
+    at runtime by setting WEBKIT_GST_DISABLE_WEBRTC_NETWORK_SANDBOX=1 in the
+    environment.
+  - Add support the XR_ANDROID_raycast OpenXR extension for WebXR Hit Testing.
+  - Add support to use super-tiled graphics buffers when running on Vivante GPUs.
+    Currently setting WEBKIT_SKIA_USE_VIVANTE_SUPER_TILED_TILE_TEXTURES=1 in the
+    environment is needed to opt-in into using those.
+  - Ensure that GStreamer is properly initialized before applying any multimedia
+    handling quirks.
+  - Fix pointer event processing no longer working after a mouse right button press.
+  - Fix PointerEvent behaviour for mouse events synthesized from touch inputs.
+  - Fix seeking and looping of media elements that set the "loop" property.
+  - Fix several crashes and rendering issues.
+
+=================
 WPE WebKit 2.51.2
 =================
 
