@@ -44,7 +44,7 @@ RenderCombineText::RenderCombineText(Text& textNode, const String& string)
 
 RenderCombineText::~RenderCombineText() = default;
 
-void RenderCombineText::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderCombineText::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     // FIXME: This is pretty hackish.
     // Only cache a new font style if our old one actually changed. We do this to avoid

@@ -3246,6 +3246,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     style/ScopedName.h
     style/StyleChange.h
     style/StyleCustomProperty.h
+    style/StyleDifference.h
     style/StyleForVisitedLink.h
     style/StyleInterpolationClient.h
     style/StyleInterpolationContext.h

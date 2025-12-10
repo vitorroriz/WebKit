@@ -984,12 +984,12 @@ void RenderSVGText::updatePositionAndOverflow(const FloatRect& boundaries)
     ASSERT(m_objectBoundingBox == frameRect());
 }
 
-void RenderSVGText::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderSVGText::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     auto needsTransformUpdate = [&]() {
         if (document().settings().layerBasedSVGEngineEnabled())
             return false;
-        if (diff != StyleDifference::Layout)
+        if (diff != Style::DifferenceResult::Layout)
             return false;
 
         auto& newStyle = style();

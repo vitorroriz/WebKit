@@ -288,7 +288,7 @@ bool RenderMathMLOperator::useMathOperator() const
     return isStretchy() || (textContent() && isLargeOperatorInDisplayStyle()) || textContent() == minusSign;
 }
 
-void RenderMathMLOperator::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderMathMLOperator::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderMathMLBlock::styleDidChange(diff, oldStyle);
     m_mathOperator.reset(style());

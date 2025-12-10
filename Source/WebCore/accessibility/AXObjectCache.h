@@ -361,7 +361,7 @@ public:
     void onSelectedTextChanged(const VisiblePositionRange&, AccessibilityObject* = nullptr);
     void onSlottedContentChange(const HTMLSlotElement&);
     void onStyleChange(Element&, OptionSet<Style::Change>, const RenderStyle* oldStyle, const RenderStyle* newStyle);
-    void onStyleChange(RenderText&, StyleDifference, const RenderStyle* oldStyle, const RenderStyle& newStyle);
+    void onStyleChange(RenderText&, Style::Difference, const RenderStyle* oldStyle, const RenderStyle& newStyle);
 #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
     void onAccessibilityPaintStarted();
     void onAccessibilityPaintFinished();

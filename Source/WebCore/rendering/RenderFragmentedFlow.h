@@ -86,7 +86,7 @@ public:
     // Called when a descendant box's layout is finished and it has been positioned within its container.
     virtual void fragmentedFlowDescendantBoxLaidOut(RenderBox*) { }
 
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
 
     void repaintRectangleInFragments(const LayoutRect&) const;
 

@@ -84,9 +84,9 @@ bool InlineInvalidation::rootStyleWillChange(const ElementBox& formattingContext
     return true;
 }
 
-bool InlineInvalidation::styleWillChange(const Box& layoutBox, const RenderStyle& newStyle, StyleDifference diff)
+bool InlineInvalidation::styleWillChange(const Box& layoutBox, const RenderStyle& newStyle, Style::Difference diff)
 {
-    if (diff == StyleDifference::Layout) {
+    if (diff == Style::DifferenceResult::Layout) {
         m_inlineDamage.resetLayoutPosition();
         m_inlineDamage.setDamageReason(InlineDamage::Reason::StyleChange);
     }

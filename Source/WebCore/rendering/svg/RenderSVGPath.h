@@ -50,7 +50,7 @@ private:
     void strokeShape(GraphicsContext&) const override;
     bool shapeDependentStrokeContains(const FloatPoint&, PointCoordinateSpace = GlobalCoordinateSpace) override;
 
-    void styleDidChange(StyleDifference, const RenderStyle*) final;
+    void styleDidChange(Style::Difference, const RenderStyle*) final;
 
     bool shouldStrokeZeroLengthSubpath() const;
     Path* zeroLengthLinecapPath(const FloatPoint&) const;

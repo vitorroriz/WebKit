@@ -117,7 +117,7 @@ void RenderReplaced::willBeDestroyed()
     RenderBox::willBeDestroyed();
 }
 
-void RenderReplaced::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderReplaced::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBox::styleDidChange(diff, oldStyle);
     auto previousUsedZoom = oldStyle ? oldStyle->usedZoom() : Style::evaluate<float>(RenderStyle::initialZoom());

@@ -2399,7 +2399,7 @@ bool RenderBlockFlow::subtreeContainsFloats() const
     return false;
 }
 
-void RenderBlockFlow::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderBlockFlow::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBlock::styleDidChange(diff, oldStyle);
     
@@ -2408,7 +2408,7 @@ void RenderBlockFlow::styleDidChange(StyleDifference diff, const RenderStyle* ol
     // then mark its descendants with floats for layout and clear all floats from its next
     // sibling blocks that exist in our floating objects list. See bug 56299 and 62875.
     bool canPropagateFloatIntoSibling = !isFloatingOrOutOfFlowPositioned() && !avoidsFloats();
-    if (diff == StyleDifference::Layout && s_canPropagateFloatIntoSibling && !canPropagateFloatIntoSibling && hasOverhangingFloats()) {
+    if (diff == Style::DifferenceResult::Layout && s_canPropagateFloatIntoSibling && !canPropagateFloatIntoSibling && hasOverhangingFloats()) {
         RenderBlockFlow* parentBlock = this;
         for (auto& ancestor : ancestorsOfType<RenderBlockFlow>(*this)) {
             if (ancestor.isRenderView())
@@ -2429,7 +2429,7 @@ void RenderBlockFlow::styleDidChange(StyleDifference diff, const RenderStyle* ol
         parentBlock->markSiblingsWithFloatsForLayout();
     }
 
-    if (diff == StyleDifference::Layout && selfNeedsLayout() && childrenInline()) {
+    if (diff == Style::DifferenceResult::Layout && selfNeedsLayout() && childrenInline()) {
         for (auto walker = InlineWalker(*this); !walker.atEnd(); walker.advance())
             walker.current()->setNeedsPreferredWidthsUpdate();
     }
@@ -2448,7 +2448,7 @@ void RenderBlockFlow::updateStylesForColumnChildren(const RenderStyle* oldStyle)
     }
 }
 
-void RenderBlockFlow::styleWillChange(StyleDifference diff, const RenderStyle& newStyle)
+void RenderBlockFlow::styleWillChange(Style::Difference diff, const RenderStyle& newStyle)
 {
     const RenderStyle* oldStyle = hasInitializedStyle() ? &style() : nullptr;
     s_canPropagateFloatIntoSibling = oldStyle ? !isFloatingOrOutOfFlowPositioned() && !avoidsFloats() : false;
@@ -2457,7 +2457,7 @@ void RenderBlockFlow::styleWillChange(StyleDifference diff, const RenderStyle& n
         auto oldPosition = oldStyle->position();
         auto newPosition = newStyle.position();
 
-        if (parent() && diff == StyleDifference::Layout && oldPosition != newPosition) {
+        if (parent() && diff == Style::DifferenceResult::Layout && oldPosition != newPosition) {
             if (containsFloats() && !isFloating() && !isOutOfFlowPositioned() && newStyle.hasOutOfFlowPosition())
                 markAllDescendantsWithFloatsForLayout();
         }

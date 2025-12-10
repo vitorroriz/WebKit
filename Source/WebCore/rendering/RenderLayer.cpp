@@ -6189,7 +6189,7 @@ bool RenderLayer::isVisuallyNonEmpty(PaintedContentRequest* request) const
     return request->probablyHasPaintedContent();
 }
 
-void RenderLayer::styleChanged(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderLayer::styleChanged(Style::Difference diff, const RenderStyle* oldStyle)
 {
     setIsNormalFlowOnly(shouldBeNormalFlowOnly());
     setCanBeBackdropRoot(computeCanBeBackdropRoot());
@@ -6228,7 +6228,7 @@ void RenderLayer::styleChanged(StyleDifference diff, const RenderStyle* oldStyle
             if (oldStyle->writingMode() != renderer().style().writingMode())
                 m_scrollableArea->invalidateScrollCornerRect({ });
             if (visibilityChanged || oldStyle->isOverflowVisible() != renderer().style().isOverflowVisible())
-                m_scrollableArea->computeHasCompositedScrollableOverflow(diff <= StyleDifference::RepaintLayer ? LayoutUpToDate::Yes : LayoutUpToDate::No);
+                m_scrollableArea->computeHasCompositedScrollableOverflow(diff <= Style::DifferenceResult::RepaintLayer ? LayoutUpToDate::Yes : LayoutUpToDate::No);
         }
 
         if (oldStyle->isOverflowVisible() != renderer().style().isOverflowVisible())
@@ -6278,7 +6278,7 @@ void RenderLayer::styleChanged(StyleDifference diff, const RenderStyle* oldStyle
         dirtyAncestorChainHasViewportConstrainedDescendantStatus();
 
 #if PLATFORM(IOS_FAMILY) && ENABLE(TOUCH_EVENTS)
-    if (diff == StyleDifference::RecompositeLayer || diff >= StyleDifference::LayoutOutOfFlowMovementOnly)
+    if (diff == Style::DifferenceResult::RecompositeLayer || diff >= Style::DifferenceResult::LayoutOutOfFlowMovementOnly)
         renderer().document().invalidateRenderingDependentRegions();
 #else
     UNUSED_PARAM(diff);
@@ -6408,7 +6408,7 @@ void RenderLayer::clearLayerScrollableArea()
     }
 }
 
-void RenderLayer::updateFiltersAfterStyleChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderLayer::updateFiltersAfterStyleChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     if (renderer().style().filter().hasReferenceFilter())
         ensureLayerFilters().updateReferenceFilterClients(renderer().style().filter());
@@ -6420,7 +6420,7 @@ void RenderLayer::updateFiltersAfterStyleChange(StyleDifference diff, const Rend
     auto filterChanged = [&] {
         if (!m_filters)
             return false;
-        if (diff < StyleDifference::RepaintLayer)
+        if (diff < Style::DifferenceResult::RepaintLayer)
             return false;
         if (!oldStyle)
             return false;

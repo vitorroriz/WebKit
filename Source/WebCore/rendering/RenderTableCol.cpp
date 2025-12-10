@@ -66,7 +66,7 @@ RenderTableCol::RenderTableCol(Document& document, RenderStyle&& style)
 
 RenderTableCol::~RenderTableCol() = default;
 
-void RenderTableCol::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderTableCol::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBox::styleDidChange(diff, oldStyle);
     CheckedPtr table = this->table();

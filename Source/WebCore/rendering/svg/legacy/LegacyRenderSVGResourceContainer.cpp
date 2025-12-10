@@ -68,7 +68,7 @@ void LegacyRenderSVGResourceContainer::willBeDestroyed()
     LegacyRenderSVGHiddenContainer::willBeDestroyed();
 }
 
-void LegacyRenderSVGResourceContainer::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void LegacyRenderSVGResourceContainer::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     LegacyRenderSVGHiddenContainer::styleDidChange(diff, oldStyle);
 
@@ -226,7 +226,7 @@ void LegacyRenderSVGResourceContainer::registerResource()
         auto* renderer = client->renderer();
         if (!renderer)
             continue;
-        SVGResourcesCache::clientStyleChanged(*renderer, StyleDifference::Layout, nullptr, renderer->style());
+        SVGResourcesCache::clientStyleChanged(*renderer, Style::DifferenceResult::Layout, nullptr, renderer->style());
         renderer->setNeedsLayout();
     }
 }

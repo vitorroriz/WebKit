@@ -40,7 +40,7 @@ public:
     LegacyRenderSVGResourceFilterPrimitive(SVGFilterPrimitiveStandardAttributes&, RenderStyle&&);
     SVGFilterPrimitiveStandardAttributes& filterPrimitiveElement() const;
 
-    void styleDidChange(StyleDifference, const RenderStyle*) override;
+    void styleDidChange(Style::Difference, const RenderStyle*) override;
 
     ASCIILiteral renderName() const override { return "RenderSVGResourceFilterPrimitive"_s; }
 

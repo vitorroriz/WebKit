@@ -297,7 +297,7 @@ void RenderVideo::layout()
     updatePlayer();
 }
 
-void RenderVideo::styleDidChange(StyleDifference difference, const RenderStyle* oldStyle)
+void RenderVideo::styleDidChange(Style::Difference difference, const RenderStyle* oldStyle)
 {
     RenderMedia::styleDidChange(difference, oldStyle);
     if (!oldStyle || style().objectFit() != oldStyle->objectFit())

@@ -68,21 +68,21 @@ void RenderListMarker::willBeDestroyed()
     RenderBox::willBeDestroyed();
 }
 
-static StyleDifference adjustedStyleDifference(StyleDifference diff, const RenderStyle& oldStyle, const RenderStyle& newStyle)
+static Style::Difference adjustedStyleDifference(Style::Difference diff, const RenderStyle& oldStyle, const RenderStyle& newStyle)
 {
-    if (diff >= StyleDifference::Layout)
+    if (diff >= Style::DifferenceResult::Layout)
         return diff;
     // FIXME: Preferably we do this at RenderStyle::changeRequiresLayout but checking against pseudo(::marker) is not sufficient.
     auto needsLayout = oldStyle.listStylePosition() != newStyle.listStylePosition() || oldStyle.listStyleType() != newStyle.listStyleType() || oldStyle.isDisplayInlineType() != newStyle.isDisplayInlineType();
-    return needsLayout ? StyleDifference::Layout : diff;
+    return needsLayout ? Style::DifferenceResult::Layout : diff;
 }
 
-void RenderListMarker::styleWillChange(StyleDifference diff, const RenderStyle& newStyle)
+void RenderListMarker::styleWillChange(Style::Difference diff, const RenderStyle& newStyle)
 {
     RenderBox::styleWillChange(adjustedStyleDifference(diff, style(), newStyle), newStyle);
 }
 
-void RenderListMarker::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderListMarker::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     if (oldStyle)
         diff = adjustedStyleDifference(diff, *oldStyle, style());

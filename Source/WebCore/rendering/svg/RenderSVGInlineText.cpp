@@ -106,7 +106,7 @@ void RenderSVGInlineText::setTextInternal(const String& newText, bool force)
         textAncestor->subtreeTextDidChange(this);
 }
 
-void RenderSVGInlineText::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderSVGInlineText::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderText::styleDidChange(diff, oldStyle);
     updateScaledFont();
@@ -123,7 +123,7 @@ void RenderSVGInlineText::styleDidChange(StyleDifference diff, const RenderStyle
         return;
     }
 
-    if (diff != StyleDifference::Layout)
+    if (diff != Style::DifferenceResult::Layout)
         return;
 
     // The text metrics may be influenced by style changes.

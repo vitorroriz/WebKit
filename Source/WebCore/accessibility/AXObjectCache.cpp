@@ -2236,7 +2236,7 @@ bool AXObjectCache::onTextColorChange(Element& element, const RenderStyle* oldSt
 }
 #endif // ENABLE(ACCESSIBILITY_ISOLATED_TREE)
 
-void AXObjectCache::onStyleChange(RenderText& renderText, StyleDifference difference, const RenderStyle* oldStyle, const RenderStyle& newStyle)
+void AXObjectCache::onStyleChange(RenderText& renderText, Style::Difference difference, const RenderStyle* oldStyle, const RenderStyle& newStyle)
 {
 #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
     if (!oldStyle)
@@ -2249,8 +2249,8 @@ void AXObjectCache::onStyleChange(RenderText& renderText, StyleDifference differ
         return;
 #endif // !ENABLE(AX_THREAD_TEXT_APIS)
 
-    bool diffIsEqual = difference == StyleDifference::Equal;
-    // When speak-as changes, style difference will be StyleDifference::Equal (so "equal"
+    bool diffIsEqual = difference == Style::DifferenceResult::Equal;
+    // When speak-as changes, style difference will be Style::DifferenceResult::Equal (so "equal"
     // is not exactly accurate). So if the styles are "equal" and speak-as hasn't changed,
     // we have nothing to do.
     if (diffIsEqual) {
@@ -2269,7 +2269,7 @@ void AXObjectCache::onStyleChange(RenderText& renderText, StyleDifference differ
     if (speakAsChanged) [[unlikely]]
         postNotification(*object, AXNotification::SpeakAsChanged);
 
-    // The following style changes will not have a StyleDifference::Equal, so we can
+    // The following style changes will not have a Style::DifferenceResult::Equal, so we can
     // exit early if the diff is equal.
     if (diffIsEqual)
         return;

@@ -205,7 +205,7 @@ bool RenderFragmentContainer::shouldClipFragmentedFlowContent() const
     return hasNonVisibleOverflow();
 }
 
-void RenderFragmentContainer::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderFragmentContainer::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBlockFlow::styleDidChange(diff, oldStyle);
 

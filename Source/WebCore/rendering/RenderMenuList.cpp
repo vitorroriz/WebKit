@@ -181,7 +181,7 @@ void RenderMenuList::adjustInnerStyle()
         if (auto* inlineFormattingContextRoot = dynamicDowncast<RenderBlockFlow>(*m_innerBlock); inlineFormattingContextRoot && inlineFormattingContextRoot->inlineLayout())
             inlineFormattingContextRoot->inlineLayout()->rootStyleWillChange(*inlineFormattingContextRoot, innerStyle);
         if (auto* lineLayout = LayoutIntegration::LineLayout::containing(*m_innerBlock))
-            lineLayout->styleWillChange(*m_innerBlock, innerStyle, StyleDifference::Layout);
+            lineLayout->styleWillChange(*m_innerBlock, innerStyle, Style::DifferenceResult::Layout);
         LayoutIntegration::LineLayout::updateStyle(*m_innerBlock);
         for (auto& child : childrenOfType<RenderText>(*m_innerBlock))
             LayoutIntegration::LineLayout::updateStyle(child);
@@ -199,7 +199,7 @@ void RenderMenuList::didAttachChild(RenderObject& child, RenderObject*)
         cache->childrenChanged(*this, &child);
 }
 
-void RenderMenuList::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderMenuList::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBlock::styleDidChange(diff, oldStyle);
 

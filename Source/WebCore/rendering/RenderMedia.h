@@ -45,7 +45,7 @@ public:
 
 protected:
     void layout() override;
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
 
     void visibleInViewportStateChanged() override { }
 

@@ -293,19 +293,6 @@ inline bool RenderStyle::columnSpanEqual(const RenderStyle& other) const
     return m_nonInheritedData->miscData->multiCol->columnSpan == other.m_nonInheritedData->miscData->multiCol->columnSpan;
 }
 
-inline bool RenderStyle::borderIsEquivalentForPainting(const RenderStyle& other) const
-{
-    bool colorDiffers = color() != other.color();
-
-    if (!colorDiffers
-        && (m_nonInheritedData.ptr() == other.m_nonInheritedData.ptr()
-        || m_nonInheritedData->surroundData.ptr() == other.m_nonInheritedData->surroundData.ptr()
-        || m_nonInheritedData->surroundData->border == other.m_nonInheritedData->surroundData->border))
-        return true;
-
-    return border().isEquivalentForPainting(other.border(), colorDiffers);
-}
-
 inline bool RenderStyle::containerTypeAndNamesEqual(const RenderStyle& other) const
 {
     if (m_nonInheritedData.ptr() == other.m_nonInheritedData.ptr()

@@ -227,7 +227,7 @@ public:
     bool foregroundIsKnownToBeOpaqueInRect(const LayoutRect&, unsigned) const override { return false; }
 
 protected:
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) final;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) final;
     void simplifiedNormalFlowLayout() final;
 
     ASCIILiteral renderName() const override { return "RenderTable"_s; }

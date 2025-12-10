@@ -261,11 +261,11 @@ void RenderListItem::updateValue()
         m_marker->setNeedsLayoutAndPreferredWidthsUpdate();
 }
 
-void RenderListItem::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderListItem::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBlockFlow::styleDidChange(diff, oldStyle);
 
-    if (diff == StyleDifference::Layout && oldStyle && oldStyle->counterDirectives().map.get("list-item"_s) != style().counterDirectives().map.get("list-item"_s))
+    if (diff == Style::DifferenceResult::Layout && oldStyle && oldStyle->counterDirectives().map.get("list-item"_s) != style().counterDirectives().map.get("list-item"_s))
         counterDirectivesChanged();
 }
 

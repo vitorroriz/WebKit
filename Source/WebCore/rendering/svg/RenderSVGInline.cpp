@@ -163,14 +163,14 @@ void RenderSVGInline::willBeDestroyed()
     RenderInline::willBeDestroyed();
 }
 
-void RenderSVGInline::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderSVGInline::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     if (document().settings().layerBasedSVGEngineEnabled()) {
         RenderInline::styleDidChange(diff, oldStyle);
         return;
     }
 
-    if (diff == StyleDifference::Layout)
+    if (diff == Style::DifferenceResult::Layout)
         invalidateCachedBoundaries();
     RenderInline::styleDidChange(diff, oldStyle);
     SVGResourcesCache::clientStyleChanged(*this, diff, oldStyle, style());

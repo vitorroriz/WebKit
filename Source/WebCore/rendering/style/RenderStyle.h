@@ -69,8 +69,6 @@ public:
 
     bool operator==(const RenderStyle&) const;
 
-    StyleDifference diff(const RenderStyle&, OptionSet<StyleDifferenceContextSensitiveProperty>& changedContextSensitiveProperties) const;
-    bool diffRequiresLayerRepaint(const RenderStyle&, bool isComposited) const;
     void conservativelyCollectChangedAnimatableProperties(const RenderStyle&, CSSPropertiesBitSet&) const;
 
     bool scrollAnchoringSuppressionStyleDidChange(const RenderStyle*) const;
@@ -87,11 +85,6 @@ public:
     inline bool scrollPaddingEqual(const RenderStyle&) const;
     inline bool fontCascadeEqual(const RenderStyle&) const;
     bool scrollSnapDataEquivalent(const RenderStyle&) const;
-    inline bool borderIsEquivalentForPainting(const RenderStyle&) const;
-
-#if !LOG_DISABLED
-    void dumpDifferences(TextStream&, const RenderStyle&) const;
-#endif
 
     // MARK: - Style adjustment utilities
 
@@ -520,14 +513,6 @@ private:
     static constexpr bool isDisplayTableOrTablePart(DisplayType);
     static constexpr bool isInternalTableBox(DisplayType);
     static constexpr bool isRubyContainerOrInternalRubyBox(DisplayType);
-
-    bool changeAffectsVisualOverflow(const RenderStyle&) const;
-    bool changeRequiresLayout(const RenderStyle&, OptionSet<StyleDifferenceContextSensitiveProperty>& changedContextSensitiveProperties) const;
-    bool changeRequiresOutOfFlowMovementLayoutOnly(const RenderStyle&, OptionSet<StyleDifferenceContextSensitiveProperty>& changedContextSensitiveProperties) const;
-    bool changeRequiresLayerRepaint(const RenderStyle&, OptionSet<StyleDifferenceContextSensitiveProperty>& changedContextSensitiveProperties) const;
-    bool changeRequiresRepaint(const RenderStyle&, OptionSet<StyleDifferenceContextSensitiveProperty>& changedContextSensitiveProperties) const;
-    bool changeRequiresRepaintIfText(const RenderStyle&, OptionSet<StyleDifferenceContextSensitiveProperty>& changedContextSensitiveProperties) const;
-    bool changeRequiresRecompositeLayer(const RenderStyle&, OptionSet<StyleDifferenceContextSensitiveProperty>& changedContextSensitiveProperties) const;
 };
 
 // Map from computed style values (which take zoom into account) to web-exposed values, which are zoom-independent.

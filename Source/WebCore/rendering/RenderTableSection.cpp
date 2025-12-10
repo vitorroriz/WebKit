@@ -109,7 +109,7 @@ ASCIILiteral RenderTableSection::renderName() const
     return (isAnonymous() || isPseudoElement()) ? "RenderTableSection (anonymous)"_s : "RenderTableSection"_s;
 }
 
-void RenderTableSection::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderTableSection::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBox::styleDidChange(diff, oldStyle);
     propagateStyleToAnonymousChildren(StylePropagationType::AllChildren);

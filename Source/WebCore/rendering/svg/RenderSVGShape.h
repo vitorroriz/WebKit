@@ -141,7 +141,7 @@ private:
     void fillStrokeMarkers(PaintInfo&);
     virtual void drawMarkers(PaintInfo&) { }
 
-    void styleWillChange(StyleDifference, const RenderStyle& newStyle) override;
+    void styleWillChange(Style::Difference, const RenderStyle& newStyle) override;
 
     FloatRect calculateApproximateStrokeBoundingBox() const;
 

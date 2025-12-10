@@ -150,7 +150,7 @@ RenderTableSection* RenderTable::bottomSection() const
     return m_head.get();
 }
 
-void RenderTable::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderTable::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBlock::styleDidChange(diff, oldStyle);
     propagateStyleToAnonymousChildren(StylePropagationType::AllChildren);
@@ -680,7 +680,7 @@ void RenderTable::invalidateCollapsedBordersAfterStyleChangeIfNeeded(const Rende
     auto shouldInvalidate = [&] {
         if (oldStyle.writingMode() != newStyle.writingMode())
             return true;
-        return !oldStyle.borderIsEquivalentForPainting(newStyle);
+        return !Style::borderIsEquivalentForPainting(oldStyle, newStyle);
     };
 
     if (shouldInvalidate())

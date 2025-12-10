@@ -57,7 +57,7 @@ public:
     RenderBox* rendererOwningScrollbar() const;
 
 private:
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
     void imageChanged(WrappedImagePtr, const IntRect* = nullptr) override;
 
     void layoutHorizontalPart();

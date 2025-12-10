@@ -30,7 +30,7 @@ class RenderSVGResourceContainer : public RenderSVGHiddenContainer {
 public:
     virtual ~RenderSVGResourceContainer();
 
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
 
     void idChanged();
     void repaintAllClients() const;

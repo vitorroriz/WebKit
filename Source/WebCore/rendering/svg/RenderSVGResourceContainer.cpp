@@ -52,7 +52,7 @@ void RenderSVGResourceContainer::willBeDestroyed()
     RenderSVGHiddenContainer::willBeDestroyed();
 }
 
-void RenderSVGResourceContainer::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderSVGResourceContainer::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderSVGHiddenContainer::styleDidChange(diff, oldStyle);
 

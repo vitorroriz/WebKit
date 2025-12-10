@@ -32,6 +32,7 @@
 #include "RenderInline.h"
 #include "RenderObject.h"
 #include "RenderStyle.h"
+#include "StyleDifference.h"
 
 namespace WebCore {
 
@@ -86,10 +87,8 @@ void SimplifyMarkupCommand::doApply()
                 break;
             }
             
-            OptionSet<StyleDifferenceContextSensitiveProperty> contextSensitiveProperties;
-            if (currentNode->renderStyle()->diff(*startingStyle, contextSensitiveProperties) == StyleDifference::Equal)
+            if (Style::difference(*currentNode->renderStyle(), *startingStyle) == Style::DifferenceResult::Equal)
                 topNodeWithStartingStyle = currentNode;
-            
         }
         if (topNodeWithStartingStyle) {
             for (RefPtr node = startingNode; node && node != topNodeWithStartingStyle; node = node->parentNode())

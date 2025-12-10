@@ -51,7 +51,7 @@ RenderTreeUpdater::ViewTransition::ViewTransition(RenderTreeUpdater& updater)
 
 // The contents and ordering of the named elements map should remain stable during the duration of the transition.
 // We should only need to handle changes in the `display` CSS property by recreating / deleting renderers as needed.
-void RenderTreeUpdater::ViewTransition::updatePseudoElementTree(RenderElement* documentElementRenderer, StyleDifference minimalStyleDifference)
+void RenderTreeUpdater::ViewTransition::updatePseudoElementTree(RenderElement* documentElementRenderer, Style::DifferenceResult minimalStyleDifference)
 {
     auto destroyPseudoElementTreeIfNeeded = [&]() {
         if (WeakPtr viewTransitionContainingBlock = m_updater.renderView().viewTransitionContainingBlock())
@@ -194,7 +194,7 @@ void RenderTreeUpdater::ViewTransition::buildPseudoElementGroup(RenderBlockFlow&
     }
 }
 
-void RenderTreeUpdater::ViewTransition::updatePseudoElementGroup(const RenderStyle& groupStyle, RenderBox& group, RenderElement& documentElementRenderer, StyleDifference minimalStyleDifference)
+void RenderTreeUpdater::ViewTransition::updatePseudoElementGroup(const RenderStyle& groupStyle, RenderBox& group, RenderElement& documentElementRenderer, Style::DifferenceResult minimalStyleDifference)
 {
     auto& documentElementStyle = documentElementRenderer.style();
     auto name = groupStyle.pseudoElementNameArgument();

@@ -354,7 +354,7 @@ bool LineLayout::rootStyleWillChange(const RenderBlockFlow& root, const RenderSt
     return Layout::InlineInvalidation { ensureLineDamage(), m_inlineContentCache.inlineItems().content(), m_inlineContent->displayContent() }.rootStyleWillChange(downcast<Layout::ElementBox>(*root.layoutBox()), newStyle);
 }
 
-bool LineLayout::styleWillChange(const RenderElement& renderer, const RenderStyle& newStyle, StyleDifference diff)
+bool LineLayout::styleWillChange(const RenderElement& renderer, const RenderStyle& newStyle, Style::Difference diff)
 {
     if (!renderer.layoutBox()) {
         ASSERT_NOT_REACHED();

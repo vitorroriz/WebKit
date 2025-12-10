@@ -43,7 +43,7 @@ protected:
 
     void updateFromStyle() override;
     bool needsHasSVGTransformFlags() const override;
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
 
 private:
     void element() const = delete;

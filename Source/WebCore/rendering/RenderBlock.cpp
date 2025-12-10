@@ -288,7 +288,7 @@ RenderBlock::~RenderBlock()
     // Do not add any more code here. Add it to willBeDestroyed() instead.
 }
 
-void RenderBlock::styleWillChange(StyleDifference diff, const RenderStyle& newStyle)
+void RenderBlock::styleWillChange(Style::Difference diff, const RenderStyle& newStyle)
 {
     const RenderStyle* oldStyle = hasInitializedStyle() ? &style() : nullptr;
     setBlockLevelReplacedOrAtomicInline(newStyle.isDisplayInlineType());
@@ -332,7 +332,7 @@ bool RenderBlock::paddingBoxLogicaHeightChanged(const RenderStyle& oldStyle, con
     return oldStyle.borderLeftWidth() != newStyle.borderLeftWidth() || oldStyle.borderRightWidth() != newStyle.borderRightWidth() || scrollbarHeightDidChange(ScrollbarOrientation::Vertical);
 }
 
-void RenderBlock::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderBlock::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBox::styleDidChange(diff, oldStyle);
 
@@ -344,7 +344,7 @@ void RenderBlock::styleDidChange(StyleDifference diff, const RenderStyle* oldSty
     // It's possible for our border/padding to change, but for the overall logical width of the block to
     // end up being the same. We keep track of this change so in layoutBlock, we can know to set relayoutChildren=true.
     auto shouldForceRelayoutChildren = false;
-    if (oldStyle && diff == StyleDifference::Layout && needsLayout()) {
+    if (oldStyle && diff == Style::DifferenceResult::Layout && needsLayout()) {
         // Out-of-flow boxes anchored to the padding box.
         shouldForceRelayoutChildren = contentBoxLogicalWidthChanged(*oldStyle, style()) || (outOfFlowBoxes() && paddingBoxLogicaHeightChanged(*oldStyle, style()));
     }

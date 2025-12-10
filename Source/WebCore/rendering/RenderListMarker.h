@@ -83,8 +83,8 @@ private:
     void imageChanged(WrappedImagePtr, const IntRect*) final;
     LayoutRect selectionRectForRepaint(const RenderLayerModelObject* repaintContainer, bool clipToVisibleContent) final;
     bool canBeSelectionLeaf() const final { return true; }
-    void styleWillChange(StyleDifference, const RenderStyle& newStyle) final;
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) final;
+    void styleWillChange(Style::Difference, const RenderStyle& newStyle) final;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) final;
     void computeIntrinsicLogicalWidths(LayoutUnit&, LayoutUnit&) const override { ASSERT_NOT_REACHED(); }
     std::pair<int, int> layoutBoundForTextContent(String) const;
 

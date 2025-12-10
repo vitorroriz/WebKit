@@ -264,7 +264,7 @@ void RenderTreeUpdater::GeneratedContent::updateBeforeOrAfterPseudoElement(Eleme
     m_updater.m_builder.updateAfterDescendants(*pseudoElementRenderer);
 }
 
-void RenderTreeUpdater::GeneratedContent::updateBackdropRenderer(RenderElement& renderer, StyleDifference minimalStyleDifference)
+void RenderTreeUpdater::GeneratedContent::updateBackdropRenderer(RenderElement& renderer, Style::DifferenceResult minimalStyleDifference)
 {
     auto destroyBackdropIfNeeded = [&renderer, this]() {
         if (WeakPtr backdropRenderer = renderer.backdropRenderer())
@@ -323,7 +323,7 @@ void RenderTreeUpdater::GeneratedContent::removeAfterPseudoElement(Element& elem
     element.clearAfterPseudoElement();
 }
 
-void RenderTreeUpdater::GeneratedContent::updateWritingSuggestionsRenderer(RenderElement& renderer, StyleDifference minimalStyleDifference)
+void RenderTreeUpdater::GeneratedContent::updateWritingSuggestionsRenderer(RenderElement& renderer, Style::DifferenceResult minimalStyleDifference)
 {
     auto destroyWritingSuggestionsIfNeeded = [&renderer, this]() {
         if (!renderer.element())

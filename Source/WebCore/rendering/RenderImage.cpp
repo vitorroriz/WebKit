@@ -250,14 +250,14 @@ ImageSizeChangeType RenderImage::setImageSizeForAltText(CachedImage* newImage /*
     return ImageSizeChangeForAltText;
 }
 
-void RenderImage::styleWillChange(StyleDifference diff, const RenderStyle& newStyle)
+void RenderImage::styleWillChange(Style::Difference diff, const RenderStyle& newStyle)
 {
     if (!hasInitializedStyle())
         imageResource().initialize(*this);
     RenderReplaced::styleWillChange(diff, newStyle);
 }
 
-void RenderImage::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderImage::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderReplaced::styleDidChange(diff, oldStyle);
     if (m_needsToSetSizeForAltText) {
@@ -266,7 +266,7 @@ void RenderImage::styleDidChange(StyleDifference diff, const RenderStyle* oldSty
         m_needsToSetSizeForAltText = false;
     }
 
-    if (oldStyle && diff == StyleDifference::Layout) {
+    if (oldStyle && diff == Style::DifferenceResult::Layout) {
         if (oldStyle->imageOrientation() != style().imageOrientation())
             return repaintOrMarkForLayout(ImageSizeChangeNone);
 

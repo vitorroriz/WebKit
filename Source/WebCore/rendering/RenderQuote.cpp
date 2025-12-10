@@ -235,10 +235,10 @@ void RenderQuote::willBeRemovedFromTree()
     RenderInline::willBeRemovedFromTree();
 }
 
-void RenderQuote::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderQuote::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderInline::styleDidChange(diff, oldStyle);
-    if (diff >= StyleDifference::Layout) {
+    if (diff >= Style::DifferenceResult::Layout) {
         m_needsTextUpdate = true;
         view().setHasQuotesNeedingUpdate(true);
     }

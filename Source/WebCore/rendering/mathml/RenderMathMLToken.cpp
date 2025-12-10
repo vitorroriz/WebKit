@@ -127,7 +127,7 @@ void RenderMathMLToken::setMathVariantGlyphDirty()
     setNeedsLayoutAndPreferredWidthsUpdate();
 }
 
-void RenderMathMLToken::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderMathMLToken::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderMathMLBlock::styleDidChange(diff, oldStyle);
     setMathVariantGlyphDirty();

@@ -69,7 +69,7 @@ private:
     ASCIILiteral renderName() const override { return "RenderSVGInlineText"_s; }
 
     String originalText() const override;
-    void styleDidChange(StyleDifference, const RenderStyle*) override;
+    void styleDidChange(Style::Difference, const RenderStyle*) override;
 
     FloatRect objectBoundingBox() const override { return floatLinesBoundingBox(); }
 

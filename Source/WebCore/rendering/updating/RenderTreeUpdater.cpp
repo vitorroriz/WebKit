@@ -300,7 +300,7 @@ void RenderTreeUpdater::updateRenderTree(ContainerNode& root)
         if (!mayHaveRenderedDescendants) {
             it.traverseNextSkippingChildren();
             if (&element == element.document().documentElement())
-                viewTransition().updatePseudoElementTree(nullptr, StyleDifference::Equal);
+                viewTransition().updatePseudoElementTree(nullptr, Style::DifferenceResult::Equal);
             continue;
         }
 
@@ -371,13 +371,13 @@ void RenderTreeUpdater::updateAfterDescendants(Element& element, const Style::El
     auto* renderer = element.renderer();
     if (!renderer) {
         if (&element == element.document().documentElement())
-            viewTransition().updatePseudoElementTree(nullptr, StyleDifference::Equal);
+            viewTransition().updatePseudoElementTree(nullptr, Style::DifferenceResult::Equal);
         return;
     }
 
-    StyleDifference minimalStyleDifference = StyleDifference::Equal;
+    Style::DifferenceResult minimalStyleDifference = Style::DifferenceResult::Equal;
     if (update && update->recompositeLayer)
-        minimalStyleDifference = StyleDifference::RecompositeLayer;
+        minimalStyleDifference = Style::DifferenceResult::RecompositeLayer;
 
     generatedContent().updateBackdropRenderer(*renderer, minimalStyleDifference);
     generatedContent().updateWritingSuggestionsRenderer(*renderer, minimalStyleDifference);
@@ -410,7 +410,7 @@ static bool pseudoStyleCacheIsInvalid(RenderElement* renderer, RenderStyle* newS
     return false;
 }
 
-void RenderTreeUpdater::updateRendererStyle(RenderElement& renderer, RenderStyle&& newStyle, StyleDifference minimalStyleDifference)
+void RenderTreeUpdater::updateRendererStyle(RenderElement& renderer, RenderStyle&& newStyle, Style::DifferenceResult minimalStyleDifference)
 {
     auto oldStyle = RenderStyle::clone(renderer.style());
     renderer.setStyle(WTFMove(newStyle), minimalStyleDifference);
@@ -509,19 +509,19 @@ void RenderTreeUpdater::updateElementRenderer(Element& element, const Style::Ele
     auto& renderer = *element.renderer();
 
     if (elementUpdate.recompositeLayer) {
-        updateRendererStyle(renderer, WTFMove(elementUpdateStyle), StyleDifference::RecompositeLayer);
+        updateRendererStyle(renderer, WTFMove(elementUpdateStyle), Style::DifferenceResult::RecompositeLayer);
         return;
     }
 
     if (!elementUpdate.changes) {
         if (pseudoStyleCacheIsInvalid(&renderer, &elementUpdateStyle)) {
-            updateRendererStyle(renderer, WTFMove(elementUpdateStyle), StyleDifference::Equal);
+            updateRendererStyle(renderer, WTFMove(elementUpdateStyle), Style::DifferenceResult::Equal);
             return;
         }
         return;
     }
 
-    updateRendererStyle(renderer, WTFMove(elementUpdateStyle), StyleDifference::Equal);
+    updateRendererStyle(renderer, WTFMove(elementUpdateStyle), Style::DifferenceResult::Equal);
 }
 
 void RenderTreeUpdater::createRenderer(Element& element, RenderStyle&& style)

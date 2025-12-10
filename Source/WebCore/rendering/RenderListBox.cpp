@@ -202,7 +202,7 @@ void RenderListBox::layout()
     }
 }
 
-void RenderListBox::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderListBox::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBlockFlow::styleDidChange(diff, oldStyle);
 

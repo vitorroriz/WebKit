@@ -74,7 +74,7 @@ protected:
 
     bool isSelected() const;
 
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
 
     virtual FloatSize computeIntrinsicSize() const;
     virtual FloatSize preferredAspectRatio() const;

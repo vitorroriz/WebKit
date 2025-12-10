@@ -121,7 +121,7 @@ void RenderHTMLCanvas::canvasSizeChanged()
     setNeedsLayoutIfNeededAfterIntrinsicSizeChange();
 }
 
-void RenderHTMLCanvas::styleDidChange(StyleDifference difference, const RenderStyle* oldStyle)
+void RenderHTMLCanvas::styleDidChange(Style::Difference difference, const RenderStyle* oldStyle)
 {
     RenderReplaced::styleDidChange(difference, oldStyle);
 

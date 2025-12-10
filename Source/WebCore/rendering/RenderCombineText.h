@@ -47,7 +47,7 @@ private:
     void node() const = delete;
 
     ASCIILiteral renderName() const override { return "RenderCombineText"_s; }
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
     void setRenderedText(const String&) override;
 
     std::unique_ptr<RenderStyle> m_combineFontStyle;

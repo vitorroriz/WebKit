@@ -136,10 +136,10 @@ bool RenderGrid::selfAlignmentChangedFromStretch(Style::GridTrackSizingDirection
         && selfAlignmentForGridItem(alignmentContextType, gridItem, &newStyle).position() != ItemPosition::Stretch;
 }
 
-void RenderGrid::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderGrid::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBlock::styleDidChange(diff, oldStyle);
-    if (!oldStyle || diff != StyleDifference::Layout)
+    if (!oldStyle || diff != Style::DifferenceResult::Layout)
         return;
 
     m_intrinsicLogicalHeightsForRowSizingFirstPass.reset();

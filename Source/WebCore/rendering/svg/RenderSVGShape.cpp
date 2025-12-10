@@ -406,11 +406,11 @@ std::unique_ptr<Path> RenderSVGShape::createPath() const
     return makeUnique<Path>(pathFromGraphicsElement(protectedGraphicsElement()));
 }
 
-void RenderSVGShape::styleWillChange(StyleDifference diff, const RenderStyle& newStyle)
+void RenderSVGShape::styleWillChange(Style::Difference diff, const RenderStyle& newStyle)
 {
     auto* oldStyle = hasInitializedStyle() ? &style() : nullptr;
     if (oldStyle) {
-        if (diff == StyleDifference::Layout)
+        if (diff == Style::DifferenceResult::Layout)
             setNeedsShapeUpdate();
     }
 

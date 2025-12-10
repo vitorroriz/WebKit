@@ -42,7 +42,7 @@ public:
     void markFilterEffectForRepaint(FilterEffect*);
     void markFilterEffectForRebuild();
 
-    void styleDidChange(StyleDifference, const RenderStyle*) override;
+    void styleDidChange(Style::Difference, const RenderStyle*) override;
 };
 
 } // namespace WebCore

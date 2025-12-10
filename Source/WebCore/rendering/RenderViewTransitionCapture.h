@@ -43,7 +43,7 @@ public:
     void paintReplaced(PaintInfo&, const LayoutPoint& paintOffset) override;
     void intrinsicSizeChanged() override;
 
-    void styleDidChange(StyleDifference, const RenderStyle*) override;
+    void styleDidChange(Style::Difference, const RenderStyle*) override;
 
     void layout() override;
 

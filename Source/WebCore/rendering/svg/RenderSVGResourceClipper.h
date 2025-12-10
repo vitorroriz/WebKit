@@ -59,7 +59,7 @@ private:
 
     ASCIILiteral renderName() const final { return "RenderSVGResourceClipper"_s; }
 
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) final;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) final;
 };
 
 }

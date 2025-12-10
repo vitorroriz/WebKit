@@ -229,7 +229,7 @@ void RenderWidget::layout()
     clearNeedsLayout();
 }
 
-void RenderWidget::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderWidget::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderReplaced::styleDidChange(diff, oldStyle);
     if (m_widget) {

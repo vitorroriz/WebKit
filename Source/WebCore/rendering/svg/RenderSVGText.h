@@ -104,7 +104,7 @@ private:
 
     void willBeDestroyed() override;
 
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) final;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) final;
 
     // FIXME: [LBSE] Begin code only needed for legacy SVG engine.
     bool nodeAtFloatPoint(const HitTestRequest&, HitTestResult&, const FloatPoint& pointInParent, HitTestAction) override;

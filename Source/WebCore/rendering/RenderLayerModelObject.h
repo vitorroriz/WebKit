@@ -55,8 +55,8 @@ public:
     RenderLayer* layer() const { return m_layer.get(); }
     CheckedPtr<RenderLayer> checkedLayer() const;
 
-    void styleWillChange(StyleDifference, const RenderStyle& newStyle) override;
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleWillChange(Style::Difference, const RenderStyle& newStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
 
     virtual bool requiresLayer() const = 0;
 

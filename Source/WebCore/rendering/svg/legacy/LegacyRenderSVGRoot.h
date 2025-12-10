@@ -83,7 +83,7 @@ private:
     void insertedIntoTree() override;
     void willBeRemovedFromTree() override;
 
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
 
     const AffineTransform& localToParentTransform() const override;
 

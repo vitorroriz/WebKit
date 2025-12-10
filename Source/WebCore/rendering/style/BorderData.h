@@ -158,15 +158,13 @@ public:
     const Style::CornerShapeValue& bottomLeftCornerShape() const { return m_cornerShapes.bottomLeft(); }
     const Style::CornerShapeValue& bottomRightCornerShape() const { return m_cornerShapes.bottomRight(); }
 
-    bool isEquivalentForPainting(const BorderData& other, bool currentColorDiffers) const;
+    bool containsCurrentColor() const;
 
     void dump(TextStream&, DumpStyleValues = DumpStyleValues::All) const;
 
     bool operator==(const BorderData&) const = default;
 
 private:
-    bool containsCurrentColor() const;
-
     RectEdges<BorderValue> m_edges;
     Style::BorderImage m_image;
     Style::BorderRadius m_radii { Style::BorderRadiusValue { 0_css_px, 0_css_px } };

@@ -38,7 +38,7 @@ public:
 private:
     ASCIILiteral renderName() const override { return "RenderQuote"_s; }
     bool isOpen() const;
-    void styleDidChange(StyleDifference, const RenderStyle*) override;
+    void styleDidChange(Style::Difference, const RenderStyle*) override;
     void insertedIntoTree() override;
     void willBeRemovedFromTree() override;
 

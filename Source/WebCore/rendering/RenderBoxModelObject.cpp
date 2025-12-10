@@ -138,7 +138,7 @@ static FirstLetterRemainingTextMap& firstLetterRemainingTextMap()
     return map;
 }
 
-void RenderBoxModelObject::styleWillChange(StyleDifference diff, const RenderStyle& newStyle)
+void RenderBoxModelObject::styleWillChange(Style::Difference diff, const RenderStyle& newStyle)
 {
     const RenderStyle* oldStyle = hasInitializedStyle() ? &style() : nullptr;
 

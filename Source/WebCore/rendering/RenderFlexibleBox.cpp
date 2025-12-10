@@ -368,10 +368,10 @@ static const StyleContentAlignmentData& contentAlignmentNormalBehavior()
     return normalBehavior;
 }
 
-void RenderFlexibleBox::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderFlexibleBox::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBlock::styleDidChange(diff, oldStyle);
-    if (!oldStyle || diff != StyleDifference::Layout)
+    if (!oldStyle || diff != Style::DifferenceResult::Layout)
         return;
 
     auto oldStyleAlignItemsIsStretch = oldStyle->alignItems().resolve(selfAlignmentNormalBehavior()).position() == ItemPosition::Stretch;

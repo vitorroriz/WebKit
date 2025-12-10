@@ -119,7 +119,7 @@ bool RenderLayerModelObject::hasSelfPaintingLayer() const
     return m_layer && m_layer->isSelfPaintingLayer();
 }
 
-void RenderLayerModelObject::styleWillChange(StyleDifference diff, const RenderStyle& newStyle)
+void RenderLayerModelObject::styleWillChange(Style::Difference diff, const RenderStyle& newStyle)
 {
     s_wasFloating = isFloating();
     s_hadLayer = hasLayer();
@@ -128,12 +128,12 @@ void RenderLayerModelObject::styleWillChange(StyleDifference diff, const RenderS
         s_layerWasSelfPainting = layer()->isSelfPaintingLayer();
 
     auto* oldStyle = hasInitializedStyle() ? &style() : nullptr;
-    if (diff == StyleDifference::RepaintLayer && parent() && oldStyle && oldStyle->clip() != newStyle.clip())
+    if (diff == Style::DifferenceResult::RepaintLayer && parent() && oldStyle && oldStyle->clip() != newStyle.clip())
         layer()->clearClipRectsIncludingDescendants();
     RenderElement::styleWillChange(diff, newStyle);
 }
 
-void RenderLayerModelObject::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderLayerModelObject::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     updateFromStyle();
     RenderElement::styleDidChange(diff, oldStyle);

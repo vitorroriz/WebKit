@@ -222,7 +222,7 @@ void RenderMathMLBlock::computeAndSetBlockDirectionMarginsOfChildren()
         child->computeAndSetBlockDirectionMargins(*this);
 }
 
-void RenderMathMLBlock::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderMathMLBlock::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBlock::styleDidChange(diff, oldStyle);
 

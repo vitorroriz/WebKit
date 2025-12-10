@@ -258,7 +258,7 @@ public:
     // Notify us that a layer has been removed
     void layerWillBeRemoved(RenderLayer& parent, RenderLayer& child);
 
-    void layerStyleChanged(StyleDifference, RenderLayer&, const RenderStyle* oldStyle);
+    void layerStyleChanged(Style::Difference, RenderLayer&, const RenderStyle* oldStyle);
     void layerGainedCompositedScrollableOverflow(RenderLayer&);
 
     void establishesTopLayerWillChangeForLayer(RenderLayer&);

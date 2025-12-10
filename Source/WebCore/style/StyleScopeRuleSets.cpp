@@ -33,6 +33,7 @@
 #include "CSSStyleSheet.h"
 #include "CSSViewTransitionRule.h"
 #include "DeclarationOrigin.h"
+#include "DocumentInlines.h"
 #include "ExtensionStyleSheets.h"
 #include "FrameLoader.h"
 #include "HTMLNames.h"
@@ -44,6 +45,7 @@
 #include "StyleResolver.h"
 #include "StyleScope.h"
 #include "StyleSheetContents.h"
+#include <JavaScriptCore/ConsoleTypes.h>
 #include <ranges>
 
 namespace WebCore {

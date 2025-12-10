@@ -73,7 +73,7 @@ private:
     LayoutUnit preferredContentLogicalWidth(float charWidth) const override;
     LayoutUnit computeControlLogicalHeight(LayoutUnit lineHeight, LayoutUnit nonContentHeight) const override;
     
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
 
     HTMLElement* innerSpinButtonElement() const;
 };

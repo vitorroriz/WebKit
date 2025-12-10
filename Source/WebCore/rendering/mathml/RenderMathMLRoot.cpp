@@ -97,7 +97,7 @@ RenderBox& RenderMathMLRoot::getIndex() const
     return *firstInFlowChildBox()->nextInFlowSiblingBox();
 }
 
-void RenderMathMLRoot::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderMathMLRoot::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderMathMLRow::styleDidChange(diff, oldStyle);
     m_radicalOperator.reset(style());

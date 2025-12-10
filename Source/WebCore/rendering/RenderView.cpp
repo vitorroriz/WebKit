@@ -116,7 +116,7 @@ void RenderView::willBeDestroyed()
     RenderBlockFlow::willBeDestroyed();
 }
 
-void RenderView::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderView::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBlockFlow::styleDidChange(diff, oldStyle);
 

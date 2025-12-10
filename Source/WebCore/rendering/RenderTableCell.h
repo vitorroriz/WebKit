@@ -142,7 +142,7 @@ protected:
     LogicalExtentComputedValues computeLogicalHeight(LayoutUnit logicalHeight, LayoutUnit logicalTop) const override;
 
 private:
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
     void computePreferredLogicalWidths() override;
 
     LayoutRect frameRectForStickyPositioning() const override;

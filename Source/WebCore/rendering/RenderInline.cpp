@@ -164,7 +164,7 @@ static void updateStyleOfAnonymousBlockContinuations(const RenderBlock& block, c
     }
 }
 
-void RenderInline::styleWillChange(StyleDifference diff, const RenderStyle& newStyle)
+void RenderInline::styleWillChange(Style::Difference diff, const RenderStyle& newStyle)
 {
     RenderBoxModelObject::styleWillChange(diff, newStyle);
 
@@ -179,7 +179,7 @@ void RenderInline::styleWillChange(StyleDifference diff, const RenderStyle& newS
         removeOutOfFlowBoxesIfNeededOnStyleChange(*container, *oldStyle, newStyle);
 }
 
-void RenderInline::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderInline::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBoxModelObject::styleDidChange(diff, oldStyle);
 

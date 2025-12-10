@@ -55,7 +55,7 @@ private:
     MathMLRootElement& element() const;
     RootType rootType() const;
 
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) final;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) final;
 
     void computePreferredLogicalWidths() final;
     void layoutBlock(RelayoutChildren, LayoutUnit pageLogicalHeight = 0_lu) final;

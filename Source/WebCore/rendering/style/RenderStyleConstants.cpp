@@ -1067,23 +1067,6 @@ TextStream& operator<<(TextStream& ts, Scroller scroller)
     return ts;
 }
 
-TextStream& operator<<(TextStream& ts, StyleDifference diff)
-{
-    switch (diff) {
-    case StyleDifference::Equal: ts << "equal"_s; break;
-    case StyleDifference::RecompositeLayer: ts << "recomposite layer"_s; break;
-    case StyleDifference::Repaint: ts << "repaint"_s; break;
-    case StyleDifference::RepaintIfText: ts << "repaint if text"_s; break;
-    case StyleDifference::RepaintLayer: ts << "repaint layer"_s; break;
-    case StyleDifference::LayoutOutOfFlowMovementOnly: ts << "layout positioned movement only"_s; break;
-    case StyleDifference::Overflow: ts << "overflow"_s; break;
-    case StyleDifference::OverflowAndOutOfFlowMovement: ts << "overflow and positioned movement"_s; break;
-    case StyleDifference::Layout: ts << "layout"_s; break;
-    case StyleDifference::NewStyle: ts << "new style"_s; break;
-    }
-    return ts;
-}
-
 TextStream& operator<<(TextStream& ts, TableLayoutType layoutType)
 {
     switch (layoutType) {
@@ -1402,19 +1385,6 @@ TextStream& operator<<(TextStream& ts, OverflowContinue overflowContinue)
     case OverflowContinue::Discard:
         ts << "discard"_s;
         break;
-    }
-    return ts;
-}
-
-TextStream& operator<<(TextStream& ts, StyleDifferenceContextSensitiveProperty property)
-{
-    switch (property) {
-    case StyleDifferenceContextSensitiveProperty::Transform: ts << "transform"_s; break;
-    case StyleDifferenceContextSensitiveProperty::Opacity: ts << "opacity"_s; break;
-    case StyleDifferenceContextSensitiveProperty::Filter: ts << "filter"_s; break;
-    case StyleDifferenceContextSensitiveProperty::ClipRect: ts << "clipRect"_s; break;
-    case StyleDifferenceContextSensitiveProperty::ClipPath: ts << "clipPath"_s; break;
-    case StyleDifferenceContextSensitiveProperty::WillChange: ts << "willChange"_s; break;
     }
     return ts;
 }

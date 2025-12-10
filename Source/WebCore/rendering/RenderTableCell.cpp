@@ -616,7 +616,7 @@ static inline void markCellDirtyWhenCollapsedBorderChanges(RenderTableCell* cell
     cell->setNeedsLayoutAndPreferredWidthsUpdate();
 }
 
-void RenderTableCell::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderTableCell::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     ASSERT(style().display() == DisplayType::TableCell);
     ASSERT(!row() || row()->rowIndexWasSet());
@@ -633,7 +633,7 @@ void RenderTableCell::styleDidChange(StyleDifference diff, const RenderStyle* ol
 
     if (CheckedPtr table = this->table(); table && oldStyle) {
         table->invalidateCollapsedBordersAfterStyleChangeIfNeeded(*oldStyle, style(), this);
-        if (table->collapseBorders() && diff == StyleDifference::Layout) {
+        if (table->collapseBorders() && diff == Style::DifferenceResult::Layout) {
             markCellDirtyWhenCollapsedBorderChanges(table->cellBelow(this));
             markCellDirtyWhenCollapsedBorderChanges(table->cellAbove(this));
             markCellDirtyWhenCollapsedBorderChanges(table->cellBefore(this));

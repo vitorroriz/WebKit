@@ -307,7 +307,7 @@ bool RenderTextControlSingleLine::nodeAtPoint(const HitTestRequest& request, Hit
     return true;
 }
 
-void RenderTextControlSingleLine::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderTextControlSingleLine::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderTextControl::styleDidChange(diff, oldStyle);
 
@@ -323,7 +323,7 @@ void RenderTextControlSingleLine::styleDidChange(StyleDifference diff, const Ren
         containerRenderer->mutableStyle().setHeight(CSS::Keyword::Auto { });
         containerRenderer->mutableStyle().setWidth(CSS::Keyword::Auto { });
     }
-    if (diff == StyleDifference::Layout) {
+    if (diff == Style::DifferenceResult::Layout) {
         if (auto innerTextRenderer = innerTextElement()->renderer())
             innerTextRenderer->setNeedsLayout(MarkContainingBlockChain);
         if (auto* placeholder = inputElement().placeholderElement()) {

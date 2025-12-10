@@ -170,8 +170,6 @@ enum class ScrollAxis : uint8_t;
 enum class ScrollSnapStop : bool;
 enum class StyleAppearance : uint8_t;
 enum class StyleColorOptions : uint8_t;
-enum class StyleDifference : uint8_t;
-enum class StyleDifferenceContextSensitiveProperty : uint8_t;
 enum class TableLayoutType : bool;
 enum class TextBoxTrim : uint8_t;
 enum class TextCombine : bool;
@@ -670,15 +668,6 @@ public:
     inline const Style::PageSize& pageSize() const;
     inline void setPageSize(Style::PageSize&&);
 
-protected:
-    RenderStyleBase(RenderStyleBase&&);
-    RenderStyleBase& operator=(RenderStyleBase&&);
-
-    RenderStyleBase(CreateDefaultStyleTag);
-    RenderStyleBase(const RenderStyleBase&, CloneTag);
-
-    RenderStyleBase(RenderStyleBase&, RenderStyleBase&&);
-
     struct NonInheritedFlags {
         bool operator==(const NonInheritedFlags&) const = default;
 
@@ -766,6 +755,24 @@ protected:
 #endif
         // Total = 56 bits (fits in 8 bytes)
     };
+
+    const StyleNonInheritedData& nonInheritedData() const { return m_nonInheritedData; }
+    const NonInheritedFlags& nonInheritedFlags() const { return m_nonInheritedFlags; }
+
+    const StyleRareInheritedData& rareInheritedData() const { return m_rareInheritedData; }
+    const StyleInheritedData& inheritedData() const { return m_inheritedData; }
+    const InheritedFlags& inheritedFlags() const { return m_inheritedFlags; }
+
+    const SVGRenderStyle& svgStyle() const { return m_svgStyle; }
+
+protected:
+    RenderStyleBase(RenderStyleBase&&);
+    RenderStyleBase& operator=(RenderStyleBase&&);
+
+    RenderStyleBase(CreateDefaultStyleTag);
+    RenderStyleBase(const RenderStyleBase&, CloneTag);
+
+    RenderStyleBase(RenderStyleBase&, RenderStyleBase&&);
 
     // non-inherited attributes
     DataRef<StyleNonInheritedData> m_nonInheritedData;

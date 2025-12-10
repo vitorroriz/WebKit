@@ -74,11 +74,11 @@ SVGFilterPrimitiveStandardAttributes& RenderSVGResourceFilterPrimitive::filterPr
     return static_cast<SVGFilterPrimitiveStandardAttributes&>(RenderSVGHiddenContainer::element());
 }
 
-void RenderSVGResourceFilterPrimitive::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderSVGResourceFilterPrimitive::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderSVGHiddenContainer::styleDidChange(diff, oldStyle);
 
-    if (diff == StyleDifference::Equal || !oldStyle)
+    if (diff == Style::DifferenceResult::Equal || !oldStyle)
         return;
 
     auto& newStyle = style();

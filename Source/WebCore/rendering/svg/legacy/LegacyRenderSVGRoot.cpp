@@ -197,7 +197,7 @@ void LegacyRenderSVGRoot::layout()
         // Invalidate resource clients, which may mark some nodes for layout.
         for (auto& resource :  m_resourcesNeedingToInvalidateClients) {
             resource.removeAllClientsFromCacheAndMarkForInvalidation();
-            SVGResourcesCache::clientStyleChanged(resource, StyleDifference::Layout, nullptr, resource.style());
+            SVGResourcesCache::clientStyleChanged(resource, Style::DifferenceResult::Layout, nullptr, resource.style());
         }
 
         m_isLayoutSizeChanged = false;
@@ -355,13 +355,13 @@ void LegacyRenderSVGRoot::willBeRemovedFromTree()
     RenderReplaced::willBeRemovedFromTree();
 }
 
-void LegacyRenderSVGRoot::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void LegacyRenderSVGRoot::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
-    if (diff == StyleDifference::Layout)
+    if (diff == Style::DifferenceResult::Layout)
         invalidateCachedBoundaries();
 
     // Box decorations may have appeared/disappeared - recompute status.
-    if (diff == StyleDifference::Repaint)
+    if (diff == Style::DifferenceResult::Repaint)
         m_hasBoxDecorations = hasVisibleBoxDecorationStyle();
 
     RenderReplaced::styleDidChange(diff, oldStyle);

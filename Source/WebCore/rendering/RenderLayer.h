@@ -459,7 +459,7 @@ public:
     void setBackingNeedsRepaintInRect(const LayoutRect&, GraphicsLayerShouldClipToLayer = GraphicsLayerShouldClipToLayer::Clip);
     void repaintIncludingNonCompositingDescendants(const RenderLayerModelObject* repaintContainer);
 
-    void styleChanged(StyleDifference, const RenderStyle* oldStyle);
+    void styleChanged(Style::Difference, const RenderStyle* oldStyle);
 
     bool isSelfPaintingLayer() const { return m_isSelfPaintingLayer; }
 
@@ -1268,7 +1268,7 @@ private:
     bool paintingInsideReflection() const { return m_paintingInsideReflection; }
     void setPaintingInsideReflection(bool b) { m_paintingInsideReflection = b; }
 
-    void updateFiltersAfterStyleChange(StyleDifference, const RenderStyle* oldStyle);
+    void updateFiltersAfterStyleChange(Style::Difference, const RenderStyle* oldStyle);
     void updateFilterPaintingStrategy();
 
     void updateAncestorChainHasBlendingDescendants();

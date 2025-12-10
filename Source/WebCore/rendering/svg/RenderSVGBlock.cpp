@@ -101,14 +101,14 @@ void RenderSVGBlock::willBeDestroyed()
     RenderBlockFlow::willBeDestroyed();
 }
 
-void RenderSVGBlock::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderSVGBlock::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     if (document().settings().layerBasedSVGEngineEnabled()) {
         RenderBlockFlow::styleDidChange(diff, oldStyle);
         return;
     }
 
-    if (diff == StyleDifference::Layout)
+    if (diff == Style::DifferenceResult::Layout)
         invalidateCachedBoundaries();
     RenderBlockFlow::styleDidChange(diff, oldStyle);
     SVGResourcesCache::clientStyleChanged(*this, diff, oldStyle, style());

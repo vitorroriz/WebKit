@@ -133,9 +133,9 @@ void LegacyRenderSVGModelObject::willBeDestroyed()
     RenderElement::willBeDestroyed();
 }
 
-void LegacyRenderSVGModelObject::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void LegacyRenderSVGModelObject::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
-    if (diff == StyleDifference::Layout) {
+    if (diff == Style::DifferenceResult::Layout) {
         invalidateCachedBoundaries();
         if (style().affectsTransform() || (oldStyle && oldStyle->affectsTransform()))
             setNeedsTransformUpdate();

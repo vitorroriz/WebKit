@@ -154,7 +154,7 @@ public:
     bool backgroundIsKnownToBeOpaqueInRect(const LayoutRect&) const override { return false; }
 
 private:
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
 
     static RenderPtr<RenderTableSection> createTableSectionWithStyle(Document&, const RenderStyle&);
 

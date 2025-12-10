@@ -60,7 +60,7 @@ void RenderMedia::layout()
         protectedMediaElement()->layoutSizeChanged();
 }
 
-void RenderMedia::styleDidChange(StyleDifference difference, const RenderStyle* oldStyle)
+void RenderMedia::styleDidChange(Style::Difference difference, const RenderStyle* oldStyle)
 {
     RenderImage::styleDidChange(difference, oldStyle);
     if (!oldStyle || style().usedVisibility() != oldStyle->usedVisibility())

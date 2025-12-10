@@ -135,14 +135,14 @@ void RenderScrollbarPart::computeScrollbarHeight()
     m_marginBox.setBottom(Style::evaluateMinimum<LayoutUnit>(style().marginBottom(), 0_lu, style().usedZoomForLength()));
 }
 
-void RenderScrollbarPart::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderScrollbarPart::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderBlock::styleDidChange(diff, oldStyle);
     setInline(false);
     clearPositionedState();
     setFloating(false);
     setHasNonVisibleOverflow(false);
-    if (oldStyle && m_scrollbar && m_part != NoPart && diff >= StyleDifference::Repaint)
+    if (oldStyle && m_scrollbar && m_part != NoPart && diff >= Style::DifferenceResult::Repaint)
         m_scrollbar->theme().invalidatePart(*m_scrollbar, m_part);
 }
 

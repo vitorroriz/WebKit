@@ -42,22 +42,6 @@ bool BorderData::containsCurrentColor() const
     });
 }
 
-bool BorderData::isEquivalentForPainting(const BorderData& other, bool currentColorDiffers) const
-{
-    if (this == &other) {
-        ASSERT(currentColorDiffers);
-        return !containsCurrentColor();
-    }
-
-    if (*this != other)
-        return false;
-
-    if (!currentColorDiffers)
-        return true;
-
-    return !containsCurrentColor();
-}
-
 void BorderData::dump(TextStream& ts, DumpStyleValues behavior) const
 {
     if (behavior == DumpStyleValues::All || left() != BorderValue())

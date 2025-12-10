@@ -72,7 +72,7 @@ private:
     std::unique_ptr<LegacyInlineFlowBox> createInlineFlowBox() final;
 
     void willBeDestroyed() final;
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) final;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) final;
 };
 
 } // namespace WebCore

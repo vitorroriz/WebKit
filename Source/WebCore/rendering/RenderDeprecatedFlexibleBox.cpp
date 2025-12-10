@@ -184,7 +184,7 @@ static LayoutUnit contentHeightForChild(RenderBox* child)
     return std::max<LayoutUnit>(0, heightForChild(child) - child->borderAndPaddingLogicalHeight());
 }
 
-void RenderDeprecatedFlexibleBox::styleWillChange(StyleDifference diff, const RenderStyle& newStyle)
+void RenderDeprecatedFlexibleBox::styleWillChange(Style::Difference diff, const RenderStyle& newStyle)
 {
     auto shouldClearLineClamp = [&] {
         auto* oldStyle = hasInitializedStyle() ? &style() : nullptr;

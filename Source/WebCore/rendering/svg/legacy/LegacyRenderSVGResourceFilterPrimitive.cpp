@@ -54,11 +54,11 @@ SVGFilterPrimitiveStandardAttributes& LegacyRenderSVGResourceFilterPrimitive::fi
     return static_cast<SVGFilterPrimitiveStandardAttributes&>(LegacyRenderSVGHiddenContainer::element());
 }
 
-void LegacyRenderSVGResourceFilterPrimitive::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void LegacyRenderSVGResourceFilterPrimitive::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     LegacyRenderSVGHiddenContainer::styleDidChange(diff, oldStyle);
 
-    if (diff == StyleDifference::Equal || !oldStyle)
+    if (diff == Style::DifferenceResult::Equal || !oldStyle)
         return;
 
     auto& newStyle = style();

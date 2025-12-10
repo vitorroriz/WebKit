@@ -26,6 +26,7 @@
 #include <WebCore/RenderObject.h>
 #include <WebCore/RenderPtr.h>
 #include <WebCore/RenderStyle.h>
+#include <WebCore/StyleDifference.h>
 #include <wtf/CheckedRef.h>
 #include <wtf/MonotonicTime.h>
 #include <wtf/Packed.h>
@@ -83,10 +84,10 @@ public:
 
     void initializeStyle();
 
-    // Calling with minimalStyleDifference > StyleDifference::Equal indicates that
+    // Calling with minimalStyleDifference > Style::DifferenceResult::Equal indicates that
     // out-of-band state (e.g. animations) requires that styleDidChange processing
     // continue even if the style isn't different from the current style.
-    void setStyle(RenderStyle&&, StyleDifference minimalStyleDifference = StyleDifference::Equal);
+    void setStyle(RenderStyle&&, Style::DifferenceResult minimalStyleDifference = Style::DifferenceResult::Equal);
 
     // The pseudo element style can be cached or uncached. Use the uncached method if the pseudo element
     // has the concept of changing state (like ::-webkit-scrollbar-thumb:hover), or if it takes additional
@@ -153,7 +154,7 @@ public:
     void setOutOfFlowChildNeedsStaticPositionLayout();
     void clearChildNeedsLayout();
     void setNeedsOutOfFlowMovementLayout(const RenderStyle* oldStyle);
-    void setNeedsLayoutForStyleDifference(StyleDifference, const RenderStyle* oldStyle);
+    void setNeedsLayoutForStyleDifference(Style::Difference, const RenderStyle* oldStyle);
     void setNeedsLayoutForOverflowChange();
 
     // paintOffset is the offset from the origin of the GraphicsContext at which to paint the current object.
@@ -358,10 +359,10 @@ protected:
     };
     void propagateStyleToAnonymousChildren(StylePropagationType);
 
-    bool repaintBeforeStyleChange(StyleDifference, const RenderStyle& oldStyle, const RenderStyle& newStyle);
+    bool repaintBeforeStyleChange(Style::Difference, const RenderStyle& oldStyle, const RenderStyle& newStyle);
 
-    virtual void styleWillChange(StyleDifference, const RenderStyle& newStyle);
-    virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
+    virtual void styleWillChange(Style::Difference, const RenderStyle& newStyle);
+    virtual void styleDidChange(Style::Difference, const RenderStyle* oldStyle);
 
     void insertedIntoTree() override;
     void willBeRemovedFromTree() override;
@@ -414,13 +415,13 @@ private:
     // normal flow object.
     void handleDynamicFloatPositionChange();
 
-    bool shouldRepaintForStyleDifference(StyleDifference) const;
+    bool shouldRepaintForStyleDifference(Style::Difference) const;
 
     template<typename FillLayerType> void updateFillImages(const FillLayerType*, const FillLayerType*);
     void updateImage(StyleImage*, StyleImage*);
     void updateShapeImage(const Style::ShapeOutside*, const Style::ShapeOutside*);
 
-    StyleDifference adjustStyleDifference(StyleDifference, OptionSet<StyleDifferenceContextSensitiveProperty>) const;
+    Style::Difference adjustStyleDifference(Style::Difference) const;
 
     bool canDestroyDecodedData() const final { return !isVisibleInViewport(); }
     bool useSystemDarkAppearance() const final;

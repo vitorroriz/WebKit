@@ -98,6 +98,7 @@
 #include "SVGSVGElement.h"
 #include "Settings.h"
 #include "ShadowRoot.h"
+#include "StyleDifference.h"
 #include "StylePendingResources.h"
 #include "StylePrimitiveNumericTypes+Evaluation.h"
 #include "StyleResolver.h"
@@ -296,70 +297,69 @@ const RenderStyle& RenderElement::firstLineStyle() const
     return style();
 }
 
-StyleDifference RenderElement::adjustStyleDifference(StyleDifference diff, OptionSet<StyleDifferenceContextSensitiveProperty> contextSensitiveProperties) const
+Style::Difference RenderElement::adjustStyleDifference(Style::Difference diff) const
 {
     // If transform changed, and we are not composited, need to do a layout.
-    if (contextSensitiveProperties & StyleDifferenceContextSensitiveProperty::Transform) {
+    if (diff.contextSensitiveProperties & Style::DifferenceContextSensitiveProperty::Transform) {
         // FIXME: when transforms are taken into account for overflow, we will need to do a layout.
         if (!hasLayer() || !downcast<RenderLayerModelObject>(*this).layer()->isComposited()) {
             if (!hasLayer())
-                diff = std::max(diff, StyleDifference::Layout);
+                diff.result = std::max(diff.result, Style::DifferenceResult::Layout);
             else {
                 // We need to set at least Overflow, but if OutOfFlowMovementOnly is already set
                 // then we actually need OverflowAndOutOfFlowMovement.
-                diff = std::max(diff, (diff == StyleDifference::LayoutOutOfFlowMovementOnly) ? StyleDifference::OverflowAndOutOfFlowMovement : StyleDifference::Overflow);
+                diff.result = std::max(diff.result, (diff.result == Style::DifferenceResult::LayoutOutOfFlowMovementOnly) ? Style::DifferenceResult::OverflowAndOutOfFlowMovement : Style::DifferenceResult::Overflow);
             }
         } else
-            diff = std::max(diff, StyleDifference::RecompositeLayer);
+            diff.result = std::max(diff.result, Style::DifferenceResult::RecompositeLayer);
     }
 
-    if (contextSensitiveProperties & StyleDifferenceContextSensitiveProperty::Opacity) {
+    if (diff.contextSensitiveProperties & Style::DifferenceContextSensitiveProperty::Opacity) {
         if (!hasLayer() || !downcast<RenderLayerModelObject>(*this).layer()->isComposited())
-            diff = std::max(diff, StyleDifference::RepaintLayer);
+            diff.result = std::max(diff.result, Style::DifferenceResult::RepaintLayer);
         else
-            diff = std::max(diff, StyleDifference::RecompositeLayer);
+            diff.result = std::max(diff.result, Style::DifferenceResult::RecompositeLayer);
     }
 
-    if (contextSensitiveProperties & StyleDifferenceContextSensitiveProperty::ClipPath) {
+    if (diff.contextSensitiveProperties & Style::DifferenceContextSensitiveProperty::ClipPath) {
         if (hasLayer() && downcast<RenderLayerModelObject>(*this).layer()->willCompositeClipPath())
-            diff = std::max(diff, StyleDifference::RecompositeLayer);
+            diff.result = std::max(diff.result, Style::DifferenceResult::RecompositeLayer);
         else
-            diff = std::max(diff, StyleDifference::Repaint);
+            diff.result = std::max(diff.result, Style::DifferenceResult::Repaint);
     }
     
-    if (contextSensitiveProperties & StyleDifferenceContextSensitiveProperty::WillChange) {
+    if (diff.contextSensitiveProperties & Style::DifferenceContextSensitiveProperty::WillChange) {
         if (style().willChange().canTriggerCompositing())
-            diff = std::max(diff, StyleDifference::RecompositeLayer);
+            diff.result = std::max(diff.result, Style::DifferenceResult::RecompositeLayer);
     }
     
-    if ((contextSensitiveProperties & StyleDifferenceContextSensitiveProperty::Filter) && hasLayer()) {
+    if ((diff.contextSensitiveProperties & Style::DifferenceContextSensitiveProperty::Filter) && hasLayer()) {
         auto& layer = *downcast<RenderLayerModelObject>(*this).layer();
         if (!layer.isComposited() || layer.shouldPaintWithFilters())
-            diff = std::max(diff, StyleDifference::RepaintLayer);
+            diff.result = std::max(diff.result, Style::DifferenceResult::RepaintLayer);
         else
-            diff = std::max(diff, StyleDifference::RecompositeLayer);
+            diff.result = std::max(diff.result, Style::DifferenceResult::RecompositeLayer);
     }
 
     if (isHTMLMarquee())
-        diff = std::max(diff, StyleDifference::Layout);
+        diff.result = std::max(diff.result, Style::DifferenceResult::Layout);
 
     // The answer to requiresLayer() for plugins, iframes, and canvas can change without the actual
     // style changing, since it depends on whether we decide to composite these elements. When the
     // layer status of one of these elements changes, we need to force a layout.
-    if (diff < StyleDifference::Layout) {
+    if (diff < Style::DifferenceResult::Layout) {
         if (auto* modelObject = dynamicDowncast<RenderLayerModelObject>(*this)) {
             if (hasLayer() != modelObject->requiresLayer())
-                diff = StyleDifference::Layout;
+                diff.result = Style::DifferenceResult::Layout;
         }
     }
 
     // If we have no layer(), just treat a RepaintLayer hint as a normal Repaint.
-    if (diff == StyleDifference::RepaintLayer && !hasLayer())
-        diff = StyleDifference::Repaint;
+    if (diff == Style::DifferenceResult::RepaintLayer && !hasLayer())
+        diff.result = Style::DifferenceResult::Repaint;
 
     return diff;
 }
-
 
 static inline bool hasNonWhitespaceTextContent(const RenderElement& renderer)
 {
@@ -381,12 +381,12 @@ static inline bool hasNonWhitespaceTextContent(const RenderElement& renderer)
     return false;
 }
 
-inline bool RenderElement::shouldRepaintForStyleDifference(StyleDifference diff) const
+inline bool RenderElement::shouldRepaintForStyleDifference(Style::Difference diff) const
 {
-    if (diff == StyleDifference::Repaint)
+    if (diff == Style::DifferenceResult::Repaint)
         return true;
 
-    if (diff == StyleDifference::RepaintIfText) {
+    if (diff == Style::DifferenceResult::RepaintIfText) {
         if (hasNonWhitespaceTextContent(*this))
             return true;
         for (auto& blockChild : childrenOfType<RenderBlock>(*this)) {
@@ -463,7 +463,7 @@ void RenderElement::updateShapeImage(const Style::ShapeOutside* oldShapeValue, c
         updateImage(oldShapeValue ? oldShapeValue->image().get() : nullptr, newShapeValue ? newShapeValue->image().get() : nullptr);
 }
 
-bool RenderElement::repaintBeforeStyleChange(StyleDifference diff, const RenderStyle& oldStyle, const RenderStyle& newStyle)
+bool RenderElement::repaintBeforeStyleChange(Style::Difference diff, const RenderStyle& oldStyle, const RenderStyle& newStyle)
 {
     enum class RequiredRepaint { None, RendererOnly, RendererAndDescendantsRenderersWithLayers };
     auto shouldRepaintBeforeStyleChange = [&]() -> RequiredRepaint {
@@ -473,10 +473,10 @@ bool RenderElement::repaintBeforeStyleChange(StyleDifference diff, const RenderS
         }
 
         if (is<RenderLayerModelObject>(this) && hasLayer()) {
-            if (diff == StyleDifference::RepaintLayer)
+            if (diff == Style::DifferenceResult::RepaintLayer)
                 return RequiredRepaint::RendererAndDescendantsRenderersWithLayers;
 
-            if (diff == StyleDifference::Layout || diff == StyleDifference::Overflow) {
+            if (diff == Style::DifferenceResult::Layout || diff == Style::DifferenceResult::Overflow) {
                 // Certain style changes require layer repaint, since the layer could end up being destroyed.
                 auto layerMayGetDestroyed = oldStyle.position() != newStyle.position()
                     || oldStyle.usedZIndex() != newStyle.usedZIndex()
@@ -510,18 +510,18 @@ bool RenderElement::repaintBeforeStyleChange(StyleDifference diff, const RenderS
         // Note that RenderObject::setNeedsLayout issues setLayerNeedsFullRepaint on renderers with layers.
         if (is<RenderBox>(*this)) {
             if (oldStyle.position() != newStyle.position() && oldStyle.position() == PositionType::Static) {
-                ASSERT(diff == StyleDifference::Layout);
+                ASSERT(diff == Style::DifferenceResult::Layout);
                 return RequiredRepaint::RendererOnly;
             }
 
             auto willBecomeHiddenSkippedContent =  newStyle.usedContentVisibility() == ContentVisibility::Hidden && oldStyle.usedContentVisibility() != ContentVisibility::Hidden && oldStyle.usedVisibility() == Visibility::Visible;
             if (willBecomeHiddenSkippedContent) {
-                ASSERT(diff == StyleDifference::Layout);
+                ASSERT(diff == Style::DifferenceResult::Layout);
                 return RequiredRepaint::RendererOnly;
             }
         }
 
-        if (diff > StyleDifference::RepaintLayer && oldStyle.usedVisibility() != newStyle.usedVisibility()) {
+        if (diff > Style::DifferenceResult::RepaintLayer && oldStyle.usedVisibility() != newStyle.usedVisibility()) {
             if (CheckedPtr enclosingLayer = this->enclosingLayer()) {
                 bool rendererWillBeHidden = newStyle.usedVisibility() != Visibility::Visible;
                 if (rendererWillBeHidden && enclosingLayer->hasVisibleContent() && (this == &enclosingLayer->renderer() || enclosingLayer->renderer().style().usedVisibility() != Visibility::Visible))
@@ -529,7 +529,7 @@ bool RenderElement::repaintBeforeStyleChange(StyleDifference diff, const RenderS
             }
         }
 
-        if (diff == StyleDifference::Layout && parent()->writingMode().isBlockFlipped()) {
+        if (diff == Style::DifferenceResult::Layout && parent()->writingMode().isBlockFlipped()) {
             // FIXME: Repaint during (after) layout is currently broken for flipped writing modes in block direction (mostly affecting vertical-rl) (see webkit.org/b/70762)
             // This repaint call here ensures we invalidate at least the current rect which should cover the non-moving type of cases.
             return RequiredRepaint::RendererOnly;
@@ -566,9 +566,9 @@ void RenderElement::initializeStyle()
 {
     Style::loadPendingResources(m_style, protectedDocument(), protectedElement().get());
 
-    styleWillChange(StyleDifference::NewStyle, style());
+    styleWillChange(Style::DifferenceResult::NewStyle, style());
     m_hasInitializedStyle = true;
-    styleDidChange(StyleDifference::NewStyle, nullptr);
+    styleDidChange(Style::DifferenceResult::NewStyle, nullptr);
 
     // We shouldn't have any text children that would need styleDidChange at this point.
     ASSERT(!childrenOfType<RenderText>(*this).first());
@@ -581,38 +581,36 @@ void RenderElement::initializeStyle()
 }
 
 #if !LOG_DISABLED
-static void logStyleDifference(const RenderElement& renderer, const RenderStyle& style1, const RenderStyle& style2, StyleDifference diff, OptionSet<StyleDifferenceContextSensitiveProperty> contextSensitiveProperties)
+static void logStyleDifference(const RenderElement& renderer, const RenderStyle& style1, const RenderStyle& style2, Style::Difference diff)
 {
     if (LogStyle.state != WTFLogChannelState::On)
         return;
 
     TextStream diffStream(TextStream::LineMode::MultipleLine, TextStream::Formatting::NumberRespectingIntegers);
     diffStream.increaseIndent(2);
-    style1.dumpDifferences(diffStream, style2);
+    Style::dumpDifferences(diffStream, style1, style2);
     if (!diffStream.isEmpty())
-        LOG_WITH_STREAM(Style, stream << renderer << " style diff [" << diff << "] (context sensitive changes " << contextSensitiveProperties << "):\n" << diffStream.release());
+        LOG_WITH_STREAM(Style, stream << renderer << " " << diff << ":\n" << diffStream.release());
 }
 #endif
 
-void RenderElement::setStyle(RenderStyle&& style, StyleDifference minimalStyleDifference)
+void RenderElement::setStyle(RenderStyle&& style, Style::DifferenceResult minimalStyleDifference)
 {
     // FIXME: Should change RenderView so it can use initializeStyle too.
     // If we do that, we can assert m_hasInitializedStyle unconditionally,
     // and remove the check of m_hasInitializedStyle below too.
     ASSERT(m_hasInitializedStyle || isRenderView());
 
-    auto diff = StyleDifference::Equal;
-    OptionSet<StyleDifferenceContextSensitiveProperty> contextSensitiveProperties;
+    auto diff = Style::Difference { };
     if (m_hasInitializedStyle) {
-        diff = m_style.diff(style, contextSensitiveProperties);
+        diff = Style::difference(m_style, style);
 #if !LOG_DISABLED
-        logStyleDifference(*this, m_style, style, diff, contextSensitiveProperties);
+        logStyleDifference(*this, m_style, style, diff);
 #endif
     }
 
-    diff = std::max(diff, minimalStyleDifference);
-
-    diff = adjustStyleDifference(diff, contextSensitiveProperties);
+    diff.result = std::max(diff.result, minimalStyleDifference);
+    diff = adjustStyleDifference(diff);
 
     Style::loadPendingResources(style, protectedDocument(), protectedElement().get());
 
@@ -638,12 +636,12 @@ void RenderElement::setStyle(RenderStyle&& style, StyleDifference minimalStyleDi
 
     // Now that the layer (if any) has been updated, we need to adjust the diff again,
     // check whether we should layout now, and decide if we need to repaint.
-    StyleDifference updatedDiff = adjustStyleDifference(diff, contextSensitiveProperties);
-    
-    if (diff <= StyleDifference::LayoutOutOfFlowMovementOnly)
+    auto updatedDiff = adjustStyleDifference(diff);
+
+    if (diff <= Style::DifferenceResult::LayoutOutOfFlowMovementOnly)
         setNeedsLayoutForStyleDifference(updatedDiff, &oldStyle);
 
-    if (!didRepaint && (updatedDiff == StyleDifference::RepaintLayer || shouldRepaintForStyleDifference(updatedDiff))) {
+    if (!didRepaint && (updatedDiff.result == Style::DifferenceResult::RepaintLayer || shouldRepaintForStyleDifference(updatedDiff))) {
         // Do a repaint with the new style now, e.g., for example if we go from
         // not having an outline to having an outline.
         repaint();
@@ -653,7 +651,7 @@ void RenderElement::setStyle(RenderStyle&& style, StyleDifference minimalStyleDi
 void RenderElement::didAttachChild(RenderObject& child, RenderObject*)
 {
     if (CheckedPtr textRenderer = dynamicDowncast<RenderText>(child))
-        textRenderer->styleDidChange(StyleDifference::Equal, nullptr);
+        textRenderer->styleDidChange(Style::DifferenceResult::Equal, nullptr);
 
     // The following only applies to the legacy SVG engine -- LBSE always creates layers
     // independent of the position in the render tree, see comment in layerCreationAllowedForSubtree().
@@ -906,7 +904,7 @@ static inline bool rendererHasBackground(const RenderElement* renderer)
     return renderer && renderer->hasBackground();
 }
 
-void RenderElement::styleWillChange(StyleDifference diff, const RenderStyle& newStyle)
+void RenderElement::styleWillChange(Style::Difference diff, const RenderStyle& newStyle)
 {
     ASSERT(settings().shouldAllowUserInstalledFonts() || newStyle.fontDescription().shouldAllowUserInstalledFonts() == AllowUserInstalledFonts::No);
 
@@ -928,7 +926,7 @@ void RenderElement::styleWillChange(StyleDifference diff, const RenderStyle& new
     };
 
     if (oldStyle) {
-        if (diff >= StyleDifference::Repaint && layoutBox()) {
+        if (diff >= Style::DifferenceResult::Repaint && layoutBox()) {
             // FIXME: It is highly unlikely that a style mutation has effect on both the formatting context the box lives in
             // and the one it establishes but calling only one would require to come up with a list of properties that only affects one or the other.
             if (auto* inlineFormattingContextRoot = dynamicDowncast<RenderBlockFlow>(*this); inlineFormattingContextRoot && inlineFormattingContextRoot->inlineLayout())
@@ -1013,7 +1011,7 @@ void RenderElement::styleWillChange(StyleDifference diff, const RenderStyle& new
         invalidateEnclosingFragmentedFlowInfoIfNeeded();
 
         // reset style flags
-        if (diff == StyleDifference::Layout || diff == StyleDifference::LayoutOutOfFlowMovementOnly) {
+        if (diff == Style::DifferenceResult::Layout || diff == Style::DifferenceResult::LayoutOutOfFlowMovementOnly) {
             setFloating(false);
             clearPositionedState();
         }
@@ -1062,7 +1060,7 @@ inline void RenderCounter::rendererStyleChanged(RenderElement& renderer, const R
     rendererStyleChangedSlowCase(renderer, oldStyle, newStyle);
 }
 
-void RenderElement::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderElement::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     auto registerImages = [this](auto* style, auto* oldStyle) {
         if (!style && !oldStyle)
@@ -1083,16 +1081,16 @@ void RenderElement::styleDidChange(StyleDifference diff, const RenderStyle* oldS
 
     SVGRenderSupport::styleChanged(*this, oldStyle);
 
-    if (diff >= StyleDifference::Repaint) {
+    if (diff >= Style::DifferenceResult::Repaint) {
         updateReferencedSVGResources();
-        if (oldStyle && diff <= StyleDifference::RepaintLayer)
+        if (oldStyle && diff <= Style::DifferenceResult::RepaintLayer)
             repaintClientsOfReferencedSVGResources();
     }
 
     if (!m_parent)
         return;
     
-    if (diff == StyleDifference::Layout || diff == StyleDifference::Overflow) {
+    if (diff == Style::DifferenceResult::Layout || diff == Style::DifferenceResult::Overflow) {
         RenderCounter::rendererStyleChanged(*this, oldStyle, m_style);
 
         // If the object already needs layout, then setNeedsLayout won't do
@@ -1137,7 +1135,7 @@ void RenderElement::styleDidChange(StyleDifference diff, const RenderStyle* oldS
     }
 
     // FIXME: First line change on the block comes in as equal on inline boxes.
-    auto needsLayoutBoxStyleUpdate = (diff >= StyleDifference::Repaint || (is<RenderInline>(*this) && &style() != &firstLineStyle())) && layoutBox();
+    auto needsLayoutBoxStyleUpdate = (diff >= Style::DifferenceResult::Repaint || (is<RenderInline>(*this) && &style() != &firstLineStyle())) && layoutBox();
     if (needsLayoutBoxStyleUpdate)
         LayoutIntegration::LineLayout::updateStyle(*this);
 }
@@ -1252,7 +1250,7 @@ void RenderElement::setNeedsOutOfFlowMovementLayout(const RenderStyle* oldStyle)
     setNeedsOutOfFlowMovementLayoutBit(true);
     scheduleLayout(markContainingBlocksForLayout());
     if (hasLayer()) {
-        if (oldStyle && style().diffRequiresLayerRepaint(*oldStyle, downcast<RenderLayerModelObject>(*this).layer()->isComposited()))
+        if (oldStyle && Style::differenceRequiresLayerRepaint(style(), *oldStyle, downcast<RenderLayerModelObject>(*this).layer()->isComposited()))
             setLayerNeedsFullRepaint();
         else
             setLayerNeedsFullRepaintForOutOfFlowMovementLayout();
@@ -1268,16 +1266,16 @@ void RenderElement::clearChildNeedsLayout()
     setOutOfFlowChildNeedsStaticPositionLayoutBit(false);
 }
 
-void RenderElement::setNeedsLayoutForStyleDifference(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderElement::setNeedsLayoutForStyleDifference(Style::Difference diff, const RenderStyle* oldStyle)
 {
-    if (diff == StyleDifference::Layout)
+    if (diff == Style::DifferenceResult::Layout)
         setNeedsLayoutAndPreferredWidthsUpdate();
-    else if (diff == StyleDifference::LayoutOutOfFlowMovementOnly)
+    else if (diff == Style::DifferenceResult::LayoutOutOfFlowMovementOnly)
         setNeedsOutOfFlowMovementLayout(oldStyle);
-    else if (diff == StyleDifference::OverflowAndOutOfFlowMovement) {
+    else if (diff == Style::DifferenceResult::OverflowAndOutOfFlowMovement) {
         setNeedsOutOfFlowMovementLayout(oldStyle);
         setNeedsLayoutForOverflowChange();
-    } else if (diff == StyleDifference::Overflow)
+    } else if (diff == Style::DifferenceResult::Overflow)
         setNeedsLayoutForOverflowChange();
 }
 

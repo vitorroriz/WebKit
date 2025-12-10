@@ -29,6 +29,7 @@
 namespace WebCore {
 
 class RenderStyle;
+class RenderStyleProperties;
 class StyleBoxData;
 
 namespace Style {

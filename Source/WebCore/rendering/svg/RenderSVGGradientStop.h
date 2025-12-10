@@ -39,7 +39,7 @@ public:
     inline SVGStopElement& element() const;
 
 private:
-    void styleDidChange(StyleDifference, const RenderStyle* oldStyle) override;
+    void styleDidChange(Style::Difference, const RenderStyle* oldStyle) override;
 
     void layout() override;
 

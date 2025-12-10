@@ -2177,9 +2177,9 @@ void RenderLayerCompositor::layerGainedCompositedScrollableOverflow(RenderLayer&
     backing->updateConfigurationAfterStyleChange();
 }
 
-void RenderLayerCompositor::layerStyleChanged(StyleDifference diff, RenderLayer& layer, const RenderStyle* oldStyle)
+void RenderLayerCompositor::layerStyleChanged(Style::Difference diff, RenderLayer& layer, const RenderStyle* oldStyle)
 {
-    if (diff == StyleDifference::Equal)
+    if (diff == Style::DifferenceResult::Equal)
         return;
 
     // Create or destroy backing here so that code that runs during layout can reliably use isComposited() (though this
@@ -2197,12 +2197,12 @@ void RenderLayerCompositor::layerStyleChanged(StyleDifference diff, RenderLayer&
     const auto& newStyle = layer.renderer().style();
 
     if (hasContentCompositingLayers()) {
-        if (diff >= StyleDifference::LayoutOutOfFlowMovementOnly) {
+        if (diff >= Style::DifferenceResult::LayoutOutOfFlowMovementOnly) {
             layer.setNeedsPostLayoutCompositingUpdate();
             layer.setNeedsCompositingGeometryUpdate();
         }
 
-        if (diff >= StyleDifference::Layout) {
+        if (diff >= Style::DifferenceResult::Layout) {
             // FIXME: only set flags here if we know we have a composited descendant, but we might not know at this point.
             if (oldStyle && clippingChanged(*oldStyle, newStyle)) {
                 if (layer.isStackingContext()) {
@@ -2236,7 +2236,7 @@ void RenderLayerCompositor::layerStyleChanged(StyleDifference diff, RenderLayer&
         }
     }
 
-    if (diff >= StyleDifference::Repaint && oldStyle) {
+    if (diff >= Style::DifferenceResult::Repaint && oldStyle) {
         // This ensures that we update border-radius clips on layers that are descendants in containing-block order but not paint order. This is necessary even when
         // the current layer is not composited.
         bool changeAffectsClippingOfNonPaintOrderDescendants = !layer.isStackingContext() && layer.renderer().hasNonVisibleOverflow() && oldStyle->border() != newStyle.border();
@@ -2267,7 +2267,7 @@ void RenderLayerCompositor::layerStyleChanged(StyleDifference diff, RenderLayer&
 
     backing->updateConfigurationAfterStyleChange();
 
-    if (diff >= StyleDifference::Repaint) {
+    if (diff >= Style::DifferenceResult::Repaint) {
         // Visibility change may affect geometry of the enclosing composited layer.
         if (oldStyle && oldStyle->usedVisibility() != newStyle.usedVisibility())
             layer.setNeedsCompositingGeometryUpdate();
@@ -2283,7 +2283,7 @@ void RenderLayerCompositor::layerStyleChanged(StyleDifference diff, RenderLayer&
             layer.setNeedsCompositingConfigurationUpdate();
     }
 
-    if (diff >= StyleDifference::RecompositeLayer) {
+    if (diff >= Style::DifferenceResult::RecompositeLayer) {
         if (layer.isComposited()) {
             bool hitTestingStateChanged = oldStyle && (oldStyle->usedPointerEvents() != newStyle.usedPointerEvents());
             if (is<RenderWidget>(layer.renderer()) || hitTestingStateChanged) {

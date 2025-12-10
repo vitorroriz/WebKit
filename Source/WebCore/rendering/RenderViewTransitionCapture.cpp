@@ -116,7 +116,7 @@ void RenderViewTransitionCapture::updateFromStyle()
         setHasNonVisibleOverflow();
 }
 
-void RenderViewTransitionCapture::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderViewTransitionCapture::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderReplaced::styleDidChange(diff, oldStyle);
 

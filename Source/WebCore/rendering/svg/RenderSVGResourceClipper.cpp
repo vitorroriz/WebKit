@@ -249,7 +249,7 @@ bool RenderSVGResourceClipper::needsHasSVGTransformFlags() const
     return protectedClipPathElement()->hasTransformRelatedAttributes();
 }
 
-void RenderSVGResourceClipper::styleDidChange(StyleDifference diff, const RenderStyle* oldStyle)
+void RenderSVGResourceClipper::styleDidChange(Style::Difference diff, const RenderStyle* oldStyle)
 {
     RenderSVGHiddenContainer::styleDidChange(diff, oldStyle);
 
