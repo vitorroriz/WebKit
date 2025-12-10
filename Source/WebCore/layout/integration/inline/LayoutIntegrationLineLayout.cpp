@@ -57,8 +57,10 @@
 #include "RenderLayer.h"
 #include "RenderLayoutState.h"
 #include "RenderLineBreak.h"
+#include "RenderObjectInlines.h"
 #include "RenderView.h"
 #include "SVGTextFragment.h"
+#include "Settings.h"
 #include "ShapeOutsideInfo.h"
 #include <ranges>
 #include <wtf/Assertions.h>
@@ -260,43 +262,47 @@ bool LineLayout::contains(const RenderElement& renderer) const
 LineLayout* LineLayout::containing(RenderObject& renderer)
 {
     if (!isContentRenderer(renderer))
-        return nullptr;
+        return { };
 
     if (!renderer.isInline()) {
         // IFC may contain block level boxes (floats and out-of-flow boxes).
         if (renderer.isRenderSVGBlock()) {
             // SVG content inside svg root shows up as block (see RenderSVGBlock). We only support inline root svg as "atomic content".
-            return nullptr;
+            return { };
         }
         if (renderer.isRenderFrameSet()) {
             // Since RenderFrameSet is not a RenderBlock, finding container for nested framesets can't use containingBlock ancestor walk.
             if (auto* parent = dynamicDowncast<RenderBlockFlow>(renderer.parent()))
                 return parent->inlineLayout();
-            return nullptr;
+            return { };
         }
-        auto adjustedContainingBlock = [&] {
-            RenderElement* containingBlock = nullptr;
-            // Only out of flow and floating block level boxes may participate in IFC.
+        auto adjustedContainingBlock = [&]() -> RenderBlockFlow* {
             if (renderer.isOutOfFlowPositioned()) {
                 // Here we are looking for the containing block as if the out-of-flow box was inflow (for static position purpose).
-                containingBlock = renderer.parent();
+                auto* containingBlock = renderer.parent();
                 if (is<RenderInline>(containingBlock))
                     containingBlock = containingBlock->containingBlock();
-            } else if (renderer.isFloating()) {
-                // Note that containigBlock() on boxes in top layer (i.e. dialog) may return incorrect result during style change even with not-yet-updated style.
-                containingBlock = RenderObject::containingBlockForPositionType(downcast<RenderBox>(renderer).style().position(), renderer);
+                return dynamicDowncast<RenderBlockFlow>(containingBlock);
             }
-            return dynamicDowncast<RenderBlockFlow>(containingBlock);
+            if (renderer.isFloating()) {
+                // Note that containigBlock() on boxes in top layer (i.e. dialog) may return incorrect result during style change even with not-yet-updated style.
+                return dynamicDowncast<RenderBlockFlow>(RenderObject::containingBlockForPositionType(downcast<RenderBox>(renderer).style().position(), renderer));
+            }
+            if (auto* parentInlineBox = dynamicDowncast<RenderInline>(renderer.parent())) {
+                ASSERT(parentInlineBox->settings().blocksInInlineLayoutEnabled());
+                return dynamicDowncast<RenderBlockFlow>(parentInlineBox->containingBlock());
+            }
+            return { };
         };
         if (auto* blockContainer = adjustedContainingBlock())
             return blockContainer->inlineLayout();
-        return nullptr;
+        return { };
     }
 
     if (auto* container = blockContainer(renderer))
         return container->inlineLayout();
 
-    return nullptr;
+    return { };
 }
 
 const LineLayout* LineLayout::containing(const RenderObject& renderer)
