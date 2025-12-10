@@ -2392,6 +2392,7 @@ GUniquePtr<GstStructure> GStreamerMediaEndpoint::preprocessStats(const GRefPtr<G
             return TRUE;
         });
     };
+    GUniquePtr<GstStructure> result(gst_structure_copy(stats));
     if (!pad) {
         auto peerConnectionBackend = this->peerConnectionBackend();
         if (!peerConnectionBackend)
@@ -2399,16 +2400,25 @@ GUniquePtr<GstStructure> GStreamerMediaEndpoint::preprocessStats(const GRefPtr<G
 
         for (auto& sender : peerConnectionBackend->connection().getSenders()) {
             auto& backend = peerConnectionBackend->backendFromRTPSender(sender);
-            GUniquePtr<GstStructure> stats;
-            if (auto* videoSource = backend.videoSource())
+            GUniquePtr<GstStructure> stats, captureStats;
+            ASCIILiteral captureStatsName;
+            if (auto* videoSource = backend.videoSource()) {
                 stats = videoSource->stats();
-            else if (auto audioSource = backend.audioSource())
+                captureStats = videoSource->mediaCaptureStats();
+                captureStatsName = "video-source-capture-stats"_s;
+            } else if (auto audioSource = backend.audioSource()) {
                 stats = audioSource->stats();
+                captureStats = audioSource->mediaCaptureStats();
+                captureStatsName = "audio-source-capture-stats"_s;
+            }
 
-            if (!stats)
+            if (stats)
+                mergeStructureInAdditionalStats(stats.get());
+
+            if (!captureStats)
                 continue;
 
-            mergeStructureInAdditionalStats(stats.get());
+            gst_structure_set(result.get(), captureStatsName.characters(), GST_TYPE_STRUCTURE, captureStats.get(), nullptr);
         }
         for (auto& receiver : peerConnectionBackend->connection().getReceivers()) {
             auto& track = receiver.get().track();
@@ -2440,7 +2450,6 @@ GUniquePtr<GstStructure> GStreamerMediaEndpoint::preprocessStats(const GRefPtr<G
     bool hasInboundVideoStats = false;
     bool hasOutboundVideoStats = false;
     Seconds convertedTimestamp;
-    GUniquePtr<GstStructure> result(gst_structure_copy(stats));
     gstStructureMapInPlace(result.get(), [&](auto, auto value) -> bool {
         if (!GST_VALUE_HOLDS_STRUCTURE(value))
             return TRUE;
@@ -2606,12 +2615,10 @@ void GStreamerMediaEndpoint::processStatsItem(const GValue* value)
         return;
 
     const GstStructure* structure = gst_value_get_structure(value);
-    GstWebRTCStatsType statsType;
-    if (!gst_structure_get(structure, "type", GST_TYPE_WEBRTC_STATS_TYPE, &statsType, nullptr))
-        return;
 
     // Just check a single timestamp, inbound RTP for instance.
-    if (!m_statsFirstDeliveredTimestamp && statsType == GST_WEBRTC_STATS_INBOUND_RTP) {
+    GstWebRTCStatsType statsType;
+    if (!m_statsFirstDeliveredTimestamp && gst_structure_get(structure, "type", GST_TYPE_WEBRTC_STATS_TYPE, &statsType, nullptr) && statsType == GST_WEBRTC_STATS_INBOUND_RTP) {
         if (auto timestamp = gstStructureGet<double>(structure, "timestamp"_s)) {
             auto ts = Seconds::fromMilliseconds(*timestamp);
             m_statsFirstDeliveredTimestamp = ts;

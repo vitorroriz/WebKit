@@ -287,6 +287,44 @@ RTCStatsReport::IceCandidatePairStats::IceCandidatePairStats(const GstStructure*
     // stats.consentResponsesSent =
 }
 
+RTCStatsReport::CertificateStats::CertificateStats(const GstStructure* structure)
+    : Stats(Type::Certificate, structure)
+    , fingerprint(gstStructureGetString(structure, "fingerprint"_s).span())
+    , fingerprintAlgorithm(gstStructureGetString(structure, "fingerprint-algorithm"_s).span())
+    , base64Certificate(gstStructureGetString(structure, "base64-certificate"_s).span())
+
+{
+    // FIXME: Fill issuerCertificateId if present.
+}
+
+RTCStatsReport::MediaSourceStats::MediaSourceStats(Type type, const GstStructure* structure)
+    : Stats(type, structure)
+    , trackIdentifier(gstStructureGetString(structure, "track-identifier"_s).span())
+    , kind(gstStructureGetString(structure, "kind"_s).span())
+{
+}
+
+RTCStatsReport::AudioSourceStats::AudioSourceStats(const GstStructure* structure)
+    : MediaSourceStats(Type::MediaSource, structure)
+    , audioLevel(gstStructureGet<double>(structure, "audio-level"_s))
+    , totalAudioEnergy(gstStructureGet<double>(structure, "total-audio-energy"_s))
+    , totalSamplesDuration(gstStructureGet<double>(structure, "total-samples-duration"_s))
+{
+    /* FIXME:
+        std::optional<double> echoReturnLoss;
+        std::optional<double> echoReturnLossEnhancement;
+     */
+}
+
+RTCStatsReport::VideoSourceStats::VideoSourceStats(const GstStructure* structure)
+    : MediaSourceStats(Type::MediaSource, structure)
+    , width(gstStructureGet<unsigned>(structure, "width"_s))
+    , height(gstStructureGet<unsigned>(structure, "height"_s))
+    , frames(gstStructureGet<unsigned>(structure, "frames"_s))
+    , framesPerSecond(gstStructureGet<double>(structure, "frames-per-second"_s))
+{
+}
+
 struct ReportHolder : public ThreadSafeRefCounted<ReportHolder> {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(ReportHolder);
     WTF_MAKE_NONCOPYABLE(ReportHolder);
@@ -303,14 +341,28 @@ static gboolean fillReportCallback(const GValue* value, Ref<ReportHolder>& repor
         return TRUE;
 
     const GstStructure* structure = gst_value_get_structure(value);
-    GstWebRTCStatsType statsType;
-    if (!gst_structure_get(structure, "type", GST_TYPE_WEBRTC_STATS_TYPE, &statsType, nullptr))
-        return TRUE;
 
     if (!reportHolder->adapter) [[unlikely]]
         return TRUE;
 
     auto& report = *reportHolder->adapter;
+
+    if (auto webkitStatsType = gstStructureGetString(structure, "webkit-stats-type"_s)) {
+        if (webkitStatsType == "audio-source-stats"_s) {
+            RTCStatsReport::AudioSourceStats stats(structure);
+            report.set<IDLDOMString, IDLDictionary<RTCStatsReport::AudioSourceStats>>(stats.id, WTFMove(stats));
+            return TRUE;
+        }
+        if (webkitStatsType == "video-source-stats"_s) {
+            RTCStatsReport::VideoSourceStats stats(structure);
+            report.set<IDLDOMString, IDLDictionary<RTCStatsReport::VideoSourceStats>>(stats.id, WTFMove(stats));
+            return TRUE;
+        }
+    }
+
+    GstWebRTCStatsType statsType;
+    if (!gst_structure_get(structure, "type", GST_TYPE_WEBRTC_STATS_TYPE, &statsType, nullptr))
+        return TRUE;
 
     switch (statsType) {
     case GST_WEBRTC_STATS_CODEC: {
@@ -370,9 +422,12 @@ static gboolean fillReportCallback(const GValue* value, Ref<ReportHolder>& repor
             report.set<IDLDOMString, IDLDictionary<RTCStatsReport::IceCandidatePairStats>>(stats.id, WTFMove(stats));
         }
         break;
-    case GST_WEBRTC_STATS_CERTIFICATE:
-        // FIXME: Missing certificate stats support
+    case GST_WEBRTC_STATS_CERTIFICATE: {
+        // https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/10313
+        RTCStatsReport::CertificateStats stats(structure);
+        report.set<IDLDOMString, IDLDictionary<RTCStatsReport::CertificateStats>>(stats.id, WTFMove(stats));
         break;
+    }
     }
 
     return TRUE;

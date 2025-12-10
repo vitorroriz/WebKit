@@ -393,6 +393,8 @@ public:
 
         m_hasPushedInitialSample = true;
         gst_app_src_push_sample(GST_APP_SRC(m_src.get()), sample.get());
+
+        updateStats(sample.get());
     }
 
     void trackStarted(MediaStreamTrackPrivate&) final { };
@@ -565,6 +567,8 @@ public:
     void updateFirstVideoSampleSeenFlag();
     bool receivedAudioSampleBeforeVideo();
 
+    const GstStructure* stats() const { return m_stats.get(); }
+
 private:
     InternalSource(GstElement* parent, MediaStreamTrackPrivate& track, const String& padName, bool consumerIsVideoPlayer)
         : m_parent(parent)
@@ -645,6 +649,21 @@ private:
                 GST_DEBUG_OBJECT(self->m_src.get(), "Latency from capture source is min: %" GST_TIME_FORMAT " max: %" GST_TIME_FORMAT, GST_TIME_ARGS(minLatency), GST_TIME_ARGS(maxLatency));
                 if (GST_CLOCK_TIME_IS_VALID(minLatency) && GST_CLOCK_TIME_IS_VALID(maxLatency)) {
                     gst_query_set_latency(query, TRUE, minLatency, maxLatency);
+                    return GST_PAD_PROBE_HANDLED;
+                }
+                break;
+            }
+            case GST_QUERY_CUSTOM: {
+                auto structure = gst_query_writable_structure(query);
+                if (gst_structure_has_name(structure, "webkit-media-source-stats")) {
+                    const auto stats = self->stats();
+                    if (!stats)
+                        return GST_PAD_PROBE_OK;
+
+                    gstStructureForeach(stats, [&](auto id, const auto* value) {
+                        gstStructureIdSetValue(structure, id, value);
+                        return true;
+                    });
                     return GST_PAD_PROBE_HANDLED;
                 }
                 break;
@@ -757,6 +776,66 @@ private:
         }), this);
     }
 
+    void updateStats(const GRefPtr<GstSample>& sample)
+    {
+        // Update stats only for capture sources.
+        if (!m_trackSource)
+            return;
+
+        if (m_isVideoTrack) {
+            if (!m_stats)
+                m_stats.reset(gst_structure_new_empty("video-stats"));
+
+            auto frames = gstStructureGet<unsigned>(m_stats.get(), "frames"_s).value_or(0);
+            gst_structure_set(m_stats.get(), "width", G_TYPE_UINT, m_configuredSize.width(), "height", G_TYPE_UINT, m_configuredSize.height(), "frames", G_TYPE_UINT, frames + 1, nullptr);
+
+            // https://www.w3.org/TR/webrtc-stats/#dom-rtcvideosourcestats-framespersecond
+            // The number of frames originating from this source, measured during the last second.
+            // For the first second of this object's lifetime this member MUST NOT exist.
+            auto now = MonotonicTime::now().secondsSinceEpoch();
+            auto [timeStamp, totalFramesSinceLastMeasurement] = m_frameRateStats;
+            if (timeStamp.isNaN())
+                m_frameRateStats = { now, 1 };
+            else if (now - timeStamp >= 1_s) {
+                gst_structure_set(m_stats.get(), "frames-per-second", G_TYPE_UINT, totalFramesSinceLastMeasurement + 1, nullptr);
+                m_frameRateStats = { now, 0 };
+            } else
+                m_frameRateStats = { timeStamp, totalFramesSinceLastMeasurement + 1 };
+
+            return;
+        }
+
+        if (!m_stats)
+            m_stats.reset(gst_structure_new_empty("audio-stats"));
+
+        GstAudioInfo info;
+        gst_audio_info_from_caps(&info, gst_sample_get_caps(sample.get()));
+
+        auto buffer = gst_sample_get_buffer(sample.get());
+        auto samplesPerChannel = static_cast<double>(gst_buffer_get_size(buffer)) / GST_AUDIO_INFO_BPF(&info) / GST_AUDIO_INFO_CHANNELS(&info);
+        auto duration = samplesPerChannel / GST_AUDIO_INFO_RATE(&info);
+
+        // Update level approximately 9 times per second, like LibWebRTC.
+        if (m_audioSamplesCountSinceLastTotalEnergyCalculation++ == 10) {
+            m_audioSamplesCountSinceLastTotalEnergyCalculation = 0;
+
+#if GST_CHECK_VERSION(1, 20, 0)
+            if (auto audioLevelMeta = gst_buffer_get_audio_level_meta(buffer)) {
+                // The level exposed in the meta is expressed in -dBov (DeciBel relative to overload), so convert back to dBov.
+                auto levelDBov = -audioLevelMeta->level;
+                // Convert to [0.0, 1.0] amplitude range where 0.0 is silence.
+                m_audioLevel = levelDBov == -127 ? 0 : powf(10.0f, levelDBov / 20.0f);
+            }
+
+            m_totalAudioEnergy += m_audioLevel * m_audioLevel * duration;
+#endif
+        }
+
+        m_totalAudioSamplesDuration += duration;
+        gst_structure_set(m_stats.get(), "total-samples-duration", G_TYPE_DOUBLE, m_totalAudioSamplesDuration,
+            "total-audio-energy", G_TYPE_DOUBLE, m_totalAudioEnergy, "audio-level", G_TYPE_DOUBLE, m_audioLevel, nullptr);
+    }
+
     GstElement* m_parent { nullptr };
     RefPtr<MediaStreamTrackPrivate> m_track;
     RefPtr<RealtimeMediaSource> m_trackSource;
@@ -784,6 +863,12 @@ private:
     bool m_isIncomingVideoSource { false };
     GRefPtr<GstStream> m_stream;
     bool m_isVideoTrack { false };
+    std::pair<Seconds, unsigned> m_frameRateStats { Seconds::nan(), 0 };
+    double m_audioLevel;
+    double m_totalAudioSamplesDuration;
+    double m_totalAudioEnergy;
+    unsigned m_audioSamplesCountSinceLastTotalEnergyCalculation { 0 };
+    GUniquePtr<GstStructure> m_stats;
 };
 
 struct _WebKitMediaStreamSrcPrivate {
