@@ -2318,10 +2318,21 @@ std::tuple<Ref<WebProcessProxy>, RefPtr<SuspendedPageProxy>, ASCIILiteral> WebPr
 
     // If it is the first navigation in a DOM popup and there is no opener, then force a process swap no matter what since
     // popup windows are originally created in their opener's process.
+    // However, if the navigation is same-site with the related page (the opener), keep them in the same process,
+    // IFF the page was initially opened with noopener. If openerFrameIdentifier is set,
+    // the page was originally opened with an opener but COOP severed it, so we should still swap processes.
     // Note that we currently do not process swap if the window popup has a name. In theory, we should be able to swap in this case too
     // but we would need to transfer over the name to the new process. At this point, it is not clear it is worth the extra complexity.
-    if (page.openedByDOM() && !navigation.openedByDOMWithOpener() && !page.hasCommittedAnyProvisionalLoads() && frameInfo.frameName.isEmpty() && !targetURL.protocolIsBlob())
-        return { createNewProcess(), nullptr, "Process swap because this is a first navigation in a DOM popup without opener"_s };
+    if (page.openedByDOM() && !navigation.openedByDOMWithOpener() && !page.hasCommittedAnyProvisionalLoads() && frameInfo.frameName.isEmpty() && !targetURL.protocolIsBlob()) {
+        bool isSameSiteWithRelatedPage = false;
+        if (!page.openerFrameIdentifier() && pageConfiguration->relatedPage()) {
+            RefPtr relatedPage = pageConfiguration->relatedPage();
+            URL relatedPageURL { relatedPage->pageLoadState().url() };
+            isSameSiteWithRelatedPage = relatedPageURL.isValid() && targetSite.matches(relatedPageURL);
+        }
+        if (!isSameSiteWithRelatedPage)
+            return { createNewProcess(), nullptr, "Process swap because this is a first navigation in a DOM popup without opener"_s };
+    }
 
     if (navigation.treatAsSameOriginNavigation())
         return { WTFMove(sourceProcess), nullptr, "The treatAsSameOriginNavigation flag is set"_s };

@@ -1404,8 +1404,8 @@ TEST(ProcessSwap, CrossOriginButSameSiteWindowOpenNoOpener)
     auto pid2 = [createdWebView _webProcessIdentifier];
     EXPECT_TRUE(!!pid2);
 
-    // Since there is no opener, we process-swap, even though the navigation is same-site.
-    EXPECT_NE(pid1, pid2);
+    // Same-site navigations without opener still share the same process.
+    EXPECT_EQ(pid1, pid2);
 }
 
 static void enableSiteIsolationForPSONTest(WKWebViewConfiguration *configuration)
@@ -1502,8 +1502,8 @@ static void runSameSiteWindowOpenNoOpenerTest(WindowHasName windowHasName)
     auto pid2 = [createdWebView _webProcessIdentifier];
     EXPECT_TRUE(!!pid2);
 
-    // Since there is no opener, we process-swap, even though the navigation is same-site.
-    EXPECT_NE(pid1, pid2);
+    // Same-site navigations without opener still share the same process.
+    EXPECT_EQ(pid1, pid2);
 
     done = false;
     request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"pson://www.webkit.org/popup2.html"]];
@@ -1520,7 +1520,7 @@ static void runSameSiteWindowOpenNoOpenerTest(WindowHasName windowHasName)
 
 TEST(ProcessSwap, SameSiteWindowOpenNoOpener)
 {
-    // We process-swap even though the navigation is same-site, because the popup has no opener.
+    // Same-site navigations without opener still share the same process.
     runSameSiteWindowOpenNoOpenerTest(WindowHasName::No);
 }
 
@@ -1689,8 +1689,8 @@ TEST(ProcessSwap, SameSiteBlankTargetNoOpener)
     auto pid2 = [createdWebView _webProcessIdentifier];
     EXPECT_TRUE(!!pid2);
 
-    // Since there is no opener, we process-swap, even though the navigation is same-site.
-    EXPECT_NE(pid1, pid2);
+    // Same-site navigations without opener still share the same process.
+    EXPECT_EQ(pid1, pid2);
 }
 
 TEST(ProcessSwap, ServerRedirectFromNewWebView)
@@ -6833,8 +6833,8 @@ TEST(ProcessSwap, GoBackToSuspendedPageWithMainFrameIDThatIsNotOne)
     EXPECT_WK_STREQ(@"pson://www.webkit.org/main2.html", [[createdWebView URL] absoluteString]);
     auto pid2 = [createdWebView _webProcessIdentifier];
 
-    // We process-swap since there is no opener relationship.
-    EXPECT_NE(pid1, pid2);
+    // Same-site navigations without opener still share the same process.
+    EXPECT_EQ(pid1, pid2);
 
     // Click link in new WKWebView so that it navigates cross-site to apple.com.
     [createdWebView evaluateJavaScript:@"testLink.click()" completionHandler:nil];
@@ -9827,3 +9827,95 @@ TEST(ProcessSwap, MouseEventDuringCrossSiteProvisionalNavigation)
     done = false;
 }
 #endif
+
+TEST(ProcessSwap, CrossSiteWindowOpenNoOpenerUsesNewProcess)
+{
+    using namespace TestWebKitAPI;
+    HTTPServer server({
+        { "/main.html"_s, { "<script>window.open('https://other.com/opened.html', '_blank', 'noopener')</script>"_s } },
+        { "/opened.html"_s, { "opened page"_s } }
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto configuration = server.httpsProxyConfiguration();
+    configuration.preferences.javaScriptCanOpenWindowsAutomatically = YES;
+
+    auto webView = adoptNS([[WKWebView alloc] initWithFrame:CGRectZero configuration:configuration]);
+    __block RetainPtr<WKWebView> openedWebView;
+    __block RetainPtr<TestNavigationDelegate> openedNavigationDelegate;
+    __block bool openedPageLoaded = false;
+
+    auto navigationDelegate = adoptNS([TestNavigationDelegate new]);
+    [navigationDelegate allowAnyTLSCertificate];
+    [webView setNavigationDelegate:navigationDelegate.get()];
+
+    auto uiDelegate = adoptNS([TestUIDelegate new]);
+    uiDelegate.get().createWebViewWithConfiguration = ^WKWebView *(WKWebViewConfiguration *config, WKNavigationAction *, WKWindowFeatures *) {
+        openedWebView = adoptNS([[WKWebView alloc] initWithFrame:CGRectZero configuration:config]);
+        openedNavigationDelegate = adoptNS([TestNavigationDelegate new]);
+        [openedNavigationDelegate allowAnyTLSCertificate];
+        openedNavigationDelegate.get().didFinishNavigation = ^(WKWebView *, WKNavigation *) {
+            openedPageLoaded = true;
+        };
+        [openedWebView setNavigationDelegate:openedNavigationDelegate.get()];
+        return openedWebView.get();
+    };
+    [webView setUIDelegate:uiDelegate.get()];
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/main.html"]]];
+
+    Util::run(&openedPageLoaded);
+
+    auto pid1 = [webView _webProcessIdentifier];
+    auto pid2 = [openedWebView _webProcessIdentifier];
+
+    EXPECT_TRUE(!!pid1);
+    EXPECT_TRUE(!!pid2);
+    // Cross-site window.open with noopener should use a different process.
+    EXPECT_NE(pid1, pid2);
+}
+
+TEST(ProcessSwap, CrossSiteLinkTargetBlankNoOpenerUsesNewProcess)
+{
+    using namespace TestWebKitAPI;
+    HTTPServer server({
+        { "/main.html"_s, { "<a id='link' href='https://other.com/opened.html' target='_blank' rel='noopener'>click</a><script>document.getElementById('link').click()</script>"_s } },
+        { "/opened.html"_s, { "opened page"_s } }
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto configuration = server.httpsProxyConfiguration();
+    configuration.preferences.javaScriptCanOpenWindowsAutomatically = YES;
+
+    auto webView = adoptNS([[WKWebView alloc] initWithFrame:CGRectZero configuration:configuration]);
+    __block RetainPtr<WKWebView> openedWebView;
+    __block RetainPtr<TestNavigationDelegate> openedNavigationDelegate;
+    __block bool openedPageLoaded = false;
+
+    auto navigationDelegate = adoptNS([TestNavigationDelegate new]);
+    [navigationDelegate allowAnyTLSCertificate];
+    [webView setNavigationDelegate:navigationDelegate.get()];
+
+    auto uiDelegate = adoptNS([TestUIDelegate new]);
+    uiDelegate.get().createWebViewWithConfiguration = ^WKWebView *(WKWebViewConfiguration *config, WKNavigationAction *, WKWindowFeatures *) {
+        openedWebView = adoptNS([[WKWebView alloc] initWithFrame:CGRectZero configuration:config]);
+        openedNavigationDelegate = adoptNS([TestNavigationDelegate new]);
+        [openedNavigationDelegate allowAnyTLSCertificate];
+        openedNavigationDelegate.get().didFinishNavigation = ^(WKWebView *, WKNavigation *) {
+            openedPageLoaded = true;
+        };
+        [openedWebView setNavigationDelegate:openedNavigationDelegate.get()];
+        return openedWebView.get();
+    };
+    [webView setUIDelegate:uiDelegate.get()];
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/main.html"]]];
+
+    Util::run(&openedPageLoaded);
+
+    auto pid1 = [webView _webProcessIdentifier];
+    auto pid2 = [openedWebView _webProcessIdentifier];
+
+    EXPECT_TRUE(!!pid1);
+    EXPECT_TRUE(!!pid2);
+    // Cross-site link with target=_blank and rel=noopener should use a different process.
+    EXPECT_NE(pid1, pid2);
+}
