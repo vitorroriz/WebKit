@@ -203,7 +203,7 @@
             "contextsAllowed": ["attribute", "operation", "interface"]
         },
         "EnabledForWorld": {
-            "contextsAllowed": ["attribute", "operation", "interface"],
+            "contextsAllowed": ["attribute", "operation", "interface", "dictionary-member"],
             "values": ["*"],
             "supportsConjunction": true
         },
