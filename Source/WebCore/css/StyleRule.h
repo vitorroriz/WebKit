@@ -31,11 +31,11 @@
 #include <WebCore/MediaQuery.h>
 #include <WebCore/StyleRuleType.h>
 #include <map>
+#include <wtf/FixedVector.h>
 #include <wtf/NoVirtualDestructorBase.h>
 #include <wtf/Ref.h>
 #include <wtf/RefPtr.h>
 #include <wtf/TypeCasts.h>
-#include <wtf/UniqueArray.h>
 #include <wtf/text/TextStream.h>
 
 namespace WebCore {
@@ -144,7 +144,7 @@ public:
     void adoptSelectorList(CSSSelectorList&&);
 #if ENABLE(CSS_SELECTOR_JIT)
     CompiledSelector& compiledSelectorForListIndex(unsigned index) const;
-    void releaseCompiledSelectors() const { m_compiledSelectors = nullptr; }
+    void releaseCompiledSelectors() const { m_compiledSelectors = { }; }
 #endif
 
     static unsigned averageSizeInBytes();
@@ -164,7 +164,7 @@ private:
     mutable Ref<StyleProperties> m_properties;
     CSSSelectorList m_selectorList;
 #if ENABLE(CSS_SELECTOR_JIT)
-    mutable UniqueArray<CompiledSelector> m_compiledSelectors;
+    mutable FixedVector<CompiledSelector> m_compiledSelectors;
 #endif
 };
 
@@ -505,7 +505,7 @@ inline void StyleRule::adoptSelectorList(CSSSelectorList&& selectors)
 {
     m_selectorList = WTFMove(selectors);
 #if ENABLE(CSS_SELECTOR_JIT)
-    m_compiledSelectors = nullptr;
+    m_compiledSelectors = { };
 #endif
 }
 
@@ -515,14 +515,9 @@ inline CompiledSelector& StyleRule::compiledSelectorForListIndex(unsigned index)
 {
     ASSERT(index < m_selectorList.listSize());
 
-    if (!m_compiledSelectors) {
-        auto listSize = m_selectorList.listSize();
-        RELEASE_ASSERT_WITH_SECURITY_IMPLICATION(index < listSize);
-        m_compiledSelectors = makeUniqueArray<CompiledSelector>(listSize);
-    }
-WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
+    if (m_compiledSelectors.isEmpty())
+        m_compiledSelectors = FixedVector<CompiledSelector>(m_selectorList.listSize());
     return m_compiledSelectors[index];
-WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 }
 
 #endif
