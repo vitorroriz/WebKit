@@ -2064,8 +2064,17 @@ bool LocalDOMWindow::addEventListener(const AtomString& eventType, Ref<EventList
         if (typeInfo.isInCategory(EventCategory::Wheel)) {
             document->didAddWheelEventHandler(*document);
             document->invalidateEventListenerRegions();
-        } else if (isTouchRelatedEventType(typeInfo, *document))
+        } else if (isTouchRelatedEventType(typeInfo, *document)) {
             document->didAddTouchEventHandler(*document);
+#if ENABLE(TOUCH_EVENT_REGIONS)
+            document->invalidateEventListenerRegions();
+#endif
+        } else if (typeInfo.isInCategory(EventCategory::Gesture)) {
+#if ENABLE(TOUCH_EVENT_REGIONS)
+            document->didAddTouchEventHandler(*document);
+            document->invalidateEventListenerRegions();
+#endif
+        }
         else if (eventType == eventNames.storageEvent)
             didAddStorageEventListener(*this);
     }
@@ -2322,8 +2331,17 @@ bool LocalDOMWindow::removeEventListener(const AtomString& eventType, EventListe
         if (typeInfo.isInCategory(EventCategory::Wheel)) {
             document->didRemoveWheelEventHandler(*document);
             document->invalidateEventListenerRegions();
-        } else if (isTouchRelatedEventType(typeInfo, *document))
+        } else if (isTouchRelatedEventType(typeInfo, *document)) {
             document->didRemoveTouchEventHandler(*document);
+#if ENABLE(TOUCH_EVENT_REGIONS)
+            document->invalidateEventListenerRegions();
+#endif
+        } else if (typeInfo.isInCategory(EventCategory::Gesture)) {
+#if ENABLE(TOUCH_EVENT_REGIONS)
+            document->didRemoveTouchEventHandler(*document);
+            document->invalidateEventListenerRegions();
+#endif
+        }
     }
 
     switch (typeInfo.type()) {

@@ -2468,8 +2468,17 @@ static inline bool tryAddEventListener(Node* targetNode, const AtomString& event
     if (typeInfo.isInCategory(EventCategory::Wheel)) {
         document->didAddWheelEventHandler(*targetNode);
         document->invalidateEventListenerRegions();
-    } else if (isTouchRelatedEventType(typeInfo, *targetNode))
+    } else if (isTouchRelatedEventType(typeInfo, *targetNode)) {
         document->didAddTouchEventHandler(*targetNode);
+#if ENABLE(TOUCH_EVENT_REGIONS)
+        document->invalidateEventListenerRegions();
+#endif
+    } else if (typeInfo.isInCategory(EventCategory::Gesture)) {
+#if ENABLE(TOUCH_EVENT_REGIONS)
+        document->didAddTouchEventHandler(*targetNode);
+        document->invalidateEventListenerRegions();
+#endif
+    }
     else if (typeInfo.isInCategory(EventCategory::MouseClickRelated))
         document->didAddOrRemoveMouseEventHandler(*targetNode);
 
@@ -2520,8 +2529,17 @@ static inline bool didRemoveEventListenerOfType(Node& targetNode, const AtomStri
     if (typeInfo.isInCategory(EventCategory::Wheel)) {
         document->didRemoveWheelEventHandler(targetNode);
         document->invalidateEventListenerRegions();
-    } else if (isTouchRelatedEventType(typeInfo, targetNode))
+    } else if (isTouchRelatedEventType(typeInfo, targetNode)) {
         document->didRemoveTouchEventHandler(targetNode);
+#if ENABLE(TOUCH_EVENT_REGIONS)
+        document->invalidateEventListenerRegions();
+#endif
+    } else if (typeInfo.isInCategory(EventCategory::Gesture)) {
+#if ENABLE(TOUCH_EVENT_REGIONS)
+        document->didRemoveTouchEventHandler(targetNode);
+        document->invalidateEventListenerRegions();
+#endif
+    }
     else if (typeInfo.isInCategory(EventCategory::MouseClickRelated))
         document->didAddOrRemoveMouseEventHandler(targetNode);
 
