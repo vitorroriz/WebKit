@@ -2344,6 +2344,12 @@ void FrameLoader::commitProvisionalLoad()
     RefPtr pdl = m_provisionalDocumentLoader;
     Ref frame = m_frame.get();
 
+    // Clear prefetch resources for URLs other than the one being navigated to.
+    // This ensures that prefetches are only used for the immediate next navigation,
+    // not for subsequent navigations to the same URL.
+    if (pdl)
+        m_documentPrefetcher->clearPrefetchedResourcesExcept(pdl->url());
+
     std::unique_ptr<CachedPage> cachedPage;
     if (m_loadingFromCachedPage && history().provisionalItem())
         cachedPage = BackForwardCache::singleton().take(*history().protectedProvisionalItem(), frame->protectedPage().get());

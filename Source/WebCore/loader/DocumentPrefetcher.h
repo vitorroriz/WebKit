@@ -60,7 +60,8 @@ public:
     void prefetch(const URL&, const Vector<String>& tags, std::optional<ReferrerPolicy>, bool lowPriority = false);
     void removePrefetch(const URL&);
     bool wasPrefetched(const URL&) const;
-    Box<NetworkLoadMetrics> takePrefetchedNetworkLoadMetrics(const URL&);
+    Box<NetworkLoadMetrics> takePrefetchedResourceMetrics(const URL&);
+    void clearPrefetchedResourcesExcept(const URL&);
 
     // CachedRawResourceClient
     void responseReceived(const CachedResource&, const ResourceResponse&, CompletionHandler<void()>&&) override;

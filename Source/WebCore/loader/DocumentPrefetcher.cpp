@@ -194,16 +194,29 @@ bool DocumentPrefetcher::wasPrefetched(const URL& url) const
     return m_prefetchedData.contains(url);
 }
 
-Box<NetworkLoadMetrics> DocumentPrefetcher::takePrefetchedNetworkLoadMetrics(const URL& url)
+Box<NetworkLoadMetrics> DocumentPrefetcher::takePrefetchedResourceMetrics(const URL& url)
 {
     auto it = m_prefetchedData.find(url);
     if (it != m_prefetchedData.end() && it->value.metrics) {
         auto metrics = WTFMove(it->value.metrics);
+        if (it->value.resource)
+            MemoryCache::singleton().remove(*it->value.resource);
         m_prefetchedData.remove(it);
         return metrics;
     }
     return { };
 }
 
+void DocumentPrefetcher::clearPrefetchedResourcesExcept(const URL& url)
+{
+    m_prefetchedData.removeIf([&url](auto& entry) {
+        if (entry.key != url) {
+            if (entry.value.resource)
+                MemoryCache::singleton().remove(*entry.value.resource);
+            return true;
+        }
+        return false;
+    });
+}
 
 } // namespace WebCore

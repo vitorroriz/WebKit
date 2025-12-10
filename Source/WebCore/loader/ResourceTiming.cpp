@@ -70,6 +70,15 @@ void ResourceTiming::updateExposure(const SecurityOrigin& origin)
     m_isSameOriginRequest = m_isSameOriginRequest && origin.canRequest(m_url, OriginAccessPatternsForWebProcess::singleton());
 }
 
+String ResourceTiming::deliveryType() const
+{
+    if (m_networkLoadMetrics.fromPrefetch)
+        return "navigational-prefetch"_s;
+    if (m_networkLoadMetrics.fromCache)
+        return "cache"_s;
+    return emptyString();
+}
+
 Vector<Ref<PerformanceServerTiming>> ResourceTiming::populateServerTiming() const
 {
     // To increase privacy, this additional check was proposed at https://github.com/w3c/resource-timing/issues/342 .

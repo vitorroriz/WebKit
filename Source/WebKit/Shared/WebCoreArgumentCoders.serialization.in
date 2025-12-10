@@ -7400,6 +7400,7 @@ class WebCore::NetworkLoadMetrics {
     [BitField] bool failsTAOCheck;
     [BitField] bool hasCrossOriginRedirect;
     [BitField] bool fromPrefetch;
+    [BitField] bool fromCache;
 
     WebCore::PrivacyStance privacyStance;
 

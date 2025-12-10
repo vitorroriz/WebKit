@@ -446,7 +446,7 @@ void DocumentLoader::notifyFinished(CachedResource& resource, const NetworkLoadM
 
     Box<NetworkLoadMetrics> metrics;
     if (RefPtr frameLoader = this->frameLoader()) {
-        if (auto prefetchedMetrics = frameLoader->documentPrefetcher().takePrefetchedNetworkLoadMetrics(url())) {
+        if (auto prefetchedMetrics = frameLoader->documentPrefetcher().takePrefetchedResourceMetrics(url())) {
             metrics = WTFMove(prefetchedMetrics);
             metrics->fromPrefetch = true;
         }
@@ -1339,6 +1339,11 @@ void DocumentLoader::commitData(const SharedBuffer& data)
             if (m_mainResource) {
                 auto* metrics = m_response.deprecatedNetworkLoadMetricsOrNull();
                 NetworkLoadMetrics finalMetrics = metrics ? *metrics : NetworkLoadMetrics::emptyMetrics();
+                auto source = m_response.source();
+                finalMetrics.fromCache = source == ResourceResponse::Source::DiskCache
+                    || source == ResourceResponse::Source::DiskCacheAfterValidation
+                    || source == ResourceResponse::Source::MemoryCache
+                    || source == ResourceResponse::Source::MemoryCacheAfterValidation;
                 if (RefPtr frameLoader = this->frameLoader())
                     finalMetrics.fromPrefetch = frameLoader->documentPrefetcher().wasPrefetched(url());
                 window->protectedPerformance()->addNavigationTiming(*this, document, *m_mainResource, timing(), finalMetrics);
