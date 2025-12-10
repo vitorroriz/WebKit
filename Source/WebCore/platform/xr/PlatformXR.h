@@ -93,7 +93,6 @@ enum class ReferenceSpaceType : uint8_t {
     LocalFloor,
     BoundedFloor,
     Unbounded,
-    Webgpu
 };
 
 enum class Eye : uint8_t {
@@ -168,8 +167,6 @@ inline SessionFeature sessionFeatureFromReferenceSpaceType(ReferenceSpaceType re
         return SessionFeature::ReferenceSpaceTypeBoundedFloor;
     case ReferenceSpaceType::Unbounded:
         return SessionFeature::ReferenceSpaceTypeUnbounded;
-    case ReferenceSpaceType::Webgpu:
-        return SessionFeature::WebGPU;
     }
 
     ASSERT_NOT_REACHED();
