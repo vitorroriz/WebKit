@@ -298,9 +298,11 @@ static std::optional<SpeculationRules::Rule> parseSingleRule(const JSON::Object&
 
     // 18. If input["tag"] exists:
     auto tagValue = input.getValue("tag"_s);
-    if (tagValue && tagValue->type() == JSON::Value::Type::String) {
-        String ruleTag = tagValue->asString();
+    if (tagValue) {
         // 18.1. If input["tag"] is not a speculation rule tag... return null.
+        if (tagValue->type() != JSON::Value::Type::String)
+            return std::nullopt;
+        String ruleTag = tagValue->asString();
         if (!ruleTag.containsOnlyASCII() || !ruleTag.containsOnly<isASCIIPrintable>())
             return std::nullopt;
         StringBuilder ruleTagBuilder;
@@ -358,15 +360,17 @@ bool SpeculationRules::parseSpeculationRules(Node& sourceNode, const StringView&
 
     String rulesetLevelTag;
     auto tagValue = jsonObject->getValue("tag"_s);
-    // 4. If parsed["tag"] exists:
-    if (tagValue && tagValue->type() == JSON::Value::Type::String) {
+    // 5. If parsed["tag"] exists:
+    if (tagValue) {
+        // 5.1. If parsed["tag"] is not a speculation rule tag, then throw a TypeError indicating that the speculation rule tag is invalid.
+        if (tagValue->type() != JSON::Value::Type::String)
+            return false;
         String candidateTag = tagValue->asString();
-        // 4.1. If parsed["tag"] is not a speculation rule tag, then throw a TypeError indicating that the speculation rule tag is invalid.
         if (!candidateTag.containsOnlyASCII() || !candidateTag.containsOnly<isASCIIPrintable>())
             return false;
         StringBuilder ruleTagBuilder;
         ruleTagBuilder.appendQuotedJSONString(candidateTag);
-        // 4.2. Set tag to parsed["tag"].
+        // 5.2. Set tag to parsed["tag"].
         rulesetLevelTag = ruleTagBuilder.toString();
     }
 
