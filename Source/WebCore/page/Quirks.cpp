@@ -1085,7 +1085,6 @@ bool Quirks::shouldDisableImageCaptureQuirk() const
     return m_quirksData.quirkIsEnabled(QuirksData::SiteSpecificQuirk::ShouldDisableImageCaptureQuirk);
 }
 
-#if ENABLE(MEDIA_STREAM)
 bool Quirks::shouldEnableCameraAndMicrophonePermissionStateQuirk() const
 {
     if (!needsQuirks()) [[unlikely]]
@@ -1101,8 +1100,6 @@ bool Quirks::shouldEnableRemoteTrackLabelQuirk() const
 
     return m_quirksData.quirkIsEnabled(QuirksData::SiteSpecificQuirk::ShouldEnableRemoteTrackLabelQuirk);
 }
-
-#endif
 
 bool Quirks::shouldEnableSpeakerSelectionPermissionsPolicyQuirk() const
 {
