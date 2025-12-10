@@ -2623,9 +2623,11 @@ webrtc/video-replace-track.html [ Pass Failure Timeout Crash ]
 # GStreamerRtpSenderBackend::setMediaStreamIds() unimplemented.
 webkit.org/b/235885 webrtc/video.html [ Skip ]
 
-# webrtcbin emits no ICE candidate stats for a PeerConnection managing only one data-channel.
+# Expected to pass when updating SDK to GStreamer 1.28.
 webkit.org/b/235885 webrtc/candidate-stats.html [ Failure ]
 webkit.org/b/262989 imported/w3c/web-platform-tests/webrtc-stats/getStats-remote-candidate-address.html [ Failure ]
+imported/w3c/web-platform-tests/webrtc/protocol/candidate-exchange.https.html [ Failure ]
+imported/w3c/web-platform-tests/webrtc/RTCIceTransport.html [ Skip ]
 
 # Pending investigation.
 webkit.org/b/235885 fast/mediastream/mediastreamtrack-video-clone.html [ Failure ]
@@ -2709,7 +2711,6 @@ imported/w3c/web-platform-tests/webrtc/RTCRtpParameters-transactionId.html [ Fai
 
 imported/w3c/web-platform-tests/webrtc/protocol/ [ Pass ]
 imported/w3c/web-platform-tests/webrtc/protocol/bundle.https.html [ Failure ]
-imported/w3c/web-platform-tests/webrtc/protocol/candidate-exchange.https.html [ Failure ]
 imported/w3c/web-platform-tests/webrtc/protocol/crypto-suite.https.html [ Failure ]
 imported/w3c/web-platform-tests/webrtc/protocol/dtls-fingerprint-validation.html [ Failure ]
 imported/w3c/web-platform-tests/webrtc/protocol/dtls-setup.https.html [ Failure ]

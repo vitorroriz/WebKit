@@ -229,32 +229,46 @@ RTCStatsReport::TransportStats::TransportStats(const GstStructure* structure)
     // stats.srtpCipher =
 }
 
-static inline RTCIceCandidateType iceCandidateType(CStringView type)
-{
-    if (type == "host"_s)
-        return RTCIceCandidateType::Host;
-    if (type == "srflx"_s)
-        return RTCIceCandidateType::Srflx;
-    if (type == "prflx"_s)
-        return RTCIceCandidateType::Prflx;
-    if (type == "relay"_s)
-        return RTCIceCandidateType::Relay;
-    ASSERT_NOT_REACHED();
-    return RTCIceCandidateType::Host;
-}
-
 RTCStatsReport::IceCandidateStats::IceCandidateStats(GstWebRTCStatsType statsType, const GstStructure* structure)
     : Stats(statsType == GST_WEBRTC_STATS_REMOTE_CANDIDATE ? Type::RemoteCandidate : Type::LocalCandidate, structure)
     , transportId(gstStructureGetString(structure, "transport-id"_s).span())
-    , address(gstStructureGetString(structure, "address"_s).span())
     , protocol(gstStructureGetString(structure, "protocol"_s).span())
     , url(gstStructureGetString(structure, "url"_s).span())
+    , foundation(gstStructureGetString(structure, "foundation"_s).span())
+    , usernameFragment(gstStructureGetString(structure, "username-fragment"_s).span())
 {
+    // NOTE: We have the address field in the structure but we don't expose it for privacy reasons.
+    // Covered by test: webrtc/candidate-stats.html
     port = gstStructureGet<unsigned>(structure, "port"_s);
     priority = gstStructureGet<unsigned>(structure, "priority"_s);
 
-    if (auto value = gstStructureGetString(structure, "candidate-type"_s))
-        candidateType = iceCandidateType(value);
+#if GST_CHECK_VERSION(1, 27, 0)
+    GstWebRTCICETcpCandidateType gstTcpType;
+    if (gst_structure_get(structure, "tcp-type", &gstTcpType, nullptr)) {
+        switch (gstTcpType) {
+        case GST_WEBRTC_ICE_TCP_CANDIDATE_TYPE_ACTIVE:
+            tcpType = RTCIceTcpCandidateType::Active;
+            break;
+        case GST_WEBRTC_ICE_TCP_CANDIDATE_TYPE_PASSIVE:
+            tcpType = RTCIceTcpCandidateType::Passive;
+            break;
+        case GST_WEBRTC_ICE_TCP_CANDIDATE_TYPE_SO:
+            tcpType = RTCIceTcpCandidateType::So;
+            break;
+        case GST_WEBRTC_ICE_TCP_CANDIDATE_TYPE_NONE:
+            break;
+        };
+    }
+#endif
+
+    candidateType = RTCIceCandidateType::Host;
+
+    auto value = gstStructureGetString(structure, "candidate-type"_s);
+    if (!value) [[unlikely]]
+        return;
+
+    if (auto iceCandidateType = toRTCIceCandidateType(StringView::fromLatin1(value.utf8())))
+        candidateType = *iceCandidateType;
 }
 
 RTCStatsReport::IceCandidatePairStats::IceCandidatePairStats(const GstStructure* structure)

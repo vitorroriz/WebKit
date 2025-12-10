@@ -24,6 +24,7 @@
 
 #include "GStreamerWebRTCUtils.h"
 #include "NotImplemented.h"
+#include "RTCIceTcpCandidateType.h"
 #include <JavaScriptCore/ArrayBuffer.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/glib/GUniquePtr.h>
@@ -150,11 +151,69 @@ void GStreamerIceTransportBackend::gatheringStateChanged() const
     });
 }
 
+#if GST_CHECK_VERSION(1, 27, 0)
+static Ref<RTCIceCandidate> candidateFromGstWebRTC(const GstWebRTCICECandidate* candidate)
+{
+    RTCIceCandidate::Fields fields;
+
+    fields.component = toRTCIceComponent(candidate->component);
+
+    if (candidate->stats) [[likely]] {
+        fields.foundation = String::fromUTF8(GST_WEBRTC_ICE_CANDIDATE_STATS_FOUNDATION(candidate->stats));
+        fields.priority = GST_WEBRTC_ICE_CANDIDATE_STATS_PRIORITY(candidate->stats);
+        fields.address = String::fromUTF8(GST_WEBRTC_ICE_CANDIDATE_STATS_ADDRESS(candidate->stats));
+        fields.protocol = toRTCIceProtocol(StringView::fromLatin1(GST_WEBRTC_ICE_CANDIDATE_STATS_PROTOCOL(candidate->stats)));
+        fields.port = GST_WEBRTC_ICE_CANDIDATE_STATS_PORT(candidate->stats);
+
+        fields.type = toRTCIceCandidateType(StringView::fromLatin1(GST_WEBRTC_ICE_CANDIDATE_STATS_TYPE(candidate->stats)));
+
+        fields.usernameFragment = String::fromUTF8(GST_WEBRTC_ICE_CANDIDATE_STATS_USERNAME_FRAGMENT(candidate->stats));
+
+        switch (GST_WEBRTC_ICE_CANDIDATE_STATS_TCP_TYPE(candidate->stats)) {
+        case GST_WEBRTC_ICE_TCP_CANDIDATE_TYPE_ACTIVE:
+            fields.tcpType = RTCIceTcpCandidateType::Active;
+            break;
+        case GST_WEBRTC_ICE_TCP_CANDIDATE_TYPE_PASSIVE:
+            fields.tcpType = RTCIceTcpCandidateType::Passive;
+            break;
+        case GST_WEBRTC_ICE_TCP_CANDIDATE_TYPE_SO:
+            fields.tcpType = RTCIceTcpCandidateType::So;
+            break;
+        case GST_WEBRTC_ICE_TCP_CANDIDATE_TYPE_NONE:
+            break;
+        };
+
+        auto relatedAddress = CStringView::unsafeFromUTF8(GST_WEBRTC_ICE_CANDIDATE_STATS_RELATED_ADDRESS(candidate->stats));
+        if (!relatedAddress.isNull()) {
+            fields.relatedAddress = relatedAddress.span();
+            fields.relatedPort = GST_WEBRTC_ICE_CANDIDATE_STATS_RELATED_PORT(candidate->stats);
+        }
+    }
+
+    // FIXME: relayProtocol is not exposed in RTCIceCandidate::Fields.
+
+    auto sdpMid = emptyString();
+    auto candidateString = String::fromUTF8(candidate->candidate);
+    return RTCIceCandidate::create(candidateString, sdpMid, WTFMove(fields));
+}
+#endif
+
 void GStreamerIceTransportBackend::selectedCandidatePairChanged()
 {
-    // FIXME: call m_client->onSelectedCandidatePairChanged(). See also
-    // https://github.com/WebKit/WebKit/commit/0692fae10c8e53deba214fd080a35f7c54bd6985
-    notImplemented();
+    // https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8484
+#if GST_CHECK_VERSION(1, 27, 0)
+    GUniquePtr<GstWebRTCICECandidatePair> selectedPair(gst_webrtc_ice_transport_get_selected_candidate_pair(m_iceTransport.get()));
+    if (!selectedPair)
+        return;
+
+    auto localCandidate = candidateFromGstWebRTC(selectedPair->local);
+    auto remoteCandidate = candidateFromGstWebRTC(selectedPair->remote);
+    WTF::callOnMainThreadAndWait([weakThis = WeakPtr { *this }, localCandidate = WTFMove(localCandidate), remoteCandidate = WTFMove(remoteCandidate)] mutable {
+        if (!weakThis || !weakThis->m_client)
+            return;
+        weakThis->m_client->onSelectedCandidatePairChanged(WTFMove(localCandidate), WTFMove(remoteCandidate));
+    });
+#endif
 }
 
 #undef GST_CAT_DEFAULT
