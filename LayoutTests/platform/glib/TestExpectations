@@ -2558,7 +2558,8 @@ fast/mediastream/getDisplayMedia-max-constraints5.html [ Skip ]
 # DataChannel GstWebRTC implementation incomplete, missing stats support.
 webkit.org/b/235885 webrtc/datachannel/datachannel-stats.html [ Skip ]
 webkit.org/b/235885 webrtc/datachannel/getStats-no-prflx-remote-candidate.html [ Failure ]
-webkit.org/b/187064 imported/w3c/web-platform-tests/webrtc/RTCPeerConnection-getStats.https.html [ Failure ]
+# Crash due to webkit.org/b/286859
+webkit.org/b/187064 imported/w3c/web-platform-tests/webrtc/RTCPeerConnection-getStats.https.html [ Failure Crash ]
 
 # Missing support for qpSum WebRTC stats.
 webkit.org/b/269285 webrtc/h265.html [ Failure Timeout ]
@@ -2775,7 +2776,8 @@ webrtc/video-getParameters.html [ Failure ]
 imported/w3c/web-platform-tests/webrtc/legacy/RTCPeerConnection-createOffer-offerToReceive.optional.html [ Pass ]
 
 # Fails because the transceiver state.currentDirection is expected to be null but isn't.
-imported/w3c/web-platform-tests/webrtc/legacy/RTCRtpTransceiver-with-OfferToReceive-options.optional.https.html [ Failure ]
+# Crash due to webkit.org/b/286859
+imported/w3c/web-platform-tests/webrtc/legacy/RTCRtpTransceiver-with-OfferToReceive-options.optional.https.html [ Failure Crash ]
 
 # Missing support for ICE restarts
 imported/w3c/web-platform-tests/webrtc/RTCPeerConnection-explicit-rollback-iceGatheringState.html [ Skip ]
@@ -2818,6 +2820,7 @@ webrtc/datachannel/multiple-connections.html [ Slow ]
 # Skia crash in GrResourceCache::notifyARefCntReachedZero
 webkit.org/b/286859 webrtc/video-vp8-videorange.html [ Crash Pass ]
 webkit.org/b/286859 webrtc/captureCanvas-webrtc-with-video-scaling-adaptation.html [ Crash Pass ]
+webkit.org/b/286859 imported/w3c/web-platform-tests/webrtc-stats/hardware-capability-stats.https.html [ Crash Pass ]
 
 # This test is almost the same as http/wpt/webrtc/transfer-datachannel-service-worker.https.html.
 # The main difference is that in this test an additional message is sent on the data-channel.
