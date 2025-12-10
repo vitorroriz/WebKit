@@ -910,7 +910,6 @@ http/tests/security/local-user-CSS-from-remote.html [ Skip ] # Failure
 http/tests/security/local-video-poster-from-remote.html [ Skip ] # Failure
 http/tests/security/local-video-source-from-remote.html [ Skip ] # Failure
 http/tests/security/local-video-src-from-remote.html [ Skip ] # Failure
-http/tests/security/mixedContent/insecure-audio-video-in-main-frame.html [ Skip ] # Failure
 http/tests/security/module-no-mime-type.html [ Skip ] # Failure
 http/tests/security/sync-xhr-partition.html [ Skip ] # Failure
 http/tests/security/video-cross-origin-accessfailure.html [ Skip ] # Failure

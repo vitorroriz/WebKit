@@ -5051,7 +5051,6 @@ http/tests/uri/css-href.py [ Failure ]
 
 # HTTP tests that assert:
 http/tests/security/inactive-document-with-empty-security-origin.html
-http/tests/security/mixedContent/insecure-audio-video-in-main-frame.html
 http/tests/security/popup-blocked-from-fake-event.html
 http/tests/security/popup-blocked-from-window-open.html
 http/tests/xmlhttprequest/cross-origin-no-authorization.html
