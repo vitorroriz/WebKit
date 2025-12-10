@@ -306,6 +306,9 @@ public:
 
     Ref<FragmentedSharedBuffer> asFragmentedSharedBuffer() const { return const_cast<SharedBuffer&>(*this); }
 
+    template<typename T>
+    bool isSpanWithinBounds(std::span<T> otherSpan) const;
+
 private:
     friend class SharedBufferBuilder;
 
@@ -447,6 +450,17 @@ private:
 };
 
 RefPtr<SharedBuffer> utf8Buffer(const String&);
+
+template<typename T>
+inline bool SharedBuffer::isSpanWithinBounds(std::span<T> otherSpan) const
+{
+    auto thisSpan = this->span();
+    auto otherByteSpan = asByteSpan(otherSpan);
+    if (std::to_address(otherByteSpan.end()) < std::to_address(thisSpan.begin()))
+        return false;
+    size_t offset = std::to_address(otherByteSpan.end()) - std::to_address(thisSpan.begin());
+    return offset <= size(); // "<=" because end is included as valid.
+}
 
 } // namespace WebCore
 
