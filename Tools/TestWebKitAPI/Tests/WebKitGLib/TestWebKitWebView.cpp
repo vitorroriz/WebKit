@@ -23,6 +23,7 @@
 #include "WebViewTest.h"
 #include <glib/gstdio.h>
 #include <wtf/glib/GRefPtr.h>
+#include <wtf/glib/GSpanExtras.h>
 
 class IsPlayingAudioWebViewTest : public WebViewTest {
 public:
@@ -1169,6 +1170,95 @@ public:
 #endif
 };
 
+static void testWebViewColorQuadrants(SnapshotWebViewTest* test, gconstpointer)
+{
+    static const char* html =
+        "<html>"
+        "  <head>"
+        "    <style type=\"text/css\">"
+        "      * {"
+        "        margin: 0;"
+        "        padding: 0;"
+        "      }"
+        "      body, html {"
+        "        width: 100vw;"
+        "        height: 100vh;"
+        "      }"
+        "      div {"
+        "        width: 50vw;"
+        "        height: 50vh;"
+        "        position: fixed;"
+        "      }"
+        "      #top-left { background-color: #ff0000; top: 0; left: 0 }"
+        "      #top-right { background-color: #ffff00; top: 0; right: 0 }"
+        "      #bottom-left { background-color: #ff00ff; bottom: 0; left: 0 }"
+        "      #bottom-right { background-color: #0000ff; bottom: 0; right: 0 }"
+        "    </style>"
+        "  </head>"
+        "  <body>"
+        "    <div id=\"top-left\"></div>"
+        "    <div id=\"top-right\"></div>"
+        "    <div id=\"bottom-left\"></div>"
+        "    <div id=\"bottom-right\"></div>"
+        "  </body>"
+        "</html>";
+
+    test->showInWindow();
+    test->loadHtml(html, nullptr);
+    test->waitUntilLoadFinished();
+
+    auto snapshot = test->getSnapshotAndWaitUntilReady(WEBKIT_SNAPSHOT_REGION_FULL_DOCUMENT, WEBKIT_SNAPSHOT_OPTIONS_NONE);
+    g_assert_nonnull(snapshot);
+
+#if PLATFORM(GTK)
+    auto* surface = SnapshotWebViewTest::snapshotToSurface(snapshot);
+    int width = cairo_image_surface_get_width(surface);
+    int height = cairo_image_surface_get_height(surface);
+    int stride = cairo_image_surface_get_stride(surface);
+
+    auto dataSpan = unsafeMakeSpan(cairo_image_surface_get_data(surface), stride * height);
+#else
+    int width = webkit_image_get_width(snapshot.get());
+    int height = webkit_image_get_height(snapshot.get());
+    guint stride = webkit_image_get_stride(snapshot.get());
+    GBytes* bytes = webkit_image_as_bytes(snapshot.get());
+
+    auto dataSpan = span(bytes);
+#endif
+
+    static constexpr int BytesPerPixel = 4; // needs to stay in sync with WebKitImage's private BGRA8BytesPerPixel
+
+    struct RGBA {
+        uint8_t r, g, b, a;
+
+        bool operator==(const RGBA& other) const = default;
+    };
+
+    auto getPixel = [&](int x, int y) -> RGBA {
+        auto row = dataSpan.subspan(y * stride);
+        auto pixel = row.subspan(x * BytesPerPixel, BytesPerPixel);
+        // swap B and R channels
+        return { pixel[2], pixel[1], pixel[0], pixel[3] };
+    };
+
+    constexpr RGBA Red     { 255, 0,   0,   255 };
+    constexpr RGBA Yellow  { 255, 255, 0,   255 };
+    constexpr RGBA Magenta { 255, 0,   255, 255 };
+    constexpr RGBA Blue    { 0,   0,   255, 255 };
+
+    int quadrantWidth = width / 4;
+    int quadrantHeight = height / 4;
+
+    g_assert_true(getPixel(quadrantWidth, quadrantHeight) == Red);
+    g_assert_true(getPixel(3 * quadrantWidth, quadrantHeight) == Yellow);
+    g_assert_true(getPixel(quadrantWidth, 3 * quadrantHeight) == Magenta);
+    g_assert_true(getPixel(3 * quadrantWidth, 3 * quadrantHeight) == Blue);
+
+#if PLATFORM(GTK)
+    cairo_surface_destroy(surface);
+#endif
+}
+
 static void testWebViewSnapshot(SnapshotWebViewTest* test, gconstpointer)
 {
     test->loadHtml("<html><head><style>html { width: 200px; height: 100px; } ::-webkit-scrollbar { display: none; }</style></head><body><p>Whatever</p></body></html>", nullptr);
@@ -2200,6 +2290,7 @@ void beforeAll()
     SaveWebViewTest::add("WebKitWebView", "save", testWebViewSave);
 #if PLATFORM(GTK) || ENABLE(2022_GLIB_API)
     SnapshotWebViewTest::add("WebKitWebView", "snapshot", testWebViewSnapshot);
+    SnapshotWebViewTest::add("WebKitWebView", "snapshot-color-quadrants", testWebViewColorQuadrants);
 #endif
     WebViewTest::add("WebKitWebView", "page-visibility", testWebViewPageVisibility);
     WebViewTest::add("WebKitWebView", "document-focus", testWebViewDocumentFocus);

@@ -110,9 +110,6 @@
 #include "WPEUtilities.h"
 #include "WPEWebViewLegacy.h"
 #include "WPEWebViewPlatform.h"
-#if ENABLE(2022_GLIB_API)
-#include "WebKitImagePrivate.h"
-#endif
 #include "WebKitOptionMenuPrivate.h"
 #include "WebKitWebViewBackendPrivate.h"
 #include "WebKitWebViewClient.h"
@@ -123,6 +120,7 @@
 #endif
 
 #if ENABLE(2022_GLIB_API)
+#include "WebKitImagePrivate.h"
 #include "WebKitNetworkSessionPrivate.h"
 #else
 #include "WebKitJavascriptResultPrivate.h"
@@ -5135,11 +5133,6 @@ gboolean webkit_web_view_get_tls_info(WebKitWebView* webView, GTlsCertificate** 
 #if PLATFORM(GTK) || ENABLE(2022_GLIB_API)
 #if USE(GTK4)
 #define SNAPSHOT_TYPE GdkTexture*
-#if USE(CAIRO)
-#define PLATFORM_IMAGE_TO_TEXTURE(image) cairoSurfaceToGdkTexture(image)
-#else
-#define PLATFORM_IMAGE_TO_TEXTURE(image) skiaImageToGdkTexture(*image)
-#endif
 #elif PLATFORM(GTK) && !USE(GTK4)
 #define SNAPSHOT_TYPE cairo_surface_t*
 #else
@@ -5186,33 +5179,32 @@ void webkit_web_view_get_snapshot(WebKitWebView* webView, WebKitSnapshotRegion r
     getPage(webView).takeSnapshotLegacy({ }, { }, snapshotOptions, [task = WTFMove(task)](std::optional<ShareableBitmap::Handle>&& handle) {
         if (handle) {
             if (auto bitmap = ShareableBitmap::create(WTFMove(*handle), SharedMemory::Protection::ReadOnly)) {
-#if PLATFORM(GTK)
-#if USE(GTK4)
-                if (auto texture = PLATFORM_IMAGE_TO_TEXTURE(bitmap->createPlatformImage(BackingStoreCopy::DontCopyBackingStore).get())) {
-                    g_task_return_pointer(task.get(), texture.leakRef(), g_object_unref);
-                    return;
-                }
-#else
-#if USE(CAIRO)
-                auto surface = bitmap->createCairoSurface();
-#elif USE(SKIA)
-                auto surface = skiaImageToCairoSurface(*bitmap->createPlatformImage(BackingStoreCopy::DontCopyBackingStore));
-#endif
-                if (surface) {
-                    g_task_return_pointer(task.get(), surface.leakRef(), reinterpret_cast<GDestroyNotify>(cairo_surface_destroy));
-                    return;
-                }
-#endif
-#else
+#if ENABLE(2022_GLIB_API)
                 RELEASE_ASSERT(bitmap->bytesPerRow() <= std::numeric_limits<guint>::max());
                 bitmap->ref();
                 auto imageBytes = adoptGRef(g_bytes_new_with_free_func(bitmap->span().data(), bitmap->span().size(), [](void* data) {
                     static_cast<ShareableBitmap*>(data)->deref();
                 }, bitmap.get()));
-                auto* image = webkitImageNew(bitmap->size().width(), bitmap->size().height(), bitmap->bytesPerRow(), WTFMove(imageBytes));
-                g_task_return_pointer(task.get(), image, g_object_unref);
-                return;
-#endif
+                GRefPtr<WebKitImage> image = adoptGRef(webkitImageNew(bitmap->size().width(), bitmap->size().height(), bitmap->bytesPerRow(), WTFMove(imageBytes)));
+                if (image) {
+#if USE(GTK4)
+                    auto* bytes = webkit_image_as_bytes(image.get());
+                    if (auto texture = adoptGRef(gdk_memory_texture_new(webkit_image_get_width(image.get()), webkit_image_get_height(image.get()), GDK_MEMORY_DEFAULT, bytes, webkit_image_get_stride(image.get())))) {
+                        g_task_return_pointer(task.get(), texture.leakRef(), g_object_unref);
+                        return;
+                    }
+#else
+                    g_task_return_pointer(task.get(), image.leakRef(), g_object_unref);
+                    return;
+#endif // USE(GTK4)
+                }
+#else
+                auto surface = bitmap->createCairoSurface();
+                if (surface) {
+                    g_task_return_pointer(task.get(), surface.leakRef(), reinterpret_cast<GDestroyNotify>(cairo_surface_destroy));
+                    return;
+                }
+#endif // ENABLE(2022_GLIB_API)
             }
         }
         g_task_return_new_error(task.get(), WEBKIT_SNAPSHOT_ERROR, WEBKIT_SNAPSHOT_ERROR_FAILED_TO_CREATE, _("There was an error creating the snapshot"));
