@@ -242,25 +242,30 @@ static String counterForSystemCJK(int number, const std::array<char16_t, 17>& ta
 
 String CSSCounterStyle::counterForSystemDisclosureClosed(WritingMode writingMode)
 {
-    if (writingMode.isVerticalTypographic())
-        return span(writingMode.isInlineTopToBottom() ? blackDownPointingTriangle : blackUpPointingTriangle);
-    return span(writingMode.isBidiLTR() ? blackRightPointingTriangle : blackLeftPointingTriangle);
+    auto triangleCodepoint = writingMode.isVerticalTypographic()
+        ? (writingMode.isInlineTopToBottom() ? blackDownPointingTriangle : blackUpPointingTriangle)
+        : (writingMode.isBidiLTR() ? blackRightPointingTriangle : blackLeftPointingTriangle);
+    return makeString(triangleCodepoint, textVariationSelector);
 }
 
 String CSSCounterStyle::counterForSystemDisclosureOpen(WritingMode writingMode)
 {
+    char16_t triangleCodepoint;
     switch (writingMode.blockDirection()) {
     case FlowDirection::TopToBottom:
-        return span(blackDownPointingTriangle);
+        triangleCodepoint = blackDownPointingTriangle;
+        break;
     case FlowDirection::BottomToTop:
-        return span(blackUpPointingTriangle);
+        triangleCodepoint = blackUpPointingTriangle;
+        break;
     case FlowDirection::LeftToRight:
-        return span(blackRightPointingTriangle);
+        triangleCodepoint = blackRightPointingTriangle;
+        break;
     case FlowDirection::RightToLeft:
-        return span(blackLeftPointingTriangle);
+        triangleCodepoint = blackLeftPointingTriangle;
+        break;
     }
-    ASSERT_NOT_REACHED();
-    return { };
+    return makeString(triangleCodepoint, textVariationSelector);
 }
 
 String CSSCounterStyle::counterForSystemSimplifiedChineseInformal(int value)

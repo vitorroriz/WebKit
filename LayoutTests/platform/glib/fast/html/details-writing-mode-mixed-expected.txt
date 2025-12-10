@@ -40,12 +40,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (0,1) size 16x17: "\x{25B6}"
+                    RenderListMarker at (0,1) size 16x17: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (16,1) size 58x17
                       text run at (16,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (0,0) size 20x17: "\x{25BC}"
+                    RenderListMarker at (0,0) size 20x17: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (20,0) size 58x17
                       text run at (20,0) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -53,12 +53,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (0,1) size 16x17: "\x{25B6}"
+                    RenderListMarker at (0,1) size 16x17: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (16,1) size 58x17
                       text run at (16,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (0,1) size 20x17: "\x{25B2}"
+                    RenderListMarker at (0,1) size 20x17: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (20,1) size 58x17
                       text run at (20,1) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -66,12 +66,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,0) size 17x20: "\x{25BC}"
+                    RenderListMarker at (1,0) size 17x20: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (1,20) size 17x58
                       text run at (1,20) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,0) size 17x16: "\x{25B6}"
+                    RenderListMarker at (1,0) size 17x16: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (1,16) size 17x58
                       text run at (1,16) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -79,12 +79,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,0) size 17x20: "\x{25BC}"
+                    RenderListMarker at (0,0) size 17x20: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (0,20) size 17x58
                       text run at (0,20) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,0) size 17x16: "\x{25C0}"
+                    RenderListMarker at (0,0) size 17x16: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (0,16) size 17x58
                       text run at (0,16) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -96,12 +96,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (104,1) size 16x17: "\x{25C0}"
+                    RenderListMarker at (104,1) size 16x17: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (46,1) size 58x17
                       text run at (46,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (100,0) size 20x17: "\x{25BC}"
+                    RenderListMarker at (100,0) size 20x17: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (42,0) size 58x17
                       text run at (42,0) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -109,12 +109,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (104,1) size 16x17: "\x{25C0}"
+                    RenderListMarker at (104,1) size 16x17: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (46,1) size 58x17
                       text run at (46,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (100,1) size 20x17: "\x{25B2}"
+                    RenderListMarker at (100,1) size 20x17: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (42,1) size 58x17
                       text run at (42,1) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -122,12 +122,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,100) size 17x20: "\x{25B2}"
+                    RenderListMarker at (1,100) size 17x20: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (1,42) size 17x58
                       text run at (1,42) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,104) size 17x16: "\x{25B6}"
+                    RenderListMarker at (1,104) size 17x16: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (1,46) size 17x58
                       text run at (1,46) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -135,12 +135,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,100) size 17x20: "\x{25B2}"
+                    RenderListMarker at (0,100) size 17x20: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (0,42) size 17x58
                       text run at (0,42) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,104) size 17x16: "\x{25C0}"
+                    RenderListMarker at (0,104) size 17x16: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (0,46) size 17x58
                       text run at (0,46) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -183,12 +183,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (0,1) size 16x17: "\x{25B6}"
+                    RenderListMarker at (0,1) size 16x17: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (16,1) size 58x17
                       text run at (16,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (0,0) size 20x17: "\x{25BC}"
+                    RenderListMarker at (0,0) size 20x17: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (20,0) size 58x17
                       text run at (20,0) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -196,12 +196,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (0,1) size 16x17: "\x{25B6}"
+                    RenderListMarker at (0,1) size 16x17: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (16,1) size 58x17
                       text run at (16,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (0,1) size 20x17: "\x{25B2}"
+                    RenderListMarker at (0,1) size 20x17: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (20,1) size 58x17
                       text run at (20,1) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -209,12 +209,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,0) size 17x20: "\x{25BC}"
+                    RenderListMarker at (1,0) size 17x20: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (1,20) size 17x58
                       text run at (1,20) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,0) size 17x16: "\x{25B6}"
+                    RenderListMarker at (1,0) size 17x16: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (1,16) size 17x58
                       text run at (1,16) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -222,12 +222,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,0) size 17x20: "\x{25BC}"
+                    RenderListMarker at (0,0) size 17x20: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (0,20) size 17x58
                       text run at (0,20) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,0) size 17x16: "\x{25C0}"
+                    RenderListMarker at (0,0) size 17x16: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (0,16) size 17x58
                       text run at (0,16) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -239,12 +239,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (58,1) size 16x17: "\x{25C0}"
+                    RenderListMarker at (58,1) size 16x17: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (0,1) size 58x17
                       text run at (0,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (58,0) size 20x17: "\x{25BC}"
+                    RenderListMarker at (58,0) size 20x17: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (0,0) size 58x17
                       text run at (0,0) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -252,12 +252,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (58,1) size 16x17: "\x{25C0}"
+                    RenderListMarker at (58,1) size 16x17: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (0,1) size 58x17
                       text run at (0,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (58,1) size 20x17: "\x{25B2}"
+                    RenderListMarker at (58,1) size 20x17: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (0,1) size 58x17
                       text run at (0,1) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -265,12 +265,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,58) size 17x20: "\x{25B2}"
+                    RenderListMarker at (1,58) size 17x20: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (1,0) size 17x58
                       text run at (1,0) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,58) size 17x16: "\x{25B6}"
+                    RenderListMarker at (1,58) size 17x16: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (1,0) size 17x58
                       text run at (1,0) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -278,12 +278,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,58) size 17x20: "\x{25B2}"
+                    RenderListMarker at (0,58) size 17x20: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (0,0) size 17x58
                       text run at (0,0) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,58) size 17x16: "\x{25C0}"
+                    RenderListMarker at (0,58) size 17x16: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (0,0) size 17x58
                       text run at (0,0) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -326,12 +326,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (23,1) size 16x17: "\x{25B6}"
+                    RenderListMarker at (23,1) size 16x17: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (39,1) size 58x17
                       text run at (39,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (21,0) size 20x17: "\x{25BC}"
+                    RenderListMarker at (21,0) size 20x17: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (41,0) size 58x17
                       text run at (41,0) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -339,12 +339,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (23,1) size 16x17: "\x{25B6}"
+                    RenderListMarker at (23,1) size 16x17: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (39,1) size 58x17
                       text run at (39,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (21,1) size 20x17: "\x{25B2}"
+                    RenderListMarker at (21,1) size 20x17: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (41,1) size 58x17
                       text run at (41,1) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -352,12 +352,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,21) size 17x20: "\x{25BC}"
+                    RenderListMarker at (1,21) size 17x20: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (1,41) size 17x58
                       text run at (1,41) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,23) size 17x16: "\x{25B6}"
+                    RenderListMarker at (1,23) size 17x16: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (1,39) size 17x58
                       text run at (1,39) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -365,12 +365,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,21) size 17x20: "\x{25BC}"
+                    RenderListMarker at (0,21) size 17x20: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (0,41) size 17x58
                       text run at (0,41) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,23) size 17x16: "\x{25C0}"
+                    RenderListMarker at (0,23) size 17x16: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (0,39) size 17x58
                       text run at (0,39) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -382,12 +382,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (81,1) size 16x17: "\x{25C0}"
+                    RenderListMarker at (81,1) size 16x17: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (23,1) size 58x17
                       text run at (23,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (79,0) size 20x17: "\x{25BC}"
+                    RenderListMarker at (79,0) size 20x17: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (21,0) size 58x17
                       text run at (21,0) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -395,12 +395,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (81,1) size 16x17: "\x{25C0}"
+                    RenderListMarker at (81,1) size 16x17: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (23,1) size 58x17
                       text run at (23,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (79,1) size 20x17: "\x{25B2}"
+                    RenderListMarker at (79,1) size 20x17: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (21,1) size 58x17
                       text run at (21,1) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -408,12 +408,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,79) size 17x20: "\x{25B2}"
+                    RenderListMarker at (1,79) size 17x20: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (1,21) size 17x58
                       text run at (1,21) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,81) size 17x16: "\x{25B6}"
+                    RenderListMarker at (1,81) size 17x16: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (1,23) size 17x58
                       text run at (1,23) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -421,12 +421,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,79) size 17x20: "\x{25B2}"
+                    RenderListMarker at (0,79) size 17x20: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (0,21) size 17x58
                       text run at (0,21) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,81) size 17x16: "\x{25C0}"
+                    RenderListMarker at (0,81) size 17x16: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (0,23) size 17x58
                       text run at (0,23) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -469,12 +469,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (46,1) size 16x17: "\x{25B6}"
+                    RenderListMarker at (46,1) size 16x17: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (62,1) size 58x17
                       text run at (62,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (42,0) size 20x17: "\x{25BC}"
+                    RenderListMarker at (42,0) size 20x17: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (62,0) size 58x17
                       text run at (62,0) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -482,12 +482,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (46,1) size 16x17: "\x{25B6}"
+                    RenderListMarker at (46,1) size 16x17: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (62,1) size 58x17
                       text run at (62,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (42,1) size 20x17: "\x{25B2}"
+                    RenderListMarker at (42,1) size 20x17: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (62,1) size 58x17
                       text run at (62,1) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -495,12 +495,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,42) size 17x20: "\x{25BC}"
+                    RenderListMarker at (1,42) size 17x20: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (1,62) size 17x58
                       text run at (1,62) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,46) size 17x16: "\x{25B6}"
+                    RenderListMarker at (1,46) size 17x16: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (1,62) size 17x58
                       text run at (1,62) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -508,12 +508,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,42) size 17x20: "\x{25BC}"
+                    RenderListMarker at (0,42) size 17x20: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (0,62) size 17x58
                       text run at (0,62) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,46) size 17x16: "\x{25C0}"
+                    RenderListMarker at (0,46) size 17x16: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (0,62) size 17x58
                       text run at (0,62) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -525,12 +525,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (104,1) size 16x17: "\x{25C0}"
+                    RenderListMarker at (104,1) size 16x17: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (46,1) size 58x17
                       text run at (46,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (100,0) size 20x17: "\x{25BC}"
+                    RenderListMarker at (100,0) size 20x17: "\x{25BC}\x{FE0E}"
                     RenderText {#text} at (42,0) size 58x17
                       text run at (42,0) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -538,12 +538,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 120x19
                   RenderListItem {SUMMARY} at (0,0) size 120x19
-                    RenderListMarker at (104,1) size 16x17: "\x{25C0}"
+                    RenderListMarker at (104,1) size 16x17: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (46,1) size 58x17
                       text run at (46,1) width 58: "summary"
                 RenderBlock {DETAILS} at (0,19) size 120x18
                   RenderListItem {SUMMARY} at (0,0) size 120x18
-                    RenderListMarker at (100,1) size 20x17: "\x{25B2}"
+                    RenderListMarker at (100,1) size 20x17: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (42,1) size 58x17
                       text run at (42,1) width 58: "summary"
                   RenderBlock {SLOT} at (0,18) size 120x0
@@ -551,12 +551,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,100) size 17x20: "\x{25B2}"
+                    RenderListMarker at (1,100) size 17x20: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (1,42) size 17x58
                       text run at (1,42) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (1,104) size 17x16: "\x{25B6}"
+                    RenderListMarker at (1,104) size 17x16: "\x{25B6}\x{FE0E}"
                     RenderText {#text} at (1,46) size 17x58
                       text run at (1,46) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
@@ -564,12 +564,12 @@ layer at (0,0) size 785x1478
               RenderBlock {DIV} at (2,2) size 120x120
                 RenderBlock {DETAILS} at (0,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,100) size 17x20: "\x{25B2}"
+                    RenderListMarker at (0,100) size 17x20: "\x{25B2}\x{FE0E}"
                     RenderText {#text} at (0,42) size 17x58
                       text run at (0,42) width 58: "summary"
                 RenderBlock {DETAILS} at (18,0) size 18x120
                   RenderListItem {SUMMARY} at (0,0) size 18x120
-                    RenderListMarker at (0,104) size 17x16: "\x{25C0}"
+                    RenderListMarker at (0,104) size 17x16: "\x{25C0}\x{FE0E}"
                     RenderText {#text} at (0,46) size 17x58
                       text run at (0,46) width 58: "summary"
                   RenderBlock {SLOT} at (18,0) size 0x120
