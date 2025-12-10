@@ -62,7 +62,7 @@ class _Result(_Message):
 
     def __call__(self, caller):
         if caller:
-            if self.repeat:
+            if getattr(self, 'repeat', False):
                 # For repeat tasks, only decrement count when they actually stop
                 # (not on each iteration)
                 if getattr(self, 'stopped', False):
