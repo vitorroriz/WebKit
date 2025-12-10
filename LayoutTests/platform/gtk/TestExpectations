@@ -102,7 +102,13 @@ webkit.org/b/303375 inspector/debugger/async-stack-trace-truncate.html [ Crash T
 # Crash on EWS bot.
 webrtc/vp8-then-h264-gpu-process-crash.html [ Skip ]
 
+webkit.org/b/303366 webrtc/datachannel/multiple-connections.html [ Crash Pass ]
 webkit.org/b/303372 webrtc/datachannel/gather-candidates-networkprocess-crash.html [ Crash Pass ]
+webkit.org/b/303919 imported/w3c/web-platform-tests/webrtc-stats/hardware-capability-stats.https.html [ Crash Pass ]
+
+webkit.org/b/303924 webrtc/peer-connection-audio-mute2.html [ Failure ]
+webkit.org/b/303925 webrtc/audio-replace-track.html [ Failure ]
+webkit.org/b/303924 webrtc/ephemeral-certificates-and-cnames.html [ Timeout ]
 
 #//////////////////////////////////////////////////////////////////////////////////////////
 # End of Triaged Expectations
