@@ -196,7 +196,30 @@ void SimulatedXRDevice::frameTimerFired()
     };
     // Non-transient hit test
     for (const auto& pair : m_hitTestSources) {
-        PlatformXR::Ray ray = transformRay(data.origin, pair.value->offsetRay);
+        std::optional<PlatformXR::FrameData::Pose> origin;
+        WTF::switchOn(pair.value->nativeOrigin, [&](const PlatformXR::ReferenceSpaceType& referenceSpaceType) {
+            switch (referenceSpaceType) {
+            case PlatformXR::ReferenceSpaceType::Viewer:
+                origin = data.origin;
+                break;
+            case PlatformXR::ReferenceSpaceType::Local:
+                origin = PlatformXR::FrameData::Pose();
+                break;
+            case PlatformXR::ReferenceSpaceType::LocalFloor:
+                origin = data.floorTransform;
+                break;
+            default:
+                break;
+            }
+        }, [&](const PlatformXR::InputSourceSpaceInfo& inputSource) {
+            auto i = data.inputSources.findIf([&](auto& item) { return item.handle == inputSource.handle; });
+            if (i == notFound)
+                return;
+            origin = data.inputSources[i].pointerOrigin.pose;
+        });
+        if (!origin)
+            continue;
+        PlatformXR::Ray ray = transformRay(*origin, pair.value->offsetRay);
         data.hitTestResults.add(pair.key, hitTestWorld(ray, pair.value->entityTypes));
     }
     // Transient hit test

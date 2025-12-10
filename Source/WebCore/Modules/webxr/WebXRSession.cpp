@@ -784,7 +784,7 @@ void WebXRSession::requestHitTestSource(const XRHitTestOptionsInit& init, Reques
         promise.reject(Exception { ExceptionCode::InvalidStateError });
         return;
     }
-    auto maybeNativeOrigin = init.space->nativeOrigin();
+    auto maybeNativeOrigin = init.space->nativeOriginInformation();
     if (!maybeNativeOrigin) {
         promise.reject(Exception { ExceptionCode::InvalidStateError, "Unable to retrieve the native origin from XRSpace"_s });
         return;

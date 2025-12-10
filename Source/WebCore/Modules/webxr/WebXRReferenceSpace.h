@@ -52,6 +52,9 @@ public:
 
     WebXRSession* session() const final { return m_session.get(); }
     std::optional<TransformationMatrix> nativeOrigin() const override;
+#if ENABLE(WEBXR_HIT_TEST)
+    std::optional<PlatformXR::NativeOriginInformation> nativeOriginInformation() const override { return { m_type }; }
+#endif
     virtual ExceptionOr<Ref<WebXRReferenceSpace>> getOffsetReferenceSpace(const WebXRRigidTransform&);
     XRReferenceSpaceType type() const { return m_type; }
 

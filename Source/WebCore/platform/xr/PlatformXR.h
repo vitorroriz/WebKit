@@ -296,9 +296,21 @@ struct Ray {
     WebCore::FloatPoint3D direction;
 };
 
+enum class InputSourceSpaceType : uint8_t {
+    TargetRay,
+    Grip,
+};
+
+struct InputSourceSpaceInfo {
+    InputSourceHandle handle;
+    InputSourceSpaceType type;
+};
+
+using NativeOriginInformation = Variant<ReferenceSpaceType, InputSourceSpaceInfo>;
+
 struct HitTestOptions {
     WTF_DEPRECATED_MAKE_STRUCT_FAST_ALLOCATED(HitTestOptions);
-    WebCore::TransformationMatrix nativeOrigin;
+    NativeOriginInformation nativeOrigin;
     Vector<WebCore::XRHitTestTrackableType> entityTypes;
     Ray offsetRay;
 };

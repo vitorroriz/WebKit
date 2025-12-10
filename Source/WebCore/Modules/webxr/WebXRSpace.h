@@ -51,6 +51,9 @@ public:
 
     virtual WebXRSession* session() const = 0;
     virtual std::optional<TransformationMatrix> nativeOrigin() const = 0;
+#if ENABLE(WEBXR_HIT_TEST)
+    virtual std::optional<PlatformXR::NativeOriginInformation> nativeOriginInformation() const { return std::nullopt; }
+#endif
     std::optional<TransformationMatrix> effectiveOrigin() const;
     virtual std::optional<bool> isPositionEmulated() const;
 
