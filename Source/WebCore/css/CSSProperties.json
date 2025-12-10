@@ -483,8 +483,14 @@
                 "inline-flex",
                 "grid",
                 "inline-grid",
-                "grid-lanes",
-                "inline-grid-lanes",
+                {
+                    "value": "grid-lanes",
+                    "settings-flag": "gridLanesEnabled"
+                },
+                {
+                    "value": "inline-grid-lanes",
+                    "settings-flag": "gridLanesEnabled"
+                },
                 {
                     "value": "ruby",
                     "status": "unimplemented"

@@ -2967,7 +2967,10 @@ class GenerateCSSPropertyNames:
             to=to,
             headers=[
                 "BoxSides.h",
+                "CSSParserContext.h",
                 "CSSProperty.h",
+                "CSSValueKeywords.h",
+                "DeprecatedGlobalSettings.h",
                 "Settings.h",
             ],
             system_headers=[
@@ -3359,6 +3362,138 @@ class GenerateCSSPropertyNames:
             }
             """)
 
+    def _generate_valid_keywords_for_property(self, *, to):
+        # Generate static arrays of valid keyword CSSValueIDs for each property
+        # that has a 'values' array in CSSProperties.json. This is used by the
+        # Inspector to provide completions for properties that aren't keyword-fast-path
+        # eligible but still have enumerated values.
+
+        # First, collect all properties with values and generate static arrays for them
+        properties_with_values = []
+        seen_array_names = set()
+        for prop in self.properties_and_descriptors.style_properties.all:
+            if hasattr(prop, 'values') and prop.values:
+                # Filter to only include values that have a valid keyword_term (actual keywords)
+                keyword_values = [value for value in prop.values if hasattr(value, 'value_keyword_name') and value.value_keyword_name]
+                if keyword_values:
+                    array_name = f"validKeywordsFor{prop.property_name.name_for_methods}"
+                    # Skip if we've already generated an array with this name (handles aliases)
+                    if array_name not in seen_array_names:
+                        seen_array_names.add(array_name)
+                        properties_with_values.append((prop, keyword_values, array_name))
+
+        # Generate static arrays for each property with values
+        for prop, keywordValues, array_name in properties_with_values:
+            value_ids = [value.value_keyword_name.id for value in keywordValues]
+            to.write(f"static constexpr std::array {array_name} {{")
+            with to.indent():
+                for value_id in value_ids:
+                    to.write(f"{value_id},")
+            to.write("};")
+            to.newline()
+
+        # Generate the switch function - include all properties, even those with duplicate array names
+        all_properties_with_values = []
+        for prop in self.properties_and_descriptors.style_properties.all:
+            if hasattr(prop, 'values') and prop.values:
+                keyword_values = [value for value in prop.values if hasattr(value, 'value_keyword_name') and value.value_keyword_name]
+                if keyword_values:
+                    array_name = f"validKeywordsFor{prop.property_name.name_for_methods}"
+                    all_properties_with_values.append((prop, keyword_values, array_name))
+
+        to.write("std::span<const CSSValueID> CSSProperty::validKeywordsForProperty(CSSPropertyID id)")
+        to.write("{")
+        with to.indent():
+            to.write("switch (id) {")
+            for prop, keyword_values, array_name in all_properties_with_values:
+                to.write(f"case {prop.id}:")
+                with to.indent():
+                    to.write(f"return std::span<const CSSValueID> {{ {array_name} }};")
+            to.write("default:")
+            with to.indent():
+                to.write("return { };")
+            to.write("}")
+        to.write("}")
+        to.newline()
+
+        # Generate isKeywordValidForPropertyValues function to check settings flags.
+        # This is used by the Inspector to filter keywords based on enabled settings.
+
+        # Collect properties that have any keywords with settings-flags
+        properties_with_settings_flags = []
+        for prop, keyword_values, array_name in all_properties_with_values:
+            # Check if any keyword has a settings_flag
+            keywords_with_flags = [(value, value.settings_flag) for value in keyword_values if value.settings_flag]
+            if keywords_with_flags:
+                properties_with_settings_flags.append((prop, keyword_values))
+
+        # Generate helper functions for properties with settings-flagged keywords
+        for prop, keyword_values in properties_with_settings_flags:
+            func_name = f"isKeywordValidFor{prop.property_name.name_for_methods}Values"
+            to.write(f"static bool {func_name}(CSSValueID keyword, const CSSParserContext& context)")
+            to.write("{")
+            with to.indent():
+                to.write("switch (keyword) {")
+
+                # Group keywords by their settings_flag (or lack thereof)
+                # Keywords without settings_flag always return true
+                keywords_without_flag = [value for value in keyword_values if not value.settings_flag]
+                keywords_with_flag = [value for value in keyword_values if value.settings_flag]
+
+                if keywords_without_flag:
+                    for value in keywords_without_flag:
+                        to.write(f"case {value.value_keyword_name.id}:")
+                    with to.indent():
+                        to.write("return true;")
+
+                # Group keywords by their settings_flag for efficient switch generation
+                from collections import defaultdict
+                flag_to_keywords = defaultdict(list)
+                for value in keywords_with_flag:
+                    flag_to_keywords[value.settings_flag].append(value)
+
+                for flag, keywordValues in flag_to_keywords.items():
+                    for value in keywordValues:
+                        to.write(f"case {value.value_keyword_name.id}:")
+                    with to.indent():
+                        # Check if this is a function call (e.g., DeprecatedGlobalSettings::attachmentElementEnabled())
+                        if "::" in flag or "(" in flag:
+                            to.write(f"return {flag};")
+                        else:
+                            to.write(f"return context.{flag};")
+
+                to.write("default:")
+                with to.indent():
+                    to.write("return false;")
+                to.write("}")
+            to.write("}")
+            to.newline()
+
+        # Generate the main isKeywordValidForPropertyValues switch function
+        to.write("bool CSSProperty::isKeywordValidForPropertyValues(CSSPropertyID id, CSSValueID keyword, const CSSParserContext& context)")
+        to.write("{")
+        with to.indent():
+            to.write("switch (id) {")
+
+            for prop, keyword_values, array_name in all_properties_with_values:
+                to.write(f"case {prop.id}:")
+                with to.indent():
+                    # Check if this property has any keywords with settings flags
+                    has_settings_flags = any(value.settings_flag for value in keyword_values)
+                    if has_settings_flags:
+                        func_name = f"isKeywordValidFor{prop.property_name.name_for_methods}Values"
+                        to.write(f"return {func_name}(keyword, context);")
+                    else:
+                        # No settings flags, just check if keyword is in the valid set
+                        to.write(f"return std::ranges::find({array_name}, keyword) != {array_name}.end();")
+
+            to.write("default:")
+            with to.indent():
+                to.write("return false;")
+            to.write("}")
+        to.write("}")
+        to.newline()
+
     def _term_matches_number_or_integer(self, term):
         if isinstance(term, MatchOneTerm):
             return any(self._term_matches_number_or_integer(inner_term) for inner_term in term.subterms)
@@ -3581,6 +3716,10 @@ class GenerateCSSPropertyNames:
             )
 
             self._generate_css_property_id_text_stream(
+                to=writer
+            )
+
+            self._generate_valid_keywords_for_property(
                 to=writer
             )
 

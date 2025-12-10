@@ -23,6 +23,7 @@
 
 #include <WebCore/CSSPropertyNames.h>
 #include <WebCore/CSSValue.h>
+#include <WebCore/CSSValueKeywords.h>
 #include <WebCore/IsImportant.h>
 #include <WebCore/WritingMode.h>
 #include <wtf/BitSet.h>
@@ -32,6 +33,7 @@ namespace WebCore {
 
 class CSSValueList;
 class Settings;
+struct CSSParserContext;
 
 enum class IsImplicit : bool { No, Yes };
 
@@ -139,6 +141,15 @@ public:
     static bool isSizingProperty(CSSPropertyID);
 
     static bool disablesNativeAppearance(CSSPropertyID);
+
+    // Returns the valid keyword values for a property from CSSProperties.json.
+    // This is used by the Inspector to provide completions for properties
+    // that aren't keyword-fast-path eligible but still have enumerated values.
+    static std::span<const CSSValueID> validKeywordsForProperty(CSSPropertyID);
+
+    // Checks if a keyword is valid for a property, taking settings flags into account.
+    // This is used by the Inspector to filter keywords based on enabled settings.
+    static bool isKeywordValidForPropertyValues(CSSPropertyID, CSSValueID, const CSSParserContext&);
 
     const StylePropertyMetadata& metadata() const { return m_metadata; }
     static bool isColorProperty(CSSPropertyID propertyId)

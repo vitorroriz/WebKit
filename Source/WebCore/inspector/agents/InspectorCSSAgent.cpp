@@ -28,7 +28,7 @@
 
 #include "CSSComputedStyleDeclaration.h"
 #include "CSSImportRule.h"
-#include "CSSParserMode.h"
+#include "CSSParserContext.h"
 #include "CSSPropertyNames.h"
 #include "CSSPropertyParserState.h"
 #include "CSSPropertyParsing.h"
@@ -891,8 +891,12 @@ Inspector::Protocol::ErrorStringOr<Ref<JSON::ArrayOf<Inspector::Protocol::CSS::C
 {
     auto cssProperties = JSON::ArrayOf<Inspector::Protocol::CSS::CSSPropertyInfo>::create();
 
+    // Create a CSSParserContext with the page's settings for keyword validation.
+    auto& settings = m_inspectedPage->settings();
+    auto parserContext = CSSParserContext { settings };
+
     for (auto propertyID : allCSSProperties()) {
-        if (!isExposed(propertyID, &m_inspectedPage->settings()))
+        if (!isExposed(propertyID, &settings))
             continue;
 
         auto property = Inspector::Protocol::CSS::CSSPropertyInfo::create()
@@ -911,7 +915,7 @@ Inspector::Protocol::ErrorStringOr<Ref<JSON::ArrayOf<Inspector::Protocol::CSS::C
         if (shorthand.length()) {
             auto longhands = JSON::ArrayOf<String>::create();
             for (auto longhand : shorthand) {
-                if (isExposed(longhand, &m_inspectedPage->settings()))
+                if (isExposed(longhand, &settings))
                     longhands->addItem(nameString(longhand));
             }
             if (longhands->length())
@@ -920,7 +924,7 @@ Inspector::Protocol::ErrorStringOr<Ref<JSON::ArrayOf<Inspector::Protocol::CSS::C
 
         if (CSSPropertyParsing::isKeywordFastPathEligibleStyleProperty(propertyID)) {
             auto propertyParserState = CSS::PropertyParserState {
-                .context = strictCSSParserContext(),
+                .context = parserContext,
             };
             auto values = JSON::ArrayOf<String>::create();
             for (auto valueID : allCSSValueKeywords()) {
@@ -929,6 +933,19 @@ Inspector::Protocol::ErrorStringOr<Ref<JSON::ArrayOf<Inspector::Protocol::CSS::C
             }
             if (values->length())
                 property->setValues(WTFMove(values));
+        } else {
+            // For properties that aren't keyword-fast-path eligible (e.g., display),
+            // use the values from CSSProperties.json if available, filtered by settings.
+            auto validKeywords = CSSProperty::validKeywordsForProperty(propertyID);
+            if (!validKeywords.empty()) {
+                auto values = JSON::ArrayOf<String>::create();
+                for (auto valueID : validKeywords) {
+                    if (CSSProperty::isKeywordValidForPropertyValues(propertyID, valueID, parserContext))
+                        values->addItem(nameString(valueID));
+                }
+                if (values->length())
+                    property->setValues(WTFMove(values));
+            }
         }
 
         if (CSSProperty::isInheritedProperty(propertyID))
