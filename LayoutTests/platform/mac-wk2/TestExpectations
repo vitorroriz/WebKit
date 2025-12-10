@@ -2432,3 +2432,5 @@ webkit.org/b/303507 [ Sonoma+ Debug ] inspector/dom/customElementState.html [ Ti
 webkit.org/b/303507 [ Sonoma+ Debug ] inspector/injected-script/observable.html [ Timeout ]
 webkit.org/b/303507 [ Sonoma+ Debug ] inspector/network/intercept-aborted-request.html [ Timeout ]
 webkit.org/b/303507 [ Sonoma+ Debug ] inspector/page/filter-cookies-for-domain.html [ Timeout ]
+
+webkit.org/b/303876 [ Debug ] ipc/serialized-type-info.html [ Failure ]
