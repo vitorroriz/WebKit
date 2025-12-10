@@ -30,6 +30,7 @@
 #include <wtf/KeyValuePair.h>
 #include <wtf/OptionSetHash.h>
 #include <wtf/Packed.h>
+#include <wtf/RangeAdaptors.h>
 
 namespace WTF {
 
@@ -93,6 +94,20 @@ public:
 
 public:
     HashMap() = default;
+
+    template<typename Range>
+        requires std::ranges::input_range<Range> && std::convertible_to<std::ranges::range_value_t<Range>, KeyValuePairType>
+    explicit HashMap(FromRange, Range&& range)
+    {
+        if constexpr (std::ranges::sized_range<Range>)
+            reserveInitialCapacity(std::ranges::size(range));
+        for (auto&& keyValuePair : range) {
+            if constexpr (std::is_rvalue_reference_v<Range&&>)
+                add(WTFMove(keyValuePair.key), WTFMove(keyValuePair.value));
+            else
+                add(keyValuePair.key, keyValuePair.value);
+        }
+    }
 
     HashMap(std::initializer_list<KeyValuePairType> initializerList)
     {

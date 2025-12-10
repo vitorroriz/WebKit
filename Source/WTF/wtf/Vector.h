@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <initializer_list>
 #include <limits>
 #include <optional>
@@ -37,6 +38,7 @@
 #include <wtf/MathExtras.h>
 #include <wtf/Noncopyable.h>
 #include <wtf/NotFound.h>
+#include <wtf/RangeAdaptors.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/SwiftBridging.h>
 #include <wtf/ValueCheck.h>
@@ -600,6 +602,20 @@ public:
 
     Vector()
     {
+    }
+
+    template<typename Range>
+        requires std::ranges::input_range<Range> && std::convertible_to<std::ranges::range_value_t<Range>, T>
+    explicit Vector(FromRange, Range&& range)
+    {
+        if constexpr (std::ranges::sized_range<Range>)
+            reserveInitialCapacity(std::ranges::size(range));
+        for (auto&& item : range) {
+            if constexpr (std::is_rvalue_reference_v<Range&&>)
+                append(WTFMove(item));
+            else
+                append(item);
+        }
     }
 
     // Unlike in std::vector, this constructor does not initialize POD types.

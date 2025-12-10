@@ -251,6 +251,7 @@ set(WTF_PUBLIC_HEADERS
     RAMSize.h
     RandomDevice.h
     Range.h
+    RangeAdaptors.h
     RangeSet.h
     RawHex.h
     RawPointer.h

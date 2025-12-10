@@ -272,6 +272,7 @@
 		CDD4AC792D9C309A00D11414 /* CStringView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CDD4AC772D9C309A00D11414 /* CStringView.cpp */; };
 		CDD4AC7A2D9C309A00D11414 /* CStringView.h in Headers */ = {isa = PBXBuildFile; fileRef = CDD4AC782D9C309A00D11414 /* CStringView.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CEA072AA236FFBF70018839C /* CrashReporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CEA072A9236FFBF70018839C /* CrashReporter.cpp */; };
+		D6135B2E2EE4BCE0002B5F19 /* RangeAdaptors.h in Headers */ = {isa = PBXBuildFile; fileRef = D6135B2D2EE4BCE0002B5F19 /* RangeAdaptors.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DCEE22011CEA7551000C2396 /* BlockObjCExceptions.mm in Sources */ = {isa = PBXBuildFile; fileRef = DCEE21FD1CEA7551000C2396 /* BlockObjCExceptions.mm */; };
 		DD03059327B5DA0D00344002 /* SignedPtr.h in Headers */ = {isa = PBXBuildFile; fileRef = 862A8D32278DE74A0014120C /* SignedPtr.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DD28468829248DDA0009A61D /* UnifiedWebPreferences.yaml in Headers */ = {isa = PBXBuildFile; fileRef = DD284687292442F30009A61D /* UnifiedWebPreferences.yaml */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -1705,6 +1706,7 @@
 		CE1132832370634900A8C83B /* AnsiColors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnsiColors.h; sourceTree = "<group>"; };
 		CEA072A8236FFBF70018839C /* CrashReporter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CrashReporter.h; sourceTree = "<group>"; };
 		CEA072A9236FFBF70018839C /* CrashReporter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CrashReporter.cpp; sourceTree = "<group>"; };
+		D6135B2D2EE4BCE0002B5F19 /* RangeAdaptors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RangeAdaptors.h; sourceTree = "<group>"; };
 		DCEE21FC1CEA7551000C2396 /* BlockObjCExceptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockObjCExceptions.h; sourceTree = "<group>"; };
 		DCEE21FD1CEA7551000C2396 /* BlockObjCExceptions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BlockObjCExceptions.mm; sourceTree = "<group>"; };
 		DCEE22041CEB9869000C2396 /* BackwardsGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackwardsGraph.h; sourceTree = "<group>"; };
@@ -2632,6 +2634,7 @@
 				C8F597CA2A57417FBAB92FD6 /* RandomDevice.cpp */,
 				24F1B248619F412296D1C19C /* RandomDevice.h */,
 				0F2AC5601E89F70C0001EE3F /* Range.h */,
+				D6135B2D2EE4BCE0002B5F19 /* RangeAdaptors.h */,
 				0F725CAB1C50461600AD943A /* RangeSet.h */,
 				FE7ACFEE285DC2F8007FC8E9 /* RawHex.h */,
 				0F87105916643F190090B0AD /* RawPointer.h */,
@@ -3786,6 +3789,7 @@
 				DD3DC8E827A4BF8E007E5B61 /* RAMSize.h in Headers */,
 				DD3DC8B327A4BF8E007E5B61 /* RandomDevice.h in Headers */,
 				DD3DC92027A4BF8E007E5B61 /* Range.h in Headers */,
+				D6135B2E2EE4BCE0002B5F19 /* RangeAdaptors.h in Headers */,
 				DD3DC8EB27A4BF8E007E5B61 /* RangeSet.h in Headers */,
 				FE7ACFEF285DC2F9007FC8E9 /* RawHex.h in Headers */,
 				DD3DC8DC27A4BF8E007E5B61 /* RawPointer.h in Headers */,

@@ -61,7 +61,7 @@ TEST(WTF_HashMap, HashTableIteratorComparison)
 }
 
 struct TestDoubleHashTraits : HashTraits<double> {
-    static const int minimumTableSize = 8;
+    static constexpr unsigned minimumTableSize = 8;
 };
 
 typedef HashMap<double, int64_t, DefaultHash<double>, TestDoubleHashTraits> DoubleHashMap;
@@ -1333,6 +1333,133 @@ TEST(WTF_HashMap, KeysValuesRangesAllAnyNoneOf)
     EXPECT_TRUE(std::ranges::any_of(map.values(), [] (int el) {
         return el < 2;
     }));
+}
+
+TEST(WTF_HashMap, fromRangeConstructorBasicTypes)
+{
+    Vector<KeyValuePair<int, String>> pairs {
+        { 1, "one"_s },
+        { 2, "two"_s },
+        { 3, "three"_s }
+    };
+    HashMap<int, String> wtfMap = pairs | rangeTo<HashMap<int, String>>();
+
+    EXPECT_EQ(3U, wtfMap.size());
+    EXPECT_EQ("one"_s, wtfMap.get(1));
+    EXPECT_EQ("two"_s, wtfMap.get(2));
+    EXPECT_EQ("three"_s, wtfMap.get(3));
+}
+
+TEST(WTF_HashMap, fromRangeConstructorInitializerList)
+{
+    auto initList = {
+        KeyValuePair { 10, 100 },
+        KeyValuePair(20, 200),
+        KeyValuePair(30, 300)
+    };
+    HashMap<int, int> wtfMap(fromRange, initList);
+
+    EXPECT_EQ(3U, wtfMap.size());
+    EXPECT_EQ(100, wtfMap.get(10));
+    EXPECT_EQ(200, wtfMap.get(20));
+    EXPECT_EQ(300, wtfMap.get(30));
+}
+
+TEST(WTF_HashMap, fromRangeConstructorEmptyRange)
+{
+    Vector<KeyValuePair<int, int>> emptyVec;
+    HashMap<int, int> wtfMap(fromRange, emptyVec);
+
+    EXPECT_TRUE(wtfMap.isEmpty());
+    EXPECT_EQ(0U, wtfMap.size());
+}
+
+TEST(WTF_HashMap, fromRangeConstructorMoveOnlyValues)
+{
+    Vector<KeyValuePair<int, MoveOnly>> stdVec;
+    stdVec.append({ 1, MoveOnly { 42 } });
+    stdVec.append({ 2, MoveOnly { 99 } });
+
+    HashMap<int, MoveOnly> wtfMap(fromRange, WTFMove(stdVec));
+
+    EXPECT_EQ(2U, wtfMap.size());
+
+    auto it1 = wtfMap.find(1);
+    auto it2 = wtfMap.find(2);
+
+    ASSERT_NE(wtfMap.end(), it1);
+    ASSERT_NE(wtfMap.end(), it2);
+
+    EXPECT_EQ(42U, it1->value.value());
+    EXPECT_EQ(99U, it2->value.value());
+}
+
+TEST(WTF_HashMap, fromRangeConstructorStringKeys)
+{
+    Vector<KeyValuePair<String, double>> stdVec {
+        { "pi"_s, 3.14159 },
+        { "e"_s, 2.71828 },
+        { "sqrt2"_s, 1.41421 }
+    };
+    HashMap<String, double> wtfMap(fromRange, stdVec);
+
+    EXPECT_EQ(3U, wtfMap.size());
+    EXPECT_DOUBLE_EQ(3.14159, wtfMap.get("pi"_s));
+    EXPECT_DOUBLE_EQ(2.71828, wtfMap.get("e"_s));
+    EXPECT_DOUBLE_EQ(1.41421, wtfMap.get("sqrt2"_s));
+}
+
+TEST(WTF_HashMap, fromRangeConstructorCustomHashTraits)
+{
+    // Test with custom hash map configuration
+    using CustomHashMap = HashMap<double, int64_t, DefaultHash<double>, TestDoubleHashTraits>;
+
+    Vector<KeyValuePair<double, int64_t>> stdVec {
+        { 1.1, 11 },
+        { 2.2, 22 },
+        { 3.3, 33 }
+    };
+    CustomHashMap wtfMap(fromRange, stdVec);
+
+    EXPECT_EQ(3U, wtfMap.size());
+    EXPECT_EQ(11, wtfMap.get(1.1));
+    EXPECT_EQ(22, wtfMap.get(2.2));
+    EXPECT_EQ(33, wtfMap.get(3.3));
+}
+
+TEST(WTF_HashMap, RangeToBasicUsage)
+{
+    // Test the rangeTo range adaptor with HashMap
+    Vector<KeyValuePair<int, String>> stdVec {
+        { 1, "one"_s },
+        { 2, "two"_s },
+        { 3, "three"_s }
+    };
+    auto wtfMap = stdVec | rangeTo<HashMap<int, String>>();
+
+    EXPECT_EQ(3U, wtfMap.size());
+    EXPECT_EQ("one"_s, wtfMap.get(1));
+    EXPECT_EQ("two"_s, wtfMap.get(2));
+    EXPECT_EQ("three"_s, wtfMap.get(3));
+}
+
+TEST(WTF_HashMap, RangeToChainedOperations)
+{
+    Vector<KeyValuePair<int, int>> stdVec {
+        { 1, 10 },
+        { 2, 20 },
+        { 3, 30 },
+        { 4, 40 }
+    };
+
+    auto result = stdVec
+        | std::views::filter([](const auto& pair) { return !(pair.key % 2); })
+        | std::views::transform([](const auto& pair) -> KeyValuePair<int, int> { return { pair.key, pair.value * 2 }; })
+        | rangeTo<HashMap<int, int>>();
+
+    EXPECT_EQ(2U, result.size());
+    EXPECT_EQ(40, result.get(2)); // 20 * 2
+    EXPECT_EQ(80, result.get(4)); // 40 * 2
 }
 
 } // namespace TestWebKitAPI

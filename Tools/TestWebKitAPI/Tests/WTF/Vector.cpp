@@ -2140,4 +2140,117 @@ TEST(WTF_Vector, InsertFill)
         EXPECT_EQ(vector[i + 150], i + 50U);
 }
 
+TEST(WTF_Vector, fromRangeConstructorBasicTypes)
+{
+    auto isPrime = [](int n) {
+        if (n <= 1)
+            return false;
+        if (n == 2)
+            return true;
+        if (!(n % 2))
+            return false;
+
+        for (int i = 3; i <= std::sqrt(n); i += 2) {
+            if (!(n % i))
+                return false;
+        }
+
+        return true;
+    };
+    Vector<int> wtfVec = std::views::iota(1)
+        | std::views::filter(isPrime)
+        | std::views::take(5)
+        | rangeTo<Vector<int>>();
+
+    EXPECT_EQ(5U, wtfVec.size());
+    EXPECT_EQ(2, wtfVec[0]);
+    EXPECT_EQ(3, wtfVec[1]);
+    EXPECT_EQ(5, wtfVec[2]);
+    EXPECT_EQ(7, wtfVec[3]);
+    EXPECT_EQ(11, wtfVec[4]);
+}
+
+TEST(WTF_Vector, fromRangeConstructorArray)
+{
+    int arr[] = { 10, 20, 30 };
+    Vector<int> wtfVec(fromRange, arr);
+
+    EXPECT_EQ(3U, wtfVec.size());
+    EXPECT_EQ(10, wtfVec[0]);
+    EXPECT_EQ(20, wtfVec[1]);
+    EXPECT_EQ(30, wtfVec[2]);
+}
+
+TEST(WTF_Vector, fromRangeConstructorInitializerList)
+{
+    std::initializer_list<int> initList = { 7, 8, 9 };
+    Vector<int> wtfVec(fromRange, initList);
+
+    EXPECT_EQ(3U, wtfVec.size());
+    EXPECT_EQ(7, wtfVec[0]);
+    EXPECT_EQ(8, wtfVec[1]);
+    EXPECT_EQ(9, wtfVec[2]);
+}
+
+TEST(WTF_Vector, fromRangeConstructorEmptyRange)
+{
+    auto emptyRange = std::views::empty<int>;
+    Vector<int> wtfVec(fromRange, emptyRange);
+
+    EXPECT_TRUE(wtfVec.isEmpty());
+    EXPECT_EQ(0U, wtfVec.size());
+}
+
+TEST(WTF_Vector, fromRangeStrings)
+{
+    Vector<String> stringVec = { "hello"_s, "world"_s };
+    Vector<String> upperStrings = stringVec | std::views::transform([](const String& str) {
+        return str.convertToUppercaseWithoutLocale();
+    }) | rangeTo<Vector<String>>();
+
+    EXPECT_EQ(2U, stringVec.size());
+    EXPECT_EQ("HELLO"_s, upperStrings[0]);
+    EXPECT_EQ("WORLD"_s, upperStrings[1]);
+}
+
+TEST(WTF_Vector, RangeToBasicUsage)
+{
+    auto wtfVec = std::views::iota(1, 5) | rangeTo<Vector<int>>();
+
+    EXPECT_EQ(4U, wtfVec.size());
+    EXPECT_EQ(1, wtfVec[0]);
+    EXPECT_EQ(2, wtfVec[1]);
+    EXPECT_EQ(3, wtfVec[2]);
+    EXPECT_EQ(4, wtfVec[3]);
+}
+
+TEST(WTF_Vector, RangeToChainedOperations)
+{
+    Vector<int> stdVec { 1, 2, 3, 4, 5 };
+
+    auto result = stdVec
+        | std::views::filter([](int x) { return !(x % 2); })
+        | std::views::transform([](int x) { return x * 2; })
+        | rangeTo<Vector<int>>();
+
+    EXPECT_EQ(2U, result.size());
+    EXPECT_EQ(4, result[0]); // 2 * 2
+    EXPECT_EQ(8, result[1]); // 4 * 2
+}
+
+TEST(WTF_Vector, RangeToMoveOnly)
+{
+    Vector<MoveOnly> source;
+    source.append(5);
+    source.append(6);
+    source.append(7);
+
+    auto dest = WTFMove(source) | rangeTo<Vector<MoveOnly>>();
+
+    EXPECT_EQ(3U, dest.size());
+    EXPECT_EQ(5U, dest[0].value());
+    EXPECT_EQ(6U, dest[1].value());
+    EXPECT_EQ(7U, dest[2].value());
+}
+
 } // namespace TestWebKitAPI
