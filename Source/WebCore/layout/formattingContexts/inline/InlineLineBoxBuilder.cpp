@@ -540,7 +540,7 @@ void LineBoxBuilder::constructBlockContent(LineBox& lineBox)
     for (size_t index = 0;  index < runs.size() - 1; ++index) {
         auto& run = runs[index];
         if (run.isLineSpanningInlineBoxStart()) {
-            auto lineSpanningInlineBox = InlineLevelBox::createInlineBox(run.layoutBox(), run.layoutBox().style(), lineLayoutResult.contentGeometry.logicalLeft, lineLayoutResult.contentGeometry.logicalWidth, InlineLevelBox::LineSpanningInlineBox::Yes);
+            auto lineSpanningInlineBox = InlineLevelBox::createInlineBox(run.layoutBox(), run.layoutBox().style(), lineLayoutResult.contentGeometry.logicalLeft, lineLayoutResult.lineGeometry.logicalWidth, InlineLevelBox::LineSpanningInlineBox::Yes);
             setVerticalPropertiesForInlineLevelBox(lineBox, lineSpanningInlineBox);
             lineSpanningInlineBox.setLogicalTop(blockGeometry.marginBefore());
             lineSpanningInlineBox.setLogicalHeight(InlineLayoutUnit(blockGeometry.borderBoxHeight()));
