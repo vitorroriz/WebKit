@@ -9242,8 +9242,8 @@ void WebPageProxy::createNewPage(IPC::Connection& connection, WindowFeatures&& w
         configuration->setOpenedSite(site);
     } else {
         configuration->setOpenerInfo(std::nullopt);
-        configuration->setOpenedSite(WebCore::Site(request.url()));
-        if (openedBlobURL)
+        configuration->setOpenedSite(WebCore::Site(navigationAction->request().url()));
+        if (openedBlobURL && !protectedPreferences()->siteIsolationEnabled())
             configuration->setRelatedPage(*this);
     }
 

@@ -7132,6 +7132,28 @@ TEST(SiteIsolation, LocalIframeOpensBlobURLFromFileMainFrame)
     EXPECT_NOT_NULL(blobWindow.get());
 }
 
+TEST(SiteIsolation, CrossSiteIframeOpenWindowWithBlobURL)
+{
+    auto iframeHTML = "<script>"
+    "   const blob = new Blob(['<script>function alertOpener() { alert(!!window.opener); }<\\/script>'], { type: 'text/html' });"
+    "   const blobURL = URL.createObjectURL(blob);"
+    "   window.open(blobURL);"
+    "</script>"_s;
+
+    HTTPServer server({
+        { "/main"_s, { "<iframe src='https://webkit.org/iframe'></iframe>"_s } },
+        { "/iframe"_s, { iframeHTML } },
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto [opener, opened] = openerAndOpenedViews(server, @"https://example.com/main");
+    [opened.webView evaluateJavaScript:@"alertOpener()" completionHandler:nil];
+    EXPECT_WK_STREQ([opened.uiDelegate waitForAlert], "false");
+
+    pid_t openedMainFramePID = [opened.webView mainFrame].info._processIdentifier;
+    EXPECT_NE([opener.webView mainFrame].info._processIdentifier, openedMainFramePID);
+    EXPECT_NE([opener.webView firstChildFrame]._processIdentifier, openedMainFramePID);
+}
+
 #if PLATFORM(MAC)
 
 TEST(SiteIsolation, ColorInputPickerLocation)
