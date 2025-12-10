@@ -78,6 +78,7 @@ void HTMLScriptElement::removedFromAncestor(RemovalType type, ContainerNode& con
 {
     HTMLElement::removedFromAncestor(type, container);
     unblockRendering();
+    unregisterSpeculationRules();
 }
 
 void HTMLScriptElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason attributeModificationReason)

@@ -93,6 +93,7 @@ static bool matches(const Box<SpeculationRules::Negation>& predicate, Document& 
     return !matches(*predicate->clause, document, anchor);
 }
 
+// https://html.spec.whatwg.org/C#dr-predicate-matches
 static bool matches(const SpeculationRules::DocumentPredicate& predicate, Document& document, HTMLAnchorElement& anchor)
 {
     return WTF::switchOn(predicate.value(),
@@ -104,20 +105,22 @@ static bool matches(const SpeculationRules::DocumentPredicate& predicate, Docume
     );
 }
 
-// https://wicg.github.io/nav-speculation/speculation-rules.html#document-rule-predicate-matching
+// https://html.spec.whatwg.org/C#find-matching-links
 std::optional<PrefetchRule> SpeculationRulesMatcher::hasMatchingRule(Document& document, HTMLAnchorElement& anchor)
 {
     const auto& speculationRules = document.speculationRules();
     const auto& url = anchor.href();
 
-    for (const auto& rule : speculationRules->prefetchRules()) {
-        for (const auto& href : rule.urls) {
-            if (href == url)
-                return PrefetchRule { rule.tags, rule.referrerPolicy, rule.eagerness == SpeculationRules::Eagerness::Conservative };
-        }
+    for (auto [node, rules] : speculationRules->prefetchRules()) {
+        for (const auto& rule : rules) {
+            for (const auto& href : rule.urls) {
+                if (href == url)
+                    return PrefetchRule { rule.tags, rule.referrerPolicy, rule.eagerness == SpeculationRules::Eagerness::Conservative };
+            }
 
-        if (rule.predicate && matches(rule.predicate.value(), document, anchor))
-            return PrefetchRule { rule.tags, rule.referrerPolicy, rule.eagerness == SpeculationRules::Eagerness::Conservative || rule.eagerness == SpeculationRules::Eagerness::Moderate };
+            if (rule.predicate && matches(rule.predicate.value(), document, anchor))
+                return PrefetchRule { rule.tags, rule.referrerPolicy, rule.eagerness == SpeculationRules::Eagerness::Conservative || rule.eagerness == SpeculationRules::Eagerness::Moderate };
+        }
     }
 
     return std::nullopt;

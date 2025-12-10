@@ -175,6 +175,20 @@ void DocumentPrefetcher::notifyFinished(CachedResource& resource, const NetworkL
         resource.removeClient(*this);
 }
 
+void DocumentPrefetcher::removePrefetch(const URL& url)
+{
+    auto it = m_prefetchedData.find(url);
+    if (it == m_prefetchedData.end())
+        return;
+
+    if (auto& resource = it->value.resource) {
+        if (resource->hasClient(*this))
+            resource->removeClient(*this);
+        MemoryCache::singleton().remove(*resource);
+    }
+    m_prefetchedData.remove(it);
+}
+
 bool DocumentPrefetcher::wasPrefetched(const URL& url) const
 {
     return m_prefetchedData.contains(url);

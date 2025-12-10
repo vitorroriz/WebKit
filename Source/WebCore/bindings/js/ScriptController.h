@@ -59,6 +59,7 @@ namespace WebCore {
 
 class CachedScriptFetcher;
 class HTMLDocument;
+class Node;
 class HTMLPlugInElement;
 class LoadableModuleScript;
 class LocalFrame;
@@ -176,7 +177,7 @@ public:
     void reportExceptionFromScriptError(LoadableScript::Error, bool);
 
     void registerImportMap(const ScriptSourceCode&, const URL& baseURL);
-    bool registerSpeculationRules(const ScriptSourceCode&, const URL& baseURL);
+    bool registerSpeculationRules(Node&, const ScriptSourceCode&, const URL& baseURL);
 
 private:
     ValueOrException executeScriptInWorld(DOMWrapperWorld&, RunJavaScriptParameters&&);

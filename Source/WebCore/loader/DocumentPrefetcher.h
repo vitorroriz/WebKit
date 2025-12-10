@@ -58,6 +58,7 @@ public:
     void deref() const final { RefCounted::deref(); }
 
     void prefetch(const URL&, const Vector<String>& tags, std::optional<ReferrerPolicy>, bool lowPriority = false);
+    void removePrefetch(const URL&);
     bool wasPrefetched(const URL&) const;
     Box<NetworkLoadMetrics> takePrefetchedNetworkLoadMetrics(const URL&);
 
