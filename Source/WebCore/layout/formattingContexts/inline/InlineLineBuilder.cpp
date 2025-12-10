@@ -533,36 +533,6 @@ UniqueRef<LineContent> LineBuilder::placeInlineAndFloatContent(const InlineItemR
                 return;
             } else {
                 auto result = handleInlineContent(needsLayoutRange, lineCandidate);
-
-                auto adjustLineWithMarginBefore = [&] {
-                    // We don't know if margin coming from previous content should be applied or not
-                    // until after we managed to put some inline content on the line.
-                    // e.g.
-                    // <span>text<div style="margin-bottom: 100px;"></div>more text</span> v.s
-                    // <span>text<div style="margin-bottom: 100px;"></div> <div></div></span>
-                    // where in the first example, the 100px gap is between the block container's edge and "more text"
-                    // while in the second case, it is somewhere after the second block container (can't tell).
-                    if (!m_line.hasContentOrListMarker())
-                        return false;
-                    auto& marginState = blockLayoutState().marginState();
-                    auto marginValue = marginState.margin();
-                    marginState.resetMarginValues();
-                    if (marginState.atBeforeSideOfBlock) {
-                        marginState.resetBeforeSideOfBlock();
-                        return false;
-                    }
-                    if (!marginValue)
-                        return false;
-                    m_lineLogicalRect = { m_lineLogicalRect.top() + marginValue, m_lineInitialLogicalRect.left(), m_lineInitialLogicalRect.width(), m_lineInitialLogicalRect.height() };
-                    return true;
-                };
-                if (adjustLineWithMarginBefore() && !floatingContext().isEmpty()) {
-                    // This is similar to what we do in block layout when the estimated top position turns out to be incorrect
-                    // and now we have to relayout the content with the adjusted vertical position to make sure we avoid floats properly.
-                    m_line.initialize(m_lineSpanningInlineBoxes, isFirstFormattedLineCandidate());
-                    result = handleInlineContent(needsLayoutRange, lineCandidate);
-                }
-
                 auto isEndOfLine = result.isEndOfLine == InlineContentBreaker::IsEndOfLine::Yes;
                 if (!result.committedCount.isRevert) {
                     placedInlineItemCount += result.committedCount.value;
@@ -1408,6 +1378,63 @@ void LineBuilder::handleBlockContent(const InlineItem& blockItem)
 }
 
 LineBuilder::Result LineBuilder::handleInlineContent(const InlineItemRange& layoutRange, LineCandidate& lineCandidate)
+{
+    auto result = applyLineBreakingOnCandidateInlineContent(layoutRange, lineCandidate);
+    if (!m_line.hasContentOrListMarker())
+        return result;
+
+    auto applyMarginInBlockDirection = [&]() -> LayoutUnit {
+        // We don't know if margin coming from previous content should be applied or not
+        // until after we managed to put some inline content on the line.
+        // e.g.
+        // <span>text<div style="margin-bottom: 100px;"></div>more text</span> v.s
+        // <span>text<div style="margin-bottom: 100px;"></div> <div></div></span>
+        // where in the first example, the 100px gap is between the block container's edge and "more text"
+        // while in the second case, it is somewhere after the second block container (can't tell).
+        auto& marginState = blockLayoutState().marginState();
+        auto marginValue = marginState.margin();
+        marginState.resetMarginValues();
+
+        if (marginState.atBeforeSideOfBlock) {
+            marginState.resetBeforeSideOfBlock();
+            return { };
+        }
+        return marginValue;
+    };
+    auto lineOffset = applyMarginInBlockDirection();
+    if (!lineOffset)
+        return result;
+
+    // This is similar to what we do in block layout when the estimated top position turns out to be incorrect
+    // and now we have to relayout the content with the adjusted vertical position to make sure we avoid floats properly.
+    m_lineLogicalRect = { m_lineLogicalRect.top() + lineOffset, m_lineInitialLogicalRect.left(), m_lineInitialLogicalRect.width(), m_lineInitialLogicalRect.height() };
+    if (floatingContext().isEmpty())
+        return result;
+
+    m_line.initialize(m_lineSpanningInlineBoxes, isFirstFormattedLineCandidate());
+
+    auto commitPrecedingNonContentfulContent = [&] {
+        LineCandidate precedingNonContentfulContent;
+        auto& firstCandidateItem = lineCandidate.inlineContent.continuousContent().runs().first().inlineItem;
+        // FIXME: There should not be any previous-non-contentful inline items here but since we "break" before/after floats, content like <span><floatbox>content</span> may trigger this (where the <span> is disconnected from the inline content)
+        for (size_t index = layoutRange.startIndex(); index < layoutRange.endIndex(); ++index) {
+            auto& inlineItem = m_inlineItemList[index];
+            if (&inlineItem == &firstCandidateItem)
+                break;
+
+            if (!inlineItem.isFloat()) {
+                auto& styleToUse = isFirstFormattedLineCandidate() ? inlineItem.firstLineStyle() : inlineItem.style();
+                precedingNonContentfulContent.inlineContent.appendInlineItem(inlineItem, styleToUse, { });
+            }
+        }
+        if (!precedingNonContentfulContent.inlineContent.isEmpty())
+            applyLineBreakingOnCandidateInlineContent(layoutRange, precedingNonContentfulContent);
+    };
+    commitPrecedingNonContentfulContent();
+    return applyLineBreakingOnCandidateInlineContent(layoutRange, lineCandidate);
+}
+
+LineBuilder::Result LineBuilder::applyLineBreakingOnCandidateInlineContent(const InlineItemRange& layoutRange, LineCandidate& lineCandidate)
 {
     auto result = LineBuilder::Result { };
     auto& inlineContent = lineCandidate.inlineContent;
