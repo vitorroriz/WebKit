@@ -48,8 +48,10 @@
 #import <wtf/ProcessPrivilege.h>
 #import <wtf/RetainPtr.h>
 #import <wtf/RuntimeApplicationChecks.h>
+#import <wtf/cocoa/AuditToken.h>
 #import <wtf/cocoa/RuntimeApplicationChecksCocoa.h>
 #import <wtf/darwin/DispatchExtras.h>
+#import <wtf/spi/darwin/SandboxSPI.h>
 
 #if ENABLE(CONTENT_FILTERING)
 #import <pal/spi/cocoa/NEFilterSourceSPI.h>
@@ -134,6 +136,22 @@ void NetworkProcess::platformInitializeNetworkProcessCocoa(const NetworkProcessC
         }
     }
 #endif // ENABLE(DNS_SERVER_FOR_TESTING_IN_NETWORKING_PROCESS)
+
+#if ENABLE(INHERITANCE_OF_NETWORK_ACCESS_FROM_UI_PROCESS)
+    if (auto auditToken = protectedParentProcessConnection()->getAuditToken()) {
+        bool isNetworkAccessBlockedInUIProcess = (1 == sandbox_check_by_audit_token(*auditToken, "network-outbound", SANDBOX_FILTER_PATH, "/private/var/run/mDNSResponder"));
+
+        if (isNetworkAccessBlockedInUIProcess) {
+            RELEASE_LOG(Process, "Setting sandbox state flag to block network access");
+            if (auto auditTokenForSelf = WTF::auditTokenForSelf()) {
+                if (!sandbox_enable_state_flag("BlockNetworkAccess", *auditTokenForSelf))
+                    RELEASE_LOG_ERROR(Process, "Unable to set sandbox state flag to block network access");
+            } else
+                RELEASE_LOG_FAULT(Process, "Unable to get audit token to block network access");
+        }
+    } else
+        RELEASE_LOG_FAULT(Process, "Unable to get audit token for UI process to block network access");
+#endif
 
     increaseFileDescriptorLimit();
 }
