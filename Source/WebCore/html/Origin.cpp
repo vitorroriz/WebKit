@@ -83,12 +83,12 @@ ExceptionOr<Ref<Origin>> Origin::from(ScriptExecutionContext& context, JSC::JSVa
             return create(securityOrigin.releaseNonNull());
     } else if (auto* jsMessageEvent = JSC::jsDynamicCast<JSMessageEvent*>(value)) {
         Ref messageEvent = jsMessageEvent->wrapped();
-        // FIXME: MessageEvent needs to store the actual origin.
-        return create(SecurityOrigin::createFromString(messageEvent->origin()));
+        if (RefPtr securityOrigin = messageEvent->securityOrigin())
+            return create(securityOrigin.releaseNonNull());
     } else if (auto* jsExtendableMessageEvent = JSC::jsDynamicCast<JSExtendableMessageEvent*>(value)) {
         Ref extendableMessageEvent = jsExtendableMessageEvent->wrapped();
-        // FIXME: ExtendableMessageEvent needs to store the actual origin.
-        return create(SecurityOrigin::createFromString(extendableMessageEvent->origin()));
+        if (RefPtr securityOrigin = extendableMessageEvent->securityOrigin())
+            return create(securityOrigin.releaseNonNull());
     } else if (auto* jsOrigin = JSC::jsDynamicCast<JSOrigin*>(value)) {
         Ref origin = jsOrigin->wrapped();
         return create(origin->m_origin.copyRef());

@@ -104,4 +104,10 @@ String ExtendableMessageEvent::origin() const
     });
 }
 
+const RefPtr<SecurityOrigin> ExtendableMessageEvent::securityOrigin() const
+{
+    auto* origin = std::get_if<Ref<SecurityOrigin>>(&m_origin);
+    return origin ? origin->ptr() : nullptr;
+}
+
 } // namespace WebCore

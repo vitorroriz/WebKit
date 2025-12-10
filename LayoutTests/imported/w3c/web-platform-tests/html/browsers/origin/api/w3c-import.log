@@ -14,7 +14,6 @@ Property values requiring vendor prefixes:
 None
 ------------------------------------------------------------------------
 List of files:
-/LayoutTests/imported/w3c/web-platform-tests/html/browsers/origin/api/idlharness.any.js
 /LayoutTests/imported/w3c/web-platform-tests/html/browsers/origin/api/origin-comparison.any.js
 /LayoutTests/imported/w3c/web-platform-tests/html/browsers/origin/api/origin-from-extendablemessageevent.any.js
 /LayoutTests/imported/w3c/web-platform-tests/html/browsers/origin/api/origin-from-global.any.js

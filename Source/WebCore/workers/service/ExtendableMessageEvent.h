@@ -71,6 +71,7 @@ public:
     JSValueInWrappedObject& cachedPorts() { return m_cachedPorts; }
 
     String origin() const;
+    const RefPtr<SecurityOrigin> securityOrigin() const;
     const String& lastEventId() const { return m_lastEventId; }
     const std::optional<ExtendableMessageEventSource>& source() const { return m_source; }
     const Vector<Ref<MessagePort>>& ports() const { return m_ports; }

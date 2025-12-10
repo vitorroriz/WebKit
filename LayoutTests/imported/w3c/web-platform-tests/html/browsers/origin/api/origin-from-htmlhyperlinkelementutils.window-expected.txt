@@ -1,4 +1,6 @@
 
+PASS Origin.from(<a>) throws.
+PASS Origin.from(<area>) throws.
 PASS Origin.from(<a href="about:blank">) returns an opaque origin.
 PASS Origin.from(<area href="about:blank">) returns an opaque origin.
 PASS Origin.from(<a href="data:text/plain,opaque">) returns an opaque origin.

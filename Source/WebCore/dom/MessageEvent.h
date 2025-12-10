@@ -71,6 +71,7 @@ public:
     void initMessageEvent(const AtomString& type, bool canBubble, bool cancelable, JSC::JSValue data, const String& origin, const String& lastEventId, std::optional<MessageEventSource>&&, Vector<Ref<MessagePort>>&&);
 
     String origin() const;
+    const RefPtr<SecurityOrigin> securityOrigin() const;
     const String& lastEventId() const { return m_lastEventId; }
     const std::optional<MessageEventSource>& source() const { return m_source; }
     const Vector<Ref<MessagePort>>& ports() const { return m_ports; }

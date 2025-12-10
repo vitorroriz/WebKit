@@ -611,10 +611,6 @@ imported/w3c/web-platform-tests/webvtt/rendering/cues-with-video/processing-mode
 imported/w3c/web-platform-tests/webvtt/rendering/cues-with-video/processing-model/2_tracks.html [ Skip ]
 imported/w3c/web-platform-tests/webvtt/rendering/cues-with-video/processing-model/3_tracks.html [ Skip ]
 
-# Origin API tests that are broken and need fixing upstream.
-imported/w3c/web-platform-tests/html/browsers/origin/api/idlharness.any.html [ Skip ]
-imported/w3c/web-platform-tests/html/browsers/origin/api/idlharness.any.worker.html [ Skip ]
-
 # Enhanced <select> tests that need fixing.
 imported/w3c/web-platform-tests/html/semantics/forms/the-select-element/customizable-select-in-page/customizable-select-in-page-appearance.tentative.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/html/semantics/forms/the-select-element/customizable-select-in-page/customizable-select-in-page-sizing.tentative.html [ ImageOnlyFailure ]

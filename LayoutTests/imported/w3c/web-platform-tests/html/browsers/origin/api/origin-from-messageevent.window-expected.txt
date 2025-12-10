@@ -1,4 +1,5 @@
 
+PASS Constructed `MessageEvent` objects have no real origins.
 PASS Origin.from(MessageEvent) returns a tuple origin for messages from same-origin frames.
 PASS Origin.from(MessageEvent) returns a tuple origin for messages from cross-origin frames.
 PASS Origin.from(MessageEvent) returns an opaque origin for messages from sandboxed frames.

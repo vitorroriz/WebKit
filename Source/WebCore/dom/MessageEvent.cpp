@@ -120,6 +120,12 @@ String MessageEvent::origin() const
     });
 }
 
+const RefPtr<SecurityOrigin> MessageEvent::securityOrigin() const
+{
+    auto* origin = std::get_if<RefPtr<SecurityOrigin>>(&m_origin);
+    return origin ? *origin : nullptr;
+}
+
 void MessageEvent::initMessageEvent(const AtomString& type, bool canBubble, bool cancelable, JSValue data, const String& origin, const String& lastEventId, std::optional<MessageEventSource>&& source, Vector<Ref<MessagePort>>&& ports)
 {
     if (isBeingDispatched())
