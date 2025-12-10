@@ -73,7 +73,7 @@ public:
     virtual WARN_UNUSED_RETURN GRefPtr<GstPad> outgoingSourcePad() const = 0;
     virtual RefPtr<GStreamerRTPPacketizer> createPacketizer(RefPtr<UniqueSSRCGenerator>, const GstStructure*, GUniquePtr<GstStructure>&&) = 0;
 
-    void replaceTrack(RefPtr<MediaStreamTrack>&&);
+    void replaceTrack(const RefPtr<MediaStreamTrack>&);
 
     void teardown();
 

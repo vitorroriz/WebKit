@@ -378,23 +378,24 @@ void RealtimeOutgoingMediaSourceGStreamer::codecPreferencesChanged()
     m_isStopped = false;
 }
 
-void RealtimeOutgoingMediaSourceGStreamer::replaceTrack(RefPtr<MediaStreamTrack>&& newTrack)
+void RealtimeOutgoingMediaSourceGStreamer::replaceTrack(const RefPtr<MediaStreamTrack>& newTrack)
 {
-    if (!m_track)
-        return;
+    if (m_track)
+        m_track->removeObserver(*this);
 
-    m_track->removeObserver(*this);
     RefPtr<MediaStreamTrackPrivate> trackPrivate;
     if (newTrack)
         trackPrivate = newTrack->privateTrack();
 
     webkitMediaStreamSrcReplaceTrack(WEBKIT_MEDIA_STREAM_SRC_CAST(m_outgoingSource.get()), RefPtr(trackPrivate));
-    if (!newTrack)
+    if (!newTrack) {
+        m_isStopped = true;
+        m_track = nullptr;
         return;
+    }
 
     m_track = WTFMove(trackPrivate);
-    if (m_track)
-        m_track->addObserver(*this);
+    start();
 }
 
 void RealtimeOutgoingMediaSourceGStreamer::setInitialParameters(GUniquePtr<GstStructure>&& parameters)
