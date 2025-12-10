@@ -412,6 +412,8 @@ public:
 
     std::optional<LayoutUnit> lowestInitialLetterLogicalBottom() const;
 
+    void paintBlockLevelContentInInline(PaintInfo&, const LayoutPoint& paintOffset);
+
 protected:
     bool isChildEligibleForMarginTrim(Style::MarginTrimSide, const RenderBox&) const final;
 

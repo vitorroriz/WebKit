@@ -163,6 +163,9 @@ void InlineContentBuilder::adjustDisplayLines(InlineContent& inlineContent, size
         };
         adjustOverflowLogicalWidthWithBlockFlowQuirk();
 
+        if (line.hasContentfulInFlowBox() && !line.hasBlockLevelBox())
+            inlineContent.setHasPaintedInlineLevelBoxes();
+
         auto firstBoxIndex = boxIndex;
         auto lineInkOverflowRect = lineScrollableOverflowRect;
         // Collect overflow from boxes.
@@ -207,8 +210,16 @@ void InlineContentBuilder::adjustDisplayLines(InlineContent& inlineContent, size
             }
 
             if (box.isInlineBox()) {
-                if (!downcast<RenderElement>(*box.layoutBox().rendererForIntegration()).hasSelfPaintingLayer())
+                bool hasSelfPaintingLayer = downcast<RenderElement>(*box.layoutBox().rendererForIntegration()).hasSelfPaintingLayer();
+                if (!hasSelfPaintingLayer)
                     lineInkOverflowRect.unite(box.inkOverflow());
+
+                if (line.hasBlockLevelBox()) {
+                    if (hasSelfPaintingLayer || box.layoutBox().style().hasOpacity() || box.layoutBox().style().hasOutline()) {
+                        // See if the inline box has properties that affect block-in-inline painting.
+                        inlineContent.setHasPaintedInlineLevelBoxes();
+                    }
+                }
                 continue;
             }
         }
