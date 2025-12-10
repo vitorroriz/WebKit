@@ -867,7 +867,8 @@
         },
         "test-function-no-parameters": {
             "animation-type": "discrete",
-            "initial": "foo()",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -877,7 +878,8 @@
         },
         "test-function-single-parameter": {
             "animation-type": "discrete",
-            "initial": "foo(1)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -887,7 +889,8 @@
         },
         "test-function-single-parameter-match-one": {
             "animation-type": "discrete",
-            "initial": "foo(1)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -897,7 +900,8 @@
         },
         "test-function-single-parameter-optional": {
             "animation-type": "discrete",
-            "initial": "foo()",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -907,7 +911,8 @@
         },
         "test-function-bounded-parameters": {
             "animation-type": "discrete",
-            "initial": "foo(1, 2)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -917,7 +922,8 @@
         },
         "test-function-fixed-parameters": {
             "animation-type": "discrete",
-            "initial": "foo(1, 2, 3)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -927,7 +933,8 @@
         },
         "test-function-unbounded-parameters-no-min": {
             "animation-type": "discrete",
-            "initial": "foo(1, 2)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -937,7 +944,8 @@
         },
         "test-function-unbounded-parameters-with-minimum": {
             "animation-type": "discrete",
-            "initial": "foo(1, 2)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -947,7 +955,8 @@
         },
         "test-function-parameters-match-all-ordered": {
             "animation-type": "discrete",
-            "initial": "foo(1, 2)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -957,7 +966,8 @@
         },
         "test-function-parameters-match-all-ordered-with-optional": {
             "animation-type": "discrete",
-            "initial": "foo(1, 2)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -967,7 +977,8 @@
         },
         "test-function-parameters-match-all-any-order": {
             "animation-type": "discrete",
-            "initial": "foo(1, 2)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -977,7 +988,8 @@
         },
         "test-function-parameters-match-all-any-order-with-optional": {
             "animation-type": "discrete",
-            "initial": "foo(1, 2)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -987,7 +999,8 @@
         },
         "test-function-parameters-match-one-or-more-any-order": {
             "animation-type": "discrete",
-            "initial": "foo(1, 2)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -1019,7 +1032,8 @@
         },
         "test-image": {
             "animation-type": "discrete",
-            "initial": "url(about:blank)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,
@@ -1029,7 +1043,8 @@
         },
         "test-image-no-image-set": {
             "animation-type": "discrete",
-            "initial": "url(about:blank)",
+            "initial": "@invalid-for-test",
+            "initial-comment": "Parsing initial values with functions is not yet supported",
             "codegen-properties": {
                 "skip-render-style": true,
                 "skip-style-builder": true,

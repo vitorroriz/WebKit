@@ -85,6 +85,21 @@ Color::Color(SRGBA<uint8_t> color)
 {
 }
 
+Color::Color(CSS::Keyword::Transparent)
+    : value { ResolvedColor { WebCore::Color::transparentBlack } }
+{
+}
+
+Color::Color(CSS::Keyword::Black)
+    : value { ResolvedColor { WebCore::Color::black } }
+{
+}
+
+Color::Color(CSS::Keyword::White)
+    : value { ResolvedColor { WebCore::Color::white } }
+{
+}
+
 Color::Color(ResolvedColor&& color)
     : value { WTFMove(color) }
 {

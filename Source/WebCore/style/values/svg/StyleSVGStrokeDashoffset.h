@@ -43,6 +43,7 @@ struct SVGStrokeDashoffset {
     SVGStrokeDashoffsetLength value;
 
     SVGStrokeDashoffset(SVGStrokeDashoffsetLength&& length) : value { WTFMove(length) } { }
+    SVGStrokeDashoffset(CSS::ValueLiteral<CSS::NumberUnit::Number> literal) : value { Fixed { static_cast<float>(literal.value) } } { }
     SVGStrokeDashoffset(CSS::ValueLiteral<CSS::LengthUnit::Px> literal) : value { literal } { }
     SVGStrokeDashoffset(CSS::ValueLiteral<CSS::PercentageUnit::Percentage> literal) : value { literal } { }
 

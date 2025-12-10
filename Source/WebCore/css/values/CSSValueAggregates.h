@@ -1419,12 +1419,12 @@ template<typename T> struct MinimallySerializingSpaceSeparatedPoint {
     using Array = SpaceSeparatedPair<T>;
     using value_type = T;
 
-    constexpr MinimallySerializingSpaceSeparatedPoint(T p1)
+    template<typename U> constexpr MinimallySerializingSpaceSeparatedPoint(U p1)
         : value { p1, p1 }
     {
     }
 
-    constexpr MinimallySerializingSpaceSeparatedPoint(T p1, T p2)
+    template<typename U> constexpr MinimallySerializingSpaceSeparatedPoint(U p1, U p2)
         : value { WTFMove(p1), WTFMove(p2) }
     {
     }
@@ -1456,12 +1456,12 @@ template<typename T> struct MinimallySerializingSpaceSeparatedSize {
     using Array = SpaceSeparatedPair<T>;
     using value_type = T;
 
-    constexpr MinimallySerializingSpaceSeparatedSize(T p1)
+    template<typename U> constexpr MinimallySerializingSpaceSeparatedSize(U p1)
         : value { p1, p1 }
     {
     }
 
-    constexpr MinimallySerializingSpaceSeparatedSize(T p1, T p2)
+    template<typename U> constexpr MinimallySerializingSpaceSeparatedSize(U p1, U p2)
         : value { WTFMove(p1), WTFMove(p2) }
     {
     }

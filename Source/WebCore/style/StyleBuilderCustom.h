@@ -772,22 +772,22 @@ inline void BuilderCustom::applyValueFontFamily(BuilderState& builderState, CSSV
 
 inline void BuilderCustom::applyInitialBorderTopWidth(BuilderState& builderState)
 {
-    builderState.style().setBorderTopWidth(Style::LineWidth { RenderStyle::initialBorderWidth().value.unresolvedValue() * builderState.style().usedZoom() });
+    builderState.style().setBorderTopWidth(Style::LineWidth { RenderStyle::initialBorderTopWidth().value.unresolvedValue() * builderState.style().usedZoom() });
 }
 
 inline void BuilderCustom::applyInitialBorderRightWidth(BuilderState& builderState)
 {
-    builderState.style().setBorderRightWidth(Style::LineWidth { RenderStyle::initialBorderWidth().value.unresolvedValue() * builderState.style().usedZoom() });
+    builderState.style().setBorderRightWidth(Style::LineWidth { RenderStyle::initialBorderRightWidth().value.unresolvedValue() * builderState.style().usedZoom() });
 }
 
 inline void BuilderCustom::applyInitialBorderBottomWidth(BuilderState& builderState)
 {
-    builderState.style().setBorderBottomWidth(Style::LineWidth { RenderStyle::initialBorderWidth().value.unresolvedValue() * builderState.style().usedZoom() });
+    builderState.style().setBorderBottomWidth(Style::LineWidth { RenderStyle::initialBorderBottomWidth().value.unresolvedValue() * builderState.style().usedZoom() });
 }
 
 inline void BuilderCustom::applyInitialBorderLeftWidth(BuilderState& builderState)
 {
-    builderState.style().setBorderLeftWidth(Style::LineWidth { RenderStyle::initialBorderWidth().value.unresolvedValue() * builderState.style().usedZoom() });
+    builderState.style().setBorderLeftWidth(Style::LineWidth { RenderStyle::initialBorderLeftWidth().value.unresolvedValue() * builderState.style().usedZoom() });
 }
 
 inline void BuilderCustom::applyInitialOutlineWidth(BuilderState& builderState)
@@ -802,7 +802,7 @@ inline void BuilderCustom::applyInitialColumnRuleWidth(BuilderState& builderStat
 
 inline void BuilderCustom::applyInitialBorderBottomLeftRadius(BuilderState& builderState)
 {
-    builderState.style().setBorderBottomLeftRadius(RenderStyle::initialBorderRadius());
+    builderState.style().setBorderBottomLeftRadius(RenderStyle::initialBorderBottomLeftRadius());
     builderState.style().setHasExplicitlySetBorderBottomLeftRadius(false);
 }
 
@@ -820,7 +820,7 @@ inline void BuilderCustom::applyValueBorderBottomLeftRadius(BuilderState& builde
 
 inline void BuilderCustom::applyInitialBorderBottomRightRadius(BuilderState& builderState)
 {
-    builderState.style().setBorderBottomRightRadius(RenderStyle::initialBorderRadius());
+    builderState.style().setBorderBottomRightRadius(RenderStyle::initialBorderBottomRightRadius());
     builderState.style().setHasExplicitlySetBorderBottomRightRadius(false);
 }
 
@@ -838,7 +838,7 @@ inline void BuilderCustom::applyValueBorderBottomRightRadius(BuilderState& build
 
 inline void BuilderCustom::applyInitialBorderTopLeftRadius(BuilderState& builderState)
 {
-    builderState.style().setBorderTopLeftRadius(RenderStyle::initialBorderRadius());
+    builderState.style().setBorderTopLeftRadius(RenderStyle::initialBorderTopLeftRadius());
     builderState.style().setHasExplicitlySetBorderTopLeftRadius(false);
 }
 
@@ -856,7 +856,7 @@ inline void BuilderCustom::applyValueBorderTopLeftRadius(BuilderState& builderSt
 
 inline void BuilderCustom::applyInitialBorderTopRightRadius(BuilderState& builderState)
 {
-    builderState.style().setBorderTopRightRadius(RenderStyle::initialBorderRadius());
+    builderState.style().setBorderTopRightRadius(RenderStyle::initialBorderTopRightRadius());
     builderState.style().setHasExplicitlySetBorderTopRightRadius(false);
 }
 
@@ -1213,7 +1213,7 @@ inline void BuilderCustom::applyInheritColor(BuilderState& builderState)
 
 inline void BuilderCustom::applyInitialPaddingBottom(BuilderState& builderState)
 {
-    builderState.style().setPaddingBottom(RenderStyle::initialPadding());
+    builderState.style().setPaddingBottom(RenderStyle::initialPaddingBottom());
     builderState.style().setHasExplicitlySetPaddingBottom(builderState.isAuthorOrigin());
 }
 
@@ -1231,7 +1231,7 @@ inline void BuilderCustom::applyValuePaddingBottom(BuilderState& builderState, C
 
 inline void BuilderCustom::applyInitialPaddingLeft(BuilderState& builderState)
 {
-    builderState.style().setPaddingLeft(RenderStyle::initialPadding());
+    builderState.style().setPaddingLeft(RenderStyle::initialPaddingLeft());
     builderState.style().setHasExplicitlySetPaddingLeft(builderState.isAuthorOrigin());
 }
 
@@ -1249,7 +1249,7 @@ inline void BuilderCustom::applyValuePaddingLeft(BuilderState& builderState, CSS
 
 inline void BuilderCustom::applyInitialPaddingRight(BuilderState& builderState)
 {
-    builderState.style().setPaddingRight(RenderStyle::initialPadding());
+    builderState.style().setPaddingRight(RenderStyle::initialPaddingRight());
     builderState.style().setHasExplicitlySetPaddingRight(builderState.isAuthorOrigin());
 }
 
@@ -1267,7 +1267,7 @@ inline void BuilderCustom::applyValuePaddingRight(BuilderState& builderState, CS
 
 inline void BuilderCustom::applyInitialPaddingTop(BuilderState& builderState)
 {
-    builderState.style().setPaddingTop(RenderStyle::initialPadding());
+    builderState.style().setPaddingTop(RenderStyle::initialPaddingTop());
     builderState.style().setHasExplicitlySetPaddingTop(builderState.isAuthorOrigin());
 }
 

@@ -46,7 +46,6 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
     , lineClamp(RenderStyle::initialLineClamp())
     , zoom(RenderStyle::initialZoom())
     , maxLines(RenderStyle::initialMaxLines())
-    , overflowContinue(RenderStyle::initialOverflowContinue())
     , touchAction(RenderStyle::initialTouchAction())
     , initialLetter(RenderStyle::initialInitialLetter())
     , marquee(StyleMarqueeData::create())
@@ -96,7 +95,6 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
     , scrollbarGutter(RenderStyle::initialScrollbarGutter())
     , scrollSnapType(RenderStyle::initialScrollSnapType())
     , scrollSnapAlign(RenderStyle::initialScrollSnapAlign())
-    , scrollSnapStop(RenderStyle::initialScrollSnapStop())
     , pseudoElementNameArgument(nullAtom())
     , anchorNames(RenderStyle::initialAnchorNames())
     , anchorScope(RenderStyle::initialAnchorScope())
@@ -124,8 +122,8 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
     , applePayButtonStyle(static_cast<unsigned>(RenderStyle::initialApplePayButtonStyle()))
     , applePayButtonType(static_cast<unsigned>(RenderStyle::initialApplePayButtonType()))
 #endif
-    , breakBefore(static_cast<unsigned>(RenderStyle::initialBreakBetween()))
-    , breakAfter(static_cast<unsigned>(RenderStyle::initialBreakBetween()))
+    , breakBefore(static_cast<unsigned>(RenderStyle::initialBreakBefore()))
+    , breakAfter(static_cast<unsigned>(RenderStyle::initialBreakAfter()))
     , breakInside(static_cast<unsigned>(RenderStyle::initialBreakInside()))
     , containerType(static_cast<unsigned>(RenderStyle::initialContainerType()))
     , textBoxTrim(static_cast<unsigned>(RenderStyle::initialTextBoxTrim()))
@@ -144,6 +142,8 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
     , useSVGZoomRulesForLength(false)
     , marginTrim(RenderStyle::initialMarginTrim().toRaw())
     , contain(RenderStyle::initialContain().toRaw())
+    , overflowContinue(static_cast<unsigned>(RenderStyle::initialOverflowContinue()))
+    , scrollSnapStop(static_cast<unsigned>(RenderStyle::initialScrollSnapStop()))
 {
 }
 
@@ -154,7 +154,6 @@ inline StyleRareNonInheritedData::StyleRareNonInheritedData(const StyleRareNonIn
     , lineClamp(o.lineClamp)
     , zoom(o.zoom)
     , maxLines(o.maxLines)
-    , overflowContinue(o.overflowContinue)
     , touchAction(o.touchAction)
     , initialLetter(o.initialLetter)
     , marquee(o.marquee)
@@ -204,7 +203,6 @@ inline StyleRareNonInheritedData::StyleRareNonInheritedData(const StyleRareNonIn
     , scrollbarGutter(o.scrollbarGutter)
     , scrollSnapType(o.scrollSnapType)
     , scrollSnapAlign(o.scrollSnapAlign)
-    , scrollSnapStop(o.scrollSnapStop)
     , pseudoElementNameArgument(o.pseudoElementNameArgument)
     , anchorNames(o.anchorNames)
     , anchorScope(o.anchorScope)
@@ -252,6 +250,8 @@ inline StyleRareNonInheritedData::StyleRareNonInheritedData(const StyleRareNonIn
     , useSVGZoomRulesForLength(o.useSVGZoomRulesForLength)
     , marginTrim(o.marginTrim)
     , contain(o.contain)
+    , overflowContinue(o.overflowContinue)
+    , scrollSnapStop(o.scrollSnapStop)
 {
 }
 
@@ -269,7 +269,6 @@ bool StyleRareNonInheritedData::operator==(const StyleRareNonInheritedData& o) c
         && lineClamp == o.lineClamp
         && zoom == o.zoom
         && maxLines == o.maxLines
-        && overflowContinue == o.overflowContinue
         && touchAction == o.touchAction
         && initialLetter == o.initialLetter
         && marquee == o.marquee
@@ -317,7 +316,6 @@ bool StyleRareNonInheritedData::operator==(const StyleRareNonInheritedData& o) c
         && scrollbarGutter == o.scrollbarGutter
         && scrollSnapType == o.scrollSnapType
         && scrollSnapAlign == o.scrollSnapAlign
-        && scrollSnapStop == o.scrollSnapStop
         && pseudoElementNameArgument == o.pseudoElementNameArgument
         && anchorNames == o.anchorNames
         && anchorScope == o.anchorScope
@@ -366,7 +364,9 @@ bool StyleRareNonInheritedData::operator==(const StyleRareNonInheritedData& o) c
         && isPopoverInvoker == o.isPopoverInvoker
         && useSVGZoomRulesForLength == o.useSVGZoomRulesForLength
         && marginTrim == o.marginTrim
-        && contain == o.contain;
+        && contain == o.contain
+        && overflowContinue == o.overflowContinue
+        && scrollSnapStop == o.scrollSnapStop;
 }
 
 Style::Contain StyleRareNonInheritedData::usedContain() const
@@ -408,7 +408,6 @@ void StyleRareNonInheritedData::dumpDifferences(TextStream& ts, const StyleRareN
     LOG_IF_DIFFERENT(zoom);
 
     LOG_IF_DIFFERENT(maxLines);
-    LOG_IF_DIFFERENT(overflowContinue);
 
     LOG_IF_DIFFERENT(touchAction);
 
@@ -476,7 +475,6 @@ void StyleRareNonInheritedData::dumpDifferences(TextStream& ts, const StyleRareN
 
     LOG_IF_DIFFERENT(scrollSnapType);
     LOG_IF_DIFFERENT(scrollSnapAlign);
-    LOG_IF_DIFFERENT(scrollSnapStop);
 
     LOG_IF_DIFFERENT(pseudoElementNameArgument);
 
@@ -525,15 +523,15 @@ void StyleRareNonInheritedData::dumpDifferences(TextStream& ts, const StyleRareN
     LOG_IF_DIFFERENT_WITH_CAST(TextBoxTrim, textBoxTrim);
     LOG_IF_DIFFERENT_WITH_CAST(OverflowAnchor, overflowAnchor);
     LOG_IF_DIFFERENT_WITH_CAST(Style::PositionTryOrder, positionTryOrder);
-    LOG_IF_DIFFERENT(fieldSizing);
+    LOG_IF_DIFFERENT_WITH_CAST(FieldSizing, fieldSizing);
 
-    LOG_IF_DIFFERENT(nativeAppearanceDisabled);
+    LOG_IF_DIFFERENT_WITH_CAST(bool, nativeAppearanceDisabled);
 
 #if HAVE(CORE_MATERIAL)
-    LOG_IF_DIFFERENT(appleVisualEffect);
+    LOG_IF_DIFFERENT_WITH_CAST(AppleVisualEffect, appleVisualEffect);
 #endif
 
-    LOG_IF_DIFFERENT(scrollbarWidth);
+    LOG_IF_DIFFERENT_WITH_CAST(Style::ScrollbarWidth, scrollbarWidth);
 
     LOG_IF_DIFFERENT_WITH_CAST(bool, usesAnchorFunctions);
     LOG_IF_DIFFERENT_WITH_CAST(bool, anchorFunctionScrollCompensatedAxes);
@@ -542,6 +540,9 @@ void StyleRareNonInheritedData::dumpDifferences(TextStream& ts, const StyleRareN
 
     LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::MarginTrim, marginTrim);
     LOG_IF_DIFFERENT_WITH_FROM_RAW(Style::Contain, contain);
+
+    LOG_IF_DIFFERENT_WITH_CAST(OverflowContinue, overflowContinue);
+    LOG_IF_DIFFERENT_WITH_CAST(ScrollSnapStop, scrollSnapStop);
 }
 #endif // !LOG_DISABLED
 

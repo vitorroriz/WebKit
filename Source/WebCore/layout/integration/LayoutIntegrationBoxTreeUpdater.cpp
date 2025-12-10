@@ -199,14 +199,16 @@ void BoxTreeUpdater::adjustStyleIfNeeded(const RenderElement& renderer, RenderSt
             auto shouldNotRetainBorderPaddingAndMarginEnd = !renderInline->isContinuation() && renderInline->inlineContinuation();
             // This looks like continuation renderer.
             if (shouldNotRetainBorderPaddingAndMarginStart) {
-                styleToAdjust.setMarginStart(RenderStyle::initialMargin());
+                // This uses `RenderStyle::initialMarginLeft()` because there is no defined initial value for margin start. However, since all margin edges have the same initial value, this is fine.
+                styleToAdjust.setMarginStart(RenderStyle::initialMarginLeft());
                 styleToAdjust.resetBorderLeft();
-                styleToAdjust.setPaddingLeft(RenderStyle::initialPadding());
+                styleToAdjust.setPaddingLeft(RenderStyle::initialPaddingLeft());
             }
             if (shouldNotRetainBorderPaddingAndMarginEnd) {
-                styleToAdjust.setMarginEnd(RenderStyle::initialMargin());
+                // This uses `RenderStyle::initialMarginRight()` because there is no defined initial value for margin end. However, since all margin edges have the same initial value, this is fine.
+                styleToAdjust.setMarginEnd(RenderStyle::initialMarginRight());
                 styleToAdjust.resetBorderRight();
-                styleToAdjust.setPaddingRight(RenderStyle::initialPadding());
+                styleToAdjust.setPaddingRight(RenderStyle::initialPaddingRight());
             }
 
             auto isSupportedInlineDisplay = [&] {

@@ -129,12 +129,12 @@ inline void RenderStyle::resetBorderBottom()
 
 inline void RenderStyle::resetBorderBottomLeftRadius()
 {
-    SET_NESTED(m_nonInheritedData, surroundData, border.radii().bottomLeft(), initialBorderRadius());
+    SET_NESTED(m_nonInheritedData, surroundData, border.radii().bottomLeft(), initialBorderBottomLeftRadius());
 }
 
 inline void RenderStyle::resetBorderBottomRightRadius()
 {
-    SET_NESTED(m_nonInheritedData, surroundData, border.radii().bottomRight(), initialBorderRadius());
+    SET_NESTED(m_nonInheritedData, surroundData, border.radii().bottomRight(), initialBorderBottomRightRadius());
 }
 
 inline void RenderStyle::resetBorderImage()
@@ -159,12 +159,12 @@ inline void RenderStyle::resetBorderTop()
 
 inline void RenderStyle::resetBorderTopLeftRadius()
 {
-    SET_NESTED(m_nonInheritedData, surroundData, border.radii().topLeft(), initialBorderRadius());
+    SET_NESTED(m_nonInheritedData, surroundData, border.radii().topLeft(), initialBorderTopLeftRadius());
 }
 
 inline void RenderStyle::resetBorderTopRightRadius()
 {
-    SET_NESTED(m_nonInheritedData, surroundData, border.radii().topRight(), initialBorderRadius());
+    SET_NESTED(m_nonInheritedData, surroundData, border.radii().topRight(), initialBorderTopRightRadius());
 }
 
 inline void RenderStyle::resetColumnRule()

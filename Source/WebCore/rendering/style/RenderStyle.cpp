@@ -2736,15 +2736,6 @@ void RenderStyle::setPaddingAfter(Style::PaddingEdge&& padding)
     }
 }
 
-#if ENABLE(TOUCH_EVENTS)
-
-Style::Color RenderStyle::initialTapHighlightColor()
-{
-    return RenderTheme::tapHighlightColor();
-}
-
-#endif
-
 String RenderStyle::altFromContent() const
 {
     if (auto* contentData = content().tryData())

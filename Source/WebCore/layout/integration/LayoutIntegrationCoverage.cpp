@@ -151,7 +151,7 @@ static OptionSet<FlexAvoidanceReason> canUseForFlexLayoutWithReason(const Render
         ADD_REASON_AND_RETURN_IF_NEEDED(FlexBoxHasNestedFlex, reasons, includeReasons);
     }
 
-    if (flexBoxStyle.minHeight() != RenderStyle::initialMinSize() || flexBoxStyle.maxHeight() != RenderStyle::initialMaxSize())
+    if (flexBoxStyle.minHeight() != RenderStyle::initialMinHeight() || flexBoxStyle.maxHeight() != RenderStyle::initialMaxHeight())
         ADD_REASON_AND_RETURN_IF_NEEDED(FlexWithNonInitialMinMaxHeight, reasons, includeReasons);
 
     if (flexBox.isOutOfFlowPositioned()) {
@@ -185,7 +185,7 @@ static OptionSet<FlexAvoidanceReason> canUseForFlexLayoutWithReason(const Render
         if (!flexItemStyle.height().isFixed())
             ADD_REASON_AND_RETURN_IF_NEEDED(FlexItemHasNonFixedHeight, reasons, includeReasons);
 
-        if (flexItemStyle.minHeight() != RenderStyle::initialMinSize() || flexItemStyle.maxHeight() != RenderStyle::initialMaxSize())
+        if (flexItemStyle.minHeight() != RenderStyle::initialMinHeight() || flexItemStyle.maxHeight() != RenderStyle::initialMaxHeight())
             ADD_REASON_AND_RETURN_IF_NEEDED(FlexWithNonInitialMinMaxHeight, reasons, includeReasons);
 
         if (flexItemStyle.usedContain().contains(Style::ContainValue::Size))

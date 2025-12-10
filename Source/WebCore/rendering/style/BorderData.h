@@ -170,7 +170,7 @@ private:
     RectEdges<BorderValue> m_edges;
     Style::BorderImage m_image;
     Style::BorderRadius m_radii { Style::BorderRadiusValue { 0_css_px, 0_css_px } };
-    Style::CornerShape m_cornerShapes { Style::CornerShapeValue::round() };
+    Style::CornerShape m_cornerShapes { Style::CornerShapeValue(CSS::Keyword::Round { }) };
 };
 
 WTF::TextStream& operator<<(WTF::TextStream&, const BorderData&);

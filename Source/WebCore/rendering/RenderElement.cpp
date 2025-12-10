@@ -656,7 +656,7 @@ void RenderElement::didAttachChild(RenderObject& child, RenderObject*)
         textRenderer->styleDidChange(StyleDifference::Equal, nullptr);
 
     // The following only applies to the legacy SVG engine -- LBSE always creates layers
-    // independant of the position in the render tree, see comment in layerCreationAllowedForSubtree().
+    // independent of the position in the render tree, see comment in layerCreationAllowedForSubtree().
 
     // SVG creates renderers for <g display="none">, as SVG requires children of hidden
     // <g>s to have renderers - at least that's how our implementation works. Consider:

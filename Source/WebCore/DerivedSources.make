@@ -1971,6 +1971,7 @@ all : \
     NodeName.h \
     RenderStyleProperties.h \
     RenderStylePropertiesGettersInlines.h \
+    RenderStylePropertiesInitialInlines.h \
     RenderStylePropertiesSettersInlines.h \
     SVGElementFactory.cpp \
     SVGElementFactory.h \
@@ -2024,6 +2025,7 @@ CSS_PROPERTY_NAME_FILES = \
     CSSStyleProperties+PropertyNames.idl \
     RenderStyleProperties.h \
     RenderStylePropertiesGettersInlines.h \
+    RenderStylePropertiesInitialInlines.h \
     RenderStylePropertiesSettersInlines.h \
     StyleBuilderGenerated.cpp \
     StyleExtractorGenerated.cpp \
