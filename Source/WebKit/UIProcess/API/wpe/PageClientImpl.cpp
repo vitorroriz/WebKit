@@ -246,8 +246,11 @@ void PageClientImpl::doneWithTouchEvent(const WebTouchEvent& touchEvent, bool wa
     }
 
 #if ENABLE(WPE_PLATFORM)
-    if (m_view.wpeView())
+    if (m_view.wpeView()) {
+        if (touchEvent.isNativeWebTouchEvent())
+            static_cast<WKWPE::ViewPlatform&>(m_view).handleGesture(static_cast<const NativeWebTouchEvent&>(touchEvent).nativeEvent());
         return;
+    }
 #endif
 
     const struct wpe_input_touch_event_raw* touchPoint = touchEvent.isNativeWebTouchEvent() ? static_cast<const NativeWebTouchEvent&>(touchEvent).nativeFallbackTouchPoint() : nullptr;
