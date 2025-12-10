@@ -66,7 +66,8 @@
 #if CPU(ADDRESS64)
 #if HAVE(36BIT_ADDRESS)
 #define WTF_OS_CONSTANT_EFFECTIVE_ADDRESS_WIDTH 36
-#elif OS(DARWIN)
+/* iOS simulators lie about the size of the address space */
+#elif OS(DARWIN) && !PLATFORM(IOS_FAMILY_SIMULATOR)
 #define WTF_OS_CONSTANT_EFFECTIVE_ADDRESS_WIDTH (WTF::getMSBSetConstexpr(MACH_VM_MAX_ADDRESS) + 1)
 #else
 /* We strongly assume that effective address width is <= 48 in 64bit architectures (e.g. NaN boxing). */
