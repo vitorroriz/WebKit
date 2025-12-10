@@ -328,7 +328,7 @@ void HTMLImageElement::setIsUserAgentShadowRootResource()
 void HTMLImageElement::evaluateDynamicMediaQueryDependencies()
 {
     RefPtr documentElement = document().documentElement();
-    MQ::MediaQueryEvaluator evaluator { document().printing() ? printAtom() : screenAtom(), document(), documentElement ? documentElement->computedStyle() : nullptr };
+    MQ::MediaQueryEvaluator evaluator { protectedDocument()->printing() ? printAtom() : screenAtom(), document(), documentElement ? documentElement->computedStyle() : nullptr };
 
     auto hasChanges = [&] {
         for (auto& results : m_dynamicMediaQueryResults) {

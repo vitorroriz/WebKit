@@ -668,7 +668,7 @@ void HTMLCanvasElement::paint(GraphicsContext& context, const LayoutRect& r)
     m_context->clearAccumulatedDirtyRect();
 
     if (!context.paintingDisabled()) {
-        if (!usesContentsAsLayerContents() || document().printing() || m_isSnapshotting) {
+        if (!usesContentsAsLayerContents() || protectedDocument()->printing() || m_isSnapshotting) {
             if (m_context->compositingResultsNeedUpdating())
                 m_context->prepareForDisplay();
             if (m_context->isSurfaceBufferTransparentBlack(CanvasRenderingContext::SurfaceBuffer::DisplayBuffer)) {

@@ -694,7 +694,6 @@ void LocalFrame::setPrinting(bool printing, FloatSize pageSize, FloatSize origin
     // See https://bugs.webkit.org/show_bug.cgi?id=43704
     ResourceCacheValidationSuppressor validationSuppressor(document->cachedResourceLoader());
 
-    document->setPrinting(printing);
     protectedView()->adjustMediaTypeForPrinting(printing);
 
     // FIXME: Consider invoking Page::updateRendering or an equivalent.

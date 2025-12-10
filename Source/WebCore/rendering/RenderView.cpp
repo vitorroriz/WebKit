@@ -175,7 +175,7 @@ bool RenderView::isChildAllowed(const RenderObject& child, const RenderStyle&) c
 void RenderView::layout()
 {
     StackStats::LayoutCheckPoint layoutCheckPoint;
-    if (!document().paginated())
+    if (!protectedDocument()->paginated())
         m_pageLogicalSize = { };
 
     if (shouldUsePrintingLayout()) {
@@ -675,7 +675,7 @@ void RenderView::absoluteQuads(Vector<FloatQuad>& quads, bool* wasFixed) const
 
 bool RenderView::printing() const
 {
-    return document().printing();
+    return protectedDocument()->printing();
 }
 
 bool RenderView::shouldUsePrintingLayout() const

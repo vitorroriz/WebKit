@@ -8173,6 +8173,13 @@ RefPtr<Document> Document::sameOriginTopLevelTraversable() const
     return document->protectedSecurityOrigin()->isSameOriginDomain(protectedSecurityOrigin()) ? document : nullptr;
 }
 
+bool Document::printing() const
+{
+    if (RefPtr frame = m_frame.get())
+        return frame->isPrinting();
+    return false;
+}
+
 RefPtr<LocalFrame> Document::localMainFrame() const
 {
     if (RefPtr page = this->page())
