@@ -70,7 +70,13 @@ public:
     bool isOutermostSVGSVGElement() const;
 
     SVGSVGElement* ownerSVGElement() const;
-    SVGElement* viewportElement() const;
+
+    enum class ViewportElementType : uint8_t {
+        Any, // Returns first SVGSVGElement, SVGImageElement, or symbol
+        SVGSVGOnly // Returns only SVGSVGElement
+    };
+
+    SVGElement* viewportElement(ViewportElementType = ViewportElementType::Any) const;
 
     String title() const override;
     virtual bool supportsMarkers() const { return false; }

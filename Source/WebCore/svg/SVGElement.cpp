@@ -230,14 +230,17 @@ SVGSVGElement* SVGElement::ownerSVGElement() const
     return nullptr;
 }
 
-SVGElement* SVGElement::viewportElement() const
+SVGElement* SVGElement::viewportElement(ViewportElementType type) const
 {
     // This function needs shadow tree support - as RenderSVGContainer uses this function
-    // to determine the "overflow" property. <use> on <symbol> wouldn't work otherwhise.
+    // to determine the "overflow" property. <use> on <symbol> wouldn't work otherwise.
     auto* node = parentNode();
     while (node) {
-        if (is<SVGSVGElement>(*node) || is<SVGImageElement>(*node) || node->hasTagName(SVGNames::symbolTag))
-            return downcast<SVGElement>(node);
+        if (is<SVGSVGElement>(*node) || is<SVGImageElement>(*node))
+            return dynamicDowncast<SVGElement>(node);
+
+        if (type == ViewportElementType::Any && node->hasTagName(SVGNames::symbolTag))
+            return dynamicDowncast<SVGElement>(node);
 
         node = node->parentOrShadowHostNode();
     }
