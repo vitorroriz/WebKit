@@ -276,7 +276,7 @@ JSC_DEFINE_HOST_FUNCTION(promiseConstructorFuncRace, (JSGlobalObject* globalObje
             RETURN_IF_EXCEPTION(scope, void());
             if (constructor == globalObject->promiseConstructor()) [[likely]] {
                 scope.release();
-                nextPromise->performPromiseThenWithInternalMicrotask(vm, globalObject, InternalMicrotask::PromiseFirstResolveWithoutHandlerJob, promise, promise);
+                nextPromise->performPromiseThenWithInternalMicrotask(vm, globalObject, InternalMicrotask::PromiseRaceResolveJob, promise, promise);
                 return;
             }
         }
