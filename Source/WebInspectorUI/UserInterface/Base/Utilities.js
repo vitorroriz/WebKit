@@ -871,7 +871,7 @@ Object.defineProperty(String.prototype, "truncateMiddle",
             return this;
         var leftHalf = maxLength >> 1;
         var rightHalf = maxLength - leftHalf - 1;
-        return this.substr(0, leftHalf) + ellipsis + this.substr(this.length - rightHalf, rightHalf);
+        return this.substring(0, leftHalf) + ellipsis + this.substring(this.length - rightHalf);
     }
 });
 
@@ -883,7 +883,7 @@ Object.defineProperty(String.prototype, "truncateEnd",
 
         if (this.length <= maxLength)
             return this;
-        return this.substr(0, maxLength - 1) + ellipsis;
+        return this.substring(0, maxLength - 1) + ellipsis;
     }
 });
 

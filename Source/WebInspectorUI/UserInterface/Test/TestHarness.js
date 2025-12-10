@@ -333,7 +333,7 @@ TestHarness = class TestHarness extends WI.Object
         // Most frames are of the form "functionName@file:///foo/bar/File.js:345".
         // But, some frames do not have a functionName. Get rid of the file path.
         let nameAndURLSeparator = frame.indexOf("@");
-        let frameName = nameAndURLSeparator > 0 ? frame.substr(0, nameAndURLSeparator) : "(anonymous)";
+        let frameName = nameAndURLSeparator > 0 ? frame.substring(0, nameAndURLSeparator) : "(anonymous)";
 
         let lastPathSeparator = Math.max(frame.lastIndexOf("/"), frame.lastIndexOf("\\"));
         let frameLocation = lastPathSeparator > 0 ? frame.substring(lastPathSeparator + 1) : frame;
