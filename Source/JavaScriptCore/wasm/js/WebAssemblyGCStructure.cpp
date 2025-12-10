@@ -32,10 +32,11 @@
 
 namespace JSC {
 
-WebAssemblyGCStructure::WebAssemblyGCStructure(VM& vm, JSGlobalObject* globalObject, const TypeInfo& typeInfo, const ClassInfo* classInfo, Ref<const Wasm::TypeDefinition>&& type, Ref<const Wasm::RTT>&& rtt)
+WebAssemblyGCStructure::WebAssemblyGCStructure(VM& vm, JSGlobalObject* globalObject, const TypeInfo& typeInfo, const ClassInfo* classInfo, Ref<const Wasm::TypeDefinition>&& unexpandedType, Ref<const Wasm::TypeDefinition>&& type, Ref<const Wasm::RTT>&& rtt)
     : Structure(vm, StructureVariant::WebAssemblyGC, globalObject, typeInfo, classInfo)
     , m_rtt(WTFMove(rtt))
     , m_type(WTFMove(type))
+    , m_unexpandedType(WTFMove(unexpandedType))
 {
     for (unsigned i = 0; i < std::min((m_rtt->displaySizeExcludingThis() + 1), inlinedTypeDisplaySize); ++i)
         m_inlinedTypeDisplay[i] = m_rtt->displayEntry(i);
@@ -46,14 +47,15 @@ WebAssemblyGCStructure::WebAssemblyGCStructure(VM& vm, WebAssemblyGCStructure* p
     , m_rtt(previous->m_rtt)
     , m_type(previous->m_type)
     , m_inlinedTypeDisplay(previous->m_inlinedTypeDisplay)
+    , m_unexpandedType(previous->m_unexpandedType)
 {
 }
 
 
-WebAssemblyGCStructure* WebAssemblyGCStructure::create(VM& vm, JSGlobalObject* globalObject, const TypeInfo& typeInfo, const ClassInfo* classInfo, Ref<const Wasm::TypeDefinition>&& type, Ref<const Wasm::RTT>&& rtt)
+WebAssemblyGCStructure* WebAssemblyGCStructure::create(VM& vm, JSGlobalObject* globalObject, const TypeInfo& typeInfo, const ClassInfo* classInfo, Ref<const Wasm::TypeDefinition>&& unexpandedType, Ref<const Wasm::TypeDefinition>&& type, Ref<const Wasm::RTT>&& rtt)
 {
     ASSERT(vm.structureStructure);
-    WebAssemblyGCStructure* newStructure = new (NotNull, allocateCell<WebAssemblyGCStructure>(vm)) WebAssemblyGCStructure(vm, globalObject, typeInfo, classInfo, WTFMove(type), WTFMove(rtt));
+    WebAssemblyGCStructure* newStructure = new (NotNull, allocateCell<WebAssemblyGCStructure>(vm)) WebAssemblyGCStructure(vm, globalObject, typeInfo, classInfo, WTFMove(unexpandedType), WTFMove(type), WTFMove(rtt));
     newStructure->finishCreation(vm);
     ASSERT(newStructure->type() == StructureType);
     return newStructure;

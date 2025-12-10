@@ -56,18 +56,21 @@ public:
     const Wasm::RTT& rtt() const LIFETIME_BOUND { return m_rtt; }
     const Wasm::TypeDefinition& typeDefinition() const LIFETIME_BOUND { return m_type; }
 
-    static WebAssemblyGCStructure* create(VM&, JSGlobalObject*, const TypeInfo&, const ClassInfo*, Ref<const Wasm::TypeDefinition>&&, Ref<const Wasm::RTT>&&);
+    static WebAssemblyGCStructure* create(VM&, JSGlobalObject*, const TypeInfo&, const ClassInfo*, Ref<const Wasm::TypeDefinition>&& unexpandedType, Ref<const Wasm::TypeDefinition>&& expandedType, Ref<const Wasm::RTT>&&);
 
     static constexpr ptrdiff_t offsetOfRTT() { return OBJECT_OFFSETOF(WebAssemblyGCStructure, m_rtt); }
     static constexpr ptrdiff_t offsetOfInlinedTypeDisplay() { return OBJECT_OFFSETOF(WebAssemblyGCStructure, m_inlinedTypeDisplay); }
 
 private:
-    WebAssemblyGCStructure(VM&, JSGlobalObject*, const TypeInfo&, const ClassInfo*, Ref<const Wasm::TypeDefinition>&&, Ref<const Wasm::RTT>&&);
+    WebAssemblyGCStructure(VM&, JSGlobalObject*, const TypeInfo&, const ClassInfo*, Ref<const Wasm::TypeDefinition>&& unexpandedType, Ref<const Wasm::TypeDefinition>&& expandedType, Ref<const Wasm::RTT>&&);
     WebAssemblyGCStructure(VM&, WebAssemblyGCStructure* previous);
 
     Ref<const Wasm::RTT> m_rtt;
     Ref<const Wasm::TypeDefinition> m_type;
     std::array<RefPtr<const Wasm::RTT>, inlinedTypeDisplaySize> m_inlinedTypeDisplay { };
+    // The type of a struct or an array can be a Subtype wrapping the underlying Struct or Array type. In these situations `m_type` retains the expanded underlying type.
+    // We must also retain the original unexpanded Subtype because it may be the target of raw pointers in Wasm::Types of FieldTypes.
+    Ref<const Wasm::TypeDefinition> m_unexpandedType;
 };
 
 } // namespace JSC

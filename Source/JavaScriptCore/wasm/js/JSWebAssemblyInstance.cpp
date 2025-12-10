@@ -149,9 +149,9 @@ void JSWebAssemblyInstance::finishCreation(VM& vm)
     for (unsigned i = 0; i < m_moduleInformation->typeCount(); ++i) {
         Ref rtt = m_moduleInformation->rtts[i];
         if (rtt->kind() == RTTKind::Array)
-            gcObjectStructureID(i).set(vm, this, JSWebAssemblyArray::createStructure(vm, globalObject, m_moduleInformation->typeSignatures[i]->expand(), WTFMove(rtt)));
+            gcObjectStructureID(i).set(vm, this, JSWebAssemblyArray::createStructure(vm, globalObject, m_moduleInformation->typeSignatures[i], WTFMove(rtt)));
         else if (rtt->kind() == RTTKind::Struct)
-            gcObjectStructureID(i).set(vm, this, JSWebAssemblyStruct::createStructure(vm, globalObject, m_moduleInformation->typeSignatures[i]->expand(), WTFMove(rtt)));
+            gcObjectStructureID(i).set(vm, this, JSWebAssemblyStruct::createStructure(vm, globalObject, m_moduleInformation->typeSignatures[i], WTFMove(rtt)));
     }
 
     m_vm->traps().registerMirror(m_stackMirror);
