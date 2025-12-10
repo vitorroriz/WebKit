@@ -138,6 +138,24 @@ static void webkitGstWebRTCIceAgentSetForceRelay(GstWebRTCICE*, gboolean)
     GST_FIXME("Not implemented yet.");
 }
 
+static void webkitGstWebRTCIceAgentSetRiceStunServer(WebKitGstIceAgent* agent, StringView host, uint16_t port)
+{
+    const auto& iceAgent = agent->priv->agent;
+    if (!iceAgent) [[unlikely]]
+        return;
+
+    auto address = makeString(host, ':', port);
+    auto addressString = address.ascii();
+    GUniquePtr<RiceAddress> stunAddress(rice_address_new_from_string(addressString.data()));
+    if (!stunAddress) {
+        GST_WARNING_OBJECT(agent, "Unable to make use of STUN server %s", addressString.data());
+        return;
+    }
+
+    rice_agent_add_stun_server(iceAgent.get(), RICE_TRANSPORT_TYPE_UDP, stunAddress.get());
+    rice_agent_add_stun_server(iceAgent.get(), RICE_TRANSPORT_TYPE_TCP, stunAddress.get());
+}
+
 static void webkitGstWebRTCIceAgentSetStunServer(GstWebRTCICE* ice, const gchar* uri)
 {
     auto backend = WEBKIT_GST_WEBRTC_ICE_BACKEND(ice);
@@ -149,6 +167,11 @@ static void webkitGstWebRTCIceAgentSetStunServer(GstWebRTCICE* ice, const gchar*
     const auto& host = url.host();
     auto port = url.port().value_or(3478);
 
+    if (URL::hostIsIPAddress(host)) {
+        webkitGstWebRTCIceAgentSetRiceStunServer(backend, host, port);
+        return;
+    }
+
     backend->priv->iceBackend->resolveAddress(host.toString(), [weakAgent = GThreadSafeWeakPtr(backend), port](ExceptionOr<String>&& result) mutable {
         auto agent = weakAgent.get();
         if (!agent) [[unlikely]]
@@ -157,20 +180,11 @@ static void webkitGstWebRTCIceAgentSetStunServer(GstWebRTCICE* ice, const gchar*
             GST_WARNING_OBJECT(agent.get(), "Unable to configure STUN server on ICE agent: %s", result.exception().message().utf8().data());
             return;
         }
-        const auto& iceAgent = agent->priv->agent;
-        if (!iceAgent) [[unlikely]]
-            return;
 
-        auto& host = result.returnValue();
-        auto address = makeString(host, ':', port);
+        auto address = result.returnValue();
         auto addressString = address.ascii();
-        GST_DEBUG_OBJECT(agent.get(), "STUN server address resolved to %s", addressString.data());
-        GUniquePtr<RiceAddress> stunAddress(rice_address_new_from_string(addressString.data()));
-        if (stunAddress) {
-            rice_agent_add_stun_server(iceAgent.get(), RICE_TRANSPORT_TYPE_UDP, stunAddress.get());
-            rice_agent_add_stun_server(iceAgent.get(), RICE_TRANSPORT_TYPE_TCP, stunAddress.get());
-        } else
-            GST_WARNING_OBJECT(agent.get(), "Unable to make use of STUN server %s", address.ascii().data());
+        GST_DEBUG_OBJECT(agent.get(), "STUN address resolved to %s", addressString.data());
+        webkitGstWebRTCIceAgentSetRiceStunServer(agent.get(), address, port);
     });
 }
 
@@ -230,6 +244,25 @@ Expected<URL, URLValidationError> validateTurnServerURL(const String& turnUrl)
     return url;
 }
 
+static void webkitGstWebRTCIceAgentAddRiceTurnServer(WebKitGstIceAgent* agent, const String& address, bool isTurns, const String& user, const String& password, const std::array<RiceTransportType, 4>& relays, unsigned nRelay)
+{
+    const auto& iceAgent = agent->priv->agent;
+    if (!iceAgent) [[unlikely]]
+        return;
+
+    GUniquePtr<RiceAddress> riceAddress(rice_address_new_from_string(address.ascii().data()));
+    GUniquePtr<RiceCredentials> credentials(rice_credentials_new(g_strdup(user.utf8().data()), g_strdup(password.utf8().data())));
+    GRefPtr<RiceTlsConfig> tlsConfig;
+    if (isTurns)
+        tlsConfig = adoptGRef(rice_tls_config_new_rustls_with_ip(riceAddress.get()));
+
+    auto family = rice_address_get_family(riceAddress.get());
+    for (unsigned i = 0; i < nRelay; i++) {
+        auto config = adoptGRef(rice_turn_config_new(relays[i], riceAddress.get(), credentials.get(), 1, &family, tlsConfig.get()));
+        agent->priv->turnConfigs.append(WTFMove(config));
+    }
+}
+
 static void addTurnServer(WebKitGstIceAgent* agent, const URL& url)
 {
     GST_INFO_OBJECT(agent, "Adding TURN server %s", url.string().utf8().data());
@@ -253,6 +286,13 @@ static void addTurnServer(WebKitGstIceAgent* agent, const URL& url)
 
     RELEASE_ASSERT(url.port());
     auto port = url.port().value();
+
+    const auto& host = url.host();
+    if (URL::hostIsIPAddress(host)) {
+        webkitGstWebRTCIceAgentAddRiceTurnServer(agent, url.hostAndPort(), isTurns, url.user(), url.password(), relays, nRelay);
+        return;
+    }
+
     agent->priv->iceBackend->resolveAddress(url.host().toString(), [weakAgent = GThreadSafeWeakPtr(agent), isTurns, port, nRelay, user = url.user(), password = url.password(), relays = WTFMove(relays)](ExceptionOr<String>&& result) mutable {
         auto agent = weakAgent.get();
         if (!agent) [[unlikely]]
@@ -261,24 +301,10 @@ static void addTurnServer(WebKitGstIceAgent* agent, const URL& url)
             GST_WARNING_OBJECT(agent.get(), "Unable to configure TURN server on ICE agent: %s", result.exception().message().utf8().data());
             return;
         }
-        const auto& iceAgent = agent->priv->agent;
-        if (!iceAgent) [[unlikely]]
-            return;
 
         auto turnAddress = makeString(result.returnValue(), ':', port);
-        auto turnAddressString = turnAddress.ascii();
-        GST_DEBUG_OBJECT(agent.get(), "TURN address resolved to %s", turnAddressString.data());
-        GUniquePtr<RiceAddress> address(rice_address_new_from_string(turnAddressString.data()));
-        GUniquePtr<RiceCredentials> credentials(rice_credentials_new(g_strdup(user.utf8().data()), g_strdup(password.utf8().data())));
-        GRefPtr<RiceTlsConfig> tlsConfig;
-        if (isTurns)
-            tlsConfig = adoptGRef(rice_tls_config_new_rustls_with_ip(address.get()));
-
-        auto family = rice_address_get_family(address.get());
-        for (unsigned i = 0; i < nRelay; i++) {
-            auto config = adoptGRef(rice_turn_config_new(relays[i], address.get(), credentials.get(), 1, &family, tlsConfig.get()));
-            agent->priv->turnConfigs.append(WTFMove(config));
-        }
+        GST_DEBUG_OBJECT(agent.get(), "TURN address resolved to %s", turnAddress.ascii().data());
+        webkitGstWebRTCIceAgentAddRiceTurnServer(agent.get(), turnAddress, isTurns, user, password, relays, nRelay);
     });
 }
 
