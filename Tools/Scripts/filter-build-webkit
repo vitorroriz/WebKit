@@ -520,6 +520,7 @@ sub shouldIgnoreLine($$)
     return 1 if $line =~ /SwiftDriver\\ Compilation/;
     return 1 if $line =~ /SwiftExplicitDependencyGeneratePcm/;
     return 1 if $line =~ /SwiftExplicitDependencyCompileModuleFromInterface/;
+    return 1 if $line =~ /^Cache (hit|miss)/;
     return 1 if $line =~ /^warning: .*libtool: archive library: .* the table of contents is empty \(no object file members in the library define global symbols\)/;
     # Investigate these in https://bugs.webkit.org/show_bug.cgi?id=245263.
     return 1 if $line =~ /warning: Could not read serialized diagnostics file: error\(\"Failed to open diagnostics file\"\)/;
