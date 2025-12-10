@@ -394,7 +394,7 @@ void AXLiveRegionManager::postAnnouncementForChange(AccessibilityObject& object,
         return;
 
     AttributedString announcement = computeAnnouncement(newSnapshot, diff);
-    if (announcement.isNull())
+    if (announcement.isNull() || announcement.string.isEmpty())
         return;
 
     if (CheckedPtr cache = m_cache)

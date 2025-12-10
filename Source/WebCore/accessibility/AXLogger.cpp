@@ -155,11 +155,11 @@ void AXLogger::log(const Vector<Ref<AXCoreObject>>& objects)
     }
 }
 
-void AXLogger::log(const std::pair<Ref<AccessibilityObject>, AXNotification>& notification)
+void AXLogger::log(const std::pair<Ref<AccessibilityObject>, AXNotificationWithData>& notification)
 {
     if (shouldLog()) {
         TextStream stream(TextStream::LineMode::MultipleLine);
-        stream << "Notification " << notification.second << " for object ";
+        stream << "Notification " << notification.second.notification << " for object ";
         stream << notification.first.get();
         LOG(Accessibility, "%s", stream.release().utf8().data());
     }

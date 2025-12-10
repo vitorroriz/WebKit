@@ -394,7 +394,7 @@ void AXObjectCache::postPlatformAnnouncementNotification(const String& message)
     }
 }
 
-void AXObjectCache::postPlatformARIANotifyNotification(const String& announcement, NotifyPriority priority, InterruptBehavior interruptBehavior, const String& language)
+void AXObjectCache::postPlatformARIANotifyNotification(const AriaNotifyData& notificationData)
 {
     ASSERT(isMainThread());
 
@@ -403,10 +403,10 @@ void AXObjectCache::postPlatformARIANotifyNotification(const String& announcemen
 #endif
 
     NSDictionary *userInfo = @{
-        NSAccessibilityARIAAnnouncementPriority: notifyPriorityToAXValueString(priority).get(),
-        NSAccessibilityARIAAnnouncementInterrupt: interruptBehaviorToAXValueString(interruptBehavior).get(),
-        NSAccessibilityAnnouncementKey: announcement.createNSString().get(),
-        NSAccessibilityAnnouncementLanguageKey: language.createNSString().get()
+        NSAccessibilityARIAAnnouncementPriority: notifyPriorityToAXValueString(notificationData.priority).get(),
+        NSAccessibilityARIAAnnouncementInterrupt: interruptBehaviorToAXValueString(notificationData.interrupt).get(),
+        NSAccessibilityAnnouncementKey: notificationData.message.createNSString().get(),
+        NSAccessibilityAnnouncementLanguageKey: notificationData.language.createNSString().get()
     };
     NSAccessibilityPostNotificationWithUserInfo(NSApp, NSAccessibilityAnnouncementRequestedNotification, userInfo);
 
@@ -416,9 +416,9 @@ void AXObjectCache::postPlatformARIANotifyNotification(const String& announcemen
     }
 }
 
-void AXObjectCache::postPlatformLiveRegionNotification(AccessibilityObject& object, LiveRegionStatus status, const AttributedString& announcement)
+void AXObjectCache::postPlatformLiveRegionNotification(AccessibilityObject& object, const LiveRegionAnnouncementData& liveRegionData)
 {
-    RetainPtr userInfo = adoptNS([[NSMutableDictionary alloc] initWithObjectsAndKeys:announcement.nsAttributedString().get(), NSAccessibilityAnnouncementKey, @(status == LiveRegionStatus::Assertive ? NSAccessibilityPriorityHigh : NSAccessibilityPriorityLow), NSAccessibilityPriorityKey, @(YES), NSAccessibilityAnnouncementIsLiveRegionKey, nil]);
+    RetainPtr userInfo = adoptNS([[NSMutableDictionary alloc] initWithObjectsAndKeys:liveRegionData.message.nsAttributedString().get(), NSAccessibilityAnnouncementKey, @(liveRegionData.status == LiveRegionStatus::Assertive ? NSAccessibilityPriorityHigh : NSAccessibilityPriorityLow), NSAccessibilityPriorityKey, @(YES), NSAccessibilityAnnouncementIsLiveRegionKey, nil]);
 
     NSAccessibilityPostNotificationWithUserInfo(object.wrapper(), NSAccessibilityAnnouncementRequestedNotification, userInfo.get());
 
