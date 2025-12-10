@@ -27,6 +27,7 @@
 
 #if ENABLE(WEBGPU_SWIFT)
 
+#include <ImageIO/CGImageSource.h>
 #include <WebCore/DDImageAsset.h>
 #include <WebCore/DDMaterialDescriptor.h>
 #include <WebCore/DDMesh.h>
