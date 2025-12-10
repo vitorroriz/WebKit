@@ -504,6 +504,10 @@ void EventRegion::translate(const IntSize& offset)
     m_nonPassiveWheelEventListenerRegion.translate(offset);
 #endif
 
+#if ENABLE(TOUCH_EVENT_REGIONS)
+    m_touchEventListenerRegion.translate(offset);
+#endif
+
 #if ENABLE(EDITABLE_REGION)
     if (m_editableRegion)
         m_editableRegion->translate(offset);
