@@ -26,6 +26,7 @@
 #include "config.h"
 #include "PushManager.h"
 
+#include "DocumentQuirks.h"
 #include "DocumentSecurityOrigin.h"
 #include "EventLoop.h"
 #include "Exception.h"
@@ -139,7 +140,7 @@ void PushManager::subscribe(ScriptExecutionContext& context, std::optional<PushS
             }
 
             RefPtr window = document.frame() ? document.frame()->window() : nullptr;
-            if (!window || !window->consumeTransientActivation()) {
+            if (!window || (!window->consumeTransientActivation() && !document.quirks().shouldAllowNotificationPermissionWithoutUserGesture())) {
 #if !RELEASE_LOG_DISABLED
                 Seconds lastActivationDuration = window ? MonotonicTime::now() - window->lastActivationTimestamp() : Seconds::infinity();
                 RELEASE_LOG_ERROR(Push, "Failing PushManager.subscribe call due to failed transient activation check; last activated %.2f sec ago", lastActivationDuration.value());

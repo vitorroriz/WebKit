@@ -103,6 +103,7 @@ public:
     WEBCORE_EXPORT bool shouldIgnoreViewportArgumentsToAvoidExcessiveZoom() const;
     WEBCORE_EXPORT bool shouldIgnoreViewportArgumentsToAvoidEnlargedView() const;
     WEBCORE_EXPORT bool shouldLayOutAtMinimumWindowWidthWhenIgnoringScalingConstraints() const;
+    WEBCORE_EXPORT bool shouldAllowNotificationPermissionWithoutUserGesture() const;
     WEBCORE_EXPORT static bool shouldAllowNavigationToCustomProtocolWithoutUserGesture(StringView protocol, const SecurityOriginData& requesterOrigin);
 
     WEBCORE_EXPORT bool needsYouTubeMouseOutQuirk() const;

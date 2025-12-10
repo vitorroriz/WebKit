@@ -1128,6 +1128,15 @@ bool Quirks::shouldEnableRTCEncodedStreamsQuirk() const
 }
 #endif
 
+// FIXME: Remove this Quirk if Pinterest decides to trigger this notification from an user gesture (rdar://165745719)
+bool Quirks::shouldAllowNotificationPermissionWithoutUserGesture() const
+{
+    if (!needsQuirks()) [[unlikely]]
+        return false;
+
+    return m_quirksData.quirkIsEnabled(QuirksData::SiteSpecificQuirk::ShouldAllowNotificationPermissionWithoutUserGesture);
+}
+
 bool Quirks::shouldUnloadHeavyFrame() const
 {
     if (!needsQuirks()) [[unlikely]]
@@ -3163,6 +3172,16 @@ static void handlePandoraQuirks(QuirksData& quirksData, const URL& /* quirksURL 
     quirksData.enableQuirk(QuirksData::SiteSpecificQuirk::ShouldExposeShowModalDialog);
 }
 
+// FIXME: Remove this Quirk if Pinterest decides to trigger this notification from an user gesture (rdar://165745719)
+static void handlePinterestQuirks(QuirksData& quirksData, const URL& /* quirksURL */, const String& quirksDomainString, const URL&  /* documentURL */)
+{
+    if (quirksDomainString != "pinterest.com"_s) [[unlikely]]
+        return;
+
+    // pinterest.com rdar://104979314
+    quirksData.enableQuirk(QuirksData::SiteSpecificQuirk::ShouldAllowNotificationPermissionWithoutUserGesture);
+}
+
 static void handlePremierLeagueQuirks(QuirksData& quirksData, const URL& /* quirksURL */, const String& quirksDomainString, const URL&  /* documentURL */)
 {
     if (quirksDomainString != "premierleague.com"_s) [[unlikely]]
@@ -3530,6 +3549,7 @@ void Quirks::determineRelevantQuirks()
         { "nytimes"_s, &handleNYTimesQuirks },
 #endif
         { "pandora"_s, &handlePandoraQuirks },
+        { "pinterest"_s, &handlePinterestQuirks },
         { "premierleague"_s, &handlePremierLeagueQuirks },
 #if PLATFORM(IOS_FAMILY)
         { "ralphlauren"_s, &handleRalphLaurenQuirks },

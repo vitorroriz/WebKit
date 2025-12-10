@@ -229,6 +229,7 @@ struct QuirksData {
 #endif
         ShouldUnloadHeavyFrames,
         ShouldAvoidStartingSelectionOnMouseDownOverPointerCursor,
+        ShouldAllowNotificationPermissionWithoutUserGesture,
 
         NumberOfQuirks
     };
