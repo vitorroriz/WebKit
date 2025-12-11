@@ -143,7 +143,7 @@ DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(HashTable);
 
         void skipEmptyBuckets()
         {
-            while (m_position != m_endPosition && HashTableType::isEmptyOrDeletedBucket(*m_position))
+            while (m_position != m_endPosition && HashTableType::isEmptyOrDeletedOrWeakNullBucket(*m_position))
                 ++m_position;
         }
 
@@ -516,6 +516,7 @@ DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(HashTable);
         static bool isWeakNullBucket(const ValueType& value) { return isHashTraitsWeakNullValue<KeyTraits>(Extractor::extract(value)); }
         static bool isDeletedBucket(const ValueType& value) { return KeyTraits::isDeletedValue(Extractor::extract(value)); }
         static bool isEmptyOrDeletedBucket(const ValueType& value) { return isEmptyBucket(value) || isDeletedBucket(value); }
+        static bool isEmptyOrDeletedOrWeakNullBucket(const ValueType& value) { return isEmptyBucket(value) || isDeletedBucket(value) || isWeakNullBucket(value); }
 
         bool isValidKey(const ValueType& value) { return !isEmptyOrDeletedBucket(value); }
 
@@ -573,7 +574,7 @@ DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(HashTable);
         ValueType* expand(ValueType* entry = nullptr);
         void shrink() { rehash(tableSize() / 2, nullptr); }
         void shrinkToBestSize();
-    
+
         ValueType* rehash(unsigned newTableSize, ValueType* entry);
         ValueType* reinsert(ValueType&&);
 
@@ -1153,7 +1154,7 @@ DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(HashTable);
 
         for (unsigned i = tableSize(); i--;) {
             ValueType& bucket = table[i];
-            if (isEmptyOrDeletedBucket(bucket))
+            if (isEmptyOrDeletedOrWeakNullBucket(bucket))
                 continue;
             
             if (!functor(bucket))
@@ -1187,7 +1188,7 @@ DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(HashTable);
 
         for (unsigned i = tableSize(); i--;) {
             ValueType& bucket = table[i];
-            if (isEmptyOrDeletedBucket(bucket))
+            if (isEmptyOrDeletedOrWeakNullBucket(bucket))
                 continue;
 
             if (!functor(bucket))

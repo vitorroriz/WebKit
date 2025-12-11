@@ -29,7 +29,8 @@
 #include "MoveOnly.h"
 #include <wtf/ListHashSet.h>
 #include <wtf/NeverDestroyed.h>
-#include <wtf/RefCounted.h>
+#include <wtf/RefCountedAndCanMakeWeakPtr.h>
+#include <wtf/WeakPtr.h>
 
 namespace TestWebKitAPI {
 
@@ -578,6 +579,52 @@ TEST(WTF_ListHashSet, ClearsItemUponAssignment)
     data->setCollection(WTFMove(secondCollection));
 
     EXPECT_EQ(0u, ListHashSetReferencedItem::instances().size());
+}
+
+class Object : public WTF::RefCountedAndCanMakeWeakPtr<Object> {
+public:
+    static Ref<Object> create() { return adoptRef(*new Object); }
+
+private:
+    Object() = default;
+};
+
+TEST(WTF_ListHashSet, WeakPtr)
+{
+    ListHashSet<WeakPtr<Object>> set;
+
+    RefPtr object1 = Object::create();
+    set.add(object1.get());
+
+    Ref object2 = Object::create();
+
+    // Present when live
+    EXPECT_TRUE(set.contains(object1.get()));
+    EXPECT_EQ(set.find(object1.get())->get(), object1.get());
+    EXPECT_EQ(1u, set.size());
+    for (auto& entry : set)
+        EXPECT_EQ(entry, object1.get());
+
+    EXPECT_FALSE(set.contains(&object2.get()));
+    EXPECT_EQ(set.find(&object2.get()), set.end());
+
+    Object* rawObject1 = object1.get();
+    object1 = nullptr;
+
+    // Absent when dead
+    EXPECT_FALSE(set.contains(rawObject1));
+    EXPECT_EQ(set.find(rawObject1), set.end());
+    EXPECT_EQ(set.begin(), set.end());
+
+    // Accurate size after removing weak nulls
+    EXPECT_EQ(1u, set.size());
+    set.removeWeakNullEntries();
+    EXPECT_EQ(0u, set.size());
+
+    // Bounded growth as added objects die
+    for (size_t i = 0; i < 128; ++i)
+        set.add(&Object::create().get());
+    EXPECT_LT(set.size(), 16u);
 }
 
 } // namespace TestWebKitAPI

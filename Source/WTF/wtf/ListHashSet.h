@@ -292,8 +292,8 @@ private:
 
     friend class ListHashSet<ValueArg, HashArg>;
 
-    ListHashSetIterator(const ListHashSetType* set, Link* position)
-        : m_iterator(set, position)
+    ListHashSetIterator(const ListHashSetType* set, Link* position, Link* sentinel)
+        : m_iterator(set, position, sentinel)
     {
     }
 
@@ -349,18 +349,21 @@ private:
     typedef ListHashSetLink Link;
     typedef ListHashSetNode<ValueArg> Node;
     typedef ValueArg ValueType;
+    using ValueTraits = HashTraits<ValueType>;
 
     friend class ListHashSet<ValueArg, HashArg>;
     friend class ListHashSetIterator<ValueArg, HashArg>;
 
-    ListHashSetConstIterator(const ListHashSetType* set, const Link* position)
+    ListHashSetConstIterator(const ListHashSetType* set, const Link* position, const Link* sentinel)
         : m_position(position)
+        , m_sentinel(sentinel)
 #if CHECK_HASHTABLE_ITERATORS
         , m_weakSet(set, EnableWeakPtrThreadingAssertions::No)
         , m_weakPosition(position, EnableWeakPtrThreadingAssertions::No)
 #endif
     {
         UNUSED_PARAM(set);
+        skipEmptyBuckets();
     }
 
 public:
@@ -395,6 +398,7 @@ public:
 #if CHECK_HASHTABLE_ITERATORS
         m_weakPosition = m_position;
 #endif
+        skipEmptyBuckets();
         return *this;
     }
 
@@ -415,6 +419,7 @@ public:
 #if CHECK_HASHTABLE_ITERATORS
         m_weakPosition = m_position;
 #endif
+        skipEmptyBucketsBackwards();
         return *this;
     }
 
@@ -432,12 +437,32 @@ public:
     }
 
 private:
+    void skipEmptyBuckets()
+    {
+        while (m_position != m_sentinel && isHashTraitsWeakNullValue<ValueTraits>(node()->m_value)) {
+            m_position = m_position->m_next;
+#if CHECK_HASHTABLE_ITERATORS
+            m_weakPosition = m_position;
+#endif
+        }
+    }
+
+    void skipEmptyBucketsBackwards()
+    {
+        while (m_position != m_sentinel && isHashTraitsWeakNullValue<ValueTraits>(node()->m_value)) {
+            m_position = m_position->m_prev;
+#if CHECK_HASHTABLE_ITERATORS
+            m_weakPosition = m_position;
+#endif
+        }
+    }
+
     const Node* node() const
     {
 #if CHECK_HASHTABLE_ITERATORS
         ASSERT(m_weakSet);
         ASSERT(m_weakPosition);
-        ASSERT(m_position != &m_weakSet->m_sentinel);
+        ASSERT(m_position != m_sentinel);
 #endif
         return static_cast<const Node*>(m_position);
     }
@@ -452,6 +477,7 @@ private:
     }
 
     const Link* m_position { nullptr };
+    const Link* m_sentinel { nullptr };
 #if CHECK_HASHTABLE_ITERATORS
     WeakPtr<const ListHashSetType> m_weakSet;
     WeakPtr<Link> m_weakPosition;
@@ -939,13 +965,13 @@ void ListHashSet<T, U>::insertNodeBefore(Link* beforeNode, Node* newNode)
 template<typename T, typename U>
 inline auto ListHashSet<T, U>::makeIterator(Link* position) -> iterator
 {
-    return iterator(this, position);
+    return iterator(this, position, &m_sentinel);
 }
 
 template<typename T, typename U>
 inline auto ListHashSet<T, U>::makeConstIterator(const Link* position) const -> const_iterator
 { 
-    return const_iterator(this, position);
+    return const_iterator(this, position, &m_sentinel);
 }
 
 } // namespace WTF

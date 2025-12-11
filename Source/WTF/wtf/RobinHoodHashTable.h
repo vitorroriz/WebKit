@@ -204,6 +204,7 @@ public:
 
     static bool isEmptyBucket(const ValueType& value) { return isHashTraitsEmptyValue<KeyTraits>(Extractor::extract(value)); }
     static bool isEmptyOrDeletedBucket(const ValueType& value) { return isEmptyBucket(value); }
+    static bool isEmptyOrDeletedOrWeakNullBucket(const ValueType& value) { static_assert(!KeyTraits::hasIsWeakNullValueFunction); return isEmptyOrDeletedBucket(value); }
 
     template<ShouldValidateKey shouldValidateKey> ValueType* lookup(const Key& key) { return lookup<IdentityTranslatorType, shouldValidateKey>(key); }
     template<typename HashTranslator, ShouldValidateKey, typename T> ValueType* lookup(const T&);

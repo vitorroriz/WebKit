@@ -75,7 +75,6 @@ public:
             , m_position { position }
             , m_endPosition { weakHashMap.m_map.end() }
         {
-            skipEmptyBuckets();
         }
     
         ~WeakHashMapIteratorBase() = default;
@@ -97,14 +96,7 @@ public:
             ASSERT(m_position != m_endPosition);
             ++m_position;
             ++m_advanceCount;
-            skipEmptyBuckets();
             m_weakHashMap.increaseOperationCountSinceLastCleanup();
-        }
-
-        void skipEmptyBuckets()
-        {
-            while (m_position != m_endPosition && !m_position->key.get())
-                ++m_position;
         }
 
         const MapType& m_weakHashMap;
@@ -354,10 +346,13 @@ public:
     bool hasNullReferences() const
     {
         unsigned count = 0;
-        auto result = std::ranges::any_of(m_map, [&](auto& iterator) {
+        for (auto _ : m_map) {
+            UNUSED_VARIABLE(_);
             ++count;
-            return !iterator.key.get();
-        });
+        }
+
+        bool result = count != m_map.size();
+
         if (result)
             increaseOperationCountSinceLastCleanup(count);
         else

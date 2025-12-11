@@ -54,7 +54,6 @@ public:
             , m_position(position)
             , m_endPosition(set.m_set.end())
         {
-            skipEmptyBuckets();
         }
 
     public:
@@ -68,7 +67,6 @@ public:
         {
             ASSERT(m_position != m_endPosition);
             ++m_position;
-            skipEmptyBuckets();
             m_set->increaseOperationCountSinceLastCleanup();
             return *this;
         }
@@ -78,12 +76,6 @@ public:
             WeakHashSetConstIterator temp = *this;
             ++(*this);
             return temp;
-        }
-
-        void skipEmptyBuckets()
-        {
-            while (m_position != m_endPosition && !get())
-                ++m_position;
         }
 
         bool operator==(const WeakHashSetConstIterator& other) const
@@ -176,10 +168,13 @@ public:
     bool hasNullReferences() const
     {
         unsigned count = 0;
-        auto result = std::ranges::any_of(m_set, [&](auto& value) {
+        for (auto _ : m_set) {
+            UNUSED_VARIABLE(_);
             ++count;
-            return !value;
-        });
+        }
+
+        bool result = count != m_set.size();
+
         if (result)
             increaseOperationCountSinceLastCleanup(count);
         else
