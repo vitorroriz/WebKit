@@ -62,25 +62,25 @@ const MQ::MediaQueryList& MediaList::mediaQueries() const
 {
     if (m_detachedMediaQueries)
         return *m_detachedMediaQueries;
-    if (auto* rule = dynamicDowncast<CSSImportRule>(m_parentRule))
+    if (RefPtr rule = dynamicDowncast<CSSImportRule>(m_parentRule.get()))
         return rule->mediaQueries();
-    if (auto* rule = dynamicDowncast<CSSMediaRule>(m_parentRule))
+    if (RefPtr rule = dynamicDowncast<CSSMediaRule>(m_parentRule.get()))
         return rule->mediaQueries();
     return m_parentStyleSheet->mediaQueries();
 }
 
 void MediaList::setMediaQueries(MQ::MediaQueryList&& queries)
 {
-    if (m_parentStyleSheet) {
-        m_parentStyleSheet->setMediaQueries(WTFMove(queries));
-        m_parentStyleSheet->didMutate();
+    if (RefPtr parentStyleSheet = m_parentStyleSheet.get()) {
+        parentStyleSheet->setMediaQueries(WTFMove(queries));
+        parentStyleSheet->didMutate();
         return;
     }
 
-    CSSStyleSheet::RuleMutationScope mutationScope(m_parentRule);
-    if (auto* rule = dynamicDowncast<CSSImportRule>(m_parentRule))
+    CSSStyleSheet::RuleMutationScope mutationScope(m_parentRule.get());
+    if (RefPtr rule = dynamicDowncast<CSSImportRule>(m_parentRule.get()))
         rule->setMediaQueries(WTFMove(queries));
-    if (auto* rule = dynamicDowncast<CSSMediaRule>(m_parentRule))
+    if (RefPtr rule = dynamicDowncast<CSSMediaRule>(m_parentRule.get()))
         rule->setMediaQueries(WTFMove(queries));
 }
 
@@ -94,6 +94,16 @@ String MediaList::mediaText() const
 void MediaList::setMediaText(const String& value)
 {
     setMediaQueries(MQ::MediaQueryParser::parse(value, strictCSSParserContext()));
+}
+
+CSSRule* MediaList::parentRule() const
+{
+    return m_parentRule.get();
+}
+
+CSSStyleSheet* MediaList::parentStyleSheet() const
+{
+    return m_parentStyleSheet.get();
 }
 
 String MediaList::item(unsigned index) const

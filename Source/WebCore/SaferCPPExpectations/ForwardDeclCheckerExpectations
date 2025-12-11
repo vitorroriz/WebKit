@@ -32,7 +32,6 @@ bindings/js/JSPaintRenderingContext2DCustom.cpp
 bridge/objc/objc_runtime.h
 css/CSSStyleProperties.h
 css/CSSToLengthConversionData.h
-css/MediaList.h
 css/StyleSheetContents.cpp
 css/StyleSheetContents.h
 css/values/primitives/CSSPrimitiveData.h

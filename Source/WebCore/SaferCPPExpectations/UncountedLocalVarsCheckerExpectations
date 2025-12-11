@@ -112,7 +112,6 @@ css/CSSValueList.h
 css/DeprecatedCSSOMPrimitiveValue.cpp
 css/FontFaceSet.cpp
 css/ImmutableStyleProperties.cpp
-css/MediaList.cpp
 css/MediaQueryMatcher.cpp
 css/SelectorChecker.cpp
 css/SelectorFilter.cpp
