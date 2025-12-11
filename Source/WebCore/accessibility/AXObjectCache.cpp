@@ -1669,7 +1669,7 @@ void AXObjectCache::notificationPostTimerFired()
     for (const auto& note : notificationsToPost) {
         WTF::switchOn(note.second.data,
             [&](const AriaNotifyData& data) {
-                postPlatformARIANotifyNotification(data);
+                postPlatformARIANotifyNotification(note.first, data);
             },
 #if PLATFORM(COCOA)
             [&](const LiveRegionAnnouncementData& data) {

@@ -133,7 +133,7 @@ void AXObjectCache::postPlatformAnnouncementNotification(const String& message)
     }
 }
 
-void AXObjectCache::postPlatformARIANotifyNotification(const AriaNotifyData& notificationData)
+void AXObjectCache::postPlatformARIANotifyNotification(AccessibilityObject&, const AriaNotifyData& notificationData)
 {
     if (RefPtr page = document() ? document()->page() : nullptr)
         page->chrome().relayAriaNotifyNotification(AriaNotifyData { notificationData });

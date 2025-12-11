@@ -394,7 +394,7 @@ void AXObjectCache::postPlatformAnnouncementNotification(const String& message)
     }
 }
 
-void AXObjectCache::postPlatformARIANotifyNotification(const AriaNotifyData& notificationData)
+void AXObjectCache::postPlatformARIANotifyNotification(AccessibilityObject& object, const AriaNotifyData& notificationData)
 {
     ASSERT(isMainThread());
 
@@ -408,7 +408,8 @@ void AXObjectCache::postPlatformARIANotifyNotification(const AriaNotifyData& not
         NSAccessibilityAnnouncementKey: notificationData.message.createNSString().get(),
         NSAccessibilityAnnouncementLanguageKey: notificationData.language.createNSString().get()
     };
-    NSAccessibilityPostNotificationWithUserInfo(NSApp, NSAccessibilityAnnouncementRequestedNotification, userInfo);
+
+    NSAccessibilityPostNotificationWithUserInfo(object.wrapper(), NSAccessibilityAnnouncementRequestedNotification, userInfo);
 
     if (gShouldRepostNotificationsForTests) [[unlikely]] {
         if (RefPtr root = getOrCreate(m_document->view()))

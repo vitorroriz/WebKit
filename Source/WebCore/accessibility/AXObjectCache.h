@@ -699,11 +699,11 @@ protected:
 
 #if PLATFORM(COCOA)
     WEBCORE_EXPORT void postPlatformAnnouncementNotification(const String&);
-    WEBCORE_EXPORT void postPlatformARIANotifyNotification(const AriaNotifyData&);
+    WEBCORE_EXPORT void postPlatformARIANotifyNotification(AccessibilityObject&, const AriaNotifyData&);
     WEBCORE_EXPORT void postPlatformLiveRegionNotification(AccessibilityObject&, const LiveRegionAnnouncementData&);
 #else
     void postPlatformAnnouncementNotification(const String&) { }
-    void postPlatformARIANotifyNotification(const AriaNotifyData&) { }
+    void postPlatformARIANotifyNotification(AccessibilityObject&, const AriaNotifyData&) { }
 #endif
 
     void frameLoadingEventPlatformNotification(RenderView*, AXLoadingEvent);
