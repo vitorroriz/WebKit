@@ -2281,7 +2281,17 @@ void GStreamerMediaEndpoint::onIceCandidate(guint sdpMLineIndex, gchararray cand
     if (candidateString.isEmpty())
         return;
 
-    callOnMainThread([protectedThis = Ref(*this), this, sdp = WTFMove(candidateString).isolatedCopy(), sdpMLineIndex]() mutable {
+    auto descriptions = descriptionsFromWebRTCBin(m_webrtcBin.get());
+
+    String mid;
+    GUniqueOutPtr<GstWebRTCSessionDescription> description;
+    g_object_get(m_webrtcBin.get(), "local-description", &description.outPtr(), nullptr);
+    if (description && sdpMLineIndex < gst_sdp_message_medias_len(description->sdp)) {
+        const auto media = gst_sdp_message_get_media(description->sdp, sdpMLineIndex);
+        mid = unsafeSpan(gst_sdp_media_get_attribute_val(media, "mid"));
+    }
+
+    callOnMainThread([protectedThis = Ref(*this), this, sdp = candidateString.isolatedCopy(), sdpMLineIndex, descriptions = WTFMove(descriptions), mid = WTFMove(mid)]() mutable {
         if (isStopped())
             return;
         auto peerConnectionBackend = this->peerConnectionBackend();
@@ -2290,15 +2300,6 @@ void GStreamerMediaEndpoint::onIceCandidate(guint sdpMLineIndex, gchararray cand
 
         m_statsCollector->invalidateCache();
 
-        String mid;
-        GUniqueOutPtr<GstWebRTCSessionDescription> description;
-        g_object_get(m_webrtcBin.get(), "local-description", &description.outPtr(), nullptr);
-        if (description && sdpMLineIndex < gst_sdp_message_medias_len(description->sdp)) {
-            const auto media = gst_sdp_message_get_media(description->sdp, sdpMLineIndex);
-            mid = unsafeSpan(gst_sdp_media_get_attribute_val(media, "mid"));
-        }
-
-        auto descriptions = descriptionsFromWebRTCBin(m_webrtcBin.get());
         GST_DEBUG_OBJECT(m_pipeline.get(), "Notifying ICE candidate: %s", sdp.ascii().data());
         peerConnectionBackend->newICECandidate(WTFMove(sdp), WTFMove(mid), sdpMLineIndex, { }, WTFMove(descriptions));
     });
