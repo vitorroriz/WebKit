@@ -8155,6 +8155,8 @@ imported/w3c/web-platform-tests/css/css-viewport/zoom/border-spacing.html [ Imag
 imported/w3c/web-platform-tests/css/css-viewport/zoom/border-width.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-viewport/zoom/border.html [ ImageOnlyFailure ]
 
+# RenderTreeNeedsLayoutChecker hits.
+webkit.org/b/304002 [ Debug ] fast/inline/missing-content-on-autofill-with-out-of-flow-input-descendant.html [ Skip ]
 
 # Hits assert in debug, tracked by https://bugs.webkit.org/show_bug.cgi?id=303414
 [ Debug ] fullscreen/fullscreen-grid-item-container-type-crash.html [ Skip ]

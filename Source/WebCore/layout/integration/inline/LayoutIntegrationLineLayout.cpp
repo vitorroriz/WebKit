@@ -1158,8 +1158,10 @@ bool LineLayout::isContentConsideredStale() const
     auto* rootRenderer = m_rootLayoutBox->rendererForIntegration();
     if (!rootRenderer)
         return true;
-    if (rootRenderer->needsLayout())
+    if (rootRenderer->normalChildNeedsLayout()) {
+        // FIXME: Let's bail out on needsLayout() -see webkit.org/b/304002
         return true;
+    }
     if (rootRenderer->style().isSkippedRootOrSkippedContent())
         return true;
     if (m_lineDamage && m_lineDamage->hasDetachedContent())
