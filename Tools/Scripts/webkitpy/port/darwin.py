@@ -77,10 +77,12 @@ class DarwinPort(ApplePort):
 
     def sharding_groups(self, suite=None):
         if suite == 'api-tests':
-            return {
-                'system': lambda shard: self._should_use_system_shard(shard.name),
-                'system': lambda shard: self._should_use_system_shard(shard.name),
-            }
+            groups = {}
+
+            # Add system group - test-parallel-safety groups will be created dynamically in runner.py
+            groups['system'] = lambda shard: '__WEBKIT_TEST_PARALLEL_SAFETY_SHARD_' not in shard.name and self._should_use_system_shard(shard.name)
+
+            return groups
         return {
             'media': lambda shard: 'media' in shard.name or 'webaudio' in shard.name,
         }
