@@ -58,7 +58,7 @@ void InspectorWorkerAgent::willDestroyFrontendAndBackend(DisconnectReason)
 {
     Ref { m_instrumentingAgents.get() }->setPersistentWorkerAgent(nullptr);
 
-    disable();
+    std::ignore = disable();
 }
 
 Inspector::Protocol::ErrorStringOr<void> InspectorWorkerAgent::enable()

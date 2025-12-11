@@ -262,7 +262,7 @@ void PingLoader::startPingLoad(LocalFrame& frame, ResourceRequest& request, HTTP
     }
 
     CachedResourceRequest cachedResourceRequest { ResourceRequest { request }, options };
-    frame.protectedDocument()->protectedCachedResourceLoader()->requestPingResource(WTFMove(cachedResourceRequest));
+    std::ignore = frame.protectedDocument()->protectedCachedResourceLoader()->requestPingResource(WTFMove(cachedResourceRequest));
 }
 
 // // https://html.spec.whatwg.org/multipage/origin.html#sanitize-url-report

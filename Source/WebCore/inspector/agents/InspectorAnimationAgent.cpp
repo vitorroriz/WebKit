@@ -270,8 +270,8 @@ void InspectorAnimationAgent::didCreateFrontendAndBackend()
 
 void InspectorAnimationAgent::willDestroyFrontendAndBackend(DisconnectReason)
 {
-    stopTracking();
-    disable();
+    std::ignore = stopTracking();
+    std::ignore = disable();
 
     Ref agents = m_instrumentingAgents.get();
     ASSERT(agents->persistentAnimationAgent() == this);

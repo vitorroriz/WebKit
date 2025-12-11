@@ -64,7 +64,7 @@
 
 namespace WebCore {
 
-static WARN_UNUSED_RETURN AudioBufferList* tryCreateAudioBufferList(size_t numberOfBuffers)
+WARN_UNUSED_RETURN static AudioBufferList* tryCreateAudioBufferList(size_t numberOfBuffers)
 {
     if (!numberOfBuffers)
         return nullptr;

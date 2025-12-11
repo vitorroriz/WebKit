@@ -137,7 +137,7 @@ void InspectorNetworkAgent::didCreateFrontendAndBackend()
 
 void InspectorNetworkAgent::willDestroyFrontendAndBackend(Inspector::DisconnectReason)
 {
-    disable();
+    std::ignore = disable();
 }
 
 static Ref<Inspector::Protocol::Network::Headers> buildObjectForHeaders(const HTTPHeaderMap& headers)
@@ -847,7 +847,7 @@ Inspector::Protocol::ErrorStringOr<void> InspectorNetworkAgent::disable()
     continuePendingRequests();
     continuePendingResponses();
 
-    setResourceCachingDisabled(false);
+    std::ignore = setResourceCachingDisabled(false);
 
 #if ENABLE(INSPECTOR_NETWORK_THROTTLING)
     setEmulatedConditions(std::nullopt);

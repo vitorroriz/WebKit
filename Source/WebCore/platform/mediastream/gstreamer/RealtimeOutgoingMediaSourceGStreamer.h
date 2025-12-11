@@ -70,7 +70,7 @@ public:
 
     WARN_UNUSED_RETURN GUniquePtr<GstStructure> mediaCaptureStats();
 
-    virtual WARN_UNUSED_RETURN GRefPtr<GstPad> outgoingSourcePad() const = 0;
+    WARN_UNUSED_RETURN virtual GRefPtr<GstPad> outgoingSourcePad() const = 0;
     virtual RefPtr<GStreamerRTPPacketizer> createPacketizer(RefPtr<UniqueSSRCGenerator>, const GstStructure*, GUniquePtr<GstStructure>&&) = 0;
 
     void replaceTrack(const RefPtr<MediaStreamTrack>&);

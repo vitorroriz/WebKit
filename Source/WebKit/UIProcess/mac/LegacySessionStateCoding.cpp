@@ -977,7 +977,7 @@ static void decodeBackForwardTreeNode(HistoryEntryDataDecoder& decoder, FrameSta
 #endif
 }
 
-static WARN_UNUSED_RETURN bool decodeSessionHistoryEntryData(std::span<const uint8_t> buffer, FrameState& mainFrameState)
+WARN_UNUSED_RETURN static bool decodeSessionHistoryEntryData(std::span<const uint8_t> buffer, FrameState& mainFrameState)
 {
     HistoryEntryDataDecoder decoder { buffer };
 
@@ -992,12 +992,12 @@ static WARN_UNUSED_RETURN bool decodeSessionHistoryEntryData(std::span<const uin
     return decoder.finishDecoding();
 }
 
-static WARN_UNUSED_RETURN bool decodeSessionHistoryEntryData(CFDataRef historyEntryData, FrameState& mainFrameState)
+WARN_UNUSED_RETURN static bool decodeSessionHistoryEntryData(CFDataRef historyEntryData, FrameState& mainFrameState)
 {
     return decodeSessionHistoryEntryData(span(historyEntryData), mainFrameState);
 }
 
-static WARN_UNUSED_RETURN bool decodeSessionHistoryEntry(CFDictionaryRef entryDictionary, FrameState& backForwardListItemState)
+WARN_UNUSED_RETURN static bool decodeSessionHistoryEntry(CFDictionaryRef entryDictionary, FrameState& backForwardListItemState)
 {
     RetainPtr title = dynamic_cf_cast<CFStringRef>(CFDictionaryGetValue(entryDictionary, sessionHistoryEntryTitleKey));
     if (!title)
@@ -1032,7 +1032,7 @@ static WARN_UNUSED_RETURN bool decodeSessionHistoryEntry(CFDictionaryRef entryDi
     return true;
 }
 
-static WARN_UNUSED_RETURN bool decodeSessionHistoryEntries(CFArrayRef entriesArray, Vector<Ref<FrameState>>& entries)
+WARN_UNUSED_RETURN static bool decodeSessionHistoryEntries(CFArrayRef entriesArray, Vector<Ref<FrameState>>& entries)
 {
     for (CFIndex i = 0, size = CFArrayGetCount(entriesArray); i < size; ++i) {
         RetainPtr entryDictionary = dynamic_cf_cast<CFDictionaryRef>(CFArrayGetValueAtIndex(entriesArray, i));
@@ -1049,7 +1049,7 @@ static WARN_UNUSED_RETURN bool decodeSessionHistoryEntries(CFArrayRef entriesArr
     return true;
 }
 
-static WARN_UNUSED_RETURN bool decodeV0SessionHistory(CFDictionaryRef sessionHistoryDictionary, BackForwardListState& backForwardListState)
+WARN_UNUSED_RETURN static bool decodeV0SessionHistory(CFDictionaryRef sessionHistoryDictionary, BackForwardListState& backForwardListState)
 {
     RetainPtr currentIndexNumber = dynamic_cf_cast<CFNumberRef>(CFDictionaryGetValue(sessionHistoryDictionary, sessionHistoryCurrentIndexKey));
     if (!currentIndexNumber)
@@ -1085,7 +1085,7 @@ static WARN_UNUSED_RETURN bool decodeV0SessionHistory(CFDictionaryRef sessionHis
     return true;
 }
 
-static WARN_UNUSED_RETURN bool decodeV1SessionHistory(CFDictionaryRef sessionHistoryDictionary, BackForwardListState& backForwardListState)
+WARN_UNUSED_RETURN static bool decodeV1SessionHistory(CFDictionaryRef sessionHistoryDictionary, BackForwardListState& backForwardListState)
 {
     RetainPtr currentIndexNumber = dynamic_cf_cast<CFNumberRef>(CFDictionaryGetValue(sessionHistoryDictionary, sessionHistoryCurrentIndexKey));
     if (!currentIndexNumber) {
@@ -1116,7 +1116,7 @@ static WARN_UNUSED_RETURN bool decodeV1SessionHistory(CFDictionaryRef sessionHis
     return true;
 }
 
-static WARN_UNUSED_RETURN bool decodeSessionHistory(CFDictionaryRef backForwardListDictionary, BackForwardListState& backForwardListState)
+WARN_UNUSED_RETURN static bool decodeSessionHistory(CFDictionaryRef backForwardListDictionary, BackForwardListState& backForwardListState)
 {
     RetainPtr sessionHistoryVersionNumber = dynamic_cf_cast<CFNumberRef>(CFDictionaryGetValue(backForwardListDictionary, sessionHistoryVersionKey));
     if (!sessionHistoryVersionNumber) {

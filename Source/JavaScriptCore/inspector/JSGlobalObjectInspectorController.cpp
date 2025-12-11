@@ -238,8 +238,8 @@ void JSGlobalObjectInspectorController::frontendInitialized()
     if (m_pauseAfterInitialization) {
         m_pauseAfterInitialization = false;
 
-        ensureDebuggerAgent().enable();
-        ensureDebuggerAgent().pause();
+        std::ignore = ensureDebuggerAgent().enable();
+        std::ignore = ensureDebuggerAgent().pause();
     }
 
 #if ENABLE(REMOTE_INSPECTOR)
