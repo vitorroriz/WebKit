@@ -505,13 +505,21 @@ void webkit_user_content_filter_store_fetch_identifiers(WebKitUserContentFilterS
         if (g_task_return_error_if_cancelled(task.get()))
             return;
 
-        GStrv result = static_cast<GStrv>(g_new0(gchar*, identifiers.size() + 1));
-        for (size_t i = 0; i < identifiers.size(); ++i) {
-            WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN // GTK/WPE port
-            result[i] = g_strdup(identifiers[i].utf8().data());
-            WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
+        auto bytesToAllocate = checkedSum<size_t>(identifiers.size(), 1);
+        bytesToAllocate *= sizeof(gchar*);
+        if (bytesToAllocate.hasOverflowed()) [[unlikely]] {
+            g_task_return_new_error(task.get(), G_IO_ERROR, g_io_error_from_errno(EOVERFLOW), "Too many items in result");
+            return;
         }
-        g_task_return_pointer(task.get(), result, reinterpret_cast<GDestroyNotify>(g_strfreev));
+
+        auto result = GMallocSpan<gchar*>::malloc(bytesToAllocate);
+        for (size_t i = 0; i < identifiers.size(); ++i) {
+            const auto identifier = identifiers[i].utf8();
+            result[i] = g_strndup(identifier.data(), identifier.length());
+        }
+        result[identifiers.size()] = nullptr;
+
+        g_task_return_pointer(task.get(), result.leakSpan().data(), reinterpret_cast<GDestroyNotify>(g_strfreev));
     });
 #else
     g_task_return_new_error(task.get(), WEBKIT_USER_CONTENT_FILTER_ERROR, WEBKIT_USER_CONTENT_FILTER_ERROR_NOT_FOUND, "Content Extensions disabled");
