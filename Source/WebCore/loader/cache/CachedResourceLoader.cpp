@@ -973,7 +973,7 @@ void CachedResourceLoader::updateHTTPRequestHeaders(FrameLoader& frameLoader, Ca
     // Implementing steps 11 to 19 of https://fetch.spec.whatwg.org/#http-network-or-cache-fetch as of 22 Feb 2022.
 
     // FIXME: We should reconcile handling of MainResource with other resources.
-    if (type != CachedResource::Type::MainResource)
+    if (type != CachedResource::Type::MainResource && request.options().cachingPolicy != CachingPolicy::AllowCachingMainResourcePrefetch)
         request.updateReferrerAndOriginHeaders(frameLoader);
     // FetchMetadata depends on PSL to determine same-site relationships and without this
     // ability it is best to not set any FetchMetadata headers as sites generally expect

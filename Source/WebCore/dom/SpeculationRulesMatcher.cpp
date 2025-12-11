@@ -30,6 +30,7 @@
 #include "Element.h"
 #include "HTMLAnchorElement.h"
 #include "JSDOMGlobalObject.h"
+#include "ReferrerPolicy.h"
 #include "ScriptController.h"
 #include "SelectorQuery.h"
 #include "SpeculationRules.h"
@@ -118,8 +119,17 @@ std::optional<PrefetchRule> SpeculationRulesMatcher::hasMatchingRule(Document& d
                     return PrefetchRule { rule.tags, rule.referrerPolicy, rule.eagerness == SpeculationRules::Eagerness::Conservative };
             }
 
-            if (rule.predicate && matches(rule.predicate.value(), document, anchor))
-                return PrefetchRule { rule.tags, rule.referrerPolicy, rule.eagerness == SpeculationRules::Eagerness::Conservative || rule.eagerness == SpeculationRules::Eagerness::Moderate };
+            if (rule.predicate && matches(rule.predicate.value(), document, anchor)) {
+                // For document rules, if the rule doesn't specify a referrer policy,
+                // use the link element's referrerPolicy attribute if present.
+                auto referrerPolicy = rule.referrerPolicy;
+                if (!referrerPolicy) {
+                    auto linkReferrerPolicy = anchor.referrerPolicy();
+                    if (linkReferrerPolicy != ReferrerPolicy::EmptyString)
+                        referrerPolicy = linkReferrerPolicy;
+                }
+                return PrefetchRule { rule.tags, referrerPolicy, rule.eagerness == SpeculationRules::Eagerness::Conservative || rule.eagerness == SpeculationRules::Eagerness::Moderate };
+            }
         }
     }
 
