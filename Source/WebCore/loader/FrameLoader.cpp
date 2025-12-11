@@ -796,7 +796,9 @@ void FrameLoader::receivedFirstData()
 
     scheduleRefreshIfNeeded(document, documentLoader->response().httpHeaderField(HTTPHeaderName::Refresh), IsMetaRefresh::No);
 
-    if (document->settings().speculationRulesPrefetchEnabled()) {
+    // https://html.spec.whatwg.org/C#shared-document-creation-infrastructure
+    // 18. If navigationParams's navigable is a top-level traversable, then process the `Speculation-Rules` header given document and navigationParams's response.
+    if (frame->isMainFrame() && document->settings().speculationRulesPrefetchEnabled()) {
         String speculationRulesHeader = documentLoader->response().httpHeaderField(HTTPHeaderName::SpeculationRules);
         if (!speculationRulesHeader.isEmpty())
             document->processSpeculationRulesHeader(speculationRulesHeader, documentLoader->response().url());
