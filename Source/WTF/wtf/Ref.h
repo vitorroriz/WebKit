@@ -141,13 +141,13 @@ public:
     operator T&() const LIFETIME_BOUND { ASSERT(m_ptr); return *PtrTraits::unwrap(m_ptr); }
     bool operator!() const { ASSERT(m_ptr); return !*m_ptr; }
 
-    template<typename X, typename Y, typename Z> WARN_UNUSED_RETURN Ref<T, PtrTraits, RefDerefTraits> replace(Ref<X, Y, Z>&&);
+    template<typename X, typename Y, typename Z> Ref<T, PtrTraits, RefDerefTraits> replace(Ref<X, Y, Z>&&) WARN_UNUSED_RETURN;
 
     // The following function is deprecated.
     Ref copyRef() && = delete;
-    WARN_UNUSED_RETURN Ref copyRef() const & { return Ref(*m_ptr); }
+    Ref copyRef() const & WARN_UNUSED_RETURN { return Ref(*m_ptr); }
 
-    WARN_UNUSED_RETURN T& leakRef()
+    T& leakRef() WARN_UNUSED_RETURN
     {
         ASSERT(m_ptr);
 

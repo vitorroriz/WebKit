@@ -42,8 +42,8 @@ public:
     void attach(RenderButton& parent, RenderPtr<RenderObject> child, RenderObject* beforeChild);
     void attach(RenderMenuList& parent, RenderPtr<RenderObject> child, RenderObject* beforeChild);
 
-    WARN_UNUSED_RETURN RenderPtr<RenderObject> detach(RenderButton& parent, RenderObject& child, RenderTreeBuilder::WillBeDestroyed);
-    WARN_UNUSED_RETURN RenderPtr<RenderObject> detach(RenderMenuList& parent, RenderObject& child, RenderTreeBuilder::WillBeDestroyed);
+    RenderPtr<RenderObject> detach(RenderButton& parent, RenderObject& child, RenderTreeBuilder::WillBeDestroyed) WARN_UNUSED_RETURN;
+    RenderPtr<RenderObject> detach(RenderMenuList& parent, RenderObject& child, RenderTreeBuilder::WillBeDestroyed) WARN_UNUSED_RETURN;
 
 private:
     RenderBlock& findOrCreateParentForChild(RenderButton&);

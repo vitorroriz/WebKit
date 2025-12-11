@@ -360,7 +360,7 @@ void InspectorDOMAgent::willDestroyFrontendAndBackend(Inspector::DisconnectReaso
 
     Inspector::Protocol::ErrorString ignored;
     setSearchingForNode(ignored, false, nullptr, nullptr, nullptr, false);
-    std::ignore = hideHighlight();
+    hideHighlight();
 
     Ref overlay = m_overlay.get();
     overlay->clearAllGridOverlays();
@@ -1367,7 +1367,7 @@ void InspectorDOMAgent::setSearchingForNode(Inspector::Protocol::ErrorString& er
 
         highlightMousedOverNode();
     } else
-        std::ignore = hideHighlight();
+        hideHighlight();
 
     protectedOverlay()->didSetSearchingForNode(m_searchingForNode);
 
@@ -1727,7 +1727,7 @@ Inspector::Protocol::ErrorStringOr<void> InspectorDOMAgent::showGridOverlay(Insp
     if (!config)
         return makeUnexpected(errorString);
 
-    std::ignore = protectedOverlay()->setGridOverlayForNode(*node, *config);
+    protectedOverlay()->setGridOverlayForNode(*node, *config);
 
     return { };
 }
@@ -1759,7 +1759,7 @@ Inspector::Protocol::ErrorStringOr<void> InspectorDOMAgent::showFlexOverlay(Insp
     if (!config)
         return makeUnexpected(errorString);
 
-    std::ignore = protectedOverlay()->setFlexOverlayForNode(*node, *config);
+    protectedOverlay()->setFlexOverlayForNode(*node, *config);
 
     return { };
 }

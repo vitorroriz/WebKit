@@ -57,7 +57,7 @@ void InspectorAgent::willDestroyFrontendAndBackend(DisconnectReason)
 {
     m_pendingEvaluateTestCommands.clear();
 
-    std::ignore = disable();
+    disable();
 }
 
 Protocol::ErrorStringOr<void> InspectorAgent::enable()

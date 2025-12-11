@@ -1408,10 +1408,10 @@ auto SectionParser::parseCustom() -> PartialResult
             dataLogLnIf(Options::dumpWasmWarnings(), "Could not parse name section: ", nameSection.error());
     } else if (WTF::Unicode::equal("metadata.code.branch_hint"_span8, section.name.span())) {
         BranchHintsSectionParser branchHintsSectionParser(section.payload, m_info);
-        std::ignore = branchHintsSectionParser.parse();
+        branchHintsSectionParser.parse();
     } else if (WTF::Unicode::equal("sourceMappingURL"_span8, section.name.span())) {
         SourceMappingURLSectionParser sourceMappingURLSectionParser(section.payload, m_info);
-        std::ignore = sourceMappingURLSectionParser.parse();
+        sourceMappingURLSectionParser.parse();
     }
 
     m_info->customSections.append(WTFMove(section));

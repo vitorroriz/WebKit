@@ -58,7 +58,7 @@ void InspectorConsoleAgent::didCreateFrontendAndBackend()
 
 void InspectorConsoleAgent::willDestroyFrontendAndBackend(DisconnectReason)
 {
-    std::ignore = disable();
+    disable();
 }
 
 void InspectorConsoleAgent::discardValues()

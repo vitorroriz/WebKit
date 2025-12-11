@@ -111,7 +111,7 @@ void InspectorCanvasAgent::didCreateFrontendAndBackend()
 
 void InspectorCanvasAgent::willDestroyFrontendAndBackend(Inspector::DisconnectReason)
 {
-    std::ignore = disable();
+    disable();
 }
 
 void InspectorCanvasAgent::discardAgent()

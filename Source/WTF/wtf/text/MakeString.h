@@ -149,7 +149,7 @@ AtomString makeAtomString(StringTypes... strings)
     return result;
 }
 
-WARN_UNUSED_RETURN inline String makeStringByInserting(StringView originalString, StringView stringToInsert, unsigned position)
+inline String WARN_UNUSED_RETURN makeStringByInserting(StringView originalString, StringView stringToInsert, unsigned position)
 {
     return makeString(originalString.left(position), stringToInsert, originalString.substring(position));
 }

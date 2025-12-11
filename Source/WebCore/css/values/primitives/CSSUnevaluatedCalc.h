@@ -71,7 +71,7 @@ struct UnevaluatedCalcBase {
     ~UnevaluatedCalcBase();
 
     Ref<CSSCalc::Value> protectedCalc() const;
-    WARN_UNUSED_RETURN CSSCalc::Value& leakRef();
+    CSSCalc::Value& leakRef() WARN_UNUSED_RETURN;
 
     bool requiresConversionData() const;
 

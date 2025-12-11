@@ -299,7 +299,7 @@ void InspectorCSSAgent::didCreateFrontendAndBackend()
 
 void InspectorCSSAgent::willDestroyFrontendAndBackend(Inspector::DisconnectReason)
 {
-    std::ignore = disable();
+    disable();
 }
 
 void InspectorCSSAgent::reset()

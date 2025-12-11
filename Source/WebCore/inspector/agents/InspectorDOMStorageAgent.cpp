@@ -74,7 +74,7 @@ void InspectorDOMStorageAgent::didCreateFrontendAndBackend()
 
 void InspectorDOMStorageAgent::willDestroyFrontendAndBackend(Inspector::DisconnectReason)
 {
-    std::ignore = disable();
+    disable();
 }
 
 Inspector::Protocol::ErrorStringOr<void> InspectorDOMStorageAgent::enable()

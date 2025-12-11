@@ -512,7 +512,7 @@ Expected<int64_t, GrowFailReason> ArrayBuffer::resize(VM& vm, size_t newByteLeng
                 // The memory will call back to our refreshAfterWasmMemoryGrow().
                 RefPtr<Wasm::Memory> memory = m_associatedWasmMemory.get();
                 if (memory) {
-                    std::ignore = memory->grow(vm, PageCount(newPageCount.pageCount() - oldPageCount.pageCount()));
+                    memory->grow(vm, PageCount(newPageCount.pageCount() - oldPageCount.pageCount()));
                     return deltaByteLength;
                 }
             }

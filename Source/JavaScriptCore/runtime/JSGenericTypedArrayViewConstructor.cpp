@@ -105,7 +105,7 @@ JSC_DEFINE_HOST_FUNCTION(uint8ArrayConstructorFromBase64, (JSGlobalObject* globa
 }
 
 template<typename CharacterType>
-WARN_UNUSED_RETURN inline static size_t decodeHexImpl(std::span<CharacterType> span, std::span<uint8_t> result)
+inline static WARN_UNUSED_RETURN size_t decodeHexImpl(std::span<CharacterType> span, std::span<uint8_t> result)
 {
     ASSERT(span.size() == result.size() * 2);
 

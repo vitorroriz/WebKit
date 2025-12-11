@@ -142,20 +142,20 @@ void JSGlobalObjectConsoleClient::startConsoleProfile()
 {
     if (m_debuggerAgent) {
         m_profileRestoreBreakpointActiveValue = m_debuggerAgent->breakpointsActive();
-        std::ignore = m_debuggerAgent->setBreakpointsActive(false);
+        m_debuggerAgent->setBreakpointsActive(false);
     }
 
     if (m_scriptProfilerAgent)
-        std::ignore = m_scriptProfilerAgent->startTracking(true);
+        m_scriptProfilerAgent->startTracking(true);
 }
 
 void JSGlobalObjectConsoleClient::stopConsoleProfile()
 {
     if (m_scriptProfilerAgent)
-        std::ignore = m_scriptProfilerAgent->stopTracking();
+        m_scriptProfilerAgent->stopTracking();
 
     if (m_debuggerAgent)
-        std::ignore = m_debuggerAgent->setBreakpointsActive(m_profileRestoreBreakpointActiveValue);
+        m_debuggerAgent->setBreakpointsActive(m_profileRestoreBreakpointActiveValue);
 }
 
 void JSGlobalObjectConsoleClient::takeHeapSnapshot(JSC::JSGlobalObject*, const String& title)

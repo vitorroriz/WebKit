@@ -160,49 +160,49 @@ public:
 
     std::optional<FailedCheck> check();
 
-    WARN_UNUSED_RETURN Result<void> visit(ShaderModule&);
+    Result<void> visit(ShaderModule&) WARN_UNUSED_RETURN;
 
     // Declarations
-    WARN_UNUSED_RETURN Result<void> visit(AST::Declaration&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::Structure&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::Variable&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::Function&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::TypeAlias&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::ConstAssert&);
+    Result<void> visit(AST::Declaration&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::Structure&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::Variable&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::Function&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::TypeAlias&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::ConstAssert&) WARN_UNUSED_RETURN;
 
     // Attributes
-    WARN_UNUSED_RETURN Result<void> visit(AST::Attribute&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::AlignAttribute&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::BindingAttribute&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::GroupAttribute&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::IdAttribute&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::LocationAttribute&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::SizeAttribute&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::WorkgroupSizeAttribute&);
+    Result<void> visit(AST::Attribute&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::AlignAttribute&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::BindingAttribute&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::GroupAttribute&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::IdAttribute&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::LocationAttribute&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::SizeAttribute&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::WorkgroupSizeAttribute&) WARN_UNUSED_RETURN;
 
     // Statements
-    WARN_UNUSED_RETURN Result<void> visit(AST::Statement&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::AssignmentStatement&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::CallStatement&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::CompoundAssignmentStatement&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::CompoundStatement&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::DecrementIncrementStatement&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::IfStatement&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::PhonyAssignmentStatement&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::ReturnStatement&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::ForStatement&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::LoopStatement&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::WhileStatement&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::SwitchStatement&);
+    Result<void> visit(AST::Statement&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::AssignmentStatement&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::CallStatement&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::CompoundAssignmentStatement&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::CompoundStatement&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::DecrementIncrementStatement&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::IfStatement&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::PhonyAssignmentStatement&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::ReturnStatement&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::ForStatement&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::LoopStatement&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::WhileStatement&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::SwitchStatement&) WARN_UNUSED_RETURN;
 
     // Expressions
-    WARN_UNUSED_RETURN Result<void> visit(AST::Expression&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::FieldAccessExpression&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::IndexAccessExpression&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::BinaryExpression&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::IdentifierExpression&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::CallExpression&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::UnaryExpression&);
+    Result<void> visit(AST::Expression&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::FieldAccessExpression&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::IndexAccessExpression&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::BinaryExpression&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::IdentifierExpression&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::CallExpression&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::UnaryExpression&) WARN_UNUSED_RETURN;
 
     // Literal Expressions
     void visit(AST::BoolLiteral&);
@@ -214,59 +214,59 @@ public:
     void visit(AST::AbstractFloatLiteral&);
 
     // Types
-    WARN_UNUSED_RETURN Result<void> visit(AST::ArrayTypeExpression&);
-    WARN_UNUSED_RETURN Result<void> visit(AST::ElaboratedTypeExpression&);
+    Result<void> visit(AST::ArrayTypeExpression&) WARN_UNUSED_RETURN;
+    Result<void> visit(AST::ElaboratedTypeExpression&) WARN_UNUSED_RETURN;
 
-    WARN_UNUSED_RETURN Result<void> visit(AST::Continuing&);
+    Result<void> visit(AST::Continuing&) WARN_UNUSED_RETURN;
 
 private:
-    WARN_UNUSED_RETURN Result<void> declareBuiltins();
+    Result<void> declareBuiltins() WARN_UNUSED_RETURN;
 
-    WARN_UNUSED_RETURN Result<const Type*> vectorFieldAccess(const Types::Vector&, AST::FieldAccessExpression&);
-    WARN_UNUSED_RETURN Result<void> visitAttributes(AST::Attribute::List&);
-    WARN_UNUSED_RETURN Result<void> visitStatements(AST::Statement::List&);
-    WARN_UNUSED_RETURN Result<void> bitcast(AST::CallExpression&, const Vector<const Type*>&);
+    Result<const Type*> vectorFieldAccess(const Types::Vector&, AST::FieldAccessExpression&) WARN_UNUSED_RETURN;
+    Result<void> visitAttributes(AST::Attribute::List&) WARN_UNUSED_RETURN;
+    Result<void> visitStatements(AST::Statement::List&) WARN_UNUSED_RETURN;
+    Result<void> bitcast(AST::CallExpression&, const Vector<const Type*>&) WARN_UNUSED_RETURN;
 
-    WARN_UNUSED_RETURN Result<const Type*> check(AST::Expression&, Constraint, Evaluation);
-    WARN_UNUSED_RETURN Result<const Type*> infer(AST::Expression&, Evaluation, DiscardResult = DiscardResult::No);
-    WARN_UNUSED_RETURN Result<const Type*> resolve(AST::Expression&);
-    WARN_UNUSED_RETURN Result<const Type*> lookupType(const AST::Identifier&);
-    WARN_UNUSED_RETURN Result<void> validateF16Usage(const SourceSpan&, const Type*);
-    WARN_UNUSED_RETURN Result<void> introduceType(const AST::Identifier&, const Type*);
-    WARN_UNUSED_RETURN Result<void> introduceValue(const AST::Identifier&, const Type*, Evaluation = Evaluation::Runtime, std::optional<ConstantValue> = std::nullopt);
-    WARN_UNUSED_RETURN Result<void> introduceFunction(const AST::Identifier&, const Type*);
-    WARN_UNUSED_RETURN Result<void> convertValue(const SourceSpan&, const Type*, std::optional<ConstantValue>&);
+    Result<const Type*> check(AST::Expression&, Constraint, Evaluation) WARN_UNUSED_RETURN;
+    Result<const Type*> infer(AST::Expression&, Evaluation, DiscardResult = DiscardResult::No) WARN_UNUSED_RETURN;
+    Result<const Type*> resolve(AST::Expression&) WARN_UNUSED_RETURN;
+    Result<const Type*> lookupType(const AST::Identifier&) WARN_UNUSED_RETURN;
+    Result<void> validateF16Usage(const SourceSpan&, const Type*) WARN_UNUSED_RETURN;
+    Result<void> introduceType(const AST::Identifier&, const Type*) WARN_UNUSED_RETURN;
+    Result<void> introduceValue(const AST::Identifier&, const Type*, Evaluation = Evaluation::Runtime, std::optional<ConstantValue> = std::nullopt) WARN_UNUSED_RETURN;
+    Result<void> introduceFunction(const AST::Identifier&, const Type*) WARN_UNUSED_RETURN;
+    Result<void> convertValue(const SourceSpan&, const Type*, std::optional<ConstantValue>&) WARN_UNUSED_RETURN;
 
     void inferred(const Type*);
-    WARN_UNUSED_RETURN bool unify(const Type*, const Type*);
-    WARN_UNUSED_RETURN bool convertValueImpl(const SourceSpan&, const Type*, ConstantValue&);
+    bool unify(const Type*, const Type*) WARN_UNUSED_RETURN;
+    bool convertValueImpl(const SourceSpan&, const Type*, ConstantValue&) WARN_UNUSED_RETURN;
 
-    WARN_UNUSED_RETURN Result<void> binaryExpression(const SourceSpan&, AST::Expression*, AST::BinaryOperation, AST::Expression&, AST::Expression&);
+    Result<void> binaryExpression(const SourceSpan&, AST::Expression*, AST::BinaryOperation, AST::Expression&, AST::Expression&) WARN_UNUSED_RETURN;
 
     template<typename TargetConstructor, typename Validator, typename... Arguments>
-    WARN_UNUSED_RETURN Result<void> allocateSimpleConstructor(ASCIILiteral, TargetConstructor, const Validator&, Arguments&&...);
-    WARN_UNUSED_RETURN Result<void> allocateTextureStorageConstructor(ASCIILiteral, Types::TextureStorage::Kind);
+    Result<void> allocateSimpleConstructor(ASCIILiteral, TargetConstructor, const Validator&, Arguments&&...) WARN_UNUSED_RETURN;
+    Result<void> allocateTextureStorageConstructor(ASCIILiteral, Types::TextureStorage::Kind) WARN_UNUSED_RETURN;
 
     bool isModuleScope() const;
 
-    WARN_UNUSED_RETURN Result<AccessMode> accessMode(AST::Expression&);
-    WARN_UNUSED_RETURN Result<TexelFormat> texelFormat(AST::Expression&);
-    WARN_UNUSED_RETURN Result<AddressSpace> addressSpace(AST::Expression&);
+    Result<AccessMode> accessMode(AST::Expression&) WARN_UNUSED_RETURN;
+    Result<TexelFormat> texelFormat(AST::Expression&) WARN_UNUSED_RETURN;
+    Result<AddressSpace> addressSpace(AST::Expression&) WARN_UNUSED_RETURN;
 
     template<typename CallArguments>
-    WARN_UNUSED_RETURN Result<const Type*> chooseOverload(ASCIILiteral, const SourceSpan&, AST::Expression*, const String&, CallArguments&& valueArguments, const Vector<const Type*>& typeArguments);
+    Result<const Type*> chooseOverload(ASCIILiteral, const SourceSpan&, AST::Expression*, const String&, CallArguments&& valueArguments, const Vector<const Type*>& typeArguments) WARN_UNUSED_RETURN;
 
     template<typename Node>
-    WARN_UNUSED_RETURN Result<void> setConstantValue(Node&, const Type*, const ConstantValue&);
+    Result<void> setConstantValue(Node&, const Type*, const ConstantValue&) WARN_UNUSED_RETURN;
 
-    WARN_UNUSED_RETURN Result<Behaviors> analyze(AST::Statement&);
-    WARN_UNUSED_RETURN Result<Behaviors> analyze(AST::CompoundStatement&);
-    WARN_UNUSED_RETURN Result<Behaviors> analyze(AST::ForStatement&);
-    WARN_UNUSED_RETURN Result<Behaviors> analyze(AST::IfStatement&);
-    WARN_UNUSED_RETURN Result<Behaviors> analyze(AST::LoopStatement&);
-    WARN_UNUSED_RETURN Result<Behaviors> analyze(AST::SwitchStatement&);
-    WARN_UNUSED_RETURN Result<Behaviors> analyze(AST::WhileStatement&);
-    WARN_UNUSED_RETURN Result<Behaviors> analyzeStatements(AST::Statement::List&);
+    Result<Behaviors> analyze(AST::Statement&) WARN_UNUSED_RETURN;
+    Result<Behaviors> analyze(AST::CompoundStatement&) WARN_UNUSED_RETURN;
+    Result<Behaviors> analyze(AST::ForStatement&) WARN_UNUSED_RETURN;
+    Result<Behaviors> analyze(AST::IfStatement&) WARN_UNUSED_RETURN;
+    Result<Behaviors> analyze(AST::LoopStatement&) WARN_UNUSED_RETURN;
+    Result<Behaviors> analyze(AST::SwitchStatement&) WARN_UNUSED_RETURN;
+    Result<Behaviors> analyze(AST::WhileStatement&) WARN_UNUSED_RETURN;
+    Result<Behaviors> analyzeStatements(AST::Statement::List&) WARN_UNUSED_RETURN;
 
     ShaderModule& m_shaderModule;
     const Type* m_inferredType { nullptr };
@@ -305,7 +305,7 @@ Result<void> TypeChecker::declareBuiltins()
 
     CHECK(introduceType(AST::Identifier::make("ptr"_s), m_types.typeConstructorType(
         "ptr"_s,
-        [this](AST::ElaboratedTypeExpression& type) -> Result<const Type*> {
+        [this](AST::ElaboratedTypeExpression& type) WARN_UNUSED_RETURN -> Result<const Type*> {
             auto argumentCount = type.arguments().size();
             if (argumentCount < 2) [[unlikely]]
                 TYPE_ERROR(type.span(), "'ptr' requires at least 2 template arguments"_s);
@@ -352,7 +352,7 @@ Result<void> TypeChecker::declareBuiltins()
 
     CHECK(introduceType(AST::Identifier::make("atomic"_s), m_types.typeConstructorType(
         "atomic"_s,
-        [this](AST::ElaboratedTypeExpression& type) -> Result<const Type*> {
+        [this](AST::ElaboratedTypeExpression& type) WARN_UNUSED_RETURN -> Result<const Type*> {
             if (type.arguments().size() != 1) [[unlikely]]
                 TYPE_ERROR(type.span(), "'atomic' requires 1 template argument"_s);
 
@@ -1116,7 +1116,7 @@ Result<void> TypeChecker::visit(AST::SwitchStatement& statement)
     if (!satisfies(valueType, Constraints::ConcreteInteger)) [[unlikely]]
         TYPE_ERROR(statement.value().span(), "switch selector must be of type i32 or u32"_s);
 
-    const auto& visitClause = [&](AST::SwitchClause& clause) -> Result<void> {
+    const auto& visitClause = [&](AST::SwitchClause& clause) WARN_UNUSED_RETURN -> Result<void> {
         for (auto& selector : clause.selectors) {
             UNWRAP(selectorType, infer(selector, Evaluation::Runtime));
             if (unify(valueType, selectorType)) {
@@ -1197,7 +1197,7 @@ Result<void> TypeChecker::visit(AST::Expression& expression)
 
 Result<void> TypeChecker::visit(AST::FieldAccessExpression& access)
 {
-    const auto& accessImpl = [&](const Type* baseType, bool* canBeReference = nullptr, bool* isVector = nullptr) -> Result<const Type*> {
+    const auto& accessImpl = [&](const Type* baseType, bool* canBeReference = nullptr, bool* isVector = nullptr) WARN_UNUSED_RETURN -> Result<const Type*> {
         if (std::holds_alternative<Types::Struct>(*baseType)) {
             auto& structType = std::get<Types::Struct>(*baseType);
             auto it = structType.fields.find(access.fieldName().id());
@@ -1238,7 +1238,7 @@ Result<void> TypeChecker::visit(AST::FieldAccessExpression& access)
         TYPE_ERROR(access.span(), "invalid member access expression. Expected vector or struct, got '"_s, *baseType, '\'');
     };
 
-    const auto& referenceImpl = [&](const auto& type) -> Result<void> {
+    const auto& referenceImpl = [&](const auto& type) WARN_UNUSED_RETURN -> Result<void> {
         bool canBeReference = true;
         bool isVector = false;
 
@@ -1266,7 +1266,7 @@ Result<void> TypeChecker::visit(AST::FieldAccessExpression& access)
 
 Result<void> TypeChecker::visit(AST::IndexAccessExpression& access)
 {
-    const auto& constantAccess = [&]<typename T>(std::optional<unsigned> typeSize) -> Result<void> {
+    const auto& constantAccess = [&]<typename T>(std::optional<unsigned> typeSize) WARN_UNUSED_RETURN -> Result<void> {
         auto constantBase = access.base().constantValue();
         auto constantIndex = access.index().constantValue();
 
@@ -1288,7 +1288,7 @@ Result<void> TypeChecker::visit(AST::IndexAccessExpression& access)
         return { };
     };
 
-    const auto& accessImpl = [&](const Type* base, bool* isVector = nullptr) -> Result<const Type*> {
+    const auto& accessImpl = [&](const Type* base, bool* isVector = nullptr) WARN_UNUSED_RETURN -> Result<const Type*> {
         const Type* result = nullptr;
         if (auto* array = std::get_if<Types::Array>(base)) {
             result = array->element;
@@ -1322,7 +1322,7 @@ Result<void> TypeChecker::visit(AST::IndexAccessExpression& access)
     if (!unify(m_types.i32Type(), index) && !unify(m_types.u32Type(), index) && !unify(m_types.abstractIntType(), index)) [[unlikely]]
         TYPE_ERROR(access.span(), "index must be of type 'i32' or 'u32', found: '"_s, *index, '\'');
 
-    const auto& referenceImpl = [&](const auto& type) -> Result<void> {
+    const auto& referenceImpl = [&](const auto& type) WARN_UNUSED_RETURN -> Result<void> {
         bool isVector = false;
         UNWRAP(result, accessImpl(type.element, &isVector));
         result = m_types.referenceType(type.addressSpace, result, type.accessMode, isVector);
@@ -1406,7 +1406,7 @@ Result<void> TypeChecker::visit(AST::CallExpression& call)
     bool isArrayType = is<AST::ArrayTypeExpression>(target);
 
     Vector<const Type*> typeArguments;
-    UNWRAP(targetName, [&]() -> Result<String> {
+    UNWRAP(targetName, [&]() WARN_UNUSED_RETURN -> Result<String> {
         if (isNamedType)
             return { downcast<AST::IdentifierExpression>(target).identifier() };
         if (isArrayType)
@@ -2662,7 +2662,7 @@ Result<void> TypeChecker::allocateSimpleConstructor(ASCIILiteral name, TargetCon
 {
     return introduceType(AST::Identifier::make(name), m_types.typeConstructorType(
         name,
-        [this, constructor, &validate, arguments...](AST::ElaboratedTypeExpression& type) -> Result<const Type*> {
+        [this, constructor, &validate, arguments...](AST::ElaboratedTypeExpression& type) WARN_UNUSED_RETURN -> Result<const Type*> {
             if (type.arguments().size() != 1) [[unlikely]]
                 TYPE_ERROR(type.span(), '\'', type.base(), "' requires 1 template argument"_s);
 
@@ -2680,7 +2680,7 @@ Result<void> TypeChecker::allocateTextureStorageConstructor(ASCIILiteral name, T
 {
     return introduceType(AST::Identifier::make(name), m_types.typeConstructorType(
         name,
-        [this, kind](AST::ElaboratedTypeExpression& type) -> Result<const Type*> {
+        [this, kind](AST::ElaboratedTypeExpression& type) WARN_UNUSED_RETURN -> Result<const Type*> {
             if (type.arguments().size() != 2) [[unlikely]]
                 TYPE_ERROR(type.span(), '\'', type.base(), "' requires 2 template argument"_s);
 

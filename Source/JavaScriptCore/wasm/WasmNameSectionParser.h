@@ -41,7 +41,7 @@ public:
     {
     }
 
-    WARN_UNUSED_RETURN Result parse();
+    Result WARN_UNUSED_RETURN parse();
     
 private:
     const ModuleInformation& m_info;

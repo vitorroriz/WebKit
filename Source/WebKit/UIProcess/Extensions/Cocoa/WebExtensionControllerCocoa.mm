@@ -362,7 +362,7 @@ void WebExtensionController::unloadAll()
 {
     auto contextsCopy = m_extensionContexts;
     for (Ref context : contextsCopy)
-        std::ignore = unload(context);
+        unload(context);
 }
 
 void WebExtensionController::dispatchDidLoad(WebExtensionContext& context)

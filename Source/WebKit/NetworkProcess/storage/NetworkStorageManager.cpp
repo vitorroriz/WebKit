@@ -1720,7 +1720,7 @@ void NetworkStorageManager::clear(IPC::Connection& connection, StorageAreaIdenti
 
     MESSAGE_CHECK_COMPLETION(isStorageAreaTypeEnabled(connection, storageArea->storageType()), connection, completionHandler());
 
-    std::ignore = storageArea->clear(connection.uniqueID(), implIdentifier, WTFMove(urlString));
+    storageArea->clear(connection.uniqueID(), implIdentifier, WTFMove(urlString));
     completionHandler();
 
     writeOriginToFileIfNecessary(storageArea->origin(), storageArea.get());

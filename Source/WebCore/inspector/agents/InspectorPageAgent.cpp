@@ -122,7 +122,7 @@ void InspectorPageAgent::didCreateFrontendAndBackend()
 
 void InspectorPageAgent::willDestroyFrontendAndBackend(Inspector::DisconnectReason)
 {
-    std::ignore = disable();
+    disable();
 }
 
 Inspector::Protocol::ErrorStringOr<void> InspectorPageAgent::enable()
@@ -146,12 +146,12 @@ Inspector::Protocol::ErrorStringOr<void> InspectorPageAgent::disable()
 {
     Ref { m_instrumentingAgents.get() }->setEnabledPageAgent(nullptr);
 
-    std::ignore = setShowPaintRects(false);
+    setShowPaintRects(false);
 #if !PLATFORM(IOS_FAMILY)
-    std::ignore = setShowRulers(false);
+    setShowRulers(false);
 #endif
-    std::ignore = overrideUserAgent(nullString());
-    std::ignore = setEmulatedMedia(emptyString());
+    overrideUserAgent(nullString());
+    setEmulatedMedia(emptyString());
     overridePrefersColorScheme(std::nullopt);
 
     auto& inspectedPageSettings = m_inspectedPage->settings();

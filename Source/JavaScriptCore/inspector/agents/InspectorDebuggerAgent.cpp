@@ -1174,7 +1174,7 @@ void InspectorDebuggerAgent::didBecomeIdle()
     m_conditionToDispatchResumed = ShouldDispatchResumed::No;
 
     if (m_enablePauseWhenIdle)
-        std::ignore = pause();
+        pause();
 }
 
 Protocol::ErrorStringOr<void> InspectorDebuggerAgent::setPauseOnDebuggerStatements(bool enabled, RefPtr<JSON::Object>&& options)
@@ -1856,7 +1856,7 @@ void InspectorDebuggerAgent::breakProgram(DebuggerFrontendDispatcher::Reason rea
 void InspectorDebuggerAgent::clearInspectorBreakpointState()
 {
     for (auto& protocolBreakpointID : copyToVector(m_debuggerBreakpointsForProtocolBreakpointID.keys()))
-        std::ignore = removeBreakpoint(protocolBreakpointID);
+        removeBreakpoint(protocolBreakpointID);
 
     m_protocolBreakpointForProtocolBreakpointID.clear();
 

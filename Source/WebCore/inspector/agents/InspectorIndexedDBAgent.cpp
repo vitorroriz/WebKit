@@ -526,7 +526,7 @@ void InspectorIndexedDBAgent::didCreateFrontendAndBackend()
 
 void InspectorIndexedDBAgent::willDestroyFrontendAndBackend(Inspector::DisconnectReason)
 {
-    std::ignore = disable();
+    disable();
 }
 
 Inspector::Protocol::ErrorStringOr<void> InspectorIndexedDBAgent::enable()

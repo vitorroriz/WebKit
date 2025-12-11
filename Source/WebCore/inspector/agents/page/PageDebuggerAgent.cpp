@@ -177,7 +177,7 @@ void PageDebuggerAgent::mainFrameStartedLoading()
     if (isPaused()) {
         setSuppressAllPauses(true);
 
-        std::ignore = resume();
+        resume();
     }
 }
 

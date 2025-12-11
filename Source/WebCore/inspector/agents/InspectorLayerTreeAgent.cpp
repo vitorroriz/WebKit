@@ -67,7 +67,7 @@ void InspectorLayerTreeAgent::didCreateFrontendAndBackend()
 
 void InspectorLayerTreeAgent::willDestroyFrontendAndBackend(Inspector::DisconnectReason)
 {
-    std::ignore = disable();
+    disable();
 }
 
 void InspectorLayerTreeAgent::reset()

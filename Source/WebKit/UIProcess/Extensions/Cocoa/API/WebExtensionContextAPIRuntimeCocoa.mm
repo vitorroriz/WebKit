@@ -123,7 +123,7 @@ void WebExtensionContext::runtimeOpenOptionsPage(CompletionHandler<void(Expected
 
 void WebExtensionContext::runtimeReload()
 {
-    std::ignore = reload();
+    reload();
 }
 
 void WebExtensionContext::runtimeSendMessage(const String& extensionID, const String& messageJSON, const WebExtensionMessageSenderParameters& senderParameters, CompletionHandler<void(Expected<String, WebExtensionError>&&)>&& completionHandler)

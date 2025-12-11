@@ -279,7 +279,7 @@ void PageTimelineAgent::mainFrameStartedLoading()
 
     // Pre-emptively disable breakpoints. The frontend must re-enable them.
     if (auto* webDebuggerAgent = Ref { m_instrumentingAgents.get() }->enabledWebDebuggerAgent())
-        std::ignore = webDebuggerAgent->setBreakpointsActive(false);
+        webDebuggerAgent->setBreakpointsActive(false);
 
     // Inform the frontend we started an auto capture. The frontend must stop capture.
     autoCaptureStarted();

@@ -65,7 +65,7 @@ void InspectorBrowserAgent::didCreateFrontendAndBackend()
 
 void InspectorBrowserAgent::willDestroyFrontendAndBackend(Inspector::DisconnectReason)
 {
-    std::ignore = disable();
+    disable();
 }
 
 Inspector::Protocol::ErrorStringOr<void> InspectorBrowserAgent::enable()

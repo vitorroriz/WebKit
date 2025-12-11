@@ -86,7 +86,7 @@ public:
     WEBCORE_EXPORT IDBKeyData isolatedCopy() const;
 
     WEBCORE_EXPORT void encode(KeyedEncoder&) const;
-    WARN_UNUSED_RETURN WEBCORE_EXPORT static bool decode(KeyedDecoder&, IDBKeyData&);
+    WEBCORE_EXPORT static WARN_UNUSED_RETURN bool decode(KeyedDecoder&, IDBKeyData&);
 
     void setArrayValue(const Vector<IDBKeyData>&);
     void setBinaryValue(const ThreadSafeDataBuffer&);

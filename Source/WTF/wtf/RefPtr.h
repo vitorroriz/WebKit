@@ -70,7 +70,7 @@ public:
 
     Ref<T> releaseNonNull() { ASSERT(m_ptr); Ref<T> tmp(adoptRef(*m_ptr)); m_ptr = nullptr; return tmp; }
 
-    WARN_UNUSED_RETURN T* leakRef();
+    T* leakRef() WARN_UNUSED_RETURN;
 
     T& operator*() const LIFETIME_BOUND { ASSERT(m_ptr); return *PtrTraits::unwrap(m_ptr); }
     ALWAYS_INLINE T* operator->() const LIFETIME_BOUND { return PtrTraits::unwrap(m_ptr); }
@@ -94,7 +94,7 @@ public:
     template<typename X, typename Y, typename Z> void swap(RefPtr<X, Y, Z>&);
 
     RefPtr copyRef() && = delete;
-    WARN_UNUSED_RETURN RefPtr copyRef() const & { return RefPtr(m_ptr); }
+    RefPtr copyRef() const & WARN_UNUSED_RETURN { return RefPtr(m_ptr); }
 
 private:
     void unspecifiedBoolTypeInstance() const { }

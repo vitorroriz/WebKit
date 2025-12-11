@@ -56,7 +56,7 @@ void InspectorCPUProfilerAgent::didCreateFrontendAndBackend()
 
 void InspectorCPUProfilerAgent::willDestroyFrontendAndBackend(DisconnectReason)
 {
-    std::ignore = stopTracking();
+    stopTracking();
 
     Ref { m_instrumentingAgents.get() }->setPersistentCPUProfilerAgent(nullptr);
 }

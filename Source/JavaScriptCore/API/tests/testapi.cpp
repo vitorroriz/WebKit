@@ -587,7 +587,7 @@ void TestAPI::promiseUnhandledRejectionFromUnhandledRejectionCallback()
     JSGlobalContextSetUnhandledRejectionCallback(context, callbackFunction, &exception);
     check(!exception, "setting unhandled rejection callback should not throw");
 
-    std::ignore = callFunction("(function () { Promise.reject(); })");
+    callFunction("(function () { Promise.reject(); })");
     check(!exception && callbackCallCount == 2, "unhandled rejection from unhandled rejection callback should also trigger the callback");
 }
 
@@ -605,10 +605,10 @@ void TestAPI::promiseEarlyHandledRejections()
     JSGlobalContextSetUnhandledRejectionCallback(context, callbackFunction, &exception);
     check(!exception, "setting unhandled rejection callback should not throw");
 
-    std::ignore = callFunction("(function () { const p = Promise.reject(); p.catch(() => {}); })");
+    callFunction("(function () { const p = Promise.reject(); p.catch(() => {}); })");
     check(!callbackCalled, "unhandled rejection callback should not be called for synchronous early-handled rejection");
 
-    std::ignore = callFunction("(function () { const p = Promise.reject(); Promise.resolve().then(() => { p.catch(() => {}); }); })");
+    callFunction("(function () { const p = Promise.reject(); Promise.resolve().then(() => { p.catch(() => {}); }); })");
     check(!callbackCalled, "unhandled rejection callback should not be called for asynchronous early-handled rejection");
 }
 

@@ -73,7 +73,7 @@ protected:
     RefPtr<DeprecatedCSSOMValue> wrapForDeprecatedCSSOM(CSSValue*);
 
     enum class MutationType : uint8_t { NoChanges, StyleAttributeChanged, PropertyChanged };
-    WARN_UNUSED_RETURN bool willMutate();
+    bool willMutate() WARN_UNUSED_RETURN;
     void didMutate(MutationType);
 
     // CSSPropertyID versions of the CSSOM functions to support bindings.
