@@ -43,7 +43,7 @@ namespace WebCore {
 
 static bool populateFontFaceWithArrayBuffer(CSSFontFace& fontFace, Ref<JSC::ArrayBufferView>&& arrayBufferView)
 {
-    auto source = makeUnique<CSSFontFaceSource>(fontFace, WTFMove(arrayBufferView));
+    auto source = makeUniqueWithoutRefCountedCheck<CSSFontFaceSource>(fontFace, WTFMove(arrayBufferView));
     fontFace.adoptSource(WTFMove(source));
     return false;
 }

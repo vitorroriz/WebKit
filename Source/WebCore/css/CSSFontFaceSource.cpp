@@ -113,6 +113,16 @@ CSSFontFaceSource::~CSSFontFaceSource()
         m_fontRequest->setClient(nullptr);
 }
 
+void CSSFontFaceSource::ref() const
+{
+    m_owningCSSFontFace->ref();
+}
+
+void CSSFontFaceSource::deref() const
+{
+    m_owningCSSFontFace->deref();
+}
+
 bool CSSFontFaceSource::shouldIgnoreFontLoadCompletions() const
 {
     return protectedCSSFontFace()->shouldIgnoreFontLoadCompletions();

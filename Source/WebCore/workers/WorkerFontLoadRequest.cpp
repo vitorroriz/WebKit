@@ -147,7 +147,7 @@ void WorkerFontLoadRequest::didFinishLoading(ScriptExecutionContextIdentifier, s
     m_isLoading = false;
 
     if (!m_errorOccurred) {
-        if (CheckedPtr client = m_fontLoadRequestClient.get())
+        if (RefPtr client = m_fontLoadRequestClient.get())
             client->fontLoaded(*this);
         else
             m_notifyOnClientSet = true;
@@ -157,7 +157,7 @@ void WorkerFontLoadRequest::didFinishLoading(ScriptExecutionContextIdentifier, s
 void WorkerFontLoadRequest::didFail(std::optional<ScriptExecutionContextIdentifier>, const ResourceError&)
 {
     m_errorOccurred = true;
-    if (CheckedPtr client = m_fontLoadRequestClient.get())
+    if (RefPtr client = m_fontLoadRequestClient.get())
         client->fontLoaded(*this);
 }
 

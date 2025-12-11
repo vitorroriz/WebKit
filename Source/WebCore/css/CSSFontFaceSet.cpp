@@ -131,7 +131,7 @@ void CSSFontFaceSet::ensureLocalFontFacesForFamilyRegistered(const AtomString& f
         auto& pool = owningFontSelector->protectedScriptExecutionContext()->cssValuePool();
         face->setFamily(pool.createFontFamilyValue(familyName));
         face->setFontSelectionCapabilities(item);
-        face->adoptSource(makeUnique<CSSFontFaceSource>(face.get(), familyName));
+        face->adoptSource(makeUniqueWithoutRefCountedCheck<CSSFontFaceSource>(face.get(), familyName));
         ASSERT(!face->computeFailureState());
         faces.append(WTFMove(face));
     }
