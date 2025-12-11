@@ -187,7 +187,7 @@ void BoxTreeUpdater::adjustStyleIfNeeded(const RenderElement& renderer, RenderSt
                 styleToAdjust.setOverflowX(anonBlockParentStyle.overflowX());
                 styleToAdjust.setOverflowY(anonBlockParentStyle.overflowY());
             }
-            if (renderer.isRenderTextControl()) {
+            if (renderer.isRenderTextControl() || renderer.isRenderMathMLMath()) {
                 // Something like <input style="appearance:none; display:table-header-group"> confuses IFC.
                 if (styleToAdjust.isInternalTableBox() || styleToAdjust.display() == DisplayType::TableCaption)
                     styleToAdjust.setDisplay(DisplayType::Block);
