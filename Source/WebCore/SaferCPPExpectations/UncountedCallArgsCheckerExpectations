@@ -31,7 +31,6 @@ Modules/model-element/HTMLModelElement.cpp
 Modules/pictureinpicture/HTMLVideoElementPictureInPicture.cpp
 Modules/push-api/PushManager.cpp
 Modules/push-api/PushSubscription.cpp
-Modules/push-api/ServiceWorkerRegistrationPushAPI.cpp
 Modules/remoteplayback/RemotePlayback.cpp
 Modules/speech/SpeechSynthesis.cpp
 Modules/storage/StorageManager.cpp

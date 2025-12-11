@@ -3,7 +3,6 @@ Modules/mediastream/RTCPeerConnection.h
 Modules/mediastream/libwebrtc/LibWebRTCObservers.h
 Modules/notifications/NotificationResourcesLoader.h
 Modules/push-api/PushManager.h
-Modules/push-api/ServiceWorkerRegistrationPushAPI.h
 Modules/storage/StorageManager.cpp
 Modules/webdatabase/DatabaseTask.h
 Modules/webdatabase/SQLTransactionBackend.h
@@ -70,6 +69,5 @@ style/StyleScope.h
 style/StyleScopeRuleSets.h
 style/Styleable.h
 svg/properties/SVGPropertyOwnerRegistry.h
-workers/WorkerMessagingProxy.h
 xml/XPathGrammar.cpp
 xml/XPathGrammar.h
