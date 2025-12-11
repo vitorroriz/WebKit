@@ -408,6 +408,9 @@ bool GStreamerMediaEndpoint::setConfiguration(MediaEndpointConfiguration& config
     if (!peerConnectionBackend)
         return false;
 
+    if (!m_webrtcBin)
+        return false;
+
     auto& document = downcast<Document>(*peerConnectionBackend->connection().scriptExecutionContext());
     GST_DEBUG_OBJECT(m_pipeline.get(), "Configuring webrtcbin for PeerConnection created by %s", document.url().string().utf8().data());
     GstWebRTCBundlePolicy bundlePolicy;
