@@ -61,7 +61,7 @@ private:
 
     WeakPtr<WebXRSession> m_session;
     PlatformXR::FrameData::InputSourcePose m_pose;
-    PlatformXR::InputSourceHandle m_handle;
+    [[maybe_unused]] PlatformXR::InputSourceHandle m_handle;
 };
 
 } // namespace WebCore
