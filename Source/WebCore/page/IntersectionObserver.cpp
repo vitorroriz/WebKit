@@ -442,7 +442,7 @@ auto IntersectionObserver::computeIntersectionState(const IntersectionObserverRe
             if (root() == &target.document())
                 intersectionState.rootBounds = layoutViewportRectForIntersection();
             else if (rootRenderer->hasNonVisibleOverflow())
-                intersectionState.rootBounds = rootRenderer->contentBoxRect();
+                intersectionState.rootBounds = rootRenderer->paddingBoxRect();
             else
                 intersectionState.rootBounds = { FloatPoint(), rootRenderer->size() };
 
