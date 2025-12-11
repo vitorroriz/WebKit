@@ -293,9 +293,10 @@ void PlaceholderModelPlayer::ensureImmersivePresentation(CompletionHandler<void(
     ASSERT_NOT_REACHED("PlaceholderModelPlayer cannot provide a layer context identifier");
     completion(std::nullopt);
 }
+
 void PlaceholderModelPlayer::exitImmersivePresentation(CompletionHandler<void()>&& completion)
 {
-    ASSERT_NOT_REACHED("PlaceholderModelPlayer cannot exit an immersive presentation");
+    m_transformState->invalidateTransform();
     completion();
 }
 

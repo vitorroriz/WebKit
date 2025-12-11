@@ -543,11 +543,21 @@ void HTMLModelElement::createModelPlayer()
 
 void HTMLModelElement::deleteModelPlayer()
 {
-    RefPtr protectedModelPlayerProvider = m_modelPlayerProvider.get();
-    if (protectedModelPlayerProvider && m_modelPlayer)
-        protectedModelPlayerProvider->deleteModelPlayer(*m_modelPlayer);
+    auto deleteModelPlayerBlock = [weakThis = WeakPtr { *this }, modelPlayerProvider = RefPtr { m_modelPlayerProvider.get() }, modelPlayer = RefPtr { m_modelPlayer }] () {
+        if (modelPlayerProvider && modelPlayer)
+            modelPlayerProvider->deleteModelPlayer(*modelPlayer);
 
-    m_modelPlayer = nullptr;
+        RefPtr protectedThis = weakThis.get();
+        if (protectedThis)
+            protectedThis->m_modelPlayer = nullptr;
+    };
+
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    if (immersive())
+        return document().protectedImmersive()->exitRemovedImmersiveElement(this, WTFMove(deleteModelPlayerBlock));
+#endif
+
+    deleteModelPlayerBlock();
 }
 
 void HTMLModelElement::unloadModelPlayer(bool onSuspend)
@@ -1611,11 +1621,6 @@ void HTMLModelElement::removedFromAncestor(RemovalType removalType, ContainerNod
         m_loadModelTimer = nullptr;
 
         deleteModelPlayer();
-
-#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
-        if (immersive())
-            document().protectedImmersive()->exitRemovedImmersiveElement(this);
-#endif
     }
 }
 

@@ -60,7 +60,7 @@ public:
 
     void requestImmersive(HTMLModelElement*, CompletionHandler<void(ExceptionOr<void>)>&&);
     void exitImmersive(CompletionHandler<void(ExceptionOr<void>)>&&);
-    void exitRemovedImmersiveElement(HTMLModelElement*);
+    void exitRemovedImmersiveElement(HTMLModelElement*, CompletionHandler<void()>&&);
 
     enum class EventType : bool { Change, Error };
     void dispatchPendingEvents();

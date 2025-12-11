@@ -142,7 +142,7 @@ void DocumentImmersive::requestImmersive(HTMLModelElement* element, CompletionHa
                     return;
                 }
 
-                if (RefPtr oldImmersiveElement = protectedThis->m_immersiveElement.get()) {
+                if (RefPtr oldImmersiveElement = protectedThis->immersiveElement()) {
                     oldImmersiveElement->exitImmersivePresentation([] { });
                     protectedThis->updateElementIsImmersive(oldImmersiveElement.get(), false);
                 }
@@ -157,7 +157,7 @@ void DocumentImmersive::requestImmersive(HTMLModelElement* element, CompletionHa
 
 void DocumentImmersive::exitImmersive(CompletionHandler<void(ExceptionOr<void>)>&& completionHandler)
 {
-    RefPtr exitingImmersiveElement = m_immersiveElement.get();
+    RefPtr exitingImmersiveElement = immersiveElement();
     if (!exitingImmersiveElement) {
         completionHandler(Exception { ExceptionCode::TypeError, "Not in immersive"_s });
         return;
@@ -190,10 +190,19 @@ void DocumentImmersive::exitImmersive(CompletionHandler<void(ExceptionOr<void>)>
     });
 }
 
-void DocumentImmersive::exitRemovedImmersiveElement(HTMLModelElement* element)
+void DocumentImmersive::exitRemovedImmersiveElement(HTMLModelElement* element, CompletionHandler<void()>&& completionHandler)
 {
-    queueImmersiveEventForElement(DocumentImmersive::EventType::Error, *element);
-    document().scheduleRenderingUpdate(RenderingUpdateStep::Immersive);
+    ASSERT(element->immersive());
+
+    if (immersiveElement() == element) {
+        exitImmersive([completionHandler = WTFMove(completionHandler)] (auto) mutable {
+            completionHandler();
+        });
+    } else {
+        element->exitImmersivePresentation([] { });
+        updateElementIsImmersive(element, false);
+        completionHandler();
+    }
 }
 
 void DocumentImmersive::updateElementIsImmersive(HTMLModelElement* element, bool isImmersive)
