@@ -2407,6 +2407,16 @@ bool Quirks::shouldExposeCredentialsContainerQuirk() const
     return needsQuirks() && m_quirksData.isGoogleAccounts;
 }
 
+#if ENABLE(PICTURE_IN_PICTURE_API)
+bool Quirks::shouldReportVisibleDueToActivePictureInPictureContent() const
+{
+    if (!needsQuirks()) [[unlikely]]
+        return false;
+
+    return m_quirksData.quirkIsEnabled(QuirksData::SiteSpecificQuirk::ShouldReportDocumentAsVisibleIfActivePIPQuirk);
+}
+#endif
+
 URL Quirks::topDocumentURL() const
 {
     if (!m_topDocumentURLForTesting.isEmpty()) [[unlikely]]
@@ -3321,6 +3331,17 @@ static void handleWikipediaQuirks(QuirksData& quirksData, const URL& /* quirksUR
     });
 }
 
+#if ENABLE(PICTURE_IN_PICTURE_API)
+static void handleTwitchQuirks(QuirksData& quirksData, const URL& /* quirksURL */, const String& quirksDomainString, const URL&  /* documentURL */)
+{
+    if (quirksDomainString != "twitch.tv"_s) [[unlikely]]
+        return;
+
+    // twitch.tv rdar://102420527
+    quirksData.enableQuirk(QuirksData::SiteSpecificQuirk::ShouldReportDocumentAsVisibleIfActivePIPQuirk);
+}
+#endif
+
 static void handleTwitterXQuirks(QuirksData& quirksData, const URL& /* quirksURL */, const String& quirksDomainString, const URL&  /* documentURL */)
 {
     if (quirksDomainString != "x.com"_s) [[unlikely]]
@@ -3578,6 +3599,9 @@ void Quirks::determineRelevantQuirks()
         { "tiktok"_s, &handleTikTokQuirks },
 #if PLATFORM(MAC)
         { "trix-editor"_s, &handleTrixEditorQuirks },
+#endif
+#if ENABLE(PICTURE_IN_PICTURE_API)
+        { "twitch"_s, &handleTwitchQuirks },
 #endif
         { "tympanus"_s, &handleTympanusQuirks },
         { "victoriassecret"_s, &handleVictoriasSecretQuirks },

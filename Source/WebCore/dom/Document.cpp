@@ -2711,6 +2711,10 @@ VisibilityState Document::visibilityState() const
     // https://w3c.github.io/page-visibility/#visibilitystate-attribute
     if (!m_frame || !m_frame->page() || m_visibilityHiddenDueToDismissal)
         return VisibilityState::Hidden;
+#if ENABLE(PICTURE_IN_PICTURE_API)
+    if (quirks().shouldReportVisibleDueToActivePictureInPictureContent() && pictureInPictureElement())
+        return VisibilityState::Visible;
+#endif
     return m_frame->page()->visibilityState();
 }
 

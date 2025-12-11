@@ -209,6 +209,9 @@ struct QuirksData {
         ShouldPreventDispatchOfTouchEventQuirk,
 #endif
         ShouldPreventOrientationMediaQueryFromEvaluatingToLandscapeQuirk,
+#if ENABLE(PICTURE_IN_PICTURE_API)
+        ShouldReportDocumentAsVisibleIfActivePIPQuirk,
+#endif
         ShouldUseLegacySelectPopoverDismissalBehaviorInDataActivationQuirk,
 #if PLATFORM(IOS_FAMILY)
         ShouldSilenceWindowResizeEventsDuringApplicationSnapshotting,

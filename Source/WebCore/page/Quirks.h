@@ -306,6 +306,10 @@ public:
 
     bool shouldExposeCredentialsContainerQuirk() const;
 
+#if ENABLE(PICTURE_IN_PICTURE_API)
+    bool shouldReportVisibleDueToActivePictureInPictureContent() const;
+#endif
+
     void determineRelevantQuirks();
 
 private:
