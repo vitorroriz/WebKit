@@ -878,9 +878,23 @@ private:
         return tmp;
     }
 
+    template<Bank bank>
+    Tmp groupForTmp(Tmp tmp)
+    {
+        while (Tmp parent = m_map.get<bank>(tmp).parentGroup)
+            tmp = parent;
+        return tmp;
+    }
+
     Reg assignedReg(Tmp tmp)
     {
         return m_map[groupForTmp(tmp)].assigned;
+    }
+
+    template<Bank bank>
+    Reg assignedReg(Tmp tmp)
+    {
+        return m_map.get<bank>(groupForTmp<bank>(tmp)).assigned;
     }
 
     StackSlot* spillSlot(Tmp tmp)
@@ -926,13 +940,13 @@ private:
 
         auto checkConflicts = [&](BasicBlock* block, const typename TmpLiveness<bank>::LocalCalc& localCalc) {
             for (Tmp a : localCalc.live()) {
-                Tmp aGrp = groupForTmp(a);
-                Reg aReg = assignedReg(a);
+                Tmp aGrp = groupForTmp<bank>(a);
+                Reg aReg = assignedReg<bank>(a);
                 if (!aReg)
                     continue;
                 for (Tmp b : localCalc.live()) {
-                    Tmp bGrp = groupForTmp(b);
-                    Reg bReg = assignedReg(b);
+                    Tmp bGrp = groupForTmp<bank>(b);
+                    Reg bReg = assignedReg<bank>(b);
                     if (aGrp == bGrp) {
                         // Coalesced a & b so they better have the same register.
                         if (aReg != bReg)
@@ -1238,13 +1252,13 @@ private:
 
         m_code.forEachTmp<bank>([&](Tmp tmp) {
             ASSERT(!tmp.isReg());
-            TmpData& data = m_map[tmp];
+            TmpData& data = m_map.get<bank>(tmp);
             std::ranges::sort(data.coalescables, [this](const auto& a, const auto& b) {
                     if (a.moveCost != b.moveCost)
                         return a.moveCost > b.moveCost;
                     // Favor coalescing shorter live ranges.
-                    auto aSize = m_map[a.tmp].liveRange.size();
-                    auto bSize = m_map[b.tmp].liveRange.size();
+                    auto aSize = m_map.get<bank>(a.tmp).liveRange.size();
+                    auto bSize = m_map.get<bank>(b.tmp).liveRange.size();
                     if (aSize != bSize)
                         return aSize < bSize;
                     return a.tmp.tmpIndex(bank) < b.tmp.tmpIndex(bank);
@@ -1268,12 +1282,12 @@ private:
             bool conflicts = false;
             forEachTmpInGroup(group0, worklist0, [&](Tmp tmp0) {
                 ASSERT(!conflicts);
-                TmpData& data0 = m_map[tmp0];
+                TmpData& data0 = m_map.get<bank>(tmp0);
                 ASSERT(!data0.subGroup0 && !data0.subGroup1);
                 forEachTmpInGroup(group1, worklist1, [&](Tmp tmp1) {
                     ASSERT(!conflicts);
                     ASSERT(tmp0 != tmp1);
-                    TmpData& data1 = m_map[tmp1];
+                    TmpData& data1 = m_map.get<bank>(tmp1);
                     if (!data0.coalescables.containsIf([tmp1](auto& with) { return with.tmp == tmp1; })
                         && data0.liveRange.overlaps(data1.liveRange)) {
                         conflicts = true;
@@ -1287,7 +1301,7 @@ private:
         };
 
         auto addSubGroup = [this](Tmp group, TmpData& groupData, Tmp& subGroupField, Tmp subGroup) {
-            TmpData& subGroupData = m_map[subGroup];
+            TmpData& subGroupData = m_map.get<bank>(subGroup);
             subGroupField = subGroup;
             subGroupData.parentGroup = group;
             subGroupData.stage = Stage::Coalesced;
@@ -1305,8 +1319,8 @@ private:
 
         for (Move& move : moves) {
             dataLogLnIf(verbose(), "Processing move: ", move);
-            Tmp group0 = groupForTmp(move.tmp0);
-            Tmp group1 = groupForTmp(move.tmp1);
+            Tmp group0 = groupForTmp<bank>(move.tmp0);
+            Tmp group1 = groupForTmp<bank>(move.tmp1);
             if (group0 == group1) {
                 dataLogLnIf(verbose(), "Already grouped transitively into ", group0);
                 continue;
@@ -1320,12 +1334,12 @@ private:
                 addSubGroup(newGrp, newGrpData, newGrpData.subGroup1, group1);
                 newGrpData.validate();
                 m_map.append(newGrp, newGrpData);
-                dataLogLnIf(verbose(), "Created group ", newGrp, ": ", m_map[newGrp]);
+                dataLogLnIf(verbose(), "Created group ", newGrp, ": ", m_map.get<bank>(newGrp));
             }
         }
         if (verbose()) {
             m_code.forEachTmp<bank>([&](Tmp tmp) {
-                TmpData& data = m_map[tmp];
+                TmpData& data = m_map.get<bank>(tmp);
                 if (!data.parentGroup && data.isGroup()) {
                     dataLog("Group: ", tmp, " = { ");
                     CommaPrinter comma;
@@ -1364,12 +1378,12 @@ private:
         }
 
         for (Reg reg : m_allowedRegistersInPriorityOrder[bank])
-            m_map[Tmp(reg)].spillability = TmpData::Spillability::Unspillable;
+            m_map.get<bank>(Tmp(reg)).spillability = TmpData::Spillability::Unspillable;
 
         m_code.forEachTmp<bank>([&](Tmp tmp) {
             ASSERT(tmp.bank() == bank);
             ASSERT(!tmp.isReg());
-            TmpData& tmpData = m_map[tmp];
+            TmpData& tmpData = m_map.get<bank>(tmp);
             ASSERT(tmpData.useDefCost == 0.0f);
             auto index = AbsoluteTmpMapper<bank>::absoluteIndex(tmp);
             float useDefCost = m_useCounts.numWarmUsesAndDefs<bank>(index);
@@ -1387,7 +1401,7 @@ private:
         m_code.forEachFastTmp([&](Tmp tmp) {
             if (tmp.bank() != bank)
                 return;
-            m_map[tmp].spillability = TmpData::Spillability::FastTmp;
+            m_map.get<bank>(tmp).spillability = TmpData::Spillability::FastTmp;
             m_stats[bank].numFastTmps++;
             dataLogLnIf(verbose(), "FastTmp: ", tmp);
         });
@@ -1449,11 +1463,11 @@ private:
         CompilerTimingScope timingScope("Air"_s, "GreedyRegAlloc::allocateRegisters"_s);
 
         for (Reg reg : m_allowedRegistersInPriorityOrder[bank])
-            assign(Tmp(reg), m_map[Tmp(reg)], reg);
+            assign(Tmp(reg), m_map.get<bank>(Tmp(reg)), reg);
 
         m_code.forEachTmp<bank>([&](Tmp tmp) {
             ASSERT(!tmp.isReg());
-            TmpData& tmpData = m_map[tmp];
+            TmpData& tmpData = m_map.get<bank>(tmp);
             if (tmpData.parentGroup)
                 return;
             if (tmpData.liveRange.intervals().isEmpty())
@@ -1467,7 +1481,7 @@ private:
                 auto entry = m_queue.dequeue();
                 Tmp tmp = entry.tmp();
                 ASSERT(tmp && tmp.bank() == bank);
-                TmpData& tmpData = m_map[tmp];
+                TmpData& tmpData = m_map.get<bank>(tmp);
                 if (verbose()) {
                     StringPrintStream out;
                     out.println("Pop: ", entry, " tmp: ", tmpData);
@@ -1481,7 +1495,7 @@ private:
                 if (tmpData.stage != Stage::TrySplit && tryEvict<bank>(tmp, tmpData))
                     continue;
 
-                ASSERT(&tmpData == &m_map[tmp]); // Verify m_map hasn't been resized on this path
+                ASSERT(&tmpData == &m_map.get<bank>(tmp)); // Verify m_map hasn't been resized on this path
                 switch (tmpData.stage) {
                 case Stage::TryAllocate: {
                     // If we couldn't allocate tmp, allow it to split next time.
@@ -1525,7 +1539,7 @@ private:
     template <Bank bank>
     bool tryAllocate(Tmp tmp, TmpData& tmpData)
     {
-        ASSERT(&m_map[tmp] == &tmpData);
+        ASSERT(&m_map.get<bank>(tmp) == &tmpData);
         ASSERT(!assignedReg(tmp));
         ASSERT(!tmpData.parentGroup);
 
@@ -1547,8 +1561,8 @@ private:
             // FIXME: this will check coalescables within the group, which is wasteful and common.
             // But without doing this, we won't try to coalescables between partially split groups.
             IterationStatus status = forEachTmpInGroup(tmp, worklist, [&](Tmp member) {
-                for (auto& with : m_map[member].coalescables) {
-                    Reg r = assignedReg(with.tmp);
+                for (auto& with : m_map.get<bank>(member).coalescables) {
+                    Reg r = assignedReg<bank>(with.tmp);
                     if (r) {
                         if (tryAllocateToReg(r))
                             return IterationStatus::Done;
@@ -1563,7 +1577,7 @@ private:
             }
         } else {
             for (auto& with : tmpData.coalescables) {
-                Reg r = m_map[with.tmp].assigned;
+                Reg r = m_map.get<bank>(with.tmp).assigned;
                 if (r) {
                     if (tryAllocateToReg(r))
                         return true;
@@ -1590,7 +1604,7 @@ private:
     template <Bank bank>
     bool tryEvict(Tmp tmp, TmpData& tmpData)
     {
-        ASSERT(&m_map[tmp] == &tmpData);
+        ASSERT(&m_map.get<bank>(tmp) == &tmpData);
         ASSERT(tmp.bank() == bank);
 
         auto failOutOfRegisters = [this](Tmp tmp) {
@@ -1600,9 +1614,9 @@ private:
             out.println("Unspillable Conflicts:");
             for (Reg r : m_allowedRegistersInPriorityOrder[bank]) {
                 out.print("  ", r, ": ");
-                m_regRanges[r].forEachConflict(m_map[tmp].liveRange, widthForConflicts<bank>(tmp),
+                m_regRanges[r].forEachConflict(m_map.get<bank>(tmp).liveRange, widthForConflicts<bank>(tmp),
                     [&](auto& conflict) -> IterationStatus {
-                        if (m_map[conflict.tmp].spillCost() == unspillableCost)
+                        if (m_map.get<bank>(conflict.tmp).spillCost() == unspillableCost)
                             out.print("{", conflict.tmp, ", ", conflict.interval, "}, ");
                         return IterationStatus::Continue;
                     });
@@ -1633,7 +1647,7 @@ private:
                     if (visited.quickGet(conflictTmpIndex))
                         return IterationStatus::Continue;
                     visited.quickSet(conflictTmpIndex);
-                    auto cost = m_map[conflict.tmp].spillCost();
+                    auto cost = m_map.get<bank>(conflict.tmp).spillCost();
                     if (cost == unspillableCost) {
                         conflictsSpillCost = unspillableCost;
                         return IterationStatus::Done;
@@ -1659,7 +1673,7 @@ private:
         // It's cheaper to spill all the already-assigned conflicting tmps, so evict them in favor of assigning 'tmp'.
         m_regRanges[bestEvictReg].forEachConflict(liveRange, widthForConflicts<bank>(tmp),
             [&](auto& conflict) -> IterationStatus {
-                TmpData& conflictData = m_map[conflict.tmp];
+                TmpData& conflictData = m_map.get<bank>(conflict.tmp);
                 evict(conflict.tmp, conflictData, bestEvictReg);
                 setStageAndEnqueue(conflict.tmp, conflictData, Stage::TryAllocate);
                 return IterationStatus::Continue;
@@ -1694,20 +1708,21 @@ private:
     bool trySplit(Tmp tmp, TmpData& tmpData)
     {
         ASSERT(tmpData.spillCost() != unspillableCost); // Should have evicted.
-        if (trySplitGroup(tmp, tmpData))
+        if (trySplitGroup<bank>(tmp, tmpData))
             return true;
         if (trySplitAroundClobbers<bank>(tmp, tmpData))
             return true;
         return trySplitIntraBlock<bank>(tmp, tmpData);
     }
 
+    template<Bank bank>
     bool trySplitGroup(Tmp tmp, TmpData& tmpData)
     {
         if (!tmpData.isGroup())
             return false;
         auto enqueueSubgroup = [&](Tmp subGrp) {
-            m_map[subGrp].parentGroup = Tmp();
-            setStageAndEnqueue(subGrp, m_map[subGrp], Stage::TryAllocate);
+            m_map.get<bank>(subGrp).parentGroup = Tmp();
+            setStageAndEnqueue(subGrp, m_map.get<bank>(subGrp), Stage::TryAllocate);
         };
         enqueueSubgroup(tmpData.subGroup0);
         enqueueSubgroup(tmpData.subGroup1);
@@ -1809,9 +1824,9 @@ private:
             Interval gapInterval = hole | Interval(hole.begin() - 1);
             Tmp gapTmp = newTmp(tmp, freq, gapInterval);
             metadata.splits.append({ gapTmp, 0 });
-            setStageAndEnqueue(gapTmp, m_map[gapTmp], Stage::TryAllocate);
+            setStageAndEnqueue(gapTmp, m_map.get<bank>(gapTmp), Stage::TryAllocate);
         }
-        dataLogLnIf(verbose(), "Split (clobbers): reg = ", bestSplitReg, " spillCost = ", m_map[tmp].spillCost(), " splitCost = ", minSplitCost, " split tmp = ", metadata);
+        dataLogLnIf(verbose(), "Split (clobbers): reg = ", bestSplitReg, " spillCost = ", m_map.get<bank>(tmp).spillCost(), " splitCost = ", minSplitCost, " split tmp = ", metadata);
         m_splitMetadata.append(WTFMove(metadata));
         m_stats[bank].numSplitAroundClobbers++;
         return true;
@@ -1904,7 +1919,7 @@ private:
         size_t numIntervals = tmpData.liveRange.intervals().size();
         for (size_t i = 0; i < numIntervals; i++) {
             // Note: this loop calls newTmp() which invalidates the tmpData reference.
-            Interval interval = *(m_map[tmp].liveRange.intervals().begin() + i);
+            Interval interval = *(m_map.get<bank>(tmp).liveRange.intervals().begin() + i);
             Interval remaining = interval;
 
             do {
@@ -1927,7 +1942,7 @@ private:
                 if (tmpPtrs.size() > 1) {
                     ASSERT(cluster);
                     if (!metadata) {
-                        m_map[tmp].splitMetadataIndex = m_splitMetadata.size();
+                        m_map.get<bank>(tmp).splitMetadataIndex = m_splitMetadata.size();
                         m_splitMetadata.constructAndAppend(SplitMetadata::Type::IntraBlock, tmp);
                         metadata = &m_splitMetadata.last();
                     }
@@ -1947,7 +1962,7 @@ private:
                     for (auto& ptr : tmpPtrs)
                         *ptr = clusterTmp; // Within this cluster, use clusterTmp rather than Tmp
                     metadata->splits.append({ clusterTmp, lastDefPoint });
-                    setStageAndEnqueue(clusterTmp, m_map[clusterTmp], Stage::TryAllocate);
+                    setStageAndEnqueue(clusterTmp, m_map.get<bank>(clusterTmp), Stage::TryAllocate);
                 }
             } while (remaining);
         }
@@ -1959,7 +1974,7 @@ private:
 
         // The original Tmp is spilled, but the cluster Tmps will hopefully carry the value in registers
         // within the cluster intervals.
-        spill(tmp, m_map[tmp]);
+        spill(tmp, m_map.get<bank>(tmp));
         m_stats[bank].numSplitIntraBlock++;
         dataLogLnIf(verbose(), "Split (intra-block): ", *metadata);
         return true;
@@ -2042,7 +2057,7 @@ private:
     void emitSpillCodeAndEnqueueNewTmps()
     {
         m_code.forEachTmp<bank>([&](Tmp tmp) {
-            TmpData& tmpData = m_map[tmp];
+            TmpData& tmpData = m_map.get<bank>(tmp);
             if (tmpData.stage == Stage::Spilled && !tmpData.spillSlot) {
                 tmpData.spillSlot = m_code.addStackSlot(stackSlotMinimumWidth(m_tmpWidth.requiredWidth(tmp)), StackSlotKind::Spill);
                 m_stats[bank].numSpillStackSlots++;
@@ -2054,7 +2069,7 @@ private:
                     ASSERT(tmpData.stage == Stage::Spilled && spillSlot(tmp));
                     for (auto& split : metadata.splits) {
                         Tmp clusterTmp = split.tmp;
-                        TmpData& clusterData = m_map[clusterTmp];
+                        TmpData& clusterData = m_map.get<bank>(clusterTmp);
                         if (clusterData.stage == Stage::Spilled) {
                             if (!clusterData.spillSlot)
                                 clusterData.spillSlot = spillSlot(tmp);
@@ -2124,7 +2139,7 @@ private:
                         // If the Tmp holds a constant then we want to rematerialize its
                         // value rather than loading it from the stack.
                         unsigned tmpIndex = AbsoluteTmpMapper<bank>::absoluteIndex(arg.tmp());
-                        ASSERT_IMPLIES(Arg::isColdUse(role), m_map[arg.tmp()].hasColdUse);
+                        ASSERT_IMPLIES(Arg::isColdUse(role), m_map.get<bank>(arg.tmp()).hasColdUse);
                         if (!Arg::isColdUse(role) && m_useCounts.isConstDef<bank>(tmpIndex)) {
                             int64_t value = m_useCounts.constant<bank>(tmpIndex);
                             Arg oldArg = arg;
@@ -2213,7 +2228,7 @@ private:
                     ASSERT_IMPLIES(canRematerializeConstant, !(Arg::isAnyUse(role) && Arg::isAnyDef(role)));
                     ASSERT_IMPLIES(canRematerializeConstant, role != Arg::Scratch);
 
-                    bool canKillDef = canRematerializeConstant && !m_map[originalTmp].hasColdUse;
+                    bool canKillDef = canRematerializeConstant && !m_map.get<bank>(originalTmp).hasColdUse;
 
                     if (Arg::isAnyUse(role) || (!canKillDef && Arg::isAnyDef(role)))
                         tmp = addSpillTmpWithInterval(tmp, intervalForSpill(indexOfEarly, role));
