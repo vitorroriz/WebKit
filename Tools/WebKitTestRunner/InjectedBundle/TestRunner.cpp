@@ -1572,6 +1572,11 @@ void TestRunner::setHasMouseDeviceForTesting(bool hasMouseDevice)
     postSynchronousPageMessage("SetHasMouseDeviceForTesting", hasMouseDevice);
 }
 
+void TestRunner::exitImmersive()
+{
+    postSynchronousPageMessage("ExitImmersive");
+}
+
 ALLOW_DEPRECATED_DECLARATIONS_END
 
 } // namespace WTR

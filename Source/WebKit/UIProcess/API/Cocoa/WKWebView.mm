@@ -2111,22 +2111,6 @@ inline OptionSet<WebKit::FindOptions> toFindOptions(WKFindConfiguration *configu
 }
 #endif
 
-- (id<_WKImmersiveEnvironmentDelegate>)_immersiveEnvironmentDelegate
-{
-#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
-    return _immersiveEnvironmentDelegate.getAutoreleased();
-#else
-    return nil;
-#endif
-}
-
-- (void)_setImmersiveEnvironmentDelegate:(id<_WKImmersiveEnvironmentDelegate>)delegate
-{
-#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
-    _immersiveEnvironmentDelegate = delegate;
-#endif
-}
-
 #if ENABLE(MODEL_ELEMENT_IMMERSIVE)
 - (void)_allowImmersiveElementFromURL:(const URL&)url completion:(CompletionHandler<void(bool)>&&)completion
 {
@@ -4607,6 +4591,29 @@ static void convertAndAddHighlight(Vector<Ref<WebCore::SharedMemory>>& buffers, 
     _page->restoreAppHighlightsAndScrollToIndex(buffers, 0);
 #else
     UNUSED_PARAM(highlight);
+#endif
+}
+
+- (id<_WKImmersiveEnvironmentDelegate>)_immersiveEnvironmentDelegate
+{
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    return _immersiveEnvironmentDelegate.getAutoreleased();
+#else
+    return nil;
+#endif
+}
+
+- (void)_setImmersiveEnvironmentDelegate:(id<_WKImmersiveEnvironmentDelegate>)delegate
+{
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    _immersiveEnvironmentDelegate = delegate;
+#endif
+}
+
+- (void)_exitImmersive
+{
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    _page->exitImmersive();
 #endif
 }
 

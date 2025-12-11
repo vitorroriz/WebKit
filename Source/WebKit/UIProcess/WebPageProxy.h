@@ -2883,6 +2883,10 @@ public:
     RefPtr<WebDeviceOrientationUpdateProviderProxy> webDeviceOrientationUpdateProviderProxy();
 #endif
 
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    void exitImmersive();
+#endif
+
 private:
     WebPageProxy(PageClient&, WebProcessProxy&, Ref<API::PageConfiguration>&&);
     void platformInitialize();

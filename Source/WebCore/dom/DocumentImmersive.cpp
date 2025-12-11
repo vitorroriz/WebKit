@@ -190,6 +190,21 @@ void DocumentImmersive::exitImmersive(CompletionHandler<void(ExceptionOr<void>)>
     });
 }
 
+void DocumentImmersive::exitImmersive()
+{
+    if (!immersiveElement())
+        return;
+
+    exitImmersive([weakThis = WeakPtr { *this }](auto result) {
+        RefPtr protectedThis = weakThis.get();
+        if (!protectedThis)
+            return;
+
+        if (result.hasException())
+            RELEASE_LOG_ERROR(Immersive, "%p - DocumentImmersive: %s", protectedThis.get(), result.releaseException().message().utf8().data());
+    });
+}
+
 void DocumentImmersive::exitRemovedImmersiveElement(HTMLModelElement* element, CompletionHandler<void()>&& completionHandler)
 {
     ASSERT(element->immersive());

@@ -480,6 +480,7 @@ public:
     }
 
     void setHasMouseDeviceForTesting(bool);
+    void exitImmersive();
 
 private:
     TestRunner();

@@ -1693,6 +1693,7 @@ public:
     void allowImmersiveElement(const WebCore::Element&, CompletionHandler<void(bool)>&&);
     void presentImmersiveElement(const WebCore::Element&, const WebCore::LayerHostingContextIdentifier, CompletionHandler<void(bool)>&&);
     void dismissImmersiveElement(const WebCore::Element&, CompletionHandler<void()>&&);
+    void exitImmersive() const;
 #endif
 
     void flushPendingEditorStateUpdate();

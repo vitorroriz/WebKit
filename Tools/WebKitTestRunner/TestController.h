@@ -472,6 +472,10 @@ public:
 
     void setHasMouseDeviceForTesting(bool);
 
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    void exitImmersive();
+#endif
+
     void uiScriptDidComplete(const String& result, unsigned scriptCallbackID);
 
 private:

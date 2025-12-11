@@ -369,4 +369,7 @@ interface TestRunner {
     readonly attribute boolean canModifyResourceMonitorList;
 
     undefined setHasMouseDeviceForTesting(boolean hasMouseDevice);
+
+    // Immersive models
+    undefined exitImmersive();
 };

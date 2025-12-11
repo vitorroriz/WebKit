@@ -930,4 +930,8 @@ messages -> WebPage WantsAsyncDispatchMessage {
     ShowCaptionDisplaySettingsPreview(WebCore::MediaPlayerClientIdentifier identifier)
     HideCaptionDisplaySettingsPreview(WebCore::MediaPlayerClientIdentifier identifier)
 #endif
+
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    ExitImmersive()
+#endif
 }

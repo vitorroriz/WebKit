@@ -13594,6 +13594,11 @@ void WebPageProxy::dismissImmersiveElement(CompletionHandler<void()>&& completio
     else
         completion();
 }
+
+void WebPageProxy::exitImmersive()
+{
+    send(Messages::WebPage::ExitImmersive());
+}
 #endif
 
 void WebPageProxy::copyLinkWithHighlight()

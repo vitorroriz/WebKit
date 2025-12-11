@@ -505,6 +505,7 @@ for this property.
 @property (nonatomic, readonly) _WKSpatialBackdropSource *_spatialBackdropSource WK_API_AVAILABLE(visionos(26.0));
 
 @property (nonatomic, weak, setter=_setImmersiveEnvironmentDelegate:) id <_WKImmersiveEnvironmentDelegate> _immersiveEnvironmentDelegate WK_API_AVAILABLE(visionos(WK_XROS_TBA));
+- (void)_exitImmersive WK_API_AVAILABLE(visionos(WK_XROS_TBA));
 
 - (void)_grantAccessToAssetServices WK_API_AVAILABLE(macos(12.0), ios(14.0));
 - (void)_revokeAccessToAssetServices WK_API_AVAILABLE(macos(12.0), ios(14.0));

@@ -204,6 +204,7 @@
 #include <WebCore/Document.h>
 #include <WebCore/DocumentFragment.h>
 #include <WebCore/DocumentFullscreen.h>
+#include <WebCore/DocumentImmersive.h>
 #include <WebCore/DocumentInlines.h>
 #include <WebCore/DocumentLoader.h>
 #include <WebCore/DocumentMarkerController.h>
@@ -7911,6 +7912,12 @@ void WebPage::presentImmersiveElement(const Element&, const LayerHostingContextI
 void WebPage::dismissImmersiveElement(const Element&, CompletionHandler<void()>&& completion)
 {
     sendWithAsyncReply(Messages::WebPageProxy::DismissImmersiveElement(), WTFMove(completion));
+}
+
+void WebPage::exitImmersive() const
+{
+    if (RefPtr localTopDocument = this->localTopDocument(); RefPtr protectedImmersive = localTopDocument->immersiveIfExists())
+        protectedImmersive->exitImmersive();
 }
 #endif
 
