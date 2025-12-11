@@ -679,6 +679,11 @@ String AccessibilityRenderObject::textUnderElement(TextUnderElementMode mode) co
     if (auto* fileUpload = dynamicDowncast<RenderFileUploadControl>(*m_renderer))
         return fileUpload->buttonValue();
 
+    if (mode.includeListMarkers == IncludeListMarkerText::Yes) {
+        if (CheckedPtr listMarker = dynamicDowncast<RenderListMarker>(*m_renderer))
+            return listMarker->textWithSuffix();
+    }
+
     // Reflect when a content author has explicitly marked a line break.
     if (m_renderer->isBR())
         return "\n"_s;

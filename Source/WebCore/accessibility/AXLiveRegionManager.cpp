@@ -205,9 +205,10 @@ LiveRegionSnapshot AXLiveRegionManager::buildLiveRegionSnapshot(AccessibilityObj
 
         if (shouldIncludeInSnapshot(object))
             snapshot.objects.append({ object.objectID(), textForObject(object), object.languageIncludingAncestors(), { } });
-
-        for (auto& child : object.unignoredChildren())
-            buildObjectList(downcast<AccessibilityObject>(child.get()));
+        else {
+            for (auto& child : object.unignoredChildren())
+                buildObjectList(downcast<AccessibilityObject>(child.get()));
+        }
     };
 
     buildObjectList(object);
@@ -218,6 +219,10 @@ LiveRegionSnapshot AXLiveRegionManager::buildLiveRegionSnapshot(AccessibilityObj
 bool AXLiveRegionManager::shouldIncludeInSnapshot(AccessibilityObject& object) const
 {
     if (object.isStaticText())
+        return true;
+
+    // Description will account for alt text, aria-label(ledby), and title attributes.
+    if (String description = object.description(); description.length())
         return true;
 
     // If an object has unignored children, there isn't a need to include it in the snapshot since the children will return YES.
@@ -239,7 +244,14 @@ bool AXLiveRegionManager::shouldIncludeInSnapshot(AccessibilityObject& object) c
 
 String AXLiveRegionManager::textForObject(AccessibilityObject& object) const
 {
-    return object.textMarkerRange().toString(IncludeListMarkerText::Yes, IncludeImageAltText::Yes);
+    if (String description = object.description(); description.length())
+        return description;
+
+    TextUnderElementMode mode;
+    mode.includeListMarkers = IncludeListMarkerText::Yes;
+    // We want all of the text beneath this object when speaking live regions.
+    mode.descendIntoContainers = DescendIntoContainers::Yes;
+    return object.textUnderElement(mode);
 }
 
 AXLiveRegionManager::LiveRegionDiff AXLiveRegionManager::computeChanges(const Vector<LiveRegionObject>& oldObjects, const Vector<LiveRegionObject>& newObjects) const
@@ -333,10 +345,12 @@ AttributedString AXLiveRegionManager::computeAnnouncement(const LiveRegionSnapsh
         if (!object.language.isEmpty()) {
             HashMap<String, AttributedString::AttributeValue> languageAttribute;
             languageAttribute.set(accessibilityLanguageAttributeKey, AttributedString::AttributeValue { object.language });
-            attributes.append({ { startLocation, object.text.length() }, WTFMove(languageAttribute) });
+            // The - / + 1 allows us to set the language of the space character seemlessly with the text around it.
+            attributes.append({ { needsSpace && startLocation ? startLocation - 1 : startLocation, needsSpace && startLocation ? object.text.length() + 1 : object.text.length() }, WTFMove(languageAttribute) });
         }
 
-        needsSpace = true;
+        // If the preceeding object already ends with a space (e.g., list markers), no need to add another.
+        needsSpace = object.text.isEmpty() || object.text[object.text.length() - 1] != ' ';
         spokenObjects.add(object.objectID);
     };
 

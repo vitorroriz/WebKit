@@ -255,6 +255,7 @@ enum class AccessibilityOrientation : uint8_t {
     Horizontal
 };
 
+enum class DescendIntoContainers : bool { No, Yes };
 enum class DidTimeout : bool { No, Yes };
 enum class IncludeListMarkerText : bool { No, Yes };
 enum class IncludeImageAltText : bool { No, Yes };
@@ -271,6 +272,8 @@ struct TextUnderElementMode {
     bool includeFocusableContent { false };
     bool considerHiddenState { true };
     bool inHiddenSubtree { false };
+    IncludeListMarkerText includeListMarkers { IncludeListMarkerText::No };
+    DescendIntoContainers descendIntoContainers { DescendIntoContainers::No };
     TrimWhitespace trimWhitespace { TrimWhitespace::Yes };
     CheckedPtr<Node> ignoredChildNode { nullptr };
 

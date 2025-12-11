@@ -133,7 +133,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 static String accessibleNameForNode(Node&, Node* labelledbyNode = nullptr);
-static void appendNameToStringBuilder(StringBuilder&, String&&, bool prependSpace = true);
+static void appendNameToStringBuilder(StringBuilder&, String&&, bool prependSpace = true, bool prependNewline = false);
 
 AccessibilityNodeObject::AccessibilityNodeObject(AXID axID, Node* node, AXObjectCache& cache)
     : AccessibilityObject(axID, cache)
@@ -3729,15 +3729,11 @@ static bool shouldUseAccessibilityObjectInnerText(AccessibilityObject& object, T
     if (object.canSetFocusAttribute() && !mode.includeFocusableContent)
         return false;
 
-    // Skip big container elements like lists, tables, etc.
-    if (object.isAccessibilityList())
-        return false;
-
-    if (object.isExposableTable())
-        return false;
-
-    if (object.isTree() || object.isCanvas())
-        return false;
+    if (mode.descendIntoContainers == DescendIntoContainers::No) {
+        // Skip big container elements like lists, tables, etc.
+        if (object.isAccessibilityList() || object.isExposableTable() || object.isTree() || object.isCanvas())
+            return false;
+    }
 
 #if ENABLE(MODEL_ELEMENT)
     if (object.isModel())
@@ -3747,13 +3743,21 @@ static bool shouldUseAccessibilityObjectInnerText(AccessibilityObject& object, T
     return true;
 }
 
-static void appendNameToStringBuilder(StringBuilder& builder, String&& text, bool prependSpace)
+static void appendNameToStringBuilder(StringBuilder& builder, String&& text, bool prependSpace, bool prependNewline)
 {
     if (text.isEmpty())
         return;
 
     if (prependSpace && !isHTMLLineBreak(text[0]) && builder.length() && !isHTMLLineBreak(builder[builder.length() - 1]))
         builder.append(' ');
+    else if (prependNewline) {
+        // FIXME: This is in an else if so we don't break existing behavior of adding spaces for specific display
+        // types, even if they emit newlines.
+        // We should update prependSpace to also be based off of TextIterator's behavior, so that textUnderElement is
+        // more accurate in adding whitespace or newlines based on the node/renderer.
+        builder.append('\n');
+    }
+
     builder.append(WTFMove(text));
 }
 
@@ -3789,6 +3793,12 @@ static bool shouldPrependSpace(AccessibilityObject& object, AccessibilityObject*
         || (previousObject && needsSpaceFromDisplay(*previousObject))
         || object.isControl()
         || (previousObject && previousObject->isControl());
+}
+
+static bool shouldPrependNewline(AccessibilityObject* previousObject)
+{
+    RefPtr node = previousObject ? previousObject->node() : nullptr;
+    return node && WebCore::shouldEmitNewlinesBeforeAndAfterNode(*node);
 }
 
 String AccessibilityNodeObject::textUnderElement(TextUnderElementMode mode) const
@@ -3830,7 +3840,7 @@ String AccessibilityNodeObject::textUnderElement(TextUnderElementMode mode) cons
 
         auto childText = object.textUnderElement(mode);
         if (childText.length()) {
-            appendNameToStringBuilder(builder, WTFMove(childText), previousRequiresSpace || shouldPrependSpace(object, previous.get()));
+            appendNameToStringBuilder(builder, WTFMove(childText), previousRequiresSpace || shouldPrependSpace(object, previous.get()), shouldPrependNewline(previous.get()));
             previousRequiresSpace = false;
         }
     };
@@ -4205,7 +4215,7 @@ static String accessibleNameForNode(Node& node, Node* labelledbyNode)
     String text;
     if (axObject) {
         if (axObject->accessibleNameDerivesFromContent())
-            text = axObject->textUnderElement({ TextUnderElementMode::Children::IncludeNameFromContentsChildren, true, true, false, TrimWhitespace::Yes, labelledbyNode });
+            text = axObject->textUnderElement({ TextUnderElementMode::Children::IncludeNameFromContentsChildren, true, true, false, IncludeListMarkerText::No, DescendIntoContainers::No, TrimWhitespace::Yes, labelledbyNode });
     } else
         text = (element ? element->innerText() : node.textContent()).simplifyWhiteSpace(isASCIIWhitespace);
 

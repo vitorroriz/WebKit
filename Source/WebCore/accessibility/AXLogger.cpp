@@ -603,6 +603,10 @@ TextStream& operator<<(WTF::TextStream& stream, const TextUnderElementMode& mode
         stream << ", inHiddenSubtree: 1";
     if (!mode.considerHiddenState)
         stream << ", considerHiddenState: 0";
+    if (mode.includeListMarkers == IncludeListMarkerText::Yes)
+        stream << ", includeListMarkers: 1";
+    if (mode.descendIntoContainers == DescendIntoContainers::Yes)
+        stream << ", descendIntoContainers: 1";
     if (mode.ignoredChildNode)
         stream << ", ignoredChildNode: " << mode.ignoredChildNode;
     if (mode.trimWhitespace == TrimWhitespace::No)
