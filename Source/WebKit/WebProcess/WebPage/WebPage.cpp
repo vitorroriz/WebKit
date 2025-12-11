@@ -7614,6 +7614,7 @@ void WebPage::didCommitLoad(WebFrame* frame)
     m_internals->lastTransactionIDWithScaleChange = firstTransactionIDAfterDidCommitLoad;
     m_scaleWasSetByUIProcess = false;
     m_userHasChangedPageScaleFactor = false;
+    m_previousViewportConfigurationMinimumScale = { };
     m_estimatedLatency = Seconds(1.0 / 60);
     m_shouldRevealCurrentSelectionAfterInsertion = true;
     m_internals->lastLayerTreeTransactionIdAndPageScaleBeforeScalingPage = std::nullopt;

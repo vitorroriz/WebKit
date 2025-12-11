@@ -4914,15 +4914,26 @@ void WebPage::viewportConfigurationChanged(ZoomToInitialScale zoomToInitialScale
     if (setFixedLayoutSize(m_viewportConfiguration.layoutSize()))
         resetTextAutosizing();
 
-    double scale;
-    if (m_userHasChangedPageScaleFactor && zoomToInitialScale == ZoomToInitialScale::No)
-        scale = std::max(std::min(pageScaleFactor(), m_viewportConfiguration.maximumScale()), m_viewportConfiguration.minimumScale());
-    else
-        scale = initialScale;
+    auto minimumScale = m_viewportConfiguration.minimumScale();
+    auto previousMinimumScale = m_previousViewportConfigurationMinimumScale.value_or(minimumScale);
+    auto updatePreviousMinimumScale = makeScopeExit([&] {
+        m_previousViewportConfigurationMinimumScale = minimumScale;
+    });
 
-    LOG_WITH_STREAM(VisibleRects, stream << "WebPage " << m_identifier << " viewportConfigurationChanged - setting zoomedOutPageScaleFactor to " << m_viewportConfiguration.minimumScale() << " and scale to " << scale);
+    double scale = [&] {
+        if (!m_userHasChangedPageScaleFactor || zoomToInitialScale == ZoomToInitialScale::Yes)
+            return initialScale;
 
-    m_page->setZoomedOutPageScaleFactor(m_viewportConfiguration.minimumScale());
+        auto currentScale = pageScaleFactor();
+        if (scalesAreEssentiallyEqual(previousMinimumScale, currentScale))
+            return minimumScale;
+
+        return std::max(std::min(currentScale, m_viewportConfiguration.maximumScale()), minimumScale);
+    }();
+
+    LOG_WITH_STREAM(VisibleRects, stream << "WebPage " << m_identifier << " viewportConfigurationChanged - setting zoomedOutPageScaleFactor to " << minimumScale << " and scale to " << scale);
+
+    m_page->setZoomedOutPageScaleFactor(minimumScale);
 
     updateSizeForCSSDefaultViewportUnits();
     updateSizeForCSSSmallViewportUnits();

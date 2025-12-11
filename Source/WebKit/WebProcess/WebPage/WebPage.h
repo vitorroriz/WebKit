@@ -3023,6 +3023,7 @@ private:
     bool m_isInStableState { true };
     bool m_shouldRevealCurrentSelectionAfterInsertion { true };
     bool m_screenIsBeingCaptured { false };
+    std::optional<double> m_previousViewportConfigurationMinimumScale;
     MonotonicTime m_oldestNonStableUpdateVisibleContentRectsTimestamp;
     Seconds m_estimatedLatency { 0 };
     WebCore::FloatSize m_screenSize;
