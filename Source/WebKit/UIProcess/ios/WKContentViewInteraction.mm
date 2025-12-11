@@ -3928,7 +3928,7 @@ static void cancelPotentialTapIfNecessary(WKContentView* contentView)
             return;
 
         RetainPtr strongSelf = weakSelf.get();
-        if (![strongSelf _hasFocusedElement] || !strongSelf->_focusedElementInformation.elementContext.isSameElement(element))
+        if (![strongSelf _isSameAsFocusedElement:element])
             return;
 
         RELEASE_LOG(ViewGestures, "Dismissing keyboard after tap (%p, pageProxyID=%llu)", strongSelf.get(), strongSelf->_page->identifier().toUInt64());
@@ -5420,6 +5420,11 @@ static void selectionChangedWithTouch(WKTextInteractionWrapper *interaction, con
 - (BOOL)_hasFocusedElement
 {
     return _focusedElementInformation.elementType != WebKit::InputType::None;
+}
+
+- (BOOL)_isSameAsFocusedElement:(const WebCore::ElementContext&)element
+{
+    return [self _hasFocusedElement] && _focusedElementInformation.elementContext.isSameElement(element);
 }
 
 - (void)changeSelectionWithGestureAt:(CGPoint)point withGesture:(WKBEGestureType)gestureType withState:(UIGestureRecognizerState)state
@@ -7433,9 +7438,12 @@ static UITextAutocapitalizationType toUITextAutocapitalize(WebCore::Autocapitali
 
 - (BOOL)_isTextInputContextFocused:(_WKTextInputContext *)context
 {
-    ASSERT(context);
+    if (!context) {
+        ASSERT_NOT_REACHED();
+        return NO;
+    }
     // We ignore bounding rect changes as the bounding rect of the focused element is not kept up-to-date.
-    return self._hasFocusedElement && context._textInputContext.isSameElement(_focusedElementInformation.elementContext);
+    return [self _isSameAsFocusedElement:context._textInputContext];
 }
 
 - (void)_focusTextInputContext:(_WKTextInputContext *)context placeCaretAt:(CGPoint)point completionHandler:(void (^)(UIResponder<UITextInput> *))completionHandler
@@ -8427,7 +8435,7 @@ static RetainPtr<NSObject <WKFormPeripheral>> createInputPeripheralWithView(WebK
 
     // FIXME: We should remove this check when we manage to send ElementDidFocus from the WebProcess
     // only when it is truly time to show the keyboard.
-    if (self._hasFocusedElement && _focusedElementInformation.elementContext.isSameElement(information.elementContext)) {
+    if ([self _isSameAsFocusedElement:information.elementContext]) {
         if (_inputPeripheral) {
             if (!self.isFirstResponder)
                 [self becomeFirstResponder];
@@ -8682,10 +8690,7 @@ static RetainPtr<NSObject <WKFormPeripheral>> createInputPeripheralWithView(WebK
 
 - (void)_didProgrammaticallyClearFocusedElement:(WebCore::ElementContext&&)context
 {
-    if (!self._hasFocusedElement)
-        return;
-
-    if (!context.isSameElement(_focusedElementInformation.elementContext))
+    if (![self _isSameAsFocusedElement:context])
         return;
 
     [self _internalInvalidateTextEntryContext];
@@ -8705,10 +8710,7 @@ static RetainPtr<NSObject <WKFormPeripheral>> createInputPeripheralWithView(WebK
 
 - (void)_updateFocusedElementInformation:(const WebKit::FocusedElementInformation&)information
 {
-    if (!self._hasFocusedElement)
-        return;
-
-    if (!_focusedElementInformation.elementContext.isSameElement(information.elementContext))
+    if (![self _isSameAsFocusedElement:information.elementContext])
         return;
 
     _focusedElementInformation = information;
@@ -12429,7 +12431,7 @@ static WebKit::DocumentEditingContextRequest toWebRequest(id request)
 - (BOOL)_elementForTextInputContextIsFocused:(_WKTextInputContext *)context
 {
     // We ignore bounding rect changes as the bounding rect of the focused element is not kept up-to-date.
-    return self._hasFocusedElement && context && context._textInputContext.isSameElement(_focusedElementInformation.elementContext);
+    return context && [self _isSameAsFocusedElement:context._textInputContext];
 }
 
 - (void)indirectScribbleInteraction:(UIIndirectScribbleInteraction *)interaction requestElementsInRect:(CGRect)rect completion:(void(^)(NSArray<UIScribbleElementIdentifier> *))completion
