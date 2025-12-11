@@ -984,8 +984,11 @@ void RenderReplaced::layoutShadowContent(const LayoutSize& oldSize)
         // and this method might be called many times per second during video playback, use a LayoutStateMaintainer:
         LayoutStateMaintainer statePusher(*this, locationOffset(), isTransformed() || hasReflection() || writingMode().isBlockFlipped());
         renderBox.setLocation(LayoutPoint(borderLeft(), borderTop()) + LayoutSize(paddingLeft(), paddingTop()));
-        renderBox.mutableStyle().setHeight(Style::PreferredSize::Fixed { newSize.height() });
-        renderBox.mutableStyle().setWidth(Style::PreferredSize::Fixed { newSize.width() });
+
+        auto usedZoom = renderBox.style().usedZoomForLength();
+        renderBox.mutableStyle().setHeight(Style::PreferredSize::Fixed { newSize.height() / usedZoom.value });
+        renderBox.mutableStyle().setWidth(Style::PreferredSize::Fixed { newSize.width() / usedZoom.value });
+
         renderBox.setNeedsLayout(MarkOnlyThis);
         renderBox.layout();
     }
