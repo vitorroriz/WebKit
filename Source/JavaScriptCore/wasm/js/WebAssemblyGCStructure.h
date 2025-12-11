@@ -27,6 +27,7 @@
 
 #include <JavaScriptCore/Structure.h>
 #include <JavaScriptCore/WasmTypeDefinition.h>
+#include <wtf/ReferenceWrapperVector.h>
 
 #if ENABLE(WEBASSEMBLY)
 
@@ -37,6 +38,26 @@ class UniquedStringImpl;
 } // namespace WTF
 
 namespace JSC {
+
+// A set of all TypeDefinitions a WebAssemblyGCStructure needs to keep alive.
+// The TypeDefinition retained by a structure as `m_type` may reference other
+// TypeDefinitions. Such references are stored as raw pointers in Wasm::FieldTypes. To
+// prevent these unmanaged pointers from dangling if a GC object and its structure outlive
+// the originating Wasm instance, we collect a transitive closure of all TypeDefinitions
+// reachable from the declared type of the GC object. The structure holds onto this set
+// to ensure all relevant type definitions live for at least as long as itself.
+class WebAssemblyGCStructureTypeDependencies {
+    public:
+        WebAssemblyGCStructureTypeDependencies(Ref<const Wasm::TypeDefinition>&& unexpandedType);
+
+    private:
+        using WorkList = ReferenceWrapperVector<const Wasm::TypeDefinition>;
+
+        void process(const Wasm::TypeDefinition&, WorkList&);
+        void process(Wasm::FieldType, WorkList&);
+
+        UncheckedKeyHashSet<Wasm::TypeHash> m_typeDefinitions;
+};
 
 // FIXME: It seems like almost all the fields of a Structure are useless to a wasm GC "object" since they can't have dynamic fields
 // e.g. PropertyTables, Transitions, SeenProperties, Prototype, etc.
@@ -68,9 +89,7 @@ private:
     Ref<const Wasm::RTT> m_rtt;
     Ref<const Wasm::TypeDefinition> m_type;
     std::array<RefPtr<const Wasm::RTT>, inlinedTypeDisplaySize> m_inlinedTypeDisplay { };
-    // The type of a struct or an array can be a Subtype wrapping the underlying Struct or Array type. In these situations `m_type` retains the expanded underlying type.
-    // We must also retain the original unexpanded Subtype because it may be the target of raw pointers in Wasm::Types of FieldTypes.
-    Ref<const Wasm::TypeDefinition> m_unexpandedType;
+    WebAssemblyGCStructureTypeDependencies m_typeDependencies;
 };
 
 } // namespace JSC
