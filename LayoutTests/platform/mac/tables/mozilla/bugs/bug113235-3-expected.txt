@@ -9,49 +9,44 @@ layer at (0,0) size 785x982
         RenderInline {A} at (97,0) size 13x18
           RenderText {#text} at (97,0) size 13x18
             text run at (97,0) width 13: "X"
-        RenderBlock (anonymous) at (0,18) size 769x28
-          RenderTable {TABLE} at (0,0) size 55x28 [border: (1px outset #000000)]
-            RenderTableSection {TBODY} at (1,1) size 53x26
-              RenderTableRow {TR} at (0,2) size 53x22
-                RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
-                  RenderText {#text} at (2,2) size 45x18
-                    text run at (2,2) width 45: "table-1"
+        RenderTable {TABLE} at (0,18) size 55x28 [border: (1px outset #000000)]
+          RenderTableSection {TBODY} at (1,1) size 53x26
+            RenderTableRow {TR} at (0,2) size 53x22
+              RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
+                RenderText {#text} at (2,2) size 45x18
+                  text run at (2,2) width 45: "table-1"
         RenderInline {A} at (0,46) size 10x18
           RenderText {#text} at (0,46) size 10x18
             text run at (0,46) width 10: "Z"
         RenderInline {FONT} at (0,46) size 769x928
           RenderText {#text} at (0,0) size 0x0
-          RenderBlock (anonymous) at (0,72) size 769x2
           RenderInline {FONT} at (0,82) size 769x900
             RenderInline {A} at (0,82) size 12x18
               RenderText {#text} at (0,82) size 12x18
                 text run at (0,82) width 12: "X"
             RenderText {#text} at (11,82) size 99x18
               text run at (11,82) width 99: " same line as X"
-            RenderBlock (anonymous) at (0,100) size 769x28
-              RenderTable {TABLE} at (0,0) size 55x28 [border: (1px outset #000000)]
-                RenderTableSection {TBODY} at (1,1) size 53x26
-                  RenderTableRow {TR} at (0,2) size 53x22
-                    RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
-                      RenderText {#text} at (2,2) size 45x18
-                        text run at (2,2) width 45: "table-2"
+            RenderTable {TABLE} at (0,100) size 55x28 [border: (1px outset #000000)]
+              RenderTableSection {TBODY} at (1,1) size 53x26
+                RenderTableRow {TR} at (0,2) size 53x22
+                  RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
+                    RenderText {#text} at (2,2) size 45x18
+                      text run at (2,2) width 45: "table-2"
             RenderInline {A} at (0,128) size 10x18
               RenderText {#text} at (0,128) size 10x18
                 text run at (0,128) width 10: "Z"
             RenderInline {FONT} at (0,128) size 769x862
               RenderText {#text} at (0,0) size 0x0
-              RenderBlock (anonymous) at (0,154) size 769x2
               RenderInline {FONT} at (0,164) size 769x834
                 RenderInline {A} at (0,164) size 12x18
                   RenderText {#text} at (0,164) size 12x18
                     text run at (0,164) width 12: "X"
-                RenderBlock (anonymous) at (0,182) size 769x28
-                  RenderTable {TABLE} at (0,0) size 55x28 [border: (1px outset #000000)]
-                    RenderTableSection {TBODY} at (1,1) size 53x26
-                      RenderTableRow {TR} at (0,2) size 53x22
-                        RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
-                          RenderText {#text} at (2,2) size 45x18
-                            text run at (2,2) width 45: "table-3"
+                RenderTable {TABLE} at (0,182) size 55x28 [border: (1px outset #000000)]
+                  RenderTableSection {TBODY} at (1,1) size 53x26
+                    RenderTableRow {TR} at (0,2) size 53x22
+                      RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
+                        RenderText {#text} at (2,2) size 45x18
+                          text run at (2,2) width 45: "table-3"
                 RenderText {#text} at (0,210) size 96x18
                   text run at (0,210) width 96: "same line as Z "
                 RenderInline {A} at (95,210) size 11x18
@@ -59,31 +54,27 @@ layer at (0,0) size 785x982
                     text run at (95,210) width 11: "Z"
                 RenderInline {FONT} at (0,210) size 769x796
                   RenderText {#text} at (0,0) size 0x0
-                  RenderBlock (anonymous) at (0,236) size 769x2
                   RenderInline {FONT} at (0,246) size 769x768
                     RenderText {#text} at (0,246) size 104x18
                       text run at (0,246) width 104: "line before table"
-                    RenderBlock (anonymous) at (0,264) size 769x28
-                      RenderTable {TABLE} at (0,0) size 55x28 [border: (1px outset #000000)]
-                        RenderTableSection {TBODY} at (1,1) size 53x26
-                          RenderTableRow {TR} at (0,2) size 53x22
-                            RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
-                              RenderText {#text} at (2,2) size 45x18
-                                text run at (2,2) width 45: "table-4"
+                    RenderTable {TABLE} at (0,264) size 55x28 [border: (1px outset #000000)]
+                      RenderTableSection {TBODY} at (1,1) size 53x26
+                        RenderTableRow {TR} at (0,2) size 53x22
+                          RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
+                            RenderText {#text} at (2,2) size 45x18
+                              text run at (2,2) width 45: "table-4"
                     RenderInline {A} at (0,292) size 10x18
                       RenderText {#text} at (0,292) size 10x18
                         text run at (0,292) width 10: "Z"
                     RenderInline {FONT} at (0,292) size 769x730
                       RenderText {#text} at (0,0) size 0x0
-                      RenderBlock (anonymous) at (0,318) size 769x2
                       RenderInline {FONT} at (0,356) size 769x674
-                        RenderBlock (anonymous) at (0,328) size 769x28
-                          RenderTable {TABLE} at (0,0) size 55x28 [border: (1px outset #000000)]
-                            RenderTableSection {TBODY} at (1,1) size 53x26
-                              RenderTableRow {TR} at (0,2) size 53x22
-                                RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
-                                  RenderText {#text} at (2,2) size 45x18
-                                    text run at (2,2) width 45: "table-5"
+                        RenderTable {TABLE} at (0,328) size 55x28 [border: (1px outset #000000)]
+                          RenderTableSection {TBODY} at (1,1) size 53x26
+                            RenderTableRow {TR} at (0,2) size 53x22
+                              RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
+                                RenderText {#text} at (2,2) size 45x18
+                                  text run at (2,2) width 45: "table-5"
                         RenderText {#text} at (0,356) size 97x18
                           text run at (0,356) width 97: "line after table "
                         RenderInline {A} at (96,356) size 11x18
@@ -91,41 +82,35 @@ layer at (0,0) size 785x982
                             text run at (96,356) width 11: "Z"
                         RenderInline {FONT} at (0,356) size 769x682
                           RenderText {#text} at (0,0) size 0x0
-                          RenderBlock (anonymous) at (0,382) size 769x2
                           RenderInline {FONT} at (0,392) size 769x654
                             RenderText {#text} at (0,392) size 104x18
                               text run at (0,392) width 104: "line before table"
-                            RenderBlock (anonymous) at (0,410) size 769x28
-                              RenderTable {TABLE} at (0,0) size 55x28 [border: (1px outset #000000)]
-                                RenderTableSection {TBODY} at (1,1) size 53x26
-                                  RenderTableRow {TR} at (0,2) size 53x22
-                                    RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
-                                      RenderText {#text} at (2,2) size 45x18
-                                        text run at (2,2) width 45: "table-6"
+                            RenderTable {TABLE} at (0,410) size 55x28 [border: (1px outset #000000)]
+                              RenderTableSection {TBODY} at (1,1) size 53x26
+                                RenderTableRow {TR} at (0,2) size 53x22
+                                  RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
+                                    RenderText {#text} at (2,2) size 45x18
+                                      text run at (2,2) width 45: "table-6"
                             RenderInline {FONT} at (0,474) size 769x580
                               RenderText {#text} at (0,0) size 0x0
-                              RenderBlock (anonymous) at (0,446) size 769x2
                               RenderInline {FONT} at (0,474) size 769x588
-                                RenderBlock (anonymous) at (0,456) size 769x18
-                                  RenderBlock {DIV} at (0,0) size 769x18
-                                    RenderText {#text} at (0,0) size 81x18
-                                      text run at (0,0) width 81: "div before X"
+                                RenderBlock {DIV} at (0,456) size 769x18
+                                  RenderText {#text} at (0,0) size 81x18
+                                    text run at (0,0) width 81: "div before X"
                                 RenderInline {A} at (0,474) size 12x18
                                   RenderText {#text} at (0,474) size 12x18
                                     text run at (0,474) width 12: "X"
-                                RenderBlock (anonymous) at (0,492) size 769x28
-                                  RenderTable {TABLE} at (0,0) size 55x28 [border: (1px outset #000000)]
-                                    RenderTableSection {TBODY} at (1,1) size 53x26
-                                      RenderTableRow {TR} at (0,2) size 53x22
-                                        RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
-                                          RenderText {#text} at (2,2) size 45x18
-                                            text run at (2,2) width 45: "table-7"
+                                RenderTable {TABLE} at (0,492) size 55x28 [border: (1px outset #000000)]
+                                  RenderTableSection {TBODY} at (1,1) size 53x26
+                                    RenderTableRow {TR} at (0,2) size 53x22
+                                      RenderTableCell {TD} at (2,2) size 49x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
+                                        RenderText {#text} at (2,2) size 45x18
+                                          text run at (2,2) width 45: "table-7"
                                 RenderInline {A} at (0,520) size 10x18
                                   RenderText {#text} at (0,520) size 10x18
                                     text run at (0,520) width 10: "Z"
                                 RenderInline {FONT} at (0,520) size 769x550
                                   RenderText {#text} at (0,0) size 0x0
-                                  RenderBlock (anonymous) at (0,546) size 769x2
                                   RenderInline {FONT} at (0,556) size 769x522
                                     RenderInline {A} at (0,556) size 12x18
                                       RenderText {#text} at (0,556) size 12x18
@@ -145,7 +130,6 @@ layer at (0,0) size 785x982
                                         text run at (0,620) width 10: "Z"
                                     RenderInline {FONT} at (0,620) size 769x466
                                       RenderText {#text} at (0,0) size 0x0
-                                      RenderBlock (anonymous) at (0,646) size 769x2
                                       RenderInline {FONT} at (0,656) size 769x438
                                         RenderInline {A} at (0,656) size 12x18
                                           RenderText {#text} at (0,656) size 12x18
@@ -165,7 +149,6 @@ layer at (0,0) size 785x982
                                             text run at (0,720) width 10: "Z"
                                         RenderInline {FONT} at (0,720) size 769x382
                                           RenderText {#text} at (0,0) size 0x0
-                                          RenderBlock (anonymous) at (0,746) size 769x2
                                           RenderInline {FONT} at (0,802) size 769x308
                                             RenderBlock (anonymous) at (0,756) size 769x46
                                               RenderBlock {DIV} at (0,0) size 769x18
@@ -182,7 +165,6 @@ layer at (0,0) size 785x982
                                                 text run at (0,802) width 10: "Z"
                                             RenderInline {FONT} at (0,802) size 769x316
                                               RenderText {#text} at (0,0) size 0x0
-                                              RenderBlock (anonymous) at (0,828) size 769x2
                                               RenderInline {FONT} at (0,884) size 769x242
                                                 RenderBlock (anonymous) at (0,838) size 769x46
                                                   RenderTable {TABLE} at (0,0) size 62x28 [border: (1px outset #000000)]
@@ -199,7 +181,6 @@ layer at (0,0) size 785x982
                                                     text run at (0,884) width 10: "Z"
                                                 RenderInline {FONT} at (0,884) size 769x250
                                                   RenderText {#text} at (0,0) size 0x0
-                                                  RenderBlock (anonymous) at (0,910) size 769x2
                                                   RenderInline {FONT} at (0,1096) size 769x124
                                                     RenderBlock (anonymous) at (0,920) size 769x46
                                                       RenderBlock {DIV} at (0,0) size 769x18
@@ -214,24 +195,24 @@ layer at (0,0) size 785x982
                                                     RenderInline {FONT} at (0,1288) size 0x0
                                                       RenderText {#text} at (0,0) size 0x0
 layer at (8,80) size 769x2 clip at (0,0) size 0x0
-  RenderBlock {HR} at (0,0) size 769x2 [color=#808080] [border: (1px inset #808080)]
+  RenderBlock {HR} at (0,72) size 769x2 [color=#808080] [border: (1px inset #808080)]
 layer at (8,162) size 769x2 clip at (0,0) size 0x0
-  RenderBlock {HR} at (0,0) size 769x2 [color=#808080] [border: (1px inset #808080)]
+  RenderBlock {HR} at (0,154) size 769x2 [color=#808080] [border: (1px inset #808080)]
 layer at (8,244) size 769x2 clip at (0,0) size 0x0
-  RenderBlock {HR} at (0,0) size 769x2 [color=#808080] [border: (1px inset #808080)]
+  RenderBlock {HR} at (0,236) size 769x2 [color=#808080] [border: (1px inset #808080)]
 layer at (8,326) size 769x2 clip at (0,0) size 0x0
-  RenderBlock {HR} at (0,0) size 769x2 [color=#808080] [border: (1px inset #808080)]
+  RenderBlock {HR} at (0,318) size 769x2 [color=#808080] [border: (1px inset #808080)]
 layer at (8,390) size 769x2 clip at (0,0) size 0x0
-  RenderBlock {HR} at (0,0) size 769x2 [color=#808080] [border: (1px inset #808080)]
+  RenderBlock {HR} at (0,382) size 769x2 [color=#808080] [border: (1px inset #808080)]
 layer at (8,454) size 769x2 clip at (0,0) size 0x0
-  RenderBlock {HR} at (0,0) size 769x2 [color=#808080] [border: (1px inset #808080)]
+  RenderBlock {HR} at (0,446) size 769x2 [color=#808080] [border: (1px inset #808080)]
 layer at (8,554) size 769x2 clip at (0,0) size 0x0
-  RenderBlock {HR} at (0,0) size 769x2 [color=#808080] [border: (1px inset #808080)]
+  RenderBlock {HR} at (0,546) size 769x2 [color=#808080] [border: (1px inset #808080)]
 layer at (8,654) size 769x2 clip at (0,0) size 0x0
-  RenderBlock {HR} at (0,0) size 769x2 [color=#808080] [border: (1px inset #808080)]
+  RenderBlock {HR} at (0,646) size 769x2 [color=#808080] [border: (1px inset #808080)]
 layer at (8,754) size 769x2 clip at (0,0) size 0x0
-  RenderBlock {HR} at (0,0) size 769x2 [color=#808080] [border: (1px inset #808080)]
+  RenderBlock {HR} at (0,746) size 769x2 [color=#808080] [border: (1px inset #808080)]
 layer at (8,836) size 769x2 clip at (0,0) size 0x0
-  RenderBlock {HR} at (0,0) size 769x2 [color=#808080] [border: (1px inset #808080)]
+  RenderBlock {HR} at (0,828) size 769x2 [color=#808080] [border: (1px inset #808080)]
 layer at (8,918) size 769x2 clip at (0,0) size 0x0
-  RenderBlock {HR} at (0,0) size 769x2 [color=#808080] [border: (1px inset #808080)]
+  RenderBlock {HR} at (0,910) size 769x2 [color=#808080] [border: (1px inset #808080)]

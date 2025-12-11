@@ -12,18 +12,17 @@ layer at (0,0) size 785x11400
             RenderTableCell {TD} at (16,2) size 711x11379 [border: (1px inset #000000)] [r=0 c=1 rs=1 cs=1]
               RenderInline {FONT} at (2,2) size 707x11375
                 RenderText {#text} at (0,0) size 0x0
-                RenderBlock (anonymous) at (2,2) size 707x52
-                  RenderTable {TABLE} at (0,0) size 567x52 [border: (1px outset #000000)]
-                    RenderTableSection {TBODY} at (1,1) size 565x50
-                      RenderTableRow {TR} at (0,2) size 565x22
-                        RenderTableCell {TD} at (2,2) size 112x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
-                          RenderText {#text} at (2,2) size 5x17
-                            text run at (2,2) width 5: " "
-                        RenderTableCell {TD} at (115,2) size 448x4 [border: (1px inset #000000)] [r=0 c=1 rs=1 cs=1]
-                      RenderTableRow {TR} at (0,26) size 565x22
-                        RenderTableCell {TD} at (2,26) size 112x22 [border: (1px inset #000000)] [r=1 c=0 rs=1 cs=1]
-                          RenderText {#text} at (2,2) size 108x17
-                            text run at (2,2) width 108: "Search again..."
+                RenderTable {TABLE} at (2,2) size 567x52 [border: (1px outset #000000)]
+                  RenderTableSection {TBODY} at (1,1) size 565x50
+                    RenderTableRow {TR} at (0,2) size 565x22
+                      RenderTableCell {TD} at (2,2) size 112x22 [border: (1px inset #000000)] [r=0 c=0 rs=1 cs=1]
+                        RenderText {#text} at (2,2) size 5x17
+                          text run at (2,2) width 5: " "
+                      RenderTableCell {TD} at (115,2) size 448x4 [border: (1px inset #000000)] [r=0 c=1 rs=1 cs=1]
+                    RenderTableRow {TR} at (0,26) size 565x22
+                      RenderTableCell {TD} at (2,26) size 112x22 [border: (1px inset #000000)] [r=1 c=0 rs=1 cs=1]
+                        RenderText {#text} at (2,2) size 108x17
+                          text run at (2,2) width 108: "Search again..."
                 RenderText {#text} at (2,54) size 707x15
                   text run at (2,54) width 327: "This text node only exists once in the original document! "
                   text run at (328,54) width 305: "If it were a large collection of inlines, the page would "

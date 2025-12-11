@@ -260,13 +260,12 @@ layer at (0,0) size 785x1452
                 RenderInline {EM} at (742,0) size 27x18
                   RenderText {#text} at (742,0) size 27x18
                     text run at (742,0) width 27: "Test"
-                  RenderBlock (anonymous) at (0,18) size 769x24
-                    RenderTable {TABLE} at (755,0) size 14x24
-                      RenderTableSection {TBODY} at (0,0) size 14x24
-                        RenderTableRow {TR} at (0,2) size 14x20
-                          RenderTableCell {TD} at (2,2) size 10x20 [r=0 c=0 rs=1 cs=1]
-                            RenderText {#text} at (1,1) size 8x18
-                              text run at (1,1) width 8: "a"
+                  RenderTable {TABLE} at (755,18) size 14x24
+                    RenderTableSection {TBODY} at (0,0) size 14x24
+                      RenderTableRow {TR} at (0,2) size 14x20
+                        RenderTableCell {TD} at (2,2) size 10x20 [r=0 c=0 rs=1 cs=1]
+                          RenderText {#text} at (1,1) size 8x18
+                            text run at (1,1) width 8: "a"
             RenderBlock {UL} at (0,222) size 769x468
               RenderListItem {LI} at (40,0) size 729x18
                 RenderListMarker at (-17,0) size 7x18: bullet

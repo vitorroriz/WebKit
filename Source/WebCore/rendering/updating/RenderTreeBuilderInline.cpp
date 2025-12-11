@@ -466,7 +466,7 @@ void RenderTreeBuilder::Inline::wrapRunsOfBlocksInAnonymousBlock(RenderInline& p
 
     auto wrapRunInAnonymousBlockIfNeeded = [&] {
         // FIXME: Removing wrapping requires changes how RenderBlockFlow handles block formatting state.
-        if (!firstInRun)
+        if (firstInRun == lastInRun)
             return;
 
         auto newBlock = Block::createAnonymousBlockWithStyle(parent.protectedDocument(), parent.containingBlock()->style());
