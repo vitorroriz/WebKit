@@ -215,6 +215,21 @@ enum class AXTextChange : uint8_t { Inserted, Deleted, Replaced, AttributesChang
 
 enum class PostTarget { Element, ObservableParent };
 
+struct DeferredNotificationData {
+    // The renderer or element to post a notification for.
+    SingleThreadWeakPtr<RenderObject> renderer { nullptr };
+    WeakPtr<Element, WeakPtrImplWithEventTargetData> element { nullptr };
+    // The notification to post.
+    AXNotification notification;
+
+    DeferredNotificationData() = delete;
+
+    explicit DeferredNotificationData(RenderObject& renderer, AXNotification notification)
+        : renderer(renderer)
+        , notification(notification)
+    { }
+};
+
 DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(AXObjectCache);
 class AXObjectCache final : public CanMakeWeakPtr<AXObjectCache>, public CanMakeCheckedPtr<AXObjectCache>
     , public AXTreeStore<AXObjectCache> {
@@ -556,6 +571,7 @@ public:
             postNotification(*object, notification);
     }
     void postNotification(AccessibilityObject&, AXNotification);
+    void postDeferredNotification(RenderObject&, AXNotification);
     void postARIANotifyNotification(Node&, const String&, const AriaNotifyOptions&);
 #if PLATFORM(COCOA)
     void postLiveRegionNotification(AccessibilityObject&, LiveRegionStatus, const AttributedString&);
@@ -783,6 +799,7 @@ private:
 #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
     void handleRowspanChanged(AccessibilityNodeObject&);
 #endif
+    void handleDeferredNotification(const DeferredNotificationData&);
 
     // aria-modal or modal <dialog> related
     bool isModalElement(Element&) const;
@@ -928,6 +945,7 @@ private:
 #if PLATFORM(MAC)
     HashMap<PreSortedObjectType, Vector<Ref<AccessibilityObject>>, IntHash<PreSortedObjectType>, WTF::StrongEnumHashTraits<PreSortedObjectType>> m_deferredUnsortedObjects;
 #endif
+    Vector<DeferredNotificationData> m_deferredNotifications;
 
 #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
     Timer m_buildIsolatedTreeTimer;
