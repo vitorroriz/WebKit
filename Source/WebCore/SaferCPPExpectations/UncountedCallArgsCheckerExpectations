@@ -704,7 +704,6 @@ rendering/BorderPainter.cpp
 rendering/CSSFilterRenderer.cpp
 rendering/CaretRectComputation.cpp
 rendering/EllipsisBoxPainter.cpp
-rendering/GlyphDisplayListCache.h
 rendering/HitTestResult.cpp
 rendering/ImageQualityController.cpp
 rendering/InlineBoxPainter.cpp

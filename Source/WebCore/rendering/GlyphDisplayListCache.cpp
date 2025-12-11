@@ -65,9 +65,11 @@ struct GlyphDisplayListCacheKeyTranslator {
         return computeHash(key);
     }
 
-    static bool equal(const SingleThreadWeakRef<GlyphDisplayListCacheEntry>& entryRef, const GlyphDisplayListCacheKey& key)
+    static bool equal(const WeakPtr<GlyphDisplayListCacheEntry, SingleThreadWeakPtrImpl>& entryRef, const GlyphDisplayListCacheKey& key)
     {
-        auto& entry = entryRef.get();
+        if (!entryRef)
+            return false;
+        auto& entry = *entryRef;
         return entry.m_textRun == key.textRun
             && entry.m_scaleFactor == key.scaleFactor
             && entry.m_fontCascadeGeneration == key.fontCascadeGeneration
@@ -117,19 +119,28 @@ RefPtr<const DisplayList::DisplayList> GlyphDisplayListCache::getDisplayList(con
             return nullptr;
     }
 
-    if (auto iterator = m_entries.find<GlyphDisplayListCacheKeyTranslator>(GlyphDisplayListCacheKey { textRun, font, context }); iterator != m_entries.end()) {
-        Ref entry { iterator->get() };
-        RefPtr result = &entry->displayList();
-        const_cast<LayoutRun&>(run).setIsInGlyphDisplayListCache();
-        m_entriesForLayoutRun.add(&run, WTFMove(entry));
-        return result;
+    if (auto iterator = m_entries.findIf([&](auto& weakEntry) {
+        return GlyphDisplayListCacheKeyTranslator::equal(weakEntry, GlyphDisplayListCacheKey { textRun, font, context });
+    }); iterator != m_entries.end()) {
+        RefPtr<GlyphDisplayListCacheEntry> entry = iterator->get();
+        if (!entry)
+            m_entries.remove(iterator);
+        else {
+            const_cast<LayoutRun&>(run).setIsInGlyphDisplayListCache();
+            RefPtr result = &entry->displayList();
+            m_entriesForLayoutRun.add(&run, entry.releaseNonNull());
+            return result;
+        }
     }
 
     if (RefPtr displayList = font.displayListForTextRun(context, textRun)) {
         Ref entry = GlyphDisplayListCacheEntry::create(displayList.releaseNonNull(), textRun, font, context);
         Ref result = entry->displayList();
-        if (canShareDisplayList(result))
-            m_entries.add(entry.get());
+        if (canShareDisplayList(result)) {
+            m_entries.append(entry.get());
+            if (m_entries.size() > s_maxDeduplicationCacheSize)
+                m_entries.removeFirst();
+        }
         const_cast<LayoutRun&>(run).setIsInGlyphDisplayListCache();
         m_entriesForLayoutRun.add(&run, WTFMove(entry));
         return result;
@@ -193,9 +204,5 @@ bool GlyphDisplayListCache::canShareDisplayList(const DisplayList::DisplayList& 
     return true;
 }
 
-GlyphDisplayListCacheEntry::~GlyphDisplayListCacheEntry()
-{
-    GlyphDisplayListCache::singleton().m_entries.remove(this);
-}
 
 } // namespace WebCore
