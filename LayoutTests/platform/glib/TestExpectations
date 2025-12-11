@@ -4851,6 +4851,12 @@ webkit.org/b/303873 imported/w3c/web-platform-tests/trusted-types/navigate-to-ja
 # No USE(AUDIO_SESSION) support:
 media/volume-activate-audio-session.html [ Skip ]
 
+# Does not work on glib platforms
+http/tests/performance/performance-resource-timing-cross-origin-media-with-cors.html [ Skip ]
+http/tests/performance/performance-resource-timing-cross-origin-media.html [ Skip ] 
+http/tests/performance/performance-resource-timing-redirection-cross-origin-media-with-cors.html [ Skip ] 
+http/tests/performance/performance-resource-timing-redirection-cross-origin-media.html [ Skip ]
+
 # End: Common failures between GTK and WPE.
 
 #////////////////////////////////////////////////////////////////////////////////////////
