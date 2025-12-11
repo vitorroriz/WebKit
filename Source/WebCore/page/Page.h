@@ -75,6 +75,10 @@
 #include <WebCore/ShouldRequireExplicitConsentForGamepadAccess.h>
 #endif
 
+#if ENABLE(THREADED_ANIMATIONS)
+#include <WebCore/AcceleratedTimelinesUpdater.h>
+#endif
+
 namespace JSC {
 class Debugger;
 class JSGlobalObject;
@@ -1410,6 +1414,11 @@ public:
     void showCaptionDisplaySettings(HTMLMediaElement&, const ResolvedCaptionDisplaySettingsOptions&, CompletionHandler<void(ExceptionOr<void>)>&&);
 #endif
 
+#if ENABLE(THREADED_ANIMATIONS)
+    AcceleratedTimelinesUpdater* acceleratedTimelinesUpdater() const { return m_acceleratedTimelinesUpdater.get(); }
+    AcceleratedTimelinesUpdater& ensureAcceleratedTimelinesUpdater();
+#endif
+
 private:
     explicit Page(PageConfiguration&&);
 
@@ -1893,6 +1902,11 @@ private:
 #if ENABLE(VIDEO)
     RefPtr<CaptionDisplaySettingsClient> m_captionDisplaySettingsClientForTesting;
 #endif
+
+#if ENABLE(THREADED_ANIMATIONS)
+    const std::unique_ptr<AcceleratedTimelinesUpdater> m_acceleratedTimelinesUpdater;
+#endif
+
 }; // class Page
 
 WTF::TextStream& operator<<(WTF::TextStream&, RenderingUpdateStep);

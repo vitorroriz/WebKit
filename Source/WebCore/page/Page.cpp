@@ -6154,4 +6154,13 @@ void Page::showCaptionDisplaySettings(HTMLMediaElement& element, const ResolvedC
 }
 #endif
 
+#if ENABLE(THREADED_ANIMATIONS)
+AcceleratedTimelinesUpdater& Page::ensureAcceleratedTimelinesUpdater()
+{
+    if (!m_acceleratedTimelinesUpdater)
+        lazyInitialize(m_acceleratedTimelinesUpdater, makeUnique<AcceleratedTimelinesUpdater>());
+    return *m_acceleratedTimelinesUpdater.get();
+}
+#endif
+
 } // namespace WebCore

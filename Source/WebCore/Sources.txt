@@ -624,6 +624,7 @@ accessibility/AccessibilityTableHeaderContainer.cpp
 accessibility/isolatedtree/AXIsolatedObject.cpp
 accessibility/isolatedtree/AXIsolatedTree.cpp
 animation/AcceleratedEffectStackUpdater.cpp
+animation/AcceleratedTimelinesUpdater.cpp
 animation/AnimationEffect.cpp
 animation/AnimationEffectTiming.cpp
 animation/AnimationEventBase.cpp

@@ -903,6 +903,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     accessibility/isolatedtree/AXIsolatedTree.h
 
     animation/AcceleratedEffectStackUpdater.h
+    animation/AcceleratedTimelinesUpdater.h
     animation/AnimationEffect.h
     animation/AnimationEffectPhase.h
     animation/AnimationEffectTiming.h
