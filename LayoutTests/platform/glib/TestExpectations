@@ -4850,6 +4850,9 @@ webkit.org/b/303863 imported/w3c/web-platform-tests/css/css-view-transitions/tra
 webkit.org/b/303865 imported/w3c/web-platform-tests/css/css-overflow/scrollbar-gutter-fixedpos-003.html [ Pass ImageOnlyFailure ]
 webkit.org/b/303873 imported/w3c/web-platform-tests/trusted-types/navigate-to-javascript-url-csp-headers.html [ Pass Failure ]
 
+# No USE(AUDIO_SESSION) support:
+media/volume-activate-audio-session.html [ Skip ]
+
 # End: Common failures between GTK and WPE.
 
 #////////////////////////////////////////////////////////////////////////////////////////

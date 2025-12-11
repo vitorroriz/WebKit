@@ -1174,6 +1174,7 @@ private:
     bool limitedMatroskaSupportEnabled() const;
 
     void maybeUpdatePlayerPreload() const;
+    void canProduceAudioChanged();
 
     Timer m_progressEventTimer;
     Timer m_playbackProgressTimer;
