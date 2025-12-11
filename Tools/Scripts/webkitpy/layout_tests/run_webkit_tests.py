@@ -501,7 +501,7 @@ def _set_up_derived_options(port, options):
             raise RuntimeError('--site-isolation implicitly sets the result flavor, this should not be overridden')
         options.result_report_flavor = 'site-isolation'
 
-    if (port.port_name.startswith('ios')) and options.site_isolation:
+    if port.port_name.startswith(('ios', 'iphone', 'ipad')) and options.site_isolation:
         host = Host()
         host.initialize_scm()
         options.additional_expectations.insert(0, port.host.filesystem.join(host.scm().checkout_root, 'LayoutTests/platform/ios-site-isolation/TestExpectations'))

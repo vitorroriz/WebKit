@@ -57,6 +57,12 @@ def main(argv, stdout, stderr):
         print('{} cannot run API tests'.format(port.operating_system()), file=stderr)
         return EXCEPTIONAL_EXIT_STATUS
 
+    # Add site-isolation results report flavor for API tests when ran
+    if options.site_isolation:
+        if options.result_report_flavor:
+            raise RuntimeError('--site-isolation implicitly sets the result flavor, this should not be overridden')
+        options.result_report_flavor = 'site-isolation'
+
     try:
         return run(port, options, args, stderr)
     except KeyboardInterrupt:
