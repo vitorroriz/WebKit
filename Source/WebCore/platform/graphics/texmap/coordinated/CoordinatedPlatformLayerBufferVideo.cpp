@@ -103,8 +103,11 @@ std::unique_ptr<CoordinatedPlatformLayerBuffer> CoordinatedPlatformLayerBufferVi
     // compositor thread, in paintToTextureMapper(), which also allows us to use the texture mapper
     // bitmap texture pool.
     m_videoFrame.emplace(GstMappedFrame(buffer, videoInfo, GST_MAP_READ));
-    if (!*m_videoFrame)
+    if (!*m_videoFrame) {
+        // If mapping failed, clear the GstMappedFrame holder.
+        m_videoFrame = std::nullopt;
         return nullptr;
+    }
 
     if (GST_VIDEO_INFO_HAS_ALPHA(m_videoFrame->info()))
         m_flags.add({ TextureMapperFlags::ShouldBlend, TextureMapperFlags::ShouldPremultiply });
@@ -205,8 +208,11 @@ std::unique_ptr<CoordinatedPlatformLayerBuffer> CoordinatedPlatformLayerBufferVi
 std::unique_ptr<CoordinatedPlatformLayerBuffer> CoordinatedPlatformLayerBufferVideo::createBufferFromGLMemory(GstBuffer* buffer, const GstVideoInfo* videoInfo)
 {
     m_videoFrame.emplace(GstMappedFrame(buffer, videoInfo, static_cast<GstMapFlags>(GST_MAP_READ | GST_MAP_GL)));
-    if (!*m_videoFrame)
+    if (!*m_videoFrame) {
+        // If mapping failed, clear the GstMappedFrame holder.
+        m_videoFrame = std::nullopt;
         return nullptr;
+    }
 
     if (GST_VIDEO_INFO_HAS_ALPHA(m_videoFrame->info()))
         m_flags.add({ TextureMapperFlags::ShouldBlend, TextureMapperFlags::ShouldPremultiply });
@@ -260,6 +266,7 @@ std::unique_ptr<CoordinatedPlatformLayerBuffer> CoordinatedPlatformLayerBufferVi
 void CoordinatedPlatformLayerBufferVideo::paintToTextureMapper(TextureMapper& textureMapper, const FloatRect& targetRect, const TransformationMatrix& modelViewMatrix, float opacity)
 {
     if (m_videoFrame) {
+        RELEASE_ASSERT(*m_videoFrame);
 #if USE(GSTREAMER_GL)
         if (m_videoDecoderPlatform != GstVideoDecoderPlatform::OpenMAX) {
             if (auto* meta = gst_buffer_get_gl_sync_meta(m_videoFrame->get()->buffer)) {
@@ -286,7 +293,8 @@ void CoordinatedPlatformLayerBufferVideo::paintToTextureMapper(TextureMapper& te
             if (!m_buffer) {
                 int stride = m_videoFrame->planeStride(0);
                 auto srcData = m_videoFrame->planeData(0);
-                texture->updateContents(srcData.data(), IntRect(0, 0, m_size.width(), m_size.height()), IntPoint(0, 0), stride, PixelFormat::BGRA8);
+                IntPoint origin { 0, 0 };
+                texture->updateContents(srcData.data(), IntRect(origin, m_size), origin, stride, PixelFormat::BGRA8);
                 m_buffer = CoordinatedPlatformLayerBufferRGB::create(WTFMove(texture), m_flags, nullptr);
                 m_videoFrame = std::nullopt;
             }
