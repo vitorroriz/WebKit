@@ -178,6 +178,8 @@ ProvisionalPageProxy::~ProvisionalPageProxy()
     }
 
     process->removeProvisionalPageProxy(*this);
+    if (RefPtr takenRemotePage = m_takenRemotePage)
+        takenRemotePage->disconnect();
 }
 
 WebProcessProxy& ProvisionalPageProxy::process()
@@ -279,6 +281,7 @@ void ProvisionalPageProxy::initializeWebPage(RefPtr<API::WebsitePolicies>&& webs
                 m_needsDidStartProvisionalLoad = false;
                 m_needsCookieAccessAddedInNetworkProcess = true;
                 registerWithInspectorController = false; // FIXME: <rdar://121240770> This is a hack. There seems to be a bug in our interaction with WebPageInspectorController.
+                existingRemotePageProxy->disconnect();
             } else
                 m_takenRemotePage = WTFMove(existingRemotePageProxy);
         }
