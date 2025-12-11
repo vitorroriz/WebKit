@@ -1996,6 +1996,19 @@ TEST(WTF_WeakPtr, WeakHashMap_iterator_destruction)
     }
 }
 
+TEST(WTF_WeakPtr, ListHashSetBoundedGrowth)
+{
+    ListHashSet<WeakPtr<BaseObjectWithRefAndWeakPtr>> set;
+    for (size_t i = 0; i < 128; ++i)
+        set.add(BaseObjectWithRefAndWeakPtr::create().get());
+
+    size_t entryCount = 0;
+    for (auto entry : set)
+        ++entryCount;
+
+    EXPECT_LT(entryCount, 16u);
+}
+
 template <typename T>
 unsigned computeSizeOfWeakListHashSet(const WeakListHashSet<T>& set)
 {

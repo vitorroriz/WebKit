@@ -1258,6 +1258,11 @@ DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(HashTable);
         unsigned tableSize = this->tableSize();
         for (unsigned i = 0; i < tableSize; ++i) {
             auto& entry = m_table[i];
+            if constexpr (!HashFunctions::safeToCompareToEmptyOrDeleted) {
+                if (isEmptyOrDeletedBucket(entry))
+                    continue;
+            }
+
             if (isReleasedWeakBucket(entry)) {
                 deleteBucket(entry);
                 setDeletedCount(deletedCount() + 1);
