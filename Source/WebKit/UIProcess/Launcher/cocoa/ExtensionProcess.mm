@@ -33,10 +33,6 @@
 #import <BrowserEngineKit/BrowserEngineKit.h>
 #import <wtf/CrossThreadCopier.h>
 
-#if __has_include(<WebKitAdditions/BEKAdditions.h>)
-#import <WebKitAdditions/BEKAdditions.h>
-#endif
-
 namespace WebKit {
 
 ExtensionProcess::ExtensionProcess(BEWebContentProcess *process)
@@ -81,11 +77,7 @@ PlatformGrant ExtensionProcess::grantCapability(const PlatformCapability& capabi
     NSError *error = nil;
     PlatformGrant grant;
     WTF::switchOn(m_process, [&] (auto& process) {
-#if __has_include(<WebKitAdditions/BEKAdditions.h>)
-        GRANT_ADDITIONS
-#else
-        grant = [process grantCapability:capability.get() error:&error];
-#endif
+        grant = [process grantCapability:capability.get() error:&error invalidationHandler:makeBlockPtr(WTFMove(invalidationHandler)).get()];
     });
     return grant;
 }
