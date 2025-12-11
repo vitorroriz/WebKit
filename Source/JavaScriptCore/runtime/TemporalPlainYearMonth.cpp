@@ -31,6 +31,7 @@
 #include "JSCInlines.h"
 #include "LazyPropertyInlines.h"
 #include "TemporalDuration.h"
+#include "TemporalPlainDate.h"
 #include "TemporalPlainDateTime.h"
 #include "VMTrapsInlines.h"
 
@@ -198,6 +199,35 @@ TemporalPlainYearMonth* TemporalPlainYearMonth::from(JSGlobalObject* globalObjec
         message = "Temporal.PlainYearMonth.from: invalid date string"_s;
     throwRangeError(globalObject, scope, message);
     return { };
+}
+
+ISO8601::PlainDate TemporalPlainYearMonth::with(JSGlobalObject* globalObject, JSObject* temporalYearMonthLike, JSValue optionsValue)
+{
+    VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    rejectObjectWithCalendarOrTimeZone(globalObject, temporalYearMonthLike);
+    RETURN_IF_EXCEPTION(scope, { });
+
+    if (!calendar()->isISO8601()) [[unlikely]] {
+        throwRangeError(globalObject, scope, "unimplemented: with non-ISO8601 calendar"_s);
+        return { };
+    }
+
+
+    auto [optionalMonth, optionalMonthCode, optionalYear] = TemporalPlainDate::toYearMonth(globalObject, temporalYearMonthLike);
+    RETURN_IF_EXCEPTION(scope, { });
+    if (!optionalMonth && !optionalMonthCode && !optionalYear) [[unlikely]] {
+        throwTypeError(globalObject, scope, "Object must contain at least one Temporal date property"_s);
+        return { };
+    }
+
+    TemporalOverflow overflow = toTemporalOverflow(globalObject, optionsValue);
+    RETURN_IF_EXCEPTION(scope, { });
+
+    int32_t y = optionalYear.value_or(year());
+    int32_t m = optionalMonth.value_or(month());
+    RELEASE_AND_RETURN(scope, TemporalCalendar::yearMonthFromFields(globalObject, y, m, optionalMonthCode, overflow));
 }
 
 String TemporalPlainYearMonth::monthCode() const
