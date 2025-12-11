@@ -159,6 +159,9 @@ JSC_DEFINE_NOEXCEPT_JIT_OPERATION_WITH_ATTRIBUTES(ftlUnreachable, NO_RETURN_DUE_
 template<typename OperationResultType>
 concept isB3SupportedExceptionOperationResult = isExceptionOperationResult<OperationResultType> && !std::is_floating_point_v<typename OperationResultType::ResultType>;
 
+template<typename T>
+concept isFunction = std::is_function_v<std::remove_pointer_t<T>>;
+
 class LowerDFGToB3 {
     WTF_MAKE_NONCOPYABLE(LowerDFGToB3);
 public:
@@ -2701,16 +2704,20 @@ private:
         compileBinaryMathIC<JITSubGenerator>(arithProfile, repatchingFunction, nonRepatchingFunction);
     }
 
-    template <typename Generator, typename = typename std::enable_if<std::is_same<Generator, JITAddGenerator>::value>::type>
+    template<typename Generator>
+        requires std::same_as<Generator, JITAddGenerator>
     static JITAddIC* addMathIC(DFG::CommonData& common, BinaryArithProfile* profile) { return common.addJITAddIC(profile); }
 
-    template <typename Generator, typename = typename std::enable_if<std::is_same<Generator, JITMulGenerator>::value>::type>
+    template<typename Generator>
+        requires std::same_as<Generator, JITMulGenerator>
     static JITMulIC* addMathIC(DFG::CommonData& common, BinaryArithProfile* profile) { return common.addJITMulIC(profile); }
 
-    template <typename Generator, typename = typename std::enable_if<std::is_same<Generator, JITNegGenerator>::value>::type>
+    template<typename Generator>
+        requires std::same_as<Generator, JITNegGenerator>
     static JITNegIC* addMathIC(DFG::CommonData& common, UnaryArithProfile* profile) { return common.addJITNegIC(profile); }
 
-    template <typename Generator, typename = typename std::enable_if<std::is_same<Generator, JITSubGenerator>::value>::type>
+    template<typename Generator>
+        requires std::same_as<Generator, JITSubGenerator>
     static JITSubIC* addMathIC(DFG::CommonData& common, BinaryArithProfile* profile) { return common.addJITSubIC(profile); }
 
     void compileValueMul()
@@ -2755,8 +2762,7 @@ private:
         compileBinaryMathIC<JITMulGenerator>(arithProfile, repatchingFunction, nonRepatchingFunction);
     }
 
-    template <typename Generator, typename Func1, typename Func2,
-        typename = std::enable_if_t<std::is_function<typename std::remove_pointer<Func1>::type>::value && std::is_function<typename std::remove_pointer<Func2>::type>::value>>
+    template<typename Generator, isFunction Func1, isFunction Func2>
     void compileUnaryMathIC(UnaryArithProfile* arithProfile, Func1 repatchingFunction, Func2 nonRepatchingFunction)
     {
         Node* node = m_node;
@@ -2842,8 +2848,7 @@ private:
         setJSValue(patchpoint);
     }
 
-    template <typename Generator, typename Func1, typename Func2,
-        typename = std::enable_if_t<std::is_function<typename std::remove_pointer<Func1>::type>::value && std::is_function<typename std::remove_pointer<Func2>::type>::value>>
+    template<typename Generator, isFunction Func1, isFunction Func2>
     void compileBinaryMathIC(BinaryArithProfile* arithProfile, Func1 repatchingFunction, Func2 nonRepatchingFunction)
     {
         Node* node = m_node;
