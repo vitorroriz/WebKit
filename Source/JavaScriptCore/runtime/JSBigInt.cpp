@@ -932,6 +932,76 @@ JSValue JSBigInt::multiply(JSGlobalObject* globalObject, JSBigInt* x, int32_t y)
 }
 #endif
 
+// The algorithm is from "Division by Invariant Integers using Multiplication", Granlund and Montgomery, PLDI'94.
+// https://gmplib.org/~tege/divcnst-pldi94.pdf
+// This is summarized in "Improved division by invariant integers", Moller and Granlund, as "Previous Methods".
+// https://gmplib.org/~tege/division-paper.pdf
+//
+// We implemented both previous and new methods and it turned out that the previous method is faster than the new method.
+// The reason is ARM64 etc. has umulhi, which performs high umul in a extremely fast manner than the older hardware.
+// So making the following adjustment branch more predictable is profitable than avoiding umulhi.
+class DigitDiv {
+    using Digit = JSBigInt::Digit;
+    static constexpr auto digitBits = JSBigInt::digitBits;
+public:
+    DigitDiv(Digit d)
+        : m_divisor(d)
+        , m_inverse(calculateInverse(d))
+    {
+    }
+
+    ALWAYS_INLINE Digit div(Digit high, Digit low, Digit& remainder)
+    {
+        ASSERT(high < m_divisor); // This means that quotient is within Digit. This is an invariant used in digitDiv too.
+        Digit u1 = high;
+        Digit u0 = low;
+        Digit v = m_inverse;
+        Digit d = m_divisor;
+
+        // 1. q = ((v * u1) / beta) + u1
+        Digit q = u1 + static_cast<Digit>((static_cast<TwoDigit>(u1) * static_cast<TwoDigit>(v)) >> digitBits);
+
+        // 2. <p1, p0> = q * d
+        TwoDigit p = static_cast<TwoDigit>(q) * static_cast<TwoDigit>(d);
+
+        // 3. <r1, r0> = <u1, u0> - <p1, p0>
+        TwoDigit u = (static_cast<TwoDigit>(u1) << digitBits) | u0;
+        TwoDigit rem = u - p;
+
+        // 4. while (r1 > 0 || r0 >= d) { q++; <r1, r0> = <r1, r0> - d; }
+        while (rem >= d) {
+            q++;
+            rem -= d;
+        }
+
+        Digit r = static_cast<Digit>(rem);
+
+#if ASSERT_ENABLED
+        Digit refR = 0;
+        Digit refQ = JSBigInt::digitDiv(u1, u0, d, refR);
+        if (!(refR == r && refQ == q)) [[unlikely]] {
+            dataLogLn(u1, " ", u0, " ", d, " ", refR, " ", r, " ", refR == r, " ", refQ, " ", q, " ", refQ == q);
+            ASSERT(refR == r);
+            ASSERT(refQ == q);
+        }
+#endif
+
+        remainder = r;
+        return q;
+    }
+
+private:
+    static ALWAYS_INLINE Digit calculateInverse(Digit d)
+    {
+        ASSERT(d & (1ULL << (digitBits - 1))); // d is already normalized.
+        TwoDigit limit = ~static_cast<TwoDigit>(0);
+        return static_cast<Digit>(limit / d);
+    }
+
+    const Digit m_divisor { };
+    const Digit m_inverse { };
+};
+
 // Computes Q(uotient) and remainder for A/b, such that
 // Q = (A - remainder) / b, with 0 <= remainder < b.
 // If Q.len == 0, only the remainder will be returned.
@@ -1122,6 +1192,7 @@ std::tuple<std::span<JSBigInt::Digit>, std::span<JSBigInt::Digit>> JSBigInt::div
     // Iterate over the dividend's digits (like the "grad school" algorithm).
     // {vn1} is the divisor's most significant digit.
     Digit vn1 = normalizedDivisor[n - 1];
+    DigitDiv digitDiv(vn1);
     for (int j = m; j >= 0; j--) {
         // D3.
         // Estimate the current iteration's quotient digit (see Knuth for details).
@@ -1136,7 +1207,7 @@ std::tuple<std::span<JSBigInt::Digit>, std::span<JSBigInt::Digit>> JSBigInt::div
             // Estimate the current quotient digit by dividing the most significant
             // digits of dividend and divisor. The result will not be too small,
             // but could be a bit too large.
-            qhat = digitDiv(ujn, uSpan[j + n - 1], vn1, rhat);
+            qhat = digitDiv.div(ujn, uSpan[j + n - 1], rhat);
 
             // Decrement the quotient estimate as needed by looking at the next
             // digit, i.e. by testing whether
@@ -1158,18 +1229,16 @@ std::tuple<std::span<JSBigInt::Digit>, std::span<JSBigInt::Digit>> JSBigInt::div
         // it from the dividend. If there was "borrow", then the quotient digit
         // was one too high, so we must correct it and undo one subtraction of
         // the (shifted) divisor.
-        if (qhat == 0)
-            zeroSpan(qhatvSpan);
-        else {
+        if (qhat != 0) {
             auto filled = multiplySingle(normalizedDivisor, qhat, qhatvSpan);
             zeroSpan(qhatvSpan.subspan(filled.size()));
-        }
 
-        Digit c = inplaceSub(uSpan.subspan(j), qhatvSpan);
-        if (c) {
-            c = inplaceAdd(uSpan.subspan(j), normalizedDivisor);
-            uSpan[j + n] = uSpan[j + n] + c;
-            qhat--;
+            Digit c = inplaceSub(uSpan.subspan(j), qhatvSpan);
+            if (c) {
+                c = inplaceAdd(uSpan.subspan(j), normalizedDivisor);
+                uSpan[j + n] = uSpan[j + n] + c;
+                qhat--;
+            }
         }
 
         if (!q.empty()) {

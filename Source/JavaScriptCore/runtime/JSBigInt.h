@@ -485,6 +485,17 @@ public:
     static constexpr unsigned halfDigitBits = digitBits / 2;
     static constexpr Digit halfDigitMask = (1ull << halfDigitBits) - 1;
 
+    // Digit arithmetic helpers.
+    static Digit digitAdd(Digit a, Digit b, Digit& carry);
+    static Digit digitAdd3(Digit a, Digit b, Digit c, Digit& carry);
+    static Digit digitSub(Digit a, Digit b, Digit& borrow);
+    static Digit digitSub2(Digit a, Digit b, Digit borrowIn, Digit& borrowOut);
+    static std::tuple<Digit, Digit> digitMul(Digit a, Digit b);
+    static Digit digitDiv(Digit high, Digit low, Digit divisor, Digit& remainder);
+    static Digit digitPow(Digit base, Digit exponent);
+    static Digit subtractAndReturnBorrow(std::span<Digit> z, std::span<const Digit> x, std::span<const Digit> y);
+    static Digit addAndReturnCarry(std::span<Digit> z, std::span<const Digit> x, std::span<const Digit> y);
+
 private:
     JSBigInt(VM&, Structure*, Digit*, unsigned length);
 
@@ -570,16 +581,6 @@ private:
     template <typename BigIntImpl>
     static JSBigInt* absoluteSubOne(JSGlobalObject*, BigIntImpl x, unsigned resultLength);
 
-    // Digit arithmetic helpers.
-    static Digit digitAdd(Digit a, Digit b, Digit& carry);
-    static Digit digitAdd3(Digit a, Digit b, Digit c, Digit& carry);
-    static Digit digitSub(Digit a, Digit b, Digit& borrow);
-    static Digit digitSub2(Digit a, Digit b, Digit borrowIn, Digit& borrowOut);
-    static std::tuple<Digit, Digit> digitMul(Digit a, Digit b);
-    static Digit digitDiv(Digit high, Digit low, Digit divisor, Digit& remainder);
-    static Digit digitPow(Digit base, Digit exponent);
-    static Digit subtractAndReturnBorrow(std::span<Digit> z, std::span<const Digit> x, std::span<const Digit> y);
-    static Digit addAndReturnCarry(std::span<Digit> z, std::span<const Digit> x, std::span<const Digit> y);
     static Digit inplaceAdd(std::span<Digit> z, std::span<const Digit> x);
     static Digit inplaceSub(std::span<Digit> z, std::span<const Digit> x);
     static std::span<Digit> rightShift(std::span<Digit> z, std::span<const Digit> x, unsigned);
