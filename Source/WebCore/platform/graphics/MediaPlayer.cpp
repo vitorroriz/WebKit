@@ -108,6 +108,7 @@
 #endif
 
 #if ENABLE(WIRELESS_PLAYBACK_MEDIA_PLAYER)
+#include "MediaDeviceRouteController.h"
 #include "MediaPlayerPrivateWirelessPlayback.h"
 #endif
 
@@ -368,7 +369,7 @@ static void buildMediaEnginesVector() WTF_REQUIRES_LOCK(mediaEngineVectorLock)
 
 #if ENABLE(WIRELESS_PLAYBACK_MEDIA_PLAYER)
     if (DeprecatedGlobalSettings::isWirelessPlaybackMediaPlayerEnabled()) {
-        if (registerRemoteEngine)
+        if (registerRemoteEngine && !mockMediaDeviceRouteControllerEnabled())
             registerRemoteEngine(addMediaEngine, MediaPlayerEnums::MediaEngineIdentifier::WirelessPlayback);
         else
             MediaPlayerPrivateWirelessPlayback::registerMediaEngine(addMediaEngine);

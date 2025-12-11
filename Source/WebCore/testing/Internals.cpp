@@ -429,6 +429,10 @@
 #include "ImageControlsMac.h"
 #endif
 
+#if ENABLE(WIRELESS_PLAYBACK_MEDIA_PLAYER)
+#import "MockMediaDeviceRouteController.h"
+#endif
+
 using JSC::CallData;
 using JSC::CodeBlock;
 using JSC::FunctionExecutable;
@@ -788,6 +792,13 @@ Internals::Internals(Document& document)
 
 #if ENABLE(DAMAGE_TRACKING)
     document.page()->chrome().client().resetDamageHistoryForTesting();
+#endif
+
+#if ENABLE(WIRELESS_PLAYBACK_MEDIA_PLAYER)
+    if (RefPtr mockMediaDeviceRouteController = m_mockMediaDeviceRouteController) {
+        m_mockMediaDeviceRouteController->setEnabled(false);
+        m_mockMediaDeviceRouteController = nullptr;
+    }
 #endif
 }
 
@@ -8212,5 +8223,14 @@ ExceptionOr<void> Internals::copyImageAtLocation(int x, int y)
     UNUSED_PARAM(y);
     return { };
 }
+
+#if ENABLE(WIRELESS_PLAYBACK_MEDIA_PLAYER)
+MockMediaDeviceRouteController& Internals::mockMediaDeviceRouteController()
+{
+    if (!m_mockMediaDeviceRouteController)
+        m_mockMediaDeviceRouteController = MockMediaDeviceRouteController::create();
+    return *m_mockMediaDeviceRouteController;
+}
+#endif
 
 } // namespace WebCore

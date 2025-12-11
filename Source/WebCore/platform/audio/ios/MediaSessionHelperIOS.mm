@@ -30,7 +30,6 @@
 
 #import "Logging.h"
 #import "MediaDeviceRoute.h"
-#import "MediaDeviceRouteController.h"
 #import "MediaPlaybackTargetCocoa.h"
 #import "MediaPlaybackTargetWirelessPlayback.h"
 #import "PlatformMediaSessionManager.h"
@@ -91,7 +90,7 @@ class MediaSessionHelperIOS;
 class MediaSessionHelperIOS final
     : public MediaSessionHelper
 #if HAVE(AVROUTING_FRAMEWORK)
-    , private MediaDeviceRouteControllerClient
+    , public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<MediaSessionHelperIOS>
 #endif
 {
 public:
@@ -118,10 +117,6 @@ private:
     void providePresentingApplicationPID(ProcessID) final;
     void startMonitoringWirelessRoutesInternal() final;
     void stopMonitoringWirelessRoutesInternal() final;
-
-#if HAVE(AVROUTING_FRAMEWORK)
-    void activeRoutesDidChange(MediaDeviceRouteController&) final;
-#endif
 
     const RetainPtr<WebMediaSessionHelper> m_objcObserver;
 #if HAVE(MEDIAEXPERIENCE_AVSYSTEMCONTROLLER)
@@ -295,6 +290,18 @@ void MediaSessionHelper::setActiveAudioRouteSupportsSpatialPlayback(bool support
     activeAudioRouteSupportsSpatialPlaybackDidChange(supports ? SupportsSpatialAudioPlayback::Yes : SupportsSpatialAudioPlayback::No);
 }
 
+#if HAVE(AVROUTING_FRAMEWORK)
+void MediaSessionHelper::activeRoutesDidChange(MediaDeviceRouteController& routeController)
+{
+    if (RefPtr mostRecentActiveRoute = routeController.mostRecentActiveRoute()) {
+        activeVideoRouteDidChange(SupportsAirPlayVideo::Yes, MediaPlaybackTargetWirelessPlayback::create(*mostRecentActiveRoute));
+        return;
+    }
+
+    // FIXME: Reset the active route for local playback
+}
+#endif // HAVE(AVROUTING_FRAMEWORK)
+
 MediaSessionHelperIOS::MediaSessionHelperIOS()
 {
     BEGIN_BLOCK_OBJC_EXCEPTIONS
@@ -411,20 +418,6 @@ void MediaSessionHelperIOS::externalOutputDeviceAvailableDidChange()
 
     MediaSessionHelper::externalOutputDeviceAvailableDidChange(hasAvailableTargets);
 }
-
-#if HAVE(AVROUTING_FRAMEWORK)
-void MediaSessionHelperIOS::activeRoutesDidChange(MediaDeviceRouteController& routeController)
-{
-    if (RefPtr mostRecentActiveRoute = routeController.mostRecentActiveRoute()) {
-        MediaSessionHelper::activeVideoRouteDidChange(SupportsAirPlayVideo::Yes, MediaPlaybackTargetWirelessPlayback::create(*mostRecentActiveRoute));
-        return;
-    }
-
-#if PLATFORM(IOS_FAMILY) && !PLATFORM(IOS_FAMILY_SIMULATOR) && !PLATFORM(MACCATALYST) && !PLATFORM(WATCHOS)
-    activeVideoRouteDidChange();
-#endif
-}
-#endif // HAVE(AVROUTING_FRAMEWORK)
 
 @implementation WebMediaSessionHelper
 

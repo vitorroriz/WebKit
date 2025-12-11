@@ -33,7 +33,7 @@
 
 #define FOR_EACH_READONLY_KEY_PATH(Macro) \
     Macro(minValue, MinValue, float) \
-    Macro(maxValue, MinValue, float) \
+    Macro(maxValue, MaxValue, float) \
     Macro(segments, Segments, Vector<MediaTimelineSegment>) \
     Macro(currentSegment, CurrentSegment, std::optional<MediaTimelineSegment>) \
     Macro(state, State, MediaPlaybackSourceState) \

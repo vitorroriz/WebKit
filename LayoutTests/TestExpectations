@@ -8162,3 +8162,5 @@ imported/w3c/web-platform-tests/css/CSS2/stacking-context/opacity-affects-block-
 imported/w3c/web-platform-tests/css/CSS2/stacking-context/zindex-affects-block-in-inline.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/webrtc/RTCDataChannel-worker-GC.html [ Failure Pass ]
 imported/w3c/web-platform-tests/webrtc/RTCRtpReceiver-track-settings.tentative.html [ Failure Pass ]
+
+media/wireless-playback-media-player/ [ Skip ]

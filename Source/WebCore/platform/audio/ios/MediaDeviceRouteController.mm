@@ -68,18 +68,6 @@ RefPtr<MediaDeviceRoute> MediaDeviceRouteController::routeForIdentifier(const st
     return nullptr;
 }
 
-bool MediaDeviceRouteController::handleEvent(WebMediaDevicePlatformRouteEvent *event)
-{
-    switch (event.reason) {
-    case WebMediaDevicePlatformRouteEventReasonActivate:
-        return activateRoute(event.route);
-    case WebMediaDevicePlatformRouteEventReasonDeactivate:
-        return deactivateRoute(event.route);
-    }
-
-    RELEASE_ASSERT_NOT_REACHED();
-}
-
 bool MediaDeviceRouteController::activateRoute(WebMediaDevicePlatformRoute *platformRoute)
 {
     m_activeRoutes.removeAllMatching([&](auto& route) { return route->platformRoute() == platformRoute; });
@@ -100,6 +88,21 @@ bool MediaDeviceRouteController::deactivateRoute(WebMediaDevicePlatformRoute *pl
         client->activeRoutesDidChange(*this);
 
     return true;
+}
+
+static bool& mockMediaDeviceRouteControllerEnabledValue()
+{
+    static bool mockMediaDeviceRouteControllerEnabled;
+    return mockMediaDeviceRouteControllerEnabled;
+}
+
+void setMockMediaDeviceRouteControllerEnabled(bool isEnabled)
+{
+    mockMediaDeviceRouteControllerEnabledValue() = isEnabled;
+}
+bool mockMediaDeviceRouteControllerEnabled()
+{
+    return mockMediaDeviceRouteControllerEnabledValue();
 }
 
 } // namespace WebCore

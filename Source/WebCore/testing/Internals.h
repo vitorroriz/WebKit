@@ -119,6 +119,7 @@ class MessagePort;
 class MockCDMFactory;
 class MockCaptionDisplaySettingsClientCallback;
 class MockContentFilterSettings;
+class MockMediaDeviceRouteController;
 class MockPageOverlay;
 class MockPaymentCoordinator;
 class NodeList;
@@ -1662,6 +1663,10 @@ public:
 
     size_t fileConnectionHandleCount(const FileSystemHandle&) const;
 
+#if ENABLE(WIRELESS_PLAYBACK_MEDIA_PLAYER)
+    MockMediaDeviceRouteController& mockMediaDeviceRouteController();
+#endif
+
 private:
     explicit Internals(Document&);
 
@@ -1736,6 +1741,9 @@ private:
 #if ENABLE(VIDEO)
     std::unique_ptr<CaptionUserPreferencesTestingModeToken> m_testingModeToken;
     RefPtr<MockCaptionDisplaySettingsClientCallback> m_mockCaptionDisplaySettingsClientCallback;
+#endif
+#if ENABLE(WIRELESS_PLAYBACK_MEDIA_PLAYER)
+    RefPtr<MockMediaDeviceRouteController> m_mockMediaDeviceRouteController;
 #endif
 };
 

@@ -1498,4 +1498,6 @@ enum ContentsFormat {
     // Navigation API rate limiter testing
     undefined setNavigationRateLimiterParameters(DOMWindow window, unsigned long maxNavigations, double windowDurationSeconds);
     undefined resetNavigationRateLimiter(DOMWindow window);
+
+    [Conditional=WIRELESS_PLAYBACK_MEDIA_PLAYER] readonly attribute MockMediaDeviceRouteController mockMediaDeviceRouteController;
 };
