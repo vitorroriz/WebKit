@@ -87,9 +87,7 @@ void CoordinatedBackingStoreTile::processPendingUpdates(TextureMapper& textureMa
             m_texture->reset(update.tileRect.size(), flags);
         WTFEndSignpost(this, AcquireTexture);
 
-        WTFBeginSignpost(this, WaitPaintingCompletion);
         update.buffer->waitUntilPaintingComplete();
-        WTFEndSignpost(this, WaitPaintingCompletion);
 
 #if USE(SKIA)
         if (update.buffer->isBackedByOpenGL()) {

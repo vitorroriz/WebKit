@@ -179,8 +179,8 @@ enum TracePointCode {
 #if PLATFORM(GTK) || PLATFORM(WPE)
     GTKWPEPortRange = 20000,
 
-    UpdateRenderingStart,
-    UpdateRenderingEnd,
+    LayerTreeHostRenderingUpdateStart,
+    LayerTreeHostRenderingUpdateEnd,
     WaitForCompositionCompletionStart,
     WaitForCompositionCompletionEnd,
     RenderLayerTreeStart,

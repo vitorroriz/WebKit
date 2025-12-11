@@ -411,8 +411,24 @@ void ThreadedCompositor::requestComposition(CompositionReason reason)
     scheduleUpdateLocked();
 }
 
+ASCIILiteral ThreadedCompositor::stateToString(ThreadedCompositor::State state)
+{
+    switch (state) {
+    case State::Idle:
+        return "Idle"_s;
+    case State::Scheduled:
+        return "Scheduled"_s;
+    case State::InProgress:
+        return "InProgress"_s;
+    case State::ScheduledWhileInProgress:
+        return "ScheduledWhileInProgress"_s;
+    }
+    RELEASE_ASSERT_NOT_REACHED();
+}
+
 void ThreadedCompositor::scheduleUpdateLocked()
 {
+    WTFEmitSignpost(this, ScheduleComposition, "reasons: %s, state: %s, waiting for tiles: %s, render timer active: %s", reasonsToString(m_state.reasons).ascii().data(), stateToString(m_state.state).characters(), m_state.isWaitingForTiles ? "yes" : "no", m_renderTimer.isActive() ? "yes" : "no");
     switch (m_state.state) {
     case State::Idle:
         m_state.state = State::Scheduled;
@@ -434,9 +450,10 @@ void ThreadedCompositor::scheduleUpdateLocked()
 void ThreadedCompositor::frameComplete()
 {
     ASSERT(m_workQueue->runLoop().isCurrent());
-    WTFEmitSignpost(this, FrameComplete);
 
     Locker locker { m_state.lock };
+    WTFEmitSignpost(this, FrameComplete, "reasons: %s, state: %s, waiting for tiles: %s", reasonsToString(m_state.reasons).ascii().data(), stateToString(m_state.state).characters(), m_state.isWaitingForTiles ? "yes" : "no");
+
     switch (m_state.state) {
     case State::Idle:
     case State::Scheduled:

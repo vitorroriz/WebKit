@@ -127,6 +127,7 @@ private:
         InProgress,
         ScheduledWhileInProgress
     };
+    static ASCIILiteral stateToString(State);
 
     struct {
         mutable Lock lock;
