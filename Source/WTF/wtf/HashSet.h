@@ -144,6 +144,7 @@ public:
     bool remove(const ValueType&);
     bool remove(iterator);
     bool removeIf(NOESCAPE const Invocable<bool(const ValueType&)> auto&);
+    void removeWeakNullEntries();
     void clear();
 
     TakeType take(const ValueType&);
@@ -403,6 +404,12 @@ template<typename T, typename U, typename V, typename W, ShouldValidateKey shoul
 inline bool HashSet<T, U, V, W, shouldValidateKey>::removeIf(NOESCAPE const Invocable<bool(const ValueType&)> auto& functor)
 {
     return m_impl.removeIf(functor);
+}
+
+template<typename T, typename U, typename V, typename W, ShouldValidateKey shouldValidateKey>
+inline void HashSet<T, U, V, W, shouldValidateKey>::removeWeakNullEntries()
+{
+    m_impl.removeWeakNullEntries();
 }
 
 template<typename T, typename U, typename V, typename W, ShouldValidateKey shouldValidateKey>

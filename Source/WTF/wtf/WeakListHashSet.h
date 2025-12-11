@@ -339,11 +339,10 @@ public:
 
     void checkConsistency() { } // To be implemented.
 
-    bool removeNullReferences()
+    void removeNullReferences()
     {
-        bool didRemove = m_set.removeIf([] (auto& value) { return !value.get(); });
+        m_set.removeWeakNullEntries();
         cleanupHappened();
-        return didRemove;
     }
 
     T& first()

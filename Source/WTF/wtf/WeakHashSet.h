@@ -224,11 +224,10 @@ private:
         m_maxOperationCountWithoutCleanup = std::min(std::numeric_limits<unsigned>::max() / 2, m_set.size()) * 2;
     }
 
-    ALWAYS_INLINE bool removeNullReferences()
+    ALWAYS_INLINE void removeNullReferences()
     {
-        bool didRemove = m_set.removeIf([] (auto& value) { return !value.get(); });
+        m_set.removeWeakNullEntries();
         cleanupHappened();
-        return didRemove;
     }
 
     ALWAYS_INLINE unsigned increaseOperationCountSinceLastCleanup(unsigned count = 1) const

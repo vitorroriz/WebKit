@@ -310,8 +310,8 @@ template<typename P, typename WeakPtrImpl> struct WeakPtrHashTraits : SimpleClas
     static constexpr bool hasIsEmptyValueFunction = true;
     static bool isEmptyValue(const WeakPtr<P, WeakPtrImpl>& value) { return value.isHashTableEmptyValue(); }
 
-    static constexpr bool hasIsReleasedWeakValueFunction = true;
-    static bool isReleasedWeakValue(const WeakPtr<P, WeakPtrImpl>& value) { return value.isWeakNullValue(); }
+    static constexpr bool hasIsWeakNullValueFunction = true;
+    static bool isWeakNullValue(const WeakPtr<P, WeakPtrImpl>& value) { return value.isWeakNullValue(); }
 
     using PeekType = P*;
     static PeekType peek(const WeakPtr<P, WeakPtrImpl>& value) { return const_cast<PeekType>(value.ptrAllowingHashTableEmptyValue()); }

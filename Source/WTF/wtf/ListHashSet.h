@@ -91,8 +91,8 @@ private:
     struct NodeTraits : public HashTraits<std::unique_ptr<Node>> {
         using ValueTraits = HashTraits<ValueArg>;
 
-        static constexpr bool hasIsReleasedWeakValueFunction = ValueTraits::hasIsReleasedWeakValueFunction;
-        static bool isReleasedWeakValue(const std::unique_ptr<Node>& node) { return isHashTraitsReleasedWeakValue<ValueTraits>(node->m_value); }
+        static constexpr bool hasIsWeakNullValueFunction = ValueTraits::hasIsWeakNullValueFunction;
+        static bool isWeakNullValue(const std::unique_ptr<Node>& node) { return isHashTraitsWeakNullValue<ValueTraits>(node->m_value); }
     };
 
     typedef ListHashSetNodeHashFunctions<HashArg> NodeHash;
@@ -184,6 +184,7 @@ public:
     bool remove(const ValueType&);
     bool remove(iterator);
     bool removeIf(NOESCAPE const Invocable<bool(ValueType&)> auto&);
+    void removeWeakNullEntries();
     void clear();
 
     // Overloads for smart pointer values that take the raw pointer type as the parameter.
@@ -799,6 +800,12 @@ inline bool ListHashSet<T, U>::remove(const ValueType& value)
         return false;
     m_impl.remove(it);
     return true;
+}
+
+template<typename T, typename U>
+inline void ListHashSet<T, U>::removeWeakNullEntries()
+{
+    m_impl.removeWeakNullEntries();
 }
 
 template<typename T, typename U>

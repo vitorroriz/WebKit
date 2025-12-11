@@ -118,7 +118,7 @@ public:
 
     static constexpr unsigned probeDistanceThreshold = 128;
 
-    static_assert(!KeyTraits::hasIsReleasedWeakValueFunction);
+    static_assert(!KeyTraits::hasIsWeakNullValueFunction);
     static_assert(HashFunctions::hasHashInValue);
 
     RobinHoodHashTable() = default;

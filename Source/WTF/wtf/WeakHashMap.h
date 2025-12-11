@@ -371,11 +371,10 @@ public:
         return m_map.size();
     }
 
-    NEVER_INLINE bool removeNullReferences()
+    NEVER_INLINE void removeNullReferences()
     {
-        bool result = m_map.removeIf([](auto& iterator) { return !iterator.key.get(); });
+        m_map.removeWeakNullEntries();
         cleanupHappened();
-        return result;
     }
 
 #if ASSERT_ENABLED
