@@ -4109,8 +4109,6 @@ webgl/2.0.y/conformance/textures/misc/texture-corner-case-videos.html [ Skip ] #
 [ Debug ] imported/blink/fast/hidpi/border-background-align.html [ ImageOnlyFailure Pass ]
 [ Debug ] imported/blink/svg/zoom/text/lowdpi-zoom-text.html [ Crash ]
 
-webkit.org/b/303928 http/tests/pasteboard/copy-image-from-context-menu.html [ Crash ]
-
 # Test causes OOM in the EWS release bots
 webkit.org/b/283558 fast/css-custom-paint/out-of-memory-while-adding-worklet-module.html [ Skip ]
 
