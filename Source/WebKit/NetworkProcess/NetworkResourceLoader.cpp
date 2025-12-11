@@ -295,7 +295,7 @@ void NetworkResourceLoader::startContentFiltering(ResourceRequest&& request, Com
         completionHandler(WTFMove(request));
         return;
     }
-    NetworkProcess::setSharedParentalControlsURLFilterIfNecessary();
+
     m_contentFilter = ContentFilter::create(*this);
     CheckedPtr contentFilter = m_contentFilter.get();
 #if HAVE(AUDIT_TOKEN)

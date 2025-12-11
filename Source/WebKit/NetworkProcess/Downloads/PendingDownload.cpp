@@ -51,10 +51,6 @@ PendingDownload::PendingDownload(IPC::Connection* parentProcessConnection, Netwo
 {
     relaxAdoptionRequirement();
 
-#if ENABLE(CONTENT_FILTERING)
-    NetworkProcess::setSharedParentalControlsURLFilterIfNecessary();
-#endif
-
 #if HAVE(WEBCONTENTRESTRICTIONS)
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
     m_urlFilter = ParentalControlsURLFilter::filterWithConfigurationPath();

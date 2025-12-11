@@ -199,18 +199,6 @@ NetworkProcess::NetworkProcess(AuxiliaryProcessInitializationParameters&& parame
 
 NetworkProcess::~NetworkProcess() = default;
 
-void NetworkProcess::setSharedParentalControlsURLFilterIfNecessary()
-{
-#if HAVE(BROWSERENGINEKIT_WEBCONTENTFILTER) && !HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
-    ASSERT(isMainRunLoop());
-    static bool initialized = false;
-    if (!initialized) {
-        WebCore::ParentalControlsURLFilter::setGlobalFilter(WebParentalControlsURLFilter::create());
-        initialized = true;
-    }
-#endif
-}
-
 AuthenticationManager& NetworkProcess::authenticationManager()
 {
     return *supplement<AuthenticationManager>();
@@ -379,6 +367,10 @@ void NetworkProcess::initializeNetworkProcess(NetworkProcessCreationParameters&&
 
     if (parameters.defaultRequestTimeoutInterval)
         setDefaultRequestTimeoutInterval(*parameters.defaultRequestTimeoutInterval);
+
+#if HAVE(BROWSERENGINEKIT_WEBCONTENTFILTER) && !HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
+    WebCore::ParentalControlsURLFilter::setGlobalFilter(WebParentalControlsURLFilter::create());
+#endif
 
     RELEASE_LOG(Process, "%p - NetworkProcess::initializeNetworkProcess: Presenting processPID=%d", this, legacyPresentingApplicationPID());
 }
