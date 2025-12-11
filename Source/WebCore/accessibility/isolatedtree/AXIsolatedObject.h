@@ -633,7 +633,7 @@ private:
         {
             ASSERT(isMainThread());
 
-            auto* cache = m_tree->axObjectCache();
+            CheckedPtr cache = m_tree->axObjectCache();
             return cache ? cache->objectForID(m_axID) : nullptr;
         }
 
