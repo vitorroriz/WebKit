@@ -439,7 +439,7 @@ MediaTime MediaPlayerPrivateMediaSourceAVFObjC::clampTimeToSensicalValue(const M
 bool MediaPlayerPrivateMediaSourceAVFObjC::setCurrentTimeDidChangeCallback(MediaPlayer::CurrentTimeDidChangeCallback&& callback)
 {
     assertIsMainThread();
-    m_renderer->setTimeObserver(10_ms, [weakThis = WeakPtr { *this }, callback = WTFMove(callback)](const MediaTime& currentTime) mutable {
+    m_renderer->setTimeObserver(100_ms, [weakThis = WeakPtr { *this }, callback = WTFMove(callback)](const MediaTime& currentTime) mutable {
         // This method is only used with the RemoteMediaPlayerProxy and RemoteAudioVideoRendererProxyManager where m_renderer is an AudioVideoRendererAVFObjC that runs on the main thread only (for now).
         assertIsMainThread();
         if (RefPtr protectedThis = weakThis.get())
