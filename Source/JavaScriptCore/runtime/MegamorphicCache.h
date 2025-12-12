@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2023-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -151,11 +151,11 @@ public:
 
     MegamorphicCache() = default;
 
-#if CPU(ADDRESS64) && !ENABLE(STRUCTURE_ID_WITH_SHIFT)
+#if CPU(ADDRESS64)
     // Because Structure is allocated with 16-byte alignment, we should assume that StructureID's lower 4 bits are zeros.
     static constexpr unsigned structureIDHashShift1 = 4;
 #else
-    // When using STRUCTURE_ID_WITH_SHIFT, all bits can be different. Thus we do not need to shift the first level.
+    // With 32-bit addresses, all bits can be different. Thus we do not need to shift the first level.
     static constexpr unsigned structureIDHashShift1 = 0;
 #endif
     static constexpr unsigned structureIDHashShift2 = structureIDHashShift1 + 11;

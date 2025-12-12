@@ -20842,13 +20842,7 @@ IGNORE_CLANG_WARNINGS_END
 
     LValue encodeStructureID(LValue structure)
     {
-#if ENABLE(STRUCTURE_ID_WITH_SHIFT)
-        return m_out.castToInt32(m_out.lShr(structure, m_out.constInt32(StructureID::encodeShiftAmount)));
-#elif CPU(ADDRESS64)
-        return m_out.castToInt32(m_out.bitAnd(structure, m_out.constInt64(StructureID::structureIDMask)));
-#else
         return m_out.castToInt32(structure);
-#endif
     }
 
     void storeStructure(LValue object, LValue structure)
@@ -25289,16 +25283,7 @@ IGNORE_CLANG_WARNINGS_END
 
     LValue decodeNonNullStructure(LValue structureID)
     {
-#if ENABLE(STRUCTURE_ID_WITH_SHIFT)
-        return m_out.shl(m_out.zeroExtPtr(structureID), m_out.constIntPtr(StructureID::encodeShiftAmount));
-#else
-        LValue maskedStructureID = structureID;
-        if constexpr (structureHeapAddressSize < 4 * GB) {
-            static_assert(static_cast<uint32_t>(StructureID::structureIDMask) == StructureID::structureIDMask);
-            maskedStructureID = m_out.bitAnd(structureID, m_out.constInt32(static_cast<uint32_t>(StructureID::structureIDMask)));
-        }
-        return m_out.bitOr(m_out.constIntPtr(startOfStructureHeap()), m_out.zeroExtPtr(maskedStructureID));
-#endif
+        return m_out.bitOr(m_out.constIntPtr(structureIDBase()), m_out.zeroExtPtr(structureID));
     }
 
     LValue loadStructure(LValue value)

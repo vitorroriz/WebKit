@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2016-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -4253,28 +4253,14 @@ void OMGIRGenerator::emitCheckOrBranchForCast(CastKind kind, Value* condition, c
 
 Value* OMGIRGenerator::decodeNonNullStructure(Value* structureID)
 {
-#if ENABLE(STRUCTURE_ID_WITH_SHIFT)
-    return m_currentBlock->appendNew<Value>(m_proc, B3::Shl, pointerType(), origin(),
-        m_currentBlock->appendNew<Value>(m_proc, ZExt32, origin(), structureID),
-        constant(pointerType(), StructureID::encodeShiftAmount));
-#else
-    if constexpr (structureHeapAddressSize < 4 * GB) {
-        static_assert(static_cast<uint32_t>(StructureID::structureIDMask) == StructureID::structureIDMask);
-        structureID = m_currentBlock->appendNew<Value>(m_proc, B3::BitAnd, origin(), structureID, constant(Int32, static_cast<uint32_t>(StructureID::structureIDMask)));
-    }
     return m_currentBlock->appendNew<Value>(m_proc, B3::BitOr, origin(),
         m_currentBlock->appendNew<Value>(m_proc, ZExt32, origin(), structureID),
-        constant(pointerType(), startOfStructureHeap()));
-#endif
+        constant(pointerType(), structureIDBase()));
 }
 
 Value* OMGIRGenerator::encodeStructureID(Value* structure)
 {
-#if ENABLE(STRUCTURE_ID_WITH_SHIFT)
-    return m_currentBlock->appendNew<B3::Value>(m_proc, B3::Trunc, origin(), m_currentBlock->appendNew<Value>(m_proc, ZShr, origin(), structure, constant(Int32, StructureID::encodeShiftAmount)));
-#else
-    return m_currentBlock->appendNew<B3::Value>(m_proc, B3::Trunc, origin(), m_currentBlock->appendNew<Value>(m_proc, B3::BitAnd, origin(), structure, constant(pointerType(), StructureID::structureIDMask)));
-#endif
+    return m_currentBlock->appendNew<B3::Value>(m_proc, B3::Trunc, origin(), structure);
 }
 
 Value* OMGIRGenerator::allocatorForWasmGCHeapCellSize(Value* sizeInBytes, BasicBlock* slowPath)
