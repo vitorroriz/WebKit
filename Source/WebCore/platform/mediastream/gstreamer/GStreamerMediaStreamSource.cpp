@@ -864,9 +864,9 @@ private:
     GRefPtr<GstStream> m_stream;
     bool m_isVideoTrack { false };
     std::pair<Seconds, unsigned> m_frameRateStats { Seconds::nan(), 0 };
-    double m_audioLevel;
-    double m_totalAudioSamplesDuration;
-    double m_totalAudioEnergy;
+    double m_audioLevel { 0 };
+    double m_totalAudioSamplesDuration { 0 };
+    double m_totalAudioEnergy { 0 };
     unsigned m_audioSamplesCountSinceLastTotalEnergyCalculation { 0 };
     GUniquePtr<GstStructure> m_stats;
 };
