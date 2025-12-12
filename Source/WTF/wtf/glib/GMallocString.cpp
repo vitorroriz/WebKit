@@ -30,14 +30,11 @@
 #include <wtf/glib/GMallocString.h>
 
 #include <wtf/PrintStream.h>
-#include <wtf/text/CStringView.h>
-#include <wtf/text/MakeString.h>
-#include <wtf/text/StringView.h>
-#include <wtf/text/WTFString.h>
 
 namespace WTF {
 
-void GMallocString::dump(PrintStream& out) const LIFETIME_BOUND {
+void GMallocString::dump(PrintStream& out) const
+{
     out.print(span());
 }
 
