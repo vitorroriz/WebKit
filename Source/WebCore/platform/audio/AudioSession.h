@@ -29,6 +29,7 @@
 
 #include <memory>
 #include <wtf/AbstractRefCountedAndCanMakeWeakPtr.h>
+#include <wtf/AbstractThreadSafeRefCountedAndCanMakeWeakPtr.h>
 #include <wtf/CompletionHandler.h>
 #include <wtf/NeverDestroyed.h>
 #include <wtf/Noncopyable.h>
@@ -93,7 +94,7 @@ public:
     virtual void routingContextUIDDidChange(const AudioSession&) { }
 };
 
-class WEBCORE_EXPORT AudioSession : public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<AudioSession> {
+class WEBCORE_EXPORT AudioSession : public AbstractThreadSafeRefCountedAndCanMakeWeakPtr {
     WTF_MAKE_TZONE_ALLOCATED_EXPORT(AudioSession, WEBCORE_EXPORT);
     WTF_MAKE_NONCOPYABLE(AudioSession);
 public:
