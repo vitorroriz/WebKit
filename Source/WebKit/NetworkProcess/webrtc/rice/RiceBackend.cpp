@@ -162,7 +162,8 @@ GRefPtr<GSource> RiceBackend::getRecvSourceForStream(unsigned streamId)
 void RiceBackend::notifyIncomingData(unsigned streamId, WebCore::RTCIceProtocol protocol, String&& from, String&& to, WebCore::SharedMemory::Handle&& data)
 {
     callOnMainRunLoopAndWait([&, streamId, protocol, data = WTFMove(data), from = WTFMove(from), to = WTFMove(to)] mutable {
-        messageSenderConnection()->send(Messages::RiceBackendProxy::NotifyIncomingData { streamId, protocol, from, to, WTFMove(data) }, messageSenderDestinationID());
+        if (RefPtr connection = messageSenderConnection())
+            connection->send(Messages::RiceBackendProxy::NotifyIncomingData { streamId, protocol, from, to, WTFMove(data) }, messageSenderDestinationID());
     });
 }
 
