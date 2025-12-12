@@ -2012,10 +2012,6 @@ Node* RenderBlock::nodeForHitTest() const
     // that was split. Use the appropriate inner node.
     if (auto* continuation = this->continuation())
         return continuation->element();
-    if (auto inlineBox = dynamicDowncast<RenderInline>(parent()); inlineBox && isAnonymousBlock()) {
-        ASSERT(settings().blocksInInlineLayoutEnabled());
-        return inlineBox->element();
-    }
     return element();
 }
 

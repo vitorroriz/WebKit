@@ -319,7 +319,7 @@ layer at (0,0) size 785x1121
             RenderInline {SPAN} at (0,1063) size 0x0
           RenderText {#text} at (0,0) size 0x0
         RenderText {#text} at (0,0) size 0x0
-        RenderInline {SPAN} at (0,1044) size 769x63
+        RenderInline {SPAN} at (0,1044) size 769x69
           RenderText {#text} at (0,0) size 0x0
           RenderInline {SPAN} at (0,1042) size 279x18
             RenderText {#text} at (0,0) size 0x0
@@ -330,14 +330,13 @@ layer at (0,0) size 785x1121
             RenderBR {BR} at (278,1042) size 1x18
           RenderText {#text} at (0,0) size 0x0
           RenderText {#text} at (0,0) size 0x0
-          RenderBlock (anonymous) at (0,1069) size 769x31
-            RenderBlock {P} at (0,15) size 769x16
-              RenderText {#text} at (0,0) size 206x15
-                text run at (0,0) width 206: "This itinerary is subject to change. "
-              RenderInline {A} at (205,0) size 166x15 [color=#0000EE]
-                RenderText {#text} at (205,0) size 166x15
-                  text run at (205,0) width 166: "Click here for latest updates"
-              RenderText {#text} at (0,0) size 0x0
+          RenderBlock {P} at (0,1084) size 769x16
+            RenderText {#text} at (0,0) size 206x15
+              text run at (0,0) width 206: "This itinerary is subject to change. "
+            RenderInline {A} at (205,0) size 166x15 [color=#0000EE]
+              RenderText {#text} at (205,0) size 166x15
+                text run at (205,0) width 166: "Click here for latest updates"
+            RenderText {#text} at (0,0) size 0x0
         RenderText {#text} at (0,0) size 0x0
 layer at (8,35) size 769x2 clip at (0,0) size 0x0
   RenderBlock {HR} at (0,26) size 769x3 [color=#808080] [border: (1px inset #808080)]
@@ -360,7 +359,7 @@ layer at (8,1006) size 769x2 clip at (0,0) size 0x0
 layer at (8,1042) size 769x2 clip at (0,0) size 0x0
   RenderBlock {HR} at (0,1034) size 769x2 [color=#808080] [border: (1px inset #808080)]
 layer at (8,1077) size 769x2 clip at (0,0) size 0x0
-  RenderBlock {HR} at (0,0) size 769x2 [color=#808080] [border: (1px inset #808080)]
+  RenderBlock {HR} at (0,1069) size 769x3 [color=#808080] [border: (1px inset #808080)]
 layer at (23,8) size 106x16
   RenderInline (relative positioned) {SPAN} at (0,64) size 106x16
     RenderText {#text} at (0,0) size 0x0
