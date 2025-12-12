@@ -63,6 +63,7 @@ public:
     String textWithSuffix() const { return m_textContent.textWithSuffix; };
 
     bool isInside() const;
+    bool isDisclosureMarker() const;
 
     void updateInlineMarginsAndContent();
 

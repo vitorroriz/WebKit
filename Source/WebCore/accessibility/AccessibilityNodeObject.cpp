@@ -3964,7 +3964,7 @@ Vector<AXStitchGroup> AccessibilityNodeObject::stitchGroups() const
     std::optional<AXID> representativeID;
     for (auto lineBox = inlineLayout->firstLineBox(); lineBox && !shouldStop; lineBox.traverseNext()) {
         for (auto box = lineBox->logicalLeftmostLeafBox(); box; box.traverseLogicalRightwardOnLine()) {
-            if (CheckedPtr renderListMarker = dynamicDowncast<RenderListMarker>(box->renderer())) {
+            if (CheckedPtr renderListMarker = dynamicDowncast<RenderListMarker>(box->renderer()); renderListMarker && !renderListMarker->isDisclosureMarker()) {
                 if (RefPtr object = cache->getOrCreate(const_cast<RenderListMarker&>(*renderListMarker)))
                     currentGroup.append(object->objectID());
                 continue;

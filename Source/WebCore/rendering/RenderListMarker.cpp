@@ -424,6 +424,16 @@ bool RenderListMarker::isInside() const
     return style().listStylePosition() == ListStylePosition::Inside;
 }
 
+bool RenderListMarker::isDisclosureMarker() const
+{
+    auto& listStyleType = style().listStyleType();
+    if (std::optional counterStyle = listStyleType.tryCounterStyle()) {
+        AtomString& identifier = counterStyle->identifier.value;
+        return identifier == "disclosure-open"_s || identifier == "disclosure-closed"_s;
+    }
+    return false;
+}
+
 const RenderListItem* RenderListMarker::listItem() const
 {
     return m_listItem.get();
