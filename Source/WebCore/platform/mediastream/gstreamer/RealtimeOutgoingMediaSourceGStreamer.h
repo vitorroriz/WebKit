@@ -109,6 +109,8 @@ protected:
     RefPtr<MediaStreamTrackPrivate> m_track;
     std::optional<RealtimeMediaSourceSettings> m_initialSettings;
     GRefPtr<GstElement> m_bin;
+    GRefPtr<GstElement> m_inputSelector;
+    GRefPtr<GstElement> m_fallbackSource;
     GRefPtr<GstElement> m_outgoingSource;
     GRefPtr<GstElement> m_tee;
     GRefPtr<GstElement> m_rtpFunnel;

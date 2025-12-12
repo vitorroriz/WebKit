@@ -47,11 +47,6 @@ RealtimeOutgoingAudioSourceGStreamer::RealtimeOutgoingAudioSourceGStreamer(const
     : RealtimeOutgoingMediaSourceGStreamer(RealtimeOutgoingMediaSourceGStreamer::Type::Audio, ssrcGenerator)
 {
     initialize();
-
-    m_outgoingSource = gst_element_factory_make("audiotestsrc", nullptr);
-    gst_util_set_object_arg(G_OBJECT(m_outgoingSource.get()), "wave", "silence");
-    g_object_set(m_outgoingSource.get(), "is-live", TRUE, "do-timestamp", TRUE, nullptr);
-    gst_bin_add(GST_BIN_CAST(m_bin.get()), m_outgoingSource.get());
 }
 
 RealtimeOutgoingAudioSourceGStreamer::~RealtimeOutgoingAudioSourceGStreamer() = default;
@@ -64,6 +59,12 @@ void RealtimeOutgoingAudioSourceGStreamer::initialize()
     });
     static Atomic<uint64_t> sourceCounter = 0;
     gst_element_set_name(m_bin.get(), makeString("outgoing-audio-source-"_s, sourceCounter.exchangeAdd(1)).ascii().data());
+
+    m_fallbackSource = gst_element_factory_make("audiotestsrc", nullptr);
+    gst_util_set_object_arg(G_OBJECT(m_fallbackSource.get()), "wave", "silence");
+    g_object_set(m_fallbackSource.get(), "is-live", TRUE, "do-timestamp", TRUE, nullptr);
+    gst_bin_add(GST_BIN_CAST(m_bin.get()), m_fallbackSource.get());
+    gst_element_link(m_fallbackSource.get(), m_inputSelector.get());
 }
 
 void RealtimeOutgoingAudioSourceGStreamer::setInitialParameters(GUniquePtr<GstStructure>&& parameters)
@@ -113,7 +114,7 @@ GRefPtr<GstPad> RealtimeOutgoingAudioSourceGStreamer::outgoingSourcePad() const
 {
     if (WEBKIT_IS_MEDIA_STREAM_SRC(m_outgoingSource.get()))
         return adoptGRef(gst_element_get_static_pad(m_outgoingSource.get(), "audio_src0"));
-    return adoptGRef(gst_element_get_static_pad(m_outgoingSource.get(), "src"));
+    return adoptGRef(gst_element_get_static_pad(m_fallbackSource.get(), "src"));
 }
 
 RefPtr<GStreamerRTPPacketizer> RealtimeOutgoingAudioSourceGStreamer::createPacketizer(RefPtr<UniqueSSRCGenerator> ssrcGenerator, const GstStructure* codecParameters, GUniquePtr<GstStructure>&& encodingParameters)

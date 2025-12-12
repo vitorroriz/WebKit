@@ -82,7 +82,7 @@ void RealtimeOutgoingMediaSourceGStreamer::initialize()
     });
 
     m_bin = gst_bin_new(nullptr);
-
+    m_inputSelector = gst_element_factory_make("input-selector", nullptr);
     m_tee = gst_element_factory_make("tee", nullptr);
 
     m_rtpFunnel = gst_element_factory_make("rtpfunnel", nullptr);
@@ -90,7 +90,7 @@ void RealtimeOutgoingMediaSourceGStreamer::initialize()
         g_object_set(m_rtpFunnel.get(), "forward-unknown-ssrc", TRUE, nullptr);
 
     m_rtpCapsfilter = gst_element_factory_make("capsfilter", nullptr);
-    gst_bin_add_many(GST_BIN_CAST(m_bin.get()), m_tee.get(), m_rtpFunnel.get(), m_rtpCapsfilter.get(), nullptr);
+    gst_bin_add_many(GST_BIN_CAST(m_bin.get()), m_inputSelector.get(), m_tee.get(), m_rtpFunnel.get(), m_rtpCapsfilter.get(), nullptr);
     gst_element_link(m_rtpFunnel.get(), m_rtpCapsfilter.get());
 
     auto srcPad = adoptGRef(gst_element_get_static_pad(m_rtpCapsfilter.get(), "src"));
@@ -387,7 +387,20 @@ void RealtimeOutgoingMediaSourceGStreamer::replaceTrack(const RefPtr<MediaStream
     if (newTrack)
         trackPrivate = newTrack->privateTrack();
 
-    webkitMediaStreamSrcReplaceTrack(WEBKIT_MEDIA_STREAM_SRC_CAST(m_outgoingSource.get()), RefPtr(trackPrivate));
+    if (m_outgoingSource)
+        webkitMediaStreamSrcReplaceTrack(WEBKIT_MEDIA_STREAM_SRC_CAST(m_outgoingSource.get()), RefPtr(trackPrivate));
+    else {
+        if (trackPrivate) {
+            m_outgoingSource = webkitMediaStreamSrcNew();
+            gst_bin_add(GST_BIN_CAST(m_bin.get()), m_outgoingSource.get());
+            webkitMediaStreamSrcAddTrack(WEBKIT_MEDIA_STREAM_SRC_CAST(m_outgoingSource.get()), trackPrivate.get());
+            gst_element_link(m_outgoingSource.get(), m_inputSelector.get());
+            gst_element_sync_state_with_parent(m_outgoingSource.get());
+        }
+        auto srcPad = outgoingSourcePad();
+        auto activePad = adoptGRef(gst_pad_get_peer(srcPad.get()));
+        g_object_set(m_inputSelector.get(), "active-pad", activePad.get(), nullptr);
+    }
     if (!newTrack) {
         m_isStopped = true;
         m_track = nullptr;
@@ -471,11 +484,18 @@ bool RealtimeOutgoingMediaSourceGStreamer::configurePacketizers(GRefPtr<GstCaps>
     if (gst_caps_is_empty(codecPreferences.get()) || gst_caps_is_any(codecPreferences.get())) [[unlikely]]
         return false;
 
+    auto inputSelectorSrcPad = adoptGRef(gst_element_get_static_pad(m_inputSelector.get(), "src"));
+    if (!gst_pad_is_linked(inputSelectorSrcPad.get()) && !gst_element_link(m_inputSelector.get(), m_tee.get()))
+        return false;
+
+    auto srcPad = outgoingSourcePad();
     if (m_outgoingSource) {
-        auto srcPad = outgoingSourcePad();
-        if (!gst_pad_is_linked(srcPad.get()) && !gst_element_link(m_outgoingSource.get(), m_tee.get()))
+        if (!gst_pad_is_linked(srcPad.get()) && !gst_element_link(m_outgoingSource.get(), m_inputSelector.get()))
             return false;
+
     }
+    auto activePad = adoptGRef(gst_pad_get_peer(srcPad.get()));
+    g_object_set(m_inputSelector.get(), "active-pad", activePad.get(), nullptr);
 
     auto rtpCaps = adoptGRef(gst_caps_new_empty());
     unsigned totalCodecs = gst_caps_get_size(codecPreferences.get());
@@ -706,6 +726,7 @@ void RealtimeOutgoingMediaSourceGStreamer::teardown()
         m_packetizers.clear();
 
         m_bin.clear();
+        m_inputSelector.clear();
         m_tee.clear();
         m_rtpFunnel.clear();
         m_allowedCaps.clear();
