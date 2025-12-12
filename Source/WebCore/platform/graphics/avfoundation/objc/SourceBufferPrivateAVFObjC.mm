@@ -283,9 +283,6 @@ void SourceBufferPrivateAVFObjC::processInitializationSegment(std::optional<Init
 
         setTrackChangeCallbacks(*segment, true);
     }
-    callOnMainThreadWithPlayer([](auto& player) {
-        player.characteristicsChanged();
-    });
 
     ALWAYS_LOG(LOGIDENTIFIER, "initialization segment was processed");
 }

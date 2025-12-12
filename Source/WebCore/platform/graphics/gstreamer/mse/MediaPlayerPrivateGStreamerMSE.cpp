@@ -685,6 +685,13 @@ void MediaPlayerPrivateGStreamerMSE::notifyActiveSourceBuffersChanged()
         player->activeSourceBuffersChanged();
 }
 
+void MediaPlayerPrivateGStreamerMSE::characteristicsFromMediaSourceChanged()
+{
+    assertIsMainThread();
+    if (RefPtr player = m_player.get())
+        player->characteristicChanged();
+}
+
 #undef GST_CAT_DEFAULT
 
 } // namespace WebCore.

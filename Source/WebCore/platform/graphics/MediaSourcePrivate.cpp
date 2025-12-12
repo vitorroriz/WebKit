@@ -192,7 +192,15 @@ void MediaSourcePrivate::updateTracksType()
     TracksType tracksCombinedTypes;
     for (auto type : m_tracksTypes.values())
         tracksCombinedTypes |= type;
-    m_tracksCombinedTypes = tracksCombinedTypes;
+    if (m_tracksCombinedTypes.exchange(tracksCombinedTypes) != tracksCombinedTypes) {
+        ensureOnMainThread([weakThis = ThreadSafeWeakPtr { *this }] {
+            RefPtr protectedThis = weakThis.get();
+            if (!protectedThis)
+                return;
+            if (RefPtr player = protectedThis->player())
+                player->characteristicsFromMediaSourceChanged();
+        });
+    }
 }
 
 void MediaSourcePrivate::durationChanged(const MediaTime& duration)

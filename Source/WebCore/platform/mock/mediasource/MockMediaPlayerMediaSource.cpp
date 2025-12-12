@@ -157,6 +157,13 @@ bool MockMediaPlayerMediaSource::hasAudio() const
     return mediaSourcePrivate ? mediaSourcePrivate->hasAudio() : false;
 }
 
+void MockMediaPlayerMediaSource::characteristicsFromMediaSourceChanged()
+{
+    assertIsMainThread();
+    if (RefPtr player = m_player.get())
+        player->characteristicChanged();
+}
+
 void MockMediaPlayerMediaSource::setPageIsVisible(bool)
 {
 }
