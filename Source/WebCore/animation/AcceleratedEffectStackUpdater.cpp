@@ -70,8 +70,8 @@ void AcceleratedEffectStackUpdater::update()
         renderLayer->backing()->updateAcceleratedEffectsAndBaseValues(timelinesInUpdate);
     }
 
-    ASSERT(page);
-    page->ensureAcceleratedTimelinesUpdater().processTimelinesSeenDuringEffectStacksUpdate(WTFMove(timelinesInUpdate));
+    if (page && !timelinesInUpdate.isEmpty())
+        page->ensureAcceleratedTimelinesUpdater().processTimelinesSeenDuringEffectStacksUpdate(WTFMove(timelinesInUpdate));
 }
 
 void AcceleratedEffectStackUpdater::scheduleUpdateForTarget(const Styleable& target)
