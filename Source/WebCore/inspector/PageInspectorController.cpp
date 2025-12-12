@@ -513,7 +513,7 @@ void PageInspectorController::frontendInitialized()
     if (m_pauseAfterInitialization) {
         m_pauseAfterInitialization = false;
         if (auto* debuggerAgent = m_instrumentingAgents->enabledPageDebuggerAgent())
-            debuggerAgent->pause();
+            std::ignore = debuggerAgent->pause();
     }
 
 #if ENABLE(REMOTE_INSPECTOR)

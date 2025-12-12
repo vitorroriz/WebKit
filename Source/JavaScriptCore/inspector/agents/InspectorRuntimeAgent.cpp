@@ -454,7 +454,7 @@ void InspectorRuntimeAgent::willDestroyFrontendAndBackend(DisconnectReason reaso
     if (reason != DisconnectReason::InspectedTargetDestroyed && m_isTypeProfilingEnabled)
         setTypeProfilerEnabledState(false);
 
-    disable();
+    std::ignore = disable();
 }
 
 Protocol::ErrorStringOr<void> InspectorRuntimeAgent::enableTypeProfiler()

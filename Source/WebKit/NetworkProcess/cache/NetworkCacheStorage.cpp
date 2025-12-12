@@ -594,7 +594,7 @@ struct RecordMetaData {
     uint64_t headerOffset { 0 };
 };
 
-static WARN_UNUSED_RETURN bool decodeRecordMetaData(RecordMetaData& metaData, const Data& fileData)
+WARN_UNUSED_RETURN static bool decodeRecordMetaData(RecordMetaData& metaData, const Data& fileData)
 {
     bool success = false;
     fileData.apply([&metaData, &success](std::span<const uint8_t> span) {
@@ -658,7 +658,7 @@ static WARN_UNUSED_RETURN bool decodeRecordMetaData(RecordMetaData& metaData, co
     return success;
 }
 
-static WARN_UNUSED_RETURN bool decodeRecordHeader(const Data& fileData, RecordMetaData& metaData, Data& headerData, const Salt& salt)
+WARN_UNUSED_RETURN static bool decodeRecordHeader(const Data& fileData, RecordMetaData& metaData, Data& headerData, const Salt& salt)
 {
     if (!decodeRecordMetaData(metaData, fileData)) {
         LOG(NetworkCacheStorage, "(NetworkProcess) meta data decode failure");

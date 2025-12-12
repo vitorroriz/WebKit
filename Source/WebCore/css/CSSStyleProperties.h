@@ -121,7 +121,7 @@ private:
 
     RefPtr<DeprecatedCSSOMValue> wrapForDeprecatedCSSOM(CSSValue*);
 
-    virtual bool willMutate() WARN_UNUSED_RETURN { return true; }
+    WARN_UNUSED_RETURN virtual bool willMutate() { return true; }
     virtual void didMutate(MutationType) { }
 };
 
@@ -148,7 +148,7 @@ private:
 
     CSSRule* parentRule() const final;
 
-    bool willMutate() final WARN_UNUSED_RETURN;
+    WARN_UNUSED_RETURN bool willMutate() final;
     void didMutate(MutationType) final;
     OptionalOrReference<CSSParserContext> cssParserContext() const final;
 
@@ -169,7 +169,7 @@ private:
     CSSStyleSheet* parentStyleSheet() const final;
     StyledElement* parentElement() const final { return m_parentElement.get(); }
 
-    bool willMutate() final WARN_UNUSED_RETURN;
+    WARN_UNUSED_RETURN bool willMutate() final;
     void didMutate(MutationType) final;
     OptionalOrReference<CSSParserContext> cssParserContext() const final;
 

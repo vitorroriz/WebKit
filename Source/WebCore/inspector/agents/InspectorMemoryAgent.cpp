@@ -57,7 +57,7 @@ void InspectorMemoryAgent::didCreateFrontendAndBackend()
 
 void InspectorMemoryAgent::willDestroyFrontendAndBackend(DisconnectReason)
 {
-    disable();
+    std::ignore = disable();
 
     Ref { m_instrumentingAgents.get() }->setPersistentMemoryAgent(nullptr);
 }

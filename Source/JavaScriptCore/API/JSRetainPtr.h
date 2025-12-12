@@ -54,7 +54,7 @@ public:
     T get() const { return m_ptr; }
     
     void clear();
-    T leakRef() WARN_UNUSED_RETURN;
+    WARN_UNUSED_RETURN T leakRef();
 
     T operator->() const { return m_ptr; }
     

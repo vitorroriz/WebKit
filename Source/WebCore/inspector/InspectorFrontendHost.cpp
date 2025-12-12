@@ -136,7 +136,7 @@ private:
 
             ScriptFunctionCall function(m_globalObject, m_frontendApiObject.get(), "contextMenuItemSelected"_s, WebCore::functionCallHandlerFromAnyThread);
             function.appendArgument(itemNumber);
-            function.call();
+            std::ignore = function.call();
         }
     }
     
@@ -144,7 +144,7 @@ private:
     {
         if (m_frontendHost) {
             ScriptFunctionCall function(m_globalObject, m_frontendApiObject.get(), "contextMenuCleared"_s, WebCore::functionCallHandlerFromAnyThread);
-            function.call();
+            std::ignore = function.call();
 
             m_frontendHost->m_menuProvider = nullptr;
         }

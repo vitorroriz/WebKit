@@ -83,7 +83,7 @@ public:
         return UnixFileDescriptor { m_value, Duplicate };
     }
 
-    int release() WARN_UNUSED_RETURN { return std::exchange(m_value, -1); }
+    WARN_UNUSED_RETURN int release() { return std::exchange(m_value, -1); }
 
 private:
     int m_value { -1 };

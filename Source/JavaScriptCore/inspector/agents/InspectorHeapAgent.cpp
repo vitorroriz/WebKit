@@ -59,7 +59,7 @@ void InspectorHeapAgent::didCreateFrontendAndBackend()
 
 void InspectorHeapAgent::willDestroyFrontendAndBackend(DisconnectReason)
 {
-    disable();
+    std::ignore = disable();
 }
 
 Protocol::ErrorStringOr<void> InspectorHeapAgent::enable()

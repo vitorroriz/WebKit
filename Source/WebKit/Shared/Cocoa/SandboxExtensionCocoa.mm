@@ -56,7 +56,7 @@ SandboxExtensionImpl::~SandboxExtensionImpl()
         secureMemsetSpan(m_token.mutableSpan(), 0);
 }
 
-bool WARN_UNUSED_RETURN SandboxExtensionImpl::consume()
+WARN_UNUSED_RETURN bool SandboxExtensionImpl::consume()
 {
     m_handle = sandbox_extension_consume(m_token.data());
 #if PLATFORM(IOS_FAMILY_SIMULATOR)
