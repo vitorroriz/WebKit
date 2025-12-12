@@ -310,6 +310,14 @@ void JSPromise::performPromiseThenWithInternalMicrotask(VM& vm, JSGlobalObject* 
     markAsHandled();
 }
 
+static ALWAYS_INLINE bool isIteratorResultObject(JSObject* object, JSGlobalObject* globalObject)
+{
+    if (globalObject->iteratorResultObjectStructure() != object->structure())
+        return false;
+
+    return globalObject->promiseThenWatchpointSet().isStillValid();
+}
+
 void JSPromise::rejectPromise(VM& vm, JSGlobalObject* globalObject, JSValue argument)
 {
     ASSERT(status() == Status::Pending);
@@ -357,6 +365,9 @@ void JSPromise::resolvePromise(JSGlobalObject* globalObject, JSValue resolution)
         if (promise->isThenFastAndNonObservable())
             return globalObject->queueMicrotask(InternalMicrotask::PromiseResolveThenableJobFast, resolutionObject, this, jsUndefined(), jsUndefined());
     }
+
+    if (isIteratorResultObject(resolutionObject, globalObject))
+        return fulfillPromise(vm, globalObject, resolution);
 
     JSValue then;
     JSValue error;
@@ -687,6 +698,9 @@ void JSPromise::resolveWithoutPromise(JSGlobalObject* globalObject, JSValue reso
             return globalObject->queueMicrotask(InternalMicrotask::PromiseResolveThenableJobWithoutPromiseFast, resolutionObject, onFulfilled, onRejected, context);
     }
 
+    if (isIteratorResultObject(resolutionObject, globalObject))
+        return fulfillWithoutPromise(globalObject, resolution, onFulfilled, onRejected, context);
+
     JSValue then;
     JSValue error;
     {
@@ -733,6 +747,9 @@ void JSPromise::resolveWithInternalMicrotask(JSGlobalObject* globalObject, JSVal
         if (promise->isThenFastAndNonObservable())
             return globalObject->queueMicrotask(InternalMicrotask::PromiseResolveThenableJobWithInternalMicrotaskFast, resolutionObject, jsNumber(static_cast<int32_t>(task)), context, jsUndefined());
     }
+
+    if (isIteratorResultObject(resolutionObject, globalObject))
+        return fulfillWithInternalMicrotask(globalObject, resolution, task, context);
 
     JSValue then;
     JSValue error;
