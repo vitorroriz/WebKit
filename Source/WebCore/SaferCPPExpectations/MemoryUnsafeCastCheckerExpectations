@@ -74,8 +74,6 @@ rendering/svg/SVGRenderTreeAsText.cpp
 rendering/svg/SVGTextQuery.cpp
 svg/SVGFELightElement.cpp
 svg/SVGPathSegListSource.cpp
-svg/SVGTRefElement.cpp
-svg/animation/SVGSMILElement.cpp
 svg/properties/SVGAnimatedDecoratedProperty.h
 svg/properties/SVGAnimatedPrimitiveProperty.h
 svg/properties/SVGAnimatedPropertyAccessorImpl.h

@@ -58,11 +58,6 @@ public:
         return adoptRef(*new SVGTRefTargetEventListener(trefElement));
     }
 
-    static const SVGTRefTargetEventListener* cast(const EventListener* listener)
-    {
-        return listener->type() == SVGTRefTargetEventListenerType ? static_cast<const SVGTRefTargetEventListener*>(listener) : nullptr;
-    }
-
     void attach(RefPtr<Element>&& target);
     void detach();
     bool isAttached() const { return m_target.get(); }
@@ -109,7 +104,7 @@ void SVGTRefTargetEventListener::detach()
 
 bool SVGTRefTargetEventListener::operator==(const EventListener& listener) const
 {
-    if (const SVGTRefTargetEventListener* targetListener = SVGTRefTargetEventListener::cast(&listener))
+    if (auto* targetListener = dynamicDowncast<SVGTRefTargetEventListener>(listener))
         return &m_trefElement == &targetListener->m_trefElement;
     return false;
 }
@@ -274,4 +269,11 @@ void SVGTRefElement::removedFromAncestor(RemovalType removalType, ContainerNode&
         protectedTargetListener()->detach();
 }
 
-}
+} // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::SVGTRefTargetEventListener)
+    static bool isType(const WebCore::EventListener& listener)
+    {
+        return listener.type() == WebCore::EventListener::SVGTRefTargetEventListenerType;
+    }
+SPECIALIZE_TYPE_TRAITS_END()

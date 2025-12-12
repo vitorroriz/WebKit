@@ -82,13 +82,6 @@ public:
         return adoptRef(*new ConditionEventListener(animation, condition));
     }
 
-    static const ConditionEventListener* cast(const EventListener* listener)
-    {
-        return listener->type() == ConditionEventListenerType
-            ? static_cast<const ConditionEventListener*>(listener)
-            : nullptr;
-    }
-
     bool operator==(const EventListener& other) const final;
     
     void disconnectAnimation()
@@ -112,7 +105,7 @@ private:
 
 bool ConditionEventListener::operator==(const EventListener& listener) const
 {
-    if (const ConditionEventListener* conditionEventListener = ConditionEventListener::cast(&listener))
+    if (auto* conditionEventListener = dynamicDowncast<ConditionEventListener>(listener))
         return m_animation == conditionEventListener->m_animation && m_condition == conditionEventListener->m_condition;
     return false;
 }
@@ -1275,4 +1268,11 @@ void SVGSMILElement::dispatchPendingEvent(SMILEventSender* eventSender, const At
     dispatchEvent(Event::create(eventType, Event::CanBubble::No, Event::IsCancelable::No));
 }
 
-}
+} // namespace WebCore
+
+SPECIALIZE_TYPE_TRAITS_BEGIN(WebCore::ConditionEventListener)
+    static bool isType(const WebCore::EventListener& listener)
+    {
+        return listener.type() == WebCore::EventListener::ConditionEventListenerType;
+    }
+SPECIALIZE_TYPE_TRAITS_END()
