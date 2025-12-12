@@ -5326,56 +5326,6 @@ static void convertAndAddHighlight(Vector<Ref<WebCore::SharedMemory>>& buffers, 
     [self _evaluateJavaScript:javaScriptString asAsyncFunction:NO withSourceURL:url withArguments:nil forceUserGesture:withUserGesture inFrame:frame inWorld:contentWorld completionHandler:completionHandler];
 }
 
-- (void)_evaluateJavaScriptFromBuffer:(_WKJSBuffer *)javaScriptStringBuffer withEncoding:(_WKJSBufferStringEncoding) bufferStringEncoding withSourceURL:(NSURL *)sourceURL inFrame:(WKFrameInfo *)frame inContentWorld:(WKContentWorld *)contentWorld withUserGesture:(BOOL)withUserGesture completionHandler:(void (^)(id, NSError *error))completionHandler
-{
-    THROW_IF_SUSPENDED;
-    auto handler = adoptNS([completionHandler copy]);
-
-    std::optional<WebCore::SharedMemoryHandle> handle;
-    if (javaScriptStringBuffer)
-        handle = Ref { *javaScriptStringBuffer->_buffer }->sharedMemory()->createHandle(WebCore::SharedMemory::Protection::ReadOnly);
-    std::optional<IPC::TransferString> scriptString;
-    if (handle) {
-        if (bufferStringEncoding == _WKJSBufferStringEncodingLatin1)
-            scriptString = IPC::TransferString { IPC::TransferString::SharedSpan8 { WTFMove(*handle) } };
-        else
-            scriptString = IPC::TransferString { IPC::TransferString::SharedSpan16 { WTFMove(*handle) } };
-    }
-    if (!scriptString) {
-        if (handler) {
-            RunLoop::mainSingleton().dispatch([handler = WTFMove(handler)] {
-                auto rawHandler = (void (^)(id, NSError *))handler.get();
-                rawHandler(nil, unknownError().get());
-            });
-        }
-        return;
-    }
-
-    std::optional<WebCore::FrameIdentifier> frameID;
-    if (frame && frame._handle && frame._handle->_frameHandle->frameID())
-        frameID = frame._handle->_frameHandle->frameID();
-
-    auto removeTransientActivation = !_dontResetTransientActivationAfterRunJavaScript && WebKit::shouldEvaluateJavaScriptWithoutTransientActivation() ? WebCore::RemoveTransientActivation::Yes : WebCore::RemoveTransientActivation::No;
-
-    _page->runJavaScriptInFrameInScriptWorld(WebKit::RunJavaScriptParameters {
-        WTFMove(*scriptString),
-        JSC::SourceTaintedOrigin::Untainted,
-        sourceURL,
-        WebCore::RunAsAsyncFunction::No,
-        std::nullopt,
-        withUserGesture ? WebCore::ForceUserGesture::Yes : WebCore::ForceUserGesture::No,
-        removeTransientActivation
-    }, frameID, Ref { *contentWorld->_contentWorld }, !!handler, [handler] (auto&& result) {
-        if (!handler)
-            return;
-
-        auto rawHandler = (void (^)(id, NSError *))handler.get();
-        if (!result)
-            return rawHandler(nil, nsErrorFromExceptionDetails(result.error()).get());
-        rawHandler(result->toID().get(), nil);
-    });
-}
-
 - (void)_updateWebpagePreferences:(WKWebpagePreferences *)webpagePreferences
 {
     THROW_IF_SUSPENDED;
