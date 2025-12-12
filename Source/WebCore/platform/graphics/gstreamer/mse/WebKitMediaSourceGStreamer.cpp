@@ -38,6 +38,7 @@
 #include <wtf/MainThreadData.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Scope.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/glib/WTFGType.h>
 #include <wtf/text/AtomString.h>
 #include <wtf/text/AtomStringHash.h>
@@ -88,7 +89,7 @@ struct WebKitMediaSrcPrivate {
     double rate { 1.0 };
 
     // Only used by URI Handler API implementation.
-    GUniquePtr<char> uri;
+    GMallocString uri;
 
     ThreadSafeWeakPtr<MediaPlayerPrivateGStreamerMSE> player;
 };
@@ -495,8 +496,8 @@ static void webKitMediaSrcLoop(void* userData)
     }
 
     if (!streamingMembers->wasStreamStartSent) {
-        GUniquePtr<char> streamId { g_strdup_printf("mse/%" PRIu64 "", stream->track->id()) };
-        GRefPtr<GstEvent> event = adoptGRef(gst_event_new_stream_start(streamId.get()));
+        auto streamId = GMallocString::unsafeAdoptFromUTF8(g_strdup_printf("mse/%" PRIu64 "", stream->track->id()));
+        GRefPtr<GstEvent> event = adoptGRef(gst_event_new_stream_start(streamId.utf8()));
         gst_event_set_group_id(event.get(), stream->source->priv->groupId);
         gst_event_set_stream(event.get(), stream->streamInfo.get());
 
@@ -879,7 +880,7 @@ static gchar* webKitMediaSrcGetUri(GstURIHandler* handler)
     WebKitMediaSrc* source = WEBKIT_MEDIA_SRC(handler);
 
     auto locker = GstObjectLocker(source);
-    return g_strdup(source->priv->uri.get());
+    return g_strdup(source->priv->uri.utf8());
 }
 
 static gboolean webKitMediaSrcSetUri(GstURIHandler* handler, const gchar* uri, GError**)
@@ -892,7 +893,7 @@ static gboolean webKitMediaSrcSetUri(GstURIHandler* handler, const gchar* uri, G
     }
 
     auto locker = GstObjectLocker(source);
-    source->priv->uri = GUniquePtr<char>(g_strdup(uri));
+    source->priv->uri = GMallocString::unsafeAdoptFromUTF8(g_strdup(uri));
     return TRUE;
 }
 

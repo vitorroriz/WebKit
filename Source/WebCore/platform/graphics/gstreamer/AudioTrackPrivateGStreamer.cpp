@@ -33,6 +33,7 @@
 #include "MediaPlayerPrivateGStreamer.h"
 #include <gst/pbutils/pbutils.h>
 #include <wtf/Scope.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/text/StringToIntegerConversion.h>
 
 namespace WebCore {
@@ -134,9 +135,9 @@ void AudioTrackPrivateGStreamer::updateConfigurationFromCaps(GRefPtr<GstCaps>&& 
     });
 
 #if GST_CHECK_VERSION(1, 20, 0)
-    GUniquePtr<char> mimeCodec(gst_codec_utils_caps_get_mime_codec(caps.get()));
+    auto mimeCodec = GMallocString::unsafeAdoptFromUTF8(gst_codec_utils_caps_get_mime_codec(caps.get()));
     if (mimeCodec)
-        configuration.codec = unsafeSpan(mimeCodec.get());
+        configuration.codec = mimeCodec.span();
 #endif
 
     if (areEncryptedCaps(caps.get())) {

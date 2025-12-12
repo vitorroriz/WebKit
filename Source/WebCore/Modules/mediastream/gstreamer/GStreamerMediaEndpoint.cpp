@@ -61,6 +61,7 @@
 #include <wtf/Scope.h>
 #include <wtf/SetForScope.h>
 #include <wtf/UniqueRef.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/glib/GThreadSafeWeakPtr.h>
 #include <wtf/glib/RunLoopSourcePriority.h>
 #include <wtf/text/StringToIntegerConversion.h>
@@ -204,9 +205,8 @@ bool GStreamerMediaEndpoint::initializePipeline()
     if (!m_srcNetSimOptions.isEmpty() || !m_sinkNetSimOptions.isEmpty()) {
         if (auto factory = adoptGRef(gst_element_factory_find("netsim"))) {
             g_signal_connect_swapped(m_webrtcBin.get(), "deep-element-added", G_CALLBACK(+[](GStreamerMediaEndpoint* self, GstBin* bin, GstElement* element) {
-                GUniquePtr<char> elementName(gst_element_get_name(element));
-                auto view = StringView::fromLatin1(elementName.get());
-                if (view.startsWith("nice"_s) || view.startsWith("ice-sink"_s) || view.startsWith("ice-src"_s))
+                auto elementName = GMallocString::unsafeAdoptFromUTF8(gst_element_get_name(element));
+                if (startsWith(elementName.span(), "nice"_s) || startsWith(elementName.span(), "ice-sink"_s) || startsWith(elementName.span(), "ice-src"_s))
                     self->maybeInsertNetSimForElement(bin, element);
             }), this);
         } else
@@ -220,9 +220,8 @@ bool GStreamerMediaEndpoint::initializePipeline()
     }
 
     g_signal_connect_swapped(rtpBin.get(), "element-added", G_CALLBACK(+[](GStreamerMediaEndpoint* self, GstElement* element) {
-        GUniquePtr<char> elementName(gst_element_get_name(element));
-        auto view = StringView::fromLatin1(elementName.get());
-        if (!view.startsWith("rtpptdemux"_s))
+        auto elementName = GMallocString::unsafeAdoptFromUTF8(gst_element_get_name(element));
+        if (!startsWith(elementName.span(), "rtpptdemux"_s))
             return;
 
         auto pad = adoptGRef(gst_element_get_static_pad(element, "sink"));
@@ -329,8 +328,8 @@ bool GStreamerMediaEndpoint::initializePipeline()
     g_signal_connect(m_webrtcBin.get(), "notify::connection-state", G_CALLBACK(+[](GstElement* webrtcBin, GParamSpec*, GStreamerMediaEndpoint* endPoint) {
         GstWebRTCPeerConnectionState state;
         g_object_get(webrtcBin, "connection-state", &state, nullptr);
-        GUniquePtr<char> desc(g_enum_to_string(GST_TYPE_WEBRTC_PEER_CONNECTION_STATE, state));
-        auto dotFilename = makeString(unsafeSpan(GST_ELEMENT_NAME(endPoint->pipeline())), '-', unsafeSpan(desc.get()));
+        auto desc = GMallocString::unsafeAdoptFromUTF8(g_enum_to_string(GST_TYPE_WEBRTC_PEER_CONNECTION_STATE, state));
+        auto dotFilename = makeString(unsafeSpan(GST_ELEMENT_NAME(endPoint->pipeline())), '-', desc.span());
         GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(GST_BIN_CAST(endPoint->pipeline()), GST_DEBUG_GRAPH_SHOW_ALL, dotFilename.ascii().data());
     }), this);
 #endif
@@ -483,8 +482,8 @@ static std::optional<std::pair<RTCSdpType, String>> fetchDescription(GstElement*
         }
     }
 
-    GUniquePtr<char> sdpString(gst_sdp_message_as_text(description->sdp));
-    return { { fromSessionDescriptionType(*description.get()), String::fromUTF8(sdpString.get()) } };
+    auto sdpString = GMallocString::unsafeAdoptFromUTF8(gst_sdp_message_as_text(description->sdp));
+    return { { fromSessionDescriptionType(*description.get()), sdpString.span() } };
 }
 
 static GstWebRTCSignalingState fetchSignalingState(GstElement* webrtcBin)
@@ -492,8 +491,8 @@ static GstWebRTCSignalingState fetchSignalingState(GstElement* webrtcBin)
     GstWebRTCSignalingState state;
     g_object_get(webrtcBin, "signaling-state", &state, nullptr);
 #ifndef GST_DISABLE_GST_DEBUG
-    GUniquePtr<char> desc(g_enum_to_string(GST_TYPE_WEBRTC_SIGNALING_STATE, state));
-    GST_DEBUG_OBJECT(webrtcBin, "Signaling state set to %s", desc.get());
+    auto desc = GMallocString::unsafeAdoptFromUTF8(g_enum_to_string(GST_TYPE_WEBRTC_SIGNALING_STATE, state));
+    GST_DEBUG_OBJECT(webrtcBin, "Signaling state set to %s", desc.utf8());
 #endif
     return state;
 }
@@ -594,17 +593,18 @@ inline bool isRecvDirection(GstWebRTCRTPTransceiverDirection direction)
 static std::optional<GStreamerMediaEndpointTransceiverState> toGStreamerMediaEndpointTransceiverState(GstElement* webrtcBin, GstWebRTCRTPTransceiver* transceiver, const GstWebRTCSessionDescription* remoteDescription)
 {
     GRefPtr<GstWebRTCRTPReceiver> receiver;
-    GUniqueOutPtr<char> mid;
+    GUniqueOutPtr<char> midChars;
     GstWebRTCRTPTransceiverDirection direction, currentDirection, firedDirection;
     guint mLineIndex;
     // GstWebRTCRTPTransceiver doesn't have a fired-direction property, so use direction. Until
     // GStreamer 1.26 direction and current-direction always had the same value. This was fixed by:
     // https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/cafb999fb0cdf32803fcc3f85f2652212f05c2d0
-    g_object_get(transceiver, "receiver", &receiver.outPtr(), "direction", &direction, "current-direction", &currentDirection, "mlineindex", &mLineIndex, "mid", &mid.outPtr(), nullptr);
+    g_object_get(transceiver, "receiver", &receiver.outPtr(), "direction", &direction, "current-direction", &currentDirection, "mlineindex", &mLineIndex, "mid", &midChars.outPtr(), nullptr);
+    auto mid = GMallocString::unsafeAdoptFromUTF8(WTFMove(midChars));
 #ifndef GST_DISABLE_GST_DEBUG
-    GUniquePtr<char> desc(g_enum_to_string(GST_TYPE_WEBRTC_RTP_TRANSCEIVER_DIRECTION, direction));
-    GUniquePtr<char> currentDesc(g_enum_to_string(GST_TYPE_WEBRTC_RTP_TRANSCEIVER_DIRECTION, currentDirection));
-    GST_TRACE_OBJECT(webrtcBin, "Receiver = %" GST_PTR_FORMAT ", direction = %s, current-direction = %s, mlineindex = %u, mid = %s", receiver.get(), desc.get(), currentDesc.get(), mLineIndex, GST_STR_NULL(mid.get()));
+    auto desc = GMallocString::unsafeAdoptFromUTF8(g_enum_to_string(GST_TYPE_WEBRTC_RTP_TRANSCEIVER_DIRECTION, direction));
+    auto currentDesc = GMallocString::unsafeAdoptFromUTF8(g_enum_to_string(GST_TYPE_WEBRTC_RTP_TRANSCEIVER_DIRECTION, currentDirection));
+    GST_TRACE_OBJECT(webrtcBin, "Receiver = %" GST_PTR_FORMAT ", direction = %s, current-direction = %s, mlineindex = %u, mid = %s", receiver.get(), desc.utf8(), currentDesc.utf8(), mLineIndex, GST_STR_NULL(mid.utf8()));
 #endif
     firedDirection = currentDirection != GST_WEBRTC_RTP_TRANSCEIVER_DIRECTION_NONE ? currentDirection : direction;
 
@@ -633,7 +633,7 @@ static std::optional<GStreamerMediaEndpointTransceiverState> toGStreamerMediaEnd
     if (!streamIds.isEmpty())
         firedDirectionResult = toRTCRtpTransceiverDirection(firedDirection);
 
-    return { { String::fromUTF8(mid.get()), WTFMove(streamIds), WTFMove(firedDirectionResult) } };
+    return { { String(mid.span()), WTFMove(streamIds), WTFMove(firedDirectionResult) } };
 }
 
 static Vector<GStreamerMediaEndpointTransceiverState> transceiverStatesFromWebRTCBin(const GRefPtr<GstElement>& webrtcBin)
@@ -647,12 +647,12 @@ static Vector<GStreamerMediaEndpointTransceiverState> transceiverStatesFromWebRT
     GUniqueOutPtr<GstWebRTCSessionDescription> localDescription;
     g_object_get(webrtcBin.get(), "local-description", &localDescription.outPtr(), nullptr);
     if (localDescription) {
-        GUniquePtr<char> sdp(gst_sdp_message_as_text(localDescription->sdp));
-        GST_TRACE_OBJECT(webrtcBin.get(), "Local-description:\n%s", sdp.get());
+        auto sdp = GMallocString::unsafeAdoptFromUTF8(gst_sdp_message_as_text(localDescription->sdp));
+        GST_TRACE_OBJECT(webrtcBin.get(), "Local-description:\n%s", sdp.utf8());
     }
     if (remoteDescription) {
-        GUniquePtr<char> sdp(gst_sdp_message_as_text(remoteDescription->sdp));
-        GST_TRACE_OBJECT(webrtcBin.get(), "Remote-description:\n%s", sdp.get());
+        auto sdp = GMallocString::unsafeAdoptFromUTF8(gst_sdp_message_as_text(remoteDescription->sdp));
+        GST_TRACE_OBJECT(webrtcBin.get(), "Remote-description:\n%s", sdp.utf8());
     }
 #endif
 
@@ -674,8 +674,8 @@ void GStreamerMediaEndpoint::linkOutgoingSources(GstSDPMessage* sdpMessage)
     unsigned totalMedias = gst_sdp_message_medias_len(sdpMessage);
 #ifndef GST_DISABLE_GST_DEBUG
     GST_DEBUG_OBJECT(m_pipeline.get(), "Linking outgoing sources for %u m-lines", totalMedias);
-    GUniquePtr<char> sdp(gst_sdp_message_as_text(sdpMessage));
-    GST_TRACE_OBJECT(m_pipeline.get(), "in SDP:\n%s", sdp.get());
+    auto sdp = GMallocString::unsafeAdoptFromUTF8(gst_sdp_message_as_text(sdpMessage));
+    GST_TRACE_OBJECT(m_pipeline.get(), "in SDP:\n%s", sdp.utf8());
 #endif
     for (unsigned i = 0; i < totalMedias; i++) {
         const auto media = gst_sdp_message_get_media(sdpMessage, i);
@@ -1033,8 +1033,7 @@ void GStreamerMediaEndpoint::setDescription(const RTCSessionDescription* descrip
         sdpType = description->type();
         if (descriptionType == DescriptionType::Local && sdpType == RTCSdpType::Answer && !gst_sdp_message_get_version(message.get())) {
             GError error;
-            GUniquePtr<char> errorMessage(g_strdup("Expect line: v="));
-            error.message = errorMessage.get();
+            error.message = const_cast<gchar*>("Expect line: v=");
             failureCallback(&error);
             return;
         }
@@ -1067,8 +1066,8 @@ void GStreamerMediaEndpoint::setDescription(const RTCSessionDescription* descrip
     gst_sdp_message_copy(message.get(), &data->message.outPtr());
 
 #ifndef GST_DISABLE_GST_DEBUG
-    GUniquePtr<char> sdp(gst_sdp_message_as_text(data->message.get()));
-    GST_DEBUG_OBJECT(m_pipeline.get(), "SDP: %s", sdp.get());
+    auto sdp = GMallocString::unsafeAdoptFromUTF8(gst_sdp_message_as_text(data->message.get()));
+    GST_DEBUG_OBJECT(m_pipeline.get(), "SDP: %s", sdp.utf8());
 #endif
 
     GUniquePtr<GstWebRTCSessionDescription> sessionDescription(gst_webrtc_session_description_new(type, message.release()));
@@ -1110,8 +1109,8 @@ void GStreamerMediaEndpoint::processSDPMessage(const GstSDPMessage* message, Fun
             continue;
 
 #ifndef GST_DISABLE_GST_DEBUG
-        GUniquePtr<char> mediaRepresentation(gst_sdp_media_as_text(media));
-        GST_LOG_OBJECT(m_pipeline.get(), "Processing media:\n%s", mediaRepresentation.get());
+        auto mediaRepresentation = GMallocString::unsafeAdoptFromUTF8(gst_sdp_media_as_text(media));
+        GST_LOG_OBJECT(m_pipeline.get(), "Processing media:\n%s", mediaRepresentation.utf8());
 #endif
         auto mid = CStringView::unsafeFromUTF8(gst_sdp_media_get_attribute_val(media, "mid"));
         if (!mid)
@@ -1736,8 +1735,8 @@ ExceptionOr<GStreamerMediaEndpoint::Backends> GStreamerMediaEndpoint::createTran
     });
 
 #ifndef GST_DISABLE_GST_DEBUG
-    GUniquePtr<char> desc(g_enum_to_string(GST_TYPE_WEBRTC_RTP_TRANSCEIVER_DIRECTION, direction));
-    GST_DEBUG_OBJECT(m_pipeline.get(), "Adding %s transceiver for payload %" GST_PTR_FORMAT, desc.get(), caps.get());
+    auto desc = GMallocString::unsafeAdoptFromUTF8(g_enum_to_string(GST_TYPE_WEBRTC_RTP_TRANSCEIVER_DIRECTION, direction));
+    GST_DEBUG_OBJECT(m_pipeline.get(), "Adding %s transceiver for payload %" GST_PTR_FORMAT, desc.utf8(), caps.get());
 #endif
 
     // FIXME: None of this (excepted direction) is passed to webrtcbin yet.
@@ -2257,8 +2256,8 @@ void GStreamerMediaEndpoint::onIceGatheringChange()
     GstWebRTCICEGatheringState state;
     g_object_get(m_webrtcBin.get(), "ice-gathering-state", &state, nullptr);
 #ifndef GST_DISABLE_GST_DEBUG
-    GUniquePtr<char> desc(g_enum_to_string(GST_TYPE_WEBRTC_ICE_GATHERING_STATE, state));
-    GST_DEBUG_OBJECT(m_pipeline.get(), "ICE gathering state changed to %s", desc.get());
+    auto desc = GMallocString::unsafeAdoptFromUTF8(g_enum_to_string(GST_TYPE_WEBRTC_ICE_GATHERING_STATE, state));
+    GST_DEBUG_OBJECT(m_pipeline.get(), "ICE gathering state changed to %s", desc.utf8());
 #endif
     callOnMainThread([protectedThis = Ref(*this), this, state] {
         if (isStopped())
@@ -2369,9 +2368,10 @@ void GStreamerMediaEndpoint::collectTransceivers()
         if (existingTransceiver)
             return false;
 
-        GUniqueOutPtr<char> mid;
+        GUniqueOutPtr<char> midChars;
         unsigned mLineIndex;
-        g_object_get(transceiver.get(), "mid", &mid.outPtr(), "mlineindex", &mLineIndex, nullptr);
+        g_object_get(transceiver.get(), "mid", &midChars.outPtr(), "mlineindex", &mLineIndex, nullptr);
+        auto mid = GMallocString::unsafeAdoptFromUTF8(WTFMove(midChars));
         if (!mid)
             return false;
 
@@ -2381,7 +2381,7 @@ void GStreamerMediaEndpoint::collectTransceivers()
             return false;
         }
 
-        existingTransceiver = peerConnectionBackend->newRemoteTransceiver(WTF::makeUnique<GStreamerRtpTransceiverBackend>(WTFMove(transceiver)), m_mediaForMid.get(String::fromUTF8(mid.get())), trackIdFromSDPMedia(*media));
+        existingTransceiver = peerConnectionBackend->newRemoteTransceiver(WTF::makeUnique<GStreamerRtpTransceiverBackend>(WTFMove(transceiver)), m_mediaForMid.get(String(mid.span())), trackIdFromSDPMedia(*media));
         return false;
     });
 }

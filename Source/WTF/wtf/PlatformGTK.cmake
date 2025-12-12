@@ -7,6 +7,7 @@ list(APPEND WTF_SOURCES
     glib/Application.cpp
     glib/ChassisType.cpp
     glib/FileSystemGlib.cpp
+    glib/GMallocString.cpp
     glib/GRefPtr.cpp
     glib/GSocketMonitor.cpp
     glib/GSpanExtras.cpp
@@ -33,6 +34,7 @@ list(APPEND WTF_PUBLIC_HEADERS
     glib/ActivityObserver.h
     glib/Application.h
     glib/ChassisType.h
+    glib/GMallocString.h
     glib/GMutexLocker.h
     glib/GRefPtr.h
     glib/GSocketMonitor.h

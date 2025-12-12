@@ -54,6 +54,7 @@
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/URL.h>
 #include <wtf/UUID.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/glib/GSpanExtras.h>
 #include <wtf/glib/GThreadSafeWeakPtr.h>
 #include <wtf/glib/GUniquePtr.h>
@@ -312,15 +313,15 @@ bool isProtocolAllowed(const WTF::URL& url)
 
 std::optional<TrackID> getStreamIdFromPad(const GRefPtr<GstPad>& pad)
 {
-    GUniquePtr<gchar> streamIdAsCharacters(gst_pad_get_stream_id(pad.get()));
-    if (!streamIdAsCharacters) {
+    auto streamIdAsString = GMallocString::unsafeAdoptFromUTF8(gst_pad_get_stream_id(pad.get()));
+    if (!streamIdAsString) {
         GST_DEBUG_OBJECT(pad.get(), "Failed to get stream-id from pad");
         return std::nullopt;
     }
 
-    std::optional<TrackID> streamId(parseStreamId(String::fromUTF8(streamIdAsCharacters.get())));
+    std::optional<TrackID> streamId(parseStreamId(streamIdAsString.span()));
     if (!streamId)
-        GST_WARNING_OBJECT(pad.get(), "Got invalid stream-id from pad: %s", streamIdAsCharacters.get());
+        GST_WARNING_OBJECT(pad.get(), "Got invalid stream-id from pad: %s", streamIdAsString.utf8());
 
     return streamId;
 }
@@ -632,16 +633,16 @@ static HashMap<String, GRefPtr<GstElement>>& activePipelinesMap()
 
 void registerActivePipeline(const GRefPtr<GstElement>& pipeline)
 {
-    GUniquePtr<gchar> name(gst_object_get_name(GST_OBJECT_CAST(pipeline.get())));
+    auto name = GMallocString::unsafeAdoptFromUTF8(gst_object_get_name(GST_OBJECT_CAST(pipeline.get())));
     Locker locker { s_activePipelinesMapLock };
-    activePipelinesMap().add(unsafeSpan(name.get()), GRefPtr<GstElement>(pipeline));
+    activePipelinesMap().add(name.span(), GRefPtr<GstElement>(pipeline));
 }
 
 void unregisterPipeline(const GRefPtr<GstElement>& pipeline)
 {
-    GUniquePtr<gchar> name(gst_object_get_name(GST_OBJECT_CAST(pipeline.get())));
+    auto name = GMallocString::unsafeAdoptFromUTF8(gst_object_get_name(GST_OBJECT_CAST(pipeline.get())));
     Locker locker { s_activePipelinesMapLock };
-    activePipelinesMap().remove(unsafeSpan(name.get()));
+    activePipelinesMap().remove(name.span());
 }
 
 void WebCoreLogObserver::didLogMessage(const WTFLogChannel& channel, WTFLogLevel level, Vector<JSONLogValue>&& values)
@@ -1562,7 +1563,7 @@ PlatformVideoColorSpace videoColorSpaceFromInfo(const GstVideoInfo& info)
 {
     ensureGStreamerInitialized();
 #ifndef GST_DISABLE_GST_DEBUG
-    GUniquePtr<char> colorimetry(gst_video_colorimetry_to_string(&GST_VIDEO_INFO_COLORIMETRY(&info)));
+    auto colorimetry = GMallocString::unsafeAdoptFromUTF8(gst_video_colorimetry_to_string(&GST_VIDEO_INFO_COLORIMETRY(&info)));
 #endif
     PlatformVideoColorSpace colorSpace;
     switch (GST_VIDEO_INFO_COLORIMETRY(&info).matrix) {
@@ -1589,7 +1590,7 @@ PlatformVideoColorSpace videoColorSpaceFromInfo(const GstVideoInfo& info)
         break;
     default:
 #ifndef GST_DISABLE_GST_DEBUG
-        GST_WARNING("Unhandled colorspace matrix from %s", colorimetry.get());
+        GST_WARNING("Unhandled colorspace matrix from %s", colorimetry.utf8());
 #endif
         break;
     }
@@ -1639,7 +1640,7 @@ PlatformVideoColorSpace videoColorSpaceFromInfo(const GstVideoInfo& info)
         break;
     default:
 #ifndef GST_DISABLE_GST_DEBUG
-        GST_WARNING("Unhandled colorspace transfer from %s", colorimetry.get());
+        GST_WARNING("Unhandled colorspace transfer from %s", colorimetry.utf8());
 #endif
         break;
     }
@@ -1680,7 +1681,7 @@ PlatformVideoColorSpace videoColorSpaceFromInfo(const GstVideoInfo& info)
         break;
     default:
 #ifndef GST_DISABLE_GST_DEBUG
-        GST_WARNING("Unhandled colorspace primaries from %s", colorimetry.get());
+        GST_WARNING("Unhandled colorspace primaries from %s", colorimetry.utf8());
 #endif
         break;
     }

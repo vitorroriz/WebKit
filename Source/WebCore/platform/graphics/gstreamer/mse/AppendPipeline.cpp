@@ -45,6 +45,7 @@
 #include <wtf/Condition.h>
 #include <wtf/Scope.h>
 #include <wtf/TZoneMallocInlines.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/glib/RunLoopSourcePriority.h>
 #include <wtf/text/ASCIILiteral.h>
 #include <wtf/text/MakeString.h>
@@ -595,7 +596,7 @@ void AppendPipeline::didReceiveInitializationSegment()
             auto [parsedCaps, streamType, presentationSize] = parseDemuxerSrcPadCaps(adoptGRef(gst_pad_get_current_caps(pad)).get());
             UNUSED_VARIABLE(parsedCaps);
             UNUSED_VARIABLE(presentationSize);
-            String streamID = String(byteCast<char8_t>(unsafeSpan(GUniquePtr<char>(gst_pad_get_stream_id(pad)).get())));
+            String streamID(GMallocString::unsafeAdoptFromUTF8(gst_pad_get_stream_id(pad)).span());
             if (streamType == StreamType::Audio)
                 audioPadStreamIDs.add(WTFMove(streamID));
             else if (streamType == StreamType::Video)
@@ -611,8 +612,7 @@ void AppendPipeline::didReceiveInitializationSegment()
         bool doVideoTrackStreamIDsMatch = true;
         bool doTextTrackStreamIDsMatch = true;
         for (const auto& track : m_tracks) {
-            GUniquePtr<char> streamIDAsCharacters(gst_pad_get_stream_id(track->entryPad.get()));
-            String streamID = String(byteCast<char8_t>(unsafeSpan(streamIDAsCharacters.get())));
+            String streamID(GMallocString::unsafeAdoptFromUTF8(gst_pad_get_stream_id(track->entryPad.get())).span());
             if (track->streamType == StreamType::Audio) {
                 audioTracksCount++;
                 if (streamID.isEmpty() || !audioPadStreamIDs.contains(streamID))

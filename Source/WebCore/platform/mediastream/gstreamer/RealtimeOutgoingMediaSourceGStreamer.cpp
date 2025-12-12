@@ -31,8 +31,8 @@
 #undef GST_USE_UNSTABLE_API
 
 #include <wtf/UUID.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/glib/WTFGType.h>
-#include <wtf/text/MakeString.h>
 #include <wtf/text/StringToIntegerConversion.h>
 
 GST_DEBUG_CATEGORY(webkit_webrtc_outgoing_media_debug);
@@ -286,16 +286,16 @@ void RealtimeOutgoingMediaSourceGStreamer::setSinkPad(GRefPtr<GstPad>&& pad)
 
 void RealtimeOutgoingMediaSourceGStreamer::checkMid()
 {
-    GUniqueOutPtr<char> mid;
-    g_object_get(m_transceiver.get(), "mid", &mid.outPtr(), nullptr);
+    GUniqueOutPtr<char> midChars;
+    g_object_get(m_transceiver.get(), "mid", &midChars.outPtr(), nullptr);
+    auto mid = GMallocString::unsafeAdoptFromUTF8(WTFMove(midChars));
     if (!mid)
         return;
 
-    auto newMid = makeString(unsafeSpan(mid.get()));
-    if (newMid == m_mid)
+    if (equal(m_mid, mid.span()))
         return;
 
-    m_mid = WTFMove(newMid);
+    m_mid = mid.span();
     for (auto& packetizer : m_packetizers)
         packetizer->ensureMidExtension(m_mid);
 

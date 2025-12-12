@@ -67,18 +67,12 @@ GMallocSpan<T, Malloc> adoptGMallocSpan(std::span<T> span)
     return adoptMallocSpan<T, Malloc>(span);
 }
 
-template<typename Malloc = GMalloc>
-GMallocSpan<char, Malloc> adoptGMallocString(char* str, size_t length)
+template<typename T, typename Malloc = GMalloc>
+GMallocSpan<T, Malloc> dupGMallocSpan(std::span<const T> span)
 {
-    return adoptGMallocSpan<char, Malloc>(unsafeMakeSpan(str, length));
-}
-
-template<typename Malloc = GMalloc>
-GMallocSpan<char, Malloc> adoptGMallocString(char* str)
-{
-    WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
-    return adoptGMallocSpan<char, Malloc>(unsafeMakeSpan(str, str ? strlen(str) : 0));
-    WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
+    auto duplicate = GMallocSpan<T, Malloc>::malloc(span.size_bytes());
+    memcpySpan(duplicate.mutableSpan(), span);
+    return duplicate;
 }
 
 WTF_EXPORT_PRIVATE Expected<GMallocSpan<char>, GUniquePtr<GError>> gFileGetContents(CStringView);
@@ -144,7 +138,6 @@ inline std::span<T> span(GRefPtr<GPtrArray>& array)
 } // namespace WTF
 
 using WTF::GMallocSpan;
-using WTF::adoptGMallocString;
 using WTF::gFileGetContents;
 using WTF::gKeyFileGetKeys;
 using WTF::gObjectClassGetProperties;

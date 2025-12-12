@@ -32,6 +32,7 @@
 
 #include <wtf/MainThread.h>
 #include <wtf/TZoneMallocInlines.h>
+#include <wtf/glib/GMallocString.h>
 
 GST_DEBUG_CATEGORY(webkit_webrtc_data_channel_debug);
 #define GST_CAT_DEFAULT webkit_webrtc_data_channel_debug
@@ -304,8 +305,8 @@ bool GStreamerDataChannelHandler::checkState()
     }
 
 #ifndef GST_DISABLE_GST_DEBUG
-    GUniquePtr<char> stateString(g_enum_to_string(GST_TYPE_WEBRTC_DATA_CHANNEL_STATE, channelState));
-    DC_DEBUG("Dispatching state change to %s on channel %p", stateString.get(), m_channel.get());
+    auto stateString = GMallocString::unsafeAdoptFromUTF8(g_enum_to_string(GST_TYPE_WEBRTC_DATA_CHANNEL_STATE, channelState));
+    DC_DEBUG("Dispatching state change to %s on channel %p", stateString.utf8(), m_channel.get());
 #endif
     postTask([client = m_client, state] {
         if (!*client) {

@@ -27,6 +27,7 @@
 #include "RTCIceTcpCandidateType.h"
 #include <JavaScriptCore/ArrayBuffer.h>
 #include <wtf/TZoneMallocInlines.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/glib/GUniquePtr.h>
 
 namespace WebCore {
@@ -98,8 +99,8 @@ void GStreamerIceTransportBackend::registerClient(RTCIceTransportBackendClient& 
             return;
 
 #ifndef GST_DISABLE_GST_DEBUG
-        GUniquePtr<char> desc(g_enum_to_string(GST_TYPE_WEBRTC_ICE_CONNECTION_STATE, transportState));
-        GST_DEBUG_OBJECT(weakThis->m_backend.get(), "Initial ICE transport state: %s", desc.get());
+        auto desc = GMallocString::unsafeAdoptFromUTF8(g_enum_to_string(GST_TYPE_WEBRTC_ICE_CONNECTION_STATE, transportState));
+        GST_DEBUG_OBJECT(weakThis->m_backend.get(), "Initial ICE transport state: %s", desc.utf8());
 #endif
 
         // We start observing a bit late and might miss the checking state. Synthesize it as needed.
@@ -126,8 +127,8 @@ void GStreamerIceTransportBackend::stateChanged() const
     g_object_get(m_iceTransport.get(), "state", &transportState, nullptr);
 
 #ifndef GST_DISABLE_GST_DEBUG
-    GUniquePtr<char> desc(g_enum_to_string(GST_TYPE_WEBRTC_ICE_CONNECTION_STATE, transportState));
-    GST_DEBUG_OBJECT(m_backend.get(), "ICE transport state changed to %s", desc.get());
+    auto desc = GMallocString::unsafeAdoptFromUTF8(g_enum_to_string(GST_TYPE_WEBRTC_ICE_CONNECTION_STATE, transportState));
+    GST_DEBUG_OBJECT(m_backend.get(), "ICE transport state changed to %s", desc.utf8());
 #endif
 
     callOnMainThread([weakThis = WeakPtr { *this }, transportState] {

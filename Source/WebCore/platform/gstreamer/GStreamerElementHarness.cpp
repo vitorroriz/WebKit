@@ -29,6 +29,7 @@
 #include <wtf/PrintStream.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/TZoneMallocInlines.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/text/MakeString.h>
 #include <wtf/text/StringBuilder.h>
 
@@ -651,8 +652,8 @@ void MermaidBuilder::dumpElement(GStreamerElementHarness& harness, GstElement* e
 String MermaidBuilder::describeCaps(const GRefPtr<GstCaps>& caps)
 {
     if (gst_caps_is_any(caps.get()) || gst_caps_is_empty(caps.get())) {
-        GUniquePtr<char> capsString(gst_caps_to_string(caps.get()));
-        return unsafeSpan(capsString.get());
+        auto capsString = GMallocString::unsafeAdoptFromUTF8(gst_caps_to_string(caps.get()));
+        return capsString.span();
     }
 
     StringBuilder builder;
@@ -662,19 +663,18 @@ String MermaidBuilder::describeCaps(const GRefPtr<GstCaps>& caps)
         const auto* structure = gst_caps_get_structure(caps.get(), i);
         builder.append(gstStructureGetName(structure).span(), "<br/>"_s);
         if (features && (gst_caps_features_is_any(features) || !gst_caps_features_is_equal(features, GST_CAPS_FEATURES_MEMORY_SYSTEM_MEMORY))) {
-            GUniquePtr<char> serializedFeature(gst_caps_features_to_string(features));
-            builder.append('(', unsafeSpan(serializedFeature.get()), ')');
+            auto serializedFeature = GMallocString::unsafeAdoptFromUTF8(gst_caps_features_to_string(features));
+            builder.append('(', serializedFeature.span(), ')');
         }
 
         gstStructureForeach(structure, [&](auto id, const auto value) -> bool {
             builder.append(gstIdToString(id), ": "_s);
 
-            GUniquePtr<char> serializedValue(gst_value_serialize(value));
-            String valueString = unsafeSpan(serializedValue.get());
-            if (valueString.length() > 25)
-                builder.append(valueString.substring(0, 25), "…"_s);
+            auto serializedValue = GMallocString::unsafeAdoptFromUTF8(gst_value_serialize(value));
+            if (serializedValue.lengthInBytes() > 25)
+                builder.append(serializedValue.span().subspan(0, 25), "…"_s);
             else
-                builder.append(valueString);
+                builder.append(serializedValue.span());
             builder.append("<br/>"_s);
             return TRUE;
         });
@@ -696,8 +696,8 @@ void GStreamerElementHarness::dumpGraph(ASCIILiteral filenamePrefix)
         return;
 
     auto elapsed = gst_util_get_timestamp() - webkitGstInitTime();
-    GUniquePtr<char> elapsedTimeStamp(gst_info_strdup_printf("%" GST_TIME_FORMAT, GST_TIME_ARGS(elapsed)));
-    auto filename = makeString(unsafeSpan(elapsedTimeStamp.get()), '-', filenamePrefix, "-harness-"_s, unsafeSpan(GST_ELEMENT_NAME(m_element.get())), ".mmd"_s);
+    auto elapsedTimeStamp = GMallocString::unsafeAdoptFromUTF8(gst_info_strdup_printf("%" GST_TIME_FORMAT, GST_TIME_ARGS(elapsed)));
+    auto filename = makeString(elapsedTimeStamp.span(), '-', filenamePrefix, "-harness-"_s, unsafeSpan(GST_ELEMENT_NAME(m_element.get())), ".mmd"_s);
 
     MermaidBuilder builder;
     builder.process(*this);

@@ -722,9 +722,9 @@ void setSsrcAudioLevelVadOn(GstStructure* structure)
         g_value_set_static_string(&stringValue, "vad=on");
         gst_value_array_append_and_take_value(&arrayValue, &stringValue);
 
-        GUniquePtr<char> fieldNamePtr(g_strdup(fieldName.utf8()));
-        gst_structure_remove_field(structure, fieldNamePtr.get());
-        gst_structure_take_value(structure, fieldNamePtr.get(), &arrayValue);
+        GMallocString fieldNameCopy(fieldName);
+        gst_structure_remove_field(structure, fieldNameCopy.utf8());
+        gst_structure_take_value(structure, fieldNameCopy.utf8(), &arrayValue);
     }
 }
 

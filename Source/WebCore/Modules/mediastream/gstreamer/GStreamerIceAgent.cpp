@@ -42,6 +42,7 @@
 #include <wtf/TZoneMalloc.h>
 #include <wtf/URL.h>
 #include <wtf/URLHash.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/glib/GThreadSafeWeakPtr.h>
 #include <wtf/glib/WTFGType.h>
 #include <wtf/text/StringBuilder.h>
@@ -792,8 +793,7 @@ void webkitGstWebRTCIceAgentGatheringDoneForStream(WebKitGstIceAgent* agent, uns
 void webkitGstWebRTCIceAgentLocalCandidateGatheredForStream(WebKitGstIceAgent* agent, unsigned streamId, RiceAgentGatheredCandidate& candidate)
 {
     findStreamAndApply(agent->priv->streams, streamId, [&](const auto* stream) {
-        GUniquePtr<char> sdpCandidate(rice_candidate_to_sdp_string(&candidate.gathered.candidate));
-        auto sdp = CStringView::unsafeFromUTF8(sdpCandidate.get());
+        auto sdp = GMallocString::unsafeAdoptFromUTF8(rice_candidate_to_sdp_string(&candidate.gathered.candidate));
         ASSERT(startsWith(sdp.span(), "a="_s));
         String strippedSdp(sdp.span().subspan(2));
 

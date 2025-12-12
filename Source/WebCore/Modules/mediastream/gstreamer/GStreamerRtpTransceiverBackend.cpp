@@ -28,6 +28,7 @@
 #include "GStreamerWebRTCUtils.h"
 #include "RTCRtpCodecCapability.h"
 #include <wtf/TZoneMallocInlines.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/glib/GUniquePtr.h>
 
 GST_DEBUG_CATEGORY(webkit_webrtc_transceiver_debug);
@@ -93,8 +94,8 @@ void GStreamerRtpTransceiverBackend::setDirection(RTCRtpTransceiverDirection dir
 {
     auto gstDirection = fromRTCRtpTransceiverDirection(direction);
 #ifndef GST_DISABLE_GST_DEBUG
-    GUniquePtr<char> directionString(g_enum_to_string(GST_TYPE_WEBRTC_RTP_TRANSCEIVER_DIRECTION, gstDirection));
-    GST_DEBUG_OBJECT(m_rtcTransceiver.get(), "Setting direction to %s", directionString.get());
+    auto directionString = GMallocString::unsafeAdoptFromUTF8(g_enum_to_string(GST_TYPE_WEBRTC_RTP_TRANSCEIVER_DIRECTION, gstDirection));
+    GST_DEBUG_OBJECT(m_rtcTransceiver.get(), "Setting direction to %s", directionString.utf8());
 #endif
     g_object_set(m_rtcTransceiver.get(), "direction", gstDirection, nullptr);
 }

@@ -29,6 +29,7 @@
 #include <gst/pbutils/gstpluginsbaseversion.h>
 #include <mutex>
 #include <wtf/PrintStream.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/glib/GRefPtr.h>
 #include <wtf/glib/GUniquePtr.h>
 #include <wtf/glib/WTFGType.h>
@@ -102,8 +103,8 @@ private:
     static bool checkIsNeeded()
     {
 #ifndef GST_DISABLE_GST_DEBUG
-        GUniquePtr<char> versionString(gst_version_string());
-        GST_DEBUG("BaseSinkPositionFlushWorkaroundProbe: running %s, the bug was fixed in 1.24.", versionString.get());
+        auto versionString = GMallocString::unsafeAdoptFromUTF8(gst_version_string());
+        GST_DEBUG("BaseSinkPositionFlushWorkaroundProbe: running %s, the bug was fixed in 1.24.", versionString.utf8());
 #endif
         WorkaroundMode mode = getWorkAroundModeFromEnvironment("WEBKIT_GST_WORKAROUND_BASE_SINK_POSITION_FLUSH"_s,
             ASCIILiteral::fromLiteralUnsafe(WEBKIT_GST_WORKAROUND_BASE_SINK_POSITION_FLUSH_DEFAULT_MODE));
@@ -208,8 +209,8 @@ private:
         }
 
 #ifndef GST_DISABLE_GST_DEBUG
-        GUniquePtr<char> version(gst_plugins_base_version_string());
-        GST_DEBUG("AppSinkFlushCapsWorkaroundProbe: gst-plugins-base version is %s, bug was fixed in 1.21.1 and backported to 1.20.3.", version.get());
+        auto version = GMallocString::unsafeAdoptFromUTF8(gst_plugins_base_version_string());
+        GST_DEBUG("AppSinkFlushCapsWorkaroundProbe: gst-plugins-base version is %s, bug was fixed in 1.21.1 and backported to 1.20.3.", version.utf8());
 #endif
         WorkaroundMode mode = getWorkAroundModeFromEnvironment("WEBKIT_GST_WORKAROUND_APP_SINK_FLUSH_CAPS"_s,
             ASCIILiteral::fromLiteralUnsafe(WEBKIT_GST_WORKAROUND_APP_SINK_FLUSH_CAPS_DEFAULT_MODE));

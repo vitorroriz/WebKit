@@ -26,6 +26,7 @@
 #include "GStreamerWebRTCUtils.h"
 #include <JavaScriptCore/ArrayBuffer.h>
 #include <wtf/Noncopyable.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/glib/GUniquePtr.h>
 
 namespace WebCore {
@@ -70,8 +71,8 @@ void GStreamerDtlsTransportBackendObserver::stateChanged()
         g_object_get(m_backend.get(), "state", &state, nullptr);
 
 #ifndef GST_DISABLE_GST_DEBUG
-        GUniquePtr<char> desc(g_enum_to_string(GST_TYPE_WEBRTC_DTLS_TRANSPORT_STATE, state));
-        GST_DEBUG_OBJECT(m_backend.get(), "DTLS transport state changed to %s", desc.get());
+        auto desc = GMallocString::unsafeAdoptFromUTF8(g_enum_to_string(GST_TYPE_WEBRTC_DTLS_TRANSPORT_STATE, state));
+        GST_DEBUG_OBJECT(m_backend.get(), "DTLS transport state changed to %s", desc.utf8());
 #endif
 
         Vector<Ref<JSC::ArrayBuffer>> certificates;

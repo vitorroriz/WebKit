@@ -34,6 +34,7 @@
 #include "VP9Utilities.h"
 #include <gst/pbutils/pbutils.h>
 #include <wtf/Scope.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/text/StringToIntegerConversion.h>
 
 namespace WebCore {
@@ -135,9 +136,9 @@ void VideoTrackPrivateGStreamer::updateConfigurationFromCaps(GRefPtr<GstCaps>&& 
     });
 
 #if GST_CHECK_VERSION(1, 20, 0)
-    GUniquePtr<char> mimeCodec(gst_codec_utils_caps_get_mime_codec(caps.get()));
-    if (mimeCodec) {
-        String codec = unsafeSpan(mimeCodec.get());
+    auto mimeCodec = GMallocString::unsafeAdoptFromUTF8(gst_codec_utils_caps_get_mime_codec(caps.get()));
+    if (!mimeCodec.isEmpty()) {
+        String codec(mimeCodec.span());
         if (!gst_check_version(1, 22, 8)) {
             // The gst_codec_utils_caps_get_mime_codec() function will return all the codec parameters,
             // including the default ones, so to strip them away, re-parse the returned string, using

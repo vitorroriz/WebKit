@@ -35,6 +35,7 @@
 #include <WebCore/IntSize.h>
 #include <WebCore/PlatformVideoColorSpace.h>
 #include <wtf/URL.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/text/MakeString.h>
 
 using namespace WebCore;
@@ -167,16 +168,16 @@ TEST_F(GStreamerTest, capsFromCodecString)
         auto inputStructure = gst_caps_get_structure(input.get(), 0);   \
         const char* inputFormat = gst_structure_get_string(inputStructure, "format"); \
         ASSERT_STREQ(inputFormat, expectedInputFormat);                 \
-        GUniquePtr<char> outputCaps(gst_caps_to_string(output.get()));  \
-        ASSERT_STREQ(outputCaps.get(), expectedOutputCaps);             \
+        auto outputCaps = GMallocString::unsafeAdoptFromUTF8(gst_caps_to_string(output.get())); \
+        ASSERT_STREQ(outputCaps.utf8(), expectedOutputCaps);             \
     } G_STMT_END
 
 #define TEST_CAPS_FROM_CODEC_FULL(codecString, expectedInputCaps, expectedOutputCaps) G_STMT_START { \
         auto [input, output] = capsFromCodecString(codecString, { });   \
-        GUniquePtr<char> inputCaps(gst_caps_to_string(input.get()));    \
-        ASSERT_STREQ(inputCaps.get(), expectedInputCaps);               \
-        GUniquePtr<char> outputCaps(gst_caps_to_string(output.get()));  \
-        ASSERT_STREQ(outputCaps.get(), expectedOutputCaps);             \
+        auto inputCaps = GMallocString::unsafeAdoptFromUTF8(gst_caps_to_string(input.get())); \
+        ASSERT_STREQ(inputCaps.utf8(), expectedInputCaps);               \
+        auto outputCaps = GMallocString::unsafeAdoptFromUTF8(gst_caps_to_string(output.get())); \
+        ASSERT_STREQ(outputCaps.utf8(), expectedOutputCaps);             \
     } G_STMT_END
 
     TEST_CAPS_FROM_CODEC("av01.0.01M.08"_s, "I420", "video/x-av1, profile=(string)main, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, chroma-format=(string)4:2:0");
@@ -185,8 +186,8 @@ TEST_F(GStreamerTest, capsFromCodecString)
 
     // AV1 levels, per spec valid values range from 00 to 31, but we support only up to 23.
     for (unsigned i = 0; i < 23; i++) {
-        GUniquePtr<char> codecString(g_strdup_printf("av01.0.%02dM.08", i));
-        TEST_CAPS_FROM_CODEC(makeString(unsafeSpan(codecString.get())), "I420", "video/x-av1, profile=(string)main, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, chroma-format=(string)4:2:0");
+        auto codecString = GMallocString::unsafeAdoptFromUTF8(g_strdup_printf("av01.0.%02dM.08", i));
+        TEST_CAPS_FROM_CODEC(String(codecString.span()), "I420", "video/x-av1, profile=(string)main, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, chroma-format=(string)4:2:0");
     }
 
     // AV1 monochrome.

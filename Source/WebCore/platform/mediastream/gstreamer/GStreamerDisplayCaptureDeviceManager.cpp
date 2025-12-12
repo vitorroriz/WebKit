@@ -27,6 +27,7 @@
 #include "GStreamerVideoCaptureSource.h"
 #include "PipeWireCaptureDevice.h"
 #include <wtf/UUID.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/glib/GUniquePtr.h>
 #include <wtf/text/MakeString.h>
 
@@ -95,17 +96,19 @@ CaptureSourceOrError GStreamerDisplayCaptureDeviceManager::createDisplayCaptureS
     if (!result)
         return CaptureSourceOrError({ { }, MediaAccessDenialReason::PermissionDenied });
 
-    GUniqueOutPtr<char> objectPath;
-    g_variant_get(result.get(), "(o)", &objectPath.outPtr());
-    m_portal->waitResponseSignal(ASCIILiteral::fromLiteralUnsafe(objectPath.get()));
+    GUniqueOutPtr<char> objectPathChars;
+    g_variant_get(result.get(), "(o)", &objectPathChars.outPtr());
+    auto objectPath = GMallocString::unsafeAdoptFromUTF8(WTFMove(objectPathChars));
+    m_portal->waitResponseSignal(toCStringView(objectPath));
 
     result = session->start();
     if (!result)
         return CaptureSourceOrError({ { }, MediaAccessDenialReason::PermissionDenied });
 
     std::optional<uint32_t> nodeId;
-    g_variant_get(result.get(), "(o)", &objectPath.outPtr());
-    m_portal->waitResponseSignal(ASCIILiteral::fromLiteralUnsafe(objectPath.get()), [&nodeId](GVariant* parameters) mutable {
+    g_variant_get(result.get(), "(o)", &objectPathChars.outPtr());
+    objectPath = GMallocString::unsafeAdoptFromUTF8(WTFMove(objectPathChars));
+    m_portal->waitResponseSignal(toCStringView(objectPath), [&nodeId](GVariant* parameters) mutable {
         uint32_t portalResponse;
         GRefPtr<GVariant> responseData;
         g_variant_get(parameters, "(u@a{sv})", &portalResponse, &responseData.outPtr());

@@ -30,6 +30,7 @@
 #include <wtf/Scope.h>
 #include <wtf/UUID.h>
 #include <wtf/WeakRandomNumber.h>
+#include <wtf/glib/GMallocString.h>
 #include <wtf/glib/GUniquePtr.h>
 
 #if GST_CHECK_VERSION(1, 24, 0)
@@ -100,13 +101,13 @@ GRefPtr<GVariant> DesktopPortal::getProperty(ASCIILiteral name)
     return nullptr;
 }
 
-void DesktopPortal::waitResponseSignal(ASCIILiteral objectPath, ResponseCallback&& callback)
+void DesktopPortal::waitResponseSignal(CStringView objectPath, ResponseCallback&& callback)
 {
     RELEASE_ASSERT(!m_currentResponseCallback);
     m_currentResponseCallback = WTFMove(callback);
     auto* connection = g_dbus_proxy_get_connection(m_proxy.get());
     auto signalId = g_dbus_connection_signal_subscribe(connection, "org.freedesktop.portal.Desktop", "org.freedesktop.portal.Request",
-        "Response", objectPath.characters(), nullptr, G_DBUS_SIGNAL_FLAGS_NO_MATCH_RULE, reinterpret_cast<GDBusSignalCallback>(+[](GDBusConnection*, const char* /* senderName */, const char* /* objectPath */, const char* /* interfaceName */, const char* /* signalName */, GVariant* parameters, gpointer userData) {
+        "Response", objectPath.utf8(), nullptr, G_DBUS_SIGNAL_FLAGS_NO_MATCH_RULE, reinterpret_cast<GDBusSignalCallback>(+[](GDBusConnection*, const char* /* senderName */, const char* /* objectPath */, const char* /* interfaceName */, const char* /* signalName */, GVariant* parameters, gpointer userData) {
             auto& self = *reinterpret_cast<DesktopPortal*>(userData);
             self.notifyResponse(parameters);
         }), this, nullptr);
@@ -210,12 +211,12 @@ std::optional<DesktopPortalScreenCast::ScreencastSession> DesktopPortalScreenCas
         return { };
     }
 
-    GUniqueOutPtr<char> objectPath;
-    g_variant_get(result.get(), "(o)", &objectPath.outPtr());
-    waitResponseSignal(ASCIILiteral::fromLiteralUnsafe(objectPath.get()));
+    GUniqueOutPtr<char> objectPathChars;
+    g_variant_get(result.get(), "(o)", &objectPathChars.outPtr());
+    auto objectPath = GMallocString::unsafeAdoptFromUTF8(WTFMove(objectPathChars));
+    waitResponseSignal(toCStringView(objectPath));
 
-    auto requestPath = StringView::fromLatin1(objectPath.get());
-    auto sessionPath = makeStringByReplacingAll(requestPath.toStringWithoutCopying(), "/request/"_s, "/session/"_s);
+    auto sessionPath = makeStringByReplacingAll(objectPath.span(), "/request/"_s, "/session/"_s);
     sessionPath = makeStringByReplacingAll(sessionPath, token, sessionToken);
     return { ScreencastSession { WTFMove(sessionPath), m_proxy } };
 }
@@ -299,8 +300,8 @@ std::optional<PipeWireNodeData> DesktopPortalScreenCast::ScreencastSession::open
 
 #if GST_CHECK_VERSION(1, 24, 0)
     auto fourcc = gst_video_dma_drm_fourcc_from_format(GST_VIDEO_FORMAT_BGRA);
-    GUniquePtr<char> drmFormat(gst_video_dma_drm_fourcc_to_string(fourcc, 0));
-    gst_caps_set_simple(nodeData.caps.get(), "format", G_TYPE_STRING, "DMA_DRM", "drm-format", G_TYPE_STRING, drmFormat.get(), nullptr);
+    auto drmFormat = GMallocString::unsafeAdoptFromUTF8(gst_video_dma_drm_fourcc_to_string(fourcc, 0));
+    gst_caps_set_simple(nodeData.caps.get(), "format", G_TYPE_STRING, "DMA_DRM", "drm-format", G_TYPE_STRING, drmFormat.utf8(), nullptr);
 #endif
     return nodeData;
 }
