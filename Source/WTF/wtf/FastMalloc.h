@@ -665,12 +665,3 @@ using __thisIsHereToForceASemicolonAfterWTFOverrideDelete UNUSED_TYPE_ALIAS = in
 #define WTF_STRUCT_OVERRIDE_DELETE_FOR_CHECKED_PTR(ClassName) \
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR_IMPL(ClassName) \
 using __thisIsHereToForceASemicolonAfterWTFOverrideDelete UNUSED_TYPE_ALIAS = int
-
-#if HAVE(36BIT_ADDRESS)
-#define WTF_DATA_ADDRESS_IS_SANE(p) (reinterpret_cast<uintptr_t>(p) < (1ull << 36))
-#define RELEASE_ASSERT_DATA_ADDRESS_IS_SANE(p) RELEASE_ASSERT(WTF_DATA_ADDRESS_IS_SANE(p))
-#else
-#define WTF_DATA_ADDRESS_IS_SANE(p) (UNUSED_PARAM(p), true)
-#define RELEASE_ASSERT_DATA_ADDRESS_IS_SANE(p) UNUSED_PARAM(p)
-#endif
-
