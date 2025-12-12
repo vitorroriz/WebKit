@@ -80,3 +80,8 @@ cleanup = "rdar://161402756"
 symbols = [
     "FPFontCreateMemorySafeFontsFromData",
 ]
+
+[[staging]]
+symbols = [
+    "MACaptionAppearanceCopyPreviewText",
+]

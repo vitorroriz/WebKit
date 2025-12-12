@@ -1060,6 +1060,10 @@ String CaptionUserPreferencesMediaAF::captionPreviewTitle() const
         return CaptionUserPreferences::captionPreviewTitle();
 
     String activeProfileID = platformActiveProfileID();
+
+    if (canLoad_MediaAccessibility_MACaptionAppearanceCopyPreviewText())
+        return adoptCF(MACaptionAppearanceCopyPreviewText(activeProfileID.createCFString().get(), nullptr)).get();
+
     String activeProfileName = nameForProfileID(activeProfileID);
     if (activeProfileName.isEmpty())
         return CaptionUserPreferences::captionPreviewTitle();
