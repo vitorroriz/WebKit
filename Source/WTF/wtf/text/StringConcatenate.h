@@ -549,7 +549,7 @@ decltype(auto) interleave(const C& container, NOESCAPE E&& each, const B& betwee
 {
     return Interleave {
         container,
-        WTFMove(each),
+        std::forward<E>(each),
         between
     };
 }
@@ -560,7 +560,7 @@ decltype(auto) interleave(const C& container, NOESCAPE E&& each, const B& betwee
 {
     return Interleave {
         container,
-        WTFMove(each),
+        std::forward<E>(each),
         between
     };
 }
