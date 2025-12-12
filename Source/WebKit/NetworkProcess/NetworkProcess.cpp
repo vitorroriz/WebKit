@@ -136,11 +136,6 @@
 #include <WebCore/ParentalControlsURLFilter.h>
 #endif
 
-
-#if HAVE(BROWSERENGINEKIT_WEBCONTENTFILTER)
-#include "WebParentalControlsURLFilter.h"
-#endif
-
 namespace WebKit {
 using namespace WebCore;
 
@@ -367,10 +362,6 @@ void NetworkProcess::initializeNetworkProcess(NetworkProcessCreationParameters&&
 
     if (parameters.defaultRequestTimeoutInterval)
         setDefaultRequestTimeoutInterval(*parameters.defaultRequestTimeoutInterval);
-
-#if HAVE(BROWSERENGINEKIT_WEBCONTENTFILTER) && !HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
-    WebCore::ParentalControlsURLFilter::setGlobalFilter(WebParentalControlsURLFilter::create());
-#endif
 
     RELEASE_LOG(Process, "%p - NetworkProcess::initializeNetworkProcess: Presenting processPID=%d", this, legacyPresentingApplicationPID());
 }

@@ -34,11 +34,6 @@
 #include <wtf/RefCountedAndCanMakeWeakPtr.h>
 #include <wtf/TZoneMalloc.h>
 
-#if HAVE(WEBCONTENTRESTRICTIONS)
-#include <WebCore/ParentalControlsContentFilter.h>
-#include <WebCore/ParentalControlsURLFilter.h>
-#endif
-
 namespace IPC {
 class Connection;
 }
@@ -106,13 +101,8 @@ private:
     IPC::Connection* messageSenderConnection() const override;
     uint64_t messageSenderDestinationID() const override;
 
-#if HAVE(WEBCONTENTRESTRICTIONS)
-    void blockDueToContentFilter(const WebCore::ResourceResponse&, CompletionHandler<void()>&& postBlockHandler);
-#endif
-
 private:
     const Ref<NetworkLoad> m_networkLoad;
-    DownloadID m_downloadID;
     RefPtr<IPC::Connection> m_parentProcessConnection;
     bool m_isAllowedToAskUserForCredentials;
     bool m_isDownloadCancelled = false;
@@ -128,11 +118,6 @@ private:
 #else
     SandboxExtension::Handle m_progressSandboxExtension;
 #endif
-#endif
-
-#if HAVE(WEBCONTENTRESTRICTIONS)
-    RefPtr<WebCore::ParentalControlsURLFilter> m_urlFilter;
-    bool m_wasBlockedDueToContentFilter : 1 { false };
 #endif
 };
 

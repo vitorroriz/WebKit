@@ -61,16 +61,18 @@ bool WebParentalControlsURLFilter::isEnabledImpl() const
     return [BEWebContentFilter shouldEvaluateURLs];
 }
 
-void WebParentalControlsURLFilter::isURLAllowedImpl(const URL& url, CompletionHandler<void(bool, NSData *)>&& completionHandler
+void WebParentalControlsURLFilter::isURLAllowed(const URL& url, WebCore::ParentalControlsContentFilter& filter)
 {
-    workQueueSingleton().dispatch([this, protectedThis = Ref { *this }, currentIsEnabled = isEnabled(), url = crossThreadCopy(url), completionHandler = WTFMove(completionHandler)]() mutable {
-        if (!currentIsEnabled) {
-            completionHandler(true, nullptr);
+    workQueueSingleton().dispatch([this, protectedThis = Ref { *this }, currentIsEnabled = isEnabled(), url = crossThreadCopy(url), weakFilter = ThreadSafeWeakPtr { filter }]() mutable {
+        RefPtr filter = weakFilter.get();
+        if (!currentIsEnabled && filter) {
+            filter->didReceiveAllowDecisionOnQueue(true, nullptr);
             return;
         }
 
-        [ensureWebContentFilter() evaluateURL:url.createNSURL().get() completionHandler:makeBlockPtr([completionHandler = WTFMove(completionHandler)](BOOL shouldBlock, NSData *replacementData) mutable {
-            completionHandler(!shouldBlock, replacementData);
+        [ensureWebContentFilter() evaluateURL:url.createNSURL().get() completionHandler:makeBlockPtr([weakFilter = WTFMove(weakFilter)](BOOL shouldBlock, NSData *replacementData) mutable {
+            if (RefPtr filter = weakFilter.get())
+                filter->didReceiveAllowDecisionOnQueue(!shouldBlock, replacementData);
         }).get()];
     });
 }

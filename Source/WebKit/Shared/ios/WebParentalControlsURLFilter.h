@@ -43,7 +43,7 @@ private:
 
     // WebCore::ParentalControlsURLFilter
     bool isEnabledImpl() const final;
-    void isURLAllowedImpl(const URL&, CompletionHandler<void(bool, NSData *)>&&) final;
+    void isURLAllowed(const URL&, WebCore::ParentalControlsContentFilter&) final;
     void allowURL(const URL&, CompletionHandler<void(bool)>&&) final;
 
     BEWebContentFilter* ensureWebContentFilter();

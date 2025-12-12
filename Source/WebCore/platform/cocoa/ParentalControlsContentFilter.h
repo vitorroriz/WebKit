@@ -27,7 +27,6 @@
 
 #include <WebCore/PlatformContentFilter.h>
 #include <wtf/Compiler.h>
-#include <wtf/Condition.h>
 #include <wtf/RetainPtr.h>
 #include <wtf/TZoneMalloc.h>
 #include <wtf/UniqueRef.h>
