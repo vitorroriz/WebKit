@@ -454,35 +454,31 @@ public:
     Interleave(Interleave&&) = default;
     Interleave& operator=(Interleave&&) = default;
 
-WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
     template<typename Accumulator> void writeUsing(Accumulator& accumulator) const
     {
-        auto begin = std::begin(container);
-        auto end = std::end(container);
-        if (begin == end)
-            return;
-
         constexpr bool eachTakesAccumulator = requires {
-            { std::invoke(each, accumulator, *begin) } -> std::same_as<void>;
+            { std::invoke(each, accumulator, *std::begin(container)) } -> std::same_as<void>;
         };
 
+        bool isFirst = true;
         if constexpr (eachTakesAccumulator) {
-            std::invoke(each, accumulator, *begin);
-
-            ++begin;
-            for (; begin != end; ++begin) {
-                accumulator.append(between);
-                std::invoke(each, accumulator, *begin);
+            for (auto& item : container) {
+                if (isFirst)
+                    isFirst = false;
+                else
+                    accumulator.append(between);
+                std::invoke(each, accumulator, item);
             }
         } else {
-            accumulator.append(std::invoke(each, *begin));
-
-            ++begin;
-            for (; begin != end; ++begin)
-                accumulator.append(between, std::invoke(each, *begin));
+            for (auto& item : container) {
+                if (isFirst)
+                    isFirst = false;
+                else
+                    accumulator.append(between);
+                accumulator.append(std::invoke(each, item));
+            }
         }
     }
-WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 
 private:
     const C& container;
