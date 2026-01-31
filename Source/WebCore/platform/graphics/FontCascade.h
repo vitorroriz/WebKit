@@ -337,7 +337,6 @@ public:
 
     bool useBackslashAsYenSymbol() const { return m_useBackslashAsYenSymbol; }
     FontCascadeFonts* fonts() const { return m_fonts.get(); }
-    RefPtr<FontCascadeFonts> protectedFonts() const { return m_fonts; }
     bool isLoadingCustomFonts() const;
 
     static ResolvedEmojiPolicy resolveEmojiPolicy(FontVariantEmoji, char32_t);
@@ -418,7 +417,7 @@ private:
 inline Ref<const Font> FontCascade::primaryFont() const
 {
     ASSERT(m_fonts);
-    Ref font = protectedFonts()->primaryFont(m_fontDescription, protect(fontSelector()).get());
+    Ref font = protect(fonts())->primaryFont(m_fontDescription, protect(fontSelector()).get());
     m_fontDescription.resolveFontSizeAdjustFromFontIfNeeded(font);
     return font;
 }
@@ -426,19 +425,19 @@ inline Ref<const Font> FontCascade::primaryFont() const
 inline const FontRanges& FontCascade::fallbackRangesAt(unsigned index) const
 {
     ASSERT(m_fonts);
-    return protectedFonts()->realizeFallbackRangesAt(m_fontDescription, protect(fontSelector()).get(), index);
+    return protect(fonts())->realizeFallbackRangesAt(m_fontDescription, protect(fontSelector()).get(), index);
 }
 
 inline bool FontCascade::isFixedPitch() const
 {
     ASSERT(m_fonts);
-    return protectedFonts()->isFixedPitch(m_fontDescription, protect(fontSelector()).get());
+    return protect(fonts())->isFixedPitch(m_fontDescription, protect(fontSelector()).get());
 }
 
 inline bool FontCascade::canTakeFixedPitchFastContentMeasuring() const
 {
     ASSERT(m_fonts);
-    return protectedFonts()->canTakeFixedPitchFastContentMeasuring(m_fontDescription, protect(fontSelector()).get());
+    return protect(fonts())->canTakeFixedPitchFastContentMeasuring(m_fontDescription, protect(fontSelector()).get());
 }
 
 inline FontSelector* FontCascade::fontSelector() const
