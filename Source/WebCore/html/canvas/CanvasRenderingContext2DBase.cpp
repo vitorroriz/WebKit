@@ -56,6 +56,7 @@
 #include "DOMMatrix2DInit.h"
 #include "FloatQuad.h"
 #include "GeometryUtilities.h"
+#include "GlyphBuffer.h"
 #include "Gradient.h"
 #include "HTMLCanvasElement.h"
 #include "HTMLImageElement.h"
@@ -2849,14 +2850,22 @@ String CanvasRenderingContext2DBase::normalizeSpaces(const String& text)
 
 void CanvasRenderingContext2DBase::drawTextUnchecked(const TextRun& textRun, double x, double y, bool fill, std::optional<double> maxWidth)
 {
-    auto measureTextRun = [&](const TextRun& textRun) -> std::tuple<float, FontMetrics>  {
-        auto& fontProxy = *this->fontProxy();
+    auto& fontCascade = this->fontProxy()->fontCascade();
+    auto& fontMetrics = fontProxy()->metricsOfPrimaryFont();
+    // On our simple path we do 2 things:
+    // 1. We don't invoke BidiResolver because this will form a LTR single bidi run
+    // 2. We create a glyphbuffer for measuring width and re-use it for painting directly.
+    auto canUseSimplePath = textRun.ltr() && textRun.is8Bit();
 
         // FIXME: Need to turn off font smoothing.
-        return { fontProxy.width(textRun), fontProxy.metricsOfPrimaryFont() };
-    };
-
-    auto [fontWidth, fontMetrics] = measureTextRun(textRun);
+    std::optional<GlyphBuffer> glyphBuffer;
+    float fontWidth;
+    if (canUseSimplePath) {
+        auto codePath = fontCascade.codePath(textRun);
+        glyphBuffer = fontCascade.layoutText(codePath, textRun, 0, textRun.length(), FontCascade::ForTextEmphasisOrNot::NotForTextEmphasis, &fontWidth);
+        glyphBuffer->flatten();
+    } else
+        fontWidth = fontCascade.width(textRun);
     bool useMaxWidth = maxWidth && maxWidth.value() < fontWidth;
     float width = useMaxWidth ? maxWidth.value() : fontWidth;
     FloatPoint location(x, y);
@@ -2874,6 +2883,16 @@ void CanvasRenderingContext2DBase::drawTextUnchecked(const TextRun& textRun, dou
     // https://bugs.webkit.org/show_bug.cgi?id=193077.
     auto* c = effectiveDrawingContext();
     auto& fontProxy = *this->fontProxy();
+
+    auto drawText = [&](GraphicsContext& context, const FloatPoint& point) {
+        if (canUseSimplePath) {
+            if (glyphBuffer->isEmpty())
+                return;
+            FloatPoint startPoint = point + WebCore::size(glyphBuffer->initialAdvance());
+            fontProxy.fontCascade().drawGlyphBuffer(context, *glyphBuffer, startPoint, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+        } else
+            fontProxy.drawBidiText(context, textRun, point, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+    };
 
 #if USE(CG)
     const CanvasStyle& drawStyle = fill ? state().fillStyle : state().strokeStyle;
@@ -2903,7 +2922,7 @@ void CanvasRenderingContext2DBase::drawTextUnchecked(const TextRun& textRun, dou
             else
                 c->setStrokeColor(Color::black);
 
-            fontProxy.drawBidiText(*c, textRun, location + offset, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+            drawText(*c, location + offset);
         }
 
         auto maskImage = c->createAlignedImageBuffer(maskRect.size());
@@ -2925,10 +2944,10 @@ void CanvasRenderingContext2DBase::drawTextUnchecked(const TextRun& textRun, dou
             maskImageContext.translate(location - maskRect.location());
             // We draw when fontWidth is 0 so compositing operations (eg, a "copy" op) still work.
             maskImageContext.scale(FloatSize((fontWidth > 0 ? (width / fontWidth) : 0), 1));
-            fontProxy.drawBidiText(maskImageContext, textRun, FloatPoint(0, 0), FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+            drawText(maskImageContext, FloatPoint(0, 0));
         } else {
             maskImageContext.translate(-maskRect.location());
-            fontProxy.drawBidiText(maskImageContext, textRun, location, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+            drawText(maskImageContext, location);
         }
 
         GraphicsContextStateSaver stateSaver(*c);
@@ -2956,18 +2975,18 @@ void CanvasRenderingContext2DBase::drawTextUnchecked(const TextRun& textRun, dou
     bool repaintEntireCanvas = false;
     if (isFullCanvasCompositeMode(state().globalComposite)) {
         beginCompositeLayer();
-        fontProxy.drawBidiText(*c, textRun, location, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+        drawText(*c, location);
         endCompositeLayer();
         repaintEntireCanvas = true;
     } else if (state().globalComposite == CompositeOperator::Copy) {
         clearCanvas();
-        fontProxy.drawBidiText(*c, textRun, location, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+        drawText(*c, location);
         repaintEntireCanvas = true;
     } else {
         auto clipBounds = c->clipBounds();
         if ((clipBounds.isEmpty() || !clipBounds.intersects(enclosingIntRect(textRect))) && !shouldDrawShadows())
             return;
-        fontProxy.drawBidiText(*c, textRun, location, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+        drawText(*c, location);
     }
 
     didDraw(repaintEntireCanvas, targetSwitcher ? targetSwitcher->expandedBounds() : textRect);
