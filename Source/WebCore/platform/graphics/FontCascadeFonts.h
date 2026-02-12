@@ -24,11 +24,14 @@
 #include <WebCore/FontCascadeDescription.h>
 #include <WebCore/FontRanges.h>
 #include <WebCore/FontSelector.h>
+#include <WebCore/GlyphBuffer.h>
 #include <WebCore/GlyphPage.h>
 #include <WebCore/TextMeasurementCache.h>
+#include <WebCore/TextRun.h>
 #include <wtf/EnumeratedArray.h>
 #include <wtf/Forward.h>
 #include <wtf/HashFunctions.h>
+#include <wtf/HashMap.h>
 #include <wtf/HashTraits.h>
 #include <wtf/MainThread.h>
 #include <wtf/Platform.h>
@@ -59,6 +62,35 @@ struct GlyphOverflow {
     bool computeBounds { false };
 };
 
+// Key for caching shaped glyph buffers
+// Uses just text + direction (no font generation needed - cache lives per FontCascadeFonts)
+struct GlyphBufferCacheKey {
+    String text;
+    TextDirection direction;
+    bool directionalOverride;
+
+    bool operator==(const GlyphBufferCacheKey& other) const
+    {
+        return text == other.text
+            && direction == other.direction
+            && directionalOverride == other.directionalOverride;
+    }
+};
+
+struct GlyphBufferCacheKeyHash {
+    static unsigned hash(const GlyphBufferCacheKey& key)
+    {
+        return computeHash(key.text, key.direction, key.directionalOverride);
+    }
+
+    static bool equal(const GlyphBufferCacheKey& a, const GlyphBufferCacheKey& b)
+    {
+        return a == b;
+    }
+
+    static const bool safeToCompareToEmptyOrDeleted = false;
+};
+
 } // namespace WebCore
 
 namespace WTF {
@@ -76,6 +108,13 @@ struct MarkableTraits<WebCore::GlyphOverflow> {
     }
 };
 
+template<> struct HashTraits<WebCore::GlyphBufferCacheKey> : GenericHashTraits<WebCore::GlyphBufferCacheKey> {
+    static constexpr bool emptyValueIsZero = false;
+    static void constructDeletedValue(WebCore::GlyphBufferCacheKey& slot) { new (NotNull, &slot.text) String(WTF::HashTableDeletedValue); }
+    static bool isDeletedValue(const WebCore::GlyphBufferCacheKey& value) { return value.text.isHashTableDeletedValue(); }
+};
+
+template<> struct DefaultHash<WebCore::GlyphBufferCacheKey> : WebCore::GlyphBufferCacheKeyHash { };
 } // namespace WTF
 
 namespace WebCore {
@@ -110,6 +149,12 @@ public:
     using GlyphGeometryCache = TextMeasurementCache<GlyphGeometryCacheEntry>;
     GlyphGeometryCache& glyphGeometryCache() { return m_glyphGeometryCache; }
     const GlyphGeometryCache& glyphGeometryCache() const { return m_glyphGeometryCache; }
+
+    using GlyphBufferCache = HashMap<GlyphBufferCacheKey, Ref<SharedGlyphBuffer>>;
+    GlyphBufferCache& glyphBufferCache() { return m_glyphBufferCache; }
+    const GlyphBufferCache& glyphBufferCache() const { return m_glyphBufferCache; }
+
+    RefPtr<SharedGlyphBuffer> getOrCreateShapedGlyphs(const TextRun&, const FontCascade&);
 
     const Font& primaryFont(const FontCascadeDescription&, FontSelector*);
     WEBCORE_EXPORT const FontRanges& realizeFallbackRangesAt(const FontCascadeDescription&, FontSelector*, unsigned fallbackIndex);
@@ -155,6 +200,7 @@ private:
     SingleThreadWeakPtr<const Font> m_cachedPrimaryFont;
 
     GlyphGeometryCache m_glyphGeometryCache;
+    GlyphBufferCache m_glyphBufferCache;
 
     unsigned short m_generation { 0 };
     Pitch m_pitch { UnknownPitch };

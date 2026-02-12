@@ -33,6 +33,7 @@
 #include "FontCache.h"
 #include "FontCascade.h"
 #include "GlyphPage.h"
+#include <wtf/Assertions.h>
 #include <wtf/TZoneMallocInlines.h>
 
 namespace WebCore {
@@ -568,6 +569,60 @@ void FontCascadeFonts::pruneSystemFallbacks()
         });
     }
     m_systemFallbackFontSet.clear();
+}
+
+RefPtr<SharedGlyphBuffer> FontCascadeFonts::getOrCreateShapedGlyphs(const TextRun& run, const FontCascade& fontCascade)
+{
+    // Apply same caching conditions as TextMeasurementCache (WidthCache)
+    // The cache is not profitable unless we're doing expensive glyph transformations
+    bool hasKerningOrLigatures = fontCascade.enableKerning() || fontCascade.requiresShaping();
+    if (!hasKerningOrLigatures)
+        return nullptr;
+
+    // Word spacing and letter spacing change the width of a word
+    bool hasWordSpacingOrLetterSpacing = fontCascade.wordSpacing() || fontCascade.letterSpacing();
+    if (hasWordSpacingOrLetterSpacing)
+        return nullptr;
+
+    // If we allow tabs, tab width varies based on position on the line
+    if (run.allowTabs())
+        return nullptr;
+
+    // Text spacing depends on context of adjacent characters
+    bool hasTextSpacing = !fontCascade.textAutospace().isNoAutospace();
+    if (hasTextSpacing)
+        return nullptr;
+
+    // Build cache key
+    GlyphBufferCacheKey key {
+        run.text().toString(),
+        run.direction(),
+        run.directionalOverride()
+    };
+
+    // Check cache
+    auto it = m_glyphBufferCache.find(key);
+    if (it != m_glyphBufferCache.end())
+        return it->value.ptr();
+
+    // Shape the text
+    auto codePath = fontCascade.codePath(run);
+    auto glyphBuffer = fontCascade.layoutText(codePath, run, 0, run.length(), FontCascade::ForTextEmphasisOrNot::NotForTextEmphasis);
+    glyphBuffer.flatten();
+
+    if (glyphBuffer.isEmpty())
+        return nullptr;
+
+    // Calculate width by summing advances
+    float totalWidth = 0;
+    for (unsigned i = 0; i < glyphBuffer.size(); ++i)
+        totalWidth += width(glyphBuffer.advanceAt(i));
+
+    // Create SharedGlyphBuffer and cache it
+    auto sharedBuffer = SharedGlyphBuffer::create(WTF::move(glyphBuffer), totalWidth);
+    m_glyphBufferCache.set(key, sharedBuffer.copyRef());
+
+    return sharedBuffer;
 }
 
 TextStream& operator<<(TextStream& ts, const FontCascadeFonts& fontCascadeFonts)

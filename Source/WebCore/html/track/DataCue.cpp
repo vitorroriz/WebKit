@@ -31,6 +31,8 @@
 #include "DataCue.h"
 
 #include "Document.h"
+#include "Exception.h"
+#include "ExceptionOr.h"
 #include "Logging.h"
 #include "TextTrack.h"
 #include "TextTrackCueList.h"

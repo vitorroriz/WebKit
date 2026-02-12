@@ -36,6 +36,7 @@
 #include <climits>
 #include <limits>
 #include <wtf/CheckedRef.h>
+#include <wtf/RefCounted.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/Vector.h>
 
@@ -267,6 +268,27 @@ private:
     Vector<GlyphBufferOrigin, 1024> m_origins;
     Vector<GlyphBufferStringOffset, 1024> m_offsetsInString;
     GlyphBufferAdvance m_initialAdvance { makeGlyphBufferAdvance() };
+};
+
+class SharedGlyphBuffer : public RefCounted<SharedGlyphBuffer> {
+public:
+    static Ref<SharedGlyphBuffer> create(GlyphBuffer&& buffer, float width)
+    {
+        return adoptRef(*new SharedGlyphBuffer(WTF::move(buffer), width));
+    }
+
+    const GlyphBuffer& glyphBuffer() const { return m_glyphBuffer; }
+    float width() const { return m_width; }
+
+private:
+    SharedGlyphBuffer(GlyphBuffer&& buffer, float width)
+        : m_glyphBuffer(WTF::move(buffer))
+        , m_width(width)
+    {
+    }
+
+    GlyphBuffer m_glyphBuffer;
+    float m_width;
 };
 
 }

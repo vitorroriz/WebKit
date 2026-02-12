@@ -55,7 +55,9 @@
 #include "DOMMatrix.h"
 #include "DOMMatrix2DInit.h"
 #include "FloatQuad.h"
+#include "FontCascadeFonts.h"
 #include "GeometryUtilities.h"
+#include "GlyphBuffer.h"
 #include "Gradient.h"
 #include "HTMLCanvasElement.h"
 #include "HTMLImageElement.h"
@@ -81,6 +83,7 @@
 #include "StyleResolver.h"
 #include "TextMetrics.h"
 #include "TextRun.h"
+#include "TextUtil.h"
 #include "WebCodecsVideoFrame.h"
 #include <JavaScriptCore/ConsoleTypes.h>
 #include <wtf/CheckedArithmetic.h>
@@ -2851,14 +2854,21 @@ String CanvasRenderingContext2DBase::normalizeSpaces(const String& text)
 
 void CanvasRenderingContext2DBase::drawTextUnchecked(const TextRun& textRun, double x, double y, bool fill, std::optional<double> maxWidth)
 {
-    auto measureTextRun = [&](const TextRun& textRun) -> std::tuple<float, FontMetrics>  {
-        auto& fontProxy = *this->fontProxy();
+    auto& fontCascade = this->fontProxy()->fontCascade();
+    auto& fontMetrics = fontProxy()->metricsOfPrimaryFont();
 
-        // FIXME: Need to turn off font smoothing.
-        return { fontProxy.width(textRun), fontProxy.metricsOfPrimaryFont() };
-    };
+    // Determine if we can use simple path (single bidi run) and try to get cached shaped glyphs
+    bool canUseSimplePath = textRun.ltr() && !Layout::TextUtil::containsStrongDirectionalityText(textRun.text());
+    RefPtr<SharedGlyphBuffer> cachedShapedGlyphs;
+    if (canUseSimplePath) {
+        auto* fonts = fontCascade.fonts();
+        ASSERT(fonts);
+        cachedShapedGlyphs = fonts->getOrCreateShapedGlyphs(textRun, fontCascade);
+    }
 
-    auto [fontWidth, fontMetrics] = measureTextRun(textRun);
+    // Get width: from cached glyphs if available, otherwise measure normally
+    float fontWidth = cachedShapedGlyphs ? cachedShapedGlyphs->width() : fontCascade.width(textRun);
+
     bool useMaxWidth = maxWidth && maxWidth.value() < fontWidth;
     float width = useMaxWidth ? maxWidth.value() : fontWidth;
     FloatPoint location(x, y);
@@ -2876,6 +2886,21 @@ void CanvasRenderingContext2DBase::drawTextUnchecked(const TextRun& textRun, dou
     // https://bugs.webkit.org/show_bug.cgi?id=193077.
     auto* c = effectiveDrawingContext();
     auto& fontProxy = *this->fontProxy();
+
+    // Lambda to draw text - uses cached glyphs when available
+    auto drawText = [&](GraphicsContext& context, const FloatPoint& point) {
+        if (cachedShapedGlyphs) {
+            // Use cached shaped glyphs
+            const auto& glyphBuffer = cachedShapedGlyphs->glyphBuffer();
+            if (!glyphBuffer.isEmpty()) {
+                FloatPoint startPoint = point + WebCore::size(glyphBuffer.initialAdvance());
+                fontCascade.drawGlyphBuffer(context, glyphBuffer, startPoint, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+            }
+        } else {
+            // Complex text or caching not allowed - use standard path
+            fontProxy.drawBidiText(context, textRun, point, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+        }
+    };
 
 #if USE(CG)
     const CanvasStyle& drawStyle = fill ? state().fillStyle : state().strokeStyle;
@@ -2905,7 +2930,7 @@ void CanvasRenderingContext2DBase::drawTextUnchecked(const TextRun& textRun, dou
             else
                 c->setStrokeColor(Color::black);
 
-            fontProxy.drawBidiText(*c, textRun, location + offset, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+            drawText(*c, location + offset);
         }
 
         auto maskImage = c->createAlignedImageBuffer(maskRect.size());
@@ -2927,10 +2952,10 @@ void CanvasRenderingContext2DBase::drawTextUnchecked(const TextRun& textRun, dou
             maskImageContext.translate(location - maskRect.location());
             // We draw when fontWidth is 0 so compositing operations (eg, a "copy" op) still work.
             maskImageContext.scale(FloatSize((fontWidth > 0 ? (width / fontWidth) : 0), 1));
-            fontProxy.drawBidiText(maskImageContext, textRun, FloatPoint(0, 0), FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+            drawText(maskImageContext, FloatPoint(0, 0));
         } else {
             maskImageContext.translate(-maskRect.location());
-            fontProxy.drawBidiText(maskImageContext, textRun, location, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+            drawText(maskImageContext, location);
         }
 
         GraphicsContextStateSaver stateSaver(*c);
@@ -2958,18 +2983,18 @@ void CanvasRenderingContext2DBase::drawTextUnchecked(const TextRun& textRun, dou
     bool repaintEntireCanvas = false;
     if (isFullCanvasCompositeMode(state().globalComposite)) {
         beginCompositeLayer();
-        fontProxy.drawBidiText(*c, textRun, location, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+        drawText(*c, location);
         endCompositeLayer();
         repaintEntireCanvas = true;
     } else if (state().globalComposite == CompositeOperator::Copy) {
         clearCanvas();
-        fontProxy.drawBidiText(*c, textRun, location, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+        drawText(*c, location);
         repaintEntireCanvas = true;
     } else {
         auto clipBounds = c->clipBounds();
         if ((clipBounds.isEmpty() || !clipBounds.intersects(enclosingIntRect(textRect))) && !shouldDrawShadows())
             return;
-        fontProxy.drawBidiText(*c, textRun, location, FontCascade::CustomFontNotReadyAction::UseFallbackIfFontNotReady);
+        drawText(*c, location);
     }
 
     didDraw(repaintEntireCanvas, targetSwitcher ? targetSwitcher->expandedBounds() : textRect);
