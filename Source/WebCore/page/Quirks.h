@@ -134,6 +134,8 @@ public:
     bool NODELETE needsGoogleTranslateScrollingQuirk() const;
     bool needsGeforcenowWarningDisplayNoneQuirk() const;
 
+    bool needsZillowFloorplanMarginQuirk() const;
+
     bool needsPrimeVideoUserSelectNoneQuirk() const;
 
     bool needsFacebookRemoveNotSupportedQuirk() const;
