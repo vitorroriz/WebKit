@@ -1781,7 +1781,18 @@ final class USDModelLoader: _Proto_UsdStageSession_v1.Delegate {
 
     func update(deltaTime: TimeInterval) {
         let newTime = currentTime() + deltaTime
-        time = startTime + (loop ? fmod(newTime, max(duration(), 1)) : min(newTime, duration()))
+        let adjustedTime: TimeInterval
+        if loop {
+            let modValue = max(duration(), 1)
+            var wrappedTime = fmod(newTime, modValue)
+            if wrappedTime < 0 {
+                wrappedTime += modValue
+            }
+            adjustedTime = wrappedTime
+        } else {
+            adjustedTime = max(0, min(newTime, duration()))
+        }
+        time = startTime + adjustedTime
         usdLoader.update(time: time * timeCodePerSecond)
     }
 }
