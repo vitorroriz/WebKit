@@ -3117,6 +3117,7 @@ webkit.org/b/181838 js/slow-stress/Int32Array-alloc-huge-long-lived.html [ Slow 
 webkit.org/b/182592 webgl/webgl-texture-image-buffer-reuse.html [ Skip ]
 
 webkit.org/b/183219 editing/pasteboard/data-transfer-get-data-on-pasting-html-uses-blob-url.html [ Skip ]
+editing/pasteboard/paste-image-as-blob-url.html [ Skip ]
 
 [ Debug ] imported/w3c/web-platform-tests/hr-time/idlharness.any.html [ Slow ]
 

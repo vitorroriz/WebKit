@@ -3672,6 +3672,8 @@ fast/url/data-url-mediatype.html [ Skip ]
 
 # Needs Cocoa specific features
 editing/pasteboard/copy-paste-data-detected-links.html [ Skip ]
+editing/pasteboard/paste-image-as-data-url.html [ Skip ]
+editing/pasteboard/data-transfer-get-data-on-pasting-html-uses-data-url.html [ Skip ]
 
 # PDF as image source
 fast/hidpi/pdf-image-scaled.html [ Skip ]

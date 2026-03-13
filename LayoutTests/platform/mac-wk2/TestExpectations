@@ -221,6 +221,8 @@ editing/mac/pasteboard/drag-selections-to-contenteditable.html
 editing/pasteboard/4947130.html
 editing/pasteboard/cleanup-on-move.html
 editing/pasteboard/copy-standalone-image-crash.html
+# webkit.org/b/309400 Times out due to web archive UTI issue on modern macOS
+editing/pasteboard/copy-standalone-image.html [ Skip ]
 editing/pasteboard/drag-drop-paragraph-crasher.html
 editing/pasteboard/emacs-cntl-y-001.html
 editing/pasteboard/emacs-ctrl-k-y-001.html
