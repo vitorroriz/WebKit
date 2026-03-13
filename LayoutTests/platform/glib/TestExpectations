@@ -4037,7 +4037,6 @@ webkit.org/b/175134 fast/text/line-height-minimumFontSize.html [ Failure ]
 webkit.org/b/175134 fast/text/line-height-minimumFontSize-text-zoom.html [ ImageOnlyFailure ]
 webkit.org/b/175134 fast/text/line-height-minimumFontSize-visual.html [ ImageOnlyFailure ]
 webkit.org/b/175134 fast/text/line-height-minimumFontSize-zoom.html [ ImageOnlyFailure ]
-webkit.org/b/297177 media/media-source/media-source-init-segment-duration.html [ Failure ]
 webkit.org/b/297178 media/media-source/media-source-paint-stereo-to-canvas.html [ Failure ]
 
 # Flaky failure
