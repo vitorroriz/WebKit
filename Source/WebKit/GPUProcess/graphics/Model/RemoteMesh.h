@@ -41,6 +41,7 @@ class Mesh;
 namespace WebModel {
 struct Float3;
 struct Float4x4;
+struct MaterialDescriptor;
 struct MeshDescriptor;
 struct TextureDescriptor;
 struct UpdateMaterialDescriptor;
