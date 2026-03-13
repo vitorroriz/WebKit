@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <WebCore/LocalFrameView.h>
 #include <WebCore/Region.h>
 #include <WebCore/RenderBlockFlow.h>
 #include <WebCore/RenderSelection.h>
@@ -33,6 +32,7 @@
 
 namespace WebCore {
 
+class LocalFrameView;
 class ImageQualityController;
 class RenderLayerCompositor;
 class RenderLayoutState;
@@ -74,7 +74,7 @@ public:
 
     float NODELETE zoomFactor() const;
 
-    LocalFrameView& frameView() const { return m_frameView.get(); }
+    WEBCORE_EXPORT LocalFrameView& NODELETE frameView() const LIFETIME_BOUND;
 
     Layout::InitialContainingBlock& initialContainingBlock() { return m_initialContainingBlock.get(); }
     const Layout::InitialContainingBlock& initialContainingBlock() const { return m_initialContainingBlock.get(); }

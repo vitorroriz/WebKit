@@ -34,6 +34,7 @@
 #include "FontCustomPlatformData.h"
 #include "FontDescription.h"
 #include "FontPlatformData.h"
+#include "LocalFrame.h"
 #include "Logging.h"
 #include "MemoryCache.h"
 #include "Settings.h"

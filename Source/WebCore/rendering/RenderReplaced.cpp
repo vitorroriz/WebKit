@@ -988,8 +988,8 @@ bool RenderReplaced::isContentLikelyVisibleInViewport()
     if (!isVisibleIgnoringGeometry())
         return false;
 
-    auto& frameView = view().frameView();
-    auto visibleRect = LayoutRect(frameView.windowToContents(frameView.windowClipRect()));
+    CheckedRef frameView = view().frameView();
+    auto visibleRect = LayoutRect(frameView->windowToContents(frameView->windowClipRect()));
     auto contentRect = computeRectForRepaint(replacedContentRect(), nullptr);
 
     // Content rectangle may be empty because it is intrinsically sized and the content has not loaded yet.

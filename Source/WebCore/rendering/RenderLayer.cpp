@@ -3475,12 +3475,12 @@ bool RenderLayer::setupFontSubpixelQuantization(GraphicsContext& context, bool& 
         return false;
 
     bool documentScrollsOnMainThread = [&]() {
-        auto& frameView = renderer().view().frameView();
+        CheckedRef frameView = renderer().view().frameView();
 #if ENABLE(ASYNC_SCROLLING)
         if (RefPtr scrollingCoordinator = page().scrollingCoordinator())
             return scrollingCoordinator->shouldUpdateScrollLayerPositionSynchronously(frameView);
 #endif
-        if (frameView.isScrollableOrRubberbandable())
+        if (frameView->isScrollableOrRubberbandable())
             return true;
 
         return false;
@@ -4502,15 +4502,15 @@ bool RenderLayer::hitTest(const HitTestRequest& request, const HitTestLocation& 
     LayoutRect hitTestArea = renderer().view().documentRect();
     if (!request.ignoreClipping()) {
         const auto& settings = renderer().settings();
+        CheckedRef frameView = renderer().view().frameView();
         if (settings.visualViewportEnabled() && settings.clientCoordinatesRelativeToLayoutViewport()) {
-            auto& frameView = renderer().view().frameView();
-            LayoutRect absoluteLayoutViewportRect = frameView.layoutViewportRect();
-            auto scaleFactor = frameView.frame().frameScaleFactor();
+            LayoutRect absoluteLayoutViewportRect = frameView->layoutViewportRect();
+            auto scaleFactor = frameView->frame().frameScaleFactor();
             if (scaleFactor > 1)
                 absoluteLayoutViewportRect.scale(scaleFactor);
             hitTestArea.intersect(absoluteLayoutViewportRect);
         } else
-            hitTestArea.intersect(renderer().view().frameView().visibleContentRect(ScrollableArea::LegacyIOSDocumentVisibleRect));
+            hitTestArea.intersect(frameView->visibleContentRect(ScrollableArea::LegacyIOSDocumentVisibleRect));
     }
 
     auto insideLayer = hitTestLayer(this, nullptr, request, result, hitTestArea, hitTestLocation, false);
@@ -5570,9 +5570,9 @@ LayoutRect RenderLayer::localBoundingBox(OptionSet<CalculateLayerBoundsFlag> fla
             // If the root layer becomes composited (e.g. because some descendant with negative z-index is composited),
             // then it has to be big enough to cover the viewport in order to display the background. This is akin
             // to the code in RenderBox::paintRootBoxFillLayers().
-            auto& frameView = renderer().view().frameView();
-            result.setWidth(std::max(result.width(), frameView.contentsWidth() - result.x()));
-            result.setHeight(std::max(result.height(), frameView.contentsHeight() - result.y()));
+            CheckedRef frameView = renderer().view().frameView();
+            result.setWidth(std::max(result.width(), frameView->contentsWidth() - result.x()));
+            result.setHeight(std::max(result.height(), frameView->contentsHeight() - result.y()));
         }
     }
     return result;

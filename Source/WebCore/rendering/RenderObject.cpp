@@ -2334,7 +2334,7 @@ ScrollAnchoringController* RenderObject::searchParentChainForScrollAnchoringCont
                 return controller;
         }
     }
-    return renderer.view().frameView().scrollAnchoringController();
+    return protect(renderer.view().frameView())->scrollAnchoringController();
 }
 
 void RenderObject::RepaintRects::transform(const TransformationMatrix& matrix)

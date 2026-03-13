@@ -154,7 +154,7 @@ public:
     using LayoutStateStack = Vector<std::unique_ptr<RenderLayoutState>>;
 
     UpdateScrollInfoAfterLayoutTransaction& updateScrollInfoAfterLayoutTransaction() LIFETIME_BOUND;
-    UpdateScrollInfoAfterLayoutTransaction* updateScrollInfoAfterLayoutTransactionIfExists() LIFETIME_BOUND { return m_updateScrollInfoAfterLayoutTransaction.get(); }
+    UpdateScrollInfoAfterLayoutTransaction* NODELETE updateScrollInfoAfterLayoutTransactionIfExists() LIFETIME_BOUND { return m_updateScrollInfoAfterLayoutTransaction.get(); }
     void setBoxNeedsTransformUpdateAfterContainerLayout(RenderBox&, RenderBlock& container);
     Vector<SingleThreadWeakPtr<RenderBox>> takeBoxesNeedingTransformUpdateAfterContainerLayout(RenderBlock&);
 

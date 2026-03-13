@@ -55,6 +55,7 @@
 #include <WebCore/RenderPtr.h>
 #include <WebCore/RenderSVGModelObject.h>
 #include <WebCore/RenderView.h>
+#include <WebCore/ScrollAlignment.h>
 #include <WebCore/ScrollBehavior.h>
 #include <WebCore/TransformationMatrix.h>
 #include <wtf/InlineWeakPtr.h>

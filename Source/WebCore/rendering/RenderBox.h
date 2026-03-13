@@ -26,7 +26,6 @@
 #include <WebCore/CSSPrimitiveNumeric.h>
 #include <WebCore/FontBaseline.h>
 #include <WebCore/LayoutRange.h>
-#include <WebCore/LocalFrameView.h>
 #include <WebCore/RenderBoxModelObject.h>
 #include <WebCore/RenderOverflow.h>
 #include <WebCore/ScrollSnapOffsetsInfo.h>
@@ -38,6 +37,7 @@
 namespace WebCore {
 
 class LayoutRoundedRectRadii;
+class LocalFrameView;
 class RenderBlockFlow;
 class RenderBoxFragmentInfo;
 class RenderFragmentContainer;

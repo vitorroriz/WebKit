@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include "LocalFrameView.h"
 #include "ParserContentPolicy.h"
 #include "PendingScriptClient.h"
 #include "ScriptableDocumentParser.h"
