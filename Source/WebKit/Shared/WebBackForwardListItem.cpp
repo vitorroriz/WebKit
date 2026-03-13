@@ -154,11 +154,6 @@ SuspendedPageProxy* WebBackForwardListItem::suspendedPage() const
     return m_backForwardCacheEntry ? m_backForwardCacheEntry->suspendedPage() : nullptr;
 }
 
-Ref<FrameState> WebBackForwardListItem::navigatedFrameState() const
-{
-    return protect(navigatedFrameItem())->copyFrameStateWithChildren();
-}
-
 const FrameState& WebBackForwardListItem::mainFrameState() const
 {
     return m_mainFrameItem->frameState();

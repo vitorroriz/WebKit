@@ -61,7 +61,6 @@ public:
 
     BrowsingContextGroup* browsingContextGroup() const { return m_browsingContextGroup.get(); }
 
-    Ref<FrameState> navigatedFrameState() const;
     const FrameState& mainFrameState() const;
     Ref<FrameState> copyMainFrameStateWithChildren() const;
 
