@@ -613,6 +613,10 @@ public:
     void setIneligbleForWebProcessCache() { m_isEligibleForWebProcessCache = false; }
     bool isEligibleForWebProcessCache() const { return m_isEligibleForWebProcessCache; }
 
+    void incrementFrameProcessCount() { ++m_frameProcessCount; }
+    void decrementFrameProcessCount() { --m_frameProcessCount; }
+    uint64_t frameProcessCount() const { return m_frameProcessCount; }
+
 private:
     Type type() const final { return Type::WebContent; }
 
@@ -801,6 +805,7 @@ private:
     WeakHashSet<SuspendedPageProxy> m_suspendedPages;
     UserInitiatedActionMap m_userInitiatedActionMap;
     HashMap<WebCore::PageIdentifier, UserInitiatedActionByAuthorizationTokenMap> m_userInitiatedActionByAuthorizationTokenMap;
+    uint64_t m_frameProcessCount { 0 };
 
     WeakHashMap<VisitedLinkStore, HashSet<WebPageProxyIdentifier>> m_visitedLinkStoresWithUsers;
 

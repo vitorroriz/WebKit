@@ -2300,7 +2300,7 @@ void WebProcessProxy::didStartUsingProcessForSiteIsolation(const std::optional<W
         m_sharedProcessMainFrameSite = mainFrameSite;
         return;
     }
-    ASSERT(m_site ? (m_site.value().isEmpty() || m_site.value() == *site) : (m_site.error() == SiteState::NotYetSpecified || m_site.error() == SiteState::MultipleSites));
+    ASSERT(m_site ? (m_site.value().isEmpty() || m_site.value() == *site || !m_hasCommittedAnyProvisionalLoads) : (m_site.error() == SiteState::NotYetSpecified || m_site.error() == SiteState::MultipleSites));
     m_site = *site;
 }
 
