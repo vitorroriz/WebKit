@@ -188,7 +188,7 @@ webkit.org/b/305553 fast/selectors/selection-window-inactive-stroke-color.html [
 # 9. TESTS FAILING
 # Each test should (eventually) have a bug. Missing test harness features also go here.
 
-webkit.org/b/302127 imported/w3c/web-platform-tests/css/css-grid/grid-lanes/tentative/alignment/column-grid-lanes-justify-self-003.html [ ImageOnlyFailure ]
+webkit.org/b/302127 imported/w3c/web-platform-tests/css/css-grid/grid-lanes/alignment/column-grid-lanes-justify-self-003.html [ ImageOnlyFailure ]
 
 # 10. THREADED COMPOSITOR FAILURES
 # Tests that are now failing because of the switch to ThreadedCompositor.
