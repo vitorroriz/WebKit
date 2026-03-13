@@ -22,6 +22,7 @@
 #include "RenderView.h"
 
 #include "ContainerNodeInlines.h"
+#include "DocumentLoader.h"
 #include "DocumentPage.h"
 #include "Element.h"
 #include "FloatQuad.h"
@@ -732,6 +733,12 @@ bool RenderView::shouldPaintBaseBackground() const
         return true;
 
     if (RefPtr parentFrame = frameView->frame().parent()) {
+        if (RefPtr documentLoader = document->loader(); documentLoader && documentLoader->isInitialAboutBlank()) {
+            // https://github.com/w3c/csswg-drafts/issues/9624#issuecomment-1944425637
+            // > RESOLVED: initial about:blank iframes are always transparent
+            return false;
+        }
+
         if (RefPtr parentFrameView = parentFrame->virtualView()) {
             // iframes should fill with a base color if the used color scheme of the
             // element and the used color scheme of the embedded document’s root
