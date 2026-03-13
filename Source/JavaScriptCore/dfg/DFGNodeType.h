@@ -458,6 +458,7 @@ namespace JSC { namespace DFG {
     macro(MatchStructure, NodeMustGenerate | NodeResultBoolean) \
     \
     macro(IsCellWithType, NodeResultBoolean) \
+    macro(ArrayIsArray, NodeMustGenerate | NodeResultBoolean) \
     macro(IsEmpty, NodeResultBoolean) \
     macro(IsEmptyStorage, NodeResultBoolean) \
     macro(HasStructureWithFlags, NodeResultBoolean) \
