@@ -149,6 +149,9 @@ extension WKSeparatedImageView {
 
         let portalEntity = ModelEntity()
         var ipc = ImagePresentationComponent(spatial3DImage: spatial3DImage)
+        #if canImport(RealityKit, _version: 420)
+        ipc.enableSpatial3DDepthPatching = true
+        #endif
         ipc.desiredViewingMode = desiredViewingModeSpatial ? .spatial3D : .mono
         #if USE_APPLE_INTERNAL_SDK
         ipc.cornerRadiusInPoints = Float(layer.cornerRadius)
