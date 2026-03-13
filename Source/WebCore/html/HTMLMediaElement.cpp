@@ -7533,11 +7533,11 @@ void HTMLMediaElement::enterFullscreen(VideoFullscreenMode mode)
         auto fullscreenCheckType = m_ignoreFullscreenPermissionsPolicy ? DocumentFullscreen::ExemptIFrameAllowFullscreenRequirement : DocumentFullscreen::EnforceIFrameAllowFullscreenRequirement;
         m_ignoreFullscreenPermissionsPolicy = false;
         protect(protect(document())->fullscreen())->requestFullscreen(*this, fullscreenCheckType, [weakThis = WeakPtr { *this }](ExceptionOr<void> result) {
-            auto* protectedThis = weakThis.get();
-            if (!protectedThis || !result.hasException())
+            auto* rawThis = weakThis.get();
+            if (!rawThis || !result.hasException())
                 return;
-            protectedThis->m_changingVideoFullscreenMode = false;
-            protectedThis->m_waitingToEnterFullscreen = false;
+            rawThis->m_changingVideoFullscreenMode = false;
+            rawThis->m_waitingToEnterFullscreen = false;
         }, mode);
         return;
     }
