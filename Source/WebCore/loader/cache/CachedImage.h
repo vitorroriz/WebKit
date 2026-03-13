@@ -30,16 +30,6 @@
 #include <WebCore/SVGImageCache.h>
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
-#include <wtf/WeakRef.h>
-
-namespace WebCore {
-class CachedImage;
-}
-
-namespace WTF {
-template<typename T> struct IsDeprecatedWeakRefSmartPointerException;
-template<> struct IsDeprecatedWeakRefSmartPointerException<WebCore::CachedImage> : std::true_type { };
-}
 
 namespace WebCore {
 

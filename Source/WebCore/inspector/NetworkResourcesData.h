@@ -123,7 +123,7 @@ public:
         SharedBufferBuilder m_dataBuffer;
         RefPtr<FragmentedSharedBuffer> m_buffer;
         std::optional<CertificateInfo> m_certificateInfo;
-        CachedResource* m_cachedResource { nullptr };
+        WeakPtr<CachedResource> m_cachedResource;
         Inspector::ResourceType m_type { Inspector::ResourceType::Other };
         int m_httpStatusCode { 0 };
         String m_httpStatusText;

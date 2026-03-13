@@ -1222,7 +1222,7 @@ HashSet<Ref<HTMLImageElement>> visibleImageElementsInRangeWithNonLoadedImages(co
         if (!imageElement)
             continue;
 
-        auto* cachedImage = imageElement->cachedImage();
+        RefPtr cachedImage = imageElement->cachedImage();
         if (cachedImage && cachedImage->isLoading())
             result.add(imageElement.releaseNonNull());
     }

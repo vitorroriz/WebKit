@@ -595,7 +595,7 @@ Inspector::Protocol::ErrorStringOr<Ref<JSON::ArrayOf<Inspector::Protocol::Generi
         success = ResourceUtilities::mainResourceContent(frame, false, &content);
 
     if (!success) {
-        if (auto* resource = ResourceUtilities::cachedResource(frame, kurl)) {
+        if (RefPtr resource = ResourceUtilities::cachedResource(frame, kurl)) {
             if (auto textContent = ResourceUtilities::textContentForCachedResource(*resource)) {
                 content = *textContent;
                 success = true;

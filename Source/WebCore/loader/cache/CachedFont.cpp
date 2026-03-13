@@ -108,7 +108,7 @@ void CachedFont::finishLoading(const FragmentedSharedBuffer* data, const Network
 
 void CachedFont::setErrorAndDeleteData()
 {
-    CachedResourceHandle protectedThis { *this };
+    RefPtr protectedThis { *this };
     setEncodedSize(0);
     error(Status::DecodeError);
     if (inCache())

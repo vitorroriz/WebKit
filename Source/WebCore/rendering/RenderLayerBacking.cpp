@@ -3396,7 +3396,7 @@ bool RenderLayerBacking::isDirectlyCompositedImage() const
         return false;
 #endif
 
-    if (auto* cachedImage = imageRenderer->cachedImage()) {
+    if (RefPtr cachedImage = imageRenderer->cachedImage()) {
         if (!cachedImage->hasImage())
             return false;
 
@@ -3441,7 +3441,7 @@ bool RenderLayerBacking::isUnscaledBitmapOnly() const
         return false;
 
     if (CheckedPtr imageRenderer = dynamicDowncast<RenderImage>(renderer())) {
-        if (auto* cachedImage = imageRenderer->cachedImage()) {
+        if (RefPtr cachedImage = imageRenderer->cachedImage()) {
             if (!cachedImage->hasImage())
                 return false;
 
@@ -3537,7 +3537,7 @@ void RenderLayerBacking::updateImageContents(PaintedContentsInfo& contentsInfo)
     } else {
         auto& imageRenderer = downcast<RenderImage>(renderer());
 
-        auto* cachedImage = imageRenderer.cachedImage();
+        RefPtr cachedImage = imageRenderer.cachedImage();
         if (!cachedImage)
             return;
 

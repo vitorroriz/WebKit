@@ -50,7 +50,7 @@ void resourceContent(Inspector::Protocol::ErrorString&, WebCore::LocalFrame*, co
 bool mainResourceContent(WebCore::LocalFrame*, bool withBase64Encode, String* result);
 
 String sourceMapURLForResource(WebCore::CachedResource*);
-WebCore::CachedResource* cachedResource(const WebCore::LocalFrame*, const URL&);
+RefPtr<WebCore::CachedResource> cachedResource(const WebCore::LocalFrame*, const URL&);
 Inspector::ResourceType NODELETE inspectorResourceType(WebCore::CachedResource::Type);
 Inspector::ResourceType inspectorResourceType(const WebCore::CachedResource&);
 

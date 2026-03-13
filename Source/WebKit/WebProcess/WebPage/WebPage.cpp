@@ -9224,7 +9224,7 @@ void WebPage::requestTextRecognition(Element& element, TextRecognitionOptions&& 
         if (!protectedThis)
             return;
 
-        auto cachedImage = renderImage->cachedImage();
+        RefPtr cachedImage = renderImage->cachedImage();
         auto imageURL = cachedImage ? protect(weakElement->document())->completeURL(cachedImage->url().string()) : URL { };
         protectedThis->sendWithAsyncReply(Messages::WebPageProxy::RequestTextRecognition(WTF::move(imageURL), WTF::move(*bitmapHandle), options.sourceLanguageIdentifier, options.targetLanguageIdentifier), [weakThis, weakElement, resolveAndRemoveHandlerFollowingError = WTF::move(resolveAndRemoveHandlerFollowingError)] (auto&& result) mutable {
             RefPtr protectedThis = weakThis.get();
@@ -9334,7 +9334,7 @@ void WebPage::requestImageBitmap(const ElementContext& context, CompletionHandle
     }
 
     String mimeType;
-    if (auto* cachedImage = renderImage->cachedImage()) {
+    if (RefPtr cachedImage = renderImage->cachedImage()) {
         if (RefPtr image = cachedImage->image())
             mimeType = image->mimeType();
     }

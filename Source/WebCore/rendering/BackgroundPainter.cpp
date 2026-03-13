@@ -555,7 +555,7 @@ template<typename Layer> void BackgroundPainter::paintFillLayerImpl(const Color&
                 if (m_renderer.element())
                     m_renderer.element()->setHasEverPaintedImages(true);
 
-                if (auto* image = bgImage->cachedImage(); image && image->currentFrameIsComplete(&m_renderer)) {
+                if (RefPtr image = bgImage->cachedImage(); image && image->currentFrameIsComplete(&m_renderer)) {
                     if (auto styleable = Styleable::fromRenderer(m_renderer))
                         document().didPaintImage(styleable->element, image, geometry.destinationRect);
                 }

@@ -4812,7 +4812,7 @@ void Editor::registerAttachmentIdentifier(const String& identifier, const Attach
         if (!renderer)
             return std::nullopt;
 
-        auto* cachedImage = renderer->cachedImage();
+        RefPtr cachedImage = renderer->cachedImage();
         if (!cachedImage || cachedImage->errorOccurred())
             return std::nullopt;
 

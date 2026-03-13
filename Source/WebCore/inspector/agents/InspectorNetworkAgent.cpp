@@ -465,9 +465,12 @@ void InspectorNetworkAgent::willSendRequest(ResourceLoaderIdentifier identifier,
         }
     }
     if (type == ResourceType::Other) {
+        RefPtr<const CachedResource> updatedCachedResource;
         if (!cachedResource && loader)
-            cachedResource = ResourceUtilities::cachedResource(loader->frame(), request.url());
-        type = resourceTypeForCachedResource(cachedResource);
+            updatedCachedResource = ResourceUtilities::cachedResource(loader->frame(), request.url());
+        else
+            updatedCachedResource = cachedResource;
+        type = resourceTypeForCachedResource(updatedCachedResource);
     }
     willSendRequest(identifier, loader, request, redirectResponse, type, resourceLoader);
 }
@@ -499,7 +502,7 @@ void InspectorNetworkAgent::didReceiveResponse(ResourceLoaderIdentifier identifi
 
     bool isNotModified = response.httpStatusCode() == 304;
 
-    CachedResource* cachedResource = nullptr;
+    RefPtr<CachedResource> cachedResource;
     if (auto* subresourceLoader = dynamicDowncast<SubresourceLoader>(resourceLoader); subresourceLoader && !isNotModified)
         cachedResource = subresourceLoader->cachedResource();
     if (!cachedResource && loader)

@@ -2728,7 +2728,7 @@ AccessibilitySVGObject* AccessibilityRenderObject::remoteSVGRootElement(CreateIf
     if (!renderImage)
         return nullptr;
 
-    auto* cachedImage = renderImage->cachedImage();
+    RefPtr cachedImage = renderImage->cachedImage();
     if (!cachedImage)
         return nullptr;
 
