@@ -59,7 +59,7 @@ ALWAYS_INLINE JSValue MicrotaskCall::tryCallWithArguments(VM& vm, JSFunction* fu
     ASSERT(vm.currentThreadIsHoldingAPILock());
 
     constexpr unsigned argumentCountIncludingThis = 1 + sizeof...(args);
-#if CPU(ARM64) && CPU(ADDRESS64) && !ENABLE(C_LOOP)
+#if (CPU(ARM64) || CPU(X86_64)) && CPU(ADDRESS64) && !ENABLE(C_LOOP)
     static_assert(argumentCountIncludingThis <= 7);
     if (m_numParameters <= argumentCountIncludingThis) [[likely]] {
         auto* entry = m_addressForCall;
