@@ -49,7 +49,7 @@ public:
     void NODELETE setController(ReadableByteStreamController*);
     void NODELETE setView(JSC::ArrayBufferView*);
 
-    template<typename Visitor> void visitAdditionalChildren(Visitor&);
+    template<typename Visitor> void visitAdditionalChildrenInGCThread(Visitor&);
 
 private:
     ReadableStreamBYOBRequest();

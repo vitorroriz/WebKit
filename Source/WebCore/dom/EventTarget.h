@@ -133,7 +133,7 @@ public:
     void fireEventListeners(Event&, EventInvokePhase);
 
     template<typename Visitor>
-    inline void visitJSEventListeners(Visitor&);
+    inline void visitJSEventListenersInGCThread(Visitor&);
     void invalidateJSEventListeners(JSC::JSObject*);
 
     inline const EventTargetData* eventTargetData() const;

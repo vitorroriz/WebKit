@@ -1497,7 +1497,7 @@ void IDBTransaction::connectionClosedFromServer(const IDBError& error)
 }
 
 template<typename Visitor>
-void IDBTransaction::visitReferencedObjectStores(Visitor& visitor) const
+void IDBTransaction::visitReferencedObjectStoresInGCThread(Visitor& visitor) const
 {
     Locker locker { m_objectStoresLock };
     for (auto& objectStore : m_referencedObjectStores.values())
@@ -1506,8 +1506,8 @@ void IDBTransaction::visitReferencedObjectStores(Visitor& visitor) const
         SUPPRESS_UNCHECKED_ARG addWebCoreOpaqueRoot(visitor, objectStore.get());
 }
 
-template void IDBTransaction::visitReferencedObjectStores(JSC::AbstractSlotVisitor&) const;
-template void IDBTransaction::visitReferencedObjectStores(JSC::SlotVisitor&) const;
+template void IDBTransaction::visitReferencedObjectStoresInGCThread(JSC::AbstractSlotVisitor&) const;
+template void IDBTransaction::visitReferencedObjectStoresInGCThread(JSC::SlotVisitor&) const;
 
 void IDBTransaction::handlePendingOperations()
 {

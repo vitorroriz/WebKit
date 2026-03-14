@@ -88,9 +88,9 @@ public:
     }
     void visit(JSC::AbstractSlotVisitor& visitor) final
     {
-        m_branch1Reason.visit(visitor);
-        m_branch2Reason.visit(visitor);
-        m_stream->visitAdditionalChildren(visitor);
+        m_branch1Reason.visitInGCThread(visitor);
+        m_branch2Reason.visitInGCThread(visitor);
+        m_stream->visitAdditionalChildrenInGCThread(visitor);
     }
     void NODELETE clearReasons()
     {
