@@ -7123,6 +7123,18 @@ ScrollToTextFragmentMarkingEnabled:
     WebCore:
       default: true
 
+ScrollViewAdaptiveDecelerationTrackingEnabled:
+  type: bool
+  status: internal
+  humanReadableName: "Adaptive Deceleration Tracking"
+  humanReadableDescription: "Use adaptive deceleration tracking behavior for scroll views"
+  webcoreBinding: none
+  exposed: [ WebKit ]
+  condition: HAVE(UISCROLLVIEW_DECELERATION_TRACKING_BEHAVIOR)
+  defaultValue:
+    WebKit:
+      default: false
+
 ScrollendEventEnabled:
   type: bool
   status: stable
