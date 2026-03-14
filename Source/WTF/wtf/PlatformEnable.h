@@ -853,8 +853,8 @@
 #endif
 
 /* WebAssembly Debugger - GDB Remote Protocol debugging for WebAssembly.
- * Restricted to macOS ARM64 only. Supports JSC shell TCP socket mode and WebKit RWI integration. */
-#if !defined(ENABLE_WEBASSEMBLY_DEBUGGER) && PLATFORM(MAC) && CPU(ARM64) && ENABLE(WEBASSEMBLY)
+ * Restricted to macOS only. Supports JSC shell TCP socket mode and WebKit RWI integration. */
+#if !defined(ENABLE_WEBASSEMBLY_DEBUGGER) && PLATFORM(MAC) && ENABLE(WEBASSEMBLY)
 #define ENABLE_WEBASSEMBLY_DEBUGGER 1
 #endif
 
