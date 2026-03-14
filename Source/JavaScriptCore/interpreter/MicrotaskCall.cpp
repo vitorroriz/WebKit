@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2026 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,38 +24,50 @@
  */
 
 #include "config.h"
-#include "CallLinkInfoBase.h"
-
-#include "CachedCall.h"
-#include "CallLinkInfo.h"
-#include "JSCJSValueInlines.h"
-#include "JSFunctionInlines.h"
 #include "MicrotaskCall.h"
-#include "PolymorphicCallStubRoutine.h"
+
+#include "CodeBlock.h"
+#include "Interpreter.h"
+#include "JSFunction.h"
+#include "ThrowScope.h"
 
 namespace JSC {
 
-void CallLinkInfoBase::unlinkOrUpgrade(VM& vm, CodeBlock* oldCodeBlock, CodeBlock* newCodeBlock)
+void MicrotaskCall::initialize(VM& vm, JSFunction* function)
 {
-    switch (callSiteType()) {
-    case CallSiteType::CallLinkInfo:
-        static_cast<CallLinkInfo*>(this)->unlinkOrUpgradeImpl(vm, oldCodeBlock, newCodeBlock);
-        break;
-    case CallSiteType::PolymorphicCallNode:
-        static_cast<PolymorphicCallNode*>(this)->unlinkOrUpgradeImpl(vm, oldCodeBlock, newCodeBlock);
-        break;
-#if ENABLE(JIT)
-    case CallSiteType::DirectCall:
-        static_cast<DirectCallLinkInfo*>(this)->unlinkOrUpgradeImpl(vm, oldCodeBlock, newCodeBlock);
-        break;
-#endif
-    case CallSiteType::CachedCall:
-        static_cast<CachedCall*>(this)->unlinkOrUpgradeImpl(vm, oldCodeBlock, newCodeBlock);
-        break;
-    case CallSiteType::MicrotaskCall:
-        static_cast<MicrotaskCall*>(this)->unlinkOrUpgradeImpl(vm, oldCodeBlock, newCodeBlock);
-        break;
+    m_addressForCall = nullptr;
+    m_functionExecutable = function->jsExecutable();
+    relink(vm, function);
+}
+
+void MicrotaskCall::relink(VM& vm, JSFunction* function)
+{
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    // Unlink from any prior CodeBlock before we reset state.
+    if (isOnList())
+        remove();
+
+    auto* newCodeBlock = vm.interpreter.prepareForMicrotaskCall(*this, function);
+    RETURN_IF_EXCEPTION_WITH_TRAPS_DEFERRED(scope, void());
+    m_codeBlock = newCodeBlock;
+    m_numParameters = newCodeBlock->numParameters();
+}
+
+void MicrotaskCall::unlinkOrUpgradeImpl(VM&, CodeBlock* oldCodeBlock, CodeBlock* newCodeBlock)
+{
+    if (isOnList())
+        remove();
+
+    if (newCodeBlock && m_codeBlock == oldCodeBlock) {
+        newCodeBlock->m_shouldAlwaysBeInlined = false;
+        m_addressForCall = newCodeBlock->jitCode()->addressForCall();
+        m_codeBlock = newCodeBlock;
+        m_numParameters = newCodeBlock->numParameters();
+        newCodeBlock->linkIncomingCall(nullptr, this);
+        return;
     }
+    m_addressForCall = nullptr;
 }
 
 } // namespace JSC
