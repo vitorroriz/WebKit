@@ -485,9 +485,7 @@ public:
 
 #if !PLATFORM(COCOA)
     void doAfterProcessingAllPendingMouseEvents(CompletionHandler<void()>&&);
-    void flushPendingMouseEventsCompletionHanders();
     void doAfterProcessingAllPendingKeyEvents(CompletionHandler<void()>&&);
-    void flushPendingKeyEventsCompletionHanders();
 #endif
 
 private:
@@ -896,11 +894,6 @@ private:
 
 #if ENABLE(WPE_PLATFORM)
     bool m_useWPELegacyAPI { false };
-#endif
-
-#if !PLATFORM(COCOA)
-    Vector<CompletionHandler<void()>> m_pendingMouseEventsCompletionHanders;
-    Vector<CompletionHandler<void()>> m_pendingKeyEventsCompletionHanders;
 #endif
 };
 
