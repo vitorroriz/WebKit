@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Apple Inc. All rights reserved.
+ * Copyright (C) 2014-2026 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,36 +23,37 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <config.h>
+#include "config.h"
+#include "FindIndicator.h"
 
 #if PLATFORM(IOS_FAMILY)
 
-#import "FindController.h"
-#import "FindIndicatorOverlayClientIOS.h"
-#import "MessageSenderInlines.h"
-#import "SmartMagnificationControllerMessages.h"
-#import "WebPage.h"
-#import "WebPageProxyMessages.h"
-#import <WebCore/DocumentPage.h>
-#import <WebCore/Editor.h>
-#import <WebCore/FindRevealAlgorithms.h>
-#import <WebCore/FocusController.h>
-#import <WebCore/GraphicsContext.h>
-#import <WebCore/ImageOverlay.h>
-#import <WebCore/LocalFrame.h>
-#import <WebCore/LocalFrameView.h>
-#import <WebCore/Page.h>
-#import <WebCore/PageOverlayController.h>
-#import <WebCore/PathUtilities.h>
-#import <WebCore/Settings.h>
-#import <WebCore/TextIndicator.h>
+#include "MessageSenderInlines.h"
+#include "SmartMagnificationControllerMessages.h"
+#include "WebPage.h"
+#include "WebPageProxyMessages.h"
+#include <WebCore/DocumentPage.h>
+#include <WebCore/Editor.h>
+#include <WebCore/FindRevealAlgorithms.h>
+#include <WebCore/FocusController.h>
+#include <WebCore/GraphicsContext.h>
+#include <WebCore/ImageOverlay.h>
+#include <WebCore/LocalFrame.h>
+#include <WebCore/LocalFrameView.h>
+#include <WebCore/Page.h>
+#include <WebCore/PageOverlayController.h>
+#include <WebCore/PathUtilities.h>
+#include <WebCore/Settings.h>
+#include <WebCore/TextIndicator.h>
 
 namespace WebKit {
 using namespace WebCore;
 
-const int cornerRadius = 3;
-const int totalHorizontalMargin = 1;
-const int totalVerticalMargin = 1;
+WTF_MAKE_TZONE_ALLOCATED_IMPL(FindIndicatorIOS);
+
+constexpr int totalHorizontalMargin = 1;
+constexpr int totalVerticalMargin = 1;
+constexpr unsigned findIndicatorRadius = 3;
 
 static OptionSet<TextIndicatorOption> findTextIndicatorOptions(const LocalFrame& frame)
 {
@@ -63,7 +64,6 @@ static OptionSet<TextIndicatorOption> findTextIndicatorOptions(const LocalFrame&
 };
 
 static constexpr auto highlightColor = SRGBA<uint8_t> { 255, 228, 56 };
-
 void FindIndicatorOverlayClientIOS::drawRect(PageOverlay& overlay, GraphicsContext& context, const IntRect& dirtyRect)
 {
     Ref frame = m_frame.get();
@@ -84,7 +84,7 @@ void FindIndicatorOverlayClientIOS::drawRect(PageOverlay& overlay, GraphicsConte
         return;
 
     Vector<FloatRect> textRectsInBoundingRectCoordinates = m_textIndicator->textRectsInBoundingRectCoordinates();
-    Vector<Path> paths = PathUtilities::pathsWithShrinkWrappedRects(textRectsInBoundingRectCoordinates, cornerRadius);
+    Vector<Path> paths = PathUtilities::pathsWithShrinkWrappedRects(textRectsInBoundingRectCoordinates, findIndicatorRadius);
 
     context.setFillColor(highlightColor);
     for (const auto& path : paths)
@@ -93,9 +93,8 @@ void FindIndicatorOverlayClientIOS::drawRect(PageOverlay& overlay, GraphicsConte
     context.drawImage(*indicatorImage, overlay.bounds());
 }
 
-bool FindController::updateFindIndicator(bool isShowingOverlay, bool shouldAnimate)
+bool FindIndicatorIOS::update(WebCore::LocalFrame* selectedFrame, bool isShowingOverlay, bool shouldAnimate)
 {
-    RefPtr selectedFrame = frameWithSelection(protect(protect(*m_webPage)->corePage()));
     if (!selectedFrame)
         return false;
 
@@ -128,24 +127,8 @@ bool FindController::updateFindIndicator(bool isShowingOverlay, bool shouldAnima
     }
 
     m_isShowingFindIndicator = true;
-    
+
     return true;
-}
-
-void FindController::hideFindIndicator()
-{
-    if (!m_isShowingFindIndicator)
-        return;
-
-    protect(*m_webPage)->corePage()->pageOverlayController().uninstallPageOverlay(*protect(m_findIndicatorOverlay), PageOverlay::FadeMode::DoNotFade);
-    m_findIndicatorOverlay = nullptr;
-    m_isShowingFindIndicator = false;
-    didHideFindIndicator();
-}
-
-void FindController::resetMatchIndex()
-{
-    m_foundStringMatchIndex = -1;
 }
 
 static void setSelectionChangeUpdatesEnabledInAllFrames(WebPage& page, bool enabled)
@@ -158,23 +141,31 @@ static void setSelectionChangeUpdatesEnabledInAllFrames(WebPage& page, bool enab
     }
 }
 
-void FindController::willFindString()
+void FindIndicatorIOS::hide()
 {
-    setSelectionChangeUpdatesEnabledInAllFrames(protect(*m_webPage), true);
+    if (!m_isShowingFindIndicator)
+        return;
+
+    protect(*m_webPage)->corePage()->pageOverlayController().uninstallPageOverlay(*protect(m_findIndicatorOverlay), PageOverlay::FadeMode::DoNotFade);
+    m_findIndicatorOverlay = nullptr;
+    m_isShowingFindIndicator = false;
+    setSelectionChangeUpdatesEnabledInAllFrames(protect(*m_webPage), false);
 }
 
-void FindController::didFindString()
+void FindIndicatorIOS::willFindString()
+{
+}
+
+void FindIndicatorIOS::didFindString(WebCore::LocalFrame* selectedFrame)
 {
     // If the selection before we enabled appearance updates is equal to the
     // range that we just found, setSelection will bail and fail to actually call
     // updateAppearance, so the selection won't have been pushed to the render tree.
     // Therefore, we need to force an update no matter what.
-
-    RefPtr frame = protect(*m_webPage)->corePage()->focusController().focusedOrMainFrame();
-    if (!frame)
+    if (!selectedFrame)
         return;
 
-    CheckedRef selection = frame->selection();
+    CheckedRef selection = selectedFrame->selection();
     selection->setUpdateAppearanceEnabled(true);
     selection->updateAppearance();
     selection->setUpdateAppearanceEnabled(false);
@@ -187,26 +178,6 @@ void FindController::didFindString()
     selection->revealSelection({ SelectionRevealMode::RevealUpToMainFrame, ScrollAlignment::alignCenterAlways, WebCore::RevealExtentOption::DoNotRevealExtent });
     if (RefPtr anchorNode = selection->selection().start().anchorNode())
         revealClosedDetailsAndHiddenUntilFoundAncestors(*anchorNode);
-}
-
-void FindController::didFailToFindString()
-{
-    setSelectionChangeUpdatesEnabledInAllFrames(protect(*m_webPage), false);
-}
-
-void FindController::didHideFindIndicator()
-{
-    setSelectionChangeUpdatesEnabledInAllFrames(protect(*m_webPage), false);
-}
-    
-unsigned FindController::findIndicatorRadius() const
-{
-    return cornerRadius;
-}
-    
-bool FindController::shouldHideFindIndicatorOnScroll() const
-{
-    return false;
 }
 
 } // namespace WebKit

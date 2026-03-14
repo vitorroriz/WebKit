@@ -1246,7 +1246,7 @@ auto Page::findTextMatches(const String& target, FindOptions options, unsigned l
         return result;
 
     if (frameWithSelection) {
-        result.indexForSelection = NoMatchAfterUserSelection;
+        result.indexForSelection = std::nullopt;
         auto selectedRange = *frameWithSelection->selection().selection().firstRange();
         if (options.contains(FindOption::Backwards)) {
             for (size_t i = result.ranges.size(); i > 0; --i) {

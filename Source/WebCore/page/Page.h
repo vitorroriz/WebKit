@@ -576,12 +576,11 @@ public:
     // Upon return, indexForSelection will be one of the following:
     // 0 if there is no user selection
     // the index of the first range after the user selection
-    // NoMatchAfterUserSelection if there is no matching text after the user selection.
+    // std::nullopt if there is no matching text after the user selection.
     struct MatchingRanges {
         Vector<SimpleRange> ranges;
-        int indexForSelection { 0 }; // FIXME: Consider std::optional<unsigned> or unsigned for this instead.
+        std::optional<uint32_t> indexForSelection;
     };
-    static constexpr int NoMatchAfterUserSelection = -1;
     WEBCORE_EXPORT MatchingRanges findTextMatches(const String&, FindOptions, unsigned maxCount, bool markMatches = true);
 
 #if PLATFORM(COCOA)
