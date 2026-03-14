@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2015 Apple Inc. All rights reserved.
+ * Copyright (C) 2026 Apple Inc. All rights reserved.
+ * Copyright (C) 2025-2026 the V8 project authors. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,50 +21,23 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "B3UseCounts.h"
+#pragma once
 
 #if ENABLE(B3_JIT)
 
-#include "B3Procedure.h"
-#include "B3ValueInlines.h"
+namespace JSC::B3 {
 
-namespace JSC { namespace B3 {
+class Procedure;
 
-UseCounts::UseCounts(Procedure& procedure)
-    : m_counts(procedure.values().size())
-{
-    Vector<Value*, 64> children;
-    for (Value* value : procedure.values()) {
-        children.shrink(0);
-        for (Value* child : value->children()) {
-            m_counts[child].numUses++;
-            children.append(child);
-        }
-        std::ranges::sort(children);
-        Value* last = nullptr;
-        for (Value* child : children) {
-            if (child == last)
-                continue;
+// SIMD shuffle-specific optimizations for ARM64:
+// - Shuffle-of-shuffle composition: merges chained shuffles into a single shuffle,
+//   enabling recognition of patterns like EXT (byte extraction).
 
-            m_counts[child].numUsingInstructions++;
-            last = child;
-        }
-    }
-}
+void reduceSIMDShuffle(Procedure&);
 
-UseCountsWithoutUsingInstructions::UseCountsWithoutUsingInstructions(Procedure& procedure)
-    : m_counts(procedure.values().size())
-{
-    for (Value* value : procedure.values()) {
-        for (Value* child : value->children())
-            m_counts[child]++;
-    }
-}
-
-} } // namespace JSC::B3
+} // namespace JSC::B3
 
 #endif // ENABLE(B3_JIT)
