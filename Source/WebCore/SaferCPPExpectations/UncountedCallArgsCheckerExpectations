@@ -161,7 +161,6 @@ css/CSSKeyframesRule.cpp
 css/CSSNestedDeclarations.cpp
 css/CSSPageRule.cpp
 css/CSSProperty.h
-css/CSSPropertyRule.cpp
 css/CSSRuleList.h
 css/CSSSelector.cpp
 css/CSSStyleProperties.cpp
@@ -169,18 +168,14 @@ css/CSSStyleRule.cpp
 css/CSSStyleSheet.cpp
 css/CSSStyleSheetObservableArray.cpp
 css/CSSValueList.cpp
-css/DOMMatrixReadOnly.cpp
 css/DeprecatedCSSOMPrimitiveValue.h
 css/DeprecatedCSSOMRGBColor.h
 css/FontFace.cpp
 css/FontFaceSet.cpp
-css/ImmutableStyleProperties.cpp
 css/MediaQueryList.cpp
 css/MediaQueryMatcher.cpp
-css/MutableStyleProperties.cpp
 css/SelectorChecker.cpp
 css/SelectorCheckerTestFunctions.h
-css/SelectorFilter.cpp
 css/ShorthandSerializer.cpp
 css/StyleAttributeMutationScope.h
 css/StyleProperties.cpp

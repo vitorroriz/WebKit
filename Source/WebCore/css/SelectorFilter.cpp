@@ -85,7 +85,7 @@ void SelectorFilter::initializeParentStack(Element& parent)
         ancestors.append(ancestor.get());
     m_parentStack.reserveCapacity(m_parentStack.capacity() + ancestors.size());
     for (unsigned i = ancestors.size(); i--;)
-        pushParent(ancestors[i]);
+        pushParent(protect(ancestors[i]));
 }
 
 void SelectorFilter::pushParent(Element* parent)

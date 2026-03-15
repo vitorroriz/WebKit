@@ -75,7 +75,6 @@ css/MediaQueryList.cpp
 css/MediaQueryMatcher.cpp
 css/SelectorChecker.cpp
 css/SelectorCheckerTestFunctions.h
-css/SelectorFilter.cpp
 css/StyleAttributeMutationScope.h
 css/parser/SizesAttributeParser.cpp
 css/typedom/InlineStylePropertyMap.cpp
