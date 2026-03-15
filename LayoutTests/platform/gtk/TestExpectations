@@ -630,8 +630,6 @@ webkit.org/b/306688 fast/events/monotonic-event-time.html [ Failure Pass ]
 
 webkit.org/b/114735 svg/filters/filter-hidden-content.svg [ Failure Pass ]
 
-webkit.org/b/129758 js/dom/create-lots-of-workers.html [ Crash Pass ]
-
 webkit.org/b/263872 imported/w3c/web-platform-tests/scroll-animations/scroll-timelines/progress-based-effect-delay.tentative.html [ ImageOnlyFailure ]
 
 # These tests started to time out (or time out more often) since the FTL merge
