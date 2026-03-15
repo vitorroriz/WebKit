@@ -36,6 +36,7 @@
 #include <wtf/text/StringCommon.h>
 #include <wtf/text/StringImpl.h>
 #include <wtf/text/WYHash.h>
+#include <wtf/unicode/CharacterNames.h>
 
 namespace WebCore {
 

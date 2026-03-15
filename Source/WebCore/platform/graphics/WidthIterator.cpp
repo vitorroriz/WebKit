@@ -26,6 +26,7 @@
 #include "Font.h"
 #include "FontCascade.h"
 #include "FontCascadeInlines.h"
+#include "FontInlines.h"
 #include "GlyphBuffer.h"
 #include "Latin1TextIterator.h"
 #include "SurrogatePairAwareTextIterator.h"

@@ -30,6 +30,7 @@
 
 #if ENABLE(MATHML)
 
+#include "FontCascadeInlines.h"
 #include "GraphicsContext.h"
 #include "MathMLFractionElement.h"
 #include "PaintInfo.h"

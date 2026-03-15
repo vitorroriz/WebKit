@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <WebCore/FontCascade.h>
 #include <WebCore/InlineIteratorBoxLegacyPath.h>
 #include <WebCore/LayoutElementBox.h>
 #include <WebCore/LayoutIntegrationInlineContent.h>

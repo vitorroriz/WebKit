@@ -26,6 +26,8 @@
 #include "ComplexTextController.h"
 #include "DashArray.h"
 #include "Font.h"
+#include "FontCascadeFonts.h"
+#include "FontCascadeInlines.h"
 #include "GlyphBuffer.h"
 #include "GraphicsContext.h"
 #include "LayoutRect.h"

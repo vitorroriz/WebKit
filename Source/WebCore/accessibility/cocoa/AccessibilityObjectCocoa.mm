@@ -30,6 +30,7 @@
 #if PLATFORM(COCOA)
 
 #import "AXObjectCacheInlines.h"
+#import "FontCascadeInlines.h"
 #import "TextIterator.h"
 #import "WebAccessibilityObjectWrapperBase.h"
 #import <wtf/cocoa/TypeCastsCocoa.h>

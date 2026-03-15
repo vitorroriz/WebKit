@@ -30,6 +30,7 @@
 #import <WebCore/DocumentPage.h>
 #import <WebCore/EventHandler.h>
 #import <WebCore/Font.h>
+#import <WebCore/FontCascadeInlines.h>
 #import <WebCore/FrameInlines.h>
 #import <WebCore/LocalFrame.h>
 #import <WebCore/LocalFrameView.h>

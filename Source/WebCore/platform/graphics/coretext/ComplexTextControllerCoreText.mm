@@ -26,8 +26,9 @@
 #import "ComplexTextController.h"
 
 #import "FontCache.h"
-#import "FontCascade.h"
+#import "FontCascadeInlines.h"
 #import "Logging.h"
+#import "SimpleFontDataCoreText.h"
 #import <CoreText/CoreText.h>
 #import <pal/spi/cf/CoreTextSPI.h>
 #import <wtf/SoftLinking.h>
@@ -195,11 +196,11 @@ void ComplexTextController::collectComplexTextRunsForCharacters(std::span<const 
         effectiveFont = m_fontCascade->fallbackRangesAt(0).fontForCharacter(baseCharacter);
         if (!effectiveFont)
             effectiveFont = &m_fontCascade->fallbackRangesAt(0).fontForFirstRange();
-        stringAttributes = adoptCF(CFDictionaryCreateMutableCopy(kCFAllocatorDefault, 0, effectiveFont->getCFStringAttributes(m_fontCascade->enableKerning(), effectiveFont->platformData().orientation(), m_fontCascade->fontDescription().computedLocale()).get()));
+        stringAttributes = adoptCF(CFDictionaryCreateMutableCopy(kCFAllocatorDefault, 0, getCFStringAttributes(*effectiveFont, m_fontCascade->enableKerning(), effectiveFont->platformData().orientation(), m_fontCascade->fontDescription().computedLocale()).get()));
         // We don't know which font should be used to render this grapheme cluster, so enable CoreText's fallback mechanism by using the CTFont which doesn't have CoreText's fallback disabled.
         CFDictionarySetValue(const_cast<CFMutableDictionaryRef>(stringAttributes.get()), kCTFontAttributeName, effectiveFont->platformData().ctFont());
     } else
-        stringAttributes = effectiveFont->getCFStringAttributes(m_fontCascade->enableKerning(), effectiveFont->platformData().orientation(), m_fontCascade->fontDescription().computedLocale());
+        stringAttributes = getCFStringAttributes(*effectiveFont, m_fontCascade->enableKerning(), effectiveFont->platformData().orientation(), m_fontCascade->fontDescription().computedLocale());
 
     RetainPtr<CTLineRef> line;
 

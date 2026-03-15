@@ -29,6 +29,8 @@
 
 #if ENABLE(MATHML)
 
+#include "FontCascadeInlines.h"
+#include "FontInlines.h"
 #include "RenderStyle+GettersInlines.h"
 #include <wtf/StdLibExtras.h>
 

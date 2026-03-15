@@ -56,6 +56,7 @@
 #include "DOMMatrix2DInit.h"
 #include "FloatQuad.h"
 #include "FontCascadeFonts.h"
+#include "FontCascadeInlines.h"
 #include "GeometryUtilities.h"
 #include "GlyphBuffer.h"
 #include "Gradient.h"

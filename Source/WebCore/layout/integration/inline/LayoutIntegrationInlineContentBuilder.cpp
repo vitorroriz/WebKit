@@ -26,6 +26,8 @@
 #include "config.h"
 #include "LayoutIntegrationInlineContentBuilder.h"
 
+#include "FontCascadeInlines.h"
+#include "FontInlines.h"
 #include "InlineDamage.h"
 #include "InlineDisplayBoxInlines.h"
 #include "LayoutBoxGeometry.h"

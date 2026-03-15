@@ -32,6 +32,8 @@
 #include "DocumentMarkerController.h"
 #include "DocumentView.h"
 #include "FloatQuad.h"
+#include "FontCascadeFonts.h"
+#include "FontCascadeInlines.h"
 #include "Hyphenation.h"
 #include "InlineIteratorBoxInlines.h"
 #include "InlineIteratorLineBoxInlines.h"

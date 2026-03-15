@@ -31,6 +31,7 @@
 #include "FloatPoint.h"
 #include "Font.h"
 #include "FontCascade.h"
+#include "FontInlines.h"
 #include "FontPlatformData.h"
 #include "GlyphBuffer.h"
 #include "GraphicsContextCG.h"

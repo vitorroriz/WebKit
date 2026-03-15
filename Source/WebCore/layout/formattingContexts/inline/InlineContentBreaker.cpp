@@ -33,6 +33,7 @@
 #include "LayoutElementBox.h"
 #include "RenderStyle+GettersInlines.h"
 #include "TextUtil.h"
+#include <wtf/unicode/CharacterNames.h>
 
 namespace WebCore {
 namespace Layout {

@@ -31,6 +31,7 @@
 #if ENABLE(MATHML)
 
 #include "MathMLElement.h"
+#include "FontInlines.h"
 #include "MathMLNames.h"
 #include "MathMLTokenElement.h"
 #include "PaintInfo.h"

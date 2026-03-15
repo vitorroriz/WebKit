@@ -34,7 +34,7 @@
 #include "DocumentView.h"
 #include "FocusController.h"
 #include "FontCache.h"
-#include "FontCascade.h"
+#include "FontCascadeInlines.h"
 #include "FrameSelection.h"
 #include "GeometryUtilities.h"
 #include "GraphicsContext.h"

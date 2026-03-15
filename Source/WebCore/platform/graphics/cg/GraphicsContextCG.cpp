@@ -43,13 +43,15 @@
 #include "Pattern.h"
 #include "ShadowBlur.h"
 #include "Timer.h"
-#include <pal/cg/CoreGraphicsSoftLink.h>
 #include <pal/spi/cg/CoreGraphicsSPI.h>
 #include <wtf/MathExtras.h>
 #include <wtf/RetainPtr.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/URL.h>
+#include <wtf/ZippedRange.h>
 #include <wtf/text/TextStream.h>
+
+#include <pal/cg/CoreGraphicsSoftLink.h>
 
 namespace WebCore {
 

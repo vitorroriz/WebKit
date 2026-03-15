@@ -59,6 +59,7 @@
 #include <wtf/StdLibExtras.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/TypeCasts.h>
+#include <wtf/ZippedRange.h>
 
 namespace WebKit {
 using namespace WebCore;

@@ -28,6 +28,7 @@
 
 #import "PlatformPopupMenuData.h"
 #import <CoreText/CoreText.h>
+#import <WebCore/FontCascadeInlines.h>
 #import <WebCore/LocalFrame.h>
 #import <WebCore/LocalFrameView.h>
 #import <WebCore/PopupMenuClient.h>

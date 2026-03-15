@@ -32,6 +32,7 @@
 #include <ranges>
 #include <wtf/MathExtras.h>
 #include <wtf/PriorityQueue.h>
+#include <wtf/unicode/CharacterNames.h>
 
 namespace WebCore {
 namespace Layout {

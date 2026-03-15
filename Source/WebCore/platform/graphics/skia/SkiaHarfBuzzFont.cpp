@@ -28,7 +28,7 @@
 
 #if USE(SKIA)
 #include "FontCache.h"
-#include "FontCascade.h"
+#include "FontCascadeInlines.h"
 #include "FontPlatformData.h"
 #include "NotImplemented.h"
 #include "SkiaHarfBuzzFontCache.h"

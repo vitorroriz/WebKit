@@ -26,6 +26,7 @@
 #include "config.h"
 #include "SVGTextBoxPainter.h"
 
+#include "FontCascadeInlines.h"
 #include "GraphicsContext.h"
 #include "GraphicsContextStateSaver.h"
 #include "LegacyRenderSVGResourceSolidColor.h"

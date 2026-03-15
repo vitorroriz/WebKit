@@ -77,6 +77,7 @@
 #import <wtf/BlockObjCExceptions.h>
 #import <wtf/cocoa/VectorCocoa.h>
 #import <wtf/text/TextStream.h>
+#import <wtf/unicode/CharacterNames.h>
 
 using namespace WebCore::HTMLNames;
 using namespace WTF::Unicode;

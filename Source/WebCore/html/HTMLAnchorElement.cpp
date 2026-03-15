@@ -71,6 +71,7 @@
 
 #if PLATFORM(COCOA)
 #include "DataDetection.h"
+#include <wtf/cocoa/RuntimeApplicationChecksCocoa.h>
 #endif
 
 namespace WebCore {

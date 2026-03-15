@@ -30,6 +30,7 @@
 #include "FloatRect.h"
 #include "FontCache.h"
 #include "FontCascadeInlines.h"
+#include "FontInlines.h"
 #include "GlyphBuffer.h"
 #include "GraphicsContext.h"
 #include "LayoutRect.h"
@@ -104,6 +105,8 @@ FontCascade::FontCascade(const FontCascade& other)
     , m_requiresShaping(computeRequiresShaping())
 {
 }
+
+FontCascade::~FontCascade() = default;
 
 FontCascade& FontCascade::operator=(const FontCascade& other)
 {
@@ -357,7 +360,7 @@ float FontCascade::width(CodePath codePathToUse, const TextRun& run, SingleThrea
     return it.runWidthSoFar();
 }
 
-NEVER_INLINE float FontCascade::widthForSimpleTextSlow(StringView text, TextDirection textDirection, FontCascadeFonts::GlyphGeometryCacheEntry* cacheEntry) const
+NEVER_INLINE float FontCascade::widthForSimpleTextSlow(StringView text, TextDirection textDirection, GlyphGeometryCacheEntry* cacheEntry) const
 {
 #if PLATFORM(GTK) || PLATFORM(WPE)
     TextRun run { text, 0, 0, ExpansionBehavior::defaultBehavior(), textDirection, false, false };

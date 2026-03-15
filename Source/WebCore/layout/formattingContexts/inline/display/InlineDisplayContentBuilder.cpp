@@ -40,6 +40,7 @@
 #include <wtf/ListHashSet.h>
 #include <wtf/Range.h>
 #include <wtf/text/MakeString.h>
+#include <wtf/unicode/CharacterNames.h>
 
 using WTF::Range;
 

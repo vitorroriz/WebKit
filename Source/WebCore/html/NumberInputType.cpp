@@ -54,6 +54,7 @@
 #include <wtf/ASCIICType.h>
 #include <wtf/MathExtras.h>
 #include <wtf/TZoneMallocInlines.h>
+#include <wtf/unicode/CharacterNames.h>
 
 namespace WebCore {
 

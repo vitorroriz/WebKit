@@ -72,6 +72,7 @@ class TextMetrics;
 class WebCodecsVideoFrame;
 
 struct DOMMatrix2DInit;
+struct GlyphOverflow;
 
 using CanvasImageSource = Variant<
       Ref<HTMLImageElement>
@@ -263,7 +264,7 @@ public:
         FontProxy(const FontProxy&);
         FontProxy& operator=(const FontProxy&);
 
-        bool realized() const { return m_font.fontSelector(); }
+        bool realized() const { return m_font.hasFontSelector(); }
         void initialize(FontSelector&, const FontCascade&);
         const FontMetrics& metricsOfPrimaryFont() const LIFETIME_BOUND;
         const FontCascadeDescription& NODELETE fontDescription() const LIFETIME_BOUND;

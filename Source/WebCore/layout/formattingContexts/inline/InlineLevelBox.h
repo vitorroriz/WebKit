@@ -26,7 +26,6 @@
 
 #pragma once
 
-#include <WebCore/FontCascade.h>
 #include <WebCore/InlineRect.h>
 #include <WebCore/LayoutBox.h>
 #include <WebCore/LayoutUnits.h>

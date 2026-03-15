@@ -47,6 +47,7 @@
 #include "DocumentResourceLoader.h"
 #include "DocumentView.h"
 #include "ElementRuleCollector.h"
+#include "FontCascadeInlines.h"
 #include "FrameSelection.h"
 #include "InspectorInstrumentation.h"
 #include "LocalFrame.h"

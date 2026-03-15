@@ -27,6 +27,7 @@
 #include "FontPlatformData.h"
 
 #include "FontCache.h"
+#include "FontCascadeInlines.h"
 #include "FontCustomPlatformData.h"
 #include "FontRenderOptions.h"
 #include "FontVariationsSkia.h"
@@ -34,6 +35,10 @@
 #include "OpenTypeTypes.h"
 #include "SkiaHarfBuzzFont.h"
 #include <wtf/Hasher.h>
+
+#if ENABLE(MATHML)
+#include "OpenTypeMathData.h"
+#endif
 
 WTF_IGNORE_WARNINGS_IN_THIRD_PARTY_CODE_BEGIN
 #include <skia/core/SkStream.h>

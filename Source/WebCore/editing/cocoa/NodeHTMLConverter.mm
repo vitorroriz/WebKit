@@ -48,7 +48,7 @@
 #import "ElementTraversal.h"
 #import "File.h"
 #import "FontAttributes.h"
-#import "FontCascade.h"
+#import "FontCascadeInlines.h"
 #import "FrameDestructionObserverInlines.h"
 #import "FrameLoader.h"
 #import "HTMLAttachmentElement.h"

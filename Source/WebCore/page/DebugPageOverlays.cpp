@@ -31,6 +31,7 @@
 #include "DocumentView.h"
 #include "ElementIterator.h"
 #include "FloatRoundedRect.h"
+#include "FontSelector.h"
 #include "Gradient.h"
 #include "GraphicsContext.h"
 #include "GraphicsLayer.h"

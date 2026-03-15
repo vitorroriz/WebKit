@@ -28,6 +28,7 @@
 #include "FloatSize.h"
 #include "FontCascade.h"
 #include "FontCascadeInlines.h"
+#include "FontInlines.h"
 #include "GlyphBuffer.h"
 #include "RenderBlock.h"
 #include "RenderText.h"

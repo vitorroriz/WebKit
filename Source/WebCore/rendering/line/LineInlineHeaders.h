@@ -24,6 +24,7 @@
 #pragma once
 
 #include "LineInfo.h"
+#include "FontCascadeInlines.h"
 #include "RenderBoxInlines.h"
 #include "RenderBoxModelObjectInlines.h"
 #include "RenderObjectInlines.h"

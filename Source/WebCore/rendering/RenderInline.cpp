@@ -27,6 +27,7 @@
 
 #include "Chrome.h"
 #include "FloatQuad.h"
+#include "FontCascadeInlines.h"
 #include "FrameSelection.h"
 #include "GraphicsContext.h"
 #include "HitTestResult.h"

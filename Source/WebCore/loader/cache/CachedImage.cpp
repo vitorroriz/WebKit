@@ -30,7 +30,7 @@
 #include "CachedResourceClientWalker.h"
 #include "CachedResourceLoader.h"
 #include "Font.h"
-#include "FontCascade.h"
+#include "FontCascadeInlines.h"
 #include "FrameLoader.h"
 #include "FrameLoaderTypes.h"
 #include "ImageAdapter.h"

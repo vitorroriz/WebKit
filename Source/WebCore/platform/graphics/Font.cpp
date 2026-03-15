@@ -30,6 +30,8 @@
 #include "config.h"
 #include "Font.h"
 
+#include "FontInlines.h"
+
 #if PLATFORM(COCOA)
 #include <pal/spi/cf/CoreTextSPI.h>
 #endif
@@ -38,7 +40,13 @@
 #include "FontCache.h"
 #include "FontCascade.h"
 #include "FontCustomPlatformData.h"
+#include "GlyphPage.h"
 #include "SharedBuffer.h"
+
+#if ENABLE(MATHML)
+#include "OpenTypeMathData.h"
+#endif
+
 #include <wtf/MathExtras.h>
 #include <wtf/NeverDestroyed.h>
 #include <wtf/TZoneMallocInlines.h>

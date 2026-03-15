@@ -26,7 +26,6 @@
 #pragma once
 
 #include <WebCore/Font.h>
-#include <WebCore/FontCascade.h>
 #include <WebCore/InlineItem.h>
 #include <WebCore/InlineLine.h>
 #include <WebCore/LayoutUnits.h>
@@ -41,6 +40,8 @@ namespace TextSpacing {
 struct SpacingState;
 }
 
+struct GlyphOverflow;
+class FontCascade;
 class RenderStyle;
 class TextRun;
 

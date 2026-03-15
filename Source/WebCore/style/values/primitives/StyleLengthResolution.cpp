@@ -32,7 +32,7 @@
 #include "ContainerQueryEvaluator.h"
 #include "Document.h"
 #include "Element.h"
-#include "FontCascade.h"
+#include "FontCascadeInlines.h"
 #include "FontCascadeDescription.h"
 #include "FontMetrics.h"
 #include "NodeRenderStyle.h"

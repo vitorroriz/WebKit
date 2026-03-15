@@ -43,7 +43,7 @@
 #import <WebCore/DocumentView.h>
 #import <WebCore/DragImage.h>
 #import <WebCore/FocusController.h>
-#import <WebCore/FontCascade.h>
+#import <WebCore/FontCascadeInlines.h>
 #import <WebCore/GeometryUtilities.h>
 #import <WebCore/HTMLDocument.h>
 #import <WebCore/HTMLLinkElement.h>

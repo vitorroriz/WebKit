@@ -49,7 +49,7 @@
 #include "EventTargetInlines.h"
 #include "Font.h"
 #include "FontCache.h"
-#include "FontCascade.h"
+#include "FontCascadeInlines.h"
 #include "FontPlatformData.h"
 #include "HTMLHeadElement.h"
 #include "HTMLHtmlElement.h"

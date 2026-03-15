@@ -29,6 +29,7 @@
 
 #include "FloatQuad.h"
 #include "Font.h"
+#include "FontCascadeInlines.h"
 #include "GraphicsContext.h"
 #include "HitTestRequest.h"
 #include "HitTestResult.h"

@@ -66,6 +66,11 @@ struct GlyphOverflow {
     bool computeBounds { false };
 };
 
+struct GlyphGeometryCacheEntry {
+    Markable<float> width;
+    Markable<GlyphOverflow> glyphOverflow;
+};
+
 namespace ShapedTextCacheDefaults {
 // This is tuned for Canvas text operations (fillText, strokeText)
 static constexpr int initialInterval = -3; // Cache immediately, no countdown
@@ -125,10 +130,6 @@ public:
     // FIXME: It should be possible to combine fontSelectorVersion and generation.
     unsigned generation() const { return m_generation; }
 
-    struct GlyphGeometryCacheEntry {
-        Markable<float> width;
-        Markable<GlyphOverflow> glyphOverflow;
-    };
     using GlyphGeometryCache = TextMeasurementCache<GlyphGeometryCacheEntry>;
     GlyphGeometryCache& glyphGeometryCache() LIFETIME_BOUND { return m_glyphGeometryCache; }
     const GlyphGeometryCache& glyphGeometryCache() const LIFETIME_BOUND { return m_glyphGeometryCache; }

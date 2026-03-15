@@ -27,6 +27,7 @@
 #include "config.h"
 #include "LayoutIntegrationBoxGeometryUpdater.h"
 
+#include "FontCascadeInlines.h"
 #include "FormattingConstraints.h"
 #include "InlineWalker.h"
 #include "LayoutIntegrationLineLayout.h"

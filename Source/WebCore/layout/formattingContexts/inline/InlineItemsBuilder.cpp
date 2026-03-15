@@ -27,6 +27,7 @@
 #include "InlineItemsBuilder.h"
 
 #include "FontCascade.h"
+#include "FontCascadeFonts.h"
 #include "InlineSoftLineBreakItem.h"
 #include "RenderObjectInlines.h"
 #include "RenderStyle+GettersInlines.h"

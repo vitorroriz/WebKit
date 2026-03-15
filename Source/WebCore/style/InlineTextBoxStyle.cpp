@@ -26,7 +26,7 @@
 #include "config.h"
 #include "InlineTextBoxStyle.h"
 
-#include "FontCascade.h"
+#include "FontCascadeInlines.h"
 #include "HTMLAnchorElement.h"
 #include "HTMLNames.h"
 #include "InlineIteratorBoxInlines.h"

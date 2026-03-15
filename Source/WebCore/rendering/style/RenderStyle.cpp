@@ -27,7 +27,7 @@
 #include "AutosizeStatus.h"
 #include "CSSCustomPropertyValue.h"
 #include "ColorBlending.h"
-#include "FontCascade.h"
+#include "FontCascadeInlines.h"
 #include "FontSelector.h"
 #include "Logging.h"
 #include "Pagination.h"

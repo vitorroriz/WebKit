@@ -23,6 +23,7 @@
 #include "CSSPropertyNames.h"
 #include "Document.h"
 #include "FontCascade.h"
+#include "FontCascadeFonts.h"
 #include "GraphicsContext.h"
 #include "HitTestResult.h"
 #include "InlineBoxPainter.h"

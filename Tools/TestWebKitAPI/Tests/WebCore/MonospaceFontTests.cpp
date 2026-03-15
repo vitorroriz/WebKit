@@ -27,7 +27,9 @@
 
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/ComplexTextController.h>
-#include <WebCore/FontCascade.h>
+#include <WebCore/FontCascadeFonts.h>
+#include <WebCore/FontCascadeInlines.h>
+#include <WebCore/TextRun.h>
 #include <WebCore/WidthIterator.h>
 #include <wtf/MainThread.h>
 #include <wtf/RunLoop.h>

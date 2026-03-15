@@ -30,6 +30,7 @@
 #include "DocumentMarkerController.h"
 #include "Editor.h"
 #include "EventRegion.h"
+#include "FontCascadeInlines.h"
 #include "GraphicsContext.h"
 #include "HTMLAnchorElement.h"
 #include "InlineIteratorBoxInlines.h"

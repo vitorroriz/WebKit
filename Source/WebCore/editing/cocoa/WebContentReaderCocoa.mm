@@ -76,6 +76,7 @@
 #import <wtf/URLParser.h>
 #import <wtf/cocoa/RuntimeApplicationChecksCocoa.h>
 #import <wtf/text/Base64.h>
+#import <wtf/unicode/CharacterNames.h>
 
 #if PLATFORM(MAC)
 #import "LocalDefaultSystemAppearance.h"

@@ -33,7 +33,7 @@
 #include "DocumentMarkers.h"
 #include "DocumentView.h"
 #include "FloatQuad.h"
-#include "FontCascade.h"
+#include "FontCascadeInlines.h"
 #include "LocalFrame.h"
 #include "NodeTraversal.h"
 #include "Page.h"

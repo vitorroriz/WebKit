@@ -40,6 +40,8 @@
 #include "DebugPageOverlays.h"
 #include "DocumentPage.h"
 #include "EventRegion.h"
+#include "FontCascade.h"
+#include "FontSelector.h"
 #include "GraphicsContext.h"
 #include "GraphicsLayer.h"
 #include "GraphicsLayerFilterAnimationValue.h"

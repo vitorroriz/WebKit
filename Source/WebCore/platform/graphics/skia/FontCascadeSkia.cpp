@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#include "FontCascade.h"
+#include "FontCascadeInlines.h"
 
 #if USE(SKIA)
 #include "FontCache.h"

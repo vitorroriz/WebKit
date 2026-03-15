@@ -24,7 +24,7 @@
 #include "ContainerNodeInlines.h"
 #include "ElementRareData.h"
 #include "FileList.h"
-#include "FontCascade.h"
+#include "FontCascadeInlines.h"
 #include "GraphicsContext.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"

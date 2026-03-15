@@ -28,7 +28,6 @@
 #include <wtf/Forward.h>
 #include <wtf/text/CharacterProperties.h>
 #include <wtf/text/TextStream.h>
-#include <wtf/unicode/CharacterNames.h>
 
 namespace WebCore {
 

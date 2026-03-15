@@ -43,7 +43,7 @@
 
 #if PLATFORM(IOS_FAMILY)
 #include "WebCoreThreadInternal.h"
-#include <wtf/RuntimeApplicationChecks.h>
+#include <wtf/cocoa/RuntimeApplicationChecksCocoa.h>
 #endif
 
 #if PLATFORM(COCOA)

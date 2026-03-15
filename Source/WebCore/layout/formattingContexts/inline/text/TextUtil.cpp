@@ -29,7 +29,9 @@
 
 #include "BreakablePositions.h"
 #include "ComplexTextController.h"
-#include "FontCascade.h"
+#include "FontCascadeFonts.h"
+#include "FontCascadeInlines.h"
+#include "FontInlines.h"
 #include "InlineLineTypes.h"
 #include "InlineTextItem.h"
 #include "Latin1TextIterator.h"

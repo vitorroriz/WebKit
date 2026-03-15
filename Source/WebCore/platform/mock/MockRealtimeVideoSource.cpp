@@ -34,6 +34,7 @@
 #if ENABLE(MEDIA_STREAM)
 #include "CaptureDevice.h"
 #include "FillLightMode.h"
+#include "FontSelector.h"
 #include "GraphicsContext.h"
 #include "ImageUtilities.h"
 #include "IntRect.h"
@@ -43,6 +44,7 @@
 #include "NotImplemented.h"
 #include "PlatformLayer.h"
 #include "RealtimeMediaSourceSettings.h"
+#include "TextRun.h"
 #include "ThreadGlobalData.h"
 #include "VideoFrame.h"
 #include <algorithm>
