@@ -266,7 +266,6 @@ namespace JSC { namespace B3 {
     case VectorExtractPair: \
     case VectorRelaxedSwizzle: \
     case VectorMulByElement: \
-    case VectorShiftByVector: \
     case VectorRelaxedMAdd: \
     case VectorRelaxedNMAdd: \
     case VectorRelaxedLaneSelect: \

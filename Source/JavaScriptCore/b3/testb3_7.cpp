@@ -3162,7 +3162,7 @@ void testTruncSShrAddUnalignedConstant()
 }
 
 // Test XOR-and-rotate-right pattern matching for XAR instruction (SHA3).
-// Pattern: VectorOr(VectorShiftByVector(VectorXor(a, b), shlAmount), VectorShiftByVector(VectorXor(a, b), shrAmount))
+// Pattern: VectorOr(VectorShl(VectorXor(a, b), shlConst), VectorShr(VectorXor(a, b), shrConst))
 // Should be folded into a single XAR instruction on ARM64 with SHA3 support.
 void testVectorXorRotateRight64()
 {
@@ -3399,8 +3399,8 @@ void testVectorReverse()
     CHECK(vectors[1].u32x4[3] == 0xCC);
 }
 
-// Test that VectorShiftByVector(x, splat(1)) is strength-reduced to VectorAdd(x, x).
-void testVectorShiftByVectorShlByOne()
+// Test that VectorShl(x, 1) is strength-reduced to VectorAdd(x, x).
+void testVectorShlByOne()
 {
     alignas(16) v128_t vectors[2];
     Procedure proc;
@@ -3409,8 +3409,7 @@ void testVectorShiftByVectorShlByOne()
     Value* address = arguments[0];
     Value* input = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address);
 
-    // Build VectorShl(input, 1) — will become VectorShiftByVector after LowerMacros,
-    // then VectorAdd(input, input) after ReduceStrength.
+    // Build VectorShl(input, 1) — will become VectorAdd(input, input) after ReduceStrength.
     Value* shiftAmount = root->appendNew<Const32Value>(proc, Origin(), 1);
     Value* result = root->appendNew<SIMDValue>(proc, Origin(), VectorShl, B3::V128, SIMDLane::i64x2, SIMDSignMode::Unsigned, input, shiftAmount);
 
@@ -3433,6 +3432,143 @@ void testVectorShiftByVectorShlByOne()
     CHECK(vectors[1].u64x2[1] == 2);
 }
 
+template<typename T>
+static void testVectorShlImmediateForLane(SIMDLane lane, unsigned shift, T inputVal)
+{
+    if constexpr (!isARM64())
+        return;
+
+    alignas(16) v128_t vectors[2];
+    Procedure proc;
+    BasicBlock* root = proc.addBlock();
+    auto arguments = cCallArgumentValues<void*>(proc, root);
+    Value* address = arguments[0];
+    Value* input = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address);
+    Value* shiftAmount = root->appendNew<Const32Value>(proc, Origin(), shift);
+    Value* result = root->appendNew<SIMDValue>(proc, Origin(), VectorShl, B3::V128, lane, SIMDSignMode::Unsigned, input, shiftAmount);
+    root->appendNew<MemoryValue>(proc, Store, Origin(), result, address, static_cast<int32_t>(sizeof(v128_t)));
+    root->appendNewControlValue(proc, Return, Origin());
+
+    auto code = compileProc(proc);
+
+    constexpr unsigned numLanes = sizeof(v128_t) / sizeof(T);
+    for (unsigned i = 0; i < numLanes; ++i)
+        reinterpret_cast<T*>(&vectors[0])[i] = inputVal;
+    invoke<void>(*code, vectors);
+
+    unsigned bitWidth = sizeof(T) * 8;
+    unsigned maskedShift = shift & (bitWidth - 1);
+    for (unsigned i = 0; i < numLanes; ++i) {
+        T expected = static_cast<T>(inputVal << maskedShift);
+        CHECK(reinterpret_cast<T*>(&vectors[1])[i] == expected);
+    }
+}
+
+void testVectorShlImmediate()
+{
+    if constexpr (!isARM64())
+        return;
+
+    // i8x16
+    testVectorShlImmediateForLane<uint8_t>(SIMDLane::i8x16, 1, static_cast<uint8_t>(0xAB));
+    testVectorShlImmediateForLane<uint8_t>(SIMDLane::i8x16, 4, static_cast<uint8_t>(0x0F));
+    testVectorShlImmediateForLane<uint8_t>(SIMDLane::i8x16, 7, static_cast<uint8_t>(0x01));
+
+    // i16x8
+    testVectorShlImmediateForLane<uint16_t>(SIMDLane::i16x8, 1, static_cast<uint16_t>(0xABCD));
+    testVectorShlImmediateForLane<uint16_t>(SIMDLane::i16x8, 8, static_cast<uint16_t>(0x00FF));
+    testVectorShlImmediateForLane<uint16_t>(SIMDLane::i16x8, 15, static_cast<uint16_t>(0x0001));
+
+    // i32x4
+    testVectorShlImmediateForLane<uint32_t>(SIMDLane::i32x4, 1, 0xDEADBEEFu);
+    testVectorShlImmediateForLane<uint32_t>(SIMDLane::i32x4, 16, 0x0000FFFFu);
+    testVectorShlImmediateForLane<uint32_t>(SIMDLane::i32x4, 31, 0x00000001u);
+
+    // i64x2
+    testVectorShlImmediateForLane<uint64_t>(SIMDLane::i64x2, 1, 0x0123456789ABCDEFull);
+    testVectorShlImmediateForLane<uint64_t>(SIMDLane::i64x2, 32, 0x00000000FFFFFFFFull);
+    testVectorShlImmediateForLane<uint64_t>(SIMDLane::i64x2, 63, 0x0000000000000001ull);
+}
+
+template<typename T, typename SignedT>
+static void testVectorShrImmediateForLane(SIMDLane lane, SIMDSignMode signMode, unsigned shift, T inputVal)
+{
+    if constexpr (!isARM64())
+        return;
+
+    alignas(16) v128_t vectors[2];
+    Procedure proc;
+    BasicBlock* root = proc.addBlock();
+    auto arguments = cCallArgumentValues<void*>(proc, root);
+    Value* address = arguments[0];
+    Value* input = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address);
+    Value* shiftAmount = root->appendNew<Const32Value>(proc, Origin(), shift);
+    Value* result = root->appendNew<SIMDValue>(proc, Origin(), VectorShr, B3::V128, lane, signMode, input, shiftAmount);
+    root->appendNew<MemoryValue>(proc, Store, Origin(), result, address, static_cast<int32_t>(sizeof(v128_t)));
+    root->appendNewControlValue(proc, Return, Origin());
+
+    auto code = compileProc(proc);
+
+    constexpr unsigned numLanes = sizeof(v128_t) / sizeof(T);
+    for (unsigned i = 0; i < numLanes; ++i)
+        reinterpret_cast<T*>(&vectors[0])[i] = inputVal;
+    invoke<void>(*code, vectors);
+
+    unsigned bitWidth = sizeof(T) * 8;
+    unsigned maskedShift = shift & (bitWidth - 1);
+    for (unsigned i = 0; i < numLanes; ++i) {
+        T expected;
+        if (signMode == SIMDSignMode::Signed)
+            expected = static_cast<T>(static_cast<SignedT>(inputVal) >> maskedShift);
+        else
+            expected = static_cast<T>(inputVal >> maskedShift);
+        CHECK(reinterpret_cast<T*>(&vectors[1])[i] == expected);
+    }
+}
+
+void testVectorShrImmediate()
+{
+    if constexpr (!isARM64())
+        return;
+
+    // i8x16 unsigned
+    testVectorShrImmediateForLane<uint8_t, int8_t>(SIMDLane::i8x16, SIMDSignMode::Unsigned, 1, static_cast<uint8_t>(0xAB));
+    testVectorShrImmediateForLane<uint8_t, int8_t>(SIMDLane::i8x16, SIMDSignMode::Unsigned, 4, static_cast<uint8_t>(0xFF));
+    testVectorShrImmediateForLane<uint8_t, int8_t>(SIMDLane::i8x16, SIMDSignMode::Unsigned, 7, static_cast<uint8_t>(0x80));
+
+    // i8x16 signed
+    testVectorShrImmediateForLane<uint8_t, int8_t>(SIMDLane::i8x16, SIMDSignMode::Signed, 1, static_cast<uint8_t>(0xAB));
+    testVectorShrImmediateForLane<uint8_t, int8_t>(SIMDLane::i8x16, SIMDSignMode::Signed, 4, static_cast<uint8_t>(0xFF));
+    testVectorShrImmediateForLane<uint8_t, int8_t>(SIMDLane::i8x16, SIMDSignMode::Signed, 7, static_cast<uint8_t>(0x80));
+
+    // i16x8 unsigned
+    testVectorShrImmediateForLane<uint16_t, int16_t>(SIMDLane::i16x8, SIMDSignMode::Unsigned, 1, static_cast<uint16_t>(0xABCD));
+    testVectorShrImmediateForLane<uint16_t, int16_t>(SIMDLane::i16x8, SIMDSignMode::Unsigned, 8, static_cast<uint16_t>(0xFF00));
+    testVectorShrImmediateForLane<uint16_t, int16_t>(SIMDLane::i16x8, SIMDSignMode::Unsigned, 15, static_cast<uint16_t>(0x8000));
+
+    // i16x8 signed
+    testVectorShrImmediateForLane<uint16_t, int16_t>(SIMDLane::i16x8, SIMDSignMode::Signed, 1, static_cast<uint16_t>(0xABCD));
+    testVectorShrImmediateForLane<uint16_t, int16_t>(SIMDLane::i16x8, SIMDSignMode::Signed, 8, static_cast<uint16_t>(0xFF00));
+
+    // i32x4 unsigned
+    testVectorShrImmediateForLane<uint32_t, int32_t>(SIMDLane::i32x4, SIMDSignMode::Unsigned, 1, 0xDEADBEEFu);
+    testVectorShrImmediateForLane<uint32_t, int32_t>(SIMDLane::i32x4, SIMDSignMode::Unsigned, 16, 0xFFFF0000u);
+    testVectorShrImmediateForLane<uint32_t, int32_t>(SIMDLane::i32x4, SIMDSignMode::Unsigned, 31, 0x80000000u);
+
+    // i32x4 signed
+    testVectorShrImmediateForLane<uint32_t, int32_t>(SIMDLane::i32x4, SIMDSignMode::Signed, 1, 0xDEADBEEFu);
+    testVectorShrImmediateForLane<uint32_t, int32_t>(SIMDLane::i32x4, SIMDSignMode::Signed, 16, 0xFFFF0000u);
+
+    // i64x2 unsigned
+    testVectorShrImmediateForLane<uint64_t, int64_t>(SIMDLane::i64x2, SIMDSignMode::Unsigned, 1, 0x0123456789ABCDEFull);
+    testVectorShrImmediateForLane<uint64_t, int64_t>(SIMDLane::i64x2, SIMDSignMode::Unsigned, 32, 0xFFFFFFFF00000000ull);
+    testVectorShrImmediateForLane<uint64_t, int64_t>(SIMDLane::i64x2, SIMDSignMode::Unsigned, 63, 0x8000000000000000ull);
+
+    // i64x2 signed
+    testVectorShrImmediateForLane<uint64_t, int64_t>(SIMDLane::i64x2, SIMDSignMode::Signed, 1, 0x8000000000000000ull);
+    testVectorShrImmediateForLane<uint64_t, int64_t>(SIMDLane::i64x2, SIMDSignMode::Signed, 32, 0xFFFFFFFF00000000ull);
+    testVectorShrImmediateForLane<uint64_t, int64_t>(SIMDLane::i64x2, SIMDSignMode::Signed, 63, 0x8000000000000000ull);
+}
 // Helper: build a 3-child (binary) VectorSwizzle with the given byte pattern, verify result.
 static void testBinarySwizzlePattern(const char*, const uint8_t pattern[16], v128_t inputA, v128_t inputB, v128_t expected)
 {

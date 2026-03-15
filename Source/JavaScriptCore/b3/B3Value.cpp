@@ -787,7 +787,6 @@ Effects Value::effects() const
     case VectorReverse:
     case VectorExtractPair:
     case VectorMulByElement:
-    case VectorShiftByVector:
     case VectorRelaxedSwizzle:
     case VectorRelaxedMAdd:
     case VectorRelaxedNMAdd:
@@ -1094,7 +1093,6 @@ ValueKey Value::key() const
     case VectorShr:
     case VectorMulSat:
     case VectorAvgRound:
-    case VectorShiftByVector:
     case VectorRelaxedSwizzle:
     case VectorUnzipEven:
     case VectorUnzipOdd:

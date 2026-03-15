@@ -3526,17 +3526,29 @@ void NODELETE BBQJIT::notifyFunctionUsesSIMD()
     LOG_INSTRUCTION("Vector", op, src, srcLocation, shift, shiftLocation, RESULT(result));
 
 #if CPU(ARM64)
-    m_jit.and32(Imm32(mask), shiftLocation.asGPR(), wasmScratchGPR);
-    if (op == SIMDLaneOperation::Shr) {
-        // ARM64 doesn't have a version of this instruction for right shift. Instead, if the input to
-        // left shift is negative, it's a right shift by the absolute value of that amount.
-        m_jit.neg32(wasmScratchGPR);
+    if (shift.isConst()) {
+        int32_t shiftImm = shift.asI32() & mask;
+        if (!shiftImm)
+            m_jit.moveVector(srcLocation.asFPR(), resultLocation.asFPR());
+        else if (op == SIMDLaneOperation::Shl)
+            m_jit.vectorShl8(info, srcLocation.asFPR(), TrustedImm32(shiftImm), resultLocation.asFPR());
+        else if (info.signMode == SIMDSignMode::Signed)
+            m_jit.vectorSshr8(info, srcLocation.asFPR(), TrustedImm32(shiftImm), resultLocation.asFPR());
+        else
+            m_jit.vectorUshr8(info, srcLocation.asFPR(), TrustedImm32(shiftImm), resultLocation.asFPR());
+    } else {
+        m_jit.and32(Imm32(mask), shiftLocation.asGPR(), wasmScratchGPR);
+        if (op == SIMDLaneOperation::Shr) {
+            // ARM64 doesn't have a version of this instruction for right shift. Instead, if the input to
+            // left shift is negative, it's a right shift by the absolute value of that amount.
+            m_jit.neg32(wasmScratchGPR);
+        }
+        m_jit.vectorSplatInt8(wasmScratchGPR, wasmScratchFPR);
+        if (info.signMode == SIMDSignMode::Signed)
+            m_jit.vectorSshl(info, srcLocation.asFPR(), wasmScratchFPR, resultLocation.asFPR());
+        else
+            m_jit.vectorUshl(info, srcLocation.asFPR(), wasmScratchFPR, resultLocation.asFPR());
     }
-    m_jit.vectorSplatInt8(wasmScratchGPR, wasmScratchFPR);
-    if (info.signMode == SIMDSignMode::Signed)
-        m_jit.vectorSshl(info, srcLocation.asFPR(), wasmScratchFPR, resultLocation.asFPR());
-    else
-        m_jit.vectorUshl(info, srcLocation.asFPR(), wasmScratchFPR, resultLocation.asFPR());
 #else
     ASSERT(isX86());
     m_jit.move(shiftLocation.asGPR(), wasmScratchGPR);

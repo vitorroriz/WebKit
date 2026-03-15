@@ -1514,7 +1514,11 @@ void testVectorTransposeOdd();
 void testVectorReverse();
 
 // SIMD strength reduction: shift-by-1 → add
-void testVectorShiftByVectorShlByOne();
+void testVectorShlByOne();
+
+// SIMD vector shift by immediate
+void testVectorShlImmediate();
+void testVectorShrImmediate();
 
 // SIMD shuffle → canonical instruction strength reduction
 void testVectorSwizzleToUnzipEven();

@@ -557,7 +557,6 @@ protected:
         case VectorMulSat:
         case VectorAvgRound:
         case VectorMulByElement:
-        case VectorShiftByVector:
         case VectorRelaxedSwizzle:
         case VectorUnzipEven:
         case VectorUnzipOdd:
@@ -805,7 +804,6 @@ private:
         case VectorMulSat:
         case VectorAvgRound:
         case VectorMulByElement:
-        case VectorShiftByVector:
         case VectorRelaxedSwizzle:
         case VectorUnzipEven:
         case VectorUnzipOdd:

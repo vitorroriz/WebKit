@@ -106,7 +106,6 @@ public:
         case VectorReverse:
         case VectorExtractPair:
         case VectorMulByElement:
-        case VectorShiftByVector:
         case VectorDotProduct:
         case VectorRelaxedSwizzle:
         case VectorRelaxedMAdd:

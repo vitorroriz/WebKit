@@ -2104,6 +2104,17 @@ public:
         insn(0b011'011110'0000'000'000001'00000'00000 | (immh << 19) | (immb << 16) | (vn << 5) | vd);
     }
 
+    ALWAYS_INLINE void shl_vi(FPRegisterID vd, FPRegisterID vn, uint8_t shift, SIMDLane lane)
+    {
+        uint8_t maxShift = elementByteSize(lane) * 8;
+        ASSERT_UNUSED(maxShift, shift < maxShift);
+        unsigned immh = elementByteSize(lane) | ((shift & 0b0111000) >> 3);
+        unsigned immb = shift & 0b0111;
+        ASSERT(immh);
+        ASSERT(!(immh & (~0b1111)));
+        insn(0b010'011110'0000'000'010101'00000'00000 | (immh << 19) | (immb << 16) | (vn << 5) | vd);
+    }
+
     template<SIMDLane narrowedLane>
     ALWAYS_INLINE void shrn(FPRegisterID vd, FPRegisterID vn, uint8_t shift)
     {

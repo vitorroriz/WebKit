@@ -198,7 +198,6 @@ Value* ValueKey::materialize(Procedure& proc, Origin origin) const
     case VectorShr:
     case VectorMulSat:
     case VectorAvgRound:
-    case VectorShiftByVector:
     case VectorUnzipEven:
     case VectorUnzipOdd:
     case VectorZipLower:

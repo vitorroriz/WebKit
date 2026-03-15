@@ -462,7 +462,6 @@ enum Opcode : uint8_t {
     // Currently only some architectures support this.
     // FIXME: Expand this to identical instructions for the other architectures as a macro.
     VectorMulByElement,
-    VectorShiftByVector,
 
     // SSA support, in the style of DFG SSA.
     Upsilon, // This uses the UpsilonValue class.

@@ -1150,7 +1150,9 @@ void run(const TestConfig* config)
             RUN(testVectorTransposeEven());
             RUN(testVectorTransposeOdd());
             RUN(testVectorReverse());
-            RUN(testVectorShiftByVectorShlByOne());
+            RUN(testVectorShlByOne());
+            RUN(testVectorShlImmediate());
+            RUN(testVectorShrImmediate());
             RUN(testVectorSwizzleToUnzipEven());
             RUN(testVectorSwizzleBinaryToUnzipOdd());
             RUN(testVectorSwizzleBinaryCanonical());

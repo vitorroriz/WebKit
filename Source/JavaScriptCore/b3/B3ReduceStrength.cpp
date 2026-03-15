@@ -3422,21 +3422,11 @@ private:
             break;
         }
 
-        case VectorShiftByVector: {
-            // VectorShiftByVector(x, splat(1)) for unsigned left shift → VectorAdd(x, x)
-            // Since x + x = x << 1, this avoids the shift instruction.
-            if constexpr (isARM64()) {
-                SIMDValue* value = m_value->as<SIMDValue>();
-                if (value->signMode() == SIMDSignMode::Unsigned || value->signMode() == SIMDSignMode::None) {
-                    Value* shiftVec = m_value->child(1);
-                    if (shiftVec->opcode() == Const128) {
-                        auto result = SIMDShuffle::isI8x16SameElement(shiftVec->as<Const128Value>()->value());
-                        if (result && result.value() == 1) {
-                            replaceWithNew<SIMDValue>(m_value->origin(), VectorAdd, B3::V128, value->simdLane(), SIMDSignMode::None, m_value->child(0), m_value->child(0));
-                            break;
-                        }
-                    }
-                }
+        case VectorShl: {
+            SIMDValue* value = m_value->as<SIMDValue>();
+            if (value->child(1)->hasInt32() && value->child(1)->asInt32() == 1) {
+                replaceWithNew<SIMDValue>(m_value->origin(), VectorAdd, B3::V128, value->simdLane(), SIMDSignMode::None, m_value->child(0), m_value->child(0));
+                break;
             }
             break;
         }
