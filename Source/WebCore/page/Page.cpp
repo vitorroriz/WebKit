@@ -2166,7 +2166,7 @@ unsigned NODELETE Page::renderingUpdateCount() const
 void Page::syncLocalFrameInfoToRemote()
 {
     forEachLocalFrame([] (LocalFrame& frame) {
-        CheckedPtr frameView = frame.view();
+        RefPtr<LocalFrameView> frameView = frame.view();
 
         frameView->updateLayoutViewportRect();
 
@@ -2175,12 +2175,8 @@ void Page::syncLocalFrameInfoToRemote()
 
             for (RefPtr child = frame.tree().firstChild(); child; child = child->tree().nextSibling()) {
                 auto visibleRect = frameView->visibleRectOfChild(*child.get());
-
-                float usedZoom = 1.0;
-                if (CheckedPtr ownerRenderer = child->ownerRenderer())
-                    usedZoom = ownerRenderer->style().usedZoom();
-
-                auto useDarkAppearance = frameView->useDarkAppearance();
+                float usedZoom = frame.usedZoomForChild(*child);
+                bool useDarkAppearance = frameView->ownerElementOfChildFrameUsesDarkAppearance(*child);
 
                 childrenFrameLayoutInfo.add(child->frameID(), RemoteFrameLayoutInfo { .visibleRectInParent = visibleRect, .usedZoom = usedZoom, .useDarkAppearance = useDarkAppearance });
             }
