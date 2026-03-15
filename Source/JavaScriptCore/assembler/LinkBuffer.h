@@ -521,6 +521,9 @@ private:
 #define FINALIZE_WASM_CODE_FOR_MODE(mode, linkBufferReference, resultPtrTag, simpleName, ...)  \
     FINALIZE_CODE_IF(shouldDumpDisassemblyFor(mode), linkBufferReference, resultPtrTag, simpleName, __VA_ARGS__)
 
+#define FINALIZE_CSSJIT_CODE(linkBufferReference, resultPtrTag, simpleName, ...)  \
+    FINALIZE_CODE_IF((JSC::Options::dumpDisassembly() || JSC::Options::dumpCSSJITDisassembly()), linkBufferReference, resultPtrTag, simpleName, __VA_ARGS__)
+
 
 
 } // namespace JSC

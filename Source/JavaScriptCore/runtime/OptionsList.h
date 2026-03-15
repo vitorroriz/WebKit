@@ -137,6 +137,7 @@ bool hasCapacityToUseLargeGigacage();
     v(Bool, dumpBaselineDisassembly, false, Normal, "dumps disassembly of Baseline function upon compilation"_s) \
     v(Bool, dumpDFGDisassembly, false, Normal, "dumps disassembly of DFG function upon compilation"_s) \
     v(Bool, dumpFTLDisassembly, false, Normal, "dumps disassembly of FTL function upon compilation"_s) \
+    v(Bool, dumpCSSJITDisassembly, false, Normal, "dumps disassembly of CSS Selector JIT upon compilation"_s) \
     v(Bool, dumpRegExpDisassembly, false, Normal, "dumps disassembly of RegExp upon compilation"_s) \
     v(Bool, traceRegExpJITExecution, false, Normal, "traces RegExp JIT execution at reentry points"_s) \
     v(Bool, dumpWasmDisassembly, false, Normal, "dumps disassembly of all wasm code upon compilation"_s) \

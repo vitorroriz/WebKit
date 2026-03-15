@@ -56,6 +56,7 @@
 #include <JavaScriptCore/GPRInfo.h>
 #include <JavaScriptCore/LinkBuffer.h>
 #include <JavaScriptCore/MacroAssembler.h>
+#include <JavaScriptCore/Options.h>
 #include <JavaScriptCore/VM.h>
 #include <limits>
 #include <wtf/Deque.h>
@@ -315,7 +316,10 @@ static JSC_DECLARE_NOEXCEPT_JIT_OPERATION_WITHOUT_WTF_INTERNAL(operationAttribut
 
 } // extern "C"
 
-#define CSS_SELECTOR_JIT_DEBUGGING 0
+static bool shouldDumpCSSJITDisassembly()
+{
+    return JSC::Options::dumpDisassembly() || JSC::Options::dumpCSSJITDisassembly();
+}
 
 enum class BacktrackingAction {
     NoBacktracking,
@@ -625,9 +629,7 @@ private:
     StackAllocator::StackReference m_lastVisitedElement;
     StackAllocator::StackReference m_startElement;
 
-#if CSS_SELECTOR_JIT_DEBUGGING
     const CSSSelector& m_originalSelector;
-#endif
 };
 
 const Assembler::RegisterID SelectorCodeGenerator::returnRegister = JSC::GPRInfo::returnValueGPR;
@@ -1482,13 +1484,9 @@ inline SelectorCodeGenerator::SelectorCodeGenerator(const CSSSelector& rootSelec
     , m_functionType(FunctionType::SimpleSelectorChecker)
     , m_visitedMode(VisitedMode::None)
     , m_descendantBacktrackingStartInUse(false)
-#if CSS_SELECTOR_JIT_DEBUGGING
     , m_originalSelector(rootSelector)
-#endif
 {
-#if CSS_SELECTOR_JIT_DEBUGGING
-    dataLogF("Compiling \"%s\"\n", m_originalSelector.selectorText().utf8().data());
-#endif
+    dataLogFIf(shouldDumpCSSJITDisassembly(), "Compiling \"%s\"\n", m_originalSelector.selectorText().utf8().data());
 
     // In QuerySelector context, :visited always has no effect due to security issues.
     bool visitedMatchEnabled = selectorContext != SelectorContext::QuerySelector;
@@ -1889,11 +1887,7 @@ inline SelectorCompilationStatus SelectorCodeGenerator::compile(JSC::MacroAssemb
     for (unsigned i = 0; i < m_functionCalls.size(); i++)
         linkBuffer.link(m_functionCalls[i].first, m_functionCalls[i].second);
 
-#if CSS_SELECTOR_JIT_DEBUGGING
-    codeRef = linkBuffer.finalizeCodeWithDisassembly<JSC::CSSSelectorPtrTag>(true, nullptr, "CSS Selector JIT for \"%s\"", m_originalSelector.selectorText().utf8().data());
-#else
-    codeRef = FINALIZE_CODE(linkBuffer, JSC::CSSSelectorPtrTag, nullptr, "CSS Selector JIT");
-#endif
+    codeRef = FINALIZE_CSSJIT_CODE(linkBuffer, JSC::CSSSelectorPtrTag, nullptr, "CSS Selector JIT for \"%s\"", m_originalSelector.selectorText().utf8().data());
 
     if (m_functionType == FunctionType::SimpleSelectorChecker || m_functionType == FunctionType::CannotMatchAnything)
         return SelectorCompilationStatus::SimpleSelectorChecker;
@@ -2225,9 +2219,7 @@ void computeBacktrackingInformation(SelectorFragmentList& selectorFragments, uns
 
         computeBacktrackingWidthFromIndirectAdjacent(fragment, tagNamesForDirectAdjacentChain, hasIndirectAdjacentRelationOnTheRightOfDirectAdjacentChain, previousDirectAdjacentFragmentInDirectAdjacentChain);
 
-#if CSS_SELECTOR_JIT_DEBUGGING
-        dataLogF("%*sComputing fragment[%d] backtracking height %u. NotMatched %u / Matched %u | width %u. NotMatched %u / Matched %u\n", level * 4, "", i, fragment.heightFromDescendant, fragment.tagNameNotMatchedBacktrackingStartHeightFromDescendant, fragment.tagNameMatchedBacktrackingStartHeightFromDescendant, fragment.widthFromIndirectAdjacent, fragment.tagNameNotMatchedBacktrackingStartWidthFromIndirectAdjacent, fragment.tagNameMatchedBacktrackingStartWidthFromIndirectAdjacent);
-#endif
+        dataLogFIf(shouldDumpCSSJITDisassembly(), "%*sComputing fragment[%d] backtracking height %u. NotMatched %u / Matched %u | width %u. NotMatched %u / Matched %u\n", level * 4, "", i, fragment.heightFromDescendant, fragment.tagNameNotMatchedBacktrackingStartHeightFromDescendant, fragment.tagNameMatchedBacktrackingStartHeightFromDescendant, fragment.widthFromIndirectAdjacent, fragment.tagNameNotMatchedBacktrackingStartWidthFromIndirectAdjacent, fragment.tagNameMatchedBacktrackingStartWidthFromIndirectAdjacent);
 
         solveBacktrackingAction(fragment, hasDescendantRelationOnTheRight, hasIndirectAdjacentRelationOnTheRightOfDirectAdjacentChain);
 
@@ -2274,9 +2266,7 @@ void computeBacktrackingInformation(SelectorFragmentList& selectorFragments, uns
 
     for (SelectorFragment& fragment : selectorFragments) {
         if (!fragment.notFilters.isEmpty()) {
-#if CSS_SELECTOR_JIT_DEBUGGING
-            dataLogF("%*s  Subselectors for :not():\n", level * 4, "");
-#endif
+            dataLogFIf(shouldDumpCSSJITDisassembly(), "%*s  Subselectors for :not():\n", level * 4, "");
 
             for (SelectorFragmentList& selectorList : fragment.notFilters)
                 computeBacktrackingInformation(selectorList, level + 1);
@@ -2284,9 +2274,7 @@ void computeBacktrackingInformation(SelectorFragmentList& selectorFragments, uns
 
         if (!fragment.matchesFilters.isEmpty()) {
             for (SelectorList& matchesList : fragment.matchesFilters) {
-#if CSS_SELECTOR_JIT_DEBUGGING
-                dataLogF("%*s  Subselectors for :matches():\n", level * 4, "");
-#endif
+                dataLogFIf(shouldDumpCSSJITDisassembly(), "%*s  Subselectors for :matches():\n", level * 4, "");
 
                 for (SelectorFragmentList& selectorList : matchesList)
                     computeBacktrackingInformation(selectorList, level + 1);
@@ -2294,18 +2282,14 @@ void computeBacktrackingInformation(SelectorFragmentList& selectorFragments, uns
         }
 
         for (NthChildOfSelectorInfo& nthChildOfSelectorInfo : fragment.nthChildOfFilters) {
-#if CSS_SELECTOR_JIT_DEBUGGING
-            dataLogF("%*s  Subselectors for %dn+%d:\n", level * 4, "", nthChildOfSelectorInfo.a, nthChildOfSelectorInfo.b);
-#endif
+            dataLogFIf(shouldDumpCSSJITDisassembly(), "%*s  Subselectors for %dn+%d:\n", level * 4, "", nthChildOfSelectorInfo.a, nthChildOfSelectorInfo.b);
 
             for (SelectorFragmentList& selectorList : nthChildOfSelectorInfo.selectorList)
                 computeBacktrackingInformation(selectorList, level + 1);
         }
 
         for (NthChildOfSelectorInfo& nthLastChildOfSelectorInfo : fragment.nthLastChildOfFilters) {
-#if CSS_SELECTOR_JIT_DEBUGGING
-            dataLogF("%*s  Subselectors for %dn+%d:\n", level * 4, "", nthLastChildOfSelectorInfo.a, nthLastChildOfSelectorInfo.b);
-#endif
+            dataLogFIf(shouldDumpCSSJITDisassembly(), "%*s  Subselectors for %dn+%d:\n", level * 4, "", nthLastChildOfSelectorInfo.a, nthLastChildOfSelectorInfo.b);
 
             for (SelectorFragmentList& selectorList : nthLastChildOfSelectorInfo.selectorList)
                 computeBacktrackingInformation(selectorList, level + 1);
@@ -2329,11 +2313,13 @@ inline bool SelectorCodeGenerator::generatePrologue()
     prologueRegisters.append(JSC::ARM64Registers::fp);
     m_prologueStackReferences = m_stackAllocator.push(prologueRegisters);
     return true;
-#elif CPU(X86_64) && CSS_SELECTOR_JIT_DEBUGGING
-    Vector<JSC::MacroAssembler::RegisterID, 1> prologueRegister;
-    prologueRegister.append(callFrameRegister);
-    m_prologueStackReferences = m_stackAllocator.push(prologueRegister);
-    return true;
+#elif CPU(X86_64)
+    if (shouldDumpCSSJITDisassembly()) {
+        Vector<JSC::MacroAssembler::RegisterID, 1> prologueRegister;
+        prologueRegister.append(callFrameRegister);
+        m_prologueStackReferences = m_stackAllocator.push(prologueRegister);
+        return true;
+    }
 #endif
     return false;
 }
@@ -2343,9 +2329,11 @@ inline void SelectorCodeGenerator::generateEpilogue(StackAllocator& stackAllocat
 #if CPU(ARM64)
     Vector<JSC::MacroAssembler::RegisterID, 2> prologueRegisters({ JSC::ARM64Registers::lr, JSC::ARM64Registers::fp });
     stackAllocator.pop(m_prologueStackReferences, prologueRegisters);
-#elif CPU(X86_64) && CSS_SELECTOR_JIT_DEBUGGING
-    Vector<JSC::MacroAssembler::RegisterID, 1> prologueRegister({ callFrameRegister });
-    stackAllocator.pop(m_prologueStackReferences, prologueRegister);
+#elif CPU(X86_64)
+    if (shouldDumpCSSJITDisassembly()) {
+        Vector<JSC::MacroAssembler::RegisterID, 1> prologueRegister({ callFrameRegister });
+        stackAllocator.pop(m_prologueStackReferences, prologueRegister);
+    }
 #else
     UNUSED_PARAM(stackAllocator);
 #endif
@@ -2397,9 +2385,7 @@ void SelectorCodeGenerator::generateSelectorChecker()
     computeBacktrackingMemoryRequirements(m_selectorFragments);
     unsigned availableRegisterCount = m_registerAllocator.reserveCallerSavedRegisters(m_selectorFragments.registerRequirements);
 
-#if CSS_SELECTOR_JIT_DEBUGGING
-    dataLogF("Compiling with minimum required register count %u, minimum stack space %u\n", m_selectorFragments.registerRequirements, m_selectorFragments.stackRequirements);
-#endif
+    dataLogFIf(shouldDumpCSSJITDisassembly(), "Compiling with minimum required register count %u, minimum stack space %u\n", m_selectorFragments.registerRequirements, m_selectorFragments.stackRequirements);
 
     // We do not want unbounded stack allocation for backtracking. Going down 8 enry points would already be incredibly inefficient.
     unsigned maximumBacktrackingAllocations = 8;
