@@ -58,7 +58,8 @@ namespace WebCore {
 SizesAttributeParser::SizesAttributeParser(const String& attribute, const Document& document)
     : m_document(document)
 {
-    m_result = parse(CSSTokenizer(attribute).tokenRange(), CSSParserContext(document));
+    if (!attribute.isEmpty())
+        m_result = parse(CSSTokenizer(attribute).tokenRange(), CSSParserContext(document));
 }
 
 float SizesAttributeParser::effectiveSize()
