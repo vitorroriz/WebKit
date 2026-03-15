@@ -1486,7 +1486,9 @@ inline SelectorCodeGenerator::SelectorCodeGenerator(const CSSSelector& rootSelec
     , m_descendantBacktrackingStartInUse(false)
     , m_originalSelector(rootSelector)
 {
-    dataLogFIf(shouldDumpCSSJITDisassembly(), "Compiling \"%s\"\n", m_originalSelector.selectorText().utf8().data());
+    auto selectorTextUTF8 = m_originalSelector.selectorText().utf8();
+    auto selectorTextSpan = selectorTextUTF8.span();
+    dataLogFIf(shouldDumpCSSJITDisassembly(), "Compiling \"%.*s\"\n", static_cast<int>(selectorTextSpan.size()), selectorTextSpan.data());
 
     // In QuerySelector context, :visited always has no effect due to security issues.
     bool visitedMatchEnabled = selectorContext != SelectorContext::QuerySelector;
