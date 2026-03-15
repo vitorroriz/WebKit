@@ -12535,13 +12535,59 @@ IGNORE_CLANG_WARNINGS_END
             return;
         }
 
-        // FIXME: we can do something much smarter here, see the DFGSpeculativeJIT approach in e.g. SpeculativeJIT::nonSpeculativePeepholeStrictEq
         DFG_ASSERT(m_graph, m_node, m_node->isBinaryUseKind(UntypedUse), m_node->child1().useKind(), m_node->child2().useKind());
-        genericJSValueCompare(
-            [&] (LValue left, LValue right) {
-                return m_out.equal(left, right);
-            },
-            operationCompareStrictEq);
+
+        // Same bit-trick as DFG's SpeculativeJIT::genericJSValueNonPeepholeStrictEq:
+        // At a high level:
+        //   if (left is Double || right is Double) goto slowPath;
+        //   if (left == right) return true;  // covers Int32, Boolean, null, undefined, identical cells
+        //   if (both are cells) goto slowPath;  // String===String, HeapBigInt===HeapBigInt
+        //   return false;
+        JSGlobalObject* globalObject = m_graph.globalObjectFor(m_origin.semantic);
+        LValue left = lowJSValue(m_node->child1(), ManualOperandSpeculation);
+        LValue right = lowJSValue(m_node->child2(), ManualOperandSpeculation);
+        speculate(m_node->child1());
+        speculate(m_node->child2());
+
+        LBasicBlock notDoubleCase = m_out.newBlock();
+        LBasicBlock checkCellCase = m_out.newBlock();
+        LBasicBlock slowPath = m_out.newBlock();
+        LBasicBlock continuation = m_out.newBlock();
+
+        // If a JSValue is an Int32, then adding 1<<49 will overflow, leaving all high bits at 0.
+        // If it is not a number at all (Cell/Other), then 1<<49 will be its only high bit set.
+        // Only Doubles end up above or equal to 1<<50 after this transformation.
+        // This lets us detect "either is Double" with a single branch instead of four.
+        LValue lowestOfHighBits = m_out.constInt64(JSValue::LowestOfHighBits);
+        LValue leftAdjusted = m_out.add(left, lowestOfHighBits);
+        LValue rightAdjusted = m_out.add(right, lowestOfHighBits);
+        LValue combined = m_out.bitOr(leftAdjusted, rightAdjusted);
+        m_out.branch(
+            m_out.aboveOrEqual(combined, m_out.constInt64(JSValue::LowestOfHighBits << 1)),
+            rarely(slowPath), usually(notDoubleCase));
+
+        LBasicBlock lastNext = m_out.appendTo(notDoubleCase, checkCellCase);
+        ValueFromBlock fastTrue = m_out.anchor(m_out.booleanTrue);
+        m_out.branch(m_out.equal(left, right), unsure(continuation), unsure(checkCellCase));
+
+        m_out.appendTo(checkCellCase, slowPath);
+        // At this point neither operand is a Double, and their JSValue bits are not equal.
+        // We only need the slow path when values could still be strictly equal, which after
+        // ruling out Doubles means two cells (String===String or HeapBigInt===HeapBigInt).
+        // (left is Cell && right is Cell) is equivalent to ((left | right) is Cell): a Cell
+        // has all NotCellMask bits clear (high bits and OtherTag), and OR preserves that
+        // only when both sides are Cells.
+        LValue cellCheck = m_out.bitOr(left, right);
+        ValueFromBlock fastFalse = m_out.anchor(m_out.booleanFalse);
+        m_out.branch(isCell(cellCheck), rarely(slowPath), usually(continuation));
+
+        m_out.appendTo(slowPath, continuation);
+        ValueFromBlock slowResult = m_out.anchor(m_out.notNull(vmCall(
+            pointerType(), operationCompareStrictEq, weakPointer(globalObject), left, right)));
+        m_out.jump(continuation);
+
+        m_out.appendTo(continuation, lastNext);
+        setBoolean(m_out.phi(Int32, fastTrue, fastFalse, slowResult));
     }
 
     void compileStringToUntypedStrictEquality(Edge stringEdge, Edge untypedEdge)
