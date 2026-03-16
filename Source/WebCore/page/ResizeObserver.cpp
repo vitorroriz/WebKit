@@ -67,20 +67,36 @@ ResizeObserver::~ResizeObserver()
         m_document->removeResizeObserver(*this);
 }
 
-void ResizeObserver::observeInternal(Element& target, const ResizeObserverBoxOptions boxOptions)
+ResizeObservation* ResizeObserver::observationForElement(Element& target)
 {
-    ASSERT(!m_JSOrNativeCallback.valueless_by_exception());
+    auto* data = target.resizeObserverDataIfExists();
+    if (!data)
+        return nullptr;
+
+    // There tend to be more elements to be observed than there are observers.
+    // Check if this observer appears in node's observer data first to avoid a linear search over m_observations.
+    if (data->observers.size() * 2 < m_observations.size() && data->observers.contains(this))
+        return nullptr;
 
     auto position = m_observations.findIf([&](auto& observation) {
         return observation->target() == &target;
     });
 
-    if (position != notFound) {
+    if (position == notFound)
+        return nullptr;
+
+    return m_observations[position].ptr();
+}
+
+void ResizeObserver::observeInternal(Element& target, const ResizeObserverBoxOptions boxOptions)
+{
+    ASSERT(!m_JSOrNativeCallback.valueless_by_exception());
+
+    if (RefPtr existingObservation = observationForElement(target)) {
         // The spec suggests unconditionally unobserving here, but that causes a test failure:
         // https://github.com/web-platform-tests/wpt/issues/30708
-        if (m_observations[position]->observedBox() == boxOptions)
+        if (existingObservation->observedBox() == boxOptions)
             return;
-
         unobserve(target);
     }
 
@@ -299,12 +315,8 @@ ResizeObserverCallback* ResizeObserver::callbackConcurrently()
 
 void ResizeObserver::resetObservationSize(Element& target)
 {
-    auto position = m_observations.findIf([&](auto& observation) {
-        return observation->target() == &target;
-    });
-
-    if (position != notFound)
-        m_observations[position]->resetObservationSize();
+    if (RefPtr observation = observationForElement(target))
+        observation->resetObservationSize();
 }
 
 } // namespace WebCore

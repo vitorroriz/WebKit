@@ -86,6 +86,7 @@ public:
 private:
     ResizeObserver(Document&, JSOrNativeResizeObserverCallback&&);
 
+    ResizeObservation* observationForElement(Element&);
     bool removeTarget(Element&);
     void removeAllTargets();
     bool removeObservation(const Element&);
