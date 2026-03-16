@@ -753,15 +753,10 @@ TEST(EnhancedSecurity, WindowOpenNoopenerFromStandardWithEnhancedSecurityViaDele
     __block RetainPtr<TestNavigationDelegate> openedDelegate;
     auto uiDelegate = adoptNS([TestUIDelegate new]);
     uiDelegate.get().createWebViewWithConfiguration = ^(WKWebViewConfiguration *configuration, WKNavigationAction *, WKWindowFeatures *) {
+        configuration.defaultWebpagePreferences._enhancedSecurityEnabled = YES;
         openedWebView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:configuration]);
         openedDelegate = adoptNS([TestNavigationDelegate new]);
         [openedDelegate allowAnyTLSCertificate];
-
-        openedDelegate.get().decidePolicyForNavigationActionWithPreferences = ^(WKNavigationAction *action, WKWebpagePreferences *preferences, void (^completionHandler)(WKNavigationActionPolicy, WKWebpagePreferences *)) {
-            preferences._enhancedSecurityEnabled = YES;
-            completionHandler(WKNavigationActionPolicyAllow, preferences);
-        };
-
         [openedWebView setNavigationDelegate:openedDelegate.get()];
         return openedWebView.get();
     };
@@ -819,15 +814,10 @@ TEST(EnhancedSecurity, WindowOpenNoopenerFromEnhancedSecurityWithStandardViaDele
     __block RetainPtr<TestNavigationDelegate> openedDelegate;
     auto uiDelegate = adoptNS([TestUIDelegate new]);
     uiDelegate.get().createWebViewWithConfiguration = ^(WKWebViewConfiguration *configuration, WKNavigationAction *, WKWindowFeatures *) {
+        configuration.defaultWebpagePreferences._enhancedSecurityEnabled = NO;
         openedWebView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:configuration]);
         openedDelegate = adoptNS([TestNavigationDelegate new]);
         [openedDelegate allowAnyTLSCertificate];
-
-        openedDelegate.get().decidePolicyForNavigationActionWithPreferences = ^(WKNavigationAction *action, WKWebpagePreferences *preferences, void (^completionHandler)(WKNavigationActionPolicy, WKWebpagePreferences *)) {
-            preferences._enhancedSecurityEnabled = NO;
-            completionHandler(WKNavigationActionPolicyAllow, preferences);
-        };
-
         [openedWebView setNavigationDelegate:openedDelegate.get()];
         return openedWebView.get();
     };
