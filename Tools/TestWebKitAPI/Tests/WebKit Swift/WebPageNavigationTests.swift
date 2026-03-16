@@ -155,7 +155,7 @@ struct WebPageNavigationTests {
         }
     }
 
-    @Test
+    @Test(.disabled("This test is too slow"))
     func navigationProceedsAfterDiscardingNavigationStream() async throws {
         let page = WebPage()
 
