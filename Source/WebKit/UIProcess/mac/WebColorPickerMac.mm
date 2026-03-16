@@ -75,9 +75,9 @@ static const CGFloat colorPickerMatrixSwatchWidth = 13.0;
 
 namespace WebKit {
 
-Ref<WebColorPickerMac> WebColorPickerMac::create(WebColorPicker::Client* client, const WebCore::Color& initialColor, const WebCore::IntRect& rect, WebKit::ColorControlSupportsAlpha supportsAlpha, Vector<WebCore::Color>&& suggestions, NSView *view)
+Ref<WebColorPickerMac> WebColorPickerMac::create(WebColorPicker::Client* client, const WebCore::Color& initialColor, const WebCore::IntRect& rect, WebKit::ColorControlSupportsAlpha supportsAlpha, Vector<WebCore::Color>&& suggestions, NSView *view, std::optional<WebCore::FrameIdentifier> frameID)
 {
-    return adoptRef(*new WebColorPickerMac(client, initialColor, rect, supportsAlpha, WTF::move(suggestions), view));
+    return adoptRef(*new WebColorPickerMac(client, initialColor, rect, supportsAlpha, WTF::move(suggestions), view, frameID));
 }
 
 WebColorPickerMac::~WebColorPickerMac()
@@ -88,8 +88,8 @@ WebColorPickerMac::~WebColorPickerMac()
     }
 }
 
-WebColorPickerMac::WebColorPickerMac(WebColorPicker::Client* client, const WebCore::Color& initialColor, const WebCore::IntRect& rect, WebKit::ColorControlSupportsAlpha supportsAlpha, Vector<WebCore::Color>&& suggestions, NSView *view)
-    : WebColorPicker(client)
+WebColorPickerMac::WebColorPickerMac(WebColorPicker::Client* client, const WebCore::Color& initialColor, const WebCore::IntRect& rect, WebKit::ColorControlSupportsAlpha supportsAlpha, Vector<WebCore::Color>&& suggestions, NSView *view, std::optional<WebCore::FrameIdentifier> frameID)
+    : WebColorPicker(client, frameID)
     , m_supportsAlpha(supportsAlpha)
     , m_suggestions(WTF::move(suggestions))
 {

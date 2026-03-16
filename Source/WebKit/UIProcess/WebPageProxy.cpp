@@ -10499,7 +10499,7 @@ void WebPageProxy::showColorPicker(IPC::Connection& connection, const WebCore::C
 {
     MESSAGE_CHECK_BASE(supportsAlpha == ColorControlSupportsAlpha::No || protect(preferences())->inputTypeColorEnhancementsEnabled(), connection);
 
-    convertRectToMainFrameCoordinates(elementRect, rootFrameID, [weakThis = WeakPtr { *this }, initialColor, supportsAlpha, suggestions = WTF::move(suggestions)](std::optional<FloatRect> convertedRect) mutable {
+    convertRectToMainFrameCoordinates(elementRect, rootFrameID, [weakThis = WeakPtr { *this }, initialColor, supportsAlpha, suggestions = WTF::move(suggestions), rootFrameID](std::optional<FloatRect> convertedRect) mutable {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis || !convertedRect)
             return;
@@ -10508,7 +10508,7 @@ void WebPageProxy::showColorPicker(IPC::Connection& connection, const WebCore::C
         if (!pageClient)
             return;
 
-        protectedThis->internals().colorPicker = pageClient->createColorPicker(*protectedThis, initialColor, IntRect(*convertedRect), supportsAlpha, WTF::move(suggestions));
+        protectedThis->internals().colorPicker = pageClient->createColorPicker(*protectedThis, initialColor, IntRect(*convertedRect), supportsAlpha, WTF::move(suggestions), rootFrameID);
         // FIXME: Remove this conditional once all ports have a functional PageClientImpl::createColorPicker.
         if (RefPtr colorPicker = protectedThis->internals().colorPicker)
             colorPicker->showColorPicker(initialColor);
@@ -10547,11 +10547,12 @@ void WebPageProxy::Internals::didChooseColor(const WebCore::Color& color)
     if (!protectedPage->hasRunningProcess())
         return;
 
-    protectedPage->send(Messages::WebPage::DidChooseColor(color));
+    protectedPage->sendToProcessContainingFrame(colorPicker->frameID(), Messages::WebPage::DidChooseColor(color));
 }
 
 void WebPageProxy::Internals::didEndColorPicker()
 {
+    auto frameID = colorPicker ? colorPicker->frameID() : std::nullopt;
     if (!std::exchange(colorPicker, nullptr))
         return;
 
@@ -10559,7 +10560,7 @@ void WebPageProxy::Internals::didEndColorPicker()
     if (!protectedPage->hasRunningProcess())
         return;
 
-    protectedPage->send(Messages::WebPage::DidEndColorPicker());
+    protectedPage->sendToProcessContainingFrame(frameID, Messages::WebPage::DidEndColorPicker());
 }
 
 void WebPageProxy::showDataListSuggestions(WebCore::DataListSuggestionInformation&& info)

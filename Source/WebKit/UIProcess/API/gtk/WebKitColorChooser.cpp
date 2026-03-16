@@ -29,13 +29,13 @@
 namespace WebKit {
 using namespace WebCore;
 
-Ref<WebKitColorChooser> WebKitColorChooser::create(WebPageProxy& page, const WebCore::Color& initialColor, const WebCore::IntRect& rect)
+Ref<WebKitColorChooser> WebKitColorChooser::create(WebPageProxy& page, const WebCore::Color& initialColor, const WebCore::IntRect& rect, std::optional<WebCore::FrameIdentifier> frameID)
 {
-    return adoptRef(*new WebKitColorChooser(page, initialColor, rect));
+    return adoptRef(*new WebKitColorChooser(page, initialColor, rect, frameID));
 }
 
-WebKitColorChooser::WebKitColorChooser(WebPageProxy& page, const Color& initialColor, const IntRect& rect)
-    : WebColorPickerGtk(page, initialColor, rect)
+WebKitColorChooser::WebKitColorChooser(WebPageProxy& page, const Color& initialColor, const IntRect& rect, std::optional<WebCore::FrameIdentifier> frameID)
+    : WebColorPickerGtk(page, initialColor, rect, frameID)
     , m_elementRect(rect)
 {
 }

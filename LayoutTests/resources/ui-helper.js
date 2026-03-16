@@ -757,6 +757,14 @@ window.UIHelper = class UIHelper {
         const x = element.offsetLeft + element.offsetWidth / 2;
         const y = element.offsetTop + element.offsetHeight / 2;
 
+        return this.activateFormControlAtPoint(x, y);
+    }
+
+    static activateFormControlAtPoint(x, y)
+    {
+        if (!this.isWebKit2() || !this.isIOSFamily())
+            return this.activateAt(x, y);
+
         return new Promise(resolve => {
             testRunner.runUIScript(`
                 (function() {

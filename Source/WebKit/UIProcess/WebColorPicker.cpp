@@ -29,8 +29,9 @@
 
 namespace WebKit {
 
-WebColorPicker::WebColorPicker(Client* client)
+WebColorPicker::WebColorPicker(Client* client, std::optional<WebCore::FrameIdentifier> frameID)
     : m_client(client)
+    , m_frameID(frameID)
 {
 }
 

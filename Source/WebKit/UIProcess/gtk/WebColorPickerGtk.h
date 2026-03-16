@@ -39,7 +39,7 @@ namespace WebKit {
 
 class WebColorPickerGtk : public WebColorPicker {
 public:
-    static Ref<WebColorPickerGtk> create(WebPageProxy&, const WebCore::Color&, const WebCore::IntRect&);
+    static Ref<WebColorPickerGtk> create(WebPageProxy&, const WebCore::Color&, const WebCore::IntRect&, std::optional<WebCore::FrameIdentifier> = std::nullopt);
     virtual ~WebColorPickerGtk();
 
     void endPicker() override;
@@ -50,7 +50,7 @@ public:
     const GdkRGBA* initialColor() const LIFETIME_BOUND { return &m_initialColor; }
 
 protected:
-    WebColorPickerGtk(WebPageProxy&, const WebCore::Color&, const WebCore::IntRect&);
+    WebColorPickerGtk(WebPageProxy&, const WebCore::Color&, const WebCore::IntRect&, std::optional<WebCore::FrameIdentifier> = std::nullopt);
 
     void didChooseColor(const WebCore::Color&);
 

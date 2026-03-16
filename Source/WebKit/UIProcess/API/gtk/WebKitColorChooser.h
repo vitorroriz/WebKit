@@ -33,13 +33,13 @@ namespace WebKit {
 
 class WebKitColorChooser final : public WebColorPickerGtk {
 public:
-    static Ref<WebKitColorChooser> create(WebPageProxy&, const WebCore::Color&, const WebCore::IntRect&);
+    static Ref<WebKitColorChooser> create(WebPageProxy&, const WebCore::Color&, const WebCore::IntRect&, std::optional<WebCore::FrameIdentifier> = std::nullopt);
     virtual ~WebKitColorChooser();
 
     const WebCore::IntRect& elementRect() const LIFETIME_BOUND { return m_elementRect; }
 
 private:
-    WebKitColorChooser(WebPageProxy&, const WebCore::Color&, const WebCore::IntRect&);
+    WebKitColorChooser(WebPageProxy&, const WebCore::Color&, const WebCore::IntRect&, std::optional<WebCore::FrameIdentifier>);
 
     void endPicker() override;
     void showColorPicker(const WebCore::Color&) override;
