@@ -2401,6 +2401,9 @@ webkit.org/b/305581 http/tests/workers/service/shownotification-allowed.html [ P
 
 webkit.org/b/303348 http/tests/site-isolation/remote-frame-loaded-while-hidden.html [ ImageOnlyFailure ]
 
+webkit.org/b/310052 [ Tahoe Release arm64 ] inspector/unit-tests/array-utilities.html [ Pass Failure ]
+webkit.org/b/310052 [ Tahoe Debug arm64 ] inspector/unit-tests/array-utilities.html [ Pass Timeout ]
+
 webkit.org/b/305660 [ Debug ] http/tests/cache-storage/cache-clearing-all.https.html [ Pass Failure ]
 
 webkit.org/b/305671 fast/animation/css-animation-throttling.html [ Pass Failure ]
