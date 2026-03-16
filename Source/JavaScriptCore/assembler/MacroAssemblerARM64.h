@@ -6720,6 +6720,12 @@ public:
         m_assembler.xar(dest, a, b, static_cast<uint8_t>(rotate.m_value));
     }
 
+    void vectorXor3(FPRegisterID a, FPRegisterID b, FPRegisterID c, FPRegisterID dest)
+    {
+        ASSERT(supportsSHA3());
+        m_assembler.eor3(dest, a, b, c);
+    }
+
     void moveZeroToVector(FPRegisterID dest)
     {
         m_assembler.movi<128, 8>(dest, 0);

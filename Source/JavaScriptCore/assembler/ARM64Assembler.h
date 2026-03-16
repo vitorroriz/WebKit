@@ -2210,6 +2210,12 @@ public:
         insn(0b11001110100'00000'000000'00000'00000 | (static_cast<uint32_t>(vm) << 16) | (static_cast<uint32_t>(imm6) << 10) | (static_cast<uint32_t>(vn) << 5) | static_cast<uint32_t>(vd));
     }
 
+    ALWAYS_INLINE void eor3(FPRegisterID vd, FPRegisterID vn, FPRegisterID vm, FPRegisterID va)
+    {
+        // Three-way exclusive OR. Requires SHA3 (FEAT_SHA3) extension.
+        insn(0b110011100'00'00000'0'00000'00000'00000 | (static_cast<uint32_t>(vm) << 16) | (static_cast<uint32_t>(va) << 10) | (static_cast<uint32_t>(vn) << 5) | static_cast<uint32_t>(vd));
+    }
+
     ALWAYS_INLINE void tbl(FPRegisterID vd, FPRegisterID vn, FPRegisterID vm)
     {
         const unsigned len = 0;

@@ -5145,9 +5145,25 @@ private:
             emitSIMDBinaryOp(Air::VectorOr);
             return;
         }
-        case B3::VectorXor:
+        case B3::VectorXor: {
+#if CPU(ARM64)
+            // VectorXor(VectorXor(a, b), c) → EOR3(a, b, c)
+            // VectorXor(a, VectorXor(b, c)) → EOR3(b, c, a)
+            if (isARM64_SHA3()) {
+                for (unsigned childIdx = 0; childIdx < 2; ++childIdx) {
+                    Value* inner = m_value->child(childIdx);
+                    Value* other = m_value->child(1 - childIdx);
+                    if (inner->opcode() == B3::VectorXor && canBeInternal(inner)) {
+                        commitInternal(inner);
+                        append(Air::VectorXor3, tmp(inner->child(0)), tmp(inner->child(1)), tmp(other), tmp(m_value));
+                        return;
+                    }
+                }
+            }
+#endif
             emitSIMDBinaryOp(Air::VectorXor);
             return;
+        }
         case B3::VectorUnzipEven:
             emitSIMDBinaryOp(Air::VectorUnzipEven);
             return;

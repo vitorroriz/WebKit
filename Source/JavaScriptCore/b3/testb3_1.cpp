@@ -1133,6 +1133,7 @@ void run(const TestConfig* config)
         RUN(testVectorExtractLane0Double());
         RUN(testVectorMulHigh());
         RUN(testVectorMulLow());
+        RUN(testVectorDotProductSplatOne());
         RUN_UNARY(testVectorXorOrAllOnesConstantToVectorAndXor, v128Operands());
         RUN_UNARY(testVectorXorAndAllOnesConstantToVectorOrXor, v128Operands());
         RUN_BINARY(testVectorOrConstants, v128Operands(), v128Operands());
@@ -1143,6 +1144,7 @@ void run(const TestConfig* config)
             RUN(testVectorFmulByElementFloat());
             RUN(testVectorFmulByElementDouble());
             RUN(testVectorXorRotateRight64());
+            RUN(testVectorXor3());
             RUN(testVectorUnzipEven());
             RUN(testVectorUnzipOdd());
             RUN(testVectorZipLower());
