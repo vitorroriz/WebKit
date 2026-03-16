@@ -42,6 +42,8 @@ public:
     static Ref<VideoPresentationInterfaceAVKit> create(WebCore::PlaybackSessionInterfaceIOS&);
     ~VideoPresentationInterfaceAVKit();
 
+    void didToggleCaptionStylePreviewID(const String&);
+
 #if !RELEASE_LOG_DISABLED
     ASCIILiteral logClassName() const { return "VideoPresentationInterfaceAVKit"_s; };
 #endif
@@ -73,8 +75,7 @@ private:
     bool isExternalPlaybackActive() const final { return false; }
     bool willRenderToLayer() const final { return false; }
     AVPlayerViewController *avPlayerViewController() const final { return nullptr; }
-    CALayer *captionsLayer() final { return nullptr; }
-    void setupCaptionsLayer(CALayer *, const WebCore::FloatSize&) final { }
+    void setupCaptionsLayer(CALayer *, const WebCore::FloatSize&) final;
 #if ENABLE(LINEAR_MEDIA_PLAYER)
     WKSPlayableViewControllerHost *playableViewController() final { return nullptr; }
 #endif

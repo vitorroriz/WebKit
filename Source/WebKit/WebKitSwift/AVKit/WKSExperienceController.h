@@ -34,6 +34,9 @@ NS_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @protocol WKSExperienceControllerDelegate <NSObject>
 - (void)experienceControllerDidExitFullscreen:(WKSExperienceController *)experienceController;
+- (void)experienceControllerDidBeginScrubbing:(WKSExperienceController *)experienceController;
+- (void)experienceControllerDidEndScrubbing:(WKSExperienceController *)experienceController;
+- (void)experienceController:(WKSExperienceController *)experienceController didToggleCaptionStylePreviewID:(NSString * _Nullable)captionStylePreviewID;
 @end
 
 NS_SWIFT_MAIN_ACTOR

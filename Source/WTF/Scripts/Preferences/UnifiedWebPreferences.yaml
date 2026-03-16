@@ -86,6 +86,7 @@ AVExperienceControllerFullscreenEnabled:
   category: media
   getter: isAVExperienceControllerFullscreenEnabled
   webcoreGetter: isAVExperienceControllerFullscreenEnabled
+  defaultsOverridable: true
   humanReadableName: "AVExperienceController Fullscreen"
   humanReadableDescription: "Enable fullscreen video via AVExperienceController"
   condition: HAVE(AVEXPERIENCECONTROLLER)

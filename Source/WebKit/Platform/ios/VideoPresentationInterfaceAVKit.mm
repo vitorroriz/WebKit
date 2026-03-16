@@ -48,27 +48,51 @@ NS_ASSUME_NONNULL_BEGIN
 @interface WKExperienceControllerDelegate: NSObject <WKSExperienceControllerDelegate>
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithModel:(WebCore::PlaybackSessionModel&)model NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithParent:(WebKit::VideoPresentationInterfaceAVKit&)parent NS_DESIGNATED_INITIALIZER;
 @end
 
 @implementation WKExperienceControllerDelegate {
-    WeakPtr<WebCore::PlaybackSessionModel> _model;
+    WeakPtr<WebKit::VideoPresentationInterfaceAVKit> _parent;
 }
 
-- (instancetype)initWithModel:(WebCore::PlaybackSessionModel&)model
+- (instancetype)initWithParent:(WebKit::VideoPresentationInterfaceAVKit&)parent
 {
     self = [super init];
     if (!self)
         return nil;
 
-    _model = model;
+    _parent = parent;
     return self;
 }
 
 - (void)experienceControllerDidExitFullscreen:(nonnull WKSExperienceController *)experienceController
 {
-    if (CheckedPtr model = _model.get())
-        model->exitFullscreen();
+    if (RefPtr parent = _parent.get()) {
+        if (CheckedPtr playbackSessionModel = parent->playbackSessionModel())
+            playbackSessionModel->exitFullscreen();
+    }
+}
+
+- (void)experienceControllerDidBeginScrubbing:(nonnull WKSExperienceController *)experienceController
+{
+    if (RefPtr parent = _parent.get()) {
+        if (CheckedPtr playbackSessionModel = parent->playbackSessionModel())
+            playbackSessionModel->beginScrubbing();
+    }
+}
+
+- (void)experienceControllerDidEndScrubbing:(nonnull WKSExperienceController *)experienceController
+{
+    if (RefPtr parent = _parent.get()) {
+        if (CheckedPtr playbackSessionModel = parent->playbackSessionModel())
+            playbackSessionModel->endScrubbing();
+    }
+}
+
+- (void)experienceController:(nonnull WKSExperienceController *)experienceController didToggleCaptionStylePreviewID:(NSString * _Nullable)captionStylePreviewID
+{
+    if (RefPtr parent = _parent.get())
+        parent->didToggleCaptionStylePreviewID(captionStylePreviewID);
 }
 
 @end
@@ -86,11 +110,23 @@ Ref<VideoPresentationInterfaceAVKit> VideoPresentationInterfaceAVKit::create(Web
 
 VideoPresentationInterfaceAVKit::VideoPresentationInterfaceAVKit(WebCore::PlaybackSessionInterfaceIOS& playbackSessionInterface)
     : VideoPresentationInterfaceIOS { playbackSessionInterface }
-    , m_experienceControllerDelegate { adoptNS([[WKExperienceControllerDelegate alloc] initWithModel:*playbackSessionInterface.playbackSessionModel()]) }
+    , m_experienceControllerDelegate { adoptNS([[WKExperienceControllerDelegate alloc] initWithParent:*this]) }
 {
 }
 
 VideoPresentationInterfaceAVKit::~VideoPresentationInterfaceAVKit() = default;
+
+void VideoPresentationInterfaceAVKit::didToggleCaptionStylePreviewID(const String& captionStylePreviewID)
+{
+    RefPtr model = videoPresentationModel();
+    if (!model)
+        return;
+
+    if (captionStylePreviewID.isEmpty())
+        model->requestHideCaptionDisplaySettingsPreview();
+    else
+        model->requestShowCaptionDisplaySettingsPreview(captionStylePreviewID);
+}
 
 WebAVPlayerLayer *VideoPresentationInterfaceAVKit::fullscreenPlayerLayer()
 {
@@ -118,10 +154,12 @@ void VideoPresentationInterfaceAVKit::setupPlayerViewController()
 
     m_fullscreenPlayerLayerView = adoptNS([WebCore::allocWebAVPlayerLayerViewInstance() init]);
     [fullscreenPlayerLayer() setPresentationModel:videoPresentationModel()];
+    [fullscreenPlayerLayer() setCaptionsLayer:captionsLayer()];
     [playerLayerView() transferVideoViewTo:m_fullscreenPlayerLayerView.get()];
 
     RetainPtr contentSource = playbackSessionInterface().contentSource();
     [contentSource setVideoLayer:fullscreenPlayerLayer()];
+    [contentSource setCaptionLayer:captionsLayer()];
 
     RetainPtr platformContentSource = [allocAVPlayerViewControllerContentSourceInstance() initWithVideoPlaybackControllable:contentSource.get()];
     m_experienceController = [allocWKSExperienceControllerInstance() initWithContentSource:platformContentSource.get()];
@@ -135,6 +173,16 @@ void VideoPresentationInterfaceAVKit::invalidatePlayerViewController()
     m_fullscreenPlayerLayerView = nil;
     [m_experienceController setDelegate:nil];
     m_experienceController = nil;
+}
+
+void VideoPresentationInterfaceAVKit::setupCaptionsLayer(CALayer *, const WebCore::FloatSize&)
+{
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    [captionsLayer() removeFromSuperlayer];
+    [fullscreenPlayerLayer() setCaptionsLayer:captionsLayer()];
+    [fullscreenPlayerLayer() layoutSublayers];
+    [CATransaction commit];
 }
 
 void VideoPresentationInterfaceAVKit::presentFullscreen(bool animated, Function<void(BOOL, NSError *)>&& completionHandler)

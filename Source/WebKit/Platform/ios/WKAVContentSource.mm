@@ -67,6 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
     RetainPtr<AVInterfaceMetadata> _metadata;
     RetainPtr<CALayer> _videoLayer;
     CGSize _videoSize;
+    RetainPtr<CALayer> _captionLayer;
 }
 
 static RetainPtr<AVInterfaceTimelineSegment> emptyTimelineSegment()
@@ -166,6 +167,11 @@ static RetainPtr<AVInterfaceTimelineSegment> emptyTimelineSegment()
 - (void)setVideoSize:(CGSize)videoSize
 {
     _videoSize = videoSize;
+}
+
+- (void)setCaptionLayer:(CALayer * _Nullable)captionLayer
+{
+    _captionLayer = captionLayer;
 }
 
 - (void)setCurrentPlaybackPositionInternal:(CMTime)currentPlaybackPosition
@@ -441,6 +447,11 @@ ALLOW_DEPRECATED_IMPLEMENTATIONS_END
 - (CGSize)videoSize
 {
     return _videoSize;
+}
+
+- (CALayer * _Nullable)captionLayer
+{
+    return _captionLayer;
 }
 
 @end
