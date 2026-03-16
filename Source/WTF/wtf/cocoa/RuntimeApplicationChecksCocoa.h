@@ -136,7 +136,7 @@ enum class SDKAlignedBehavior {
     NoFontFaceSetConstructor,
     NoHTMLEnhancedSelectParsingQuirk,
     DataURLForPastedImages,
-
+    SuppressKeypressForModifierShortcuts,
     NumberOfBehaviors
 };
 

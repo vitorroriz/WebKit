@@ -8499,3 +8499,4 @@ webkit.org/b/308849 css3/filters/effect-drop-shadow.html [ Skip ]
 
 imported/w3c/web-platform-tests/html/semantics/embedded-content/the-audio-element/audio-with-replaced-after-pseudo-crash.html [ Skip ] #Timeout
 
+imported/w3c/web-platform-tests/uievents/keyboard/keypress-not-fired-for-modifier-shortcuts.html [ Skip ]
