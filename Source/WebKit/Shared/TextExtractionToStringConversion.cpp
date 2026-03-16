@@ -32,10 +32,12 @@
 #include <wtf/JSONValues.h>
 #include <wtf/Scope.h>
 #include <wtf/TZoneMallocInlines.h>
+#include <unicode/ubrk.h>
 #include <wtf/text/CharacterProperties.h>
 #include <wtf/text/MakeString.h>
 #include <wtf/text/StringBuilder.h>
 #include <wtf/text/StringToIntegerConversion.h>
+#include <wtf/text/TextBreakIterator.h>
 #include <wtf/unicode/CharacterNames.h>
 
 namespace WebKit {
@@ -62,6 +64,197 @@ static String removeZeroWidthCharacters(const String& string)
             return false;
         }
     });
+}
+
+static constexpr uint64_t linkContextWords = 5;
+
+static Vector<CharacterRange> characterRangesFromLinks(const Vector<std::pair<URL, CharacterRange>>& links)
+{
+    return links.map([](auto& pair) {
+        return pair.second;
+    });
+}
+
+static String truncateByWordCount(StringView text, uint64_t wordLimit, const Vector<CharacterRange>& linkCharacterRanges = { })
+{
+    auto truncateComponent = [wordLimit](auto&& component, const Vector<CharacterRange>& localLinkRanges) -> String {
+        if (component.isEmpty())
+            return emptyString();
+
+        auto* iterator = WTF::wordBreakIterator(component);
+        if (!iterator)
+            return component.toString();
+
+        Vector<std::pair<int, int>> wordPositions;
+        int position = 0;
+        int stringLength = component.length();
+        int wordStart = 0;
+
+        while (position < stringLength) {
+            wordStart = position;
+            position = ubrk_following(iterator, position);
+            if (position == UBRK_DONE)
+                break;
+
+            if (!position || !u_isalnum(component[position - 1]))
+                continue;
+
+            wordPositions.append({ wordStart, position });
+        }
+
+        uint64_t totalWords = wordPositions.size();
+        if (totalWords <= wordLimit)
+            return component.toString();
+
+        int simpleCutPosition = wordPositions[wordLimit - 1].second;
+
+        Vector<CharacterRange> linksBeyondCut;
+        for (auto& range : localLinkRanges) {
+            if (range.location + range.length > static_cast<uint64_t>(simpleCutPosition))
+                linksBeyondCut.append(range);
+        }
+
+        if (linksBeyondCut.isEmpty())
+            return makeString(component.left(simpleCutPosition), u"…"_str);
+
+        Vector<std::pair<uint64_t, uint64_t>> protectedRanges;
+        for (auto& linkRange : linksBeyondCut) {
+            uint64_t linkStart = linkRange.location;
+            uint64_t linkEnd = linkRange.location + linkRange.length;
+
+            std::optional<uint64_t> firstWordIndex;
+            std::optional<uint64_t> lastWordIndex;
+            if (!linkRange.length) {
+                for (uint64_t i = 0; i < totalWords; ++i) {
+                    if (static_cast<uint64_t>(wordPositions[i].first) >= linkStart || static_cast<uint64_t>(wordPositions[i].second) >= linkStart) {
+                        firstWordIndex = i;
+                        lastWordIndex = i;
+                        break;
+                    }
+                }
+                if (!firstWordIndex && totalWords > 0) {
+                    firstWordIndex = totalWords - 1;
+                    lastWordIndex = totalWords - 1;
+                }
+            } else {
+                for (uint64_t i = 0; i < totalWords; ++i) {
+                    auto [ws, we] = wordPositions[i];
+                    if (static_cast<uint64_t>(we) > linkStart && static_cast<uint64_t>(ws) < linkEnd) {
+                        if (!firstWordIndex)
+                            firstWordIndex = i;
+                        lastWordIndex = i;
+                    }
+                }
+            }
+
+            if (!firstWordIndex)
+                continue;
+
+            uint64_t rangeStart;
+            uint64_t rangeEnd;
+            if (!linkRange.length) {
+                // Zero-length ranges are virtual boundary markers. Protect linkContextWords
+                // words ending at the anchor (the link is adjacent, not overlapping).
+                rangeStart = *firstWordIndex >= linkContextWords ? *firstWordIndex - linkContextWords + 1 : 0;
+                rangeEnd = *lastWordIndex;
+            } else {
+                rangeStart = *firstWordIndex > linkContextWords ? *firstWordIndex - linkContextWords : 0;
+                rangeEnd = std::min(*lastWordIndex + linkContextWords, totalWords - 1);
+            }
+            protectedRanges.append({ rangeStart, rangeEnd });
+        }
+
+        if (protectedRanges.isEmpty())
+            return makeString(component.left(simpleCutPosition), u"…"_str);
+
+        std::sort(protectedRanges.begin(), protectedRanges.end());
+        Vector<std::pair<uint64_t, uint64_t>> mergedRanges;
+        mergedRanges.append(protectedRanges[0]);
+        for (size_t i = 1; i < protectedRanges.size(); ++i) {
+            auto& last = mergedRanges.last();
+            if (protectedRanges[i].first <= last.second + 1)
+                last.second = std::max(last.second, protectedRanges[i].second);
+            else
+                mergedRanges.append(protectedRanges[i]);
+        }
+
+        uint64_t totalProtectedWords = 0;
+        for (auto& [rangeStart, rangeEnd] : mergedRanges)
+            totalProtectedWords += rangeEnd - rangeStart + 1;
+
+        while (totalProtectedWords > wordLimit && !mergedRanges.isEmpty()) {
+            auto& [rangeStart, rangeEnd] = mergedRanges.first();
+            uint64_t excess = totalProtectedWords - wordLimit;
+            uint64_t rangeSize = rangeEnd - rangeStart + 1;
+            if (excess >= rangeSize) {
+                totalProtectedWords -= rangeSize;
+                mergedRanges.removeAt(0);
+            } else {
+                rangeStart += excess;
+                totalProtectedWords -= excess;
+            }
+        }
+
+        if (mergedRanges.isEmpty())
+            return makeString(component.left(simpleCutPosition), u"…"_str);
+
+        uint64_t headWords = wordLimit > totalProtectedWords ? wordLimit - totalProtectedWords : 0;
+
+        StringBuilder builder;
+        if (headWords > 0) {
+            int headEndPosition = wordPositions[headWords - 1].second;
+            builder.append(component.left(headEndPosition));
+        }
+
+        std::optional<uint64_t> lastEmittedWordIndex;
+        if (headWords > 0)
+            lastEmittedWordIndex = headWords - 1;
+
+        for (auto& [rangeStart, rangeEnd] : mergedRanges) {
+            if (rangeEnd < headWords)
+                continue;
+
+            uint64_t effectiveStart = std::max(rangeStart, headWords);
+
+            if (!lastEmittedWordIndex || effectiveStart > *lastEmittedWordIndex + 1)
+                builder.append(u"…"_str);
+
+            int charStart = wordPositions[effectiveStart].first;
+            int charEnd = wordPositions[rangeEnd].second;
+            builder.append(component.substring(charStart, charEnd - charStart));
+            lastEmittedWordIndex = rangeEnd;
+        }
+
+        if (!lastEmittedWordIndex || *lastEmittedWordIndex < totalWords - 1)
+            builder.append(u"…"_str);
+
+        return builder.toString();
+    };
+
+    Vector<String> result;
+    uint64_t cumulativeOffset = 0;
+    for (auto component : text.splitAllowingEmptyEntries('\n')) {
+        uint64_t componentStart = cumulativeOffset;
+        uint64_t componentLength = component.length();
+
+        Vector<CharacterRange> localRanges;
+        for (auto& range : linkCharacterRanges) {
+            uint64_t rangeStart = range.location;
+            uint64_t rangeEnd = range.location + range.length;
+            bool overlapsComponent = rangeEnd > componentStart && rangeStart < componentStart + componentLength;
+            bool isZeroLengthAtEnd = !range.length && rangeStart == componentStart + componentLength;
+            if (overlapsComponent || isZeroLengthAtEnd) {
+                uint64_t localStart = rangeStart > componentStart ? rangeStart - componentStart : 0;
+                uint64_t localEnd = std::min(rangeEnd - componentStart, componentLength);
+                localRanges.append({ localStart, localEnd - localStart });
+            }
+        }
+
+        result.append(truncateComponent(component, localRanges));
+        cumulativeOffset += componentLength + 1;
+    }
+
+    return makeStringByJoining(WTF::move(result), "\n"_s);
 }
 
 static bool isEmptyMarkdownListItem(StringView line)
@@ -412,6 +605,22 @@ public:
             text = makeStringByReplacingAll(text, original, replacement);
     }
 
+    void truncateTextByWordLimitIfNeeded(String& text, const Vector<CharacterRange>& linkCharacterRanges = { }, bool hasAdjacentLinkAfter = false)
+    {
+        if (!m_options.maxWordsPerParagraph)
+            return;
+
+        Vector<CharacterRange> ranges = linkCharacterRanges;
+        if (hasAdjacentLinkAfter)
+            ranges.append({ text.length(), 0 });
+
+        auto truncated = truncateByWordCount(text, *m_options.maxWordsPerParagraph, ranges);
+        if (truncated != text) {
+            m_filteredOutAnyText = true;
+            text = WTF::move(truncated);
+        }
+    }
+
     void appendToLine(unsigned lineIndex, const String& text)
     {
         if (lineIndex >= m_lines.size()) {
@@ -731,12 +940,13 @@ static void setCommonJSONProperties(JSON::Object& jsonObject, const TextExtracti
 
 static void addJSONTextContent(Ref<JSON::Object>&& jsonObject, const TextExtraction::TextItemData& textData, const std::optional<FrameIdentifier>& frameIdentifier, const std::optional<NodeIdentifier>& identifier, TextExtractionAggregator& aggregator)
 {
-    CompletionHandler<void(String&&)> completion = [jsonObject = WTF::move(jsonObject), aggregator = Ref { aggregator }, selectedRange = textData.selectedRange](String&& filteredText) mutable {
+    CompletionHandler<void(String&&)> completion = [jsonObject = WTF::move(jsonObject), aggregator = Ref { aggregator }, selectedRange = textData.selectedRange, linkRanges = characterRangesFromLinks(textData.links)](String&& filteredText) mutable {
         if (filteredText.isEmpty())
             return;
 
         auto content = removeZeroWidthCharacters(filteredText.trim(isASCIIWhitespace).simplifyWhiteSpace(isASCIIWhitespace));
         aggregator->applyReplacements(content);
+        aggregator->truncateTextByWordLimitIfNeeded(content, linkRanges);
 
         if (content.isEmpty())
             return;
@@ -924,7 +1134,7 @@ static Vector<String> partsForItem(const TextExtraction::Item& item, const TextE
 
 enum class HasLineThroughStyle : bool { No, Yes };
 
-static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector<String>&& itemParts, const std::optional<FrameIdentifier>& frameIdentifier, const std::optional<NodeIdentifier>& enclosingNode, const TextExtractionLine& line, Ref<TextExtractionAggregator>&& aggregator, HasLineThroughStyle hasLineThrough = HasLineThroughStyle::No, const String& closingTag = { })
+static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector<String>&& itemParts, const std::optional<FrameIdentifier>& frameIdentifier, const std::optional<NodeIdentifier>& enclosingNode, const TextExtractionLine& line, Ref<TextExtractionAggregator>&& aggregator, HasLineThroughStyle hasLineThrough = HasLineThroughStyle::No, const String& closingTag = { }, bool hasAdjacentLinkAfter = false)
 {
     auto completion = [
         itemParts = WTF::move(itemParts),
@@ -933,7 +1143,9 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
         line,
         closingTag,
         urlString = aggregator->currentURLString(),
-        isStrikethrough = aggregator->isInsideStrikethrough() || hasLineThrough == HasLineThroughStyle::Yes
+        isStrikethrough = aggregator->isInsideStrikethrough() || hasLineThrough == HasLineThroughStyle::Yes,
+        linkRanges = characterRangesFromLinks(textItem.links),
+        hasAdjacentLinkAfter
     ](String&& filteredText) mutable {
         Vector<String> textParts;
         auto currentLine = line;
@@ -942,6 +1154,7 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
             // Apply replacements only after filtering, so any filtering steps that rely on comparing DOM text against
             // visual data (e.g. recognized text) won't result in false positives.
             aggregator->applyReplacements(filteredText);
+            aggregator->truncateTextByWordLimitIfNeeded(filteredText, linkRanges, hasAdjacentLinkAfter);
 
             if (aggregator->usePlainTextOutput()) {
                 aggregator->addResult(currentLine, { escapeString(removeZeroWidthCharacters(filteredText.trim(isASCIIWhitespace).simplifyWhiteSpace(isASCIIWhitespace))) });
@@ -1018,7 +1231,7 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
     });
 }
 
-static void addPartsForItem(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, const TextExtractionLine& line, TextExtractionAggregator& aggregator, IncludeRectForParentItem includeRectForParentItem)
+static void addPartsForItem(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, const TextExtractionLine& line, TextExtractionAggregator& aggregator, IncludeRectForParentItem includeRectForParentItem, bool hasAdjacentLinkAfter = false)
 {
     Vector<String> parts;
     WTF::switchOn(item.data,
@@ -1054,7 +1267,7 @@ static void addPartsForItem(const TextExtraction::Item& item, std::optional<Node
         },
         [&](const TextExtraction::TextItemData& textData) {
             auto hasLineThrough = item.hasLineThrough ? HasLineThroughStyle::Yes : HasLineThroughStyle::No;
-            addPartsForText(textData, partsForItem(item, aggregator, includeRectForParentItem), item.frameIdentifier, enclosingNode, line, aggregator, hasLineThrough);
+            addPartsForText(textData, partsForItem(item, aggregator, includeRectForParentItem), item.frameIdentifier, enclosingNode, line, aggregator, hasLineThrough, { }, hasAdjacentLinkAfter);
         },
         [&](const TextExtraction::ContentEditableData& editableData) {
             if (aggregator.useHTMLOutput()) {
@@ -1359,7 +1572,7 @@ static bool childTextNodeIsRedundant(const TextExtractionAggregator& aggregator,
     return false;
 }
 
-static void addTextRepresentationRecursive(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, unsigned depth, TextExtractionAggregator& aggregator)
+static void addTextRepresentationRecursive(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, unsigned depth, TextExtractionAggregator& aggregator, bool hasAdjacentLinkAfter = false)
 {
     auto identifier = item.nodeIdentifier;
     if (!identifier)
@@ -1367,9 +1580,12 @@ static void addTextRepresentationRecursive(const TextExtraction::Item& item, std
 
     if (aggregator.usePlainTextOutput()) {
         if (std::holds_alternative<TextExtraction::TextItemData>(item.data))
-            addPartsForText(std::get<TextExtraction::TextItemData>(item.data), { }, item.frameIdentifier, identifier, { aggregator.advanceToNextLine(), depth }, aggregator);
-        for (auto& child : item.children)
-            addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, aggregator);
+            addPartsForText(std::get<TextExtraction::TextItemData>(item.data), { }, item.frameIdentifier, identifier, { aggregator.advanceToNextLine(), depth }, aggregator, HasLineThroughStyle::No, { }, hasAdjacentLinkAfter);
+        for (size_t i = 0; i < item.children.size(); ++i) {
+            auto& child = item.children[i];
+            bool childHasLinkAfter = i + 1 < item.children.size() && item.children[i + 1].hasData<TextExtraction::LinkItemData>();
+            addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, aggregator, childHasLinkAfter);
+        }
         return;
     }
 
@@ -1421,7 +1637,7 @@ static void addTextRepresentationRecursive(const TextExtraction::Item& item, std
     auto includeRectForParentItem = omitChildTextNode ? IncludeRectForParentItem::Yes : IncludeRectForParentItem::No;
 
     TextExtractionLine line { aggregator.advanceToNextLine(), depth, item.enclosingBlockNumber, aggregator.superscriptLevel() };
-    addPartsForItem(item, std::optional { identifier }, line, aggregator, includeRectForParentItem);
+    addPartsForItem(item, std::optional { identifier }, line, aggregator, includeRectForParentItem, hasAdjacentLinkAfter);
 
     auto closingTagName = [&] -> String {
         if (!aggregator.useHTMLOutput())
@@ -1450,8 +1666,11 @@ static void addTextRepresentationRecursive(const TextExtraction::Item& item, std
         }
     }
 
-    for (auto& child : item.children)
-        addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, aggregator);
+    for (size_t i = 0; i < item.children.size(); ++i) {
+        auto& child = item.children[i];
+        bool childHasLinkAfter = i + 1 < item.children.size() && item.children[i + 1].hasData<TextExtraction::LinkItemData>();
+        addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, aggregator, childHasLinkAfter);
+    }
 
     if (aggregator.useHTMLOutput() && !item.children.isEmpty())
         aggregator.addResult({ aggregator.advanceToNextLine(), depth }, { makeString("</"_s, closingTagName, '>') });

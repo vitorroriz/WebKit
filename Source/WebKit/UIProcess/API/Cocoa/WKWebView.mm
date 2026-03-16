@@ -7025,42 +7025,8 @@ static RetainPtr<_WKTextExtractionResult> createEmptyTextExtractionResult()
 
         static constexpr auto minimumTextLengthWhenApplyingDiscretionaryWordLimit = 1 << 12;
         bool enforceWordLimit = !applyDiscretionaryWordLimit || result->visibleTextLength >= minimumTextLengthWhenApplyingDiscretionaryWordLimit;
-        if (maxWordsPerParagraph && enforceWordLimit) {
-            filterCallbacks.append([wordLimit = WTF::move(maxWordsPerParagraph)](auto& text, auto&&, auto&&) mutable {
-                auto truncatedComponents = text.splitAllowingEmptyEntries('\n').map([wordLimit](auto&& component) {
-                    if (component.isEmpty())
-                        return emptyString();
-
-                    auto* iterator = WTF::wordBreakIterator(component);
-                    if (!iterator)
-                        return component;
-
-                    uint64_t wordCount = 0;
-                    int position = 0;
-                    int stringLength = component.length();
-
-                    while (position < stringLength) {
-                        position = ubrk_following(iterator, position);
-                        if (position == UBRK_DONE)
-                            break;
-
-                        if (!position || !u_isalnum(component[position - 1]))
-                            continue;
-
-                        wordCount++;
-                        if (wordCount != wordLimit)
-                            continue;
-
-                        return position < stringLength ? makeString(component.left(position), u"…") : component;
-                    }
-
-                    return component;
-                });
-
-                auto truncatedString = makeStringByJoining(WTF::move(truncatedComponents), "\n"_s);
-                return WebKit::TextExtractionFilterPromise::createAndResolve(WTF::move(truncatedString));
-            });
-        }
+        if (!enforceWordLimit)
+            maxWordsPerParagraph = std::nullopt;
 
         using enum WebKit::TextExtractionOptionFlag;
         WebKit::TextExtractionOptionFlags optionFlags;
@@ -7082,6 +7048,7 @@ static RetainPtr<_WKTextExtractionResult> createEmptyTextExtractionResult()
             optionFlags,
             outputFormat,
             urlCache.get(),
+            WTF::move(maxWordsPerParagraph),
         };
         WebKit::convertToText(WTF::move(result->rootItem), WTF::move(options), [weakSelf, startTime, urlCache, completionHandler = WTF::move(completionHandler), endTextExtractionScope = WTF::move(endTextExtractionScope)](auto&& result) {
             RetainPtr strongSelf = weakSelf.get();

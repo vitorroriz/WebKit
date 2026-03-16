@@ -75,18 +75,20 @@ struct TextExtractionOptions {
         , nativeMenuItems(WTF::move(other.nativeMenuItems))
         , replacementStrings(WTF::move(other.replacementStrings))
         , version(other.version)
+        , maxWordsPerParagraph(other.maxWordsPerParagraph)
         , flags(other.flags)
         , outputFormat(other.outputFormat)
         , urlCache(WTF::move(other.urlCache))
     {
     }
 
-    TextExtractionOptions(WebCore::FrameIdentifier&& mainFrameIdentifier, Vector<TextExtractionFilterCallback>&& filters, Vector<String>&& items, HashMap<String, String>&& replacementStrings, std::optional<TextExtractionVersion> version, TextExtractionOptionFlags flags, TextExtractionOutputFormat outputFormat, TextExtractionURLCache* urlCache = nullptr)
+    TextExtractionOptions(WebCore::FrameIdentifier&& mainFrameIdentifier, Vector<TextExtractionFilterCallback>&& filters, Vector<String>&& items, HashMap<String, String>&& replacementStrings, std::optional<TextExtractionVersion> version, TextExtractionOptionFlags flags, TextExtractionOutputFormat outputFormat, TextExtractionURLCache* urlCache = nullptr, std::optional<uint64_t> maxWordsPerParagraph = std::nullopt)
         : mainFrameIdentifier(WTF::move(mainFrameIdentifier))
         , filterCallbacks(WTF::move(filters))
         , nativeMenuItems(WTF::move(items))
         , replacementStrings(WTF::move(replacementStrings))
         , version(version)
+        , maxWordsPerParagraph(maxWordsPerParagraph)
         , flags(flags)
         , outputFormat(outputFormat)
         , urlCache(urlCache)
@@ -98,6 +100,7 @@ struct TextExtractionOptions {
     Vector<String> nativeMenuItems;
     HashMap<String, String> replacementStrings;
     std::optional<TextExtractionVersion> version;
+    std::optional<uint64_t> maxWordsPerParagraph;
     TextExtractionOptionFlags flags;
     TextExtractionOutputFormat outputFormat { TextExtractionOutputFormat::TextTree };
     RefPtr<TextExtractionURLCache> urlCache;
