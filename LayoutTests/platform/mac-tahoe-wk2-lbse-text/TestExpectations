@@ -49,9 +49,6 @@ svg/filters/sourceAlpha.svg                                                     
 svg/filters/subRegion-one-effect.svg                                                   [ ImageOnlyFailure ]
 svg/filters/subRegion-two-effects.svg                                                  [ ImageOnlyFailure ]
 #  Dynamic updates to filter input should render correctly (bugs.webkit.org/b/275844)
-svg/dynamic-updates/SVGFEBlendElement-dom-in-attr.html                                 [ ImageOnlyFailure ]
-svg/dynamic-updates/SVGFEBlendElement-dom-in2-attr.html                                [ ImageOnlyFailure ]
-svg/dynamic-updates/SVGFEBlendElement-dom-mode-attr.html                               [ ImageOnlyFailure ]
 svg/dynamic-updates/SVGFEColorMatrixElement-dom-in-attr.html                           [ ImageOnlyFailure ]
 svg/dynamic-updates/SVGFEColorMatrixElement-dom-type-attr.html                         [ ImageOnlyFailure ]
 svg/dynamic-updates/SVGFEColorMatrixElement-dom-values-attr.html                       [ ImageOnlyFailure ]
