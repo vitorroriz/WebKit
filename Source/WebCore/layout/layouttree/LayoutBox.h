@@ -138,7 +138,7 @@ public:
     bool isWordBreakOpportunity() const { return m_nodeType == NodeType::WordBreakOpportunity; }
     bool NODELETE isInternalTableBox() const;
     inline bool isRuby() const;
-    inline bool isRubyBase() const;
+    bool isRubyBase() const;
     inline bool isRubyInlineBox() const;
     inline bool isTableCaption() const;
     inline bool isTableHeader() const;

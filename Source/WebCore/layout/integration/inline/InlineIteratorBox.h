@@ -56,6 +56,7 @@ public:
     bool isText() const;
     bool isSVGText() const;
     bool isInlineBox() const;
+    bool isRubyBase() const;
     bool isRootInlineBox() const;
     bool isLineBreak() const;
     bool isBlockLevelBox() const;
@@ -225,6 +226,13 @@ inline bool Box::isRootInlineBox() const
 {
     return WTF::switchOn(m_pathVariant, [](auto& path) {
         return path.isRootInlineBox();
+    });
+}
+
+inline bool Box::isRubyBase() const
+{
+    return WTF::switchOn(m_pathVariant, [](auto& path) {
+        return path.isRubyBase();
     });
 }
 

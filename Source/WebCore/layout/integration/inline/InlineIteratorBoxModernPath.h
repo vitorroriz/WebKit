@@ -50,6 +50,7 @@ public:
     bool isText() const { return box().isTextOrSoftLineBreak(); }
     bool isInlineBox() const { return box().isInlineBox(); }
     bool isRootInlineBox() const { return box().isRootInlineBox(); }
+    bool isRubyBase() const { return box().isRubyBase(); }
     // Blocks-in-inline.
     bool isBlockLevelBox() const { return box().isBlockLevelBox(); }
     bool isAtomicInlineBox() const { return box().isAtomicInlineBox(); }

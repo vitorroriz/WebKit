@@ -103,6 +103,7 @@ struct Box {
     bool isInlineBox() const { return isNonRootInlineBox() || isRootInlineBox(); }
     bool isNonRootInlineBox() const { return m_type == Type::NonRootInlineBox; }
     bool isRootInlineBox() const { return m_type == Type::RootInlineBox; }
+    bool isRubyBase() const { return isNonRootInlineBox() && layoutBox().isRubyBase(); }
     bool isGenericInlineLevelBox() const { return m_type == Type::GenericInlineLevelBox; }
     bool isInlineLevelBox() const { return isAtomicInlineBox() || isLineBreakBox() || isInlineBox() || isGenericInlineLevelBox(); }
     bool isBlockLevelBox() const { return m_type == Type::BlockLevelBox; }
