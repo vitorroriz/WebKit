@@ -43,6 +43,7 @@
 #include "WebCodecsErrorCallback.h"
 #include "WebCodecsUtilities.h"
 
+#include <wtf/Scope.h>
 #include <wtf/TZoneMallocInlines.h>
 
 namespace WebCore {

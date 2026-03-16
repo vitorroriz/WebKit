@@ -48,6 +48,7 @@
 #include "WebCodecsVideoFrame.h"
 #include <JavaScriptCore/ArrayBuffer.h>
 #include <JavaScriptCore/ConsoleTypes.h>
+#include <wtf/Scope.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/text/MakeString.h>

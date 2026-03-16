@@ -49,6 +49,7 @@
 #include "WebCodecsVideoFrame.h"
 #include "WebCodecsVideoFrameOutputCallback.h"
 #include <wtf/ASCIICType.h>
+#include <wtf/Scope.h>
 #include <wtf/TZoneMallocInlines.h>
 
 namespace WebCore {

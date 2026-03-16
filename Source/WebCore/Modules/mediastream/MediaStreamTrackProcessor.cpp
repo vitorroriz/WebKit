@@ -38,6 +38,7 @@
 #include "OffscreenCanvas.h"
 #include "ReadableStream.h"
 #include "SVGImageElement.h"
+#include <wtf/Scope.h>
 #include <wtf/Seconds.h>
 #include <wtf/TZoneMallocInlines.h>
 
