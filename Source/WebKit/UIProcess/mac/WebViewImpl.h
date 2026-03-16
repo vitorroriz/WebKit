@@ -703,7 +703,7 @@ public:
     void mouseMoved(NSEvent *);
     void mouseDown(NSEvent *, WebMouseEventInputSource);
     void mouseUp(NSEvent *, WebMouseEventInputSource);
-    void mouseDragged(NSEvent *);
+    void mouseDragged(NSEvent *, WebMouseEventInputSource);
     void mouseEntered(NSEvent *);
     void mouseExited(NSEvent *);
     void otherMouseDown(NSEvent *);
@@ -940,7 +940,7 @@ private:
     void mouseMovedInternal(NSEvent *);
     void mouseDownInternal(NSEvent *, WebMouseEventInputSource);
     void mouseUpInternal(NSEvent *, WebMouseEventInputSource);
-    void mouseDraggedInternal(NSEvent *);
+    void mouseDraggedInternal(NSEvent *, WebMouseEventInputSource);
 
     void handleProcessSwapOrExit();
 

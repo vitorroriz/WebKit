@@ -6263,9 +6263,9 @@ void WebViewImpl::mouseUpInternal(NSEvent *event, WebMouseEventInputSource input
     nativeMouseEventHandlerInternal(event, inputSource);
 }
 
-void WebViewImpl::mouseDraggedInternal(NSEvent *event)
+void WebViewImpl::mouseDraggedInternal(NSEvent *event, WebMouseEventInputSource inputSource)
 {
-    nativeMouseEventHandlerInternal(event, WebMouseEventInputSource::UserDriven);
+    nativeMouseEventHandlerInternal(event, inputSource);
 }
 
 void WebViewImpl::mouseMoved(NSEvent *event)
@@ -6383,14 +6383,14 @@ void WebViewImpl::mouseUp(NSEvent *event, WebMouseEventInputSource inputSource)
     mouseUpInternal(event, inputSource);
 }
 
-void WebViewImpl::mouseDragged(NSEvent *event)
+void WebViewImpl::mouseDragged(NSEvent *event, WebMouseEventInputSource inputSource)
 {
     if (m_ignoresNonWheelEvents)
         return;
     if (ignoresMouseDraggedEvents())
         return;
 
-    mouseDraggedInternal(event);
+    mouseDraggedInternal(event, inputSource);
 }
 
 bool WebViewImpl::windowIsFrontWindowUnderMouse(NSEvent *event)
