@@ -157,28 +157,28 @@ bridge/objc/objc_instance.mm @nonARC @no-unify
 bridge/objc/objc_runtime.mm @nonARC @no-unify
 bridge/objc/objc_utility.mm @nonARC @no-unify
 crypto/cocoa/CommonCryptoDERUtilities.cpp
-crypto/cocoa/CryptoAlgorithmAESCBCMac.cpp
-crypto/cocoa/CryptoAlgorithmAESCFBMac.cpp
-crypto/cocoa/CryptoAlgorithmAESCTRMac.cpp
-crypto/cocoa/CryptoAlgorithmAESGCMMac.cpp
-crypto/cocoa/CryptoAlgorithmAESKWMac.cpp
-crypto/cocoa/CryptoAlgorithmECDHMac.cpp
-crypto/cocoa/CryptoAlgorithmECDSAMac.cpp
+crypto/cocoa/CryptoAlgorithmAESCBCCocoa.cpp
+crypto/cocoa/CryptoAlgorithmAESCFBCocoa.cpp
+crypto/cocoa/CryptoAlgorithmAESCTRCocoa.cpp
+crypto/cocoa/CryptoAlgorithmAESGCMCocoa.cpp
+crypto/cocoa/CryptoAlgorithmAESKWCocoa.cpp
+crypto/cocoa/CryptoAlgorithmECDHCocoa.cpp
+crypto/cocoa/CryptoAlgorithmECDSACocoa.cpp
 crypto/cocoa/CryptoAlgorithmEd25519Cocoa.cpp
-crypto/cocoa/CryptoAlgorithmHKDFMac.cpp
-crypto/cocoa/CryptoAlgorithmHMACMac.cpp
-crypto/cocoa/CryptoAlgorithmPBKDF2Mac.cpp
-crypto/cocoa/CryptoAlgorithmRSASSA_PKCS1_v1_5Mac.cpp
-crypto/cocoa/CryptoAlgorithmRSA_OAEPMac.cpp
-crypto/cocoa/CryptoAlgorithmRSA_PSSMac.cpp
-crypto/cocoa/CryptoAlgorithmRegistryMac.cpp
+crypto/cocoa/CryptoAlgorithmHKDFCocoa.cpp
+crypto/cocoa/CryptoAlgorithmHMACCocoa.cpp
+crypto/cocoa/CryptoAlgorithmPBKDF2Cocoa.cpp
+crypto/cocoa/CryptoAlgorithmRSASSA_PKCS1_v1_5Cocoa.cpp
+crypto/cocoa/CryptoAlgorithmRSA_OAEPCocoa.cpp
+crypto/cocoa/CryptoAlgorithmRSA_PSSCocoa.cpp
+crypto/cocoa/CryptoAlgorithmRegistryCocoa.cpp
 crypto/cocoa/CryptoAlgorithmX25519Cocoa.cpp
-crypto/cocoa/CryptoKeyECMac.cpp
+crypto/cocoa/CryptoKeyCocoa.cpp
+crypto/cocoa/CryptoKeyECCocoa.cpp
 crypto/cocoa/CryptoKeyOKPCocoa.cpp
-crypto/cocoa/CryptoKeyMac.cpp
-crypto/cocoa/CryptoKeyRSAMac.cpp
+crypto/cocoa/CryptoKeyRSACocoa.cpp
 crypto/cocoa/CryptoUtilitiesCocoa.cpp
-crypto/cocoa/SerializedCryptoKeyWrapMac.mm @nonARC
+crypto/cocoa/SerializedCryptoKeyWrapCocoa.mm @nonARC
 crypto/CommonCryptoUtilities.cpp
 dom/DataTransferMac.mm @nonARC
 dom/ios/MouseEventIOS.cpp

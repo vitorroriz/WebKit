@@ -15,7 +15,7 @@ bridge/objc/WebScriptObject.mm
 bridge/objc/objc_instance.mm
 bridge/objc/objc_runtime.mm
 bridge/objc/objc_utility.mm
-crypto/cocoa/SerializedCryptoKeyWrapMac.mm
+crypto/cocoa/SerializedCryptoKeyWrapCocoa.mm
 editing/SmartReplaceCF.cpp
 [ iOS ] editing/cocoa/DataDetection.mm
 editing/cocoa/EditingHTMLConverter.mm
