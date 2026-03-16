@@ -557,13 +557,12 @@ void RenderTable::layout()
 
         LayoutUnit oldLogicalWidth = logicalWidth();
         LayoutUnit oldLogicalHeight = logicalHeight();
-        resetLogicalHeightBeforeLayoutIfNeeded();
         updateLogicalWidth();
-
         if (logicalWidth() != oldLogicalWidth) {
             for (unsigned i = 0; i < m_captions.size(); i++)
                 m_captions[i]->setNeedsLayout(MarkOnlyThis);
         }
+        resetLogicalHeightBeforeLayoutIfNeeded();
         // FIXME: The optimisation below doesn't work since the internal table
         // layout could have changed. We need to add a flag to the table
         // layout that tells us if something has changed in the min max
