@@ -183,14 +183,16 @@ void SpeechSynthesis::cancel()
     // Clear m_utteranceQueue before calling cancel to avoid picking up new utterances
     // on completion callback
     auto utteranceQueue = WTF::move(m_utteranceQueue);
-    if (RefPtr speechSynthesisClient = m_speechSynthesisClient.get()) {
+    if (RefPtr speechSynthesisClient = m_speechSynthesisClient.get())
         speechSynthesisClient->cancel();
-        // If we wait for cancel to callback speakingErrorOccurred, then m_currentSpeechUtterance will be null
-        // and the event won't be processed. Instead we process the error immediately.
-        speakingErrorOccurred();
-        m_currentSpeechUtterance = nullptr;
-    } else if (RefPtr platformSpeechSynthesizer = m_platformSpeechSynthesizer)
+    else if (RefPtr platformSpeechSynthesizer = m_platformSpeechSynthesizer)
         platformSpeechSynthesizer->cancel();
+
+    // Process the current utterance's error immediately rather than waiting for the
+    // platform's async cancel callback. This ensures the error event fires before
+    // any new utterances are queued via speak().
+    speakingErrorOccurred();
+    m_currentSpeechUtterance = nullptr;
 
     // Trigger canceled events for queued utterances
     while (!utteranceQueue.isEmpty()) {
@@ -225,7 +227,11 @@ void SpeechSynthesis::resumeSynthesis()
 
 void SpeechSynthesis::handleSpeakingCompleted(SpeechSynthesisUtterance& utterance, bool errorOccurred)
 {
-    ASSERT(m_currentSpeechUtterance);
+    // Ignore callbacks for stale utterances. This can happen when cancel() is called
+    // and a new utterance is queued before the platform's async cancel callback fires.
+    if (!m_currentSpeechUtterance || &utterance != currentSpeechUtterance())
+        return;
+
     Ref<SpeechSynthesisUtterance> protect(utterance);
 
     m_currentSpeechUtterance = nullptr;
@@ -234,7 +240,7 @@ void SpeechSynthesis::handleSpeakingCompleted(SpeechSynthesisUtterance& utteranc
         utterance.errorEventOccurred(eventNames().errorEvent, SpeechSynthesisErrorCode::Canceled);
     else
         utterance.eventOccurred(eventNames().endEvent, 0, 0, String());
-    
+
     if (m_utteranceQueue.size()) {
         Ref<SpeechSynthesisUtterance> firstUtterance = m_utteranceQueue.takeFirst();
         ASSERT(&utterance == firstUtterance.ptr());
