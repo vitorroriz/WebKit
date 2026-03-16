@@ -1181,7 +1181,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     RetainPtr<WKAppKitGestureController> m_appKitGestureController;
     RetainPtr<WKTextSelectionController> m_textSelectionController;
 #endif
-} SWIFT_UNSAFE_REFERENCE;
+} SWIFT_SHARED_REFERENCE(.incrementCheckedPtrCount, .decrementCheckedPtrCount);
 
 } // namespace WebKit
 

@@ -67,9 +67,9 @@ extension WKTextSelectionController {
             return
         }
 
-        let editorState = unsafe page.editorState
+        let editorState = page.editorState
         view.textSelectionManager?.textSelectionMode =
-            unsafe editorState.isContentEditable || editorState.isContentRichlyEditable ? .editable : .selectable
+            editorState.isContentEditable || editorState.isContentRichlyEditable ? .editable : .selectable
     }
 }
 
@@ -81,11 +81,11 @@ extension WKTextSelectionController {
             return .zero
         }
 
-        guard let visualData = unsafe Optional(fromCxx: page.editorState.visualData) else {
+        guard let visualData = Optional(fromCxx: page.editorState.visualData) else {
             return .zero
         }
 
-        return unsafe CGRect(visualData.caretRectAtStart)
+        return CGRect(visualData.caretRectAtStart)
     }
 
     var selectionIsInsertionPoint: Bool {
@@ -93,8 +93,8 @@ extension WKTextSelectionController {
             return false
         }
 
-        let editorState = unsafe page.editorState
-        return unsafe editorState.selectionType == .Caret
+        let editorState = page.editorState
+        return editorState.selectionType == .Caret
     }
 
     @objc(isTextSelectedAtPoint:)
@@ -107,18 +107,18 @@ extension WKTextSelectionController {
 
         Logger.viewGestures.log("[pageProxyID=\(page.logIdentifier())] \(#function) point: \(String(reflecting: point))")
 
-        let editorState = unsafe page.editorState
-        let hasSelection = unsafe editorState.selectionType != .None
+        let editorState = page.editorState
+        let hasSelection = editorState.selectionType != .None
 
-        if unsafe !hasSelection || !editorState.hasPostLayoutAndVisualData() {
+        if !hasSelection || !editorState.hasPostLayoutAndVisualData() {
             Logger.viewGestures.log(
                 "[pageProxyID=\(page.logIdentifier())] Editor state has no selection, post layout data, or visual data"
             )
             return false
         }
 
-        let isRange = unsafe editorState.selectionType == .Range
-        let isContentEditable = unsafe editorState.isContentEditable
+        let isRange = editorState.selectionType == .Range
+        let isContentEditable = editorState.isContentEditable
 
         if !isContentEditable && !isRange {
             Logger.viewGestures.log("[pageProxyID=\(page.logIdentifier())] Selection is neither contenteditable nor a range")
@@ -129,10 +129,10 @@ extension WKTextSelectionController {
         // If so, then the rest of the logic in this function can be elided in that case.
 
         var selectionRects: [WKTextSelectionRect] = []
-        let selectionGeometries = unsafe editorState.visualData.pointee.selectionGeometries
+        let selectionGeometries = editorState.visualData.pointee.selectionGeometries
 
         // FIXME: `WTF::Vector` should be able to be used as a Swift `Sequence`.
-        for i in unsafe 0..<selectionGeometries.size() {
+        for i in 0..<selectionGeometries.size() {
             let selectionGeometry = unsafe selectionGeometries.__atUnsafe(i).pointee
             selectionRects.append(.init(selectionGeometry: selectionGeometry, delegate: nil))
         }
@@ -153,8 +153,8 @@ extension WKTextSelectionController {
 
         Logger.viewGestures.log("[pageProxyID=\(page.logIdentifier())] \(#function) point: \(String(reflecting: point))")
 
-        let previousState = unsafe page.editorState
-        let previousVisualData = unsafe Optional(fromCxx: previousState.visualData)
+        let previousState = page.editorState
+        let previousVisualData = Optional(fromCxx: previousState.visualData)
 
         // FIXME: Properly handle the case where this isn't actually true.
         let isInteractingWithFocusedElement = true
@@ -173,29 +173,29 @@ extension WKTextSelectionController {
             )
         }
 
-        let newState = unsafe page.editorState
-        let newVisualData = unsafe Optional(fromCxx: newState.visualData)
+        let newState = page.editorState
+        let newVisualData = Optional(fromCxx: newState.visualData)
 
-        guard let previousVisualData = unsafe previousVisualData, let newVisualData = unsafe newVisualData else {
+        guard let previousVisualData, let newVisualData else {
             return false
         }
 
         // FIXME: (rdar://170847912) Use the `!=` operator instead when possible.
-        return unsafe !(previousVisualData.caretRectAtStart == newVisualData.caretRectAtStart)
+        return !(previousVisualData.caretRectAtStart == newVisualData.caretRectAtStart)
     }
 
     @objc(showContextMenuAtPoint:)
     func showContextMenu(at point: NSPoint) {
         // The `point` location is relative to the window.
 
-        guard let page = view._protectedPage().get(), let impl = unsafe view._impl() else {
+        guard let page = view._protectedPage().get(), let impl = view._impl() else {
             return
         }
 
         Logger.viewGestures.log("[pageProxyID=\(page.logIdentifier())] \(#function) point: \(String(reflecting: point))")
 
         let timestamp = GetCurrentEventTime()
-        let windowNumber = unsafe impl.windowNumber()
+        let windowNumber = impl.windowNumber()
 
         let mouseDown = NSEvent.mouseEvent(
             with: .rightMouseDown,
@@ -220,8 +220,8 @@ extension WKTextSelectionController {
             pressure: 0
         )
 
-        unsafe impl.mouseDown(mouseDown, .Automation)
-        unsafe impl.mouseUp(mouseUp, .Automation)
+        impl.mouseDown(mouseDown, .Automation)
+        impl.mouseUp(mouseUp, .Automation)
     }
 
     @objc(dragSelectionWithGesture:completionHandler:)

@@ -31,6 +31,7 @@
 #include <wtf/HashTraits.h>
 #include <wtf/RawPtrTraits.h>
 #include <wtf/SingleThreadIntegralWrapper.h>
+#include <wtf/SwiftBridging.h>
 #include <wtf/TypeTraits.h>
 #include <wtf/UniqueRef.h>
 
@@ -393,7 +394,7 @@ private:
 #if ASSERT_ENABLED || ENABLE(SECURITY_ASSERTIONS)
     DeletionFlagType m_didBeginDeletion { false };
 #endif
-};
+} SWIFT_RETURNED_AS_UNRETAINED_BY_DEFAULT;
 
 template<typename T, DefaultedOperatorEqual defaultedOperatorEqual = DefaultedOperatorEqual::No, CheckedPtrDeleteCheckException deleteException = CheckedPtrDeleteCheckException::No>
 class CanMakeCheckedPtr : public CanMakeCheckedPtrBase<SingleThreadIntegralWrapper<uint32_t>, uint32_t, bool, deleteException> {

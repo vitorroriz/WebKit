@@ -28,6 +28,7 @@
 #include <WebCore/IntPoint.h>
 #include <WebCore/LayoutUnit.h>
 #include <wtf/Platform.h>
+#include <wtf/SwiftBridging.h>
 #include <wtf/TZoneMalloc.h>
 
 #if USE(CG)
@@ -227,7 +228,7 @@ public:
 private:
     IntPoint m_location;
     IntSize m_size;
-};
+} SWIFT_ESCAPABLE;
 
 inline IntRect intersection(const IntRect& a, const IntRect& b)
 {

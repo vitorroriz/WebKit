@@ -97,7 +97,7 @@ extension WebKit.WebPageProxy {
     }
 
     var editorState: WebKit.EditorState {
-        unsafe editorStateCopy()
+        editorStateCopy()
     }
 }
 

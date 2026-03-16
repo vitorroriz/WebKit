@@ -29,6 +29,7 @@
 #include <WebCore/IntRect.h>
 #include <WebCore/WritingMode.h>
 #include <optional>
+#include <wtf/SwiftBridging.h>
 #include <wtf/TZoneMalloc.h>
 
 namespace WebCore {
@@ -114,7 +115,7 @@ private:
     int m_pageNumber { 0 };
 
     mutable std::optional<IntRect> m_cachedEnclosingRect;
-};
+} SWIFT_ESCAPABLE;
 
 WEBCORE_EXPORT WTF::TextStream& operator<<(WTF::TextStream&, const SelectionGeometry&);
 

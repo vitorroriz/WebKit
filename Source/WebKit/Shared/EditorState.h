@@ -32,11 +32,12 @@
 #include <WebCore/IntRect.h>
 #include <WebCore/PlatformLayerIdentifier.h>
 #include <WebCore/ScrollTypes.h>
+#include <WebCore/SelectionGeometry.h>
 #include <WebCore/SelectionType.h>
 #include <WebCore/WritingDirection.h>
+#include <optional>
+#include <wtf/Vector.h>
 #include <wtf/text/WTFString.h>
-
-#include <WebCore/SelectionGeometry.h>
 
 #if USE(DICTATION_ALTERNATIVES)
 #include <WebCore/DictationContext.h>
