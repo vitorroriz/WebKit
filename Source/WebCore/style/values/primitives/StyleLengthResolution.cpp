@@ -57,7 +57,7 @@ static double adjustValueForPageZoom(double dimension, const CSSToLengthConversi
     if (!renderView || !style || !evaluationTimeZoomEnabled(*style))
         return dimension;
 
-    return dimension / renderView->zoomFactor();
+    return dimension / renderView->pageZoomFactor();
 }
 
 static double NODELETE lengthOfViewportPhysicalAxisForLogicalAxis(LogicalBoxAxis logicalAxis, const FloatSize& size, const RenderStyle* style)

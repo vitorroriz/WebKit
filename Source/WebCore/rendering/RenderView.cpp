@@ -826,7 +826,7 @@ void RenderView::setPageLogicalSize(LayoutSize size)
     m_pageLogicalSize = size;
 }
 
-float RenderView::zoomFactor() const
+float RenderView::pageZoomFactor() const
 {
     return frameView().frame().pageZoomFactor();
 }

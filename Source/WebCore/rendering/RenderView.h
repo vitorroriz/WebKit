@@ -72,7 +72,7 @@ public:
     LayoutUnit clientLogicalWidthForFixedPosition() const;
     LayoutUnit clientLogicalHeightForFixedPosition() const;
 
-    float NODELETE zoomFactor() const;
+    float NODELETE pageZoomFactor() const;
 
     WEBCORE_EXPORT LocalFrameView& NODELETE frameView() const LIFETIME_BOUND;
 
