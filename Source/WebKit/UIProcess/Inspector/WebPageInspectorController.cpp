@@ -228,13 +228,21 @@ void WebPageInspectorController::didCommitProvisionalPage(WebCore::PageIdentifie
     newTarget->didCommitProvisionalTarget();
     targetAgent->didCommitProvisionalTarget(oldID, newID);
 
-    // We've disconnected from the old page and will not receive any message from it, so
-    // we destroy everything but the new target here.
-    // FIXME: <https://webkit.org/b/202937> do not destroy targets that belong to the committed page.
+    // Update target list to only include targets from the committed page.
     for (auto& target : m_targets.values())
         targetAgent->targetDestroyed(*target);
     m_targets.clear();
     m_targets.set(newTarget->identifier(), WTF::move(newTarget));
+
+    if (shouldManageFrameTargets()) {
+        // WebFrameProxies are structurally preserved across page navigation rather than destroyed and recreated,
+        // so no didCreateFrame/willDestroyFrame callbacks fire for them. Recreate the frame targets here.
+        //
+        // (Frame target ids include the process id, which changes across a cross-origin navigation,
+        // so surviving frames need to surface as new targets to the frontend.)
+        for (RefPtr frame = m_inspectedPage->mainFrame(); frame; frame = frame->traverseNext().frame)
+            didCreateFrame(*frame);
+    }
 }
 
 void WebPageInspectorController::didCreateFrame(WebFrameProxy& frame)
