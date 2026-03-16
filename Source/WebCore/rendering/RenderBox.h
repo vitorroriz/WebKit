@@ -618,15 +618,15 @@ public:
 
     ShapeOutsideInfo* shapeOutsideInfo() const LIFETIME_BOUND;
 
-    LayoutUnit computeIntrinsicLogicalWidthUsing(CSS::Keyword::WebkitFillAvailable, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
-    LayoutUnit computeIntrinsicLogicalWidthUsing(CSS::Keyword::MinIntrinsic, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
-    LayoutUnit computeIntrinsicLogicalWidthUsing(CSS::Keyword::MaxContent, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
-    LayoutUnit computeIntrinsicLogicalWidthUsing(CSS::Keyword::MinContent, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
-    LayoutUnit computeIntrinsicLogicalWidthUsing(CSS::Keyword::FitContent, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
-    LayoutUnit computeIntrinsicLogicalWidthUsing(const Style::PreferredSize& logicalWidth, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
-    LayoutUnit computeIntrinsicLogicalWidthUsing(const Style::MinimumSize& logicalWidth, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
-    LayoutUnit computeIntrinsicLogicalWidthUsing(const Style::MaximumSize& logicalWidth, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
-    LayoutUnit computeIntrinsicLogicalWidthUsing(const Style::FlexBasis& logicalWidth, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
+    LayoutUnit computeSizingKeywordLogicalWidthUsing(CSS::Keyword::WebkitFillAvailable, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
+    LayoutUnit computeSizingKeywordLogicalWidthUsing(CSS::Keyword::MinIntrinsic, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
+    LayoutUnit computeSizingKeywordLogicalWidthUsing(CSS::Keyword::MaxContent, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
+    LayoutUnit computeSizingKeywordLogicalWidthUsing(CSS::Keyword::MinContent, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
+    LayoutUnit computeSizingKeywordLogicalWidthUsing(CSS::Keyword::FitContent, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
+    LayoutUnit computeSizingKeywordLogicalWidthUsing(const Style::PreferredSize& logicalWidth, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
+    LayoutUnit computeSizingKeywordLogicalWidthUsing(const Style::MinimumSize& logicalWidth, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
+    LayoutUnit computeSizingKeywordLogicalWidthUsing(const Style::MaximumSize& logicalWidth, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
+    LayoutUnit computeSizingKeywordLogicalWidthUsing(const Style::FlexBasis& logicalWidth, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
 
     bool includeVerticalScrollbarSize() const;
     bool includeHorizontalScrollbarSize() const;
@@ -668,10 +668,10 @@ protected:
 
     void computeOutOfFlowPositionedLogicalWidth(LogicalExtentComputedValues&) const;
 
-    std::optional<LayoutUnit> computeIntrinsicLogicalContentHeightUsing(const Style::PreferredSize& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;
-    std::optional<LayoutUnit> computeIntrinsicLogicalContentHeightUsing(const Style::MinimumSize& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;
-    std::optional<LayoutUnit> computeIntrinsicLogicalContentHeightUsing(const Style::MaximumSize& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;
-    std::optional<LayoutUnit> computeIntrinsicLogicalContentHeightUsing(const Style::FlexBasis& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;
+    std::optional<LayoutUnit> computeSizingKeywordLogicalContentHeightUsing(const Style::PreferredSize& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;
+    std::optional<LayoutUnit> computeSizingKeywordLogicalContentHeightUsing(const Style::MinimumSize& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;
+    std::optional<LayoutUnit> computeSizingKeywordLogicalContentHeightUsing(const Style::MaximumSize& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;
+    std::optional<LayoutUnit> computeSizingKeywordLogicalContentHeightUsing(const Style::FlexBasis& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;
 
     LayoutRect localOutlineBoundsRepaintRect() const;
 
@@ -740,7 +740,7 @@ private:
     }
 
     template<typename SizeType> LayoutUnit computeLogicalWidthUsingGeneric(const SizeType& logicalWidth, LayoutUnit availableLogicalWidth, const RenderBlock& containingBlock) const;
-    template<typename SizeType> LayoutUnit computeIntrinsicLogicalWidthUsingGeneric(const SizeType& logicalWidth, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
+    template<typename SizeType> LayoutUnit computeSizingKeywordLogicalWidthUsingGeneric(const SizeType& logicalWidth, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
 
     template<typename SizeType> std::optional<LayoutUnit> computeLogicalHeightUsingGeneric(const SizeType& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight) const;
     template<typename SizeType> std::optional<LayoutUnit> computeSizingKeywordLogicalContentHeightUsingGeneric(const SizeType& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;

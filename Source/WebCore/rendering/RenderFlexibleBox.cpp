@@ -1734,7 +1734,7 @@ std::pair<LayoutUnit, LayoutUnit> RenderFlexibleBox::computeFlexItemMinMaxSizes(
     
     if (shouldApplyMinSizeAutoForFlexItem(flexItem)) {
         // FIXME: If the min value is expected to be valid here, we need to come up with a non optional version of computeMainAxisExtentForFlexItem and
-        // ensure it's valid through the virtual calls of computeIntrinsicLogicalContentHeightUsing.
+        // ensure it's valid through the virtual calls of computeSizingKeywordLogicalContentHeightUsing.
         LayoutUnit contentSize;
         auto& flexItemCrossSizeLength = preferredCrossSizeLengthForFlexItem(flexItem);
 

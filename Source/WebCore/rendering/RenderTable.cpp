@@ -371,7 +371,7 @@ void RenderTable::updateLogicalWidth()
 template<typename SizeType> LayoutUnit RenderTable::convertStyleLogicalWidthToComputedWidth(const SizeType& styleLogicalWidth, LayoutUnit availableWidth)
 {
     if (styleLogicalWidth.isIntrinsicOrStretch())
-        return computeIntrinsicLogicalWidthUsing(styleLogicalWidth, availableWidth, bordersPaddingAndSpacingInRowDirection());
+        return computeSizingKeywordLogicalWidthUsing(styleLogicalWidth, availableWidth, bordersPaddingAndSpacingInRowDirection());
 
     // HTML tables' width styles already include borders and padding, but CSS tables' width styles do not.
     LayoutUnit borders;
@@ -398,7 +398,7 @@ template<typename SizeType> LayoutUnit RenderTable::convertStyleLogicalHeightToC
     } else if (styleLogicalHeight.isPercentOrCalculated())
         return computePercentageLogicalHeight(styleLogicalHeight).value_or(0);
     else if (styleLogicalHeight.isIntrinsicOrStretch())
-        return computeIntrinsicLogicalContentHeightUsing(styleLogicalHeight, logicalHeight() - borderAndPadding, borderAndPadding).value_or(0);
+        return computeSizingKeywordLogicalContentHeightUsing(styleLogicalHeight, logicalHeight() - borderAndPadding, borderAndPadding).value_or(0);
     else
         ASSERT_NOT_REACHED();
     return 0_lu;
