@@ -27,6 +27,7 @@
 
 #import "HTTPServer.h"
 #import "PlatformUtilities.h"
+#import "SiteIsolationUtilities.h"
 #import "TestCocoa.h"
 #import "TestNavigationDelegate.h"
 #import "TestUIDelegate.h"
@@ -167,9 +168,17 @@ TEST(EnhancedSecurity, PSONToEnhancedSecurity)
     [webView loadRequest:[NSURLRequest requestWithURL:url2]];
     TestWebKitAPI::Util::run(&finishedNavigation);
 
-    EXPECT_EQ(true, isEnhancedSecurityEnabled(webView.get()));
-    EXPECT_STREQ("security", [webView _webContentProcessVariantForFrame:nil].UTF8String);
-    EXPECT_NE(pid1, [webView _webProcessIdentifier]);
+    // Under Site Isolation, navigation has to reuse existing site process in BCG,
+    // so navigation inherits enhanced security state of that process.
+    if (isSiteIsolationEnabled(webView.get())) {
+        EXPECT_FALSE(isEnhancedSecurityEnabled(webView.get()));
+        EXPECT_STREQ("standard", [webView _webContentProcessVariantForFrame:nil].UTF8String);
+        EXPECT_EQ(pid1, [webView _webProcessIdentifier]);
+    } else {
+        EXPECT_TRUE(isEnhancedSecurityEnabled(webView.get()));
+        EXPECT_STREQ("security", [webView _webContentProcessVariantForFrame:nil].UTF8String);
+        EXPECT_NE(pid1, [webView _webProcessIdentifier]);
+    }
 }
 
 TEST(EnhancedSecurity, PSONToEnhancedSecuritySamePage)
@@ -205,9 +214,17 @@ TEST(EnhancedSecurity, PSONToEnhancedSecuritySamePage)
     [webView loadRequest:[NSURLRequest requestWithURL:url2]];
     TestWebKitAPI::Util::run(&finishedNavigation);
 
-    EXPECT_EQ(true, isEnhancedSecurityEnabled(webView.get()));
-    EXPECT_STREQ("security", [webView _webContentProcessVariantForFrame:nil].UTF8String);
-    EXPECT_NE(pid1, [webView _webProcessIdentifier]);
+    // Under Site Isolation, navigation has to reuse existing site process in BCG,
+    // so navigation inherits enhanced security state of that process.
+    if (isSiteIsolationEnabled(webView.get())) {
+        EXPECT_FALSE(isEnhancedSecurityEnabled(webView.get()));
+        EXPECT_STREQ("standard", [webView _webContentProcessVariantForFrame:nil].UTF8String);
+        EXPECT_EQ(pid1, [webView _webProcessIdentifier]);
+    } else {
+        EXPECT_TRUE(isEnhancedSecurityEnabled(webView.get()));
+        EXPECT_STREQ("security", [webView _webContentProcessVariantForFrame:nil].UTF8String);
+        EXPECT_NE(pid1, [webView _webProcessIdentifier]);
+    }
 }
 
 static RetainPtr<_WKProcessPoolConfiguration> psonProcessPoolConfiguration()
@@ -492,7 +509,11 @@ TEST(EnhancedSecurity, EnhancedSecurityNavigationStaysEnabledAfterSubFrameNaviga
 
     EXPECT_EQ(true, isEnhancedSecurityEnabled(webView.get()));
     EXPECT_STREQ("security", [webView _webContentProcessVariantForFrame:nil].UTF8String);
-    EXPECT_STREQ("security", [webView _webContentProcessVariantForFrame:[webView firstChildFrame]._handle].UTF8String);
+    // Without Site Isolation, cross-site frame must be loaded in the same process as main frame,
+    // so process variant cannot change; with Site Isolation, cross-site frame is put in a
+    // different process, and that process can have different variant.
+    auto frameProcessVariant = isSiteIsolationEnabled(webView.get()) ? "standard" : "security";
+    EXPECT_STREQ(frameProcessVariant, [webView _webContentProcessVariantForFrame:[webView firstChildFrame]._handle].UTF8String);
 
 }
 
@@ -544,7 +565,6 @@ TEST(EnhancedSecurity, EnhancedSecurityNavigationStaysDisabledAfterSubFrameNavig
 
 TEST(EnhancedSecurity, EnhancedSecurityNavigationStaysDisabledAfterSubFrameNavigationRequestEnabledCrossOrigin)
 {
-
     HTTPServer server({
         { "/example"_s, { "<iframe id='webkit_frame' src='https://example.com/webkit'></iframe>"_s } },
         { "/example_subframe"_s, { "<script>alert('done')</script>"_s } },
@@ -584,7 +604,11 @@ TEST(EnhancedSecurity, EnhancedSecurityNavigationStaysDisabledAfterSubFrameNavig
 
     EXPECT_EQ(false, isEnhancedSecurityEnabled(webView.get()));
     EXPECT_STREQ("standard", [webView _webContentProcessVariantForFrame:nil].UTF8String);
-    EXPECT_STREQ("standard", [webView _webContentProcessVariantForFrame:[webView firstChildFrame]._handle].UTF8String);
+    // Without Site Isolation, cross-site frame must be loaded in the same process as main frame,
+    // so process variant cannot change; with Site Isolation, cross-site frame is put in a
+    // different process, and that process can have different variant.
+    auto frameProcessVariant = isSiteIsolationEnabled(webView.get()) ? "security" : "standard";
+    EXPECT_STREQ(frameProcessVariant, [webView _webContentProcessVariantForFrame:[webView firstChildFrame]._handle].UTF8String);
 }
 
 TEST(EnhancedSecurity, WindowOpenWithNoopenerFromEnhancedSecurityPage)
