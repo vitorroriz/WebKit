@@ -54,14 +54,10 @@ AllowedSPI*.toml @emw-apple
 /Tools/TestWebKitAPI
 /Tools/TestWebKitAPI/Tests/WebKitGLib/ @WebKit/glib-reviewers
 /Tools/TestWebKitAPI/Tests/WebKitGtk/ @WebKit/glib-reviewers
-/Tools/TestWebKitAPI/Tests/WPEQt/ @philn
 /Tools/TestWebKitAPI/WebKitGLib/ @WebKit/glib-reviewers
 /Tools/TestWebKitAPI/WebKitGtk/ @WebKit/glib-reviewers
-/Tools/TestWebKitAPI/WPEQt/ @philn
 
-/Tools/buildstream/ @philn
-/Tools/flatpak/ @philn
-/Tools/gstreamer/ @WebKit/glib-reviewers @philn
+/Tools/gstreamer/ @WebKit/glib-reviewers
 /Tools/jhbuild/ @WebKit/glib-reviewers
 
 /Tools/WebKitTestRunner/InjectedBundle/Accessibility* @twilco @hoffmanjoshua @minorninth @fleizach @AndresGonzalezApple
@@ -219,6 +215,7 @@ skia/ @alexgcastro @carlosgcampos @nikolaszimmermann
 /Source/WebCore/Modules/mediastream/gstreamer @calvaris @philn
 /Source/WebCore/platform/audio/gstreamer @calvaris @philn
 /Source/WebCore/platform/graphics/gstreamer @ntrrgc @calvaris @philn
+/Source/WebCore/platform/gstreamer @ntrrgc @calvaris @philn
 /Source/WebCore/platform/mediastream/gstreamer @calvaris @philn
 gstreamer/ @philn
 
@@ -242,7 +239,6 @@ soup/ @WebKit/glib-reviewers
 unix/ @WebKit/glib-reviewers
 xdg/ @WebKit/glib-reviewers
 wpe/ @WebKit/glib-reviewers
-**/wpe/qt/ @philn
 
 # Don't want to own these
 /Source/ThirdParty/libwebrtc/Source/third_party/boringssl/src/util/ar/testdata/linux
