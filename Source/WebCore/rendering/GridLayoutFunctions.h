@@ -75,7 +75,7 @@ bool isAspectRatioBlockSizeDependentGridItem(const RenderBox&);
 Style::GridTrackSizingDirection NODELETE flowAwareDirectionForGridItem(const RenderGrid&, const RenderBox&, Style::GridTrackSizingDirection);
 Style::GridTrackSizingDirection NODELETE flowAwareDirectionForParent(const RenderGrid&, const RenderElement& parent, Style::GridTrackSizingDirection);
 std::optional<RenderBox::GridAreaSize> overridingContainingBlockContentSizeForGridItem(const RenderBox&, Style::GridTrackSizingDirection);
-bool NODELETE hasRelativeOrIntrinsicSizeForGridItem(const RenderBox& gridItem, Style::GridTrackSizingDirection);
+bool NODELETE hasRelativeOrKeywordOrAutoSizeForGridItem(const RenderBox& gridItem, Style::GridTrackSizingDirection);
 
 bool NODELETE isFlippedDirection(const RenderGrid&, Style::GridTrackSizingDirection);
 bool NODELETE isSubgridReversedDirection(const RenderGrid&, Style::GridTrackSizingDirection outerDirection, const RenderGrid& subgrid);

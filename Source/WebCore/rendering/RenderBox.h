@@ -743,7 +743,7 @@ private:
     template<typename SizeType> LayoutUnit computeIntrinsicLogicalWidthUsingGeneric(const SizeType& logicalWidth, LayoutUnit availableLogicalWidth, LayoutUnit borderAndPadding) const;
 
     template<typename SizeType> std::optional<LayoutUnit> computeLogicalHeightUsingGeneric(const SizeType& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight) const;
-    template<typename SizeType> std::optional<LayoutUnit> computeIntrinsicLogicalContentHeightUsingGeneric(const SizeType& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;
+    template<typename SizeType> std::optional<LayoutUnit> computeSizingKeywordLogicalContentHeightUsingGeneric(const SizeType& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const;
     template<typename SizeType> std::optional<LayoutUnit> computePercentageLogicalHeightGeneric(const SizeType& logicalHeight, UpdatePercentageHeightDescendants = UpdatePercentageHeightDescendants::Yes) const;
     template<typename SizeType> std::optional<LayoutUnit> computeContentLogicalHeightGeneric(const SizeType& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight) const;
     template<typename SizeType> std::optional<LayoutUnit> computeContentAndScrollbarLogicalHeightUsing(const SizeType& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight) const;

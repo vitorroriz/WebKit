@@ -3526,7 +3526,7 @@ static inline bool NODELETE isOrthogonal(const RenderBox& renderer, const Render
     return renderer.isHorizontalWritingMode() != ancestor.isHorizontalWritingMode();
 }
 
-template<typename SizeType> std::optional<LayoutUnit> RenderBox::computeIntrinsicLogicalContentHeightUsingGeneric(const SizeType& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const
+template<typename SizeType> std::optional<LayoutUnit> RenderBox::computeSizingKeywordLogicalContentHeightUsingGeneric(const SizeType& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const
 {
     auto intrinsic = [&] -> std::optional<LayoutUnit> {
         if (intrinsicContentHeight)
@@ -3585,27 +3585,27 @@ template<typename SizeType> std::optional<LayoutUnit> RenderBox::computeIntrinsi
 
 std::optional<LayoutUnit> RenderBox::computeIntrinsicLogicalContentHeightUsing(const Style::PreferredSize& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const
 {
-    return computeIntrinsicLogicalContentHeightUsingGeneric(logicalHeight, intrinsicContentHeight, borderAndPadding);
+    return computeSizingKeywordLogicalContentHeightUsingGeneric(logicalHeight, intrinsicContentHeight, borderAndPadding);
 }
 
 std::optional<LayoutUnit> RenderBox::computeIntrinsicLogicalContentHeightUsing(const Style::MinimumSize& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const
 {
-    return computeIntrinsicLogicalContentHeightUsingGeneric(logicalHeight, intrinsicContentHeight, borderAndPadding);
+    return computeSizingKeywordLogicalContentHeightUsingGeneric(logicalHeight, intrinsicContentHeight, borderAndPadding);
 }
 
 std::optional<LayoutUnit> RenderBox::computeIntrinsicLogicalContentHeightUsing(const Style::MaximumSize& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const
 {
-    return computeIntrinsicLogicalContentHeightUsingGeneric(logicalHeight, intrinsicContentHeight, borderAndPadding);
+    return computeSizingKeywordLogicalContentHeightUsingGeneric(logicalHeight, intrinsicContentHeight, borderAndPadding);
 }
 
 std::optional<LayoutUnit> RenderBox::computeIntrinsicLogicalContentHeightUsing(const Style::FlexBasis& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight, LayoutUnit borderAndPadding) const
 {
-    return computeIntrinsicLogicalContentHeightUsingGeneric(logicalHeight, intrinsicContentHeight, borderAndPadding);
+    return computeSizingKeywordLogicalContentHeightUsingGeneric(logicalHeight, intrinsicContentHeight, borderAndPadding);
 }
 
 template<typename SizeType> std::optional<LayoutUnit> RenderBox::computeContentAndScrollbarLogicalHeightUsing(const SizeType& logicalHeight, std::optional<LayoutUnit> intrinsicContentHeight) const
 {
-    auto intrinsic = [&] {
+    auto keywordSize = [&] {
         // FIXME: The CSS sizing spec is considering changing what min-content/max-content should resolve to.
         // If that happens, this code will have to change.
         return computeIntrinsicLogicalContentHeightUsing(logicalHeight, intrinsicContentHeight, borderAndPaddingLogicalHeight());
@@ -3622,22 +3622,22 @@ template<typename SizeType> std::optional<LayoutUnit> RenderBox::computeContentA
             return computePercentageLogicalHeight(logicalHeight);
         },
         [&](const CSS::Keyword::MinContent&) -> std::optional<LayoutUnit> {
-            return intrinsic();
+            return keywordSize();
         },
         [&](const CSS::Keyword::MaxContent&) -> std::optional<LayoutUnit> {
-            return intrinsic();
+            return keywordSize();
         },
         [&](const CSS::Keyword::FitContent&) -> std::optional<LayoutUnit> {
-            return intrinsic();
+            return keywordSize();
         },
         [&](const CSS::Keyword::WebkitFillAvailable&) -> std::optional<LayoutUnit> {
-            return intrinsic();
+            return keywordSize();
         },
         [&](const CSS::Keyword::Intrinsic&) -> std::optional<LayoutUnit> {
-            return intrinsic();
+            return keywordSize();
         },
         [&](const CSS::Keyword::MinIntrinsic&) -> std::optional<LayoutUnit> {
-            return intrinsic();
+            return keywordSize();
         },
         [&](const CSS::Keyword::Auto&) -> std::optional<LayoutUnit> {
             if constexpr (std::same_as<SizeType, Style::MinimumSize>) {

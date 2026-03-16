@@ -75,7 +75,7 @@ LayoutUnit computeMarginLogicalSizeForGridItem(const RenderGrid& grid, Style::Gr
     return marginStartIsAuto(gridItem, flowAwareDirection) ? marginEnd : marginEndIsAuto(gridItem, flowAwareDirection) ? marginStart : marginStart + marginEnd;
 }
 
-bool hasRelativeOrIntrinsicSizeForGridItem(const RenderBox& gridItem, Style::GridTrackSizingDirection direction)
+bool hasRelativeOrKeywordOrAutoSizeForGridItem(const RenderBox& gridItem, Style::GridTrackSizingDirection direction)
 {
     if (direction == Style::GridTrackSizingDirection::Columns)
         return gridItem.hasRelativeLogicalWidth() || gridItem.style().logicalWidth().isSizingKeywordOrAuto();
@@ -89,7 +89,7 @@ static ExtraMarginsFromSubgrids extraMarginForSubgrid(const RenderGrid& parent, 
         return { };
 
     std::optional<LayoutUnit> availableSpace;
-    if (!hasRelativeOrIntrinsicSizeForGridItem(parent, direction))
+    if (!hasRelativeOrKeywordOrAutoSizeForGridItem(parent, direction))
         availableSpace = parent.availableSpaceForGutters(direction);
 
     RenderGrid& grandParent = downcast<RenderGrid>(*parent.parent());

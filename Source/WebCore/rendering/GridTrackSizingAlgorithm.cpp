@@ -141,7 +141,7 @@ static bool NODELETE hasRelativeMarginOrPaddingForGridItem(const RenderBox& grid
     return gridItem.style().marginBefore().isPercentOrCalculated() || gridItem.style().marginAfter().isPercentOrCalculated() || gridItem.style().paddingBefore().isPercentOrCalculated() || gridItem.style().paddingAfter().isPercentOrCalculated();
 }
 
-static bool NODELETE hasRelativeOrIntrinsicSizeForGridItem(const RenderBox& gridItem, Style::GridTrackSizingDirection direction)
+static bool NODELETE hasRelativeOrKeywordOrAutoSizeForGridItem(const RenderBox& gridItem, Style::GridTrackSizingDirection direction)
 {
     if (direction == Style::GridTrackSizingDirection::Columns)
         return gridItem.hasRelativeLogicalWidth() || gridItem.style().logicalWidth().isSizingKeywordOrAuto();
@@ -150,7 +150,7 @@ static bool NODELETE hasRelativeOrIntrinsicSizeForGridItem(const RenderBox& grid
 
 static bool NODELETE shouldClearOverridingContainingBlockContentSizeForGridItem(const RenderBox& gridItem, Style::GridTrackSizingDirection direction)
 {
-    return hasRelativeOrIntrinsicSizeForGridItem(gridItem, direction) || hasRelativeMarginOrPaddingForGridItem(gridItem, direction);
+    return hasRelativeOrKeywordOrAutoSizeForGridItem(gridItem, direction) || hasRelativeMarginOrPaddingForGridItem(gridItem, direction);
 }
 
 static void setOverridingContainingBlockContentSizeForGridItem(const RenderGrid& grid, RenderBox& gridItem, Style::GridTrackSizingDirection direction, std::optional<LayoutUnit> size)
@@ -1509,7 +1509,7 @@ LayoutUnit DefiniteSizeStrategy::minLogicalSizeForGridItem(RenderBox& gridItem, 
 {
     auto gridItemInlineDirection = GridLayoutFunctions::flowAwareDirectionForGridItem(*renderGrid(), gridItem, Style::GridTrackSizingDirection::Columns);
     auto flowAwareDirection = GridLayoutFunctions::flowAwareDirectionForGridItem(*renderGrid(), gridItem, direction());
-    if (hasRelativeMarginOrPaddingForGridItem(gridItem, flowAwareDirection) || (direction() != gridItemInlineDirection && hasRelativeOrIntrinsicSizeForGridItem(gridItem, flowAwareDirection))) {
+    if (hasRelativeMarginOrPaddingForGridItem(gridItem, flowAwareDirection) || (direction() != gridItemInlineDirection && hasRelativeOrKeywordOrAutoSizeForGridItem(gridItem, flowAwareDirection))) {
         auto indefiniteSize = direction() == gridItemInlineDirection ? std::make_optional(0_lu) : std::nullopt;
         setOverridingContainingBlockContentSizeForGridItem(*renderGrid(), gridItem, direction(), indefiniteSize);
     }
@@ -1656,7 +1656,7 @@ static std::optional<LayoutUnit> extraMarginFromSubgridAncestorGutters(const Ren
 
     for (auto& currentAncestorSubgrid : ancestorSubgridsOfGridItem(gridItem, direction)) {
         std::optional<LayoutUnit> availableSpace;
-        if (!GridLayoutFunctions::hasRelativeOrIntrinsicSizeForGridItem(currentAncestorSubgrid, direction))
+        if (!GridLayoutFunctions::hasRelativeOrKeywordOrAutoSizeForGridItem(currentAncestorSubgrid, direction))
             availableSpace = currentAncestorSubgrid.availableSpaceForGutters(direction);
 
         auto gridItemSpanInAncestor = currentAncestorSubgrid.gridSpanForGridItem(gridItem, direction);
