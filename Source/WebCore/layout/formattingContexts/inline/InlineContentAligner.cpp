@@ -74,7 +74,7 @@ struct InlineBoxIndexAndExpansion {
     size_t index { 0 };
     InlineLayoutUnit expansion { 0.f };
 };
-static InlineBoxIndexAndExpansion expandInlineBoxWithDescendants(size_t inlineBoxIndex, std::span<InlineDisplay::Box> displayBoxes, const HashMap<const Box*, InlineLayoutUnit>& alignmentOffsetList,  InlineFormattingContext& inlineFormattingContext)
+static InlineBoxIndexAndExpansion expandInlineBoxWithDescendants(size_t inlineBoxIndex, std::span<InlineDisplay::Box> displayBoxes, const HashMap<const Box*, InlineLayoutUnit>& alignmentOffsetList, InlineFormattingContext& inlineFormattingContext)
 {
     if (inlineBoxIndex >= displayBoxes.size() || !displayBoxes[inlineBoxIndex].isInlineBox()) {
         ASSERT_NOT_REACHED();

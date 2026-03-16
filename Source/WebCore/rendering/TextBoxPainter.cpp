@@ -803,40 +803,37 @@ static inline bool isDecoratingBoxForBackground(const InlineIterator::InlineBox&
         || (inlineBox.isRootInlineBox() && styleToUse.textDecorationLineInEffect().containsAny({ Style::TextDecorationLine::Flag::Underline, Style::TextDecorationLine::Flag::Overline }));
 }
 
-void TextBoxPainter::collectDecoratingBoxesForBackgroundPainting(DecoratingBoxList& decoratingBoxList, const InlineIterator::TextBoxIterator& textBox, FloatPoint textBoxLocation, const TextDecorationPainter::Styles& overrideDecorationStyle)
+void TextBoxPainter::collectDecoratingBoxesForBackgroundPainting(DecoratingBoxList& decoratingBoxList, const InlineIterator::TextBoxIterator& textBox, const FloatRect& textBoxRect, const TextDecorationPainter::Styles& overrideDecorationStyle)
 {
-    auto ancestorInlineBox = textBox->parentInlineBox();
-    if (!ancestorInlineBox) {
+    auto parentInlineBox = textBox->parentInlineBox();
+    if (!parentInlineBox) {
         ASSERT_NOT_REACHED();
         return;
     }
 
-    if (ancestorInlineBox->isRootInlineBox()) {
-        decoratingBoxList.append({ ancestorInlineBox, decoratingBoxStyleForInlineBox(*ancestorInlineBox, m_isFirstLine), overrideDecorationStyle, textBoxLocation });
+    auto textBoxLocation = textBoxRect.location();
+    auto decorationWidth = textBoxRect.width();
+    if (parentInlineBox->isRootInlineBox()) {
+        decoratingBoxList.append({ parentInlineBox, decoratingBoxStyleForInlineBox(*parentInlineBox, m_isFirstLine), overrideDecorationStyle, textBoxLocation, decorationWidth });
         return;
     }
 
     if (writingMode().isLineInverted()) {
         // FIXME: underlineOffsetForTextBoxPainting returns incorrect value for vertical-lr.
-        decoratingBoxList.append({ ancestorInlineBox, m_style.get(), overrideDecorationStyle, textBoxLocation });
+        decoratingBoxList.append({ parentInlineBox, m_style.get(), overrideDecorationStyle, textBoxLocation, decorationWidth });
         return;
     }
 
-    enum UseOverriderDecorationStyle : bool { No, Yes };
-    auto appendIfIsDecoratingBoxForBackground = [&] (auto& inlineBox, auto useOverriderDecorationStyle) {
+    auto appendIfIsDecoratingBoxForBackground = [&] (auto& inlineBox) {
         CheckedRef style = decoratingBoxStyleForInlineBox(*inlineBox, m_isFirstLine);
+        auto computedDecorationStyle = TextDecorationPainter::stylesForRenderer(inlineBox->renderer(), style->textDecorationLineInEffect(), m_isFirstLine);
+        auto isParentInlineBox = &inlineBox == &parentInlineBox;
 
-        auto computedDecorationStyle = [&] {
-            return TextDecorationPainter::stylesForRenderer(inlineBox->renderer(), style->textDecorationLineInEffect(), m_isFirstLine);
-        };
-        if (!isDecoratingBoxForBackground(*inlineBox, style)) {
-            // Some cases even non-decoration boxes may have some decoration pieces coming from the marked text (e.g. highlight).
-            if (useOverriderDecorationStyle == UseOverriderDecorationStyle::No || overrideDecorationStyle == computedDecorationStyle())
-                return;
-        }
+        // Some cases even non-decoration boxes may have some decoration pieces coming from the marked text (e.g. highlight).
+        if (!isDecoratingBoxForBackground(*inlineBox, style) && (!isParentInlineBox || overrideDecorationStyle == computedDecorationStyle))
+            return;
 
         auto decoratingBoxLocation = textBoxLocation;
-        auto parentInlineBox = textBox->parentInlineBox();
         // Normally text box top is aligned with the parent inline box top (i.e. textBox->logicalTop() == parentInlineBox->logicalTop()) but when inline box sides are trimmed (see: text-box property)
         // inline box gets an offset while text box does not.
         if (&inlineBox->renderer() != &parentInlineBox->renderer()) {
@@ -845,19 +842,22 @@ void TextBoxPainter::collectDecoratingBoxesForBackgroundPainting(DecoratingBoxLi
             decoratingBoxLocation.moveBy(FloatPoint { 0.f, decoratingBoxContentBoxTop - parentInlineBoxContentBoxTop + snap(textBoxEdgeAdjustmentForUnderline(parentInlineBox->style()), m_renderer) });
         } else
             decoratingBoxLocation.moveBy(FloatPoint { 0.f, snap(textBoxEdgeAdjustmentForUnderline(inlineBox->style()), m_renderer) });
-        auto& decorationStyleToUse = useOverriderDecorationStyle == UseOverriderDecorationStyle::Yes ? overrideDecorationStyle : computedDecorationStyle();
-        decoratingBoxList.append({ inlineBox, style, decorationStyleToUse, decoratingBoxLocation });
+
+        decoratingBoxList.append({
+            inlineBox,
+            style,
+            isParentInlineBox ? overrideDecorationStyle : computedDecorationStyle,
+            decoratingBoxLocation,
+            decorationWidth
+        });
     };
 
     // FIXME: Figure out if the decoration styles coming from the styled marked text should be used only on the closest inline box (direct parent).
-    appendIfIsDecoratingBoxForBackground(ancestorInlineBox, UseOverriderDecorationStyle::Yes);
-    while (!ancestorInlineBox->isRootInlineBox()) {
-        ancestorInlineBox = ancestorInlineBox->parentInlineBox();
-        if (!ancestorInlineBox) {
-            ASSERT_NOT_REACHED();
+    appendIfIsDecoratingBoxForBackground(parentInlineBox);
+    for (auto ancestorInlineBox = parentInlineBox->parentInlineBox(); ancestorInlineBox; ancestorInlineBox = ancestorInlineBox->parentInlineBox()) {
+        appendIfIsDecoratingBoxForBackground(ancestorInlineBox);
+        if (ancestorInlineBox->isRootInlineBox())
             break;
-        }
-        appendIfIsDecoratingBoxForBackground(ancestorInlineBox, UseOverriderDecorationStyle::No);
     }
 }
 
@@ -870,7 +870,7 @@ void TextBoxPainter::paintBackgroundDecorations(TextDecorationPainter& decoratio
 
     auto textBox = makeIterator();
     auto decoratingBoxList = DecoratingBoxList { };
-    collectDecoratingBoxesForBackgroundPainting(decoratingBoxList, textBox, textBoxPaintRect.location(), markedText.style.textDecorationStyles);
+    collectDecoratingBoxesForBackgroundPainting(decoratingBoxList, textBox, textBoxPaintRect, markedText.style.textDecorationStyles);
 
     for (auto& decoratingBox : decoratingBoxList | std::views::reverse) {
         auto computedTextDecorationType = WebCore::computedTextDecorationType(decoratingBox.style.get(), decoratingBox.textDecorationStyles);
@@ -896,7 +896,7 @@ void TextBoxPainter::paintBackgroundDecorations(TextDecorationPainter& decoratio
             return TextDecorationPainter::BackgroundDecorationGeometry {
                 textOriginFromPaintRect(textBoxPaintRect),
                 decoratingBox.location,
-                textBoxPaintRect.width(),
+                decoratingBox.contentWidth,
                 textDecorationThickness,
                 underlineOffset(),
                 overlineOffset(),

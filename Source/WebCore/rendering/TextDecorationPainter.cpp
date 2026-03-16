@@ -232,7 +232,7 @@ void TextDecorationPainter::paintBackgroundDecorations(const RenderStyle& style,
     auto boxOrigin = decorationGeometry.boxOrigin;
     bool clipping = m_shadow.size() > 1 && !areLinesOpaque;
     if (clipping) {
-        auto clipRect = FloatRect { boxOrigin, FloatSize { decorationGeometry.textBoxWidth, decorationGeometry.clippingOffset } };
+        auto clipRect = FloatRect { boxOrigin, FloatSize { decorationGeometry.width, decorationGeometry.clippingOffset } };
         const auto& zoomFactor = style.usedZoomForLength();
         for (const auto& shadow : m_shadow) {
             auto shadowExtent = Style::paintingExtent(shadow, zoomFactor);
@@ -250,7 +250,7 @@ void TextDecorationPainter::paintBackgroundDecorations(const RenderStyle& style,
     }
 
     // These decorations should match the visual overflows computed in visualOverflowForDecorations().
-    auto underlineRect = FloatRect { boxOrigin, FloatSize { decorationGeometry.textBoxWidth, decorationGeometry.textDecorationThickness } };
+    auto underlineRect = FloatRect { boxOrigin, FloatSize { decorationGeometry.width, decorationGeometry.textDecorationThickness } };
     auto overlineRect = underlineRect;
     if (decorationType.hasUnderline())
         underlineRect.move(0.f, decorationGeometry.underlineOffset);
@@ -266,7 +266,7 @@ void TextDecorationPainter::paintBackgroundDecorations(const RenderStyle& style,
         // which will be painted in paintForegroundDecorations().
         if (shadow && decorationType.hasLineThrough()) {
             auto paintOrigin = roundPointToDevicePixels(LayoutPoint { boxOrigin }, deviceScaleFactor, textRun.ltr());
-            paintLineThrough({ paintOrigin, decorationGeometry.textBoxWidth, decorationGeometry.textDecorationThickness, decorationGeometry.linethroughCenter, decorationGeometry.wavyStrokeParameters }, Color::transparentBlack, decorationStyle);
+            paintLineThrough({ paintOrigin, decorationGeometry.width, decorationGeometry.textDecorationThickness, decorationGeometry.linethroughCenter, decorationGeometry.wavyStrokeParameters }, Color::transparentBlack, decorationStyle);
         }
     };
 

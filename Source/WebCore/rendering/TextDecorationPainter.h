@@ -54,7 +54,7 @@ public:
     struct BackgroundDecorationGeometry {
         FloatPoint textOrigin;
         FloatPoint boxOrigin;
-        float textBoxWidth { 0.f };
+        float width { 0.f };
         float textDecorationThickness { 0.f };
         float underlineOffset { 0.f };
         float overlineOffset { 0.f };
