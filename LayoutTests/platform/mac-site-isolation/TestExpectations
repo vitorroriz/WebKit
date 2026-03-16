@@ -383,7 +383,6 @@ imported/w3c/web-platform-tests/websockets/back-forward-cache-with-closed-websoc
 imported/w3c/web-platform-tests/websockets/back-forward-cache-with-open-websocket-connection-and-close-it-in-pagehide.window.html [ Failure ]
 imported/w3c/web-platform-tests/websockets/back-forward-cache-with-open-websocket-connection-ccns.tentative.window.html [ Failure ]
 imported/w3c/web-platform-tests/websockets/back-forward-cache-with-open-websocket-connection.window.html [ Failure ]
-inspector/console/x-frame-options-message.html [ Failure ]
 inspector/dom/inspect-template-node.html [ Failure ]
 inspector/dom/inspect.html [ Failure ]
 inspector/dom/willDestroyDOMNode.html [ Failure ]
