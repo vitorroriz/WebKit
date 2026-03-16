@@ -3445,7 +3445,6 @@ svg/SVGAnimationElement.cpp
 svg/SVGCircleElement.cpp
 svg/SVGClipPathElement.cpp
 svg/SVGComponentTransferFunctionElement.cpp
-svg/SVGCursorElement.cpp
 svg/SVGDefsElement.cpp
 svg/SVGDescElement.cpp
 svg/SVGDocument.cpp

@@ -598,7 +598,6 @@ style/values/images/kinds/StylePaintImage.cpp
 style/values/primitives/StyleLengthResolution.cpp
 svg/SVGAElement.cpp
 svg/SVGClipPathElement.cpp
-svg/SVGCursorElement.cpp
 svg/SVGElement.cpp
 svg/SVGElement.h
 svg/SVGFEImageElement.cpp

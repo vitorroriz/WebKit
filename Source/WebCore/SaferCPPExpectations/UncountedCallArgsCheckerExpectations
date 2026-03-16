@@ -693,7 +693,6 @@ style/values/will-change/StyleWillChange.h
 svg/SVGAElement.cpp
 svg/SVGAltGlyphElement.cpp
 svg/SVGComponentTransferFunctionElement.cpp
-svg/SVGCursorElement.cpp
 svg/SVGElement.cpp
 svg/SVGElement.h
 svg/SVGFEColorMatrixElement.cpp

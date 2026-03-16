@@ -31,7 +31,6 @@
 namespace WebCore {
 
 class CSSCursorImageValue;
-class SVGCursorElement;
 class SVGElement;
 
 class SVGElementRareData {
