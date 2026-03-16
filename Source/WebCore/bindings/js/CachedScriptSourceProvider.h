@@ -52,7 +52,8 @@ public:
 
     JSC::CodeBlockHash codeBlockHashConcurrently(int startOffset, int endOffset, JSC::CodeSpecializationKind kind) override
     {
-        return protect(m_cachedScript)->codeBlockHashConcurrently(startOffset, endOffset, kind, isModuleType() ? CachedScript::ShouldDecodeAsUTF8Only::Yes : CachedScript::ShouldDecodeAsUTF8Only::No);
+        // We cannot protect m_cachedScript here since this function gets called on the GC thread.
+        SUPPRESS_UNCOUNTED_ARG return m_cachedScript->codeBlockHashConcurrently(startOffset, endOffset, kind, isModuleType() ? CachedScript::ShouldDecodeAsUTF8Only::Yes : CachedScript::ShouldDecodeAsUTF8Only::No);
     }
 
 private:
@@ -63,7 +64,7 @@ private:
         cachedScript->addClient(*this);
     }
 
-    CachedResourceHandle<CachedScript> m_cachedScript;
+    const CachedResourceHandle<CachedScript> m_cachedScript;
 };
 
 inline unsigned CachedScriptSourceProvider::hash() const
