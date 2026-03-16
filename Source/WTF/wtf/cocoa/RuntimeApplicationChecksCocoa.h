@@ -137,6 +137,8 @@ enum class SDKAlignedBehavior {
     NoHTMLEnhancedSelectParsingQuirk,
     DataURLForPastedImages,
     SuppressKeypressForModifierShortcuts,
+    DocumentBackgroundColorFromCanvas,
+
     NumberOfBehaviors
 };
 
