@@ -4644,6 +4644,9 @@ void ForNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
     RegisterID* forLoopSymbolTable = nullptr;
     generator.pushLexicalScope(this, BytecodeGenerator::ScopeType::LetConstScope, BytecodeGenerator::TDZCheckOptimization::Optimize, BytecodeGenerator::NestedScopeType::IsNested, &forLoopSymbolTable);
 
+    Ref<Label> loopEnd = generator.newLabel();
+    Label& conditionFalseTarget = usingDeclarationCount() ? loopEnd.get() : scope->breakTarget();
+
     auto emitLoopBody = [&](BytecodeGenerator& generator) {
         if (m_expr1) {
             generator.emitNodeInIgnoreResultPosition(m_expr1);
@@ -4653,7 +4656,7 @@ void ForNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
 
         Ref<Label> topOfLoop = generator.newLabel();
         if (m_expr2)
-            generator.emitNodeInConditionContext(m_expr2, topOfLoop.get(), scope->breakTarget(), FallThroughMeansTrue);
+            generator.emitNodeInConditionContext(m_expr2, topOfLoop.get(), conditionFalseTarget, FallThroughMeansTrue);
 
         generator.emitLabel(topOfLoop.get());
         generator.emitLoopHint();
@@ -4667,9 +4670,11 @@ void ForNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
             generator.emitNodeInIgnoreResultPosition(m_expr3);
 
         if (m_expr2)
-            generator.emitNodeInConditionContext(m_expr2, topOfLoop.get(), scope->breakTarget(), FallThroughMeansFalse);
+            generator.emitNodeInConditionContext(m_expr2, topOfLoop.get(), conditionFalseTarget, FallThroughMeansFalse);
         else
             generator.emitJump(topOfLoop.get());
+
+        generator.emitLabel(loopEnd.get());
     };
 
     generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(),
