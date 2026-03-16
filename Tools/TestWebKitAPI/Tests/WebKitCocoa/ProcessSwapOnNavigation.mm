@@ -1728,11 +1728,7 @@ TEST(ProcessSwap, ServerRedirectFromNewWebView)
 
     EXPECT_FALSE(serverRedirected);
     EXPECT_EQ(2, numberOfDecidePolicyCalls);
-
-    // Site Isolation currently swap process during cross-site redirect even though the process has not committed load.
-    // This might be changed if rdar://116203552 is fixed.
-    unsigned processCount = isSiteIsolationEnabled(webView.get()) ? 2u : 1u;
-    EXPECT_EQ(processCount, seenPIDs.size());
+    EXPECT_EQ(1u, seenPIDs.size());
 }
 
 TEST(ProcessSwap, ServerRedirect)
