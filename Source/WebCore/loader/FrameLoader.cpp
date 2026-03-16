@@ -1103,6 +1103,7 @@ bool FrameLoader::loadChildHistoryItemIntoFrame(LocalFrame& childFrame)
 {
     ASSERT(isBackForwardLoadType(loadType()));
     ASSERT(!m_frame->document()->loadEventFinished());
+    ASSERT(!m_frame->page() || !m_frame->page()->settings().useUIProcessForBackForwardItemLoading());
 
     RefPtr parentItem = history().currentItem();
     if (!parentItem || !parentItem->children().size())
@@ -4665,9 +4666,19 @@ void FrameLoader::loadItem(HistoryItem& item, HistoryItem* fromItem, FrameLoadTy
 void FrameLoader::setRequestedHistoryItem(HistoryItem& item)
 {
     Ref frame = m_frame.get();
+    ASSERT(!frame->page() || !frame->page()->settings().useUIProcessForBackForwardItemLoading() || item.children().isEmpty());
 
     item.setFrameID(frame->frameID());
     m_requestedHistoryItem = item;
+
+    // When UseUIProcessForBackForwardItemLoading is enabled, each child frame receives
+    // its HistoryItem individually from UIProcess. Add it to the parent's current
+    // HistoryItem so the tree structure matches what createItemTree would have produced
+    // during a normal navigation.
+    if (RefPtr parentFrame = dynamicDowncast<LocalFrame>(frame->tree().parent())) {
+        if (RefPtr parentItem = parentFrame->loader().history().currentItem())
+            parentItem->setChildItem(Ref { item });
+    }
 }
 
 void FrameLoader::setPendingAsyncBackForwardNavigation()

@@ -652,6 +652,7 @@ void WebFrame::setHistoryItemForBackForwardNavigation(const FrameState& frameSta
     // Build HistoryItem from FrameState
     Ref historyItemClient = page->historyItemClient();
     auto ignoreHistoryItemChangesForScope = historyItemClient->ignoreChangesForScope();
+    ASSERT(!page->corePage()->settings().useUIProcessForBackForwardItemLoading() || frameState.children.isEmpty());
     Ref historyItem = toHistoryItem(historyItemClient, protect(frameState));
 
     Ref frameLoader = localFrame->loader();

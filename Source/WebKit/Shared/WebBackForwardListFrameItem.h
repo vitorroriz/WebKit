@@ -46,6 +46,7 @@ public:
     FrameState& frameState() const { return m_frameState; }
     void setFrameState(Ref<FrameState>&&);
 
+    Ref<FrameState> copyFrameState();
     Ref<FrameState> copyFrameStateWithChildren();
 
     std::optional<WebCore::FrameIdentifier> NODELETE frameID() const;

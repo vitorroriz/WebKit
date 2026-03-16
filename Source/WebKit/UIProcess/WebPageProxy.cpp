@@ -1743,7 +1743,7 @@ RefPtr<API::Navigation> WebPageProxy::launchProcessForReload()
     auto publicSuffix = WebCore::PublicSuffixStore::singleton().publicSuffix(URL(currentItem->url()));
 
     // We allow stale content when reloading a WebProcess that's been killed or crashed.
-    send(Messages::WebPage::GoToBackForwardItem({ navigation->navigationID(), currentItem->copyMainFrameStateWithChildren(), FrameLoadType::IndexedBackForward, ShouldTreatAsContinuingLoad::No, std::nullopt, m_lastNavigationWasAppInitiated, std::nullopt, publicSuffix, { }, WebCore::ProcessSwapDisposition::None }));
+    send(Messages::WebPage::GoToBackForwardItem({ navigation->navigationID(), copyFrameStateForBackForwardNavigation(protect(currentItem->mainFrameItem())), FrameLoadType::IndexedBackForward, ShouldTreatAsContinuingLoad::No, std::nullopt, m_lastNavigationWasAppInitiated, std::nullopt, publicSuffix, { }, WebCore::ProcessSwapDisposition::None }));
 
     Ref legacyMainFrameProcess = m_legacyMainFrameProcess;
     legacyMainFrameProcess->startResponsivenessTimer();
@@ -2716,7 +2716,7 @@ RefPtr<API::Navigation> WebPageProxy::goToBackForwardItem(WebBackForwardListFram
 #endif
     }
 
-    Ref process = m_legacyMainFrameProcess;
+    Ref process = processForTheFrameItem(frameItem);
     Ref navigation = m_navigationState->createBackForwardNavigation(process->coreProcessIdentifier(), frameItem, protect(backForwardList().currentItem()), frameLoadType);
     Ref pageLoadState = internals().pageLoadState;
     auto transaction = pageLoadState->transaction();
@@ -2724,18 +2724,35 @@ RefPtr<API::Navigation> WebPageProxy::goToBackForwardItem(WebBackForwardListFram
 
     process->markProcessAsRecentlyUsed();
 
-    Ref frameState = item->copyMainFrameStateWithChildren();
-    if (protect(preferences())->siteIsolationEnabled()) {
-        if (RefPtr frame = WebFrameProxy::webFrame(frameItem.frameID()); frame && frame->page() == this) {
-            process = frame->process();
-            frameState = frameItem.copyFrameStateWithChildren();
-        }
-    }
     auto publicSuffix = WebCore::PublicSuffixStore::singleton().publicSuffix(URL(item->url()));
-    process->send(Messages::WebPage::GoToBackForwardItem({ navigation->navigationID(), WTF::move(frameState), frameLoadType, ShouldTreatAsContinuingLoad::No, std::nullopt, m_lastNavigationWasAppInitiated, std::nullopt, WTF::move(publicSuffix), { }, WebCore::ProcessSwapDisposition::None }), webPageIDInProcess(process));
+    process->send(Messages::WebPage::GoToBackForwardItem({ navigation->navigationID(), copyFrameStateForBackForwardNavigation(frameItem), frameLoadType, ShouldTreatAsContinuingLoad::No, std::nullopt, m_lastNavigationWasAppInitiated, std::nullopt, WTF::move(publicSuffix), { }, WebCore::ProcessSwapDisposition::None }), webPageIDInProcess(process));
     process->startResponsivenessTimer();
 
     return RefPtr<API::Navigation> { WTF::move(navigation) };
+}
+
+WebProcessProxy& WebPageProxy::processForTheFrameItem(WebBackForwardListFrameItem& frameItem) const
+{
+    if (protect(preferences())->siteIsolationEnabled()) {
+        if (RefPtr frame = WebFrameProxy::webFrame(frameItem.frameID()); frame && frame->page() == this)
+            return frame->process();
+    }
+
+    return m_legacyMainFrameProcess;
+}
+
+Ref<FrameState> WebPageProxy::copyFrameStateForBackForwardNavigation(WebBackForwardListFrameItem& frameItem) const
+{
+    auto frameItemForNavigation = [&]() -> Ref<WebBackForwardListFrameItem> {
+        if (protect(preferences())->siteIsolationEnabled()) {
+            if (RefPtr frame = WebFrameProxy::webFrame(frameItem.frameID()); frame && frame->page() == this)
+                return frameItem;
+        }
+        return frameItem.backForwardListItem()->mainFrameItem();
+    };
+
+    Ref targetFrameItem = frameItemForNavigation();
+    return protect(preferences())->useUIProcessForBackForwardItemLoading() ? targetFrameItem->copyFrameState() : targetFrameItem->copyFrameStateWithChildren();
 }
 
 void WebPageProxy::tryRestoreScrollPosition()

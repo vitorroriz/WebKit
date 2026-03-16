@@ -150,10 +150,16 @@ void WebBackForwardListFrameItem::updateFrameID(FrameIdentifier newFrameID)
     m_frameState->frameID = newFrameID;
 }
 
-Ref<FrameState> WebBackForwardListFrameItem::copyFrameStateWithChildren()
+Ref<FrameState> WebBackForwardListFrameItem::copyFrameState()
 {
     Ref frameState = protect(this->frameState())->copy();
     ASSERT(frameState->children.isEmpty());
+    return frameState;
+}
+
+Ref<FrameState> WebBackForwardListFrameItem::copyFrameStateWithChildren()
+{
+    Ref frameState = copyFrameState();
     for (auto& child : m_children)
         frameState->children.append(child->copyFrameStateWithChildren());
     return frameState;

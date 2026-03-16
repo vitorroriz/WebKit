@@ -3671,6 +3671,9 @@ private:
 
     Ref<BrowsingContextGroup> browsingContextGroupForNavigation(WebFrameProxy&, API::Navigation&, WebsiteDataStore&, ProcessSwapRequestedByClient);
 
+    WebProcessProxy& processForTheFrameItem(WebBackForwardListFrameItem&) const;
+    Ref<FrameState> copyFrameStateForBackForwardNavigation(WebBackForwardListFrameItem&) const;
+
     const UniqueRef<Internals> m_internals;
     Identifier m_identifier;
     WebCore::PageIdentifier m_webPageID;

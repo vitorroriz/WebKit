@@ -363,7 +363,7 @@ void ProvisionalPageProxy::goToBackForwardItem(API::Navigation& navigation, WebB
 
     SandboxExtension::Handle sandboxExtensionHandle;
     URL itemURL { item.url() };
-    Ref frameState = navigation.targetFrameItem() ? navigation.targetFrameItem()->copyFrameStateWithChildren() : item.copyMainFrameStateWithChildren();
+    Ref frameState = copyFrameStateForBackForwardNavigation(navigation, item);
     page->maybeInitializeSandboxExtensionHandle(process, itemURL, item.resourceDirectoryURL(), true, [
         weakThis = WeakPtr { *this },
         itemURL,
@@ -390,6 +390,16 @@ void ProvisionalPageProxy::goToBackForwardItem(API::Navigation& navigation, WebB
 
         protect(protectedThis->process())->startResponsivenessTimer();
     });
+}
+
+Ref<FrameState> ProvisionalPageProxy::copyFrameStateForBackForwardNavigation(API::Navigation& navigation, WebBackForwardListItem& item) const
+{
+    Ref frameItem = navigation.targetFrameItem() ? *navigation.targetFrameItem() : item.mainFrameItem();
+    if (RefPtr page = m_page.get()) {
+        if (protect(page->preferences())->useUIProcessForBackForwardItemLoading())
+            return frameItem->copyFrameState();
+    }
+    return frameItem->copyFrameStateWithChildren();
 }
 
 inline bool ProvisionalPageProxy::validateInput(FrameIdentifier frameID, const std::optional<WebCore::NavigationIdentifier>& navigationID)

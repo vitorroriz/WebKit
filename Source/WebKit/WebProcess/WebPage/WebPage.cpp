@@ -2453,6 +2453,7 @@ void WebPage::goToBackForwardItem(GoToBackForwardItemParameters&& parameters)
     RefPtr<HistoryItem> item;
     {
         auto ignoreHistoryItemChangesForScope = m_historyItemClient->ignoreChangesForScope();
+        ASSERT(!corePage()->settings().useUIProcessForBackForwardItemLoading() || parameters.frameState->children.isEmpty());
         item = toHistoryItem(m_historyItemClient, parameters.frameState);
         if (RefPtr localMainFrame = corePage()->localMainFrame(); localMainFrame && item)
             localMainFrame->loader().setNavigationUpgradeToHTTPSBehavior(item->url().protocolIs("http"_s) ? NavigationUpgradeToHTTPSBehavior::Disabled : NavigationUpgradeToHTTPSBehavior::BasedOnPolicy);
