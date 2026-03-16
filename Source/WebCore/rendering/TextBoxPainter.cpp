@@ -829,6 +829,11 @@ void TextBoxPainter::collectDecoratingBoxesForBackgroundPainting(DecoratingBoxLi
         auto computedDecorationStyle = TextDecorationPainter::stylesForRenderer(inlineBox->renderer(), style->textDecorationLineInEffect(), m_isFirstLine);
         auto isParentInlineBox = &inlineBox == &parentInlineBox;
 
+        if (inlineBox->isRubyBase()) {
+            decorationWidth = inlineBox->logicalWidth();
+            writingMode().isHorizontal() ? textBoxLocation.setX(m_paintOffset.x() + inlineBox->logicalLeft()) : textBoxLocation.setX(textBoxLocation.x() - (textBox->logicalLeft() - inlineBox->logicalLeft()));
+        }
+
         // Some cases even non-decoration boxes may have some decoration pieces coming from the marked text (e.g. highlight).
         if (!isDecoratingBoxForBackground(*inlineBox, style) && (!isParentInlineBox || overrideDecorationStyle == computedDecorationStyle))
             return;
