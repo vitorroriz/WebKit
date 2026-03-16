@@ -78,10 +78,10 @@ void notifyChildNodeInserted(ContainerNode& parentOfInsertedTree, Node& node, No
 {
     ASSERT(ScriptDisallowedScope::InMainThread::hasDisallowedScope());
 
-    InspectorInstrumentation::didInsertDOMNode(node.document(), node);
-
-    Ref protectDocument { node.document() };
+    Ref document { node.document() };
     Ref protectNode { node };
+
+    InspectorInstrumentation::didInsertDOMNode(document, node);
 
     // Tree scope has changed if the container node into which "node" is inserted is in a document or a shadow root.
     auto treeScopeChange = parentOfInsertedTree.isInTreeScope() ? TreeScopeChange::Changed : TreeScopeChange::DidNotChange;

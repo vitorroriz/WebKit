@@ -83,7 +83,6 @@ dom/BoundaryPoint.cpp
 dom/CollectionIndexCacheInlines.h
 dom/ComposedTreeIterator.h
 dom/ContainerNode.cpp
-dom/ContainerNodeAlgorithms.cpp
 dom/ContentVisibilityDocumentState.cpp
 dom/CurrentScriptIncrementer.h
 [ iOS ] dom/DataTransfer.cpp

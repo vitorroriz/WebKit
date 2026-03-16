@@ -264,8 +264,10 @@ template<typename Visitor>
 void CustomElementRegistry::visitJSCustomElementInterfacesInGCThread(Visitor& visitor) const
 {
     Locker locker { m_constructorMapLock };
-    for (const auto& iterator : m_constructorMap)
-        iterator.value->visitJSFunctionsInGCThread(visitor);
+    for (const auto& iterator : m_constructorMap) {
+        // Cannot ref iterator.value here since this may get called on a GC thread.
+        SUPPRESS_UNCOUNTED_ARG iterator.value->visitJSFunctionsInGCThread(visitor);
+    }
 }
 
 template void CustomElementRegistry::visitJSCustomElementInterfacesInGCThread(JSC::AbstractSlotVisitor&) const;

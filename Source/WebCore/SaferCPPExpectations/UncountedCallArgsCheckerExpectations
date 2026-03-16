@@ -204,11 +204,8 @@ dom/ChildListMutationScope.h
 dom/CollectionIndexCacheInlines.h
 dom/ComposedTreeIterator.h
 dom/ContainerNode.cpp
-dom/ContainerNodeAlgorithms.cpp
 dom/ContentVisibilityDocumentState.cpp
 dom/CurrentScriptIncrementer.h
-dom/CustomElementDefaultARIA.cpp
-dom/CustomElementRegistry.cpp
 dom/DataTransfer.cpp
 dom/Document.cpp
 dom/Element.cpp
@@ -218,7 +215,6 @@ dom/ElementIteratorInlines.h
 dom/EventPath.cpp
 dom/ExtensionStyleSheets.cpp
 dom/GCReachableRef.h
-dom/IdleCallbackController.cpp
 dom/ImageOverlay.cpp
 dom/InlineStyleSheetOwner.cpp
 dom/LiveNodeListInlines.h

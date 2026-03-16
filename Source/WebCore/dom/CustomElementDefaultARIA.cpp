@@ -93,7 +93,7 @@ RefPtr<Element> CustomElementDefaultARIA::elementForAttribute(const Element& thi
     RefPtr<Element> result;
     WTF::visit(WTF::makeVisitor([&](const AtomString& stringValue) {
         if (thisElement.isInTreeScope())
-            result = thisElement.treeScope().elementByIdResolvingReferenceTarget(stringValue);
+            result = protect(thisElement.treeScope())->elementByIdResolvingReferenceTarget(stringValue);
     }, [&](const WeakPtr<Element, WeakPtrImplWithEventTargetData>& weakElementValue) {
         RefPtr elementValue = weakElementValue.get();
         if (elementValue && isElementVisible(*elementValue, thisElement))
