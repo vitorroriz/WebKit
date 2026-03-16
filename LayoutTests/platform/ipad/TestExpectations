@@ -167,10 +167,6 @@ webkit.org/b/307451 imported/w3c/web-platform-tests/html/semantics/forms/the-sel
 
 # webkit.org/b/307469 4x fast/viewport/iOS tests are constant text failures on iPad
 fast/viewport/ios/viewport-fit-auto-safe-area-inset-change.html [ Failure ]
-fast/viewport/ios/shrink-to-fit-content-responsive-viewport-with-horizontal-overflow.html [ Failure ]
 fast/viewport/ios/shrink-to-fit-content-large-constant-width.html [ Failure ]
-fast/viewport/ios/shrink-to-fit-content-constant-width.html [ Failure ]
-
-webkit.org/b/307477 editing/selection/ios/scrolling-to-focused-element-inside-iframe.html [ Failure ]
 
 webkit.org/b/307488 media/volume-activate-audio-session.html [ Failure ]
