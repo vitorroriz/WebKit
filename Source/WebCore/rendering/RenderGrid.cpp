@@ -467,9 +467,9 @@ void RenderGrid::layoutGrid(RelayoutChildren relayoutChildren)
 
         auto aspectRatioBlockSizeDependentGridItems = computeAspectRatioDependentAndBaselineItems(gridLayoutState);
 
-        resetLogicalHeightBeforeLayoutIfNeeded();
-
         updateLogicalWidth();
+
+        resetLogicalHeightBeforeLayoutIfNeeded();
 
         if (layoutUsingGridFormattingContext())
             return;
@@ -605,14 +605,14 @@ void RenderGrid::layoutMasonry(RelayoutChildren relayoutChildren)
 
         auto aspectRatioBlockSizeDependentGridItems = computeAspectRatioDependentAndBaselineItems(gridLayoutState);
 
+        updateLogicalWidth();
+
         resetLogicalHeightBeforeLayoutIfNeeded();
 
         // Fieldsets need to find their legend and position it inside the border of the object.
         // The legend then gets skipped during normal layout. The same is true for ruby text.
         // It doesn't get included in the normal layout process but is instead skipped.
         layoutExcludedChildren(relayoutChildren);
-
-        updateLogicalWidth();
 
         LayoutUnit availableSpaceForColumns = contentBoxLogicalWidth();
         placeItemsOnGrid(availableSpaceForColumns);
