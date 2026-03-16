@@ -3493,13 +3493,16 @@ private:
                             }
                         }
 
-                        // Also try unary-specific patterns (REV, EXT).
+                        // General unary EXT (byte rotation): {k, k+1, ..., 15, 0, 1, ..., k-1}
+                        // Subsumes S64x2Reverse (which is EXT #8).
+                        if (auto offset = SIMDShuffle::isUnaryEXT(pattern)) {
+                            replaceWithNew<SIMDValue>(m_value->origin(), VectorExtractPair, B3::V128, SIMDLane::i8x16, SIMDSignMode::None, static_cast<uint8_t>(*offset), m_value->child(0), m_value->child(0));
+                            break;
+                        }
+
+                        // Also try unary-specific patterns (REV).
                         {
                             auto canonical = SIMDShuffle::tryMatchCanonicalUnary(pattern);
-                            if (canonical == CanonicalShuffle::S64x2Reverse) {
-                                replaceWithNew<SIMDValue>(m_value->origin(), VectorExtractPair, B3::V128, SIMDLane::i8x16, SIMDSignMode::None, static_cast<uint8_t>(8), m_value->child(0), m_value->child(0));
-                                break;
-                            }
                             if (auto info = canonicalShuffleInfo(canonical)) {
                                 if (info->opcode == VectorReverse) {
                                     replaceWithNew<SIMDValue>(m_value->origin(), info->opcode, B3::V128, info->lane, SIMDSignMode::None, info->groupSize, m_value->child(0));

@@ -95,7 +95,6 @@ private:
     // expose another composition opportunity.
     void composeShuffles()
     {
-        UseCountsWithoutUsingInstructions useCounts(m_proc);
         bool changed = true;
         unsigned iterations = 0;
         constexpr unsigned maxIterations = 4;
@@ -109,89 +108,111 @@ private:
                     Value* value = block->at(index);
                     if (value->opcode() != VectorSwizzle)
                         continue;
-                    if (value->numChildren() != 3)
-                        continue;
 
-                    Value* patternValue = value->child(2);
-                    if (!patternValue->isConstant())
-                        continue;
-
-                    v128_t outerPattern = patternValue->as<Const128Value>()->value();
-
-                    for (unsigned childIdx = 0; childIdx < 2; ++childIdx) {
-                        Value* inner = value->child(childIdx);
-                        // The inner must be a single-use unary VectorSwizzle with a constant pattern.
-                        if (inner->opcode() != VectorSwizzle)
-                            continue;
-                        if (inner->numChildren() != 2)
-                            continue;
-                        if (useCounts.numUses(inner) != 1)
-                            continue;
-                        if (!inner->child(1)->isConstant())
+                    if (value->numChildren() == 3) {
+                        Value* patternValue = value->child(2);
+                        if (!patternValue->hasV128())
                             continue;
 
-                        v128_t innerPattern = inner->child(1)->as<Const128Value>()->value();
-                        // Compose: for each output byte, chase through outer → inner patterns
-                        // to find the original source byte index.
-                        v128_t newPattern = SIMDShuffle::composeShuffle(outerPattern, innerPattern, childIdx == 0);
+                        v128_t outerPattern = patternValue->asV128();
 
-                        // After composition, the new shuffle reads from innerSrc (the inner's
-                        // original input) and other (the outer's other child).
-                        Value* innerSrc = inner->child(0);
-                        Value* other = value->child(1 - childIdx);
+                        for (unsigned childIdx = 0; childIdx < 2; ++childIdx) {
+                            Value* inner = value->child(childIdx);
+                            // The inner must be a unary VectorSwizzle with a constant pattern.
+                            if (inner->opcode() != VectorSwizzle)
+                                continue;
+                            if (inner->numChildren() != 2)
+                                continue;
+                            if (!inner->child(1)->hasV128())
+                                continue;
 
-                        // Maintain the convention: child(0) = newChild0, child(1) = newChild1.
-                        // If inner was child(0), innerSrc becomes newChild0 and other stays newChild1.
-                        // If inner was child(1), other stays newChild0 and innerSrc becomes newChild1.
-                        Value* newChild0;
-                        Value* newChild1;
-                        if (childIdx == 0) {
-                            newChild0 = innerSrc;
-                            newChild1 = other;
-                        } else {
-                            newChild0 = other;
-                            newChild1 = innerSrc;
-                        }
+                            v128_t innerPattern = inner->child(1)->asV128();
+                            // Compose: for each output byte, chase through outer → inner patterns
+                            // to find the original source byte index.
+                            v128_t newPattern = SIMDShuffle::composeShuffle(outerPattern, innerPattern, childIdx == 0);
 
-                        // If all composed indices reference only one side (0..15 or 16..31),
-                        // emit a 2-child unary shuffle instead of a 3-child binary shuffle.
-                        // This enables further optimizations like DUP detection in ReduceStrength.
-                        if (auto side = SIMDShuffle::isOnlyOneSideMask(newPattern)) {
-                            Value* src;
-                            v128_t unaryPattern = newPattern;
-                            if (*side == 0)
-                                src = newChild0;
-                            else {
-                                src = newChild1;
-                                for (unsigned i = 0; i < 16; ++i)
-                                    unaryPattern.u8x16[i] -= 16;
+                            // After composition, the new shuffle reads from innerSrc (the inner's
+                            // original input) and other (the outer's other child).
+                            Value* innerSrc = inner->child(0);
+                            Value* other = value->child(1 - childIdx);
+
+                            // Maintain the convention: child(0) = newChild0, child(1) = newChild1.
+                            // If inner was child(0), innerSrc becomes newChild0 and other stays newChild1.
+                            // If inner was child(1), other stays newChild0 and innerSrc becomes newChild1.
+                            Value* newChild0;
+                            Value* newChild1;
+                            if (childIdx == 0) {
+                                newChild0 = innerSrc;
+                                newChild1 = other;
+                            } else {
+                                newChild0 = other;
+                                newChild1 = innerSrc;
                             }
-                            Value* newPat = m_proc.addConstant(value->origin(), B3::V128, unaryPattern);
-                            m_insertionSet.insertValue(index, newPat);
-                            Value* newShuffle = m_insertionSet.insert<SIMDValue>(
-                                index, value->origin(), VectorSwizzle, B3::V128,
-                                SIMDLane::i8x16, SIMDSignMode::None, src, newPat);
-                            value->replaceWithIdentity(newShuffle);
-                        } else {
-                            Value* newPat = m_proc.addConstant(value->origin(), B3::V128, newPattern);
-                            m_insertionSet.insertValue(index, newPat);
-                            Value* newShuffle = m_insertionSet.insert<SIMDValue>(
-                                index, value->origin(), VectorSwizzle, B3::V128,
-                                SIMDLane::i8x16, SIMDSignMode::None, newChild0, newChild1, newPat);
-                            value->replaceWithIdentity(newShuffle);
+
+                            // If all composed indices reference only one side (0..15 or 16..31),
+                            // emit a 2-child unary shuffle instead of a 3-child binary shuffle.
+                            // This enables further optimizations like DUP detection in ReduceStrength.
+                            if (auto side = SIMDShuffle::isOnlyOneSideMask(newPattern)) {
+                                Value* src;
+                                v128_t unaryPattern = newPattern;
+                                if (*side == 0)
+                                    src = newChild0;
+                                else {
+                                    src = newChild1;
+                                    for (unsigned i = 0; i < 16; ++i)
+                                        unaryPattern.u8x16[i] -= 16;
+                                }
+                                Value* newPat = m_proc.addConstant(value->origin(), B3::V128, unaryPattern);
+                                m_insertionSet.insertValue(index, newPat);
+                                Value* newShuffle = m_insertionSet.insert<SIMDValue>(
+                                    index, value->origin(), VectorSwizzle, B3::V128,
+                                    SIMDLane::i8x16, SIMDSignMode::None, src, newPat);
+                                value->replaceWithIdentity(newShuffle);
+                            } else {
+                                Value* newPat = m_proc.addConstant(value->origin(), B3::V128, newPattern);
+                                m_insertionSet.insertValue(index, newPat);
+                                Value* newShuffle = m_insertionSet.insert<SIMDValue>(
+                                    index, value->origin(), VectorSwizzle, B3::V128,
+                                    SIMDLane::i8x16, SIMDSignMode::None, newChild0, newChild1, newPat);
+                                value->replaceWithIdentity(newShuffle);
+                            }
+
+                            changed = true;
+                            dataLogLnIf(B3ReduceSIMDShuffleInternal::verbose, "Composed shuffle: ", *value);
+                            break;
                         }
 
+                        continue;
+                    }
+
+                    if (value->numChildren() == 2) {
+                        if (!value->child(1)->hasV128())
+                            continue;
+
+                        Value* inner = value->child(0);
+                        if (inner->opcode() != VectorSwizzle || inner->numChildren() != 2)
+                            continue;
+                        if (!inner->child(1)->hasV128())
+                            continue;
+
+                        v128_t outerPat = value->child(1)->asV128();
+                        v128_t innerPat = inner->child(1)->asV128();
+                        v128_t composed = SIMDShuffle::composeUnaryShuffle(outerPat, innerPat);
+
+                        Value* newPat = m_proc.addConstant(value->origin(), B3::V128, composed);
+                        m_insertionSet.insertValue(index, newPat);
+                        Value* newShuffle = m_insertionSet.insert<SIMDValue>(
+                            index, value->origin(), VectorSwizzle, B3::V128,
+                            SIMDLane::i8x16, SIMDSignMode::None, inner->child(0), newPat);
+                        value->replaceWithIdentity(newShuffle);
                         changed = true;
-                        dataLogLnIf(B3ReduceSIMDShuffleInternal::verbose, "Composed shuffle: ", *value);
-                        break;
+                        dataLogLnIf(B3ReduceSIMDShuffleInternal::verbose, "Composed unary shuffle: ", *value);
+                        continue;
                     }
                 }
 
                 m_insertionSet.execute(block);
             }
-
-            if (changed)
-                useCounts = UseCountsWithoutUsingInstructions(m_proc);
         }
     }
 

@@ -1165,6 +1165,8 @@ void run(const TestConfig* config)
             RUN(testVectorCanonicalSameInputFolding());
             RUN(testVectorSwizzleToDupElement());
             RUN(testVectorSwizzleComposition());
+            RUN(testVectorSwizzleUnaryComposition());
+            RUN(testVectorSwizzleCompositionMultiUse());
         }
         RUN(testMulHigh32());
         RUN(testMulHigh64());

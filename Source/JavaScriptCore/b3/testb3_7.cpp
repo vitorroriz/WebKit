@@ -3939,16 +3939,18 @@ void testVectorSwizzleUnaryToEXT()
     if constexpr (!isARM64())
         return;
 
-    // S64x2 reverse = swap 64-bit halves = EXT #8 with same register
-    // Pattern: {8,9,10,11,12,13,14,15, 0,1,2,3,4,5,6,7}
     v128_t v;
     for (unsigned i = 0; i < 16; ++i) v.u8x16[i] = i;
-    {
-        const uint8_t pat[] = { 8,9,10,11,12,13,14,15, 0,1,2,3,4,5,6,7 };
+
+    // Test all 15 rotation offsets (EXT #1 through #15).
+    for (unsigned offset = 1; offset <= 15; ++offset) {
+        uint8_t pat[16];
         v128_t exp;
-        for (unsigned i = 0; i < 8; ++i) exp.u8x16[i] = 8 + i;
-        for (unsigned i = 0; i < 8; ++i) exp.u8x16[8 + i] = i;
-        testUnarySwizzlePattern("S64x2Reverse → EXT #8", pat, v, exp);
+        for (unsigned i = 0; i < 16; ++i) {
+            pat[i] = (offset + i) % 16;
+            exp.u8x16[i] = (offset + i) % 16;
+        }
+        testUnarySwizzlePattern("Unary EXT", pat, v, exp);
     }
 }
 
@@ -4460,6 +4462,125 @@ void testVectorSwizzleComposition()
     CHECK(vectors[2].u8x16[13] == 6);
     CHECK(vectors[2].u8x16[14] == 5);
     CHECK(vectors[2].u8x16[15] == 4);
+}
+
+void testVectorSwizzleUnaryComposition()
+{
+    if constexpr (!isARM64())
+        return;
+
+    // Compose two chained unary rotations: EXT4(EXT4(x)) = EXT8(x).
+    // inner = VectorSwizzle(input, rotate4Pattern)
+    // outer = VectorSwizzle(inner, rotate4Pattern)
+    // After composition, this should be a single rotation by 8.
+
+    alignas(16) v128_t vectors[2];
+    Procedure proc;
+    BasicBlock* root = proc.addBlock();
+    auto arguments = cCallArgumentValues<void*>(proc, root);
+    Value* address = arguments[0];
+    Value* input = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address);
+
+    // Rotate by 4: {4,5,...,15,0,1,2,3}
+    v128_t rotate4;
+    for (unsigned i = 0; i < 16; ++i)
+        rotate4.u8x16[i] = (4 + i) % 16;
+    Value* rotate4Const = root->appendNew<Const128Value>(proc, Origin(), rotate4);
+
+    Value* inner = root->appendNew<SIMDValue>(proc, Origin(), VectorSwizzle, B3::V128, SIMDLane::i8x16, SIMDSignMode::None, input, rotate4Const);
+    Value* rotate4Const2 = root->appendNew<Const128Value>(proc, Origin(), rotate4);
+    Value* outer = root->appendNew<SIMDValue>(proc, Origin(), VectorSwizzle, B3::V128, SIMDLane::i8x16, SIMDSignMode::None, inner, rotate4Const2);
+
+    root->appendNew<MemoryValue>(proc, Store, Origin(), outer, address, static_cast<int32_t>(sizeof(v128_t)));
+    root->appendNewControlValue(proc, Return, Origin());
+
+    auto code = compileProc(proc);
+    for (unsigned i = 0; i < 16; ++i) vectors[0].u8x16[i] = i;
+    invoke<void>(*code, vectors);
+
+    // Expected: rotation by 8 → {8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7}
+    for (unsigned i = 0; i < 16; ++i)
+        CHECK(vectors[1].u8x16[i] == ((8 + i) % 16));
+}
+
+void testVectorSwizzleCompositionMultiUse()
+{
+    if constexpr (!isARM64())
+        return;
+
+    // Test that composition works when inner has multiple consumers.
+    // inner = VectorSwizzle(src, rev32Pattern)  (used by both outer shuffles)
+    // outer1 = VectorSwizzle(other, inner, concatPattern)
+    // outer2 = VectorSwizzle(inner, other, concatPattern2)
+
+    alignas(16) v128_t vectors[4];
+    Procedure proc;
+    BasicBlock* root = proc.addBlock();
+    auto arguments = cCallArgumentValues<void*>(proc, root);
+    Value* address = arguments[0];
+    Value* src = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address);
+    Value* other = root->appendNew<MemoryValue>(proc, Load, V128, Origin(), address, static_cast<int32_t>(sizeof(v128_t)));
+
+    // Inner: reverse bytes within 32-bit groups
+    v128_t innerPat;
+    for (unsigned i = 0; i < 16; i += 4) {
+        innerPat.u8x16[i] = i + 3;
+        innerPat.u8x16[i + 1] = i + 2;
+        innerPat.u8x16[i + 2] = i + 1;
+        innerPat.u8x16[i + 3] = i;
+    }
+    Value* innerPatConst = root->appendNew<Const128Value>(proc, Origin(), innerPat);
+    Value* inner = root->appendNew<SIMDValue>(proc, Origin(), VectorSwizzle, B3::V128, SIMDLane::i8x16, SIMDSignMode::None, src, innerPatConst);
+
+    // outer1 = binary shuffle(other, inner): take lo64 from other, hi64 from inner
+    // Pattern: {0..7 from child0, 24..31 from child1}
+    v128_t outerPat1;
+    for (unsigned i = 0; i < 8; ++i) outerPat1.u8x16[i] = i;         // child0[0..7]
+    for (unsigned i = 0; i < 8; ++i) outerPat1.u8x16[8 + i] = 24 + i; // child1[8..15]
+    Value* outerPatConst1 = root->appendNew<Const128Value>(proc, Origin(), outerPat1);
+    Value* outer1 = root->appendNew<SIMDValue>(proc, Origin(), VectorSwizzle, B3::V128, SIMDLane::i8x16, SIMDSignMode::None, other, inner, outerPatConst1);
+
+    // outer2 = binary shuffle(inner, other): take lo64 from inner, hi64 from other
+    v128_t outerPat2;
+    for (unsigned i = 0; i < 8; ++i) outerPat2.u8x16[i] = i;           // child0[0..7] = inner[0..7]
+    for (unsigned i = 0; i < 8; ++i) outerPat2.u8x16[8 + i] = 24 + i;  // child1[8..15] = other[8..15]
+    Value* outerPatConst2 = root->appendNew<Const128Value>(proc, Origin(), outerPat2);
+    Value* outer2 = root->appendNew<SIMDValue>(proc, Origin(), VectorSwizzle, B3::V128, SIMDLane::i8x16, SIMDSignMode::None, inner, other, outerPatConst2);
+
+    root->appendNew<MemoryValue>(proc, Store, Origin(), outer1, address, static_cast<int32_t>(2 * sizeof(v128_t)));
+    root->appendNew<MemoryValue>(proc, Store, Origin(), outer2, address, static_cast<int32_t>(3 * sizeof(v128_t)));
+    root->appendNewControlValue(proc, Return, Origin());
+
+    auto code = compileProc(proc);
+    for (unsigned i = 0; i < 16; ++i) vectors[0].u8x16[i] = i;        // src
+    for (unsigned i = 0; i < 16; ++i) vectors[1].u8x16[i] = 0x80 + i;  // other
+    invoke<void>(*code, vectors);
+
+    // outer1: {other[0..7], rev32(src)[8..15]}
+    for (unsigned i = 0; i < 8; ++i)
+        CHECK(vectors[2].u8x16[i] == 0x80 + i);
+    // rev32(src)[8..15] = {11,10,9,8, 15,14,13,12}
+    CHECK(vectors[2].u8x16[8] == 11);
+    CHECK(vectors[2].u8x16[9] == 10);
+    CHECK(vectors[2].u8x16[10] == 9);
+    CHECK(vectors[2].u8x16[11] == 8);
+    CHECK(vectors[2].u8x16[12] == 15);
+    CHECK(vectors[2].u8x16[13] == 14);
+    CHECK(vectors[2].u8x16[14] == 13);
+    CHECK(vectors[2].u8x16[15] == 12);
+
+    // outer2: {rev32(src)[0..7], other[8..15]}
+    // rev32(src)[0..7] = {3,2,1,0, 7,6,5,4}
+    CHECK(vectors[3].u8x16[0] == 3);
+    CHECK(vectors[3].u8x16[1] == 2);
+    CHECK(vectors[3].u8x16[2] == 1);
+    CHECK(vectors[3].u8x16[3] == 0);
+    CHECK(vectors[3].u8x16[4] == 7);
+    CHECK(vectors[3].u8x16[5] == 6);
+    CHECK(vectors[3].u8x16[6] == 5);
+    CHECK(vectors[3].u8x16[7] == 4);
+    for (unsigned i = 8; i < 16; ++i)
+        CHECK(vectors[3].u8x16[i] == 0x80 + i);
 }
 
 #endif // ENABLE(B3_JIT)

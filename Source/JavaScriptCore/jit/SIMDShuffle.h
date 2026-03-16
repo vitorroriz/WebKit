@@ -204,6 +204,21 @@ public:
         return true;
     }
 
+    // Detect unary EXT (byte rotation) pattern.
+    // Returns offset if pattern[i] == (offset + i) % 16 for all i,
+    // with offset in [1, 15]. Offset 0 is identity (handled separately).
+    static std::optional<uint8_t> isUnaryEXT(v128_t pattern)
+    {
+        uint8_t first = pattern.u8x16[0];
+        if (first == 0 || first >= 16)
+            return std::nullopt;
+        for (unsigned i = 1; i < 16; ++i) {
+            if (pattern.u8x16[i] != ((first + i) % 16))
+                return std::nullopt;
+        }
+        return first;
+    }
+
     // Detect EXT (byte extraction / concatenation) pattern for binary shuffle.
     // Returns the byte offset if the pattern is {offset, offset+1, ..., 31, 0, 1, ...}
     // i.e., pattern[i] == (offset + i) % 32 for some offset in [0, 15].
@@ -276,6 +291,22 @@ public:
             return CanonicalShuffle::S64x2Reverse;
 
         return CanonicalShuffle::Unknown;
+    }
+
+    // Compose two unary shuffles: outer(inner(x)) → combined(x).
+    // Both patterns have indices in 0..15 (or OOB >= 16).
+    static v128_t composeUnaryShuffle(v128_t outerPattern, v128_t innerPattern)
+    {
+        v128_t result;
+        for (unsigned i = 0; i < 16; ++i) {
+            uint8_t outerIdx = outerPattern.u8x16[i];
+            if (outerIdx >= 16) {
+                result.u8x16[i] = 0xFF; // OOB
+                continue;
+            }
+            result.u8x16[i] = innerPattern.u8x16[outerIdx];
+        }
+        return result;
     }
 
     // Compose an outer shuffle with an inner shuffle.

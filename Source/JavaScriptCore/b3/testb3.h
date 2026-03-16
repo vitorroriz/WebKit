@@ -1533,5 +1533,7 @@ void testVectorSwizzleUnaryToEXT();
 void testVectorCanonicalSameInputFolding();
 void testVectorSwizzleToDupElement();
 void testVectorSwizzleComposition();
+void testVectorSwizzleUnaryComposition();
+void testVectorSwizzleCompositionMultiUse();
 
 #endif // ENABLE(B3_JIT)
