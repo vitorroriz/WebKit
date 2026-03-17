@@ -3041,6 +3041,8 @@ imported/w3c/web-platform-tests/webrtc/simulcast/setParameters-active.https.html
 # Instead it should create one outbound-rtp stat structure per configured rid.
 imported/w3c/web-platform-tests/webrtc/simulcast/getStats.https.html [ Failure ]
 
+webkit.org/b/310095 imported/w3c/web-platform-tests/webrtc/simulcast/screenshare.https.html [ Pass Failure ]
+
 # This test expects the backend to not fill codecs encoding parameters, which we do, at least in the
 # GstWebRTC backend case.
 webrtc/video-getParameters.html [ Failure ]
@@ -3507,6 +3509,8 @@ webkit.org/b/131546 media/track/track-forced-subtitles-in-band.html [ Timeout Fa
 media/track/track-in-band-chapters.html [ Timeout Failure ]
 media/track/track-in-band-layout.html [ Skip ]
 media/track/track-paint-on-captions.html [ Skip ]
+
+webkit.org/b/230070 media/track/track-cue-css.html [ Pass Timeout ]
 
 # ENABLE(WEBVTT_REGIONS) is disabled
 webkit.org/b/109570 media/track/regions-webvtt [ Skip ]

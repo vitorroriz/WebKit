@@ -145,6 +145,9 @@ webkit.org/b/308362 [ Debug ] webrtc/processIceTransportStateChange-gc.html [ Pa
 
 webkit.org/b/305553 fast/selectors/selection-window-inactive-stroke-color.html [ ImageOnlyFailure ]
 
+# This test constantly fails in EWS but passes in post-commit bots, so skip it.
+fast/selectors/selection-window-inactive-text-shadow.html [ Skip ]
+
 #//////////////////////////////////////////////////////////////////////////////////////////
 # End of Triaged Expectations
 # Legacy Expectations sections below
