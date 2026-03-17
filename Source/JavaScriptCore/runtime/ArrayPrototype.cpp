@@ -1436,7 +1436,7 @@ static JSArray* concatAppendOne(JSGlobalObject* globalObject, VM& vm, JSArray* f
     auto scope = DECLARE_THROW_SCOPE(vm);
 
     ASSERT(!isJSArray(second));
-    ASSERT(!shouldUseSlowPut(first->indexingType()));
+    ASSERT(!first->mayInterceptIndexedAccesses());
     Butterfly* firstButterfly = first->butterfly();
     unsigned firstArraySize = firstButterfly->publicLength();
 
@@ -1604,7 +1604,7 @@ JSC_DEFINE_HOST_FUNCTION(arrayProtoFuncConcat, (JSGlobalObject* globalObject, Ca
                 // This code assumes that neither array has set Symbol.isConcatSpreadable. If the first array
                 // has indexed accessors then one of those accessors might change the value of Symbol.isConcatSpreadable
                 // on the second argument.
-                if (!shouldUseSlowPut(firstArray->indexingType())) [[likely]] {
+                if (!firstArray->mayInterceptIndexedAccesses()) [[likely]] {
                     if (!argumentValue.isObject()) {
                         auto* result = concatAppendOne(globalObject, vm, firstArray, argumentValue);
                         RETURN_IF_EXCEPTION(scope, { });
