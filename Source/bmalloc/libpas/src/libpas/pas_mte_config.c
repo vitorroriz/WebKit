@@ -176,15 +176,13 @@ static void pas_mte_do_initialization(void)
             pas_mte_force_nontaggable_user_allocations_into_large_heap();
         } else {
             *medium_byte = 0;
+            *hardened_byte = 0;
 #if !PAS_USE_MTE_IN_WEBCONTENT
             // Disable tagging in libpas by default in WebContent process
             *enabled_byte = 0;
 #else
             *enabled_byte = 1;
 #endif
-            *hardened_byte = 0;
-            // FIXME: rdar://159974195
-            bmalloc_common_primitive_heap.is_non_compact_heap = false;
         }
 
 #ifndef NDEBUG
