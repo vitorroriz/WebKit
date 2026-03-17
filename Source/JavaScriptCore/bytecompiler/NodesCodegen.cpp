@@ -4125,6 +4125,7 @@ static InitializationMode initializationModeForAssignmentContext(AssignmentConte
         return InitializationMode::Initialization;
     case AssignmentContext::ConstDeclarationStatement:
     case AssignmentContext::UsingDeclarationStatement:
+    case AssignmentContext::AwaitUsingDeclarationStatement:
         return InitializationMode::ConstInitialization;
     case AssignmentContext::AssignmentExpression:
         return InitializationMode::NotInitialization;
@@ -4134,10 +4135,15 @@ static InitializationMode initializationModeForAssignmentContext(AssignmentConte
     return InitializationMode::NotInitialization;
 }
 
+static inline bool isUsingOrAwaitUsingAssignmentContext(AssignmentContext context)
+{
+    return context == AssignmentContext::UsingDeclarationStatement || context == AssignmentContext::AwaitUsingDeclarationStatement;
+}
+
 RegisterID* AssignResolveNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
 {
     Variable var = generator.variable(m_ident);
-    bool isReadOnly = var.isReadOnly() && m_assignmentContext != AssignmentContext::ConstDeclarationStatement && m_assignmentContext != AssignmentContext::UsingDeclarationStatement;
+    bool isReadOnly = var.isReadOnly() && m_assignmentContext != AssignmentContext::ConstDeclarationStatement && !isUsingOrAwaitUsingAssignmentContext(m_assignmentContext);
     JSTextPosition newDivot = divotStart() + m_ident.length();
     if (RegisterID* local = var.local()) {
         RegisterID* result = nullptr;
@@ -4170,10 +4176,10 @@ RegisterID* AssignResolveNode::emitBytecode(BytecodeGenerator& generator, Regist
             result = generator.move(dst, right);
         }
 
-        if (m_assignmentContext == AssignmentContext::UsingDeclarationStatement)
-            generator.emitPrepareDisposable(local, divotStart());
+        if (isUsingOrAwaitUsingAssignmentContext(m_assignmentContext))
+            generator.emitPrepareDisposable(local, divotStart(), m_assignmentContext == AssignmentContext::AwaitUsingDeclarationStatement);
 
-        if (m_assignmentContext == AssignmentContext::DeclarationStatement || m_assignmentContext == AssignmentContext::ConstDeclarationStatement || m_assignmentContext == AssignmentContext::UsingDeclarationStatement)
+        if (m_assignmentContext != AssignmentContext::AssignmentExpression)
             generator.liftTDZCheckIfPossible(var);
         return result;
     }
@@ -4200,10 +4206,10 @@ RegisterID* AssignResolveNode::emitBytecode(BytecodeGenerator& generator, Regist
         generator.emitProfileType(result.get(), var, divotStart(), divotEnd());
     }
 
-    if (m_assignmentContext == AssignmentContext::UsingDeclarationStatement)
-        generator.emitPrepareDisposable(result.get(), divotStart());
+    if (isUsingOrAwaitUsingAssignmentContext(m_assignmentContext))
+        generator.emitPrepareDisposable(result.get(), divotStart(), m_assignmentContext == AssignmentContext::AwaitUsingDeclarationStatement);
 
-    if (m_assignmentContext == AssignmentContext::DeclarationStatement || m_assignmentContext == AssignmentContext::ConstDeclarationStatement || m_assignmentContext == AssignmentContext::UsingDeclarationStatement)
+    if (m_assignmentContext != AssignmentContext::AssignmentExpression)
         generator.liftTDZCheckIfPossible(var);
     return returnResult;
 }
@@ -4426,7 +4432,7 @@ void BlockNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
         return;
     generator.pushLexicalScope(this, BytecodeGenerator::ScopeType::LetConstScope, BytecodeGenerator::TDZCheckOptimization::Optimize, BytecodeGenerator::NestedScopeType::IsNested);
 
-    generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(),
+    generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(), hasAwaitUsingDeclaration(),
         scopedLambda<void(BytecodeGenerator&)>([&](BytecodeGenerator& generator) {
             m_statements->emitBytecode(generator, dst);
         })
@@ -4677,7 +4683,7 @@ void ForNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
         generator.emitLabel(loopEnd.get());
     };
 
-    generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(),
+    generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(), hasAwaitUsingDeclaration(),
         scopedLambda<void(BytecodeGenerator&)>([&](BytecodeGenerator& generator) {
             emitLoopBody(generator);
         })
@@ -4873,7 +4879,8 @@ void ForOfNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
     RegisterID* forLoopSymbolTable = nullptr;
     generator.pushLexicalScope(this, BytecodeGenerator::ScopeType::LetConstScope, BytecodeGenerator::TDZCheckOptimization::Optimize, BytecodeGenerator::NestedScopeType::IsNested, &forLoopSymbolTable);
     bool isUsingDeclaration = hasUsingDeclaration();
-    auto extractor = scopedLambda<void(BytecodeGenerator&, RegisterID*)>([this, dst, isUsingDeclaration](BytecodeGenerator& generator, RegisterID* value)
+    bool isAwaitUsingDeclaration = hasAwaitUsingDeclaration();
+    auto extractor = scopedLambda<void(BytecodeGenerator&, RegisterID*)>([this, dst, isUsingDeclaration, isAwaitUsingDeclaration](BytecodeGenerator& generator, RegisterID* value)
     {
         auto emitBody = [&](BytecodeGenerator& generator) {
             if (m_lexpr->isResolveNode()) {
@@ -4894,7 +4901,7 @@ void ForOfNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
                 }
                 generator.emitProfileType(value, var, m_lexpr->position(), m_lexpr->position() + ident.length());
                 if (isUsingDeclaration)
-                    generator.emitPrepareDisposable(value, divotStart());
+                    generator.emitPrepareDisposable(value, divotStart(), isAwaitUsingDeclaration);
             } else if (m_lexpr->isDotAccessorNode()) {
                 DotAccessorNode* assignNode = static_cast<DotAccessorNode*>(m_lexpr);
                 RefPtr<RegisterID> base = generator.emitNode(assignNode->base());
@@ -4922,7 +4929,7 @@ void ForOfNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
             generator.emitNode(dst, m_statement);
         };
 
-        generator.emitBodyWithUsingIfNeeded(isUsingDeclaration ? 1 : 0,
+        generator.emitBodyWithUsingIfNeeded(isUsingDeclaration ? 1 : 0, isAwaitUsingDeclaration,
             scopedLambda<void(BytecodeGenerator&)>([&](BytecodeGenerator& generator) {
                 emitBody(generator);
             })
@@ -5212,7 +5219,7 @@ void SwitchNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
 
     generator.pushLexicalScope(this, BytecodeGenerator::ScopeType::LetConstScope, BytecodeGenerator::TDZCheckOptimization::DoNotOptimize, BytecodeGenerator::NestedScopeType::IsNested);
 
-    generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(),
+    generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(), hasAwaitUsingDeclaration(),
         scopedLambda<void(BytecodeGenerator&)>([&](BytecodeGenerator& generator) {
             m_block->emitBytecodeForBlock(generator, r0.get(), dst);
         })
@@ -5408,7 +5415,7 @@ static void emitProgramNodeBytecode(BytecodeGenerator& generator, ScopeNode& sco
     generator.emitLoad(dstRegister.get(), jsUndefined());
     generator.emitProfileControlFlow(scopeNode.startStartOffset());
 
-    generator.emitBodyWithUsingIfNeeded(scopeNode.usingDeclarationCount(),
+    generator.emitBodyWithUsingIfNeeded(scopeNode.usingDeclarationCount(), scopeNode.hasAwaitUsingDeclaration(),
         scopedLambda<void(BytecodeGenerator&)>([&](BytecodeGenerator& generator) {
             scopeNode.emitStatementsBytecode(generator, dstRegister.get());
         })
@@ -5441,7 +5448,7 @@ void EvalNode::emitBytecode(BytecodeGenerator& generator, RegisterID*)
     RefPtr<RegisterID> dstRegister = generator.newTemporary();
     generator.emitLoad(dstRegister.get(), jsUndefined());
 
-    generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(),
+    generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(), hasAwaitUsingDeclaration(),
         scopedLambda<void(BytecodeGenerator&)>([&](BytecodeGenerator& generator) {
             emitStatementsBytecode(generator, dstRegister.get());
         })
@@ -5540,7 +5547,7 @@ void FunctionNode::emitBytecode(BytecodeGenerator& generator, RegisterID*)
             Ref<Label> catchLabel = generator.newLabel();
             Ref<Label> tryStartLabel = generator.newEmittedLabel();
             TryData* tryData = generator.pushTry(tryStartLabel.get(), catchLabel.get(), HandlerType::Catch);
-            generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(),
+            generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(), hasAwaitUsingDeclaration(),
                 scopedLambda<void(BytecodeGenerator&)>([&](BytecodeGenerator& generator) {
                     emitStatementsBytecode(generator, generator.ignoredResult());
                 })
@@ -5710,7 +5717,7 @@ void FunctionNode::emitBytecode(BytecodeGenerator& generator, RegisterID*)
 
     case SourceParseMode::AsyncArrowFunctionBodyMode:
     case SourceParseMode::AsyncFunctionBodyMode: {
-        generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(),
+        generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(), hasAwaitUsingDeclaration(),
             scopedLambda<void(BytecodeGenerator&)>([&](BytecodeGenerator& generator) {
                 emitStatementsBytecode(generator, generator.ignoredResult());
             })
@@ -5721,7 +5728,7 @@ void FunctionNode::emitBytecode(BytecodeGenerator& generator, RegisterID*)
     }
 
     default: {
-        generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(),
+        generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(), hasAwaitUsingDeclaration(),
             scopedLambda<void(BytecodeGenerator&)>([&](BytecodeGenerator& generator) {
                 emitStatementsBytecode(generator, generator.ignoredResult());
             })
@@ -6444,7 +6451,7 @@ void BindingNode::finishDirectBindingAssignment(BytecodeGenerator& generator) co
 void BindingNode::bindValue(BytecodeGenerator& generator, RegisterID* value) const
 {
     Variable var = generator.variable(m_boundProperty);
-    bool isReadOnly = var.isReadOnly() && m_bindingContext != AssignmentContext::ConstDeclarationStatement && m_bindingContext != AssignmentContext::UsingDeclarationStatement;
+    bool isReadOnly = var.isReadOnly() && m_bindingContext != AssignmentContext::ConstDeclarationStatement && !isUsingOrAwaitUsingAssignmentContext(m_bindingContext);
     if (RegisterID* local = var.local()) {
         if (m_bindingContext == AssignmentContext::AssignmentExpression)
             generator.emitTDZCheckIfNecessary(var, local, nullptr);
@@ -6454,9 +6461,9 @@ void BindingNode::bindValue(BytecodeGenerator& generator, RegisterID* value) con
         }
         generator.move(local, value);
         generator.emitProfileType(local, var, divotStart(), divotEnd());
-        if (m_bindingContext == AssignmentContext::UsingDeclarationStatement)
-            generator.emitPrepareDisposable(local, divotStart());
-        if (m_bindingContext == AssignmentContext::DeclarationStatement || m_bindingContext == AssignmentContext::ConstDeclarationStatement || m_bindingContext == AssignmentContext::UsingDeclarationStatement)
+        if (isUsingOrAwaitUsingAssignmentContext(m_bindingContext))
+            generator.emitPrepareDisposable(local, divotStart(), m_bindingContext == AssignmentContext::AwaitUsingDeclarationStatement);
+        if (m_bindingContext != AssignmentContext::AssignmentExpression)
             generator.liftTDZCheckIfPossible(var);
         return;
     }
@@ -6472,9 +6479,9 @@ void BindingNode::bindValue(BytecodeGenerator& generator, RegisterID* value) con
     }
     generator.emitPutToScope(scope.get(), var, value, generator.ecmaMode().isStrict() ? ThrowIfNotFound : DoNotThrowIfNotFound, initializationModeForAssignmentContext(m_bindingContext));
     generator.emitProfileType(value, var, divotStart(), divotEnd());
-    if (m_bindingContext == AssignmentContext::UsingDeclarationStatement)
-        generator.emitPrepareDisposable(value, divotStart());
-    if (m_bindingContext == AssignmentContext::DeclarationStatement || m_bindingContext == AssignmentContext::ConstDeclarationStatement || m_bindingContext == AssignmentContext::UsingDeclarationStatement)
+    if (isUsingOrAwaitUsingAssignmentContext(m_bindingContext))
+        generator.emitPrepareDisposable(value, divotStart(), m_bindingContext == AssignmentContext::AwaitUsingDeclarationStatement);
+    if (m_bindingContext != AssignmentContext::AssignmentExpression)
         generator.liftTDZCheckIfPossible(var);
     return;
 }

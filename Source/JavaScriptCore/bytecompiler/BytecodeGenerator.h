@@ -330,11 +330,14 @@ namespace JSC {
     struct UsingSlot {
         RefPtr<RegisterID> value;
         RefPtr<RegisterID> method;
+        RefPtr<RegisterID> reached;
+        bool isAsync { false };
     };
 
     struct UsingScope {
         Vector<UsingSlot> slots;
         unsigned nextSlot { 0 };
+        bool hasAwaitUsing { false };
     };
 
     struct JSGeneratorTraits {
@@ -880,9 +883,9 @@ namespace JSC {
 
         // Explicit Resource Management: using declarations
         UsingScope& currentUsingScope() { ASSERT(!m_usingScopeStack.isEmpty()); return m_usingScopeStack.last(); }
-        void emitPrepareDisposable(RegisterID* value, const JSTextPosition& divot);
-        void emitUsingBodyScope(unsigned usingCount, const ScopedLambda<void(BytecodeGenerator&)>& emitBody);
-        void emitBodyWithUsingIfNeeded(unsigned usingCount, const ScopedLambda<void(BytecodeGenerator&)>& emitBody);
+        void emitPrepareDisposable(RegisterID* value, const JSTextPosition& divot, bool isAsync = false);
+        void emitUsingBodyScope(unsigned usingCount, bool hasAwaitUsing, const ScopedLambda<void(BytecodeGenerator&)>& emitBody);
+        void emitBodyWithUsingIfNeeded(unsigned usingCount, bool hasAwaitUsing, const ScopedLambda<void(BytecodeGenerator&)>& emitBody);
 
         void emitGenericEnumeration(ThrowableExpressionData* enumerationNode, ExpressionNode* subjectNode, const ScopedLambda<void(BytecodeGenerator&, RegisterID*)>& callBack, ForOfNode* = nullptr, RegisterID* forLoopSymbolTable = nullptr);
         void emitEnumeration(ThrowableExpressionData* enumerationNode, ExpressionNode* subjectNode, const ScopedLambda<void(BytecodeGenerator&, RegisterID*)>& callBack, ForOfNode* = nullptr, RegisterID* forLoopSymbolTable = nullptr);

@@ -154,12 +154,14 @@ public:
     VariableEnvironment(VariableEnvironment&& other)
         : m_map(WTF::move(other.m_map))
         , m_isEverythingCaptured(other.m_isEverythingCaptured)
+        , m_hasAwaitUsingDeclaration(other.m_hasAwaitUsingDeclaration)
         , m_rareData(WTF::move(other.m_rareData))
     {
     }
     VariableEnvironment(const VariableEnvironment& other)
         : m_map(other.m_map)
         , m_isEverythingCaptured(other.m_isEverythingCaptured)
+        , m_hasAwaitUsingDeclaration(other.m_hasAwaitUsingDeclaration)
         , m_rareData(other.m_rareData ? WTF::makeUnique<VariableEnvironment::RareData>(*other.m_rareData) : nullptr)
     {
     }
@@ -214,6 +216,8 @@ public:
         }
         return count;
     }
+    bool hasAwaitUsingDeclaration() const { return m_hasAwaitUsingDeclaration; }
+    void setHasAwaitUsingDeclaration() { m_hasAwaitUsingDeclaration = true; }
     bool isEmpty() const { return !m_map.size() && !privateNamesSize(); }
 
     using PrivateNamesRange = WTF::IteratorRange<PrivateNameEnvironment::iterator>;
@@ -339,6 +343,7 @@ private:
 
     Map m_map;
     bool m_isEverythingCaptured { false };
+    bool m_hasAwaitUsingDeclaration { false };
 
     PrivateNameEntry& getOrAddPrivateName(UniquedStringImpl* impl)
     {

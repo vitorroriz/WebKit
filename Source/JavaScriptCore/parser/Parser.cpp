@@ -819,6 +819,30 @@ template <class TreeBuilder> TreeStatement Parser<LexerType>::parseStatementList
         }
         [[fallthrough]];
     case AWAIT:
+        if (Options::useExplicitResourceManagement()
+            && match(AWAIT)
+            && !m_parserState.classFieldInitMasksAsync
+            && (currentFunctionScope()->isAsyncFunctionBoundary() || isModuleParseMode(sourceParseMode()))) [[unlikely]] {
+            SavePoint savePoint = createSavePoint(context);
+            next();
+            if (!m_lexer->hasLineTerminatorBeforeToken()
+                && match(IDENT)
+                && *m_token.m_data.ident == m_vm.propertyNames->usingIdentifier
+                && !m_token.m_data.escaped) {
+                next();
+                if (!m_lexer->hasLineTerminatorBeforeToken() && matchSpecIdentifier()) {
+                    restoreSavePoint(context, savePoint);
+                    semanticFailIfTrue(currentScope()->isGlobalCode() && !currentScope()->isModuleCode() && m_statementDepth == 1, "'await using' declaration is not allowed at the top level of a script or eval");
+                    semanticFailIfTrue(m_insideSwitchCaseBody, "'await using' declaration is not allowed directly in a switch case or default clause");
+                    currentFunctionScope()->setUsesAwait();
+                    result = parseVariableDeclaration(context, DeclarationType::AwaitUsingDeclaration);
+                    shouldSetPauseLocation = true;
+                    break;
+                }
+            }
+            restoreSavePoint(context, savePoint);
+        }
+        [[fallthrough]];
     case YIELD: {
         if (currentScope()->isStaticBlock()) [[unlikely]] {
             failIfTrue(match(YIELD), "Cannot use 'yield' within static block");
@@ -853,7 +877,9 @@ template <class TreeBuilder> TreeStatement Parser<LexerType>::parseStatementList
 template <typename LexerType>
 template <class TreeBuilder> TreeStatement Parser<LexerType>::parseVariableDeclaration(TreeBuilder& context, DeclarationType declarationType, ExportType exportType)
 {
-    ASSERT(match(VAR) || match(LET) || match(CONSTTOKEN) || (declarationType == DeclarationType::UsingDeclaration && match(IDENT)));
+    ASSERT(match(VAR) || match(LET) || match(CONSTTOKEN)
+        || (declarationType == DeclarationType::UsingDeclaration && match(IDENT))
+        || (declarationType == DeclarationType::AwaitUsingDeclaration && match(AWAIT)));
     JSTokenLocation location(tokenLocation());
     int start = tokenLine();
     int end = 0;
@@ -920,19 +946,23 @@ template <class TreeBuilder> TreeStatement Parser<LexerType>::parseWhileStatemen
 template <typename LexerType>
 template <class TreeBuilder> TreeExpression Parser<LexerType>::parseVariableDeclarationList(TreeBuilder& context, int& declarations, TreeDestructuringPattern& lastPattern, TreeExpression& lastInitializer, JSTextPosition& identStart, JSTextPosition& initStart, JSTextPosition& initEnd, VarDeclarationListContext declarationListContext, DeclarationType declarationType, ExportType exportType, bool& forLoopConstDoesNotHaveInitializer)
 {
-    ASSERT(declarationType == DeclarationType::LetDeclaration || declarationType == DeclarationType::VarDeclaration || declarationType == DeclarationType::ConstDeclaration || declarationType == DeclarationType::UsingDeclaration);
+    ASSERT(declarationType == DeclarationType::LetDeclaration || declarationType == DeclarationType::VarDeclaration || declarationType == DeclarationType::ConstDeclaration || declarationType == DeclarationType::UsingDeclaration || declarationType == DeclarationType::AwaitUsingDeclaration);
     TreeExpression head = 0;
     JSTokenLocation headLocation;
     TreeExpression tail = 0;
     const Identifier* lastIdent;
     JSToken lastIdentToken;
     AssignmentContext assignmentContext = assignmentContextFromDeclarationType(declarationType);
-    bool isUsingDeclaration = declarationType == DeclarationType::UsingDeclaration;
+    bool isUsingDeclaration = declarationType == DeclarationType::UsingDeclaration || declarationType == DeclarationType::AwaitUsingDeclaration;
     do {
         lastPattern = TreeDestructuringPattern(0);
         lastIdent = nullptr;
         JSTokenLocation location(tokenLocation());
         next();
+        if (!head && declarationType == DeclarationType::AwaitUsingDeclaration) {
+            ASSERT(match(IDENT) && *m_token.m_data.ident == m_vm.propertyNames->usingIdentifier);
+            next();
+        }
         if (head) {
             // Move the location of subsequent declarations after the comma.
             location = tokenLocation();
@@ -949,7 +979,7 @@ template <class TreeBuilder> TreeExpression Parser<LexerType>::parseVariableDecl
         }
         if (matchSpecIdentifier()) {
             semanticFailIfTrue(currentScope()->isStaticBlock() && isArgumentsIdentifier(), "Cannot use 'arguments' as an identifier in static block");
-            failIfTrue(isPossiblyEscapedLet(m_token) && (declarationType == DeclarationType::LetDeclaration || declarationType == DeclarationType::ConstDeclaration || declarationType == DeclarationType::UsingDeclaration),
+            failIfTrue(isPossiblyEscapedLet(m_token) && (declarationType == DeclarationType::LetDeclaration || declarationType == DeclarationType::ConstDeclaration || isUsingDeclaration),
                 "Cannot use 'let' as an identifier name for a LexicalDeclaration");
             semanticFailIfTrue(isDisallowedIdentifierAwait(m_token), "Cannot use 'await' as a ", declarationTypeToVariableKind(declarationType), " ", disallowedIdentifierAwaitReason());
             JSTextPosition varStart = tokenStartPosition();
@@ -1474,6 +1504,7 @@ template <class TreeBuilder> TreeStatement Parser<LexerType>::parseForStatement(
     bool isLetDeclaration = match(LET);
     bool isConstDeclaration = match(CONSTTOKEN);
     bool isUsingDeclaration = false;
+    bool isAwaitUsingDeclaration = false;
     if (Options::useExplicitResourceManagement() && match(IDENT)
         && *m_token.m_data.ident == m_vm.propertyNames->usingIdentifier
         && !m_token.m_data.escaped) {
@@ -1493,26 +1524,46 @@ template <class TreeBuilder> TreeStatement Parser<LexerType>::parseForStatement(
                 isUsingDeclaration = true;
         }
         restoreSavePoint(context, savePoint);
+    } else if (Options::useExplicitResourceManagement() && match(AWAIT)
+        && !m_parserState.classFieldInitMasksAsync
+        && (currentFunctionScope()->isAsyncFunctionBoundary() || isModuleParseMode(sourceParseMode()))) {
+        SavePoint savePoint = createSavePoint(context);
+        next();
+        if (!m_lexer->hasLineTerminatorBeforeToken()
+            && match(IDENT)
+            && *m_token.m_data.ident == m_vm.propertyNames->usingIdentifier
+            && !m_token.m_data.escaped) {
+            next();
+            // Note: unlike sync `using`, there is no [lookahead != `of`] constraint for `await using`,
+            // so `for (await using of of expr)` binds `of` as an identifier.
+            if (!m_lexer->hasLineTerminatorBeforeToken() && matchSpecIdentifier())
+                isAwaitUsingDeclaration = true;
+        }
+        restoreSavePoint(context, savePoint);
+        if (isAwaitUsingDeclaration)
+            currentFunctionScope()->setUsesAwait();
     }
+    bool isAnyUsingDeclaration = isUsingDeclaration || isAwaitUsingDeclaration;
+    bool isLexicalDeclaration = isLetDeclaration || isConstDeclaration || isAnyUsingDeclaration;
     bool forLoopConstDoesNotHaveInitializer = false;
     bool forLoopinitializerContainsClosure = false;
 
     AutoCleanupLexicalScope lexicalScope;
 
     auto popLexicalScopeIfNecessary = [&]() -> VariableEnvironment {
-        if (isLetDeclaration || isConstDeclaration || isUsingDeclaration) {
+        if (isLexicalDeclaration) {
             auto [lexicalVariables, functionDeclarations] = popScope(lexicalScope, TreeBuilder::NeedsFreeVariableInfo);
             return lexicalVariables;
         }
         return { };
     };
 
-    if (isVarDeclaration || isLetDeclaration || isConstDeclaration || isUsingDeclaration) {
+    if (isVarDeclaration || isLexicalDeclaration) {
         /*
          for (var/let/const/using IDENT in/of expression) statement
          for (var/let/const varDeclarationList; expressionOpt; expressionOpt)
          */
-        if (isLetDeclaration || isConstDeclaration || isUsingDeclaration) {
+        if (isLexicalDeclaration) {
             Scope* newScope = pushScope();
             newScope->setIsLexicalScope();
             newScope->preventVarDeclarations();
@@ -1533,6 +1584,8 @@ template <class TreeBuilder> TreeStatement Parser<LexerType>::parseForStatement(
             declarationType = DeclarationType::ConstDeclaration;
         else if (isUsingDeclaration)
             declarationType = DeclarationType::UsingDeclaration;
+        else if (isAwaitUsingDeclaration)
+            declarationType = DeclarationType::AwaitUsingDeclaration;
         else
             RELEASE_ASSERT_NOT_REACHED();
         unsigned candidateCountBeforeInitializer = currentScope()->closedVariableCandidates().size();
@@ -1555,7 +1608,7 @@ template <class TreeBuilder> TreeStatement Parser<LexerType>::parseForStatement(
             isOfEnumeration = true;
             next();
         } else {
-            failIfTrue(isUsingDeclaration, "Cannot use 'using' declaration in for-in loop");
+            failIfTrue(isAnyUsingDeclaration, "Cannot use 'using' declaration in for-in loop");
             failIfFalse(!isAwaitFor, "Expected 'of' in for-await syntax");
             next();
         }
@@ -1620,7 +1673,7 @@ template <class TreeBuilder> TreeStatement Parser<LexerType>::parseForStatement(
         next();
         TreeExpression condition = 0;
         failIfTrue(forLoopConstDoesNotHaveInitializer && isConstDeclaration, "const variables in for loops must have initializers");
-        failIfTrue(forLoopConstDoesNotHaveInitializer && isUsingDeclaration, "'using' declaration requires an initializer");
+        failIfTrue(forLoopConstDoesNotHaveInitializer && isAnyUsingDeclaration, "'using' declaration requires an initializer");
         
         if (!match(SEMICOLON)) {
             condition = parseExpression(context);

@@ -103,6 +103,7 @@ namespace JSC {
         DeclarationStatement,
         ConstDeclarationStatement,
         UsingDeclarationStatement,
+        AwaitUsingDeclarationStatement,
         AssignmentExpression
     };
 
@@ -283,6 +284,7 @@ namespace JSC {
         FunctionStack& functionStack() LIFETIME_BOUND { return m_functionStack; }
 
         bool hasUsingDeclaration() const { return m_lexicalVariables.hasUsingDeclaration(); }
+        bool hasAwaitUsingDeclaration() const { return m_lexicalVariables.hasAwaitUsingDeclaration(); }
         unsigned usingDeclarationCount() const { return m_lexicalVariables.usingDeclarationCount(); }
 
     protected:

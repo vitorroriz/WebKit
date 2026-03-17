@@ -91,6 +91,7 @@ enum class DeclarationType {
     LetDeclaration,
     ConstDeclaration,
     UsingDeclaration,
+    AwaitUsingDeclaration,
 };
 
 enum class DeclarationImportType {
@@ -456,7 +457,7 @@ public:
     DeclarationStacks::FunctionStack takeFunctionDeclarations() { return WTF::move(m_functionDeclarations); }
     
 
-    DeclarationResultMask declareLexicalVariable(const Identifier* ident, bool isConstant, DeclarationImportType importType = DeclarationImportType::NotImported, bool isUsing = false)
+    DeclarationResultMask declareLexicalVariable(const Identifier* ident, bool isConstant, DeclarationImportType importType = DeclarationImportType::NotImported, bool isUsing = false, bool isAwaitUsing = false)
     {
         ASSERT(m_allowsLexicalDeclarations);
         DeclarationResultMask result = DeclarationResult::Valid;
@@ -469,6 +470,8 @@ public:
             addResult.iterator->value.setIsLet();
         if (isUsing)
             addResult.iterator->value.setIsUsing();
+        if (isAwaitUsing)
+            m_lexicalVariables.setHasAwaitUsingDeclaration();
 
         if (importType == DeclarationImportType::Imported)
             addResult.iterator->value.setIsImported();
@@ -1166,6 +1169,7 @@ private:
         case DeclarationType::ConstDeclaration:
             return DestructuringKind::DestructureToConst;
         case DeclarationType::UsingDeclaration:
+        case DeclarationType::AwaitUsingDeclaration:
             RELEASE_ASSERT_NOT_REACHED();
             return DestructuringKind::DestructureToVariables;
         }
@@ -1183,6 +1187,7 @@ private:
         case DeclarationType::ConstDeclaration:
             return "lexical variable name";
         case DeclarationType::UsingDeclaration:
+        case DeclarationType::AwaitUsingDeclaration:
             return "using variable name";
         }
         RELEASE_ASSERT_NOT_REACHED();
@@ -1196,6 +1201,8 @@ private:
             return AssignmentContext::ConstDeclarationStatement;
         case DeclarationType::UsingDeclaration:
             return AssignmentContext::UsingDeclarationStatement;
+        case DeclarationType::AwaitUsingDeclaration:
+            return AssignmentContext::AwaitUsingDeclarationStatement;
         default:
             return AssignmentContext::DeclarationStatement;
         }
@@ -1382,7 +1389,7 @@ private:
         if (type == DeclarationType::VarDeclaration)
             return declareHoistedVariable(ident);
 
-        ASSERT(type == DeclarationType::LetDeclaration || type == DeclarationType::ConstDeclaration || type == DeclarationType::UsingDeclaration);
+        ASSERT(type == DeclarationType::LetDeclaration || type == DeclarationType::ConstDeclaration || type == DeclarationType::UsingDeclaration || type == DeclarationType::AwaitUsingDeclaration);
         // Lexical variables declared at a top level scope that shadow arguments or vars are not allowed.
         if (!m_lexer->isReparsingFunction() && m_statementDepth == 1 && (hasDeclaredParameter(*ident) || hasDeclaredVariable(*ident)))
             return DeclarationResult::InvalidDuplicateDeclaration;
@@ -1391,8 +1398,9 @@ private:
         if (scope->isCatchBlockScope() && scope->containingScope()->hasLexicallyDeclaredVariable(*ident))
             return DeclarationResult::InvalidDuplicateDeclaration;
 
-        bool isUsing = type == DeclarationType::UsingDeclaration;
-        return scope->declareLexicalVariable(ident, type == DeclarationType::ConstDeclaration || isUsing, importType, isUsing);
+        bool isAwaitUsing = type == DeclarationType::AwaitUsingDeclaration;
+        bool isUsing = type == DeclarationType::UsingDeclaration || isAwaitUsing;
+        return scope->declareLexicalVariable(ident, type == DeclarationType::ConstDeclaration || isUsing, importType, isUsing, isAwaitUsing);
     }
 
     std::pair<DeclarationResultMask, Scope*> declareFunction(const Identifier* ident)

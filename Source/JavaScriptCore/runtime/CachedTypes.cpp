@@ -1072,6 +1072,7 @@ public:
     void encode(Encoder& encoder, const VariableEnvironment& env)
     {
         m_isEverythingCaptured = env.m_isEverythingCaptured;
+        m_hasAwaitUsingDeclaration = env.m_hasAwaitUsingDeclaration;
         m_map.encode(encoder, env.m_map);
         m_rareData.encode(encoder, env.m_rareData.get());
     }
@@ -1079,6 +1080,7 @@ public:
     void decode(Decoder& decoder, VariableEnvironment& env) const
     {
         env.m_isEverythingCaptured = m_isEverythingCaptured;
+        env.m_hasAwaitUsingDeclaration = m_hasAwaitUsingDeclaration;
         m_map.decode(decoder, env.m_map);
         if (!m_rareData.isEmpty()) {
             env.m_rareData = WTF::makeUnique<VariableEnvironment::RareData>();
@@ -1088,6 +1090,7 @@ public:
 
 private:
     bool m_isEverythingCaptured;
+    bool m_hasAwaitUsingDeclaration;
     CachedHashMap<CachedRefPtr<CachedUniquedStringImpl, UniquedStringImpl, WTF::PackedPtrTraits<UniquedStringImpl>>, VariableEnvironmentEntry, IdentifierRepHash, HashTraits<RefPtr<UniquedStringImpl>>, VariableEnvironmentEntryHashTraits> m_map;
     CachedPtr<CachedVariableEnvironmentRareData> m_rareData;
 };
