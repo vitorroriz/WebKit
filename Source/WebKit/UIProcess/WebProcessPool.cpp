@@ -109,6 +109,7 @@
 #include <WebCore/ProcessWarming.h>
 #include <WebCore/RegistrableDomain.h>
 #include <WebCore/ResourceRequest.h>
+#include <WebCore/SecurityPolicy.h>
 #include <WebCore/Site.h>
 #include <algorithm>
 #include <pal/SessionID.h>
@@ -2352,7 +2353,16 @@ std::tuple<Ref<WebProcessProxy>, RefPtr<SuspendedPageProxy>, ASCIILiteral> WebPr
             return { createNewProcess(), nullptr, "Process swap because this is a first navigation in a DOM popup without opener"_s };
     }
 
-    if (navigation.treatAsSameOriginNavigation())
+    const bool treatAsSameOriginNavigation = [&targetURL, &navigation, &siteIsolationEnabled] {
+        if (siteIsolationEnabled
+            && targetURL.protocolIsAbout()
+            && !SecurityPolicy::shouldInheritSecurityOriginFromOwner(targetURL))
+            return false;
+
+        return navigation.treatAsSameOriginNavigation();
+    }();
+
+    if (treatAsSameOriginNavigation)
         return { WTF::move(sourceProcess), nullptr, "The treatAsSameOriginNavigation flag is set"_s };
 
     URL sourceURL;
