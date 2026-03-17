@@ -50,6 +50,18 @@
 
 namespace WebCore {
 
+static bool s_shouldMockParentSearchResults = false;
+
+void setShouldMockParentSearchResultsForTesting(bool enabled)
+{
+    s_shouldMockParentSearchResults = enabled;
+}
+
+bool shouldMockParentSearchResultsForTesting()
+{
+    return s_shouldMockParentSearchResults;
+}
+
 static bool NODELETE canDoRemoteSearch(const std::optional<AXTreeID>& treeID)
 {
 #if PLATFORM_SUPPORTS_REMOTE_SEARCH
@@ -413,13 +425,26 @@ AccessibilitySearchResults performSearchWithParentCoordination(AXCoreObject& anc
         RefPtr frame = document ? document->frame() : nullptr;
         RefPtr page = frame ? frame->page() : nullptr;
 
-        if (!frame || !page || frame->isMainFrame() || !page->settings().siteIsolationEnabled()) {
-            // Not in a child frame, or site isolation is disabled (so no cross-process coordination needed).
+        if (!frame || !page || frame->isMainFrame() || !page->settings().siteIsolationEnabled() || criteriaForParent.immediateDescendantsOnly) {
+            // Not in a child frame, site isolation is disabled, or this is an
+            // immediateDescendantsOnly search. In the latter case, the search is scoped
+            // to a specific container in the child frame, so the parent frame has nothing
+            // to contribute — skip the parent search to match non-site-isolation behavior
+            // and avoid returning unrelated elements (like the parent's ScrollBar).
             context->signal();
             return;
         }
 
         context->markParentDispatched();
+
+        if (shouldMockParentSearchResultsForTesting()) [[unlikely]] {
+            // Testing: provide a mock parent result instead of dispatching
+            // real IPC (which deadlocks in the test runner). This lets tests
+            // verify that the parent search is correctly skipped for
+            // immediateDescendantsOnly searches (i.e. the if just above).
+            context->signal();
+            return;
+        }
 
         // Use the provided frameID if available, otherwise use the frame's own ID.
         FrameIdentifier frameIDToUse = currentFrameID.value_or(frame->frameID());
@@ -440,8 +465,16 @@ AccessibilitySearchResults performSearchWithParentCoordination(AXCoreObject& anc
         context->waitWithTimeout(*remainingTimeout);
 
     // Merge parent results with local results based on search direction.
-    if (context->didDispatchParent())
+    if (context->didDispatchParent()) {
         searchResults = mergeParentSearchResults(WTF::move(searchResults), context->takeParentTokens(), isForward, originalLimit);
+
+        if (shouldMockParentSearchResultsForTesting()) [[unlikely]] {
+            // Inject the anchor as a mock parent result. Tests should not rely on
+            // this being any specific object — just that *something* is returned
+            // from the parent search.
+            searchResults.append(AccessibilitySearchResult::local(anchorObject));
+        }
+    }
 
     return searchResults;
 #else

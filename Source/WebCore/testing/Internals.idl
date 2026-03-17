@@ -995,6 +995,7 @@ enum ContentsFormat {
     undefined setUsesOverlayScrollbars(boolean enabled);
 
     undefined forceAXObjectCacheUpdate();
+    undefined setShouldMockParentSearchResultsForTesting(boolean enabled);
     undefined forceReload(boolean endToEnd);
     undefined reloadExpiredOnly();
 

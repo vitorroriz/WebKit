@@ -27,6 +27,7 @@
 #include "config.h"
 #include "Internals.h"
 
+#include "AXCrossProcessSearch.h"
 #include "AXObjectCacheInlines.h"
 #include "AnimationTimeline.h"
 #include "AnimationTimelinesController.h"
@@ -668,6 +669,7 @@ void Internals::resetToConsistentState(Page& page)
 #endif
     AXObjectCache::setEnhancedUserInterfaceAccessibility(false);
     AXObjectCache::disableAccessibility();
+    WebCore::setShouldMockParentSearchResultsForTesting(false);
 
     MockPageOverlayClient::singleton().uninstallAllOverlays();
 
@@ -4595,6 +4597,11 @@ void Internals::forceAXObjectCacheUpdate() const
         if (CheckedPtr cache = document->axObjectCache())
             cache->performDeferredCacheUpdate(ForceLayout::Yes);
     }
+}
+
+void Internals::setShouldMockParentSearchResultsForTesting(bool enabled)
+{
+    WebCore::setShouldMockParentSearchResultsForTesting(enabled);
 }
 
 void Internals::forceReload(bool endToEnd)

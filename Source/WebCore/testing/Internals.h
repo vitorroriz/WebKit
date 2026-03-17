@@ -771,6 +771,7 @@ public:
     String toolTipFromElement(Element&) const;
 
     void forceAXObjectCacheUpdate() const;
+    void setShouldMockParentSearchResultsForTesting(bool);
     void forceReload(bool endToEnd);
     void reloadExpiredOnly();
 
