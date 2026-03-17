@@ -725,7 +725,6 @@ svg/SVGTextPositioningElement.cpp
 svg/SVGToOTFFontConversion.cpp
 svg/SVGURIReference.cpp
 svg/SVGUseElement.cpp
-svg/SVGViewSpec.cpp
 svg/SVGViewSpec.h
 svg/animation/SVGSMILElement.cpp
 svg/graphics/SVGImage.cpp
