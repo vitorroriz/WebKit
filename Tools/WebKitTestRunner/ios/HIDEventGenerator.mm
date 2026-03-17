@@ -145,14 +145,9 @@ static const long nanosecondsPerSecond = 1e9;
 
 NSUInteger const HIDMaxTouchCount = 5;
 
-
-
 static int fingerIdentifiers[HIDMaxTouchCount] = { 2, 3, 4, 5, 1 };
 
-typedef enum {
-    InterpolationTypeLinear,
-    InterpolationTypeSimpleCurve,
-} InterpolationType;
+enum class InterpolationType : uint8_t { Linear, SimpleCurve };
 
 typedef enum {
     HandEventNull,
@@ -183,27 +178,37 @@ static CFTimeInterval secondsSinceAbsoluteTime(CFAbsoluteTime startTime)
     return (CFAbsoluteTimeGetCurrent() - startTime);
 }
 
-static double linearInterpolation(double a, double b, double t)
-{
-    return (a + (b - a) * t );
-}
+using PressureInterpolationFunction = Function<double(double, double, CFTimeInterval)>;
 
-static double simpleCurveInterpolation(double a, double b, double t)
-{
-    return (a + (b - a) * sin(sin(t * std::numbers::pi / 2) * t * std::numbers::pi / 2));
-}
+static const PressureInterpolationFunction linearInterpolation {
+    [](double a, double b, double t) {
+        return std::lerp(a, b, t);
+    }
+};
 
+static const PressureInterpolationFunction simpleCurveInterpolation {
+    [](double a, double b, double t) {
+        return (a + (b - a) * sin(sin(t * std::numbers::pi / 2) * t * std::numbers::pi / 2));
+    }
+};
 
 static CGPoint calculateNextCurveLocation(CGPoint a, CGPoint b, CFTimeInterval t)
 {
     return CGPointMake(simpleCurveInterpolation(a.x, b.x, t), simpleCurveInterpolation(a.y, b.y, t));
 }
 
-typedef double(*pressureInterpolationFunction)(double, double, CFTimeInterval);
-static pressureInterpolationFunction interpolations[] = {
-    linearInterpolation,
-    simpleCurveInterpolation,
-};
+static const PressureInterpolationFunction& interpolationFunctor(InterpolationType type)
+{
+    using enum InterpolationType;
+    switch (type) {
+    case Linear:
+        return linearInterpolation;
+    case SimpleCurve:
+        return simpleCurveInterpolation;
+    }
+    ASSERT_NOT_REACHED();
+    return linearInterpolation;
+}
 
 static void delayBetweenMove(int eventIndex, double elapsed)
 {
@@ -304,13 +309,14 @@ static UITouchPhase phaseFromString(NSString *string)
 
 static InterpolationType interpolationFromString(NSString *string)
 {
+    using enum InterpolationType;
     if ([string isEqualToString:HIDEventInterpolationTypeLinear])
-        return InterpolationTypeLinear;
-    
+        return Linear;
+
     if ([string isEqualToString:HIDEventInterpolationTypeSimpleCurve])
-        return InterpolationTypeSimpleCurve;
-    
-    return InterpolationTypeLinear;
+        return SimpleCurve;
+
+    return Linear;
 }
 
 - (IOHIDDigitizerEventMask)eventMaskFromEventInfo:(NSDictionary *)info
@@ -1132,8 +1138,8 @@ RetainPtr<IOHIDEventRef> createHIDKeyEvent(NSString *character, uint64_t timesta
     NSDictionary *startEvent = interpolationsDictionary[HIDEventStartEventKey];
     NSDictionary *endEvent = interpolationsDictionary[HIDEventEndEventKey];
     NSTimeInterval timeStep = [interpolationsDictionary[HIDEventTimestepKey] doubleValue];
-    InterpolationType interpolationType = interpolationFromString(interpolationsDictionary[HIDEventInterpolateKey]);
-    
+    auto interpolationType = interpolationFromString(interpolationsDictionary[HIDEventInterpolateKey]);
+
     NSMutableArray *interpolatedEvents = [NSMutableArray arrayWithObject:startEvent];
     
     NSTimeInterval startTime = [startEvent[HIDEventTimeOffsetKey] doubleValue];
@@ -1163,14 +1169,14 @@ RetainPtr<IOHIDEventRef> createHIDKeyEvent(NSString *character, uint64_t timesta
                 auto newTouch = adoptNS([endTouch mutableCopy]);
                 
                 if (newTouch.get()[HIDEventXKey] != startTouch[HIDEventXKey])
-                    newTouch.get()[HIDEventXKey] = @(interpolations[interpolationType]([startTouch[HIDEventXKey] doubleValue], [endTouch[HIDEventXKey] doubleValue], timeRatio));
-                
+                    newTouch.get()[HIDEventXKey] = @(interpolationFunctor(interpolationType)([startTouch[HIDEventXKey] doubleValue], [endTouch[HIDEventXKey] doubleValue], timeRatio));
+
                 if (newTouch.get()[HIDEventYKey] != startTouch[HIDEventYKey])
-                    newTouch.get()[HIDEventYKey] = @(interpolations[interpolationType]([startTouch[HIDEventYKey] doubleValue], [endTouch[HIDEventYKey] doubleValue], timeRatio));
-                
+                    newTouch.get()[HIDEventYKey] = @(interpolationFunctor(interpolationType)([startTouch[HIDEventYKey] doubleValue], [endTouch[HIDEventYKey] doubleValue], timeRatio));
+
                 if (newTouch.get()[HIDEventPressureKey] != startTouch[HIDEventPressureKey])
-                    newTouch.get()[HIDEventPressureKey] = @(interpolations[interpolationType]([startTouch[HIDEventPressureKey] doubleValue], [endTouch[HIDEventPressureKey] doubleValue], timeRatio));
-                
+                    newTouch.get()[HIDEventPressureKey] = @(interpolationFunctor(interpolationType)([startTouch[HIDEventPressureKey] doubleValue], [endTouch[HIDEventPressureKey] doubleValue], timeRatio));
+
                 [newTouches addObject:newTouch.get()];
             } else
                 NSLog(@"Missing End Touch with ID: %ld", (long)startTouchID);
