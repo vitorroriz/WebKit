@@ -8472,6 +8472,8 @@ webkit.org/b/309283 imported/w3c/web-platform-tests/html/semantics/forms/the-sel
 
 webkit.org/b/307091 inspector/network/intercept-aborted-request.html [ Skip ]
 
+webkit.org/b/310132 imported/w3c/web-platform-tests/intersection-observer/target-in-different-window.html [ Pass Failure ]
+
 # Requires mousedown
 media/caption-display-settings/caption-display-settings-default-anchorBounds.html [ Skip ]
 
