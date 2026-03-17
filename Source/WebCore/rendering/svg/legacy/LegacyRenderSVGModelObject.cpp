@@ -42,7 +42,7 @@
 #include "RenderObjectInlines.h"
 #include "RenderView.h"
 #include "SVGElementInlines.h"
-#include "SVGLocatable.h"
+#include "SVGGraphicsElement.h"
 #include "SVGNames.h"
 #include "SVGResourcesCache.h"
 #include "ShadowRoot.h"
@@ -162,7 +162,7 @@ static void getElementCTM(SVGElement* element, AffineTransform& transform)
 {
     ASSERT(element);
 
-    RefPtr stopAtElement = SVGLocatable::nearestViewportElement(element);
+    RefPtr stopAtElement = SVGGraphicsElement::nearestViewportElement(element);
     ASSERT(stopAtElement);
 
     AffineTransform localTransform;

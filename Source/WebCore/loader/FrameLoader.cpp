@@ -125,7 +125,6 @@
 #include "ResourceLoadInfo.h"
 #include "ResourceLoadObserver.h"
 #include "ResourceRequest.h"
-#include "SVGLocatable.h"
 #include "SVGNames.h"
 #include "SVGViewElement.h"
 #include "SVGViewSpec.h"

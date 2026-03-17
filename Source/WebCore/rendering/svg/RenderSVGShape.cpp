@@ -178,7 +178,7 @@ bool RenderSVGShape::setupNonScalingStrokeContext(AffineTransform& strokeTransfo
 
 AffineTransform RenderSVGShape::nonScalingStrokeTransform() const
 {
-    return protect(graphicsElement())->getScreenCTM(SVGLocatable::DisallowStyleUpdate);
+    return protect(graphicsElement())->getScreenCTM(DisallowStyleUpdate);
 }
 
 void RenderSVGShape::fillShape(const RenderStyle& style, GraphicsContext& context)

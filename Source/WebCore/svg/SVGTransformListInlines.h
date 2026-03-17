@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "SVGTransformable.h"
+#include "SVGTransformList.h"
 
 namespace WebCore {
 
@@ -91,7 +91,7 @@ static constexpr std::array requiredValuesForType { 0, 6, 1, 1, 1, 1, 1 };
 static constexpr std::array optionalValuesForType { 0, 0, 1, 1, 2, 0, 0 };
 
 template<typename CharacterType>
-bool SVGTransformable::parseAndReplaceTransform(SVGTransformValue::SVGTransformType type, StringParsingBuffer<CharacterType>& buffer, SVGTransform& transform)
+bool SVGTransformList::parseAndReplaceTransform(SVGTransformValue::SVGTransformType type, StringParsingBuffer<CharacterType>& buffer, SVGTransform& transform)
 {
     ASSERT(type == transform.value().type());
 
@@ -146,7 +146,7 @@ bool SVGTransformable::parseAndReplaceTransform(SVGTransformValue::SVGTransformT
 }
 
 template<typename CharacterType>
-RefPtr<SVGTransform> SVGTransformable::parseTransform(SVGTransformValue::SVGTransformType type, StringParsingBuffer<CharacterType>& buffer)
+RefPtr<SVGTransform> SVGTransformList::parseTransform(SVGTransformValue::SVGTransformType type, StringParsingBuffer<CharacterType>& buffer)
 {
     if (type == SVGTransformValue::SVG_TRANSFORM_UNKNOWN)
         return nullptr;

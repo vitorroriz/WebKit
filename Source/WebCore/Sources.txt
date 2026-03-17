@@ -3502,7 +3502,6 @@ svg/SVGLengthList.cpp
 svg/SVGLengthValue.cpp
 svg/SVGLineElement.cpp
 svg/SVGLinearGradientElement.cpp
-svg/SVGLocatable.cpp
 svg/SVGMPathElement.cpp
 svg/SVGMarkerElement.cpp
 svg/SVGMaskElement.cpp
@@ -3551,7 +3550,6 @@ svg/SVGTitleElement.cpp
 svg/SVGToOTFFontConversion.cpp
 svg/SVGTransformDistance.cpp
 svg/SVGTransformList.cpp
-svg/SVGTransformable.cpp
 svg/SVGURIReference.cpp
 svg/SVGUnknownElement.cpp
 svg/SVGUseElement.cpp

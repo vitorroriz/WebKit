@@ -21,41 +21,49 @@
 
 #pragma once
 
+#include "AffineTransform.h"
 #include "SVGAnimatedPropertyImpl.h"
 #include "SVGElement.h"
 #include "SVGTests.h"
 #include "SVGTransformList.h"
-#include "SVGTransformable.h"
 #include <wtf/TZoneMalloc.h>
 
 namespace WebCore {
 
-class AffineTransform;
 class Path;
 class SVGRect;
 class SVGMatrix;
 
-class SVGGraphicsElement : public SVGElement, public SVGTransformable, public SVGTests {
+enum class CTMScope : bool {
+    NearestViewportScope, // Used for getCTM()
+    ScreenScope // Used for getScreenCTM()
+};
+
+enum StyleUpdateStrategy { AllowStyleUpdate, DisallowStyleUpdate };
+
+class SVGGraphicsElement : public SVGElement, public SVGTests {
     WTF_MAKE_TZONE_ALLOCATED(SVGGraphicsElement);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(SVGGraphicsElement);
 public:
     virtual ~SVGGraphicsElement();
 
     Ref<SVGMatrix> getCTMForBindings();
-    AffineTransform getCTM(StyleUpdateStrategy = AllowStyleUpdate) override;
+    AffineTransform getCTM(StyleUpdateStrategy = AllowStyleUpdate);
 
     Ref<SVGMatrix> getScreenCTMForBindings();
-    AffineTransform getScreenCTM(StyleUpdateStrategy = AllowStyleUpdate) override;
+    AffineTransform getScreenCTM(StyleUpdateStrategy = AllowStyleUpdate);
 
-    AffineTransform localCoordinateSpaceTransform(CTMScope mode) const override { return SVGTransformable::localCoordinateSpaceTransform(mode); }
-    AffineTransform animatedLocalTransform() const override;
+    AffineTransform localCoordinateSpaceTransform(CTMScope) const override { return animatedLocalTransform(); }
+    AffineTransform animatedLocalTransform() const;
     AffineTransform* ensureSupplementalTransform() override;
     AffineTransform* supplementalTransform() const LIFETIME_BOUND override { return m_supplementalTransform.get(); }
 
     virtual bool hasTransformRelatedAttributes() const { return !transform().concatenate().isIdentity() || m_supplementalTransform; }
 
     Ref<SVGRect> getBBoxForBindings();
-    FloatRect getBBox(StyleUpdateStrategy = AllowStyleUpdate) override;
+    virtual FloatRect getBBox(StyleUpdateStrategy = AllowStyleUpdate);
+
+    static SVGElement* nearestViewportElement(const SVGElement*);
 
     bool shouldIsolateBlending() const { return m_shouldIsolateBlending; }
     void setShouldIsolateBlending(bool isolate) { m_shouldIsolateBlending = isolate; }
@@ -82,6 +90,9 @@ protected:
 
 private:
     bool isSVGGraphicsElement() const override { return true; }
+
+    static FloatRect computeBBox(SVGElement*, StyleUpdateStrategy);
+    static AffineTransform computeCTM(SVGElement*, CTMScope, StyleUpdateStrategy);
 
     // Used by <animateMotion>
     std::unique_ptr<AffineTransform> m_supplementalTransform;

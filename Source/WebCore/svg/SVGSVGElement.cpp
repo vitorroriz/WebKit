@@ -174,7 +174,7 @@ void SVGSVGElement::updateCurrentTranslate()
 
 void SVGSVGElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason attributeModificationReason)
 {
-    if (!SVGLocatable::nearestViewportElement(this) && isConnected()) {
+    if (!SVGGraphicsElement::nearestViewportElement(this) && isConnected()) {
         // For these events, the outermost <svg> element works like a <body> element does,
         // setting certain event handlers directly on the window object.
         switch (name.nodeName()) {

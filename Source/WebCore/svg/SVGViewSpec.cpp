@@ -27,7 +27,6 @@
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
 #include "SVGTransformList.h"
-#include "SVGTransformable.h"
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/text/StringParsingBuffer.h>
 

@@ -41,7 +41,6 @@
 #include "SVGParsingError.h"
 #include "SVGRenderSupport.h"
 #include "SVGStringList.h"
-#include "SVGTransformable.h"
 #include "Settings.h"
 #include <wtf/NeverDestroyed.h>
 #include <wtf/TZoneMallocInlines.h>

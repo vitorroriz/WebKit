@@ -32,7 +32,6 @@
 #include "RenderSVGResourceGradient.h"
 #include "SVGElementTypeHelpers.h"
 #include "SVGStopElement.h"
-#include "SVGTransformable.h"
 #include "StyleResolver.h"
 #include <wtf/NeverDestroyed.h>
 #include <wtf/TZoneMallocInlines.h>
