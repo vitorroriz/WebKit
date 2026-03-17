@@ -181,10 +181,10 @@ using VectorRefFrameState = Vector<Ref<FrameState>>;
 
 inline void refFrameState(WebKit::FrameState* obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefFrameState(WebKit::FrameState* obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }

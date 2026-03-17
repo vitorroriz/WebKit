@@ -701,12 +701,12 @@ private:
 
 inline void refDataStore(WebKit::WebsiteDataStore* WTF_NONNULL obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefDataStore(WebKit::WebsiteDataStore* WTF_NONNULL obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }
 
 SPECIALIZE_TYPE_TRAITS_BEGIN(WebKit::WebsiteDataStore)

@@ -192,12 +192,12 @@ private:
 
 inline void refBuffer(WebGPU::Buffer* obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefBuffer(WebGPU::Buffer* obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }
 
 IGNORE_CLANG_WARNINGS_END

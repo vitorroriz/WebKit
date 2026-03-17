@@ -143,10 +143,10 @@ private:
 
 inline void refSuspendedPageProxy(WebKit::SuspendedPageProxy* WTF_NONNULL obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefSuspendedPageProxy(WebKit::SuspendedPageProxy* WTF_NONNULL obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }

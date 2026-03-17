@@ -96,12 +96,12 @@ using RefAPIArray = Ref<Array>;
 
 inline void refArray(API::Array* WTF_NONNULL obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefArray(API::Array* WTF_NONNULL obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }
 
 SPECIALIZE_TYPE_TRAITS_API_OBJECT(Array);

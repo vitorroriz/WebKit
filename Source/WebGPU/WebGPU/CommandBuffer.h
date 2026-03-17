@@ -99,10 +99,10 @@ private:
 
 inline void refCommandBuffer(WebGPU::CommandBuffer* obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefCommandBuffer(WebGPU::CommandBuffer* obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }

@@ -976,12 +976,12 @@ inline RefPtr<WebProcessProxy> downcastToWebProcessProxy(AuxiliaryProcessProxy* 
 
 inline void refWebProcessProxy(WebKit::WebProcessProxy* WTF_NONNULL obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefWebProcessProxy(WebKit::WebProcessProxy* WTF_NONNULL obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }
 
 SPECIALIZE_TYPE_TRAITS_BEGIN(WebKit::WebProcessProxy)

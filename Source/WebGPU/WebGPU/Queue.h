@@ -147,12 +147,12 @@ private:
 
 inline void refQueue(WebGPU::Queue* obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefQueue(WebGPU::Queue* obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }
 
 IGNORE_CLANG_WARNINGS_END

@@ -124,10 +124,10 @@ private:
 
 inline void refQuerySet(WebGPU::QuerySet* obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefQuerySet(WebGPU::QuerySet* obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }

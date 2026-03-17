@@ -404,10 +404,10 @@ inline AuxiliaryProcessProxy::State AuxiliaryProcessProxy::state() const
 
 inline void refAuxiliaryProcessProxy(WebKit::AuxiliaryProcessProxy* WTF_NONNULL obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefAuxiliaryProcessProxy(WebKit::AuxiliaryProcessProxy* WTF_NONNULL obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }

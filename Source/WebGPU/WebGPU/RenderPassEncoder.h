@@ -230,10 +230,10 @@ private:
 
 inline void refRenderPassEncoder(WebGPU::RenderPassEncoder* obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefRenderPassEncoder(WebGPU::RenderPassEncoder* obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }

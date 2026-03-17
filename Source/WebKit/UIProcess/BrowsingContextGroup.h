@@ -100,10 +100,10 @@ private:
 
 inline void refBrowsingContextGroup(WebKit::BrowsingContextGroup* WTF_NONNULL obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefBrowsingContextGroup(WebKit::BrowsingContextGroup* WTF_NONNULL obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }

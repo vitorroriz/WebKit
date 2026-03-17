@@ -144,12 +144,12 @@ inline API::Object* WTF_NONNULL toAPIObject(WebBackForwardListItem* WTF_NONNULL 
 
 inline void refBackForwardListItem(WebKit::WebBackForwardListItem* WTF_NONNULL obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefBackForwardListItem(WebKit::WebBackForwardListItem* WTF_NONNULL obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }
 
 SPECIALIZE_TYPE_TRAITS_BEGIN(WebKit::WebBackForwardListItem)

@@ -92,10 +92,10 @@ private:
 
 inline void refWebBackForwardListFrameItem(WebKit::WebBackForwardListFrameItem* obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefWebBackForwardListFrameItem(WebKit::WebBackForwardListFrameItem* obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }

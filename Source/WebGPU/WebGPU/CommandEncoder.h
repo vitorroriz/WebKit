@@ -218,12 +218,12 @@ private:
 
 inline void refCommandEncoder(WebGPU::CommandEncoder* obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefCommandEncoder(WebGPU::CommandEncoder* obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }
 
 IGNORE_CLANG_WARNINGS_END

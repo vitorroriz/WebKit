@@ -349,12 +349,12 @@ private:
 
 inline void refDevice(WebGPU::Device* obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefDevice(WebGPU::Device* obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }
 
 IGNORE_CLANG_WARNINGS_END

@@ -4241,12 +4241,12 @@ using WeakPtrWebPageProxy = WeakPtr<WebPageProxy>;
 
 inline void refWebPageProxy(WebKit::WebPageProxy* WTF_NONNULL obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefWebPageProxy(WebKit::WebPageProxy* WTF_NONNULL obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }
 
 SPECIALIZE_TYPE_TRAITS_BEGIN(WebKit::WebPageProxy)

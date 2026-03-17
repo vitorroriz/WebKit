@@ -1163,10 +1163,10 @@ inline void markCurrentlyDispatchedMessageAsInvalid(const RefPtr<Connection>& co
 
 inline void refConnection(IPC::Connection* WTF_NONNULL obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefConnection(IPC::Connection* WTF_NONNULL obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }

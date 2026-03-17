@@ -190,10 +190,10 @@ private:
 
 inline void refTexture(WebGPU::Texture* obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefTexture(WebGPU::Texture* obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }

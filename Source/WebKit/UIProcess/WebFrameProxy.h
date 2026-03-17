@@ -361,12 +361,12 @@ private:
 
 inline void refWebFrameProxy(WebKit::WebFrameProxy* WTF_NONNULL obj)
 {
-    WTF::ref(obj);
+    obj->ref();
 }
 
 inline void derefWebFrameProxy(WebKit::WebFrameProxy* WTF_NONNULL obj)
 {
-    WTF::deref(obj);
+    obj->deref();
 }
 
 SPECIALIZE_TYPE_TRAITS_BEGIN(WebKit::WebFrameProxy)
