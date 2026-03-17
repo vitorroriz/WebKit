@@ -543,6 +543,8 @@
 
 [Legacy] StructureParam WebCore::AccessibilityRemoteToken.bytes Vector<uint8_t>
 
+[NeedsReview] StructureParam WebCore::X509SubjectKeyIdentifier.data Vector<uint8_t>
+
 # GTK Specific
 [Legacy] StructureParam sk_sp<SkColorSpace>.dataReference() std::span<const uint8_t>
 [Legacy] StructureParam sk_sp<SkData>.dataReference() std::span<const uint8_t>

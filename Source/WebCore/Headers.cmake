@@ -476,6 +476,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     Modules/identity/protocols/UnvalidatedDigitalCredentialRequest.h
     Modules/identity/protocols/ISO18013/ISO18013.h
     Modules/identity/protocols/ISO18013/ISO18013DocumentRequest.h
+    Modules/identity/protocols/ISO18013/ISO18013DocumentRequestInfo.h
     Modules/identity/protocols/ISO18013/ISO18013DocumentRequestSet.h
     Modules/identity/protocols/ISO18013/ISO18013ElementInfo.h
     Modules/identity/protocols/ISO18013/ISO18013PresentmentRequest.h
@@ -1027,6 +1028,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     crypto/RsaOtherPrimesInfo.h
     crypto/SerializedCryptoKeyWrap.h
     crypto/WrappedCryptoKey.h
+    crypto/X509SubjectKeyIdentifier.h
 
     crypto/algorithms/CryptoAlgorithmAESCBC.h
     crypto/algorithms/CryptoAlgorithmECDH.h

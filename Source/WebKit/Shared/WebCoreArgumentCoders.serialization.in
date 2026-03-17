@@ -6462,8 +6462,6 @@ header: <WebCore/ISO18013.h>
     bool isRetaining;
 };
 
-#if ENABLE(ISO18013_DOCUMENT_REQUEST_INFO)
-
 [Nested] struct WebCore::ISO18013Any {
     Variant<std::monostate, int, bool, String, Vector<Box<WebCore::ISO18013Any>>, HashMap<String, Box<WebCore::ISO18013Any>>> data;
 };
@@ -6485,7 +6483,7 @@ header: <WebCore/ISO18013.h>
 
 [Nested] struct WebCore::ISO18013DocumentRequestInfo {
     std::optional<WebCore::ISO18013AlternativeDataElementsSet> alternativeDataElements;
-    std::optional<Vector<String>> issuerIdentifiers;
+    [Validator='!*issuerIdentifiers || (*issuerIdentifiers)->size() <= 1000'] std::optional<Vector<WebCore::X509SubjectKeyIdentifier>> issuerIdentifiers;
     std::optional<bool> uniqueDocSetRequired;
     std::optional<uint32_t> maximumResponseSize;
     std::optional<WebCore::ISO18013ZkRequest> zkRequest;
@@ -6493,14 +6491,10 @@ header: <WebCore/ISO18013.h>
     HashMap<String, WebCore::ISO18013Any> extension;
 };
 
-#endif // ENABLE(ISO18013_DOCUMENT_REQUEST_INFO)
-
 [Nested] struct WebCore::ISO18013DocumentRequest {
     String documentType;
     Vector<std::pair<String, Vector<std::pair<String, WebCore::ISO18013ElementInfo>>>> namespaces;
-#if ENABLE(ISO18013_DOCUMENT_REQUEST_INFO)
     std::optional<WebCore::ISO18013DocumentRequestInfo> requestInfo;
-#endif // ENABLE(ISO18013_DOCUMENT_REQUEST_INFO)
 };
 
 [Nested] struct WebCore::ISO18013DocumentRequestSet {
@@ -6511,6 +6505,11 @@ header: <WebCore/ISO18013.h>
     bool isMandatory;
     Vector<WebCore::ISO18013DocumentRequestSet> documentRequestSets;
 };
+
+header: <WebCore/X509SubjectKeyIdentifier.h>
+struct WebCore::X509SubjectKeyIdentifier {
+    [Validator='!data->isEmpty() && data->size() <= WebCore::X509SubjectKeyIdentifier::maxSize'] Vector<uint8_t> data;
+}
 
 struct WebCore::MobileDocumentRequest {
     String deviceRequest;

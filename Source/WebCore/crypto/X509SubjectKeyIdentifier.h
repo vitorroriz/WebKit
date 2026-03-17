@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Apple Inc. All rights reserved.
+ * Copyright (C) 2026 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,8 +25,14 @@
 
 #pragma once
 
-#include <WebCore/ISO18013DocumentRequest.h>
-#include <WebCore/ISO18013DocumentRequestInfo.h>
-#include <WebCore/ISO18013DocumentRequestSet.h>
-#include <WebCore/ISO18013ElementInfo.h>
-#include <WebCore/ISO18013PresentmentRequest.h>
+#include <wtf/Vector.h>
+
+namespace WebCore {
+
+struct X509SubjectKeyIdentifier {
+    static constexpr size_t maxSize = 64;
+
+    Vector<uint8_t> data;
+};
+
+} // namespace WebCore
