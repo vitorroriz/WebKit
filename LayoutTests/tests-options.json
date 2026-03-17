@@ -2243,6 +2243,102 @@
     "imported/w3c/web-platform-tests/editing/crashtests/insertparagraph-in-listitem-in-svg-followed-by-collapsible-spaces.html": [
         "slow"
     ],
+    "imported/w3c/web-platform-tests/editing/other/cloning-attributes-at-splitting-element.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/copy-paste-in-styled-inline-editing-host.https.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/delete-in-child-of-head.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/delete-in-child-of-html.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/delete-in-last-definition-list-item-when-parent-list-is-editing-host.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/delete-in-last-list-item-when-parent-list-is-editing-host.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/delete-without-unwrapping-first-line-of-child-block.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/editing-around-select-element.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/formatblock-preserving-selection.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/indent-preserving-selection.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/input-in-text-control-which-is-also-editing-host.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/insert-list-preserving-selection.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/insert-paragraph-in-void-element.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/insert-text-in-void-element.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/inserthtml-do-not-preserve-inline-styles.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/insertlinebreak-with-white-space-style.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/insertparagraph-in-child-of-head.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/insertparagraph-in-child-of-html.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/insertparagraph-in-editing-host-cannot-have-div.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/insertparagraph-in-inline-editing-host.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/insertparagraph-in-non-splittable-element.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/insertparagraph-with-white-space-style.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/join-different-white-space-style-left-line-and-right-paragraph.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/join-different-white-space-style-left-paragraph-and-right-line.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/join-different-white-space-style-paragraphs.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/justify-preserving-selection.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/keeping-attributes-at-joining-elements.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/outdent-preserving-selection.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/typing-around-link-element-after-joining-paragraphs.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/typing-around-link-element-at-collapsed-selection.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/typing-around-link-element-at-non-collapsed-selection.tentative.html": [
+        "slow"
+    ],
+    "imported/w3c/web-platform-tests/editing/other/undo-insertparagraph-after-moving-split-nodes.html": [
+        "slow"
+    ],
     "imported/w3c/web-platform-tests/editing/run/backcolor.html": [
         "slow"
     ],

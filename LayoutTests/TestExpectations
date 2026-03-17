@@ -8304,6 +8304,9 @@ imported/w3c/web-platform-tests/editing/other/insertparagraph-in-child-of-head.t
 imported/w3c/web-platform-tests/editing/other/insertparagraph-in-child-of-head.tentative.html?designMode=on&white-space=pre-line [ Pass Failure ]
 imported/w3c/web-platform-tests/editing/other/insertparagraph-in-child-of-head.tentative.html?designMode=on&white-space=pre-wrap [ Pass Failure ]
 
+imported/w3c/web-platform-tests/editing/other/exec-command-with-text-editor.tentative.html?type=password [ Pass Failure ]
+imported/w3c/web-platform-tests/editing/other/fire-selection-change-on-deleting-empty-element.html [ Failure ]
+
 webkit.org/b/288546 imported/w3c/web-platform-tests/fullscreen/api/element-ready-allowed.html [ Pass Failure ]
 
 # Tests that timed out
