@@ -17,6 +17,8 @@ skip:
     - import-defer
     - joint-iteration
     - Intl.Era-monthcode
+    - await-dictionary
+    - import-bytes
   paths:
     - test/built-ins/Temporal/Instant/prototype/toZonedDateTimeISO
     - test/built-ins/Temporal/Now/plainDateISO

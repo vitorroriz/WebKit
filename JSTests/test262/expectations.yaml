@@ -19,42 +19,6 @@ test/built-ins/Function/prototype/caller/prop-desc.js:
 test/built-ins/Function/prototype/toString/built-in-function-object.js:
   default: 'Test262Error: Conforms to NativeFunction Syntax: "function $*() {\n    [native code]\n}" (%RegExp%.$*)'
   strict mode: 'Test262Error: Conforms to NativeFunction Syntax: "function $*() {\n    [native code]\n}" (%RegExp%.$*)'
-test/built-ins/Promise/allKeyed/extensible.js:
-  default: 'Test262Error: Expected true but got false'
-  strict mode: 'Test262Error: Expected true but got false'
-test/built-ins/Promise/allKeyed/length.js:
-  default: "TypeError: undefined is not an object (evaluating '__getOwnPropertyDescriptor(obj, name)')"
-  strict mode: "TypeError: undefined is not an object (evaluating '__getOwnPropertyDescriptor(obj, name)')"
-test/built-ins/Promise/allKeyed/name.js:
-  default: "TypeError: undefined is not an object (evaluating '__getOwnPropertyDescriptor(obj, name)')"
-  strict mode: "TypeError: undefined is not an object (evaluating '__getOwnPropertyDescriptor(obj, name)')"
-test/built-ins/Promise/allKeyed/not-a-constructor.js:
-  default: 'Test262Error: isConstructor invoked with a non-function value'
-  strict mode: 'Test262Error: isConstructor invoked with a non-function value'
-test/built-ins/Promise/allKeyed/prop-desc.js:
-  default: 'Test262Error: obj should have an own property allKeyed'
-  strict mode: 'Test262Error: obj should have an own property allKeyed'
-test/built-ins/Promise/allKeyed/proto.js:
-  default: "TypeError: undefined is not an object (evaluating 'Object.getPrototypeOf(Promise.allKeyed)')"
-  strict mode: "TypeError: undefined is not an object (evaluating 'Object.getPrototypeOf(Promise.allKeyed)')"
-test/built-ins/Promise/allSettledKeyed/extensible.js:
-  default: 'Test262Error: Expected true but got false'
-  strict mode: 'Test262Error: Expected true but got false'
-test/built-ins/Promise/allSettledKeyed/length.js:
-  default: "TypeError: undefined is not an object (evaluating '__getOwnPropertyDescriptor(obj, name)')"
-  strict mode: "TypeError: undefined is not an object (evaluating '__getOwnPropertyDescriptor(obj, name)')"
-test/built-ins/Promise/allSettledKeyed/name.js:
-  default: "TypeError: undefined is not an object (evaluating '__getOwnPropertyDescriptor(obj, name)')"
-  strict mode: "TypeError: undefined is not an object (evaluating '__getOwnPropertyDescriptor(obj, name)')"
-test/built-ins/Promise/allSettledKeyed/not-a-constructor.js:
-  default: 'Test262Error: isConstructor invoked with a non-function value'
-  strict mode: 'Test262Error: isConstructor invoked with a non-function value'
-test/built-ins/Promise/allSettledKeyed/prop-desc.js:
-  default: 'Test262Error: obj should have an own property allSettledKeyed'
-  strict mode: 'Test262Error: obj should have an own property allSettledKeyed'
-test/built-ins/Promise/allSettledKeyed/proto.js:
-  default: "TypeError: undefined is not an object (evaluating 'Object.getPrototypeOf(Promise.allSettledKeyed)')"
-  strict mode: "TypeError: undefined is not an object (evaluating 'Object.getPrototypeOf(Promise.allSettledKeyed)')"
 test/built-ins/Promise/resolve/arg-uniq-ctor.js:
   default: 'TypeError: |this|.constructor is not an Object or undefined'
   strict mode: 'TypeError: |this|.constructor is not an Object or undefined'
@@ -908,16 +872,6 @@ test/language/identifiers/start-unicode-17.0.0-escaped.js:
 test/language/identifiers/start-unicode-17.0.0.js:
   default: "SyntaxError: Invalid character '\\u088f'"
   strict mode: "SyntaxError: Invalid character '\\u088f'"
-test/language/import/import-bytes/bytes-from-empty.js:
-  module: 'TypeError: Import attribute type "bytes" is not valid'
-test/language/import/import-bytes/bytes-from-js.js:
-  module: 'TypeError: Import attribute type "bytes" is not valid'
-test/language/import/import-bytes/bytes-from-json.js:
-  module: 'TypeError: Import attribute type "bytes" is not valid'
-test/language/import/import-bytes/bytes-from-png.js:
-  module: 'TypeError: Import attribute type "bytes" is not valid'
-test/language/import/import-bytes/bytes-from-txt.js:
-  module: 'TypeError: Import attribute type "bytes" is not valid'
 test/language/module-code/top-level-await/async-module-does-not-block-sibling-modules.js:
   module: 'Test262Error: Expected SameValue(«true», «false») to be true'
 test/language/module-code/top-level-await/dynamic-import-of-waiting-module.js:
@@ -962,12 +916,6 @@ test/language/statements/for-of/head-await-using-bound-names-fordecl-tdz.js:
   strict mode: "SyntaxError: Unexpected identifier 'x'. Expected either 'in' or 'of' in enumeration syntax."
 test/language/statements/for-of/head-await-using-fresh-binding-per-iteration.js:
   module: "SyntaxError: Unexpected identifier 'x'. Expected either 'in' or 'of' in enumeration syntax."
-test/language/statements/for-of/head-using-bound-names-fordecl-tdz.js:
-  default: "SyntaxError: Unexpected identifier 'x'. Expected either 'in' or 'of' in enumeration syntax."
-  strict mode: "SyntaxError: Unexpected identifier 'x'. Expected either 'in' or 'of' in enumeration syntax."
-test/language/statements/for-of/head-using-fresh-binding-per-iteration.js:
-  default: "SyntaxError: Unexpected identifier 'x'. Expected either 'in' or 'of' in enumeration syntax."
-  strict mode: "SyntaxError: Unexpected identifier 'x'. Expected either 'in' or 'of' in enumeration syntax."
 test/language/statements/for/head-lhs-let.js:
   default: "SyntaxError: Unexpected token ';'. Expected a parameter pattern or a ')' in parameter list."
 test/language/statements/with/get-binding-value-call-with-proxy-env.js:
