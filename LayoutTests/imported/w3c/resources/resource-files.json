@@ -13127,6 +13127,7 @@
         "web-platform-tests/mathml/presentation-markup/operators/operator-dictionary-arabic-002-ref.html",
         "web-platform-tests/mathml/presentation-markup/operators/operator-dictionary-empty-and-three-chars-ref.html",
         "web-platform-tests/mathml/presentation-markup/operators/painting-stretchy-operator-001-ref.html",
+        "web-platform-tests/mathml/presentation-markup/operators/painting-stretchy-operator-002-ref.html",
         "web-platform-tests/mathml/presentation-markup/operators/stretchy-underbar-1-ref.xhtml",
         "web-platform-tests/mathml/presentation-markup/radicals/dynamic-radical-paint-invalidation-001-ref.html",
         "web-platform-tests/mathml/presentation-markup/radicals/empty-msqrt-ref.html",
