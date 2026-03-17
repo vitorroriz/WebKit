@@ -1428,8 +1428,7 @@ public:
     bool isSecureContext() const final;
     bool isJSExecutionForbidden() const final { return false; }
 
-    void queueTaskToDispatchEvent(TaskSource, Ref<Event>&&);
-    void queueTaskToDispatchEventOnWindow(TaskSource, Ref<Event>&&);
+    void queueTaskToDispatchEventOnWindow(LocalDOMWindow&, TaskSource, Ref<Event>&&);
     void dispatchPageshowEvent(PageshowEventPersistence);
     void dispatchPagehideEvent(PageshowEventPersistence);
     WEBCORE_EXPORT void dispatchPageswapEvent(CanTriggerCrossDocumentViewTransition, RefPtr<NavigationActivation>&&);

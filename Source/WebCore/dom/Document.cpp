@@ -7026,18 +7026,11 @@ void Document::whenWindowLoadEventOrDestroyed(CompletionHandler<void()>&& comple
     };
 }
 
-void Document::queueTaskToDispatchEvent(TaskSource source, Ref<Event>&& event)
+void Document::queueTaskToDispatchEventOnWindow(LocalDOMWindow& window, TaskSource source, Ref<Event>&& event)
 {
-    queueTaskKeepingNodeAlive(*this, source, [event = WTF::move(event)](auto& document) {
-        document.dispatchEvent(event);
-    });
-}
-
-void Document::queueTaskToDispatchEventOnWindow(TaskSource source, Ref<Event>&& event)
-{
-    eventLoop().queueTask(source, [this, protectedThis = Ref { *this }, event = WTF::move(event)] {
-        if (RefPtr window = m_domWindow)
-            window->dispatchEvent(event);
+    // GCReachableRef is not needed here as JSDOMWindow is kept alive as long as the environment exists.
+    eventLoop().queueTask(source, [protectedWindow = Ref { window }, event = WTF::move(event)] {
+        protectedWindow->dispatchEvent(event);
     });
 }
 
@@ -8865,7 +8858,8 @@ void Document::enqueueSecurityPolicyViolationEvent(SecurityPolicyViolationEventI
 void Document::enqueueHashchangeEvent(const String& oldURL, const String& newURL)
 {
     // FIXME: popstate event and hashchange event are supposed to fire in a single task.
-    queueTaskToDispatchEventOnWindow(TaskSource::DOMManipulation, HashChangeEvent::create(oldURL, newURL));
+    if (RefPtr window = m_domWindow)
+        queueTaskToDispatchEventOnWindow(*window, TaskSource::DOMManipulation, HashChangeEvent::create(oldURL, newURL));
 }
 
 void Document::dispatchPopstateEvent(RefPtr<SerializedScriptValue>&& stateObject)

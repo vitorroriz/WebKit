@@ -2372,7 +2372,7 @@ void LocalDOMWindow::languagesChanged()
 {
     // https://html.spec.whatwg.org/multipage/system-state.html#dom-navigator-languages
     if (RefPtr document = this->document())
-        document->queueTaskToDispatchEventOnWindow(TaskSource::DOMManipulation, Event::create(eventNames().languagechangeEvent, Event::CanBubble::No, Event::IsCancelable::No));
+        document->queueTaskToDispatchEventOnWindow(*this, TaskSource::DOMManipulation, Event::create(eventNames().languagechangeEvent, Event::CanBubble::No, Event::IsCancelable::No));
 }
 
 void LocalDOMWindow::dispatchLoadEvent()
