@@ -67,43 +67,23 @@ ResizeObserver::~ResizeObserver()
         m_document->removeResizeObserver(*this);
 }
 
-ResizeObservation* ResizeObserver::observationForElement(Element& target)
-{
-    auto* data = target.resizeObserverDataIfExists();
-    if (!data)
-        return nullptr;
-
-    // There tend to be more elements to be observed than there are observers.
-    // Check if this observer appears in node's observer data first to avoid a linear search over m_observations.
-    if (data->observers.size() * 2 < m_observations.size() && data->observers.contains(this))
-        return nullptr;
-
-    auto position = m_observations.findIf([&](auto& observation) {
-        return observation->target() == &target;
-    });
-
-    if (position == notFound)
-        return nullptr;
-
-    return m_observations[position].ptr();
-}
-
 void ResizeObserver::observeInternal(Element& target, const ResizeObserverBoxOptions boxOptions)
 {
     ASSERT(!m_JSOrNativeCallback.valueless_by_exception());
 
-    if (RefPtr existingObservation = observationForElement(target)) {
+    auto addResult = m_observationMap.ensure(target, [&]() {
+        return ResizeObservation::create(target, boxOptions);
+    });
+    if (!addResult.isNewEntry) {
         // The spec suggests unconditionally unobserving here, but that causes a test failure:
         // https://github.com/web-platform-tests/wpt/issues/30708
-        if (existingObservation->observedBox() == boxOptions)
+        if (addResult.iterator->value->observedBox() == boxOptions)
             return;
         unobserve(target);
     }
-
     auto& observerData = target.ensureResizeObserverData();
     observerData.observers.append(*this);
-
-    m_observations.append(ResizeObservation::create(target, boxOptions));
+    m_observations.add(addResult.iterator->value.copyRef());
 
     // Per the specification, we should dispatch at least one observation for the target. For this reason, we make sure to keep the
     // target alive until this first observation. This, in turn, will keep the ResizeObserver's JS wrapper alive via
@@ -276,6 +256,7 @@ void ResizeObserver::removeAllTargets()
     }
     m_activeObservations.clear();
     m_observations.clear();
+    m_observationMap.clear();
 }
 
 bool ResizeObserver::removeObservation(const Element& target)
@@ -286,9 +267,11 @@ bool ResizeObserver::removeObservation(const Element& target)
             return pendingTarget.get() == &target;
         });
     }
-    return m_observations.removeFirstMatching([&target](auto& observation) {
-        return observation->target() == &target;
-    });
+    RefPtr observation = m_observationMap.take(target);
+    if (!observation)
+        return false;
+    m_observations.remove(observation);
+    return true;
 }
 
 bool ResizeObserver::isJSCallback()
@@ -315,7 +298,7 @@ ResizeObserverCallback* ResizeObserver::callbackConcurrently()
 
 void ResizeObserver::resetObservationSize(Element& target)
 {
-    if (RefPtr observation = observationForElement(target))
+    if (RefPtr observation = m_observationMap.get(target))
         observation->resetObservationSize();
 }
 
