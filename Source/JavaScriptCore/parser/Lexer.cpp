@@ -2559,18 +2559,26 @@ start:
             goto returnError;
         }
 
-        record8('0');
         if (strictMode && isASCIIDigit(m_current)) [[unlikely]] {
             m_lexErrorMessage = "Decimal integer literals with a leading zero are forbidden in strict mode"_s;
             token = UNTERMINATED_OCTAL_NUMBER_ERRORTOK;
             goto returnError;
         }
+
         if (isASCIIOctalDigit(m_current)) {
+            record8('0');
             auto parseNumberResult = parseOctal();
             if (parseNumberResult && std::holds_alternative<double>(*parseNumberResult)) {
                 tokenData->doubleValue = std::get<double>(*parseNumberResult);
                 token = tokenTypeForIntegerLikeToken(tokenData->doubleValue);
             }
+        } else {
+            if (!isASCIIDigit(m_current) && m_current != '.' && cannotBeIdentStart(m_current)) {
+                tokenData->doubleValue = 0;
+                token = INTEGER;
+                break;
+            }
+            record8('0');
         }
         [[fallthrough]];
     }
