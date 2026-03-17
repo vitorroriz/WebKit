@@ -2683,29 +2683,23 @@ $(IDL_INTERMEDIATE_PATTERNS) : $(PREPROCESS_IDLS_SCRIPTS) $(IDL_ATTRIBUTES_FILE)
 vpath %.idl $(ADDITIONAL_BINDING_IDLS_PATHS) $(WebCore)/bindings/scripts
 
 # -------------------------------------------------
-define GENERATE_BINDINGS_template
+JS_DOM_HEADERS_PATTERNS = $(subst .h,%h,$(JS_DOM_HEADERS))
+JS_DOM_IMPLEMENTATIONS_PATTERNS = $(subst .cpp,%cpp,$(JS_DOM_IMPLEMENTATIONS))
 
-JS$(call get_bare_name,$(1)).cpp JS$(call get_bare_name,$(1)).h: $(1) $$(JS_BINDINGS_SCRIPTS) $$(IDL_ATTRIBUTES_FILE) $$(IDL_INTERMEDIATE_FILES) $$(FEATURE_AND_PLATFORM_FLAGS_RESPONSE_FILE) | $(IDL_FILE_NAMES_LIST)
-	$$(PERL) $$(WebCore)/bindings/scripts/generate-bindings.pl \
-		$$(IDL_COMMON_ARGS) \
-		--defines "$$(FEATURE_AND_PLATFORM_DEFINES) LANGUAGE_JAVASCRIPT" \
+$(JS_DOM_HEADERS_PATTERNS) $(JS_DOM_IMPLEMENTATIONS_PATTERNS): $(JS_BINDING_IDLS) $(JS_BINDINGS_SCRIPTS) \
+        $(IDL_ATTRIBUTES_FILE) $(IDL_INTERMEDIATE_FILES) \
+        $(FEATURE_AND_PLATFORM_FLAGS_RESPONSE_FILE) \
+        | $(IDL_FILE_NAMES_LIST)
+	$(PERL) $(WebCore)/bindings/scripts/generate-bindings-all.pl \
+		--outputDir . \
+		--idlFilesList $(IDL_FILE_NAMES_LIST) \
+		--supplementalDependencyFile $(SUPPLEMENTAL_DEPENDENCY_FILE) \
+		--idlAttributesFile $(IDL_ATTRIBUTES_FILE) \
+		--defines "$(FEATURE_AND_PLATFORM_DEFINES) LANGUAGE_JAVASCRIPT" \
 		--generator JS \
-		--idlAttributesFile $$(IDL_ATTRIBUTES_FILE) \
-		--idlFileNamesList $(IDL_FILE_NAMES_LIST) \
-		--supplementalDependencyFile $$(SUPPLEMENTAL_DEPENDENCY_FILE) \
-		$$<
-endef
+		$(addprefix --generatorDependency ,$(JS_BINDINGS_SCRIPTS)) \
+		--exclude EventListener.idl
 # -------------------------------------------------
-
-$(foreach IDL_FILE,$(JS_BINDING_IDLS),$(eval $(call GENERATE_BINDINGS_template,$(IDL_FILE))))
-
-ifneq ($(NO_SUPPLEMENTAL_FILES),1)
--include $(SUPPLEMENTAL_MAKEFILE_DEPS)
-endif
-
-ifneq ($(NO_SUPPLEMENTAL_FILES),1)
--include $(JS_DOM_HEADERS:.h=.dep)
-endif
 
 # WebCore JS Builtins
 
