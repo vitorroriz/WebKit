@@ -139,6 +139,7 @@ static const NSTimeInterval multiTapInterval = 0.15;
 static const NSTimeInterval fingerMoveInterval = 0.016;
 static const NSTimeInterval longPressHoldDelay = 2.0;
 static const IOHIDFloat defaultMajorRadius = 5;
+static const IOHIDFloat defaultMajorRadiusTolerance = 0;
 static const IOHIDFloat defaultPathPressure = 0;
 static const long nanosecondsPerSecond = 1e9;
 
@@ -169,6 +170,7 @@ typedef struct {
     int identifier;
     CGPoint point;
     IOHIDFloat pathMajorRadius;
+    IOHIDFloat pathMajorRadiusTolerance;
     IOHIDFloat pathPressure;
     UInt8 pathProximity;
     BOOL isStylus;
@@ -447,6 +449,8 @@ static InterpolationType interpolationFromString(NSString *string)
         if (eventType == HandEventTouched) {
             if (!pointInfo->pathMajorRadius)
                 pointInfo->pathMajorRadius = defaultMajorRadius;
+            if (!pointInfo->pathMajorRadiusTolerance)
+                pointInfo->pathMajorRadiusTolerance = defaultMajorRadiusTolerance;
             if (!pointInfo->pathPressure)
                 pointInfo->pathPressure = defaultPathPressure;
             if (!pointInfo->pathProximity)
@@ -506,6 +510,7 @@ static InterpolationType interpolationFromString(NSString *string)
 
         IOHIDEventSetFloatValue(subEvent.get(), kIOHIDEventFieldDigitizerMajorRadius, pointInfo->pathMajorRadius);
         IOHIDEventSetFloatValue(subEvent.get(), kIOHIDEventFieldDigitizerMinorRadius, pointInfo->pathMajorRadius);
+        IOHIDEventSetFloatValue(subEvent.get(), kIOHIDEventFieldDigitizerQualityRadiiAccuracy, pointInfo->pathMajorRadiusTolerance);
 
         IOHIDEventAppendEvent(eventRef.get(), subEvent.get(), 0);
     }
@@ -625,6 +630,26 @@ static InterpolationType interpolationFromString(NSString *string)
 - (void)touchDown:(CGPoint)location
 {
     [self touchDownAtPoints:&location touchCount:1];
+}
+
+- (void)touchDown:(CGPoint)location majorRadius:(CGFloat)majorRadius majorRadiusTolerance:(CGFloat)majorRadiusTolerance
+{
+    _activePointCount = 1;
+    _activePoints[0].point = location;
+    _activePoints[0].isStylus = NO;
+    _activePoints[0].pathMajorRadius = majorRadius;
+    _activePoints[0].pathMajorRadiusTolerance = majorRadiusTolerance;
+
+    [[GeneratedTouchesDebugWindow sharedGeneratedTouchesDebugWindow] updateDebugIndicatorForTouch:0 withPointInWindowCoordinates:location isTouching:YES];
+
+    RetainPtr eventRef = adoptCF([self _createIOHIDEventType:HandEventTouched]);
+    [self _sendHIDEvent:eventRef.get()];
+}
+
+- (void)touchDown:(CGPoint)location majorRadius:(CGFloat)majorRadius majorRadiusTolerance:(CGFloat)majorRadiusTolerance completionBlock:(void (^)(void))completionBlock
+{
+    [self touchDown:location majorRadius:majorRadius majorRadiusTolerance:majorRadiusTolerance];
+    [self sendMarkerHIDEventWithCompletionBlock:completionBlock];
 }
 
 - (void)liftUpAtPoints:(CGPoint*)locations touchCount:(NSUInteger)touchCount

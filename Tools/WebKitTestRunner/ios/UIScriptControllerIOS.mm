@@ -337,6 +337,18 @@ void UIScriptControllerIOS::touchDownAtPoint(long x, long y, long touchCount, JS
     }).get()];
 }
 
+void UIScriptControllerIOS::touchDownAtPointWithMajorRadius(long x, long y, float majorRadius, float majorRadiusTolerance, JSValueRef callback)
+{
+    unsigned callbackID = m_context->prepareForAsyncTask(callback, CallbackTypeNonPersistent);
+
+    auto location = globalToContentCoordinates(webView(), x, y);
+    [[HIDEventGenerator sharedHIDEventGenerator] touchDown:location majorRadius:majorRadius majorRadiusTolerance:majorRadiusTolerance completionBlock:makeBlockPtr([this, protectedThis = Ref { *this }, callbackID] {
+        if (!m_context)
+            return;
+        m_context->asyncTaskComplete(callbackID);
+    }).get()];
+}
+
 void UIScriptControllerIOS::liftUpAtPoint(long x, long y, long touchCount, JSValueRef callback)
 {
     unsigned callbackID = m_context->prepareForAsyncTask(callback, CallbackTypeNonPersistent);

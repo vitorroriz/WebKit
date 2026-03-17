@@ -64,6 +64,7 @@ private:
     void simulateAccessibilitySettingsChangeNotification(JSValueRef) override;
     double zoomScale() const override;
     void touchDownAtPoint(long x, long y, long touchCount, JSValueRef) override;
+    void touchDownAtPointWithMajorRadius(long x, long y, float majorRadius, float majorRadiusTolerance, JSValueRef) override;
     void liftUpAtPoint(long x, long y, long touchCount, JSValueRef) override;
     void singleTapAtPoint(long x, long y, JSValueRef) override;
     void singleTapAtPointWithModifiers(long x, long y, JSValueRef modifierArray, JSValueRef) override;

@@ -217,6 +217,7 @@ public:
     // Touches
 
     virtual void touchDownAtPoint(long, long, long, JSValueRef) { notImplemented(); }
+    virtual void touchDownAtPointWithMajorRadius(long, long, float, float, JSValueRef) { notImplemented(); }
     virtual void liftUpAtPoint(long, long, long, JSValueRef) { notImplemented(); }
     virtual void singleTapAtPoint(long, long, JSValueRef) { notImplemented(); }
     virtual void singleTapAtPointWithModifiers(long, long, JSValueRef, JSValueRef) { notImplemented(); }
