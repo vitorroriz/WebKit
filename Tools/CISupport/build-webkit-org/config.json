@@ -55,7 +55,7 @@
                   { "name": "bot185", "platform": "mac-sequoia" },
                   { "name": "bot198", "platform": "mac-sequoia" },
                   { "name": "bot279", "platform": "mac-sequoia" },
-                  { "name": "bot600", "platform": "mac-sequoia" },
+                  { "name": "bot600", "platform": "mac-tahoe" },
                   { "name": "bot614", "platform": "mac-sequoia" },
                   { "name": "bot1021", "platform": "mac-sequoia" },
                   { "name": "bot1025", "platform": "mac-sequoia" },
@@ -310,8 +310,8 @@
                   "workernames": ["bot258"]
                   },
                   {
-                    "name": "Apple-Sequoia-Safer-CPP-Checks", "factory": "SaferCPPStaticAnalyzerFactory",
-                    "platform": "mac-sequoia", "configuration": "release", "architectures": ["arm64"],
+                    "name": "Apple-Tahoe-Safer-CPP-Checks", "factory": "SaferCPPStaticAnalyzerFactory",
+                    "platform": "mac-tahoe", "configuration": "release", "architectures": ["arm64"],
                     "workernames": ["bot600"]
                   },
                   { "name": "Apple-Sequoia-Release-Build", "factory": "BuildFactory",
@@ -797,7 +797,7 @@
                                      "WPE-Linux-ARM64-bit-Release-Build"]
                   },
                   { "type": "PlatformSpecificScheduler", "platform": "mac-tahoe", "branch": "main", "treeStableTimer": 45.0,
-                  "builderNames": ["Apple-Tahoe-Release-Build", "Apple-Tahoe-Debug-Build", "Apple-Tahoe-LLINT-CLoop-BuildAndTest"]
+                  "builderNames": ["Apple-Tahoe-Release-Build", "Apple-Tahoe-Debug-Build", "Apple-Tahoe-LLINT-CLoop-BuildAndTest", "Apple-Tahoe-Safer-CPP-Checks"]
                   },
                   { "type": "Triggerable", "name": "tahoe-release-tests-wk1",
                   "builderNames": ["Apple-Tahoe-Release-WK1-Tests"]
@@ -839,7 +839,7 @@
                     "builderNames": ["Apple-Tahoe-Release-World-Leaks-Tests"]
                   },
                   { "type": "PlatformSpecificScheduler", "platform": "mac-sequoia", "branch": "main", "treeStableTimer": 45.0,
-                  "builderNames": ["Apple-Sequoia-Release-Build", "Apple-Sequoia-Debug-Build", "Apple-Sequoia-Safer-CPP-Checks", "Apple-Sequoia-AppleSilicon-O3-Debug-JSC-BuildAndTest"]
+                  "builderNames": ["Apple-Sequoia-Release-Build", "Apple-Sequoia-Debug-Build", "Apple-Sequoia-AppleSilicon-O3-Debug-JSC-BuildAndTest"]
                   },
                   { "type": "Triggerable", "name": "sequoia-release-tests-wk1",
                   "builderNames": ["Apple-Sequoia-Release-WK1-Tests"]
