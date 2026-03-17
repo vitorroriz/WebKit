@@ -248,25 +248,19 @@ namespace WTF {
         using SegmentPtr = std::unique_ptr<Segment, NonDestructingDeleter<Segment, Malloc>>;
 
         struct EmptyInlineStorage { };
-        struct alignas(T) InlineStorageData { std::byte m_data[sizeof(T) * InlineCapacity]; };
-
-// armv7 compiler doesn't recognize that m_data is aligned to sizeof(T) by InlineStorageData
-// and complains that the two reinterpret_cast()s below increase the alignment.
-IGNORE_WARNINGS_BEGIN("cast-align")
+        struct InlineStorageData { AlignedStorage<T> m_data[InlineCapacity]; };
 
         ALWAYS_INLINE T* inlineStorage() LIFETIME_BOUND
         {
             static_assert(hasInlineStorage);
-            return reinterpret_cast<T*>(m_inlineStorageMember.m_data);
+            return m_inlineStorageMember.m_data[0].get();
         }
 
         ALWAYS_INLINE const T* inlineStorage() const LIFETIME_BOUND
         {
             static_assert(hasInlineStorage);
-            return reinterpret_cast<const T*>(m_inlineStorageMember.m_data);
+            return m_inlineStorageMember.m_data[0].get();
         }
-
-IGNORE_WARNINGS_END
 
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
 
