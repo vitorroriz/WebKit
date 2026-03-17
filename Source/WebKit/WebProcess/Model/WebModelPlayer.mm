@@ -308,6 +308,8 @@ void WebModelPlayer::load(WebCore::Model& modelSource, WebCore::LayoutSize size)
 
             if (RefPtr client = protectedThis->m_client.get(); client && !protectedThis->m_didFinishLoading) {
                 protectedThis->m_didFinishLoading = true;
+                [protectedThis->m_modelLoader setLoop:protectedThis->m_isLooping];
+
                 client->didFinishLoading(protectedThis.get());
                 auto [simdCenter, simdExtents] = model->getCenterAndExtents();
                 client->didUpdateBoundingBox(protectedThis.get(), WebCore::FloatPoint3D(simdCenter.x, simdCenter.y, simdCenter.z), WebCore::FloatPoint3D(simdExtents.x, simdExtents.y, simdExtents.z));
