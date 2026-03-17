@@ -62,7 +62,7 @@ template<typename Numeric, CSS::PrimitiveKeyword... Ks> struct LengthWrapperBase
     static constexpr bool SupportsMinIntrinsic = Keywords::isValidKeyword(CSS::Keyword::MinIntrinsic { });
     static constexpr bool SupportsMinContent = Keywords::isValidKeyword(CSS::Keyword::MinContent { });
     static constexpr bool SupportsMaxContent = Keywords::isValidKeyword(CSS::Keyword::MaxContent { });
-    static constexpr bool SupportsWebkitFillAvailable = Keywords::isValidKeyword(CSS::Keyword::WebkitFillAvailable { });
+    static constexpr bool SupportsStretch = Keywords::isValidKeyword(CSS::Keyword::Stretch { });
     static constexpr bool SupportsFitContent = Keywords::isValidKeyword(CSS::Keyword::FitContent { });
     static constexpr bool SupportsContent = Keywords::isValidKeyword(CSS::Keyword::Content { });
     static constexpr bool SupportsNone = Keywords::isValidKeyword(CSS::Keyword::None { });

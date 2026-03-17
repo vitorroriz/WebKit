@@ -421,10 +421,10 @@ bool RenderReplaced::hasReplacedLogicalHeight() const
     if (style().logicalHeight().isPercentOrCalculated())
         return !hasAutoHeightOrContainingBlockWithAutoHeight();
 
-    if (style().logicalHeight().isIntrinsicOrStretch())
+    if (style().logicalHeight().isIntrinsic())
         return !style().aspectRatio().hasRatio();
 
-    return false;
+    return isResolveableStretchSize(style().logicalHeight());
 }
 
 bool RenderReplaced::setNeedsLayoutIfNeededAfterIntrinsicSizeChange()
@@ -433,7 +433,7 @@ bool RenderReplaced::setNeedsLayoutIfNeededAfterIntrinsicSizeChange()
 
     // If the actual area occupied by the image has changed and it is not constrained by style then a layout is required.
     bool imageSizeIsConstrained = style().logicalWidth().isSpecified() && style().logicalHeight().isSpecified()
-        && !style().logicalMinWidth().isIntrinsicOrStretch() && !style().logicalMaxWidth().isIntrinsicOrStretch()
+        && !style().logicalMinWidth().isIntrinsic() && !style().logicalMaxWidth().isIntrinsic()
         && !hasAutoHeightOrContainingBlockWithAutoHeight(UpdatePercentageHeightDescendants::No);
 
     // FIXME: We only need to recompute the containing block's preferred size
@@ -529,7 +529,7 @@ void RenderReplaced::computeIntrinsicSizesConstrainedByTransferredMinMaxSizes(Re
     // each axis, the final returned size may in fact not preserve the aspect ratio.
     auto& style = this->style();
     auto computedLogicalHeight = style.logicalHeight();
-    bool logicalHeightBehavesAsAuto = computedLogicalHeight.isAuto() || (computedLogicalHeight.isPercentOrCalculated() && !percentageLogicalHeightIsResolvable());
+    bool logicalHeightBehavesAsAuto = computedLogicalHeight.isAuto() || (computedLogicalHeight.isPercentOrCalculated() && !percentageLogicalHeightIsResolvable()) || isUnresolveableStretchSize(computedLogicalHeight);
     if (!intrinsicRatio.isZero() && style.logicalWidth().isAuto() && logicalHeightBehavesAsAuto) {
         auto removeBorderAndPaddingFromMinMaxSizes = [](LayoutUnit& minSize, LayoutUnit &maxSize, LayoutUnit borderAndPadding) {
             minSize = std::max(0_lu, minSize - borderAndPadding);
@@ -787,7 +787,7 @@ LayoutUnit RenderReplaced::computeReplacedLogicalWidth(ShouldComputePreferred sh
                 if (isOutOfFlowPositioned() && !style.logicalLeft().isAuto() && !style.logicalRight().isAuto()) {
                     // Still respect min-width, but ignore max-width if it's an intrinsic keyword.
                     auto& logicalMinWidth = style.logicalMinWidth();
-                    auto minLogicalWidth = logicalMinWidth.isIntrinsicOrStretch() ? 0_lu : computeReplacedLogicalWidthUsing(logicalMinWidth);
+                    auto minLogicalWidth = logicalMinWidth.isIntrinsic() ? 0_lu : computeReplacedLogicalWidthUsing(logicalMinWidth);
                     return std::max(minLogicalWidth, constrainedLogicalWidth);
                 }
 
@@ -1073,10 +1073,15 @@ void RenderReplaced::computeReplacedOutOfFlowPositionedLogicalWidth(LogicalExten
     PositionedLayoutConstraints inlineConstraints(*this, LogicalBoxAxis::Inline);
     inlineConstraints.computeInsets();
 
-    // NOTE: This value of width is final in that the min/max width calculations
-    // are dealt with in computeReplacedWidth(). This means that the steps to produce
-    // correct max/min in the non-replaced version, are not necessary.
-    computedValues.extent = computeReplacedLogicalWidth() + borderAndPaddingLogicalWidth();
+    if (style().logicalWidth().isStretch()) {
+        auto stretchedContent = inlineConstraints.availableContentSpace();
+        computedValues.extent = computeReplacedLogicalWidthRespectingMinMaxWidth(stretchedContent) + borderAndPaddingLogicalWidth();
+    } else {
+        // NOTE: This value of width is final in that the min/max width calculations
+        // are dealt with in computeReplacedWidth(). This means that the steps to produce
+        // correct max/min in the non-replaced version, are not necessary.
+        computedValues.extent = computeReplacedLogicalWidth() + borderAndPaddingLogicalWidth();
+    }
 
     inlineConstraints.resolvePosition(computedValues);
     inlineConstraints.fixupLogicalLeftPosition(computedValues);
@@ -1087,10 +1092,15 @@ void RenderReplaced::computeReplacedOutOfFlowPositionedLogicalHeight(LogicalExte
     PositionedLayoutConstraints blockConstraints(*this, LogicalBoxAxis::Block);
     blockConstraints.computeInsets();
 
-    // NOTE: This value of height is final in that the min/max height calculations
-    // are dealt with in computeReplacedHeight(). This means that the steps to produce
-    // correct max/min in the non-replaced version, are not necessary.
-    computedValues.extent = computeReplacedLogicalHeight() + borderAndPaddingLogicalHeight();
+    if (style().logicalHeight().isStretch()) {
+        auto stretchedContent = blockConstraints.availableContentSpace();
+        computedValues.extent = computeReplacedLogicalHeightRespectingMinMaxHeight(stretchedContent) + borderAndPaddingLogicalHeight();
+    } else {
+        // NOTE: This value of height is final in that the min/max height calculations
+        // are dealt with in computeReplacedHeight(). This means that the steps to produce
+        // correct max/min in the non-replaced version, are not necessary.
+        computedValues.extent = computeReplacedLogicalHeight() + borderAndPaddingLogicalHeight();
+    }
 
     blockConstraints.resolvePosition(computedValues);
     blockConstraints.adjustLogicalTopWithLogicalHeightIfNeeded(computedValues);
@@ -1154,8 +1164,25 @@ LayoutUnit RenderReplaced::computeReplacedLogicalWidthUsing(const SizeType& logi
         [&](const CSS::Keyword::FitContent& keyword) -> LayoutUnit {
             return content(keyword, calculateContainerWidth());
         },
-        [&](const CSS::Keyword::WebkitFillAvailable& keyword) -> LayoutUnit {
-            return content(keyword, calculateContainerWidth());
+        [&](const CSS::Keyword::Stretch&) -> LayoutUnit {
+            auto availableWidth = calculateContainerWidth();
+            auto borderAndPadding = borderAndPaddingLogicalWidth();
+            LayoutUnit marginStart;
+            LayoutUnit marginEnd;
+            auto logicalWidthResult = fillAvailableMeasure(availableWidth, marginStart, marginEnd);
+            // Block-level replaced elements need to shrink their stretch size to account for float
+            // intrusion. Inline replaced elements don't avoid floats this way — they flow alongside
+            // them.
+            if (!isInline()) {
+                ASSERT(containingBlock());
+                if (CheckedRef containingBlock = *this->containingBlock(); containingBlock->containsFloats()) {
+                    LayoutUnit logicalHeight;
+                    if (auto height = computeContentLogicalHeight(style().logicalHeight(), std::nullopt))
+                        logicalHeight = *height + borderAndPaddingLogicalHeight();
+                    logicalWidthResult = std::min(logicalWidthResult, shrinkLogicalWidthToAvoidFloats(marginStart, marginEnd, containingBlock, logicalHeight));
+                }
+            }
+            return std::max(borderAndPadding, logicalWidthResult) - borderAndPadding;
         },
         [&](const CSS::Keyword::MinContent& keyword) -> LayoutUnit {
             // min-content/max-content don't need the availableLogicalWidth argument.
@@ -1192,6 +1219,12 @@ bool RenderReplaced::replacedMinMaxLogicalHeightComputesAsNone(const auto& logic
         if (auto gridAreaContentLogicalHeight = this->gridAreaContentLogicalHeight())
             return !*gridAreaContentLogicalHeight;
     }
+
+    // stretch with an indefinite containing block behaves as the initial
+    // value (0 for min-height, none for max-height), so treat it as none
+    // here to prevent the stretch value from being resolved.
+    if (isUnresolveableStretchSize(logicalHeight))
+        return true;
 
     // Make sure % min-height and % max-height resolve to none if the containing block has auto height.
     // Note that the "height" case for replaced elements was handled by hasReplacedLogicalHeight, which is why
@@ -1333,8 +1366,11 @@ LayoutUnit RenderReplaced::computeReplacedLogicalHeightUsingGeneric(const SizeTy
             auto [transferredMinLogicalHeight, transferredMaxLogicalHeight] = computeMinMaxLogicalHeightFromAspectRatio();
             return std::clamp(content(), transferredMinLogicalHeight, transferredMaxLogicalHeight);
         },
-        [&](const CSS::Keyword::WebkitFillAvailable&) -> LayoutUnit {
-            return content();
+        [&](const CSS::Keyword::Stretch&) -> LayoutUnit {
+            // stretch with indefinite containing block falls back to intrinsic height for replaced elements.
+            if (auto result = computeSizingKeywordLogicalContentHeightUsing(logicalHeight, intrinsicLogicalHeight(), borderAndPaddingLogicalHeight()))
+                return *result;
+            return intrinsicLogicalHeight();
         },
         [&](const CSS::Keyword::MinContent&) -> LayoutUnit {
             auto [transferredMinLogicalHeight, transferredMaxLogicalHeight] = computeMinMaxLogicalHeightFromAspectRatio();

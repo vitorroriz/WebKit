@@ -1167,6 +1167,10 @@ template<typename SizeType> LayoutUnit RenderFlexibleBox::computeMainSizeFromAsp
             ASSERT(flexItemCrossSizeShouldUseContainerCrossSize(flexItem));
             return computeCrossSizeForFlexItemUsingContainerCrossSize(flexItem);
         },
+        [&](const CSS::Keyword::Stretch&) -> std::optional<LayoutUnit> {
+            // Resolve stretch against the flex container's cross-axis definite size.
+            return computeCrossSizeForFlexItemUsingContainerCrossSize(flexItem);
+        },
         [&](const auto&) -> std::optional<LayoutUnit> {
             ASSERT_NOT_REACHED();
             return { };
@@ -1232,8 +1236,13 @@ template<typename SizeType> bool RenderFlexibleBox::flexItemMainSizeIsDefinite(c
         if (size.isContent())
             return false;
     }
-    if (!mainAxisIsFlexItemInlineAxis(flexItem) && (size.isIntrinsicOrStretch() || size.isIntrinsicKeyword()))
+    if (!mainAxisIsFlexItemInlineAxis(flexItem) && (size.isIntrinsic() || size.isIntrinsicKeyword()))
         return false;
+    // Stretch is definite in the same cases as percentages, i.e., when the
+    // container's cross size is definite. We use a dummy percentage since
+    // canComputePercentageFlexBasis evaluates the value as a percentage.
+    if (size.isStretch())
+        return canComputePercentageFlexBasis(flexItem, Style::PreferredSize { 0_css_percentage }, UpdatePercentageHeightDescendants::No);
     if (size.isPercentOrCalculated())
         return canComputePercentageFlexBasis(flexItem, size, UpdatePercentageHeightDescendants::No);
     return true;
@@ -1277,16 +1286,26 @@ template<typename SizeType> bool RenderFlexibleBox::flexItemCrossSizeIsDefinite(
             return false;
     }
 
-    if (size.isPercentOrCalculated()) {
+    // Stretch is definite in the same cases as percentages, i.e. when the
+    // container's cross size is definite. We use a dummy percentage for stretch
+    // since computePercentageLogicalHeight evaluates the value as a percentage.
+    auto crossSizeIsDefinite = [&](const auto& sizeForPercentageComputation) {
         if (!mainAxisIsFlexItemInlineAxis(flexItem) || m_hasDefiniteHeight == SizeDefiniteness::Definite)
             return true;
         if (m_hasDefiniteHeight == SizeDefiniteness::Indefinite)
             return false;
-        bool definite = bool(flexItem.computePercentageLogicalHeight(size));
+        bool definite = bool(flexItem.computePercentageLogicalHeight(sizeForPercentageComputation));
         m_hasDefiniteHeight = definite ? SizeDefiniteness::Definite : SizeDefiniteness::Indefinite;
         return definite;
-    }
-    // FIXME: Eventually we should support other types of sizes here.
+    };
+
+    if (size.isPercentOrCalculated())
+        return crossSizeIsDefinite(size);
+
+    if (size.isStretch())
+        return crossSizeIsDefinite(Style::PreferredSize { 0_css_percentage });
+
+    // FIXME: Support other intrinsic sizes (min-content, max-content, fit-content) here.
     // Requires updating computeMainSizeFromAspectRatioUsing.
     return size.isFixed();
 }
@@ -1723,8 +1742,9 @@ std::pair<LayoutUnit, LayoutUnit> RenderFlexibleBox::computeFlexItemMinMaxSizes(
         maxExtent = computeMainAxisExtentForFlexItem(flexItem, max);
 
     auto min = minMainSizeLengthForFlexItem(flexItem);
-    // Intrinsic sizes in child's block axis are handled by the min-size:auto code path.
-    if (min.isSpecified() || (min.isIntrinsicOrStretch() && mainAxisIsFlexItemInlineAxis(flexItem))) {
+    // Intrinsic sizes in child's block axis are handled by the min-size:auto code path,
+    // but stretch always resolves to a definite value and should be computed directly.
+    if (min.isSpecified() || min.isStretch() || (min.isIntrinsic() && mainAxisIsFlexItemInlineAxis(flexItem))) {
         auto minExtent = computeMainAxisExtentForFlexItem(flexItem, min).value_or(0_lu);
         // We must never return a min size smaller than the min preferred size for tables.
         if (flexItem.isRenderTable() && mainAxisIsFlexItemInlineAxis(flexItem))
@@ -2272,14 +2292,19 @@ bool RenderFlexibleBox::willStretchItem(const RenderBox& item, LogicalBoxAxis co
         return false;
 
     auto& itemStyle = item.style();
+    bool isVerticalCrossAxis = physicalAxis == BoxAxis::Vertical;
+    auto& crossSize = isVerticalCrossAxis ? itemStyle.height() : itemStyle.width();
 
-    if (!itemStyle.alignSelf().resolve(&style()).isStretchy(mode == StretchingMode::Explicit ? ItemPosition::Normal : ItemPosition::Stretch))
-        return false;
+    if (!crossSize.isStretch()) {
+        if (!itemStyle.alignSelf().resolve(&style()).isStretchy(mode == StretchingMode::Explicit ? ItemPosition::Normal : ItemPosition::Stretch))
+            return false;
+        if (!crossSize.isAuto())
+            return false;
+    }
 
-    bool isItemBlockAxis = (LogicalBoxAxis::Block == containingAxis) == !writingMode().isOrthogonal(itemStyle.writingMode());
-    return isItemBlockAxis
-        ? itemStyle.logicalHeight().isAuto() && !itemStyle.marginBefore().isAuto() && !itemStyle.marginAfter().isAuto()
-        : itemStyle.logicalWidth().isAuto() && !itemStyle.marginStart().isAuto() && !itemStyle.marginEnd().isAuto();
+    return isVerticalCrossAxis
+        ? !itemStyle.marginTop().isAuto() && !itemStyle.marginBottom().isAuto()
+        : !itemStyle.marginLeft().isAuto() && !itemStyle.marginRight().isAuto();
 }
 
 bool RenderFlexibleBox::needToStretchFlexItemLogicalHeight(const RenderBox& flexItem) const
@@ -2291,9 +2316,6 @@ bool RenderFlexibleBox::needToStretchFlexItemLogicalHeight(const RenderBox& flex
     // - We are horizontal and the child is in vertical writing mode
     // - We are vertical and the child is in horizontal writing mode
     // Otherwise, we need to stretch if the cross axis size is auto.
-    if (alignmentForFlexItem(flexItem) != ItemPosition::Stretch)
-        return false;
-
     if (isHorizontalFlow() != flexItem.isHorizontalWritingMode())
         return false;
 
@@ -2301,7 +2323,11 @@ bool RenderFlexibleBox::needToStretchFlexItemLogicalHeight(const RenderBox& flex
     if (flexItem.isRenderReplaced() && flexItemHasAspectRatio(flexItem))
         return false;
 
-    return flexItem.style().logicalHeight().isAuto();
+    if (flexItem.style().logicalHeight().isStretch())
+        return true;
+
+    return alignmentForFlexItem(flexItem) == ItemPosition::Stretch
+        && flexItem.style().logicalHeight().isAuto();
 }
 
 bool RenderFlexibleBox::flexItemHasIntrinsicMainAxisSize(const RenderBox& flexItem)
@@ -2316,7 +2342,7 @@ bool RenderFlexibleBox::flexItemHasIntrinsicMainAxisSize(const RenderBox& flexIt
     // which has some side effects like calling addPercentHeightDescendant() for example so it is not possible to skip
     // the call for example by moving it to the end of the conditional expression. This is error-prone and we should
     // refactor computePercentageLogicalHeight() at some point so that it only computes stuff without those side effects.
-    if (!flexItemMainSizeIsDefinite(flexItem, flexBasis) || minSize.isIntrinsicOrStretch() || maxSize.isIntrinsicOrStretch())
+    if (!flexItemMainSizeIsDefinite(flexItem, flexBasis) || minSize.isIntrinsic() || maxSize.isIntrinsic())
         return true;
 
     if (shouldApplyMinSizeAutoForFlexItem(flexItem))
@@ -2751,15 +2777,75 @@ void RenderFlexibleBox::performBaselineAlignment(LineState& lineState)
     }
 }
 
+void RenderFlexibleBox::applyStretchMinMaxCrossSize(RenderBox& flexItem, LayoutUnit lineCrossAxisExtent, LogicalBoxAxis crossAxis)
+{
+    bool isBlockAxis = crossAxis == LogicalBoxAxis::Block;
+    auto& style = flexItem.style();
+    auto& min = isBlockAxis ? style.logicalMinHeight() : style.logicalMinWidth();
+    auto& max = isBlockAxis ? style.logicalMaxHeight() : style.logicalMaxWidth();
+    bool minIsStretch = min.isStretch();
+    bool maxIsStretch = !max.isNone() && max.isStretch();
+    if (!minIsStretch && !maxIsStretch)
+        return;
+
+    // The block-axis floor ensures the stretched size never goes below border+padding,
+    // matching the behavior in applyStretchAlignmentToFlexItem.
+    auto stretchValue = std::max(isBlockAxis ? flexItem.borderAndPaddingLogicalHeight() : 0_lu,
+        lineCrossAxisExtent - crossAxisMarginExtentForFlexItem(flexItem));
+
+    auto computeBlockSize = [&](const auto& size, LayoutUnit fallback) {
+        return flexItem.computeLogicalHeightUsing(size, std::nullopt).value_or(fallback);
+    };
+    auto computeInlineSize = [&](const auto& size) {
+        return flexItem.computeLogicalWidthUsing(size, crossAxisContentExtent(), *this);
+    };
+
+    // Compute the specified cross-size, unclamped by stretch min/max.
+    // We cannot use the current laid-out size because the initial layout
+    // resolves stretch against the container, not the flex line.
+    auto specifiedSize = isBlockAxis
+        ? computeBlockSize(style.logicalHeight(), flexItem.logicalHeight())
+        : computeInlineSize(style.logicalWidth());
+
+    // Resolve each constraint: stretch resolves to the line cross size,
+    // non-stretch constraints are computed normally.
+    auto effectiveMax = maxIsStretch ? stretchValue
+        : max.isNone() ? LayoutUnit::max()
+        : isBlockAxis ? computeBlockSize(max, LayoutUnit::max())
+        : computeInlineSize(max);
+
+    // FIXME: The auto minimum does not account for aspect-ratio automatic
+    // minimums, which are computed in constrainLogicalHeightByMinMax.
+    auto effectiveMin = minIsStretch ? stretchValue
+        : isBlockAxis ? computeBlockSize(min, 0_lu)
+        : computeInlineSize(min);
+
+    auto newSize = std::max(std::min(specifiedSize, effectiveMax), effectiveMin);
+
+    auto currentSize = isBlockAxis ? flexItem.logicalHeight() : flexItem.logicalWidth();
+    if (newSize != currentSize) {
+        if (isBlockAxis)
+            flexItem.setOverridingBorderBoxLogicalHeight(newSize);
+        else
+            flexItem.setOverridingBorderBoxLogicalWidth(newSize);
+        flexItem.setChildNeedsLayout(MarkOnlyThis);
+        flexItem.layoutIfNeeded();
+    }
+}
+
 void RenderFlexibleBox::applyStretchAlignmentToFlexItem(RenderBox& flexItem, LayoutUnit lineCrossAxisExtent)
 {
     auto flexLayoutScope = SetForScope(m_afterCrossAxisItemSizing, true);
-    if (mainAxisIsFlexItemInlineAxis(flexItem) && flexItem.style().logicalHeight().isAuto()) {
-        LayoutUnit stretchedLogicalHeight = std::max(flexItem.borderAndPaddingLogicalHeight(),
-        lineCrossAxisExtent - crossAxisMarginExtentForFlexItem(flexItem));
+    if (mainAxisIsFlexItemInlineAxis(flexItem)) {
+        // Cross axis is block axis (height).
+        if (!flexItem.style().logicalHeight().isAuto() && !flexItem.style().logicalHeight().isStretch())
+            return applyStretchMinMaxCrossSize(flexItem, lineCrossAxisExtent, LogicalBoxAxis::Block);
+
+        auto stretchedLogicalHeight = std::max(flexItem.borderAndPaddingLogicalHeight(),
+            lineCrossAxisExtent - crossAxisMarginExtentForFlexItem(flexItem));
         ASSERT(!flexItem.needsLayout());
         LayoutUnit desiredLogicalHeight = flexItem.constrainLogicalHeightByMinMax(stretchedLogicalHeight, cachedFlexItemIntrinsicContentLogicalHeight(flexItem));
-        
+
         // FIXME: Can avoid laying out here in some cases. See https://webkit.org/b/87905.
         bool flexItemNeedsRelayout = desiredLogicalHeight != flexItem.logicalHeight();
         if (auto* block = dynamicDowncast<RenderBlock>(flexItem); block && block->hasPercentHeightDescendants() && m_relaidOutFlexItems.contains(flexItem)) {
@@ -2780,21 +2866,26 @@ void RenderFlexibleBox::applyStretchAlignmentToFlexItem(RenderBox& flexItem, Lay
             // there's an overrideHeight.
             LayoutUnit flexItemIntrinsicContentLogicalHeight = cachedFlexItemIntrinsicContentLogicalHeight(flexItem);
             flexItem.setChildNeedsLayout(MarkOnlyThis);
-            
+
             // Don't use layoutChildIfNeeded to avoid setting cross axis cached size twice.
             flexItem.layoutIfNeeded();
 
             setCachedFlexItemIntrinsicContentLogicalHeight(flexItem, flexItemIntrinsicContentLogicalHeight);
         }
-    } else if (!mainAxisIsFlexItemInlineAxis(flexItem) && flexItem.style().logicalWidth().isAuto()) {
-        LayoutUnit flexItemWidth = std::max(0_lu, lineCrossAxisExtent - crossAxisMarginExtentForFlexItem(flexItem));
-        flexItemWidth = flexItem.constrainLogicalWidthByMinMax(flexItemWidth, crossAxisContentExtent(), *this);
-        
-        if (flexItemWidth != flexItem.logicalWidth()) {
-            flexItem.setOverridingBorderBoxLogicalWidth(flexItemWidth);
-            flexItem.setChildNeedsLayout(MarkOnlyThis);
-            flexItem.layoutIfNeeded();
-        }
+        return;
+    }
+
+    // Cross axis is inline axis (width).
+    if (!flexItem.style().logicalWidth().isAuto() && !flexItem.style().logicalWidth().isStretch())
+        return applyStretchMinMaxCrossSize(flexItem, lineCrossAxisExtent, LogicalBoxAxis::Inline);
+
+    auto flexItemWidth = std::max(0_lu, lineCrossAxisExtent - crossAxisMarginExtentForFlexItem(flexItem));
+    flexItemWidth = flexItem.constrainLogicalWidthByMinMax(flexItemWidth, crossAxisContentExtent(), *this);
+
+    if (flexItemWidth != flexItem.logicalWidth()) {
+        flexItem.setOverridingBorderBoxLogicalWidth(flexItemWidth);
+        flexItem.setChildNeedsLayout(MarkOnlyThis);
+        flexItem.layoutIfNeeded();
     }
 }
 

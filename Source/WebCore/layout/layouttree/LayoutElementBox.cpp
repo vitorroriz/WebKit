@@ -186,12 +186,12 @@ void ElementBox::destroyChildren()
 
 bool ElementBox::hasIntrinsicWidth() const
 {
-    return (m_replacedData && m_replacedData->intrinsicSize) || style().logicalWidth().isIntrinsicOrStretch();
+    return (m_replacedData && m_replacedData->intrinsicSize) || style().logicalWidth().isIntrinsic();
 }
 
 bool ElementBox::hasIntrinsicHeight() const
 {
-    return (m_replacedData && m_replacedData->intrinsicSize) || style().logicalHeight().isIntrinsicOrStretch();
+    return (m_replacedData && m_replacedData->intrinsicSize) || style().logicalHeight().isIntrinsic();
 }
 
 bool ElementBox::hasIntrinsicRatio() const

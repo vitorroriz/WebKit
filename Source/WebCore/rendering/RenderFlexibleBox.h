@@ -270,6 +270,7 @@ private:
     void alignFlexLines(FlexLineStates&, LayoutUnit gapBetweenLines);
     void alignFlexItems(FlexLineStates&);
     void applyStretchAlignmentToFlexItem(RenderBox& flexItem, LayoutUnit lineCrossAxisExtent);
+    void applyStretchMinMaxCrossSize(RenderBox& flexItem, LayoutUnit lineCrossAxisExtent, LogicalBoxAxis);
     void performBaselineAlignment(LineState&);
     void flipForRightToLeftColumn(const FlexLineStates& linesState);
     void flipForWrapReverse(const FlexLineStates&, LayoutUnit crossAxisStartEdge);

@@ -392,6 +392,9 @@ bool RenderBlock::isSelfCollapsingBlock() const
             [&](const Style::PreferredSize::Calc&) {
                 return true;
             },
+            [](const CSS::Keyword::Stretch&) {
+                return true;
+            },
             [](const auto&) {
                 return false;
             }
@@ -413,7 +416,7 @@ bool RenderBlock::isSelfCollapsingBlock() const
         };
 
         return WTF::switchOn(style().logicalHeight(),
-            [](const Style::PreferredSize::Fixed& fixedValue) {
+            [&](const Style::PreferredSize::Fixed& fixedValue) {
                 return fixedValue.isZero();
             },
             [&](const Style::PreferredSize::Percentage& percentageValue) {
@@ -3078,7 +3081,7 @@ std::optional<LayoutUnit> RenderBlock::availableLogicalHeightForPercentageComput
         // However, intrinsic heights (fit-content, min-content, max-content) are
         // content-dependent and should be treated as indefinite for percentage
         // resolution of children, since the actual height is not yet determined.
-        auto heightIsIntrinsic = style.logicalHeight().isIntrinsicOrStretch() || style.logicalHeight().isIntrinsicKeyword() || style.logicalHeight().isMinIntrinsic();
+        auto heightIsIntrinsic = style.logicalHeight().isIntrinsic() || style.logicalHeight().isIntrinsicKeyword() || style.logicalHeight().isMinIntrinsic();
         auto hasNonIntrinsicSpecifiedHeight = !style.logicalHeight().isAuto() && !heightIsIntrinsic;
         auto hasDefiniteHeightFromInsets = !style.logicalTop().isAuto() && !style.logicalBottom().isAuto() && style.logicalHeight().isAuto();
         auto isOutOfFlowPositionedWithSpecifiedHeight = isOutOfFlowPositioned() && (hasNonIntrinsicSpecifiedHeight || hasDefiniteHeightFromInsets);
@@ -3087,6 +3090,12 @@ std::optional<LayoutUnit> RenderBlock::availableLogicalHeightForPercentageComput
             // can get called while the block is still laying out its kids.
             return std::max(0_lu, computeLogicalHeight(logicalHeight(), 0_lu).extent - borderAndPaddingLogicalHeight() - scrollbarLogicalHeight());
         }
+
+        // `stretch` resolves to the containing block's available size (a definite
+        // length) when the containing block itself has a definite height. Treat it
+        // as definite for percentage/stretch resolution of children.
+        if (isResolveableStretchSize(style.logicalHeight()))
+            return std::max(0_lu, computeLogicalHeight(logicalHeight(), 0_lu).extent - borderAndPaddingLogicalHeight() - scrollbarLogicalHeight());
 
         if (style.logicalHeight().isPercentOrCalculated()) {
             if (auto heightWithScrollbar = computePercentageLogicalHeight(style.logicalHeight())) {

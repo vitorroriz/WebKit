@@ -251,8 +251,11 @@ bool hasAutoMarginsInRowAxis(const RenderBox& gridItem, WritingMode parentWritin
 
 bool hasStretchableSizeInColumnAxis(const RenderBox& gridItem, const RenderGrid& gridContainer)
 {
-    // Only auto sizes are stretchable.
-    if (!(gridContainer.isHorizontalWritingMode() ? gridItem.style().height().isAuto() : gridItem.style().width().isAuto()))
+    // Auto and stretch sizes are stretchable — alignment stretch handles the
+    // final layout for both. During intrinsic track sizing, the CSS stretch
+    // keyword falls back to auto, and alignment stretch applies afterward.
+    auto& columnAxisSize = gridContainer.isHorizontalWritingMode() ? gridItem.style().height() : gridItem.style().width();
+    if (!(columnAxisSize.isAuto() || columnAxisSize.isStretch()))
         return false;
 
     if (gridItem.style().aspectRatio().hasRatio() && !gridContainer.selfAlignmentForGridItem(gridItem, LogicalBoxAxis::Block, StretchingMode::Explicit).isStretch()) {
@@ -274,8 +277,10 @@ bool hasStretchableSizeInColumnAxis(const RenderBox& gridItem, const RenderGrid&
 
 bool hasStretchableSizeInRowAxis(const RenderBox& gridItem, const RenderGrid& gridContainer)
 {
-    // Only auto sizes are stretchable.
-    if (!(gridContainer.isHorizontalWritingMode() ? gridItem.style().width().isAuto() : gridItem.style().height().isAuto()))
+    // Auto and stretch sizes are stretchable — alignment stretch handles the
+    // final layout for both.
+    auto& rowAxisSize = gridContainer.isHorizontalWritingMode() ? gridItem.style().width() : gridItem.style().height();
+    if (!(rowAxisSize.isAuto() || rowAxisSize.isStretch()))
         return false;
 
     if (gridItem.style().aspectRatio().hasRatio() && !gridContainer.selfAlignmentForGridItem(gridItem, LogicalBoxAxis::Inline, StretchingMode::Explicit).isStretch()) {
