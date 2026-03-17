@@ -542,7 +542,9 @@ Ref<WebPage> WebPage::create(PageIdentifier pageID, WebPageCreationParameters&& 
     if (RefPtr injectedBundle = WebProcess::singleton().injectedBundle())
         injectedBundle->didCreatePage(page);
 
-    page->corePage()->mainFrame().tree().setSpecifiedName(AtomString(openedMainFrameName));
+    Ref mainFrame = page->corePage()->mainFrame();
+    if (mainFrame->tree().specifiedName().isNull())
+        mainFrame->tree().setSpecifiedName(AtomString(openedMainFrameName));
 
 #if HAVE(SANDBOX_STATE_FLAGS)
     setHasLaunchedWebContentProcess();
@@ -1005,11 +1007,16 @@ WebPage::WebPage(PageIdentifier pageID, WebPageCreationParameters&& parameters)
     m_mainFrame->initWithCoreMainFrame(*this, protect(page->mainFrame()));
 
     if (auto& remotePageParameters = parameters.remotePageParameters) {
+        m_mainFrame->coreFrame()->tree().setSpecifiedName(AtomString { remotePageParameters->frameTreeParameters.frameName });
+
         Ref frameTreeSyncData = remotePageParameters->frameTreeParameters.frameTreeSyncData;
         protect(page->mainFrame())->updateFrameTreeSyncData(WTF::move(frameTreeSyncData));
+
         for (auto& childParameters : remotePageParameters->frameTreeParameters.children)
             constructFrameTree(m_mainFrame.get(), childParameters);
+
         page->setMainFrameURLAndOrigin(remotePageParameters->initialMainDocumentURL, nullptr);
+
         if (auto websitePolicies = remotePageParameters->websitePoliciesData) {
             if (auto* remoteMainFrameClient = m_mainFrame->remoteFrameClient())
                 remoteMainFrameClient->applyWebsitePolicies(WTF::move(*remotePageParameters->websitePoliciesData));

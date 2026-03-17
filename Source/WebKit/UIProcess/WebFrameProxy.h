@@ -173,6 +173,8 @@ public:
 
     const String& title() const LIFETIME_BOUND { return m_title; }
 
+    void setSpecifiedName(const String& name) { m_frameName = name; }
+
     const WebCore::CertificateInfo& certificateInfo() const LIFETIME_BOUND { return m_certificateInfo; }
 
     bool canProvideSource() const;
