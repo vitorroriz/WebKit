@@ -1233,10 +1233,12 @@ DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(HashTable);
     template<typename Key, typename Value, typename Extractor, typename HashFunctions, typename Traits, typename KeyTraits, typename Malloc>
     void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits, Malloc>::deallocateTable(ValueType* table)
     {
-        unsigned size = reinterpret_cast_ptr<unsigned*>(table)[tableSizeOffset];
-        for (unsigned i = 0; i < size; ++i) {
-            if (!isDeletedBucket(table[i]))
-                table[i].~ValueType();
+        if constexpr (!std::is_trivially_destructible_v<ValueType>) {
+            unsigned size = reinterpret_cast_ptr<unsigned *>(table)[tableSizeOffset];
+            for (unsigned i = 0; i < size; ++i) {
+                if (!isDeletedBucket(table[i]))
+                    table[i].~ValueType();
+            }
         }
         Malloc::free(reinterpret_cast<char*>(table) - metadataSize);
     }
