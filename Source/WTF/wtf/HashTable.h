@@ -1299,14 +1299,18 @@ DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(HashTable);
     template<typename Key, typename Value, typename Extractor, typename HashFunctions, typename Traits, typename KeyTraits, typename Malloc>
     void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits, Malloc>::deleteReleasedWeakBuckets()
     {
+        unsigned removedBucketCount = 0;
         unsigned tableSize = this->tableSize();
         for (unsigned i = 0; i < tableSize; ++i) {
             auto& entry = m_table[i];
             if (isReleasedWeakBucket(entry)) {
                 deleteBucket(entry);
-                setDeletedCount(deletedCount() + 1);
-                setKeyCount(keyCount() - 1);
+                ++removedBucketCount;
             }
+        }
+        if (removedBucketCount) {
+            setDeletedCount(deletedCount() + removedBucketCount);
+            setKeyCount(keyCount() - removedBucketCount);
         }
     }
 
