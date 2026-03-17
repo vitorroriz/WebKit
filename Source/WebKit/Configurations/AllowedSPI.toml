@@ -308,3 +308,11 @@ selectors = [
     { name = "_lookToScrollGroupName", class = "UIScrollView" },
 ]
 requires = ["PLATFORM_VISION"]
+
+[[staging]]
+request = "rdar://171222829"
+selectors = [
+    { name = "setPresentingAppBundleID:", class = "?" },
+    { name = "setPresentingAppProcessIdentifier:", class = "?" },
+]
+requires = ["ENABLE_AIRPLAY_PICKER", "ENABLE_WIRELESS_PLAYBACK_MEDIA_PLAYER"]
