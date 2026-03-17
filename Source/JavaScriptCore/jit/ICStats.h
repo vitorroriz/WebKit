@@ -37,6 +37,10 @@
 
 namespace JSC {
 
+namespace ICStatsInternal {
+static constexpr bool traceHandlerChains = false;
+}
+
 #define FOR_EACH_ICEVENT_KIND(macro) \
     macro(InvalidKind) \
     macro(GetByAddAccessCase) \
@@ -280,7 +284,11 @@ public:
     void add(const ICEvent& event);
     
     static ICStats& singleton();
-    
+
+    void startNewChain(unsigned totalNumberOfHandlersInChain);
+    void appendToCurrentChain(ICEvent::Kind);
+    void dumpChains();
+
 private:
 
     Spectrum<ICEvent, uint64_t> m_spectrum;
@@ -288,7 +296,7 @@ private:
     Lock m_lock;
     Condition m_condition;
     bool m_shouldStop { false };
-    
+
     static Atomic<ICStats*> s_instance;
 };
 

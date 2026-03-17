@@ -363,6 +363,8 @@ public:
     static constexpr ptrdiff_t offsetOfHandler() { return OBJECT_OFFSETOF(PropertyInlineCache, m_handler); }
     static constexpr ptrdiff_t offsetOfGlobalObject() { return OBJECT_OFFSETOF(PropertyInlineCache, m_globalObject); }
 
+    InlineCacheHandler* firstHandler() const { return m_handler.get(); }
+
     JSGlobalObject* globalObject() const { return m_globalObject; }
 
     void resetStubAsJumpInAccess(CodeBlock*);

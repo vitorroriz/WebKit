@@ -79,7 +79,7 @@ namespace JSC {
 namespace InlineCacheCompilerInternal {
 static constexpr bool verbose = false;
 static constexpr bool traceHandlerExecution = false;
-static constexpr bool traceHandlerStats = false;
+static constexpr bool traceHandlerStats = false || ICStatsInternal::traceHandlerChains;
 }
 
 template<typename... Args>
@@ -95,7 +95,10 @@ static void traceHandler(CCallHelpers& jit, ICEvent::Kind kind, Args&&... args)
     if constexpr (InlineCacheCompilerInternal::traceHandlerStats) {
         if (Options::useICStats()) {
             jit.probeDebug([=] (Probe::Context&) {
-                ICStats::singleton().add(ICEvent(kind));
+                auto& stats = ICStats::singleton();
+                stats.add(ICEvent(kind));
+                if constexpr (ICStatsInternal::traceHandlerChains)
+                    stats.appendToCurrentChain(kind);
             });
         }
     }
