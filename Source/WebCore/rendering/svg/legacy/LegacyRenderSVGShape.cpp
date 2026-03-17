@@ -219,8 +219,8 @@ static AffineTransform legacyNonScalingStrokeCTM(const Ref<SVGGraphicsElement>& 
         if (!svgElement)
             break;
         ctm = svgElement->localCoordinateSpaceTransform(CTMScope::NearestViewportScope).multiply(ctm);
-        if (auto* svgSVGElement = dynamicDowncast<SVGSVGElement>(*svgElement))
-            outermostSVG = svgSVGElement;
+        if (RefPtr svgSVGElement = dynamicDowncast<SVGSVGElement>(*svgElement))
+            outermostSVG = WTF::move(svgSVGElement);
     }
 
     // Now add the outermost SVG's screen position as a translation.
