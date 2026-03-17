@@ -80,8 +80,6 @@ FontPlatformData::FontPlatformData(RetainPtr<CTFontRef>&& font, float size, bool
     m_font = WTF::move(font);
     m_isColorBitmapFont = CTFontGetSymbolicTraits(m_font.get()) & kCTFontColorGlyphsTrait;
     m_isSystemFont = WebCore::isSystemFont(m_font.get());
-    auto variations = adoptCF(checked_cf_cast<CFDictionaryRef>(CTFontCopyAttribute(m_font.get(), kCTFontVariationAttribute)));
-    m_hasVariations = variations && CFDictionaryGetCount(variations.get());
 
 #if PLATFORM(IOS_FAMILY)
     m_isEmoji = CTFontIsAppleColorEmoji(m_font.get());
@@ -259,8 +257,6 @@ FontPlatformData::FontPlatformData(float size, WebCore::FontOrientation&& orient
 {
     m_isColorBitmapFont = CTFontGetSymbolicTraits(m_font.get()) & kCTFontColorGlyphsTrait;
     m_isSystemFont = WebCore::isSystemFont(m_font.get());
-    auto variations = adoptCF(checked_cf_cast<CFDictionaryRef>(CTFontCopyAttribute(m_font.get(), kCTFontVariationAttribute)));
-    m_hasVariations = variations && CFDictionaryGetCount(variations.get());
 #if PLATFORM(IOS_FAMILY)
     m_isEmoji = CTFontIsAppleColorEmoji(m_font.get());
 #endif

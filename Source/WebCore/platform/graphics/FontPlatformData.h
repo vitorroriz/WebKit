@@ -389,8 +389,6 @@ public:
     bool isSystemFont() const { return m_isSystemFont; }
 #endif
 
-    bool hasVariations() const { return m_hasVariations; }
-
     bool isFixedPitch() const;
     float size() const { return m_size; }
     bool syntheticBold() const { return m_syntheticBold; }
@@ -531,7 +529,6 @@ private:
 #if PLATFORM(COCOA)
     bool m_isSystemFont { false };
 #endif
-    bool m_hasVariations { false };
     // The values above are common to all ports
 
 #if PLATFORM(IOS_FAMILY)
