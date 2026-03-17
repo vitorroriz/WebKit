@@ -221,11 +221,14 @@ inline const Font& FontCascadeFonts::primaryFont(const FontCascadeDescription& d
 {
     ASSERT(m_thread ? m_thread->ptr() == &Thread::currentSingleton() : isMainThread());
     if (!m_cachedPrimaryFont) {
+        // CSS Fonts 4 §5.2: "The first available font [...] is defined to be the first font for which
+        // the character U+0020 (space) is not excluded by a unicode-range [...]. Note: it does not
+        // matter whether that font actually has a glyph for the space character."
         auto& primaryRanges = realizeFallbackRangesAt(description, fontSelector, 0);
         m_cachedPrimaryFont = primaryRanges.glyphDataForCharacter(' ', ExternalResourceDownloadPolicy::Allow).font.get();
-        if (!m_cachedPrimaryFont)
+        if (!m_cachedPrimaryFont && primaryRanges.hasRangeContaining(' '))
             m_cachedPrimaryFont = primaryRanges.rangeAt(0).font(ExternalResourceDownloadPolicy::Allow);
-        else if (m_cachedPrimaryFont->isInterstitial()) {
+        if (!m_cachedPrimaryFont || m_cachedPrimaryFont->isInterstitial()) {
             for (unsigned index = 1; ; ++index) {
                 auto& localRanges = realizeFallbackRangesAt(description, fontSelector, index);
                 if (localRanges.isNull())
@@ -237,6 +240,9 @@ inline const Font& FontCascadeFonts::primaryFont(const FontCascadeDescription& d
                 }
             }
         }
+        // Last resort: all cascade fonts are loading or unavailable.
+        if (!m_cachedPrimaryFont)
+            m_cachedPrimaryFont = realizeFallbackRangesAt(description, fontSelector, 0).rangeAt(0).font(ExternalResourceDownloadPolicy::Forbid);
     }
     ASSERT(m_cachedPrimaryFont);
     return *m_cachedPrimaryFont;

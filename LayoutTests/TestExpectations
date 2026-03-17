@@ -4767,8 +4767,6 @@ webkit.org/b/203606 imported/w3c/web-platform-tests/css/css-display/select-4-opt
 webkit.org/b/203606 imported/w3c/web-platform-tests/css/css-display/display-contents-shadow-dom-1.html [ Skip ]
 
 # Untriaged css-fonts failures
-webkit.org/b/206881 imported/w3c/web-platform-tests/css/css-fonts/first-available-font-001.html [ ImageOnlyFailure ]
-webkit.org/b/206881 imported/w3c/web-platform-tests/css/css-fonts/first-available-font-002.html [ Skip ] # This should be failing but it is not
 webkit.org/b/206881 imported/w3c/web-platform-tests/css/css-fonts/font-family-name-001.xht [ ImageOnlyFailure ]
 webkit.org/b/206881 imported/w3c/web-platform-tests/css/css-fonts/font-family-name-002.xht [ ImageOnlyFailure ]
 webkit.org/b/206881 imported/w3c/web-platform-tests/css/css-fonts/font-family-name-003.xht [ ImageOnlyFailure ]
@@ -4796,11 +4794,6 @@ webkit.org/b/214300 imported/w3c/web-platform-tests/css/css-fonts/variations/fon
 webkit.org/b/214300 imported/w3c/web-platform-tests/css/css-fonts/variations/font-slant-2a.html [ ImageOnlyFailure ]
 webkit.org/b/214300 imported/w3c/web-platform-tests/css/css-fonts/variations/font-slant-2c.html [ ImageOnlyFailure ]
 webkit.org/b/214300 imported/w3c/web-platform-tests/css/css-fonts/hiragana-katakana-kerning.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-fonts/first-available-font-003.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-fonts/first-available-font-004.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-fonts/first-available-font-005.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-fonts/first-available-font-006.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-fonts/first-available-font-007.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-fonts/font-face-local-not-family.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-fonts/font-family-name-000.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-fonts/font-palette-23b.html [ ImageOnlyFailure ]
