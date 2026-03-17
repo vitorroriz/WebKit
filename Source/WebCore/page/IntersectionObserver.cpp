@@ -241,9 +241,7 @@ String IntersectionObserver::scrollMargin() const
 
 bool IntersectionObserver::isObserving(const Element& element) const
 {
-    return m_observationTargets.findIf([&](auto& target) {
-        return target.get() == &element;
-    }) != notFound;
+    return m_observationTargets.contains(element);
 }
 
 void IntersectionObserver::observe(Element& target)
@@ -253,7 +251,7 @@ void IntersectionObserver::observe(Element& target)
 
     target.ensureIntersectionObserverData().registrations.append({ *this, std::nullopt });
     bool hadObservationTargets = hasObservationTargets();
-    m_observationTargets.append(target);
+    m_observationTargets.add(target);
 
     // Per the specification, we should dispatch at least one observation for the target. For this reason, we make sure to keep the
     // target alive until this first observation. This, in turn, will keep the IntersectionObserver's JS wrapper alive via
@@ -271,7 +269,7 @@ void IntersectionObserver::unobserve(Element& target)
     if (!removeTargetRegistration(target))
         return;
 
-    bool removed = m_observationTargets.removeFirst(&target);
+    bool removed = m_observationTargets.remove(&target);
     ASSERT_UNUSED(removed, removed);
     m_targetsWaitingForFirstObservation.removeFirstMatching([&](auto& pendingTarget) { return pendingTarget.ptr() == &target; });
 
@@ -300,7 +298,7 @@ auto IntersectionObserver::takeRecords() -> TakenRecords
 
 void IntersectionObserver::targetDestroyed(Element& target)
 {
-    m_observationTargets.removeFirst(&target);
+    m_observationTargets.remove(target);
     m_targetsWaitingForFirstObservation.removeFirstMatching([&](auto& pendingTarget) { return pendingTarget.ptr() == &target; });
     if (!hasObservationTargets()) {
         if (RefPtr document = trackingDocument())
@@ -323,7 +321,7 @@ bool IntersectionObserver::removeTargetRegistration(Element& target)
 void IntersectionObserver::removeAllTargets()
 {
     for (auto& target : m_observationTargets) {
-        bool removed = removeTargetRegistration(*target);
+        bool removed = removeTargetRegistration(target);
         ASSERT_UNUSED(removed, removed);
     }
     m_observationTargets.clear();
@@ -631,7 +629,7 @@ auto IntersectionObserver::updateObservations(const Frame& hostFrame) -> NeedNot
     auto needNotify = NeedNotify::No;
 
     for (auto& target : observationTargets()) {
-        auto& targetRegistrations = target->intersectionObserverDataIfExists()->registrations;
+        auto& targetRegistrations = target.intersectionObserverDataIfExists()->registrations;
         auto index = targetRegistrations.findIf([&](auto& registration) {
             return registration.observer.get() == this;
         });
@@ -640,12 +638,12 @@ auto IntersectionObserver::updateObservations(const Frame& hostFrame) -> NeedNot
 
         bool isSameOriginObservation = [&] () {
             if (RefPtr hostFrameSecurityOrigin = hostFrame.frameDocumentSecurityOrigin())
-                return protect(target->document().securityOrigin())->isSameOriginDomain(*hostFrameSecurityOrigin);
+                return protect(target.document().securityOrigin())->isSameOriginDomain(*hostFrameSecurityOrigin);
 
             return false;
         }();
         auto applyRootMargin = isSameOriginObservation ? ApplyRootMargin::Yes : ApplyRootMargin::No;
-        auto intersectionState = computeIntersectionState(registration, *hostFrameView, *target, applyRootMargin);
+        auto intersectionState = computeIntersectionState(registration, *hostFrameView, target, applyRootMargin);
 
         if (intersectionState.observationChanged) {
             FloatRect targetBoundingClientRect;
@@ -655,13 +653,13 @@ auto IntersectionObserver::updateObservations(const Frame& hostFrame) -> NeedNot
                 ASSERT(intersectionState.absoluteTargetRect);
                 ASSERT(intersectionState.absoluteRootBounds);
 
-                RefPtr targetFrameView = target->document().view();
-                targetBoundingClientRect = targetFrameView->absoluteToClientRect(*intersectionState.absoluteTargetRect, target->renderer()->style().usedZoom());
+                RefPtr targetFrameView = target.document().view();
+                targetBoundingClientRect = targetFrameView->absoluteToClientRect(*intersectionState.absoluteTargetRect, target.renderer()->style().usedZoom());
                 clientRootBounds = hostFrameView->absoluteToLayoutViewportRect(*intersectionState.absoluteRootBounds);
 
                 if (intersectionState.isIntersecting) {
                     ASSERT(intersectionState.absoluteIntersectionRect);
-                    clientIntersectionRect = targetFrameView->absoluteToClientRect(*intersectionState.absoluteIntersectionRect, target->renderer()->style().usedZoom());
+                    clientIntersectionRect = targetFrameView->absoluteToClientRect(*intersectionState.absoluteIntersectionRect, target.renderer()->style().usedZoom());
                 }
             }
 
@@ -682,7 +680,7 @@ auto IntersectionObserver::updateObservations(const Frame& hostFrame) -> NeedNot
                 { clientIntersectionRect.x(), clientIntersectionRect.y(), clientIntersectionRect.width(), clientIntersectionRect.height() },
                 intersectionState.thresholdIndex > 0,
                 intersectionState.intersectionRatio,
-                *target,
+                target,
             }));
 
             needNotify = NeedNotify::Yes;
@@ -749,8 +747,7 @@ void IntersectionObserver::notify()
 bool IntersectionObserver::isReachableFromOpaqueRoots(JSC::AbstractSlotVisitor& visitor) const
 {
     for (auto& target : m_observationTargets) {
-        SUPPRESS_UNCOUNTED_LOCAL auto* element = target.get();
-        if (containsWebCoreOpaqueRoot(visitor, element))
+        if (containsWebCoreOpaqueRoot(visitor, target))
             return true;
     }
     for (auto& target : m_pendingTargets) {

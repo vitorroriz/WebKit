@@ -32,6 +32,7 @@
 #include "IntersectionObserverMarginBox.h"
 #include "ReducedResolutionSeconds.h"
 #include <wtf/RefCountedAndCanMakeWeakPtr.h>
+#include <wtf/WeakListHashSet.h>
 #include <wtf/WeakPtr.h>
 #include <wtf/text/WTFString.h>
 
@@ -97,8 +98,8 @@ public:
     const IntersectionObserverMarginBox& rootMarginBox() const LIFETIME_BOUND { return m_rootMargin; }
     const IntersectionObserverMarginBox& scrollMarginBox() const LIFETIME_BOUND { return m_scrollMargin; }
     const Vector<double>& thresholds() const LIFETIME_BOUND { return m_thresholds; }
-    const Vector<WeakPtr<Element, WeakPtrImplWithEventTargetData>>& observationTargets() const LIFETIME_BOUND { return m_observationTargets; }
-    bool hasObservationTargets() const { return m_observationTargets.size(); }
+    const WeakListHashSet<Element, WeakPtrImplWithEventTargetData>& observationTargets() const LIFETIME_BOUND { return m_observationTargets; }
+    bool hasObservationTargets() const { return !m_observationTargets.isEmptyIgnoringNullReferences(); }
     bool isObserving(const Element&) const;
 
     void observe(Element&);
@@ -154,7 +155,7 @@ private:
     IntersectionObserverMarginBox m_scrollMargin;
     Vector<double> m_thresholds;
     const Ref<IntersectionObserverCallback> m_callback;
-    Vector<WeakPtr<Element, WeakPtrImplWithEventTargetData>> m_observationTargets;
+    WeakListHashSet<Element, WeakPtrImplWithEventTargetData> m_observationTargets;
     Vector<GCReachableRef<Element>> m_pendingTargets;
     Vector<Ref<IntersectionObserverEntry>> m_queuedEntries;
     Vector<GCReachableRef<Element>> m_targetsWaitingForFirstObservation;

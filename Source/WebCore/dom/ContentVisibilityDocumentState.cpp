@@ -184,11 +184,9 @@ bool ContentVisibilityDocumentState::checkRelevancyOfContentVisibilityElement(El
 DidUpdateAnyContentRelevancy ContentVisibilityDocumentState::updateRelevancyOfContentVisibilityElements(OptionSet<ContentRelevancy> relevancyToCheck) const
 {
     auto didUpdateAnyContentRelevancy = DidUpdateAnyContentRelevancy::No;
-    for (auto& weakTarget : m_observer->observationTargets()) {
-        if (RefPtr target = weakTarget.get()) {
-            if (checkRelevancyOfContentVisibilityElement(*target, relevancyToCheck))
-                didUpdateAnyContentRelevancy = DidUpdateAnyContentRelevancy::Yes;
-        }
+    for (Ref target : m_observer->observationTargets()) {
+        if (checkRelevancyOfContentVisibilityElement(target, relevancyToCheck))
+            didUpdateAnyContentRelevancy = DidUpdateAnyContentRelevancy::Yes;
     }
     return didUpdateAnyContentRelevancy;
 }
@@ -198,12 +196,10 @@ HadInitialVisibleContentVisibilityDetermination ContentVisibilityDocumentState::
     if (!m_observer)
         return HadInitialVisibleContentVisibilityDetermination::No;
     Vector<Ref<Element>> elementsToCheck;
-    for (auto& weakTarget : m_observer->observationTargets()) {
-        if (RefPtr target = weakTarget.get()) {
-            bool checkForInitialDetermination = !m_elementViewportProximities.contains(*target) && !target->isRelevantToUser();
-            if (checkForInitialDetermination)
-                elementsToCheck.append(target.releaseNonNull());
-        }
+    for (Ref target : m_observer->observationTargets()) {
+        bool checkForInitialDetermination = !m_elementViewportProximities.contains(target) && !target->isRelevantToUser();
+        if (checkForInitialDetermination)
+            elementsToCheck.append(target);
     }
     auto hadInitialVisibleContentVisibilityDetermination = HadInitialVisibleContentVisibilityDetermination::No;
     if (!elementsToCheck.isEmpty()) {
