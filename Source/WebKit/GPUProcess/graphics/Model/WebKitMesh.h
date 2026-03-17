@@ -44,6 +44,7 @@ struct WebModelCreateMeshDescriptor;
 
 namespace WebModel {
 struct ImageAsset;
+struct ResizeMeshDescriptor;
 struct UpdateMaterialDescriptor;
 struct UpdateMeshDescriptor;
 struct UpdateTextureDescriptor;
@@ -71,6 +72,7 @@ public:
     void NODELETE setBackgroundColor(const simd_float3&);
     void NODELETE setEnvironmentMap(const WebModel::ImageAsset&);
     void NODELETE play(bool);
+    void NODELETE updateRenderBuffers(const WebModel::ResizeMeshDescriptor&);
 
 private:
     WebMesh(const WebModelCreateMeshDescriptor&);

@@ -40,5 +40,6 @@ messages -> RemoteMesh Stream {
     void SetBackgroundColor(struct WebModel::Float3 color)
     void Play(bool playing)
     void SetEnvironmentMap(struct WebModel::ImageAsset imageAsset)
+    void UpdateRenderBuffers(unsigned width, unsigned height) -> (Vector<MachSendRight> renderBuffers) NotStreamEncodableReply
 }
 #endif

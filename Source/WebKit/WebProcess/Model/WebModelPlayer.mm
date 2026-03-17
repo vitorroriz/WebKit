@@ -262,6 +262,8 @@ void WebModelPlayer::load(WebCore::Model& modelSource, WebCore::LayoutSize size)
         return;
 
     size.scale(document->deviceScaleFactor());
+    m_currentPixelSize = WebCore::IntSize(size.width().toUnsigned(), size.height().toUnsigned());
+
     WebModel::ImageAsset diffuseTexture {
         .data = loadData(adoptCF(static_cast<CFStringRef>(@"modelDefaultDiffuseData"))),
         .width = 64,
@@ -289,7 +291,7 @@ void WebModelPlayer::load(WebCore::Model& modelSource, WebCore::LayoutSize size)
         .swizzle = { }
     };
 
-    m_currentModel = static_cast<RemoteGPUProxy&>(gpu->backing()).createModelBacking(size.width().toUnsigned(), size.height().toUnsigned(), diffuseTexture, specularTexture, [protectedThis = Ref { *this }] (Vector<MachSendRight>&& surfaceHandles) {
+    m_currentModel = static_cast<RemoteGPUProxy&>(gpu->backing()).createModelBacking(m_currentPixelSize.width(), m_currentPixelSize.height(), diffuseTexture, specularTexture, [protectedThis = Ref { *this }] (Vector<MachSendRight>&& surfaceHandles) {
         if (surfaceHandles.size())
             protectedThis->m_displayBuffers = WTF::move(surfaceHandles);
     });
@@ -359,9 +361,38 @@ void WebModelPlayer::notifyEntityTransformUpdated()
     client->didUpdateEntityTransform(*this, WebCore::TransformationMatrix(static_cast<simd_float4x4>(scaledTransform)));
 }
 
-void WebModelPlayer::sizeDidChange(WebCore::LayoutSize layoutSize)
+void WebModelPlayer::sizeDidChange(WebCore::LayoutSize size)
 {
-    m_currentScale = static_cast<float>(layoutSize.minDimension());
+    RefPtr currentModel = m_currentModel;
+    if (!currentModel)
+        return;
+
+    RefPtr corePage = m_page.get();
+    if (!corePage)
+        return;
+    RefPtr document = corePage->localTopDocument();
+    if (!document)
+        return;
+
+    size.scale(document->deviceScaleFactor());
+    auto newPixelSize = WebCore::IntSize(size.width().toUnsigned(), size.height().toUnsigned());
+    if (newPixelSize == m_currentPixelSize)
+        return;
+
+    m_currentPixelSize = newPixelSize;
+
+    currentModel->sizeDidChange(newPixelSize.width(), newPixelSize.height(), [protectedThis = Ref { *this }](Vector<MachSendRight>&& newBuffers) {
+        if (newBuffers.isEmpty())
+            return;
+
+        protectedThis->m_displayBuffers = WTF::move(newBuffers);
+        protectedThis->m_currentTexture = 0;
+        if (protectedThis->m_contentsDisplayDelegate)
+            RefPtr { protectedThis->m_contentsDisplayDelegate }->setDisplayBuffer(*protectedThis->displayBuffer());
+    });
+
+    m_currentScale = static_cast<float>(size.minDimension());
+    notifyEntityTransformUpdated();
 }
 
 void WebModelPlayer::enterFullscreen()

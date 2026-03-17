@@ -110,6 +110,12 @@ Vector<MachSendRight> MeshImpl::ioSurfaceHandles()
         return renderBuffer->createSendRight();
     });
 }
+
+void MeshImpl::updateRenderBuffers(WebModel::ResizeMeshDescriptor&& descriptor)
+{
+    m_backing->updateRenderBuffers(descriptor);
+    m_renderBuffers = WTF::move(descriptor.renderBuffers);
+}
 #endif
 
 }

@@ -51,6 +51,7 @@ public:
 
 #if PLATFORM(COCOA)
     Vector<MachSendRight> ioSurfaceHandles() final;
+    void updateRenderBuffers(WebModel::ResizeMeshDescriptor&&) final;
 #endif
 
 private:

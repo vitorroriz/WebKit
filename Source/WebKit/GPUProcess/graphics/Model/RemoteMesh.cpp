@@ -127,6 +127,20 @@ void RemoteMesh::setEnvironmentMap(const WebModel::ImageAsset& imageAsset)
     m_backing->setEnvironmentMap(imageAsset);
 }
 
+void RemoteMesh::updateRenderBuffers(unsigned width, unsigned height, CompletionHandler<void(Vector<MachSendRight>&&)>&& completionHandler)
+{
+    auto gpuProcessConnection = m_gpuConnectionToWebProcess.get();
+    if (!gpuProcessConnection) {
+        completionHandler({ });
+        return;
+    }
+
+    auto renderBuffers = RemoteGPU::createRenderBuffers(width, height, gpuProcessConnection->webProcessIdentity());
+    WebModel::ResizeMeshDescriptor descriptor { width, height, WTF::move(renderBuffers) };
+    m_backing->updateRenderBuffers(WTF::move(descriptor));
+    completionHandler(m_backing->ioSurfaceHandles());
+}
+
 } // namespace WebKit
 
 #undef MESSAGE_CHECK

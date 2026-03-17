@@ -271,7 +271,7 @@ void RemoteGPU::paintNativeImageToImageBuffer(WebCore::NativeImage& nativeImage,
 
 
 #if ENABLE(GPU_PROCESS_MODEL)
-static Vector<UniqueRef<WebCore::IOSurface>> createIOSurfaces(unsigned width, unsigned height)
+Vector<UniqueRef<WebCore::IOSurface>> RemoteGPU::createRenderBuffers(unsigned width, unsigned height, const WebCore::ProcessIdentity& processIdentity)
 {
     const auto colorFormat = WebCore::IOSurface::Format::RGBA16F;
     const auto colorSpace = WebCore::DestinationColorSpace::LinearDisplayP3();
@@ -280,8 +280,10 @@ static Vector<UniqueRef<WebCore::IOSurface>> createIOSurfaces(unsigned width, un
 
     constexpr auto surfaceCount = 3;
     for (auto i = 0; i < surfaceCount; ++i) {
-        if (auto buffer = WebCore::IOSurface::create(nullptr, WebCore::IntSize(width, height), colorSpace, WebCore::IOSurface::Name::WebGPU, colorFormat))
+        if (auto buffer = WebCore::IOSurface::create(nullptr, WebCore::IntSize(width, height), colorSpace, WebCore::IOSurface::Name::WebGPU, colorFormat)) {
+            buffer->setOwnershipIdentity(processIdentity);
             ioSurfaces.append(makeUniqueRefFromNonNullUniquePtr(WTF::move(buffer)));
+        }
     }
 
     return ioSurfaces;
@@ -291,12 +293,10 @@ static Vector<UniqueRef<WebCore::IOSurface>> createIOSurfaces(unsigned width, un
 #if ENABLE(GPU_PROCESS_MODEL)
 static RefPtr<WebKit::Mesh> createModelBackingInternal(unsigned width, unsigned height, const WebModel::ImageAsset& diffuseTexture, const WebModel::ImageAsset& specularTexture, const WebCore::ProcessIdentity& processIdentity, CompletionHandler<void(Vector<MachSendRight>&&)>&& callback)
 {
-    auto ioSurfaceVector = createIOSurfaces(width, height);
+    auto ioSurfaceVector = RemoteGPU::createRenderBuffers(width, height, processIdentity);
     Vector<RetainPtr<IOSurfaceRef>> ioSurfaces;
-    for (UniqueRef<WebCore::IOSurface>& ioSurface : ioSurfaceVector) {
+    for (auto& ioSurface : ioSurfaceVector)
         ioSurfaces.append(ioSurface->surface());
-        ioSurface->setOwnershipIdentity(processIdentity);
-    }
 
     WebModelCreateMeshDescriptor backingDescriptor {
         .width = width,

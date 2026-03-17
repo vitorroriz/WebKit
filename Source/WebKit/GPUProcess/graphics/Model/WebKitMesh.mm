@@ -28,6 +28,7 @@
 
 #import "ModelTypes.h"
 
+#import <WebCore/IOSurface.h>
 #import <WebCore/ProcessIdentity.h>
 #import <wtf/CheckedArithmetic.h>
 #import <wtf/MathExtras.h>
@@ -563,15 +564,21 @@ static WKBridgeMaterialGraph *convert(const MaterialGraph& material)
 
 namespace WebKit {
 
+static RetainPtr<NSMutableArray> createMetalTextures(id<MTLDevice> device, const Vector<RetainPtr<IOSurfaceRef>>& ioSurfaces, unsigned width, unsigned height)
+{
+    MTLTextureDescriptor *textureDescriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA16Float width:width height:height mipmapped:NO];
+    RetainPtr textures = adoptNS([[NSMutableArray alloc] init]);
+    for (auto& ioSurface : ioSurfaces)
+        [textures addObject:[device newTextureWithDescriptor:textureDescriptor iosurface:ioSurface.get() plane:0]];
+    return textures;
+}
+
 WTF_MAKE_TZONE_ALLOCATED_IMPL(WebMesh);
 
 WebMesh::WebMesh(const WebModelCreateMeshDescriptor& descriptor)
 {
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
-    MTLTextureDescriptor *textureDescriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA16Float width:descriptor.width height:descriptor.height mipmapped:NO];
-    m_textures = [NSMutableArray array];
-    for (RetainPtr ioSurface : descriptor.ioSurfaces)
-        [m_textures addObject:[device newTextureWithDescriptor:textureDescriptor iosurface:ioSurface.get() plane:0]];
+    m_textures = createMetalTextures(device, descriptor.ioSurfaces, descriptor.width, descriptor.height);
 
 #if ENABLE(GPU_PROCESS_MODEL)
     WKBridgeUSDConfiguration *configuration = [WebKit::allocWKBridgeUSDConfigurationInstance() initWithDevice:device memoryOwner:descriptor.processIdentity ? descriptor.processIdentity->taskIdToken() : 0];
@@ -738,6 +745,19 @@ void WebMesh::play(bool play)
     [m_receiver setPlaying:play];
 #else
     UNUSED_PARAM(play);
+#endif
+}
+
+void WebMesh::updateRenderBuffers(const WebModel::ResizeMeshDescriptor& descriptor)
+{
+#if ENABLE(GPU_PROCESS_MODEL)
+    auto ioSurfaces = descriptor.renderBuffers.map([](auto& buffer) -> RetainPtr<IOSurfaceRef> {
+        return buffer->surface();
+    });
+    m_textures = createMetalTextures(MTLCreateSystemDefaultDevice(), ioSurfaces, descriptor.width, descriptor.height);
+    m_currentTexture = 0;
+#else
+    UNUSED_PARAM(descriptor);
 #endif
 }
 

@@ -93,6 +93,7 @@ private:
     void updateMaterial(const WebModel::UpdateMaterialDescriptor&) final;
 #if PLATFORM(COCOA)
     std::pair<simd_float4, simd_float4> getCenterAndExtents() const final;
+    void sizeDidChange(unsigned, unsigned, CompletionHandler<void(Vector<MachSendRight>&&)>&&) final;
 #endif
     void play(bool) final;
 

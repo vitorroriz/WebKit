@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <wtf/CompletionHandler.h>
 #include <wtf/Ref.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefCountedAndCanMakeWeakPtr.h>
@@ -35,6 +36,10 @@
 #include <simd/simd.h>
 #include <wtf/MachSendRight.h>
 #endif
+
+namespace WebModel {
+struct ResizeMeshDescriptor;
+}
 
 namespace WebCore {
 class TransformationMatrix;
@@ -85,6 +90,8 @@ public:
 #if PLATFORM(COCOA)
     virtual std::optional<WebModel::Float4x4> entityTransform() const = 0;
     virtual Vector<MachSendRight> ioSurfaceHandles() { return { }; }
+    virtual void updateRenderBuffers(WebModel::ResizeMeshDescriptor&&) { }
+    virtual void sizeDidChange(unsigned, unsigned, CompletionHandler<void(Vector<MachSendRight>&&)>&& callback) { callback({ }); }
     virtual std::pair<simd_float4, simd_float4> getCenterAndExtents() const { return std::make_pair(simd_make_float4(0.f), simd_make_float4(0.f)); }
 #endif
 

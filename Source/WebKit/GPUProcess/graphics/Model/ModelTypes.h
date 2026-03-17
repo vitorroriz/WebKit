@@ -31,6 +31,7 @@
 #include <WebKit/Float4x4.h>
 #include <wtf/ExportMacros.h>
 #include <wtf/RetainPtr.h>
+#include <wtf/UniqueRef.h>
 #include <wtf/Vector.h>
 #include <wtf/text/WTFString.h>
 #endif
@@ -452,6 +453,7 @@ NS_HEADER_AUDIT_END(nullability, sendability)
 #ifdef __cplusplus
 
 namespace WebCore {
+class IOSurface;
 class ProcessIdentity;
 }
 
@@ -690,6 +692,13 @@ struct UpdateMeshDescriptor {
     Vector<String> materialPrims;
     std::optional<DeformationData> deformationData;
 };
+
+struct ResizeMeshDescriptor {
+    unsigned width;
+    unsigned height;
+    Vector<UniqueRef<WebCore::IOSurface>> renderBuffers;
+};
+
 }
 
 typedef struct WebModelCreateMeshDescriptor {
