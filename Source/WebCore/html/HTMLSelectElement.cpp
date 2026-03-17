@@ -607,12 +607,23 @@ CompletionHandlerCallingScope HTMLSelectElement::optionToSelectFromChildChangeSc
     };
 
     RefPtr<HTMLOptionElement> optionToSelect;
-    if (change.type == ChildChange::Type::ElementInserted) {
-        if (auto* option = dynamicDowncast<HTMLOptionElement>(*change.siblingChanged)) {
-            if (option->selectedWithoutUpdate())
-                optionToSelect = option;
-        } else if (auto* optGroup = dynamicDowncast<HTMLOptGroupElement>(change.siblingChanged); !parentOptGroup && optGroup)
-            optionToSelect = getLastSelectedOption(*optGroup);
+    if (change.type == ChildChange::Type::ElementInserted || change.type == ChildChange::Type::ElementAndTextInserted) {
+        auto handleInsertedElement = [&](Element& insertedElement) {
+            if (auto* option = dynamicDowncast<HTMLOptionElement>(insertedElement)) {
+                if (option->selectedWithoutUpdate())
+                    optionToSelect = option;
+            } else if (auto* optGroup = dynamicDowncast<HTMLOptGroupElement>(insertedElement); !parentOptGroup && optGroup)
+                optionToSelect = getLastSelectedOption(*optGroup);
+        };
+        if (RefPtr element = change.siblingChanged)
+            handleInsertedElement(*element);
+        else if (change.insertedChildren) {
+            for (auto& child : *change.insertedChildren) {
+                if (RefPtr element = dynamicDowncast<Element>(child))
+                    handleInsertedElement(*element);
+            }
+        }
+
     } else if (parentOptGroup && change.type == ContainerNode::ChildChange::Type::AllChildrenReplaced)
         optionToSelect = getLastSelectedOption(*parentOptGroup);
 

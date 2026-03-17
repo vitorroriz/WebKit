@@ -242,6 +242,7 @@ void HTMLMeterElement::appendShadowTreeForBaseAppearance(ShadowRoot& root)
     trackElement->setUserAgentPart(UserAgentParts::sliderTrack());
     trackElement->setInlineStyleProperty(CSSPropertyAppearance, "inherit"_s);
     trackElement->setInlineStyleProperty(CSSPropertyDisplay, "-internal-auto-base(none, inline-block) !important"_s);
+    ScriptDisallowedScope::EventAllowedScope rootScope { root };
     root.appendChild(trackElement);
 
     Ref fillElement = HTMLDivElement::create(document);

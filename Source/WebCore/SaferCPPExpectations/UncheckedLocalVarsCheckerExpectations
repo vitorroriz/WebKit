@@ -17,7 +17,6 @@ html/HTMLFormElement.cpp
 [ iOS ] html/HTMLImageLoader.cpp
 html/HTMLOptionElement.cpp
 [ iOS ] html/HTMLPictureElement.cpp
-html/HTMLSelectElement.cpp
 html/OffscreenCanvas.cpp
 html/canvas/CanvasRenderingContext2DBase.cpp
 inspector/InspectorNodeFinder.cpp

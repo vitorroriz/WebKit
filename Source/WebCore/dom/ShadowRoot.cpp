@@ -166,6 +166,7 @@ void ShadowRoot::childrenChanged(const ChildChange& childChange)
     // FIXME: Avoid always invalidating style just for first-child, etc... as done in Element::childrenChanged.
     switch (childChange.type) {
     case ChildChange::Type::ElementInserted:
+    case ChildChange::Type::ElementAndTextInserted:
     case ChildChange::Type::ElementRemoved:
         m_host->invalidateStyleForSubtreeInternal();
         break;

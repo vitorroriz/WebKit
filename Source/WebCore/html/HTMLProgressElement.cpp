@@ -158,6 +158,7 @@ void HTMLProgressElement::appendShadowTreeForAutoAppearance(ShadowRoot& root)
     innerElement->setUserAgentPart(UserAgentParts::webkitProgressInnerElement());
     innerElement->setInlineStyleProperty(CSSPropertyAppearance, "inherit"_s);
     innerElement->setInlineStyleProperty(CSSPropertyDisplay, "-internal-auto-base(inline-block, none) !important"_s);
+    ScriptDisallowedScope::EventAllowedScope rootScope { root };
     root.appendChild(innerElement);
 
     Ref barElement = HTMLDivElement::create(document);
@@ -183,6 +184,7 @@ void HTMLProgressElement::appendShadowTreeForBaseAppearance(ShadowRoot& root)
     trackElement->setUserAgentPart(UserAgentParts::sliderTrack());
     trackElement->setInlineStyleProperty(CSSPropertyAppearance, "inherit"_s);
     trackElement->setInlineStyleProperty(CSSPropertyDisplay, "-internal-auto-base(none, inline-block) !important"_s);
+    ScriptDisallowedScope::EventAllowedScope rootScope { root };
     root.appendChild(trackElement);
 
     Ref fillElement = HTMLDivElement::create(document);

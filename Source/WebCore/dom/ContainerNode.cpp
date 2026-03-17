@@ -153,7 +153,7 @@ ALWAYS_INLINE auto ContainerNode::removeAllChildrenWithScriptAssertion(ChildChan
         collectChildNodes(*this, children);
     }
 
-    ContainerNode::ChildChange childChange { ChildChange::Type::AllChildrenRemoved, nullptr, nullptr, nullptr, source, ContainerNode::ChildChange::AffectsElements::Unknown };
+    ContainerNode::ChildChange childChange { ChildChange::Type::AllChildrenRemoved, nullptr, nullptr, nullptr, nullptr, source, ContainerNode::ChildChange::AffectsElements::Unknown };
 
     bool hadElementChild = false;
 
@@ -210,6 +210,7 @@ static ContainerNode::ChildChange makeChildChangeForRemoval(Node& childToRemove,
 
     return {
         changeType,
+        nullptr,
         dynamicDowncast<Element>(childToRemove),
         ElementTraversal::previousSibling(childToRemove),
         ElementTraversal::nextSibling(childToRemove),
@@ -286,7 +287,7 @@ enum class ReplacedAllChildren { No, YesIncludingElements, YesNotIncludingElemen
 static ContainerNode::ChildChange makeChildChangeForInsertion(ContainerNode& containerNode, Node& child, Node* beforeChild, ContainerNode::ChildChange::Source source, ReplacedAllChildren replacedAllChildren)
 {
     if (replacedAllChildren != ReplacedAllChildren::No)
-        return { ContainerNode::ChildChange::Type::AllChildrenReplaced, nullptr, nullptr, nullptr, source, replacedAllChildren == ReplacedAllChildren::YesIncludingElements ? ContainerNode::ChildChange::AffectsElements::Yes : ContainerNode::ChildChange::AffectsElements::No };
+        return { ContainerNode::ChildChange::Type::AllChildrenReplaced, nullptr, nullptr, nullptr, nullptr, source, replacedAllChildren == ReplacedAllChildren::YesIncludingElements ? ContainerNode::ChildChange::AffectsElements::Yes : ContainerNode::ChildChange::AffectsElements::No };
 
     auto changeType = [&] {
         if (is<Element>(child))
@@ -299,6 +300,7 @@ static ContainerNode::ChildChange makeChildChangeForInsertion(ContainerNode& con
     auto* beforeChildElement = dynamicDowncast<Element>(beforeChild);
     return {
         changeType,
+        nullptr,
         dynamicDowncast<Element>(child),
         beforeChild ? ElementTraversal::previousSibling(*beforeChild) : ElementTraversal::lastChild(containerNode),
         !beforeChild || beforeChildElement ? beforeChildElement : ElementTraversal::nextSibling(*beforeChild),
@@ -307,10 +309,49 @@ static ContainerNode::ChildChange makeChildChangeForInsertion(ContainerNode& con
     };
 }
 
+static ContainerNode::ChildChange makeChildChangeForInsertion(ContainerNode& containerNode, NodeVector& children, Node* beforeChild, ContainerNode::ChildChange::Source source, ReplacedAllChildren replacedAllChildren)
+{
+    using Type = ContainerNode::ChildChange::Type;
+    using AffectsElements = ContainerNode::ChildChange::AffectsElements;
+
+    if (replacedAllChildren != ReplacedAllChildren::No)
+        return { Type::AllChildrenReplaced, &children, nullptr, nullptr, nullptr, source, replacedAllChildren == ReplacedAllChildren::YesIncludingElements ? AffectsElements::Yes : AffectsElements::No };
+
+    ASSERT(children.size());
+    auto changeType = Type::NonContentsChildInserted;
+    for (auto& child : children) {
+        if (is<Element>(child)) {
+            if (changeType == Type::TextInserted)
+                changeType = Type::ElementAndTextInserted;
+            else if (changeType != Type::ElementAndTextInserted)
+                changeType = Type::ElementInserted;
+            continue;
+        }
+        if (is<Text>(child)) {
+            if (changeType == Type::ElementInserted)
+                changeType = Type::ElementAndTextInserted;
+            else if (changeType != Type::ElementAndTextInserted)
+                changeType = Type::TextInserted;
+            continue;
+        }
+    }
+
+    auto* beforeChildElement = dynamicDowncast<Element>(beforeChild);
+    return {
+        changeType,
+        &children,
+        nullptr,
+        beforeChild ? ElementTraversal::previousSibling(*beforeChild) : ElementTraversal::lastChild(containerNode),
+        !beforeChild || beforeChildElement ? beforeChildElement : ElementTraversal::nextSibling(*beforeChild),
+        source,
+        changeType == Type::ElementInserted || changeType == Type::ElementAndTextInserted ? AffectsElements::Yes : AffectsElements::No
+    };
+}
+
 enum class ClonedChildIncludesElements { No, Yes };
 static ContainerNode::ChildChange NODELETE makeChildChangeForCloneInsertion(ClonedChildIncludesElements clonedChildIncludesElements)
 {
-    return { ContainerNode::ChildChange::Type::AllChildrenReplaced, nullptr, nullptr, nullptr, ContainerNode::ChildChange::Source::Clone,
+    return { ContainerNode::ChildChange::Type::AllChildrenReplaced, nullptr, nullptr, nullptr, nullptr, ContainerNode::ChildChange::Source::Clone,
         clonedChildIncludesElements == ClonedChildIncludesElements::Yes ? ContainerNode::ChildChange::AffectsElements::Yes : ContainerNode::ChildChange::AffectsElements::No };
 }
 
@@ -343,6 +384,45 @@ static ALWAYS_INLINE void executeNodeInsertionWithScriptAssertion(ContainerNode&
 
     if (source == ContainerNode::ChildChange::Source::API)
         dispatchChildInsertionEvents(child);
+}
+
+template<typename DOMInsertionWork>
+static ALWAYS_INLINE void executeNodeInsertionWithScriptAssertion(ContainerNode& containerNode, NodeVector& children, Node* beforeChild,
+    ContainerNode::ChildChange::Source source, ReplacedAllChildren replacedAllChildren, NOESCAPE const DOMInsertionWork& doNodeInsertion)
+{
+    if (children.isEmpty())
+        return;
+
+    // FIXME: Make it work with multiple children. Add TextAndElementInserted.
+    auto childChange = makeChildChangeForInsertion(containerNode, children, beforeChild, source, replacedAllChildren);
+
+    NodeVector postInsertionNotificationTargets;
+    {
+        WidgetHierarchyUpdatesSuspensionScope suspendWidgetHierarchyUpdates;
+        ScriptDisallowedScope::InMainThread scriptDisallowedScope;
+        Style::ChildChangeInvalidation styleInvalidation(containerNode, childChange);
+
+        if (containerNode.isShadowRoot() || containerNode.isInShadowTree()) [[unlikely]]
+            containerNode.containingShadowRoot()->resolveSlotsBeforeNodeInsertionOrRemoval();
+
+        for (auto& child : children) {
+            doNodeInsertion(child);
+            ChildListMutationScope(containerNode).childAdded(child);
+            notifyChildNodeInserted(containerNode, child, postInsertionNotificationTargets);
+        }
+    }
+
+    // FIXME: Move childrenChanged into ScriptDisallowedScope block.
+    containerNode.childrenChanged(childChange);
+
+    ASSERT(ScriptDisallowedScope::InMainThread::isEventDispatchAllowedInSubtree(containerNode));
+    for (auto& target : postInsertionNotificationTargets)
+        target->didFinishInsertingNode();
+
+    if (source == ContainerNode::ChildChange::Source::API) {
+        for (auto& child : children)
+            dispatchChildInsertionEvents(child);
+    }
 }
 
 template<typename DOMInsertionWork>
@@ -578,26 +658,21 @@ ExceptionOr<void> ContainerNode::insertBefore(Node& newChild, RefPtr<Node>&& ref
             if (checkAcceptResult.hasException())
                 return checkAcceptResult.releaseException();
         }
+        if (next->parentNode() != this)
+            return { };
+        for (auto& child : targets) {
+            if (child->parentNode())
+                return { };
+        }
     }
 
     InspectorInstrumentation::willInsertDOMNode(protect(document()), *this);
 
     ChildListMutationScope mutation(*this);
-    for (auto& child : targets) {
-        // Due to arbitrary code running in response to a DOM mutation event it's
-        // possible that "next" is no longer a child of "this".
-        // It's also possible that "child" has been inserted elsewhere.
-        // In either of those cases, we'll just stop.
-        if (next->parentNode() != this)
-            break;
-        if (child->parentNode())
-            break;
-
-        executeNodeInsertionWithScriptAssertion(*this, child.get(), next.ptr(), ChildChange::Source::API, ReplacedAllChildren::No, [&] {
-            child->setTreeScopeRecursively(treeScope());
-            insertBeforeCommon(next, child);
-        });
-    }
+    executeNodeInsertionWithScriptAssertion(*this, targets, next.ptr(), ChildChange::Source::API, ReplacedAllChildren::No, [&](Node& child) {
+        child.setTreeScopeRecursively(treeScope());
+        insertBeforeCommon(next, child);
+    });
 
     dispatchSubtreeModifiedEvent();
     return { };
@@ -607,6 +682,8 @@ void ContainerNode::insertBeforeCommon(Node& nextChild, Node& newChild)
 {
     ScriptDisallowedScope::InMainThread scriptDisallowedScope;
 
+    ASSERT(nextChild.parentNode() == this);
+    ASSERT(&nextChild != &newChild);
     ASSERT(!newChild.parentNode()); // Use insertBefore if you need to handle reparenting (and want DOM mutation events).
     ASSERT(!newChild.nextSibling());
     ASSERT(!newChild.previousSibling());
@@ -632,6 +709,7 @@ void ContainerNode::appendChildCommon(Node& child)
 {
     ScriptDisallowedScope::InMainThread scriptDisallowedScope;
 
+    ASSERT(!child.parentNode());
     child.setParentNode(this);
 
     if (auto* lastChild = this->lastChild()) {
@@ -696,6 +774,12 @@ ExceptionOr<void> ContainerNode::replaceChild(Node& newChild, Node& oldChild)
             if (validityResult.hasException())
                 return validityResult.releaseException();
         }
+        if (refChild && refChild->parentNode() != this)
+            return { };
+        for (auto& child : targets) {
+            if (child->parentNode())
+                return { };
+        }
         beforeScriptExecutionCount = ScriptController::scriptExecutionCount();
     }
 
@@ -717,30 +801,24 @@ ExceptionOr<void> ContainerNode::replaceChild(Node& newChild, Node& oldChild)
                 if (validityResult.hasException())
                     return validityResult.releaseException();
             }
+            if (refChild && refChild->parentNode() != this)
+                return { };
+            for (auto& child : targets) {
+                if (child->parentNode())
+                    return { };
+            }
         }
     }
 
     InspectorInstrumentation::willInsertDOMNode(protect(document()), *this);
 
-    // Add the new child(ren).
-    for (auto& child : targets) {
-        // Due to arbitrary code running in response to a DOM mutation event it's
-        // possible that "refChild" is no longer a child of "this".
-        // It's also possible that "child" has been inserted elsewhere.
-        // In either of those cases, we'll just stop.
-        if (refChild && refChild->parentNode() != this)
-            break;
-        if (child->parentNode())
-            break;
-
-        executeNodeInsertionWithScriptAssertion(*this, child.get(), refChild.get(), ChildChange::Source::API, ReplacedAllChildren::No, [&] {
-            child->setTreeScopeRecursively(treeScope());
-            if (refChild)
-                insertBeforeCommon(*refChild, child.get());
-            else
-                appendChildCommon(child);
-        });
-    }
+    executeNodeInsertionWithScriptAssertion(*this, targets, refChild.get(), ChildChange::Source::API, ReplacedAllChildren::No, [&](Node& child) {
+        child.setTreeScopeRecursively(treeScope());
+        if (refChild)
+            insertBeforeCommon(*refChild, child);
+        else
+            appendChildCommon(child);
+    });
 
     dispatchSubtreeModifiedEvent();
     return { };
@@ -836,6 +914,8 @@ void ContainerNode::replaceAll(Node* node)
         return;
     }
 
+    InspectorInstrumentation::willInsertDOMNode(protect(document()), *this);
+
     Ref protectedThis { *this };
     ChildListMutationScope mutation(*this);
     NodeVector removedChildren;
@@ -843,7 +923,6 @@ void ContainerNode::replaceAll(Node* node)
         ? ReplacedAllChildren::YesIncludingElements : ReplacedAllChildren::YesNotIncludingElements;
 
     executeNodeInsertionWithScriptAssertion(*this, *node, nullptr, ChildChange::Source::API, replacedAllChildren, [&] {
-        InspectorInstrumentation::willInsertDOMNode(protect(document()), *this);
         node->setTreeScopeRecursively(treeScope());
         appendChildCommon(*node);
     });
@@ -915,25 +994,19 @@ ExceptionOr<void> ContainerNode::appendChildWithoutPreInsertionValidityCheck(Nod
             if (nodeTypeResult.hasException())
                 return nodeTypeResult.releaseException();
         }
+        for (auto& child : targets) {
+            if (child->parentNode())
+                return { };
+        }
     }
 
     InspectorInstrumentation::willInsertDOMNode(protect(document()), *this);
 
-    // Now actually add the child(ren)
     ChildListMutationScope mutation(*this);
-    for (auto& child : targets) {
-        // If the child has a parent again, just stop what we're doing, because
-        // that means someone is doing something with DOM mutation -- can't re-parent
-        // a child that already has a parent.
-        if (child->parentNode())
-            break;
-
-        // Append child to the end of the list
-        executeNodeInsertionWithScriptAssertion(*this, child.get(), nullptr, ChildChange::Source::API, ReplacedAllChildren::No, [&] {
-            child->setTreeScopeRecursively(treeScope());
-            appendChildCommon(child);
-        });
-    }
+    executeNodeInsertionWithScriptAssertion(*this, targets, nullptr, ChildChange::Source::API, ReplacedAllChildren::No, [&](Node& child) {
+        child.setTreeScopeRecursively(treeScope());
+        appendChildCommon(child);
+    });
 
     dispatchSubtreeModifiedEvent();
     return { };
@@ -953,7 +1026,6 @@ ExceptionOr<void> ContainerNode::insertChildrenBeforeWithoutPreInsertionValidity
         }
     }
 
-
     if (ScriptController::scriptExecutionCount() != beforeScriptExecutionCount) {
         // Check conditions when events in removeChild executed js.
         for (auto& child : newChildren) {
@@ -961,24 +1033,24 @@ ExceptionOr<void> ContainerNode::insertChildrenBeforeWithoutPreInsertionValidity
             if (nodeTypeResult.hasException())
                 return nodeTypeResult.releaseException();
         }
+        if (refChild && refChild->parentNode() != this)
+            return { };
+        for (auto& child : newChildren) {
+            if (child->parentNode())
+                return { };
+        }
     }
 
     InspectorInstrumentation::willInsertDOMNode(protect(document()), *this);
 
     ChildListMutationScope mutation(*this);
-    for (auto& child : newChildren) {
-        if (refChild && refChild->parentNode() != this) // Event listeners moved nextChild elsewhere.
-            break;
-        if (child->parentNode()) // Event listeners inserted this child elsewhere.
-            break;
-        executeNodeInsertionWithScriptAssertion(*this, child.get(), refChild.get(), ChildChange::Source::API, ReplacedAllChildren::No, [&] {
-            child->setTreeScopeRecursively(treeScope());
-            if (refChild)
-                insertBeforeCommon(*refChild, child.get());
-            else
-                appendChildCommon(child);
-        });
-    }
+    executeNodeInsertionWithScriptAssertion(*this, newChildren, refChild.get(), ChildChange::Source::API, ReplacedAllChildren::No, [&](auto& child) {
+        child->setTreeScopeRecursively(treeScope());
+        if (refChild)
+            insertBeforeCommon(*refChild, child);
+        else
+            appendChildCommon(child);
+    });
 
     dispatchSubtreeModifiedEvent();
     return { };
@@ -1025,7 +1097,7 @@ void ContainerNode::parserNotifyChildrenChanged()
     ASSERT(is<Element>(*this));
     ASSERT(hasHeldBackChildrenChanged());
     clearHasHeldBackChildrenChanged();
-    childrenChanged(ChildChange { ContainerNode::ChildChange::Type::AllChildrenReplaced, nullptr, nullptr, nullptr, ChildChange::Source::Parser,
+    childrenChanged(ChildChange { ContainerNode::ChildChange::Type::AllChildrenReplaced, nullptr, nullptr, nullptr, nullptr, ChildChange::Source::Parser,
         firstElementChild() ? ChildChange::AffectsElements::Yes : ChildChange::AffectsElements::No, IsMutationBySetInnerHTML::Yes });
 }
 

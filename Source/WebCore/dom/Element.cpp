@@ -3641,6 +3641,7 @@ bool Element::childTypeAllowed(NodeType type) const
     }
     return false;
 }
+
 void Element::childrenChanged(const ChildChange& change)
 {
     ContainerNode::childrenChanged(change);
@@ -3655,6 +3656,7 @@ void Element::childrenChanged(const ChildChange& change)
         case ChildChange::Type::AllChildrenReplaced:
             shadowRoot->didRemoveAllChildrenOfShadowHost();
             break;
+        case ChildChange::Type::ElementAndTextInserted:
         case ChildChange::Type::TextInserted:
         case ChildChange::Type::TextRemoved:
         case ChildChange::Type::TextChanged:
@@ -3667,9 +3669,20 @@ void Element::childrenChanged(const ChildChange& change)
     }
 
     if (document().isDirAttributeDirty()) [[unlikely]] {
-        // Inserting a replaced Element (image, canvas, input, etc) should be treated as a neutral character.
-        if (selfOrPrecedingNodesAffectDirAuto() && !(change.type == ChildChange::Type::ElementInserted && change.siblingChanged->isReplaced()))
-            updateEffectiveTextDirection();
+        if (selfOrPrecedingNodesAffectDirAuto()) {
+            bool allInsertedElementsAreTreatedAsNeutralCharacter = false;
+            if (change.siblingChanged && change.siblingChanged->isReplaced())
+                allInsertedElementsAreTreatedAsNeutralCharacter = true;
+            else if (change.insertedChildren) {
+                allInsertedElementsAreTreatedAsNeutralCharacter = true;
+                for (auto& child : *change.insertedChildren) {
+                    if (RefPtr element = dynamicDowncast<Element>(child); !element || !element->isReplaced())
+                        allInsertedElementsAreTreatedAsNeutralCharacter = false;
+                }
+            }
+            if (!allInsertedElementsAreTreatedAsNeutralCharacter)
+                updateEffectiveTextDirection();
+        }
     }
 }
 

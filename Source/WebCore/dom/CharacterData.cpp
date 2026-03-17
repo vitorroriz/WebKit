@@ -86,6 +86,7 @@ static ContainerNode::ChildChange NODELETE makeChildChange(CharacterData& charac
     return {
         ContainerNode::ChildChange::Type::TextChanged,
         nullptr,
+        nullptr,
         ElementTraversal::previousSibling(characterData),
         ElementTraversal::nextSibling(characterData),
         source,
