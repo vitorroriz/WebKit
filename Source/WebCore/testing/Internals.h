@@ -1044,14 +1044,14 @@ public:
         GPUStatusFailure,
         Timeout
     };
-    void simulateEventForWebGLContext(SimulatedWebGLContextEvent, WebGLRenderingContext&);
+    void simulateEventForWebGLContext(SimulatedWebGLContextEvent, WebGLRenderingContextBase&);
 
     enum class RequestedGPU {
         Default,
         LowPower,
         HighPerformance
     };
-    RequestedGPU NODELETE requestedGPU(WebGLRenderingContext&);
+    RequestedGPU NODELETE requestedGPU(WebGLRenderingContextBase&);
 #endif
 
     void setPageVisibility(bool isVisible);
