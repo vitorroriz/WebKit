@@ -137,8 +137,8 @@ public:
     bool isReplacedBox() const { return m_nodeType == NodeType::ReplacedElement || m_nodeType == NodeType::Image || m_nodeType == NodeType::ListMarker; }
     bool isWordBreakOpportunity() const { return m_nodeType == NodeType::WordBreakOpportunity; }
     bool NODELETE isInternalTableBox() const;
-    inline bool isRuby() const;
-    bool isRubyBase() const;
+    inline bool NODELETE isRuby() const;
+    bool NODELETE isRubyBase() const;
     inline bool isRubyInlineBox() const;
     inline bool isTableCaption() const;
     inline bool isTableHeader() const;
