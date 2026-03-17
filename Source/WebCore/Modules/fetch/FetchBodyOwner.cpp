@@ -37,6 +37,7 @@
 #include "HTTPStatusCodes.h"
 #include "JSBlob.h"
 #include "JSDOMConvertInterface.h"
+#include "JSDOMConvertStrings.h"
 #include "JSDOMFormData.h"
 #include "JSDOMPromise.h"
 #include "JSDOMPromiseDeferred.h"
