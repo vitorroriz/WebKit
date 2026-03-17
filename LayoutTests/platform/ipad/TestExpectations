@@ -166,7 +166,6 @@ scrollingcoordinator/ios/fixed-scrolling-with-keyboard.html [ Skip ]
 webkit.org/b/307451 imported/w3c/web-platform-tests/html/semantics/forms/the-select-element/customizable-select/select-keyboard-behavior.optional.html [ Pass Failure ]
 
 # webkit.org/b/307469 4x fast/viewport/iOS tests are constant text failures on iPad
-fast/viewport/ios/viewport-fit-auto-safe-area-inset-change.html [ Failure ]
 fast/viewport/ios/shrink-to-fit-content-large-constant-width.html [ Failure ]
 
 webkit.org/b/307488 media/volume-activate-audio-session.html [ Failure ]
