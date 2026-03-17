@@ -119,11 +119,11 @@ static void pas_mte_do_initialization(void)
     if (rc == sizeof(info) && info.pbi_flags & PAS_MTE_PROC_FLAG_SEC_ENABLED)
         *enabled_byte = 1;
 
-    if (is_env_true("JSC_useAllocationProfiling") || is_env_true("MTE_overrideEnablementForJavaScriptCore")) {
-        PAS_ASSERT(!(is_env_false("JSC_useAllocationProfiling") || is_env_false("MTE_overrideEnablementForJavaScriptCore")));
+    if (is_env_true("MTE_overrideEnablementForJavaScriptCore")) {
+        PAS_ASSERT(!is_env_false("MTE_overrideEnablementForJavaScriptCore"));
         *enabled_byte = 1;
     }
-    if (is_env_false("JSC_useAllocationProfiling") || is_env_false("MTE_overrideEnablementForJavaScriptCore"))
+    if (is_env_false("MTE_overrideEnablementForJavaScriptCore"))
         *enabled_byte = 0;
 
     if (!*enabled_byte)
@@ -137,25 +137,11 @@ static void pas_mte_do_initialization(void)
         *lockdown_mode_byte = 0;
 
     unsigned mode = 0;
-    if (get_value_if_available(&mode, "JSC_allocationProfilingMode"))
+    if (get_value_if_available(&mode, "MTE_libpasConfig"))
         *mode_byte = (uint8_t)(mode & 0xFF);
 
     const char* name = getprogname();
     bool isWebContentProcess = !strncmp(name, "com.apple.WebKit.WebContent", 27) || !strncmp(name, "jsc", 3);
-
-    unsigned taggingRate = 100;
-    if (isWebContentProcess) {
-        const uint8_t defaultWebContentTaggingRate = 33;
-        taggingRate = defaultWebContentTaggingRate;
-
-        // Debug option to override the WCP tagging rate.
-        get_value_if_available(&taggingRate, "MTE_taggingRateForWebContent");
-    }
-
-    // Debug option to unconditionally override the tagging rate.
-    get_value_if_available(&taggingRate, "MTE_taggingRate");
-
-    PAS_MTE_CONFIG_BYTE(PAS_MTE_TAGGING_RATE) = taggingRate;
 
     if (isWebContentProcess) {
         // For a variety of reasons, a full MTE implementation in the WebContent process is not generally practical.
@@ -213,14 +199,13 @@ static bool pas_mte_is_enabled(void)
     return (rc == sizeof(info) && (info.pbi_flags & PAS_MTE_PROC_FLAG_SEC_ENABLED) && !!*enabledByte);
 }
 
-static void pas_mte_get_config_bytes(uint8_t (*bytes_out)[6])
+static void pas_mte_get_config_bytes(uint8_t (*bytes_out)[5])
 {
     (*bytes_out)[0] = PAS_MTE_CONFIG_BYTE(PAS_MTE_ENABLE_FLAG);
     (*bytes_out)[1] = PAS_MTE_CONFIG_BYTE(PAS_MTE_MODE_BITS);
-    (*bytes_out)[2] = PAS_MTE_CONFIG_BYTE(PAS_MTE_TAGGING_RATE);
-    (*bytes_out)[3] = PAS_MTE_CONFIG_BYTE(PAS_MTE_MEDIUM_TAGGING_ENABLE_FLAG);
-    (*bytes_out)[4] = PAS_MTE_CONFIG_BYTE(PAS_MTE_LOCKDOWN_MODE_FLAG);
-    (*bytes_out)[5] = PAS_MTE_CONFIG_BYTE(PAS_MTE_HARDENED_FLAG);
+    (*bytes_out)[2] = PAS_MTE_CONFIG_BYTE(PAS_MTE_MEDIUM_TAGGING_ENABLE_FLAG);
+    (*bytes_out)[3] = PAS_MTE_CONFIG_BYTE(PAS_MTE_LOCKDOWN_MODE_FLAG);
+    (*bytes_out)[4] = PAS_MTE_CONFIG_BYTE(PAS_MTE_HARDENED_FLAG);
 }
 
 #else // !PAS_ENABLE_MTE
@@ -232,9 +217,9 @@ static PAS_UNUSED bool pas_mte_is_enabled(void)
     return false;
 }
 
-static PAS_UNUSED void pas_mte_get_config_bytes(uint8_t (*bytes_out)[6])
+static PAS_UNUSED void pas_mte_get_config_bytes(uint8_t (*bytes_out)[5])
 {
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 5; i++)
         (*bytes_out)[i] = 0;
 }
 
@@ -256,7 +241,7 @@ static void pas_report_config(void)
     const int pid = getpid();
     const mach_port_t threadno = pthread_mach_thread_np(pthread_self());
 
-    uint8_t mte_conf[6];
+    uint8_t mte_conf[5];
     pas_mte_get_config_bytes(&mte_conf);
 
 #define LOG_FMT_STR_FOR_HEAP_CONFIG(name) "\n\tHeap-Config " #name ":" \
@@ -279,7 +264,7 @@ static void pas_report_config(void)
         "%s(%d,0x%x) malloc: libpas config:"
         "\n\tDeallocation Log (Max Entries, Max Bytes): %zu, %zuB"
         "\n\tScavenger (Period, Deep-Sleep Timeout, Epoch-Delta): %.2fms, %.2fms, %llu"
-        "\n\tMTE (Enabled/Mode-Bits/Tagging-Rate/Medium-Enabled/Lockdown/Hardened): (%u, %u, %u, %u, %u, %u)"
+        "\n\tMTE (Enabled/Mode-Bits/Medium-Enabled/Lockdown/Hardened): (%u, %u, %u, %u, %u)"
 #if PAS_ENABLE_BMALLOC
         "\n\tUsing System Heap: %u"
         LOG_FMT_STR_FOR_HEAP_CONFIG(bmalloc)
@@ -304,7 +289,7 @@ static void pas_report_config(void)
         progname, pid, (int)threadno,
         (size_t)PAS_DEALLOCATION_LOG_SIZE, (size_t)PAS_DEALLOCATION_LOG_MAX_BYTES,
         pas_scavenger_period_in_milliseconds, pas_scavenger_deep_sleep_timeout_in_milliseconds, pas_scavenger_max_epoch_delta,
-        mte_conf[0], mte_conf[1], mte_conf[2], mte_conf[3], mte_conf[4], mte_conf[5],
+        mte_conf[0], mte_conf[1], mte_conf[2], mte_conf[3], mte_conf[4],
 #if PAS_ENABLE_BMALLOC
         pas_system_heap_should_supplant_bmalloc(pas_heap_config_kind_bmalloc),
         LOG_FMT_VARS_FOR_HEAP_CONFIG(bmalloc_heap_config),
