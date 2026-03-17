@@ -301,6 +301,10 @@ struct AdvanceInternalState {
 
 void WidthIterator::commitCurrentFontRange(AdvanceInternalState& advanceInternalState)
 {
+    // advanceInternalState.lastGlyphCount is only synced to advanceInternalState.glyphBuffer.size() at the end of this function itself and lastGlyphCount is initialized to glyphBuffer.size(), we just have anything to commit if the glyphBuffer has grown bigger than lastGlyphCount since the last time commitCurrentFontRange was called, otherwise there is notthing to be committed.
+    if (advanceInternalState.lastGlyphCount == advanceInternalState.glyphBuffer.size())
+        return;
+
 #if ASSERT_ENABLED
     ASSERT(advanceInternalState.rangeFont);
     for (unsigned i = advanceInternalState.lastGlyphCount; i < advanceInternalState.glyphBuffer.size(); ++i)
@@ -418,20 +422,6 @@ inline void WidthIterator::advanceInternal(TextIterator& textIterator, GlyphBuff
     float width = 0;
     unsigned clusterLength = 0;
     // We are iterating in string order, not glyph order. Compare this to ComplexTextController::adjustGlyphsAndAdvances()
-    if (!textIterator.consume(character, clusterLength))
-        return;
-
-    auto glyphData = m_fontCascade->glyphDataForCharacter(character, false, FontVariant::NormalVariant);
-
-    RefPtr halfWidthFont = applyTextSpacingTrimIfNeeded(glyphData, character, fontDescription.textSpacingTrim());
-
-    advanceInternalState.updateFont(glyphData.font ? protect(glyphData.font).get() : primaryFont.ptr());
-    auto capitalizedCharacter = capitalized(character);
-    if (shouldSynthesizeSmallCaps(smallCapsState.dontSynthesizeSmallCaps, advanceInternalState.font.get(), character, capitalizedCharacter, smallCapsState.fontVariantCaps, smallCapsState.engageAllSmallCapsProcessing))
-        smallCapsState.setSmallCapsData(advanceInternalState.font.get(), fontDescription);
-    advanceInternalState.rangeFont = fontForRange(advanceInternalState.font.get(), smallCapsState, smallCapsState.isSmallCaps);
-    advanceInternalState.nextRangeFont = advanceInternalState.rangeFont;
-
     while (textIterator.consume(character, clusterLength)) {
         // FIXME: Should we replace unpaired surrogates with the object replacement character?
         // Should we do this before or after shaping? What does a shaper do with an unpaired surrogate?
@@ -442,7 +432,7 @@ inline void WidthIterator::advanceInternal(TextIterator& textIterator, GlyphBuff
             m_lastCharacterIndex = advanceInternalState.currentCharacterIndex;
         bool isDefaultIgnorable = isDefaultIgnorableCodePoint(character);
 
-        capitalizedCharacter = capitalized(character);
+        auto capitalizedCharacter = capitalized(character);
         char32_t characterToWrite = character;
 
         auto advanceToNextCharacter = [&] {
@@ -460,7 +450,7 @@ inline void WidthIterator::advanceInternal(TextIterator& textIterator, GlyphBuff
 #endif
         auto glyphData = m_fontCascade->glyphDataForCharacter(character, false, FontVariant::NormalVariant);
 
-        halfWidthFont = applyTextSpacingTrimIfNeeded(glyphData, character, fontDescription.textSpacingTrim());
+        RefPtr halfWidthFont = applyTextSpacingTrimIfNeeded(glyphData, character, fontDescription.textSpacingTrim());
 
         advanceInternalState.updateFont(glyphData.font ? protect(glyphData.font).get() : primaryFont.ptr());
         smallCapsState.shouldSynthesizeCharacter = shouldSynthesizeSmallCaps(smallCapsState.dontSynthesizeSmallCaps, advanceInternalState.font.get(), character, capitalizedCharacter, smallCapsState.fontVariantCaps, smallCapsState.engageAllSmallCapsProcessing);
