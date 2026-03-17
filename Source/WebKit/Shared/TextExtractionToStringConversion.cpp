@@ -138,8 +138,8 @@ static String truncateByWordCount(StringView text, uint64_t wordLimit, const Vec
                 }
             } else {
                 for (uint64_t i = 0; i < totalWords; ++i) {
-                    auto [ws, we] = wordPositions[i];
-                    if (static_cast<uint64_t>(we) > linkStart && static_cast<uint64_t>(ws) < linkEnd) {
+                    auto [wordStart, wordEnd] = wordPositions[i];
+                    if (static_cast<uint64_t>(wordEnd) > linkStart && static_cast<uint64_t>(wordStart) < linkEnd) {
                         if (!firstWordIndex)
                             firstWordIndex = i;
                         lastWordIndex = i;
@@ -394,6 +394,8 @@ static bool shouldEmitExtraSpace(char16_t previousCharacter, char16_t nextCharac
     return !(nextCharacterMask & U_GC_PO_MASK);
 }
 
+enum class HasAdjacentLinkAfter : bool { No, Yes };
+
 class TextExtractionAggregator : public RefCounted<TextExtractionAggregator> {
     WTF_MAKE_NONCOPYABLE(TextExtractionAggregator);
     WTF_MAKE_TZONE_ALLOCATED(TextExtractionAggregator);
@@ -605,13 +607,13 @@ public:
             text = makeStringByReplacingAll(text, original, replacement);
     }
 
-    void truncateTextByWordLimitIfNeeded(String& text, const Vector<CharacterRange>& linkCharacterRanges = { }, bool hasAdjacentLinkAfter = false)
+    void truncateTextByWordLimitIfNeeded(String& text, const Vector<CharacterRange>& linkCharacterRanges = { }, HasAdjacentLinkAfter hasAdjacentLinkAfter = HasAdjacentLinkAfter::No)
     {
         if (!m_options.maxWordsPerParagraph)
             return;
 
         Vector<CharacterRange> ranges = linkCharacterRanges;
-        if (hasAdjacentLinkAfter)
+        if (hasAdjacentLinkAfter == HasAdjacentLinkAfter::Yes)
             ranges.append({ text.length(), 0 });
 
         auto truncated = truncateByWordCount(text, *m_options.maxWordsPerParagraph, ranges);
@@ -1134,7 +1136,7 @@ static Vector<String> partsForItem(const TextExtraction::Item& item, const TextE
 
 enum class HasLineThroughStyle : bool { No, Yes };
 
-static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector<String>&& itemParts, const std::optional<FrameIdentifier>& frameIdentifier, const std::optional<NodeIdentifier>& enclosingNode, const TextExtractionLine& line, Ref<TextExtractionAggregator>&& aggregator, HasLineThroughStyle hasLineThrough = HasLineThroughStyle::No, const String& closingTag = { }, bool hasAdjacentLinkAfter = false)
+static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector<String>&& itemParts, const std::optional<FrameIdentifier>& frameIdentifier, const std::optional<NodeIdentifier>& enclosingNode, const TextExtractionLine& line, Ref<TextExtractionAggregator>&& aggregator, HasLineThroughStyle hasLineThrough = HasLineThroughStyle::No, const String& closingTag = { }, HasAdjacentLinkAfter hasAdjacentLinkAfter = HasAdjacentLinkAfter::No)
 {
     auto completion = [
         itemParts = WTF::move(itemParts),
@@ -1231,7 +1233,7 @@ static void addPartsForText(const TextExtraction::TextItemData& textItem, Vector
     });
 }
 
-static void addPartsForItem(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, const TextExtractionLine& line, TextExtractionAggregator& aggregator, IncludeRectForParentItem includeRectForParentItem, bool hasAdjacentLinkAfter = false)
+static void addPartsForItem(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, const TextExtractionLine& line, TextExtractionAggregator& aggregator, IncludeRectForParentItem includeRectForParentItem, HasAdjacentLinkAfter hasAdjacentLinkAfter = HasAdjacentLinkAfter::No)
 {
     Vector<String> parts;
     WTF::switchOn(item.data,
@@ -1572,7 +1574,7 @@ static bool childTextNodeIsRedundant(const TextExtractionAggregator& aggregator,
     return false;
 }
 
-static void addTextRepresentationRecursive(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, unsigned depth, TextExtractionAggregator& aggregator, bool hasAdjacentLinkAfter = false)
+static void addTextRepresentationRecursive(const TextExtraction::Item& item, std::optional<NodeIdentifier>&& enclosingNode, unsigned depth, TextExtractionAggregator& aggregator, HasAdjacentLinkAfter hasAdjacentLinkAfter = HasAdjacentLinkAfter::No)
 {
     auto identifier = item.nodeIdentifier;
     if (!identifier)
@@ -1584,7 +1586,7 @@ static void addTextRepresentationRecursive(const TextExtraction::Item& item, std
         for (size_t i = 0; i < item.children.size(); ++i) {
             auto& child = item.children[i];
             bool childHasLinkAfter = i + 1 < item.children.size() && item.children[i + 1].hasData<TextExtraction::LinkItemData>();
-            addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, aggregator, childHasLinkAfter);
+            addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, aggregator, childHasLinkAfter ? HasAdjacentLinkAfter::Yes : HasAdjacentLinkAfter::No);
         }
         return;
     }
@@ -1669,7 +1671,7 @@ static void addTextRepresentationRecursive(const TextExtraction::Item& item, std
     for (size_t i = 0; i < item.children.size(); ++i) {
         auto& child = item.children[i];
         bool childHasLinkAfter = i + 1 < item.children.size() && item.children[i + 1].hasData<TextExtraction::LinkItemData>();
-        addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, aggregator, childHasLinkAfter);
+        addTextRepresentationRecursive(child, std::optional { identifier }, depth + 1, aggregator, childHasLinkAfter ? HasAdjacentLinkAfter::Yes : HasAdjacentLinkAfter::No);
     }
 
     if (aggregator.useHTMLOutput() && !item.children.isEmpty())
