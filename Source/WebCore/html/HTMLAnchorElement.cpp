@@ -719,7 +719,7 @@ Node::InsertedIntoAncestorResult HTMLAnchorElement::insertedIntoAncestor(Inserti
 {
     HTMLElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
     protect(document())->processInternalResourceLinks(this);
-    if (document().settings().speculationRulesPrefetchEnabled())
+    if (insertionType.connectedToDocument && document().settings().speculationRulesPrefetchEnabled())
         return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
     return InsertedIntoAncestorResult::Done;
 }

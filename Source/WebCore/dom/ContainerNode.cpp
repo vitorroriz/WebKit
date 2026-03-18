@@ -374,6 +374,7 @@ static ALWAYS_INLINE void executeNodeInsertionWithScriptAssertion(ContainerNode&
         ChildListMutationScope(containerNode).childAdded(child);
         notifyChildNodeInserted(containerNode, child, postInsertionNotificationTargets);
     }
+    ASSERT(postInsertionNotificationTargets.isEmpty() || child.isConnected());
 
     // FIXME: Move childrenChanged into ScriptDisallowedScope block.
     containerNode.childrenChanged(childChange);
@@ -411,6 +412,7 @@ static ALWAYS_INLINE void executeNodeInsertionWithScriptAssertion(ContainerNode&
             notifyChildNodeInserted(containerNode, child, postInsertionNotificationTargets);
         }
     }
+    ASSERT(postInsertionNotificationTargets.isEmpty() || children[0]->isConnected());
 
     // FIXME: Move childrenChanged into ScriptDisallowedScope block.
     containerNode.childrenChanged(childChange);
