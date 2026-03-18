@@ -1375,7 +1375,7 @@ namespace JSC {
         Vector<SwitchInfo> m_switchContextStack;
         Vector<Ref<ForInContext>> m_forInContextStack;
         Vector<TryContext> m_tryContextStack;
-        Vector<UsingScope> m_usingScopeStack;
+        SegmentedVector<UsingScope, 8> m_usingScopeStack;
         unsigned m_yieldPoints { 0 };
         bool m_needsGeneratorification { false };
 
