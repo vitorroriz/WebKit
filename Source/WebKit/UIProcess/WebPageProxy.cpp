@@ -11783,6 +11783,7 @@ void WebPageProxy::setCursorHiddenUntilMouseMoves(bool hiddenUntilMouseMoves)
 
 void WebPageProxy::mouseEventHandlingCompleted(std::optional<WebEventType> eventType, bool handled, std::optional<RemoteUserInputEventData> remoteUserInputEventData)
 {
+    MESSAGE_CHECK(m_legacyMainFrameProcess, !internals().mouseEventQueue.isEmpty());
     if (remoteUserInputEventData) {
         CheckedRef event = internals().mouseEventQueue.first();
         const auto originalPosition = event->position();
@@ -11806,7 +11807,6 @@ void WebPageProxy::mouseEventHandlingCompleted(std::optional<WebEventType> event
     }
 
     // Retire the last sent event now that WebProcess is done handling it.
-    MESSAGE_CHECK(m_legacyMainFrameProcess, !internals().mouseEventQueue.isEmpty());
     auto event = internals().mouseEventQueue.takeFirst();
     if (eventType) {
         MESSAGE_CHECK(m_legacyMainFrameProcess, *eventType == event.type());
