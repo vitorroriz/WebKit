@@ -71,9 +71,7 @@ static LineBoxParentSearchResult findParentOfEmptyOrFirstLineBox(RenderBlock& bl
             break;
 
         if (!is<RenderBlock>(child) || is<RenderTable>(child)) {
-            // FIXME: handle all block level children, not just replaced elements that got blockified.
-            if (!child.isInline() && child.style().originalDisplay().isInlineType())
-                failedDueToBlockification = true;
+            failedDueToBlockification = true;
             break;
         }
 
@@ -197,8 +195,7 @@ void RenderTreeBuilder::List::updateItemMarker(RenderListItem& listItemRenderer)
     m_builder.attach(*searchResult.parent, WTF::move(newMarkerRenderer), firstNonMarkerChild(*searchResult.parent));
     // For outside markers, if the search failed because a flex/grid container blockified a replaced
     // child (e.g., <img>), we should collapse the anonymous block's height so it doesn't inflate the list item.
-    if (shouldCollapseAnonymousBlockParent)
-        listItemRenderer.markerRenderer()->setShouldCollapseAnonymousBlockParent(true);
+    listItemRenderer.markerRenderer()->setShouldCollapseAnonymousBlockParent(shouldCollapseAnonymousBlockParent);
 }
 
 }
