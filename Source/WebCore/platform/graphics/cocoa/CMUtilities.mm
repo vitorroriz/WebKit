@@ -298,7 +298,10 @@ static CFStringRef convertToCMTransferFunction(PlatformVideoTransferCharacterist
     case PlatformVideoTransferCharacteristics::AribStdB67Hlg:
         return PAL::kCMFormatDescriptionTransferFunction_ITU_R_2100_HLG;
     case PlatformVideoTransferCharacteristics::Iec6196621:
-        return PAL::canLoad_CoreMedia_kCMFormatDescriptionTransferFunction_sRGB() ? PAL::kCMFormatDescriptionTransferFunction_sRGB : nullptr;
+        return PAL::kCMFormatDescriptionTransferFunction_sRGB;
+    case PlatformVideoTransferCharacteristics::Gamma22curve:
+    case PlatformVideoTransferCharacteristics::Gamma28curve:
+        return kCVImageBufferTransferFunction_UseGamma;
     case PlatformVideoTransferCharacteristics::Linear:
         return PAL::kCMFormatDescriptionTransferFunction_Linear;
     default:
@@ -370,6 +373,10 @@ RetainPtr<CMFormatDescriptionRef> createFormatDescriptionFromTrackInfo(const Tra
     if (videoInfo.colorSpace().transfer) {
         if (RetainPtr cmTransferFunction = convertToCMTransferFunction(*videoInfo.colorSpace().transfer))
             CFDictionaryAddValue(extensions.get(), kCVImageBufferTransferFunctionKey, cmTransferFunction.get());
+        if (*videoInfo.colorSpace().transfer == PlatformVideoTransferCharacteristics::Gamma22curve)
+            CFDictionaryAddValue(extensions.get(), kCVImageBufferGammaLevelKey, (__bridge CFTypeRef)@(2.2));
+        else if (*videoInfo.colorSpace().transfer == PlatformVideoTransferCharacteristics::Gamma28curve)
+            CFDictionaryAddValue(extensions.get(), kCVImageBufferGammaLevelKey, (__bridge CFTypeRef)@(2.8));
     }
 
     if (videoInfo.colorSpace().matrix) {
@@ -379,9 +386,9 @@ RetainPtr<CMFormatDescriptionRef> createFormatDescriptionFromTrackInfo(const Tra
     if (videoInfo.size() != videoInfo.displaySize()) {
         double horizontalRatio = videoInfo.displaySize().width() / videoInfo.size().width();
         double verticalRatio = videoInfo.displaySize().height() / videoInfo.size().height();
-        CFDictionaryAddValue(extensions.get(), PAL::get_CoreMedia_kCMFormatDescriptionExtension_PixelAspectRatioSingleton(), @{
-            (__bridge NSString*)PAL::get_CoreMedia_kCMFormatDescriptionKey_PixelAspectRatioHorizontalSpacingSingleton() : @(horizontalRatio),
-            (__bridge NSString*)PAL::get_CoreMedia_kCMFormatDescriptionKey_PixelAspectRatioVerticalSpacingSingleton() : @(verticalRatio)
+        CFDictionaryAddValue(extensions.get(), kCVImageBufferPixelAspectRatioKey, @{
+            (__bridge NSString*)kCVImageBufferPixelAspectRatioHorizontalSpacingKey : @(horizontalRatio),
+            (__bridge NSString*)kCVImageBufferPixelAspectRatioVerticalSpacingKey : @(verticalRatio)
         });
     }
 
@@ -667,8 +674,13 @@ void attachColorSpaceToPixelBuffer(const PlatformVideoColorSpace& colorSpace, CV
     CVBufferRemoveAttachment(pixelBuffer, kCVImageBufferCGColorSpaceKey);
     if (colorSpace.primaries)
         CVBufferSetAttachment(pixelBuffer, kCVImageBufferColorPrimariesKey, convertToCMColorPrimaries(*colorSpace.primaries), kCVAttachmentMode_ShouldPropagate);
-    if (colorSpace.transfer)
+    if (colorSpace.transfer) {
         CVBufferSetAttachment(pixelBuffer, kCVImageBufferTransferFunctionKey, convertToCMTransferFunction(*colorSpace.transfer), kCVAttachmentMode_ShouldPropagate);
+        if (*colorSpace.transfer == PlatformVideoTransferCharacteristics::Gamma22curve)
+            CVBufferSetAttachment(pixelBuffer, kCVImageBufferGammaLevelKey, (__bridge CFTypeRef)@(2.2), kCVAttachmentMode_ShouldPropagate);
+        else if (*colorSpace.transfer == PlatformVideoTransferCharacteristics::Gamma28curve)
+            CVBufferSetAttachment(pixelBuffer, kCVImageBufferGammaLevelKey, (__bridge CFTypeRef)@(2.8), kCVAttachmentMode_ShouldPropagate);
+    }
     if (colorSpace.matrix)
         CVBufferSetAttachment(pixelBuffer, kCVImageBufferYCbCrMatrixKey, convertToCMYCbCRMatrix(*colorSpace.matrix), kCVAttachmentMode_ShouldPropagate);
 }
@@ -685,6 +697,10 @@ PlatformVideoColorSpace computeVideoFrameColorSpace(CVPixelBufferRef pixelBuffer
         primaries = PlatformVideoColorPrimaries::Bt709;
     else if (safeCFEqual(pixelPrimaries, kCVImageBufferColorPrimaries_EBU_3213))
         primaries = PlatformVideoColorPrimaries::JedecP22Phosphors;
+    else if (safeCFEqual(pixelPrimaries, kCVImageBufferColorPrimaries_P22))
+        primaries = PlatformVideoColorPrimaries::JedecP22Phosphors;
+    else if (safeCFEqual(pixelPrimaries, kCVImageBufferColorPrimaries_SMPTE_C))
+        primaries = PlatformVideoColorPrimaries::Smpte170m;
     else if (safeCFEqual(pixelPrimaries, PAL::kCMFormatDescriptionColorPrimaries_DCI_P3))
         primaries = PlatformVideoColorPrimaries::SmpteRp431;
     else if (safeCFEqual(pixelPrimaries, PAL::kCMFormatDescriptionColorPrimaries_P3_D65))
@@ -706,8 +722,17 @@ PlatformVideoColorSpace computeVideoFrameColorSpace(CVPixelBufferRef pixelBuffer
         transfer = PlatformVideoTransferCharacteristics::AribStdB67Hlg;
     else if (safeCFEqual(pixelTransfer, PAL::kCMFormatDescriptionTransferFunction_Linear))
         transfer = PlatformVideoTransferCharacteristics::Linear;
-    else if (PAL::canLoad_CoreMedia_kCMFormatDescriptionTransferFunction_sRGB() && safeCFEqual(pixelTransfer, PAL::kCMFormatDescriptionTransferFunction_sRGB))
+    else if (safeCFEqual(pixelTransfer, PAL::kCMFormatDescriptionTransferFunction_sRGB))
         transfer = PlatformVideoTransferCharacteristics::Iec6196621;
+    else if (safeCFEqual(pixelTransfer, PAL::kCMFormatDescriptionTransferFunction_ITU_R_2020))
+        transfer = PlatformVideoTransferCharacteristics::Bt2020_10bit;
+    else if (safeCFEqual(pixelTransfer, kCVImageBufferTransferFunction_UseGamma)) {
+        if (auto gammaLevel = CVBufferGetAttachment(pixelBuffer, kCVImageBufferGammaLevelKey, nil)) {
+            double gamma = 0;
+            CFNumberGetValue(static_cast<CFNumberRef>(gammaLevel), kCFNumberFloat64Type, &gamma);
+            transfer = gamma < 2.5 ? PlatformVideoTransferCharacteristics::Gamma22curve : PlatformVideoTransferCharacteristics::Gamma28curve;
+        }
+    }
 
     std::optional<PlatformVideoMatrixCoefficients> matrix;
     auto pixelMatrix = CVBufferGetAttachment(pixelBuffer, kCVImageBufferYCbCrMatrixKey, nil);
@@ -717,6 +742,8 @@ PlatformVideoColorSpace computeVideoFrameColorSpace(CVPixelBufferRef pixelBuffer
         matrix = PlatformVideoMatrixCoefficients::Bt709;
     else if (safeCFEqual(pixelMatrix, kCVImageBufferYCbCrMatrix_SMPTE_240M_1995))
         matrix = PlatformVideoMatrixCoefficients::Smpte240m;
+    else if (safeCFEqual(pixelMatrix, kCVImageBufferYCbCrMatrix_ITU_R_601_4))
+        matrix = PlatformVideoMatrixCoefficients::Bt470bg;
 
     auto pixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer);
     bool isFullRange = pixelFormat != kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;

@@ -188,11 +188,11 @@ static TransferFunctionCV transferFunctionFromString(CFStringRef string)
         return TransferFunctionCV::kITU_R_601_4;
     if (CFEqual(string, kCVImageBufferYCbCrMatrix_SMPTE_240M_1995))
         return TransferFunctionCV::kSMPTE_240M_1995;
-    if (canLoad_CoreVideo_kCVImageBufferYCbCrMatrix_DCI_P3() && CFEqual(string, kCVImageBufferYCbCrMatrix_DCI_P3))
+    if (CFEqual(string, kCVImageBufferYCbCrMatrix_DCI_P3))
         return TransferFunctionCV::kDCI_P3;
-    if (canLoad_CoreVideo_kCVImageBufferYCbCrMatrix_P3_D65() && CFEqual(string, kCVImageBufferYCbCrMatrix_P3_D65))
+    if (CFEqual(string, kCVImageBufferYCbCrMatrix_P3_D65))
         return TransferFunctionCV::kP3_D65;
-    if (canLoad_CoreVideo_kCVImageBufferYCbCrMatrix_ITU_R_2020() && CFEqual(string, kCVImageBufferYCbCrMatrix_ITU_R_2020))
+    if (CFEqual(string, kCVImageBufferYCbCrMatrix_ITU_R_2020))
         return TransferFunctionCV::kITU_R_2020;
     return TransferFunctionCV::Unknown;
 }
