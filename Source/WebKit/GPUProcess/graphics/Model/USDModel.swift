@@ -1406,14 +1406,19 @@ extension ShaderGraph._Proto_ShaderNodeGraph {
                     }
 
                 case .builtin, .arguments, .results:
-                    // Handle builtin nodes by looking up their definitions
+                    // Handle builtin, arguments, and results nodes
                     if let builtin = bridgeNode.builtin, !builtin.definition.isEmpty {
                         if let definition = library.definition(named: builtin.definition) {
                             let node = _Proto_ShaderNodeGraph.Node(name: nodeName, data: .definition(definition))
                             nodesDictionary[nodeName] = node
                         } else {
                             logError("Could not find builtin definition named '\(builtin.definition)' for node '\(nodeName)'")
+                            // Don't add this node to the dictionary - it will be filtered out later
                         }
+                    } else {
+                        // For arguments/results nodes without definitions, skip them
+                        // These are special node types that don't need explicit nodes in the graph
+                        logInfo("Skipping \(bridgeNode.bridgeNodeType) node '\(nodeName)' (no definition)")
                     }
 
                 @unknown default:
@@ -1421,9 +1426,31 @@ extension ShaderGraph._Proto_ShaderNodeGraph {
                 }
             }
 
-            // Convert bridge edges to edges
-            let edges = descriptor.edges.map { bridgeEdge in
-                _Proto_ShaderNodeGraph.Edge(
+            // Build a set of valid node names (excluding special nodes like arguments/results)
+            let validNodeNames = Set(nodesDictionary.keys)
+
+            // Get the names of arguments and results nodes from the descriptor fields
+            // These are stored separately in descriptor.arguments and descriptor.results, not in descriptor.nodes
+            let specialNodeNames = Set(
+                [descriptor.arguments, descriptor.results]
+                    .compactMap {
+                        $0.builtin?.name ?? $0.constant?.name
+                    }
+            )
+
+            // Convert bridge edges to edges, filtering out edges that reference truly missing nodes
+            let edges = descriptor.edges.compactMap { bridgeEdge -> _Proto_ShaderNodeGraph.Edge? in
+                let outputExists = validNodeNames.contains(bridgeEdge.outputNode) || specialNodeNames.contains(bridgeEdge.outputNode)
+                let inputExists = validNodeNames.contains(bridgeEdge.inputNode) || specialNodeNames.contains(bridgeEdge.inputNode)
+
+                guard outputExists && inputExists else {
+                    logError(
+                        "Skipping edge from '\(bridgeEdge.outputNode).\(bridgeEdge.outputPort)' to '\(bridgeEdge.inputNode).\(bridgeEdge.inputPort)' - one or both nodes not found"
+                    )
+                    return nil
+                }
+
+                return _Proto_ShaderNodeGraph.Edge(
                     outputNode: bridgeEdge.outputNode,
                     outputPort: bridgeEdge.outputPort,
                     inputNode: bridgeEdge.inputNode,
