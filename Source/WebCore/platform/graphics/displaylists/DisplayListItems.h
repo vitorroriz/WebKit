@@ -139,7 +139,7 @@ public:
 
     const AffineTransform& transform() const LIFETIME_BOUND { return m_transform; }
 
-    WEBCORE_EXPORT void apply(GraphicsContext&) const;
+    WEBCORE_EXPORT void apply(GraphicsContext&, const AffineTransform& baseTransform = AffineTransform()) const;
     void dump(TextStream&, OptionSet<AsTextFlag>) const;
 
 private:
