@@ -3782,26 +3782,7 @@ void WebPage::updateVisibleContentRects(const VisibleContentRectUpdateInfo& visi
             viewportStability = ViewportRectStability::Unstable;
             layerAction = ScrollingLayerPositionAction::SetApproximate;
         }
-
-        auto mainFrameScrollingNodeID = frameView->scrollingNodeID();
-        if (!mainFrameScrollingNodeID) {
-            ASSERT_NOT_REACHED();
-            return;
-        }
-
-        auto scrollUpdate = ScrollUpdate {
-            .nodeID = *mainFrameScrollingNodeID,
-            .scrollPosition = scrollPosition,
-            .data = ScrollUpdateData {
-                .updateType = ScrollUpdateType::PositionUpdate,
-                .updateLayerPositionAction = layerAction,
-                .layoutViewportOrigin = visibleContentRectUpdateInfo.layoutViewportRect().location()
-            }
-        };
-
-        // We don't actually know that these are user scrolls; we get here for all kinds of state changes.
-        scrollingCoordinator->applyScrollUpdate(WTF::move(scrollUpdate), ScrollType::User, viewportStability);
-
+        scrollingCoordinator->reconcileScrollingState(*frameView, scrollPosition, visibleContentRectUpdateInfo.layoutViewportRect(), ScrollType::User, viewportStability, layerAction);
         if (visibleContentRectUpdateInfo.needsScrollend() && frameView->scrollingNodeID()) {
             auto scrollUpdate = ScrollUpdate {
                 .nodeID = *frameView->scrollingNodeID(),
