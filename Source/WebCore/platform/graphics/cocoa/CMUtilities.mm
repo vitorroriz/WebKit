@@ -39,16 +39,14 @@
 #import "SharedBuffer.h"
 #import "WebMAudioUtilitiesCocoa.h"
 #import <CoreMedia/CMFormatDescription.h>
-#import <JavaScriptCore/ArrayBuffer.h>
-#import <JavaScriptCore/DataView.h>
 #import <pal/avfoundation/MediaTimeAVFoundation.h>
 #import <pal/cf/CoreAudioExtras.h>
 #import <pal/spi/cocoa/AudioToolboxSPI.h>
 #import <wtf/Expected.h>
 #import <wtf/Scope.h>
-#import <wtf/SharedTask.h>
 #import <wtf/TZoneMallocInlines.h>
 #import <wtf/cf/TypeCastsCF.h>
+#import <wtf/cf/VectorCF.h>
 
 #import "CoreVideoSoftLink.h"
 #import "VideoToolboxSoftLink.h"
@@ -903,14 +901,8 @@ Vector<Ref<SharedBuffer>> getKeyIDs(CMFormatDescriptionRef description)
         // AVStreamDataParser will attach the 'tenc' box to each sample, not including the leading
         // size and boxType data. Extract the 'tenc' box and use that box to derive the sample's
         // keyID.
-        auto length = CFDataGetLength(trackEncryptionData.get());
-        auto ptr = (void*)(CFDataGetBytePtr(trackEncryptionData.get()));
-        Ref destructorFunction = createSharedTask<void(void*)>([data = WTF::move(trackEncryptionData)] (void*) { UNUSED_PARAM(data); });
-        Ref trackEncryptionDataBuffer = ArrayBuffer::create(JSC::ArrayBufferContents(ptr, length, std::nullopt, WTF::move(destructorFunction)));
-
         ISOTrackEncryptionBox trackEncryptionBox;
-        auto trackEncryptionView = JSC::DataView::create(WTF::move(trackEncryptionDataBuffer), 0, length);
-        if (!trackEncryptionBox.parseWithoutTypeAndSize(trackEncryptionView))
+        if (!trackEncryptionBox.parseWithoutTypeAndSize(span(trackEncryptionData.get())))
             return { };
         return { SharedBuffer::create(trackEncryptionBox.defaultKID()) };
     }
