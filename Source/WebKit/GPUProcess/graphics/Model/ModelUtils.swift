@@ -30,6 +30,22 @@ import Metal
 @_spi(RealityCoreRendererAPI) import RealityKit
 @_spi(SGInternal) import RealityKit
 
+extension simd_float4x4 {
+    var minor: simd_float3x3 {
+        .init(
+            [columns.0.x, columns.0.y, columns.0.z],
+            [columns.1.x, columns.1.y, columns.1.z],
+            [columns.2.x, columns.2.y, columns.2.z]
+        )
+    }
+
+    func transformPosition(_ position: simd_float3) -> simd_float3 {
+        var result = simd_mul(self, simd_float4(position, 1))
+        result /= result.w
+        return simd_float3(result.x, result.y, result.z)
+    }
+}
+
 func mapSemantic(_ semantic: LowLevelMesh.VertexSemantic) -> _Proto_LowLevelMeshResource_v1.VertexSemantic {
     switch semantic {
     case .position: .position

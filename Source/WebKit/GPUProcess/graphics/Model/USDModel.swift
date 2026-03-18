@@ -259,16 +259,6 @@ internal func logInfo(_ info: String) {
     Logger.modelGPU.info("\(info)")
 }
 
-extension simd_float4x4 {
-    fileprivate var minor: simd_float3x3 {
-        .init(
-            [self.columns.0.x, self.columns.0.y, self.columns.0.z],
-            [self.columns.1.x, self.columns.1.y, self.columns.1.z],
-            [self.columns.2.x, self.columns.2.y, self.columns.2.z]
-        )
-    }
-}
-
 @objc
 @implementation
 extension WKBridgeUSDConfiguration {
@@ -665,6 +655,16 @@ extension WKBridgeReceiver {
                             fatalError("Failed to get material instance \(materialIdentifier)")
                         }
 
+                        #if canImport(RealityCoreRenderer, _version: 12)
+                        let pipeline = try await renderContext.makeRenderPipelineState(
+                            descriptor: .init(
+                                mesh: meshResource.descriptor,
+                                material: material.resource,
+                                renderTargets: [renderTarget],
+                                blending: material.blending == .transparent ? .sourceOver : nil
+                            )
+                        )
+                        #else
                         let pipeline = try await renderContext.makeRenderPipelineState(
                             descriptor: .descriptor(
                                 mesh: meshResource.descriptor,
@@ -672,6 +672,7 @@ extension WKBridgeReceiver {
                                 renderTargets: [renderTarget]
                             )
                         )
+                        #endif
 
                         let meshPart = try renderContext.makeMeshPart(
                             resource: meshResource,
@@ -684,6 +685,18 @@ extension WKBridgeReceiver {
                         )
 
                         for instanceTransform in data.instanceTransforms {
+                            #if canImport(RealityCoreRenderer, _version: 12)
+                            let position = instanceTransform.transformPosition(.zero)
+                            let meshInstance = try renderContext.makeMeshInstance(
+                                meshPart: meshPart,
+                                pipeline: pipeline,
+                                geometryArguments: material.geometryArguments,
+                                surfaceArguments: material.surfaceArguments,
+                                lightingArguments: lightingArguments,
+                                transform: .single(instanceTransform),
+                                category: material.blending == .transparent ? .transparent(sortPosition: position) : .opaque
+                            )
+                            #else
                             let meshInstance = try renderContext.makeMeshInstance(
                                 meshPart: meshPart,
                                 pipeline: pipeline,
@@ -693,6 +706,7 @@ extension WKBridgeReceiver {
                                 transform: .single(instanceTransform),
                                 category: .opaque
                             )
+                            #endif
 
                             // FIXME: https://bugs.webkit.org/show_bug.cgi?id=305857
                             // swift-format-ignore: NeverForceUnwrap
