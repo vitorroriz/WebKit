@@ -928,6 +928,16 @@ void RenderImage::layout()
 
     if (hasShadowContent())
         layoutShadowContent(oldSize);
+
+    if (contentBoxRect().size().width() == oldSize.width())
+        return;
+
+    // https://html.spec.whatwg.org/multipage/images.html#relevant-mutations
+    // "If the element allows auto-sizes: ... its concrete object size width changes"
+    if (RefPtr imageElement = dynamicDowncast<HTMLImageElement>(element())) {
+        if (imageElement->hasAutoSizes() && imageElement->isLazyLoadable())
+            imageElement->scheduleAutoSizesResolution();
+    }
 }
 
 FloatSize RenderImage::computeIntrinsicSize() const

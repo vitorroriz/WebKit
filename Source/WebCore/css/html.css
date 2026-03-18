@@ -1484,6 +1484,12 @@ slot {
     display: contents;
 }
 
+/* https://html.spec.whatwg.org/multipage/rendering.html#img-contain-size */
+img:is([sizes="auto" i], [sizes^="auto," i]) {
+    contain: size !important;
+    contain-intrinsic-size: 300px 150px;
+}
+
 #if defined(WTF_PLATFORM_IOS_FAMILY) && WTF_PLATFORM_IOS_FAMILY
 embed, object, img {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);

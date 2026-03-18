@@ -47,6 +47,7 @@ public:
     SizesAttributeParser(const String&, const Document&);
 
     float effectiveSize();
+    bool isAuto() const { return m_isAuto; }
 
     const Vector<MQ::MediaQueryResult>& dynamicMediaQueryResults() const LIFETIME_BOUND { return m_dynamicMediaQueryResults; }
 
@@ -65,6 +66,7 @@ private:
     WeakRef<const Document, WeakPtrImplWithEventTargetData> m_document;
     Vector<MQ::MediaQueryResult> m_dynamicMediaQueryResults;
     std::optional<float> m_result;
+    bool m_isAuto { false };
 };
 
 } // namespace WebCore
