@@ -996,6 +996,7 @@ enum ContentsFormat {
 
     undefined forceAXObjectCacheUpdate();
     undefined setShouldMockParentSearchResultsForTesting(boolean enabled);
+    undefined setShouldMockChildFrameSearchResultsForTesting(boolean enabled);
     undefined forceReload(boolean endToEnd);
     undefined reloadExpiredOnly();
 

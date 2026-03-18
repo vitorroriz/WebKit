@@ -344,6 +344,15 @@ AccessibilitySearchResultStream AXSearchManager::findMatchingObjectsInternalAsSt
     if (!anchorObject)
         return stream;
 
+    if (anchorObject->isIgnored() && criteria.immediateDescendantsOnly) {
+        // If the anchor is ignored (e.g. a FrameHost for a cross-origin iframe with
+        // ENABLE_ACCESSIBILITY_LOCAL_FRAME), it's not really in the outwardly exposed
+        // accessibility tree, and thus doesn't have any true immediate descendants.
+        // Allowing these searches would cause issues for ATs, e.g. infinite navigation
+        // loops in VoiceOver.
+        return stream;
+    }
+
     // Track how many local results we've found to determine when to stop searching.
     unsigned localResultCount = 0;
 

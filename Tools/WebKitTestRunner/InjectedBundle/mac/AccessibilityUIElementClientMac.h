@@ -55,6 +55,7 @@ public:
     JSRetainPtr<JSStringRef> stringValue() override;
     JSRetainPtr<JSStringRef> domIdentifier() const override;
     RefPtr<AccessibilityUIElement> parentElement() final;
+    bool isIgnored() const override;
     unsigned childrenCount() override;
     RefPtr<AccessibilityUIElement> childAtIndex(unsigned) override;
     JSValueRef uiElementsForSearchPredicate(JSContextRef, AccessibilityUIElement* startElement, bool isDirectionNext, JSValueRef searchKey, JSStringRef searchText, bool visibleOnly, bool immediateDescendantsOnly, unsigned resultsLimit) override;

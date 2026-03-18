@@ -179,4 +179,9 @@ WEBCORE_EXPORT AccessibilitySearchResults performSearchWithParentCoordination(AX
 WEBCORE_EXPORT void setShouldMockParentSearchResultsForTesting(bool);
 WEBCORE_EXPORT bool shouldMockParentSearchResultsForTesting();
 
+// Same as above but for child frame (remote frame) search. When enabled,
+// dispatchRemoteFrameSearch injects a mock result instead of sending IPC.
+WEBCORE_EXPORT void setShouldMockChildFrameSearchResultsForTesting(bool);
+WEBCORE_EXPORT bool shouldMockChildFrameSearchResultsForTesting();
+
 } // namespace WebCore

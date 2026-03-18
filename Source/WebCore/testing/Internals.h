@@ -772,6 +772,7 @@ public:
 
     void forceAXObjectCacheUpdate() const;
     void setShouldMockParentSearchResultsForTesting(bool);
+    void setShouldMockChildFrameSearchResultsForTesting(bool);
     void forceReload(bool endToEnd);
     void reloadExpiredOnly();
 

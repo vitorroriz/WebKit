@@ -2571,6 +2571,9 @@ id attributeValueForTesting(const RefPtr<AXCoreObject>& backingObject, NSString 
     if ([attributeName isEqualToString:@"_AXRawRoleForTesting"])
         return roleToString(backingObject->role()).createNSString().autorelease();
 
+    if ([attributeName isEqualToString:@"_AXIsIgnoredForTesting"])
+        return @(backingObject->isIgnored());
+
     return nil;
 }
 

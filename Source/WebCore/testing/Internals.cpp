@@ -670,6 +670,7 @@ void Internals::resetToConsistentState(Page& page)
     AXObjectCache::setEnhancedUserInterfaceAccessibility(false);
     AXObjectCache::disableAccessibility();
     WebCore::setShouldMockParentSearchResultsForTesting(false);
+    WebCore::setShouldMockChildFrameSearchResultsForTesting(false);
 
     MockPageOverlayClient::singleton().uninstallAllOverlays();
 
@@ -4602,6 +4603,11 @@ void Internals::forceAXObjectCacheUpdate() const
 void Internals::setShouldMockParentSearchResultsForTesting(bool enabled)
 {
     WebCore::setShouldMockParentSearchResultsForTesting(enabled);
+}
+
+void Internals::setShouldMockChildFrameSearchResultsForTesting(bool enabled)
+{
+    WebCore::setShouldMockChildFrameSearchResultsForTesting(enabled);
 }
 
 void Internals::forceReload(bool endToEnd)

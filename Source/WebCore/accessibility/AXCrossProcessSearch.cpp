@@ -62,6 +62,18 @@ bool shouldMockParentSearchResultsForTesting()
     return s_shouldMockParentSearchResults;
 }
 
+static bool s_shouldMockChildFrameSearchResults = false;
+
+void setShouldMockChildFrameSearchResultsForTesting(bool enabled)
+{
+    s_shouldMockChildFrameSearchResults = enabled;
+}
+
+bool shouldMockChildFrameSearchResultsForTesting()
+{
+    return s_shouldMockChildFrameSearchResults;
+}
+
 static bool NODELETE canDoRemoteSearch(const std::optional<AXTreeID>& treeID)
 {
 #if PLATFORM_SUPPORTS_REMOTE_SEARCH
@@ -286,6 +298,9 @@ AccessibilitySearchResults performSearchWithCrossProcessCoordination(AXCoreObjec
             return;
         }
 
+        if (shouldMockChildFrameSearchResultsForTesting()) [[unlikely]]
+            return;
+
         coordinator->addPendingRequest();
 
         auto slotCriteria = criteriaForIPC;
@@ -305,7 +320,16 @@ AccessibilitySearchResults performSearchWithCrossProcessCoordination(AXCoreObjec
         coordinator->waitWithTimeout(*remainingTimeout);
 
     // Merge results in tree order.
-    return mergeStreamResults(stream.entries(), originalLimit, coordinator.ptr());
+    auto results = mergeStreamResults(stream.entries(), originalLimit, coordinator.ptr());
+
+    if (shouldMockChildFrameSearchResultsForTesting()) [[unlikely]] {
+        // Testing: inject the anchor as a mock child frame result. Tests should
+        // not rely on this being any specific object — just that *something* is
+        // returned from the child frame search.
+        results.append(AccessibilitySearchResult::local(anchorObject));
+    }
+
+    return results;
 #else
     RELEASE_ASSERT_NOT_REACHED();
 #endif // PLATFORM_SUPPORTS_REMOTE_SEARCH
