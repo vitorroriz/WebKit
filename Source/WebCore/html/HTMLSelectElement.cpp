@@ -1588,7 +1588,7 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event& event)
             if (!clickedInsidePopover)
                 hidePickerPopoverElement();
         } else
-            openPickerForUserInteraction();
+            openPickerForUserInteraction(false);
 
         event.setDefaultHandled();
         return;
@@ -2025,7 +2025,7 @@ void HTMLSelectElement::showPickerInternal()
     }
 }
 
-void HTMLSelectElement::openPickerForUserInteraction()
+void HTMLSelectElement::openPickerForUserInteraction(std::optional<bool> focusVisible)
 {
     // Save the selection so it can be compared to the new selection when
     // dispatching change events during selectOption, which gets called from
@@ -2041,10 +2041,10 @@ void HTMLSelectElement::openPickerForUserInteraction()
     int listIndex = optionToListIndex(selectedIndex());
     if (listIndex < 0)
         listIndex = firstSelectableListIndex();
-    focusOptionAtIndex(listIndex);
+    focusOptionAtIndex(listIndex, focusVisible);
 }
 
-void HTMLSelectElement::focusOptionAtIndex(int listIndex)
+void HTMLSelectElement::focusOptionAtIndex(int listIndex, std::optional<bool> focusVisible)
 {
     if (!usesBaseAppearancePicker())
         return;
@@ -2059,6 +2059,7 @@ void HTMLSelectElement::focusOptionAtIndex(int listIndex)
 
     FocusOptions focusOptions;
     focusOptions.preventScroll = false;
+    focusOptions.focusVisible = focusVisible;
     option->focus(focusOptions);
 }
 

@@ -194,7 +194,7 @@ public:
     };
     NavigationKeyIdentifiers pickerNavigationKeyIdentifiers() const;
     int computeNavigationIndex(const String& keyIdentifier, int currentListIndex, NavigationKeyIdentifiers) const;
-    void focusOptionAtIndex(int listIndex);
+    void focusOptionAtIndex(int listIndex, std::optional<bool> focusVisible = std::nullopt);
     int typeAheadMatchIndex(KeyboardEvent&);
 
 protected:
@@ -281,7 +281,7 @@ private:
     void didAddUserAgentShadowRoot(ShadowRoot&) final;
 
     void showPickerInternal();
-    void openPickerForUserInteraction();
+    void openPickerForUserInteraction(std::optional<bool> focusVisible = std::nullopt);
 
     // TypeAheadDataSource functions.
     int indexOfSelectedOption() const final;
