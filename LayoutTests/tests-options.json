@@ -6851,6 +6851,9 @@
     "imported/w3c/web-platform-tests/webrtc/RTCPeerConnection-ondatachannel.html": [
         "slow"
     ],
+    "imported/w3c/web-platform-tests/webrtc/RTCPeerConnection-onicecandidateerror.https.html": [
+        "slow"
+    ],
     "imported/w3c/web-platform-tests/webrtc/RTCPeerConnection-perfect-negotiation-stress-glare-linear.https.html": [
         "slow"
     ],

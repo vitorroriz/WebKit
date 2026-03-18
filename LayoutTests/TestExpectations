@@ -329,6 +329,13 @@ webrtc/peerConnection-rvfc.html [ Skip ]
 # not implemented.
 imported/w3c/web-platform-tests/webrtc/legacy/munge-dont.html [ Failure ]
 
+imported/w3c/web-platform-tests/webrtc/RTCIceTransport.html?rest [ Pass Failure ]
+imported/w3c/web-platform-tests/webrtc/RTCRtpParameters-codec.html?rest [ Pass Failure ]
+imported/w3c/web-platform-tests/webrtc/protocol/h264-profile-levels.https.html?interop-2026 [ Pass Failure ]
+imported/w3c/web-platform-tests/webrtc/protocol/h264-profile-levels.https.html?rest [ Pass Failure ]
+imported/w3c/web-platform-tests/webrtc/simulcast/negotiation-encodings.https.html?interop-2026 [ Pass Failure ]
+imported/w3c/web-platform-tests/webrtc/simulcast/negotiation-encodings.https.html?rest [ Pass Failure ]
+
 # The addstream event is not supported anymore.
 imported/w3c/web-platform-tests/webrtc/legacy/onaddstream.https.html [ Skip ]
 

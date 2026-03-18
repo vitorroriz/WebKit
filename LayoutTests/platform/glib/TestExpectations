@@ -2668,6 +2668,14 @@ webkit.org/b/264803 fast/mediastream/mediastreamtrack-video-resize-event.html [ 
 http/tests/media/video-play-stall-seek.html [ Timeout Pass ]
 
 webkit.org/b/265865 imported/w3c/web-platform-tests/webrtc-stats/rtp-stats-creation.html [ Pass Failure ]
+imported/w3c/web-platform-tests/webrtc/protocol/bundle.https.html?interop-2026 [ Failure ]
+imported/w3c/web-platform-tests/webrtc/protocol/bundle.https.html?rest [ Failure ]
+imported/w3c/web-platform-tests/webrtc/protocol/candidate-exchange.https.html?interop-2026 [ Pass Failure ]
+imported/w3c/web-platform-tests/webrtc/protocol/h264-profile-levels.https.html?rest [ Pass Failure ]
+imported/w3c/web-platform-tests/webrtc/protocol/rtp-payloadtypes.html?interop-2026 [ Pass Failure ]
+imported/w3c/web-platform-tests/webrtc/protocol/rtp-payloadtypes.html?rest [ Pass Failure ]
+imported/w3c/web-platform-tests/webrtc/simulcast/negotiation-encodings.https.html?interop-2026 [ Pass Failure ]
+imported/w3c/web-platform-tests/webrtc/simulcast/negotiation-encodings.https.html?rest [ Pass Failure ]
 
 # Missing support for RTP header encryption support:
 # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/4625
@@ -2865,7 +2873,6 @@ imported/w3c/web-platform-tests/webrtc/RTCDataChannel-bufferedAmount.html [ Skip
 imported/w3c/web-platform-tests/webrtc/RTCDataChannel-close.html [ Skip ] # Timeout
 imported/w3c/web-platform-tests/webrtc/RTCDataChannel-iceRestart.html [ Pass ]
 imported/w3c/web-platform-tests/webrtc/RTCDataChannel-id.html [ Failure ]
-imported/w3c/web-platform-tests/webrtc/RTCDataChannel-local-close.html [ Failure ]
 imported/w3c/web-platform-tests/webrtc/RTCDataChannel-send-blob-order.html [ Pass ]
 imported/w3c/web-platform-tests/webrtc/RTCDataChannel-send-close-array-buffer-negotiated.window.html [ Pass ]
 imported/w3c/web-platform-tests/webrtc/RTCDataChannel-send-close-array-buffer.window.html [ Pass ]
