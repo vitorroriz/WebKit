@@ -829,7 +829,7 @@ ElementUpdate TreeResolver::createAnimatedElementUpdate(ResolvedStyle&& resolved
 
     WeakStyleOriginatedAnimations newStyleOriginatedAnimations;
 
-    auto updateAnimations = [&] {
+    auto updateTransitionsAndTimelines = [&] {
         if (document->backForwardCacheState() != Document::NotInBackForwardCache || document->printing())
             return;
 
@@ -849,12 +849,6 @@ ElementUpdate TreeResolver::createAnimatedElementUpdate(ResolvedStyle&& resolved
             CheckedRef styleOriginatedTimelinesController = protect(element->document())->ensureStyleOriginatedTimelinesController();
             styleOriginatedTimelinesController->updateNamedTimelineMapForTimelineScope(resolvedStyle.style->timelineScope(), styleable);
         }
-
-        // The order in which CSS Transitions and CSS Animations are updated matters since CSS Transitions define the after-change style
-        // to use CSS Animations as defined in the previous style change event. As such, we update CSS Animations after CSS Transitions
-        // such that when CSS Transitions are updated the CSS Animations data is the same as during the previous style change event.
-        if ((oldStyle && !oldStyle->animations().isInitial()) || !resolvedStyle.style->animations().isInitial())
-            styleable.updateCSSAnimations(oldStyle, *resolvedStyle.style, resolutionContext, newStyleOriginatedAnimations, isInDisplayNoneTree);
     };
 
     auto applyAnimations = [&]() -> std::pair<std::unique_ptr<RenderStyle>, OptionSet<AnimationImpact>> {
@@ -914,9 +908,18 @@ ElementUpdate TreeResolver::createAnimatedElementUpdate(ResolvedStyle&& resolved
     if (currentStyle && parent().needsUpdateQueryContainerDependentStyle)
         styleable.queryContainerDidChange();
 
-    // First, we need to make sure that any new CSS animation occuring on this element has a matching WebAnimation
-    // on the document timeline.
-    updateAnimations();
+    // First, update CSS Transitions and timelines (skipped when printing or in back/forward cache).
+    updateTransitionsAndTimelines();
+
+    // CSS Animations must be updated even during printing to reflect the current animation state.
+    // FIXME: CSS Transitions and scroll/view-driven animations may also need to be updated during printing.
+    // The order in which CSS Transitions and CSS Animations are updated matters since CSS Transitions define the after-change style
+    // to use CSS Animations as defined in the previous style change event. As such, we update CSS Animations after CSS Transitions
+    // such that when CSS Transitions are updated the CSS Animations data is the same as during the previous style change event.
+    if (document->backForwardCacheState() == Document::NotInBackForwardCache && !skipAnimationForAnchorPosition) {
+        if ((oldStyle && !oldStyle->animations().isInitial()) || !resolvedStyle.style->animations().isInitial())
+            styleable.updateCSSAnimations(oldStyle, *resolvedStyle.style, resolutionContext, newStyleOriginatedAnimations, isInDisplayNoneTree);
+    }
 
     // Now we can update all Web animations, which will include CSS Animations as well
     // as animations created via the JS API.
