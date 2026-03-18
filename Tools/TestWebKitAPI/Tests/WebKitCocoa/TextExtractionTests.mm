@@ -1139,4 +1139,51 @@ TEST(TextExtractionTests, DelayedSafeBrowsingWarningBlocksTextExtraction)
 
 #endif // HAVE(SAFE_BROWSING)
 
+TEST(TextExtractionTests, InvalidURLsAreSkipped)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:^{
+        RetainPtr configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+        [[configuration preferences] _setTextExtractionEnabled:YES];
+        return configuration.autorelease();
+    }()]);
+
+    constexpr auto markupString = R"HTML(<!DOCTYPE html>
+        <html>
+        <body>
+            <a href="https://example.com/valid">Valid link</a>
+            <a href="   https://not a valid url   ">Link with spaces</a>
+            <a href="https://example
+        .com/newline">Link with newline</a>
+            <a href="">Empty href</a>
+            <img src="https://example.com/valid.png" alt="Valid image">
+            <img src="   not a valid src   " alt="Image with spaces">
+            <img src="https://example
+        .com/broken.png" alt="Image with newline">
+            <img src="" alt="Empty src">
+        </body>
+        </html>)HTML";
+    [webView synchronouslyLoadHTMLString:@(markupString)];
+
+    for (auto format : { _WKTextExtractionOutputFormatTextTree, _WKTextExtractionOutputFormatMarkdown }) {
+        RetainPtr debugText = [webView synchronouslyGetDebugText:^{
+            RetainPtr configuration = adoptNS([_WKTextExtractionConfiguration new]);
+            [configuration setIncludeURLs:YES];
+            [configuration setShortenURLs:YES];
+            [configuration setOutputFormat:format];
+            return configuration.autorelease();
+        }()];
+
+        EXPECT_TRUE([debugText containsString:@"Valid link"]);
+        EXPECT_TRUE([debugText containsString:@"example.com"]);
+        EXPECT_TRUE([debugText containsString:@"Valid image"]);
+
+        EXPECT_TRUE([debugText containsString:@"Link with spaces"]);
+        EXPECT_TRUE([debugText containsString:@"Link with newline"]);
+        EXPECT_TRUE([debugText containsString:@"Image with spaces"]);
+        EXPECT_TRUE([debugText containsString:@"Image with newline"]);
+
+        EXPECT_FALSE([debugText containsString:@"not a valid"]);
+    }
+}
+
 } // namespace TestWebKitAPI

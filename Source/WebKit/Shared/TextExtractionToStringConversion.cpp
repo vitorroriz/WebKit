@@ -724,7 +724,10 @@ private:
 
     String stringForURL(const String& shortenedString, const URL& url, ExtractedURLType type)
     {
-        auto string = [&] {
+        auto string = [&] -> String {
+            if (!url.isValid())
+                return { };
+
             if (!shortenURLs())
                 return url.string();
 
