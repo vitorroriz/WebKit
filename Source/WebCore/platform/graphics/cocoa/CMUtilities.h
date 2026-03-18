@@ -28,9 +28,9 @@
 #include <wtf/Platform.h>
 #if PLATFORM(COCOA)
 
-#include "CAAudioStreamDescription.h"
-#include "TrackInfo.h"
 #include <CoreAudio/CoreAudioTypes.h>
+#include <WebCore/CAAudioStreamDescription.h>
+#include <WebCore/TrackInfo.h>
 #include <memory>
 #include <wtf/Forward.h>
 #include <wtf/RetainPtr.h>
