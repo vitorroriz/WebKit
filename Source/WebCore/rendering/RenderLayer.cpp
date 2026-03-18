@@ -6498,6 +6498,12 @@ IntOutsets RenderLayer::filterOutsets() const
     return renderer().style().filter().calculateOutsets(renderer().style().usedZoomForLength());
 }
 
+void RenderLayer::clearFilters()
+{
+    if (m_filters)
+        m_filters->clearFilter();
+}
+
 static RenderLayer* parentLayerCrossFrame(const RenderLayer& layer)
 {
     if (auto* parent = layer.parent())

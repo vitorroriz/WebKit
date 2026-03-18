@@ -72,6 +72,13 @@ void CSSSVGResourceElementClient::resourceChanged(SVGElement& element)
     if (m_clientRenderer->renderTreeBeingDestroyed())
         return;
 
+    if (is<SVGFilterElement>(element)) {
+        if (auto* layerModelObject = dynamicDowncast<RenderLayerModelObject>(m_clientRenderer.get())) {
+            if (CheckedPtr layer = layerModelObject->layer())
+                layer->clearFilters();
+        }
+    }
+
     if (!m_clientRenderer->document().settings().layerBasedSVGEngineEnabled()) {
         m_clientRenderer->repaint();
         return;
