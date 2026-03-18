@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2025 Apple Inc. All rights reserved.
+ * Copyright (C) 2012-2026 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -698,7 +698,7 @@ void NetworkConnectionToWebProcess::removeLoadIdentifier(WebCore::ResourceLoader
 
 void NetworkConnectionToWebProcess::pageLoadCompleted(PageIdentifier webPageID)
 {
-    stopAllNetworkActivityTrackingForPage(webPageID);
+    stopAllNetworkActivityTrackingForPage(webPageID, NetworkActivityTracker::CompletionCode::Success);
 }
 
 void NetworkConnectionToWebProcess::browsingContextRemoved(WebPageProxyIdentifier webPageProxyID, PageIdentifier webPageID, FrameIdentifier webFrameID)
@@ -707,6 +707,7 @@ void NetworkConnectionToWebProcess::browsingContextRemoved(WebPageProxyIdentifie
         if (RefPtr cache = session->cache())
             cache->browsingContextRemoved(webPageProxyID, webPageID, webFrameID);
     }
+    m_lastRootActivityCompletionCodesForTesting.remove(webPageID);
 }
 
 void NetworkConnectionToWebProcess::prefetchDNS(const String& hostname)
@@ -1465,6 +1466,7 @@ std::optional<NetworkActivityTracker> NetworkConnectionToWebProcess::startTracki
     auto& newActivityTracker = m_networkActivityTrackers[newActivityIndex];
     newActivityTracker.networkActivity.setParent(m_networkActivityTrackers[rootActivityIndex].networkActivity);
     newActivityTracker.networkActivity.start();
+    newActivityTracker.isTopResource = isTopResource;
 
     return newActivityTracker.networkActivity;
 }
@@ -1475,8 +1477,13 @@ void NetworkConnectionToWebProcess::stopTrackingResourceLoad(WebCore::ResourceLo
     if (itemIndex == notFound)
         return;
 
+    bool isTopResource = m_networkActivityTrackers[itemIndex].isTopResource;
+    auto pageID = m_networkActivityTrackers[itemIndex].pageID;
     m_networkActivityTrackers[itemIndex].networkActivity.complete(code);
     m_networkActivityTrackers.removeAt(itemIndex);
+
+    if (isTopResource && code != NetworkActivityTracker::CompletionCode::Success)
+        stopAllNetworkActivityTrackingForPage(pageID, code);
 }
 
 void NetworkConnectionToWebProcess::stopAllNetworkActivityTracking()
@@ -1485,18 +1492,35 @@ void NetworkConnectionToWebProcess::stopAllNetworkActivityTracking()
         activityTracker.networkActivity.complete(NetworkActivityTracker::CompletionCode::Cancel);
 
     m_networkActivityTrackers.clear();
+    m_lastRootActivityCompletionCodesForTesting.clear();
 }
 
-void NetworkConnectionToWebProcess::stopAllNetworkActivityTrackingForPage(PageIdentifier pageID)
+void NetworkConnectionToWebProcess::stopAllNetworkActivityTrackingForPage(PageIdentifier pageID, NetworkActivityTracker::CompletionCode rootCompletionCode)
 {
     for (auto& activityTracker : m_networkActivityTrackers) {
-        if (activityTracker.pageID == pageID)
-            activityTracker.networkActivity.complete(NetworkActivityTracker::CompletionCode::Cancel);
+        if (activityTracker.pageID == pageID) {
+            auto code = activityTracker.isRootActivity ? rootCompletionCode : NetworkActivityTracker::CompletionCode::Cancel;
+            activityTracker.networkActivity.complete(code);
+            if (activityTracker.isRootActivity)
+                m_lastRootActivityCompletionCodesForTesting.set(pageID, code);
+        }
     }
 
     m_networkActivityTrackers.removeAllMatching([&](const auto& activityTracker) {
         return activityTracker.pageID == pageID;
     });
+
+    // Note: We clear m_lastRootActivityCompletionCodesForTesting in browsingContextRemoved
+    // instead of here so that it exists long enough for the test infrastructure
+    // to read it.
+}
+
+auto NetworkConnectionToWebProcess::lastRootActivityCompletionCodeForTesting(PageIdentifier pageID) const -> std::optional<NetworkActivityTracker::CompletionCode>
+{
+    auto it = m_lastRootActivityCompletionCodesForTesting.find(pageID);
+    if (it == m_lastRootActivityCompletionCodesForTesting.end())
+        return std::nullopt;
+    return it->value;
 }
 
 size_t NetworkConnectionToWebProcess::findRootNetworkActivity(PageIdentifier pageID)

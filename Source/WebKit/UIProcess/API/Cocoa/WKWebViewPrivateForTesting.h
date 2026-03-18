@@ -204,6 +204,8 @@ typedef NSVisualEffectView _WKPlatformVisualEffectView;
 #endif
 - (bool)_displayLinkWantsHighFrameRate;
 
+- (void)_lastPageLoadNetworkActivityCompletionCodeForTesting:(void(^)(NSNumber * _Nullable completionCode))completionHandler;
+
 @end
 
 typedef NS_ENUM(NSInteger, _WKMediaSessionReadyState) {

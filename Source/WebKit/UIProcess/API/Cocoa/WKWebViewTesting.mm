@@ -1299,6 +1299,14 @@ static void dumpCALayer(TextStream& ts, CALayer *layer, bool traverse)
     return downcast<WebKit::RemoteLayerTreeDrawingAreaProxy>(protect(_page->drawingArea()))->displayLinkWantsHighFrameRateForTesting();
 }
 
+- (void)_lastPageLoadNetworkActivityCompletionCodeForTesting:(void(^)(NSNumber * _Nullable))completionHandler
+{
+    auto completionHandlerCopy = makeBlockPtr(completionHandler);
+    protect(protect(_page->websiteDataStore())->networkProcess())->lastPageLoadNetworkActivityCompletionCodeForTesting(_page->sessionID(), _page->webPageIDInMainFrameProcess(), [completionHandlerCopy = WTF::move(completionHandlerCopy)](std::optional<WebKit::NetworkActivityTracker::CompletionCode> code) {
+        completionHandlerCopy(code ? @(static_cast<uint8_t>(*code)) : nil);
+    });
+}
+
 - (STWebpageController *)_screenTimeWebpageController
 {
 #if ENABLE(SCREEN_TIME)

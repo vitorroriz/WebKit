@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2025 Apple Inc. All rights reserved.
+ * Copyright (C) 2006-2026 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
  * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved. (http://www.torchmobile.com/)
  * Copyright (C) 2008 Alp Toker <alp@atoker.com>
@@ -358,7 +358,8 @@ public:
         m_inProgress = true;
     }
 
-    void progressCompleted()
+    enum class LoadCompletionStatus { Success, Failure };
+    void progressCompleted(LoadCompletionStatus completion)
     {
         ASSERT(m_inProgress);
         ASSERT(m_frame->page());
@@ -366,7 +367,8 @@ public:
         Ref frame = m_frame.get();
         RefPtr page = frame->page();
         protect(page->progress())->progressCompleted(frame);
-        platformStrategies()->loaderStrategy()->pageLoadCompleted(*page);
+        if (completion == LoadCompletionStatus::Success)
+            platformStrategies()->loaderStrategy()->pageLoadCompleted(*page);
     }
 
 private:
@@ -2352,7 +2354,7 @@ void FrameLoader::clearProvisionalLoad()
     FRAMELOADER_RELEASE_LOG(ResourceLoading, "clearProvisionalLoad: Clearing provisional document loader (m_provisionalDocumentLoader=%p)", m_provisionalDocumentLoader.get());
     setProvisionalDocumentLoader(nullptr);
     if (CheckedPtr progressTracker = m_progressTracker.get())
-        progressTracker->progressCompleted();
+        progressTracker->progressCompleted(FrameProgressTracker::LoadCompletionStatus::Failure);
     setState(FrameState::Complete);
 }
 
@@ -3019,7 +3021,7 @@ void FrameLoader::checkLoadCompleteForThisFrame(LoadWillContinueInAnotherProcess
         if (m_stateMachine.creatingInitialEmptyDocument() || !m_stateMachine.committedFirstRealDocumentLoad())
             return;
 
-        m_progressTracker->progressCompleted();
+        m_progressTracker->progressCompleted(FrameProgressTracker::LoadCompletionStatus::Success);
         if (RefPtr page = m_frame->page()) {
             if (m_frame->isMainFrame()) {
                 tracePoint(MainResourceLoadDidEnd, PAGE_ID);
