@@ -2585,7 +2585,10 @@ HandleUserInputEventResult EventHandler::handleMouseReleaseEvent(const PlatformM
 
     bool swallowMouseUpEvent = !dispatchMouseEvent(eventNames().mouseupEvent, protect(mouseEvent.targetNode()).get(), m_clickCount, platformMouseEvent, FireMouseOverOut::Yes);
 
-    bool swallowClickEvent = swallowAnyClickEvent(platformMouseEvent, mouseEvent, IgnoreAncestorNodesForClickEvent::No);
+    bool isNonSyntheticAutomationEvent = platformMouseEvent.inputSource() == MouseEventInputSource::Automation
+        && platformMouseEvent.syntheticClickType() == SyntheticClickType::NoTap;
+    bool swallowClickEvent = !isNonSyntheticAutomationEvent
+        && swallowAnyClickEvent(platformMouseEvent, mouseEvent, IgnoreAncestorNodesForClickEvent::No);
 
     if (m_resizeLayer) {
         m_resizeLayer->setInResizeMode(false);
