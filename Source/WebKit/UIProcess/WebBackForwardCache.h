@@ -77,7 +77,7 @@ private:
     WeakRef<WebProcessPool> m_processPool;
     unsigned m_capacity { 0 };
     WeakListHashSet<WebBackForwardListItem> m_itemsWithCachedPage;
-} SWIFT_SHARED_REFERENCE(refWebBackForwardCache, derefWebBackForwardCache);
+} SWIFT_SHARED_REFERENCE(refWebBackForwardCache, derefWebBackForwardCache) SWIFT_RETURNED_AS_UNRETAINED_BY_DEFAULT;
 
 } // namespace WebKit
 
