@@ -1153,7 +1153,12 @@ TEST(SiteIsolation, CloseAfterWindowOpen)
 // Also test when the opener frame (if it's an iframe) is removed from the tree and garbage collected.
 // That should probably do some teardown that should be visible from the API.
 
+// FIXME when webkit.org/b/310149 is resolved.
+#if PLATFORM(MAC) && defined(NDEBUG)
+TEST(SiteIsolation, DISABLED_PostMessageWithMessagePorts)
+#else
 TEST(SiteIsolation, PostMessageWithMessagePorts)
+#endif
 {
     auto exampleHTML = "<script>"
     "    const channel = new MessageChannel();"
