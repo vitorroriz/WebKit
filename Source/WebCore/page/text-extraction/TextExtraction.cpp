@@ -62,6 +62,7 @@
 #include "HandleUserInputEventResult.h"
 #include "HighlightRegistry.h"
 #include "HitTestResult.h"
+#include "ICUSearcher.h"
 #include "Image.h"
 #include "ImageOverlay.h"
 #include "JSNode.h"

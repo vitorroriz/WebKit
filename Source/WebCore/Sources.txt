@@ -1458,6 +1458,7 @@ editing/InsertNestedListCommand.cpp
 editing/InsertNodeBeforeCommand.cpp
 editing/InsertParagraphSeparatorCommand.cpp
 editing/InsertTextCommand.cpp
+editing/ICUSearcher.cpp
 editing/MarkupAccumulator.cpp
 editing/MergeIdenticalElementsCommand.cpp
 editing/ModifySelectionListLevel.cpp

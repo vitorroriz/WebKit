@@ -104,11 +104,11 @@
 #import <WebCore/EventTargetInlines.h>
 #import <WebCore/File.h>
 #import <WebCore/FloatQuad.h>
-#import <WebCore/FrameDestructionObserverInlines.h>
 #import <WebCore/FocusController.h>
 #import <WebCore/FocusControllerTypes.h>
 #import <WebCore/FontCache.h>
 #import <WebCore/FontCacheCoreText.h>
+#import <WebCore/FrameDestructionObserverInlines.h>
 #import <WebCore/GeometryUtilities.h>
 #import <WebCore/GraphicsLayer.h>
 #import <WebCore/HTMLAreaElement.h>
@@ -134,6 +134,7 @@
 #import <WebCore/HistoryItem.h>
 #import <WebCore/HitTestResult.h>
 #import <WebCore/HitTestSource.h>
+#import <WebCore/ICUSearcher.h>
 #import <WebCore/Image.h>
 #import <WebCore/ImageOverlay.h>
 #import <WebCore/InputMode.h>

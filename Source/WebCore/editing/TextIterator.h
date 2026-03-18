@@ -58,7 +58,6 @@ WEBCORE_EXPORT SimpleRange findPlainText(const SimpleRange&, const String&, Find
 WEBCORE_EXPORT SimpleRange findClosestPlainText(const SimpleRange&, const String&, FindOptions, uint64_t targetCharacterOffset);
 WEBCORE_EXPORT Vector<SimpleRange> findAllPlainText(const SimpleRange&, const String&, FindOptions, unsigned limit);
 WEBCORE_EXPORT bool containsPlainText(const String& document, const String&, FindOptions); // Lets us use the search algorithm on a string.
-WEBCORE_EXPORT String foldQuoteMarks(const String&);
 
 // FIXME: Move this somewhere else in the editing directory. It doesn't belong in the header with TextIterator.
 bool isRendererReplacedElement(RenderObject*, TextIteratorBehaviors = { });

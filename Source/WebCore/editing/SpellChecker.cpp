@@ -40,8 +40,9 @@
 #include "Settings.h"
 #include "TextCheckerClient.h"
 #include "TextIterator.h"
-#include <wtf/TZoneMallocInlines.h>
 #include <wtf/SetForScope.h>
+#include <wtf/TZoneMallocInlines.h>
+#include <wtf/ZippedRange.h>
 
 namespace WebCore {
 

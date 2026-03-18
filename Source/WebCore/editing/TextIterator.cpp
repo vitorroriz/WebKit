@@ -50,6 +50,7 @@
 #include "HTMLSlotElement.h"
 #include "HTMLTextAreaElement.h"
 #include "HTMLTextFormControlElement.h"
+#include "ICUSearcher.h"
 #include "ImageOverlay.h"
 #include "LocalFrame.h"
 #include "NodeInlines.h"
@@ -105,7 +106,6 @@ class SearchBuffer {
     WTF_MAKE_NONCOPYABLE(SearchBuffer);
 public:
     SearchBuffer(const String& target, FindOptions);
-    ~SearchBuffer();
 
     // Returns number of characters appended; guaranteed to be in the range [1, length].
     size_t append(StringView);
@@ -121,10 +121,6 @@ public:
 #if !UCONFIG_NO_COLLATION
 
 private:
-    bool isBadMatch(const char16_t*, size_t length) const;
-    bool isWordStartMatch(size_t start, size_t length) const;
-    bool isWordEndMatch(size_t start, size_t length) const;
-
     const String m_target;
     const StringView::UpconvertedCharacters m_targetCharacters;
     FindOptions m_options;
@@ -138,6 +134,7 @@ private:
     const bool m_targetRequiresKanaWorkaround;
     Vector<char16_t> m_normalizedTarget;
     mutable Vector<char16_t> m_normalizedMatch;
+    ICUSearcher m_ICUSearcher;
 
 #else
 
@@ -1698,355 +1695,9 @@ StringView WordAwareIterator::text() const LIFETIME_BOUND
     return m_underlyingIterator.text();
 }
 
-// --------
-
-static inline char16_t NODELETE foldQuoteMarkAndReplaceNoBreakSpace(char16_t c)
-{
-    switch (c) {
-    case hebrewPunctuationGershayim:
-    case leftDoubleQuotationMark:
-    case leftLowDoubleQuotationMark:
-    case rightDoubleQuotationMark:
-    case leftPointingDoubleAngleQuotationMark:
-    case rightPointingDoubleAngleQuotationMark:
-    case doubleHighReversed9QuotationMark:
-    case doubleLowReversed9QuotationMark:
-    case reversedDoublePrimeQuotationMark:
-    case doublePrimeQuotationMark:
-    case lowDoublePrimeQuotationMark:
-    case fullwidthQuotationMark:
-        return '"';
-    case hebrewPunctuationGeresh:
-    case leftSingleQuotationMark:
-    case leftLowSingleQuotationMark:
-    case rightSingleQuotationMark:
-    case singleLow9QuotationMark:
-    case singleLeftPointingAngleQuotationMark:
-    case singleRightPointingAngleQuotationMark:
-    case leftCornerBracket:
-    case rightCornerBracket:
-    case leftWhiteCornerBracket:
-    case rightWhiteCornerBracket:
-    case presentationFormForVerticalLeftCornerBracket:
-    case presentationFormForVerticalRightCornerBracket:
-    case presentationFormForVerticalLeftWhiteCornerBracket:
-    case presentationFormForVerticalRightWhiteCornerBracket:
-    case fullwidthApostrophe:
-    case halfwidthLeftCornerBracket:
-    case halfwidthRightCornerBracket:
-        return '\'';
-    case noBreakSpace:
-        return ' ';
-    default:
-        return c;
-    }
-}
-
-// FIXME: We'd like to tailor the searcher to fold quote marks for us instead
-// of doing it in a separate replacement pass here, but ICU doesn't offer a way
-// to add tailoring on top of the locale-specific tailoring as of this writing.
-String foldQuoteMarks(const String& stringToFold)
-{
-    String result = makeStringByReplacingAll(stringToFold, hebrewPunctuationGeresh, '\'');
-    result = makeStringByReplacingAll(result, hebrewPunctuationGershayim, '"');
-    result = makeStringByReplacingAll(result, leftDoubleQuotationMark, '"');
-    result = makeStringByReplacingAll(result, leftLowDoubleQuotationMark, '"');
-    result = makeStringByReplacingAll(result, leftSingleQuotationMark, '\'');
-    result = makeStringByReplacingAll(result, leftLowSingleQuotationMark, '\'');
-    result = makeStringByReplacingAll(result, rightDoubleQuotationMark, '"');
-    result = makeStringByReplacingAll(result, singleLow9QuotationMark, '\'');
-    result = makeStringByReplacingAll(result, singleLeftPointingAngleQuotationMark, '\'');
-    result = makeStringByReplacingAll(result, singleRightPointingAngleQuotationMark, '\'');
-    result = makeStringByReplacingAll(result, leftCornerBracket, '\'');
-    result = makeStringByReplacingAll(result, rightCornerBracket, '\'');
-    result = makeStringByReplacingAll(result, leftWhiteCornerBracket, '\'');
-    result = makeStringByReplacingAll(result, rightWhiteCornerBracket, '\'');
-    result = makeStringByReplacingAll(result, presentationFormForVerticalLeftCornerBracket, '\'');
-    result = makeStringByReplacingAll(result, presentationFormForVerticalRightCornerBracket, '\'');
-    result = makeStringByReplacingAll(result, presentationFormForVerticalLeftWhiteCornerBracket, '\'');
-    result = makeStringByReplacingAll(result, presentationFormForVerticalRightWhiteCornerBracket, '\'');
-    result = makeStringByReplacingAll(result, fullwidthApostrophe, '\'');
-    result = makeStringByReplacingAll(result, halfwidthLeftCornerBracket, '\'');
-    result = makeStringByReplacingAll(result, halfwidthRightCornerBracket, '\'');
-    result = makeStringByReplacingAll(result, leftPointingDoubleAngleQuotationMark, '"');
-    result = makeStringByReplacingAll(result, rightPointingDoubleAngleQuotationMark, '"');
-    result = makeStringByReplacingAll(result, doubleHighReversed9QuotationMark, '"');
-    result = makeStringByReplacingAll(result, doubleLowReversed9QuotationMark, '"');
-    result = makeStringByReplacingAll(result, reversedDoublePrimeQuotationMark, '"');
-    result = makeStringByReplacingAll(result, doublePrimeQuotationMark, '"');
-    result = makeStringByReplacingAll(result, lowDoublePrimeQuotationMark, '"');
-    result = makeStringByReplacingAll(result, fullwidthQuotationMark, '"');
-    return makeStringByReplacingAll(result, rightSingleQuotationMark, '\'');
-}
-
 #if !UCONFIG_NO_COLLATION
 
 constexpr size_t minimumSearchBufferSize = 8192;
-
-#ifndef NDEBUG
-static bool searcherInUse;
-#endif
-
-static UStringSearch* createSearcher()
-{
-    // Provide a non-empty pattern and non-empty text so usearch_open will not fail,
-    // but it doesn't matter exactly what it is, since we don't perform any searches
-    // without setting both the pattern and the text.
-    UErrorCode status = U_ZERO_ERROR;
-    auto searchCollatorName = makeString(unsafeSpan(currentSearchLocaleID()), "@collation=search"_s);
-    SUPPRESS_FORWARD_DECL_ARG UStringSearch* searcher = usearch_open(&newlineCharacter, 1, &newlineCharacter, 1, searchCollatorName.utf8().data(), 0, &status);
-    ASSERT(U_SUCCESS(status) || status == U_USING_FALLBACK_WARNING || status == U_USING_DEFAULT_WARNING);
-    return searcher;
-}
-
-static UStringSearch* searcher()
-{
-    SUPPRESS_FORWARD_DECL_ARG static UStringSearch* searcher = createSearcher();
-    return searcher;
-}
-
-static inline void NODELETE lockSearcher()
-{
-#ifndef NDEBUG
-    ASSERT(!searcherInUse);
-    searcherInUse = true;
-#endif
-}
-
-static inline void NODELETE unlockSearcher()
-{
-#ifndef NDEBUG
-    ASSERT(searcherInUse);
-    searcherInUse = false;
-#endif
-}
-
-// ICU's search ignores the distinction between small kana letters and ones
-// that are not small, and also characters that differ only in the voicing
-// marks when considering only primary collation strength differences.
-// This is not helpful for end users, since these differences make words
-// distinct, so for our purposes we need these to be considered.
-// The Unicode folks do not think the collation algorithm should be
-// changed. To work around this, we would like to tailor the ICU searcher,
-// but we can't get that to work yet. So instead, we check for cases where
-// these differences occur, and skip those matches.
-
-// We refer to the above technique as the "kana workaround". The next few
-// functions are helper functinos for the kana workaround.
-
-static inline bool NODELETE isKanaLetter(char16_t character)
-{
-    // Hiragana letters.
-    if (character >= 0x3041 && character <= 0x3096)
-        return true;
-
-    // Katakana letters.
-    if (character >= 0x30A1 && character <= 0x30FA)
-        return true;
-    if (character >= 0x31F0 && character <= 0x31FF)
-        return true;
-
-    // Halfwidth katakana letters.
-    if (character >= 0xFF66 && character <= 0xFF9D && character != 0xFF70)
-        return true;
-
-    return false;
-}
-
-static inline bool NODELETE isSmallKanaLetter(char16_t character)
-{
-    ASSERT(isKanaLetter(character));
-
-    switch (character) {
-    case 0x3041: // HIRAGANA LETTER SMALL A
-    case 0x3043: // HIRAGANA LETTER SMALL I
-    case 0x3045: // HIRAGANA LETTER SMALL U
-    case 0x3047: // HIRAGANA LETTER SMALL E
-    case 0x3049: // HIRAGANA LETTER SMALL O
-    case 0x3063: // HIRAGANA LETTER SMALL TU
-    case 0x3083: // HIRAGANA LETTER SMALL YA
-    case 0x3085: // HIRAGANA LETTER SMALL YU
-    case 0x3087: // HIRAGANA LETTER SMALL YO
-    case 0x308E: // HIRAGANA LETTER SMALL WA
-    case 0x3095: // HIRAGANA LETTER SMALL KA
-    case 0x3096: // HIRAGANA LETTER SMALL KE
-    case 0x30A1: // KATAKANA LETTER SMALL A
-    case 0x30A3: // KATAKANA LETTER SMALL I
-    case 0x30A5: // KATAKANA LETTER SMALL U
-    case 0x30A7: // KATAKANA LETTER SMALL E
-    case 0x30A9: // KATAKANA LETTER SMALL O
-    case 0x30C3: // KATAKANA LETTER SMALL TU
-    case 0x30E3: // KATAKANA LETTER SMALL YA
-    case 0x30E5: // KATAKANA LETTER SMALL YU
-    case 0x30E7: // KATAKANA LETTER SMALL YO
-    case 0x30EE: // KATAKANA LETTER SMALL WA
-    case 0x30F5: // KATAKANA LETTER SMALL KA
-    case 0x30F6: // KATAKANA LETTER SMALL KE
-    case 0x31F0: // KATAKANA LETTER SMALL KU
-    case 0x31F1: // KATAKANA LETTER SMALL SI
-    case 0x31F2: // KATAKANA LETTER SMALL SU
-    case 0x31F3: // KATAKANA LETTER SMALL TO
-    case 0x31F4: // KATAKANA LETTER SMALL NU
-    case 0x31F5: // KATAKANA LETTER SMALL HA
-    case 0x31F6: // KATAKANA LETTER SMALL HI
-    case 0x31F7: // KATAKANA LETTER SMALL HU
-    case 0x31F8: // KATAKANA LETTER SMALL HE
-    case 0x31F9: // KATAKANA LETTER SMALL HO
-    case 0x31FA: // KATAKANA LETTER SMALL MU
-    case 0x31FB: // KATAKANA LETTER SMALL RA
-    case 0x31FC: // KATAKANA LETTER SMALL RI
-    case 0x31FD: // KATAKANA LETTER SMALL RU
-    case 0x31FE: // KATAKANA LETTER SMALL RE
-    case 0x31FF: // KATAKANA LETTER SMALL RO
-    case 0xFF67: // HALFWIDTH KATAKANA LETTER SMALL A
-    case 0xFF68: // HALFWIDTH KATAKANA LETTER SMALL I
-    case 0xFF69: // HALFWIDTH KATAKANA LETTER SMALL U
-    case 0xFF6A: // HALFWIDTH KATAKANA LETTER SMALL E
-    case 0xFF6B: // HALFWIDTH KATAKANA LETTER SMALL O
-    case 0xFF6C: // HALFWIDTH KATAKANA LETTER SMALL YA
-    case 0xFF6D: // HALFWIDTH KATAKANA LETTER SMALL YU
-    case 0xFF6E: // HALFWIDTH KATAKANA LETTER SMALL YO
-    case 0xFF6F: // HALFWIDTH KATAKANA LETTER SMALL TU
-        return true;
-    }
-    return false;
-}
-
-enum VoicedSoundMarkType { NoVoicedSoundMark, VoicedSoundMark, SemiVoicedSoundMark };
-
-static inline VoicedSoundMarkType NODELETE composedVoicedSoundMark(char16_t character)
-{
-    ASSERT(isKanaLetter(character));
-
-    switch (character) {
-    case 0x304C: // HIRAGANA LETTER GA
-    case 0x304E: // HIRAGANA LETTER GI
-    case 0x3050: // HIRAGANA LETTER GU
-    case 0x3052: // HIRAGANA LETTER GE
-    case 0x3054: // HIRAGANA LETTER GO
-    case 0x3056: // HIRAGANA LETTER ZA
-    case 0x3058: // HIRAGANA LETTER ZI
-    case 0x305A: // HIRAGANA LETTER ZU
-    case 0x305C: // HIRAGANA LETTER ZE
-    case 0x305E: // HIRAGANA LETTER ZO
-    case 0x3060: // HIRAGANA LETTER DA
-    case 0x3062: // HIRAGANA LETTER DI
-    case 0x3065: // HIRAGANA LETTER DU
-    case 0x3067: // HIRAGANA LETTER DE
-    case 0x3069: // HIRAGANA LETTER DO
-    case 0x3070: // HIRAGANA LETTER BA
-    case 0x3073: // HIRAGANA LETTER BI
-    case 0x3076: // HIRAGANA LETTER BU
-    case 0x3079: // HIRAGANA LETTER BE
-    case 0x307C: // HIRAGANA LETTER BO
-    case 0x3094: // HIRAGANA LETTER VU
-    case 0x30AC: // KATAKANA LETTER GA
-    case 0x30AE: // KATAKANA LETTER GI
-    case 0x30B0: // KATAKANA LETTER GU
-    case 0x30B2: // KATAKANA LETTER GE
-    case 0x30B4: // KATAKANA LETTER GO
-    case 0x30B6: // KATAKANA LETTER ZA
-    case 0x30B8: // KATAKANA LETTER ZI
-    case 0x30BA: // KATAKANA LETTER ZU
-    case 0x30BC: // KATAKANA LETTER ZE
-    case 0x30BE: // KATAKANA LETTER ZO
-    case 0x30C0: // KATAKANA LETTER DA
-    case 0x30C2: // KATAKANA LETTER DI
-    case 0x30C5: // KATAKANA LETTER DU
-    case 0x30C7: // KATAKANA LETTER DE
-    case 0x30C9: // KATAKANA LETTER DO
-    case 0x30D0: // KATAKANA LETTER BA
-    case 0x30D3: // KATAKANA LETTER BI
-    case 0x30D6: // KATAKANA LETTER BU
-    case 0x30D9: // KATAKANA LETTER BE
-    case 0x30DC: // KATAKANA LETTER BO
-    case 0x30F4: // KATAKANA LETTER VU
-    case 0x30F7: // KATAKANA LETTER VA
-    case 0x30F8: // KATAKANA LETTER VI
-    case 0x30F9: // KATAKANA LETTER VE
-    case 0x30FA: // KATAKANA LETTER VO
-        return VoicedSoundMark;
-    case 0x3071: // HIRAGANA LETTER PA
-    case 0x3074: // HIRAGANA LETTER PI
-    case 0x3077: // HIRAGANA LETTER PU
-    case 0x307A: // HIRAGANA LETTER PE
-    case 0x307D: // HIRAGANA LETTER PO
-    case 0x30D1: // KATAKANA LETTER PA
-    case 0x30D4: // KATAKANA LETTER PI
-    case 0x30D7: // KATAKANA LETTER PU
-    case 0x30DA: // KATAKANA LETTER PE
-    case 0x30DD: // KATAKANA LETTER PO
-        return SemiVoicedSoundMark;
-    }
-    return NoVoicedSoundMark;
-}
-
-static inline bool NODELETE isCombiningVoicedSoundMark(char16_t character)
-{
-    switch (character) {
-    case 0x3099: // COMBINING KATAKANA-HIRAGANA VOICED SOUND MARK
-    case 0x309A: // COMBINING KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK
-        return true;
-    }
-    return false;
-}
-
-static inline bool NODELETE containsKanaLetters(const String& pattern)
-{
-    if (pattern.is8Bit())
-        return false;
-    for (auto character : pattern.span16()) {
-        if (isKanaLetter(character))
-            return true;
-    }
-    return false;
-}
-
-static void normalizeCharacters(const char16_t* characters, unsigned length, Vector<char16_t>& buffer)
-{
-    UErrorCode status = U_ZERO_ERROR;
-    auto* normalizer = unorm2_getNFCInstance(&status);
-    ASSERT(U_SUCCESS(status));
-
-    buffer.reserveCapacity(length);
-
-    status = callBufferProducingFunction(unorm2_normalize, normalizer, characters, length, buffer);
-    ASSERT(U_SUCCESS(status));
-}
-
-static bool isNonLatin1Separator(char32_t character)
-{
-    ASSERT_ARG(character, !isLatin1(character));
-
-    return U_GET_GC_MASK(character) & (U_GC_S_MASK | U_GC_P_MASK | U_GC_Z_MASK | U_GC_CF_MASK);
-}
-
-static inline bool isSeparator(char32_t character)
-{
-    static constexpr std::array<bool, 256> latin1SeparatorTable {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // space ! " # $ % & ' ( ) * + , - . /
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, //                         : ; < = > ?
-        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //   @
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, //                         [ \ ] ^ _
-        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //   `
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, //                           { | } ~
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0
-    };
-
-    if (isLatin1(character))
-        return latin1SeparatorTable[character];
-
-    return isNonLatin1Separator(character);
-}
 
 inline SearchBuffer::SearchBuffer(const String& target, FindOptions options)
     : m_target(foldQuoteMarks(target))
@@ -2074,12 +1725,7 @@ inline SearchBuffer::SearchBuffer(const String& target, FindOptions options)
         }
     }
 
-    // Grab the single global searcher.
-    // If we ever have a reason to do more than once search buffer at once, we'll have
-    // to move to multiple searchers.
-    lockSearcher();
-
-    SUPPRESS_FORWARD_DECL_ARG UStringSearch* searcher = WebCore::searcher();
+    SUPPRESS_FORWARD_DECL_ARG UStringSearch* searcher = m_ICUSearcher.searcher();
     SUPPRESS_FORWARD_DECL_ARG UCollator* collator = usearch_getCollator(searcher);
 
     UCollationStrength strength;
@@ -2108,18 +1754,6 @@ inline SearchBuffer::SearchBuffer(const String& target, FindOptions options)
     // The kana workaround requires a normalized copy of the target string.
     if (m_targetRequiresKanaWorkaround)
         normalizeCharacters(m_targetCharacters, targetLength, m_normalizedTarget);
-}
-
-inline SearchBuffer::~SearchBuffer()
-{
-    // Leave the static object pointing to a valid string.
-    UErrorCode status = U_ZERO_ERROR;
-    SUPPRESS_FORWARD_DECL_ARG usearch_setPattern(WebCore::searcher(), &newlineCharacter, 1, &status);
-    ASSERT(U_SUCCESS(status));
-    SUPPRESS_FORWARD_DECL_ARG usearch_setText(WebCore::searcher(), &newlineCharacter, 1, &status);
-    ASSERT(U_SUCCESS(status));
-
-    unlockSearcher();
 }
 
 inline size_t SearchBuffer::append(StringView text)
@@ -2183,129 +1817,7 @@ inline void SearchBuffer::reachedBreak()
 {
     m_atBreak = true;
 }
-
-inline bool SearchBuffer::isBadMatch(const char16_t* match, size_t matchLength) const
-{
-    // This function implements the kana workaround. If usearch treats
-    // it as a match, but we do not want to, then it's a "bad match".
-    if (!m_targetRequiresKanaWorkaround)
-        return false;
-
-    // Normalize into a match buffer. We reuse a single buffer rather than
-    // creating a new one each time.
-    normalizeCharacters(match, matchLength, m_normalizedMatch);
-
-    auto a = m_normalizedTarget.span();
-    auto b = m_normalizedMatch.span();
-
-    while (true) {
-        // Skip runs of non-kana-letter characters. This is necessary so we can
-        // correctly handle strings where the target and match have different-length
-        // runs of characters that match, while still double checking the correctness
-        // of matches of kana letters with other kana letters.
-        skipUntil<isKanaLetter>(a);
-        skipUntil<isKanaLetter>(b);
-
-        // If we reached the end of either the target or the match, we should have
-        // reached the end of both; both should have the same number of kana letters.
-        if (a.empty() || b.empty()) {
-            ASSERT(a.empty());
-            ASSERT(b.empty());
-            return false;
-        }
-
-        // Check for differences in the kana letter character itself.
-        if (isSmallKanaLetter(a.front()) != isSmallKanaLetter(b.front()))
-            return true;
-        if (composedVoicedSoundMark(a.front()) != composedVoicedSoundMark(b.front()))
-            return true;
-        skip(a, 1);
-        skip(b, 1);
-
-        // Check for differences in combining voiced sound marks found after the letter.
-        while (1) {
-            if (!(!a.empty() && isCombiningVoicedSoundMark(a.front()))) {
-                if (!b.empty() && isCombiningVoicedSoundMark(b.front()))
-                    return true;
-                break;
-            }
-            if (!(!b.empty() && isCombiningVoicedSoundMark(b.front())))
-                return true;
-            if (a.front() != b.front())
-                return true;
-            skip(a, 1);
-            skip(b, 1);
-        }
-    }
-}
     
-inline bool SearchBuffer::isWordEndMatch(size_t start, size_t length) const
-{
-    ASSERT(length);
-    ASSERT(m_options.contains(FindOption::AtWordEnds));
-
-    // Start searching at the end of matched search, so that multiple word matches succeed.
-    int endWord;
-    findEndWordBoundary(m_buffer.span(), start + length - 1, &endWord);
-    return static_cast<size_t>(endWord) == start + length;
-}
-
-inline bool SearchBuffer::isWordStartMatch(size_t start, size_t length) const
-{
-    ASSERT(m_options.contains(FindOption::AtWordStarts));
-
-    if (!start)
-        return true;
-
-    int size = m_buffer.size();
-    int offset = start;
-    char32_t firstCharacter;
-    auto buffer = m_buffer.span();
-    U16_GET(buffer, 0, offset, size, firstCharacter);
-
-    if (m_options.contains(FindOption::TreatMedialCapitalAsWordStart)) {
-        char32_t previousCharacter;
-        U16_PREV(buffer, 0, offset, previousCharacter);
-
-        if (isSeparator(firstCharacter)) {
-            // The start of a separator run is a word start (".org" in "webkit.org").
-            if (!isSeparator(previousCharacter))
-                return true;
-        } else if (isASCIIUpper(firstCharacter)) {
-            // The start of an uppercase run is a word start ("Kit" in "WebKit").
-            if (!isASCIIUpper(previousCharacter))
-                return true;
-            // The last character of an uppercase run followed by a non-separator, non-digit
-            // is a word start ("Request" in "XMLHTTPRequest").
-            offset = start;
-            U16_FWD_1(buffer, offset, size);
-            char32_t nextCharacter = 0;
-            if (offset < size)
-                U16_GET(buffer, 0, offset, size, nextCharacter);
-            if (!isASCIIUpper(nextCharacter) && !isASCIIDigit(nextCharacter) && !isSeparator(nextCharacter))
-                return true;
-        } else if (isASCIIDigit(firstCharacter)) {
-            // The start of a digit run is a word start ("2" in "WebKit2").
-            if (!isASCIIDigit(previousCharacter))
-                return true;
-        } else if (isSeparator(previousCharacter) || isASCIIDigit(previousCharacter)) {
-            // The start of a non-separator, non-uppercase, non-digit run is a word start,
-            // except after an uppercase. ("org" in "webkit.org", but not "ore" in "WebCore").
-            return true;
-        }
-    }
-
-    // Chinese and Japanese lack word boundary marks, and there is no clear agreement on what constitutes
-    // a word, so treat the position before any CJK character as a word start.
-    if (FontCascade::isCJKIdeographOrSymbol(firstCharacter))
-        return true;
-
-    size_t wordBreakSearchStart = start + length;
-    while (wordBreakSearchStart > start)
-        wordBreakSearchStart = findNextWordFromIndex(buffer, wordBreakSearchStart, false /* backwards */);
-    return wordBreakSearchStart == start;
-}
-
 inline size_t SearchBuffer::search(size_t& start)
 {
     size_t size = m_buffer.size();
@@ -2317,7 +1829,7 @@ inline size_t SearchBuffer::search(size_t& start)
             return 0;
     }
 
-    SUPPRESS_FORWARD_DECL_ARG UStringSearch* searcher = WebCore::searcher();
+    SUPPRESS_FORWARD_DECL_ARG UStringSearch* searcher = m_ICUSearcher.searcher();
 
     UErrorCode status = U_ZERO_ERROR;
     SUPPRESS_FORWARD_DECL_ARG usearch_setText(searcher, m_buffer.span().data(), size, &status);
@@ -2358,9 +1870,9 @@ nextMatch:
     ASSERT_WITH_SECURITY_IMPLICATION(matchStart + matchedLength <= size);
 
     // If this match is "bad", move on to the next match.
-    if (isBadMatch(m_buffer.subspan(matchStart).data(), matchedLength)
-        || (m_options.contains(FindOption::AtWordStarts) && !isWordStartMatch(matchStart, matchedLength))
-        || (m_options.contains(FindOption::AtWordEnds) && !isWordEndMatch(matchStart, matchedLength))) {
+    if ((m_targetRequiresKanaWorkaround && isBadMatch(m_buffer.subspan(matchStart, matchedLength), m_normalizedTarget.span(), m_normalizedMatch))
+        || (m_options.contains(FindOption::AtWordStarts) && !isWordStartMatch(m_buffer, matchStart, matchedLength, m_options))
+        || (m_options.contains(FindOption::AtWordEnds) && !isWordEndMatch(m_buffer, matchStart, matchedLength, m_options))) {
         SUPPRESS_FORWARD_DECL_ARG matchStart = usearch_next(searcher, &status);
         ASSERT(U_SUCCESS(status));
         goto nextMatch;

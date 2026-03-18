@@ -42,6 +42,7 @@
 #include "HTMLScriptElement.h"
 #include "HTMLStyleElement.h"
 #include "HTMLVideoElement.h"
+#include "ICUSearcher.h"
 #include "NodeInlines.h"
 #include "NodeRenderStyle.h"
 #include "NodeTraversal.h"

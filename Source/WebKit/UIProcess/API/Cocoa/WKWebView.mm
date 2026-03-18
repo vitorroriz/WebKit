@@ -175,6 +175,7 @@
 #import <WebCore/ElementContext.h>
 #import <WebCore/ElementTargetingTypes.h>
 #import <WebCore/ExceptionCode.h>
+#import <WebCore/ICUSearcher.h>
 #import <WebCore/ImageUtilities.h>
 #import <WebCore/JSDOMBinding.h>
 #import <WebCore/JSDOMExceptionHandling.h>

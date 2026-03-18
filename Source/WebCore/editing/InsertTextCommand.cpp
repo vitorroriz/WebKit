@@ -35,6 +35,7 @@
 #include "HTMLElement.h"
 #include "HTMLImageElement.h"
 #include "HTMLInterchange.h"
+#include "InsertListCommand.h"
 #include "LocalFrame.h"
 #include "MutableStyleProperties.h"
 #include "PositionInlines.h"
