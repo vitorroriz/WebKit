@@ -119,7 +119,7 @@ function addDisposableResource(disposeCapability, value, isAsync /* , method */)
 
     var resource;
     if (@argumentCount() < 4) {
-        if (@isUndefinedOrNull(value))
+        if (@isUndefinedOrNull(value) && !isAsync)
             return;
         resource = @createDisposableResource(value, isAsync);
     } else {
