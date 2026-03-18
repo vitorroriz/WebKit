@@ -715,6 +715,7 @@ public:
     // OSR exit code is code generated, so the value of the execute
     // counter that this corresponds to is also available directly.
     void optimizeAfterWarmUp();
+    void optimizeAfterWarmUpIgnoreQuickTierUp();
 
     // Call this to force an optimization trigger to fire only after
     // a lot of warm-up.
@@ -769,6 +770,7 @@ public:
 
 #else // No JIT
     void optimizeAfterWarmUp() { }
+    void optimizeAfterWarmUpIgnoreQuickTierUp() { }
     unsigned numberOfDFGCompiles() { return 0; }
 #endif
 
@@ -925,6 +927,9 @@ private:
     friend class CodeBlockSet;
     friend class FunctionExecutable;
     friend class ScriptExecutable;
+
+    enum class QuickTierUpCheck : bool { Apply, Ignore };
+    template<QuickTierUpCheck> void optimizeAfterWarmUpImpl();
 
     template<typename Visitor> ALWAYS_INLINE void visitChildren(Visitor&);
 

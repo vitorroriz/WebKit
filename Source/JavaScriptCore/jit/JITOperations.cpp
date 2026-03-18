@@ -3226,8 +3226,11 @@ JSC_DEFINE_JIT_OPERATION(operationOptimize, UGPRPair, (VM* vmPointer, uint32_t b
 
     // OSR failed this time, but it might succeed next time! Let the code run a bit
     // longer and then try again.
-    codeBlock->optimizeAfterWarmUp();
-    
+    // Use the normal threshold regardless of quickDFGTierUp: DFG is already installed,
+    // so this controls OSR retry spacing, not compilation trigger timing. Fast retries
+    // increment the exit counter on every attempt, which can cause premature jettison.
+    codeBlock->optimizeAfterWarmUpIgnoreQuickTierUp();
+
     CODEBLOCK_LOG_EVENT(codeBlock, "delayOptimizeToDFG", ("OSR failed"));
     OPERATION_RETURN(scope, encodeResult(nullptr, nullptr));
 }

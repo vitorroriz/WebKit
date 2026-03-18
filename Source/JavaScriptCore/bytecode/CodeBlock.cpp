@@ -2726,20 +2726,28 @@ void CodeBlock::dontOptimizeAnytimeSoon()
         jitData->executeCounter().deferIndefinitely();
 }
 
-void CodeBlock::optimizeAfterWarmUp()
+template<CodeBlock::QuickTierUpCheck check>
+void CodeBlock::optimizeAfterWarmUpImpl()
 {
     dataLogLnIf(Options::verboseOSR(), *this, ": Optimizing after warm-up.");
 #if ENABLE(DFG_JIT)
     if (auto* jitData = baselineJITData()) {
         int32_t threshold = Options::thresholdForOptimizeAfterWarmUp();
-        if (unlinkedCodeBlock()->isQuickDFGTierUp()) {
-            threshold = static_cast<int32_t>(Options::thresholdForOptimizeAfterWarmUp() * Options::quickDFGTierUpThresholdFactor());
-            dataLogLnIf(Options::verboseOSR(), *this, ": Quick DFG tier-up enabled and code is stable, bytecodeCost=", bytecodeCost(), ", codeType=", codeType(), ", adjustedThreshold=", threshold, ", finalThreshold=", adjustedCounterValue(threshold), " optimizationDelayCounter=", m_optimizationDelayCounter);
+        if constexpr (check == QuickTierUpCheck::Apply) {
+            if (unlinkedCodeBlock()->isQuickDFGTierUp()) {
+                threshold = static_cast<int32_t>(threshold * Options::quickDFGTierUpThresholdFactor());
+                dataLogLnIf(Options::verboseOSR(), *this, ": Quick DFG tier-up enabled and code is stable, bytecodeCost=", bytecodeCost(), ", codeType=", codeType(), ", adjustedThreshold=", threshold, ", finalThreshold=", adjustedCounterValue(threshold), " optimizationDelayCounter=", m_optimizationDelayCounter);
+            }
         }
         jitData->executeCounter().setNewThreshold(adjustedCounterValue(threshold), this);
     }
 #endif
 }
+
+template void CodeBlock::optimizeAfterWarmUpImpl<CodeBlock::QuickTierUpCheck::Apply>();
+void CodeBlock::optimizeAfterWarmUp() { optimizeAfterWarmUpImpl<QuickTierUpCheck::Apply>(); }
+template void CodeBlock::optimizeAfterWarmUpImpl<CodeBlock::QuickTierUpCheck::Ignore>();
+void CodeBlock::optimizeAfterWarmUpIgnoreQuickTierUp() { optimizeAfterWarmUpImpl<QuickTierUpCheck::Ignore>(); }
 
 void CodeBlock::optimizeAfterLongWarmUp()
 {
