@@ -3078,13 +3078,7 @@ std::optional<LayoutUnit> RenderBlock::availableLogicalHeightForPercentageComput
         // A positioned element that specified both top/bottom or that specifies
         // height should be treated as though it has a height explicitly specified
         // that can be used for any percentage computations.
-        // However, intrinsic heights (fit-content, min-content, max-content) are
-        // content-dependent and should be treated as indefinite for percentage
-        // resolution of children, since the actual height is not yet determined.
-        auto heightIsIntrinsic = style.logicalHeight().isIntrinsic() || style.logicalHeight().isIntrinsicKeyword() || style.logicalHeight().isMinIntrinsic();
-        auto hasNonIntrinsicSpecifiedHeight = !style.logicalHeight().isAuto() && !heightIsIntrinsic;
-        auto hasDefiniteHeightFromInsets = !style.logicalTop().isAuto() && !style.logicalBottom().isAuto() && style.logicalHeight().isAuto();
-        auto isOutOfFlowPositionedWithSpecifiedHeight = isOutOfFlowPositioned() && (hasNonIntrinsicSpecifiedHeight || hasDefiniteHeightFromInsets);
+        auto isOutOfFlowPositionedWithSpecifiedHeight = isOutOfFlowPositioned() && (!style.logicalHeight().isAuto() || (!style.logicalTop().isAuto() && !style.logicalBottom().isAuto()));
         if (isOutOfFlowPositionedWithSpecifiedHeight) {
             // Don't allow this to affect the block' size() member variable, since this
             // can get called while the block is still laying out its kids.
