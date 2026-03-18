@@ -28,6 +28,7 @@
 #include <JavaScriptCore/Identifier.h>
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
+#include <wtf/InlineMap.h>
 #include <wtf/IteratorRange.h>
 #include <wtf/PackedRefPtr.h>
 #include <wtf/TZoneMalloc.h>
@@ -145,8 +146,12 @@ typedef UncheckedKeyHashMap<PackedRefPtr<UniquedStringImpl>, PrivateNameEntry, I
 
 class VariableEnvironment {
     WTF_MAKE_TZONE_ALLOCATED(VariableEnvironment);
+
+public:
+    static constexpr unsigned inlineMapCapacity = 9;
+
 private:
-    typedef UncheckedKeyHashMap<PackedRefPtr<UniquedStringImpl>, VariableEnvironmentEntry, IdentifierRepHash, HashTraits<RefPtr<UniquedStringImpl>>, VariableEnvironmentEntryHashTraits> Map;
+    typedef InlineMap<PackedRefPtr<UniquedStringImpl>, VariableEnvironmentEntry, inlineMapCapacity, IdentifierRepHash, HashTraits<RefPtr<UniquedStringImpl>>, VariableEnvironmentEntryHashTraits> Map;
 
 public:
 

@@ -138,6 +138,7 @@ set(WTF_PUBLIC_HEADERS
     IndexSparseSet.h
     IndexedContainerIterator.h
     InlineASM.h
+    InlineMap.h
     InlineWeakPtr.h
     InlineWeakRef.h
     Insertion.h
