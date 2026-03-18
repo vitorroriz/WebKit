@@ -3735,28 +3735,6 @@ void RenderLayer::paintLayerContents(GraphicsContext& context, const LayerPainti
         && !isCollectingAccessibilityRegion
         && !shouldSkipNonFixedTopDocumentContent();
 
-    bool shouldPaintOutline = [&]() {
-        if (!isSelfPaintingLayer)
-            return false;
-
-        if (!shouldPaintContent)
-            return false;
-
-        if (isPaintingOverlayScrollbars || isCollectingEventRegion || isCollectingAccessibilityRegion)
-            return false;
-
-        // For the current layer, the outline has been painted by the primary GraphicsLayer.
-        if (localPaintFlags.contains(PaintLayerFlag::PaintingOverflowContentsRoot))
-            return false;
-
-        // Paint outlines in the background phase for a scroll container so that they don't scroll with the content.
-        // FIXME: inset outlines will have the wrong z-ordering with scrolled content. See also webkit.org/b/249457.
-        if (localPaintFlags.contains(PaintLayerFlag::PaintingOverflowContainer))
-            return isPaintingCompositedBackground;
-
-        return isPaintingCompositedForeground;
-    }();
-
     bool shouldPaintNegativeZIndexChildren = [&]() {
         if (localPaintFlags.contains(PaintLayerFlag::PaintingOverflowContainer))
             return false;
@@ -3901,6 +3879,32 @@ void RenderLayer::paintLayerContents(GraphicsContext& context, const LayerPainti
 
         if (filterContext)
             localPaintingInfo.paintBehavior.add(PaintBehavior::DontShowVisitedLinks);
+        else if (hasFailedFilterForSVGRenderer()) {
+            shouldPaintContent = false;
+            isPaintingCompositedForeground = false;
+        }
+
+        bool shouldPaintOutline = [&]() {
+            if (!isSelfPaintingLayer)
+                return false;
+
+            if (!shouldPaintContent)
+                return false;
+
+            if (isPaintingOverlayScrollbars || isCollectingEventRegion || isCollectingAccessibilityRegion)
+                return false;
+
+            // For the current layer, the outline has been painted by the primary GraphicsLayer.
+            if (localPaintFlags.contains(PaintLayerFlag::PaintingOverflowContentsRoot))
+                return false;
+
+            // Paint outlines in the background phase for a scroll container so that they don't scroll with the content.
+            // FIXME: inset outlines will have the wrong z-ordering with scrolled content. See also webkit.org/b/249457.
+            if (localPaintFlags.contains(PaintLayerFlag::PaintingOverflowContainer))
+                return isPaintingCompositedBackground;
+
+            return isPaintingCompositedForeground;
+        }();
 
         // If this layer's renderer is a child of the subtreePaintRoot, we render unconditionally, which
         // is done by passing a nil subtreePaintRoot down to our renderer (as if no subtreePaintRoot was ever set).
@@ -6637,6 +6641,23 @@ bool RenderLayer::invalidateEventRegion(EventRegionInvalidationReason reason)
     UNUSED_PARAM(reason);
     return false;
 #endif
+}
+
+bool RenderLayer::hasFailedFilterForSVGRenderer() const
+{
+    // Per the SVG spec, if a filter is referenced but cannot be applied (non-existent
+    // reference, empty filter, etc.), the element must not be rendered — the filter
+    // produces transparent black, making the element invisible. The CSS Filter Effects
+    // spec differs — a failed filter means "no effect" (painted normally). Therefore
+    // treat SVG renderers differently, obeying to the SVG rules.
+    if (!m_filters || m_filters->filter() || !renderer().isSVGLayerAwareRenderer() || !renderer().style().filter().isReferenceFilter())
+        return false;
+    return WTF::switchOn(renderer().style().filter().first(),
+        [&](const Style::FilterReference& reference) {
+            return ReferencedSVGResources::referencedFilterElement(renderer().treeScopeForSVGReferences(), reference) != nullptr;
+        },
+        [&](const auto&) { return false; }
+    );
 }
 
 TextStream& operator<<(WTF::TextStream& ts, ClipRectsType clipRectsType)

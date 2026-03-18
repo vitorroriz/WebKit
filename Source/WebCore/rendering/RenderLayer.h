@@ -1317,6 +1317,8 @@ private:
 
     void removeClipperClientIfNeeded() const;
 
+    bool hasFailedFilterForSVGRenderer() const;
+
     struct OverflowControlRects {
         IntRect horizontalScrollbar;
         IntRect verticalScrollbar;
