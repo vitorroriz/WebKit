@@ -210,16 +210,6 @@ void HTMLFrameElementBase::setLocation(const String& str)
         openURL(LockHistory::No, LockBackForwardList::No);
 }
 
-void HTMLFrameElementBase::setLocation(JSC::JSGlobalObject& state, const String& newLocation)
-{
-    if (WTF::protocolIsJavaScript(newLocation)) {
-        if (!BindingSecurity::shouldAllowAccessToNode(state, protect(contentDocument()).get()))
-            return;
-    }
-
-    setLocation(newLocation);
-}
-
 bool HTMLFrameElementBase::supportsFocus() const
 {
     return true;

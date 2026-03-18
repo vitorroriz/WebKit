@@ -36,8 +36,6 @@ class HTMLFrameElementBase : public HTMLFrameOwnerElement {
     WTF_MAKE_TZONE_ALLOCATED(HTMLFrameElementBase);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(HTMLFrameElementBase);
 public:
-    void setLocation(JSC::JSGlobalObject&, const String&);
-
     ScrollbarMode scrollingMode() const final;
 
 protected:
