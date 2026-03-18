@@ -248,6 +248,7 @@ void RealtimeMediaSource::notifySettingsDidChangeObservers(OptionSet<RealtimeMed
 {
     ASSERT(isMainThread());
 
+    ++m_settingsCapabilitiesUpdateCount;
     settingsDidChange(flags);
 
     if (m_pendingSettingsDidChangeNotification)

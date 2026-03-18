@@ -81,7 +81,7 @@ private:
     std::unique_ptr<PreventSourceFromEndingObserver> m_observer;
 };
 
-MediaStreamTrackDataHolder::MediaStreamTrackDataHolder(String&& trackId, String&& label, RealtimeMediaSource::Type type, CaptureDevice::DeviceType deviceType, bool isEnabled, bool isEnded, MediaStreamTrackHintValue contentHint, bool isProducingData, bool isMuted, bool isInterrupted, RealtimeMediaSourceSettings settings, RealtimeMediaSourceCapabilities capabilities, Ref<RealtimeMediaSource>&& source)
+MediaStreamTrackDataHolder::MediaStreamTrackDataHolder(String&& trackId, String&& label, RealtimeMediaSource::Type type, CaptureDevice::DeviceType deviceType, bool isEnabled, bool isEnded, MediaStreamTrackHintValue contentHint, bool isProducingData, bool isMuted, bool isInterrupted, RealtimeMediaSourceSettings settings, RealtimeMediaSourceCapabilities capabilities, size_t settingsCapabilitiesUpdateCount, Ref<RealtimeMediaSource>&& source)
     : trackId(WTF::move(trackId))
     , label(WTF::move(label))
     , type(type)
@@ -94,6 +94,7 @@ MediaStreamTrackDataHolder::MediaStreamTrackDataHolder(String&& trackId, String&
     , isInterrupted(isInterrupted)
     , settings(WTF::move(settings))
     , capabilities(WTF::move(capabilities))
+    , settingsCapabilitiesUpdateCount(settingsCapabilitiesUpdateCount)
     , source(source.get())
     , preventSourceFromEndingObserverWrapper(PreventSourceFromEndingObserverWrapper::create(WTF::move(source)))
 {

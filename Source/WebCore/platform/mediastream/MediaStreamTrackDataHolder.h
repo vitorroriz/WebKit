@@ -38,7 +38,7 @@ class PreventSourceFromEndingObserverWrapper;
 struct MediaStreamTrackDataHolder {
     WTF_DEPRECATED_MAKE_STRUCT_FAST_ALLOCATED(MediaStreamTrackDataHolder);
 
-    WEBCORE_EXPORT MediaStreamTrackDataHolder(String&& trackId, String&& label, RealtimeMediaSource::Type, CaptureDevice::DeviceType, bool isEnabled, bool isEnded, MediaStreamTrackHintValue, bool isProducingData, bool isMuted, bool isInterrupted, RealtimeMediaSourceSettings, RealtimeMediaSourceCapabilities, Ref<RealtimeMediaSource>&&);
+    WEBCORE_EXPORT MediaStreamTrackDataHolder(String&& trackId, String&& label, RealtimeMediaSource::Type, CaptureDevice::DeviceType, bool isEnabled, bool isEnded, MediaStreamTrackHintValue, bool isProducingData, bool isMuted, bool isInterrupted, RealtimeMediaSourceSettings, RealtimeMediaSourceCapabilities, size_t, Ref<RealtimeMediaSource>&&);
     WEBCORE_EXPORT ~MediaStreamTrackDataHolder();
 
     MediaStreamTrackDataHolder(const MediaStreamTrackDataHolder &) = delete;
@@ -56,6 +56,7 @@ struct MediaStreamTrackDataHolder {
     bool isInterrupted { false };
     RealtimeMediaSourceSettings settings;
     RealtimeMediaSourceCapabilities capabilities;
+    size_t settingsCapabilitiesUpdateCount { 0 };
     Ref<RealtimeMediaSource> source;
 
     Ref<PreventSourceFromEndingObserverWrapper> preventSourceFromEndingObserverWrapper;

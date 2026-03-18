@@ -185,6 +185,7 @@ public:
     void updateLabelIfRemoteTrack();
 
     MediaStreamTrackPrivateSourceObserver& sourceObserver() { return m_sourceObserver; }
+    size_t settingsCapabilitiesUpdateCount() const { return m_settingsCapabilitiesUpdateCount; }
 
 private:
     MediaStreamTrackPrivate(Ref<const Logger>&&, Ref<RealtimeMediaSource>&&, String&& id, std::function<void(Function<void()>&&)>&&);
@@ -197,8 +198,8 @@ private:
 
     void sourceStopped(bool captureDidFail);
     void sourceMutedChanged(bool interrupted, bool muted);
-    void sourceSettingsChanged(RealtimeMediaSourceSettings&&, RealtimeMediaSourceCapabilities&&);
-    void sourceConfigurationChanged(String&&, RealtimeMediaSourceSettings&&, RealtimeMediaSourceCapabilities&&);
+    void sourceSettingsChanged(RealtimeMediaSourceSettings&&, RealtimeMediaSourceCapabilities&&, size_t);
+    void sourceConfigurationChanged(String&&, RealtimeMediaSourceSettings&&, RealtimeMediaSourceCapabilities&&, size_t);
 
     void updateReadyState();
 
@@ -236,6 +237,7 @@ private:
     bool m_isInterrupted { false };
     RealtimeMediaSourceSettings m_settings;
     RealtimeMediaSourceCapabilities m_capabilities;
+    size_t m_settingsCapabilitiesUpdateCount { 0 };
 #if ASSERT_ENABLED
     uint32_t m_creationThreadId { 0 };
 #endif

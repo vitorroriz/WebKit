@@ -311,6 +311,8 @@ public:
 
     virtual void configurationChanged();
 
+    size_t settingsCapabilitiesUpdateCount() const;
+
 protected:
     RealtimeMediaSource(const CaptureDevice&, MediaDeviceHashSalts&& hashSalts = { }, std::optional<PageIdentifier> = std::nullopt);
 
@@ -427,6 +429,7 @@ private:
     bool m_hasStartedProducingData { false };
     std::atomic<bool> m_isApplyingRotation { false };
 
+    size_t m_settingsCapabilitiesUpdateCount { 0 };
     unsigned m_videoFrameObserversWithAdaptors { 0 };
 };
 
@@ -499,6 +502,11 @@ inline void RealtimeMediaSource::setCanUseIOSurface()
 inline const AudioStreamDescription* RealtimeMediaSource::audioStreamDescription() const
 {
     return nullptr;
+}
+
+inline size_t RealtimeMediaSource::settingsCapabilitiesUpdateCount() const
+{
+    return m_settingsCapabilitiesUpdateCount;
 }
 
 } // namespace WebCore

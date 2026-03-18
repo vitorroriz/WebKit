@@ -94,7 +94,7 @@ public:
         return m_postTask;
     }
 
-    void initialize(bool interrupted, bool muted)
+    void initialize(bool interrupted, bool muted, size_t settingsCapabilitiesUpdateCount)
     {
         ASSERT(isMainThread());
         if (m_source->isEnded()) {
@@ -105,7 +105,8 @@ public:
         if (muted != m_source->muted() || interrupted != m_source->interrupted())
             sourceMutedChanged();
 
-        // FIXME: We should check for settings capabilities changes.
+        if (settingsCapabilitiesUpdateCount != m_source->settingsCapabilitiesUpdateCount())
+            sourceSettingsChanged();
 
         m_isStarted = true;
         m_source->addObserver(*this);
@@ -185,15 +186,15 @@ private:
 
     void sourceSettingsChanged() final
     {
-        sendToMediaStreamTrackPrivate([settings = crossThreadCopy(m_source->settings()), capabilities = crossThreadCopy(m_source->capabilities())] (auto& privateTrack) mutable {
-            privateTrack.sourceSettingsChanged(WTF::move(settings), WTF::move(capabilities));
+        sendToMediaStreamTrackPrivate([settings = crossThreadCopy(m_source->settings()), capabilities = crossThreadCopy(m_source->capabilities()), settingsCapabilitiesUpdateCount = m_source->settingsCapabilitiesUpdateCount()] (auto& privateTrack) mutable {
+            privateTrack.sourceSettingsChanged(WTF::move(settings), WTF::move(capabilities), settingsCapabilitiesUpdateCount);
         });
     }
 
     void sourceConfigurationChanged() final
     {
-        sendToMediaStreamTrackPrivate([name = crossThreadCopy(m_source->name()), settings = crossThreadCopy(m_source->settings()), capabilities = crossThreadCopy(m_source->capabilities())] (auto& privateTrack) mutable {
-            privateTrack.sourceConfigurationChanged(WTF::move(name), WTF::move(settings), WTF::move(capabilities));
+        sendToMediaStreamTrackPrivate([name = crossThreadCopy(m_source->name()), settings = crossThreadCopy(m_source->settings()), capabilities = crossThreadCopy(m_source->capabilities()), settingsCapabilitiesUpdateCount = m_source->settingsCapabilitiesUpdateCount()] (auto& privateTrack) mutable {
+            privateTrack.sourceConfigurationChanged(WTF::move(name), WTF::move(settings), WTF::move(capabilities), settingsCapabilitiesUpdateCount);
         });
     }
 
@@ -234,9 +235,9 @@ MediaStreamTrackPrivateSourceObserver::~MediaStreamTrackPrivateSourceObserver() 
 
 void MediaStreamTrackPrivateSourceObserver::initialize(MediaStreamTrackPrivate& privateTrack)
 {
-    ensureOnMainThread([this, protectedThis = Ref { *this }, privateTrack = WeakPtr { privateTrack }, postTask = m_postTask, source = m_source, interrupted = privateTrack.interrupted(), muted = privateTrack.muted()] () mutable {
+    ensureOnMainThread([this, protectedThis = Ref { *this }, privateTrack = WeakPtr { privateTrack }, postTask = m_postTask, source = m_source, interrupted = privateTrack.interrupted(), muted = privateTrack.muted(), settingsCapabilitiesUpdateCount = privateTrack.settingsCapabilitiesUpdateCount()] () mutable {
         lazyInitialize(m_sourceProxy, makeUnique<MediaStreamTrackPrivateSourceObserverSourceProxy>(WTF::move(privateTrack), WTF::move(source), WTF::move(postTask)));
-        m_sourceProxy->initialize(interrupted, muted);
+        m_sourceProxy->initialize(interrupted, muted, settingsCapabilitiesUpdateCount);
     });
 }
 
@@ -307,6 +308,7 @@ MediaStreamTrackPrivate::MediaStreamTrackPrivate(Ref<const Logger>&& trackLogger
     , m_isInterrupted(m_sourceObserver->source().interrupted())
     , m_settings(m_sourceObserver->source().settings())
     , m_capabilities(m_sourceObserver->source().capabilities())
+    , m_settingsCapabilitiesUpdateCount(m_sourceObserver->source().settingsCapabilitiesUpdateCount())
 #if ASSERT_ENABLED
     , m_creationThreadId(isMainThread() ? 0 : Thread::currentSingleton().uid())
 #endif
@@ -341,6 +343,7 @@ MediaStreamTrackPrivate::MediaStreamTrackPrivate(Ref<const Logger>&& logger, Uni
     , m_isInterrupted(dataHolder->isInterrupted)
     , m_settings(WTF::move(dataHolder->settings))
     , m_capabilities(WTF::move(dataHolder->capabilities))
+    , m_settingsCapabilitiesUpdateCount(dataHolder->settingsCapabilitiesUpdateCount)
 #if ASSERT_ENABLED
     , m_creationThreadId(isMainThread() ? 0 : Thread::currentSingleton().uid())
 #endif
@@ -601,18 +604,20 @@ void MediaStreamTrackPrivate::sourceMutedChanged(bool interrupted, bool muted)
     });
 }
 
-void MediaStreamTrackPrivate::sourceSettingsChanged(RealtimeMediaSourceSettings&& settings, RealtimeMediaSourceCapabilities&& capabilities)
+void MediaStreamTrackPrivate::sourceSettingsChanged(RealtimeMediaSourceSettings&& settings, RealtimeMediaSourceCapabilities&& capabilities, size_t settingsCapabilitiesUpdateCount)
 {
     ASSERT(isOnCreationThread());
     ALWAYS_LOG(LOGIDENTIFIER);
 
     m_settings = WTF::move(settings);
     m_capabilities = WTF::move(capabilities);
+    m_settingsCapabilitiesUpdateCount = settingsCapabilitiesUpdateCount;
     forEachObserver([this](auto& observer) {
         observer.trackSettingsChanged(*this);
     });
 }
-void MediaStreamTrackPrivate::sourceConfigurationChanged(String&& label, RealtimeMediaSourceSettings&& settings, RealtimeMediaSourceCapabilities&& capabilities)
+
+void MediaStreamTrackPrivate::sourceConfigurationChanged(String&& label, RealtimeMediaSourceSettings&& settings, RealtimeMediaSourceCapabilities&& capabilities, size_t settingsCapabilitiesUpdateCount)
 {
     ASSERT(isOnCreationThread());
     ALWAYS_LOG(LOGIDENTIFIER);
@@ -620,6 +625,7 @@ void MediaStreamTrackPrivate::sourceConfigurationChanged(String&& label, Realtim
     m_label = WTF::move(label);
     m_settings = WTF::move(settings);
     m_capabilities = WTF::move(capabilities);
+    m_settingsCapabilitiesUpdateCount = settingsCapabilitiesUpdateCount;
     forEachObserver([this](auto& observer) {
         observer.trackConfigurationChanged(*this);
     });
@@ -671,6 +677,7 @@ UniqueRef<MediaStreamTrackDataHolder> MediaStreamTrackPrivate::toDataHolder(Shou
         m_isInterrupted,
         m_settings.isolatedCopy(),
         m_capabilities.isolatedCopy(),
+        m_settingsCapabilitiesUpdateCount,
         shouldClone == ShouldClone::Yes ? m_sourceObserver->source().clone() : Ref { m_sourceObserver->source() });
 }
 
