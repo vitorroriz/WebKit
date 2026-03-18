@@ -7442,9 +7442,12 @@ static OptionSet<WebCore::DataDetectorType> NODELETE coreDataDetectorTypes(_WKTe
 #endif
             }
 
+            WebCore::FloatSize bitmapSize { snapshotRect.width(), snapshotRect.height() };
+            bitmapSize.scale(strongSelf->_page->deviceScaleFactor());
+
             static constexpr OptionSet snapshotOptions { WebKit::SnapshotOption::FullContentRect, WebKit::SnapshotOption::ExcludeSelectionHighlighting };
 
-            strongSelf->_page->takeSnapshot(WebCore::enclosingIntRect(snapshotRect), { }, snapshotOptions, [weakSelf, aggregator = WTF::move(aggregator), startTime](CGImageRef image) mutable {
+            strongSelf->_page->takeSnapshot(WebCore::enclosingIntRect(snapshotRect), WebCore::expandedIntSize(bitmapSize), snapshotOptions, [weakSelf, aggregator = WTF::move(aggregator), startTime](CGImageRef image) mutable {
                 RetainPtr strongSelf = weakSelf.get();
                 if (!strongSelf)
                     return;
@@ -7628,7 +7631,7 @@ static OptionSet<WebCore::DataDetectorType> NODELETE coreDataDetectorTypes(_WKTe
         if (!cgImage)
             return completionHandler(text);
 
-        WebKit::recognizeText(cgImage.get(), WebKit::TextRecognitionLevel::Fast, [text = WTF::move(text), completionHandler = WTF::move(completionHandler), view = WTF::move(view), textHash](NSString *recognizedText, NSError *error) mutable {
+        WebKit::recognizeText(cgImage.get(), WebKit::TextRecognitionLevel::Accurate, [text = WTF::move(text), completionHandler = WTF::move(completionHandler), view = WTF::move(view), textHash](NSString *recognizedText, NSError *error) mutable {
             if (error)
                 return completionHandler(text);
 
