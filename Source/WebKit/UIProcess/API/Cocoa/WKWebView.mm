@@ -3318,10 +3318,11 @@ WebCore::CocoaColor *sampledFixedPositionContentColor(const WebCore::FixedContai
         if (!topFixedColor.isVisible())
             return 0;
 
-        if (!WebCore::PageColorSampler::colorsAreSimilar(_page->sampledPageTopColor(), topFixedColor))
+        if (WebCore::PageColorSampler::colorsAreSimilar(_page->underPageBackgroundColor(), topFixedColor))
             return 0;
 
-        if (WebCore::PageColorSampler::colorsAreSimilar(_page->underPageBackgroundColor(), topFixedColor))
+        static const auto scrollColorExtensionGrowsDuringRubberBanding = linkedOnOrAfterSDKWithBehavior(SDKAlignedBehavior::ScrollColorExtensionGrowsDuringRubberBanding);
+        if (!scrollColorExtensionGrowsDuringRubberBanding && !WebCore::PageColorSampler::colorsAreSimilar(_page->sampledPageTopColor(), topFixedColor))
             return 0;
 
         return std::max<CGFloat>(-obscuredInsets.top - [_scrollView contentOffset].y, 0);

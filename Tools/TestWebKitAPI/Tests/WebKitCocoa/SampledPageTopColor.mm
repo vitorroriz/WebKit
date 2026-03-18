@@ -518,6 +518,86 @@ TEST(SampledPageTopColor, TopColorExtensionWhenRubberBanding)
     EXPECT_EQ(colorExtensionViewHeight(), 100.f);
 }
 
+TEST(SampledPageTopColor, TopColorExtensionGrowsDuringRubberBandingWithoutSampledPageTopColor)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600)]);
+
+    auto insets = UIEdgeInsetsMake(75, 0, 0, 0);
+    auto insetSize = UIEdgeInsetsInsetRect([webView bounds], insets).size;
+    [webView _setObscuredInsets:insets];
+    RetainPtr scrollView = [webView scrollView];
+    [scrollView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
+    [scrollView setContentInset:insets];
+    [webView _overrideLayoutParametersWithMinimumLayoutSize:insetSize minimumUnobscuredSizeOverride:insetSize maximumUnobscuredSizeOverride:insetSize];
+
+    [webView synchronouslyLoadTestPageNamed:@"top-fixed-element"];
+    [webView waitForNextPresentationUpdate];
+
+    RetainPtr topColorExtension = [webView _colorExtensionViewForTesting:UIRectEdgeTop];
+    EXPECT_NOT_NULL(topColorExtension.get());
+
+    auto colorExtensionViewHeight = [topColorExtension] {
+        return CGRectGetHeight([topColorExtension bounds]);
+    };
+
+    EXPECT_EQ(colorExtensionViewHeight(), 75.f);
+
+    {
+        auto components = CGColorGetComponents([topColorExtension layer].backgroundColor);
+        EXPECT_IN_RANGE(components[0], 0.99, 1.01);
+        EXPECT_IN_RANGE(components[1], 0.38, 0.39);
+        EXPECT_IN_RANGE(components[2], 0.27, 0.28);
+    }
+
+    [scrollView setContentOffset:CGPointMake(0, -100) animated:NO];
+    [webView waitForNextPresentationUpdate];
+
+    EXPECT_EQ(colorExtensionViewHeight(), 100.f);
+
+    {
+        auto components = CGColorGetComponents([topColorExtension layer].backgroundColor);
+        EXPECT_IN_RANGE(components[0], 0.99, 1.01);
+        EXPECT_IN_RANGE(components[1], 0.38, 0.39);
+        EXPECT_IN_RANGE(components[2], 0.27, 0.28);
+    }
+}
+
+TEST(SampledPageTopColor, TopColorExtensionHeightIncreasesWithRubberBandAmount)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600)]);
+
+    auto insets = UIEdgeInsetsMake(75, 0, 0, 0);
+    auto insetSize = UIEdgeInsetsInsetRect([webView bounds], insets).size;
+    [webView _setObscuredInsets:insets];
+    RetainPtr scrollView = [webView scrollView];
+    [scrollView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
+    [scrollView setContentInset:insets];
+    [webView _overrideLayoutParametersWithMinimumLayoutSize:insetSize minimumUnobscuredSizeOverride:insetSize maximumUnobscuredSizeOverride:insetSize];
+
+    [webView synchronouslyLoadTestPageNamed:@"top-fixed-element"];
+    [webView waitForNextPresentationUpdate];
+
+    RetainPtr topColorExtension = [webView _colorExtensionViewForTesting:UIRectEdgeTop];
+
+    auto colorExtensionViewHeight = [topColorExtension] {
+        return CGRectGetHeight([topColorExtension bounds]);
+    };
+
+    EXPECT_EQ(colorExtensionViewHeight(), 75.f);
+
+    [scrollView setContentOffset:CGPointMake(0, -100) animated:NO];
+    [webView waitForNextPresentationUpdate];
+    EXPECT_EQ(colorExtensionViewHeight(), 100.f);
+
+    [scrollView setContentOffset:CGPointMake(0, -150) animated:NO];
+    [webView waitForNextPresentationUpdate];
+    EXPECT_EQ(colorExtensionViewHeight(), 150.f);
+
+    [scrollView setContentOffset:CGPointMake(0, -75) animated:NO];
+    [webView waitForNextPresentationUpdate];
+    EXPECT_EQ(colorExtensionViewHeight(), 75.f);
+}
+
 #endif // PLATFORM(IOS_FAMILY) && ENABLE(CONTENT_INSET_BACKGROUND_FILL)
 
 #if ENABLE(CONTENT_INSET_BACKGROUND_FILL)
