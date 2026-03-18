@@ -1,0 +1,3 @@
+[ macOS ] UIProcess/API/mac/WKWebViewMac.mm
+[ macOS ] UIProcess/Inspector/mac/WebInspectorUIProxyMac.mm
+[ macOS ] UIProcess/mac/WebViewImpl.mm
