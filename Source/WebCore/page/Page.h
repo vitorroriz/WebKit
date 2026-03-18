@@ -568,6 +568,7 @@ public:
     WEBCORE_EXPORT unsigned markAllMatchesForText(const String&, FindOptions, bool shouldHighlight, unsigned maxMatchCount);
 
     WEBCORE_EXPORT void unmarkAllTextMatches();
+    WEBCORE_EXPORT void removeAllActiveTextMatches();
 
     WEBCORE_EXPORT void dispatchBeforePrintEvent();
     WEBCORE_EXPORT void dispatchAfterPrintEvent();

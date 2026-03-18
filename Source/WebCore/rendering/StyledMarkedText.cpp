@@ -138,6 +138,7 @@ static StyledMarkedText resolveStyleForMarkedText(const MarkedText& markedText, 
             style.backgroundColor = selectionBackgroundColor.invertedColorWithAlpha(1.0);
         break;
     }
+    case MarkedText::Type::ActiveTextMatch:
     case MarkedText::Type::TextMatch: {
         // Text matches always use the light system appearance.
 #if PLATFORM(MAC)

@@ -1057,6 +1057,11 @@ Color RenderThemeIOS::platformAnnotationHighlightBackgroundColor(OptionSet<Style
     return SRGBA<uint8_t> { 255, 238, 190 };
 }
 
+Color RenderThemeIOS::platformTextSearchHighlightColor(OptionSet<StyleColorOptions>) const
+{
+    return SRGBA<uint8_t> { 255, 228, 56 };
+}
+
 bool RenderThemeIOS::shouldHaveSpinButton(const HTMLInputElement&) const
 {
     return false;

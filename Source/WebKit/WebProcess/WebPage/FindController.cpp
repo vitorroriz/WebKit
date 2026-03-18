@@ -325,7 +325,7 @@ void FindController::findString(const String& string, OptionSet<FindOptions> opt
     // and reveal the selection in FindIndicatorStrategy::didFindString.
     coreOptions.add(FindOption::DoNotRevealSelection);
 
-    m_findIndicator->willFindString();
+    protect(protect(m_webPage.get())->corePage())->removeAllActiveTextMatches();
 
     bool foundStringStartsAfterSelection = false;
     RefPtr webPage { m_webPage.get() };
@@ -359,7 +359,13 @@ void FindController::findString(const String& string, OptionSet<FindOptions> opt
     }
 
     if (found && !options.contains(FindOptions::DoNotSetSelection)) {
-        m_findIndicator->didFindString(frameWithSelection(protect(m_webPage->corePage()).get()));
+        RefPtr selectedFrame = frameWithSelection(protect(m_webPage->corePage()).get());
+        m_findIndicator->didFindString(selectedFrame);
+
+        if (selectedFrame) {
+            if (std::optional<SimpleRange> range = selectedFrame->selection().selection().range())
+                addMarker(*range, DocumentMarkerType::ActiveTextMatch);
+        }
 
         if (!foundStringStartsAfterSelection && options.contains(FindOptions::DetermineMatchIndex)) {
             if (m_foundStringMatchIndex) {
@@ -435,7 +441,7 @@ void FindController::selectFindMatch(uint32_t matchIndex)
 
 void FindController::indicateFindMatch(uint32_t matchIndex)
 {
-    m_findIndicator->willFindString();
+    protect(protect(m_webPage.get())->corePage())->removeAllActiveTextMatches();
 
     selectFindMatch(matchIndex);
     RefPtr selectedFrame = frameWithSelection(protect(protect(m_webPage.get())->corePage()).get());
@@ -443,6 +449,10 @@ void FindController::indicateFindMatch(uint32_t matchIndex)
         return;
 
     m_findIndicator->didFindString(selectedFrame);
+
+    if (std::optional<SimpleRange> range = selectedFrame->selection().selection().range())
+        addMarker(*range, DocumentMarkerType::ActiveTextMatch);
+
     m_findIndicator->update(selectedFrame, !!m_findPageOverlay);
 }
 
@@ -459,6 +469,7 @@ void FindController::hideFindUI()
 #endif
         protect(protect(m_webPage.get())->corePage())->unmarkAllTextMatches();
 
+    protect(protect(m_webPage.get())->corePage())->removeAllActiveTextMatches();
     m_findIndicator->hide();
     resetMatchIndex();
 

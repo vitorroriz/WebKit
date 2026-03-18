@@ -100,6 +100,8 @@ enum class DocumentMarkerType : uint32_t {
 #endif
     TransparentContent = 1 << 17,
     DictationStreamingOpacity = 1 << 18,
+    // FIXME(172843016)
+    ActiveTextMatch = 1 << 19,
 };
 
 // A range of a node within a document that is "marked", such as the range of a misspelled word.
@@ -218,6 +220,7 @@ constexpr auto DocumentMarker::allMarkers() -> OptionSet<DocumentMarkerType>
 #endif
         DocumentMarkerType::TransparentContent,
         DocumentMarkerType::DictationStreamingOpacity,
+        DocumentMarkerType::ActiveTextMatch,
     };
 }
 

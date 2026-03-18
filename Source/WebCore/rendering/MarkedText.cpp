@@ -218,6 +218,8 @@ Vector<MarkedText> MarkedText::collectForDocumentMarkers(const RenderText& rende
         case DocumentMarkerType::DictationPhraseWithAlternatives:
             return MarkedText::Type::DictationPhraseWithAlternatives;
 #endif
+        case DocumentMarkerType::ActiveTextMatch:
+            return MarkedText::Type::ActiveTextMatch;
         default:
             return MarkedText::Type::Unmarked;
         }
@@ -250,6 +252,10 @@ Vector<MarkedText> MarkedText::collectForDocumentMarkers(const RenderText& rende
         case DocumentMarkerType::TextMatch:
             if (!renderer.frame().editor().markedTextMatchesAreHighlighted())
                 continue;
+            if (phase == MarkedText::PaintPhase::Decoration)
+                continue;
+            break;
+        case DocumentMarkerType::ActiveTextMatch:
             if (phase == MarkedText::PaintPhase::Decoration)
                 continue;
             break;
@@ -309,6 +315,7 @@ Vector<MarkedText> MarkedText::collectForDocumentMarkers(const RenderText& rende
         // FIXME: See <rdar://problem/8933352>. Also, remove the PLATFORM(IOS_FAMILY)-guard.
         case DocumentMarkerType::DictationPhraseWithAlternatives:
 #endif
+        case DocumentMarkerType::ActiveTextMatch:
         case DocumentMarkerType::TextMatch: {
             auto [clampedStart, clampedEnd] = selectableRange.clamp(marker->startOffset(), marker->endOffset());
 

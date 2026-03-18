@@ -74,6 +74,8 @@ std::ostream& operator<<(std::ostream& os, MarkedText::Type type)
         return os << "TransparentContent";
     case MarkedText::Type::DictationStreamingOpacity:
         return os << "DictationStreamingOpacity";
+    case MarkedText::Type::ActiveTextMatch:
+        return os << "ActiveTextMatch";
     case MarkedText::Type::Unmarked:
         return os << "Unmarked";
     }

@@ -187,6 +187,8 @@ void WebFoundTextRangeController::decorateTextRangeWithStyle(const WebFoundTextR
     if (currentStyleForRange == FindDecorationStyle::Highlighted && range == m_highlightedRange) {
         m_textIndicator = nullptr;
         m_highlightedRange = { };
+
+        protect(protect(m_webPage.get())->corePage())->removeAllActiveTextMatches();
     }
 
     if (auto simpleRange = simpleRangeFromFoundTextRange(range)) {
@@ -202,6 +204,8 @@ void WebFoundTextRangeController::decorateTextRangeWithStyle(const WebFoundTextR
         }
         case FindDecorationStyle::Highlighted: {
             m_highlightedRange = range;
+
+            protect(protect(simpleRange->start.document())->markers())->addMarker(*simpleRange, WebCore::DocumentMarkerType::ActiveTextMatch);
 
             auto ancestorsRevealed = revealClosedDetailsAndHiddenUntilFoundAncestors(protect(simpleRange->startContainer()));
 
@@ -284,7 +288,9 @@ void WebFoundTextRangeController::clearAllDecoratedFoundText()
     clearCachedRanges();
     m_decoratedRanges.clear();
     m_unhighlightedFoundRanges.clear();
-    protect(protect(m_webPage.get())->corePage())->unmarkAllTextMatches();
+    RefPtr corePage = protect(m_webPage.get())->corePage();
+    corePage->unmarkAllTextMatches();
+    corePage->removeAllActiveTextMatches();
 
     m_highlightedRange = { };
     m_textIndicator = nullptr;

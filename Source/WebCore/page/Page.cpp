@@ -1452,6 +1452,14 @@ void Page::unmarkAllTextMatches()
     });
 }
 
+void Page::removeAllActiveTextMatches()
+{
+    forEachDocument([] (Document& document) {
+        if (CheckedPtr markers = document.markersIfExists())
+            markers->removeMarkers(DocumentMarkerType::ActiveTextMatch);
+    });
+}
+
 #if ENABLE(EDITABLE_REGION)
 
 void Page::setEditableRegionEnabled(bool enabled)
