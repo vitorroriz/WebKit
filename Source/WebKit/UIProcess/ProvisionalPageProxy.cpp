@@ -894,6 +894,12 @@ bool ProvisionalPageProxy::sendMessageWithAsyncReply(UniqueRef<IPC::Encoder>&& e
     return protect(process())->sendMessage(WTF::move(encoder), sendOptions, WTF::move(handler));
 }
 
+void ProvisionalPageProxy::updateFrameProcess()
+{
+    if (auto mainFrame = m_mainFrame)
+        m_frameProcess = mainFrame->frameProcess();
+}
+
 } // namespace WebKit
 
 #undef MESSAGE_CHECK

@@ -676,6 +676,8 @@ void WebFrameProxy::setProcess(FrameProcess& process)
 
     m_frameProcess->decrementFrameCount();
     m_frameProcess = process;
+    if (RefPtr provisionalPage = m_page ? m_page->provisionalPageProxy() : nullptr)
+        provisionalPage->updateFrameProcess();
     m_frameProcess->incrementFrameCount();
 }
 

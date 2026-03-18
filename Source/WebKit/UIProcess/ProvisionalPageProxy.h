@@ -153,6 +153,7 @@ public:
     WebPageProxyMessageReceiverRegistration& messageReceiverRegistration() LIFETIME_BOUND { return m_messageReceiverRegistration; }
 
     bool needsMainFrameObserver() const { return m_needsMainFrameObserver; }
+    void updateFrameProcess();
 
 private:
     ProvisionalPageProxy(WebPageProxy&, Ref<FrameProcess>&&, BrowsingContextGroup&, RefPtr<SuspendedPageProxy>&&, API::Navigation&, bool isServerRedirect, const WebCore::ResourceRequest&, ProcessSwapRequestedByClient, bool isProcessSwappingOnNavigationResponse, API::WebsitePolicies*, WebsiteDataStore* replacedDataStoreForWebArchiveLoad = nullptr);
@@ -208,7 +209,7 @@ private:
 
     WeakPtr<WebPageProxy> m_page;
     WebCore::PageIdentifier m_webPageID;
-    const Ref<FrameProcess> m_frameProcess;
+    Ref<FrameProcess> m_frameProcess;
     const Ref<BrowsingContextGroup> m_browsingContextGroup;
     RefPtr<RemotePageProxy> m_takenRemotePage;
 
