@@ -382,6 +382,7 @@ loader/cache/CachedSVGFont.cpp
 mathml/MathMLElement.cpp
 mathml/MathMLSelectElement.cpp
 page/AutoscrollController.cpp
+[ macOS ] page/ContextMenuController.cpp
 [ iOS ] page/DOMTimer.cpp
 page/DOMWindow.cpp
 page/DragController.cpp
@@ -593,7 +594,7 @@ rendering/RenderView.cpp
 rendering/RenderViewTransitionCapture.cpp
 rendering/RenderWidget.cpp
 rendering/TextBoxPainter.cpp
-[ iOS ] rendering/cocoa/RenderThemeCocoa.mm
+rendering/cocoa/RenderThemeCocoa.mm
 [ iOS ] rendering/ios/RenderThemeIOS.mm
 rendering/mathml/MathOperator.cpp
 rendering/mathml/RenderMathMLFraction.cpp
