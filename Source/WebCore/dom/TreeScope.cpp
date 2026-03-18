@@ -277,24 +277,28 @@ Element* TreeScope::ancestorElementInThisScope(Element* element) const
     return nullptr;
 }
 
-void TreeScope::addImageMap(HTMLMapElement& imageMap)
+void TreeScope::addImageMap(HTMLMapElement& imageMap, const AtomString& name, const AtomString& id)
 {
-    auto name = imageMap.getName();
-    if (name.isNull())
+    if (name.isNull() && id.isNull())
         return;
     if (!m_imageMapsByName)
         m_imageMapsByName = makeUnique<TreeScopeOrderedMap>();
-    m_imageMapsByName->add(name, imageMap, *this);
+
+    if (!name.isNull())
+        m_imageMapsByName->add(name, imageMap, *this);
+    if (!id.isNull() && id != name)
+        m_imageMapsByName->add(id, imageMap, *this);
 }
 
-void TreeScope::removeImageMap(HTMLMapElement& imageMap)
+void TreeScope::removeImageMap(HTMLMapElement& imageMap, const AtomString& name, const AtomString& id)
 {
     if (!m_imageMapsByName)
         return;
-    auto name = imageMap.getName();
-    if (name.isNull())
-        return;
-    m_imageMapsByName->remove(name, imageMap);
+
+    if (!name.isNull())
+        m_imageMapsByName->remove(name, imageMap);
+    if (!id.isNull() && id != name)
+        m_imageMapsByName->remove(id, imageMap);
 }
 
 RefPtr<HTMLMapElement> TreeScope::getImageMap(const AtomString& name) const

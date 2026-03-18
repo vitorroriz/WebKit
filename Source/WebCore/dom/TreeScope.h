@@ -108,8 +108,8 @@ public:
     WEBCORE_EXPORT Node* NODELETE ancestorNodeInThisScope(Node*) const;
     WEBCORE_EXPORT Element* NODELETE ancestorElementInThisScope(Element*) const;
 
-    void addImageMap(HTMLMapElement&);
-    void removeImageMap(HTMLMapElement&);
+    void addImageMap(HTMLMapElement&, const AtomString& name, const AtomString& id);
+    void removeImageMap(HTMLMapElement&, const AtomString& name, const AtomString& id);
     RefPtr<HTMLMapElement> getImageMap(const AtomString&) const;
 
     void addImageElementByUsemap(const AtomString&, HTMLImageElement&);

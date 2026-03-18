@@ -454,7 +454,10 @@ AtomString parseHTMLHashNameReference(StringView usemap)
     size_t numberSignIndex = usemap.find('#');
     if (numberSignIndex == notFound)
         return nullAtom();
-    return usemap.substring(numberSignIndex + 1).toAtomString();
+    auto result = usemap.substring(numberSignIndex + 1);
+    if (result.isEmpty())
+        return nullAtom();
+    return result.toAtomString();
 }
 
 struct HTMLDimensionParsingResult {
