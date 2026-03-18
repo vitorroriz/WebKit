@@ -2968,8 +2968,7 @@ ExceptionOr<RefPtr<WindowProxy>> LocalDOMWindow::open(LocalDOMWindow& activeWind
 
         URL completedURL = protect(firstFrame->document())->completeURL(urlString);
 
-        RefPtr localTargetFrame = dynamicDowncast<LocalFrame>(targetFrame.get());
-        if (localTargetFrame && protect(localTargetFrame->document()->window())->isInsecureScriptAccess(activeWindow, completedURL.string()))
+        if (protect(targetFrame->window())->isInsecureScriptAccess(activeWindow, completedURL.string()))
             return &targetFrame->windowProxy();
 
         if (urlString.isEmpty())
