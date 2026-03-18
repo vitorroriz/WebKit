@@ -361,11 +361,14 @@ void FindController::findString(const String& string, OptionSet<FindOptions> opt
     if (found && !options.contains(FindOptions::DoNotSetSelection)) {
         m_findIndicator->didFindString(frameWithSelection(protect(m_webPage->corePage()).get()));
 
-        if (!foundStringStartsAfterSelection && m_foundStringMatchIndex) {
-            if (options.contains(FindOptions::Backwards))
-                (*m_foundStringMatchIndex)--;
-            else if (!options.contains(FindOptions::NoIndexChange))
-                (*m_foundStringMatchIndex)++;
+        if (!foundStringStartsAfterSelection && options.contains(FindOptions::DetermineMatchIndex)) {
+            if (m_foundStringMatchIndex) {
+                if (options.contains(FindOptions::Backwards))
+                    (*m_foundStringMatchIndex)--;
+                else if (!options.contains(FindOptions::NoIndexChange))
+                    (*m_foundStringMatchIndex)++;
+            } else
+                m_foundStringMatchIndex = 0;
         }
     }
 
