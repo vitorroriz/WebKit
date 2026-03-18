@@ -3241,6 +3241,7 @@ static void handleSpotifyQuirks(QuirksData& quirksData, const URL& quirksURL, co
         QuirksData::SiteSpecificQuirk::NeedsBodyScrollbarWidthNoneDisabledQuirk,
         QuirksData::SiteSpecificQuirk::ShouldAvoidStartingSelectionOnMouseDownOverPointerCursor,
         QuirksData::SiteSpecificQuirk::ShouldLimitHLSPlaybackRate,
+        QuirksData::SiteSpecificQuirk::NeedsWebKitMediaTextTrackDisplayQuirk,
     });
 }
 
