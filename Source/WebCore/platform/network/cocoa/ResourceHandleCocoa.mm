@@ -20,18 +20,17 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #import "config.h"
-#import "ResourceHandleInternal.h"
 
 #import "AuthenticationChallenge.h"
-#import "AuthenticationMac.h"
+#import "AuthenticationCocoa.h"
 #import "CachedResourceLoader.h"
 #import "CookieStorage.h"
 #import "CredentialStorage.h"
-#import "FormDataStreamMac.h"
+#import "FormDataStreamCocoa.h"
 #import "FrameLoader.h"
 #import "HTTPHeaderNames.h"
 #import "HTTPStatusCodes.h"
@@ -41,6 +40,7 @@
 #import "NetworkStorageSession.h"
 #import "NetworkingContext.h"
 #import "ResourceError.h"
+#import "ResourceHandleInternal.h"
 #import "ResourceResponse.h"
 #import "SharedBuffer.h"
 #import "SubresourceLoader.h"
@@ -65,7 +65,7 @@
 using namespace WebCore;
 
 namespace WebCore {
-    
+
 static void applyBasicAuthorizationHeader(ResourceRequest& request, const Credential& credential)
 {
     request.setHTTPHeaderField(HTTPHeaderName::Authorization, credential.serializationForBasicAuthorizationHeader());
@@ -146,7 +146,7 @@ void ResourceHandle::createNSURLConnection(id delegate, bool shouldUseCredential
 
     if (shouldUseCredentialStorage && firstRequest().url().protocolIsInHTTPFamily()) {
         if (d->m_user.isEmpty() && d->m_password.isEmpty()) {
-            // <rdar://problem/7174050> - For URLs that match the paths of those previously challenged for HTTP Basic authentication, 
+            // <rdar://problem/7174050> - For URLs that match the paths of those previously challenged for HTTP Basic authentication,
             // try and reuse the credential preemptively, as allowed by RFC 2617.
             if (auto* networkStorageSession = d->m_context->storageSession())
                 d->m_initialCredential = networkStorageSession->credentialStorage().get(firstRequest().cachePartition(), firstRequest().url());
@@ -158,7 +158,7 @@ void ResourceHandle::createNSURLConnection(id delegate, bool shouldUseCredential
                 networkStorageSession->credentialStorage().set(firstRequest().cachePartition(), Credential(d->m_user, d->m_password, CredentialPersistence::None), firstRequest().url());
         }
     }
-        
+
     if (!d->m_initialCredential.isEmpty() && !firstRequest().hasHTTPHeaderField(HTTPHeaderName::Authorization)) {
         // FIXME: Support Digest authentication, and Proxy-Authorization.
         applyBasicAuthorizationHeader(firstRequest(), d->m_initialCredential);
@@ -214,11 +214,11 @@ void ResourceHandle::createNSURLConnection(id delegate, bool shouldUseCredential
     NSMutableDictionary *propertyDictionary = [NSMutableDictionary dictionaryWithObject:streamProperties.get() forKey:@"kCFURLConnectionSocketStreamProperties"];
     const bool usesCache = true;
 #endif
-    [propertyDictionary setObject:@{@"_kCFURLConnectionPropertyTimingDataOptions": @(_TimingDataOptionsEnableW3CNavigationTiming)} forKey:@"kCFURLConnectionURLConnectionProperties"];
+    [propertyDictionary setObject:@{ @"_kCFURLConnectionPropertyTimingDataOptions": @(_TimingDataOptionsEnableW3CNavigationTiming) } forKey:@"kCFURLConnectionURLConnectionProperties"];
 
     // This is used to signal that to CFNetwork that this connection should be considered
     // web content for purposes of App Transport Security.
-    [propertyDictionary setObject:@{@"NSAllowsArbitraryLoadsInWebContent": @YES} forKey:@"_kCFURLConnectionPropertyATSFrameworkOverrides"];
+    [propertyDictionary setObject:@{ @"NSAllowsArbitraryLoadsInWebContent": @YES } forKey:@"_kCFURLConnectionPropertyATSFrameworkOverrides"];
 
 ALLOW_DEPRECATED_DECLARATIONS_BEGIN
     d->m_connection = adoptNS([[NSURLConnection alloc] _initWithRequest:nsRequest.get() delegate:delegate usesCache:usesCache maxContentLength:0 startImmediately:NO connectionProperties:propertyDictionary]);
@@ -267,7 +267,7 @@ bool ResourceHandle::start()
     d->m_startTime = MonotonicTime::now();
 
     LOG(Network, "Handle %p starting connection %p for %@", this, connection(), firstRequest().nsURLRequest(HTTPBodyUpdatePolicy::DoNotUpdateHTTPBody));
-    
+
     if (d->m_connection) {
         if (d->m_defersLoading)
             connection().defersCallbacks = YES;
@@ -342,7 +342,7 @@ NSURLConnection *ResourceHandle::connection() const
 {
     return d->m_connection.get();
 }
-    
+
 CFStringRef ResourceHandle::synchronousLoadRunLoopMode()
 {
     return CFSTR("WebCoreSynchronousLoaderRunLoopMode");
@@ -353,7 +353,7 @@ void ResourceHandle::platformLoadResourceSynchronously(NetworkingContext* contex
     LOG(Network, "ResourceHandle::platformLoadResourceSynchronously:%@ storedCredentialsPolicy:%u", request.nsURLRequest(HTTPBodyUpdatePolicy::DoNotUpdateHTTPBody), static_cast<unsigned>(storedCredentialsPolicy));
 
     ASSERT(!request.isEmpty());
-    
+
     SynchronousLoaderClient client;
     client.setAllowStoredCredentials(storedCredentialsPolicy == StoredCredentialsPolicy::Use);
 
@@ -388,14 +388,14 @@ void ResourceHandle::platformLoadResourceSynchronously(NetworkingContext* contex
 
     [handle->connection() setDelegateQueue:operationQueueForAsyncClients()];
     [handle->connection() start];
-    
+
     do {
         if (auto task = client.messageQueue().waitForMessage())
             (*task)();
     } while (!client.messageQueue().killed());
 
     error = client.error();
-    
+
     [handle->connection() cancel];
 
     if (error.isNull())
@@ -413,7 +413,7 @@ void ResourceHandle::willSendRequest(ResourceRequest&& request, ResourceResponse
         String lastHTTPMethod = d->m_lastHTTPMethod;
         if (!equalIgnoringASCIICase(lastHTTPMethod, request.httpMethod())) {
             request.setHTTPMethod(lastHTTPMethod);
-    
+
             RefPtr body = previousRequest.httpBody();
             if (!equalLettersIgnoringASCIICase(lastHTTPMethod, "get"_s) && body && !body->isEmpty())
                 request.setHTTPBody(WTF::move(body));
@@ -459,7 +459,7 @@ void ResourceHandle::willSendRequest(ResourceRequest&& request, ResourceResponse
                 credential = networkStorageSession->credentialStorage().get(request.cachePartition(), request.url());
             if (!credential.isEmpty()) {
                 d->m_initialCredential = credential;
-                
+
                 // FIXME: Support Digest authentication, and Proxy-Authorization.
                 applyBasicAuthorizationHeader(request, d->m_initialCredential);
             }
@@ -496,7 +496,7 @@ void ResourceHandle::didReceiveAuthenticationChallenge(const AuthenticationChall
 
 #if PLATFORM(IOS_FAMILY)
     // If the challenge is for a proxy protection space, look for default credentials in
-    // the keychain.  CFNetwork used to handle this until WebCore was changed to always
+    // the keychain. CFNetwork used to handle this until WebCore was changed to always
     // return NO to -connectionShouldUseCredentialStorage: for <rdar://problem/7704943>.
     if (!challenge.previousFailureCount() && challenge.protectionSpace().isProxy()) {
         RELEASE_ASSERT(hasProcessPrivilege(ProcessPrivilege::CanAccessCredentials));

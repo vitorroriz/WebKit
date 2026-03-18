@@ -74,7 +74,7 @@
 #import "_WKRenderingProgressEventsInternal.h"
 #import "_WKSameDocumentNavigationTypeInternal.h"
 #import <JavaScriptCore/ConsoleTypes.h>
-#import <WebCore/AuthenticationMac.h>
+#import <WebCore/AuthenticationCocoa.h>
 #import <WebCore/ContentRuleListMatchedRule.h>
 #import <WebCore/ContentRuleListResults.h>
 #import <WebCore/Credential.h>

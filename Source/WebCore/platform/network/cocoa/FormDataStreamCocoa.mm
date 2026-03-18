@@ -27,7 +27,7 @@
  */
 
 #import "config.h"
-#import "FormDataStreamMac.h"
+#import "FormDataStreamCocoa.h"
 
 #import "FormData.h"
 #import "FormDataStreamCFNet.h"

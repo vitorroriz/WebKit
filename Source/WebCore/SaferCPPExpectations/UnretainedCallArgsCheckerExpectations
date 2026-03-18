@@ -122,9 +122,9 @@ platform/mediastream/mac/AVVideoCaptureSource.mm
 [ Mac ] platform/mediastream/mac/ScreenCaptureKitCaptureSource.mm
 [ Mac ] platform/mediastream/mac/ScreenCaptureKitSharingSessionManager.mm
 platform/network/cf/DNSResolveQueueCFNet.cpp
-platform/network/mac/ResourceHandleMac.mm
-platform/network/mac/SynchronousLoaderClient.mm
-platform/network/mac/WebCoreResourceHandleAsOperationQueueDelegate.mm
+platform/network/cocoa/ResourceHandleCocoa.mm
+platform/network/cocoa/SynchronousLoaderClient.mm
+platform/network/cocoa/WebCoreResourceHandleAsOperationQueueDelegate.mm
 [ iOS ] platform/text/mac/TextBoundaries.mm
 rendering/AttachmentLayout.mm
 [ iOS ] rendering/ios/RenderThemeIOS.mm

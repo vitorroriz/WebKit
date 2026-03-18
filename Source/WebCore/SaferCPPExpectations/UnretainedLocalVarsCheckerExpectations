@@ -83,9 +83,9 @@ platform/mediastream/mac/AVVideoCaptureSource.mm
 platform/mediastream/mac/CoreAudioCaptureUnit.mm
 platform/mediastream/mac/RealtimeIncomingVideoSourceCocoa.mm
 [ iOS ] platform/network/ios/WebCoreURLResponseIOS.mm
-[ iOS ] platform/network/mac/ResourceErrorMac.mm
-platform/network/mac/ResourceHandleMac.mm
-platform/network/mac/WebCoreResourceHandleAsOperationQueueDelegate.mm
+[ iOS ] platform/network/cocoa/ResourceErrorCocoa.mm
+platform/network/cocoa/ResourceHandleCocoa.mm
+platform/network/cocoa/WebCoreResourceHandleAsOperationQueueDelegate.mm
 [ iOS ] platform/text/mac/TextBoundaries.mm
 rendering/AttachmentLayout.mm
 [ iOS ] rendering/ios/RenderThemeIOS.mm

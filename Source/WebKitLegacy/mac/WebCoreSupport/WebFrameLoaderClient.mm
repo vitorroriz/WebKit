@@ -75,7 +75,7 @@
 #import "WebViewInternal.h"
 #import <JavaScriptCore/InitializeThreading.h>
 #import <JavaScriptCore/JSContextInternal.h>
-#import <WebCore/AuthenticationMac.h>
+#import <WebCore/AuthenticationCocoa.h>
 #import <WebCore/BackForwardController.h>
 #import <WebCore/BackForwardItemIdentifier.h>
 #import <WebCore/BitmapImage.h>

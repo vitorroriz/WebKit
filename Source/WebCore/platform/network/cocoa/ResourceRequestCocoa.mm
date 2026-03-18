@@ -28,7 +28,7 @@
 
 #if PLATFORM(COCOA)
 
-#import "FormDataStreamMac.h"
+#import "FormDataStreamCocoa.h"
 #import "HTTPHeaderNames.h"
 #import "RegistrableDomain.h"
 #import "ResourceRequestCFNet.h"

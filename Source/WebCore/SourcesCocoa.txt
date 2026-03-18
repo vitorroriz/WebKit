@@ -698,30 +698,30 @@ platform/network/cf/DNSResolveQueueCFNet.cpp
 platform/network/cf/FormDataStreamCFNet.mm @nonARC
 platform/network/cf/NetworkStorageSessionCFNet.cpp
 platform/network/cf/ResourceRequestCFNet.cpp
+platform/network/cocoa/AuthenticationCocoa.mm @nonARC
+platform/network/cocoa/BlobDataFileReferenceCocoa.mm @nonARC
 platform/network/cocoa/CertificateInfoCocoa.mm @nonARC
 platform/network/cocoa/CookieCocoa.mm @nonARC
+platform/network/cocoa/CookieStorageCocoa.mm @nonARC
 platform/network/cocoa/CookieStorageObserver.mm @nonARC
 platform/network/cocoa/CredentialCocoa.mm @nonARC
+platform/network/cocoa/CredentialStorageCocoa.mm @nonARC
+platform/network/cocoa/FormDataStreamCocoa.mm @nonARC
 platform/network/cocoa/NetworkLoadMetrics.mm @nonARC
 platform/network/cocoa/NetworkStorageSessionCocoa.mm @nonARC
 platform/network/cocoa/ProtectionSpaceCocoa.mm @nonARC
 platform/network/cocoa/RangeResponseGenerator.mm @nonARC
 platform/network/cocoa/ResourceRequestCocoa.mm @nonARC
+platform/network/cocoa/ResourceErrorCocoa.mm @nonARC
+platform/network/cocoa/ResourceHandleCocoa.mm @nonARC
 platform/network/cocoa/ResourceResponseCocoa.mm @nonARC @no-unify // Unsafe to unify until rdar://problem/48853137 is resolved
+platform/network/cocoa/SynchronousLoaderClient.mm @nonARC
+platform/network/cocoa/UTIUtilities.mm @nonARC
 platform/network/cocoa/WebCoreNSURLSession.mm @nonARC @no-unify
+platform/network/cocoa/WebCoreURLResponse.mm @nonARC
 platform/network/ios/NetworkStateNotifierIOS.mm @nonARC
 platform/network/ios/WebCoreURLResponseIOS.mm @nonARC
-platform/network/mac/AuthenticationMac.mm @nonARC
-platform/network/mac/BlobDataFileReferenceMac.mm @nonARC
-platform/network/mac/CookieStorageMac.mm @nonARC
-platform/network/mac/CredentialStorageMac.mm @nonARC
-platform/network/mac/FormDataStreamMac.mm @nonARC
 platform/network/mac/NetworkStateNotifierMac.cpp
-platform/network/mac/ResourceErrorMac.mm @nonARC
-platform/network/mac/ResourceHandleMac.mm @nonARC
-platform/network/mac/SynchronousLoaderClient.mm @nonARC
-platform/network/mac/UTIUtilities.mm @nonARC
-platform/network/mac/WebCoreURLResponse.mm @nonARC
 platform/text/cf/HyphenationCF.cpp
 platform/text/cocoa/LocaleCocoa.mm @nonARC
 platform/text/cocoa/LocalizedDateCache.mm @nonARC

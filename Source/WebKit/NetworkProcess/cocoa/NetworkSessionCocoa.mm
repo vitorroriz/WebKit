@@ -47,7 +47,7 @@
 #import <Foundation/NSURLSession.h>
 #import <WebCore/AdvancedPrivacyProtections.h>
 #import <WebCore/Credential.h>
-#import <WebCore/FormDataStreamMac.h>
+#import <WebCore/FormDataStreamCocoa.h>
 #import <WebCore/FrameLoaderTypes.h>
 #import <WebCore/HTTPStatusCodes.h>
 #import <WebCore/NetworkStorageSession.h>

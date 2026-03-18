@@ -22,8 +22,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-#ifndef AuthenticationMac_h
-#define AuthenticationMac_h
+
+#pragma once
 
 #import <WebCore/PlatformExportMacros.h>
 
@@ -38,5 +38,3 @@ WEBCORE_EXPORT NSURLAuthenticationChallenge *mac(const AuthenticationChallenge&)
 WEBCORE_EXPORT AuthenticationChallenge core(NSURLAuthenticationChallenge *);
 
 }
-
-#endif // AuthenticationMac_h

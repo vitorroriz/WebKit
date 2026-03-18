@@ -26,7 +26,7 @@
 #import "config.h"
 #import "CredentialStorage.h"
 
-#import "AuthenticationMac.h"
+#import "AuthenticationCocoa.h"
 #import "Credential.h"
 #import "ProtectionSpace.h"
 

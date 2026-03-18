@@ -67,15 +67,14 @@ static NSDictionary* dictionaryThatCanCode(NSDictionary* src)
     [dst removeObjectForKey:NSUnderlyingErrorKey]; // (Immutable) CFError containing kCF equivalent of the above
     // We could reconstitute this but it's more trouble than it's worth
 
-    // Non-comprehensive safety check:  Kill top-level dictionary entries that don't conform to NSCoding.
+    // Non-comprehensive safety check: Kill top-level dictionary entries that don't conform to NSCoding.
     // We may hit ones we just removed, but that's fine.
     // We don't handle arbitrary objects that clients have stuffed into the dictionary, since we may not know how to
     // get at its conents (e.g., a CFError object -- you'd have to know it had a userInfo dictionary and kill things
     // inside it).
     [src enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL*) {
-        if (! [obj conformsToProtocol:@protocol(NSCoding)]) {
+        if (![obj conformsToProtocol:@protocol(NSCoding)])
             [dst removeObjectForKey:key];
-        }
         // FIXME: We could drill down into subdictionaries, but it seems more trouble than it's worth
     }];
 

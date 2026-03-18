@@ -22,8 +22,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
+
 #import "config.h"
-#import "AuthenticationMac.h"
+#import "AuthenticationCocoa.h"
 
 #import "AuthenticationChallenge.h"
 #import "AuthenticationClient.h"
@@ -34,8 +35,7 @@
 
 using namespace WebCore;
 
-@interface WebCoreAuthenticationClientAsChallengeSender : NSObject <NSURLAuthenticationChallengeSender>
-{
+@interface WebCoreAuthenticationClientAsChallengeSender : NSObject <NSURLAuthenticationChallengeSender> {
     WeakPtr<AuthenticationClient> m_client;
 }
 - (id)initWithAuthenticationClient:(AuthenticationClient*)client;
@@ -138,7 +138,7 @@ AuthenticationClient* AuthenticationChallenge::authenticationClient() const
 {
     if ([m_sender isMemberOfClass:[WebCoreAuthenticationClientAsChallengeSender class]])
         return [static_cast<WebCoreAuthenticationClientAsChallengeSender*>(m_sender.get()) client];
-    
+
     return nullptr;
 }
 
@@ -146,7 +146,7 @@ bool AuthenticationChallenge::platformCompare(const AuthenticationChallenge& a, 
 {
     if (a.sender() != b.sender())
         return false;
-        
+
     if (a.nsURLAuthenticationChallenge() != b.nsURLAuthenticationChallenge())
         return false;
 

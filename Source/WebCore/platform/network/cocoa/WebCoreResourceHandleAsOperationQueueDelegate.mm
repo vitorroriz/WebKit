@@ -27,7 +27,7 @@
 #import "WebCoreResourceHandleAsOperationQueueDelegate.h"
 
 #import "AuthenticationChallenge.h"
-#import "AuthenticationMac.h"
+#import "AuthenticationCocoa.h"
 #import "Logging.h"
 #import "NetworkingContext.h"
 #import "OriginAccessPatterns.h"
