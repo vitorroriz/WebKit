@@ -5361,6 +5361,9 @@ webkit.org/b/246356 imported/w3c/web-platform-tests/html/semantics/embedded-cont
 
 webkit.org/b/309893 http/tests/images/heic-as-heif.html [ Pass Timeout ImageOnlyFailure ]
 
+webkit.org/b/310178 css3/font-variant-font-face-override.html [ ImageOnlyFailure ]
+webkit.org/b/310178 fast/canvas/fill-text-with-font-features.html [ ImageOnlyFailure ]
+
 # End: Common failures between GTK and WPE.
 
 #////////////////////////////////////////////////////////////////////////////////////////
