@@ -6325,9 +6325,7 @@ fast/text/accessibility-bold-system-font [ Pass Failure ImageOnlyFailure ]
 imported/w3c/web-platform-tests/streams/transferable/gc-crash.html [ Skip ]
 
 # height: fill-available failures
-webkit.org/b/241104 fast/block/fill-available-with-no-specified-containing-block-height.html [ ImageOnlyFailure ]
 webkit.org/b/241104 fast/block/fill-available-with-absolute-position.html [ ImageOnlyFailure ]
-webkit.org/b/241104 fast/css/fill-available-with-percent-height-no-quirk.html [ ImageOnlyFailure ]
 
 # scroll anchoring failures
 imported/w3c/web-platform-tests/css/css-scroll-anchoring/anchor-inside-textarea.tentative.html [ Failure ]
@@ -7873,7 +7871,6 @@ imported/w3c/web-platform-tests/css/CSS2/floats/floats-rule3-outside-right-002.x
 imported/w3c/web-platform-tests/css/CSS2/floats/floats-rule7-outside-left-001.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/floats/floats-rule7-outside-right-001.xht [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/CSS2/floats/floats-wrap-bfc-006.xht [ ImageOnlyFailure ]
-webkit.org/b/239976 imported/w3c/web-platform-tests/css/CSS2/floats/floats-wrap-bfc-with-margin-001a.tentative.html [ ImageOnlyFailure ]
 webkit.org/b/239976 imported/w3c/web-platform-tests/css/CSS2/floats/floats-wrap-bfc-with-margin-002.tentative.html [ ImageOnlyFailure ]
 webkit.org/b/239976 imported/w3c/web-platform-tests/css/CSS2/floats/floats-wrap-bfc-with-margin-003.tentative.html [ ImageOnlyFailure ]
 webkit.org/b/239976 imported/w3c/web-platform-tests/css/CSS2/floats/floats-wrap-bfc-with-margin-004.html [ ImageOnlyFailure ]
