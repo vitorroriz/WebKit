@@ -1076,14 +1076,14 @@ void HistoryController::pushState(RefPtr<SerializedScriptValue>&& stateObject, c
     m_frame->navigationScheduler().adjustPendingHistoryNavigationForNewBackForwardEntry();
     protect(page->backForward())->addItem(WTF::move(topItem));
 
+    if (document && document->settings().navigationAPIEnabled())
+        protect(protect(document->window())->navigation())->updateForNavigation(*currentItem, NavigationNavigationType::Push);
+
     if (!canRecordHistoryForFrame(frame))
         return;
 
     addVisitedLink(*page, URL({ }, urlString));
     protect(frame->loader().client())->updateGlobalHistory();
-
-    if (document && document->settings().navigationAPIEnabled())
-        protect(protect(document->window())->navigation())->updateForNavigation(*currentItem, NavigationNavigationType::Push);
 }
 
 void HistoryController::updateBackForwardListForReplaceState(RefPtr<SerializedScriptValue>&& stateObject, const String& urlString)
