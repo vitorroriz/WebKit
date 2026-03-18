@@ -125,6 +125,7 @@ struct URLSchemeHandlerTests {
     }
 
     @Test(
+        .disabled("This test is too slow"),
         .bug("https://bugs.webkit.org/show_bug.cgi?id=295741"),
         arguments: [
             TestURLSchemeHandler.Delays(beforeYield: .seconds(2), beforeFinish: .zero),
