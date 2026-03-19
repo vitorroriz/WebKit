@@ -112,6 +112,30 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(Quirks);
 
 #if PLATFORM(IOS_FAMILY)
 static constexpr auto chromeUserAgentScript = "(function() { let userAgent = navigator.userAgent; Object.defineProperty(navigator, 'userAgent', { get: () => { return userAgent + ' Chrome/130.0.0.0 Android/15.0'; }, configurable: true }); })();"_s;
+
+// nba.com rdar://147429596
+static constexpr auto nbaSeekBarFixScript = R"js(if (!window.__nbaSeekFix) {
+    window.__nbaSeekFix = true;
+    document.addEventListener('touchmove', function({ target, touches }) {
+        if (!target?.getAttribute
+            || target.getAttribute('data-id') !== 'video-player:scrub-bar:controls'
+            || !touches?.[0])
+            return;
+        const touch = touches[0];
+        const rect = target.getBoundingClientRect();
+        const event = new MouseEvent('mousemove', {
+            clientX: touch.clientX,
+            clientY: touch.clientY,
+            screenX: touch.screenX,
+            screenY: touch.screenY,
+            bubbles: true,
+            cancelable: true
+        });
+        Object.defineProperty(event, 'offsetX', { value: touch.clientX - rect.left, configurable: true });
+        Object.defineProperty(event, 'offsetY', { value: touch.clientY - rect.top, configurable: true });
+        target.dispatchEvent(event);
+    }, false);
+})js"_s;
 #endif
 
 static inline OptionSet<AutoplayQuirk> allowedAutoplayQuirks(Document& document)
@@ -1916,6 +1940,10 @@ String Quirks::scriptToEvaluateBeforeRunningScriptFromURL(const URL& scriptURL)
     if (m_quirksData.quirkIsEnabled(QuirksData::SiteSpecificQuirk::NeedsGoogleTranslateScrollingQuirk) && !scriptURL.isEmpty()) [[unlikely]]
         return chromeUserAgentScript;
 
+    // nba.com rdar://147429596
+    if (m_quirksData.isNBA && !scriptURL.isEmpty()) [[unlikely]]
+        return nbaSeekBarFixScript;
+
 #if ENABLE(DESKTOP_CONTENT_MODE_QUIRKS)
     if (m_quirksData.isWebEx && scriptURL.lastPathComponent().startsWith("pushdownload."_s)) [[unlikely]]
         return "Object.defineProperty(window, 'Touch', { get: () => undefined });"_s;
@@ -3123,12 +3151,17 @@ static void handleMenloSecurityQuirks(QuirksData& quirksData, const URL& quirksU
 
 static void NODELETE handleNBAQuirks(QuirksData& quirksData, const URL& /* quirksURL */, const String& quirksDomainString, const URL& /* documentURL */)
 {
-#if PLATFORM(IOS)
+#if PLATFORM(IOS_FAMILY)
     QUIRKS_EARLY_RETURN_IF_NOT_DOMAIN("nba.com"_s);
 
     quirksData.isNBA = true;
 
+    // rdar://147429596
+    quirksData.enableQuirk(QuirksData::SiteSpecificQuirk::NeedsScriptToEvaluateBeforeRunningScriptFromURLQuirk);
+
+#if PLATFORM(IOS)
     quirksData.setQuirkState(QuirksData::SiteSpecificQuirk::ShouldEnterNativeFullscreenWhenCallingElementRequestFullscreen, PAL::currentUserInterfaceIdiomIsSmallScreen());
+#endif
 #else
     UNUSED_PARAM(quirksData);
     UNUSED_PARAM(quirksDomainString);
