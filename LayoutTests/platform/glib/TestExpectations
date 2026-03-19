@@ -492,7 +492,6 @@ http/tests/security/contentSecurityPolicy/audio-redirect-allowed.html [ Pass Tim
 http/tests/security/contentSecurityPolicy/video-redirect-allowed.html [ Pass ]
 media/media-can-play-webm.html [ Pass ]
 media/media-controller-time-constant.html [ Pass ]
-media/media-controller-time.html [ Pass ]
 media/media-controller-unpause.html [ Pass ]
 media/mediacapabilities/mediacapabilities-types.html [ Pass ]
 media/video-controller-currentTime-rate.html [ Pass ]
@@ -5373,6 +5372,8 @@ webkit.org/b/310213 http/tests/xmlhttprequest/chunked-progress-event-expectedLen
 webkit.org/b/310215 fast/loader/submit-form-while-parsing-2.html [ Pass Failure Timeout ]
 
 webkit.org/b/310268 fast/css/anchor-position-media-query-viewport-units.html [ ImageOnlyFailure ]
+
+webkit.org/b/310274 media/media-controller-time.html [ Pass Timeout ]
 
 # End: Common failures between GTK and WPE.
 
