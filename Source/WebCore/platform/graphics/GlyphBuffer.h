@@ -171,6 +171,14 @@ public:
         setWidth(lastAdvance, WebCore::width(lastAdvance) + width);
     }
 
+    void expandAdvance(unsigned index, GlyphBufferAdvance additionalAdvance)
+    {
+        ASSERT(index < size());
+        auto& advance = m_advances[index];
+        setWidth(advance, width(advance) + width(additionalAdvance));
+        setHeight(advance, height(advance) + height(additionalAdvance));
+    }
+
     void expandAdvanceToLogicalRight(unsigned index, float width)
     {
         if (index >= size()) {

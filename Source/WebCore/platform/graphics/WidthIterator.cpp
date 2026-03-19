@@ -152,12 +152,6 @@ static inline std::pair<bool, bool> NODELETE expansionLocation(bool ideograph, b
     return std::make_pair(expandLeft, expandRight);
 }
 
-static void NODELETE expandWithInitialAdvance(GlyphBufferAdvance& advanceToExpand, const GlyphBufferAdvance& initialAdvance)
-{
-    setWidth(advanceToExpand, width(advanceToExpand) + width(initialAdvance));
-    setHeight(advanceToExpand, height(advanceToExpand) + height(initialAdvance));
-}
-
 void WidthIterator::applyInitialAdvance(GlyphBuffer& glyphBuffer, GlyphBufferAdvance initialAdvance, unsigned lastGlyphCount)
 {
     ASSERT(glyphBuffer.size() >= lastGlyphCount);
@@ -168,8 +162,7 @@ void WidthIterator::applyInitialAdvance(GlyphBuffer& glyphBuffer, GlyphBufferAdv
     ASSERT(lastGlyphCount || (!width(m_leftoverInitialAdvance) && !height(m_leftoverInitialAdvance)));
 
     if (rtl() && lastGlyphCount) {
-        auto& visuallyLastAdvance = glyphBuffer.advanceAt(lastGlyphCount);
-        expandWithInitialAdvance(visuallyLastAdvance, m_leftoverInitialAdvance);
+        glyphBuffer.expandAdvance(lastGlyphCount, m_leftoverInitialAdvance);
         m_runWidthSoFar += width(m_leftoverInitialAdvance);
         m_leftoverInitialAdvance = makeGlyphBufferAdvance();
     }
@@ -178,8 +171,7 @@ void WidthIterator::applyInitialAdvance(GlyphBuffer& glyphBuffer, GlyphBufferAdv
         m_leftoverInitialAdvance = initialAdvance;
     else {
         if (lastGlyphCount) {
-            auto& visuallyPreviousAdvance = glyphBuffer.advanceAt(lastGlyphCount - 1);
-            expandWithInitialAdvance(visuallyPreviousAdvance, initialAdvance);
+            glyphBuffer.expandAdvance(lastGlyphCount - 1, initialAdvance);
             m_runWidthSoFar += width(initialAdvance);
         } else
             glyphBuffer.expandInitialAdvance(initialAdvance);
