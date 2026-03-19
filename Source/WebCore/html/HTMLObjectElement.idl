@@ -31,7 +31,7 @@
     [CEReactions=NotNeeded, Reflect] attribute DOMString height;
     [CheckSecurityForNode] readonly attribute Document? contentDocument;
     readonly attribute WindowProxy? contentWindow;
-    [CheckSecurityForNode] Document? getSVGDocument();
+    [CheckSecurityForNodeWithOwner] Document? getSVGDocument();
 
     readonly attribute boolean willValidate;
     readonly attribute ValidityState validity;

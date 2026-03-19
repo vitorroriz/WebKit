@@ -36,7 +36,7 @@
     [CEReactions=NotNeeded, EnabledBySetting=LazyIframeLoadingEnabled, Reflect, Enumerated=HTMLIFrameElementLoadingValues] attribute DOMString loading;
     [CheckSecurityForNode] readonly attribute Document? contentDocument;
     readonly attribute WindowProxy? contentWindow;
-    [CheckSecurityForNode] Document? getSVGDocument();
+    [CheckSecurityForNodeWithOwner] Document? getSVGDocument();
 
     // also has obsolete members
     // https://html.spec.whatwg.org/multipage/obsolete.html#HTMLIFrameElement-partial
