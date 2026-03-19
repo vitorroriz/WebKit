@@ -596,14 +596,11 @@ ExceptionOr<std::optional<std::tuple<PaymentDetailsModifier, ApplePayModifier>>>
         if (serializedModifierData[i].isEmpty())
             continue;
 
+        JSC::JSLockHolder lock(&lexicalGlobalObject);
         auto scope = DECLARE_THROW_SCOPE(lexicalGlobalObject.vm());
-        JSC::JSValue data;
-        {
-            JSC::JSLockHolder lock(&lexicalGlobalObject);
-            data = JSONParse(&lexicalGlobalObject, serializedModifierData[i]);
-            if (scope.exception())
-                return Exception(ExceptionCode::ExistingExceptionError);
-        }
+        auto data = JSONParse(&lexicalGlobalObject, serializedModifierData[i]);
+        if (scope.exception())
+            return Exception(ExceptionCode::ExistingExceptionError);
 
         auto applePayModifierConversionResult = convertDictionary<ApplePayModifier>(lexicalGlobalObject, WTF::move(data));
         if (applePayModifierConversionResult.hasException(scope))
@@ -920,6 +917,7 @@ ExceptionOr<void> ApplePayPaymentHandler::complete(Document& document, std::opti
     }
 
     if (!serializedData.isEmpty()) {
+        JSC::JSLockHolder lock(document.globalObject());
         auto throwScope = DECLARE_THROW_SCOPE(document.vm());
 
         auto parsedData = JSONParse(document.globalObject(), WTF::move(serializedData));
