@@ -5375,6 +5375,8 @@ webkit.org/b/310268 fast/css/anchor-position-media-query-viewport-units.html [ I
 
 webkit.org/b/310274 media/media-controller-time.html [ Pass Timeout ]
 
+webkit.org/b/310278 media/video-pause-play-resolve.html [ Pass Timeout ]
+
 # End: Common failures between GTK and WPE.
 
 #////////////////////////////////////////////////////////////////////////////////////////
