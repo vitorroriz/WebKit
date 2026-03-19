@@ -1349,3 +1349,5 @@ storage/indexeddb/modern/idbobjectstore-getallkeys-1.html [ Failure ]
 
 imported/w3c/web-platform-tests/screen-wake-lock/chrome-bug-1348019.https.html [ Skip ]
 imported/w3c/web-platform-tests/screen-wake-lock/wakelock-document-hidden.https.html [ Skip ]
+
+webkit.org/b/310273 imported/w3c/web-platform-tests/uievents/textInput/basic.html [ Pass Failure ]
