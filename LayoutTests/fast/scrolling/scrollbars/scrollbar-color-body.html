@@ -2,11 +2,9 @@
 <html>
 <head>
     <style>
-        html {
-            scrollbar-color: yellow blue;
-        }
         body {
             height: 1000px;
+            scrollbar-color: yellow blue;
         }
         .scroller {
             margin: 10px;
@@ -21,8 +19,8 @@
             height: 200%;
         }
     </style>
-    <script src="../../../../resources/js-test.js"></script>
-    <script src="../../../../resources/ui-helper.js"></script>
+    <script src="../../../resources/js-test.js"></script>
+    <script src="../../../resources/ui-helper.js"></script>
     
     <script>
         jsTestIsAsync = true;
@@ -32,7 +30,7 @@
 
         async function doTest()
         {
-            description('Test scrollbar-color on overflow and main document');
+            description('Test scrollbar-color on overflow and that setting it on body does not propagate to the root');
             if (!window.internals) {
                 finishJSTest();
                 return;
@@ -49,10 +47,10 @@
                 return scrollbarColor;
             });
 
-            debug('Document should have scrollbar-color');
+            debug('Document should not have scrollbar-color');
             await UIHelper.waitForConditionAsync(async () => {
                 let state = await UIHelper.verticalScrollbarState();
-                let scrollbarColor = state.indexOf('0000FF') != -1 && state.indexOf('FFFF00') != -1 ;
+                let scrollbarColor = state.indexOf('enabled') != -1;
                 if (scrollbarColor)
                     testPassed('Scrollbar state: ' + state);
                 return scrollbarColor;

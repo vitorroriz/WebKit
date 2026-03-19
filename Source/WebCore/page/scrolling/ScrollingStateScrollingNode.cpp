@@ -130,9 +130,7 @@ ScrollingStateScrollingNode::ScrollingStateScrollingNode(const ScrollingStateScr
     , m_verticalScrollerImp(stateNode.verticalScrollerImp())
     , m_horizontalScrollerImp(stateNode.horizontalScrollerImp())
 #endif
-#if PLATFORM(COCOA)
     , m_scrollbarColor(stateNode.scrollbarColor())
-#endif
     , m_scrollableAreaParameters(stateNode.scrollableAreaParameters())
     , m_requestedScrollData(stateNode.requestedScrollData())
     , m_keyboardScrollData(stateNode.keyboardScrollData())

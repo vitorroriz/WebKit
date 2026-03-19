@@ -7027,6 +7027,8 @@ imported/w3c/web-platform-tests/css/css-scrollbars/scrollbar-width-015.html [ Sk
 imported/w3c/web-platform-tests/css/css-scrollbars/scrollbar-width-016.html [ Skip ]
 
 # Skipping scrollbar-color tests that don't work with overlay scrollbars
+fast/scrolling/scrollbars/scrollbar-color.html [ Skip ]
+fast/scrolling/scrollbars/scrollbar-color-body.html [ Skip ]
 imported/w3c/web-platform-tests/css/css-scrollbars/scrollbar-color-001.html [ Skip ]
 imported/w3c/web-platform-tests/css/css-scrollbars/scrollbar-color-002.html [ Skip ]
 imported/w3c/web-platform-tests/css/css-scrollbars/scrollbar-color-003.html [ Skip ]
