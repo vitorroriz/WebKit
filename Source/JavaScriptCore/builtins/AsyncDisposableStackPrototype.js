@@ -119,8 +119,13 @@ function disposeAsync()
             try {
                 result = resource.method.@call(resource.value);
             } catch (error) {
-                handleError(error);
-                return;
+                if (thrown)
+                    suppressed = new @SuppressedError(error, suppressed);
+                else {
+                    thrown = true;
+                    suppressed = error;
+                }
+                continue;
             }
             hasAwaited = true;
             @promiseResolve(@Promise, result).@then(loop, handleError);
