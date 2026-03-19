@@ -73,6 +73,7 @@ public:
             buffer.resize(0);
             buffer.append('\0');
         } else {
+WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN // GLib ports
             va_list args, copyArgs;
             va_start(args, description);
             va_copy(copyArgs, args);
@@ -83,6 +84,7 @@ public:
 
             vsnprintf(buffer.mutableSpan().data(), descriptionLength + 1, description, copyArgs);
             va_end(copyArgs);
+WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
         }
 
         auto key = std::make_pair(pointer, static_cast<const void*>(name.data()));
@@ -109,6 +111,7 @@ public:
             Vector<char>& buffer = std::get<1>(*value);
 
             if (description && description[0] != '\0') {
+WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN // GLib ports
                 va_list args, copyArgs;
                 va_start(args, description);
                 va_copy(copyArgs, args);
@@ -131,6 +134,7 @@ public:
                     vsnprintf(span.data(), descriptionLength + 1, description, copyArgs);
                 }
                 va_end(copyArgs);
+WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
             }
 
             sysprof_collector_mark(startTime, time - startTime, m_processName, name.data(), buffer.span().data());
