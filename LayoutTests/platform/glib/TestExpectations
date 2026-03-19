@@ -5372,6 +5372,8 @@ webkit.org/b/310213 http/tests/xmlhttprequest/chunked-progress-event-expectedLen
 
 webkit.org/b/310215 fast/loader/submit-form-while-parsing-2.html [ Pass Failure Timeout ]
 
+webkit.org/b/310268 fast/css/anchor-position-media-query-viewport-units.html [ ImageOnlyFailure ]
+
 # End: Common failures between GTK and WPE.
 
 #////////////////////////////////////////////////////////////////////////////////////////
