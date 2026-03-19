@@ -83,6 +83,12 @@ module WebKit_Internal [system] {
         export *
     }
 
+    module NSGlassEffectView_Extras {
+        requires objc
+        header "../../UIProcess/Cocoa/NSGlassEffectView+Extras.h"
+        export *
+    }
+
     module WKTextSelectionRect {
         requires cplusplus20
         header "../../UIProcess/Cocoa/WKTextSelectionRect.h"
