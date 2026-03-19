@@ -1351,3 +1351,5 @@ imported/w3c/web-platform-tests/screen-wake-lock/chrome-bug-1348019.https.html [
 imported/w3c/web-platform-tests/screen-wake-lock/wakelock-document-hidden.https.html [ Skip ]
 
 webkit.org/b/310273 imported/w3c/web-platform-tests/uievents/textInput/basic.html [ Pass Failure ]
+
+webkit.org/b/310279 imported/w3c/web-platform-tests/html/semantics/interactive-elements/the-dialog-element/dialog-popover-closedby-simple.html [ Pass Failure ]
