@@ -2399,7 +2399,6 @@ accessibility/element-haspopup.html [ Pass ]
 
 # Regressions from ENABLE(ACCESSIBILITY_LOCAL_FRAME).
 # accessibility/empty-text-under-element-cached.html [ Pass ]
-accessibility/ios-simulator/unobscured-content-rect.html [ Failure ]
 
 accessibility/heading-level.html [ Pass ]
 accessibility/hidden-elements-with-aria-attributes.html [ Pass ]
