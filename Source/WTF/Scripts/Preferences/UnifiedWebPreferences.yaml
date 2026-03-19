@@ -1064,6 +1064,20 @@ CSSAppearanceBaseEnabled:
     WebCore:
       default: false
 
+CSSAttrSubstitutionFunctionEnabled:
+  type: bool
+  category: css
+  status: testable
+  humanReadableName: "CSS attr() substitution function"
+  humanReadableDescription: "Enable CSS Values 5 attr() arbitrary substitution function"
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+
 CSSAxisRelativePositionKeywordsEnabled:
   type: bool
   category: css

@@ -198,6 +198,10 @@ std::optional<Vector<CSSParserToken>> CSSVariableReferenceValue::resolveTokenRan
                     success = false;
                 continue;
             }
+            if (functionId == CSSValueAttr) {
+                // attr() substitution function
+                // FIXME: Implement.
+            }
             if (isCustomPropertyName(token.value())) {
                 // <dashed-function>
                 if (!evaluateDashedFunction(token.value(), range.consumeBlock(), tokens, builder))
