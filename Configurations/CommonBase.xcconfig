@@ -110,7 +110,7 @@ WK_SWIFT_MEMORY_SAFETY_FLAGS = $(WK_SWIFT_MEMORY_SAFETY_FLAGS_$(WK_XCODE_BEFORE_
 WK_SWIFT_MEMORY_SAFETY_FLAGS_ = -strict-memory-safety -enable-experimental-feature Lifetimes -enable-experimental-feature LifetimeDependence -enable-experimental-feature ImportNonPublicCxxMembers;
 
 // Treat memory safety warnings as errors.
-WK_SWIFT_MEMORY_SAFETY_ERROR_FLAGS = -Werror StrictMemorySafety;
+WK_SWIFT_MEMORY_SAFETY_ERROR_FLAGS = -Werror StrictMemorySafety -Werror ForeignReferenceType;
 // Keep it turned off on VisionOS until rdar://164555610 and rdar://164559261 are fixed.
 WK_SWIFT_MEMORY_SAFETY_ERROR_FLAGS[sdk=xr*] = ;
 // rdar://164903024: Work around false positives in some SDK versions.
