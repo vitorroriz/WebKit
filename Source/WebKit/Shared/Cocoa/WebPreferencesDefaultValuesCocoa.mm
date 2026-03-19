@@ -189,7 +189,7 @@ bool defaultHostedBlurMaterialInMediaControlsEnabled()
 }
 #endif
 
-bool NODELETE defaultIOSurfaceLosslessCompressionEnabled()
+bool defaultIOSurfaceLosslessCompressionEnabled()
 {
 #if HAVE(COREVIDEO_COMPRESSED_PIXEL_FORMAT_TYPES) && HAVE(LOSSLESS_COMPRESSED_IOSURFACE_CG_SUPPORT)
 #define WK_CA_FEATURE_CG_COMPRESSED_IOSURFACES 15

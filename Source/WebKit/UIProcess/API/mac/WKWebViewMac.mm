@@ -1205,7 +1205,7 @@ ALLOW_DEPRECATED_IMPLEMENTATIONS_END
     if (!_page)
         return NO;
 
-    if (!_page->preferences().contentInsetBackgroundFillEnabled())
+    if (!protect(_page->preferences())->contentInsetBackgroundFillEnabled())
         return NO;
 
     return _page->obscuredContentInsets().top() > 0 || _page->overflowHeightForTopScrollEdgeEffect() > 0;

@@ -599,14 +599,14 @@ static void* keyValueObservingContext = &keyValueObservingContext;
 
 - (void)_windowDidEnterOrExitFullScreen:(NSNotification *)notification
 {
-    if (_impl)
-        _impl->windowDidEnterOrExitFullScreen();
+    if (CheckedPtr impl = _impl.get())
+        impl->windowDidEnterOrExitFullScreen();
 }
 
 - (void)_windowWillEnterOrExitFullScreen:(NSNotification *)notification
 {
-    if (_impl)
-        _impl->windowWillEnterOrExitFullScreen();
+    if (CheckedPtr impl = _impl.get())
+        impl->windowWillEnterOrExitFullScreen();
 }
 
 - (void)_activeSpaceDidChange:(NSNotification *)notification
@@ -7325,7 +7325,7 @@ void WebViewImpl::updateScrollPocket()
     RetainPtr view = m_view.get();
     CGFloat topContentInset = obscuredContentInsets().top();
     CGFloat additionalHeight = page->overflowHeightForTopScrollEdgeEffect();
-    bool needsTopView = page->preferences().contentInsetBackgroundFillEnabled()
+    bool needsTopView = protect(page->preferences())->contentInsetBackgroundFillEnabled()
         && view
         && !view->_reasonsToHideTopScrollPocket
         && (m_clientImplicitlyRequestedTopScrollPocket || automaticallyAdjustsContentInsets())
@@ -7368,7 +7368,7 @@ void WebViewImpl::updateScrollPocket()
 
     auto topInsetFrame = NSMakeRect(NSMinX(bounds), NSMinY(bounds) - additionalHeight, NSWidth(bounds), additionalHeight + std::min<CGFloat>(topContentInset, NSHeight(bounds)));
 
-    if ([m_view _usesAutomaticContentInsetBackgroundFill]) {
+    if ([protect(m_view) _usesAutomaticContentInsetBackgroundFill]) {
         for (NSView *pocketContainer in m_viewsAboveScrollPocket.get())
             topInsetFrame = NSUnionRect(topInsetFrame, [view convertRect:pocketContainer.bounds fromView:pocketContainer]);
     }
@@ -7385,7 +7385,7 @@ void WebViewImpl::updateScrollPocket()
 
 void WebViewImpl::updateTopScrollPocketStyle()
 {
-    [m_topScrollPocket setStyle:[m_view _usesAutomaticContentInsetBackgroundFill] ? NSScrollPocketStyleAutomatic : NSScrollPocketStyleHard];
+    [m_topScrollPocket setStyle:[protect(m_view) _usesAutomaticContentInsetBackgroundFill] ? NSScrollPocketStyleAutomatic : NSScrollPocketStyleHard];
 }
 
 void WebViewImpl::registerViewAboveScrollPocket(NSView *containerView)

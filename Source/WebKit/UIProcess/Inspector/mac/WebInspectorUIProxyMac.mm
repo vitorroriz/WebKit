@@ -788,7 +788,7 @@ void WebInspectorUIProxy::inspectedViewFrameDidChange(CGFloat currentDimension)
 
     auto frameAdjustedForContentLayoutRect = [&](NSRect frameIgnoringContentLayoutRect) {
 #if ENABLE(CONTENT_INSET_BACKGROUND_FILL)
-        bool drawsScrollPocket = inspectedPage->preferences().contentInsetBackgroundFillEnabled() && inspectedPage->pendingOrActualObscuredContentInsets().top();
+        bool drawsScrollPocket = protect(inspectedPage->preferences())->contentInsetBackgroundFillEnabled() && inspectedPage->pendingOrActualObscuredContentInsets().top();
         if (drawsScrollPocket)
             return frameIgnoringContentLayoutRect;
 #endif

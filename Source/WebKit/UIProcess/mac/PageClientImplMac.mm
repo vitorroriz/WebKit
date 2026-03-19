@@ -1207,7 +1207,7 @@ void PageClientImpl::cancelTextRecognitionForVideoInElementFullscreen()
 void PageClientImpl::didChangeLocalInspectorAttachment()
 {
 #if ENABLE(CONTENT_INSET_BACKGROUND_FILL)
-    m_impl->updateScrollPocket();
+    protect(m_impl)->updateScrollPocket();
 #endif
 }
 
