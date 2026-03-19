@@ -60,7 +60,7 @@ const AtomString& CustomElementDefaultARIA::valueForAttribute(const Element& thi
     return WTF::visit(WTF::makeVisitor([&](const AtomString& stringValue) -> const AtomString& {
         return stringValue;
     }, [&](const WeakPtr<Element, WeakPtrImplWithEventTargetData>& weakElementValue) -> const AtomString& {
-        RefPtr elementValue = weakElementValue.get();
+        auto* elementValue = weakElementValue.get();
         if (elementValue && isElementVisible(*elementValue, thisElement))
             return elementValue->attributeWithoutSynchronization(HTMLNames::idAttr);
         return nullAtom();

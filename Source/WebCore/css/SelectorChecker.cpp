@@ -349,7 +349,7 @@ SelectorChecker::MatchResult SelectorChecker::matchRecursively(CheckingContext& 
                 matchType = MatchType::VirtualPseudoElementOnly;
                 break;
             }
-            if (CheckedPtr root = context.element->containingShadowRoot()) {
+            if (auto* root = context.element->containingShadowRoot()) {
                 if (root->mode() != ShadowRootMode::UserAgent)
                     return MatchResult::fails(Match::SelectorFailsLocally);
 

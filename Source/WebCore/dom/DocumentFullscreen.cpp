@@ -363,7 +363,7 @@ ExceptionOr<void> DocumentFullscreen::willEnterFullscreen(Element& element, HTML
     for (auto ancestor : ancestors | std::views::reverse)
         elementEnterFullscreen(ancestor);
 
-    if (RefPtr iframe = dynamicDowncast<HTMLIFrameElement>(element); iframe && !elementWasFullscreen)
+    if (auto* iframe = dynamicDowncast<HTMLIFrameElement>(element); iframe && !elementWasFullscreen)
         iframe->setIFrameFullscreenFlag(true);
 
     return { };
@@ -457,7 +457,7 @@ static Vector<Ref<Document>> documentsToUnfullscreen(Frame& firstFrame)
         ASSERT(protect(document->fullscreen())->fullscreenElement());
         if (!protect(document->fullscreen())->isSimpleFullscreenDocument())
             break;
-        if (RefPtr iframe = dynamicDowncast<HTMLIFrameElement>(document->ownerElement()); iframe && iframe->hasIFrameFullscreenFlag())
+        if (auto* iframe = dynamicDowncast<HTMLIFrameElement>(document->ownerElement()); iframe && iframe->hasIFrameFullscreenFlag())
             break;
     }
     return documents;

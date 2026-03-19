@@ -74,7 +74,7 @@ Seconds ScriptedAnimationController::interval() const
 
 Seconds ScriptedAnimationController::preferredScriptedAnimationInterval() const
 {
-    RefPtr page = this->page();
+    auto* page = this->page();
     if (!page)
         return FullSpeedAnimationInterval;
 

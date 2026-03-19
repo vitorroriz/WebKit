@@ -733,7 +733,7 @@ RefPtr<AXIsolatedObject> AXIsolatedObject::approximateHitTest(const IntPoint& po
 
     if (result) {
         if (std::optional stitchedIntoID = result->stitchedIntoID()) {
-            if (RefPtr stitchRepresentative = tree().objectForID(*stitchedIntoID))
+            if (auto* stitchRepresentative = tree().objectForID(*stitchedIntoID))
                 return stitchRepresentative;
         }
     }

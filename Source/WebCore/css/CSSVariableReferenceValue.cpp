@@ -165,8 +165,8 @@ bool CSSVariableReferenceValue::evaluateDashedFunction(StringView functionName, 
 
     CheckedPtr element = builder.state().element();
     auto customFunction = Style::Scope::resolveTreeScopedReference(*element, scopedFunctionName, [](const Style::Scope& scope, const AtomString& name) -> CheckedPtr<const Style::CustomFunction> {
-        RefPtr resolver = scope.resolverIfExists();
-        CheckedPtr registry = resolver ? resolver->customFunctionRegistry() : nullptr;
+        auto* resolver = scope.resolverIfExists();
+        auto* registry = resolver ? resolver->customFunctionRegistry() : nullptr;
         return registry ? registry->functionForName(name) : nullptr;
     });
 

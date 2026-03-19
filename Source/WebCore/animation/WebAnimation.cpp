@@ -916,8 +916,8 @@ void WebAnimation::enqueueAnimationEvent(Ref<AnimationEventBase>&& event)
             if (RefPtr source = scrollTimeline->source())
                 return source->document().existingTimeline();
         }
-        if (RefPtr keyframeEffect = this->keyframeEffect()) {
-            if (RefPtr target = keyframeEffect->target())
+        if (auto* keyframeEffect = this->keyframeEffect()) {
+            if (auto* target = keyframeEffect->target())
                 return target->document().existingTimeline();
         }
         return nullptr;
@@ -1811,7 +1811,7 @@ ExceptionOr<void> WebAnimation::commitStyles()
 
     auto unanimatedStyle = [&]() {
         if (auto styleable = Styleable::fromRenderer(*renderer)) {
-            if (CheckedPtr lastStyleChangeEventStyle = styleable->lastStyleChangeEventStyle())
+            if (auto* lastStyleChangeEventStyle = styleable->lastStyleChangeEventStyle())
                 return RenderStyle::clone(*lastStyleChangeEventStyle);
         }
         // If we don't have a style for the last style change event, then the

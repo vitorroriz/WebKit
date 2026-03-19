@@ -268,7 +268,7 @@ bool ShorthandSerializer::commonSerializationChecks(const StyleProperties& prope
             return true;
 
         // Don't serialize if any longhand was set to -internal-auto-base().
-        if (RefPtr functionValue = dynamicDowncast<CSSFunctionValue>(value); functionValue && functionValue->name() == CSSValueInternalAutoBase)
+        if (auto* functionValue = dynamicDowncast<CSSFunctionValue>(*value); functionValue && functionValue->name() == CSSValueInternalAutoBase)
             return true;
 
         // Don't serialize if any longhand was set by a different shorthand.
