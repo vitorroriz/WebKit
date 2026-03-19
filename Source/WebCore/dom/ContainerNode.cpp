@@ -381,7 +381,7 @@ static ALWAYS_INLINE void executeNodeInsertionWithScriptAssertion(ContainerNode&
 
     ASSERT(ScriptDisallowedScope::InMainThread::isEventDispatchAllowedInSubtree(child));
     for (auto& target : postInsertionNotificationTargets)
-        target->didFinishInsertingNode();
+        target->postConnectionSteps();
 
     if (source == ContainerNode::ChildChange::Source::API)
         dispatchChildInsertionEvents(child);
@@ -419,7 +419,7 @@ static ALWAYS_INLINE void executeNodeInsertionWithScriptAssertion(ContainerNode&
 
     ASSERT(ScriptDisallowedScope::InMainThread::isEventDispatchAllowedInSubtree(containerNode));
     for (auto& target : postInsertionNotificationTargets)
-        target->didFinishInsertingNode();
+        target->postConnectionSteps();
 
     if (source == ContainerNode::ChildChange::Source::API) {
         for (auto& child : children)
@@ -1188,7 +1188,7 @@ void ContainerNode::cloneChildNodes(Document& document, CustomElementRegistry* f
     clone.childrenChanged(makeChildChangeForCloneInsertion(hadElement ? ClonedChildIncludesElements::Yes : ClonedChildIncludesElements::No));
 
     for (auto& target : postInsertionNotificationTargets)
-        target->didFinishInsertingNode();
+        target->postConnectionSteps();
 }
 
 Vector<SerializedNode> ContainerNode::serializeChildNodes(size_t currentDepth) const

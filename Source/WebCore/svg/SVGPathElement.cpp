@@ -168,16 +168,16 @@ void SVGPathElement::invalidateMPathDependencies()
     }
 }
 
-Node::InsertedIntoAncestorResult SVGPathElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps SVGPathElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    auto result = SVGGeometryElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    auto result = SVGGeometryElement::insertionSteps(insertionType, parentOfInsertedTree);
     invalidateMPathDependencies();
     return result;
 }
 
-void SVGPathElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void SVGPathElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    SVGGeometryElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    SVGGeometryElement::removingSteps(removalType, oldParentOfRemovedTree);
     invalidateMPathDependencies();
 }
 

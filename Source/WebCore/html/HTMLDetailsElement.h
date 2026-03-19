@@ -46,8 +46,8 @@ public:
 private:
     HTMLDetailsElement(const QualifiedName&, Document&);
 
-    InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) final;
-    void didFinishInsertingNode() final;
+    NeedsPostConnectionSteps insertionSteps(InsertionType, ContainerNode&) final;
+    void postConnectionSteps() final;
 
     Vector<Ref<HTMLDetailsElement>> otherElementsInNameGroup() const;
     void ensureDetailsExclusivityAfterMutation();

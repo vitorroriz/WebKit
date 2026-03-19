@@ -144,23 +144,23 @@ void SVGFEImageElement::svgAttributeChanged(const QualifiedName& attrName)
     SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
 }
 
-Node::InsertedIntoAncestorResult SVGFEImageElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps SVGFEImageElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    SVGFilterPrimitiveStandardAttributes::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    SVGFilterPrimitiveStandardAttributes::insertionSteps(insertionType, parentOfInsertedTree);
     if (!insertionType.connectedToDocument)
-        return InsertedIntoAncestorResult::Done;
-    return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
+        return NeedsPostConnectionSteps::No;
+    return NeedsPostConnectionSteps::Yes;
 }
 
-void SVGFEImageElement::didFinishInsertingNode()
+void SVGFEImageElement::postConnectionSteps()
 {
-    SVGFilterPrimitiveStandardAttributes::didFinishInsertingNode();
+    SVGFilterPrimitiveStandardAttributes::postConnectionSteps();
     buildPendingResource();
 }
 
-void SVGFEImageElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void SVGFEImageElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    SVGFilterPrimitiveStandardAttributes::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    SVGFilterPrimitiveStandardAttributes::removingSteps(removalType, oldParentOfRemovedTree);
     if (removalType.disconnectedFromDocument)
         clearResourceReferences();
 }

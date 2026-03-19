@@ -67,8 +67,8 @@ public:
     WEBCORE_EXPORT void updateIconForNarrowLayout(const RefPtr<Image>& icon, const WebCore::FloatSize&);
     WEBCORE_EXPORT void updateIconForWideLayout(Vector<uint8_t>&&);
 
-    InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) final;
-    void removedFromAncestor(RemovalType, ContainerNode&) final;
+    NeedsPostConnectionSteps insertionSteps(InsertionType, ContainerNode&) final;
+    void removingSteps(RemovalType, ContainerNode&) final;
 
     String ensureUniqueIdentifier();
     AttachmentAssociatedElement* associatedElement() const;

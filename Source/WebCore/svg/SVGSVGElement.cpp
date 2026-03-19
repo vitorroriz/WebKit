@@ -520,7 +520,7 @@ bool SVGSVGElement::isReplaced(const RenderStyle*) const
     return isOutermostSVGSVGElement();
 }
 
-Node::InsertedIntoAncestorResult SVGSVGElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps SVGSVGElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
     if (insertionType.connectedToDocument) {
         Ref document = this->document();
@@ -535,17 +535,17 @@ Node::InsertedIntoAncestorResult SVGSVGElement::insertedIntoAncestor(InsertionTy
         if (!document->parsing() && !document->processingLoadEvent() && document->loadEventFinished())
             m_timeContainer->begin();
     }
-    return SVGGraphicsElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    return SVGGraphicsElement::insertionSteps(insertionType, parentOfInsertedTree);
 }
 
-void SVGSVGElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void SVGSVGElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
     if (removalType.disconnectedFromDocument) {
         Ref<Document> document = this->document();
         protect(document->svgExtensions())->removeTimeContainer(*this);
         pauseAnimations();
     }
-    SVGGraphicsElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    SVGGraphicsElement::removingSteps(removalType, oldParentOfRemovedTree);
 }
 
 void SVGSVGElement::pauseAnimations()

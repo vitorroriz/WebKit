@@ -699,7 +699,7 @@ void Element::cloneShadowTreeIfPossible(Element& newHost) const
         return downcast<ShadowRoot>(WTF::move(clone));
     }();
     if (oldShadowRoot->usesNullCustomElementRegistry())
-        clonedShadowRoot->setUsesNullCustomElementRegistry(); // Set this flag for Element::insertedIntoAncestor.
+        clonedShadowRoot->setUsesNullCustomElementRegistry(); // Set this flag for Element::insertionSteps.
     else {
         clonedShadowRoot->clearUsesNullCustomElementRegistry(); // Unset flag potentially set by DocumentFragment constructor
         if (RefPtr registry = oldShadowRoot->customElementRegistry()) {
@@ -3063,9 +3063,9 @@ RenderPtr<RenderElement> Element::createElementRenderer(RenderStyle&& style, con
     return RenderElement::createFor(*this, WTF::move(style));
 }
 
-Node::InsertedIntoAncestorResult Element::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps Element::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    ContainerNode::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    ContainerNode::insertionSteps(insertionType, parentOfInsertedTree);
 
     if (insertionType.treeScopeChanged) {
         RefPtr<HTMLDocument> newHTMLDocument = insertionType.connectedToDocument && parentOfInsertedTree.isInDocumentTree()
@@ -3128,7 +3128,7 @@ Node::InsertedIntoAncestorResult Element::insertedIntoAncestor(InsertionType ins
     if (!is<HTMLSlotElement>(*this))
         updateEffectiveTextDirectionIfNeeded();
 
-    return InsertedIntoAncestorResult::Done;
+    return NeedsPostConnectionSteps::No;
 }
 
 void Element::clearEffectiveLangStateOnNewDocumentElement()
@@ -3163,9 +3163,9 @@ bool Element::hasEffectiveLangState() const
     return false;
 }
 
-void Element::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void Element::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    ContainerNode::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    ContainerNode::removingSteps(removalType, oldParentOfRemovedTree);
 
     if (RefPtr<Page> page = document().page()) {
 #if ENABLE(POINTER_LOCK)
@@ -3435,7 +3435,7 @@ ExceptionOr<ShadowRoot&> Element::attachShadow(const ShadowRootInit& init, std::
         isPrecustomizedOrDefinedCustomElement() ? ShadowRootAvailableToElementInternals::Yes : ShadowRootAvailableToElementInternals::No,
         WTF::move(registry), scopedRegistry);
     if (registryKind == CustomElementRegistryKind::Null)
-        shadow->setUsesNullCustomElementRegistry(); // Set this flag for Element::insertedIntoAncestor.
+        shadow->setUsesNullCustomElementRegistry(); // Set this flag for Element::insertionSteps.
     shadow->setReferenceTarget(AtomString(init.referenceTarget));
     addShadowRoot(shadow.copyRef());
     return shadow.get();
@@ -3650,7 +3650,7 @@ void Element::childrenChanged(const ChildChange& change)
         switch (change.type) {
         case ChildChange::Type::ElementInserted:
         case ChildChange::Type::ElementRemoved:
-            // For elements, we notify shadowRoot in Element::insertedIntoAncestor and Element::removedFromAncestor.
+            // For elements, we notify shadowRoot in Element::insertionSteps and Element::removingSteps.
             break;
         case ChildChange::Type::AllChildrenRemoved:
         case ChildChange::Type::AllChildrenReplaced:

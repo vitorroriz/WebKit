@@ -576,7 +576,7 @@ void HTMLImageElement::didAttachRenderers()
         renderImage->setImageSizeForAltText();
 }
 
-Node::InsertedIntoAncestorResult HTMLImageElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps HTMLImageElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
     FormAssociatedElement::elementInsertedIntoAncestor(*this, insertionType);
     if (!form())
@@ -584,7 +584,7 @@ Node::InsertedIntoAncestorResult HTMLImageElement::insertedIntoAncestor(Insertio
 
     // Insert needs to complete first, before we start updating the loader. Loader dispatches events which could result
     // in callbacks back to this node.
-    Node::InsertedIntoAncestorResult insertNotificationRequest = HTMLElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    Node::NeedsPostConnectionSteps insertNotificationRequest = HTMLElement::insertionSteps(insertionType, parentOfInsertedTree);
 
     if (insertionType.treeScopeChanged && !m_parsedUsemap.isNull())
         protect(treeScope())->addImageElementByUsemap(m_parsedUsemap, *this);
@@ -605,7 +605,7 @@ Node::InsertedIntoAncestorResult HTMLImageElement::insertedIntoAncestor(Insertio
     return insertNotificationRequest;
 }
 
-void HTMLImageElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void HTMLImageElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
     if (removalType.treeScopeChanged && !m_parsedUsemap.isNull())
         protect(oldParentOfRemovedTree.treeScope())->removeImageElementByUsemap(m_parsedUsemap, *this);
@@ -616,7 +616,7 @@ void HTMLImageElement::removedFromAncestor(RemovalType removalType, ContainerNod
         selectImageSource(RelevantMutation::Yes);
     }
 
-    HTMLElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    HTMLElement::removingSteps(removalType, oldParentOfRemovedTree);
     FormAssociatedElement::elementRemovedFromAncestor(*this, removalType);
 }
 

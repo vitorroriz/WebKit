@@ -101,14 +101,14 @@ protected:
     void setHasRelevantLoadEventsListener(bool hasListener) { m_hasRelevantLoadEventsListener = hasListener; }
 
     // Helper functions used by our parent classes.
-    Node::InsertedIntoAncestorResult insertedIntoAncestor(Node::InsertionType insertionType, ContainerNode&) const
+    Node::NeedsPostConnectionSteps insertionSteps(Node::InsertionType insertionType, ContainerNode&) const
     {
         if (insertionType.connectedToDocument && m_parserInserted == ParserInserted::No)
-            return Node::InsertedIntoAncestorResult::NeedsPostInsertionCallback;
-        return Node::InsertedIntoAncestorResult::Done;
+            return Node::NeedsPostConnectionSteps::Yes;
+        return Node::NeedsPostConnectionSteps::No;
     }
 
-    void didFinishInsertingNode();
+    void postConnectionSteps();
     void childrenChanged(const ContainerNode::ChildChange&);
     void finishParsingChildren();
     void handleSourceAttribute(const String& sourceURL);

@@ -113,28 +113,28 @@ void SVGUseElement::attributeChanged(const QualifiedName& name, const AtomString
     SVGGraphicsElement::attributeChanged(name, oldValue, newValue, attributeModificationReason);
 }
 
-Node::InsertedIntoAncestorResult SVGUseElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps SVGUseElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    auto result = SVGGraphicsElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    auto result = SVGGraphicsElement::insertionSteps(insertionType, parentOfInsertedTree);
     if (insertionType.connectedToDocument) {
         if (m_shadowTreeNeedsUpdate)
             protect(document())->addElementWithPendingUserAgentShadowTreeUpdate(*this);
         invalidateShadowTree();
         // FIXME: Move back the call to updateExternalDocument() here once notifyFinished is made always async.
-        return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
+        return NeedsPostConnectionSteps::Yes;
     }
     return result;
 }
 
-void SVGUseElement::didFinishInsertingNode()
+void SVGUseElement::postConnectionSteps()
 {
-    SVGGraphicsElement::didFinishInsertingNode();
+    SVGGraphicsElement::postConnectionSteps();
     updateExternalDocument();
 }
 
-void SVGUseElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void SVGUseElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    // Check m_shadowTreeNeedsUpdate before calling SVGElement::removedFromAncestor which calls SVGElement::invalidateInstances
+    // Check m_shadowTreeNeedsUpdate before calling SVGElement::removingSteps which calls SVGElement::invalidateInstances
     // and SVGUseElement::updateExternalDocument which calls invalidateShadowTree().
     if (removalType.disconnectedFromDocument) {
         if (m_shadowTreeNeedsUpdate) {
@@ -142,7 +142,7 @@ void SVGUseElement::removedFromAncestor(RemovalType removalType, ContainerNode& 
             document->removeElementWithPendingUserAgentShadowTreeUpdate(*this);
         }
     }
-    SVGGraphicsElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    SVGGraphicsElement::removingSteps(removalType, oldParentOfRemovedTree);
     if (removalType.disconnectedFromDocument) {
         clearShadowTree();
         updateExternalDocument();

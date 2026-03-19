@@ -112,19 +112,19 @@ Ref<HTMLCollection> HTMLMapElement::areas()
     return ensureRareData().ensureNodeLists().addCachedCollection<HTMLMapAreasCollection>(*this);
 }
 
-Node::InsertedIntoAncestorResult HTMLMapElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps HTMLMapElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    Node::InsertedIntoAncestorResult request = HTMLElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    Node::NeedsPostConnectionSteps request = HTMLElement::insertionSteps(insertionType, parentOfInsertedTree);
     if (insertionType.treeScopeChanged)
         treeScope().addImageMap(*this, m_name, getIdAttribute());
     return request;
 }
 
-void HTMLMapElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void HTMLMapElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
     if (removalType.treeScopeChanged)
         oldParentOfRemovedTree.treeScope().removeImageMap(*this, m_name, getIdAttribute());
-    HTMLElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    HTMLElement::removingSteps(removalType, oldParentOfRemovedTree);
 }
 
 }

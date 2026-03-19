@@ -120,9 +120,9 @@ void HTMLOptGroupElement::didAddUserAgentShadowRoot(ShadowRoot& root)
     root.appendChild(HTMLSlotElement::create(slotTag, document));
 }
 
-auto HTMLOptGroupElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree) -> InsertedIntoAncestorResult
+auto HTMLOptGroupElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree) -> NeedsPostConnectionSteps
 {
-    auto result = HTMLElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    auto result = HTMLElement::insertionSteps(insertionType, parentOfInsertedTree);
 
     if (!document().settings().htmlEnhancedSelectParsingEnabled())
         return result;
@@ -140,9 +140,9 @@ auto HTMLOptGroupElement::insertedIntoAncestor(InsertionType insertionType, Cont
     return result;
 }
 
-void HTMLOptGroupElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void HTMLOptGroupElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    HTMLElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    HTMLElement::removingSteps(removalType, oldParentOfRemovedTree);
 
     if (removalType.disconnectedFromDocument && m_shadowTreeNeedsUpdate)
         protect(document())->removeElementWithPendingUserAgentShadowTreeUpdate(*this);

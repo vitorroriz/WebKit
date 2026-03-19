@@ -409,19 +409,19 @@ void HTMLElement::attributeChanged(const QualifiedName& name, const AtomString& 
         setAttributeEventListener(eventName, name, newValue);
 }
 
-Node::InsertedIntoAncestorResult HTMLElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps HTMLElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    auto result = StyledElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    auto result = StyledElement::insertionSteps(insertionType, parentOfInsertedTree);
     hideNonce();
     return result;
 }
 
-void HTMLElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void HTMLElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
     if (popoverData())
         hidePopoverInternal(FocusPreviousElement::No, FireEvents::No);
 
-    StyledElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    StyledElement::removingSteps(removalType, oldParentOfRemovedTree);
 }
 
 static Ref<DocumentFragment> textToFragment(Document& document, const String& text)

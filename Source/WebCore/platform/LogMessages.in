@@ -97,9 +97,9 @@ MEDIASESSIONMANAGERINTERFACE_MAYBEACTIVATEAUDIOSESSION_ACTIVE_SESSION_NOT_REQUIR
 HTMLMEDIAELEMENT_CONSTRUCTOR, "HTMLMediaElement::HTMLMediaElement(%" PRIX64 ")", (uint64_t), DEFAULT, Media
 HTMLMEDIAELEMENT_DESTRUCTOR, "HTMLMediaElement::~HTMLMediaElement(%" PRIX64 ")", (uint64_t), DEFAULT, Media
 HTMLMEDIAELEMENT_SETBUFFERINGPOLICY, "HTMLMediaElement::setBufferingPolicy(%" PRIX64 "): %" PRIu8, (uint64_t, uint8_t), DEFAULT, Media
-HTMLMEDIAELEMENT_INSERTEDINTOANCESTOR, "HTMLMediaElement::insertedIntoAncestor(%" PRIX64 ")", (uint64_t), DEFAULT, Media
-HTMLMEDIAELEMENT_REMOVEDFROMANCESTOR, "HTMLMediaElement::removedFromAncestor(%" PRIX64 ")", (uint64_t), DEFAULT, Media
-HTMLMEDIAELEMENT_DIDFINISHINSERTINGNODE, "HTMLMediaElement::didFinishInsertingNode(%" PRIX64 ")", (uint64_t), DEFAULT, Media
+HTMLMEDIAELEMENT_INSERTEDINTOANCESTOR, "HTMLMediaElement::insertionSteps(%" PRIX64 ")", (uint64_t), DEFAULT, Media
+HTMLMEDIAELEMENT_REMOVEDFROMANCESTOR, "HTMLMediaElement::removingSteps(%" PRIX64 ")", (uint64_t), DEFAULT, Media
+HTMLMEDIAELEMENT_DIDFINISHINSERTINGNODE, "HTMLMediaElement::postConnectionSteps(%" PRIX64 ")", (uint64_t), DEFAULT, Media
 HTMLMEDIAELEMENT_MEDIAPLAYERRATECHANGED, "HTMLMediaElement::mediaPlayerRateChanged(%" PRIX64 ") rate: %f", (uint64_t, double), DEFAULT, Media
 HTMLMEDIAELEMENT_MEDIAPLAYERTIMECHANGED, "HTMLMediaElement::mediaPlayerTimeChanged(%" PRIX64 ")", (uint64_t), DEFAULT, Media
 HTMLMEDIAELEMENT_MEDIAPLAYERTIMECHANGED_LOOPING, "HTMLMediaElement::mediaPlayerTimeChanged(%" PRIX64 ") current time (%f) is greater then duration (%f), looping", (uint64_t, double, double), DEFAULT, Media

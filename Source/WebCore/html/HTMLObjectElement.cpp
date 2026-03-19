@@ -237,23 +237,23 @@ void HTMLObjectElement::updateWidget(CreatePlugins createPlugins)
         renderFallbackContent();
 }
 
-Node::InsertedIntoAncestorResult HTMLObjectElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps HTMLObjectElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    HTMLPlugInElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    HTMLPlugInElement::insertionSteps(insertionType, parentOfInsertedTree);
     FormListedElement::elementInsertedIntoAncestor(*this, insertionType);
     if (!insertionType.connectedToDocument)
-        return InsertedIntoAncestorResult::Done;
-    return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
+        return NeedsPostConnectionSteps::No;
+    return NeedsPostConnectionSteps::Yes;
 }
 
-void HTMLObjectElement::didFinishInsertingNode()
+void HTMLObjectElement::postConnectionSteps()
 {
     resetFormOwner();
 }
 
-void HTMLObjectElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void HTMLObjectElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    HTMLPlugInElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    HTMLPlugInElement::removingSteps(removalType, oldParentOfRemovedTree);
     FormListedElement::elementRemovedFromAncestor(*this, removalType);
 }
 

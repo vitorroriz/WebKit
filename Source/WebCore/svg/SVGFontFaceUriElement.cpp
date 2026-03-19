@@ -83,10 +83,10 @@ void SVGFontFaceUriElement::childrenChanged(const ChildChange& change)
         grandParent->rebuildFontFace();
 }
 
-Node::InsertedIntoAncestorResult SVGFontFaceUriElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps SVGFontFaceUriElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
     loadFont();
-    return SVGElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    return SVGElement::insertionSteps(insertionType, parentOfInsertedTree);
 }
 
 static bool isSVGFontTarget(const SVGFontFaceUriElement& element)

@@ -62,8 +62,8 @@ private:
     int defaultTabIndex() const final;
 
     void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) final;
-    InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode& parentOfInsertedTree) final;
-    void removedFromAncestor(RemovalType, ContainerNode& oldParentOfRemovedTree) final;
+    NeedsPostConnectionSteps insertionSteps(InsertionType, ContainerNode& parentOfInsertedTree) final;
+    void removingSteps(RemovalType, ContainerNode& oldParentOfRemovedTree) final;
     bool hasPresentationalHintsForAttribute(const QualifiedName&) const final;
     void defaultEventHandler(Event&) final;
 

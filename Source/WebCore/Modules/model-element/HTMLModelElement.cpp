@@ -1697,9 +1697,9 @@ bool HTMLModelElement::isURLAttribute(const Attribute& attribute) const
         || HTMLElement::isURLAttribute(attribute);
 }
 
-Node::InsertedIntoAncestorResult HTMLModelElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps HTMLModelElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    auto insertResult = HTMLElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    auto insertResult = HTMLElement::insertionSteps(insertionType, parentOfInsertedTree);
 
     if (insertionType.connectedToDocument) {
         Ref document = this->document();
@@ -1714,9 +1714,9 @@ Node::InsertedIntoAncestorResult HTMLModelElement::insertedIntoAncestor(Insertio
     return insertResult;
 }
 
-void HTMLModelElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void HTMLModelElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    HTMLElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    HTMLElement::removingSteps(removalType, oldParentOfRemovedTree);
 
     if (removalType.disconnectedFromDocument) {
         Ref document = this->document();

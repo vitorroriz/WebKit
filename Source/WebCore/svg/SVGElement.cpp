@@ -183,9 +183,9 @@ void SVGElement::reportAttributeParsingError(SVGParsingError error, const Qualif
     ASSERT_NOT_REACHED();
 }
 
-void SVGElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void SVGElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    StyledElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    StyledElement::removingSteps(removalType, oldParentOfRemovedTree);
 
     if (!parentNode()) {
         m_hasRegisteredWithParentForRelativeLengths = false;
@@ -1056,9 +1056,9 @@ void SVGElement::svgAttributeChanged(const QualifiedName& attrName)
     }
 }
 
-Node::InsertedIntoAncestorResult SVGElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps SVGElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    StyledElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    StyledElement::insertionSteps(insertionType, parentOfInsertedTree);
 
     if (!m_hasInitializedRelativeLengthsState)
         updateRelativeLengthsInformation();
@@ -1069,13 +1069,13 @@ Node::InsertedIntoAncestorResult SVGElement::insertedIntoAncestor(InsertionType 
 
     if (needsPendingResourceHandling() && insertionType.connectedToDocument && !isInShadowTree()) {
         if (treeScopeForSVGReferences().isIdOfPendingSVGResource(getIdAttribute()))
-            return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
+            return NeedsPostConnectionSteps::Yes;
     }
 
-    return InsertedIntoAncestorResult::Done;
+    return NeedsPostConnectionSteps::No;
 }
 
-void SVGElement::didFinishInsertingNode()
+void SVGElement::postConnectionSteps()
 {
     buildPendingResourcesIfNeeded();
 }

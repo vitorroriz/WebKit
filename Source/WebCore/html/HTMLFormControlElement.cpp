@@ -105,20 +105,20 @@ String HTMLFormControlElement::formAction() const
     return document->completeURL(value).string();
 }
 
-Node::InsertedIntoAncestorResult HTMLFormControlElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps HTMLFormControlElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    HTMLElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
-    ValidatedFormListedElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    HTMLElement::insertionSteps(insertionType, parentOfInsertedTree);
+    ValidatedFormListedElement::insertionSteps(insertionType, parentOfInsertedTree);
 
     if (!insertionType.connectedToDocument)
-        return InsertedIntoAncestorResult::Done;
-    return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
+        return NeedsPostConnectionSteps::No;
+    return NeedsPostConnectionSteps::Yes;
 }
 
-void HTMLFormControlElement::didFinishInsertingNode()
+void HTMLFormControlElement::postConnectionSteps()
 {
-    HTMLElement::didFinishInsertingNode();
-    ValidatedFormListedElement::didFinishInsertingNode();
+    HTMLElement::postConnectionSteps();
+    ValidatedFormListedElement::postConnectionSteps();
 }
 
 void HTMLFormControlElement::didMoveToNewDocument(Document& oldDocument, Document& newDocument)
@@ -127,10 +127,10 @@ void HTMLFormControlElement::didMoveToNewDocument(Document& oldDocument, Documen
     ValidatedFormListedElement::didMoveToNewDocument();
 }
 
-void HTMLFormControlElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void HTMLFormControlElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    HTMLElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
-    ValidatedFormListedElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    HTMLElement::removingSteps(removalType, oldParentOfRemovedTree);
+    ValidatedFormListedElement::removingSteps(removalType, oldParentOfRemovedTree);
 }
 
 void HTMLFormControlElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason attributeModificationReason)

@@ -648,9 +648,9 @@ static bool shouldMonitorDocumentTraffic(Document& document)
 }
 #endif // ATTACHMENT_LOG_DOCUMENT_TRAFFIC
 
-Node::InsertedIntoAncestorResult HTMLAttachmentElement::insertedIntoAncestor(InsertionType type, ContainerNode& ancestor)
+Node::NeedsPostConnectionSteps HTMLAttachmentElement::insertionSteps(InsertionType type, ContainerNode& ancestor)
 {
-    auto result = HTMLElement::insertedIntoAncestor(type, ancestor);
+    auto result = HTMLElement::insertionSteps(type, ancestor);
     if (isWideLayout()) {
         setInlineStyleProperty(CSSPropertyMarginLeft, 1, CSSUnitType::CSS_PX);
         setInlineStyleProperty(CSSPropertyMarginRight, 1, CSSUnitType::CSS_PX);
@@ -684,9 +684,9 @@ Node::InsertedIntoAncestorResult HTMLAttachmentElement::insertedIntoAncestor(Ins
     return result;
 }
 
-void HTMLAttachmentElement::removedFromAncestor(RemovalType type, ContainerNode& ancestor)
+void HTMLAttachmentElement::removingSteps(RemovalType type, ContainerNode& ancestor)
 {
-    HTMLElement::removedFromAncestor(type, ancestor);
+    HTMLElement::removingSteps(type, ancestor);
 
     Ref document = this->document();
 #if ATTACHMENT_LOG_DOCUMENT_TRAFFIC

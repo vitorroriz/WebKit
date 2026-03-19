@@ -128,9 +128,9 @@ ShadowRoot::~ShadowRoot()
     removeDetachedChildren();
 }
 
-Node::InsertedIntoAncestorResult ShadowRoot::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps ShadowRoot::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    DocumentFragment::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    DocumentFragment::insertionSteps(insertionType, parentOfInsertedTree);
     if (!m_hasScopedCustomElementRegistry && usesNullCustomElementRegistry() && !parentOfInsertedTree.usesNullCustomElementRegistry()) {
         if (RefPtr registry = CustomElementRegistry::registryForElement(*host())) {
             clearUsesNullCustomElementRegistry();
@@ -146,12 +146,12 @@ Node::InsertedIntoAncestorResult ShadowRoot::insertedIntoAncestor(InsertionType 
     }
     if (!adoptedStyleSheets().empty() && document().frame())
         protect(styleScope())->didChangeActiveStyleSheetCandidates();
-    return InsertedIntoAncestorResult::Done;
+    return NeedsPostConnectionSteps::No;
 }
 
-void ShadowRoot::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void ShadowRoot::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    DocumentFragment::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    DocumentFragment::removingSteps(removalType, oldParentOfRemovedTree);
     if (removalType.disconnectedFromDocument)
         protect(document())->didRemoveInDocumentShadowRoot(*this);
 }

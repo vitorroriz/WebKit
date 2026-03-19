@@ -99,7 +99,7 @@ ScriptElement::ScriptElement(Element& element, bool parserInserted, bool already
     }
 }
 
-void ScriptElement::didFinishInsertingNode()
+void ScriptElement::postConnectionSteps()
 {
     if (m_parserInserted == ParserInserted::No)
         prepareScript(); // FIXME: Provide a real starting line number here.

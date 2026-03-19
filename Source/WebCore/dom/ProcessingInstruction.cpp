@@ -267,23 +267,23 @@ void ProcessingInstruction::addSubresourceAttributeURLs(ListHashSet<URL>& urls) 
     addSubresourceURL(urls, sheet()->baseURL());
 }
 
-Node::InsertedIntoAncestorResult ProcessingInstruction::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps ProcessingInstruction::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    CharacterData::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    CharacterData::insertionSteps(insertionType, parentOfInsertedTree);
     if (!insertionType.connectedToDocument)
-        return InsertedIntoAncestorResult::Done;
+        return NeedsPostConnectionSteps::No;
     document().styleScope().addStyleSheetCandidateNode(*this, m_createdByParser);
-    return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
+    return NeedsPostConnectionSteps::Yes;
 }
 
-void ProcessingInstruction::didFinishInsertingNode()
+void ProcessingInstruction::postConnectionSteps()
 {
     checkStyleSheet();
 }
 
-void ProcessingInstruction::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void ProcessingInstruction::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    CharacterData::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    CharacterData::removingSteps(removalType, oldParentOfRemovedTree);
     if (!removalType.disconnectedFromDocument)
         return;
     

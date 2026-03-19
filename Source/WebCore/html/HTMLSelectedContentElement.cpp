@@ -50,20 +50,20 @@ Ref<HTMLSelectedContentElement> HTMLSelectedContentElement::create(const Qualifi
     return adoptRef(*new HTMLSelectedContentElement(document));
 }
 
-auto HTMLSelectedContentElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree) -> InsertedIntoAncestorResult
+auto HTMLSelectedContentElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree) -> NeedsPostConnectionSteps
 {
-    HTMLElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    HTMLElement::insertionSteps(insertionType, parentOfInsertedTree);
 
     ASSERT(document().settings().htmlEnhancedSelectParsingEnabled());
     ASSERT(document().settings().htmlEnhancedSelectEnabled());
     ASSERT(!document().settings().mutationEventsEnabled());
 
     if (insertionType.connectedToDocument)
-        return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
-    return InsertedIntoAncestorResult::Done;
+        return NeedsPostConnectionSteps::Yes;
+    return NeedsPostConnectionSteps::No;
 }
 
-void HTMLSelectedContentElement::didFinishInsertingNode()
+void HTMLSelectedContentElement::postConnectionSteps()
 {
     RefPtr<HTMLSelectElement> nearestAncestorSelect;
     m_isDisabled = false;
@@ -93,9 +93,9 @@ void HTMLSelectedContentElement::didFinishInsertingNode()
     nearestAncestorSelect->updateSelectedContent();
 }
 
-void HTMLSelectedContentElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void HTMLSelectedContentElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    HTMLElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    HTMLElement::removingSteps(removalType, oldParentOfRemovedTree);
 
     if (RefPtr select = m_owningSelect; select && !isInclusiveDescendantOf(*select)) {
         select->unregisterSelectedContentElement();

@@ -191,21 +191,21 @@ void HTMLDetailsElement::attributeChanged(const QualifiedName& name, const AtomS
         ensureDetailsExclusivityAfterMutation();
 }
 
-Node::InsertedIntoAncestorResult HTMLDetailsElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps HTMLDetailsElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    HTMLElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    HTMLElement::insertionSteps(insertionType, parentOfInsertedTree);
 
     m_shouldCloseElementAfterInsertion = shouldClose();
 
     if (!insertionType.connectedToDocument)
-        return InsertedIntoAncestorResult::Done;
-    return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
+        return NeedsPostConnectionSteps::No;
+    return NeedsPostConnectionSteps::Yes;
 }
 
-void HTMLDetailsElement::didFinishInsertingNode()
+void HTMLDetailsElement::postConnectionSteps()
 {
     // FIXME: Spec makes this DOM mutation synchronously in "insertion steps"
-    // but our current model of insertedIntoAncestor is not compatible with that.
+    // but our current model of insertionSteps is not compatible with that.
     if (hasAttributeWithoutSynchronization(openAttr) && m_shouldCloseElementAfterInsertion) {
         ShouldNotFireMutationEventsScope scope(document());
         toggleOpen();

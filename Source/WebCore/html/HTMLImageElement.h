@@ -214,8 +214,8 @@ private:
     void addSubresourceAttributeURLs(ListHashSet<URL>&) const override;
     void addCandidateSubresourceURLs(ListHashSet<URL>&) const override;
 
-    InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) override;
-    void removedFromAncestor(RemovalType, ContainerNode&) override;
+    NeedsPostConnectionSteps insertionSteps(InsertionType, ContainerNode&) override;
+    void removingSteps(RemovalType, ContainerNode&) override;
 
     bool NODELETE isFormListedElement() const final { return false; }
     FormAssociatedElement* NODELETE asFormAssociatedElement() final { return this; }

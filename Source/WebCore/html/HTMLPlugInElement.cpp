@@ -222,17 +222,17 @@ void HTMLPlugInElement::collectPresentationalHintsForAttribute(const QualifiedNa
     }
 }
 
-Node::InsertedIntoAncestorResult HTMLPlugInElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps HTMLPlugInElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    auto result = HTMLFrameOwnerElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    auto result = HTMLFrameOwnerElement::insertionSteps(insertionType, parentOfInsertedTree);
     if (insertionType.connectedToDocument)
         document().didConnectPluginElement();
     return result;
 }
 
-void HTMLPlugInElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void HTMLPlugInElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    HTMLFrameOwnerElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    HTMLFrameOwnerElement::removingSteps(removalType, oldParentOfRemovedTree);
     if (removalType.disconnectedFromDocument)
         document().didDisconnectPluginElement();
 }

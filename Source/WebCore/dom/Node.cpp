@@ -1486,7 +1486,7 @@ void Node::queueTaskToDispatchEvent(TaskSource source, Ref<Event>&& event)
     });
 }
 
-Node::InsertedIntoAncestorResult Node::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps Node::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
     ASSERT(!containsSelectionEndPoint());
     if (insertionType.connectedToDocument)
@@ -1496,10 +1496,10 @@ Node::InsertedIntoAncestorResult Node::insertedIntoAncestor(InsertionType insert
 
     invalidateStyle(Style::Validity::SubtreeInvalid, Style::InvalidationMode::InsertedIntoAncestor);
 
-    return InsertedIntoAncestorResult::Done;
+    return NeedsPostConnectionSteps::No;
 }
 
-void Node::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void Node::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
     ASSERT(!containsSelectionEndPoint());
     if (removalType.disconnectedFromDocument)

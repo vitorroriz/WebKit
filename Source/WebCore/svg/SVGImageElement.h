@@ -64,7 +64,7 @@ private:
     void svgAttributeChanged(const QualifiedName&) final;
 
     void didAttachRenderers() final;
-    InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) final;
+    NeedsPostConnectionSteps insertionSteps(InsertionType, ContainerNode&) final;
     RenderPtr<RenderElement> createElementRenderer(RenderStyle&&, const RenderTreePosition&) final;
 
     void addSubresourceAttributeURLs(ListHashSet<URL>&) const final;

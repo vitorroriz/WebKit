@@ -128,7 +128,7 @@ private:
     SVGTextPathElement(const QualifiedName&, Document&);
     virtual ~SVGTextPathElement();
 
-    void didFinishInsertingNode() override;
+    void postConnectionSteps() override;
 
     void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) override;
     void svgAttributeChanged(const QualifiedName&) override;
@@ -139,8 +139,8 @@ private:
 
     void clearResourceReferences();
     void buildPendingResource() override;
-    InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) override;
-    void removedFromAncestor(RemovalType, ContainerNode&) override;
+    NeedsPostConnectionSteps insertionSteps(InsertionType, ContainerNode&) override;
+    void removingSteps(RemovalType, ContainerNode&) override;
 
     bool selfHasRelativeLengths() const override;
 

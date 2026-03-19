@@ -496,24 +496,25 @@ public:
     WEBCORE_EXPORT const RenderStyle* computedStyle();
     virtual const RenderStyle* computedStyle(const std::optional<Style::PseudoElementIdentifier>&);
 
-    enum class InsertedIntoAncestorResult {
-        Done,
-        NeedsPostInsertionCallback,
-    };
+    enum class NeedsPostConnectionSteps : bool { No, Yes };
     struct InsertionType {
         bool connectedToDocument { false };
         bool treeScopeChanged { false };
     };
+    // https://dom.spec.whatwg.org/#concept-node-insert-ext
     // Called *after* this node or its ancestor is inserted into a new parent (may or may not be a part of document) by scripts or parser.
-    // insertedInto **MUST NOT** invoke scripts. Return NeedsPostInsertionCallback and implement didFinishInsertingNode instead to run scripts.
-    virtual InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode& parentOfInsertedTree);
-    virtual void didFinishInsertingNode() { }
+    // insertionSteps **MUST NOT** invoke scripts. Return NeedsPostConnectionSteps and implement postConnectionSteps instead to run scripts.
+    virtual NeedsPostConnectionSteps insertionSteps(InsertionType, ContainerNode& parentOfInsertedTree);
+
+    // https://dom.spec.whatwg.org/#concept-node-post-connection-ext
+    virtual void postConnectionSteps() { }
 
     struct RemovalType {
         bool disconnectedFromDocument { false };
         bool treeScopeChanged { false };
     };
-    virtual void removedFromAncestor(RemovalType, ContainerNode& oldParentOfRemovedTree);
+    // https://dom.spec.whatwg.org/#concept-node-remove-ext
+    virtual void removingSteps(RemovalType, ContainerNode& oldParentOfRemovedTree);
 
     virtual String description() const;
     virtual String debugDescription() const;

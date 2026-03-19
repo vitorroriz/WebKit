@@ -109,11 +109,11 @@ public:
 protected:
     HTMLFormControlElement(const QualifiedName& tagName, Document&, HTMLFormElement*);
 
-    InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) override;
-    void didFinishInsertingNode() override;
+    NeedsPostConnectionSteps insertionSteps(InsertionType, ContainerNode&) override;
+    void postConnectionSteps() override;
     void didAttachRenderers() override;
     void didMoveToNewDocument(Document& oldDocument, Document& newDocument) override;
-    void removedFromAncestor(RemovalType, ContainerNode&) override;
+    void removingSteps(RemovalType, ContainerNode&) override;
     void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) override;
 
     void disabledStateChanged() override;

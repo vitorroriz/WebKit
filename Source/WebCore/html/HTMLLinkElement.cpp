@@ -516,27 +516,27 @@ bool HTMLLinkElement::isImplicitlyPotentiallyRenderBlocking() const
     return m_relAttribute.isStyleSheet && m_createdByParser;
 }
 
-Node::InsertedIntoAncestorResult HTMLLinkElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps HTMLLinkElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    HTMLElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    HTMLElement::insertionSteps(insertionType, parentOfInsertedTree);
     if (!insertionType.connectedToDocument)
-        return InsertedIntoAncestorResult::Done;
+        return NeedsPostConnectionSteps::No;
 
     m_styleScope = &Style::Scope::forNode(*this);
     protect(m_styleScope)->addStyleSheetCandidateNode(*this, m_createdByParser);
 
-    return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
+    return NeedsPostConnectionSteps::Yes;
 }
 
-void HTMLLinkElement::didFinishInsertingNode()
+void HTMLLinkElement::postConnectionSteps()
 {
     m_url = getNonEmptyURLAttribute(hrefAttr);
     process();
 }
 
-void HTMLLinkElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void HTMLLinkElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    HTMLElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    HTMLElement::removingSteps(removalType, oldParentOfRemovedTree);
     if (!removalType.disconnectedFromDocument)
         return;
 

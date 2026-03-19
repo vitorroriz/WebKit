@@ -80,16 +80,16 @@ void SVGScriptElement::svgAttributeChanged(const QualifiedName& attrName)
     SVGElement::svgAttributeChanged(attrName);
 }
 
-Node::InsertedIntoAncestorResult SVGScriptElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps SVGScriptElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    auto result1 = SVGElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
-    auto result2 = ScriptElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
-    return result1 == InsertedIntoAncestorResult::NeedsPostInsertionCallback ? result1 : result2;
+    auto result1 = SVGElement::insertionSteps(insertionType, parentOfInsertedTree);
+    auto result2 = ScriptElement::insertionSteps(insertionType, parentOfInsertedTree);
+    return result1 == NeedsPostConnectionSteps::Yes ? result1 : result2;
 }
 
-void SVGScriptElement::didFinishInsertingNode()
+void SVGScriptElement::postConnectionSteps()
 {
-    ScriptElement::didFinishInsertingNode();
+    ScriptElement::postConnectionSteps();
 }
 
 void SVGScriptElement::childrenChanged(const ChildChange& change)

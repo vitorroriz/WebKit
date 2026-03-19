@@ -715,18 +715,18 @@ ReferrerPolicy HTMLAnchorElement::referrerPolicy() const
     return parseReferrerPolicy(attributeWithoutSynchronization(referrerpolicyAttr), ReferrerPolicySource::ReferrerPolicyAttribute).value_or(ReferrerPolicy::EmptyString);
 }
 
-Node::InsertedIntoAncestorResult HTMLAnchorElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps HTMLAnchorElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    HTMLElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    HTMLElement::insertionSteps(insertionType, parentOfInsertedTree);
     protect(document())->processInternalResourceLinks(this);
     if (insertionType.connectedToDocument && document().settings().speculationRulesPrefetchEnabled())
-        return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
-    return InsertedIntoAncestorResult::Done;
+        return NeedsPostConnectionSteps::Yes;
+    return NeedsPostConnectionSteps::No;
 }
 
-void HTMLAnchorElement::didFinishInsertingNode()
+void HTMLAnchorElement::postConnectionSteps()
 {
-    HTMLElement::didFinishInsertingNode();
+    HTMLElement::postConnectionSteps();
     checkForSpeculationRules();
 }
 

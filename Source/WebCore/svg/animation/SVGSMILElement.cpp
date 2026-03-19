@@ -258,11 +258,11 @@ void SVGSMILElement::reset()
     resolveFirstInterval();
 }
 
-Node::InsertedIntoAncestorResult SVGSMILElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps SVGSMILElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    SVGElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    SVGElement::insertionSteps(insertionType, parentOfInsertedTree);
     if (!insertionType.connectedToDocument)
-        return InsertedIntoAncestorResult::Done;
+        return NeedsPostConnectionSteps::No;
 
     // Verify we are not in <use> instance tree.
     ASSERT(!isInShadowTree() || !is<SVGUseElement>(shadowHost()));
@@ -271,7 +271,7 @@ Node::InsertedIntoAncestorResult SVGSMILElement::insertedIntoAncestor(InsertionT
 
     RefPtr owner = ownerSVGElement();
     if (!owner)
-        return InsertedIntoAncestorResult::Done;
+        return NeedsPostConnectionSteps::No;
 
     m_timeContainer = owner->timeContainer();
     timeContainer()->setDocumentOrderIndexesDirty();
@@ -286,16 +286,16 @@ Node::InsertedIntoAncestorResult SVGSMILElement::insertedIntoAncestor(InsertionT
     if (RefPtr timeContainer = m_timeContainer)
         timeContainer->notifyIntervalsChanged();
 
-    return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
+    return NeedsPostConnectionSteps::Yes;
 }
 
-void SVGSMILElement::didFinishInsertingNode()
+void SVGSMILElement::postConnectionSteps()
 {
-    SVGElement::didFinishInsertingNode();
+    SVGElement::postConnectionSteps();
     buildPendingResource();
 }
 
-void SVGSMILElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void SVGSMILElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
     if (removalType.disconnectedFromDocument) {
         clearResourceReferences();
@@ -306,7 +306,7 @@ void SVGSMILElement::removedFromAncestor(RemovalType removalType, ContainerNode&
         m_timeContainer = nullptr;
     }
 
-    SVGElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    SVGElement::removingSteps(removalType, oldParentOfRemovedTree);
 }
 
 bool SVGSMILElement::hasValidAttributeName() const

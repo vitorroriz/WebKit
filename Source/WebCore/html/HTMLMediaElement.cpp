@@ -1104,20 +1104,20 @@ bool HTMLMediaElement::childShouldCreateRenderer(const Node& child) const
     return hasShadowRootParent(child) && HTMLElement::childShouldCreateRenderer(child);
 }
 
-Node::InsertedIntoAncestorResult HTMLMediaElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps HTMLMediaElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
     HTMLMEDIAELEMENT_RELEASE_LOG(INSERTEDINTOANCESTOR);
 
-    HTMLElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    HTMLElement::insertionSteps(insertionType, parentOfInsertedTree);
     if (insertionType.connectedToDocument)
         setInActiveDocument(true);
 
     if (!insertionType.connectedToDocument)
-        return InsertedIntoAncestorResult::Done;
-    return InsertedIntoAncestorResult::NeedsPostInsertionCallback;
+        return NeedsPostConnectionSteps::No;
+    return NeedsPostConnectionSteps::Yes;
 }
 
-void HTMLMediaElement::didFinishInsertingNode()
+void HTMLMediaElement::postConnectionSteps()
 {
     Ref protectedThis { *this }; // prepareForLoad may result in a 'beforeload' event, which can make arbitrary DOM mutations.
 
@@ -1199,7 +1199,7 @@ void HTMLMediaElement::pauseAfterDetachedTask()
     }
 }
 
-void HTMLMediaElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void HTMLMediaElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
     HTMLMEDIAELEMENT_RELEASE_LOG(REMOVEDFROMANCESTOR);
 
@@ -1215,7 +1215,7 @@ void HTMLMediaElement::removedFromAncestor(RemovalType removalType, ContainerNod
     if (RefPtr mediaSession = m_mediaSession)
         mediaSession->clientCharacteristicsChanged(false);
 
-    HTMLElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    HTMLElement::removingSteps(removalType, oldParentOfRemovedTree);
 
     visibilityAdjustmentStateDidChange();
 }

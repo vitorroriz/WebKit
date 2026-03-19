@@ -60,7 +60,7 @@ public:
 private:
     HTMLDialogElement(const QualifiedName&, Document&);
 
-    void removedFromAncestor(RemovalType, ContainerNode& oldParentOfRemovedTree) final;
+    void removingSteps(RemovalType, ContainerNode& oldParentOfRemovedTree) final;
     void setIsModal(bool newValue);
     bool supportsFocus() const final;
 

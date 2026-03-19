@@ -50,8 +50,8 @@ public:
 
     void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) override;
     void svgAttributeChanged(const QualifiedName&) override;
-    InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) override;
-    void removedFromAncestor(RemovalType, ContainerNode&) override;
+    NeedsPostConnectionSteps insertionSteps(InsertionType, ContainerNode&) override;
+    void removingSteps(RemovalType, ContainerNode&) override;
     
     virtual bool hasValidAttributeType() const = 0;
     virtual bool hasValidAttributeName() const;
@@ -118,7 +118,7 @@ protected:
     virtual void setTargetElement(SVGElement*);
     virtual void setAttributeName(const QualifiedName&);
 
-    void didFinishInsertingNode() override;
+    void postConnectionSteps() override;
 
     enum BeginOrEnd { Begin, End };
 

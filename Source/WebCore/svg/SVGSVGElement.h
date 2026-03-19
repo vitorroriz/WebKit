@@ -137,8 +137,8 @@ private:
     bool rendererIsNeeded(const RenderStyle&) override;
     RenderPtr<RenderElement> createElementRenderer(RenderStyle&&, const RenderTreePosition&) override;
     bool isReplaced(const RenderStyle* = nullptr) const final;
-    InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) override;
-    void removedFromAncestor(RemovalType, ContainerNode&) override;
+    NeedsPostConnectionSteps insertionSteps(InsertionType, ContainerNode&) override;
+    void removingSteps(RemovalType, ContainerNode&) override;
     void prepareForDocumentSuspension() override;
     void resumeFromDocumentSuspension() override;
     void didMoveToNewDocument(Document& oldDocument, Document& newDocument) override;

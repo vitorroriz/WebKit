@@ -82,8 +82,8 @@ public:
     String referrerPolicyForBindings() const;
     ReferrerPolicy referrerPolicy() const;
 
-    Node::InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode& parentOfInsertedTree) override;
-    void didFinishInsertingNode() override;
+    Node::NeedsPostConnectionSteps insertionSteps(InsertionType, ContainerNode& parentOfInsertedTree) override;
+    void postConnectionSteps() override;
 
     AtomString target() const override;
 

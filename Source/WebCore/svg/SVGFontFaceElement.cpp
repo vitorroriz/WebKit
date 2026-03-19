@@ -289,12 +289,12 @@ void SVGFontFaceElement::rebuildFontFace()
     document().styleScope().didChangeStyleSheetEnvironment();
 }
 
-Node::InsertedIntoAncestorResult SVGFontFaceElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps SVGFontFaceElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    auto result = SVGElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    auto result = SVGElement::insertionSteps(insertionType, parentOfInsertedTree);
     if (!insertionType.connectedToDocument) {
         ASSERT(!m_fontElement);
-        return InsertedIntoAncestorResult::Done;
+        return NeedsPostConnectionSteps::No;
     }
     protect(document())->svgExtensions().registerSVGFontFaceElement(*this);
 
@@ -302,9 +302,9 @@ Node::InsertedIntoAncestorResult SVGFontFaceElement::insertedIntoAncestor(Insert
     return result;
 }
 
-void SVGFontFaceElement::removedFromAncestor(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
+void SVGFontFaceElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
-    SVGElement::removedFromAncestor(removalType, oldParentOfRemovedTree);
+    SVGElement::removingSteps(removalType, oldParentOfRemovedTree);
 
     if (removalType.disconnectedFromDocument) {
         m_fontElement = nullptr;

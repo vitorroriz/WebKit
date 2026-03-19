@@ -76,9 +76,9 @@ void HTMLScriptElement::finishParsingChildren()
     ScriptElement::finishParsingChildren();
 }
 
-void HTMLScriptElement::removedFromAncestor(RemovalType type, ContainerNode& container)
+void HTMLScriptElement::removingSteps(RemovalType type, ContainerNode& container)
 {
-    HTMLElement::removedFromAncestor(type, container);
+    HTMLElement::removingSteps(type, container);
     unblockRendering();
     unregisterSpeculationRules();
 }
@@ -98,15 +98,15 @@ void HTMLScriptElement::attributeChanged(const QualifiedName& name, const AtomSt
         HTMLElement::attributeChanged(name, oldValue, newValue, attributeModificationReason);
 }
 
-Node::InsertedIntoAncestorResult HTMLScriptElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+Node::NeedsPostConnectionSteps HTMLScriptElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
 {
-    HTMLElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
-    return ScriptElement::insertedIntoAncestor(insertionType, parentOfInsertedTree);
+    HTMLElement::insertionSteps(insertionType, parentOfInsertedTree);
+    return ScriptElement::insertionSteps(insertionType, parentOfInsertedTree);
 }
 
-void HTMLScriptElement::didFinishInsertingNode()
+void HTMLScriptElement::postConnectionSteps()
 {
-    ScriptElement::didFinishInsertingNode();
+    ScriptElement::postConnectionSteps();
 }
 
 void HTMLScriptElement::setText(String&& value)
