@@ -55,6 +55,18 @@ public:
     template<typename... Args> requires (std::is_convertible_v<Args, JSValue> && ...)
     JSValue tryCallWithArguments(VM&, JSFunction*, JSValue thisValue, JSCell* context, Args...);
 
+    ALWAYS_INLINE bool canUseCall(JSValue functionObject) const
+    {
+        if (!m_functionExecutable) [[unlikely]]
+            return false;
+        if (!functionObject.isCell()) [[unlikely]]
+            return false;
+        auto* cell = functionObject.asCell();
+        if (cell->type() != JSFunctionType) [[unlikely]]
+            return false;
+        return m_functionExecutable == jsCast<JSFunction*>(cell)->executable();
+    }
+
     bool isInitializedFor(FunctionExecutable* executable) const
     {
         return m_functionExecutable == executable;

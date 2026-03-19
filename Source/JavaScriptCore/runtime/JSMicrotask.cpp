@@ -77,6 +77,17 @@ static JSValue callMicrotask(JSGlobalObject* globalObject, JSValue functionObjec
     auto scope = DECLARE_THROW_SCOPE(vm);
     static_assert(sizeof...(args) <= MicrotaskCall::maxCallArguments);
 
+    if (microtaskCall && microtaskCall->canUseCall(functionObject)) [[likely]] {
+        if (!vm.isSafeToRecurseSoft()) [[unlikely]]
+            return throwStackOverflowError(globalObject, scope);
+        auto* jsFunction = jsCast<JSFunction*>(functionObject.asCell());
+        if (auto result = microtaskCall->tryCallWithArguments(vm, jsFunction, thisValue, context, args...)) [[likely]] {
+            scope.release();
+            return result;
+        }
+        RETURN_IF_EXCEPTION_WITH_TRAPS_DEFERRED(scope, scope.exception());
+    }
+
     auto callData = JSC::getCallDataInline(functionObject);
     if (callData.type == CallData::Type::None)
         return throwTypeError(globalObject, scope, message);
@@ -102,19 +113,6 @@ static JSValue callMicrotask(JSGlobalObject* globalObject, JSValue functionObjec
         if (!vm.isSafeToRecurseSoft()) [[unlikely]]
             return throwStackOverflowError(functionScope->globalObject(), scope);
 
-        if (microtaskCall) [[likely]] {
-            auto* jsFunction = jsCast<JSFunction*>(functionObject.asCell());
-            if (!microtaskCall->isInitializedFor(functionExecutable)) {
-                microtaskCall->initialize(vm, jsFunction);
-                RETURN_IF_EXCEPTION_WITH_TRAPS_DEFERRED(scope, scope.exception());
-            }
-            if (auto result = microtaskCall->tryCallWithArguments(vm, jsFunction, thisValue, context, args...)) [[likely]] {
-                scope.release();
-                return result;
-            }
-            RETURN_IF_EXCEPTION_WITH_TRAPS_DEFERRED(scope, scope.exception());
-        }
-
         {
             DeferTraps deferTraps(vm); // We can't jettison this code if we're about to run it.
 
@@ -124,6 +122,19 @@ static JSValue callMicrotask(JSGlobalObject* globalObject, JSValue functionObjec
             ASSERT(newCodeBlock);
             newCodeBlock->m_shouldAlwaysBeInlined = false;
         }
+
+        if (microtaskCall) {
+            auto* jsFunction = jsCast<JSFunction*>(functionObject.asCell());
+            microtaskCall->initialize(vm, jsFunction);
+            RETURN_IF_EXCEPTION_WITH_TRAPS_DEFERRED(scope, scope.exception());
+
+            if (auto result = microtaskCall->tryCallWithArguments(vm, jsFunction, thisValue, context, args...)) [[likely]] {
+                scope.release();
+                return result;
+            }
+            RETURN_IF_EXCEPTION_WITH_TRAPS_DEFERRED(scope, scope.exception());
+        }
+
 #if (CPU(ARM64) || CPU(X86_64)) && CPU(ADDRESS64) && !ENABLE(C_LOOP)
         if ((sizeof...(args) + 1) >= newCodeBlock->numParameters()) [[likely]] {
             auto* entry = functionExecutable->generatedJITCodeAddressForCall();
