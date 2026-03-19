@@ -116,6 +116,7 @@ private:
 
     bool m_paused { false };
     bool m_didFail { false };
+    Seconds m_lastMetricsSampleTime WTF_GUARDED_BY_CAPABILITY(workQueue());
 #if !RELEASE_LOG_DISABLED
     uint64_t m_logIdentifier;
     FrameRateMonitor m_frameRateMonitor WTF_GUARDED_BY_CAPABILITY(workQueue());

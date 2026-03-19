@@ -427,6 +427,27 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     }
     m_frameRateMonitor.update();
 #endif
+
+    auto gatherSampleVideoMetricsIfNeeded = [&] -> RetainPtr<AVVideoPerformanceMetrics> {
+        assertIsCurrent(workQueue());
+
+        auto currentTime = MonotonicTime::now().secondsSinceEpoch();
+        const Seconds maximumPlaybackQualityMetricsSampleTimeDelta = 0.25_s;
+        if (currentTime < m_lastMetricsSampleTime + maximumPlaybackQualityMetricsSampleTimeDelta)
+            return nullptr;
+
+        m_lastMetricsSampleTime = currentTime;
+        return [m_sampleBufferDisplayLayer videoPerformanceMetrics];
+    };
+
+    RetainPtr metrics = gatherSampleVideoMetricsIfNeeded();
+    if (!metrics)
+        return;
+
+    callOnMainThread([client = m_client, totalVideoFrames = metrics.get().totalNumberOfVideoFrames, droppedVideoFrames = metrics.get().numberOfDroppedVideoFrames] {
+        if (RefPtr protectedClient = client.get())
+            protectedClient->updateVideoFrameCounters(totalVideoFrames, droppedVideoFrames);
+    });
 }
 
 #if !RELEASE_LOG_DISABLED

@@ -172,6 +172,11 @@ void RemoteSampleBufferDisplayLayer::sampleBufferDisplayLayerStatusDidFail()
     send(Messages::SampleBufferDisplayLayer::SetDidFail { protect(m_sampleBufferDisplayLayer)->didFail() });
 }
 
+void RemoteSampleBufferDisplayLayer::updateVideoFrameCounters(uint64_t totalFrameCount, uint64_t droppedFrameCount)
+{
+    send(Messages::SampleBufferDisplayLayer::UpdateVideoFrameCounters { totalFrameCount,  droppedFrameCount });
+}
+
 void RemoteSampleBufferDisplayLayer::setSharedVideoFrameSemaphore(IPC::Semaphore&& semaphore)
 {
     m_sharedVideoFrameReader.setSemaphore(WTF::move(semaphore));

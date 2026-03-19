@@ -362,6 +362,20 @@ void MediaPlayerPrivateMediaStreamAVFObjC::sampleBufferDisplayLayerStatusDidFail
     updateLayersAsNeeded();
 }
 
+void MediaPlayerPrivateMediaStreamAVFObjC::updateVideoFrameCounters(uint64_t totalFrameCount, uint64_t droppedFrameCount)
+{
+    m_totalFrameCount = totalFrameCount;
+    m_droppedFrameCount = droppedFrameCount;
+}
+
+std::optional<VideoPlaybackQualityMetrics> MediaPlayerPrivateMediaStreamAVFObjC::videoPlaybackQualityMetrics()
+{
+    return VideoPlaybackQualityMetrics {
+        .totalVideoFrames = static_cast<uint32_t>(m_totalFrameCount),
+        .droppedVideoFrames = static_cast<uint32_t>(m_droppedFrameCount)
+    };
+}
+
 #if PLATFORM(IOS_FAMILY)
 bool MediaPlayerPrivateMediaStreamAVFObjC::canShowWhileLocked() const
 {

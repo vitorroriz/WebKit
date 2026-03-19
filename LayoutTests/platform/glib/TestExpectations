@@ -2269,6 +2269,8 @@ imported/w3c/web-platform-tests/html/semantics/embedded-content/the-img-element/
 fast/mediastream/camera-powerEfficient-track.html [ Failure ]
 fast/mediastream/multi-microphone.html [ Skip ]
 
+fast/mediastream/getUserMedia-and-getVideoPlaybackQuality.html [ Skip ]
+
 webkit.org/b/208182 fast/repaint/backgroundSizeRepaint.html [ ImageOnlyFailure Pass ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
