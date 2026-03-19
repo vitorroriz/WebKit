@@ -397,7 +397,6 @@ class TestExpectedBuildSteps(unittest.TestCase):
             'update-swift-checkouts',
             'build-swift',
             'install-metal-toolchain',
-            'update-clang',
             'scan-build'
         ],
         'Apple-Sequoia-Release-Build': [
@@ -782,7 +781,6 @@ class TestExpectedBuildSteps(unittest.TestCase):
             'update-swift-checkouts',
             'build-swift',
             'install-metal-toolchain',
-            'update-clang',
             'scan-build'
         ],
         'Apple-iPadOS-26-Simulator-Release-WK2-Tests': [

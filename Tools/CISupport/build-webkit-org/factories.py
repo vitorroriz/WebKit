@@ -326,7 +326,6 @@ class SaferCPPStaticAnalyzerFactory(Factory):
         self.addStep(UpdateSwiftCheckouts())
         self.addStep(BuildSwift())
         self.addStep(InstallMetalToolchain())
-        self.addStep(UpdateClang())
         self.addStep(ScanBuild())
 
 
