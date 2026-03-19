@@ -1116,10 +1116,8 @@ static bool shouldForwardWheelEvent(WebKitWebViewBase* webViewBase, GdkEvent* ev
             // The last entry in the history is the current event time, so ignore that.
             if (length > 0)
                 length--;
-            for (unsigned i = 0; i < length; i++) {
-                WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN // GTK port
-                auto oldTime = history.get()[i].time;
-                WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
+            for (const auto& item : unsafeMakeSpan(history.get(), length)) {
+                auto oldTime = item.time;
                 webViewBase->priv->wheelEventsToPropagate.removeAllMatching([&oldTime] (GRefPtr<GdkEvent>& current) {
                     return gdk_event_get_time(current.get()) == oldTime;
                 });
