@@ -84,15 +84,6 @@ const FontCascade& CSSToLengthConversionData::fontCascadeForFontUnits() const
     return style()->fontCascade();
 }
 
-float CSSToLengthConversionData::computedLineHeightForFontUnits() const
-{
-    if (computingFontSize()) {
-        ASSERT(parentStyle());
-        return parentStyle()->computedLineHeight();
-    }
-    ASSERT(style());
-    return style()->computedLineHeight();
-}
 
 float CSSToLengthConversionData::zoom() const
 {
