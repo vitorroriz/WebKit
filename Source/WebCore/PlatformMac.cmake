@@ -389,11 +389,11 @@ list(APPEND WebCore_SOURCES
     platform/mac/WebCoreObjCExtras.mm
     platform/mac/WidgetMac.mm
 
-    platform/mediastream/cocoa/MockRealtimeVideoSourceCocoa.mm
-    platform/mediastream/cocoa/RealtimeOutgoingVideoSourceCocoa.cpp
-    platform/mediastream/cocoa/RealtimeOutgoingVideoSourceCocoa.mm
-
     platform/mediastream/libwebrtc/LibWebRTCAudioModule.cpp
+
+    platform/mediastream/mac/MockRealtimeVideoSourceMac.mm
+    platform/mediastream/mac/RealtimeOutgoingVideoSourceCocoa.cpp
+    platform/mediastream/mac/RealtimeOutgoingVideoSourceCocoa.mm
 
     platform/network/cf/CertificateInfoCFNet.cpp
     platform/network/cf/DNSResolveQueueCFNet.cpp
@@ -733,9 +733,10 @@ list(APPEND WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     platform/mediastream/cocoa/AudioMediaStreamTrackRendererInternalUnit.h
     platform/mediastream/cocoa/AudioMediaStreamTrackRendererUnit.h
-    platform/mediastream/cocoa/RealtimeIncomingVideoSourceCocoa.h
-    platform/mediastream/cocoa/RealtimeVideoUtilities.h
-    platform/mediastream/cocoa/WebAudioSourceProviderCocoa.h
+
+    platform/mediastream/mac/RealtimeIncomingVideoSourceCocoa.h
+    platform/mediastream/mac/RealtimeVideoUtilities.h
+    platform/mediastream/mac/WebAudioSourceProviderCocoa.h
 
     platform/mediastream/libwebrtc/LibWebRTCProviderCocoa.h
     platform/mediastream/libwebrtc/VideoFrameLibWebRTC.h

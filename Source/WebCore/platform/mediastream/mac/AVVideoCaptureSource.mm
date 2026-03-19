@@ -501,7 +501,7 @@ const RealtimeMediaSourceSettings& AVVideoCaptureSource::settings()
     auto size = this->size();
     if (m_videoFrameRotation == VideoFrame::Rotation::Left || m_videoFrameRotation == VideoFrame::Rotation::Right)
         size = size.transposedSize();
-
+    
     settings.setWidth(size.width());
     settings.setHeight(size.height());
     settings.setDeviceId(hashedId());
@@ -901,11 +901,11 @@ static bool isFrameRateMatching(double frameRate, AVCaptureDevice* device)
 
 bool AVVideoCaptureSource::areSettingsMatching() const
 {
-    return m_appliedPreset && m_appliedPreset->format() == m_currentPreset->format()
+    return m_appliedPreset && m_appliedPreset->format() == m_currentPreset->format() &&
 #if PLATFORM(IOS_FAMILY)
-        && device().videoZoomFactor == m_currentZoom
+        device().videoZoomFactor == m_currentZoom &&
 #endif
-        && isFrameRateMatching(m_currentFrameRate, device());
+        isFrameRateMatching(m_currentFrameRate, device());
 }
 
 void AVVideoCaptureSource::setSessionSizeFrameRateAndZoom()
@@ -1412,7 +1412,7 @@ void AVVideoCaptureSource::generatePresets()
 
         Vector<FrameRateRange> frameRates;
         for (AVFrameRateRange* range in [format videoSupportedFrameRateRanges])
-            frameRates.append({ range.minFrameRate, range.maxFrameRate });
+            frameRates.append({ range.minFrameRate, range.maxFrameRate});
 
         VideoPreset preset { size, WTF::move(frameRates), computeMinZoom(), computeMaxZoom(format), isFormatPowerEfficient(format) };
         preset.setFormat(format);

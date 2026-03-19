@@ -25,7 +25,6 @@
 
 #include "config.h"
 #include "DisplayCaptureManagerCocoa.h"
-
 #include "RealtimeMediaSourceCenter.h"
 
 #if ENABLE(MEDIA_STREAM)

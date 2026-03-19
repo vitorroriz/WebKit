@@ -79,9 +79,9 @@ platform/ios/WebAVPlayerController.mm
 [ iOS ] platform/ios/wak/WKView.mm
 [ iOS ] platform/ios/wak/WebCoreThread.mm
 platform/libwebrtc/LibWebRTCVPXVideoDecoder.cpp
-platform/mediastream/cocoa/AVVideoCaptureSource.mm
-platform/mediastream/cocoa/CoreAudioCaptureUnit.mm
-platform/mediastream/cocoa/RealtimeIncomingVideoSourceCocoa.mm
+platform/mediastream/mac/AVVideoCaptureSource.mm
+platform/mediastream/mac/CoreAudioCaptureUnit.mm
+platform/mediastream/mac/RealtimeIncomingVideoSourceCocoa.mm
 [ iOS ] platform/network/ios/WebCoreURLResponseIOS.mm
 [ iOS ] platform/network/cocoa/ResourceErrorCocoa.mm
 platform/network/cocoa/ResourceHandleCocoa.mm

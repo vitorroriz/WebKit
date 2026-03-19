@@ -118,9 +118,9 @@ platform/ios/WebAVPlayerController.mm
 [ iOS ] platform/ios/wak/WebCoreThread.mm
 [ iOS ] platform/ios/wak/WebCoreThreadRun.cpp
 platform/mediarecorder/MediaRecorderPrivateEncoder.cpp
-platform/mediastream/cocoa/AVVideoCaptureSource.mm
-[ Mac ] platform/mediastream/cocoa/ScreenCaptureKitCaptureSource.mm
-[ Mac ] platform/mediastream/cocoa/ScreenCaptureKitSharingSessionManager.mm
+platform/mediastream/mac/AVVideoCaptureSource.mm
+[ Mac ] platform/mediastream/mac/ScreenCaptureKitCaptureSource.mm
+[ Mac ] platform/mediastream/mac/ScreenCaptureKitSharingSessionManager.mm
 platform/network/cf/DNSResolveQueueCFNet.cpp
 platform/network/cocoa/ResourceHandleCocoa.mm
 platform/network/cocoa/SynchronousLoaderClient.mm

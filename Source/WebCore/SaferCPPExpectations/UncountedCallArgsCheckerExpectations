@@ -525,11 +525,11 @@ platform/mediastream/RealtimeOutgoingAudioSource.h
 platform/mediastream/RealtimeOutgoingVideoSource.cpp
 platform/mediastream/cocoa/IncomingAudioMediaStreamTrackRendererUnit.cpp
 [ iOS ] platform/mediastream/ios/CoreAudioCaptureSourceIOS.mm
-platform/mediastream/cocoa/CoreAudioCaptureSource.cpp
-[ iOS ] platform/mediastream/cocoa/CoreAudioCaptureUnit.cpp
-platform/mediastream/cocoa/MediaStreamTrackAudioSourceProviderCocoa.cpp
-platform/mediastream/cocoa/RealtimeOutgoingAudioSourceCocoa.cpp
-platform/mediastream/cocoa/WebAudioSourceProviderCocoa.mm
+platform/mediastream/mac/CoreAudioCaptureSource.cpp
+[ iOS ] platform/mediastream/mac/CoreAudioCaptureUnit.cpp
+platform/mediastream/mac/MediaStreamTrackAudioSourceProviderCocoa.cpp
+platform/mediastream/mac/RealtimeOutgoingAudioSourceCocoa.cpp
+platform/mediastream/mac/WebAudioSourceProviderCocoa.mm
 platform/mock/MockRealtimeVideoSource.cpp
 platform/network/cocoa/ResourceHandleCocoa.mm
 platform/network/cocoa/WebCoreResourceHandleAsOperationQueueDelegate.mm
