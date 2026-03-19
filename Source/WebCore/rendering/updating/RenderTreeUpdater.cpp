@@ -658,8 +658,12 @@ void RenderTreeUpdater::updateTextRenderer(Text& text, const Style::TextUpdate* 
     bool needsRenderer = textRendererIsNeeded(text);
 
     if (existingRenderer && textUpdate && textUpdate->inheritedDisplayContentsStyle) {
-        if (existingRenderer->inlineWrapperForDisplayContents() || *textUpdate->inheritedDisplayContentsStyle) {
-            // FIXME: We could update without teardown.
+        auto* existingWrapper = existingRenderer->inlineWrapperForDisplayContents();
+        auto& newStylePtr = *textUpdate->inheritedDisplayContentsStyle;
+        if (existingWrapper && newStylePtr) {
+            // Update wrapper style in place instead of teardown+recreate.
+            existingWrapper->setStyle(RenderStyle::clone(*newStylePtr));
+        } else if (existingWrapper || newStylePtr) {
             tearDownTextRenderer(text, root, m_builder);
             existingRenderer = nullptr;
         }
