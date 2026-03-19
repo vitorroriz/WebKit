@@ -112,6 +112,8 @@ protected:
     void computeIntrinsicLogicalWidths(LayoutUnit& minLogicalWidth, LayoutUnit& maxLogicalWidth) const override;
 
 private:
+    friend class ScopedCrossAxisOverrideForFlexItem;
+
     class FlexLayoutItem {
     public:
         FlexLayoutItem(RenderBox&, LayoutUnit, LayoutUnit, LayoutUnit, std::pair<LayoutUnit, LayoutUnit>, bool);

@@ -273,6 +273,53 @@ private:
     std::optional<LayoutUnit> m_previousOverridingBorderBoxLogicalHeight;
 };
 
+// Sets m_inFlexItemIntrinsicWidthComputation and applies the container's definite
+// cross size as the flex item's cross-axis override when applicable. Clears all
+// overrides otherwise.
+//
+// When setNeedsPreferredWidthsUpdate is true, the flex item's preferred widths are
+// invalidated so that min/maxPreferredLogicalWidth() will recompute them with the
+// cross-axis override in place. The destructor ASSERTs the dirty flag was consumed.
+enum class InvalidatePreferredWidths : bool { No, Yes };
+
+class ScopedCrossAxisOverrideForFlexItem {
+public:
+    ScopedCrossAxisOverrideForFlexItem(const RenderFlexibleBox& flexBox, RenderBox& flexItem, InvalidatePreferredWidths invalidatePreferredWidths)
+        : m_intrinsicWidthComputation(flexBox.m_inFlexItemIntrinsicWidthComputation, true)
+#if ASSERT_ENABLED
+        , m_flexItem(flexItem)
+#endif
+    {
+        if (flexBox.flexItemCrossSizeShouldUseContainerCrossSize(flexItem) && !flexBox.isFlexItem()) {
+            auto axis = flexBox.mainAxisIsFlexItemInlineAxis(flexItem) ? OverridingSizesScope::Axis::Block : OverridingSizesScope::Axis::Inline;
+            m_overridingScope.emplace(flexItem, axis, flexBox.computeCrossSizeForFlexItemUsingContainerCrossSize(flexItem));
+            if (invalidatePreferredWidths == InvalidatePreferredWidths::Yes) {
+                flexItem.setNeedsPreferredWidthsUpdate(MarkOnlyThis);
+#if ASSERT_ENABLED
+                m_didDirtyPreferredWidths = true;
+#endif
+            }
+        } else
+            m_overridingScope.emplace(flexItem, OverridingSizesScope::Axis::Both);
+    }
+
+    ~ScopedCrossAxisOverrideForFlexItem()
+    {
+#if ASSERT_ENABLED
+        if (m_didDirtyPreferredWidths)
+            ASSERT(!m_flexItem.needsPreferredLogicalWidthsUpdate());
+#endif
+    }
+
+private:
+    SetForScope<bool> m_intrinsicWidthComputation;
+    std::optional<OverridingSizesScope> m_overridingScope;
+#if ASSERT_ENABLED
+    RenderBox& m_flexItem;
+    bool m_didDirtyPreferredWidths { false };
+#endif
+};
+
 static void updateFlexItemDirtyBitsBeforeLayout(bool relayoutFlexItem, RenderBox& flexItem)
 {
     if (flexItem.isOutOfFlowPositioned())
@@ -289,18 +336,8 @@ void RenderFlexibleBox::computeChildIntrinsicLogicalWidths(RenderBox& flexBoxChi
     // Children excluded from normal layout are handled here too (e.g. legend when fieldset is set to flex).
     ASSERT(flexBoxChild.isFlexItem() || (flexBoxChild.parent() == this && flexBoxChild.isExcludedFromNormalLayout()));
 
-    // If the item cross size should use the definite container cross size then set the overriding size now so
-    // the intrinsic sizes are properly computed in the presence of aspect ratios. The only exception is when
-    // we are both a flex item&container, because our parent might have already set our overriding size.
-    auto flexItemIntrinsicSizeComputation = SetForScope(m_inFlexItemIntrinsicWidthComputation, true);
-    if (flexItemCrossSizeShouldUseContainerCrossSize(flexBoxChild) && !isFlexItem()) {
-        auto axis = mainAxisIsFlexItemInlineAxis(flexBoxChild) ? OverridingSizesScope::Axis::Block : OverridingSizesScope::Axis::Inline;
-        OverridingSizesScope overridingSizeScope(flexBoxChild, axis, computeCrossSizeForFlexItemUsingContainerCrossSize(flexBoxChild));
-        RenderBlock::computeChildIntrinsicLogicalWidths(flexBoxChild, minPreferredLogicalWidth, maxPreferredLogicalWidth);
-        return;
-    }
-
-    OverridingSizesScope cleanOverridingSizesScope(flexBoxChild, OverridingSizesScope::Axis::Both);
+    // Compute preferred widths of the child with the correct cross-axis size.
+    ScopedCrossAxisOverrideForFlexItem scopedCrossAxisOverride(*this, flexBoxChild, InvalidatePreferredWidths::Yes);
     RenderBlock::computeChildIntrinsicLogicalWidths(flexBoxChild, minPreferredLogicalWidth, maxPreferredLogicalWidth);
 }
 
@@ -1274,7 +1311,7 @@ bool RenderFlexibleBox::flexItemCrossSizeShouldUseContainerCrossSize(const Rende
             return true;
         // This must be kept in sync with computeMainSizeFromAspectRatioUsing().
         auto& crossSize = isHorizontalFlow() ? style().height() : style().width();
-        return crossSize.isFixed() || (crossSize.isPercent() && availableLogicalHeightForPercentageComputation());  
+        return crossSize.isFixed() || (crossSize.isPercent() && availableLogicalHeightForPercentageComputation());
     }
     return false;
 }
@@ -1397,6 +1434,7 @@ LayoutUnit RenderFlexibleBox::computeFlexBaseSizeForFlexItem(RenderBox& flexItem
     } else {
         // We don't need to add scrollbarLogicalWidth here because the preferred
         // width includes the scrollbar, even for overflow: auto.
+        ScopedCrossAxisOverrideForFlexItem crossSizeScope(*this, flexItem, InvalidatePreferredWidths::Yes);
         mainAxisExtent = flexItem.maxPreferredLogicalWidth();
     }
     return mainAxisExtent - mainAxisBorderAndPadding;
@@ -1738,20 +1776,33 @@ std::pair<LayoutUnit, LayoutUnit> RenderFlexibleBox::computeFlexItemMinMaxSizes(
 {
     auto max = maxMainSizeLengthForFlexItem(flexItem);
     std::optional<LayoutUnit> maxExtent = std::nullopt;
-    if (max.isSpecified() || max.isIntrinsicOrStretch())
+    if (max.isSpecified()) {
         maxExtent = computeMainAxisExtentForFlexItem(flexItem, max);
+    } else if (max.isIntrinsicOrStretch()) {
+        ScopedCrossAxisOverrideForFlexItem scopedCrossAxisOverride(*this, flexItem, InvalidatePreferredWidths::No);
+        maxExtent = computeMainAxisExtentForFlexItem(flexItem, max);
+    }
 
     auto min = minMainSizeLengthForFlexItem(flexItem);
     // Intrinsic sizes in child's block axis are handled by the min-size:auto code path,
     // but stretch always resolves to a definite value and should be computed directly.
     if (min.isSpecified() || min.isStretch() || (min.isIntrinsic() && mainAxisIsFlexItemInlineAxis(flexItem))) {
-        auto minExtent = computeMainAxisExtentForFlexItem(flexItem, min).value_or(0_lu);
+        auto computeMinExtent = [&] {
+            if (min.isIntrinsicOrStretch()) {
+                ScopedCrossAxisOverrideForFlexItem scopedCrossAxisOverride(*this, flexItem, InvalidatePreferredWidths::No);
+                return computeMainAxisExtentForFlexItem(flexItem, min).value_or(0_lu);
+            }
+            return computeMainAxisExtentForFlexItem(flexItem, min).value_or(0_lu);
+        };
+        auto minExtent = computeMinExtent();
         // We must never return a min size smaller than the min preferred size for tables.
-        if (flexItem.isRenderTable() && mainAxisIsFlexItemInlineAxis(flexItem))
+        if (flexItem.isRenderTable() && mainAxisIsFlexItemInlineAxis(flexItem)) {
+            ScopedCrossAxisOverrideForFlexItem scopedCrossAxisOverride(*this, flexItem, InvalidatePreferredWidths::Yes);
             minExtent = std::max(minExtent, flexItem.minPreferredLogicalWidth());
+        }
         return { minExtent, maxExtent.value_or(LayoutUnit::max()) };
     }
-    
+
     if (shouldApplyMinSizeAutoForFlexItem(flexItem)) {
         // FIXME: If the min value is expected to be valid here, we need to come up with a non optional version of computeMainAxisExtentForFlexItem and
         // ensure it's valid through the virtual calls of computeSizingKeywordLogicalContentHeightUsing.
@@ -1762,8 +1813,10 @@ std::pair<LayoutUnit, LayoutUnit> RenderFlexibleBox::computeFlexItemMinMaxSizes(
 
         if (canComputeSizeThroughAspectRatio)
             contentSize = computeMainSizeFromAspectRatioUsing(flexItem, flexItemCrossSizeLength);
-        else
+        else {
+            ScopedCrossAxisOverrideForFlexItem scopedCrossAxisOverride(*this, flexItem, InvalidatePreferredWidths::No);
             contentSize = computeMainAxisExtentForFlexItem(flexItem, Style::MinimumSize { CSS::Keyword::MinContent { } }).value_or(0_lu);
+        }
 
         if (flexItemHasAspectRatio(flexItem))
             contentSize = adjustFlexItemSizeForAspectRatioCrossAxisMinAndMax(flexItem, contentSize);
@@ -1909,7 +1962,7 @@ RenderFlexibleBox::FlexLayoutItem RenderFlexibleBox::constructFlexLayoutItem(Ren
 
     if (everHadLayout && flexItem.hasTrimmedMargin(std::optional<Style::MarginTrimSide> { }))
         flexItem.clearTrimmedMarginsMarkings();
-    
+
     if (flexItem.shouldInvalidatePreferredWidths())
         flexItem.setNeedsPreferredWidthsUpdate(MarkOnlyThis);
 

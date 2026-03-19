@@ -1,10 +1,6 @@
 
-FAIL .container 1 assert_equals:
-<div class="container row"><div data-expected-height="50" data-expected-width="50" class="item" style="flex-basis: auto;"><canvas height="5" width="5"></canvas></div></div>
-width expected 50 but got 5
-FAIL .container 2 assert_equals:
-<div class="container row"><div data-expected-height="50" data-expected-width="50" class="item" style="flex-basis: content;"><canvas height="5" width="5"></canvas></div></div>
-width expected 50 but got 5
+PASS .container 1
+PASS .container 2
 FAIL .container 3 assert_equals:
 <div class="container row"><div data-expected-height="50" data-expected-width="50" class="item" style="flex-basis: min-content;"><canvas height="5" width="5"></canvas></div></div>
 width expected 50 but got 5
