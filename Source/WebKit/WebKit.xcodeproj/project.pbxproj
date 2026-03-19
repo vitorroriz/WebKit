@@ -21138,14 +21138,14 @@
 			);
 			inputFileListPaths = (
 				"$(SRCROOT)/DerivedSources-input.xcfilelist",
-				"$(WK_WEBKIT_INPUT_XCFILELIST_ADDITIONS)",
+				"$(WK_WEBKIT_DERIVEDSOURCES_INPUT_XCFILELIST_ADDITIONS)",
 			);
 			inputPaths = (
 			);
 			name = "Generate Derived Sources";
 			outputFileListPaths = (
 				"$(SRCROOT)/DerivedSources-output.xcfilelist",
-				"$(WK_WEBKIT_OUTPUT_XCFILELIST_ADDITIONS)",
+				"$(WK_WEBKIT_DERIVEDSOURCES_OUTPUT_XCFILELIST_ADDITIONS)",
 			);
 			outputPaths = (
 			);
