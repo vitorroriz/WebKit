@@ -1835,34 +1835,43 @@ void BBQJIT::pushArrayNewFromSegment(ArraySegmentOperation operation, uint32_t t
         LOG_INSTRUCTION("Select", condition, lhs, lhsLocation, rhs, rhsLocation, RESULT(result));
         LOG_INDENT();
 
-        bool inverted = false;
+        TypeKind type = lhs.type();
+        if (!lhs.isConst() && !rhs.isConst() && type != TypeKind::V128) {
+            consume(condition);
+            if (type == TypeKind::F32 || type == TypeKind::F64)
+                m_jit.moveDoubleConditionallyTest32(ResultCondition::NonZero, conditionLocation.asGPR(), conditionLocation.asGPR(), lhsLocation.asFPR(), rhsLocation.asFPR(), resultLocation.asFPR());
+            else
+                m_jit.moveConditionallyTest32(ResultCondition::NonZero, conditionLocation.asGPR(), conditionLocation.asGPR(), lhsLocation.asGPR(), rhsLocation.asGPR(), resultLocation.asGPR());
+        } else {
+            bool inverted = false;
 
-        // If the operands or the result alias, we want the matching one to be on top.
-        if (rhsLocation == resultLocation) {
-            std::swap(lhs, rhs);
-            std::swap(lhsLocation, rhsLocation);
-            inverted = true;
+            // If the operands or the result alias, we want the matching one to be on top.
+            if (rhsLocation == resultLocation) {
+                std::swap(lhs, rhs);
+                std::swap(lhsLocation, rhsLocation);
+                inverted = true;
+            }
+
+            // If the condition location and the result alias, we want to make sure the condition is
+            // preserved no matter what.
+            if (conditionLocation == resultLocation) {
+                m_jit.move(conditionLocation.asGPR(), wasmScratchGPR);
+                conditionLocation = Location::fromGPR(wasmScratchGPR);
+            }
+
+            // Kind of gross isel, but it should handle all use/def aliasing cases correctly.
+            if (lhs.isConst())
+                emitMoveConst(lhs, resultLocation);
+            else
+                emitMove(lhs.type(), lhsLocation, resultLocation);
+            Jump ifZero = m_jit.branchTest32(inverted ? ResultCondition::Zero : ResultCondition::NonZero, conditionLocation.asGPR(), conditionLocation.asGPR());
+            consume(condition);
+            if (rhs.isConst())
+                emitMoveConst(rhs, resultLocation);
+            else
+                emitMove(rhs.type(), rhsLocation, resultLocation);
+            ifZero.link(&m_jit);
         }
-
-        // If the condition location and the result alias, we want to make sure the condition is
-        // preserved no matter what.
-        if (conditionLocation == resultLocation) {
-            m_jit.move(conditionLocation.asGPR(), wasmScratchGPR);
-            conditionLocation = Location::fromGPR(wasmScratchGPR);
-        }
-
-        // Kind of gross isel, but it should handle all use/def aliasing cases correctly.
-        if (lhs.isConst())
-            emitMoveConst(lhs, resultLocation);
-        else
-            emitMove(lhs.type(), lhsLocation, resultLocation);
-        Jump ifZero = m_jit.branchTest32(inverted ? ResultCondition::Zero : ResultCondition::NonZero, conditionLocation.asGPR(), conditionLocation.asGPR());
-        consume(condition);
-        if (rhs.isConst())
-            emitMoveConst(rhs, resultLocation);
-        else
-            emitMove(rhs.type(), rhsLocation, resultLocation);
-        ifZero.link(&m_jit);
 
         LOG_DEDENT();
     }
