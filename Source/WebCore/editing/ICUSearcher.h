@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "FindOptions.h"
+#include <WebCore/FindOptions.h>
 #include <unicode/usearch.h>
 
 namespace WebCore {
