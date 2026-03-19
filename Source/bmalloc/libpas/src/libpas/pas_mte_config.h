@@ -200,6 +200,7 @@ extern "C" {
 #endif
 void pas_mte_ensure_initialized(void);
 void pas_mte_force_nontaggable_user_allocations_into_large_heap(void);
+void pas_bmalloc_force_allocations_into_bitfit_heaps_where_available(void);
 #ifdef __cplusplus
 }
 #endif
