@@ -1446,12 +1446,17 @@ static UIWindowScene *windowScene()
 
 - (void)evaluateJavaScriptAndWaitForInputSessionToChange:(NSString *)script
 {
+    [self evaluateJavaScriptAndWaitForInputSessionToChange:script inFrame:nil];
+}
+
+- (void)evaluateJavaScriptAndWaitForInputSessionToChange:(NSString *)script inFrame:(WKFrameInfo *)frame
+{
     auto initialChangeCount = _inputSessionChangeCount;
     BOOL hasEmittedWarning = NO;
     NSTimeInterval secondsToWaitUntilWarning = 2;
     NSTimeInterval startTime = [NSDate timeIntervalSinceReferenceDate];
 
-    [self objectByEvaluatingJavaScript:script];
+    [self objectByEvaluatingJavaScript:script inFrame:frame];
     while ([[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantPast]]) {
         if (_inputSessionChangeCount != initialChangeCount)
             break;

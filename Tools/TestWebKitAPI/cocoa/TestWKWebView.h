@@ -233,6 +233,7 @@ class Color;
 @property (nonatomic, readonly) NSString *textForSpeakSelection;
 - (_WKActivatedElementInfo *)activatedElementAtPosition:(CGPoint)position;
 - (void)evaluateJavaScriptAndWaitForInputSessionToChange:(NSString *)script;
+- (void)evaluateJavaScriptAndWaitForInputSessionToChange:(NSString *)script inFrame:(WKFrameInfo *)frame;
 - (WKContentView *)wkContentView;
 - (void)setZoomScaleSimulatingUserTriggeredZoom:(CGFloat)zoomScale;
 @end
