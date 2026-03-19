@@ -764,8 +764,14 @@ FrameState* WebBackForwardList::findFrameStateInItem(WebCore::BackForwardItemIde
         return nullptr;
 
     RefPtr parentFrameItem = targetItem->mainFrameItem().childItemForFrameID(parentFrameID);
-    if (!parentFrameItem)
-        return nullptr;
+    if (!parentFrameItem) {
+        // FIXME: After session restore, the back/forward list's frame identifiers don't match
+        // the current WebView's frames because the original identifiers are unavailable.
+        // Fall back to the mainFrameItem if the parentFrameID isn't found.
+        // This only works correctly for direct children of the main frame; nested frames
+        // (e.g., subframe > nestedframe) will get the wrong FrameState.
+        parentFrameItem = &targetItem->mainFrameItem();
+    }
 
     RefPtr childFrameItem = parentFrameItem->childItemAtIndex(childFrameIndex);
     if (!childFrameItem)

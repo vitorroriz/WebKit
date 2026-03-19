@@ -1197,6 +1197,7 @@ void WebLocalFrameLoaderClient::dispatchDecidePolicyForBackForwardNavigationActi
             if (!localFrame)
                 return;
 
+            // The frame will become a RemoteFrame, which handles parent completion tracking.
             if (action == PolicyAction::LoadWillContinueInAnotherProcess)
                 return;
 
@@ -1204,8 +1205,6 @@ void WebLocalFrameLoaderClient::dispatchDecidePolicyForBackForwardNavigationActi
                 // Reset the pending async state and re-check completeness
                 // on the parent since this child won't be loading.
                 localFrame->loader().cancelPendingAsyncBackForwardNavigation();
-                if (RefPtr parent = dynamicDowncast<LocalFrame>(localFrame->tree().parent()))
-                    parent->loader().checkCompleted();
                 return;
             }
 
@@ -1213,13 +1212,18 @@ void WebLocalFrameLoaderClient::dispatchDecidePolicyForBackForwardNavigationActi
             if (!historyItem) {
                 // Fallback: FrameState not found, use normal load path
                 RELEASE_LOG(Loading, "dispatchDecidePolicyForBackForwardNavigationAction: FrameState not found, using fallback normal load path");
-
+                localFrame->loader().cancelPendingAsyncBackForwardNavigation();
                 if (RefPtr parent = dynamicDowncast<LocalFrame>(localFrame->tree().parent()))
                     parent->loader().continueLoadURLIntoChildFrame(URL { url }, referer, *localFrame);
                 return;
             }
 
-            localFrame->loader().loadRequestedHistoryItem(loadType, PolicyAlreadyDecided::Yes);
+            // The async wait is over — UIProcess has resolved the HistoryItem
+            // and the actual loading begins via normal DocumentLoader mechanisms.
+            // Clear the async state so that frame completion tracking behaves
+            // identically to the non-flag path.
+            if (localFrame->loader().shouldProceedWithAsyncBackForwardNavigation())
+                localFrame->loader().loadRequestedHistoryItem(loadType, PolicyAlreadyDecided::Yes);
         }
     );
 }

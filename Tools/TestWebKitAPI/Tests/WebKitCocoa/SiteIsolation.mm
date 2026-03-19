@@ -1903,6 +1903,7 @@ TEST(SiteIsolation, NavigationWithIFrames)
 
     [webView goBack];
     [navigationDelegate waitForDidFinishNavigation];
+    [navigationDelegate waitForDidFinishLoadInSubframe];
     checkFrameTreesInProcesses(webView.get(), {
         { "https://domain1.com"_s, { { RemoteFrame } } },
         { RemoteFrame, { { "https://domain2.com"_s } } }
@@ -4151,6 +4152,7 @@ TEST(SiteIsolation, GoBackToPageWithIframe)
 
     [webView goBack];
     [navigationDelegate waitForDidFinishNavigation];
+    [navigationDelegate waitForDidFinishLoadInSubframe];
     checkFrameTreesInProcesses(webView.get(), {
         { "https://a.com"_s,
             { { RemoteFrame } }
@@ -4835,6 +4837,8 @@ TEST(SiteIsolation, ProcessTerminationReason)
 
     kill([webView mainFrame].info._processIdentifier, 9);
     [navigationDelegate waitForDidFinishNavigation];
+    while (server.totalRequests() < 5u)
+        Util::spinRunLoop();
     EXPECT_EQ(server.totalRequests(), 5u);
 }
 

@@ -269,7 +269,7 @@ public:
     void loadDone(LoadCompletionType);
     void subresourceLoadDone(LoadCompletionType);
     void finishedParsing();
-    WEBCORE_EXPORT void checkCompleted();
+    void checkCompleted();
 
     bool isComplete() const { return m_isComplete; }
 

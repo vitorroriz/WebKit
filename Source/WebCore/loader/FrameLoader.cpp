@@ -3785,6 +3785,9 @@ void FrameLoader::continueFragmentScrollAfterNavigationPolicy(const ResourceRequ
     // frame to be deallocated.
     Ref frame = m_frame.get();
 
+    // A fragment scroll should cancel any pending async back-forward navigation.
+    cancelPendingAsyncBackForwardNavigation();
+
     // If we have a provisional request for a different document, a fragment scroll should cancel it.
     if (m_provisionalDocumentLoader && !equalIgnoringFragmentIdentifier(m_provisionalDocumentLoader->request().url(), request.url())) {
         protect(m_provisionalDocumentLoader)->stopLoading();
@@ -4689,8 +4692,14 @@ void FrameLoader::setPendingAsyncBackForwardNavigation()
 
 void FrameLoader::cancelPendingAsyncBackForwardNavigation()
 {
-    if (m_asyncBackForwardNavigationState == AsyncBackForwardNavigationState::Pending)
-        m_asyncBackForwardNavigationState = AsyncBackForwardNavigationState::Cancelled;
+    if (m_asyncBackForwardNavigationState != AsyncBackForwardNavigationState::Pending)
+        return;
+
+    m_asyncBackForwardNavigationState = AsyncBackForwardNavigationState::Cancelled;
+
+    Ref frame = m_frame.get();
+    if (RefPtr parentFrame = dynamicDowncast<LocalFrame>(frame->tree().parent()))
+        parentFrame->loader().checkCompleted();
 }
 
 bool FrameLoader::shouldProceedWithAsyncBackForwardNavigation()

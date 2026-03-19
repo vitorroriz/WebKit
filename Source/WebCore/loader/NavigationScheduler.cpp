@@ -312,6 +312,12 @@ public:
 
         UserGestureIndicator gestureIndicator(userGestureToForward());
 
+        // history.go(0) is a reload, not a back-forward navigation.
+        if (!m_steps) {
+            localFrame->loader().changeLocation(localFrame->document()->url(), selfTargetFrameName(), 0, ReferrerPolicy::EmptyString, shouldOpenExternalURLs(), std::nullopt, nullAtom(), std::nullopt, NavigationHistoryBehavior::Reload);
+            return;
+        }
+
         if (page->settings().useUIProcessForBackForwardItemLoading()) {
             localFrame->loader().setPendingAsyncBackForwardNavigation();
             localFrame->loader().client().dispatchGoToBackForwardItemAtIndex(m_steps, FrameLoadType::IndexedBackForward);
@@ -324,11 +330,6 @@ public:
 
         if (!protect(page->backForward())->containsItem(*historyItem))
             return;
-
-        if (RefPtr currentItem = protect(page->backForward())->currentItem(); currentItem && currentItem->itemID() == historyItem->itemID()) {
-            localFrame->loader().changeLocation(localFrame->document()->url(), selfTargetFrameName(), 0, ReferrerPolicy::EmptyString, shouldOpenExternalURLs(), std::nullopt, nullAtom(), std::nullopt, NavigationHistoryBehavior::Reload);
-            return;
-        }
 
         Ref rootFrame = localFrame->rootFrame();
         page->goToItem(rootFrame, *historyItem, FrameLoadType::IndexedBackForward, ShouldTreatAsContinuingLoad::No);

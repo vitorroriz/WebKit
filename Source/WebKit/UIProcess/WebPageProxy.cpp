@@ -5594,8 +5594,15 @@ void WebPageProxy::commitProvisionalPage(IPC::Connection& connection, FrameIdent
 
     RefPtr mainFrameInPreviousProcess = m_mainFrame;
     Ref preferences = m_preferences;
-    if (mainFrameInPreviousProcess && preferences->siteIsolationEnabled())
+    if (mainFrameInPreviousProcess && preferences->siteIsolationEnabled()) {
+        // Update the back/forward list so existing entries use the new main frame's FrameIdentifier.
+        // This is needed for back/forward navigations that trigger a process swap, since no new
+        // back/forward list item is added (unlike forward navigations where backForwardAddItemShared
+        // handles the update).
+        if (mainFrameInPreviousProcess->frameID() != frameID)
+            backForwardList().updateFrameIdentifier(mainFrameInPreviousProcess->frameID(), frameID);
         mainFrameInPreviousProcess->removeChildFrames();
+    }
 
     ASSERT(m_legacyMainFrameProcess.ptr() != &provisionalPage->process() || preferences->siteIsolationEnabled());
 
