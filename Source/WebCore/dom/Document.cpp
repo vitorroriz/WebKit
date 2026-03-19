@@ -75,6 +75,7 @@
 #include "DOMAudioSession.h"
 #include "DOMCSSPaintWorklet.h"
 #include "DOMImplementation.h"
+#include "DOMRect.h"
 #include "DOMTimer.h"
 #include "DateComponents.h"
 #include "DebugPageOverlays.h"
@@ -10892,6 +10893,34 @@ HTMLElement* Document::topmostAutoPopover() const
     return m_autoPopoverList.last().ptr();
 }
 
+RefPtr<HTMLDialogElement> Document::nearestClickedDialog(const PointerEvent& event, Node& target) const
+{
+    RefPtr currentNode = dynamicDowncast<Element>(target);
+    RefPtr dialog = dynamicDowncast<HTMLDialogElement>(currentNode);
+
+    if (dialog) {
+        Ref dialogRect = dialog->getBoundingClientRect();
+        auto insideBounds = event.clientX() >= dialogRect->left()
+            && event.clientX() < dialogRect->right()
+            && event.clientY() >= dialogRect->top()
+            && event.clientY() < dialogRect->bottom();
+        if (dialog->isOpen() && dialog->isModal() && !insideBounds)
+            return nullptr;
+    }
+
+    do {
+        if (dialog && dialog->isOpen())
+            return dialog;
+
+        currentNode = currentNode->parentElementInComposedTree();
+        if (!currentNode)
+            break;
+        dialog = dynamicDowncast<HTMLDialogElement>(*currentNode);
+    } while (currentNode);
+
+    return nullptr;
+}
+
 // https://html.spec.whatwg.org/#hide-all-popovers-until
 void Document::hideAllPopoversUntil(HTMLElement* endpoint, FocusPreviousElement focusPreviousElement, FireEvents fireEvents)
 {
@@ -10995,6 +11024,41 @@ void Document::handlePopoverLightDismiss(const PointerEvent& event, Node& target
     if (m_popoverPointerDownTarget == popoverToAvoidHiding.get())
         hideAllPopoversUntil(popoverToAvoidHiding.get(), FocusPreviousElement::No, FireEvents::Yes);
     m_popoverPointerDownTarget = nullptr;
+}
+
+// https://html.spec.whatwg.org/multipage/interactive-elements.html#dialog-light-dismiss
+void Document::handleDialogLightDismiss(const PointerEvent& event, Node& target)
+{
+    ASSERT(event.isTrusted());
+
+    if (m_openDialogsList.isEmpty())
+        return;
+
+    RefPtr ancestor = nearestClickedDialog(event, target);
+
+    if (event.type() == eventNames().pointerdownEvent) {
+        m_dialogPointerDownTarget = ancestor.get();
+        return;
+    }
+
+    ASSERT(event.type() == eventNames().pointerupEvent);
+
+    bool sameTarget = ancestor.get() == m_dialogPointerDownTarget;
+
+    m_dialogPointerDownTarget = nullptr;
+
+    if (!sameTarget)
+        return;
+
+    RefPtr topMostDialog = m_openDialogsList.last().ptr();
+
+    if (ancestor == topMostDialog)
+        return;
+
+    if (topMostDialog->computedClosedByState() != ClosedByState::Any)
+        return;
+
+    topMostDialog->requestClose(nullString());
 }
 
 #if ENABLE(ATTACHMENT_ELEMENT)

@@ -26,6 +26,7 @@
 #include "config.h"
 #include "HTMLDialogElement.h"
 
+#include "CommonAtomStrings.h"
 #include "ContainerNodeInlines.h"
 #include "CSSSelector.h"
 #include "DocumentPage.h"
@@ -55,6 +56,46 @@ using namespace HTMLNames;
 HTMLDialogElement::HTMLDialogElement(const QualifiedName& tagName, Document& document)
     : HTMLElement(tagName, document)
 {
+}
+
+const AtomString& HTMLDialogElement::closedBy() const
+{
+    switch (computedClosedByState()) {
+    case ClosedByState::None:
+        return noneAtom();
+    case ClosedByState::CloseRequest:
+        return closerequestAtom();
+    case ClosedByState::Any:
+        return anyAtom();
+    default:
+        ASSERT_NOT_REACHED();
+        return nullAtom();
+    }
+}
+
+ClosedByState HTMLDialogElement::closedByState() const
+{
+    if (!hasAttributeWithoutSynchronization(HTMLNames::closedbyAttr))
+        return ClosedByState::Auto;
+
+    auto value = attributeWithoutSynchronization(HTMLNames::closedbyAttr);
+    if (value == noneAtom())
+        return ClosedByState::None;
+    if (value == closerequestAtom())
+        return ClosedByState::CloseRequest;
+    if (value == anyAtom())
+        return ClosedByState::Any;
+
+    return ClosedByState::Auto;
+}
+
+ClosedByState HTMLDialogElement::computedClosedByState() const
+{
+    ClosedByState result = closedByState();
+    if (result == ClosedByState::Auto)
+        return m_isModal ? ClosedByState::CloseRequest : ClosedByState::None;
+
+    return result;
 }
 
 ExceptionOr<void> HTMLDialogElement::show()
@@ -289,20 +330,72 @@ bool HTMLDialogElement::supportsFocus() const
     return true;
 }
 
+Node::NeedsPostConnectionSteps HTMLDialogElement::insertionSteps(InsertionType insertionType, ContainerNode& parentOfInsertedTree)
+{
+    HTMLElement::insertionSteps(insertionType, parentOfInsertedTree);
+    if (!insertionType.connectedToDocument)
+        return NeedsPostConnectionSteps::No;
+    Ref document = this->document();
+    if (document->settings().closedbyAttributeEnabled())
+        return NeedsPostConnectionSteps::Yes;
+
+    return NeedsPostConnectionSteps::No;
+}
+
+void HTMLDialogElement::postConnectionSteps()
+{
+    HTMLElement::postConnectionSteps();
+    Ref document = this->document();
+    ASSERT(document->settings().closedbyAttributeEnabled());
+    if (!document->isFullyActive())
+        return;
+    if (isOpen() && isConnected())
+        setupSteps();
+}
+
 void HTMLDialogElement::removingSteps(RemovalType removalType, ContainerNode& oldParentOfRemovedTree)
 {
     HTMLElement::removingSteps(removalType, oldParentOfRemovedTree);
+    if (document().settings().closedbyAttributeEnabled() && isOpen())
+        cleanupSteps();
     setIsModal(false);
 }
 
 void HTMLDialogElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason attributeModificationReason)
 {
     HTMLElement::attributeChanged(name, oldValue, newValue, attributeModificationReason);
+    Ref document = this->document();
     if (name == openAttr) {
         auto isOpen = !newValue.isNull();
         Style::PseudoClassChangeInvalidation styleInvalidation(*this, CSSSelector::PseudoClass::Open, isOpen);
         m_isOpen = isOpen;
+
+        if (document->settings().closedbyAttributeEnabled()) {
+            if (!document->isFullyActive())
+                return;
+            if (newValue.isNull() && !oldValue.isNull())
+                cleanupSteps();
+            if (!isConnected())
+                return;
+            if (!newValue.isNull() && oldValue.isNull())
+                setupSteps();
+        }
     }
+}
+
+void HTMLDialogElement::setupSteps()
+{
+    ASSERT(isOpen());
+    ASSERT(isConnected());
+    Ref document = this->document();
+    ASSERT(!document->openDialogsList().contains(this));
+    document->openDialogsList().add(*this);
+}
+
+void HTMLDialogElement::cleanupSteps()
+{
+    Ref document = this->document();
+    document->openDialogsList().remove(*this);
 }
 
 void HTMLDialogElement::setIsModal(bool newValue)
