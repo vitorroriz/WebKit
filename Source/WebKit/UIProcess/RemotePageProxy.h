@@ -27,6 +27,7 @@
 
 #include "MessageReceiver.h"
 #include "NavigationActionData.h"
+#include "ProcessActivityGroup.h"
 #include "WebPageProxyMessageReceiverRegistration.h"
 #include "WebProcessProxy.h"
 #include <WebCore/FrameIdentifier.h>
@@ -49,6 +50,7 @@ enum class FrameLoadType : uint8_t;
 enum class HasInsecureContent : bool;
 enum class MediaProducerMediaState : uint32_t;
 enum class MouseEventPolicy : uint8_t;
+enum class ScreenOrientationType : uint8_t;
 
 class CertificateInfo;
 class ResourceResponse;

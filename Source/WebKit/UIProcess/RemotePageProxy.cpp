@@ -105,6 +105,8 @@ RemotePageProxy::RemotePageProxy(WebPageProxy& page, WebProcessProxy& process, c
 #endif
 
     m_process->addRemotePageProxy(*this);
+
+    protectedPage->didCreateRemotePage(*this);
 }
 
 void RemotePageProxy::disconnect()
@@ -200,6 +202,8 @@ RemotePageProxy::~RemotePageProxy()
     RefPtr page = m_page.get();
     if (!page)
         return;
+
+    page->willDestroyRemotePage(*this);
 
     if (RefPtr client = page->pageClient())
         client->didStopUsingProcessForSiteIsolation(m_process);

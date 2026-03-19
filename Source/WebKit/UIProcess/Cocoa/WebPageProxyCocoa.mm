@@ -1192,6 +1192,23 @@ bool WebPageProxy::shouldForceForegroundPriorityForClientNavigation() const
     return canTakeForegroundAssertions;
 }
 
+void WebPageProxy::setClientNavigationActivity(API::Navigation& navigation)
+{
+    ASCIILiteral activityName = "Client navigation"_s;
+
+    Seconds timeout(API::Navigation::navigationActivityTimeout);
+
+    if (protect(preferences())->siteIsolationEnabled()) {
+        navigation.setClientNavigationActivity(internals().foregroundProcessActivityGroup(activityName, timeout));
+        return;
+    }
+
+    Ref legacyMainFrameProcess = m_legacyMainFrameProcess;
+    Ref timedActivity = ProcessThrottler::TimedActivity::create(timeout);
+    timedActivity->setActivity(protect(legacyMainFrameProcess->throttler())->foregroundActivity(activityName));
+    navigation.setClientNavigationActivity(WTF::move(timedActivity));
+}
+
 #if HAVE(ESIM_AUTOFILL_SYSTEM_SUPPORT)
 
 bool WebPageProxy::shouldAllowAutoFillForCellularIdentifiers() const

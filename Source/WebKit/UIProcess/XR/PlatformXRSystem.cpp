@@ -83,6 +83,12 @@ void PlatformXRSystem::invalidate(InvalidationReason reason)
     invalidateImmersiveSessionState(reason == InvalidationReason::Client ? ImmersiveSessionState::SessionEndingFromSystem : ImmersiveSessionState::Idle);
 }
 
+bool PlatformXRSystem::hasActiveSession() const
+{
+    return std::holds_alternative<Ref<ProcessActivityGroup>>(m_immersiveSessionActivity)
+        || std::holds_alternative<Ref<ProcessThrottler::ForegroundActivity>>(m_immersiveSessionActivity);
+}
+
 void PlatformXRSystem::ensureImmersiveSessionActivity()
 {
     ASSERT(RunLoop::isMain());
@@ -91,10 +97,20 @@ void PlatformXRSystem::ensureImmersiveSessionActivity()
     if (!page)
         return;
 
-    if (m_immersiveSessionActivity && m_immersiveSessionActivity->isValid())
-        return;
+    const bool siteIsolationEnabled = protect(page->preferences())->siteIsolationEnabled();
+    constexpr ASCIILiteral activityName = "XR immersive session"_s;
 
-    m_immersiveSessionActivity = protect(protect(page->legacyMainFrameProcess())->throttler())->foregroundActivity("XR immersive session"_s);
+    if (siteIsolationEnabled) {
+        if (std::holds_alternative<Ref<ProcessActivityGroup>>(m_immersiveSessionActivity))
+            return;
+        m_immersiveSessionActivity = page->activityGroupContext().foregroundProcessActivityGroup(activityName);
+        return;
+    }
+
+    if (std::holds_alternative<Ref<ProcessThrottler::ForegroundActivity>>(m_immersiveSessionActivity)
+        && std::get<Ref<ProcessThrottler::ForegroundActivity>>(m_immersiveSessionActivity)->isValid())
+        return;
+    m_immersiveSessionActivity = protect(protect(page->legacyMainFrameProcess())->throttler())->foregroundActivity(activityName);
 }
 
 void PlatformXRSystem::enumerateImmersiveXRDevices(CompletionHandler<void(Vector<XRDeviceInfo>&&)>&& completionHandler)
@@ -355,7 +371,7 @@ void PlatformXRSystem::sessionDidEnd(XRDeviceIdentifier deviceIdentifier)
             return;
 
         protect(page->legacyMainFrameProcess())->send(Messages::PlatformXRSystemProxy::SessionDidEnd(deviceIdentifier), page->webPageIDInMainFrameProcess());
-        protectedThis->m_immersiveSessionActivity = nullptr;
+        protectedThis->m_immersiveSessionActivity = { };
         // If this is called when the session is running, the ending of the session is triggered by the system side
         // and we should set the state to SessionEndingFromSystem. We expect the web process to send a
         // didCompleteShutdownTriggeredBySystem message later when it has ended the XRSession, which will

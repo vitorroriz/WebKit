@@ -33,6 +33,7 @@
 #include "LayerTreeContext.h"
 #include "PDFDisplayMode.h"
 #include "PageLoadState.h"
+#include "ProcessActivityGroup.h"
 #include "ProcessThrottler.h"
 #include "ScrollingAccelerationCurve.h"
 #include "TextManipulationParameters.h"
@@ -229,6 +230,7 @@ struct WebPageProxy::Internals final : WebPopupMenuProxy::Client
 #if ENABLE(WIRELESS_PLAYBACK_TARGET) && !PLATFORM(IOS_FAMILY)
     , WebCore::WebMediaSessionManagerClient
 #endif
+    , ProcessActivityGroupContext
 {
     WTF_DEPRECATED_MAKE_STRUCT_FAST_ALLOCATED(WebPageProxy);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(Internals);
@@ -247,6 +249,7 @@ public:
         WebPaymentCoordinatorProxy::Client::setDidBeginCheckedPtrDeletion();
 #endif
         WebColorPickerClient::setDidBeginCheckedPtrDeletion();
+        ProcessActivityGroupContext::setDidBeginCheckedPtrDeletion();
     }
 
 #if PLATFORM(MACCATALYST)
@@ -532,6 +535,8 @@ public:
     bool alwaysOnLoggingAllowed() const final { return protect(page)->isAlwaysOnLoggingAllowed(); }
     RetainPtr<CocoaView> platformView() const final;
 #endif
+
+    Vector<Ref<WebProcessProxy>> activityTargets() final;
 
     std::optional<WebCore::SecurityOriginData> openerOrigin;
 };

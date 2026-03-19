@@ -32,6 +32,7 @@
 #include "APIUserScript.h"
 #include "APIUserStyleSheet.h"
 #include "MessageReceiver.h"
+#include "ProcessActivityGroup.h"
 #include "WebExtension.h"
 #include "WebExtensionAction.h"
 #include "WebExtensionAlarm.h"
@@ -77,6 +78,7 @@
 #include <wtf/RunLoop.h>
 #include <wtf/URLHash.h>
 #include <wtf/UUID.h>
+#include <wtf/Variant.h>
 #include <wtf/Vector.h>
 #include <wtf/WeakHashCountedSet.h>
 #include <wtf/WeakHashMap.h>
@@ -316,7 +318,7 @@ public:
         std::optional<WebExtensionTabIdentifier> tabIdentifier;
         RefPtr<API::InspectorExtension> extension;
         RetainPtr<WKWebView> backgroundWebView;
-        RefPtr<ProcessThrottlerActivity> activity;
+        Variant<std::monostate, Ref<ProcessThrottlerActivity>, Ref<ProcessActivityGroup>> activity;
     };
 #endif
 
@@ -1069,7 +1071,7 @@ private:
 
 #if PLATFORM(COCOA)
     RetainPtr<WKWebView> m_backgroundWebView;
-    RefPtr<ProcessThrottlerActivity> m_backgroundWebViewActivity;
+    Variant<std::monostate, Ref<ProcessThrottlerActivity>, Ref<ProcessActivityGroup>> m_backgroundWebViewActivity;
     RetainPtr<_WKWebExtensionContextDelegate> m_delegate;
 #endif
     RefPtr<API::Error> m_backgroundContentLoadError;

@@ -2417,6 +2417,7 @@
 		E326E357284E580E00157372 /* AuxiliaryProcessProxyCocoa.mm in Sources */ = {isa = PBXBuildFile; fileRef = E326E356284E580E00157372 /* AuxiliaryProcessProxyCocoa.mm */; };
 		E326F4DC2CA6C44F00182187 /* LogStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = E326F4DA2CA6C44F00182187 /* LogStream.mm */; };
 		E326F4DD2CA6C44F00182187 /* LogStream.h in Headers */ = {isa = PBXBuildFile; fileRef = E326F4D92CA6C44F00182187 /* LogStream.h */; };
+		E3301EE32F48C85500796190 /* WKNavigationPrivateForTesting.h in Headers */ = {isa = PBXBuildFile; fileRef = E3301EE22F48C84E00796190 /* WKNavigationPrivateForTesting.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E33E8FFD2C7FD2980002BEB3 /* UseDownloadPlaceholder.h in Headers */ = {isa = PBXBuildFile; fileRef = E33E8FFC2C7FD2980002BEB3 /* UseDownloadPlaceholder.h */; };
 		E34DAD392B753FA700FABEE2 /* ExtensionProcess.mm in Sources */ = {isa = PBXBuildFile; fileRef = E34DAD372B753FA700FABEE2 /* ExtensionProcess.mm */; };
 		E34DAD3A2B753FA700FABEE2 /* ExtensionProcess.h in Headers */ = {isa = PBXBuildFile; fileRef = E34DAD382B753FA700FABEE2 /* ExtensionProcess.h */; };
@@ -8575,6 +8576,7 @@
 		E326E356284E580E00157372 /* AuxiliaryProcessProxyCocoa.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AuxiliaryProcessProxyCocoa.mm; sourceTree = "<group>"; };
 		E326F4D92CA6C44F00182187 /* LogStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LogStream.h; sourceTree = "<group>"; };
 		E326F4DA2CA6C44F00182187 /* LogStream.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LogStream.mm; sourceTree = "<group>"; };
+		E3301EE22F48C84E00796190 /* WKNavigationPrivateForTesting.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKNavigationPrivateForTesting.h; sourceTree = "<group>"; };
 		E33E8FFC2C7FD2980002BEB3 /* UseDownloadPlaceholder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UseDownloadPlaceholder.h; sourceTree = "<group>"; };
 		E3439B632345463A0011DE0B /* NetworkProcessConnectionInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NetworkProcessConnectionInfo.h; path = Network/NetworkProcessConnectionInfo.h; sourceTree = "<group>"; };
 		E34B110C27C46BC6006D2F2E /* libWebCoreTestShim.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; path = libWebCoreTestShim.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -8642,6 +8644,10 @@
 		E3E6297C2D5FA8F200DAE50C /* ServiceWorkerDebuggableProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ServiceWorkerDebuggableProxy.h; sourceTree = "<group>"; };
 		E3E6297D2D5FA8F200DAE50C /* ServiceWorkerDebuggableProxy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ServiceWorkerDebuggableProxy.cpp; sourceTree = "<group>"; };
 		E3E84BED2AE1AA5A0091B3C2 /* ExtensionKitSPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtensionKitSPI.h; sourceTree = "<group>"; };
+		E3EA8E7C2F3F61EA006CC6B3 /* SiteIsolatedActivity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SiteIsolatedActivity.h; sourceTree = "<group>"; };
+		E3EA8E7D2F3F72BD006CC6B3 /* SiteIsolatedActivity.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SiteIsolatedActivity.cpp; sourceTree = "<group>"; };
+		E3EA8F0C2F439059006CC6B3 /* ProcessActivityGroup.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProcessActivityGroup.h; sourceTree = "<group>"; };
+		E3EA8F0D2F439059006CC6B3 /* ProcessActivityGroup.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ProcessActivityGroup.cpp; sourceTree = "<group>"; };
 		E3EFB02C2550617C003C2F96 /* WebSystemSoundDelegate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = WebSystemSoundDelegate.cpp; sourceTree = "<group>"; };
 		E3EFB02D2550617C003C2F96 /* WebSystemSoundDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebSystemSoundDelegate.h; sourceTree = "<group>"; };
 		E404907121DE65F70037F0DB /* ScrollingTreeFrameScrollingNodeRemoteMac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScrollingTreeFrameScrollingNodeRemoteMac.cpp; sourceTree = "<group>"; };
@@ -12962,6 +12968,7 @@
 				1AA20D5018AD50E0005D1ED4 /* WKNavigationDelegatePrivate.h */,
 				1ABC3DF01899C6B6004F0626 /* WKNavigationInternal.h */,
 				1ACC87B91981C341003D1AF4 /* WKNavigationPrivate.h */,
+				E3301EE22F48C84E00796190 /* WKNavigationPrivateForTesting.h */,
 				1A1B0EB418A424950038481A /* WKNavigationResponse.h */,
 				1A1B0EB318A424950038481A /* WKNavigationResponse.mm */,
 				1A1B0EB718A424CD0038481A /* WKNavigationResponseInternal.h */,
@@ -15918,6 +15925,8 @@
 				F4660BC125DEF08100E86598 /* PasteboardAccessIntent.h */,
 				832ED1891E2FE13B006BA64A /* PerActivityStateCPUUsageSampler.cpp */,
 				832ED18A1E2FE13B006BA64A /* PerActivityStateCPUUsageSampler.h */,
+				E3EA8F0D2F439059006CC6B3 /* ProcessActivityGroup.cpp */,
+				E3EA8F0C2F439059006CC6B3 /* ProcessActivityGroup.h */,
 				37716A59195B910500EE8B1B /* ProcessAssertion.cpp */,
 				86F9536018FF4FD4001DB2EF /* ProcessAssertion.h */,
 				86E67A22190F411800004AB7 /* ProcessThrottler.cpp */,
@@ -15944,6 +15953,8 @@
 				7BDE98AC2F0F33140091DCA3 /* RemotePageWebDeviceOrientationUpdateProviderProxy.h */,
 				BC111B08112F5E3C00337BAB /* ResponsivenessTimer.cpp */,
 				1A30066C1110F4F70031937C /* ResponsivenessTimer.h */,
+				E3EA8E7D2F3F72BD006CC6B3 /* SiteIsolatedActivity.cpp */,
+				E3EA8E7C2F3F61EA006CC6B3 /* SiteIsolatedActivity.h */,
 				93D6B7B0255268A10058DD3A /* SpeechRecognitionPermissionManager.cpp */,
 				93D6B7B2255268A20058DD3A /* SpeechRecognitionPermissionManager.h */,
 				93D6B7AF255268A10058DD3A /* SpeechRecognitionPermissionRequest.h */,
@@ -19300,6 +19311,7 @@
 				1AA20D5118AD50E0005D1ED4 /* WKNavigationDelegatePrivate.h in Headers */,
 				1ABC3DF11899C6B6004F0626 /* WKNavigationInternal.h in Headers */,
 				1ACC87BA1981C341003D1AF4 /* WKNavigationPrivate.h in Headers */,
+				E3301EE32F48C85500796190 /* WKNavigationPrivateForTesting.h in Headers */,
 				2D3A65E31A7C3A9300CAC637 /* WKNavigationRef.h in Headers */,
 				1A1B0EB618A424950038481A /* WKNavigationResponse.h in Headers */,
 				1A1B0EB818A424CD0038481A /* WKNavigationResponseInternal.h in Headers */,

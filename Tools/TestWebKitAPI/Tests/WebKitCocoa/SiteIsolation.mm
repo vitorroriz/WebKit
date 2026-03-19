@@ -45,10 +45,12 @@
 #import <WebKit/WKFrameInfoPrivate.h>
 #import <WebKit/WKNavigationDelegatePrivate.h>
 #import <WebKit/WKNavigationPrivate.h>
+#import <WebKit/WKNavigationPrivateForTesting.h>
 #import <WebKit/WKPreferencesPrivate.h>
 #import <WebKit/WKProcessPoolPrivate.h>
 #import <WebKit/WKURLSchemeTaskPrivate.h>
 #import <WebKit/WKUserContentControllerPrivate.h>
+#import <WebKit/WKWebViewConfigurationPrivate.h>
 #import <WebKit/WKWebViewPrivate.h>
 #import <WebKit/WKWebViewPrivateForTesting.h>
 #import <WebKit/WKWebpagePreferencesPrivate.h>
@@ -321,7 +323,7 @@ static std::pair<RetainPtr<TestWKWebView>, RetainPtr<TestNavigationDelegate>> si
 
 static std::pair<RetainPtr<TestWKWebView>, RetainPtr<TestNavigationDelegate>> siteIsolatedViewAndDelegate(const HTTPServer& server, CGRect rect = CGRectZero)
 {
-    return siteIsolatedViewAndDelegate(server.httpsProxyConfiguration(), rect);
+    return siteIsolatedViewAndDelegate(server.httpsProxyConfiguration(), rect, true);
 }
 
 static std::pair<RetainPtr<TestWKWebView>, RetainPtr<TestNavigationDelegate>> viewAndDelegate(const HTTPServer& server, CGRect rect = CGRectZero)
@@ -8389,5 +8391,30 @@ TEST(SiteIsolation, CrossSiteIFrameCanReceiveDeviceMotionEvents)
 }
 
 #endif // ENABLE(DEVICE_ORIENTATION) && PLATFORM(IOS_FAMILY)
+
+TEST(SiteIsolation, ProcessActivityGroup)
+{
+    HTTPServer server({
+        { "/example"_s, { "<iframe src='https://apple.com/apple'></iframe>"_s } },
+        { "/apple"_s, { "hello"_s } }
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server, CGRectMake(0, 0, 800, 600));
+    bool finishedLoading { false };
+    navigationDelegate.get().didFinishNavigation = makeBlockPtr([&](WKWebView *, WKNavigation *navigation) {
+#if PLATFORM(IOS_SIMULATOR)
+        // In the Simulator, we are never taking an activity when the view is hidden and we are calling
+        // -[WKWebViewConfiguration _setClientNavigationsRunAtForegroundPriority:YES], so we disable this check.
+        EXPECT_EQ([navigation _processActivityGroupSizeForTesting], 0u);
+#else
+        EXPECT_EQ([navigation _processActivityGroupSizeForTesting], 2u);
+#endif
+        finishedLoading = true;
+    }).get();
+    [webView.get().configuration _setClientNavigationsRunAtForegroundPriority:YES];
+    [webView setHidden:YES];
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/example"]]];
+    Util::run(&finishedLoading);
+}
 
 }

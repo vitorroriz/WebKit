@@ -29,6 +29,7 @@
 #include "APIWebsitePolicies.h"
 #include "FrameInfoData.h"
 #include "NavigationActionData.h"
+#include "ProcessActivityGroup.h"
 #include "ProcessThrottler.h"
 #include "WebBackForwardListItem.h"
 #include "WebContentMode.h"
@@ -42,6 +43,7 @@
 #include <wtf/ListHashSet.h>
 #include <wtf/MonotonicTime.h>
 #include <wtf/Ref.h>
+#include <wtf/Variant.h>
 
 namespace WebCore {
 enum class FrameLoadType : uint8_t;
@@ -171,9 +173,7 @@ public:
     const std::unique_ptr<SubstituteData>& substituteData() const LIFETIME_BOUND { return m_substituteData; }
 
     const WebCore::PrivateClickMeasurement* privateClickMeasurement() const { return m_lastNavigationAction && m_lastNavigationAction->privateClickMeasurement ? &*m_lastNavigationAction->privateClickMeasurement : nullptr; }
-
-    void setClientNavigationActivity(RefPtr<WebKit::ProcessThrottler::Activity>&& activity) { Ref { m_clientNavigationActivity }->setActivity(WTF::move(activity)); }
-
+    void setClientNavigationActivity(Variant<std::monostate, Ref<WebKit::ProcessThrottler::TimedActivity>, Ref<WebKit::ProcessActivityGroup>>&& activity) { m_clientNavigationActivity = WTF::move(activity); }
     void setIsLoadedWithNavigationShared(bool value) { m_isLoadedWithNavigationShared = value; }
     bool isLoadedWithNavigationShared() const { return m_isLoadedWithNavigationShared; }
 
@@ -207,6 +207,10 @@ public:
     WebKit::FrameState* backForwardFrameState() const { return m_backForwardFrameState.get(); }
     void setBackForwardFrameState(RefPtr<WebKit::FrameState>&& frameState) { m_backForwardFrameState = WTF::move(frameState); }
 
+    static constexpr Seconds navigationActivityTimeout { 30_s };
+
+    unsigned processActivityGroupSizeForTesting() const;
+
 private:
     Navigation(WebCore::ProcessIdentifier);
     Navigation(WebCore::ProcessIdentifier, RefPtr<WebKit::WebBackForwardListItem>&&);
@@ -231,7 +235,7 @@ private:
     std::optional<WebKit::FrameInfoData> m_originatingFrameInfo;
     WebCore::SecurityOriginData m_destinationFrameSecurityOrigin;
     WebKit::WebContentMode m_effectiveContentMode { WebKit::WebContentMode::Recommended };
-    Ref<WebKit::ProcessThrottler::TimedActivity> m_clientNavigationActivity;
+    Variant<std::monostate, Ref<WebKit::ProcessThrottler::TimedActivity>, Ref<WebKit::ProcessActivityGroup>> m_clientNavigationActivity;
     bool m_userContentExtensionsEnabled : 1 { true };
     bool m_isLoadedWithNavigationShared : 1 { false };
     bool m_requestIsFromClientInput : 1 { false };
