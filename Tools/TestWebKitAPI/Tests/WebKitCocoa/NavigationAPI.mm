@@ -59,4 +59,30 @@ TEST(NavigationAPI, PushStateUpdatesCurrentEntryKeyWithoutAllowPrivacySensitiveO
     EXPECT_FALSE([keyBefore isEqualToString:keyAfter]);
 }
 
+TEST(NavigationAPI, ReplaceStateUpdatesCurrentEntryIDWithoutAllowPrivacySensitiveOperationsInNonPersistentDataStores)
+{
+    HTTPServer server({
+        { "/example"_s, { "example"_s } }
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    RetainPtr configuration = server.httpsProxyConfiguration();
+    [configuration setWebsiteDataStore:[WKWebsiteDataStore nonPersistentDataStore]];
+    [configuration preferences]._allowPrivacySensitiveOperationsInNonPersistentDataStores = NO;
+
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 300, 300) configuration:configuration.get()]);
+
+    RetainPtr navigationDelegate = adoptNS([TestNavigationDelegate new]);
+    [navigationDelegate allowAnyTLSCertificate];
+    [webView setNavigationDelegate:navigationDelegate.get()];
+
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/example"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+
+    NSString *idBefore = [webView stringByEvaluatingJavaScript:@"navigation.currentEntry.id"];
+    [webView stringByEvaluatingJavaScript:@"history.replaceState(null, '', '/foo')"];
+    NSString *idAfter = [webView stringByEvaluatingJavaScript:@"navigation.currentEntry.id"];
+
+    EXPECT_FALSE([idBefore isEqualToString:idAfter]);
+}
+
 } // namespace TestWebKitAPI

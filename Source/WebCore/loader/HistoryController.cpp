@@ -1113,16 +1113,17 @@ void HistoryController::replaceState(RefPtr<SerializedScriptValue>&& stateObject
     Ref frame = m_frame.get();
     RefPtr page = frame->page();
     ASSERT(page);
-    if (!canRecordHistoryForFrame(frame))
-        return;
-
-    addVisitedLink(*page, URL({ }, urlString));
-    protect(frame->loader().client())->updateGlobalHistory();
 
     if (RefPtr document = frame->document(); document && document->settings().navigationAPIEnabled()) {
         currentItem->setNavigationAPIStateObject(nullptr);
         protect(protect(document->window())->navigation())->updateForNavigation(*currentItem, NavigationNavigationType::Replace);
     }
+
+    if (!canRecordHistoryForFrame(frame))
+        return;
+
+    addVisitedLink(*page, URL({ }, urlString));
+    protect(frame->loader().client())->updateGlobalHistory();
 }
 
 void HistoryController::replaceCurrentItem(RefPtr<HistoryItem>&& item)
