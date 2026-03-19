@@ -494,6 +494,18 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTreeTransaction(IPC::Connection
         didCommitLayerTree(connection, layerTreeTransaction, scrollingTreeTransaction, mainFrameData, transactionID);
 
         scrollingCoordinatorProxy->applyScrollingTreeLayerPositionsAfterCommit();
+
+#if ENABLE(SCROLL_STRETCH_NOTIFICATIONS)
+        if (mainFrameData && !layerTreeTransaction.remoteContextHostedIdentifier()) {
+            if (RefPtr pageClient = page->pageClient()) {
+                auto scrollPosition = scrollingCoordinatorProxy->currentMainFrameScrollPosition();
+                auto scrollOrigin = scrollingCoordinatorProxy->scrollOrigin();
+                auto topScrollStretch = std::max(0.0f, -scrollOrigin.y() - scrollPosition.y());
+                pageClient->topScrollStretchDidChange(topScrollStretch);
+            }
+        }
+#endif
+
 #if PLATFORM(IOS_FAMILY)
         page->adjustLayersForLayoutViewport(page->unobscuredContentRect().location(), page->unconstrainedLayoutViewportRect(), page->displayedContentScale());
 #endif

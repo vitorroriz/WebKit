@@ -857,7 +857,7 @@ public:
     void updateBannerViewFrame();
 #endif
 #if ENABLE(SCROLL_STRETCH_NOTIFICATIONS)
-    void topScrollStretchDidChange(uint64_t topScrollStretch);
+    void topScrollStretchDidChange(CGFloat topScrollStretch);
 #endif
 
 #if ENABLE(VIDEO)
@@ -1167,7 +1167,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 #endif
 
 #if ENABLE(SCROLL_STRETCH_NOTIFICATIONS)
-    uint64_t m_cachedTopScrollStretch { 0 };
+    CGFloat m_cachedTopScrollStretch { 0 };
 #endif
 
 #if HAVE(INLINE_PREDICTIONS)

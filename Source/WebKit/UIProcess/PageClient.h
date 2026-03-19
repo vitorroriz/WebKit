@@ -554,6 +554,10 @@ public:
     virtual void didCommitMainFrameData(const MainFrameData&) = 0;
     virtual void layerTreeCommitComplete() { }
 
+#if ENABLE(SCROLL_STRETCH_NOTIFICATIONS)
+    virtual void topScrollStretchDidChange(CGFloat) { }
+#endif
+
     virtual void scrollingNodeScrollViewDidScroll(WebCore::ScrollingNodeID) = 0;
 
     virtual CocoaWindow *platformWindow() const = 0;

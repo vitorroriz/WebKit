@@ -656,7 +656,7 @@ struct PerWebProcessState {
 - (void)_updateScrollGeometryWithContentOffset:(CGPoint)contentOffset contentSize:(CGSize)contentSize;
 
 #if ENABLE(SCROLL_STRETCH_NOTIFICATIONS)
-- (void)_topScrollStretchDidChange:(NSUInteger)topScrollStretch;
+- (void)_topScrollStretchDidChange:(CGFloat)topScrollStretch;
 #endif
 
 - (WKPageRef)_pageForTesting;

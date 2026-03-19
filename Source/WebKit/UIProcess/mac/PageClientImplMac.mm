@@ -806,13 +806,12 @@ void PageClientImpl::scrollingNodeScrollViewDidScroll(WebCore::ScrollingNodeID)
     protect(m_impl)->suppressContentRelativeChildViews(WebViewImpl::ContentRelativeChildViewsSuppressionType::TemporarilyRemove);
 }
 
-void PageClientImpl::didCommitMainFrameData(const MainFrameData& mainFrameData)
-{
-    PageClientImplCocoa::didCommitMainFrameData(mainFrameData);
 #if ENABLE(SCROLL_STRETCH_NOTIFICATIONS)
-    [webView() _topScrollStretchDidChange:mainFrameData.topScrollStretch];
-#endif
+void PageClientImpl::topScrollStretchDidChange(CGFloat topScrollStretch)
+{
+    [webView() _topScrollStretchDidChange:topScrollStretch];
 }
+#endif
 
 void PageClientImpl::willBeginViewGesture()
 {

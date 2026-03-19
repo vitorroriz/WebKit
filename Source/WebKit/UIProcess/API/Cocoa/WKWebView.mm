@@ -3174,7 +3174,7 @@ WebCore::CocoaColor *sampledFixedPositionContentColor(const WebCore::FixedContai
 }
 
 #if ENABLE(SCROLL_STRETCH_NOTIFICATIONS)
-- (void)_topScrollStretchDidChange:(NSUInteger)topScrollStretch
+- (void)_topScrollStretchDidChange:(CGFloat)topScrollStretch
 {
     _impl->topScrollStretchDidChange(topScrollStretch);
 }

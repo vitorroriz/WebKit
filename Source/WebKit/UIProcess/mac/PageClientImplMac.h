@@ -207,7 +207,9 @@ private:
 
     void scrollingNodeScrollViewDidScroll(WebCore::ScrollingNodeID) override;
 
-    void didCommitMainFrameData(const MainFrameData&) override;
+#if ENABLE(SCROLL_STRETCH_NOTIFICATIONS)
+    void topScrollStretchDidChange(CGFloat) override;
+#endif
 
     void registerInsertionUndoGrouping() override;
 
