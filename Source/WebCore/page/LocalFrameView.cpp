@@ -4259,6 +4259,13 @@ Color LocalFrameView::baseBackgroundColor() const
     return m_baseBackgroundColor;
 }
 
+void LocalFrameView::invalidateForBaseBackgroundOrColorSchemeChange()
+{
+    recalculateScrollbarOverlayStyle();
+    setNeedsLayoutAfterViewConfigurationChange();
+    setNeedsCompositingConfigurationUpdate();
+}
+
 void LocalFrameView::setBaseBackgroundColor(const Color& backgroundColor)
 {
     Color newBaseBackgroundColor = backgroundColor.isValid() ? backgroundColor : Color::white;
@@ -4273,9 +4280,7 @@ void LocalFrameView::setBaseBackgroundColor(const Color& backgroundColor)
     if (!isViewForDocumentInFrame())
         return;
 
-    recalculateScrollbarOverlayStyle();
-    setNeedsLayoutAfterViewConfigurationChange();
-    setNeedsCompositingConfigurationUpdate();
+    invalidateForBaseBackgroundOrColorSchemeChange();
 }
 
 #if ENABLE(DARK_MODE_CSS)

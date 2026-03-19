@@ -215,6 +215,7 @@ public:
     // True if the FrameView is not transparent, and the base background color is opaque.
     bool NODELETE hasOpaqueBackground() const;
 
+    WEBCORE_EXPORT void invalidateForBaseBackgroundOrColorSchemeChange();
     WEBCORE_EXPORT Color NODELETE baseBackgroundColor() const;
     WEBCORE_EXPORT void setBaseBackgroundColor(const Color&);
     WEBCORE_EXPORT void updateBackgroundRecursively(const std::optional<Color>& backgroundColor);
