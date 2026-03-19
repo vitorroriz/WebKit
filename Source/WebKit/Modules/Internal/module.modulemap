@@ -1,6 +1,6 @@
 module WebKit_Internal [system] {
     module AppKitSPI {
-        requires cplusplus20
+        requires objc
         header "../../Platform/spi/mac/AppKitSPI.h"
         export *
     }
@@ -74,6 +74,12 @@ module WebKit_Internal [system] {
     module WKTextSelectionController {
         requires cplusplus20
         header "../../UIProcess/mac/WKTextSelectionController.h"
+        export *
+    }
+
+    module WKPDFHUDView {
+        requires objc
+        header "../../UIProcess/PDF/WKPDFHUDView.h"
         export *
     }
 

@@ -200,7 +200,7 @@ void PageClientImpl::makeFirstResponder()
     [retainPtr([m_view.get() window]) makeFirstResponder:m_view.get().get()];
 }
     
-bool PageClientImpl::isViewVisible(NSView *view, NSWindow *viewWindow)
+bool PageClientImpl::isViewVisible(NSView *view, NSWindow *viewWindow) const
 {
     auto windowIsOccluded = [&]()->bool {
         return m_impl && m_impl->windowOcclusionDetectionEnabled() && (viewWindow.occlusionState & NSWindowOcclusionStateVisible) != NSWindowOcclusionStateVisible;
@@ -411,6 +411,11 @@ void PageClientImpl::removePDFHUD(PDFPluginIdentifier identifier)
 void PageClientImpl::removeAllPDFHUDs()
 {
     protect(m_impl)->removeAllPDFHUDs();
+}
+
+void PageClientImpl::showPDFHUD(PDFPluginIdentifier identifier)
+{
+    protect(m_impl)->showPDFHUD(identifier);
 }
 
 void PageClientImpl::clearAllEditCommands()

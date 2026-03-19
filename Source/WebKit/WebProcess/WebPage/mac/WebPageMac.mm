@@ -1091,6 +1091,12 @@ void WebPage::removePDFHUD(PDFPluginBase& plugin)
         send(Messages::WebPageProxy::RemovePDFHUD(plugin.identifier()));
 }
 
+void WebPage::showPDFHUD(PDFPluginBase& plugin)
+{
+    if (m_pdfPlugInsWithHUD.contains(plugin.identifier()))
+        send(Messages::WebPageProxy::ShowPDFHUD(plugin.identifier()));
+}
+
 #endif // ENABLE(PDF_PLUGIN)
 
 } // namespace WebKit

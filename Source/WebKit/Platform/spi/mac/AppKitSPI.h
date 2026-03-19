@@ -63,6 +63,10 @@ DECLARE_SYSTEM_HEADER
 #import <AppKit/NSTextSelectionManager.h>
 #endif
 
+#if HAVE(LIQUID_GLASS)
+#import <AppKit/NSGlassEffectView_Private.h>
+#endif
+
 #else
 
 @interface NSInspectorBar : NSObject
@@ -192,6 +196,20 @@ typedef NS_ENUM(NSInteger, NSScrollPocketEdge) {
 - (BOOL)_gestureRecognizer:(NSGestureRecognizer *)preventingGestureRecognizer canPreventGestureRecognizer:(NSGestureRecognizer *)preventedGestureRecognizer;
 
 @end
+
+#if HAVE(LIQUID_GLASS)
+
+typedef NS_ENUM(NSInteger, _NSGlassEffectViewAdaptiveAppearance) {
+    _NSGlassEffectViewAdaptiveAppearanceAutomatic,
+    _NSGlassEffectViewAdaptiveAppearanceOff,
+    _NSGlassEffectViewAdaptiveAppearanceOn,
+} NS_REFINED_FOR_SWIFT;
+
+@interface NSGlassEffectView (SPI)
+@property _NSGlassEffectViewAdaptiveAppearance _adaptiveAppearance;
+@end
+
+#endif
 
 #endif
 

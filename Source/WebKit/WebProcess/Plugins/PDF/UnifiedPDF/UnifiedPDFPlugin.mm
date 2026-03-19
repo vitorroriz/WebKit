@@ -4779,6 +4779,18 @@ void UnifiedPDFPlugin::clearSelection()
 
 void UnifiedPDFPlugin::handleSyntheticClick(PlatformMouseEvent&& event)
 {
+#if ENABLE(PDF_HUD)
+    if (shouldShowHUD()) {
+        RefPtr frame = m_frame.get();
+        if (RefPtr page = frame ? frame->page() : nullptr)
+            page->showPDFHUD(*this);
+    }
+#endif
+
+#if ENABLE(PDF_PAGE_NUMBER_INDICATOR)
+    updatePageNumberIndicator();
+#endif
+
 #if HAVE(PDFDOCUMENT_SELECTION_WITH_GRANULARITY)
     auto pointInRootView = event.position();
     if (RetainPtr annotation = annotationForRootViewPoint(IntPoint(pointInRootView))) {

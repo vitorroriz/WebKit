@@ -1736,7 +1736,7 @@ void WebViewImpl::viewDidEndLiveResize()
 void WebViewImpl::createPDFHUD(PDFPluginIdentifier identifier, WebCore::FrameIdentifier frameID, const WebCore::IntRect& rect)
 {
     removePDFHUD(identifier);
-    RetainPtr hud = adoptNS([[WKPDFHUDView alloc] initWithFrame:rect pluginIdentifier:identifier frameIdentifier:frameID page:m_page.get()]);
+    RetainPtr hud = adoptNS([[WKPDFHUDView alloc] initWithFrame:rect pluginIdentifier:identifier.toUInt64() frameIdentifier:frameID.toUInt64() webView:m_page->cocoaView().get()]);
     [m_view.get() addSubview:hud.get()];
     _pdfHUDViews.add(identifier, WTF::move(hud));
 }
@@ -1766,6 +1766,36 @@ RetainPtr<NSSet> WebViewImpl::pdfHUDs()
     for (auto& hud : _pdfHUDViews.values())
         [set addObject:hud.get()];
     return set;
+}
+
+void WebViewImpl::showPDFHUD(PDFPluginIdentifier identifier)
+{
+    if (RetainPtr hud = _pdfHUDViews.get(identifier))
+        [hud show];
+}
+
+RetainPtr<NSView> WebViewImpl::hitTestPDFHUD(WebCore::FloatPoint locationInView)
+{
+    for (RetainPtr hud : _pdfHUDViews.values()) {
+        RetainPtr hitView = [hud hitTest:locationInView];
+        if (!hitView)
+            continue;
+        if (hitView == m_view.get())
+            continue;
+        if (hitView == hud || [hitView isDescendantOf:hud.get()])
+            return hitView;
+    }
+    return nil;
+}
+
+bool WebViewImpl::isPointOnPDFHUD(WebCore::FloatPoint locationInView)
+{
+    return !!hitTestPDFHUD(locationInView);
+}
+
+bool WebViewImpl::isViewVisible(NSView *view)
+{
+    return m_pageClient->isViewVisible(view, [view window]);
 }
 
 void WebViewImpl::renewGState()
@@ -2225,8 +2255,6 @@ void WebViewImpl::windowDidChangeBackingProperties(CGFloat oldBackingScaleFactor
         return;
 
     m_page->setIntrinsicDeviceScaleFactor(newBackingScaleFactor);
-    for (auto& hud : _pdfHUDViews.values())
-        [hud setDeviceScaleFactor:newBackingScaleFactor];
 }
 
 void WebViewImpl::windowDidChangeScreen()
@@ -6276,9 +6304,13 @@ void WebViewImpl::mouseMoved(NSEvent *event)
     for (auto& hud : _pdfHUDViews.values())
         [hud mouseMoved:event];
 
-    // When a view is first responder, it gets mouse moved events even when the mouse is outside its visible rect.
     RetainPtr view = m_view.get();
-    if (view == [view window].firstResponder && !NSPointInRect([view convertPoint:[event locationInWindow] fromView:nil], [view visibleRect]))
+    WebCore::FloatPoint locationInView { [view convertPoint:[event locationInWindow] fromView:nil] };
+    if (isPointOnPDFHUD(locationInView))
+        return;
+
+    // When a view is first responder, it gets mouse moved events even when the mouse is outside its visible rect.
+    if (view == [view window].firstResponder && !NSPointInRect(locationInView, [view visibleRect]))
         return;
 
     mouseMovedInternal(event);
@@ -6356,11 +6388,6 @@ void WebViewImpl::mouseDown(NSEvent *event, WebMouseEventInputSource inputSource
     setLastMouseDownEvent(event);
     setIgnoresMouseDraggedEvents(false);
 
-    for (auto& hud : _pdfHUDViews.values()) {
-        if ([hud handleMouseDown:event])
-            return;
-    }
-
     mouseDownInternal(event, inputSource);
 }
 
@@ -6374,11 +6401,6 @@ void WebViewImpl::mouseUp(NSEvent *event, WebMouseEventInputSource inputSource)
 #if ENABLE(IMAGE_ANALYSIS_ENHANCEMENTS)
     fulfillDeferredImageAnalysisOverlayViewHierarchyTask();
 #endif
-
-    for (auto& hud : _pdfHUDViews.values()) {
-        if ([hud handleMouseUp:event])
-            return;
-    }
 
     mouseUpInternal(event, inputSource);
 }

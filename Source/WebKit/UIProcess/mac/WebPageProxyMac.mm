@@ -855,6 +855,12 @@ void WebPageProxy::updatePDFHUDLocation(PDFPluginIdentifier identifier, const We
         pageClient->updatePDFHUDLocation(identifier, rect);
 }
 
+void WebPageProxy::showPDFHUD(PDFPluginIdentifier identifier)
+{
+    if (RefPtr pageClient = this->pageClient())
+        pageClient->showPDFHUD(identifier);
+}
+
 void WebPageProxy::pdfZoomIn(PDFPluginIdentifier identifier, WebCore::FrameIdentifier frameID)
 {
     sendToProcessContainingFrame(frameID, Messages::WebPage::ZoomPDFIn(identifier));

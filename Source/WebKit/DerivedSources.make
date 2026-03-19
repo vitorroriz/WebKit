@@ -100,7 +100,7 @@ VPATH = \
     $(WebKit2)/UIProcess/Network \
     $(WebKit2)/UIProcess/Network/CustomProtocols \
     $(WebKit2)/UIProcess/Notifications \
-    $(WebKit2)/UIProcess/Plugins \
+    $(WebKit2)/UIProcess/PDF \
     $(WebKit2)/UIProcess/RemoteLayerTree \
     $(WebKit2)/UIProcess/Storage \
     $(WebKit2)/UIProcess/UserContent \
@@ -1068,6 +1068,7 @@ all : JSWebExtensionAPIUnified.mm $(EXTENSION_INTERFACES:%=JS%.h) $(EXTENSION_IN
 
 ifeq ($(USE_INTERNAL_SDK),YES)
 WEBKIT_ADDITIONS_SWIFT_FILES = \
+	NSGlassEffectView+Extras.swift \
 	UIWindowScene+Extras.swift \
 	WebViewRepresentable+Extras.swift \
 	WKWebView+WKBannerViewOverlay.swift \

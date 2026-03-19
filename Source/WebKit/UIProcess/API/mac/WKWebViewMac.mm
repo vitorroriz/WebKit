@@ -34,6 +34,7 @@
 #if PLATFORM(MAC)
 
 #import "AppKitSPI.h"
+#import "PDFPluginIdentifier.h"
 #import "WKAPICast.h"
 #import "WKIntelligenceTextEffectCoordinator.h"
 #import "WKTextFinderClient.h"
@@ -49,6 +50,7 @@
 #import "_WKWarningView.h"
 #import <WebCore/CGWindowUtilities.h>
 #import <WebCore/CornerRadii.h>
+#import <WebCore/FrameIdentifier.h>
 #import <WebCore/LegacyNSPasteboardTypes.h>
 #import <WebKit/WKUIDelegatePrivate.h>
 #import <pal/spi/mac/NSTextFinderSPI.h>
@@ -2186,5 +2188,37 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     SUPPRESS_RETAINPTR_CTOR_ADOPT return [[NSImage alloc] initWithCGImage:snapshot.get() size:NSZeroSize];
 }
 @end
+
+#if ENABLE(PDF_HUD)
+
+@implementation WKWebView (WKPDFHUD)
+
+- (void)_pdfZoomIn:(WebKit::PDFPluginIdentifier)pluginIdentifier frameIdentifier:(WebCore::FrameIdentifier)frameIdentifier
+{
+    if (RefPtr page = _page)
+        page->pdfZoomIn(pluginIdentifier, frameIdentifier);
+}
+
+- (void)_pdfZoomOut:(WebKit::PDFPluginIdentifier)pluginIdentifier frameIdentifier:(WebCore::FrameIdentifier)frameIdentifier
+{
+    if (RefPtr page = _page)
+        page->pdfZoomOut(pluginIdentifier, frameIdentifier);
+}
+
+- (void)_pdfOpenWithPreview:(WebKit::PDFPluginIdentifier)pluginIdentifier frameIdentifier:(WebCore::FrameIdentifier)frameIdentifier
+{
+    if (RefPtr page = _page)
+        page->pdfOpenWithPreview(pluginIdentifier, frameIdentifier);
+}
+
+- (void)_pdfSaveToPDF:(WebKit::PDFPluginIdentifier)pluginIdentifier frameIdentifier:(WebCore::FrameIdentifier)frameIdentifier
+{
+    if (RefPtr page = _page)
+        page->pdfSaveToPDF(pluginIdentifier, frameIdentifier);
+}
+
+@end
+
+#endif // ENABLE(PDF_HUD)
 
 #endif // PLATFORM(MAC)

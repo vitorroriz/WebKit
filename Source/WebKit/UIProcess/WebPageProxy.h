@@ -2522,6 +2522,7 @@ public:
     void createPDFHUD(PDFPluginIdentifier, WebCore::FrameIdentifier, const WebCore::IntRect&);
     void updatePDFHUDLocation(PDFPluginIdentifier, const WebCore::IntRect&);
     void removePDFHUD(PDFPluginIdentifier);
+    void showPDFHUD(PDFPluginIdentifier);
 #endif
 
 #if ENABLE(PDF_PAGE_NUMBER_INDICATOR)

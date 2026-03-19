@@ -342,6 +342,19 @@ static WebCore::FloatSize toRawPlatformDelta(WebCore::FloatSize delta)
     if (_singleClickGestureRecognizer != gesture)
         return;
 
+    // Clicks aren't delivered to NSButton's built-in click gesture
+    // recognizer when a parent view's GR recognizes first, so we
+    // forward the click manually.
+    if (gesture.state == NSGestureRecognizerStateBegan) {
+        WebCore::FloatPoint location { [gesture locationInView:webView.get()] };
+        if (RetainPtr hitView = viewImpl->hitTestPDFHUD(location); hitView && viewImpl->isViewVisible(hitView.get())) {
+            if (RetainPtr hudButton = dynamic_objc_cast<NSButton>(hitView))
+                [hudButton performClick:nil];
+            gesture.state = NSGestureRecognizerStateCancelled;
+            return;
+        }
+    }
+
     switch (gesture.state) {
     case NSGestureRecognizerStateBegan:
         [self _handleClickBegan:gesture];

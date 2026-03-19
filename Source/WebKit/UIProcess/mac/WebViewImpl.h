@@ -282,7 +282,12 @@ public:
     void updatePDFHUDLocation(PDFPluginIdentifier, const WebCore::IntRect&);
     void removePDFHUD(PDFPluginIdentifier);
     void removeAllPDFHUDs();
+    void showPDFHUD(PDFPluginIdentifier);
     RetainPtr<NSSet> pdfHUDs();
+    bool isPointOnPDFHUD(WebCore::FloatPoint locationInView);
+    RetainPtr<NSView> hitTestPDFHUD(WebCore::FloatPoint locationInView);
+
+    bool isViewVisible(NSView *);
 
     void renewGState();
     void setFrameSize(CGSize);

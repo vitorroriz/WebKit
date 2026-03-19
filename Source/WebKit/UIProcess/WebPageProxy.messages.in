@@ -219,6 +219,7 @@ messages -> WebPageProxy {
     HandleSmartMagnificationInformationForPotentialTap(WebKit::TapIdentifier requestID, WebCore::FloatRect renderRect, bool fitEntireRect, double viewportMinimumScale, double viewportMaximumScale, bool nodeIsRootLevel, bool nodeIsPluginElement)
     IsPotentialTapInProgress() -> (bool result)
 #endif
+
 #if ENABLE(DATA_DETECTION)
     SetDataDetectionResult(struct WebKit::DataDetectionResult dataDetectionResult)
     HandleClickForDataDetectionResult(struct WebCore::DataDetectorElementInfo info, WebCore::IntPoint location)
@@ -576,6 +577,7 @@ messages -> WebPageProxy {
     CreatePDFHUD(WebKit::PDFPluginIdentifier identifier, WebCore::FrameIdentifier frameID, WebCore::IntRect boundingBox)
     UpdatePDFHUDLocation(WebKit::PDFPluginIdentifier identifier, WebCore::IntRect boundingBox)
     RemovePDFHUD(WebKit::PDFPluginIdentifier identifier)
+    ShowPDFHUD(WebKit::PDFPluginIdentifier identifier)
 #endif
 
 #if ENABLE(PDF_PAGE_NUMBER_INDICATOR)

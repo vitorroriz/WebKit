@@ -324,6 +324,7 @@ public:
     virtual void updatePDFHUDLocation(PDFPluginIdentifier, const WebCore::IntRect&) = 0;
     virtual void removePDFHUD(PDFPluginIdentifier) = 0;
     virtual void removeAllPDFHUDs() = 0;
+    virtual void showPDFHUD(PDFPluginIdentifier) = 0;
 #endif
 
 #if ENABLE(PDF_PAGE_NUMBER_INDICATOR)
@@ -431,6 +432,10 @@ public:
     virtual void didNotHandleTapAsClick(const WebCore::IntPoint&) = 0;
     virtual void didHandleTapAsHover() = 0;
     virtual void didCompleteSyntheticClick() = 0;
+#endif
+
+#if PLATFORM(MAC)
+    virtual bool isViewVisible(NSView *, NSWindow *) const = 0;
 #endif
 
     virtual void runModalJavaScriptDialog(CompletionHandler<void()>&& callback) { callback(); }
