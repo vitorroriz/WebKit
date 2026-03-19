@@ -8508,3 +8508,7 @@ imported/w3c/web-platform-tests/html/semantics/embedded-content/the-audio-elemen
 imported/w3c/web-platform-tests/uievents/keyboard/keypress-not-fired-for-modifier-shortcuts.html [ Skip ]
 
 webkit.org/b/310310 editing/input/cocoa/extended-proofreading.html [ Skip ]
+
+# webkit.org/b/310313 REGRESSION(309498@main): [iOS Debug] ASSERTION FAILED: request.hasHTTPHeaderField(HTTPHeaderName::SecFetchDest)
+[ Debug ] http/tests/navigation/post-frames-goback1.html [ Skip ]
+[ Debug ] http/tests/navigation/post-goback1.html [ Skip ]
