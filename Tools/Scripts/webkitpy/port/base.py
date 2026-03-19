@@ -1296,6 +1296,8 @@ class Port(object):
         pass
 
     def _should_use_jhbuild(self):
+        if os.environ.get('WEBKIT_JHBUILD') != '1':
+            return False
         suffix = ""
         if self.port_name:
             suffix = self.port_name.upper()

@@ -28,18 +28,18 @@ from glib_test_runner import GLibTestRunner
 
 top_level_directory = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, os.path.join(top_level_directory, "Tools", "glib"))
-import common
+
+
+import common  # noqa: E402
+import jhbuildutils  # noqa: E402
+import subprocess  # noqa: E402
 from webkitpy.common.host import Host
 from webkitpy.common.test_expectations import TestExpectations
 from webkitpy.port.monadodriver import MonadoDriver  # noqa: E402
 from webkitpy.port.westondriver import WestonDriver
 from webkitcorepy import Timeout
 
-import subprocess
-
-
 UNKNOWN_CRASH_STR = "CRASH_OR_PROBLEM_IN_TEST_EXECUTABLE"
-
 
 def port_options(options):
     port_options = optparse.Values()
@@ -482,6 +482,16 @@ class TestRunner(object):
         sys.stdout.flush()
 
         return number_of_failed_tests
+
+
+def check_environment(port):
+    if jhbuildutils.should_use_jhbuild():
+        # This not only checks, but also enters into the jhbuild environment if present
+        if not jhbuildutils.enter_jhbuild_environment_if_available(port):
+            print('***')
+            print('*** Warning: jhbuild environment not present.')
+            print('*** Run update-webkitgtk-libs before build-webkit to ensure proper testing.')
+            print('***')
 
 
 def create_option_parser():

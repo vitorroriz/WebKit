@@ -196,6 +196,7 @@ BEGIN {
        &splitVersionString
        &tsanIsEnabled
        &ubsanIsEnabled
+       &updateGtkOrWpeLibs
        &usesCryptexPath
        &vcpkgArgsFromFeatures
        &willUseAppleTVDeviceSDK
@@ -2541,8 +2542,13 @@ sub maybeUseContainerSDKRootDir()
 {
     return if not isLinux();
     return if (shouldUseFlatpak() or shouldBuildForCrossTarget() or inCrossTargetEnvironment());
-    return if ($ENV{'WEBKIT_CONTAINER_SDK'} // '') ne '1';
     return if ($ENV{'WEBKIT_CONTAINER_SDK_INSIDE_MOUNT_NAMESPACE'} // '') eq '1';
+    return if ($ENV{'WEBKIT_FLATPAK'} // '') eq '1';
+    return if ($ENV{'WEBKIT_JHBUILD'} // '') eq '1';
+    if (($ENV{'WEBKIT_CONTAINER_SDK'} // '') ne '1') {
+        print STDERR "WARNING: Running outside wkdev-sdk container. For proper testing, use https://github.com/Igalia/webkit-container-sdk\n";
+        return;
+    }
 
     my $sourceDir = sourceDir();
     my @wrapperScript = (File::Spec->catfile($sourceDir, "Tools", "Scripts", "container-sdk-rootdir-wrapper"));
@@ -2644,41 +2650,27 @@ sub wrapperPrefixIfNeeded()
         return ();
     }
 
-    # Returning () here means either Flatpak or no wrapper will be used.
-    if (isGtk() or isWPE()) {
-        # Respect user's choice.
-        if (defined $ENV{'WEBKIT_JHBUILD'}) {
-            if ($ENV{'WEBKIT_JHBUILD'} and -e getJhbuildPath()) {
-                return jhbuildWrapperPrefix();
-            } else {
-                return ();
-            }
-            # or let Flatpak take precedence over JHBuild.
-        } elsif (-e getUserFlatpakPath()) {
-            return ();
-        } elsif (-e getJhbuildPath()) {
-            return jhbuildWrapperPrefix();
-        }
+    if ((isGtk() or isWPE()) and (defined $ENV{'WEBKIT_JHBUILD'} and $ENV{'WEBKIT_JHBUILD'} and -e getJhbuildPath())) {
+        return jhbuildWrapperPrefix();
     }
     return ();
 }
 
 sub shouldUseFlatpak()
 {
-    # TODO: Use flatpak for JSCOnly on Linux? Could be useful when the SDK
-    # supports cross-compilation for ARMv7 and Aarch64 for instance.
-
     if (!isGtk() and !isWPE()) {
         return 0;
     }
 
-    if ((defined $ENV{'WEBKIT_JHBUILD'} && $ENV{'WEBKIT_JHBUILD'}) or (defined $ENV{'WEBKIT_BUILD_USE_SYSTEM_LIBRARIES'} && $ENV{'WEBKIT_BUILD_USE_SYSTEM_LIBRARIES'})) {
+    if (defined $ENV{'WEBKIT_JHBUILD'} and $ENV{'WEBKIT_JHBUILD'}) {
         return 0;
     }
 
     if (shouldBuildForCrossTarget() or inCrossTargetEnvironment()) {
         return 0;
     }
+
+    return 0 unless (defined $ENV{'WEBKIT_FLATPAK'} and $ENV{'WEBKIT_FLATPAK'});
 
     my @prefix = wrapperPrefixIfNeeded();
     return ((! inFlatpakSandbox()) and (@prefix == 0) and -e getUserFlatpakPath());
@@ -2716,7 +2708,8 @@ sub shouldRemoveCMakeCache(@)
                              "PKG_CONFIG_LIBDIR", "PKG_CONFIG_PATH", # pkg-config
                              "CPATH", "LIBRARY_PATH", # GCC/Clang include/lib helpers
                              "CMAKE_MODULE_PATH", "CMAKE_PREFIX_PATH", # CMake-specific
-                             "WEBKIT_USE_SCCACHE"); # sccache
+                             # WebKit-tooling build modifiers
+                             "WEBKIT_CONTAINER_SDK", "WEBKIT_FLATPAK", "WEBKIT_JHBUILD", "WEBKIT_USE_SCCACHE");
     for my $envFlag (@relevantEnvFlags) {
         my $flagValue = $ENV{$envFlag} || "";
             $buildArgsEnv .= "\n" . $envFlag . "=" . $flagValue;
@@ -3771,5 +3764,28 @@ sub runGitUpdate()
     # almost certainly what we want.
     system("git", "pull", "--autostash") == 0 or die;
 }
+
+
+sub updateGtkOrWpeLibs
+{
+    my ($port) = @_;
+    my $scriptsDir = relativeScriptsDir();
+    if (defined $ENV{'WEBKIT_JHBUILD'} and $ENV{'WEBKIT_JHBUILD'}) {
+        system("perl", "$scriptsDir/update-webkit-libs-jhbuild", "--$port", @ARGV) == 0 or die $!;
+    } elsif (defined $ENV{'WEBKIT_CROSS_TARGET'} or grep(/^--cross-target/, @ARGV)) {
+        system("$scriptsDir/cross-toolchain-helper", "--build-toolchain", @ARGV) == 0 or die $!;
+    } elsif (defined $ENV{'WEBKIT_FLATPAK'} and $ENV{'WEBKIT_FLATPAK'}) {
+        system("$scriptsDir/update-webkit-flatpak", @ARGV) == 0 or die $!;
+    }
+
+    if (defined $ENV{'WEBKIT_CONTAINER_SDK'} and $ENV{'WEBKIT_CONTAINER_SDK'}) {
+        # FIXME: implement a way to check if the update is needed by calling some script at /wkdev-sdk and then print a different message.
+        print "Running inside wkdev-sdk: execute wkdev-update on the host to check for updates.\n";
+    } else {
+        warn "Please download and install wkdev-sdk from https://github.com/Igalia/webkit-container-sdk\n";
+        exit 1;
+    }
+}
+
 
 1;
