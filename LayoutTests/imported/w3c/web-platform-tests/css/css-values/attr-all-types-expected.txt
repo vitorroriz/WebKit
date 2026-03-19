@@ -60,9 +60,9 @@ FAIL CSS Values and Units Test: attr 56 assert_equals: Value 'attr(data-foo type
 PASS CSS Values and Units Test: attr 57
 FAIL CSS Values and Units Test: attr 58 assert_equals: Value 'attr(data-foo type(invalid), 10px)', where 'data-foo=0px' should be valid for the property 'width'. expected "10px" but got "784px"
 PASS CSS Values and Units Test: attr 59
-FAIL CSS Values and Units Test: attr 60 assert_equals: Value 'attr(data-foo type("<color>")', where 'data-foo=#ff0099aa' should be valid for the property 'background-color'. expected "rgba(255, 0, 153, 0.667)" but got "rgba(0, 0, 0, 0)"
-FAIL CSS Values and Units Test: attr 61 assert_equals: Value 'attr(data-foo type("invalid | blue")', where 'data-foo=blue' should be valid for the property 'background-color'. expected "rgb(0, 0, 255)" but got "rgba(0, 0, 0, 0)"
-FAIL CSS Values and Units Test: attr 62 assert_equals: Value 'attr(data-foo type("<length> | <percentage>")', where 'data-foo=10%' should be valid for the property 'width'. expected "78.390625px" but got "784px"
+FAIL CSS Values and Units Test: attr 60 assert_equals: Value 'attr(data-foo type(<color>)', where 'data-foo=#ff0099aa' should be valid for the property 'background-color'. expected "rgba(255, 0, 153, 0.667)" but got "rgba(0, 0, 0, 0)"
+FAIL CSS Values and Units Test: attr 61 assert_equals: Value 'attr(data-foo type(invalid | blue)', where 'data-foo=blue' should be valid for the property 'background-color'. expected "rgb(0, 0, 255)" but got "rgba(0, 0, 0, 0)"
+FAIL CSS Values and Units Test: attr 62 assert_equals: Value 'attr(data-foo type(<length> | <percentage>)', where 'data-foo=10%' should be valid for the property 'width'. expected "78.390625px" but got "784px"
 PASS CSS Values and Units Test: attr 63
 FAIL CSS Values and Units Test: attr 64 assert_equals: Value 'attr(data-foo px)', where 'data-foo=10' should be valid for the property 'height'. expected "10px" but got "0px"
 FAIL CSS Values and Units Test: attr 65 assert_equals: Value 'calc(attr(data-foo px) + 1px)', where 'data-foo=10' should be valid for the property 'width'. expected "11px" but got "784px"

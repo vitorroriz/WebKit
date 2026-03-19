@@ -33,6 +33,7 @@ List of files:
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/angle-units-005.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-IACVT.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-all-types.html
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-argument-grammar.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-color-invalid-cast-expected.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-color-invalid-cast.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-color-valid-expected.html
@@ -58,6 +59,12 @@ List of files:
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-namespace-case-sensitivity-expected.xhtml
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-namespace-case-sensitivity-ref.xhtml
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-namespace-case-sensitivity.xhtml
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-namespace-non-existing-expected.xht
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-namespace-non-existing.html
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-namespace-valid-expected.xht
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-namespace-valid.xhtml
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-namespace-wildcard-expected.xht
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-namespace-wildcard.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-notype-fallback-expected.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-notype-fallback-ref.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-notype-fallback.html
@@ -65,6 +72,7 @@ List of files:
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-pseudo-elem-invalidation.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-revert-rule.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-security.html
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-serialization.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-style-sharing-1-expected.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-style-sharing-1-ref.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/attr-style-sharing-1.html
@@ -259,6 +267,8 @@ List of files:
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/ch-unit-019.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/chrome-interpolation-crash.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/chrome-typed-arithmetic-crash.html
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/clamp-color-computed.html
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/clamp-color-invalid.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/clamp-integer-computed.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/clamp-integer-invalid.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/clamp-length-computed.html
@@ -398,7 +408,11 @@ List of files:
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/q-unit-case-insensitivity-002.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/random-alias-property.tentative.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/random-computed.tentative.html
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/random-in-animations.tentative.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/random-in-container-query.tentative.html
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/random-in-custom-function.tentative.html
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/random-in-descriptors.tentative.html
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/random-in-if.tentative.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/random-in-keyframe.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/random-in-media.tentative.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/random-invalid.tentative.html
@@ -434,6 +448,7 @@ List of files:
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/sin-cos-tan-serialize.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/typed-arithmetic-different-categories-crash.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/typed-arithmetic-inside-calc-crash.html
+/LayoutTests/imported/w3c/web-platform-tests/css/css-values/typed-arithmetic-mixed-units-crash.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/typed_arithmetic.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/typed_arithmetic_cycle.html
 /LayoutTests/imported/w3c/web-platform-tests/css/css-values/update-subpixel-rem-unit.html

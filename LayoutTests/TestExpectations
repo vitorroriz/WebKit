@@ -2795,21 +2795,6 @@ webkit.org/b/148650 fast/repaint/add-table-overpaint.html [ Pass Failure ]
 
 # Initial failures on the import of css-content
 
-imported/w3c/web-platform-tests/css/css-content/content-none-details.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-fieldset.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-math.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-option.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-root-block.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-root-columns.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-root-flex.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-root-grid.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-root-ruby.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-root-table.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-select-1.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-select-2.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-span-dynamic.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-span.html [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/css/css-content/content-none-table.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-content/element-replacement-gradient.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-content/element-replacement-on-replaced-element.tentative.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-content/quotes-001.html [ ImageOnlyFailure ]
@@ -2830,6 +2815,8 @@ imported/w3c/web-platform-tests/css/css-content/quotes-034.html [ ImageOnlyFailu
 imported/w3c/web-platform-tests/css/css-content/quotes-first-letter-002.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-content/quotes-first-letter-004.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-content/quotes-first-letter-005.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/css-content/attr-chained-pseudo-001.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/css-content/quotes-first-line.html [ ImageOnlyFailure ]
 
 imported/w3c/web-platform-tests/html/browsers/history/the-history-interface/history_go_zero.html [ Pass Failure ]
 
@@ -4477,6 +4464,8 @@ imported/w3c/web-platform-tests/css/css-values/calc-size/calc-size-flex-008.html
 imported/w3c/web-platform-tests/css/css-values/calc-size/calc-size-flex-009.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-values/viewport-units-scrollbars-dynamic-001.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-values/viewport-units-scrollbars-scroll-vw-002.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/css-values/attr-namespace-non-existing.html [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/css-values/attr-namespace-valid.xhtml [ ImageOnlyFailure ]
 
 # wpt css-sizing failures
 webkit.org/b/308648 imported/w3c/web-platform-tests/css/css-sizing/abspos-auto-sizing-fit-content-percentage-005.html [ ImageOnlyFailure ]

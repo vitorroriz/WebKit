@@ -51,8 +51,8 @@ PASS Property scale value 'random(10, infinity, infinity)'
 PASS Property scale value 'calc(10 + random(10, infinity))'
 PASS Property scale value 'calc(10 + random(10, infinity, 10))'
 PASS Property scale value 'calc(10 + random(10, infinity, infinity))'
-FAIL Property scale value 'random(10, 100, infinity)' assert_equals: Random values should be equal expected "10" but got "0"
-FAIL Property scale value 'calc(10 + random(10, 100, infinity))' assert_equals: Random values should be equal expected "20" but got "0"
+FAIL Property scale value 'random(10, 100, infinity)' assert_true: Random values should be equal expected true got false
+FAIL Property scale value 'calc(10 + random(10, 100, infinity))' assert_true: Random values should be equal expected true got false
 PASS Property scale value 'random(10, 100, -infinity)'
 PASS Property scale value 'calc(10 + random(10, 100, -infinity))'
 PASS Property scale value on pseudo element '::before' 'random(7, 17)'
@@ -89,7 +89,7 @@ PASS Property y value 'random(10%, 30%)'
 FAIL Property border-image-slice value 'random(10%, 30%)' assert_true: Computed value for random(10%, 30%) should include 'fixed' expected true got false
 PASS Property background-color value 'rgb(225, 215, 0, random(30%, 10%))'
 PASS Property font-size value 'random(30%, 10%)'
-FAIL Property font-size value 'random(10px * 10% / 1%, 0%)' assert_equals: Random values should be equal expected "100px" but got "30px"
+FAIL Property font-size value 'random(10px * 10% / 1%, 0%)' assert_true: Random values should be equal expected true got false
 FAIL Property --percent value 'random(10%, 30%)' assert_greater_than_equal: random(10%, 30%) expected a number greater than or equal to 10 but got 3
 FAIL Property width value 'random(fixed random(1, 2), 10px, 100px)' assert_true: 'random(fixed random(1, 2), 10px, 100px)' is a supported value for width. expected true got false
 FAIL Property translate value 'random(fixed random(-2, -1), 10%, 100%)' assert_true: 'random(fixed random(-2, -1), 10%, 100%)' is a supported value for translate. expected true got false
@@ -141,7 +141,7 @@ PASS Shared globally - shorthand: random(element-shared, a, b)
 PASS Shared by property - shorthand and longhand: random(element-shared, a, b)
 PASS Shared by property - logical and physical property: random(element-shared, a, b)
 PASS Fixed: random(fixed <number>, a, b)
-FAIL Custom property with random() inside transform() should not have fixed assert_equals: Random values should be equal expected "translate(30%)" but got "translate(3%)"
+FAIL Custom property with random() inside transform() should not have fixed assert_true: Random values should be equal expected true got false
 FAIL random() with percentages inside multiple nested functions assert_true: expected true got false
 PASS Different between elements with same identifier random(--identifier, a, b)
 PASS random() values should not be allowed as initial values in @property
