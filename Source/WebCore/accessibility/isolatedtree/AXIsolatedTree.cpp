@@ -130,7 +130,11 @@ void AXIsolatedTree::createEmptyContent(AccessibilityObject& axRoot)
 
     // Create the IsolatedObjects for the root/ScrollView and WebArea.
     auto rootData = createIsolatedObjectData(axRoot, *this);
+#if !ENABLE(ACCESSIBILITY_LOCAL_FRAME)
+    // When ACCESSIBILITY_LOCAL_FRAME is enabled, the root's screen-relative position is
+    // derived dynamically from the tree's frame geometry, so we don't need to cache it.
     rootData.setProperty(AXProperty::ScreenRelativePosition, axRoot.screenRelativePosition());
+#endif
     NodeChange rootAppend { WTF::move(rootData), axRoot.wrapper() };
 
     RefPtr axWebArea = Accessibility::findUnignoredChild(axRoot, [] (auto& object) {
@@ -1553,8 +1557,10 @@ void AXIsolatedTree::applyPendingChangesLocked()
         m_selectedTextMarkerRange = std::exchange(m_pendingSelectedTextMarkerRange, std::nullopt).value();
 
 #if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
-    if (m_pendingFrameGeometry)
+    if (m_pendingFrameGeometry) {
         m_frameGeometry = std::exchange(m_pendingFrameGeometry, std::nullopt).value();
+        m_hasReceivedFrameGeometry = true;
+    }
 #endif
 
     // Do this at the end because it requires looking up the root node by ID, so doing it at the end
@@ -2070,7 +2076,12 @@ IsolatedObjectData createIsolatedObjectData(const Ref<AccessibilityObject>& axOb
             // Eagerly cache the screen relative position for the root. AXIsolatedObject::screenRelativePosition()
             // of non-root objects depend on the root object's screen relative position, so make sure it's there
             // from the start. We keep this up-to-date via AXIsolatedTree::updateRootScreenRelativePosition().
+#if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
+            // When ACCESSIBILITY_LOCAL_FRAME is enabled, the root's screen-relative position is
+            // derived dynamically from the tree's frame geometry via convertFrameToSpace().
+#else
             setProperty(AXProperty::ScreenRelativePosition, axObject->screenRelativePosition());
+#endif
 #if !ENABLE(ACCESSIBILITY_LOCAL_FRAME)
             setProperty(AXProperty::RemoteFrameOffset, object.remoteFrameOffset());
 #endif //

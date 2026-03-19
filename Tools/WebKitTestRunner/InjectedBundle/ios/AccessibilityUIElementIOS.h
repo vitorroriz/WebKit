@@ -307,6 +307,7 @@ public:
     bool isFirstItemInSuggestion() const override;
     bool isLastItemInSuggestion() const override;
     bool isMarkAnnotation() const override;
+    bool isFrameGeometryInitialized() const override;
 
     // Text input
     bool insertText(JSStringRef) override;

@@ -3039,6 +3039,18 @@ static RenderObject* rendererForView(WAKView* view)
     return ancestorWithRole(*self.axBackingObject, { AccessibilityRole::Mark }) != nullptr;
 }
 
+- (BOOL)_accessibilityIsFrameGeometryInitialized
+{
+    if (![self _prepareAccessibilityCall])
+        return NO;
+
+#if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
+    return self.axBackingObject->isFrameGeometryInitialized();
+#else
+    return YES;
+#endif
+}
+
 - (BOOL)_accessibilityIsSwitch
 {
     if (![self _prepareAccessibilityCall])

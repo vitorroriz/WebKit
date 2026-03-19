@@ -590,6 +590,16 @@ AccessibilityObject* AccessibilityScrollView::crossFrameChildObject() const
     return nullptr;
 }
 
+bool AccessibilityScrollView::isFrameGeometryInitialized() const
+{
+    if (isRoot()) {
+        if (CheckedPtr cache = axObjectCache())
+            return cache->frameGeometry().has_value();
+        return false;
+    }
+    return true;
+}
+
 FrameGeometry AccessibilityScrollView::frameGeometry() const
 {
     if (CheckedPtr cache = axObjectCache()) {

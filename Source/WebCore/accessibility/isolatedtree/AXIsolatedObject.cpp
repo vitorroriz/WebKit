@@ -582,8 +582,21 @@ RefPtr<AXCoreObject> AXIsolatedObject::accessibilityHitTest(const IntPoint& poin
 {
     // For layout tests, we want to exercise hit testing using the accessibility thread, so don't
     // use any caching or main-thread calls in testing contexts.
-    if (AXObjectCache::clientIsInTestMode()) [[unlikely]]
+    if (AXObjectCache::clientIsInTestMode()) [[unlikely]] {
+        // In layout tests, we pass page-relative coordinates. Convert to screen for approximateHitTest, which works in screen-space.
+#if ENABLE(ACCESSIBILITY_LOCAL_FRAME) && PLATFORM(MAC)
+        if (RefPtr root = tree().rootNode()) {
+            auto rootPosition = root->screenRelativePosition();
+            auto rootSize = root->size();
+            IntPoint screenPoint(rootPosition.x() + point.x(), rootPosition.y() + rootSize.height() - point.y());
+            return approximateHitTest(screenPoint);
+        }
+#else
+        // If ITM exists on non-macOS platforms, the coordinate conversion above (using a bottom-left origin) will be incorrect.
+        AX_ASSERT_NOT_REACHED();
+#endif // ENABLE(ACCESSIBILITY_LOCAL_FRAME) && PLATFORM(MAC)
         return approximateHitTest(point);
+    }
 
     // Check if we have a cached result for this point.
     RefPtr geometryManager = tree().geometryManager();
@@ -645,6 +658,10 @@ RefPtr<AXCoreObject> AXIsolatedObject::accessibilityHitTest(const IntPoint& poin
 RefPtr<AXIsolatedObject> AXIsolatedObject::approximateHitTest(const IntPoint& point) const
 {
     FloatRect bounds;
+    IntPoint adjustedPoint = point;
+#if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
+    bounds = screenRelativeRect();
+#else
     if (!AXObjectCache::clientIsInTestMode()) [[likely]] {
         // For "real" off-main-thread hit tests (i.e. those forwarded to us by WKAccessibilityWebPageObjectMac),
         // the coordinates are in the screen space. Note this may not be true for non-Mac platforms when we
@@ -655,8 +672,6 @@ RefPtr<AXIsolatedObject> AXIsolatedObject::approximateHitTest(const IntPoint& po
         bounds = relativeFrame();
     }
 
-    IntPoint adjustedPoint = point;
-#if !ENABLE(ACCESSIBILITY_LOCAL_FRAME)
     adjustedPoint.moveBy(-remoteFrameOffset());
 #endif
 
@@ -685,6 +700,22 @@ RefPtr<AXIsolatedObject> AXIsolatedObject::approximateHitTest(const IntPoint& po
             // cell (or cell contents) instead, which is typically more useful for ATs like Hover Text.
             continue;
         }
+
+#if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
+        if (child->role() == AccessibilityRole::LocalFrame) {
+            // LocalFrames have no unique platform wrapper (they delegate to the child tree), so we must explicitly
+            // cross into the child tree here.
+            // RemoteFrames don't have this problem since they have a wrapper that points to the remote accessibility
+            // object, and the frameworks recursively hit test in the bridged process.
+            // This also helps guard against potential frame wrapper issues, like the one noted in
+            // AXIsolatedTree::applyPendingChangesLocked.
+            if (RefPtr crossFrameChild = child->crossFrameChildObject()) {
+                if (RefPtr hitChild = crossFrameChild->approximateHitTest(point))
+                    return hitChild;
+            }
+            continue;
+        }
+#endif
 
         if (RefPtr hitChild = child->approximateHitTest(point))
             return hitChild;
@@ -1184,15 +1215,19 @@ IntPoint AXIsolatedObject::remoteFrameOffset() const
 
 FloatPoint AXIsolatedObject::screenRelativePosition() const
 {
+#if !ENABLE(ACCESSIBILITY_LOCAL_FRAME)
     if (auto point = optionalAttributeValue<FloatPoint>(AXProperty::ScreenRelativePosition))
         return *point;
+#endif
     return convertFrameToSpace(relativeFrame(), AccessibilityConversionSpace::Screen).location();
 }
 
 FloatRect AXIsolatedObject::screenRelativeRect() const
 {
+#if !ENABLE(ACCESSIBILITY_LOCAL_FRAME)
     if (auto point = optionalAttributeValue<FloatPoint>(AXProperty::ScreenRelativePosition))
         return { *point, size() };
+#endif
     return convertFrameToSpace(relativeFrame(), AccessibilityConversionSpace::Screen);
 }
 
@@ -1831,6 +1866,11 @@ AXIsolatedObject* AXIsolatedObject::crossFrameChildObject() const
         return childTree->rootNode();
     }
     return nullptr;
+}
+
+bool AXIsolatedObject::isFrameGeometryInitialized() const
+{
+    return tree().isFrameGeometryInitialized();
 }
 
 #endif // ENABLE_ACCESSIBILITY_LOCAL_FRAME

@@ -994,6 +994,7 @@ public:
 #if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
     virtual IntPoint frameScreenPosition() const = 0;
     virtual AffineTransform frameScreenTransform() const = 0;
+    virtual bool isFrameGeometryInitialized() const { return true; }
 #endif
 
     virtual FloatRect convertFrameToSpace(const FloatRect&, AccessibilityConversionSpace) const = 0;

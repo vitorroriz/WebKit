@@ -137,6 +137,7 @@ typedef void (*AXPostedNotificationCallback)(id element, NSString* notification,
 - (BOOL)accessibilityIsFirstItemInSuggestion;
 - (BOOL)accessibilityIsLastItemInSuggestion;
 - (BOOL)accessibilityIsMarkAnnotation;
+- (BOOL)_accessibilityIsFrameGeometryInitialized;
 
 // TextMarker related
 - (NSArray *)textMarkerRange;
@@ -1643,6 +1644,11 @@ bool AccessibilityUIElementIOS::isLastItemInSuggestion() const
 bool AccessibilityUIElementIOS::isMarkAnnotation() const
 {
     return [m_element accessibilityIsMarkAnnotation];
+}
+
+bool AccessibilityUIElementIOS::isFrameGeometryInitialized() const
+{
+    return [m_element _accessibilityIsFrameGeometryInitialized];
 }
 
 } // namespace WTR

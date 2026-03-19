@@ -442,6 +442,7 @@ public:
 
 #if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
     FrameGeometry frameGeometry() const { return m_frameGeometry; }
+    bool isFrameGeometryInitialized() const { return m_hasReceivedFrameGeometry; }
     void setFrameGeometry(FrameGeometry&&);
 #endif
 
@@ -690,6 +691,7 @@ private:
     HashMap<AXID, AXRelations> m_relations;
 #if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
     FrameGeometry m_frameGeometry;
+    bool m_hasReceivedFrameGeometry { false };
 #endif
 
     // Set to true by the AXObjectCache and false by AXIsolatedTree.

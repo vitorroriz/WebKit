@@ -2568,6 +2568,14 @@ id attributeValueForTesting(const RefPtr<AXCoreObject>& backingObject, NSString 
     if ([attributeName isEqualToString:@"_AXDebugDescription"])
         return debugDescriptionFrom(backingObject.get()).createNSString().autorelease();
 
+    if ([attributeName isEqualToString:@"_AXFrameGeometryInitialized"]) {
+#if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
+        return [NSNumber numberWithBool:backingObject->isFrameGeometryInitialized()];
+#else
+        return @YES;
+#endif
+    }
+
     if ([attributeName isEqualToString:@"_AXRawRoleForTesting"])
         return roleToString(backingObject->role()).createNSString().autorelease();
 

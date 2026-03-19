@@ -89,6 +89,7 @@ public:
     // Returns the child or parent object that crosses a local frame boundary.
     AXIsolatedObject* crossFrameParentObject() const final;
     AXIsolatedObject* crossFrameChildObject() const final;
+    bool isFrameGeometryInitialized() const final;
 #endif
 
     const AXTextRuns* textRuns() const;

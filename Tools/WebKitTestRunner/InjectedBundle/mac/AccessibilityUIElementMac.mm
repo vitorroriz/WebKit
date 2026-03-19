@@ -231,6 +231,7 @@ static id attributeValue(id element, NSString *attribute)
         @"AXOwns",
         @"AXPopupValue",
         @"AXRelativeFrame", // Continue to support this for testing purposes with ENABLE(ACCESSIBILITY_LOCAL_FRAME).
+        @"_AXFrameGeometryInitialized",
         @"AXValue",
     ];
 
@@ -3203,6 +3204,11 @@ bool AccessibilityUIElementMac::isRemotePlatformElement() const
     BEGIN_AX_OBJC_EXCEPTIONS
     return [m_element isKindOfClass:NSAccessibilityRemoteUIElement.class];
     END_AX_OBJC_EXCEPTIONS
+}
+
+bool AccessibilityUIElementMac::isFrameGeometryInitialized() const
+{
+    return boolAttributeValueNS(@"_AXFrameGeometryInitialized");
 }
 
 } // namespace WTR

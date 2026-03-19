@@ -307,6 +307,12 @@ AXObjectCache::AXObjectCache(LocalFrame& localFrame, Document* document)
 #endif
 
     AXTreeStore::add(m_id, WeakPtr { this });
+
+#if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
+    // This is the first time this frame has its cache initialized, so it has no geometry. Kick off a request to initialize it asynchronously.
+    if (RefPtr page = localFrame.page())
+        page->chrome().client().requestFrameScreenPosition(m_frameID);
+#endif
 }
 
 AXObjectCache::~AXObjectCache()

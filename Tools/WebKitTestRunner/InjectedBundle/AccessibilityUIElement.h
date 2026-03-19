@@ -416,6 +416,7 @@ public:
     virtual bool isRemoteFrame() const;
     // True if the element backing |this| is a platform remote element (e.g. NSAccessibilityRemoteUIElement on macOS).
     virtual bool isRemotePlatformElement() const { return false; }
+    virtual bool isFrameGeometryInitialized() const { return true; }
 
     virtual bool isMarkAnnotation() const;
 protected:
