@@ -75,7 +75,6 @@ public:
     RefPtr<WebsiteDataStore> dataStoreForWebArchive() const { return m_dataStoreForWebArchive; }
     void setDataStoreForWebArchive(WebsiteDataStore* dataStore) { m_dataStoreForWebArchive = dataStore; }
 
-    bool itemIsInSameDocument(const WebBackForwardListItem&) const;
     bool itemIsClone(const WebBackForwardListItem&);
 
 #if PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)

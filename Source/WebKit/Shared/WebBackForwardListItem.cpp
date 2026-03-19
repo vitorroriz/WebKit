@@ -89,15 +89,6 @@ static const FrameState* NODELETE childItemWithTarget(const FrameState& frameSta
     return nullptr;
 }
 
-bool WebBackForwardListItem::itemIsInSameDocument(const WebBackForwardListItem& other) const
-{
-    if (m_pageID != other.m_pageID)
-        return false;
-
-    // The following logic must be kept in sync with WebCore::HistoryItem::shouldDoSameDocumentNavigationTo().
-    return mainFrameState().documentSequenceNumber == other.mainFrameState().documentSequenceNumber;
-}
-
 static bool NODELETE hasSameFrames(const FrameState& a, const FrameState& b)
 {
     if (a.target != b.target)
