@@ -81,7 +81,7 @@ private:
     URL m_mainDocumentURL;
     Lock m_resultLock;
     Condition m_resultCondition;
-    std::optional<bool> m_isAllowdByWebContentRestrictions WTF_GUARDED_BY_LOCK(m_resultLock);
+    std::optional<bool> m_isAllowedByWebContentRestrictions WTF_GUARDED_BY_LOCK(m_resultLock);
     RetainPtr<NSData> m_webContentRestrictionsReplacementData WTF_GUARDED_BY_LOCK(m_resultLock);
 
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)

@@ -147,12 +147,12 @@ void ParentalControlsContentFilter::finishedAddingData()
 
     // Callers expect state is ready after finishing adding data.
     Locker resultLocker { m_resultLock };
-    while (!m_isAllowdByWebContentRestrictions) {
+    while (!m_isAllowedByWebContentRestrictions) {
         if (!m_resultCondition.waitFor(m_resultLock, 250_ms))
             RELEASE_LOG_ERROR(ContentFiltering, "ParentalControlsContentFilter::finishedAddingData timed out waiting for result after 250 ms");
     }
 
-    m_state = *m_isAllowdByWebContentRestrictions ? State::Allowed : State::Blocked;
+    m_state = *m_isAllowedByWebContentRestrictions ? State::Allowed : State::Blocked;
     m_replacementData = std::exchange(m_webContentRestrictionsReplacementData, nullptr);
 
 #elif HAVE(WEBCONTENTANALYSIS_FRAMEWORK)
@@ -188,8 +188,8 @@ void ParentalControlsContentFilter::didReceiveAllowDecisionOnQueue(bool isAllowe
     RELEASE_ASSERT(!isMainThread());
 
     Locker resultLocker { m_resultLock };
-    ASSERT(!m_isAllowdByWebContentRestrictions);
-    m_isAllowdByWebContentRestrictions = isAllowed;
+    ASSERT(!m_isAllowedByWebContentRestrictions);
+    m_isAllowedByWebContentRestrictions = isAllowed;
     m_webContentRestrictionsReplacementData = replacementData;
     m_resultCondition.notifyOne();
     callOnMainRunLoop([weakThis = ThreadSafeWeakPtr { *this }]() {
@@ -206,8 +206,8 @@ void ParentalControlsContentFilter::updateFilterStateOnMain()
         return;
 
     Locker resultLocker { m_resultLock };
-    ASSERT(m_isAllowdByWebContentRestrictions);
-    m_state = *m_isAllowdByWebContentRestrictions ? State::Allowed : State::Blocked;
+    ASSERT(m_isAllowedByWebContentRestrictions);
+    m_state = *m_isAllowedByWebContentRestrictions ? State::Allowed : State::Blocked;
     m_replacementData = std::exchange(m_webContentRestrictionsReplacementData, nullptr);
 }
 
