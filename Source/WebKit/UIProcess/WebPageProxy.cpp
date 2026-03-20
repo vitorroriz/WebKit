@@ -12424,6 +12424,8 @@ void WebPageProxy::resetState(ResetStateReason resetStateReason)
 
 #if ENABLE(MODEL_ELEMENT_IMMERSIVE)
     m_allowedImmersiveElementFrameURL = std::nullopt;
+    if (m_immersive)
+        dismissImmersiveElement([] { });
 #endif
 
 #if PLATFORM(COCOA)
