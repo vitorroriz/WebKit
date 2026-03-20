@@ -56,18 +56,18 @@ BUG_SERVER_URL = 'https://bugs.webkit.org/'
 COMMITS_INFO_URL = 'https://commits.webkit.org/'
 S3URL = 'https://s3-us-west-2.amazonaws.com/'
 S3_BUCKET = f'ews-archives.webkit{custom_suffix}.org'
-S3_RESULTS_URL = f'https://ews-build{custom_suffix}.s3-us-west-2.amazonaws.com/'
+S3_RESULTS_URL = load_password('S3_RESULTS_URL', default=f'https://ews-build{custom_suffix}.s3-us-west-2.amazonaws.com/')
 CURRENT_HOSTNAME = socket.gethostname().strip()
 EWS_BUILD_HOSTNAMES = load_password('EWS_BUILD_HOSTNAMES', default=['ews-build.webkit.org', 'ews-build'])
 TESTING_ENVIRONMENT_HOSTNAMES = ['ews-build.webkit-uat.org', 'ews-build-uat', 'ews-build.webkit-dev.org', 'ews-build-dev']
-EWS_URL = load_password('EWS_BUILD_HOSTNAMES', default='https://ews.webkit.org/')
+EWS_URL = load_password('EWS_URL', default='https://ews.webkit.org/')
 RESULTS_DB_URL = 'https://results.webkit.org/'
 RESULTS_SERVER_API_KEY = 'RESULTS_SERVER_API_KEY'
 WithProperties = properties.WithProperties
 Interpolate = properties.Interpolate
 GITHUB_URL = 'https://github.com/'
 # First project is treated as the default
-GITHUB_PROJECTS = ['WebKit/WebKit', 'WebKit/WebKit-security']
+GITHUB_PROJECTS = load_password('GITHUB_PROJECTS', default=['WebKit/WebKit', 'WebKit/WebKit-security'])
 CANONICAL_GITHUB_PROJECT = 'WebKit/WebKit'
 HASH_LENGTH_TO_DISPLAY = 8
 DEFAULT_BRANCH = 'main'
@@ -81,8 +81,10 @@ SCAN_BUILD_OUTPUT_DIR = 'scan-build-output'
 LLVM_DIR = 'llvm-project'
 STATIC_ANALYSIS_ARCHIVE_PATH = '/tmp/static-analysis.zip'
 SHOULD_FILTER_LOGS = load_password('SHOULD_FILTER_LOGS', default=True)
-SHOULD_LOAD_CONTRIBUTORS_FROM_NETWORK = load_password('SHOULD_FILTER_LOGS', default=True)
+SHOULD_LOAD_CONTRIBUTORS_FROM_NETWORK = load_password('SHOULD_LOAD_CONTRIBUTORS_FROM_NETWORK', default=True)
 SUFFIX_WITHOUT_CHANGE = '-without-change'
+USE_S3 = load_password('USE_S3', default=True)
+USE_GITHUB_PROJECTS_FOR_HOOKS = load_password('USE_GITHUB_PROJECTS_FOR_HOOKS', default=True)
 
 if CURRENT_HOSTNAME in EWS_BUILD_HOSTNAMES:
     CURRENT_HOSTNAME = 'ews-build.webkit.org'
@@ -1013,8 +1015,12 @@ class InstallHooks(steps.ShellSequence):
         ]
         source = self.getProperty('github.head.repo.full_name', None)
         project = self.getProperty('project', None)
-        if project in GITHUB_PROJECTS and source:
-            install_hooks_command += ['--level', 'github.com:{}={}'.format(source, GITHUB_PROJECTS.index(project))]
+
+        if USE_GITHUB_PROJECTS_FOR_HOOKS:
+            if project in GITHUB_PROJECTS and source:
+                install_hooks_command += ['--level', 'github.com:{}={}'.format(source, GITHUB_PROJECTS.index(project))]
+        else:
+            install_hooks_command += ['--level', 'github.com:{}={}'.format(source, 2)]
 
         self.commands = []
         for command in [
@@ -3412,20 +3418,19 @@ class CompileWebKit(shell.Compile, AddToLogMixin, ShellMixin):
         self.build.buildFinished([MSG_FOR_EXCESSIVE_LOGS], FAILURE)
 
     def follow_up_steps(self):
-        if self.getProperty('platform') in self.APPLE_PLATFORMS and CURRENT_HOSTNAME in EWS_BUILD_HOSTNAMES + TESTING_ENVIRONMENT_HOSTNAMES:
-            if SHOULD_FILTER_LOGS is True:
-                return [
-                    GenerateS3URL(
-                        f"{self.getProperty('fullPlatform')}-{self.getProperty('archForUpload')}-{self.getProperty('configuration')}-{self.name}",
-                        extension='txt',
-                        additions=f'{self.build.number}',
-                        content_type='text/plain',
-                    ), UploadFileToS3(
-                        'build-log.txt',
-                        links={self.name: 'Full build log'},
-                        content_type='text/plain',
-                    )
-                ]
+        if self.getProperty('platform') in self.APPLE_PLATFORMS and USE_S3 and SHOULD_FILTER_LOGS and CURRENT_HOSTNAME in EWS_BUILD_HOSTNAMES + TESTING_ENVIRONMENT_HOSTNAMES:
+            return [
+                GenerateS3URL(
+                    f"{self.getProperty('fullPlatform')}-{self.getProperty('archForUpload')}-{self.getProperty('configuration')}-{self.name}",
+                    extension='txt',
+                    additions=f'{self.build.number}',
+                    content_type='text/plain',
+                ), UploadFileToS3(
+                    'build-log.txt',
+                    links={self.name: 'Full build log'},
+                    content_type='text/plain',
+                )
+            ]
         return []
 
     def evaluateCommand(self, cmd):
@@ -3447,13 +3452,12 @@ class CompileWebKit(shell.Compile, AddToLogMixin, ShellMixin):
             triggers = self.getProperty('triggers', None)
             if triggers or not self.skipUpload:
                 steps_to_add += [ArchiveBuiltProduct()]
-                if CURRENT_HOSTNAME in EWS_BUILD_HOSTNAMES + TESTING_ENVIRONMENT_HOSTNAMES:
+                if USE_S3 and CURRENT_HOSTNAME in EWS_BUILD_HOSTNAMES + TESTING_ENVIRONMENT_HOSTNAMES:
                     steps_to_add.extend([
                         GenerateS3URL(f"{self.getProperty('fullPlatform')}-{self.getProperty('archForUpload')}-{self.getProperty('configuration')}"),
                         UploadFileToS3(f"WebKitBuild/{self.getProperty('configuration')}.zip", links={self.name: 'Archive'}),
                     ])
                 else:
-                    # S3 might not be configured on local instances, achieve similar functionality without S3.
                     steps_to_add.extend([UploadBuiltProduct()])
                 if triggers:
                     steps_to_add.append(Trigger(
@@ -5550,7 +5554,7 @@ class UploadFileToS3(shell.ShellCommand, AddToLogMixin):
         return defer.returnValue(rc)
 
     def doStepIf(self, step):
-        return CURRENT_HOSTNAME in EWS_BUILD_HOSTNAMES + TESTING_ENVIRONMENT_HOSTNAMES
+        return USE_S3 and CURRENT_HOSTNAME in EWS_BUILD_HOSTNAMES + TESTING_ENVIRONMENT_HOSTNAMES
 
     def getResultSummary(self):
         if self.results == FAILURE:
@@ -5613,7 +5617,7 @@ class GenerateS3URL(master.MasterShellCommand):
         return results == SUCCESS
 
     def doStepIf(self, step):
-        return CURRENT_HOSTNAME in EWS_BUILD_HOSTNAMES + TESTING_ENVIRONMENT_HOSTNAMES
+        return USE_S3 and CURRENT_HOSTNAME in EWS_BUILD_HOSTNAMES + TESTING_ENVIRONMENT_HOSTNAMES
 
     def getResultSummary(self):
         if self.results == FAILURE:
@@ -5652,7 +5656,7 @@ class TransferToS3(master.MasterShellCommand):
         defer.returnValue(rc)
 
     def doStepIf(self, step):
-        return CURRENT_HOSTNAME in EWS_BUILD_HOSTNAMES + TESTING_ENVIRONMENT_HOSTNAMES
+        return USE_S3 and CURRENT_HOSTNAME in EWS_BUILD_HOSTNAMES + TESTING_ENVIRONMENT_HOSTNAMES
 
     def hideStepIf(self, results, step):
         return results == SUCCESS and self.getProperty('sensitive', False)
@@ -5684,6 +5688,11 @@ class DownloadBuiltProduct(shell.ShellCommand):
 
     @defer.inlineCallbacks
     def run(self):
+        # Skip S3 if USE_S3 is False
+        if not USE_S3:
+            self.build.addStepsAfterCurrentStep([DownloadBuiltProductFromMaster()])
+            return defer.returnValue(SKIPPED)
+
         # Only try to download from S3 on the official deployments <https://webkit.org/b/230006>
         if CURRENT_HOSTNAME not in (EWS_BUILD_HOSTNAMES + TESTING_ENVIRONMENT_HOSTNAMES):
             self.build.addStepsAfterCurrentStep([DownloadBuiltProductFromMaster()])
