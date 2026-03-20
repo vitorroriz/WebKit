@@ -145,6 +145,9 @@ class BuildStepMixinAdditions(BuildStepMixin, TestReactorMixin):
     def tear_down_test_build_step(self):
         shutil.rmtree(self._temp_directory)
 
+    def fakeStopBuild(self, reason, results):
+        pass
+
     def fakeBuildFinished(self, text, results):
         self.build.text = text
         self.build.results = results
@@ -158,6 +161,7 @@ class BuildStepMixinAdditions(BuildStepMixin, TestReactorMixin):
         self.build.terminate = False
         self.build.stopped = False
         self.build.executedSteps = self.executedSteps
+        self.build.stopBuild = self.fakeStopBuild
         self.build.buildFinished = self.fakeBuildFinished
         self._expected_added_urls = []
         self._expected_sources = None
@@ -1285,6 +1289,24 @@ class TestCompileWebKit(BuildStepMixinAdditions, unittest.TestCase):
                         timeout=3600,
                         log_environ=False,
                         command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'perl Tools/Scripts/build-webkit --release --architecture "x86_64 arm64" -hideShellScriptEnvironment WK_VALIDATE_DEPENDENCIES=YES 2>&1 | perl Tools/Scripts/filter-build-webkit -logfile build-log.txt'],
+                        )
+            .exit(0),
+        )
+        self.expect_outcome(result=SUCCESS, state_string='Compiled WebKit')
+        return self.run_step()
+
+    def test_success_deployment_target(self):
+        self.setup_step(CompileWebKit())
+        self.setProperty('platform', 'mac')
+        self.setProperty('fullPlatform', 'mac-sequoia')
+        self.setProperty('configuration', 'release')
+        self.setProperty('architecture', 'arm64')
+        self.setProperty('deployment_target', '15.4')
+        self.expectRemoteCommands(
+            ExpectShell(workdir='wkdir',
+                        timeout=3600,
+                        log_environ=False,
+                        command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'perl Tools/Scripts/build-webkit --release --architecture "arm64" -hideShellScriptEnvironment WK_VALIDATE_DEPENDENCIES=YES MACOSX_DEPLOYMENT_TARGET=15.4 2>&1 | perl Tools/Scripts/filter-build-webkit -logfile build-log.txt'],
                         )
             .exit(0),
         )
@@ -6105,12 +6127,7 @@ class TestPrintConfiguration(BuildStepMixinAdditions, unittest.TestCase):
     def tearDown(self):
         return self.tear_down_test_build_step()
 
-    def test_success_mac(self):
-        self.setup_step(PrintConfiguration())
-        self.setProperty('buildername', 'macOS-Sequoia-Release-WK2-Tests-EWS')
-        self.setProperty('platform', 'mac-sequoia')
-
-        self.expectRemoteCommands(
+    mac_remote_commands = [
             ExpectShell(command=['hostname'], workdir='wkdir', timeout=60, log_environ=False).exit(0)
             .log('stdio', stdout='ews150.apple.com'),
             ExpectShell(command=['df', '-hl'], workdir='wkdir', timeout=60, log_environ=False).exit(0)
@@ -6121,39 +6138,35 @@ class TestPrintConfiguration(BuildStepMixinAdditions, unittest.TestCase):
             ExpectShell(command=['date'], workdir='wkdir', timeout=60, log_environ=False).exit(0)
             .log('stdio', stdout='Tue Apr  9 15:30:52 PDT 2019'),
             ExpectShell(command=['sw_vers'], workdir='wkdir', timeout=60, log_environ=False).exit(0)
-            .log('stdio', stdout='''ProductName:	macOS
-ProductVersion:	15.0
-BuildVersion:	24A335'''),
+            .log('stdio', stdout='''\
+ProductName:		macOS
+ProductVersion:		15.7.3
+BuildVersion:		24G419
+'''),
             ExpectShell(command=['system_profiler', 'SPSoftwareDataType', 'SPHardwareDataType'], workdir='wkdir', timeout=60, log_environ=False).exit(0)
             .log('stdio', stdout='Configuration version: Software: System Software Overview: System Version: macOS 11.4 (20F71) Kernel Version: Darwin 20.5.0 Boot Volume: Macintosh HD Boot Mode: Normal Computer Name: bot1020 User Name: WebKit Build Worker (buildbot) Secure Virtual Memory: Enabled System Integrity Protection: Enabled Time since boot: 27 seconds Hardware: Hardware Overview: Model Name: Mac mini Model Identifier: Macmini8,1 Processor Name: 6-Core Intel Core i7 Processor Speed: 3.2 GHz Number of Processors: 1 Total Number of Cores: 6 L2 Cache (per Core): 256 KB L3 Cache: 12 MB Hyper-Threading Technology: Enabled Memory: 32 GB System Firmware Version: 1554.120.19.0.0 (iBridge: 18.16.14663.0.0,0) Serial Number (system): C07DXXXXXXXX Hardware UUID: F724DE6E-706A-5A54-8D16-000000000000 Provisioning UDID: E724DE6E-006A-5A54-8D16-000000000000 Activation Lock Status: Disabled Xcode 12.5 Build version 12E262'),
             ExpectShell(command=['cat', '/usr/share/zoneinfo/+VERSION'], workdir='wkdir', timeout=60, log_environ=False).exit(0),
             ExpectShell(command=['xcodebuild', '-sdk', '-version'], workdir='wkdir', timeout=60, log_environ=False)
-            .log('stdio', stdout='''MacOSX15.sdk - macOS 15.0 (macosx15.0)
-SDKVersion: 15.0
-Path: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.sdk
-PlatformVersion: 15.0
+            .log('stdio', stdout='''\
+MacOSX26.2.sdk - macOS 26.2 (macosx26.2)
+SDKVersion: 26.2
+Path: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk
+PlatformVersion: 26.2
 PlatformPath: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform
-BuildID: E7931D9A-726E-11EF-B57C-DCEFEEF80074
-ProductBuildVersion: 24A336
-ProductCopyright: 1983-2024 Apple Inc.
+BuildID: 05A94E40-D000-11F0-8431-777054EDFE1B
+ProductBuildVersion: 25C57
+ProductCopyright: 1983-2025 Apple Inc.
 ProductName: macOS
-ProductUserVisibleVersion: 15.0
-ProductVersion: 15.0
-iOSSupportVersion: 18.0
+ProductUserVisibleVersion: 26.2
+ProductVersion: 26.2
+iOSSupportVersion: 26.2
 
-Xcode 16.0
-Build version 16A242d''')
+Xcode 26.2
+Build version 17C52''')
             .exit(0),
-        )
-        self.expect_outcome(result=SUCCESS, state_string='OS: Sequoia (15.0), Xcode: 16.0')
-        return self.run_step()
+    ]
 
-    def test_success_ios_simulator(self):
-        self.setup_step(PrintConfiguration())
-        self.setProperty('buildername', 'Apple-iOS-17-Simulator-Release-WK2-Tests')
-        self.setProperty('platform', 'ios-simulator-17')
-
-        self.expectRemoteCommands(
+    ios_remote_commands = [
             ExpectShell(command=['hostname'], workdir='wkdir', timeout=60, log_environ=False).exit(0)
             .log('stdio', stdout='ews152.apple.com'),
             ExpectShell(command=['df', '-hl'], workdir='wkdir', timeout=60, log_environ=False).exit(0)
@@ -6185,9 +6198,70 @@ ProductVersion: 17.5
 Xcode 15.4
 Build version 15F31d''')
             .exit(0),
-        )
+    ]
+
+    def test_success_mac(self):
+        self.setup_step(PrintConfiguration())
+        self.setProperty('buildername', 'macOS-Sequoia-Release-WK2-Tests-EWS')
+        self.setProperty('platform', 'mac-sequoia')
+
+        self.expectRemoteCommands(*self.mac_remote_commands)
+        self.expect_outcome(result=SUCCESS, state_string='OS: Sequoia (15.7.3), Xcode: 26.2')
+        return self.run_step()
+
+    @defer.inlineCallbacks
+    def test_failure_deployment_target_different_major_version(self):
+        self.setup_step(PrintConfiguration())
+        self.setProperty('buildername', 'macOS-Sequoia-Release-WK2-Tests')
+        self.setProperty('platform', 'mac-sequoia')
+        self.setProperty('deployment_target_builder', '14.0')
+
+        self.expectRemoteCommands(*self.mac_remote_commands)
+
+        # Configuration step will have completed successfully but stopped the
+        # build with a cancellation text.
+        self.expect_outcome(result=SUCCESS, state_string='OS: Sequoia (15.7.3), Xcode: 26.2')
+        rc = yield self.run_step()
+        self.assertEqual(self.build.results, FAILURE)
+        self.assertIn('Error: Builder deploys to 14.0, but this machine is running 15.7.3', self.build.text)
+        return rc
+
+    def test_success_deployment_target_earlier_minor_release(self):
+        self.setup_step(PrintConfiguration())
+        self.setProperty('buildername', 'macOS-Sequoia-Release-WK2-Tests')
+        self.setProperty('platform', 'mac-sequoia')
+        self.setProperty('deployment_target_builder', '15.4')
+
+        self.expectRemoteCommands(*self.mac_remote_commands)
+        self.expect_outcome(result=SUCCESS, state_string='OS: Sequoia (15.7.3), Xcode: 26.2')
+        return self.run_step()
+
+    def test_success_ios_simulator(self):
+        self.setup_step(PrintConfiguration())
+        self.setProperty('buildername', 'Apple-iOS-17-Simulator-Release-WK2-Tests')
+        self.setProperty('platform', 'ios-simulator-17')
+
+        self.expectRemoteCommands(*self.ios_remote_commands)
         self.expect_outcome(result=SUCCESS, state_string='OS: Sonoma (14.5), Xcode: 15.4')
         return self.run_step()
+
+    @defer.inlineCallbacks
+    def test_failure_ios_version_mismatch(self):
+        self.setup_step(PrintConfiguration())
+        self.setProperty('buildername', 'Apple-iOS-17-Simulator-Release-WK2-Tests')
+        self.setProperty('platform', 'ios-simulator-17')
+        self.setProperty('os_version_builder', '26.0')
+        self.setProperty('xcode_version_builder', '26.0')
+
+        self.expectRemoteCommands(*self.ios_remote_commands)
+
+        # Configuration step will have completed successfully but stopped the
+        # build with a cancellation text.
+        self.expect_outcome(result=SUCCESS, state_string='OS: Sonoma (14.5), Xcode: 15.4')
+        rc = yield self.run_step()
+        self.assertEqual(self.build.results, FAILURE)
+        self.assertIn('Error: OS/SDK version mismatch, please inform an admin.', self.build.text)
+        return rc
 
     def test_success_webkitpy(self):
         self.setup_step(PrintConfiguration())
@@ -10788,8 +10862,7 @@ class TestTrigger(BuildStepMixinAdditions, unittest.TestCase):
         self.assertIn('architecture', props)
         self.assertIn('codebase', props)
         self.assertIn('retry_count', props)
-        self.assertIn('os_version_builder', props)
-        self.assertIn('xcode_version_builder', props)
+        self.assertIn('deployment_target_builder', props)
         self.assertIn('ews_revision', props)
         self.assertIn('parent_buildnumber', props)
         self.assertIn('parent_builderid', props)

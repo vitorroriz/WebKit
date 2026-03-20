@@ -655,7 +655,7 @@ class ConfigureBuild(buildstep.BuildStep, AddToLogMixin):
     description = ['configuring build']
     descriptionDone = ['Configured build']
 
-    def __init__(self, platform, configuration, architectures, buildOnly, triggers, remotes, additionalArguments, triggered_by=None, rebuild_without_change_on_builder=False):
+    def __init__(self, platform, configuration, architectures, buildOnly, triggers, remotes, additionalArguments, triggered_by=None, rebuild_without_change_on_builder=False, deployment_target=None):
         super().__init__()
         self.platform = platform
         if platform != 'jsc-only':
@@ -669,6 +669,7 @@ class ConfigureBuild(buildstep.BuildStep, AddToLogMixin):
         self.remotes = remotes
         self.additionalArguments = additionalArguments
         self.rebuild_without_change_on_builder = rebuild_without_change_on_builder
+        self.deployment_target = deployment_target
 
     @defer.inlineCallbacks
     def run(self):
@@ -693,6 +694,8 @@ class ConfigureBuild(buildstep.BuildStep, AddToLogMixin):
             self.setProperty('additionalArguments', self.additionalArguments, 'config.json')
         if self.rebuild_without_change_on_builder:
             self.setProperty('rebuild_without_change_on_builder', self.rebuild_without_change_on_builder, 'config.json')
+        if self.deployment_target:
+            self.setProperty('deployment_target', self.deployment_target, 'config.json')
 
         self.add_patch_id_url()
         yield self.add_pr_details()
@@ -2965,6 +2968,7 @@ class Trigger(trigger.Trigger):
         properties_to_pass['retry_count'] = properties.Property('retry_count', default=0)
         properties_to_pass['os_version_builder'] = properties.Property('os_version', default='')
         properties_to_pass['xcode_version_builder'] = properties.Property('xcode_version', default='')
+        properties_to_pass['deployment_target_builder'] = properties.Property('deployment_target')
         properties_to_pass['parent_buildnumber'] = properties.Property('buildnumber')
         properties_to_pass['parent_builderid'] = properties.Property('builderid')
         properties_to_pass['rebuild_without_change_on_builder'] = properties.Property('rebuild_without_change_on_builder', default=False)
@@ -3377,6 +3381,9 @@ class CompileWebKit(shell.Compile, AddToLogMixin, ShellMixin):
                 # this much faster than full debug info, and crash logs still have line numbers.
                 # Some projects (namely lldbWebKitTester) require full debug info, and may override this.
                 build_command += ['DEBUG_INFORMATION_FORMAT=dwarf-with-dsym', 'CLANG_DEBUG_INFORMATION_LEVEL=$(WK_OVERRIDE_DEBUG_INFORMATION_LEVEL:default=line-tables-only)']
+            deployment_target = self.getProperty('deployment_target')
+            if deployment_target and platform == 'mac':
+                build_command += [f'MACOSX_DEPLOYMENT_TARGET={deployment_target}']
 
         build_command += customBuildFlag(platform, self.getProperty('fullPlatform'))
 
@@ -6706,17 +6713,32 @@ class PrintConfiguration(steps.ShellSequence, ShellMixin):
         self.setProperty('os_version', os_version)
         self.setProperty('os_name', os_name)
         self.setProperty('xcode_version', xcode_version)
+
+        deployment_target_builder = self.getProperty('deployment_target_builder')
         os_version_builder = self.getProperty('os_version_builder', '')
         xcode_version_builder = self.getProperty('xcode_version_builder', '')
-        os_major_version_mismatch = os_version and os_version_builder and (os_version.split('.')[:2] != os_version_builder.split('.')[:2])
-        xcode_version_mismatch = xcode_version and xcode_version_builder and (xcode_version != xcode_version_builder)
 
-        if os_major_version_mismatch or xcode_version_mismatch:
-            message = f'Error: OS/SDK version mismatch, please inform an admin.'
-            detailed_message = message + f' Builder: OS={os_version_builder}, Xcode={xcode_version_builder}; Tester: OS={os_version}, Xcode={xcode_version}'
-            print(f'\n{detailed_message}')
-            self.build.stopBuild(reason=detailed_message, results=FAILURE)
-            self.build.buildFinished([message], FAILURE)
+        os_major, os_minor = os_version.split('.')[:2] if '.' in os_version else (os_version, '0')
+        if deployment_target_builder:
+            # Compare the builder's deployment target with the machine's OS
+            # version.
+            dt_major, dt_minor = deployment_target_builder.split('.')[:2]
+            if dt_major != os_major or dt_minor > os_minor:
+                message = f'Error: Builder deploys to {deployment_target_builder}, but this machine is running {os_version}'
+                details = message + ('\nPossible configuration issue. Either this machine should be upgraded to the '
+                                     'deployment OS or newer, or the build configuration should change to target the '
+                                     'intended testing OS.')
+                self.build.stopBuild(reason=details, results=FAILURE)
+                self.build.buildFinished([message], FAILURE)
+        elif os_version_builder and xcode_version_builder:
+            ob_major, ob_minor = os_version_builder.split('.')[:2]
+            xb_major, xb_minor = xcode_version_builder.split('.')[:2]
+            xc_major, xc_minor = xcode_version.split('.')[:2]
+            if (os_major, os_minor) != (ob_major, ob_minor) or (xc_major, xc_minor) != (xb_major, xb_minor):
+                message = f'Error: OS/SDK version mismatch, please inform an admin.'
+                detailed_message = message + f' Builder: OS={os_version_builder}, Xcode={xcode_version_builder}; Tester: OS={os_version}, Xcode={xcode_version}'
+                self.build.stopBuild(reason=detailed_message, results=FAILURE)
+                self.build.buildFinished([message], FAILURE)
 
     def getResultSummary(self):
         if self.results not in [SUCCESS, WARNINGS, EXCEPTION]:
