@@ -570,11 +570,7 @@ http/wpt/webauthn/public-key-credential-get-failure.https.html [ DumpJSConsoleLo
 imported/w3c/web-platform-tests/webvtt/rendering/cues-with-video [ ImageOnlyFailure ]
 
 # Cookie Store API tests that timeout
-imported/w3c/web-platform-tests/cookiestore/cookieStore_delete.sub.https.html [ Skip ]
-imported/w3c/web-platform-tests/cookiestore/cookieStore_get_set_across_origins.sub.https.html [ Skip ]
-imported/w3c/web-platform-tests/cookiestore/cookieStore_set_domain_parsing.sub.https.html [ Skip ]
 imported/w3c/web-platform-tests/cookiestore/cookieStore_set_domain_parsing.tentative.sub.https.html [ Skip ]
-imported/w3c/web-platform-tests/cookiestore/serviceworker_cookieStore_cross_origin.https.sub.html [ Skip ]
 
 # Cookie Store API tests for unsupported service worker change events 
 imported/w3c/web-platform-tests/cookiestore/serviceworker_cookiechange_eventhandler_already_expired.https.any.serviceworker.html [ Skip ]
