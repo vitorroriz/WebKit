@@ -4645,51 +4645,43 @@ void ForNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
     if (generator.shouldBeConcernedWithCompletionValue() && m_statement->hasEarlyBreakOrContinue())
         generator.emitLoad(dst, jsUndefined());
 
-    Ref<LabelScope> scope = generator.newLabelScope(LabelScope::Loop);
-
     RegisterID* forLoopSymbolTable = nullptr;
     generator.pushLexicalScope(this, BytecodeGenerator::ScopeType::LetConstScope, BytecodeGenerator::TDZCheckOptimization::Optimize, BytecodeGenerator::NestedScopeType::IsNested, &forLoopSymbolTable);
 
-    Ref<Label> loopEnd = generator.newLabel();
-    Label& conditionFalseTarget = usingDeclarationCount() ? loopEnd.get() : scope->breakTarget();
-
-    auto emitLoopBody = [&](BytecodeGenerator& generator) {
-        if (m_expr1) {
-            generator.emitNodeInIgnoreResultPosition(m_expr1);
-            if (m_initializerContainsClosure)
-                generator.prepareLexicalScopeForNextForLoopIteration(this, forLoopSymbolTable);
-        }
-
-        Ref<Label> topOfLoop = generator.newLabel();
-        if (m_expr2)
-            generator.emitNodeInConditionContext(m_expr2, topOfLoop.get(), conditionFalseTarget, FallThroughMeansTrue);
-
-        generator.emitLabel(topOfLoop.get());
-        generator.emitLoopHint();
-        generator.emitProfileControlFlow(m_statement->startOffset());
-
-        generator.emitNodeInTailPosition(dst, m_statement);
-
-        generator.emitLabel(*scope->continueTarget());
-        generator.prepareLexicalScopeForNextForLoopIteration(this, forLoopSymbolTable);
-        if (m_expr3)
-            generator.emitNodeInIgnoreResultPosition(m_expr3);
-
-        if (m_expr2)
-            generator.emitNodeInConditionContext(m_expr2, topOfLoop.get(), conditionFalseTarget, FallThroughMeansFalse);
-        else
-            generator.emitJump(topOfLoop.get());
-
-        generator.emitLabel(loopEnd.get());
-    };
-
     generator.emitBodyWithUsingIfNeeded(usingDeclarationCount(), hasAwaitUsingDeclaration(),
         scopedLambda<void(BytecodeGenerator&)>([&](BytecodeGenerator& generator) {
-            emitLoopBody(generator);
+            Ref<LabelScope> scope = generator.newLabelScope(LabelScope::Loop);
+
+            if (m_expr1) {
+                generator.emitNodeInIgnoreResultPosition(m_expr1);
+                if (m_initializerContainsClosure)
+                    generator.prepareLexicalScopeForNextForLoopIteration(this, forLoopSymbolTable);
+            }
+
+            Ref<Label> topOfLoop = generator.newLabel();
+            if (m_expr2)
+                generator.emitNodeInConditionContext(m_expr2, topOfLoop.get(), scope->breakTarget(), FallThroughMeansTrue);
+
+            generator.emitLabel(topOfLoop.get());
+            generator.emitLoopHint();
+            generator.emitProfileControlFlow(m_statement->startOffset());
+
+            generator.emitNodeInTailPosition(dst, m_statement);
+
+            generator.emitLabel(*scope->continueTarget());
+            generator.prepareLexicalScopeForNextForLoopIteration(this, forLoopSymbolTable);
+            if (m_expr3)
+                generator.emitNodeInIgnoreResultPosition(m_expr3);
+
+            if (m_expr2)
+                generator.emitNodeInConditionContext(m_expr2, topOfLoop.get(), scope->breakTarget(), FallThroughMeansFalse);
+            else
+                generator.emitJump(topOfLoop.get());
+
+            generator.emitLabel(scope->breakTarget());
         })
     );
 
-    generator.emitLabel(scope->breakTarget());
     generator.popLexicalScope(this);
     generator.emitProfileControlFlow(m_statement->endOffset() + (m_statement->isBlock() ? 1 : 0));
 }
