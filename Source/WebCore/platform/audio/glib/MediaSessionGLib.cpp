@@ -220,6 +220,10 @@ bool MediaSessionGLib::ensureMprisSessionRegistered()
     if (!m_connection || mprisRegistrationEligibility() == MediaSessionGLibMprisRegistrationEligiblilty::NotEligible)
         return false;
 
+    const auto& info = nowPlayingInfo();
+    if (!info || info->metadata.title.isEmpty())
+        return false;
+
     if (m_ownerId)
         return true;
 
