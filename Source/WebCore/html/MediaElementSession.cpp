@@ -667,6 +667,11 @@ bool MediaElementSession::canShowControlsManager(PlaybackControlsPurpose purpose
         return false;
     }
 
+    if (element->isFullscreen()) {
+        INFO_LOG(LOGIDENTIFIER, "returning TRUE: is fullscreen");
+        return true;
+    }
+
 #if ENABLE(REQUIRES_PAGE_VISIBILITY_FOR_NOW_PLAYING)
     if (purpose == MediaElementSession::PlaybackControlsPurpose::NowPlaying
         && hasBehaviorRestriction(RequirePageVisibilityForVideoToBeNowPlaying)
@@ -676,11 +681,6 @@ bool MediaElementSession::canShowControlsManager(PlaybackControlsPurpose purpose
         return false;
     }
 #endif
-
-    if (element->isFullscreen()) {
-        INFO_LOG(LOGIDENTIFIER, "returning TRUE: is fullscreen");
-        return true;
-    }
 
     if (element->muted()) {
         INFO_LOG(LOGIDENTIFIER, "returning FALSE: muted");
