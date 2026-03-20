@@ -1944,7 +1944,7 @@ String Quirks::scriptToEvaluateBeforeRunningScriptFromURL(const URL& scriptURL)
         return { };
 
     // player.anyclip.com rdar://138789765
-    if (m_quirksData.isThesaurus && scriptURL.lastPathComponent().endsWith("lre.js"_s)) [[unlikely]] {
+    if ((m_quirksData.isDictionary || m_quirksData.isThesaurus) && scriptURL.lastPathComponent().endsWith("lre.js"_s)) [[unlikely]] {
         if (scriptURL.host() == "player.anyclip.com"_s)
             return chromeUserAgentScript;
     }
@@ -2610,6 +2610,11 @@ static void handleSlackQuirks(QuirksData& quirksData, const URL&, const String& 
 
 static void handleScriptToEvaluateBeforeRunningScriptFromURLQuirk(QuirksData& quirksData, const URL& /* quirksURL */, const String& topDomain, const URL& /* documentURL */)
 {
+    if (topDomain == "dictionary.com"_s) {
+        quirksData.isDictionary = true;
+        quirksData.enableQuirk(QuirksData::SiteSpecificQuirk::NeedsScriptToEvaluateBeforeRunningScriptFromURLQuirk);
+    }
+
     if (topDomain == "thesaurus.com"_s) {
         quirksData.isThesaurus = true;
         quirksData.enableQuirk(QuirksData::SiteSpecificQuirk::NeedsScriptToEvaluateBeforeRunningScriptFromURLQuirk);
@@ -3576,6 +3581,7 @@ void Quirks::determineRelevantQuirks()
         { "t-mobile"_s, &handleTMobileQuirks },
         { "descript"_s, &handleDescriptQuirks },
 #if PLATFORM(IOS_FAMILY)
+        { "dictionary"_s, &handleScriptToEvaluateBeforeRunningScriptFromURLQuirk },
         { "disneyplus"_s, &handleDisneyPlusQuirks },
 #endif
         { "ea"_s, &handleEAQuirks },
