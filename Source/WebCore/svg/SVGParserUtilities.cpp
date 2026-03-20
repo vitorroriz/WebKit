@@ -131,7 +131,7 @@ template <typename CharacterType, typename FloatType = float> static std::option
         // Fail if the exponent is greater than the largest positive power of ten
         // (that would yield a representable float).
         if (exponent > std::numeric_limits<FloatType>::max_exponent10)
-            return false;
+            return std::nullopt;
 
         // If the exponent is smaller than smallest negative power of 10 (that
         // would yield a representable float), then rely on the pow()+rounding to
