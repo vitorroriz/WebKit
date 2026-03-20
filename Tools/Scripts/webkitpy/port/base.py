@@ -60,7 +60,6 @@ import time
 
 from collections import OrderedDict
 from webkitcorepy import string_utils, decorators
-from webkitscmpy import local
 
 from webkitpy.common.memoized import memoized
 from webkitpy.common.prettypatch import PrettyPatch
@@ -301,12 +300,13 @@ class Port(object):
         return True
 
     def check_api_test_build(self, canonicalized_binaries=None):
+        binaries = self.path_to_api_test_binaries()
         if not canonicalized_binaries:
-            canonicalized_binaries = self.path_to_api_test_binaries().keys()
+            canonicalized_binaries = binaries.keys()
         if not self._root_was_set and self.get_option('build') and not self._build_api_tests(wtf_only=(canonicalized_binaries == ['TestWTF'])):
             return False
 
-        for binary, path in self.path_to_api_test_binaries().items():
+        for binary, path in binaries.items():
             if binary not in canonicalized_binaries:
                 continue
             if not self._filesystem.exists(path):
@@ -1427,6 +1427,7 @@ class Port(object):
     @memoized
     def commits_for_upload(self):
         from webkitpy.results.upload import Upload
+        from webkitscmpy import local
 
         repos = {}
         if port_config.apple_additions() and getattr(port_config.apple_additions(), 'repos', False):
