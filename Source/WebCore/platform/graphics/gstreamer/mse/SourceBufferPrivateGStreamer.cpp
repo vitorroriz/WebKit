@@ -241,7 +241,7 @@ bool SourceBufferPrivateGStreamer::isReadyForMoreSamples(TrackID trackId)
     auto track = m_tracks[trackId];
     bool ret = track->isReadyForMoreSamples();
     if (RefPtr player = this->player())
-        GST_TRACE_OBJECT(player->pipeline(), "track %" PRIu64 "isReadyForMoreSamples: %s", trackId, boolForPrinting(ret));
+        GST_TRACE_OBJECT(player->pipeline(), "track %" PRIu64 " isReadyForMoreSamples: %s", trackId, boolForPrinting(ret));
     return ret;
 }
 
