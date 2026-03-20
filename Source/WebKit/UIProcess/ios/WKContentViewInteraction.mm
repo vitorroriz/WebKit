@@ -10114,6 +10114,13 @@ static String fallbackLabelTextForUnlabeledInputFieldInZoomedFormControls(WebCor
 }
 #endif
 
+- (NSURL *)currentPageURLForActionSheetAssistant:(WKActionSheetAssistant *)assistant
+{
+    if (!_page)
+        return nil;
+    return URL { protect(_page)->currentURL() }.createNSURL().autorelease();
+}
+
 - (BOOL)actionSheetAssistant:(WKActionSheetAssistant *)assistant showCustomSheetForElement:(_WKActivatedElementInfo *)element
 {
     RetainPtr uiDelegate = static_cast<id <WKUIDelegatePrivate>>([_webView.get() UIDelegate]);

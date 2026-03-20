@@ -67,6 +67,7 @@ typedef NS_ENUM(NSInteger, _WKElementActionType);
 - (BOOL)actionSheetAssistant:(WKActionSheetAssistant *)assistant shouldIncludeAppLinkActionsForElement:(_WKActivatedElementInfo *)element;
 #endif
 - (RetainPtr<NSArray>)actionSheetAssistant:(WKActionSheetAssistant *)assistant decideActionsForElement:(_WKActivatedElementInfo *)element defaultActions:(RetainPtr<NSArray>)defaultActions;
+- (NSURL *)currentPageURLForActionSheetAssistant:(WKActionSheetAssistant *)assistant;
 
 @optional
 - (BOOL)actionSheetAssistant:(WKActionSheetAssistant *)assistant showCustomSheetForElement:(_WKActivatedElementInfo *)element;
