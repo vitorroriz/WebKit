@@ -4223,6 +4223,7 @@ AXCoreObject::AccessibilityChildrenVector AccessibilityObject::relatedObjects(AX
 bool AccessibilityObject::shouldFocusActiveDescendant() const
 {
     switch (ariaRoleAttribute()) {
+    case AccessibilityRole::ComboBox:
     case AccessibilityRole::Group:
     case AccessibilityRole::ListBox:
     case AccessibilityRole::Menu:
