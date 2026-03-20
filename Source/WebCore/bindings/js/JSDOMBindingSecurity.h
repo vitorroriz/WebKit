@@ -25,6 +25,7 @@
 
 #include <WebCore/ExceptionOr.h>
 #include <WebCore/HTMLFrameOwnerElement.h>
+#include <WebCore/RemoteFrame.h>
 #include <wtf/Forward.h>
 
 namespace JSC {
@@ -48,7 +49,7 @@ namespace BindingSecurity {
 
 template<typename T> T* checkSecurityForNode(JSC::JSGlobalObject&, T&);
 template<typename T> T* checkSecurityForNode(JSC::JSGlobalObject&, T*);
-template<typename T> T* checkSecurityForNodeWithOwner(JSC::JSGlobalObject&, T*, const HTMLFrameOwnerElement&);
+template<typename T> T* checkSecurityForNodeWithFrameOwner(JSC::JSGlobalObject&, T*, const HTMLFrameOwnerElement&);
 template<typename T> ExceptionOr<T*> checkSecurityForNode(JSC::JSGlobalObject&, ExceptionOr<T*>&&);
 template<typename T> ExceptionOr<T*> checkSecurityForNode(JSC::JSGlobalObject&, ExceptionOr<T&>&&);
 
@@ -76,14 +77,15 @@ template<typename T> inline T* BindingSecurity::checkSecurityForNode(JSC::JSGlob
     return shouldAllowAccessToNode(lexicalGlobalObject, node) ? node : nullptr;
 }
 
-template<typename T> inline T* BindingSecurity::checkSecurityForNodeWithOwner(JSC::JSGlobalObject& lexicalGlobalObject, T* node, const HTMLFrameOwnerElement& owner)
+template<typename T> inline T* BindingSecurity::checkSecurityForNodeWithFrameOwner(JSC::JSGlobalObject& lexicalGlobalObject, T* node, const HTMLFrameOwnerElement& owner)
 {
     if (node)
         return shouldAllowAccessToNode(lexicalGlobalObject, node) ? node : nullptr;
 
-    // If the node is null because it lives in a RemoteFrame and so the owner could
-    // not access it, log the cross-origin error.
-    shouldAllowAccessToFrame(&lexicalGlobalObject, owner.contentFrame());
+    // Perform access check to log cross-origin error if there is one, matching
+    // behavior before Site Isolation.
+    if (RefPtr frame = dynamicDowncast<RemoteFrame>(owner.contentFrame()))
+        shouldAllowAccessToFrame(&lexicalGlobalObject, frame);
     return nullptr;
 }
 

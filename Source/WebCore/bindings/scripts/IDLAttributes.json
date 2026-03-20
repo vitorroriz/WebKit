@@ -67,7 +67,7 @@
         "CheckSecurityForNode": {
             "contextsAllowed": ["attribute", "operation"]
         },
-        "CheckSecurityForNodeWithOwner": {
+        "CheckSecurityForNodeWithFrameOwner": {
             "contextsAllowed": ["attribute", "operation"]
         },
         "Clamp": {

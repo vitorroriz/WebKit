@@ -3,8 +3,6 @@
 ####################
 # Tests that crash #
 ####################
-http/tests/security/clipboard/copy-paste-html-cross-origin-iframe-across-origin.html [ Crash ]
-http/tests/security/clipboard/copy-paste-html-cross-origin-iframe-in-same-origin.html [ Crash ]
 http/tests/security/top-level-unique-origin2.https.html [ Crash ]
 http/wpt/webauthn/public-key-credential-same-origin-with-ancestors.https.html [ Crash ]
 imported/w3c/web-platform-tests/content-security-policy/inheritance/history.sub.html [ Crash ]
@@ -171,8 +169,6 @@ fast/workers/worker-page-cache.html [ Failure ]
 http/tests/cache-storage/page-cache-domcache-pending-promise.html [ Failure ]
 http/tests/cache-storage/page-cache-domcachestorage-pending-promise.html [ Failure ]
 http/tests/device-orientation/device-orientation-permission-granted-in-other-iframes-from-same-origin.html [ Failure ]
-http/tests/dom/set-document-location-host-to-accepted-values.html [ Failure ]
-http/tests/dom/set-document-location-hostname-to-accepted-values.html [ Failure ]
 http/tests/eventsource/eventsource-page-cache-connected.html [ Failure ]
 http/tests/eventsource/eventsource-page-cache-connecting.html [ Failure ]
 http/tests/fast/events/touch/ios/block-without-overflow-scroll-and-passive-observer-on-document-scrolling-state.html [ Failure ]
@@ -249,7 +245,6 @@ http/tests/security/contentSecurityPolicy/iframe-redirect-allowed-by-frame-src2.
 http/tests/security/contentSecurityPolicy/object-redirect-allowed.html [ Failure ]
 http/tests/security/contentSecurityPolicy/object-redirect-allowed2.html [ Failure ]
 http/tests/security/contentSecurityPolicy/upgrade-insecure-requests/proper-nested-upgrades.html [ Failure ]
-http/tests/security/cross-origin-iframe-contentDocument.html [ Failure ]
 http/tests/security/cross-origin-local-storage.html [ Failure ]
 http/tests/security/file-system-access-via-dataTransfer.html [ Failure ]
 http/tests/security/video-poster-cross-origin-crash2.html [ Failure ]

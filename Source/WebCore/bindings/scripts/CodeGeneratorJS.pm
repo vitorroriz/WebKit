@@ -8380,9 +8380,9 @@ sub NativeToJSValue
         AddToImplIncludes("JSDOMBindingSecurity.h", $conditional);
         $value = "BindingSecurity::checkSecurityForNode($lexicalGlobalObjectReference, $value)";
     }
-    if ($context->extendedAttributes->{CheckSecurityForNodeWithOwner}) {
+    if ($context->extendedAttributes->{CheckSecurityForNodeWithFrameOwner}) {
         AddToImplIncludes("JSDOMBindingSecurity.h", $conditional);
-        $value = "BindingSecurity::checkSecurityForNodeWithOwner($lexicalGlobalObjectReference, $value, impl)";
+        $value = "BindingSecurity::checkSecurityForNodeWithFrameOwner($lexicalGlobalObjectReference, $value, impl)";
     }
 
     my $IDLType = GetIDLType($interface, $type);
