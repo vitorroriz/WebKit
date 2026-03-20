@@ -34,6 +34,7 @@
 #include "HTMLNames.h"
 #include "HitTestResult.h"
 #include "PaintInfo.h"
+#include "PaintInfoInlines.h"
 #include "RenderBoxInlines.h"
 #include "RenderBoxModelObjectInlines.h"
 #include "RenderChildIterator.h"
@@ -1308,6 +1309,16 @@ static BoxSide NODELETE physicalBorderForDirection(const WritingMode writingMode
 
 void RenderTableSection::paintObject(PaintInfo& paintInfo, const LayoutPoint& paintOffset)
 {
+    if (paintInfo.phase == PaintPhase::Accessibility) {
+        if (auto* context = paintInfo.accessibilityRegionContext()) {
+            context->takeBounds(*this, paintOffset);
+            for (auto& rowStruct : m_grid) {
+                if (auto* row = rowStruct.rowRenderer; row && !row->hasSelfPaintingLayer())
+                    context->takeBounds(*row, paintOffset + row->location());
+            }
+        }
+    }
+
     auto localRepaintRect = paintInfo.rect;
     localRepaintRect.moveBy(-paintOffset);
 
