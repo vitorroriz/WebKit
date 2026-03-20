@@ -3241,8 +3241,12 @@ WebCore::CocoaColor *sampledFixedPositionContentColor(const WebCore::FixedContai
     UNUSED_VARIABLE(isTopFixedEdgeChanging);
 #endif
 
-    if (isTopColorChanging)
+    if (isTopColorChanging) {
         [self didChangeValueForKey:RetainPtr { NSStringFromSelector(@selector(_sampledTopFixedPositionContentColor)) }.get()];
+#if ENABLE(MANAGED_UIREFRESHCONTROL_APPEARANCE)
+        [self _updateRefreshControlAppearance];
+#endif
+    }
 }
 
 #if ENABLE(PDF_PAGE_NUMBER_INDICATOR)

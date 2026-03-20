@@ -43,6 +43,10 @@
 #import "IOSMouseEventTestHarness.h"
 #endif
 
+#if USE(APPLE_INTERNAL_SDK)
+#import <WebKitAdditions/SampledPageTopColorAdditionsBefore.mm>
+#endif
+
 #define EXPECT_IN_RANGE(actual, min, max) \
     EXPECT_GE(actual, min); \
     EXPECT_LE(actual, max);
@@ -132,6 +136,10 @@ static String createHTMLGradientWithColorStops(String&& direction, Vector<String
     gradientBuilder.append(")\">Test"_s);
     return gradientBuilder.toString();
 }
+
+#if USE(APPLE_INTERNAL_SDK)
+#import <WebKitAdditions/SampledPageTopColorAdditionsAfter.mm>
+#endif
 
 TEST(SampledPageTopColor, ZeroMaxDifference)
 {

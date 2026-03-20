@@ -660,6 +660,10 @@ struct PerWebProcessState {
 #endif
 #endif
 
+#if ENABLE(MANAGED_UIREFRESHCONTROL_APPEARANCE)
+- (void)_updateRefreshControlAppearance;
+#endif
+
 - (void)_updateFixedContainerEdges:(const WebCore::FixedContainerEdges&)edges;
 - (void)_updateScrollGeometryWithContentOffset:(CGPoint)contentOffset contentSize:(CGSize)contentSize;
 
