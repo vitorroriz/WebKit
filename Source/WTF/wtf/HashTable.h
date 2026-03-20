@@ -523,7 +523,7 @@ DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(HashTable);
         static bool isEmptyOrDeletedBucket(const ValueType& value) { return isEmptyBucket(value) || isDeletedBucket(value); }
         static bool isEmptyOrDeletedOrWeakNullBucket(const ValueType& value) { return isEmptyBucket(value) || isDeletedBucket(value) || isWeakNullBucket(value); }
 
-        bool isValidKey(const ValueType& value) { return !isEmptyOrDeletedBucket(value); }
+        bool isValidKey(const ValueType& value) { return !isEmptyOrDeletedOrWeakNullBucket(value); }
 
         template<ShouldValidateKey shouldValidateKey>
         void validateKey(const ValueType& value)
