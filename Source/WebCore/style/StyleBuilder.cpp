@@ -57,6 +57,7 @@
 #include "StyleCustomPropertyRegistry.h"
 #include "StyleFontSizeFunctions.h"
 #include "StylePropertyShorthand.h"
+#include "StyleSubstitutionResolver.h"
 #include <wtf/SetForScope.h>
 #include <wtf/TZoneMallocInlines.h>
 
@@ -345,7 +346,7 @@ void Builder::applyProperty(CSSPropertyID id, CSSValue& value, SelectorChecker::
     ASSERT_WITH_MESSAGE(id != CSSPropertyCustom, "Custom property should be handled by applyCustomProperty");
 
     auto valueToApply = resolveInternalAutoBaseFunction(value);
-    valueToApply = resolveVariableReferences(id, valueToApply);
+    valueToApply = resolveSubstitutionFunctions(id, valueToApply);
     auto& style = m_state->style();
 
     if (CSSProperty::isDirectionAwareProperty(id)) {
@@ -603,17 +604,17 @@ Ref<CSSValue> Builder::resolveInternalAutoBaseFunction(CSSValue& value)
     return result.releaseNonNull();
 }
 
-Ref<CSSValue> Builder::resolveVariableReferences(CSSPropertyID propertyID, CSSValue& value)
+Ref<CSSValue> Builder::resolveSubstitutionFunctions(CSSPropertyID propertyID, CSSValue& value)
 {
     if (!value.hasVariableReferences())
         return value;
 
+    SubstitutionResolver substitutionResolver(*this);
+
     auto variableValue = [&]() -> RefPtr<CSSValue> {
         if (auto* substitution = dynamicDowncast<CSSPendingSubstitutionValue>(value))
-            return substitution->resolveValue(*this, propertyID);
-
-        auto& variableReferenceValue = downcast<CSSVariableReferenceValue>(value);
-        return variableReferenceValue.resolveSingleValue(*this, propertyID);
+            return substitutionResolver.substituteAndParseShorthand(*substitution, propertyID);
+        return substitutionResolver.substituteAndParse(downcast<CSSVariableReferenceValue>(value), propertyID);
     }();
 
     // https://drafts.csswg.org/css-variables-2/#invalid-variables
@@ -705,7 +706,8 @@ std::optional<Variant<Ref<const Style::CustomProperty>, CSSWideKeyword>> Builder
 
     auto resolvedData = switchOn(value.value(),
         [&](const Ref<CSSVariableReferenceValue>& variableReferenceValue) -> RefPtr<CSSVariableData> {
-            return variableReferenceValue->resolveVariableReferences(*this);
+            SubstitutionResolver substitutionResolver(*this);
+            return substitutionResolver.substitute(variableReferenceValue.get());
         },
         [&](const Ref<CSSVariableData>& data) -> RefPtr<CSSVariableData> {
             return data.ptr();

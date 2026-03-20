@@ -46,6 +46,7 @@
 #include "HTMLProgressElement.h"
 #include "HTMLSelectElement.h"
 #include "HTMLSlotElement.h"
+#include "KeyframeEffectStack.h"
 #include "LoaderStrategy.h"
 #include "LocalFrame.h"
 #include "MatchResultCache.h"

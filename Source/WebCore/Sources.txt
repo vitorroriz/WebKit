@@ -3154,6 +3154,7 @@ style/StyleResolver.cpp
 style/StyleScope.cpp
 style/StyleScopeRuleSets.cpp
 style/StyleSheetContentsCache.cpp
+style/StyleSubstitutionResolver.cpp
 style/StyleTransformResolver.cpp
 style/StyleTreeResolver.cpp
 style/StyleUpdate.cpp

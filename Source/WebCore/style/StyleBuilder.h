@@ -76,7 +76,7 @@ private:
     void applyCustomProperty(const AtomString& name, Variant<Ref<const Style::CustomProperty>, CSSWideKeyword>&&);
 
     Ref<CSSValue> resolveInternalAutoBaseFunction(CSSValue&);
-    Ref<CSSValue> resolveVariableReferences(CSSPropertyID, CSSValue&);
+    Ref<CSSValue> resolveSubstitutionFunctions(CSSPropertyID, CSSValue&);
     std::optional<Variant<Ref<const Style::CustomProperty>, CSSWideKeyword>> resolveCustomPropertyValue(CSSCustomPropertyValue&);
 
     void applyPageSizeDescriptor(CSSValue&);
