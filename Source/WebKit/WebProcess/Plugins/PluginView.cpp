@@ -65,6 +65,7 @@
 #include <WebCore/LocalFrameView.h>
 #include <WebCore/MIMETypeRegistry.h>
 #include <WebCore/MouseEvent.h>
+#include <WebCore/MouseEventTypes.h>
 #include <WebCore/NetscapePlugInStreamLoader.h>
 #include <WebCore/NetworkStorageSession.h>
 #include <WebCore/NodeDocument.h>
@@ -703,6 +704,12 @@ void PluginView::handleEvent(Event& event)
 {
     if (!m_isInitialized)
         return;
+
+    {
+        RefPtr mouseEvent = dynamicDowncast<WebCore::MouseEvent>(event);
+        if (mouseEvent && mouseEvent->inputSource() == WebCore::MouseEventInputSource::Automation)
+            return;
+    }
 
     const CheckedPtr currentEvent = WebPage::currentEvent();
     if (!currentEvent)
