@@ -551,6 +551,13 @@ WTF_MAKE_COMPACT_TZONE_ALLOCATED_IMPL(EventLoopFunctionMicrotaskDispatcher);
 
 void EventLoopTaskGroup::queueMicrotask(JSC::VM& vm, EventLoop::TaskFunction&& function)
 {
+    // FIXME: Queueing microtask during GC destruction is not allowed. This is a workaround posting
+    // it as a macrotask. But it should not be a microtask from the beginning. Caller of
+    // queueMicrotask should be changed to use macrotask instead.
+    if (vm.heap.currentThreadIsDoingGCWork()) {
+        queueTask(TaskSource::InternalAsyncTask, WTF::move(function));
+        return;
+    }
     JSC::JSLockHolder locker(vm);
     auto* cell = JSC::JSMicrotaskDispatcher::create(vm, EventLoopFunctionMicrotaskDispatcher::create(*this, WTF::move(function)));
     queueMicrotask(JSC::QueuedTask { cell });
