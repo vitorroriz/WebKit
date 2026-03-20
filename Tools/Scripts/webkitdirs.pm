@@ -3766,25 +3766,29 @@ sub runGitUpdate()
 }
 
 
+# Never returns to the caller: either exec()s an external program or exit()s directly.
+# Exit code follows shell convention (0 = success, non-zero = failure).
 sub updateGtkOrWpeLibs
 {
     my ($port) = @_;
     my $scriptsDir = relativeScriptsDir();
     if (defined $ENV{'WEBKIT_JHBUILD'} and $ENV{'WEBKIT_JHBUILD'}) {
-        system("perl", "$scriptsDir/update-webkit-libs-jhbuild", "--$port", @ARGV) == 0 or die $!;
+        exec("perl", "$scriptsDir/update-webkit-libs-jhbuild", "--$port", @ARGV)
+            or die "Failed to exec update-webkit-libs-jhbuild: $!";
     } elsif (defined $ENV{'WEBKIT_CROSS_TARGET'} or grep(/^--cross-target/, @ARGV)) {
-        system("$scriptsDir/cross-toolchain-helper", "--build-toolchain", @ARGV) == 0 or die $!;
+        exec("$scriptsDir/cross-toolchain-helper", "--build-toolchain", @ARGV)
+            or die "Failed to exec cross-toolchain-helper: $!";
     } elsif (defined $ENV{'WEBKIT_FLATPAK'} and $ENV{'WEBKIT_FLATPAK'}) {
-        system("$scriptsDir/update-webkit-flatpak", @ARGV) == 0 or die $!;
+        exec("$scriptsDir/update-webkit-flatpak", @ARGV)
+            or die "Failed to exec update-webkit-flatpak: $!";
     }
-
     if (defined $ENV{'WEBKIT_CONTAINER_SDK'} and $ENV{'WEBKIT_CONTAINER_SDK'}) {
         # FIXME: implement a way to check if the update is needed by calling some script at /wkdev-sdk and then print a different message.
         print "Running inside wkdev-sdk: execute wkdev-update on the host to check for updates.\n";
-    } else {
-        warn "Please download and install wkdev-sdk from https://github.com/Igalia/webkit-container-sdk\n";
-        exit 1;
+        exit 0;  # success
     }
+    warn "Please download and install wkdev-sdk from https://github.com/Igalia/webkit-container-sdk\n";
+    exit 1;  # failure
 }
 
 
