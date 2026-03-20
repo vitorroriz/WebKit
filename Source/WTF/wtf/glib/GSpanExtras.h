@@ -102,6 +102,21 @@ inline std::span<const uint8_t> span(const GRefPtr<GByteArray>& array LIFETIME_B
     return span(array.get());
 }
 
+template <typename T = uint8_t*, typename = std::enable_if_t<std::is_pointer_v<T>>>
+inline std::span<T>span(GArray* array LIFETIME_BOUND)
+{
+    if (!array)
+        return unsafeMakeSpan<T>(nullptr, 0);
+
+    return unsafeMakeSpan(static_cast<T*>(static_cast<void*>(array->data)), array->len);
+}
+
+template <typename T = uint8_t*, typename = std::enable_if_t<std::is_pointer_v<T>>>
+inline std::span<T>span(GRefPtr<GArray>& array LIFETIME_BOUND)
+{
+    return span<T>(array.get());
+}
+
 inline std::span<const uint8_t> span(GVariant* variant LIFETIME_BOUND)
 {
     const auto* ptr = static_cast<const uint8_t*>(g_variant_get_data(variant));
