@@ -519,8 +519,13 @@ static CGFloat effectivePointsPerMeter(CALayer *caLayer)
     return defaultPointsPerMeter;
 }
 
-static RESRT modelStandardizedTransformSRT(RESRT originalSRT)
+RESRT ModelProcessModelPlayerProxy::modelStandardizedTransformSRT(RESRT originalSRT)
 {
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    if (m_immersivePresentation)
+        return originalSRT;
+#endif
+
     constexpr float defaultScaleFactor = 0.36f;
 
     originalSRT.scale *= defaultScaleFactor;
@@ -529,8 +534,13 @@ static RESRT modelStandardizedTransformSRT(RESRT originalSRT)
     return originalSRT;
 }
 
-static RESRT modelLocalizedTransformSRT(RESRT originalSRT)
+RESRT ModelProcessModelPlayerProxy::modelLocalizedTransformSRT(RESRT originalSRT)
 {
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    if (m_immersivePresentation)
+        return originalSRT;
+#endif
+
     constexpr float defaultScaleFactor = 0.36f;
 
     originalSRT.scale /= defaultScaleFactor;
