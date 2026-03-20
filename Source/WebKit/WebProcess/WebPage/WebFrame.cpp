@@ -705,7 +705,11 @@ void WebFrame::addConsoleMessage(MessageSource messageSource, MessageLevel messa
 {
     RefPtr localFrame = dynamicDowncast<LocalFrame>(m_coreFrame.get());
     if (!localFrame)
+        localFrame = m_provisionalFrame.get();
+
+    if (!localFrame)
         return;
+
     if (RefPtr document = localFrame->document())
         document->addConsoleMessage(messageSource, messageLevel, message, requestID);
 }
