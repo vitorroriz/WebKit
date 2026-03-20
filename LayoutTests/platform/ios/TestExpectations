@@ -8470,8 +8470,6 @@ webkit.org/b/306998 [ Debug ] inspector/page/filter-cookies-for-domain.html [ Sk
 
 webkit.org/b/309600 [ Release arm64 ] http/tests/xmlhttprequest/chunked-progress-event-expectedLength.html [ Pass Failure ]
 
-webkit.org/b/309283 imported/w3c/web-platform-tests/html/semantics/forms/the-select-element/customizable-select/select-base-appearance-computed-style.html [ Failure ]
-
 webkit.org/b/307091 inspector/network/intercept-aborted-request.html [ Skip ]
 
 webkit.org/b/310132 imported/w3c/web-platform-tests/intersection-observer/target-in-different-window.html [ Pass Failure ]
