@@ -291,24 +291,34 @@ void MediaStreamTrackPrivateSourceObserver::applyConstraints(const MediaConstrai
     });
 }
 
+static MediaStreamTrackData fromIdAndSource(String&& id, RealtimeMediaSource& source)
+{
+    return  {
+        .trackId = WTF::move(id),
+        .label = source.name(),
+        .type = source.type(),
+        .deviceType = source.deviceType(),
+        .isEnabled = true,
+        .isEnded = false,
+        .contentHint = MediaStreamTrackHintValue::Empty,
+        .isProducingData = source.isProducingData(),
+        .isMuted = source.muted(),
+        .isInterrupted = source.interrupted(),
+        .settings = source.settings(),
+        .capabilities = source.capabilities(),
+        .settingsCapabilitiesUpdateCount = source.settingsCapabilitiesUpdateCount()
+    };
+}
+
 MediaStreamTrackPrivate::MediaStreamTrackPrivate(Ref<const Logger>&& trackLogger, Ref<RealtimeMediaSource>&& source, String&& id, std::function<void(Function<void()>&&)>&& postTask)
     : m_sourceObserver(MediaStreamTrackPrivateSourceObserver::create(WTF::move(source), WTF::move(postTask)))
-    , m_id(WTF::move(id))
-    , m_label(m_sourceObserver->source().name())
-    , m_type(m_sourceObserver->source().type())
-    , m_deviceType(m_sourceObserver->source().deviceType())
+    , m_data(fromIdAndSource(WTF::move(id), m_sourceObserver->source()))
     , m_isCaptureTrack(m_sourceObserver->source().isCaptureSource())
     , m_captureDidFail(m_sourceObserver->source().captureDidFail())
     , m_logger(WTF::move(trackLogger))
 #if !RELEASE_LOG_DISABLED
     , m_logIdentifier(uniqueLogIdentifier())
 #endif
-    , m_isProducingData(m_sourceObserver->source().isProducingData())
-    , m_isMuted(m_sourceObserver->source().muted())
-    , m_isInterrupted(m_sourceObserver->source().interrupted())
-    , m_settings(m_sourceObserver->source().settings())
-    , m_capabilities(m_sourceObserver->source().capabilities())
-    , m_settingsCapabilitiesUpdateCount(m_sourceObserver->source().settingsCapabilitiesUpdateCount())
 #if ASSERT_ENABLED
     , m_creationThreadId(isMainThread() ? 0 : Thread::currentSingleton().uid())
 #endif
@@ -324,26 +334,14 @@ MediaStreamTrackPrivate::MediaStreamTrackPrivate(Ref<const Logger>&& trackLogger
 }
 
 MediaStreamTrackPrivate::MediaStreamTrackPrivate(Ref<const Logger>&& logger, UniqueRef<MediaStreamTrackDataHolder>&& dataHolder, std::function<void(Function<void()>&&)>&& postTask)
-    : m_sourceObserver(MediaStreamTrackPrivateSourceObserver::create(WTF::move(dataHolder->source), WTF::move(postTask)))
-    , m_id(WTF::move(dataHolder->trackId))
-    , m_label(WTF::move(dataHolder->label))
-    , m_type(dataHolder->type)
-    , m_deviceType(dataHolder->deviceType)
+    : m_sourceObserver(MediaStreamTrackPrivateSourceObserver::create(WTF::move(dataHolder->source()), WTF::move(postTask)))
+    , m_data(WTF::move(dataHolder->data()))
     , m_isCaptureTrack(false)
-    , m_isEnabled(dataHolder->isEnabled)
-    , m_isEnded(dataHolder->isEnded)
     , m_captureDidFail(false)
-    , m_contentHint(dataHolder->contentHint)
     , m_logger(WTF::move(logger))
 #if !RELEASE_LOG_DISABLED
     , m_logIdentifier(uniqueLogIdentifier())
 #endif
-    , m_isProducingData(dataHolder->isProducingData)
-    , m_isMuted(dataHolder->isMuted)
-    , m_isInterrupted(dataHolder->isInterrupted)
-    , m_settings(WTF::move(dataHolder->settings))
-    , m_capabilities(WTF::move(dataHolder->capabilities))
-    , m_settingsCapabilitiesUpdateCount(dataHolder->settingsCapabilitiesUpdateCount)
 #if ASSERT_ENABLED
     , m_creationThreadId(isMainThread() ? 0 : Thread::currentSingleton().uid())
 #endif
@@ -376,7 +374,7 @@ void MediaStreamTrackPrivate::updateLabelIfRemoteTrack()
     if (!isMainThread() || !(protect(source())->isIncomingAudioSource() || protect(source())->isIncomingVideoSource()))
         return;
 
-    m_label = makeString(m_label, " - "_s, m_id);
+    m_data.label = makeString(m_data.label, " - "_s, m_data.trackId);
 }
 
 
@@ -402,7 +400,7 @@ void MediaStreamTrackPrivate::removeObserver(MediaStreamTrackPrivateObserver& ob
 
 void MediaStreamTrackPrivate::setContentHint(MediaStreamTrackHintValue hintValue)
 {
-    m_contentHint = hintValue;
+    m_data.contentHint = hintValue;
 }
 
 void MediaStreamTrackPrivate::startProducingData()
@@ -431,7 +429,7 @@ void MediaStreamTrackPrivate::setIsInBackground(bool value)
 void MediaStreamTrackPrivate::setMuted(bool muted)
 {
     ASSERT(isOnCreationThread());
-    m_isMuted = muted;
+    m_data.isMuted = muted;
 
     m_sourceObserver->setMuted(muted);
 }
@@ -439,13 +437,13 @@ void MediaStreamTrackPrivate::setMuted(bool muted)
 void MediaStreamTrackPrivate::setEnabled(bool enabled)
 {
     ASSERT(isOnCreationThread());
-    if (m_isEnabled == enabled)
+    if (m_data.isEnabled == enabled)
         return;
 
     ALWAYS_LOG(LOGIDENTIFIER, enabled);
 
     // Always update the enabled state regardless of the track being ended.
-    m_isEnabled = enabled;
+    m_data.isEnabled = enabled;
 
     forEachObserver([this](auto& observer) {
         observer.trackEnabledChanged(*this);
@@ -455,15 +453,15 @@ void MediaStreamTrackPrivate::setEnabled(bool enabled)
 void MediaStreamTrackPrivate::endTrack()
 {
     ASSERT(isOnCreationThread());
-    if (m_isEnded)
+    if (m_data.isEnded)
         return;
 
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    // Set m_isEnded to true before telling the source it can stop, so if this is the
+    // Set m_data.isEnded to true before telling the source it can stop, so if this is the
     // only track using the source and it does stop, we will only call each observer's
     // trackEnded method once.
-    m_isEnded = true;
+    m_data.isEnded = true;
     updateReadyState();
 
     m_sourceObserver->requestToEnd();
@@ -486,7 +484,7 @@ Ref<MediaStreamTrackPrivate> MediaStreamTrackPrivate::clone()
     clonedMediaStreamTrackPrivate->m_captureDidFail = this->m_captureDidFail;
     clonedMediaStreamTrackPrivate->updateReadyState();
 
-    if (m_isProducingData && !m_isMuted && !m_isInterrupted)
+    if (m_data.isProducingData && !m_data.isMuted && !m_data.isInterrupted)
         clonedMediaStreamTrackPrivate->startProducingData();
 
     return clonedMediaStreamTrackPrivate;
@@ -538,8 +536,8 @@ void MediaStreamTrackPrivate::applyConstraints(const MediaConstraints& constrain
 {
     MediaStreamTrackPrivateSourceObserver::ApplyConstraintsHandler callback = [weakThis = WeakPtr { *this }, completionHandler = WTF::move(completionHandler)] (auto&& result, auto&& settings, auto&& capabilities) mutable {
         if (RefPtr protectedThis = weakThis.get()) {
-            protectedThis->m_settings = WTF::move(settings);
-            protectedThis->m_capabilities = WTF::move(capabilities);
+            protectedThis->m_data.settings = WTF::move(settings);
+            protectedThis->m_data.capabilities = WTF::move(capabilities);
         }
         completionHandler(WTF::move(result));
     };
@@ -567,7 +565,7 @@ void MediaStreamTrackPrivate::sourceStarted()
     ASSERT(isOnCreationThread());
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    m_isProducingData = true;
+    m_data.isProducingData = true;
     forEachObserver([this](auto& observer) {
         observer.trackStarted(*this);
     });
@@ -576,14 +574,14 @@ void MediaStreamTrackPrivate::sourceStarted()
 void MediaStreamTrackPrivate::sourceStopped(bool captureDidFail)
 {
     ASSERT(isOnCreationThread());
-    m_isProducingData = false;
+    m_data.isProducingData = false;
 
-    if (m_isEnded)
+    if (m_data.isEnded)
         return;
 
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    m_isEnded = true;
+    m_data.isEnded = true;
     m_captureDidFail = captureDidFail;
     updateReadyState();
 
@@ -597,8 +595,8 @@ void MediaStreamTrackPrivate::sourceMutedChanged(bool interrupted, bool muted)
     ASSERT(isOnCreationThread());
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    m_isInterrupted = interrupted;
-    m_isMuted = muted;
+    m_data.isInterrupted = interrupted;
+    m_data.isMuted = muted;
     forEachObserver([this](auto& observer) {
         observer.trackMutedChanged(*this);
     });
@@ -609,9 +607,9 @@ void MediaStreamTrackPrivate::sourceSettingsChanged(RealtimeMediaSourceSettings&
     ASSERT(isOnCreationThread());
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    m_settings = WTF::move(settings);
-    m_capabilities = WTF::move(capabilities);
-    m_settingsCapabilitiesUpdateCount = settingsCapabilitiesUpdateCount;
+    m_data.settings = WTF::move(settings);
+    m_data.capabilities = WTF::move(capabilities);
+    m_data.settingsCapabilitiesUpdateCount = settingsCapabilitiesUpdateCount;
     forEachObserver([this](auto& observer) {
         observer.trackSettingsChanged(*this);
     });
@@ -622,10 +620,10 @@ void MediaStreamTrackPrivate::sourceConfigurationChanged(String&& label, Realtim
     ASSERT(isOnCreationThread());
     ALWAYS_LOG(LOGIDENTIFIER);
 
-    m_label = WTF::move(label);
-    m_settings = WTF::move(settings);
-    m_capabilities = WTF::move(capabilities);
-    m_settingsCapabilitiesUpdateCount = settingsCapabilitiesUpdateCount;
+    m_data.label = WTF::move(label);
+    m_data.settings = WTF::move(settings);
+    m_data.capabilities = WTF::move(capabilities);
+    m_data.settingsCapabilitiesUpdateCount = settingsCapabilitiesUpdateCount;
     forEachObserver([this](auto& observer) {
         observer.trackConfigurationChanged(*this);
     });
@@ -646,7 +644,7 @@ void MediaStreamTrackPrivate::updateReadyState()
     ASSERT(isOnCreationThread());
     ReadyState state = ReadyState::None;
 
-    if (m_isEnded)
+    if (m_data.isEnded)
         state = ReadyState::Ended;
     else if (m_hasStartedProducingData)
         state = ReadyState::Live;
@@ -664,21 +662,7 @@ void MediaStreamTrackPrivate::updateReadyState()
 
 UniqueRef<MediaStreamTrackDataHolder> MediaStreamTrackPrivate::toDataHolder(ShouldClone shouldClone)
 {
-    return makeUniqueRef<MediaStreamTrackDataHolder>(
-        shouldClone == ShouldClone::Yes ? createVersion4UUIDString() : m_id.isolatedCopy(),
-        m_label.isolatedCopy(),
-        m_type,
-        m_deviceType,
-        m_isEnabled,
-        m_isEnded,
-        m_contentHint,
-        m_isProducingData,
-        m_isMuted,
-        m_isInterrupted,
-        m_settings.isolatedCopy(),
-        m_capabilities.isolatedCopy(),
-        m_settingsCapabilitiesUpdateCount,
-        shouldClone == ShouldClone::Yes ? m_sourceObserver->source().clone() : Ref { m_sourceObserver->source() });
+    return makeUniqueRef<MediaStreamTrackDataHolder>(m_data.isolatedCopy(shouldClone), shouldClone == ShouldClone::Yes ? m_sourceObserver->source().clone() : Ref { m_sourceObserver->source() });
 }
 
 #if !RELEASE_LOG_DISABLED
