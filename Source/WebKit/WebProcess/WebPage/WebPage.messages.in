@@ -878,7 +878,7 @@ messages -> WebPage WantsAsyncDispatchMessage {
 #endif
 
 #if ENABLE(WRITING_TOOLS)
-    WillBeginWritingToolsSession(std::optional<WebCore::WritingTools::Session> session, Vector<WebCore::JSHandleIdentifier> preservedNodeIdentifiers) -> (Vector<WebCore::WritingTools::Context> contexts)
+    WillBeginWritingToolsSession(std::optional<WebCore::WritingTools::Session> session) -> (Vector<WebCore::WritingTools::Context> contexts)
 
     DidBeginWritingToolsSession(struct WebCore::WritingTools::Session session, Vector<WebCore::WritingTools::Context> contexts)
 

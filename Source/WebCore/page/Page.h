@@ -1270,7 +1270,7 @@ public:
 #endif
 
 #if ENABLE(WRITING_TOOLS)
-    WEBCORE_EXPORT void willBeginWritingToolsSession(const std::optional<WritingTools::Session>&, WeakHashSet<Node, WeakPtrImplWithEventTargetData>&&, CompletionHandler<void(const Vector<WritingTools::Context>&)>&&);
+    WEBCORE_EXPORT void willBeginWritingToolsSession(const std::optional<WritingTools::Session>&, CompletionHandler<void(const Vector<WritingTools::Context>&)>&&);
 
     WEBCORE_EXPORT void didBeginWritingToolsSession(const WritingTools::Session&, const Vector<WritingTools::Context>&);
 

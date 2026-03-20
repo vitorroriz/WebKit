@@ -385,10 +385,6 @@ void PageClientImpl::didCommitLoadForMainFrame(const String& mimeType, bool useC
     [webView _clearTextExtractionFilterCache];
 #endif
 
-#if ENABLE(WRITING_TOOLS)
-    [webView _clearWritingToolsPreservedNodes];
-#endif
-
 #if ENABLE(SYSTEM_TEXT_EXTRACTION)
     if (protect(*[webView _page])->preferences().systemTextExtractionEnabled())
         [webView _addTextExtractionAnnotation];
