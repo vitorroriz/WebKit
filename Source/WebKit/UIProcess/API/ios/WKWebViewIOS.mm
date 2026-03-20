@@ -880,6 +880,10 @@ static WebCore::Color scrollViewBackgroundColor(WKWebView *webView, AllowPageBac
     [self _clearTextExtractionFilterCache];
 #endif
 
+#if ENABLE(WRITING_TOOLS)
+    [self _clearWritingToolsPreservedNodes];
+#endif
+
     if (_gestureController)
         protect(_gestureController)->disconnectFromProcess();
 

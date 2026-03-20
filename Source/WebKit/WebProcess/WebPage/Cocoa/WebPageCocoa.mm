@@ -106,6 +106,7 @@
 #import <WebCore/HitTestResult.h>
 #import <WebCore/ImageOverlay.h>
 #import <WebCore/ImageUtilities.h>
+#import <WebCore/JSNode.h>
 #import <WebCore/LegacyWebArchive.h>
 #import <WebCore/LocalFrameInlines.h>
 #import <WebCore/LocalFrameView.h>
@@ -1276,9 +1277,19 @@ void WebPage::setDisplayCaptureEnvironment(const String& environment)
 #endif
 
 #if ENABLE(WRITING_TOOLS)
-void WebPage::willBeginWritingToolsSession(const std::optional<WebCore::WritingTools::Session>& session, CompletionHandler<void(const Vector<WebCore::WritingTools::Context>&)>&& completionHandler)
+void WebPage::willBeginWritingToolsSession(const std::optional<WebCore::WritingTools::Session>& session, Vector<WebCore::JSHandleIdentifier>&& preservedNodeIdentifiers, CompletionHandler<void(const Vector<WebCore::WritingTools::Context>&)>&& completionHandler)
 {
-    protect(corePage())->willBeginWritingToolsSession(session, WTF::move(completionHandler));
+    WeakHashSet<Node, WeakPtrImplWithEventTargetData> preservedNodes;
+    for (auto& identifier : preservedNodeIdentifiers) {
+        auto* object = WebKitJSHandle::objectForIdentifier(identifier);
+        if (!object)
+            continue;
+
+        if (auto* jsNode = JSC::jsDynamicCast<JSNode*>(object))
+            preservedNodes.add(protect(jsNode->wrapped()));
+    }
+
+    protect(corePage())->willBeginWritingToolsSession(session, WTF::move(preservedNodes), WTF::move(completionHandler));
 }
 
 void WebPage::didBeginWritingToolsSession(const WebCore::WritingTools::Session& session, const Vector<WebCore::WritingTools::Context>& contexts)
