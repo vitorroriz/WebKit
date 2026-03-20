@@ -7647,6 +7647,9 @@ void HTMLMediaElement::exitFullscreen()
 
         m_changingVideoFullscreenMode = true;
 
+        if (!paused() && protect(document())->quirks().needsPauseBeforeFullscreenExitQuirk())
+            pauseInternal();
+
         if (isInWindowOrStandardFullscreen(oldVideoFullscreenMode)) {
             setFullscreenMode(VideoFullscreenModeNone);
             // The exit fullscreen request will be sent in dispatchEvent().

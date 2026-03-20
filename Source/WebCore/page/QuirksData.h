@@ -100,6 +100,7 @@ struct QuirksData {
         NeedsNavigatorUserAgentDataQuirk,
         NeedsNowPlayingFullscreenSwapQuirk,
 #if PLATFORM(IOS_FAMILY)
+        NeedsPauseBeforeFullscreenExitQuirk,
         NeedsPreloadAutoQuirk,
 #endif
 #if PLATFORM(MAC)

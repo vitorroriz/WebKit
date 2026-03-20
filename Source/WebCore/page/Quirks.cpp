@@ -951,6 +951,18 @@ bool Quirks::needsPreloadAutoQuirk() const
 #endif
 }
 
+// espn.com rdar://154903596
+bool Quirks::needsPauseBeforeFullscreenExitQuirk() const
+{
+#if PLATFORM(IOS_FAMILY)
+    QUIRKS_EARLY_RETURN_IF_DISABLED_WITH_VALUE(false);
+
+    return m_quirksData.quirkIsEnabled(QuirksData::SiteSpecificQuirk::NeedsPauseBeforeFullscreenExitQuirk);
+#else
+    return false;
+#endif
+}
+
 // vimeo.com rdar://56996057
 // docs.google.com rdar://59893415
 // bing.com rdar://133223599
@@ -2932,6 +2944,10 @@ static void handleESPNQuirks(QuirksData& quirksData, const URL& /* quirksURL */,
     quirksData.isESPN = true;
 
     quirksData.enableQuirks({
+#if PLATFORM(IOS)
+        // espn.com rdar://154903596
+        QuirksData::SiteSpecificQuirk::NeedsPauseBeforeFullscreenExitQuirk,
+#endif
 #if PLATFORM(IOS) || PLATFORM(VISION)
         // espn.com rdar://problem/95651814
         QuirksData::SiteSpecificQuirk::AllowLayeredFullscreenVideos,
