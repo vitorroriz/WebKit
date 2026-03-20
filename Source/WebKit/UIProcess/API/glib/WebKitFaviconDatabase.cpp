@@ -180,7 +180,7 @@ void webkitFaviconDatabaseGetFaviconInternal(WebKitFaviconDatabase* database, co
         return;
     }
 
-    if (StringView::fromLatin1(pageURI).startsWith("about:"_s)) {
+    if (startsWith(CStringView::unsafeFromUTF8(pageURI).span(), "about:"_s)) {
         g_task_report_new_error(database, callback, userData, 0,
             WEBKIT_FAVICON_DATABASE_ERROR, WEBKIT_FAVICON_DATABASE_ERROR_FAVICON_NOT_FOUND, _("Page %s does not have a favicon"), pageURI);
         return;
