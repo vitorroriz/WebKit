@@ -752,8 +752,8 @@ void MediaSessionManagerCocoa::updateNowPlayingSuppression(const NowPlayingInfo*
 
 #if HAVE(AVEXPERIENCECONTROLLER)
         if (nowPlayingInfo && nowPlayingInfo->fullscreenMode == MediaPlayerEnums::VideoFullscreenModeStandard) {
-            RELEASE_LOG(Media, "MediaSessionManagerCocoa::updateNowPlayingSuppression: taking Now Playing assertion");
-            [nowPlayingActivityController() acquireNowPlayingActivityAssertionForRouteIdentifier:MRNowPlayingActivityActiveRouteIdentifier withDuration:MRNowPlayingActivityUIDurationBrief preferredState:MRNowPlayingActivityUIStateUnsuppressed];
+            RELEASE_LOG(Media, "MediaSessionManagerCocoa::updateNowPlayingSuppression: setting preferred state");
+            [nowPlayingActivityController() setPreferredState:MRNowPlayingActivityUIStateUnsuppressed];
         }
 #endif
     } else {
