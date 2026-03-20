@@ -5865,7 +5865,7 @@ class RunAPITests(shell.Test, AddToLogMixin, ShellMixin):
             second_results_failing_tests = set(self.getProperty('second_run_failures', set()))
             list_failed_tests_with_change = sorted(first_results_failing_tests.union(second_results_failing_tests))
             if list_failed_tests_with_change:
-                self.command = self.command + list_failed_tests_with_change
+                self.command = self.command + [quote(t) for t in list_failed_tests_with_change]
         if SHOULD_FILTER_LOGS is True:
             self.command = self.shell_command(' '.join(self.command) + ' > logs.txt 2>&1 ; ret=$? ; grep "Ran " logs.txt ; exit $ret')
 

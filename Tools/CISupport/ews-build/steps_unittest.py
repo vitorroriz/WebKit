@@ -5746,6 +5746,40 @@ All tests successfully passed!
         self.expect_outcome(result=SUCCESS, state_string='run-api-tests-without-change')
         return self.run_step()
 
+    def test_special_characters_in_test_name(self):
+        self.setup_step(RunAPITestsWithoutChange())
+        self.setProperty('fullPlatform', 'mac-catalina')
+        self.setProperty('platform', 'mac')
+        self.setProperty('configuration', 'release')
+        self.setProperty('buildername', 'API-Tests-macOS-EWS')
+        self.setProperty('buildnumber', '11525')
+        self.setProperty('workername', 'ews155')
+        self.setProperty('first_run_failures', ['suite.test1(foo:)', 'suite.test2'])
+        self.setProperty('second_run_failures', ['suite.test1(foo:)', 'suite.test3'])
+
+        self.expectRemoteCommands(
+            ExpectShell(workdir='wkdir',
+                        log_environ=False,
+                        command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', f'python3 Tools/Scripts/run-api-tests --timestamps --no-build --release --verbose --json-output={self.jsonFileName} \'suite.test1(foo:)\' suite.test2 suite.test3 > logs.txt 2>&1 ; ret=$? ; grep "Ran " logs.txt ; exit $ret'],
+                        logfiles={'json': self.jsonFileName},
+                        timeout=3 * 60 * 60
+                        )
+            .log('stdio', stdout='''...
+worker/0 TestWTF.WTF_Variant.OperatorAmpersand Passed
+worker/0 TestWTF.WTF_Variant.Ref Passed
+worker/0 TestWTF.WTF_Variant.RefPtr Passed
+worker/0 TestWTF.WTF_Variant.RetainPtr Passed
+worker/0 TestWTF.WTF_Variant.VisitorUsingMakeVisitor Passed
+worker/0 TestWTF.WTF_Variant.VisitorUsingSwitchOn Passed
+Ran 1888 tests of 1888 with 1888 successful
+------------------------------
+All tests successfully passed!
+''')
+            .exit(0),
+        )
+        self.expect_outcome(result=SUCCESS, state_string='run-api-tests-without-change')
+        return self.run_step()
+
     def test_one_failure(self):
         self.setup_step(RunAPITestsWithoutChange())
         self.setProperty('fullPlatform', 'mac-catalina')
