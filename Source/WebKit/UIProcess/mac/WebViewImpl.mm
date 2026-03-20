@@ -1470,6 +1470,10 @@ void WebViewImpl::handleProcessSwapOrExit()
     hideDOMPasteMenuWithResult(WebCore::DOMPasteAccessResponse::DeniedForGesture);
 
     [m_view.get() _updateFixedContainerEdges:FixedContainerEdges { }];
+
+#if ENABLE(WRITING_TOOLS)
+    [m_view.get() _clearWritingToolsPreservedNodes];
+#endif
 }
 
 void WebViewImpl::processWillSwap()

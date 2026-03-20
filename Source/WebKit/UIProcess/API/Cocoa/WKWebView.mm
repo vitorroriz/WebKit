@@ -2497,6 +2497,24 @@ static _WKSelectionAttributes NODELETE selectionAttributes(const WebKit::EditorS
     _page->setNeedsScrollGeometryUpdates(needsScrollGeometryUpdates);
 }
 
+#if (USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))) || ENABLE(WRITING_TOOLS)
+
+static std::optional<WebCore::JSHandleIdentifier> jsHandleIdentifierInFrame(const WebKit::WebFrameProxy& frame, _WKJSHandle *nodeHandle)
+{
+    if (!nodeHandle)
+        return std::nullopt;
+
+    auto handleInfo = nodeHandle->_ref->info();
+    if (RefPtr handleFrame = WebKit::WebFrameProxy::webFrame(handleInfo.frameInfo.frameID)) {
+        if (handleFrame->process().coreProcessIdentifier() == frame.process().coreProcessIdentifier())
+            return handleInfo.identifier;
+    }
+
+    return std::nullopt;
+}
+
+#endif // (USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))) || ENABLE(WRITING_TOOLS)
+
 #if ENABLE(WRITING_TOOLS)
 
 #pragma mark - Writing Tools API
@@ -2507,6 +2525,13 @@ static _WKSelectionAttributes NODELETE selectionAttributes(const WebKit::EditorS
     return _page->isWritingToolsActive();
 #else
     return NO;
+#endif
+}
+
+- (void)_clearWritingToolsPreservedNodes
+{
+#if ENABLE(WRITING_TOOLS)
+    _writingToolsPreservedNodes = nil;
 #endif
 }
 
@@ -2539,7 +2564,15 @@ static _WKSelectionAttributes NODELETE selectionAttributes(const WebKit::EditorS
     if (proofreadingReview && webSession)
         webSession->isForProofreadingReview = WebCore::WritingTools::IsForProofreadingReview::Yes;
 
-    _page->willBeginWritingToolsSession(webSession, [completion = makeBlockPtr(completion)](const auto& contextData) {
+    Vector<WebCore::JSHandleIdentifier> preservedNodeIdentifiers;
+    if (RefPtr mainFrame = _page->mainFrame()) {
+        for (_WKJSHandle *handle in _writingToolsPreservedNodes.get()) {
+            if (auto identifier = jsHandleIdentifierInFrame(*mainFrame, handle))
+                preservedNodeIdentifiers.append(WTF::move(*identifier));
+        }
+    }
+
+    _page->willBeginWritingToolsSession(webSession, WTF::move(preservedNodeIdentifiers), [completion = makeBlockPtr(completion)](const auto& contextData) {
         auto contexts = [NSMutableArray arrayWithCapacity:contextData.size()];
         for (auto& context : contextData) {
             auto platformContext = WebKit::convertToPlatformContext(context);
@@ -7216,6 +7249,15 @@ static RetainPtr<_WKTextExtractionResult> createEmptyTextExtractionResult()
     });
 }
 
+- (void)_addWritingToolsPreservedNodes:(NSArray<_WKJSHandle *> *)nodes
+{
+#if ENABLE(WRITING_TOOLS)
+    if (!_writingToolsPreservedNodes)
+        _writingToolsPreservedNodes = adoptNS([[NSMutableArray alloc] initWithCapacity:nodes.count]);
+    [_writingToolsPreservedNodes addObjectsFromArray:nodes];
+#endif
+}
+
 @end
 
 @implementation WKWebView (WKDeprecated)
@@ -7244,20 +7286,6 @@ static RetainPtr<_WKTextExtractionResult> createEmptyTextExtractionResult()
 @implementation WKWebView (WKTextExtraction)
 
 #if USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
-
-static std::optional<WebCore::JSHandleIdentifier> jsHandleIdentifierInFrame(const WebKit::WebFrameProxy& frame, _WKJSHandle *nodeHandle)
-{
-    if (!nodeHandle)
-        return std::nullopt;
-
-    auto handleInfo = nodeHandle->_ref->info();
-    if (RefPtr handleFrame = WebKit::WebFrameProxy::webFrame(handleInfo.frameInfo.frameID)) {
-        if (handleFrame->process().coreProcessIdentifier() == frame.process().coreProcessIdentifier())
-            return handleInfo.identifier;
-    }
-
-    return std::nullopt;
-}
 
 static Vector<WebCore::JSHandleIdentifier> extractHandleIdentifiersOfNodesToSkip(Ref<WebKit::WebFrameProxy>&& frame, _WKTextExtractionConfiguration *configuration)
 {

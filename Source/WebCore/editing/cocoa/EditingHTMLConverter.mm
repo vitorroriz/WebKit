@@ -39,6 +39,7 @@
 #import "ContainerNodeInlines.h"
 #import "Document.h"
 #import "DocumentLoader.h"
+#import "DocumentPage.h"
 #import "Editing.h"
 #import "ElementChildIteratorInlines.h"
 #import "ElementInlines.h"
@@ -57,6 +58,7 @@
 #import "LocalFrame.h"
 #import "LocalizedStrings.h"
 #import "NodeName.h"
+#import "Page.h"
 #import "RenderImage.h"
 #import "RenderObjectStyle.h"
 #import "RenderStyle+GettersInlines.h"
@@ -204,11 +206,20 @@ static RetainPtr<NSAttributedString> attributedStringWithAttachmentForElement(co
 }
 
 #if ENABLE(WRITING_TOOLS)
-static bool elementQualifiesForWritingToolsPreservation(Element* element)
+static bool elementQualifiesForWritingToolsPreservation(Element* element, const WeakHashSet<Node, WeakPtrImplWithEventTargetData>& clientPreservedNodes)
 {
+    if (clientPreservedNodes.contains(*element))
+        return true;
+
     // If the element is a mail blockquote, it should be preserved after a Writing Tools composition.
     if (isMailBlockquote(*element))
         return true;
+
+    if (element->getIdAttribute() == "AppleMailSignature"_s) [[unlikely]] {
+        // FIXME (310312): Remove this special case once Mail adopts `-_addWritingToolsPreservedNodes:`.
+        if (RefPtr page = element->document().page(); page && page->isEditable())
+            return true;
+    }
 
     // If the element is a tab span node, it is a tab character with `whitespace:pre`, and need not be preserved.
     if (tabSpanNode(element))
@@ -229,14 +240,14 @@ static bool elementQualifiesForWritingToolsPreservation(Element* element)
     return false;
 }
 
-static bool hasAncestorQualifyingForWritingToolsPreservation(Element* ancestor, ElementCache<bool>& cache)
+static bool hasAncestorQualifyingForWritingToolsPreservation(Element* ancestor, ElementCache<bool>& cache, const WeakHashSet<Node, WeakPtrImplWithEventTargetData>& clientPreservedNodes)
 {
     if (!ancestor)
         return false;
 
     auto entry = cache.find(*ancestor);
     if (entry == cache.end()) {
-        auto result = elementQualifiesForWritingToolsPreservation(ancestor) || hasAncestorQualifyingForWritingToolsPreservation(protect(ancestor->parentElement()).get(), cache);
+        auto result = elementQualifiesForWritingToolsPreservation(ancestor, clientPreservedNodes) || hasAncestorQualifyingForWritingToolsPreservation(protect(ancestor->parentElement()).get(), cache, clientPreservedNodes);
 
         cache.set(*ancestor, result);
         return result;
@@ -332,11 +343,11 @@ static void associateElementWithTextLists(Element* element, ElementCache<RefPtr<
 }
 
 // FIXME: Encapsulate all these parameters into a type for readability and maintainability.
-static void updateAttributes(const Node* node, const RenderStyle& style, OptionSet<IncludedElement> includedElements, ElementCache<bool>& elementQualifiesForWritingToolsPreservationCache, ElementCache<RefPtr<Element>>& enclosingLinkCache, ElementCache<RefPtr<Element>>& enclosingListCache, NSMutableDictionary<NSAttributedStringKey, id> *attributes, ElementCache<RetainPtr<NSArray<NSTextList *>>>& textListsForListElements)
+static void updateAttributes(const Node* node, const RenderStyle& style, OptionSet<IncludedElement> includedElements, ElementCache<bool>& elementQualifiesForWritingToolsPreservationCache, ElementCache<RefPtr<Element>>& enclosingLinkCache, ElementCache<RefPtr<Element>>& enclosingListCache, NSMutableDictionary<NSAttributedStringKey, id> *attributes, ElementCache<RetainPtr<NSArray<NSTextList *>>>& textListsForListElements, const WeakHashSet<Node, WeakPtrImplWithEventTargetData>& clientPreservedNodes)
 {
 #if ENABLE(WRITING_TOOLS)
     if (includedElements.contains(IncludedElement::PreservedContent)) {
-        if (hasAncestorQualifyingForWritingToolsPreservation(protect(node->parentElement()).get(), elementQualifiesForWritingToolsPreservationCache))
+        if (hasAncestorQualifyingForWritingToolsPreservation(protect(node->parentElement()).get(), elementQualifiesForWritingToolsPreservationCache, clientPreservedNodes))
             [attributes setObject:@(1) forKey:WTWritingToolsPreservedAttributeName];
         else
             [attributes removeObjectForKey:WTWritingToolsPreservedAttributeName];
@@ -345,6 +356,7 @@ static void updateAttributes(const Node* node, const RenderStyle& style, OptionS
     UNUSED_PARAM(node);
     UNUSED_PARAM(includedElements);
     UNUSED_PARAM(elementQualifiesForWritingToolsPreservationCache);
+    UNUSED_PARAM(clientPreservedNodes);
 #endif
 
     if (style.textDecorationLineInEffect().hasUnderline())
@@ -448,7 +460,7 @@ static void updateAttributes(const Node* node, const RenderStyle& style, OptionS
 
 // This function uses TextIterator, which makes offsets in its result compatible with HTML editing.
 enum class ReplaceAllNoBreakSpaces : bool { No, Yes };
-static AttributedString editingAttributedStringInternal(const SimpleRange& range, TextIteratorBehaviors behaviors, OptionSet<IncludedElement> includedElements, ReplaceAllNoBreakSpaces replaceAllNoBreakSpaces)
+static AttributedString editingAttributedStringInternal(const SimpleRange& range, TextIteratorBehaviors behaviors, OptionSet<IncludedElement> includedElements, ReplaceAllNoBreakSpaces replaceAllNoBreakSpaces, const WeakHashSet<Node, WeakPtrImplWithEventTargetData>& clientPreservedNodes = { })
 {
     ElementCache<RefPtr<Element>> enclosingLinkCache;
     ElementCache<RefPtr<Element>> enclosingListCache;
@@ -484,7 +496,7 @@ static AttributedString editingAttributedStringInternal(const SimpleRange& range
         CheckedPtr renderer = node->renderer();
 
         if (renderer)
-            updateAttributes(node.get(), protect(renderer->style()), includedElements, elementQualifiesForWritingToolsPreservationCache, enclosingLinkCache, enclosingListCache, attributes.get(), textListsForListElements);
+            updateAttributes(node.get(), protect(renderer->style()), includedElements, elementQualifiesForWritingToolsPreservationCache, enclosingLinkCache, enclosingListCache, attributes.get(), textListsForListElements, clientPreservedNodes);
         else if (!includedElements.contains(IncludedElement::NonRenderedContent))
             continue;
 
@@ -509,9 +521,9 @@ static AttributedString editingAttributedStringInternal(const SimpleRange& range
     return AttributedString::fromNSAttributedString(WTF::move(string));
 }
 
-AttributedString editingAttributedString(const SimpleRange& range, OptionSet<IncludedElement> includedElements)
+AttributedString editingAttributedString(const SimpleRange& range, OptionSet<IncludedElement> includedElements, const WeakHashSet<Node, WeakPtrImplWithEventTargetData>& clientPreservedNodes)
 {
-    return editingAttributedStringInternal(range, { }, includedElements, ReplaceAllNoBreakSpaces::No);
+    return editingAttributedStringInternal(range, { }, includedElements, ReplaceAllNoBreakSpaces::No, clientPreservedNodes);
 }
 
 AttributedString editingAttributedStringReplacingNoBreakSpace(const SimpleRange& range, TextIteratorBehaviors behaviors, OptionSet<IncludedElement> includedElements)

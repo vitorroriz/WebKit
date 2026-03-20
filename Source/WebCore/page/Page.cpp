@@ -5558,9 +5558,9 @@ void Page::initializeGamepadAccessForPageLoad()
 #endif // ENABLE(GAMEPAD)
 
 #if ENABLE(WRITING_TOOLS)
-void Page::willBeginWritingToolsSession(const std::optional<WritingTools::Session>& session, CompletionHandler<void(const Vector<WritingTools::Context>&)>&& completionHandler)
+void Page::willBeginWritingToolsSession(const std::optional<WritingTools::Session>& session, WeakHashSet<Node, WeakPtrImplWithEventTargetData>&& preservedNodes, CompletionHandler<void(const Vector<WritingTools::Context>&)>&& completionHandler)
 {
-    m_writingToolsController->willBeginWritingToolsSession(session, WTF::move(completionHandler));
+    m_writingToolsController->willBeginWritingToolsSession(session, WTF::move(preservedNodes), WTF::move(completionHandler));
 }
 
 void Page::didBeginWritingToolsSession(const WritingTools::Session& session, const Vector<WritingTools::Context>& contexts)
