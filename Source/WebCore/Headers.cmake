@@ -586,6 +586,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     Modules/mediastream/RTCIceServerTransportProtocol.h
     Modules/mediastream/RTCIceTcpCandidateType.h
     Modules/mediastream/RTCNetworkManager.h
+    Modules/mediastream/RTCRtpCodec.h
     Modules/mediastream/RTCRtpSFrameTransformer.h
     Modules/mediastream/RTCRtpScriptTransformer.h
     Modules/mediastream/RTCRtpTransceiver.h
@@ -2805,7 +2806,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/mediastream/RTCPeerConnectionHandlerClient.h
     platform/mediastream/RTCPriorityType.h
     platform/mediastream/RTCRtpCapabilities.h
-    platform/mediastream/RTCRtpCodecCapability.h
     platform/mediastream/RealtimeIncomingVideoSource.h
     platform/mediastream/RealtimeMediaSource.h
     platform/mediastream/RealtimeMediaSourceCapabilities.h

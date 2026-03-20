@@ -104,7 +104,7 @@ ExceptionOr<void> RTCRtpTransceiver::stop()
     return { };
 }
 
-ExceptionOr<void> RTCRtpTransceiver::setCodecPreferences(const Vector<RTCRtpCodecCapability>& codecs)
+ExceptionOr<void> RTCRtpTransceiver::setCodecPreferences(const Vector<RTCRtpCodec>& codecs)
 {
     RELEASE_LOG_INFO(WebRTC, "RTCRtpTransceiver::setCodecPreferences");
     return m_backend->setCodecPreferences(codecs);

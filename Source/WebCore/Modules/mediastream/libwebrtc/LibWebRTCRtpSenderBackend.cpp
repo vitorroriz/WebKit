@@ -204,7 +204,7 @@ void LibWebRTCRtpSenderBackend::setParameters(const RTCRtpSendParameters& parame
     }
 
     auto rtcParameters = *std::exchange(m_currentParameters, std::nullopt);
-    updateRTCRtpSendParameters(parameters, rtcParameters);
+    updateRTCRtpSendParameters(parameters, rtcParameters, m_rtcSender->media_type());
 
     auto error = m_rtcSender->SetParameters(rtcParameters);
     if (!error.ok()) {

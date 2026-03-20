@@ -1714,7 +1714,7 @@ ExceptionOr<GStreamerMediaEndpoint::Backends> GStreamerMediaEndpoint::createTran
 
     auto& registryScanner = GStreamerRegistryScanner::singleton();
     auto direction = fromRTCRtpTransceiverDirection(init.direction);
-    Vector<RTCRtpCodecCapability> codecs;
+    Vector<RTCRtpCodec> codecs;
 
     auto rtpExtensions = kind == "video"_s ? registryScanner.videoRtpExtensions() : registryScanner.audioRtpExtensions();
     for (auto& extension : rtpExtensions) {

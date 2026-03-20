@@ -67,7 +67,7 @@ enum class RTCPriorityType : uint8_t;
 enum class RTCRtpTransceiverDirection;
 
 RTCRtpParameters toRTCRtpParameters(const webrtc::RtpParameters&);
-void updateRTCRtpSendParameters(const RTCRtpSendParameters&, webrtc::RtpParameters&);
+void updateRTCRtpSendParameters(const RTCRtpSendParameters&, webrtc::RtpParameters&, webrtc::MediaType);
 RTCRtpSendParameters toRTCRtpSendParameters(const webrtc::RtpParameters&);
 webrtc::RtpParameters fromRTCRtpSendParameters(const RTCRtpSendParameters&, const webrtc::RtpParameters& currentParameters);
 

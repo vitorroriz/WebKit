@@ -4738,7 +4738,7 @@ JSRTCPeerConnectionState.cpp
 JSRTCPriorityType.cpp
 JSRTCRtcpParameters.cpp
 JSRTCRtpCapabilities.cpp
-JSRTCRtpCodecCapability.cpp
+JSRTCRtpCodec.cpp
 JSRTCRtpCodecParameters.cpp
 JSRTCRtpContributingSource.cpp
 JSRTCRtpEncodingParameters.cpp

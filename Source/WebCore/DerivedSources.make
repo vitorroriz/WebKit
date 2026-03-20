@@ -510,7 +510,8 @@ JS_BINDING_IDLS := \
     $(WebCore)/Modules/mediastream/RTCPriorityType.idl \
     $(WebCore)/Modules/mediastream/RTCRtcpParameters.idl \
     $(WebCore)/Modules/mediastream/RTCRtpCapabilities.idl \
-    $(WebCore)/Modules/mediastream/RTCRtpCodecCapability.idl \
+    $(WebCore)/Modules/mediastream/RTCRtpCodec.idl \
+    $(WebCore)/Modules/mediastream/RTCRtpCodec.idl \
     $(WebCore)/Modules/mediastream/RTCRtpCodecParameters.idl \
     $(WebCore)/Modules/mediastream/RTCRtpCodingParameters.idl \
     $(WebCore)/Modules/mediastream/RTCRtpContributingSource.idl \
