@@ -74,7 +74,6 @@ public:
     // MARK: - Derived Values
 
     WEBCORE_EXPORT float computedLineHeight() const;
-    float computeLineHeight(const LineHeight&) const;
 
     // MARK: - Non-property initial values.
 

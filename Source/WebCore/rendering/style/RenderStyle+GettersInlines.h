@@ -634,11 +634,6 @@ inline float RenderStyle::computedLineHeight() const
     return m_computedStyle.computedLineHeight();
 }
 
-inline float RenderStyle::computeLineHeight(const Style::LineHeight& lineHeight) const
-{
-    return m_computedStyle.computeLineHeight(lineHeight);
-}
-
 // MARK: - Derived used values
 
 inline UserModify RenderStyle::usedUserModify() const
