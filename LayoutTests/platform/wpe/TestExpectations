@@ -364,6 +364,7 @@ webkit.org/b/206454 fast/events/mouse-cursor-change.html [ Failure ]
 webkit.org/b/206454 fast/events/mouse-cursor-no-mousemove.html [ Failure ]
 
 webkit.org/b/285785 printing/background-clip-text.html [ ImageOnlyFailure ]
+webkit.org/b/285785 printing/light-text-dark-background-economy.html [ ImageOnlyFailure ]
 
 webkit.org/b/208985 fast/viewport/ios/shrink-to-fit-large-content-width.html [ Failure ]
 
