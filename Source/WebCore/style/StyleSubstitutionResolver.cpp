@@ -30,6 +30,7 @@
 #include "CSSPendingSubstitutionValue.h"
 #include "CSSPropertyNames.h"
 #include "CSSPropertyParser.h"
+#include "CSSPropertyParserConsumer+Primitives.h"
 #include "CSSRegisteredCustomProperty.h"
 #include "CSSValueKeywords.h"
 #include "CSSVariableData.h"
@@ -37,7 +38,9 @@
 #include "ConstantPropertyMap.h"
 #include "CustomFunctionRegistry.h"
 #include "Document.h"
+#include "Element.h"
 #include "RenderStyle+GettersInlines.h"
+#include "RenderStyle+SettersInlines.h"
 #include "StyleBuilder.h"
 #include "StyleCustomProperty.h"
 #include "StyleCustomPropertyRegistry.h"
@@ -160,6 +163,50 @@ bool SubstitutionResolver::substituteDashedFunction(StringView functionName, CSS
     return true;
 }
 
+bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vector<CSSParserToken>& tokens, const CSSParserContext& context) const
+{
+    // https://drafts.csswg.org/css-values-5/#funcdef-attr
+    // attr( <attr-name> <attr-type>? , <declaration-value>?)
+
+    range.consumeWhitespace();
+
+    if (range.peek().type() != IdentToken)
+        return false;
+
+    auto attributeName = range.consumeIncludingWhitespace().value().toAtomString();
+
+    // FIXME: Support <attr-type> for non-string types.
+
+    m_styleBuilder.state().registerContentAttribute(attributeName);
+    m_styleBuilder.state().style().setHasAttrContent();
+
+    CheckedPtr element = m_styleBuilder.state().element();
+    if (!element)
+        return false;
+
+    auto& attributeValue = element->getAttribute(QualifiedName { nullAtom(), attributeName, nullAtom() });
+
+    if (attributeValue.isNull()) {
+        // Use fallback if available.
+        if (range.atEnd())
+            return false;
+
+        if (!CSSPropertyParserHelpers::consumeCommaIncludingWhitespace(range))
+            return false;
+
+        auto fallbackTokens = substituteTokenRange(range, context);
+        if (!fallbackTokens)
+            return false;
+
+        tokens.appendVector(*fallbackTokens);
+        return true;
+    }
+
+    // Default type is string: produce a CSS string token with the attribute value.
+    tokens.append(CSSParserToken(StringToken, attributeValue));
+    return true;
+}
+
 std::optional<Vector<CSSParserToken>> SubstitutionResolver::substituteTokenRange(CSSParserTokenRange range, const CSSParserContext& context) const
 {
     Vector<CSSParserToken> tokens;
@@ -174,8 +221,9 @@ std::optional<Vector<CSSParserToken>> SubstitutionResolver::substituteTokenRange
                 continue;
             }
             if (functionId == CSSValueAttr) {
-                // attr()
-                // FIXME: Implement.
+                if (!substituteAttrFunction(range.consumeBlock(), tokens, context))
+                    success = false;
+                continue;
             }
             if (isCustomPropertyName(token.value())) {
                 // <dashed-function>
