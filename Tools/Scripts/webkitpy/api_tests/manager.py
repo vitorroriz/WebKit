@@ -243,7 +243,25 @@ class Manager(object):
         self._port.stop_helper()
         self._port.clean_up_test_run()
 
+    @staticmethod
+    def _read_test_names_from_file(filenames: list[str], filesystem) -> list[str]:
+        result = []
+        for filename in filenames:
+            with filesystem.open_text_file_for_reading(filename) as f:
+                for line in f:
+                    line = line.split('#')[0].strip()
+                    if line:
+                        result.append(line)
+        return result
+
     def run(self, args, json_output=None):
+        if self._options.test_list:
+            for list_path in self._options.test_list:
+                if not self.host.filesystem.isfile(list_path):
+                    _log.error('--test-list file "%s" not found', list_path)
+                    return Manager.FAILED_COLLECT_TESTS
+            args = args + Manager._read_test_names_from_file(self._options.test_list, self.host.filesystem)
+
         if json_output:
             json_output = self.host.filesystem.abspath(json_output)
             if not self.host.filesystem.isdir(self.host.filesystem.dirname(json_output)) or self.host.filesystem.isdir(json_output):
