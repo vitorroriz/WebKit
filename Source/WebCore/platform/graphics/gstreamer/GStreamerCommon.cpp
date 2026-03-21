@@ -54,6 +54,7 @@
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/URL.h>
 #include <wtf/UUID.h>
+#include <wtf/ZippedRange.h>
 #include <wtf/glib/GMallocString.h>
 #include <wtf/glib/GSpanExtras.h>
 #include <wtf/glib/GThreadSafeWeakPtr.h>
@@ -467,14 +468,13 @@ bool ensureGStreamerInitialized()
             WTFLogAlways("The USE_PLAYBIN3 variable was detected in the environment. Expect playback issues or please unset it.");
 
 #if ENABLE(VIDEO) || ENABLE(WEB_AUDIO)
-        Vector<String> parameters = s_UIProcessCommandLineOptions.value_or(extractGStreamerOptionsFromCommandLine());
-        s_UIProcessCommandLineOptions.reset();
-        WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN // GLib port
-        char** argv = g_new0(char*, parameters.size() + 2);
+        auto parameters = std::exchange(s_UIProcessCommandLineOptions, std::nullopt).value_or(extractGStreamerOptionsFromCommandLine());
         int argc = parameters.size() + 1;
-        argv[0] = g_strdup(FileSystem::currentExecutableName().data());
-        for (unsigned i = 0; i < parameters.size(); i++)
-            argv[i + 1] = g_strdup(parameters[i].utf8().data());
+        char** argv = g_new0(char*, argc + 1);
+        auto argvSpan = unsafeMakeSpan(argv, argc);
+        argvSpan[0] = g_strdup(FileSystem::currentExecutableName().data());
+        for (auto [arg, parameter] : zippedRange(argvSpan.subspan(1), parameters))
+            arg = g_strdup(parameter.utf8().data());
 
         GUniqueOutPtr<GError> error;
         isGStreamerInitialized = gst_init_check(&argc, &argv, &error.outPtr());
@@ -493,7 +493,6 @@ bool ensureGStreamerInitialized()
             if (!disableFastMalloc || disableFastMalloc == "0"_s)
                 gst_allocator_set_default(GST_ALLOCATOR(g_object_new(gst_allocator_fast_malloc_get_type(), nullptr)));
         }
-        WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 
 #if USE(GSTREAMER_MPEGTS)
         if (isGStreamerInitialized)
