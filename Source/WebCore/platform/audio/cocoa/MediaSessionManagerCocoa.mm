@@ -64,10 +64,10 @@ static const size_t kLowPowerVideoBufferSize = 4096;
 #define MEDIASESSIONMANAGER_RELEASE_LOG(formatString, ...) \
 do { \
     if (willLog(WTFLogLevel::Always)) { \
-        RELEASE_LOG_FORWARDABLE(Media, MEDIASESSIONMANAGERCOCOA_##formatString, ##__VA_ARGS__); \
+        RELEASE_LOG_FORWARDABLE(Media, MediaSessionManagerCocoa##formatString, ##__VA_ARGS__); \
         if (logger().hasEnabledInspector()) { \
             char buffer[1024] = { 0 }; \
-            SAFE_SPRINTF(std::span { buffer }, MESSAGE_MEDIASESSIONMANAGERCOCOA_##formatString, ##__VA_ARGS__); \
+            SAFE_SPRINTF(std::span { buffer }, MESSAGE_MediaSessionManagerCocoa##formatString, ##__VA_ARGS__); \
             logger().toObservers(logChannel(), WTFLogLevel::Always, String::fromUTF8(buffer)); \
         } \
     } \
@@ -154,7 +154,7 @@ void MediaSessionManagerCocoa::updateSessionState()
         }
     });
 
-    MEDIASESSIONMANAGER_RELEASE_LOG(UPDATESESSIONSTATE, captureCount, audioMediaStreamTrackCount, videoCount, audioCount, videoAudioCount, webAudioCount, domMediaSessionCount);
+    MEDIASESSIONMANAGER_RELEASE_LOG(UpdateSessionState, captureCount, audioMediaStreamTrackCount, videoCount, audioCount, videoAudioCount, webAudioCount, domMediaSessionCount);
 
     Ref sharedSession = AudioSession::singleton();
     if (!m_defaultBufferSize)
@@ -368,13 +368,13 @@ void MediaSessionManagerCocoa::sessionWillEndPlayback(PlatformMediaSessionInterf
 
 void MediaSessionManagerCocoa::clientCharacteristicsChanged(PlatformMediaSessionInterface& session, bool)
 {
-    MEDIASESSIONMANAGER_RELEASE_LOG(CLIENTCHARACTERISTICSCHANGED, session.logIdentifier());
+    MEDIASESSIONMANAGER_RELEASE_LOG(ClientCharacteristicsChanged, session.logIdentifier());
     scheduleSessionStatusUpdate();
 }
 
 void MediaSessionManagerCocoa::sessionCanProduceAudioChanged()
 {
-    MEDIASESSIONMANAGER_RELEASE_LOG(SESSIONCANPRODUCEAUDIOCHANGED);
+    MEDIASESSIONMANAGER_RELEASE_LOG(SessionCanProduceAudioChanged);
     PlatformMediaSessionManager::sessionCanProduceAudioChanged();
     scheduleSessionStatusUpdate();
 }

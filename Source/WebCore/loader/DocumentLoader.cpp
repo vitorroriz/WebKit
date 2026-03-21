@@ -329,7 +329,7 @@ void DocumentLoader::frameDestroyed()
 // but not loads initiated by child frames' data sources -- that's the WebFrame's job.
 void DocumentLoader::stopLoading()
 {
-    DOCUMENTLOADER_RELEASE_LOG_FORWARDABLE(DOCUMENTLOADER_STOPLOADING);
+    DOCUMENTLOADER_RELEASE_LOG_FORWARDABLE(DocumentLoaderStopLoading);
 
     RefPtr frame = m_frame.get();
     ASSERT(frame);
@@ -1519,12 +1519,12 @@ void DocumentLoader::attachToFrame(LocalFrame& frame)
 void DocumentLoader::attachToFrame()
 {
     ASSERT(m_frame);
-    DOCUMENTLOADER_RELEASE_LOG_FORWARDABLE(DOCUMENTLOADER_ATTACHTOFRAME);
+    DOCUMENTLOADER_RELEASE_LOG_FORWARDABLE(DocumentLoaderAttachToFrame);
 }
 
 void DocumentLoader::detachFromFrame(LoadWillContinueInAnotherProcess loadWillContinueInAnotherProcess)
 {
-    DOCUMENTLOADER_RELEASE_LOG_FORWARDABLE(DOCUMENTLOADER_DETACHFROMFRAME);
+    DOCUMENTLOADER_RELEASE_LOG_FORWARDABLE(DocumentLoaderDetachFromFrame);
 
     RefPtr frame = m_frame.get();
 #if ASSERT_ENABLED
@@ -2161,7 +2161,7 @@ void DocumentLoader::startLoadingMainResource()
     }
 
     if (maybeLoadEmpty()) {
-        DOCUMENTLOADER_RELEASE_LOG_FORWARDABLE(DOCUMENTLOADER_STARTLOADINGMAINRESOURCE_EMTPY_DOCUMENT);
+        DOCUMENTLOADER_RELEASE_LOG_FORWARDABLE(DocumentLoaderStartLoadingMainResourceEmptyDocument);
         return;
     }
 
@@ -2204,7 +2204,7 @@ void DocumentLoader::startLoadingMainResource()
         // If this is a reload the cache layer might have made the previous request conditional. DocumentLoader can't handle 304 responses itself.
         request.makeUnconditional();
 
-        DOCUMENTLOADER_RELEASE_LOG_FORWARDABLE(DOCUMENTLOADER_STARTLOADINGMAINRESOURCE_STARTING_LOAD);
+        DOCUMENTLOADER_RELEASE_LOG_FORWARDABLE(DocumentLoaderStartLoadingMainResourceStartingLoad);
 
         if (m_substituteData.isValid()) {
             auto url = request.url();

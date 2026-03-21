@@ -4869,7 +4869,7 @@ void LocalFrameView::scheduleResizeEventIfNeeded()
     RefPtr document = m_frame->document();
     if (document->quirks().shouldSilenceWindowResizeEventsDuringApplicationSnapshotting()) {
         document->addConsoleMessage(MessageSource::Other, MessageLevel::Info, "Window resize events silenced due to: http://webkit.org/b/258597"_s);
-        FRAMEVIEW_RELEASE_LOG(Events, LOCALFRAMEVIEW_FIRING_RESIZE_EVENTS_DISABLED_FOR_PAGE);
+        FRAMEVIEW_RELEASE_LOG(Events, LocalFrameViewFiringResizeEventsDisabledForPage);
         return;
     }
 
@@ -5758,7 +5758,7 @@ void LocalFrameView::paintContents(GraphicsContext& context, const IntRect& dirt
 
     ASSERT(!needsLayout());
     if (needsLayout()) {
-        FRAMEVIEW_RELEASE_LOG(Layout, LOCALFRAMEVIEW_NOT_PAINTING_LAYOUT_NEEDED);
+        FRAMEVIEW_RELEASE_LOG(Layout, LocalFrameViewNotPaintingLayoutNeeded);
         return;
     }
 
@@ -6689,7 +6689,7 @@ void LocalFrameView::fireLayoutRelatedMilestonesIfNeeded()
 
     if (milestonesAchieved && m_frame->isMainFrame()) {
         if (milestonesAchieved.contains(LayoutMilestone::DidFirstVisuallyNonEmptyLayout))
-            FRAMEVIEW_RELEASE_LOG(Layout, LOCALFRAMEVIEW_FIRING_FIRST_VISUALLY_NON_EMPTY_LAYOUT_MILESTONE);
+            FRAMEVIEW_RELEASE_LOG(Layout, LocalFrameViewFiringFirstVisuallyNonEmptyLayoutMilestone);
         m_frame->loader().didReachLayoutMilestone(milestonesAchieved);
     }
 }

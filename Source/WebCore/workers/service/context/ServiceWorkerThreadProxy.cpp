@@ -281,7 +281,7 @@ void ServiceWorkerThreadProxy::navigationPreloadFailed(SWServerConnectionIdentif
 
 void ServiceWorkerThreadProxy::removeFetch(SWServerConnectionIdentifier connectionIdentifier, FetchIdentifier fetchIdentifier)
 {
-    RELEASE_LOG_FORWARDABLE(ServiceWorker, SERVICEWORKERTHREADPROXY_REMOVEFETCH, fetchIdentifier.toUInt64());
+    RELEASE_LOG_FORWARDABLE(ServiceWorker, ServiceWorkerThreadProxyRemoveFetch, fetchIdentifier.toUInt64());
 
     postTaskForModeToWorkerOrWorkletGlobalScope([protectedThis = Ref { *this }, connectionIdentifier, fetchIdentifier] (auto& context) {
         downcast<ServiceWorkerGlobalScope>(context).removeFetchTask({ connectionIdentifier, fetchIdentifier });

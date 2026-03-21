@@ -271,7 +271,7 @@ void PolicyChecker::checkNavigationPolicy(ResourceRequest&& request, const Resou
             checkedThis = nullptr;
             return function({ }, nullptr, NavigationPolicyDecision::IgnoreLoad);
         case PolicyAction::LoadWillContinueInAnotherProcess:
-            POLICYCHECKER_RELEASE_LOG_FORWARDABLE_WITH_THIS(checkedThis, POLICYCHECKER_CHECKNAVIGATIONPOLICY_CONTINUE_LOAD_IN_ANOTHER_PROCESS);
+            POLICYCHECKER_RELEASE_LOG_FORWARDABLE_WITH_THIS(checkedThis, PolicyCheckerCheckNavigationPolicyContinueLoadInAnotherProcess);
             checkedThis = nullptr;
             function({ }, nullptr, NavigationPolicyDecision::LoadWillContinueInAnotherProcess);
             return;
@@ -283,9 +283,9 @@ void PolicyChecker::checkNavigationPolicy(ResourceRequest&& request, const Resou
                 return function({ }, { }, NavigationPolicyDecision::IgnoreLoad);
             }
             if (isInitialEmptyDocumentLoad)
-                POLICYCHECKER_RELEASE_LOG_FORWARDABLE_WITH_THIS(checkedThis, POLICYCHECKER_CHECKNAVIGATIONPOLICY_CONTINUE_INITIAL_EMPTY_DOCUMENT);
+                POLICYCHECKER_RELEASE_LOG_FORWARDABLE_WITH_THIS(checkedThis, PolicyCheckerCheckNavigationPolicyContinueInitialEmptyDocument);
             else
-                POLICYCHECKER_RELEASE_LOG_FORWARDABLE_WITH_THIS(checkedThis, POLICYCHECKER_CHECKNAVIGATIONPOLICY_CONTINUE_POLICYACTION_IS_USE);
+                POLICYCHECKER_RELEASE_LOG_FORWARDABLE_WITH_THIS(checkedThis, PolicyCheckerCheckNavigationPolicyContinuePolicyActionIsUse);
             checkedThis = nullptr;
             return function(WTF::move(request), formSubmission, NavigationPolicyDecision::ContinueLoad);
         }
