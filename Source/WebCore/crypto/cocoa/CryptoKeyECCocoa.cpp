@@ -97,8 +97,6 @@ bool CryptoKeyEC::platformSupportedCurve(NamedCurve curve)
     return curve == NamedCurve::P256 || curve == NamedCurve::P384 || curve == NamedCurve::P521;
 }
 
-#if !defined(CLANG_WEBKIT_BRANCH)
-
 static pal::ECCurve namedCurveToCryptoKitCurve(CryptoKeyEC::NamedCurve curve)
 {
     switch (curve) {
@@ -118,26 +116,15 @@ static PlatformECKeyContainer toPlatformKey(pal::ECKey key)
     return makeUniqueRefWithoutFastMallocCheck<pal::ECKey>(key);
 }
 
-#endif
-
 std::optional<CryptoKeyPair> CryptoKeyEC::platformGeneratePair(CryptoAlgorithmIdentifier identifier, NamedCurve curve, bool extractable, CryptoKeyUsageBitmap usages)
 {
-#if !defined(CLANG_WEBKIT_BRANCH)
     auto privateKey = CryptoKeyEC::create(identifier, curve, CryptoKeyType::Private, toPlatformKey(pal::ECKey::init(namedCurveToCryptoKitCurve(curve))), extractable, usages);
     auto publicKey = CryptoKeyEC::create(identifier, curve, CryptoKeyType::Public, toPlatformKey(privateKey->platformKey()->toPub()), true, usages);
     return CryptoKeyPair { WTF::move(publicKey), WTF::move(privateKey) };
-#else
-    UNUSED_PARAM(identifier);
-    UNUSED_PARAM(curve);
-    UNUSED_PARAM(extractable);
-    UNUSED_PARAM(usages);
-    RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE("CLANG_WEBKIT_BRANCH");
-#endif
 }
 
 RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportRaw(CryptoAlgorithmIdentifier identifier, NamedCurve curve, Vector<uint8_t>&& keyData, bool extractable, CryptoKeyUsageBitmap usages)
 {
-#if !defined(CLANG_WEBKIT_BRANCH)
     if (!doesUncompressedPointMatchNamedCurve(curve, keyData.size()))
         return nullptr;
 
@@ -145,19 +132,10 @@ RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportRaw(CryptoAlgorithmIdentifier ide
     if (!rv.getErrorCode().isSuccess() || !rv.getKey())
         return nullptr;
     return create(identifier, curve, CryptoKeyType::Public, toPlatformKey(rv.getKey().get()), extractable, usages);
-#else
-    UNUSED_PARAM(identifier);
-    UNUSED_PARAM(curve);
-    UNUSED_PARAM(keyData);
-    UNUSED_PARAM(extractable);
-    UNUSED_PARAM(usages);
-    RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE("CLANG_WEBKIT_BRANCH");
-#endif
 }
 
 Vector<uint8_t> CryptoKeyEC::platformExportRaw() const
 {
-#if !defined(CLANG_WEBKIT_BRANCH)
     size_t expectedSize = 2 * keySizeInBytes() + 1; // Per Section 2.3.4 of http://www.secg.org/sec1-v2.pdf
     auto rv = platformKey()->exportX963Pub();
     if (rv.errorCode != Cpp::ErrorCodes::Success)
@@ -165,9 +143,6 @@ Vector<uint8_t> CryptoKeyEC::platformExportRaw() const
     if (rv.result.size() != expectedSize)
         return { };
     return WTF::move(rv.result);
-#else
-    RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE("CLANG_WEBKIT_BRANCH");
-#endif
 }
 
 RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportJWKPublic(CryptoAlgorithmIdentifier identifier, NamedCurve curve, Vector<uint8_t>&& x, Vector<uint8_t>&& y, bool extractable, CryptoKeyUsageBitmap usages)
@@ -182,7 +157,6 @@ RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportJWKPublic(CryptoAlgorithmIdentifi
 
 RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportJWKPrivate(CryptoAlgorithmIdentifier identifier, NamedCurve curve, Vector<uint8_t>&& x, Vector<uint8_t>&& y, Vector<uint8_t>&& d, bool extractable, CryptoKeyUsageBitmap usages)
 {
-#if !defined(CLANG_WEBKIT_BRANCH)
     if (!doesFieldElementMatchNamedCurve(curve, x.size()) || !doesFieldElementMatchNamedCurve(curve, y.size()) || !doesFieldElementMatchNamedCurve(curve, d.size()))
         return nullptr;
 
@@ -198,21 +172,10 @@ RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportJWKPrivate(CryptoAlgorithmIdentif
     if (!rv.getErrorCode().isSuccess() || !rv.getKey())
         return nullptr;
     return create(identifier, curve, CryptoKeyType::Private, toPlatformKey(rv.getKey().get()), extractable, usages);
-#else
-    UNUSED_PARAM(identifier);
-    UNUSED_PARAM(curve);
-    UNUSED_PARAM(x);
-    UNUSED_PARAM(y);
-    UNUSED_PARAM(d);
-    UNUSED_PARAM(extractable);
-    UNUSED_PARAM(usages);
-    RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE("CLANG_WEBKIT_BRANCH");
-#endif
 }
 
 bool CryptoKeyEC::platformAddFieldElements(JsonWebKey& jwk) const
 {
-#if !defined(CLANG_WEBKIT_BRANCH)
     size_t keySizeInBytes = this->keySizeInBytes();
     size_t publicKeySize = keySizeInBytes * 2 + 1; // 04 + X + Y per Section 2.3.4 of http://www.secg.org/sec1-v2.pdf
     size_t privateKeySize = keySizeInBytes * 3 + 1; // 04 + X + Y + D
@@ -244,13 +207,8 @@ bool CryptoKeyEC::platformAddFieldElements(JsonWebKey& jwk) const
     if (result.size() > publicKeySize)
         jwk.d = base64URLEncodeToString(result.subspan(publicKeySize, keySizeInBytes));
     return true;
-#else
-    UNUSED_PARAM(jwk);
-    RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE("CLANG_WEBKIT_BRANCH");
-#endif
 }
 
-#if !defined(CLANG_WEBKIT_BRANCH)
 static std::span<const uint8_t> getOID(CryptoKeyEC::NamedCurve curve)
 {
     switch (curve) {
@@ -262,7 +220,6 @@ static std::span<const uint8_t> getOID(CryptoKeyEC::NamedCurve curve)
         return Secp521r1;
     }
 }
-#endif
 
 // Per https://www.ietf.org/rfc/rfc5280.txt
 // SubjectPublicKeyInfo ::= SEQUENCE { algorithm AlgorithmIdentifier, subjectPublicKey BIT STRING }
@@ -274,7 +231,6 @@ static std::span<const uint8_t> getOID(CryptoKeyEC::NamedCurve curve)
 // secp521r1 OBJECT IDENTIFIER      ::= { iso(1) identified-organization(3) certicom(132) curve(0) 35 }
 RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportSpki(CryptoAlgorithmIdentifier identifier, NamedCurve curve, Vector<uint8_t>&& keyData, bool extractable, CryptoKeyUsageBitmap usages)
 {
-#if !defined(CLANG_WEBKIT_BRANCH)
     // The following is a loose check on the provided SPKI key, it aims to extract AlgorithmIdentifier, ECParameters, and Key.
     // Once the underlying crypto library is updated to accept SPKI EC Key, we should remove this hack.
     // <rdar://problem/30987628>
@@ -307,19 +263,10 @@ RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportSpki(CryptoAlgorithmIdentifier id
     if (!rv.getErrorCode().isSuccess() || !rv.getKey())
         return nullptr;
     return create(identifier, curve, CryptoKeyType::Public, toPlatformKey(rv.getKey().get()), extractable, usages);
-#else
-    UNUSED_PARAM(identifier);
-    UNUSED_PARAM(curve);
-    UNUSED_PARAM(keyData);
-    UNUSED_PARAM(extractable);
-    UNUSED_PARAM(usages);
-    RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE("CLANG_WEBKIT_BRANCH");
-#endif
 }
 
 Vector<uint8_t> CryptoKeyEC::platformExportSpki() const
 {
-#if !defined(CLANG_WEBKIT_BRANCH)
     size_t expectedKeySize = 2 * keySizeInBytes() + 1; // Per Section 2.3.4 of http://www.secg.org/sec1-v2.pdf
     Vector<uint8_t> keyBytes(expectedKeySize);
     size_t keySize = keyBytes.size();
@@ -354,9 +301,6 @@ Vector<uint8_t> CryptoKeyEC::platformExportSpki() const
     result.appendVector(keyBytes);
 
     return result;
-#else
-    RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE("CLANG_WEBKIT_BRANCH");
-#endif
 }
 
 // Per https://www.ietf.org/rfc/rfc5208.txt
@@ -366,7 +310,6 @@ Vector<uint8_t> CryptoKeyEC::platformExportSpki() const
 // OpenSSL uses custom ECParameters. We follow OpenSSL as a compatibility concern.
 RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportPkcs8(CryptoAlgorithmIdentifier identifier, NamedCurve curve, Vector<uint8_t>&& keyData, bool extractable, CryptoKeyUsageBitmap usages)
 {
-#if !defined(CLANG_WEBKIT_BRANCH)
     // The following is a loose check on the provided PKCS8 key, it aims to extract AlgorithmIdentifier, ECParameters, and Key.
     // Once the underlying crypto library is updated to accept PKCS8 EC Key, we should remove this hack.
     // <rdar://problem/30987628>
@@ -420,19 +363,10 @@ RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportPkcs8(CryptoAlgorithmIdentifier i
     if (!rv.getErrorCode().isSuccess() || !rv.getKey())
         return nullptr;
     return create(identifier, curve, CryptoKeyType::Private, toPlatformKey(rv.getKey().get()), extractable, usages);
-#else
-    UNUSED_PARAM(identifier);
-    UNUSED_PARAM(curve);
-    UNUSED_PARAM(keyData);
-    UNUSED_PARAM(extractable);
-    UNUSED_PARAM(usages);
-    RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE("CLANG_WEBKIT_BRANCH");
-#endif
 }
 
 Vector<uint8_t> CryptoKeyEC::platformExportPkcs8() const
 {
-#if !defined(CLANG_WEBKIT_BRANCH)
     size_t keySizeInBytes = this->keySizeInBytes();
     size_t expectedKeySize = keySizeInBytes * 3 + 1; // 04 + X + Y + D
     Vector<uint8_t> keyBytes(expectedKeySize);
@@ -485,9 +419,6 @@ Vector<uint8_t> CryptoKeyEC::platformExportPkcs8() const
     result.append(keyBytes.subspan(0, publicKeySize - 1));
 
     return result;
-#else
-    RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE("CLANG_WEBKIT_BRANCH");
-#endif
 }
 
 } // namespace WebCore

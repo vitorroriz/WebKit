@@ -33,12 +33,10 @@
 #include <wtf/CryptographicUtilities.h>
 #include <wtf/StdLibExtras.h>
 
-#if !defined(CLANG_WEBKIT_BRANCH)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #include "PALSwift-Generated.h"
 #pragma clang diagnostic pop
-#endif // !defined(CLANG_WEBKIT_BRANCH)
 
 namespace WebCore {
 
@@ -59,19 +57,10 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 
 static ExceptionOr<Vector<uint8_t>> encryptCryptoKitAESGCM(const Vector<uint8_t>& iv, const Vector<uint8_t>& key, const Vector<uint8_t>& plainText, const Vector<uint8_t>& additionalData, size_t desiredTagLengthInBytes)
 {
-#if !defined(CLANG_WEBKIT_BRANCH)
     auto rv = pal::AesGcm::encrypt(key.span(), iv.span(), additionalData.span(), plainText.span(), desiredTagLengthInBytes);
     if (rv.errorCode != Cpp::ErrorCodes::Success)
         return Exception { ExceptionCode::OperationError };
     return WTF::move(rv.result);
-#else
-    UNUSED_PARAM(iv);
-    UNUSED_PARAM(key);
-    UNUSED_PARAM(plainText);
-    UNUSED_PARAM(additionalData);
-    UNUSED_PARAM(desiredTagLengthInBytes);
-    RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE("CLANG_WEBKIT_BRANCH");
-#endif
 }
 
 static ExceptionOr<Vector<uint8_t>> decyptAESGCM(const Vector<uint8_t>& iv, const Vector<uint8_t>& key, const Vector<uint8_t>& cipherText, const Vector<uint8_t>& additionalData, size_t desiredTagLengthInBytes)

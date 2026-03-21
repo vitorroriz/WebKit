@@ -31,7 +31,6 @@
 #include <wtf/Platform.h>
 #if OS(DARWIN) && !PLATFORM(GTK)
 #include <WebCore/CommonCryptoUtilities.h>
-#if !defined(CLANG_WEBKIT_BRANCH)
 namespace pal {
 class ECKey;
 }
@@ -39,11 +38,6 @@ class ECKey;
 namespace WebCore {
 using PlatformECKeyContainer = UniqueRef<pal::ECKey>;
 }
-#else
-namespace WebCore {
-using PlatformECKeyContainer = std::unique_ptr<std::monostate>;
-}
-#endif
 #endif
 
 #if USE(GCRYPT)
