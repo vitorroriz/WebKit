@@ -1282,6 +1282,8 @@ webkit.org/b/273396 imported/w3c/web-platform-tests/css/motion/offset-path-shape
 webkit.org/b/273396 imported/w3c/web-platform-tests/css/motion/offset-path-shape-polygon-002.html [ ImageOnlyFailure ]
 webkit.org/b/273396 platform/gtk/fonts/webkit-font-smoothing.html [ ImageOnlyFailure ]
 
+css3/masking/reference-clip-path-animate-transform-repaint.html [ Failure Pass ]
+
 # Bidi content-aware paste not yet supported
 editing/pasteboard/paste-rtl-paragraph-with-leading-ltr-text.html [ ImageOnlyFailure ]
 
@@ -1556,6 +1558,8 @@ webkit.org/b/309267 inspector/unit-tests/array-utilities.html [ Pass Failure ]
 [ Release ] imported/w3c/web-platform-tests/permissions/permissions-garbage-collect.https.html [ Pass Failure ]
 [ Release ] platform/gtk/fast/frames/scrolling-iframe-out-of-viewport.html [ Pass Failure ]
 [ Release ] imported/w3c/web-platform-tests/preload/prefetch-document.html [ Failure Pass ]
+[ Release ] imported/w3c/web-platform-tests/content-security-policy/frame-ancestors/frame-ancestors-none-block.html [ Failure Pass ]
+[ Release ] fast/dom/Window/window-resize-update-scrollbars.html [ Failure Pass ]
 
 webkit.org/b/309892 accessibility/aria-role-on-label.html [ Pass Crash ]
 webkit.org/b/309894 http/tests/inspector/target/pause-on-inline-debugger-statement.html [ Pass Timeout ]
