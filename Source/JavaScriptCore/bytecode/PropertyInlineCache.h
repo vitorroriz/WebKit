@@ -512,22 +512,32 @@ public:
 //                                                      | m_next            |---> (slow-path handler)
 //                                                      +-------------------+
 //
-// Most handler stub follows a uniform pattern compiled by InlineCacheCompiler::compileHandler():
+// Most handler stubs follow a uniform pattern compiled by InlineCacheCompiler::compileHandler():
 //
-//     emitDataICPrologue()       // save frame pointer; does NOT update callFrameRegister
+//     emitDataICPrologue()       // x86_64 pushes FP; ARM64E tags return address;
+//                                //   other ISAs do nothing. callFrameRegister is NOT updated.
 //     check guard                // e.g. do a structure check: load from base, compare against
 //                                //   [handlerGPR + offsetOfStructureID]
 //     --- on match ---
-//     perform access             // load / store / call, depending on AccessCase kind
-//     emitDataICEpilogue()       // restore frame pointer
+//     perform access             // load / store, depending on AccessCase kind
+//     emitDataICEpilogue()       // minimal inverse of prologue
 //     return
+//
+//     --- on match (JS/C++ call needed, e.g. getter/setter/custom accessor) ---
+//     emitDataICPrepareForCall() // lazily save LR/FP now that we know we need a full frame
+//     call into JS/C++
+//     emitDataICRestoreAfterCall() // restore LR/FP
+//     emitDataICEpilogue()
+//     return
+//
 //     --- on miss ---
 //     load  handlerGPR, [handlerGPR + offsetOfNext]
 //     jump  [handlerGPR + offsetOfJumpTarget]            // offset skips prologue
 //
-// Not modifying callFrameRegister is important because it means handler stubs execute in the
-// caller's frame context. Thus, exception unwinding and access to CallFrame* via
-// callFrameRegister require no special handling in the handler prologue/epilogue.
+// Not modifying callFrameRegister is important because it means handler stubs execute in the caller's frame
+// context, so exception unwinding and CallFrame* access via callFrameRegister need no special
+// handling in the handler prologue/epilogue. The lazy save/restore pattern also means that
+// simple load/store handlers (the common case) pay no frame-setup cost at all.
 //
 // The terminal handler is always the slow-path. It calls m_slowOperation
 // to fall back to the C++ runtime. The slow path may generate and prepend a new
