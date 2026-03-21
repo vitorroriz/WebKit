@@ -178,7 +178,7 @@ bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vec
     // FIXME: Support <attr-type> for non-string types.
 
     m_styleBuilder.state().registerContentAttribute(attributeName);
-    m_styleBuilder.state().style().setHasAttrContent();
+    protect(m_styleBuilder.state().style())->setHasAttrContent();
 
     CheckedPtr element = m_styleBuilder.state().element();
     if (!element)
