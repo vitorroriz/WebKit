@@ -42,6 +42,7 @@
 # * IndexedDB
 # * JavaScriptCore
 # * MathML
+# * Navigation Timing
 # * OffscreenCanvas
 # * PageOverlay
 # * Perf
@@ -1151,6 +1152,8 @@ webkit.org/b/305740 compositing/backing/solid-color-with-paints-into-ancestor.ht
 
 imported/w3c/web-platform-tests/css/compositing/mix-blend-mode/mix-blend-mode-plus-lighter-svg.html [ ImageOnlyFailure Pass ]
 
+webkit.org/b/310417 compositing/masks/become-tiled-mask.html [ ImageOnlyFailure Pass ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Compositing tests
 #////////////////////////////////////////////////////////////////////////////////////////
@@ -1432,8 +1435,6 @@ webkit.org/b/179261 editing/selection/drag-to-contenteditable-iframe.html [ Time
 #////////////////////////////////////////////////////////////////////////////////////////
 # Events-related bugs
 #////////////////////////////////////////////////////////////////////////////////////////
-
-fast/events/onunload-not-on-body.html [ Failure Pass ]
 
 # Times out due to missing event 'callAfterScrollingCompletes'.
 webkit.org/b/212202 fast/events/wheel/platform-wheelevent-in-scrolling-div.html [ Skip ]
@@ -1796,6 +1797,8 @@ webkit.org/b/298925 fast/mediacapturefromelement/CanvasCaptureMediaStream-offscr
 
 webkit.org/b/264665 http/wpt/webcodecs/videoFrame-webglCanvasImageSource.html [ Failure ]
 
+webkit.org/b/310410 http/wpt/webcodecs/videoFrame-video-element-compressed.html [ Failure Pass ]
+
 # This test doesn't look right. Encoding 6 frames, each at different framerates should only produce
 # key-frames. The test asserts because it expects at least one delta frame.
 http/wpt/webcodecs/encode-bitrate-change.html [ Failure ]
@@ -2013,6 +2016,15 @@ webkit.org/b/212080 mathml/presentation/href-style.html [ ImageOnlyFailure ]
 # End of MathML-related bugs
 #////////////////////////////////////////////////////////////////////////////////////////
 
+#////////////////////////////////////////////////////////////////////////////////////////
+# Navigation Timing-related bugs
+#////////////////////////////////////////////////////////////////////////////////////////
+
+webkit.org/b/310407 imported/w3c/web-platform-tests/navigation-timing/unload-event-same-origin-check.html [ Failure Pass ]
+
+#////////////////////////////////////////////////////////////////////////////////////////
+# End of Navigation Timing-related bugs
+#////////////////////////////////////////////////////////////////////////////////////////
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # OffscreenCanvas-related bugs
@@ -2363,6 +2375,8 @@ webkit.org/b/298587 fast/media/mq-inverted-colors-ua-style-on-to-off.html [ Imag
 
 # This test requires generation of progress events during loading
 webkit.org/b/100984 http/tests/media/progress-events-generated-correctly.html [ Failure ]
+
+webkit.org/b/122042 media/media-controller-playback.html [ Pass Timeout ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Media-related bugs
@@ -4527,7 +4541,6 @@ webkit.org/b/202228 compositing/layer-creation/fixed-position-descendants-out-of
 webkit.org/b/169918 [ Release ] compositing/layer-creation/fixed-position-out-of-view-scaled-scroll.html [ Failure ]
 webkit.org/b/169918 [ Debug ] compositing/layer-creation/fixed-position-out-of-view-scaled-scroll.html [ Skip ] # Crash.
 webkit.org/b/169918 compositing/layer-creation/fixed-position-out-of-view-scaled.html [ Failure ]
-webkit.org/b/169918 compositing/layer-creation/spanOverlapsCanvas.html [ Failure ]
 webkit.org/b/169918 compositing/masks/clip-path-composited-descendent.html [ Failure ]
 webkit.org/b/169918 compositing/masks/compositing-clip-path-change-no-repaint.html [ Failure ]
 compositing/no-compositing-when-full-screen-is-present.html [ Failure ]
@@ -5190,6 +5203,8 @@ webkit.org/b/305514 webgl/1.0.x/conformance/textures/misc/video-rotation.html [ 
 webkit.org/b/305514 webgl/2.0.y/conformance/textures/misc/video-rotation.html [ Failure Pass ]
 webkit.org/b/305514 fullscreen/fullscreen-zero-height-element-with-non-zero-children.html [ Failure Pass ]
 
+webkit.org/b/310418 http/wpt/mediastream/getUserMedia-odd-size.html [ Failure Pass ]
+
 webkit.org/b/305538 fast/images/async-image-multiple-clients-repaint.html [ Pass Failure ]
 
 webkit.org/b/306256 editing/selection/modify-up-on-rtl-wrapping-text.html [ Failure ]
@@ -5247,6 +5262,11 @@ webkit.org/b/306384 imported/w3c/web-platform-tests/css/filter-effects/root-elem
 webkit.org/b/306384 imported/w3c/web-platform-tests/html/editing/editing-0/spelling-and-grammar-checking/spelling-markers-009.html [ ImageOnlyFailure ]
 webkit.org/b/306384 imported/w3c/web-platform-tests/html/editing/editing-0/spelling-and-grammar-checking/spelling-markers-010.html [ ImageOnlyFailure ]
 webkit.org/b/306384 svg/as-list-image/svg-list-image-intrinsic-size-1.html [ ImageOnlyFailure ]
+
+webkit.org/b/219498 imported/w3c/web-platform-tests/css/css-scroll-snap/scroll-target-padding-003.html [ Pass ImageOnlyFailure ]
+webkit.org/b/244538 imported/w3c/web-platform-tests/css/css-scroll-snap/scroll-target-margin-003.html [ Pass ImageOnlyFailure ]
+webkit.org/b/245034 imported/w3c/web-platform-tests/css/css-scroll-snap/scroll-target-align-003.html [ Pass ImageOnlyFailure ]
+webkit.org/b/227085 imported/w3c/web-platform-tests/css/css-scroll-snap/scroll-target-snap-003.html [ Pass ImageOnlyFailure ]
 
 webkit.org/b/306455 http/tests/xmlhttprequest/logout.html [ Failure Pass ]
 
