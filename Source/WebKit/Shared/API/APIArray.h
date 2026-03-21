@@ -29,7 +29,7 @@
 #include "APIObject.h"
 #include <ranges>
 #include <wtf/Forward.h>
-#include <wtf/RetainReleaseSwift.h>
+#include <wtf/SwiftBridging.h>
 #include <wtf/Vector.h>
 
 namespace API {

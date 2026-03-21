@@ -36,8 +36,8 @@
 #include <WebCore/SerializedScriptValue.h>
 #include <wtf/ArgumentCoder.h>
 #include <wtf/RefCounted.h>
-#include <wtf/RetainReleaseSwift.h>
 #include <wtf/RunLoop.h>
+#include <wtf/SwiftBridging.h>
 #include <wtf/URL.h>
 #include <wtf/Vector.h>
 #include <wtf/text/WTFString.h>

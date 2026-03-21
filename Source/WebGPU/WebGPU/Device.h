@@ -44,7 +44,7 @@
 #import <wtf/HashTable.h>
 #import <wtf/KeyValuePair.h>
 #import <wtf/Ref.h>
-#import <wtf/RetainReleaseSwift.h>
+#import <wtf/SwiftBridging.h>
 #import <wtf/TZoneMalloc.h>
 #import <wtf/ThreadSafeWeakPtr.h>
 #import <wtf/Vector.h>

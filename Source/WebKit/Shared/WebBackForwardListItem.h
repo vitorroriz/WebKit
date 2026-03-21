@@ -32,7 +32,6 @@
 #include "WebsiteDataStore.h"
 #include <wtf/CheckedPtr.h>
 #include <wtf/Ref.h>
-#include <wtf/RetainReleaseSwift.h>
 #include <wtf/SwiftBridging.h>
 #include <wtf/WeakPtr.h>
 #include <wtf/text/WTFString.h>

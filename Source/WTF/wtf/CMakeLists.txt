@@ -281,7 +281,6 @@ set(WTF_PUBLIC_HEADERS
     ReferenceWrapperVector.h
     ResourceUsage.h
     RetainPtr.h
-    RetainReleaseSwift.h
     RobinHoodHashMap.h
     RobinHoodHashSet.h
     RobinHoodHashTable.h
