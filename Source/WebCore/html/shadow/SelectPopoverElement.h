@@ -44,10 +44,10 @@ private:
 
     bool isSelectPopoverElement() const final { return true; }
 
-    void didRecalcStyle(OptionSet<Style::Change>) final;
+    void didAttachRenderers() final;
     void popoverWasHidden() final;
 
-    bool m_isAppearanceBase { false };
+    bool m_wasBaseAppearancePicker { false };
 };
 
 } // namespace WebCore

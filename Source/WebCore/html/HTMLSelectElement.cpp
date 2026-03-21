@@ -42,6 +42,7 @@
 #include "ElementChildIteratorInlines.h"
 #include "ElementTraversal.h"
 #include "EventHandler.h"
+#include "EventLoop.h"
 #include "EventNames.h"
 #include "FrameDestructionObserverInlines.h"
 #include "FormController.h"
@@ -214,6 +215,11 @@ HTMLSelectElement* HTMLSelectElement::findOwnerSelect(ContainerNode* startNode, 
     return findOwnerSelect(startNode->parentNode(), excludeOptGroup);
 }
 
+static bool hasBaseAppearance(const RenderStyle* style)
+{
+    return style && style->usedAppearance() == StyleAppearance::Base;
+}
+
 void HTMLSelectElement::didRecalcStyle(OptionSet<Style::Change> styleChange)
 {
     // Even though the options didn't necessarily change, we will call setOptionsChangedOnRenderer for its side effect
@@ -228,6 +234,11 @@ void HTMLSelectElement::didRecalcStyle(OptionSet<Style::Change> styleChange)
                 fallbackButton->invalidateStyle();
         }
     }
+
+    bool newIsBaseAppearance = hasBaseAppearance(existingComputedStyle());
+    if (m_wasBaseAppearance && !newIsBaseAppearance && m_popupIsVisible)
+        queuePickerCloseForAppearanceChange();
+    m_wasBaseAppearance = newIsBaseAppearance;
 
     HTMLFormControlElement::didRecalcStyle(styleChange);
 }
@@ -361,6 +372,18 @@ void HTMLSelectElement::hidePickerPopoverElement()
 
     setPopupIsVisible(false);
     popover->hidePopover();
+}
+
+void HTMLSelectElement::queuePickerCloseForAppearanceChange()
+{
+    protect(protect(document())->eventLoop())->queueTask(TaskSource::DOMManipulation, [weakThis = WeakPtr { *this }] {
+        RefPtr select = weakThis.get();
+        if (!select)
+            return;
+        protect(select->document())->addConsoleMessage(MessageSource::Other, MessageLevel::Warning,
+            "The select element's appearance property changed while its picker was open. The picker has been closed."_s);
+        select->hidePickerPopoverElement();
+    });
 }
 
 static inline auto navigationKeyIdentifiersForWritingMode(const RenderElement* renderer) -> HTMLSelectElement::NavigationKeyIdentifiers
@@ -553,7 +576,7 @@ bool HTMLSelectElement::isMouseFocusable() const
 RenderPtr<RenderElement> HTMLSelectElement::createElementRenderer(RenderStyle&& style, const RenderTreePosition& position)
 {
     if (usesMenuList()) {
-        if (style.usedAppearance() == StyleAppearance::Base)
+        if (hasBaseAppearance(&style))
             return HTMLElement::createElementRenderer(WTF::move(style), position);
         return createRenderer<RenderMenuList>(*this, WTF::move(style));
     }
@@ -572,6 +595,19 @@ bool HTMLSelectElement::childShouldCreateRenderer(const Node& child) const
         return true;
     if (child.isBeforePseudoElement() || child.isAfterPseudoElement())
         return true;
+    // When the first-child author button has display:contents, its descendant nodes become
+    // rendering children of the select. Allow those through based on the select's own
+    // appearance rather than usesBaseAppearancePicker(), because during render tree updates
+    // the popover may not have its updated style yet (it comes after the button slot in the
+    // composed tree).
+    if (hasBaseAppearance(existingComputedStyle())) {
+        for (auto* ancestor = child.parentElement(); ancestor && ancestor != this; ancestor = ancestor->parentElement()) {
+            if (isFirstElementChildButton(*ancestor))
+                return true;
+            if (!ancestor->hasDisplayContents())
+                break;
+        }
+    }
     if (usesBaseAppearancePicker())
         return true;
     return validationMessageShadowTreeContains(child);
@@ -1442,6 +1478,23 @@ bool HTMLSelectElement::platformHandleKeydownEvent(KeyboardEvent* event)
 
 #endif
 
+static bool isClickInsidePopover(SelectPopoverElement* popover, Event& event)
+{
+    if (!popover)
+        return false;
+    RefPtr targetNode = dynamicDowncast<Node>(event.target());
+    if (!targetNode)
+        return false;
+    RefPtr select = popover->selectElement();
+    for (RefPtr element = dynamicDowncast<Element>(targetNode); element; element = element->parentElementInComposedTree()) {
+        if (element == popover)
+            return true;
+        if (element == select)
+            return false;
+    }
+    return false;
+}
+
 void HTMLSelectElement::menuListDefaultEventHandler(Event& event)
 {
     ASSERT(renderer());
@@ -1568,24 +1621,13 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event& event)
             event.setDefaultHandled();
             return;
         }
-        ASSERT(usesBaseAppearancePicker() || !m_popupIsVisible);
         if (m_popupIsVisible) {
-            bool clickedInsidePopover = [&] {
-                RefPtr popover = m_popover;
-                if (!popover)
-                    return false;
-                RefPtr targetNode = dynamicDowncast<Node>(event.target());
-                if (!targetNode)
-                    return false;
-                for (RefPtr element = dynamicDowncast<Element>(targetNode); element; element = element->parentElementInComposedTree()) {
-                    if (element == popover)
-                        return true;
-                    if (element == this)
-                        return false;
-                }
-                return false;
-            }();
-            if (!clickedInsidePopover)
+            if (!usesBaseAppearancePicker()) {
+#if !PLATFORM(IOS_FAMILY)
+                hidePopup();
+#endif
+                hidePickerPopoverElement();
+            } else if (!isClickInsidePopover(protect(m_popover), event))
                 hidePickerPopoverElement();
         } else
             openPickerForUserInteraction(false);
@@ -2038,6 +2080,14 @@ void HTMLSelectElement::openPickerForUserInteraction(std::optional<bool> focusVi
         return;
 
     protect(document())->updateStyleIfNeeded();
+
+    // If the appearance changed due to :open (e.g., a rule switching appearance away from
+    // base-select), close the picker.
+    if (!usesBaseAppearancePicker()) {
+        hidePickerPopoverElement();
+        return;
+    }
+
     int listIndex = optionToListIndex(selectedIndex());
     if (listIndex < 0)
         listIndex = firstSelectableListIndex();
@@ -2081,7 +2131,17 @@ ExceptionOr<void> HTMLSelectElement::showPicker()
     if (!window || !window->consumeTransientActivation())
         return Exception { ExceptionCode::NotAllowedError, "Select showPicker() requires a user gesture."_s };
 
+    protect(document())->updateStyleIfNeeded();
+    bool openedBaseAppearancePicker = usesBaseAppearancePicker();
     showPickerInternal(); // showPickerInternal() may run JS and cause the renderer to get destroyed.
+
+    // Resolve styles with :open now matching. If the appearance changed (e.g., due to a
+    // :open rule switching appearance away from base-select), close the picker immediately.
+    if (openedBaseAppearancePicker && m_popupIsVisible) {
+        protect(document())->updateStyleIfNeeded();
+        if (!usesBaseAppearancePicker())
+            hidePickerPopoverElement();
+    }
 
     return { };
 }

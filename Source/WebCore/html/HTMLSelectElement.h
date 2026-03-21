@@ -187,6 +187,7 @@ public:
     WEBCORE_EXPORT bool usesBaseAppearancePicker() const;
     SelectPopoverElement* NODELETE pickerPopoverElement() const;
     void hidePickerPopoverElement();
+    void queuePickerCloseForAppearanceChange();
 
     struct NavigationKeyIdentifiers {
         ASCIILiteral next;
@@ -313,6 +314,7 @@ private:
     RefPtr<PopupMenu> m_popup;
 #endif
     bool m_popupIsVisible { false };
+    bool m_wasBaseAppearance { false };
 };
 
 } // namespace
