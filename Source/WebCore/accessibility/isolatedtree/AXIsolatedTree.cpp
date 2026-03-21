@@ -611,7 +611,7 @@ void AXIsolatedTree::objectChangedIgnoredState(const AccessibilityObject& object
     }
 
     if (object.isLink()) {
-        CheckedPtr axObjectCache = m_axObjectCache.get();
+        CheckedPtr axObjectCache = m_axObjectCache;
         if (RefPtr webArea = axObjectCache ? axObjectCache->rootWebArea() : nullptr)
             queueNodeUpdate(webArea->objectID(), { AXProperty::DocumentLinks });
     }
@@ -1295,7 +1295,7 @@ void AXIsolatedTree::updateRootScreenRelativePosition()
     AXTRACE("AXIsolatedTree::updateRootScreenRelativePosition"_s);
     AX_ASSERT(isMainThread());
 
-    CheckedPtr cache = m_axObjectCache.get();
+    CheckedPtr cache = m_axObjectCache;
     if (RefPtr axRoot = cache && cache->document() ? dynamicDowncast<AccessibilityScrollView>(cache->getOrCreate(cache->document()->view())) : nullptr) {
         queueNodeUpdate(axRoot->objectID(), { AXProperty::ScreenRelativePosition });
 
@@ -1673,7 +1673,7 @@ void AXIsolatedTree::processQueuedNodeUpdates()
         return;
 
     if (AXObjectCache::isAppleInternalInstall()) [[unlikely]]
-        WTFBeginSignpostAlways(this, UpdateAccessibilityIsolatedTree, "updating isolated tree for AXObjectCache: %" PRIVATE_LOG_STRING "", cache ? CheckedPtr { cache.get() }->debugDescription().utf8().data() : "null");
+        WTFBeginSignpostAlways(this, UpdateAccessibilityIsolatedTree, "updating isolated tree for AXObjectCache: %" PRIVATE_LOG_STRING "", cache ? CheckedPtr { cache }->debugDescription().utf8().data() : "null");
 
     for (const auto& nodeIDs : m_needsNodeRemoval)
         removeNode(nodeIDs.key, nodeIDs.value);

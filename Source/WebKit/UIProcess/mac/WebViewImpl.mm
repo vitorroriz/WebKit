@@ -1153,7 +1153,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 - (NSViewController *)textListViewController
 {
     if (!_textListTouchBarViewController)
-        _textListTouchBarViewController = adoptNS([[WKTextListTouchBarViewController alloc] initWithWebViewImpl:CheckedPtr { _webViewImpl.get() }]);
+        _textListTouchBarViewController = adoptNS([[WKTextListTouchBarViewController alloc] initWithWebViewImpl:CheckedPtr { _webViewImpl }]);
     return _textListTouchBarViewController.get();
 }
 
@@ -1219,7 +1219,7 @@ static void* imageOverlayObservationContext = &imageOverlayObservationContext;
 
     BOOL oldHasActiveTextSelection = [change[NSKeyValueChangeOldKey] boolValue];
     BOOL newHasActiveTextSelection = [change[NSKeyValueChangeNewKey] boolValue];
-    RetainPtr webView = _impl ? CheckedPtr { _impl.get() }->view() : nil;
+    RetainPtr webView = _impl ? CheckedPtr { _impl }->view() : nil;
     RetainPtr<NSResponder> currentResponder = webView.get().window.firstResponder;
     if (oldHasActiveTextSelection && !newHasActiveTextSelection) {
         if (self.firstResponderIsInsideImageOverlay) {
@@ -1237,7 +1237,7 @@ static void* imageOverlayObservationContext = &imageOverlayObservationContext;
     if (!_impl)
         return NO;
 
-    for (RetainPtr view = dynamic_objc_cast<NSView>(protect(CheckedPtr { _impl.get() }->view()).get().window.firstResponder); view; view = view.get().superview) {
+    for (RetainPtr view = dynamic_objc_cast<NSView>(protect(CheckedPtr { _impl }->view()).get().window.firstResponder); view; view = view.get().superview) {
         if (view == _overlayView.get())
             return YES;
     }
@@ -1257,7 +1257,7 @@ static void* imageOverlayObservationContext = &imageOverlayObservationContext;
         return CGRectMake(0, 0, 1, 1);
 
     auto unitInteractionRect = _impl->imageAnalysisInteractionBounds();
-    WebCore::FloatRect unobscuredRect = protect(CheckedPtr { _impl.get() }->view()).get().bounds;
+    WebCore::FloatRect unobscuredRect = protect(CheckedPtr { _impl }->view()).get().bounds;
     unitInteractionRect.moveBy(-unobscuredRect.location());
     unitInteractionRect.scale(1 / unobscuredRect.size());
     return unitInteractionRect;

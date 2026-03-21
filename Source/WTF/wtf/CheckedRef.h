@@ -105,6 +105,11 @@ public:
         ASSERT(m_ptr);
     }
 
+    template<typename X, typename WeakPtrImplType>
+    CheckedRef(const WeakRef<X, WeakPtrImplType>& other) requires std::is_convertible_v<X*, T*>
+        : CheckedRef(other.get())
+    { }
+
     CheckedRef(HashTableDeletedValueType) : m_ptr(PtrTraits::hashTableDeletedValue()) { }
     bool isHashTableDeletedValue() const { return PtrTraits::isHashTableDeletedValue(m_ptr); }
 
@@ -210,6 +215,9 @@ private:
 
     typename PtrTraits::StorageType m_ptr;
 };
+
+template<typename X, typename WeakPtrImplType> CheckedRef(WeakRef<X, WeakPtrImplType>&) -> CheckedRef<X>;
+template<typename X, typename WeakPtrImplType> CheckedRef(const WeakRef<X, WeakPtrImplType>&) -> CheckedRef<X>;
 
 template <typename T, typename PtrTraits>
 struct GetPtrHelper<CheckedRef<T, PtrTraits>> {

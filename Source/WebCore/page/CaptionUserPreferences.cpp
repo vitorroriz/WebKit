@@ -179,7 +179,7 @@ void CaptionUserPreferences::setUserPrefersTextDescriptions(bool preference)
 
 void CaptionUserPreferences::captionPreferencesChanged()
 {
-    CheckedRef { m_pageGroup.get() }->captionPreferencesChanged();
+    CheckedRef { m_pageGroup }->captionPreferencesChanged();
 }
 
 Vector<String> CaptionUserPreferences::preferredLanguages() const

@@ -1437,7 +1437,7 @@ unsigned MediaPlayer::videoDecodedByteCount() const
 void MediaPlayer::reloadTimerFired()
 {
     protect(m_private)->cancelLoad();
-    loadWithNextMediaEngine(CheckedPtr { m_currentMediaEngine.get() });
+    loadWithNextMediaEngine(CheckedPtr { m_currentMediaEngine });
 }
 
 template<typename T>

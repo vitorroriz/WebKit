@@ -114,7 +114,7 @@ const RenderElement* RenderSVGModelObject::pushMappingToContainer(const RenderLa
 
     ASSERT_UNUSED(ancestorSkipped, !ancestorSkipped);
 
-    pushOntoGeometryMap(geometryMap, ancestorToStopAt, CheckedPtr { container.get() }, ancestorSkipped);
+    pushOntoGeometryMap(geometryMap, ancestorToStopAt, CheckedPtr { container }, ancestorSkipped);
     return container.get();
 }
 
