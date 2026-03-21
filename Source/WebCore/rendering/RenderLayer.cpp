@@ -2032,6 +2032,9 @@ bool RenderLayer::computeHasVisibleContent() const
     if (renderer().style().usedVisibility() == Visibility::Visible)
         return true;
 
+    if (!renderer().style().filter().isNone() && renderer().isSVGLayerAwareRenderer())
+        return true;
+
     // Layer's renderer has visibility:hidden, but some non-layer child may have visibility:visible.
     auto nextRenderer = [&] (auto& renderer) -> const RenderObject* {
         for (auto* ancestor = &renderer; ancestor && ancestor != &this->renderer(); ancestor = ancestor->parent()) {

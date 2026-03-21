@@ -38,7 +38,6 @@ svg/custom/feComponentTransfer-Table.svg                                        
 svg/custom/image-with-transform-clip-filter.svg                                        [ ImageOnlyFailure ]
 svg/custom/recursive-filter.svg                                                        [ ImageOnlyFailure ]
 svg/custom/resources-css-scaled.html                                                   [ ImageOnlyFailure ]
-svg/custom/visibility-override-filter.svg                                              [ ImageOnlyFailure ]
 svg/filters/filter-image-ref-root.html                                                 [ ImageOnlyFailure ]
 svg/filters/filter-on-filter-for-text.svg                                              [ ImageOnlyFailure ]
 svg/filters/filter-refresh.svg                                                         [ ImageOnlyFailure ]
