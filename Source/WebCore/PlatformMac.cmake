@@ -194,13 +194,13 @@ list(APPEND WebCore_SOURCES
 
     platform/audio/AudioSession.cpp
 
+    platform/audio/cocoa/AudioBusCocoa.mm
     platform/audio/cocoa/AudioDecoderCocoa.cpp
     platform/audio/cocoa/AudioEncoderCocoa.cpp
+    platform/audio/cocoa/FFTFrameCocoa.cpp
     platform/audio/cocoa/WebAudioBufferList.cpp
 
-    platform/audio/mac/AudioBusMac.mm
     platform/audio/mac/AudioHardwareListenerMac.cpp
-    platform/audio/mac/FFTFrameMac.cpp
 
     platform/cf/KeyedDecoderCF.cpp
     platform/cf/KeyedEncoderCF.cpp

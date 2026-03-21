@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// macOS - specific FFTFrame implementation
+// Cocoa FFTFrame implementation
 
 #include "config.h"
 
