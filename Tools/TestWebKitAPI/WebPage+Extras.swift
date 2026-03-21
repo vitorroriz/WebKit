@@ -21,7 +21,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-#if ENABLE_SWIFTUI && compiler(>=6.2)
+#if ENABLE_SWIFTUI
 
 import Foundation
 @_spi(Testing) @_spi(CrossImportOverlay) import WebKit
@@ -114,4 +114,4 @@ extension WebPage {
     #endif // os(macOS)
 }
 
-#endif // ENABLE_SWIFTUI && compiler(>=6.2)
+#endif // ENABLE_SWIFTUI

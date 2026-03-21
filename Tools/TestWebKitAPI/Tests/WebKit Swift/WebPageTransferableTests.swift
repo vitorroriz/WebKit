@@ -22,7 +22,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 
 // FIXME: Remove !SWIFT_WEBKIT_TOOLCHAIN once Swift toolchain is fixed (see webkit.org/b/307344).
-#if ENABLE_SWIFTUI && canImport(Testing) && compiler(>=6.2) && !SWIFT_WEBKIT_TOOLCHAIN
+#if ENABLE_SWIFTUI && canImport(Testing) && !SWIFT_WEBKIT_TOOLCHAIN
 
 import Testing
 @_spi(Testing) import WebKit
@@ -183,4 +183,4 @@ struct WebPageTransferableTests {
     }
 }
 
-#endif // ENABLE_SWIFTUI && canImport(Testing) && compiler(>=6.2)
+#endif // ENABLE_SWIFTUI && canImport(Testing) && !SWIFT_WEBKIT_TOOLCHAIN

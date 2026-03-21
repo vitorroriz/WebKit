@@ -23,8 +23,6 @@
 
 import Foundation
 
-#if compiler(>=6.2)
-
 /// A set of facilities to mimic basic Swift Testing support, until Swift Testing can be directly used.
 public enum Testing {
     /// The cause of a test failure.
@@ -122,5 +120,3 @@ public enum Testing {
         throw Error("Timed out.", function: function, line: line)
     }
 }
-
-#endif // compiler(>=6.2)

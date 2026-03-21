@@ -24,7 +24,7 @@
 import Metal
 import WebKit
 
-#if ENABLE_GPU_PROCESS_MODEL && canImport(RealityCoreRenderer, _version: 11) && compiler(>=6.2)
+#if ENABLE_GPU_PROCESS_MODEL && canImport(RealityCoreRenderer, _version: 11)
 @_weakLinked @_spi(UsdLoaderAPI) import _USDKit_RealityKit
 @_spi(RealityCoreRendererAPI) import RealityKit
 @_weakLinked import USDKit
@@ -246,7 +246,7 @@ extension WKBridgeUpdateMesh {
     }
 }
 
-#if ENABLE_GPU_PROCESS_MODEL && canImport(RealityCoreRenderer, _version: 11) && compiler(>=6.2)
+#if ENABLE_GPU_PROCESS_MODEL && canImport(RealityCoreRenderer, _version: 11)
 func decodeValues<T>(from data: Data) -> [T] {
     let stride = MemoryLayout<T>.stride
 
@@ -545,9 +545,9 @@ extension WKBridgeMaterialGraph {
     }
 }
 
-#if ENABLE_GPU_PROCESS_MODEL && canImport(RealityCoreRenderer, _version: 11) && compiler(>=6.2)
+#if ENABLE_GPU_PROCESS_MODEL && canImport(RealityCoreRenderer, _version: 11)
 
-internal func toData<T>(_ input: [T]) -> Data {
+func toData<T>(_ input: [T]) -> Data {
     // FIXME: (rdar://164559261) understand/document/remove unsafety
     unsafe input.withUnsafeBytes { bufferPointer in
         unsafe Data(bufferPointer)
@@ -710,7 +710,6 @@ extension WKBridgeSkinningData {
             return []
         }
 
-        #if compiler(>=6.2)
         return unsafe data.withUnsafeBytes { rawBufferPointer in
             guard let baseAddress = rawBufferPointer.baseAddress else {
                 return []
@@ -719,16 +718,6 @@ extension WKBridgeSkinningData {
             let matrices = unsafe baseAddress.assumingMemoryBound(to: Float.self)
             return (0..<influenceWeightsCount).map { unsafe matrices[$0] }
         }
-        #else
-        return data.withUnsafeBytes { rawBufferPointer in
-            guard let baseAddress = rawBufferPointer.baseAddress else {
-                return []
-            }
-
-            let matrices = baseAddress.assumingMemoryBound(to: Float.self)
-            return (0..<influenceWeightsCount).map { matrices[$0] }
-        }
-        #endif
     }
 
     @nonobjc

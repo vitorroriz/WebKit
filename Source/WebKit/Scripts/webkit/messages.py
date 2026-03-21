@@ -2091,17 +2091,9 @@ def generate_swift_message_handler(receiver):
         result.append('#endif\n')
     result.append('\n')
 
-    # Workaround for absence of https://github.com/swiftlang/swift/pull/74415
-    # - we repeat everything for older compilers
-    result.append('#if compiler(>=6.2)\n')
     result.append('\n')
     result.extend(generate_swift_message_handler_internals(receiver, 'unsafe '))
     result.append('\n')
-    result.append('#else\n')
-    result.append('\n')
-    result.extend(generate_swift_message_handler_internals(receiver, ''))
-    result.append('\n')
-    result.append('#endif\n')
 
     return ''.join(result)
 
