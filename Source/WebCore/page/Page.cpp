@@ -4874,7 +4874,7 @@ OptionSet<FilterRenderingMode> Page::preferredFilterRenderingModes(const Graphic
 #if !HAVE(FIX_FOR_RADAR_104392017)
     if (context.renderingMode() == RenderingMode::Accelerated || !context.knownToHaveFloatBasedBacking()) {
 #endif
-        if (settings().graphicsContextFiltersEnabled())
+        if (!context.hasDropShadow() && settings().graphicsContextFiltersEnabled())
             modes.add(FilterRenderingMode::GraphicsContext);
 #if !HAVE(FIX_FOR_RADAR_104392017)
     }
