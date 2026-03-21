@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include "BlockFormattingState.h"
 #include "InlineDamage.h"
 #include "InlineFormattingConstraints.h"
 #include "InlineFormattingContext.h"
