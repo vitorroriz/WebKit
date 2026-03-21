@@ -1679,12 +1679,6 @@
     "imported/w3c/web-platform-tests/cookies/attributes/path.html": [
         "slow"
     ],
-    "imported/w3c/web-platform-tests/cookies/attributes/resources/domain-child.sub.html": [
-        "slow"
-    ],
-    "imported/w3c/web-platform-tests/cookies/attributes/resources/secure-non-secure-child.html": [
-        "slow"
-    ],
     "imported/w3c/web-platform-tests/cookies/attributes/secure-non-secure.html": [
         "slow"
     ],
@@ -1701,9 +1695,6 @@
         "slow"
     ],
     "imported/w3c/web-platform-tests/cookies/ordering/ordering.sub.html": [
-        "slow"
-    ],
-    "imported/w3c/web-platform-tests/cookies/ordering/resources/ordering-child.sub.html": [
         "slow"
     ],
     "imported/w3c/web-platform-tests/cookies/partitioned-cookies/partitioned-cookies-a-b-a-embed.tentative.https.html": [
@@ -1731,9 +1722,6 @@
         "slow"
     ],
     "imported/w3c/web-platform-tests/cookies/samesite-none-secure/cookies-without-samesite-must-be-secure.https.html": [
-        "slow"
-    ],
-    "imported/w3c/web-platform-tests/cookies/samesite-none-secure/cookies-without-samesite-must-be-secure.https.tentative.html": [
         "slow"
     ],
     "imported/w3c/web-platform-tests/cookies/samesite/fetch.https.html": [
@@ -1778,10 +1766,7 @@
     "imported/w3c/web-platform-tests/cookies/size/name-and-value.html": [
         "slow"
     ],
-    "imported/w3c/web-platform-tests/cookies/third-party-cookies/resources/third-party-cookies-cross-site-embed.html": [
-        "slow"
-    ],
-    "imported/w3c/web-platform-tests/cookies/third-party-cookies/resources/third-party-cookies-cross-site-window.html": [
+    "imported/w3c/web-platform-tests/cookies/third-party-cookies/third-party-cookie-heuristics.tentative.https.html": [
         "slow"
     ],
     "imported/w3c/web-platform-tests/cookies/third-party-cookies/third-party-cookies.tentative.https.html": [
