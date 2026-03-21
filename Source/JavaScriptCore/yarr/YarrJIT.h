@@ -59,6 +59,7 @@ class YarrCodeBlock;
 enum class JITFailureReason : uint8_t {
     DecodeSurrogatePair,
     BackReference,
+    ForwardReference,
     Lookbehind,
     VariableCountedParenthesisWithNonZeroMinimum,
     ParenthesizedSubpattern,

@@ -2106,7 +2106,7 @@ class YarrGenerator final : public YarrJITInfo {
             m_jit.branch32(MacroAssembler::NotEqual, patternIndex, subpatternEndAddress(subpatternId)).linkTo(loop, &m_jit);
     }
 
-    void generateBackReference(size_t opIndex)
+    void generateBackReference(bool isNamed, size_t opIndex)
     {
         YarrOp& op = m_ops[opIndex];
         PatternTerm* term = op.m_term;
@@ -2119,7 +2119,7 @@ class YarrGenerator final : public YarrJITInfo {
 #endif
 
         unsigned subpatternId = term->backReferenceSubpatternId;
-        unsigned duplicateNamedGroupId = m_pattern.hasDuplicateNamedCaptureGroups() ? m_pattern.m_duplicateNamedGroupForSubpatternId[subpatternId] : 0;
+        unsigned duplicateNamedGroupId = (isNamed && m_pattern.hasDuplicateNamedCaptureGroups()) ? m_pattern.m_duplicateNamedGroupForSubpatternId[subpatternId] : 0;
         unsigned parenthesesFrameLocation = term->frameLocation;
 
         const MacroAssembler::RegisterID characterOrTemp = m_regs.regT0;
@@ -3317,18 +3317,19 @@ class YarrGenerator final : public YarrJITInfo {
             generateAssertionWordBoundary(opIndex);
             break;
 
-        case PatternTerm::Type::ForwardReference:
-            // Forward references always match the empty string (the referenced
-            // group hasn't captured anything yet), so no code needs to be emitted.
+        case PatternTerm::Type::NumberedForwardReference:
+        case PatternTerm::Type::NamedForwardReference:
+            m_failureReason = JITFailureReason::ForwardReference;
             break;
 
         case PatternTerm::Type::ParenthesesSubpattern:
         case PatternTerm::Type::ParentheticalAssertion:
             RELEASE_ASSERT_NOT_REACHED();
 
-        case PatternTerm::Type::BackReference:
+        case PatternTerm::Type::NumberedBackReference:
+        case PatternTerm::Type::NamedBackReference:
 #if ENABLE(YARR_JIT_BACKREFERENCES)
-            generateBackReference(opIndex);
+            generateBackReference(term->type == PatternTerm::Type::NamedBackReference, opIndex);
 #else
             m_failureReason = JITFailureReason::BackReference;
 #endif
@@ -3399,15 +3400,17 @@ class YarrGenerator final : public YarrJITInfo {
             backtrackAssertionWordBoundary(opIndex);
             break;
 
-        case PatternTerm::Type::ForwardReference:
-            // Nothing to backtrack for a forward reference (always matches empty string).
+        case PatternTerm::Type::NumberedForwardReference:
+        case PatternTerm::Type::NamedForwardReference:
+            m_failureReason = JITFailureReason::ForwardReference;
             break;
 
         case PatternTerm::Type::ParenthesesSubpattern:
         case PatternTerm::Type::ParentheticalAssertion:
             RELEASE_ASSERT_NOT_REACHED();
 
-        case PatternTerm::Type::BackReference:
+        case PatternTerm::Type::NumberedBackReference:
+        case PatternTerm::Type::NamedBackReference:
 #if ENABLE(YARR_JIT_BACKREFERENCES)
             backtrackBackReference(opIndex);
 #else
@@ -5621,12 +5624,11 @@ class YarrGenerator final : public YarrJITInfo {
             // Conservatively say any assertions just match.
             return cursor;
 
-        case PatternTerm::Type::BackReference:
+        case PatternTerm::Type::NumberedBackReference:
+        case PatternTerm::Type::NamedBackReference:
+        case PatternTerm::Type::NumberedForwardReference:
+        case PatternTerm::Type::NamedForwardReference:
             return std::nullopt;
-
-        case PatternTerm::Type::ForwardReference:
-            // Forward references always match the empty string, like assertions.
-            return cursor;
 
         case PatternTerm::Type::ParenthesesSubpattern: {
             // Right now, we only support /(...)/ or /(...)?/ case.
@@ -6610,7 +6612,7 @@ public:
                     return true;
 
                 // Back references can cause backtracking
-                if (term.type == PatternTerm::Type::BackReference)
+                if (term.type == PatternTerm::Type::NumberedBackReference || term.type == PatternTerm::Type::NamedBackReference)
                     return true;
                 // ForwardReference always matches empty string - no backtracking needed.
 
@@ -6982,8 +6984,9 @@ public:
                 out.printf("Assert EOL checked-offset:(%u)", op.m_checkedOffset.value());
                 break;
 
-            case PatternTerm::Type::BackReference:
-                out.printf("BackReference pattern #%u checked-offset:(%u)", term->backReferenceSubpatternId, op.m_checkedOffset.value());
+            case PatternTerm::Type::NumberedBackReference:
+            case PatternTerm::Type::NamedBackReference:
+                out.printf("%sBackReference pattern #%u checked-offset:(%u)", term->type == PatternTerm::Type::NumberedBackReference ? "Numbered" : "Named", term->backReferenceSubpatternId, op.m_checkedOffset.value());
                 term->dumpQuantifier(out);
                 break;
 
@@ -7012,8 +7015,9 @@ public:
                 out.printf(".* enclosure checked-offset:(%u)", op.m_checkedOffset.value());
                 break;
 
-            case PatternTerm::Type::ForwardReference:
-                out.printf("ForwardReference checked-offset:(%u)", op.m_checkedOffset.value());
+            case PatternTerm::Type::NumberedForwardReference:
+            case PatternTerm::Type::NamedForwardReference:
+                out.printf("%sForwardReference <not handled> checked-offset:(%u)", term->type == PatternTerm::Type::NumberedForwardReference ? "Numbered" : "Named", op.m_checkedOffset.value());
                 break;
 
             case PatternTerm::Type::ParenthesesSubpattern:
@@ -7379,6 +7383,9 @@ static void dumpCompileFailure(JITFailureReason failure)
         break;
     case JITFailureReason::BackReference:
         dataLog("Can't JIT some patterns containing back references\n");
+        break;
+    case JITFailureReason::ForwardReference:
+        dataLog("Can't JIT some patterns containing forward references\n");
         break;
     case JITFailureReason::Lookbehind:
         dataLog("Can't JIT a pattern containing lookbehinds\n");
