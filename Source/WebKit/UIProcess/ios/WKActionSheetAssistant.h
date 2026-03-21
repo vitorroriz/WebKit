@@ -25,6 +25,7 @@
 
 #if PLATFORM(IOS_FAMILY)
 
+#import "FrameInfoData.h"
 #import "GestureTypes.h"
 #import "WKActionSheet.h"
 #import <UIKit/UIPopoverController.h>
