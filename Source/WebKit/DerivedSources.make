@@ -800,6 +800,7 @@ SERIALIZATION_DESCRIPTION_FILES = \
 	Shared/SerializedNode.serialization.in \
 	Shared/ServiceWorkerTimingInfo.serialization.in \
 	Shared/SessionState.serialization.in \
+	Shared/ShareableSpatialImage.serialization.in \
 	Shared/SyntheticEditingCommandType.serialization.in \
 	Shared/TextFlags.serialization.in \
 	Shared/TextAnimationTypes.serialization.in \

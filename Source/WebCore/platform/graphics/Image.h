@@ -166,7 +166,6 @@ public:
     virtual bool hasSolidColor() { return false; }
 #endif
 #if ENABLE(QUICKLOOK_FULLSCREEN)
-    virtual bool shouldUseQuickLookForFullscreen() const { return false; }
     virtual bool isPanorama() const { return false; }
 #endif
 
