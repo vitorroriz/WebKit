@@ -336,6 +336,8 @@ void WebFrameProxy::didFailProvisionalLoad()
 void WebFrameProxy::didCommitLoad(const String& contentType, const WebCore::CertificateInfo& certificateInfo, bool containsPluginDocument, DocumentSecurityPolicy&& documentSecurityPolicy)
 {
     m_frameLoadState.didCommitLoad();
+    if (m_isShowingInitialAboutBlank && !url().isAboutBlank())
+        m_isShowingInitialAboutBlank = false;
 
     m_title = String();
     m_MIMEType = contentType;
