@@ -70,7 +70,7 @@ static CFStringTokenizerRef tokenizerForString(CFStringRef str)
     if (!locale.get())
         return nullptr;
 
-    CFRange entireRange = CFRangeMake(0, CFStringGetLength(str));    
+    CFRange entireRange = CFRangeMake(0, CFStringGetLength(str));
 
     static NeverDestroyed<RetainPtr<CFStringTokenizerRef>> tokenizer;
     if (!tokenizer.get())
@@ -106,7 +106,7 @@ static void findSimpleWordBoundary(StringView text, int position, int* start, in
         }
         U16_BACK_1(text, 0, startPos);
     }
-    
+
     unsigned endPos = position;
     while (endPos < text.length()) {
         char32_t character;
@@ -152,7 +152,7 @@ static void findComplexWordBoundary(StringView text, int position, int* start, i
         return;
     }
 
-    CFStringTokenizerTokenType  token = CFStringTokenizerGoToTokenAtIndex(tokenizer, position);
+    CFStringTokenizerTokenType token = CFStringTokenizerGoToTokenAtIndex(tokenizer, position);
     if (token == kCFStringTokenizerTokenNone) {
         // No token found: select entire block.
         // NB: I never hit this section in all my testing.
@@ -189,7 +189,7 @@ void findWordBoundary(StringView text, int position, int* start, int* end)
         return;
     }
 
-    // For complex text (Thai, Japanese, Chinese), visible_units will pass the text in as a 
+    // For complex text (Thai, Japanese, Chinese), visible_units will pass the text in as a
     // single contiguous run of characters, providing as much context as is possible.
     // We only need one character to determine if the text is complex.
     char32_t ch;
@@ -217,7 +217,7 @@ void findWordBoundary(StringView text, int position, int* start, int* end)
     auto foundWord = text.substring(*start, *end - *start).createCFStringWithoutCopying();
     NSLog(@"%s_BREAK '%@' (%d,%d) in '%@' (%p) at %d, length=%d", isComplex ? "COMPLEX" : "SIMPLE", foundWord.get(), *start, *end, uniString.get(), uniString.get(), position, text.length());
 #endif
-    
+
 #endif
 }
 
@@ -232,7 +232,7 @@ void findEndWordBoundary(StringView text, int position, int* end)
 // FIXME: Is this special Mac implementation actually important, or can
 // we share with all the other platforms?
 int findNextWordFromIndex(StringView text, int position, bool forward)
-{   
+{
     String textWithoutUnpairedSurrogates;
     if (hasUnpairedSurrogate(text)) {
         textWithoutUnpairedSurrogates = replaceUnpairedSurrogatesWithReplacementCharacter(text.toStringWithoutCopying());

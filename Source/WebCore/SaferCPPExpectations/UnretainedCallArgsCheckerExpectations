@@ -125,7 +125,7 @@ platform/network/cf/DNSResolveQueueCFNet.cpp
 platform/network/cocoa/ResourceHandleCocoa.mm
 platform/network/cocoa/SynchronousLoaderClient.mm
 platform/network/cocoa/WebCoreResourceHandleAsOperationQueueDelegate.mm
-[ iOS ] platform/text/mac/TextBoundaries.mm
+[ iOS ] platform/text/cocoa/TextBoundaries.mm
 rendering/AttachmentLayout.mm
 [ iOS ] rendering/ios/RenderThemeIOS.mm
 [ Mac ] testing/ServiceWorkerInternals.mm

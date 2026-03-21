@@ -86,7 +86,7 @@ platform/mediastream/cocoa/RealtimeIncomingVideoSourceCocoa.mm
 [ iOS ] platform/network/cocoa/ResourceErrorCocoa.mm
 platform/network/cocoa/ResourceHandleCocoa.mm
 platform/network/cocoa/WebCoreResourceHandleAsOperationQueueDelegate.mm
-[ iOS ] platform/text/mac/TextBoundaries.mm
+[ iOS ] platform/text/cocoa/TextBoundaries.mm
 rendering/AttachmentLayout.mm
 [ iOS ] rendering/ios/RenderThemeIOS.mm
 testing/cocoa/WebViewVisualIdentificationOverlay.mm

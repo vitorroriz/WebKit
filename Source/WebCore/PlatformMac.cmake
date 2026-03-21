@@ -428,7 +428,7 @@ list(APPEND WebCore_SOURCES
 
     platform/text/cf/HyphenationCF.cpp
 
-    platform/text/mac/TextBoundaries.mm
+    platform/text/cocoa/TextBoundaries.mm
     platform/text/mac/TextCheckingMac.mm
 
     rendering/TextAutoSizing.cpp
