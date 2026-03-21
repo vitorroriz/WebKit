@@ -140,6 +140,13 @@
             }
         }
     },
+    "TestWebKitFaviconDatabase": {
+        "subtests": {
+            "/webkit/WebKitFaviconDatabase/get-favicon": {
+                "expected": {"gtk": {"status": ["FAIL", "PASS"], "bug": "webkit.org/b/310428"}}
+            }
+        }
+    },
     "TestWebKitWebContext": {
         "subtests": {
             "/webkit/WebKitWebContext/uri-scheme": {
