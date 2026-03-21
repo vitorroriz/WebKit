@@ -149,6 +149,13 @@ static void invalidateAssignedElements(HTMLSlotElement& slot)
             continue;
         }
         element->invalidateStyleInternal();
+        // Invalidate ::slotted nested pseudo-elements.
+        if (RefPtr shadowRoot = element->userAgentShadowRoot()) {
+            for (Ref descendant : descendantsOfType<Element>(*shadowRoot)) {
+                if (!descendant->userAgentPart().isEmpty())
+                    descendant->invalidateStyleInternal();
+            }
+        }
     }
 }
 
