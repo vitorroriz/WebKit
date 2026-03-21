@@ -273,7 +273,7 @@ pas_mte_compute_valid_tags_under_adjacent_tag_exclusion(
             // If an allocation were to somehow abut both the beginning and
             // the end of a page (e.g. by changing PAS_MIN_OBJECTS_PER_PAGE)
             // then it would not be possible to guarantee cross-page ATE.
-            PAS_ASSERT(current_pageno == succeeding_pageno);
+            PAS_ASSERT(current_pageno == succeeding_pageno, current_pageno, prior_pageno, succeeding_pageno);
         } else if (current_pageno != succeeding_pageno)
             valid_tags = pas_mte_odd_tag;
 
@@ -493,7 +493,7 @@ PAS_IGNORE_WARNINGS_END
             uintptr_t curr_tag = (uintptr_t)curr_ptr & PAS_MTE_TAG_MASK; \
             if (prev_tag == curr_tag && !curr_tag) \
                 printf("[MTE]\tAdjacent tag collision between %p and %p: crashing\n", prev_ptr, curr_ptr); \
-            PAS_ASSERT(prev_tag != curr_tag || !curr_tag); \
+            PAS_ASSERT(prev_tag != curr_tag || !curr_tag, (uintptr_t)prev_ptr, (uintptr_t)curr_ptr); \
         } \
     } while (0)
 
@@ -795,7 +795,7 @@ pas_mte_retag_freed_region_if_tagged(
                 childProcessInheritance); \
             if (vm_map_result != KERN_SUCCESS) \
                 errno = 0; \
-            PAS_ASSERT(vm_map_result == KERN_SUCCESS); \
+            PAS_ASSERT(vm_map_result == KERN_SUCCESS, vm_map_result); \
             /* Early exit from caller function since we've done the zero-fill ourselves */ \
             return; \
         } \
