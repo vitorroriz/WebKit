@@ -46,8 +46,7 @@
 
 using namespace WebCore;
 
-@interface WebCoreAVCaptureDeviceManagerObserver : NSObject
-{
+@interface WebCoreAVCaptureDeviceManagerObserver : NSObject {
     AVCaptureDeviceManager* m_callback;
 }
 

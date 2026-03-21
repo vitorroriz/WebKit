@@ -29,7 +29,7 @@
  */
 
 #import "config.h"
-#import "MockRealtimeVideoSourceMac.h"
+#import "MockRealtimeVideoSourceCocoa.h"
 
 #if ENABLE(MEDIA_STREAM)
 
