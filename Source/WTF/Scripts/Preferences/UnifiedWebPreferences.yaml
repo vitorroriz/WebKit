@@ -82,7 +82,7 @@ ARIAActionsSupportEnabled:
 
 AVExperienceControllerFullscreenEnabled:
   type: bool
-  status: unstable
+  status: internal
   category: media
   getter: isAVExperienceControllerFullscreenEnabled
   webcoreGetter: isAVExperienceControllerFullscreenEnabled
@@ -94,7 +94,7 @@ AVExperienceControllerFullscreenEnabled:
     WebCore:
       default: false
     WebKit:
-      default: false
+      default: true
     WebKitLegacy:
       default: false
 
