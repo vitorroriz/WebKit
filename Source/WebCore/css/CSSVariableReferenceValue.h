@@ -77,9 +77,7 @@ private:
     struct Cache {
         RefPtr<CSSVariableData> dependencyData;
         RefPtr<CSSValue> value;
-#if ASSERT_ENABLED
         CSSPropertyID propertyID { CSSPropertyInvalid };
-#endif
     };
     mutable Cache m_cache;
 };

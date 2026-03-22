@@ -346,14 +346,11 @@ void Builder::applyProperty(CSSPropertyID id, CSSValue& value, SelectorChecker::
     ASSERT_WITH_MESSAGE(id != CSSPropertyCustom, "Custom property should be handled by applyCustomProperty");
 
     auto valueToApply = resolveInternalAutoBaseFunction(value);
-    valueToApply = resolveSubstitutionFunctions(id, valueToApply);
     auto& style = m_state->style();
 
-    if (CSSProperty::isDirectionAwareProperty(id)) {
-        CSSPropertyID newId = CSSProperty::resolveDirectionAwareProperty(id, style.writingMode());
-        ASSERT(newId != id);
-        return applyProperty(newId, valueToApply.get(), linkMatchMask, cascadeOrigin);
-    }
+    id = CSSProperty::resolveDirectionAwareProperty(id, style.writingMode());
+
+    valueToApply = resolveSubstitutionFunctions(id, valueToApply);
 
     if (m_state->positionTryFallback())
         id = AnchorPositionEvaluator::resolvePositionTryFallbackProperty(id, style.writingMode(), *m_state->positionTryFallback());

@@ -273,20 +273,19 @@ RefPtr<CSSValue> SubstitutionResolver::substituteAndParse(const CSSVariableRefer
     if (!data)
         return nullptr;
 
-    if (!arePointingToEqualData(variableRef.m_cache.dependencyData, data)) {
+    if (!arePointingToEqualData(variableRef.m_cache.dependencyData, data) || variableRef.m_cache.propertyID != propertyID) {
         variableRef.m_cache.value = CSSPropertyParser::parseStylePropertyLonghand(propertyID, data->tokens(), variableRef.context());
-#if ASSERT_ENABLED
         variableRef.m_cache.propertyID = propertyID;
-#endif
     }
     variableRef.m_cache.dependencyData = WTF::move(data);
 
-    ASSERT(variableRef.m_cache.propertyID == propertyID);
     return variableRef.m_cache.value;
 }
 
 RefPtr<CSSValue> SubstitutionResolver::substituteAndParseShorthand(const CSSPendingSubstitutionValue& substitution, CSSPropertyID propertyID) const
 {
+    ASSERT(!CSSProperty::isDirectionAwareProperty(propertyID));
+
     auto& variableRef = substitution.shorthandValue();
 
     auto data = substitute(variableRef);
@@ -303,7 +302,7 @@ RefPtr<CSSValue> SubstitutionResolver::substituteAndParseShorthand(const CSSPend
     variableRef.m_cache.dependencyData = WTF::move(data);
 
     for (auto& property : substitution.m_cachedPropertyValues) {
-        if (property.id() == propertyID)
+        if (CSSProperty::resolveDirectionAwareProperty(property.id(), m_styleBuilder.state().style().writingMode()) == propertyID)
             return property.value();
     }
 
