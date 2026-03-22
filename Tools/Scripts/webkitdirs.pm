@@ -1173,7 +1173,6 @@ sub determineConfigurationProductDir
     determineConfiguration();
     if (isWin() || isPlayStation() || (isJSCOnly() && isWindows())) {
         $configurationProductDir = File::Spec->catdir($baseProductDir, $configuration);
-        $configurationProductDir .= sanitizerSuffix();
     } else {
         if (usesPerConfigurationBuildDirectory()) {
             $configurationProductDir = "$baseProductDir";
@@ -1184,7 +1183,6 @@ sub determineConfigurationProductDir
                 $configurationProductDir = "$baseProductDir/$configuration";
             }
             $configurationProductDir .= "-" . xcodeSDKPlatformName() if isEmbeddedWebKit() || isMacCatalystWebKit();
-            $configurationProductDir .= sanitizerSuffix();
         }
     }
 }
@@ -1262,17 +1260,6 @@ sub asanIsEnabled()
 {
     determineASanIsEnabled();
     return $asanIsEnabled;
-}
-
-sub sanitizerSuffix()
-{
-    determineASanIsEnabled();
-    determineTSanIsEnabled();
-
-    # Priority: ASan > TSan (mutually exclusive)
-    return "-asan" if $asanIsEnabled;
-    return "-tsan" if $tsanIsEnabled;
-    return "";
 }
 
 sub tsanIsEnabled()
