@@ -28,47 +28,47 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "config.h"
-#include "CSSVariableReferenceValue.h"
+#include "CSSSubstitutionValue.h"
 
 #include "CSSVariableData.h"
 
 namespace WebCore {
 
-CSSVariableReferenceValue::CSSVariableReferenceValue(Ref<CSSVariableData>&& data)
-    : CSSValue(ClassType::VariableReference)
+CSSSubstitutionValue::CSSSubstitutionValue(Ref<CSSVariableData>&& data)
+    : CSSValue(ClassType::Substitution)
     , m_data(WTF::move(data))
 {
     cacheSimpleReference();
 }
 
-Ref<CSSVariableReferenceValue> CSSVariableReferenceValue::create(const CSSParserTokenRange& range, const CSSParserContext& context)
+Ref<CSSSubstitutionValue> CSSSubstitutionValue::create(const CSSParserTokenRange& range, const CSSParserContext& context)
 {
-    return adoptRef(*new CSSVariableReferenceValue(CSSVariableData::create(range, context)));
+    return adoptRef(*new CSSSubstitutionValue(CSSVariableData::create(range, context)));
 }
 
-Ref<CSSVariableReferenceValue> CSSVariableReferenceValue::create(Ref<CSSVariableData>&& data)
+Ref<CSSSubstitutionValue> CSSSubstitutionValue::create(Ref<CSSVariableData>&& data)
 {
-    return adoptRef(*new CSSVariableReferenceValue(WTF::move(data)));
+    return adoptRef(*new CSSSubstitutionValue(WTF::move(data)));
 }
 
-bool CSSVariableReferenceValue::equals(const CSSVariableReferenceValue& other) const
+bool CSSSubstitutionValue::equals(const CSSSubstitutionValue& other) const
 {
     return arePointingToEqualData(m_data, other.m_data);
 }
 
-String CSSVariableReferenceValue::customCSSText(const CSS::SerializationContext&) const
+String CSSSubstitutionValue::customCSSText(const CSS::SerializationContext&) const
 {
     if (m_stringValue.isNull())
         m_stringValue = m_data->serialize();
     return m_stringValue;
 }
 
-const CSSParserContext& CSSVariableReferenceValue::context() const
+const CSSParserContext& CSSSubstitutionValue::context() const
 {
     return m_data->context();
 }
 
-void CSSVariableReferenceValue::cacheSimpleReference()
+void CSSSubstitutionValue::cacheSimpleReference()
 {
     ASSERT(!m_simpleReference);
 

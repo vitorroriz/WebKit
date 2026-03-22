@@ -1,5 +1,5 @@
 // Copyright 2015 The Chromium Authors. All rights reserved.
-// Copyright (C) 2016-2021 Apple Inc. All rights reserved.
+// Copyright (C) 2016 Apple Inc. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -29,59 +29,27 @@
 
 #pragma once
 
-#include <WebCore/CSSPropertyNames.h>
-#include <WebCore/CSSValue.h>
-#include <WebCore/CSSValueKeywords.h>
-#include <WebCore/CSSVariableData.h>
-#include <wtf/text/WTFString.h>
+#include "CSSParserTokenRange.h"
+#include <wtf/RefPtr.h>
+#include <wtf/text/AtomString.h>
 
 namespace WebCore {
 
-class CSSParserToken;
-class CSSParserTokenRange;
+class CSSCustomPropertyValue;
 struct CSSParserContext;
 
 namespace Style {
-class SubstitutionResolver;
+class CustomProperty;
 }
 
-class CSSVariableReferenceValue final : public CSSValue {
+class CSSSubstitutionParser {
 public:
-    static Ref<CSSVariableReferenceValue> create(const CSSParserTokenRange&, const CSSParserContext&);
-    static Ref<CSSVariableReferenceValue> create(Ref<CSSVariableData>&&);
+    static bool containsSubstitutionFunctions(CSSParserTokenRange, const CSSParserContext&);
 
-    bool equals(const CSSVariableReferenceValue&) const;
-    String customCSSText(const CSS::SerializationContext&) const;
+    static RefPtr<CSSCustomPropertyValue> parseDeclarationValue(const AtomString&, CSSParserTokenRange, const CSSParserContext&);
+    static RefPtr<const Style::CustomProperty> parseInitialValueForUniversalSyntax(const AtomString&, CSSParserTokenRange);
 
-    const CSSParserContext& NODELETE context() const;
-
-    const CSSVariableData& data() const { return m_data.get(); }
-
-private:
-    friend class Style::SubstitutionResolver;
-
-    explicit CSSVariableReferenceValue(Ref<CSSVariableData>&&);
-
-    void cacheSimpleReference();
-
-    const Ref<CSSVariableData> m_data;
-    mutable String m_stringValue;
-
-    // For quickly resolving simple var(--foo) values.
-    struct SimpleReference {
-        AtomString name;
-        CSSValueID functionId;
-    };
-    std::optional<SimpleReference> m_simpleReference;
-
-    struct Cache {
-        RefPtr<CSSVariableData> dependencyData;
-        RefPtr<CSSValue> value;
-        CSSPropertyID propertyID { CSSPropertyInvalid };
-    };
-    mutable Cache m_cache;
+    static bool NODELETE isValidCustomPropertyName(const CSSParserToken&);
 };
 
 } // namespace WebCore
-
-SPECIALIZE_TYPE_TRAITS_CSS_VALUE(CSSVariableReferenceValue, isVariableReferenceValue())
