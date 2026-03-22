@@ -172,7 +172,8 @@ size_t RubyFormattingContext::applyRubyAlignOnBaseContent(size_t rubyBaseStart, 
         return rubyBaseStart + 1;
 
     auto spaceToDistribute = annotationBoxLogicalWidth - baseContentLogicalWidth;
-    auto alignmentOffset = InlineContentAligner::applyRubyAlign(rubyBaseLayoutBox->style().rubyAlign(), line.runs(), { rubyBaseStart, rubyBaseEnd ? *rubyBaseEnd + 1 : runs.size() }, spaceToDistribute);
+    auto rangeSize = (rubyBaseEnd ? *rubyBaseEnd + 1 : runs.size()) - rubyBaseStart;
+    auto alignmentOffset = InlineContentAligner::applyRubyAlign(rubyBaseLayoutBox->style().rubyAlign(), runs.mutableSubspan(rubyBaseStart, rangeSize), spaceToDistribute);
     if (rubyBaseEnd) {
         // Reset the spacing we added at LineBuilder.
         auto& rubyBaseEndRun = runs[*rubyBaseEnd];
@@ -202,7 +203,7 @@ HashMap<const Box*, InlineLayoutUnit> RubyFormattingContext::applyRubyAlign(Line
 
 InlineLayoutUnit RubyFormattingContext::applyRubyAlignOnAnnotationBox(Line& line, InlineLayoutUnit spaceToDistribute, InlineFormattingContext& inlineFormattingContext)
 {
-    return InlineContentAligner::applyRubyAlign(inlineFormattingContext.root().style().rubyAlign(), line.runs(), { 0, line.runs().size() }, spaceToDistribute);
+    return InlineContentAligner::applyRubyAlign(inlineFormattingContext.root().style().rubyAlign(), line.runs().mutableSpan(), spaceToDistribute);
 }
 
 void RubyFormattingContext::adjustRubyBaseContentWithAlignmentOffset(std::span<InlineDisplay::Box> displayBoxes, const HashMap<const Box*, InlineLayoutUnit>& alignmentOffsetList, InlineFormattingContext& inlineFormattingContext)

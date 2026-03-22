@@ -734,6 +734,11 @@ public:
         return span().subspan(offset, length);
     }
 
+    std::span<T> mutableSubspan(size_t offset, size_t length = std::dynamic_extent) LIFETIME_BOUND
+    {
+        return mutableSpan().subspan(offset, length);
+    }
+
     [[nodiscard]] T& at(size_t i) LIFETIME_BOUND
     {
         if (i >= size()) [[unlikely]]

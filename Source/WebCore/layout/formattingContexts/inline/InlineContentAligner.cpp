@@ -147,17 +147,12 @@ static BaseIndexAndOffset shiftRubyBaseContentByAlignmentOffset(BaseIndexAndOffs
 }
 
 enum class IgnoreRubyRange : bool { No, Yes };
-static void computedExpansions(const Line::RunList& runs, WTF::Range<size_t> runRange, size_t hangingTrailingWhitespaceLength, ExpansionInfo& expansionInfo, IgnoreRubyRange ignoreRuby)
+static void computedExpansions(std::span<Line::Run> runs, size_t hangingTrailingWhitespaceLength, ExpansionInfo& expansionInfo, IgnoreRubyRange ignoreRuby)
 {
     // Collect and distribute the expansion opportunities.
     expansionInfo.opportunityCount = 0;
-    auto rangeSize = runRange.end() - runRange.begin();
-    if (rangeSize > runs.size()) {
-        ASSERT_NOT_REACHED();
-        return;
-    }
-    expansionInfo.opportunityList.resizeToFit(rangeSize);
-    expansionInfo.behaviorList.resizeToFit(rangeSize);
+    expansionInfo.opportunityList.resizeToFit(runs.size());
+    expansionInfo.behaviorList.resizeToFit(runs.size());
     auto lastExpansionIndexWithContent = std::optional<size_t> { };
 
     // Line start behaves as if we had an expansion here (i.e. first runs should not start with allowing left expansion).
@@ -171,19 +166,16 @@ static void computedExpansions(const Line::RunList& runs, WTF::Range<size_t> run
         }
         return { };
     }();
-    for (size_t index = 0; index < rangeSize; ++index) {
-        auto runIndex = [&] {
-            return runRange.begin() + index;
-        };
+    for (size_t index = 0; index < runs.size(); ++index) {
         auto skipRubyContentIfApplicable = [&] {
-            auto& rubyBox = runs[runIndex()].layoutBox();
+            auto& rubyBox = runs[index].layoutBox();
             if (ignoreRuby == IgnoreRubyRange::No || !rubyBox.isRuby())
                 return;
             runIsAfterExpansion = false;
-            for (; index < rangeSize; ++index) {
+            for (; index < runs.size(); ++index) {
                 expansionInfo.behaviorList[index] = ExpansionBehavior::defaultBehavior();
                 expansionInfo.opportunityList[index] = 0;
-                auto& run = runs[runIndex()];
+                auto& run = runs[index];
                 if (run.isInlineBoxEnd() && &run.layoutBox() == &rubyBox) {
                     ++index;
                     return;
@@ -191,9 +183,9 @@ static void computedExpansions(const Line::RunList& runs, WTF::Range<size_t> run
             }
         };
         skipRubyContentIfApplicable();
-        if (index >= rangeSize)
+        if (index >= runs.size())
             break;
-        auto& run = runs[runIndex()];
+        auto& run = runs[index];
 
         auto expansionBehavior = ExpansionBehavior::defaultBehavior();
         size_t expansionOpportunitiesInRun = 0;
@@ -206,7 +198,7 @@ static void computedExpansions(const Line::RunList& runs, WTF::Range<size_t> run
                 expansionBehavior.right = ExpansionBehavior::Behavior::Allow;
                 auto& textContent = run.textContent();
                 auto length = textContent.length;
-                if (lastTextRunIndexForTrimming && runIndex() == *lastTextRunIndexForTrimming) {
+                if (lastTextRunIndexForTrimming && index == *lastTextRunIndexForTrimming) {
                     // Trailing hanging whitespace sequence is ignored when computing the expansion opportunities.
                     length -= hangingTrailingWhitespaceLength;
                 }
@@ -235,20 +227,15 @@ static void computedExpansions(const Line::RunList& runs, WTF::Range<size_t> run
     }
 }
 
-InlineLayoutUnit InlineContentAligner::applyExpansionOnRange(Line::RunList& runs, WTF::Range<size_t> range, const ExpansionInfo& expansion, InlineLayoutUnit spaceToDistribute)
+InlineLayoutUnit InlineContentAligner::applyExpansionOnRange(std::span<Line::Run> runs, const ExpansionInfo& expansion, InlineLayoutUnit spaceToDistribute)
 {
     ASSERT(spaceToDistribute > 0);
     ASSERT(expansion.opportunityCount);
     // Distribute the extra space.
     auto expansionToDistribute = spaceToDistribute / expansion.opportunityCount;
     auto accumulatedExpansion = InlineLayoutUnit { };
-    auto rangeSize = range.distance();
-    if (range.end() > runs.size()) {
-        ASSERT_NOT_REACHED();
-        return { };
-    }
-    for (size_t index = 0; index < rangeSize; ++index) {
-        auto& run = runs[range.begin() + index];
+    for (size_t index = 0; index < runs.size(); ++index) {
+        auto& run = runs[index];
         // Move runs by the accumulated expansion first
         run.moveHorizontally(accumulatedExpansion);
         // and expand.
@@ -272,17 +259,16 @@ InlineLayoutUnit InlineContentAligner::applyTextAlignJustify(Line::RunList& runs
         return { };
 
     auto expansion = ExpansionInfo { };
-    auto fullRange = WTF::Range<size_t> { 0, runs.size() };
-    computedExpansions(runs, fullRange, hangingTrailingWhitespaceLength, expansion, IgnoreRubyRange::Yes);
+    computedExpansions(runs.mutableSpan(), hangingTrailingWhitespaceLength, expansion, IgnoreRubyRange::Yes);
     // Anything to distribute?
     if (!expansion.opportunityCount)
         return { };
-    return applyExpansionOnRange(runs, fullRange, expansion, spaceToDistribute);
+    return applyExpansionOnRange(runs.mutableSpan(), expansion, spaceToDistribute);
 }
 
-InlineLayoutUnit InlineContentAligner::applyRubyAlign(RubyAlign rubyAlign, Line::RunList& runs, WTF::Range<size_t> range, InlineLayoutUnit spaceToDistribute)
+InlineLayoutUnit InlineContentAligner::applyRubyAlign(RubyAlign rubyAlign, std::span<Line::Run> runs, InlineLayoutUnit spaceToDistribute)
 {
-    if (runs.isEmpty()) {
+    if (runs.empty()) {
         ASSERT_NOT_REACHED();
         return { };
     }
@@ -291,10 +277,7 @@ InlineLayoutUnit InlineContentAligner::applyRubyAlign(RubyAlign rubyAlign, Line:
         return { };
 
     auto rangeHasInlineContent = [&] {
-        if (!range.distance())
-            return false;
-        for (auto index = range.begin(); index < range.end(); ++index) {
-            auto& run = runs[index];
+        for (auto& run : runs) {
             if (!run.isInlineBox() && !run.isOutOfFlow())
                 return true;
         }
@@ -312,22 +295,22 @@ InlineLayoutUnit InlineContentAligner::applyRubyAlign(RubyAlign rubyAlign, Line:
         // The ruby content expands as defined for normal text justification (as defined by text-justify), except that if there are no
         // justification opportunities the content is centered.
         auto expansion = ExpansionInfo { };
-        computedExpansions(runs, range, { }, expansion, IgnoreRubyRange::No);
+        computedExpansions(runs, { }, expansion, IgnoreRubyRange::No);
         // Anything to distribute?
         if (!expansion.opportunityCount)
             return spaceToDistribute / 2;
-        applyExpansionOnRange(runs, range, expansion, spaceToDistribute);
+        applyExpansionOnRange(runs, expansion, spaceToDistribute);
         return { };
     }
     case RubyAlign::SpaceAround: {
         auto expansion = ExpansionInfo { };
-        computedExpansions(runs, range, { }, expansion, IgnoreRubyRange::No);
+        computedExpansions(runs, { }, expansion, IgnoreRubyRange::No);
         // Anything to distribute?
         if (!expansion.opportunityCount)
             return spaceToDistribute / 2;
         // As for space-between except that there exists an extra justification opportunities whose space is distributed half before and half after the ruby content.
         auto extraExpansionOpportunitySpace = spaceToDistribute / (expansion.opportunityCount + 1);
-        applyExpansionOnRange(runs, range, expansion, spaceToDistribute - extraExpansionOpportunitySpace);
+        applyExpansionOnRange(runs, expansion, spaceToDistribute - extraExpansionOpportunitySpace);
         return extraExpansionOpportunitySpace / 2;
     }
     default:
