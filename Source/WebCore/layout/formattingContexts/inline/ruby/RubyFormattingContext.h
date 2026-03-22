@@ -56,9 +56,8 @@ public:
 
     static void applyRubyOverhang(InlineFormattingContext& parentFormattingContext, InlineLayoutUnit lineLogicalHeight, std::span<InlineDisplay::Box>, const Vector<WTF::Range<size_t>>& interlinearRubyColumnRangeList);
 
-    enum class RubyBasesMayNeedResizing : bool { No, Yes };
-    static void applyAlignmentOffsetList(std::span<InlineDisplay::Box>, const HashMap<const Box*, InlineLayoutUnit>& alignmentOffsetList, RubyBasesMayNeedResizing, InlineFormattingContext&);
-    static void applyAnnotationAlignmentOffset(std::span<InlineDisplay::Box>, InlineLayoutUnit alignmentOffset, InlineFormattingContext&);
+    static void adjustRubyBaseContentWithAlignmentOffset(std::span<InlineDisplay::Box>, const HashMap<const Box*, InlineLayoutUnit>& alignmentOffsetList, InlineFormattingContext&);
+    static void adjustAnnotationContentWithAlignmentOffset(std::span<InlineDisplay::Box>, InlineLayoutUnit alignmentOffset, InlineFormattingContext&);
 
     // Miscellaneous helpers
     static bool hasInterlinearAnnotation(const Box& rubyBaseLayoutBox);

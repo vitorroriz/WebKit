@@ -104,18 +104,18 @@ struct BaseIndexAndOffset {
     size_t index { 0 };
     InlineLayoutUnit offset { 0.f };
 };
-static BaseIndexAndOffset shiftRubyBaseContentByAlignmentOffset(BaseIndexAndOffset baseIndexAndOffset, std::span<InlineDisplay::Box> displayBoxes, const HashMap<const Box*, InlineLayoutUnit>& alignmentOffsetList, InlineContentAligner::AdjustContentOnlyInsideRubyBase adjustContentOnlyInsideRubyBase, InlineFormattingContext& inlineFormattingContext)
+static BaseIndexAndOffset shiftRubyBaseContentByAlignmentOffset(BaseIndexAndOffset baseIndexAndContentOffset, std::span<InlineDisplay::Box> displayBoxes, const HashMap<const Box*, InlineLayoutUnit>& alignmentOffsetList, InlineFormattingContext& inlineFormattingContext)
 {
-    auto baseIndex = baseIndexAndOffset.index;
-    if (baseIndex >= displayBoxes.size() || !displayBoxes[baseIndex].layoutBox().isRubyBase()) {
+    auto baseIndex = baseIndexAndContentOffset.index;
+    if (baseIndex >= displayBoxes.size() || !displayBoxes[baseIndex].isRubyBase()) {
         ASSERT_NOT_REACHED();
-        return { baseIndexAndOffset.index, { } };
+        return { baseIndexAndContentOffset.index, { } };
     }
 
     // Shift base content within the base (no resize) as part of the alignment process.
     CheckedRef rootBox = inlineFormattingContext.root();
     CheckedRef rubyBaseBox = displayBoxes[baseIndex].layoutBox();
-    auto baseOffset = baseIndexAndOffset.offset;
+    auto baseOffset = baseIndexAndContentOffset.offset;
     auto baseContentOffset = alignmentOffset(rubyBaseBox, alignmentOffsetList);
     size_t baseContentIndex = baseIndex + 1;
 
@@ -137,17 +137,15 @@ static BaseIndexAndOffset shiftRubyBaseContentByAlignmentOffset(BaseIndexAndOffs
         if (!layoutBox->isRubyAnnotationBox())
             shiftDisplayBox(displayBox, baseOffset + baseContentOffset, inlineFormattingContext);
         if (layoutBox->isRubyBase()) {
-            auto baseEndIndexAndAlignment = shiftRubyBaseContentByAlignmentOffset({ baseContentIndex, baseOffset + baseContentOffset }, displayBoxes, alignmentOffsetList, adjustContentOnlyInsideRubyBase, inlineFormattingContext);
-            baseContentIndex = baseEndIndexAndAlignment.index;
-            if (adjustContentOnlyInsideRubyBase == InlineContentAligner::AdjustContentOnlyInsideRubyBase::No)
-                baseOffset += baseEndIndexAndAlignment.offset;
+            auto baseContentEndIndexAndOffset = shiftRubyBaseContentByAlignmentOffset({ baseContentIndex, baseOffset + baseContentOffset }, displayBoxes, alignmentOffsetList, inlineFormattingContext);
+            baseContentIndex = baseContentEndIndexAndOffset.index;
+            baseOffset += baseContentEndIndexAndOffset.offset;
             continue;
         }
         ++baseContentIndex;
     }
     auto accumulatedOffset = 2 * baseContentOffset;
-    if (adjustContentOnlyInsideRubyBase == InlineContentAligner::AdjustContentOnlyInsideRubyBase::No)
-        accumulatedOffset += baseOffset;
+    accumulatedOffset += baseOffset;
     return { baseContentIndex, accumulatedOffset };
 }
 
@@ -340,32 +338,25 @@ InlineLayoutUnit InlineContentAligner::applyRubyAlign(RubyAlign rubyAlign, Line:
     }
 }
 
-void InlineContentAligner::applyRubyBaseAlignmentOffset(std::span<InlineDisplay::Box> displayBoxes, const HashMap<const Box*, InlineLayoutUnit>& alignmentOffsetList, AdjustContentOnlyInsideRubyBase adjustContentOnlyInsideRubyBase, InlineFormattingContext& inlineFormattingContext)
+void InlineContentAligner::adjustRubyBaseContentWithAlignmentOffset(std::span<InlineDisplay::Box> displayBoxes, const HashMap<const Box*, InlineLayoutUnit>& alignmentOffsetList, InlineFormattingContext& inlineFormattingContext)
 {
     ASSERT(!alignmentOffsetList.isEmpty());
 
-    auto contentOffset = InlineLayoutUnit { 0.f };
-    for (size_t index = 0; index < displayBoxes.size();) {
-        auto& displayBox = displayBoxes[index];
+    auto baseIndexAndOffset = BaseIndexAndOffset { };
+    while (baseIndexAndOffset.index < displayBoxes.size()) {
+        shiftDisplayBox(displayBoxes[baseIndexAndOffset.index], baseIndexAndOffset.offset, inlineFormattingContext);
 
-        if (adjustContentOnlyInsideRubyBase == AdjustContentOnlyInsideRubyBase::No)
-            shiftDisplayBox(displayBox, contentOffset, inlineFormattingContext);
-
-        if (displayBox.layoutBox().isRubyBase()) {
-            auto baseEndIndexAndAlignment = shiftRubyBaseContentByAlignmentOffset({ index, contentOffset }, displayBoxes, alignmentOffsetList, adjustContentOnlyInsideRubyBase, inlineFormattingContext);
-            index = baseEndIndexAndAlignment.index;
-            if (adjustContentOnlyInsideRubyBase == AdjustContentOnlyInsideRubyBase::No)
-                contentOffset = baseEndIndexAndAlignment.offset;
+        if (!displayBoxes[baseIndexAndOffset.index].isRubyBase()) {
+            ++baseIndexAndOffset.index;
             continue;
         }
-        ++index;
+        baseIndexAndOffset = shiftRubyBaseContentByAlignmentOffset(baseIndexAndOffset, displayBoxes, alignmentOffsetList, inlineFormattingContext);
     }
 
-    if (adjustContentOnlyInsideRubyBase == AdjustContentOnlyInsideRubyBase::No)
-        expandInlineBoxWithDescendants(0, displayBoxes, alignmentOffsetList, inlineFormattingContext);
+    expandInlineBoxWithDescendants(0, displayBoxes, alignmentOffsetList, inlineFormattingContext);
 }
 
-void InlineContentAligner::applyRubyAnnotationAlignmentOffset(std::span<InlineDisplay::Box> displayBoxes, InlineLayoutUnit alignmentOffset, InlineFormattingContext& inlineFormattingContext)
+void InlineContentAligner::adjustAnnotationContentWithAlignmentOffset(std::span<InlineDisplay::Box> displayBoxes, InlineLayoutUnit alignmentOffset, InlineFormattingContext& inlineFormattingContext)
 {
     for (auto& displayBox : displayBoxes)
         shiftDisplayBox(displayBox, alignmentOffset, inlineFormattingContext);

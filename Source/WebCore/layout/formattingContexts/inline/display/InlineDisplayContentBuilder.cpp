@@ -1322,7 +1322,7 @@ size_t InlineDisplayContentBuilder::processRubyBase(size_t rubyBaseStart, std::s
 Vector<size_t> InlineDisplayContentBuilder::processRubyContent(std::span<InlineDisplay::Box> displayBoxes, const LineLayoutResult& lineLayoutResult)
 {
     if (root().isRubyAnnotationBox())
-        RubyFormattingContext::applyAnnotationAlignmentOffset(displayBoxes, lineLayoutResult.ruby.annotationAlignmentOffset, formattingContext());
+        RubyFormattingContext::adjustAnnotationContentWithAlignmentOffset(displayBoxes, lineLayoutResult.ruby.annotationAlignmentOffset, formattingContext());
 
     if (!m_hasSeenRubyBase)
         return { };
@@ -1333,8 +1333,7 @@ Vector<size_t> InlineDisplayContentBuilder::processRubyContent(std::span<InlineD
             lineSpanningRubyBaseList.add(&lineRun.layoutBox());
     }
 
-    auto rubyBasesMayHaveCollapsed = !lineLayoutResult.directionality.visualOrderList.isEmpty();
-    RubyFormattingContext::applyAlignmentOffsetList(displayBoxes, lineLayoutResult.ruby.baseAlignmentOffsetList, rubyBasesMayHaveCollapsed ? RubyFormattingContext::RubyBasesMayNeedResizing::Yes : RubyFormattingContext::RubyBasesMayNeedResizing::No, formattingContext());
+    RubyFormattingContext::adjustRubyBaseContentWithAlignmentOffset(displayBoxes, lineLayoutResult.ruby.baseAlignmentOffsetList, formattingContext());
 
     Vector<WTF::Range<size_t>> interlinearRubyColumnRangeList;
     Vector<size_t> rubyBaseStartIndexListWithAnnotation;
