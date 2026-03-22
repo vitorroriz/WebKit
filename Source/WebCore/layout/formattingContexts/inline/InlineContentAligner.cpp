@@ -46,24 +46,6 @@ static inline void shiftDisplayBox(InlineDisplay::Box& displayBox, InlineLayoutU
         inlineFormattingContext.geometryForBox(displayBox.layoutBox()).moveHorizontally(LayoutUnit { offset });
 }
 
-static inline void expandInlineBox(InlineLayoutUnit expansion, InlineDisplay::Box& displayBox, InlineFormattingContext& inlineFormattingContext)
-{
-    if (!displayBox.isInlineBox()) {
-        ASSERT_NOT_REACHED();
-        return;
-    }
-    if (!expansion)
-        return;
-    auto writingMode = inlineFormattingContext.root().writingMode();
-    writingMode.isHorizontal() ? displayBox.expandHorizontally(expansion) : displayBox.expandVertically(expansion);
-    auto& boxGeometry = inlineFormattingContext.geometryForBox(displayBox.layoutBox());
-    if (writingMode.isLineOverLeft()) {
-        displayBox.setTop(displayBox.top() - expansion);
-        boxGeometry.setLeft(BoxGeometry::borderBoxLeft(boxGeometry) - LayoutUnit { expansion });
-    }
-    boxGeometry.setContentBoxWidth(boxGeometry.contentBoxWidth() + LayoutUnit { expansion });
-}
-
 static inline InlineLayoutUnit alignmentOffset(auto& latyoutBox, auto& alignmentOffsetList)
 {
     auto alignmentOffsetEntry = alignmentOffsetList.find(latyoutBox.ptr());
@@ -74,18 +56,20 @@ struct InlineBoxIndexAndExpansion {
     size_t index { 0 };
     InlineLayoutUnit expansion { 0.f };
 };
-static InlineBoxIndexAndExpansion expandInlineBoxWithDescendants(size_t inlineBoxIndex, std::span<InlineDisplay::Box> displayBoxes, const HashMap<const Box*, InlineLayoutUnit>& alignmentOffsetList, InlineFormattingContext& inlineFormattingContext)
+static InlineBoxIndexAndExpansion expandInlineBoxToEncloseContent(size_t inlineBoxIndex, std::span<InlineDisplay::Box> displayBoxes, const HashMap<const Box*, InlineLayoutUnit>& alignmentOffsetList, InlineFormattingContext& inlineFormattingContext)
 {
     if (inlineBoxIndex >= displayBoxes.size() || !displayBoxes[inlineBoxIndex].isInlineBox()) {
         ASSERT_NOT_REACHED();
         return { inlineBoxIndex, { } };
     }
-    CheckedRef inlineBox = displayBoxes[inlineBoxIndex].layoutBox();
+
+    auto& inlineBoxDisplayBox = displayBoxes[inlineBoxIndex];
+    CheckedRef inlineBox = inlineBoxDisplayBox.layoutBox();
     auto descendantExpansion = InlineLayoutUnit { 0.f };
     size_t index = inlineBoxIndex + 1;
     while (index < displayBoxes.size() && &displayBoxes[index].layoutBox().parent() == inlineBox.ptr()) {
         if (displayBoxes[index].isInlineBox()) {
-            auto indexAndExpansion = expandInlineBoxWithDescendants(index, displayBoxes, alignmentOffsetList, inlineFormattingContext);
+            auto indexAndExpansion = expandInlineBoxToEncloseContent(index, displayBoxes, alignmentOffsetList, inlineFormattingContext);
             index = indexAndExpansion.index;
             descendantExpansion += indexAndExpansion.expansion;
             continue;
@@ -93,10 +77,23 @@ static InlineBoxIndexAndExpansion expandInlineBoxWithDescendants(size_t inlineBo
         ++index;
     }
     auto totalExpansion = 2 * alignmentOffset(inlineBox, alignmentOffsetList) + descendantExpansion;
-    if (inlineBoxIndex) {
-        // Root inline box has the correct (inflated) logical width.
-        expandInlineBox(totalExpansion, displayBoxes[inlineBoxIndex], inlineFormattingContext);
-    }
+    // Root inline box always has the correct size.
+    if (!inlineBoxIndex || !totalExpansion)
+        return { index, totalExpansion };
+
+    // This could either be an ruby inline box (<ruby> or base) or an inline box enclosing <ruby> e.g. <span><ruby>.
+    ASSERT(!inlineBoxDisplayBox.isRubyBase() || (inlineBoxDisplayBox.style().rubyAlign() == RubyAlign::Center || inlineBoxDisplayBox.style().rubyAlign() == RubyAlign::SpaceAround));
+    auto expand = [&] {
+        auto writingMode = inlineFormattingContext.root().writingMode();
+        writingMode.isHorizontal() ? inlineBoxDisplayBox.expandHorizontally(totalExpansion) : inlineBoxDisplayBox.expandVertically(totalExpansion);
+        auto& boxGeometry = inlineFormattingContext.geometryForBox(inlineBoxDisplayBox.layoutBox());
+        if (writingMode.isLineOverLeft()) {
+            inlineBoxDisplayBox.setTop(inlineBoxDisplayBox.top() - totalExpansion);
+            boxGeometry.setLeft(BoxGeometry::borderBoxLeft(boxGeometry) - LayoutUnit { totalExpansion });
+        }
+        boxGeometry.setContentBoxWidth(boxGeometry.contentBoxWidth() + LayoutUnit { totalExpansion });
+    };
+    expand();
     return { index, totalExpansion };
 }
 
@@ -344,16 +341,17 @@ void InlineContentAligner::adjustRubyBaseContentWithAlignmentOffset(std::span<In
 
     auto baseIndexAndOffset = BaseIndexAndOffset { };
     while (baseIndexAndOffset.index < displayBoxes.size()) {
-        shiftDisplayBox(displayBoxes[baseIndexAndOffset.index], baseIndexAndOffset.offset, inlineFormattingContext);
+        auto& displayBox = displayBoxes[baseIndexAndOffset.index];
+        shiftDisplayBox(displayBox, baseIndexAndOffset.offset, inlineFormattingContext);
 
-        if (!displayBoxes[baseIndexAndOffset.index].isRubyBase()) {
+        if (!displayBox.isRubyBase()) {
             ++baseIndexAndOffset.index;
             continue;
         }
         baseIndexAndOffset = shiftRubyBaseContentByAlignmentOffset(baseIndexAndOffset, displayBoxes, alignmentOffsetList, inlineFormattingContext);
     }
 
-    expandInlineBoxWithDescendants(0, displayBoxes, alignmentOffsetList, inlineFormattingContext);
+    expandInlineBoxToEncloseContent(0, displayBoxes, alignmentOffsetList, inlineFormattingContext);
 }
 
 void InlineContentAligner::adjustAnnotationContentWithAlignmentOffset(std::span<InlineDisplay::Box> displayBoxes, InlineLayoutUnit alignmentOffset, InlineFormattingContext& inlineFormattingContext)
