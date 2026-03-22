@@ -117,7 +117,10 @@ RenderStyle RenderStyle::createAnonymousStyleWithDisplay(const RenderStyle& pare
 
 RenderStyle RenderStyle::createStyleInheritingFromPseudoStyle(const RenderStyle& pseudoStyle)
 {
-    ASSERT(pseudoStyle.pseudoElementType() == PseudoElementType::Before || pseudoStyle.pseudoElementType() == PseudoElementType::After || pseudoStyle.pseudoElementType() == PseudoElementType::Checkmark);
+    ASSERT(pseudoStyle.pseudoElementType() == PseudoElementType::Before
+        || pseudoStyle.pseudoElementType() == PseudoElementType::After
+        || pseudoStyle.pseudoElementType() == PseudoElementType::Checkmark
+        || pseudoStyle.pseudoElementType() == PseudoElementType::PickerIcon);
 
     auto style = create();
     style.inheritFrom(pseudoStyle);
