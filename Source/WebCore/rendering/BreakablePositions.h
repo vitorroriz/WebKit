@@ -125,6 +125,7 @@ inline bool BreakablePositions::isBreakableSpace(char16_t character)
     case '\n':
     case '\t':
     case lineSeparator:
+    case paragraphSeparator:
         return true;
     case noBreakSpace:
         return nonBreakingSpaceBehavior == NoBreakSpaceBehavior::Break;

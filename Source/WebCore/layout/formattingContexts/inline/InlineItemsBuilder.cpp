@@ -395,7 +395,7 @@ static void replaceNonPreservedNewLineAndTabCharactersAndAppend(const InlineText
                 char32_t character;
                 auto characters = textContent.span16();
                 U16_NEXT(characters, position, contentLength, character);
-                return character == newlineCharacter || character == tabCharacter;
+                return character == newlineCharacter || character == tabCharacter || character == paragraphSeparator;
             }
             auto isNewLineOrTab = textContent[position] == newlineCharacter || textContent[position] == tabCharacter;
             ++position;
@@ -559,7 +559,19 @@ static inline void buildBidiParagraph(const RenderStyle& rootStyle, const Inline
         auto& inlineItem = inlineItemList[index];
         CheckedRef layoutBox = inlineItem.layoutBox();
 
-        if (inlineItem.isText() || inlineItem.isSoftLineBreak()) {
+        auto isBidiParagraphSeparator = [&] {
+            // Bidi paragraph separators (hard line breaks, block-level items, and soft line breaks
+            // at characters with bidi class B like U+000A and U+2029) need handleBidiParagraphStart
+            // to unwind/rewind the bidi context stack. U+2028 LINE SEPARATOR has bidi class WS
+            // and does not reset the paragraph context.
+            if (inlineItem.isHardLineBreak() || inlineItem.isBlock())
+                return true;
+            auto* softLineBreak = dynamicDowncast<InlineSoftLineBreakItem>(inlineItem);
+            return softLineBreak && softLineBreak->isBidiParagraphStart();
+        };
+        if (isBidiParagraphSeparator())
+            handleBidiParagraphStart(paragraphContentBuilder, inlineItemOffsetList, bidiContextStack);
+        else if (inlineItem.isText() || inlineItem.isSoftLineBreak()) {
             CheckedPtr inlineTextBox = dynamicDowncast<InlineTextBox>(layoutBox.get());
             auto mayAppendTextContentAsOneEntry = inlineTextBox && !TextUtil::shouldPreserveNewline(*inlineTextBox);
             if (mayAppendTextContentAsOneEntry) {
@@ -574,9 +586,11 @@ static inline void buildBidiParagraph(const RenderStyle& rootStyle, const Inline
             } else if (auto* inlineTextItem = dynamicDowncast<InlineTextItem>(inlineItem)) {
                 inlineItemOffsetList.append({ paragraphContentBuilder.length() });
                 paragraphContentBuilder.append(inlineTextItem->content());
-            } else if (is<InlineSoftLineBreakItem>(inlineItem))
-                handleBidiParagraphStart(paragraphContentBuilder, inlineItemOffsetList, bidiContextStack);
-            else
+            } else if (auto* softLineBreak = dynamicDowncast<InlineSoftLineBreakItem>(inlineItem)) {
+                // Non-paragraph-separator soft breaks (e.g., U+2028) in per-item mode just record their offset.
+                inlineItemOffsetList.append({ paragraphContentBuilder.length() });
+                paragraphContentBuilder.append(softLineBreak->character());
+            } else
                 ASSERT_NOT_REACHED();
         } else if (inlineItem.isAtomicInlineBox()) {
             inlineItemOffsetList.append({ paragraphContentBuilder.length() });
@@ -598,9 +612,7 @@ static inline void buildBidiParagraph(const RenderStyle& rootStyle, const Inline
                 , isEnteringBidi ? EnterExitType::EnteringInlineBox : EnterExitType::ExitingInlineBox
                 , bidiContextStack
             );
-        } else if (inlineItem.isHardLineBreak())
-            handleBidiParagraphStart(paragraphContentBuilder, inlineItemOffsetList, bidiContextStack);
-        else if (inlineItem.isWordBreakOpportunity()) {
+        } else if (inlineItem.isWordBreakOpportunity()) {
             // Soft wrap opportunity markers are opaque to bidi. 
             inlineItemOffsetList.append({ });
         } else if (inlineItem.isFloat()) {
@@ -615,9 +627,7 @@ static inline void buildBidiParagraph(const RenderStyle& rootStyle, const Inline
                 // Out-of-flow items are also opaque to bidi.
                 inlineItemOffsetList.append({ });
             }
-        } else if (inlineItem.isBlock())
-            handleBidiParagraphStart(paragraphContentBuilder, inlineItemOffsetList, bidiContextStack);
-        else
+        } else
             ASSERT_NOT_IMPLEMENTED_YET();
 
     }
@@ -878,7 +888,7 @@ bool InlineItemsBuilder::buildInlineItemListForTextFromBreakingPositionsCache(co
         }
 
         auto character = text[startPosition];
-        if (character == lineSeparator || (character == newlineCharacter && shouldPreserveNewline)) {
+        if (character == lineSeparator || character == paragraphSeparator || (character == newlineCharacter && shouldPreserveNewline)) {
             inlineItemList.append(InlineSoftLineBreakItem::createSoftLineBreakItem(inlineTextBox, startPosition));
             continue;
         }
@@ -941,10 +951,10 @@ void InlineItemsBuilder::handleTextContent(const InlineTextBox& inlineTextBox, I
     ASSERT(currentPosition <= contentLength);
 
     auto handleSegmentBreak = [&] {
-        // U+2028 LINE SEPARATOR is always a forced line break (UAX#14 class BK, CSS Text §5.1).
+        // U+2028 LINE SEPARATOR and U+2029 PARAGRAPH SEPARATOR are always forced line breaks (UAX#14 class BK, CSS Text §5.1).
         // U+000A is a forced line break only when white-space preserves newlines.
         auto character = text[currentPosition];
-        if (character != lineSeparator && (character != newlineCharacter || !shouldPreserveNewline))
+        if (character != lineSeparator && character != paragraphSeparator && (character != newlineCharacter || !shouldPreserveNewline))
             return false;
         inlineItemList.append(InlineSoftLineBreakItem::createSoftLineBreakItem(inlineTextBox, currentPosition++));
         return true;
