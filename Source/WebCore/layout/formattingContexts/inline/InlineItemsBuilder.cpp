@@ -878,7 +878,7 @@ bool InlineItemsBuilder::buildInlineItemListForTextFromBreakingPositionsCache(co
         }
 
         auto character = text[startPosition];
-        if (character == newlineCharacter && shouldPreserveNewline) {
+        if (character == lineSeparator || (character == newlineCharacter && shouldPreserveNewline)) {
             inlineItemList.append(InlineSoftLineBreakItem::createSoftLineBreakItem(inlineTextBox, startPosition));
             continue;
         }
@@ -941,9 +941,10 @@ void InlineItemsBuilder::handleTextContent(const InlineTextBox& inlineTextBox, I
     ASSERT(currentPosition <= contentLength);
 
     auto handleSegmentBreak = [&] {
-        // Segment breaks with preserve new line style (white-space: pre, pre-wrap, break-spaces and pre-line) compute to forced line break.
-        auto isSegmentBreakCandidate = text[currentPosition] == newlineCharacter;
-        if (!isSegmentBreakCandidate || !shouldPreserveNewline)
+        // U+2028 LINE SEPARATOR is always a forced line break (UAX#14 class BK, CSS Text §5.1).
+        // U+000A is a forced line break only when white-space preserves newlines.
+        auto character = text[currentPosition];
+        if (character != lineSeparator && (character != newlineCharacter || !shouldPreserveNewline))
             return false;
         inlineItemList.append(InlineSoftLineBreakItem::createSoftLineBreakItem(inlineTextBox, currentPosition++));
         return true;
