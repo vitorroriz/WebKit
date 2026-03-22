@@ -70,7 +70,7 @@ static LineBoxParentSearchResult findParentOfEmptyOrFirstLineBox(RenderBlock& bl
         if (is<RenderListItem>(blockContainer) && inQuirksMode && child.node() && isHTMLListElement(*child.node()))
             break;
 
-        if (!is<RenderBlock>(child) || is<RenderTable>(child)) {
+        if (!is<RenderBlock>(child) || is<RenderTable>(child) || child.style().display() == Style::DisplayType::BlockRuby) {
             failedDueToBlockification = true;
             break;
         }

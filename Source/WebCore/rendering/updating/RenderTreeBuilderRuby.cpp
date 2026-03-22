@@ -86,7 +86,9 @@ CheckedRef<RenderElement> RenderTreeBuilder::Ruby::findOrCreateParentForStyleBas
             if (first->style().display() == Style::DisplayType::InlineRuby) {
                 if (beforeChild && !beforeChild->isDescendantOf(first.get()))
                     beforeChild = nullptr;
-                return downcast<RenderElement>(*first);
+                if (first.get() != beforeChild)
+                    return downcast<RenderElement>(*first);
+                break;
             }
         }
     }
