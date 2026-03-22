@@ -38,14 +38,14 @@ static ExceptionOr<Vector<uint8_t>> platformSignCryptoKit(const CryptoKeyHMAC& k
 {
     if (!isValidHashParameter(key.hashAlgorithmIdentifier()))
         return Exception { ExceptionCode::OperationError };
-    return pal::HMAC::sign(key.key().span(), data.span(), std::to_underlying(toCKHashFunction(key.hashAlgorithmIdentifier())));
+    return pal::HMAC::sign(key.key().span(), data.span(), toCKHashFunction(key.hashAlgorithmIdentifier()));
 }
 
 static ExceptionOr<bool> platformVerifyCryptoKit(const CryptoKeyHMAC& key, const Vector<uint8_t>& signature, const Vector<uint8_t>& data)
 {
     if (!isValidHashParameter(key.hashAlgorithmIdentifier()))
         return Exception { ExceptionCode::OperationError };
-    return pal::HMAC::verify(signature.span(), key.key().span(), data.span(), std::to_underlying(toCKHashFunction(key.hashAlgorithmIdentifier())));
+    return pal::HMAC::verify(signature.span(), key.key().span(), data.span(), toCKHashFunction(key.hashAlgorithmIdentifier()));
 }
 
 ExceptionOr<Vector<uint8_t>> CryptoAlgorithmHMAC::platformSign(const CryptoKeyHMAC& key, const Vector<uint8_t>& data)

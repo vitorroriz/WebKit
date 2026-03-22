@@ -27,6 +27,7 @@
 #import "ServiceWorkerRoute.h"
 
 #import <pal/PALSwift.h>
+#import <pal/crypto/CryptoDigestHashFunction.h>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"

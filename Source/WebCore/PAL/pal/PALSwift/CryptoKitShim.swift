@@ -406,17 +406,12 @@ public struct ECKey {
         return returnValue
     }
 
-    // FIXME: `hashFunction` should not be a raw value, but compilers < 6.0 do not understand C++ enums as parameters.
     // FIXME: PALSwift should have no public symbols.
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func sign(
         message: SpanConstUInt8,
-        hashFunction hashFunctionRawValue: PAL.CryptoDigestHashFunction.RawValue
+        hashFunction: PAL.CryptoDigestHashFunction
     ) -> CryptoOperationReturnValue {
-        // FIXME: This is safe because all callers use the enum type itself, and this is only temporary.
-        // swift-format-ignore: NeverForceUnwrap
-        let hashFunction = PAL.CryptoDigestHashFunction(rawValue: hashFunctionRawValue)!
-
         var returnValue = CryptoOperationReturnValue()
         do {
             switch try getInternalPrivate() {
@@ -445,12 +440,8 @@ public struct ECKey {
     public func verify(
         message: SpanConstUInt8,
         signature: SpanConstUInt8,
-        hashFunction hashFunctionRawValue: PAL.CryptoDigestHashFunction.RawValue
+        hashFunction: PAL.CryptoDigestHashFunction
     ) -> CryptoOperationReturnValue {
-        // FIXME: This is safe because all callers use the enum type itself, and this is only temporary.
-        // swift-format-ignore: NeverForceUnwrap
-        let hashFunction = PAL.CryptoDigestHashFunction(rawValue: hashFunctionRawValue)!
-
         var returnValue = CryptoOperationReturnValue()
         do {
             let internalPublic = try getInternalPublic()
@@ -772,12 +763,8 @@ public class HMAC {
     public static func sign(
         key: SpanConstUInt8,
         data: SpanConstUInt8,
-        hashFunction hashFunctionRawValue: PAL.CryptoDigestHashFunction.RawValue
+        hashFunction: PAL.CryptoDigestHashFunction
     ) -> VectorUInt8 {
-        // FIXME: This is safe because all callers use the enum type itself, and this is only temporary.
-        // swift-format-ignore: NeverForceUnwrap
-        let hashFunction = PAL.CryptoDigestHashFunction(rawValue: hashFunctionRawValue)!
-
         switch hashFunction {
         case .SHA_1:
             return unsafe CryptoKit.HMAC<Insecure.SHA1>.authenticationCode(data: data, key: key)
@@ -800,12 +787,8 @@ public class HMAC {
         mac: SpanConstUInt8,
         key: SpanConstUInt8,
         data: SpanConstUInt8,
-        hashFunction hashFunctionRawValue: PAL.CryptoDigestHashFunction.RawValue
+        hashFunction: PAL.CryptoDigestHashFunction
     ) -> Bool {
-        // FIXME: This is safe because all callers use the enum type itself, and this is only temporary.
-        // swift-format-ignore: NeverForceUnwrap
-        let hashFunction = PAL.CryptoDigestHashFunction(rawValue: hashFunctionRawValue)!
-
         switch hashFunction {
         case .SHA_1:
             return unsafe CryptoKit.HMAC<Insecure.SHA1>
@@ -844,12 +827,8 @@ public class HKDF {
         salt: SpanConstUInt8,
         info: SpanConstUInt8,
         outputBitCount: Int,
-        hashFunction hashFunctionRawValue: PAL.CryptoDigestHashFunction.RawValue
+        hashFunction: PAL.CryptoDigestHashFunction
     ) -> CryptoOperationReturnValue {
-        // FIXME: This is safe because all callers use the enum type itself, and this is only temporary.
-        // swift-format-ignore: NeverForceUnwrap
-        let hashFunction = PAL.CryptoDigestHashFunction(rawValue: hashFunctionRawValue)!
-
         var returnValue = CryptoOperationReturnValue()
         if outputBitCount <= 0 || outputBitCount % 8 != 0 {
             returnValue.errorCode = .InvalidArgument

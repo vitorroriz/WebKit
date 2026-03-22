@@ -43,7 +43,7 @@ static ExceptionOr<Vector<uint8_t>> platformDeriveBitsCryptoKit(const CryptoAlgo
 {
     if (!isValidHashParameter(parameters.hashIdentifier))
         return Exception { ExceptionCode::OperationError };
-    auto rv = pal::HKDF::deriveBits(key.key().span(), parameters.saltVector().span(), parameters.infoVector().span(), length, std::to_underlying(toCKHashFunction(parameters.hashIdentifier)));
+    auto rv = pal::HKDF::deriveBits(key.key().span(), parameters.saltVector().span(), parameters.infoVector().span(), length, toCKHashFunction(parameters.hashIdentifier));
     if (rv.errorCode != Cpp::ErrorCodes::Success)
         return Exception { ExceptionCode::OperationError };
     return WTF::move(rv.result);
