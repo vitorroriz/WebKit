@@ -30,15 +30,15 @@
 #import <wtf/text/StringBuilder.h>
 
 namespace WebCore {
-    
+
 static String wildcardRegexPatternString(const String& string)
 {
     String metaCharacters = ".|+?()[]{}^$"_s;
     char16_t escapeCharacter = '\\';
     char16_t wildcardCharacter = '*';
-    
+
     StringBuilder stringBuilder;
-    
+
     stringBuilder.append('^');
     for (unsigned i = 0; i < string.length(); i++) {
         auto character = string[i];
@@ -46,14 +46,14 @@ static String wildcardRegexPatternString(const String& string)
             stringBuilder.append(escapeCharacter);
         else if (character == wildcardCharacter)
             stringBuilder.append('.');
-        
+
         stringBuilder.append(character);
     }
     stringBuilder.append('$');
-        
+
     return stringBuilder.toString();
 }
-    
+
 bool stringMatchesWildcardString(const String& string, const String& wildcardString)
 {
     return JSC::Yarr::RegularExpression(wildcardRegexPatternString(wildcardString), { JSC::Yarr::Flags::IgnoreCase }).match(string) != -1;

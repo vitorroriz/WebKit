@@ -311,9 +311,11 @@ platform/cocoa/EffectiveRateChangedListener.mm @nonARC
 platform/cocoa/FileMonitorCocoa.mm @nonARC
 platform/cocoa/KeyEventCocoa.mm @nonARC
 platform/cocoa/LocalizedStringsCocoa.mm @nonARC
+platform/cocoa/LoggingCocoa.mm @nonARC
 platform/cocoa/LowPowerModeNotifier.mm @nonARC
 platform/cocoa/MIMETypeRegistryCocoa.mm @nonARC
 platform/cocoa/MediaUtilities.cpp
+platform/cocoa/MediaRemoteSoftLink.mm @nonARC
 platform/cocoa/NetworkExtensionContentFilter.mm @nonARC
 platform/cocoa/NSURLUtilities.mm @nonARC
 platform/cocoa/ParentalControlsContentFilter.mm @nonARC
@@ -331,6 +333,7 @@ platform/cocoa/SearchPopupMenuCocoa.mm @nonARC
 platform/cocoa/SerializedPlatformDataCueValue.mm @nonARC @no-unify
 platform/cocoa/SharedBufferCocoa.mm @nonARC
 platform/cocoa/SharedMemoryCocoa.mm @nonARC
+platform/cocoa/StringUtilities.mm @nonARC
 platform/cocoa/SystemVersion.mm @nonARC
 platform/cocoa/TelephoneNumberDetectorCocoa.cpp
 platform/cocoa/TextRecognitionResultCocoa.mm @nonARC
@@ -342,6 +345,8 @@ platform/cocoa/VideoPresentationLayerProvider.mm @nonARC
 platform/cocoa/VideoToolboxSoftLink.cpp
 platform/cocoa/WebCoreAdditions.mm @nonARC @no-unify
 platform/cocoa/WebCoreNSErrorExtras.mm @nonARC
+platform/cocoa/WebCoreNSURLExtras.mm @nonARC
+platform/cocoa/WebCoreObjCExtras.mm @nonARC
 platform/cocoa/WebNSAttributedStringExtras.mm @nonARC
 platform/gamepad/cocoa/GameControllerGamepad.mm @nonARC
 platform/gamepad/cocoa/GameControllerGamepadProvider.mm @nonARC
@@ -622,8 +627,6 @@ platform/mac/HIDElement.cpp
 platform/mac/KeyEventMac.mm @nonARC @no-unify
 platform/mac/LocalCurrentGraphicsContextMac.mm @nonARC
 platform/mac/LocalDefaultSystemAppearance.mm @nonARC
-platform/mac/LoggingMac.mm @nonARC
-platform/mac/MediaRemoteSoftLink.mm @nonARC
 platform/mac/NSScrollerImpDetails.mm @nonARC
 platform/mac/PasteboardMac.mm @nonARC
 platform/mac/PasteboardWriter.mm @nonARC
@@ -642,7 +645,6 @@ platform/mac/ScrollbarThemeMac.mm @nonARC @no-unify
 platform/mac/ScrollingEffectsController.mm @nonARC
 platform/mac/ScrollingMomentumCalculatorMac.mm @nonARC
 platform/mac/SerializedPlatformDataCueMac.mm @nonARC
-platform/mac/StringUtilities.mm @nonARC
 platform/mac/SuddenTermination.mm @nonARC
 platform/mac/ThemeMac.mm @nonARC
 platform/mac/ThreadCheck.mm @nonARC @no-unify
@@ -654,8 +656,6 @@ platform/mac/WebCoreFullScreenPlaceholderView.mm @nonARC
 platform/mac/WebCoreFullScreenWarningView.mm @nonARC
 platform/mac/WebCoreFullScreenWindow.mm @nonARC
 platform/mac/WebCoreNSFontManagerExtras.mm @nonARC
-platform/mac/WebCoreNSURLExtras.mm @nonARC
-platform/mac/WebCoreObjCExtras.mm @nonARC
 platform/mac/WebPlaybackControlsManager.mm @nonARC
 platform/mac/WidgetMac.mm @nonARC
 platform/mediarecorder/MediaRecorderPrivateAVFImpl.cpp

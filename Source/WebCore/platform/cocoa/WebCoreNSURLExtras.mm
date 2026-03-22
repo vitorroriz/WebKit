@@ -30,12 +30,12 @@
 #import "WebCoreNSURLExtras.h"
 
 #import <pal/spi/cf/CFNetworkSPI.h>
-#import <wtf/Function.h>
-#import <wtf/RetainPtr.h>
-#import <wtf/Vector.h>
 #import <unicode/uchar.h>
 #import <unicode/uidna.h>
 #import <unicode/uscript.h>
+#import <wtf/Function.h>
+#import <wtf/RetainPtr.h>
+#import <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -47,10 +47,9 @@ NSURL *URLByCanonicalizingURL(NSURL *URL)
 #else
     Class concreteClass = [NSURLProtocol _protocolClassForRequest:request.get()];
 #endif
-    if (!concreteClass) {
+    if (!concreteClass)
         return URL;
-    }
-    
+
     // This applies NSURL's concept of canonicalization, but not URL's concept. It would
     // make sense to apply both, but when we tried that it caused a performance degradation
     // (see 5315926). It might make sense to apply only the URL concept and not the NSURL
