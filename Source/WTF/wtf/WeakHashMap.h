@@ -95,14 +95,12 @@ public:
         {
             ASSERT(m_position != m_endPosition);
             ++m_position;
-            ++m_advanceCount;
             m_weakHashMap.increaseOperationCountSinceLastCleanup();
         }
 
         const MapType& m_weakHashMap;
         IteratorType m_position;
         IteratorType m_endPosition;
-        unsigned m_advanceCount { 0 };
     };
 
     class WeakHashMapIterator : public WeakHashMapIteratorBase<WeakHashMap, typename MapType::iterator, PeekPtrType, PeekType> {
