@@ -692,11 +692,23 @@ static constexpr bool unreachableForValue = false;
 
 /* RELEASE_LOG */
 
+#if USE(OS_LOG)
+#define PUBLIC_LOG    "{public}"
+#define PRIVATE_LOG   "{private}"
+#define SENSITIVE_LOG "{sensitive}"
+#else
+#define PUBLIC_LOG    ""
+#define PRIVATE_LOG   ""
+#define SENSITIVE_LOG ""
+#endif
+
+// Convenience macros.
+#define PUBLIC_LOG_STRING    PUBLIC_LOG    "s"
+#define PRIVATE_LOG_STRING   PRIVATE_LOG   "s"
+#define SENSITIVE_LOG_STRING SENSITIVE_LOG "s"
+
 #if RELEASE_LOG_DISABLED
 
-#define PUBLIC_LOG_STRING "s"
-#define PRIVATE_LOG_STRING "s"
-#define SENSITIVE_LOG_STRING "s"
 #define RELEASE_LOG(channel, ...) ((void)0)
 #define RELEASE_LOG_ERROR(channel, ...) LOG_ERROR(__VA_ARGS__)
 #define RELEASE_LOG_FAULT(channel, ...) LOG_ERROR(__VA_ARGS__)
@@ -714,9 +726,6 @@ static constexpr bool unreachableForValue = false;
 
 #elif USE(OS_LOG)
 
-#define PUBLIC_LOG_STRING "{public}s"
-#define PRIVATE_LOG_STRING "{private}s"
-#define SENSITIVE_LOG_STRING "{sensitive}s"
 #define RELEASE_LOG(channel, ...) WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN SUPPRESS_UNCOUNTED_LOCAL os_log(LOG_CHANNEL(channel).osLogChannel, __VA_ARGS__) WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 #define RELEASE_LOG_ERROR(channel, ...) WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN SUPPRESS_UNCOUNTED_LOCAL os_log_error(LOG_CHANNEL(channel).osLogChannel, __VA_ARGS__) WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
 #define RELEASE_LOG_FAULT(channel, ...) WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN SUPPRESS_UNCOUNTED_LOCAL os_log_fault(LOG_CHANNEL(channel).osLogChannel, __VA_ARGS__) WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
@@ -738,10 +747,6 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END \
 } while (0)
 
 #elif OS(ANDROID)
-
-#define PUBLIC_LOG_STRING "s"
-#define PRIVATE_LOG_STRING "s"
-#define SENSITIVE_LOG_STRING "s"
 
 #define LOG_ANDROID_SEND(channel, priority, fmt, ...) do { \
     auto& logChannel = LOG_CHANNEL(channel); \
@@ -768,12 +773,16 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END \
 
 #elif ENABLE(JOURNALD_LOG)
 
-#define PUBLIC_LOG_STRING "s"
-#define PRIVATE_LOG_STRING "s"
-#define SENSITIVE_LOG_STRING "s"
+inline void wtfCompileTimeCheckPrintfSpecifier(const char*, ...) WTF_ATTRIBUTE_PRINTF(1, 2);
+inline void wtfCompileTimeCheckPrintfSpecifier(const char* format, ...)
+{
+    UNUSED_PARAM(format); // Function intentionally empty.
+}
+
 #define SD_JOURNAL_SEND(channel, priority, file, line, function, ...) do { \
+    wtfCompileTimeCheckPrintfSpecifier(__VA_ARGS__); \
     if (LOG_CHANNEL(channel).state != WTFLogChannelState::Off) \
-        sd_journal_send_with_location("CODE_FILE=" file, "CODE_LINE=" line, function, "WEBKIT_SUBSYSTEM=" LOG_CHANNEL_WEBKIT_SUBSYSTEM, "WEBKIT_CHANNEL=%s", LOG_CHANNEL(channel).name, "PRIORITY=%i", priority, "MESSAGE=" __VA_ARGS__, nullptr); \
+        sd_journal_send_with_location("CODE_FILE=" file, "CODE_LINE=" line, function, "WEBKIT_SUBSYSTEM=" LOG_CHANNEL_WEBKIT_SUBSYSTEM, "WEBKIT_CHANNEL=%s", LOG_CHANNEL(channel).name, "PRIORITY=%u", static_cast<unsigned>(priority), "MESSAGE=" __VA_ARGS__, nullptr); \
 } while (0)
 
 #define RELEASE_LOG(channel, ...) SD_JOURNAL_SEND(channel, LOG_NOTICE, __FILE__, _STRINGIFY(__LINE__), __func__, __VA_ARGS__)
@@ -795,13 +804,10 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END \
 
 #else
 
-#define PUBLIC_LOG_STRING "s"
-#define PRIVATE_LOG_STRING "s"
-#define SENSITIVE_LOG_STRING "s"
 #define LOGF(channel, priority, fmt, ...) do { \
     auto& logChannel = LOG_CHANNEL(channel); \
     if (logChannel.state != WTFLogChannelState::Off) \
-        fprintf(stderr, "[" LOG_CHANNEL_WEBKIT_SUBSYSTEM ":%s:%i] " fmt "\n", logChannel.name, priority, ##__VA_ARGS__); \
+        fprintf(stderr, "[" LOG_CHANNEL_WEBKIT_SUBSYSTEM ":%s:%u] " fmt "\n", logChannel.name, static_cast<unsigned>(priority), ##__VA_ARGS__); \
 } while (0)
 
 #define RELEASE_LOG(channel, ...) LOGF(channel, 4, __VA_ARGS__)
