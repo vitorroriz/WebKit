@@ -24,17 +24,17 @@
  */
 
 #include "config.h"
-#include "CSSShorthandSubstitutionValue.h"
+#include "CSSPendingSubstitutionValue.h"
 
 namespace WebCore {
 
-Ref<CSSShorthandSubstitutionValue> CSSShorthandSubstitutionValue::create(CSSPropertyID shorthandPropertyId, Ref<CSSSubstitutionValue>&& shorthandValue)
+Ref<CSSPendingSubstitutionValue> CSSPendingSubstitutionValue::create(CSSPropertyID shorthandPropertyId, Ref<CSSVariableReferenceValue>&& shorthandValue)
 {
-    return adoptRef(*new CSSShorthandSubstitutionValue(shorthandPropertyId, WTF::move(shorthandValue)));
+    return adoptRef(*new CSSPendingSubstitutionValue(shorthandPropertyId, WTF::move(shorthandValue)));
 }
 
-CSSShorthandSubstitutionValue::CSSShorthandSubstitutionValue(CSSPropertyID shorthandPropertyId, Ref<CSSSubstitutionValue>&& shorthandValue)
-    : CSSValue(ClassType::ShorthandSubstitution)
+CSSPendingSubstitutionValue::CSSPendingSubstitutionValue(CSSPropertyID shorthandPropertyId, Ref<CSSVariableReferenceValue>&& shorthandValue)
+    : CSSValue(ClassType::PendingSubstitutionValue)
     , m_shorthandPropertyId(shorthandPropertyId)
     , m_shorthandValue(WTF::move(shorthandValue))
 {

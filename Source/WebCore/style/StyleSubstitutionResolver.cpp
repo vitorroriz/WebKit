@@ -27,14 +27,14 @@
 #include "StyleSubstitutionResolver.h"
 
 #include "CSSCustomPropertyValue.h"
+#include "CSSPendingSubstitutionValue.h"
 #include "CSSPropertyNames.h"
 #include "CSSPropertyParser.h"
 #include "CSSPropertyParserConsumer+Primitives.h"
 #include "CSSRegisteredCustomProperty.h"
-#include "CSSShorthandSubstitutionValue.h"
-#include "CSSSubstitutionValue.h"
 #include "CSSValueKeywords.h"
 #include "CSSVariableData.h"
+#include "CSSVariableReferenceValue.h"
 #include "ConstantPropertyMap.h"
 #include "CustomFunctionRegistry.h"
 #include "Document.h"
@@ -240,7 +240,7 @@ std::optional<Vector<CSSParserToken>> SubstitutionResolver::substituteTokenRange
     return tokens;
 }
 
-RefPtr<CSSVariableData> SubstitutionResolver::trySimpleSubstitution(const CSSSubstitutionValue& value) const
+RefPtr<CSSVariableData> SubstitutionResolver::trySimpleSubstitution(const CSSVariableReferenceValue& value) const
 {
     if (!value.m_simpleReference)
         return nullptr;
@@ -254,7 +254,7 @@ RefPtr<CSSVariableData> SubstitutionResolver::trySimpleSubstitution(const CSSSub
     return std::get<Ref<CSSVariableData>>(property->value()).ptr();
 }
 
-RefPtr<CSSVariableData> SubstitutionResolver::substitute(const CSSSubstitutionValue& value) const
+RefPtr<CSSVariableData> SubstitutionResolver::substitute(const CSSVariableReferenceValue& value) const
 {
     if (auto data = trySimpleSubstitution(value))
         return data;
@@ -267,39 +267,39 @@ RefPtr<CSSVariableData> SubstitutionResolver::substitute(const CSSSubstitutionVa
     return CSSVariableData::create(*substitutedTokens, context);
 }
 
-RefPtr<CSSValue> SubstitutionResolver::substituteAndParse(const CSSSubstitutionValue& substitutionValue, CSSPropertyID propertyID) const
+RefPtr<CSSValue> SubstitutionResolver::substituteAndParse(const CSSVariableReferenceValue& variableRef, CSSPropertyID propertyID) const
 {
-    auto data = substitute(substitutionValue);
+    auto data = substitute(variableRef);
     if (!data)
         return nullptr;
 
-    if (!arePointingToEqualData(substitutionValue.m_cache.dependencyData, data) || substitutionValue.m_cache.propertyID != propertyID) {
-        substitutionValue.m_cache.value = CSSPropertyParser::parseStylePropertyLonghand(propertyID, data->tokens(), substitutionValue.context());
-        substitutionValue.m_cache.propertyID = propertyID;
+    if (!arePointingToEqualData(variableRef.m_cache.dependencyData, data) || variableRef.m_cache.propertyID != propertyID) {
+        variableRef.m_cache.value = CSSPropertyParser::parseStylePropertyLonghand(propertyID, data->tokens(), variableRef.context());
+        variableRef.m_cache.propertyID = propertyID;
     }
-    substitutionValue.m_cache.dependencyData = WTF::move(data);
+    variableRef.m_cache.dependencyData = WTF::move(data);
 
-    return substitutionValue.m_cache.value;
+    return variableRef.m_cache.value;
 }
 
-RefPtr<CSSValue> SubstitutionResolver::substituteAndParseShorthand(const CSSShorthandSubstitutionValue& substitution, CSSPropertyID propertyID) const
+RefPtr<CSSValue> SubstitutionResolver::substituteAndParseShorthand(const CSSPendingSubstitutionValue& substitution, CSSPropertyID propertyID) const
 {
     ASSERT(!CSSProperty::isDirectionAwareProperty(propertyID));
 
-    auto& substitutionValue = substitution.shorthandValue();
+    auto& variableRef = substitution.shorthandValue();
 
-    auto data = substitute(substitutionValue);
+    auto data = substitute(variableRef);
     if (!data)
         return nullptr;
 
-    if (!arePointingToEqualData(substitutionValue.m_cache.dependencyData, data)) {
+    if (!arePointingToEqualData(variableRef.m_cache.dependencyData, data)) {
         ParsedPropertyVector parsedProperties;
         if (!CSSPropertyParser::parseValue(substitution.m_shorthandPropertyId, IsImportant::No, data->tokens(), data->context(), parsedProperties, StyleRuleType::Style))
             substitution.m_cachedPropertyValues = { };
         else
             substitution.m_cachedPropertyValues = parsedProperties;
     }
-    substitutionValue.m_cache.dependencyData = WTF::move(data);
+    variableRef.m_cache.dependencyData = WTF::move(data);
 
     for (auto& property : substitution.m_cachedPropertyValues) {
         if (CSSProperty::resolveDirectionAwareProperty(property.id(), m_styleBuilder.state().style().writingMode()) == propertyID)

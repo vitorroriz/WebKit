@@ -110,7 +110,7 @@ public:
     bool isOffsetRotateValue() const { return m_classType == ClassType::OffsetRotate; }
     bool isPair() const { return m_classType == ClassType::ValuePair; }
     bool isPath() const { return m_classType == ClassType::Path; }
-    bool isShorthandSubstitutionValue() const { return m_classType == ClassType::ShorthandSubstitution; }
+    bool isPendingSubstitutionValue() const { return m_classType == ClassType::PendingSubstitutionValue; }
     bool isPositionValue() const { return m_classType == ClassType::Position; }
     bool isPositionXValue() const { return m_classType == ClassType::PositionX; }
     bool isPositionYValue() const { return m_classType == ClassType::PositionY; }
@@ -127,11 +127,11 @@ public:
     bool isURL() const { return m_classType == ClassType::URL; }
     bool isUnicodeRangeValue() const { return m_classType == ClassType::UnicodeRange; }
     bool isValueList() const { return m_classType == ClassType::ValueList; }
-    bool isSubstitutionValue() const { return m_classType == ClassType::Substitution; }
+    bool isVariableReferenceValue() const { return m_classType == ClassType::VariableReference; }
     bool isViewValue() const { return m_classType == ClassType::View; }
     bool isPaintImageValue() const { return m_classType == ClassType::PaintImage; }
 
-    bool hasSubstitutionFunctions() const { return isSubstitutionValue() || isShorthandSubstitutionValue(); }
+    bool hasVariableReferences() const { return isVariableReferenceValue() || isPendingSubstitutionValue(); }
     bool isImageGeneratorValue() const { return m_classType >= ClassType::Canvas && m_classType <= ClassType::Gradient; }
     bool isImplicitInitialValue() const { return m_isImplicitInitialValue; }
     bool containsVector() const { return m_classType >= ClassType::ValueList; }
@@ -242,7 +242,7 @@ protected:
         GridTemplateAreas,
         OffsetRotate,
         Path,
-        ShorthandSubstitution,
+        PendingSubstitutionValue,
         Position,
         PositionX,
         PositionY,
@@ -256,7 +256,7 @@ protected:
         URL,
         UnicodeRange,
         ValuePair,
-        Substitution,
+        VariableReference,
         View,
 
         // Classes that contain vectors, which derive from CSSValueContainingVector.

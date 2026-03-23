@@ -34,9 +34,9 @@
 #include "CSSFontSelector.h"
 #include "CSSFunctionValue.h"
 #include "CSSPaintImageValue.h"
+#include "CSSPendingSubstitutionValue.h"
 #include "CSSPropertyParser.h"
 #include "CSSRegisteredCustomProperty.h"
-#include "CSSShorthandSubstitutionValue.h"
 #include "CSSValuePair.h"
 #include "CSSValuePool.h"
 #include "CSSWideKeyword.h"
@@ -603,15 +603,15 @@ Ref<CSSValue> Builder::resolveInternalAutoBaseFunction(CSSValue& value)
 
 Ref<CSSValue> Builder::resolveSubstitutionFunctions(CSSPropertyID propertyID, CSSValue& value)
 {
-    if (!value.hasSubstitutionFunctions())
+    if (!value.hasVariableReferences())
         return value;
 
     SubstitutionResolver substitutionResolver(*this);
 
     auto variableValue = [&]() -> RefPtr<CSSValue> {
-        if (auto* substitution = dynamicDowncast<CSSShorthandSubstitutionValue>(value))
+        if (auto* substitution = dynamicDowncast<CSSPendingSubstitutionValue>(value))
             return substitutionResolver.substituteAndParseShorthand(*substitution, propertyID);
-        return substitutionResolver.substituteAndParse(downcast<CSSSubstitutionValue>(value), propertyID);
+        return substitutionResolver.substituteAndParse(downcast<CSSVariableReferenceValue>(value), propertyID);
     }();
 
     // https://drafts.csswg.org/css-variables-2/#invalid-variables
@@ -684,7 +684,7 @@ std::optional<Variant<Ref<const Style::CustomProperty>, CSSWideKeyword>> Builder
     auto* registered = m_state->document().customPropertyRegistry().get(name);
 
     auto preResolved = switchOn(value.value(),
-        [&](const Ref<CSSSubstitutionValue>&) -> std::optional<Variant<Ref<const Style::CustomProperty>, CSSWideKeyword>> {
+        [&](const Ref<CSSVariableReferenceValue>&) -> std::optional<Variant<Ref<const Style::CustomProperty>, CSSWideKeyword>> {
             return { };
         },
         [&](const Ref<CSSVariableData>& data) -> std::optional<Variant<Ref<const Style::CustomProperty>, CSSWideKeyword>> {
@@ -702,9 +702,9 @@ std::optional<Variant<Ref<const Style::CustomProperty>, CSSWideKeyword>> Builder
         return preResolved;
 
     auto resolvedData = switchOn(value.value(),
-        [&](const Ref<CSSSubstitutionValue>& substitutionValue) -> RefPtr<CSSVariableData> {
+        [&](const Ref<CSSVariableReferenceValue>& variableReferenceValue) -> RefPtr<CSSVariableData> {
             SubstitutionResolver substitutionResolver(*this);
-            return substitutionResolver.substitute(substitutionValue.get());
+            return substitutionResolver.substitute(variableReferenceValue.get());
         },
         [&](const Ref<CSSVariableData>& data) -> RefPtr<CSSVariableData> {
             return data.ptr();

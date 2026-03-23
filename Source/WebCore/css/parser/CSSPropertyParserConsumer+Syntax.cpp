@@ -29,7 +29,7 @@
 #include "CSSCustomPropertyValue.h"
 #include "CSSParserTokenRange.h"
 #include "CSSPropertyParserState.h"
-#include "CSSSubstitutionParser.h"
+#include "CSSVariableParser.h"
 #include <wtf/text/AtomString.h>
 
 namespace WebCore {
@@ -39,7 +39,7 @@ RefPtr<CSSValue> consumeDeclarationValue(CSSParserTokenRange& range, CSS::Proper
 {
     // https://drafts.csswg.org/css-syntax-3/#typedef-declaration-value
 
-    return CSSSubstitutionParser::parseDeclarationValue(nullAtom(), range.consumeAll(), state.context);
+    return CSSVariableParser::parseDeclarationValue(nullAtom(), range.consumeAll(), state.context);
 }
 
 } // namespace CSSPropertyParserHelpers

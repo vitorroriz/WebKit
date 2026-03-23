@@ -56,11 +56,11 @@
 #include "CSSPropertyParserConsumer+Timeline.h"
 #include "CSSSelectorParser.h"
 #include "CSSStyleSheet.h"
-#include "CSSSubstitutionParser.h"
 #include "CSSSupportsParser.h"
 #include "CSSTokenizer.h"
 #include "CSSValueList.h"
 #include "CSSValuePair.h"
+#include "CSSVariableParser.h"
 #include "CSSViewTransitionRule.h"
 #include "ComputedStyleDependencies.h"
 #include "ContainerQueryParser.h"
@@ -1425,7 +1425,7 @@ RefPtr<StyleRuleProperty> CSSParser::consumePropertyRule(CSSParserTokenRange pre
         auto dependencies = CSSPropertyParser::collectParsedCustomPropertyValueDependencies(*syntax, tokenRange, m_context);
         if (!dependencies.isComputationallyIndependent())
             return false;
-        auto containsVariable = CSSSubstitutionParser::containsSubstitutionFunctions(descriptor.initialValue->tokenRange(), m_context);
+        auto containsVariable = CSSVariableParser::containsValidVariableReferences(descriptor.initialValue->tokenRange(), m_context);
         if (containsVariable)
             return false;
         return true;
@@ -1787,7 +1787,7 @@ bool CSSParser::consumeDeclaration(CSSParserTokenRange range, StyleRuleType rule
 
     // @position-try doesn't allow custom properties.
     // FIXME: maybe make this logic more elegant?
-    if (propertyID == CSSPropertyInvalid && CSSSubstitutionParser::isValidCustomPropertyName(token) && ruleType != StyleRuleType::PositionTry) {
+    if (propertyID == CSSPropertyInvalid && CSSVariableParser::isValidVariableName(token) && ruleType != StyleRuleType::PositionTry) {
         AtomString variableName = token.value().toAtomString();
         consumeCustomPropertyValue(range, variableName, important);
     }
@@ -1809,7 +1809,7 @@ void CSSParser::consumeCustomPropertyValue(CSSParserTokenRange range, const Atom
 {
     if (range.atEnd())
         topContext().m_parsedProperties.append(CSSProperty(CSSPropertyCustom, CSSCustomPropertyValue::createEmpty(variableName), important));
-    else if (auto value = CSSSubstitutionParser::parseDeclarationValue(variableName, range, m_context))
+    else if (auto value = CSSVariableParser::parseDeclarationValue(variableName, range, m_context))
         topContext().m_parsedProperties.append(CSSProperty(CSSPropertyCustom, value.releaseNonNull(), important));
 }
 

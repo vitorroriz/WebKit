@@ -1435,7 +1435,7 @@ static Vector<String> authoredGridTrackSizes(Node* node, Style::GridTrackSizingD
     }
 
     // FIXME: https://bugs.webkit.org/show_bug.cgi?id=301874 add indication for developers that value originally auto
-    if (cssValue && cssValue->hasSubstitutionFunctions()) {
+    if (cssValue && cssValue->hasVariableReferences()) {
         Style::Extractor extractor(element);
         CheckedRef style = element->renderer()->style();
         if (auto computedValue = extractor.propertyValueInStyle(style, directionCSSPropertyID, CSSValuePool::singleton(), nullptr))

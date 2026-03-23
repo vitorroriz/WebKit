@@ -55,7 +55,7 @@ void BlendingKeyframes::clear()
     m_propertiesSetToInherit.clear();
     m_propertiesSetToCurrentColor.clear();
     m_usesRelativeFontWeight = false;
-    m_containsSubstitutionFunctions = false;
+    m_containsCSSVariableReferences = false;
     m_usesAnchorFunctions = false;
 }
 
@@ -314,8 +314,8 @@ void BlendingKeyframes::updatePropertiesMetadata(const StyleProperties& properti
         if (!cssValue)
             continue;
 
-        if (!m_containsSubstitutionFunctions && cssValue->hasSubstitutionFunctions())
-            m_containsSubstitutionFunctions = true;
+        if (!m_containsCSSVariableReferences && cssValue->hasVariableReferences())
+            m_containsCSSVariableReferences = true;
 
         if (RefPtr primitiveValue = dynamicDowncast<CSSPrimitiveValue>(cssValue)) {
             auto propertyID = propertyReference.id();

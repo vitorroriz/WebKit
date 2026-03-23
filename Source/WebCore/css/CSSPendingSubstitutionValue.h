@@ -29,25 +29,21 @@
 
 #pragma once
 
-#include "CSSSubstitutionValue.h"
 #include "CSSValue.h"
+#include "CSSVariableReferenceValue.h"
 
 namespace WebCore {
 
 class CSSProperty;
 
-// Longhand placeholder for a shorthand value containing substitution functions.
-// Each longhand of the shorthand gets one of these; they share the CSSSubstitutionValue.
-// During style resolution, the shared value is resolved and parsed as the shorthand
-// to extract individual longhand values.
-class CSSShorthandSubstitutionValue final : public CSSValue {
+class CSSPendingSubstitutionValue final : public CSSValue {
 public:
-    static Ref<CSSShorthandSubstitutionValue> create(CSSPropertyID shorthandPropertyId, Ref<CSSSubstitutionValue>&&);
+    static Ref<CSSPendingSubstitutionValue> create(CSSPropertyID shorthandPropertyId, Ref<CSSVariableReferenceValue>&&);
 
-    CSSSubstitutionValue& shorthandValue() const { return m_shorthandValue; }
+    CSSVariableReferenceValue& shorthandValue() const { return m_shorthandValue; }
     CSSPropertyID shorthandPropertyId() const { return m_shorthandPropertyId; }
 
-    bool equals(const CSSShorthandSubstitutionValue& other) const { return m_shorthandValue.ptr() == other.m_shorthandValue.ptr(); }
+    bool equals(const CSSPendingSubstitutionValue& other) const { return m_shorthandValue.ptr() == other.m_shorthandValue.ptr(); }
     static String customCSSText(const CSS::SerializationContext&) { return emptyString(); }
 
     IterationStatus customVisitChildren(NOESCAPE const Function<IterationStatus(CSSValue&)>& func) const
@@ -60,14 +56,14 @@ public:
 private:
     friend class Style::SubstitutionResolver;
 
-    CSSShorthandSubstitutionValue(CSSPropertyID shorthandPropertyId, Ref<CSSSubstitutionValue>&&);
+    CSSPendingSubstitutionValue(CSSPropertyID shorthandPropertyId, Ref<CSSVariableReferenceValue>&&);
 
     const CSSPropertyID m_shorthandPropertyId;
-    const Ref<CSSSubstitutionValue> m_shorthandValue;
+    const Ref<CSSVariableReferenceValue> m_shorthandValue;
 
     mutable Vector<CSSProperty> m_cachedPropertyValues;
 };
 
 } // namespace WebCore
 
-SPECIALIZE_TYPE_TRAITS_CSS_VALUE(CSSShorthandSubstitutionValue, isShorthandSubstitutionValue())
+SPECIALIZE_TYPE_TRAITS_CSS_VALUE(CSSPendingSubstitutionValue, isPendingSubstitutionValue())

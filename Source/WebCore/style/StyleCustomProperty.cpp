@@ -28,10 +28,10 @@
 #include "CSSCalcValue.h"
 #include "CSSPrimitiveValue.h"
 #include "CSSSerializationContext.h"
-#include "CSSSubstitutionValue.h"
 #include "CSSTokenizer.h"
 #include "CSSValueList.h"
 #include "CSSValuePool.h"
+#include "CSSVariableReferenceValue.h"
 #include "RenderStyle.h"
 #include "StyleCalculationValue.h"
 #include "StylePrimitiveNumericTypes+CSSValueCreation.h"
@@ -80,7 +80,7 @@ Ref<CSSValue> CustomProperty::propertyValue(CSSValuePool& pool, const RenderStyl
             return CSSPrimitiveValue::create(""_s);
         },
         [&](const Ref<CSSVariableData>& variableData) -> Ref<CSSValue> {
-            return CSSSubstitutionValue::create(variableData.copyRef());
+            return CSSVariableReferenceValue::create(variableData.copyRef());
         },
         [&](const Value& value) -> Ref<CSSValue> {
             return convertValue(value);

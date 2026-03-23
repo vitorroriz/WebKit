@@ -940,7 +940,7 @@ css/CSSPageDescriptors.cpp
 css/CSSPageRule.cpp
 css/CSSPaintImageValue.cpp
 css/CSSPathValue.cpp
-css/CSSShorthandSubstitutionValue.cpp
+css/CSSPendingSubstitutionValue.cpp
 css/CSSPositionTryDescriptors.cpp
 css/CSSPositionTryRule.cpp
 css/CSSPositionValue.cpp
@@ -981,7 +981,7 @@ css/CSSValueList.cpp
 css/CSSValuePair.cpp
 css/CSSValuePool.cpp
 css/CSSVariableData.cpp
-css/CSSSubstitutionValue.cpp
+css/CSSVariableReferenceValue.cpp
 css/CSSViewTransitionRule.cpp
 css/CSSViewValue.cpp
 css/ComputedStyleDependencies.cpp
@@ -1090,7 +1090,7 @@ css/parser/CSSSelectorParserContext.cpp
 css/parser/CSSSupportsParser.cpp
 css/parser/CSSTokenizer.cpp
 css/parser/CSSTokenizerInputStream.cpp
-css/parser/CSSSubstitutionParser.cpp
+css/parser/CSSVariableParser.cpp
 css/parser/MediaQueryBlockWatcher.cpp
 css/parser/MutableCSSSelector.cpp
 css/parser/SizesAttributeParser.cpp

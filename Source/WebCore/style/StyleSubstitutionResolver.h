@@ -29,10 +29,10 @@
 
 namespace WebCore {
 
-class CSSShorthandSubstitutionValue;
+class CSSPendingSubstitutionValue;
 class CSSValue;
 class CSSVariableData;
-class CSSSubstitutionValue;
+class CSSVariableReferenceValue;
 struct CSSParserContext;
 enum CSSPropertyID : uint16_t;
 enum CSSValueID : uint16_t;
@@ -47,9 +47,9 @@ class SubstitutionResolver {
 public:
     explicit SubstitutionResolver(Builder&);
 
-    RefPtr<CSSValue> substituteAndParse(const CSSSubstitutionValue&, CSSPropertyID) const;
-    RefPtr<CSSValue> substituteAndParseShorthand(const CSSShorthandSubstitutionValue&, CSSPropertyID) const;
-    RefPtr<CSSVariableData> substitute(const CSSSubstitutionValue&) const;
+    RefPtr<CSSValue> substituteAndParse(const CSSVariableReferenceValue&, CSSPropertyID) const;
+    RefPtr<CSSValue> substituteAndParseShorthand(const CSSPendingSubstitutionValue&, CSSPropertyID) const;
+    RefPtr<CSSVariableData> substitute(const CSSVariableReferenceValue&) const;
 
 private:
     std::optional<Vector<CSSParserToken>> substituteTokenRange(CSSParserTokenRange, const CSSParserContext&) const;
@@ -61,7 +61,7 @@ private:
     std::pair<FallbackResult, Vector<CSSParserToken>> substituteVariableFallback(const AtomString& variableName, CSSParserTokenRange, CSSValueID functionId, const CSSParserContext&) const;
 
     RefPtr<const CustomProperty> propertyValueForVariableName(const AtomString&, CSSValueID) const;
-    RefPtr<CSSVariableData> trySimpleSubstitution(const CSSSubstitutionValue&) const;
+    RefPtr<CSSVariableData> trySimpleSubstitution(const CSSVariableReferenceValue&) const;
 
     Builder& m_styleBuilder;
 };
