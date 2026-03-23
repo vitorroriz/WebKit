@@ -104,16 +104,21 @@ LayoutUnit RenderMathMLOperator::trailingSpace() const
 
 LayoutUnit RenderMathMLOperator::minSize() const
 {
-    LayoutUnit minSize { style().fontCascade().size() }; // Default minsize is "1em".
-    minSize = toUserUnits(element().minSize(), style(), minSize);
-    return std::max<LayoutUnit>(0, minSize);
+    // Per MathML Core, default minsize is 100% of the unstretched size and
+    // percentage values are relative to the unstretched size ("height of g").
+    // If the unstretched size is unavailable (e.g. base glyph not found),
+    // percentages and the default resolve to 0 (no constraint).
+    return toUserUnits(element().minSize(), style(), m_mathOperator.unstretchedSize());
 }
 
 LayoutUnit RenderMathMLOperator::maxSize() const
 {
-    LayoutUnit maxSize = intMaxForLayoutUnit; // Default maxsize is ∞.
-    maxSize = toUserUnits(element().maxSize(), style(), maxSize);
-    return std::max<LayoutUnit>(0, maxSize);
+    // Default maxsize is infinity. Percentages are relative to the unstretched size.
+    const auto& length = element().maxSize();
+    if (length.type == MathMLElement::LengthType::ParsingFailed)
+        return intMaxForLayoutUnit;
+
+    return toUserUnits(length, style(), m_mathOperator.unstretchedSize());
 }
 
 bool RenderMathMLOperator::isVertical() const
@@ -142,18 +147,17 @@ void RenderMathMLOperator::stretchTo(LayoutUnit heightAboveBaseline, LayoutUnit 
         m_stretchDepthBelowBaseline = halfStretchSize - axis;
     }
     // We try to honor the minsize/maxsize condition by increasing or decreasing both height and depth proportionately.
-    // The MathML specification does not indicate what to do when maxsize < minsize, so we follow Gecko and make minsize take precedence.
+    // Per MathML Core step 5 of https://w3c.github.io/mathml-core/#layout-of-operators:
+    // "If minsize < 0 then set minsize to 0. If maxsize < minsize then set maxsize to minsize."
     LayoutUnit size = stretchSize();
+    LayoutUnit minSizeValue = std::max(0_lu, minSize());
+    LayoutUnit maxSizeValue = std::max(minSizeValue, maxSize());
     float aspect = 1.0;
     if (size > 0) {
-        LayoutUnit minSizeValue = minSize();
         if (size < minSizeValue)
             aspect = minSizeValue.toFloat() / size;
-        else {
-            LayoutUnit maxSizeValue = maxSize();
-            if (maxSizeValue < size)
-                aspect = maxSizeValue.toFloat() / size;
-        }
+        else if (maxSizeValue < size)
+            aspect = maxSizeValue.toFloat() / size;
     }
     m_stretchHeightAboveBaseline *= aspect;
     m_stretchDepthBelowBaseline *= aspect;
