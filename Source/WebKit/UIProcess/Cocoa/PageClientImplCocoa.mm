@@ -32,6 +32,7 @@
 #import "WKWebViewInternal.h"
 #import "WebFullScreenManagerProxy.h"
 #import "WebPageProxy.h"
+#import "WebPreferences.h"
 #import <WebCore/AlternativeTextUIController.h>
 #import <WebCore/Color.h>
 #import <WebCore/FixedContainerEdges.h>
