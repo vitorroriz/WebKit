@@ -2846,6 +2846,59 @@ private:
                 break;
             }
 
+            {
+                bool converted = false;
+                switch (m_value->opcode()) {
+                case BelowEqual: {
+                    // Turn this: value <= 0
+                    // Into this: value == 0
+                    if (m_value->child(1)->isInt(0)) {
+                        replaceWithNew<Value>(Equal, m_value->origin(), m_value->child(0), m_value->child(1));
+                        converted = true;
+                        break;
+                    }
+                    break;
+                }
+                case Below: {
+                    // Turn this: value < 1
+                    // Into this: value == 0
+                    if (m_value->child(1)->isInt(1)) {
+                        auto* constant = m_insertionSet.insertValue(m_index, m_proc.addIntConstant(m_value->child(1), 0));
+                        replaceWithNew<Value>(Equal, m_value->origin(), m_value->child(0), constant);
+                        converted = true;
+                        break;
+                    }
+                    break;
+                }
+                case AboveEqual: {
+                    // Turn this: value >= 1
+                    // Into this: value != 0
+                    if (m_value->child(1)->isInt(1)) {
+                        auto* constant = m_insertionSet.insertValue(m_index, m_proc.addIntConstant(m_value->child(1), 0));
+                        replaceWithNew<Value>(NotEqual, m_value->origin(), m_value->child(0), constant);
+                        converted = true;
+                        break;
+                    }
+                    break;
+                }
+                case Above: {
+                    // Turn this: value > 0
+                    // Into this: value != 0
+                    if (m_value->child(1)->isInt(0)) {
+                        replaceWithNew<Value>(NotEqual, m_value->origin(), m_value->child(0), m_value->child(1));
+                        converted = true;
+                        break;
+                    }
+                    break;
+                }
+                default:
+                    break;
+                }
+
+                if (converted)
+                    break;
+            }
+
             if (m_value->child(0)->isInteger() && m_value->child(0) == m_value->child(1)) {
                 switch (m_value->opcode()) {
                 case LessThan:
