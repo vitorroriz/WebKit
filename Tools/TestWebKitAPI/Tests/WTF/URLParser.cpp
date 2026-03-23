@@ -1134,4 +1134,11 @@ TEST_F(WTF_URLParser, AdditionalTests)
         { "http"_s, ""_s, ""_s, "w"_s, 0, "/"_s, "%EF%BF%BD"_s, ""_s, "http://w/?%EF%BF%BD"_s });
 }
 
+TEST_F(WTF_URLParser, FilePathStartBackslash)
+{
+    // Backslash after empty host in file URL should be treated like forward slash in FilePathStart,
+    // triggering Windows drive letter detection. The pipe in C| must be normalized to a colon.
+    checkURL("file://\\C|\\path"_s, { "file"_s, ""_s, ""_s, ""_s, 0, "/C:/path"_s, ""_s, ""_s, "file:///C:/path"_s }, TestTabs::No);
+}
+
 } // namespace TestWebKitAPI

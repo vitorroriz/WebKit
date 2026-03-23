@@ -1708,7 +1708,7 @@ void URLParser::parse(std::span<const CharacterType> input, const URL& base, con
             break;
         case State::FilePathStart:
             LOG_STATE("FilePathStart");
-            if (*c == '/' || *c != '\\') {
+            if (*c == '/' || *c == '\\') {
                 if (m_urlIsSpecial && *c == '\\') [[unlikely]]
                     syntaxViolation(c);
                 appendToASCIIBuffer('/');
