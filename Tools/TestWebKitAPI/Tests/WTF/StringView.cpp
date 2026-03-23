@@ -954,6 +954,38 @@ TEST(WTF, StringViewReverseFindBasic)
     EXPECT_EQ(reference.reverseFind('c', 4), notFound);
 }
 
+TEST(WTF, StringViewReverseFindStringView)
+{
+    auto reference = stringViewFromLiteral("Cappuccino");
+
+    // Basic substring search.
+    EXPECT_EQ(reference.reverseFind(stringViewFromLiteral("ccino")), 5U);
+    EXPECT_EQ(reference.reverseFind(stringViewFromLiteral("Cap")), 0U);
+    EXPECT_EQ(reference.reverseFind(stringViewFromLiteral("puc")), 3U);
+    EXPECT_EQ(reference.reverseFind(stringViewFromLiteral("xyz")), notFound);
+
+    // Search with start position.
+    EXPECT_EQ(reference.reverseFind(stringViewFromLiteral("cc"), 6), 5U);
+    EXPECT_EQ(reference.reverseFind(stringViewFromLiteral("cc"), 4), notFound);
+
+    // Empty match string returns clamped start position.
+    EXPECT_EQ(reference.reverseFind(stringViewFromLiteral("")), 10U);
+    EXPECT_EQ(reference.reverseFind(stringViewFromLiteral(""), 5), 5U);
+
+    // Match string longer than haystack.
+    EXPECT_EQ(reference.reverseFind(stringViewFromLiteral("Cappuccino!")), notFound);
+
+    // Null haystack.
+    StringView nullView;
+    EXPECT_EQ(nullView.reverseFind(stringViewFromLiteral("abc")), notFound);
+
+    // Null match string.
+    EXPECT_EQ(reference.reverseFind(nullView), notFound);
+
+    // Full string match.
+    EXPECT_EQ(reference.reverseFind(stringViewFromLiteral("Cappuccino")), 0U);
+}
+
 TEST(WTF, StringViewTrim)
 {
     auto isA = [] (char16_t c) { 

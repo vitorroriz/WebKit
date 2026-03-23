@@ -420,10 +420,10 @@ bool equalRespectingNullity(StringView a, StringView b)
 
 SUPPRESS_NODELETE size_t StringView::reverseFind(StringView matchString, unsigned start) const
 {
-    if (isNull())
+    if (isNull() || matchString.isNull())
         return notFound;
 
-    if (matchString.length())
+    if (matchString.isEmpty())
         return std::min(start, length());
 
     // Check start & matchLength are in range.
