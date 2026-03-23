@@ -89,7 +89,7 @@ private:
         WeakPtr<HTMLModelElement, WeakPtrImplWithEventTargetData> element;
     };
     ActiveRequest m_activeRequest;
-    std::optional<Exception> checkRequestStillValid(HTMLModelElement*, ActiveRequest::Stage expectedStage);
+    std::optional<Exception> isRequestOutdated(HTMLModelElement*, ActiveRequest::Stage expectedStage);
 
     void cancelActiveRequest(CompletionHandler<void()>&&);
     void beginImmersiveRequest(Ref<HTMLModelElement>&&, CompletionHandler<void(ExceptionOr<void>)>&&);
