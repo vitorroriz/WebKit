@@ -574,7 +574,7 @@ inline size_t Deque<T, inlineCapacity>::removeAllMatching(const Predicate& predi
         if (!predicate(value))
             append(WTF::move(value));
     }
-    return size() - oldSize;
+    return oldSize - size();
 }
 
 template<typename T, size_t inlineCapacity>
