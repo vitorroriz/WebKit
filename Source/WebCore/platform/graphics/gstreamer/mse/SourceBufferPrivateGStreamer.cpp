@@ -82,16 +82,73 @@ SourceBufferPrivateGStreamer::SourceBufferPrivateGStreamer(MediaSourcePrivateGSt
     std::call_once(debugRegisteredFlag, [] {
         GST_DEBUG_CATEGORY_INIT(webkit_mse_sourcebuffer_debug, "webkitmsesourcebuffer", 0, "WebKit MSE SourceBuffer");
     });
+
+#if !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
+    m_logger->addMessageHandlerObserver(*this);
+#endif
 }
 
 SourceBufferPrivateGStreamer::~SourceBufferPrivateGStreamer()
 {
+#if !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
+    m_logger->removeMessageHandlerObserver(*this);
+#endif
+
     if (!m_appendPromise)
         return;
 
     m_appendPromise->reject(PlatformMediaError::BufferRemoved);
     m_appendPromise.reset();
 }
+
+#if !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
+void SourceBufferPrivateGStreamer::handleLogMessage(const WTFLogChannel& channel, WTFLogLevel level, Vector<JSONLogValue>&& values)
+{
+    auto name = StringView::fromLatin1(channel.name);
+    if (name != "MediaSource"_s)
+        return;
+
+    if (!gst_debug_category_get_threshold(GST_CAT_DEFAULT))
+        return;
+
+    // Ignore logs containing only the call site information.
+    if (values.size() < 2)
+        return;
+
+    // Parse "foo::bar(hexidentifier) "
+    auto& callSite = values[0].value;
+    auto leftParenthesisIndex = callSite.reverseFind('(');
+    if (leftParenthesisIndex == notFound)
+        return;
+
+    auto rightParenthesisIndex = callSite.reverseFind(')');
+    if (rightParenthesisIndex == notFound)
+        return;
+
+    if (!m_objectIdentifierString)
+        m_objectIdentifierString = makeString(hex(sourceBufferLogIdentifier()));
+
+    auto identifier = callSite.substring(leftParenthesisIndex + 1, rightParenthesisIndex - leftParenthesisIndex - 1);
+    if (identifier != m_objectIdentifierString)
+        return;
+
+    StringBuilder builder;
+    for (auto& value : values.subvector(1))
+        builder.append(WTF::makeStringByReplacingAll(value.value, '\"', '\''));
+
+    // Find the C++ method name, foo::bar() -> bar.
+    auto methodName = emptyString();
+    auto methodNameSeparatorIndex = callSite.reverseFind(':');
+    if (methodNameSeparatorIndex != notFound)
+        methodName = callSite.substring(methodNameSeparatorIndex + 1, leftParenthesisIndex - methodNameSeparatorIndex - 1);
+
+    auto gstDebugLevel = gstDebugLevelFromWTFLogLevel(level);
+    auto message = builder.toString();
+    auto pipeline = m_appendPipeline ? m_appendPipeline->pipeline() : nullptr;
+    // FIXME: Filename and line number are inaccurate. https://bugs.webkit.org/show_bug.cgi?id=310526
+    gst_debug_log(GST_CAT_DEFAULT, gstDebugLevel, __FILE__, methodName.utf8().data(), __LINE__, G_OBJECT(pipeline), "%s", message.utf8().data());
+}
+#endif // !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
 
 Ref<MediaPromise> SourceBufferPrivateGStreamer::appendInternal(Ref<SharedBuffer>&& data)
 {

@@ -675,22 +675,7 @@ void WebCoreLogObserver::didLogMessage(const WTFLogChannel& channel, WTFLogLevel
         builder.append(value);
 
     auto logString = builder.toString();
-    GstDebugLevel gstDebugLevel;
-    switch (level) {
-    case WTFLogLevel::Error:
-        gstDebugLevel = GST_LEVEL_ERROR;
-        break;
-    case WTFLogLevel::Debug:
-        gstDebugLevel = GST_LEVEL_DEBUG;
-        break;
-    case WTFLogLevel::Always:
-    case WTFLogLevel::Info:
-        gstDebugLevel = GST_LEVEL_INFO;
-        break;
-    case WTFLogLevel::Warning:
-        gstDebugLevel = GST_LEVEL_WARNING;
-        break;
-    };
+    auto gstDebugLevel = gstDebugLevelFromWTFLogLevel(level);
     gst_debug_log(debugCategory(), gstDebugLevel, __FILE__, __FUNCTION__, __LINE__, nullptr, "%s", logString.utf8().data());
 #else
     UNUSED_PARAM(channel);
@@ -2291,6 +2276,24 @@ void dumpBinToDotFile(const GRefPtr<GstElement>& element, const String& filename
     ASSERT(GST_IS_BIN(element.get()));
     dumpBinToDotFile(GST_BIN_CAST(element.get()), filename, details);
 }
+
+#if !RELEASE_LOG_DISABLED
+GstDebugLevel gstDebugLevelFromWTFLogLevel(WTFLogLevel level)
+{
+    switch (level) {
+    case WTFLogLevel::Error:
+        return GST_LEVEL_ERROR;
+    case WTFLogLevel::Debug:
+        return GST_LEVEL_DEBUG;
+    case WTFLogLevel::Always:
+    case WTFLogLevel::Info:
+        return GST_LEVEL_INFO;
+    case WTFLogLevel::Warning:
+        return GST_LEVEL_WARNING;
+    };
+    return GST_LEVEL_NONE;
+}
+#endif
 
 #undef GST_CAT_DEFAULT
 

@@ -521,13 +521,6 @@ void AppendPipeline::appsinkNewSample(const Track& track, GRefPtr<GstSample>&& s
 
     auto mediaSample = MediaSampleGStreamer::create(WTF::move(sample), track.presentationSize, track.trackId);
 
-    GST_TRACE_OBJECT(pipeline(), "append: trackId=%" PRIu64 " PTS=%s DTS=%s DUR=%s presentationSize=%.0fx%.0f",
-        mediaSample->trackID(),
-        mediaSample->presentationTime().toString().utf8().data(),
-        mediaSample->decodeTime().toString().utf8().data(),
-        mediaSample->duration().toString().utf8().data(),
-        mediaSample->presentationSize().width(), mediaSample->presentationSize().height());
-
     // Hack, rework when GStreamer >= 1.16 becomes a requirement:
     // We're not applying edit lists. GStreamer < 1.16 doesn't emit the correct segments to do so.
     // GStreamer fix in https://gitlab.freedesktop.org/gstreamer/gst-plugins-good/-/commit/c2a0da8096009f0f99943f78dc18066965be60f9
