@@ -21,15 +21,17 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-public import Foundation
-import RegexBuilder
+import Foundation
+import pal.Core.system.cocoa.RegexHelper
 
-public class RegexHelper {
-    public static func match(pattern: NSString, value: NSString, shouldIgnoreCase: Bool) -> Bool {
-        guard let expression = try? Regex(pattern as String) else {
+@objc
+@implementation
+extension WebPALRegexHelper {
+    @objc(matchPattern:value:shouldIgnoreCase:)
+    class func matchPattern(_ pattern: String, value: String, shouldIgnoreCase: Bool) -> Bool {
+        guard let expression = try? Regex(pattern) else {
             return false
         }
-        let swiftValue = value as String
-        return swiftValue.contains(shouldIgnoreCase ? expression.ignoresCase() : expression)
+        return value.contains(shouldIgnoreCase ? expression.ignoresCase() : expression)
     }
 }

@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		070BEE2D2F0381BF00392FEA /* module.modulemap in Headers */ = {isa = PBXBuildFile; fileRef = 94C759022B990D31000CC511 /* module.modulemap */; settings = {ATTRIBUTES = (Private, ); }; };
 		071CFF4F2F0614FB00E07A47 /* pal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071CFF4E2F0614FB00E07A47 /* pal.swift */; };
+		0721D32D2F709E930069239A /* RegexHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 0721D32A2F709E930069239A /* RegexHelper.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		0721D3322F709F9F0069239A /* RegexHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0721D3312F709F9F0069239A /* RegexHelper.swift */; };
 		07611DB7243FA5BF00D80704 /* UsageTrackingSoftLink.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07611DB5243FA5BF00D80704 /* UsageTrackingSoftLink.mm */; };
 		077121B62C1E8B4400FACBF9 /* WritingToolsSPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 077121B52C1E8B4400FACBF9 /* WritingToolsSPI.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		077121BA2C1E8BE500FACBF9 /* WritingToolsUISPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 077121B92C1E8BE500FACBF9 /* WritingToolsUISPI.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -53,7 +55,6 @@
 		3CBEEDE928A1861D00221FAE /* BarcodeSupportSPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C963637289DC1C600570DD6 /* BarcodeSupportSPI.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		416E995323DAE6BE00E871CB /* AudioToolboxSoftLink.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 416E995123DAE6BD00E871CB /* AudioToolboxSoftLink.cpp */; };
 		4177B3DA296CB8C3009711F0 /* CoreCryptoSPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 4177B3D9296CB8C3009711F0 /* CoreCryptoSPI.h */; };
-		41832D362F16454200103096 /* RegexpHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41832D352F16454200103096 /* RegexpHelper.swift */; };
 		41D99CC82C9C45590025844F /* AVFAudioSoftLink.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D99CC22C9C45580025844F /* AVFAudioSoftLink.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		41D99CC92C9C45590025844F /* AVFAudioSoftLink.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41D99CC72C9C45580025844F /* AVFAudioSoftLink.mm */; };
 		41E1F344248A6A000022D5DE /* VideoToolboxSoftLink.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 416E995523DAEFF700E871CB /* VideoToolboxSoftLink.cpp */; };
@@ -458,6 +459,8 @@
 
 /* Begin PBXFileReference section */
 		071CFF4E2F0614FB00E07A47 /* pal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = pal.swift; sourceTree = "<group>"; };
+		0721D32A2F709E930069239A /* RegexHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RegexHelper.h; sourceTree = "<group>"; };
+		0721D3312F709F9F0069239A /* RegexHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexHelper.swift; sourceTree = "<group>"; };
 		07611DB4243FA5BE00D80704 /* UsageTrackingSoftLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsageTrackingSoftLink.h; sourceTree = "<group>"; };
 		07611DB5243FA5BF00D80704 /* UsageTrackingSoftLink.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = UsageTrackingSoftLink.mm; sourceTree = "<group>"; };
 		077121B52C1E8B4400FACBF9 /* WritingToolsSPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WritingToolsSPI.h; sourceTree = "<group>"; };
@@ -614,7 +617,6 @@
 		416E995523DAEFF700E871CB /* VideoToolboxSoftLink.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VideoToolboxSoftLink.cpp; sourceTree = "<group>"; };
 		416E995623DAEFF700E871CB /* VideoToolboxSoftLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoToolboxSoftLink.h; sourceTree = "<group>"; };
 		4177B3D9296CB8C3009711F0 /* CoreCryptoSPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreCryptoSPI.h; sourceTree = "<group>"; };
-		41832D352F16454200103096 /* RegexpHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexpHelper.swift; sourceTree = "<group>"; };
 		41B99E4525DD70150007829A /* AVStreamDataParserSPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVStreamDataParserSPI.h; sourceTree = "<group>"; };
 		41D99CC22C9C45580025844F /* AVFAudioSoftLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVFAudioSoftLink.h; sourceTree = "<group>"; };
 		41D99CC72C9C45580025844F /* AVFAudioSoftLink.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AVFAudioSoftLink.mm; sourceTree = "<group>"; };
@@ -808,7 +810,6 @@
 			isa = PBXGroup;
 			children = (
 				94F4AA012B730D2C006DFFDE /* CryptoKitShim.swift */,
-				41832D352F16454200103096 /* RegexpHelper.swift */,
 				94A41E702BB1E10D00DA715C /* UnsafeOverlays.swift */,
 			);
 			path = PALSwift;
@@ -1379,6 +1380,8 @@
 		A3AB6E5D1F3D1E28009C14B1 /* cocoa */ = {
 			isa = PBXGroup;
 			children = (
+				0721D32A2F709E930069239A /* RegexHelper.h */,
+				0721D3312F709F9F0069239A /* RegexHelper.swift */,
 				A3AB6E5E1F3D1E39009C14B1 /* SleepDisablerCocoa.cpp */,
 				A3AB6E5F1F3D1E39009C14B1 /* SleepDisablerCocoa.h */,
 			);
@@ -1572,6 +1575,7 @@
 				DD20DDC127BC90D70093D175 /* QuickLookSoftLink.h in Headers */,
 				DD20DE1827BC90D80093D175 /* QuickLookSPI.h in Headers */,
 				DD20DDC727BC90D70093D175 /* QuickLookUISoftLink.h in Headers */,
+				0721D32D2F709E930069239A /* RegexHelper.h in Headers */,
 				DD20DD2327BC90D60093D175 /* RevealSoftLink.h in Headers */,
 				DD20DE0627BC90D80093D175 /* RevealSPI.h in Headers */,
 				41E9EE2628BCA19E006A2298 /* SBSStatusBarSPI.h in Headers */,
@@ -1842,7 +1846,7 @@
 				4450FC9F21F5F602004DFA56 /* QuickLookSoftLink.mm in Sources */,
 				F4C85A4E2658551A005B89CC /* QuickLookUISoftLink.mm in Sources */,
 				DD5697F92DC1303C00050321 /* rdar150228472.swift in Sources */,
-				41832D362F16454200103096 /* RegexpHelper.swift in Sources */,
+				0721D3322F709F9F0069239A /* RegexHelper.swift in Sources */,
 				F4974EA4265EEA2200B49B8C /* RevealSoftLink.mm in Sources */,
 				07789181273B14FF00E408D1 /* ScreenCaptureKitSoftLink.mm in Sources */,
 				6D45AA372D026F8F0002871B /* ScreenTimeSoftLink.mm in Sources */,
