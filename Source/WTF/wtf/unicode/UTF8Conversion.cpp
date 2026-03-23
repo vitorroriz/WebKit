@@ -40,7 +40,7 @@ static constexpr char32_t sentinelCodePoint = U_SENTINEL;
 enum class Replacement : bool { None, ReplaceInvalidSequences };
 
 template<Replacement = Replacement::None, typename CharacterType> static char32_t next(std::span<const CharacterType>, size_t& offset);
-template<Replacement = Replacement::None, typename CharacterType> static bool append(std::span<CharacterType>, size_t& offset, char32_t character);
+template<typename CharacterType> static bool append(std::span<CharacterType>, size_t& offset, char32_t character);
 
 template<> char32_t next<Replacement::None, Latin1Character>(std::span<const Latin1Character> characters, size_t& offset)
 {
@@ -75,30 +75,18 @@ template<> char32_t next<Replacement::ReplaceInvalidSequences, char16_t>(std::sp
     return character;
 }
 
-template<> bool append<Replacement::None, char8_t>(std::span<char8_t> characters, size_t& offset, char32_t character)
+template<> bool append<char8_t>(std::span<char8_t> characters, size_t& offset, char32_t character)
 {
     UBool sawError = false;
     U8_APPEND(characters, offset, characters.size(), character, sawError);
     return sawError;
 }
 
-template<> bool append<Replacement::ReplaceInvalidSequences, char8_t>(std::span<char8_t> characters, size_t& offset, char32_t character)
-{
-    return append(characters, offset, character)
-        && append(characters, offset, replacementCharacter);
-}
-
-template<> bool append<Replacement::None, char16_t>(std::span<char16_t> characters, size_t& offset, char32_t character)
+template<> bool append<char16_t>(std::span<char16_t> characters, size_t& offset, char32_t character)
 {
     UBool sawError = false;
     U16_APPEND(characters, offset, characters.size(), character, sawError);
     return sawError;
-}
-
-template<> bool append<Replacement::ReplaceInvalidSequences, char16_t>(std::span<char16_t> characters, size_t& offset, char32_t character)
-{
-    return append(characters, offset, character)
-        && append(characters, offset, replacementCharacter);
 }
 
 template<Replacement replacement = Replacement::None, typename SourceCharacterType, typename BufferCharacterType> static ConversionResult<BufferCharacterType> convertInternal(std::span<const SourceCharacterType> source, std::span<BufferCharacterType> buffer)
@@ -116,7 +104,7 @@ template<Replacement replacement = Replacement::None, typename SourceCharacterTy
             resultCode = ConversionResultCode::TargetExhausted;
             break;
         }
-        bool sawError = append<replacement>(buffer, bufferOffset, character);
+        bool sawError = append(buffer, bufferOffset, character);
         if (sawError) {
             resultCode = ConversionResultCode::TargetExhausted;
             break;

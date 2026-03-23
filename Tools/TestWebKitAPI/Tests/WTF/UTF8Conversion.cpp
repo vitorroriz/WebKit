@@ -379,8 +379,8 @@ TEST(WTF_UTF8Conversion, UTF8ToUTF16ReplacingInvalidSequences)
     EXPECT_STREQ("0061 target exhausted", serialize(convertReplacingInvalidSequences(char8Array('a', 0), buffer1)));
     EXPECT_STREQ("D7FF target exhausted", serialize(convertReplacingInvalidSequences(char8Array(0xED, 0x9F, 0xBF, 0), buffer1)));
 
-    EXPECT_STREQ("FFFD", serialize(convertReplacingInvalidSequences(char8Array(0xF0, 0x90, 0x80, 0x80), buffer1)));
-    EXPECT_STREQ("FFFD", serialize(convertReplacingInvalidSequences(char8Array(0xF4, 0x8F, 0xBF, 0xBF), buffer1)));
+    EXPECT_STREQ("target exhausted", serialize(convertReplacingInvalidSequences(char8Array(0xF0, 0x90, 0x80, 0x80), buffer1)));
+    EXPECT_STREQ("target exhausted", serialize(convertReplacingInvalidSequences(char8Array(0xF4, 0x8F, 0xBF, 0xBF), buffer1)));
 
     EXPECT_STREQ("FFFD target exhausted", serialize(convertReplacingInvalidSequences(char8Array(0xF4, 0x90, 0x80, 0x80), buffer1)));
 
@@ -464,6 +464,28 @@ TEST(WTF_UTF8Conversion, UTF16ToUTF8ReplacingInvalidSequences)
     EXPECT_STREQ("target exhausted", serialize(convertReplacingInvalidSequences(char16Array(0xDC00, 0xDC00), buffer1)));
     EXPECT_STREQ("target exhausted", serialize(convertReplacingInvalidSequences(char16Array(0xD800, 0), buffer1)));
     EXPECT_STREQ("target exhausted", serialize(convertReplacingInvalidSequences(char16Array(0xD800, 0xE000), buffer1)));
+}
+
+TEST(WTF_UTF8Conversion, ReplaceInvalidSequencesShouldNotCorruptValidSupplementaryCharacters)
+{
+    using namespace WTF::Unicode;
+
+    // UTF-16 to UTF-8: valid U+10000 (surrogate pair) needs 4 UTF-8 bytes.
+    // A 3-byte buffer cannot hold it. Should report TargetExhausted, not silently write U+FFFD.
+    std::array<char8_t, 3> utf8Buffer3;
+    EXPECT_STREQ("target exhausted", serialize(convertReplacingInvalidSequences(char16Array(0xD800, 0xDC00), utf8Buffer3)));
+
+    // Same but with an ASCII prefix: 'a' takes 1 byte, leaving 2. U+10000 needs 4. Should stop after 'a'.
+    EXPECT_STREQ("61 target exhausted", serialize(convertReplacingInvalidSequences(char16Array('a', 0xD800, 0xDC00), utf8Buffer3)));
+
+    // UTF-8 to UTF-16: valid U+10000 (F0 90 80 80) needs 2 UTF-16 units.
+    // A 1-unit buffer cannot hold it. Should report TargetExhausted, not silently write U+FFFD.
+    std::array<char16_t, 1> utf16Buffer1;
+    EXPECT_STREQ("target exhausted", serialize(convertReplacingInvalidSequences(char8Array(0xF0, 0x90, 0x80, 0x80), utf16Buffer1)));
+
+    // Same but with an ASCII prefix: 'a' takes 1 unit, leaving 1. U+10000 needs 2. Should stop after 'a'.
+    std::array<char16_t, 2> utf16Buffer2;
+    EXPECT_STREQ("0061 target exhausted", serialize(convertReplacingInvalidSequences(char8Array('a', 0xF0, 0x90, 0x80, 0x80), utf16Buffer2)));
 }
 
 TEST(WTF_UTF8Conversion, CheckUTF8)
