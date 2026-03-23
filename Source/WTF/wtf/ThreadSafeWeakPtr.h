@@ -99,7 +99,7 @@ public:
                 // We retained ourselves above.
                 Locker locker { m_lock };
                 hasOtherWeakRefs = --m_weakReferenceCount;
-                // release the lock here so we don't do it in Locker's destuctor after we've already called delete.
+                // release the lock here so we don't do it in Locker's destructor after we've already called delete.
             }
 
             if (!hasOtherWeakRefs)
