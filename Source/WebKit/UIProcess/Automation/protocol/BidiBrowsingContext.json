@@ -140,7 +140,7 @@
             "parameters": [
                 { "name": "context", "$ref": "BidiBrowsingContext.BrowsingContext", "description": "The identifier of the browsing context to navigate." },
                 { "name": "url", "type": "string", "description": "The URL to navigate to." },
-                { "name": "wait", "$ref": "BidiBrowsingContext.ReadinessState", "optional": true, "description": "The readiness state at which the command will return (default is 'none')." }
+                { "name": "wait", "type": "string", "optional": true, "description": "The readiness state at which the command will return (default is 'none'). Should be a BidiBrowsingContext.ReadinessState value." }
             ],
             "returns": [
                 { "name": "url", "type": "string", "description": "The URL the browsing context navigated to." },

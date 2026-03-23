@@ -2513,25 +2513,36 @@
     "imported/w3c/webdriver/tests/bidi/browsing_context/navigate/image.py": {
         "expected": { "all": { "status": ["FAIL"], "bug": "webkit.org/b/288330"}}
     },
-    "imported/w3c/webdriver/tests/bidi/browsing_context/navigate/invalid.py": {
-        "subtests": {
-            "test_params_context_invalid_value[]": {
-                "expected": { "all": { "status": ["FAIL"], "bug": "webkit.org/b/288330"}}
-            },
-            "test_params_context_invalid_value[somestring]": {
-                "expected": { "all": { "status": ["FAIL"], "bug": "webkit.org/b/288330"}}
-            },
-            "test_params_wait_invalid_value[]": {
-                "expected": { "all": { "status": ["FAIL"], "bug": "webkit.org/b/288330"}}
-            },
-            "test_params_wait_invalid_value[somestring]": {
-                "expected": { "all": { "status": ["FAIL"], "bug": "webkit.org/b/288330"}}
-            }
-        }
-    },
     "imported/w3c/webdriver/tests/bidi/browsing_context/navigate/navigate.py": {
         "subtests": {
             "test_payload": {
+                "expected": { "all": { "status": ["PASS"]}}
+            },
+            "test_interrupted_navigation[none-Interrupted immediately]": {
+                "expected": { "all": { "status": ["PASS"]}}
+            },
+            "test_interrupted_navigation[none-Interrupted on DOMContentLoaded]": {
+                "expected": { "all": { "status": ["PASS"]}}
+            },
+            "test_interrupted_navigation[none-Interrupted on load]": {
+                "expected": { "all": { "status": ["PASS"]}}
+            },
+            "test_interrupted_navigation[interactive-Interrupted immediately]": {
+                "expected": { "all": { "status": ["PASS"]}}
+            },
+            "test_interrupted_navigation[interactive-Interrupted on DOMContentLoaded]": {
+                "expected": { "all": { "status": ["PASS"]}}
+            },
+            "test_interrupted_navigation[interactive-Interrupted on load]": {
+                "expected": { "all": { "status": ["PASS"]}}
+            },
+            "test_interrupted_navigation[complete-Interrupted immediately]": {
+                "expected": { "all": { "status": ["PASS"]}}
+            },
+            "test_interrupted_navigation[complete-Interrupted on DOMContentLoaded]": {
+                "expected": { "all": { "status": ["PASS"]}}
+            },
+            "test_interrupted_navigation[complete-Interrupted on load]": {
                 "expected": { "all": { "status": ["PASS"]}}
             }
         },
