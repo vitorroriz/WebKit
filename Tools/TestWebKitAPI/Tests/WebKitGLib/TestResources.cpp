@@ -21,8 +21,8 @@
 
 #include "WebKitTestServer.h"
 #include "WebViewTest.h"
+#include <wtf/Lock.h>
 #include <wtf/Vector.h>
-#include <wtf/glib/GMutexLocker.h>
 #include <wtf/glib/GRefPtr.h>
 
 static WebKitTestServer* kServer;
@@ -693,7 +693,7 @@ static void testWebResourceSendRequest(SendRequestTest* test, gconstpointer)
     events.clear();
 }
 
-static GMutex s_serverMutex;
+static Lock s_serverLock;
 static const unsigned s_maxConnectionsPerHost = 6;
 
 class SyncRequestOnMaxConnsTest: public ResourcesTest {
@@ -720,7 +720,7 @@ public:
 
 static void testWebViewSyncRequestOnMaxConns(SyncRequestOnMaxConnsTest* test, gconstpointer)
 {
-    WTF::GMutexLocker<GMutex> lock(s_serverMutex);
+    s_serverLock.lock();
     test->loadURI(kServer->getURIForPath("/sync-request-on-max-conns-0").data());
     test->waitUntilResourcesStarted(s_maxConnectionsPerHost + 1); // s_maxConnectionsPerHost resource + main resource.
 
@@ -732,18 +732,17 @@ static void testWebViewSyncRequestOnMaxConns(SyncRequestOnMaxConnsTest* test, gc
     // By default sync XHRs have a 10 seconds timeout, we don't want to wait all that so use our own timeout.
     guint timeoutSourceID = g_timeout_add(1000, [] (gpointer) -> gboolean {
         g_assert_not_reached();
+        s_serverLock.unlock();
         return G_SOURCE_REMOVE;
     }, nullptr);
 
     struct UnlockServerSourceContext {
-        WTF::GMutexLocker<GMutex>& lock;
         guint unlockServerSourceID;
     } context = {
-        lock,
         g_idle_add_full(G_PRIORITY_DEFAULT, [](gpointer userData) -> gboolean {
             auto& context = *static_cast<UnlockServerSourceContext*>(userData);
             context.unlockServerSourceID = 0;
-            context.lock.unlock();
+            s_serverLock.unlock();
             return G_SOURCE_REMOVE;
         }, &context, nullptr)
     };
@@ -864,8 +863,8 @@ static void serverCallback(SoupServer* server, SoupServerMessage* message, const
             contents = g_string_free(imagesHTML, FALSE);
         } else {
             {
-                // We don't actually need to keep the mutex, so we release it as soon as we get it.
-                WTF::GMutexLocker<GMutex> lock(s_serverMutex);
+                // We don't actually need to keep the lock, so we release it as soon as we get it.
+                Locker locker { s_serverLock };
             }
 
             GUniquePtr<char> filePath(g_build_filename(Test::getResourcesDir().data(), "blank.ico", nullptr));
