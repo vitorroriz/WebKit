@@ -604,6 +604,8 @@ webkit.org/b/257624 imported/w3c/web-platform-tests/html/infrastructure/urls/res
 webkit.org/b/257624 imported/w3c/web-platform-tests/media-source/mediasource-play.html [ Failure Pass ]
 webkit.org/b/257624 imported/w3c/web-platform-tests/media-source/mediasource-redundant-seek.html [ Failure Pass ]
 
+webkit.org/b/310547 imported/w3c/web-platform-tests/media-source/mediasource-append-buffer.html [ Failure Pass ]
+
 # Sometimes times out, it's easier to reproduce with WPE Platform API.
 fullscreen/full-screen-enter-while-exiting-multiple-elements.html [ Pass Timeout ]
 
