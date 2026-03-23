@@ -2304,9 +2304,9 @@ sub checkRequiredSystemConfig
             print "*************************************************************\n";
         }
         determineXcodeVersion();
-        if (eval "v$xcodeVersion" lt v7.0) {
+        if (eval "v$xcodeVersion" lt v26.2) {
             print "*************************************************************\n";
-            print "Xcode 7.0 or later is required to build WebKit.\n";
+            print "Xcode 26.2 or later is required to build WebKit.\n";
             print "You have an earlier version of Xcode, thus the build will\n";
             print "most likely fail. The latest Xcode is available from the App Store.\n";
             print "*************************************************************\n";
