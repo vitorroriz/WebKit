@@ -1793,10 +1793,10 @@ void WebGL2RenderingContext::beginQuery(GCGLenum target, WebGLQuery& query)
     query.setTarget(target);
 }
 
-void WebGL2RenderingContext::endQuery(GCGLenum target)
+void WebGL2RenderingContext::endQuery(ScriptExecutionContext& scriptExecutionContext, GCGLenum target)
 {
     Locker locker { objectGraphLock() };
-    if (isContextLost() || !scriptExecutionContext())
+    if (isContextLost())
         return;
     auto activeQueryKey = validateQueryTarget("endQuery"_s, target);
     if (!activeQueryKey)
@@ -1808,14 +1808,14 @@ void WebGL2RenderingContext::endQuery(GCGLenum target)
     graphicsContextGL()->endQuery(target);
 
     // A query's result must not be made available until control has returned to the user agent's main loop.
-    protect(protect(scriptExecutionContext())->eventLoop())->queueMicrotask(protect(scriptExecutionContext())->vm(), [query = WTF::move(m_activeQueries[*activeQueryKey])] {
+    protect(scriptExecutionContext.eventLoop())->queueMicrotask(scriptExecutionContext.vm(), [query = WTF::move(m_activeQueries[*activeQueryKey])] {
         query->makeResultAvailable();
     });
 }
 
 WebGLAny WebGL2RenderingContext::getQuery(GCGLenum target, GCGLenum pname)
 {
-    if (isContextLost() || !scriptExecutionContext())
+    if (isContextLost())
         return nullptr;
 
     RefPtr context = m_context;
