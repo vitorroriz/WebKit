@@ -66,8 +66,8 @@ protected:
     ~ThreadSafeRefCountedWithSuppressingSaferCPPCheckingBase()
     {
         m_refCountDebugger.willDestroy(m_refCount);
-        // FIXME: Test performance, then change this to RELEASE_ASSERT.
-        ASSERT(m_refCount == 1);
+        // Ideally we'd use a RELEASE_ASSERT() here but it is a 0.7-0.8% regression on Speedometer 3.
+        ASSERT_WITH_SECURITY_IMPLICATION(m_refCount == 1);
     }
 
     // Returns true if the pointer should be freed.
