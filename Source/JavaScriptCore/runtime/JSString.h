@@ -526,8 +526,6 @@ public:
         return m_compactFibers.length();
     }
 
-    inline StringImpl* tryGetLHS(ASCIILiteral rhs) const;
-
 private:
     friend class LLIntOffsetsExtractor;
 
