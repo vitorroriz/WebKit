@@ -28,7 +28,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "config.h"
-#include "CSSVariableParser.h"
+#include "CSSSubstitutionParser.h"
 
 #include "CSSCustomPropertyValue.h"
 #include "CSSParserContext.h"
@@ -43,7 +43,7 @@
 
 namespace WebCore {
 
-bool CSSVariableParser::isValidVariableName(const CSSParserToken& token)
+bool CSSSubstitutionParser::isValidCustomPropertyName(const CSSParserToken& token)
 {
     if (token.type() != IdentToken)
         return false;
@@ -185,7 +185,7 @@ static std::optional<ClassifyBlockResult> classifyBlock(CSSParserTokenRange rang
 bool isValidVariableReference(CSSParserTokenRange range, const CSSParserContext& parserContext)
 {
     range.consumeWhitespace();
-    if (!CSSVariableParser::isValidVariableName(range.consumeIncludingWhitespace()))
+    if (!CSSSubstitutionParser::isValidCustomPropertyName(range.consumeIncludingWhitespace()))
         return false;
     if (range.atEnd())
         return true;
@@ -290,7 +290,7 @@ static std::optional<VariableType> classifyVariableRange(CSSParserTokenRange ran
     return VariableType { { }, WTF::move(*classifyBlockResult) };
 }
 
-bool CSSVariableParser::containsValidVariableReferences(CSSParserTokenRange range, const CSSParserContext& parserContext)
+bool CSSSubstitutionParser::containsSubstitutionFunctions(CSSParserTokenRange range, const CSSParserContext& parserContext)
 {
     auto type = classifyVariableRange(range, parserContext);
     if (!type)
@@ -299,7 +299,7 @@ bool CSSVariableParser::containsValidVariableReferences(CSSParserTokenRange rang
     return type->classifyBlockResult.hasSubstitutionFunctions && !type->classifyBlockResult.hasTopLevelBraceBlockMixedWithOtherValues;
 }
 
-RefPtr<CSSCustomPropertyValue> CSSVariableParser::parseDeclarationValue(const AtomString& variableName, CSSParserTokenRange range, const CSSParserContext& parserContext)
+RefPtr<CSSCustomPropertyValue> CSSSubstitutionParser::parseDeclarationValue(const AtomString& variableName, CSSParserTokenRange range, const CSSParserContext& parserContext)
 {
     auto type = classifyVariableRange(range, parserContext);
     if (!type)
@@ -309,12 +309,12 @@ RefPtr<CSSCustomPropertyValue> CSSVariableParser::parseDeclarationValue(const At
         return CSSCustomPropertyValue::createWithCSSWideKeyword(variableName, *type->cssWideKeyword);
 
     if (type->classifyBlockResult.hasSubstitutionFunctions)
-        return CSSCustomPropertyValue::createUnresolved(variableName, CSSVariableReferenceValue::create(range, parserContext));
+        return CSSCustomPropertyValue::createUnresolved(variableName, CSSSubstitutionValue::create(range, parserContext));
 
     return CSSCustomPropertyValue::createSyntaxAll(variableName, CSSVariableData::create(range, parserContext));
 }
 
-RefPtr<const Style::CustomProperty> CSSVariableParser::parseInitialValueForUniversalSyntax(const AtomString& variableName, CSSParserTokenRange range)
+RefPtr<const Style::CustomProperty> CSSSubstitutionParser::parseInitialValueForUniversalSyntax(const AtomString& variableName, CSSParserTokenRange range)
 {
     auto type = classifyVariableRange(range, strictCSSParserContext());
 

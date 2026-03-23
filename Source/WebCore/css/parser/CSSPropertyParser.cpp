@@ -38,7 +38,6 @@
 #include "CSSParserFastPaths.h"
 #include "CSSParserIdioms.h"
 #include "CSSParserTokenRange.h"
-#include "CSSPendingSubstitutionValue.h"
 #include "CSSPrimitiveValue.h"
 #include "CSSPropertyParserConsumer+AngleDefinitions.h"
 #include "CSSPropertyParserConsumer+CSSPrimitiveValueResolver.h"
@@ -59,11 +58,12 @@
 #include "CSSPropertyParserResult.h"
 #include "CSSPropertyParserState.h"
 #include "CSSPropertyParsing.h"
+#include "CSSShorthandSubstitutionValue.h"
+#include "CSSSubstitutionParser.h"
+#include "CSSSubstitutionValue.h"
 #include "CSSTokenizer.h"
 #include "CSSTransformListValue.h"
 #include "CSSURLValue.h"
-#include "CSSVariableParser.h"
-#include "CSSVariableReferenceValue.h"
 #include "CSSWideKeyword.h"
 #include "ComputedStyleDependencies.h"
 #include "StyleBuilder.h"
@@ -379,7 +379,7 @@ std::optional<Variant<Ref<const Style::CustomProperty>, CSSWideKeyword>> CSSProp
 RefPtr<const Style::CustomProperty> CSSPropertyParser::parseTypedCustomPropertyInitialValue(const AtomString& name, const CSSCustomPropertySyntax& syntax, CSSParserTokenRange range, Style::BuilderState& builderState, const CSSParserContext& context)
 {
     if (syntax.isUniversal())
-        return CSSVariableParser::parseInitialValueForUniversalSyntax(name, range);
+        return CSSSubstitutionParser::parseInitialValueForUniversalSyntax(name, range);
 
     auto state = CSS::PropertyParserState {
         .context = context,
@@ -622,8 +622,8 @@ bool consumeStyleProperty(CSSParserTokenRange& range, const CSSParserContext& co
         if (CSSPropertyParsing::parseStylePropertyShorthand(range, property, state, result))
             return true;
 
-        if (CSSVariableParser::containsValidVariableReferences(originalRange, context)) {
-            result.addPropertyForAllLonghandsOfCurrentShorthand(state, CSSPendingSubstitutionValue::create(property, CSSVariableReferenceValue::create(originalRange, context)));
+        if (CSSSubstitutionParser::containsSubstitutionFunctions(originalRange, context)) {
+            result.addPropertyForAllLonghandsOfCurrentShorthand(state, CSSShorthandSubstitutionValue::create(property, CSSSubstitutionValue::create(originalRange, context)));
             return true;
         }
     } else {
@@ -642,8 +642,8 @@ bool consumeStyleProperty(CSSParserTokenRange& range, const CSSParserContext& co
             return true;
         }
 
-        if (CSSVariableParser::containsValidVariableReferences(originalRange, context)) {
-            result.addProperty(state, property, CSSPropertyInvalid, CSSVariableReferenceValue::create(originalRange, context), important);
+        if (CSSSubstitutionParser::containsSubstitutionFunctions(originalRange, context)) {
+            result.addProperty(state, property, CSSPropertyInvalid, CSSSubstitutionValue::create(originalRange, context), important);
             return true;
         }
     }

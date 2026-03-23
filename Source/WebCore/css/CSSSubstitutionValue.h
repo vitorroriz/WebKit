@@ -45,12 +45,15 @@ namespace Style {
 class SubstitutionResolver;
 }
 
-class CSSVariableReferenceValue final : public CSSValue {
+// A property value containing arbitrary substitution functions (var(), env(), attr(), etc.)
+// that need to be resolved during style resolution.
+// https://drafts.csswg.org/css-values-5/#arbitrary-substitution
+class CSSSubstitutionValue final : public CSSValue {
 public:
-    static Ref<CSSVariableReferenceValue> create(const CSSParserTokenRange&, const CSSParserContext&);
-    static Ref<CSSVariableReferenceValue> create(Ref<CSSVariableData>&&);
+    static Ref<CSSSubstitutionValue> create(const CSSParserTokenRange&, const CSSParserContext&);
+    static Ref<CSSSubstitutionValue> create(Ref<CSSVariableData>&&);
 
-    bool equals(const CSSVariableReferenceValue&) const;
+    bool equals(const CSSSubstitutionValue&) const;
     String customCSSText(const CSS::SerializationContext&) const;
 
     const CSSParserContext& NODELETE context() const;
@@ -60,7 +63,7 @@ public:
 private:
     friend class Style::SubstitutionResolver;
 
-    explicit CSSVariableReferenceValue(Ref<CSSVariableData>&&);
+    explicit CSSSubstitutionValue(Ref<CSSVariableData>&&);
 
     void cacheSimpleReference();
 
@@ -87,4 +90,4 @@ private:
 
 } // namespace WebCore
 
-SPECIALIZE_TYPE_TRAITS_CSS_VALUE(CSSVariableReferenceValue, isVariableReferenceValue())
+SPECIALIZE_TYPE_TRAITS_CSS_VALUE(CSSSubstitutionValue, isSubstitutionValue())

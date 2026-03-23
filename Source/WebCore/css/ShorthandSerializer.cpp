@@ -29,7 +29,6 @@
 #include "CSSGridLineNamesValue.h"
 #include "CSSGridTemplateAreasValue.h"
 #include "CSSParserIdioms.h"
-#include "CSSPendingSubstitutionValue.h"
 #include "CSSPropertyInitialValues.h"
 #include "CSSPropertyNames.h"
 #include "CSSPropertyParser.h"
@@ -37,10 +36,11 @@
 #include "CSSPropertyParserConsumer+Grid.h"
 #include "CSSPropertyParserConsumer+Ident.h"
 #include "CSSSerializationContext.h"
+#include "CSSShorthandSubstitutionValue.h"
+#include "CSSSubstitutionValue.h"
 #include "CSSValueKeywords.h"
 #include "CSSValueList.h"
 #include "CSSValuePair.h"
-#include "CSSVariableReferenceValue.h"
 #include "FontSelectionValueInlines.h"
 #include "Quad.h"
 #include "StyleExtractor.h"
@@ -229,7 +229,7 @@ bool ShorthandSerializer::commonSerializationChecks(const StyleProperties& prope
     std::optional<CSSValueID> specialKeyword;
     bool allSpecialKeywords = true;
     std::optional<bool> importance;
-    std::optional<CSSPendingSubstitutionValue*> firstValueFromShorthand;
+    std::optional<CSSShorthandSubstitutionValue*> firstValueFromShorthand;
     String commonValue;
     for (unsigned i = 0; i < length(); ++i) {
         auto longhand = longhandProperty(i);
@@ -263,11 +263,11 @@ bool ShorthandSerializer::commonSerializationChecks(const StyleProperties& prope
         }
 
         // Don't serialize if any longhand was set to a variable or substitution function.
-        if (is<CSSVariableReferenceValue>(value))
+        if (is<CSSSubstitutionValue>(value))
             return true;
 
         // Don't serialize if any longhand was set by a different shorthand.
-        RefPtr valueFromShorthand = dynamicDowncast<CSSPendingSubstitutionValue>(value);
+        RefPtr valueFromShorthand = dynamicDowncast<CSSShorthandSubstitutionValue>(value);
         if (valueFromShorthand && valueFromShorthand->shorthandPropertyId() != m_shorthand.id())
             return true;
 

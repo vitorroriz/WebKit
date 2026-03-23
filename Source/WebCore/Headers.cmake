@@ -1096,6 +1096,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     css/CSSStyleRule.h
     css/CSSStyleSheet.h
     css/CSSSubgridValue.h
+    css/CSSSubstitutionValue.h
     css/CSSToLengthConversionData.h
     css/CSSUnits.h
     css/CSSValue.h
@@ -1103,7 +1104,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     css/CSSValuePair.h
     css/CSSValuePool.h
     css/CSSVariableData.h
-    css/CSSVariableReferenceValue.h
     css/CSSWideKeyword.h
     css/ComputedStyleDependencies.h
     css/DOMCSSPaintWorklet.h

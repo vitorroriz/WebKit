@@ -42,14 +42,14 @@ namespace Style {
 class CustomProperty;
 }
 
-class CSSVariableParser {
+class CSSSubstitutionParser {
 public:
-    static bool containsValidVariableReferences(CSSParserTokenRange, const CSSParserContext&);
+    static bool containsSubstitutionFunctions(CSSParserTokenRange, const CSSParserContext&);
 
     static RefPtr<CSSCustomPropertyValue> parseDeclarationValue(const AtomString&, CSSParserTokenRange, const CSSParserContext&);
     static RefPtr<const Style::CustomProperty> parseInitialValueForUniversalSyntax(const AtomString&, CSSParserTokenRange);
 
-    static bool NODELETE isValidVariableName(const CSSParserToken&);
+    static bool NODELETE isValidCustomPropertyName(const CSSParserToken&);
 };
 
 } // namespace WebCore

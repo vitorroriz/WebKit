@@ -37,6 +37,7 @@
 #include <queue>
 #include <wtf/Assertions.h>
 #include <wtf/Hasher.h>
+#include <wtf/SmallMap.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/Vector.h>
