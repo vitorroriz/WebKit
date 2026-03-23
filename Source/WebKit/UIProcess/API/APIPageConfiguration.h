@@ -132,6 +132,9 @@ public:
     const WebCore::Site& NODELETE openedSite() const;
     void setOpenedSite(const WebCore::Site&);
 
+    bool processInheritedFromOpener() const { return m_data.processInheritedFromOpener; }
+    void setProcessInheritedFromOpener(bool value) { m_data.processInheritedFromOpener = value; }
+
     const WTF::String& NODELETE openedMainFrameName() const;
     void setOpenedMainFrameName(const WTF::String&);
 
@@ -538,6 +541,7 @@ private:
         WeakPtr<WebKit::WebPageProxy> relatedPage;
         Box<std::optional<OpenerInfo>> openerInfo;
         WebCore::Site openedSite;
+        bool processInheritedFromOpener { false };
         WTF::String openedMainFrameName;
         std::optional<WebCore::WindowFeatures> windowFeatures;
         WebCore::SandboxFlags initialSandboxFlags;

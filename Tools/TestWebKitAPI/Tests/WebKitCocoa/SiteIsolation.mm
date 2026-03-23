@@ -8417,4 +8417,91 @@ TEST(SiteIsolation, ProcessActivityGroup)
     Util::run(&finishedLoading);
 }
 
+TEST(SiteIsolation, OpenAboutBlankFromAboutBlank)
+{
+    HTTPServer server({
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+    RetainPtr uiDelegate = adoptNS([TestUIDelegate new]);
+    RetainPtr<WKWebView> opened;
+    __block bool openedFinishedLoading { false };
+    RetainPtr openedNavigationDelegate = adoptNS([TestNavigationDelegate new]);
+    openedNavigationDelegate.get().didFinishNavigation = ^(WKWebView *, WKNavigation *navigation) {
+        openedFinishedLoading = true;
+    };
+    uiDelegate.get().createWebViewWithConfiguration = [&](WKWebViewConfiguration *configuration, WKNavigationAction *action, WKWindowFeatures *windowFeatures) {
+        opened = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectZero configuration:configuration]);
+        opened.get().navigationDelegate = openedNavigationDelegate.get();
+        opened.get().UIDelegate = uiDelegate.get();
+        return opened.get();
+    };
+    [webView setUIDelegate:uiDelegate.get()];
+
+    [webView evaluateJavaScript:@"window.open()" completionHandler:nil];
+    Util::run(&openedFinishedLoading);
+}
+
+TEST(SiteIsolation, OpenNonEmptySiteFromAboutBlank)
+{
+    HTTPServer server({
+        { "/webkit"_s, { "hi"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+    RetainPtr uiDelegate = adoptNS([TestUIDelegate new]);
+    RetainPtr<WKWebView> opened;
+    __block bool openedFinishedLoading { false };
+    RetainPtr openedNavigationDelegate = adoptNS([TestNavigationDelegate new]);
+    [openedNavigationDelegate allowAnyTLSCertificate];
+    openedNavigationDelegate.get().didFinishNavigation = ^(WKWebView *, WKNavigation *navigation) {
+        openedFinishedLoading = true;
+    };
+    uiDelegate.get().createWebViewWithConfiguration = [&](WKWebViewConfiguration *configuration, WKNavigationAction *action, WKWindowFeatures *windowFeatures) {
+        opened = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectZero configuration:configuration]);
+        opened.get().navigationDelegate = openedNavigationDelegate.get();
+        opened.get().UIDelegate = uiDelegate.get();
+        return opened.get();
+    };
+    [webView setUIDelegate:uiDelegate.get()];
+
+    [webView evaluateJavaScript:@"window.open('https://webkit.org/webkit')" completionHandler:nil];
+    Util::run(&openedFinishedLoading);
+}
+
+TEST(SiteIsolation, OpenEmptySiteFromProcessWithNonEmptySite)
+{
+    HTTPServer server({
+        { "/webkit"_s, { "hi"_s } },
+    }, HTTPServer::Protocol::HttpsProxy);
+
+    auto [webView, navigationDelegate] = siteIsolatedViewAndDelegate(server);
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://webkit.org/webkit"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+    [webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
+    [navigationDelegate waitForDidFinishNavigation];
+    RetainPtr uiDelegate = adoptNS([TestUIDelegate new]);
+    RetainPtr<WKWebView> opened;
+    __block bool openedFinishedLoading { false };
+    RetainPtr openedNavigationDelegate = adoptNS([TestNavigationDelegate new]);
+    [openedNavigationDelegate allowAnyTLSCertificate];
+    openedNavigationDelegate.get().didFinishNavigation = ^(WKWebView *, WKNavigation *navigation) {
+        openedFinishedLoading = true;
+    };
+    uiDelegate.get().createWebViewWithConfiguration = [&](WKWebViewConfiguration *configuration, WKNavigationAction *action, WKWindowFeatures *windowFeatures) {
+        opened = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectZero configuration:configuration]);
+        opened.get().navigationDelegate = openedNavigationDelegate.get();
+        opened.get().UIDelegate = uiDelegate.get();
+        return opened.get();
+    };
+    [webView setUIDelegate:uiDelegate.get()];
+
+    [webView evaluateJavaScript:@"window.open()" completionHandler:nil];
+    Util::run(&openedFinishedLoading);
+}
+
 }

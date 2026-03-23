@@ -1347,9 +1347,10 @@ Ref<WebPageProxy> WebProcessPool::createWebPage(PageClient& pageClient, Ref<API:
         protect(pageConfiguration->preferences())->setUseUIProcessForBackForwardItemLoading(true);
     RefPtr preferredBrowsingContextGroup = pageConfiguration->preferredBrowsingContextGroup();
     RefPtr preferredFrameProcess = preferredBrowsingContextGroup ? preferredBrowsingContextGroup->processForSite(pageConfiguration->openedSite()) : nullptr;
-    if (auto& openerInfo = pageConfiguration->openerInfo(); openerInfo && siteIsolationEnabled)
+    if (auto& openerInfo = pageConfiguration->openerInfo(); openerInfo && siteIsolationEnabled) {
         process = openerInfo->process.ptr();
-    else if (preferredFrameProcess)
+        pageConfiguration->setProcessInheritedFromOpener(true);
+    } else if (preferredFrameProcess)
         process = preferredFrameProcess->process();
     else if (relatedPage && !relatedPage->isClosed() && relatedPage->hasSameGPUAndNetworkProcessPreferencesAs(pageConfiguration) && !siteIsolationEnabled) {
         // Sharing processes, e.g. when creating the page via window.open().
