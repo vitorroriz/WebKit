@@ -248,6 +248,7 @@ TEST_F(SecurityOriginTest, IsRegistrableDomainSuffix)
     auto exampleOrigin = SecurityOrigin::create(URL { "http://www.example.com"_str });
     EXPECT_TRUE(exampleOrigin->isMatchingRegistrableDomainSuffix("example.com"_s));
     EXPECT_TRUE(exampleOrigin->isMatchingRegistrableDomainSuffix("www.example.com"_s));
+    EXPECT_TRUE(exampleOrigin->isMatchingRegistrableDomainSuffix("www.EXAMple.com"_s));
     EXPECT_FALSE(exampleOrigin->isMatchingRegistrableDomainSuffix(emptyString()));
     EXPECT_FALSE(exampleOrigin->isMatchingRegistrableDomainSuffix("."_s));
     EXPECT_FALSE(exampleOrigin->isMatchingRegistrableDomainSuffix(".example.com"_s));

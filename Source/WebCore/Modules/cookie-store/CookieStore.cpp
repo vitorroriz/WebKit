@@ -342,7 +342,6 @@ void CookieStore::set(CookieInit&& options, Ref<DeferredPromise>&& promise)
     static constexpr auto maximumAttributeValueSize = 1024;
 
     auto url = context->cookieURL();
-    auto host = url.host();
     auto domain = origin->domain();
 
     Cookie cookie;
@@ -407,19 +406,14 @@ void CookieStore::set(CookieInit&& options, Ref<DeferredPromise>&& promise)
             return;
         }
 
-        if (!host.endsWith(cookie.domain) || (host.length() > cookie.domain.length() && !host.substring(0, host.length() - cookie.domain.length()).endsWith('.'))) {
-            promise->reject(Exception { ExceptionCode::TypeError, "The domain must domain-match current host"_s });
+        if (!SecurityOrigin::create(url)->isMatchingRegistrableDomainSuffix(cookie.domain)) {
+            promise->reject(Exception { ExceptionCode::TypeError, "The domain must be a registrable domain suffix of or be equal to the current host"_s });
             return;
         }
 
         // FIXME: <rdar://85515842> Obtain the encoded length without allocating and encoding.
         if (cookie.domain.utf8().length() > maximumAttributeValueSize) {
             promise->reject(Exception { ExceptionCode::TypeError, makeString("The size of the domain must not be greater than "_s, maximumAttributeValueSize, " bytes"_s) });
-            return;
-        }
-
-        if (PublicSuffixStore::singleton().isPublicSuffix(cookie.domain)) {
-            promise->reject(Exception { ExceptionCode::TypeError, "The domain must not be a public suffix"_s });
             return;
         }
 

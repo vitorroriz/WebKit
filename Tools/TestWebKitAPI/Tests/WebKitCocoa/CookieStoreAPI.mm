@@ -83,7 +83,7 @@ TEST(WebKit, CookieStoreSetCookieForPublicSuffixDomain)
     NSError *error;
     [webView objectByCallingAsyncFunction:@"await cookieStore.set({ name: 'cookieName', value: 'cookieValue', domain: 'com' });" withArguments:nil error:&error];
     EXPECT_NOT_NULL(error);
-    EXPECT_TRUE([[error description] containsString:@"The domain must not be a public suffix"]);
+    EXPECT_TRUE([[error description] containsString:@"The domain must be a registrable domain suffix of or be equal to the current host"]);
     error = NULL;
 
     // Test for "co.uk".
@@ -92,7 +92,7 @@ TEST(WebKit, CookieStoreSetCookieForPublicSuffixDomain)
 
     [webView objectByCallingAsyncFunction:@"await cookieStore.set({ name: 'cookieName', value: 'cookieValue', domain: 'co.uk' });" withArguments:nil error:&error];
     EXPECT_NOT_NULL(error);
-    EXPECT_TRUE([[error description] containsString:@"The domain must not be a public suffix"]);
+    EXPECT_TRUE([[error description] containsString:@"The domain must be a registrable domain suffix of or be equal to the current host"]);
 }
 
 } // namespace TestWebKitAPI
