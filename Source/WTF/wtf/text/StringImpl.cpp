@@ -927,19 +927,24 @@ SUPPRESS_NODELETE size_t StringImpl::find(std::span<const Latin1Character> match
     // only call equal if the hashes match.
 
     auto findWithHash = [&](auto searchCharacters) -> size_t {
+        // Rabin-Karp style rolling hash with base 31.
+        constexpr unsigned base = 31;
         unsigned searchHash = 0;
         unsigned matchHash = 0;
+        unsigned basePower = 1; // base^(matchString.size()-1)
         for (size_t i = 0; i < matchString.size(); ++i) {
-            searchHash += searchCharacters[i];
-            matchHash += matchString[i];
+            searchHash = searchHash * base + searchCharacters[i];
+            matchHash = matchHash * base + matchString[i];
+            if (i)
+                basePower *= base;
         }
 
         for (size_t i = 0; i <= delta; ++i) {
             if (searchHash == matchHash && equal(searchCharacters.subspan(i, matchString.size()), matchString))
                 return start + i;
             if (i < delta) {
-                searchHash += searchCharacters[i + matchString.size()];
-                searchHash -= searchCharacters[i];
+                searchHash -= searchCharacters[i] * basePower;
+                searchHash = searchHash * base + searchCharacters[i + matchString.size()];
             }
         }
         return notFound;
