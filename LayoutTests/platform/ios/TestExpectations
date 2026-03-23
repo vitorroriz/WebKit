@@ -8427,6 +8427,8 @@ http/tests/site-isolation/remote-frame-loaded-while-hidden.html [ Pass ImageOnly
 # from fast/ tests that are flaky: adding timeout 
 webkit.org/b/304027 fast/block/basic/001.html [ Pass Failure Timeout ]
 
+webkit.org/b/310557 [ Release ] webanimations/transform-animation-with-delay-yields-accelerated-animation.html [ Pass Failure ]
+
 webkit.org/b/303650 fast/lists/marker-before-empty-inline.html [ ImageOnlyFailure ]
 
 webkit.org/b/304298 accessibility/text-stitching-inside-links.html [ Failure ]
