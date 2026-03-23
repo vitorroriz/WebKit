@@ -35,6 +35,7 @@
 #include "ChromeClient.h"
 #include "ContainerNodeInlines.h"
 #include "DocumentFullscreen.h"
+#include "FixedContainerEdges.h"
 #include "GraphicsLayer.h"
 #include "HTMLCanvasElement.h"
 #include "HTMLIFrameElement.h"
@@ -3238,7 +3239,18 @@ void RenderLayerCompositor::updateRootLayerPosition()
         RefPtr { m_contentShadowLayer }->setSize(m_rootContentsLayer->size());
     }
 
-    updateLayerForTopOverhangColorExtension(m_layerForTopOverhangColorExtension);
+    bool wantsLayer = m_layerForTopOverhangColorExtension;
+    Color cachedTopColor;
+    if (!wantsLayer) {
+        cachedTopColor = page().fixedContainerEdges().predominantColor(BoxSide::Top);
+        wantsLayer = cachedTopColor.isVisible();
+    }
+
+    if (RefPtr layer = updateLayerForTopOverhangColorExtension(wantsLayer)) {
+        if (cachedTopColor.isVisible())
+            layer->setBackgroundColor(cachedTopColor);
+    }
+
     updateSizeAndPositionForTopOverhangColorExtensionLayer();
     updateLayerForTopOverhangImage(m_layerForTopOverhangImage);
     updateLayerForBottomOverhangArea(m_layerForBottomOverhangArea);

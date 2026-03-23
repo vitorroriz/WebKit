@@ -437,6 +437,67 @@ TEST(ObscuredContentInsets, OverflowHeightForTopScrollEdgeEffect)
     checkScrollPocket();
 }
 
+TEST(ObscuredContentInsets, TopOverhangColorExtensionLayerAppearsImmediatelyAfterReload)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 600, 400)]);
+
+    [webView setObscuredContentInsets:NSEdgeInsetsMake(100, 0, 0, 0)];
+    [webView waitForNextPresentationUpdate];
+
+    [webView synchronouslyLoadTestPageNamed:@"top-fixed-element"];
+    [webView waitForNextPresentationUpdate];
+
+    RetainPtr layerBeforeReload = [webView firstLayerWithNameContaining:@"top overhang"];
+    EXPECT_NOT_NULL(layerBeforeReload.get());
+
+    RetainPtr expectedColor = [webView _sampledTopFixedPositionContentColor];
+    EXPECT_NOT_NULL(expectedColor.get());
+
+    RetainPtr actualColorBeforeReload = [NSColor colorWithCGColor:[layerBeforeReload backgroundColor]];
+    EXPECT_TRUE(Util::compareColors(actualColorBeforeReload, expectedColor.get()));
+
+    __block bool layerChecked = false;
+    RetainPtr navigationDelegate = adoptNS([[TestNavigationDelegate alloc] init]);
+    [navigationDelegate setDidCommitNavigation:^(WKWebView *view, WKNavigation *) {
+        [view _doAfterNextPresentationUpdate:^{
+            layerChecked = true;
+        }];
+    }];
+    [webView setNavigationDelegate:navigationDelegate.get()];
+
+    [webView reload];
+    Util::run(&layerChecked);
+
+    RetainPtr layerAfterReload = [webView firstLayerWithNameContaining:@"top overhang"];
+    EXPECT_NOT_NULL(layerAfterReload.get());
+
+    if (layerAfterReload) {
+        RetainPtr actualColorAfterReload = [NSColor colorWithCGColor:[layerAfterReload backgroundColor]];
+        EXPECT_TRUE(Util::compareColors(actualColorAfterReload, expectedColor.get()));
+    }
+}
+
+TEST(ObscuredContentInsets, TopOverhangColorExtensionLayerRemovedQuicklyAfterNavigatingToPageWithoutFixedHeader)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 600, 400)]);
+
+    [webView setObscuredContentInsets:NSEdgeInsetsMake(100, 0, 0, 0)];
+    [webView waitForNextPresentationUpdate];
+
+    [webView synchronouslyLoadTestPageNamed:@"top-fixed-element"];
+    [webView waitForNextPresentationUpdate];
+
+    EXPECT_NOT_NULL([webView firstLayerWithNameContaining:@"top overhang"]);
+
+    [webView synchronouslyLoadHTMLString:@"<body style='height:4000px'>No fixed header</body>"];
+
+    [webView waitForNextPresentationUpdate];
+    [webView waitForNextPresentationUpdate];
+    [webView waitForNextPresentationUpdate];
+
+    EXPECT_NULL([webView firstLayerWithNameContaining:@"top overhang"]);
+}
+
 #endif // ENABLE(CONTENT_INSET_BACKGROUND_FILL)
 
 } // namespace TestWebKitAPI
