@@ -71,6 +71,7 @@
 #include "RenderMenuList.h"
 #include "RenderTheme.h"
 #include "ScriptDisallowedScope.h"
+#include "ScrollIntoViewOptions.h"
 #include "SelectFallbackButtonElement.h"
 #include "SelectPopoverElement.h"
 #include "Settings.h"
@@ -386,36 +387,36 @@ void HTMLSelectElement::queuePickerCloseForAppearanceChange()
     });
 }
 
-static inline auto navigationKeyIdentifiersForWritingMode(const RenderElement* renderer) -> HTMLSelectElement::NavigationKeyIdentifiers
+static inline auto navigationKeyIdentifiersForWritingMode(WritingMode writingMode) -> HTMLSelectElement::NavigationKeyIdentifiers
 {
-    bool isHorizontalWritingMode = renderer ? renderer->writingMode().isHorizontal() : true;
-    bool isBlockFlipped = renderer ? renderer->writingMode().isBlockFlipped() : false;
+    bool isHorizontal = writingMode.isHorizontal();
 
-    auto next = isHorizontalWritingMode ? "Down"_s : "Right"_s;
-    auto previous = isHorizontalWritingMode ? "Up"_s : "Left"_s;
-    if (isBlockFlipped)
+    auto next = isHorizontal ? "Down"_s : "Right"_s;
+    auto previous = isHorizontal ? "Up"_s : "Left"_s;
+    if (writingMode.isBlockFlipped())
         std::swap(next, previous);
 
-    return { next, previous };
+    return { next, previous, writingMode };
 }
 
 auto HTMLSelectElement::pickerNavigationKeyIdentifiers() const -> NavigationKeyIdentifiers
 {
     RefPtr popover = m_popover;
     CheckedPtr renderer = popover ? popover->renderer() : nullptr;
-    return navigationKeyIdentifiersForWritingMode(renderer);
+    auto writingMode = renderer ? renderer->writingMode() : WritingMode { };
+    return navigationKeyIdentifiersForWritingMode(writingMode);
 }
 
-int HTMLSelectElement::computeNavigationIndex(const String& keyIdentifier, int currentListIndex, NavigationKeyIdentifiers navKeys) const
+int HTMLSelectElement::computeNavigationIndex(const String& keyIdentifier, int currentListIndex, NavigationKeyIdentifiers navigationKeys) const
 {
     // Primary axis (writing-mode aware block direction).
-    if (keyIdentifier == navKeys.next)
+    if (keyIdentifier == navigationKeys.next)
         return nextSelectableListIndex(currentListIndex);
-    if (keyIdentifier == navKeys.previous)
+    if (keyIdentifier == navigationKeys.previous)
         return previousSelectableListIndex(currentListIndex);
 
     // Secondary axis (the other pair of arrow keys, for convenience).
-    bool primaryIsVertical = (navKeys.next == "Down"_s || navKeys.next == "Up"_s);
+    bool primaryIsVertical = (navigationKeys.next == "Down"_s || navigationKeys.next == "Up"_s);
     if (primaryIsVertical) {
         // Primary is Down/Up, secondary is Right/Left.
         if (keyIdentifier == "Right"_s)
@@ -434,10 +435,16 @@ int HTMLSelectElement::computeNavigationIndex(const String& keyIdentifier, int c
         return firstSelectableListIndex();
     if (keyIdentifier == "End"_s)
         return lastSelectableListIndex();
-    if (keyIdentifier == "PageDown"_s)
+    if (keyIdentifier == "PageDown"_s) {
+        if (usesBaseAppearancePicker())
+            return nextSelectableListIndexForPickerPageMove(currentListIndex, SkipDirection::Forwards, navigationKeys.writingMode);
         return nextValidIndex(currentListIndex, SkipDirection::Forwards, 3);
-    if (keyIdentifier == "PageUp"_s)
+    }
+    if (keyIdentifier == "PageUp"_s) {
+        if (usesBaseAppearancePicker())
+            return nextSelectableListIndexForPickerPageMove(currentListIndex, SkipDirection::Backwards, navigationKeys.writingMode);
         return nextValidIndex(currentListIndex, SkipDirection::Backwards, 3);
+    }
 
     return -1;
 }
@@ -889,6 +896,50 @@ int HTMLSelectElement::nextSelectableListIndexPageAway(int startIndex, SkipDirec
     int edgeIndex = direction == SkipDirection::Forwards ? 0 : items.size() - 1;
     int skipAmount = pageSize + (direction == SkipDirection::Forwards ? startIndex : edgeIndex - startIndex);
     return nextValidIndex(edgeIndex, direction, skipAmount);
+}
+
+int HTMLSelectElement::nextSelectableListIndexForPickerPageMove(int startIndex, SkipDirection direction, WritingMode writingMode) const
+{
+    RefPtr popover = m_popover;
+    if (!popover)
+        return startIndex;
+
+    bool isHorizontal = writingMode.isHorizontal();
+    int pageSize = isHorizontal ? popover->clientHeight() : popover->clientWidth();
+    if (pageSize <= 0)
+        return startIndex;
+
+    auto& items = listItems();
+    int size = items.size();
+    if (startIndex < 0 || startIndex >= size)
+        return startIndex;
+
+    int scrollPos = isHorizontal ? popover->scrollTop() : popover->scrollLeft();
+    bool physicallyForward = (direction == SkipDirection::Forwards) != writingMode.isBlockFlipped();
+    int boundary = physicallyForward ? scrollPos + 2 * pageSize : scrollPos - pageSize;
+
+    int step = direction == SkipDirection::Forwards ? 1 : -1;
+    int lastGoodIndex = startIndex;
+
+    for (int i = startIndex + step; i >= 0 && i < size; i += step) {
+        RefPtr listItem = items[i].get();
+        if (!is<HTMLOptionElement>(*listItem) || listItem->isDisabledFormControl() || !listItem->isFocusable())
+            continue;
+
+        int itemStart = isHorizontal ? listItem->offsetTop() : listItem->offsetLeft();
+        int itemEnd = itemStart + (isHorizontal ? listItem->offsetHeight() : listItem->offsetWidth());
+
+        if (physicallyForward) {
+            if (itemEnd > boundary)
+                break;
+        } else {
+            if (itemStart < boundary)
+                break;
+        }
+        lastGoodIndex = i;
+    }
+
+    return lastGoodIndex;
 }
 
 void HTMLSelectElement::selectAll()
@@ -1773,7 +1824,8 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event& event)
             return;
 
         CheckedPtr renderer = this->renderer();
-        auto [nextKeyIdentifier, previousKeyIdentifier] = navigationKeyIdentifiersForWritingMode(renderer);
+        auto writingMode = renderer ? renderer->writingMode() : WritingMode { };
+        auto navigationKeys = navigationKeyIdentifiersForWritingMode(writingMode);
 
         const String& keyIdentifier = keyboardEvent->keyIdentifier();
 
@@ -1781,27 +1833,27 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event& event)
         int endIndex = 0;
         if (m_activeSelectionEndIndex < 0) {
             // Initialize the end index
-            if (keyIdentifier == nextKeyIdentifier || keyIdentifier == "PageDown"_s) {
+            if (keyIdentifier == navigationKeys.next || keyIdentifier == "PageDown"_s) {
                 int startIndex = lastSelectedListIndex();
                 handled = true;
-                if (keyIdentifier == nextKeyIdentifier)
+                if (keyIdentifier == navigationKeys.next)
                     endIndex = nextSelectableListIndex(startIndex);
                 else
                     endIndex = nextSelectableListIndexPageAway(startIndex, SkipDirection::Forwards);
-            } else if (keyIdentifier == previousKeyIdentifier || keyIdentifier == "PageUp"_s) {
+            } else if (keyIdentifier == navigationKeys.previous || keyIdentifier == "PageUp"_s) {
                 int startIndex = optionToListIndex(selectedIndex());
                 handled = true;
-                if (keyIdentifier == previousKeyIdentifier)
+                if (keyIdentifier == navigationKeys.previous)
                     endIndex = previousSelectableListIndex(startIndex);
                 else
                     endIndex = nextSelectableListIndexPageAway(startIndex, SkipDirection::Backwards);
             }
         } else {
             // Set the end index based on the current end index.
-            if (keyIdentifier == nextKeyIdentifier) {
+            if (keyIdentifier == navigationKeys.next) {
                 endIndex = nextSelectableListIndex(m_activeSelectionEndIndex);
                 handled = true;
-            } else if (keyIdentifier == previousKeyIdentifier) {
+            } else if (keyIdentifier == navigationKeys.previous) {
                 endIndex = previousSelectableListIndex(m_activeSelectionEndIndex);
                 handled = true;
             } else if (keyIdentifier == "PageDown"_s) {
@@ -2094,7 +2146,7 @@ void HTMLSelectElement::openPickerForUserInteraction(std::optional<bool> focusVi
     focusOptionAtIndex(listIndex, focusVisible);
 }
 
-void HTMLSelectElement::focusOptionAtIndex(int listIndex, std::optional<bool> focusVisible)
+void HTMLSelectElement::focusOptionAtIndex(int listIndex, std::optional<bool> focusVisible, PickerScrollMode scrollMode)
 {
     if (!usesBaseAppearancePicker())
         return;
@@ -2108,9 +2160,21 @@ void HTMLSelectElement::focusOptionAtIndex(int listIndex, std::optional<bool> fo
         return;
 
     FocusOptions focusOptions;
-    focusOptions.preventScroll = false;
+    focusOptions.preventScroll = true;
     focusOptions.focusVisible = focusVisible;
     option->focus(focusOptions);
+
+    switch (scrollMode) {
+    case PickerScrollMode::Nearest:
+        option->scrollIntoViewIfNeeded();
+        break;
+    case PickerScrollMode::AlignTop:
+        option->scrollIntoView(true);
+        break;
+    case PickerScrollMode::AlignBottom:
+        option->scrollIntoView(false);
+        break;
+    }
 }
 
 ExceptionOr<void> HTMLSelectElement::showPicker()

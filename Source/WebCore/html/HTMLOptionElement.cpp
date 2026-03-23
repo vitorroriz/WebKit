@@ -291,7 +291,12 @@ void HTMLOptionElement::defaultEventHandler(Event& event)
         int currentIndex = select->optionToListIndex(index());
         int listIndex = select->computeNavigationIndex(keyIdentifier, currentIndex, select->pickerNavigationKeyIdentifiers());
         if (listIndex >= 0) {
-            select->focusOptionAtIndex(listIndex);
+            auto scrollMode = HTMLSelectElement::PickerScrollMode::Nearest;
+            if (keyIdentifier == "PageDown"_s)
+                scrollMode = HTMLSelectElement::PickerScrollMode::AlignBottom;
+            else if (keyIdentifier == "PageUp"_s)
+                scrollMode = HTMLSelectElement::PickerScrollMode::AlignTop;
+            select->focusOptionAtIndex(listIndex, std::nullopt, scrollMode);
             keyboardEvent->setDefaultHandled();
             return;
         }
