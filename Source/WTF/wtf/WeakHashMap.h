@@ -344,7 +344,7 @@ public:
     bool hasNullReferences() const
     {
         unsigned count = 0;
-        for (auto _ : m_map) {
+        for (auto& _ : m_map) {
             UNUSED_VARIABLE(_);
             ++count;
         }
