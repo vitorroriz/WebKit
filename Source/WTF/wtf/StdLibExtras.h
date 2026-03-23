@@ -1016,6 +1016,8 @@ bool equalSpans(std::span<T, TExtent> a, std::span<U, UExtent> b)
     static_assert(ignoreTypeChecks == IgnoreTypeChecks::Yes || std::has_unique_object_representations_v<U>);
     if (a.size() != b.size())
         return false;
+    if (!a.size())
+        return true;
     return !memcmp(a.data(), b.data(), a.size_bytes()); // NOLINT
 }
 
