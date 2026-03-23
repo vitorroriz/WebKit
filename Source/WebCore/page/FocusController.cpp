@@ -812,8 +812,6 @@ FocusableElementSearchResult FocusController::findFocusableElementAcrossFocusSco
     }
 
     auto candidateInCurrentScope = findFocusableElementWithinScope(direction, scope, currentNode, focusEventData, shouldFocusElement);
-    if (candidateInCurrentScope.continuedSearchInRemoteFrame == ContinuedSearchInRemoteFrame::Yes)
-        return candidateInCurrentScope;
     if (candidateInCurrentScope.element) {
         if (direction == FocusDirection::Backward) {
             // Skip through invokers if they have popovers with focusable contents, and navigate through those contents instead.
@@ -862,19 +860,15 @@ FocusableElementSearchResult FocusController::findFocusableElementAcrossFocusSco
             },
             [&](const RefPtr<Frame>& frame) -> FocusableElementSearchResult {
                 switch (frame->frameType()) {
-                case Frame::FrameType::Remote: {
-                    if (!currentNode)
-                        return { };
-                    RefPtr currentFrame = currentNode->document().frame();
-                    if (!currentFrame)
-                        return { };
+                case Frame::FrameType::Remote:
+
                     if (shouldFocusElement == ShouldFocusElement::Yes) {
+                        RefPtr currentFrame = currentNode->document().frame();
                         clearSelectionIfNeeded(currentFrame.get(), nullptr, nullptr);
                         currentNode->document().setFocusedElement(nullptr);
                     }
-                    downcast<RemoteFrame>(*frame).client().findFocusableElementContinuingFromFrame(direction, currentFrame->frameID(), focusEventData, shouldFocusElement);
+                    downcast<RemoteFrame>(*frame).client().findFocusableElementContinuingFromFrame(direction, currentNode->document().frame()->frameID(), focusEventData, shouldFocusElement);
                     return { nullptr, ContinuedSearchInRemoteFrame::Yes };
-                }
                 case Frame::FrameType::Local:
                     if (RefPtr ownerElement = frame->ownerElement())
                         return handleElementOwner(*ownerElement);
