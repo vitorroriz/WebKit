@@ -269,9 +269,16 @@ void TextFieldInputType::elementDidBlur()
 
     CheckedPtr innerLayerScrollable = innerLayer->ensureLayerScrollableArea();
 
-    bool isLeftToRightDirection = downcast<RenderTextControlSingleLine>(*renderer).style().writingMode().deprecatedIsLeftToRightDirection();
-    ScrollOffset scrollOffset(isLeftToRightDirection ? 0 : innerLayerScrollable->scrollWidth(), 0);
-    innerLayerScrollable->scrollToOffset(scrollOffset);
+    auto writingMode = downcast<RenderTextControlSingleLine>(*renderer).style().writingMode();
+    int xOffset = 0;
+    int yOffset = 0;
+    if (writingMode.isInlineFlipped()) {
+        if (writingMode.isHorizontal())
+            xOffset = innerLayerScrollable->scrollWidth();
+        else
+            yOffset = innerLayerScrollable->scrollHeight();
+    }
+    innerLayerScrollable->scrollToOffset(ScrollOffset(xOffset, yOffset));
 
     closeSuggestions();
 }
