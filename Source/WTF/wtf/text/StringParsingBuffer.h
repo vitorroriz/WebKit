@@ -121,7 +121,7 @@ public:
         return result;
     }
 
-    constexpr StringParsingBuffer& operator+=(int places)
+    constexpr StringParsingBuffer& operator+=(size_t places)
     {
         advanceBy(places);
         return *this;
