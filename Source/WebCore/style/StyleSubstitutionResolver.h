@@ -56,12 +56,14 @@ private:
     bool substituteVariableFunction(CSSParserTokenRange, CSSValueID, Vector<CSSParserToken>&, const CSSParserContext&) const;
     bool substituteDashedFunction(StringView functionName, CSSParserTokenRange, Vector<CSSParserToken>&) const;
     bool substituteAttrFunction(CSSParserTokenRange, Vector<CSSParserToken>&, const CSSParserContext&) const;
+    bool substituteInternalAutoBaseFunction(CSSParserTokenRange, Vector<CSSParserToken>&, const CSSParserContext&) const;
 
     enum class FallbackResult : uint8_t { None, Valid, Invalid };
     std::pair<FallbackResult, Vector<CSSParserToken>> substituteVariableFallback(const AtomString& variableName, CSSParserTokenRange, CSSValueID functionId, const CSSParserContext&) const;
 
     RefPtr<const CustomProperty> propertyValueForVariableName(const AtomString&, CSSValueID) const;
     RefPtr<CSSVariableData> trySimpleSubstitution(const CSSVariableReferenceValue&) const;
+    bool isBaseAppearance() const;
 
     Builder& m_styleBuilder;
 };

@@ -39,8 +39,10 @@
 #include "CustomFunctionRegistry.h"
 #include "Document.h"
 #include "Element.h"
+#include "HTMLSelectElement.h"
 #include "RenderStyle+GettersInlines.h"
 #include "RenderStyle+SettersInlines.h"
+#include "SelectPopoverElement.h"
 #include "StyleBuilder.h"
 #include "StyleCustomProperty.h"
 #include "StyleCustomPropertyRegistry.h"
@@ -207,6 +209,34 @@ bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vec
     return true;
 }
 
+bool SubstitutionResolver::substituteInternalAutoBaseFunction(CSSParserTokenRange range, Vector<CSSParserToken>& tokens, const CSSParserContext& context) const
+{
+    // -internal-auto-base(autoValue, baseValue)
+    // Picks between the two arguments based on whether the element has base appearance.
+
+    auto firstArgRange = CSSPropertyParserHelpers::consumeArgument(range, 0);
+    if (!firstArgRange)
+        return false;
+
+    auto secondArgRange = CSSPropertyParserHelpers::consumeArgument(range, 1);
+    if (!secondArgRange)
+        return false;
+
+    auto selectedRange = isBaseAppearance() ? *secondArgRange : *firstArgRange;
+
+    // Strip outer braces if present, allowing comma-containing values like:
+    // -internal-auto-base({value1, value2}, {value3, value4})
+    if (!selectedRange.atEnd() && selectedRange.peek().type() == LeftBraceToken)
+        selectedRange = selectedRange.consumeBlock();
+
+    auto selectedTokens = substituteTokenRange(selectedRange, context);
+    if (!selectedTokens)
+        return false;
+
+    tokens.appendVector(*selectedTokens);
+    return true;
+}
+
 std::optional<Vector<CSSParserToken>> SubstitutionResolver::substituteTokenRange(CSSParserTokenRange range, const CSSParserContext& context) const
 {
     Vector<CSSParserToken> tokens;
@@ -222,6 +252,11 @@ std::optional<Vector<CSSParserToken>> SubstitutionResolver::substituteTokenRange
             }
             if (functionId == CSSValueAttr) {
                 if (!substituteAttrFunction(range.consumeBlock(), tokens, context))
+                    success = false;
+                continue;
+            }
+            if (functionId == CSSValueInternalAutoBase) {
+                if (!substituteInternalAutoBaseFunction(range.consumeBlock(), tokens, context))
                     success = false;
                 continue;
             }
@@ -245,13 +280,28 @@ RefPtr<CSSVariableData> SubstitutionResolver::trySimpleSubstitution(const CSSVar
     if (!value.m_simpleReference)
         return nullptr;
 
-    // Shortcut for the simple common case of property:var(--foo)
+    // Shortcut for simple -internal-auto-base(val1, val2): return cached data if appearance hasn't changed.
+    if (value.m_simpleReference->functionId == CSSValueInternalAutoBase)
+        return value.m_cache.isBaseAppearance == isBaseAppearance() ? value.m_cache.dependencyData : nullptr;
 
+    // Shortcut for the simple common case of property:var(--foo)
     RefPtr property = propertyValueForVariableName(value.m_simpleReference->name, value.m_simpleReference->functionId);
     if (!property || !std::holds_alternative<Ref<CSSVariableData>>(property->value()))
         return nullptr;
 
     return std::get<Ref<CSSVariableData>>(property->value()).ptr();
+}
+
+bool SubstitutionResolver::isBaseAppearance() const
+{
+    auto& state = m_styleBuilder.state();
+    if (state.style().appearance() == StyleAppearance::Base)
+        return true;
+    if (state.style().appearance() == StyleAppearance::BaseSelect) {
+        CheckedPtr element = state.element();
+        return element && isAnyOf<HTMLSelectElement, SelectPopoverElement>(*element);
+    }
+    return false;
 }
 
 RefPtr<CSSVariableData> SubstitutionResolver::substitute(const CSSVariableReferenceValue& value) const
@@ -279,6 +329,9 @@ RefPtr<CSSValue> SubstitutionResolver::substituteAndParse(const CSSVariableRefer
     }
     variableRef.m_cache.dependencyData = WTF::move(data);
 
+    if (variableRef.m_simpleReference && variableRef.m_simpleReference->functionId == CSSValueInternalAutoBase)
+        variableRef.m_cache.isBaseAppearance = isBaseAppearance();
+
     return variableRef.m_cache.value;
 }
 
@@ -300,6 +353,9 @@ RefPtr<CSSValue> SubstitutionResolver::substituteAndParseShorthand(const CSSPend
             substitution.m_cachedPropertyValues = parsedProperties;
     }
     variableRef.m_cache.dependencyData = WTF::move(data);
+
+    if (variableRef.m_simpleReference && variableRef.m_simpleReference->functionId == CSSValueInternalAutoBase)
+        variableRef.m_cache.isBaseAppearance = isBaseAppearance();
 
     for (auto& property : substitution.m_cachedPropertyValues) {
         if (CSSProperty::resolveDirectionAwareProperty(property.id(), m_styleBuilder.state().style().writingMode()) == propertyID)

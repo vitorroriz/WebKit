@@ -134,6 +134,10 @@ static std::optional<ClassifyBlockResult> classifyBlock(CSSParserTokenRange rang
                 result.hasSubstitutionFunctions = true;
                 continue;
             }
+            if (token.functionId() == CSSValueInternalAutoBase && parserContext.cssInternalAutoBaseParsingEnabled) {
+                result.hasSubstitutionFunctions = true;
+                continue;
+            }
             if (token.type() == FunctionToken && isCustomPropertyName(token.value()) && parserContext.propertySettings.cssFunctionAtRuleEnabled) {
                 // https://drafts.csswg.org/css-mixins/#typedef-dashed-function
                 if (!isValidDashedFunction(block, parserContext))

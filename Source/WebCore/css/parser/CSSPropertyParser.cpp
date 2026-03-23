@@ -225,69 +225,6 @@ static std::optional<CSSWideKeyword> consumeCSSWideKeyword(CSSParserTokenRange& 
     return keyword;
 }
 
-// MARK: - function value consumer
-
-static bool consumeFunctionArgument(CSSParserTokenRange& range, unsigned index, CSSPropertyID property, CSS::PropertyParserState& state, CSS::PropertyParserResult& result)
-{
-    auto argument = CSSPropertyParserHelpers::consumeArgument(range, index);
-    if (!argument)
-        return false;
-
-    // If the argument is a block, strip the braces.
-    if (argument->peek().type() == LeftBraceToken) {
-        auto last = argument->consumeLast();
-        if (last.type() != RightBraceToken)
-            return false;
-        argument->consume(); // Consume left brace.
-        argument->consumeWhitespace();
-        argument->trimTrailingWhitespace();
-    }
-
-    const auto& context = state.context;
-    auto important = state.important;
-    auto ruleType = state.currentRule;
-
-    return consumeStyleProperty(*argument, context, property, important, ruleType, result);
-}
-
-static bool consumeInternalAutoBaseFunction(CSSParserTokenRange& range, CSSPropertyID property, CSS::PropertyParserState& state, CSS::PropertyParserResult& result)
-{
-    // -internal-auto-base() = -internal-auto-base( <auto value>, <base value> )
-
-    if (!state.context.cssInternalAutoBaseParsingEnabled)
-        return false;
-
-    if (range.peek().functionId() != CSSValueInternalAutoBase)
-        return false;
-
-    auto args = CSSPropertyParserHelpers::consumeFunction(range);
-
-    Vector<CSSProperty, 256> autoProperties;
-    CSS::PropertyParserResult autoResult { autoProperties };
-
-    if (!consumeFunctionArgument(args, 0, property, state, autoResult))
-        return false;
-
-    Vector<CSSProperty, 256> baseProperties;
-    CSS::PropertyParserResult baseResult { baseProperties };
-
-    if (!consumeFunctionArgument(args, 1, property, state, baseResult))
-        return false;
-
-    if (autoProperties.size() != baseProperties.size())
-        return false;
-
-    for (unsigned index = 0; index < autoProperties.size(); ++index) {
-        const auto& autoProperty = autoProperties[index];
-        const auto& baseProperty = baseProperties[index];
-
-        Ref value = CSSFunctionValue::create(CSSValueInternalAutoBase, protect(*autoProperty.value()), protect(*baseProperty.value()));
-        result.addProperty(CSSProperty(autoProperty.metadata(), WTF::move(value)));
-    }
-
-    return true;
-}
-
 // MARK: - Parser entry points
 
 using namespace CSSPropertyParserHelpers;
@@ -671,9 +608,6 @@ bool consumeStyleProperty(CSSParserTokenRange& range, const CSSParserContext& co
         .currentProperty = property,
         .important = important,
     };
-
-    if (consumeInternalAutoBaseFunction(range, property, state, result))
-        return true;
 
     if (WebCore::isShorthand(property)) {
         auto rangeCopy = range;

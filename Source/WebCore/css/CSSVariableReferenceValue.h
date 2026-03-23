@@ -67,7 +67,7 @@ private:
     const Ref<CSSVariableData> m_data;
     mutable String m_stringValue;
 
-    // For quickly resolving simple var(--foo) values.
+    // For quickly resolving simple substitution functions.
     struct SimpleReference {
         AtomString name;
         CSSValueID functionId;
@@ -75,7 +75,10 @@ private:
     std::optional<SimpleReference> m_simpleReference;
 
     struct Cache {
+        // For var() case: cache key is the substituted data pointer.
         RefPtr<CSSVariableData> dependencyData;
+        // For -internal-auto-base() case: cache key is the base appearance state.
+        std::optional<bool> isBaseAppearance;
         RefPtr<CSSValue> value;
         CSSPropertyID propertyID { CSSPropertyInvalid };
     };
