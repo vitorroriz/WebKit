@@ -77,7 +77,7 @@ class SimpleHTTPServerDriver(HTTPServerDriver):
         self._ensure_http_server_dependencies()
 
     def serve(self, web_root):
-        _log.info('Launching an {} http server'.format(self._server_type))
+        _log.info('Launching a {} HTTP server'.format(self._server_type))
         http_server_file = 'http_server/{}_http_server.py'.format(self._server_type)
         http_server_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), http_server_file)
         extra_args = []
@@ -91,7 +91,7 @@ class SimpleHTTPServerDriver(HTTPServerDriver):
         max_attempt = 7
         retry_sequence = map(lambda attempt: attempt != max_attempt - 1, range(max_attempt))
         interval = 0.5
-        _log.info('Start to fetching the port number of the http server')
+        _log.info('Fetching HTTP server port number')
         for retry in retry_sequence:
             self._find_http_server_port()
             if self._server_port:
@@ -100,7 +100,7 @@ class SimpleHTTPServerDriver(HTTPServerDriver):
             assert self._server_process.poll() is None, 'HTTP Server Process is not running'
             if not retry:
                 continue
-            _log.info('Server port is not found this time, retry after {} seconds'.format(interval))
+            _log.info('Port not found yet, retrying in {} seconds'.format(interval))
             time.sleep(interval)
             interval *= 2
         else:
@@ -174,6 +174,6 @@ class SimpleHTTPServerDriver(HTTPServerDriver):
         self._server_type = server_type
 
     def _ensure_http_server_dependencies(self):
-        _log.info('Ensure dependencies of http server is satisfied')
+        _log.info('Ensure dependencies of http server are satisfied')
         if(self._server_type == 'twisted'):
             from webkitpy.autoinstalled import twisted
