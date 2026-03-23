@@ -77,7 +77,11 @@ class GraphicsContextGLTextureMapperTest : public ::testing::Test {
 protected:
     void SetUp() override // NOLINT
     {
+#if ENABLE(GPU_PROCESS)
         m_scopedProcessType = ScopedSetAuxiliaryProcessTypeForTesting { WTF::AuxiliaryProcessType::GPU };
+#else
+        m_scopedProcessType = ScopedSetAuxiliaryProcessTypeForTesting { WTF::AuxiliaryProcessType::WebContent };
+#endif
     }
     void TearDown() override // NOLINT
     {
@@ -99,7 +103,11 @@ protected:
 
     void SetUp() override // NOLINT
     {
+#if ENABLE(GPU_PROCESS)
         m_scopedProcessType = ScopedSetAuxiliaryProcessTypeForTesting { WTF::AuxiliaryProcessType::GPU };
+#else
+        m_scopedProcessType = ScopedSetAuxiliaryProcessTypeForTesting { WTF::AuxiliaryProcessType::WebContent };
+#endif
     }
     void TearDown() override // NOLINT
     {

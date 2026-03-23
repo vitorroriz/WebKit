@@ -141,8 +141,10 @@ RefPtr<SkiaGPUAtlas> SkiaPaintingEngine::createAtlas(const SkiaImageAtlasLayout&
     // falls back to GL if DMA-buf allocation fails, but we must not dispatch
     // GL operations to the upload worker thread (which has no GL context).
     auto texture = BitmapTexturePool::singleton().acquireTexture(atlasSize, textureFlags);
+#if USE(GBM)
     if (!texture->memoryMappedGPUBuffer())
         isDMABufBackedTexture = false;
+#endif
 
     auto atlas = SkiaGPUAtlas::create(layout, WTF::move(texture));
     if (!atlas)
