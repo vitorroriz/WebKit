@@ -1634,6 +1634,8 @@ def headers_for_type(type, for_implementation_file=False):
         'WebKit::WebPushD::WebPushDaemonConnectionConfiguration': ['"WebPushDaemonConnectionConfiguration.h"'],
         'WebKit::WebScriptMessageHandlerData': ['"WebUserContentControllerDataTypes.h"'],
         'WebKit::WebTransportSessionIdentifier': ['"WebTransportSession.h"'],
+        'WebKit::WebCoreUserScriptData': ['"WebUserContentControllerDataTypes.h"'],
+        'WebKit::WebCoreUserStyleSheetData': ['"WebUserContentControllerDataTypes.h"'],
         'WebKit::WebUserScriptData': ['"WebUserContentControllerDataTypes.h"'],
         'WebKit::WebUserStyleSheetData': ['"WebUserContentControllerDataTypes.h"'],
         'WTF::UnixFileDescriptor': ['<wtf/unix/UnixFileDescriptor.h>'],
