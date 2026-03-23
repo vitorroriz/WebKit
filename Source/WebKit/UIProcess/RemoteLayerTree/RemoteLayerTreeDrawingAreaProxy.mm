@@ -421,13 +421,15 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTree(IPC::Connection& connectio
     if (!sendRights.isEmpty())
         [CATransaction addCommitHandler:^{ sendRights.clear(); } forPhase:kCATransactionPhasePostCommit];
 
-    auto duration = MonotonicTime::now() - bundle.startTime;
-    if (duration.value() > (1.0 / displayNominalFramesPerSecond().value_or(FullSpeedFramesPerSecond)))
-        WTFEmitSignpost(this, WebKitPerformance, "slowFrame");
-    m_frameDurations.append(duration);
+    if (RefPtr page = this->page(); page && page->isViewVisible()) {
+        auto duration = MonotonicTime::now() - bundle.startTime;
+        if (duration.value() > (1.0 / displayNominalFramesPerSecond().value_or(FullSpeedFramesPerSecond)))
+            WTFEmitSignpost(this, WebKitPerformance, "slowFrame");
+        m_frameDurations.append(duration);
 
-    if (m_frameDurations.size() > kSlowFrameIndicatorWidth)
-        m_frameDurations.removeFirst();
+        if (m_frameDurations.size() > kSlowFrameIndicatorWidth)
+            m_frameDurations.removeFirst();
+    }
 
     {
         ProcessState& state = processStateForConnection(connection);
