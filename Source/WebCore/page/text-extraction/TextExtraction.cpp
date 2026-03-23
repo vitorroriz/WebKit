@@ -2353,11 +2353,11 @@ InteractionDescription interactionDescription(const Interaction& interaction, Lo
 
 RefPtr<Element> elementForExtractedText(const LocalFrame& frame, ExtractedText&& extractedText)
 {
+    auto nodeIdentifier = extractedText.nodeIdentifier;
     auto range = rangeForExtractedText(frame, WTF::move(extractedText));
-    if (!range)
-        return { };
-
-    RefPtr node = commonInclusiveAncestor<ComposedTree>(*range);
+    RefPtr node = range.transform([](auto& range) -> RefPtr<Node> {
+        return commonInclusiveAncestor<ComposedTree>(range);
+    }).value_or(nodeIdentifier ? Node::fromIdentifier(WTF::move(*nodeIdentifier)) : nullptr);
     if (!node)
         return { };
 

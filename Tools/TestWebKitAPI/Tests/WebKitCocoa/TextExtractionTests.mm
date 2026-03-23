@@ -617,6 +617,10 @@ TEST(TextExtractionTests, RequestJSHandleForNodeIdentifier)
     }()];
 
     EXPECT_WK_STREQ(debugTextForBody.get(), @"root,'“The quick brown fox jumped over the lazy dog”'");
+
+    RetainPtr nodeID = extractNodeIdentifier([extractionResult textContent], @"Compose a new message");
+    EXPECT_NOT_NULL([extractionResult jsHandleForNodeIdentifier:nodeID.get() searchText:@"text that does not exist"]);
+    EXPECT_NULL([extractionResult jsHandleForNodeIdentifier:nil searchText:@"text that does not exist"]);
 }
 
 TEST(TextExtractionTests, RequestJSHandleForNodeIdentifierCaseSensitive)
@@ -704,6 +708,10 @@ TEST(TextExtractionTests, RequestContainerJSHandleForNodeIdentifier)
     EXPECT_TRUE([debugText1 containsString:@"Sale - 20% Off"]);
     EXPECT_TRUE([debugText1 containsString:@"In Stock - Ships within 24 hours"]);
     EXPECT_FALSE([debugText1 containsString:@"Customers Also Bought"]);
+
+    RetainPtr nodeID = extractNodeIdentifier([extractionResult textContent], @"$99.99");
+    EXPECT_NOT_NULL([extractionResult containerJSHandleForNodeIdentifier:nodeID.get() searchText:@"text that does not exist"]);
+    EXPECT_NULL([extractionResult containerJSHandleForNodeIdentifier:nil searchText:@"text that does not exist"]);
 }
 
 TEST(TextExtractionTests, ResolveTargetNodeFromSelectorData)
