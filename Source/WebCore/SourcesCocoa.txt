@@ -140,6 +140,7 @@ accessibility/cocoa/AXCoreObjectCocoa.mm @nonARC
 accessibility/cocoa/AXObjectCacheCocoa.mm @nonARC
 accessibility/cocoa/AXTextMarkerCocoa.mm @nonARC
 accessibility/cocoa/AccessibilityObjectCocoa.mm @nonARC
+accessibility/cocoa/WebAccessibilityObjectWrapperBase.mm @nonARC @no-unify
 accessibility/ios/AXObjectCacheIOS.mm @nonARC
 accessibility/ios/AXRemoteTokenIOS.mm @nonARC
 accessibility/ios/AccessibilityObjectIOS.mm @nonARC
@@ -147,7 +148,6 @@ accessibility/ios/WebAccessibilityObjectWrapperIOS.mm @nonARC
 accessibility/isolatedtree/mac/AXIsolatedObjectMac.mm @nonARC
 accessibility/mac/AXObjectCacheMac.mm @nonARC
 accessibility/mac/AccessibilityObjectMac.mm @nonARC
-accessibility/mac/WebAccessibilityObjectWrapperBase.mm @nonARC @no-unify
 accessibility/mac/WebAccessibilityObjectWrapperMac.mm @nonARC @no-unify
 bindings/js/ScriptControllerMac.mm @nonARC
 bridge/objc/ObjCRuntimeObject.mm @nonARC @no-unify

@@ -494,8 +494,9 @@ list(APPEND WebCore_PRIVATE_FRAMEWORK_HEADERS
     Modules/mediasession/MediaSessionReadyState.h
     Modules/mediasession/NavigatorMediaSession.h
 
-    accessibility/mac/CocoaAccessibilityConstants.h
-    accessibility/mac/WebAccessibilityObjectWrapperBase.h
+    accessibility/cocoa/CocoaAccessibilityConstants.h
+    accessibility/cocoa/WebAccessibilityObjectWrapperBase.h
+
     accessibility/mac/WebAccessibilityObjectWrapperMac.h
 
     bridge/objc/WebScriptObject.h
