@@ -78,6 +78,7 @@
 #include "HTMLSummaryElement.h"
 #include "HTMLTableElement.h"
 #include "HTMLTextAreaElement.h"
+#include "HTMLTextFormControlElement.h"
 #include "HTMLVideoElement.h"
 #include "HitTestRequest.h"
 #include "HitTestResult.h"
@@ -2107,10 +2108,22 @@ void AccessibilityRenderObject::setSelectedVisiblePositionRange(const VisiblePos
     if (client)
         client->willChangeSelectionForAccessibility();
 
+    // Resolve the target text control: either this object itself is a native
+    // text control, or the target position is inside one (e.g. a textarea in
+    // an iframe when this object is the web area). In the latter case, the
+    // else branch below would fail because contains<ComposedTree> returns
+    // false for cross-document positions, clamping the selection to the web
+    // area start.
+    RefPtr<HTMLTextFormControlElement> textControl;
     if (isNativeTextControl()) {
-        // isNativeTextControl returns true only if this->node() is<HTMLTextAreaElement> or is<HTMLInputElement>.
-        // Since both HTMLTextAreaElement and HTMLInputElement derive from HTMLTextFormControlElement, it is safe to downcast here.
-        Ref textControl = uncheckedDowncast<HTMLTextFormControlElement>(*node());
+        // isNativeTextControl returns true only for HTMLTextAreaElement or HTMLInputElement,
+        // both of which derive from HTMLTextFormControlElement.
+        ASSERT(is<HTMLTextFormControlElement>(node()));
+        textControl = downcast<HTMLTextFormControlElement>(node());
+    } else
+        textControl = enclosingTextFormControl(range.start.deepEquivalent());
+
+    if (textControl) {
         int start = textControl->indexForVisiblePosition(range.start);
         int end = textControl->indexForVisiblePosition(range.end);
 
@@ -2120,10 +2133,11 @@ void AccessibilityRenderObject::setSelectedVisiblePositionRange(const VisiblePos
         // the case when range is obtained from AXObjectCache::rangeForNodeContents
         // for the HTMLTextFormControlElement.
         // Thus, the following corrects the start and end indexes in such a case..
-        if (range.start.deepEquivalent().anchorNode() == range.end.deepEquivalent().anchorNode()
-            && range.start.deepEquivalent().anchorNode() == textControl.ptr()) {
+        if (isNativeTextControl()
+            && range.start.deepEquivalent().anchorNode() == range.end.deepEquivalent().anchorNode()
+            && range.start.deepEquivalent().anchorNode() == textControl) {
             if (auto innerText = textControl->innerTextElement()) {
-                auto textControlRange = makeVisiblePositionRange(AXObjectCache::rangeForNodeContents(textControl.get()));
+                auto textControlRange = makeVisiblePositionRange(AXObjectCache::rangeForNodeContents(*textControl));
                 auto innerRange = makeVisiblePositionRange(AXObjectCache::rangeForNodeContents(*innerText));
 
                 if (range.start.equals(textControlRange.end))
