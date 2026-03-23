@@ -715,7 +715,7 @@ bool RenderView::shouldPaintBaseBackground() const
     if (frameView->frame().isMainFrame())
         return !frameView->isTransparent();
 
-    if (RefPtr ownerElement = document->ownerElement(); ownerElement && ownerElement->hasTagName(HTMLNames::frameTag))
+    if (auto* ownerElement = document->ownerElement(); ownerElement && ownerElement->hasTagName(HTMLNames::frameTag))
         return true;
 
     // Locate the <body> element using the DOM. This is easier than trying
@@ -733,7 +733,7 @@ bool RenderView::shouldPaintBaseBackground() const
         return true;
 
     if (RefPtr parentFrame = frameView->frame().parent()) {
-        if (RefPtr documentLoader = document->loader(); documentLoader && documentLoader->isInitialAboutBlank()) {
+        if (auto* documentLoader = document->loader(); documentLoader && documentLoader->isInitialAboutBlank()) {
             // https://github.com/w3c/csswg-drafts/issues/9624#issuecomment-1944425637
             // > RESOLVED: initial about:blank iframes are always transparent
             return false;

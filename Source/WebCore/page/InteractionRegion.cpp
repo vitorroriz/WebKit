@@ -131,8 +131,8 @@ void InteractionRegion::clearCache()
 
 static bool hasInteractiveCursorType(Element& element)
 {
-    CheckedPtr renderer = element.renderer();
-    CheckedPtr style = renderer ? &renderer->style() : nullptr;
+    auto* renderer = element.renderer();
+    auto* style = renderer ? &renderer->style() : nullptr;
     auto cursorType = style ? style->cursorType() : CursorType::Auto;
 
     if (cursorType == CursorType::Auto && element.enclosingLinkEventParentOrSelf())

@@ -187,7 +187,7 @@ void HTMLOptionElement::removingSteps(RemovalType removalType, ContainerNode& ol
     if (!document().settings().htmlEnhancedSelectParsingEnabled() || !m_ownerSelect)
         return;
 
-    if (RefPtr select = HTMLSelectElement::findOwnerSelect(parentNode(), HTMLSelectElement::ExcludeOptGroup::No)) {
+    if (auto* select = HTMLSelectElement::findOwnerSelect(parentNode(), HTMLSelectElement::ExcludeOptGroup::No)) {
         ASSERT_UNUSED(select, select == m_ownerSelect.get());
         return;
     }

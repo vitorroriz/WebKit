@@ -74,7 +74,7 @@ FileInputType::FileInputType(HTMLInputElement& element)
 
 FileInputType::~FileInputType()
 {
-    if (RefPtr fileChooser = m_fileChooser)
+    if (auto* fileChooser = m_fileChooser.get())
         fileChooser->invalidate();
 
     if (m_fileIconLoader)
@@ -309,7 +309,7 @@ FileChooserSettings FileInputType::fileChooserSettings() const
 
 void FileInputType::applyFileChooserSettings()
 {
-    if (RefPtr fileChooser = m_fileChooser)
+    if (auto* fileChooser = m_fileChooser.get())
         fileChooser->invalidate();
 
     m_fileChooser = FileChooser::create(*this, fileChooserSettings());

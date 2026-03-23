@@ -327,7 +327,7 @@ String HitTestResult::spellingToolTip(TextDirection& dir) const
     if (!marker)
         return String();
 
-    if (CheckedPtr renderer = m_innerNonSharedNode->renderer())
+    if (auto* renderer = m_innerNonSharedNode->renderer())
         dir = renderer->writingMode().computedTextDirection();
     return marker->description();
 }
@@ -647,7 +647,7 @@ bool HitTestResult::mediaControlsEnabled() const
 bool HitTestResult::mediaLoopEnabled() const
 {
 #if ENABLE(VIDEO)
-    if (RefPtr mediaElt = mediaElement())
+    if (auto* mediaElt = mediaElement())
         return mediaElt->loop();
 #endif
     return false;

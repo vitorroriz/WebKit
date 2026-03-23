@@ -77,7 +77,7 @@ void HTMLHRElement::removingSteps(RemovalType removalType, ContainerNode& oldPar
     if (!document().settings().htmlEnhancedSelectParsingEnabled() || !m_ownerSelect)
         return;
 
-    if (RefPtr select = HTMLSelectElement::findOwnerSelect(parentNode(), HTMLSelectElement::ExcludeOptGroup::Yes)) {
+    if (auto* select = HTMLSelectElement::findOwnerSelect(parentNode(), HTMLSelectElement::ExcludeOptGroup::Yes)) {
         ASSERT_UNUSED(select, select == m_ownerSelect.get());
         return;
     }
