@@ -366,9 +366,8 @@ void MediaSessionManagerCocoa::sessionWillEndPlayback(PlatformMediaSessionInterf
 #endif
 }
 
-void MediaSessionManagerCocoa::clientCharacteristicsChanged(PlatformMediaSessionInterface& session, bool)
+void MediaSessionManagerCocoa::clientCharacteristicsChanged(PlatformMediaSessionInterface&, bool)
 {
-    MEDIASESSIONMANAGER_RELEASE_LOG(ClientCharacteristicsChanged, session.logIdentifier());
     scheduleSessionStatusUpdate();
 }
 

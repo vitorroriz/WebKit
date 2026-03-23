@@ -44,10 +44,16 @@ enum class MediaSessionMainContentPurpose { MediaControls, Autoplay };
 enum class MediaPlaybackState { Playing, Paused };
 
 enum class MediaPlaybackDenialReason {
+    Unknown,
     UserGestureRequired,
     FullscreenRequired,
     PageConsentRequired,
     InvalidState,
+};
+
+struct MediaPlaybackDenialExplanation {
+    MediaPlaybackDenialReason reason { MediaPlaybackDenialReason::Unknown };
+    String description;
 };
 
 class AudioTrack;
@@ -86,7 +92,7 @@ public:
     void isVisibleInViewportChanged();
     void inActiveDocumentChanged();
 
-    Expected<void, MediaPlaybackDenialReason> playbackStateChangePermitted(MediaPlaybackState) const;
+    Expected<void, MediaPlaybackDenialExplanation> playbackStateChangePermitted(MediaPlaybackState) const;
     bool autoplayPermitted() const;
     bool dataLoadingPermitted() const;
     MediaPlayer::BufferingPolicy preferredBufferingPolicy() const;
@@ -276,7 +282,15 @@ struct LogArgument<WebCore::MediaPlaybackDenialReason> {
         return convertEnumerationToString(reason);
     }
 };
-    
+
+template <>
+struct LogArgument<WebCore::MediaPlaybackDenialExplanation> {
+    static String toString(const WebCore::MediaPlaybackDenialExplanation explanation)
+    {
+        return makeString(convertEnumerationToString(explanation.reason), ": "_s, explanation.description);
+    }
+};
+
 }; // namespace WTF
 
 

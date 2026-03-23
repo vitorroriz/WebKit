@@ -3182,47 +3182,35 @@ void HTMLMediaElement::mediaPlayerReadyStateChanged()
     m_remainingReadyStateChangedAttempts.store(0);
 }
 
-Expected<void, MediaPlaybackDenialReason> HTMLMediaElement::canTransitionFromAutoplayToPlay() const
+Expected<void, MediaPlaybackDenialExplanation> HTMLMediaElement::canTransitionFromAutoplayToPlay() const
 {
-    if (m_readyState != HAVE_ENOUGH_DATA) {
-        HTMLMEDIAELEMENT_RELEASE_LOG(CanTransitionFromAutoplayToPlayNotEnoughData);
-        return makeUnexpected(MediaPlaybackDenialReason::PageConsentRequired);
-    }
-    if (!isAutoplaying()) {
-        HTMLMEDIAELEMENT_RELEASE_LOG(CanTransitionFromAutoplayToPlayNotAutoplaying);
-        return makeUnexpected(MediaPlaybackDenialReason::PageConsentRequired);
-    }
+    auto makeUnexpectedDenial = [](MediaPlaybackDenialReason reason, const String& explanation) {
+        return makeUnexpected<MediaPlaybackDenialExplanation>({ reason, explanation });
+    };
+
+    if (m_readyState != HAVE_ENOUGH_DATA)
+        return makeUnexpectedDenial(MediaPlaybackDenialReason::PageConsentRequired, "Not enough data"_s);
+
+    if (!isAutoplaying())
+        return makeUnexpectedDenial(MediaPlaybackDenialReason::PageConsentRequired, "!autoplaying"_s);
+
     Ref mediaSession = this->mediaSession();
-    if (!mediaSession->autoplayPermitted()) {
-        ALWAYS_LOG(LOGIDENTIFIER, "!mediaSession().autoplayPermitted");
-        return makeUnexpected(MediaPlaybackDenialReason::PageConsentRequired);
-    }
-    if (!paused()) {
-        ALWAYS_LOG(LOGIDENTIFIER, "!paused");
-        return makeUnexpected(MediaPlaybackDenialReason::PageConsentRequired);
-    }
-    if (!autoplay()) {
-        ALWAYS_LOG(LOGIDENTIFIER, "!autoplay");
-        return makeUnexpected(MediaPlaybackDenialReason::PageConsentRequired);
-    }
-    if (pausedForUserInteraction()) {
-        ALWAYS_LOG(LOGIDENTIFIER, "pausedForUserInteraction");
-        return makeUnexpected(MediaPlaybackDenialReason::PageConsentRequired);
-    }
-    if (document().isSandboxed(SandboxFlag::AutomaticFeatures)) {
-        ALWAYS_LOG(LOGIDENTIFIER, "isSandboxed");
-        return makeUnexpected(MediaPlaybackDenialReason::PageConsentRequired);
-    }
+    if (!mediaSession->autoplayPermitted())
+        return makeUnexpectedDenial(MediaPlaybackDenialReason::PageConsentRequired, "!mediaSession().autoplayPermitted"_s);
 
-    auto permitted = mediaSession->playbackStateChangePermitted(MediaPlaybackState::Playing);
-#if !RELEASE_LOG_DISABLED
-    if (!permitted)
-        ALWAYS_LOG(LOGIDENTIFIER, permitted.error());
-    else
-        ALWAYS_LOG(LOGIDENTIFIER, "can transition!");
-#endif
+    if (!paused())
+        return makeUnexpectedDenial(MediaPlaybackDenialReason::PageConsentRequired, "!paused"_s);
 
-    return permitted;
+    if (!autoplay())
+        return makeUnexpectedDenial(MediaPlaybackDenialReason::PageConsentRequired, "!autoplay"_s);
+
+    if (pausedForUserInteraction())
+        return makeUnexpectedDenial(MediaPlaybackDenialReason::PageConsentRequired, "pausedForUserInteraction"_s);
+
+    if (document().isSandboxed(SandboxFlag::AutomaticFeatures))
+        return makeUnexpectedDenial(MediaPlaybackDenialReason::PageConsentRequired, "isSandboxed"_s);
+
+    return mediaSession->playbackStateChangePermitted(MediaPlaybackState::Playing);
 }
 
 void HTMLMediaElement::dispatchPlayPauseEventsIfNeedsQuirks()
@@ -3419,9 +3407,10 @@ void HTMLMediaElement::setReadyState(MediaPlayer::ReadyState state)
                 m_playbackStartedTime = currentMediaTime().toDouble();
                 scheduleEvent(eventNames().playEvent);
                 scheduleNotifyAboutPlaying();
-            } else if (canTransition.error() == MediaPlaybackDenialReason::UserGestureRequired) {
-                ALWAYS_LOG(LOGIDENTIFIER, "Autoplay blocked, user gesture required");
-                setAutoplayEventPlaybackState(AutoplayEventPlaybackState::PreventedAutoplay);
+            } else {
+                ALWAYS_LOG(LOGIDENTIFIER, "Autoplay blocked with reason: ", canTransition.error());
+                if (canTransition.error().reason == MediaPlaybackDenialReason::UserGestureRequired)
+                    setAutoplayEventPlaybackState(AutoplayEventPlaybackState::PreventedAutoplay);
             }
         }
     } while (false);
@@ -3430,8 +3419,8 @@ void HTMLMediaElement::setReadyState(MediaPlayer::ReadyState state)
     // honoring any playback denial reasons such as the requirement of a user gesture.
     if (m_readyState == HAVE_FUTURE_DATA && oldState < HAVE_FUTURE_DATA && potentiallyPlaying() && !mediaSession().playbackStateChangePermitted(MediaPlaybackState::Playing)) {
         auto canTransition = canTransitionFromAutoplayToPlay();
-        if (!canTransition && canTransition.error() == MediaPlaybackDenialReason::UserGestureRequired)
-            ALWAYS_LOG(LOGIDENTIFIER, "Autoplay blocked, user gesture required");
+        if (!canTransition && canTransition.error().reason == MediaPlaybackDenialReason::UserGestureRequired)
+            ALWAYS_LOG(LOGIDENTIFIER, "Autoplay blocked with reason: ", canTransition.error());
 
         pauseInternal();
         setAutoplayEventPlaybackState(AutoplayEventPlaybackState::PreventedAutoplay);
@@ -4461,12 +4450,12 @@ void HTMLMediaElement::setPreload(const AtomString& preload)
 
 void HTMLMediaElement::play(DOMPromiseDeferred<void>&& promise)
 {
-    HTMLMEDIAELEMENT_RELEASE_LOG(Play);
+    HTMLMEDIAELEMENT_RELEASE_LOG(PlayDom);
 
     Ref mediaSession = this->mediaSession();
     auto permitted = mediaSession->playbackStateChangePermitted(MediaPlaybackState::Playing);
     if (!permitted) {
-        if (permitted.error() == MediaPlaybackDenialReason::UserGestureRequired)
+        if (permitted.error().reason == MediaPlaybackDenialReason::UserGestureRequired)
             setAutoplayEventPlaybackState(AutoplayEventPlaybackState::PreventedAutoplay);
         ERROR_LOG(LOGIDENTIFIER, "rejecting promise: ", permitted.error());
         promise.reject(ExceptionCode::NotAllowedError);
@@ -4499,7 +4488,7 @@ void HTMLMediaElement::play()
     auto permitted = protect(mediaSession())->playbackStateChangePermitted(MediaPlaybackState::Playing);
     if (!permitted) {
         ERROR_LOG(LOGIDENTIFIER, "playback not permitted: ", permitted.error());
-        if (permitted.error() == MediaPlaybackDenialReason::UserGestureRequired)
+        if (permitted.error().reason == MediaPlaybackDenialReason::UserGestureRequired)
             setAutoplayEventPlaybackState(AutoplayEventPlaybackState::PreventedAutoplay);
         return;
     }
@@ -9146,11 +9135,14 @@ void HTMLMediaElement::suspendPlayback()
 
 void HTMLMediaElement::resumeAutoplaying()
 {
-    ALWAYS_LOG(LOGIDENTIFIER, "paused = ", paused());
     m_autoplaying = true;
 
-    if (canTransitionFromAutoplayToPlay())
+    auto canTransition = canTransitionFromAutoplayToPlay();
+    if (canTransition) {
+        ALWAYS_LOG(LOGIDENTIFIER, "paused = ", paused());
         play();
+    } else
+        ALWAYS_LOG(LOGIDENTIFIER, "paused = ", paused(), ", blocked with reason: ", canTransition.error());
 }
 
 void HTMLMediaElement::mayResumePlayback(bool shouldResume)
@@ -9699,8 +9691,15 @@ void HTMLMediaElement::updateShouldPlay()
         scheduleRejectPendingPlayPromises(DOMException::create(ExceptionCode::NotAllowedError));
         pauseInternal();
         setAutoplayEventPlaybackState(AutoplayEventPlaybackState::PreventedAutoplay);
-    } else if (canTransitionFromAutoplayToPlay())
+        return;
+    }
+
+    auto canTransition = canTransitionFromAutoplayToPlay();
+    if (canTransition) {
+        ALWAYS_LOG(LOGIDENTIFIER);
         play();
+    } else
+        ALWAYS_LOG(LOGIDENTIFIER, "autoplay blocked with reason: ", canTransition.error());
 }
 
 void HTMLMediaElement::resetPlaybackSessionState()
@@ -9876,8 +9875,12 @@ bool HTMLMediaElement::hasMediaStreamSource() const
 #if ENABLE(MEDIA_STREAM)
 void HTMLMediaElement::mediaStreamCaptureStarted()
 {
-    if (canTransitionFromAutoplayToPlay())
+    auto canTransition = canTransitionFromAutoplayToPlay();
+    if (canTransition) {
+        ALWAYS_LOG(LOGIDENTIFIER);
         play();
+    } else
+        ALWAYS_LOG(LOGIDENTIFIER, "autoplay blocked with reason: ", canTransition.error());
 }
 #endif
 

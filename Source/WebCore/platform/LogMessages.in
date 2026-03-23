@@ -110,6 +110,7 @@ HTMLMediaElementUpdatePlayState, "HTMLMediaElement::updatePlayState(%" PRIX64 ")
 HTMLMediaElementVisibilityStateChanged, "HTMLMediaElement::visibilityStateChanged(%" PRIX64 ") visible = %d", (uint64_t, int), DEFAULT, Media
 HTMLMediaElementCreateMediaPlayer, "HTMLMediaElement::createMediaPlayer(%" PRIX64 ")", (uint64_t), DEFAULT, Media
 HTMLMediaElementPlay, "HTMLMediaElement::play(%" PRIX64 ")", (uint64_t), DEFAULT, Media
+HTMLMediaElementPlayDom, "HTMLMediaElement::play(%" PRIX64 ") (DOM)", (uint64_t), DEFAULT, Media
 HTMLMediaElementPlayInternal, "HTMLMediaElement::playInternal(%" PRIX64 ")", (uint64_t), DEFAULT, Media
 HTMLMediaElementAddAudioTrack, "HTMLMediaElement::addAudioTrack(%" PRIX64 ") id: %" PUBLIC_LOG_STRING ", %" PUBLIC_LOG_STRING "", (uint64_t, CString, CString), DEFAULT, Media
 HTMLMediaElementAddVideoTrack, "HTMLMediaElement::addVideoTrack(%" PRIX64 ") id: %" PUBLIC_LOG_STRING ", %" PUBLIC_LOG_STRING "", (uint64_t, CString, CString), DEFAULT, Media
