@@ -1018,6 +1018,9 @@ public:
     void hoveredElementDidDetach(Element&);
     void elementInActiveChainDidDetach(Element&);
 
+    Element* hoveredElement() const { return m_hoveredElement.get(); }
+    Element* activatedElement() const { return m_activeElement.get(); }
+
     enum class CaptureChange : bool { No, Yes };
     void updateHoverActiveState(const HitTestRequest&, Element*, CaptureChange = CaptureChange::No);
 
