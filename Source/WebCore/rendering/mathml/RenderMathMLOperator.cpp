@@ -316,7 +316,19 @@ LayoutUnit RenderMathMLOperator::verticalStretchedOperatorShift() const
 std::optional<LayoutUnit> RenderMathMLOperator::firstLineBaseline() const
 {
     if (useMathOperator()) {
-        auto baseline = settings().subpixelInlineLayoutEnabled() ? m_mathOperator.ascent() - verticalStretchedOperatorShift() : LayoutUnit(roundf(m_mathOperator.ascent() - verticalStretchedOperatorShift()));
+        LayoutUnit shift;
+        if (isVertical() && hasOperatorFlag(MathMLOperatorDictionary::Stretchy)) {
+            // If the operator has the stretchy property.
+            // If the stretch axis of the operator is block.
+            // https://w3c.github.io/mathml-core/#layout-of-operators
+            shift = verticalStretchedOperatorShift();
+        } else if (isLargeOperatorInDisplayStyle() && hasOperatorFlag(MathMLOperatorDictionary::Symmetric)) {
+            // If the operator has the largeop property and if math-style on the mo element is normal.
+            // If the operator has the symmetric property.
+            // https://w3c.github.io/mathml-core/#layout-of-operators
+            shift = (m_mathOperator.ascent() - m_mathOperator.descent() - 2 * mathAxisHeight()) / 2;
+        }
+        auto baseline = settings().subpixelInlineLayoutEnabled() ? m_mathOperator.ascent() - shift : LayoutUnit(roundf(m_mathOperator.ascent() - shift));
         return { borderAndPaddingBefore() + baseline };
     }
     return RenderMathMLToken::firstLineBaseline();
