@@ -2507,19 +2507,19 @@ std::optional<URLParser::IPv6Address> URLParser::parseIPv6Host(CodePointIterator
 }
 
 // FIXME: This function should take span<const char8_t>, since it requires UTF-8.
-template<typename CharacterType>
-URLParser::Latin1Buffer URLParser::percentDecode(std::span<const Latin1Character> input, const CodePointIterator<CharacterType>& iteratorForSyntaxViolationPosition)
+template<typename SyntaxViolationHandler>
+URLParser::Latin1Buffer URLParser::percentDecodeImpl(std::span<const Latin1Character> input, SyntaxViolationHandler&& syntaxViolationHandler)
 {
     Latin1Buffer output;
     output.reserveInitialCapacity(input.size());
-    
+
     for (size_t i = 0; i < input.size(); ++i) {
         uint8_t byte = input[i];
         if (byte != '%')
             output.append(byte);
-        else if (input.size() > 2 && i < input.size() - 2) {
+        else if (i + 2 < input.size()) {
             if (isASCIIHexDigit(input[i + 1]) && isASCIIHexDigit(input[i + 2])) {
-                syntaxViolation(iteratorForSyntaxViolationPosition);
+                syntaxViolationHandler();
                 output.append(toASCIIHexValue(input[i + 1], input[i + 2]));
                 i += 2;
             } else
@@ -2529,26 +2529,16 @@ URLParser::Latin1Buffer URLParser::percentDecode(std::span<const Latin1Character
     }
     return output;
 }
-    
+
+template<typename CharacterType>
+URLParser::Latin1Buffer URLParser::percentDecode(std::span<const Latin1Character> input, const CodePointIterator<CharacterType>& iteratorForSyntaxViolationPosition)
+{
+    return percentDecodeImpl(input, [&] { syntaxViolation(iteratorForSyntaxViolationPosition); });
+}
+
 URLParser::Latin1Buffer URLParser::percentDecode(std::span<const Latin1Character> input)
 {
-    Latin1Buffer output;
-    output.reserveInitialCapacity(input.size());
-    
-    for (size_t i = 0; i < input.size(); ++i) {
-        uint8_t byte = input[i];
-        if (byte != '%')
-            output.append(byte);
-        else if (input.size() > 2 && i < input.size() - 2) {
-            if (isASCIIHexDigit(input[i + 1]) && isASCIIHexDigit(input[i + 2])) {
-                output.append(toASCIIHexValue(input[i + 1], input[i + 2]));
-                i += 2;
-            } else
-                output.append(byte);
-        } else
-            output.append(byte);
-    }
-    return output;
+    return percentDecodeImpl(input, [] { });
 }
 
 bool URLParser::needsNonSpecialDotSlash() const
