@@ -452,20 +452,30 @@ void CookieStore::set(CookieInit&& options, Ref<DeferredPromise>&& promise)
     }
 
     if (options.expires) {
+        if (options.maxAge) {
+            promise->reject(Exception { ExceptionCode::TypeError, "Only one of 'expires' or 'maxAge' may be specified"_s });
+            return;
+        }
+
         // When this cookie is converted to an NSHTTPCookie, the creation and expiration
-        // times will first be converted to seconds and then CFNetwork will floor these times.
-        // If the creation and expiration differ by less than 1 second, flooring them may
-        // reduce the difference to 0 seconds. This can cause the onchange event to wrongly
-        // fire as a deletion instead of a change. In such cases, account for this flooring by
-        // adding 1 second to the expiration.
+        // times will first be converted from milliseconds to seconds and then CFNetwork will
+        // floor these times. If the creation and expiration differ by less than 1 second,
+        // flooring them may reduce the difference to 0 seconds. This can cause the onchange
+        // event to wrongly fire as a deletion instead of a change. In such cases, account for
+        // this flooring by adding 1 second to the expiration.
 
         auto expires = *options.expires;
-        bool equalAfterConversion = floor(expires / 1000.0) == floor(cookie.created / 1000.0);
+
+        auto expiresConverted = floor(Seconds::fromMilliseconds(expires).value());
+        auto createdConverted = floor(Seconds::fromMilliseconds(cookie.created).value());
+        bool equalAfterConversion = expiresConverted == createdConverted;
+
         if (equalAfterConversion && (expires > cookie.created))
-            expires += 1000.0;
+            expires += Seconds(1).milliseconds();
 
         cookie.expires = expires;
-    }
+    } else if (options.maxAge)
+        cookie.expires = cookie.created + Seconds(*options.maxAge).milliseconds();
 
     switch (options.sameSite) {
     case CookieSameSite::Strict:
