@@ -76,6 +76,7 @@
 #import "WKQuickLookPreviewController.h"
 #import "WKRevealItemPresenter.h"
 #import "WKTextAnimationManagerMac.h"
+#import "WKTextEffectManager.h"
 #import "WKTextPlaceholder.h"
 #import "WKTextSelectionController.h"
 #import "WKViewLayoutStrategy.h"
@@ -5108,6 +5109,27 @@ void WebViewImpl::hideTextAnimationView()
 {
     [m_textAnimationTypeManager hideTextAnimationView];
 }
+
+#if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
+void WebViewImpl::addTextEffectForID(NSUUID *uuid, const WebCore::TextEffectData& data)
+{
+    if (!protect(m_page->preferences())->textEffectsEnabled())
+        return;
+
+    if (!m_textEffectManager)
+        m_textEffectManager = adoptNS([[WKTextEffectManager alloc] initWithWebView:view()]);
+
+    [m_textEffectManager addTextEffectForID:uuid withData:data];
+}
+
+void WebViewImpl::removeTextEffectForID(NSUUID *uuid)
+{
+    if (!protect(m_page->preferences())->textEffectsEnabled())
+        return;
+
+    [m_textEffectManager removeTextEffectForID:uuid];
+}
+#endif // ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
 
 #endif // ENABLE(WRITING_TOOLS)
 

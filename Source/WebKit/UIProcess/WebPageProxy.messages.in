@@ -284,6 +284,11 @@ messages -> WebPageProxy {
     DidEndPartialIntelligenceTextAnimation()
 #endif
 
+#if ENABLE(WRITING_TOOLS) && ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
+    AddTextEffectForID(WTF::UUID uuid, struct WebCore::TextEffectData data, RefPtr<WebCore::TextIndicator> textIndicator, RefPtr<WebCore::TextIndicator> decorationIndicator)
+    RemoveTextEffectForID(WTF::UUID uuid)
+#endif
+
 #if ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)
     [EnabledBy=MediaControlsContextMenusEnabled] ShowMediaControlsContextMenu(WebCore::FloatRect targetFrame, Vector<WebCore::MediaControlsContextMenuItem> items, struct WebKit::FrameInfoData frameInfoData, WebCore::MediaPlayerClientIdentifier identifier) -> (WebCore::MediaControlsContextMenuItem::ID selectedItemID)
 #endif // ENABLE(MEDIA_CONTROLS_CONTEXT_MENUS) && USE(UICONTEXTMENU)

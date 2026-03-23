@@ -3078,6 +3078,26 @@ static std::optional<WebCore::JSHandleIdentifier> jsHandleIdentifierInFrame(cons
 #endif
 }
 
+#if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
+- (void)_addTextEffectForID:(NSUUID *)nsUUID withData:(const WebCore::TextEffectData&)data
+{
+#if PLATFORM(IOS_FAMILY)
+    [_contentView addTextEffectForID:nsUUID withData:data];
+#else
+    _impl->addTextEffectForID(nsUUID, data);
+#endif
+}
+
+- (void)_removeTextEffectForID:(NSUUID *)nsUUID
+{
+#if PLATFORM(IOS_FAMILY)
+    [_contentView removeTextEffectForID:nsUUID];
+#else
+    _impl->removeTextEffectForID(nsUUID);
+#endif
+}
+#endif // ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
+
 #endif
 
 #if ENABLE(GAMEPAD)

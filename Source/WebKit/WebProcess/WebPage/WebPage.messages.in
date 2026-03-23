@@ -910,6 +910,11 @@ messages -> WebPage WantsAsyncDispatchMessage {
     IntelligenceTextAnimationsDidComplete();
 #endif
 
+#if ENABLE(WRITING_TOOLS) && ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
+    UpdateUnderlyingTextVisibilityForTextEffectID(WTF::UUID uuid, bool visible) -> ()
+    CreateTextIndicatorForTextEffectID(WTF::UUID uuid) -> (RefPtr<WebCore::TextIndicator> textIndicator)
+#endif
+
 #if PLATFORM(COCOA)
     CreateTextIndicatorForElementWithID(String elementID) -> (RefPtr<WebCore::TextIndicator> textIndicator)
 #endif
