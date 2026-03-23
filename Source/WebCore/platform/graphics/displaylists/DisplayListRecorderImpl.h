@@ -81,7 +81,7 @@ public:
     void drawEllipse(const FloatRect&) final;
     void drawPath(const Path&) final;
     void drawFocusRing(const Path&, float outlineWidth, const Color&) final;
-    void drawFocusRing(const Vector<FloatRect>&, float outlineOffset, float outlineWidth, const Color&) final;
+    void drawFocusRing(const Vector<FloatRect>&, float outlineWidth, const Color&) final;
     void drawPattern(const NativeImage&, const FloatRect& destRect, const FloatRect& tileRect, const AffineTransform&, const FloatPoint& phase, const FloatSize& spacing, ImagePaintingOptions) final;
     void drawPattern(ImageBuffer&, const FloatRect& destRect, const FloatRect& tileRect, const AffineTransform&, const FloatPoint& phase, const FloatSize& spacing, ImagePaintingOptions) final;
     void fillEllipse(const FloatRect&) final;

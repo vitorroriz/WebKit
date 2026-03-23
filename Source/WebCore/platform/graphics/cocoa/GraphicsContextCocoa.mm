@@ -135,14 +135,11 @@ void GraphicsContextCG::drawFocusRing(const Path& path, float, const Color& colo
     CGContextFillPath(platformContext);
 }
 
-void GraphicsContextCG::drawFocusRing(const Vector<FloatRect>& rects, float outlineOffset, float outlineWidth, const Color& color)
+void GraphicsContextCG::drawFocusRing(const Vector<FloatRect>& rects, float outlineWidth, const Color& color)
 {
     Path path;
-    for (const auto& rect : rects) {
-        auto r = rect;
-        r.inflate(-outlineOffset);
-        path.addRect(r);
-    }
+    for (const auto& rect : rects)
+        path.addRect(rect);
     drawFocusRing(path, outlineWidth, color);
 }
 

@@ -512,10 +512,10 @@ void BifurcatedGraphicsContext::drawFocusRing(const Path& path, float outlineWid
     VERIFY_STATE_SYNCHRONIZATION();
 }
 
-void BifurcatedGraphicsContext::drawFocusRing(const Vector<FloatRect>& rects, float outlineOffset, float outlineWidth, const Color& color)
+void BifurcatedGraphicsContext::drawFocusRing(const Vector<FloatRect>& rects, float outlineWidth, const Color& color)
 {
-    m_primaryContext.drawFocusRing(rects, outlineOffset, outlineWidth, color);
-    m_secondaryContext.drawFocusRing(rects, outlineOffset, outlineWidth, color);
+    m_primaryContext.drawFocusRing(rects, outlineWidth, color);
+    m_secondaryContext.drawFocusRing(rects, outlineWidth, color);
 
     VERIFY_STATE_SYNCHRONIZATION();
 }

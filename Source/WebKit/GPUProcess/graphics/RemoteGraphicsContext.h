@@ -119,7 +119,7 @@ public:
     void drawEllipse(const WebCore::FloatRect&);
     void drawPath(const WebCore::Path&);
     void drawFocusRingPath(const WebCore::Path&, float outlineWidth, const WebCore::Color&);
-    void drawFocusRingRects(const Vector<WebCore::FloatRect>&, float outlineOffset, float outlineWidth, const WebCore::Color&);
+    void drawFocusRingRects(const Vector<WebCore::FloatRect>&, float outlineWidth, const WebCore::Color&);
     void fillRect(const WebCore::FloatRect&, WebCore::RequiresClipToRect);
     void fillRectWithColor(const WebCore::FloatRect&, const WebCore::Color&);
     void fillRectWithGradient(const WebCore::FloatRect&, Ref<WebCore::Gradient>&&);

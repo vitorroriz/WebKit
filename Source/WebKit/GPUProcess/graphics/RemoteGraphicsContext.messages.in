@@ -93,7 +93,7 @@ messages -> RemoteGraphicsContext Stream {
     DrawEllipse(WebCore::FloatRect rect) StreamBatched
     DrawPath(WebCore::Path path) StreamBatched
     DrawFocusRingPath(WebCore::Path path, float outlineWidth, WebCore::Color color) StreamBatched
-    DrawFocusRingRects(Vector<WebCore::FloatRect> rects, float outlineOffset, float outlineWidth, WebCore::Color color) StreamBatched
+    DrawFocusRingRects(Vector<WebCore::FloatRect> rects, float outlineWidth, WebCore::Color color) StreamBatched
     FillRect(WebCore::FloatRect rect, enum:bool WebCore::RequiresClipToRect requiresClipToRect) StreamBatched
     FillRectWithColor(WebCore::FloatRect rect, WebCore::Color color) StreamBatched
     FillRectWithGradient(WebCore::FloatRect rect, Ref<WebCore::Gradient> gradient) StreamBatched

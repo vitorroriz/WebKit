@@ -209,7 +209,7 @@ void SwitchTrackMac::draw(GraphicsContext& context, const FloatRoundedRect& bord
 
     if (isFocused) {
         auto color = colorFromCocoaColor([NSColor keyboardFocusIndicatorColor]).opaqueColor();
-        context.drawFocusRing(Vector { trackRect }, 0, 0, color);
+        context.drawFocusRing(Vector { trackRect }, 0, color);
     }
 }
 

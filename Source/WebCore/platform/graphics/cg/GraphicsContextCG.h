@@ -119,7 +119,7 @@ public:
     AffineTransform getCTM(IncludeDeviceScale = PossiblyIncludeDeviceScale) const override;
 
     void drawFocusRing(const Path&, float outlineWidth, const Color&) final;
-    void drawFocusRing(const Vector<FloatRect>&, float outlineOffset, float outlineWidth, const Color&) final;
+    void drawFocusRing(const Vector<FloatRect>&, float outlineWidth, const Color&) final;
 
     void drawLinesForText(const FloatPoint&, float thickness, std::span<const FloatSegment>, bool isPrinting, bool doubleLines, StrokeStyle) final;
 

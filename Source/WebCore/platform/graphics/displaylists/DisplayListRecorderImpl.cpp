@@ -312,10 +312,10 @@ void RecorderImpl::drawFocusRing(const Path& path, float outlineWidth, const Col
     m_items.append(DrawFocusRingPath(path, outlineWidth, color));
 }
 
-void RecorderImpl::drawFocusRing(const Vector<FloatRect>& rects, float outlineOffset, float outlineWidth, const Color& color)
+void RecorderImpl::drawFocusRing(const Vector<FloatRect>& rects, float outlineWidth, const Color& color)
 {
     appendStateChangeItemIfNecessary();
-    m_items.append(DrawFocusRingRects(rects, outlineOffset, outlineWidth, color));
+    m_items.append(DrawFocusRingRects(rects, outlineWidth, color));
 }
 
 void RecorderImpl::fillRect(const FloatRect& rect, RequiresClipToRect requiresClipToRect)

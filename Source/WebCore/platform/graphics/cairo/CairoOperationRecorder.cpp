@@ -786,7 +786,7 @@ void OperationRecorder::drawFocusRing(const Path& path, float outlineWidth, cons
 #endif
 }
 
-void OperationRecorder::drawFocusRing(const Vector<FloatRect>& rects, float outlineOffset, float outlineWidth, const Color& color)
+void OperationRecorder::drawFocusRing(const Vector<FloatRect>& rects, float outlineWidth, const Color& color)
 {
 #if USE(THEME_ADWAITA)
     Adwaita::paintFocus(*this, rects, color);
@@ -808,7 +808,6 @@ void OperationRecorder::drawFocusRing(const Vector<FloatRect>& rects, float outl
 
     append(createCommand<DrawFocusRing>(rects, outlineWidth, color));
 #endif
-    UNUSED_PARAM(outlineOffset);
 }
 
 void OperationRecorder::save(GraphicsContextState::Purpose purpose)

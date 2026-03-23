@@ -246,11 +246,7 @@ static void drawFocusRing(GraphicsContext& context, const Path& path, const Rend
 
 static void drawFocusRing(GraphicsContext& context, Vector<FloatRect> rects, const RenderStyle& style, const Color& color)
 {
-#if PLATFORM(MAC)
-    context.drawFocusRing(rects, 0, Style::evaluate<float>(style.usedOutlineWidth(), Style::ZoomNeeded { }), color);
-#else
-    context.drawFocusRing(rects, Style::evaluate<float>(style.usedOutlineOffset(), Style::ZoomNeeded { }), Style::evaluate<float>(style.usedOutlineWidth(), Style::ZoomNeeded { }), color);
-#endif
+    context.drawFocusRing(rects, Style::evaluate<float>(style.usedOutlineWidth(), Style::ZoomNeeded { }), color);
 }
 
 void OutlinePainter::paintFocusRing(const RenderElement& renderer, const Vector<LayoutRect>& focusRingRects) const

@@ -505,13 +505,12 @@ void DrawFocusRingPath::dump(TextStream& ts, OptionSet<AsTextFlag>) const
 
 void DrawFocusRingRects::apply(GraphicsContext& context) const
 {
-    context.drawFocusRing(m_rects, m_outlineOffset, m_outlineWidth, m_color);
+    context.drawFocusRing(m_rects, m_outlineWidth, m_color);
 }
 
 void DrawFocusRingRects::dump(TextStream& ts, OptionSet<AsTextFlag>) const
 {
     ts.dumpProperty("rects"_s, rects());
-    ts.dumpProperty("outline-offset"_s, outlineOffset());
     ts.dumpProperty("outline-width"_s, outlineWidth());
     ts.dumpProperty("color"_s, color());
 }

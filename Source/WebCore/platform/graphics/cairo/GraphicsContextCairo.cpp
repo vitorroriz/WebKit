@@ -235,15 +235,13 @@ void GraphicsContextCairo::drawFocusRing(const Path& path, float outlineWidth, c
 #endif
 }
 
-void GraphicsContextCairo::drawFocusRing(const Vector<FloatRect>& rects, float outlineOffset, float outlineWidth, const Color& color)
+void GraphicsContextCairo::drawFocusRing(const Vector<FloatRect>& rects, float outlineWidth, const Color& color)
 {
 #if USE(THEME_ADWAITA)
     Adwaita::paintFocus(*this, rects, color);
-    UNUSED_PARAM(outlineOffset);
     UNUSED_PARAM(outlineWidth);
     return;
 #else
-    UNUSED_PARAM(outlineOffset);
     Cairo::drawFocusRing(*this, rects, outlineWidth, color);
 #endif
 }

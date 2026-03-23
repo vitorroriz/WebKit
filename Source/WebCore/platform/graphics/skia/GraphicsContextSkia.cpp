@@ -800,7 +800,7 @@ void GraphicsContextSkia::drawFocusRing(const Path& path, float, const Color& co
 #endif
 }
 
-void GraphicsContextSkia::drawFocusRing(const Vector<FloatRect>& rects, float, float, const Color& color)
+void GraphicsContextSkia::drawFocusRing(const Vector<FloatRect>& rects, float, const Color& color)
 {
 #if USE(THEME_ADWAITA)
     Adwaita::paintFocus(*this, rects, color);

@@ -512,9 +512,9 @@ void RemoteGraphicsContext::drawFocusRingPath(const Path& path, float outlineWid
     context().drawFocusRing(path, outlineWidth, color);
 }
 
-void RemoteGraphicsContext::drawFocusRingRects(const Vector<FloatRect>& rects, float outlineOffset, float outlineWidth, const Color& color)
+void RemoteGraphicsContext::drawFocusRingRects(const Vector<FloatRect>& rects, float outlineWidth, const Color& color)
 {
-    context().drawFocusRing(rects, outlineOffset, outlineWidth, color);
+    context().drawFocusRing(rects, outlineWidth, color);
 }
 
 void RemoteGraphicsContext::fillRect(const FloatRect& rect, GraphicsContext::RequiresClipToRect requiresClipToRect)

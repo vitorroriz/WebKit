@@ -949,24 +949,21 @@ class DrawFocusRingRects {
 public:
     static constexpr char name[] = "draw-focus-ring-rects";
 
-    DrawFocusRingRects(const Vector<FloatRect>& rects, float outlineOffset, float outlineWidth, const Color& color)
+    DrawFocusRingRects(const Vector<FloatRect>& rects, float outlineWidth, const Color& color)
         : m_rects(rects)
-        , m_outlineOffset(outlineOffset)
         , m_outlineWidth(outlineWidth)
         , m_color(color)
     {
     }
 
-    DrawFocusRingRects(Vector<FloatRect>&& rects, float outlineOffset, float outlineWidth, Color color)
+    DrawFocusRingRects(Vector<FloatRect>&& rects, float outlineWidth, Color color)
         : m_rects(WTF::move(rects))
-        , m_outlineOffset(outlineOffset)
         , m_outlineWidth(outlineWidth)
         , m_color(color)
     {
     }
 
     const Vector<FloatRect>& rects() const LIFETIME_BOUND { return m_rects; }
-    float outlineOffset() const { return m_outlineOffset; }
     float outlineWidth() const { return m_outlineWidth; }
     const Color& color() const LIFETIME_BOUND { return m_color; }
 
@@ -975,7 +972,6 @@ public:
 
 private:
     Vector<FloatRect> m_rects;
-    float m_outlineOffset;
     float m_outlineWidth;
     Color m_color;
 };

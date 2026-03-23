@@ -124,7 +124,7 @@ private:
     ImageDrawResult drawTiledImage(Image&, const FloatRect&, const FloatRect&, const FloatSize&, Image::TileRule, Image::TileRule, ImagePaintingOptions = { }) final { return ImageDrawResult::DidNothing; }
 
     void drawFocusRing(const Path&, float, const Color&) final { }
-    void drawFocusRing(const Vector<FloatRect>&, float, float, const Color&) final { }
+    void drawFocusRing(const Vector<FloatRect>&, float, const Color&) final { }
 
     void drawImageBuffer(ImageBuffer&, const FloatRect&, const FloatRect&, ImagePaintingOptions = { }) final { }
 
