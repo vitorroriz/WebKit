@@ -114,7 +114,12 @@ TEST(WebKit, PreferenceObserverArray)
     CLEAR_DEFAULTS();
 }
 
+// FIXME when webkit.org/b/290797 is resolved.
+#if PLATFORM(MAC) && !defined(NDEBUG)
+TEST(WebKit, DISABLED_PreferenceChanges)
+#else
 TEST(WebKit, PreferenceChanges)
+#endif
 {
     CLEAR_DEFAULTS();
 
