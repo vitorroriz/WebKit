@@ -3530,8 +3530,8 @@
 		07E691C62E9EB5C4000C7E3C /* RemoteMediaSessionManagerMessages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteMediaSessionManagerMessages.h; sourceTree = "<group>"; };
 		07E691C72E9EB5C4000C7E3C /* RemoteMediaSessionManagerProxyMessageReceiver.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteMediaSessionManagerProxyMessageReceiver.cpp; sourceTree = "<group>"; };
 		07E691C82E9EB5C4000C7E3C /* RemoteMediaSessionManagerProxyMessages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteMediaSessionManagerProxyMessages.h; sourceTree = "<group>"; };
-		07EF0751274593FA0066EA04 /* UserMediaPermissionRequestProxyMac.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = UserMediaPermissionRequestProxyMac.mm; sourceTree = "<group>"; };
-		07EF0752274593FA0066EA04 /* UserMediaPermissionRequestProxyMac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserMediaPermissionRequestProxyMac.h; sourceTree = "<group>"; };
+		07EF0751274593FA0066EA04 /* UserMediaPermissionRequestProxyCocoa.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = UserMediaPermissionRequestProxyCocoa.mm; sourceTree = "<group>"; };
+		07EF0752274593FA0066EA04 /* UserMediaPermissionRequestProxyCocoa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserMediaPermissionRequestProxyCocoa.h; sourceTree = "<group>"; };
 		07EF07582745A8160066EA04 /* DisplayCaptureSessionManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DisplayCaptureSessionManager.mm; sourceTree = "<group>"; };
 		07EF07592745A8160066EA04 /* DisplayCaptureSessionManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DisplayCaptureSessionManager.h; sourceTree = "<group>"; };
 		07EF24BE2E309EFE004429B6 /* WebKitInternalCxx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebKitInternalCxx.h; sourceTree = "<group>"; };
@@ -4946,7 +4946,7 @@
 		2D6B371918A967AD0042AE80 /* _WKThumbnailView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WKThumbnailView.h; sourceTree = "<group>"; };
 		2D6B371A18A967AD0042AE80 /* _WKThumbnailView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = _WKThumbnailView.mm; sourceTree = "<group>"; };
 		2D6CD117189058A500E5A4A0 /* ViewSnapshotStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewSnapshotStore.h; sourceTree = "<group>"; };
-		2D6CD118189058A500E5A4A0 /* ViewSnapshotStoreMac.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewSnapshotStoreMac.mm; sourceTree = "<group>"; };
+		2D6CD118189058A500E5A4A0 /* ViewSnapshotStoreCocoa.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewSnapshotStoreCocoa.mm; sourceTree = "<group>"; };
 		2D6CD11A189058A500E5A4A0 /* ViewSnapshotStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ViewSnapshotStore.cpp; sourceTree = "<group>"; };
 		2D6FC80E2B05C98B00C87B49 /* ScrollingTreePluginScrollingNodeRemoteMac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScrollingTreePluginScrollingNodeRemoteMac.h; sourceTree = "<group>"; };
 		2D6FC80F2B05C98B00C87B49 /* ScrollingTreePluginScrollingNodeRemoteMac.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ScrollingTreePluginScrollingNodeRemoteMac.cpp; sourceTree = "<group>"; };
@@ -10700,6 +10700,8 @@
 				49DC1DDF27E5128F00C1CB36 /* CSPExtensionUtilities.mm */,
 				83891B6A1A68C30B0030F386 /* DiagnosticLoggingClient.h */,
 				83891B6B1A68C30B0030F386 /* DiagnosticLoggingClient.mm */,
+				07EF07592745A8160066EA04 /* DisplayCaptureSessionManager.h */,
+				07EF07582745A8160066EA04 /* DisplayCaptureSessionManager.mm */,
 				5C2B1AF5223C1FD200B91CF7 /* DownloadProxyMapCocoa.mm */,
 				A1AE0EC12B1663D4008A2563 /* ExtensionCapabilityGranter.h */,
 				A1AE0EC22B1663D4008A2563 /* ExtensionCapabilityGranter.mm */,
@@ -10717,6 +10719,7 @@
 				7A821F4D1E2F679E00604577 /* LegacyCustomProtocolManagerClient.mm */,
 				A1DF631118E0B7C8003A3E2A /* LegacyDownloadClient.h */,
 				A1DF631018E0B7C8003A3E2A /* LegacyDownloadClient.mm */,
+				1AFDE65B1954E8D500C48FFA /* LegacySessionStateCoding.cpp */,
 				3A4DC9C92E9463AE0083A531 /* LegacyWebArchiveCallbackAggregator.h */,
 				9342588F2555DCA50059EEDD /* MediaPermissionUtilities.mm */,
 				411286EF21C8A90C003A8550 /* MediaUtilities.h */,
@@ -10754,9 +10757,12 @@
 				EE73715F2EE25554009F354F /* UIWindowScene+Extras.h */,
 				EEEEBCBC2EE35A8B000FF6AF /* UIWindowScene+Extras.swift */,
 				070259BE2522841C00153405 /* UserMediaPermissionRequestManagerProxy.mm */,
+				07EF0752274593FA0066EA04 /* UserMediaPermissionRequestProxyCocoa.h */,
+				07EF0751274593FA0066EA04 /* UserMediaPermissionRequestProxyCocoa.mm */,
 				52D5A1AA1C57494E00DE34A3 /* VideoPresentationManagerProxy.h */,
 				52D5A1AB1C57494E00DE34A3 /* VideoPresentationManagerProxy.messages.in */,
 				52D5A1AC1C57494E00DE34A3 /* VideoPresentationManagerProxy.mm */,
+				2D6CD118189058A500E5A4A0 /* ViewSnapshotStoreCocoa.mm */,
 				46DA285727B73E760089D339 /* WebGeolocationManagerProxyCocoa.cpp */,
 				C18F3A13256332A600797E66 /* WebInspectorPreferenceObserver.h */,
 				C18F3A142563334300797E66 /* WebInspectorPreferenceObserver.mm */,
@@ -16853,10 +16859,7 @@
 				CD89ACBB2EA696A300C76423 /* _WKCaptionStyleMenuControllerMac.mm */,
 				B878B613133428DC006888E9 /* CorrectionPanel.h */,
 				B878B614133428DC006888E9 /* CorrectionPanel.mm */,
-				07EF07592745A8160066EA04 /* DisplayCaptureSessionManager.h */,
-				07EF07582745A8160066EA04 /* DisplayCaptureSessionManager.mm */,
 				7AFA6F682A9F57C50055322A /* DisplayLinkMac.cpp */,
-				1AFDE65B1954E8D500C48FFA /* LegacySessionStateCoding.cpp */,
 				0FCB4E5818BBE3D9000FCFC9 /* PageClientImplMac.h */,
 				0FCB4E5918BBE3D9000FCFC9 /* PageClientImplMac.mm */,
 				E18E6909169B563F009B6670 /* SecItemShimProxy.cpp */,
@@ -16867,10 +16870,7 @@
 				1AA417ED12C00D87002BE67B /* TextCheckerMac.mm */,
 				1AF05D8514688348008B1E81 /* TiledCoreAnimationDrawingAreaProxy.h */,
 				1AF05D8414688348008B1E81 /* TiledCoreAnimationDrawingAreaProxy.mm */,
-				07EF0752274593FA0066EA04 /* UserMediaPermissionRequestProxyMac.h */,
-				07EF0751274593FA0066EA04 /* UserMediaPermissionRequestProxyMac.mm */,
 				2D125C5D1857EA05003BA3CB /* ViewGestureControllerMac.mm */,
-				2D6CD118189058A500E5A4A0 /* ViewSnapshotStoreMac.mm */,
 				728E86EF1795188C0087879E /* WebColorPickerMac.h */,
 				728E86F01795188C0087879E /* WebColorPickerMac.mm */,
 				51ACBB9E127A8F2C00D203B9 /* WebContextMenuProxyMac.h */,

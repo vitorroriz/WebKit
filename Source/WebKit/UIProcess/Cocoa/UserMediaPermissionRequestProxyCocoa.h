@@ -30,11 +30,11 @@
 
 namespace WebKit {
 
-class UserMediaPermissionRequestProxyMac final : public UserMediaPermissionRequestProxy {
+class UserMediaPermissionRequestProxyCocoa final : public UserMediaPermissionRequestProxy {
 public:
-    ~UserMediaPermissionRequestProxyMac() final;
+    ~UserMediaPermissionRequestProxyCocoa() final;
 
-    UserMediaPermissionRequestProxyMac(UserMediaPermissionRequestManagerProxy&, std::optional<WebCore::UserMediaRequestIdentifier>, WebCore::FrameIdentifier mainFrameID, FrameInfoData&&, Ref<WebCore::SecurityOrigin>&& userMediaDocumentOrigin, Ref<WebCore::SecurityOrigin>&& topLevelDocumentOrigin, Vector<WebCore::CaptureDevice>&& audioDevices, Vector<WebCore::CaptureDevice>&& videoDevices, WebCore::MediaStreamRequest&&, CompletionHandler<void(bool)>&&);
+    UserMediaPermissionRequestProxyCocoa(UserMediaPermissionRequestManagerProxy&, std::optional<WebCore::UserMediaRequestIdentifier>, WebCore::FrameIdentifier mainFrameID, FrameInfoData&&, Ref<WebCore::SecurityOrigin>&& userMediaDocumentOrigin, Ref<WebCore::SecurityOrigin>&& topLevelDocumentOrigin, Vector<WebCore::CaptureDevice>&& audioDevices, Vector<WebCore::CaptureDevice>&& videoDevices, WebCore::MediaStreamRequest&&, CompletionHandler<void(bool)>&&);
 
 private:
     void promptForGetDisplayMedia(UserMediaDisplayCapturePromptType) final;
