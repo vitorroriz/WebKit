@@ -150,10 +150,6 @@
 #include <wtf/text/MakeString.h>
 #include <wtf/text/TextStream.h>
 
-#if PLATFORM(COCOA)
-#include <wtf/cocoa/RuntimeApplicationChecksCocoa.h>
-#endif
-
 #if PLATFORM(IOS_FAMILY)
 #include "DocumentLoader.h"
 #include "LegacyTileCache.h"
@@ -5436,6 +5432,10 @@ void LocalFrameView::paintScrollbar(GraphicsContext& context, Scrollbar& bar, co
 
 Color LocalFrameView::documentBackgroundColor() const
 {
+    // <https://bugs.webkit.org/show_bug.cgi?id=59540> We blend the background color of
+    // the document and the body against the base background color of the frame view.
+    // Background images are unfortunately impractical to include.
+
     // Return invalid Color objects whenever there is insufficient information.
     RefPtr backgroundDocument = [&] {
 #if ENABLE(FULLSCREEN_API)
@@ -5450,8 +5450,19 @@ Color LocalFrameView::documentBackgroundColor() const
     if (!backgroundDocument)
         return Color();
 
+    RefPtr htmlElement = backgroundDocument->documentElement();
+    RefPtr bodyElement = backgroundDocument->bodyOrFrameset();
+
+    // Start with invalid colors.
+    Color htmlBackgroundColor;
+    Color bodyBackgroundColor;
+    if (htmlElement && htmlElement->renderer())
+        htmlBackgroundColor = htmlElement->renderer()->style().visitedDependentBackgroundColorApplyingColorFilter();
+    if (bodyElement && bodyElement->renderer())
+        bodyBackgroundColor = bodyElement->renderer()->style().visitedDependentBackgroundColorApplyingColorFilter();
+
 #if ENABLE(FULLSCREEN_API)
-    auto fullscreenBackgroundColor = [&] -> Color {
+    Color fullscreenBackgroundColor = [&] () -> Color {
         RefPtr documentFullscreen = backgroundDocument->fullscreenIfExists();
         if (!documentFullscreen)
             return { };
@@ -5474,74 +5485,33 @@ Color LocalFrameView::documentBackgroundColor() const
         // intentionally be visible underneath (and around) the fullscreen element.
         return backdropRenderer->style().visitedDependentBackgroundColorApplyingColorFilter();
     }();
-#endif
 
-#if PLATFORM(COCOA)
-    // <https://bugs.webkit.org/show_bug.cgi?id=59540> We blend the background color of
-    // the document and the body against the base background color of the frame view.
-    // Background images are unfortunately impractical to include.
-    if (!linkedOnOrAfterSDKWithBehavior(SDKAlignedBehavior::DocumentBackgroundColorFromCanvas)) {
-        RefPtr htmlElement = backgroundDocument->documentElement();
-        RefPtr bodyElement = backgroundDocument->bodyOrFrameset();
-
-        // Start with invalid colors.
-        Color htmlBackgroundColor;
-        Color bodyBackgroundColor;
-        if (htmlElement && htmlElement->renderer())
-            htmlBackgroundColor = htmlElement->renderer()->style().visitedDependentBackgroundColorApplyingColorFilter();
-        if (bodyElement && bodyElement->renderer())
-            bodyBackgroundColor = bodyElement->renderer()->style().visitedDependentBackgroundColorApplyingColorFilter();
-
-#if ENABLE(FULLSCREEN_API)
-        // Replace or blend the fullscreen background color with the body background color, if present.
-        if (fullscreenBackgroundColor.isValid()) {
-            if (!bodyBackgroundColor.isValid())
-                bodyBackgroundColor = fullscreenBackgroundColor;
-            else
-                bodyBackgroundColor = blendSourceOver(bodyBackgroundColor, fullscreenBackgroundColor);
-        }
-#endif
-
-        if (!bodyBackgroundColor.isValid()) {
-            if (!htmlBackgroundColor.isValid())
-                return Color();
-            return blendSourceOver(baseBackgroundColor(), htmlBackgroundColor);
-        }
-
-        if (!htmlBackgroundColor.isValid())
-            return blendSourceOver(baseBackgroundColor(), bodyBackgroundColor);
-
-        // We take the aggregate of the base background color
-        // the <html> background color, and the <body>
-        // background color to find the document color. The
-        // addition of the base background color is not
-        // technically part of the document background, but it
-        // otherwise poses problems when the aggregate is not
-        // fully opaque.
-        return blendSourceOver(blendSourceOver(baseBackgroundColor(), htmlBackgroundColor), bodyBackgroundColor);
-    }
-#endif
-
-    CheckedPtr renderView = backgroundDocument->renderView();
-    Color result;
-    if (renderView) {
-        if (CheckedPtr canvasRenderer = renderView->rendererForRootBackground()) {
-            auto canvasColor = canvasRenderer->style().visitedDependentBackgroundColorApplyingColorFilter();
-            if (canvasColor.isValid())
-                result = blendSourceOver(baseBackgroundColor(), canvasColor);
-        }
-    }
-
-#if ENABLE(FULLSCREEN_API)
+    // Replace or blend the fullscreen background color with the body background color, if present.
     if (fullscreenBackgroundColor.isValid()) {
-        if (result.isValid())
-            result = blendSourceOver(result, fullscreenBackgroundColor);
+        if (!bodyBackgroundColor.isValid())
+            bodyBackgroundColor = fullscreenBackgroundColor;
         else
-            result = blendSourceOver(baseBackgroundColor(), fullscreenBackgroundColor);
+            bodyBackgroundColor = blendSourceOver(bodyBackgroundColor, fullscreenBackgroundColor);
     }
 #endif
 
-    return result;
+    if (!bodyBackgroundColor.isValid()) {
+        if (!htmlBackgroundColor.isValid())
+            return Color();
+        return blendSourceOver(baseBackgroundColor(), htmlBackgroundColor);
+    }
+
+    if (!htmlBackgroundColor.isValid())
+        return blendSourceOver(baseBackgroundColor(), bodyBackgroundColor);
+
+    // We take the aggregate of the base background color
+    // the <html> background color, and the <body>
+    // background color to find the document color. The
+    // addition of the base background color is not
+    // technically part of the document background, but it
+    // otherwise poses problems when the aggregate is not
+    // fully opaque.
+    return blendSourceOver(blendSourceOver(baseBackgroundColor(), htmlBackgroundColor), bodyBackgroundColor);
 }
 
 bool LocalFrameView::hasCustomScrollbars() const
