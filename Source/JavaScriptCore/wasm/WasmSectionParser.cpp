@@ -388,6 +388,8 @@ auto SectionParser::parseMemoryHelper(bool isImport) -> PartialResult
     if (!Options::useWasmMultiMemory())
         WASM_PARSER_FAIL_IF(m_info->memoryCount(), "there can at most be one Memory section for now"_s);
 
+    WASM_PARSER_FAIL_IF(m_info->memoryCount() >= maxMemories, "there can be at most "_s, maxMemories, " memories"_s);
+
     PageCount initialPageCount;
     PageCount maximumPageCount;
     bool isShared { false };
@@ -400,6 +402,11 @@ auto SectionParser::parseMemoryHelper(bool isImport) -> PartialResult
             return makeUnexpected(WTF::move(limits.error()));
         ASSERT(!maximum || *maximum >= initial);
         WASM_PARSER_FAIL_IF(!PageCount::isValid(initial), "Memory's initial page count of "_s, initial, " is invalid"_s);
+
+        // FIXME(wasm-memory64): for now IPInt checks m_cachedIsMemory64 (flag if memory 0 is 64-bit)
+        // no matter which memory is being accessed
+        if (isMemory64)
+            WASM_PARSER_FAIL_IF(m_info->memoryCount(), "if using memory64 then multiple memories are illegal for now");
 
         initialPageCount = PageCount(initial);
 
