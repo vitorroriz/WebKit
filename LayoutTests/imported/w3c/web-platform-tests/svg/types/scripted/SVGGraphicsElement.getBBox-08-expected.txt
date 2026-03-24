@@ -1,0 +1,22 @@
+
+FAIL image with zero width assert_equals: x expected 0 but got 10
+FAIL image with zero height assert_equals: x expected 0 but got 10
+FAIL image with zero width and height assert_equals: x expected 0 but got 10
+FAIL image with no width/height attributes assert_equals: x expected 0 but got 10
+FAIL foreignObject with zero width assert_equals: height expected 0 but got 50
+FAIL foreignObject with zero height assert_equals: width expected 0 but got 50
+PASS foreignObject with zero width and height
+PASS foreignObject with no width/height attributes
+PASS empty nested SVG element
+PASS empty nested SVG with no attributes
+PASS empty nested SVG with zero width and height
+PASS anchor element wrapping zero-dimension rect
+PASS anchor element with zero-dim and normal child: zero-dim child does not affect bbox
+PASS zero-dim rect with translate transform
+PASS rect with negative width and scale(2) (not rendered)
+PASS zero-dim rect inside rotated group (not rendered)
+PASS zero-width rect with scale(3) (not rendered)
+PASS zero-radius circle with translate (not rendered)
+PASS group with translate transform â€” bbox in group's local coords
+PASS rotated group with zero-dim child â€” bbox is zero
+
