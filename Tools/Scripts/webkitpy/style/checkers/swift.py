@@ -30,6 +30,7 @@ class SwiftChecker(object):
     def __init__(self, file_path, handle_style_error):
         self.file_path = file_path
         self.handle_style_error = handle_style_error
+        self.has_swift_format_errors = False
 
     def _swift_format(self, file_path, lines, error):
         lint_result = subprocess.run(['/usr/bin/swift', 'format', 'lint', '--strict', file_path], capture_output=True, text=True)
@@ -53,6 +54,7 @@ class SwiftChecker(object):
             category = match.group("category")
             message = match.group("message")
 
+            self.has_swift_format_errors = True
             self.handle_style_error(int(line_number), category, 5, message)
 
     def _check_unsafe(self, lines):
