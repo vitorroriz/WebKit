@@ -1503,7 +1503,7 @@ void WebPageProxy::setSelectionForActiveWritingToolsSession(const WebCore::Chara
 }
 
 #if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
-void WebPageProxy::addTextEffectForID(IPC::Connection& connection, const WTF::UUID& uuid, const WebCore::TextEffectData& data, RefPtr<WebCore::TextIndicator>&& textIndicator, RefPtr<WebCore::TextIndicator>&& decorationIndicator)
+void WebPageProxy::addTextEffectForID(IPC::Connection& connection, const WTF::UUID& uuid, WebCore::TextEffectData&& data, RefPtr<WebCore::TextIndicator>&& textIndicator, RefPtr<WebCore::TextIndicator>&& decorationIndicator)
 {
     MESSAGE_CHECK(uuid.isValid(), connection);
 
@@ -1511,7 +1511,7 @@ void WebPageProxy::addTextEffectForID(IPC::Connection& connection, const WTF::UU
     internals().decorationIndicatorForAnimationID.add(uuid, decorationIndicator);
 
     if (RefPtr pageClient = this->pageClient())
-        pageClient->addTextEffectForID(uuid, data);
+        pageClient->addTextEffectForID(uuid, WTF::move(data));
 }
 
 void WebPageProxy::removeTextEffectForID(IPC::Connection& connection, const WTF::UUID& uuid)

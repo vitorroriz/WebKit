@@ -149,7 +149,7 @@ public:
     void removeTextAnimationForAnimationID(const WTF::UUID&) final;
 
 #if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
-    void addTextEffectForID(const WTF::UUID&, const WebCore::TextEffectData&) final;
+    void addTextEffectForID(const WTF::UUID&, WebCore::TextEffectData&&) final;
     void removeTextEffectForID(const WTF::UUID&) final;
 #endif
 #endif

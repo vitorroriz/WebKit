@@ -347,6 +347,7 @@ struct TargetedElementInfo;
 struct TargetedElementRequest;
 struct TextAnimationData;
 struct TextCheckingResult;
+struct TextEffectData;
 struct TextManipulationControllerExclusionRule;
 struct TextManipulationControllerManipulationResult;
 struct TextManipulationItem;
@@ -2097,6 +2098,11 @@ public:
     void addTextAnimationForAnimationID(const WTF::UUID&, const WebCore::TextAnimationData&, const RefPtr<WebCore::TextIndicator>, CompletionHandler<void(WebCore::TextAnimationRunMode)>&& = { });
 
     void removeTextAnimationForAnimationID(const WTF::UUID&);
+
+#if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
+    void addTextEffectForID(const WTF::UUID&, WebCore::TextEffectData&&, RefPtr<WebCore::TextIndicator>&&, RefPtr<WebCore::TextIndicator>&&);
+    void removeTextEffectForID(const WTF::UUID&);
+#endif
 
     void removeInitialTextAnimationForActiveWritingToolsSession();
     void addInitialTextAnimationForActiveWritingToolsSession();

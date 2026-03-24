@@ -2804,7 +2804,7 @@ public:
     void removeTextAnimationForAnimationID(IPC::Connection&, const WTF::UUID&);
 
 #if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
-    void addTextEffectForID(IPC::Connection&, const WTF::UUID&, const WebCore::TextEffectData&, RefPtr<WebCore::TextIndicator>&&, RefPtr<WebCore::TextIndicator>&& decorationIndicator);
+    void addTextEffectForID(IPC::Connection&, const WTF::UUID&, WebCore::TextEffectData&&, RefPtr<WebCore::TextIndicator>&&, RefPtr<WebCore::TextIndicator>&& decorationIndicator);
     void removeTextEffectForID(IPC::Connection&, const WTF::UUID&);
 #endif
 

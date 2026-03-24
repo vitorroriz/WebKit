@@ -179,6 +179,10 @@
 #include "WebExtensionControllerProxy.h"
 #endif
 
+#if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
+#import <WebCore/TextEffectController.h>
+#endif
+
 #import "PDFKitSoftLink.h"
 
 #define WEBPAGE_RELEASE_LOG(channel, fmt, ...) RELEASE_LOG(channel, "%p - [webPageID=%" PRIu64 "] WebPage::" fmt, this, m_identifier.toUInt64(), ##__VA_ARGS__)
@@ -1353,6 +1357,18 @@ void WebPage::removeTextAnimationForAnimationID(const WTF::UUID& uuid)
     send(Messages::WebPageProxy::RemoveTextAnimationForAnimationID(uuid));
 }
 
+#if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
+void WebPage::addTextEffectForID(const WTF::UUID& uuid, WebCore::TextEffectData&& data, RefPtr<WebCore::TextIndicator>&& textIndicator, RefPtr<WebCore::TextIndicator>&& decorationIndicator)
+{
+    send(Messages::WebPageProxy::AddTextEffectForID(uuid, WTF::move(data), WTF::move(textIndicator), WTF::move(decorationIndicator)));
+}
+
+void WebPage::removeTextEffectForID(const WTF::UUID& uuid)
+{
+    send(Messages::WebPageProxy::RemoveTextEffectForID(uuid));
+}
+#endif // ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
+
 void WebPage::removeInitialTextAnimationForActiveWritingToolsSession()
 {
     m_textAnimationController->removeInitialTextAnimationForActiveWritingToolsSession();
@@ -1394,14 +1410,14 @@ void WebPage::updateUnderlyingTextVisibilityForTextAnimationID(const WTF::UUID& 
 }
 
 #if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
-void WebPage::updateUnderlyingTextVisibilityForTextEffectID(const WTF::UUID&, bool, CompletionHandler<void()>&& completionHandler)
+void WebPage::updateUnderlyingTextVisibilityForTextEffectID(const WTF::UUID& uuid, bool visible, CompletionHandler<void()>&& completionHandler)
 {
-    completionHandler();
+    protect(corePage())->textEffectController().updateUnderlyingTextVisibilityForTextEffectID(uuid, visible, WTF::move(completionHandler));
 }
 
-void WebPage::createTextIndicatorForTextEffectID(const WTF::UUID&, CompletionHandler<void(RefPtr<WebCore::TextIndicator>&&)>&& completionHandler)
+void WebPage::createTextIndicatorForTextEffectID(const WTF::UUID& uuid, CompletionHandler<void(RefPtr<WebCore::TextIndicator>&&)>&& completionHandler)
 {
-    completionHandler(nullptr);
+    protect(corePage())->textEffectController().createTextIndicatorForTextEffectID(uuid, WTF::move(completionHandler));
 }
 #endif // ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
 

@@ -2380,6 +2380,20 @@ void WebChromeClient::clearAnimationsForActiveWritingToolsSession()
         page->clearAnimationsForActiveWritingToolsSession();
 }
 
+#if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
+void WebChromeClient::addTextEffectForID(const WTF::UUID& uuid, WebCore::TextEffectData&& data, RefPtr<WebCore::TextIndicator>&& textIndicator, RefPtr<WebCore::TextIndicator>&& decorationIndicator)
+{
+    if (RefPtr page = m_page.get())
+        page->addTextEffectForID(uuid, WTF::move(data), WTF::move(textIndicator), WTF::move(decorationIndicator));
+}
+
+void WebChromeClient::removeTextEffectForID(const WTF::UUID& uuid)
+{
+    if (RefPtr page = m_page.get())
+        page->removeTextEffectForID(uuid);
+}
+#endif // ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
+
 #endif
 
 void WebChromeClient::setIsInRedo(bool isInRedo)

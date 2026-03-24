@@ -366,7 +366,7 @@ void PageClientImplCocoa::removeTextAnimationForAnimationID(const WTF::UUID& uui
 }
 
 #if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
-void PageClientImplCocoa::addTextEffectForID(const WTF::UUID& uuid, const WebCore::TextEffectData& data)
+void PageClientImplCocoa::addTextEffectForID(const WTF::UUID& uuid, WebCore::TextEffectData&& data)
 {
     [webView() _addTextEffectForID:uuid.createNSUUID().get() withData:data];
 }
