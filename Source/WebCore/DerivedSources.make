@@ -385,6 +385,7 @@ JS_BINDING_IDLS := \
     $(WebCore)/Modules/indexeddb/IDBCursorWithValue.idl \
     $(WebCore)/Modules/indexeddb/IDBDatabase.idl \
     $(WebCore)/Modules/indexeddb/IDBFactory.idl \
+    $(WebCore)/Modules/indexeddb/IDBGetAllOptions.idl \
     $(WebCore)/Modules/indexeddb/IDBIndex.idl \
     $(WebCore)/Modules/indexeddb/IDBKeyRange.idl \
     $(WebCore)/Modules/indexeddb/IDBObjectStore.idl \

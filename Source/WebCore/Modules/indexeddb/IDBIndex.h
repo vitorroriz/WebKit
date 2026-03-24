@@ -40,6 +40,7 @@ namespace WebCore {
 class IDBKeyRange;
 class WebCoreOpaqueRoot;
 
+struct IDBGetAllOptions;
 struct IDBKeyRangeData;
 
 class IDBIndex final : public ActiveDOMObject {
@@ -75,6 +76,8 @@ public:
     ExceptionOr<Ref<IDBRequest>> getAll(JSC::JSGlobalObject&, JSC::JSValue key, std::optional<uint32_t> count);
     ExceptionOr<Ref<IDBRequest>> getAllKeys(RefPtr<IDBKeyRange>&&, std::optional<uint32_t> count);
     ExceptionOr<Ref<IDBRequest>> getAllKeys(JSC::JSGlobalObject&, JSC::JSValue key, std::optional<uint32_t> count);
+
+    ExceptionOr<Ref<IDBRequest>> getAllRecords(JSC::JSGlobalObject&, IDBGetAllOptions&&);
 
     const IDBIndexInfo& info() const LIFETIME_BOUND { return m_info; }
 

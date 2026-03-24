@@ -524,6 +524,7 @@ $(PROJECT_DIR)/Modules/indexeddb/IDBCursorDirection.idl
 $(PROJECT_DIR)/Modules/indexeddb/IDBCursorWithValue.idl
 $(PROJECT_DIR)/Modules/indexeddb/IDBDatabase.idl
 $(PROJECT_DIR)/Modules/indexeddb/IDBFactory.idl
+$(PROJECT_DIR)/Modules/indexeddb/IDBGetAllOptions.idl
 $(PROJECT_DIR)/Modules/indexeddb/IDBIndex.idl
 $(PROJECT_DIR)/Modules/indexeddb/IDBKeyRange.idl
 $(PROJECT_DIR)/Modules/indexeddb/IDBObjectStore.idl

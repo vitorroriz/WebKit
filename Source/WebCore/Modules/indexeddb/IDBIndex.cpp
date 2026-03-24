@@ -31,6 +31,7 @@
 #include "IDBBindingUtilities.h"
 #include "IDBCursor.h"
 #include "IDBDatabase.h"
+#include "IDBGetAllOptions.h"
 #include "IDBKeyRangeData.h"
 #include "IDBObjectStore.h"
 #include "IDBRequest.h"
@@ -418,6 +419,11 @@ ExceptionOr<Ref<IDBRequest>> IDBIndex::getAllKeys(JSGlobalObject& execState, JSV
 
         return ExceptionOr<RefPtr<IDBKeyRange>> { onlyResult.releaseReturnValue() };
     });
+}
+
+ExceptionOr<Ref<IDBRequest>> IDBIndex::getAllRecords(JSGlobalObject&, IDBGetAllOptions&&)
+{
+    return Exception { ExceptionCode::NotSupportedError, "getAllRecords is not yet supported"_s };
 }
 
 void IDBIndex::markAsDeleted()

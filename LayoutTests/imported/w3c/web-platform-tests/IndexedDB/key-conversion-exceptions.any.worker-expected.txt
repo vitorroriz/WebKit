@@ -23,7 +23,13 @@ PASS IDBIndex openKeyCursor() method with throwing/invalid keys
 PASS IDBObjectStore getAll() method with throwing/invalid keys
 PASS IDBObjectStore getAllKeys() method with throwing/invalid keys
 PASS IDBObjectStore getAllRecords() method with throwing/invalid keys
-PASS IDBIndex getAll() method with throwing/invalid keys
-PASS IDBIndex getAllKeys() method with throwing/invalid keys
-PASS IDBIndex getAllRecords() method with throwing/invalid keys
+FAIL IDBIndex getAll() method with throwing/invalid keys assert_throws_exactly: options query key conversion with throwing getter should rethrow function "() => {
+    receiver[method]({query: key});
+  }" threw object "DataError: Failed to execute 'getAll' on 'IDBIndex': The parameter is not a valid key." but we expected it to throw object "getter: throwing from getter"
+FAIL IDBIndex getAllKeys() method with throwing/invalid keys assert_throws_exactly: options query key conversion with throwing getter should rethrow function "() => {
+    receiver[method]({query: key});
+  }" threw object "DataError: Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key." but we expected it to throw object "getter: throwing from getter"
+FAIL IDBIndex getAllRecords() method with throwing/invalid keys assert_throws_dom: options query key conversion with invalid key should throw DataError function "() => {
+    receiver[method]({query: invalid_key});
+  }" threw object "NotSupportedError: getAllRecords is not yet supported" that is not a DOMException DataError: property "code" is equal to 9, expected 0
 

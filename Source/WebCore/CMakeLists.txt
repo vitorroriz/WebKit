@@ -460,6 +460,7 @@ set(WebCore_NON_SVG_IDL_FILES
     Modules/indexeddb/IDBCursorWithValue.idl
     Modules/indexeddb/IDBDatabase.idl
     Modules/indexeddb/IDBFactory.idl
+    Modules/indexeddb/IDBGetAllOptions.idl
     Modules/indexeddb/IDBIndex.idl
     Modules/indexeddb/IDBKeyRange.idl
     Modules/indexeddb/IDBObjectStore.idl

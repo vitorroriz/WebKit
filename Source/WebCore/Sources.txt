@@ -4410,6 +4410,7 @@ JSIDBCursorDirection.cpp
 JSIDBCursorWithValue.cpp
 JSIDBDatabase.cpp
 JSIDBFactory.cpp
+JSIDBGetAllOptions.cpp
 JSIDBIndex.cpp
 JSIDBKeyRange.cpp
 JSIDBObjectStore.cpp
