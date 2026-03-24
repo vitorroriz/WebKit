@@ -28,7 +28,7 @@
 
 #include "CryptoKeyAES.h"
 #include <CommonCrypto/CommonCrypto.h>
-#include <pal/PALSwift.h>
+#include <pal/crypto/CryptoTypes.h>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
@@ -40,7 +40,7 @@ namespace WebCore {
 static ExceptionOr<Vector<uint8_t>> wrapKeyAESKWCryptoKit(const Vector<uint8_t>& key, const Vector<uint8_t>& data)
 {
     auto rv = pal::AesKw::wrap(data.span(), key.span());
-    if (rv.errorCode != Cpp::ErrorCodes::Success)
+    if (rv.errorCode != PAL::Crypto::Error::Success)
         return Exception { ExceptionCode::OperationError };
     return WTF::move(rv.result);
 }
@@ -48,7 +48,7 @@ static ExceptionOr<Vector<uint8_t>> wrapKeyAESKWCryptoKit(const Vector<uint8_t>&
 static ExceptionOr<Vector<uint8_t>> unwrapKeyAESKWCryptoKit(const Vector<uint8_t>& key, const Vector<uint8_t>& data)
 {
     auto rv = pal::AesKw::unwrap(data.span(), key.span());
-    if (rv.errorCode != Cpp::ErrorCodes::Success)
+    if (rv.errorCode != PAL::Crypto::Error::Success)
         return Exception { ExceptionCode::OperationError };
     return WTF::move(rv.result);
 }

@@ -28,7 +28,7 @@
 
 #include "CommonCryptoDERUtilities.h"
 #include "JsonWebKey.h"
-#include <pal/PALSwift.h>
+#include <pal/crypto/CryptoTypes.h>
 #include <wtf/text/Base64.h>
 
 namespace WebCore {
@@ -138,7 +138,7 @@ Vector<uint8_t> CryptoKeyEC::platformExportRaw() const
 {
     size_t expectedSize = 2 * keySizeInBytes() + 1; // Per Section 2.3.4 of http://www.secg.org/sec1-v2.pdf
     auto rv = platformKey()->exportX963Pub();
-    if (rv.errorCode != Cpp::ErrorCodes::Success)
+    if (rv.errorCode != PAL::Crypto::Error::Success)
         return { };
     if (rv.result.size() != expectedSize)
         return { };
@@ -184,14 +184,14 @@ bool CryptoKeyEC::platformAddFieldElements(JsonWebKey& jwk) const
     switch (type()) {
     case CryptoKeyType::Public: {
         auto rv = platformKey()->exportX963Pub();
-        if (rv.errorCode != Cpp::ErrorCodes::Success)
+        if (rv.errorCode != PAL::Crypto::Error::Success)
             return false;
         result = WTF::move(rv.result);
         break;
     }
     case CryptoKeyType::Private: {
         auto rv = platformKey()->exportX963Private();
-        if (rv.errorCode != Cpp::ErrorCodes::Success)
+        if (rv.errorCode != PAL::Crypto::Error::Success)
             return false;
         result = WTF::move(rv.result);
         break;
@@ -272,7 +272,7 @@ Vector<uint8_t> CryptoKeyEC::platformExportSpki() const
     size_t keySize = keyBytes.size();
 
     auto rv = platformKey()->exportX963Pub();
-    if (rv.errorCode != Cpp::ErrorCodes::Success)
+    if (rv.errorCode != PAL::Crypto::Error::Success)
         return { };
     if (rv.result.size() != expectedKeySize)
         return { };
@@ -372,7 +372,7 @@ Vector<uint8_t> CryptoKeyEC::platformExportPkcs8() const
     Vector<uint8_t> keyBytes(expectedKeySize);
 
     auto rv = platformKey()->exportX963Private();
-    if (rv.errorCode != Cpp::ErrorCodes::Success)
+    if (rv.errorCode != PAL::Crypto::Error::Success)
         return { };
     if (rv.result.size() != expectedKeySize)
         return { };

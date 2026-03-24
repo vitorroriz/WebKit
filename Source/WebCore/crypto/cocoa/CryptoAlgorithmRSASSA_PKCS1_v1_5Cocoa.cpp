@@ -41,7 +41,7 @@ static ExceptionOr<Vector<uint8_t>> signRSASSA_PKCS1_v1_5(CryptoAlgorithmIdentif
     auto cryptoDigestAlgorithm = WebCore::cryptoDigestAlgorithm(hash);
     if (!cryptoDigestAlgorithm)
         return Exception { ExceptionCode::OperationError };
-    auto digest = PAL::CryptoDigest::create(*cryptoDigestAlgorithm);
+    auto digest = PAL::Crypto::CryptoDigest::create(*cryptoDigestAlgorithm);
     if (!digest)
         return Exception { ExceptionCode::OperationError };
     digest->addBytes(data.span());
@@ -66,7 +66,7 @@ static ExceptionOr<bool> verifyRSASSA_PKCS1_v1_5(CryptoAlgorithmIdentifier hash,
     auto cryptoDigestAlgorithm = WebCore::cryptoDigestAlgorithm(hash);
     if (!cryptoDigestAlgorithm)
         return Exception { ExceptionCode::OperationError };
-    auto digest = PAL::CryptoDigest::create(*cryptoDigestAlgorithm);
+    auto digest = PAL::Crypto::CryptoDigest::create(*cryptoDigestAlgorithm);
     if (!digest)
         return Exception { ExceptionCode::OperationError };
     digest->addBytes(data.span());

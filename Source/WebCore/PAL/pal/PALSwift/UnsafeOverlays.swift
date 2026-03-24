@@ -24,7 +24,7 @@
 public import CryptoKit
 public import Foundation
 
-public import pal.Core.PALSwift
+public import pal.Core.crypto.CryptoTypes
 
 enum UnsafeErrors: Error {
     case invalidLength

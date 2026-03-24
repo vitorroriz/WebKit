@@ -88,20 +88,20 @@ std::optional<int> digestAlgorithm(CryptoAlgorithmIdentifier identifier)
     }
 }
 
-std::optional<PAL::CryptoDigest::Algorithm> hashCryptoDigestAlgorithm(CryptoAlgorithmIdentifier identifier)
+std::optional<PAL::Crypto::CryptoDigest::Algorithm> hashCryptoDigestAlgorithm(CryptoAlgorithmIdentifier identifier)
 {
     switch (identifier) {
     case CryptoAlgorithmIdentifier::SHA_1:
-        return PAL::CryptoDigest::Algorithm::SHA_1;
+        return PAL::Crypto::CryptoDigest::Algorithm::SHA_1;
     case CryptoAlgorithmIdentifier::DEPRECATED_SHA_224:
         RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE(sha224DeprecationMessage);
-        return PAL::CryptoDigest::Algorithm::SHA_256;
+        return PAL::Crypto::CryptoDigest::Algorithm::SHA_256;
     case CryptoAlgorithmIdentifier::SHA_256:
-        return PAL::CryptoDigest::Algorithm::SHA_256;
+        return PAL::Crypto::CryptoDigest::Algorithm::SHA_256;
     case CryptoAlgorithmIdentifier::SHA_384:
-        return PAL::CryptoDigest::Algorithm::SHA_384;
+        return PAL::Crypto::CryptoDigest::Algorithm::SHA_384;
     case CryptoAlgorithmIdentifier::SHA_512:
-        return PAL::CryptoDigest::Algorithm::SHA_512;
+        return PAL::Crypto::CryptoDigest::Algorithm::SHA_512;
     default:
         return std::nullopt;
     }

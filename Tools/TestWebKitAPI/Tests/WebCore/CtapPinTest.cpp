@@ -136,7 +136,7 @@ TEST(CtapPinTest, TestSetPinRequest)
     auto sharedKeyResult = CryptoAlgorithmECDH::platformDeriveBits(downcast<CryptoKeyEC>(*keyPair.privateKey), *cosePublicKey);
     EXPECT_TRUE(sharedKeyResult);
 
-    auto crypto = PAL::CryptoDigest::create(PAL::CryptoDigest::Algorithm::SHA_256);
+    auto crypto = PAL::Crypto::CryptoDigest::create(PAL::Crypto::CryptoDigest::Algorithm::SHA_256);
     crypto->addBytes(sharedKeyResult->span());
     auto sharedKeyHash = crypto->computeHash();
 
@@ -324,7 +324,7 @@ TEST(CtapPinTest, TestTokenRequest)
     auto sharedKeyResult = CryptoAlgorithmECDH::platformDeriveBits(downcast<CryptoKeyEC>(*keyPair.privateKey), *cosePublicKey);
     EXPECT_TRUE(sharedKeyResult);
 
-    auto crypto = PAL::CryptoDigest::create(PAL::CryptoDigest::Algorithm::SHA_256);
+    auto crypto = PAL::Crypto::CryptoDigest::create(PAL::Crypto::CryptoDigest::Algorithm::SHA_256);
     crypto->addBytes(sharedKeyResult->span());
     auto sharedKeyHash = crypto->computeHash();
 
@@ -531,7 +531,7 @@ TEST(CtapPinTest, TestProtocol2HKDFKeyDerivation)
         0xaa, 0xce, 0x11, 0x8e, 0x3e, 0x72, 0x49, 0xd2
     };
 
-    auto crypto = PAL::CryptoDigest::create(PAL::CryptoDigest::Algorithm::SHA_256);
+    auto crypto = PAL::Crypto::CryptoDigest::create(PAL::Crypto::CryptoDigest::Algorithm::SHA_256);
     crypto->addBytes(std::span { testECDHResult });
     auto protocol1Key = crypto->computeHash();
 

@@ -28,7 +28,7 @@
 
 #include "CryptoKeyOKP.h"
 #include "ExceptionOr.h"
-#include <pal/PALSwift.h>
+#include <pal/crypto/CryptoTypes.h>
 #include <pal/spi/cocoa/CoreCryptoSPI.h>
 
 #pragma clang diagnostic push
@@ -43,7 +43,7 @@ static ExceptionOr<Vector<uint8_t>> signEd25519CryptoKit(const Vector<uint8_t>&s
     if (sk.size() != ed25519KeySize)
         return Exception { ExceptionCode::OperationError };
     auto rv = pal::EdKey::sign(pal::EdSigningAlgorithm::ed25519(), sk.span(), data.span());
-    if (rv.errorCode != Cpp::ErrorCodes::Success)
+    if (rv.errorCode != PAL::Crypto::Error::Success)
         return Exception { ExceptionCode::OperationError };
     return WTF::move(rv.result);
 }
@@ -53,7 +53,7 @@ static ExceptionOr<bool> verifyEd25519CryptoKit(const Vector<uint8_t>& pubKey, c
     if (pubKey.size() != ed25519KeySize || signature.size() != ed25519SignatureSize)
         return false;
     auto rv = pal::EdKey::verify(pal::EdSigningAlgorithm::ed25519(), pubKey.span(), signature.span(), data.span());
-    return rv.errorCode == Cpp::ErrorCodes::Success;
+    return rv.errorCode == PAL::Crypto::Error::Success;
 }
 
 ExceptionOr<Vector<uint8_t>> CryptoAlgorithmEd25519::platformSign(const CryptoKeyOKP& key, const Vector<uint8_t>& data)

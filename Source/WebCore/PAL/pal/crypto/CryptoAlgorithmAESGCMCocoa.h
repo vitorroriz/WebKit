@@ -25,14 +25,16 @@
 
 #pragma once
 
-namespace PAL {
+#include <pal/crypto/CryptoTypes.h>
+#include <wtf/Expected.h>
+#include <wtf/Unexpected.h>
 
-enum class CryptoDigestHashFunction : int {
-    SHA_1,
-    DEPRECATED_SHA_224,
-    SHA_256,
-    SHA_384,
-    SHA_512,
-};
+namespace PAL::Crypto {
 
-} // namespace PAL
+Expected<VectorUInt8, Error> encryptAESGCM(const VectorUInt8& iv, const VectorUInt8& key, const VectorUInt8& plainText, const VectorUInt8& additionalData, size_t desiredTagLengthInBytes);
+
+Expected<VectorUInt8, Error> encryptCryptoKitAESGCM(const VectorUInt8& iv, const Vector<uint8_t>& key, const VectorUInt8& plainText, const VectorUInt8& additionalData, size_t desiredTagLengthInBytes);
+
+Expected<VectorUInt8, Error> decyptAESGCM(const VectorUInt8& iv, const VectorUInt8& key, const VectorUInt8& cipherText, const VectorUInt8& additionalData, size_t desiredTagLengthInBytes);
+
+} // namespace PAL::Crypto

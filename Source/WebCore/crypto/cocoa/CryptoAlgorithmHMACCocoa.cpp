@@ -29,7 +29,7 @@
 #include "CryptoKeyHMAC.h"
 #include "CryptoUtilitiesCocoa.h"
 #include <CommonCrypto/CommonHMAC.h>
-#include <pal/PALSwift.h>
+#include <pal/crypto/CryptoTypes.h>
 #include <wtf/CryptographicUtilities.h>
 
 namespace WebCore {

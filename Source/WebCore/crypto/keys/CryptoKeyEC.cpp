@@ -32,7 +32,7 @@
 #include <wtf/text/Base64.h>
 
 #if OS(DARWIN) && !PLATFORM(GTK)
-#include <pal/PALSwift.h>
+#include <pal/crypto/CryptoTypes.h>
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #include "PALSwift-Generated.h"

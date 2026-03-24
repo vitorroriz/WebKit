@@ -21,7 +21,7 @@
 #include "CryptoAlgorithmX25519.h"
 
 #include "CryptoKeyOKP.h"
-#include <pal/PALSwift.h>
+#include <pal/crypto/CryptoTypes.h>
 #include <pal/spi/cocoa/CoreCryptoSPI.h>
 
 #pragma clang diagnostic push
@@ -36,7 +36,7 @@ static std::optional<Vector<uint8_t>> deriveBitsCryptoKit(const Vector<uint8_t>&
     if (baseKey.size() != ed25519KeySize || publicKey.size() != ed25519KeySize)
         return std::nullopt;
     auto rv = pal::EdKey::deriveBits(pal::EdKeyAgreementAlgorithm::x25519(), baseKey.span(), publicKey.span());
-    if (rv.errorCode != Cpp::ErrorCodes::Success)
+    if (rv.errorCode != PAL::Crypto::Error::Success)
         return std::nullopt;
     return WTF::move(rv.result);
 }

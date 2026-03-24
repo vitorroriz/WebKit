@@ -26,9 +26,9 @@
 #include "config.h"
 #include "CryptoDigest.h"
 
-#include "PALSwift.h"
 #include <CommonCrypto/CommonCrypto.h>
 #include <optional>
+#include <pal/crypto/CryptoTypes.h>
 #include <span>
 #include <wtf/TZoneMallocInlines.h>
 
@@ -37,7 +37,7 @@
 #include "PALSwift-Generated.h"
 #pragma clang diagnostic pop
 
-namespace PAL {
+namespace PAL::Crypto {
 
 struct CryptoDigestContext {
     WTF_MAKE_STRUCT_TZONE_ALLOCATED(CryptoDigestContext);

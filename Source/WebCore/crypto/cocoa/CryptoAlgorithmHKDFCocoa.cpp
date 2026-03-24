@@ -30,7 +30,7 @@
 #include "CryptoAlgorithmHkdfParams.h"
 #include "CryptoKeyRaw.h"
 #include "CryptoUtilitiesCocoa.h"
-#include <pal/PALSwift.h>
+#include <pal/crypto/CryptoTypes.h>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
@@ -44,7 +44,7 @@ static ExceptionOr<Vector<uint8_t>> platformDeriveBitsCryptoKit(const CryptoAlgo
     if (!isValidHashParameter(parameters.hashIdentifier))
         return Exception { ExceptionCode::OperationError };
     auto rv = pal::HKDF::deriveBits(key.key().span(), parameters.saltVector().span(), parameters.infoVector().span(), length, toCKHashFunction(parameters.hashIdentifier));
-    if (rv.errorCode != Cpp::ErrorCodes::Success)
+    if (rv.errorCode != PAL::Crypto::Error::Success)
         return Exception { ExceptionCode::OperationError };
     return WTF::move(rv.result);
 }

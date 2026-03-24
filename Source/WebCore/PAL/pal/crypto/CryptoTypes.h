@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2026 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,17 +26,24 @@
 #pragma once
 
 #include <cstdint>
-#include <optional>
 #include <span>
-#include <wtf/Forward.h>
 #include <wtf/Vector.h>
 
-namespace Cpp {
+namespace PAL::Crypto {
 
 using VectorUInt8 = WTF::Vector<uint8_t>;
+
 using SpanConstUInt8 = std::span<const uint8_t>;
 
-enum class ErrorCodes: int {
+enum class CryptoDigestHashFunction: int {
+    SHA_1,
+    DEPRECATED_SHA_224,
+    SHA_256,
+    SHA_384,
+    SHA_512,
+};
+
+enum class Error: int {
     Success = 0,
     WrongTagSize,
     EncryptionFailed,
@@ -55,9 +62,10 @@ enum class ErrorCodes: int {
     DefaultValue,
     UnsupportedAlgorithm,
 };
+
 struct CryptoOperationReturnValue {
-    ErrorCodes errorCode = ErrorCodes::DefaultValue;
+    Error errorCode = Error::DefaultValue;
     VectorUInt8 result;
 };
 
-} // Cpp
+} // namespace PAL::Crypto

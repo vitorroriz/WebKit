@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <pal/crypto/CryptoDigestHashFunction.h>
+#include <pal/crypto/CryptoTypes.h>
 
 namespace WebCore {
 
@@ -54,20 +54,20 @@ enum class CryptoAlgorithmIdentifier : uint8_t {
     X25519
 };
 
-inline PAL::CryptoDigestHashFunction toCKHashFunction(CryptoAlgorithmIdentifier hash)
+inline PAL::Crypto::CryptoDigestHashFunction toCKHashFunction(CryptoAlgorithmIdentifier hash)
 {
     switch (hash) {
     case CryptoAlgorithmIdentifier::SHA_256:
-        return PAL::CryptoDigestHashFunction::SHA_256;
+        return PAL::Crypto::CryptoDigestHashFunction::SHA_256;
     case CryptoAlgorithmIdentifier::SHA_384:
-        return PAL::CryptoDigestHashFunction::SHA_384;
+        return PAL::Crypto::CryptoDigestHashFunction::SHA_384;
     case CryptoAlgorithmIdentifier::SHA_512:
-        return PAL::CryptoDigestHashFunction::SHA_512;
+        return PAL::Crypto::CryptoDigestHashFunction::SHA_512;
     case CryptoAlgorithmIdentifier::SHA_1:
-        return PAL::CryptoDigestHashFunction::SHA_1;
+        return PAL::Crypto::CryptoDigestHashFunction::SHA_1;
     default:
         ASSERT_NOT_REACHED();
-        return PAL::CryptoDigestHashFunction::SHA_512;
+        return PAL::Crypto::CryptoDigestHashFunction::SHA_512;
     }
 }
 
