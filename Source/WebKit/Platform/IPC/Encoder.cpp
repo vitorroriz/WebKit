@@ -96,10 +96,7 @@ void Encoder::wrapForTesting(UniqueRef<Encoder>&& original)
 
     *this << original->span();
 
-    auto attachments = original->releaseAttachments();
-    reserve(attachments.size());
-    for (auto&& attachment : WTF::move(attachments))
-        addAttachment(WTF::move(attachment));
+    m_attachments.appendVector(original->releaseAttachments());
 }
 
 static inline size_t NODELETE roundUpToAlignment(size_t value, size_t alignment)
