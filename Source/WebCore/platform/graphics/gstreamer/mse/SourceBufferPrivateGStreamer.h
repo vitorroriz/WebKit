@@ -137,7 +137,6 @@ private:
 #if !RELEASE_LOG_DISABLED
     const Ref<const Logger> m_logger;
     const uint64_t m_logIdentifier;
-    String m_objectIdentifierString;
 #endif
 };
 

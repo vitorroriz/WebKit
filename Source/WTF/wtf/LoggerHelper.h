@@ -107,6 +107,12 @@ public:
         return reinterpret_cast<uint64_t>((parentIdentifier & parentMask) | (childIdentifier & maskLowerWord));
     }
 
+    static bool isChildLogIdentifier(uint64_t identifier, uint64_t parentIdentifier)
+    {
+        static constexpr uint64_t parentMask = 0xffffffffffff0000ull;
+        return (identifier & parentMask) == (parentIdentifier & parentMask);
+    }
+
     static uint64_t uniqueLogIdentifier()
     {
         return cryptographicallyRandomNumber<uint64_t>();

@@ -125,11 +125,13 @@ void SourceBufferPrivateGStreamer::handleLogMessage(const WTFLogChannel& channel
     if (rightParenthesisIndex == notFound)
         return;
 
-    if (!m_objectIdentifierString)
-        m_objectIdentifierString = makeString(hex(sourceBufferLogIdentifier()));
+    auto identifierString = callSite.substring(leftParenthesisIndex + 1, rightParenthesisIndex - leftParenthesisIndex - 1);
+    auto identifier = WTF::parseInteger<uint64_t>(identifierString, 16);
+    if (!identifier)
+        return;
 
-    auto identifier = callSite.substring(leftParenthesisIndex + 1, rightParenthesisIndex - leftParenthesisIndex - 1);
-    if (identifier != m_objectIdentifierString)
+    // Filter out logs not related with our log identifier.
+    if (!LoggerHelper::isChildLogIdentifier(*identifier, sourceBufferLogIdentifier()))
         return;
 
     StringBuilder builder;
