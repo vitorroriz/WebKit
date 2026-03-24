@@ -6581,8 +6581,7 @@ void WebPageProxy::pageScaleFactorDidChange(IPC::Connection& connection, double 
 
 #if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
     // If the page's scale factor changes, the UI process needs to send an updated AffineTransform to each frame.
-    for (RefPtr frame = m_mainFrame; frame; frame = frame->traverseNext().frame)
-        requestFrameScreenPosition(frame->frameID());
+    updateAccessibilityFrameGeometry();
 #endif
 }
 
@@ -10047,6 +10046,12 @@ void WebPageProxy::requestFrameScreenPosition(FrameIdentifier frameID)
 
         protectedThis->sendToProcessContainingFrame(frameID, Messages::WebPage::UpdateRemotePageAccessibilityScreenPosition(frameID, geometry));
     });
+}
+
+void WebPageProxy::updateAccessibilityFrameGeometry()
+{
+    for (RefPtr frame = m_mainFrame; frame; frame = frame->traverseNext().frame)
+        requestFrameScreenPosition(frame->frameID());
 }
 #endif // ENABLE(ACCESSIBILITY_LOCAL_FRAME)
 

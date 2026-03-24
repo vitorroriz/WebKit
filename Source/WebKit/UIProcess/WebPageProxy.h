@@ -1574,6 +1574,9 @@ public:
     void setCustomDeviceScaleFactor(float, CompletionHandler<void()>&&);
 
     void accessibilitySettingsDidChange();
+#if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
+    void updateAccessibilityFrameGeometry();
+#endif
     void enableAccessibilityForAllProcesses();
 
 #if PLATFORM(MAC)

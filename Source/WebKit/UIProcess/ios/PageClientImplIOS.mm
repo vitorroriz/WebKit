@@ -33,6 +33,7 @@
 #import "APIPageConfiguration.h"
 #import "APIUIClient.h"
 #import "ApplicationStateTracker.h"
+#import "DefaultWebBrowserChecks.h"
 #import "DrawingAreaProxy.h"
 #import "EndowmentStateTracker.h"
 #import "FrameInfoData.h"
@@ -592,6 +593,14 @@ IntRect PageClientImpl::rootViewToAccessibilityScreen(const IntRect& rect)
     auto contentView = this->contentView();
     if ([contentView respondsToSelector:@selector(accessibilityConvertRectToSceneReferenceCoordinates:)])
         rootViewRect = [contentView accessibilityConvertRectToSceneReferenceCoordinates:rootViewRect];
+#if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
+    else if (isRunningTest(applicationBundleIdentifier())) [[unlikely]] {
+        // accessibilityConvertRectToSceneReferenceCoordinates is a no-op when running tests,
+        // so fall back to standard UIKit coordinate conversion.
+        if (UIWindow *window = [contentView window])
+            rootViewRect = [contentView convertRect:rootViewRect toCoordinateSpace:window.screen.coordinateSpace];
+    }
+#endif
     return enclosingIntRect(rootViewRect);
 }
     

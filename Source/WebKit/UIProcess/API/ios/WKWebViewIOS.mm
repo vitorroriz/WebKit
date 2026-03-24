@@ -2055,6 +2055,12 @@ static WebCore::FloatPoint constrainContentOffset(WebCore::FloatPoint contentOff
     [self _scheduleVisibleContentRectUpdate];
     [_contentView didFinishScrolling];
 
+#if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
+    // After scrolling completes, recompute the screen position for each frame
+    // so accessibility clients get up-to-date screen coordinates.
+    _page->updateAccessibilityFrameGeometry();
+#endif
+
     if (CheckedPtr coordinator = _page->scrollingCoordinatorProxy())
         coordinator->setRootNodeIsInUserScroll(false);
 }
