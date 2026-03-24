@@ -4572,16 +4572,13 @@ TEST(WKNavigation, GeneratePageLoadTimingWithNoSubresources)
         { "/index.html"_s, { "Hello world!"_s } },
     }, HTTPServer::Protocol::HttpsProxy);
 
-    auto storeConfiguration = adoptNS([[_WKWebsiteDataStoreConfiguration alloc] initNonPersistentConfiguration]);
-    [storeConfiguration setHTTPSProxy:[NSURL URLWithString:[NSString stringWithFormat:@"https://127.0.0.1:%d/", server.port()]]];
-    [storeConfiguration setAllowsHSTSWithUntrustedRootCertificate:YES];
-    auto viewConfiguration = adoptNS([WKWebViewConfiguration new]);
-    [viewConfiguration setWebsiteDataStore:adoptNS([[WKWebsiteDataStore alloc] _initWithConfiguration:storeConfiguration.get()]).get()];
+    RetainPtr viewConfiguration = server.httpsProxyConfiguration();
 
     RetainPtr window = adoptNS([[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 400, 400) styleMask:0 backing:NSBackingStoreBuffered defer:NO]);
     RetainPtr webView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 400, 400) configuration:viewConfiguration.get()]);
 
     auto delegate = adoptNS([TestNavigationDelegate new]);
+    [delegate allowAnyTLSCertificate];
     [webView setNavigationDelegate:delegate.get()];
     [window.get().contentView addSubview:webView.get()];
 
@@ -4605,7 +4602,7 @@ TEST(WKNavigation, GeneratePageLoadTimingWithNoSubresources)
         done = true;
     };
 
-    auto request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://example.com/index.html"]];
+    auto request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/index.html"]];
     [webView loadRequest:request];
     TestWebKitAPI::Util::run(&done);
 }
