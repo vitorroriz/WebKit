@@ -27,8 +27,6 @@
 #include "config.h"
 #include "UserScript.h"
 
-#include <wtf/HashCountedSet.h>
-#include <wtf/NeverDestroyed.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/text/MakeString.h>
 
@@ -42,20 +40,8 @@ static WTF::URL generateUserScriptUniqueURL()
     return { { }, makeString("user-script:"_s, ++identifier) };
 }
 
-static HashCountedSet<String>& sourceStrings()
-{
-    static NeverDestroyed<HashCountedSet<String>> set;
-    return set;
-}
-
-static String internedSourceString(const String& string)
-{
-    auto result = sourceStrings().add(string);
-    return result.iterator->key;
-}
-
 UserScript::UserScript(String&& source, URL&& url, Vector<String>&& allowlist, Vector<String>&& blocklist, UserScriptInjectionTime injectionTime, UserContentInjectedFrames injectedFrames, UserContentMatchParentFrame matchParentFrame)
-    : m_source(internedSourceString(source))
+    : m_source(WTF::move(source))
     , m_url(url.isEmpty() ? generateUserScriptUniqueURL() : WTF::move(url))
     , m_allowlist(WTF::move(allowlist))
     , m_blocklist(WTF::move(blocklist))
@@ -63,11 +49,6 @@ UserScript::UserScript(String&& source, URL&& url, Vector<String>&& allowlist, V
     , m_injectedFrames(injectedFrames)
     , m_matchParentFrame(matchParentFrame)
 {
-}
-
-UserScript::~UserScript()
-{
-    sourceStrings().remove(m_source);
 }
 
 String UserScript::debugDescription() const

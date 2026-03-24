@@ -28,9 +28,7 @@
 #include "APIObject.h"
 #include "ContentWorldShared.h"
 #include "ScriptMessageHandlerIdentifier.h"
-#include "TransferString.h"
 #include "UserContentControllerIdentifier.h"
-#include "WebUserContentControllerDataTypes.h"
 #include <wtf/CheckedRef.h>
 #include <wtf/Forward.h>
 #include <wtf/HashCountedSet.h>
@@ -88,9 +86,6 @@ public:
 
     UserContentControllerParameters parametersForProcess(WebProcessProxy&) const;
 
-    IPC::TransferString cachedTransferString(const String&) const;
-    void resetTransferStringCache();
-
     API::Array& userScripts() { return m_userScripts.get(); }
     void addUserScript(API::UserScript&, InjectUserScriptImmediately);
     void removeUserScript(API::UserScript&);
@@ -100,7 +95,6 @@ public:
 #else
     void removeAllUserScripts();
 #endif
-    WebCoreUserScriptData dataFromUserScript(const WebCore::UserScript&) const;
 
     API::Array& userStyleSheets() { return m_userStyleSheets.get(); }
     void addUserStyleSheet(API::UserStyleSheet&);
@@ -111,7 +105,6 @@ public:
 #else
     void removeAllUserStyleSheets();
 #endif
-    WebCoreUserStyleSheetData dataFromUserStyleSheet(const WebCore::UserStyleSheet&) const;
 
     void addJSBuffer(API::JSBuffer&, API::ContentWorld&, const String&);
     void removeJSBuffer(API::ContentWorld&, const String&);
@@ -148,7 +141,6 @@ private:
     const Ref<API::Array> m_userStyleSheets;
     HashMap<ScriptMessageHandlerIdentifier, Ref<WebScriptMessageHandler>> m_scriptMessageHandlers;
     HashMap<std::pair<WebKit::ContentWorldIdentifier, String>, Ref<API::JSBuffer>> m_buffers;
-    mutable HashMap<String, IPC::TransferString> m_transferStringCache;
 
 #if ENABLE(CONTENT_EXTENSIONS)
     WeakHashSet<NetworkProcessProxy> m_networkProcesses;
