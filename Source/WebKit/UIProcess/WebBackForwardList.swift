@@ -702,9 +702,12 @@ final class WebBackForwardList {
         guard let targetItem = itemForID(identifier: itemID) else {
             return nil
         }
-        guard let parentFrameItem = targetItem.mainFrameItem().childItemForFrameID(parentFrameID) else {
-            return nil
-        }
+        // FIXME: After session restore, the back/forward list's frame identifiers don't match
+        // the current WebView's frames because the original identifiers are unavailable.
+        // Fall back to the mainFrameItem if the parentFrameID isn't found.
+        // This only works correctly for direct children of the main frame; nested frames
+        // (e.g., subframe > nestedframe) will get the wrong FrameState.
+        let parentFrameItem = targetItem.mainFrameItem().childItemForFrameID(parentFrameID) ?? targetItem.mainFrameItem()
         guard let childFrameItem = parentFrameItem.childItemAtIndex(childFrameIndex) else {
             return nil
         }
