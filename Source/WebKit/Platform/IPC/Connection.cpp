@@ -909,21 +909,26 @@ auto Connection::sendSyncMessage(SyncRequestID syncRequestID, UniqueRef<Encoder>
     }
 #endif
 
+    auto cleanup = makeScopeExit([&] {
+#if ENABLE(CORE_IPC_SIGNPOSTS)
+        if (signpostIdentifier) [[unlikely]]
+            WTFEndSignpost(signpostIdentifier, IPCConnection);
+#endif
+        popPendingSyncRequestID(syncRequestID);
+    });
+
     // Since sync IPC is blocking the current thread, make sure we use the same priority for the IPC sending thread
     // as the current thread.
-    sendMessageImpl(WTF::move(encoder), sendOptions, Thread::currentThreadQOS());
+    auto sendError = sendMessageImpl(WTF::move(encoder), sendOptions, Thread::currentThreadQOS());
+    if (sendError != Error::NoError) {
+        didFailToSendSyncMessage(sendError);
+        return makeUnexpected(sendError);
+    }
 
     // Then wait for a reply. Waiting for a reply could involve dispatching incoming sync messages, so
     // keep an extra reference to the connection here in case it's invalidated.
     Ref<Connection> protect(*this);
     auto replyOrError = waitForSyncReply(syncRequestID, messageName, timeout, sendSyncOptions);
-
-#if ENABLE(CORE_IPC_SIGNPOSTS)
-    if (signpostIdentifier) [[unlikely]]
-        WTFEndSignpost(signpostIdentifier, IPCConnection);
-#endif
-
-    popPendingSyncRequestID(syncRequestID);
 
     if (!replyOrError.has_value()) {
         if (replyOrError.error() == Error::NoError)
