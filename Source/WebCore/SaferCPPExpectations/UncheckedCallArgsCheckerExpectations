@@ -582,7 +582,6 @@ style/StyleResolveForFont.cpp
 style/StyleResolver.cpp
 style/StyleScope.cpp
 style/StyleScopeRuleSets.cpp
-style/StyleSubstitutionResolver.cpp
 style/StyleTreeResolver.cpp
 style/StyleUpdate.cpp
 style/Styleable.cpp
