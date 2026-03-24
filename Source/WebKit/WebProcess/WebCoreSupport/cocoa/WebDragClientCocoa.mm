@@ -124,7 +124,7 @@ static RefPtr<WebCore::CachedImage> cachedImage(Element& element)
     if (!renderImage)
         return nullptr;
     RefPtr image = renderImage->cachedImage();
-    if (!image || image->errorOccurred()) 
+    if (!image || image->errorOccurred())
         return nullptr;
     return image;
 }
@@ -152,7 +152,7 @@ void WebDragClient::declareAndWriteDragImage(const String& pasteboardName, Eleme
     auto archive = LegacyWebArchive::create(element);
 
     RetainPtr response = image->response().nsURLResponse();
-    
+
     RefPtr imageBuffer = image->image()->data();
 
     std::optional<SharedMemory::Handle> imageHandle;

@@ -8254,7 +8254,7 @@
 		C54256B218BEC18B00DE4179 /* WKFormPopover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKFormPopover.h; sourceTree = "<group>"; };
 		C54256B318BEC18B00DE4179 /* WKFormPopover.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WKFormPopover.mm; sourceTree = "<group>"; };
 		C54256B418BEC18C00DE4179 /* WKFormSelectControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKFormSelectControl.h; sourceTree = "<group>"; };
-		C554FFA212E4E8EA002F22C0 /* WebDragClientMac.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WebDragClientMac.mm; sourceTree = "<group>"; };
+		C554FFA212E4E8EA002F22C0 /* WebDragClientCocoa.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WebDragClientCocoa.mm; sourceTree = "<group>"; };
 		C55F916C1C595E440029E92D /* DataDetectionResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataDetectionResult.h; sourceTree = "<group>"; };
 		C57193B918C149D0002D0F12 /* WKFormSelectPicker.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WKFormSelectPicker.mm; sourceTree = "<group>"; };
 		C57193BA18C149D0002D0F12 /* WKFormSelectPopover.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WKFormSelectPopover.mm; sourceTree = "<group>"; };
@@ -13942,7 +13942,11 @@
 		46CBA2B02EAB07AA00D771E2 /* cocoa */ = {
 			isa = PBXGroup;
 			children = (
+				CEDA12DF152CCAE800D9E08D /* WebAlternativeTextClient.cpp */,
 				46CBA2B12EAB080500D771E2 /* WebChromeClientCocoa.mm */,
+				C554FFA212E4E8EA002F22C0 /* WebDragClientCocoa.mm */,
+				9391F283121B38F500EBF7E8 /* WebFrameNetworkingContext.h */,
+				9391F284121B38F500EBF7E8 /* WebFrameNetworkingContext.mm */,
 				46CBA2AF2EAB07AA00D771E2 /* WebLocalFrameLoaderClientCocoa.mm */,
 			);
 			path = cocoa;
@@ -16431,12 +16435,8 @@
 		BC111ADE112F5B9A00337BAB /* mac */ = {
 			isa = PBXGroup;
 			children = (
-				CEDA12DF152CCAE800D9E08D /* WebAlternativeTextClient.cpp */,
 				51021E9B12B16788005C033C /* WebContextMenuClientMac.mm */,
-				C554FFA212E4E8EA002F22C0 /* WebDragClientMac.mm */,
 				C5237F5F12441CA300780472 /* WebEditorClientMac.mm */,
-				9391F283121B38F500EBF7E8 /* WebFrameNetworkingContext.h */,
-				9391F284121B38F500EBF7E8 /* WebFrameNetworkingContext.mm */,
 				BCC43AC6127B99DE00317F16 /* WebPopupMenuMac.mm */,
 			);
 			path = mac;
