@@ -72,17 +72,4 @@ const Vector<IDBValue>& IDBGetAllResult::values() const
     return m_values;
 }
 
-Vector<String> IDBGetAllResult::allBlobFilePaths() const
-{
-    ASSERT(m_type == IndexedDB::GetAllType::Values);
-
-    HashSet<String> pathSet;
-    for (auto& value : m_values) {
-        for (auto& path : value.blobFilePaths())
-            pathSet.add(path);
-    }
-
-    return copyToVector(pathSet);
-}
-
 } // namespace WebCore

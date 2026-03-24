@@ -57,8 +57,6 @@ public:
     void addKey(IDBKeyData&&);
     void addValue(IDBValue&&);
 
-    WEBCORE_EXPORT Vector<String> allBlobFilePaths() const;
-
 private:
     friend struct IPC::ArgumentCoder<IDBGetAllResult>;
     IDBGetAllResult(IndexedDB::GetAllType type, Vector<IDBKeyData>&& keys, Vector<IDBValue>&& values, std::optional<IDBKeyPath>&& keyPath)
