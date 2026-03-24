@@ -716,7 +716,7 @@ platform/network/cocoa/RangeResponseGenerator.mm @nonARC
 platform/network/cocoa/ResourceRequestCocoa.mm @nonARC
 platform/network/cocoa/ResourceErrorCocoa.mm @nonARC
 platform/network/cocoa/ResourceHandleCocoa.mm @nonARC
-platform/network/cocoa/ResourceResponseCocoa.mm @nonARC @no-unify // Unsafe to unify until rdar://problem/48853137 is resolved
+platform/network/cocoa/ResourceResponseCocoa.mm @nonARC
 platform/network/cocoa/SynchronousLoaderClient.mm @nonARC
 platform/network/cocoa/UTIUtilities.mm @nonARC
 platform/network/cocoa/WebCoreNSURLSession.mm @nonARC @no-unify
