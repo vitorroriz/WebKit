@@ -228,6 +228,7 @@ private:
     // See the comment in maybeUpdateFontForLetterSpacingOrWordSpacing() about why this needs to be a friend.
     friend void maybeUpdateFontForLetterSpacingOrWordSpacing(BuilderState&, CSSValue&);
     friend class Builder;
+    friend class SubstitutionResolver;
 
     BuilderState(RenderStyle&);
     BuilderState(RenderStyle&, BuilderContext&&);
@@ -251,6 +252,7 @@ private:
     HashSet<AtomString> m_appliedCustomProperties;
     HashSet<AtomString> m_inProgressCustomProperties;
     HashSet<AtomString> m_inCycleCustomProperties;
+    HashSet<AtomString> m_inProgressAttrAttributes;
     WTF::BitSet<cssPropertyIDEnumValueCount> m_inProgressProperties;
     WTF::BitSet<cssPropertyIDEnumValueCount> m_invalidAtComputedValueTimeProperties;
 

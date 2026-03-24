@@ -26,13 +26,17 @@
 #include "config.h"
 #include "StyleSubstitutionResolver.h"
 
+#include "CSSCustomPropertySyntax.h"
 #include "CSSCustomPropertyValue.h"
+#include "CSSPrimitiveValue.h"
 #include "CSSPropertyNames.h"
 #include "CSSPropertyParser.h"
 #include "CSSPropertyParserConsumer+Primitives.h"
 #include "CSSRegisteredCustomProperty.h"
 #include "CSSShorthandSubstitutionValue.h"
 #include "CSSSubstitutionValue.h"
+#include "CSSTokenizer.h"
+#include "CSSUnits.h"
 #include "CSSValueKeywords.h"
 #include "CSSVariableData.h"
 #include "ConstantPropertyMap.h"
@@ -57,8 +61,9 @@ SubstitutionResolver::SubstitutionResolver(Builder& builder)
 {
 }
 
-auto SubstitutionResolver::substituteVariableFallback(const AtomString& variableName, CSSParserTokenRange range, CSSValueID functionId, const CSSParserContext& context) const -> std::pair<FallbackResult, Vector<CSSParserToken>> {
-    ASSERT(range.atEnd() || range.peek().type() == CommaToken);
+auto SubstitutionResolver::substituteVariableFallback(const AtomString& variableName, CSSParserTokenRange range, CSSValueID functionId, const CSSParserContext& context) -> std::pair<FallbackResult, Vector<CSSParserToken>> {
+    if (!range.atEnd() && range.peek().type() != CommaToken)
+        return { FallbackResult::Invalid, { } };
 
     if (range.atEnd())
         return { FallbackResult::None, { } };
@@ -86,7 +91,7 @@ auto SubstitutionResolver::substituteVariableFallback(const AtomString& variable
     return { FallbackResult::Valid, WTF::move(*tokens) };
 }
 
-RefPtr<const CustomProperty> SubstitutionResolver::propertyValueForVariableName(const AtomString& variableName, CSSValueID functionId) const
+RefPtr<const CustomProperty> SubstitutionResolver::propertyValueForVariableName(const AtomString& variableName, CSSValueID functionId)
 {
     if (functionId == CSSValueEnv)
         return m_styleBuilder.state().document().constantProperties().values().get(variableName);
@@ -97,7 +102,7 @@ RefPtr<const CustomProperty> SubstitutionResolver::propertyValueForVariableName(
     return protect(m_styleBuilder.state().style())->customPropertyValue(variableName);
 }
 
-bool SubstitutionResolver::substituteVariableFunction(CSSParserTokenRange range, CSSValueID functionId, Vector<CSSParserToken>& tokens, const CSSParserContext& context) const
+bool SubstitutionResolver::substituteVariableFunction(CSSParserTokenRange range, CSSValueID functionId, Vector<CSSParserToken>& tokens, const CSSParserContext& context)
 {
     // The maximum number of tokens that may be produced by a substitution function reference or fallback value.
     // https://drafts.csswg.org/css-variables/#long-variables
@@ -106,7 +111,8 @@ bool SubstitutionResolver::substituteVariableFunction(CSSParserTokenRange range,
     ASSERT(functionId == CSSValueVar || functionId == CSSValueEnv);
 
     range.consumeWhitespace();
-    ASSERT(range.peek().type() == IdentToken);
+    if (range.peek().type() != IdentToken)
+        return false;
     auto variableName = range.consumeIncludingWhitespace().value().toAtomString();
 
     // Fallback has to be resolved even when not used to detect cycles and invalid syntax.
@@ -134,7 +140,7 @@ bool SubstitutionResolver::substituteVariableFunction(CSSParserTokenRange range,
     return true;
 }
 
-bool SubstitutionResolver::substituteDashedFunction(StringView functionName, CSSParserTokenRange, Vector<CSSParserToken>& tokens) const
+bool SubstitutionResolver::substituteDashedFunction(StringView functionName, CSSParserTokenRange, Vector<CSSParserToken>& tokens)
 {
     // https://drafts.csswg.org/css-mixins/#evaluating-custom-functions
 
@@ -165,7 +171,7 @@ bool SubstitutionResolver::substituteDashedFunction(StringView functionName, CSS
     return true;
 }
 
-bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vector<CSSParserToken>& tokens, const CSSParserContext& context) const
+bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vector<CSSParserToken>& tokens, const CSSParserContext& context)
 {
     // https://drafts.csswg.org/css-values-5/#funcdef-attr
     // attr( <attr-name> <attr-type>? , <declaration-value>?)
@@ -177,7 +183,65 @@ bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vec
 
     auto attributeName = range.consumeIncludingWhitespace().value().toAtomString();
 
-    // FIXME: Support <attr-type> for non-string types.
+    // Consume optional <attr-type>.
+    // https://drafts.csswg.org/css-values-5/#typedef-attr-type
+    // <attr-type> = type( <syntax> ) | raw-string | number | <attr-unit>
+    enum class AttrType { RawString, Number, Unit, Percentage, Syntax };
+    struct AttrTypeResult {
+        AttrType type;
+        CSSUnitType unitType { CSSUnitType::CSS_UNKNOWN };
+        CSSCustomPropertySyntax syntax { };
+    };
+
+    auto consumeAttrType = [&]() -> std::optional<AttrTypeResult> {
+        if (range.peek().type() == FunctionToken) {
+            auto syntax = CSSCustomPropertySyntax::consumeType(range);
+            if (!syntax)
+                return { };
+            return AttrTypeResult { AttrType::Syntax, { }, WTF::move(*syntax) };
+        }
+
+        if (range.peek().type() == IdentToken) {
+            auto value = range.peek().value();
+            if (equalLettersIgnoringASCIICase(value, "raw-string"_s)) {
+                range.consumeIncludingWhitespace();
+                return AttrTypeResult { AttrType::RawString };
+            }
+            if (equalLettersIgnoringASCIICase(value, "number"_s)) {
+                range.consumeIncludingWhitespace();
+                return AttrTypeResult { AttrType::Number };
+            }
+            auto unit = CSSParserToken::stringToUnitType(value);
+            if (unit == CSSUnitType::CSS_UNKNOWN)
+                return { };
+            range.consumeIncludingWhitespace();
+            return AttrTypeResult { AttrType::Unit, unit };
+        }
+
+        if (range.peek().type() == DelimiterToken && range.peek().delimiter() == '%') {
+            range.consumeIncludingWhitespace();
+            return AttrTypeResult { AttrType::Percentage };
+        }
+
+        return { };
+    };
+
+    std::optional<AttrTypeResult> parsedAttrType;
+    if (!range.atEnd() && range.peek().type() != CommaToken) {
+        parsedAttrType = consumeAttrType();
+        if (!parsedAttrType)
+            return false;
+    }
+
+    // Fallback has to be resolved even when not used to detect cycles and invalid syntax.
+    std::optional<Vector<CSSParserToken>> fallbackTokens;
+    bool hasFallback = false;
+    if (!range.atEnd()) {
+        if (CSSPropertyParserHelpers::consumeCommaIncludingWhitespace(range)) {
+            hasFallback = true;
+            fallbackTokens = substituteTokenRange(range, context);
+        }
+    }
 
     m_styleBuilder.state().registerContentAttribute(attributeName);
     protect(m_styleBuilder.state().style())->setHasAttrContent();
@@ -188,28 +252,110 @@ bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vec
 
     auto& attributeValue = element->getAttribute(QualifiedName { nullAtom(), attributeName, nullAtom() });
 
-    if (attributeValue.isNull()) {
-        // Use fallback if available.
-        if (range.atEnd())
-            return false;
+    // https://drafts.csswg.org/css-values-5/#attr-substitution
+    // Cycle detection: type(<syntax>) allows substitution of arbitrary substitution functions
+    // in the attribute value, which could create attr() cycles.
+    auto isNewEntry = m_styleBuilder.state().m_inProgressAttrAttributes.add(attributeName).isNewEntry;
+    auto removeOnExit = makeScopeExit([&] {
+        if (isNewEntry)
+            m_styleBuilder.state().m_inProgressAttrAttributes.remove(attributeName);
+    });
 
-        if (!CSSPropertyParserHelpers::consumeCommaIncludingWhitespace(range))
-            return false;
-
-        auto fallbackTokens = substituteTokenRange(range, context);
+    // https://drafts.csswg.org/css-values-5/#attr-substitution
+    // FAILURE step: "If second arg is null, and syntax was omitted, return an empty CSS <string>."
+    // "If second arg is null, return the guaranteed-invalid value."
+    // "Substitute arbitrary substitution functions in second arg, and return the result."
+    auto substituteFailure = [&]() -> bool {
+        if (!hasFallback && !parsedAttrType) {
+            tokens.append(CSSParserToken(StringToken, emptyAtom()));
+            return true;
+        }
         if (!fallbackTokens)
             return false;
 
         tokens.appendVector(*fallbackTokens);
         return true;
+    };
+
+    if (attributeValue.isNull() || !isNewEntry)
+        return substituteFailure();
+
+    // "If syntax is null or the keyword raw-string, return a CSS <string> whose value is attr value."
+    auto attrType = parsedAttrType ? parsedAttrType->type : AttrType::RawString;
+
+    switch (attrType) {
+    case AttrType::RawString:
+        tokens.append(CSSParserToken(StringToken, attributeValue));
+        return true;
+
+    // "If syntax is the keyword number, [...] the attribute's literal value, after stripping leading
+    //  and trailing whitespace, [is] parsed as a <number-token>. Values that fail to parse trigger fallback."
+    case AttrType::Number: {
+        CSSTokenizer tokenizer(attributeValue.string().trim(isUnicodeCompatibleASCIIWhitespace<UChar>));
+        auto tokenRange = tokenizer.tokenRange();
+        tokenRange.consumeWhitespace();
+        if (tokenRange.peek().type() != NumberToken)
+            return substituteFailure();
+        auto numberToken = tokenRange.consumeIncludingWhitespace();
+        if (!tokenRange.atEnd())
+            return substituteFailure();
+        tokens.append(CSSParserToken(numberToken.numericValue(), numberToken.numericValueType(), numberToken.numericSign(), StringView()));
+        return true;
     }
 
-    // Default type is string: produce a CSS string token with the attribute value.
-    tokens.append(CSSParserToken(StringToken, attributeValue));
-    return true;
+    // "If given as an <attr-unit> value, the value is first parsed as if number keyword was specified,
+    //  then the resulting numeric value is turned into a dimension with the corresponding unit,
+    //  or a percentage if % was given."
+    case AttrType::Unit:
+    case AttrType::Percentage: {
+        CSSTokenizer tokenizer(attributeValue.string().trim(isUnicodeCompatibleASCIIWhitespace<UChar>));
+        auto tokenRange = tokenizer.tokenRange();
+        tokenRange.consumeWhitespace();
+        if (tokenRange.peek().type() != NumberToken)
+            return substituteFailure();
+        auto numberToken = tokenRange.consumeIncludingWhitespace();
+        if (!tokenRange.atEnd())
+            return substituteFailure();
+        auto token = CSSParserToken(numberToken.numericValue(), numberToken.numericValueType(), numberToken.numericSign(), StringView());
+        if (attrType == AttrType::Percentage)
+            token.convertToPercentage();
+        else
+            token.convertToDimensionWithUnit(CSSPrimitiveValue::unitTypeString(parsedAttrType->unitType));
+        tokens.append(token);
+        return true;
+    }
+
+    // "If given as a type() function, the value is parsed according to the <syntax> argument,
+    //  and substitutes as the resulting tokens. Values that fail to parse according to the syntax
+    //  trigger fallback."
+    case AttrType::Syntax: {
+        CSSTokenizer tokenizer(attributeValue.string());
+        // Keep tokenizer's escaped strings alive until substitute() copies them into CSSVariableData.
+        m_intermediateTokenStrings.appendVector(tokenizer.escapedStringsForAdoption());
+
+        // Substitute any var()/attr()/env() in the attribute value.
+        auto substitutedTokens = substituteTokenRange(tokenizer.tokenRange(), context);
+        if (!substitutedTokens)
+            return substituteFailure();
+
+        // "This is different from specifying a syntax of type(*), which still triggers CSS parsing
+        //  (but with no requirements placed on it beyond that it parse validly), and which substitutes
+        //  the result of that parsing directly as tokens, rather than as a <string> value."
+        if (!parsedAttrType->syntax.isUniversal()) {
+            CSSParserTokenRange substitutedRange(*substitutedTokens);
+            if (!CSSPropertyParser::isValidCustomPropertyValueForSyntax(parsedAttrType->syntax, substitutedRange, context))
+                return substituteFailure();
+        }
+
+        tokens.appendVector(*substitutedTokens);
+        return true;
+    }
+    }
+
+    RELEASE_ASSERT_NOT_REACHED();
 }
 
-bool SubstitutionResolver::substituteInternalAutoBaseFunction(CSSParserTokenRange range, Vector<CSSParserToken>& tokens, const CSSParserContext& context) const
+bool SubstitutionResolver::substituteInternalAutoBaseFunction(CSSParserTokenRange range, Vector<CSSParserToken>& tokens, const CSSParserContext& context)
 {
     // -internal-auto-base(autoValue, baseValue)
     // Picks between the two arguments based on whether the element has base appearance.
@@ -237,7 +383,7 @@ bool SubstitutionResolver::substituteInternalAutoBaseFunction(CSSParserTokenRang
     return true;
 }
 
-std::optional<Vector<CSSParserToken>> SubstitutionResolver::substituteTokenRange(CSSParserTokenRange range, const CSSParserContext& context) const
+std::optional<Vector<CSSParserToken>> SubstitutionResolver::substituteTokenRange(CSSParserTokenRange range, const CSSParserContext& context)
 {
     Vector<CSSParserToken> tokens;
     bool success = true;
@@ -275,7 +421,7 @@ std::optional<Vector<CSSParserToken>> SubstitutionResolver::substituteTokenRange
     return tokens;
 }
 
-RefPtr<CSSVariableData> SubstitutionResolver::trySimpleSubstitution(const CSSSubstitutionValue& value) const
+RefPtr<CSSVariableData> SubstitutionResolver::trySimpleSubstitution(const CSSSubstitutionValue& value)
 {
     if (!value.m_simpleReference)
         return nullptr;
@@ -292,7 +438,7 @@ RefPtr<CSSVariableData> SubstitutionResolver::trySimpleSubstitution(const CSSSub
     return std::get<Ref<CSSVariableData>>(property->value()).ptr();
 }
 
-bool SubstitutionResolver::isBaseAppearance() const
+bool SubstitutionResolver::isBaseAppearance()
 {
     auto& state = m_styleBuilder.state();
     if (state.style().appearance() == StyleAppearance::Base)
@@ -304,20 +450,24 @@ bool SubstitutionResolver::isBaseAppearance() const
     return false;
 }
 
-RefPtr<CSSVariableData> SubstitutionResolver::substitute(const CSSSubstitutionValue& value) const
+RefPtr<CSSVariableData> SubstitutionResolver::substitute(const CSSSubstitutionValue& value)
 {
     if (auto data = trySimpleSubstitution(value))
         return data;
 
     auto& context = value.context();
     auto substitutedTokens = substituteTokenRange(value.m_data->tokenRange(), context);
-    if (!substitutedTokens)
+    if (!substitutedTokens) {
+        m_intermediateTokenStrings.clear();
         return nullptr;
+    }
 
-    return CSSVariableData::create(*substitutedTokens, context);
+    auto data = CSSVariableData::create(*substitutedTokens, context);
+    m_intermediateTokenStrings.clear();
+    return data;
 }
 
-RefPtr<CSSValue> SubstitutionResolver::substituteAndParse(const CSSSubstitutionValue& substitutionValue, CSSPropertyID propertyID) const
+RefPtr<CSSValue> SubstitutionResolver::substituteAndParse(const CSSSubstitutionValue& substitutionValue, CSSPropertyID propertyID)
 {
     auto data = substitute(substitutionValue);
     if (!data)
@@ -335,7 +485,7 @@ RefPtr<CSSValue> SubstitutionResolver::substituteAndParse(const CSSSubstitutionV
     return substitutionValue.m_cache.value;
 }
 
-RefPtr<CSSValue> SubstitutionResolver::substituteAndParseShorthand(const CSSShorthandSubstitutionValue& substitution, CSSPropertyID propertyID) const
+RefPtr<CSSValue> SubstitutionResolver::substituteAndParseShorthand(const CSSShorthandSubstitutionValue& substitution, CSSPropertyID propertyID)
 {
     ASSERT(!CSSProperty::isDirectionAwareProperty(propertyID));
 

@@ -47,25 +47,26 @@ class SubstitutionResolver {
 public:
     explicit SubstitutionResolver(Builder&);
 
-    RefPtr<CSSValue> substituteAndParse(const CSSSubstitutionValue&, CSSPropertyID) const;
-    RefPtr<CSSValue> substituteAndParseShorthand(const CSSShorthandSubstitutionValue&, CSSPropertyID) const;
-    RefPtr<CSSVariableData> substitute(const CSSSubstitutionValue&) const;
+    RefPtr<CSSValue> substituteAndParse(const CSSSubstitutionValue&, CSSPropertyID);
+    RefPtr<CSSValue> substituteAndParseShorthand(const CSSShorthandSubstitutionValue&, CSSPropertyID);
+    RefPtr<CSSVariableData> substitute(const CSSSubstitutionValue&);
 
 private:
-    std::optional<Vector<CSSParserToken>> substituteTokenRange(CSSParserTokenRange, const CSSParserContext&) const;
-    bool substituteVariableFunction(CSSParserTokenRange, CSSValueID, Vector<CSSParserToken>&, const CSSParserContext&) const;
-    bool substituteDashedFunction(StringView functionName, CSSParserTokenRange, Vector<CSSParserToken>&) const;
-    bool substituteAttrFunction(CSSParserTokenRange, Vector<CSSParserToken>&, const CSSParserContext&) const;
-    bool substituteInternalAutoBaseFunction(CSSParserTokenRange, Vector<CSSParserToken>&, const CSSParserContext&) const;
+    std::optional<Vector<CSSParserToken>> substituteTokenRange(CSSParserTokenRange, const CSSParserContext&);
+    bool substituteVariableFunction(CSSParserTokenRange, CSSValueID, Vector<CSSParserToken>&, const CSSParserContext&);
+    bool substituteDashedFunction(StringView functionName, CSSParserTokenRange, Vector<CSSParserToken>&);
+    bool substituteAttrFunction(CSSParserTokenRange, Vector<CSSParserToken>&, const CSSParserContext&);
+    bool substituteInternalAutoBaseFunction(CSSParserTokenRange, Vector<CSSParserToken>&, const CSSParserContext&);
 
     enum class FallbackResult : uint8_t { None, Valid, Invalid };
-    std::pair<FallbackResult, Vector<CSSParserToken>> substituteVariableFallback(const AtomString& variableName, CSSParserTokenRange, CSSValueID functionId, const CSSParserContext&) const;
+    std::pair<FallbackResult, Vector<CSSParserToken>> substituteVariableFallback(const AtomString& variableName, CSSParserTokenRange, CSSValueID functionId, const CSSParserContext&);
 
-    RefPtr<const CustomProperty> propertyValueForVariableName(const AtomString&, CSSValueID) const;
-    RefPtr<CSSVariableData> trySimpleSubstitution(const CSSSubstitutionValue&) const;
-    bool isBaseAppearance() const;
+    RefPtr<const CustomProperty> propertyValueForVariableName(const AtomString&, CSSValueID);
+    RefPtr<CSSVariableData> trySimpleSubstitution(const CSSSubstitutionValue&);
+    bool isBaseAppearance();
 
     Builder& m_styleBuilder;
+    Vector<String> m_intermediateTokenStrings;
 };
 
 } // namespace Style
