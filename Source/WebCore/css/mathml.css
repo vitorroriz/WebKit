@@ -38,7 +38,7 @@
 }
 
 :focus {
-    outline: auto 5px -webkit-focus-ring-color
+    outline-style: auto;
 }
 
 /* Universal rules */

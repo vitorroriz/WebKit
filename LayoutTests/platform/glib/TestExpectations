@@ -5401,6 +5401,17 @@ webkit.org/b/310274 media/media-controller-time.html [ Pass Timeout ]
 
 webkit.org/b/310278 media/video-pause-play-resolve.html [ Pass Timeout ]
 
+webkit.org/b/310543 fast/images/image-map-outline-with-paint-root-offset.html [ ImageOnlyFailure ]
+webkit.org/b/310543 fast/inline/hidpi-outline-auto-with-border-radius-horizontal-ltr.html [ ImageOnlyFailure ]
+webkit.org/b/310543 fast/inline/hidpi-outline-auto-with-border-radius-vertical-ltr.html [ ImageOnlyFailure ]
+webkit.org/b/310543 fast/inline/hidpi-outline-auto-with-fractional-radius.html [ ImageOnlyFailure ]
+webkit.org/b/310543 fast/repaint/outline-auto-with-default-width-and-offset-repaint.html [ Failure ]
+webkit.org/b/310543 fast/repaint/outline-auto-with-width-less-than-focus-ring-width-and-offset-repaint.html [ Failure ]
+webkit.org/b/310543 fast/repaint/outline-with1px-auto-repaint-rect.html [ Failure ]
+webkit.org/b/310543 fast/repaint/outline-with2px-auto-repaint-rect.html [ Failure ]
+webkit.org/b/310543 fast/repaint/outline-with3px-auto-repaint-rect.html [ Failure ]
+webkit.org/b/310543 imported/w3c/web-platform-tests/css/css-ui/outline-028.html [ ImageOnlyFailure ]
+
 # End: Common failures between GTK and WPE.
 
 #////////////////////////////////////////////////////////////////////////////////////////

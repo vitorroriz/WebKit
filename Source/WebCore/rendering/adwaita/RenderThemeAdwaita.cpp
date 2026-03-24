@@ -193,6 +193,11 @@ Color RenderThemeAdwaita::platformFocusRingColor(OptionSet<StyleColorOptions>) c
     return systemFocusRingColor();
 }
 
+float RenderThemeAdwaita::platformFocusRingWidth() const
+{
+    return Adwaita::focusLineWidth;
+}
+
 void RenderThemeAdwaita::platformColorsDidChange()
 {
     static_cast<ThemeAdwaita&>(Theme::singleton()).platformColorsDidChange();

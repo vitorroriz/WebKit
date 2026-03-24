@@ -2,13 +2,13 @@
 
 
 (repaint rects
-  (rect 1 37 798 32)
+  (rect 4 40 792 26)
   (rect 8 44 784 18)
-  (rect 1 51 798 18)
-  (rect 1 44 798 7)
-  (rect 1 19 15 31)
+  (rect 4 48 792 18)
+  (rect 4 44 792 4)
+  (rect 4 22 9 25)
   (rect 8 26 1 17)
-  (rect 1 37 15 31)
+  (rect 4 40 9 25)
   (rect 8 44 1 17)
 )
 

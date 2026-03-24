@@ -200,8 +200,11 @@ public:
 
     WEBCORE_EXPORT Color focusRingColor(OptionSet<StyleColorOptions>) const;
     virtual Color platformFocusRingColor(OptionSet<StyleColorOptions>) const { return Color::black; }
-    static float platformFocusRingWidth() { return 3; }
-    static float platformFocusRingOffset(float outlineWidth) { return std::max<float>(outlineWidth - platformFocusRingWidth(), 0); }
+
+    // On iOS, this matches [UIFocusRingStyle borderThickness] and on macOS this matches AppKit.
+    virtual float platformFocusRingWidth() const { return 3; }
+    float platformFocusRingWidthOffset(float outlineWidth) const { return std::max<float>(outlineWidth - platformFocusRingWidth(), 0); }
+
 #if ENABLE(CSS_TAP_HIGHLIGHT_COLOR)
     static Color tapHighlightColor();
     virtual Color platformTapHighlightColor() const;

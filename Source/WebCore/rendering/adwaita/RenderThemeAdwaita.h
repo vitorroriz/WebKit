@@ -72,6 +72,7 @@ public:
     Color platformInactiveListBoxSelectionBackgroundColor(OptionSet<StyleColorOptions>) const final;
     Color platformInactiveListBoxSelectionForegroundColor(OptionSet<StyleColorOptions>) const final;
     Color platformFocusRingColor(OptionSet<StyleColorOptions>) const final;
+    float platformFocusRingWidth() const final;
     void platformColorsDidChange() final;
 
     void adjustTextFieldStyle(RenderStyle&, const Element*) const final;
