@@ -298,6 +298,44 @@ TEST(WTF_UTF8Conversion, EqualUTF16ToUTF8)
     EXPECT_FALSE(equal(char16Array(0xDC00, 0xD800), char8Array(0xED, 0xB0, 0x80, 0xED, 0xA0, 0x80)));
     EXPECT_FALSE(equal(char16Array(0xDC00, 0xDC00), char8Array(0xED, 0xB0, 0x80, 0xED, 0xB0, 0x80)));
     EXPECT_FALSE(equal(char16Array(0xD800, 0), char8Array(0xED, 0xA0, 0x80, 0x00)));
+
+    // Properly encoded U+FFFD on both sides should compare as equal.
+    // This is a real code point, not a decoding error.
+    EXPECT_TRUE(equal(char16Array(0xFFFD), char8Array(0xEF, 0xBF, 0xBD)));
+
+    // Invalid sequences should not compare as equal, even if both sides fail.
+    // next() returns sentinelCodePoint (U_SENTINEL) for these, which is an
+    // internal error signal — not U+FFFD — so no code point was produced.
+
+    // Different invalid sequences (lone UTF-16 surrogate vs lone UTF-8 continuation byte).
+    EXPECT_FALSE(equal(char16Array(0xD800), char8Array(0x80)));
+    EXPECT_FALSE(equal(char16Array(0xDC00), char8Array(0x80)));
+    EXPECT_FALSE(equal(char16Array(0xD800), char8Array(0xFE)));
+
+    // Same invalid UTF-8 byte on both sides (via UTF-16 surrogates that map to same sentinel).
+    EXPECT_FALSE(equal(char16Array(0xD800), char8Array(0xED, 0xA0, 0x80)));
+    EXPECT_FALSE(equal(char16Array(0xDBFF), char8Array(0xED, 0xAF, 0xBF)));
+    EXPECT_FALSE(equal(char16Array(0xDC00), char8Array(0xED, 0xB0, 0x80)));
+
+    // Truncated UTF-8 multi-byte sequences.
+    EXPECT_FALSE(equal(char16Array(0xD800), char8Array(0xC2)));
+    EXPECT_FALSE(equal(char16Array(0xD800), char8Array(0xE0, 0x80)));
+    EXPECT_FALSE(equal(char16Array(0xD800), char8Array(0xF0, 0x90, 0x80)));
+
+    // Overlong UTF-8 encoding (2-byte encoding of a character that fits in 1 byte).
+    EXPECT_FALSE(equal(char16Array(0xD800), char8Array(0xC0, 0x80)));
+    EXPECT_FALSE(equal(char16Array(0xD800), char8Array(0xC1, 0xBF)));
+
+    // Out-of-range UTF-8 (above U+10FFFF).
+    EXPECT_FALSE(equal(char16Array(0xD800), char8Array(0xF4, 0x90, 0x80, 0x80)));
+
+    // Invalid sequence surrounded by valid data: "a" + invalid + "b" vs "a" + invalid + "b".
+    EXPECT_FALSE(equal(char16Array('a', 0xD800, 'b'), char8Array('a', 0x80, 'b')));
+    EXPECT_FALSE(equal(char16Array('a', 0xD800, 'b'), char8Array('a', 0xFE, 'b')));
+
+    // Valid data followed by invalid should not match valid data alone.
+    EXPECT_FALSE(equal(char16Array('a', 0xD800), char8Array('a')));
+    EXPECT_FALSE(equal(char16Array('a'), char8Array('a', 0x80)));
 }
 
 TEST(WTF_UTF8Conversion, EqualLatin1ToUTF8)
@@ -318,6 +356,12 @@ TEST(WTF_UTF8Conversion, EqualLatin1ToUTF8)
     EXPECT_FALSE(equal(latin1Array(0), char8Array(1)));
     EXPECT_FALSE(equal(latin1Array(0), char8Array(1)));
     EXPECT_FALSE(equal(latin1Array(1), char8Array(0)));
+
+    // Latin1 never produces sentinelCodePoint, but invalid UTF-8 does.
+    EXPECT_FALSE(equal(latin1Array(0x80), char8Array(0x80)));
+    EXPECT_FALSE(equal(latin1Array(0xFF), char8Array(0xFE)));
+    EXPECT_FALSE(equal(latin1Array('a'), char8Array(0x80)));
+    EXPECT_FALSE(equal(latin1Array('a', 'b'), char8Array('a', 0x80)));
 }
 
 TEST(WTF_UTF8Conversion, UTF8ToUTF16ReplacingInvalidSequences)

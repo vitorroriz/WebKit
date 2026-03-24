@@ -181,7 +181,11 @@ template<typename CharacterTypeA, typename CharacterTypeB> bool equalInternal(st
     size_t offsetA = 0;
     size_t offsetB = 0;
     while (offsetA < a.size() && offsetB < b.size()) {
-        if (next(a, offsetA) != next(b, offsetB))
+        auto characterA = next(a, offsetA);
+        // sentinelCodePoint is U_SENTINEL (not U+FFFD), meaning decoding failed
+        // without producing any code point. Two unrelated decoding failures
+        // should not compare as equal.
+        if (characterA == sentinelCodePoint || characterA != next(b, offsetB))
             return false;
     }
     return offsetA == a.size() && offsetB == b.size();
