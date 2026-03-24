@@ -26,8 +26,6 @@
 #import "config.h"
 #import "WKExtrinsicButton.h"
 
-#import <wtf/RetainPtr.h>
-
 #if PLATFORM(IOS_FAMILY)
 
 #import <wtf/RetainPtr.h>
