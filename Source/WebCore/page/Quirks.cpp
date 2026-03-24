@@ -1941,19 +1941,26 @@ std::optional<TargetedElementSelectors> Quirks::defaultVisibilityAdjustmentSelec
 
 String Quirks::scriptToEvaluateBeforeRunningScriptFromURL(const URL& scriptURL)
 {
-#if PLATFORM(IOS_FAMILY)
     QUIRKS_EARLY_RETURN_IF_DISABLED_WITH_VALUE({ });
 
     if (!m_quirksData.quirkIsEnabled(QuirksData::SiteSpecificQuirk::NeedsScriptToEvaluateBeforeRunningScriptFromURLQuirk))
         return { };
 
+    if (scriptURL.isEmpty())
+        return { };
+
+    // iheart.com rdar://171198911
+    if (m_quirksData.isIHeart)
+        return "document.cookie = 'app=listen:60; path=/; domain=.iheart.com';"_s;
+
+#if PLATFORM(IOS_FAMILY)
     // player.anyclip.com rdar://138789765
     if ((m_quirksData.isDictionary || m_quirksData.isThesaurus) && scriptURL.lastPathComponent().endsWith("lre.js"_s)) [[unlikely]] {
         if (scriptURL.host() == "player.anyclip.com"_s)
             return chromeUserAgentScript;
     }
 
-    if (m_quirksData.quirkIsEnabled(QuirksData::SiteSpecificQuirk::NeedsGoogleTranslateScrollingQuirk) && !scriptURL.isEmpty()) [[unlikely]]
+    if (m_quirksData.quirkIsEnabled(QuirksData::SiteSpecificQuirk::NeedsGoogleTranslateScrollingQuirk)) [[unlikely]]
         return chromeUserAgentScript;
 
     // nba.com rdar://147429596
@@ -1964,8 +1971,6 @@ String Quirks::scriptToEvaluateBeforeRunningScriptFromURL(const URL& scriptURL)
     if (m_quirksData.isWebEx && scriptURL.lastPathComponent().startsWith("pushdownload."_s)) [[unlikely]]
         return "Object.defineProperty(window, 'Touch', { get: () => undefined });"_s;
 #endif
-#else
-    UNUSED_PARAM(scriptURL);
 #endif
 
     return { };
@@ -3091,6 +3096,14 @@ static void handleHuluQuirks(QuirksData& quirksData, const URL& /* quirksURL */,
     });
 }
 
+static void handleIHeartQuirks(QuirksData& quirksData, const URL& /* quirksURL */, const String& quirksDomainString, const URL& /* documentURL */)
+{
+    QUIRKS_EARLY_RETURN_IF_NOT_DOMAIN("iheart.com"_s);
+
+    quirksData.isIHeart = true;
+    quirksData.enableQuirk(QuirksData::SiteSpecificQuirk::NeedsScriptToEvaluateBeforeRunningScriptFromURLQuirk);
+}
+
 static void handleIMDBQuirks(QuirksData& quirksData, const URL& /* quirksURL */, const String& quirksDomainString, const URL&  /* documentURL */)
 {
     QUIRKS_EARLY_RETURN_IF_NOT_DOMAIN("imdb.com"_s);
@@ -3605,6 +3618,7 @@ void Quirks::determineRelevantQuirks()
 #if PLATFORM(IOS_FAMILY) || PLATFORM(MAC)
         { "icloud"_s, &handleICloudQuirks },
 #endif
+        { "iheart"_s, &handleIHeartQuirks },
         { "imdb"_s, &handleIMDBQuirks },
         { "instagram"_s, &handleInstagramQuirks },
         { "live"_s, &handleLiveQuirks },
