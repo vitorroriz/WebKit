@@ -664,7 +664,7 @@ void unregisterPipeline(const GRefPtr<GstElement>& pipeline)
     activePipelinesMap().remove(name.span());
 }
 
-void WebCoreLogObserver::didLogMessage(const WTFLogChannel& channel, WTFLogLevel level, Vector<JSONLogValue>&& values)
+void WebCoreLogObserver::didLogMessage(const WTFLogChannel& channel, WTFLogLevel level, std::optional<WTFLogLocation> location, Vector<JSONLogValue>&& values)
 {
 #ifndef GST_DISABLE_GST_DEBUG
     if (!shouldEmitLogMessage(channel))
@@ -676,7 +676,10 @@ void WebCoreLogObserver::didLogMessage(const WTFLogChannel& channel, WTFLogLevel
 
     auto logString = builder.toString();
     auto gstDebugLevel = gstDebugLevelFromWTFLogLevel(level);
-    gst_debug_log(debugCategory(), gstDebugLevel, __FILE__, __FUNCTION__, __LINE__, nullptr, "%s", logString.utf8().data());
+    const char* file = location ? location->file : __FILE__;
+    const char* function = location ? location->function : __FUNCTION__;
+    int line = location ? location->line : __LINE__;
+    gst_debug_log(debugCategory(), gstDebugLevel, file, function, line, nullptr, "%s", logString.utf8().data());
 #else
     UNUSED_PARAM(channel);
     UNUSED_PARAM(level);

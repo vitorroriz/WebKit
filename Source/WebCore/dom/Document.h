@@ -2233,7 +2233,7 @@ private:
 
     bool isBodyPotentiallyScrollable(HTMLBodyElement&);
 
-    void didLogMessage(const WTFLogChannel&, WTFLogLevel, Vector<JSONLogValue>&&) final;
+    void didLogMessage(const WTFLogChannel&, WTFLogLevel, std::optional<WTFLogLocation>, Vector<JSONLogValue>&&) final;
     static void configureSharedLogger();
 
     void addToDocumentsMap();

@@ -68,7 +68,7 @@ do { \
         if (logger().hasEnabledInspector()) { \
             char buffer[1024] = { 0 }; \
             SAFE_SPRINTF(std::span { buffer }, MESSAGE_MediaSessionManagerCocoa##formatString, ##__VA_ARGS__); \
-            logger().toObservers(logChannel(), WTFLogLevel::Always, String::fromUTF8(buffer)); \
+            logger().toObservers(logChannel(), WTFLogLevel::Always, { }, String::fromUTF8(buffer)); \
         } \
     } \
 } while (0)

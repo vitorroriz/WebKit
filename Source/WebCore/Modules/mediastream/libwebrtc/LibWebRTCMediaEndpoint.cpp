@@ -905,7 +905,7 @@ void LibWebRTCMediaEndpoint::OnStatsDelivered(const webrtc::scoped_refptr<const 
 #endif
 
             // Stats are very verbose, let's only display them in inspector console in verbose mode.
-            logger().toObservers(LogWebRTC, WTFLogLevel::Debug, Logger::LogSiteIdentifier("LibWebRTCMediaEndpoint"_s, "OnStatsDelivered"_s, logIdentifier()), statsLogger);
+            logger().toObservers(LogWebRTC, WTFLogLevel::Debug, { }, Logger::LogSiteIdentifier("LibWebRTCMediaEndpoint"_s, "OnStatsDelivered"_s, logIdentifier()), statsLogger);
 
             RELEASE_LOG_FORWARDABLE(WebRTCStats, LibWebRtcMediaEndpointOnStatsDelivered, logIdentifier(), statsLogger.toJSONString().utf8());
         }
@@ -940,7 +940,7 @@ Seconds LibWebRTCMediaEndpoint::statsLogInterval(int64_t reportTimestamp) const
     if (m_isGatheringRTCLogs)
         return 1_s;
 
-    if (logger().willLog(logChannel(), WTFLogLevel::Info))
+    if (logger().willLog(logChannel(), WTFLogLevel::Info, { }))
         return 2_s;
 
     if (reportTimestamp - m_statsFirstDeliveredTimestamp > 15000000)

@@ -102,7 +102,7 @@ SourceBufferPrivateGStreamer::~SourceBufferPrivateGStreamer()
 }
 
 #if !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
-void SourceBufferPrivateGStreamer::handleLogMessage(const WTFLogChannel& channel, WTFLogLevel level, Vector<JSONLogValue>&& values)
+void SourceBufferPrivateGStreamer::handleLogMessage(const WTFLogChannel& channel, WTFLogLevel level, std::optional<WTFLogLocation> location, Vector<JSONLogValue>&& values)
 {
     auto gstDebugLevel = gstDebugLevelFromWTFLogLevel(level);
     if (gstDebugLevel > gst_debug_category_get_threshold(GST_CAT_DEFAULT))
@@ -117,16 +117,16 @@ void SourceBufferPrivateGStreamer::handleLogMessage(const WTFLogChannel& channel
         return;
 
     // Parse "foo::bar(hexidentifier) "
-    auto& callSite = values[0].value;
-    auto leftParenthesisIndex = callSite.reverseFind('(');
+    auto& signature = values[0].value;
+    auto leftParenthesisIndex = signature.reverseFind('(');
     if (leftParenthesisIndex == notFound)
         return;
 
-    auto rightParenthesisIndex = callSite.reverseFind(')');
+    auto rightParenthesisIndex = signature.reverseFind(')');
     if (rightParenthesisIndex == notFound)
         return;
 
-    auto identifierString = callSite.substring(leftParenthesisIndex + 1, rightParenthesisIndex - leftParenthesisIndex - 1);
+    auto identifierString = signature.substring(leftParenthesisIndex + 1, rightParenthesisIndex - leftParenthesisIndex - 1);
     auto identifier = WTF::parseInteger<uint64_t>(identifierString, 16);
     if (!identifier)
         return;
@@ -141,14 +141,19 @@ void SourceBufferPrivateGStreamer::handleLogMessage(const WTFLogChannel& channel
 
     // Find the C++ method name, foo::bar() -> bar.
     auto methodName = emptyString();
-    auto methodNameSeparatorIndex = callSite.reverseFind(':');
-    if (methodNameSeparatorIndex != notFound)
-        methodName = callSite.substring(methodNameSeparatorIndex + 1, leftParenthesisIndex - methodNameSeparatorIndex - 1);
+    if (location)
+        methodName = String::fromUTF8(location->function);
+    else {
+        auto methodNameSeparatorIndex = signature.reverseFind(':');
+        if (methodNameSeparatorIndex != notFound)
+            methodName = signature.substring(methodNameSeparatorIndex + 1, leftParenthesisIndex - methodNameSeparatorIndex - 1);
+    }
 
     auto message = builder.toString();
     auto pipeline = m_appendPipeline ? m_appendPipeline->pipeline() : nullptr;
-    // FIXME: Filename and line number are inaccurate. https://bugs.webkit.org/show_bug.cgi?id=310526
-    gst_debug_log(GST_CAT_DEFAULT, gstDebugLevel, __FILE__, methodName.utf8().data(), __LINE__, G_OBJECT(pipeline), "%s", message.utf8().data());
+    const char* file = location ? location->file : __FILE__;
+    int line = location ? location->line : __LINE__;
+    gst_debug_log(GST_CAT_DEFAULT, gstDebugLevel, file, methodName.utf8().data(), line, G_OBJECT(pipeline), "%s", message.utf8().data());
 }
 #endif // !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
 

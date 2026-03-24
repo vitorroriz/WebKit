@@ -2686,7 +2686,7 @@ void GStreamerMediaEndpoint::processStatsItem(const GValue* value)
         peerConnectionBackend->provideStatLogs(WTF::move(event));
     }
 
-    if (logger().willLog(logChannel(), WTFLogLevel::Debug)) {
+    if (logger().willLog(logChannel(), WTFLogLevel::Debug, { })) {
         // Stats are very verbose, let's only display them in inspector console in verbose mode.
         logger().debug(LogWebRTC, Logger::LogSiteIdentifier("GStreamerMediaEndpoint"_s, "OnStatsDelivered"_s, logIdentifier()), statsLogger);
     } else
@@ -2730,7 +2730,7 @@ Seconds GStreamerMediaEndpoint::statsLogInterval(Seconds reportTimestamp) const
     if (m_isGatheringRTCLogs)
         return 1_s;
 
-    if (logger().willLog(logChannel(), WTFLogLevel::Info))
+    if (logger().willLog(logChannel(), WTFLogLevel::Info, { }))
         return 2_s;
 
     if (reportTimestamp - m_statsFirstDeliveredTimestamp > 15_s)

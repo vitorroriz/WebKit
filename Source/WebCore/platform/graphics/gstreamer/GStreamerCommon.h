@@ -350,7 +350,7 @@ class WebCoreLogObserver : public Logger::Observer {
     friend NeverDestroyed<WebCoreLogObserver>;
 public:
     explicit WebCoreLogObserver() = default;
-    void didLogMessage(const WTFLogChannel&, WTFLogLevel, Vector<JSONLogValue>&&) final;
+    void didLogMessage(const WTFLogChannel&, WTFLogLevel, std::optional<WTFLogLocation>, Vector<JSONLogValue>&&) final;
 
     virtual GstDebugCategory* debugCategory() const = 0;
     virtual bool shouldEmitLogMessage(const WTFLogChannel&) const = 0;

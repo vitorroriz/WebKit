@@ -256,7 +256,7 @@ Ref<Logger> MediaSource::logger(ScriptExecutionContext& context)
     return logger;
 }
 
-void MediaSource::didLogMessage(const WTFLogChannel&, WTFLogLevel, Vector<JSONLogValue>&&)
+void MediaSource::didLogMessage(const WTFLogChannel&, WTFLogLevel, std::optional<WTFLogLocation>, Vector<JSONLogValue>&&)
 {
     // FIXME: Add logging for when MediaSource is running in worker.
 }

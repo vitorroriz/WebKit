@@ -182,6 +182,12 @@ typedef struct {
 #endif
 } WTFLogChannel;
 
+typedef struct {
+    const char* file;
+    const char* function;
+    int line;
+} WTFLogLocation;
+
 #define LOG_CHANNEL(name) JOIN_LOG_CHANNEL_WITH_PREFIX(LOG_CHANNEL_PREFIX, name)
 #define LOG_CHANNEL_ADDRESS(name) &LOG_CHANNEL(name),
 #define JOIN_LOG_CHANNEL_WITH_PREFIX(prefix, channel) JOIN_LOG_CHANNEL_WITH_PREFIX_LEVEL_2(prefix, channel)
