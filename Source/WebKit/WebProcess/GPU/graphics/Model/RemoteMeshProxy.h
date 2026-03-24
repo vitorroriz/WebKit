@@ -108,8 +108,10 @@ private:
     void setScale(float) final;
     void setCameraDistance(float) final;
     void setBackgroundColor(const WebModel::Float3&) final;
+    void setViewportSize(float, float) final;
     void setStageMode(WebCore::StageModeOperation) final;
 #if ENABLE(GPU_PROCESS_MODEL)
+    void computeTransform();
     void setRotation(float yaw, float pitch, float roll) final;
 #endif
     void setEnvironmentMap(const WebModel::ImageAsset&) final;
@@ -124,6 +126,8 @@ private:
 #endif
 #if ENABLE(GPU_PROCESS_MODEL)
     float m_cameraDistance { 1.f };
+    float m_viewportWidth { 0.f };
+    float m_viewportHeight { 0.f };
     WebCore::StageModeOperation m_stageMode;
 #endif
 };

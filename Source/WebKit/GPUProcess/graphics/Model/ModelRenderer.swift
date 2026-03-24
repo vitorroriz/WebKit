@@ -98,7 +98,7 @@ class Renderer {
 
         let aspect = Float(texture.width) / Float(texture.height)
         let projection = _Proto_LowLevelRenderer_v1.Camera.Projection.perspective(
-            fovYRadians: 90 * .pi / 180,
+            fovYRadians: 60 * .pi / 180,
             aspectRatio: aspect,
             nearZ: modelDistance * 0.01,
             farZ: modelDistance * 100,

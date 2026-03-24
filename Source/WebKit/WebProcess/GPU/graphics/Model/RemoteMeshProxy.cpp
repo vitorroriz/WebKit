@@ -121,15 +121,6 @@ RemoteMeshProxy::~RemoteMeshProxy()
 #endif
 }
 
-#if ENABLE(GPU_PROCESS_MODEL)
-static WebModel::Float4x4 buildTranslation(float x, float y, float z)
-{
-    WebModel::Float4x4 result = matrix_identity_float4x4;
-    result.column3 = simd_make_float4(x, y, z, 1.f);
-    return result;
-}
-#endif
-
 void RemoteMeshProxy::update(const WebModel::UpdateMeshDescriptor& descriptor)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
@@ -141,15 +132,11 @@ void RemoteMeshProxy::update(const WebModel::UpdateMeshDescriptor& descriptor)
         m_maxCorner = simd_max(m_maxCorner, maxCorner);
     }
 
-    auto [center, extents] = getCenterAndExtents();
-    if (boundingBoxChanged)
-        setCameraDistance(std::max(extents.x, extents.y) * .5f);
-
     auto sendResult = sendWithAsyncReply(Messages::RemoteMesh::Update(descriptor), [](auto) mutable {
     });
     UNUSED_VARIABLE(sendResult);
     if (boundingBoxChanged)
-        setStageMode(m_stageMode);
+        computeTransform();
 
 #else
     UNUSED_PARAM(descriptor);
@@ -332,22 +319,59 @@ void RemoteMeshProxy::setScale(float scale)
 #endif
 }
 
+void RemoteMeshProxy::setViewportSize(float width, float height)
+{
+#if ENABLE(GPU_PROCESS_MODEL)
+    m_viewportWidth = width;
+    m_viewportHeight = height;
+    computeTransform();
+#endif
+}
+
 void RemoteMeshProxy::setStageMode(WebCore::StageModeOperation stageMode)
 {
 #if ENABLE(GPU_PROCESS_MODEL)
     m_stageMode = stageMode;
+    computeTransform();
+#else
+    UNUSED_PARAM(stageMode);
+#endif
+}
+
+
+static constexpr float kCSSPixelsPerMeter = 96 / 2.54 * 100;
+// Based on the 60° fovYRadians in ModelRenderer.swift
+static constexpr float kVerticalFOVScale = 1.1547;
+
+#if ENABLE(GPU_PROCESS_MODEL)
+void RemoteMeshProxy::computeTransform()
+{
     auto [center, extents] = getCenterAndExtents();
-    if (stageMode == WebCore::StageModeOperation::None) {
-        setEntityTransformInternal(buildTranslation(-center.x, -center.y, -center.z - .5f * extents.z));
-        return;
+
+    float viewportWidth = m_viewportWidth / kCSSPixelsPerMeter;
+    float viewportHeight = m_viewportHeight / kCSSPixelsPerMeter;
+
+    float scale = 0;
+    float depth = 0;
+
+    if (m_stageMode == WebCore::StageModeOperation::None) {
+        if (std::fmin(extents.x, extents.y) > FLT_EPSILON)
+            scale = std::fmin(viewportWidth / extents.x, viewportHeight / extents.y);
+        depth = extents.z;
+    } else {
+        float boundingDiameter = std::max(
+            { simd_length(simd_make_float2(extents.x, extents.y))
+            , simd_length(simd_make_float2(extents.x, extents.z))
+            , simd_length(simd_make_float2(extents.y, extents.z)) }
+        );
+        if (boundingDiameter > FLT_EPSILON)
+            scale = std::fmin(viewportWidth, viewportHeight) / boundingDiameter;
+        depth = boundingDiameter;
     }
 
     WebModel::Float4x4 result = matrix_identity_float4x4;
     if (auto existingTransform = entityTransform())
         result = *existingTransform;
-
-    float maxExtent = simd_reduce_max(extents.xyz);
-    float scale = m_cameraDistance / maxExtent;
 
     result.column0 = scale * simd_normalize(result.column0);
     result.column1 = scale * simd_normalize(result.column1);
@@ -355,14 +379,13 @@ void RemoteMeshProxy::setStageMode(WebCore::StageModeOperation stageMode)
     result.column3 = simd_make_float4(
         -simd_dot(center.xyz, simd_make_float3(result.column0.x, result.column1.x, result.column2.x)),
         -simd_dot(center.xyz, simd_make_float3(result.column0.y, result.column1.y, result.column2.y)),
-        -simd_dot(center.xyz, simd_make_float3(result.column0.z, result.column1.z, result.column2.z)),
+        -simd_dot(center.xyz, simd_make_float3(result.column0.z, result.column1.z, result.column2.z)) - scale * depth / 2,
         1.f);
 
+    setCameraDistance(viewportHeight / kVerticalFOVScale);
     setEntityTransformInternal(result);
-#else
-    UNUSED_PARAM(stageMode);
-#endif
 }
+#endif
 
 #if ENABLE(GPU_PROCESS_MODEL)
 static simd_float4x4 buildRotation(float azimuth, float elevation)

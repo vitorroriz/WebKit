@@ -295,6 +295,7 @@ void WebModelPlayer::load(WebCore::Model& modelSource, WebCore::LayoutSize size)
         if (surfaceHandles.size())
             protectedThis->m_displayBuffers = WTF::move(surfaceHandles);
     });
+    m_currentModel->setViewportSize(size.width().toFloat(), size.height().toFloat());
 
     m_modelLoader = adoptNS([allocWKBridgeModelLoaderInstance() init]);
     Ref protectedThis = Ref { *this };
@@ -392,6 +393,8 @@ void WebModelPlayer::sizeDidChange(WebCore::LayoutSize size)
     });
 
     m_currentScale = static_cast<float>(size.minDimension());
+    if (RefPtr model = m_currentModel)
+        model->setViewportSize(size.width().toFloat(), size.height().toFloat());
     notifyEntityTransformUpdated();
 }
 
