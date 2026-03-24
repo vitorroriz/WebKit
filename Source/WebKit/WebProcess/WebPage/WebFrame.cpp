@@ -1769,6 +1769,20 @@ void WebFrame::requestContainerJSHandleForExtractedText(TextExtraction::Extracte
     completion({ WTF::move(info) });
 }
 
+void WebFrame::requestContainerJSHandleForSearchTexts(Vector<String>&& searchTexts, std::optional<NodeIdentifier>&& targetNodeIdentifier, CompletionHandler<void(std::optional<JSHandleInfo>&&)>&& completion)
+{
+    RefPtr frame = coreLocalFrame();
+    if (!frame)
+        return completion({ });
+
+    RefPtr element = TextExtraction::containerElementForSearchTexts(*frame, WTF::move(searchTexts), WTF::move(targetNodeIdentifier));
+    if (!element)
+        return completion({ });
+
+    auto [handle, info] = createAndPrepareToSendJSHandle(*element);
+    completion({ WTF::move(info) });
+}
+
 void WebFrame::getSelectorPathsForNode(JSHandleInfo&& handle, CompletionHandler<void(Vector<HashSet<String>>&&)>&& completion)
 {
     RefPtr node = nodeFromJSHandleIdentifier(handle.identifier);

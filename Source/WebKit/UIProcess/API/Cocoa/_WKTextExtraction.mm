@@ -193,6 +193,15 @@
     [webView _requestContainerJSHandleForNodeIdentifier:nodeIdentifier searchText:searchText completionHandler:completionHandler];
 }
 
+- (void)requestContainerJSHandleForSearchTexts:(NSArray<NSString *> *)searchTexts nodeIdentifier:(NSString *)nodeIdentifier completionHandler:(void (^)(_WKJSHandle *))completionHandler
+{
+    RetainPtr webView = _webView;
+    if (!webView)
+        return completionHandler(nil);
+
+    [webView _requestContainerJSHandleForSearchTexts:searchTexts nodeIdentifier:nodeIdentifier completionHandler:completionHandler];
+}
+
 @end
 
 @implementation _WKTextExtractionInteraction {

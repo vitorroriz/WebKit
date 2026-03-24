@@ -1581,12 +1581,11 @@ static std::optional<SimpleRange> searchForClickTarget(Node& container, const St
     return bestRange;
 }
 
-static std::optional<SimpleRange> searchForText(Node& node, const String& searchText)
+static std::optional<SimpleRange> searchForText(const SimpleRange& searchRange, const String& searchText)
 {
     if (searchText.isEmpty())
         return std::nullopt;
 
-    auto searchRange = makeRangeSelectingNodeContents(node);
     auto caseSensitiveRange = findPlainText(searchRange, searchText, {
         FindOption::DoNotRevealSelection,
         FindOption::DoNotSetSelection,
@@ -1605,6 +1604,11 @@ static std::optional<SimpleRange> searchForText(Node& node, const String& search
         return { WTF::move(caseInsensitiveRange) };
 
     return { };
+}
+
+static std::optional<SimpleRange> searchForText(Node& node, const String& searchText)
+{
+    return searchForText(makeRangeSelectingNodeContents(node), searchText);
 }
 
 static String invalidNodeIdentifierDescription(std::optional<NodeIdentifier>&& identifier)
@@ -2365,15 +2369,11 @@ RefPtr<Element> elementForExtractedText(const LocalFrame& frame, ExtractedText&&
     return element ? element : RefPtr { node->parentElementInComposedTree() };
 }
 
-RefPtr<Element> containerElementForExtractedText(const LocalFrame& frame, ExtractedText&& extractedText)
+static RefPtr<Element> findLargeElementAboveNode(Node& node)
 {
-    RefPtr element = elementForExtractedText(frame, WTF::move(extractedText));
-    if (!element)
-        return { };
-
-    RefPtr container = findLargeContainerAboveNode(*element, minimumSizeForLargeContainer);
+    RefPtr container = findLargeContainerAboveNode(node, minimumSizeForLargeContainer);
     if (!container)
-        return element;
+        return { };
 
     if (RefPtr containerElement = dynamicDowncast<Element>(container))
         return containerElement;
@@ -2381,7 +2381,63 @@ RefPtr<Element> containerElementForExtractedText(const LocalFrame& frame, Extrac
     if (RefPtr containerElement = container->parentElementInComposedTree())
         return containerElement;
 
+    return { };
+}
+
+RefPtr<Element> containerElementForExtractedText(const LocalFrame& frame, ExtractedText&& extractedText)
+{
+    RefPtr element = elementForExtractedText(frame, WTF::move(extractedText));
+    if (!element)
+        return { };
+
+    if (RefPtr largeElement = findLargeElementAboveNode(*element))
+        return largeElement;
+
     return element;
+}
+
+RefPtr<Element> containerElementForSearchTexts(const LocalFrame& frame, Vector<String>&& searchTexts, std::optional<NodeIdentifier>&& targetNodeIdentifier)
+{
+    RefPtr body = documentBodyElement(frame);
+    if (!body)
+        return { };
+
+    RefPtr target = resolveNodeWithBodyAsFallback(frame, targetNodeIdentifier);
+    if (!target)
+        return { };
+
+    std::optional<SimpleRange> encompassingMatchRange;
+    auto searchRange = makeSimpleRange(makeBoundaryPointBeforeNodeContents(*target), makeBoundaryPointAfterNodeContents(*body));
+    for (auto& text : searchTexts) {
+        auto matchRange = searchForText(searchRange, text);
+        if (!matchRange)
+            continue;
+
+        if (!encompassingMatchRange) {
+            encompassingMatchRange = WTF::move(matchRange);
+            continue;
+        }
+
+        encompassingMatchRange = unionRange(*encompassingMatchRange, *matchRange);
+    }
+
+    if (encompassingMatchRange) {
+        if (RefPtr commonAncestor = commonInclusiveAncestor<ComposedTree>(*encompassingMatchRange)) {
+            if (RefPtr largeElement = findLargeElementAboveNode(*commonAncestor))
+                return largeElement;
+        }
+    }
+
+    if (RefPtr largeElement = findLargeElementAboveNode(*target))
+        return largeElement;
+
+    if (RefPtr targetElement = dynamicDowncast<Element>(*target))
+        return targetElement;
+
+    if (RefPtr parentElement = target->parentElementInComposedTree())
+        return parentElement;
+
+    return { };
 }
 
 std::optional<SimpleRange> rangeForExtractedText(const LocalFrame& frame, ExtractedText&& extractedText)

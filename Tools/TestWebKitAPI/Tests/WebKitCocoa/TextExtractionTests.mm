@@ -83,6 +83,7 @@ SOFT_LINK_CLASS(SafariSafeBrowsing, SSBLookupContext);
 @interface _WKTextExtractionResult (TextExtractionTests)
 - (_WKJSHandle *)jsHandleForNodeIdentifier:(NSString *)nodeIdentifier searchText:(NSString *)searchText;
 - (_WKJSHandle *)containerJSHandleForNodeIdentifier:(NSString *)nodeIdentifier searchText:(NSString *)searchText;
+- (_WKJSHandle *)containerJSHandleForSearchTexts:(NSArray<NSString *> *)searchTexts nodeIdentifier:(NSString *)nodeIdentifier;
 @end
 
 @implementation WKWebView (TextExtractionTests)
@@ -185,6 +186,18 @@ SOFT_LINK_CLASS(SafariSafeBrowsing, SSBLookupContext);
     __block bool done = false;
     __block RetainPtr<_WKJSHandle> result;
     [self requestContainerJSHandleForNodeIdentifier:nodeIdentifier searchText:searchText completionHandler:^(_WKJSHandle *handle) {
+        result = handle;
+        done = true;
+    }];
+    TestWebKitAPI::Util::run(&done);
+    return result.autorelease();
+}
+
+- (_WKJSHandle *)containerJSHandleForSearchTexts:(NSArray<NSString *> *)searchTexts nodeIdentifier:(NSString *)nodeIdentifier
+{
+    __block bool done = false;
+    __block RetainPtr<_WKJSHandle> result;
+    [self requestContainerJSHandleForSearchTexts:searchTexts nodeIdentifier:nodeIdentifier completionHandler:^(_WKJSHandle *handle) {
         result = handle;
         done = true;
     }];
@@ -712,6 +725,42 @@ TEST(TextExtractionTests, RequestContainerJSHandleForNodeIdentifier)
     RetainPtr nodeID = extractNodeIdentifier([extractionResult textContent], @"$99.99");
     EXPECT_NOT_NULL([extractionResult containerJSHandleForNodeIdentifier:nodeID.get() searchText:@"text that does not exist"]);
     EXPECT_NULL([extractionResult containerJSHandleForNodeIdentifier:nil searchText:@"text that does not exist"]);
+}
+
+TEST(TextExtractionTests, RequestContainerJSHandleForSearchTexts)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:^{
+        RetainPtr configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+        [[configuration preferences] _setTextExtractionEnabled:YES];
+        return configuration.autorelease();
+    }()]);
+
+    [webView synchronouslyLoadTestPageNamed:@"debug-text-product"];
+
+    RetainPtr extractionResult = [webView synchronouslyExtractDebugTextResult:^{
+        RetainPtr configuration = adoptNS([_WKTextExtractionConfiguration new]);
+        [configuration setIncludeRects:NO];
+        [configuration setIncludeURLs:NO];
+        [configuration setNodeIdentifierInclusion:_WKTextExtractionNodeIdentifierInclusionAllContainers];
+        return configuration.autorelease();
+    }()];
+
+    RetainPtr debugText = [webView synchronouslyGetDebugText:^{
+        RetainPtr configuration = adoptNS([_WKTextExtractionConfiguration new]);
+        [configuration setIncludeRects:NO];
+        [configuration setOutputFormat:_WKTextExtractionOutputFormatMarkdown];
+        [configuration setNodeIdentifierInclusion:_WKTextExtractionNodeIdentifierInclusionNone];
+
+        RetainPtr firstSectionID = extractNodeIdentifier([extractionResult textContent], @"section");
+        RetainPtr handle = [extractionResult containerJSHandleForSearchTexts:@[ @"Premium Wireless Headphones", @"Ships within 24 hours" ] nodeIdentifier:firstSectionID.get()];
+        [configuration setTargetNode:handle.get()];
+        return configuration.autorelease();
+    }()];
+
+    EXPECT_TRUE([debugText containsString:@"Premium Wireless Headphones"]);
+    EXPECT_TRUE([debugText containsString:@"Ships within 24 hours"]);
+    EXPECT_FALSE([debugText containsString:@"Customers Also Bought"]);
+    EXPECT_FALSE([debugText containsString:@"The noise cancellation is incredible"]);
 }
 
 TEST(TextExtractionTests, ResolveTargetNodeFromSelectorData)

@@ -1017,6 +1017,14 @@ void WebFrameProxy::requestContainerJSHandleForExtractedText(TextExtraction::Ext
     sendWithAsyncReply(Messages::WebFrame::RequestContainerJSHandleForExtractedText(WTF::move(extractedText)), WTF::move(completion));
 }
 
+void WebFrameProxy::requestContainerJSHandleForSearchTexts(Vector<String>&& searchTexts, std::optional<NodeIdentifier>&& targetNodeIdentifier, CompletionHandler<void(std::optional<JSHandleInfo>&&)>&& completion)
+{
+    if (RefPtr page = m_page.get(); !page || !page->hasRunningProcess())
+        return completion({ });
+
+    sendWithAsyncReply(Messages::WebFrame::RequestContainerJSHandleForSearchTexts(WTF::move(searchTexts), WTF::move(targetNodeIdentifier)), WTF::move(completion));
+}
+
 void WebFrameProxy::getSelectorPathsForNode(JSHandleInfo&& handle, CompletionHandler<void(Vector<HashSet<String>>&&)>&& completion)
 {
     if (RefPtr page = m_page.get(); !page || !page->hasRunningProcess())

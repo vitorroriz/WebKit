@@ -73,6 +73,7 @@ struct FocusEventData;
 struct FrameIdentifierType;
 struct JSHandleIdentifierType;
 struct NavigationIdentifierType;
+struct NodeIdentifierType;
 
 enum class FocusDirection : uint8_t;
 enum class FoundElementInRemoteFrame : bool;
@@ -92,6 +93,7 @@ struct Result;
 
 using FrameIdentifier = ObjectIdentifier<FrameIdentifierType>;
 using NavigationIdentifier = ObjectIdentifier<NavigationIdentifierType, uint64_t>;
+using NodeIdentifier = ObjectIdentifier<NodeIdentifierType>;
 using SandboxFlags = OptionSet<SandboxFlag>;
 using WebProcessJSHandleIdentifier = ObjectIdentifier<JSHandleIdentifierType>;
 using JSHandleIdentifier = ProcessQualified<WebProcessJSHandleIdentifier>;
@@ -308,6 +310,7 @@ public:
     void takeSnapshotOfExtractedText(WebCore::TextExtraction::ExtractedText&&, CompletionHandler<void(RefPtr<WebCore::TextIndicator>&&)>&&);
     void requestJSHandleForExtractedText(WebCore::TextExtraction::ExtractedText&&, CompletionHandler<void(std::optional<JSHandleInfo>&&)>&&);
     void requestContainerJSHandleForExtractedText(WebCore::TextExtraction::ExtractedText&&, CompletionHandler<void(std::optional<JSHandleInfo>&&)>&&);
+    void requestContainerJSHandleForSearchTexts(Vector<String>&&, std::optional<WebCore::NodeIdentifier>&&, CompletionHandler<void(std::optional<JSHandleInfo>&&)>&&);
 
     void getSelectorPathsForNode(JSHandleInfo&&, CompletionHandler<void(Vector<HashSet<String>>&&)>&&);
     void getNodeForSelectorPaths(Vector<HashSet<String>>&&, CompletionHandler<void(std::optional<JSHandleInfo>&&)>&&);

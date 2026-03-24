@@ -276,6 +276,18 @@ WK_CLASS_AVAILABLE(macos(WK_MAC_TBA), ios(WK_IOS_TBA), visionos(WK_XROS_TBA))
  */
 - (void)requestContainerJSHandleForNodeIdentifier:(nullable NSString *)nodeIdentifier searchText:(nullable NSString *)searchText completionHandler:(void (^)(_WKJSHandle * _Nullable))completionHandler;
 
+/*!
+ Asynchronously find the smallest appropriately-sized container element that
+ contains all of the given search texts. Each search text is independently
+ located in the document; their common ancestor is then expanded upward until
+ a container meeting a minimum size threshold is found.
+ @param searchTexts         An array of one or more rendered text strings to search for in the document.
+ @param nodeIdentifier      Optional fallback node identifier; text searches will be performed in a range
+                            after the start of this node. If no matches are found, this node will be returned.
+ At least one search text or a non-null node identifier must be specified.
+ */
+- (void)requestContainerJSHandleForSearchTexts:(NSArray<NSString *> *)searchTexts nodeIdentifier:(nullable NSString *)nodeIdentifier completionHandler:(void (^)(_WKJSHandle * _Nullable))completionHandler;
+
 @end
 
 typedef NS_ENUM(NSInteger, _WKTextExtractionAction) {

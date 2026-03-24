@@ -7767,6 +7767,28 @@ static OptionSet<WebCore::DataDetectorType> NODELETE coreDataDetectorTypes(_WKTe
     });
 }
 
+- (void)_requestContainerJSHandleForSearchTexts:(NSArray<NSString *> *)texts nodeIdentifier:(NSString *)nodeIdentifierString completionHandler:(void (^)(_WKJSHandle *))completion
+{
+    if (!texts.count && !nodeIdentifierString.length)
+        return completion(nil);
+
+    RefPtr targetFrame = _page->mainFrame();
+    std::optional<WebCore::NodeIdentifier> targetNodeIdentifier;
+    if (auto identifiers = WebKit::parseFrameAndNodeIdentifiers(String { nodeIdentifierString })) {
+        targetNodeIdentifier = identifiers->nodeIdentifier;
+        if (identifiers->frameIdentifier)
+            targetFrame = WebKit::WebFrameProxy::webFrame(identifiers->frameIdentifier);
+    }
+
+    if (!targetFrame)
+        return completion(nil);
+
+    auto searchTexts = makeVector<String>(texts);
+    targetFrame->requestContainerJSHandleForSearchTexts(WTF::move(searchTexts), WTF::move(targetNodeIdentifier), [completion = makeBlockPtr(completion)](auto&& info) {
+        completion(info ? wrapper(API::JSHandle::create(WTF::move(*info))).get() : nil);
+    });
+}
+
 #if ENABLE(BANNER_VIEW_OVERLAYS)
 
 - (CGFloat)_bannerViewOverlayHeight
