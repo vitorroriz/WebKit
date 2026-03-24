@@ -5730,7 +5730,9 @@ void FunctionNode::emitBytecode(BytecodeGenerator& generator, RegisterID*)
         ReturnNode* returnNode = nullptr;
 
         // Check for a return statement at the end of a function composed of a single block.
-        if (singleStatement && singleStatement->isBlock()) {
+        // With using declarations, emitUsingBodyScope ends with a `done` label that needs
+        // a terminal, otherwise it collides with the op_catch stubs appended by generate().
+        if (singleStatement && singleStatement->isBlock() && !usingDeclarationCount()) {
             StatementNode* lastStatementInBlock = static_cast<BlockNode*>(singleStatement)->lastStatement();
             if (lastStatementInBlock && lastStatementInBlock->isReturnNode())
                 returnNode = static_cast<ReturnNode*>(lastStatementInBlock);
