@@ -894,6 +894,7 @@ void RenderLayer::setWasOmittedFromZOrderTree()
 
     ASSERT(!isNormalFlowOnly());
     removeSelfFromCompositor();
+    setSelfAndDescendantsNeedPositionUpdate();
 
     // Omitting a stacking context removes the whole subtree, otherwise collectLayers will
     // visit and omit/include descendants separately.
@@ -904,6 +905,15 @@ void RenderLayer::setWasOmittedFromZOrderTree()
         parent()->setDescendantsNeedCompositingRequirementsTraversal();
 
     m_wasOmittedFromZOrderTree = true;
+}
+
+void RenderLayer::setWasIncludedInZOrderTree()
+{
+    if (!m_wasOmittedFromZOrderTree)
+        return;
+
+    m_wasOmittedFromZOrderTree = false;
+    setSelfAndDescendantsNeedPositionUpdate();
 }
 
 void RenderLayer::collectLayers(std::unique_ptr<Vector<RenderLayer*>>& positiveZOrderList, std::unique_ptr<Vector<RenderLayer*>>& negativeZOrderList, OptionSet<Compositing>& accumulatedDirtyFlags)
@@ -1253,7 +1263,7 @@ void RenderLayer::recursiveUpdateLayerPositions(OptionSet<UpdateLayerPositionsFl
     }
 
     if (mode == Write)
-        updateDescendantDependentFlags();
+        updateLayerListsIfNeeded();
     else {
         LAYER_POSITIONS_ASSERT(!m_visibleDescendantStatusDirty);
         LAYER_POSITIONS_ASSERT(!m_hasSelfPaintingLayerDescendantDirty);
@@ -1292,10 +1302,7 @@ void RenderLayer::recursiveUpdateLayerPositions(OptionSet<UpdateLayerPositionsFl
         if (mode == Verify) {
             WeakPtr repaintContainer = renderer().containerForRepaint().renderer.get();
             LAYER_POSITIONS_ASSERT(repaintRects() || (isSubtreeVisibilityHiddenOrOpacityZero() || !isSelfPaintingLayer()));
-            if (isSubtreeVisibilityHiddenOrOpacityZero())
-                LAYER_POSITIONS_ASSERT(!m_repaintContainer);
-            else
-                LAYER_POSITIONS_ASSERT(m_repaintContainer == repaintContainer);
+            LAYER_POSITIONS_ASSERT(m_repaintContainer == repaintContainer);
             LAYER_POSITIONS_ASSERT_IMPLIES(repaintRects(), *repaintRects() == renderer().rectsForRepaintingAfterLayout(repaintContainer.get(), RepaintOutlineBounds::Yes));
             return;
         }
@@ -1489,10 +1496,7 @@ void RenderLayer::computeRepaintRects(const RenderLayerModelObject* repaintConta
     else
         setRepaintRects(renderer().rectsForRepaintingAfterLayout(repaintContainer, RepaintOutlineBounds::Yes));
 
-    if (isSubtreeVisibilityHiddenOrOpacityZero())
-        m_repaintContainer = nullptr;
-    else
-        m_repaintContainer = repaintContainer;
+    m_repaintContainer = repaintContainer;
 }
 
 void RenderLayer::computeRepaintRectsIncludingDescendants()
