@@ -222,11 +222,42 @@ RetainPtr<CGImageRef> PlatformWebView::windowSnapshotImage()
     [platformView() display];
     CGWindowImageOption options = kCGWindowImageBoundsIgnoreFraming | kCGWindowImageShouldBeOpaque;
 
-    if ([m_window backingScaleFactor] == 1)
+    CGFloat backingScaleFactor = [m_window backingScaleFactor];
+    if (backingScaleFactor == 1)
         options |= kCGWindowImageNominalResolution;
 
-    RetainPtr image = adoptNS([platformView() _windowSnapshotInRect:CGRectNull withOptions:options]);
-    return [image CGImageForProposedRect:nil context:nil hints:nil];
+    NSRect viewFrame = [platformView() frame];
+    size_t expectedWidth = viewFrame.size.width * backingScaleFactor;
+    size_t expectedHeight = viewFrame.size.height * backingScaleFactor;
+
+    // Work around <rdar://problem/17084993>: CGWindowListCreateImage() can return images with
+    // incorrect dimensions immediately after a window resolution change via _setWindowResolution:,
+    // because the window server reallocates the backing store asynchronously. There is no public
+    // synchronization API to wait for this, so validate the captured dimensions and retry if needed.
+    constexpr unsigned maxRetries = 10;
+    for (unsigned attempt = 0; ; ++attempt) {
+        RetainPtr image = adoptNS([platformView() _windowSnapshotInRect:CGRectNull withOptions:options]);
+        if (!image)
+            return nil;
+
+        auto cgImage = [image CGImageForProposedRect:nil context:nil hints:nil];
+        if (!cgImage)
+            return nil;
+
+        size_t actualWidth = CGImageGetWidth(cgImage);
+        size_t actualHeight = CGImageGetHeight(cgImage);
+        if (actualWidth == expectedWidth && actualHeight == expectedHeight)
+            return cgImage;
+
+        if (attempt >= maxRetries)
+            break;
+
+        usleep(10000); // 10ms — allow the window server to finish the backing store update
+        [platformView() display];
+    }
+
+    WTFLogAlways("Failed to take snapshot of window -- expected dimensions don't match captured images."); // NOLINT
+    return nil;
 }
 
 void PlatformWebView::changeWindowScaleIfNeeded(float newScale)
