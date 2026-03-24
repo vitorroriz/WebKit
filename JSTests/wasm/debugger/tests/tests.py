@@ -510,6 +510,45 @@ class SwiftWasmTestCase(BaseTestCase):
         ])
 
 
+class SwiftWasmGlobalTestCase(BaseTestCase):
+
+    def __init__(self, build_config: str = None, port: int = None):
+        super().__init__(build_config, port)
+
+    def execute(self):
+        self.setup_debugging_session_or_raise("resources/swift-wasm/globals-test/main.js")
+
+        try:
+            for _ in range(1):
+                self.globalVariableTest()
+
+        except Exception as e:
+            raise Exception(f"Test failed: {e}")
+
+    def globalVariableTest(self):
+        self.send_lldb_command_or_raise("b helper")
+        self.send_lldb_command_or_raise(
+            "c",
+            patterns=[
+                "Process 1 stopped",
+                "stop reason = breakpoint",
+                "-> 7   	    globalCounter2 = 2",
+            ],
+        )
+
+        self.send_lldb_command_or_raise("n", patterns=["-> 8   	    globalCounter3 = 3"])
+        self.send_lldb_command_or_raise("n", patterns=["-> 9   	}"])
+
+        self.send_lldb_command_or_raise("p globalCounter2", patterns=["(Int32) 2"])
+        self.send_lldb_command_or_raise("p globalCounter3", patterns=["(Int32) 3"])
+
+        self.send_lldb_command_or_raise("up", patterns=["-> 14  	    helper()"])
+
+        self.send_lldb_command_or_raise("p globalCounter1", patterns=["(Int32) 1"])
+
+        self.send_lldb_command_or_raise("br del -f", patterns=["All breakpoints removed."])
+
+
 class NopDropSelectEndTestCase(BaseTestCase):
 
     def __init__(self, build_config: str = None, port: int = None):

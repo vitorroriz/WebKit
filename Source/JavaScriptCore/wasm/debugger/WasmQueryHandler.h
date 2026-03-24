@@ -56,6 +56,7 @@ public:
     void handleLibrariesRead(StringView packet);
     void handleWasmCallStack(StringView packet);
     void handleWasmLocal(StringView packet);
+    void handleWasmGlobal(StringView packet);
 
 private:
     DebugServer& m_debugServer;

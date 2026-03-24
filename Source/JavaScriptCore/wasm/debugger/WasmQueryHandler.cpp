@@ -87,6 +87,8 @@ void QueryHandler::handleGeneralQuery(StringView packet)
         handleWasmCallStack(packet);
     else if (packet.startsWith("qWasmLocal:"_s))
         handleWasmLocal(packet);
+    else if (packet.startsWith("qWasmGlobal:"_s))
+        handleWasmGlobal(packet);
     else if (packet.startsWith("qMemoryRegionInfo:"_s))
         m_debugServer.m_memoryHandler->handleMemoryRegionInfo(packet);
     else
@@ -433,6 +435,72 @@ void QueryHandler::handleWasmLocal(StringView packet)
     }
     default:
         RELEASE_ASSERT(false, "Unsupported TypeKind bit size: ", width, " for TypeKind: ", localType.kind);
+        break;
+    }
+    m_debugServer.sendReply(response);
+}
+
+void QueryHandler::handleWasmGlobal(StringView packet)
+{
+    // Format: qWasmGlobal:<frame-index>;<variable-index>
+    // LLDB: Get value of WebAssembly global variable for a given frame's instance
+    // Reference: https://lldb.llvm.org/resources/lldbgdbremote.html#qwasmglobal
+
+    // WebAssembly Context: Globals are per-instance; the frame index identifies which
+    // WASM instance to read from, and variable-index is the global index within that instance.
+    auto parts = splitWithDelimiters(packet, ":;"_s);
+    if (parts.size() != 3) {
+        m_debugServer.sendErrorReply(ProtocolError::InvalidPacket);
+        return;
+    }
+
+    uint32_t frameIndex = parseDecimal(parts[1]);
+    uint32_t globalIndex = parseDecimal(parts[2]);
+
+    dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] qWasmGlobal frame=", frameIndex, ", global=", globalIndex);
+
+    auto* state = m_debugServer.execution().debuggeeStateSafe();
+    if (!state->atBreakpoint()) {
+        m_debugServer.sendErrorReply(ProtocolError::UnknownCommand);
+        return;
+    }
+
+    auto& stopData = *state->stopData;
+    JSWebAssemblyInstance* instance = nullptr;
+
+    if (!frameIndex)
+        instance = stopData.instance;
+    else {
+        auto frames = collectCallStack(stopData.address, stopData.callFrame, stopData.instance->vm());
+        if (frameIndex >= frames.size() || !frames[frameIndex].isWasmFrame()) {
+            m_debugServer.sendErrorReply(ProtocolError::UnknownCommand);
+            return;
+        }
+        instance = frames[frameIndex].wasmCallFrame->wasmInstance();
+    }
+
+    const auto& moduleInfo = instance->module().moduleInformation();
+    if (globalIndex >= moduleInfo.globalCount()) {
+        m_debugServer.sendErrorReply(ProtocolError::InvalidPacket);
+        return;
+    }
+
+    Type globalType = moduleInfo.global(globalIndex).type;
+    uint32_t width = typeKindToWidth(globalType.kind);
+
+    String response;
+    switch (width) {
+    case 32:
+        response = toNativeEndianHex(static_cast<uint32_t>(instance->loadI32Global(globalIndex)));
+        break;
+    case 64:
+        response = toNativeEndianHex(static_cast<uint64_t>(instance->loadI64Global(globalIndex)));
+        break;
+    case 128:
+        response = toNativeEndianHex(instance->loadV128Global(globalIndex));
+        break;
+    default:
+        RELEASE_ASSERT_NOT_REACHED();
         break;
     }
     m_debugServer.sendReply(response);
