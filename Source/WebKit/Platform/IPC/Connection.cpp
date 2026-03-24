@@ -523,10 +523,10 @@ void Connection::invalidate()
     assertIsCurrent(dispatcher());
     m_client = nullptr;
     m_outgoingMessageQueueIsGrowingLargeCallback = nullptr;
-    [this] {
+    {
         Locker locker { m_incomingMessagesLock };
-        return WTF::move(m_syncState);
-    }();
+        m_syncState = nullptr;
+    }
 
     cancelAsyncReplyHandlers();
 
@@ -1012,16 +1012,18 @@ void Connection::processIncomingSyncReply(UniqueRef<Decoder> decoder)
 
             pendingSyncReply.replyDecoder = decoder.moveToUniquePtr();
 
-            // Keep track of the last message (that returns true for shouldDispatchMessageWhenWaitingForSyncReply())
-            // we've received before this sync reply. This is to make sure that we dispatch all messages up to this
-            // one, before the sync reply, to maintain ordering.
-            pendingSyncReply.identifierOfLastMessageToDispatchBeforeSyncReply = protect(m_syncState)->identifierOfLastMessageToDispatchWhileWaitingForSyncReply();
+            {
+                Locker incomingMessagesLocker { m_incomingMessagesLock };
+                if (RefPtr syncState = m_syncState) {
+                    // Keep track of the last message (that returns true for shouldDispatchMessageWhenWaitingForSyncReply())
+                    // we've received before this sync reply. This is to make sure that we dispatch all messages up to this
+                    // one, before the sync reply, to maintain ordering.
+                    pendingSyncReply.identifierOfLastMessageToDispatchBeforeSyncReply = syncState->identifierOfLastMessageToDispatchWhileWaitingForSyncReply();
 
-            // We got a reply to the last send message, wake up the client run loop so it can be processed.
-            if (i == m_pendingSyncReplies.size()) {
-                Locker locker { m_incomingMessagesLock };
-                if (RefPtr syncState = m_syncState)
-                    syncState->wakeUpClientRunLoop();
+                    // We got a reply to the last send message, wake up the client run loop so it can be processed.
+                    if (i == m_pendingSyncReplies.size())
+                        syncState->wakeUpClientRunLoop();
+                }
             }
             return;
         }
