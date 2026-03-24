@@ -216,6 +216,7 @@ html/canvas/GPUCanvasContextCocoa.mm @nonARC
 html/canvas/UsdModelLoader.swift
 html/shadow/YouTubeEmbedShadowElement.cpp
 inspector/LegacyWebSocketInspectorInstrumentation.cpp
+inspector/mac/FrameDebuggerMac.mm @nonARC
 inspector/mac/PageDebuggerMac.mm @nonARC
 loader/archive/cf/LegacyWebArchive.cpp
 loader/archive/cf/LegacyWebArchiveMac.mm @nonARC
