@@ -35,6 +35,7 @@
 #import "CharacterData.h"
 #import "ColorCocoa.h"
 #import "CommonAtomStrings.h"
+#import "ComposedTreeAncestorIterator.h"
 #import "ComposedTreeIterator.h"
 #import "ContainerNodeInlines.h"
 #import "Document.h"
@@ -261,19 +262,19 @@ static RefPtr<Element> enclosingElement(const Node& node, ElementCache<RefPtr<El
 {
     Vector<Ref<Element>> ancestors;
     RefPtr<Element> result;
-    for (RefPtr ancestor = node.parentElementInComposedTree(); ancestor; ancestor = ancestor->parentElementInComposedTree()) {
-        if (predicate(ancestor.get())) {
-            result = ancestor.get();
+    for (Ref ancestor : composedTreeAncestors(const_cast<Node&>(node))) {
+        if (predicate(ancestor.ptr())) {
+            result = ancestor.ptr();
             break;
         }
 
-        auto entry = cache.find(*ancestor);
+        auto entry = cache.find(ancestor);
         if (entry != cache.end()) {
             result = entry->value;
             break;
         }
 
-        ancestors.append(*ancestor);
+        ancestors.append(ancestor);
     }
 
     for (auto& ancestor : ancestors)

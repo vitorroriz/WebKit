@@ -27,6 +27,7 @@
 
 #include "Chrome.h"
 #include "ChromeClient.h"
+#include "ComposedTreeAncestorIterator.h"
 #include "DocumentPage.h"
 #include "Element.h"
 #include "EventHandler.h"
@@ -236,9 +237,9 @@ void PointerCaptureController::dispatchEnterOrLeaveEvent(const AtomString& type,
     }
 
     Vector<Ref<Element>, 32> targetChain;
-    for (RefPtr element = targetElement; element; element = element->parentElementInComposedTree()) {
+    for (Ref element : composedTreeLineage(targetElement)) {
         if (hasCapturingListenerInHierarchy || element->hasEventListeners(type))
-            targetChain.append(*element);
+            targetChain.append(element);
     }
 
     if (type == eventNames().pointerenterEvent) {
