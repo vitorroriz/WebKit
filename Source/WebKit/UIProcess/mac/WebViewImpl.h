@@ -1195,9 +1195,21 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     RetainPtr<WKAppKitGestureController> m_appKitGestureController;
     RetainPtr<WKTextSelectionController> m_textSelectionController;
 #endif
-} SWIFT_SHARED_REFERENCE(.incrementCheckedPtrCount, .decrementCheckedPtrCount);
+} SWIFT_SHARED_REFERENCE(incrementCheckedPtrCountOnWebViewImpl, decrementCheckedPtrCountOnWebViewImpl);
 
 } // namespace WebKit
+
+// FIXME: (rdar://173210238) Use `SWIFT_SHARED_REFERENCE(.incrementCheckedPtrCount, .decrementCheckedPtrCount)` when possible.
+
+inline void incrementCheckedPtrCountOnWebViewImpl(WebKit::WebViewImpl* obj)
+{
+    obj->incrementCheckedPtrCount();
+}
+
+inline void decrementCheckedPtrCountOnWebViewImpl(WebKit::WebViewImpl* obj)
+{
+    obj->decrementCheckedPtrCount();
+}
 
 #endif // PLATFORM(MAC)
 
