@@ -2824,11 +2824,13 @@ header: <WebCore/ScrollingCoordinatorTypes.h>
 header: <WebCore/ScrollingCoordinatorTypes.h>
 [CustomHeader] enum class WebCore::ShouldFireScrollEnd : bool;
 
+using WebCore::LayoutViewportOriginOrOverrideRect = Variant<WebCore::FloatPoint, WebCore::FloatRect>;
+
 header: <WebCore/ScrollingCoordinatorTypes.h>
 [CustomHeader] struct WebCore::ScrollUpdateData {
     WebCore::ScrollUpdateType updateType;
     WebCore::ScrollingLayerPositionAction updateLayerPositionAction;
-    std::optional<WebCore::FloatPoint> layoutViewportOrigin;
+    std::optional<WebCore::LayoutViewportOriginOrOverrideRect> layoutViewportOriginOrOverrideRect;
 };
 
 header: <WebCore/ScrollingCoordinatorTypes.h>

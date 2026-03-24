@@ -242,10 +242,16 @@ void RemoteScrollingCoordinatorProxy::sendScrollingTreeNodeUpdate()
             if (updateData.updateType == ScrollUpdateType::PositionUpdate) {
                 webPageProxy->scrollingNodeScrollViewDidScroll(update.nodeID);
                 auto* scrollPerfData = webPageProxy->scrollingPerformanceData();
-                // update.layoutViewportOrigin is set for frame scrolls.
-                if (scrollPerfData && updateData.layoutViewportOrigin) {
+
+                if (scrollPerfData && updateData.layoutViewportOriginOrOverrideRect) {
+                    // updateData.layoutViewportOriginOrOverrideRect is set for frame scrolls and is an origin (point)
+                    if (!std::holds_alternative<FloatPoint>(*updateData.layoutViewportOriginOrOverrideRect)) {
+                        ASSERT_NOT_REACHED();
+                        continue;
+                    }
+
                     auto layoutViewport = m_scrollingTree->layoutViewport();
-                    layoutViewport.setLocation(*updateData.layoutViewportOrigin);
+                    layoutViewport.setLocation(std::get<FloatPoint>(*updateData.layoutViewportOriginOrOverrideRect));
                     scrollPerfData->didScroll(layoutViewport);
                 }
             }
