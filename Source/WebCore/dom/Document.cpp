@@ -10903,6 +10903,16 @@ HTMLDialogElement* Document::activeModalDialog() const
     return nullptr;
 }
 
+HTMLDialogElement* Document::activeCloseableDialog() const
+{
+    for (auto& dialog : m_openDialogsList | std::views::reverse) {
+        if (dialog->computedClosedByState() != ClosedByState::None)
+            return &dialog.get();
+    }
+
+    return nullptr;
+}
+
 HTMLElement* Document::topmostAutoPopover() const
 {
     if (m_autoPopoverList.isEmpty())

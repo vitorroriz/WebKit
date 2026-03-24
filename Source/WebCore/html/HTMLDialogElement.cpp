@@ -79,11 +79,11 @@ ClosedByState HTMLDialogElement::closedByState() const
         return ClosedByState::Auto;
 
     auto value = attributeWithoutSynchronization(HTMLNames::closedbyAttr);
-    if (value == noneAtom())
+    if (equalIgnoringASCIICase(value, noneAtom()))
         return ClosedByState::None;
-    if (value == closerequestAtom())
+    if (equalIgnoringASCIICase(value, closerequestAtom()))
         return ClosedByState::CloseRequest;
-    if (value == anyAtom())
+    if (equalIgnoringASCIICase(value, anyAtom()))
         return ClosedByState::Any;
 
     return ClosedByState::Auto;

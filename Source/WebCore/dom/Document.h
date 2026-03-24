@@ -1878,6 +1878,7 @@ public:
     ListHashSet<Ref<HTMLDialogElement>>& openDialogsList() { return m_openDialogsList; }
 
     HTMLDialogElement* activeModalDialog() const;
+    HTMLDialogElement* activeCloseableDialog() const;
     HTMLElement* NODELETE topmostAutoPopover() const;
     RefPtr<HTMLDialogElement> nearestClickedDialog(const PointerEvent&, Node&) const;
 

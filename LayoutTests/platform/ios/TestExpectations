@@ -4060,6 +4060,8 @@ imported/w3c/web-platform-tests/css/css-ui/compute-kind-widget-generated/kind-of
 webkit.org/b/274832 imported/w3c/web-platform-tests/close-watcher/esc-key [ Skip ]
 webkit.org/b/274832 imported/w3c/web-platform-tests/close-watcher/user-activation [ Skip ]
 webkit.org/b/274832 imported/w3c/web-platform-tests/html/semantics/interactive-elements/the-dialog-element/dialog-closedby-show-stacked.html [ Skip ]
+webkit.org/b/274832 imported/w3c/web-platform-tests/html/semantics/interactive-elements/the-dialog-element/dialog-closedby-corner-cases.html [ Skip ]
+webkit.org/b/274832 imported/w3c/web-platform-tests/html/semantics/interactive-elements/the-dialog-element/dialog-closedby-start-open.html [ Skip ]
 
 # iOS user agent styles are preventing these from passing for <input type=search>
 webkit.org/b/241095 imported/w3c/web-platform-tests/css/css-ui/appearance-textfield-001.html [ ImageOnlyFailure ]
