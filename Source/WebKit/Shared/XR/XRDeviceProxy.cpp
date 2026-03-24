@@ -140,7 +140,7 @@ std::optional<PlatformXR::LayerHandle> XRDeviceProxy::createLayerProjection(uint
     return xrSystem ? xrSystem->createLayerProjection(width, height, alpha) : std::nullopt;
 }
 
-void XRDeviceProxy::submitFrame(Vector<PlatformXR::Device::Layer>&& layers)
+void XRDeviceProxy::submitFrame(Vector<PlatformXR::DeviceLayer>&& layers)
 {
     if (RefPtr xrSystem = m_xrSystem.get()) {
 #if USE(OPENXR)

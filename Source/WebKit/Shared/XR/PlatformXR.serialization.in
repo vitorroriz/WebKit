@@ -281,9 +281,17 @@ enum class PlatformXR::Eye : uint8_t {
 };
 
 header: <WebCore/PlatformXR.h>
-[Nested] struct PlatformXR::Device::LayerView {
+[Nested] struct PlatformXR::DeviceLayer::LayerView {
     PlatformXR::Eye eye;
     WebCore::IntRect viewport;
+};
+
+header: <WebCore/PlatformXR.h>
+[CustomHeader] struct PlatformXR::DeviceLayer {
+    PlatformXR::LayerHandle handle;
+    bool visible;
+    Vector<PlatformXR::DeviceLayer::LayerView> views;
+    WTF::UnixFileDescriptor fenceFD;
 };
 #endif
 

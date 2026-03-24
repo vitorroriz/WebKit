@@ -475,6 +475,19 @@ struct FrameData {
     FrameData copy() const;
 };
 
+struct DeviceLayer {
+    struct LayerView {
+        Eye eye { Eye::None };
+        WebCore::IntRect viewport;
+    };
+    LayerHandle handle { 0 };
+    bool visible { true };
+    Vector<LayerView> views;
+#if USE(OPENXR)
+    WTF::UnixFileDescriptor fenceFD;
+#endif
+};
+
 class Device : public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<Device> {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(Device);
     WTF_MAKE_NONCOPYABLE(Device);
@@ -522,20 +535,6 @@ public:
     virtual void deleteTransientInputHitTestSource(TransientInputHitTestSource) = 0;
 #endif
 
-    struct LayerView {
-        Eye eye { Eye::None };
-        WebCore::IntRect viewport;
-    };
-
-    struct Layer {
-        LayerHandle handle { 0 };
-        bool visible { true };
-        Vector<LayerView> views;
-#if USE(OPENXR)
-        WTF::UnixFileDescriptor fenceFD;
-#endif
-    };
-
     struct ViewData {
         bool active { false };
         Eye eye { Eye::None };
@@ -545,7 +544,7 @@ public:
 
     using RequestFrameCallback = Function<void(FrameData&&)>;
     virtual void requestFrame(std::optional<RequestData>&&, RequestFrameCallback&&) = 0;
-    virtual void submitFrame(Vector<Layer>&&) { };
+    virtual void submitFrame(Vector<DeviceLayer>&&) { };
 protected:
     Device() = default;
 

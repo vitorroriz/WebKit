@@ -72,10 +72,10 @@ std::optional<PlatformXR::FrameData::LayerData> XRProjectionLayer::layerData() c
 }
 #endif
 
-PlatformXR::Device::Layer XRProjectionLayer::endFrame()
+PlatformXR::DeviceLayer XRProjectionLayer::endFrame()
 {
     m_backing->endFrame();
-    return PlatformXR::Device::Layer {
+    return PlatformXR::DeviceLayer {
         .handle = 0,
         .visible = true,
         .views = { },

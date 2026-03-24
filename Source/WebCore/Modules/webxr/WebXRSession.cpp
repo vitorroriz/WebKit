@@ -750,7 +750,7 @@ void WebXRSession::onFrame(PlatformXR::FrameData&& frameData)
                 return;
 
             // Submit current frame layers to the device.
-            Vector<PlatformXR::Device::Layer> frameLayers;
+            Vector<PlatformXR::DeviceLayer> frameLayers;
             if (isImmersive(session.m_mode) && session.m_activeRenderState->baseLayer())
                 frameLayers.append(session.m_activeRenderState->baseLayer()->endFrame());
 

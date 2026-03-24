@@ -60,7 +60,7 @@ public:
 
     // WebXRLayer
     void startFrame(PlatformXR::FrameData&) final;
-    PlatformXR::Device::Layer endFrame() final;
+    PlatformXR::DeviceLayer endFrame() final;
 #if ENABLE(WEBGPU)
     std::optional<PlatformXR::FrameData::LayerData> layerData() const;
 #endif

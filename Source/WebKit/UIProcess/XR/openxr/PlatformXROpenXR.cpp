@@ -354,7 +354,7 @@ void OpenXRCoordinator::scheduleAnimationFrame(WebPageProxy& page, std::optional
         });
 }
 
-void OpenXRCoordinator::submitFrame(WebPageProxy& page, Vector<XRDeviceLayer>&& layers)
+void OpenXRCoordinator::submitFrame(WebPageProxy& page, Vector<PlatformXR::DeviceLayer>&& layers)
 {
     ASSERT(RunLoop::isMain());
     WTF::switchOn(m_state,
@@ -1135,7 +1135,7 @@ void OpenXRCoordinator::beginFrame(Box<RenderState> renderState)
     }
 }
 
-void OpenXRCoordinator::endFrame(Box<RenderState> renderState, Vector<XRDeviceLayer>&& layers)
+void OpenXRCoordinator::endFrame(Box<RenderState> renderState, Vector<PlatformXR::DeviceLayer>&& layers)
 {
     ASSERT(!RunLoop::isMain());
 

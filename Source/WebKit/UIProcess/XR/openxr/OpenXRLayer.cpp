@@ -26,7 +26,6 @@
 #include <EGL/egl.h>
 #endif
 
-#include "XRDeviceLayer.h"
 #include <WebCore/FourCC.h>
 #include <WebCore/GLContext.h>
 #include <WebCore/GLDisplay.h>
@@ -427,7 +426,7 @@ std::optional<PlatformXR::FrameData::LayerData> OpenXRLayerProjection::startFram
     return layerData;
 }
 
-XrCompositionLayerBaseHeader* OpenXRLayerProjection::endFrame(const XRDeviceLayer& layer, XrSpace space, const Vector<XrView>& frameViews)
+XrCompositionLayerBaseHeader* OpenXRLayerProjection::endFrame(const PlatformXR::DeviceLayer& layer, XrSpace space, const Vector<XrView>& frameViews)
 {
 #if OS(ANDROID) || USE(GBM)
     if (needsBlitTexture()) {
