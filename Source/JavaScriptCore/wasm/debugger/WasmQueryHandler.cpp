@@ -218,28 +218,16 @@ String QueryHandler::buildWasmCallStackResponse()
 
     auto& stopData = *state->stopData;
     RELEASE_ASSERT(stopData.callFrame);
-    dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] buildWasmCallStackResponse: starting manual stack walk from CallFrame ", RawPointer(stopData.callFrame));
+    dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] buildWasmCallStackResponse: walking call stack from CallFrame ", RawPointer(stopData.callFrame));
 
-    Vector<VirtualAddress> frameAddresses;
-    frameAddresses.append(stopData.address);
-    CallFrame* currentFrame = stopData.callFrame;
-    uint8_t* returnPC = nullptr;
-    VirtualAddress virtualReturnPC;
-    unsigned frameIndex = 0;
+    Vector<VirtualAddress> frameAddresses = collectCallStack(stopData.address, stopData.callFrame, stopData.instance->vm());
 
-    // FIXME: Only supports consecutive wasm->wasm calls. Need to support interleaved wasm<->js calls (skipping stubs, including JS frames).
-    while (getWasmReturnPC(currentFrame, returnPC, virtualReturnPC) && frameIndex < 100) {
-        frameAddresses.append(virtualReturnPC);
-        currentFrame = currentFrame->callerFrame();
-        frameIndex++;
-    }
-
-    dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] CallStack: finished walking call stack, processed ", frameIndex, " frames");
+    dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] buildWasmCallStackResponse: finished walking, ", frameAddresses.size(), " frames");
 
     StringBuilder result;
     for (VirtualAddress address : frameAddresses)
         result.append(toNativeEndianHex(address));
-    dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] buildWasmCallStackResponse: collected ", frameAddresses.size(), " frames, response length: ", result.length());
+    dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] buildWasmCallStackResponse: response length: ", result.length());
     return result.toString();
 }
 

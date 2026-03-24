@@ -165,6 +165,7 @@ end
 const UnboxedWasmCalleeStackSlot = CallerFrame - constexpr Wasm::numberOfIPIntCalleeSaveRegisters * SlotSize - MachineRegisterSize
 const WasmToJSScratchSpaceSize = constexpr Wasm::WasmToJSScratchSpaceSize
 const WasmToJSCallableFunctionSlot = constexpr Wasm::WasmToJSCallableFunctionSlot
+const WasmToJSIPIntReturnPCSlot = constexpr Wasm::WasmToJSIPIntReturnPCSlot
 
 const IPIntCalleeSaveSpaceAsVirtualRegisters = constexpr Wasm::numberOfIPIntCalleeSaveRegisters + constexpr Wasm::numberOfIPIntInternalRegisters
 const IPIntCalleeSaveSpaceStackAligned = (IPIntCalleeSaveSpaceAsVirtualRegisters * SlotSize + StackAlignment - 1) & ~StackAlignmentMask
@@ -1029,6 +1030,8 @@ op(wasm_to_js_wrapper_entry, macro()
 
     const RegisterSpaceScratchSize = 0x80
     subp (WasmToJSScratchSpaceSize + RegisterSpaceScratchSize), sp
+
+    storep PC, WasmToJSIPIntReturnPCSlot[cfr]
 
     loadp CodeBlock[cfr], ws0
     storep ws0, WasmToJSCallableFunctionSlot[cfr]
