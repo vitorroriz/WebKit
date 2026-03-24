@@ -1,4 +1,4 @@
-// Copyright (C) 2024 Apple Inc. All rights reserved.
+// Copyright (C) 2026 Apple Inc. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -21,51 +21,19 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-public import CryptoKit
-public import Foundation
+import CryptoKit
+import Foundation
+import pal.Core.crypto.CryptoTypes
 
-public import pal.Core.crypto.CryptoTypes
+// FIXME: (rdar://164560176) resolve the many 'unsafe' statements here
 
-enum UnsafeErrors: Error {
+private enum UnsafeErrors: Error {
     case invalidLength
     case emptySpan
 }
 
-extension CryptoKit.HashFunction {
-    mutating func update(data: SpanConstUInt8) {
-        if unsafe data.empty() {
-            self.update(data: Data())
-        } else {
-            unsafe self.update(
-                bufferPointer: UnsafeRawBufferPointer(
-                    start: data.__dataUnsafe(),
-                    count: data.size()
-                )
-            )
-        }
-    }
-}
-
-extension ContiguousBytes {
-    // FIXME: PALSwift should have no public symbols.
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func copyToVectorUInt8() -> VectorUInt8 {
-        unsafe self.withUnsafeBytes { buf in
-            let result = VectorUInt8(buf.count)
-            unsafe buf.copyBytes(
-                to: UnsafeMutableRawBufferPointer(
-                    start: UnsafeMutableRawPointer(mutating: result.span().__dataUnsafe()),
-                    count: result.size()
-                ),
-                count: result.size()
-            )
-            return result
-        }
-    }
-}
-
 extension Data {
-    fileprivate static func temporaryDataFromSpan(spanNoCopy: SpanConstUInt8) -> Data {
+    fileprivate static func temporaryDataFromSpan(spanNoCopy: PAL.Crypto.SpanConstUInt8) -> Data {
         guard unsafe spanNoCopy.empty() else {
             return unsafe Data(
                 bytesNoCopy: UnsafeMutablePointer(mutating: spanNoCopy.__dataUnsafe()),
@@ -79,14 +47,27 @@ extension Data {
     }
 }
 
+extension CryptoKit.HashFunction {
+    mutating func update(data: PAL.Crypto.SpanConstUInt8) {
+        if unsafe data.empty() {
+            self.update(data: Data())
+        } else {
+            unsafe self.update(
+                bufferPointer: UnsafeRawBufferPointer(
+                    start: data.__dataUnsafe(),
+                    count: data.size()
+                )
+            )
+        }
+    }
+}
+
 extension AES.GCM {
-    // FIXME: PALSwift should have no public symbols.
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public static func seal(
-        _ message: SpanConstUInt8,
-        key: SpanConstUInt8,
-        iv: SpanConstUInt8,
-        ad: SpanConstUInt8
+    static func seal(
+        _ message: PAL.Crypto.SpanConstUInt8,
+        key: PAL.Crypto.SpanConstUInt8,
+        iv: PAL.Crypto.SpanConstUInt8,
+        ad: PAL.Crypto.SpanConstUInt8
     ) throws -> AES.GCM.SealedBox {
         guard unsafe ad.size() > 0 else {
             return try unsafe AES.GCM.seal(
@@ -105,18 +86,14 @@ extension AES.GCM {
 }
 
 extension AES.KeyWrap {
-    // FIXME: PALSwift should have no public symbols.
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public static func unwrap(_ wrapped: SpanConstUInt8, using: SpanConstUInt8) throws -> SymmetricKey {
+    static func unwrap(_ wrapped: PAL.Crypto.SpanConstUInt8, using: PAL.Crypto.SpanConstUInt8) throws -> SymmetricKey {
         try unsafe AES.KeyWrap.unwrap(
             Data.temporaryDataFromSpan(spanNoCopy: wrapped),
             using: SymmetricKey(data: Data.temporaryDataFromSpan(spanNoCopy: using))
         )
     }
 
-    // FIXME: PALSwift should have no public symbols.
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public static func wrap(_ keyToWrap: SpanConstUInt8, using: SpanConstUInt8) throws -> VectorUInt8 {
+    static func wrap(_ keyToWrap: PAL.Crypto.SpanConstUInt8, using: PAL.Crypto.SpanConstUInt8) throws -> PAL.Crypto.VectorUInt8 {
         try unsafe AES.KeyWrap
             .wrap(
                 SymmetricKey(data: Data.temporaryDataFromSpan(spanNoCopy: keyToWrap)),
@@ -127,7 +104,7 @@ extension AES.KeyWrap {
 }
 
 extension P256.Signing.ECDSASignature {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
@@ -136,7 +113,7 @@ extension P256.Signing.ECDSASignature {
 }
 
 extension P384.Signing.ECDSASignature {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
@@ -145,7 +122,7 @@ extension P384.Signing.ECDSASignature {
 }
 
 extension P521.Signing.ECDSASignature {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
@@ -154,14 +131,14 @@ extension P521.Signing.ECDSASignature {
 }
 
 extension P256.Signing.PublicKey {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
         try unsafe self.init(x963Representation: Data.temporaryDataFromSpan(spanNoCopy: span))
     }
 
-    init(spanCompressed: SpanConstUInt8) throws {
+    init(spanCompressed: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe spanCompressed.empty() {
             throw UnsafeErrors.emptySpan
         }
@@ -172,14 +149,14 @@ extension P256.Signing.PublicKey {
 }
 
 extension P384.Signing.PublicKey {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
         try unsafe self.init(x963Representation: Data.temporaryDataFromSpan(spanNoCopy: span))
     }
 
-    init(spanCompressed: SpanConstUInt8) throws {
+    init(spanCompressed: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe spanCompressed.empty() {
             throw UnsafeErrors.emptySpan
         }
@@ -190,14 +167,14 @@ extension P384.Signing.PublicKey {
 }
 
 extension P521.Signing.PublicKey {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
         try unsafe self.init(x963Representation: Data.temporaryDataFromSpan(spanNoCopy: span))
     }
 
-    init(spanCompressed: SpanConstUInt8) throws {
+    init(spanCompressed: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe spanCompressed.empty() {
             throw UnsafeErrors.emptySpan
         }
@@ -208,7 +185,7 @@ extension P521.Signing.PublicKey {
 }
 
 extension P256.Signing.PrivateKey {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
@@ -217,7 +194,7 @@ extension P256.Signing.PrivateKey {
 }
 
 extension P384.Signing.PrivateKey {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
@@ -226,7 +203,7 @@ extension P384.Signing.PrivateKey {
 }
 
 extension P521.Signing.PrivateKey {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
@@ -235,16 +212,14 @@ extension P521.Signing.PrivateKey {
 }
 
 extension Curve25519.Signing.PrivateKey {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
         try unsafe self.init(rawRepresentation: Data.temporaryDataFromSpan(spanNoCopy: span))
     }
 
-    // FIXME: PALSwift should have no public symbols.
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func signature(span: SpanConstUInt8) throws -> VectorUInt8 {
+    func signature(span: PAL.Crypto.SpanConstUInt8) throws -> PAL.Crypto.VectorUInt8 {
         if unsafe span.empty() {
             return try self.signature(for: Data()).copyToVectorUInt8()
         }
@@ -254,16 +229,14 @@ extension Curve25519.Signing.PrivateKey {
 }
 
 extension Curve25519.Signing.PublicKey {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
         try unsafe self.init(rawRepresentation: Data.temporaryDataFromSpan(spanNoCopy: span))
     }
 
-    // FIXME: PALSwift should have no public symbols.
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func isValidSignature(signature: SpanConstUInt8, data: SpanConstUInt8) -> Bool {
+    func isValidSignature(signature: PAL.Crypto.SpanConstUInt8, data: PAL.Crypto.SpanConstUInt8) -> Bool {
         if unsafe (signature.empty() || data.empty()) {
             return false
         }
@@ -276,16 +249,14 @@ extension Curve25519.Signing.PublicKey {
 }
 
 extension Curve25519.KeyAgreement.PrivateKey {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
         try unsafe self.init(rawRepresentation: Data.temporaryDataFromSpan(spanNoCopy: span))
     }
 
-    // FIXME: PALSwift should have no public symbols.
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func sharedSecretFromKeyAgreement(pubSpan: SpanConstUInt8) throws -> VectorUInt8 {
+    func sharedSecretFromKeyAgreement(pubSpan: PAL.Crypto.SpanConstUInt8) throws -> PAL.Crypto.VectorUInt8 {
         if unsafe pubSpan.empty() {
             throw UnsafeErrors.emptySpan
         }
@@ -297,7 +268,7 @@ extension Curve25519.KeyAgreement.PrivateKey {
 }
 
 extension Curve25519.KeyAgreement.PublicKey {
-    init(span: SpanConstUInt8) throws {
+    init(span: PAL.Crypto.SpanConstUInt8) throws {
         if unsafe span.empty() {
             throw UnsafeErrors.emptySpan
         }
@@ -306,7 +277,7 @@ extension Curve25519.KeyAgreement.PublicKey {
 }
 
 extension CryptoKit.HMAC {
-    static func authenticationCode(data: SpanConstUInt8, key: SpanConstUInt8) -> VectorUInt8 {
+    static func authenticationCode(data: PAL.Crypto.SpanConstUInt8, key: PAL.Crypto.SpanConstUInt8) -> PAL.Crypto.VectorUInt8 {
         unsafe self.authenticationCode(
             for: Data.temporaryDataFromSpan(spanNoCopy: data),
             using: SymmetricKey(data: Data.temporaryDataFromSpan(spanNoCopy: key))
@@ -314,7 +285,11 @@ extension CryptoKit.HMAC {
         .copyToVectorUInt8()
     }
 
-    static func isValidAuthenticationCode(mac: SpanConstUInt8, data: SpanConstUInt8, key: SpanConstUInt8) -> Bool {
+    static func isValidAuthenticationCode(
+        mac: PAL.Crypto.SpanConstUInt8,
+        data: PAL.Crypto.SpanConstUInt8,
+        key: PAL.Crypto.SpanConstUInt8
+    ) -> Bool {
         unsafe Self.isValidAuthenticationCode(
             Data.temporaryDataFromSpan(spanNoCopy: mac),
             authenticating: Data.temporaryDataFromSpan(spanNoCopy: data),
@@ -325,11 +300,11 @@ extension CryptoKit.HMAC {
 
 extension CryptoKit.HKDF {
     static func deriveKey(
-        inputKeyMaterial: SpanConstUInt8,
-        salt: SpanConstUInt8,
-        info: SpanConstUInt8,
+        inputKeyMaterial: PAL.Crypto.SpanConstUInt8,
+        salt: PAL.Crypto.SpanConstUInt8,
+        info: PAL.Crypto.SpanConstUInt8,
         outputByteCount: Int
-    ) -> VectorUInt8 {
+    ) -> PAL.Crypto.VectorUInt8 {
         unsafe Self.deriveKey(
             inputKeyMaterial: SymmetricKey(
                 data: Data.temporaryDataFromSpan(spanNoCopy: inputKeyMaterial)

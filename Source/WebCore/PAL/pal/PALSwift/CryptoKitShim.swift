@@ -26,6 +26,8 @@ public import Foundation
 
 public import pal.Core.crypto.CryptoTypes
 
+// FIXME: (rdar://164560176) resolve the many 'unsafe' statements here
+
 // FIXME: PALSwift should have no public symbols.
 // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
 public typealias CryptoOperationReturnValue = PAL.Crypto.CryptoOperationReturnValue
