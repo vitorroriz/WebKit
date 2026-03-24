@@ -557,8 +557,7 @@ void Lexer<T>::setCode(const SourceCode& source, ParserArena* arena)
     m_arena = &arena->identifierArena();
     
     m_lineNumber = source.firstLine().oneBasedInt();
-    m_lastToken = -1;
-    
+
     StringView sourceString = source.provider()->source();
 
     if (!sourceString.isNull())
@@ -731,10 +730,9 @@ void Lexer<T>::shiftLineTerminator()
     m_lineStart = m_code;
 }
 
-template <typename T>
-ALWAYS_INLINE bool Lexer<T>::lastTokenWasRestrKeyword() const
+static ALWAYS_INLINE bool isRestrKeyword(JSTokenType token)
 {
-    return m_lastToken == CONTINUE || m_lastToken == BREAK || m_lastToken == RETURN || m_lastToken == THROW;
+    return token == CONTINUE || token == BREAK || token == RETURN || token == THROW;
 }
 
 template <typename T>
@@ -1998,10 +1996,9 @@ bool Lexer<T>::nextTokenIsColon()
 }
 
 template <typename T>
-void Lexer<T>::fillTokenInfo(JSToken* tokenRecord, JSTokenType token, JSTextPosition endPosition)
+void Lexer<T>::fillTokenInfo(JSToken* tokenRecord, JSTextPosition endPosition)
 {
     tokenRecord->m_endPosition = endPosition;
-    m_lastToken = token;
 }
 
 template <typename T>
@@ -2009,7 +2006,7 @@ JSTokenType Lexer<T>::lexWithoutClearingLineTerminator(JSToken* tokenRecord, Opt
 {
     JSTokenData* tokenData = &tokenRecord->m_data;
     ASSERT(!m_error);
-    m_lastTokenLocation = tokenRecord->location();
+
     ASSERT(m_buffer8.isEmpty());
     ASSERT(m_buffer16.isEmpty());
     JSTokenType token = ERRORTOK;
@@ -2021,12 +2018,6 @@ start:
     tokenRecord->m_startPosition = currentPosition();
 
     Latin1Character type = m_current;
-
-    if (atEnd()) {
-        token = EOFTOK;
-        goto returnToken;
-    }
-
     if constexpr (!std::is_same_v<T, Latin1Character>) {
         if (!isLatin1(m_current)) [[unlikely]] {
             char32_t codePoint;
@@ -2216,7 +2207,7 @@ start:
             m_lexErrorMessage = "Multiline comment was not closed properly"_s;
             token = UNTERMINATED_MULTILINE_COMMENT_ERRORTOK;
             m_error = true;
-            fillTokenInfo(tokenRecord, token, currentPosition());
+            fillTokenInfo(tokenRecord, currentPosition());
             return token;
         }
         if (m_current == '=') {
@@ -2674,13 +2665,13 @@ start:
         if (result != StringParsedSuccessfully) [[unlikely]] {
             token = result == StringUnterminated ? UNTERMINATED_STRING_LITERAL_ERRORTOK : INVALID_STRING_LITERAL_ERRORTOK;
             m_error = true;
-            fillTokenInfo(tokenRecord, token, currentPosition());
+            fillTokenInfo(tokenRecord, currentPosition());
             return token;
         }
         shift();
         token = STRING;
         m_atLineStart = false;
-        fillTokenInfo(tokenRecord, token, currentPosition());
+        fillTokenInfo(tokenRecord, currentPosition());
         return token;
     }
 
@@ -2889,7 +2880,6 @@ start:
     }
 
     case 183 /* 183 = Po category      CharacterOtherIdentifierPart */:
-    case   0 /*   0 = Null             CharacterInvalid */:
     case   1 /*   1 = Start of Heading CharacterInvalid */:
     case   2 /*   2 = Start of Text    CharacterInvalid */:
     case   3 /*   3 = End of Text      CharacterInvalid */:
@@ -2980,6 +2970,14 @@ start:
     case 247 /* 247 = Sm category      CharacterInvalid */: {
         goto invalidCharacter;
     }
+
+    case   0 /*   0 = Null             CharacterInvalid */: {
+        if (atEnd()) {
+            token = EOFTOK;
+            goto returnToken;
+        }
+        goto invalidCharacter;
+    }
     }
 
     m_atLineStart = false;
@@ -3025,7 +3023,7 @@ inSingleLineComment:
         if (m_code == m_codeEnd) {
             m_current = 0;
             token = EOFTOK;
-            fillTokenInfo(tokenRecord, token, endPosition);
+            fillTokenInfo(tokenRecord, endPosition);
             return token;
         }
 
@@ -3033,16 +3031,16 @@ inSingleLineComment:
         shiftLineTerminator();
         m_atLineStart = true;
         m_hasLineTerminatorBeforeToken = true;
-        if (!lastTokenWasRestrKeyword())
+        if (!isRestrKeyword(tokenRecord->m_type))
             goto start;
 
         token = SEMICOLON;
-        fillTokenInfo(tokenRecord, token, endPosition);
+        fillTokenInfo(tokenRecord, endPosition);
         return token;
     }
 
 returnToken:
-    fillTokenInfo(tokenRecord, token, currentPosition());
+    fillTokenInfo(tokenRecord, currentPosition());
     return token;
 
 invalidCharacter:
@@ -3052,7 +3050,7 @@ invalidCharacter:
 
 returnError:
     m_error = true;
-    fillTokenInfo(tokenRecord, token, currentPosition());
+    fillTokenInfo(tokenRecord, currentPosition());
     RELEASE_ASSERT(token & CanBeErrorTokenFlag);
     return token;
 }
@@ -3090,7 +3088,7 @@ JSTokenType Lexer<T>::scanRegExp(JSToken* tokenRecord, char16_t patternPrefix)
         if (isLineTerminator(m_current) || atEnd()) {
             m_buffer16.shrink(0);
             JSTokenType token = UNTERMINATED_REGEXP_LITERAL_ERRORTOK;
-            fillTokenInfo(tokenRecord, token, currentPosition());
+            fillTokenInfo(tokenRecord, currentPosition());
             m_error = true;
             m_lexErrorMessage = makeString("Unterminated regular expression literal '"_s, getToken(*tokenRecord), '\'');
             return token;
@@ -3139,7 +3137,7 @@ JSTokenType Lexer<T>::scanRegExp(JSToken* tokenRecord, char16_t patternPrefix)
     if (!isLatin1(m_current) && !isWhiteSpace(m_current) && !isLineTerminator(m_current)) [[unlikely]] {
         m_buffer8.shrink(0);
         JSTokenType token = INVALID_IDENTIFIER_UNICODE_ERRORTOK;
-        fillTokenInfo(tokenRecord, token, currentPosition());
+        fillTokenInfo(tokenRecord, currentPosition());
         m_error = true;
         String codePoint = String::fromCodePoint(currentCodePoint());
         if (!codePoint)
@@ -3155,7 +3153,7 @@ JSTokenType Lexer<T>::scanRegExp(JSToken* tokenRecord, char16_t patternPrefix)
     m_atLineStart = false;
 
     JSTokenType token = REGEXP;
-    fillTokenInfo(tokenRecord, token, currentPosition());
+    fillTokenInfo(tokenRecord, currentPosition());
     return token;
 }
 
@@ -3178,7 +3176,7 @@ JSTokenType Lexer<T>::scanTemplateString(JSToken* tokenRecord, RawStringsBuildMo
 
     // Since TemplateString always ends with ` or }, m_atLineStart always becomes false.
     m_atLineStart = false;
-    fillTokenInfo(tokenRecord, token, currentPosition());
+    fillTokenInfo(tokenRecord, currentPosition());
     return token;
 }
 
