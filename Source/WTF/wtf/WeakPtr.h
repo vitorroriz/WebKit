@@ -167,7 +167,6 @@ public:
             !IsDeprecatedWeakRefSmartPointerException<std::remove_cv_t<T>>::value || (!HasRefPtrMemberFunctions<T>::value && !HasCheckedPtrMemberFunctions<T>::value),
             "IsDeprecatedWeakRefSmartPointerException specialization is no longer needed for this class, please remove it.");
 
-        ASSERT_WITH_SECURITY_IMPLICATION(canSafelyBeUsed());
         auto* result = get();
         RELEASE_ASSERT(result);
         return result;
@@ -183,7 +182,6 @@ public:
             !IsDeprecatedWeakRefSmartPointerException<std::remove_cv_t<T>>::value || (!HasRefPtrMemberFunctions<T>::value && !HasCheckedPtrMemberFunctions<T>::value),
             "IsDeprecatedWeakRefSmartPointerException specialization is no longer needed for this class, please remove it.");
 
-        ASSERT_WITH_SECURITY_IMPLICATION(canSafelyBeUsed());
         auto* result = get();
         RELEASE_ASSERT(result);
         return *result;
