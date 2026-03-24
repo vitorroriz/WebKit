@@ -34,6 +34,7 @@
 #include "rtc_base/network/sent_packet.h"
 #include "rtc_base/socket.h"
 #include "rtc_base/socket_address.h"
+#include "rtc_base/third_party/sigslot/sigslot.h"
 #include "rtc_base/thread.h"
 #include "rtc_base/virtual_socket_server.h"
 #include "test/gmock.h"
@@ -62,14 +63,14 @@ static const SocketAddress kRemoteIPv6Addr("2401:fa00:4:1000:be30:5bff:fee5:c4",
 
 constexpr uint64_t kTiebreakerDefault = 44444;
 
-class ConnectionObserver {
+class ConnectionObserver : public sigslot::has_slots<> {
  public:
   explicit ConnectionObserver(Connection* conn) : conn_(conn) {
     conn->SubscribeDestroyed(
         this, [this](Connection* connection) { OnDestroyed(connection); });
   }
 
-  ~ConnectionObserver() {
+  ~ConnectionObserver() override {
     if (!connection_destroyed_) {
       RTC_DCHECK(conn_);
       conn_->UnsubscribeDestroyed(this);
@@ -85,7 +86,7 @@ class ConnectionObserver {
   bool connection_destroyed_ = false;
 };
 
-class TCPPortTest : public ::testing::Test {
+class TCPPortTest : public ::testing::Test, public sigslot::has_slots<> {
  public:
   TCPPortTest()
       : ss_(new webrtc::VirtualSocketServer()),
@@ -245,12 +246,10 @@ TEST_F(TCPPortTest, TCPPortNotDiscardedIfBoundToTemporaryIP) {
       webrtc::IsRtcOk());
 }
 
-class SentPacketCounter {
+class SentPacketCounter : public sigslot::has_slots<> {
  public:
   explicit SentPacketCounter(TCPPort* p) {
-    p->SubscribeSentPacket(this, [this](const webrtc::SentPacketInfo& info) {
-      OnSentPacket(info);
-    });
+    p->SignalSentPacket.connect(this, &SentPacketCounter::OnSentPacket);
   }
 
   int sent_packets() const { return sent_packets_; }

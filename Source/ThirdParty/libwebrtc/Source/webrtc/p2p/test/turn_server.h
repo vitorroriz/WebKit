@@ -39,6 +39,7 @@
 #include "rtc_base/socket.h"
 #include "rtc_base/socket_address.h"
 #include "rtc_base/ssl_adapter.h"
+#include "rtc_base/third_party/sigslot/sigslot.h"
 #include "rtc_base/thread_annotations.h"
 
 namespace webrtc {
@@ -184,13 +185,13 @@ class StunMessageObserver {
 // AddInternalServerSocket, and a factory to create external sockets via
 // SetExternalSocketFactory, and it's ready to go.
 // Not yet wired up: TCP support.
-class TurnServer {
+class TurnServer : public sigslot::has_slots<> {
  public:
   typedef std::map<TurnServerConnection, std::unique_ptr<TurnServerAllocation>>
       AllocationMap;
 
   TurnServer(const Environment& env, TaskQueueBase* thread);
-  virtual ~TurnServer();
+  ~TurnServer() override;
 
   // Gets/sets the realm value to use for the server.
   const std::string& realm() const {

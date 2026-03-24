@@ -14,6 +14,7 @@
 #include <utility>
 
 #include "api/video/encoded_image.h"
+#include "api/video/video_frame_type.h"
 #include "api/video_codecs/scalability_mode.h"
 #include "api/video_codecs/video_codec.h"
 #include "modules/video_coding/svc/scalability_mode_util.h"
@@ -21,6 +22,7 @@
 #include "rtc_base/checks.h"
 #include "rtc_base/logging.h"
 #include "rtc_base/strings/string_builder.h"
+#include "rtc_base/system/file_wrapper.h"
 
 namespace webrtc {
 namespace test {
@@ -52,7 +54,8 @@ EncodedImageFileWriter::EncodedImageFileWriter(
            << j << ".ivf";
 
       decode_target_writers_.emplace_back(std::make_pair(
-          IvfFileWriter::Wrap(name.str(), /*byte_limit=*/0), name.str()));
+          IvfFileWriter::Wrap(FileWrapper::OpenWriteOnly(name.str()), 0),
+          name.str()));
     }
   }
 }
@@ -72,7 +75,8 @@ int EncodedImageFileWriter::Write(const EncodedImage& encoded_image) {
   RTC_CHECK_LT(temporal_index, temporal_layers_);
 
   if (spatial_index == 0) {
-    is_base_layer_key_frame_ = encoded_image.IsKey();
+    is_base_layer_key_frame =
+        (encoded_image._frameType == VideoFrameType::kVideoFrameKey);
   }
 
   switch (inter_layer_pred_mode_) {
@@ -113,7 +117,7 @@ int EncodedImageFileWriter::Write(const EncodedImage& encoded_image) {
         }
 
         // Write to higher spatial layers only if key frame.
-        if (!is_base_layer_key_frame_) {
+        if (!is_base_layer_key_frame) {
           break;
         }
       }

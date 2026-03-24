@@ -58,7 +58,7 @@ RTCNetwork::RTCNetwork(String&& name, String&& description, IPAddress prefix, in
     , scopeID(scopeID)
     , ips(WTF::move(ips)) { }
 
-std::unique_ptr<webrtc::Network> RTCNetwork::value() const
+webrtc::Network RTCNetwork::value() const
 {
     auto nameUTF8 = name.utf8();
     auto descriptionUTF8 = description.utf8();
@@ -75,7 +75,7 @@ std::unique_ptr<webrtc::Network> RTCNetwork::value() const
         vector.push_back(ip.rtcAddress());
     network.SetIPs(WTF::move(vector), true);
 
-    return network.Clone();
+    return network;
 }
 
 RTCNetwork RTCNetwork::isolatedCopy() const

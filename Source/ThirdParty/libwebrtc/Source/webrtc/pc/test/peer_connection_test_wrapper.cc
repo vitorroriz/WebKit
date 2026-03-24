@@ -114,22 +114,15 @@ class FuzzyMatchedVideoEncoderFactory : public VideoEncoderFactory {
 
 void PeerConnectionTestWrapper::Connect(PeerConnectionTestWrapper* caller,
                                         PeerConnectionTestWrapper* callee) {
-  caller->SubscribeOnIceCandidateReady(
-      callee, [callee](const std::string& mid, int index,
-                       const std::string& candidate) {
-        callee->AddIceCandidate(mid, index, candidate);
-      });
-  callee->SubscribeOnIceCandidateReady(
-      caller, [caller](const std::string& mid, int index,
-                       const std::string& candidate) {
-        caller->AddIceCandidate(mid, index, candidate);
-      });
-  caller->SubscribeOnSdpReady(callee, [callee](const std::string& sdp) {
-    callee->ReceiveOfferSdp(sdp);
-  });
-  callee->SubscribeOnSdpReady(caller, [caller](const std::string& sdp) {
-    caller->ReceiveAnswerSdp(sdp);
-  });
+  caller->SignalOnIceCandidateReady.connect(
+      callee, &PeerConnectionTestWrapper::AddIceCandidate);
+  callee->SignalOnIceCandidateReady.connect(
+      caller, &PeerConnectionTestWrapper::AddIceCandidate);
+
+  caller->SignalOnSdpReady.connect(callee,
+                                   &PeerConnectionTestWrapper::ReceiveOfferSdp);
+  callee->SignalOnSdpReady.connect(
+      caller, &PeerConnectionTestWrapper::ReceiveAnswerSdp);
 }
 
 void PeerConnectionTestWrapper::AwaitNegotiation(
@@ -309,11 +302,8 @@ void PeerConnectionTestWrapper::AwaitSetRemoteDescription(
 void PeerConnectionTestWrapper::ListenForRemoteIceCandidates(
     scoped_refptr<PeerConnectionTestWrapper> remote_wrapper) {
   remote_wrapper_ = remote_wrapper;
-  remote_wrapper_->SubscribeOnIceCandidateReady(
-      this,
-      [this](const std::string& mid, int index, const std::string& candidate) {
-        OnRemoteIceCandidate(mid, index, candidate);
-      });
+  remote_wrapper_->SignalOnIceCandidateReady.connect(
+      this, &PeerConnectionTestWrapper::OnRemoteIceCandidate);
 }
 
 void PeerConnectionTestWrapper::AwaitAddRemoteIceCandidates() {
@@ -361,13 +351,13 @@ void PeerConnectionTestWrapper::OnAddTrack(
 
 void PeerConnectionTestWrapper::OnIceCandidate(const IceCandidate* candidate) {
   std::string sdp = candidate->ToString();
-  NotifyOnIceCandidateReady(candidate->sdp_mid(), candidate->sdp_mline_index(),
+  SignalOnIceCandidateReady(candidate->sdp_mid(), candidate->sdp_mline_index(),
                             sdp);
 }
 
 void PeerConnectionTestWrapper::OnDataChannel(
     scoped_refptr<DataChannelInterface> data_channel) {
-  NotifyOnDataChannel(data_channel.get());
+  SignalOnDataChannel(data_channel.get());
 }
 
 void PeerConnectionTestWrapper::OnSuccess(SessionDescriptionInterface* desc) {
@@ -381,7 +371,7 @@ void PeerConnectionTestWrapper::OnSuccess(SessionDescriptionInterface* desc) {
 
   SetLocalDescription(desc->GetType(), sdp);
 
-  NotifyOnSdpReady(sdp);
+  SignalOnSdpReady(sdp);
 }
 
 void PeerConnectionTestWrapper::CreateOffer(
@@ -540,8 +530,8 @@ scoped_refptr<MediaStreamInterface> PeerConnectionTestWrapper::GetUserMedia(
   if (video) {
     // Set max frame rate to 10fps to reduce the risk of the tests to be flaky.
     FakePeriodicVideoSource::Config config;
-    config.frame_interval = TimeDelta::Millis(100);
-    config.timestamp_offset = env_.clock().CurrentTime();
+    config.frame_interval_ms = 100;
+    config.timestamp_offset_ms = env_.clock().TimeInMilliseconds();
     config.width = resolution.width;
     config.height = resolution.height;
 

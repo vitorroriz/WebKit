@@ -21,7 +21,6 @@ namespace webrtc {
 
 enum ProtocolType {
   PROTO_UDP,
-  PROTO_DTLS,
   PROTO_TCP,
   PROTO_SSLTCP,  // Pseudo-TLS.
   PROTO_TLS,
@@ -29,7 +28,6 @@ enum ProtocolType {
 };
 
 RTC_EXPORT extern const char UDP_PROTOCOL_NAME[];
-extern const char DTLS_PROTOCOL_NAME[];
 RTC_EXPORT extern const char TCP_PROTOCOL_NAME[];
 extern const char SSLTCP_PROTOCOL_NAME[];
 extern const char TLS_PROTOCOL_NAME[];

@@ -47,7 +47,6 @@
 using ::testing::_;
 using ::testing::AllOf;
 using ::testing::Field;
-using ::testing::Property;
 using ::testing::Return;
 
 namespace webrtc {
@@ -102,10 +101,10 @@ class SimulcastTestFixtureImpl::TestEncodedImageCallback
     bool is_h264 = (codec_specific_info->codecType == kVideoCodecH264);
     // Only store the base layer.
     if (encoded_image.SimulcastIndex().value_or(0) == 0) {
-      if (encoded_image.IsKey()) {
+      if (encoded_image._frameType == VideoFrameType::kVideoFrameKey) {
         encoded_key_frame_.SetEncodedData(EncodedImageBuffer::Create(
             encoded_image.data(), encoded_image.size()));
-        encoded_key_frame_.set_frame_type(VideoFrameType::kVideoFrameKey);
+        encoded_key_frame_._frameType = VideoFrameType::kVideoFrameKey;
       } else {
         encoded_frame_.SetEncodedData(EncodedImageBuffer::Create(
             encoded_image.data(), encoded_image.size()));
@@ -369,7 +368,7 @@ void SimulcastTestFixtureImpl::ExpectStream(VideoFrameType frame_type,
                                             int scaleResolutionDownBy) {
   EXPECT_CALL(
       encoder_callback_,
-      OnEncodedImage(AllOf(Property(&EncodedImage::frame_type, frame_type),
+      OnEncodedImage(AllOf(Field(&EncodedImage::_frameType, frame_type),
                            Field(&EncodedImage::_encodedWidth,
                                  kDefaultWidth / scaleResolutionDownBy),
                            Field(&EncodedImage::_encodedHeight,
@@ -713,8 +712,8 @@ void SimulcastTestFixtureImpl::SwitchingToOneStream(int width, int height) {
                                           VideoFrameType::kVideoFrameDelta);
   EXPECT_CALL(
       encoder_callback_,
-      OnEncodedImage(AllOf(Property(&EncodedImage::frame_type,
-                                    VideoFrameType::kVideoFrameKey),
+      OnEncodedImage(AllOf(Field(&EncodedImage::_frameType,
+                                 VideoFrameType::kVideoFrameKey),
                            Field(&EncodedImage::_encodedWidth, width),
                            Field(&EncodedImage::_encodedHeight, height)),
                      _))
@@ -945,13 +944,12 @@ void SimulcastTestFixtureImpl::TestDecodeWidthHeightSet() {
       .WillRepeatedly(
           [&](const EncodedImage& encoded_image,
               const CodecSpecificInfo* /* codec_specific_info */) {
-            EXPECT_EQ(encoded_image.frame_type(),
-                      VideoFrameType::kVideoFrameKey);
+            EXPECT_EQ(encoded_image._frameType, VideoFrameType::kVideoFrameKey);
 
             size_t index = encoded_image.SimulcastIndex().value_or(0);
             encoded_frame[index].SetEncodedData(EncodedImageBuffer::Create(
                 encoded_image.data(), encoded_image.size()));
-            encoded_frame[index].set_frame_type(encoded_image.frame_type());
+            encoded_frame[index]._frameType = encoded_image._frameType;
             return EncodedImageCallback::Result(
                 EncodedImageCallback::Result::OK, 0);
           });

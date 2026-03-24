@@ -12,7 +12,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <optional>
 #include <string>
 #include <utility>
 
@@ -86,21 +85,16 @@ void ParsedRtcEventLogBuilder::AdvanceTime(TimeDelta duration) {
   log_clock_.AdvanceTime(duration);
 }
 
-void ParsedRtcEventLogBuilder::LogVideoRecvConfig(uint32_t ssrc,
-                                                  uint32_t rtx_ssrc) {
+void ParsedRtcEventLogBuilder::LogVideoRecvConfig(uint32_t ssrc) {
   auto config = std::make_unique<rtclog::StreamConfig>();
   config->remote_ssrc = ssrc;
-  config->rtx_ssrc = rtx_ssrc;
   Log(std::make_unique<RtcEventVideoReceiveStreamConfig>(std::move(config)));
 }
 
-void ParsedRtcEventLogBuilder::LogRtpPacketIncoming(
-    uint32_t ssrc,
-    std::optional<uint16_t> rtx_original_sequence_number /*= std::nullopt*/) {
+void ParsedRtcEventLogBuilder::LogRtpPacketIncoming(uint32_t ssrc) {
   RtpPacketReceived rtp_packet(/*extensions=*/nullptr);
   rtp_packet.SetSsrc(ssrc);
-  Log(std::make_unique<RtcEventRtpPacketIncoming>(
-      rtp_packet, rtx_original_sequence_number));
+  Log(std::make_unique<RtcEventRtpPacketIncoming>(rtp_packet));
 }
 
 void ParsedRtcEventLogBuilder::Log(std::unique_ptr<RtcEvent> event) {

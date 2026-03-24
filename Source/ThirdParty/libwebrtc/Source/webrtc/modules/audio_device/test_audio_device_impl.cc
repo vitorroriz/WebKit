@@ -64,7 +64,7 @@ TestAudioDevice::TestAudioDevice(
 
 AudioDeviceGeneric::InitStatus TestAudioDevice::Init() {
   task_queue_ = env_.task_queue_factory().CreateTaskQueue(
-      "TestAudioDeviceModuleImpl", TaskQueueFactory::Priority::kNormal);
+      "TestAudioDeviceModuleImpl", TaskQueueFactory::Priority::NORMAL);
 
   RepeatingTaskHandle::Start(task_queue_.get(), [this]() {
     ProcessAudio();

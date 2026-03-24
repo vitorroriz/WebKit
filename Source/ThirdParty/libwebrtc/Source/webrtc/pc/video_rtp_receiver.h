@@ -17,7 +17,6 @@
 #include <string>
 #include <vector>
 
-#include "absl/strings/string_view.h"
 #include "api/crypto/frame_decryptor_interface.h"
 #include "api/dtls_transport_interface.h"
 #include "api/frame_transformer_interface.h"
@@ -47,20 +46,16 @@ class VideoRtpReceiver : public RtpReceiverInternal {
   // An SSRC of 0 will create a receiver that will match the first SSRC it
   // sees. Must be called on signaling thread.
   VideoRtpReceiver(Thread* worker_thread,
-                   absl::string_view receiver_id,
-                   std::vector<std::string> streams_ids,
-                   VideoMediaReceiveChannelInterface* media_channel = nullptr);
+                   std::string receiver_id,
+                   std::vector<std::string> streams_ids);
   // TODO(hbos): Remove this when streams() is removed.
   // https://crbug.com/webrtc/9480
-  // This should be PLAN_B_ONLY; but this marking is deferred due to templating
-  // issues
   VideoRtpReceiver(
       Thread* worker_thread,
-      absl::string_view receiver_id,
-      const std::vector<scoped_refptr<MediaStreamInterface>>& streams,
-      VideoMediaReceiveChannelInterface* media_channel = nullptr);
+      const std::string& receiver_id,
+      const std::vector<scoped_refptr<MediaStreamInterface>>& streams);
 
-  ~VideoRtpReceiver() override;
+  virtual ~VideoRtpReceiver();
 
   scoped_refptr<VideoTrackInterface> video_track() const { return track_; }
 
@@ -94,7 +89,6 @@ class VideoRtpReceiver : public RtpReceiverInternal {
   void SetupUnsignaledMediaChannel() override;
   std::optional<uint32_t> ssrc() const override;
   void NotifyFirstPacketReceived() override;
-  void NotifyFirstPacketReceivedAfterReceptiveChange() override;
   void set_stream_ids(std::vector<std::string> stream_ids) override;
   void set_transport(
       scoped_refptr<DtlsTransportInterface> dtls_transport) override;

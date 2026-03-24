@@ -32,6 +32,7 @@
 #include "rtc_base/socket_factory.h"
 #include "rtc_base/socket_server.h"
 #include "rtc_base/test_client.h"
+#include "rtc_base/third_party/sigslot/sigslot.h"
 #include "rtc_base/thread.h"
 #include "rtc_base/virtual_socket_server.h"
 #include "test/create_test_environment.h"
@@ -332,7 +333,7 @@ TEST(NatTest, TestVirtualIPv6) {
   }
 }
 
-class NatTcpTest : public ::testing::Test {
+class NatTcpTest : public ::testing::Test, public sigslot::has_slots<> {
  public:
   NatTcpTest()
       : env_(CreateTestEnvironment()),
@@ -366,10 +367,9 @@ class NatTcpTest : public ::testing::Test {
   void OnCloseEvent(Socket* socket, int error) {}
 
   void ConnectEvents() {
-    server_->SubscribeReadEvent(
-        this, [this](Socket* socket) { OnAcceptEvent(socket); });
+    server_->SignalReadEvent.connect(this, &NatTcpTest::OnAcceptEvent);
     client_->SubscribeConnectEvent(
-        this, [this](Socket* socket) { OnConnectEvent(socket); });
+        [this](Socket* socket) { OnConnectEvent(socket); });
   }
 
   const Environment env_;

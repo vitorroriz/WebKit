@@ -31,18 +31,13 @@
 namespace webrtc {
 namespace {
 
-// TODO(crbug.com/470337728): make use of QoS instead of dispatch queue
-// priorities to enable greater fidelity mapping of AUDIO and VIDEO
-// priorities.
 int TaskQueuePriorityToGCD(TaskQueueFactory::Priority priority) {
   switch (priority) {
-    case TaskQueueFactory::Priority::kNormal:
+    case TaskQueueFactory::Priority::NORMAL:
       return DISPATCH_QUEUE_PRIORITY_DEFAULT;
-    case TaskQueueFactory::Priority::kHigh:
-    case TaskQueueFactory::Priority::kAudio:
-    case TaskQueueFactory::Priority::kVideo:
+    case TaskQueueFactory::Priority::HIGH:
       return DISPATCH_QUEUE_PRIORITY_HIGH;
-    case TaskQueueFactory::Priority::kLow:
+    case TaskQueueFactory::Priority::LOW:
       return DISPATCH_QUEUE_PRIORITY_LOW;
   }
 }

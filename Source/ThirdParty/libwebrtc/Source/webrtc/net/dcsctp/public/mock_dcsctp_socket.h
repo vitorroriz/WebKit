@@ -38,11 +38,6 @@ class MockDcSctpSocket : public DcSctpSocketInterface {
   MOCK_METHOD(void, HandleTimeout, (TimeoutID timeout_id), (override));
 
   MOCK_METHOD(void, Connect, (), (override));
-  MOCK_METHOD(bool,
-              ConnectWithConnectionToken,
-              (webrtc::ArrayView<const uint8_t>,
-               webrtc::ArrayView<const uint8_t>),
-              (override));
 
   MOCK_METHOD(void,
               RestoreFromState,

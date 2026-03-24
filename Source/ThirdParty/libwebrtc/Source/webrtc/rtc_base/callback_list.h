@@ -190,7 +190,7 @@ class CallbackList {
 
   // Adds a new receiver with no removal tag.
   template <typename F>
-  [[deprecated]] void AddReceiver(F&& f) {
+  void AddReceiver(F&& f) {
     receivers_.AddReceiver(
         UntypedFunction::PrepareArgs<void(ArgT...)>(std::forward<F>(f)));
   }

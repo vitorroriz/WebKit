@@ -50,7 +50,6 @@
 #include "call/payload_type_picker.h"
 #include "p2p/base/port.h"
 #include "p2p/base/port_allocator.h"
-#include "pc/channel_interface.h"
 #include "pc/data_channel_utils.h"
 #include "pc/jsep_transport_controller.h"
 #include "pc/peer_connection_internal.h"
@@ -60,7 +59,6 @@
 #include "pc/session_description.h"
 #include "pc/transport_stats.h"
 #include "pc/usage_pattern.h"
-#include "rtc_base/containers/flat_map.h"
 #include "rtc_base/rtc_certificate.h"
 #include "rtc_base/ssl_certificate.h"
 #include "rtc_base/ssl_stream_adapter.h"
@@ -72,7 +70,7 @@ namespace webrtc {
 class MockPeerConnectionInternal : public PeerConnectionInternal {
  public:
   MockPeerConnectionInternal() {}
-  ~MockPeerConnectionInternal() override = default;
+  ~MockPeerConnectionInternal() = default;
   // PeerConnectionInterface
   MOCK_METHOD(scoped_refptr<StreamCollectionInterface>,
               local_streams,
@@ -132,13 +130,10 @@ class MockPeerConnectionInternal : public PeerConnectionInternal {
               GetTransceivers,
               (),
               (const, override));
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
   MOCK_METHOD(bool,
               GetStats,
               (StatsObserver*, MediaStreamTrackInterface*, StatsOutputLevel),
               (override));
-#pragma clang diagnostic pop
   MOCK_METHOD(void, GetStats, (RTCStatsCollectorCallback*), (override));
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-designated-field-initializers"
@@ -314,7 +309,7 @@ class MockPeerConnectionInternal : public PeerConnectionInternal {
   MOCK_METHOD(bool,
               ValidateBundleSettings,
               (const webrtc::SessionDescription*,
-               (const flat_map<std::string, const webrtc::ContentGroup*>&)),
+               (const std::map<std::string, const webrtc::ContentGroup*>&)),
               (override));
   MOCK_METHOD(RTCErrorOr<scoped_refptr<RtpTransceiverInterface>>,
               AddTransceiver,

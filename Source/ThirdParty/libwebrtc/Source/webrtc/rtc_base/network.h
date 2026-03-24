@@ -16,7 +16,6 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -29,15 +28,16 @@
 #include "api/scoped_refptr.h"
 #include "api/sequence_checker.h"
 #include "api/task_queue/pending_task_safety_flag.h"
-#include "rtc_base/callback_list.h"
 #include "rtc_base/checks.h"
 #include "rtc_base/ip_address.h"
 #include "rtc_base/mdns_responder_interface.h"
 #include "rtc_base/network_constants.h"
 #include "rtc_base/network_monitor.h"
 #include "rtc_base/network_monitor_factory.h"
+#include "rtc_base/sigslot_trampoline.h"
 #include "rtc_base/socket_factory.h"
 #include "rtc_base/system/rtc_export.h"
+#include "rtc_base/third_party/sigslot/sigslot.h"
 #include "rtc_base/thread.h"
 #include "rtc_base/thread_annotations.h"
 
@@ -71,6 +71,7 @@ std::string MakeNetworkKey(absl::string_view name,
 // Utility function that attempts to determine an adapter type by an interface
 // name (e.g., "wlan0"). Can be used by NetworkManager subclasses when other
 // mechanisms fail to determine the type.
+RTC_EXPORT AdapterType GetAdapterTypeFromName(absl::string_view network_name);
 RTC_EXPORT AdapterType GetAdapterTypeFromName(absl::string_view network_name);
 
 class DefaultLocalAddressProvider {
@@ -128,7 +129,8 @@ class NetworkMask {
 class RTC_EXPORT NetworkManager : public DefaultLocalAddressProvider,
                                   public MdnsResponderProvider {
  public:
-  NetworkManager() = default;
+  NetworkManager()
+      : networks_changed_trampoline_(this), error_trampoline_(this) {}
   // This enum indicates whether adapter enumeration is allowed.
   enum EnumerationPermission {
     ENUMERATION_ALLOWED,  // Adapter enumeration is allowed. Getting 0 network
@@ -137,6 +139,12 @@ class RTC_EXPORT NetworkManager : public DefaultLocalAddressProvider,
     ENUMERATION_BLOCKED,  // Adapter enumeration is disabled.
                           // GetAnyAddressNetworks() should be used instead.
   };
+
+  // Called when network list is updated.
+  sigslot::signal0<> SignalNetworksChanged;
+
+  // Indicates a failure when getting list of network interfaces.
+  sigslot::signal0<> SignalError;
 
   // This should be called on the NetworkManager's thread before the
   // NetworkManager is used. Subclasses may override this if necessary.
@@ -187,22 +195,20 @@ class RTC_EXPORT NetworkManager : public DefaultLocalAddressProvider,
   MdnsResponderInterface* GetMdnsResponder() const override;
 
   virtual void set_vpn_list(const std::vector<NetworkMask>& /* vpn */) {}
-
-  // The implementation of the Subscribe methods is in the .cc file due
-  // to linking issues with Chrome.
-  [[deprecated]] void SubscribeNetworksChanged(
-      absl::AnyInvocable<void()> callback);
-  void SubscribeNetworksChanged(void* tag, absl::AnyInvocable<void()> callback);
-  void UnsubscribeNetworksChanged(void* tag);
-  void NotifyNetworksChanged() { networks_changed_callbacks_.Send(); }
-  [[deprecated]] void SubscribeError(absl::AnyInvocable<void()> callback);
-  void SubscribeError(void* tag, absl::AnyInvocable<void()> callback);
-  void UnsubscribeError(void* tag);
-  void NotifyError() { error_callbacks_.Send(); }
+  void SubscribeNetworksChanged(absl::AnyInvocable<void()> callback) {
+    networks_changed_trampoline_.Subscribe(std::move(callback));
+  }
+  void NotifyNetworksChanged() { SignalNetworksChanged(); }
+  void SubscribeError(absl::AnyInvocable<void()> callback) {
+    error_trampoline_.Subscribe(std::move(callback));
+  }
+  void NotifyError() { SignalError(); }
 
  private:
-  CallbackList<> networks_changed_callbacks_;
-  CallbackList<> error_callbacks_;
+  SignalTrampoline<NetworkManager, &NetworkManager::SignalNetworksChanged>
+      networks_changed_trampoline_;
+  SignalTrampoline<NetworkManager, &NetworkManager::SignalError>
+      error_trampoline_;
 };
 
 // Represents a Unix-type network interface, with a name and single address.
@@ -223,49 +229,18 @@ class RTC_EXPORT Network {
           const IPAddress& prefix,
           int prefix_length,
           AdapterType type);
-  // A Network is immovable.
-  Network(const Network&) = delete;
-  Network& operator=(const Network&) = delete;
-  Network(Network&&) = delete;
-  Network& operator=(Network&&) = delete;
+  // Copying a Network only works if signal listeners have not been set.
+  Network(const Network& o);
+  Network(Network&&) = default;
   ~Network();
 
-  // The Clone operator creates a new network
-  // with the same configuration, but no connected signals.
-  std::unique_ptr<Network> Clone() const;
-
   // This signal is fired whenever type() or underlying_type_for_vpn() changes.
-  [[deprecated]] void SubscribeTypeChanged(
-      absl::AnyInvocable<void(const Network*)> callback) {
-    type_changed_callbacks_.AddReceiver(std::move(callback));
-  }
-  void SubscribeTypeChanged(void* tag,
-                            absl::AnyInvocable<void(const Network*)> callback) {
-    type_changed_callbacks_.AddReceiver(tag, std::move(callback));
-  }
-  void UnsubscribeTypeChanged(void* tag) {
-    type_changed_callbacks_.RemoveReceivers(tag);
-  }
-  void NotifyTypeChanged(const Network* network) {
-    type_changed_callbacks_.Send(network);
-  }
+  // Mutable, to support connecting on the const Network passed to Port
+  // constructor.
+  mutable sigslot::signal1<const Network*> SignalTypeChanged;
 
   // This signal is fired whenever network preference changes.
-  [[deprecated]] void SubscribeNetworkPreferenceChanged(
-      absl::AnyInvocable<void(const Network*)> callback) {
-    network_preference_changed_callbacks_.AddReceiver(std::move(callback));
-  }
-  void SubscribeNetworkPreferenceChanged(
-      void* tag,
-      absl::AnyInvocable<void(const Network*)> callback) {
-    network_preference_changed_callbacks_.AddReceiver(tag, std::move(callback));
-  }
-  void UnsubscribeNetworkPreferenceChanged(void* tag) {
-    network_preference_changed_callbacks_.RemoveReceivers(tag);
-  }
-  void NotifyNetworkPreferenceChanged(Network* network) {
-    network_preference_changed_callbacks_.Send(network);
-  }
+  sigslot::signal1<const Network*> SignalNetworkPreferenceChanged;
 
   const DefaultLocalAddressProvider* default_local_address_provider() const {
     return default_local_address_provider_;
@@ -364,7 +339,7 @@ class RTC_EXPORT Network {
     if (type != ADAPTER_TYPE_VPN) {
       underlying_type_for_vpn_ = ADAPTER_TYPE_UNKNOWN;
     }
-    NotifyTypeChanged(this);
+    SignalTypeChanged(this);
   }
 
   void set_underlying_type_for_vpn(AdapterType type) {
@@ -372,7 +347,7 @@ class RTC_EXPORT Network {
       return;
     }
     underlying_type_for_vpn_ = type;
-    NotifyTypeChanged(this);
+    SignalTypeChanged(this);
   }
 
   bool IsVpn() const { return type_ == ADAPTER_TYPE_VPN; }
@@ -424,14 +399,11 @@ class RTC_EXPORT Network {
       return;
     }
     network_preference_ = val;
-    NotifyNetworkPreferenceChanged(this);
+    SignalNetworkPreferenceChanged(this);
   }
 
-  NetworkSlice network_slice() const { return network_slice_; }
-  void set_network_slice(NetworkSlice slice) { network_slice_ = slice; }
-
-  static std::tuple<AdapterType, bool /* vpn */, NetworkSlice>
-  GuessAdapterFromNetworkCost(int network_cost);
+  static std::pair<AdapterType, bool /* vpn */> GuessAdapterFromNetworkCost(
+      int network_cost);
 
   // Debugging description of this network
   std::string ToString() const;
@@ -453,9 +425,7 @@ class RTC_EXPORT Network {
   bool active_ = true;
   uint16_t id_ = 0;
   NetworkPreference network_preference_ = NetworkPreference::NEUTRAL;
-  NetworkSlice network_slice_ = NetworkSlice::NO_SLICE;
-  CallbackList<const Network*> type_changed_callbacks_;
-  CallbackList<const Network*> network_preference_changed_callbacks_;
+
   friend class NetworkManager;
 };
 
@@ -532,7 +502,8 @@ class RTC_EXPORT NetworkManagerBase : public NetworkManager {
 // Basic implementation of the NetworkManager interface that gets list
 // of networks using OS APIs.
 class RTC_EXPORT BasicNetworkManager : public NetworkManagerBase,
-                                       public NetworkBinderInterface {
+                                       public NetworkBinderInterface,
+                                       public sigslot::has_slots<> {
  public:
   BasicNetworkManager(
       const Environment& env,
@@ -633,5 +604,6 @@ class RTC_EXPORT BasicNetworkManager : public NetworkManagerBase,
 #endif // WEBRTC_WEBKIT_BUILD
 
 }  //  namespace webrtc
+
 
 #endif  // RTC_BASE_NETWORK_H_

@@ -271,17 +271,13 @@ bool OutstandingData::NackItem(UnwrappedTSN tsn,
                                bool retransmit_now,
                                bool do_fast_retransmit) {
   Item& item = GetItem(tsn);
-  bool was_outstanding = item.is_outstanding();
-
-  Item::NackAction action = item.Nack(retransmit_now);
-
-  if (was_outstanding && !item.is_outstanding()) {
+  if (item.is_outstanding()) {
     unacked_payload_bytes_ -= item.data().size();
     unacked_packet_bytes_ -= GetSerializedChunkSize(item.data());
     --unacked_items_;
   }
 
-  switch (action) {
+  switch (item.Nack(retransmit_now)) {
     case Item::NackAction::kNothing:
       return false;
     case Item::NackAction::kRetransmit:
@@ -339,13 +335,7 @@ void OutstandingData::AbandonAllFor(const Item& item) {
         to_be_fast_retransmitted_.erase(tsn);
         to_be_retransmitted_.erase(tsn);
       }
-      bool was_outstanding = other.is_outstanding();
       other.Abandon();
-      if (was_outstanding) {
-        unacked_payload_bytes_ -= other.data().size();
-        unacked_packet_bytes_ -= GetSerializedChunkSize(other.data());
-        --unacked_items_;
-      }
     }
   }
 }
@@ -527,12 +517,10 @@ OutstandingData::GetChunkStatesForTesting() const {
       state = State::kToBeRetransmitted;
     } else if (item.is_acked()) {
       state = State::kAcked;
-    } else if (item.is_nacked()) {
-      state = State::kNacked;
     } else if (item.is_outstanding()) {
       state = State::kInFlight;
     } else {
-      RTC_CHECK_NOTREACHED();
+      state = State::kNacked;
     }
 
     states.emplace_back(tsn.Wrap(), state);

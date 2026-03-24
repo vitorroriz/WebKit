@@ -60,24 +60,18 @@ enum class FecMechanism {
 };
 
 // Used in RtcpFeedback struct.
-// Also used as an UMA key.
 enum class RtcpFeedbackType {
-  NONE,
   CCM,
   LNTF,  // "goog-lntf"
   NACK,
   REMB,  // "goog-remb"
   TRANSPORT_CC,
   CCFB,  // RFC8888
-  MAX = CCFB
 };
 
 template <typename Sink>
 void AbslStringify(Sink& sink, RtcpFeedbackType type) {
   switch (type) {
-    case RtcpFeedbackType::NONE:
-      sink.Append("NONE");
-      break;
     case RtcpFeedbackType::CCM:
       sink.Append("CCM");
       break;
@@ -234,7 +228,7 @@ struct RTC_EXPORT RtpCodec {
 // implementation of a codec.
 struct RTC_EXPORT RtpCodecCapability : public RtpCodec {
   RtpCodecCapability();
-  ~RtpCodecCapability() override;
+  virtual ~RtpCodecCapability();
 
   // Default payload type for this codec. Mainly needed for codecs that have
   // statically assigned payload types.
@@ -647,7 +641,7 @@ struct RTC_EXPORT RtpEncodingParameters {
 struct RTC_EXPORT RtpCodecParameters : public RtpCodec {
   RtpCodecParameters();
   RtpCodecParameters(const RtpCodecParameters&);
-  ~RtpCodecParameters() override;
+  virtual ~RtpCodecParameters();
 
   // Payload type used to identify this codec in RTP packets.
   // This must always be present, and must be unique across all codecs using

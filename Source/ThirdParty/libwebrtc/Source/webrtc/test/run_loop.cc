@@ -9,8 +9,6 @@
  */
 #include "test/run_loop.h"
 
-#include "absl/functional/any_invocable.h"
-#include "api/task_queue/pending_task_safety_flag.h"
 #include "api/task_queue/task_queue_base.h"
 #include "api/units/time_delta.h"
 #include "rtc_base/socket.h"
@@ -21,7 +19,7 @@
 namespace webrtc {
 namespace test {
 
-RunLoop::RunLoop() : weak_factory_(this) {
+RunLoop::RunLoop() {
   worker_thread_.WrapCurrent();
 }
 
@@ -39,23 +37,6 @@ void RunLoop::Run() {
 
 void RunLoop::Quit() {
   socket_server_.FailNextWait();
-}
-
-absl::AnyInvocable<void()> RunLoop::QuitClosure() {
-  return [loop = weak_factory_.GetWeakPtr()] {
-    if (loop) {
-      loop->Quit();
-    }
-  };
-}
-
-void RunLoop::RunFor(TimeDelta max_wait_duration) {
-  // If Quit is called before the timeout expires, then we'll cancel this post
-  // task automatically.
-  ScopedTaskSafety auto_cancel;
-  worker_thread_.PostDelayedHighPrecisionTask(
-      SafeTask(auto_cancel.flag(), QuitClosure()), max_wait_duration);
-  Run();
 }
 
 void RunLoop::Flush() {

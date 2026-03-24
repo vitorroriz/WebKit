@@ -41,6 +41,8 @@ using ::testing::Eq;
 using ::testing::InSequence;
 using ::testing::Matcher;
 using ::testing::NiceMock;
+using ::testing::Pointee;
+using ::testing::Property;
 
 class MockAssemblerEvents : public AssemblerEvents {
  public:
@@ -160,7 +162,7 @@ class AssemblerTest : public SimulatedTimeTestFixture {
   void InsertPacket(const RtpPacketReceived& rtp_packet) {
     SendTask([this, &rtp_packet]() {
       RTC_DCHECK_RUN_ON(queue_ptr_);
-      assembler_->OnReceivedRtpPacket(rtp_packet);
+      assembler_->InsertPacket(rtp_packet);
     });
   }
 

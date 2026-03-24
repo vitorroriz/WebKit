@@ -150,6 +150,8 @@ NetEqTest::SimulationStepResult NetEqTest::RunToNextGetAudio() {
           callbacks_.post_insert_packet->AfterInsertPacket(*packet_data,
                                                            neteq_.get());
         }
+      } else {
+        neteq_->InsertEmptyPacket(rtp_header);
       }
       if (last_packet_time_ms_) {
         current_state_.packet_iat_ms.push_back(time_now_ms -

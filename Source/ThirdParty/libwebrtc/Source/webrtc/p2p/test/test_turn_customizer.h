@@ -24,7 +24,7 @@ namespace webrtc {
 class TestTurnCustomizer : public TurnCustomizer {
  public:
   TestTurnCustomizer() {}
-  ~TestTurnCustomizer() override {}
+  virtual ~TestTurnCustomizer() {}
 
   enum TestTurnAttributeExtensions {
     // Test only attribute

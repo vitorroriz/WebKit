@@ -56,10 +56,7 @@ bool BaseCapturerPipeWire::IsSupported() {
 BaseCapturerPipeWire::BaseCapturerPipeWire(const DesktopCaptureOptions& options,
                                            CaptureType type)
     : BaseCapturerPipeWire(options,
-                           std::make_unique<ScreenCastPortal>(
-                               type,
-                               this,
-                               options.prefer_cursor_embedded())) {
+                           std::make_unique<ScreenCastPortal>(type, this)) {
   is_screencast_portal_ = true;
 }
 
@@ -200,7 +197,7 @@ bool BaseCapturerPipeWire::GetSourceList(SourceList* sources) {
   // is often treated as a null/placeholder id, so we shouldn't use that.
   // TODO(https://crbug.com/1297671): Reconsider type of ID when plumbing
   // token that will enable stream re-use.
-  sources->push_back({.id = source_id_});
+  sources->push_back({source_id_});
   return true;
 }
 

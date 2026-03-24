@@ -157,8 +157,6 @@ class FakeAudioReceiveStream final : public AudioReceiveStreamInterface {
       bool get_and_clear_legacy_stats) const override;
   void SetSink(AudioSinkInterface* sink) override;
   void SetGain(float gain) override;
-  void SetJitterBufferMaxPackets(size_t max_packets) override {}
-  void SetJitterBufferFastAccelerate(bool fast_accelerate) override {}
   bool SetBaseMinimumPlayoutDelayMs(int delay_ms) override {
     base_mininum_playout_delay_ms_ = delay_ms;
     return true;
@@ -207,7 +205,7 @@ class FakeVideoSendStream final : public VideoSendStream,
   int GetLastWidth() const;
   int GetLastHeight() const;
   int64_t GetLastTimestamp() const;
-  void SetStats(const VideoSendStream::Stats& stats) override;
+  void SetStats(const VideoSendStream::Stats& stats);
   void SetCsrcs(ArrayView<const uint32_t> csrcs) override;
   int num_encoder_reconfigurations() const {
     return num_encoder_reconfigurations_;
@@ -220,7 +218,7 @@ class FakeVideoSendStream final : public VideoSendStream,
   void InjectVideoSinkWants(const VideoSinkWants& wants);
 
   VideoSourceInterface<VideoFrame>* source() const { return source_; }
-  void GenerateKeyFrame(const std::vector<std::string>& rids) override;
+  void GenerateKeyFrame(const std::vector<std::string>& rids);
   const std::vector<std::string>& GetKeyFramesRequested() const {
     return keyframes_requested_by_rid_;
   }
@@ -291,7 +289,7 @@ class FakeVideoReceiveStream final : public VideoReceiveStreamInterface {
     config_.rtp.local_ssrc = local_ssrc;
   }
 
-  void UpdateRtxSsrc(uint32_t ssrc) override { config_.rtp.rtx_ssrc = ssrc; }
+  void UpdateRtxSsrc(uint32_t ssrc) { config_.rtp.rtx_ssrc = ssrc; }
 
   void SetFrameDecryptor(scoped_refptr<FrameDecryptorInterface>
                          /* frame_decryptor */) override {}
@@ -332,8 +330,7 @@ class FakeVideoReceiveStream final : public VideoReceiveStreamInterface {
     config_.rtp.rtcp_xr = rtcp_xr;
   }
 
-  void SetAssociatedPayloadTypes(
-      std::map<int, int> associated_payload_types) override {
+  void SetAssociatedPayloadTypes(std::map<int, int> associated_payload_types) {
     config_.rtp.rtx_associated_payload_types =
         std::move(associated_payload_types);
   }
@@ -364,7 +361,9 @@ class FakeFlexfecReceiveStream final : public FlexfecReceiveStream {
  public:
   explicit FakeFlexfecReceiveStream(const FlexfecReceiveStream::Config config);
 
-  void SetLocalSsrc(uint32_t local_ssrc) { config_.local_ssrc = local_ssrc; }
+  void SetLocalSsrc(uint32_t local_ssrc) {
+    config_.rtp.local_ssrc = local_ssrc;
+  }
 
   void SetRtcpMode(RtcpMode mode) override { config_.rtcp_mode = mode; }
 
@@ -375,7 +374,7 @@ class FakeFlexfecReceiveStream final : public FlexfecReceiveStream {
 
   const FlexfecReceiveStream::Config& GetConfig() const;
 
-  uint32_t remote_ssrc() const { return config_.remote_ssrc; }
+  uint32_t remote_ssrc() const { return config_.rtp.remote_ssrc; }
 
   const ReceiveStatistics* GetStats() const override { return nullptr; }
 
@@ -434,10 +433,8 @@ class FakeCall final : public Call, public PacketReceiver {
       const BitrateSettings& /* preferences */) override {}
   void SetPreferredRtcpCcAckType(
       RtcpFeedbackType preferred_rtcp_cc_ack_type) override {}
-  std::optional<int> FeedbackAccordingToRfc8888Count() override { return 0; }
-  std::optional<int> FeedbackAccordingToTransportCcCount() override {
-    return 0;
-  }
+  std::optional<int> FeedbackAccordingToRfc8888Count() { return 0; }
+  std::optional<int> FeedbackAccordingToTransportCcCount() { return 0; }
 
  private:
   AudioSendStream* CreateAudioSendStream(

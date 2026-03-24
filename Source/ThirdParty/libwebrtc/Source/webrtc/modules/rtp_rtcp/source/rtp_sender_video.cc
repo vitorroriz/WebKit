@@ -26,7 +26,6 @@
 #include "api/field_trials_view.h"
 #include "api/make_ref_counted.h"
 #include "api/media_types.h"
-#include "api/task_queue/task_queue_factory.h"
 #include "api/transport/rtp/corruption_detection_message.h"
 #include "api/transport/rtp/dependency_descriptor.h"
 #include "api/units/data_rate.h"
@@ -211,11 +210,7 @@ RTPSenderVideo::RTPSenderVideo(const Config& config)
                     config.frame_transformer,
                     rtp_sender_->SSRC(),
                     rtp_sender_->Rid(),
-                    config.task_queue_factory,
-                    config.field_trials->IsEnabled(
-                        "WebRTC-MediaTaskQueuePriorities")
-                        ? TaskQueueFactory::Priority::kVideo
-                        : TaskQueueFactory::Priority::kNormal)
+                    config.task_queue_factory)
               : nullptr) {
   if (frame_transformer_delegate_)
     frame_transformer_delegate_->Init();

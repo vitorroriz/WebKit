@@ -41,8 +41,7 @@ TestClient::TestClient(std::unique_ptr<AsyncPacketSocket> socket,
       [&](AsyncPacketSocket* socket, const ReceivedIpPacket& packet) {
         OnPacket(socket, packet);
       });
-  socket_->SubscribeReadyToSend(
-      this, [this](AsyncPacketSocket* socket) { OnReadyToSend(socket); });
+  socket_->SignalReadyToSend.connect(this, &TestClient::OnReadyToSend);
 }
 
 TestClient::~TestClient() {}

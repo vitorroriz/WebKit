@@ -73,7 +73,7 @@ class VideoAnalyzer : public PacketReceiver,
                 Clock* clock,
                 std::string rtp_dump_name,
                 TaskQueueBase* task_queue);
-  ~VideoAnalyzer() override;
+  ~VideoAnalyzer();
 
   virtual void SetReceiver(PacketReceiver* receiver);
   void SetSource(VideoSourceInterface<VideoFrame>* video_source,

@@ -18,7 +18,6 @@
 #include "api/environment/environment.h"
 #include "api/rtp_parameters.h"
 #include "api/sequence_checker.h"
-#include "api/task_queue/task_queue_base.h"
 #include "api/video/encoded_frame.h"
 #include "api/video/video_codec_type.h"
 #include "call/video_receive_stream.h"
@@ -33,9 +32,6 @@ VideoReceiveStreamInterface::Config CreateVideoReceiveStreamConfig(
     uint32_t ssrc) {
   VideoReceiveStreamInterface::Config config(/*rtcp_send_transport=*/nullptr);
   config.rtp.remote_ssrc = ssrc;
-  // From `kNackHistoryMs` in webrtc_video_engine.cc. This enables creating the
-  // `NackRequester`.
-  config.rtp.nack.rtp_history_ms = 1000;
   // The value of `local_ssrc` is not really used, but we need to set it to
   // _something_ due to an RTC_DCHECK in rtp_video_stream_receiver2.cc.
   config.rtp.local_ssrc = ssrc + 1;
@@ -55,7 +51,7 @@ Assembler::Assembler(const Environment& env,
       // Provide the minimal needed dependencies to the
       // `RtpVideoStreamReceiver2`.
       rtp_video_stream_receiver2_(env_,
-                                  TaskQueueBase::Current(),
+                                  /*current_queue=*/nullptr,
                                   /*transport=*/this,
                                   /*rtt_stats=*/nullptr,
                                   /*packet_router=*/nullptr,
@@ -63,7 +59,7 @@ Assembler::Assembler(const Environment& env,
                                   rtp_receive_statistics_.get(),
                                   /*rtcp_packet_type_counter_observer=*/nullptr,
                                   /*rtcp_cname_callback=*/nullptr,
-                                  &nack_periodic_processor_,
+                                  /*nack_periodic_processor=*/nullptr,
                                   /*complete_frame_callback=*/this,
                                   /*frame_decryptor=*/nullptr,
                                   /*frame_transformer=*/nullptr),
@@ -78,7 +74,7 @@ Assembler::~Assembler() {
   rtp_video_stream_receiver2_.StopReceive();
 }
 
-void Assembler::OnReceivedRtpPacket(const RtpPacketReceived& rtp_packet) {
+void Assembler::InsertPacket(const RtpPacketReceived& rtp_packet) {
   RTC_DCHECK_RUN_ON(&sequence_checker_);
   // Register all payload types as generic codec with raw packetization.
   uint8_t payload_type = rtp_packet.PayloadType();

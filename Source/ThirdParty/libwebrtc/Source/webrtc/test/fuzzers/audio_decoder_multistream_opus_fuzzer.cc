@@ -38,7 +38,7 @@ AudioDecoderMultiChannelOpusConfig MakeDecoderConfig(
 }
 
 void FuzzOneInput(const uint8_t* data, size_t size) {
-  AudioDecoderMultiChannelOpusConfig surround_configs[] = {
+  const AudioDecoderMultiChannelOpusConfig kSurroundConfigs[] = {
       MakeDecoderConfig(1, 1, 0, {0}),  // Mono
 
       MakeDecoderConfig(2, 2, 0, {0, 0}),  // Copy the first (of
@@ -56,10 +56,10 @@ void FuzzOneInput(const uint8_t* data, size_t size) {
 
   FuzzDataHelper helper(MakeArrayView(data, size));
 
-  auto config = helper.MoveOneOf(surround_configs);
+  const auto config = helper.SelectOneOf(kSurroundConfigs);
   RTC_CHECK(config.IsOk());
   std::unique_ptr<AudioDecoder> dec =
-      AudioDecoderMultiChannelOpus::MakeAudioDecoder(std::move(config));
+      AudioDecoderMultiChannelOpus::MakeAudioDecoder(config);
   RTC_CHECK(dec);
   const int kSampleRateHz = 48000;
   const size_t kAllocatedOuputSizeSamples =

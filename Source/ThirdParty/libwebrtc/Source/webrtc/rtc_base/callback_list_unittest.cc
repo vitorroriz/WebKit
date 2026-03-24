@@ -39,9 +39,7 @@ TEST(CallbackList, NoParameterMessageTest) {
 
   c.Send();
 }
-// Temporary while we deprecate tag-less AddReceiver
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 TEST(CallbackList, ReferenceTest) {
   CallbackList<int&> c;
   int index = 1;
@@ -267,7 +265,6 @@ TEST(CallbackList, RemoveFromSend) {
   c.Send();
   EXPECT_EQ(removal_tag, 1);
 }
-#pragma clang diagnostic pop
 
 }  // namespace
 }  // namespace webrtc

@@ -463,7 +463,7 @@ TEST(TaskQueuePacedSenderTest, NoMinSleepTimeWhenProbing) {
   const DataRate kPacingDataRate = kPacketSize / kPacketPacingTime;
   pacer.SetConfig(PacerConfig::Create(time_controller.GetClock()->CurrentTime(),
                                       /*send_rate=*/kPacingDataRate,
-                                      /*pad_rate=*/DataRate::Zero()));
+                                      /*padding_rate=*/DataRate::Zero()));
   pacer.EnsureStarted();
   EXPECT_CALL(packet_router, FetchFec).WillRepeatedly([]() {
     return std::vector<std::unique_ptr<RtpPacketToSend>>();
@@ -679,7 +679,7 @@ TEST(TaskQueuePacedSenderTest, PostedPacketsNotSendFromRemovePacketsForSsrc) {
   pacer.EnsureStarted();
 
   auto encoder_queue = time_controller.GetTaskQueueFactory()->CreateTaskQueue(
-      "encoder_queue", TaskQueueFactory::Priority::kHigh);
+      "encoder_queue", TaskQueueFactory::Priority::HIGH);
 
   EXPECT_CALL(packet_router, SendPacket).Times(5);
   encoder_queue->PostTask([&pacer] {
@@ -790,7 +790,7 @@ TEST(TaskQueuePacedSenderTest,
   pacer.SetConfig(PacerConfig::Create(
       time_controller.GetClock()->CurrentTime(),
       /*send_rate=*/DataRate::KilobitsPerSec(500),
-      /*pad_rate=*/DataRate::Zero(), /*time_window=*/TimeDelta::Zero()));
+      /*padding_rate=*/DataRate::Zero(), /*time_window=*/TimeDelta::Zero()));
 
   bool send_packet_stack = false;
   EXPECT_CALL(packet_router, SendPacket)
@@ -803,7 +803,7 @@ TEST(TaskQueuePacedSenderTest,
         pacer.SetConfig(
             PacerConfig::Create(time_controller.GetClock()->CurrentTime(),
                                 /*send_rate=*/DataRate::KilobitsPerSec(1000),
-                                /*pad_rate=*/DataRate::Zero(),
+                                /*padding_rate=*/DataRate::Zero(),
                                 /*time_window=*/TimeDelta::Zero()));
       });
   pacer.EnqueuePackets(

@@ -95,7 +95,7 @@ class RTPSenderVideo : public RTPVideoFrameSenderInterface {
 
   explicit RTPSenderVideo(const Config& config);
 
-  ~RTPSenderVideo() override;
+  virtual ~RTPSenderVideo();
 
   // `capture_time` and `clock::CurrentTime` should be using the same epoch.
   // `expected_retransmission_time.IsFinite()` -> retransmission allowed.

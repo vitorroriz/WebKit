@@ -83,7 +83,7 @@ class LoggingNetworkControllerFactory
   LoggingNetworkControllerFactory(LogWriterFactoryInterface* log_writer_factory,
                                   TransportControllerConfig config);
 
-  ~LoggingNetworkControllerFactory() override;
+  ~LoggingNetworkControllerFactory();
 
   LoggingNetworkControllerFactory(const LoggingNetworkControllerFactory&) =
       delete;
@@ -120,7 +120,7 @@ class CallClient : public EmulatedNetworkReceiverInterface {
              std::unique_ptr<LogWriterFactoryInterface> log_writer_factory,
              CallClientConfig config);
 
-  ~CallClient() override;
+  ~CallClient();
 
   CallClient(const CallClient&) = delete;
   CallClient& operator=(const CallClient&) = delete;

@@ -35,7 +35,7 @@ namespace webrtc {
 namespace test {
 class MockCustomProcessing : public CustomProcessing {
  public:
-  ~MockCustomProcessing() override {}
+  virtual ~MockCustomProcessing() {}
   MOCK_METHOD(void,
               Initialize,
               (int sample_rate_hz, int num_channels),
@@ -50,7 +50,7 @@ class MockCustomProcessing : public CustomProcessing {
 
 class MockCustomAudioAnalyzer : public CustomAudioAnalyzer {
  public:
-  ~MockCustomAudioAnalyzer() override {}
+  virtual ~MockCustomAudioAnalyzer() {}
   MOCK_METHOD(void,
               Initialize,
               (int sample_rate_hz, int num_channels),
@@ -61,7 +61,7 @@ class MockCustomAudioAnalyzer : public CustomAudioAnalyzer {
 
 class MockEchoControl : public EchoControl {
  public:
-  ~MockEchoControl() override {}
+  virtual ~MockEchoControl() {}
   MOCK_METHOD(void, AnalyzeRender, (AudioBuffer * render), (override));
   MOCK_METHOD(void, AnalyzeCapture, (AudioBuffer * capture), (override));
   MOCK_METHOD(void,
@@ -81,7 +81,7 @@ class MockEchoControl : public EchoControl {
 
 class MockEchoDetector : public EchoDetector {
  public:
-  ~MockEchoDetector() override {}
+  virtual ~MockEchoDetector() {}
   MOCK_METHOD(void,
               Initialize,
               (int capture_sample_rate_hz,
@@ -104,7 +104,7 @@ class MockAudioProcessing : public AudioProcessing {
  public:
   MockAudioProcessing() {}
 
-  ~MockAudioProcessing() override {}
+  virtual ~MockAudioProcessing() {}
 
   MOCK_METHOD(int, Initialize, (), (override));
   MOCK_METHOD(int,

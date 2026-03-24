@@ -22,16 +22,14 @@ namespace webrtc {
 namespace rtcp {
 
 Buffer RtcpPacket::Build() const {
-  Buffer packet = Buffer::CreateWithCapacity(BlockLength());
+  Buffer packet(BlockLength());
 
-  packet.AppendData(BlockLength(), [&](ArrayView<uint8_t> data) {
-    size_t length = 0;
-    bool created = Create(data.data(), &length, data.size(), nullptr);
-    RTC_DCHECK(created) << "Invalid packet is not supported.";
-    RTC_DCHECK_EQ(length, data.size())
-        << "BlockLength mispredicted size used by Create";
-    return length;
-  });
+  size_t length = 0;
+  bool created = Create(packet.data(), &length, packet.capacity(), nullptr);
+  RTC_DCHECK(created) << "Invalid packet is not supported.";
+  RTC_DCHECK_EQ(length, packet.size())
+      << "BlockLength mispredicted size used by Create";
+
   return packet;
 }
 

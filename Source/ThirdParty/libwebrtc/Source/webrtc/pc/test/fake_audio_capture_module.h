@@ -159,7 +159,7 @@ class FakeAudioCaptureModule : public webrtc::AudioDeviceModule {
   FakeAudioCaptureModule();
   // The destructor is protected because it is reference counted and should not
   // be deleted directly.
-  ~FakeAudioCaptureModule() override;
+  virtual ~FakeAudioCaptureModule();
 
  private:
   // Initializes the state of the FakeAudioCaptureModule. This API is called on

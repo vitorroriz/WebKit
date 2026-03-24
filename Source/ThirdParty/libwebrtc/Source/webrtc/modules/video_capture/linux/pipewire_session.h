@@ -86,7 +86,7 @@ class PipeWireNode {
 class CameraPortalNotifier : public CameraPortal::PortalNotifier {
  public:
   CameraPortalNotifier(PipeWireSession* session);
-  ~CameraPortalNotifier() override = default;
+  ~CameraPortalNotifier() = default;
 
   void OnCameraRequestResult(xdg_portal::RequestResponse result,
                              int fd) override;
@@ -140,7 +140,6 @@ class PipeWireSession : public webrtc::RefCountedNonVirtual<PipeWireSession> {
 
   VideoCaptureOptions::Status status_;
 
-  std::unique_ptr<PipeWireInitializer> pw_initializer_;
   struct pw_thread_loop* pw_main_loop_ = nullptr;
   struct pw_context* pw_context_ = nullptr;
   struct pw_core* pw_core_ = nullptr;

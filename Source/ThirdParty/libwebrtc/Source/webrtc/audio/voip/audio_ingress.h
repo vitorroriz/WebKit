@@ -95,7 +95,6 @@ class AudioIngress : public AudioMixer::Source {
       AudioFrame* audio_frame) override;
   int Ssrc() const override { return dchecked_cast<int>(remote_ssrc_.load()); }
   int PreferredSampleRate() const override {
-    MutexLock lock(&neteq_mutex_);
     std::optional<NetEq::DecoderFormat> decoder =
         neteq_->GetCurrentDecoderFormat();
 
@@ -118,19 +117,19 @@ class AudioIngress : public AudioMixer::Source {
   std::atomic<uint32_t> remote_ssrc_;
 
   // The first rtp timestamp of the output audio frame that is used to
-  // calculate elapsed time for subsequent audio frames.
+  // calculate elasped time for subsequent audio frames.
   std::atomic<int64_t> first_rtp_timestamp_;
 
-  // Synchronization is handled internally by ReceiveStatistics.
+  // Synchronizaton is handled internally by ReceiveStatistics.
   ReceiveStatistics* const rtp_receive_statistics_;
 
-  // Synchronization is handled internally by RtpRtcpInterface.
+  // Synchronizaton is handled internally by RtpRtcpInterface.
   RtpRtcpInterface* const rtp_rtcp_;
 
-  mutable Mutex neteq_mutex_;
-  const std::unique_ptr<NetEq> neteq_ RTC_GUARDED_BY(neteq_mutex_);
+  // Synchronizaton is handled internally by NetEq.
+  const std::unique_ptr<NetEq> neteq_;
 
-  // Synchronization is handled internally by voe::AudioLevel.
+  // Synchronizaton is handled internally by voe::AudioLevel.
   voe::AudioLevel output_audio_level_;
 
   Mutex lock_;
@@ -143,8 +142,8 @@ class AudioIngress : public AudioMixer::Source {
 
   RtpTimestampUnwrapper timestamp_wrap_handler_ RTC_GUARDED_BY(lock_);
 
-  // Resampler for the output audio. Only accessed in the playout thread.
-  acm2::ResamplerHelper resampler_helper_;
+  // Resampler for the output audio.
+  acm2::ResamplerHelper resampler_helper_ RTC_GUARDED_BY(lock_);
 };
 
 }  // namespace webrtc

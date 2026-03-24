@@ -81,6 +81,7 @@
 #include "rtc_base/race_checker.h"
 #include "rtc_base/strings/string_builder.h"
 #include "rtc_base/synchronization/mutex.h"
+#include "rtc_base/system/file_wrapper.h"
 #include "rtc_base/trace_event.h"
 #include "system_wrappers/include/clock.h"
 #include "system_wrappers/include/ntp_time.h"
@@ -114,7 +115,7 @@ class WebRtcRecordableEncodedFrame : public RecordableEncodedFrame {
       : buffer_(frame.GetEncodedData()),
         render_time_ms_(frame.RenderTime()),
         codec_(frame.CodecSpecific()->codecType),
-        is_key_frame_(frame.IsKey()),
+        is_key_frame_(frame.FrameType() == VideoFrameType::kVideoFrameKey),
         resolution_(resolution) {
     if (frame.ColorSpace()) {
       color_space_ = *frame.ColorSpace();
@@ -198,7 +199,8 @@ class NullVideoDecoder : public VideoDecoder {
 };
 
 bool IsKeyFrameAndUnspecifiedResolution(const EncodedFrame& frame) {
-  return frame.IsKey() && frame.EncodedImage()._encodedWidth == 0 &&
+  return frame.FrameType() == VideoFrameType::kVideoFrameKey &&
+         frame.EncodedImage()._encodedWidth == 0 &&
          frame.EncodedImage()._encodedHeight == 0;
 }
 
@@ -266,10 +268,8 @@ VideoReceiveStream2::VideoReceiveStream2(
           false)),
       frame_evaluator_(FrameInstrumentationEvaluation::Create(&stats_proxy_)),
       decode_queue_(env_.task_queue_factory().CreateTaskQueue(
-          "VideoDecoderQueue",
-          env_.field_trials().IsEnabled("WebRTC-MediaTaskQueuePriorities")
-              ? TaskQueueFactory::Priority::kVideo
-              : TaskQueueFactory::Priority::kHigh)) {
+          "DecodingQueue",
+          TaskQueueFactory::Priority::HIGH)) {
   RTC_LOG(LS_INFO) << "VideoReceiveStream2: " << config_.ToString();
 
   RTC_DCHECK(call_->worker_thread());
@@ -300,7 +300,7 @@ VideoReceiveStream2::VideoReceiveStream2(
 
   if (!config_.rtp.rtx_associated_payload_types.empty()) {
     rtx_receive_stream_ = std::make_unique<RtxReceiveStream>(
-        env_, &rtp_video_stream_receiver_,
+        &rtp_video_stream_receiver_,
         std::move(config_.rtp.rtx_associated_payload_types), remote_ssrc(),
         rtp_receive_statistics_.get());
   } else {
@@ -587,8 +587,8 @@ void VideoReceiveStream2::CreateAndRegisterExternalDecoder(
     SimpleStringBuilder ssb(filename_buffer);
     ssb << decoded_output_file << "/webrtc_receive_stream_" << remote_ssrc()
         << "-" << env_.clock().TimeInMicroseconds() << ".ivf";
-    video_decoder =
-        CreateFrameDumpingDecoderWrapper(std::move(video_decoder), ssb.str());
+    video_decoder = CreateFrameDumpingDecoderWrapper(
+        std::move(video_decoder), FileWrapper::OpenWriteOnly(ssb.str()));
   }
 
   video_receiver_.RegisterExternalDecoder(std::move(video_decoder),
@@ -818,7 +818,8 @@ void VideoReceiveStream2::OnEncodedFrame(std::unique_ptr<EncodedFrame> frame) {
   const bool keyframe_request_is_due =
       !last_keyframe_request_ ||
       now >= (*last_keyframe_request_ + max_wait_for_keyframe_);
-  const bool received_frame_is_keyframe = frame->IsKey();
+  const bool received_frame_is_keyframe =
+      frame->FrameType() == VideoFrameType::kVideoFrameKey;
 
   // Current OnPreDecode only cares about QP for VP8.
   // TODO(brandtr): Move to stats_proxy_.OnDecodableFrame in VSBC, or deprecate.
@@ -988,7 +989,7 @@ int VideoReceiveStream2::DecodeAndMaybeDispatchEncodedFrame(
         << "Failed to decode frame. Return code: " << decode_result
         << ", SSRC: " << remote_ssrc()
         << ", frame RTP timestamp: " << frame_ptr->RtpTimestamp()
-        << ", type: " << VideoFrameTypeToString(frame_ptr->frame_type())
+        << ", type: " << VideoFrameTypeToString(frame_ptr->FrameType())
         << ", size: " << frame_ptr->size()
         << ", width: " << frame_ptr->_encodedWidth
         << ", height: " << frame_ptr->_encodedHeight

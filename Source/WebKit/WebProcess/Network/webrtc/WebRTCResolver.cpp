@@ -57,36 +57,16 @@ void WebRTCResolver::setResolvedAddress(const Vector<RTCNetwork::IPAddress>& add
         return address.rtcAddress();
     });
     WebCore::LibWebRTCProvider::callOnWebRTCNetworkThread([factory = m_socketFactory, identifier = m_identifier, rtcAddresses = WTF::move(rtcAddresses)] () mutable {
-        auto takeResolverCallback = [&] -> Function<void()> {
-            auto resolver = factory->resolver(identifier);
-            if (!resolver)
-                return { };
-
+        if (auto resolver = factory->resolver(identifier))
             resolver->setResolvedAddress(WTF::move(rtcAddresses));
-            return resolver->takeCallback();
-        };
-
-        if (auto callback = takeResolverCallback())
-            callback();
-
-        ASSERT(!factory->resolver(identifier));
     });
 }
 
 void WebRTCResolver::resolvedAddressError(int error)
 {
     WebCore::LibWebRTCProvider::callOnWebRTCNetworkThread([factory = m_socketFactory, identifier = m_identifier, error]() {
-        auto takeResolverCallback = [&] -> Function<void()> {
-            auto resolver = factory->resolver(identifier);
-            if (!resolver)
-                return { };
-
+        if (auto resolver = factory->resolver(identifier))
             resolver->setError(error);
-            return resolver->takeCallback();
-        };
-
-        if (auto callback = takeResolverCallback())
-            callback();
     });
 }
 

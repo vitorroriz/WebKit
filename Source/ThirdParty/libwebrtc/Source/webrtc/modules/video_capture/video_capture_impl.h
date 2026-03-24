@@ -63,7 +63,7 @@ class RTC_EXPORT VideoCaptureImpl : public VideoCaptureModule {
   // Call backs
   void RegisterCaptureDataCallback(
       VideoSinkInterface<VideoFrame>* dataCallback) override;
-  void RegisterCaptureDataCallback(
+  virtual void RegisterCaptureDataCallback(
       RawVideoSinkInterface* dataCallback) override;
   void DeRegisterCaptureDataCallback() override;
 

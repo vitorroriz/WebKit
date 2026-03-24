@@ -38,7 +38,7 @@ AudioEgress::AudioEgress(const Environment& env, RtpRtcpInterface* rtp_rtcp)
       audio_coding_(AudioCodingModule::Create()),
       encoder_queue_(env.task_queue_factory().CreateTaskQueue(
           "AudioEncoder",
-          TaskQueueFactory::Priority::kNormal)),
+          TaskQueueFactory::Priority::NORMAL)),
       encoder_queue_checker_(encoder_queue_.get()) {
   audio_coding_->RegisterTransportCallback(this);
 }

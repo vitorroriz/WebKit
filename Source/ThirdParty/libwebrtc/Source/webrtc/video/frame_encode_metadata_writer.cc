@@ -23,6 +23,7 @@
 #include "api/video/video_codec_type.h"
 #include "api/video/video_content_type.h"
 #include "api/video/video_frame.h"
+#include "api/video/video_frame_type.h"
 #include "api/video/video_timing.h"
 #include "api/video_codecs/video_codec.h"
 #include "api/video_codecs/video_encoder.h"
@@ -207,7 +208,7 @@ void FrameEncodeMetadataWriter::UpdateBitstream(
     EncodedImage* encoded_image) {
   if (!codec_specific_info ||
       codec_specific_info->codecType != kVideoCodecH264 ||
-      !encoded_image->IsKey()) {
+      encoded_image->_frameType != VideoFrameType::kVideoFrameKey) {
     return;
   }
 
@@ -266,7 +267,7 @@ FrameEncodeMetadataWriter::ExtractEncodeStartTimeAndFillMetadata(
       // Key frames should never be considered as steady state refresh frames.
       encoded_image->SetIsSteadyStateRefreshFrame(
           metadata_list->front().is_steady_state_refresh_frame &&
-          !encoded_image->IsKey());
+          encoded_image->FrameType() != VideoFrameType::kVideoFrameKey);
       encoded_image->SetPacketInfos(metadata_list->front().packet_infos);
       metadata_list->pop_front();
     } else {

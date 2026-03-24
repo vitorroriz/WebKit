@@ -23,7 +23,6 @@
 
 #include "absl/flags/flag.h"
 #include "absl/strings/string_view.h"
-#include "api/environment/environment.h"
 #include "api/test/metrics/chrome_perf_dashboard_metrics_exporter.h"
 #include "api/test/metrics/global_metrics_logger_and_exporter.h"
 #include "api/test/metrics/metric.h"
@@ -35,7 +34,6 @@
 #include "rtc_base/ssl_adapter.h"
 #include "rtc_base/ssl_stream_adapter.h"
 #include "system_wrappers/include/metrics.h"
-#include "test/create_test_environment.h"
 #include "test/gtest.h"
 #include "test/test_flags.h"
 #include "test/testsupport/file_utils.h"
@@ -43,9 +41,9 @@
 
 #if defined(RTC_USE_PERFETTO)
 #include "rtc_base/event_tracer.h"
-#include "third_party/perfetto/include/perfetto/tracing/backend_type.h"  // nogncheck
-#include "third_party/perfetto/include/perfetto/tracing/tracing.h"  // nogncheck
-#include "third_party/perfetto/protos/perfetto/config/trace_config.gen.h"  // nogncheck
+#include "third_party/perfetto/include/perfetto/tracing/backend_type.h"
+#include "third_party/perfetto/include/perfetto/tracing/tracing.h"
+#include "third_party/perfetto/protos/perfetto/config/trace_config.gen.h"
 #endif
 
 #if defined(WEBRTC_WIN)
@@ -89,14 +87,6 @@ ABSL_FLAG(std::string, use_vulkan, "", "Intentionally ignored flag.");
 ABSL_FLAG(bool, no_sandbox, false, "Intentionally ignored flag.");
 ABSL_FLAG(bool, test_launcher_bot_mode, false, "Intentionally ignored flag.");
 #endif
-
-ABSL_FLAG(std::string,
-          webrtc_test_metrics_output_path,
-          "",
-          "Path where the test perf metrics should be stored using "
-          "api/test/metrics/metric.proto proto format. File will contain "
-          "MetricsSet as a root proto. On iOS, this MUST be a file name "
-          "and the file will be stored under NSDocumentDirectory.");
 
 ABSL_FLAG(std::string,
           isolated_script_test_output,
@@ -297,8 +287,7 @@ class TestMainImpl : public TestMain {
         << trace_output_file << "\"";
     tracing_session_->StartBlocking();
 #else
-    Environment env = CreateTestEnvironment();
-    tracing::SetupInternalTracer(env);
+    tracing::SetupInternalTracer();
     tracing::StartInternalCapture(trace_output_file);
 #endif
   }

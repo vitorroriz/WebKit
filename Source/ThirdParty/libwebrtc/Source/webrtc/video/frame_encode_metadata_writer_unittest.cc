@@ -461,7 +461,7 @@ TEST(FrameEncodeMetadataWriterTest, KeyFramesAreNotMarkedAsSteadyStateRefresh) {
                                  .set_video_frame_buffer(kFrameBuffer)
                                  .build();
   encode_timer.OnEncodeStarted(refresh_frame);
-  image.set_frame_type(VideoFrameType::kVideoFrameKey);
+  image.SetFrameType(VideoFrameType::kVideoFrameKey);
   encode_timer.FillMetadataAndTimingInfo(0, &image);
   EXPECT_FALSE(image.IsSteadyStateRefreshFrame());
 }
@@ -533,7 +533,7 @@ TEST(FrameEncodeMetadataWriterTest, RewritesH264BitstreamWithNonOptimalSps) {
   EncodedImage image;
   image.SetEncodedData(
       EncodedImageBuffer::Create(kOriginalSps, sizeof(kOriginalSps)));
-  image.set_frame_type(VideoFrameType::kVideoFrameKey);
+  image._frameType = VideoFrameType::kVideoFrameKey;
 
   CodecSpecificInfo codec_specific_info;
   codec_specific_info.codecType = kVideoCodecH264;

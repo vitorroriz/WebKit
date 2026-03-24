@@ -50,14 +50,11 @@ class DecodabilityTrackerTest : public SimulatedTimeTestFixture {
     SendTask([this]() {
       RTC_DCHECK_RUN_ON(queue_ptr_);
       decodability_tracker_ = std::make_unique<DecodabilityTracker>(
-          env_,
-          DecodabilityTracker::Config{.ssrc =
-                                          EncodedFrameBuilderGenerator::kSsrc},
-          &decodability_tracker_events_);
+          env_, &decodability_tracker_events_);
       decodability_tracker_->SetDecodedFrameIdCallback(&decoded_frame_id_cb_);
     });
   }
-  ~DecodabilityTrackerTest() override {
+  ~DecodabilityTrackerTest() {
     SendTask([this]() {
       RTC_DCHECK_RUN_ON(queue_ptr_);
       decodability_tracker_.reset();

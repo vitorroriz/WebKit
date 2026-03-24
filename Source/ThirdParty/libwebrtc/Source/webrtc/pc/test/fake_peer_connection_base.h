@@ -52,7 +52,6 @@
 #include "call/payload_type_picker.h"
 #include "p2p/base/port.h"
 #include "p2p/base/port_allocator.h"
-#include "pc/channel_interface.h"
 #include "pc/jsep_transport_controller.h"
 #include "pc/peer_connection_internal.h"
 #include "pc/peer_connection_message_handler.h"
@@ -62,12 +61,10 @@
 #include "pc/transport_stats.h"
 #include "pc/usage_pattern.h"
 #include "rtc_base/checks.h"
-#include "rtc_base/containers/flat_map.h"
 #include "rtc_base/ref_counted_object.h"
 #include "rtc_base/rtc_certificate.h"
 #include "rtc_base/ssl_certificate.h"
 #include "rtc_base/ssl_stream_adapter.h"
-#include "rtc_base/system/plan_b_only.h"
 #include "rtc_base/thread.h"
 
 namespace webrtc {
@@ -80,23 +77,18 @@ class FakePeerConnectionBase : public PeerConnectionInternal {
  public:
   // PeerConnectionInterface implementation.
   FakePeerConnectionBase() : env_(CreateEnvironment()) {}
-  explicit FakePeerConnectionBase(const Environment& env) : env_(env) {}
 
-  PLAN_B_ONLY scoped_refptr<StreamCollectionInterface> local_streams()
-      override {
+  scoped_refptr<StreamCollectionInterface> local_streams() override {
     return nullptr;
   }
 
-  PLAN_B_ONLY scoped_refptr<StreamCollectionInterface> remote_streams()
-      override {
+  scoped_refptr<StreamCollectionInterface> remote_streams() override {
     return nullptr;
   }
 
-  PLAN_B_ONLY bool AddStream(MediaStreamInterface* stream) override {
-    return false;
-  }
+  bool AddStream(MediaStreamInterface* stream) override { return false; }
 
-  PLAN_B_ONLY void RemoveStream(MediaStreamInterface* stream) override {}
+  void RemoveStream(MediaStreamInterface* stream) override {}
 
   RTCErrorOr<scoped_refptr<RtpSenderInterface>> AddTrack(
       scoped_refptr<MediaStreamTrackInterface> track,
@@ -138,7 +130,7 @@ class FakePeerConnectionBase : public PeerConnectionInternal {
     return RTCError(RTCErrorType::UNSUPPORTED_OPERATION, "Not implemented");
   }
 
-  PLAN_B_ONLY scoped_refptr<RtpSenderInterface> CreateSender(
+  scoped_refptr<RtpSenderInterface> CreateSender(
       const std::string& kind,
       const std::string& stream_id) override {
     return nullptr;
@@ -158,9 +150,9 @@ class FakePeerConnectionBase : public PeerConnectionInternal {
     return {};
   }
 
-  [[deprecated]] bool GetStats(StatsObserver* observer,
-                               MediaStreamTrackInterface* track,
-                               StatsOutputLevel level) override {
+  bool GetStats(StatsObserver* observer,
+                MediaStreamTrackInterface* track,
+                StatsOutputLevel level) override {
     return false;
   }
 
@@ -172,7 +164,7 @@ class FakePeerConnectionBase : public PeerConnectionInternal {
 
   void ClearStatsCache() override {}
 
-  scoped_refptr<SctpTransportInterface> GetSctpTransport() const override {
+  scoped_refptr<SctpTransportInterface> GetSctpTransport() const {
     return nullptr;
   }
 
@@ -226,15 +218,12 @@ class FakePeerConnectionBase : public PeerConnectionInternal {
       std::unique_ptr<SessionDescriptionInterface> desc,
       scoped_refptr<SetRemoteDescriptionObserverInterface> observer) override {}
 
-  bool ShouldFireNegotiationNeededEvent(uint32_t event_id) override {
-    return true;
-  }
+  bool ShouldFireNegotiationNeededEvent(uint32_t event_id) { return true; }
 
-  RTCConfiguration GetConfiguration() override { return config_; }
+  RTCConfiguration GetConfiguration() override { return RTCConfiguration(); }
 
   RTCError SetConfiguration(
       const PeerConnectionInterface::RTCConfiguration& config) override {
-    config_ = config;
     return RTCError();
   }
 
@@ -256,7 +245,7 @@ class FakePeerConnectionBase : public PeerConnectionInternal {
   void SetAudioRecording(bool recording) override {}
 
   scoped_refptr<DtlsTransportInterface> LookupDtlsTransportByMid(
-      const std::string& mid) override {
+      const std::string& mid) {
     return nullptr;
   }
 
@@ -278,11 +267,9 @@ class FakePeerConnectionBase : public PeerConnectionInternal {
     return IceGatheringState::kIceGatheringNew;
   }
 
-  std::optional<bool> can_trickle_ice_candidates() override {
-    return std::nullopt;
-  }
+  std::optional<bool> can_trickle_ice_candidates() { return std::nullopt; }
 
-  void AddAdaptationResource(scoped_refptr<Resource> resource) override {}
+  void AddAdaptationResource(scoped_refptr<Resource> resource) {}
 
   bool StartRtcEventLog(std::unique_ptr<RtcEventLogOutput> output,
                         int64_t output_period_ms) override {
@@ -354,10 +341,9 @@ class FakePeerConnectionBase : public PeerConnectionInternal {
   bool GetSslRole(const std::string& content_name, SSLRole* role) override {
     return false;
   }
-
   const PeerConnectionInterface::RTCConfiguration* configuration()
       const override {
-    return &config_;
+    return nullptr;
   }
 
   void ReportSdpBundleUsage(
@@ -392,7 +378,7 @@ class FakePeerConnectionBase : public PeerConnectionInternal {
   bool IsClosed() const override { return false; }
   bool IsUnifiedPlan() const override { return true; }
   bool ValidateBundleSettings(const SessionDescription* desc,
-                              const flat_map<std::string, const ContentGroup*>&
+                              const std::map<std::string, const ContentGroup*>&
                                   bundle_groups_by_mid) override {
     return false;
   }
@@ -430,7 +416,6 @@ class FakePeerConnectionBase : public PeerConnectionInternal {
  protected:
   Environment env_;
   PayloadTypePicker payload_type_picker_;
-  RTCConfiguration config_;
 };
 
 static_assert(

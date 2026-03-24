@@ -37,16 +37,12 @@ namespace {
 ThreadPriority TaskQueuePriorityToThreadPriority(
     TaskQueueFactory::Priority priority) {
   switch (priority) {
-    case TaskQueueFactory::Priority::kHigh:
+    case TaskQueueFactory::Priority::HIGH:
       return ThreadPriority::kRealtime;
-    case TaskQueueFactory::Priority::kLow:
+    case TaskQueueFactory::Priority::LOW:
       return ThreadPriority::kLow;
-    case TaskQueueFactory::Priority::kNormal:
+    case TaskQueueFactory::Priority::NORMAL:
       return ThreadPriority::kNormal;
-    case TaskQueueFactory::Priority::kVideo:
-      return ThreadPriority::kVideo;
-    case TaskQueueFactory::Priority::kAudio:
-      return ThreadPriority::kAudio;
   }
 }
 

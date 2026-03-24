@@ -83,9 +83,7 @@ class RTC_EXPORT ScreenCastPortal
     virtual ~PortalNotifier() = default;
   };
 
-  ScreenCastPortal(CaptureType type,
-                   PortalNotifier* notifier,
-                   bool prefer_cursor_embedded);
+  ScreenCastPortal(CaptureType type, PortalNotifier* notifier);
   ScreenCastPortal(CaptureType type,
                    PortalNotifier* notifier,
                    ProxyRequestResponseHandler proxy_request_response_handler,
@@ -96,7 +94,7 @@ class RTC_EXPORT ScreenCastPortal
                    // downstream has been adjusted.
                    bool prefer_cursor_embedded = false);
 
-  ~ScreenCastPortal() override;
+  ~ScreenCastPortal();
 
   // Initialize ScreenCastPortal with series of DBus calls where we try to
   // obtain all the required information, like PipeWire file descriptor and

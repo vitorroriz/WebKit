@@ -381,7 +381,7 @@ class AgcManagerDirectTestHelper {
     manager.AnalyzePreProcess(audio_buffer);
     manager.Process(audio_buffer, speech_probability_override,
                     speech_level_override);
-    std::optional<int> digital_gain = manager.GetDigitalCompressionGain();
+    std::optional<int> digital_gain = manager.GetDigitalComressionGain();
     if (digital_gain) {
       mock_gain_control.set_compression_gain_db(*digital_gain);
     }
@@ -400,7 +400,7 @@ class AgcManagerDirectTestHelper {
       EXPECT_CALL(*mock_agc, Process(_)).WillOnce(Return());
       manager.Process(audio_buffer, speech_probability_override,
                       speech_level_override);
-      std::optional<int> new_digital_gain = manager.GetDigitalCompressionGain();
+      std::optional<int> new_digital_gain = manager.GetDigitalComressionGain();
       if (new_digital_gain) {
         mock_gain_control.set_compression_gain_db(*new_digital_gain);
       }
@@ -927,7 +927,7 @@ TEST_P(AgcManagerDirectParametrizedTest, NoActionWhileMuted) {
                          GetOverrideOrEmpty(kSpeechLevelDbfs));
 
   std::optional<int> new_digital_gain =
-      helper.manager.GetDigitalCompressionGain();
+      helper.manager.GetDigitalComressionGain();
   if (new_digital_gain) {
     helper.mock_gain_control.set_compression_gain_db(*new_digital_gain);
   }

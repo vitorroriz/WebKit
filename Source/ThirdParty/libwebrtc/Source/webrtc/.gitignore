@@ -39,7 +39,6 @@
 .project
 .pydevproject
 .settings
-.siso_failed_targets
 .sw?
 /Makefile
 /base

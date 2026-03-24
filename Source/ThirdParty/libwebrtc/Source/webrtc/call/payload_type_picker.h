@@ -49,10 +49,6 @@ class PayloadTypePicker {
    private:
     PayloadType payload_type_;
     Codec codec_;
-    template <typename Sink>
-    friend void AbslStringify(Sink& sink, const MapEntry& entry) {
-      absl::Format(&sink, "%v:%v", entry.payload_type(), entry.codec());
-    }
   };
   std::vector<MapEntry> entries_;
   std::set<PayloadType> seen_payload_types_;
@@ -61,10 +57,6 @@ class PayloadTypePicker {
     sink.Append("Reserved:");
     for (PayloadType pt : picker.seen_payload_types_) {
       absl::Format(&sink, " %v", pt);
-    }
-    sink.Append("\nEntries:");
-    for (const MapEntry& entry : picker.entries_) {
-      absl::Format(&sink, "\n %v", entry);
     }
   }
 };

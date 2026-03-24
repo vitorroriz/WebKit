@@ -56,7 +56,7 @@ class CongestionControlFeedbackGenerator
   CongestionControlFeedbackGenerator(
       const Environment& env,
       RtpTransportFeedbackGenerator::RtcpSender feedback_sender);
-  ~CongestionControlFeedbackGenerator() override = default;
+  ~CongestionControlFeedbackGenerator() = default;
 
   void OnReceivedPacket(const RtpPacketReceived& packet) override;
 
@@ -89,7 +89,8 @@ class CongestionControlFeedbackGenerator
   std::map</*ssrc=*/uint32_t, CongestionControlFeedbackTracker>
       feedback_trackers_;
 
-  Timestamp last_feedback_sent_time_ = Timestamp::MinusInfinity();
+  // std::vector<PacketInfo> packets_;
+  Timestamp last_feedback_sent_time_ = Timestamp::Zero();
   std::optional<Timestamp> first_arrival_time_since_feedback_;
   bool marker_bit_seen_ = false;
   Timestamp next_possible_feedback_send_time_ = Timestamp::Zero();

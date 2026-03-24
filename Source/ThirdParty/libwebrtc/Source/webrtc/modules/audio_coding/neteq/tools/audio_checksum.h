@@ -16,7 +16,6 @@
 #include <memory>
 #include <string>
 
-#include "api/array_view.h"
 #include "modules/audio_coding/neteq/tools/audio_sink.h"
 #include "rtc_base/buffer.h"
 #include "rtc_base/message_digest.h"
@@ -30,7 +29,7 @@ class AudioChecksum : public AudioSink {
  public:
   AudioChecksum()
       : checksum_(MessageDigestFactory::Create(DIGEST_MD5)),
-        checksum_result_(0, checksum_->Size()),
+        checksum_result_(checksum_->Size()),
         finished_(false) {}
 
   AudioChecksum(const AudioChecksum&) = delete;
@@ -51,11 +50,7 @@ class AudioChecksum : public AudioSink {
   std::string Finish() {
     if (!finished_) {
       finished_ = true;
-      checksum_result_.AppendData(checksum_->Size(),
-                                  [&](ArrayView<uint8_t> view) {
-                                    checksum_->Finish(view.data(), view.size());
-                                    return view.size();
-                                  });
+      checksum_->Finish(checksum_result_.data(), checksum_result_.size());
     }
     return hex_encode(checksum_result_);
   }

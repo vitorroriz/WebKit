@@ -59,13 +59,11 @@ AsyncTCPSocketBase::AsyncTCPSocketBase(
   inbuf_.EnsureCapacity(kMinimumRecvSize);
 
   socket_->SubscribeConnectEvent(
-      this, [this](Socket* socket) { OnConnectEvent(socket); });
-  socket_->SubscribeReadEvent(this,
-                              [this](Socket* socket) { OnReadEvent(socket); });
-  socket_->SubscribeWriteEvent(
-      this, [this](Socket* socket) { OnWriteEvent(socket); });
+      [this](Socket* socket) { OnConnectEvent(socket); });
+  socket_->SignalReadEvent.connect(this, &AsyncTCPSocketBase::OnReadEvent);
+  socket_->SignalWriteEvent.connect(this, &AsyncTCPSocketBase::OnWriteEvent);
   socket_->SubscribeCloseEvent(
-      this, [this](Socket* socket, int error) { OnCloseEvent(socket, error); });
+      [this](Socket* socket, int error) { OnCloseEvent(socket, error); });
 }
 
 AsyncTCPSocketBase::~AsyncTCPSocketBase() {}
@@ -226,7 +224,7 @@ void AsyncTCPSocketBase::OnWriteEvent(Socket* socket) {
   }
 
   if (outbuf_.empty()) {
-    NotifyReadyToSend(this);
+    SignalReadyToSend(this);
   }
 }
 
@@ -265,7 +263,7 @@ int AsyncTCPSocket::Send(const void* pv,
                              env_.clock().TimeInMilliseconds(),
                              options.info_signaled_after_sent);
   CopySocketInformationToPacketInfo(cb, *this, &sent_packet.info);
-  NotifySentPacket(this, sent_packet);
+  SignalSentPacket(this, sent_packet);
 
   // We claim to have sent the whole thing, even if we only sent partial
   return static_cast<int>(cb);
@@ -296,8 +294,7 @@ AsyncTcpListenSocket::AsyncTcpListenSocket(const Environment& env,
                                            std::unique_ptr<Socket> socket)
     : env_(env), socket_(std::move(socket)) {
   RTC_DCHECK(socket_.get() != nullptr);
-  socket_->SubscribeReadEvent(this,
-                              [this](Socket* socket) { OnReadEvent(socket); });
+  socket_->SignalReadEvent.connect(this, &AsyncTcpListenSocket::OnReadEvent);
   if (socket_->Listen(kListenBacklog) < 0) {
     RTC_LOG(LS_ERROR) << "Listen() failed with error " << socket_->GetError();
   }
@@ -334,12 +331,12 @@ void AsyncTcpListenSocket::OnReadEvent(Socket* socket) {
   HandleIncomingConnection(absl::WrapUnique(new_socket));
 
   // Prime a read event in case data is waiting.
-  new_socket->NotifyReadEvent(new_socket);
+  new_socket->SignalReadEvent(new_socket);
 }
 
 void AsyncTcpListenSocket::HandleIncomingConnection(
     std::unique_ptr<Socket> socket) {
-  NotifyNewConnection(this, new AsyncTCPSocket(env_, std::move(socket)));
+  SignalNewConnection(this, new AsyncTCPSocket(env_, std::move(socket)));
 }
 
 }  // namespace webrtc

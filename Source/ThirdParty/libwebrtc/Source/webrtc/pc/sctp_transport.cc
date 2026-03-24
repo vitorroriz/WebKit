@@ -29,7 +29,6 @@
 #include "rtc_base/checks.h"
 #include "rtc_base/copy_on_write_buffer.h"
 #include "rtc_base/logging.h"
-#include "rtc_base/ssl_stream_adapter.h"
 #include "rtc_base/thread.h"
 
 namespace webrtc {
@@ -44,14 +43,14 @@ SctpTransport::SctpTransport(std::unique_ptr<SctpTransportInternal> internal,
       internal_sctp_transport_(std::move(internal)),
       dtls_transport_(dtls_transport) {
   RTC_DCHECK(internal_sctp_transport_.get());
-  RTC_DCHECK(internal_sctp_transport_->dtls_transport());
   RTC_DCHECK(dtls_transport_.get());
 
-  internal_sctp_transport_->dtls_transport()->SubscribeDtlsTransportState(
-      this, [this](DtlsTransportInternal* transport, DtlsTransportState state) {
+  dtls_transport_->internal()->SubscribeDtlsTransportState(
+      [this](DtlsTransportInternal* transport, DtlsTransportState state) {
         OnDtlsStateChange(transport, state);
       });
 
+  internal_sctp_transport_->SetDtlsTransport(dtls_transport->internal());
   internal_sctp_transport_->SetOnConnectedCallback(
       [this]() { OnAssociationChangeCommunicationUp(); });
 }
@@ -136,29 +135,6 @@ void SctpTransport::SetBufferedAmountLowThreshold(int channel_id,
   internal_sctp_transport_->SetBufferedAmountLowThreshold(channel_id, bytes);
 }
 
-std::optional<int> SctpTransport::MaxChannels() {
-  RTC_DCHECK_RUN_ON(owner_thread_);
-  return info_.MaxChannels();
-}
-
-std::optional<SSLRole> SctpTransport::DtlsRole() {
-  RTC_DCHECK_RUN_ON(owner_thread_);
-  if (!dtls_transport_) {
-    return std::nullopt;
-  }
-  std::optional<DtlsTransportTlsRole> role =
-      dtls_transport_->Information().role();
-  if (!role.has_value()) {
-    return std::nullopt;
-  }
-  switch (*role) {
-    case DtlsTransportTlsRole::kServer:
-      return SSL_SERVER;
-    case DtlsTransportTlsRole::kClient:
-      return SSL_CLIENT;
-  }
-}
-
 scoped_refptr<DtlsTransportInterface> SctpTransport::dtls_transport() const {
   RTC_DCHECK_RUN_ON(owner_thread_);
   return dtls_transport_;
@@ -167,10 +143,9 @@ scoped_refptr<DtlsTransportInterface> SctpTransport::dtls_transport() const {
 // Internal functions
 void SctpTransport::Clear() {
   RTC_DCHECK_RUN_ON(owner_thread_);
+  RTC_DCHECK(internal());
   // Note that we delete internal_sctp_transport_, but
   // only drop the reference to dtls_transport_.
-  internal_sctp_transport_->dtls_transport()->UnsubscribeDtlsTransportState(
-      this);
   dtls_transport_ = nullptr;
   internal_sctp_transport_ = nullptr;
   UpdateInformation(SctpTransportState::kClosed);
@@ -225,6 +200,7 @@ void SctpTransport::OnAssociationChangeCommunicationUp() {
 void SctpTransport::OnDtlsStateChange(DtlsTransportInternal* transport,
                                       DtlsTransportState state) {
   RTC_DCHECK_RUN_ON(owner_thread_);
+  RTC_CHECK(transport == dtls_transport_->internal());
   if (state == DtlsTransportState::kClosed ||
       state == DtlsTransportState::kFailed) {
     UpdateInformation(SctpTransportState::kClosed);

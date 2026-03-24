@@ -106,13 +106,14 @@ CodecSpecificInfo FakeVp8Encoder::EncodeHook(
   frame_buffer_controller_->NextFrameConfig(simulcast_index,
                                             encoded_image.RtpTimestamp());
   CodecSpecificInfo codec_specific =
-      PopulateCodecSpecific(encoded_image.size(), encoded_image.frame_type(),
+      PopulateCodecSpecific(encoded_image.size(), encoded_image._frameType,
                             simulcast_index, encoded_image.RtpTimestamp());
 
   // Write width and height to the payload the same way as the real encoder
   // does.
   WriteFakeVp8(buffer->data(), encoded_image._encodedWidth,
-               encoded_image._encodedHeight, encoded_image.IsKey());
+               encoded_image._encodedHeight,
+               encoded_image._frameType == VideoFrameType::kVideoFrameKey);
   return codec_specific;
 }
 

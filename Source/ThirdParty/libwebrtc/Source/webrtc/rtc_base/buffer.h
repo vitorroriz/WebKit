@@ -19,7 +19,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "absl/base/attributes.h"
 #include "absl/strings/string_view.h"
 #include "api/array_view.h"
 #include "rtc_base/checks.h"
@@ -87,7 +86,6 @@ class BufferT {
   }
 
   // Construct a buffer with the specified number of uninitialized elements.
-  ABSL_DEPRECATED("Use CreateUninitializedWithSize()")
   explicit BufferT(size_t size) : BufferT(size, size) {}
 
   BufferT(size_t size, size_t capacity)
@@ -128,14 +126,6 @@ class BufferT {
   operator typename std::enable_if<internal::BufferCompat<U, char>::value,
                                    absl::string_view>::type() const {
     return absl::string_view(data<char>(), size());
-  }
-
-  // Static methods to construct a buffer with size and/or capacity.
-  static BufferT CreateWithCapacity(size_t capacity) {
-    return BufferT(0, capacity);
-  }
-  static BufferT CreateUninitializedWithSize(size_t size) {
-    return BufferT(size, size);
   }
 
   // Get a pointer to the data. Just .data() will give you a (const) T*, but if

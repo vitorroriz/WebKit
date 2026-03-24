@@ -11,6 +11,7 @@
 #include "video/rtp_video_stream_receiver2.h"
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <limits>
@@ -49,7 +50,6 @@
 #include "call/rtp_packet_sink_interface.h"
 #include "call/syncable.h"
 #include "call/video_receive_stream.h"
-#include "logging/rtc_event_log/events/rtc_event_rtp_packet_incoming.h"
 #include "media/base/media_constants.h"
 #include "modules/include/module_common_types.h"
 #include "modules/pacing/packet_router.h"
@@ -140,7 +140,7 @@ std::unique_ptr<ModuleRtpRtcpImpl2> CreateRtpRtcpModule(
   configuration.local_media_ssrc = local_ssrc;
   configuration.non_sender_rtt_measurement = non_sender_rtt_measurement;
 
-  auto rtp_rtcp = ModuleRtpRtcpImpl2::CreateReceiveModule(env, configuration);
+  auto rtp_rtcp = std::make_unique<ModuleRtpRtcpImpl2>(env, configuration);
   rtp_rtcp->SetRTCPStatus(RtcpMode::kCompound);
 
   return rtp_rtcp;
@@ -491,8 +491,7 @@ RtpVideoStreamReceiver2::ParseGenericDependenciesExtension(
     // Save it if there is a (potentially) new structure.
     if (dependency_descriptor.attached_structure) {
       RTC_DCHECK(dependency_descriptor.first_packet_in_frame);
-      if (video_structure_frame_id_.has_value() &&
-          video_structure_frame_id_ > frame_id) {
+      if (video_structure_frame_id_ > frame_id) {
         RTC_LOG(LS_WARNING)
             << "Arrived key frame with id " << frame_id << " and structure id "
             << dependency_descriptor.attached_structure->structure_id
@@ -756,14 +755,9 @@ void RtpVideoStreamReceiver2::OnRecoveredPacket(
 }
 
 // This method handles both regular RTP packets and packets recovered
-// via RTX or FlexFEC.
+// via FlexFEC.
 void RtpVideoStreamReceiver2::OnRtpPacket(const RtpPacketReceived& packet) {
   RTC_DCHECK_RUN_ON(&packet_sequence_checker_);
-
-  if (!packet.recovered()) {
-    // Recovery packets (RTX or FlexFEC) are logged in their respective streams.
-    env_.event_log().Log(std::make_unique<RtcEventRtpPacketIncoming>(packet));
-  }
 
   if (!receiving_)
     return;
@@ -964,7 +958,7 @@ void RtpVideoStreamReceiver2::OnAssembledFrame(
   // If frames arrive before a key frame, they would not be decodable.
   // In that case, request a key frame ASAP.
   if (!has_received_frame_) {
-    if (!frame->IsKey()) {
+    if (frame->FrameType() != VideoFrameType::kVideoFrameKey) {
       // `loss_notification_controller_`, if present, would have already
       // requested a key frame when the first packet for the non-key frame
       // had arrived, so no need to replicate the request.

@@ -141,23 +141,23 @@ int CalculateBitrate(int max_playback_rate_hz,
 
 std::unique_ptr<AudioEncoder>
 AudioEncoderMultiChannelOpusImpl::MakeAudioEncoder(
-    AudioEncoderMultiChannelOpusConfig config,
+    const AudioEncoderMultiChannelOpusConfig& config,
     int payload_type) {
   if (!config.IsOk()) {
     RTC_DCHECK_NOTREACHED();
     return nullptr;
   }
-  return std::make_unique<AudioEncoderMultiChannelOpusImpl>(std::move(config),
+  return std::make_unique<AudioEncoderMultiChannelOpusImpl>(config,
                                                             payload_type);
 }
 
 AudioEncoderMultiChannelOpusImpl::AudioEncoderMultiChannelOpusImpl(
-    AudioEncoderMultiChannelOpusConfig config,
+    const AudioEncoderMultiChannelOpusConfig& config,
     int payload_type)
     : payload_type_(payload_type), inst_(nullptr) {
   RTC_DCHECK(0 <= payload_type && payload_type <= 127);
 
-  RTC_CHECK(RecreateEncoderInstance(std::move(config)));
+  RTC_CHECK(RecreateEncoderInstance(config));
 }
 
 AudioEncoderMultiChannelOpusImpl::~AudioEncoderMultiChannelOpusImpl() {
@@ -175,7 +175,7 @@ size_t AudioEncoderMultiChannelOpusImpl::SufficientOutputBufferSize() const {
 }
 
 void AudioEncoderMultiChannelOpusImpl::Reset() {
-  RTC_CHECK(RecreateEncoderInstance());
+  RTC_CHECK(RecreateEncoderInstance(config_));
 }
 
 std::optional<std::pair<TimeDelta, TimeDelta>>
@@ -188,31 +188,27 @@ AudioEncoderMultiChannelOpusImpl::GetFrameLengthRange() const {
 // settings, save the config, and return true. Otherwise, do nothing and return
 // false.
 bool AudioEncoderMultiChannelOpusImpl::RecreateEncoderInstance(
-    AudioEncoderMultiChannelOpusConfig config) {
+    const AudioEncoderMultiChannelOpusConfig& config) {
   if (!config.IsOk())
     return false;
-  config_ = std::move(config);
-  return RecreateEncoderInstance();
-}
-
-bool AudioEncoderMultiChannelOpusImpl::RecreateEncoderInstance() {
+  config_ = config;
   if (inst_)
     RTC_CHECK_EQ(0, WebRtcOpus_EncoderFree(inst_));
   input_buffer_.clear();
   input_buffer_.reserve(Num10msFramesPerPacket() * SamplesPer10msFrame());
   RTC_CHECK_EQ(
       0, WebRtcOpus_MultistreamEncoderCreate(
-             &inst_, config_.num_channels,
-             config_.application ==
+             &inst_, config.num_channels,
+             config.application ==
                      AudioEncoderMultiChannelOpusConfig::ApplicationMode::kVoip
                  ? 0
                  : 1,
-             config_.num_streams, config_.coupled_streams,
-             config_.channel_mapping.data()));
-  const int bitrate = GetBitrateBps(config_);
+             config.num_streams, config.coupled_streams,
+             config.channel_mapping.data()));
+  const int bitrate = GetBitrateBps(config);
   RTC_CHECK_EQ(0, WebRtcOpus_SetBitRate(inst_, bitrate));
   RTC_LOG(LS_VERBOSE) << "Set Opus bitrate to " << bitrate << " bps.";
-  if (config_.fec_enabled) {
+  if (config.fec_enabled) {
     RTC_CHECK_EQ(0, WebRtcOpus_EnableFec(inst_));
     RTC_LOG(LS_VERBOSE) << "Opus enable FEC";
   } else {
@@ -220,9 +216,9 @@ bool AudioEncoderMultiChannelOpusImpl::RecreateEncoderInstance() {
     RTC_LOG(LS_VERBOSE) << "Opus disable FEC";
   }
   RTC_CHECK_EQ(
-      0, WebRtcOpus_SetMaxPlaybackRate(inst_, config_.max_playback_rate_hz));
+      0, WebRtcOpus_SetMaxPlaybackRate(inst_, config.max_playback_rate_hz));
   RTC_LOG(LS_VERBOSE) << "Set Opus playback rate to "
-                      << config_.max_playback_rate_hz << " hz.";
+                      << config.max_playback_rate_hz << " hz.";
 
   // Use the DEFAULT complexity.
   RTC_CHECK_EQ(
@@ -230,7 +226,7 @@ bool AudioEncoderMultiChannelOpusImpl::RecreateEncoderInstance() {
   RTC_LOG(LS_VERBOSE) << "Set Opus coding complexity to "
                       << AudioEncoderOpusConfig().complexity;
 
-  if (config_.dtx_enabled) {
+  if (config.dtx_enabled) {
     RTC_CHECK_EQ(0, WebRtcOpus_EnableDtx(inst_));
     RTC_LOG(LS_VERBOSE) << "Opus enable DTX";
   } else {
@@ -238,7 +234,7 @@ bool AudioEncoderMultiChannelOpusImpl::RecreateEncoderInstance() {
     RTC_LOG(LS_VERBOSE) << "Opus disable DTX";
   }
 
-  if (config_.cbr_enabled) {
+  if (config.cbr_enabled) {
     RTC_CHECK_EQ(0, WebRtcOpus_EnableCbr(inst_));
     RTC_LOG(LS_VERBOSE) << "Opus enable CBR";
   } else {

@@ -18,7 +18,6 @@
 #include <optional>
 #include <vector>
 
-#include "absl/memory/memory.h"
 #include "absl/strings/string_view.h"
 #include "api/array_view.h"
 #include "api/environment/environment.h"
@@ -43,7 +42,6 @@
 #include "modules/rtp_rtcp/source/rtp_sender.h"
 #include "modules/rtp_rtcp/source/rtp_sender_egress.h"
 #include "modules/rtp_rtcp/source/rtp_sequence_number_map.h"
-#include "rtc_base/checks.h"
 #include "rtc_base/gtest_prod_util.h"
 #include "rtc_base/synchronization/mutex.h"
 #include "rtc_base/system/no_unique_address.h"
@@ -58,18 +56,8 @@ struct RTPVideoHeader;
 class ModuleRtpRtcpImpl2 final : public RtpRtcpInterface,
                                  public RTCPReceiver::ModuleRtpRtcp {
  public:
-  static std::unique_ptr<ModuleRtpRtcpImpl2> CreateSendModule(
-      const Environment& env,
-      const RtpRtcpInterface::Configuration& configuration) {
-    RTC_DCHECK(!configuration.receiver_only);
-    return absl::WrapUnique(new ModuleRtpRtcpImpl2(env, configuration));
-  }
-  static std::unique_ptr<ModuleRtpRtcpImpl2> CreateReceiveModule(
-      const Environment& env,
-      const RtpRtcpInterface::Configuration& configuration) {
-    RTC_DCHECK(configuration.receiver_only);
-    return absl::WrapUnique(new ModuleRtpRtcpImpl2(env, configuration));
-  }
+  ModuleRtpRtcpImpl2(const Environment& env,
+                     const RtpRtcpInterface::Configuration& configuration);
   ~ModuleRtpRtcpImpl2() override;
 
   // Receiver part.
@@ -283,10 +271,6 @@ class ModuleRtpRtcpImpl2 final : public RtpRtcpInterface,
     // Handles creation of RTP packets to be sent.
     RTPSender packet_generator;
   };
-
-  // Private constructor, to enforce sender/receiver separation.
-  ModuleRtpRtcpImpl2(const Environment& env,
-                     const RtpRtcpInterface::Configuration& configuration);
 
   void set_rtt_ms(int64_t rtt_ms);
   int64_t rtt_ms() const;

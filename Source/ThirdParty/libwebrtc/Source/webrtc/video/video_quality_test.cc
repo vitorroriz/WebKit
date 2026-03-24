@@ -74,6 +74,7 @@
 #include "rtc_base/logging.h"
 #include "rtc_base/numerics/safe_conversions.h"
 #include "rtc_base/strings/string_builder.h"
+#include "rtc_base/system/file_wrapper.h"
 #include "rtc_base/task_queue_for_test.h"
 #include "test/call_test.h"
 #include "test/create_test_field_trials.h"
@@ -170,14 +171,14 @@ class QualityTestVideoEncoder : public VideoEncoder,
  public:
   QualityTestVideoEncoder(std::unique_ptr<VideoEncoder> encoder,
                           VideoAnalyzer* analyzer,
-                          std::vector<std::string> file_names,
+                          std::vector<FileWrapper> files,
                           double overshoot_factor)
       : encoder_(std::move(encoder)),
         overshoot_factor_(overshoot_factor),
         analyzer_(analyzer) {
-    for (const std::string& file_name : file_names) {
+    for (FileWrapper& file : files) {
       writers_.push_back(
-          IvfFileWriter::Wrap(file_name, /* byte_limit= */ 100000000));
+          IvfFileWriter::Wrap(std::move(file), /* byte_limit= */ 100000000));
     }
   }
 
@@ -346,7 +347,8 @@ std::unique_ptr<VideoDecoder> VideoQualityTest::CreateVideoDecoder(
     str << receive_logs_++;
     std::string path =
         params_.logging.encoded_frame_base_path + "." + str.str() + ".recv.ivf";
-    decoder = CreateFrameDumpingDecoderWrapper(std::move(decoder), path);
+    decoder = CreateFrameDumpingDecoderWrapper(
+        std::move(decoder), FileWrapper::OpenWriteOnly(path));
   }
   return decoder;
 }
@@ -363,16 +365,19 @@ std::unique_ptr<VideoEncoder> VideoQualityTest::CreateVideoEncoder(
         env, encoder_factory_.get(), nullptr, format);
   }
 
-  std::vector<std::string> encoded_frame_dump_files;
+  std::vector<FileWrapper> encoded_frame_dump_files;
   if (!params_.logging.encoded_frame_base_path.empty()) {
     char ss_buf[100];
     SimpleStringBuilder sb(ss_buf);
     sb << send_logs_++;
     std::string prefix =
         params_.logging.encoded_frame_base_path + "." + sb.str() + ".send.";
-    encoded_frame_dump_files.push_back(prefix + "1.ivf");
-    encoded_frame_dump_files.push_back(prefix + "2.ivf");
-    encoded_frame_dump_files.push_back(prefix + "3.ivf");
+    encoded_frame_dump_files.push_back(
+        FileWrapper::OpenWriteOnly(prefix + "1.ivf"));
+    encoded_frame_dump_files.push_back(
+        FileWrapper::OpenWriteOnly(prefix + "2.ivf"));
+    encoded_frame_dump_files.push_back(
+        FileWrapper::OpenWriteOnly(prefix + "3.ivf"));
   }
 
   double overshoot_factor = 1.0;
@@ -696,7 +701,7 @@ void VideoQualityTest::FillScalabilitySettings(
     std::vector<int> v = VideoQualityTest::ParseCSV(descriptor);
     RTC_CHECK_EQ(v.size(), 8);
 
-    SpatialLayer layer = {.width = 0};
+    SpatialLayer layer = {0};
     layer.width = v[0];
     layer.height = v[1];
     layer.maxFramerate = v[2];
@@ -1212,7 +1217,7 @@ VideoQualityTest::CreateSendTransport() {
     network_behavior = std::move(injection_components_.sender_network);
   }
   return std::make_unique<test::LayerFilteringTransport>(
-      env_, task_queue(),
+      task_queue(),
       std::make_unique<FakeNetworkPipe>(&env_.clock(),
                                         std::move(network_behavior)),
       sender_call_.get(), test::VideoTestConstants::kPayloadTypeVP8,
@@ -1233,7 +1238,7 @@ VideoQualityTest::CreateReceiveTransport() {
     network_behavior = std::move(injection_components_.receiver_network);
   }
   return std::make_unique<test::DirectTransport>(
-      env_, task_queue(),
+      task_queue(),
       std::make_unique<FakeNetworkPipe>(&env_.clock(),
                                         std::move(network_behavior)),
       receiver_call_.get(), payload_type_map_, GetRegisteredExtensions(),

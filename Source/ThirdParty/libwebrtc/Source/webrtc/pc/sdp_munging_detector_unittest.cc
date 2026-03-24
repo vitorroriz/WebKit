@@ -59,7 +59,6 @@
 #include "pc/test/fake_rtc_certificate_generator.h"
 #include "pc/test/integration_test_helpers.h"
 #include "pc/test/mock_peer_connection_observers.h"
-#include "rtc_base/event.h"
 #include "rtc_base/strings/string_format.h"
 #include "rtc_base/thread.h"
 #include "system_wrappers/include/metrics.h"
@@ -546,19 +545,14 @@ TEST_F(SdpMungingTest, IceUfragRestrictedAddresses) {
     std::optional<RTCError> result;
     const std::string candidate = StringFormat(
         tmpl, absl::StrReplaceAll(address_test.first, {{":", " "}}).c_str());
-
-    Event event;
     caller->pc()->AddIceCandidate(
         std::unique_ptr<IceCandidate>(
             CreateIceCandidate("", 0, candidate, nullptr)),
-        [&](RTCError error) {
-          result = error;
-          event.Set();
-        });
+        [&result](RTCError error) { result = error; });
 
-    ASSERT_TRUE(event.Wait(kDefaultTimeout));
-    EXPECT_TRUE(result.has_value());
-
+    ASSERT_THAT(
+        WaitUntil([&] { return result.has_value(); }, ::testing::IsTrue()),
+        IsRtcOk());
     if (address_test.second == true) {
       EXPECT_TRUE(result.value().ok());
     } else {
@@ -697,7 +691,7 @@ TEST_F(SdpMungingTest, RemoveContentRejected) {
   std::unique_ptr<SessionDescriptionInterface> offer = pc->CreateOffer();
   auto& contents = offer->description()->contents();
   ASSERT_THAT(contents, SizeIs(1));
-  std::string name = contents[0].mid();
+  auto name = contents[0].mid();
   EXPECT_TRUE(offer->description()->RemoveContentByName(contents[0].mid()));
   std::string sdp;
   offer->ToString(&sdp);

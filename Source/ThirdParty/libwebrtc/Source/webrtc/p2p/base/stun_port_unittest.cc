@@ -55,6 +55,7 @@
 #include "rtc_base/socket_address.h"
 #include "rtc_base/socket_factory.h"
 #include "rtc_base/socket_server.h"
+#include "rtc_base/third_party/sigslot/sigslot.h"
 #include "rtc_base/thread.h"
 #include "rtc_base/virtual_socket_server.h"
 #include "system_wrappers/include/metrics.h"
@@ -138,7 +139,7 @@ class FakeMdnsResponderProvider : public webrtc::MdnsResponderProvider {
 
 // Base class for tests connecting a StunPort to a fake STUN server
 // (webrtc::StunServer).
-class StunPortTestBase : public ::testing::Test {
+class StunPortTestBase : public ::testing::Test, public sigslot::has_slots<> {
  public:
   StunPortTestBase()
       : StunPortTestBase(kPrivateIP.ipaddr(),
@@ -221,22 +222,17 @@ class StunPortTestBase : public ::testing::Test {
       stun_port_->set_stun_keepalive_lifetime(*stun_keepalive_lifetime_);
     }
     stun_port_->SubscribePortComplete(
-        this, [this](Port* port) { OnPortComplete(port); });
-    stun_port_->SubscribePortError(this,
-                                   [this](Port* port) { OnPortError(port); });
+        [this](Port* port) { OnPortComplete(port); });
+    stun_port_->SubscribePortError([this](Port* port) { OnPortError(port); });
 
     stun_port_->SubscribeCandidateError(
-        this, [this](Port* port, const IceCandidateErrorEvent& event) {
+        [this](Port* port, const IceCandidateErrorEvent& event) {
           OnCandidateError(port, event);
         });
   }
 
   void CreateSharedUdpPort(const SocketAddress& server_addr,
                            std::unique_ptr<AsyncPacketSocket> socket) {
-    // Destroy existing stun_port_, if any, before overwriting socket_.
-    if (stun_port_) {
-      stun_port_ = nullptr;
-    }
     if (socket) {
       socket_ = std::move(socket);
     } else {
@@ -263,9 +259,8 @@ class StunPortTestBase : public ::testing::Test {
     ASSERT_TRUE(stun_port_ != nullptr);
     stun_port_->SetIceTiebreaker(kTiebreakerDefault);
     stun_port_->SubscribePortComplete(
-        this, [this](Port* port) { OnPortComplete(port); });
-    stun_port_->SubscribePortError(this,
-                                   [this](Port* port) { OnPortError(port); });
+        [this](Port* port) { OnPortComplete(port); });
+    stun_port_->SubscribePortError([this](Port* port) { OnPortError(port); });
   }
 
   void PrepareAddress() { stun_port_->PrepareAddress(); }
@@ -307,10 +302,9 @@ class StunPortTestBase : public ::testing::Test {
   }
 
   webrtc::Network* MakeNetwork(const webrtc::IPAddress& addr) {
-    networks_.emplace_back(
-        std::make_unique<Network>("unittest", "unittest", addr, 32));
-    networks_.back()->AddIP(addr);
-    return networks_.back().get();
+    networks_.emplace_back("unittest", "unittest", addr, 32);
+    networks_.back().AddIP(addr);
+    return &networks_.back();
   }
 
   webrtc::TestStunServer* stun_server_1() { return stun_servers_[0].get(); }
@@ -321,18 +315,16 @@ class StunPortTestBase : public ::testing::Test {
 
  private:
   const Environment env_;
-  std::vector<std::unique_ptr<webrtc::Network>> networks_;
+  std::vector<webrtc::Network> networks_;
   webrtc::Network* network_;
 
   std::unique_ptr<webrtc::VirtualSocketServer> ss_;
   webrtc::AutoSocketServerThread thread_;
   webrtc::NATSocketFactory nat_factory_;
   webrtc::BasicPacketSocketFactory nat_socket_factory_;
-  // Note that stun_port_ can refer to socket_, so must be destroyed
-  // before it.
-  std::unique_ptr<webrtc::AsyncPacketSocket> socket_;
   std::unique_ptr<webrtc::UDPPort> stun_port_;
   std::vector<webrtc::TestStunServer::StunServerPtr> stun_servers_;
+  std::unique_ptr<webrtc::AsyncPacketSocket> socket_;
   std::unique_ptr<webrtc::MdnsResponderProvider> mdns_responder_provider_;
   std::unique_ptr<webrtc::NATServer> nat_server_;
   bool done_;

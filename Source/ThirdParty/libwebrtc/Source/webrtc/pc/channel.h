@@ -13,13 +13,13 @@
 
 #include <stdint.h>
 
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "absl/functional/any_invocable.h"
 #include "absl/strings/string_view.h"
 #include "api/crypto/crypto_options.h"
 #include "api/jsep.h"
@@ -91,7 +91,7 @@ class BaseChannel : public ChannelInterface,
       bool srtp_required,
       CryptoOptions crypto_options,
       UniqueRandomIdGenerator* ssrc_generator);
-  ~BaseChannel() override;
+  virtual ~BaseChannel();
 
   TaskQueueBase* worker_thread() const { return worker_thread_; }
   Thread* network_thread() const { return network_thread_; }
@@ -148,13 +148,8 @@ class BaseChannel : public ChannelInterface,
   }
 
   // Used for latency measurements.
-  void SetFirstPacketReceivedCallback(
-      absl::AnyInvocable<void() &&> callback) override;
-  void SetFirstPacketSentCallback(
-      absl::AnyInvocable<void() &&> callback) override;
-
-  void SetPacketReceivedCallback_n(absl::AnyInvocable<void()> callback) override
-      RTC_RUN_ON(network_thread());
+  void SetFirstPacketReceivedCallback(std::function<void()> callback) override;
+  void SetFirstPacketSentCallback(std::function<void()> callback) override;
 
   // From RtpTransport - public for testing only
   void OnTransportReadyToSend(bool ready);
@@ -311,8 +306,7 @@ class BaseChannel : public ChannelInterface,
   const std::unique_ptr<MediaReceiveChannelInterface> media_receive_channel_;
 
  private:
-  bool ConnectToRtpTransport_n(RtpTransportInternal* rtp_transport)
-      RTC_RUN_ON(network_thread());
+  bool ConnectToRtpTransport_n() RTC_RUN_ON(network_thread());
   void DisconnectFromRtpTransport_n() RTC_RUN_ON(network_thread());
   void SignalSentPacket_n(const SentPacketInfo& sent_packet);
 
@@ -322,14 +316,9 @@ class BaseChannel : public ChannelInterface,
   scoped_refptr<PendingTaskSafetyFlag> alive_;
 
   // The functions are deleted after they have been called.
-  absl::AnyInvocable<void() &&> on_first_packet_received_
+  std::function<void()> on_first_packet_received_
       RTC_GUARDED_BY(network_thread());
-  absl::AnyInvocable<void() &&> on_first_packet_sent_
-      RTC_GUARDED_BY(network_thread());
-
-  // Used to unmute.
-  absl::AnyInvocable<void()> on_packet_received_n_
-      RTC_GUARDED_BY(network_thread());
+  std::function<void()> on_first_packet_sent_ RTC_GUARDED_BY(network_thread());
 
   RtpTransportInternal* rtp_transport_ RTC_GUARDED_BY(network_thread()) =
       nullptr;
@@ -389,7 +378,7 @@ class VoiceChannel : public BaseChannel {
       CryptoOptions crypto_options,
       UniqueRandomIdGenerator* ssrc_generator);
 
-  ~VoiceChannel() override;
+  ~VoiceChannel();
 
   VideoChannel* AsVideoChannel() override {
     RTC_CHECK_NOTREACHED();
@@ -456,7 +445,7 @@ class VideoChannel : public BaseChannel {
       bool srtp_required,
       CryptoOptions crypto_options,
       UniqueRandomIdGenerator* ssrc_generator);
-  ~VideoChannel() override;
+  ~VideoChannel();
 
   VideoChannel* AsVideoChannel() override { return this; }
   VoiceChannel* AsVoiceChannel() override {

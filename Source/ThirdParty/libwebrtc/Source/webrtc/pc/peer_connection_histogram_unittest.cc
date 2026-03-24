@@ -35,6 +35,7 @@
 #include "rtc_base/checks.h"
 #include "rtc_base/fake_mdns_responder.h"
 #include "rtc_base/fake_network.h"
+#include "rtc_base/gunit.h"
 #include "rtc_base/ip_address.h"
 #include "rtc_base/network.h"
 #include "rtc_base/socket_address.h"
@@ -175,17 +176,12 @@ class PeerConnectionWrapperForUsageHistogramTest
       return false;
     }
     // Wait until the gathering completes before we signal the candidate.
-    EXPECT_TRUE(WaitUntil([&] { return observer()->ice_gathering_complete_; },
-                          {.timeout = kDefaultTimeout}));
-    EXPECT_TRUE(
-        WaitUntil([&] { return callee->observer()->ice_gathering_complete_; },
-                  {.timeout = kDefaultTimeout}));
+    WAIT(observer()->ice_gathering_complete_, kDefaultTimeout.ms());
+    WAIT(callee->observer()->ice_gathering_complete_, kDefaultTimeout.ms());
     AddBufferedIceCandidates();
     callee->AddBufferedIceCandidates();
-    EXPECT_TRUE(
-        WaitUntil([&] { return IsConnected(); }, {.timeout = kDefaultTimeout}));
-    EXPECT_TRUE(WaitUntil([&] { return callee->IsConnected(); },
-                          {.timeout = kDefaultTimeout}));
+    WAIT(IsConnected(), kDefaultTimeout.ms());
+    WAIT(callee->IsConnected(), kDefaultTimeout.ms());
     return IsConnected() && callee->IsConnected();
   }
 

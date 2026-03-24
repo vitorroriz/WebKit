@@ -33,8 +33,9 @@ class RtcEventLog;
 
 class AudioEncoderMultiChannelOpusImpl final : public AudioEncoder {
  public:
-  AudioEncoderMultiChannelOpusImpl(AudioEncoderMultiChannelOpusConfig config,
-                                   int payload_type);
+  AudioEncoderMultiChannelOpusImpl(
+      const AudioEncoderMultiChannelOpusConfig& config,
+      int payload_type);
   ~AudioEncoderMultiChannelOpusImpl() override;
 
   AudioEncoderMultiChannelOpusImpl(const AudioEncoderMultiChannelOpusImpl&) =
@@ -68,14 +69,14 @@ class AudioEncoderMultiChannelOpusImpl final : public AudioEncoder {
   static AudioCodecInfo QueryAudioEncoder(
       const AudioEncoderMultiChannelOpusConfig& config);
   static std::unique_ptr<AudioEncoder> MakeAudioEncoder(
-      AudioEncoderMultiChannelOpusConfig config,
+      const AudioEncoderMultiChannelOpusConfig&,
       int payload_type);
 
   size_t Num10msFramesPerPacket() const;
   size_t SamplesPer10msFrame() const;
   size_t SufficientOutputBufferSize() const;
-  bool RecreateEncoderInstance(AudioEncoderMultiChannelOpusConfig config);
-  bool RecreateEncoderInstance();
+  bool RecreateEncoderInstance(
+      const AudioEncoderMultiChannelOpusConfig& config);
   void SetFrameLength(int frame_length_ms);
   void SetNumChannelsToEncode(size_t num_channels_to_encode);
   void SetProjectedPacketLossRate(float fraction);

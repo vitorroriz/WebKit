@@ -16,12 +16,13 @@
 #include <vector>
 
 #include "absl/functional/any_invocable.h"
-#include "rtc_base/callback_list.h"
 #include "rtc_base/memory/fifo_buffer.h"
 #include "rtc_base/server_socket_adapters.h"
+#include "rtc_base/sigslot_trampoline.h"
 #include "rtc_base/socket.h"
 #include "rtc_base/socket_address.h"
 #include "rtc_base/socket_factory.h"
+#include "rtc_base/third_party/sigslot/sigslot.h"
 
 namespace webrtc {
 
@@ -32,26 +33,20 @@ namespace webrtc {
 // class; children of ProxyServer implement WrapSocket appropriately to return
 // the correct protocol handler.
 
-class ProxyBinding {
+class ProxyBinding : public sigslot::has_slots<> {
  public:
   ProxyBinding(AsyncProxyServerSocket* in_socket, Socket* out_socket);
-  virtual ~ProxyBinding();
+  ~ProxyBinding() override;
 
   ProxyBinding(const ProxyBinding&) = delete;
   ProxyBinding& operator=(const ProxyBinding&) = delete;
 
-  [[deprecated]] void SubscribeDestroyed(
-      absl::AnyInvocable<void(ProxyBinding* proxy)> callback) {
-    destroyed_callbacks_.AddReceiver(std::move(callback));
-  }
+  sigslot::signal1<ProxyBinding*> SignalDestroyed;
   void SubscribeDestroyed(
-      void* tag,
       absl::AnyInvocable<void(ProxyBinding* proxy)> callback) {
-    destroyed_callbacks_.AddReceiver(tag, std::move(callback));
+    destroyed_trampoline_.Subscribe(std::move(callback));
   }
-  void NotifyDestroyed(ProxyBinding* proxy) {
-    destroyed_callbacks_.Send(proxy);
-  }
+  void NotifyDestroyed(ProxyBinding* proxy) { SignalDestroyed(proxy); }
 
  private:
   void OnConnectRequest(AsyncProxyServerSocket* socket,
@@ -75,16 +70,17 @@ class ProxyBinding {
   FifoBuffer out_buffer_;
   FifoBuffer in_buffer_;
 
-  CallbackList<ProxyBinding*> destroyed_callbacks_;
+  SignalTrampoline<ProxyBinding, &ProxyBinding::SignalDestroyed>
+      destroyed_trampoline_;
 };
 
-class ProxyServer {
+class ProxyServer : public sigslot::has_slots<> {
  public:
   ProxyServer(SocketFactory* int_factory,
               const SocketAddress& int_addr,
               SocketFactory* ext_factory,
               const SocketAddress& ext_ip);
-  virtual ~ProxyServer();
+  ~ProxyServer() override;
 
   ProxyServer(const ProxyServer&) = delete;
   ProxyServer& operator=(const ProxyServer&) = delete;
@@ -104,5 +100,6 @@ class ProxyServer {
 };
 
 }  //  namespace webrtc
+
 
 #endif  // RTC_BASE_PROXY_SERVER_H_

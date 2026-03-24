@@ -15,7 +15,6 @@
 #include <string>
 #include <utility>
 
-#include "absl/strings/has_absl_stringify.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/string_view.h"
 #include "api/array_view.h"
@@ -44,12 +43,6 @@ class SimpleStringBuilder {
   SimpleStringBuilder& operator<<(float f);
   SimpleStringBuilder& operator<<(double f);
   SimpleStringBuilder& operator<<(long double f);
-
-  template <typename T>
-    requires absl::HasAbslStringify<T>::value
-  SimpleStringBuilder& operator<<(const T& value) {
-    return *this << absl::StrCat(value);
-  }
 
   // Returns a pointer to the built string. The name `str()` is borrowed for
   // compatibility reasons as we replace usage of stringstream throughout the
@@ -90,10 +83,12 @@ class SimpleStringBuilder {
 // might be more efficient for some use cases.
 class StringBuilder {
  public:
-  StringBuilder() = default;
+  StringBuilder() {}
   explicit StringBuilder(absl::string_view s) : str_(s) {}
-  StringBuilder(const StringBuilder&) = default;
-  StringBuilder& operator=(const StringBuilder&) = default;
+
+  // TODO(tommi): Support construction from StringBuilder?
+  StringBuilder(const StringBuilder&) = delete;
+  StringBuilder& operator=(const StringBuilder&) = delete;
 
   StringBuilder& operator<<(const absl::string_view str) {
     str_.append(str.data(), str.length());
@@ -139,13 +134,6 @@ class StringBuilder {
 
   StringBuilder& operator<<(double f) {
     str_ += absl::StrCat(f);
-    return *this;
-  }
-
-  template <typename T>
-    requires absl::HasAbslStringify<T>::value
-  StringBuilder& operator<<(const T& value) {
-    str_ += absl::StrCat(value);
     return *this;
   }
 

@@ -39,7 +39,7 @@ namespace webrtc {
 class BasicIceController : public IceControllerInterface {
  public:
   explicit BasicIceController(const IceControllerFactoryArgs& args);
-  ~BasicIceController() override;
+  virtual ~BasicIceController();
 
   void SetIceConfig(const IceConfig& config) override;
   void SetSelectedConnection(const Connection* selected_connection) override;

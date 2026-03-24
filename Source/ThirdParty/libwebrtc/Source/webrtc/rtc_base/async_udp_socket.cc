@@ -53,15 +53,8 @@ AsyncUDPSocket::AsyncUDPSocket(const Environment& env,
       sequence_checker_(SequenceChecker::kDetached),
       socket_(std::move(socket)) {
   // The socket should start out readable but not writable.
-  socket_->SubscribeReadEvent(this,
-                              [this](Socket* socket) { OnReadEvent(socket); });
-  socket_->SubscribeWriteEvent(
-      this, [this](Socket* socket) { OnWriteEvent(socket); });
-  // need to forward that also for UDP case (DTLS) once the SSL handshake is
-  // finished
-
-  socket_->SubscribeConnectEvent(
-      this, [this](Socket* socket) { OnConnectEvent(socket); });
+  socket_->SignalReadEvent.connect(this, &AsyncUDPSocket::OnReadEvent);
+  socket_->SignalWriteEvent.connect(this, &AsyncUDPSocket::OnWriteEvent);
 }
 
 SocketAddress AsyncUDPSocket::GetLocalAddress() const {
@@ -80,7 +73,7 @@ int AsyncUDPSocket::Send(const void* pv,
                              options.info_signaled_after_sent);
   CopySocketInformationToPacketInfo(cb, *this, &sent_packet.info);
   int ret = socket_->Send(pv, cb);
-  NotifySentPacket(this, sent_packet);
+  SignalSentPacket(this, sent_packet);
   return ret;
 }
 
@@ -102,7 +95,7 @@ int AsyncUDPSocket::SendTo(const void* pv,
     }
   }
   int ret = socket_->SendTo(pv, cb, addr);
-  NotifySentPacket(this, sent_packet);
+  SignalSentPacket(this, sent_packet);
   return ret;
 }
 
@@ -128,10 +121,6 @@ int AsyncUDPSocket::GetError() const {
 
 void AsyncUDPSocket::SetError(int error) {
   return socket_->SetError(error);
-}
-
-void AsyncUDPSocket::OnConnectEvent(Socket* socket) {
-  NotifyConnect(this);
 }
 
 void AsyncUDPSocket::OnReadEvent(Socket* socket) {
@@ -177,7 +166,7 @@ void AsyncUDPSocket::OnReadEvent(Socket* socket) {
 }
 
 void AsyncUDPSocket::OnWriteEvent(Socket* socket) {
-  NotifyReadyToSend(this);
+  SignalReadyToSend(this);
 }
 
 }  // namespace webrtc

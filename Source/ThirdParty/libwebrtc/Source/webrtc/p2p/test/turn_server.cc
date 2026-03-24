@@ -122,8 +122,8 @@ void TurnServer::AddInternalServerSocket(
       ServerSocketInfo{.proto = protocol,
                        .ssl_adapter_factory = std::move(ssl_adapter_factory)});
   RTC_DCHECK(inserted);
-  iter->first->SubscribeReadEvent(
-      this, [this](Socket* socket) { OnNewInternalConnection(socket); });
+  iter->first->SignalReadEvent.connect(this,
+                                       &TurnServer::OnNewInternalConnection);
 }
 
 void TurnServer::SetExternalSocketFactory(PacketSocketFactory* factory,
@@ -554,9 +554,10 @@ bool TurnServerConnection::operator<(const TurnServerConnection& c) const {
 }
 
 std::string TurnServerConnection::ToString() const {
+  const char* const kProtos[] = {"unknown", "udp", "tcp", "ssltcp"};
   StringBuilder ost;
   ost << src_.ToSensitiveString() << "-" << dst_.ToSensitiveString() << ":"
-      << ProtoToString(proto_);
+      << kProtos[proto_];
   return ost.Release();
 }
 

@@ -78,7 +78,7 @@ static inline RTCIceGatheringState NODELETE toRTCIceGatheringState(webrtc::IceGa
     RELEASE_ASSERT_NOT_REACHED();
 }
 
-class LibWebRTCIceTransportBackendObserver final : public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<LibWebRTCIceTransportBackendObserver> {
+class LibWebRTCIceTransportBackendObserver final : public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<LibWebRTCIceTransportBackendObserver>, public sigslot::has_slots<> {
 public:
     static Ref<LibWebRTCIceTransportBackendObserver> create(RTCIceTransportBackendClient& client, Ref<webrtc::IceTransportInterface> backend) { return adoptRef(*new LibWebRTCIceTransportBackendObserver(client, WTF::move(backend))); }
 
@@ -110,20 +110,13 @@ void LibWebRTCIceTransportBackendObserver::start()
         auto* internal = m_backend->internal();
         if (!internal)
             return;
-        internal->SubscribeIceTransportStateChanged(this, [weakThis = ThreadSafeWeakPtr { * this }](auto* transport) {
+        internal->SubscribeIceTransportStateChanged([weakThis = ThreadSafeWeakPtr { * this }](auto* transport) {
             if (RefPtr protectedThis = weakThis.get())
                 protectedThis->onIceTransportStateChanged(transport);
         });
 
-        internal->AddGatheringStateCallback(this, [weakThis = ThreadSafeWeakPtr { * this }](auto* transport) {
-            if (RefPtr protectedThis = weakThis.get())
-                protectedThis->onGatheringStateChanged(transport);
-        });
-
-        internal->SubscribeNetworkRouteChanged(this, [weakThis = ThreadSafeWeakPtr { * this }](auto&& route) {
-            if (RefPtr protectedThis = weakThis.get())
-                protectedThis->onNetworkRouteChanged(WTF::move(route));
-        });
+        internal->AddGatheringStateCallback(this, [this](auto* transport) { onGatheringStateChanged(transport); });
+        internal->SignalNetworkRouteChanged.connect(this, &LibWebRTCIceTransportBackendObserver::onNetworkRouteChanged);
 
         auto transportState = internal->GetIceTransportState();
         // We start observing a bit late and might miss the checking state. Synthesize it as needed.
@@ -154,7 +147,7 @@ void LibWebRTCIceTransportBackendObserver::stop()
         if (!internal)
             return;
         internal->RemoveGatheringStateCallback(this);
-        internal->UnsubscribeNetworkRouteChanged(this);
+        internal->SignalNetworkRouteChanged.disconnect(this);
     });
 }
 

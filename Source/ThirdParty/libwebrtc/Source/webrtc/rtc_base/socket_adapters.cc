@@ -210,7 +210,7 @@ void AsyncSSLSocket::ProcessInput(char* data, size_t* len) {
 
   // FIX: if SignalConnect causes the socket to be destroyed, we are in trouble
   if (remainder)
-    NotifyReadEvent(this);
+    SignalReadEvent(this);
 }
 
 }  // namespace webrtc

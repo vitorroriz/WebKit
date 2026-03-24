@@ -183,7 +183,7 @@ TEST(WaitUntilTest,
       CreateSimulatedTimeController();
   std::unique_ptr<TaskQueueBase, TaskQueueDeleter> task_queue =
       time_controller->GetTaskQueueFactory()->CreateTaskQueue(
-          "task_queue", TaskQueueFactory::Priority::kNormal);
+          "task_queue", TaskQueueFactory::Priority::NORMAL);
 
   bool condition = false;
   Timestamp start = time_controller->GetClock()->CurrentTime();

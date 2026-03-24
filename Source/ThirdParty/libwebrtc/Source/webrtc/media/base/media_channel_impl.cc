@@ -35,8 +35,8 @@
 
 namespace webrtc {
 
-RTCError InvokeSetParametersCallback(SetParametersCallback& callback,
-                                     RTCError error) {
+webrtc::RTCError InvokeSetParametersCallback(SetParametersCallback& callback,
+                                             RTCError error) {
   if (callback) {
     std::move(callback)(error);
     callback = nullptr;

@@ -15,7 +15,6 @@
 #include <utility>
 #include <vector>
 
-#include "api/array_view.h"
 #include "api/field_trials_view.h"
 #include "api/units/timestamp.h"
 #include "call/rtp_demuxer.h"
@@ -90,7 +89,7 @@ bool SrtpTransport::SendRtpPacket(CopyOnWriteBuffer* packet,
     return false;
   }
 
-  return RtpTransport::SendRtpPacket(packet, updated_options, flags);
+  return SendPacket(/*rtcp=*/false, packet, updated_options, flags);
 }
 
 bool SrtpTransport::SendRtcpPacket(CopyOnWriteBuffer* packet,
@@ -112,7 +111,7 @@ bool SrtpTransport::SendRtcpPacket(CopyOnWriteBuffer* packet,
     return false;
   }
 
-  return RtpTransport::SendRtcpPacket(packet, options, flags);
+  return SendPacket(/*rtcp=*/true, packet, options, flags);
 }
 
 void SrtpTransport::OnRtpPacketReceived(const ReceivedIpPacket& packet) {
@@ -159,8 +158,8 @@ void SrtpTransport::OnRtcpPacketReceived(const ReceivedIpPacket& packet) {
                       << payload.size() << ", type=" << type;
     return;
   }
-  SendRtcpPacketReceived(std::move(payload), packet.arrival_time(),
-                         packet.ecn());
+  SendRtcpPacketReceived(
+      &payload, packet.arrival_time() ? packet.arrival_time()->us() : -1);
 }
 
 void SrtpTransport::OnNetworkRouteChanged(

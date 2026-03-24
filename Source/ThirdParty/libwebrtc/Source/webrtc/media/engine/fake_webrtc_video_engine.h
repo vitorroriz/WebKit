@@ -44,7 +44,7 @@ class FakeWebRtcVideoEncoderFactory;
 class FakeWebRtcVideoDecoder : public VideoDecoder {
  public:
   explicit FakeWebRtcVideoDecoder(FakeWebRtcVideoDecoderFactory* factory);
-  ~FakeWebRtcVideoDecoder() override;
+  ~FakeWebRtcVideoDecoder();
 
   bool Configure(const Settings& settings) override;
   int32_t Decode(const EncodedImage&, int64_t) override;
@@ -83,7 +83,7 @@ class FakeWebRtcVideoDecoderFactory : public VideoDecoderFactory {
 class FakeWebRtcVideoEncoder : public VideoEncoder {
  public:
   explicit FakeWebRtcVideoEncoder(FakeWebRtcVideoEncoderFactory* factory);
-  ~FakeWebRtcVideoEncoder() override;
+  ~FakeWebRtcVideoEncoder();
 
   void SetFecControllerOverride(
       FecControllerOverride* fec_controller_override) override;

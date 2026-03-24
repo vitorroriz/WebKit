@@ -27,6 +27,7 @@
 #include "rtc_base/network/sent_packet.h"
 #include "rtc_base/socket.h"
 #include "rtc_base/socket_address.h"
+#include "rtc_base/third_party/sigslot/sigslot.h"
 #include "rtc_base/thread.h"
 #include "rtc_base/virtual_socket_server.h"
 #include "test/create_test_environment.h"
@@ -75,11 +76,12 @@ class AsyncStunServerTCPSocket : public AsyncTcpListenSocket {
                            std::unique_ptr<Socket> socket)
       : AsyncTcpListenSocket(env, std::move(socket)) {}
   void HandleIncomingConnection(std::unique_ptr<Socket> socket) override {
-    NotifyNewConnection(this, new AsyncStunTCPSocket(env(), std::move(socket)));
+    SignalNewConnection(this, new AsyncStunTCPSocket(env(), std::move(socket)));
   }
 };
 
-class AsyncStunTCPSocketTest : public ::testing::Test {
+class AsyncStunTCPSocketTest : public ::testing::Test,
+                               public sigslot::has_slots<> {
  protected:
   AsyncStunTCPSocketTest()
       : vss_(new VirtualSocketServer()), thread_(vss_.get()) {}
@@ -93,11 +95,8 @@ class AsyncStunTCPSocketTest : public ::testing::Test {
     server->Bind(kServerAddr);
     listen_socket_ =
         std::make_unique<AsyncStunServerTCPSocket>(env, std::move(server));
-    listen_socket_->SubscribeNewConnection(
-        this, [this](AsyncListenSocket* listen_socket,
-                     AsyncPacketSocket* packet_socket) {
-          OnNewConnection(listen_socket, packet_socket);
-        });
+    listen_socket_->SignalNewConnection.connect(
+        this, &AsyncStunTCPSocketTest::OnNewConnection);
 
     std::unique_ptr<Socket> client =
         vss_->Create(kClientAddr.family(), SOCK_STREAM);
@@ -105,10 +104,8 @@ class AsyncStunTCPSocketTest : public ::testing::Test {
     ASSERT_EQ(client->Bind(kClientAddr), 0);
     ASSERT_EQ(client->Connect(listen_socket_->GetLocalAddress()), 0);
     send_socket_ = std::make_unique<AsyncStunTCPSocket>(env, std::move(client));
-    send_socket_->SubscribeSentPacket(
-        this, [this](AsyncPacketSocket* socket, const SentPacketInfo& info) {
-          OnSentPacket(socket, info);
-        });
+    send_socket_->SignalSentPacket.connect(
+        this, &AsyncStunTCPSocketTest::OnSentPacket);
     vss_->ProcessMessagesUntilIdle();
   }
 

@@ -55,13 +55,13 @@ class AudioEncoderOpusImpl final : public AudioEncoder {
 
   static std::unique_ptr<AudioEncoderOpusImpl> CreateForTesting(
       const Environment& env,
-      AudioEncoderOpusConfig config,
+      const AudioEncoderOpusConfig& config,
       int payload_type,
       const AudioNetworkAdaptorCreator& audio_network_adaptor_creator,
       std::unique_ptr<SmoothingFilter> bitrate_smoother);
 
   AudioEncoderOpusImpl(const Environment& env,
-                       AudioEncoderOpusConfig config,
+                       const AudioEncoderOpusConfig& config,
                        int payload_type);
 
   ~AudioEncoderOpusImpl() override;
@@ -125,7 +125,7 @@ class AudioEncoderOpusImpl final : public AudioEncoder {
 
   AudioEncoderOpusImpl(
       const Environment& env,
-      AudioEncoderOpusConfig config,
+      const AudioEncoderOpusConfig& config,
       int payload_type,
       const AudioNetworkAdaptorCreator& audio_network_adaptor_creator,
       std::unique_ptr<SmoothingFilter> bitrate_smoother);
@@ -138,8 +138,7 @@ class AudioEncoderOpusImpl final : public AudioEncoder {
   size_t Num10msFramesPerPacket() const;
   size_t SamplesPer10msFrame() const;
   size_t SufficientOutputBufferSize() const;
-  bool RecreateEncoderInstance(AudioEncoderOpusConfig config);
-  bool RecreateEncoderInstance();
+  bool RecreateEncoderInstance(const AudioEncoderOpusConfig& config);
   void SetFrameLength(int frame_length_ms);
   void SetNumChannelsToEncode(size_t num_channels_to_encode);
   void SetProjectedPacketLossRate(float fraction);

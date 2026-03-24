@@ -13,26 +13,11 @@
 #include <cstring>
 #include <string>
 
-#include "absl/strings/string_view.h"
 #include "rtc_base/checks.h"
 #include "test/gmock.h"
 #include "test/gtest.h"
 
 namespace webrtc {
-namespace {
-
-class StructWithAbslStringify {
- public:
-  explicit StructWithAbslStringify(absl::string_view sv) : value_(sv) {}
-
-  template <typename Sink>
-  friend void AbslStringify(Sink& sink, const StructWithAbslStringify& self) {
-    sink.Append(self.value_);
-  }
-
- private:
-  std::string value_;
-};
 
 TEST(SimpleStringBuilder, Limit) {
   char sb_buf[10];
@@ -69,14 +54,6 @@ TEST(SimpleStringBuilder, StdString) {
   std::string str = "does this work?";
   sb << str;
   EXPECT_EQ(str, sb.str());
-}
-
-TEST(SimpleStringBuilder, CanUseAbslStringForCustomTypes) {
-  char sb_buf[100];
-  SimpleStringBuilder sb(sb_buf);
-  StructWithAbslStringify value("absl-stringify");
-  sb << value;
-  EXPECT_STREQ(sb.str(), "absl-stringify");
 }
 
 // These tests are safe to run if we have death test support or if DCHECKs are
@@ -198,13 +175,6 @@ TEST(StringBuilder, StdString) {
   EXPECT_EQ(str, sb.str());
 }
 
-TEST(StringBuilder, CanUseAbslStringForCustomTypes) {
-  StringBuilder sb;
-  StructWithAbslStringify value("absl-stringify");
-  sb << value;
-  EXPECT_EQ(sb.str(), "absl-stringify");
-}
-
 TEST(StringBuilder, Release) {
   StringBuilder sb;
   std::string str =
@@ -230,5 +200,4 @@ TEST(StringBuilder, Reset) {
   EXPECT_EQ("123!", sb.str());
 }
 
-}  // namespace
 }  // namespace webrtc

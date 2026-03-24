@@ -114,7 +114,7 @@ std::string ToString(const EncodedImage& encoded_image) {
   char buffer[1024];
   SimpleStringBuilder ss(buffer);
 
-  ss << VideoFrameTypeToString(encoded_image.frame_type())
+  ss << VideoFrameTypeToString(encoded_image._frameType)
      << ", size=" << encoded_image.size() << ", qp=" << encoded_image.qp_
      << ", timestamp=" << encoded_image.RtpTimestamp();
 

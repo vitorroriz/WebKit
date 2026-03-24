@@ -227,9 +227,7 @@ class OutstandingData {
     // Marks this item as abandoned.
     void Abandon();
 
-    bool is_outstanding() const {
-      return ack_state_ != AckState::kAcked && lifecycle_ == Lifecycle::kActive;
-    }
+    bool is_outstanding() const { return ack_state_ == AckState::kUnacked; }
     bool is_acked() const { return ack_state_ == AckState::kAcked; }
     bool is_nacked() const { return ack_state_ == AckState::kNacked; }
     bool is_abandoned() const { return lifecycle_ == Lifecycle::kAbandoned; }

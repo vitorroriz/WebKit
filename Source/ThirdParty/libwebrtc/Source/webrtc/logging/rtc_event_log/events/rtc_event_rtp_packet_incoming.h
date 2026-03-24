@@ -15,7 +15,6 @@
 #include <cstdint>
 #include <map>
 #include <memory>
-#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -35,9 +34,7 @@ class RtcEventRtpPacketIncoming final : public RtcEvent {
  public:
   static constexpr Type kType = Type::RtpPacketIncoming;
 
-  RtcEventRtpPacketIncoming(
-      const RtpPacketReceived& packet,
-      std::optional<uint16_t> rtx_original_sequence_number = std::nullopt);
+  explicit RtcEventRtpPacketIncoming(const RtpPacketReceived& packet);
   ~RtcEventRtpPacketIncoming() override;
 
   Type GetType() const override { return kType; }
@@ -71,9 +68,6 @@ class RtcEventRtpPacketIncoming final : public RtcEvent {
   size_t payload_length() const { return packet_.payload_size(); }
   size_t header_length() const { return packet_.headers_size(); }
   size_t padding_length() const { return packet_.padding_size(); }
-  std::optional<uint16_t> rtx_original_sequence_number() const {
-    return rtx_original_sequence_number_;
-  }
 
   static std::string Encode(ArrayView<const RtcEvent*> /* batch */) {
     // TODO(terelius): Implement
@@ -92,7 +86,6 @@ class RtcEventRtpPacketIncoming final : public RtcEvent {
   RtcEventRtpPacketIncoming(const RtcEventRtpPacketIncoming&) = default;
 
   const RtpPacket packet_;
-  const std::optional<uint16_t> rtx_original_sequence_number_;
 };
 
 }  // namespace webrtc

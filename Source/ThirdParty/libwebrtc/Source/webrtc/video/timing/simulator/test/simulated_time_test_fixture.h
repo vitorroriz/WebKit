@@ -25,7 +25,7 @@ namespace webrtc::video_timing_simulator {
 class SimulatedTimeTestFixture : public ::testing::Test {
  protected:
   SimulatedTimeTestFixture();
-  ~SimulatedTimeTestFixture() override;
+  ~SimulatedTimeTestFixture();
 
   // Post a task to the simulated time task queue and synchronize.
   void SendTask(absl::AnyInvocable<void() &&> task);

@@ -1166,17 +1166,16 @@ TEST(EchoCanceller3, StereoContentDetectionForMonoSignals) {
 }
 
 TEST(EchoCanceller3, InjectedNeuralResidualEchoEstimatorIsUsed) {
-  class NeuralResidualEchoEstimatorMock : public NeuralResidualEchoEstimator {
+  class NeuralResidualEchoEstimatorImpl : public NeuralResidualEchoEstimator {
    public:
-    NeuralResidualEchoEstimatorMock() {}
+    NeuralResidualEchoEstimatorImpl() {}
 
-    void Estimate(const Block& render,
+    void Estimate(ArrayView<const float> render,
                   ArrayView<const std::array<float, 64>> capture,
                   ArrayView<const std::array<float, 64>> linear_aec_output,
                   ArrayView<const std::array<float, 65>> S2_linear,
                   ArrayView<const std::array<float, 65>> Y2,
                   ArrayView<const std::array<float, 65>> E2,
-                  bool dominant_nearend,
                   ArrayView<std::array<float, 65>> R2,
                   ArrayView<std::array<float, 65>> R2_unbounded) override {
       residual_echo_estimate_requested_ = true;
@@ -1195,15 +1194,13 @@ TEST(EchoCanceller3, InjectedNeuralResidualEchoEstimatorIsUsed) {
       return EchoCanceller3Config();
     }
 
-    MOCK_METHOD(void, Reset, (), (override));
-
    private:
     bool residual_echo_estimate_requested_ = false;
   };
 
   constexpr int kSampleRateHz = 16000;
   constexpr int kNumChannels = 1;
-  NeuralResidualEchoEstimatorMock neural_residual_echo_estimator;
+  NeuralResidualEchoEstimatorImpl neural_residual_echo_estimator;
   const Environment env = CreateEnvironment();
   EchoCanceller3Config config;
   AudioBuffer buffer(/*input_rate=*/kSampleRateHz,
@@ -1216,7 +1213,7 @@ TEST(EchoCanceller3, InjectedNeuralResidualEchoEstimatorIsUsed) {
                       &neural_residual_echo_estimator,
                       /*sample_rate_hz=*/kSampleRateHz,
                       /*num_render_channels=*/kNumChannels,
-                      /*num_capture_channels=*/kNumChannels);
+                      /*num_capture_input_channels=*/kNumChannels);
   constexpr int kNumFramesToProcess = 300;
   for (int k = 0; k < kNumFramesToProcess; ++k) {
     RunAecInSMono(buffer, aec3, k);

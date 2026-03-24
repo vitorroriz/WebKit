@@ -288,42 +288,28 @@ void MultiCodecReceiveTest::RunTestWithCodecs(
 }
 
 TEST_F(MultiCodecReceiveTest, SingleStreamReceivesVp8Vp9) {
-  RunTestWithCodecs({{.payload_name = "VP8", .num_temporal_layers = 1},
-                     {.payload_name = "VP9", .num_temporal_layers = 1},
-                     {.payload_name = "VP8", .num_temporal_layers = 1}});
+  RunTestWithCodecs({{"VP8", 1}, {"VP9", 1}, {"VP8", 1}});
 }
 
 TEST_F(MultiCodecReceiveTest, SingleStreamReceivesVp8Vp9WithTl) {
-  RunTestWithCodecs({{.payload_name = "VP8", .num_temporal_layers = 2},
-                     {.payload_name = "VP9", .num_temporal_layers = 2},
-                     {.payload_name = "VP8", .num_temporal_layers = 2}});
+  RunTestWithCodecs({{"VP8", 2}, {"VP9", 2}, {"VP8", 2}});
 }
 
 #if defined(WEBRTC_USE_H264)
 TEST_F(MultiCodecReceiveTest, SingleStreamReceivesVp8H264) {
-  RunTestWithCodecs({{.payload_name = "VP8", .num_temporal_layers = 1},
-                     {.payload_name = "H264", .num_temporal_layers = 1},
-                     {.payload_name = "VP8", .num_temporal_layers = 1}});
+  RunTestWithCodecs({{"VP8", 1}, {"H264", 1}, {"VP8", 1}});
 }
 
 TEST_F(MultiCodecReceiveTest, SingleStreamReceivesVp8H264WithTl) {
-  RunTestWithCodecs({{.payload_name = "VP8", .num_temporal_layers = 3},
-                     {.payload_name = "H264", .num_temporal_layers = 1},
-                     {.payload_name = "VP8", .num_temporal_layers = 3}});
+  RunTestWithCodecs({{"VP8", 3}, {"H264", 1}, {"VP8", 3}});
 }
 
 TEST_F(MultiCodecReceiveTest, SingleStreamReceivesVp8Vp9H264) {
-  RunTestWithCodecs({{.payload_name = "VP8", .num_temporal_layers = 1},
-                     {.payload_name = "VP9", .num_temporal_layers = 1},
-                     {.payload_name = "H264", .num_temporal_layers = 1},
-                     {.payload_name = "VP9", .num_temporal_layers = 1}});
+  RunTestWithCodecs({{"VP8", 1}, {"VP9", 1}, {"H264", 1}, {"VP9", 1}});
 }
 
 TEST_F(MultiCodecReceiveTest, SingleStreamReceivesVp8Vp9H264WithTl) {
-  RunTestWithCodecs({{.payload_name = "VP8", .num_temporal_layers = 3},
-                     {.payload_name = "VP9", .num_temporal_layers = 2},
-                     {.payload_name = "H264", .num_temporal_layers = 1},
-                     {.payload_name = "VP9", .num_temporal_layers = 3}});
+  RunTestWithCodecs({{"VP8", 3}, {"VP9", 2}, {"H264", 1}, {"VP9", 3}});
 }
 #endif  // defined(WEBRTC_USE_H264)
 
