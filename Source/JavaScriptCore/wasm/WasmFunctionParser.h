@@ -2271,6 +2271,8 @@ FOR_EACH_WASM_MEMORY_STORE_OP(CREATE_CASE)
             MemoryInitImmediates immediates;
             WASM_FAIL_IF_HELPER_FAILS(parseMemoryInitImmediates(immediates));
 
+            WASM_VALIDATOR_FAIL_IF(!m_info.memoryCount(), "memory must be present");
+
             TypedExpression dstAddress;
             TypedExpression srcAddress;
             TypedExpression length;
