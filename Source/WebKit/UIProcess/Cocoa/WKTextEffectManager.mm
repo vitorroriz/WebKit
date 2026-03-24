@@ -70,23 +70,33 @@ static constexpr WTTextEffectManagerWritingDirection toTextEffectWritingDirectio
         return nil;
 
     _webView = webView;
-    _textEffectManager = adoptNS([PAL::alloc_WTTextEffectManagerInstance() initWithDelegate:self]);
+    if (WKTextEffectManager.canUse)
+        _textEffectManager = adoptNS([PAL::alloc_WTTextEffectManagerInstance() initWithDelegate:self]);
 
     return self;
 }
 
 - (void)addTextEffectForID:(NSUUID *)uuid withData:(const WebCore::TextEffectData&)data
 {
+    if (!WKTextEffectManager.canUse)
+        return;
+
     [_textEffectManager startAnimationForSuggestionWithUUID:uuid writingDirection:toTextEffectWritingDirection(data.writingDirection) effectType:WTTextEffectManagerEffectTypeDefault completion:^(NSUUID *uuid) { }];
 }
 
 - (void)removeTextEffectForID:(NSUUID *)uuid
 {
+    if (!WKTextEffectManager.canUse)
+        return;
+
     [_textEffectManager cancelAnimationForSuggestionWithUUID:uuid];
 }
 
 - (void)removeAllTextEffects
 {
+    if (!WKTextEffectManager.canUse)
+        return;
+
     [_textEffectManager cancelAllAnimations];
 }
 
