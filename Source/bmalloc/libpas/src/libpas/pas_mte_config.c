@@ -391,6 +391,16 @@ void pas_bmalloc_force_allocations_into_bitfit_heaps_where_available(void)
     PAS_IGNORE_WARNINGS_END;
 }
 
+bool pas_mte_is_mte_enabled(void)
+{
+    pas_mte_ensure_initialized();
+#if PAS_ENABLE_MTE
+    return PAS_MTE_CONFIG_BYTE(PAS_MTE_ENABLE_FLAG);
+#else
+    return false;
+#endif
+}
+
 void pas_mte_force_nontaggable_user_allocations_into_large_heap(void)
 {
 #if PAS_ENABLE_BMALLOC

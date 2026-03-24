@@ -206,6 +206,7 @@ PAS_ALLOW_UNSAFE_BUFFER_USAGE_END;
 #ifdef __cplusplus
 extern "C" {
 #endif
+bool pas_mte_is_mte_enabled(void);
 void pas_mte_ensure_initialized(void);
 void pas_mte_force_nontaggable_user_allocations_into_large_heap(void);
 void pas_bmalloc_force_allocations_into_bitfit_heaps_where_available(void);
