@@ -490,6 +490,7 @@ void LayerTreeHost::applyTransientZoomToLayers(double scale, FloatPoint origin)
     transform.translate(constrainedOrigin.x(), constrainedOrigin.y());
     transform.scale(scale);
 
+    Locker locker { zoomLayer->lock() };
     zoomLayer->setTransform(transform);
     zoomLayer->setAnchorPoint(FloatPoint3D());
     zoomLayer->setPosition(FloatPoint());
@@ -512,7 +513,9 @@ void LayerTreeHost::commitTransientZoom(double scale, FloatPoint origin, FloatPo
         TransformationMatrix finalTransform;
         finalTransform.scale(scale);
 
-        layerForTransientZoom()->setTransform(finalTransform);
+        auto* zoomLayer = layerForTransientZoom();
+        Locker locker { zoomLayer->lock() };
+        zoomLayer->setTransform(finalTransform);
     }
 
     m_transientZoom = false;
