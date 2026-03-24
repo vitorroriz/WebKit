@@ -97,7 +97,7 @@ bool DocumentMarkerController::addMarker(const SimpleRange& range, DocumentMarke
 
 #if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
     RefPtr page = m_document->page();
-    bool needsTextEffect = type == DocumentMarkerType::Grammar && page;
+    bool needsTextEffect = type == DocumentMarkerType::Grammar && page && page->settings().textEffectsEnabled();
     RefPtr<TextIndicator> textIndicator;
     if (needsTextEffect)
         textIndicator = page->textEffectController().createTextIndicatorForRange(range);
