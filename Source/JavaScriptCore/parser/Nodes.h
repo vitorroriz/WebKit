@@ -1854,6 +1854,7 @@ namespace JSC {
         
     private:
         bool hasCompletionValue() const final { return false; }
+        bool hasEarlyBreakOrContinue() const final { return true; }
         bool isContinue() const final { return true; }
         void emitBytecode(BytecodeGenerator&, RegisterID* = nullptr) final;
 
@@ -1864,9 +1865,10 @@ namespace JSC {
     public:
         BreakNode(const JSTokenLocation&, const Identifier&);
         Label* trivialTarget(BytecodeGenerator&);
-        
+
     private:
         bool hasCompletionValue() const final { return false; }
+        bool hasEarlyBreakOrContinue() const final { return true; }
         bool isBreak() const final { return true; }
         void emitBytecode(BytecodeGenerator&, RegisterID* = nullptr) final;
 
@@ -1908,6 +1910,7 @@ namespace JSC {
 
     private:
         bool hasCompletionValue() const final { return m_statement->hasCompletionValue(); }
+        bool hasEarlyBreakOrContinue() const final { return m_statement->hasEarlyBreakOrContinue(); }
         void emitBytecode(BytecodeGenerator&, RegisterID* = nullptr) final;
 
         const Identifier& m_name;
