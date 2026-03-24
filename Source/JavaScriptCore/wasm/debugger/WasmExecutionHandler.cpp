@@ -882,13 +882,13 @@ String ExecutionHandler::callStackStringFor(uint64_t threadId)
         auto& stopData = *state->stopData;
         RELEASE_ASSERT(stopData.callFrame);
 
-        Vector<VirtualAddress> frameAddresses = collectCallStack(stopData.address, stopData.callFrame, *targetVM);
+        Vector<FrameInfo> frames = collectCallStack(stopData.address, stopData.callFrame, *targetVM);
 
         StringBuilder result;
-        for (VirtualAddress address : frameAddresses)
-            result.append(toNativeEndianHex(address));
+        for (const auto& frame : frames)
+            result.append(toNativeEndianHex(frame.address));
 
-        dataLogLnIf(Options::verboseWasmDebugger(), "[ExecutionHandler] callStackStringFor: collected ", frameAddresses.size(), " frames");
+        dataLogLnIf(Options::verboseWasmDebugger(), "[ExecutionHandler] callStackStringFor: collected ", frames.size(), " frames");
         return result.toString();
     }
 

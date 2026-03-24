@@ -220,13 +220,13 @@ String QueryHandler::buildWasmCallStackResponse()
     RELEASE_ASSERT(stopData.callFrame);
     dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] buildWasmCallStackResponse: walking call stack from CallFrame ", RawPointer(stopData.callFrame));
 
-    Vector<VirtualAddress> frameAddresses = collectCallStack(stopData.address, stopData.callFrame, stopData.instance->vm());
+    Vector<FrameInfo> frames = collectCallStack(stopData.address, stopData.callFrame, stopData.instance->vm());
 
-    dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] buildWasmCallStackResponse: finished walking, ", frameAddresses.size(), " frames");
+    dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] buildWasmCallStackResponse: finished walking, ", frames.size(), " frames");
 
     StringBuilder result;
-    for (VirtualAddress address : frameAddresses)
-        result.append(toNativeEndianHex(address));
+    for (const auto& frame : frames)
+        result.append(toNativeEndianHex(frame.address));
     dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] buildWasmCallStackResponse: response length: ", result.length());
     return result.toString();
 }
@@ -375,12 +375,6 @@ void QueryHandler::handleWasmLocal(StringView packet)
 
     dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] qWasmLocal frame=", frameIndex, ", variable=", localIndex);
 
-    // For now, only support frame 0 (current frame)
-    if (frameIndex) {
-        m_debugServer.sendErrorReply(ProtocolError::UnknownCommand);
-        return;
-    }
-
     auto* state = m_debugServer.execution().debuggeeStateSafe();
     if (!state->atBreakpoint()) {
         m_debugServer.sendErrorReply(ProtocolError::UnknownCommand);
@@ -388,11 +382,36 @@ void QueryHandler::handleWasmLocal(StringView packet)
     }
 
     auto& stopData = *state->stopData;
-    auto functionIndex = stopData.callee->functionIndex();
-    const auto& moduleInfo = stopData.instance->module().moduleInformation();
+    IPInt::IPIntLocal* locals = nullptr;
+    RefPtr<IPIntCallee> localCallee;
+    JSWebAssemblyInstance* instance = nullptr;
+
+    if (!frameIndex) {
+        locals = stopData.locals;
+        localCallee = stopData.callee;
+        instance = stopData.instance;
+    } else {
+        auto frames = collectCallStack(stopData.address, stopData.callFrame, stopData.instance->vm());
+        if (frameIndex >= frames.size() || !frames[frameIndex].isWasmFrame()) {
+            m_debugServer.sendErrorReply(ProtocolError::UnknownCommand);
+            return;
+        }
+        const auto& frameInfo = frames[frameIndex];
+        locals = localsFromFrame(frameInfo.wasmCallFrame, frameInfo.wasmCallee.get());
+        localCallee = frameInfo.wasmCallee;
+        instance = frameInfo.wasmCallFrame->wasmInstance();
+    }
+
+    auto functionIndex = localCallee->functionIndex();
+    const auto& moduleInfo = instance->module().moduleInformation();
     const Vector<Type>& localTypes = moduleInfo.debugInfo->ensureFunctionDebugInfo(functionIndex).locals;
 
-    IPInt::IPIntLocal& local = stopData.locals[localIndex];
+    if (localIndex >= localTypes.size()) {
+        m_debugServer.sendErrorReply(ProtocolError::InvalidPacket);
+        return;
+    }
+
+    IPInt::IPIntLocal& local = locals[localIndex];
     Type localType = localTypes[localIndex];
     logWasmLocalValue(localIndex, local, localType);
 

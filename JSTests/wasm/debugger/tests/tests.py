@@ -275,6 +275,8 @@ class SwiftWasmTestCase(BaseTestCase):
                 self.breakpointTest()
                 self.inspectionTest()
                 self.stepTest()
+                self.memoryTest()
+                self.variableTest()
 
         except Exception as e:
             raise Exception(f"Test failed: {e}")
@@ -349,6 +351,7 @@ class SwiftWasmTestCase(BaseTestCase):
                 "frame #0: 0x4000000000010960",
                 "frame #1: 0x4000000000010a05",
                 "frame #2: 0x400000000001098f",
+                "frame #3: 0xc000000000000000",
             ],
         )
 
@@ -494,6 +497,17 @@ class SwiftWasmTestCase(BaseTestCase):
             "mem reg 0x0000000000000000",
             patterns=["[0x0000000000000000-0x0000000000130000) rw- wasm_memory_0_0"],
         )
+
+    def variableTest(self):
+        self.send_lldb_command_or_raise("b isEven")
+        self.send_lldb_command_or_raise("c", patterns=["Process 1 stopped", "stop reason = breakpoint"])
+        self.send_lldb_command_or_raise("v", patterns=["(Int32) n ="])
+        self.send_lldb_command_or_raise("up", patterns=["-> 17  	    guard isEven(sum) else {"])
+        self.send_lldb_command_or_raise("v", patterns=[
+            "(Int32) input =",
+            "(Int32) doubled =",
+            "(Int32) sum =",
+        ])
 
 
 class NopDropSelectEndTestCase(BaseTestCase):

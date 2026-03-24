@@ -248,7 +248,17 @@ Vector<StringView> splitWithDelimiters(StringView packet, StringView delimiters)
 
 bool getWasmReturnPC(CallFrame* currentFrame, uint8_t*& returnPC, VirtualAddress& virtualReturnPC);
 
-Vector<VirtualAddress> collectCallStack(VirtualAddress stopAddress, CallFrame* startFrame, VM&, unsigned maxFrames = 100);
+struct FrameInfo {
+    VirtualAddress address;
+    CallFrame* wasmCallFrame { nullptr };
+    RefPtr<IPIntCallee> wasmCallee;
+
+    bool isWasmFrame() const { return !!wasmCallee; }
+};
+
+Vector<FrameInfo> collectCallStack(VirtualAddress stopAddress, CallFrame* startFrame, VM&, unsigned maxFrames = 100);
+
+IPInt::IPIntLocal* localsFromFrame(CallFrame*, const IPIntCallee*);
 
 inline StringView getErrorReply(ProtocolError error)
 {

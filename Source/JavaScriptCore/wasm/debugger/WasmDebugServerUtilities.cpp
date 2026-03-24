@@ -43,6 +43,7 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
 #include "WasmVirtualAddress.h"
 #include <cstring>
 #include <wtf/DataLog.h>
+#include <wtf/StdLibExtras.h>
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/Vector.h>
 #include <wtf/text/StringToIntegerConversion.h>
@@ -175,6 +176,16 @@ bool getWasmReturnPC(CallFrame* currentFrame, uint8_t*& returnPC, VirtualAddress
     return true;
 }
 
+// This is the C++ equivalent of the "# Recompute PL" block in InPlaceInterpreter.asm.
+IPInt::IPIntLocal* localsFromFrame(CallFrame* callFrame, const IPIntCallee* callee)
+{
+    // IPIntCalleeSaveSpaceStackAligned is defined in InPlaceInterpreter.asm.
+    static constexpr size_t ipintCalleeSaveSpaceStackAligned = WTF::roundUpToMultipleOf<stackAlignmentBytes()>((Wasm::numberOfIPIntCalleeSaveRegisters + Wasm::numberOfIPIntInternalRegisters) * sizeof(Register));
+    size_t localsAndRethrowSize = (callee->localSizeToAlloc() + callee->rethrowSlots()) * IPInt::LOCAL_SIZE;
+    auto pl = reinterpret_cast<uintptr_t>(callFrame) - ipintCalleeSaveSpaceStackAligned - localsAndRethrowSize;
+    return reinterpret_cast<IPInt::IPIntLocal*>(pl);
+}
+
 // Walk the full CallFrame chain from a WASM breakpoint, collecting virtual addresses for
 // every WASM and JS frame. The result is consumed by qWasmCallStack to give LLDB a
 // complete backtrace even when WASM and JS frames are interleaved.
@@ -195,10 +206,20 @@ bool getWasmReturnPC(CallFrame* currentFrame, uint8_t*& returnPC, VirtualAddress
 //           trampoline), WasmToJS (recover outer WASM call-site PC from WasmToJSIPIntReturnPCSlot).
 //           Both the JIT and no-JIT WasmToJS stubs save the IPInt PC into
 //           WasmToJSIPIntReturnPCSlot[cfr] on entry, before JS JIT can clobber the register.
-Vector<VirtualAddress> collectCallStack(VirtualAddress stopAddress, CallFrame* startFrame, VM& vm, unsigned maxFrames)
+Vector<FrameInfo> collectCallStack(VirtualAddress stopAddress, CallFrame* startFrame, VM& vm, unsigned maxFrames)
 {
-    Vector<VirtualAddress> frames;
-    frames.append(stopAddress);
+    Vector<FrameInfo> frames;
+
+    // Frame 0 — the breakpoint frame. startFrame is always an IPInt WASM frame.
+    {
+        RELEASE_ASSERT(startFrame->callee().isNativeCallee());
+        RefPtr startNativeCallee = startFrame->callee().asNativeCallee();
+        RELEASE_ASSERT(startNativeCallee->category() == NativeCallee::Category::Wasm);
+        RefPtr startWasmCallee = uncheckedDowncast<const Wasm::Callee>(startNativeCallee.get());
+        RELEASE_ASSERT(startWasmCallee->compilationMode() == Wasm::CompilationMode::IPIntMode);
+        RefPtr startIPIntCallee = uncheckedDowncast<const Wasm::IPIntCallee>(startWasmCallee.get());
+        frames.append({ stopAddress, startFrame, WTF::move(startIPIntCallee) });
+    }
 
     if (Options::verboseWasmDebugger()) {
         dataLogLn("[collectCallStack] frames:");
@@ -231,13 +252,13 @@ Vector<VirtualAddress> collectCallStack(VirtualAddress stopAddress, CallFrame* s
                             else
                                 dataLogLn("  [", frames.size(), "] [JS] ", frame->codeBlock()->inferredNameWithHash());
                         }
-                        frames.append(VirtualAddress(VirtualAddress::JS_FRAME_BASE));
+                        frames.append({ VirtualAddress(VirtualAddress::JS_FRAME_BASE), nullptr, { } });
                     }
                 });
             } else {
 #endif
                 dataLogLnIf(Options::verboseWasmDebugger(), "  [", frames.size(), "] [JS] ", frame->codeBlock()->inferredNameWithHash());
-                frames.append(VirtualAddress(VirtualAddress::JS_FRAME_BASE));
+                frames.append({ VirtualAddress(VirtualAddress::JS_FRAME_BASE), nullptr, { } });
 #if ENABLE(DFG_JIT)
             }
 #endif
@@ -269,7 +290,7 @@ Vector<VirtualAddress> collectCallStack(VirtualAddress stopAddress, CallFrame* s
             RefPtr ipintCaller = uncheckedDowncast<const Wasm::IPIntCallee>(wasmCallerCallee.get());
             VirtualAddress virtualReturnPC = VirtualAddress::toVirtual(caller->wasmInstance(), ipintCaller->functionIndex(), savedWasmToWasmPC(frame));
             dataLogLnIf(Options::verboseWasmDebugger(), "  [", frames.size(), "] [WASM][IPInt] ", virtualReturnPC);
-            frames.append(virtualReturnPC);
+            frames.append({ virtualReturnPC, caller, ipintCaller });
             entryFrame = callerEntryFrame;
             frame = caller;
             break;
@@ -302,7 +323,7 @@ Vector<VirtualAddress> collectCallStack(VirtualAddress stopAddress, CallFrame* s
             RefPtr outerIPIntCallee = uncheckedDowncast<const Wasm::IPIntCallee>(outerWasmCallee.get());
             VirtualAddress callSiteAddr = VirtualAddress::toVirtual(outerFrame->wasmInstance(), outerIPIntCallee->functionIndex(), savedWasmToJSPC(caller));
             dataLogLnIf(Options::verboseWasmDebugger(), "  [", frames.size(), "] [WASM][WasmToJS]", callSiteAddr);
-            frames.append(callSiteAddr);
+            frames.append({ callSiteAddr, outerFrame, outerIPIntCallee });
             entryFrame = callerEntryFrame;
             frame = outerFrame;
             break;
