@@ -870,6 +870,10 @@ bool Quirks::shouldTranscodeHeicImagesForURL(const URL& url)
     if (quirksDomain.string() == "canva.com"_s)
         return true;
 
+    // uhc.com rdar://173206598
+    if (quirksDomain.string() == "uhc.com"_s)
+        return true;
+
     return false;
 }
 
