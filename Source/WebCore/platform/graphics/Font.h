@@ -166,7 +166,7 @@ public:
 
     FloatRect boundsForGlyph(Glyph) const;
 #if USE(CORE_TEXT) || USE(SKIA)
-    static constexpr size_t inlineGlyphRunCapacity = 128;
+    static constexpr size_t inlineGlyphRunCapacity = 256;
     Vector<FloatRect, inlineGlyphRunCapacity> boundsForGlyphs(std::span<const Glyph>) const;
 #endif
 
