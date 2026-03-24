@@ -104,11 +104,12 @@ SourceBufferPrivateGStreamer::~SourceBufferPrivateGStreamer()
 #if !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
 void SourceBufferPrivateGStreamer::handleLogMessage(const WTFLogChannel& channel, WTFLogLevel level, Vector<JSONLogValue>&& values)
 {
-    auto name = StringView::fromLatin1(channel.name);
-    if (name != "MediaSource"_s)
+    auto gstDebugLevel = gstDebugLevelFromWTFLogLevel(level);
+    if (gstDebugLevel > gst_debug_category_get_threshold(GST_CAT_DEFAULT))
         return;
 
-    if (!gst_debug_category_get_threshold(GST_CAT_DEFAULT))
+    auto name = StringView::fromLatin1(channel.name);
+    if (name != "MediaSource"_s)
         return;
 
     // Ignore logs containing only the call site information.
@@ -144,7 +145,6 @@ void SourceBufferPrivateGStreamer::handleLogMessage(const WTFLogChannel& channel
     if (methodNameSeparatorIndex != notFound)
         methodName = callSite.substring(methodNameSeparatorIndex + 1, leftParenthesisIndex - methodNameSeparatorIndex - 1);
 
-    auto gstDebugLevel = gstDebugLevelFromWTFLogLevel(level);
     auto message = builder.toString();
     auto pipeline = m_appendPipeline ? m_appendPipeline->pipeline() : nullptr;
     // FIXME: Filename and line number are inaccurate. https://bugs.webkit.org/show_bug.cgi?id=310526
