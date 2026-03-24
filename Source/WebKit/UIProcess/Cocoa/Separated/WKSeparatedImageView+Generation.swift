@@ -34,12 +34,12 @@ extension WKSeparatedImageView {
             Logger.separatedImage.log("\(self.logPrefix) - Cache Hit for Image Generation.")
             self.spatial3DImage = cachedData.spatial3DImage
             self.desiredViewingModeSpatial = cachedData.desiredViewingModeSpatial
-            return Task { @Sendable [weak self] () -> Void in
+            return Task { @MainActor [weak self] in
                 self?.preparePortalEntity()
             }
         }
 
-        return Task { @Sendable [weak self] () -> Void in
+        return Task { @MainActor [weak self] in
             guard let self else { return }
             return try await self.generate()
         }
