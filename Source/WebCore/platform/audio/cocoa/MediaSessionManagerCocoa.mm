@@ -404,6 +404,9 @@ void MediaSessionManagerCocoa::clearNowPlayingInfo()
     if (canLoad_MediaRemote_MRMediaRemoteSetNowPlayingVisibility())
         MRMediaRemoteSetNowPlayingVisibility(MRMediaRemoteGetLocalOrigin(), MRNowPlayingClientVisibilityNeverVisible);
 
+    if (canLoad_MediaRemote_MRMediaRemoteSetParentApplication())
+        MRMediaRemoteSetParentApplication(MRMediaRemoteGetLocalOrigin(), nullptr);
+
     MRMediaRemoteSetCanBeNowPlayingApplication(false);
     MRMediaRemoteSetNowPlayingInfo(nullptr);
     MRMediaRemoteSetNowPlayingApplicationPlaybackStateForOrigin(MRMediaRemoteGetLocalOrigin(), kMRPlaybackStateStopped, mainDispatchQueueSingleton(), ^(MRMediaRemoteError error) {
