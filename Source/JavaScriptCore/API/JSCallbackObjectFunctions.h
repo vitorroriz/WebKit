@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2020 Apple Inc. All rights reserved.
+ * Copyright (C) 2006-2020, 2026 Apple Inc. All rights reserved.
  * Copyright (C) 2007 Eric Seidel <eric@webkit.org>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 #include "APICast.h"
 #include "Error.h"
 #include "ExceptionHelpers.h"
+#include "Integrity.h"
 #include "JSCallbackFunction.h"
 #include "JSClassRef.h"
 #include "JSFunction.h"
@@ -478,15 +479,23 @@ EncodedJSValue JSCallbackObject<Parent>::constructImpl(JSGlobalObject* globalObj
     
     for (JSClassRef jsClass = jsCast<JSCallbackObject<Parent>*>(constructor)->classRef(); jsClass; jsClass = jsClass->parentClass) {
         if (JSObjectCallAsConstructorCallback callAsConstructor = jsClass->callAsConstructor) {
-            size_t argumentCount = callFrame->argumentCount();
-            Vector<JSValueRef, 16> arguments(argumentCount, [&](size_t i) {
+#if CPU(ADDRESS64)
+            auto argumentsSpan = Integrity::audit(callFrame->argumentsSpan());
+            JSValueRef* argumentsSpanData = std::bit_cast<JSValueRef*>(argumentsSpan.data());
+#else
+            // It is safe to use a Vector here because the values are protected by their source
+            // location in the call frame arguments on the stack.
+            Vector<JSValueRef, 16> arguments(callFrame->argumentCount(), [&](size_t i) {
                 return toRef(globalObject, callFrame->uncheckedArgument(i));
             });
+            auto argumentsSpan = arguments.span();
+            auto* argumentsSpanData = argumentsSpan.data();
+#endif
             JSValueRef exception = nullptr;
             JSObject* result;
             {
                 JSLock::DropAllLocks dropAllLocks(globalObject);
-                result = toJS(callAsConstructor(execRef, constructorRef, argumentCount, arguments.span().data(), &exception));
+                result = toJS(callAsConstructor(execRef, constructorRef, argumentsSpan.size(), argumentsSpanData, &exception));
             }
             if (exception) {
                 throwException(globalObject, scope, toJS(globalObject, exception));
@@ -556,16 +565,24 @@ EncodedJSValue JSCallbackObject<Parent>::callImpl(JSGlobalObject* globalObject, 
     
     for (JSClassRef jsClass = jsCast<JSCallbackObject<Parent>*>(toJS(functionRef))->classRef(); jsClass; jsClass = jsClass->parentClass) {
         if (JSObjectCallAsFunctionCallback callAsFunction = jsClass->callAsFunction) {
-            size_t argumentCount = callFrame->argumentCount();
-            Vector<JSValueRef, 16> arguments(argumentCount, [&](size_t i) {
+#if CPU(ADDRESS64)
+            auto argumentsSpan = Integrity::audit(callFrame->argumentsSpan());
+            JSValueRef* argumentsSpanData = std::bit_cast<JSValueRef*>(argumentsSpan.data());
+#else
+            // It is safe to use a Vector here because the values are protected by their source
+            // location in the call frame arguments on the stack.
+            Vector<JSValueRef, 16> arguments(callFrame->argumentCount(), [&](size_t i) {
                 return toRef(globalObject, callFrame->uncheckedArgument(i));
             });
+            auto argumentsSpan = arguments.span();
+            auto* argumentsSpanData = argumentsSpan.data();
+#endif
 
             JSValueRef exception = nullptr;
             JSValue result;
             {
                 JSLock::DropAllLocks dropAllLocks(globalObject);
-                result = toJS(globalObject, callAsFunction(execRef, functionRef, thisObjRef, argumentCount, arguments.span().data(), &exception));
+                result = toJS(globalObject, callAsFunction(execRef, functionRef, thisObjRef, argumentsSpan.size(), argumentsSpanData, &exception));
             }
             if (exception) {
                 throwException(globalObject, scope, toJS(globalObject, exception));
