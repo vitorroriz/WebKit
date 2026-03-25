@@ -566,20 +566,28 @@ void RemoteScrollingTreeMac::scrollingTreeNodeScrollbarMinimumThumbLengthDidChan
 
 void RemoteScrollingTreeMac::triggerMainFrameRubberBandSnapBack()
 {
-    RefPtr rootScrollingNode = dynamicDowncast<ScrollingTreeFrameScrollingNodeMac>(rootNode());
-    if (!rootScrollingNode)
-        return;
+    ASSERT(isMainRunLoop());
+    ScrollingThread::dispatch([protectedThis = Ref { *this }]() {
+        Locker locker { protectedThis->m_treeLock };
+        RefPtr rootScrollingNode = dynamicDowncast<ScrollingTreeFrameScrollingNodeMac>(protectedThis->rootNode());
+        if (!rootScrollingNode)
+            return;
 
-    rootScrollingNode->startRubberBandSnapBack();
+        rootScrollingNode->startRubberBandSnapBack();
+    });
 }
 
 void RemoteScrollingTreeMac::mainFrameRubberBandTargetOffsetDidChange()
 {
-    RefPtr rootScrollingNode = dynamicDowncast<ScrollingTreeFrameScrollingNodeMac>(rootNode());
-    if (!rootScrollingNode)
-        return;
+    ASSERT(isMainRunLoop());
+    ScrollingThread::dispatch([protectedThis = Ref { *this }]() {
+        Locker locker { protectedThis->m_treeLock };
+        RefPtr rootScrollingNode = dynamicDowncast<ScrollingTreeFrameScrollingNodeMac>(protectedThis->rootNode());
+        if (!rootScrollingNode)
+            return;
 
-    rootScrollingNode->rubberBandTargetOffsetDidChange();
+        rootScrollingNode->rubberBandTargetOffsetDidChange();
+    });
 }
 
 } // namespace WebKit
