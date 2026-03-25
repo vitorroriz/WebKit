@@ -11904,8 +11904,6 @@
                     "-webkit-text-stroke-width",
                     "-webkit-text-stroke-color"
                 ],
-                "skip-style-extractor": true,
-                "skip-style-extractor-comment": "FIXME: Figure out and document why this has no computed value",
                 "shorthand-pattern": "StandardSpaceSeparated",
                 "parser-grammar-unused": "<'-webkit-text-stroke-width'> || <'-webkit-text-stroke-color'>",
                 "parser-grammar-unused-reason": "Needs support for shorthand grammars."

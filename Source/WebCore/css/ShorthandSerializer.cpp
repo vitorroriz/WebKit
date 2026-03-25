@@ -358,8 +358,9 @@ String ShorthandSerializer::serialize()
     case CSSPropertyOutline:
     case CSSPropertyTextEmphasis:
     case CSSPropertyTextDecoration:
-    case CSSPropertyWebkitTextStroke:
         return serializeLonghandsOmittingInitialValues();
+    case CSSPropertyWebkitTextStroke:
+        return serializeLonghands();
     case CSSPropertyBorderColor:
     case CSSPropertyBorderStyle:
     case CSSPropertyBorderWidth:
