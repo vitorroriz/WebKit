@@ -77,7 +77,7 @@ text, tspan, tref {
 
 /* states */
 
-:focus {
+:focus-visible {
     outline-style: auto;
 }
 

@@ -37,7 +37,7 @@
     color: -webkit-activelink;
 }
 
-:focus {
+:focus-visible {
     outline-style: auto;
 }
 
