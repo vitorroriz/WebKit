@@ -5157,17 +5157,14 @@ bool Document::isNavigationBlockedByThirdPartyIFrameRedirectBlocking(Frame& targ
         return false;
 
     // Only prevent cross-site navigations.
-    RefPtr targetLocalFrame = dynamicDowncast<LocalFrame>(targetFrame);
-    if (!targetLocalFrame)
-        return true;
-    RefPtr targetDocument = targetLocalFrame->document();
-    if (!targetDocument)
+    RefPtr targetSecurityOrigin = targetFrame.frameDocumentSecurityOrigin();
+    if (!targetSecurityOrigin)
         return true;
 
-    if (targetDocument->securityOrigin().protocol() != destinationURL.protocol())
+    if (targetSecurityOrigin->protocol() != destinationURL.protocol())
         return true;
 
-    return !(protect(targetDocument->securityOrigin())->isSameOriginDomain(SecurityOrigin::create(destinationURL)) || areRegistrableDomainsEqual(targetDocument->url(), destinationURL));
+    return !(targetSecurityOrigin->isSameOriginDomain(SecurityOrigin::create(destinationURL)) || RegistrableDomain(targetSecurityOrigin->data()).matches(destinationURL));
 }
 
 void Document::didRemoveAllPendingStylesheet()

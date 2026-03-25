@@ -247,7 +247,6 @@ http/tests/security/XFrameOptions/x-frame-options-ancestors-same-origin-deny.htm
 http/tests/security/XFrameOptions/x-frame-options-ignore-deny-meta-tag-parent-same-origin-deny.html [ Failure ]
 http/tests/security/XFrameOptions/x-frame-options-multiple-headers-sameorigin-deny.html [ Failure ]
 http/tests/security/XFrameOptions/x-frame-options-parent-same-origin-deny.html [ Failure ]
-http/tests/security/allow-top-level-navigations-by-third-party-iframes-to-same-origin.html [ Failure ]
 http/tests/security/basic-auth-subresource.html [ Failure ]
 http/tests/security/block-top-level-navigation-to-different-scheme-by-third-party-iframes.html [ Failure ]
 http/tests/security/block-top-level-navigations-by-sandboxed-iframe-with-propagated-user-gesture.html [ Failure ]
