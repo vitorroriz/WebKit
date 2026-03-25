@@ -87,6 +87,7 @@ namespace JSC {
     macro(DatePrototypeGetTimezoneOffsetIntrinsic) \
     macro(DatePrototypeGetYearIntrinsic) \
     macro(DatePrototypeSetTimeIntrinsic) \
+    macro(ErrorIsErrorIntrinsic) \
     macro(FromCharCodeIntrinsic) \
     macro(GlobalIsFiniteIntrinsic) \
     macro(GlobalIsNaNIntrinsic) \
