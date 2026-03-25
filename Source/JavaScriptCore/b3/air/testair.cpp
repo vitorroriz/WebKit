@@ -2464,6 +2464,9 @@ void testLinearScanSpillRangesEarlyDef()
 #if USE(JSVALUE64)
 void testZDefOfSpillSlotWithOffsetNeedingToBeMaterializedInARegister()
 {
+    // This test runs slowly in Debug builds so run it less frequently. B3OptLevel 1 and 2 behave the same w.r.t. this code anyway.
+    if (Options::defaultB3OptLevel() == 1)
+        return;
 
     B3::Procedure proc;
     Code& code = proc.code();
