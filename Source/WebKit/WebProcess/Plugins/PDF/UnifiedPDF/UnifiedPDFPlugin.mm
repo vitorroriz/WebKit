@@ -2974,8 +2974,16 @@ void UnifiedPDFPlugin::extendCurrentSelectionIfNeeded()
     setCurrentSelection(WTF::move(selection));
 }
 
+static bool shouldNotTrackSelectionForEvent(const WebCore::PlatformMouseEvent& event)
+{
+    return event.inputSource() == WebCore::MouseEventInputSource::Automation && event.syntheticClickType() != WebCore::SyntheticClickType::NoTap;
+}
+
 void UnifiedPDFPlugin::beginTrackingSelection(PDFDocumentLayout::PageIndex pageIndex, const WebCore::FloatPoint& pagePoint, const WebCore::PlatformMouseEvent& event)
 {
+    if (shouldNotTrackSelectionForEvent(event))
+        return;
+
     auto modifiers = event.modifiers();
 
     m_selectionTrackingData.isActivelyTrackingSelection = true;
@@ -3200,6 +3208,9 @@ std::pair<String, String> UnifiedPDFPlugin::stringsBeforeAndAfterSelection(int c
 
 bool UnifiedPDFPlugin::existingSelectionContainsPoint(const FloatPoint& rootViewPoint) const
 {
+    if (!hasSelection())
+        return false;
+
     auto pluginPoint = convertFromRootViewToPlugin(roundedIntPoint(rootViewPoint));
     auto documentPoint = convertDown(CoordinateSpace::Plugin, CoordinateSpace::PDFDocumentLayout, FloatPoint { pluginPoint });
     auto pageIndex = protect(m_presentationController)->pageIndexForDocumentPoint(documentPoint);
@@ -4840,7 +4851,15 @@ void UnifiedPDFPlugin::handleSyntheticClick(PlatformMouseEvent&& event)
     UNUSED_PARAM(event);
 #endif
 
-    clearSelection();
+#if PLATFORM(IOS_FAMILY)
+    // On iOS, we only end up here with synthetic clicks outside of an existing selection range.
+    static constexpr bool shouldClearSelection = true;
+#else
+    bool shouldClearSelection = !existingSelectionContainsPoint(WebCore::FloatPoint { pointInRootView });
+#endif
+
+    if (shouldClearSelection)
+        clearSelection();
 }
 
 #endif
