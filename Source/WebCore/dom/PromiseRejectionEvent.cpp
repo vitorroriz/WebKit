@@ -37,10 +37,10 @@ using namespace JSC;
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(PromiseRejectionEvent);
 
-PromiseRejectionEvent::PromiseRejectionEvent(const AtomString& type, Init&& initializer, IsTrusted isTrusted)
+PromiseRejectionEvent::PromiseRejectionEvent(JSC::JSGlobalObject& globalObject, const AtomString& type, Init&& initializer, IsTrusted isTrusted)
     : Event(EventInterfaceType::PromiseRejectionEvent, type, initializer, isTrusted)
     , m_promise(WTF::move(initializer.promise))
-    , m_reason(initializer.reason)
+    , m_reason(globalObject, initializer.reason)
 {
 }
 

@@ -45,8 +45,16 @@ JSDOMObject::JSDOMObject(JSC::Structure* structure, JSC::JSGlobalObject& globalO
 
 JSC::JSValue cloneAcrossWorlds(JSC::JSGlobalObject& lexicalGlobalObject, const JSDOMObject& owner, JSC::JSValue value)
 {
-    if (isWorldCompatible(lexicalGlobalObject, value))
+    if (!value.isObject())
         return value;
+
+    // FIXME: Realmless objects (e.g. WebAssembly GC structs/arrays) are world-agnostic
+    // and should be returned as-is here.
+
+    // Same world — no cloning needed.
+    if (&worldForDOMObject(*value.getObject()) == &currentWorld(lexicalGlobalObject))
+        return value;
+
     // FIXME: Is it best to handle errors by returning null rather than throwing an exception?
     auto serializedValue = SerializedScriptValue::create(lexicalGlobalObject, value, SerializationForStorage::No, SerializationErrorMode::NonThrowing, SerializationContext::CloneAcrossWorlds);
     if (!serializedValue)

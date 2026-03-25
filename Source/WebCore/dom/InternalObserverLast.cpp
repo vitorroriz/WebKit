@@ -55,7 +55,13 @@ public:
 private:
     void next(JSC::JSValue value) final
     {
-        m_lastValue.setWeakly(value);
+        RefPtr context = scriptExecutionContext();
+        if (!context)
+            return;
+        auto* globalObject = context->globalObject();
+        if (!globalObject)
+            return;
+        m_lastValue.setWeakly(*globalObject, value);
     }
 
     void error(JSC::JSValue value) final

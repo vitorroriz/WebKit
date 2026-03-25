@@ -78,13 +78,11 @@ public:
     JSC::JSValue NODELETE reason2() { return m_branch2Reason.getValue(); }
     void setReason1(JSDOMGlobalObject& globalObject, const JSC::JSCell* owner, JSC::JSValue value)
     {
-        Ref vm = globalObject.vm();
-        m_branch1Reason.set(vm, owner, value);
+        m_branch1Reason.set(globalObject, owner, value);
     }
     void setReason2(JSDOMGlobalObject& globalObject, const JSC::JSCell* owner, JSC::JSValue value)
     {
-        Ref vm = globalObject.vm();
-        m_branch2Reason.set(vm, owner, value);
+        m_branch2Reason.set(globalObject, owner, value);
     }
     void visit(JSC::AbstractSlotVisitor& visitor) final
     {

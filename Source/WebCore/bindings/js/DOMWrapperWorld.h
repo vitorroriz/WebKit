@@ -122,9 +122,6 @@ inline DOMWrapperWorld& pluginWorldSingleton() { return mainThreadNormalWorldSin
 DOMWrapperWorld& currentWorld(JSC::JSGlobalObject&);
 DOMWrapperWorld& worldForDOMObject(JSC::JSObject&);
 
-// Helper function for code paths that must not share objects across isolated DOM worlds.
-WEBCORE_EXPORT bool isWorldCompatible(JSC::JSGlobalObject&, JSC::JSValue);
-
 inline DOMWrapperWorld& currentWorld(JSC::JSGlobalObject& lexicalGlobalObject)
 {
     return JSC::jsCast<JSDOMGlobalObject*>(&lexicalGlobalObject)->world();

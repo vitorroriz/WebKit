@@ -273,7 +273,7 @@ void AudioWorkletProcessor::buildJSArguments(VM& vm, JSGlobalObject& globalObjec
     if (!success) {
         auto* array = constructFrozenJSArray(vm, globalObject, inputs, ShouldPopulateWithBusData::Yes);
         RETURN_IF_EXCEPTION(scope, void());
-        m_jsInputs.setWeakly(array);
+        m_jsInputs.setWeakly(globalObject, array);
     }
     args.append(m_jsInputs.getValue());
 
@@ -282,14 +282,14 @@ void AudioWorkletProcessor::buildJSArguments(VM& vm, JSGlobalObject& globalObjec
     if (!success) {
         auto* array = constructFrozenJSArray(vm, globalObject, outputs, ShouldPopulateWithBusData::No);
         RETURN_IF_EXCEPTION(scope, void());
-        m_jsOutputs.setWeakly(array);
+        m_jsOutputs.setWeakly(globalObject, array);
     }
     args.append(m_jsOutputs.getValue());
 
     success = copyDataFromParameterMapToJSObject(vm, globalObject, paramValuesMap, toJSObject(m_jsParamValues));
     RETURN_IF_EXCEPTION(scope, void());
     if (!success)
-        m_jsParamValues.setWeakly(constructFrozenKeyValueObject(vm, globalObject, paramValuesMap));
+        m_jsParamValues.setWeakly(globalObject, constructFrozenKeyValueObject(vm, globalObject, paramValuesMap));
 
     args.append(m_jsParamValues.getValue());
 }

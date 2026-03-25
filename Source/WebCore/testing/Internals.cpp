@@ -4570,8 +4570,12 @@ Ref<SerializedScriptValue> Internals::deserializeBuffer(ArrayBuffer& buffer) con
 
 bool Internals::isFromCurrentWorld(JSC::JSValue value) const
 {
+    if (!value.isObject())
+        return true;
+    // FIXME: Realmless objects (e.g. WebAssembly GC structs/arrays) have no realm
+    // and should be handled here.
     JSC::VM& vm = contextDocument()->vm();
-    return isWorldCompatible(*vm.topCallFrame->lexicalGlobalObject(vm), value);
+    return &worldForDOMObject(*value.getObject()) == &currentWorld(*vm.topCallFrame->lexicalGlobalObject(vm));
 }
 
 JSC::JSValue Internals::evaluateInWorldIgnoringException(const String& name, const String& source)

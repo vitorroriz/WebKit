@@ -65,16 +65,22 @@ ExceptionOr<Ref<TransformStream>> TransformStream::create(JSC::JSGlobalObject& g
         return result.releaseException();
 
     auto transformResult = result.releaseReturnValue();
-    return adoptRef(*new TransformStream(transformResult.transform, WTF::move(transformResult.readable), WTF::move(transformResult.writable)));
+    return adoptRef(*new TransformStream(*JSC::jsCast<JSDOMGlobalObject*>(&globalObject), transformResult.transform, WTF::move(transformResult.readable), WTF::move(transformResult.writable)));
 }
 
 Ref<TransformStream> TransformStream::create(Ref<ReadableStream>&& readable, Ref<WritableStream>&& writable)
 {
-    return adoptRef(*new TransformStream(JSC::jsUndefined(), WTF::move(readable), WTF::move(writable)));
+    return adoptRef(*new TransformStream(WTF::move(readable), WTF::move(writable)));
 }
 
-TransformStream::TransformStream(JSC::JSValue internalTransformStream, Ref<ReadableStream>&& readable, Ref<WritableStream>&& writable)
-    : m_internalTransformStream(internalTransformStream)
+TransformStream::TransformStream(Ref<ReadableStream>&& readable, Ref<WritableStream>&& writable)
+    : m_readable(WTF::move(readable))
+    , m_writable(WTF::move(writable))
+{
+}
+
+TransformStream::TransformStream(JSC::JSGlobalObject& globalObject, JSC::JSValue internalTransformStream, Ref<ReadableStream>&& readable, Ref<WritableStream>&& writable)
+    : m_internalTransformStream(globalObject, internalTransformStream)
     , m_readable(WTF::move(readable))
     , m_writable(WTF::move(writable))
 {

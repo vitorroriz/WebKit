@@ -31,7 +31,7 @@
   EnabledBySetting=NavigationAPIEnabled,
   Exposed=Window
 ] interface NavigateEvent : Event {
-  constructor([AtomString] DOMString type, NavigateEventInit eventInitDict);
+  [CallWith=CurrentGlobalObject] constructor([AtomString] DOMString type, NavigateEventInit eventInitDict);
 
   readonly attribute NavigationNavigationType navigationType;
   readonly attribute NavigationDestination destination;

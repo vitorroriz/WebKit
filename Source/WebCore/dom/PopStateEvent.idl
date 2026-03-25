@@ -28,9 +28,9 @@
     JSCustomMarkFunction,
     Exposed=Window
 ] interface PopStateEvent : Event {
-    constructor([AtomString] DOMString type, optional PopStateEventInit eventInitDict = {});
+    [CallWith=CurrentGlobalObject] constructor([AtomString] DOMString type, optional PopStateEventInit eventInitDict = {});
 
-    [CachedAttribute, CustomGetter] readonly attribute any state;
+    [CustomGetter] readonly attribute any state;
     [EnabledBySetting=UAVisualTransitionDetectionEnabled] readonly attribute boolean hasUAVisualTransition;
 };
 

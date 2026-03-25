@@ -62,7 +62,11 @@ void EventTargetForTesting::sendInternalMessage(const MessageForTesting& message
 
     JSC::JSValue detail = jsNontrivialString(scriptExecutionContext->vm(), message.data);
 
-    dispatchEvent(CustomEvent::create(message.type, CustomEvent::Init {
+    auto* globalObject = scriptExecutionContext->globalObject();
+    if (!globalObject)
+        return;
+
+    dispatchEvent(CustomEvent::create(*globalObject, message.type, CustomEvent::Init {
         { },
         detail,
     }));

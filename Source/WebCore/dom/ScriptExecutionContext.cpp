@@ -579,11 +579,15 @@ bool ScriptExecutionContext::dispatchErrorEvent(const String& errorMessage, int 
     if (!target)
         return false;
 
+    auto* jsGlobalObject = globalObject();
+    if (!jsGlobalObject)
+        return false;
+
     RefPtr<ErrorEvent> errorEvent;
     if (canIncludeErrorDetails(cachedScript, sourceURL, fromModule))
-        errorEvent = ErrorEvent::create(errorMessage, sourceURL, lineNumber, columnNumber, { vm(), exception ? exception->value() : JSC::jsNull() });
+        errorEvent = ErrorEvent::create(*jsGlobalObject, errorMessage, sourceURL, lineNumber, columnNumber, { vm(), exception ? exception->value() : JSC::jsNull() });
     else
-        errorEvent = ErrorEvent::create("Script error."_s, { }, 0, 0, { });
+        errorEvent = ErrorEvent::create(*jsGlobalObject, "Script error."_s, { }, 0, 0, { });
 
     ASSERT(!m_inDispatchErrorEvent);
     m_inDispatchErrorEvent = true;

@@ -34,10 +34,10 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(PaymentMethodChangeEvent);
 
-PaymentMethodChangeEvent::PaymentMethodChangeEvent(const AtomString& type, Init&& eventInit)
+PaymentMethodChangeEvent::PaymentMethodChangeEvent(JSC::JSGlobalObject& globalObject, const AtomString& type, Init&& eventInit)
     : PaymentRequestUpdateEvent { EventInterfaceType::PaymentMethodChangeEvent, type, eventInit }
     , m_methodName { WTF::move(eventInit.methodName) }
-    , m_methodDetails { WTF::InPlaceTypeT<JSValueInWrappedObject>(), eventInit.methodDetails.get() }
+    , m_methodDetails { WTF::InPlaceTypeT<JSValueInWrappedObject>(), globalObject, eventInit.methodDetails.get() }
 {
 }
 
