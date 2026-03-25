@@ -528,6 +528,99 @@ private:
     AllocatedIntervalSet m_allocationsHigh64; // Tracks clobbers to vector registers that preserve lower 64-bits
 };
 
+// Per-Tmp list of coalescable partners and their move costs.
+// Mutable until sort() is called, after which it is binary searchable.
+class Coalescables {
+public:
+    void add(Tmp tmp, float moveCost)
+    {
+        ASSERT(!m_isSorted);
+        ASSERT(m_entries.isEmpty() || m_entries.last().tmp.bank() == tmp.bank());
+        for (auto& entry : m_entries) {
+            if (entry.tmp == tmp) {
+                entry.moveCost += moveCost;
+                return;
+            }
+        }
+        m_entries.append({ tmp, moveCost });
+    }
+
+    void remove(Tmp target)
+    {
+        ASSERT(!m_isSorted);
+        for (size_t i = 0; i < m_entries.size(); i++) {
+            if (m_entries[i].tmp == target) {
+                m_entries[i] = m_entries.last();
+                m_entries.shrink(m_entries.size() - 1);
+                return;
+            }
+        }
+        ASSERT_NOT_REACHED();
+    }
+
+    void removeAllMatching(const Invocable<bool(Tmp)> auto& predicate)
+    {
+        ASSERT(!m_isSorted);
+        for (size_t i = 0; i < m_entries.size(); ) {
+            if (predicate(m_entries[i].tmp)) {
+                m_entries[i] = m_entries.last();
+                m_entries.shrink(m_entries.size() - 1);
+            } else
+                i++;
+        }
+    }
+
+    template<Bank bank>
+    void sort()
+    {
+        ASSERT(!m_isSorted);
+        std::ranges::sort(m_entries, [](const auto& a, const auto& b) {
+            return a.tmp.tmpIndex(bank) < b.tmp.tmpIndex(bank);
+        });
+#if ASSERT_ENABLED
+        m_isSorted = true;
+#endif
+    }
+
+    template<Bank bank>
+    bool contains(Tmp target) const
+    {
+        ASSERT(m_isSorted);
+        auto it = std::ranges::lower_bound(m_entries, target,
+            [](const auto& a, const auto& b) {
+                return a.tmpIndex(bank) < b.tmpIndex(bank);
+            },
+            &Entry::tmp);
+        return it != m_entries.end() && it->tmp == target;
+    }
+
+    size_t size() const { return m_entries.size(); }
+    bool isEmpty() const { return m_entries.isEmpty(); }
+    auto begin() const { return m_entries.begin(); }
+    auto end() const { return m_entries.end(); }
+
+    void dump(PrintStream& out) const
+    {
+        out.print(listDump(m_entries));
+    }
+
+private:
+    struct Entry {
+        Tmp tmp;
+        float moveCost;
+
+        void dump(PrintStream& out) const
+        {
+            out.print("(", tmp, ", ", moveCost, ")");
+        }
+    };
+
+    Vector<Entry> m_entries;
+#if ASSERT_ENABLED
+    bool m_isSorted { false };
+#endif
+};
+
 // Auxiliary register allocator data per Tmp.
 struct TmpData {
     // When an unspillable or fastTmp is coalesced with another tmp, we don't want the spillCost of the
@@ -538,20 +631,10 @@ struct TmpData {
         Unspillable,
     };
 
-    struct CoalescableWith {
-        void dump(PrintStream& out) const
-        {
-            out.print("(", tmp, ", ", moveCost, ")");
-        }
-
-        Tmp tmp;
-        float moveCost; // The frequency-adjusted number of moves between TmpData's tmp and CoalescableWith.tmp
-    };
-
     void dump(PrintStream& out) const
     {
         out.print("{stage = ", stage, " liveRange = ", liveRange, ", preferredReg = ", preferredReg,
-            ", coalescables = ", listDump(coalescables), ", useDefCost = ", useDefCost, ", spillability = ", spillability,
+            ", coalescables = ", coalescables, ", useDefCost = ", useDefCost, ", spillability = ", spillability,
             ", assigned = ", assigned, ", spillSlot = ", pointerDump(spillSlot), ", splitMetadataIndex = ", splitMetadataIndex, "}");
     }
 
@@ -587,7 +670,7 @@ struct TmpData {
     }
 
     LiveRange liveRange;
-    Vector<CoalescableWith> coalescables;
+    Coalescables coalescables;
     StackSlot* spillSlot { nullptr };
     float useDefCost { 0.0f };
     uint32_t splitMetadataIndex : 31 { 0 };
@@ -969,8 +1052,16 @@ private:
                         if (m_code.isPinned(aReg)) {
                             // It's okay if both Tmps were coalesced to the same pinned register.
                             TmpData& regData = m_map[Tmp(aReg)];
-                            if (regData.coalescables.containsIf([a](auto& with) { return with.tmp == a; })
-                                && regData.coalescables.containsIf([b](auto& with) { return with.tmp == b; }))
+                            bool foundA = false, foundB = false;
+                            for (auto& with : regData.coalescables) {
+                                if (with.tmp == a)
+                                    foundA = true;
+                                else if (with.tmp == b)
+                                    foundB = true;
+                                if (foundA && foundB)
+                                    break;
+                            }
+                            if (foundA && foundB)
                                 continue;
                         }
                         fail(block, a, b);
@@ -1014,7 +1105,7 @@ private:
         }
 
         // addMaybeCoalescable is used during the first pass to collect all potentially
-        // coalescables pairs. i.e. pairs of Tmps 'a' and 'b' such that there exists a
+        // coalescable pairs. i.e. pairs of Tmps 'a' and 'b' such that there exists a
         // 'Move a, b' instruction. These pairs will be pruned after liveness analysis
         // based on conflicting defs. We do this rather than simply requiring that the
         // LiveRanges of coalescable tmps do not overlap so that we can handle Tmp copies, e.g.:
@@ -1028,15 +1119,9 @@ private:
         auto addMaybeCoalescable = [&](Tmp a, Tmp b, BasicBlock* block) {
             if (a == b)
                 return;
-            TmpData& tmpData = m_map[a];
             float freq = adjustedBlockFrequency(block);
-            for (auto& with : tmpData.coalescables) {
-                if (with.tmp == b) {
-                    with.moveCost += freq;
-                    return;
-                }
-            }
-            tmpData.coalescables.append({ b, freq });
+            m_map[a].coalescables.add(b, freq);
+            m_map[b].coalescables.add(a, freq);
         };
 
         auto coalescableMoveSrc = [&](Inst& inst) {
@@ -1065,17 +1150,15 @@ private:
         // that these pairs are not coalescable.
         auto pruneCoalescable = [&](Inst& inst, Tmp def, Point point) {
             TmpData& defData = m_map[def];
-            if (!defData.coalescables.size())
+            if (defData.coalescables.isEmpty())
                 return;
             Tmp movSrc = coalescableMoveSrc(inst);
             dataLogLnIf(verbose(), "Checking affinity ", inst, " def=", def, " movSrc=", movSrc);
-            defData.coalescables.removeAllMatching([&](TmpData::CoalescableWith& with) {
-                ASSERT(with.tmp != def);
-                if (with.tmp != movSrc && isLiveAt(with.tmp, point)) {
-                    dataLogLnIf(verbose(), "Pruning affinity ", def, " ", with.tmp);
-                    m_map[with.tmp].coalescables.removeAllMatching([def](TmpData::CoalescableWith& with) {
-                        return with.tmp == def;
-                    });
+            defData.coalescables.removeAllMatching([&](Tmp tmp) {
+                ASSERT(tmp != def);
+                if (tmp != movSrc && isLiveAt(tmp, point)) {
+                    dataLogLnIf(verbose(), "Pruning affinity ", def, " ", tmp);
+                    m_map[tmp].coalescables.remove(def);
                     return true;
                 }
                 return false;
@@ -1120,7 +1203,6 @@ private:
                     }
                     ASSERT(inst.args[0].isTmp() && inst.args[1].isTmp());
                     addMaybeCoalescable(inst.args[0].tmp(), inst.args[1].tmp(), block);
-                    addMaybeCoalescable(inst.args[1].tmp(), inst.args[0].tmp(), block);
                 }
             }
         }
@@ -1270,17 +1352,6 @@ private:
                 m_stats[tmp.bank()].numCoalescedPinned++;
             }
         });
-    }
-
-    // Binary search a sorted coalescables vector to check if 'target' is coalescable.
-    template<Bank bank>
-    static bool isInCoalescables(Tmp tmp, const Vector<TmpData::CoalescableWith>& coalescables)
-    {
-        auto it = std::lower_bound(coalescables.begin(), coalescables.end(), tmp,
-            [](const auto& edge, Tmp t) {
-                return edge.tmp.tmpIndex(bank) < t.tmpIndex(bank);
-            });
-        return it != coalescables.end() && it->tmp == tmp;
     }
 
     // Maps intervals to lists of Tmps live during that interval.
@@ -1583,7 +1654,7 @@ private:
     template<Bank bank>
     void coalesceSingletons(Tmp tmp0, Tmp tmp1, Vector<AffinityGroup<bank>>& groups, TmpGroupMap<bank>& tmpToGroup)
     {
-        ASSERT(isInCoalescables<bank>(tmp1, m_map.get<bank>(tmp0).coalescables) && isInCoalescables<bank>(tmp0, m_map.get<bank>(tmp1).coalescables));
+        ASSERT(m_map.get<bank>(tmp0).coalescables.template contains<bank>(tmp1) && m_map.get<bank>(tmp1).coalescables.template contains<bank>(tmp0));
         auto newIndex = groups.size();
         groups.constructAndAppend(tmp0, m_map.get<bank>(tmp0).liveRange, tmp1, m_map.get<bank>(tmp1).liveRange);
         tmpToGroup[tmp0] = newIndex;
@@ -1604,7 +1675,7 @@ private:
                 return IterationStatus::Done;
             }
             for (Tmp member : tmpList) {
-                if (!isInCoalescables<bank>(member, singletonData.coalescables)) {
+                if (!singletonData.coalescables.contains<bank>(member)) {
                     conflict = true;
                     return IterationStatus::Done;
                 }
@@ -1629,13 +1700,13 @@ private:
         bool conflict = false;
         AffinityGroup<bank>::forEachPairwiseOverlap(group0, group1, [&](const auto& tmpListA, const auto& tmpListB) {
             for (Tmp tmpA : tmpListA) {
-                const auto& coalescables = m_map.get<bank>(tmpA).coalescables;
+                const Coalescables& coalescables = m_map.get<bank>(tmpA).coalescables;
                 if (tmpListB.size() > coalescables.size()) {
                     conflict = true; // Pigeonhole principle
                     return IterationStatus::Done;
                 }
                 for (Tmp tmpB : tmpListB) {
-                    if (!isInCoalescables<bank>(tmpB, coalescables)) {
+                    if (!coalescables.contains<bank>(tmpB)) {
                         conflict = true;
                         return IterationStatus::Done;
                     }
@@ -1681,7 +1752,6 @@ private:
         };
         Vector<Move> moves;
 
-        // Sort coalescables by Tmp index for binary search in isInCoalescables.
         m_code.forEachTmp<bank>([&](Tmp tmp) {
             ASSERT(!tmp.isReg());
             TmpData& data = m_map.get<bank>(tmp);
@@ -1689,9 +1759,8 @@ private:
                 ASSERT(assignedReg(tmp) && m_code.isPinned(assignedReg(tmp)));
                 return; // Already coalesced with a pinned register
             }
-            std::ranges::sort(data.coalescables, [](const auto& a, const auto& b) {
-                return a.tmp.tmpIndex(bank) < b.tmp.tmpIndex(bank);
-            });
+            // Sort coalescables for binary search in Coalescables::contains.
+            data.coalescables.sort<bank>();
             for (auto& with : data.coalescables) {
                 if (tmp.tmpIndex(bank) < with.tmp.tmpIndex(bank))
                     moves.append({ tmp, with.tmp, with.moveCost });
@@ -1982,7 +2051,7 @@ private:
                 rangeSizeOrStart = interval.begin();
             }
         }
-        m_queue.enqueue({ tmp, stage, rangeSizeOrStart, tmpData.preferredReg || tmpData.coalescables.size(), !isLocal });
+        m_queue.enqueue({ tmp, stage, rangeSizeOrStart, tmpData.preferredReg || !tmpData.coalescables.isEmpty(), !isLocal });
         dataLogLnIf(verbose(), "Enqueued (", stage, ") ", tmp);
     }
 
