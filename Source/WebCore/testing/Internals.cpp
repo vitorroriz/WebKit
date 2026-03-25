@@ -262,6 +262,7 @@
 #include "UserMediaController.h"
 #include "VideoConfiguration.h"
 #include "ViewportArguments.h"
+#include "ViewportConfiguration.h"
 #include "VoidCallback.h"
 #include "WebAnimation.h"
 #include "WebAnimationUtilities.h"
@@ -3816,6 +3817,11 @@ ExceptionOr<Ref<DOMRectList>> Internals::nonFastScrollableRects() const
         return DOMRectList::create();
 
     return page->nonFastScrollableRectsForTesting();
+}
+
+double Internals::minimumShrinkToFitWidthWhenPreferringHorizontalScrolling() const
+{
+    return ViewportConfiguration::minimumShrinkToFitWidthWhenPreferringHorizontalScrolling;
 }
 
 ExceptionOr<void> Internals::setElementUsesDisplayListDrawing(Element& element, bool usesDisplayListDrawing)

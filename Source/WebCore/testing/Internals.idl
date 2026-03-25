@@ -836,6 +836,8 @@ enum ContentsFormat {
 
     DOMString repaintRectsAsText();
 
+    double minimumShrinkToFitWidthWhenPreferringHorizontalScrolling();
+
     // These throw if the element does not have a compositing layer.
     undefined setElementUsesDisplayListDrawing(Element element, boolean usesDisplayListDrawing);
     undefined setElementTracksDisplayListReplay(Element element, boolean trackReplay);
