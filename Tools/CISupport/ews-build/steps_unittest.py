@@ -3095,141 +3095,34 @@ class TestRunWebKitTestsRedTree(BuildStepMixinAdditions, unittest.TestCase):
         self.assertTrue(CompileWebKitWithoutChange(retry_build_on_failure=True))
         self.assertTrue(RunWebKitTestsWithoutChangeRedTree() in next_steps)
 
-    def test_flakies_but_no_failures_then_go_to_analyze_results(self):
+    def test_flakies_with_fail_retcode_then_go_to_analyze_results(self):
         self.configureStep()
         self.setProperty('first_run_failures', [])
         self.setProperty('first_run_flakies', ['fast/css/flaky1.html', 'fast/svg/flaky2.svg', 'imported/test/flaky3.html'])
         next_steps = []
         self.patch(self.build, 'addStepsAfterCurrentStep', lambda s: next_steps.extend(s))
         self.patch(RunWebKitTestsRedTree, 'evaluateResult', lambda s, r: r)
-        self.get_nth_step(0).evaluateCommand(SUCCESS)
+        self.get_nth_step(0).evaluateCommand(FAILURE)
         self.assertFalse(RevertAppliedChanges() in next_steps)
         self.assertFalse(InstallWpeDependencies() in next_steps)
         self.assertFalse(RunWebKitTestsWithoutChangeRedTree() in next_steps)
         self.assertTrue(AnalyzeLayoutTestsResultsRedTree() in next_steps)
+        self.assertFalse(hasattr(self.build, 'results'))
 
-
-class TestRunWebKitTestsRepeatFailuresRedTree(BuildStepMixinAdditions, unittest.TestCase):
-    def setUp(self):
-        self.longMessage = True
-        self.jsonFileName = 'layout-test-results/full_results.json'
-        return self.setup_test_build_step()
-
-    def tearDown(self):
-        return self.tear_down_test_build_step()
-
-    def configureStep(self):
-        self.setup_step(RunWebKitTestsRepeatFailuresRedTree())
-        self.setProperty('platform', 'wpe')
-        self.setProperty('fullPlatform', 'wpe')
-        self.setProperty('configuration', 'release')
-
-    def test_success(self):
+    def test_flakies_with_warning_retcode_then_finish(self):
         self.configureStep()
-        first_run_failures = ['fast/css/test1.html', 'imported/test/test2.html', 'fast/svg/test3.svg']
-        first_run_flakies = ['fast/css/flaky1.html', 'imported/test/flaky2.html', 'fast/svg/flaky3.svg']
-        self.setProperty('first_run_failures', first_run_failures)
-        self.setProperty('first_run_flakies', first_run_flakies)
-        self.expectRemoteCommands(
-            ExpectShell(workdir='wkdir',
-                        logfiles={'json': self.jsonFileName},
-                        log_environ=False,
-                        max_time=18000,
-                        timeout=19800,
-                        command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'python3 Tools/Scripts/run-webkit-tests --no-build --no-show-results --no-new-test-results --clobber-old-results --release --wpe --results-directory layout-test-results --debug-rwt-logging --skip-failing-tests --fully-parallel --repeat-each=10 fast/css/test1.html fast/svg/test3.svg imported/test/test2.html 2>&1 | Tools/Scripts/filter-test-logs layout']
-                        )
-            .exit(0),
-        )
-        self.expect_outcome(result=SUCCESS, state_string='layout-tests')
-        return self.run_step()
-
-    def test_success_tests_names_with_shell_conflictive_chars(self):
-        self.configureStep()
-        first_run_failures = ['imported/w3c/web-platform-tests/html/dom/idlharness.https.html?exclude=(Document|Window|HTML.*)',
-                              'imported/w3c/web-platform-tests/html/dom/idlharness.https.html?include=HTML.*',
-                              'try/crash/for/test_with_brackets[]{}',
-                              'try/crash/for/test_with spaces " and \' quotes'
-                              ]
-        first_run_flakies = ['fast/css/flaky1.html', 'imported/test/flaky2.html', 'fast/svg/flaky3.svg']
-        self.setProperty('first_run_failures', first_run_failures)
-        self.setProperty('first_run_flakies', first_run_flakies)
-        self.expectRemoteCommands(
-            ExpectShell(workdir='wkdir',
-                        logfiles={'json': self.jsonFileName},
-                        log_environ=False,
-                        max_time=18000,
-                        timeout=19800,
-                        command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'python3 Tools/Scripts/run-webkit-tests --no-build --no-show-results --no-new-test-results --clobber-old-results --release --wpe --results-directory layout-test-results --debug-rwt-logging --skip-failing-tests --fully-parallel --repeat-each=10 \'imported/w3c/web-platform-tests/html/dom/idlharness.https.html?exclude=(Document|Window|HTML.*)\' \'imported/w3c/web-platform-tests/html/dom/idlharness.https.html?include=HTML.*\' \'try/crash/for/test_with spaces " and \'"\'"\' quotes\' \'try/crash/for/test_with_brackets[]{}\' 2>&1 | Tools/Scripts/filter-test-logs layout']
-                        )
-            .exit(0),
-        )
-        self.expect_outcome(result=SUCCESS, state_string='layout-tests')
-        return self.run_step()
-
-    @defer.inlineCallbacks
-    def test_set_properties_when_executed_scope_this_class(self):
-        self.configureStep()
-        first_run_failures = ['fast/css/test1.html', 'imported/test/test2.html', 'fast/svg/test3.svg']
-        first_run_flakies = ['fast/css/flaky1.html', 'imported/test/flaky2.html', 'fast/svg/flaky3.svg']
-        # Set good values for properties that only the superclass should set
-        self.setProperty('first_run_failures', first_run_failures)
-        self.setProperty('first_run_flakies', first_run_flakies)
-        self.setProperty('first_results_exceed_failure_limit', False)
-        self.expectRemoteCommands(
-            ExpectShell(workdir='wkdir',
-                        logfiles={'json': self.jsonFileName},
-                        log_environ=False,
-                        max_time=18000,
-                        timeout=19800,
-                        command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'python3 Tools/Scripts/run-webkit-tests --no-build --no-show-results --no-new-test-results --clobber-old-results --release --wpe --results-directory layout-test-results --debug-rwt-logging --skip-failing-tests --fully-parallel --repeat-each=10 fast/css/test1.html fast/svg/test3.svg imported/test/test2.html 2>&1 | Tools/Scripts/filter-test-logs layout']
-                        )
-            .exit(2)
-        )
-        # Patch LayoutTestFailures.results_from_string() so it always reports fake values.
-        # Check this fake values do not end on the properties that belong to the superclass.
-        fake_failing_tests = ['fake/should/not/happen/failure1.html', 'imported/fake/failure2.html']
-        fake_flaky_tests = ['fake/should/not/happen/flaky1.html', 'imported/fake/flaky2.html']
-        fake_layout_test_failures = MockLayoutTestFailures(fake_failing_tests, fake_flaky_tests, True)
-        self.patch(LayoutTestFailures, 'results_from_string', lambda f: fake_layout_test_failures)
-        self.expect_outcome(result=FAILURE, state_string='layout-tests (failure)')
-        rc = yield self.run_step()
-        # first_run properties should not be set to fake_layout_test_failures when running RunWebKitTestsRepeatFailuresRedTree()
-        self.expect_property('first_run_failures', first_run_failures)
-        self.expect_property('first_run_flakies', first_run_flakies)
-        self.assertFalse(self.getProperty('first_results_exceed_failure_limit'))
-        # Test also that this fake values are set _only_ for the properties this class should define
-        self.expect_property('with_change_repeat_failures_results_nonflaky_failures', fake_failing_tests)
-        self.expect_property('with_change_repeat_failures_results_flakies', fake_flaky_tests)
-        self.assertTrue(self.getProperty('with_change_repeat_failures_results_exceed_failure_limit'))
-        return rc
-
-    def test_last_run_with_patch_ends_with_list_of_failing_tests_then_schedule_update_libs_and_test_without_patch(self):
-        self.configureStep()
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', ['fake/should/not/happen/failure1.html', 'imported/fake/failure2.html'])
-        self.setProperty('with_change_repeat_failures_results_flakies', [])
+        self.setProperty('first_run_failures', [])
+        self.setProperty('first_run_flakies', ['fast/css/flaky1.html', 'fast/svg/flaky2.svg', 'imported/test/flaky3.html'])
         next_steps = []
         self.patch(self.build, 'addStepsAfterCurrentStep', lambda s: next_steps.extend(s))
-        self.patch(RunWebKitTestsRepeatFailuresRedTree, 'evaluateResult', lambda s, r: r)
-        self.get_nth_step(0).evaluateCommand(FAILURE)
-        self.assertTrue(RevertAppliedChanges() in next_steps)
-        self.assertTrue(InstallWpeDependencies() in next_steps)
-        self.assertTrue(CompileWebKitWithoutChange(retry_build_on_failure=True) in next_steps)
-        self.assertTrue(RunWebKitTestsRepeatFailuresWithoutChangeRedTree() in next_steps)
-        self.assertFalse(AnalyzeLayoutTestsResultsRedTree() in next_steps)
-
-    def test_last_run_with_patch_ends_with_no_failing_tests_then_go_to_analyze(self):
-        self.configureStep()
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', [])
-        self.setProperty('with_change_repeat_failures_results_flakies', ['fake/should/not/happen/flaky1.html', 'imported/fake/flaky2.html'])
-        next_steps = []
-        self.patch(self.build, 'addStepsAfterCurrentStep', lambda s: next_steps.extend(s))
-        self.patch(RunWebKitTestsRepeatFailuresRedTree, 'evaluateResult', lambda s, r: r)
-        self.get_nth_step(0).evaluateCommand(FAILURE)
+        self.patch(RunWebKitTestsRedTree, 'evaluateResult', lambda s, r: r)
+        self.get_nth_step(0).evaluateCommand(WARNINGS)
         self.assertFalse(RevertAppliedChanges() in next_steps)
         self.assertFalse(InstallWpeDependencies() in next_steps)
-        self.assertFalse(CompileWebKitWithoutChange(retry_build_on_failure=True) in next_steps)
-        self.assertFalse(RunWebKitTestsRepeatFailuresWithoutChangeRedTree() in next_steps)
-        self.assertTrue(AnalyzeLayoutTestsResultsRedTree() in next_steps)
+        self.assertFalse(RunWebKitTestsWithoutChangeRedTree() in next_steps)
+        self.assertFalse(AnalyzeLayoutTestsResultsRedTree() in next_steps)
+        self.assertTrue(hasattr(self.build, 'results'))
+        self.assertEqual(self.build.results, SUCCESS)
 
 
 class TestRunWebKitTestsRepeatFailuresWithoutChangeRedTree(BuildStepMixinAdditions, unittest.TestCase):
@@ -3251,38 +3144,8 @@ class TestRunWebKitTestsRepeatFailuresWithoutChangeRedTree(BuildStepMixinAdditio
         self.configureStep()
         first_run_failures = ['fast/css/test1.html', 'imported/test/test2.html', 'fast/svg/test3.svg']
         first_run_flakies = ['fast/css/flaky1.html', 'imported/test/flaky2.html', 'fast/svg/flaky3.svg']
-        with_change_repeat_failures_results_nonflaky_failures = ['fast/css/test1.html']
-        with_change_repeat_failures_results_flakies = ['imported/test/test2.html', 'fast/svg/test3.svg']
         self.setProperty('first_run_failures', first_run_failures)
         self.setProperty('first_run_flakies', first_run_flakies)
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', with_change_repeat_failures_results_nonflaky_failures)
-        self.setProperty('with_change_repeat_failures_results_flakies', with_change_repeat_failures_results_flakies)
-        self.expectRemoteCommands(
-            ExpectShell(workdir='wkdir',
-                        logfiles={'json': self.jsonFileName},
-                        log_environ=False,
-                        max_time=10800,
-                        timeout=19800,
-                        command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'python3 Tools/Scripts/run-webkit-tests --no-build --no-show-results --no-new-test-results --clobber-old-results --release --wpe --results-directory layout-test-results --debug-rwt-logging --skip-failing-tests --fully-parallel --repeat-each=10 --skipped=always fast/css/test1.html 2>&1 | Tools/Scripts/filter-test-logs layout']
-                        )
-            .exit(0),
-        )
-        self.expect_outcome(result=SUCCESS, state_string='layout-tests')
-        return self.run_step()
-
-    def test_step_with_change_did_timeout(self):
-        self.configureStep()
-        self.setProperty('fullPlatform', 'gtk')
-        self.setProperty('configuration', 'release')
-        first_run_failures = ['fast/css/test1.html', 'imported/test/test2.html', 'fast/svg/test3.svg']
-        first_run_flakies = ['fast/css/flaky1.html', 'imported/test/flaky2.html', 'fast/svg/flaky3.svg']
-        with_change_repeat_failures_results_nonflaky_failures = ['fast/css/test1.html']
-        with_change_repeat_failures_results_flakies = ['imported/test/test2.html', 'fast/svg/test3.svg']
-        self.setProperty('first_run_failures', first_run_failures)
-        self.setProperty('first_run_flakies', first_run_flakies)
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', with_change_repeat_failures_results_nonflaky_failures)
-        self.setProperty('with_change_repeat_failures_results_flakies', with_change_repeat_failures_results_flakies)
-        self.setProperty('with_change_repeat_failures_timedout', True)
         self.expectRemoteCommands(
             ExpectShell(workdir='wkdir',
                         logfiles={'json': self.jsonFileName},
@@ -3296,27 +3159,45 @@ class TestRunWebKitTestsRepeatFailuresWithoutChangeRedTree(BuildStepMixinAdditio
         self.expect_outcome(result=SUCCESS, state_string='layout-tests')
         return self.run_step()
 
-    @defer.inlineCallbacks
-    def test_set_properties_when_executed_scope_this_class(self):
+    def test_success_tests_names_with_shell_conflictive_chars(self):
         self.configureStep()
-        first_run_failures = ['fast/css/test1.html', 'imported/test/test2.html', 'fast/svg/test3.svg']
+        first_run_failures = ['imported/w3c/web-platform-tests/html/dom/idlharness.https.html?exclude=(Document|Window|HTML.*)',
+                              'imported/w3c/web-platform-tests/html/dom/idlharness.https.html?include=HTML.*',
+                              'try/crash/for/test_with_brackets[]{}',
+                              'try/crash/for/test_with spaces " and \' quotes'
+                              ]
         first_run_flakies = ['fast/css/flaky1.html', 'imported/test/flaky2.html', 'fast/svg/flaky3.svg']
-        with_change_repeat_failures_results_nonflaky_failures = ['fast/css/test1.html']
-        with_change_repeat_failures_results_flakies = ['imported/test/test2.html', 'fast/svg/test3.svg']
-        # Set good values for properties that only the superclass should set
         self.setProperty('first_run_failures', first_run_failures)
         self.setProperty('first_run_flakies', first_run_flakies)
-        self.setProperty('first_results_exceed_failure_limit', False)
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', with_change_repeat_failures_results_nonflaky_failures)
-        self.setProperty('with_change_repeat_failures_results_flakies', with_change_repeat_failures_results_flakies)
-        self.setProperty('with_change_repeat_failures_timedout', False)
         self.expectRemoteCommands(
             ExpectShell(workdir='wkdir',
                         logfiles={'json': self.jsonFileName},
                         log_environ=False,
                         max_time=10800,
                         timeout=19800,
-                        command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'python3 Tools/Scripts/run-webkit-tests --no-build --no-show-results --no-new-test-results --clobber-old-results --release --wpe --results-directory layout-test-results --debug-rwt-logging --skip-failing-tests --fully-parallel --repeat-each=10 --skipped=always fast/css/test1.html 2>&1 | Tools/Scripts/filter-test-logs layout']
+                        command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'python3 Tools/Scripts/run-webkit-tests --no-build --no-show-results --no-new-test-results --clobber-old-results --release --wpe --results-directory layout-test-results --debug-rwt-logging --skip-failing-tests --fully-parallel --repeat-each=10 --skipped=always \'imported/w3c/web-platform-tests/html/dom/idlharness.https.html?exclude=(Document|Window|HTML.*)\' \'imported/w3c/web-platform-tests/html/dom/idlharness.https.html?include=HTML.*\' \'try/crash/for/test_with spaces " and \'"\'"\' quotes\' \'try/crash/for/test_with_brackets[]{}\' 2>&1 | Tools/Scripts/filter-test-logs layout']
+                        )
+            .exit(0),
+        )
+        self.expect_outcome(result=SUCCESS, state_string='layout-tests')
+        return self.run_step()
+
+    @defer.inlineCallbacks
+    def test_set_properties_when_executed_scope_this_class(self):
+        self.configureStep()
+        first_run_failures = ['fast/css/test1.html', 'imported/test/test2.html', 'fast/svg/test3.svg']
+        first_run_flakies = ['fast/css/flaky1.html', 'imported/test/flaky2.html', 'fast/svg/flaky3.svg']
+        # Set good values for properties that only the superclass should set
+        self.setProperty('first_run_failures', first_run_failures)
+        self.setProperty('first_run_flakies', first_run_flakies)
+        self.setProperty('first_results_exceed_failure_limit', False)
+        self.expectRemoteCommands(
+            ExpectShell(workdir='wkdir',
+                        logfiles={'json': self.jsonFileName},
+                        log_environ=False,
+                        max_time=10800,
+                        timeout=19800,
+                        command=['/bin/bash', '--posix', '-o', 'pipefail', '-c', 'python3 Tools/Scripts/run-webkit-tests --no-build --no-show-results --no-new-test-results --clobber-old-results --release --wpe --results-directory layout-test-results --debug-rwt-logging --skip-failing-tests --fully-parallel --repeat-each=10 --skipped=always fast/css/test1.html fast/svg/test3.svg imported/test/test2.html 2>&1 | Tools/Scripts/filter-test-logs layout']
                         )
             .exit(2)
         )
@@ -3328,18 +3209,29 @@ class TestRunWebKitTestsRepeatFailuresWithoutChangeRedTree(BuildStepMixinAdditio
         self.patch(LayoutTestFailures, 'results_from_string', lambda f: fake_layout_test_failures)
         self.expect_outcome(result=FAILURE, state_string='layout-tests (failure)')
         rc = yield self.run_step()
-        # first_run properties should not be set to fake_layout_test_failures when running RunWebKitTestsRepeatFailuresWithoutChangeRedTree()
+        # first_run properties should not be set to fake_layout_test_failures when running RunWebKitTestsRepeatFailuresRedTree()
         self.expect_property('first_run_failures', first_run_failures)
         self.expect_property('first_run_flakies', first_run_flakies)
         self.assertFalse(self.getProperty('first_results_exceed_failure_limit'))
-        self.expect_property('with_change_repeat_failures_results_nonflaky_failures', with_change_repeat_failures_results_nonflaky_failures)
-        self.expect_property('with_change_repeat_failures_results_flakies', with_change_repeat_failures_results_flakies)
-        self.assertFalse(self.getProperty('with_change_repeat_failures_timedout'))
         # Test also that this fake values are set _only_ for the properties this class should define
         self.expect_property('without_change_repeat_failures_results_nonflaky_failures', fake_failing_tests)
         self.expect_property('without_change_repeat_failures_results_flakies', fake_flaky_tests)
         self.assertTrue(self.getProperty('without_change_repeat_failures_results_exceed_failure_limit'))
         return rc
+
+    def test_run_ends_then_go_to_analyze(self):
+        self.configureStep()
+        self.setProperty('first_run_failures', ['fake/should/not/happen/failure1.html', 'imported/fake/failure2.html'])
+        self.setProperty('first_run_flakies', [])
+        next_steps = []
+        self.patch(self.build, 'addStepsAfterCurrentStep', lambda s: next_steps.extend(s))
+        self.patch(RunWebKitTestsRepeatFailuresWithoutChangeRedTree, 'evaluateResult', lambda s, r: r)
+        self.get_nth_step(0).evaluateCommand(SUCCESS)
+        self.assertFalse(RevertAppliedChanges() in next_steps)
+        self.assertFalse(InstallWpeDependencies() in next_steps)
+        self.assertFalse(CompileWebKitWithoutChange(retry_build_on_failure=True) in next_steps)
+        self.assertTrue(AnalyzeLayoutTestsResultsRedTree() in next_steps)
+        self.assertFalse(hasattr(self.build, 'results'))
 
 
 class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.TestCase):
@@ -3364,10 +3256,8 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
         self.configureCommonProperties()
         self.setProperty('first_run_failures', ["test/failure1.html", "test/failure2.html"])
         self.setProperty('first_run_flakies', ["test/flaky1.html", "test/flaky2.html"])
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', ["test/failure1.html"])
-        self.setProperty('with_change_repeat_failures_results_flakies', ["test/failure2.html"])
         self.setProperty('without_change_repeat_failures_results_nonflaky_failures', [])
-        self.setProperty('without_change_repeat_failures_results_flakies', ["test/pre-existent/flaky.html"])
+        self.setProperty('without_change_repeat_failures_results_flakies', ["test/failure2.html", "test/pre-existent/flaky.html"])
         self.expect_outcome(result=FAILURE, state_string='Found 1 new test failure: test/failure1.html (failure)')
         step_result = self.run_step()
         self.assertEqual(len(self._emails_list), 2)
@@ -3384,10 +3274,8 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
         self.configureCommonProperties()
         self.setProperty('first_run_failures', ["test/failure1.html", "test/failure2.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
         self.setProperty('first_run_flakies', ["test/flaky1.html", "test/flaky2.html"])
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', ["test/failure1.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
-        self.setProperty('with_change_repeat_failures_results_flakies', ["test/failure2.html"])
         self.setProperty('without_change_repeat_failures_results_nonflaky_failures', ["test/pre-existent/failure.html"])
-        self.setProperty('without_change_repeat_failures_results_flakies', ["test/pre-existent/flaky.html"])
+        self.setProperty('without_change_repeat_failures_results_flakies', ["test/pre-existent/flaky.html", "test/failure2.html"])
         self.expect_outcome(result=FAILURE, state_string='Found 1 new test failure: test/failure1.html (failure)')
         step_result = self.run_step()
         self.assertEqual(len(self._emails_list), 3)
@@ -3406,10 +3294,8 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
         self.configureCommonProperties()
         self.setProperty('first_run_failures', ["test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
         self.setProperty('first_run_flakies', ["test/pre-existent/flaky2.html", "test/pre-existent/flaky3.html"])
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', ["test/pre-existent/failure.html"])
-        self.setProperty('with_change_repeat_failures_results_flakies', ["test/pre-existent/flaky.html"])
         self.setProperty('without_change_repeat_failures_results_nonflaky_failures', ["test/pre-existent/failure.html"])
-        self.setProperty('without_change_repeat_failures_results_flakies', [])
+        self.setProperty('without_change_repeat_failures_results_flakies', ["test/pre-existent/flaky.html"])
         self.expect_outcome(result=SUCCESS, state_string='Passed layout tests')
         step_result = self.run_step()
         self.assertEqual(len(self._emails_list), 2)
@@ -3426,10 +3312,8 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
         self.configureCommonProperties()
         self.setProperty('first_run_failures', ["test/pre-existent/flaky1.html"])
         self.setProperty('first_run_flakies', ["test/pre-existent/flaky2.html", "test/pre-existent/flaky3.html"])
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', [])
-        self.setProperty('with_change_repeat_failures_results_flakies', ["test/pre-existent/flaky1.html"])
         self.setProperty('without_change_repeat_failures_results_nonflaky_failures', [])
-        self.setProperty('without_change_repeat_failures_results_flakies', [])
+        self.setProperty('without_change_repeat_failures_results_flakies', ["test/pre-existent/flaky1.html"])
         self.setProperty('without_change_repeat_failures_retcode', SUCCESS)
         self.expect_outcome(result=SUCCESS, state_string='Passed layout tests')
         step_result = self.run_step()
@@ -3501,21 +3385,30 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
             self.assertTrue(f'Test name: <a href="https://github.com/WebKit/WebKit/blob/main/LayoutTests/{flaky_test}">{flaky_test}</a>' in self._emails_list[0])
         return step_result
 
-    def test_step_retry_with_change_exits_early_error(self):
+    def test_first_step_timeouts(self):
         self.configureStep()
         self.configureCommonProperties()
-        self.setProperty('first_run_failures', ["test/failure1.html", "test/failure2.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
-        self.setProperty('first_run_flakies', ["test/flaky1.html", "test/flaky2.html"])
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', ["test/failure1.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
-        self.setProperty('with_change_repeat_failures_results_flakies', ["test/failure2.html"])
-        self.setProperty('without_change_repeat_failures_results_nonflaky_failures', ["test/pre-existent/failure.html"])
-        self.setProperty('without_change_repeat_failures_results_flakies', ["test/pre-existent/flaky.html"])
-        self.setProperty('with_change_repeat_failures_results_exceed_failure_limit', True)
-        expected_infrastructure_error = 'One of the steps for retrying the failed tests has exited early, but this steps should run without "--exit-after-n-failures" switch, so they should not exit early.'
+        self.setProperty('first_run_failures', [])
+        self.setProperty('first_run_flakies', [])
+        self.setProperty('first_run_timedout', True)
+        expected_infrastructure_error = 'The layout-test run with change timed out, retrying with the hope it was a random infrastructure error.'
         self.expect_outcome(result=RETRY, state_string=f'Unexpected infrastructure issue: {expected_infrastructure_error}\nRetrying build [retry count is 0 of 3] (retry)')
         step_result = self.run_step()
         self.assertEqual(len(self._emails_list), 1)
         self.assertTrue(expected_infrastructure_error in self._emails_list[0])
+        return step_result
+
+    def test_first_step_timeouts_last_try(self):
+        self.configureStep()
+        self.configureCommonProperties()
+        self.setProperty('first_run_failures', [])
+        self.setProperty('first_run_flakies', [])
+        self.setProperty('first_run_timedout', True)
+        self.setProperty('clean_tree_run_status', SUCCESS)
+        self.setProperty('retry_count', AnalyzeLayoutTestsResultsRedTree.MAX_RETRY)
+        expected_infrastructure_error = 'The layout-test run with change generated no list of results and exited with error, retrying with the hope it was a random infrastructure error.'
+        self.expect_outcome(result=FAILURE,  state_string='Found unexpected failure with change (failure)')
+        step_result = self.run_step()
         return step_result
 
     def test_step_retry_without_change_exits_early_error(self):
@@ -3523,28 +3416,26 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
         self.configureCommonProperties()
         self.setProperty('first_run_failures', ["test/failure1.html", "test/failure2.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
         self.setProperty('first_run_flakies', ["test/flaky1.html", "test/flaky2.html"])
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', ["test/failure1.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
-        self.setProperty('with_change_repeat_failures_results_flakies', ["test/failure2.html"])
         self.setProperty('without_change_repeat_failures_results_nonflaky_failures', ["test/pre-existent/failure.html"])
         self.setProperty('without_change_repeat_failures_results_flakies', ["test/pre-existent/flaky.html"])
         self.setProperty('without_change_repeat_failures_results_exceed_failure_limit', True)
-        expected_infrastructure_error = 'One of the steps for retrying the failed tests has exited early, but this steps should run without "--exit-after-n-failures" switch, so they should not exit early.'
+        expected_infrastructure_error = 'The step "layout-tests-repeat-failures-without-change" has exited early, but this step should run without "--exit-after-n-failures" switch, so it should not exit early.'
         self.expect_outcome(result=RETRY, state_string=f'Unexpected infrastructure issue: {expected_infrastructure_error}\nRetrying build [retry count is 0 of 3] (retry)')
         step_result = self.run_step()
         self.assertEqual(len(self._emails_list), 1)
         self.assertTrue(expected_infrastructure_error in self._emails_list[0])
         return step_result
 
-    def test_step_retry_with_change_pass(self):
+    def test_step_retry_without_change_success(self):
         self.configureStep()
         self.configureCommonProperties()
         first_run_failures = ["test/failure1.html", "test/failure2.html", "test/pre-existent/flaky1.html", "test/pre-existent/flaky2.html"]
         first_run_flakies = ["test/flaky1.html", "test/flaky2.html"]
         self.setProperty('first_run_failures', first_run_failures)
         self.setProperty('first_run_flakies', first_run_flakies)
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', [])
-        self.setProperty('with_change_repeat_failures_results_flakies', [])
-        self.setProperty('with_change_repeat_failures_retcode', SUCCESS)
+        self.setProperty('without_change_repeat_failures_results_nonflaky_failures', [])
+        self.setProperty('without_change_repeat_failures_results_flakies', first_run_failures)
+        self.setProperty('without_change_repeat_failures_retcode', SUCCESS)
         self.expect_outcome(result=SUCCESS, state_string='Passed layout tests')
         step_result = self.run_step()
         self.assertEqual(len(self._emails_list), 1)
@@ -3553,16 +3444,16 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
             self.assertTrue(f'Test name: <a href="https://github.com/WebKit/WebKit/blob/main/LayoutTests/{flaky_test}">{flaky_test}</a>' in self._emails_list[0])
         return step_result
 
-    def test_step_retry_with_change_warnings(self):
+    def test_step_retry_without_change_warnings(self):
         self.configureStep()
         self.configureCommonProperties()
         first_run_failures = ["test/failure1.html", "test/failure2.html", "test/pre-existent/flaky1.html", "test/pre-existent/flaky2.html"]
         first_run_flakies = ["test/flaky1.html", "test/flaky2.html"]
         self.setProperty('first_run_failures', first_run_failures)
         self.setProperty('first_run_flakies', first_run_flakies)
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', [])
-        self.setProperty('with_change_repeat_failures_results_flakies', ["test/pre-existent/flaky1.html"])
-        self.setProperty('with_change_repeat_failures_retcode', WARNINGS)
+        self.setProperty('without_change_repeat_failures_results_nonflaky_failures', [])
+        self.setProperty('without_change_repeat_failures_results_flakies', first_run_failures)
+        self.setProperty('without_change_repeat_failures_retcode', WARNINGS)
         self.expect_outcome(result=SUCCESS, state_string='Passed layout tests')
         step_result = self.run_step()
         self.assertEqual(len(self._emails_list), 1)
@@ -3571,16 +3462,16 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
             self.assertTrue(f'Test name: <a href="https://github.com/WebKit/WebKit/blob/main/LayoutTests/{flaky_test}">{flaky_test}</a>' in self._emails_list[0])
         return step_result
 
-    def test_step_retry_with_change_error_with_flakies(self):
+    def test_step_retry_without_change_failure(self):
         self.configureStep()
         self.configureCommonProperties()
         first_run_failures = ["test/failure1.html", "test/failure2.html", "test/pre-existent/flaky1.html", "test/pre-existent/flaky2.html"]
         first_run_flakies = ["test/flaky1.html", "test/flaky2.html"]
         self.setProperty('first_run_failures', first_run_failures)
         self.setProperty('first_run_flakies', first_run_flakies)
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', [])
-        self.setProperty('with_change_repeat_failures_results_flakies', ["test/pre-existent/flaky1.html"])
-        self.setProperty('with_change_repeat_failures_retcode', FAILURE)
+        self.setProperty('without_change_repeat_failures_results_nonflaky_failures', [])
+        self.setProperty('without_change_repeat_failures_results_flakies', first_run_failures)
+        self.setProperty('without_change_repeat_failures_retcode', FAILURE)
         self.expect_outcome(result=SUCCESS, state_string='Passed layout tests')
         step_result = self.run_step()
         self.assertEqual(len(self._emails_list), 1)
@@ -3594,28 +3485,10 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
         self.configureCommonProperties()
         self.setProperty('first_run_failures', ["test/failure1.html", "test/failure2.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
         self.setProperty('first_run_flakies', ["test/flaky1.html", "test/flaky2.html"])
-        self.setProperty('with_change_repeat_failures_timedout', True)
+        self.setProperty('without_change_repeat_failures_timedout', True)
         self.setProperty('without_change_repeat_failures_results_nonflaky_failures', ["test/pre-existent/failure.html"])
         self.setProperty('without_change_repeat_failures_results_flakies', ["test/pre-existent/flaky.html"])
-        self.expect_outcome(result=FAILURE, state_string='Found 2 new test failures: test/failure1.html test/failure2.html (failure)')
-        step_result = self.run_step()
-        self.assertEqual(len(self._emails_list), 2)
-        expected_infrastructure_error = 'The step "layout-tests-repeat-failures-with-change" reached the timeout but the step "layout-tests-repeat-failures-without-change" ended. Not trying to repeat this. Reporting 2 failures from the first run.'
-        self.assertTrue(expected_infrastructure_error in self._emails_list[0])
-        self.assertTrue('Subject: Layout test failure for Patch' in self._emails_list[1])
-        for failed_test in ['test/failure1.html', 'test/failure2.html']:
-            self.assertTrue(failed_test in self._emails_list[1])
-        return step_result
-
-    def test_step_retry_with_change_unexpected_error(self):
-        self.configureStep()
-        self.configureCommonProperties()
-        self.setProperty('first_run_failures', ["test/failure1.html", "test/failure2.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
-        self.setProperty('first_run_flakies', ["test/flaky1.html", "test/flaky2.html"])
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', [])
-        self.setProperty('with_change_repeat_failures_results_flakies', [])
-        self.setProperty('with_change_repeat_failures_retcode', FAILURE)
-        expected_infrastructure_error = 'The step "layout-tests-repeat-failures" failed to generate any list of failures or flakies and returned an error code.'
+        expected_infrastructure_error = 'The step "layout-tests-repeat-failures-without-change" was interrumped because it reached the timeout.'
         self.expect_outcome(result=RETRY, state_string=f'Unexpected infrastructure issue: {expected_infrastructure_error}\nRetrying build [retry count is 0 of 3] (retry)')
         step_result = self.run_step()
         self.assertEqual(len(self._emails_list), 1)
@@ -3627,9 +3500,6 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
         self.configureCommonProperties()
         self.setProperty('first_run_failures', ["test/failure1.html", "test/failure2.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
         self.setProperty('first_run_flakies', ["test/flaky1.html", "test/flaky2.html"])
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', ["test/failure1.html", "test/failure2.html"])
-        self.setProperty('with_change_repeat_failures_results_flakies', [])
-        self.setProperty('with_change_repeat_failures_retcode', FAILURE)
         self.setProperty('without_change_repeat_failures_results_nonflaky_failures', [])
         self.setProperty('without_change_repeat_failures_results_flakies', [])
         self.setProperty('without_change_repeat_failures_retcode', FAILURE)
@@ -3645,7 +3515,6 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
         self.configureCommonProperties()
         self.setProperty('first_run_failures', ["test/failure1.html", "test/failure2.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
         self.setProperty('first_run_flakies', ["test/flaky1.html", "test/flaky2.html"])
-        self.setProperty('with_change_repeat_failures_timedout', True)
         self.setProperty('without_change_repeat_failures_timedout', True)
         expected_infrastructure_error = 'The step "layout-tests-repeat-failures-without-change" was interrumped because it reached the timeout.'
         self.expect_outcome(result=RETRY, state_string=f'Unexpected infrastructure issue: {expected_infrastructure_error}\nRetrying build [retry count is 0 of 3] (retry)')
@@ -3659,8 +3528,6 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
         self.configureCommonProperties()
         self.setProperty('first_run_failures', ["test/failure1.html", "test/failure2.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
         self.setProperty('first_run_flakies', ["test/flaky1.html", "test/flaky2.html"])
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', ["test/failure1.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
-        self.setProperty('with_change_repeat_failures_results_flakies', ["test/failure2.html"])
         self.setProperty('without_change_repeat_failures_timedout', True)
         expected_infrastructure_error = 'The step "layout-tests-repeat-failures-without-change" was interrumped because it reached the timeout.'
         self.expect_outcome(result=RETRY, state_string=f'Unexpected infrastructure issue: {expected_infrastructure_error}\nRetrying build [retry count is 0 of 3] (retry)')
@@ -3674,8 +3541,6 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
         self.configureCommonProperties()
         self.setProperty('first_run_failures', ["test/failure1.html", "test/failure2.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
         self.setProperty('first_run_flakies', ["test/flaky1.html", "test/flaky2.html"])
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', ["test/failure1.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
-        self.setProperty('with_change_repeat_failures_results_flakies', ["test/failure2.html"])
         self.setProperty('without_change_repeat_failures_timedout', True)
         self.setProperty('retry_count', 2)
         expected_infrastructure_error = 'The step "layout-tests-repeat-failures-without-change" was interrumped because it reached the timeout.'
@@ -3690,8 +3555,6 @@ class TestAnalyzeLayoutTestsResultsRedTree(BuildStepMixinAdditions, unittest.Tes
         self.configureCommonProperties()
         self.setProperty('first_run_failures', ["test/failure1.html", "test/failure2.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
         self.setProperty('first_run_flakies', ["test/flaky1.html", "test/flaky2.html"])
-        self.setProperty('with_change_repeat_failures_results_nonflaky_failures', ["test/failure1.html", "test/pre-existent/failure.html", "test/pre-existent/flaky.html"])
-        self.setProperty('with_change_repeat_failures_results_flakies', ["test/failure2.html"])
         self.setProperty('without_change_repeat_failures_timedout', True)
         self.setProperty('retry_count', 3)
         expected_infrastructure_error = 'The step "layout-tests-repeat-failures-without-change" was interrumped because it reached the timeout.'
