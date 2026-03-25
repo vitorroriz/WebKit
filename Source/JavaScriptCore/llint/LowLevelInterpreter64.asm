@@ -943,8 +943,8 @@ end
 
 macro equalNullComparisonOp(opcodeName, opcodeStruct, fn)
     llintOpWithReturn(opcodeName, opcodeStruct, macro (size, get, dispatch, return)
-        get(m_operand, t0)
-        loadq [cfr, t0, 8], t0
+        get(m_operand, t1)
+        loadConstantOrVariable(size, t1, t0)
         btqnz t0, notCellMask, .immediate
         btbnz JSCell::m_flags[t0], MasqueradesAsUndefined, .masqueradesAsUndefined
         move 0, t0
@@ -2145,9 +2145,8 @@ end
 
 macro equalNullJumpOp(opcodeName, opcodeStruct, cellHandler, immediateHandler)
     llintOpWithJump(op_%opcodeName%, opcodeStruct, macro (size, get, jump, dispatch)
-        get(m_value, t0)
-        assertNotConstant(size, t0)
-        loadq [cfr, t0, 8], t0
+        get(m_value, t1)
+        loadConstantOrVariable(size, t1, t0)
         btqnz t0, notCellMask, .immediate
         loadStructureWithScratch(t0, t2, t1)
         cellHandler(t2, JSCell::m_flags[t0], .target)

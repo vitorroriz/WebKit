@@ -940,10 +940,8 @@ end
 
 macro equalNullComparisonOp(opcodeName, opcodeStruct, fn)
     llintOpWithReturn(opcodeName, opcodeStruct, macro (size, get, dispatch, return)
-        get(m_operand, t0)
-        assertNotConstant(size, t0)
-        loadi TagOffset[cfr, t0, 8], t1
-        loadi PayloadOffset[cfr, t0, 8], t0
+        get(m_operand, t2)
+        loadConstantOrVariable(size, t2, t1, t0)
         bineq t1, CellTag, .opEqNullImmediate
         btbnz JSCell::m_flags[t0], MasqueradesAsUndefined, .opEqNullMasqueradesAsUndefined
         move 0, t1
@@ -2003,10 +2001,8 @@ end
 
 macro equalNullJumpOp(opcodeName, opcodeStruct, cellHandler, immediateHandler)
     llintOpWithJump(op_%opcodeName%, opcodeStruct, macro (size, get, jump, dispatch)
-        get(m_value, t0)
-        assertNotConstant(size, t0)
-        loadi TagOffset[cfr, t0, 8], t1
-        loadi PayloadOffset[cfr, t0, 8], t0
+        get(m_value, t2)
+        loadConstantOrVariable(size, t2, t1, t0)
         bineq t1, CellTag, .immediate
         loadi JSCell::m_structureID[t0], t2
         cellHandler(t2, JSCell::m_flags[t0], .target)
