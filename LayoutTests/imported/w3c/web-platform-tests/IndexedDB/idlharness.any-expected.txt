@@ -99,7 +99,7 @@ PASS IDBObjectStore interface: operation get(any)
 PASS IDBObjectStore interface: operation getKey(any)
 PASS IDBObjectStore interface: operation getAll(optional any, optional unsigned long)
 PASS IDBObjectStore interface: operation getAllKeys(optional any, optional unsigned long)
-FAIL IDBObjectStore interface: operation getAllRecords(optional IDBGetAllOptions) assert_own_property: interface prototype object missing non-static operation expected property "getAllRecords" missing
+PASS IDBObjectStore interface: operation getAllRecords(optional IDBGetAllOptions)
 PASS IDBObjectStore interface: operation count(optional any)
 PASS IDBObjectStore interface: operation openCursor(optional any, optional IDBCursorDirection)
 PASS IDBObjectStore interface: operation openKeyCursor(optional any, optional IDBCursorDirection)

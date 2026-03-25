@@ -55,6 +55,7 @@ class SerializedScriptValue;
 class WeakPtrImplWithEventTargetData;
 class WebCoreOpaqueRoot;
 
+struct IDBGetAllOptions;
 struct IDBKeyRangeData;
 
 template<typename> class ExceptionOr;
@@ -104,6 +105,8 @@ public:
     ExceptionOr<Ref<IDBRequest>> getAll(JSC::JSGlobalObject&, JSC::JSValue key, std::optional<uint32_t> count);
     ExceptionOr<Ref<IDBRequest>> getAllKeys(RefPtr<IDBKeyRange>&&, std::optional<uint32_t> count);
     ExceptionOr<Ref<IDBRequest>> getAllKeys(JSC::JSGlobalObject&, JSC::JSValue key, std::optional<uint32_t> count);
+
+    ExceptionOr<Ref<IDBRequest>> getAllRecords(JSC::JSGlobalObject&, IDBGetAllOptions&&);
 
     ExceptionOr<Ref<IDBRequest>> putForCursorUpdate(JSC::JSGlobalObject&, JSC::JSValue, RefPtr<IDBKey>&&, RefPtr<SerializedScriptValue>&&);
 
