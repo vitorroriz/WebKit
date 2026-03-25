@@ -124,9 +124,14 @@ void BidiBrowsingContextAgent::create(Inspector::Protocol::BidiBrowsingContext::
     RefPtr session = m_session.get();
     ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(!session, InternalError);
 
+    if (!optionalUserContext.isNull()) {
+        bool isValid = session->isValidUserContext(optionalUserContext);
+        ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(!isValid, NoSuchUserContext);
+    }
+
     // FIXME: implement `referenceContext` option.
     // FIXME: implement `background` option.
-    // FIXME: implement `userContext` option.
+    // FIXME: implement `userContext` option (use validated context to create in specific user context).
 
     session->createBrowsingContext(browsingContextPresentationFromCreateType(createType), [callback = WTF::move(callback)](CommandResultOf<BrowsingContext, Inspector::Protocol::Automation::BrowsingContextPresentation>&& result) {
         if (!result) {

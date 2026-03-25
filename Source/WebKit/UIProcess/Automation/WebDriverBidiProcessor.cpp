@@ -149,6 +149,8 @@ static String toBidiErrorCode(int errorCode, const String& inspectorInternalMsg)
         return "unable to unload extension"_s;
     case Inspector::Protocol::Automation::ErrorMessage::NoSuchExtension:
         return "no such web extension"_s;
+    case Inspector::Protocol::Automation::ErrorMessage::NoSuchUserContext:
+        return "no such user context"_s;
     default:
         return "unknown error"_s;
     }
