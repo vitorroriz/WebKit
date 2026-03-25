@@ -2408,6 +2408,45 @@ TEST(WKDownload, PlaceholderPolicyDisable)
         DownloadCallback::DidFinish,
     });
 }
+
+TEST(WKDownload, PlaceholderPolicyDisableWithNonExistentPlaceholderURL)
+{
+    HTTPServer server({
+        { "/"_s, { 404, { }, "http body"_s } }
+    });
+    RetainPtr expectedDownloadFile = tempFileThatDoesNotExist();
+    auto delegate = adoptNS([TestDownloadDelegate new]);
+    auto webView = adoptNS([WKWebView new]);
+    [webView setNavigationDelegate:delegate.get()];
+
+    // Pass a non-existent file URL as the placeholder. This should not cause
+    // an assertion failure when creating bookmark data for the URL.
+    NSURL *nonExistentPlaceholder = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"NonExistentPlaceholder.txt"]];
+    [[NSFileManager defaultManager] removeItemAtURL:nonExistentPlaceholder error:nil];
+
+    __block bool didFinish = false;
+    [webView startDownloadUsingRequest:server.request() completionHandler:^(WKDownload *download) {
+        download.delegate = delegate.get();
+        delegate.get().decideDestinationUsingResponse = ^(WKDownload *, NSURLResponse *, NSString *, void (^completionHandler)(NSURL *)) {
+            completionHandler(expectedDownloadFile.get());
+        };
+        delegate.get().decidePlaceholderPolicy = ^(WKDownload *, void (^completionHandler)(WKDownloadPlaceholderPolicy, NSURL *)) {
+            completionHandler(WKDownloadPlaceholderPolicyDisable, nonExistentPlaceholder);
+        };
+        delegate.get().downloadDidFinish = ^(WKDownload *download) {
+            didFinish = true;
+        };
+    }];
+    Util::run(&didFinish);
+
+    checkFileContents(expectedDownloadFile.get(), "http body"_s);
+
+    checkCallbackRecord(delegate.get(), {
+        DownloadCallback::DecideDestination,
+        DownloadCallback::DecidePlaceholderPolicy,
+        DownloadCallback::DidFinish,
+    });
+}
 #endif
 
 TEST(WKDownload, NetworkProcessCrash)
