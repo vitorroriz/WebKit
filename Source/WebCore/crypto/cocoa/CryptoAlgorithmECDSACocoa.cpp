@@ -29,9 +29,13 @@
 #include "CommonCryptoDERUtilities.h"
 #include "CommonCryptoUtilities.h"
 #include "CryptoAlgorithmEcdsaParams.h"
-#include "CryptoDigestAlgorithm.h"
 #include "CryptoKeyEC.h"
+#include "CryptoTypesBridging.h"
 #include "ExceptionOr.h"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#include "PALSwift-Generated.h"
+#pragma clang diagnostic pop
 #include <pal/crypto/CryptoTypes.h>
 #include <wtf/StdLibExtras.h>
 

@@ -27,8 +27,8 @@
 #include "CryptoAlgorithmRSASSA_PKCS1_v1_5.h"
 
 #include "CommonCryptoUtilities.h"
-#include "CryptoDigestAlgorithm.h"
 #include "CryptoKeyRSA.h"
+#include "CryptoTypesBridging.h"
 
 namespace WebCore {
 

@@ -27,6 +27,7 @@
 #include "CryptoAlgorithmHMAC.h"
 
 #include "CryptoKeyHMAC.h"
+#include "CryptoTypesBridging.h"
 #include "CryptoUtilitiesCocoa.h"
 #include <CommonCrypto/CommonHMAC.h>
 #include <pal/crypto/CryptoTypes.h>

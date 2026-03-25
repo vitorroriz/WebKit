@@ -28,6 +28,10 @@
 
 #include "CommonCryptoDERUtilities.h"
 #include "JsonWebKey.h"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#include "PALSwift-Generated.h"
+#pragma clang diagnostic pop
 #include <pal/crypto/CryptoTypes.h>
 #include <wtf/text/Base64.h>
 

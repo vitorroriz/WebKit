@@ -68,4 +68,7 @@ struct CryptoOperationReturnValue {
     VectorUInt8 result;
 };
 
+constexpr auto ed25519KeySize = 32;
+constexpr auto ed25519SignatureSize = ed25519KeySize * 2;
+
 } // namespace PAL::Crypto

@@ -29,6 +29,7 @@
 #include "CommonCryptoUtilities.h"
 #include "CryptoAlgorithmHkdfParams.h"
 #include "CryptoKeyRaw.h"
+#include "CryptoTypesBridging.h"
 #include "CryptoUtilitiesCocoa.h"
 #include <pal/crypto/CryptoTypes.h>
 

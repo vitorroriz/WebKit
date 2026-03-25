@@ -54,23 +54,6 @@ enum class CryptoAlgorithmIdentifier : uint8_t {
     X25519
 };
 
-inline PAL::Crypto::CryptoDigestHashFunction toCKHashFunction(CryptoAlgorithmIdentifier hash)
-{
-    switch (hash) {
-    case CryptoAlgorithmIdentifier::SHA_256:
-        return PAL::Crypto::CryptoDigestHashFunction::SHA_256;
-    case CryptoAlgorithmIdentifier::SHA_384:
-        return PAL::Crypto::CryptoDigestHashFunction::SHA_384;
-    case CryptoAlgorithmIdentifier::SHA_512:
-        return PAL::Crypto::CryptoDigestHashFunction::SHA_512;
-    case CryptoAlgorithmIdentifier::SHA_1:
-        return PAL::Crypto::CryptoDigestHashFunction::SHA_1;
-    default:
-        ASSERT_NOT_REACHED();
-        return PAL::Crypto::CryptoDigestHashFunction::SHA_512;
-    }
-}
-
 inline bool isValidHashParameter(CryptoAlgorithmIdentifier hash)
 {
     return hash == CryptoAlgorithmIdentifier::SHA_1 || hash == CryptoAlgorithmIdentifier::SHA_256 || hash == CryptoAlgorithmIdentifier::SHA_512 || hash == CryptoAlgorithmIdentifier::SHA_384;

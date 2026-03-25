@@ -29,32 +29,10 @@
 #include "CommonCryptoUtilities.h"
 #include "CryptoAlgorithmAesGcmParams.h"
 #include "CryptoKeyAES.h"
+#include "CryptoTypesBridging.h"
 #include <pal/crypto/CryptoAlgorithmAESGCMCocoa.h>
 
 namespace WebCore {
-
-static std::optional<ExceptionCode> toExceptionCode(const PAL::Crypto::Error& error)
-{
-    switch (error) {
-    case PAL::Crypto::Error::Success:
-        return std::nullopt;
-
-    default:
-        return ExceptionCode::OperationError;
-    }
-}
-
-static ExceptionOr<Vector<uint8_t>> toException(Expected<PAL::Crypto::VectorUInt8, PAL::Crypto::Error>&& expected)
-{
-    if (expected)
-        return WTF::move(*expected);
-
-    auto exceptionCode = toExceptionCode(expected.error());
-    if (exceptionCode)
-        return Exception { *exceptionCode };
-
-    RELEASE_ASSERT_NOT_REACHED();
-}
 
 ExceptionOr<Vector<uint8_t>> CryptoAlgorithmAESGCM::platformEncrypt(const CryptoAlgorithmAesGcmParams& parameters, const CryptoKeyAES& key, const Vector<uint8_t>& plainText)
 {
