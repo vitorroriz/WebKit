@@ -7180,8 +7180,31 @@ static RetainPtr<_WKTextExtractionResult> createEmptyTextExtractionResult()
     };
 }
 
+static NSString *nameForAction(_WKTextExtractionAction action)
+{
+    switch (action) {
+    case _WKTextExtractionActionClick:
+        return @"Click";
+    case _WKTextExtractionActionSelectText:
+        return @"SelectText";
+    case _WKTextExtractionActionSelectMenuItem:
+        return @"SelectMenuItem";
+    case _WKTextExtractionActionTextInput:
+        return @"TextInput";
+    case _WKTextExtractionActionKeyPress:
+        return @"KeyPress";
+    case _WKTextExtractionActionHighlightText:
+        return @"HighlightText";
+    case _WKTextExtractionActionScrollBy:
+        return @"ScrollBy";
+    }
+    return @"?";
+}
+
 - (void)_performInteraction:(_WKTextExtractionInteraction *)wkInteraction completionHandler:(void(^)(_WKTextExtractionInteractionResult *))completionHandler
 {
+    auto actionType = wkInteraction.action;
+    RELEASE_LOG(TextExtraction, "<%@: %p> Performing %@", [self class], self, nameForAction(actionType));
 #if USE(APPLE_INTERNAL_SDK) || (!PLATFORM(WATCHOS) && !PLATFORM(APPLETV))
     if (!self._isValid)
         return completionHandler(adoptNS([[_WKTextExtractionInteractionResult alloc] initWithErrorDescription:@"Web view is invalid"]).get());
@@ -7191,8 +7214,10 @@ static RetainPtr<_WKTextExtractionResult> createEmptyTextExtractionResult()
         return completionHandler(adoptNS([[_WKTextExtractionInteractionResult alloc] initWithErrorDescription:@"Text extraction is unavailable"]).get());
 
     auto [targetFrame, interaction] = [self _convertToWebCoreInteraction:wkInteraction];
-    if (!targetFrame)
+    if (!targetFrame) {
+        RELEASE_LOG_ERROR(TextExtraction, "<%@: %p> Invalid frame for interaction", [self class], self);
         return completionHandler(adoptNS([[_WKTextExtractionInteractionResult alloc] initWithErrorDescription:@"Browsing context is invalid"]).get());
+    }
 
 #if PLATFORM(MAC)
     RetainPtr nativePopup = [self _activePopupButtonCell];
@@ -7217,6 +7242,7 @@ static RetainPtr<_WKTextExtractionResult> createEmptyTextExtractionResult()
         weakSelf = WeakObjCPtr<WKWebView>(self),
         weakPage = WeakPtr { *page },
         assertionScope = WTF::move(assertionScope),
+        actionType,
         completionHandler = makeBlockPtr(WTF::move(completionHandler))
     ](bool success, String&& description) mutable {
         RetainPtr<NSString> errorDescription;
@@ -7226,6 +7252,11 @@ static RetainPtr<_WKTextExtractionResult> createEmptyTextExtractionResult()
         RetainPtr strongSelf = weakSelf.get();
         if (!strongSelf)
             return completionHandler(result.get());
+
+        if (success)
+            RELEASE_LOG(TextExtraction, "<%@: %p> %@ succeeded", [strongSelf class], strongSelf.get(), nameForAction(actionType));
+        else
+            RELEASE_LOG_ERROR(TextExtraction, "<%@: %p> %@ failed", [strongSelf class], strongSelf.get(), nameForAction(actionType));
 
         RefPtr strongPage = weakPage.get();
         if (!strongPage)
