@@ -614,7 +614,7 @@ private:
 
     void NODELETE platformSetCacheModel(CacheModel);
 
-    void NODELETE setEnhancedAccessibility(bool);
+    void setEnhancedAccessibility(bool);
     void bindAccessibilityFrameWithData(WebCore::FrameIdentifier, std::span<const uint8_t>);
 
     void startMemorySampler(SandboxExtension::Handle&&, const String&, const double);

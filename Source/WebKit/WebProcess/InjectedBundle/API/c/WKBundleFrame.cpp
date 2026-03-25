@@ -39,6 +39,7 @@
 #include "WebFrame.h"
 #include "WebPage.h"
 #include <WebCore/AXIsolatedObject.h>
+#include <WebCore/AXIsolatedTree.h>
 #include <WebCore/AXObjectCache.h>
 #include <WebCore/DocumentInlines.h>
 #include <WebCore/DocumentPage.h>
@@ -317,12 +318,7 @@ void* _WKAccessibilityRootObjectForTesting(WKBundleFrameRef frameRef)
         return document ? document->axObjectCache() : nullptr;
     };
 
-    // Notify the UI process that accessibility is enabled so that any new processes
-    // (e.g., for site-isolated iframes) will also have accessibility enabled.
-    if (!WebCore::AXObjectCache::accessibilityEnabled()) {
-        if (RefPtr page = protect(WebKit::toImpl(frameRef))->page())
-            page->enableAccessibilityForAllProcesses();
-    }
+    WebCore::AXObjectCache::enableAccessibility();
 
 #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
     if (!isMainRunLoop()) {

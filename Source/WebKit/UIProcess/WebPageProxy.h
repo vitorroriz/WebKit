@@ -171,6 +171,7 @@ enum class ScrollDirection : uint8_t;
 enum class ScrollbarOverlayStyle : uint8_t;
 
 enum class ActivityState : uint16_t;
+enum class AccessibilityMode : uint8_t;
 enum class AdjustViewSize : bool;
 enum class AdvancedPrivacyProtections : uint16_t;
 enum class AlternativeTextType : uint8_t;
@@ -1577,7 +1578,7 @@ public:
 #if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
     void updateAccessibilityFrameGeometry();
 #endif
-    void enableAccessibilityForAllProcesses();
+    void setAccessibilityMode(WebCore::AccessibilityMode);
 
 #if PLATFORM(MAC)
     NSDictionary *getAccessibilityWebProcessDebugInfo();
@@ -3881,7 +3882,7 @@ private:
 
     bool m_isEditable { false };
 
-    bool m_accessibilityEnabled { false };
+    WebCore::AccessibilityMode m_accessibilityMode { };
 
     double m_textZoomFactor { 1 };
     double m_pageZoomFactor { 1 };

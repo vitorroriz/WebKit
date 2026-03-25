@@ -1088,8 +1088,17 @@ WebPage::WebPage(PageIdentifier pageID, WebPageCreationParameters&& parameters)
     if (parameters.isEditable)
         setEditable(true);
 
-    if (parameters.accessibilityEnabled)
-        enableAccessibility();
+    inheritAccessibilityMode(parameters.accessibilityMode);
+
+    WebCore::AXObjectCache::setSyncModeToOtherProcessesCallback([weakPage = WeakPtr { *this }](WebCore::AccessibilityMode mode) {
+        if (RefPtr page = weakPage.get())
+            page->send(Messages::WebPageProxy::SetAccessibilityMode(mode));
+    });
+
+#if PLATFORM(MAC)
+    if (WebCore::AXObjectCache::shouldForceAccessibilityEnabled())
+        WebCore::AXObjectCache::enableAccessibility(WebCore::AXObjectCache::ForceAXThreadMode::Yes);
+#endif // PLATFORM(MAC)
 
 #if PLATFORM(MAC)
     setUseFormSemanticContext(parameters.useFormSemanticContext);
@@ -2837,15 +2846,27 @@ void WebPage::accessibilitySettingsDidChange()
     protect(corePage())->accessibilitySettingsDidChange();
 }
 
-void WebPage::enableAccessibilityForAllProcesses()
+void WebPage::inheritAccessibilityMode(WebCore::AccessibilityMode mode)
 {
-    send(Messages::WebPageProxy::EnableAccessibilityForAllProcesses());
-}
+    if (WebCore::isAccessibilityModeOff(mode)) {
+        // The only time we disable accessibility is for testing, and
+        // that should request to disable accessibility should not sync
+        // to other processes. If we hit this assert, it means we
+        // turned accessibility on in this process, and then something
+        // tried to sync an Off-state to us, which should never happen.
+        AX_ASSERT(!WebCore::AXObjectCache::accessibilityEnabled());
 
-void WebPage::enableAccessibility()
-{
-    if (!WebCore::AXObjectCache::accessibilityEnabled())
-        WebCore::AXObjectCache::enableAccessibility();
+        // In the future, we may add a way to disable accessibility in
+        // production (i.e. the user turns off their AT), in which case
+        // this function will need to change.
+        return;
+    }
+
+    auto forceAXThreadMode = mode == WebCore::AccessibilityMode::AXThread
+        ? WebCore::AXObjectCache::ForceAXThreadMode::Yes
+        : WebCore::AXObjectCache::ForceAXThreadMode::No;
+
+    WebCore::AXObjectCache::enableAccessibility(forceAXThreadMode);
 }
 
 void WebPage::screenPropertiesDidChange(bool affectsStyle)

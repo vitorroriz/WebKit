@@ -1977,11 +1977,11 @@ NSDictionary *WebPageProxy::getAccessibilityWebProcessDebugInfo()
     if (!sendResult.succeeded())
         return @{ };
 
-    auto [result] = sendResult.takeReplyOr(WebCore::AXDebugInfo({ 0, 0 }));
+    auto [result] = sendResult.takeReplyOr(WebCore::AXDebugInfo({ }));
 
     return @{
-        @"axIsEnabled": [NSNumber numberWithBool:result.isAccessibilityEnabled],
-        @"axIsThreadInitialized": [NSNumber numberWithBool:result.isAccessibilityThreadInitialized],
+        @"axIsEnabled": [NSNumber numberWithBool:!WebCore::isAccessibilityModeOff(result.accessibilityMode)],
+        @"axIsThreadInitialized": [NSNumber numberWithBool:result.accessibilityMode == WebCore::AccessibilityMode::AXThread],
         @"axLiveTree": result.liveTree.createNSString().get(),
         @"axIsolatedTree": result.isolatedTree.createNSString().get(),
         @"warnings": createNSArray(result.warnings).get(),
@@ -2000,12 +2000,12 @@ NSArray *WebPageProxy::getAccessibilityWebProcessDebugInfoForAllProcesses()
         if (!sendResult.succeeded())
             return;
 
-        auto [result] = sendResult.takeReplyOr(WebCore::AXDebugInfo({ 0, 0 }));
+        auto [result] = sendResult.takeReplyOr(WebCore::AXDebugInfo({ }));
 
         [allResults addObject:@{
             @"pid": [NSNumber numberWithInt:webProcess.processID()],
-            @"axIsEnabled": [NSNumber numberWithBool:result.isAccessibilityEnabled],
-            @"axIsThreadInitialized": [NSNumber numberWithBool:result.isAccessibilityThreadInitialized],
+            @"axIsEnabled": [NSNumber numberWithBool:!WebCore::isAccessibilityModeOff(result.accessibilityMode)],
+            @"axIsThreadInitialized": [NSNumber numberWithBool:result.accessibilityMode == WebCore::AccessibilityMode::AXThread],
             @"axLiveTree": result.liveTree.createNSString().get(),
             @"axIsolatedTree": result.isolatedTree.createNSString().get(),
             @"warnings": createNSArray(result.warnings).get(),

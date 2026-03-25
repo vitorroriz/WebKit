@@ -105,6 +105,22 @@ void AccessibilityController::resetToConsistentState()
 {
     if (m_globalNotificationHandler)
         removeNotificationListener();
+
+#if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
+    // Clear any queued AX thread functions from the previous test and wait
+    // for any in-flight function to finish. This avoids running functions
+    // from one test in another.
+    if (m_accessibilityIsolatedTreeMode) {
+        AXThread::clearQueuedFunctions();
+        // Wait for any currently-executing function to complete.
+        std::atomic<bool> complete = false;
+        AXThread::dispatch([&complete] {
+            complete = true;
+        });
+        while (!complete)
+            spinMainRunLoop();
+    }
+#endif // ENABLE(ACCESSIBILITY_ISOLATED_TREE)
 }
 
 static id findAccessibleObjectById(id obj, NSString *idAttribute)

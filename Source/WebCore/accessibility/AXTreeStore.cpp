@@ -34,7 +34,7 @@ namespace WebCore {
 
 #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
 template<>
-void AXTreeStore<AXIsolatedTree>::applyPendingChangesForAllIsolatedTrees()
+WEBCORE_EXPORT void AXTreeStore<AXIsolatedTree>::applyPendingChangesForAllIsolatedTrees()
 {
     AX_ASSERT(!isMainThread());
 

@@ -771,10 +771,7 @@ void WebPage::getAccessibilityWebProcessDebugInfo(CompletionHandler<void(WebCore
         return;
     }
 
-    bool isAXThreadInitialized = false;
-#if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
-    isAXThreadInitialized = WebCore::AXObjectCache::isAXThreadInitialized();
-#endif
+    auto mode = WebCore::AXObjectCache::accessibilityMode();
     Vector<String> warnings;
 
     RefPtr focusedFrame = [m_mockAccessibilityElement focusedLocalFrame];
@@ -784,7 +781,7 @@ void WebPage::getAccessibilityWebProcessDebugInfo(CompletionHandler<void(WebCore
         if (CheckedPtr cache = document->axObjectCache()) {
             auto treeData = cache->treeData();
             warnings = WTF::move(treeData.warnings);
-            completionHandler({ WebCore::AXObjectCache::accessibilityEnabled(), isAXThreadInitialized, WTF::move(treeData.liveTree), WTF::move(treeData.isolatedTree), WTF::move(warnings), [m_mockAccessibilityElement remoteTokenHash], [accessibilityRemoteTokenData() hash] });
+            completionHandler({ mode, WTF::move(treeData.liveTree), WTF::move(treeData.isolatedTree), WTF::move(warnings), [m_mockAccessibilityElement remoteTokenHash], [accessibilityRemoteTokenData() hash] });
             return;
         }
         warnings.append("No AXObjectCache"_s);
@@ -793,7 +790,7 @@ void WebPage::getAccessibilityWebProcessDebugInfo(CompletionHandler<void(WebCore
     else
         warnings.append("Focused LocalFrame has no document"_s);
 
-    completionHandler({ WebCore::AXObjectCache::accessibilityEnabled(), isAXThreadInitialized, emptyString(), emptyString(), WTF::move(warnings), [m_mockAccessibilityElement remoteTokenHash], [accessibilityRemoteTokenData() hash] });
+    completionHandler({ mode, emptyString(), emptyString(), WTF::move(warnings), [m_mockAccessibilityElement remoteTokenHash], [accessibilityRemoteTokenData() hash] });
 }
 
 #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)

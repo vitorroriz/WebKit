@@ -9312,9 +9312,17 @@ header: <WebCore/AXObjectCache.h>
 };
 
 header: <WebCore/AXObjectCache.h>
+[CustomHeader] enum class WebCore::AccessibilityMode : uint8_t {
+    Off,
+    MainThread,
+    AXThread,
+    OffWasMainThread,
+    OffWasAXThread
+};
+
+header: <WebCore/AXObjectCache.h>
 [CustomHeader] struct WebCore::AXDebugInfo {
-    bool isAccessibilityEnabled;
-    bool isAccessibilityThreadInitialized;
+    WebCore::AccessibilityMode accessibilityMode;
     String liveTree;
     String isolatedTree;
     Vector<String> warnings;

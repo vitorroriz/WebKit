@@ -322,15 +322,13 @@ void AccessibilityScrollView::addLocalFrameChild()
         if (!frameAXObjectCache)
             return;
 
-        RefPtr protectedView = localFrame->view();
-        RefPtr frameRoot = frameAXObjectCache->getOrCreate(protectedView.get());
+        RefPtr frameRoot = frameAXObjectCache->rootObjectForFrame(*localFrame);
         if (!frameRoot)
             return;
 
         // Set the initial hosting node state on the child frame's root scroll view.
         if (RefPtr childScrollView = dynamicDowncast<AccessibilityScrollView>(frameRoot.get())) {
-            InheritedFrameState state { isHostingFrameHidden(), isHostingFrameInert(), isHostingFrameRenderHidden() };
-            childScrollView->setInheritedFrameState(state);
+            childScrollView->setInheritedFrameState({ isHostingFrameHidden(), isHostingFrameInert(), isHostingFrameRenderHidden() });
 
             // Request the screen position for the UI process to update asynchronously.
             if (RefPtr page = this->page())

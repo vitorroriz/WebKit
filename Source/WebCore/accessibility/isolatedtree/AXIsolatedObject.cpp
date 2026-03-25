@@ -584,7 +584,8 @@ RefPtr<AXCoreObject> AXIsolatedObject::accessibilityHitTest(const IntPoint& poin
     // use any caching or main-thread calls in testing contexts.
     if (AXObjectCache::clientIsInTestMode()) [[unlikely]] {
         // In layout tests, we pass page-relative coordinates. Convert to screen for approximateHitTest, which works in screen-space.
-#if ENABLE(ACCESSIBILITY_LOCAL_FRAME) && PLATFORM(MAC)
+#if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
+#if PLATFORM(MAC)
         if (RefPtr root = tree().rootNode()) {
             auto rootPosition = root->screenRelativePosition();
             auto rootSize = root->size();
@@ -594,7 +595,8 @@ RefPtr<AXCoreObject> AXIsolatedObject::accessibilityHitTest(const IntPoint& poin
 #else
         // If ITM exists on non-macOS platforms, the coordinate conversion above (using a bottom-left origin) will be incorrect.
         AX_ASSERT_NOT_REACHED();
-#endif // ENABLE(ACCESSIBILITY_LOCAL_FRAME) && PLATFORM(MAC)
+#endif // PLATFORM(MAC)
+#endif // ENABLE(ACCESSIBILITY_LOCAL_FRAME)
         return approximateHitTest(point);
     }
 

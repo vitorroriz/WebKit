@@ -209,7 +209,7 @@ void AccessibilityReplacedText::postTextStateChangeNotification(AXObjectCache* c
         cache->postTextStateChangeNotification(node.get(), type, text, position);
 }
 
-std::atomic<bool> AXObjectCache::gAccessibilityEnabled = false;
+std::atomic<AccessibilityMode> AXObjectCache::gAccessibilityMode { AccessibilityMode::Off };
 bool AXObjectCache::gAccessibilityEnhancedUserInterfaceEnabled = false;
 std::atomic<bool> AXObjectCache::gForceDeferredSpellChecking = false;
 std::atomic<bool> AXObjectCache::gAccessibilityTextStitchingEnabled = false;
@@ -219,6 +219,147 @@ std::atomic<bool> AXObjectCache::gForceInitialFrameCaching = false;
 std::atomic<bool> AXObjectCache::gAccessibilityDOMIdentifiersEnabled = false;
 std::atomic<bool> AXObjectCache::gShouldRepostNotificationsForTests = false;
 #endif
+
+static AXObjectCache::SyncModeToOtherProcessesCallback& syncModeToOtherProcessesCallback()
+{
+    static NeverDestroyed<AXObjectCache::SyncModeToOtherProcessesCallback> callback;
+    return callback.get();
+}
+
+void AXObjectCache::setSyncModeToOtherProcessesCallback(SyncModeToOtherProcessesCallback&& callback)
+{
+    syncModeToOtherProcessesCallback() = WTF::move(callback);
+}
+
+std::optional<AccessibilityMode> resolveAccessibilityModeTransition(AccessibilityMode current, AccessibilityMode requested)
+{
+#if !ENABLE(ACCESSIBILITY_ISOLATED_TREE)
+    if (requested == AccessibilityMode::AXThread)
+        requested = AccessibilityMode::MainThread;
+#endif
+
+    if (current == requested)
+        return std::nullopt;
+
+    if (isAccessibilityModeOff(current)) {
+        if (requested == AccessibilityMode::MainThread || requested == AccessibilityMode::AXThread)
+            return requested;
+        return std::nullopt;
+    }
+
+    bool isOffRequested = isAccessibilityModeOff(requested);
+    if (current == AccessibilityMode::MainThread) {
+        if (requested == AccessibilityMode::AXThread)
+            return requested;
+        if (isOffRequested)
+            return AccessibilityMode::OffWasMainThread;
+        return std::nullopt;
+    }
+
+    if (current == AccessibilityMode::AXThread && isOffRequested)
+        return AccessibilityMode::OffWasAXThread;
+
+    // Default to disallowing the transition.
+    return std::nullopt;
+}
+
+enum class ShouldSyncToOtherProcesses : bool { No, Yes };
+static std::optional<AccessibilityMode> attemptModeTransition(AccessibilityMode requestedMode, ShouldSyncToOtherProcesses shouldSyncToOtherProcesses = ShouldSyncToOtherProcesses::Yes)
+{
+    std::optional resolvedMode = resolveAccessibilityModeTransition(AXObjectCache::accessibilityMode(), requestedMode);
+    if (!resolvedMode)
+        return std::nullopt;
+
+    AXObjectCache::gAccessibilityMode.store(*resolvedMode, std::memory_order_relaxed);
+
+    if (shouldSyncToOtherProcesses == ShouldSyncToOtherProcesses::Yes) {
+        if (auto& callback = syncModeToOtherProcessesCallback())
+            callback(*resolvedMode);
+    }
+    return resolvedMode;
+}
+
+std::optional<AccessibilityMode> AXObjectCache::attemptMainThreadModeTransition()
+{
+    return attemptModeTransition(AccessibilityMode::MainThread);
+}
+
+void AXObjectCache::disableAccessibilityForTesting()
+{
+    if (isAccessibilityModeOff(accessibilityMode()))
+        return;
+
+    // See comment for this function in the header to understand
+    // why we don't sync this mode change outside this process.
+    [[maybe_unused]] std::optional newMode = attemptModeTransition(AccessibilityMode::Off, ShouldSyncToOtherProcesses::No);
+    // Assuming proper context (i.e. this is a test client), the transition should
+    // always be successful. Anything else indicates a programming error.
+    AX_ASSERT(newMode);
+    AX_ASSERT(isAccessibilityModeOff(*newMode));
+}
+
+#if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
+std::optional<AccessibilityMode> AXObjectCache::transitionToAXThreadModeIfNeeded(ForceAXThreadMode forceAXThread)
+{
+    if (accessibilityMode() == AccessibilityMode::AXThread)
+        return std::nullopt;
+
+    if (platformAXThreadSupport(forceAXThread) == PlatformAXThreadSupport::NotSupported)
+        return std::nullopt;
+
+    if (forceAXThread == ForceAXThreadMode::No
+        && !DeprecatedGlobalSettings::isAccessibilityIsolatedTreeEnabled())
+        return std::nullopt;
+
+    // At this point we *must* be on the main-thread (our mode was not AXThread and
+    // thus the accessibility thread should not have been started). This is important
+    // because we call several functions that must be run on the main-thread, like
+    // attemptModeTransition which can initiate IPC (and sending IPC is main-thread only)
+    // and iterating over the AXObjectCaches in this process.
+    AX_ASSERT(isMainThread());
+
+    // Set mode before building all the isolated trees so any code
+    // triggered during tree building that checks the mode sees AXThread.
+    // Don't sync yet — we need to confirm the secondary thread starts
+    // successfully before notifying other processes.
+    auto previousMode = accessibilityMode();
+    std::optional newMode = attemptModeTransition(AccessibilityMode::AXThread, ShouldSyncToOtherProcesses::No);
+    if (!newMode || *newMode != AccessibilityMode::AXThread) {
+        // The mode change wasn't successful — do not start the secondary thread
+        // or build any isolated trees.
+        //
+        // We should either fail the transition outright (std::nullopt), or successfully
+        // transition to AXThread mode. Nothing else is expected.
+        AX_ASSERT(!newMode);
+        return newMode;
+    }
+
+    // Initialize the role map before the accessibility thread starts so that
+    // it's safe for both threads to use (the only thing that needs to be
+    // thread-safe about it is initialization since it's not modified after
+    // creation and is never destroyed).
+    Accessibility::initializeRoleMap();
+
+    if (platformStartSecondaryThread() == DidStartThread::No && !clientIsInTestMode()) {
+        // Failed to start the secondary thread. Revert to the previous mode.
+        // In test contexts, failing to start the real AX thread is expected
+        // because the test runner uses its own fake AX thread.
+        gAccessibilityMode.store(previousMode, std::memory_order_relaxed);
+        return std::nullopt;
+    }
+
+    // The transition succeeded — now sync the mode to other processes.
+    if (auto& callback = syncModeToOtherProcessesCallback())
+        callback(*newMode);
+
+    // Build isolated trees for all existing AXObjectCaches.
+    forEachAXObjectCache([](AXObjectCache& cache) {
+        cache.getOrCreateIsolatedTree();
+    });
+
+    return newMode;
+}
+#endif // ENABLE(ACCESSIBILITY_ISOLATED_TREE)
 
 bool AXObjectCache::accessibilityEnhancedUserInterfaceEnabled()
 {
@@ -573,7 +714,7 @@ AccessibilityObject* AXObjectCache::focusedObjectForPage(const Page* page)
 
     AX_ASSERT(isMainThread());
 
-    if (!gAccessibilityEnabled)
+    if (!accessibilityEnabled())
         return nullptr;
 
     // get the focused node in the page
@@ -604,7 +745,7 @@ AccessibilityObject* AXObjectCache::focusedObjectForLocalFrame()
 {
     AX_ASSERT(isMainThread());
 
-    if (!gAccessibilityEnabled)
+    if (!accessibilityEnabled())
         return nullptr;
 
     RefPtr document = this->document();
@@ -947,7 +1088,8 @@ RefPtr<AXIsolatedTree> AXObjectCache::getOrCreateIsolatedTree()
         if (tree->treeID() == treeID())
             return tree;
 
-        // The tree belongs to a different document (navigation occurred). Remove the old tree and create a new one.
+        // The tree belongs to a different document (navigation occurred).
+        // Remove the old tree and create a new one.
         AXIsolatedTree::removeTreeForFrameID(m_frameID);
         tree = nullptr;
     }
@@ -957,18 +1099,22 @@ RefPtr<AXIsolatedTree> AXObjectCache::getOrCreateIsolatedTree()
     // Schedule a paint to cache the rects for the objects in this new isolated tree.
     scheduleObjectRegionsUpdate(true /* scheduleImmediately */);
 
-    // This method can be called as the result of a client request. Since creating the isolated tree can take long,
-    // especially for large documents, for real clients we build a temporary "empty" isolated tree consisting only of the ScrollView and the WebArea objects.
-    // Then we schedule building the entire isolated tree on a Timer.
-    // For test clients, LayoutTests or XCTests, build the whole isolated tree.
-    if (!clientIsInTestMode()) [[likely]] {
+    if (clientIsInTestMode()) [[unlikely]] {
+        // For test clients (LayoutTests / XCTests) build the whole isolated tree synchronously.
+        // This is necessary because tests assume that APIs like accessibleElementById can
+        // immediately retrieve any object. In the future, we may want to consider finding a way
+        // to remove this test-specific path (maybe by making tests wait for the isolated tree
+        // to be built via a new accessibility test harness?)
+        tree = AXIsolatedTree::create(*this);
+    } else {
+        // This method can be called as the result of a client request. Since creating the
+        // isolated tree can take long, especially for large documents, for real clients we
+        // build a temporary "empty" isolated tree consisting only of the ScrollView and the
+        // WebArea objects. Then we schedule building the entire isolated tree on a Timer.
         tree = AXIsolatedTree::createEmpty(*this);
         if (!m_buildIsolatedTreeTimer.isActive())
             m_buildIsolatedTreeTimer.startOneShot(0_s);
-    } else
-        tree = AXIsolatedTree::create(*this);
-
-    initializeAXThreadIfNeeded();
+    }
 
     return tree;
 }
@@ -995,15 +1141,22 @@ void AXObjectCache::setIsolatedTree(Ref<AXIsolatedTree> tree)
 
 AXCoreObject* AXObjectCache::rootObjectForFrame(LocalFrame& frame)
 {
-    if (!gAccessibilityEnabled)
+    if (!accessibilityEnabled())
         return nullptr;
 
 #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
     if (isIsolatedTreeEnabled()) {
+        // FIXME: getOrCreateIsolatedTree() asserts isMainThread(), and it seems
+        // expected this function (rootObjectForFrame) can be called on and off
+        // the main-thread based on the !isMainThread() branch below. We should
+        // reconcile this.
         RefPtr tree = getOrCreateIsolatedTree();
         if (!isMainThread()) {
-            tree->applyPendingChanges();
-            return tree->rootNode();
+            if (tree) {
+                tree->applyPendingChanges();
+                return tree->rootNode();
+            }
+            return nullptr;
         }
     }
 #endif
@@ -1045,17 +1198,6 @@ const std::optional<FrameGeometry>& AXObjectCache::getAndUpdateFrameGeometry()
     return frameGeometry();
 }
 
-#endif
-
-#if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
-void AXObjectCache::buildIsolatedTreeIfNeeded()
-{
-    if (!gAccessibilityEnabled)
-        return;
-
-    if (isIsolatedTreeEnabled())
-        getOrCreateIsolatedTree();
-}
 #endif
 
 AccessibilityObject* AXObjectCache::create(AccessibilityRole role)
