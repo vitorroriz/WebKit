@@ -30,6 +30,7 @@
 #if USE(LIBWEBRTC)
 
 #import "WebRTCVideoDecoderVTBAV1.h"
+#import "WebRTCVideoDecoderVTBVP9.h"
 #import <WebCore/CMUtilities.h>
 #import <WebCore/LibWebRTCMacros.h>
 
@@ -71,7 +72,7 @@ std::unique_ptr<WebRTCVideoDecoder> WebRTCVideoDecoder::create(VideoCodecType de
     case VideoCodecType::H265:
         return makeUnique<WebRTCLocalVideoDecoder>(webrtc::createLocalH265Decoder(callback));
     case VideoCodecType::VP9:
-        return makeUnique<WebRTCLocalVideoDecoder>(webrtc::createLocalVP9Decoder(callback));
+        return makeUnique<WebRTCVideoDecoderVTBVP9>(callback);
     case VideoCodecType::AV1:
         return makeUnique<WebRTCVideoDecoderVTBAV1>(callback);
     }
