@@ -40,6 +40,7 @@
 #include "WebPageProxy.h"
 #include "WebProcessPool.h"
 #include <JavaScriptCore/MathCommon.h>
+#include <limits>
 #include <wtf/Ref.h>
 #include <wtf/URL.h>
 #include <wtf/Unexpected.h>
@@ -361,6 +362,61 @@ void BidiBrowsingContextAgent::traverseHistory(const BrowsingContext& browsingCo
     ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(!session, InternalError);
 
     session->traverseHistoryInBrowsingContext(browsingContext, delta, WTF::move(callback));
+}
+
+static std::optional<int> parseNonNegativeInteger(const JSON::Object& object, const String& key)
+{
+    auto value = object.getDouble(key);
+    if (!value || !JSC::isInteger(*value))
+        return std::nullopt;
+
+    if (*value < 0 || *value > std::numeric_limits<int>::max())
+        return std::nullopt;
+
+    return static_cast<int>(*value);
+}
+
+void BidiBrowsingContextAgent::setViewport(const BrowsingContext& optionalContext, RefPtr<JSON::Object>&& optionalViewport, std::optional<double>&& optionalDevicePixelRatio, RefPtr<JSON::Array>&& optionalUserContexts, CommandCallback<void>&& callback)
+{
+    RefPtr session = m_session.get();
+    ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(!session, InternalError);
+
+    bool hasContext = !optionalContext.isEmpty();
+    bool hasUserContexts = optionalUserContexts && optionalUserContexts->length() > 0;
+
+    ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(hasContext && hasUserContexts, InvalidParameter);
+    ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(!hasContext && !hasUserContexts, InvalidParameter);
+
+    std::optional<int> viewportWidth;
+    std::optional<int> viewportHeight;
+    if (optionalViewport) {
+        viewportWidth = parseNonNegativeInteger(*optionalViewport, "width"_s);
+        viewportHeight = parseNonNegativeInteger(*optionalViewport, "height"_s);
+        ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(!viewportWidth || !viewportHeight, InvalidParameter);
+    }
+
+    if (optionalDevicePixelRatio)
+        ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(*optionalDevicePixelRatio <= 0, InvalidParameter);
+
+    if (hasContext) {
+        RefPtr page = session->webPageProxyForHandle(optionalContext);
+        ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(!page, FrameNotFound);
+
+        RefPtr mainFrame = page->mainFrame();
+        ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(!mainFrame, InvalidParameter);
+        auto mainFrameID = getBrowsingContextID(mainFrame->frameID());
+        ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(mainFrameID != optionalContext, InvalidParameter);
+
+        session->setViewportForPage(*page, viewportWidth, viewportHeight, optionalDevicePixelRatio, WTF::move(callback));
+    } else {
+        for (const auto& userContextValue : *optionalUserContexts) {
+            auto userContext = userContextValue->asString();
+            ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(userContext.isEmpty(), InvalidParameter);
+        }
+        // FIXME: Support applying the viewport to user contexts.
+        // https://bugs.webkit.org/show_bug.cgi?id=288104
+        ASYNC_FAIL_WITH_PREDEFINED_ERROR_IF(true, NotImplemented);
+    }
 }
 
 } // namespace WebKit

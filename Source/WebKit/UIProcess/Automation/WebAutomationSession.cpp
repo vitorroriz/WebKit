@@ -1246,6 +1246,29 @@ void WebAutomationSession::contextDestroyedForFrame(const WebFrameProxy& frame)
     // Note: Frame handle cleanup is done by didDestroyFrame(), so we don't duplicate that here
 }
 
+void WebAutomationSession::setViewportForPage(WebPageProxy& page, std::optional<int> width, std::optional<int> height, std::optional<double> devicePixelRatio, CommandCallback<void>&& callback)
+{
+    auto setDevicePixelRatioAndComplete = [protectedPage = Ref { page }, devicePixelRatio, callback = WTF::move(callback)]() mutable {
+        if (devicePixelRatio) {
+            protectedPage->setCustomDeviceScaleFactor(*devicePixelRatio, [callback = WTF::move(callback)]() mutable {
+                callback({ });
+            });
+            return;
+        }
+        callback({ });
+    };
+
+    if (width && height) {
+        page.getWindowFrameWithCallback([protectedPage = Ref { page }, width, height, setDevicePixelRatioAndComplete = WTF::move(setDevicePixelRatioAndComplete)](WebCore::FloatRect originalFrame) mutable {
+            WebCore::FloatRect newFrame = WebCore::FloatRect(originalFrame.location(), WebCore::FloatSize(*width, *height));
+            if (newFrame != originalFrame)
+                protectedPage->setWindowFrame(newFrame);
+            setDevicePixelRatioAndComplete();
+        });
+    } else
+        setDevicePixelRatioAndComplete();
+}
+
 #endif
 
 void WebAutomationSession::willClosePage(const WebPageProxy& page)

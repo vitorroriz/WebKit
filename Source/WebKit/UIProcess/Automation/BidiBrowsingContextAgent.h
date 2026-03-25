@@ -59,6 +59,7 @@ public:
     void navigate(const Inspector::Protocol::BidiBrowsingContext::BrowsingContext&, const String& url, const String& /* BidiBrowsingContext.ReadinessState */ optionalWait, Inspector::CommandCallbackOf<String, Inspector::Protocol::BidiBrowsingContext::NavigationID>&&) override;
     void reload(const Inspector::Protocol::BidiBrowsingContext::BrowsingContext&, std::optional<bool>&& optionalIgnoreCache, std::optional<Inspector::Protocol::BidiBrowsingContext::ReadinessState>&& optionalWait, Inspector::CommandCallbackOf<String, Inspector::Protocol::BidiBrowsingContext::NavigationID>&&) override;
     void traverseHistory(const Inspector::Protocol::BidiBrowsingContext::BrowsingContext&, int delta, Inspector::CommandCallback<void>&&) override;
+    void setViewport(const Inspector::Protocol::BidiBrowsingContext::BrowsingContext&, RefPtr<JSON::Object>&&, std::optional<double>&&, RefPtr<JSON::Array>&&, Inspector::CommandCallback<void>&&) override;
 
 private:
     enum class IncludeParentID: bool { No, Yes };
