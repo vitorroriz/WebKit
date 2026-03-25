@@ -726,6 +726,32 @@ TEST(WebKit, ScrollToFoundRangeInNonScrollableIframe)
     EXPECT_WK_STREQ("771", [webView stringByEvaluatingJavaScript:@"document.getElementById('frame').contentWindow.scrollY"]);
 }
 
+TEST(WebKit, ScrollToUserSelectNoneFoundRange)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 300, 400)]);
+
+    [webView synchronouslyLoadHTMLString:@"<meta name='viewport' content='width=device-width,initial-scale=1'>"
+    "<p style='-webkit-user-select: none; height:500px'>findme</p>"
+    "<p style='-webkit-user-select: none; height:500px'>findme</p>"
+    "<p style='-webkit-user-select: none; height:500px'>findme</p>"
+    "<p style='-webkit-user-select: none; height:500px'>findme</p>"
+    "<p style='-webkit-user-select: none; height:500px'>findme</p>"
+    "<p style='-webkit-user-select: none; height:500px'>findme</p>"
+    ];
+
+    auto scrollViewDelegate = adoptNS([[TestScrollViewDelegate alloc] init]);
+    [webView scrollView].delegate = scrollViewDelegate.get();
+
+    EXPECT_TRUE(CGPointEqualToPoint([webView scrollView].contentOffset, CGPointMake(0, 0)));
+
+    RetainPtr ranges = textRangesForQueryString(webView.get(), @"findme");
+    [webView scrollRangeToVisible: [ranges lastObject] inDocument:nil];
+
+    TestWebKitAPI::Util::run(&scrollViewDelegate->_finishedScrolling);
+
+    EXPECT_TRUE(CGPointEqualToPoint([webView scrollView].contentOffset, CGPointMake(0, 2398)));
+}
+
 TEST(WebKit, CannotHaveMultipleFindOverlays)
 {
     auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)]);
