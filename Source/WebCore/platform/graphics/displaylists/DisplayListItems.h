@@ -918,23 +918,26 @@ class DrawFocusRingPath {
 public:
     static constexpr char name[] = "draw-focus-ring-path";
 
-    DrawFocusRingPath(const Path& path, float outlineWidth, const Color& color)
+    DrawFocusRingPath(const Path& path, float outlineWidth, const Color& color, float zoomFactor)
         : m_path(path)
         , m_outlineWidth(outlineWidth)
         , m_color(color)
+        , m_zoomFactor(zoomFactor)
     {
     }
 
-    DrawFocusRingPath(Path&& path, float outlineWidth, const Color& color)
+    DrawFocusRingPath(Path&& path, float outlineWidth, const Color& color, float zoomFactor)
         : m_path(WTF::move(path))
         , m_outlineWidth(outlineWidth)
         , m_color(color)
+        , m_zoomFactor(zoomFactor)
     {
     }
 
     const Path& path() const LIFETIME_BOUND { return m_path; }
     float outlineWidth() const { return m_outlineWidth; }
     const Color& color() const LIFETIME_BOUND { return m_color; }
+    float zoomFactor() const { return m_zoomFactor; }
 
     WEBCORE_EXPORT void apply(GraphicsContext&) const;
     void dump(TextStream&, OptionSet<AsTextFlag>) const;
@@ -943,29 +946,33 @@ private:
     Path m_path;
     float m_outlineWidth;
     Color m_color;
+    float m_zoomFactor;
 };
 
 class DrawFocusRingRects {
 public:
     static constexpr char name[] = "draw-focus-ring-rects";
 
-    DrawFocusRingRects(const Vector<FloatRect>& rects, float outlineWidth, const Color& color)
+    DrawFocusRingRects(const Vector<FloatRect>& rects, float outlineWidth, const Color& color, float zoomFactor)
         : m_rects(rects)
         , m_outlineWidth(outlineWidth)
         , m_color(color)
+        , m_zoomFactor(zoomFactor)
     {
     }
 
-    DrawFocusRingRects(Vector<FloatRect>&& rects, float outlineWidth, Color color)
+    DrawFocusRingRects(Vector<FloatRect>&& rects, float outlineWidth, Color color, float zoomFactor)
         : m_rects(WTF::move(rects))
         , m_outlineWidth(outlineWidth)
         , m_color(color)
+        , m_zoomFactor(zoomFactor)
     {
     }
 
     const Vector<FloatRect>& rects() const LIFETIME_BOUND { return m_rects; }
     float outlineWidth() const { return m_outlineWidth; }
     const Color& color() const LIFETIME_BOUND { return m_color; }
+    float zoomFactor() const { return m_zoomFactor; }
 
     WEBCORE_EXPORT void apply(GraphicsContext&) const;
     void dump(TextStream&, OptionSet<AsTextFlag>) const;
@@ -974,6 +981,7 @@ private:
     Vector<FloatRect> m_rects;
     float m_outlineWidth;
     Color m_color;
+    float m_zoomFactor;
 };
 
 class FillRect {

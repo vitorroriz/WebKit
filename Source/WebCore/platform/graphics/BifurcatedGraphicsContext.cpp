@@ -504,18 +504,18 @@ AffineTransform BifurcatedGraphicsContext::getCTM(IncludeDeviceScale includeDevi
     return m_primaryContext.getCTM(includeDeviceScale);
 }
 
-void BifurcatedGraphicsContext::drawFocusRing(const Path& path, float outlineWidth, const Color& color)
+void BifurcatedGraphicsContext::drawFocusRing(const Path& path, float outlineWidth, const Color& color, float zoomFactor)
 {
-    m_primaryContext.drawFocusRing(path, outlineWidth, color);
-    m_secondaryContext.drawFocusRing(path, outlineWidth, color);
+    m_primaryContext.drawFocusRing(path, outlineWidth, color, zoomFactor);
+    m_secondaryContext.drawFocusRing(path, outlineWidth, color, zoomFactor);
 
     VERIFY_STATE_SYNCHRONIZATION();
 }
 
-void BifurcatedGraphicsContext::drawFocusRing(const Vector<FloatRect>& rects, float outlineWidth, const Color& color)
+void BifurcatedGraphicsContext::drawFocusRing(const Vector<FloatRect>& rects, float outlineWidth, const Color& color, float zoomFactor)
 {
-    m_primaryContext.drawFocusRing(rects, outlineWidth, color);
-    m_secondaryContext.drawFocusRing(rects, outlineWidth, color);
+    m_primaryContext.drawFocusRing(rects, outlineWidth, color, zoomFactor);
+    m_secondaryContext.drawFocusRing(rects, outlineWidth, color, zoomFactor);
 
     VERIFY_STATE_SYNCHRONIZATION();
 }

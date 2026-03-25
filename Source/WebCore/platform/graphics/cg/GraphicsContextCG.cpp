@@ -62,9 +62,20 @@ static void setCGFillColor(CGContextRef context, const Color& color, const Desti
     CGContextSetFillColorWithColor(context, cachedCGColorInDestinationStandardRange(color, colorSpace).get());
 }
 
-inline CGAffineTransform getUserToBaseCTM(CGContextRef context)
+CGAffineTransform getUserToBaseCTM(CGContextRef context)
 {
     return CGAffineTransformConcat(CGContextGetCTM(context), CGAffineTransformInvert(CGContextGetBaseCTM(context)));
+}
+
+CGFloat singularValue(const CGAffineTransform& userToBaseCTM, SingularValueSelection selection)
+{
+    CGFloat A = userToBaseCTM.a * userToBaseCTM.a + userToBaseCTM.b * userToBaseCTM.b;
+    CGFloat B = userToBaseCTM.a * userToBaseCTM.c + userToBaseCTM.b * userToBaseCTM.d;
+    CGFloat D = userToBaseCTM.c * userToBaseCTM.c + userToBaseCTM.d * userToBaseCTM.d;
+    CGFloat discriminant = sqrt(4 * B * B + (A - D) * (A - D));
+    if (selection == SingularValueSelection::Smallest)
+        discriminant = -discriminant;
+    return narrowPrecisionToCGFloat(sqrt(0.5 * ((A + D) + discriminant)));
 }
 
 static InterpolationQuality coreInterpolationQuality(CGContextRef context)
@@ -1095,16 +1106,8 @@ void GraphicsContextCG::endTransparencyLayer()
 
 static CGFloat scaledBlurRadius(CGFloat blurRadius, const CGAffineTransform& userToBaseCTM, bool shadowsIgnoreTransforms)
 {
-    if (!shadowsIgnoreTransforms) {
-        CGFloat A = userToBaseCTM.a * userToBaseCTM.a + userToBaseCTM.b * userToBaseCTM.b;
-        CGFloat B = userToBaseCTM.a * userToBaseCTM.c + userToBaseCTM.b * userToBaseCTM.d;
-        CGFloat C = B;
-        CGFloat D = userToBaseCTM.c * userToBaseCTM.c + userToBaseCTM.d * userToBaseCTM.d;
-
-        CGFloat smallEigenvalue = narrowPrecisionToCGFloat(sqrt(0.5 * ((A + D) - sqrt(4 * B * C + (A - D) * (A - D)))));
-
-        blurRadius *= smallEigenvalue;
-    }
+    if (!shadowsIgnoreTransforms)
+        blurRadius *= singularValue(userToBaseCTM, SingularValueSelection::Smallest);
 
     // Extreme "blur" values can make text drawing crash or take crazy long times, so clamp
     return std::min(blurRadius, narrowPrecisionToCGFloat(1000.0));

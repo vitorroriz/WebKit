@@ -149,7 +149,7 @@ static void drawFocusRingForPathForVectorBasedControls(const RenderObject& box, 
 
     // We pass 0.f as the border thickness because the parameter is not used by
     // the context. It will determine an appropriate value for us.
-    context.drawFocusRing(path, 0.f, focusRingColor);
+    context.drawFocusRing(path, 0.f, focusRingColor, box.style().usedZoom());
 }
 
 #if PLATFORM(MAC)

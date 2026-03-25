@@ -762,7 +762,7 @@ void OperationRecorder::drawEllipse(const FloatRect& rect)
     append(createCommand<DrawEllipse>(rect, state.fillBrush().color(), state.strokeStyle(), state.strokeBrush().color(), state.strokeThickness()));
 }
 
-void OperationRecorder::drawFocusRing(const Path& path, float outlineWidth, const Color& color)
+void OperationRecorder::drawFocusRing(const Path& path, float outlineWidth, const Color& color, float)
 {
 #if USE(THEME_ADWAITA)
     Adwaita::paintFocus(*this, path, color);
@@ -786,7 +786,7 @@ void OperationRecorder::drawFocusRing(const Path& path, float outlineWidth, cons
 #endif
 }
 
-void OperationRecorder::drawFocusRing(const Vector<FloatRect>& rects, float outlineWidth, const Color& color)
+void OperationRecorder::drawFocusRing(const Vector<FloatRect>& rects, float outlineWidth, const Color& color, float)
 {
 #if USE(THEME_ADWAITA)
     Adwaita::paintFocus(*this, rects, color);

@@ -5401,6 +5401,11 @@ webkit.org/b/310274 media/media-controller-time.html [ Pass Timeout ]
 
 webkit.org/b/310278 media/video-pause-play-resolve.html [ Pass Timeout ]
 
+webkit.org/b/310543 fast/css/outline-auto-zoom.html [ ImageOnlyFailure ]
+webkit.org/b/310543 fast/css/outline-auto-zoom-canvas.html [ Failure ]
+webkit.org/b/310543 fast/css/outline-auto-zoom-canvas-rotated-scale.html [ Failure ]
+webkit.org/b/310543 fast/images/imagemap-focus-ring-zoom-style.html [ ImageOnlyFailure ]
+webkit.org/b/310543 fast/images/image-map-outline-with-scale-transform.html [ ImageOnlyFailure ]
 webkit.org/b/310543 fast/images/image-map-outline-with-paint-root-offset.html [ ImageOnlyFailure ]
 webkit.org/b/310543 fast/inline/hidpi-outline-auto-with-border-radius-horizontal-ltr.html [ ImageOnlyFailure ]
 webkit.org/b/310543 fast/inline/hidpi-outline-auto-with-border-radius-vertical-ltr.html [ ImageOnlyFailure ]

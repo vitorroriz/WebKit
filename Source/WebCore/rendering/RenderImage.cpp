@@ -749,7 +749,7 @@ void RenderImage::paintAreaElementFocusRing(PaintInfo& paintInfo, const LayoutPo
 
     auto styleOptions = styleColorOptions();
     styleOptions.add(StyleColorOptions::UseSystemAppearance);
-    paintInfo.context().drawFocusRing(path, outlineWidth, RenderTheme::singleton().focusRingColor(styleOptions));
+    paintInfo.context().drawFocusRing(path, outlineWidth, RenderTheme::singleton().focusRingColor(styleOptions), style().usedZoom());
 }
 
 void RenderImage::areaElementFocusChanged(HTMLAreaElement* element)
