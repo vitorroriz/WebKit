@@ -8515,8 +8515,3 @@ webkit.org/b/308849 css3/filters/effect-drop-shadow.html [ Skip ]
 imported/w3c/web-platform-tests/html/semantics/embedded-content/the-audio-element/audio-with-replaced-after-pseudo-crash.html [ Skip ] #Timeout
 
 imported/w3c/web-platform-tests/uievents/keyboard/keypress-not-fired-for-modifier-shortcuts.html [ Skip ]
-
-# webkit.org/b/310313 REGRESSION(309498@main): [iOS Debug] ASSERTION FAILED: request.hasHTTPHeaderField(HTTPHeaderName::SecFetchDest)
-[ Debug ] http/tests/navigation/post-frames-goback1.html [ Skip ]
-[ Debug ] http/tests/navigation/post-goback1.html [ Skip ]
-[ Debug ] http/tests/cache/subresource-failover-to-network.html [ Skip ]
