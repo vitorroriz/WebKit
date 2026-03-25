@@ -137,7 +137,6 @@ Decoder::~Decoder()
 {
     if (isValid())
         markInvalid();
-    // FIXME: We need to dispose of the mach ports in cases of failure.
 }
 
 ShouldDispatchWhenWaitingForSyncReply Decoder::shouldDispatchMessageWhenWaitingForSyncReply() const
