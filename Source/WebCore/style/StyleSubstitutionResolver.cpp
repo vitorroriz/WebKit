@@ -233,15 +233,12 @@ bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vec
             return false;
     }
 
-    // Fallback has to be resolved even when not used to detect cycles and invalid syntax.
-    std::optional<Vector<CSSParserToken>> fallbackTokens;
-    bool hasFallback = false;
-    if (!range.atEnd()) {
-        if (CSSPropertyParserHelpers::consumeCommaIncludingWhitespace(range)) {
-            hasFallback = true;
-            fallbackTokens = substituteTokenRange(range, context);
-        }
-    }
+    auto consumeFallbackRange = [&]() -> std::optional<CSSParserTokenRange> {
+        if (range.atEnd() || !CSSPropertyParserHelpers::consumeCommaIncludingWhitespace(range))
+            return std::nullopt;
+        return range;
+    };
+    auto fallbackRange = consumeFallbackRange();
 
     m_styleBuilder.state().registerContentAttribute(attributeName);
     protect(m_styleBuilder.state().style())->setHasAttrContent();
@@ -252,44 +249,62 @@ bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vec
 
     auto& attributeValue = element->getAttribute(QualifiedName { nullAtom(), attributeName, nullAtom() });
 
-    // https://drafts.csswg.org/css-values-5/#attr-substitution
-    // Cycle detection: type(<syntax>) allows substitution of arbitrary substitution functions
-    // in the attribute value, which could create attr() cycles.
+    // Check if this attribute is already being substituted (cycle detection).
     auto isNewEntry = m_styleBuilder.state().m_inProgressAttrAttributes.add(attributeName).isNewEntry;
     auto removeOnExit = makeScopeExit([&] {
         if (isNewEntry)
             m_styleBuilder.state().m_inProgressAttrAttributes.remove(attributeName);
     });
 
-    // https://drafts.csswg.org/css-values-5/#attr-substitution
-    // FAILURE step: "If second arg is null, and syntax was omitted, return an empty CSS <string>."
-    // "If second arg is null, return the guaranteed-invalid value."
-    // "Substitute arbitrary substitution functions in second arg, and return the result."
+    // Resolve fallback lazily to avoid var() cycle detection side effects during primary resolution.
+    auto resolveFallback = [&]() -> std::optional<Vector<CSSParserToken>> {
+        if (!fallbackRange)
+            return std::nullopt;
+        return substituteTokenRange(*fallbackRange, context);
+    };
+
+    // https://drafts.csswg.org/css-values-5/#replace-an-attr-function
     auto substituteFailure = [&]() -> bool {
-        if (!hasFallback && !parsedAttrType) {
+        // "If second arg is null, and syntax was omitted, return an empty CSS <string>."
+        if (!fallbackRange && !parsedAttrType) {
             tokens.append(CSSParserToken(StringToken, emptyAtom()));
             return true;
         }
+        auto fallbackTokens = resolveFallback();
+        // "If second arg is null, return the guaranteed-invalid value."
         if (!fallbackTokens)
             return false;
-
+        // "Substitute arbitrary substitution functions in second arg, and return the result."
         tokens.appendVector(*fallbackTokens);
         return true;
     };
 
-    if (attributeValue.isNull() || !isNewEntry)
+    // Cycle detected.
+    if (!isNewEntry) {
+        // Mark as in-cycle within attr() type() context for transitive detection.
+        if (m_isInAttrTypeSyntax)
+            m_styleBuilder.state().m_inCycleAttrAttributes.add(attributeName);
+        if (parsedAttrType)
+            return false;
+        return substituteFailure();
+    }
+
+    if (attributeValue.isNull())
         return substituteFailure();
 
     // "If syntax is null or the keyword raw-string, return a CSS <string> whose value is attr value."
     auto attrType = parsedAttrType ? parsedAttrType->type : AttrType::RawString;
 
     switch (attrType) {
+    // "If given as the raw-string keyword, or omitted entirely, it causes the attribute’s literal
+    //  value to be treated as the value of a CSS string, with no CSS parsing performed at all."
     case AttrType::RawString:
         tokens.append(CSSParserToken(StringToken, attributeValue));
         return true;
 
-    // "If syntax is the keyword number, [...] the attribute's literal value, after stripping leading
-    //  and trailing whitespace, [is] parsed as a <number-token>. Values that fail to parse trigger fallback."
+    // "If given as the number keyword, it causes the attribute's literal value, after stripping
+    //  leading and trailing whitespace, to be parsed as a <number-token>. Values that fail to
+    //  parse trigger fallback."
     case AttrType::Number: {
         CSSTokenizer tokenizer(attributeValue.string().trim(isUnicodeCompatibleASCIIWhitespace<UChar>));
         auto tokenRange = tokenizer.tokenRange();
@@ -330,17 +345,19 @@ bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vec
     //  trigger fallback."
     case AttrType::Syntax: {
         CSSTokenizer tokenizer(attributeValue.string());
-        // Keep tokenizer's escaped strings alive until substitute() copies them into CSSVariableData.
         m_intermediateTokenStrings.appendVector(tokenizer.escapedStringsForAdoption());
 
-        // Substitute any var()/attr()/env() in the attribute value.
+        SetForScope isInAttrTypeSyntax(m_isInAttrTypeSyntax, true);
+
         auto substitutedTokens = substituteTokenRange(tokenizer.tokenRange(), context);
         if (!substitutedTokens)
             return substituteFailure();
 
-        // "This is different from specifying a syntax of type(*), which still triggers CSS parsing
-        //  (but with no requirements placed on it beyond that it parse validly), and which substitutes
-        //  the result of that parsing directly as tokens, rather than as a <string> value."
+        // If this attribute was found to be in a cycle during substitution,
+        // the attr value transitively references itself.
+        if (m_styleBuilder.state().m_inCycleAttrAttributes.contains(attributeName))
+            return substituteFailure();
+
         if (!parsedAttrType->syntax.isUniversal()) {
             CSSParserTokenRange substitutedRange(*substitutedTokens);
             if (!CSSPropertyParser::isValidCustomPropertyValueForSyntax(parsedAttrType->syntax, substitutedRange, context))

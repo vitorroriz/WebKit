@@ -53,6 +53,7 @@ public:
 
 private:
     std::optional<Vector<CSSParserToken>> substituteTokenRange(CSSParserTokenRange, const CSSParserContext&);
+
     bool substituteVariableFunction(CSSParserTokenRange, CSSValueID, Vector<CSSParserToken>&, const CSSParserContext&);
     bool substituteDashedFunction(StringView functionName, CSSParserTokenRange, Vector<CSSParserToken>&);
     bool substituteAttrFunction(CSSParserTokenRange, Vector<CSSParserToken>&, const CSSParserContext&);
@@ -67,6 +68,8 @@ private:
 
     Builder& m_styleBuilder;
     Vector<String> m_intermediateTokenStrings;
+
+    bool m_isInAttrTypeSyntax { false };
 };
 
 } // namespace Style

@@ -253,6 +253,7 @@ private:
     HashSet<AtomString> m_inProgressCustomProperties;
     HashSet<AtomString> m_inCycleCustomProperties;
     HashSet<AtomString> m_inProgressAttrAttributes;
+    HashSet<AtomString> m_inCycleAttrAttributes;
     WTF::BitSet<cssPropertyIDEnumValueCount> m_inProgressProperties;
     WTF::BitSet<cssPropertyIDEnumValueCount> m_invalidAtComputedValueTimeProperties;
 
