@@ -141,10 +141,9 @@ RefPtr<Image> BuilderState::createStyleImage(const CSSValue& value) const
     return nullptr;
 }
 
-void BuilderState::registerContentAttribute(const AtomString& attributeLocalName)
+void BuilderState::registerSubstitutionAttribute(const AtomString& attributeLocalName)
 {
-    if (style().pseudoElementType() == PseudoElementType::Before || style().pseudoElementType() == PseudoElementType::After)
-        m_registeredContentAttributes.append(attributeLocalName);
+    m_registeredSubstitutionAttributes.append(attributeLocalName);
 }
 
 void BuilderState::adjustStyleForInterCharacterRuby()

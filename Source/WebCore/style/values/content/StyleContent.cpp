@@ -79,7 +79,7 @@ auto CSSValueConversion<Content>::operator()(BuilderState& state, const CSSValue
         const AtomString& attributeValue = element ? element->getAttribute(attr) : nullAtom();
 
         // Register the fact that the attribute value affects the style.
-        state.registerContentAttribute(attr.localName());
+        state.registerSubstitutionAttribute(attr.localName());
 
         if (attributeValue.isNull()) {
             RefPtr fallback = dynamicDowncast<CSSPrimitiveValue>(value.fallback());

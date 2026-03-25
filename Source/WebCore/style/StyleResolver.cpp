@@ -772,8 +772,8 @@ void Resolver::applyMatchedProperties(State& state, const MatchResult& matchResu
 void Resolver::setGlobalStateAfterApplyingProperties(const BuilderState& builderState)
 {
     // FIXME: This stuff should be somewhere else.
-    for (auto& contentAttribute : builderState.registeredContentAttributes())
-        ruleSets().mutableFeatures().registerContentAttribute(contentAttribute);
+    for (auto& attribute : builderState.registeredSubstitutionAttributes())
+        ruleSets().mutableFeatures().registerSubstitutionAttribute(attribute);
     if (builderState.style().usesViewportUnits())
         document().setHasStyleWithViewportUnits();
 }

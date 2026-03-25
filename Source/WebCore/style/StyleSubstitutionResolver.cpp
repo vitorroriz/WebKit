@@ -240,7 +240,7 @@ bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vec
     };
     auto fallbackRange = consumeFallbackRange();
 
-    m_styleBuilder.state().registerContentAttribute(attributeName);
+    m_styleBuilder.state().registerSubstitutionAttribute(attributeName);
     protect(m_styleBuilder.state().style())->setHasAttrContent();
 
     CheckedPtr element = m_styleBuilder.state().element();
