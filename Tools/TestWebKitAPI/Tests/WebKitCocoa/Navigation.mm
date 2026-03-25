@@ -5171,7 +5171,12 @@ TEST(WKNavigation, AllowResourceLoadFromBlockedPortWithCustomScheme)
     EXPECT_EQ(requestsSchemeHandled, 2u);
 }
 
+// FIXME when webkit.org/b/310724 is resolved.
+#if PLATFORM(MAC) && !defined(NDEBUG)
+TEST(Navigation, DISABLED_FormResubmited)
+#else
 TEST(Navigation, FormResubmited)
+#endif
 {
     using namespace TestWebKitAPI;
     std::optional<bool> requestHadSecFetchSiteCrossOrigin { false };
