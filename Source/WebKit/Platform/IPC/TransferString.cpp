@@ -138,8 +138,6 @@ TransferString::IPCData TransferString::toIPCData() const LIFETIME_BOUND
         },
 #if USE(CF)
         [](const RetainPtr<CFStringRef>& string) {
-            if (!string)
-                return IPCData { std::monostate { } };
             if (auto span8 = CFStringGetLatin1CStringSpan(string.get()); !span8.empty())
                 return IPCData { span8 };
             return IPCData { CFStringGetCharactersSpan(string.get()) };

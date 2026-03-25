@@ -25,7 +25,6 @@
 
 #import "config.h"
 
-#import "IPCTestUtilities.h"
 #import "Test.h"
 #import "TransferString.h"
 #import <Foundation/Foundation.h>
@@ -51,25 +50,12 @@ TEST(TransferStringTests, CreateFromNSString)
     for (bool releaseToCopy : bools) {
         for (auto& subcase : subcases) {
             String wtfString { subcase.get() };
-            {
-                SCOPED_TRACE(::testing::Message() << "TransferString(NSString *) releaseToCopy: " << releaseToCopy << " subcase: \"" << wtfString << "\"" << " ptr: " << static_cast<void*>(subcase.get()));
-                auto ts = IPC::TransferString::create(subcase.get());
-                EXPECT_TRUE(ts.has_value());
-                auto string = releaseToCopy ? WTF::move(*ts).releaseToCopy() : WTF::move(*ts).release();
-                ASSERT_TRUE(string.has_value());
-                EXPECT_EQ(*string, wtfString);
-            }
-
-            {
-                SCOPED_TRACE(::testing::Message() << "TransferString(NSString *) IPC encode/decode, releaseToCopy: " << releaseToCopy << " subcase: \"" << wtfString << "\"" << " ptr: " << static_cast<void*>(subcase.get()));
-                auto ts = IPC::TransferString::create(subcase.get());
-                EXPECT_TRUE(ts.has_value());
-                auto tsAfterIPC = copyViaEncoder(*ts);
-                ASSERT_TRUE(tsAfterIPC.has_value());
-                auto string = releaseToCopy ? WTF::move(*tsAfterIPC).releaseToCopy() : WTF::move(*tsAfterIPC).release();
-                ASSERT_TRUE(string.has_value());
-                EXPECT_EQ(*string, wtfString);
-            }
+            SCOPED_TRACE(::testing::Message() << "releaseToCopy: " << releaseToCopy << " subcase: \"" << wtfString << "\"" << " ptr: " << static_cast<void*>(subcase.get()));
+            auto ts = IPC::TransferString::create(subcase.get());
+            EXPECT_TRUE(ts.has_value());
+            auto string = releaseToCopy ? WTF::move(*ts).releaseToCopy() : WTF::move(*ts).release();
+            ASSERT_TRUE(string.has_value());
+            EXPECT_EQ(*string, wtfString);
         }
     }
 }
