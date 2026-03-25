@@ -88,14 +88,8 @@ bool WebAssemblyGCObjectBase::deletePropertyByIndex(JSCell*, JSGlobalObject* glo
     return typeError(globalObject, scope, true, "Cannot delete property for WebAssembly GC object"_s);
 }
 
-void WebAssemblyGCObjectBase::getOwnPropertyNames(JSObject*, JSGlobalObject*, PropertyNameArrayBuilder& propertyNameArrayBuilder, DontEnumPropertiesMode)
+void WebAssemblyGCObjectBase::getOwnPropertyNames(JSObject*, JSGlobalObject*, PropertyNameArrayBuilder&, DontEnumPropertiesMode)
 {
-#if ASSERT_ENABLED
-    ASSERT(!propertyNameArrayBuilder.size());
-#else
-    UNUSED_PARAM(propertyNameArrayBuilder);
-#endif
-    return;
 }
 
 bool WebAssemblyGCObjectBase::defineOwnProperty(JSObject*, JSGlobalObject* globalObject, PropertyName, const PropertyDescriptor&, bool shouldThrow)
