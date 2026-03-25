@@ -469,8 +469,7 @@ public:
     //
     // func is allowed to modify this RegisterRange, e.g. by calling evict().
     // func must not modify 'range' for the duration of this forEachConflict invocation.
-    template<typename Func>
-    void forEachConflict(const LiveRange& range, Width width, const Func& func)
+    void forEachConflict(const LiveRange& range, Width width, const Invocable<IterationStatus(AllocatedInterval&)> auto& func)
     {
         auto status = forEachConflictImpl(m_allocations, range, func);
         if (width > Width64) [[unlikely]] {
@@ -504,8 +503,7 @@ public:
     }
 
 private:
-    template<typename Func>
-    static IterationStatus forEachConflictImpl(AllocatedIntervalSet& allocatedSet, const LiveRange& range, const Func& func)
+    static IterationStatus forEachConflictImpl(AllocatedIntervalSet& allocatedSet, const LiveRange& range, const Invocable<IterationStatus(AllocatedInterval&)> auto& func)
     {
         for (auto interval : range.intervals()) {
             while (true) {
@@ -2442,8 +2440,7 @@ private:
     // uses or defs the given tmp, up to the end of the basic block.
     // Returns the unprocessed portion of the interval (if interval spans multiple blocks).
     // `cursor` can be used to perform a "sort-merge join" when the caller is making queries over a sorted set of intervals for the same tmp
-    template<typename Func>
-    Interval forEachUseDefWithin(Tmp tmp, Interval interval, size_t& cursor, const Func& func)
+    Interval forEachUseDefWithin(Tmp tmp, Interval interval, size_t& cursor, const Invocable<void(Point, Inst&)> auto& func)
     {
         auto& useDefs = m_useDefLists[tmp].useDefs();
 
