@@ -148,8 +148,9 @@ async function dispatchTouchActions(actions, options = { insertPauseAfterPointer
     logDebug(stream);
 
     return new Promise(resolve => testRunner.runUIScript(`(function() {
-        (function() { uiController.sendEventStream('${stream}') })();
-        uiController.uiScriptComplete();
+        uiController.sendEventStream('${stream}', function() {
+            uiController.uiScriptComplete();
+        });
     })();`, resolve));
 }
 
