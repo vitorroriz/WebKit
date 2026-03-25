@@ -45,7 +45,6 @@
 #include "WebXRBoundedReferenceSpace.h"
 #include "WebXRFrame.h"
 #include "WebXRHitTestSource.h"
-#include "WebXRSystem.h"
 #include "WebXRTransientInputHitTestSource.h"
 #include "WebXRView.h"
 #include "XRFrameRequestCallback.h"
@@ -62,17 +61,16 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(WebXRSession);
 
-Ref<WebXRSession> WebXRSession::create(Document& document, WebXRSystem& system, XRSessionMode mode, PlatformXR::Device& device, FeatureList&& requestedFeatures)
+Ref<WebXRSession> WebXRSession::create(Document& document, XRSessionMode mode, PlatformXR::Device& device, FeatureList&& requestedFeatures)
 {
-    auto session = adoptRef(*new WebXRSession(document, system, mode, device, WTF::move(requestedFeatures)));
+    auto session = adoptRef(*new WebXRSession(document, mode, device, WTF::move(requestedFeatures)));
     session->suspendIfNeeded();
     return session;
 }
 
-WebXRSession::WebXRSession(Document& document, WebXRSystem& system, XRSessionMode mode, PlatformXR::Device& device, FeatureList&& requestedFeatures)
+WebXRSession::WebXRSession(Document& document, XRSessionMode mode, PlatformXR::Device& device, FeatureList&& requestedFeatures)
     : ActiveDOMObject(&document)
     , m_inputSources(makeUniqueRefWithoutRefCountedCheck<WebXRInputSourceArray>(*this))
-    , m_xrSystem(system)
     , m_mode(mode)
     , m_device(device)
     , m_requestedFeatures(WTF::move(requestedFeatures))
@@ -399,7 +397,11 @@ void WebXRSession::shutdown(InitiatedBySystem initiatedBySystem)
 
     // 3. If the active immersive session is equal to session, set the active immersive session to null.
     // 4. Remove session from the list of inline sessions.
-    m_xrSystem.sessionEnded(*this);
+    for (WeakPtr listener : m_sessionListeners) {
+        if (RefPtr protectedListener = listener.get())
+            protectedListener->onSessionEnded(*this);
+    }
+    m_sessionListeners.clear();
 
     m_inputSources->clear();
 
@@ -919,6 +921,11 @@ void WebXRSession::visibilityStateChanged()
         return;
 
     updateSessionVisibilityState(sessionDocument->hidden() ? PlatformXR::VisibilityState::Hidden : PlatformXR::VisibilityState::Visible);
+}
+
+void WebXRSession::addSessionListener(const WebXRSessionListener& listener)
+{
+    m_sessionListeners.append(&listener);
 }
 
 WebCoreOpaqueRoot root(WebXRSession* session)

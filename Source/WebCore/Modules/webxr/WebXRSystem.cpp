@@ -582,7 +582,8 @@ void WebXRSystem::requestSession(Document& document, XRSessionMode mode, const X
 
             // 5.4.2 Let session be a new XRSession object.
             // 5.4.3 Initialize the session with session, mode, and device.
-            auto session = WebXRSession::create(protectedDocument.get(), *this, mode, *device, WTF::move(*requestedFeatures));
+            Ref session = WebXRSession::create(protectedDocument.get(), mode, *device, WTF::move(*requestedFeatures));
+            session->addSessionListener(*this);
 
             // 5.4.8 Potentially set the active immersive session as follows:
             if (immersive) {
@@ -639,7 +640,7 @@ void WebXRSystem::unregisterSimulatedXRDeviceForTesting(PlatformXR::Device& devi
     m_testingDevices--;
 }
 
-void WebXRSystem::sessionEnded(WebXRSession& session)
+void WebXRSystem::onSessionEnded(const WebXRSession& session)
 {
     if (m_activeImmersiveSession == &session)
         m_activeImmersiveSession = nullptr;
@@ -663,7 +664,7 @@ public:
 
 private:
     InlineRequestAnimationFrameCallback(ScriptExecutionContext& scriptExecutionContext, Function<void()>&& callback)
-        : RequestAnimationFrameCallback(&scriptExecutionContext), m_callback(WTF::move(callback)) 
+        : RequestAnimationFrameCallback(&scriptExecutionContext), m_callback(WTF::move(callback))
     {
     }
 

@@ -36,6 +36,7 @@
 #include "WebXRFrame.h"
 #include "WebXRInputSourceArray.h"
 #include "WebXRRenderState.h"
+#include "WebXRSessionListener.h"
 #include "XREnvironmentBlendMode.h"
 #include "XRInteractionMode.h"
 #include "XRReferenceSpaceType.h"
@@ -54,7 +55,6 @@ namespace WebCore {
 
 class XRFrameRequestCallback;
 class WebCoreOpaqueRoot;
-class WebXRSystem;
 class WebXRView;
 class WebXRReferenceSpace;
 struct XRCanvasConfiguration;
@@ -77,7 +77,7 @@ public:
     using EndPromise = DOMPromiseDeferred<void>;
     using FeatureList = PlatformXR::Device::FeatureList;
 
-    static Ref<WebXRSession> create(Document&, WebXRSystem&, XRSessionMode, PlatformXR::Device&, FeatureList&&);
+    static Ref<WebXRSession> create(Document&, XRSessionMode, PlatformXR::Device&, FeatureList&&);
     virtual ~WebXRSession();
 
     XREnvironmentBlendMode environmentBlendMode() const;
@@ -97,7 +97,7 @@ public:
 
     IntSize nativeWebGLFramebufferResolution() const;
     IntSize recommendedWebGLFramebufferResolution() const;
-    bool supportsViewportScaling() const; 
+    bool supportsViewportScaling() const;
     bool isPositionEmulated() const;
 
     // If the immersive session obscures the HTML document (for example, in standalone devices),
@@ -109,6 +109,8 @@ public:
     // EventTarget.
     ScriptExecutionContext* scriptExecutionContext() const final;
 
+    void addSessionListener(const WebXRSessionListener&);
+
     ExceptionOr<void> end(EndPromise&&);
     bool ended() const { return m_ended; }
 
@@ -118,7 +120,7 @@ public:
     const PlatformXR::FrameData& frameData() const LIFETIME_BOUND { return m_frameData; }
     const WebXRReferenceSpace& viewerReferenceSpace() const { return m_viewerReferenceSpace; }
     bool posesCanBeReported(const Document&) const;
-    
+
 #if ENABLE(WEBXR_HANDS)
     bool isHandTrackingEnabled() const;
 #endif
@@ -135,7 +137,7 @@ public:
     void initializeTrackingAndRendering(std::optional<XRCanvasConfiguration>&&);
 
 private:
-    WebXRSession(Document&, WebXRSystem&, XRSessionMode, PlatformXR::Device&, FeatureList&&);
+    WebXRSession(Document&, XRSessionMode, PlatformXR::Device&, FeatureList&&);
 
     // EventTarget
     enum EventTargetInterfaceType eventTargetInterface() const override { return EventTargetInterfaceType::WebXRSession; }
@@ -175,8 +177,8 @@ private:
     bool m_ended { false };
     bool m_shouldServiceRequestVideoFrameCallbacks { false };
     std::unique_ptr<EndPromise> m_endPromise;
+    Vector<WeakPtr<WebXRSessionListener>> m_sessionListeners;
 
-    WebXRSystem& m_xrSystem;
     XRSessionMode m_mode;
     ThreadSafeWeakPtr<PlatformXR::Device> m_device;
     FeatureList m_requestedFeatures;
