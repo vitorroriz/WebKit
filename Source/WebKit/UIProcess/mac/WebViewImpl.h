@@ -607,8 +607,8 @@ public:
     void startWindowDrag();
 
     void startDrag(const WebCore::DragItem&, WebCore::ShareableBitmap::Handle&& image, const std::optional<WebCore::FrameIdentifier>& = std::nullopt);
-    void setFileAndURLTypes(NSString *filename, NSString *extension, NSString *uti, NSString *title, NSString *url, NSString *visibleURL, NSPasteboard *);
-    void setPromisedDataForImage(WebCore::Image&, NSString *filename, NSString *extension, NSString *title, NSString *url, NSString *visibleURL, WebCore::FragmentedSharedBuffer* archiveBuffer, NSString *pasteboardName, NSString *pasteboardOrigin);
+    void setPromisedDataForImage(Ref<WebCore::Image>&&, const String& filename, const String& extension, const String& title, const String& url, const String& visibleURL, RefPtr<WebCore::FragmentedSharedBuffer>&& archiveBuffer, const String& pasteboardName, const String& pasteboardOrigin);
+    void writePromisedImageDragDataToPasteboard(NSPasteboard *);
     void pasteboardChangedOwner(NSPasteboard *);
     void provideDataForPasteboard(NSPasteboard *, NSString *type);
     NSArray *namesOfPromisedFilesDroppedAtDestination(NSURL *dropDestination);
@@ -789,7 +789,7 @@ public:
     bool NODELETE effectiveUserInterfaceLevelIsElevated();
 
     void takeFocus(WebCore::FocusDirection);
-    void clearPromisedDragImage();
+    void clearPromisedImageDragData() { m_promisedImageDragData.reset(); }
 
     void requestDOMPasteAccess(WebCore::DOMPasteAccessCategory, WebCore::DOMPasteRequiresInteraction, const WebCore::IntRect&, const String& originIdentifier, CompletionHandler<void(WebCore::DOMPasteAccessResponse)>&&);
     void handleDOMPasteRequestForCategoryWithResult(WebCore::DOMPasteAccessCategory, WebCore::DOMPasteAccessResponse);
@@ -1094,9 +1094,18 @@ ALLOW_DEPRECATED_DECLARATIONS_END
     RetainPtr<NSMutableDictionary> m_remoteAccessibilityFrameCache;
     HashSet<pid_t> m_registeredRemoteAccessibilityPids;
 
-    RefPtr<WebCore::Image> m_promisedImage;
-    String m_promisedFilename;
-    String m_promisedURL;
+    struct PromisedImageDragData {
+        Ref<WebCore::Image> image;
+        String filename;
+        String extension;
+        String title;
+        String url;
+        String visibleURL;
+        String imageUTI;
+        RefPtr<WebCore::FragmentedSharedBuffer> archiveBuffer;
+        String originIdentifier;
+    };
+    std::optional<PromisedImageDragData> m_promisedImageDragData;
 
     CGFloat m_totalHeightOfBanners { 0 };
 

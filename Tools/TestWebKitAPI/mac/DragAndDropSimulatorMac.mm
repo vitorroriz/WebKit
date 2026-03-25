@@ -191,6 +191,11 @@ static RetainPtr<NSImage> defaultExternalDragImage()
     [_webView mouseDragToPoint:[self locationInViewForCurrentProgress]];
     [_webView waitForPendingMouseEvents];
 
+    // For site isolation, startDrag() waits for an async coordinate conversion before calling
+    // beginDraggingSessionWithItems:. Flush any pending IPC callbacks.
+    if (!_draggingSession)
+        [_webView waitForNextPresentationUpdate];
+
     TestWebKitAPI::Util::run(&_doneWaitingForDraggingSession);
 
     [_webView mouseUpAtPoint:_endLocationInWindow];
@@ -228,6 +233,15 @@ static RetainPtr<NSImage> defaultExternalDragImage()
     id dragImageContents = items[0].imageComponents.firstObject.contents;
     [self initializeDraggingInfo:pasteboard dragImage:[dragImageContents isKindOfClass:[NSImage class]] ? dragImageContents : nil source:source];
 
+    // Defer draggingEntered: to the next run loop iteration, matching real AppKit
+    // where draggingEntered: fires asynchronously after beginDraggingSessionWithItems:
+    // returns. This gives the caller (startDrag) time to restore legacy pasteboard
+    // data before the WebProcess reads the pasteboard.
+    [self performSelector:@selector(enterDragSession) withObject:nil afterDelay:0];
+}
+
+- (void)enterDragSession
+{
     _currentDragOperation = [_webView draggingEntered:_draggingInfo.get()];
     [_webView waitForNextPresentationUpdate];
     [self performSelector:@selector(continueDragSession) withObject:nil afterDelay:0];
@@ -257,6 +271,7 @@ static RetainPtr<NSImage> defaultExternalDragImage()
         [_webView draggingExited:_draggingInfo.get()];
     [_webView waitForNextPresentationUpdate];
     [(id <NSDraggingSource>)_webView.get() draggingSession:_draggingSession.get() endedAtPoint:_endLocationInWindow operation:_currentDragOperation];
+    [_webView waitForNextPresentationUpdate];
 
     _doneWaitingForDraggingSession = true;
 }

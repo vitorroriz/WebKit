@@ -313,7 +313,7 @@ void PageClientImpl::didCommitLoadForMainFrame(const String&, bool)
     CheckedRef impl = *m_impl;
     impl->updateSupportsArbitraryLayoutModes();
     impl->dismissContentRelativeChildWindowsWithAnimation(true);
-    impl->clearPromisedDragImage();
+    impl->clearPromisedImageDragData();
     impl->pageDidScroll({ 0, 0 });
 #if ENABLE(WRITING_TOOLS)
     impl->hideTextAnimationView();
@@ -447,9 +447,9 @@ void PageClientImpl::startDrag(const WebCore::DragItem& item, ShareableBitmap::H
 
 void PageClientImpl::setPromisedDataForImage(const String& pasteboardName, Ref<FragmentedSharedBuffer>&& imageBuffer, const String& filename, const String& extension, const String& title, const String& url, const String& visibleURL, RefPtr<FragmentedSharedBuffer>&& archiveBuffer, const String& originIdentifier)
 {
-    auto image = BitmapImage::create();
+    Ref image = BitmapImage::create();
     image->setData(WTF::move(imageBuffer), true);
-    protect(m_impl)->setPromisedDataForImage(image.get(), filename.createNSString().get(), extension.createNSString().get(), title.createNSString().get(), url.createNSString().get(), visibleURL.createNSString().get(), archiveBuffer.get(), pasteboardName.createNSString().get(), originIdentifier.createNSString().get());
+    protect(m_impl)->setPromisedDataForImage(WTF::move(image), filename, extension, title, url, visibleURL, WTF::move(archiveBuffer), pasteboardName, originIdentifier);
 }
 
 void PageClientImpl::updateSecureInputState()
