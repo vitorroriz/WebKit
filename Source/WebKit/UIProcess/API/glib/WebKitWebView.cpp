@@ -92,7 +92,7 @@
 #include <wtf/URL.h>
 #include <wtf/glib/GSpanExtras.h>
 #include <wtf/glib/WTFGType.h>
-#include <wtf/text/CString.h>
+#include <wtf/text/CStringView.h>
 #include <wtf/text/StringBuilder.h>
 
 #if PLATFORM(GTK)

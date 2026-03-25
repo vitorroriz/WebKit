@@ -7771,7 +7771,9 @@ struct WebCore::NowPlayingInfo {
     bool isPlaying;
     bool allowsNowPlayingControlsVisibility;
     bool isVideo;
+#if ENABLE(VIDEO)
     WebCore::MediaPlayer::VideoFullscreenMode fullscreenMode;
+#endif
 }
 
 struct WebCore::PlatformMediaCapabilitiesVideoConfiguration {
