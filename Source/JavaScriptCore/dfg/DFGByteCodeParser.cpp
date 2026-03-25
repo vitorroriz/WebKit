@@ -4911,6 +4911,8 @@ bool ByteCodeParser::handleIntrinsicGetter(Operand result, SpeculatedType predic
 
         NodeType op = mayBeLargeArrayBuffer ? DataViewGetByteLengthAsInt52 : DataViewGetByteLength;
         Node* lengthNode = addToGraph(op, OpInfo(mayBeResizableOrGrowableSharedArrayBuffer), Edge(thisNode, DataViewObjectUse));
+        if (mayBeResizableOrGrowableSharedArrayBuffer)
+            lengthNode->mergeFlags(NodeMustGenerate);
         m_exitOK = true;
         addToGraph(ExitOK);
 
