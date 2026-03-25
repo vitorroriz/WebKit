@@ -1687,9 +1687,7 @@ void AXObjectCache::childrenChanged(RenderObject& renderer, RenderObject* change
         // not always true for anonymous renderers, hence this branch.
         //
         // This behavior comes from a bug on a real webpage that I unfortunately couldn't figure out how to distill
-        // into a layout test. The key seems to be anonymous continuation renderers destroyed and recreated as part
-        // of a call to Node::insertBefore(). dynamic-inline-continuation.html gets close to reproducing the issue,
-        // following many of the same codepaths, but unfortunately will still pass even without this branch.
+        // into a layout test.
         childrenChanged(getIncludingAncestors(renderer));
     } else
         childrenChanged(get(renderer));

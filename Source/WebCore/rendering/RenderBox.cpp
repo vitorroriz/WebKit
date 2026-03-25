@@ -4087,19 +4087,7 @@ LayoutRange RenderBox::containingBlockRangeForPositioned(const RenderBoxModelObj
     }
 
     // Inline containing blocks are formed by relatively-positioned inline boxes.
-    CheckedPtr<const RenderInline> inlineContainer;
-    if ((inlineContainer = container.inlineContinuation())) {
-        auto relativelyPositionedInlineBoxAncestor = [&] {
-            CheckedPtr<const RenderElement> ancestor = inlineContainer;
-            for (; ancestor && !ancestor->isRelativelyPositioned(); ancestor = ancestor->parent()) { }
-            return ancestor ? dynamicDowncast<RenderInline>(ancestor.get()) : nullptr;
-        }();
-        // Since we stop splitting inlines over 200 nested boxes (see RenderTreeBuilder::Inline::splitInlines), we may not be able to find the real containing block here.
-        if (relativelyPositionedInlineBoxAncestor)
-            inlineContainer = relativelyPositionedInlineBoxAncestor;
-    } else
-        inlineContainer = dynamicDowncast<RenderInline>(container);
-    if (inlineContainer) {
+    if (auto* inlineContainer = dynamicDowncast<RenderInline>(container)) {
         return isContainerInlineAxis
             ? LayoutRange(startEdge, inlineContainer->innerPaddingBoxWidth())
             : LayoutRange(startEdge, inlineContainer->innerPaddingBoxHeight());

@@ -77,7 +77,7 @@ void RenderTreeUpdater::GeneratedContent::updateQuotesUpTo(RenderQuote* lastQuot
         if (&quote == lastQuote)
             return;
     }
-    ASSERT(!lastQuote || m_updater.m_builder.hasBrokenContinuation());
+    ASSERT_UNUSED(lastQuote, !lastQuote);
 }
 
 void RenderTreeUpdater::GeneratedContent::updateCounters()

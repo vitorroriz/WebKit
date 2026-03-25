@@ -365,10 +365,9 @@ void InlineItemsBuilder::collectInlineItems(InlineItemList& inlineItemList, Inli
                 handleInlineBoxEnd(layoutBox, inlineItemList);
             else if (layoutBox->isFloatingPositioned())
                 inlineItemList.append({ layoutBox, InlineItem::Type::Float });
-            else if (layoutBox->isBlockLevelBox()) {
-                ASSERT(m_root.rendererForIntegration()->settings().blocksInInlineLayoutEnabled() || m_root.rendererForIntegration()->settings().anonymousBlockGenerationDisabled());
+            else if (layoutBox->isBlockLevelBox())
                 inlineItemList.append({ layoutBox, InlineItem::Type::Block });
-            } else
+            else
                 ASSERT_NOT_REACHED();
 
             if (CheckedPtr nextSibling = layoutBox->nextSibling()) {

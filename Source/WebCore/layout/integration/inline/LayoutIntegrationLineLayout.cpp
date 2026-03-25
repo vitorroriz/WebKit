@@ -283,7 +283,6 @@ LineLayout* LineLayout::containing(RenderObject& renderer)
                 return dynamicDowncast<RenderBlockFlow>(RenderObject::containingBlockForPositionType(downcast<RenderBox>(renderer).style().position(), renderer));
             }
             if (CheckedPtr parentInlineBox = dynamicDowncast<RenderInline>(renderer.parent())) {
-                ASSERT(parentInlineBox->settings().blocksInInlineLayoutEnabled());
                 return dynamicDowncast<RenderBlockFlow>(parentInlineBox->containingBlock());
             }
             if (auto* parentBlock = dynamicDowncast<RenderBlockFlow>(renderer.parent())) {

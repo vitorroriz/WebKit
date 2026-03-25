@@ -267,9 +267,6 @@ public:
     // the child.
     virtual void updateAnonymousChildStyle(RenderStyle&) const { };
 
-    bool hasContinuationChainNode() const { return m_hasContinuationChainNode; }
-    bool isContinuation() const { return m_isContinuation; }
-    void setIsContinuation() { m_isContinuation = true; }
     bool isFirstLetter() const { return m_isFirstLetter; }
     void setIsFirstLetter() { m_isFirstLetter = true; }
 
@@ -372,8 +369,6 @@ protected:
 
     void pushOntoGeometryMap(RenderGeometryMap&, const RenderLayerModelObject* repaintContainer, RenderElement* container, bool containerSkipped) const;
 
-    void setHasContinuationChainNode(bool b) { m_hasContinuationChainNode = b; }
-
     void setRenderBlockHasMarginBeforeQuirk(bool b) { m_renderBlockHasMarginBeforeQuirk = b; }
     void setRenderBlockHasMarginAfterQuirk(bool b) { m_renderBlockHasMarginAfterQuirk = b; }
     void setRenderBlockShouldForceRelayoutChildren(bool b) { m_renderBlockShouldForceRelayoutChildren = b; }
@@ -452,12 +447,10 @@ private:
 
     unsigned m_hasPausedImageAnimations : 1;
     unsigned m_hasCounterNodeMap : 1;
-    unsigned m_hasContinuationChainNode : 1;
 #if HAVE(SUPPORT_HDR_DISPLAY)
     unsigned m_hasHDRImages : 1;
 #endif
 
-    unsigned m_isContinuation : 1;
     unsigned m_isFirstLetter : 1;
     unsigned m_renderBlockHasMarginBeforeQuirk : 1;
     unsigned m_renderBlockHasMarginAfterQuirk : 1;

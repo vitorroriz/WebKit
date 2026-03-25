@@ -250,8 +250,6 @@ static OutOfFlowDescendantsMap& NODELETE outOfFlowDescendantsMap()
     return mapForOutOfFlowDescendants;
 }
 
-using ContinuationOutlineTableMap = SingleThreadWeakHashMap<RenderBlock, std::unique_ptr<SingleThreadWeakListHashSet<RenderInline>>>;
-
 // Allocated only when some of these fields have non-default values
 
 struct RenderBlockRareData {
@@ -1236,68 +1234,14 @@ void RenderBlock::paintObject(PaintInfo& paintInfo, const LayoutPoint& paintOffs
     }
 
     // 5. paint outline.
-    if ((paintPhase == PaintPhase::Outline || paintPhase == PaintPhase::SelfOutline) && hasOutline() && style().usedVisibility() == Visibility::Visible) {
-        // Don't paint focus ring for anonymous block continuation because the
-        // inline element having outline-style:auto paints the whole focus ring.
-        if (style().outlineStyle() != OutlineStyle::Auto || !isContinuation())
-            paintOutline(paintInfo, LayoutRect(paintOffset, size()));
-    }
-
-    // 6. paint continuation outlines.
-    if ((paintPhase == PaintPhase::Outline || paintPhase == PaintPhase::ChildOutlines)) {
-        RenderInline* inlineCont = inlineContinuation();
-        if (inlineCont && inlineCont->hasOutline() && inlineCont->style().usedVisibility() == Visibility::Visible) {
-            RenderInline* inlineRenderer = downcast<RenderInline>(inlineCont->element()->renderer());
-            RenderBlock* containingBlock = this->containingBlock();
-
-            bool inlineEnclosedInSelfPaintingLayer = false;
-            for (RenderBoxModelObject* box = inlineRenderer; box != containingBlock; box = &box->parent()->enclosingBoxModelObject()) {
-                if (box->hasSelfPaintingLayer()) {
-                    inlineEnclosedInSelfPaintingLayer = true;
-                    break;
-                }
-            }
-
-            // Do not add continuations for outline painting by our containing block if we are a relative positioned
-            // anonymous block (i.e. have our own layer), paint them straightaway instead. This is because a block depends on renderers in its continuation table being
-            // in the same layer. 
-            if (!inlineEnclosedInSelfPaintingLayer && !hasLayer())
-                containingBlock->addContinuationWithOutline(inlineRenderer);
-            else if (!InlineIterator::lineLeftmostInlineBoxFor(*inlineRenderer) || (!inlineEnclosedInSelfPaintingLayer && hasLayer())) {
-                auto outlineOffset = paintOffset - locationOffset() + inlineRenderer->containingBlock()->location();
-                OutlinePainter { paintInfo }.paintOutline(*inlineRenderer, outlineOffset);
-            }
-        }
-        paintContinuationOutlines(paintInfo, paintOffset);
-    }
+    if ((paintPhase == PaintPhase::Outline || paintPhase == PaintPhase::SelfOutline) && hasOutline() && style().usedVisibility() == Visibility::Visible)
+        paintOutline(paintInfo, LayoutRect(paintOffset, size()));
 
     // 7. paint caret.
     // If the caret's node's render object's containing block is this block, and the paint action is PaintPhase::Foreground,
     // then paint the caret.
     if (shouldPaintContent)
         paintCarets(paintInfo, paintOffset);
-}
-
-static ContinuationOutlineTableMap* NODELETE continuationOutlineTable()
-{
-    static NeverDestroyed<ContinuationOutlineTableMap> table;
-    return &table.get();
-}
-
-void RenderBlock::addContinuationWithOutline(RenderInline* flow)
-{
-    // We can't make this work if the inline is in a layer.  We'll just rely on the broken
-    // way of painting.
-    ASSERT(!flow->layer() && !flow->isContinuation());
-    
-    auto* table = continuationOutlineTable();
-    auto* continuations = table->get(*this);
-    if (!continuations) {
-        continuations = new SingleThreadWeakListHashSet<RenderInline>;
-        table->set(*this, std::unique_ptr<SingleThreadWeakListHashSet<RenderInline>>(continuations));
-    }
-    
-    continuations->add(*flow);
 }
 
 bool RenderBlock::establishesIndependentFormattingContextIgnoringDisplayType(const RenderStyle& style) const
@@ -1368,35 +1312,6 @@ bool RenderBlock::createsNewFormattingContext() const
         || style.columnSpan() == ColumnSpan::All
         || style.display() == Style::DisplayType::BlockFlowRoot
         || establishesIndependentFormattingContext();
-}
-
-#if ASSERT_ENABLED
-bool RenderBlock::paintsContinuationOutline(const RenderInline& renderer)
-{
-    if (auto* continuations = continuationOutlineTable()->get(*this))
-        return continuations->contains(renderer);
-    return false;
-}
-#endif
-
-void RenderBlock::paintContinuationOutlines(PaintInfo& info, const LayoutPoint& paintOffset)
-{
-    auto* table = continuationOutlineTable();
-    auto continuations = table->take(*this);
-    if (!continuations)
-        return;
-
-    LayoutPoint accumulatedPaintOffset = paintOffset;
-    // Paint each continuation outline.
-    OutlinePainter outlinePainter { info };
-    for (auto& renderInline : *continuations) {
-        // Need to add in the coordinates of the intervening blocks.
-        auto* block = renderInline.containingBlock();
-        for ( ; block && block != this; block = block->containingBlock())
-            accumulatedPaintOffset.moveBy(block->location());
-        ASSERT(block);
-        outlinePainter.paintOutline(renderInline, accumulatedPaintOffset);
-    }
 }
 
 bool RenderBlock::shouldPaintSelectionGaps() const
@@ -2019,11 +1934,6 @@ Node* RenderBlock::nodeForHitTest() const
         }
     }
 
-    // If we are in the margins of block elements that are part of a
-    // continuation we're actually still inside the enclosing element
-    // that was split. Use the appropriate inner node.
-    if (auto* continuation = this->continuation())
-        return continuation->element();
     return element();
 }
 
@@ -2679,35 +2589,14 @@ void RenderBlock::setPageLogicalOffset(LayoutUnit logicalOffset)
 
 void RenderBlock::boundingRects(Vector<LayoutRect>& rects, const LayoutPoint& accumulatedOffset) const
 {
-    // For blocks inside inlines, we include margins so that we run right up to the inline boxes
-    // above and below us (thus getting merged with them to form a single irregular shape).
-    if (auto* continuation = this->continuation()) {
-        // FIXME: This is wrong for block-flows that are horizontal.
-        // https://bugs.webkit.org/show_bug.cgi?id=46781
-        rects.append(LayoutRect(accumulatedOffset.x(), accumulatedOffset.y() - collapsedMarginBefore(), width(), height() + collapsedMarginBefore() + collapsedMarginAfter()));
-        auto* containingBlock = inlineContinuation()->containingBlock();
-        continuation->boundingRects(rects, accumulatedOffset - locationOffset() + containingBlock->locationOffset());
-    } else
-        rects.append({ accumulatedOffset, size() });
+    rects.append({ accumulatedOffset, size() });
 }
 
 void RenderBlock::absoluteQuads(Vector<FloatQuad>& quads, bool* wasFixed) const
 {
-    if (!continuation()) {
-        absoluteQuadsIgnoringContinuation({ { }, size() }, quads, wasFixed);
-        return;
-    }
-    // For blocks inside inlines, we include margins so that we run right up to the inline boxes
-    // above and below us (thus getting merged with them to form a single irregular shape).
-    auto logicalRect = FloatRect { 0, -collapsedMarginBefore(), width(), height() + collapsedMarginBefore() + collapsedMarginAfter() };
-    absoluteQuadsIgnoringContinuation(logicalRect, quads, wasFixed);
-    collectAbsoluteQuadsForContinuation(quads, wasFixed);
-}
-
-void RenderBlock::absoluteQuadsIgnoringContinuation(const FloatRect& logicalRect, Vector<FloatQuad>& quads, bool* wasFixed) const
-{
     // FIXME: This is wrong for block-flows that are horizontal.
     // https://bugs.webkit.org/show_bug.cgi?id=46781
+    FloatRect logicalRect { { }, size() };
     CheckedPtr fragmentedFlow = enclosingFragmentedFlow();
     if (!fragmentedFlow || !fragmentedFlow->absoluteQuadsForBox(quads, wasFixed, *this))
         quads.append(localToAbsoluteQuad(logicalRect, UseTransforms, wasFixed));
@@ -2715,16 +2604,11 @@ void RenderBlock::absoluteQuadsIgnoringContinuation(const FloatRect& logicalRect
 
 LayoutRect RenderBlock::rectWithOutlineForRepaint(const RenderLayerModelObject* repaintContainer, LayoutUnit outlineWidth) const
 {
-    LayoutRect r(RenderBox::rectWithOutlineForRepaint(repaintContainer, outlineWidth));
-    if (isContinuation())
-        r.inflateY(collapsedMarginBefore()); // FIXME: This is wrong for block-flows that are horizontal.
-    return r;
+    return RenderBox::rectWithOutlineForRepaint(repaintContainer, outlineWidth);
 }
 
 const RenderStyle& RenderBlock::outlineStyleForRepaint() const
 {
-    if (auto* continuation = this->continuation())
-        return continuation->style();
     return RenderElement::outlineStyleForRepaint();
 }
 

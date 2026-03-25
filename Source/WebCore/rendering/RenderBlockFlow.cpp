@@ -268,7 +268,6 @@ void RenderBlockFlow::rebuildFloatingObjectSetFromIntrudingFloats()
         if (auto* blockFlowParent = dynamicDowncast<RenderBlockFlow>(parent()))
             return blockFlowParent;
         if (auto* inlineBoxParent = dynamicDowncast<RenderInline>(parent())) {
-            ASSERT(settings().blocksInInlineLayoutEnabled());
             return dynamicDowncast<RenderBlockFlow>(inlineBoxParent->containingBlock());
         }
         // We should not process floats if the parent node is not a RenderBlock. Otherwise, we will add
@@ -4687,7 +4686,6 @@ RenderObject* InlineMinMaxIterator::next()
             break;
 
         if (candidate->style().display().isBlockType()) {
-            ASSERT(candidate->settings().blocksInInlineLayoutEnabled());
             break;
         }
 
@@ -4919,7 +4917,6 @@ void RenderBlockFlow::computeInlinePreferredLogicalWidths(LayoutUnit& minLogical
         }
 
         if (child->style().display().isBlockType() && !child->isFloating() && is<RenderBox>(*child)) {
-            ASSERT(settings().blocksInInlineLayoutEnabled());
 
             resetLineForForcedLineBreak();
 

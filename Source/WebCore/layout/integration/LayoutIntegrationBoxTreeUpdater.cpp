@@ -199,22 +199,6 @@ void BoxTreeUpdater::adjustStyleIfNeeded(const RenderElement& renderer, RenderSt
         }
 
         if (auto* renderInline = dynamicDowncast<RenderInline>(renderer)) {
-            auto shouldNotRetainBorderPaddingAndMarginStart = renderInline->isContinuation();
-            auto shouldNotRetainBorderPaddingAndMarginEnd = !renderInline->isContinuation() && renderInline->inlineContinuation();
-            // This looks like continuation renderer.
-            if (shouldNotRetainBorderPaddingAndMarginStart) {
-                // This uses `Style::ComputedStyle::initialMarginLeft()` because there is no defined initial value for margin start. However, since all margin edges have the same initial value, this is fine.
-                styleToAdjust.setMarginStart(Style::ComputedStyle::initialMarginLeft());
-                styleToAdjust.resetBorderLeft();
-                styleToAdjust.setPaddingLeft(Style::ComputedStyle::initialPaddingLeft());
-            }
-            if (shouldNotRetainBorderPaddingAndMarginEnd) {
-                // This uses `Style::ComputedStyle::initialMarginRight()` because there is no defined initial value for margin end. However, since all margin edges have the same initial value, this is fine.
-                styleToAdjust.setMarginEnd(Style::ComputedStyle::initialMarginRight());
-                styleToAdjust.resetBorderRight();
-                styleToAdjust.setPaddingRight(Style::ComputedStyle::initialPaddingRight());
-            }
-
             auto isSupportedInlineDisplay = [&] {
                 auto display = styleToAdjust.display();
                 if (display == Style::DisplayType::RubyBase || display == Style::DisplayType::RubyText)

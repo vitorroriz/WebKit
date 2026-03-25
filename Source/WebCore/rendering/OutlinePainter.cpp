@@ -361,13 +361,6 @@ void OutlinePainter::collectFocusRingRectsForInline(const RenderInline& renderer
             pos.move(box->locationOffset());
         collectFocusRingRects(child, rects, flooredIntPoint(pos), paintContainer);
     }
-
-    if (CheckedPtr continuation = renderer.continuation()) {
-        if (CheckedPtr inlineRenderer = dynamicDowncast<RenderInline>(*continuation))
-            collectFocusRingRectsForInline(*inlineRenderer, rects, flooredLayoutPoint(LayoutPoint(additionalOffset + continuation->containingBlock()->location() - renderer.containingBlock()->location())), paintContainer);
-        else
-            collectFocusRingRects(*continuation, rects, flooredLayoutPoint(LayoutPoint(additionalOffset + downcast<RenderBox>(*continuation).location() - renderer.containingBlock()->location())), paintContainer);
-    }
 }
 
 bool OutlinePainter::collectFocusRingRectsForBlock(const RenderBlock& renderer, Vector<LayoutRect>& rects, const LayoutPoint& additionalOffset, const RenderLayerModelObject* paintContainer)
@@ -375,21 +368,7 @@ bool OutlinePainter::collectFocusRingRectsForBlock(const RenderBlock& renderer, 
     if (renderer.isRenderTextControl())
         return false;
 
-    // For blocks inside inlines, we include margins so that we run right up to the inline boxes
-    // above and below us (thus getting merged with them to form a single irregular shape).
-    CheckedPtr inlineContinuation = renderer.inlineContinuation();
-    if (inlineContinuation) {
-        // FIXME: This check really isn't accurate.
-        bool nextInlineHasLineBox = inlineContinuation->firstLegacyInlineBox();
-        // FIXME: This is wrong. The principal renderer may not be the continuation preceding this block.
-        // FIXME: This is wrong for block-flows that are horizontal.
-        // https://bugs.webkit.org/show_bug.cgi?id=46781
-        bool prevInlineHasLineBox = downcast<RenderInline>(*inlineContinuation->element()->renderer()).firstLegacyInlineBox();
-        auto topMargin = prevInlineHasLineBox ? renderer.collapsedMarginBefore() : 0_lu;
-        auto bottomMargin = nextInlineHasLineBox ? renderer.collapsedMarginAfter() : 0_lu;
-        LayoutRect rect(additionalOffset.x(), additionalOffset.y() - topMargin, renderer.width(), renderer.height() + topMargin + bottomMargin);
-        appendIfNotEmpty(rects, WTF::move(rect));
-    } else if (renderer.width() && renderer.height())
+    if (renderer.width() && renderer.height())
         rects.append(LayoutRect(additionalOffset, renderer.size()));
 
     if (!renderer.hasNonVisibleOverflow() && !renderer.hasControlClip()) {
@@ -400,8 +379,6 @@ bool OutlinePainter::collectFocusRingRectsForBlock(const RenderBlock& renderer, 
             collectFocusRingRectsForChildBox(box, rects, additionalOffset, paintContainer);
     }
 
-    if (inlineContinuation)
-        collectFocusRingRects(*inlineContinuation, rects, flooredLayoutPoint(LayoutPoint(additionalOffset + inlineContinuation->containingBlock()->location() - renderer.location())), paintContainer);
     return true;
 }
 

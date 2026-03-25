@@ -4557,10 +4557,8 @@ static void forEachRenderLayer(Element& element, const std::function<void(Render
         return;
     }
 
-    RenderBoxModelObject::forRendererAndContinuations(*renderBoxModelObject, [function](RenderBoxModelObject& renderer) {
-        if (renderer.hasLayer())
-            function(*renderer.layer());
-    });
+    if (renderBoxModelObject->hasLayer())
+        function(*renderBoxModelObject->layer());
 }
 
 static void propagateUserActionPseudoClassesToAncestors(Element& element, bool value, bool hover, bool active, bool focusWithin)

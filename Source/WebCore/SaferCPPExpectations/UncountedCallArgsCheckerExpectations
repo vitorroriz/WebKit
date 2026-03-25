@@ -522,13 +522,13 @@ platform/graphics/transforms/TransformOperationsSharedPrimitivesPrefix.h
 platform/mediastream/RealtimeOutgoingAudioSource.cpp
 platform/mediastream/RealtimeOutgoingAudioSource.h
 platform/mediastream/RealtimeOutgoingVideoSource.cpp
-platform/mediastream/cocoa/IncomingAudioMediaStreamTrackRendererUnit.cpp
-[ iOS ] platform/mediastream/ios/CoreAudioCaptureSourceIOS.mm
 platform/mediastream/cocoa/CoreAudioCaptureSource.cpp
 [ iOS ] platform/mediastream/cocoa/CoreAudioCaptureUnit.cpp
+platform/mediastream/cocoa/IncomingAudioMediaStreamTrackRendererUnit.cpp
 platform/mediastream/cocoa/MediaStreamTrackAudioSourceProviderCocoa.cpp
 platform/mediastream/cocoa/RealtimeOutgoingAudioSourceCocoa.cpp
 platform/mediastream/cocoa/WebAudioSourceProviderCocoa.mm
+[ iOS ] platform/mediastream/ios/CoreAudioCaptureSourceIOS.mm
 platform/mock/MockRealtimeVideoSource.cpp
 platform/network/cocoa/ResourceHandleCocoa.mm
 platform/network/cocoa/WebCoreResourceHandleAsOperationQueueDelegate.mm
@@ -634,7 +634,6 @@ rendering/svg/legacy/SVGResources.cpp
 rendering/svg/legacy/SVGResourcesCache.cpp
 rendering/updating/RenderTreeBuilder.cpp
 rendering/updating/RenderTreeBuilderFirstLetter.cpp
-rendering/updating/RenderTreeBuilderInline.cpp
 rendering/updating/RenderTreeBuilderMathML.cpp
 rendering/updating/RenderTreeBuilderMultiColumn.cpp
 rendering/updating/RenderTreeBuilderRuby.cpp

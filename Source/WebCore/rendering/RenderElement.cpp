@@ -138,11 +138,9 @@ inline RenderElement::RenderElement(Type type, ContainerNode& elementOrDocument,
     , m_hasInitializedStyle(false)
     , m_hasPausedImageAnimations(false)
     , m_hasCounterNodeMap(false)
-    , m_hasContinuationChainNode(false)
 #if HAVE(SUPPORT_HDR_DISPLAY)
     , m_hasHDRImages(false)
 #endif
-    , m_isContinuation(false)
     , m_isFirstLetter(false)
     , m_renderBlockHasMarginBeforeQuirk(false)
     , m_renderBlockHasMarginAfterQuirk(false)
@@ -893,11 +891,6 @@ void RenderElement::propagateStyleToAnonymousChildren(StylePropagationType propa
             if (elementChild->style().columnSpan() == ColumnSpan::All)
                 newStyle.setColumnSpan(ColumnSpan::All);
         }
-
-        // Preserve the position style of anonymous block continuations as they can have relative or sticky position when
-        // they contain block descendants of relative or sticky positioned inlines.
-        if (elementChild->isInFlowPositioned() && elementChild->isContinuation())
-            newStyle.setPosition(elementChild->style().position());
 
         updateAnonymousChildStyle(newStyle);
         
@@ -2189,10 +2182,6 @@ void RenderElement::updateOutlineAutoAncestor(bool hasOutlineAuto)
             continue;
         if (auto* element = dynamicDowncast<RenderElement>(child.get()))
             element->updateOutlineAutoAncestor(hasOutlineAuto);
-    }
-    if (auto* modelObject = dynamicDowncast<RenderBoxModelObject>(*this)) {
-        if (CheckedPtr continuation = modelObject->continuation())
-            continuation->updateOutlineAutoAncestor(hasOutlineAuto);
     }
 }
 

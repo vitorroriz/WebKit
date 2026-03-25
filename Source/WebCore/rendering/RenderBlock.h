@@ -131,11 +131,6 @@ public:
 
     LayoutRect logicalRectToPhysicalRect(const LayoutPoint& physicalPosition, const LayoutRect& logicalRect);
 
-    void addContinuationWithOutline(RenderInline*);
-#if ASSERT_ENABLED
-    bool paintsContinuationOutline(const RenderInline&);
-#endif
-
     bool establishesIndependentFormattingContext() const;
     bool createsNewFormattingContext() const;
 
@@ -382,13 +377,9 @@ private:
     // FIXME-BLOCKFLOW: Remove virtualizaion when all callers have moved to RenderBlockFlow
     virtual void clipOutFloatingBoxes(RenderBlock&, const PaintInfo*, const LayoutPoint&, const LayoutSize&) { };
 
-    void paintContinuationOutlines(PaintInfo&, const LayoutPoint&);
-
     virtual PositionWithAffinity positionForPointWithInlineChildren(const LayoutPoint&, HitTestSource);
 
     RenderFragmentedFlow* updateCachedEnclosingFragmentedFlow(RenderFragmentedFlow*) const;
-
-    void absoluteQuadsIgnoringContinuation(const FloatRect&, Vector<FloatQuad>&, bool* wasFixed) const override;
 
     void paintDebugBoxShadowIfApplicable(GraphicsContext&, const LayoutRect&) const;
 
