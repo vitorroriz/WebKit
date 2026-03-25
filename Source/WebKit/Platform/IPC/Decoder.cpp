@@ -176,6 +176,8 @@ std::unique_ptr<Decoder> Decoder::unwrapForTesting(Decoder& decoder)
         return nullptr;
 
     auto wrappedDecoder = Decoder::create(*wrappedMessage, WTF::move(attachments));
+    if (!wrappedDecoder)
+        return nullptr;
     wrappedDecoder->setIsAllowedWhenWaitingForSyncReplyOverride(true);
     return wrappedDecoder;
 }
