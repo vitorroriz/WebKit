@@ -3952,6 +3952,9 @@ void RenderBlockFlow::invalidateLineLayout(InvalidationReason invalidationReason
         break;
     }
     case InvalidationReason::InsertionOrRemoval:
+        // Since we eagerly remove the display content below, issue a repaint now to cover the previously painted inline content area.
+        // FIXME: Alternatively we should be able to "detach" the display content but keep it around for subsequent repaints.
+        repaint();
         setLineLayoutPath(UndeterminedPath);
         issueNeedsLayoutIfApplicable();
         break;
