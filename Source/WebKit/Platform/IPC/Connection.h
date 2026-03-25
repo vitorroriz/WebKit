@@ -29,14 +29,14 @@
 #pragma once
 
 #include "ConnectionHandle.h"
+#include "Decoder.h"
+#include "MessageNames.h"
 #include "MessageReceiveQueueMap.h"
 #include "MessageReceiver.h"
 #include "ReceiverMatcher.h"
 #include "SyncRequestID.h"
 #include "Timeout.h"
 #include <atomic>
-#include <bmalloc/TZoneHeap.h>
-#include <bmalloc/bmalloc.h>
 #include <new>
 #include <tuple>
 #include <wtf/Assertions.h>
@@ -52,6 +52,7 @@
 #include <wtf/HashMap.h>
 #include <wtf/Lock.h>
 #include <wtf/MainThread.h>
+#include <wtf/Markable.h>
 #include <wtf/MonotonicTime.h>
 #include <wtf/NativePromise.h>
 #include <wtf/Noncopyable.h>

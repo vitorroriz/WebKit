@@ -29,8 +29,6 @@
 #include "MessageNames.h"
 #include "ReceiverMatcher.h"
 #include "SyncRequestID.h"
-#include <bmalloc/TZoneHeap.h>
-#include <bmalloc/bmalloc.h>
 #include <memory>
 #include <span>
 #include <wtf/ArgumentCoder.h>
