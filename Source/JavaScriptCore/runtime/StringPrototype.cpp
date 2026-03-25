@@ -1996,33 +1996,35 @@ JSC_DEFINE_HOST_FUNCTION(stringProtoFuncRepeat, (JSGlobalObject* globalObject, C
     if (repeatCount == 1)
         return JSValue::encode(thisString);
 
-    auto view = thisString->view(globalObject);
-    RETURN_IF_EXCEPTION(scope, { });
-
-    if (stringLength == 1) {
-        // For a string which length is single, instead of creating ropes,
-        // allocating a sequential buffer and fill with the repeated string for efficiency.
-        char16_t character = view[0];
-        scope.release();
-        if (isLatin1(character))
-            return JSValue::encode(repeatCharacter(globalObject, static_cast<Latin1Character>(character), repeatCount));
-        return JSValue::encode(repeatCharacter(globalObject, character, repeatCount));
-    }
-
     auto checkedResultLength = checkedProduct<unsigned>(stringLength, static_cast<unsigned>(repeatCount));
     if (checkedResultLength.hasOverflowed() || static_cast<unsigned>(checkedResultLength) > JSString::MaxLength) [[unlikely]]
         return JSValue::encode(throwOutOfMemoryError(globalObject, scope));
-
-    // Even if the string length is not single, if the resulting string length is small,
-    // allocating a sequential buffer and fill with the repeated string for efficiency.
     unsigned resultLength = checkedResultLength;
+
     constexpr unsigned maxStringLength = 8;
     constexpr unsigned maxResultLength = 1024;
-    if (stringLength <= maxStringLength && resultLength <= maxResultLength) {
-        scope.release();
-        if (view->is8Bit())
-            return JSValue::encode(repeatString<Latin1Character>(globalObject, view, repeatCount));
-        return JSValue::encode(repeatString<char16_t>(globalObject, view, repeatCount));
+    if (stringLength <= maxStringLength) {
+        auto view = thisString->view(globalObject);
+        RETURN_IF_EXCEPTION(scope, { });
+
+        if (stringLength == 1) {
+            // For a string which length is single, instead of creating ropes,
+            // allocating a sequential buffer and fill with the repeated string for efficiency.
+            char16_t character = view[0];
+            scope.release();
+            if (isLatin1(character))
+                return JSValue::encode(repeatCharacter(globalObject, static_cast<Latin1Character>(character), repeatCount));
+            return JSValue::encode(repeatCharacter(globalObject, character, repeatCount));
+        }
+
+        // Even if the string length is not single, if the resulting string length is small,
+        // allocating a sequential buffer and fill with the repeated string for efficiency.
+        if (resultLength <= maxResultLength) {
+            scope.release();
+            if (view->is8Bit())
+                return JSValue::encode(repeatString<Latin1Character>(globalObject, view, repeatCount));
+            return JSValue::encode(repeatString<char16_t>(globalObject, view, repeatCount));
+        }
     }
 
     RELEASE_AND_RETURN(scope, JSValue::encode(repeatRope(globalObject, thisString, repeatCount)));
