@@ -1087,7 +1087,7 @@ size_t find(std::span<T, TExtent> haystack, std::span<U, UExtent> needle)
 
 template<typename T, std::size_t TExtent, typename U, std::size_t UExtent>
     requires(TriviallyComparableOneByteCodeUnits<T, U>)
-size_t contains(std::span<T, TExtent> haystack, std::span<U, UExtent> needle)
+bool contains(std::span<T, TExtent> haystack, std::span<U, UExtent> needle)
 {
     return find(haystack, needle) != notFound;
 }
