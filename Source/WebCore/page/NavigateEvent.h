@@ -90,7 +90,7 @@ public:
     };
 
     static Ref<NavigateEvent> create(JSC::JSGlobalObject&, const AtomString& type, Init&&);
-    static Ref<NavigateEvent> create(JSC::JSGlobalObject&, const AtomString& type, Init&&, AbortController*);
+    static Ref<NavigateEvent> create(RefPtr<DOMWrapperWorld>&&, const AtomString& type, Init&&, AbortController*);
 
     NavigationNavigationType navigationType() const { return m_navigationType; }
     bool canIntercept() const { return m_canIntercept; }
@@ -117,6 +117,7 @@ public:
 
 private:
     NavigateEvent(JSC::JSGlobalObject&, const AtomString& type, Init&&, EventIsTrusted, AbortController*);
+    NavigateEvent(RefPtr<DOMWrapperWorld>&&, const AtomString& type, Init&&, EventIsTrusted, AbortController*);
 
     ExceptionOr<void> sharedChecks(Document&);
     void potentiallyProcessScrollBehavior(Document&);

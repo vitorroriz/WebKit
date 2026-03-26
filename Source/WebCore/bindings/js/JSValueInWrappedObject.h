@@ -41,6 +41,7 @@ class JSValueInWrappedObject {
 public:
     JSValueInWrappedObject() = default;
     JSValueInWrappedObject(JSC::JSGlobalObject&, JSC::JSValue);
+    JSValueInWrappedObject(RefPtr<DOMWrapperWorld>&&, JSC::JSValue);
 
     explicit operator bool() const;
     template<typename Visitor> void visitInGCThread(Visitor&) const;
@@ -50,16 +51,20 @@ public:
     // The owner parameter is typically the wrapper of the DOM node this class is embedded into but can be any GCed object that
     // will visit this JSValueInWrappedObject via visitAdditionalChildrenInGCThread/isReachableFromOpaqueRoots.
     void set(JSC::JSGlobalObject&, const JSC::JSCell* owner, JSC::JSValue);
+    void set(RefPtr<DOMWrapperWorld>&&, JSC::VM&, const JSC::JSCell* owner, JSC::JSValue);
     // Only use this if you actually expect this value to be weakly held. If you call visitInGCThread on this value *DONT* set using setWeakly
     // use set instead. The GC might or might not keep your value around in that case.
     void setWeakly(JSC::JSGlobalObject&, JSC::JSValue);
+    void setWeakly(RefPtr<DOMWrapperWorld>&&, JSC::JSValue);
     JSC::JSValue getValue(JSC::JSValue nullValue = JSC::jsUndefined()) const;
 
+    RefPtr<DOMWrapperWorld> world() const;
     bool isWorldCompatible(JSC::JSGlobalObject& lexicalGlobalObject) const;
 
 private:
     void setValueInternal(JSC::JSValue);
     void setWorld(JSC::JSGlobalObject&);
+    void setWorld(RefPtr<DOMWrapperWorld>&&);
 
     // Keep in mind that all of these fields are accessed concurrently without lock from concurrent GC thread.
     JSC::JSValue m_nonCell { };
@@ -72,6 +77,11 @@ JSC::JSValue cachedPropertyValue(JSC::ThrowScope&, JSC::JSGlobalObject&, const J
 inline JSValueInWrappedObject::JSValueInWrappedObject(JSC::JSGlobalObject& globalObject, JSC::JSValue value)
 {
     setWeakly(globalObject, value);
+}
+
+inline JSValueInWrappedObject::JSValueInWrappedObject(RefPtr<DOMWrapperWorld>&& world, JSC::JSValue value)
+{
+    setWeakly(WTF::move(world), value);
 }
 
 inline JSC::JSValue JSValueInWrappedObject::getValue(JSC::JSValue nullValue) const
@@ -114,10 +124,21 @@ inline void JSValueInWrappedObject::setWorld(JSC::JSGlobalObject& globalObject)
     m_world = &currentWorld(globalObject);
 }
 
+inline void JSValueInWrappedObject::setWorld(RefPtr<DOMWrapperWorld>&& world)
+{
+    m_world = WTF::move(world);
+}
+
 inline void JSValueInWrappedObject::setWeakly(JSC::JSGlobalObject& globalObject, JSC::JSValue value)
 {
     setValueInternal(value);
     setWorld(globalObject);
+}
+
+inline void JSValueInWrappedObject::setWeakly(RefPtr<DOMWrapperWorld>&& world, JSC::JSValue value)
+{
+    setValueInternal(value);
+    setWorld(WTF::move(world));
 }
 
 inline void JSValueInWrappedObject::set(JSC::JSGlobalObject& globalObject, const JSC::JSCell* owner, JSC::JSValue value)
@@ -125,6 +146,18 @@ inline void JSValueInWrappedObject::set(JSC::JSGlobalObject& globalObject, const
     setValueInternal(value);
     globalObject.vm().writeBarrier(owner, value);
     setWorld(globalObject);
+}
+
+inline void JSValueInWrappedObject::set(RefPtr<DOMWrapperWorld>&& world, JSC::VM& vm, const JSC::JSCell* owner, JSC::JSValue value)
+{
+    setValueInternal(value);
+    vm.writeBarrier(owner, value);
+    setWorld(WTF::move(world));
+}
+
+inline RefPtr<DOMWrapperWorld> JSValueInWrappedObject::world() const
+{
+    return m_world.get();
 }
 
 inline void JSValueInWrappedObject::clear()

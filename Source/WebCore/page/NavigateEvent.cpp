@@ -63,9 +63,27 @@ NavigateEvent::NavigateEvent(JSC::JSGlobalObject& globalObject, const AtomString
     m_info.setWeakly(globalObject, init.info);
 }
 
-Ref<NavigateEvent> NavigateEvent::create(JSC::JSGlobalObject& globalObject, const AtomString& type, Init&& init, AbortController* abortController)
+NavigateEvent::NavigateEvent(RefPtr<DOMWrapperWorld>&& world, const AtomString& type, Init&& init, EventIsTrusted isTrusted, AbortController* abortController)
+    : Event(EventInterfaceType::NavigateEvent, type, WTF::move(init), isTrusted)
+    , m_navigationType(init.navigationType)
+    , m_destination(WTF::move(init.destination))
+    , m_signal(WTF::move(init.signal))
+    , m_formData(WTF::move(init.formData))
+    , m_downloadRequest(WTF::move(init.downloadRequest))
+    , m_sourceElement(WTF::move(init.sourceElement))
+    , m_canIntercept(init.canIntercept)
+    , m_userInitiated(init.userInitiated)
+    , m_hashChange(init.hashChange)
+    , m_hasUAVisualTransition(init.hasUAVisualTransition)
+    , m_abortController(abortController)
 {
-    return adoptRef(*new NavigateEvent(globalObject, type, WTF::move(init), EventIsTrusted::Yes, abortController));
+    Locker<JSC::JSLock> locker(commonVM().apiLock());
+    m_info.setWeakly(WTF::move(world), init.info);
+}
+
+Ref<NavigateEvent> NavigateEvent::create(RefPtr<DOMWrapperWorld>&& world, const AtomString& type, Init&& init, AbortController* abortController)
+{
+    return adoptRef(*new NavigateEvent(WTF::move(world), type, WTF::move(init), EventIsTrusted::Yes, abortController));
 }
 
 Ref<NavigateEvent> NavigateEvent::create(JSC::JSGlobalObject& globalObject, const AtomString& type, Init&& init)
