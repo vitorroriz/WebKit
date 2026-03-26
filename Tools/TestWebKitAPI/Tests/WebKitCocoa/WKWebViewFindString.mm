@@ -175,4 +175,93 @@ TEST(WKWebViewFindString, MatchIndexIsCorrectWhenNavigatingForwardAndBackward)
     EXPECT_EQ(1, [findDelegate matchIndex]);
 }
 
+TEST(WKWebViewFindString, MatchIndexDoesNotUpdateWithoutDetermineMatchIndexOption)
+{
+    auto findDelegate = adoptNS([[WKWebViewFindStringFindDelegate alloc] init]);
+    auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 300, 200) configuration:configuration.get() addToWindow:YES]);
+    [webView synchronouslyLoadHTMLString:@"<p>hello</p><p>hello</p><p>hello</p>"];
+    [webView _setFindDelegate:findDelegate.get()];
+
+    [webView _findString:@"hello" options:_WKFindOptionsDetermineMatchIndex maxCount:maxCount];
+    Util::run(&isDone);
+    EXPECT_EQ(0, [findDelegate matchIndex]);
+
+    isDone = false;
+    [webView _findString:@"hello" options:_WKFindOptionsDetermineMatchIndex maxCount:maxCount];
+    Util::run(&isDone);
+    EXPECT_EQ(1, [findDelegate matchIndex]);
+
+    isDone = false;
+    [webView _findString:@"hello" options:_WKFindOptionsDetermineMatchIndex maxCount:maxCount];
+    Util::run(&isDone);
+    EXPECT_EQ(2, [findDelegate matchIndex]);
+
+    isDone = false;
+    [webView _findString:@"hello" options:_WKFindOptionsBackwards | _WKFindOptionsDetermineMatchIndex  maxCount:maxCount];
+    Util::run(&isDone);
+    EXPECT_EQ(1, [findDelegate matchIndex]);
+}
+
+TEST(WKWebViewFindString, MatchIndexIsCorrectNavigatingWrapAround)
+{
+    auto findDelegate = adoptNS([[WKWebViewFindStringFindDelegate alloc] init]);
+    auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 300, 200) configuration:configuration.get() addToWindow:YES]);
+    [webView synchronouslyLoadHTMLString:@"<p>hello</p><p>hello</p><p>hello</p>"];
+    [webView _setFindDelegate:findDelegate.get()];
+
+    auto findOptions = _WKFindOptionsWrapAround | _WKFindOptionsDetermineMatchIndex;
+
+    [webView _findString:@"hello" options:findOptions maxCount:maxCount];
+    Util::run(&isDone);
+    EXPECT_EQ(0, [findDelegate matchIndex]);
+
+    isDone = false;
+    [webView _findString:@"hello" options:findOptions maxCount:maxCount];
+    Util::run(&isDone);
+    EXPECT_EQ(1, [findDelegate matchIndex]);
+
+    isDone = false;
+    [webView _findString:@"hello" options:findOptions maxCount:maxCount];
+    Util::run(&isDone);
+    EXPECT_EQ(2, [findDelegate matchIndex]);
+
+    isDone = false;
+    [webView _findString:@"hello" options:findOptions maxCount:maxCount];
+    Util::run(&isDone);
+    EXPECT_EQ(0, [findDelegate matchIndex]);
+}
+
+TEST(WKWebViewFindString, MatchIndexIsCorrectNavigatingWrapAroundBackwards)
+{
+    auto findDelegate = adoptNS([[WKWebViewFindStringFindDelegate alloc] init]);
+    auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 300, 200) configuration:configuration.get() addToWindow:YES]);
+    [webView synchronouslyLoadHTMLString:@"<p>hello</p><p>hello</p><p>hello</p>"];
+    [webView _setFindDelegate:findDelegate.get()];
+
+    auto findOptions = _WKFindOptionsWrapAround | _WKFindOptionsDetermineMatchIndex;
+    auto findOptionsBackwards =  findOptions | _WKFindOptionsBackwards;
+
+    [webView _findString:@"hello" options:findOptions maxCount:maxCount];
+    Util::run(&isDone);
+    EXPECT_EQ(0, [findDelegate matchIndex]);
+
+    isDone = false;
+    [webView _findString:@"hello" options:findOptionsBackwards maxCount:maxCount];
+    Util::run(&isDone);
+    EXPECT_EQ(2, [findDelegate matchIndex]);
+
+    isDone = false;
+    [webView _findString:@"hello" options:findOptionsBackwards maxCount:maxCount];
+    Util::run(&isDone);
+    EXPECT_EQ(1, [findDelegate matchIndex]);
+
+    isDone = false;
+    [webView _findString:@"hello" options:findOptionsBackwards maxCount:maxCount];
+    Util::run(&isDone);
+    EXPECT_EQ(0, [findDelegate matchIndex]);
+}
+
 } // namespace TestWebKitAPI
