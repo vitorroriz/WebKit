@@ -67,6 +67,26 @@ inline bool isValidCustomIdentifier(CSSValueID valueID)
     return !isCSSWideKeyword(valueID) && valueID != CSSValueDefault;
 }
 
+// Unlike CSSPropertyParserHelpers::genericFontFamily, this does not access
+// NeverDestroyed objects that require main-thread access, making it
+// safe to call from OffscreenCanvas workers.
+inline bool isGenericFontFamilyKeyword(CSSValueID valueID)
+{
+    switch (valueID) {
+    case CSSValueSerif:
+    case CSSValueSansSerif:
+    case CSSValueCursive:
+    case CSSValueFantasy:
+    case CSSValueMonospace:
+    case CSSValueSystemUi:
+    case CSSValueWebkitPictograph:
+    case CSSValueMath:
+        return true;
+    default:
+        return false;
+    }
+}
+
 // https://drafts.csswg.org/css-conditional-5/#propdef-container-name
 inline bool isValidContainerNameIdentifier(CSSValueID valueID)
 {

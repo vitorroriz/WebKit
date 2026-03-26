@@ -37,8 +37,10 @@
 #include "ContainerNodeInlines.h"
 #include "CSSFontSelector.h"
 #include "CSSMarkup.h"
+#include "CSSParserIdioms.h"
 #include "CSSPrimitiveNumericTypes+Serialization.h"
 #include "CSSPropertyNames.h"
+#include "CSSPropertyParser.h"
 #include "CSSPropertyParserConsumer+LengthDefinitions.h"
 #include "CSSPropertyParserConsumer+MetaConsumer.h"
 #include "CSSPropertyParserState.h"
@@ -403,7 +405,13 @@ String CanvasRenderingContext2DBase::State::fontString() const
             family = family.substring(8);
 
         auto separator = i ? ", "_s : " "_s;
-        serializedFont.append(separator, serializeFontFamily(family.toString()));
+        auto familyString = family.toString();
+        // Generic font families should be emitted unquoted.
+        auto valueID = cssValueKeywordID(familyString);
+        if (isGenericFontFamilyKeyword(valueID))
+            serializedFont.append(separator, familyString);
+        else
+            serializedFont.append(separator, serializeFontFamily(familyString));
     }
 
     return serializedFont.toString();

@@ -28,6 +28,7 @@
 #include "CSSMarkup.h"
 
 #include "CSSParserIdioms.h"
+#include "CSSPropertyParser.h"
 #include <wtf/HexNumber.h>
 #include <wtf/text/ParsingUtilities.h>
 #include <wtf/text/StringBuilder.h>
@@ -145,7 +146,24 @@ String serializeURL(const String& string)
 
 String serializeFontFamily(const String& string)
 {
-    return isCSSTokenizerIdentifier(string) ? string : serializeString(string);
+    if (!isCSSTokenizerIdentifier(string))
+        return serializeString(string);
+
+    // Font family names that match CSS-wide keywords, 'default', or generic
+    // family keywords must be quoted to prevent confusion with the keywords
+    // of the same names.
+    // https://www.w3.org/TR/css-fonts-4/#family-name-syntax
+    //
+    // Note: system-ui is excluded from quoting because the parser always
+    // stores it as a CSS_FONT_FAMILY string (not a CSSValueID), even when
+    // used as a generic keyword. Since we cannot distinguish the generic
+    // keyword from a quoted family name at this point, and the generic
+    // keyword is the common case, we leave it unquoted.
+    auto valueID = cssValueKeywordID(string);
+    if (valueID != CSSValueSystemUi && (!isValidCustomIdentifier(valueID) || isGenericFontFamilyKeyword(valueID)))
+        return serializeString(string);
+
+    return string;
 }
 
 } // namespace WebCore
