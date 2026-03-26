@@ -118,7 +118,7 @@ void HTMLFrameElementBase::openURL(LockHistory lockHistory, LockBackForwardList 
         }
 
         protect(protectedThis->document())->willLoadFrameElement(completeURL);
-        parentFrame->loader().subframeLoader().requestFrame(*protectedThis, protectedThis->m_frameURL, frameName, lockHistory, lockBackForwardList);
+        parentFrame->loader().subframeLoader().requestFrame(*protectedThis, completeURL.string(), frameName, lockHistory, lockBackForwardList);
     };
 
     document->quirks().triggerOptionalStorageAccessIframeQuirk(completeURL, WTF::move(finishOpeningURL));
