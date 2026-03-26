@@ -44,9 +44,10 @@
 #include "JSDOMPromiseDeferred.h"
 #include "LayoutRect.h"
 #include "Logging.h"
-#include "RenderElementInlines.h"
+#include "PlatformScreen.h"
 #include "PseudoElementRequest.h"
 #include "RenderBoxInlines.h"
+#include "RenderElementInlines.h"
 #include "RenderFragmentedFlow.h"
 #include "RenderInline.h"
 #include "RenderLayer.h"
@@ -465,7 +466,7 @@ static RefPtr<ImageBuffer> snapshotElementVisualOverflowClippedToViewport(LocalF
         return nullptr;
     auto hostWindow = frameView->root() ? protect(frameView->root())->hostWindow() : nullptr;
 
-    auto buffer = ImageBuffer::create(paintRect.size(), RenderingMode::Accelerated, RenderingPurpose::Snapshot, scaleFactor, DestinationColorSpace::SRGB(), PixelFormat::BGRA8, hostWindow);
+    auto buffer = ImageBuffer::create(paintRect.size(), RenderingMode::Accelerated, RenderingPurpose::Snapshot, scaleFactor, screenColorSpace(frameView), PixelFormat::BGRA8, hostWindow);
     if (!buffer)
         return nullptr;
 
