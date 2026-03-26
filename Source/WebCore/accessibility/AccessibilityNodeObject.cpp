@@ -3912,43 +3912,42 @@ String AccessibilityNodeObject::textUnderElement(TextUnderElementMode mode) cons
         }
     };
 
-    auto childIterator = AXChildIterator(*this);
-    for (auto child = childIterator.begin(); child != childIterator.end(); previous = child.ptr(), ++child) {
-        if (mode.ignoredChildNode && child->node() == mode.ignoredChildNode)
-            continue;
+    auto processChild = [&] (AccessibilityObject& child) {
+        if (mode.ignoredChildNode && child.node() == mode.ignoredChildNode)
+            return;
 
         if (mode.isHidden()) {
             // If we are within a hidden context, don't add any text for this node. Instead, fan out downwards
             // to search for un-hidden nodes (e.g. visibility:visible nodes within a visibility:hidden ancestor).
-            appendTextUnderElement(*child);
-            continue;
+            appendTextUnderElement(child);
+            return;
         }
 
-        bool shouldDeriveNameFromAuthor = (mode.childrenInclusion == TextUnderElementMode::Children::IncludeNameFromContentsChildren && !child->accessibleNameDerivesFromContent());
+        bool shouldDeriveNameFromAuthor = (mode.childrenInclusion == TextUnderElementMode::Children::IncludeNameFromContentsChildren && !child.accessibleNameDerivesFromContent());
         if (shouldDeriveNameFromAuthor) {
-            auto nameForNode = accessibleNameForNode(*child->node());
+            auto nameForNode = accessibleNameForNode(*child.node());
             bool nameIsEmpty = nameForNode.isEmpty();
             appendNameToStringBuilder(builder, WTF::move(nameForNode));
             // Separate author-provided text with a space.
             previousRequiresSpace = previousRequiresSpace || !nameIsEmpty;
-            continue;
+            return;
         }
 
-        if (!shouldUseAccessibilityObjectInnerText(*child, mode))
-            continue;
+        if (!shouldUseAccessibilityObjectInnerText(child, mode))
+            return;
 
         // Skip this child if it was already referenced via aria-labelledby by a sibling.
         // This prevents double-counting elements that were already included via labelledby.
-        if (mode.nodesReferencedViaLabeledby && child->node() && mode.nodesReferencedViaLabeledby->contains(child->node()))
-            continue;
+        if (mode.nodesReferencedViaLabeledby && child.node() && mode.nodesReferencedViaLabeledby->contains(child.node()))
+            return;
 
-        if (RefPtr accessibilityNodeObject = dynamicDowncast<AccessibilityNodeObject>(*child)) {
+        if (RefPtr accessibilityNodeObject = dynamicDowncast<AccessibilityNodeObject>(child)) {
             // We should ignore the child if it's labeled by this node.
             // This could happen when this node labels multiple child nodes and we didn't
             // skip in the above ignoredChildNode check.
             auto labeledByElements = accessibilityNodeObject->ariaLabeledByElements();
             if (labeledByElements.containsIf([&](auto& element) { return element.ptr() == node; }))
-                continue;
+                return;
 
             Vector<AccessibilityText> textOrder;
             accessibilityNodeObject->alternativeText(textOrder);
@@ -3962,11 +3961,67 @@ String AccessibilityNodeObject::textUnderElement(TextUnderElementMode mode) cons
                 appendNameToStringBuilder(builder, WTF::move(textOrder[0].text));
                 // Alternative text (e.g. from aria-label, aria-labelledby, alt, etc) requires space separation.
                 previousRequiresSpace = true;
-                continue;
+                return;
             }
         }
 
-        appendTextUnderElement(*child);
+        appendTextUnderElement(child);
+    };
+
+    auto childIterator = AXChildIterator(*this);
+    for (auto child = childIterator.begin(); child != childIterator.end(); previous = child.ptr(), ++child) {
+        // Skip children that are aria-owned by another element, as they should
+        // contribute to the owning element's name, not this DOM parent's name.
+        // Only skip if the owner is not hidden, as per the ARIA spec, aria-owns must
+        // not be resolved when set on an element excluded from the accessibility tree.
+        auto owners = child->owners();
+        if (owners.size()) {
+            bool isOwnedByOtherObject = false;
+            for (const auto& owner : owners) {
+                if (owner.ptr() == this)
+                    continue;
+                Ref ownerObject = downcast<AccessibilityObject>(owner.get());
+                if (!ownerObject->isHidden()) {
+                    isOwnedByOtherObject = true;
+                    break;
+                }
+            }
+
+            if (isOwnedByOtherObject)
+                continue;
+        }
+
+        processChild(*child);
+    }
+
+    // Include children that this element owns via aria-owns. These are not in
+    // the DOM subtree, so AXChildIterator won't find them. Only do this if this
+    // element is not hidden, as aria-owns must not be resolved when set on an
+    // element excluded from the accessibility tree.
+    if (!mode.inHiddenSubtree) {
+        auto ownedChildren = ownedObjects();
+        if (ownedChildren.size()) {
+            // Owned children come from different DOM subtrees, so they need
+            // explicit space separation from preceding content (CSS whitespace
+            // collapsing may strip leading spaces from owned text since it's
+            // rendered in a different context).
+            if (builder.length())
+                previousRequiresSpace = true;
+
+            for (const auto& ownedChild : ownedChildren) {
+                Ref child = downcast<AccessibilityObject>(ownedChild.get());
+                // Per the ARIA spec, aria-owns must not be resolved when it
+                // references an element that is, or has a DOM ancestor that is,
+                // hidden from all users (e.g. display:none via the hidden attribute).
+                // Assume that elements without renderers that are ignored are hidden.
+                // Elements without renderers that are not ignored have legitimate reasons
+                // for lacking a renderer (e.g. display:contents, canvas fallback content).
+                if (!child->renderer() && child->isIgnored())
+                    continue;
+                processChild(child);
+                previous = child.ptr();
+            }
+        }
     }
 
     auto result = builder.toString();
