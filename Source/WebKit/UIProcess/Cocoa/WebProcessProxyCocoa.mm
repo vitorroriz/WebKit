@@ -142,7 +142,7 @@ const Vector<String>& WebProcessProxy::mediaMIMETypes()
 
 void WebProcessProxy::cacheMediaSourceTypeSupported(const String& type, bool isSupported)
 {
-    processPool().cacheMediaSourceTypeSupported(type, isSupported);
+    protect(processPool())->cacheMediaSourceTypeSupported(type, isSupported);
 }
 
 #if ENABLE(REMOTE_INSPECTOR)

@@ -571,7 +571,7 @@ void WebProcess::platformInitializeWebProcess(WebProcessCreationParameters& para
     if (!parameters.mediaMIMETypes.isEmpty())
         setMediaMIMETypes(parameters.mediaMIMETypes);
     else {
-        AVAssetMIMETypeCache::singleton().setCacheMIMETypesCallback([connection = parentProcessConnection()](const Vector<String>& types) {
+        AVAssetMIMETypeCache::singleton().setCacheMIMETypesCallback([connection = protect(parentProcessConnection())](const Vector<String>& types) {
             connection->send(Messages::WebProcessProxy::CacheMediaMIMETypes(types), 0);
         });
     }
@@ -581,7 +581,7 @@ void WebProcess::platformInitializeWebProcess(WebProcessCreationParameters& para
     if (!parameters.mediaSourceTypesSupported.isEmpty())
         MediaSourceTypeSupportedCache::singleton().initialize(WTF::move(parameters.mediaSourceTypesSupported));
 
-    MediaSourceTypeSupportedCache::singleton().setCacheUpdateCallback([connection = parentProcessConnection()](const String& type, bool isSupported) {
+    MediaSourceTypeSupportedCache::singleton().setCacheUpdateCallback([connection = protect(parentProcessConnection())](const String& type, bool isSupported) {
         connection->send(Messages::WebProcessProxy::CacheMediaSourceTypeSupported(type, isSupported), 0);
     });
 #endif
