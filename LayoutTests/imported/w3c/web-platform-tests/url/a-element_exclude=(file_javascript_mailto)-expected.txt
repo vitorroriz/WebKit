@@ -487,11 +487,14 @@ PASS Parsing: <http://0xffffffff> against <http://other.com/>
 PASS Parsing: <http://0xffffffff1> against <http://other.com/>
 PASS Parsing: <http://256.256.256.256> against <http://other.com/>
 PASS Parsing: <https://0x.0x.0> against <about:blank>
+PASS Parsing: <https://0x.0x.0x.0x> against <about:blank>
+PASS Parsing: <https://00.00.00.00> against <about:blank>
 PASS Parsing: <https://0x100000000/test> against <about:blank>
 PASS Parsing: <https://256.0.0.1/test> against <about:blank>
 PASS Parsing: <https://%43%7C/> against <about:blank>
 PASS Parsing: <asdf://%43|/> against <about:blank>
 PASS Parsing: <asdf://%43%7C/> against <about:blank>
+PASS Parsing: <..> against <abc://x/y/z/C:/>
 PASS Parsing: <\\\.\Y:> against <about:blank>
 PASS Parsing: <\\\.\y:> against <about:blank>
 PASS Parsing: <http://[1:0::]> against <http://example.net/>
@@ -722,5 +725,11 @@ PASS Parsing: <non-special:\/opaque> against <about:blank>
 PASS Parsing: <non-special:/\path> against <about:blank>
 PASS Parsing: <non-special://host\a> against <about:blank>
 PASS Parsing: <non-special://host/a\b> against <about:blank>
+PASS Parsing: <data:text/plain,test#<foo> <bar>> against <about:blank>
+PASS Parsing: <about:blank#<foo> <bar>> against <about:blank>
+PASS Parsing: <data:text/plain,test#\0	
+\r !"#$%&'()*+,-./09:;<=>?@AZ[\]^_`az{|}~Éé> against <about:blank>
+PASS Parsing: <about:blank#\0	
+\r !"#$%&'()*+,-./09:;<=>?@AZ[\]^_`az{|}~Éé> against <about:blank>
 PASS Parsing: <http://example.com/U+d800𐟾U+dfff﷐﷏﷯ﷰ￾￿?U+d800𐟾U+dfff﷐﷏﷯ﷰ￾￿> against <about:blank>
 Link with embedded \n is parsed correctly
