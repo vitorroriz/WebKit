@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <JavaScriptCore/Forward.h>
 #include <WebCore/FloatRect.h>
 #include <WebCore/ImageBuffer.h>
 #include <WebCore/IntRect.h>
