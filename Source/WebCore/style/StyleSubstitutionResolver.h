@@ -59,6 +59,12 @@ private:
     bool substituteAttrFunction(CSSParserTokenRange, Vector<CSSParserToken>&, const CSSParserContext&);
     bool substituteInternalAutoBaseFunction(CSSParserTokenRange, Vector<CSSParserToken>&, const CSSParserContext&);
 
+    struct AttrArgumentGrammarSubstitution {
+        Vector<CSSParserToken> firstArg;
+        std::optional<CSSParserTokenRange> fallbackRange;
+    };
+    std::optional<AttrArgumentGrammarSubstitution> substituteAttrArgumentGrammar(CSSParserTokenRange, const CSSParserContext&);
+
     enum class FallbackResult : uint8_t { None, Valid, Invalid };
     std::pair<FallbackResult, Vector<CSSParserToken>> substituteVariableFallback(const AtomString& variableName, CSSParserTokenRange, CSSValueID functionId, const CSSParserContext&);
 

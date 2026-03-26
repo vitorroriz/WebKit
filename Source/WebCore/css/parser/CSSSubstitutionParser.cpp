@@ -242,57 +242,29 @@ bool isValidDashedFunction(CSSParserTokenRange range, const CSSParserContext& pa
 }
 
 // https://drafts.csswg.org/css-values-5/#funcdef-attr
-// <attr()>    = attr( <attr-name> <attr-type>? , <declaration-value>?)
-// <attr-name> = [ <ident-token> '|' ]? <ident-token>
-// <attr-type> = type( <syntax> ) | raw-string | number | <attr-unit>
+// <attr-args> = attr( <declaration-value>, <declaration-value>? )
+// Validate using the argument grammar. Detailed parsing of <attr-name> <attr-type>?
+// happens at substitution time.
 bool isValidAttrReference(CSSParserTokenRange range, const CSSParserContext& parserContext)
 {
     range.consumeWhitespace();
 
-    // Consume <attr-name>.
-    if (range.peek().type() != IdentToken)
+    // Split at the first literal comma into two arguments.
+    auto firstArgStart = range;
+    while (!range.atEnd() && range.peek().type() != CommaToken)
+        range.consumeComponentValue();
+    auto firstArgRange = firstArgStart.rangeUntil(range);
+
+    // The first arg (<declaration-value>) must be non-empty.
+    if (firstArgRange.atEnd())
         return false;
-    range.consumeIncludingWhitespace();
 
-    if (range.atEnd())
-        return true;
-
-    auto consumeAttrType = [&] {
-        // type( <syntax> )
-        if (range.peek().type() == FunctionToken)
-            return !!CSSCustomPropertySyntax::consumeType(range);
-
-        if (range.peek().type() == IdentToken) {
-            auto value = range.peek().value();
-            if (!equalLettersIgnoringASCIICase(value, "raw-string"_s)
-                && !equalLettersIgnoringASCIICase(value, "number"_s)
-                && CSSParserToken::stringToUnitType(value) == CSSUnitType::CSS_UNKNOWN)
-                return false;
-            range.consumeIncludingWhitespace();
-            return true;
-        }
-
-        // <attr-unit>: the % delimiter.
-        if (range.peek().type() == DelimiterToken && range.peek().delimiter() == '%') {
-            range.consumeIncludingWhitespace();
-            return true;
-        }
-
+    if (!classifyBlock(firstArgRange, parserContext))
         return false;
-    };
 
-    // Consume optional <attr-type>.
-    if (range.peek().type() != CommaToken) {
-        if (!consumeAttrType())
-            return false;
-    }
-
-    if (range.atEnd())
-        return true;
-
-    // Consume optional comma and fallback <declaration-value>.
+    // Optional second arg (fallback).
     if (!CSSPropertyParserHelpers::consumeCommaIncludingWhitespace(range))
-        return false;
+        return range.atEnd();
     if (range.atEnd())
         return true;
 

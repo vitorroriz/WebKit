@@ -4429,6 +4429,7 @@ imported/w3c/web-platform-tests/css/css-values/viewport-units-scrollbars-dynamic
 imported/w3c/web-platform-tests/css/css-values/viewport-units-scrollbars-scroll-vw-002.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-values/attr-namespace-non-existing.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-values/attr-namespace-valid.xhtml [ ImageOnlyFailure ]
+imported/w3c/web-platform-tests/css/css-values/attr-namespace-wildcard.html [ ImageOnlyFailure ]
 
 # wpt css-sizing failures
 webkit.org/b/308648 imported/w3c/web-platform-tests/css/css-sizing/abspos-auto-sizing-fit-content-percentage-005.html [ ImageOnlyFailure ]

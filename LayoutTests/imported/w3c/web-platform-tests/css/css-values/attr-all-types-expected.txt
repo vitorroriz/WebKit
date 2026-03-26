@@ -40,7 +40,7 @@ PASS CSS Values and Units Test: attr 36
 PASS CSS Values and Units Test: attr 37
 PASS CSS Values and Units Test: attr 38
 PASS CSS Values and Units Test: attr 39
-FAIL CSS Values and Units Test: attr 40 assert_equals: Value 'attr(data-foo type(<number>))', where 'data-foo=attr(data-bar type(<number>) 3)' should be valid for the property 'font-weight'. expected "400" but got "3"
+PASS CSS Values and Units Test: attr 40
 PASS CSS Values and Units Test: attr 41
 PASS CSS Values and Units Test: attr 42
 PASS CSS Values and Units Test: attr 43

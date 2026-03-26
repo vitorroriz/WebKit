@@ -171,16 +171,46 @@ bool SubstitutionResolver::substituteDashedFunction(StringView functionName, CSS
     return true;
 }
 
-bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vector<CSSParserToken>& tokens, const CSSParserContext& context)
+auto SubstitutionResolver::substituteAttrArgumentGrammar(CSSParserTokenRange range, const CSSParserContext& context) -> std::optional<AttrArgumentGrammarSubstitution>
 {
-    // https://drafts.csswg.org/css-values-5/#funcdef-attr
-    // attr( <attr-name> <attr-type>? , <declaration-value>?)
+    // https://drafts.csswg.org/css-values-5/#argument-grammars
+    // <attr-args> = attr( <declaration-value>, <declaration-value>? )
+    // Splits at the first literal comma and substitutes the first argument.
 
     range.consumeWhitespace();
+
+    auto start = range;
+    while (!range.atEnd() && range.peek().type() != CommaToken)
+        range.consumeComponentValue();
+    auto firstArgRange = start.rangeUntil(range);
+
+    std::optional<CSSParserTokenRange> fallbackRange;
+    if (CSSPropertyParserHelpers::consumeCommaIncludingWhitespace(range))
+        fallbackRange = range;
+
+    auto substitutedFirstArg = substituteTokenRange(firstArgRange, context);
+    if (!substitutedFirstArg)
+        return { };
+
+    return AttrArgumentGrammarSubstitution { WTF::move(*substitutedFirstArg), fallbackRange };
+}
+
+bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange argumentsRange, Vector<CSSParserToken>& tokens, const CSSParserContext& context)
+{
+    // https://drafts.csswg.org/css-values-5/#funcdef-attr
+
+    // <attr-args> = attr( <declaration-value>, <declaration-value>? )
+    auto attrArgs = substituteAttrArgumentGrammar(argumentsRange, context);
+    if (!attrArgs)
+        return false;
+
+    // attr() = attr( <attr-name> <attr-type>? , <declaration-value>?)
+    auto range = CSSParserTokenRange { attrArgs->firstArg };
 
     if (range.peek().type() != IdentToken)
         return false;
 
+    // Consume <attr-name>
     auto attributeName = range.consumeIncludingWhitespace().value().toAtomString();
 
     // Consume optional <attr-type>.
@@ -227,18 +257,14 @@ bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vec
     };
 
     std::optional<AttrTypeResult> parsedAttrType;
-    if (!range.atEnd() && range.peek().type() != CommaToken) {
+    if (!range.atEnd()) {
         parsedAttrType = consumeAttrType();
         if (!parsedAttrType)
             return false;
     }
 
-    auto consumeFallbackRange = [&]() -> std::optional<CSSParserTokenRange> {
-        if (range.atEnd() || !CSSPropertyParserHelpers::consumeCommaIncludingWhitespace(range))
-            return std::nullopt;
-        return range;
-    };
-    auto fallbackRange = consumeFallbackRange();
+    if (!range.atEnd())
+        return false;
 
     m_styleBuilder.state().registerSubstitutionAttribute(attributeName);
     protect(m_styleBuilder.state().style())->setHasAttrContent();
@@ -250,23 +276,23 @@ bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vec
     auto& attributeValue = element->getAttribute(QualifiedName { nullAtom(), attributeName, nullAtom() });
 
     // Check if this attribute is already being substituted (cycle detection).
-    auto isNewEntry = m_styleBuilder.state().m_inProgressAttrAttributes.add(attributeName).isNewEntry;
+    auto isInCycle = !m_styleBuilder.state().m_inProgressAttrAttributes.add(attributeName).isNewEntry;
     auto removeOnExit = makeScopeExit([&] {
-        if (isNewEntry)
+        if (!isInCycle)
             m_styleBuilder.state().m_inProgressAttrAttributes.remove(attributeName);
     });
 
     // Resolve fallback lazily to avoid var() cycle detection side effects during primary resolution.
     auto resolveFallback = [&]() -> std::optional<Vector<CSSParserToken>> {
-        if (!fallbackRange)
-            return std::nullopt;
-        return substituteTokenRange(*fallbackRange, context);
+        if (!attrArgs->fallbackRange)
+            return { };
+        return substituteTokenRange(*attrArgs->fallbackRange, context);
     };
 
     // https://drafts.csswg.org/css-values-5/#replace-an-attr-function
     auto substituteFailure = [&]() -> bool {
         // "If second arg is null, and syntax was omitted, return an empty CSS <string>."
-        if (!fallbackRange && !parsedAttrType) {
+        if (!attrArgs->fallbackRange && !parsedAttrType) {
             tokens.append(CSSParserToken(StringToken, emptyAtom()));
             return true;
         }
@@ -279,8 +305,7 @@ bool SubstitutionResolver::substituteAttrFunction(CSSParserTokenRange range, Vec
         return true;
     };
 
-    // Cycle detected.
-    if (!isNewEntry) {
+    if (isInCycle) {
         // Mark as in-cycle within attr() type() context for transitive detection.
         if (m_isInAttrTypeSyntax)
             m_styleBuilder.state().m_inCycleAttrAttributes.add(attributeName);
