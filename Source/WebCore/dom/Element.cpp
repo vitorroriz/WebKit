@@ -4565,8 +4565,8 @@ void Element::addToTopLayer()
     RELEASE_ASSERT(isConnected());
     ScriptDisallowedScope::InMainThread scriptDisallowedScope;
 
-    if (auto* renderer = dynamicDowncast<RenderLayerModelObject>(this->renderer()); renderer && renderer->layer())
-        renderer->layer()->establishesTopLayerWillChange();
+    if (CheckedPtr renderer = dynamicDowncast<RenderLayerModelObject>(this->renderer()); renderer && renderer->layer())
+        protect(renderer->layer())->establishesTopLayerWillChange();
 
     Ref document = this->document();
     document->addTopLayerElement(*this);
@@ -4595,8 +4595,8 @@ void Element::removeFromTopLayer()
     RELEASE_ASSERT(isInTopLayer());
     ScriptDisallowedScope::InMainThread scriptDisallowedScope;
 
-    if (auto* renderer = dynamicDowncast<RenderLayerModelObject>(this->renderer()); renderer && renderer->layer())
-        renderer->layer()->establishesTopLayerWillChange();
+    if (CheckedPtr renderer = dynamicDowncast<RenderLayerModelObject>(this->renderer()); renderer && renderer->layer())
+        protect(renderer->layer())->establishesTopLayerWillChange();
 
     // We need to call Styleable::fromRenderer() while this element is still contained in
     // Document::topLayerElements(), since Styleable::fromRenderer() relies on this to
