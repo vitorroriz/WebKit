@@ -263,15 +263,14 @@ static inline bool NODELETE isTableCellAncestor(const Element& element)
     return element.hasTagName(theadTag)
         || element.hasTagName(tbodyTag)
         || element.hasTagName(tfootTag)
-        || element.hasTagName(trTag)
-        || element.hasTagName(thTag);
+        || element.hasTagName(trTag);
 }
 
 static bool setTableCellsChanged(Element& element)
 {
     bool cellChanged = false;
 
-    if (element.hasTagName(tdTag))
+    if (element.hasTagName(tdTag) || element.hasTagName(thTag))
         cellChanged = true;
     else if (isTableCellAncestor(element)) {
         for (auto& child : childrenOfType<Element>(element))
