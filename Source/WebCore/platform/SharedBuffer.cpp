@@ -743,13 +743,16 @@ Ref<SharedBuffer> SharedBufferDataView::createSharedBuffer() const
 RefPtr<SharedBuffer> utf8Buffer(const String& string)
 {
     // Allocate a buffer big enough to hold all the characters.
+    // 8-bit (Latin1) characters expand to at most 2 UTF-8 bytes.
+    // 16-bit characters expand to at most 3 UTF-8 bytes.
     const size_t length = string.length();
+    const size_t maxExpansion = string.is8Bit() ? 2 : 3;
     if constexpr (String::MaxLength > std::numeric_limits<size_t>::max() / 3) {
-        if (length > std::numeric_limits<size_t>::max() / 3)
+        if (length > std::numeric_limits<size_t>::max() / maxExpansion)
             return nullptr;
     }
 
-    Vector<uint8_t> buffer(length * 3);
+    Vector<uint8_t> buffer(length * maxExpansion);
     WTF::Unicode::ConversionResult<char8_t> result;
     if (length) {
         if (string.is8Bit())
