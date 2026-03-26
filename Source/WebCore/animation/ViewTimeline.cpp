@@ -40,7 +40,7 @@
 #include "RenderSVGModelObject.h"
 #include "ScrollAnchoringController.h"
 #include "ScrollingConstraints.h"
-#include "StylableInlines.h"
+#include "StyleableInlines.h"
 #include "StyleLengthWrapper+DeprecatedCSSValueConversion.h"
 #include "StylePrimitiveKeyword+Logging.h"
 #include "StylePrimitiveNumericTypes+Evaluation.h"

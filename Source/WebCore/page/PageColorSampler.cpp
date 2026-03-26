@@ -53,7 +53,7 @@
 #include "RenderObjectInlines.h"
 #include "RenderStyle+GettersInlines.h"
 #include "Settings.h"
-#include "StylableInlines.h"
+#include "StyleableInlines.h"
 #include "WebAnimation.h"
 #include <ranges>
 #include <wtf/HashCountedSet.h>

@@ -69,7 +69,7 @@
 #include "SVGURIReference.h"
 #include "Settings.h"
 #include "ShadowRoot.h"
-#include "StylableInlines.h"
+#include "StyleableInlines.h"
 #include "StyleContainmentCheckerInlines.h"
 #include "StyleComputedStyle+InitialInlines.h"
 #include "StyleFontSizeFunctions.h"

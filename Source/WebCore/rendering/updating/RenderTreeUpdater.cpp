@@ -59,7 +59,7 @@
 #include "RenderView.h"
 #include "SVGElement.h"
 #include "Settings.h"
-#include "StylableInlines.h"
+#include "StyleableInlines.h"
 #include "StyleResolver.h"
 #include "StyleTreeResolver.h"
 #include "TextManipulationController.h"
