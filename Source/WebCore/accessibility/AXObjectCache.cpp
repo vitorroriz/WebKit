@@ -6152,7 +6152,7 @@ void AXObjectCache::updateRelationsForTree(ContainerNode& rootNode)
 
         if (RefPtr shadowRoot = element->shadowRoot(); shadowRoot && shadowRoot->mode() != ShadowRootMode::UserAgent)
             updateRelationsForTree(*shadowRoot);
-        if (RefPtr frameOwnerElement = dynamicDowncast<HTMLFrameOwnerElement>(element.get())) {
+        if (auto* frameOwnerElement = dynamicDowncast<HTMLFrameOwnerElement>(element.get())) {
             if (RefPtr document = frameOwnerElement->contentDocument())
                 updateRelationsForTree(*document);
         }

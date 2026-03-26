@@ -3391,7 +3391,7 @@ bool Document::isInStyleInterleavedLayoutForSelfOrAncestor() const
 {
     if (isInStyleInterleavedLayout())
         return true;
-    if (RefPtr owner = ownerElement())
+    if (auto* owner = ownerElement())
         return owner->document().isInStyleInterleavedLayoutForSelfOrAncestor();
     return false;
 }
@@ -3841,7 +3841,7 @@ AXObjectCache* Document::axObjectCache() const
 void Document::setVisuallyOrdered()
 {
     m_visuallyOrdered = true;
-    if (CheckedPtr renderView = this->renderView())
+    if (auto* renderView = this->renderView())
         renderView->mutableStyle().setRTLOrdering(Order::Visual);
 }
 

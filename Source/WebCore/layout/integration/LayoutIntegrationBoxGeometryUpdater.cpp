@@ -137,8 +137,8 @@ static inline void adjustBorderForTableAndFieldset(const RenderBoxModelObject& r
     if (renderer.isFieldset()) {
         auto adjustment = downcast<RenderBlock>(renderer).intrinsicBorderForFieldset();
         // Note that this adjustment is coming from _inside_ the fieldset so its own flow direction is what is relevant here.
-        CheckedRef style = renderer.style();
-        switch (style->writingMode().blockDirection()) {
+        auto& style = renderer.style();
+        switch (style.writingMode().blockDirection()) {
         case FlowDirection::TopToBottom:
             borderWidths.top() += adjustment;
             break;

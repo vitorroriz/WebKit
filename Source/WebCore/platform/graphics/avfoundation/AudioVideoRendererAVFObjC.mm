@@ -143,7 +143,7 @@ AudioVideoRendererAVFObjC::~AudioVideoRendererAVFObjC()
 void AudioVideoRendererAVFObjC::setPreferences(VideoRendererPreferences preferences)
 {
     m_preferences = preferences;
-    if (RefPtr videoRenderer = m_videoRenderer)
+    if (auto* videoRenderer = m_videoRenderer.get())
         videoRenderer->setPreferences(preferences);
 }
 

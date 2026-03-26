@@ -1307,7 +1307,7 @@ bool RenderTheme::isSpinUpButtonPartHovered(const RenderElement& renderer) const
 
 bool RenderTheme::isPresenting(const RenderElement& renderer) const
 {
-    RefPtr input = dynamicDowncast<HTMLInputElement>(renderer.element());
+    auto* input = dynamicDowncast<HTMLInputElement>(renderer.element());
     return input && input->isPresentingAttachedView();
 }
 

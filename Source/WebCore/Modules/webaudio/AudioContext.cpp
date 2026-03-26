@@ -541,7 +541,7 @@ void AudioContext::didReceiveRemoteControlCommand(PlatformMediaSession::RemoteCo
 
 std::optional<MediaSessionGroupIdentifier> AudioContext::mediaSessionGroupIdentifier() const
 {
-    RefPtr document = this->document();
+    auto* document = this->document();
     return document && document->page() ? document->page()->mediaSessionGroupIdentifier() : std::nullopt;
 }
 

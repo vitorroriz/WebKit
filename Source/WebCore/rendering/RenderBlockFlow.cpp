@@ -4045,7 +4045,7 @@ static void setFullRepaintOnParentInlineBoxLayerIfNeeded(const RenderText& rende
     // Here we mark the parent inline box's layer dirty to trigger repaint at (#2).
     if (!renderer.needsLayout())
         return;
-    CheckedPtr parent = renderer.parent();
+    auto* parent = renderer.parent();
     if (!parent) {
         ASSERT_NOT_REACHED();
         return;

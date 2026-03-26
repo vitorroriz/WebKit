@@ -180,7 +180,7 @@ PeerConnectionBackend::PeerConnectionBackend(RTCPeerConnection& peerConnection)
 {
 #if USE(LIBWEBRTC)
     RefPtr document = peerConnection.document();
-    if (RefPtr page = document ? document->page() : nullptr)
+    if (auto* page = document ? document->page() : nullptr)
         m_shouldFilterICECandidates = page->webRTCProvider().isSupportingMDNS();
 #endif
 

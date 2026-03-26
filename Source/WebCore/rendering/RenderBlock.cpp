@@ -1281,7 +1281,7 @@ bool RenderBlock::establishesIndependentFormattingContext() const
         if (!style.gridTemplateColumns().subgrid && !style.gridTemplateRows().subgrid)
             return true;
         // Masonry makes grid items not subgrids.
-        if (CheckedPtr parentGridBox = dynamicDowncast<RenderGrid>(parent()))
+        if (auto* parentGridBox = dynamicDowncast<RenderGrid>(parent()))
             return parentGridBox->isMasonry();
     }
 
