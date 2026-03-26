@@ -154,6 +154,9 @@ class BenchmarkRunner(object):
     def _construct_subtest_url(self, subtests):
         if not subtests or not isinstance(subtests, collections.abc.Mapping) or 'subtest_url_format' not in self._plan:
             return ''
+        # As subtest URLs are concatenated directly, the format must account for this.
+        # MotionMark and JetStream start with '&', while Speedometer uses ',' separated values.
+        # If new plans are added, they must take this into account.
         subtest_url = ''
         for suite, tests in subtests.items():
             for test in tests:
