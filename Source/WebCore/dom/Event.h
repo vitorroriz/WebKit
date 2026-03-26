@@ -223,7 +223,7 @@ inline void Event::setCancelBubble(bool cancel)
         m_propagationStopped = true;
 }
 
-WTF::TextStream& operator<<(WTF::TextStream&, const Event&);
+WEBCORE_EXPORT WTF::TextStream& operator<<(WTF::TextStream&, const Event&);
 
 } // namespace WebCore
 
