@@ -397,8 +397,9 @@ public:
     bool isBackground() const { return !!m_backgroundToken; }
 
 #if PLATFORM(COCOA)
-    Vector<String> mediaMIMETypes() const;
+    static const Vector<String>& mediaMIMETypes();
     void cacheMediaMIMETypes(const Vector<String>&);
+    void cacheMediaSourceTypeSupported(const String& type, bool isSupported);
 #endif
 
 #if HAVE(DISPLAY_LINK)

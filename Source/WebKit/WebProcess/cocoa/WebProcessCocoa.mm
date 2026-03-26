@@ -61,6 +61,7 @@
 #import <JavaScriptCore/ConfigFile.h>
 #import <JavaScriptCore/Options.h>
 #import <WebCore/AVAssetMIMETypeCache.h>
+#import <WebCore/MediaSourceTypeSupportedCache.h>
 #import <algorithm>
 #import <pal/spi/cf/VideoToolboxSPI.h>
 #import <pal/spi/cg/ImageIOSPI.h>
@@ -556,13 +557,24 @@ void WebProcess::platformInitializeWebProcess(WebProcessCreationParameters& para
     pthread_set_fixedpriority_self();
 #endif
 
+    ASSERT(parentProcessConnection());
     if (!parameters.mediaMIMETypes.isEmpty())
         setMediaMIMETypes(parameters.mediaMIMETypes);
     else {
-        AVAssetMIMETypeCache::singleton().setCacheMIMETypesCallback([protectedThis = Ref { *this }](const Vector<String>& types) {
-            protect(protectedThis->parentProcessConnection())->send(Messages::WebProcessProxy::CacheMediaMIMETypes(types), 0);
+        AVAssetMIMETypeCache::singleton().setCacheMIMETypesCallback([connection = parentProcessConnection()](const Vector<String>& types) {
+            connection->send(Messages::WebProcessProxy::CacheMediaMIMETypes(types), 0);
         });
     }
+    ASSERT(parentProcessConnection());
+
+#if ENABLE(MEDIA_SOURCE)
+    if (!parameters.mediaSourceTypesSupported.isEmpty())
+        MediaSourceTypeSupportedCache::singleton().initialize(WTF::move(parameters.mediaSourceTypesSupported));
+
+    MediaSourceTypeSupportedCache::singleton().setCacheUpdateCallback([connection = parentProcessConnection()](const String& type, bool isSupported) {
+        connection->send(Messages::WebProcessProxy::CacheMediaSourceTypeSupported(type, isSupported), 0);
+    });
+#endif
 
     WebCore::setScreenProperties(parameters.screenProperties);
 

@@ -39,6 +39,7 @@
 #include "AudioTrackPrivate.h"
 #include "ContentType.h"
 #include "ContentTypeUtilities.h"
+#include "MediaSourceTypeSupportedCache.h"
 #include "ContextDestructionObserverInlines.h"
 #include "DocumentQuirks.h"
 #include "Event.h"
@@ -1188,15 +1189,24 @@ bool MediaSource::isTypeSupported(ScriptExecutionContext& context, const String&
         parameters.allowedMediaCaptionFormatTypes = document->settings().allowedMediaCaptionFormatTypes();
     }
 
+    auto& cache = MediaSourceTypeSupportedCache::singleton();
+    if (auto cached = cache.lookup(contentType.raw()))
+        return *cached;
+
     MediaPlayer::SupportsType supported;
     callOnMainThreadAndWait([&] {
         supported = MediaPlayer::supportsType(parameters);
     });
 
+    bool isSupported;
     if (codecs.isEmpty())
-        return supported != MediaPlayer::SupportsType::IsNotSupported;
+        isSupported = supported != MediaPlayer::SupportsType::IsNotSupported;
+    else
+        isSupported = supported == MediaPlayer::SupportsType::IsSupported;
 
-    return supported == MediaPlayer::SupportsType::IsSupported;
+    cache.store(contentType.raw(), isSupported);
+
+    return isSupported;
 }
 
 bool MediaSource::isOpen() const

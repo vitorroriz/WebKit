@@ -135,9 +135,14 @@ void WebProcessProxy::cacheMediaMIMETypesInternal(const Vector<String>& types)
     send(Messages::WebProcess::SetMediaMIMETypes(types), 0);
 }
 
-Vector<String> WebProcessProxy::mediaMIMETypes() const
+const Vector<String>& WebProcessProxy::mediaMIMETypes()
 {
     return mediaTypeCache();
+}
+
+void WebProcessProxy::cacheMediaSourceTypeSupported(const String& type, bool isSupported)
+{
+    processPool().cacheMediaSourceTypeSupported(type, isSupported);
 }
 
 #if ENABLE(REMOTE_INSPECTOR)

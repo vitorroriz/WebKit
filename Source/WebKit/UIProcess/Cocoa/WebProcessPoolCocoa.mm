@@ -375,9 +375,15 @@ void WebProcessPool::platformResolvePathsForSandboxExtensions()
     m_resolvedPaths.uiProcessBundleResourcePath = resolvePathForSandboxExtension(String { [[NSBundle mainBundle] resourcePath] });
 }
 
+void WebProcessPool::cacheMediaSourceTypeSupported(const String& type, bool isSupported)
+{
+    m_mediaSourceTypesSupported.add(type, isSupported);
+}
+
 void WebProcessPool::platformInitializeWebProcess(const WebProcessProxy& process, WebProcessCreationParameters& parameters)
 {
     parameters.mediaMIMETypes = process.mediaMIMETypes();
+    parameters.mediaSourceTypesSupported = m_mediaSourceTypesSupported;
 
 #if PLATFORM(MAC)
 ALLOW_DEPRECATED_DECLARATIONS_BEGIN
