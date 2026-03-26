@@ -248,7 +248,7 @@ sub main() {
             printLine($line, $target, $project, STYLE_PLAIN);
         } elsif ($line =~ /compile-sandbox.sh\s+(\S+)/) {
             printLine("compile-sandbox.sh ".$1, $target, $project, STYLE_PLAIN);
-        } elsif ($line =~ /^Scripts\/generate-unified-source-bundles.rb/) {
+        } elsif ($line =~ /^Scripts\/generate-unified-source-bundles.py/) {
             printLine("Generating unified sources", $target, $project, STYLE_PLAIN);
         } elsif ($line =~ /^ruby JavaScriptCore\/generator\/main.rb JavaScriptCore\/bytecode\/BytecodeList.rb.*/) {
             printLine("Generating bytecode list", $target, $project, STYLE_PLAIN);

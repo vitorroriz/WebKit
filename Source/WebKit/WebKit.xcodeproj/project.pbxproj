@@ -20399,7 +20399,7 @@
 				"$(SRCROOT)/SourcesCocoa.txt",
 				"$(SRCROOT)/Platform/Sources.txt",
 				"$(SRCROOT)/Platform/SourcesCocoa.txt",
-				"$(BUILT_PRODUCTS_DIR)$(WK_LIBRARY_HEADERS_FOLDER_PATH)/wtf/Scripts/generate-unified-source-bundles.rb",
+				"$(BUILT_PRODUCTS_DIR)$(WK_LIBRARY_HEADERS_FOLDER_PATH)/wtf/Scripts/generate-unified-source-bundles.py",
 			);
 			name = "Generate Unified Sources";
 			outputFileListPaths = (
