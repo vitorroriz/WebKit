@@ -36,14 +36,14 @@ import WebKit
 @objc
 @implementation
 extension WKBridgeVertexAttributeFormat {
-    let semantic: Int
-    let format: UInt
+    let semantic: WKBridgeVertexSemantic
+    let format: MTLVertexFormat
     let layoutIndex: Int
     let offset: Int
 
     init(
-        semantic: Int,
-        format: UInt,
+        semantic: WKBridgeVertexSemantic,
+        format: MTLVertexFormat,
         layoutIndex: Int,
         offset: Int
     ) {
@@ -558,22 +558,22 @@ private func toDataArray<T>(_ input: [[T]]) -> [Data] {
     input.map { toData($0) }
 }
 
-private func convertSemantic(_ semantic: LowLevelMesh.VertexSemantic) -> Int {
+private func convertSemantic(_ semantic: LowLevelMesh.VertexSemantic) -> WKBridgeVertexSemantic {
     switch semantic {
-    case .position: 0
-    case .color: 1
-    case .normal: 2
-    case .tangent: 3
-    case .bitangent: 4
-    case .uv0: 5
-    case .uv1: 6
-    case .uv2: 7
-    case .uv3: 8
-    case .uv4: 9
-    case .uv5: 10
-    case .uv6: 11
-    case .uv7: 12
-    default: 13
+    case .position: .position
+    case .color: .color
+    case .normal: .normal
+    case .tangent: .tangent
+    case .bitangent: .bitangent
+    case .uv0: .UV0
+    case .uv1: .UV1
+    case .uv2: .UV2
+    case .uv3: .UV3
+    case .uv4: .UV4
+    case .uv5: .UV5
+    case .uv6: .UV6
+    case .uv7: .UV7
+    default: .unspecified
     }
 }
 
@@ -581,7 +581,7 @@ private func webAttributesFromAttributes(_ attributes: [LowLevelMesh.Attribute])
     attributes.map({ a in
         WKBridgeVertexAttributeFormat(
             semantic: convertSemantic(a.semantic),
-            format: a.format.rawValue,
+            format: a.format,
             layoutIndex: a.layoutIndex,
             offset: a.offset
         )

@@ -157,23 +157,23 @@ extension _Proto_LowLevelTextureResource_v1.Descriptor {
     }
 }
 
-private func mapSemantic(_ semantic: Int) -> _Proto_LowLevelMeshResource_v1.VertexSemantic {
+private func mapSemantic(_ semantic: WKBridgeVertexSemantic) -> _Proto_LowLevelMeshResource_v1.VertexSemantic {
     switch semantic {
-    case 0: .position
-    case 1: .color
-    case 2: .normal
-    case 3: .tangent
-    case 4: .bitangent
-    case 5: .uv0
-    case 6: .uv1
-    case 7: .uv2
-    case 8: .uv3
-    case 9: .uv4
-    case 10: .uv5
-    case 11: .uv6
-    case 12: .uv7
-    case 13: .unspecified
-    default: .unspecified
+    case .position: .position
+    case .color: .color
+    case .normal: .normal
+    case .tangent: .tangent
+    case .bitangent: .bitangent
+    case .UV0: .uv0
+    case .UV1: .uv1
+    case .UV2: .uv2
+    case .UV3: .uv3
+    case .UV4: .uv4
+    case .UV5: .uv5
+    case .UV6: .uv6
+    case .UV7: .uv7
+    case .unspecified: .unspecified
+    @unknown default: .unspecified
     }
 }
 
@@ -184,7 +184,7 @@ extension _Proto_LowLevelMeshResource_v1.Descriptor {
         descriptor.vertexAttributes = llmDescriptor.vertexAttributes.map { attribute in
             .init(
                 semantic: mapSemantic(attribute.semantic),
-                format: MTLVertexFormat(rawValue: UInt(attribute.format)) ?? .invalid,
+                format: attribute.format,
                 layoutIndex: attribute.layoutIndex,
                 offset: attribute.offset
             )

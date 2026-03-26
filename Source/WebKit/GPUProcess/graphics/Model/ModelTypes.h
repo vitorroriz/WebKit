@@ -27,6 +27,11 @@
 #include <wtf/Platform.h>
 
 #ifdef __cplusplus
+#include <WebCore/WebGPUPrimitiveTopology.h>
+#include <WebCore/WebGPUTextureFormat.h>
+#include <WebCore/WebGPUTextureUsage.h>
+#include <WebCore/WebGPUTextureViewDimension.h>
+#include <WebCore/WebGPUVertexFormat.h>
 #include <WebKit/Float3.h>
 #include <WebKit/Float4x4.h>
 #include <wtf/ExportMacros.h>
@@ -51,16 +56,33 @@ typedef NS_ENUM(uint8_t, WKBridgeDataUpdateType) {
     WKBridgeDataUpdateTypeDelta
 };
 
+typedef NS_ENUM(uint8_t, WKBridgeVertexSemantic) {
+    WKBridgeVertexSemanticPosition,
+    WKBridgeVertexSemanticColor,
+    WKBridgeVertexSemanticNormal,
+    WKBridgeVertexSemanticTangent,
+    WKBridgeVertexSemanticBitangent,
+    WKBridgeVertexSemanticUV0,
+    WKBridgeVertexSemanticUV1,
+    WKBridgeVertexSemanticUV2,
+    WKBridgeVertexSemanticUV3,
+    WKBridgeVertexSemanticUV4,
+    WKBridgeVertexSemanticUV5,
+    WKBridgeVertexSemanticUV6,
+    WKBridgeVertexSemanticUV7,
+    WKBridgeVertexSemanticUnspecified,
+};
+
 @interface WKBridgeVertexAttributeFormat : NSObject
 
-@property (nonatomic, readonly) long semantic;
-@property (nonatomic, readonly) unsigned long format;
+@property (nonatomic, readonly) WKBridgeVertexSemantic semantic;
+@property (nonatomic, readonly) MTLVertexFormat format;
 @property (nonatomic, readonly) long layoutIndex;
 @property (nonatomic, readonly) long offset;
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithSemantic:(long)semantic format:(unsigned long)format layoutIndex:(long)layoutIndex offset:(long)offset NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithSemantic:(WKBridgeVertexSemantic)semantic format:(MTLVertexFormat)format layoutIndex:(long)layoutIndex offset:(long)offset NS_DESIGNATED_INITIALIZER;
 
 @end
 
@@ -474,11 +496,11 @@ struct ImageAsset {
     long height { 0 };
     long depth { 0 };
     long bytesPerPixel { 0 };
-    uint64_t textureType { 0 };
-    uint64_t pixelFormat { 0 };
+    WebCore::WebGPU::TextureViewDimension textureType { WebCore::WebGPU::TextureViewDimension::_2d };
+    WebCore::WebGPU::TextureFormat pixelFormat { WebCore::WebGPU::TextureFormat::R8unorm };
     long mipmapLevelCount { 0 };
     long arrayLength { 0 };
-    uint64_t textureUsage { 0 };
+    WebCore::WebGPU::TextureUsageFlags textureUsage { };
     ImageAssetSwizzle swizzle { };
 };
 
@@ -491,17 +513,39 @@ struct VertexLayout {
 struct MeshPart {
     uint32_t indexOffset;
     uint32_t indexCount;
-    uint32_t topology;
+    WebCore::WebGPU::PrimitiveTopology topology;
     uint32_t materialIndex;
     Float3 boundsMin;
     Float3 boundsMax;
 };
 
+enum class VertexSemantic : uint8_t {
+    Position,
+    Color,
+    Normal,
+    Tangent,
+    Bitangent,
+    UV0, // NOLINT
+    UV1, // NOLINT
+    UV2, // NOLINT
+    UV3, // NOLINT
+    UV4, // NOLINT
+    UV5, // NOLINT
+    UV6, // NOLINT
+    UV7, // NOLINT
+    Unspecified,
+};
+
 struct VertexAttributeFormat {
-    long semantic;
-    unsigned long format;
+    VertexSemantic semantic;
+    WebCore::WebGPU::VertexFormat format;
     long layoutIndex;
     long offset;
+};
+
+enum class IndexType : uint8_t {
+    UInt16,
+    UInt32,
 };
 
 struct MeshDescriptor {
@@ -510,7 +554,7 @@ struct MeshDescriptor {
     Vector<VertexAttributeFormat> vertexAttributes;
     Vector<VertexLayout> vertexLayouts;
     long indexCapacity;
-    long indexType;
+    IndexType indexType;
 };
 
 struct Edge {

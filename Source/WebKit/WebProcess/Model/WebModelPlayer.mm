@@ -228,11 +228,11 @@ static std::optional<WebModel::ImageAsset> loadIBL(Ref<WebCore::SharedBuffer>&& 
         .height = static_cast<long>(height),
         .depth = 1,
         .bytesPerPixel = static_cast<long>(bytesPerPixel),
-        .textureType = MTLTextureType2D,
-        .pixelFormat = pixelFormat,
+        .textureType = WebCore::WebGPU::TextureViewDimension::_2d,
+        .pixelFormat = toTextureFormat(pixelFormat),
         .mipmapLevelCount = 1,
         .arrayLength = 1,
-        .textureUsage = MTLTextureUsageShaderRead,
+        .textureUsage = WebCore::WebGPU::TextureUsage::TextureBinding,
         .swizzle = WebModel::ImageAssetSwizzle {
             .red = MTLTextureSwizzleRed,
             .green = MTLTextureSwizzleGreen,
@@ -270,11 +270,11 @@ void WebModelPlayer::load(WebCore::Model& modelSource, WebCore::LayoutSize size)
         .height = 64,
         .depth = 1,
         .bytesPerPixel = 2,
-        .textureType = MTLTextureTypeCube,
-        .pixelFormat = MTLPixelFormatR16Float,
+        .textureType = WebCore::WebGPU::TextureViewDimension::Cube,
+        .pixelFormat = WebCore::WebGPU::TextureFormat::R16float,
         .mipmapLevelCount = 0,
         .arrayLength = 6,
-        .textureUsage = MTLTextureUsageShaderRead,
+        .textureUsage = WebCore::WebGPU::TextureUsage::TextureBinding,
         .swizzle = { }
     };
     WebModel::ImageAsset specularTexture {
@@ -283,11 +283,11 @@ void WebModelPlayer::load(WebCore::Model& modelSource, WebCore::LayoutSize size)
         .height = 256,
         .depth = 1,
         .bytesPerPixel = 2,
-        .textureType = MTLTextureTypeCube,
-        .pixelFormat = MTLPixelFormatR16Float,
+        .textureType = WebCore::WebGPU::TextureViewDimension::Cube,
+        .pixelFormat = WebCore::WebGPU::TextureFormat::R16float,
         .mipmapLevelCount = 0,
         .arrayLength = 6,
-        .textureUsage = MTLTextureUsageShaderRead,
+        .textureUsage = WebCore::WebGPU::TextureUsage::TextureBinding,
         .swizzle = { }
     };
 

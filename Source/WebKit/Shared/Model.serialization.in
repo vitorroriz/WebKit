@@ -80,13 +80,19 @@ header: <WebKit/ModelTypes.h>
 };
 
 header: <WebKit/ModelTypes.h>
+[CustomHeader] enum class WebModel::IndexType : uint8_t {
+    UInt16,
+    UInt32,
+};
+
+header: <WebKit/ModelTypes.h>
 [AdditionalEncoder=StreamConnectionEncoder, CustomHeader] struct WebModel::MeshDescriptor {
     long vertexBufferCount;
     long vertexCapacity;
     Vector<WebModel::VertexAttributeFormat> vertexAttributes;
     Vector<WebModel::VertexLayout> vertexLayouts;
     long indexCapacity;
-    long indexType;
+    WebModel::IndexType indexType;
 };
 
 header: <WebKit/ModelTypes.h>
@@ -135,9 +141,27 @@ header: <WebKit/ModelTypes.h>
 };
 
 header: <WebKit/ModelTypes.h>
+[CustomHeader] enum class WebModel::VertexSemantic : uint8_t {
+    Position,
+    Color,
+    Normal,
+    Tangent,
+    Bitangent,
+    UV0,
+    UV1,
+    UV2,
+    UV3,
+    UV4,
+    UV5,
+    UV6,
+    UV7,
+    Unspecified,
+};
+
+header: <WebKit/ModelTypes.h>
 [AdditionalEncoder=StreamConnectionEncoder, CustomHeader] struct WebModel::VertexAttributeFormat {
-    long semantic;
-    unsigned long format;
+    WebModel::VertexSemantic semantic;
+    WebCore::WebGPU::VertexFormat format;
     long layoutIndex;
     long offset;
 };
@@ -164,11 +188,11 @@ header: <WebKit/ModelTypes.h>
     long height;
     long depth;
     long bytesPerPixel;
-    uint64_t textureType;
-    uint64_t pixelFormat;
+    WebCore::WebGPU::TextureViewDimension textureType;
+    WebCore::WebGPU::TextureFormat pixelFormat;
     long mipmapLevelCount;
     long arrayLength;
-    uint64_t textureUsage;
+    WebCore::WebGPU::TextureUsageFlags textureUsage;
     WebModel::ImageAssetSwizzle swizzle;
 };
 
@@ -176,7 +200,7 @@ header: <WebKit/ModelTypes.h>
 [AdditionalEncoder=StreamConnectionEncoder, CustomHeader] struct WebModel::MeshPart {
     uint32_t indexOffset;
     uint32_t indexCount;
-    uint32_t topology;
+    WebCore::WebGPU::PrimitiveTopology topology;
     uint32_t materialIndex;
     WebModel::Float3 boundsMin;
     WebModel::Float3 boundsMax;
