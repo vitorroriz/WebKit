@@ -145,10 +145,10 @@ inline TransferString::TransferString(IPCData&& data)
             m_storage = String { };
         },
         [&](std::span<const Latin1Character> characters) {
-            m_storage = String { characters };
+            m_storage = characters.data() ? String { characters } : emptyString();
         },
         [&](std::span<const char16_t> characters) {
-            m_storage = String { characters };
+            m_storage = characters.data() ? String { characters } : emptyString();
         },
         [&](SharedSpan8 handle) {
             m_storage = WTF::move(handle);
