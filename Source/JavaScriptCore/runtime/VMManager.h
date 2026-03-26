@@ -384,9 +384,9 @@ private:
     //
     // The choice to not track a valid m_numberOfActiveVMs at all times is just an optimization so
     // that we can skip this work when not doing Stop the World.
-    unsigned m_numberOfActiveVMs { invalidNumberOfActiveVMs };
+    unsigned m_numberOfActiveVMs WTF_GUARDED_BY_LOCK(m_worldLock) { invalidNumberOfActiveVMs };
 
-    Atomic<unsigned> m_numberOfStoppedVMs { 0 };
+    unsigned m_numberOfStoppedVMs WTF_GUARDED_BY_LOCK(m_worldLock) { 0 };
 
     // === End of variables only relevant for StopTheWorld =================================
 

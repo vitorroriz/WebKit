@@ -327,13 +327,7 @@ static void waitForVMCleanupFromPreviousTest()
 }
 
 // setupScriptAndWaitForVMs ensures all VMs are constructed, instances registered, entered with owner threads,
-// and actively running before tests start. However, this doesn't test edge cases where interrupt() races with:
-// FIXME: Add tests for VM lifecycle edge cases:
-// - interrupt() during VM construction (before m_debugState initialized)
-// - interrupt() during instance registration
-// - interrupt() race with VMs entering/activating
-// These edge cases could expose timing issues in stopTheWorld coordination that don't occur when
-// all VMs are already in a stable running state.
+// and actively running before tests start.
 static bool setupScriptAndWaitForVMs(const TestScript& script, RefPtr<Thread>& outWorkerThread)
 {
     ModuleManager& moduleManager = debugServer->moduleManager();
@@ -417,10 +411,7 @@ UNUSED_FUNCTION static int runTests()
         waitForVMCleanupFromPreviousTest();
 
         RefPtr<Thread> workerThread;
-        if (!setupScriptAndWaitForVMs(script, workerThread)) {
-            totalFailures++;
-            continue;
-        }
+        RELEASE_ASSERT(setupScriptAndWaitForVMs(script, workerThread));
 
         testRapidInterruptResumeCycles();
         testVMContextSwitching();

@@ -1345,7 +1345,6 @@ private:
 
     DoublyLinkedList<Debugger> m_debuggers;
 
-    void checkStaticAsserts(); // Not for calling.
 
     friend class Heap;
     friend class ExceptionScope; // Friend for exception checking purpose only.

@@ -230,15 +230,6 @@ See [RWI_ARCHITECTURE.md](./RWI_ARCHITECTURE.md) for complete setup instructions
 - **Issue**: Thread select and stop reply protocol handlers need improvement to correctly display multi-VM data in LLDB
 - **Current Status**: Multi-VM stop-the-world is implemented, but thread information may not display correctly in LLDB UI
 
-### VM Lifecycle and Synchronization Testing
-
-- **Issue**: ExecutionHandler stress tests need additional coverage for VM lifecycle edge cases and race conditions
-- **Current Test Limitations**: Tests wait for VM construction and instance registration, but this doesn't guarantee VMs are actively running code that checks traps
-- **Missing Test Coverage**:
-  - VM lifecycle edge cases (construction, initialization, instance registration)
-  - `interrupt()` race conditions when VMs are not yet executing code
-  - Synchronization between VM construction and actual code execution
-
 ### X86_64 Support
 
 - **Issue**: The WebAssembly debugger is currently restricted to ARM64 platforms only

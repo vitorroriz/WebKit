@@ -435,7 +435,7 @@ bool VMTraps::handleTraps(VMTraps::BitField mask)
     VM& vm = this->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
     ASSERT(onlyContainsAsyncEvents(mask));
-    ASSERT(needHandling(mask));
+    // No ASSERT(needHandling(mask)): cancelStop() from resumeTheWorld() can race with this call.
 
     if (m_trapsDeferred)
         return false; // We'll service them on the next opportunity after deferring has stopped.
@@ -503,6 +503,10 @@ bool VMTraps::handleTraps(VMTraps::BitField mask)
         case NeedStopTheWorld:
             VMManager::singleton().notifyVMStop(vm, StopTheWorldEvent::VMStopped);
             didHandleTrap = true;
+            break;
+
+        // cancelStop() cleared the bit between needHandling() and takeTopPriorityTrap().
+        case NoEvent:
             break;
 
         case NeedExceptionHandling:

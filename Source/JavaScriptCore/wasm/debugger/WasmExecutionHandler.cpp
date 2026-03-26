@@ -843,8 +843,8 @@ void ExecutionHandler::sendErrorReply(ProtocolError error) { m_debugServer.sendE
 uint64_t ExecutionHandler::threadId(const VM& vm)
 {
     auto uid = vm.ownerThreadUID();
-    RELEASE_ASSERT(uid.has_value());
-    return *uid;
+    // nullopt when JSLock was never acquired (e.g. during VM construction); fall back to current thread.
+    return uid.value_or(Thread::currentSingleton().uid());
 }
 
 DebugState* ExecutionHandler::debuggeeState() const { return m_debuggee->debugState(); }
