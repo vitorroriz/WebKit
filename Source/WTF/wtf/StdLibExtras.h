@@ -649,7 +649,7 @@ template<size_t I, typename V> constexpr bool holdsAlternative(const V& v)
     }                                                                                \
     template<typename T> bool holdsAlternative() const                               \
     {                                                                                \
-        return WTF::holdsAlternative<T>(value);                                      \
+        return WTF::holdsAlternative<T>(name);                                       \
     }                                                                                \
     template<typename T> friend T& get(Self& self)                                   \
     {                                                                                \
