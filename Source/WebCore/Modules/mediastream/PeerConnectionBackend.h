@@ -176,7 +176,7 @@ public:
     ASCIILiteral logClassName() const override { return "PeerConnectionBackend"_s; }
     WTFLogChannel& NODELETE logChannel() const final;
 #if PLATFORM(WPE) || PLATFORM(GTK)
-    void handleLogMessage(const WTFLogChannel&, WTFLogLevel, std::optional<WTFLogLocation>, Vector<JSONLogValue>&&) final;
+    void handleLogMessage(const WTFLogChannel&, WTFLogLevel, std::optional<WTFLogLocation>, const Vector<JSONLogValue>&) final;
 #endif
 #endif
 

@@ -102,7 +102,7 @@ SourceBufferPrivateGStreamer::~SourceBufferPrivateGStreamer()
 }
 
 #if !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
-void SourceBufferPrivateGStreamer::handleLogMessage(const WTFLogChannel& channel, WTFLogLevel level, std::optional<WTFLogLocation> location, Vector<JSONLogValue>&& values)
+void SourceBufferPrivateGStreamer::handleLogMessage(const WTFLogChannel& channel, WTFLogLevel level, std::optional<WTFLogLocation> location, const Vector<JSONLogValue>& values)
 {
     auto gstDebugLevel = gstDebugLevelFromWTFLogLevel(level);
     if (gstDebugLevel > gst_debug_category_get_threshold(GST_CAT_DEFAULT))

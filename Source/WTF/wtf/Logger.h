@@ -146,7 +146,7 @@ public:
     class MessageHandlerObserver {
     public:
         virtual ~MessageHandlerObserver() = default;
-        virtual void handleLogMessage(const WTFLogChannel&, WTFLogLevel, std::optional<WTFLogLocation>, Vector<JSONLogValue>&&) = 0;
+        virtual void handleLogMessage(const WTFLogChannel&, WTFLogLevel, std::optional<WTFLogLocation>, const Vector<JSONLogValue>&) = 0;
     };
 
     static Ref<Logger> create(const void* owner)
@@ -267,8 +267,9 @@ public:
                 return false;
 
             Locker locker { AdoptLock, messageHandlerObserverLock() };
+            Vector<JSONLogValue> values { ConsoleLogValue<Argument>::toValue(arguments)... };
             for (MessageHandlerObserver& observer : messageHandlerObservers())
-                observer.handleLogMessage(channel, level, logLocation, { ConsoleLogValue<Argument>::toValue(arguments)... });
+                observer.handleLogMessage(channel, level, logLocation, values);
         }
 
         if (!m_enabled)

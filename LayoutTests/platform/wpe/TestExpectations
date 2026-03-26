@@ -619,8 +619,6 @@ webkit.org/b/304405 http/tests/scroll-to-text-fragment/clear-on-new-fragment-nav
 
 webkit.org/b/102463 fast/forms/validation-message-appearance.html [ Pass Failure ]
 
-webkit.org/b/310547 imported/w3c/web-platform-tests/media-source/mediasource-append-buffer.html [ Failure Pass ]
-
 #////////////////////////////////////////////////////////////////////////////////////////
 # 6. SLOW TESTS
 #////////////////////////////////////////////////////////////////////////////////////////
