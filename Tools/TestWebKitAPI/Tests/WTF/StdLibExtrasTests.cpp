@@ -290,4 +290,39 @@ TEST(WTF_StdLibExtras, SpanReinterpretCast_NonDynamicExtent_CompileTimeErros)
 }
 */
 
+TEST(WTF_StdLibExtras, HoldsAlternativeByIndex)
+{
+    using V = Variant<int, double, float>;
+
+    V intVariant = 42;
+    EXPECT_TRUE((WTF::holdsAlternative<0>(intVariant)));
+    EXPECT_FALSE((WTF::holdsAlternative<1>(intVariant)));
+    EXPECT_FALSE((WTF::holdsAlternative<2>(intVariant)));
+
+    V doubleVariant = 3.14;
+    EXPECT_FALSE((WTF::holdsAlternative<0>(doubleVariant)));
+    EXPECT_TRUE((WTF::holdsAlternative<1>(doubleVariant)));
+    EXPECT_FALSE((WTF::holdsAlternative<2>(doubleVariant)));
+
+    V floatVariant = 1.0f;
+    EXPECT_FALSE((WTF::holdsAlternative<0>(floatVariant)));
+    EXPECT_FALSE((WTF::holdsAlternative<1>(floatVariant)));
+    EXPECT_TRUE((WTF::holdsAlternative<2>(floatVariant)));
+}
+
+TEST(WTF_StdLibExtras, HoldsAlternativeByType)
+{
+    using V = Variant<int, double, float>;
+
+    V intVariant = 42;
+    EXPECT_TRUE((WTF::holdsAlternative<int>(intVariant)));
+    EXPECT_FALSE((WTF::holdsAlternative<double>(intVariant)));
+    EXPECT_FALSE((WTF::holdsAlternative<float>(intVariant)));
+
+    V doubleVariant = 3.14;
+    EXPECT_FALSE((WTF::holdsAlternative<int>(doubleVariant)));
+    EXPECT_TRUE((WTF::holdsAlternative<double>(doubleVariant)));
+    EXPECT_FALSE((WTF::holdsAlternative<float>(doubleVariant)));
+}
+
 } // namespace TestWebKitAPI

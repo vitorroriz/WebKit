@@ -618,7 +618,7 @@ template<typename... Ts> struct HoldsAlternative<Variant<Ts...>> {
     }
     template<size_t I> static constexpr bool holdsAlternative(const Variant<Ts...>& v)
     {
-        return std::holds_alternative<I>(v);
+        return v.index() == I;
     }
 };
 
