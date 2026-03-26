@@ -4586,8 +4586,8 @@ void Element::addToTopLayer()
     if (RefPtr documentElement = document->documentElement())
         documentElement->invalidateStyleInternal();
 
-    if (auto* renderer = dynamicDowncast<RenderLayerModelObject>(this->renderer()); renderer && renderer->layer())
-        renderer->layer()->establishesTopLayerDidChange();
+    if (CheckedPtr renderer = dynamicDowncast<RenderLayerModelObject>(this->renderer()); renderer && renderer->layer())
+        protect(renderer->layer())->establishesTopLayerDidChange();
 }
 
 void Element::removeFromTopLayer()
@@ -4629,8 +4629,8 @@ void Element::removeFromTopLayer()
     if (RefPtr modalElement = document().activeModalDialog())
         modalElement->invalidateStyleInternal();
 
-    if (auto* renderer = dynamicDowncast<RenderLayerModelObject>(this->renderer()); renderer && renderer->layer())
-        renderer->layer()->establishesTopLayerDidChange();
+    if (CheckedPtr renderer = dynamicDowncast<RenderLayerModelObject>(this->renderer()); renderer && renderer->layer())
+        protect(renderer->layer())->establishesTopLayerDidChange();
 }
 
 static PseudoElement* NODELETE beforeOrAfterPseudoElement(const Element& host, PseudoElementType pseudoElementSpecifier)
