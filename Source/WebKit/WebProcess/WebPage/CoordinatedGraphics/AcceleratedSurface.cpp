@@ -722,6 +722,7 @@ AcceleratedSurface::SwapChain::SwapChain(uint64_t surfaceID, RenderingPurpose re
 #endif
 #if OS(ANDROID)
     case PlatformDisplay::Type::Android:
+    case PlatformDisplay::Type::Default:
         m_type = Type::EGLImage;
         break;
 #endif
@@ -731,10 +732,11 @@ AcceleratedSurface::SwapChain::SwapChain(uint64_t surfaceID, RenderingPurpose re
         m_type = Type::WPEBackend;
         break;
 #endif
-#if PLATFORM(GTK) || OS(ANDROID)
+#if PLATFORM(GTK)
     case PlatformDisplay::Type::Default:
         break;
-#endif // PLATFORM(GTK) || OS(ANDROID)
+#endif // PLATFORM(GTK)
+
     }
 }
 
