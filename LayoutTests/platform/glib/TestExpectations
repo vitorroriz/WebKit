@@ -4055,6 +4055,7 @@ media/modern-media-controls/tracks-support/click-track-in-contextmenu.html [ Ski
 media/modern-media-controls/tracks-support/hidden-tracks.html [ Skip ]
 media/modern-media-controls/tracks-support/off-text-track.html [ Skip ]
 media/modern-media-controls/tracks-support/show-contextmenu-then-double-click-on-tracks-button.html [ Skip ]
+media/modern-media-controls/tracks-support/sorted-by-user-preferred-languages-caption-display-settings.html [ Skip ]
 media/modern-media-controls/tracks-support/sorted-by-user-preferred-languages.html [ Skip ]
 media/modern-media-controls/tracks-support/text-track-selected-via-media-api.html [ Skip ]
 media/modern-media-controls/volume-support/volume-support-drag-to-mute.html [ Skip ]

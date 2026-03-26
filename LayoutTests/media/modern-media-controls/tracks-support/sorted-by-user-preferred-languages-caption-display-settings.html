@@ -1,4 +1,4 @@
-<!DOCTYPE html> <!-- webkit-test-runner [ CaptionDisplaySettingsEnabled=false language=en-US,zh-HK,es-US useFlexibleViewport=true ] -->
+<!DOCTYPE html> <!-- webkit-test-runner [ CaptionDisplaySettingsEnabled=true language=en-US,zh-HK,es-US useFlexibleViewport=true ] -->
 <meta name="viewport" content="width=device-width">
 <script src="../resources/media-controls-utils.js"></script>
 <script src="../../../resources/ui-helper.js"></script>
@@ -24,7 +24,7 @@
 
 window.jsTestIsAsync = true;
 
-description(`This test checks that tracks are sorted based on the user's preferred languages.`);
+description(`This test checks that tracks are sorted based on the user's preferred languages when caption display settings are enabled.`);
 
 const media = document.querySelector("video");
 const shadowRoot = window.internals.shadowRoot(media);
@@ -42,10 +42,10 @@ media.addEventListener("play", () => {
             await pressOnElement(shadowRoot.querySelector("button.tracks"));
 
             let contextmenu = await getTracksContextMenu();
-            let items = contextmenu[0].children;
-            if (items[0].title === "Subtitles")
-                items = items.slice(1);
-            debug("Subtitles: " + JSON.stringify(items.map((item) => item.title), null, 2));
+            let items = contextmenu[0]?.children ?? [];
+            let languagesItem = items.find((item) => item.title === "Languages");
+            let tracks = languagesItem?.children ?? [];
+            debug("Subtitles: " + JSON.stringify(tracks.map((item) => item.title), null, 2));
 
             media.remove();
             finishJSTest();
