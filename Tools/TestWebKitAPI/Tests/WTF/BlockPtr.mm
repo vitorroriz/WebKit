@@ -39,6 +39,30 @@ TEST(BlockPtr, FromBlock)
     EXPECT_EQ(10u, block());
 }
 
+TEST(BlockPtr, MoveAssignmentFromBlock)
+{
+    BlockPtr<unsigned ()> block { ^{
+        return 10u;
+    } };
+
+    block = WTF::move(block);
+
+    EXPECT_TRUE(!!block);
+    EXPECT_EQ(10u, block());
+}
+
+TEST(BlockPtr, MoveAssignmentFromCallable)
+{
+    auto block = makeBlockPtr([] {
+        return 42u;
+    });
+
+    block = WTF::move(block);
+
+    EXPECT_TRUE(!!block);
+    EXPECT_EQ(42u, block());
+}
+
 TEST(BlockPtr, FromLambda)
 {
     MoveOnly moveOnly { 10 };
