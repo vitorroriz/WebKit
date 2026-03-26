@@ -35,6 +35,7 @@
 #include "FontCascadeDescription.h"
 #include "GraphicsContext.h"
 #include "Path.h"
+#include "WebKitFontFamilyNames.h"
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/text/MakeString.h>
 
@@ -63,7 +64,7 @@ InspectorOverlayLabel::InspectorOverlayLabel(const String& text, FloatPoint loca
 static FontCascade systemFont()
 {
     FontCascadeDescription fontDescription;
-    fontDescription.setFamilies({ "system-ui"_s });
+    fontDescription.setFamilies({ WebKitFontFamilyNames::systemUiFamily.get() });
     fontDescription.setWeight(FontSelectionValue(500));
     fontDescription.setComputedSize(12);
 

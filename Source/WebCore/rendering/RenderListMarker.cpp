@@ -43,6 +43,7 @@
 #include "StyleListStyleType.h"
 #include "StyleScope.h"
 #include "TextUtil.h"
+#include "WebKitFontFamilyNames.h"
 #include <wtf/Assertions.h>
 #include <wtf/StackStats.h>
 #include <wtf/TZoneMallocInlines.h>
@@ -181,7 +182,7 @@ struct TextRunWithUnderlyingString {
 static FontCascade disclosureMarkerFontCascade(const RenderStyle& style, Document& document)
 {
     auto fontDescription = FontCascadeDescription { style.fontDescription() };
-    fontDescription.setFamilies(Vector<AtomString> { "system-ui"_s });
+    fontDescription.setFamilies(Vector<AtomString> { WebKitFontFamilyNames::systemUiFamily.get() });
     auto fontCascade = FontCascade(WTF::move(fontDescription));
     fontCascade.update(&document.fontSelector());
     return fontCascade;

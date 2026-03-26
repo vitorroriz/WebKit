@@ -272,6 +272,7 @@ std::optional<SystemFontKind> SystemFontDatabaseCoreText::matchSystemFontUse(con
         || equalLettersIgnoringASCIICase(string, "-apple-system"_s)
         || equalLettersIgnoringASCIICase(string, "-apple-system-font"_s)
         || equalLettersIgnoringASCIICase(string, "system-ui"_s)
+        || equalLettersIgnoringASCIICase(string, "-webkit-system-ui"_s)
         || equalLettersIgnoringASCIICase(string, "ui-sans-serif"_s))
         return SystemFontKind::SystemUI;
 
