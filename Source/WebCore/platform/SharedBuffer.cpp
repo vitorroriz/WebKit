@@ -214,6 +214,7 @@ std::span<const FragmentedSharedBuffer::DataSegmentVectorEntry> FragmentedShared
 String FragmentedSharedBuffer::toHexString() const
 {
     StringBuilder stringBuilder;
+    stringBuilder.reserveCapacity(size() * 2);
     forEachSegment([&](auto segment) {
         for (auto byte : segment)
             stringBuilder.append(pad('0', 2, hex(byte)));
