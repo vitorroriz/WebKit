@@ -1787,9 +1787,12 @@ TransformationMatrix RenderLayer::renderableTransform(OptionSet<PaintBehavior> p
 {
     if (!m_transform)
         return TransformationMatrix();
-    
+
     if (paintBehavior & PaintBehavior::FlattenCompositingLayers) {
-        TransformationMatrix matrix = *m_transform;
+        // During snapshotting (e.g., for view transitions), use currentTransform(),
+        // which already handles accelerated transform animations instead of relying
+        // on potentially stale m_transform values.
+        TransformationMatrix matrix = (paintBehavior & PaintBehavior::Snapshotting) ? currentTransform() : *m_transform;
         makeMatrixRenderable(matrix, false /* flatten 3d */);
         return matrix;
     }
