@@ -702,28 +702,18 @@ template<typename KeyArg, typename HashArg, typename KeyTraitsArg> struct Argume
 };
 
 template<typename ValueType, typename ErrorType> struct ArgumentCoder<Expected<ValueType, ErrorType>> {
-    template<typename Encoder>
-    static void encode(Encoder& encoder, const Expected<ValueType, ErrorType>& expected)
+    template<typename Encoder, typename T>
+    static void encode(Encoder& encoder, T&& expected)
     {
-        if (!expected.has_value()) {
-            encoder << false;
-            encoder << expected.error();
-            return;
-        }
-        encoder << true;
-        encoder << expected.value();
-    }
+        static_assert(std::is_same_v<std::remove_cvref_t<T>, Expected<ValueType, ErrorType>>);
 
-    template<typename Encoder>
-    static void encode(Encoder& encoder, Expected<ValueType, ErrorType>&& expected)
-    {
         if (!expected.has_value()) {
             encoder << false;
-            encoder << WTF::move(expected.error());
+            encoder << std::forward<T>(expected).error();
             return;
         }
         encoder << true;
-        encoder << WTF::move(expected.value());
+        encoder << std::forward<T>(expected).value();
     }
 
     template<typename Decoder>
