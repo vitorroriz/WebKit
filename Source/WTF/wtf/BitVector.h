@@ -255,7 +255,7 @@ public:
     size_t bitCount() const
     {
         if (isInline())
-            return bitCount(cleanseInlineBits(m_bitsOrPointer));
+            return std::popcount(cleanseInlineBits(m_bitsOrPointer));
         return bitCountSlow();
     }
 
@@ -411,14 +411,7 @@ private:
     {
         return bits & ~(static_cast<uintptr_t>(1) << maxInlineBits());
     }
-    
-    static size_t bitCount(uintptr_t bits)
-    {
-        if (sizeof(uintptr_t) == 4)
-            return WTF::bitCount(static_cast<unsigned>(bits));
-        return WTF::bitCount(static_cast<uint64_t>(bits));
-    }
-    
+
     size_t findBitFast(size_t startIndex, bool value) const
     {
         if (isInline()) {

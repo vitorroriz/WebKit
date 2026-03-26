@@ -9178,7 +9178,7 @@ void ByteCodeParser::parseBlock(unsigned limit)
             auto& metadata = bytecode.metadata(codeBlock);
             uint32_t seenModes = metadata.m_iterationMetadata.seenModes;
 
-            unsigned numberOfRemainingModes = WTF::bitCount(seenModes);
+            unsigned numberOfRemainingModes = std::popcount(seenModes);
             ASSERT(numberOfRemainingModes <= numberOfIterationModes);
             bool generatedCase = false;
 
@@ -9337,7 +9337,7 @@ void ByteCodeParser::parseBlock(unsigned limit)
             auto& metadata = bytecode.metadata(codeBlock);
             uint32_t seenModes = metadata.m_iterationMetadata.seenModes;
 
-            unsigned numberOfRemainingModes = WTF::bitCount(seenModes);
+            unsigned numberOfRemainingModes = std::popcount(seenModes);
             ASSERT(numberOfRemainingModes <= numberOfIterationModes);
             bool generatedCase = false;
 

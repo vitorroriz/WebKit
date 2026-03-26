@@ -3981,7 +3981,7 @@ private:
                 uint64_t mask = right->asInt();
                 if (!mask || mask & (mask + 1))
                     return false;
-                uint64_t width = WTF::bitCount(mask);
+                uint64_t width = std::popcount(mask);
                 uint64_t datasize = opcode == ExtractUnsignedBitfield32 ? 32 : 64;
                 uint64_t resultDataSize = 0;
                 if (!WTF::safeAdd(lsb, width, resultDataSize) || resultDataSize > datasize)
@@ -4069,7 +4069,7 @@ private:
                 uint64_t mask = maskValue->asInt();
                 if (!mask || mask & (mask + 1))
                     return false;
-                uint64_t maskBitCount = WTF::bitCount(mask);
+                uint64_t maskBitCount = std::popcount(mask);
                 uint64_t highWidth = highWidthValue->asInt();
                 uint64_t lowWidth = lowWidthValue->asInt();
                 uint64_t datasize = opcode == ExtractRegister32 ? 32 : 64;
@@ -4110,7 +4110,7 @@ private:
                 if (!mask1 || mask1 & (mask1 + 1))
                     return false;
                 uint64_t datasize = opcode == InsertBitField32 ? 32 : 64;
-                uint64_t width = WTF::bitCount(mask1);
+                uint64_t width = std::popcount(mask1);
                 uint64_t resultDataSize = 0;
                 if (!WTF::safeAdd(lsb, width, resultDataSize) || resultDataSize > datasize)
                     return false;
@@ -4160,7 +4160,7 @@ private:
                 uint64_t mask1 = maskValue1->asInt();
                 if (!mask1 || mask1 & (mask1 + 1))
                     return false;
-                uint64_t width = WTF::bitCount(mask1);
+                uint64_t width = std::popcount(mask1);
                 uint64_t datasize = opcode == ExtractInsertBitfieldAtLowEnd32 ? 32 : 64;
                 uint64_t resultDataSize = 0;
                 if (!WTF::safeAdd(lsb, width, resultDataSize) || resultDataSize > datasize)
@@ -4335,7 +4335,7 @@ private:
                     if (!mask || mask & (mask + 1))
                         return false;
 
-                    uint64_t width = WTF::bitCount(mask);
+                    uint64_t width = std::popcount(mask);
                     uint64_t datasize = opcode == InsertUnsignedBitfieldInZero32 ? 32 : 64;
                     uint64_t resultDataSize = 0;
                     if (!WTF::safeAdd(lsb, width, resultDataSize) || resultDataSize > datasize)

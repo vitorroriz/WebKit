@@ -289,7 +289,7 @@ public:
     {
         size_t result = 0;
         for (size_t index = arrayLength(); index--;)
-            result += WTF::bitCount(m_words.word(index));
+            result += std::popcount(m_words.word(index));
         return result;
     }
     
