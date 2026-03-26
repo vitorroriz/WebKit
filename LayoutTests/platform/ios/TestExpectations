@@ -42,15 +42,18 @@ http/tests/site-isolation/select-in-cross-origin-iframe.html [ Pass ]
 fast/forms/switch [ Pass ]
 fast/snapshot [ Skip ]
 
-# Missing public painting code
-fast/forms/switch/click-animation-redundant-checked.html [ ImageOnlyFailure ]
-fast/forms/switch/click-animation-redundant-disabled.html [ ImageOnlyFailure ]
-fast/forms/switch/click-animation.html [ ImageOnlyFailure ]
-
 # These require touch event support
 fast/forms/switch/pointer-tracking-there-and-back-again-rtl.html [ Skip ]
 fast/forms/switch/pointer-tracking-there-and-back-again.html [ Skip ]
 fast/forms/switch/pointer-tracking.html [ Skip ]
+
+# Shadow of Liquid Glass switches is different between transform and zoom.
+fast/forms/switch/zoom-approximates-transform.html [ Skip ]
+fast/forms/switch/zoom-approximates-transform-rtl.html [ Skip ]
+fast/forms/switch/zoom-approximates-transform-vertical-lr.html [ Skip ]
+fast/forms/switch/zoom-approximates-transform-vertical-rl.html [ Skip ]
+
+webkit.org/b/296095 fast/forms/switch/click-animation-disabled.html [ Pass Timeout ]
 
 # These tests fail or are flaky in non-internal iOS 14 simulator
 fast/forms/ios/inputmode-none-with-hardware-keyboard.html [ Pass Failure ]
@@ -8136,8 +8139,6 @@ webkit.org/b/295918 [ Release ] fast/visual-viewport/ios/resize-event-for-keyboa
 webkit.org/b/295999 media/media-garbage-collection.html [ Pass Failure Timeout ]
 
 webkit.org/b/296010 [ Debug ] fast/frames/frame-append-body-child-crash.html [ Pass Failure ]
-
-webkit.org/b/296095 fast/forms/switch/click-animation-disabled.html [ Pass Timeout ]
 
 webkit.org/b/296101 imported/w3c/web-platform-tests/css/css-shapes/shape-outside/shape-image/shape-image-012.html [ Pass ImageOnlyFailure ]
 
