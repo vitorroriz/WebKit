@@ -1219,10 +1219,13 @@ class YarrGenerator final : public YarrJITInfo {
     {
         ASSERT(term->type == PatternTerm::Type::CharacterClass);
 
-        if (term->isFixedWidthCharacterClass() && !term->invert())
-            m_jit.add32(MacroAssembler::TrustedImm32(term->characterClass->hasNonBMPCharacters() ? 2 : 1), m_regs.index);
-        else {
-            m_jit.add32(MacroAssembler::TrustedImm32(1), m_regs.index);
+        m_jit.add32(MacroAssembler::TrustedImm32(1), m_regs.index);
+        if (term->isFixedWidthCharacterClass()) {
+            if (term->characterClass->hasNonBMPCharacters()) {
+                failuresAfterIncrementingIndex.append(atEndOfInput());
+                m_jit.add32(MacroAssembler::TrustedImm32(1), m_regs.index);
+            }
+        } else {
             MacroAssembler::Jump isBMPChar = m_jit.branch32(MacroAssembler::LessThan, character, MacroAssembler::TrustedImm32(0x10000));
             failuresAfterIncrementingIndex.append(atEndOfInput());
             m_jit.add32(MacroAssembler::TrustedImm32(1), m_regs.index);
@@ -3037,13 +3040,7 @@ class YarrGenerator final : public YarrJITInfo {
         MacroAssembler::JumpList failures;
         MacroAssembler::JumpList failuresDecrementIndex;
         MacroAssembler::Label loop(&m_jit);
-#if ENABLE(YARR_JIT_UNICODE_EXPRESSIONS)
-        if (term->isFixedWidthCharacterClass() && term->characterClass->hasNonBMPCharacters()) {
-            m_jit.move(MacroAssembler::TrustedImm32(1), character);
-            failures.append(checkNotEnoughInput(character));
-        } else
-#endif
-            failures.append(atEndOfInput());
+        failures.append(atEndOfInput());
 
         readCharacter(op.m_checkedOffset - term->inputPosition, character);
 
