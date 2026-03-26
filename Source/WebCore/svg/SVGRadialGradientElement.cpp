@@ -126,7 +126,7 @@ static void setGradientAttributes(SVGGradientElement& element, RadialGradientAtt
         attributes.setGradientUnits(element.gradientUnits());
 
     if (!attributes.hasGradientTransform() && element.hasAttribute(SVGNames::gradientTransformAttr))
-        attributes.setGradientTransform(element.gradientTransform().concatenate());
+        attributes.setGradientTransform(element.gradientTransform().concatenate().value_or(identity));
 
     if (!attributes.hasStops())
         attributes.setStops(element.buildStops());

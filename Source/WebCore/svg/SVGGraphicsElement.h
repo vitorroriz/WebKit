@@ -58,7 +58,7 @@ public:
     AffineTransform* ensureSupplementalTransform() override;
     AffineTransform* supplementalTransform() const LIFETIME_BOUND override { return m_supplementalTransform.get(); }
 
-    virtual bool hasTransformRelatedAttributes() const { return !transform().concatenate().isIdentity() || m_supplementalTransform; }
+    virtual bool hasTransformRelatedAttributes() const { return (!transform().isEmpty() && !transform().concatenate()->isIdentity()) || m_supplementalTransform; }
 
     Ref<SVGRect> getBBoxForBindings();
     virtual FloatRect getBBox(StyleUpdateStrategy = AllowStyleUpdate);

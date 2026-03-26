@@ -186,7 +186,7 @@ void SVGPatternElement::collectPatternAttributes(PatternAttributes& attributes) 
         attributes.setPatternContentUnits(patternContentUnits());
 
     if (!attributes.hasPatternTransform() && hasAttribute(SVGNames::patternTransformAttr))
-        attributes.setPatternTransform(patternTransform().concatenate());
+        attributes.setPatternTransform(patternTransform().concatenate().value_or(identity));
 
     if (!attributes.hasPatternContentElement() && childElementCount())
         attributes.setPatternContentElement(this);
@@ -194,7 +194,7 @@ void SVGPatternElement::collectPatternAttributes(PatternAttributes& attributes) 
 
 AffineTransform SVGPatternElement::localCoordinateSpaceTransform(CTMScope) const
 {
-    return protect(patternTransform())->concatenate();
+    return protect(patternTransform())->concatenate().value_or(identity);
 }
 
 }

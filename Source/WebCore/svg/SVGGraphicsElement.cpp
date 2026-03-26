@@ -172,9 +172,10 @@ AffineTransform SVGGraphicsElement::animatedLocalTransform() const
 {
     // LBSE handles transforms via RenderLayer, no need to handle CSS transforms here.
     if (document().settings().layerBasedSVGEngineEnabled()) {
-        if (m_supplementalTransform)
-            return *m_supplementalTransform * transform().concatenate();
-        return protect(transform())->concatenate();
+        auto concatenatedTransform = protect(transform())->concatenate();
+        if (concatenatedTransform && m_supplementalTransform)
+            return *m_supplementalTransform * *concatenatedTransform;
+        return m_supplementalTransform ? *m_supplementalTransform : concatenatedTransform.value_or(identity);
     }
 
     AffineTransform matrix;
@@ -197,7 +198,7 @@ AffineTransform SVGGraphicsElement::animatedLocalTransform() const
     if (!hasSpecifiedTransform && style && !transform().isEmpty()) {
         auto t = Style::TransformResolver::computeTransformOrigin(*style, renderer->transformReferenceBoxRect()).xy();
         matrix.translate(t);
-        matrix *= transform().concatenate();
+        matrix *= *transform().concatenate();
         matrix.translate(-t.x(), -t.y());
     }
 
