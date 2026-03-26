@@ -93,20 +93,15 @@ using namespace WebCore;
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(AcceleratedSurface);
 
-static inline bool isColorOpaque(AcceleratedSurface::ColorComponents color)
+Ref<AcceleratedSurface> AcceleratedSurface::create(WebPage& webPage, Function<void()>&& frameCompleteHandler, RenderingPurpose renderingPurpose)
 {
-    return color[3] == WebCore::AlphaTraits<float>::opaque;
+    return adoptRef(*new AcceleratedSurface(webPage, WTF::move(frameCompleteHandler), renderingPurpose));
 }
 
 static uint64_t generateID()
 {
     static uint64_t identifier = 0;
     return ++identifier;
-}
-
-Ref<AcceleratedSurface> AcceleratedSurface::create(WebPage& webPage, Function<void()>&& frameCompleteHandler, RenderingPurpose renderingPurpose)
-{
-    return adoptRef(*new AcceleratedSurface(webPage, WTF::move(frameCompleteHandler), renderingPurpose));
 }
 
 static bool useExplicitSync()
@@ -120,21 +115,13 @@ AcceleratedSurface::AcceleratedSurface(WebPage& webPage, Function<void()>&& fram
     : m_webPage(webPage)
     , m_frameCompleteHandler(WTF::move(frameCompleteHandler))
     , m_id(generateID())
-    , m_swapChain(m_id, renderingPurpose, webPage.corePage()->settings().hardwareAccelerationEnabled())
+    , m_renderingPurpose(renderingPurpose)
+    , m_hardwareAccelerationEnabled(webPage.corePage()->settings().hardwareAccelerationEnabled())
+    , m_backgroundColor(webPage.backgroundColor())
+    , m_swapChain(*this)
     , m_isVisible(webPage.activityState().contains(ActivityState::IsVisible))
     , m_useExplicitSync(usesGL() && useExplicitSync())
 {
-    auto color = webPage.backgroundColor();
-    m_backgroundColor = color ? color->toResolvedColorComponentsInColorSpace(WebCore::ColorSpace::SRGB) : white;
-
-#if (PLATFORM(GTK) || ENABLE(WPE_PLATFORM)) && (USE(GBM) || OS(ANDROID))
-    if (m_swapChain.type() == SwapChain::Type::EGLImage)
-        m_swapChain.setupBufferFormat(webPage.preferredBufferFormats(), isColorOpaque(m_backgroundColor));
-#endif
-#if USE(WPE_RENDERER)
-    if (m_swapChain.type() == SwapChain::Type::WPEBackend)
-        m_swapChain.initialize(webPage);
-#endif
 }
 
 AcceleratedSurface::~AcceleratedSurface() = default;
@@ -147,9 +134,9 @@ static uint64_t generateTargetID()
     return ++identifier;
 }
 
-AcceleratedSurface::RenderTarget::RenderTarget(uint64_t surfaceID)
+AcceleratedSurface::RenderTarget::RenderTarget(AcceleratedSurface& surface)
     : m_id(generateTargetID())
-    , m_surfaceID(surfaceID)
+    , m_surface(surface)
 {
 }
 
@@ -171,8 +158,8 @@ void AcceleratedSurface::RenderTarget::addDamage(const std::optional<Damage>& da
 #if PLATFORM(GTK) || ENABLE(WPE_PLATFORM)
 WTF_MAKE_TZONE_ALLOCATED_IMPL(AcceleratedSurface::RenderTargetShareableBuffer);
 
-AcceleratedSurface::RenderTargetShareableBuffer::RenderTargetShareableBuffer(uint64_t surfaceID, const IntSize& size)
-    : RenderTarget(surfaceID)
+AcceleratedSurface::RenderTargetShareableBuffer::RenderTargetShareableBuffer(AcceleratedSurface& surface, const IntSize& size)
+    : RenderTarget(surface)
     , m_initialSize(size)
 {
     glGenFramebuffers(1, &m_fbo);
@@ -194,12 +181,12 @@ AcceleratedSurface::RenderTargetShareableBuffer::~RenderTargetShareableBuffer()
     if (m_depthStencilBuffer)
         glDeleteRenderbuffers(1, &m_depthStencilBuffer);
 
-    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidDestroyBuffer(m_id), m_surfaceID);
+    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidDestroyBuffer(m_id), m_surface->surfaceID());
 }
 
 void AcceleratedSurface::RenderTargetShareableBuffer::sendFrame(Vector<WebCore::IntRect, 1>&& damageRects)
 {
-    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::Frame(m_id, WTF::move(damageRects), WTF::move(m_renderingFenceFD)), m_surfaceID);
+    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::Frame(m_id, WTF::move(damageRects), WTF::move(m_renderingFenceFD)), m_surface->surfaceID());
 }
 
 #if USE(SKIA)
@@ -287,7 +274,7 @@ void AcceleratedSurface::RenderTargetShareableBuffer::setReleaseFenceFD(UnixFile
 }
 
 #if USE(GBM)
-std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTargetEGLImage::create(uint64_t surfaceID, const IntSize& size, const BufferFormat& bufferFormat)
+std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTargetEGLImage::create(AcceleratedSurface& surface, const IntSize& size, const BufferFormat& bufferFormat)
 {
     if (!bufferFormat.fourcc) {
         WTFLogAlways("Failed to create GBM buffer of size %dx%d: no valid format found", size.width(), size.height());
@@ -375,15 +362,15 @@ std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTarg
         return nullptr;
     }
 
-    return makeUnique<RenderTargetEGLImage>(surfaceID, size, image, format, WTF::move(fds), WTF::move(offsets), WTF::move(strides), modifier, bufferFormat.usage);
+    return makeUnique<RenderTargetEGLImage>(surface, size, image, format, WTF::move(fds), WTF::move(offsets), WTF::move(strides), modifier, bufferFormat.usage);
 }
 
-AcceleratedSurface::RenderTargetEGLImage::RenderTargetEGLImage(uint64_t surfaceID, const IntSize& size, EGLImage image, uint32_t format, Vector<UnixFileDescriptor>&& fds, Vector<uint32_t>&& offsets, Vector<uint32_t>&& strides, uint64_t modifier, RendererBufferFormat::Usage usage)
-    : RenderTargetShareableBuffer(surfaceID, size)
+AcceleratedSurface::RenderTargetEGLImage::RenderTargetEGLImage(AcceleratedSurface& surface, const IntSize& size, EGLImage image, uint32_t format, Vector<UnixFileDescriptor>&& fds, Vector<uint32_t>&& offsets, Vector<uint32_t>&& strides, uint64_t modifier, RendererBufferFormat::Usage usage)
+    : RenderTargetShareableBuffer(surface, size)
     , m_image(image)
 {
     initializeColorBuffer();
-    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidCreateDMABufBuffer(m_id, size, format, WTF::move(fds), WTF::move(offsets), WTF::move(strides), modifier, usage), surfaceID);
+    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidCreateDMABufBuffer(m_id, size, format, WTF::move(fds), WTF::move(offsets), WTF::move(strides), modifier, usage), m_surface->surfaceID());
 }
 #endif // USE(GBM)
 
@@ -401,7 +388,7 @@ static uint64_t usageToAHardwareBufferUsage(RendererBufferFormat::Usage usage)
     }
 }
 
-std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTargetEGLImage::create(uint64_t surfaceID, const WebCore::IntSize& size, const BufferFormat& bufferFormat)
+std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTargetEGLImage::create(AcceleratedSurface& surface, const WebCore::IntSize& size, const BufferFormat& bufferFormat)
 {
     const auto hardwareBufferFormat = toAHardwareBufferFormat(bufferFormat.fourcc);
     if (!hardwareBufferFormat) {
@@ -444,15 +431,15 @@ std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTarg
         return nullptr;
     }
 
-    return makeUnique<RenderTargetEGLImage>(surfaceID, size, image, WTF::move(hardwareBuffer));
+    return makeUnique<RenderTargetEGLImage>(surface, size, image, WTF::move(hardwareBuffer));
 }
 
-AcceleratedSurface::RenderTargetEGLImage::RenderTargetEGLImage(uint64_t surfaceID, const WebCore::IntSize& size, EGLImage image, RefPtr<AHardwareBuffer>&& hardwareBuffer)
-    : RenderTargetShareableBuffer(surfaceID, size)
+AcceleratedSurface::RenderTargetEGLImage::RenderTargetEGLImage(AcceleratedSurface& surface, const WebCore::IntSize& size, EGLImage image, RefPtr<AHardwareBuffer>&& hardwareBuffer)
+    : RenderTargetShareableBuffer(surface, size)
     , m_image(image)
 {
     initializeColorBuffer();
-    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidCreateAndroidBuffer(m_id, WTF::move(hardwareBuffer)), surfaceID);
+    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidCreateAndroidBuffer(m_id, WTF::move(hardwareBuffer)), m_surface->surfaceID());
 }
 #endif // OS(ANDROID)
 
@@ -475,7 +462,7 @@ AcceleratedSurface::RenderTargetEGLImage::~RenderTargetEGLImage()
 }
 #endif // USE(GBM) || OS(ANDROID)
 
-std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTargetSHMImage::create(uint64_t surfaceID, const IntSize& size)
+std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTargetSHMImage::create(AcceleratedSurface& surface, const IntSize& size)
 {
     RefPtr buffer = ShareableBitmap::create({ size });
     if (!buffer) {
@@ -489,11 +476,11 @@ std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTarg
         return nullptr;
     }
 
-    return makeUnique<RenderTargetSHMImage>(surfaceID, size, Ref { *buffer }, WTF::move(*bufferHandle));
+    return makeUnique<RenderTargetSHMImage>(surface, size, Ref { *buffer }, WTF::move(*bufferHandle));
 }
 
-AcceleratedSurface::RenderTargetSHMImage::RenderTargetSHMImage(uint64_t surfaceID, const IntSize& size, Ref<ShareableBitmap>&& bitmap, ShareableBitmap::Handle&& bitmapHandle)
-    : RenderTargetShareableBuffer(surfaceID, size)
+AcceleratedSurface::RenderTargetSHMImage::RenderTargetSHMImage(AcceleratedSurface& surface, const IntSize& size, Ref<ShareableBitmap>&& bitmap, ShareableBitmap::Handle&& bitmapHandle)
+    : RenderTargetShareableBuffer(surface, size)
     , m_bitmap(WTF::move(bitmap))
 {
     glGenRenderbuffers(1, &m_colorBuffer);
@@ -501,7 +488,7 @@ AcceleratedSurface::RenderTargetSHMImage::RenderTargetSHMImage(uint64_t surfaceI
     glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, size.width(), size.height());
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_colorBuffer);
 
-    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidCreateSHMBuffer(m_id, WTF::move(bitmapHandle)), surfaceID);
+    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidCreateSHMBuffer(m_id, WTF::move(bitmapHandle)), m_surface->surfaceID());
 }
 
 AcceleratedSurface::RenderTargetSHMImage::~RenderTargetSHMImage()
@@ -515,7 +502,7 @@ void AcceleratedSurface::RenderTargetSHMImage::didRenderFrame()
     glReadPixels(0, 0, m_bitmap->size().width(), m_bitmap->size().height(), GL_BGRA, GL_UNSIGNED_BYTE, m_bitmap->mutableSpan().data());
 }
 
-std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTargetSHMImageWithoutGL::create(uint64_t surfaceID, const IntSize& size)
+std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTargetSHMImageWithoutGL::create(AcceleratedSurface& surface, const IntSize& size)
 {
     RefPtr buffer = ShareableBitmap::create({ size });
     if (!buffer) {
@@ -529,20 +516,20 @@ std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTarg
         return nullptr;
     }
 
-    return makeUnique<RenderTargetSHMImageWithoutGL>(surfaceID, size, Ref { *buffer }, WTF::move(*bufferHandle));
+    return makeUnique<RenderTargetSHMImageWithoutGL>(surface, size, Ref { *buffer }, WTF::move(*bufferHandle));
 }
 
-AcceleratedSurface::RenderTargetSHMImageWithoutGL::RenderTargetSHMImageWithoutGL(uint64_t surfaceID, const IntSize& size, Ref<ShareableBitmap>&& bitmap, ShareableBitmap::Handle&& bitmapHandle)
-    : RenderTarget(surfaceID)
+AcceleratedSurface::RenderTargetSHMImageWithoutGL::RenderTargetSHMImageWithoutGL(AcceleratedSurface& surface, const IntSize& size, Ref<ShareableBitmap>&& bitmap, ShareableBitmap::Handle&& bitmapHandle)
+    : RenderTarget(surface)
     , m_initialSize(size)
     , m_bitmap(WTF::move(bitmap))
 {
-    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidCreateSHMBuffer(m_id, WTF::move(bitmapHandle)), surfaceID);
+    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidCreateSHMBuffer(m_id, WTF::move(bitmapHandle)), m_surface->surfaceID());
 }
 
 AcceleratedSurface::RenderTargetSHMImageWithoutGL::~RenderTargetSHMImageWithoutGL()
 {
-    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidDestroyBuffer(m_id), m_surfaceID);
+    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidDestroyBuffer(m_id), m_surface->surfaceID());
 }
 
 #if USE(SKIA)
@@ -556,10 +543,10 @@ SkSurface* AcceleratedSurface::RenderTargetSHMImageWithoutGL::skiaSurface()
 
 void AcceleratedSurface::RenderTargetSHMImageWithoutGL::sendFrame(Vector<IntRect, 1>&& damageRects)
 {
-    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::Frame(m_id, WTF::move(damageRects), UnixFileDescriptor()), m_surfaceID);
+    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::Frame(m_id, WTF::move(damageRects), UnixFileDescriptor()), m_surface->surfaceID());
 }
 
-std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTargetTexture::create(uint64_t surfaceID, const IntSize& size)
+std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTargetTexture::create(AcceleratedSurface& surface, const IntSize& size)
 {
     unsigned texture;
     glGenTextures(1, &texture);
@@ -609,16 +596,16 @@ std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTarg
         return static_cast<uint32_t>(offset);
     });
 
-    return makeUnique<RenderTargetTexture>(surfaceID, size, texture, fourcc, WTF::move(fds), WTF::move(offsets), WTF::move(strides), modifier);
+    return makeUnique<RenderTargetTexture>(surface, size, texture, fourcc, WTF::move(fds), WTF::move(offsets), WTF::move(strides), modifier);
 }
 
-AcceleratedSurface::RenderTargetTexture::RenderTargetTexture(uint64_t surfaceID, const IntSize& size, unsigned texture, uint32_t format, Vector<UnixFileDescriptor>&& fds, Vector<uint32_t>&& offsets, Vector<uint32_t>&& strides, uint64_t modifier)
-    : RenderTargetShareableBuffer(surfaceID, size)
+AcceleratedSurface::RenderTargetTexture::RenderTargetTexture(AcceleratedSurface& surface, const IntSize& size, unsigned texture, uint32_t format, Vector<UnixFileDescriptor>&& fds, Vector<uint32_t>&& offsets, Vector<uint32_t>&& strides, uint64_t modifier)
+    : RenderTargetShareableBuffer(surface, size)
     , m_texture(texture)
 {
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture, 0);
 
-    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidCreateDMABufBuffer(m_id, size, format, WTF::move(fds), WTF::move(offsets), WTF::move(strides), modifier, RendererBufferFormat::Usage::Rendering), surfaceID);
+    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidCreateDMABufBuffer(m_id, size, format, WTF::move(fds), WTF::move(offsets), WTF::move(strides), modifier, RendererBufferFormat::Usage::Rendering), m_surface->surfaceID());
 }
 
 AcceleratedSurface::RenderTargetTexture::~RenderTargetTexture()
@@ -629,13 +616,13 @@ AcceleratedSurface::RenderTargetTexture::~RenderTargetTexture()
 #endif // PLATFORM(GTK) || ENABLE(WPE_PLATFORM)
 
 #if USE(WPE_RENDERER)
-std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTargetWPEBackend::create(uint64_t surfaceID, const IntSize& initialSize, UnixFileDescriptor&& hostFD, const AcceleratedSurface& surface)
+std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTargetWPEBackend::create(AcceleratedSurface& surface, const IntSize& initialSize, UnixFileDescriptor&& hostFD)
 {
-    return makeUnique<RenderTargetWPEBackend>(surfaceID, initialSize, WTF::move(hostFD), surface);
+    return makeUnique<RenderTargetWPEBackend>(surface, initialSize, WTF::move(hostFD));
 }
 
-AcceleratedSurface::RenderTargetWPEBackend::RenderTargetWPEBackend(uint64_t surfaceID, const IntSize& initialSize, UnixFileDescriptor&& hostFD, const AcceleratedSurface& surface)
-    : RenderTarget(surfaceID)
+AcceleratedSurface::RenderTargetWPEBackend::RenderTargetWPEBackend(AcceleratedSurface& surface, const IntSize& initialSize, UnixFileDescriptor&& hostFD)
+    : RenderTarget(surface)
     , m_backend(wpe_renderer_backend_egl_target_create(hostFD.release()))
 {
     static struct wpe_renderer_backend_egl_target_client s_client = {
@@ -693,11 +680,11 @@ void AcceleratedSurface::RenderTargetWPEBackend::didRenderFrame()
 }
 #endif
 
-AcceleratedSurface::SwapChain::SwapChain(uint64_t surfaceID, RenderingPurpose renderingPurpose, bool useHardwareBuffersForFrameRendering)
-    : m_surfaceID(surfaceID)
+AcceleratedSurface::SwapChain::SwapChain(AcceleratedSurface& surface)
+    : m_surface(surface)
 {
 #if PLATFORM(GTK) || ENABLE(WPE_PLATFORM)
-    if (renderingPurpose == RenderingPurpose::NonComposited && !useHardwareBuffersForFrameRendering) {
+    if (m_surface->renderingPurpose() == RenderingPurpose::NonComposited && !m_surface->hardwareAccelerationEnabled()) {
         m_type = Type::SharedMemoryWithoutGL;
         return;
     }
@@ -714,23 +701,30 @@ AcceleratedSurface::SwapChain::SwapChain(uint64_t surfaceID, RenderingPurpose re
         break;
 #if USE(GBM)
     case PlatformDisplay::Type::GBM:
-        if (useHardwareBuffersForFrameRendering && display.eglExtensions().EXT_image_dma_buf_import)
+        if (m_surface->hardwareAccelerationEnabled() && display.eglExtensions().EXT_image_dma_buf_import) {
             m_type = Type::EGLImage;
-        else
-            m_type = renderingPurpose == RenderingPurpose::Composited ? Type::SharedMemory : Type::SharedMemoryWithoutGL;
+            setupBufferFormat();
+        } else
+            m_type = m_surface->renderingPurpose() == RenderingPurpose::Composited ? Type::SharedMemory : Type::SharedMemoryWithoutGL;
         break;
 #endif
 #if OS(ANDROID)
     case PlatformDisplay::Type::Android:
     case PlatformDisplay::Type::Default:
         m_type = Type::EGLImage;
+        setupBufferFormat();
         break;
 #endif
 #endif // PLATFORM(GTK) || ENABLE(WPE_PLATFORM)
 #if USE(WPE_RENDERER)
-    case PlatformDisplay::Type::WPE:
+    case PlatformDisplay::Type::WPE: {
         m_type = Type::WPEBackend;
+        Ref webPage { m_surface->m_webPage };
+        auto scaledSize = webPage->size();
+        scaledSize.scale(webPage->deviceScaleFactor());
+        m_lockedTargets.append(RenderTargetWPEBackend::create(m_surface.get(), scaledSize, webPage->hostFileDescriptor()));
         break;
+    }
 #endif
 #if PLATFORM(GTK)
     case PlatformDisplay::Type::Default:
@@ -741,8 +735,11 @@ AcceleratedSurface::SwapChain::SwapChain(uint64_t surfaceID, RenderingPurpose re
 }
 
 #if (PLATFORM(GTK) || ENABLE(WPE_PLATFORM)) && (USE(GBM) || OS(ANDROID))
-void AcceleratedSurface::SwapChain::setupBufferFormat(const Vector<RendererBufferFormat>& preferredFormats, bool isOpaque)
+void AcceleratedSurface::SwapChain::setupBufferFormat()
 {
+    if (m_type != Type::EGLImage)
+        return;
+
     auto isOpaqueFormat = [](FourCC fourcc) -> bool {
         return fourcc != DRM_FORMAT_ARGB8888
             && fourcc != DRM_FORMAT_RGBA8888
@@ -754,11 +751,14 @@ void AcceleratedSurface::SwapChain::setupBufferFormat(const Vector<RendererBuffe
             && fourcc != DRM_FORMAT_ABGR16161616F;
     };
 
+    Ref webPage { m_surface->m_webPage };
+    bool isOpaque = m_surface->isOpaque();
+
     // The preferred formats vector is sorted by usage, but all formats for the same usage has the same priority.
     Locker locker { m_bufferFormatLock };
     BufferFormat newBufferFormat;
     const auto& supportedFormats = PlatformDisplay::sharedDisplay().bufferFormats();
-    for (const auto& bufferFormat : preferredFormats) {
+    for (const auto& bufferFormat : webPage->preferredBufferFormats()) {
 
         auto matchesOpacity = false;
         for (const auto& format : supportedFormats) {
@@ -852,14 +852,14 @@ std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::SwapChain:
 #if PLATFORM(GTK) || ENABLE(WPE_PLATFORM)
 #if USE(GBM) || OS(ANDROID)
     case Type::EGLImage:
-        return RenderTargetEGLImage::create(m_surfaceID, m_size, m_bufferFormat);
+        return RenderTargetEGLImage::create(m_surface.get(), m_size, m_bufferFormat);
 #endif
     case Type::Texture:
-        return RenderTargetTexture::create(m_surfaceID, m_size);
+        return RenderTargetTexture::create(m_surface.get(), m_size);
     case Type::SharedMemory:
-        return RenderTargetSHMImage::create(m_surfaceID, m_size);
+        return RenderTargetSHMImage::create(m_surface.get(), m_size);
     case Type::SharedMemoryWithoutGL:
-        return RenderTargetSHMImageWithoutGL::create(m_surfaceID, m_size);
+        return RenderTargetSHMImageWithoutGL::create(m_surface.get(), m_size);
 #endif
 #if USE(WPE_RENDERER)
     case Type::WPEBackend:
@@ -869,9 +869,6 @@ std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::SwapChain:
     case Type::Invalid:
         break;
     }
-#if !(PLATFORM(GTK) || ENABLE(WPE_PLATFORM))
-    UNUSED_PARAM(m_surfaceID);
-#endif
     return nullptr;
 }
 
@@ -892,7 +889,7 @@ AcceleratedSurface::RenderTarget* AcceleratedSurface::SwapChain::nextTarget()
         }
 
 #if ENABLE(WPE_PLATFORM)
-        WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidChangeBufferConfiguration(m_lockedTargets.size() + targetsToCreate), m_surfaceID);
+        WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidChangeBufferConfiguration(m_lockedTargets.size() + targetsToCreate), m_surface->surfaceID());
 #endif
 
         for (unsigned i = 0; i < targetsToCreate; ++i) {
@@ -902,7 +899,7 @@ AcceleratedSurface::RenderTarget* AcceleratedSurface::SwapChain::nextTarget()
 
 #if ENABLE(WPE_PLATFORM)
         if (m_freeTargets.size() != targetsToCreate)
-            WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidChangeBufferConfiguration(m_lockedTargets.size() + m_freeTargets.size()), m_surfaceID);
+            WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidChangeBufferConfiguration(m_lockedTargets.size() + m_freeTargets.size()), m_surface->surfaceID());
 #endif
     }
 
@@ -933,7 +930,7 @@ void AcceleratedSurface::SwapChain::releaseTarget(uint64_t targetID, UnixFileDes
 void AcceleratedSurface::SwapChain::reset()
 {
 #if ENABLE(WPE_PLATFORM)
-    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidChangeBufferConfiguration(0), m_surfaceID);
+    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidChangeBufferConfiguration(0), m_surface->surfaceID());
 #endif
 
     m_lockedTargets.clear();
@@ -948,28 +945,17 @@ void AcceleratedSurface::SwapChain::releaseUnusedBuffers()
 #endif
 
 #if ENABLE(WPE_PLATFORM)
-    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidChangeBufferConfiguration(m_lockedTargets.size()), m_surfaceID);
+    WebProcess::singleton().parentProcessConnection()->send(Messages::AcceleratedBackingStore::DidChangeBufferConfiguration(m_lockedTargets.size()), m_surface->surfaceID());
 #endif
 
     m_freeTargets.clear();
 }
 
 #if USE(WPE_RENDERER)
-void AcceleratedSurface::SwapChain::initialize(WebPage& webPage)
+uint64_t AcceleratedSurface::SwapChain::window() const
 {
     ASSERT(m_type == Type::WPEBackend);
-    m_hostFD = webPage.hostFileDescriptor();
-    m_initialSize = webPage.size();
-    m_initialSize.scale(webPage.deviceScaleFactor());
-}
-
-uint64_t AcceleratedSurface::SwapChain::initializeTarget(const AcceleratedSurface& surface)
-{
-    ASSERT(m_type == Type::WPEBackend);
-    auto target = RenderTargetWPEBackend::create(m_surfaceID, m_initialSize, WTF::move(m_hostFD), surface);
-    auto window = static_cast<RenderTargetWPEBackend*>(target.get())->window();
-    m_lockedTargets.append(WTF::move(target));
-    return window;
+    return static_cast<RenderTargetWPEBackend*>(m_lockedTargets[0].get())->window();
 }
 #endif
 
@@ -986,10 +972,7 @@ void AcceleratedSurface::SwapChain::addDamage(const std::optional<Damage>& damag
 #if PLATFORM(WPE) && ENABLE(WPE_PLATFORM) && (USE(GBM) || OS(ANDROID))
 void AcceleratedSurface::preferredBufferFormatsDidChange()
 {
-    if (m_swapChain.type() != SwapChain::Type::EGLImage)
-        return;
-
-    m_swapChain.setupBufferFormat(protect(m_webPage)->preferredBufferFormats(), isColorOpaque(m_backgroundColor));
+    m_swapChain.setupBufferFormat();
 }
 #endif
 
@@ -1016,16 +999,17 @@ void AcceleratedSurface::backgroundColorDidChange()
     Ref webPage = m_webPage;
     const auto& color = webPage->backgroundColor();
 
-    bool wasOpaque = isColorOpaque(m_backgroundColor);
-    m_backgroundColor = color ? color->toResolvedColorComponentsInColorSpace(WebCore::ColorSpace::SRGB) : white;
-    bool isOpaque = isColorOpaque(m_backgroundColor);
-
+    bool wasOpaque = this->isOpaque();
+    {
+        Locker locker { m_backgroundColorLock };
+        m_backgroundColor = color;
+    }
+    bool isOpaque = this->isOpaque();
     if (isOpaque == wasOpaque)
         return;
 
 #if (PLATFORM(GTK) || ENABLE(WPE_PLATFORM)) && (USE(GBM) || OS(ANDROID))
-    if (m_swapChain.type() == SwapChain::Type::EGLImage)
-        m_swapChain.setupBufferFormat(webPage->preferredBufferFormats(), isOpaque);
+    m_swapChain.setupBufferFormat();
 #endif
 }
 
@@ -1072,18 +1056,19 @@ void AcceleratedSurface::willDestroyGLContext()
     m_swapChain.reset();
 }
 
-uint64_t AcceleratedSurface::surfaceID() const
-{
-    return m_id;
-}
-
 uint64_t AcceleratedSurface::window() const
 {
 #if USE(WPE_RENDERER)
     if (m_swapChain.type() == SwapChain::Type::WPEBackend)
-        return const_cast<SwapChain*>(&m_swapChain)->initializeTarget(*this);
+        return m_swapChain.window();
 #endif
     return 0;
+}
+
+bool AcceleratedSurface::isOpaque() const
+{
+    ASSERT(RunLoop::isMain());
+    return !m_backgroundColor || m_backgroundColor->isOpaque();
 }
 
 #if USE(SKIA)
@@ -1117,13 +1102,23 @@ void AcceleratedSurface::willRenderFrame(const IntSize& size)
 void AcceleratedSurface::clear(const OptionSet<WebCore::CompositionReason>& reasons)
 {
     ASSERT(!RunLoop::isMain());
-    auto backgroundColor = m_backgroundColor.load();
-    if (!isColorOpaque(backgroundColor)) {
+    std::optional<Color> backgroundColor;
+    {
+        Locker locker { m_backgroundColorLock };
+        backgroundColor = m_backgroundColor;
+    }
+    if (backgroundColor && !backgroundColor->isOpaque()) {
         glClearColor(0, 0, 0, 0);
         glClear(GL_COLOR_BUFFER_BIT);
-    } else if (reasons.contains(CompositionReason::AsyncScrolling)) {
-        auto [r, g, b, a] = backgroundColor;
-        glClearColor(r, g, b, a);
+        return;
+    }
+
+    if (reasons.contains(CompositionReason::AsyncScrolling)) {
+        if (backgroundColor) {
+            auto [r, g, b, a] = backgroundColor->toResolvedColorComponentsInColorSpace(WebCore::ColorSpace::SRGB);
+            glClearColor(r, g, b, a);
+        } else
+            glClearColor(1, 1, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT);
     }
 }
