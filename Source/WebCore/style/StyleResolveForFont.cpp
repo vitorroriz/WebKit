@@ -309,13 +309,13 @@ static FontVariantCaps NODELETE fontVariantCapsFromUnresolvedFontVariantCaps(con
 
 struct ResolvedFontFamily {
     Vector<AtomString> family;
-    bool isSpecifiedFont;
+    bool hasAuthorSpecifiedNonGenericPrimaryFont;
 };
 
 static ResolvedFontFamily fontFamilyFromUnresolvedFontFamily(const CSSPropertyParserHelpers::UnresolvedFontFamily& unresolvedFamily, Ref<ScriptExecutionContext> context)
 {
     bool isFirstFont = true;
-    bool isSpecifiedFont = false;
+    bool hasAuthorSpecifiedNonGenericPrimaryFont = false;
 
     auto family = WTF::compactMap(unresolvedFamily, [&](auto& item) -> std::optional<AtomString> {
         auto [family, isGenericFamily] = switchOn(item,
@@ -337,7 +337,7 @@ static ResolvedFontFamily fontFamilyFromUnresolvedFontFamily(const CSSPropertyPa
             return std::nullopt;
 
         if (isFirstFont) {
-            isSpecifiedFont = !isGenericFamily;
+            hasAuthorSpecifiedNonGenericPrimaryFont = !isGenericFamily;
             isFirstFont = false;
         }
         return family;
@@ -345,7 +345,7 @@ static ResolvedFontFamily fontFamilyFromUnresolvedFontFamily(const CSSPropertyPa
 
     return {
         .family = WTF::move(family),
-        .isSpecifiedFont = isSpecifiedFont
+        .hasAuthorSpecifiedNonGenericPrimaryFont = hasAuthorSpecifiedNonGenericPrimaryFont
     };
 }
 
@@ -373,7 +373,7 @@ std::optional<FontCascade> resolveForUnresolvedFont(const CSSPropertyParserHelpe
     if (resolvedFamily.family.isEmpty())
         return std::nullopt;
     fontDescription.setFamilies(resolvedFamily.family);
-    fontDescription.setIsSpecifiedFont(resolvedFamily.isSpecifiedFont);
+    fontDescription.setHasAuthorSpecifiedNonGenericPrimaryFont(resolvedFamily.hasAuthorSpecifiedNonGenericPrimaryFont);
 
     if (useFixedDefaultSize(fontDescription) != oldFamilyUsedFixedDefaultSize) {
         if (auto sizeIdentifier = fontDescription.keywordSizeAsIdentifier()) {

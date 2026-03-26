@@ -385,7 +385,7 @@ bool RenderText::computeUseBackslashAsYenSymbol() const
     const auto& fontDescription = style.fontDescription();
     if (style.fontCascade().useBackslashAsYenSymbol())
         return true;
-    if (fontDescription.isSpecifiedFont())
+    if (fontDescription.hasAuthorSpecifiedNonGenericPrimaryFont())
         return false;
     const PAL::TextEncoding* encoding = document().decoder() ? &document().decoder()->encoding() : 0;
     if (encoding && encoding->backslashAsCurrencySymbol() != '\\')

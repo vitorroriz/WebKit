@@ -89,7 +89,13 @@ public:
     }
     FontSmoothingMode fontSmoothing() const { return static_cast<FontSmoothingMode>(m_fontSmoothing); }
     FontSmoothingMode NODELETE usedFontSmoothing() const;
-    bool isSpecifiedFont() const { return m_isSpecifiedFont; }
+    // Used by RenderText::computeUseBackslashAsYenSymbol. In Japanese encodings
+    // (EUC-JP, Shift_JIS, etc.), the backslash byte (0x5C) maps to the yen sign.
+    // When the CSS author (or canvas font string) explicitly chose a non-generic
+    // primary font, WebKit respects that font's backslash glyph rather than
+    // substituting yen. Only the primary font matters because it represents the
+    // author's primary typographic choice.
+    bool hasAuthorSpecifiedNonGenericPrimaryFont() const { return m_hasAuthorSpecifiedNonGenericPrimaryFont; }
 
     void setOneFamily(const AtomString& family) { ASSERT(m_families->size() == 1); m_families.get()[0] = family; }
     void setFamilies(const Vector<AtomString>& families) { m_families = RefCountedFixedVector<AtomString>::createFromVector(families); }
@@ -111,7 +117,7 @@ public:
         setKeywordSize(identifier ? identifier - CSSValueXxSmall + 1 : 0);
     }
     void setFontSmoothing(FontSmoothingMode smoothing) { m_fontSmoothing = static_cast<unsigned>(smoothing); }
-    void setIsSpecifiedFont(bool isSpecifiedFont) { m_isSpecifiedFont = isSpecifiedFont; }
+    void setHasAuthorSpecifiedNonGenericPrimaryFont(bool value) { m_hasAuthorSpecifiedNonGenericPrimaryFont = value; }
 
 #if ENABLE(TEXT_AUTOSIZING)
     bool NODELETE familiesEqualForTextAutoSizing(const FontCascadeDescription& other) const;
@@ -141,7 +147,7 @@ private:
     unsigned m_keywordSize : 4;
     unsigned m_fontSmoothing : 2; // FontSmoothingMode
     // True if a web page specifies a non-generic font family as the first font family.
-    unsigned m_isSpecifiedFont : 1;
+    unsigned m_hasAuthorSpecifiedNonGenericPrimaryFont : 1;
 };
 
 inline bool FontCascadeDescription::operator==(const FontCascadeDescription& other) const
@@ -153,7 +159,7 @@ inline bool FontCascadeDescription::operator==(const FontCascadeDescription& oth
         && m_kerning == other.m_kerning
         && m_keywordSize == other.m_keywordSize
         && m_fontSmoothing == other.m_fontSmoothing
-        && m_isSpecifiedFont == other.m_isSpecifiedFont;
+        && m_hasAuthorSpecifiedNonGenericPrimaryFont == other.m_hasAuthorSpecifiedNonGenericPrimaryFont;
 }
 
 WTF::TextStream& operator<<(WTF::TextStream&, const FontCascadeDescription&);

@@ -567,7 +567,7 @@ inline void BuilderCustom::applyInitialFontFamily(BuilderState& builderState)
     }
 
     if (!initialDesc.firstFamily().isEmpty())
-        builderState.setFontDescriptionFamilies(FontFamilies { initialDesc.families(), fontDescription.isSpecifiedFont() });
+        builderState.setFontDescriptionFamilies(FontFamilies { initialDesc.families(), fontDescription.hasAuthorSpecifiedNonGenericPrimaryFont() });
 }
 
 inline void BuilderCustom::applyInheritFontFamily(BuilderState& builderState)

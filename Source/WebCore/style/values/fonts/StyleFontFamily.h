@@ -79,8 +79,8 @@ struct FontFamilies {
     {
     }
 
-    FontFamilies(Ref<RefCountedFixedVector<AtomString>>&& families, bool isSpecifiedFont)
-        : FontFamilies { WTF::move(families), isSpecifiedFont ? FontFamilyKind::Specified : FontFamilyKind::Generic }
+    FontFamilies(Ref<RefCountedFixedVector<AtomString>>&& families, bool hasAuthorSpecifiedNonGenericPrimaryFont)
+        : FontFamilies { WTF::move(families), hasAuthorSpecifiedNonGenericPrimaryFont ? FontFamilyKind::Specified : FontFamilyKind::Generic }
     {
     }
 
@@ -124,7 +124,7 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
     Ref<RefCountedFixedVector<AtomString>> takePlatform() { return WTF::move(m_families); }
 
     FontFamilyKind firstFontKind() const { return m_firstFontKind; }
-    bool isSpecifiedFont() const { return m_firstFontKind == FontFamilyKind::Specified; }
+    bool hasAuthorSpecifiedNonGenericPrimaryFont() const { return m_firstFontKind == FontFamilyKind::Specified; }
 
     bool operator==(const FontFamilies& other) const
     {

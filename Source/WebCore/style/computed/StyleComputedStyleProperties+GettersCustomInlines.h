@@ -138,7 +138,7 @@ float ComputedStyleProperties::specifiedFontSize() const
 
 inline FontFamilies ComputedStyleProperties::fontFamily() const
 {
-    return { fontDescription().families(), fontDescription().isSpecifiedFont() };
+    return { fontDescription().families(), fontDescription().hasAuthorSpecifiedNonGenericPrimaryFont() };
 }
 
 inline FontPalette ComputedStyleProperties::fontPalette() const

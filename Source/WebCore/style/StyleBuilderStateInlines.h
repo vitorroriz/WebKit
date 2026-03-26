@@ -78,13 +78,13 @@ inline void BuilderState::setFontDescriptionFontSize(float fontSize)
 
 inline void BuilderState::setFontDescriptionFamilies(FontFamilies&& families)
 {
-    if (m_style.fontDescription().families() == families.toPlatform() && m_style.fontDescription().isSpecifiedFont() == families.isSpecifiedFont())
+    if (m_style.fontDescription().families() == families.toPlatform() && m_style.fontDescription().hasAuthorSpecifiedNonGenericPrimaryFont() == families.hasAuthorSpecifiedNonGenericPrimaryFont())
         return;
 
     m_fontDirty = true;
     auto& fontCascade = m_style.mutableFontCascadeWithoutUpdate();
     fontCascade.mutableFontDescription().setFamilies(families.takePlatform());
-    fontCascade.mutableFontDescription().setIsSpecifiedFont(families.isSpecifiedFont());
+    fontCascade.mutableFontDescription().setHasAuthorSpecifiedNonGenericPrimaryFont(families.hasAuthorSpecifiedNonGenericPrimaryFont());
     fontCascade.updateUseBackslashAsYenSymbol();
 }
 

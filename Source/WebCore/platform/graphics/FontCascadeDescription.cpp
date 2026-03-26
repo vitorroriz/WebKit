@@ -67,7 +67,7 @@ FontCascadeDescription::FontCascadeDescription()
     , m_kerning(std::to_underlying(Kerning::Auto))
     , m_keywordSize(0)
     , m_fontSmoothing(std::to_underlying(FontSmoothingMode::Auto))
-    , m_isSpecifiedFont(false)
+    , m_hasAuthorSpecifiedNonGenericPrimaryFont(false)
 {
 }
 
@@ -180,7 +180,7 @@ TextStream& operator<<(TextStream& ts, const FontCascadeDescription& fontCascade
         ts << ", font smoothing "_s << fontCascadeDescription.fontSmoothing();
 
     ts << ", keyword size "_s << fontCascadeDescription.keywordSize();
-    ts << ", is specified font "_s << fontCascadeDescription.isSpecifiedFont();
+    ts << ", has author specified non-generic primary font "_s << fontCascadeDescription.hasAuthorSpecifiedNonGenericPrimaryFont();
 
     return ts;
 }
