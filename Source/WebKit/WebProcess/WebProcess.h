@@ -426,6 +426,9 @@ public:
 #endif
     void unblockServicesRequiredByAccessibility(Vector<SandboxExtension::Handle>&&);
     static id accessibilityFocusedUIElement();
+#if PLATFORM(MAC) || PLATFORM(MACCATALYST)
+    static void setAllowAXAuthenticationForTesting(bool);
+#endif
     void powerSourceDidChange(bool);
 #endif
 

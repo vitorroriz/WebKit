@@ -314,8 +314,18 @@ static void preventAppKitFromContactingLaunchServices(NSApplication*, SEL)
 #endif
 
 #if PLATFORM(MAC) || PLATFORM(MACCATALYST)
+static std::atomic<bool> allowAllAXAuthenticationForTesting { false };
+
+void WebProcess::setAllowAXAuthenticationForTesting(bool allow)
+{
+    allowAllAXAuthenticationForTesting = allow;
+}
+
 static Boolean isAXAuthenticatedCallback(audit_token_t auditToken)
 {
+    if (allowAllAXAuthenticationForTesting) [[unlikely]]
+        return true;
+
     bool authenticated = false;
     // IPC must be done on the main runloop, so dispatch it to avoid crashes when the secondary AX thread handles this callback.
     callOnMainRunLoopAndWait([&authenticated, auditToken] {

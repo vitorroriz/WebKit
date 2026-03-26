@@ -38,6 +38,7 @@
 #include "WKData.h"
 #include "WebFrame.h"
 #include "WebPage.h"
+#include "WebProcess.h"
 #include <WebCore/AXIsolatedObject.h>
 #include <WebCore/AXIsolatedTree.h>
 #include <WebCore/AXObjectCache.h>
@@ -343,4 +344,11 @@ void* _WKAccessibilityRootObjectForTesting(WKBundleFrameRef frameRef)
     CheckedPtr cache = getAXObjectCache();
     RefPtr root = cache ? cache->rootObjectForFrame(*protect(protect(WebKit::toImpl(frameRef))->coreLocalFrame())) : nullptr;
     return root ? root->wrapper() : nullptr;
+}
+
+void _WKAccessibilityAllowAuthenticationForTesting(bool allow)
+{
+#if PLATFORM(MAC) || PLATFORM(MACCATALYST)
+    WebKit::WebProcess::setAllowAXAuthenticationForTesting(allow);
+#endif
 }
