@@ -868,7 +868,7 @@ constexpr T roundDownToMultipleOf(T x)
 
 #define WTF_PROVEN_TRUE(x) (__builtin_constant_p(x) && (x))
 
-ALWAYS_INLINE int32_t truncateDoubleToInt32(double number)
+SUPPRESS_NODELETE ALWAYS_INLINE int32_t NODELETE truncateDoubleToInt32(double number)
 {
 #if CPU(X86_64)
     return _mm_cvttsd_si32(_mm_set_sd(number));
@@ -895,7 +895,7 @@ ALWAYS_INLINE int32_t truncateDoubleToInt32(double number)
 #endif
 }
 
-ALWAYS_INLINE int64_t truncateDoubleToInt64(double number)
+SUPPRESS_NODELETE ALWAYS_INLINE int64_t NODELETE truncateDoubleToInt64(double number)
 {
 #if CPU(X86_64)
     return _mm_cvttsd_si64(_mm_set_sd(number));
@@ -917,7 +917,7 @@ ALWAYS_INLINE int64_t truncateDoubleToInt64(double number)
 #endif
 }
 
-ALWAYS_INLINE uint32_t truncateDoubleToUint32(double number)
+SUPPRESS_NODELETE ALWAYS_INLINE uint32_t NODELETE truncateDoubleToUint32(double number)
 {
 #if CPU(X86_64)
     return static_cast<uint32_t>(_mm_cvttsd_si64(_mm_set_sd(number)));
@@ -939,7 +939,7 @@ ALWAYS_INLINE uint32_t truncateDoubleToUint32(double number)
 #endif
 }
 
-ALWAYS_INLINE uint64_t truncateDoubleToUint64(double number)
+SUPPRESS_NODELETE ALWAYS_INLINE uint64_t NODELETE truncateDoubleToUint64(double number)
 {
 #if CPU(X86_64)
     // Branchless conversion matching compiler codegen for static_cast<uint64_t>(double).
@@ -975,7 +975,7 @@ ALWAYS_INLINE uint64_t truncateDoubleToUint64(double number)
 
 // Float-to-integer truncation helpers.
 
-ALWAYS_INLINE int32_t truncateFloatToInt32(float number)
+SUPPRESS_NODELETE ALWAYS_INLINE int32_t NODELETE truncateFloatToInt32(float number)
 {
 #if CPU(X86_64)
     return _mm_cvttss_si32(_mm_set_ss(number));
@@ -997,7 +997,7 @@ ALWAYS_INLINE int32_t truncateFloatToInt32(float number)
 #endif
 }
 
-ALWAYS_INLINE int64_t truncateFloatToInt64(float number)
+SUPPRESS_NODELETE ALWAYS_INLINE int64_t NODELETE truncateFloatToInt64(float number)
 {
 #if CPU(X86_64)
     return _mm_cvttss_si64(_mm_set_ss(number));
@@ -1024,7 +1024,7 @@ ALWAYS_INLINE int64_t truncateFloatToInt64(float number)
 #endif
 }
 
-ALWAYS_INLINE uint32_t truncateFloatToUint32(float number)
+SUPPRESS_NODELETE ALWAYS_INLINE uint32_t NODELETE truncateFloatToUint32(float number)
 {
 #if CPU(X86_64)
     return static_cast<uint32_t>(_mm_cvttss_si64(_mm_set_ss(number)));
@@ -1040,7 +1040,7 @@ ALWAYS_INLINE uint32_t truncateFloatToUint32(float number)
 #endif
 }
 
-ALWAYS_INLINE uint64_t truncateFloatToUint64(float number)
+SUPPRESS_NODELETE ALWAYS_INLINE uint64_t NODELETE truncateFloatToUint64(float number)
 {
 #if CPU(X86_64)
     // Branchless conversion matching compiler codegen for static_cast<uint64_t>(float).
@@ -1078,7 +1078,7 @@ ALWAYS_INLINE uint64_t truncateFloatToUint64(float number)
 // tryConvertToStrictInt32: Attempts to convert a double to int32_t, returning
 // std::nullopt if the value is not exactly representable as int32 (including
 // -0.0, NaN, Infinity, non-integer values, and out-of-range values).
-ALWAYS_INLINE std::optional<int32_t> tryConvertToStrictInt32(double value)
+SUPPRESS_NODELETE ALWAYS_INLINE std::optional<int32_t> NODELETE tryConvertToStrictInt32(double value)
 {
 #if HAVE(FJCVTZS_INSTRUCTION)
     int32_t result;
