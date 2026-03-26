@@ -62,7 +62,7 @@ public:
 #if ENABLE(VIDEO)
     virtual RefPtr<AudioVideoRenderer> createAudioVideoRenderer(WTF::LoggerHelper*, HTMLMediaElementIdentifier, MediaPlayerIdentifier) const;
     bool NODELETE hasRemoteRendererFor(MediaPlayerMediaEngineIdentifier) const;
-    void NODELETE enableRemoteRenderer(MediaPlayerMediaEngineIdentifier, bool);
+    void enableRemoteRenderer(MediaPlayerMediaEngineIdentifier, bool);
 #endif
     virtual std::unique_ptr<NowPlayingManager> createNowPlayingManager() const;
     void resetMediaEngines();
