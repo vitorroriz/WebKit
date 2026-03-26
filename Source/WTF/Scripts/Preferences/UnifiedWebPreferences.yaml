@@ -5108,6 +5108,22 @@ MediaContainerTypesAllowedInLockdownMode:
     WebKit:
       default: '"video/mp4,audio/mp4,video/x-m4v,audio/x-m4a,audio/mp3,application/x-mpegURL,application/vnd.apple.mpegURL,video/mp2t,video/iso.segment,audio/aac,audio/mpeg,audio/ac3,audio/eac3,video/mpeg2,text/vtt"_str'
 
+MediaContainmentEnabled:
+  type: bool
+  status: stable
+  category: media
+  humanReadableName: "Media Containment"
+  humanReadableDescription: "Process complex media types in the web process"
+  condition: PLATFORM(COCOA) && ENABLE(VIDEO)
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: true
+    WebCore:
+      default: true
+  sharedPreferenceForWebProcess: true
+
 MediaContentTypesRequiringHardwareSupport:
   type: String
   status: embedder
@@ -5397,22 +5413,6 @@ MediaSourcePrefersDecompressionSession:
       default: false
     WebKit:
       default: WebKit::defaultMediaSourcePrefersDecompressionSession()
-    WebCore:
-      default: true
-  sharedPreferenceForWebProcess: true
-
-MediaSourceUseRemoteAudioVideoRenderer:
-  type: bool
-  status: stable
-  category: media
-  humanReadableName: "MSE player uses GPU renderer"
-  humanReadableDescription: "MSE player uses GPU renderer"
-  condition: PLATFORM(COCOA) && ENABLE(VIDEO)
-  defaultValue:
-    WebKitLegacy:
-      default: false
-    WebKit:
-      default: true
     WebCore:
       default: true
   sharedPreferenceForWebProcess: true
@@ -9668,22 +9668,6 @@ WebLocksAPIEnabled:
   disableInLockdownMode: true
   sharedPreferenceForWebProcess: true
   richJavaScript: true
-
-WebMUseRemoteAudioVideoRenderer:
-  type: bool
-  status: stable
-  category: media
-  humanReadableName: "WebM player uses GPU renderer"
-  humanReadableDescription: "WebM player uses GPU renderer"
-  condition: PLATFORM(COCOA) && ENABLE(VIDEO)
-  defaultValue:
-    WebKitLegacy:
-      default: false
-    WebKit:
-      default: true
-    WebCore:
-      default: true
-  sharedPreferenceForWebProcess: true
 
 WebPageSpatialBackdropEnabled:
   type: bool

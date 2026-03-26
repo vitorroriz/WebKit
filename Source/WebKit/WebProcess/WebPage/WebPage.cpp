@@ -5037,8 +5037,8 @@ void WebPage::updatePreferences(const WebPreferencesStore& store)
 #if ENABLE(VIDEO)
     protect(WebProcess::singleton().remoteMediaPlayerManager())->setUseGPUProcess(m_shouldPlayMediaInGPUProcess);
 #if PLATFORM(COCOA)
-    platformStrategies()->mediaStrategy()->enableRemoteRenderer(MediaPlayerMediaEngineIdentifier::CocoaWebM, settings.webMUseRemoteAudioVideoRenderer());
-    platformStrategies()->mediaStrategy()->enableRemoteRenderer(MediaPlayerMediaEngineIdentifier::AVFoundationMSE, settings.mediaSourceUseRemoteAudioVideoRenderer());
+    platformStrategies()->mediaStrategy()->enableRemoteRenderer(MediaPlayerMediaEngineIdentifier::CocoaWebM, settings.mediaContainmentEnabled());
+    platformStrategies()->mediaStrategy()->enableRemoteRenderer(MediaPlayerMediaEngineIdentifier::AVFoundationMSE, settings.mediaContainmentEnabled());
 #endif
 #endif
 #if HAVE(AVASSETREADER)
