@@ -3216,6 +3216,8 @@ webkit.org/b/191707 imported/w3c/web-platform-tests/webrtc/simplecall-no-ssrcs.h
 webkit.org/b/191707 imported/w3c/web-platform-tests/webrtc/simplecall.https.html [ Skip ]
 imported/w3c/web-platform-tests/webrtc-encoded-transform/script-metadata-transform.https.html [ Skip ]
 
+imported/w3c/web-platform-tests/webrtc/RTCRtpTransceiver.https.html?rest [ Pass Failure ]
+
 webkit.org/b/197473 imported/w3c/web-platform-tests/resource-timing/resource-timing-level1.sub.html [ Pass Failure ]
 
 # These tests depend on the implementation of "modern compatibility mode" in WebKitAdditions.

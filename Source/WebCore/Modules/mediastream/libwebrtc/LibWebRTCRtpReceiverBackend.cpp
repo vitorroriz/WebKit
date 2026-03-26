@@ -53,7 +53,10 @@ LibWebRTCRtpReceiverBackend::LibWebRTCRtpReceiverBackend(Ref<webrtc::RtpReceiver
 {
 }
 
-LibWebRTCRtpReceiverBackend::~LibWebRTCRtpReceiverBackend() = default;
+LibWebRTCRtpReceiverBackend::~LibWebRTCRtpReceiverBackend()
+{
+    m_rtcReceiver->SetObserver(nullptr);
+}
 
 RTCRtpParameters LibWebRTCRtpReceiverBackend::getParameters()
 {
@@ -117,32 +120,41 @@ Vector<RTCRtpSynchronizationSource> LibWebRTCRtpReceiverBackend::getSynchronizat
 
 Ref<RealtimeMediaSource> LibWebRTCRtpReceiverBackend::createSource(Document& document)
 {
-    auto rtcTrack = m_rtcReceiver->track();
-    switch (m_rtcReceiver->media_type()) {
-    case webrtc::MediaType::ANY:
-    case webrtc::MediaType::DATA:
-    case webrtc::MediaType::UNSUPPORTED:
-        break;
-    case webrtc::MediaType::AUDIO: {
-        // This is a cast from a webrtc type, not much we can do to make it safe.
-        SUPPRESS_MEMORY_UNSAFE_CAST webrtc::scoped_refptr<webrtc::AudioTrackInterface> audioTrack { static_cast<webrtc::AudioTrackInterface*>(rtcTrack.get()) };
-        Ref source = RealtimeIncomingAudioSource::create(toRef(WTF::move(audioTrack)), fromStdString(rtcTrack->id()));
-        if (document.page()) {
-            auto& webRTCProvider = downcast<LibWebRTCProvider>(document.page()->webRTCProvider());
-            source->setAudioModule(webRTCProvider.audioModule());
+    RefPtr source = [&] -> RefPtr<RealtimeMediaSource> {
+        auto rtcTrack = m_rtcReceiver->track();
+        switch (m_rtcReceiver->media_type()) {
+        case webrtc::MediaType::ANY:
+        case webrtc::MediaType::DATA:
+        case webrtc::MediaType::UNSUPPORTED:
+            break;
+        case webrtc::MediaType::AUDIO: {
+            // This is a cast from a webrtc type, not much we can do to make it safe.
+            SUPPRESS_MEMORY_UNSAFE_CAST webrtc::scoped_refptr<webrtc::AudioTrackInterface> audioTrack { static_cast<webrtc::AudioTrackInterface*>(rtcTrack.get()) };
+            Ref source = RealtimeIncomingAudioSource::create(toRef(WTF::move(audioTrack)), fromStdString(rtcTrack->id()));
+            if (document.page()) {
+                auto& webRTCProvider = downcast<LibWebRTCProvider>(document.page()->webRTCProvider());
+                source->setAudioModule(webRTCProvider.audioModule());
+            }
+            return source;
         }
-        return source;
-    }
-    case webrtc::MediaType::VIDEO: {
-        // This is a cast from a webrtc type, not much we can do to make it safe.
-        SUPPRESS_MEMORY_UNSAFE_CAST webrtc::scoped_refptr<webrtc::VideoTrackInterface> videoTrack { static_cast<webrtc::VideoTrackInterface*>(rtcTrack.get()) };
-        Ref source = RealtimeIncomingVideoSource::create(toRef(WTF::move(videoTrack)), fromStdString(rtcTrack->id()));
-        if (document.settings().webRTCMediaPipelineAdditionalLoggingEnabled())
-            source->enableFrameRatedMonitoring();
-        return source;
-    }
-    }
-    RELEASE_ASSERT_NOT_REACHED();
+        case webrtc::MediaType::VIDEO: {
+            // This is a cast from a webrtc type, not much we can do to make it safe.
+            SUPPRESS_MEMORY_UNSAFE_CAST webrtc::scoped_refptr<webrtc::VideoTrackInterface> videoTrack { static_cast<webrtc::VideoTrackInterface*>(rtcTrack.get()) };
+            Ref source = RealtimeIncomingVideoSource::create(toRef(WTF::move(videoTrack)), fromStdString(rtcTrack->id()));
+            if (document.settings().webRTCMediaPipelineAdditionalLoggingEnabled())
+                source->enableFrameRatedMonitoring();
+            return source;
+        }
+        }
+        return nullptr;
+    }();
+
+    RELEASE_ASSERT(source);
+
+    m_source = *source;
+    m_rtcReceiver->SetObserver(this);
+
+    return source.releaseNonNull();
 }
 
 Ref<RTCRtpTransformBackend> LibWebRTCRtpReceiverBackend::rtcRtpTransformBackend()
@@ -156,6 +168,14 @@ std::unique_ptr<RTCDtlsTransportBackend> LibWebRTCRtpReceiverBackend::dtlsTransp
 {
     RefPtr backend = toRefPtr(m_rtcReceiver->dtls_transport());
     return backend ? makeUnique<LibWebRTCDtlsTransportBackend>(backend.releaseNonNull()) : nullptr;
+}
+
+void LibWebRTCRtpReceiverBackend::OnFirstPacketReceivedAfterReceptiveChange(webrtc::MediaType)
+{
+    callOnMainThread([source = m_source] {
+        if (RefPtr protectedSource = source.get())
+            protectedSource->setMuted(false);
+    });
 }
 
 } // namespace WebCore

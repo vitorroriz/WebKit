@@ -565,8 +565,6 @@ void PeerConnectionBackend::setRemoteDescriptionSucceeded(std::optional<Descript
                     DEBUG_LOG(LOGIDENTIFIER, "PeerConnection closed while dispatching track events");
                     return;
                 }
-
-                protect(track->source())->setMuted(false);
             }
         }
 
