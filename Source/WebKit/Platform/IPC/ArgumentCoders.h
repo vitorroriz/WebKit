@@ -691,7 +691,7 @@ template<typename KeyArg, typename HashArg, typename KeyTraitsArg> struct Argume
             if (!HashCountedSetType::isValidValue(*key)) [[unlikely]]
                 return std::nullopt;
 
-            if (!tempHashCountedSet.add(*key, *count).isNewEntry) [[unlikely]] {
+            if (!tempHashCountedSet.add(WTF::move(*key), *count).isNewEntry) [[unlikely]] {
                 // The hash counted set already has the specified key, bail.
                 return std::nullopt;
             }
