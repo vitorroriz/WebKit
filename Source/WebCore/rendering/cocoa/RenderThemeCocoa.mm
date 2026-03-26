@@ -96,11 +96,13 @@
 #import <pal/ios/UIKitSoftLink.h>
 #endif
 
-namespace WebCore {
-
 #if USE(APPLE_INTERNAL_SDK)
 #import <WebKitAdditions/RenderThemeCocoaAdditionsBefore.mm>
-#else
+#endif
+
+namespace WebCore {
+
+#if !USE(APPLE_INTERNAL_SDK)
 static constexpr auto switchCornerRadiusFraction = 0.f;
 #endif
 
