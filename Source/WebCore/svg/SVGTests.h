@@ -47,8 +47,8 @@ public:
     SVGStringList& systemLanguage() { return m_systemLanguage; }
 
 private:
-    Ref<SVGStringList> m_requiredExtensions;
-    Ref<SVGStringList> m_systemLanguage;
+    const Ref<SVGStringList> m_requiredExtensions;
+    const Ref<SVGStringList> m_systemLanguage;
 };
 
 class SVGTests {

@@ -152,7 +152,7 @@ private:
     SVGSVGElement* findRootAnchor(StringView) const;
 
     bool m_useCurrentView { false };
-    Ref<SMILTimeContainer> m_timeContainer;
+    const Ref<SMILTimeContainer> m_timeContainer;
     RefPtr<SVGViewSpec> m_viewSpec;
     RefPtr<SVGViewElement> m_currentViewElement;
     String m_currentViewFragmentIdentifier;

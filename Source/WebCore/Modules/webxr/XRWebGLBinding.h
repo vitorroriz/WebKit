@@ -82,7 +82,7 @@ public:
 private:
     XRWebGLBinding(Ref<WebXRSession>&&, WebXRWebGLRenderingContext&&);
 
-    Ref<WebXRSession> m_session;
+    const Ref<WebXRSession> m_session;
     WebXRWebGLRenderingContext m_context;
 };
 
