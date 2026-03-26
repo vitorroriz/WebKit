@@ -2691,6 +2691,29 @@ FloatRect RenderElement::referenceBoxRect(CSSBoxType boxType) const
     return { };
 }
 
+void RenderElement::establishesTopLayerWillChange()
+{
+    if (CheckedPtr renderer = dynamicDowncast<RenderLayerModelObject>(this); renderer && renderer->layer())
+        protect(renderer->layer())->establishesTopLayerWillChange();
+
+    CheckedPtr renderBox = dynamicDowncast<RenderBox>(this);
+    if (!renderBox || !renderBox->isOutOfFlowPositioned())
+        return;
+
+    // Remove from the current containing block's out-of-flow list. The renderer will be
+    // re-inserted into the correct containing block's list during the next layout.
+    RenderBlock::removeOutOfFlowBox(*renderBox);
+    if (CheckedPtr parent = RenderObject::containingBlockForPositionType(PositionType::Static, *renderBox))
+        parent->setChildNeedsLayout();
+    renderBox->setNeedsLayout();
+}
+
+void RenderElement::establishesTopLayerDidChange()
+{
+    if (CheckedPtr renderer = dynamicDowncast<RenderLayerModelObject>(this); renderer && renderer->layer())
+        protect(renderer->layer())->establishesTopLayerDidChange();
+}
+
 void RenderElement::markRendererDirtyAfterTopLayerChange(RenderElement* renderer, RenderBlock* containingBlockBeforeStyleResolution)
 {
     auto* renderBox = dynamicDowncast<RenderBox>(renderer);

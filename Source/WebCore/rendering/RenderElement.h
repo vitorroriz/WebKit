@@ -306,6 +306,9 @@ public:
 
     virtual LayoutRect paintRectToClipOutFromBorder(const LayoutRect&) { return { }; }
 
+    void establishesTopLayerWillChange();
+    void establishesTopLayerDidChange();
+
     static void markRendererDirtyAfterTopLayerChange(RenderElement* renderer, RenderBlock* containingBlockBeforeStyleResolution);
 
     void clearNeedsLayoutForSkippedContent();
