@@ -25,6 +25,7 @@
 
 #include "config.h"
 
+#include <tuple>
 #include <wtf/CryptographicallyRandomNumber.h>
 #include <wtf/MathExtras.h>
 #include <wtf/StdLibExtras.h>
@@ -323,6 +324,50 @@ TEST(WTF_StdLibExtras, HoldsAlternativeByType)
     EXPECT_FALSE((WTF::holdsAlternative<int>(doubleVariant)));
     EXPECT_TRUE((WTF::holdsAlternative<double>(doubleVariant)));
     EXPECT_FALSE((WTF::holdsAlternative<float>(doubleVariant)));
+}
+
+TEST(WTF_StdLibExtras, SwitchOnTupleAtIndex)
+{
+    std::tuple<int, double, float> tuple { 42, 3.14, 1.5f };
+
+    // Visit index 0 (int).
+    bool visitedInt = false;
+    WTF::switchOnTupleAtIndex(0, tuple,
+        [&](const int& value) { visitedInt = true; EXPECT_EQ(42, value); },
+        [&](const double&) { FAIL(); },
+        [&](const float&) { FAIL(); }
+    );
+    EXPECT_TRUE(visitedInt);
+
+    // Visit index 1 (double).
+    bool visitedDouble = false;
+    WTF::switchOnTupleAtIndex(1, tuple,
+        [&](const int&) { FAIL(); },
+        [&](const double& value) { visitedDouble = true; EXPECT_DOUBLE_EQ(3.14, value); },
+        [&](const float&) { FAIL(); }
+    );
+    EXPECT_TRUE(visitedDouble);
+
+    // Visit index 2 (float).
+    bool visitedFloat = false;
+    WTF::switchOnTupleAtIndex(2, tuple,
+        [&](const int&) { FAIL(); },
+        [&](const double&) { FAIL(); },
+        [&](const float& value) { visitedFloat = true; EXPECT_FLOAT_EQ(1.5f, value); }
+    );
+    EXPECT_TRUE(visitedFloat);
+}
+
+TEST(WTF_StdLibExtras, VisitTupleElementAtIndex)
+{
+    std::tuple<int, double, float> tuple { 10, 2.5, 0.5f };
+
+    // Verify return value works through visitTupleElementAtIndex.
+    auto result = WTF::visitTupleElementAtIndex(
+        [](const auto& value) -> double { return static_cast<double>(value); },
+        1, tuple
+    );
+    EXPECT_DOUBLE_EQ(2.5, result);
 }
 
 } // namespace TestWebKitAPI
