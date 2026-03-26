@@ -448,10 +448,8 @@ public:
 #if ENABLE(MODEL_PROCESS)
     virtual void didCreateContextInModelProcessForVisibilityPropagation(LayerHostingContextID) { }
 #endif
-#if USE(EXTENSIONKIT)
-    virtual UIView *createVisibilityPropagationView() { return nullptr; }
+    virtual RetainPtr<UIView> createVisibilityPropagationView() { return nullptr; }
     virtual void removeVisibilityPropagationView(UIView *) { }
-#endif
 #endif // HAVE(VISIBILITY_PROPAGATION_VIEW)
 
 #if ENABLE(GPU_PROCESS)

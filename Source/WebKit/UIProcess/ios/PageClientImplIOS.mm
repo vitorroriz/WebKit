@@ -300,8 +300,7 @@ void PageClientImpl::didReceiveInteractiveModelElement(std::optional<WebCore::No
 }
 #endif // ENABLE(MODEL_PROCESS)
 
-#if USE(EXTENSIONKIT)
-UIView *PageClientImpl::createVisibilityPropagationView()
+RetainPtr<UIView> PageClientImpl::createVisibilityPropagationView()
 {
     return [contentView() _createVisibilityPropagationView];
 }
@@ -310,7 +309,6 @@ void PageClientImpl::removeVisibilityPropagationView(UIView *view)
 {
     [contentView() _removeVisibilityPropagationView:view];
 }
-#endif
 #endif // HAVE(VISIBILITY_PROPAGATION_VIEW)
 
 #if ENABLE(GPU_PROCESS)
