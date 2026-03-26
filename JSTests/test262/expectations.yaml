@@ -481,42 +481,6 @@ test/built-ins/TypedArrayConstructors/ctors/object-arg/iterated-array-changed-by
 test/built-ins/TypedArrayConstructors/ctors/typedarray-arg/throw-type-error-before-custom-proto-access.js:
   default: 'Test262Error: Expected a TypeError but got a Test262Error (Testing with Float64Array and makePassthrough.)'
   strict mode: 'Test262Error: Expected a TypeError but got a Test262Error (Testing with Float64Array and makePassthrough.)'
-test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-canonical-invalid-index-prototype-chain-set.js:
-  default: 'Test262Error: 1 setter should be unreachable! (Testing with BigInt64Array and makePassthrough.)'
-  strict mode: 'Test262Error: 1 setter should be unreachable! (Testing with BigInt64Array and makePassthrough.)'
-test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-canonical-invalid-index-reflect-set.js:
-  default: 'Test262Error: value should not be coerced Expected SameValue(«32», «0») to be true'
-  strict mode: 'Test262Error: value should not be coerced Expected SameValue(«32», «0») to be true'
-test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-valid-index-prototype-chain-set.js:
-  default: 'Test262Error: 0 setter should be unreachable! (Testing with BigInt64Array and makePassthrough.)'
-  strict mode: 'Test262Error: 0 setter should be unreachable! (Testing with BigInt64Array and makePassthrough.)'
-test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-valid-index-reflect-set.js:
-  default: 'Test262Error: target[0] should remain unchanged (receiver: empty object) Expected SameValue(«2n», «0n») to be true (Testing with BigInt64Array and makePassthrough.)'
-  strict mode: 'Test262Error: target[0] should remain unchanged (receiver: empty object) Expected SameValue(«2n», «0n») to be true (Testing with BigInt64Array and makePassthrough.)'
-test/built-ins/TypedArrayConstructors/internals/Set/key-is-canonical-invalid-index-prototype-chain-set.js:
-  default: 'Test262Error: 1 setter should be unreachable! (Testing with Float64Array and makePassthrough.)'
-  strict mode: 'Test262Error: 1 setter should be unreachable! (Testing with Float64Array and makePassthrough.)'
-test/built-ins/TypedArrayConstructors/internals/Set/key-is-canonical-invalid-index-reflect-set.js:
-  default: 'Test262Error: value should not be coerced Expected SameValue(«160», «0») to be true'
-  strict mode: 'Test262Error: value should not be coerced Expected SameValue(«160», «0») to be true'
-test/built-ins/TypedArrayConstructors/internals/Set/key-is-in-bounds-receiver-is-not-typed-array.js:
-  default: 'Test262Error: valueOf is not called Expected SameValue(«1», «0») to be true'
-  strict mode: 'Test262Error: valueOf is not called Expected SameValue(«1», «0») to be true'
-test/built-ins/TypedArrayConstructors/internals/Set/key-is-out-of-bounds-receiver-is-not-object.js:
-  default: 'Test262Error: valueOf is not called Expected SameValue(«1», «0») to be true'
-  strict mode: 'Test262Error: valueOf is not called Expected SameValue(«1», «0») to be true'
-test/built-ins/TypedArrayConstructors/internals/Set/key-is-out-of-bounds-receiver-is-not-typed-array.js:
-  default: 'Test262Error: valueOf is not called Expected SameValue(«1», «0») to be true'
-  strict mode: 'Test262Error: valueOf is not called Expected SameValue(«1», «0») to be true'
-test/built-ins/TypedArrayConstructors/internals/Set/key-is-out-of-bounds-receiver-is-proto.js:
-  default: 'Test262Error: [[Set]] succeeeds'
-  strict mode: 'Test262Error: [[Set]] succeeeds'
-test/built-ins/TypedArrayConstructors/internals/Set/key-is-valid-index-prototype-chain-set.js:
-  default: 'Test262Error: 0 setter should be unreachable! (Testing with Float64Array and makePassthrough.)'
-  strict mode: 'Test262Error: 0 setter should be unreachable! (Testing with Float64Array and makePassthrough.)'
-test/built-ins/TypedArrayConstructors/internals/Set/key-is-valid-index-reflect-set.js:
-  default: 'Test262Error: target[0] should remain unchanged (receiver: empty object) Expected SameValue(«2.3», «0») to be true (Testing with Float64Array and makePassthrough.)'
-  strict mode: 'Test262Error: target[0] should remain unchanged (receiver: empty object) Expected SameValue(«2.3», «0») to be true (Testing with Float64Array and makePassthrough.)'
 test/built-ins/Uint8Array/prototype/setFromBase64/trailing-garbage-empty.js:
   default: 'SyntaxError: Uint8Array.prototype.setFromBase64 requires a valid base64 string'
   strict mode: 'SyntaxError: Uint8Array.prototype.setFromBase64 requires a valid base64 string'
@@ -974,9 +938,6 @@ test/staging/sm/TypedArray/constructor-buffer-sequence.js:
 test/staging/sm/TypedArray/iterator-next-with-detached.js:
   default: 'TypeError: Underlying ArrayBuffer has been detached from the view or out-of-bounds'
   strict mode: 'TypeError: Underlying ArrayBuffer has been detached from the view or out-of-bounds'
-test/staging/sm/TypedArray/set-with-receiver.js:
-  default: 'Test262Error: Expected SameValue(«47», «0») to be true'
-  strict mode: 'Test262Error: Expected SameValue(«47», «0») to be true'
 test/staging/sm/TypedArray/slice-memcpy.js:
   default: 'Test262Error: Actual [1, 2, 1, 2, 3, 4] and expected [1, 2, 1, 2, 1, 2] should have the same contents. '
   strict mode: 'Test262Error: Actual [1, 2, 1, 2, 3, 4] and expected [1, 2, 1, 2, 1, 2] should have the same contents. '

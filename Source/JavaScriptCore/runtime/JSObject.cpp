@@ -683,6 +683,11 @@ bool ordinarySetWithOwnDescriptor(JSGlobalObject* globalObject, JSObject* object
             RELEASE_AND_RETURN(scope, proxy->ProxyObject::put(proxy, globalObject, propertyName, value, slot));
         }
 
+        if (current != object && isTypedArrayType(current->type())) {
+            PutPropertySlot slot(receiver, shouldThrow);
+            RELEASE_AND_RETURN(scope, current->methodTable()->put(current, globalObject, propertyName, value, slot));
+        }
+
         // 9.1.9.1-2 Let ownDesc be ? O.[[GetOwnProperty]](P).
         bool ownDescriptorFound;
         if (current == object)
@@ -3159,7 +3164,16 @@ bool JSObject::attemptToInterceptPutByIndexOnHoleForPrototype(JSGlobalObject* gl
             putResult = proxy->putByIndexCommon(globalObject, thisValue, i, value, shouldThrow);
             return true;
         }
-        
+
+        if (isTypedArrayType(current->type())) {
+            auto* typedArray = jsCast<JSArrayBufferView*>(current);
+            if (typedArray->isOutOfBounds() || i >= typedArray->length()) {
+                putResult = true;
+                return true;
+            }
+            return false;
+        }
+
         JSValue prototypeValue = current->getPrototype(globalObject);
         RETURN_IF_EXCEPTION(scope, false);
         if (prototypeValue.isNull())
