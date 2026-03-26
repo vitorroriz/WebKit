@@ -385,7 +385,9 @@ template<typename LHS, typename RHS, typename ResultType> struct ArithmeticOpera
 
     [[nodiscard]] static inline bool divide(LHS lhs, RHS rhs, ResultType& result)
     {
-        if (!rhs)
+        if (!rhs) [[unlikely]]
+            return false;
+        if (rhs == -1 && lhs == std::numeric_limits<ResultType>::min()) [[unlikely]]
             return false;
 
         result = lhs / rhs;
@@ -519,10 +521,12 @@ template<typename ResultType> struct ArithmeticOperations<int, unsigned, ResultT
 
     static inline bool divide(int64_t lhs, int64_t rhs, ResultType& result)
     {
-        if (!rhs)
+        if (!rhs) [[unlikely]]
             return false;
 
         int64_t temp = lhs / rhs;
+        if (!isInBounds<ResultType>(temp)) [[unlikely]]
+            return false;
         result = static_cast<ResultType>(temp);
         return true;
     }
