@@ -956,6 +956,25 @@ void Styleable::queryContainerDidChange() const
     }
 }
 
+bool Styleable::viewportSizeDidChange() const
+{
+    auto* animations = this->animations();
+    if (!animations)
+        return false;
+    bool changed = false;
+    for (auto& animation : *animations) {
+        RefPtr keyframeEffect = animation->keyframeEffect();
+        if (keyframeEffect && keyframeEffect->blendingKeyframes().usesViewportUnits()) {
+            if (RefPtr cssAnimation = dynamicDowncast<CSSAnimation>(animation))
+                cssAnimation->keyframesRuleDidChange();
+            else
+                keyframeEffect->recomputeKeyframesAtNextOpportunity();
+            changed = true;
+        }
+    }
+    return changed;
+}
+
 bool Styleable::capturedInViewTransition() const
 {
     return !element.viewTransitionCapturedName(pseudoElementIdentifier).isNull();

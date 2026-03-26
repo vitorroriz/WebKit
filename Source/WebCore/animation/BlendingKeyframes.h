@@ -149,6 +149,7 @@ public:
     auto end() const LIFETIME_BOUND { return m_keyframes.end(); }
 
     bool NODELETE usesContainerUnits() const;
+    bool usesViewportUnits() const;
     bool usesRelativeFontWeight() const { return m_usesRelativeFontWeight; }
     bool hasSubstitutionFunctions() const { return m_containsSubstitutionFunctions; }
     bool hasColorSetToCurrentColor() const;

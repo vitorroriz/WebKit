@@ -905,7 +905,6 @@ ElementUpdate TreeResolver::createAnimatedElementUpdate(ResolvedStyle&& resolved
         return { WTF::move(animatedStyle), animationImpact };
     };
 
-    // FIXME: Something like this is also needed for viewport units.
     if (currentStyle && parent().needsUpdateQueryContainerDependentStyle)
         styleable.queryContainerDidChange();
 

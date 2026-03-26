@@ -281,6 +281,15 @@ bool BlendingKeyframes::usesContainerUnits() const
     return false;
 }
 
+bool BlendingKeyframes::usesViewportUnits() const
+{
+    for (auto& keyframe : m_keyframes) {
+        if (keyframe.style()->usesViewportUnits())
+            return true;
+    }
+    return false;
+}
+
 void BlendingKeyframes::addProperty(const AnimatableCSSProperty& property)
 {
     ASSERT(!std::holds_alternative<CSSPropertyID>(property) || std::get<CSSPropertyID>(property) != CSSPropertyCustom);

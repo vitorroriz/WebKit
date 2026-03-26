@@ -174,6 +174,7 @@ struct Styleable {
     }
 
     void queryContainerDidChange() const;
+    bool viewportSizeDidChange() const;
 
     bool animationListContainsNewlyValidAnimation(const Style::Animations&) const;
 

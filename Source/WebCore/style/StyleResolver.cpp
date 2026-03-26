@@ -440,6 +440,9 @@ std::unique_ptr<RenderStyle> Resolver::styleForKeyframe(Element& element, const 
     builder.state().setIsBuildingKeyframeStyle();
     builder.applyAllProperties();
 
+    if (state.style()->usesViewportUnits())
+        element.document().setHasStyleWithViewportUnits();
+
     Adjuster adjuster(document(), *state.parentStyle(), nullptr, !pseudoElementIdentifier ? &element : nullptr);
     adjuster.adjust(*state.style());
 
