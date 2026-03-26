@@ -407,7 +407,6 @@ private:
     WEBCORE_EXPORT SharedBufferBuilder(const SharedBufferBuilder&);
     WEBCORE_EXPORT SharedBufferBuilder& operator=(const SharedBufferBuilder&);
 
-    WEBCORE_EXPORT void initialize(Ref<FragmentedSharedBuffer>&&);
     WEBCORE_EXPORT void updateBufferIfNeeded() const;
     WEBCORE_EXPORT void appendDataSegment(Ref<DataSegment>&&);
     WEBCORE_EXPORT Ref<FragmentedSharedBuffer> createBuffer() const;
