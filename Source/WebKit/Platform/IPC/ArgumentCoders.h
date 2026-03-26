@@ -599,6 +599,10 @@ template<typename KeyArg, typename MappedArg, typename HashArg, typename KeyTrai
             return std::nullopt;
 
         HashMapType hashMap;
+        // Calls to reserveInitialCapacity with untrusted large sizes can cause allocator crashes.
+        // Limit allocations from untrusted sources to 1MB.
+        if (*hashMapSize < 1024 * 1024 / (sizeof(KeyArg) + sizeof(MappedArg))) [[likely]]
+            hashMap.reserveInitialCapacity(*hashMapSize);
         for (unsigned i = 0; i < *hashMapSize; ++i) {
             auto key = decoder.template decode<KeyArg>();
             if (!key) [[unlikely]]
@@ -628,8 +632,8 @@ template<typename KeyArg, typename HashArg, typename KeyTraitsArg, typename Hash
     static void encode(Encoder& encoder, const HashSetType& hashSet)
     {
         encoder << static_cast<unsigned>(hashSet.size());
-        for (typename HashSetType::const_iterator it = hashSet.begin(), end = hashSet.end(); it != end; ++it)
-            encoder << *it;
+        for (auto& entry : hashSet)
+            encoder << entry;
     }
 
     template<typename Decoder>
@@ -640,6 +644,10 @@ template<typename KeyArg, typename HashArg, typename KeyTraitsArg, typename Hash
             return std::nullopt;
 
         HashSetType hashSet;
+        // Calls to reserveInitialCapacity with untrusted large sizes can cause allocator crashes.
+        // Limit allocations from untrusted sources to 1MB.
+        if (*hashSetSize < 1024 * 1024 / sizeof(KeyArg)) [[likely]]
+            hashSet.reserveInitialCapacity(*hashSetSize);
         for (unsigned i = 0; i < *hashSetSize; ++i) {
             auto key = decoder.template decode<KeyArg>();
             if (!key)
