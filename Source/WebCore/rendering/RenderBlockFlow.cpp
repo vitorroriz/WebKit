@@ -3967,7 +3967,7 @@ void RenderBlockFlow::invalidateLineLayout(InvalidationReason invalidationReason
 
 bool RenderBlockFlow::layoutSimpleBlockContentInInline(MarginInfo& marginInfo)
 {
-    if (!inlineLayout())
+    if (!inlineLayout() || !inlineLayout()->hasContent())
         return false;
 
     for (auto walker = InlineWalker(*this); !walker.atEnd(); walker.advance()) {
