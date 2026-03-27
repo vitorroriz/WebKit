@@ -327,6 +327,8 @@ static ASCIILiteral statusText(unsigned statusCode)
         return "See Other"_s;
     case 304:
         return "Not Modified"_s;
+    case 403:
+        return "Forbidden"_s;
     case 404:
         return "Not Found"_s;
     case 503:
