@@ -690,13 +690,13 @@ static void registerFontsInFamilyIfNeeded(const String& family)
 {
     Locker locker(userInstalledFontMapLock());
     if (!userInstalledFontMap().isEmpty()) {
-        auto fontFamily = family.convertToASCIILowercase();
-
-        if (fontFamily == "helvetica"_s) {
+        if (equalLettersIgnoringASCIICase(family, "helvetica"_s)) {
             // Helvetica is a system font with several variants, so we choose not to register additional fonts in this family.
             // This is because it can affect font matching. See rdar://172261885.
             return;
         }
+
+        auto fontFamily = family.convertToASCIILowercase();
 
         registerFontIfNeeded(fontFamily);
         auto fontNames = userInstalledFontFamilyMap().find(fontFamily);
