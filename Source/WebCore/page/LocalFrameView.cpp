@@ -3021,6 +3021,31 @@ bool LocalFrameView::scrollToFragment(const URL& url)
     return false;
 }
 
+static bool checkTextFragmentSecurity(LocalFrame& frame)
+{
+    RefPtr openerFrame = frame.opener();
+    if (!openerFrame)
+        return true;
+
+    RefPtr localOpener = dynamicDowncast<LocalFrame>(openerFrame.get());
+    if (!localOpener)
+        return false;
+
+    RefPtr openerDocument = localOpener->document();
+    RefPtr currentDocument = frame.document();
+    if (!openerDocument || !currentDocument)
+        return true;
+
+    Ref openerOrigin = openerDocument->securityOrigin();
+    Ref currentOrigin = currentDocument->securityOrigin();
+
+    // Block if cross-origin popup
+    if (!openerOrigin->isSameOriginAs(currentOrigin))
+        return false;
+
+    return true;
+}
+
 bool LocalFrameView::scrollToTextFragment(IsRetry isRetry)
 {
     static constexpr auto scrollToTextFragmentRetryInterval = 500_ms;
@@ -3033,6 +3058,10 @@ bool LocalFrameView::scrollToTextFragment(IsRetry isRetry)
         return false;
 
     if (!m_frame->isMainFrame())
+        return false;
+
+    // Block text fragments in cross-origin window.open() popups
+    if (!checkTextFragmentSecurity(m_frame.get()))
         return false;
 
     document->fragmentHighlightRegistry().clear();
