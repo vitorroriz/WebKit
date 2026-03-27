@@ -241,6 +241,12 @@ template<typename T, typename U, typename WeakPtrImpl> inline WeakPtrImpl& weak_
     return impl;
 }
 
+template<typename T, typename U, typename WeakPtrImpl> inline Ref<WeakPtrImpl> weak_ptr_impl_cast(Ref<WeakPtrImpl>&& impl)
+{
+    static_assert(std::same_as<typename T::WeakValueType, typename U::WeakValueType>, "Invalid weak pointer cast");
+    return impl;
+}
+
 template<typename T, typename WeakPtrImpl, typename PtrTraits> template<typename U> inline WeakPtr<T, WeakPtrImpl, PtrTraits>::WeakPtr(const WeakPtr<U, WeakPtrImpl, PtrTraits>& o)
     : m_impl(weak_ptr_impl_cast<T, U>(o.m_impl.get()))
 #if !ASSERT_WITH_SECURITY_IMPLICATION_DISABLED
@@ -266,7 +272,7 @@ template<typename T, typename WeakPtrImpl, typename PtrTraits> template<typename
 }
 
 template<typename T, typename WeakPtrImpl, typename PtrTraits> template<typename U> inline WeakPtr<T, WeakPtrImpl, PtrTraits>::WeakPtr(WeakRef<U, WeakPtrImpl>&& o)
-    : m_impl(adoptRef(weak_ptr_impl_cast<T, U>(o.releaseImpl().leakRef())))
+    : m_impl(weak_ptr_impl_cast<T, U>(o.releaseImpl()))
 #if !ASSERT_WITH_SECURITY_IMPLICATION_DISABLED
     , m_shouldEnableAssertions(o.enableWeakPtrThreadingAssertions() == EnableWeakPtrThreadingAssertions::Yes)
 #endif
@@ -293,7 +299,7 @@ template<typename T, typename WeakPtrImpl, typename PtrTraits> template<typename
 
 template<typename T, typename WeakPtrImpl, typename PtrTraits> template<typename U> inline WeakPtr<T, WeakPtrImpl, PtrTraits>& WeakPtr<T, WeakPtrImpl, PtrTraits>::operator=(const WeakRef<U, WeakPtrImpl>& o)
 {
-    m_impl = &weak_ptr_impl_cast<T, U>(o.m_impl.get());
+    m_impl = &weak_ptr_impl_cast<T, U>(o.impl());
 #if !ASSERT_WITH_SECURITY_IMPLICATION_DISABLED
     m_shouldEnableAssertions = o.enableWeakPtrThreadingAssertions() == EnableWeakPtrThreadingAssertions::Yes;
 #endif
@@ -302,7 +308,7 @@ template<typename T, typename WeakPtrImpl, typename PtrTraits> template<typename
 
 template<typename T, typename WeakPtrImpl, typename PtrTraits> template<typename U> inline WeakPtr<T, WeakPtrImpl, PtrTraits>& WeakPtr<T, WeakPtrImpl, PtrTraits>::operator=(WeakRef<U, WeakPtrImpl>&& o)
 {
-    m_impl = adoptRef(weak_ptr_impl_cast<T, U>(o.m_impl.leakRef()));
+    m_impl = weak_ptr_impl_cast<T, U>(o.releaseImpl());
 #if !ASSERT_WITH_SECURITY_IMPLICATION_DISABLED
     m_shouldEnableAssertions = o.enableWeakPtrThreadingAssertions() == EnableWeakPtrThreadingAssertions::Yes;
 #endif
