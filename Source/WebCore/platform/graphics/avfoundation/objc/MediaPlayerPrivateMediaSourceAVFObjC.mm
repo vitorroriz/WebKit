@@ -717,7 +717,7 @@ void MediaPlayerPrivateMediaSourceAVFObjC::setLayerRequiresFlush()
     ALWAYS_LOG(LOGIDENTIFIER);
     m_layerRequiresFlush = true;
 #if PLATFORM(IOS_FAMILY)
-    if (m_applicationIsActive)
+    if (m_applicationIsActive || m_isInFullscreenOrPictureInPicture)
         flushVideoIfNeeded();
 #else
     flushVideoIfNeeded();
@@ -1402,6 +1402,8 @@ bool MediaPlayerPrivateMediaSourceAVFObjC::supportsLimitedMatroska() const
 
 void MediaPlayerPrivateMediaSourceAVFObjC::isInFullscreenOrPictureInPictureChanged(bool isInFullscreenOrPictureInPicture)
 {
+    assertIsMainThread();
+    m_isInFullscreenOrPictureInPicture = isInFullscreenOrPictureInPicture;
     m_renderer->isInFullscreenOrPictureInPictureChanged(isInFullscreenOrPictureInPicture);
 }
 

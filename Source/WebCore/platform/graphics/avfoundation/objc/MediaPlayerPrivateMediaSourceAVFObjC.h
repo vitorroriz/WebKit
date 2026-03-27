@@ -379,6 +379,7 @@ private:
 #endif
 
     bool m_layerRequiresFlush WTF_GUARDED_BY_CAPABILITY(mainThread) { false };
+    bool m_isInFullscreenOrPictureInPicture WTF_GUARDED_BY_CAPABILITY(mainThread) { false };
 #if PLATFORM(IOS_FAMILY)
     bool m_applicationIsActive WTF_GUARDED_BY_CAPABILITY(mainThread) { true };
 #endif
