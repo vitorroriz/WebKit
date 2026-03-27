@@ -556,8 +556,6 @@
 		DD3DC97227A4BF8E007E5B61 /* InlineASM.h in Headers */ = {isa = PBXBuildFile; fileRef = A8A472BC151A825A004123FF /* InlineASM.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DD3DC97327A4BF8E007E5B61 /* ExportMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = A8A4729F151A825A004123FF /* ExportMacros.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DD3DC97427A4BF8E007E5B61 /* BloomFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = A8A47265151A825A004123FF /* BloomFilter.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		F50D171852941FCC9DB3F894 /* Borrow.h in Headers */ = {isa = PBXBuildFile; fileRef = DED4D271AFDD9025027F5497 /* Borrow.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		7310722B5EF464F16AAE91D7 /* CanBorrow.h in Headers */ = {isa = PBXBuildFile; fileRef = 41036C754D844912316DC00E /* CanBorrow.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DD3DC97527A4BF8E007E5B61 /* Locker.h in Headers */ = {isa = PBXBuildFile; fileRef = A8A472C3151A825A004123FF /* Locker.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DD3DC97627A4BF8E007E5B61 /* SingleRootGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 795212021F42588800BD6421 /* SingleRootGraph.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DD3DC97727A4BF8E007E5B61 /* MemoryPressureHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = AD89B6B61E6415080090707F /* MemoryPressureHandler.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -1548,8 +1546,6 @@
 		A8A47260151A825A004123FF /* BitVector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BitVector.cpp; sourceTree = "<group>"; };
 		A8A47261151A825A004123FF /* BitVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitVector.h; sourceTree = "<group>"; };
 		A8A47265151A825A004123FF /* BloomFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BloomFilter.h; sourceTree = "<group>"; };
-		DED4D271AFDD9025027F5497 /* Borrow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Borrow.h; sourceTree = "<group>"; };
-		41036C754D844912316DC00E /* CanBorrow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CanBorrow.h; sourceTree = "<group>"; };
 		A8A47267151A825A004123FF /* BumpPointerAllocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BumpPointerAllocator.h; sourceTree = "<group>"; };
 		A8A4726A151A825A004123FF /* CheckedArithmetic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CheckedArithmetic.h; sourceTree = "<group>"; };
 		A8A47270151A825A004123FF /* Compiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Compiler.h; sourceTree = "<group>"; };
@@ -2346,7 +2342,6 @@
 				0F0C03E6299828E50064230A /* BloomFilter.cpp */,
 				A8A47265151A825A004123FF /* BloomFilter.h */,
 				0FB399B820AF5A580017E213 /* BooleanLattice.h */,
-				DED4D271AFDD9025027F5497 /* Borrow.h */,
 				0F93274A1C17F4B700CF6564 /* Box.h */,
 				0F93274A1C17F4B700CF6566 /* BoxPtr.h */,
 				7C3F72391D78811900674E26 /* Brigand.h */,
@@ -2357,7 +2352,6 @@
 				0FEC3C4F1F323C6800F59B6C /* CagedPtr.h */,
 				0F5F3D681F3FEBA600B115A2 /* CagedUniquePtr.h */,
 				413FE8F51F8D2EAB00F6D7D7 /* CallbackAggregator.h */,
-				41036C754D844912316DC00E /* CanBorrow.h */,
 				46209A27266D543A007F8F4A /* CancellableTask.h */,
 				1470EAF62BD6FB3F00E26254 /* CanMakeWeakPtr.h */,
 				A8A4726A151A825A004123FF /* CheckedArithmetic.h */,
@@ -3486,7 +3480,6 @@
 				DD3DC97427A4BF8E007E5B61 /* BloomFilter.h in Headers */,
 				468378C62EC2D84200A9257A /* BOMSPI.h in Headers */,
 				DD3DC90E27A4BF8E007E5B61 /* BooleanLattice.h in Headers */,
-				F50D171852941FCC9DB3F894 /* Borrow.h in Headers */,
 				DD3DC91B27A4BF8E007E5B61 /* Box.h in Headers */,
 				DD3DC92927A4BF8E007E5B61 /* BoxPtr.h in Headers */,
 				DD3DC91C27A4BF8E007E5B61 /* Brigand.h in Headers */,
@@ -3499,7 +3492,6 @@
 				DD3DC95427A4BF8E007E5B61 /* CagedPtr.h in Headers */,
 				DD3DC95527A4BF8E007E5B61 /* CagedUniquePtr.h in Headers */,
 				DD3DC8E927A4BF8E007E5B61 /* CallbackAggregator.h in Headers */,
-				7310722B5EF464F16AAE91D7 /* CanBorrow.h in Headers */,
 				DD3DC99B27A4BF8E007E5B61 /* CancellableTask.h in Headers */,
 				1470EAF72BD6FB3F00E26254 /* CanMakeWeakPtr.h in Headers */,
 				DDF306DA27C08654006A526F /* CFBundleSPI.h in Headers */,

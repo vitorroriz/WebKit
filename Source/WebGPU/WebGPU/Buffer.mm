@@ -30,7 +30,6 @@
 #import "CommandBuffer.h"
 #import "Device.h"
 
-#import <wtf/Borrow.h>
 #import <wtf/CheckedArithmetic.h>
 #import <wtf/StdLibExtras.h>
 #import <wtf/TZoneMallocInlines.h>
@@ -243,8 +242,6 @@ void Buffer::setCommandEncoder(CommandEncoder& commandEncoder, bool mayModifyBuf
 
 void Buffer::destroy()
 {
-    crashIfBorrowed();
-
     // https://gpuweb.github.io/gpuweb/#dom-gpubuffer-destroy
 
     if (m_state != State::Unmapped && m_state != State::Destroyed) {
@@ -292,7 +289,7 @@ static size_t NODELETE computeRangeSize(uint64_t size, size_t offset)
         return 0;
     return result.value();
 }
-
+  
 std::span<uint8_t> Buffer::getMappedRange(size_t offset, size_t size)
 {
 #if ENABLE(WEBGPU_SWIFT)
@@ -522,17 +519,17 @@ void Buffer::takeSlowIndexValidationPath(CommandBuffer& commandBuffer, uint32_t 
         verified = verifyIndexBufferData<uint32_t>(m_buffer, firstIndex, indexCount, vertexCount, primitiveOffset);
 
     if (!verified) {
-        SUPPRESS_UNCOUNTED_ARG Vector<uint8_t> priorData = borrow(this)->getBufferContents();
-
+        auto priorData = getBufferContents();
         queue->clearBuffer(m_buffer);
         queue->finalizeBlitCommandEncoder();
 #if PLATFORM(MAC) || PLATFORM(MACCATALYST)
         if (m_buffer.storageMode == MTLStorageModeManaged)
             [m_buffer didModifyRange:NSMakeRange(0, m_buffer.length)];
 #endif
-        commandBuffer.addPostCommitHandler([queue, priorData = WTF::move(priorData), protectedThis = Ref { *this }](id<MTLCommandBuffer> mtlCommandBuffer) mutable {
+        commandBuffer.addPostCommitHandler([queue, priorData, protectedThis = Ref { *this }](id<MTLCommandBuffer> mtlCommandBuffer) {
             [mtlCommandBuffer waitUntilCompleted];
-            queue->writeBuffer(*protectedThis.ptr(), 0, priorData.mutableSpan());
+
+            queue->writeBuffer(*protectedThis.ptr(), 0, priorData);
         });
     }
 }
@@ -558,18 +555,17 @@ void Buffer::takeSlowIndirectIndexValidationPath(CommandBuffer& commandBuffer, B
         verified = verifyIndexBufferData<uint32_t>(apiIndexBuffer.buffer(), args.indexStart, args.indexCount, minVertexCount > static_cast<int64_t>(args.baseVertex) ? minVertexCount - args.baseVertex : 0, primitiveOffset);
 
     if (!verified) {
-        SUPPRESS_UNCOUNTED_ARG Vector<uint8_t> priorData = borrow(this)->getBufferContents();
-
+        auto priorData = getBufferContents();
         queue->clearBuffer(m_buffer, indirectOffset, sizeof(MTLDrawPrimitivesIndirectArguments));
         queue->finalizeBlitCommandEncoder();
 #if PLATFORM(MAC) || PLATFORM(MACCATALYST)
         if (m_buffer.storageMode == MTLStorageModeManaged)
             [m_buffer didModifyRange:NSMakeRange(0, m_buffer.length)];
 #endif
-        commandBuffer.addPostCommitHandler([queue, priorData = WTF::move(priorData), protectedThis = Ref { *this }](id<MTLCommandBuffer> mtlCommandBuffer) mutable {
+        commandBuffer.addPostCommitHandler([queue, priorData, protectedThis = Ref { *this }](id<MTLCommandBuffer> mtlCommandBuffer) {
             [mtlCommandBuffer waitUntilCompleted];
 
-            queue->writeBuffer(*protectedThis.ptr(), 0, priorData.mutableSpan());
+            queue->writeBuffer(*protectedThis.ptr(), 0, priorData);
         });
     }
 }
@@ -595,8 +591,7 @@ void Buffer::takeSlowIndirectValidationPath(CommandBuffer& commandBuffer, uint64
     bool verified = verifyIndirectBufferData(args, minVertexCount, minInstanceCount);
 
     if (!verified) {
-        SUPPRESS_UNCOUNTED_ARG Vector<uint8_t> priorData = borrow(this)->getBufferContents();
-
+        auto priorData = getBufferContents();
         MTLDrawPrimitivesIndirectArguments data = {
             .vertexCount = std::min(args.vertexCount, minVertexCount),
             .instanceCount = std::min(args.instanceCount, minInstanceCount),
@@ -610,10 +605,10 @@ void Buffer::takeSlowIndirectValidationPath(CommandBuffer& commandBuffer, uint64
         if (m_buffer.storageMode == MTLStorageModeManaged)
             [m_buffer didModifyRange:NSMakeRange(0, m_buffer.length)];
 #endif
-        commandBuffer.addPostCommitHandler([queue, priorData = WTF::move(priorData), protectedThis = Ref { *this }](id<MTLCommandBuffer> mtlCommandBuffer) mutable {
+        commandBuffer.addPostCommitHandler([queue, priorData, protectedThis = Ref { *this }](id<MTLCommandBuffer> mtlCommandBuffer) {
             [mtlCommandBuffer waitUntilCompleted];
 
-            queue->writeBuffer(*protectedThis.ptr(), 0, priorData.mutableSpan());
+            queue->writeBuffer(*protectedThis.ptr(), 0, priorData);
         });
     }
 }

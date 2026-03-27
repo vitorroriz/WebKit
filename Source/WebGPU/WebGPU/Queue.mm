@@ -35,18 +35,16 @@
 #import "MetalSPI.h"
 #import "Texture.h"
 #import "TextureView.h"
-#import <simd/simd.h>
-#import <wtf/Borrow.h>
-#import <wtf/CheckedArithmetic.h>
-#import <wtf/StdLibExtras.h>
-#import <wtf/TZoneMallocInlines.h>
-
 #if ENABLE(WEBGPU_SWIFT)
 #import "CxxBridging.h"
 #import <WebGPU/CxxBridgingPublic.h>
 #import <WebGPU/WGPUTextureImpl.h>
 #import "WebGPUSwift-Generated.h"
 #endif
+#import <simd/simd.h>
+#import <wtf/CheckedArithmetic.h>
+#import <wtf/StdLibExtras.h>
+#import <wtf/TZoneMallocInlines.h>
 
 namespace WebGPU {
 
@@ -563,11 +561,11 @@ void Queue::writeBuffer(Buffer& buffer, uint64_t bufferOffset, std::span<uint8_t
     if (isIdle()) {
         switch (buffer.buffer().storageMode) {
         case MTLStorageModeShared:
-            SUPPRESS_UNCOUNTED_ARG memcpySpan(borrow(buffer)->getBufferContents().subspan(bufferOffset, data.size()), data);
+            memcpySpan(buffer.getBufferContents().subspan(bufferOffset, data.size()), data);
             return;
 #if PLATFORM(MAC) || PLATFORM(MACCATALYST)
         case MTLStorageModeManaged:
-            SUPPRESS_UNCOUNTED_ARG memcpySpan(borrow(buffer)->getBufferContents().subspan(bufferOffset, data.size()), data);
+            memcpySpan(buffer.getBufferContents().subspan(bufferOffset, data.size()), data);
             [buffer.buffer() didModifyRange:NSMakeRange(bufferOffset, data.size())];
             return;
 #endif
