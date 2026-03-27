@@ -147,7 +147,7 @@ uint32_t XRProjectionLayer::textureHeight() const
 uint32_t XRProjectionLayer::textureArrayLength() const
 {
 #if PLATFORM(IOS_FAMILY_SIMULATOR)
-    ASSERT(m_backing->textureArrayLength() == 1);
+    ASSERT(m_backing->colorTextureArrayLength() == 1);
 #endif
     return m_backing->colorTextureArrayLength();
 }
