@@ -69,6 +69,7 @@ ExceptionOr<Ref<MediaElementAudioSourceNode>> MediaElementAudioSourceNode::creat
 MediaElementAudioSourceNode::MediaElementAudioSourceNode(BaseAudioContext& context, Ref<HTMLMediaElement>&& mediaElement)
     : AudioNode(context, NodeTypeMediaElementAudioSource)
     , m_mediaElement(WTF::move(mediaElement))
+    , m_playbackRate { abs(m_mediaElement->reportedPlaybackRate()) }
 {
     // Default to stereo. This could change depending on what the media element .src is set to.
     addOutput(2);
@@ -103,13 +104,7 @@ void MediaElementAudioSourceNode::setFormat(size_t numberOfChannels, float sourc
         m_sourceNumberOfChannels = numberOfChannels;
         m_sourceSampleRate = sourceSampleRate;
 
-        if (sourceSampleRate != sampleRate()) {
-            double scaleFactor = sourceSampleRate / sampleRate();
-            m_multiChannelResampler = makeUnique<MultiChannelResampler>(scaleFactor, numberOfChannels, AudioUtilities::renderQuantumSize, std::bind(&MediaElementAudioSourceNode::provideInput, this, std::placeholders::_1, std::placeholders::_2));
-        } else {
-            // Bypass resampling.
-            m_multiChannelResampler = nullptr;
-        }
+        updateResamplerIfNeeded();
 
         {
             // The context must be locked when changing the number of output channels.
@@ -118,6 +113,31 @@ void MediaElementAudioSourceNode::setFormat(size_t numberOfChannels, float sourc
             // Do any necesssary re-configuration to the output's number of channels.
             protect(output(0))->setNumberOfChannels(numberOfChannels);
         }
+    }
+}
+
+void MediaElementAudioSourceNode::setPlaybackRate(double playbackRate)
+{
+    playbackRate = abs(playbackRate);
+    if (!playbackRate || playbackRate == m_playbackRate)
+        return;
+
+    Locker locker { m_processLock };
+    m_playbackRate = playbackRate;
+    updateResamplerIfNeeded();
+}
+
+void MediaElementAudioSourceNode::updateResamplerIfNeeded()
+{
+    // Account for both sample rate conversion and playback rate
+    double effectiveSampleRate = m_sourceSampleRate * m_playbackRate;
+
+    if (effectiveSampleRate != sampleRate()) {
+        double scaleFactor = effectiveSampleRate / sampleRate();
+        m_multiChannelResampler = makeUnique<MultiChannelResampler>(scaleFactor, m_sourceNumberOfChannels, AudioUtilities::renderQuantumSize, std::bind(&MediaElementAudioSourceNode::provideInput, this, std::placeholders::_1, std::placeholders::_2));
+    } else {
+        // Bypass resampling.
+        m_multiChannelResampler = nullptr;
     }
 }
 
@@ -161,11 +181,9 @@ void MediaElementAudioSourceNode::process(size_t numberOfFrames)
     }
 
     if (m_multiChannelResampler) {
-        ASSERT(m_sourceSampleRate != sampleRate());
         m_multiChannelResampler->process(outputBus.get(), numberOfFrames);
     } else {
-        // Bypass the resampler completely if the source is at the context's sample-rate.
-        ASSERT(m_sourceSampleRate == sampleRate());
+        // Bypass the resampler completely if no resampling is needed.
         provideInput(outputBus, numberOfFrames);
     }
 }

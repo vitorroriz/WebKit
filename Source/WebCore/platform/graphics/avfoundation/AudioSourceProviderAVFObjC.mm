@@ -177,6 +177,15 @@ void AudioSourceProviderAVFObjC::setAudioTrack(AVAssetTrack *avAssetTrack)
     createMixIfNeeded();
 }
 
+void AudioSourceProviderAVFObjC::setPlaybackRate(double rate)
+{
+    rate = abs(rate);
+    if (m_playbackRate == rate)
+        return;
+
+    m_playbackRate = rate;
+}
+
 void AudioSourceProviderAVFObjC::recreateAudioMixIfNeeded()
 {
     if (!m_avAudioMix)
@@ -381,7 +390,7 @@ void AudioSourceProviderAVFObjC::process(MTAudioProcessingTapRef tap, CMItemCoun
         // Only check the write-ahead time when playback begins.
         m_paused = false;
         MediaTime earlyBy = rangeStart - currentTime;
-        m_writeAheadCount = m_tapDescription->mSampleRate * earlyBy.toDouble();
+        m_writeAheadCount = m_tapDescription->mSampleRate * m_playbackRate * earlyBy.toDouble();
     }
 
     auto [startFrame, endFrame] = m_ringBuffer->getStoreTimeBounds();

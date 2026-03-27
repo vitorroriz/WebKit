@@ -56,6 +56,7 @@ public:
     
     // AudioSourceProviderClient
     void setFormat(size_t numberOfChannels, float sampleRate) final;
+    void setPlaybackRate(double);
     void ref() const final { AudioNode::ref(); }
     void deref() const final { AudioNode::deref(); }
 
@@ -64,6 +65,7 @@ public:
 private:
     MediaElementAudioSourceNode(BaseAudioContext&, Ref<HTMLMediaElement>&&);
     void provideInput(AudioBus&, size_t framesToProcess);
+    void updateResamplerIfNeeded() WTF_REQUIRES_LOCK(m_processLock);
 
     double tailTime() const override { return 0; }
     double latencyTime() const override { return 0; }
@@ -79,6 +81,7 @@ private:
 
     unsigned m_sourceNumberOfChannels WTF_GUARDED_BY_LOCK(m_processLock) { 0 };
     double m_sourceSampleRate WTF_GUARDED_BY_LOCK(m_processLock) { 0 };
+    std::atomic<double> m_playbackRate { 1.0 };
     bool m_muted WTF_GUARDED_BY_LOCK(m_processLock) { false };
 
     std::unique_ptr<MultiChannelResampler> m_multiChannelResampler WTF_GUARDED_BY_LOCK(m_processLock);

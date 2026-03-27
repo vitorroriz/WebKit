@@ -291,6 +291,7 @@ public:
     void setDefaultPlaybackRate(double) override;
     WEBCORE_EXPORT double playbackRate() const override;
     void setPlaybackRate(double) override;
+    double reportedPlaybackRate() const { return m_reportedPlaybackRate; }
     WEBCORE_EXPORT bool NODELETE preservesPitch() const;
     WEBCORE_EXPORT void setPreservesPitch(bool);
 

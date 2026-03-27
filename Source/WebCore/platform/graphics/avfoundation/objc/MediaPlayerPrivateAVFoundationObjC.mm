@@ -1675,6 +1675,10 @@ void MediaPlayerPrivateAVFoundationObjC::setRateDouble(double rate)
     if (m_requestedPlaying)
         setPlayerRate(rate);
     m_wallClockAtCachedCurrentTime = std::nullopt;
+#if ENABLE(WEB_AUDIO) && USE(MEDIATOOLBOX)
+    if (RefPtr provider = m_provider)
+        provider->setPlaybackRate(rate);
+#endif
 }
 
 void MediaPlayerPrivateAVFoundationObjC::setPlayerRate(double rate, std::optional<MonotonicTime>&& hostTime)

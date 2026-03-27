@@ -6087,6 +6087,12 @@ void HTMLMediaElement::mediaPlayerRateChanged()
 
     updateSleepDisabling();
 
+#if ENABLE(WEB_AUDIO)
+    // Notify the audio source node if playback rate changed
+    if (RefPtr audioSourceNode = m_audioSourceNode)
+        audioSourceNode->setPlaybackRate(m_reportedPlaybackRate);
+#endif
+
     endProcessingMediaPlayerCallback();
 }
 

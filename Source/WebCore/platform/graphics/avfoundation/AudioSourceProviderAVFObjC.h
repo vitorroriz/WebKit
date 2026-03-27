@@ -62,6 +62,7 @@ public:
 
     void setPlayerItem(AVPlayerItem *);
     void setAudioTrack(AVAssetTrack *);
+    void setPlaybackRate(double);
 
     using AudioCallback = Function<void(uint64_t startFrame, uint64_t numberOfFrames, bool needFlush)>;
     WEBCORE_EXPORT void setAudioCallback(AudioCallback&&);
@@ -108,6 +109,7 @@ private:
     enum { NoSeek = std::numeric_limits<uint64_t>::max() };
     uint64_t m_seekTo { NoSeek };
     bool m_paused { true };
+    double m_playbackRate { 1. };
     WeakPtr<AudioSourceProviderClient> m_client;
     WeakPtrFactory<AudioSourceProviderAVFObjC> m_weakFactory;
 
