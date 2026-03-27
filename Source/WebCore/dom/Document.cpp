@@ -5676,10 +5676,10 @@ ClonedDocumentType Document::clonedDocumentType() const
     if (isXMLDocument()) {
         if (isXHTMLDocument())
             return ClonedDocumentType::XHTMLDocument;
+        if (isSVGDocument())
+            return ClonedDocumentType::SVGDocument;
         return ClonedDocumentType::XMLDocument;
     }
-    if (isSVGDocument())
-        return ClonedDocumentType::SVGDocument;
     if (isHTMLDocument())
         return ClonedDocumentType::HTMLDocument;
     return ClonedDocumentType::Document;
@@ -5727,9 +5727,9 @@ Ref<Document> Document::createCloned(ClonedDocumentType clonedDocumentType, cons
     Ref clone = [&] -> Ref<Document> {
         switch (clonedDocumentType) {
         case ClonedDocumentType::XMLDocument:
-            return XMLDocument::createXHTML(nullptr, settings, url);
-        case ClonedDocumentType::XHTMLDocument:
             return XMLDocument::create(nullptr, settings, url);
+        case ClonedDocumentType::XHTMLDocument:
+            return XMLDocument::createXHTML(nullptr, settings, url);
         case ClonedDocumentType::HTMLDocument:
             return HTMLDocument::create(nullptr, settings, url);
         case ClonedDocumentType::SVGDocument:
