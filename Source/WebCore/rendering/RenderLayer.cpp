@@ -1993,7 +1993,11 @@ void RenderLayer::updateDescendantDependentFlags()
             hasViewportConstrainedDescendant |= child->m_hasViewportConstrainedDescendant || child->isViewportConstrained();
         }
 
-        m_hasVisibleDescendant = hasVisibleDescendant;
+        if (hasVisibleDescendant != m_hasVisibleDescendant) {
+            m_hasVisibleDescendant = hasVisibleDescendant;
+            if (!isNormalFlowOnly())
+                dirtyHiddenStackingContextAncestorZOrderLists();
+        }
         m_visibleDescendantStatusDirty = false;
         m_hasSelfPaintingLayerDescendant = hasSelfPaintingLayerDescendant;
         m_hasSelfPaintingLayerDescendantDirty = false;
