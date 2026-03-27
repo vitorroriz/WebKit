@@ -2673,7 +2673,7 @@ auto ByteCodeParser::handleIntrinsicCall(Node* callee, Operand resultOperand, Ca
             auto* function = variant.function();
             if (!function)
                 return CallOptimizationResult::DidNothing;
-            if (function->globalObject() != globalObject)
+            if (function->realmMayBeNull() != globalObject)
                 return CallOptimizationResult::DidNothing;
 
             insertChecks();
@@ -5439,7 +5439,7 @@ bool ByteCodeParser::handleTypedArrayConstructor(
     if (kind == CodeSpecializationKind::CodeForCall)
         return false;
 
-    if (function->globalObject() != m_inlineStackTop->m_codeBlock->globalObject())
+    if (function->realmMayBeNull() != m_inlineStackTop->m_codeBlock->globalObject())
         return false;
     
     // We only have an intrinsic for the case where you say:
@@ -5479,12 +5479,12 @@ bool ByteCodeParser::handleTypedArrayConstructor(
     // Check both structures are already initialized.
     {
         constexpr bool isResizableOrGrowableShared = false;
-        if (!function->globalObject()->typedArrayStructureConcurrently(type, isResizableOrGrowableShared))
+        if (!function->realm()->typedArrayStructureConcurrently(type, isResizableOrGrowableShared))
             return false;
     }
     {
         constexpr bool isResizableOrGrowableShared = true;
-        if (!function->globalObject()->typedArrayStructureConcurrently(type, isResizableOrGrowableShared))
+        if (!function->realm()->typedArrayStructureConcurrently(type, isResizableOrGrowableShared))
             return false;
     }
 
@@ -5517,7 +5517,7 @@ bool ByteCodeParser::handleConstantFunction(
                 return false;
         }
 
-        if (function->globalObject() != m_inlineStackTop->m_codeBlock->globalObject())
+        if (function->realm() != m_inlineStackTop->m_codeBlock->globalObject())
             return false;
 
         insertChecks();
@@ -5581,7 +5581,7 @@ bool ByteCodeParser::handleConstantFunction(
         
         Node* resultNode;
         if (kind == CodeSpecializationKind::CodeForConstruct)
-            resultNode = addToGraph(NewStringObject, OpInfo(m_graph.registerStructure(function->globalObject()->stringObjectStructure())), addToGraph(ToString, argumentNode));
+            resultNode = addToGraph(NewStringObject, OpInfo(m_graph.registerStructure(function->realm()->stringObjectStructure())), addToGraph(ToString, argumentNode));
         else
             resultNode = addToGraph(CallStringConstructor, argumentNode);
         
@@ -5597,7 +5597,7 @@ bool ByteCodeParser::handleConstantFunction(
         if (newTargetNode != callTargetNode)
             return false;
 
-        auto* structure = function->globalObject()->regExpStructure();
+        auto* structure = function->realm()->regExpStructure();
         if (structure) {
             if (argumentCountIncludingThis >= 3) {
                 insertChecks();
@@ -5618,7 +5618,7 @@ bool ByteCodeParser::handleConstantFunction(
         if (newTargetNode != callTargetNode)
             return false;
 
-        auto* structure = function->globalObject()->mapStructureConcurrently();
+        auto* structure = function->realm()->mapStructureConcurrently();
         if (argumentCountIncludingThis <= 1 && structure) {
             insertChecks();
             Node* resultNode = addToGraph(NewMap, OpInfo(m_graph.registerStructure(structure)));
@@ -5635,7 +5635,7 @@ bool ByteCodeParser::handleConstantFunction(
         if (newTargetNode != callTargetNode)
             return false;
 
-        auto* structure = function->globalObject()->setStructureConcurrently();
+        auto* structure = function->realm()->setStructureConcurrently();
         if (argumentCountIncludingThis <= 1 && structure) {
             insertChecks();
             Node* resultNode = addToGraph(NewSet, OpInfo(m_graph.registerStructure(structure)));
@@ -5652,7 +5652,7 @@ bool ByteCodeParser::handleConstantFunction(
         if (newTargetNode != callTargetNode)
             return false;
 
-        auto* structure = function->globalObject()->arrayBufferStructureConcurrently(function->classInfo() == JSArrayBufferConstructor::info() ? ArrayBufferSharingMode::Default : ArrayBufferSharingMode::Shared);
+        auto* structure = function->realm()->arrayBufferStructureConcurrently(function->classInfo() == JSArrayBufferConstructor::info() ? ArrayBufferSharingMode::Default : ArrayBufferSharingMode::Shared);
         if (argumentCountIncludingThis == 2 && structure) {
             insertChecks();
             Node* resultNode = addToGraph(NewTypedArrayBuffer, OpInfo(m_graph.registerStructure(structure)), get(virtualRegisterForArgumentIncludingThis(1, registerOffset)));
@@ -5696,9 +5696,9 @@ bool ByteCodeParser::handleConstantFunction(
 
         Node* resultNode;
         if (argumentCountIncludingThis <= 1)
-            resultNode = addToGraph(NewObject, OpInfo(m_graph.registerStructure(function->globalObject()->objectStructureForObjectConstructor())));
+            resultNode = addToGraph(NewObject, OpInfo(m_graph.registerStructure(function->realm()->objectStructureForObjectConstructor())));
         else
-            resultNode = addToGraph(CallObjectConstructor, OpInfo(m_graph.freeze(function->globalObject())), OpInfo(prediction), get(virtualRegisterForArgumentIncludingThis(1, registerOffset)));
+            resultNode = addToGraph(CallObjectConstructor, OpInfo(m_graph.freeze(function->realm())), OpInfo(prediction), get(virtualRegisterForArgumentIncludingThis(1, registerOffset)));
         set(result, resultNode);
         return true;
     }
@@ -7293,7 +7293,7 @@ void ByteCodeParser::parseBlock(unsigned limit)
                             Structure* structure = rareData->internalFunctionAllocationStructure();
                             if (structure
                                 && structure->classInfoForCells() == (bytecode.m_isInternalPromise ? JSInternalPromise::info() : JSPromise::info())
-                                && structure->globalObject() == globalObject) {
+                                && structure->realm() == globalObject) {
                                 m_graph.freeze(rareData);
                                 m_graph.watchpoints().addLazily(rareData->allocationProfileWatchpointSet());
                                 m_graph.freeze(globalObject);
@@ -11076,7 +11076,7 @@ void ByteCodeParser::handleCreateInternalFieldObject(const ClassInfo* classInfo,
                 Structure* structure = rareData->internalFunctionAllocationStructure();
                 if (structure
                     && structure->classInfoForCells() == classInfo
-                    && structure->globalObject() == globalObject) {
+                    && structure->realm() == globalObject) {
                     m_graph.freeze(rareData);
                     m_graph.watchpoints().addLazily(rareData->allocationProfileWatchpointSet());
                     m_graph.freeze(globalObject);

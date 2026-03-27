@@ -487,8 +487,9 @@ DEFINE_VISIT_CHILDREN_WITH_MODIFIER(JS_EXPORT_PRIVATE, JSFinalObject);
 String JSObject::calculatedClassName(JSObject* object)
 {
     String constructorFunctionName;
-    auto* structure = object->structure();
-    auto* globalObject = structure->globalObject();
+    auto* globalObject = object->realmMayBeNull();
+    if (!globalObject)
+        return object->structure()->classInfoForCells()->className;
     VM& vm = globalObject->vm();
     auto scope = DECLARE_TOP_EXCEPTION_SCOPE(vm);
 
@@ -514,7 +515,7 @@ String JSObject::calculatedClassName(JSObject* object)
     // Get the display name of obj.__proto__.constructor.
     // This is useful to get `Foo` for a `new Foo` object.
     if (constructorFunctionName.isNull()) {
-        if (!structure->typeInfo().overridesGetPrototype()) [[likely]] {
+        if (!object->structure()->typeInfo().overridesGetPrototype()) [[likely]] {
             JSValue protoValue = object->getPrototypeDirect();
             if (protoValue.isObject()) {
                 JSObject* protoObject = asObject(protoValue);
@@ -870,7 +871,7 @@ bool JSObject::putInlineSlow(JSGlobalObject* globalObject, PropertyName property
                 // https://bugs.webkit.org/show_bug.cgi?id=215347
                 slot.setCustomAccessor(obj, customSetter);
                 scope.release();
-                customSetter(obj->globalObject(), JSValue::encode(slot.thisValue()), JSValue::encode(value), propertyName);
+                customSetter(obj->realm(), JSValue::encode(slot.thisValue()), JSValue::encode(value), propertyName);
                 return true;
             }
             if (attributes & PropertyAttribute::CustomValue) {
@@ -879,7 +880,7 @@ bool JSObject::putInlineSlow(JSGlobalObject* globalObject, PropertyName property
                         // FIXME: We should only be caching these if we're not an uncacheable dictionary:
                         // https://bugs.webkit.org/show_bug.cgi?id=215347
                         slot.setCustomValue(obj, customSetter);
-                        RELEASE_AND_RETURN(scope, customSetter(obj->globalObject(), JSValue::encode(obj), JSValue::encode(value), propertyName));
+                        RELEASE_AND_RETURN(scope, customSetter(obj->realm(), JSValue::encode(obj), JSValue::encode(value), propertyName));
                     }
                     // Avoid PutModePut because it fails for non-extensible structures.
                     obj->putDirect(vm, propertyName, value, attributesForStructure(attributes) & ~PropertyAttribute::CustomValue, slot);
@@ -941,7 +942,7 @@ static NEVER_INLINE bool definePropertyOnReceiverSlow(JSGlobalObject* globalObje
         if (slot.attributes() & PropertyAttribute::CustomValue) {
             PutValueFunc customSetter = slot.customSetter();
             if (customSetter)
-                RELEASE_AND_RETURN(scope, customSetter(receiver->globalObject(), JSValue::encode(receiver), JSValue::encode(value), propertyName));
+                RELEASE_AND_RETURN(scope, customSetter(receiver->realm(), JSValue::encode(receiver), JSValue::encode(value), propertyName));
         }
 
         PropertyDescriptor descriptor;
@@ -1002,7 +1003,7 @@ bool JSObject::putInlineFastReplacingStaticPropertyIfNeeded(JSGlobalObject* glob
             if (entry->value->attributes() & PropertyAttribute::CustomValue) {
                 PutValueFunc customSetter = entry->value->propertyPutter();
                 if (customSetter)
-                    RELEASE_AND_RETURN(scope, customSetter(structure->globalObject(), JSValue::encode(this), JSValue::encode(value), propertyName));
+                    RELEASE_AND_RETURN(scope, customSetter(structure->realm(), JSValue::encode(this), JSValue::encode(value), propertyName));
             }
             // Avoid PutModePut because it fails for non-extensible structures.
             putDirect(vm, propertyName, value, attributesForStructure(entry->value->attributes()) & ~PropertyAttribute::CustomValue, slot);
@@ -1205,17 +1206,21 @@ void JSObject::notifyPresenceOfIndexedAccessors(VM& vm)
 
     if (mayInterceptIndexedAccesses())
         return;
-    
+
+    auto* globalObject = realmMayBeNull();
+    if (!globalObject)
+        return;
+
     {
         Structure* oldStructure = structure();
         DeferredStructureTransitionWatchpointFire deferred(vm, oldStructure);
         setStructure(vm, Structure::nonPropertyTransition(vm, oldStructure, TransitionKind::AddIndexedAccessors, &deferred));
     }
-    
+
     if (!mayBePrototype())
         return;
-    
-    globalObject()->haveABadTime(vm);
+
+    globalObject->haveABadTime(vm);
 }
 
 static inline size_t nextLength(size_t length)
@@ -2105,12 +2110,13 @@ void JSObject::setPrototypeDirect(VM& vm, JSValue prototype)
 
     if (!anyObjectInChainMayInterceptIndexedAccesses())
         return;
-    
+
+    // Realm is always non-nullptr since realmless Structure's objects (e.g. WasmGC Struct) cannot call setPrototypeDirect.
     if (mayBePrototype()) {
-        structure()->globalObject()->haveABadTime(vm);
+        realm()->haveABadTime(vm);
         return;
     }
-    
+
     if (!hasIndexedProperties(indexingType()))
         return;
     
@@ -4188,7 +4194,10 @@ bool JSObject::anyObjectInChainMayInterceptIndexedAccesses() const
 
 bool JSObject::needsSlowPutIndexing() const
 {
-    return anyObjectInChainMayInterceptIndexedAccesses() || globalObject()->isHavingABadTime();
+    if (anyObjectInChainMayInterceptIndexedAccesses())
+        return true;
+    auto* globalObject = realmMayBeNull();
+    return globalObject && globalObject->isHavingABadTime();
 }
 
 TransitionKind JSObject::suggestedArrayStorageTransition() const
