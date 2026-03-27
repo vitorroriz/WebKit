@@ -2494,9 +2494,10 @@ webkit.org/b/298909 http/tests/site-isolation/inspector/console/message-from-wor
 webkit.org/b/298909 http/tests/site-isolation/inspector/target/target-cross-origin-page-navigation.html [ Skip ]
 webkit.org/b/298909 http/tests/site-isolation/inspector/target/target.html [ Skip ]
 webkit.org/b/298909 http/tests/site-isolation/inspector/unit-tests/target-manager.html [ Skip ]
-webkit.org/b/308240 http/tests/site-isolation/inspector/runtime/evaluate-in-cross-origin-iframe.html [ Failure ]
+webkit.org/b/308240 http/tests/site-isolation/inspector/runtime/evaluate-in-cross-origin-iframe.html [ Failure Crash ]
 webkit.org/b/308240 http/tests/site-isolation/inspector/runtime/execution-context-from-frame-target.html [ Failure ]
 webkit.org/b/308240 http/tests/site-isolation/inspector/runtime/executionContextCreated-frame-target.html [ Failure ]
+[ Debug ] http/tests/site-isolation/inspector/page/override-user-agent-cross-origin-iframe.html [ Crash ]
 
 webkit.org/b/308165 [ Debug ] scrollingcoordinator/mac/latching/simple-page-rubberbands.html [ Pass Failure ]
 

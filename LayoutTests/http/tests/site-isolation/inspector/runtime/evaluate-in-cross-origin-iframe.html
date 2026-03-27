@@ -1,4 +1,5 @@
 <script src="../../../inspector/resources/inspector-test.js"></script>
+<script src="../debugger/resources/site-isolation-debugger-test-utilities.js"></script>
 <script>
 var passphrase = "main-page-value";
 
@@ -16,18 +17,6 @@ function removeCrossOriginIFrame() {
 }
 
 function test() {
-    // FIXME: <https://webkit.org/b/307733> Dynamically creating cross-origin iframes has timing
-    // issues around frame target creation. Poll until the iframe's scripts have executed.
-    async function waitForExpressionInTarget(target, expression, maxAttempts = 20) {
-        for (let i = 0; i < maxAttempts; i++) {
-            let response = await target.RuntimeAgent.evaluate.invoke({expression, objectGroup: "test", returnByValue: true});
-            if (response.result.value)
-                return response.result.value;
-            await new Promise((resolve) => setTimeout(resolve, 100));
-        }
-        return undefined;
-    }
-
     let suite = InspectorTest.createAsyncSuite("SiteIsolation.Runtime.CrossOriginEvaluate");
 
     suite.addTestCase({
