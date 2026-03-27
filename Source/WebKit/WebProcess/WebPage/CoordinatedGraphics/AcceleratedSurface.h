@@ -109,7 +109,7 @@ public:
     void deref() const final { ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr::deref(); }
 #endif
 
-    uint64_t window() const;
+    uint64_t window();
     uint64_t surfaceID() const { return m_id; }
     bool shouldPaintMirrored() const
     {
@@ -392,7 +392,7 @@ private:
 #endif
 
 #if USE(WPE_RENDERER)
-        uint64_t window() const;
+        uint64_t window();
 #endif
 
     private:
@@ -412,6 +412,10 @@ private:
         Lock m_bufferFormatLock;
         BufferFormat m_bufferFormat WTF_GUARDED_BY_LOCK(m_bufferFormatLock);
         bool m_bufferFormatChanged WTF_GUARDED_BY_LOCK(m_bufferFormatLock) { false };
+#endif
+#if USE(WPE_RENDERER)
+        UnixFileDescriptor m_hostFD;
+        WebCore::IntSize m_initialSize;
 #endif
     };
 

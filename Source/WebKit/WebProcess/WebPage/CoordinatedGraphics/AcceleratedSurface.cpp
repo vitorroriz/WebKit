@@ -623,8 +623,9 @@ std::unique_ptr<AcceleratedSurface::RenderTarget> AcceleratedSurface::RenderTarg
 
 AcceleratedSurface::RenderTargetWPEBackend::RenderTargetWPEBackend(AcceleratedSurface& surface, const IntSize& initialSize, UnixFileDescriptor&& hostFD)
     : RenderTarget(surface)
-    , m_backend(wpe_renderer_backend_egl_target_create(hostFD.release()))
 {
+    ASSERT(hostFD, "RenderTargetWPEBackend created with invalid host FD");
+    m_backend = wpe_renderer_backend_egl_target_create(hostFD.release());
     static struct wpe_renderer_backend_egl_target_client s_client = {
         // frame_complete
         [](void* data) {
@@ -717,14 +718,13 @@ AcceleratedSurface::SwapChain::SwapChain(AcceleratedSurface& surface)
 #endif
 #endif // PLATFORM(GTK) || ENABLE(WPE_PLATFORM)
 #if USE(WPE_RENDERER)
-    case PlatformDisplay::Type::WPE: {
+    case PlatformDisplay::Type::WPE:
         m_type = Type::WPEBackend;
         Ref webPage { m_surface->m_webPage };
-        auto scaledSize = webPage->size();
-        scaledSize.scale(webPage->deviceScaleFactor());
-        m_lockedTargets.append(RenderTargetWPEBackend::create(m_surface.get(), scaledSize, webPage->hostFileDescriptor()));
+        m_initialSize = webPage->size();
+        m_initialSize.scale(webPage->deviceScaleFactor());
+        m_hostFD = webPage->hostFileDescriptor();
         break;
-    }
 #endif
 #if PLATFORM(GTK)
     case PlatformDisplay::Type::Default:
@@ -952,9 +952,11 @@ void AcceleratedSurface::SwapChain::releaseUnusedBuffers()
 }
 
 #if USE(WPE_RENDERER)
-uint64_t AcceleratedSurface::SwapChain::window() const
+uint64_t AcceleratedSurface::SwapChain::window()
 {
     ASSERT(m_type == Type::WPEBackend);
+    if (m_lockedTargets.isEmpty())
+        m_lockedTargets.append(RenderTargetWPEBackend::create(m_surface.get(), m_initialSize, WTF::move(m_hostFD)));
     return static_cast<RenderTargetWPEBackend*>(m_lockedTargets[0].get())->window();
 }
 #endif
@@ -1056,7 +1058,7 @@ void AcceleratedSurface::willDestroyGLContext()
     m_swapChain.reset();
 }
 
-uint64_t AcceleratedSurface::window() const
+uint64_t AcceleratedSurface::window()
 {
 #if USE(WPE_RENDERER)
     if (m_swapChain.type() == SwapChain::Type::WPEBackend)
