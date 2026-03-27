@@ -83,79 +83,17 @@ SourceBufferPrivateGStreamer::SourceBufferPrivateGStreamer(MediaSourcePrivateGSt
         GST_DEBUG_CATEGORY_INIT(webkit_mse_sourcebuffer_debug, "webkitmsesourcebuffer", 0, "WebKit MSE SourceBuffer");
     });
 
-#if !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
-    m_logger->addMessageHandlerObserver(*this);
-#endif
+    GST_DEBUG_OBJECT(m_appendPipeline ? m_appendPipeline->pipeline() : nullptr, "SourceBufferPrivate created");
 }
 
 SourceBufferPrivateGStreamer::~SourceBufferPrivateGStreamer()
 {
-#if !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
-    m_logger->removeMessageHandlerObserver(*this);
-#endif
-
     if (!m_appendPromise)
         return;
 
     m_appendPromise->reject(PlatformMediaError::BufferRemoved);
     m_appendPromise.reset();
 }
-
-#if !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
-void SourceBufferPrivateGStreamer::handleLogMessage(const WTFLogChannel& channel, WTFLogLevel level, std::optional<WTFLogLocation> location, const Vector<JSONLogValue>& values)
-{
-    auto gstDebugLevel = gstDebugLevelFromWTFLogLevel(level);
-    if (gstDebugLevel > gst_debug_category_get_threshold(GST_CAT_DEFAULT))
-        return;
-
-    auto name = StringView::fromLatin1(channel.name);
-    if (name != "MediaSource"_s)
-        return;
-
-    // Ignore logs containing only the call site information.
-    if (values.size() < 2)
-        return;
-
-    // Parse "foo::bar(hexidentifier) "
-    auto& signature = values[0].value;
-    auto leftParenthesisIndex = signature.reverseFind('(');
-    if (leftParenthesisIndex == notFound)
-        return;
-
-    auto rightParenthesisIndex = signature.reverseFind(')');
-    if (rightParenthesisIndex == notFound)
-        return;
-
-    auto identifierString = signature.substring(leftParenthesisIndex + 1, rightParenthesisIndex - leftParenthesisIndex - 1);
-    auto identifier = WTF::parseInteger<uint64_t>(identifierString, 16);
-    if (!identifier)
-        return;
-
-    // Filter out logs not related with our log identifier.
-    if (!LoggerHelper::isChildLogIdentifier(*identifier, sourceBufferLogIdentifier()))
-        return;
-
-    StringBuilder builder;
-    for (auto& value : values.subvector(1))
-        builder.append(WTF::makeStringByReplacingAll(value.value, '\"', '\''));
-
-    // Find the C++ method name, foo::bar() -> bar.
-    auto methodName = emptyString();
-    if (location)
-        methodName = String::fromUTF8(location->function);
-    else {
-        auto methodNameSeparatorIndex = signature.reverseFind(':');
-        if (methodNameSeparatorIndex != notFound)
-            methodName = signature.substring(methodNameSeparatorIndex + 1, leftParenthesisIndex - methodNameSeparatorIndex - 1);
-    }
-
-    auto message = builder.toString();
-    auto pipeline = m_appendPipeline ? m_appendPipeline->pipeline() : nullptr;
-    const char* file = location ? location->file : __FILE__;
-    int line = location ? location->line : __LINE__;
-    gst_debug_log(GST_CAT_DEFAULT, gstDebugLevel, file, methodName.utf8().data(), line, G_OBJECT(pipeline), "%s", message.utf8().data());
-}
-#endif // !RELEASE_LOG_DISABLED && !defined(GST_DISABLE_GST_DEBUG)
 
 Ref<MediaPromise> SourceBufferPrivateGStreamer::appendInternal(Ref<SharedBuffer>&& data)
 {
