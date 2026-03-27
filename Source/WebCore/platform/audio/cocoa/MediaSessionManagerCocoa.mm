@@ -748,15 +748,19 @@ static id<MRNowPlayingActivityUIControllable> nowPlayingActivityController()
 
 void MediaSessionManagerCocoa::updateNowPlayingSuppression(const NowPlayingInfo* nowPlayingInfo)
 {
-    if (!nowPlayingInfo || !nowPlayingInfo->isVideo || nowPlayingInfo->fullscreenMode == MediaPlayerEnums::VideoFullscreenModeStandard) {
+    if (!nowPlayingInfo || !nowPlayingInfo->isVideo || nowPlayingInfo->fullscreenMode != MediaPlayerEnums::VideoFullscreenModeNone) {
         RELEASE_LOG(Media, "MediaSessionManagerCocoa::updateNowPlayingSuppression: clearing suppressPresentationOverBundleIdentifiers (hasNowPlayingInfo=%d, isVideo=%d, fullscreenMode=%d)", !!nowPlayingInfo, nowPlayingInfo && nowPlayingInfo->isVideo, nowPlayingInfo && nowPlayingInfo->fullscreenMode);
         [nowPlayingActivityController() suppressPresentationOverBundleIdentifiers:nil];
 
 #if HAVE(AVEXPERIENCECONTROLLER)
-        if (nowPlayingInfo && nowPlayingInfo->fullscreenMode == MediaPlayerEnums::VideoFullscreenModeStandard) {
-            RELEASE_LOG(Media, "MediaSessionManagerCocoa::updateNowPlayingSuppression: setting preferred state");
-            [nowPlayingActivityController() setPreferredState:MRNowPlayingActivityUIStateUnsuppressed];
-        }
+        MRNowPlayingActivityUIState preferredState;
+        if (nowPlayingInfo && nowPlayingInfo->fullscreenMode != MediaPlayerEnums::VideoFullscreenModeNone)
+            preferredState = MRNowPlayingActivityUIStateFullScreen;
+        else
+            preferredState = MRNowPlayingActivityUIStateInline;
+
+        RELEASE_LOG(Media, "MediaSessionManagerCocoa::updateNowPlayingSuppression: setting preferred state to %ld", std::to_underlying(preferredState));
+        [nowPlayingActivityController() setPreferredState:preferredState forBundleIdentifier:NSBundle.mainBundle.bundleIdentifier];
 #endif
     } else {
         RetainPtr parentApplicationBundleIdentifier = applicationBundleIdentifier().createNSString();
