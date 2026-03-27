@@ -339,6 +339,12 @@ module WebKit_Internal [system] {
         requires objc
     }
 
+    module WKStageModeOrbitSimulator {
+        header "../../Shared/Model/WKStageModeOrbitSimulator.h"
+        export *
+        requires objc
+    }
+
     module WKSurroundingsEffect {
         header "../../Platform/spi/visionos/WKSurroundingsEffect.h"
         export *

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2026 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,27 +23,20 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "CredentialUpdaterShim.h"
+#import <Foundation/Foundation.h>
 
-#import "ModelTypes.h"
-#import "WKGroupSession.h"
-#import "WKIdentityDocumentPresentmentController.h"
-#import "WKIdentityDocumentPresentmentDelegate.h"
-#import "WKIdentityDocumentPresentmentError.h"
-#import "WKIdentityDocumentPresentmentMobileDocumentRequest.h"
-#import "WKIdentityDocumentPresentmentRawRequest.h"
-#import "WKIdentityDocumentPresentmentRequest.h"
-#import "WKIdentityDocumentPresentmentResponse.h"
-#import "WKIdentityDocumentRawRequestValidator.h"
-#import "WKIntelligenceReplacementTextEffectCoordinator.h"
-#import "WKIntelligenceSmartReplyTextEffectCoordinator.h"
-#import "WKIntelligenceTextEffectCoordinator.h"
-#import "WKMarketplaceKit.h"
-#import "WKPreviewWindowController.h"
-#import "WKRKEntity.h"
-#import "WKSExperienceController.h"
-#import "WKSLinearMediaPlayer.h"
-#import "WKSLinearMediaTypes.h"
-#import "WKStageMode.h"
-#import "WKStageModeOrbitSimulator.h"
-#import "WKTextAnimationManagerIOS.h"
+NS_HEADER_AUDIT_BEGIN(nullability, sendability)
+
+@interface WKStageModeOrbitSimulator : NSObject
+
+@property (nonatomic, readonly) float currentYaw;
+@property (nonatomic, readonly) float currentPitch;
+
+- (void)gestureDidBegin;
+- (void)gestureDidUpdateWithDeltaX:(float)dx deltaY:(float)dy;
+- (void)gestureDidEnd;
+- (BOOL)stepWithElapsedTime:(float)dt;
+
+@end
+
+NS_HEADER_AUDIT_END(nullability, sendability)
