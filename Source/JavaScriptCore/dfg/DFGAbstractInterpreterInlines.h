@@ -2724,9 +2724,9 @@ bool AbstractInterpreter<AbstractStateType>::executeEffects(unsigned clobberLimi
 
     case StringAt: {
         if (node->arrayMode().isOutOfBounds())
-            setTypeForNode(node, SpecString | SpecOther);
+            setTypeForNode(node, SpecStringResolved | SpecOther);
         else
-            setTypeForNode(node, SpecString);
+            setTypeForNode(node, SpecStringResolved);
         break;
     }
 
