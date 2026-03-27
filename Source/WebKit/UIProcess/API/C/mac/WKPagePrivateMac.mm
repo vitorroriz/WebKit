@@ -156,6 +156,11 @@ bool WKPageIsPlayingVideoInPictureInPicture(WKPageRef pageRef)
 {
     return protect(WebKit::toImpl(pageRef))->isPlayingVideoInPictureInPicture();
 }
+
+bool WKPageIsPlayingVideoInEnhancedFullscreen(WKPageRef pageRef)
+{
+    return WKPageIsPlayingVideoInPictureInPicture(pageRef);
+}
 #endif
 
 void WKPageSetFullscreenDelegate(WKPageRef page, id <_WKFullscreenDelegate> delegate)
