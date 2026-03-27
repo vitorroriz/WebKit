@@ -348,8 +348,9 @@ StopData::StopData(IPIntCallee* callee, JSWebAssemblyInstance* instance)
 {
 }
 
-StopData::StopData(Breakpoint::Type type, VirtualAddress address, uint8_t originalBytecode, uint8_t* pc, uint8_t* mc, IPInt::IPIntLocal* locals, IPInt::IPIntStackEntry* stack, IPIntCallee* callee, JSWebAssemblyInstance* instance, CallFrame* callFrame)
-    : location(Location::Breakpoint)
+StopData::StopData(Location location, Code code, VirtualAddress address, uint8_t originalBytecode, uint8_t* pc, uint8_t* mc, IPInt::IPIntLocal* locals, IPInt::IPIntStackEntry* stack, IPIntCallee* callee, JSWebAssemblyInstance* instance, CallFrame* callFrame)
+    : code(code)
+    , location(location)
     , address(address)
     , originalBytecode(originalBytecode)
     , pc(pc)
@@ -360,27 +361,33 @@ StopData::StopData(Breakpoint::Type type, VirtualAddress address, uint8_t origin
     , instance(instance)
     , callFrame(callFrame)
 {
-    setCode(type);
 }
 
-StopData::~StopData() = default;
-
-void StopData::setCode(Breakpoint::Type type)
+static StopData::Code codeForBreakpointType(Breakpoint::Type type)
 {
     switch (type) {
     case Breakpoint::Type::Interrupt:
-        code = Code::Stop;
-        break;
+        return StopData::Code::Stop;
     case Breakpoint::Type::Step:
-        code = Code::Trace;
-        break;
+        return StopData::Code::Trace;
     case Breakpoint::Type::Regular:
-        code = Code::Breakpoint;
-        break;
+        return StopData::Code::Breakpoint;
     default:
-        break;
+        return StopData::Code::Unknown;
     }
 }
+
+StopData::StopData(Breakpoint::Type type, VirtualAddress address, uint8_t originalBytecode, uint8_t* pc, uint8_t* mc, IPInt::IPIntLocal* locals, IPInt::IPIntStackEntry* stack, IPIntCallee* callee, JSWebAssemblyInstance* instance, CallFrame* callFrame)
+    : StopData(Location::Breakpoint, codeForBreakpointType(type), address, originalBytecode, pc, mc, locals, stack, callee, instance, callFrame)
+{
+}
+
+StopData::StopData(IPIntCallee* callee, JSWebAssemblyInstance* instance, CallFrame* callFrame, uint8_t* pc, uint8_t* mc, IPInt::IPIntLocal* locals, IPInt::IPIntStackEntry* stack)
+    : StopData(Location::Trap, Code::Trap, VirtualAddress::toVirtual(instance, callee->functionIndex(), pc), 0, pc, mc, locals, stack, callee, instance, callFrame)
+{
+}
+
+StopData::~StopData() = default;
 
 void StopData::dump(PrintStream& out) const
 {

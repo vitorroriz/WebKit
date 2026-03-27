@@ -213,8 +213,8 @@ bool QueryHandler::handleChunkedLibrariesResponse(size_t offset, size_t maxSize,
 String QueryHandler::buildWasmCallStackResponse()
 {
     auto* state = m_debugServer.execution().debuggeeStateSafe();
-    if (!state->atBreakpoint()) {
-        dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] buildWasmCallStackResponse: not stopped at breakpoint, returning empty");
+    if (!state->atBreakpointOrTrap()) {
+        dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] buildWasmCallStackResponse: not stopped at breakpoint or trap, returning empty");
         return String();
     }
 
@@ -378,7 +378,7 @@ void QueryHandler::handleWasmLocal(StringView packet)
     dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] qWasmLocal frame=", frameIndex, ", variable=", localIndex);
 
     auto* state = m_debugServer.execution().debuggeeStateSafe();
-    if (!state->atBreakpoint()) {
+    if (!state->atBreakpointOrTrap()) {
         m_debugServer.sendErrorReply(ProtocolError::UnknownCommand);
         return;
     }
@@ -460,7 +460,7 @@ void QueryHandler::handleWasmGlobal(StringView packet)
     dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] qWasmGlobal frame=", frameIndex, ", global=", globalIndex);
 
     auto* state = m_debugServer.execution().debuggeeStateSafe();
-    if (!state->atBreakpoint()) {
+    if (!state->atBreakpointOrTrap()) {
         m_debugServer.sendErrorReply(ProtocolError::UnknownCommand);
         return;
     }

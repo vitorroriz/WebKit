@@ -33,11 +33,11 @@ if [ -d "$SCRIPT_DIR/$FOLDER" ]; then
     # Build Swift WASM with Swiftly https://www.swift.org/documentation/articles/wasm-getting-started.html
     echo "Building Swift WebAssembly $FOLDER..."
     cd "$SCRIPT_DIR/$FOLDER"
-    "$SWIFT" build --swift-sdk "$SDK"
+    "$SWIFT" build --swift-sdk "$SDK" --configuration release
 
     # Move compiled WASM beside main.js
     echo "Moving $FOLDER.wasm..."
-    mv ".build/wasm32-unknown-wasip1/debug/$FOLDER.wasm" "./$FOLDER.wasm"
+    mv ".build/wasm32-unknown-wasip1/release/$FOLDER.wasm" "./$FOLDER.wasm"
 
     # Clean up build artifacts
     echo "Cleaning up..."

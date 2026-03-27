@@ -379,6 +379,7 @@ static void cleanupAfterScript(const TestScript& script, RefPtr<Thread>& workerT
     doneTesting = true;
     workerThread->waitForCompletion();
     executionHandler->reset();
+    executionHandler->setUnreachableHandlingEnabled(true);
     doneTesting = false;
 }
 

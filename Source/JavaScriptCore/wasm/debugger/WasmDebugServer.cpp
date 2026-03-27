@@ -203,11 +203,6 @@ void DebugServer::resetAll()
 #endif
 }
 
-bool DebugServer::needToHandleBreakpoints() const
-{
-    return isConnected() && execution().hasBreakpoints();
-}
-
 union SocketAddress {
     sockaddr_in in;
     sockaddr generic;
@@ -411,8 +406,21 @@ void DebugServer::handlePacket(StringView packet)
         dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] Routing continue packet to ExecutionHandler");
         m_executionHandler->resume();
         break;
+    case 'C':
+        // ContinueWithSignal: LLDB sends C<sig> instead of 'c' when resuming from a signal
+        // stop (e.g. T05/SIGTRAP). Signal re-delivery is a ptrace concept; we have no OS-level
+        // signal injection so the signal number is irrelevant — just resume.
+        dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] Routing ContinueWithSignal packet to ExecutionHandler (signal ignored)");
+        m_executionHandler->resume();
+        break;
     case 's':
         dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] Routing legacy step packet to ExecutionHandler");
+        m_executionHandler->step();
+        break;
+    case 'S':
+        // StepWithSignal: same reasoning as 'C' above — signal re-delivery does not apply
+        // to our WASM VM, so ignore the signal number and treat it as a plain step.
+        dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] Routing StepWithSignal packet to ExecutionHandler (signal ignored)");
         m_executionHandler->step();
         break;
     case 'Z':
@@ -430,6 +438,10 @@ void DebugServer::handlePacket(StringView packet)
     case '?':
         dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] Routing halt reason query to ExecutionHandler");
         m_executionHandler->interrupt();
+        // After the initial interrupt is handled and the stop reply is sent, the debugger has
+        // established a known VM state. Any unreachable trap encountered in future execution
+        // (after the user sends 'c') will be properly intercepted.
+        m_executionHandler->setUnreachableHandlingEnabled(true);
         break;
     case 'k':
         dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] Kill request");
@@ -561,6 +573,11 @@ bool DebugServer::isConnected() const
         return true;
 #endif
     return isSocketValid(m_clientSocket);
+}
+
+bool DebugServer::shouldHandleUnreachable() const
+{
+    return isConnected() && m_executionHandler->isUnreachableHandlingEnabled();
 }
 
 }

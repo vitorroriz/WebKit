@@ -49,6 +49,7 @@ enum class StopTheWorldEvent : uint8_t {
     VMActivated,
     VMStopped,
     BreakpointHit,
+    TrapHit,
     StepIntoSiteReached,
 };
 

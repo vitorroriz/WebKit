@@ -69,21 +69,25 @@ struct StopReasonInfo {
     StringView reasonSuffix;
 };
 
+// GDB RSP stop reply: T<AA> where AA is the POSIX signal number in two-digit hex.
+// "reason:<suffix>" is an LLDB extension (not in the GDB RSP spec).
+// Reference: https://sourceware.org/gdb/current/onlinedocs/gdb/Stop-Reply-Packets.html
+static String signalStopString(int signo)
+{
+    return makeString('T', hex(signo, 2, WTF::Uppercase));
+}
+
 static inline StopReasonInfo stopReasonCodeToInfo(StopData::Code code)
 {
     switch (code) {
     case StopData::Code::Stop:
-#if OS(DARWIN)
-        return { "T11"_s, "signal"_s }; // SIGSTOP on macOS (17 decimal = 0x11 hex)
-#elif OS(LINUX)
-        return { "T13"_s, "signal"_s }; // SIGSTOP on Linux (19 decimal = 0x13 hex)
-#else
-        return { "T11"_s, "signal"_s }; // Default: SIGSTOP (most common value)
-#endif
+        return { signalStopString(SIGSTOP), "signal"_s };
     case StopData::Code::Trace:
-        return { "T05"_s, "trace"_s }; // SIGTRAP - Trace/single step
+        return { signalStopString(SIGTRAP), "trace"_s };
     case StopData::Code::Breakpoint:
-        return { "T05"_s, "breakpoint"_s }; // SIGTRAP - Breakpoint hit
+        return { signalStopString(SIGTRAP), "breakpoint"_s };
+    case StopData::Code::Trap:
+        return { signalStopString(SIGTRAP), "exception"_s };
     default:
         RELEASE_ASSERT_NOT_REACHED();
         return { String(), "trace"_s };
@@ -111,6 +115,7 @@ void ExecutionHandler::stopTheWorld(VM& debuggee, StopTheWorldEvent event)
             RELEASE_ASSERT(m_debuggee == info.targetVM && info.worldMode == VMManager::Mode::RunOne);
             break;
         case StopTheWorldEvent::BreakpointHit:
+        case StopTheWorldEvent::TrapHit:
             RELEASE_ASSERT(info.worldMode != VMManager::Mode::Stopped);
             break;
         default:
@@ -128,16 +133,22 @@ void ExecutionHandler::stopTheWorld(VM& debuggee, StopTheWorldEvent event)
     VMManager::singleton().notifyVMStop(debuggee, event);
 }
 
-bool ExecutionHandler::hitBreakpoint(CallFrame* callFrame, JSWebAssemblyInstance* instance, IPIntCallee* callee, uint8_t* pc, uint8_t* mc, IPInt::IPIntLocal* locals, IPInt::IPIntStackEntry* stack)
+bool ExecutionHandler::handleUnreachable(CallFrame* callFrame, JSWebAssemblyInstance* instance, IPIntCallee* callee, uint8_t* pc, uint8_t* mc, IPInt::IPIntLocal* locals, IPInt::IPIntStackEntry* stack)
 {
-    VirtualAddress address = VirtualAddress::toVirtual(instance, callee->functionIndex(), pc);
-    if (auto* breakpoint = m_breakpointManager->findBreakpoint(address)) {
-        VM& debuggee = instance->vm();
-        debuggee.debugState()->setBreakpointStopData(breakpoint->type, address, breakpoint->originalBytecode, pc, mc, locals, stack, callee, instance, callFrame);
-        dataLogLnIf(Options::verboseWasmDebugger(), "[Code][hitBreakpoint] Going to stop at ", *breakpoint, " with ", *debuggee.debugState()->stopData);
-        stopTheWorld(debuggee, StopTheWorldEvent::BreakpointHit);
-        return true;
+    if (hasBreakpoints()) {
+        VirtualAddress address = VirtualAddress::toVirtual(instance, callee->functionIndex(), pc);
+        if (auto* breakpoint = m_breakpointManager->findBreakpoint(address)) {
+            VM& debuggee = instance->vm();
+            debuggee.debugState()->setBreakpointStopData(breakpoint->type, address, breakpoint->originalBytecode, pc, mc, locals, stack, callee, instance, callFrame);
+            dataLogLnIf(Options::verboseWasmDebugger(), "[Code][handleUnreachable] Breakpoint at ", *breakpoint, " with ", *debuggee.debugState()->stopData);
+            stopTheWorld(debuggee, StopTheWorldEvent::BreakpointHit);
+            return true;
+        }
     }
+    VM& debuggee = instance->vm();
+    debuggee.debugState()->setTrapStopData(callee, instance, callFrame, pc, mc, locals, stack);
+    dataLogLnIf(Options::verboseWasmDebugger(), "[Code][handleUnreachable] Wasm unreachable trap at ", *debuggee.debugState()->stopData);
+    stopTheWorld(debuggee, StopTheWorldEvent::TrapHit);
     return false;
 }
 
@@ -166,6 +177,7 @@ ExecutionHandler::ResumeMode ExecutionHandler::stopCode(Locker<Lock>& locker, St
         notifyDebuggerOfStop();
         break;
     case StopTheWorldEvent::BreakpointHit:
+    case StopTheWorldEvent::TrapHit:
         RELEASE_ASSERT(m_debuggerState == DebuggerState::StepRequested || m_debuggerState == DebuggerState::ContinueRequested || m_debuggerState == DebuggerState::SwitchRequested);
         m_breakpointManager->clearAllOneTimeBreakpoints();
         notifyDebuggerOfStop();
@@ -379,8 +391,12 @@ void ExecutionHandler::step()
     RELEASE_ASSERT(m_debuggerState == DebuggerState::Replied && state->isStopped());
 
     bool resumeAll = false;
-    if (state->atSystemCall())
+    if (state->atSystemCall() || state->atTrap()) {
+        // There is no valid next WASM instruction to step to in either case.
+        // For traps, unreachable throws a WebAssembly.RuntimeError back to JS — equivalent
+        // to returning from WASM — so resuming all is the right behavior.
         resumeAll = true;
+    }
     else if (state->atBreakpoint())
         resumeAll = stepAtBreakpoint(locker, state);
     else {
@@ -689,7 +705,7 @@ void ExecutionHandler::handleThreadStopInfo(StringView packet)
 
 static uint64_t getStopPC(const DebugState& state)
 {
-    if (state.atBreakpoint() || state.atPrologue())
+    if (state.atBreakpointOrTrap() || state.atPrologue())
         return state.stopData->address;
     return VirtualAddress(VirtualAddress::INVALID_BASE).value();
 }
@@ -697,7 +713,7 @@ static uint64_t getStopPC(const DebugState& state)
 static String getThreadName(const DebugState& state, uint64_t threadId)
 {
     StringView stateName;
-    if (state.atBreakpoint())
+    if (state.atBreakpointOrTrap())
         stateName = "wasm-call"_s;
     else if (state.atPrologue())
         stateName = "wasm-prologue"_s;
@@ -753,7 +769,7 @@ void ExecutionHandler::sendStopReplyForThread(AbstractLocker& locker, uint64_t t
     Vector<ThreadInfo> allThreads = collectAllStoppedThreads();
 
     // FIXME: Report different stop reasons for active vs passive threads (currently all use same code).
-    StopData::Code code = state->atBreakpoint() ? state->stopData->code : StopData::Code::Stop;
+    StopData::Code code = state->atBreakpointOrTrap() ? state->stopData->code : StopData::Code::Stop;
     auto stopInfo = stopReasonCodeToInfo(code);
 
     // Build packet with target thread
@@ -782,6 +798,15 @@ void ExecutionHandler::sendStopReplyForThread(AbstractLocker& locker, uint64_t t
 
     reply.append("00:"_s, toNativeEndianHex(getStopPC(*state)), ';');
     reply.append("reason:"_s, stopInfo.reasonSuffix, ';');
+
+    // For trap stops, include a hex-encoded description of the exception message
+    // matching WAMR convention so LLDB can display it to the user.
+    if (code == StopData::Code::Trap) {
+        reply.append("description:"_s);
+        for (UChar c : StringView("unreachable hit"_s).codeUnits())
+            reply.append(hex(static_cast<uint8_t>(c), 2, Lowercase));
+        reply.append(';');
+    }
 
     dataLogLnIf(Options::verboseWasmDebugger(), "[Debugger] Sending stop reply: target thread="_s, hex(threadId), ", total threads="_s, allThreads.size(), ", packet="_s, reply.toString());
     sendReplyImpl(locker, reply.toString());
@@ -833,6 +858,7 @@ void ExecutionHandler::reset()
 
     m_breakpointManager->clearAllBreakpoints();
     m_debuggerState = DebuggerState::Replied;
+    setUnreachableHandlingEnabled(false);
     takeAwaitingResumeNotification();
     m_debuggee = nullptr;
 }
@@ -877,8 +903,8 @@ String ExecutionHandler::callStackStringFor(uint64_t threadId)
     auto* state = targetVM->debugState();
     RELEASE_ASSERT(state->isStopped());
 
-    // For threads stopped at breakpoint with full call stack, walk the stack
-    if (state->atBreakpoint()) {
+    // For threads stopped at breakpoint or trap with full call stack, walk the stack
+    if (state->atBreakpointOrTrap()) {
         auto& stopData = *state->stopData;
         RELEASE_ASSERT(stopData.callFrame);
 

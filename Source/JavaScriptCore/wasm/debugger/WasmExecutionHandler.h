@@ -77,7 +77,7 @@ public:
     };
 
     ResumeMode stopCode(Locker<Lock>&, StopTheWorldEvent) WTF_REQUIRES_LOCK(m_lock);
-    bool hitBreakpoint(CallFrame*, JSWebAssemblyInstance*, IPIntCallee*, uint8_t* pc, uint8_t* mc, IPInt::IPIntLocal* = nullptr, IPInt::IPIntStackEntry* = nullptr);
+    bool handleUnreachable(CallFrame*, JSWebAssemblyInstance*, IPIntCallee*, uint8_t* pc, uint8_t* mc, IPInt::IPIntLocal* = nullptr, IPInt::IPIntStackEntry* = nullptr);
 
     JS_EXPORT_PRIVATE void resume();
     JS_EXPORT_PRIVATE void step();
@@ -126,6 +126,8 @@ public:
     StopTheWorldStatus handleStopTheWorld(VM&, StopTheWorldEvent);
     void handlePostResume();
     bool takeAwaitingResumeNotification() WTF_REQUIRES_LOCK(m_lock) { return std::exchange(m_awaitingResumeNotification, false); }
+    void setUnreachableHandlingEnabled(bool enabled) { m_unreachableHandlingEnabled.store(enabled, std::memory_order_release); }
+    bool isUnreachableHandlingEnabled() const { return m_unreachableHandlingEnabled.load(std::memory_order_acquire); }
 
 private:
     friend class DebugServer;
@@ -168,6 +170,7 @@ private:
     Condition m_debuggeeContinue;
     DebuggerState m_debuggerState WTF_GUARDED_BY_LOCK(m_lock) { DebuggerState::Replied };
     bool m_awaitingResumeNotification WTF_GUARDED_BY_LOCK(m_lock) { false };
+    std::atomic<bool> m_unreachableHandlingEnabled { false };
     VM* m_debuggee WTF_GUARDED_BY_LOCK(m_lock) { nullptr };
     std::optional<uint64_t> m_debugServerThreadId;
 };

@@ -243,7 +243,7 @@ ipintOp(_unreachable, macro()
 
     move cfr, a1
     move sp, a2
-    operationCall(macro() cCall3(_ipint_extern_unreachable_breakpoint_handler) end)
+    operationCall(macro() cCall3(_ipint_extern_unreachable_handler) end)
 
     # Remove pushed values
     addq 4 * SlotSize, sp

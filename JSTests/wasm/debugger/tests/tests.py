@@ -1766,3 +1766,64 @@ class WasmJsWasmJsWasmCallStackTestCase(BaseTestCase):
                 "frame #5: 0xc000000000000000",  # JS main loop
             ],
         )
+
+
+class SwiftWasmCrashTestCase(BaseTestCase):
+
+    def __init__(self, build_config: str = None, port: int = None):
+        super().__init__(build_config, port)
+
+    def execute(self):
+        self.setup_debugging_session_or_raise("resources/swift-wasm/crash-test/main.js")
+
+        try:
+            for _ in range(1):
+                self.faultTest()
+
+        except Exception as e:
+            raise Exception(f"Test failed: {e}")
+
+    def faultTest(self):
+        for _ in range(10):
+            self.send_lldb_command_or_raise("c", patterns=["Process 1 stopped"])
+            self.send_lldb_command_or_raise("dis", patterns=["->  0x4000000000010a43 <+1>: unreachable"]);
+
+        self.send_lldb_command_or_raise(
+            "bt",
+            patterns=[
+                "frame #0: 0x4000000000010a43",
+                "frame #1: 0x4000000000010a43",
+                "frame #2: 0x4000000000010a6a",
+                "frame #3: 0x4000000000010a46",
+                "frame #4: 0xc000000000000000",
+            ]
+        )
+
+
+class WasmUnreachableFaultTestCase(BaseTestCase):
+
+    def __init__(self, build_config: str = None, port: int = None):
+        super().__init__(build_config, port)
+
+    def execute(self):
+        self.setup_debugging_session_or_raise("resources/wasm/unreachable.js")
+
+        try:
+            for _ in range(1):
+                self.faultTest()
+
+        except Exception as e:
+            raise Exception(f"Test failed: {e}")
+
+    def faultTest(self):
+        for _ in range(10):
+            self.send_lldb_command_or_raise("c", patterns=["Process 1 stopped"])
+            self.send_lldb_command_or_raise("dis", patterns=["->  0x4000000000000024: unreachable"]);
+
+        self.send_lldb_command_or_raise(
+            "bt",
+            patterns=[
+                "frame #0: 0x4000000000000024",
+                "frame #1: 0xc000000000000000",
+            ]
+        )

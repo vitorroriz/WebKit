@@ -143,21 +143,24 @@ struct StopData {
         Unknown = 0,
         Stop, // SIGSTOP - Debugger interrupt (uncatchable stop) - reason:signal
         Trace, // SIGTRAP - Single step/trace completion - reason:trace
-        Breakpoint // SIGTRAP - Breakpoint hit - reason:breakpoint (distinct from trace)
+        Breakpoint, // SIGTRAP - Breakpoint hit - reason:breakpoint (distinct from trace)
+        Trap, // SIGTRAP - Wasm trap (unreachable instruction) - reason:signal
     };
 
     enum class Location : uint8_t {
         Prologue = 0,
-        Breakpoint
+        Breakpoint,
+        Trap, // Stopped at a Wasm unreachable trap
     };
 
     StopData(Breakpoint::Type, VirtualAddress, uint8_t originalBytecode, uint8_t* pc, uint8_t* mc, IPInt::IPIntLocal*, IPInt::IPIntStackEntry*, IPIntCallee*, JSWebAssemblyInstance*, CallFrame*);
 
     StopData(IPIntCallee*, JSWebAssemblyInstance*);
 
+    StopData(IPIntCallee*, JSWebAssemblyInstance*, CallFrame*, uint8_t* pc, uint8_t* mc, IPInt::IPIntLocal*, IPInt::IPIntStackEntry*);
+
     ~StopData();
 
-    void setCode(Breakpoint::Type);
     void dump(PrintStream&) const;
 
     Code code { Code::Unknown };
@@ -171,6 +174,9 @@ struct StopData {
     RefPtr<IPIntCallee> callee;
     JSWebAssemblyInstance* instance { nullptr };
     CallFrame* callFrame { nullptr };
+
+private:
+    StopData(Location, Code, VirtualAddress, uint8_t originalBytecode, uint8_t* pc, uint8_t* mc, IPInt::IPIntLocal*, IPInt::IPIntStackEntry*, IPIntCallee*, JSWebAssemblyInstance*, CallFrame*);
 };
 
 // Per-VM debugging state machine (Running/Stopped) with current stop information.
@@ -196,9 +202,16 @@ struct DebugState {
         stopData = makeUnique<StopData>(type, address, originalBytecode, pc, mc, locals, stack, callee, instance, callFrame);
     }
 
+    void setTrapStopData(IPIntCallee* callee, JSWebAssemblyInstance* instance, CallFrame* callFrame, uint8_t* pc, uint8_t* mc, IPInt::IPIntLocal* locals, IPInt::IPIntStackEntry* stack)
+    {
+        stopData = makeUnique<StopData>(callee, instance, callFrame, pc, mc, locals, stack);
+    }
+
     bool atSystemCall() const { return !stopData; }
     bool atPrologue() const { return !!stopData && stopData->location == StopData::Location::Prologue; }
     bool atBreakpoint() const { return !!stopData && stopData->location == StopData::Location::Breakpoint; }
+    bool atTrap() const { return !!stopData && stopData->location == StopData::Location::Trap; }
+    bool atBreakpointOrTrap() const { return atBreakpoint() || atTrap(); }
 
     void clearStop()
     {

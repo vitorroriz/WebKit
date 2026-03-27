@@ -1327,14 +1327,13 @@ static UNUSED_FUNCTION void displayWasmDebugState(JSWebAssemblyInstance* instanc
 }
 #endif
 
-WASM_IPINT_EXTERN_CPP_DECL(unreachable_breakpoint_handler, CallFrame* callFrame, Register* sp)
+WASM_IPINT_EXTERN_CPP_DECL(unreachable_handler, CallFrame* callFrame, Register* sp)
 {
-    dataLogLnIf(Options::verboseWasmDebugger(), "[Code][unreachable] Start");
     bool breakpointHandled = false;
 #if ENABLE(WEBASSEMBLY_DEBUGGER)
     if (Options::enableWasmDebugger()) [[unlikely]] {
         Wasm::DebugServer& debugServer = Wasm::DebugServer::singleton();
-        if (debugServer.needToHandleBreakpoints()) {
+        if (debugServer.shouldHandleUnreachable()) {
             uint8_t* pc = static_cast<uint8_t*>(sp[2].pointer());
             uint8_t* mc = static_cast<uint8_t*>(sp[3].pointer());
             IPIntLocal* pl = static_cast<IPIntLocal*>(sp[0].pointer());
@@ -1343,7 +1342,8 @@ WASM_IPINT_EXTERN_CPP_DECL(unreachable_breakpoint_handler, CallFrame* callFrame,
             IPIntStackEntry* stackPointer = std::bit_cast<IPIntStackEntry*>(sp + 4);
             if (Options::verboseWasmDebugger())
                 displayWasmDebugState(instance, callee, stackPointer, pl);
-            breakpointHandled = debugServer.execution().hitBreakpoint(callFrame, instance, callee, pc, mc, pl, stackPointer);
+
+            breakpointHandled = debugServer.execution().handleUnreachable(callFrame, instance, callee, pc, mc, pl, stackPointer);
         }
     }
 #else
@@ -1351,7 +1351,6 @@ WASM_IPINT_EXTERN_CPP_DECL(unreachable_breakpoint_handler, CallFrame* callFrame,
     UNUSED_PARAM(callFrame);
     UNUSED_PARAM(sp);
 #endif
-    dataLogLnIf(Options::verboseWasmDebugger(), "[Code][unreachable] Done with breakpointHandled=", breakpointHandled);
     IPINT_RETURN(static_cast<EncodedJSValue>(static_cast<int32_t>(breakpointHandled)));
 }
 
