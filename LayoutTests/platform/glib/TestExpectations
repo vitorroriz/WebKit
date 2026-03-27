@@ -5415,6 +5415,11 @@ webkit.org/b/310742 imported/w3c/web-platform-tests/IndexedDB/blob-valid-before-
 webkit.org/b/90980 fast/forms/textarea/textarea-state-restore.html [ Pass Timeout Failure ]
 imported/w3c/web-platform-tests/editing/other/fire-selection-change-on-deleting-empty-element.html [ Pass ]
 
+webkit.org/b/309872 imported/w3c/web-platform-tests/permissions-policy/experimental-features/vertical-scroll-disabled-scrollbar-tentative.html [ Skip ]
+webkit.org/b/309872 imported/w3c/web-platform-tests/permissions-policy/experimental-features/vertical-scroll-scrollintoview.tentative.html [ Skip ]
+webkit.org/b/309872 imported/w3c/web-platform-tests/permissions-policy/reporting/xr-report-only.https.html [ Skip ]
+webkit.org/b/309872 imported/w3c/web-platform-tests/permissions-policy/reporting/xr-reporting.https.html [ Skip ]
+
 # End: Common failures between GTK and WPE.
 
 #////////////////////////////////////////////////////////////////////////////////////////
