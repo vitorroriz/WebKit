@@ -32,6 +32,9 @@
 #include <WebCore/CoordinatedCompositionReason.h>
 #include <WebCore/Damage.h>
 #include <WebCore/IntSize.h>
+WTF_IGNORE_WARNINGS_IN_THIRD_PARTY_CODE_BEGIN
+#include <skia/core/SkSurface.h>
+WTF_IGNORE_WARNINGS_IN_THIRD_PARTY_CODE_END
 #include <wtf/CheckedRef.h>
 #include <wtf/Lock.h>
 #include <wtf/RunLoop.h>
@@ -59,12 +62,6 @@ typedef struct AHardwareBuffer AHardwareBuffer;
 typedef void *EGLImage;
 #endif
 
-#if USE(SKIA)
-WTF_IGNORE_WARNINGS_IN_THIRD_PARTY_CODE_BEGIN
-#include <skia/core/SkSurface.h>
-WTF_IGNORE_WARNINGS_IN_THIRD_PARTY_CODE_END
-#endif
-
 #if USE(WPE_RENDERER)
 struct wpe_renderer_backend_egl_target;
 #endif
@@ -74,6 +71,7 @@ class RunLoop;
 }
 
 namespace WebCore {
+class BitmapTexture;
 class GLFence;
 class ShareableBitmap;
 class ShareableBitmapHandle;
@@ -121,12 +119,10 @@ public:
     }
 
 #if PLATFORM(GTK) || ENABLE(WPE_PLATFORM)
-    bool usesGL() const { return m_swapChain.type() != SwapChain::Type::SharedMemoryWithoutGL; }
+    bool usesGL() const { return m_renderingPurpose == RenderingPurpose::Composited || m_hardwareAccelerationEnabled; }
 #endif
 
-#if USE(SKIA)
     SkCanvas* canvas();
-#endif
 
     void willDestroyGLContext();
     void willRenderFrame(const WebCore::IntSize&);
@@ -173,16 +169,14 @@ private:
 
         uint64_t id() const { return m_id; }
 
-#if USE(SKIA)
-        virtual SkSurface* skiaSurface() { RELEASE_ASSERT_NOT_REACHED(); }
-#endif
-
         virtual void willRenderFrame() { }
         virtual void didRenderFrame() { }
         virtual void sendFrame(Vector<WebCore::IntRect, 1>&&) { };
 
         virtual void sync(bool) { }
         virtual void setReleaseFenceFD(UnixFileDescriptor&&) { }
+
+        SkSurface* skiaSurface() const { return m_skiaSurface.get(); }
 
 #if ENABLE(DAMAGE_TRACKING)
         void setDamage(WebCore::Damage&& damage) { m_damage = WTF::move(damage); }
@@ -193,11 +187,11 @@ private:
     protected:
         explicit RenderTarget(AcceleratedSurface&);
 
+        void createSkiaSurfaceForTexture(const WebCore::BitmapTexture&);
+
         uint64_t m_id { 0 };
         const CheckedRef<AcceleratedSurface> m_surface;
-#if USE(SKIA)
         sk_sp<SkSurface> m_skiaSurface;
-#endif
 #if ENABLE(DAMAGE_TRACKING)
         std::optional<WebCore::Damage> m_damage;
 #endif
@@ -214,10 +208,6 @@ private:
 
     protected:
         RenderTargetShareableBuffer(AcceleratedSurface&, const WebCore::IntSize&);
-
-#if USE(SKIA)
-        SkSurface* skiaSurface() override;
-#endif
 
         void willRenderFrame() override;
         void sendFrame(Vector<WebCore::IntRect, 1>&&) override;
@@ -289,6 +279,7 @@ private:
 
         unsigned m_colorBuffer { 0 };
         EGLImage m_image { nullptr };
+        RefPtr<WebCore::BitmapTexture> m_texture;
     };
 #endif // USE(GBM) || OS(ANDROID)
 
@@ -306,33 +297,16 @@ private:
         const Ref<WebCore::ShareableBitmap> m_bitmap;
     };
 
-    class RenderTargetSHMImageWithoutGL final : public RenderTarget {
-    public:
-        static std::unique_ptr<RenderTarget> create(AcceleratedSurface&, const WebCore::IntSize&);
-        RenderTargetSHMImageWithoutGL(AcceleratedSurface&, const WebCore::IntSize&, Ref<WebCore::ShareableBitmap>&&, WebCore::ShareableBitmapHandle&&);
-        ~RenderTargetSHMImageWithoutGL();
-
-#if USE(SKIA)
-        SkSurface* skiaSurface() override;
-#endif
-
-    private:
-        void sendFrame(Vector<WebCore::IntRect, 1>&&) override;
-
-        WebCore::IntSize m_initialSize;
-        const Ref<WebCore::ShareableBitmap> m_bitmap;
-    };
-
     class RenderTargetTexture final : public RenderTargetShareableBuffer {
     public:
         static std::unique_ptr<RenderTarget> create(AcceleratedSurface&, const WebCore::IntSize&);
-        RenderTargetTexture(AcceleratedSurface&, const WebCore::IntSize&, unsigned texture, uint32_t format, Vector<WTF::UnixFileDescriptor>&&, Vector<uint32_t>&& offsets, Vector<uint32_t>&& strides, uint64_t modifier);
+        RenderTargetTexture(AcceleratedSurface&, const WebCore::IntSize&, Ref<WebCore::BitmapTexture>&&, uint32_t format, Vector<WTF::UnixFileDescriptor>&&, Vector<uint32_t>&& offsets, Vector<uint32_t>&& strides, uint64_t modifier);
         ~RenderTargetTexture();
 
     private:
         bool supportsExplicitSync() const override { return true; }
 
-        unsigned m_texture { 0 };
+        Ref<WebCore::BitmapTexture> m_texture;
     };
 #endif // PLATFORM(GTK) || ENABLE(WPE_PLATFORM)
 
@@ -366,7 +340,6 @@ private:
             EGLImage,
 #endif
             SharedMemory,
-            SharedMemoryWithoutGL,
             Texture,
 #endif
 #if USE(WPE_RENDERER)
