@@ -162,16 +162,6 @@ svg/custom/pointer-events-text.svg                [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/interact/scripted/svg-pointer-events-bbox.html    [ Failure ]
 
 # Failing WPT reftests
-imported/w3c/web-platform-tests/svg/animations/animate-rewind-freeze-indefinite.svg                    [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/animations/scripted/animateMotion-animated-line.svg                [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/animations/scripted/clear-mapped-animation.svg                     [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/embedded/image-modify-href-1.svg                                   [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/embedded/image-modify-href-2.svg                                   [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/embedded/image-modify-href-3.svg                                   [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/embedded/image-modify-href-4.svg                                   [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/embedded/image-remove-href-1.svg                                   [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/embedded/image-remove-href-2.svg                                   [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/embedded/image-remove-href-3.svg                                   [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/painting/marker-009.svg                                            [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/painting/reftests/non-scaling-stroke-001.html                      [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/painting/reftests/non-scaling-stroke-002.html                      [ ImageOnlyFailure ]
@@ -179,9 +169,6 @@ imported/w3c/web-platform-tests/svg/painting/reftests/non-scaling-stroke-004.htm
 imported/w3c/web-platform-tests/svg/painting/reftests/paint-context-008.svg                            [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/pservers/reftests/pattern-inheritance-template-pattern-removed.svg [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/render/reftests/blending-svg-foreign-object.html                   [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/shapes/reftests/pathlength-004b.svg                                [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/styling/invalidation/nth-child-of-class.svg                        [ ImageOnlyFailure ]
-imported/w3c/web-platform-tests/svg/styling/invalidation/nth-last-child-of-class.svg                   [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/text/reftests/dominant-baseline-hanging-small-font-size.svg        [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/svg/text/reftests/text-path-transformed-002.html                       [ ImageOnlyFailure ]
 
@@ -236,13 +223,6 @@ svg/hixie/mixed/011.xml                                  [ ImageOnlyFailure ]
 
 # Unknown error (nothing rendered)
 svg/text/adding-id-on-pending-path.html [ ImageOnlyFailure ]
-
-svg/carto.net/button.svg        [ Failure ]
-svg/carto.net/colourpicker.svg  [ Failure ]
-svg/carto.net/combobox.svg      [ Failure ]
-svg/carto.net/selectionlist.svg [ Failure ]
-svg/carto.net/tabgroup.svg      [ Failure ]
-svg/carto.net/textbox.svg       [ Failure ]
 
 # Missing text output
 svg/animations/svg-element-attribute-changed-crash.html [ Failure ]
