@@ -27,6 +27,7 @@
 #include <wtf/BitVector.h>
 
 #include <wtf/MathExtras.h>
+#include <wtf/Vector.h>
 
 namespace TestWebKitAPI {
 
@@ -66,6 +67,131 @@ TEST(WTF_BitVector, MergeLargerIntoSmaller)
 
     // Total set bits should be exactly 4.
     EXPECT_EQ(large.bitCount(), 4u);
+}
+
+TEST(WTF_BitVector, MoveConstructInline)
+{
+    BitVector a;
+    a.set(0);
+    a.set(5);
+    a.set(62);
+
+    BitVector b(WTF::move(a));
+
+    EXPECT_TRUE(b.get(0));
+    EXPECT_TRUE(b.get(5));
+    EXPECT_TRUE(b.get(62));
+    EXPECT_EQ(b.bitCount(), 3u);
+
+    // Source should be empty after move.
+    EXPECT_TRUE(a.isEmpty());
+    EXPECT_EQ(a.bitCount(), 0u);
+}
+
+TEST(WTF_BitVector, MoveConstructOutOfLine)
+{
+    BitVector a(256);
+    a.quickSet(0);
+    a.quickSet(100);
+    a.quickSet(200);
+
+    BitVector b(WTF::move(a));
+
+    EXPECT_TRUE(b.get(0));
+    EXPECT_TRUE(b.get(100));
+    EXPECT_TRUE(b.get(200));
+    EXPECT_EQ(b.bitCount(), 3u);
+    EXPECT_GE(b.size(), 256u);
+
+    // Source should be empty inline after move.
+    EXPECT_TRUE(a.isEmpty());
+    EXPECT_EQ(a.bitCount(), 0u);
+}
+
+TEST(WTF_BitVector, MoveAssignInline)
+{
+    BitVector a;
+    a.set(3);
+    a.set(10);
+
+    BitVector b;
+    b.set(7);
+
+    b = WTF::move(a);
+
+    EXPECT_TRUE(b.get(3));
+    EXPECT_TRUE(b.get(10));
+    EXPECT_FALSE(b.get(7));
+    EXPECT_EQ(b.bitCount(), 2u);
+
+    EXPECT_TRUE(a.isEmpty());
+}
+
+TEST(WTF_BitVector, MoveAssignOutOfLine)
+{
+    BitVector a(256);
+    a.quickSet(50);
+    a.quickSet(150);
+
+    BitVector b(128);
+    b.quickSet(0);
+
+    b = WTF::move(a);
+
+    EXPECT_TRUE(b.get(50));
+    EXPECT_TRUE(b.get(150));
+    EXPECT_FALSE(b.get(0));
+    EXPECT_EQ(b.bitCount(), 2u);
+    EXPECT_GE(b.size(), 256u);
+
+    EXPECT_TRUE(a.isEmpty());
+}
+
+TEST(WTF_BitVector, MoveAssignOutOfLineToOutOfLine)
+{
+    // Both source and destination are out-of-line. The destination's
+    // allocation should be freed.
+    BitVector a(200);
+    a.quickSet(100);
+
+    BitVector b(300);
+    b.quickSet(250);
+
+    b = WTF::move(a);
+
+    EXPECT_TRUE(b.get(100));
+    EXPECT_FALSE(b.get(250));
+    EXPECT_EQ(b.bitCount(), 1u);
+
+    EXPECT_TRUE(a.isEmpty());
+}
+
+TEST(WTF_BitVector, MoveInVector)
+{
+    Vector<BitVector> vec;
+    for (unsigned i = 0; i < 100; ++i) {
+        BitVector bv(256);
+        bv.quickSet(i);
+        vec.append(WTF::move(bv));
+    }
+
+    for (unsigned i = 0; i < 100; ++i) {
+        EXPECT_TRUE(vec[i].get(i));
+        EXPECT_EQ(vec[i].bitCount(), 1u);
+    }
+}
+
+TEST(WTF_BitVector, MoveAssignSelf)
+{
+    BitVector a(256);
+    a.quickSet(42);
+
+    auto& ref = a;
+    a = WTF::move(ref);
+
+    // Should survive self-move-assignment.
+    EXPECT_TRUE(a.get(42));
+    EXPECT_EQ(a.bitCount(), 1u);
 }
 
 } // namespace TestWebKitAPI

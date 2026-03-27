@@ -88,6 +88,11 @@ public:
         (*this) = other;
     }
 
+    BitVector(BitVector&& other)
+        : m_bitsOrPointer(std::exchange(other.m_bitsOrPointer, makeInlineBits(0)))
+    {
+    }
+
 #if USE(CF)
     BitVector(CFBitVectorRef bitVector)
         : BitVector(CFBitVectorGetCount(bitVector))
@@ -109,13 +114,25 @@ public:
     
     BitVector& operator=(const BitVector& other)
     {
-        if (&other == this)
+        if (&other == this) [[unlikely]]
             return *this;
 
         if (isInline() && other.isInline())
             m_bitsOrPointer = other.m_bitsOrPointer;
         else
             setSlow(other);
+        return *this;
+    }
+
+    BitVector& operator=(BitVector&& other)
+    {
+        if (&other == this) [[unlikely]]
+            return *this;
+
+        if (!isInline() && !isEmptyOrDeletedValue())
+            OutOfLineBits::destroy(outOfLineBits());
+
+        m_bitsOrPointer = std::exchange(other.m_bitsOrPointer, makeInlineBits(0));
         return *this;
     }
 
