@@ -122,7 +122,7 @@ public:
     virtual FrameView* virtualView() const = 0;
     virtual void disconnectView() = 0;
     virtual FrameLoaderClient& loaderClient() = 0;
-    virtual void documentURLForConsoleLog(CompletionHandler<void(const URL&)>&&) = 0;
+    virtual URL urlForConsoleLog() const = 0;
 
     virtual String customUserAgent() const = 0;
     virtual String customUserAgentAsSiteSpecificQuirks() const = 0;

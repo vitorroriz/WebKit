@@ -392,7 +392,7 @@ private:
     DOMWindow* NODELETE virtualWindow() const final;
     void reinitializeDocumentSecurityContext() final;
     FrameLoaderClient& NODELETE loaderClient() LIFETIME_BOUND final;
-    void documentURLForConsoleLog(CompletionHandler<void(const URL&)>&&) final;
+    URL urlForConsoleLog() const final;
 
     WeakHashSet<FrameDestructionObserver> m_destructionObservers;
 

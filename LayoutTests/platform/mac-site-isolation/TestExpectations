@@ -518,3 +518,14 @@ fast/history/page-cache-clearing.html [ Skip ]
 http/tests/navigation/page-cache-video.html [ Skip ]
 http/tests/referrer-policy/no-referrer/cross-origin-pson-bfcache-restoration.html [ Skip ]
 imported/w3c/web-platform-tests/cookies/third-party-cookies/third-party-cookies.tentative.https.html [ Skip ]
+
+####################################
+# Tests with intentional text fail #
+####################################
+# The following two tests have a different console log with Site Isolation enabled
+# vs disabled. The difference is that with Site Isolation enabled, the error message
+# only includes the protocol and origin of a RemoteFrame when with Site Isolation
+# is disabled the other frame is a LocalFrame which we log the URL with the
+# full path.
+http/tests/security/block-top-level-navigation-to-different-scheme-by-third-party-iframes.html [ Failure ]
+http/tests/security/block-top-level-navigations-by-third-party-iframes.html [ Failure ]

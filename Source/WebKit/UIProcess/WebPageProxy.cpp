@@ -17799,14 +17799,6 @@ void WebPageProxy::updateRemoteFrameAccessibilityInheritedState(WebCore::FrameId
 }
 #endif
 
-void WebPageProxy::documentURLForConsoleLog(WebCore::FrameIdentifier frameID, CompletionHandler<void(const URL&)>&& completionHandler)
-{
-    // FIXME: <rdar://125885582> Respond with an empty string if there's no inspector and no test runner.
-    if (RefPtr frame = WebFrameProxy::webFrame(frameID))
-        return completionHandler(frame->url());
-    completionHandler({ });
-}
-
 void WebPageProxy::reportMixedContentViolation(FrameIdentifier frameID, bool blocked, const URL& target)
 {
     RefPtr frame = WebFrameProxy::webFrame(frameID);
