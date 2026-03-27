@@ -145,7 +145,7 @@ CanvasCompositingStrategy canvasCompositingStrategy(const RenderObject& renderer
         // If the canvas is accelerated but drawing is not, ensure we get a
         // standalone layer for the canvas. RenderLayerBacking::createPrimaryGraphicsLayer()
         // will enable acceleration for that layer, so that we don't incur readback.
-        if (context2D->isAccelerated() && !renderer.view().layer()->compositor().acceleratedDrawingEnabled())
+        if (context2D->isAccelerated() && (!renderer.view().layer()->compositor().acceleratedDrawingEnabled() || renderer.view().layer()->compositor().useDynamicContentScalingDisplayListsForDOMRendering()))
             return CanvasPaintedToLayer;
     }
 

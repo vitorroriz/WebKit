@@ -644,13 +644,18 @@ void RenderLayerCompositor::cacheAcceleratedCompositingFlags()
     bool showDebugBorders = settings->showDebugBorders();
     bool showRepaintCounter = settings->showRepaintCounter();
     bool acceleratedDrawingEnabled = settings->acceleratedDrawingEnabled();
+#if ENABLE(RE_DYNAMIC_CONTENT_SCALING)
+    bool useDynamicContentScalingDisplayListsForDOMRendering = settings->useCGDisplayListsForDOMRendering();
+#else
+    bool useDynamicContentScalingDisplayListsForDOMRendering = false;
+#endif
 
     // forceCompositingMode for subframes can only be computed after layout.
     bool forceCompositingMode = m_forceCompositingMode;
     if (isRootFrameCompositor())
         forceCompositingMode = m_renderView.settings().forceCompositingMode() && hasAcceleratedCompositing; 
     
-    if (hasAcceleratedCompositing != m_hasAcceleratedCompositing || showDebugBorders != m_showDebugBorders || showRepaintCounter != m_showRepaintCounter || forceCompositingMode != m_forceCompositingMode) {
+    if (hasAcceleratedCompositing != m_hasAcceleratedCompositing || showDebugBorders != m_showDebugBorders || showRepaintCounter != m_showRepaintCounter || forceCompositingMode != m_forceCompositingMode || useDynamicContentScalingDisplayListsForDOMRendering != m_useDynamicContentScalingDisplayListsForDOMRendering) {
         if (auto* rootLayer = m_renderView.layer()) {
             rootLayer->setNeedsCompositingConfigurationUpdate();
             rootLayer->setDescendantsNeedUpdateBackingAndHierarchyTraversal();
@@ -663,7 +668,8 @@ void RenderLayerCompositor::cacheAcceleratedCompositingFlags()
     m_showDebugBorders = showDebugBorders;
     m_showRepaintCounter = showRepaintCounter;
     m_acceleratedDrawingEnabled = acceleratedDrawingEnabled;
-    
+    m_useDynamicContentScalingDisplayListsForDOMRendering = useDynamicContentScalingDisplayListsForDOMRendering;
+
     if (debugBordersChanged) {
         if (m_layerForHorizontalScrollbar)
             m_layerForHorizontalScrollbar->setShowDebugBorder(m_showDebugBorders);

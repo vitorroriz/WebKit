@@ -8696,11 +8696,12 @@ UseCGDisplayListsForDOMRendering:
   status: internal
   humanReadableName: "Dynamic Content Scaling: DOM Rendering"
   humanReadableDescription: "Use Dynamic Content Scaling for DOM rendering"
-  webcoreBinding: none
   condition: ENABLE(RE_DYNAMIC_CONTENT_SCALING)
-  exposed: [ WebKit ]
+  exposed: [ WebCore, WebKit ]
   defaultValue:
     WebKit:
+      default: true
+    WebCore:
       default: true
   sharedPreferenceForWebProcess: true
 
