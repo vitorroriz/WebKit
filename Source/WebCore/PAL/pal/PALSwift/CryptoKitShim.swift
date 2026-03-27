@@ -219,14 +219,6 @@ public class Digest {
     }
 }
 
-// FIXME: PALSwift should have no public symbols.
-// swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-public enum ECCurve {
-    case p256
-    case p384
-    case p521
-}
-
 enum ECPrivateKey {
     case p256(P256.Signing.PrivateKey)
     case p384(P384.Signing.PrivateKey)
@@ -246,34 +238,21 @@ enum ECKeyInternal {
 
 // FIXME: PALSwift should have no public symbols.
 // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-public enum ECImportReturnCode {
-    case defaultValue
-    case success
-    case importFailed
-}
-
-// FIXME: PALSwift should have no public symbols.
-// swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-public struct ECImportReturnValue {
-    public var errorCode: ECImportReturnCode = .defaultValue
-    public var key: ECKey? = nil
-}
-
-// FIXME: PALSwift should have no public symbols.
-// swift-format-ignore: AllPublicDeclarationsHaveDocumentation
 public struct ECKey {
     let key: ECKeyInternal
 
     // FIXME: PALSwift should have no public symbols.
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public init(curve: ECCurve) {
+    public init(curve: PAL.Crypto.ECNamedCurve) {
         switch curve {
-        case .p256:
+        case .P256:
             key = .privateKey(.p256(P256.Signing.PrivateKey(compactRepresentable: true)))
-        case .p384:
+        case .P384:
             key = .privateKey(.p384(P384.Signing.PrivateKey(compactRepresentable: true)))
-        case .p521:
+        case .P521:
             key = .privateKey(.p521(P521.Signing.PrivateKey(compactRepresentable: true)))
+        @unknown default:
+            fatalError()
         }
     }
 
@@ -309,22 +288,21 @@ public struct ECKey {
 
     // FIXME: PALSwift should have no public symbols.
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public static func importX963Pub(data: SpanConstUInt8, curve: ECCurve) -> ECImportReturnValue {
-        var returnValue = ECImportReturnValue()
+    public static func importX963Pub(data: SpanConstUInt8, curve: PAL.Crypto.ECNamedCurve) -> ECKey? {
         do {
-            switch curve {
-            case .p256:
-                returnValue.key = unsafe ECKey(internalKey: .publicKey(.p256(try P256.Signing.PublicKey(span: data))))
-            case .p384:
-                returnValue.key = unsafe ECKey(internalKey: .publicKey(.p384(try P384.Signing.PublicKey(span: data))))
-            case .p521:
-                returnValue.key = unsafe ECKey(internalKey: .publicKey(.p521(try P521.Signing.PublicKey(span: data))))
+            return switch curve {
+            case .P256:
+                unsafe ECKey(internalKey: .publicKey(.p256(try P256.Signing.PublicKey(span: data))))
+            case .P384:
+                unsafe ECKey(internalKey: .publicKey(.p384(try P384.Signing.PublicKey(span: data))))
+            case .P521:
+                unsafe ECKey(internalKey: .publicKey(.p521(try P521.Signing.PublicKey(span: data))))
+            @unknown default:
+                fatalError()
             }
-            returnValue.errorCode = .success
         } catch {
-            returnValue.errorCode = .importFailed
+            return nil
         }
-        return returnValue
     }
 
     // FIXME: PALSwift should have no public symbols.
@@ -349,42 +327,40 @@ public struct ECKey {
 
     // FIXME: PALSwift should have no public symbols.
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public static func importCompressedPub(data: SpanConstUInt8, curve: ECCurve) -> ECImportReturnValue {
-        var returnValue = ECImportReturnValue()
+    public static func importCompressedPub(data: SpanConstUInt8, curve: PAL.Crypto.ECNamedCurve) -> ECKey? {
         do {
-            switch curve {
-            case .p256:
-                returnValue.key = unsafe ECKey(publicKey: .p256(try P256.Signing.PublicKey(spanCompressed: data)))
-            case .p384:
-                returnValue.key = unsafe ECKey(publicKey: .p384(try P384.Signing.PublicKey(spanCompressed: data)))
-            case .p521:
-                returnValue.key = unsafe ECKey(publicKey: .p521(try P521.Signing.PublicKey(spanCompressed: data)))
+            return switch curve {
+            case .P256:
+                unsafe ECKey(publicKey: .p256(try P256.Signing.PublicKey(spanCompressed: data)))
+            case .P384:
+                unsafe ECKey(publicKey: .p384(try P384.Signing.PublicKey(spanCompressed: data)))
+            case .P521:
+                unsafe ECKey(publicKey: .p521(try P521.Signing.PublicKey(spanCompressed: data)))
+            @unknown default:
+                fatalError()
             }
-            returnValue.errorCode = .success
         } catch {
-            returnValue.errorCode = .importFailed
+            return nil
         }
-        return returnValue
     }
 
     // FIXME: PALSwift should have no public symbols.
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public static func importX963Private(data: SpanConstUInt8, curve: ECCurve) -> ECImportReturnValue {
-        var returnValue = ECImportReturnValue()
+    public static func importX963Private(data: SpanConstUInt8, curve: PAL.Crypto.ECNamedCurve) -> ECKey? {
         do {
-            switch curve {
-            case .p256:
-                returnValue.key = unsafe ECKey(privateKey: .p256(try P256.Signing.PrivateKey(span: data)))
-            case .p384:
-                returnValue.key = unsafe ECKey(privateKey: .p384(try P384.Signing.PrivateKey(span: data)))
-            case .p521:
-                returnValue.key = unsafe ECKey(privateKey: .p521(try P521.Signing.PrivateKey(span: data)))
+            return switch curve {
+            case .P256:
+                unsafe ECKey(privateKey: .p256(try P256.Signing.PrivateKey(span: data)))
+            case .P384:
+                unsafe ECKey(privateKey: .p384(try P384.Signing.PrivateKey(span: data)))
+            case .P521:
+                unsafe ECKey(privateKey: .p521(try P521.Signing.PrivateKey(span: data)))
+            @unknown default:
+                fatalError()
             }
-            returnValue.errorCode = .success
         } catch {
-            returnValue.errorCode = .importFailed
+            return nil
         }
-        return returnValue
     }
 
     // FIXME: PALSwift should have no public symbols.

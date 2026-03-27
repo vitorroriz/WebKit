@@ -26,16 +26,12 @@
 #include "config.h"
 #include "CryptoDigest.h"
 
+#include "PALSwift-Generated.h"
 #include <CommonCrypto/CommonCrypto.h>
 #include <optional>
 #include <pal/crypto/CryptoTypes.h>
 #include <span>
 #include <wtf/TZoneMallocInlines.h>
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-#include "PALSwift-Generated.h"
-#pragma clang diagnostic pop
 
 namespace PAL::Crypto {
 

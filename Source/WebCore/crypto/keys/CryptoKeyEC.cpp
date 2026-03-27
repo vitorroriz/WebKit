@@ -33,10 +33,7 @@
 
 #if OS(DARWIN) && !PLATFORM(GTK)
 #include <pal/crypto/CryptoTypes.h>
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-#include "PALSwift-Generated.h"
-#pragma clang diagnostic pop
+#include <pal/crypto/PlatformECKey.h>
 #endif
 
 namespace WebCore {

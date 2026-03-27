@@ -32,10 +32,6 @@
 #include "CryptoKeyEC.h"
 #include "CryptoTypesBridging.h"
 #include "ExceptionOr.h"
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-#include "PALSwift-Generated.h"
-#pragma clang diagnostic pop
 #include <pal/crypto/CryptoTypes.h>
 #include <wtf/StdLibExtras.h>
 
@@ -45,7 +41,7 @@ static ExceptionOr<Vector<uint8_t>> signECDSACryptoKit(CryptoAlgorithmIdentifier
 {
     if (!isValidHashParameter(hash))
         return Exception { ExceptionCode::OperationError };
-    auto rv = key->sign(data.span(), toCKHashFunction(hash));
+    auto rv = key.sign(data.span(), toCKHashFunction(hash));
     if (rv.errorCode != PAL::Crypto::Error::Success)
         return Exception { ExceptionCode::OperationError };
     return WTF::move(rv.result);
@@ -55,7 +51,7 @@ static ExceptionOr<bool> verifyECDSACryptoKit(CryptoAlgorithmIdentifier hash, co
 {
     if (!isValidHashParameter(hash))
         return Exception { ExceptionCode::OperationError };
-    return key->verify(data.span(), signature.span(), toCKHashFunction(hash)).errorCode == PAL::Crypto::Error::Success;
+    return key.doVerify(data.span(), signature.span(), toCKHashFunction(hash)).errorCode == PAL::Crypto::Error::Success;
 }
 
 ExceptionOr<Vector<uint8_t>> CryptoAlgorithmECDSA::platformSign(const CryptoAlgorithmEcdsaParams& parameters, const CryptoKeyEC& key, const Vector<uint8_t>& data)

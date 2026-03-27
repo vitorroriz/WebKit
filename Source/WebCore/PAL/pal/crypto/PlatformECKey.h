@@ -25,56 +25,51 @@
 
 #pragma once
 
-#include <cstdint>
-#include <span>
-#include <wtf/Vector.h>
+#include <pal/crypto/CryptoTypes.h>
+#include <wtf/UniqueRef.h>
+
+namespace pal {
+class ECKey;
+};
 
 namespace PAL::Crypto {
 
-using VectorUInt8 = WTF::Vector<uint8_t>;
+class PlatformECKey {
+    WTF_DEPRECATED_MAKE_FAST_ALLOCATED(PlatformECKey);
+    WTF_MAKE_NONCOPYABLE(PlatformECKey);
+public:
+    using NamedCurve = ECNamedCurve;
 
-using SpanConstUInt8 = std::span<const uint8_t>;
+    PlatformECKey(NamedCurve);
 
-enum class CryptoDigestHashFunction: int {
-    SHA_1,
-    DEPRECATED_SHA_224,
-    SHA_256,
-    SHA_384,
-    SHA_512,
+    PlatformECKey(PlatformECKey&&);
+
+    PlatformECKey& operator=(PlatformECKey&&);
+
+    ~PlatformECKey();
+
+    CryptoOperationReturnValue deriveBits(const PlatformECKey& publicKey) const;
+
+    CryptoOperationReturnValue sign(SpanConstUInt8 message, CryptoDigestHashFunction) const;
+
+    CryptoOperationReturnValue doVerify(SpanConstUInt8 message, SpanConstUInt8 signature, CryptoDigestHashFunction) const;
+
+    PlatformECKey toPub() const;
+
+    CryptoOperationReturnValue exportX963Pub() const;
+
+    CryptoOperationReturnValue exportX963Private() const;
+
+    static std::optional<PlatformECKey> importX963Pub(SpanConstUInt8, NamedCurve);
+
+    static std::optional<PlatformECKey> importX963Private(SpanConstUInt8, NamedCurve);
+
+    static std::optional<PlatformECKey> importCompressedPub(SpanConstUInt8, NamedCurve);
+
+private:
+    PlatformECKey(const pal::ECKey&);
+
+    UniqueRef<pal::ECKey> m_key;
 };
-
-enum class Error: int {
-    Success = 0,
-    WrongTagSize,
-    EncryptionFailed,
-    EncryptionResultNil,
-    InvalidArgument,
-    TooBigArguments,
-    DecryptionFailed,
-    HashingFailed,
-    PublicKeyProvidedToSign,
-    FailedToSign,
-    FailedToVerify,
-    PrivateKeyProvidedForVerification,
-    FailedToImport,
-    FailedToDerive,
-    FailedToExport,
-    DefaultValue,
-    UnsupportedAlgorithm,
-};
-
-struct CryptoOperationReturnValue {
-    Error errorCode = Error::DefaultValue;
-    VectorUInt8 result;
-};
-
-enum class ECNamedCurve : uint8_t {
-    P256,
-    P384,
-    P521,
-};
-
-constexpr auto ed25519KeySize = 32;
-constexpr auto ed25519SignatureSize = ed25519KeySize * 2;
 
 } // namespace PAL::Crypto

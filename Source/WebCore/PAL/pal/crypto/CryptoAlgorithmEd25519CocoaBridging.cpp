@@ -27,11 +27,7 @@
 #include "CryptoAlgorithmEd25519CocoaBridging.h"
 
 #include "CommonCryptoSPI.h"
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #include "PALSwift-Generated.h"
-#pragma clang diagnostic pop
-
 #include <wtf/CryptographicUtilities.h>
 
 namespace PAL::Crypto {
