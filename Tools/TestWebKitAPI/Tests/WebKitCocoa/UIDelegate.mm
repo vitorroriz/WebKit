@@ -879,6 +879,23 @@ TEST(WebKit, PrintPreview)
     [previewView drawRect:CGRectMake(0, 0, 10, 10)];
 }
 
+TEST(WebKit, PrintAdjustMarginsAfterPageClose)
+{
+    done = false;
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600)]);
+    RetainPtr delegate = adoptNS([[PrintDelegate alloc] init]);
+    [webView setUIDelegate:delegate.get()];
+    [webView loadHTMLString:@"<head><title>test</title></head><body onload='print()'>content</body>" baseURL:[NSURL URLWithString:@"http://example.com/"]];
+    TestWebKitAPI::Util::run(&done);
+    RetainPtr operation = [webView _printOperationWithPrintInfo:[NSPrintInfo sharedPrintInfo]];
+    [NSPrintOperation setCurrentOperation:operation];
+    RetainPtr previewView = [operation view];
+    [webView _close];
+    // Simulate the race where the page is closed between knowsPageRange:
+    // and _adjustPrintingMarginsForHeaderAndFooter.
+    [previewView performSelector:NSSelectorFromString(@"_adjustPrintingMarginsForHeaderAndFooter")];
+}
+
 @interface PrintDelegateWithCompletionHandler : NSObject <WKUIDelegatePrivate>
 - (void)waitForPrintFrameCall;
 @end
