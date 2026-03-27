@@ -113,12 +113,6 @@ void AccessGenerationResult::dump(PrintStream& out) const
         out.print(":", *m_handler);
 }
 
-void InlineCacheHandler::dump(PrintStream& out) const
-{
-    if (m_callTarget)
-        out.print(m_callTarget);
-}
-
 static TypedArrayType toTypedArrayType(AccessCase::AccessType accessType)
 {
     switch (accessType) {
@@ -1773,146 +1767,6 @@ MacroAssemblerCodeRef<JITThunkPtrTag> InlineCacheCompiler::generateSlowPathCode(
     RELEASE_ASSERT_NOT_REACHED();
     return { };
 }
-
-InlineCacheHandler::InlineCacheHandler(Ref<InlineCacheHandler>&& previous, Ref<PolymorphicAccessJITStubRoutine>&& stubRoutine, std::unique_ptr<PropertyInlineCacheClearingWatchpoint>&& watchpoint, unsigned callLinkInfoCount, CacheType cacheType)
-    : Base(callLinkInfoCount)
-    , m_callTarget(stubRoutine->code().code().template retagged<JITStubRoutinePtrTag>())
-    , m_jumpTarget(CodePtr<NoPtrTag> { m_callTarget.retagged<NoPtrTag>().dataLocation<uint8_t*>() + prologueSizeInBytesDataIC }.template retagged<JITStubRoutinePtrTag>())
-    , m_cacheType(cacheType)
-    , m_next(WTF::move(previous))
-    , m_stubRoutine(WTF::move(stubRoutine))
-    , m_watchpoint(WTF::move(watchpoint))
-{
-    disableThreadingChecks();
-}
-
-Ref<InlineCacheHandler> InlineCacheHandler::create(Ref<InlineCacheHandler>&& previous, CodeBlock* codeBlock, PropertyInlineCache& propertyCache, Ref<PolymorphicAccessJITStubRoutine>&& stubRoutine, std::unique_ptr<PropertyInlineCacheClearingWatchpoint>&& watchpoint, unsigned callLinkInfoCount)
-{
-    auto result = adoptRef(*new (NotNull, fastMalloc(Base::allocationSize(callLinkInfoCount))) InlineCacheHandler(WTF::move(previous), WTF::move(stubRoutine), WTF::move(watchpoint), callLinkInfoCount, CacheType::Unset));
-    VM& vm = codeBlock->vm();
-    for (auto& callLinkInfo : result->span())
-        callLinkInfo.initialize(vm, codeBlock, CallLinkInfo::CallType::Call, propertyCache.codeOrigin);
-    result->m_uid = propertyCache.identifier().uid();
-    return result;
-}
-
-Ref<InlineCacheHandler> InlineCacheHandler::createPreCompiled(Ref<InlineCacheHandler>&& previous, CodeBlock* codeBlock, PropertyInlineCache& propertyCache, Ref<PolymorphicAccessJITStubRoutine>&& stubRoutine, std::unique_ptr<PropertyInlineCacheClearingWatchpoint>&& watchpoint, AccessCase& accessCase, CacheType cacheType)
-{
-    unsigned callLinkInfoCount = JSC::doesJSCalls(accessCase.m_type) ? 1 : 0;
-    auto result = adoptRef(*new (NotNull, fastMalloc(Base::allocationSize(callLinkInfoCount))) InlineCacheHandler(WTF::move(previous), WTF::move(stubRoutine), WTF::move(watchpoint), callLinkInfoCount, cacheType));
-    VM& vm = codeBlock->vm();
-    for (auto& callLinkInfo : result->span())
-        callLinkInfo.initialize(vm, codeBlock, CallLinkInfo::CallType::Call, propertyCache.codeOrigin);
-
-    result->m_structureID = accessCase.structureID();
-    result->m_offset = accessCase.offset();
-    result->m_uid = propertyCache.identifier().uid();
-    if (!result->m_uid)
-        result->m_uid = accessCase.uid();
-    switch (accessCase.m_type) {
-    case AccessCase::Load:
-    case AccessCase::GetGetter:
-    case AccessCase::Getter:
-    case AccessCase::Setter: {
-        result->u.s1.m_holder = nullptr;
-        if (auto* holder = accessCase.tryGetAlternateBase())
-            result->u.s1.m_holder = holder;
-        break;
-    }
-    case AccessCase::ProxyObjectLoad: {
-        result->u.s1.m_holder = accessCase.identifier().cell();
-        break;
-    }
-    case AccessCase::Delete:
-    case AccessCase::SetPrivateBrand: {
-        result->u.s2.m_newStructureID = accessCase.newStructureID();
-        break;
-    }
-    case AccessCase::Transition: {
-        result->u.s2.m_newStructureID = accessCase.newStructureID();
-        result->u.s2.m_newSize = accessCase.newStructure()->outOfLineCapacity() * sizeof(JSValue);
-        result->u.s2.m_oldSize = accessCase.structure()->outOfLineCapacity() * sizeof(JSValue);
-        break;
-    }
-    case AccessCase::CustomAccessorGetter:
-    case AccessCase::CustomAccessorSetter:
-    case AccessCase::CustomValueGetter:
-    case AccessCase::CustomValueSetter: {
-        result->u.s1.m_holder = nullptr;
-        Structure* currStructure = accessCase.structure();
-        if (auto* holder = accessCase.tryGetAlternateBase()) {
-            currStructure = holder->structure();
-            result->u.s1.m_holder = holder;
-        }
-        result->u.s1.m_globalObject = currStructure->realm();
-        result->u.s1.m_customAccessor = accessCase.as<GetterSetterAccessCase>().customAccessor().taggedPtr();
-        break;
-    }
-    case AccessCase::InstanceOfHit:
-    case AccessCase::InstanceOfMiss: {
-        result->u.s1.m_holder = accessCase.as<InstanceOfAccessCase>().prototype();
-        break;
-    }
-    case AccessCase::ModuleNamespaceLoad: {
-        auto& derived = accessCase.as<ModuleNamespaceAccessCase>();
-        result->u.s3.m_moduleNamespaceObject = derived.moduleNamespaceObject();
-        result->u.s3.m_moduleVariableSlot = &derived.moduleEnvironment()->variableAt(derived.scopeOffset());
-        break;
-    }
-    case AccessCase::CheckPrivateBrand: {
-        break;
-    }
-    default:
-        break;
-    }
-
-    return result;
-}
-
-Ref<InlineCacheHandler> InlineCacheHandler::createNonHandlerSlowPath(CodePtr<JITStubRoutinePtrTag> slowPath)
-{
-    auto result = adoptRef(*new (NotNull, fastMalloc(Base::allocationSize(0))) InlineCacheHandler);
-    result->m_callTarget = slowPath;
-    result->m_jumpTarget = slowPath;
-    return result;
-}
-
-Ref<InlineCacheHandler> InlineCacheHandler::createSlowPath(VM& vm, AccessType accessType)
-{
-    auto result = adoptRef(*new (NotNull, fastMalloc(Base::allocationSize(0))) InlineCacheHandler);
-    auto codeRef = InlineCacheCompiler::generateSlowPathCode(vm, accessType);
-    result->m_callTarget = codeRef.code().template retagged<JITStubRoutinePtrTag>();
-    result->m_jumpTarget = CodePtr<NoPtrTag> { codeRef.retaggedCode<NoPtrTag>().dataLocation<uint8_t*>() + prologueSizeInBytesDataIC }.template retagged<JITStubRoutinePtrTag>();
-    return result;
-}
-
-Ref<InlineCacheHandler> InlineCacheCompiler::generateSlowPathHandler(VM& vm, AccessType accessType)
-{
-    ASSERT(!isCompilationThread());
-    if (auto handler = vm.m_sharedJITStubs->getSlowPathHandler(accessType))
-        return handler.releaseNonNull();
-    auto handler = InlineCacheHandler::createSlowPath(vm, accessType);
-    vm.m_sharedJITStubs->setSlowPathHandler(accessType, handler);
-    return handler;
-}
-
-template<typename Visitor>
-void InlineCacheHandler::propagateTransitions(Visitor& visitor) const
-{
-    if (m_accessCase)
-        m_accessCase->propagateTransitions(visitor);
-}
-
-template void InlineCacheHandler::propagateTransitions(AbstractSlotVisitor&) const;
-template void InlineCacheHandler::propagateTransitions(SlotVisitor&) const;
-
-template<typename Visitor>
-void InlineCacheHandler::visitAggregateImpl(Visitor& visitor)
-{
-    if (m_accessCase)
-        m_accessCase->visitAggregate(visitor);
-}
-DEFINE_VISIT_AGGREGATE(InlineCacheHandler);
 
 void InlineCacheCompiler::generateWithGuard(unsigned index, AccessCase& accessCase, CCallHelpers::JumpList& fallThrough)
 {
@@ -3601,10 +3455,10 @@ void InlineCacheCompiler::generateAccessCase(unsigned index, AccessCase& accessC
             // handlerGPR can be the same to BaselineJITRegisters::Call::calleeJSR.
             if constexpr (GPRInfo::handlerGPR == BaselineJITRegisters::Call::calleeJSR.payloadGPR()) {
                 jit.swap(scratchGPR, BaselineJITRegisters::Call::calleeJSR.payloadGPR());
-                jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandler::offsetOfCallLinkInfos() + sizeof(DataOnlyCallLinkInfo) * index), scratchGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
+                jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandlerWithJSCall::offsetOfCallLinkInfo() + sizeof(DataOnlyCallLinkInfo) * index), scratchGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
             } else {
                 jit.move(scratchGPR, BaselineJITRegisters::Call::calleeJSR.payloadGPR());
-                jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandler::offsetOfCallLinkInfos() + sizeof(DataOnlyCallLinkInfo) * index), GPRInfo::handlerGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
+                jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandlerWithJSCall::offsetOfCallLinkInfo() + sizeof(DataOnlyCallLinkInfo) * index), GPRInfo::handlerGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
             }
             // FIXME: Maybe this can tail call on ARM64
             CallLinkInfo::emitDataICFastPath(jit);
@@ -4341,10 +4195,10 @@ void InlineCacheCompiler::emitProxyObjectAccess(unsigned index, AccessCase& acce
         // handlerGPR can be the same to BaselineJITRegisters::Call::calleeJSR.
         if constexpr (GPRInfo::handlerGPR == BaselineJITRegisters::Call::calleeJSR.payloadGPR()) {
             jit.swap(scratchGPR, BaselineJITRegisters::Call::calleeJSR.payloadGPR());
-            jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandler::offsetOfCallLinkInfos() + sizeof(DataOnlyCallLinkInfo) * index), scratchGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
+            jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandlerWithJSCall::offsetOfCallLinkInfo() + sizeof(DataOnlyCallLinkInfo) * index), scratchGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
         } else {
             jit.move(scratchGPR, BaselineJITRegisters::Call::calleeJSR.payloadGPR());
-            jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandler::offsetOfCallLinkInfos() + sizeof(DataOnlyCallLinkInfo) * index), GPRInfo::handlerGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
+            jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandlerWithJSCall::offsetOfCallLinkInfo() + sizeof(DataOnlyCallLinkInfo) * index), GPRInfo::handlerGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
         }
 
         // FIXME: Maybe this can tail call on ARM64
@@ -5557,10 +5411,10 @@ static void getterHandlerImpl(VM&, CCallHelpers& jit, JSValueRegs baseJSR, [[may
     // handlerGPR can be the same to BaselineJITRegisters::Call::calleeJSR.
     if constexpr (GPRInfo::handlerGPR == BaselineJITRegisters::Call::calleeJSR.payloadGPR()) {
         jit.swap(scratch1GPR, BaselineJITRegisters::Call::calleeJSR.payloadGPR());
-        jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandler::offsetOfCallLinkInfos()), scratch1GPR, BaselineJITRegisters::Call::callLinkInfoGPR);
+        jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandlerWithJSCall::offsetOfCallLinkInfo()), scratch1GPR, BaselineJITRegisters::Call::callLinkInfoGPR);
     } else {
         jit.move(scratch1GPR, BaselineJITRegisters::Call::calleeJSR.payloadGPR());
-        jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandler::offsetOfCallLinkInfos()), GPRInfo::handlerGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
+        jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandlerWithJSCall::offsetOfCallLinkInfo()), GPRInfo::handlerGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
     }
     // FIXME: Maybe this can tail call on ARM64
     CallLinkInfo::emitDataICFastPath(jit);
@@ -5654,10 +5508,10 @@ MacroAssemblerCodeRef<JITThunkPtrTag> getByIdProxyObjectLoadHandler(VM&)
     // handlerGPR can be the same to BaselineJITRegisters::Call::calleeJSR.
     if constexpr (GPRInfo::handlerGPR == BaselineJITRegisters::Call::calleeJSR.payloadGPR()) {
         jit.swap(scratch1GPR, BaselineJITRegisters::Call::calleeJSR.payloadGPR());
-        jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandler::offsetOfCallLinkInfos()), scratch1GPR, BaselineJITRegisters::Call::callLinkInfoGPR);
+        jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandlerWithJSCall::offsetOfCallLinkInfo()), scratch1GPR, BaselineJITRegisters::Call::callLinkInfoGPR);
     } else {
         jit.move(scratch1GPR, BaselineJITRegisters::Call::calleeJSR.payloadGPR());
-        jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandler::offsetOfCallLinkInfos()), GPRInfo::handlerGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
+        jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandlerWithJSCall::offsetOfCallLinkInfo()), GPRInfo::handlerGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
     }
     // FIXME: Maybe this can tail call on ARM64
     CallLinkInfo::emitDataICFastPath(jit);
@@ -6043,10 +5897,10 @@ static void setterHandlerImpl(VM&, CCallHelpers& jit, JSValueRegs baseJSR, JSVal
     // handlerGPR can be the same to BaselineJITRegisters::Call::calleeJSR.
     if constexpr (GPRInfo::handlerGPR == BaselineJITRegisters::Call::calleeJSR.payloadGPR()) {
         jit.swap(scratch1GPR, BaselineJITRegisters::Call::calleeJSR.payloadGPR());
-        jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandler::offsetOfCallLinkInfos()), scratch1GPR, BaselineJITRegisters::Call::callLinkInfoGPR);
+        jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandlerWithJSCall::offsetOfCallLinkInfo()), scratch1GPR, BaselineJITRegisters::Call::callLinkInfoGPR);
     } else {
         jit.move(scratch1GPR, BaselineJITRegisters::Call::calleeJSR.payloadGPR());
-        jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandler::offsetOfCallLinkInfos()), GPRInfo::handlerGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
+        jit.addPtr(CCallHelpers::TrustedImm32(InlineCacheHandlerWithJSCall::offsetOfCallLinkInfo()), GPRInfo::handlerGPR, BaselineJITRegisters::Call::callLinkInfoGPR);
     }
     // FIXME: Maybe this can tail call on ARM64
     CallLinkInfo::emitDataICFastPath(jit);
@@ -8112,54 +7966,6 @@ void PolymorphicAccess::dump(PrintStream& out) const
     for (auto& entry : m_list)
         out.print(comma, entry.get());
     out.print("]"_s);
-}
-
-void InlineCacheHandler::aboutToDie()
-{
-    if (m_stubRoutine)
-        m_stubRoutine->aboutToDie();
-    // A reference to InlineCacheHandler may keep it alive later than the CodeBlock that "owns" this
-    // watchpoint but the watchpoint must not fire after the CodeBlock has finished destruction,
-    // so clear the watchpoint eagerly.
-    m_watchpoint.reset();
-}
-
-CallLinkInfo* InlineCacheHandler::callLinkInfoAt(const ConcurrentJSLocker& locker, unsigned index)
-{
-    if (index < Base::size())
-        return &span()[index];
-    if (!m_stubRoutine)
-        return nullptr;
-    return m_stubRoutine->callLinkInfoAt(locker, index);
-}
-
-bool InlineCacheHandler::visitWeak(VM& vm)
-{
-    bool isValid = true;
-    for (auto& callLinkInfo : Base::span())
-        callLinkInfo.visitWeak(vm);
-
-    if (m_accessCase)
-        isValid &= m_accessCase->visitWeak(vm);
-
-    if (m_stubRoutine)
-        isValid &= m_stubRoutine->visitWeak(vm);
-
-    return isValid;
-}
-
-void InlineCacheHandler::addOwner(CodeBlock* codeBlock)
-{
-    if (!m_stubRoutine)
-        return;
-    m_stubRoutine->addOwner(codeBlock);
-}
-
-void InlineCacheHandler::removeOwner(CodeBlock* codeBlock)
-{
-    if (!m_stubRoutine)
-        return;
-    m_stubRoutine->removeOwner(codeBlock);
 }
 
 } // namespace JSC

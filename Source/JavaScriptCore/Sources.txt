@@ -256,6 +256,7 @@ bytecode/InByStatus.cpp
 bytecode/InByVariant.cpp
 bytecode/InlineAccess.cpp
 bytecode/InlineCacheCompiler.cpp
+bytecode/InlineCacheHandler.cpp
 bytecode/InlineCallFrame.cpp
 bytecode/InlineCallFrameSet.cpp
 bytecode/InstanceOfAccessCase.cpp

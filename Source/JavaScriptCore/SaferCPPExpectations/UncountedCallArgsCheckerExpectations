@@ -26,6 +26,7 @@ bytecode/CodeBlockInlines.h
 bytecode/DirectEvalCodeCache.h
 bytecode/GetByStatus.cpp
 bytecode/InByStatus.cpp
+bytecode/InlineCacheHandler.cpp
 bytecode/InlineCacheCompiler.cpp
 bytecode/ObjectPropertyConditionSet.cpp
 bytecode/PolyProtoAccessChain.cpp
