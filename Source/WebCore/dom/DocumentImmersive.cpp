@@ -134,23 +134,24 @@ void DocumentImmersive::requestImmersive(HTMLModelElement* element, CompletionHa
 
 void DocumentImmersive::exitImmersive(CompletionHandler<void(ExceptionOr<void>)>&& completionHandler)
 {
-    RefPtr exitingImmersiveElement = immersiveElement();
-    if (!exitingImmersiveElement)
-        return completionHandler(Exception { ExceptionCode::TypeError, "Not in immersive"_s });
-
-    cancelActiveRequest([weakElement = WeakPtr { *exitingImmersiveElement }, weakThis = WeakPtr { *this }, completionHandler = WTF::move(completionHandler)]() mutable {
+    cancelActiveRequest([weakThis = WeakPtr { *this }, completionHandler = WTF::move(completionHandler)]() mutable {
         RefPtr protectedThis = weakThis.get();
         if (!protectedThis)
             return completionHandler(Exception { ExceptionCode::AbortError });
 
         protectedThis->m_pendingImmersiveElement = nullptr;
+
+        RefPtr exitingImmersiveElement = protectedThis->immersiveElement();
+        if (!exitingImmersiveElement)
+            return completionHandler(Exception { ExceptionCode::TypeError, "Not in immersive"_s });
+
         protectedThis->m_pendingExitImmersive = true;
         auto resetPendingExitScope = makeScopeExit([weakThis] {
             if (RefPtr protectedThis = weakThis.get())
                 protectedThis->m_pendingExitImmersive = false;
         });
 
-        protectedThis->dismissClientImmersivePresentation([weakThis, weakElement, resetPendingExitScope = WTF::move(resetPendingExitScope), completionHandler = WTF::move(completionHandler)]() mutable {
+        protectedThis->dismissClientImmersivePresentation([weakThis, weakElement = WeakPtr { *exitingImmersiveElement }, resetPendingExitScope = WTF::move(resetPendingExitScope), completionHandler = WTF::move(completionHandler)]() mutable {
             RefPtr protectedThis = weakThis.get();
             RefPtr protectedElement = weakElement.get();
 
@@ -178,34 +179,47 @@ void DocumentImmersive::exitImmersive(CompletionHandler<void(ExceptionOr<void>)>
     });
 }
 
-void DocumentImmersive::exitImmersive()
+void DocumentImmersive::exitImmersiveIfNeeded()
 {
-    if (!immersiveElement())
+    if (immersiveElement()) {
+        exitImmersive([weakThis = WeakPtr { *this }](auto result) {
+            RefPtr protectedThis = weakThis.get();
+            if (!protectedThis)
+                return;
+
+            if (result.hasException())
+                RELEASE_LOG_ERROR(Immersive, "%p - DocumentImmersive: %s", protectedThis.get(), result.releaseException().message().utf8().data());
+        });
         return;
+    }
 
-    exitImmersive([weakThis = WeakPtr { *this }](auto result) {
-        RefPtr protectedThis = weakThis.get();
-        if (!protectedThis)
-            return;
-
-        if (result.hasException())
-            RELEASE_LOG_ERROR(Immersive, "%p - DocumentImmersive: %s", protectedThis.get(), result.releaseException().message().utf8().data());
-    });
+    m_pendingImmersiveElement = nullptr;
+    m_activeRequest.stage = ActiveRequest::Stage::None;
+    m_activeRequest.element = nullptr;
 }
 
-void DocumentImmersive::exitRemovedImmersiveElement(HTMLModelElement* element, CompletionHandler<void()>&& completionHandler)
+void DocumentImmersive::exitRemovedImmersiveElementIfNeeded(HTMLModelElement* element, CompletionHandler<void()>&& completionHandler)
 {
-    ASSERT(element->immersive());
-
     if (immersiveElement() == element) {
         exitImmersive([completionHandler = WTF::move(completionHandler)] (auto) mutable {
             completionHandler();
         });
-    } else {
-        element->exitImmersivePresentation([] { });
-        updateElementIsImmersive(element, false);
-        completionHandler();
+        return;
     }
+
+    if (m_pendingImmersiveElement == element || m_activeRequest.element == element) {
+        if (m_pendingImmersiveElement == element)
+            m_pendingImmersiveElement = nullptr;
+
+        if (m_activeRequest.element == element) {
+            m_activeRequest.stage = ActiveRequest::Stage::None;
+            m_activeRequest.element = nullptr;
+        }
+        completionHandler();
+        return;
+    }
+
+    completionHandler();
 }
 
 void DocumentImmersive::handleImmersiveError(HTMLModelElement* element, const String& message, EmitErrorEvent emitErrorEvent, ExceptionCode code, CompletionHandler<void(ExceptionOr<void>)>&& completionHandler)

@@ -595,10 +595,10 @@ void HTMLModelElement::deleteModelPlayer()
     };
 
 #if ENABLE(MODEL_ELEMENT_IMMERSIVE)
-    if (immersive())
-        return protect(document().immersive())->exitRemovedImmersiveElement(this, WTF::move(deleteModelPlayerBlock));
+    // Let the document trigger the model player deletion after transitioning out the immersive element if needed
+    if (RefPtr documentImmersive = document().immersiveIfExists())
+        return documentImmersive->exitRemovedImmersiveElementIfNeeded(this, WTF::move(deleteModelPlayerBlock));
 #endif
-
     deleteModelPlayerBlock();
 }
 

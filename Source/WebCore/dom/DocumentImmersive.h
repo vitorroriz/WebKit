@@ -59,8 +59,8 @@ public:
 
     void requestImmersive(HTMLModelElement*, CompletionHandler<void(ExceptionOr<void>)>&&);
     void exitImmersive(CompletionHandler<void(ExceptionOr<void>)>&&);
-    WEBCORE_EXPORT void exitImmersive();
-    void exitRemovedImmersiveElement(HTMLModelElement*, CompletionHandler<void()>&&);
+    WEBCORE_EXPORT void exitImmersiveIfNeeded();
+    void exitRemovedImmersiveElementIfNeeded(HTMLModelElement*, CompletionHandler<void()>&&);
 
     enum class EventType : bool { Change, Error };
     void dispatchPendingEvents();

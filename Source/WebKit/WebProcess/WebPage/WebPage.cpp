@@ -7910,6 +7910,10 @@ void WebPage::didCommitLoad(WebFrame* frame)
 
     flushDeferredDidReceiveMouseEvent();
 
+#if ENABLE(MODEL_ELEMENT_IMMERSIVE)
+    exitImmersive();
+#endif
+
     if (frame && frame->isMainFrame())
         m_networkResourceRequestIdentifiersForPageLoadTiming.clear();
 }
@@ -8123,7 +8127,7 @@ void WebPage::dismissImmersiveElement(CompletionHandler<void()>&& completion)
 void WebPage::exitImmersive() const
 {
     if (RefPtr localTopDocument = this->localTopDocument(); RefPtr protectedImmersive = localTopDocument->immersiveIfExists())
-        protectedImmersive->exitImmersive();
+        protectedImmersive->exitImmersiveIfNeeded();
 }
 
 bool WebPage::allowsImmersiveEnvironments() const
