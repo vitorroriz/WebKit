@@ -28,6 +28,7 @@
 
 #if ENABLE(WEBXR_LAYERS)
 
+#include "WebGLOpaqueTexture.h"
 #include "XRLayerBacking.h"
 #include <wtf/TZoneMallocInlines.h>
 
@@ -35,9 +36,10 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(XRCompositionLayer);
 
-XRCompositionLayer::XRCompositionLayer(ScriptExecutionContext* scriptExecutionContext, Ref<XRLayerBacking>&& backing)
+XRCompositionLayer::XRCompositionLayer(ScriptExecutionContext* scriptExecutionContext, WebXRSession& session, Ref<XRLayerBacking>&& backing)
     : WebXRLayer(scriptExecutionContext)
     , m_backing(WTF::move(backing))
+    , m_session(session)
 {
 }
 
@@ -46,6 +48,16 @@ XRCompositionLayer::~XRCompositionLayer() = default;
 XRLayerBacking& XRCompositionLayer::backing()
 {
     return m_backing;
+}
+
+void XRCompositionLayer::setColorTextures(Vector<RefPtr<WebGLOpaqueTexture>>&& colorTextures)
+{
+    m_colorTextures = WTF::move(colorTextures);
+}
+
+void XRCompositionLayer::setDepthStencilTextures(Vector<RefPtr<WebGLOpaqueTexture>>&& depthStencilTextures)
+{
+    m_depthStencilTextures = WTF::move(depthStencilTextures);
 }
 
 }

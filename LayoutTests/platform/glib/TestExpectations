@@ -3189,7 +3189,7 @@ imported/w3c/web-platform-tests/webxr/hand-input/ [ Pass ]
 
 imported/w3c/web-platform-tests/webxr/hit-test [ Pass ]
 
-imported/w3c/web-platform-tests/webxr/layers/xrSession_updateRenderState.https.html [ Pass ]
+imported/w3c/web-platform-tests/webxr/layers [ Pass ]
 
 http/wpt/webxr [ Pass ]
 webxr [ Pass ]

@@ -708,8 +708,10 @@ void WebXRSession::onFrame(PlatformXR::FrameData&& frameData)
                 if (session.m_activeRenderState->baseLayer())
                     session.m_activeRenderState->baseLayer()->startFrame(session.m_frameData);
 #if ENABLE(WEBXR_LAYERS)
-                else if (session.m_activeRenderState->layers().size())
-                    session.m_activeRenderState->layers()[0]->startFrame(session.m_frameData);
+                else if (session.m_activeRenderState->layers().size()) {
+                    for (auto& layer : session.m_activeRenderState->layers())
+                        layer->startFrame(session.m_frameData);
+                }
 #endif
             }
 
@@ -755,6 +757,12 @@ void WebXRSession::onFrame(PlatformXR::FrameData&& frameData)
             Vector<PlatformXR::DeviceLayer> frameLayers;
             if (isImmersive(session.m_mode) && session.m_activeRenderState->baseLayer())
                 frameLayers.append(session.m_activeRenderState->baseLayer()->endFrame());
+#if ENABLE(WEBXR_LAYERS)
+            else if (!session.m_activeRenderState->layers().isEmpty()) {
+                for (auto& layer : session.m_activeRenderState->layers())
+                    frameLayers.append(layer->endFrame());
+            }
+#endif
 
             if (auto device = session.m_device.get())
                 device->submitFrame(WTF::move(frameLayers));

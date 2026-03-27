@@ -538,6 +538,7 @@ Modules/webtransport/WebTransportSendStreamSink.cpp
 Modules/webtransport/WebTransportSession.cpp
 Modules/webtransport/WorkerWebTransportSession.cpp
 Modules/webxr/NavigatorWebXR.cpp
+Modules/webxr/WebGLOpaqueTexture.cpp
 Modules/webxr/WebXRBoundedReferenceSpace.cpp
 Modules/webxr/WebXRFrame.cpp
 Modules/webxr/WebXRGamepad.cpp
@@ -560,6 +561,7 @@ Modules/webxr/WebXRView.cpp
 Modules/webxr/WebXRViewerPose.cpp
 Modules/webxr/WebXRViewport.cpp
 Modules/webxr/WebXRWebGLLayer.cpp
+Modules/webxr/WebXRWebGLSwapchain.cpp
 Modules/webxr/XRCompositionLayer.cpp
 Modules/webxr/XRGPUBinding.cpp
 Modules/webxr/XRGPUSubImage.cpp
@@ -577,6 +579,8 @@ Modules/webxr/WebXRRay.cpp
 Modules/webxr/XRReferenceSpaceEvent.cpp
 Modules/webxr/XRSessionEvent.cpp
 Modules/webxr/XRSubImage.cpp
+Modules/webxr/XRWebGLLayerBacking.cpp
+Modules/webxr/XRWebGLProjectionLayerBacking.cpp
 Modules/webxr/WebXRTransientInputHitTestResult.cpp
 Modules/webxr/WebXRTransientInputHitTestSource.cpp
 Modules/webxr/XRWebGLBinding.cpp

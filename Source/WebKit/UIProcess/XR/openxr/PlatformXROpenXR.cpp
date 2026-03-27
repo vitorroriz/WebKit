@@ -347,7 +347,7 @@ void OpenXRCoordinator::scheduleAnimationFrame(WebPageProxy& page, std::optional
             }
 
             active.renderQueue->dispatch([this, renderState = active.renderState, requestData = WTF::move(requestData), onFrameUpdateCallback = WTF::move(onFrameUpdateCallback)]() mutable {
-                renderState->passthroughFullyObscured = requestData && requestData->isPassthroughFullyObscured;
+                renderState->passthroughFullyObscured = requestData ? requestData->isPassthroughFullyObscured : false;
                 renderState->onFrameUpdate = WTF::move(onFrameUpdateCallback);
                 renderLoop(renderState);
             });

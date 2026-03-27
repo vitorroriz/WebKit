@@ -10136,8 +10136,10 @@ WebXRLayersAPIEnabled:
     WebKitLegacy:
       default: false
     WebKit:
+      "ENABLE(WEBXR_LAYERS)": true
       default: false
     WebCore:
+      "ENABLE(WEBXR_LAYERS)": true
       default: false
 
 WebXRWebGPUBindingsEnabled:

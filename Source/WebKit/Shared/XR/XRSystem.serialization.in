@@ -33,5 +33,3 @@ struct WebKit::XRDeviceInfo {
 };
 
 #endif
-
-#endif

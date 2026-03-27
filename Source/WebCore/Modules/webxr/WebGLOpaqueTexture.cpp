@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Apple, Inc. All rights reserved.
+ * Copyright (C) 2026 Igalia, S.L. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,25 +23,38 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-typedef (WebGLRenderingContext or WebGL2RenderingContext) WebXRWebGLRenderingContext;
+#include "config.h"
+#include "WebGLOpaqueTexture.h"
 
-// https://immersive-web.github.io/layers/#XRWebGLBindingtype
-[
-    Conditional=WEBXR_LAYERS,
-    EnabledBySetting=WebXRLayersAPIEnabled,
-    Exposed=Window
-] interface XRWebGLBinding {
-    constructor(WebXRSession session, WebXRWebGLRenderingContext context);
+#if ENABLE(WEBXR_LAYERS)
 
-    readonly attribute double nativeProjectionScaleFactor;
-    readonly attribute boolean usesDepthValues;
+#include "WebGLRenderingContextBase.h"
 
-    [CallWith=CurrentScriptExecutionContext] XRProjectionLayer createProjectionLayer(optional XRProjectionLayerInit init = {});
-    XRQuadLayer createQuadLayer(optional XRQuadLayerInit init = {});
-    XRCylinderLayer createCylinderLayer(optional XRCylinderLayerInit init = {});
-    XREquirectLayer createEquirectLayer(optional XREquirectLayerInit init = {});
-    XRCubeLayer createCubeLayer(optional XRCubeLayerInit init = {});
+namespace WebCore {
 
-    XRWebGLSubImage getSubImage(XRCompositionLayer layer, WebXRFrame frame, optional XREye eye = "none");
-    XRWebGLSubImage getViewSubImage(XRProjectionLayer layer, WebXRView view);
-};
+RefPtr<WebGLOpaqueTexture> WebGLOpaqueTexture::create(WebGLRenderingContextBase& context, PlatformGLObject object)
+{
+    return adoptRef(*new WebGLOpaqueTexture { context, object });
+}
+
+WebGLOpaqueTexture::WebGLOpaqueTexture(WebGLRenderingContextBase& context, PlatformGLObject object)
+    : WebGLTexture(context, object)
+{
+}
+
+void WebGLOpaqueTexture::deleteObjectImpl(const AbstractLocker&, GraphicsContextGL*, PlatformGLObject)
+{
+    // Don't do anything as the context does not own the texture.
+}
+
+WebGLOpaqueTexture::~WebGLOpaqueTexture()
+{
+    if (!m_context)
+        return;
+
+    runDestructor();
+}
+
+} // namespace WebCore
+
+#endif // ENABLE(WEBXR_LAYERS)
