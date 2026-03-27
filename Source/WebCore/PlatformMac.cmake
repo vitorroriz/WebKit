@@ -422,8 +422,6 @@ list(APPEND WebCore_SOURCES
     platform/network/cocoa/WebCoreResourceHandleAsOperationQueueDelegate.mm
     platform/network/cocoa/WebCoreURLResponse.mm
 
-    platform/network/mac/NetworkStateNotifierMac.cpp
-
     platform/text/cocoa/LocaleCocoa.mm
 
     platform/text/cf/HyphenationCF.cpp
