@@ -977,6 +977,36 @@ template <bool shouldCreateIdentifier> ALWAYS_INLINE JSTokenType Lexer<Latin1Cha
         shift();
 
     ASSERT(isIdentStart(m_current) || m_current == '\\');
+
+    // Attempt SIMD scan first
+    // caseFoldMask: OR-ing with 0x20 maps 'A'-'Z' to 'a'-'z', so one range check covers both cases.
+    constexpr auto caseFoldMask = SIMD::splat<Latin1Character>(0x20);
+    constexpr auto lowerA = SIMD::splat<Latin1Character>('a');
+    constexpr auto lowerZ = SIMD::splat<Latin1Character>('z');
+    constexpr auto zero = SIMD::splat<Latin1Character>('0');
+    constexpr auto nine = SIMD::splat<Latin1Character>('9');
+    constexpr auto dollar = SIMD::splat<Latin1Character>('$');
+    constexpr auto underscore = SIMD::splat<Latin1Character>('_');
+
+    auto vectorMatch = [&](auto input) ALWAYS_INLINE_LAMBDA {
+        auto folded = SIMD::bitOr(input, caseFoldMask);
+        auto isAlpha = SIMD::bitAnd(SIMD::greaterThanOrEqual(folded, lowerA), SIMD::lessThanOrEqual(folded, lowerZ));
+        auto isDigit = SIMD::bitAnd(SIMD::greaterThanOrEqual(input, zero), SIMD::lessThanOrEqual(input, nine));
+        auto isDollar = SIMD::equal(input, dollar);
+        auto isUnderscore = SIMD::equal(input, underscore);
+        auto isIdentContinue = SIMD::bitOr(isAlpha, isDigit, isDollar, isUnderscore);
+        return SIMD::findFirstNonZeroIndex(SIMD::bitNot(isIdentContinue));
+    };
+
+    auto scalarMatch = [](Latin1Character c) ALWAYS_INLINE_LAMBDA {
+        return !isIdentPart(c);
+    };
+
+    auto* found = SIMD::find(std::span { currentSourcePtr(), m_codeEnd }, vectorMatch, scalarMatch);
+    m_code = found;
+    m_current = (found < m_codeEnd) ? *found : 0;
+
+    // Scalar fallback for non-ASCII Latin1 identifier parts
     while (isIdentPart(m_current))
         shift();
     
@@ -1050,6 +1080,36 @@ template <bool shouldCreateIdentifier> ALWAYS_INLINE JSTokenType Lexer<char16_t>
 
     char16_t orAllChars = 0;
     ASSERT(isSingleCharacterIdentStart(m_current) || U16_IS_SURROGATE(m_current) || m_current == '\\');
+
+    // Attempt SIMD scan first
+    constexpr auto caseFoldMask = SIMD::splat<uint16_t>(0x20);
+    constexpr auto lowerA = SIMD::splat<uint16_t>('a');
+    constexpr auto lowerZ = SIMD::splat<uint16_t>('z');
+    constexpr auto zero = SIMD::splat<uint16_t>('0');
+    constexpr auto nine = SIMD::splat<uint16_t>('9');
+    constexpr auto dollar = SIMD::splat<uint16_t>('$');
+    constexpr auto underscore = SIMD::splat<uint16_t>('_');
+
+    auto vectorMatch = [&](auto input) ALWAYS_INLINE_LAMBDA {
+        auto folded = SIMD::bitOr(input, caseFoldMask);
+        auto isAlpha = SIMD::bitAnd(SIMD::greaterThanOrEqual(folded, lowerA), SIMD::lessThanOrEqual(folded, lowerZ));
+        auto isDigit = SIMD::bitAnd(SIMD::greaterThanOrEqual(input, zero), SIMD::lessThanOrEqual(input, nine));
+        auto isDollar = SIMD::equal(input, dollar);
+        auto isUnderscore = SIMD::equal(input, underscore);
+        auto isIdentContinue = SIMD::bitOr(isAlpha, isDigit, isDollar, isUnderscore);
+        return SIMD::findFirstNonZeroIndex(SIMD::bitNot(isIdentContinue));
+    };
+
+    auto scalarMatch = [](char16_t c) ALWAYS_INLINE_LAMBDA {
+        return !isASCIIAlphanumeric(c) && c != '_' && c != '$';
+    };
+
+    auto* found = SIMD::find(std::span { currentSourcePtr(), m_codeEnd }, vectorMatch, scalarMatch);
+    m_code = found;
+    m_current = (found < m_codeEnd) ? *found : 0;
+    // No need to update orAllChars: all SIMD-matched chars are ASCII, so they don't affect orAllChars & ~0xFF
+
+    // Scalar fallback for non-ASCII identifier parts
     while (isSingleCharacterIdentPart(m_current)) {
         orAllChars |= m_current;
         shift();
