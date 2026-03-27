@@ -335,9 +335,6 @@ REEXPORTED_LIBRARY_NAMES[sdk=macosx*] = objc;
 OTHER_TAPI_FLAGS = $(inherited) -reexport_install_name $(NORMAL_UMBRELLA_FRAMEWORKS_DIR)/WebKitLegacy.framework/$(WK_FRAMEWORK_VERSION_PREFIX)WebKitLegacy -extra-private-header $(SRCROOT)/Platform/ExtraPrivateSymbolsForTAPI.h -extra-private-header $(SRCROOT)/Shared/Cocoa/XPCEndpoint.h -extra-private-header $(SRCROOT)/Shared/Cocoa/XPCEndpointClient.h -extra-public-header $(SRCROOT)/Platform/ExtraPublicSymbolsForTAPI.h -extra-project-header $(SRCROOT)/UIProcess/Cocoa/WebKitSwiftOverlayMacros.h -Xparser -include -Xparser config.h $(OTHER_TAPI_FLAGS_SPI_CHECKING_$(WK_AUDIT_SPI));
 OTHER_TAPI_FLAGS_SPI_CHECKING_YES = -sdkdb-output-dir $(BUILT_PRODUCTS_DIR)/SDKDB;
 
-SECTORDER_FLAGS = $(SECTORDER_FLAGS_$(CONFIGURATION));
-SECTORDER_FLAGS_Production[sdk=macosx*] = -Wl,-order_file,mac/WebKit2.order;
-
 WK_EXCLUDED_WEBPUSHD_SANDBOX = $(WK_EXCLUDED_WEBPUSHD_SANDBOX_$(WK_RELOCATABLE_WEBPUSHD));
 WK_EXCLUDED_WEBPUSHD_SANDBOX_NO = com.apple.WebKit.webpushd.relocatable.mac.sb
 WK_EXCLUDED_WEBPUSHD_SANDBOX_YES = com.apple.WebKit.webpushd.mac.sb
