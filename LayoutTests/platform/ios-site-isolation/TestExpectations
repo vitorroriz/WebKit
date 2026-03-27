@@ -225,7 +225,6 @@ http/tests/security/XFrameOptions/x-frame-options-multiple-headers-sameorigin-de
 http/tests/security/XFrameOptions/x-frame-options-parent-same-origin-deny.html [ Failure ]
 http/tests/security/allow-top-level-navigations-by-third-party-iframes-with-previous-user-activation.html [ Failure ]
 http/tests/security/allow-top-level-navigations-by-third-party-iframes-with-user-activation.html [ Failure ]
-http/tests/security/basic-auth-subresource.html [ Failure ]
 http/tests/security/block-top-level-navigations-by-sandboxed-iframe-with-propagated-user-gesture.html [ Failure ]
 http/tests/security/block-top-level-navigations-by-third-party-sandboxed-iframe.html [ Failure ]
 http/tests/security/contentSecurityPolicy/1.1/frame-ancestors/frame-ancestors-nested-cross-in-same-none-block.html [ Failure ]

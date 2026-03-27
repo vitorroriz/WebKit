@@ -249,7 +249,6 @@ http/tests/security/XFrameOptions/x-frame-options-ancestors-same-origin-deny.htm
 http/tests/security/XFrameOptions/x-frame-options-ignore-deny-meta-tag-parent-same-origin-deny.html [ Failure ]
 http/tests/security/XFrameOptions/x-frame-options-multiple-headers-sameorigin-deny.html [ Failure ]
 http/tests/security/XFrameOptions/x-frame-options-parent-same-origin-deny.html [ Failure ]
-http/tests/security/basic-auth-subresource.html [ Failure ]
 http/tests/security/block-top-level-navigations-by-sandboxed-iframe-with-propagated-user-gesture.html [ Failure ]
 http/tests/security/block-top-level-navigations-by-third-party-sandboxed-iframe.html [ Failure ]
 http/tests/security/contentSecurityPolicy/embed-redirect-allowed.html [ Failure ]
