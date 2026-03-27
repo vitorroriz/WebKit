@@ -1317,7 +1317,7 @@ template <bool shouldBuildStrings> ALWAYS_INLINE typename Lexer<T>::StringParseR
     }
 
     while (m_current != stringQuoteCharacter) {
-        if (m_current == '\\') [[unlikely]] {
+        if (m_current == '\\') [[likely]] {
             if constexpr (shouldBuildStrings) {
                 if (stringStart != currentSourcePtr())
                     append8({ stringStart, currentSourcePtr() });
@@ -1351,6 +1351,24 @@ template <bool shouldBuildStrings> ALWAYS_INLINE typename Lexer<T>::StringParseR
                 return parseStringSlowCase<shouldBuildStrings>(tokenData, strictMode);
             }
             stringStart = currentSourcePtr();
+
+            // Retry SIMD to skip the next plain segment to an interesting character
+            found = SIMD::find(std::span { stringStart, m_codeEnd }, vectorMatch, scalarMatch);
+            if (found == m_codeEnd) [[unlikely]] {
+                setOffset(startingOffset, startingLineStartOffset);
+                setLineNumber(startingLineNumber);
+                m_buffer8.shrink(0);
+                return parseStringSlowCase<shouldBuildStrings>(tokenData, strictMode);
+            }
+            m_code = found;
+            m_current = *found;
+
+            if (characterRequiresParseStringSlowCase(m_current)) [[unlikely]] {
+                setOffset(startingOffset, startingLineStartOffset);
+                setLineNumber(startingLineNumber);
+                m_buffer8.shrink(0);
+                return parseStringSlowCase<shouldBuildStrings>(tokenData, strictMode);
+            }
             continue;
         }
 
