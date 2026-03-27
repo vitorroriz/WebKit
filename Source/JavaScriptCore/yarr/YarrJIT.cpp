@@ -4049,6 +4049,7 @@ class YarrGenerator final : public YarrJITInfo {
 
                 storeToFrame(MacroAssembler::TrustedImm32(0), parenthesesFrameLocation + BackTrackInfoParentheses::matchAmountIndex());
                 storeToFrame(MacroAssembler::TrustedImmPtr(nullptr), parenthesesFrameLocation + BackTrackInfoParentheses::parenContextHeadIndex());
+                storeToFrame(MacroAssembler::TrustedImmPtr(nullptr), parenthesesFrameLocation + BackTrackInfoParentheses::returnAddressIndex());
 
                 // Quantifier-specific setup:
                 //
@@ -4672,11 +4673,38 @@ class YarrGenerator final : public YarrJITInfo {
                 if (op.m_op == YarrOpCode::NestedAlternativeEnd) {
                     m_backtrackingState.link(*this, op);
 
-                    // Jump to the return address stored by whichever alternative was taken.
-                    // For FixedCount multi-alt: returnAddress was stored by NestedAlternativeBegin/Next
-                    // For others: returnAddress was stored by NestedAlternativeEnd itself
                     unsigned parenthesesFrameLocation = term->frameLocation;
-                    loadFromFrameAndJump(parenthesesFrameLocation + BackTrackInfoParentheses::returnAddressIndex());
+
+                    // For Greedy/NonGreedy patterns, returnAddress may be null after
+                    // restoreParenContext. For NonGreedy, the body may never have been
+                    // entered (zero iterations). For Greedy, saveParenContext at BEGIN
+                    // captures returnAddress before the body runs (still null from
+                    // initialization). Jumping to a null address would crash, so check
+                    // first: if null, route directly to Begin.bt's noContext handler
+                    // via m_zeroLengthMatch, bypassing content backtrack handlers.
+                    // FixedCount always enters the body and sets returnAddress before
+                    // saveParenContext (which is at END), so the null case cannot arise.
+                    if (term->quantityType != QuantifierType::FixedCount) {
+                        loadFromFrame(parenthesesFrameLocation + BackTrackInfoParentheses::returnAddressIndex(), m_regs.regT0);
+                        auto nullReturnAddress = m_jit.branchTestPtr(MacroAssembler::Zero, m_regs.regT0);
+                        // Non-null: jump via the stored return address (uses proper PAC on ARM64E).
+                        loadFromFrameAndJump(parenthesesFrameLocation + BackTrackInfoParentheses::returnAddressIndex());
+                        // Null returnAddress: body was never entered or saveParenContext
+                        // captured the pre-body state. Route directly to Begin.bt's
+                        // noContext handler via m_zeroLengthMatch, bypassing content
+                        // backtrack handlers that would operate on uninitialized state.
+                        nullReturnAddress.link(&m_jit);
+                        {
+                            YarrOp* walkOp = &op;
+                            while (walkOp->m_previousOp != notFound)
+                                walkOp = &m_ops[walkOp->m_previousOp];
+                            YarrOp& parenBeginOp = m_ops[walkOp->m_index - 1];
+                            parenBeginOp.m_zeroLengthMatch = m_jit.jump();
+                        }
+                    } else {
+                        // Jump to the return address stored by whichever alternative was taken.
+                        loadFromFrameAndJump(parenthesesFrameLocation + BackTrackInfoParentheses::returnAddressIndex());
+                    }
 
                     // Link the DataLabelPtr associated with the end of the last alternative to this point.
                     // For FixedCount multi-alt, op.m_returnAddress is not set (we preserve the one from Begin/Next),
@@ -4898,6 +4926,11 @@ class YarrGenerator final : public YarrJITInfo {
                     // Restore state from ParenContext (captures, frame slots)
                     restoreParenContext(currParenContextReg, m_regs.regT2, term->parentheses.subpatternId, term->parentheses.lastSubpatternId, parenthesesFrameLocation);
 
+                    // Null out inner Greedy/NonGreedy patterns' parenContextHead after
+                    // restore: those pointers may reference contexts freed and recycled
+                    // during a different backtracking path. See clearInnerParenContextHeadSlots.
+                    clearInnerParenContextHeadSlots(term->parentheses.disjunction);
+
                     // FixedCount backtracking:
                     //
                     // We use a conservative approach that always treats content as backtrackable.
@@ -5041,8 +5074,15 @@ class YarrGenerator final : public YarrJITInfo {
                     break;
                 }
 
-                // Greedy/NonGreedy path: restore from context and try fewer iterations
+                // Greedy/NonGreedy path: Restore from context and try fewer iterations
+                // If no context exists (non-greedy never entered, or greedy with zero iterations), propagate failure.
+                auto noContext = m_jit.branchTestPtr(MacroAssembler::Zero, currParenContextReg);
+
                 restoreParenContext(currParenContextReg, m_regs.regT2, term->parentheses.subpatternId, term->parentheses.lastSubpatternId, parenthesesFrameLocation);
+
+                // Clear inner Greedy/NonGreedy patterns' stale parenContextHead.
+                // (Same rationale as the FixedCount path — see clearInnerParenContextHeadSlots.)
+                clearInnerParenContextHeadSlots(term->parentheses.disjunction);
 
                 m_jit.loadPtr(MacroAssembler::Address(currParenContextReg, ParenContext::nextOffset()), newParenContextReg);
                 freeParenContext(currParenContextReg);
@@ -5081,6 +5121,11 @@ class YarrGenerator final : public YarrJITInfo {
                     break;
                 }
                 }
+
+                noContext.link(&m_jit);
+                if (op.m_zeroLengthMatch.isSet())
+                    op.m_zeroLengthMatch.link(&m_jit);
+                storeToFrame(MacroAssembler::TrustedImm32(-1), parenthesesFrameLocation + BackTrackInfoParentheses::beginIndex());
                 m_backtrackingState.fallthrough();
 #else // !YARR_JIT_ALL_PARENS_EXPRESSIONS
                 RELEASE_ASSERT_NOT_REACHED();
@@ -6592,6 +6637,36 @@ public:
             return m_compilationThreadStackChecker->isSafeToRecurse();
 
         return m_vm->isSafeToRecurse();
+    }
+
+    // Emit stores to clear parenContextHead of inner Greedy/NonGreedy
+    // ParenthesesSubpattern terms after restoreParenContext.
+    //
+    // restoreParenContext restores all frame slots including inner patterns'
+    // parenContextHead pointers. For Greedy/NonGreedy inner patterns, those
+    // pointers may reference contexts that were freed during a different
+    // backtracking path and subsequently recycled via the free list. Nulling
+    // them prevents use of corrupted context chains.
+    //
+    // FixedCount inner patterns are unaffected: their contexts become
+    // unreachable (Begin.forward sets parenContextHead=null) but are never
+    // freed, so they remain valid when restored.
+    void clearInnerParenContextHeadSlots(PatternDisjunction* disjunction)
+    {
+        for (auto& alternative : disjunction->m_alternatives) {
+            for (auto& term : alternative->m_terms) {
+                if (term.type == PatternTerm::Type::ParenthesesSubpattern || term.type == PatternTerm::Type::ParentheticalAssertion) {
+                    if (term.type == PatternTerm::Type::ParenthesesSubpattern
+                        && term.quantityType != QuantifierType::FixedCount
+                        && term.quantityMaxCount != 1
+                        && !term.parentheses.isTerminal
+                        && !term.parentheses.isCopy)
+                        storeToFrame(MacroAssembler::TrustedImmPtr(nullptr), term.frameLocation + BackTrackInfoParentheses::parenContextHeadIndex());
+
+                    clearInnerParenContextHeadSlots(term.parentheses.disjunction);
+                }
+            }
+        }
     }
 
     // Check if a disjunction contains terms that could require within-iteration backtracking.
