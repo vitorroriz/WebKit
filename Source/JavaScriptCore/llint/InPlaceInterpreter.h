@@ -29,6 +29,7 @@
 
 #if ENABLE(WEBASSEMBLY)
 
+#include <JavaScriptCore/LLIntCommon.h>
 #include <JavaScriptCore/WasmCallee.h>
 
 extern "C" void SYSV_ABI ipint_entry();
@@ -799,7 +800,14 @@ FOR_EACH_IPINT_UINT_OPCODE(IPINT_VALIDATE_DEFINE_FUNCTION);
 
 namespace JSC { namespace IPInt {
 
+#if LLINT_TRACING
+// When LLINT_TRACING is enabled, each ipintOp handler has a trace prologue injected,
+// which can push the largest handlers past 256 bytes. Double the slot size in tracing
+// builds so the dispatch table stays valid.
+constexpr uint64_t alignIPInt = 512;
+#else
 constexpr uint64_t alignIPInt = 256;
+#endif
 constexpr uint64_t alignArgumInt = 64;
 constexpr uint64_t alignUInt = 64;
 constexpr uint64_t alignMInt = 64;
