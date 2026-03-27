@@ -467,6 +467,10 @@ struct PerWebProcessState {
 
 #if PLATFORM(IOS_FAMILY)
     RefPtr<RunLoop::DispatchTimer> _pendingInteractiveObscuredInsetsChangeTimer;
+#if ENABLE(ACCESSIBILITY_LOCAL_FRAME)
+    RefPtr<RunLoop::DispatchTimer> _pendingAccessibilityFrameGeometryUpdateTimer;
+    MonotonicTime _lastAccessibilityFrameGeometryUpdate;
+#endif
 #endif
 
     // This value tracks the current adjustment added to the bottom inset due to the keyboard sliding out from the bottom
