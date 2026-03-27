@@ -29,6 +29,7 @@ set(WTF_PUBLIC_HEADERS
     BlockPtr.h
     BloomFilter.h
     BooleanLattice.h
+    Borrow.h
     Box.h
     BoxPtr.h
     Brigand.h
@@ -37,10 +38,11 @@ set(WTF_PUBLIC_HEADERS
     ButterflyArray.h
     ByteOrder.h
     CPUTime.h
-    CanMakeWeakPtr.h
     CagedPtr.h
     CagedUniquePtr.h
     CallbackAggregator.h
+    CanBorrow.h
+    CanMakeWeakPtr.h
     CancellableTask.h
     CheckedArithmetic.h
     CheckedPtr.h
