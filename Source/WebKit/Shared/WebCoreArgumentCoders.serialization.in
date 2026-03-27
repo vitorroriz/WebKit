@@ -473,6 +473,7 @@ struct WebCore::IDBGetAllRecordsData {
     WebCore::IDBKeyRangeData keyRangeData;
     WebCore::IndexedDB::GetAllType getAllType;
     std::optional<uint32_t> count;
+    WebCore::IndexedDB::CursorDirection cursorDirection;
     WebCore::IDBObjectStoreIdentifier objectStoreIdentifier;
     std::optional<WebCore::IDBIndexIdentifier> indexIdentifier;
 }

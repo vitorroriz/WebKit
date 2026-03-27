@@ -1,27 +1,27 @@
 
-FAIL Single item get Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Empty object store Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Get all keys Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Get all generated keys Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL maxCount=10 Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Get bound range Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Get bound range with maxCount Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Get upper excluded Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Get lower excluded Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Get bound range (generated) with maxCount Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Non existent key Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL maxCount=0 Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Max value count Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Query with empty range where  first key < upperBound Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Query with empty range where lowerBound < last key Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Retrieve multiEntry key Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Retrieve one key multiple values Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Direction: next Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Direction: prev Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Direction: nextunique Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Direction: prevunique Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Direction and query Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Direction, query and count Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
-FAIL Get all keys with both options and count Failed to execute 'getAllKeys' on 'IDBIndex': The parameter is not a valid key.
+PASS Single item get
+PASS Empty object store
+PASS Get all keys
+PASS Get all generated keys
+PASS maxCount=10
+PASS Get bound range
+PASS Get bound range with maxCount
+PASS Get upper excluded
+PASS Get lower excluded
+PASS Get bound range (generated) with maxCount
+PASS Non existent key
+PASS maxCount=0
+PASS Max value count
+PASS Query with empty range where  first key < upperBound
+PASS Query with empty range where lowerBound < last key
+PASS Retrieve multiEntry key
+PASS Retrieve one key multiple values
+PASS Direction: next
+PASS Direction: prev
+PASS Direction: nextunique
+PASS Direction: prevunique
+PASS Direction and query
+PASS Direction, query and count
+PASS Get all keys with both options and count
 PASS Get all keys with invalid query keys
 
