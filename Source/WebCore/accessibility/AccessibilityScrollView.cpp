@@ -335,10 +335,6 @@ void AccessibilityScrollView::addLocalFrameChild()
                 page->chrome().client().requestFrameScreenPosition(localFrame->frameID());
         }
 
-#if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
-        frameAXObjectCache->buildIsolatedTreeIfNeeded();
-#endif
-
         if (RefPtr localFrame = downcast<AXLocalFrame>(cache->create(AccessibilityRole::LocalFrame))) {
             localFrame->setLocalFrameView(localFrameView.get());
             localFrame->setWrapperFrom(*frameRoot);
