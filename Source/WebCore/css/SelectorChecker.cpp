@@ -75,7 +75,7 @@ static bool matchesActiveViewTransitionTypePseudoClass(const Element& element, c
         for (const auto& type : types) {
             // https://github.com/w3c/csswg-drafts/issues/9534#issuecomment-1802364085
             // RESOLVED: type can accept any idents, except 'none' or '-ua-' prefixes
-            if (type.convertToASCIILowercase() == "none"_s || type.convertToASCIILowercase().startsWith("-ua-"_s))
+            if (equalLettersIgnoringASCIICase(type, "none"_s) || startsWithLettersIgnoringASCIICase(type, "-ua-"_s))
                 continue;
 
             if (activeTypes.hasType(type))

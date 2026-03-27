@@ -178,30 +178,30 @@ inline SessionFeature sessionFeatureFromReferenceSpaceType(ReferenceSpaceType re
 
 inline std::optional<SessionFeature> parseSessionFeatureDescriptor(StringView string)
 {
-    auto feature = string.trim(isUnicodeCompatibleASCIIWhitespace<char16_t>).convertToASCIILowercase();
+    auto feature = string.trim(isUnicodeCompatibleASCIIWhitespace<char16_t>);
 
-    if (feature == "viewer"_s)
+    if (equalLettersIgnoringASCIICase(feature, "viewer"_s))
         return SessionFeature::ReferenceSpaceTypeViewer;
-    if (feature == "local"_s)
+    if (equalLettersIgnoringASCIICase(feature, "local"_s))
         return SessionFeature::ReferenceSpaceTypeLocal;
-    if (feature == "local-floor"_s)
+    if (equalLettersIgnoringASCIICase(feature, "local-floor"_s))
         return SessionFeature::ReferenceSpaceTypeLocalFloor;
-    if (feature == "bounded-floor"_s)
+    if (equalLettersIgnoringASCIICase(feature, "bounded-floor"_s))
         return SessionFeature::ReferenceSpaceTypeBoundedFloor;
-    if (feature == "unbounded"_s)
+    if (equalLettersIgnoringASCIICase(feature, "unbounded"_s))
         return SessionFeature::ReferenceSpaceTypeUnbounded;
 #if ENABLE(WEBXR_HANDS)
-    if (feature == "hand-tracking"_s)
+    if (equalLettersIgnoringASCIICase(feature, "hand-tracking"_s))
         return SessionFeature::HandTracking;
 #endif
 #if ENABLE(WEBXR_HIT_TEST)
-    if (feature == "hit-test"_s)
+    if (equalLettersIgnoringASCIICase(feature, "hit-test"_s))
         return SessionFeature::HitTest;
 #endif
-    if (feature == "webgpu"_s)
+    if (equalLettersIgnoringASCIICase(feature, "webgpu"_s))
         return SessionFeature::WebGPU;
 #if ENABLE(WEBXR_LAYERS)
-    if (feature == "layers"_s)
+    if (equalLettersIgnoringASCIICase(feature, "layers"_s))
         return SessionFeature::Layers;
 #endif
     return std::nullopt;
