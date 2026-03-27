@@ -588,7 +588,7 @@ std::optional<InteractionRegion> interactionRegionForRenderedRegion(const Render
         FloatSize size = svgSVGElement->currentViewportSizeExcludingZoom();
         auto viewBoxTransform = svgSVGElement->viewBoxToViewTransform(size.width(), size.height());
 
-        auto shapeBoundingBox = shapeElement->getBBox(DisallowStyleUpdate);
+        auto shapeBoundingBox = shapeElement->getBBox(StyleUpdateStrategy::Disallow);
         path.transform(viewBoxTransform);
         shapeBoundingBox = viewBoxTransform.mapRect(shapeBoundingBox);
 

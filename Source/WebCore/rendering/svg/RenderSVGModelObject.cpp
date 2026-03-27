@@ -261,7 +261,7 @@ bool RenderSVGModelObject::checkIntersection(RenderElement* renderer, const Floa
     if (!isGraphicsElement(*renderer))
         return false;
     RefPtr svgElement = downcast<SVGGraphicsElement>(renderer->element());
-    auto ctm = svgElement->getCTM(DisallowStyleUpdate);
+    auto ctm = svgElement->getCTM(StyleUpdateStrategy::Disallow);
     // FIXME: [SVG] checkEnclosure implementation is inconsistent
     // https://bugs.webkit.org/show_bug.cgi?id=262709
     return intersectsAllowingEmpty(rect, ctm.mapRect(renderer->repaintRectInLocalCoordinates(RepaintRectCalculation::Accurate)));
@@ -274,7 +274,7 @@ bool RenderSVGModelObject::checkEnclosure(RenderElement* renderer, const FloatRe
     if (!isGraphicsElement(*renderer))
         return false;
     RefPtr svgElement = downcast<SVGGraphicsElement>(renderer->element());
-    auto ctm = svgElement->getCTM(DisallowStyleUpdate);
+    auto ctm = svgElement->getCTM(StyleUpdateStrategy::Disallow);
     // FIXME: [SVG] checkEnclosure implementation is inconsistent
     // https://bugs.webkit.org/show_bug.cgi?id=262709
     return rect.contains(ctm.mapRect(renderer->repaintRectInLocalCoordinates(RepaintRectCalculation::Accurate)));

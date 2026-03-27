@@ -86,7 +86,7 @@ SVGElement* SVGGraphicsElement::nearestViewportElement(const SVGElement* element
 FloatRect SVGGraphicsElement::computeBBox(SVGElement* element, StyleUpdateStrategy styleUpdateStrategy)
 {
     ASSERT(element);
-    if (styleUpdateStrategy == AllowStyleUpdate)
+    if (styleUpdateStrategy == StyleUpdateStrategy::Allow)
         protect(element->document())->updateLayoutIgnorePendingStylesheets({ LayoutOptions::TreatContentVisibilityHiddenAsVisible, LayoutOptions::TreatContentVisibilityAutoAsVisible }, element);
 
     // FIXME: Eventually we should support getBBox for detached elements.
@@ -100,7 +100,7 @@ FloatRect SVGGraphicsElement::computeBBox(SVGElement* element, StyleUpdateStrate
 AffineTransform SVGGraphicsElement::computeCTM(SVGElement* element, CTMScope mode, StyleUpdateStrategy styleUpdateStrategy)
 {
     ASSERT(element);
-    if (styleUpdateStrategy == AllowStyleUpdate)
+    if (styleUpdateStrategy == StyleUpdateStrategy::Allow)
         protect(element->document())->updateLayoutIgnorePendingStylesheets({ LayoutOptions::TreatContentVisibilityHiddenAsVisible, LayoutOptions::TreatContentVisibilityAutoAsVisible }, element);
 
     RefPtr stopAtElement = mode == CTMScope::NearestViewportScope ? nearestViewportElement(element) : nullptr;

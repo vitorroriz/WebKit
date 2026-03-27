@@ -82,7 +82,7 @@ private:
     Document* NODELETE externalDocument() const;
     void updateExternalDocument();
 
-    FloatRect getBBox(StyleUpdateStrategy = AllowStyleUpdate) override;
+    FloatRect getBBox(StyleUpdateStrategy = StyleUpdateStrategy::Allow) final;
 
     RefPtr<SVGElement> findTarget(AtomString* targetID = nullptr) const;
 
