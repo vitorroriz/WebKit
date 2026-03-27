@@ -61,14 +61,14 @@ public:
     ~CheckedRef()
     {
         unpoison(*this);
-        if (auto* ptr = PtrTraits::exchange(m_ptr, nullptr))
-            PtrTraits::unwrap(ptr)->decrementCheckedPtrCount();
+        if (auto* ptr = PtrTraits::unwrap(m_ptr))
+            ptr->decrementCheckedPtrCount();
     }
 
     CheckedRef(T& object)
         : m_ptr(&object)
     {
-        PtrTraits::unwrap(m_ptr)->incrementCheckedPtrCount();
+        object.incrementCheckedPtrCount();
     }
 
     enum AdoptTag { Adopt };
