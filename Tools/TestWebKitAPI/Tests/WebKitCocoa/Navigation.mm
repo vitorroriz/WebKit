@@ -50,6 +50,7 @@
 #import <WebKit/WKWebsiteDataStorePrivate.h>
 #import <WebKit/_WKFeature.h>
 #import <WebKit/_WKPageLoadTiming.h>
+#import <WebKit/_WKProcessPoolConfiguration.h>
 #import <WebKit/_WKWebsiteDataStoreConfiguration.h>
 #import <WebKit/_WKWebsiteDataStoreDelegate.h>
 #import <wtf/RetainPtr.h>
@@ -4351,7 +4352,8 @@ TEST(WKNavigation, PreferredHTTPSPolicyNoFallbackOnCertificateError)
     EXPECT_WK_STREQ(@"", [webView URL].absoluteString);
 }
 
-TEST(WKNavigation, LeakCheck)
+enum class ShouldEnablePageCache : bool { No, Yes };
+static void runNavigationLeakCheck(ShouldEnablePageCache shouldEnablePageCache)
 {
     using namespace TestWebKitAPI;
     HTTPServer server({
@@ -4359,16 +4361,18 @@ TEST(WKNavigation, LeakCheck)
         { "/webkit"_s, { "hi"_s } }
     }, HTTPServer::Protocol::HttpsProxy);
 
-    auto storeConfiguration = adoptNS([[_WKWebsiteDataStoreConfiguration alloc] initNonPersistentConfiguration]);
-    [storeConfiguration setHTTPSProxy:[NSURL URLWithString:[NSString stringWithFormat:@"https://127.0.0.1:%d/", server.port()]]];
-    [storeConfiguration setAllowsHSTSWithUntrustedRootCertificate:YES];
-    auto viewConfiguration = adoptNS([WKWebViewConfiguration new]);
-    [viewConfiguration setWebsiteDataStore:adoptNS([[WKWebsiteDataStore alloc] _initWithConfiguration:storeConfiguration.get()]).get()];
+    RetainPtr viewConfiguration = server.httpsProxyConfiguration();
+    if (shouldEnablePageCache == ShouldEnablePageCache::No) {
+        RetainPtr processPoolConfiguration = adoptNS([[_WKProcessPoolConfiguration alloc] init]);
+        processPoolConfiguration.get().pageCacheEnabled = NO;
+        RetainPtr processPool = adoptNS([[WKProcessPool alloc] _initWithConfiguration:processPoolConfiguration.get()]);
+        [viewConfiguration setProcessPool:processPool.get()];
+    }
 
     __block __weak WKNavigation *gLastNavigation = nil;
 
     __block bool done = false;
-    auto delegate = adoptNS([TestNavigationDelegate new]);
+    RetainPtr delegate = adoptNS([TestNavigationDelegate new]);
     [delegate allowAnyTLSCertificate];
     delegate.get().didStartProvisionalNavigation = ^(WKWebView *, WKNavigation *navigation) {
         gLastNavigation = navigation;
@@ -4377,7 +4381,7 @@ TEST(WKNavigation, LeakCheck)
         EXPECT_EQ(gLastNavigation, navigation);
         done = true;
     };
-    auto webView = adoptNS([[WKWebView alloc] initWithFrame:CGRectZero configuration:viewConfiguration.get()]);
+    RetainPtr webView = adoptNS([[WKWebView alloc] initWithFrame:CGRectZero configuration:viewConfiguration.get()]);
     [webView setNavigationDelegate:delegate.get()];
 
     __weak WKNavigation *navigationToExample;
@@ -4400,6 +4404,16 @@ TEST(WKNavigation, LeakCheck)
 
     while (navigationToExample)
         Util::spinRunLoop();
+}
+
+TEST(WKNavigation, LeakCheck)
+{
+    runNavigationLeakCheck(ShouldEnablePageCache::Yes);
+}
+
+TEST(WKNavigation, LeakCheckNoPageCache)
+{
+    runNavigationLeakCheck(ShouldEnablePageCache::No);
 }
 
 TEST(WKNavigation, Multiple303Redirects)

@@ -914,12 +914,14 @@ void WebProcessProxy::removeWebPage(WebPageProxy& webPage, EndsUsingDataStore en
     WEBPROCESSPROXY_RELEASE_LOG(Process, "removeWebPage: webPage=%p, pageProxyID=%" PRIu64 ", webPageID=%" PRIu64, &webPage, webPage.identifier().toUInt64(), webPage.webPageIDInMainFrameProcess().toUInt64());
     RefPtr removedPage = m_pageMap.take(webPage.identifier()).get();
     ASSERT_UNUSED(removedPage, removedPage == &webPage);
+
+    // reportProcessDisassociatedWithPageIfNecessary gets page from globalPageMap() for operation,
+    // so it must be invoked before removal.
+    reportProcessDisassociatedWithPageIfNecessary(webPage.identifier());
     removedPage = globalPageMap().take(webPage.identifier()).get();
     ASSERT_UNUSED(removedPage, removedPage == &webPage);
 
     logger().setEnabled(this, isAlwaysOnLoggingAllowed());
-
-    reportProcessDisassociatedWithPageIfNecessary(webPage.identifier());
 
     if (endsUsingDataStore == EndsUsingDataStore::Yes)
         protect(processPool())->pageEndUsingWebsiteDataStore(webPage, protect(webPage.websiteDataStore()));
