@@ -823,19 +823,19 @@ public:
     }
 
     // Equality comparisons
-    template<typename V> bool operator==(Checked<T, V> rhs)
+    template<typename V> bool operator==(Checked<T, V> rhs) const
     {
         return value() == rhs.value();
     }
 
-    template<typename U> bool operator==(U rhs)
+    template<typename U> bool operator==(U rhs) const
     {
         if (this->hasOverflowed())
             this->crash();
         return safeEquals(m_value, rhs);
     }
     
-    template<typename U, typename V> bool operator==(Checked<U, V> rhs)
+    template<typename U, typename V> bool operator==(Checked<U, V> rhs) const
     {
         return value() == Checked(rhs.value());
     }
