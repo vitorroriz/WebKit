@@ -118,6 +118,7 @@
 #import <pal/spi/mac/NSApplicationSPI.h>
 #import <stdio.h>
 #import <wtf/BlockPtr.h>
+#import <wtf/FileHandle.h>
 #import <wtf/FileSystem.h>
 #import <wtf/Language.h>
 #import <wtf/LogInitialization.h>
@@ -1067,6 +1068,14 @@ void WebProcess::initializeSandbox(const AuxiliaryProcessInitializationParameter
     sandboxParameters.setOverrideSandboxProfilePath(makeString(String([webKitBundle resourcePath]), "/com.apple.WebProcess.sb"_s));
 
     AuxiliaryProcess::initializeSandbox(parameters, sandboxParameters);
+#elif ENABLE(SIMULATOR_SANDBOX)
+    auto webKitBundle = [NSBundle bundleForClass:NSClassFromString(@"WKWebView")];
+    String path = makeString(String([webKitBundle bundlePath]), "/com.apple.WebKit.WebContent.simulator"_s);
+    auto handle = FileSystem::openFile(path, FileSystem::FileOpenMode::Read, FileSystem::FileAccessPermission::All, { FileSystem::FileLockMode::Exclusive, FileSystem::FileLockMode::Nonblocking });
+    if (auto data = handle.readAll()) {
+        int rv = sandbox_apply_bytecode(data->mutableSpan().data(), data->size(), nullptr);
+        RELEASE_ASSERT(!rv);
+    }
 #endif
 }
 
