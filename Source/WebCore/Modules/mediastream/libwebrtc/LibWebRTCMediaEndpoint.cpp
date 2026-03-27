@@ -412,7 +412,9 @@ ExceptionOr<LibWebRTCMediaEndpoint::Backends> LibWebRTCMediaEndpoint::createTran
         return toException(result.error());
 
     auto transceiver = makeUniqueRef<LibWebRTCRtpTransceiverBackend>(toRef(result.MoveValue()));
-    return LibWebRTCMediaEndpoint::Backends { transceiver->createSenderBackend(*protect(m_peerConnectionBackend), WTF::move(source)), transceiver->createReceiverBackend(), WTF::move(transceiver) };
+
+    Ref document = downcast<Document>(*m_peerConnectionBackend->connection().scriptExecutionContext());
+    return LibWebRTCMediaEndpoint::Backends { transceiver->createSenderBackend(*protect(m_peerConnectionBackend), WTF::move(source)), transceiver->createReceiverBackend(document), WTF::move(transceiver) };
 }
 
 ExceptionOr<LibWebRTCMediaEndpoint::Backends> LibWebRTCMediaEndpoint::addTransceiver(const String& trackKind, const RTCRtpTransceiverInit& init, PeerConnectionBackend::IgnoreNegotiationNeededFlag ignoreNegotiationNeededFlag)

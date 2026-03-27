@@ -35,19 +35,26 @@
 
 namespace WebCore {
 class Document;
+class LibWebRTCRtpReceiverBackend;
 class RealtimeMediaSource;
+
+struct LibWebRTCRtpReceiverBackendAndSource {
+    UniqueRef<LibWebRTCRtpReceiverBackend> backend;
+    Ref<RealtimeMediaSource> source;
+};
 
 class LibWebRTCRtpReceiverBackend final : public RTCRtpReceiverBackend, public webrtc::RtpReceiverObserverInterface {
     WTF_MAKE_TZONE_ALLOCATED(LibWebRTCRtpReceiverBackend);
 public:
-    explicit LibWebRTCRtpReceiverBackend(Ref<webrtc::RtpReceiverInterface>&&);
+    static LibWebRTCRtpReceiverBackendAndSource create(Document&, Ref<webrtc::RtpReceiverInterface>&&);
+
+    LibWebRTCRtpReceiverBackend(Ref<webrtc::RtpReceiverInterface>&&, RealtimeMediaSource&);
     ~LibWebRTCRtpReceiverBackend();
 
     webrtc::RtpReceiverInterface& rtcReceiver() { return m_rtcReceiver.get(); }
 
-    Ref<RealtimeMediaSource> createSource(Document&);
-
 private:
+
     // RTCRtpReceiverBackend
     bool isLibWebRTCRtpReceiverBackend() const final { return true; }
 
@@ -64,9 +71,9 @@ private:
     double webrtcToWallTimeOffset() const;
 
     const Ref<webrtc::RtpReceiverInterface> m_rtcReceiver;
+    const ThreadSafeWeakPtr<RealtimeMediaSource> m_source;
     const RefPtr<RTCRtpTransformBackend> m_transformBackend;
     mutable std::optional<double> m_webrtcToWallTimeOffset;
-    ThreadSafeWeakPtr<RealtimeMediaSource> m_source;
 };
 
 } // namespace WebCore

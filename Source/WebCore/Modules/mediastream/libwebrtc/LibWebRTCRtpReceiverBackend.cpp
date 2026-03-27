@@ -48,9 +48,50 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(LibWebRTCRtpReceiverBackend);
 
-LibWebRTCRtpReceiverBackend::LibWebRTCRtpReceiverBackend(Ref<webrtc::RtpReceiverInterface>&& rtcReceiver)
-    : m_rtcReceiver(WTF::move(rtcReceiver))
+LibWebRTCRtpReceiverBackendAndSource LibWebRTCRtpReceiverBackend::create(Document& document, Ref<webrtc::RtpReceiverInterface>&& rtcReceiver)
 {
+    RefPtr source = [&] -> RefPtr<RealtimeMediaSource> {
+        auto rtcTrack = rtcReceiver->track();
+        switch (rtcReceiver->media_type()) {
+        case webrtc::MediaType::ANY:
+        case webrtc::MediaType::DATA:
+        case webrtc::MediaType::UNSUPPORTED:
+            break;
+        case webrtc::MediaType::AUDIO: {
+            // This is a cast from a webrtc type, not much we can do to make it safe.
+            SUPPRESS_MEMORY_UNSAFE_CAST webrtc::scoped_refptr<webrtc::AudioTrackInterface> audioTrack { static_cast<webrtc::AudioTrackInterface*>(rtcTrack.get()) };
+            Ref source = RealtimeIncomingAudioSource::create(toRef(WTF::move(audioTrack)), fromStdString(rtcTrack->id()));
+            if (document.page()) {
+                auto& webRTCProvider = downcast<LibWebRTCProvider>(document.page()->webRTCProvider());
+                source->setAudioModule(webRTCProvider.audioModule());
+            }
+            return source;
+        }
+        case webrtc::MediaType::VIDEO: {
+            // This is a cast from a webrtc type, not much we can do to make it safe.
+            SUPPRESS_MEMORY_UNSAFE_CAST webrtc::scoped_refptr<webrtc::VideoTrackInterface> videoTrack { static_cast<webrtc::VideoTrackInterface*>(rtcTrack.get()) };
+            Ref source = RealtimeIncomingVideoSource::create(toRef(WTF::move(videoTrack)), fromStdString(rtcTrack->id()));
+            if (document.settings().webRTCMediaPipelineAdditionalLoggingEnabled())
+                source->enableFrameRatedMonitoring();
+            return source;
+        }
+        }
+        return nullptr;
+    }();
+    RELEASE_ASSERT(source);
+
+    // Remote source is initially muted and will be unmuted when receiving the first packet.
+    source->setMuted(true);
+
+    auto backend = makeUniqueRef<LibWebRTCRtpReceiverBackend>(WTF::move(rtcReceiver), *source);
+    return { WTF::move(backend), source.releaseNonNull() };
+}
+
+LibWebRTCRtpReceiverBackend::LibWebRTCRtpReceiverBackend(Ref<webrtc::RtpReceiverInterface>&& rtcReceiver, RealtimeMediaSource& source)
+    : m_rtcReceiver(WTF::move(rtcReceiver))
+    , m_source(source)
+{
+    m_rtcReceiver->SetObserver(this);
 }
 
 LibWebRTCRtpReceiverBackend::~LibWebRTCRtpReceiverBackend()
@@ -116,45 +157,6 @@ Vector<RTCRtpSynchronizationSource> LibWebRTCRtpReceiverBackend::getSynchronizat
             sources.append(toRTCRtpSynchronizationSource(rtcSource, offset));
     }
     return sources;
-}
-
-Ref<RealtimeMediaSource> LibWebRTCRtpReceiverBackend::createSource(Document& document)
-{
-    RefPtr source = [&] -> RefPtr<RealtimeMediaSource> {
-        auto rtcTrack = m_rtcReceiver->track();
-        switch (m_rtcReceiver->media_type()) {
-        case webrtc::MediaType::ANY:
-        case webrtc::MediaType::DATA:
-        case webrtc::MediaType::UNSUPPORTED:
-            break;
-        case webrtc::MediaType::AUDIO: {
-            // This is a cast from a webrtc type, not much we can do to make it safe.
-            SUPPRESS_MEMORY_UNSAFE_CAST webrtc::scoped_refptr<webrtc::AudioTrackInterface> audioTrack { static_cast<webrtc::AudioTrackInterface*>(rtcTrack.get()) };
-            Ref source = RealtimeIncomingAudioSource::create(toRef(WTF::move(audioTrack)), fromStdString(rtcTrack->id()));
-            if (document.page()) {
-                auto& webRTCProvider = downcast<LibWebRTCProvider>(document.page()->webRTCProvider());
-                source->setAudioModule(webRTCProvider.audioModule());
-            }
-            return source;
-        }
-        case webrtc::MediaType::VIDEO: {
-            // This is a cast from a webrtc type, not much we can do to make it safe.
-            SUPPRESS_MEMORY_UNSAFE_CAST webrtc::scoped_refptr<webrtc::VideoTrackInterface> videoTrack { static_cast<webrtc::VideoTrackInterface*>(rtcTrack.get()) };
-            Ref source = RealtimeIncomingVideoSource::create(toRef(WTF::move(videoTrack)), fromStdString(rtcTrack->id()));
-            if (document.settings().webRTCMediaPipelineAdditionalLoggingEnabled())
-                source->enableFrameRatedMonitoring();
-            return source;
-        }
-        }
-        return nullptr;
-    }();
-
-    RELEASE_ASSERT(source);
-
-    m_source = *source;
-    m_rtcReceiver->SetObserver(this);
-
-    return source.releaseNonNull();
 }
 
 Ref<RTCRtpTransformBackend> LibWebRTCRtpReceiverBackend::rtcRtpTransformBackend()
