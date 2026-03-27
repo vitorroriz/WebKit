@@ -276,7 +276,7 @@ inline bool is(const CheckedPtr<ArgType, ArgPtrTraits>& source)
 template<typename... ExpectedTypes, typename ArgType, typename ArgPtrTraits>
 inline bool isAnyOf(CheckedPtr<ArgType, ArgPtrTraits>& source)
 {
-    return is<ExpectedTypes...>(source.get());
+    return isAnyOf<ExpectedTypes...>(source.get());
 }
 
 template<typename... ExpectedTypes, typename ArgType, typename ArgPtrTraits>
