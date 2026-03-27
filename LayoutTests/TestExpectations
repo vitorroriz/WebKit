@@ -7764,7 +7764,6 @@ webkit.org/b/282024 fast/text/text-box-edge-with-margin-padding-border-simple.ht
 
 # general failures
 
-webkit.org/b/306831 imported/w3c/web-platform-tests/css/css-anchor-position/anchor-fixed-pos-descendant.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-anchor-position/anchor-scroll-position-try-012.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-anchor-position/anchor-scroll-position-try-015.tentative.html [ ImageOnlyFailure ]
 imported/w3c/web-platform-tests/css/css-anchor-position/transform-001.html [ ImageOnlyFailure ]
