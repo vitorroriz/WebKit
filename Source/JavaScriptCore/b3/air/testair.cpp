@@ -3109,7 +3109,10 @@ void run(const char* filter)
                                 return;
                             task = tasks.takeFirst();
                         }
-
+#if USE(PROTECTED_JIT)
+                        // Must be constructed before we allocate anything using SequesteredArenaMalloc
+                        ArenaLifetime arenaLifetime;
+#endif
                         task->run();
                     }
                 }));

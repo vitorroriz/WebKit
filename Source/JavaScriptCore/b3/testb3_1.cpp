@@ -1201,6 +1201,7 @@ void run(const TestConfig* config)
                             task = tasks.takeFirst();
                         }
 
+                        B3_TEST_ARENA_LIFETIME
                         task->run();
                     }
                 }));

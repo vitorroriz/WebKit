@@ -157,11 +157,21 @@ extern Lock crashLock;
             }));                                        \
     }
 
+#if USE(PROTECTED_JIT)
+// Must be constructed before we allocate anything using SequesteredArenaMalloc
+#define B3_TEST_ARENA_LIFETIME ArenaLifetime b3TestArenaLifetime;
+#else
+#define B3_TEST_ARENA_LIFETIME
+#endif
+
 #define RUN_NOW(test) do {                      \
         if (!shouldRun(config, #test))          \
             break;                              \
         dataLog(PREFIX #test "...\n");          \
-        test;                                   \
+        {                                       \
+            B3_TEST_ARENA_LIFETIME              \
+            test;                               \
+        }                                       \
         dataLog(PREFIX #test ": OK!\n");        \
     } while (false)
 
