@@ -35,7 +35,7 @@ unsigned FontCascadeDescription::effectiveFamilyCount() const
 
 FontFamilySpecification FontCascadeDescription::effectiveFamilyAt(unsigned index) const
 {
-    return familyAt(index).name;
+    return familyAt(index);
 }
 
 }

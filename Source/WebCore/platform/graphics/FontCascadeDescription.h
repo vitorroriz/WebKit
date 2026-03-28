@@ -57,7 +57,7 @@ typedef FontFamilySpecificationCoreText FontFamilyPlatformSpecification;
 typedef FontFamilySpecificationNull FontFamilyPlatformSpecification;
 #endif
 
-typedef Variant<AtomString, FontFamilyPlatformSpecification> FontFamilySpecification;
+typedef Variant<FontFamily, FontFamilyPlatformSpecification> FontFamilySpecification;
 
 class Font;
 
