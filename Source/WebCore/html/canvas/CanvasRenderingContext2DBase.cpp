@@ -37,10 +37,8 @@
 #include "ContainerNodeInlines.h"
 #include "CSSFontSelector.h"
 #include "CSSMarkup.h"
-#include "CSSParserIdioms.h"
 #include "CSSPrimitiveNumericTypes+Serialization.h"
 #include "CSSPropertyNames.h"
-#include "CSSPropertyParser.h"
 #include "CSSPropertyParserConsumer+LengthDefinitions.h"
 #include "CSSPropertyParserConsumer+MetaConsumer.h"
 #include "CSSPropertyParserState.h"
@@ -400,18 +398,16 @@ String CanvasRenderingContext2DBase::State::fontString() const
     serializedFont.append(font.computedSize(), "px"_s);
 
     for (unsigned i = 0; i < font.familyCount(); ++i) {
-        StringView family = font.familyAt(i).name;
+        auto fontFamily = font.familyAt(i);
+        StringView family = fontFamily.name;
         if (family.startsWith("-webkit-"_s))
             family = family.substring(8);
 
         auto separator = i ? ", "_s : " "_s;
-        auto familyString = family.toString();
-        // Generic font families should be emitted unquoted.
-        auto valueID = cssValueKeywordID(familyString);
-        if (isGenericFontFamilyKeyword(valueID))
-            serializedFont.append(separator, familyString);
+        if (fontFamily.isGeneric())
+            serializedFont.append(separator, family);
         else
-            serializedFont.append(separator, serializeFontFamily(familyString));
+            serializedFont.append(separator, serializeFontFamily(family.toString()));
     }
 
     return serializedFont.toString();
