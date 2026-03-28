@@ -25,10 +25,12 @@
 
 #import "config.h"
 
+#import "InstanceMethodSwizzler.h"
 #import "TestUIDelegate.h"
 #import "TestWKWebView.h"
 #import "Utilities.h"
 #import <WebKit/WKContentWorldPrivate.h>
+#import <WebKit/WKWebViewPrivate.h>
 #import <WebKit/WebKit.h>
 #import <WebKit/_WKContentWorldConfiguration.h>
 
@@ -66,5 +68,50 @@ TEST(FormValidation, FormValidationOnUnparentedWindowDoesNotCrash)
     Util::run(&ranScript);
     Util::runFor(100_ms);
 }
+
+#if PLATFORM(IOS) || PLATFORM(VISION)
+TEST(FormValidation, ShouldSuppressFormValidationBubble)
+{
+    bool bubblePresented = false;
+    auto swizzledPresentBlock = makeBlockPtr([&](id, UIViewController *, BOOL, void (^)()) {
+        bubblePresented = true;
+    });
+
+    InstanceMethodSwizzler presentSwizzler { [UIViewController class], @selector(presentViewController:animated:completion:), imp_implementationWithBlock(swizzledPresentBlock.get()) };
+
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 300, 300)]);
+
+    RetainPtr rootViewController = adoptNS([[UIViewController alloc] init]);
+    [[webView window] setRootViewController:rootViewController.get()];
+    [rootViewController view].frame = [webView window].bounds;
+    [[rootViewController view] addSubview:webView.get()];
+
+    RetainPtr formHTML = @"<!DOCTYPE html>"
+        "<form>"
+        "    <input required>"
+        "    <input type='submit'>"
+        "</form>"
+        "<script>document.querySelector('input[type=submit]').click()</script>";
+
+    EXPECT_FALSE([webView _shouldSuppressFormValidationBubble]);
+
+    [webView synchronouslyLoadHTMLString:formHTML];
+    [webView waitForNextPresentationUpdate];
+
+    EXPECT_TRUE(bubblePresented);
+
+    bubblePresented = false;
+    [webView synchronouslyLoadHTMLString:@"<!DOCTYPE html><body></body>"];
+    [webView waitForNextPresentationUpdate];
+
+    [webView _setShouldSuppressFormValidationBubble:YES];
+    EXPECT_TRUE([webView _shouldSuppressFormValidationBubble]);
+
+    [webView synchronouslyLoadHTMLString:formHTML];
+    [webView waitForNextPresentationUpdate];
+
+    EXPECT_FALSE(bubblePresented);
+}
+#endif
 
 }

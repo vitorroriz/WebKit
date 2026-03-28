@@ -645,6 +645,8 @@ typedef NS_OPTIONS(NSUInteger, _WKWebViewDataType) {
 
 @property (nonatomic, setter=_setShouldSuppressTopColorExtensionView:) BOOL _shouldSuppressTopColorExtensionView WK_API_AVAILABLE(macos(26.0), ios(26.0));
 
+@property (nonatomic, setter=_setShouldSuppressFormValidationBubble:) BOOL _shouldSuppressFormValidationBubble WK_API_AVAILABLE(ios(WK_IOS_TBA), visionos(WK_XROS_TBA));
+
 #if TARGET_OS_OSX
 - (NSUInteger)accessibilityRemoteChildTokenHash;
 - (NSUInteger)accessibilityUIProcessLocalTokenHash;

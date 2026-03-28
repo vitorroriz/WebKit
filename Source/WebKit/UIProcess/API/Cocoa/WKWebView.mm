@@ -6761,6 +6761,16 @@ static Vector<Ref<API::TargetedElementInfo>> elementsFromWKElements(NSArray<_WKT
 #endif
 }
 
+- (BOOL)_shouldSuppressFormValidationBubble
+{
+    return _shouldSuppressFormValidationBubble;
+}
+
+- (void)_setShouldSuppressFormValidationBubble:(BOOL)value
+{
+    _shouldSuppressFormValidationBubble = value;
+}
+
 - (void)_takeSnapshotOfNode:(_WKJSHandle *)node completionHandler:(void (^)(CocoaImage *image, NSError *))completionHandler
 {
     if (!node)

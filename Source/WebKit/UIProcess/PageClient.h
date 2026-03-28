@@ -489,6 +489,8 @@ public:
     virtual Ref<WebCore::ValidationBubble> createValidationBubble(String&& message, const WebCore::ValidationBubble::Settings&) = 0;
 #endif
 
+    virtual bool shouldSuppressFormValidationBubble() const { return false; }
+
 #if PLATFORM(COCOA)
     virtual CALayer *textIndicatorInstallationLayer() = 0;
 

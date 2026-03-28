@@ -1187,6 +1187,8 @@ void WebPageProxy::showValidationMessage(const IntRect& anchorClientRect, String
     m_validationBubble = pageClient->createValidationBubble(WTF::move(message), { protect(m_preferences)->minimumFontSize() });
     Ref validationBubble = *m_validationBubble;
 
+    validationBubble->setShouldSuppressPresentation(pageClient->shouldSuppressFormValidationBubble());
+
     // FIXME: When in element fullscreen, UIClient::presentingViewController() may not return the
     // WKFullScreenViewController even though that is the presenting view controller of the WKWebView.
     // We should call PageClientImpl::presentingViewController() instead.

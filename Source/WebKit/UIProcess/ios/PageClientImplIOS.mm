@@ -1140,6 +1140,11 @@ Ref<ValidationBubble> PageClientImpl::createValidationBubble(String&& message, c
     return ValidationBubble::create(protect(m_contentView.getAutoreleased()), WTF::move(message), settings);
 }
 
+bool PageClientImpl::shouldSuppressFormValidationBubble() const
+{
+    return [webView() _shouldSuppressFormValidationBubble];
+}
+
 RefPtr<WebDataListSuggestionsDropdown> PageClientImpl::createDataListSuggestionsDropdown(WebPageProxy& page)
 {
     return WebDataListSuggestionsDropdownIOS::create(page, protect(m_contentView.getAutoreleased()));
