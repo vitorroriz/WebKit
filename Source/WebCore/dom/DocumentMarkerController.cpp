@@ -79,6 +79,9 @@ void DocumentMarkerController::detach()
     m_possiblyExistingMarkerTypes = { };
     m_fadeAnimationTimer.stop();
     m_writingToolsTextSuggestionAnimationTimer.stop();
+#if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
+    m_appliedGrammarTextEffectRanges.clear();
+#endif
 }
 
 auto DocumentMarkerController::collectTextRanges(const SimpleRange& range) -> Vector<TextRange>
@@ -97,7 +100,24 @@ bool DocumentMarkerController::addMarker(const SimpleRange& range, DocumentMarke
 
 #if ENABLE(WRITING_TOOLS_TEXT_EFFECTS)
     RefPtr page = m_document->page();
-    bool needsTextEffect = type == DocumentMarkerType::Grammar && page && page->settings().textEffectsEnabled();
+    bool isGrammar = type == DocumentMarkerType::Grammar;
+    bool textEffectsEnabled = page && page->settings().textEffectsEnabled();
+    bool needsTextEffect = false;
+    if (isGrammar && textEffectsEnabled) {
+        needsTextEffect = true;
+        auto textRanges = collectTextRanges(range);
+        for (auto& textPiece : textRanges) {
+            SimpleRange pieceRange { BoundaryPoint { textPiece.node.copyRef(), textPiece.range.start }, BoundaryPoint { textPiece.node.copyRef(), textPiece.range.end } };
+            for (auto& applied : m_appliedGrammarTextEffectRanges) {
+                if (applied == pieceRange) {
+                    needsTextEffect = false;
+                    break;
+                }
+            }
+            if (!needsTextEffect)
+                break;
+        }
+    }
     RefPtr<TextIndicator> textIndicator;
     if (needsTextEffect)
         textIndicator = page->textEffectController().createTextIndicatorForRange(range);
@@ -112,6 +132,8 @@ bool DocumentMarkerController::addMarker(const SimpleRange& range, DocumentMarke
     if (needsTextEffect) {
         RefPtr decorationIndicator = page->textEffectController().createTextIndicatorForRange(range);
         page->textEffectController().addTextEffect(range, WTF::move(textIndicator), WTF::move(decorationIndicator));
+        for (auto& textPiece : collectTextRanges(range))
+            m_appliedGrammarTextEffectRanges.append(SimpleRange { BoundaryPoint { textPiece.node.copyRef(), textPiece.range.start }, BoundaryPoint { textPiece.node.copyRef(), textPiece.range.end } });
     }
 #endif
     return added;
