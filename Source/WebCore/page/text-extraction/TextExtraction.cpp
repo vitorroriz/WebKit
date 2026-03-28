@@ -137,6 +137,11 @@ using TextNodesAndText = Vector<std::pair<Ref<Text>, String>>;
 using TextAndSelectedRange = std::pair<String, std::optional<CharacterRange>>;
 using TextAndSelectedRangeMap = HashMap<Ref<Text>, TextAndSelectedRange>;
 
+static constexpr OptionSet behaviorsForTextExtraction {
+    TextIteratorBehavior::EntersTextControls,
+    TextIteratorBehavior::TraversesFlatTree
+};
+
 static bool hasEnclosingAutoFilledInput(Node& node)
 {
     auto* input = dynamicDowncast<HTMLInputElement>(node.shadowHost());
@@ -159,7 +164,7 @@ static inline TextNodesAndText collectText(const SimpleRange& range, IncludeText
         nodesAndText.append({ lastTextNode.releaseNonNull(), WTF::move(text) });
     };
 
-    for (TextIterator iterator { range, TextIteratorBehavior::EntersTextControls }; !iterator.atEnd(); iterator.advance()) {
+    for (TextIterator iterator { range, behaviorsForTextExtraction }; !iterator.atEnd(); iterator.advance()) {
         if (iterator.text().isEmpty())
             continue;
 
@@ -1462,7 +1467,7 @@ static Vector<std::pair<String, FloatRect>> extractAllTextAndRectsRecursive(Docu
     ListHashSet<Ref<HTMLFrameOwnerElement>> frameOwners;
     Vector<std::pair<String, FloatRect>> result;
     auto fullRange = makeRangeSelectingNodeContents(*bodyElement);
-    for (TextIterator iterator { fullRange, TextIteratorBehavior::EntersTextControls }; !iterator.atEnd(); iterator.advance()) {
+    for (TextIterator iterator { fullRange, behaviorsForTextExtraction }; !iterator.atEnd(); iterator.advance()) {
         RefPtr node = iterator.node();
         if (!node)
             continue;
@@ -2169,7 +2174,7 @@ static String textDescription(Node* node, Vector<String>& stringsToValidate)
 
         String renderedTextSuffix;
         auto range = makeRangeSelectingNodeContents(*node);
-        if (auto text = normalizeText(plainText(range, TextIteratorBehavior::EntersTextControls)); !text.isEmpty()) {
+        if (auto text = normalizeText(plainText(range, behaviorsForTextExtraction)); !text.isEmpty()) {
             stringsToValidate.append(text);
             extendedDescription.append(makeString(", with rendered text "_s, wrapWithDoubleQuotes(WTF::move(text))));
         }

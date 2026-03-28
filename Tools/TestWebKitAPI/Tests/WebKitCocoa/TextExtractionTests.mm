@@ -1243,4 +1243,60 @@ TEST(TextExtractionTests, InvalidURLsAreSkipped)
     }
 }
 
+TEST(TextExtractionTests, AuthorShadowDOMText)
+{
+    RetainPtr webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:^{
+        RetainPtr configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+        [[configuration preferences] _setTextExtractionEnabled:YES];
+        return configuration.autorelease();
+    }()]);
+
+    static constexpr auto markupString = R"HTML(<!DOCTYPE html>
+        <html>
+        <body>
+            <p>Before shadow content</p>
+            <custom-button variant="primary" text="Next"></custom-button>
+            <custom-button variant="secondary" text="Cancel"></custom-button>
+            <my-card></my-card>
+            <script>
+            class CustomButton extends HTMLElement {
+                connectedCallback() {
+                    this.attachShadow({ mode: 'open' });
+                    const text = this.getAttribute('text') || '';
+                    this.shadowRoot.innerHTML = `
+                        <button type="button">
+                            <span class="button__label">${text}</span>
+                        </button>
+                    `;
+                }
+            }
+            customElements.define('custom-button', CustomButton);
+
+            class MyCard extends HTMLElement {
+                connectedCallback() {
+                    this.attachShadow({ mode: 'open' });
+                    this.shadowRoot.innerHTML = `
+                        <div>
+                            <h2>Shadow heading</h2>
+                            <p>Shadow paragraph text</p>
+                            <a href="https://example.com">Shadow link</a>
+                        </div>
+                    `;
+                }
+            }
+            customElements.define('my-card', MyCard);
+            </script>
+        </body>
+        </html>)HTML";
+    [webView synchronouslyLoadHTMLString:@(markupString)];
+
+    RetainPtr debugText = [webView synchronouslyGetDebugText:nil];
+    EXPECT_TRUE([debugText containsString:@"Before shadow content"]);
+    EXPECT_TRUE([debugText containsString:@"Next"]);
+    EXPECT_TRUE([debugText containsString:@"Cancel"]);
+    EXPECT_TRUE([debugText containsString:@"Shadow heading"]);
+    EXPECT_TRUE([debugText containsString:@"Shadow paragraph text"]);
+    EXPECT_TRUE([debugText containsString:@"Shadow link"]);
+}
+
 } // namespace TestWebKitAPI
