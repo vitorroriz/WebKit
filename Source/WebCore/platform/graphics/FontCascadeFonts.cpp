@@ -379,16 +379,16 @@ GlyphData FontCascadeFonts::glyphDataForSystemFallback(char32_t character, const
         systemFallbackFont = const_cast<Font*>(&systemFallbackFont->invisibleFont());
 
     if (systemFallbackFont->platformData().orientation() == FontOrientation::Vertical && !systemFallbackFont->hasVerticalGlyphs() && FontCascade::isCJKIdeographOrSymbol(character))
-        variant = BrokenIdeographVariant;
+        variant = FontVariant::BrokenIdeograph;
 
     GlyphData fallbackGlyphData;
-    if (variant == NormalVariant)
+    if (variant == FontVariant::Normal)
         fallbackGlyphData = systemFallbackFont->glyphDataForCharacter(character);
     else
         fallbackGlyphData = protect(systemFallbackFont->variantFont(description, variant))->glyphDataForCharacter(character);
 
     if (fallbackGlyphData.font && fallbackGlyphData.font->platformData().orientation() == FontOrientation::Vertical && !fallbackGlyphData.font->isTextOrientationFallback()) {
-        if (variant == NormalVariant && !FontCascade::isCJKIdeographOrSymbol(character))
+        if (variant == FontVariant::Normal && !FontCascade::isCJKIdeographOrSymbol(character))
             fallbackGlyphData = glyphDataForNonCJKCharacterWithGlyphOrientation(character, description.nonCJKGlyphOrientation(), fallbackGlyphData);
     }
 
@@ -455,7 +455,7 @@ GlyphData FontCascadeFonts::glyphDataForVariant(char32_t character, const FontCa
         if (fallbackVisibility == FallbackVisibility::Invisible && data.font->visibility() == Font::Visibility::Visible)
             data.font = Ref { *data.font }->invisibleFont();
 
-        if (variant == NormalVariant) {
+        if (variant == FontVariant::Normal) {
             if (data.font->platformData().orientation() == FontOrientation::Vertical && !data.font->isTextOrientationFallback()) {
                 if (!FontCascade::isCJKIdeographOrSymbol(character))
                     return glyphDataForNonCJKCharacterWithGlyphOrientation(character, description.nonCJKGlyphOrientation(), data);
@@ -463,7 +463,7 @@ GlyphData FontCascadeFonts::glyphDataForVariant(char32_t character, const FontCa
                 if (!data.font->hasVerticalGlyphs()) {
                     // Use the broken ideograph font data. The broken ideograph font will use the horizontal width of glyphs
                     // to make sure you get a square (even for broken glyphs like symbols used for punctuation).
-                    return glyphDataForVariant(character, description, fontSelector, BrokenIdeographVariant, resolvedEmojiPolicy, fallbackIndex);
+                    return glyphDataForVariant(character, description, fontSelector, FontVariant::BrokenIdeograph, resolvedEmojiPolicy, fallbackIndex);
                 }
             }
         } else {
@@ -533,9 +533,9 @@ static RefPtr<GlyphPage> glyphPageFromFontRanges(unsigned pageNumber, const Font
 GlyphData FontCascadeFonts::glyphDataForCharacter(char32_t c, const FontCascadeDescription& description, FontSelector* fontSelector, FontVariant variant, ResolvedEmojiPolicy resolvedEmojiPolicy)
 {
     ASSERT(m_thread ? m_thread->ptr() == &Thread::currentSingleton() : isMainThread());
-    ASSERT(variant != AutoVariant);
+    ASSERT(variant != FontVariant::Auto);
 
-    if (variant != NormalVariant)
+    if (variant != FontVariant::Normal)
         return glyphDataForVariant(c, description, fontSelector, variant, resolvedEmojiPolicy);
 
     const unsigned pageNumber = GlyphPage::pageNumberForCodePoint(c);
@@ -548,7 +548,7 @@ GlyphData FontCascadeFonts::glyphDataForCharacter(char32_t c, const FontCascadeD
     GlyphData glyphData = cacheEntry.glyphDataForCharacter(c);
     if (!glyphData.isValid()) {
         // No glyph, resolve per-character.
-        ASSERT(variant == NormalVariant);
+        ASSERT(variant == FontVariant::Normal);
         glyphData = glyphDataForVariant(c, description, fontSelector, variant, resolvedEmojiPolicy);
         // Cache the results.
         cacheEntry.setGlyphDataForCharacter(c, glyphData);

@@ -88,7 +88,7 @@ static bool canUseSimplifiedTextMeasuringForCharacters(std::span<const Character
 {
     Ref primaryFont = fontCascade.primaryFont();
     for (auto character : characters) {
-        if (!fontCascade.canUseSimplifiedTextMeasuring(character, AutoVariant, whitespaceIsCollapsed, primaryFont))
+        if (!fontCascade.canUseSimplifiedTextMeasuring(character, FontVariant::Auto, whitespaceIsCollapsed, primaryFont))
             return false;
     }
     return true;

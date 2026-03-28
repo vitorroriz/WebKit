@@ -398,14 +398,14 @@ void RenderText::initiateFontLoadingByAccessingGlyphDataAndComputeCanUseSimplifi
     auto& style = this->style();
     auto& fontCascade = style.fontCascade();
     // See webkit.org/b/252668
-    auto fontVariant = AutoVariant;
+    auto fontVariant = FontVariant::Auto;
     m_canUseSimplifiedTextMeasuring = canUseSimpleFontCodePath();
 #if USE(FONT_VARIANT_VIA_FEATURES)
     auto fontVariantCaps = fontCascade.fontDescription().variantCaps();
     if (fontVariantCaps == FontVariantCaps::Small || fontVariantCaps == FontVariantCaps::AllSmall || fontVariantCaps ==  FontVariantCaps::Petite || fontVariantCaps == FontVariantCaps::AllPetite) {
         // This matches the behavior of ComplexTextController::collectComplexTextRuns(): that function doesn't perform font fallback
         // on the capitalized characters when small caps is enabled, so we shouldn't here either.
-        fontVariant = NormalVariant;
+        fontVariant = FontVariant::Normal;
         m_canUseSimplifiedTextMeasuring = false;
     }
 #endif

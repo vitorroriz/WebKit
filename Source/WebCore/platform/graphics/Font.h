@@ -67,7 +67,7 @@ struct GlyphData;
 struct MultiRepresentationHEICMetrics;
 #endif
 
-enum FontVariant : uint8_t { AutoVariant, NormalVariant, SmallCapsVariant, EmphasisMarkVariant, BrokenIdeographVariant };
+enum class FontVariant : uint8_t { Auto, Normal, SmallCaps, EmphasisMark, BrokenIdeograph };
 enum Pitch : uint8_t { UnknownPitch, FixedPitch, VariablePitch };
 enum class IsForPlatformFont : bool { No, Yes };
 
@@ -132,14 +132,14 @@ public:
     const Font* variantFont(const FontDescription& description, FontVariant variant) const
     {
         switch (variant) {
-        case SmallCapsVariant:
+        case FontVariant::SmallCaps:
             return smallCapsFont(description);
-        case EmphasisMarkVariant:
+        case FontVariant::EmphasisMark:
             return emphasisMarkFont(description);
-        case BrokenIdeographVariant:
+        case FontVariant::BrokenIdeograph:
             return &brokenIdeographFont();
-        case AutoVariant:
-        case NormalVariant:
+        case FontVariant::Auto:
+        case FontVariant::Normal:
             break;
         }
         ASSERT_NOT_REACHED();

@@ -170,7 +170,7 @@ public:
 
     inline const Font& primaryFont() const; // Defined in FontCascadeInlines.h
     inline const FontRanges& fallbackRangesAt(unsigned) const; // Defined in FontCascadeInlines.h
-    WEBCORE_EXPORT GlyphData glyphDataForCharacter(char32_t, bool mirror, FontVariant = AutoVariant, std::optional<ResolvedEmojiPolicy> = std::nullopt) const;
+    WEBCORE_EXPORT GlyphData glyphDataForCharacter(char32_t, bool mirror, FontVariant = FontVariant::Auto, std::optional<ResolvedEmojiPolicy> = std::nullopt) const;
     bool canUseSimplifiedTextMeasuring(char32_t, FontVariant, bool whitespaceIsCollapsed, const Font&) const;
 
     RefPtr<const Font> fontForCombiningCharacterSequence(StringView) const;

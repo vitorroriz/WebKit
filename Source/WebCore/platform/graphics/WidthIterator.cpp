@@ -440,7 +440,7 @@ inline void WidthIterator::advanceInternal(TextIterator& textIterator, GlyphBuff
             continue;
         }
 #endif
-        auto glyphData = m_fontCascade->glyphDataForCharacter(character, false, FontVariant::NormalVariant);
+        auto glyphData = m_fontCascade->glyphDataForCharacter(character, false, FontVariant::Normal);
 
         RefPtr halfWidthFont = applyTextSpacingTrimIfNeeded(glyphData, character, fontDescription.textSpacingTrim());
 

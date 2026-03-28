@@ -440,16 +440,16 @@ float FontCascade::zeroWidth() const
 
 GlyphData FontCascade::glyphDataForCharacter(char32_t c, bool mirror, FontVariant variant, std::optional<ResolvedEmojiPolicy> resolvedEmojiPolicy) const
 {
-    if (variant == AutoVariant) {
+    if (variant == FontVariant::Auto) {
         if (m_fontDescription.variantCaps() == FontVariantCaps::Small) {
             char32_t upperC = u_toupper(c);
             if (upperC != c) {
                 c = upperC;
-                variant = SmallCapsVariant;
+                variant = FontVariant::SmallCaps;
             } else
-                variant = NormalVariant;
+                variant = FontVariant::Normal;
         } else
-            variant = NormalVariant;
+            variant = FontVariant::Normal;
     }
 
     if (mirror)
@@ -468,7 +468,7 @@ bool FontCascade::canUseSimplifiedTextMeasuring(char32_t character, FontVariant 
 
     // We cache whitespaceIsCollapsed = true result. false case is handled above.
     whitespaceIsCollapsed = true;
-    bool isCacheable = fontVariant == AutoVariant && isLatin1(character);
+    bool isCacheable = fontVariant == FontVariant::Auto && isLatin1(character);
     size_t baseIndex = static_cast<size_t>(character) * bitsPerCharacterInCanUseSimplifiedTextMeasuringForAutoVariantCache;
     if (isCacheable) {
         static_assert(0 < bitsPerCharacterInCanUseSimplifiedTextMeasuringForAutoVariantCache);
@@ -1421,7 +1421,7 @@ std::optional<GlyphData> FontCascade::getEmphasisMarkGlyphData(const AtomString&
     } else
         character = mark[0];
 
-    std::optional<GlyphData> glyphData(glyphDataForCharacter(character, false, EmphasisMarkVariant));
+    std::optional<GlyphData> glyphData(glyphDataForCharacter(character, false, FontVariant::EmphasisMark));
     return glyphData.value().isValid() ? glyphData : std::nullopt;
 }
 
@@ -1758,7 +1758,7 @@ RefPtr<const Font> FontCascade::fontForCombiningCharacterSequence(StringView str
 {
     ASSERT(stringView.length() > 0);
     char32_t baseCharacter = *stringView.codePoints().begin();
-    GlyphData baseCharacterGlyphData = glyphDataForCharacter(baseCharacter, false, NormalVariant);
+    GlyphData baseCharacterGlyphData = glyphDataForCharacter(baseCharacter, false, FontVariant::Normal);
 
     if (!baseCharacterGlyphData.isValid())
         return nullptr;
