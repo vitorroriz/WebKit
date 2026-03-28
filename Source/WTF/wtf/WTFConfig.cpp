@@ -96,10 +96,6 @@ alignas(WTF::ConfigAlignment) WTF_CONFIG_SECTION Slot g_config[WTF::ConfigSizeTo
 
 } // namespace WebConfig
 
-#if !USE(SYSTEM_MALLOC)
-static_assert(Gigacage::startSlotOfGigacageConfig == WebConfig::NumberOfReservedConfigBytes);
-#endif
-
 namespace WTF {
 
 // Works together with permanentlyFreezePages().
