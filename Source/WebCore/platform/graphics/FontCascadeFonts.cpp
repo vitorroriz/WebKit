@@ -187,7 +187,7 @@ static FontRanges realizeNextFallback(const FontCascadeDescription& description,
     // For example on macOS, we know to map any families containing the words Arabic, Pashto, or Urdu to the
     // Geeza Pro font.
     for (auto& family : description.families()) {
-        if (auto font = fontCache->similarFont(description, family))
+        if (auto font = fontCache->similarFont(description, family.name))
             return FontRanges(WTF::move(font));
     }
     return { };
@@ -416,7 +416,7 @@ static void opportunisticallyStartFontDataURLLoading(const FontCascadeDescriptio
     if (!fontSelector)
         return;
     for (unsigned i = 0; i < description.familyCount(); ++i)
-        fontSelector->opportunisticallyStartFontDataURLLoading(description, description.familyAt(i));
+        fontSelector->opportunisticallyStartFontDataURLLoading(description, description.familyAt(i).name);
 }
 
 GlyphData FontCascadeFonts::glyphDataForVariant(char32_t character, const FontCascadeDescription& description, FontSelector* fontSelector, FontVariant variant, ResolvedEmojiPolicy resolvedEmojiPolicy, unsigned fallbackIndex)

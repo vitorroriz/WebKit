@@ -41,6 +41,16 @@ class TextStream;
 
 namespace WebCore {
 
+enum class FontFamilyKind : bool { Specified, Generic };
+
+struct FontFamily {
+    AtomString name;
+    FontFamilyKind kind { FontFamilyKind::Generic };
+
+    bool isGeneric() const { return kind == FontFamilyKind::Generic; }
+    bool operator==(const FontFamily&) const = default;
+};
+
 #if PLATFORM(COCOA)
 typedef FontFamilySpecificationCoreText FontFamilyPlatformSpecification;
 #else
@@ -58,9 +68,9 @@ public:
     bool operator==(const FontCascadeDescription&) const;
 
     unsigned familyCount() const { return m_families->size(); }
-    const AtomString& firstFamily() const { return familyAt(0); }
-    const AtomString& familyAt(unsigned i) const { return m_families.get()[i]; }
-    RefCountedFixedVector<AtomString>& families() const { return m_families.get(); }
+    const FontFamily& firstFamily() const { return familyAt(0); }
+    const FontFamily& familyAt(unsigned i) const { return m_families.get()[i]; }
+    RefCountedFixedVector<FontFamily>& families() const { return m_families.get(); }
 
     static bool NODELETE familyNamesAreEqual(const AtomString&, const AtomString&);
     static unsigned familyNameHash(const AtomString&);
@@ -77,7 +87,7 @@ public:
     static FontSelectionValue bolderWeight(FontSelectionValue);
 
     // only use fixed default size when there is only one font family, and that family is "monospace"
-    bool useFixedDefaultSize() const { return familyCount() == 1 && firstFamily() == monospaceFamily; }
+    bool useFixedDefaultSize() const { return familyCount() == 1 && firstFamily().name == monospaceFamily; }
 
     Kerning kerning() const { return static_cast<Kerning>(m_kerning); }
     unsigned keywordSize() const { return m_keywordSize; }
@@ -97,10 +107,11 @@ public:
     // author's primary typographic choice.
     bool hasAuthorSpecifiedNonGenericPrimaryFont() const { return m_hasAuthorSpecifiedNonGenericPrimaryFont; }
 
-    void setOneFamily(const AtomString& family) { ASSERT(m_families->size() == 1); m_families.get()[0] = family; }
-    void setFamilies(const Vector<AtomString>& families) { m_families = RefCountedFixedVector<AtomString>::createFromVector(families); }
-    void setFamilies(RefCountedFixedVector<AtomString>& families) { m_families = families; }
-    void setFamilies(Ref<RefCountedFixedVector<AtomString>>&& families) { m_families = WTF::move(families); }
+    void setOneFamily(const FontFamily& family) { ASSERT(m_families->size() == 1); m_families.get()[0] = family; }
+    void setOneFamily(const AtomString& familyName) { setOneFamily(FontFamily { familyName, FontFamilyKind::Specified }); }
+    void setFamilies(const Vector<FontFamily>& families) { m_families = RefCountedFixedVector<FontFamily>::createFromVector(families); }
+    void setFamilies(RefCountedFixedVector<FontFamily>& families) { m_families = families; }
+    void setFamilies(Ref<RefCountedFixedVector<FontFamily>>&& families) { m_families = WTF::move(families); }
     void setSpecifiedSize(float s) { m_specifiedSize = clampToFloat(s); }
     void setIsAbsoluteSize(bool s) { m_isAbsoluteSize = s; }
     void setKerning(Kerning kerning) { m_kerning = static_cast<unsigned>(kerning); }
@@ -134,7 +145,7 @@ public:
     WEBCORE_EXPORT void NODELETE resolveFontSizeAdjustFromFontIfNeeded(const Font&);
 
 private:
-    Ref<RefCountedFixedVector<AtomString>> m_families;
+    Ref<RefCountedFixedVector<FontFamily>> m_families;
 
     // Specified CSS value. Independent of rendering issues such as integer rounding, minimum font sizes, and zooming.
     float m_specifiedSize { 0 };

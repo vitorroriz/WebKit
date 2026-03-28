@@ -106,7 +106,7 @@ static FontCascadeCacheKey makeFontCascadeCacheKey(const FontCascadeDescription&
     auto hasComplexFontSelector = fontSelector && !fontSelector->isSimpleFontSelectorForDescription();
     return FontCascadeCacheKey {
         FontDescriptionKey(description),
-        Vector<FontFamilyName, 3>(familyCount, [&](size_t i) { return description.familyAt(i); }),
+        Vector<FontFamilyName, 3>(familyCount, [&](size_t familyIndex) { return description.familyAt(familyIndex).name; }),
         hasComplexFontSelector ? fontSelector->uniqueId() : 0,
         hasComplexFontSelector ? fontSelector->version() : 0,
         hasComplexFontSelector

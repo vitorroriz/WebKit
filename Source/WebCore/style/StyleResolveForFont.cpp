@@ -49,6 +49,7 @@
 #include "ScriptExecutionContext.h"
 #include "Settings.h"
 #include "StyleBuilderChecking.h"
+#include "StyleFontFamily.h"
 #include "StyleFontSizeFunctions.h"
 #include "StyleLengthResolution.h"
 #include "StylePrimitiveNumericTypes+Conversions.h"
@@ -308,7 +309,7 @@ static FontVariantCaps NODELETE fontVariantCapsFromUnresolvedFontVariantCaps(con
 // MARK: - 'font-family'
 
 struct ResolvedFontFamily {
-    Vector<AtomString> family;
+    Vector<WebCore::FontFamily> families;
     bool hasAuthorSpecifiedNonGenericPrimaryFont;
 };
 
@@ -317,8 +318,8 @@ static ResolvedFontFamily fontFamilyFromUnresolvedFontFamily(const CSSPropertyPa
     bool isFirstFont = true;
     bool hasAuthorSpecifiedNonGenericPrimaryFont = false;
 
-    auto family = WTF::compactMap(unresolvedFamily, [&](auto& item) -> std::optional<AtomString> {
-        auto [family, isGenericFamily] = switchOn(item,
+    auto families = WTF::compactMap(unresolvedFamily, [&](auto& item) -> std::optional<WebCore::FontFamily> {
+        auto [familyName, isGenericFamily] = switchOn(item,
             [&](CSSValueID ident) -> std::pair<AtomString, bool> {
                 if (ident != CSSValueWebkitBody) {
                     // FIXME: Treat system-ui like other generic font families
@@ -333,18 +334,18 @@ static ResolvedFontFamily fontFamilyFromUnresolvedFontFamily(const CSSPropertyPa
             }
         );
 
-        if (family.isEmpty())
+        if (familyName.isEmpty())
             return std::nullopt;
 
         if (isFirstFont) {
             hasAuthorSpecifiedNonGenericPrimaryFont = !isGenericFamily;
             isFirstFont = false;
         }
-        return family;
+        return WebCore::FontFamily { WTF::move(familyName), isGenericFamily ? FontFamilyKind::Generic : FontFamilyKind::Specified };
     });
 
     return {
-        .family = WTF::move(family),
+        .families = WTF::move(families),
         .hasAuthorSpecifiedNonGenericPrimaryFont = hasAuthorSpecifiedNonGenericPrimaryFont
     };
 }
@@ -362,7 +363,7 @@ std::optional<FontCascade> resolveForUnresolvedFont(const CSSPropertyParserHelpe
 
     auto useFixedDefaultSize = [](const FontCascadeDescription& fontDescription) {
         return fontDescription.familyCount() == 1
-            && fontDescription.firstFamily() == *familyNamesData->at(FamilyNamesIndex::MonospaceFamily);
+            && fontDescription.firstFamily().name == *familyNamesData->at(FamilyNamesIndex::MonospaceFamily);
     };
 
     // Font family applied in the same way as StyleBuilderCustom::applyValueFontFamily
@@ -370,9 +371,9 @@ std::optional<FontCascade> resolveForUnresolvedFont(const CSSPropertyParserHelpe
     bool oldFamilyUsedFixedDefaultSize = useFixedDefaultSize(fontDescription);
 
     auto resolvedFamily = fontFamilyFromUnresolvedFontFamily(unresolvedFont.family, protectedContext);
-    if (resolvedFamily.family.isEmpty())
+    if (resolvedFamily.families.isEmpty())
         return std::nullopt;
-    fontDescription.setFamilies(resolvedFamily.family);
+    fontDescription.setFamilies(resolvedFamily.families);
     fontDescription.setHasAuthorSpecifiedNonGenericPrimaryFont(resolvedFamily.hasAuthorSpecifiedNonGenericPrimaryFont);
 
     if (useFixedDefaultSize(fontDescription) != oldFamilyUsedFixedDefaultSize) {

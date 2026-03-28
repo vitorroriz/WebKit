@@ -40,7 +40,7 @@ unsigned FontCascadeDescription::effectiveFamilyCount() const
     // FIXME: Move all the other system font keywords from fontDescriptorWithFamilySpecialCase() to here.
     unsigned result = 0;
     for (unsigned i = 0; i < familyCount(); ++i) {
-        const auto& cssFamily = familyAt(i);
+        const auto& cssFamily = familyAt(i).name;
         if (auto use = SystemFontDatabaseCoreText::forCurrentThread().matchSystemFontUse(cssFamily))
             result += systemFontCascadeList(*this, cssFamily, *use, shouldAllowUserInstalledFonts()).size();
         else
@@ -58,7 +58,7 @@ FontFamilySpecification FontCascadeDescription::effectiveFamilyAt(unsigned index
     // means that "src:local(system-ui)" can't follow the Core Text cascade list (the way it does for regular lookups).
     // These two behaviors should be unified, which would hopefully allow us to delete this duplicate code.
     for (unsigned i = 0; i < familyCount(); ++i) {
-        const auto& cssFamily = familyAt(i);
+        const auto& cssFamily = familyAt(i).name;
         if (auto use = SystemFontDatabaseCoreText::forCurrentThread().matchSystemFontUse(cssFamily)) {
             auto cascadeList = systemFontCascadeList(*this, cssFamily, *use, shouldAllowUserInstalledFonts());
             if (index < cascadeList.size())

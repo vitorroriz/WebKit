@@ -62,7 +62,7 @@ struct SameSizeAsFontCascadeDescription {
 static_assert(sizeof(FontCascadeDescription) == sizeof(SameSizeAsFontCascadeDescription), "FontCascadeDescription should stay small");
 
 FontCascadeDescription::FontCascadeDescription()
-    : m_families(RefCountedFixedVector<AtomString>::create(1))
+    : m_families(RefCountedFixedVector<FontFamily>::create(1))
     , m_isAbsoluteSize(false)
     , m_kerning(std::to_underlying(Kerning::Auto))
     , m_keywordSize(0)
@@ -104,7 +104,7 @@ bool FontCascadeDescription::familiesEqualForTextAutoSizing(const FontCascadeDes
         return false;
 
     for (unsigned i = 0; i < thisFamilyCount; ++i) {
-        if (!familyNamesAreEqual(familyAt(i), other.familyAt(i)))
+        if (!familyNamesAreEqual(familyAt(i).name, other.familyAt(i).name))
             return false;
     }
 
@@ -166,7 +166,7 @@ TextStream& operator<<(TextStream& ts, const FontCascadeDescription& fontCascade
     for (auto& family : fontCascadeDescription.families()) {
         if (!first)
             ts << ", "_s;
-        ts << family;
+        ts << family.name;
         first = false;
     }
 

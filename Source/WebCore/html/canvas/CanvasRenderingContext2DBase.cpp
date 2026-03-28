@@ -400,7 +400,7 @@ String CanvasRenderingContext2DBase::State::fontString() const
     serializedFont.append(font.computedSize(), "px"_s);
 
     for (unsigned i = 0; i < font.familyCount(); ++i) {
-        StringView family = font.familyAt(i);
+        StringView family = font.familyAt(i).name;
         if (family.startsWith("-webkit-"_s))
             family = family.substring(8);
 

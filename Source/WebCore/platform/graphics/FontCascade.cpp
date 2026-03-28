@@ -500,7 +500,7 @@ bool FontCascade::hasValidAverageCharWidth() const
 {
     ASSERT(isMainThread());
 
-    const AtomString& family = firstFamily();
+    const auto& family = firstFamily().name;
     if (family.isEmpty())
         return false;
 
@@ -1345,7 +1345,7 @@ bool FontCascade::isLoadingCustomFonts() const
 
 bool FontCascade::computeUseBackslashAsYenSymbol() const
 {
-    return protect(FontCache::forCurrentThread())->useBackslashAsYenSignForFamily(m_fontDescription.firstFamily());
+    return protect(FontCache::forCurrentThread())->useBackslashAsYenSignForFamily(m_fontDescription.firstFamily().name);
 }
 
 enum class GlyphUnderlineType : uint8_t {
