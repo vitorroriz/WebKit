@@ -17,6 +17,7 @@ class CWasmTestCase(BaseTestCase):
                 self.inspectionTest()
                 self.stepTest()
                 self.memoryTest()
+                self.memoryReadWriteTest()
                 self.detachTest()
                 self.quitTest()
 
@@ -249,6 +250,17 @@ class CWasmTestCase(BaseTestCase):
             patterns=["[0x0000000000000000-0x0000000001010000) rw- wasm_memory_0_0"],
         )
 
+    def memoryReadWriteTest(self):
+        self.send_lldb_command_or_raise("memory write 0x1000 0x42 0x43 0x44 0x45", patterns=[])
+        self.send_lldb_command_or_raise("memory read -c 4 0x1000", patterns=["0x00001000: 42 43 44 45"])
+
+        self.send_lldb_command_or_raise("memory write 0x0000000001000000 0x46", patterns=[])
+        self.send_lldb_command_or_raise("memory read -c 1 0x0000000001000000", patterns=["0x01000000: 46"])
+
+        self.send_lldb_command_or_raise("memory write 0x0000000001010000 0x00", patterns=["error:"])
+        self.send_lldb_command_or_raise("memory write 0x4000000000000000 0x00", patterns=["error:"])
+        self.send_lldb_command_or_raise("memory write 0x40000000000014e0 0x00", patterns=["error:"])
+
     def detachTest(self):
         self.send_lldb_command_or_raise(
             "detach",
@@ -276,6 +288,7 @@ class SwiftWasmTestCase(BaseTestCase):
                 self.inspectionTest()
                 self.stepTest()
                 self.memoryTest()
+                self.memoryReadWriteTest()
                 self.variableTest()
 
         except Exception as e:
@@ -497,6 +510,17 @@ class SwiftWasmTestCase(BaseTestCase):
             "mem reg 0x0000000000000000",
             patterns=["[0x0000000000000000-0x0000000000130000) rw- wasm_memory_0_0"],
         )
+
+    def memoryReadWriteTest(self):
+        self.send_lldb_command_or_raise("memory write 0x1000 0xde 0xad 0xbe 0xef", patterns=[])
+        self.send_lldb_command_or_raise("memory read -c 4 0x1000", patterns=["0x00001000: de ad be ef"])
+
+        self.send_lldb_command_or_raise("memory write 0x0000000000120000 0xab", patterns=[])
+        self.send_lldb_command_or_raise("memory read -c 1 0x0000000000120000", patterns=["0x00120000: ab"])
+
+        self.send_lldb_command_or_raise("memory write 0x0000000000130000 0x00", patterns=["error:"])
+        self.send_lldb_command_or_raise("memory write 0x4000000000000000 0x00", patterns=["error:"])
+        self.send_lldb_command_or_raise("memory write 0x40000000006b1239 0x00", patterns=["error:"])
 
     def variableTest(self):
         self.send_lldb_command_or_raise("b isEven")
