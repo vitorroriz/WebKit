@@ -876,13 +876,13 @@ SDPStringBuilder::SDPStringBuilder(const GstSDPMessage* sdp)
     }
 
     if (auto name = CStringView::unsafeFromUTF8(gst_sdp_message_get_session_name(sdp)))
-        m_stringBuilder.append("s="_s, name.span(), CRLF);
+        m_stringBuilder.append("s="_s, name, CRLF);
 
     if (auto info = CStringView::unsafeFromUTF8(gst_sdp_message_get_information(sdp)))
-        m_stringBuilder.append("i="_s, info.span(), CRLF);
+        m_stringBuilder.append("i="_s, info, CRLF);
 
     if (auto uri = CStringView::unsafeFromUTF8(gst_sdp_message_get_uri(sdp)))
-        m_stringBuilder.append("u="_s, uri.span(), CRLF);
+        m_stringBuilder.append("u="_s, uri, CRLF);
 
     unsigned totalEmails = gst_sdp_message_emails_len(sdp);
     for (unsigned i = 0; i < totalEmails; i++)

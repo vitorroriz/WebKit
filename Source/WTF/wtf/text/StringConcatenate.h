@@ -159,14 +159,6 @@ private:
     std::span<const CharacterType> m_characters;
 };
 
-template<> class StringTypeAdapter<CString> : public StringTypeAdapter<std::span<const char>> {
-public:
-    StringTypeAdapter(const CString& string)
-        : StringTypeAdapter<std::span<const char>> { spanReinterpretCast<const char>(string.span()) }
-    {
-    }
-};
-
 template<> class StringTypeAdapter<ASCIILiteral> : public StringTypeAdapter<std::span<const Latin1Character>> {
 public:
     StringTypeAdapter(ASCIILiteral characters)
@@ -175,10 +167,19 @@ public:
     }
 };
 
-template<typename CharacterType, size_t InlineCapacity> class StringTypeAdapter<Vector<CharacterType, InlineCapacity>> : public StringTypeAdapter<std::span<const CharacterType>> {
+template<typename ClassType>
+using SpanMemberFunctionReturnTypeElementType = typename decltype(std::declval<ClassType>().span())::element_type;
+
+template<typename ClassType> concept HasAdaptableSpanMemberFunction = requires {
+    requires StringTypeAdaptable<SpanMemberFunctionReturnTypeElementType<ClassType>>;
+};
+
+template<typename ClassType>
+    requires HasAdaptableSpanMemberFunction<ClassType>
+class StringTypeAdapter<ClassType> : public StringTypeAdapter<std::span<SpanMemberFunctionReturnTypeElementType<ClassType>>> {
 public:
-    StringTypeAdapter(const Vector<CharacterType, InlineCapacity>& vector)
-        : StringTypeAdapter<std::span<const CharacterType>> { vector.span() }
+    StringTypeAdapter(const ClassType& characters)
+        : StringTypeAdapter<std::span<SpanMemberFunctionReturnTypeElementType<ClassType>>> { characters.span() }
     {
     }
 };
