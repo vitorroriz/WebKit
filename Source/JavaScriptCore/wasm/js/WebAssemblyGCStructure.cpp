@@ -26,10 +26,12 @@
 #include "config.h"
 #include "WebAssemblyGCStructure.h"
 
+#include "AbstractSlotVisitorInlines.h"
 #include "DeferGC.h"
 #include "JSCInlines.h"
 #include "JSWebAssemblyArray.h"
 #include "JSWebAssemblyStruct.h"
+#include "SlotVisitorInlines.h"
 #include "WasmFormat.h"
 
 #if ENABLE(WEBASSEMBLY)
@@ -106,6 +108,36 @@ WebAssemblyGCStructure* WebAssemblyGCStructure::create(VM& vm, const TypeInfo& t
         return newStructure;
     });
 }
+
+void WebAssemblyGCStructure::finishCreation(VM& vm)
+{
+    Structure::finishCreation(vm);
+
+    // The RTT display stores ancestors at indices 0..displaySize-1 and |this| at index displaySize.
+    // Mirror that layout in the inlined type display with StructureIDs.
+    unsigned displaySize = m_rtt->displaySizeExcludingThis();
+    unsigned actualDisplaySize = displaySize + 1; // +1 for |this|
+    unsigned count = std::min(actualDisplaySize, inlinedDisplaySize);
+    for (unsigned i = 0; i < count; ++i) {
+        RefPtr entryRTT = m_rtt->displayEntry(i);
+        auto* structure = this;
+        if (entryRTT != m_rtt.ptr())
+            structure = vm.wasmGCStructureMap.get(entryRTT);
+        RELEASE_ASSERT(structure);
+        m_inlinedDisplay[i].set(vm, this, structure);
+    }
+}
+
+template<typename Visitor>
+void WebAssemblyGCStructure::visitAdditionalChildren(JSCell* cell, Visitor& visitor)
+{
+    WebAssemblyGCStructure* thisObject = jsCast<WebAssemblyGCStructure*>(cell);
+    for (auto& slot : thisObject->m_inlinedDisplay)
+        visitor.append(slot);
+}
+
+template void WebAssemblyGCStructure::visitAdditionalChildren(JSCell*, AbstractSlotVisitor&);
+template void WebAssemblyGCStructure::visitAdditionalChildren(JSCell*, SlotVisitor&);
 
 } // namespace JSC
 

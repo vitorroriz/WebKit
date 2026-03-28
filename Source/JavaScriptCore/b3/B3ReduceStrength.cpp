@@ -3995,7 +3995,11 @@ private:
             auto replaceWithNullTrapping = [&] {
                 auto flags = cast->flags();
                 flags.remove(WasmRefTypeCheckFlag::AllowNull);
-                SUPPRESS_UNCOUNTED_ARG Value* newValue = m_insertionSet.insert<WasmRefTypeCheckValue>(m_index, trapping(WasmRefCast), Int64, cast->origin(), cast->targetHeapType(), flags, cast->targetRTT(), cast->child(0));
+                SUPPRESS_UNCOUNTED_ARG Value* newValue;
+                if (cast->hasTargetStructureID())
+                    newValue = m_insertionSet.insert<WasmRefTypeCheckValue>(m_index, trapping(WasmRefCast), Int64, cast->origin(), cast->targetHeapType(), flags, cast->targetRTT(), cast->child(0), cast->child(1));
+                else
+                    newValue = m_insertionSet.insert<WasmRefTypeCheckValue>(m_index, trapping(WasmRefCast), Int64, cast->origin(), cast->targetHeapType(), flags, cast->targetRTT(), cast->child(0));
                 replaceWithIdentity(newValue);
             };
 

@@ -27,6 +27,7 @@
 
 #include <JavaScriptCore/Structure.h>
 #include <JavaScriptCore/WasmTypeDefinition.h>
+#include <JavaScriptCore/WriteBarrier.h>
 #include <wtf/Platform.h>
 #include <wtf/ReferenceWrapperVector.h>
 
@@ -80,12 +81,21 @@ public:
 
     static constexpr ptrdiff_t offsetOfRTT() { return OBJECT_OFFSETOF(WebAssemblyGCStructure, m_rtt); }
 
+    static constexpr unsigned inlinedDisplaySize = Wasm::RTT::inlinedDisplaySize;
+    static constexpr ptrdiff_t offsetOfInlinedDisplay() { return OBJECT_OFFSETOF(WebAssemblyGCStructure, m_inlinedDisplay); }
+
+    template<typename Visitor>
+    static void visitAdditionalChildren(JSCell*, Visitor&);
+
 private:
     WebAssemblyGCStructure(VM&, const TypeInfo&, const ClassInfo*, Ref<const Wasm::TypeDefinition>&& unexpandedType, Ref<const Wasm::TypeDefinition>&& expandedType, Ref<const Wasm::RTT>&&);
+
+    void finishCreation(VM&);
 
     const Ref<const Wasm::RTT> m_rtt;
     const Ref<const Wasm::TypeDefinition> m_type;
     WebAssemblyGCStructureTypeDependencies m_typeDependencies;
+    std::array<WriteBarrierStructureID, inlinedDisplaySize> m_inlinedDisplay { };
 };
 
 } // namespace JSC

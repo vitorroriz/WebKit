@@ -1393,8 +1393,21 @@ void Structure::visitChildrenImpl(JSCell* cell, Visitor& visitor)
     else if (thisObject->m_propertyTableUnsafe)
         thisObject->m_propertyTableUnsafe.clear();
 
-    if (thisObject->isBrandedStructure())
+    switch (thisObject->variant()) {
+    case StructureVariant::Normal:
+        break;
+    case StructureVariant::Branded:
         BrandedStructure::visitAdditionalChildren(cell, visitor);
+        break;
+    case StructureVariant::WebAssemblyGC:
+#if ENABLE(WEBASSEMBLY)
+        WebAssemblyGCStructure::visitAdditionalChildren(cell, visitor);
+        break;
+#endif
+    default:
+        RELEASE_ASSERT_NOT_REACHED();
+        break;
+    }
 
     // Mark only in non Full collection. In full collection, we handle it as a weak-link.
     if (!(visitor.heap()->collectionScope() == CollectionScope::Full)) {
