@@ -2253,4 +2253,134 @@ TEST(WTF_Vector, RangeToMoveOnly)
     EXPECT_EQ(7U, dest[2].value());
 }
 
+TEST(WTF_Vector, FillAliasingGrowth)
+{
+    // Test that fill() works correctly when val references an element in the
+    // vector and the fill triggers reallocation (clear + reserveCapacity).
+    Vector<String> v = { "a"_s, "b"_s, "c"_s };
+    v.fill(v[1], 10);
+    EXPECT_EQ(10U, v.size());
+    for (size_t i = 0; i < v.size(); ++i)
+        EXPECT_EQ("b"_s, v[i]);
+}
+
+TEST(WTF_Vector, FillAliasingShrink)
+{
+    // Test that fill() works correctly when val references an element that
+    // would be destroyed by shrink (index >= newSize).
+    Vector<String> v = { "a"_s, "b"_s, "c"_s, "d"_s, "e"_s };
+    v.fill(v[4], 3);
+    EXPECT_EQ(3U, v.size());
+    for (size_t i = 0; i < v.size(); ++i)
+        EXPECT_EQ("e"_s, v[i]);
+}
+
+TEST(WTF_Vector, FillAliasingNoReallocation)
+{
+    // Test that fill() works when val aliases an element and newSize fits
+    // within existing capacity.
+    Vector<String> v;
+    v.reserveCapacity(10);
+    v.append("a"_s);
+    v.append("b"_s);
+    v.append("c"_s);
+    v.fill(v[2], 5);
+    EXPECT_EQ(5U, v.size());
+    for (size_t i = 0; i < v.size(); ++i)
+        EXPECT_EQ("c"_s, v[i]);
+}
+
+TEST(WTF_Vector, FillAliasingSameSize)
+{
+    Vector<String> v = { "x"_s, "y"_s, "z"_s };
+    v.fill(v[0]);
+    EXPECT_EQ(3U, v.size());
+    for (size_t i = 0; i < v.size(); ++i)
+        EXPECT_EQ("x"_s, v[i]);
+}
+
+TEST(WTF_Vector, InsertFillAliasingWithReallocation)
+{
+    // Test that insertFill() works correctly when data references an element
+    // in the vector and the insertion triggers reallocation.
+    Vector<String> v;
+    v.reserveInitialCapacity(3);
+    v.append("a"_s);
+    v.append("b"_s);
+    v.append("c"_s);
+    EXPECT_EQ(3U, v.capacity());
+
+    // This must trigger reallocation since size + 2 > capacity.
+    v.insertFill(1, v[2], 2);
+    EXPECT_EQ(5U, v.size());
+    EXPECT_EQ("a"_s, v[0]);
+    EXPECT_EQ("c"_s, v[1]);
+    EXPECT_EQ("c"_s, v[2]);
+    EXPECT_EQ("b"_s, v[3]);
+    EXPECT_EQ("c"_s, v[4]);
+}
+
+TEST(WTF_Vector, InsertFillAliasingElementAfterPosition)
+{
+    // Test that insertFill() works correctly when data references an element
+    // at index >= position. Without the fix, moveOverlapping shifts the
+    // element and the reference reads the wrong value.
+    Vector<String> v;
+    v.reserveCapacity(10);
+    v.append("a"_s);
+    v.append("b"_s);
+    v.append("c"_s);
+    v.append("d"_s);
+
+    // Insert 2 copies of v[3]="d" at position 1. moveOverlapping shifts
+    // v[1..3] to v[3..5], which overwrites v[3].
+    v.insertFill(1, v[3], 2);
+    EXPECT_EQ(6U, v.size());
+    EXPECT_EQ("a"_s, v[0]);
+    EXPECT_EQ("d"_s, v[1]);
+    EXPECT_EQ("d"_s, v[2]);
+    EXPECT_EQ("b"_s, v[3]);
+    EXPECT_EQ("c"_s, v[4]);
+    EXPECT_EQ("d"_s, v[5]);
+}
+
+TEST(WTF_Vector, InsertFillAliasingElementAtPosition)
+{
+    // Test that insertFill() works when data references an element in the
+    // gap [position, position+dataSize) that gets moved/destructed.
+    Vector<String> v;
+    v.reserveCapacity(10);
+    v.append("a"_s);
+    v.append("b"_s);
+    v.append("c"_s);
+
+    // Insert 2 copies of v[1]="b" at position 1.
+    v.insertFill(1, v[1], 2);
+    EXPECT_EQ(5U, v.size());
+    EXPECT_EQ("a"_s, v[0]);
+    EXPECT_EQ("b"_s, v[1]);
+    EXPECT_EQ("b"_s, v[2]);
+    EXPECT_EQ("b"_s, v[3]);
+    EXPECT_EQ("c"_s, v[4]);
+}
+
+TEST(WTF_Vector, InsertFillAliasingElementBeforePosition)
+{
+    // Elements before position are not shifted, so aliasing should be safe
+    // even without the fix. Verify it still works.
+    Vector<String> v;
+    v.reserveCapacity(10);
+    v.append("a"_s);
+    v.append("b"_s);
+    v.append("c"_s);
+
+    v.insertFill(2, v[0], 2);
+    EXPECT_EQ(5U, v.size());
+    EXPECT_EQ("a"_s, v[0]);
+    EXPECT_EQ("b"_s, v[1]);
+    EXPECT_EQ("a"_s, v[2]);
+    EXPECT_EQ("a"_s, v[3]);
+    EXPECT_EQ("c"_s, v[4]);
+}
+
 } // namespace TestWebKitAPI

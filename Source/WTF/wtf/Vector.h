@@ -1158,6 +1158,10 @@ bool Vector<T, inlineCapacity, OverflowHandler, minCapacity, Malloc>::removeFirs
 template<typename T, size_t inlineCapacity, typename OverflowHandler, size_t minCapacity, typename Malloc>
 void Vector<T, inlineCapacity, OverflowHandler, minCapacity, Malloc>::fill(const T& val, size_t newSize)
 {
+    // Copy val before mutating the vector, since val may reference an element
+    // within this vector that could be invalidated by shrink/clear/reallocation.
+    T valCopy(val);
+
     if (size() > newSize)
         shrink(newSize);
     else if (newSize > capacity()) {
@@ -1168,8 +1172,8 @@ void Vector<T, inlineCapacity, OverflowHandler, minCapacity, Malloc>::fill(const
 
     asanBufferSizeWillChangeTo(newSize);
 
-    std::ranges::fill(*this, val);
-    TypeOperations::uninitializedFill(end(), begin() + newSize, val);
+    std::ranges::fill(*this, valCopy);
+    TypeOperations::uninitializedFill(end(), begin() + newSize, valCopy);
     m_size = newSize;
 }
 
@@ -1619,6 +1623,11 @@ inline void Vector<T, inlineCapacity, OverflowHandler, minCapacity, Malloc>::ins
 template<typename T, size_t inlineCapacity, typename OverflowHandler, size_t minCapacity, typename Malloc>
 void Vector<T, inlineCapacity, OverflowHandler, minCapacity, Malloc>::insertFill(size_t position, const T& data, size_t dataSize)
 {
+    // Copy data before mutating the vector, since data may reference an element
+    // within this vector that could be invalidated by reallocation or the
+    // moveOverlapping shift.
+    T dataCopy(data);
+
     size_t newSize = m_size + dataSize;
     if (newSize > capacity()) {
         expandCapacity<FailureAction::Crash>(newSize);
@@ -1629,7 +1638,7 @@ void Vector<T, inlineCapacity, OverflowHandler, minCapacity, Malloc>::insertFill
     asanBufferSizeWillChangeTo(newSize);
     T* spot = mutableSpan().subspan(position).data();
     TypeOperations::moveOverlapping(spot, end(), spot + dataSize);
-    TypeOperations::uninitializedFill(spot, spot + dataSize, data);
+    TypeOperations::uninitializedFill(spot, spot + dataSize, dataCopy);
     m_size = newSize;
 }
 
